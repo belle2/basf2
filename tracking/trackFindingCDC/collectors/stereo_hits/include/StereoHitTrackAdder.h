@@ -8,16 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/collectors/base/FirstMatchCollector.h>
-#include <tracking/trackFindingCDC/collectors/base/BestMatchCollector.h>
-#include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackAdder.h>
-#include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackMatcher.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
 #include <vector>
 #include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    using StereoHitCollector = BestMatchCollector<StereoHitTrackMatcher, StereoHitTrackAdder>;
+    class CDCTrack;
+    class CDCRLTaggedWireHit;
+
+    /** Class to add the matched hits to the track and set the taken flag correctly. */
+    class StereoHitTrackAdder {
+    public:
+      /** Add the matched hits to the track and set the taken flag correctly. We ignore the weight completely here. */
+      static void add(CDCTrack& track, const std::vector<WithWeight<const CDCRLTaggedWireHit*>>& matchedHits);
+    };
   }
 }

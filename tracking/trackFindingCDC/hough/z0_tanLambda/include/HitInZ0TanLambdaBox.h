@@ -30,7 +30,7 @@ namespace Belle2 {
        *  Checks if the wire hit is contained in a z0 tan lambda hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
-      inline Weight operator()(const CDCRecoHit3D& recoHit,
+      inline Weight operator()(const std::pair<CDCRecoHit3D, const CDCRLTaggedWireHit*>& recoHit,
                                const HoughBox* z0TanLambdaBox)
       {
         const float& lowerZ0 = z0TanLambdaBox->getLowerZ0();
@@ -39,8 +39,8 @@ namespace Belle2 {
         const float& lowerTanLambda = z0TanLambdaBox->getLowerTanLambda();
         const float& upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
 
-        const float& perpS = recoHit->getArcLength2D();
-        const float& reconstructedZ = recoHit->getRecoZ();
+        const float& perpS = recoHit.first->getArcLength2D();
+        const float& reconstructedZ = recoHit.first->getRecoZ();
 
         const float& distLowerZ0LowerTanLambda = perpS * lowerTanLambda - reconstructedZ + lowerZ0;
         const float& distUpperZ0LowerTanLambda = perpS * lowerTanLambda - reconstructedZ + upperZ0;

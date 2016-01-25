@@ -8,16 +8,27 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/collectors/base/FirstMatchCollector.h>
-#include <tracking/trackFindingCDC/collectors/base/BestMatchCollector.h>
-#include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackAdder.h>
-#include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackMatcher.h>
-
+#include <map>
 #include <vector>
-#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    using StereoHitCollector = BestMatchCollector<StereoHitTrackMatcher, StereoHitTrackAdder>;
+    template<class FromItem, class ToItem>
+    class MapOfList : public std::map<FromItem, std::vector<ToItem>> {
+    private:
+      typedef typename std::map<FromItem, std::vector<ToItem>> Super;
+    public:
+      void emplaceOrAppend(FromItem fromItem, ToItem newToItem)
+      {
+        if (Super::find(fromItem) != Super::end()) {
+          Super::operator [](fromItem).push_back(newToItem);
+        } else {
+          std::vector<ToItem> newToItemList;
+          newToItemList.reserve(5);
+          newToItemList.push_back(newToItem);
+          Super::emplace(fromItem, newToItemList);
+        }
+      }
+    };
   }
 }

@@ -18,15 +18,12 @@ StereoHitFinderCDCLegendreHistogrammingModule::StereoHitFinderCDCLegendreHistogr
 
   ModuleParamList moduleParamList = this->getParamList();
   m_stereohitsCollector.exposeParameters(&moduleParamList);
-
-  addParam("useOldImplementation", m_param_useOldImplementation, "Use the old implementation.", m_param_useOldImplementation);
 }
 
 /** Initialize the stereo quad trees */
 void StereoHitFinderCDCLegendreHistogrammingModule::initialize()
 {
   m_stereohitsCollector.initialize();
-  m_stereohitsProcessor.initialize();
   TrackFinderCDCBaseModule::initialize();
 }
 
@@ -34,39 +31,31 @@ void StereoHitFinderCDCLegendreHistogrammingModule::initialize()
 void StereoHitFinderCDCLegendreHistogrammingModule::terminate()
 {
   m_stereohitsCollector.terminate();
-  m_stereohitsProcessor.terminate();
   TrackFinderCDCBaseModule::terminate();
 }
 
 void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
-  if (m_param_useOldImplementation) {
-    for (CDCTrack& track : tracks) {
-      m_stereohitsProcessor.addStereoHitsWithQuadTree(track);
-      m_stereohitsProcessor.postprocessTrack(track);
+  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+  const std::vector<CDCWireHit>& wireHits = wireHitTopology.getWireHits();
+  std::vector<CDCRLTaggedWireHit> rlTaggedWireHits;
+  rlTaggedWireHits.reserve(2 * wireHits.size());
+  for (const CDCWireHit& wireHit : wireHits) {
+    for (ERightLeft rlInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
+      rlTaggedWireHits.emplace_back(&wireHit, rlInfo);
     }
-  } else {
-    const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-    const std::vector<CDCWireHit>& wireHits = wireHitTopology.getWireHits();
-    std::vector<CDCRLTaggedWireHit> rlTaggedWireHits;
-    rlTaggedWireHits.reserve(2 * wireHits.size());
-    for (const CDCWireHit& wireHit : wireHits) {
-      for (ERightLeft rlInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
-        rlTaggedWireHits.emplace_back(&wireHit, rlInfo);
-      }
-    }
+  }
 
-    m_stereohitsCollector.collect(tracks, rlTaggedWireHits);
+  m_stereohitsCollector.collect(tracks, rlTaggedWireHits);
 
-    for (CDCTrack& track : tracks) {
-      const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
+  for (CDCTrack& track : tracks) {
+    const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
 
-      track.shiftToPositiveArcLengths2D();
-      track.sortByArcLength2D();
+    track.shiftToPositiveArcLengths2D();
+    track.sortByArcLength2D();
 
-      const CDCTrajectorySZ& szTrajectory = szFitter.fitWithStereoHits(track);
-      CDCTrajectory3D newStartTrajectory(track.getStartTrajectory3D().getTrajectory2D(), szTrajectory);
-      track.setStartTrajectory3D(newStartTrajectory);
-    }
+    const CDCTrajectorySZ& szTrajectory = szFitter.fitWithStereoHits(track);
+    CDCTrajectory3D newStartTrajectory(track.getStartTrajectory3D().getTrajectory2D(), szTrajectory);
+    track.setStartTrajectory3D(newStartTrajectory);
   }
 }

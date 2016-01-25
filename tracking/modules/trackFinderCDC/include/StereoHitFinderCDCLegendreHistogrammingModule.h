@@ -1,7 +1,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitCollector.h>
-#include <tracking/trackFindingCDC/legendre/stereohits/StereoHitsProcesser.h>
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 #include <vector>
 
@@ -38,10 +37,6 @@ namespace Belle2 {
     void terminate() override;
 
   private:
-    /// Parameters
-    /// Use the old implementation
-    bool m_param_useOldImplementation = false;
-
     /**
      * Do a QuadTreeHistogramming with all the StereoHits.
      */
@@ -49,7 +44,6 @@ namespace Belle2 {
 
     /// Processor
     TrackFindingCDC::StereoHitCollector m_stereohitsCollector; /**< The stereo quad tree processor to use. */
-    TrackFindingCDC::StereoHitsProcesser m_stereohitsProcessor; /**< The stereo quad tree processor to use. */
   };
 
 }

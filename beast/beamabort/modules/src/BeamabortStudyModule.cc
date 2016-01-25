@@ -68,7 +68,7 @@ BeamabortStudyModule::~BeamabortStudyModule()
 void BeamabortStudyModule::defineHisto()
 {
   //Default values are set here. New values can be in BEAMABORT.xml.
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 8; i++) {
     h_dose[i] = new TH1F(TString::Format("h_dose_%d", i), "", 1000, 0., 1000.);
     h_amp[i] = new TH1F(TString::Format("h_amp_%d", i), "", 10000, 0., 10000.);
     h_Amp[i] = new TH1F(TString::Format("h_Amp_%d", i), "", 100000, 0., 100000.);
@@ -129,7 +129,7 @@ void BeamabortStudyModule::event()
     h_time[detNb]->Fill(time);
     h_vtime[detNb]->Fill(time, Amp * 1e15);
   }
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 8; i++) {
     if (curr[i] > 0 && Edep[i] > 0) {
       //cout << " Nb el " << curr[i]*1e15 << " edep " << Edep[i]*1e6 << endl;
       h_Amp[i]->Fill(curr[i] * 1e15);

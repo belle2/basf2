@@ -71,15 +71,15 @@ namespace Belle2 {
       double m_Ethres;
 
       /** Energy deposited vs TOF */
-      TH2F* h_qcsms_Evtof1[20];
+      TH2F* h_qcsms_Evtof1[50];
       /** Energy deposited vs TOF */
-      TH2F* h_qcsms_Evtof2[20];
+      TH2F* h_qcsms_Evtof2[50];
       /** Energy deposited vs TOF */
-      TH2F* h_qcsms_Evtof3[20];
+      TH2F* h_qcsms_Evtof3[50];
       /** Energy deposited vs TOF */
-      TH2F* h_qcsms_Evtof4[20];
+      TH2F* h_qcsms_Evtof4[50];
       /** Energy deposited */
-      TH1F* h_qcsms_edep[20];
+      TH1F* h_qcsms_edep[50];
 
     };
 

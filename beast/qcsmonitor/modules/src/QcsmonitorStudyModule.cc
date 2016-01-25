@@ -66,7 +66,7 @@ QcsmonitorStudyModule::~QcsmonitorStudyModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void QcsmonitorStudyModule::defineHisto()
 {
-  for (int i = 0; i < 20; i++) {
+  for (int i = 0; i < 50; i++) {
     h_qcsms_Evtof1[i] = new TH2F(TString::Format("h_qcsms_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 5000, 0., 1000.,
                                  1000, 0., 10.);
     h_qcsms_Evtof2[i] = new TH2F(TString::Format("h_qcsms_Evtof2_%d", i), "Energy deposited [MeV] vs TOF [ns] - only photons", 5000, 0.,

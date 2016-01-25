@@ -63,8 +63,6 @@ namespace Belle2 {
             // Insert a pointer to the cell into the path
             path.push_back(&cellHolder);
 
-            bool growMany = true;
-
             // Recursivly grow the path
             growAllPaths(path, cellHolderNeighborhood, paths);
             path.pop_back();

@@ -109,7 +109,7 @@ namespace Belle2 {
       using Super::Super;
 
       /// Constructor to view a collection of relations as a neighborhood.
-      WeightedNeighborhood(const std::vector<WeightedRelation<AItem> >& weightedRelations)
+      explicit WeightedNeighborhood(const std::vector<WeightedRelation<AItem> >& weightedRelations)
         : Super(weightedRelations.begin(), weightedRelations.end())
       {
       }

@@ -36,13 +36,13 @@ namespace Belle2 {
     public:
       /// Constructor to adapt a pair as returned by e.g. std::equal_range.
       template<class AOtherIterator>
-      SortedRange(const std::pair<AOtherIterator, AOtherIterator>& itPair)
+      explicit SortedRange(const std::pair<AOtherIterator, AOtherIterator>& itPair)
         : Super(AIterator(itPair.first), AIterator(itPair.second))
       {}
 
       /// Constructor from another range
       template<class Ts>
-      SortedRange(EnableIf<IsIterable<Ts>() == true, Ts&> ts)
+      explicit SortedRange(EnableIf<IsIterable<Ts>() == true, Ts&> ts)
         : Super(AIterator(std::begin(ts)), AIterator(std::end(ts)))
       {}
 

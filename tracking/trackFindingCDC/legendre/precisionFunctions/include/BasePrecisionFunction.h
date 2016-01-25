@@ -23,12 +23,7 @@ namespace Belle2 {
 
       typedef std::function< double(double)> PrecisionFunction;
 
-      BasePrecisionFunction()
-      {
-        m_function = [&](double __attribute__((unused)) r_qt) -> double {
-          return 0.3 / pow(2, 16);
-        };
-      };
+      BasePrecisionFunction() {};
 
       virtual ~BasePrecisionFunction() {};
 
@@ -42,7 +37,9 @@ namespace Belle2 {
 
     protected:
 
-      PrecisionFunction m_function;
+      PrecisionFunction m_function = [&](double __attribute__((unused)) r_qt) -> double {
+        return 0.3 / pow(2, 16);
+      };
 
 
     };

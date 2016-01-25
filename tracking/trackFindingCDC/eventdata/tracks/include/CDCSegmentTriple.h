@@ -32,7 +32,7 @@ namespace Belle2 {
                        const CDCAxialRecoSegment2D* endSegment);
 
       /// Constructor taking two axial segments leaving the middle stereo segment set to null pointer.
-      CDCSegmentTriple(const CDCAxialSegmentPair& segmentPair);
+      explicit CDCSegmentTriple(const CDCAxialSegmentPair& segmentPair);
 
       /// Constructor taking the three segments the triple shall be made of.
       CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,

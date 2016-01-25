@@ -38,7 +38,7 @@ namespace Belle2 {
     }
 
     /** Clone the measurement. */
-    virtual genfit::AbsMeasurement* clone() const {return new PlanarVXDMomentumMeasurement(*this);}
+    virtual genfit::AbsMeasurement* clone() const override {return new PlanarVXDMomentumMeasurement(*this);}
 
     /** Construct the measurement on the plane set in the parent element. */
     virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const override;

@@ -11,13 +11,15 @@
 #include <tracking/trackFindingCDC/collectors/base/FirstMatchCollector.h>
 #include <tracking/trackFindingCDC/collectors/base/BestMatchCollector.h>
 #include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackAdder.h>
-#include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackMatcher.h>
+
+#include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackMatcherFilter.h>
+#include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackMatcherQuadTree.h>
 
 #include <vector>
 #include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    using StereoHitCollector = BestMatchCollector<StereoHitTrackMatcher, StereoHitTrackAdder>;
+    using StereoHitCollector = BestMatchCollector<StereoHitTrackMatcherQuadTree, StereoHitTrackAdder>;
   }
 }

@@ -39,7 +39,7 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherFilter::
 
   /*
    * Use the given trajectory to reconstruct the 2d hits in the vector in z direction
-   * to match the trajectory perfectly. Then add the newly created reconstructed 3D hit to the given list.
+   * to match the trajectory perfectly. Then add the newly created reconstructed 3D hit to the matches, if the filter says "yes".
    */
   for (const CDCRLTaggedWireHit& rlWireHit : rlWireHits) {
     if (rlWireHit.getStereoKind() != EStereoKind::c_Axial and not rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag()) {

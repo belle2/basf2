@@ -27,9 +27,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
-    class CDCRecoHit3D;
     class CDCRLTaggedWireHit;
-    class CDCTrajectory2D;
 
     class StereoHitTrackMatcherFilter {
     public:
@@ -68,9 +66,13 @@ namespace Belle2 {
 
     private:
       /// Parameters
-      /// Set to false to skip the B2B check (good for curlers)
+      /// Set to false to skip the B2B check (good for curlers).
       bool m_param_checkForB2BTracks = true;
+
+      /// Use this filter factory.
       StereoHitFilterFactory m_filterFactory;
+
+      /// The filter factory will output this filter later.
       std::unique_ptr<BaseStereoHitFilter> m_stereoHitFilter;
     };
   }

@@ -13,7 +13,7 @@ def trimmed_std(array_like):
     contaminated by outliers using the interquanitle range times the appropriate factor.
     """
 
-    normal_iqr_to_std_factor = 2.0 * math.sqrt(2.0) * math.erf(0.5)
+    normal_iqr_to_std_factor = math.sqrt(2.0) * math.erf(0.5)
     return normal_iqr_to_std_factor * iqr(array_like)
 
 

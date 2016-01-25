@@ -76,12 +76,27 @@ namespace Belle2 {
         return m_filter->needsTruthInformation();
       }
 
+      /// Signal the beginning of a new run
+      virtual void beginRun() override
+      {
+        m_filter->beginRun();
+        Super::beginRun();
+      }
+
+
       /// Signal the beginning of a new event
       virtual void beginEvent() override
       {
         B2ASSERT("No filter was set up. Forgot to initialise the ChooseableFilter", m_filter);
         m_filter->beginEvent();
         Super::beginEvent();
+      }
+
+      /// Signal the end of a run
+      virtual void endRun() override
+      {
+        Super::endRun();
+        m_filter->endRun();
       }
 
       /// Initialize the recorder after event processing.

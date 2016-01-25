@@ -31,9 +31,10 @@ namespace Belle2 {
 
     public:
       /// Constructor of the filter.
-      explicit TMVAFilter(const std::string& defaultTrainingName = "") :
+      explicit TMVAFilter(const std::string& defaultTrainingName = "",
+                          double defaultCut = NAN) :
         Super(),
-        m_param_cut(NAN),
+        m_param_cut(defaultCut),
         m_param_weightFolder("data/tracking"),
         m_param_trainingName(defaultTrainingName),
         m_expert("data/tracking", defaultTrainingName)

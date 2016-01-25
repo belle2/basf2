@@ -13,6 +13,8 @@
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
+#include <framework/core/ModuleParamList.h>
+
 #include <memory>
 
 namespace Belle2 {
@@ -78,7 +80,8 @@ namespace Belle2 {
         if (m_ptrFilter and obj) {
           Weight cellWeight = (*m_ptrFilter)(*obj);
           this->template var<named("cell_weight")>() = cellWeight;
-          this->template var<named("is_cell")>() = not std::isnan(cellWeight);
+          this->template var<named("is_cell")>() =
+            not std::isnan(cellWeight) and not(cellWeight < m_cut);
           // Forward the nested result.
           return extracted;
         } else {
@@ -91,9 +94,49 @@ namespace Belle2 {
       virtual void initialize() override final
       {
         Super::initialize();
+
+        ModuleParamList moduleParamList;
+        m_ptrFilter->exposeParameters(&moduleParamList);
+
+        // try to find the TMVAFilter cut parameter and reset it such that we can set it ourself
+        try {
+          ModuleParam<double> cutParam = moduleParamList.getParameter<double>("cut");
+          m_cut = cutParam.getValue();
+          cutParam.setValue(NAN);
+        } catch (ModuleParamList::ModuleParameterNotFoundError) {
+          // Not found continue
+        }
+
         if (m_ptrFilter) {
           m_ptrFilter->initialize();
         }
+      }
+
+      /// Allow setup work to take place at beginning of new run
+      virtual void beginRun() override final
+      {
+        Super::beginRun();
+        if (m_ptrFilter) {
+          m_ptrFilter->beginRun();
+        }
+      }
+
+      /// Allow setup work to take place at beginning of new event
+      virtual void beginEvent() override final
+      {
+        Super::beginEvent();
+        if (m_ptrFilter) {
+          m_ptrFilter->beginEvent();
+        }
+      }
+
+      /// Allow clean up to take place at end of run
+      virtual void endRun() override final
+      {
+        if (m_ptrFilter) {
+          m_ptrFilter->endRun();
+        }
+        Super::endRun();
       }
 
       /// Terminate the filter after event processing
@@ -106,9 +149,11 @@ namespace Belle2 {
       }
 
     public:
+      /// The cut on the TMVA output.
+      double m_cut = NAN;
+
       /// Filter from which to generate weight as a variable set;
       std::unique_ptr<Filter> m_ptrFilter;
-
     };
   }
 }

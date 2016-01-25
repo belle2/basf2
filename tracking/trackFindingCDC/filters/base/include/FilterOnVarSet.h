@@ -41,6 +41,27 @@ namespace Belle2 {
         m_varSet.initialize();
       }
 
+      /// Allow setup work to take place at beginning of new run
+      virtual void beginRun() override final
+      {
+        Super::beginRun();
+        m_varSet.beginRun();
+      }
+
+      /// Allow setup work to take place at beginning of new event
+      virtual void beginEvent() override final
+      {
+        Super::beginEvent();
+        m_varSet.beginEvent();
+      }
+
+      /// Allow clean up to take place at end of run
+      virtual void endRun() override final
+      {
+        m_varSet.endRun();
+        Super::endRun();
+      }
+
       /// Initialize the filter after event processing.
       virtual void terminate() override
       {

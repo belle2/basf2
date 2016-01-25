@@ -24,7 +24,7 @@ namespace Belle2 {
    *   - Smarter Handling of segments (which is worse in the moment but should be better in general)
    *   - Make the precuts on the hits more transparent
    *  */
-  class StereoHitFinderCDCLegendreHistogrammingModule: public TrackFinderCDCBaseModule {
+  class StereoHitFinderCDCLegendreHistogrammingModule: public virtual TrackFinderCDCBaseModule {
 
   public:
     /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree. */

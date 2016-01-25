@@ -16,8 +16,9 @@ StereoHitFinderCDCLegendreHistogrammingModule::StereoHitFinderCDCLegendreHistogr
 {
   setDescription("Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree.");
 
-  ModuleParamList moduleParamList = this->getParamList();
-  m_stereohitsCollector.exposeParameters(&moduleParamList);
+  ModuleParamList paramList = this->getParamList();
+  m_stereohitsCollector.exposeParameters(&paramList);
+  setParamList(paramList);
 }
 
 /** Initialize the stereo quad trees */

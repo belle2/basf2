@@ -17,7 +17,7 @@ def peel_segment2d(segment, key="{part_name}"):
         size=size,
         superlayer_id=superlayer_id,
         supercluster_id=supercluster_id,
-        stereo_type=segment.getStereoType(),
+        stereo_kind=segment.getStereoKind(),
     )
 
     crops.update(trajectory2d_crops)

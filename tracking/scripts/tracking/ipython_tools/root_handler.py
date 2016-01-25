@@ -128,7 +128,7 @@ class TrackingValidationResult:
         import matplotlib.pyplot as plt
         grouped = self.grouped_by_pt_data(data)
 
-        self.plot(grouped.median().pt_truth, grouped.mean().is_matched)
+        self.plot(grouped.median().pt_truth, grouped.mean().is_matched, yerr=1 / np.sqrt(grouped.count().is_matched))
         plt.xlabel(r"$p_T$ of the MC tracks (in GeV)")
         plt.ylabel("Finding Efficiency")
 
@@ -136,7 +136,7 @@ class TrackingValidationResult:
         import matplotlib.pyplot as plt
         grouped = self.grouped_by_pt_data(data)
 
-        self.plot(grouped.median().pt_truth, grouped.mean().hit_efficiency)
+        self.plot(grouped.median().pt_truth, grouped.mean().hit_efficiency, yerr=1 / np.sqrt(grouped.sum().mc_number_of_hits))
         plt.xlabel(r"$p_T$ of the MC tracks (in GeV)")
         plt.ylabel("Hit Efficiency")
 

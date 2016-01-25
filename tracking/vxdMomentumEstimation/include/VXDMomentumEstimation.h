@@ -35,18 +35,26 @@ namespace Belle2 {
   public:
     /** Struct holding the parameters of the estimation function which maps dEdX to p. */
     struct FitParameters {
+      /// a Parameter
       double aE = 1.56173140e+07;
+      /// b Parameter
       double bE = -9.89192780e+03;
+      /// c Parameter
       double cE = 2.42177970e-02;
+      /// d Parameter
       double dE = 2.65702553e-08;
     };
 
     /** Struct holding the parameters of the correction function to map them median of the estimation
      * function to 0.  */
     struct CorrectionFitParameters {
+      /// a Parameter
       double aM = 0;
+      /// b Parameter
       double bM = 0;
+      /// c Parameter
       double cM = 0;
+      /// d Parameter
       double dM = 0;
     };
 

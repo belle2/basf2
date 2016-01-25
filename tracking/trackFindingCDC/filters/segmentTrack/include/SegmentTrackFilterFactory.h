@@ -34,6 +34,7 @@ namespace Belle2 {
       /** Fill the default filter name and parameter values*/
       FilterFactory<BaseSegmentTrackFilter>(const std::string& defaultFilterName = "simple") : Super(defaultFilterName) { }
 
+      /// Copy the create function from the parent class.
       using Super::create;
 
       /** Create a filter with the given name, does not set filter specific parameters. */
@@ -43,6 +44,7 @@ namespace Belle2 {
       virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
     };
 
+    /// Specialisation for the first step.
     class SegmentTrackFilterFirstStepFactory : public FilterFactory<BaseSegmentTrackFilter> {
 
     private:
@@ -53,6 +55,7 @@ namespace Belle2 {
       /** Fill the default filter name and parameter values*/
       SegmentTrackFilterFirstStepFactory(const std::string& defaultFilterName = "simple") : Super(defaultFilterName) { }
 
+      /// Copy the create function from the parent class.
       using Super::create;
 
       /** Getter for a descriptive purpose of the filter.*/
@@ -71,6 +74,7 @@ namespace Belle2 {
       }
     };
 
+    /// Specialisation for the second step.
     class SegmentTrackFilterSecondStepFactory : public FilterFactory<BaseSegmentTrackFilter> {
 
     private:
@@ -81,6 +85,7 @@ namespace Belle2 {
       /** Fill the default filter name and parameter values*/
       SegmentTrackFilterSecondStepFactory(const std::string& defaultFilterName = "simple") : Super(defaultFilterName) { }
 
+      /// Copy the create function from the parent class.
       using Super::create;
 
       /** Getter for a descriptive purpose of the filter.*/

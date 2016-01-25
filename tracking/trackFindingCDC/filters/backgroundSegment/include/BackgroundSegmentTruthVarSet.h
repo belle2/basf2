@@ -14,6 +14,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    /// Truth var set for finding background segments.
     class BackgroundSegmentTruthVarSet : public CDCRecoSegment2DTruthVarSet {
 
     public:

@@ -25,6 +25,7 @@ namespace Belle2 {
     class CDCTrajectory3D;
   }
 
+  /** Experimental testing module for handling segments in a quad tree instead of hits. Not to be used in production. */
   class SegmentQuadTreeModule : public TrackFinderCDCFromSegmentsModule {
 
   public:

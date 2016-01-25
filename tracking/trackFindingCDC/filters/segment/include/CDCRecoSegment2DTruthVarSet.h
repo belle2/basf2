@@ -34,6 +34,7 @@ namespace Belle2 {
       /// Number of variables to be generated.
       static const size_t nNames = 4;
 
+      /// Get the name of the corresponding column.
       constexpr
       static char const* getName(int iName)
       {

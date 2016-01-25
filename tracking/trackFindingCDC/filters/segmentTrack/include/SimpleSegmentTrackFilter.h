@@ -30,6 +30,7 @@ namespace Belle2 {
       SimpleSegmentTrackFilter() : Super() { }
 
     public:
+      /// Get the output of the filter.
       virtual Weight operator()(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>& testPair) override final;
 
     };

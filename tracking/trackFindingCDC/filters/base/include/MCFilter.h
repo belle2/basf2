@@ -18,12 +18,13 @@ namespace Belle2 {
     class MCFilter : public FilterOnVarSet<ATruthVarSet> {
 
     public:
-      /// Type of the super class
+      /// Type of the super class.
       typedef FilterOnVarSet<ATruthVarSet> Super;
+      /// Type of the handled object.
       typedef typename ATruthVarSet::Object Object;
 
     public:
-      /// Constructor
+      /// Constructor.
       MCFilter() : Super() { }
 
       /// Reject an item if the truth variable is 0, else accept it.

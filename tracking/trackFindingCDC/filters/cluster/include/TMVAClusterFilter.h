@@ -20,6 +20,7 @@ namespace Belle2 {
     class TMVAClusterFilter: public TMVAFilter<CDCWireHitClusterBasicVarSet> {
 
     public:
+      /// The super (parent) object.
       using Super = TMVAFilter<CDCWireHitClusterBasicVarSet>;
 
     public:

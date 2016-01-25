@@ -27,6 +27,10 @@ namespace Belle2 {
   class PlanarVXDMomentumMeasurement : public PlanarMomentumMeasurement {
 
   public:
+    /**
+     * Initialize the momentum measurement with a planar measurement as a parent, the corresponding hit and the reco track to
+     * get information from. The internal matrices are set accordingly.
+     */
     PlanarVXDMomentumMeasurement(const genfit::PlanarMeasurement& parentElement, HitType* hit, const Belle2::RecoTrack* recoTrack) :
       PlanarMomentumMeasurement(parentElement), m_hit(hit), m_recoTrack(recoTrack)
     {
@@ -192,14 +196,14 @@ namespace Belle2 {
     return {mop};
   }
 
-  /// Specialisation for PXD clusters.
+  /** Specialisation for PXD clusters. */
   template<>
   int PlanarVXDMomentumMeasurement<PXDCluster>::getDetId() const
   {
     return Belle2::Const::PXD;
   }
 
-  /// Specialisation for SVD clusters.
+  /** Specialisation for SVD clusters. */
   template<>
   int PlanarVXDMomentumMeasurement<SVDCluster>::getDetId() const
   {

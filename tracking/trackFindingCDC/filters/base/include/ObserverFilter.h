@@ -18,18 +18,19 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Observer listening to the number of yes and no answers from the filter
+    /// Observer listening to the number of yes and no answers from the filter.
     template<class ABaseFilter>
     class ObserverFilter : public ABaseFilter {
 
     private:
-      /// Type of the filter base class
+      /// Type of the filter base class.
       typedef ABaseFilter Super;
 
     public:
+      /// The base filter.
       using ABaseFilter::BaseFilter;
 
-      /// Object type to be filtered
+      /// Object type to be filtered.
       typedef typename ABaseFilter::Object Object;
 
     public:
@@ -64,7 +65,9 @@ namespace Belle2 {
       }
 
     private:
+      /// Number of counted yes answers.
       unsigned int m_yesAnswers = 0;
+      /// Number of counted no answers.
       unsigned int m_noAnswers = 0;
     };
   }

@@ -67,14 +67,14 @@ QcsmonitorStudyModule::~QcsmonitorStudyModule()
 void QcsmonitorStudyModule::defineHisto()
 {
   for (int i = 0; i < 50; i++) {
-    h_qcsms_Evtof1[i] = new TH2F(TString::Format("h_qcsms_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 5000, 0., 1000.,
-                                 1000, 0., 10.);
-    h_qcsms_Evtof2[i] = new TH2F(TString::Format("h_qcsms_Evtof2_%d", i), "Energy deposited [MeV] vs TOF [ns] - only photons", 5000, 0.,
-                                 1000., 1000, 0., 10.);
-    h_qcsms_Evtof3[i] = new TH2F(TString::Format("h_qcsms_Evtof3_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
-                                 1000., 1000, 0., 10.);
-    h_qcsms_Evtof4[i] = new TH2F(TString::Format("h_qcsms_Evtof4_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
-                                 1000., 1000, 0., 10.);
+    h_qcsms_Evtof1[i] = new TH2F(TString::Format("h_qcsms_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 500, 0., 1000.,
+                                 500, 0., 10.);
+    h_qcsms_Evtof2[i] = new TH2F(TString::Format("h_qcsms_Evtof2_%d", i), "Energy deposited [MeV] vs TOF [ns] - only photons", 500, 0.,
+                                 1000., 500, 0., 10.);
+    h_qcsms_Evtof3[i] = new TH2F(TString::Format("h_qcsms_Evtof3_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 500, 0.,
+                                 1000., 500, 0., 10.);
+    h_qcsms_Evtof4[i] = new TH2F(TString::Format("h_qcsms_Evtof4_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 500, 0.,
+                                 1000., 500, 0., 10.);
     h_qcsms_edep[i] = new TH1F(TString::Format("h_qcsms_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
   }
 }

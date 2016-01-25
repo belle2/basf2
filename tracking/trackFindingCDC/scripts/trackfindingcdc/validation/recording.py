@@ -17,11 +17,11 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
         argument_parser.add_argument(
             '-v',
             '--varset',
+            nargs="+",
             dest='varsets',
-            default=None,
-            action='append',
+            default=self.varsets,
             help=('Add a varset to the recording. Multiple repeatition adds more varsets.'
-                  'If not given use the default settings of the run: %s' % type(self).varsets)
+                  'If not given use the default settings of the run: %s' % self.varsets)
         )
 
         argument_parser.add_argument(

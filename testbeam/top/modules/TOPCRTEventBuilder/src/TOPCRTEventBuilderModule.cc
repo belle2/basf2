@@ -215,8 +215,15 @@ namespace Belle2 {
     vector<int> Buffer[4];
     for (int finesse = 0; finesse < 4; finesse++) {
       int size = rawTOP.GetDetectorNwords(0, finesse);
-      if (size < 2) continue;
+      if (size < 2) {
+        B2ERROR("RawTOP: data buffer is empty");
+        continue;
+      }
       int* data = rawTOP.GetDetectorBuffer(0, finesse);
+      if (data[size - 1] != 0x7473616c) {
+        B2ERROR("RawTOP: inconsistent magic trailer word -> data buffer dropped");
+        continue;
+      }
       int i0 = 0;
       if (data[0] == data[1]) i0 = 1;
       int word = swap32(data[i0 + 1]);
@@ -227,9 +234,6 @@ namespace Belle2 {
       Buffer[finesse].push_back(1); // number of gigE packets
       for (int i = i0; i < size - 1; i++) {
         Buffer[finesse].push_back(swap32(data[i]));
-      }
-      if (data[size - 1] != 0x7473616c) {
-        B2ERROR("RawTOP: inconsistent magic trailer word");
       }
     }
 

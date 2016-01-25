@@ -171,7 +171,7 @@ namespace Belle2 {
       {
         bool primary = I == GetIndexInTuple<IOType<I>, IOTypes>::value;
         int order = primary ? 1 : 2;
-        /// Cannot distinguish more than two different positions of the same type
+        // Cannot distinguish more than two different positions of the same type as of yet...
         bool input = std::is_const<IOType<I> >::value;
         using NonConstIOType = typename std::remove_const<IOType<I> >::type;
         std::string classParameterName = m_classMnemomics.getParameterName(static_cast<NonConstIOType*>(nullptr));
@@ -219,7 +219,7 @@ namespace Belle2 {
           inputPrefix[0] = ::toupper(inputPrefix.at(0));
         }
 
-        return orderPrefix + inputPrefix + classMnenomic + "Vector";
+        return orderPrefix + inputPrefix + classMnenomic + "s";
       }
 
       /** Compose a parameter description for the name of the vector on the DataStore.

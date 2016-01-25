@@ -183,7 +183,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
             trackCandHits = trackCand.getHitIDs(Belle2.Const.CDC)  # Checked
             # Working around a bug in ROOT where you should not access empty std::vectors
-            if len(cdcHitIDs) == 0:
+            if len(trackCandHits) == 0:
                 trackCandHits = set()
             else:
                 trackCandHits = set(trackCandHits)

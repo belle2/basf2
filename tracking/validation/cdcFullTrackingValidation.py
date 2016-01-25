@@ -18,6 +18,7 @@ import basf2
 basf2.set_random_seed(1337)
 
 import logging
+import tracking
 
 from tracking.validation.run import TrackingValidationRun
 
@@ -25,7 +26,12 @@ from tracking.validation.run import TrackingValidationRun
 class CDCFull(TrackingValidationRun):
     n_events = N_EVENTS
     generator_module = 'EvtGenInput'
-    finder_module = 'CDCFullFinder'
+    finder_module = staticmethod(tracking.add_cdc_track_finding)
+    tracking_coverage = {
+        'UsePXDHits': False,
+        'UseSVDHits': False,
+        'UseCDCHits': True,
+    }
     fit_geometry = None
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE
@@ -34,6 +40,7 @@ class CDCFull(TrackingValidationRun):
 def main():
     validation_run = CDCFull()
     validation_run.configure_and_execute_from_commandline()
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

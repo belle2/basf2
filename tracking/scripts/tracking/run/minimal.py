@@ -185,7 +185,11 @@ class MinimalRun(object):
 
     @classmethod
     def get_basf2_module_name(cls, module_or_module_name):
-        if isinstance(module_or_module_name, list):
+        if callable(module_or_module_name):
+            # finder module is a convenience function:
+            convenience_function = module_or_module_name
+            return convenience_function.__name__
+        elif isinstance(module_or_module_name, list):
             return "PathModule"
         elif isinstance(module_or_module_name, str):
             module_name = module_or_module_name

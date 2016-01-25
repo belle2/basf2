@@ -13,7 +13,6 @@ from tracking.metamodules import IfMCParticlesPresentModule
 import tracking.utilities as utilities
 
 import logging
-from trackfindingcdc.modules import add_cdc_tracking
 
 
 def get_logger():
@@ -93,7 +92,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                     'UseCDCHits': True,
                     'UseOnlyAxialCDCHits': True}
 
-        elif (finder_module_name in ('CDCLocalTracking', 'CDCFullFinder', 'Trasan') or
+        elif (finder_module_name in ('add_cdc_track_finding', 'CDCLocalTracking', 'CDCFullFinder', 'Trasan') or
                 finder_module_name.startswith('TrackFinderCDC')):
             return {'UsePXDHits': False,
                     'UseSVDHits': False,
@@ -106,7 +105,8 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                     'UseCDCHits': False,
                     'UseOnlyAxialCDCHits': False}
 
-        elif finder_module_name in ('StandardReco', 'StandardTrackingReconstruction'):
+        elif finder_module_name in ("add_tracking_reconstruction", 'StandardReco', 'StandardTrackingReconstruction'):
+            input("all")
             return {'UsePXDHits': 'PXD' in self.components,
                     'UseSVDHits': 'SVD' in self.components,
                     'UseCDCHits': 'CDC' in self.components,
@@ -157,41 +157,44 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
             # determine which sub-detector hits will be used
             tracking_coverage = self.determine_tracking_coverage(self.finder_module)
 
-            if tracking_coverage.get("UseCDCHits"):
+            if tracking_coverage.get("UseCDCHits") and "WireHitTopologyPreparer" not in main_path:
                 main_path.add_module("WireHitTopologyPreparer")
 
             if self.finder_module == 'StandardReco':
                 track_finder_module = StandardTrackingReconstructionModule(components=self.components)
                 main_path.add_module(track_finder_module)
 
-            elif self.finder_module == "CDCFullFinder":
-                track_finder_module = CDCFullFinder()
-                add_cdc_tracking(main_path)
+            elif callable(self.finder_module):
+                # finder module is a convenience function
+                self.finder_module(main_path)
 
             else:
                 track_finder_module = self.get_basf2_module(self.finder_module)
                 main_path.add_module(track_finder_module)
 
-            # Reference Monte Carlo tracks
-            track_finder_mc_truth_module = basf2.register_module('TrackFinderMCTruth')
-            track_finder_mc_truth_module.param({
-                'WhichParticles': ['primary'],
-                'EnergyCut': 0.1,
-                'GFTrackCandidatesColName': 'MCTrackCands'
-            })
-            track_finder_mc_truth_module.param(tracking_coverage)
-            main_path.add_module(IfMCParticlesPresentModule(track_finder_mc_truth_module))
+            has_matcher = False
+            # check for detector geometry, necessary for track extrapolation in genfit
+            if 'MCTrackMatcher' not in main_path and 'MCMatcherTracks' not in main_path:
+                # Reference Monte Carlo tracks
+                track_finder_mc_truth_module = basf2.register_module('TrackFinderMCTruth')
+                track_finder_mc_truth_module.param({
+                    'WhichParticles': ['primary'],
+                    'EnergyCut': 0.1,
+                    'GFTrackCandidatesColName': 'MCTrackCands'
+                })
+                track_finder_mc_truth_module.param(tracking_coverage)
+                main_path.add_module(IfMCParticlesPresentModule(track_finder_mc_truth_module))
 
-            # Track matcher
-            mc_track_matcher_module = basf2.register_module('MCTrackMatcher')
-            mc_track_matcher_module.param({
-                'MCGFTrackCandsColName': 'MCTrackCands',
-                'MinimalPurity': 0.66,
-                'RelateClonesToMCParticles': True,
-                'PRGFTrackCandsColName': self.trackCandidatesColumnName,
-            })
-            mc_track_matcher_module.param(tracking_coverage)
-            main_path.add_module(IfMCParticlesPresentModule(mc_track_matcher_module))
+                # Track matcher
+                mc_track_matcher_module = basf2.register_module('MCTrackMatcher')
+                mc_track_matcher_module.param({
+                    'MCGFTrackCandsColName': 'MCTrackCands',
+                    'MinimalPurity': 0.66,
+                    'RelateClonesToMCParticles': True,
+                    'PRGFTrackCandsColName': self.trackCandidatesColumnName,
+                })
+                mc_track_matcher_module.param(tracking_coverage)
+                main_path.add_module(IfMCParticlesPresentModule(mc_track_matcher_module))
 
         if self.fit_tracks:
             # Fit tracks

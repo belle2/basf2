@@ -26,7 +26,7 @@ evtnum = 10000
 usebkg = False
 simplext = False  # switch for CDCDigitizer simple / realistic x-t
 particlegun_params = {
-    'pdgCodes': [-13, -11, 11, 13],
+    'pdgCodes': [-13, 13],
     'nTracks': 1,
     'momentumGeneration': 'inversePt',
     'momentumParams': [0.3, 10.],
@@ -40,15 +40,6 @@ particlegun_params = {
     'zVertexParams': [-50.0, 50.0]}
 basf2datadir = os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None), 'data')
 bkgdir = '/sw/belle2/bkg/'
-# neurotrigger options
-mlpname = 'Neuro20150819'
-if simplext:
-    mlpname += 'Lin'
-else:
-    mlpname += 'Nonlin'
-if usebkg:
-    mlpname += 'Bkg'
-mlpname += '.root'
 # test options (z resolution is tested in different pt bins)
 ptedges = [0.3, 0.4, 0.5, 0.7, 1., 2., 10.]
 zcut = 6
@@ -109,7 +100,7 @@ main.add_module(trgcdc)
 neuro = basf2.register_module('NeuroTrigger')
 
 # define parameters
-neuro.param('filename', os.path.join(basf2datadir, "trg/cdc", mlpname))
+neuro.param('filename', os.path.join(basf2datadir, "trg/cdc/Neuro20160118Nonlin.root"))
 # output warnings, info and some debug output for neurotrigger module
 neuro.logging.log_level = basf2.LogLevel.DEBUG
 neuro.logging.debug_level = 80

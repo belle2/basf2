@@ -165,7 +165,7 @@ class PullAnalysis(object):
         estimates_by_truths_profile.xlabel = 'True ' + axis_label
         estimates_by_truths_profile.ylabel = 'Estimated ' + axis_label
         estimates_by_truths_profile.title = formatter.format(plot_title, subplot_title='Diagonal profile')
-        # estimates_by_truths_profile.fit_diag()
+        estimates_by_truths_profile.fit_diag()
 
         self.plots['diag_profile'] = estimates_by_truths_profile
 
@@ -207,7 +207,7 @@ class PullAnalysis(object):
             pulls_hist.hist(pulls, outlier_z_score=outlier_z_score)
             pulls_hist.xlabel = axis_label
             pulls_hist.title = formatter.format(plot_title, subplot_title='Pull distribution')
-            # pulls_hist.fit_gaus()
+            pulls_hist.fit_gaus()
 
             self.plots['pulls'] = pulls_hist
 
@@ -221,7 +221,7 @@ class PullAnalysis(object):
             p_values_hist.hist(p_values, lower_bound=0, upper_bound=1)
             p_values_hist.xlabel = axis_label
             p_values_hist.title = formatter.format(plot_title, subplot_title='P-value distribution')
-            # p_values_hist.fit_const()
+            p_values_hist.fit_const()
 
             self.plots['p_values'] = p_values_hist
 

@@ -309,6 +309,46 @@ class StandardEventGenerationRun(ReadOrGenerateEventsRun):
     generator_module = 'EvtGenInput'
 
 
+class IdempotentGeneratorRun(ReadOrGenerateEventsRun):
+    """
+    A special setup in which the given self.root_input_file is either used as input (if it is present)
+    or generated using the generator specified in self.generator_module (if it is not present).
+    Running the same run twice should one generate the events once and read them from the input file the
+    second time.
+
+    No matter if the file is generated or read, the modules specified in add_computation are evaluated
+    after the generation/read-in.
+    """
+
+    root_output_file = None
+
+    def add_computation(self, main_path):
+        return main_path
+
+    def create_path(self, *args, **kwargs):
+        if not self.root_input_file:
+            raise ValueError("root_input_file needs to be declared for this class!")
+
+        if not self.generator_module:
+            raise ValueError("generator_module needs to be declared for this class!")
+
+        if os.path.exists(self.root_input_file):
+            self.generator_module = None
+        else:
+            self.root_output_file = self.root_input_file
+            self.root_input_file = None
+            main_path = ReadOrGenerateEventsRun.create_path(self)
+
+        main_path = ReadOrGenerateEventsRun.create_path(self)
+
+        if self.root_output_file:
+            main_path.add_module("RootOutput", outputFileName=self.root_output_file)
+
+        main_path = self.add_computation(main_path, *args, **kwargs)
+
+        return main_path
+
+
 def main():
     readOrGenerateEventsRun = StandardEventGenerationRun()
 

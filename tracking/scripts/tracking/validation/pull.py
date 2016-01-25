@@ -207,7 +207,7 @@ class PullAnalysis(object):
             pulls_hist.hist(pulls, outlier_z_score=outlier_z_score)
             pulls_hist.xlabel = axis_label
             pulls_hist.title = formatter.format(plot_title, subplot_title='Pull distribution')
-            pulls_hist.fit_gaus()
+            pulls_hist.fit_gaus(z_score=1)
 
             self.plots['pulls'] = pulls_hist
 

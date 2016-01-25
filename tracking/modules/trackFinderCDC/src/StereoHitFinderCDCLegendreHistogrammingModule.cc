@@ -38,7 +38,7 @@ void StereoHitFinderCDCLegendreHistogrammingModule::terminate()
 void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  const std::vector<CDCWireHit>& wireHits = wireHitTopology.getWireHits();
+  const auto& wireHits = wireHitTopology.getWireHits();
   std::vector<CDCRLTaggedWireHit> rlTaggedWireHits;
   rlTaggedWireHits.reserve(2 * wireHits.size());
   for (const CDCWireHit& wireHit : wireHits) {

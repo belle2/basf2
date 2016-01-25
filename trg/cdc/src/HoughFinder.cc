@@ -1377,11 +1377,15 @@ TRGCDCHoughFinder::doFitting2(std::vector<TRGCDCTrack *> & trackList2D,
         //m_mSignalStorage["2Drr_3"].dump();
         //m_mSignalStorage["2Drr_4"].dump();
         // Name signals only once.
+	bool updateSecondName = false;
         if((*m_mSignalStorage.begin()).second.getName() == ""){
             for(auto it = m_mSignalStorage.begin(); it != m_mSignalStorage.end(); it++){
                 (*it).second.setName((*it).first);
             }
+	    updateSecondName = true;
+        }
 
+        if(updateSecondName){
             // Print Vhdl
             if((*m_mSignalStorage.begin()).second.getName() != ""){
                 if(_commonData->getPrintedToFile()==0){

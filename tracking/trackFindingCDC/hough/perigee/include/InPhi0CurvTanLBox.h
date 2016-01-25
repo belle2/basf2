@@ -118,7 +118,7 @@ namespace Belle2 {
         dist[0b110] = r2TimesHalfCurv[1] - yRotPlusL[0] - dydzRot[0] * z[0b11];
         dist[0b111] = r2TimesHalfCurv[1] - yRotPlusL[1] - dydzRot[1] * z[0b11];
 
-        return SameSignChecker::commonSign(dist);
+        return ESignUtil::common(dist);
       }
 
     private:

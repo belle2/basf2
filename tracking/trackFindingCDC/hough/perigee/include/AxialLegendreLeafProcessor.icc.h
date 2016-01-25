@@ -52,7 +52,7 @@ void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<ANode>::processLeaf(ANo
 
     const float& lowerCurv = *(curvs[0]);
     const float& upperCurv = *(curvs[1]);
-    if (SameSignChecker::commonSign(lowerCurv, upperCurv) * curv < 0) {
+    if (ESignUtil::common(lowerCurv, upperCurv) * curv < 0) {
       circle.reverse();
     }
   }

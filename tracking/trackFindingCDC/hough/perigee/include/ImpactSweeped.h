@@ -63,7 +63,7 @@ namespace Belle2 {
                                                        dxdz, dydz,
                                                        iCLayer);
 
-        return SameSignChecker::commonSign(lowerDistSign, upperDistSign);
+        return ESignUtil::common(lowerDistSign, upperDistSign);
       }
     };
   } // end namespace TrackFindingCDC

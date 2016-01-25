@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/ESign.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/GetValueType.h>
 

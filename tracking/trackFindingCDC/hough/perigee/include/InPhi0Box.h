@@ -70,7 +70,7 @@ namespace Belle2 {
         dist[0] = - yRotPlusL[0];
         dist[1] = - yRotPlusL[1];
 
-        return SameSignChecker::commonSign(dist[0], dist[1]);
+        return ESignUtil::common(dist[0], dist[1]);
       }
 
     private:

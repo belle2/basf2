@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/Box.h>
-#include <tracking/trackFindingCDC/numerics/Sign.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

@@ -32,17 +32,17 @@ TEST(TrackFindingCDCTest, numerics_sign)
   EXPECT_EQ(ESign::c_Minus, sign(-INFINITY));
   EXPECT_EQ(ESign::c_Invalid, sign(NAN));
 
-  EXPECT_TRUE(isValidSign(ESign::c_Plus));
-  EXPECT_TRUE(isValidSign(ESign::c_Minus));
-  EXPECT_TRUE(isValidSign(ESign::c_Zero));
+  EXPECT_TRUE(ESignUtil::isValid(ESign::c_Plus));
+  EXPECT_TRUE(ESignUtil::isValid(ESign::c_Minus));
+  EXPECT_TRUE(ESignUtil::isValid(ESign::c_Zero));
 
-  EXPECT_FALSE(isValidSign(ESign::c_Invalid));
-  EXPECT_FALSE(isValidSign(static_cast<ESign>(7)));
+  EXPECT_FALSE(ESignUtil::isValid(ESign::c_Invalid));
+  EXPECT_FALSE(ESignUtil::isValid(static_cast<ESign>(7)));
 
-  EXPECT_EQ(ESign::c_Minus, oppositeSign(ESign::c_Plus));
-  EXPECT_EQ(ESign::c_Plus, oppositeSign(ESign::c_Minus));
-  EXPECT_EQ(ESign::c_Zero, oppositeSign(ESign::c_Zero));
-  EXPECT_EQ(ESign::c_Invalid, oppositeSign(ESign::c_Invalid));
+  EXPECT_EQ(ESign::c_Minus, ESignUtil::opposite(ESign::c_Plus));
+  EXPECT_EQ(ESign::c_Plus, ESignUtil::opposite(ESign::c_Minus));
+  EXPECT_EQ(ESign::c_Zero, ESignUtil::opposite(ESign::c_Zero));
+  EXPECT_EQ(ESign::c_Invalid, ESignUtil::opposite(ESign::c_Invalid));
 }
 
 

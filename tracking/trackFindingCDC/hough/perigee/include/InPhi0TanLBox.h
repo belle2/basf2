@@ -82,7 +82,7 @@ namespace Belle2 {
         dist[0b10] = -(yRot[1] + dydzRot[1] * sCor[0b10] * static_cast<float>(tanL[0]) + l);
         dist[0b11] = -(yRot[1] + dydzRot[1] * sCor[0b11] * static_cast<float>(tanL[1]) + l);
 
-        return SameSignChecker::commonSign(dist);
+        return ESignUtil::common(dist);
       }
 
     private:

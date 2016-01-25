@@ -96,10 +96,10 @@ namespace Belle2 {
           dist[0b01] = - yRotMinusI[0b01] + r2MinusI[0b01] * curvHalf - l;
           dist[0b10] = - yRotMinusI[0b10] + r2MinusI[0b10] * curvHalf - l;
           dist[0b11] = - yRotMinusI[0b11] + r2MinusI[0b11] * curvHalf - l;
-          distSign[c_Curv] = SameSignChecker::commonSign(dist);
+          distSign[c_Curv] = ESignUtil::common(dist);
         }
 
-        return SameSignChecker::commonSign(distSign[0], distSign[1]);
+        return ESignUtil::common(distSign[0], distSign[1]);
 
       }
 

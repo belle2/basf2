@@ -87,7 +87,7 @@ namespace Belle2 {
                                                        upperDXDZ, upperDYDZ,
                                                        iCLayer);
 
-        return SameSignChecker::commonSign(lowerDistSign, upperDistSign);
+        return ESignUtil::common(lowerDistSign, upperDistSign);
       }
 
     private:

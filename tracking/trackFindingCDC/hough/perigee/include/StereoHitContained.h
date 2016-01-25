@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 
-#include <tracking/trackFindingCDC/numerics/Sign.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 
 namespace Belle2 {

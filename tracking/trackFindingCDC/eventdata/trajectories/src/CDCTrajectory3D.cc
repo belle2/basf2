@@ -189,7 +189,7 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) 
   ESign charge = getChargeSign();
 
   // Do not propagate invalid fits, signal that the fit is invalid to the caller.
-  if (not isValidSign(charge) or momentum.hasNAN() or position.hasNAN()) {
+  if (not ESignUtil::isValid(charge) or momentum.hasNAN() or position.hasNAN()) {
     // B2INFO("Charge " <<  charge);
     // B2INFO("Position " <<  position);
     // B2INFO("Local origin " <<  getLocalOrigin());

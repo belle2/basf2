@@ -7,19 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/facetRelation/CDCFacetRelationTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/TruthFacetRelationVarSet.h>
 #include <assert.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCFacetRelationTruthVarSet::CDCFacetRelationTruthVarSet(const std::string& prefix) :
-  VarSet<CDCFacetRelationTruthVarNames>(prefix)
+TruthFacetRelationVarSet::TruthFacetRelationVarSet(const std::string& prefix)
+  : Super(prefix)
 {
 }
 
-bool CDCFacetRelationTruthVarSet::extract(const Relation<const CDCFacet>* ptrFacetRelation)
+bool TruthFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRelation)
 {
   const CDCFacet* ptrFromFacet(ptrFacetRelation->getFrom());
   const CDCFacet* ptrToFacet(ptrFacetRelation->getTo());
@@ -37,12 +37,12 @@ bool CDCFacetRelationTruthVarSet::extract(const Relation<const CDCFacet>* ptrFac
   return true;
 }
 
-void CDCFacetRelationTruthVarSet::initialize()
+void TruthFacetRelationVarSet::initialize()
 {
   m_mcFacetFilter.initialize();
 }
 
-void CDCFacetRelationTruthVarSet::terminate()
+void TruthFacetRelationVarSet::terminate()
 {
   m_mcFacetFilter.terminate();
 }

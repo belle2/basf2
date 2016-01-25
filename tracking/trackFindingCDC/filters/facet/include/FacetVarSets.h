@@ -7,22 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
 #pragma once
-
-#include <tracking/trackFindingCDC/filters/facetRelation/BaseFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
-#include <tracking/trackFindingCDC/filters/facetRelation/CDCFacetRelationTruthVarSet.h>
-#include <tracking/trackFindingCDC/filters/facetRelation/CDCFacetRelationBasicVarSet.h>
-
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
-
-namespace Belle2 {
-  namespace TrackFindingCDC {
-
-    /// Records the encountered facet relations.
-    using  RecordingFacetRelationFilter =
-      RecordingFilter<VariadicUnionVarSet<CDCFacetRelationBasicVarSet,
-      CDCFacetRelationTruthVarSet> >;
-
-  }
-}
+#include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet/FitFacetVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet/TruthFacetVarSet.h>

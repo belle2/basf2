@@ -8,14 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
 
-#include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-
+#include <tracking/trackFindingCDC/ca/Relation.h>
 
 #include <vector>
 #include <string>
@@ -29,49 +27,53 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const facetFitlessNames[] = {
-      "superlayer_id",
-      "shape",
-      "abs_shape",
-      "start_rlinfo",
-      "start_drift_length",
-      "start_drift_length_sigma",
-      "middle_rlinfo",
-      "middle_drift_length",
-      "middle_drift_length_sigma",
-      "end_rlinfo",
-      "end_drift_length",
-      "end_drift_length_sigma",
+    static char const* const facetRelationTruthNames[] = {
+      "truth"
     };
 
     /** Class that specifies the names of the variables
-     *  that should be generated from a facet
+     *  that should be generated from a facet relation
      */
-    class CDCFacetFitlessVarNames : public VarNames<CDCFacet> {
+    class TruthFacetRelationVarNames : public VarNames<Relation<const CDCFacet>> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetFitlessNames);
+      static const size_t nNames = size(facetRelationTruthNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return facetFitlessNames[iName];
+        return facetRelationTruthNames[iName];
       }
+
     };
 
-    /** Class that computes floating point variables from a facet.
+    /** Class that computes floating point variables from a facet relation.
      *  that can be forwarded to a flat TNtuple or a TMVA method
      */
-    class CDCFacetFitlessVarSet : public VarSet<CDCFacetFitlessVarNames> {
+    class TruthFacetRelationVarSet : public VarSet<TruthFacetRelationVarNames> {
+
+    private:
+      /// Type of the super class
+      using Super = VarSet<TruthFacetRelationVarNames>;
 
     public:
       /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      explicit CDCFacetFitlessVarSet(const std::string& prefix = "");
+      explicit TruthFacetRelationVarSet(const std::string& prefix = "");
 
-      /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCFacet* facet) override final;
+      /// Generate and assign the variables from the facet relation
+      virtual bool extract(const Relation<const CDCFacet>* ptrFacetRelation) override final;
+
+      /// Initialize the varset before event processing
+      virtual void initialize() override final;
+
+      /// Initialize the varset before event processing
+      virtual void terminate() override final;
+
+    public:
+      /// Facet filter that gives if the facet is a true facet.
+      MCFacetFilter m_mcFacetFilter;
 
     };
   }

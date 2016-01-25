@@ -13,5 +13,4 @@
 #include <tracking/trackFindingCDC/filters/facetRelation/AllFacetRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/MCFacetRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/SimpleFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/facetRelation/RecordingFacetRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/UnionRecordingFacetRelationFilter.h>

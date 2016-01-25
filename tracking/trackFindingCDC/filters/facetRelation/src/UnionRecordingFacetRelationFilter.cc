@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facetRelation/UnionRecordingFacetRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/facetRelation/CDCFacetRelationVarSets.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/FacetRelationVarSets.h>
 
 using namespace std;
 using namespace Belle2;
@@ -29,9 +29,9 @@ std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >
 UnionRecordingFacetRelationFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
-    return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new CDCFacetRelationBasicVarSet());
+    return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new BasicFacetRelationVarSet());
   } else if (name == "truth") {
-    return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new CDCFacetRelationTruthVarSet());
+    return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new TruthFacetRelationVarSet());
   } else {
     return Super::createVarSet(name);
   }

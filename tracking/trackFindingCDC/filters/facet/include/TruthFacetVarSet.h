@@ -28,7 +28,7 @@ namespace Belle2 {
     /** Class that specifies the names of the variables
      *  that should be generated from a facet.
      */
-    class CDCFacetTruthVarNames : public VarNames<CDCFacet> {
+    class TruthFacetVarNames : public VarNames<CDCFacet> {
 
     public:
       /// Number of variables to be generated.
@@ -45,11 +45,15 @@ namespace Belle2 {
     /** Class that computes floating point variables from facet.
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
-    class  CDCFacetTruthVarSet : public VarSet<CDCFacetTruthVarNames> {
+    class  TruthFacetVarSet : public VarSet<TruthFacetVarNames> {
+
+    private:
+      /// Type of the base class
+      using Super = VarSet<TruthFacetVarNames>;
 
     public:
       /// Construct the varset and take an optional prefix.
-      explicit CDCFacetTruthVarSet(const std::string& prefix = "");
+      explicit TruthFacetVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the facet
       virtual bool extract(const CDCFacet* facet) override final;

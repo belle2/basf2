@@ -12,18 +12,15 @@
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/facet/CDCFacetFitlessVarSet.h>
-
-#include <tracking/trackFindingCDC/varsets/PairVarSet.h>
+#include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
-
 
 #include <vector>
 #include <string>
 #include <assert.h>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -32,46 +29,59 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const facetRelationBasicNames[] = {
-      "from_middle_phi",
-      "to_middle_phi"
+    static char const* const facetFitNames[] = {
+      "start_phi",
+      "start_phi_sigma",
+      "start_phi_pull",
+
+      "middle_phi",
+      "middle_phi_sigma",
+      "middle_phi_pull",
+
+      "end_phi",
+      "end_phi_sigma",
+      "end_phi_pull"
     };
 
     /** Class that specifies the names of the variables
-     *  that should be generated from a facet relation
+     *  that should be generated from a facet
      */
-    class CDCFacetRelationBasicVarNames : public VarNames<Relation<const CDCFacet>> {
+    class FitFacetVarNames : public VarNames<CDCFacet> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetRelationBasicNames);
+      static const size_t nNames = size(facetFitNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return facetRelationBasicNames[iName];
+        return facetFitNames[iName];
       }
 
       /// Marking that the basic facet variables should be included.
-      typedef PairVarSet<CDCFacetFitlessVarSet> NestedVarSet;
+      typedef FitlessFacetVarSet NestedVarSet;
     };
 
-    /** Class that computes floating point variables from a facet relation.
+    /** Class that computes floating point variables from a facet.
      *  that can be forwarded to a flat TNtuple or a TMVA method
      */
-    class CDCFacetRelationBasicVarSet : public VarSet<CDCFacetRelationBasicVarNames> {
+    class FitFacetVarSet : public VarSet<FitFacetVarNames> {
 
     private:
-      /// Type of the super class
-      typedef VarSet<CDCFacetRelationBasicVarNames> Super;
+      /// Type of the base class
+      using Super = VarSet<FitFacetVarNames>;
 
     public:
       /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      explicit CDCFacetRelationBasicVarSet(const std::string& prefix = "");
+      explicit FitFacetVarSet(const std::string& prefix = "");
 
-      /// Generate and assign the variables from the facet relation
-      virtual bool extract(const Relation<const CDCFacet>* ptrFacetRelation) override final;
+      /// Generate and assign the variables from the facet
+      virtual bool extract(const CDCFacet* facet) override final;
+
+    private:
+      /// Fitless filter for the feasibility cut of the right left passage information.
+      FitlessFacetFilter m_fitlessFacetFilter;
     };
   }
 }

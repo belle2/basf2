@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/facet/CDCFacetTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet/TruthFacetVarSet.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
@@ -17,12 +17,12 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCFacetTruthVarSet::CDCFacetTruthVarSet(const std::string& prefix) :
-  VarSet<CDCFacetTruthVarNames>(prefix)
+TruthFacetVarSet::TruthFacetVarSet(const std::string& prefix)
+  : Super(prefix)
 {
 }
 
-bool CDCFacetTruthVarSet::extract(const CDCFacet* ptrFacet)
+bool TruthFacetVarSet::extract(const CDCFacet* ptrFacet)
 {
   bool extracted = extractNested(ptrFacet);
   if (not extracted or not ptrFacet) return false;
@@ -50,12 +50,12 @@ bool CDCFacetTruthVarSet::extract(const CDCFacet* ptrFacet)
   return true;
 }
 
-void CDCFacetTruthVarSet::initialize()
+void TruthFacetVarSet::initialize()
 {
   m_mcFacetFilter.initialize();
 }
 
-void CDCFacetTruthVarSet::terminate()
+void TruthFacetVarSet::terminate()
 {
   m_mcFacetFilter.terminate();
 }

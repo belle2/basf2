@@ -40,8 +40,7 @@ FilterFactory<Filter<Relation<const CDCFacet> > >::getValidFilterNamesAndDescrip
     {"all", "all facet relations are valid"},
     {"truth", "facet relations from monte carlo truth"},
     {"none", "no facet relation is valid, stop at facet creation."},
-    {"recording", "record the encountered instances of facet relations"},
-    {"unionrecording", "record many multiple choosable variable set"},
+    {"unionrecording", "record multiple choosable variable sets"},
     {"simple", "mc free with simple criteria"},
   });
 
@@ -59,8 +58,6 @@ FilterFactory<Filter<Relation<const CDCFacet> > >::create(const std::string& fil
     return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new MCFacetRelationFilter());
   } else if (filterName == string("simple")) {
     return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new SimpleFacetRelationFilter());
-  } else if (filterName == string("recording")) {
-    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new RecordingFacetRelationFilter());
   } else if (filterName == string("unionrecording")) {
     return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new UnionRecordingFacetRelationFilter());
   } else {

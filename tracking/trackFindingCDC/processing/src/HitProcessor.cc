@@ -148,7 +148,7 @@ std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& track
 
     ESign trackCharge = getChargeSign(trackCandidate);
 
-    for (const CDCRecoHit3D& hit : trackCandidate.items()) {
+    for (const CDCRecoHit3D& hit : trackCandidate) {
 
       if (getCurvatureSignWrt(hit, trackCandidate.getStartTrajectory3D().getGlobalCircle().center()) != trackCharge) {
         hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
@@ -180,7 +180,7 @@ bool HitProcessor::isBack2BackTrack(CDCTrack& track)
   int vote_pos = 0;
   int vote_neg = 0;
 
-  for (const CDCRecoHit3D& hit : track.items()) {
+  for (const CDCRecoHit3D& hit : track) {
     int curve_sign = getCurvatureSignWrt(hit, track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().center());
 
     if (curve_sign == ESign::c_Plus)
@@ -229,7 +229,7 @@ ESign HitProcessor::getChargeSign(CDCTrack& track)
     return track.getStartTrajectory3D().getChargeSign();
   }
 
-  for (const CDCRecoHit3D& hit : track.items()) {
+  for (const CDCRecoHit3D& hit : track) {
     ESign curve_sign = getCurvatureSignWrt(hit, center);
 
     if (curve_sign == ESign::c_Plus)

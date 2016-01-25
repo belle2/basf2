@@ -100,7 +100,6 @@ namespace Belle2 {
       { return not isInvalid(); }
 
     public:
-
       /// Copies the trajectory information to the Genfit track candidate
       bool fillInto(genfit::TrackCand& trackCand, const double bZ) const;
 
@@ -151,7 +150,7 @@ namespace Belle2 {
 
       /// Get unit momentum vector at a specific postion.
       /** Return the unit travel direction at the closest approach to the position */
-      //inline Vector3D getUnitMom3D(const Vector3D& point) const
+      //Vector3D getUnitMom3D(const Vector3D& point) const
       //{ return getLocalCircle().tangential(point - getLocalOrigin().xy()); }
 
       /// Get the estimation for the absolute value of the transvers momentum
@@ -161,20 +160,20 @@ namespace Belle2 {
       double getAbsMom3D() const;
 
       /// Get the momentum at the start point of the trajectory
-      inline Vector3D getMom3DAtSupport(const double bZ) const
+      Vector3D getMom3DAtSupport(const double bZ) const
       { return  getUnitMom3DAtSupport() *= getAbsMom3D(bZ);  }
 
       /// Get the momentum at the start point of the trajectory
-      inline Vector3D getMom3DAtSupport() const
+      Vector3D getMom3DAtSupport() const
       { return  getUnitMom3DAtSupport() *= getAbsMom3D();  }
 
       /// Get the unit momentum at the start point of the trajectory
-      inline Vector3D getUnitMom3DAtSupport() const
+      Vector3D getUnitMom3DAtSupport() const
       { return  getLocalHelix().tangential();  }
 
 
       /// Get the support point of the trajectory in global coordinates
-      inline Vector3D getSupport() const
+      Vector3D getSupport() const
       { return getLocalHelix().support() + getLocalOrigin(); }
 
 

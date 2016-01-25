@@ -65,7 +65,7 @@ void TrackQualityTools::normalizeTrack(CDCTrack& track)
   bool m_usePosition = true;
   CDCObservations2D observations2D;
   observations2D.setUseRecoPos(m_usePosition);
-  for (const CDCRecoHit3D& item : track.items()) {
+  for (const CDCRecoHit3D& item : track) {
     observations2D.append(item, m_usePosition);
   }
 
@@ -98,7 +98,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
 
   // We then set the trajectory to start with this point
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
-  const short charge = track.getStartChargeSign();
+  const short charge = trajectory3D.getChargeSign();
 
   if (abs(charge) != 1)
     return;

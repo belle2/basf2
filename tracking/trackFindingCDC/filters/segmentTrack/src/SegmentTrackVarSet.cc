@@ -41,19 +41,20 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   const CDCRecoHit2D& back = segment->back();
 
   // Calculate distances
-  const CDCTrajectory2D& trajectoryTrack = track->getStartTrajectory3D().getTrajectory2D();
-  const CDCTrajectorySZ& szTrajectoryTrack = track->getStartTrajectory3D().getTrajectorySZ();
-  double radius = trajectoryTrack.getGlobalCircle().absRadius();
+  const CDCTrajectory3D& trajectoryTrack3D = track->getStartTrajectory3D();
+  const CDCTrajectory2D& trajectoryTrack2D = trajectoryTrack3D.getTrajectory2D();
+  const CDCTrajectorySZ& szTrajectoryTrack = trajectoryTrack3D.getTrajectorySZ();
+  double radius = trajectoryTrack2D.getGlobalCircle().absRadius();
 
-  maxmimumTrajectoryDistanceFront = trajectoryTrack.getDist2D(front.getWireHit().getRefPos2D());
-  maxmimumTrajectoryDistanceBack = trajectoryTrack.getDist2D(back.getWireHit().getRefPos2D());
+  maxmimumTrajectoryDistanceFront = trajectoryTrack2D.getDist2D(front.getWireHit().getRefPos2D());
+  maxmimumTrajectoryDistanceBack = trajectoryTrack2D.getDist2D(back.getWireHit().getRefPos2D());
 
   var<named("z_distance")>() = 0;
   var<named("theta_distance")>() = 0;
 
   if (segment->getStereoKind() == EStereoKind::c_Axial) {
     CDCTrajectory2D& trajectorySegment = segment->getTrajectory2D();
-    if (not trajectoryTrack.isFitted()) {
+    if (not trajectoryTrack2D.isFitted()) {
       const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
       fitter.update(trajectorySegment, *segment);
     }
@@ -61,7 +62,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
     CDCObservations2D observations;
     for (const CDCRecoHit2D& recoHit : *segment) {
       const CDCRLTaggedWireHit& rlWireHit = recoHit.getRLWireHit();
-      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectoryTrack);
+      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectoryTrack2D);
       double s = recoHit3D.getArcLength2D();
       double z = recoHit3D.getRecoZ();
       observations.append(s, z);
@@ -80,8 +81,8 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   }
 
   // Calculate if it is out of the CDC
-  Vector3D frontRecoPos3D = front.reconstruct3D(trajectoryTrack);
-  Vector3D backRecoPos3D = back.reconstruct3D(trajectoryTrack);
+  Vector3D frontRecoPos3D = front.reconstruct3D(trajectoryTrack2D);
+  Vector3D backRecoPos3D = back.reconstruct3D(trajectoryTrack2D);
 
   if (segment->getStereoKind() != EStereoKind::c_Axial) {
     double forwardZ = front.getWire().getWireLine().forwardZ();
@@ -94,8 +95,8 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   }
 
   // Get perpS of track in the beginning and the end
-  double perpSOfFront = trajectoryTrack.calcArcLength2D(segment->front().getRecoPos2D());
-  double perpSOfBack = trajectoryTrack.calcArcLength2D(segment->back().getRecoPos2D());
+  double perpSOfFront = trajectoryTrack2D.calcArcLength2D(segment->front().getRecoPos2D());
+  double perpSOfBack = trajectoryTrack2D.calcArcLength2D(segment->back().getRecoPos2D());
 
   double perpSMinimum = std::min(perpSOfFront, perpSOfBack);
   double perpSMaximum = std::max(perpSOfFront, perpSOfBack);
@@ -162,9 +163,9 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
     double thetaFirstSegmentHit = -10;
 
     for (const CDCRecoHit2D& recoHit2D : *segment) {
-      Vector3D reconstructedPosition = recoHit2D.reconstruct3D(trajectoryTrack);
+      Vector3D reconstructedPosition = recoHit2D.reconstruct3D(trajectoryTrack2D);
       const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
-      double perpS = trajectoryTrack.calcArcLength2D(recoPos2D);
+      double perpS = trajectoryTrack2D.calcArcLength2D(recoPos2D);
 
 
       double current_z_distance = std::abs(trajectorySZ.getZDist(perpS, reconstructedPosition.z()));
@@ -180,7 +181,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
       }
     }
 
-    double thetaTrack = track->getStartFitMom3D().theta();
+    double thetaTrack = trajectoryTrack3D.getUnitMom3DAtSupport().theta();
     stereo_quad_tree_distance = thetaTrack - thetaFirstSegmentHit;
   }
 
@@ -191,7 +192,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
       observationsNeigh.append(recoHit.getRecoPos2D());
     } else {
       const CDCRLTaggedWireHit& rlWireHit = recoHit.getRLWireHit();
-      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectoryTrack);
+      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectoryTrack2D);
       double s = recoHit3D.getArcLength2D();
       double z = recoHit3D.getRecoZ();
       observationsFull.append(s, z);
@@ -227,10 +228,10 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   var<named("max_hit_z_distance")>() = max_hit_z_distance;
   setVariableIfNotNaN<named("stereo_quad_tree_distance")>(stereo_quad_tree_distance);
 
-  setVariableIfNotNaN<named("pt_of_track")>(std::isnan(trajectoryTrack.getAbsMom2D()) ? 0.0 : trajectoryTrack.getAbsMom2D());
-  var<named("track_is_curler")>() = trajectoryTrack.getExit().hasNAN();
+  setVariableIfNotNaN<named("pt_of_track")>(std::isnan(trajectoryTrack2D.getAbsMom2D()) ? 0.0 : trajectoryTrack2D.getAbsMom2D());
+  var<named("track_is_curler")>() = trajectoryTrack2D.getExit().hasNAN();
 
-  var<named("superlayer_already_full")>() = not trajectoryTrack.getOuterExit().hasNAN() and hitsInSameRegion > 5;
+  var<named("superlayer_already_full")>() = not trajectoryTrack2D.getOuterExit().hasNAN() and hitsInSameRegion > 5;
 
   setVariableIfNotNaN<named("maxmimum_trajectory_distance_front")>(maxmimumTrajectoryDistanceFront, 999);
   setVariableIfNotNaN<named("maxmimum_trajectory_distance_back")>(maxmimumTrajectoryDistanceBack, 999);
@@ -245,7 +246,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
   var<named("segment_super_layer")>() = segment->getISuperLayer();
 
-  double phiBetweenTrackAndSegment = trajectoryTrack.getStartMom2D().angleWith(segment->front().getRecoPos2D());
+  double phiBetweenTrackAndSegment = trajectoryTrack2D.getStartMom2D().angleWith(segment->front().getRecoPos2D());
 
   setVariableIfNotNaN<named("phi_between_track_and_segment")>(phiBetweenTrackAndSegment);
   setVariableIfNotNaN<named("perp_s_of_front")>(perpSOfFront / radius);

@@ -54,63 +54,23 @@ namespace Belle2 {
 
       /** Splits the track into segments.
        *  Note : No trajectory information is copied*/
-      std::vector<Belle2::TrackFindingCDC::CDCRecoSegment3D>
-      splitIntoSegments() const;
-
-      /// Getter for the first reconstructed hit in the track.
-      const Belle2::TrackFindingCDC::CDCRecoHit3D& getStartRecoHit3D() const
-      { return front(); }
-
-      /// Getter for the last reconstructed hit in the track.
-      const Belle2::TrackFindingCDC::CDCRecoHit3D& getEndRecoHit3D() const
-      { return back(); }
-
-
+      std::vector<CDCRecoSegment3D> splitIntoSegments() const;
 
       /// Getter for the superlayer id the track starts from.
       ISuperLayer getStartISuperLayer() const
-      { return getStartRecoHit3D().getISuperLayer(); }
+      { return front().getISuperLayer(); }
 
       /// Getter for the superlayer id the track ends in.
       ISuperLayer getEndISuperLayer() const
-      { return getEndRecoHit3D().getISuperLayer(); }
-
-
+      { return back().getISuperLayer(); }
 
       /// Getter for the position of the first reconstructed hit.
       const Vector3D& getStartRecoPos3D() const
-      { return getStartRecoHit3D().getRecoPos3D(); }
+      { return front().getRecoPos3D(); }
 
       /// Getter for the position of the last reconstructed hit.
       const Vector3D& getEndRecoPos3D() const
-      { return getEndRecoHit3D().getRecoPos3D(); }
-
-
-
-      /// Getter for the start fitted position of track.
-      Vector3D getStartFitPos3D() const
-      { return getStartTrajectory3D().getSupport(); }
-
-      /// Getter for the end fitted position of track.
-      Vector3D getEndFitPos3D() const
-      { return getEndTrajectory3D().getSupport(); }
-
-
-      /// Getter for the momentum at the start position.
-      Vector3D getStartFitMom3D() const
-      { return getStartTrajectory3D().getMom3DAtSupport(); }
-
-      /// Getter for the momentum at the end position.
-      Vector3D getEndFitMom3D() const
-      { return getEndTrajectory3D().getMom3DAtSupport(); }
-
-      /// Getter for the charge sign.
-      ESign getStartChargeSign() const
-      { return getStartTrajectory3D().getChargeSign(); }
-
-      /// Getter for the charge sign.
-      ESign getEndChargeSign() const
-      { return getEndTrajectory3D().getChargeSign(); }
+      { return back().getRecoPos3D(); }
 
       /// Setter for the two dimensional trajectory. The trajectory should start at the start of the track and follow its direction.
       void setStartTrajectory3D(const CDCTrajectory3D& startTrajectory3D)
@@ -120,6 +80,7 @@ namespace Belle2 {
       void setEndTrajectory3D(const CDCTrajectory3D& endTrajectory3D)
       { m_endTrajectory3D = endTrajectory3D; }
 
+
       /// Getter for the two dimensional trajectory. The trajectory should start at the start of the track and follow its direction.
       const CDCTrajectory3D& getStartTrajectory3D() const
       { return m_startTrajectory3D; }
@@ -128,6 +89,7 @@ namespace Belle2 {
       const CDCTrajectory3D& getEndTrajectory3D() const
       { return m_endTrajectory3D; }
 
+
       /// Getter for the automaton cell.
       AutomatonCell& getAutomatonCell()
       { return m_automatonCell; }
@@ -135,6 +97,7 @@ namespace Belle2 {
       /// Constant getter for the automaton cell.
       const AutomatonCell& getAutomatonCell() const
       { return m_automatonCell; }
+
 
       /// Unset the masked flag of the automaton cell of this segment and of all contained wire hits.
       void unsetAndForwardMaskedFlag() const;
@@ -150,12 +113,14 @@ namespace Belle2 {
       */
       void receiveMaskedFlag() const;
 
+
       /** Remove all hits from the track which have an assigned flag */
       void removeAllAssignedMarkedHits();
 
       /** Set the taken flag of all hits belonging to this track to the given value (default true),
        * but do not touch the flag of the track itself. */
       void forwardTakenFlag(bool takenFlag = true) const;
+
 
       /// Sort the recoHits according to their perpS information
       void sortByArcLength2D()
@@ -173,10 +138,6 @@ namespace Belle2 {
 
       /// Sort the CDCRecoHits by their CDCWireHit.
       void sortByRadius();
-
-      /// Legacy accessor for the CDCRecoHit3D of the track, still used in some corners of python scripts.
-      const std::vector<CDCRecoHit3D>& items() const
-      { return *this; }
 
       /// Reverse the track inplace
       void reverse();

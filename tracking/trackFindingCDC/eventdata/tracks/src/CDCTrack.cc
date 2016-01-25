@@ -151,10 +151,10 @@ CDCTrack CDCTrack::condense(const std::vector<const CDCTrack*>& trackPath)
     CDCTrajectory3D endTrajectory3D = trackPath.back()->getStartTrajectory3D();
 
     double resetPerpSOffset =
-      startTrajectory3D.setLocalOrigin(result.getStartRecoHit3D().getRecoPos3D());
+      startTrajectory3D.setLocalOrigin(result.front().getRecoPos3D());
     result.setStartTrajectory3D(startTrajectory3D);
 
-    endTrajectory3D.setLocalOrigin(result.getEndRecoHit3D().getRecoPos3D());
+    endTrajectory3D.setLocalOrigin(result.back().getRecoPos3D());
     result.setEndTrajectory3D(endTrajectory3D);
 
     for (CDCRecoHit3D& recoHit3D : result) {
@@ -219,10 +219,10 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentTriple>& segmentTriplePat
   CDCTrajectory3D endTrajectory3D = lastSegmentTriple->getTrajectory3D();
 
   // Set the reference point on the trajectories to the last reconstructed hit
-  double resetPerpSOffset = startTrajectory3D.setLocalOrigin(track.getStartRecoHit3D().getRecoPos3D());
+  double resetPerpSOffset = startTrajectory3D.setLocalOrigin(track.front().getRecoPos3D());
   track.setStartTrajectory3D(startTrajectory3D);
 
-  endTrajectory3D.setLocalOrigin(track.getEndRecoHit3D().getRecoPos3D());
+  endTrajectory3D.setLocalOrigin(track.back().getRecoPos3D());
   track.setEndTrajectory3D(endTrajectory3D);
 
   for (CDCRecoHit3D& recoHit3D : track) {
@@ -276,11 +276,11 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
   CDCTrajectory3D endTrajectory3D = lastSegmentPair->getTrajectory3D();
 
   // Move the reference point of the start fit to the first observered position
-  double resetPerpSOffset = startTrajectory3D.setLocalOrigin(track.getStartRecoHit3D().getRecoPos3D());
+  double resetPerpSOffset = startTrajectory3D.setLocalOrigin(track.front().getRecoPos3D());
   track.setStartTrajectory3D(startTrajectory3D);
 
   // Move the reference point of the end fit to the last observered position
-  endTrajectory3D.setLocalOrigin(track.getEndRecoHit3D().getRecoPos3D());
+  endTrajectory3D.setLocalOrigin(track.back().getRecoPos3D());
   track.setEndTrajectory3D(endTrajectory3D);
 
   for (CDCRecoHit3D& recoHit3D : track) {

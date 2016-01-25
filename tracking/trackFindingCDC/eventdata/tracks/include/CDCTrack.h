@@ -98,11 +98,11 @@ namespace Belle2 {
 
       /// Getter for the momentum at the start position.
       Vector3D getStartFitMom3D() const
-      { return getStartTrajectory3D().getUnitMom3DAtSupport(); }
+      { return getStartTrajectory3D().getMom3DAtSupport(); }
 
       /// Getter for the momentum at the end position.
       Vector3D getEndFitMom3D() const
-      { return getEndTrajectory3D().getUnitMom3DAtSupport(); }
+      { return getEndTrajectory3D().getMom3DAtSupport(); }
 
       /// Getter for the charge sign.
       ESign getStartChargeSign() const

@@ -20,11 +20,16 @@ namespace Belle2 {
     template <class AMatcherAlgorithm, class AAdderAlgorithm>
     class FirstMatchCollector : public Collector<AMatcherAlgorithm, AAdderAlgorithm> {
     public:
+      /// The super (parent) class.
       typedef Collector<AMatcherAlgorithm, AAdderAlgorithm> Super;
+      /// Copy the CollectorItem definition.
       typedef typename Super::CollectorItem CollectorItem;
+      /// Copy the CollectionItem definition.
       typedef typename Super::CollectionItem CollectionItem;
+      /// Copy the MatchedCollectionItem definition.
       typedef typename Super::MatchedCollectionItem MatchedCollectionItem;
 
+      /// Do the collection process.
       virtual void collect(std::vector<CollectorItem>& collectorItems, const std::vector<CollectionItem>& collectionItems) override
       {
         for (CollectorItem& collectorItem : collectorItems) {

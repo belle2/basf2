@@ -20,6 +20,10 @@ namespace Belle2 {
    * The module can use the old and the new quad tree implementation - however the new one is prefered because it contains
    * a optimization step the old one does not have in the moment (but can be implemented easily).
    *
+   * Everything action in hidden in the configurable collector algorithm, which can be used to perform various
+   * collection algorithms, e.g. using the first found or best hit, using various filters/TMVA/etc.
+   * The options can be configured using the module parameters.
+   *
    * TODO:
    *   - Smarter Handling of segments (which is worse in the moment but should be better in general)
    *   - Make the precuts on the hits more transparent
@@ -42,8 +46,8 @@ namespace Belle2 {
      */
     void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) override;
 
-    /// Processor
-    TrackFindingCDC::StereoHitCollector m_stereohitsCollector; /**< The stereo quad tree processor to use. */
+    /// Collector hiding the implementation.
+    TrackFindingCDC::StereoHitCollector m_stereohitsCollector;
   };
 
 }

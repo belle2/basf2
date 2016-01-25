@@ -40,7 +40,7 @@ namespace Belle2 {
     };
 
     /** Class that specifies the names of the variables
-     *  that should be generated from a segment.
+     *  that should be generated from a stereo hit and a track pair.
      */
     class StereoHitVarNames : public VarNames<std::pair<const CDCRecoHit3D*, const CDCTrack*>> {
 
@@ -48,6 +48,7 @@ namespace Belle2 {
       /// Number of variables to be generated.
       static const size_t nNames = 17;
 
+      /// Get the name of the column.
       constexpr
       static char const* getName(int iName)
       {
@@ -55,7 +56,7 @@ namespace Belle2 {
       }
     };
 
-    /** Class that computes floating point variables from a segment.
+    /** Class that computes floating point variables from a stereo hit and a track pair
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
     class StereoHitVarSet : public VarSet<StereoHitVarNames> {
@@ -64,7 +65,7 @@ namespace Belle2 {
       /// Construct the peeler and take an optional prefix.
       explicit StereoHitVarSet(const std::string& prefix = "") : VarSet<StereoHitVarNames>(prefix) { }
 
-      /// Generate and assign the variables from the cluster
+      /// Generate and assign the variables from the pair
       virtual bool extract(const std::pair<const CDCRecoHit3D*, const CDCTrack*>* testPair) override;
 
     };

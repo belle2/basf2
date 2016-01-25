@@ -15,7 +15,13 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**
-     * TODO
+     * A templated and configurable algorithm designed class for performing a "collection" of items.
+     * The idea is to have both a list of collection items and collector items. Via a matcher algorithm,
+     * you can specify if and with which weight a pair of collection and collector items can be matched.
+     * The implemented collection algorithm (in the moment BestMatch or FirstMatch) then handles the
+     * rest and flattens this matrix of relations to one match per *collection item*
+     * (so one collector item can have more than one collection items but not vice versa).
+     * The given adder algorithm then uses these matches to do the matching (e.g. adding hits to the track).
      *
      * AMatcherAlgorithm must provide:
      *  - a function exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "")
@@ -31,10 +37,14 @@ namespace Belle2 {
     template<class AMatherAlgorithm, class AAdderAlgorithm>
     class Collector {
     public:
+      /// Copy the CollectorItem typedef from the matcher algorithm.
       typedef typename AMatherAlgorithm::CollectorItem CollectorItem;
+      /// Copy the CollectionItem typedef from the matcher algorithm.
       typedef typename AMatherAlgorithm::CollectionItem CollectionItem;
+      /// Shortcut typedef for CollectionItem pointers with weight.
       typedef WithWeight<const CollectionItem*> MatchedCollectionItem;
 
+      /// Empty desctructor.
       virtual ~Collector() { }
 
       /** Redirect all parameters of the matcher. **/
@@ -59,6 +69,7 @@ namespace Belle2 {
       virtual void collect(std::vector<CollectorItem>& collectorList, const std::vector<CollectionItem>& collectionItems) = 0;
 
     protected:
+      /// The instance of the matcher algorithm we use.
       AMatherAlgorithm m_matcherInstance;
     };
   }

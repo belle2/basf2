@@ -30,11 +30,19 @@ namespace Belle2 {
     class CDCRLTaggedWireHit;
     class CDCTrajectory2D;
 
+    /**
+     * A matcher algorithm for using a stereo quad tree for matching rl tagged wire hits
+     * to tracks. After the quad tree has given a yes to a match, the configured filter is used to
+     * give a weight to the relation.
+     */
     class StereoHitTrackMatcherQuadTree : public QuadTreeBasedMatcher<HitZ0TanLambdaLegendre> {
     public:
+      /// Use tracks as collector items.
       typedef CDCTrack CollectorItem;
+      /// Use rl tagged wire hits a collection items.
       typedef CDCRLTaggedWireHit CollectionItem;
 
+      /// Expose the parameters to the module.
       virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "") override;
 
       /**
@@ -46,6 +54,7 @@ namespace Belle2 {
       std::vector<WithWeight<const CollectionItem*>> match(const CollectorItem& collectorItem,
                                                            const std::vector<CollectionItem>& collectionList);
 
+      /** Initialize the filter and the quad tree. */
       virtual void initialize() override
       {
         QuadTreeBasedMatcher<HitZ0TanLambdaLegendre>::initialize();
@@ -59,6 +68,7 @@ namespace Belle2 {
         }
       }
 
+      /** Terminate the filter and the quad tree. */
       virtual void terminate() override
       {
         QuadTreeBasedMatcher<HitZ0TanLambdaLegendre>::terminate();
@@ -71,8 +81,10 @@ namespace Belle2 {
       /// Set to false to skip the B2B check (good for curlers)
       bool m_param_checkForB2BTracks = true;
       StereoHitFilterFactory m_filterFactory;
+      /// The used filter.
       std::unique_ptr<BaseStereoHitFilter> m_stereoHitFilter;
 
+      /// Helper function to pass the parameters to the filter.
       Weight getWeight(const CDCRecoHit3D& recoHit, const Z0TanLambdaBox& node, const CDCTrack& track) const;
 
     };

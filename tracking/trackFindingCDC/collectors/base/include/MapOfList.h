@@ -13,11 +13,21 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    /**
+     * A helper class for a map of vectors with a convenience function for adding items.
+     * TODO: Better replace this by a eigen::matrix?
+     */
     template<class FromItem, class ToItem>
     class MapOfList : public std::map<FromItem, std::vector<ToItem>> {
     private:
+      /// The super (parent) class.
       typedef typename std::map<FromItem, std::vector<ToItem>> Super;
     public:
+      /**
+       * Add a new relation to the list. If the fromItem is already there,
+       * add the newToItem to its list. If not, create a new entry with fromItem
+       * and a list with the newToItem in it.
+       */
       void emplaceOrAppend(FromItem fromItem, ToItem newToItem)
       {
         if (Super::find(fromItem) != Super::end()) {

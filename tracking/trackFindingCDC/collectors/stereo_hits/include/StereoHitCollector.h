@@ -20,6 +20,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    /// Shortcut for the used stereo hit collector.
     using StereoHitCollector = FirstMatchCollector<StereoHitTrackMatcherQuadTree, StereoHitTrackAdder>;
   }
 }

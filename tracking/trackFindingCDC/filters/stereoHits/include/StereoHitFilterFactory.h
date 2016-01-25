@@ -32,6 +32,7 @@ namespace Belle2 {
       /** Fill the default filter name and parameter values*/
       StereoHitFilterFactory(const std::string& defaultFilterName = "simple") : Super(defaultFilterName) { }
 
+      /// Cope the create function from the parent class.
       using Super::create;
 
       /** Getter for a descriptive purpose of the filter.*/

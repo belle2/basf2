@@ -24,19 +24,26 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    /// Base filter for stereo hit - track relations.
     using BaseStereoHitFilter = Filter<std::pair<const CDCRecoHit3D*, const CDCTrack*>>;
 
+    /// MC filter for stereo hit - track relations.
     using MCStereoHitFilter = MCFilter<VariadicUnionVarSet<StereoHitTruthVarSet, StereoHitVarSet>>;
 
+    /// Recording filter for stereo hit - track relations.
     using RecordingStereoHitFilter =
       RecordingFilter<VariadicUnionVarSet<StereoHitTruthVarSet, StereoHitVarSet>>;
 
+    /// All filter for stereo hit - track relations.
     using AllStereoHitFilter = AllFilter<BaseStereoHitFilter>;
 
+    /// Simple and configurable filter for stereo hit - track relations.
     using SimpleStereoHitFilter = NamedChoosableVarSetFilter<StereoHitTruthVarSet>;
 
+    /// Random filter for stereo hit - track relations.
     using RandomStereoHitFilter = RandomFilter<BaseStereoHitFilter>;
 
+    /// TMVA filter for stereo hit - track relations.
     using TMVAStereoHitFilter = TMVAFilter<StereoHitVarSet>;
   }
 }

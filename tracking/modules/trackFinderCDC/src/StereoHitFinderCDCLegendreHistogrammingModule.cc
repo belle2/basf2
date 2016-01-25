@@ -37,6 +37,7 @@ void StereoHitFinderCDCLegendreHistogrammingModule::terminate()
 
 void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
+  // Initialize the RL hits
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
   const auto& wireHits = wireHitTopology.getWireHits();
   std::vector<CDCRLTaggedWireHit> rlTaggedWireHits;
@@ -47,8 +48,10 @@ void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2:
     }
   }
 
+  // Collect the hits for each track
   m_stereohitsCollector.collect(tracks, rlTaggedWireHits);
 
+  // Postprocess each track (=fit)
   for (CDCTrack& track : tracks) {
     const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
 

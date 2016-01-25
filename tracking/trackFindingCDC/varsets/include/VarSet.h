@@ -69,23 +69,31 @@ namespace Belle2 {
         return extractNested(obj);
       }
 
-      /** Initialize the variable set before event processing.
+      /**
+       *  Initialize the variable set before event processing.
        *  Can be specialised if the derived variable set has setup work to do.
        */
-      virtual
-      void initialize() override
-      {
-        m_nestedVarSet.initialize();
-      }
+      virtual void initialize() override
+      { m_nestedVarSet.initialize(); }
 
-      /** Terminate the variable set after event processing.
+      /// Allow setup work to take place at beginning of new run
+      virtual void beginRun() override
+      { m_nestedVarSet.beginRun(); }
+
+      /// Allow setup work to take place at beginning of new event
+      virtual void beginEvent() override
+      { m_nestedVarSet.beginEvent(); }
+
+      /// Allow clean up to take place at end of run
+      virtual void endRun() override
+      { m_nestedVarSet.endRun(); }
+
+      /**
+       *  Terminate the variable set after event processing.
        *  Can be specialised if the derived variable set has to tear down aquired resources.
        */
-      virtual
-      void terminate() override
-      {
-        m_nestedVarSet.terminate();
-      }
+      virtual void terminate() override
+      { m_nestedVarSet.terminate(); }
 
       /** Getter for the named tuples storing the values of all the (possibly nested) VarSets
        *  Base implementation returns the  named tuple of this variable set.

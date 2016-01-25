@@ -72,6 +72,18 @@ namespace Belle2 {
       virtual void initialize() override final
       { m_multiVarSet.initialize(); }
 
+      /// Signal the beginning of a new run
+      virtual void beginRun() override final
+      { m_multiVarSet.beginRun(); }
+
+      /// Signal the beginning of a new event
+      virtual void beginEvent() override
+      { m_multiVarSet.beginEvent(); }
+
+      /// Signal the end of a run
+      virtual void endRun() override
+      { m_multiVarSet.beginRun(); }
+
       /**
          Terminate all contained variable set after event processing.
       */

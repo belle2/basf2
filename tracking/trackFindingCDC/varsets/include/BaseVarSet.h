@@ -53,6 +53,18 @@ namespace Belle2 {
       virtual void initialize()
       {}
 
+      /// Allow setup work to take place at beginning of new run
+      virtual void beginRun()
+      {}
+
+      /// Allow setup work to take place at beginning of new event
+      virtual void beginEvent()
+      {}
+
+      /// Allow clean up to take place at end of run
+      virtual void endRun()
+      {}
+
       /**
       Terminate the variable set after event processing.
       Can be specialised if the derived variable set has to tear down aquired resources.

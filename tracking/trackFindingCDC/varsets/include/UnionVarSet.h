@@ -64,6 +64,30 @@ namespace Belle2 {
         }
       }
 
+      /// Signal the beginning of a new run
+      virtual void beginRun() override
+      {
+        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
+          varSet->beginRun();
+        }
+      }
+
+      /// Signal the beginning of a new event
+      virtual void beginEvent() override
+      {
+        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
+          varSet->beginEvent();
+        }
+      }
+
+      /// Signal the end of a run
+      virtual void endRun() override
+      {
+        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
+          varSet->endRun();
+        }
+      }
+
       /**
       Terminate all contained variable set after event processing.
       */

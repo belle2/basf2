@@ -9,8 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
-
+#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 
 #include <vector>
 #include <string>
@@ -21,7 +20,8 @@ namespace Belle2 {
     /** Generic class that generates the same variables from a each of a pair of instances.
      **/
     template<class ABaseVarSet>
-    class PairVarSet {
+    class PairVarSet : BaseVarSet<const std::pair<const typename ABaseVarSet::Object*,
+      const typename ABaseVarSet::Object*> > {
 
     public:
       /// Object type from which the variables shall be extracted
@@ -59,16 +59,37 @@ namespace Belle2 {
       /** Initialize the variable set before event processing.
        *  Can be specialised if the derived variable set has setup work to do.
        */
-      virtual void initialize()
+      virtual void initialize() override
       {
         m_firstVarSet.initialize();
         m_secondVarSet.initialize();
       }
 
+      /// Signal the beginning of a new run
+      virtual void beginRun() override
+      {
+        m_firstVarSet.beginRun();
+        m_secondVarSet.beginRun();
+      }
+
+      /// Signal the beginning of a new event
+      virtual void beginEvent() override
+      {
+        m_firstVarSet.beginEvent();
+        m_secondVarSet.beginEvent();
+      }
+
+      /// Signal the end of a run
+      virtual void endRun() override
+      {
+        m_secondVarSet.endRun();
+        m_firstVarSet.endRun();
+      }
+
       /** Terminate the variable set after event processing.
        *  Can be specialised if the derived variable set has to tear down aquired resources.
        */
-      virtual void terminate()
+      virtual void terminate() override
       {
         m_secondVarSet.terminate();
         m_firstVarSet.terminate();

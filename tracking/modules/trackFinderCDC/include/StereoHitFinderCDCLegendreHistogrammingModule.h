@@ -1,5 +1,6 @@
 #pragma once
 
+#include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitCollector.h>
 #include <tracking/trackFindingCDC/legendre/stereohits/StereoHitsProcesser.h>
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 #include <vector>
@@ -37,20 +38,18 @@ namespace Belle2 {
     void terminate() override;
 
   private:
+    /// Parameters
+    /// Use the old implementation
+    bool m_param_useOldImplementation = false;
+
     /**
      * Do a QuadTreeHistogramming with all the StereoHits.
      */
     void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) override;
 
-    /// Parameter
-    /// Whether to use the segments or the hits in the quad tree.
-    bool m_param_useSegments = false;
-
-    /// Instead of deleting used hits, leave them where they are and check for double assignment later.
-    bool m_param_checkForDoubleHits = false;
-
     /// Processor
-    TrackFindingCDC::StereoHitsProcesser m_stereohitsProcesser; /**< The stereo quad tree processor to use. */
+    TrackFindingCDC::StereoHitCollector m_stereohitsCollector; /**< The stereo quad tree processor to use. */
+    TrackFindingCDC::StereoHitsProcesser m_stereohitsProcessor; /**< The stereo quad tree processor to use. */
   };
 
 }

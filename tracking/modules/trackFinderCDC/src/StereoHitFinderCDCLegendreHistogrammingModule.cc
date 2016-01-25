@@ -1,8 +1,8 @@
 #include <tracking/modules/trackFinderCDC/StereoHitFinderCDCLegendreHistogrammingModule.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
 using namespace std;
 using namespace Belle2;
@@ -16,65 +16,57 @@ StereoHitFinderCDCLegendreHistogrammingModule::StereoHitFinderCDCLegendreHistogr
 {
   setDescription("Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree.");
 
-  addParam("quadTreeLevel",
-           m_stereohitsProcesser.getQuadTreeLevelParameter(),
-           "The number of levels for the quad tree search.",
-           m_stereohitsProcesser.getQuadTreeLevelValue());
+  ModuleParamList moduleParamList = this->getParamList();
+  m_stereohitsCollector.exposeParameters(&moduleParamList);
 
-  addParam("minimumNumberOfHits",
-           m_stereohitsProcesser.getMinimumNumberOfHitsParameter(),
-           "The minimum number of hits in a quad tree bin to be called as result.",
-           m_stereohitsProcesser.getMinimumNumberOfHitsValue());
-
-  addParam("useSegments",
-           m_param_useSegments,
-           "Whether to use the segments or the hits in the quad tree.",
-           false);
-
-  addParam("checkForB2BTracks",
-           m_stereohitsProcesser.getCheckForB2BTracksParameter(),
-           "Set to false to skip the check for back-2-back tracks (good for cosmics)",
-           m_stereohitsProcesser.getCheckForB2BTracksValue());
-
-  addParam("checkForDoubleHits",
-           m_param_checkForDoubleHits,
-           "Set to true to turn on checking for double hits which does not delete found hits but count the number of assignments afterwards.",
-           m_param_checkForDoubleHits);
+  addParam("useOldImplementation", m_param_useOldImplementation, "Use the old implementation.", m_param_useOldImplementation);
 }
 
 /** Initialize the stereo quad trees */
 void StereoHitFinderCDCLegendreHistogrammingModule::initialize()
 {
-  m_stereohitsProcesser.initialize();
+  m_stereohitsCollector.initialize();
+  m_stereohitsProcessor.initialize();
   TrackFinderCDCBaseModule::initialize();
 }
 
 /** Terminate the stereo quad trees */
 void StereoHitFinderCDCLegendreHistogrammingModule::terminate()
 {
-  m_stereohitsProcesser.terminate();
+  m_stereohitsCollector.terminate();
+  m_stereohitsProcessor.terminate();
   TrackFinderCDCBaseModule::terminate();
 }
 
 void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
-  if (m_param_useSegments) {
-    StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedRecoSegments("CDCRecoSegment2DVector");
-    std::vector<CDCRecoSegment2D>& segments = *storedRecoSegments;
-
+  if (m_param_useOldImplementation) {
     for (CDCTrack& track : tracks) {
-      m_stereohitsProcesser.addStereoHitsWithQuadTree(track, segments);
-      m_stereohitsProcesser.postprocessTrack(track);
+      m_stereohitsProcessor.addStereoHitsWithQuadTree(track);
+      m_stereohitsProcessor.postprocessTrack(track);
     }
-
   } else {
-    for (CDCTrack& track : tracks) {
-      m_stereohitsProcesser.addStereoHitsWithQuadTree(track);
-      m_stereohitsProcesser.postprocessTrack(track);
+    const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+    const std::vector<CDCWireHit>& wireHits = wireHitTopology.getWireHits();
+    std::vector<CDCRLTaggedWireHit> rlTaggedWireHits;
+    rlTaggedWireHits.reserve(2 * wireHits.size());
+    for (const CDCWireHit& wireHit : wireHits) {
+      for (ERightLeft rlInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
+        rlTaggedWireHits.emplace_back(&wireHit, rlInfo);
+      }
     }
-  }
 
-  if (m_param_checkForDoubleHits) {
-    m_stereohitsProcesser.reassignDoubledHits(tracks);
+    m_stereohitsCollector.collect(tracks, rlTaggedWireHits);
+
+    for (CDCTrack& track : tracks) {
+      const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
+
+      track.shiftToPositiveArcLengths2D();
+      track.sortByArcLength2D();
+
+      const CDCTrajectorySZ& szTrajectory = szFitter.fitWithStereoHits(track);
+      CDCTrajectory3D newStartTrajectory(track.getStartTrajectory3D().getTrajectory2D(), szTrajectory);
+      track.setStartTrajectory3D(newStartTrajectory);
+    }
   }
 }

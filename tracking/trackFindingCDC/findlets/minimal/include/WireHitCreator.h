@@ -71,7 +71,7 @@ namespace Belle2 {
         }
 
         // Some safety checks from funky times - did not trigger for ages.
-        for (Index iHit = 0; iHit < useNHits; ++iHit) {
+        for (int iHit = 0; iHit < useNHits; ++iHit) {
           CDCHit* ptrHit = hits[iHit];
           CDCHit& hit = *ptrHit;
           const WireID wireID(hit.getID());

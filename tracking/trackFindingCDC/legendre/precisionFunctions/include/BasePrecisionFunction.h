@@ -7,8 +7,10 @@
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
-
 #pragma once
+
+#include <functional>
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -21,9 +23,11 @@ namespace Belle2 {
 
     public:
 
-      typedef std::function< double(double)> PrecisionFunction;
+      typedef std::function<double(double)> PrecisionFunction;
 
-      BasePrecisionFunction() {};
+      BasePrecisionFunction()
+      {
+      }
 
       virtual ~BasePrecisionFunction() {};
 
@@ -36,11 +40,8 @@ namespace Belle2 {
       double convertPtToRho(double pt) {return 1.5 * 0.00299792458 / fabs(pt); };
 
     protected:
-
-      PrecisionFunction m_function = [&](double __attribute__((unused)) r_qt) -> double {
-        return 0.3 / pow(2, 16);
-      };
-
+      PrecisionFunction m_function =
+        [](double /* r_qt */) -> double {return 0.3 / std::pow(2, 16);};
 
     };
   }

@@ -154,19 +154,38 @@ def pretty_print_description_list(rows):
     print('')
 
 
-def register_module(name, shared_lib_path=None):
+def register_module(name_or_module, shared_lib_path=None, logLevel=None, debugLevel=None, **kwargs):
     """
     Register the module 'name' and return it (e.g. for adding to a path)
 
-    name: The name of the module type
+    name_or_module: The name of the module type, may also be a module instance which parameters should be set
     shared_lib_path: An optional path to a shared library from which the
                      module should be loaded
+    logLevel: Number indicating the log level, e.g. LogLevel.DEBUG/INFO/RESULT/WARNING/ERROR/FATAL
+    debugLevel : Number indicating the detail of debug messages, default 100
+    kwargs: Additional parameters of the module to be set.
+
+    >>> basf.register_module('EventInfoSetter', evtNumList=100, logLevel=LogLevel.ERROR)
+    <pybasf2.Module at 0x1e356e0>
     """
 
-    if shared_lib_path is not None:
-        return fw.register_module(name, shared_lib_path)
+    if isinstance(name_or_module, Module):
+        module = name_or_module
     else:
-        return fw.register_module(name)
+        module_name = name_or_module
+        if shared_lib_path is not None:
+            module = fw.register_module(module_name, shared_lib_path)
+        else:
+            module = fw.register_module(module_name)
+
+    if kwargs:
+        module.param(kwargs)
+    if logLevel is not None:
+        module.set_log_level(logLevel)
+    if debugLevel is not None:
+        module.set_debug_level(debugLevel)
+
+    return module
 
 
 def create_path():
@@ -418,17 +437,7 @@ def _add_module(self, module, logLevel=None, debugLevel=None, **kwargs):
     >>> path.add_module(eventinfosetter)
     <pybasf2.Module at 0x2289de8>
     """
-    if isinstance(module, Module):
-        module = module
-    else:
-        module = fw.register_module(module)
-
-    if kwargs:
-        module.param(kwargs)
-    if logLevel is not None:
-        module.set_log_level(logLevel)
-    if debugLevel is not None:
-        module.set_debug_level(debugLevel)
+    module = register_module(module, logLevel=logLevel, debugLevel=debugLevel, **kwargs)
     self._add_module_object(module)
     return module
 

@@ -27,6 +27,17 @@ namespace Belle2 {
       TMVAFacetFilter()
         : Super("FacetFilter", 0.1)
       {}
+
+    public:
+      /**
+       *  Main filter method returning the weight of the facet.
+       *  The size of the facet with a small penalty depending on the tmva probability.
+       */
+      virtual Weight operator()(const CDCFacet& facet) override final
+      {
+        return 3 - 0.2 * (1 - Super::operator()(facet));
+      }
+
     };
   }
 }

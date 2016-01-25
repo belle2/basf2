@@ -30,9 +30,12 @@ Weight MCFacetFilter::operator()(const CDCFacet& facet)
   bool isCorrectReverseFacet = getAllowReverse() and operator()(facet.reversed(),
                                inTrackHitDistanceTolerance);
 
-  if (isCorrectFacet or isCorrectReverseFacet) {
+  if (isCorrectFacet) {
     facet.adjustLines();
     return 3.0;
+  } else if (isCorrectReverseFacet) {
+    facet.adjustLines();
+    return -3.0;
   } else {
     return NAN;
   }
@@ -53,19 +56,23 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
   ITrackType middleMCTrackId = mcHitLookUp.getMCTrackId(middleWireHit.getHit());
   ITrackType endMCTrackId = mcHitLookUp.getMCTrackId(endWireHit.getHit());
 
-  if (not(startMCTrackId == middleMCTrackId and middleMCTrackId == endMCTrackId) or startMCTrackId == INVALID_ITRACK) {
+  if (startMCTrackId == INVALID_ITRACK or
+      middleMCTrackId == INVALID_ITRACK or
+      endMCTrackId == INVALID_ITRACK) {
+    // B2INFO("rejected here");
     return false;
   }
 
+  if (not(startMCTrackId == middleMCTrackId and middleMCTrackId == endMCTrackId)) {
+    return false;
+  }
 
-
-  //Maybe be a bit more permissive for reassigned hits
+  // Maybe be a bit more permissive for reassigned hits
   bool startIsReassigned = mcHitLookUp.isReassignedSecondary(startWireHit.getHit());
   bool middleIsReassigned = mcHitLookUp.isReassignedSecondary(middleWireHit.getHit());
   bool endIsReassigned = mcHitLookUp.isReassignedSecondary(endWireHit.getHit());
 
-
-  //Now check the alignement in track
+  // Now check the alignement in track
   bool distanceInTrackIsSufficientlyLow = true;
 
   int startInTrackId = mcHitLookUp.getInTrackId(startWireHit.getHit());

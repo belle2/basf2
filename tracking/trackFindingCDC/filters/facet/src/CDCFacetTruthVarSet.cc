@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/CDCFacetTruthVarSet.h>
 
+#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
 #include <assert.h>
 
@@ -27,8 +28,25 @@ bool CDCFacetTruthVarSet::extract(const CDCFacet* ptrFacet)
   if (not extracted or not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 
+  const CDCRLWireHitTriple& rlWireHitTriple = facet;
+
   const Weight mcWeight = m_mcFacetFilter(facet);
   var<named("truth")>() =  not std::isnan(mcWeight);
+
+  const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
+
+  const CDCWireHit& startWireHit = rlWireHitTriple.getStartWireHit();
+  const CDCWireHit& middleWireHit = rlWireHitTriple.getMiddleWireHit();
+  const CDCWireHit& endWireHit = rlWireHitTriple.getEndWireHit();
+
+  const CDCSimHit* startSimHit = mcHitLookUp.getSimHit(startWireHit.getHit());
+  const CDCSimHit* middleSimHit = mcHitLookUp.getSimHit(middleWireHit.getHit());
+  const CDCSimHit* endSimHit = mcHitLookUp.getSimHit(endWireHit.getHit());
+
+  var<named("startThetaTruth")>() = startSimHit->getPosTrack().Theta();
+  var<named("middleThetaTruth")>() = middleSimHit->getPosTrack().Theta();
+  var<named("endThetaTruth")>() = endSimHit->getPosTrack().Theta();
+
   return true;
 }
 

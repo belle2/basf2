@@ -40,6 +40,7 @@ FilterFactory<Filter<CDCFacet> >::getValidFilterNamesAndDescriptions() const
     {"all", "all facets are valid"},
     {"fitless", "only checking the feasability of right left passage information"},
     {"truth", "monte carlo truth"},
+    {"tmva", "filter facets with a tmva method"},
     {"none", "no facet is valid, stop at cluster generation."},
     {"realistic", "mc free with more realistic criteria"},
     {"recording", "record the encountered instances of facets"},
@@ -64,6 +65,8 @@ FilterFactory<Filter<CDCFacet> >::create(const std::string& filterName) const
     return std::unique_ptr<Filter<CDCFacet> >(new SimpleFacetFilter());
   } else if (filterName == string("realistic")) {
     return std::unique_ptr<Filter<CDCFacet> >(new RealisticFacetFilter());
+  } else if (filterName == string("tmva")) {
+    return std::unique_ptr<Filter<CDCFacet> >(new TMVAFacetFilter());
   } else if (filterName == string("recording")) {
     return std::unique_ptr<Filter<CDCFacet> >(new RecordingFacetFilter());
   } else if (filterName == string("unionrecording")) {

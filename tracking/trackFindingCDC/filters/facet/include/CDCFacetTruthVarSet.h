@@ -19,7 +19,10 @@ namespace Belle2 {
     /// Names of the variables to be generated.
     constexpr
     static char const* const facetTruthNames[] = {
-      "truth"
+      "truth",
+      "startThetaTruth",
+      "middleThetaTruth",
+      "endThetaTruth",
     };
 
     /** Class that specifies the names of the variables

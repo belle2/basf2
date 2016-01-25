@@ -985,8 +985,8 @@ class ValidationPlot(object):
         x_underflow_indices = xs < x_lower_bound
         x_overflow_indices = xs > x_upper_bound
 
-        y_underflow_indices = ys < x_lower_bound
-        y_overflow_indices = ys > x_upper_bound
+        y_underflow_indices = ys < y_lower_bound
+        y_overflow_indices = ys > y_upper_bound
 
         plot_indices = ~(np.isnan(xs) |
                          x_underflow_indices |

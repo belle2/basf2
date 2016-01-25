@@ -1104,11 +1104,11 @@ class ValidationPlot(object):
 
         n_positive_inf = np.sum(xs == np.inf)
         if n_positive_inf > 0:
-            cls.add_stats_entry(histogram, name + ' +inf', n_positive_inf)
+            cls.add_stats_entry(histogram, name + ' pos inf', n_positive_inf)
 
         n_negative_inf = np.sum(xs == -np.inf)
         if n_negative_inf > 0:
-            cls.add_stats_entry(histogram, name + ' -inf', n_negative_inf)
+            cls.add_stats_entry(histogram, name + ' neg inf', n_negative_inf)
 
     @classmethod
     def add_stats_entry(cls, histogram, label, value):
@@ -1700,7 +1700,7 @@ class ValidationPlot(object):
         fit_tf1.GetRange(lower_bound, upper_bound)
         title = fit_tf1.GetTitle()
 
-        combined_formula = additional_stats_tf1.GetName() + '+' + fit_tf1.GetName()
+        combined_formula = additional_stats_tf1.GetExpFormula().Data() + '+' + fit_tf1.GetExpFormula().Data()
         combined_tf1 = ROOT.TF1("Combined", combined_formula, lower_bound, upper_bound)
         combined_tf1.SetTitle(title)
 
@@ -1737,14 +1737,23 @@ class ValidationPlot(object):
         lower_bound = ROOT.Double()
         upper_bound = ROOT.Double()
 
-        for i_parameter in range(n_parameters):
-            i_source = i_parameter
-            i_target = i_parameter + offset
+        for i_source in range(n_parameters):
+            parameter_name = tf1_source.GetParName(i_source)
+            i_target = tf1_target.GetParNumber(parameter_name)
+
+            # Workaround for a ROOT bug
+            if i_target == -1:
+                for i_target in range(target_tf1.GetNpar()):
+                    if parameter_name == target_tf1.GetParName(i_target):
+                        break
+                else:
+                    i_target = -1
+                    continue
 
             tf1_target.SetParameter(i_target,
                                     tf1_source.GetParameter(i_source))
-            tf1_target.SetParError(i_target, tf1_source.GetParError(i_source))
-            tf1_target.SetParName(i_target, tf1_source.GetParName(i_source))
+            tf1_target.SetParError(i_target,
+                                   tf1_source.GetParError(i_source))
 
             tf1_source.GetParLimits(i_source, lower_bound, upper_bound)
             tf1_target.SetParLimits(i_target, lower_bound, upper_bound)

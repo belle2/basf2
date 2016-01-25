@@ -41,7 +41,7 @@ namespace Belle2 {
       virtual ~PairVarSet() {}
 
       /// Main method that extracts the variable values from the complex object.
-      virtual bool extract(const std::pair<const BaseObject*, const BaseObject*>* obj)
+      virtual bool extract(const std::pair<const BaseObject*, const BaseObject*>* obj) override
       {
         assert(obj);
         bool first_extracted = m_firstVarSet.extract(obj->first);
@@ -54,7 +54,6 @@ namespace Belle2 {
       {
         return extract(&obj);
       }
-
 
       /** Initialize the variable set before event processing.
        *  Can be specialised if the derived variable set has setup work to do.
@@ -98,7 +97,7 @@ namespace Belle2 {
       /** Getter for the named tuples storing the values of all the (possibly nested) VarSets
        *  Base implementation returns the  named tuple of this variable set.
        */
-      virtual std::vector<Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables()
+      virtual std::vector<Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables() override
       {
         std::vector<NamedFloatTuple*> firstResult = m_firstVarSet.getAllVariables();
         std::vector<NamedFloatTuple*> secondResult = m_secondVarSet.getAllVariables();
@@ -109,7 +108,7 @@ namespace Belle2 {
       /** Const getter for the named tuples storing the values of all the (possibly nested)
        *  variable sets. Base implementation returns the named tuple of this variable set.
        */
-      virtual std::vector<const Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables() const
+      virtual std::vector<const Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables() const override
       {
         std::vector<const NamedFloatTuple*> firstResult = m_firstVarSet.getAllVariables();
         std::vector<const NamedFloatTuple*> secondResult = m_secondVarSet.getAllVariables();

@@ -65,7 +65,7 @@ default_generator_params_by_generator_name = {
         'nTracks': 10,
         'varyNTracks': False,
         'momentumGeneration': 'uniform',
-        'momentumParams': [0.6, 1.4],
+        'momentumParams': [1.0, 1.4],
         'thetaGeneration': 'uniform',
         'thetaParams': [17., 150.],
     },
@@ -159,15 +159,16 @@ class ReadOrGenerateEventsRun(MinimalRun):
                 # Allow for Background only execution
                 main_path.add_module(generator_module)
 
-            # gearbox & geometry needs to be registered any way
-            gearbox_module = basf2.register_module('Gearbox')
-            main_path.add_module(gearbox_module)
+        # gearbox & geometry needs to be registered any way
+        gearbox_module = basf2.register_module('Gearbox')
+        main_path.add_module(gearbox_module)
 
-            components = self.components
-            geometry_module = basf2.register_module('Geometry')
-            geometry_module.param('components', components)
-            main_path.add_module(geometry_module)
+        components = self.components
+        geometry_module = basf2.register_module('Geometry')
+        geometry_module.param('components', components)
+        main_path.add_module(geometry_module)
 
+        if self.root_input_file is None:
             random_barrier_module = basf2.register_module("RandomBarrier")
             main_path.add_module(random_barrier_module)
 

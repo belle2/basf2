@@ -35,9 +35,9 @@ namespace Belle2 {
                           double defaultCut = NAN) :
         Super(),
         m_param_cut(defaultCut),
-        m_param_weightFolder("data/tracking"),
+        m_param_weightFolder("tracking/data"),
         m_param_trainingName(defaultTrainingName),
-        m_expert("data/tracking", defaultTrainingName)
+        m_expert("tracking/data", defaultTrainingName)
       {}
 
       /// Expose the set of parameters of the filter to the module parameter list.

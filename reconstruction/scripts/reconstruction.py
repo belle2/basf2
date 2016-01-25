@@ -134,12 +134,14 @@ def add_track_finding(path, components=None):
         VXDtrackFitter.param('BuildBelle2Tracks', False)
         VXDtrackFitter.param("PDGCodes", [211])
         VXDtrackFitter.param('GFTracksColName', vxd_tracklets)
+        VXDtrackFitter.param('PruneFlags', "FL")
         VXDtrackFitter.set_name('VXD-only GenFitter')
 
         CDCtrackFitter = register_module('GenFitter')
         CDCtrackFitter.param('GFTrackCandidatesColName', cdc_trackcands)
         CDCtrackFitter.param('BuildBelle2Tracks', False)
         CDCtrackFitter.param("PDGCodes", [211])
+        CDCtrackFitter.param('PruneFlags', "FL")
         CDCtrackFitter.param('GFTracksColName', cdc_tracklets)
         CDCtrackFitter.set_name('CDC-only GenFitter')
 

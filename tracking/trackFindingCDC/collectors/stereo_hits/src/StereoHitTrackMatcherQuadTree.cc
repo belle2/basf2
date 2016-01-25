@@ -1,70 +1,73 @@
-#include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackMatcher.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+
 #include <utility>
+#include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackMatcherQuadTree.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-namespace {
-  /** Returns a bool if the rlWire can be used as a stereo hit. */
-  bool isValidStereoHit(const CDCRLTaggedWireHit& wireHit)
-  {
-    return not(wireHit.getStereoKind() == EStereoKind::c_Axial or wireHit.getWireHit().getAutomatonCell().hasTakenFlag());
-    // TODO Check for number of layers in between
-  }
-}
-
-void StereoHitTrackMatcher::exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix)
+void StereoHitTrackMatcherQuadTree::exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix)
 {
-
   QuadTreeBasedMatcher<HitZ0TanLambdaLegendre>::exposeParameters(moduleParameters, prefix);
+  m_filterFactory.exposeParameters(moduleParameters, prefix);
 
   moduleParameters->addParameter(prefix + "checkForB2BTracks", m_param_checkForB2BTracks,
                                  "Set to false to skip the check for back-2-back tracks (good for cosmics)",
                                  m_param_checkForB2BTracks);
+
 }
 
-void StereoHitTrackMatcher::reconstructHit(const CDCRLTaggedWireHit& rlWireHit, std::vector<CDCRecoHitWithRLPointer>& hitsVector,
-                                           const CDCTrajectory2D& trackTrajectory, const bool isCurler, const double radius) const
+Weight StereoHitTrackMatcherQuadTree::getWeight(const CDCRecoHit3D& recoHit, const Z0TanLambdaBox& node,
+                                                const CDCTrack& track) const
 {
-  Vector3D recoPos3D = rlWireHit.reconstruct3D(trackTrajectory);
-  const CDCWire& wire = rlWireHit.getWire();
-  // Skip hits out of CDC
-  if (not wire.isInCellZBounds(recoPos3D)) {
-    return;
-  }
-
-  // If the track is a curler, shift all perpS values to positive ones. Else do not use this hit if m_param_checkForB2BTracks is enabled.
-  double perpS = trackTrajectory.calcArcLength2D(recoPos3D.xy());
-  if (perpS < 0) {
-    if (isCurler) {
-      perpS += 2 * TMath::Pi() * radius;
-    } else if (m_param_checkForB2BTracks) {
-      return;
-    }
-  }
-  hitsVector.emplace_back(CDCRecoHit3D(rlWireHit, recoPos3D, perpS), &rlWireHit);
+  return m_stereoHitFilter->operator()({&recoHit, &track});
 }
 
-std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcher::match(const CDCTrack& track,
+std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree::match(const CDCTrack& track,
                                                 const std::vector<CDCRLTaggedWireHit>& rlWireHits)
 {
+  if (m_stereoHitFilter->needsTruthInformation()) {
+    CDCMCManager::getInstance().fill();
+  }
+
   // Reconstruct the hits to the track
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   const double radius = trajectory2D.getGlobalCircle().absRadius();
   const bool isCurler = trajectory2D.isCurler();
 
+  typedef std::pair<CDCRecoHit3D, const CDCRLTaggedWireHit*> CDCRecoHitWithRLPointer;
   std::vector<CDCRecoHitWithRLPointer> recoHits;
   recoHits.reserve(rlWireHits.size());
 
-  for (const CDCRLTaggedWireHit& wireHit : rlWireHits) {
-    if (isValidStereoHit(wireHit)) {
-      reconstructHit(wireHit, recoHits, trajectory2D, isCurler, radius);
+  /*
+   * Use the given trajectory to reconstruct the 2d hits in the vector in z direction
+   * to match the trajectory perfectly. Then add the newly created reconstructed 3D hit to the given list.
+   */
+  for (const CDCRLTaggedWireHit& rlWireHit : rlWireHits) {
+    if (rlWireHit.getStereoKind() != EStereoKind::c_Axial and not rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
+      Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
+      const CDCWire& wire = rlWireHit.getWire();
+      // Skip hits out of CDC
+      if (not wire.isInCellZBounds(recoPos3D)) {
+        continue;
+      }
+
+      // If the track is a curler, shift all perpS values to positive ones. Else do not use this hit if m_param_checkForB2BTracks is enabled.
+      double perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
+      if (perpS < 0) {
+        if (isCurler) {
+          perpS += 2 * TMath::Pi() * radius;
+        } else if (m_param_checkForB2BTracks) {
+          continue;
+        }
+      }
+      recoHits.emplace_back(CDCRecoHit3D(rlWireHit, recoPos3D, perpS), &rlWireHit);
     }
   }
 
@@ -86,7 +89,6 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcher::match(
 
   // Copy all usable hits (not the duplicates) into this list.
   std::vector<WithWeight<const CDCRLTaggedWireHit*>> matches;
-  const Weight weight = track.size();
 
   for (auto outerIterator = foundStereoHits.begin(); outerIterator != foundStereoHits.end();
        ++outerIterator) {
@@ -120,9 +122,15 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcher::match(
         const double zSlopeMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
 
         if (fabs((lambda11 + lambda12) / 2 - zSlopeMean) < fabs((lambda21 + lambda22) / 2 - zSlopeMean)) {
-          matches.emplace_back(currentRLWireHitInner, weight);
+          const Weight weight = getWeight(currentRecoHitInner, node, track);
+          if (not std::isnan(weight)) {
+            matches.emplace_back(currentRLWireHitInner, weight);
+          }
         } else {
-          matches.emplace_back(currentRLWireHitOuter, weight);
+          const Weight weight = getWeight(currentRecoHitOuter, node, track);
+          if (not std::isnan(weight)) {
+            matches.emplace_back(currentRLWireHitOuter, weight);
+          }
         }
 
         // currentWireHitInner = currentWireHitOuter, so it makes no difference here
@@ -133,7 +141,10 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcher::match(
     }
 
     if (not isDoubled) {
-      matches.emplace_back(currentRLWireHitOuter, weight);
+      const Weight weight = getWeight(currentRecoHitOuter, node, track);
+      if (not std::isnan(weight)) {
+        matches.emplace_back(currentRLWireHitOuter, weight);
+      }
     }
   }
 

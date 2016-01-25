@@ -10,9 +10,19 @@
 #pragma once
 #include <tracking/trackFindingCDC/collectors/base/FirstMatchCollector.h>
 #include <tracking/trackFindingCDC/collectors/quadtree/QuadTreeBasedMatcher.h>
-#include <framework/core/ModuleParamList.h>
+
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>
+
+#include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilter.h>
+#include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilterFactory.h>
+
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
+
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <mdst/dataobjects/MCParticle.h>
+
+#include <framework/core/ModuleParamList.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -21,7 +31,7 @@ namespace Belle2 {
     class CDCRLTaggedWireHit;
     class CDCTrajectory2D;
 
-    class StereoHitTrackMatcher : public QuadTreeBasedMatcher<HitZ0TanLambdaLegendre> {
+    class StereoHitTrackMatcherQuadTree : public QuadTreeBasedMatcher<HitZ0TanLambdaLegendre> {
     public:
       typedef CDCTrack CollectorItem;
       typedef CDCRLTaggedWireHit CollectionItem;
@@ -37,22 +47,35 @@ namespace Belle2 {
       std::vector<WithWeight<const CollectionItem*>> match(const CollectorItem& collectorItem,
                                                            const std::vector<CollectionItem>& collectionList);
 
+      virtual void initialize() override
+      {
+        QuadTreeBasedMatcher<HitZ0TanLambdaLegendre>::initialize();
+
+        m_stereoHitFilter = std::move(m_filterFactory.create());
+        m_stereoHitFilter->initialize();
+
+        if (m_stereoHitFilter->needsTruthInformation()) {
+          StoreArray <CDCSimHit>::required();
+          StoreArray <MCParticle>::required();
+        }
+      }
+
+      virtual void terminate() override
+      {
+        QuadTreeBasedMatcher<HitZ0TanLambdaLegendre>::terminate();
+
+        m_stereoHitFilter->terminate();
+      }
+
     private:
       /// Parameters
       /// Set to false to skip the B2B check (good for curlers)
       bool m_param_checkForB2BTracks = true;
+      StereoHitFilterFactory m_filterFactory;
+      std::unique_ptr<BaseStereoHitFilter> m_stereoHitFilter;
 
-      typedef std::pair<CDCRecoHit3D, const CDCRLTaggedWireHit*> CDCRecoHitWithRLPointer;
+      Weight getWeight(const CDCRecoHit3D& recoHit, const Z0TanLambdaBox& node, const CDCTrack& track) const;
 
-      /**
-       * Use the given trajectory to reconstruct the 2d hits in the vector in z direction
-       * to match the trajectory perfectly. Then add the newly created reconstructed 3D hit to the given list.
-       *
-       * WARNING: We *create* CDCRecoHit3Ds here as pointers, but the ownership is handled over to the list.
-       * Please delete the hits by yourself.
-       */
-      void reconstructHit(const CDCRLTaggedWireHit& rlWireHit, std::vector<CDCRecoHitWithRLPointer>& hitsVector,
-                          const CDCTrajectory2D& trackTrajectory, const bool isCurler, const double radius) const;
     };
   }
 }

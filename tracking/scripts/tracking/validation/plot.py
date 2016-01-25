@@ -388,16 +388,45 @@ class ValidationPlot(object):
 
         return self
 
-    def fit_gaus(self):
-        """Fit a gaus belle curve to a one dimensional histogram"""
+    def fit_gaus(self, z_score=None):
+        """Fit a gaus belle curve to the central portion of a one dimensional histogram
+
+        The fit is applied to the central mean +- z_score * std interval of the histogram,
+        such that it is less influence by non gaussian tails further away than the given z score.
+
+        @param float z_score   number of sigmas to include from the mean value of the histogram.
+        """
         title = "gaus"
         formula = "gaus"
+
+        if z_score is None:
+            lower_bound = None
+            upper_bound = None
+        else:
+            plot = self.plot
+            if plot is None:
+                raise RuntimeError('Validation plot must be filled before it can be fitted.')
+
+            if not isinstance(plot, ROOT.TH1D):
+                raise RuntimeError('Fitting is currently implemented / tested for one dimensional, non stacked validation plots.')
+
+            histogram = plot
+
+            mean = histogram.GetMean()
+            std = histogram.GetStdDev()
+            lower_bound = mean - z_score * std
+            upper_bound = mean + z_score * std
+
         fit_tf1 = ROOT.TF1("Fit", formula)
         fit_tf1.SetTitle(title)
         fit_tf1.SetParName(0, "n")
         fit_tf1.SetParName(1, "mean")
         fit_tf1.SetParName(2, "std")
-        self.fit(fit_tf1, 'LM')
+        fit_options = "LM"
+        self.fit(fit_tf1,
+                 fit_options,
+                 lower_bound=lower_bound,
+                 upper_bound=upper_bound)
 
     def fit_line(self):
         """Fit a general line to a one dimensional histogram"""
@@ -427,8 +456,20 @@ class ValidationPlot(object):
         fit_tf1.SetParName(0, "slope")
         self.fit(fit_tf1, 'M')
 
-    def fit(self, formula, options):
-        """Fit a user defined function to a one dimensional histogram"""
+    def fit(self, formula, options, lower_bound=None, upper_bound=None):
+        """Fit a user defined function to a one dimensional histogram
+
+        Parameters
+        ----------
+        formula : str or TF1
+            Formula string or TH1 to be fitted. See TF1 constructurs for that is a valid formula
+        options : str
+           Options string to be used in the fit. See TH1::Fit()
+        lower_bound : float
+           Lower bound of the range to be fitted
+        upper_bound : float
+           Upper bound of the range to be fitted
+        """
         plot = self.plot
         if plot is None:
             raise RuntimeError('Validation plot must be filled before it can be fitted.')
@@ -440,25 +481,32 @@ class ValidationPlot(object):
 
         xaxis = histogram.GetXaxis()
         n_bins = xaxis.GetNbins()
-        lower_bound = xaxis.GetBinLowEdge(1)
-        upper_bound = xaxis.GetBinUpEdge(n_bins)
+        hist_lower_bound = xaxis.GetBinLowEdge(1)
+        hist_upper_bound = xaxis.GetBinUpEdge(n_bins)
 
+        # Setup the plotting range of the function to match the histogram
         if isinstance(formula, ROOT.TF1):
             fit_tf1 = formula
-            fit_tf1.SetRange(lower_bound, upper_bound)
+            fit_tf1.SetRange(hist_lower_bound, hist_upper_bound)
         else:
             fit_tf1 = ROOT.TF1("Fit",
                                formula,
-                               lower_bound,
-                               upper_bound)
+                               hist_lower_bound,
+                               hist_upper_bound)
         get_logger().info('Fitting with %s', fit_tf1.GetExpFormula())
+
+        # Determine fit range
+        if lower_bound is None:
+            lower_bound = hist_lower_bound
+        if upper_bound is None:
+            upper_bound = hist_upper_bound
 
         # Make sure the fitted function is not automatically added since we want to do that one our own.
         # Look for the documentation of TH1::Fit() for details of the options.
         if 'N' not in options:
             options += 'N'
 
-            histogram.Fit(fit_tf1, options)
+        histogram.Fit(fit_tf1, options, "", lower_bound, upper_bound)
 
         self.set_fit_tf1(histogram, fit_tf1)
 

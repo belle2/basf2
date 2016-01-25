@@ -27,7 +27,6 @@ class MinimalRun(object):
     n_events = 10000
     root_input_file = None
     components = []
-    root_output_file = None
     random_seed = None
 
     def __init__(self):
@@ -79,13 +78,6 @@ class MinimalRun(object):
             type=int,
             help='The random number generator seed to be set before the processing starts.',
         )
-
-        argument_parser.add_argument(
-            '-o',
-            '--output',
-            dest='root_output_file',
-            default=self.root_output_file,
-            help='Output file to which the simulated events shall be written.')
 
         return argument_parser
 
@@ -163,13 +155,6 @@ class MinimalRun(object):
         # Create path and run #
         #######################
         main_path = self.path
-
-        # Add the (optional) output module
-        if self.root_output_file is not None:
-            root_output_module = basf2.register_module('RootOutput')
-            root_output_params = {'outputFileName': self.root_output_file}
-            root_output_module.param(root_output_params)
-            main_path.add_module(root_output_module)
 
         # Run basf2 module path #
         #########################

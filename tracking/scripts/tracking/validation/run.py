@@ -23,6 +23,7 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
     expert_level = None
     contact = TRACKING_MAILING_LIST
     output_file_name = 'TrackingValidation.root'  # Specification for BrowseTFileOnTerminateRunMixin
+    root_output_file = None  # If events file should be written
     pulls = True
     exclude_profile_mc_parameter = []
     exclude_profile_pr_parameter = []
@@ -50,6 +51,14 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
 
     def create_argument_parser(self, **kwds):
         argument_parser = super(TrackingValidationRun, self).create_argument_parser(**kwds)
+
+        argument_parser.add_argument(
+            '-o',
+            '--output',
+            dest='root_output_file',
+            default=self.root_output_file,
+            help='Output file to which the simulated events shall be written.')
+
         return argument_parser
 
     def create_path(self):
@@ -60,6 +69,14 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
         # add the validation module to the path, but only if requested
         if not self.simulate_only:
             self.preparePathValidation(main_path)
+
+        # Add the (optional) output module
+        if self.root_output_file is not None:
+            root_output_module = basf2.register_module('RootOutput')
+            root_output_params = {'outputFileName': self.root_output_file}
+            root_output_module.param(root_output_params)
+            main_path.add_module(root_output_module)
+
         return main_path
 
 

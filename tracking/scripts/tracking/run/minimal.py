@@ -28,6 +28,7 @@ class MinimalRun(object):
     root_input_file = None
     components = []
     random_seed = None
+    n_processes = 0
 
     def __init__(self):
         super(MinimalRun, self).__init__()
@@ -63,7 +64,7 @@ class MinimalRun(object):
 
         argument_parser.add_argument(
             '-n',
-            '--n-events',
+            '--events',
             dest='n_events',
             default=self.n_events,
             type=int,
@@ -77,6 +78,15 @@ class MinimalRun(object):
             default=self.random_seed,
             type=int,
             help='The random number generator seed to be set before the processing starts.',
+        )
+
+        argument_parser.add_argument(
+            '-p',
+            '--processes',
+            dest='n_processes',
+            default=self.n_processes,
+            type=int,
+            help='The number of parallel processes to be used for processing.',
         )
 
         return argument_parser
@@ -125,6 +135,14 @@ class MinimalRun(object):
             environment = Belle2.Environment.Instance()
             environment.setNumberEventsOverride(self.n_events)
 
+        # Progress module
+        progress_module = basf2.register_module('Progress')
+        main_path.add_module(progress_module)
+
+        if self.n_processes:
+            environment = Belle2.Environment.Instance()
+            environment.setNumberProcessesOverride(self.n_processes)
+
         # gearbox & geometry needs to be registered any way
         gearbox_module = basf2.register_module('Gearbox')
         main_path.add_module(gearbox_module)
@@ -133,10 +151,6 @@ class MinimalRun(object):
         geometry_module = basf2.register_module('Geometry')
         geometry_module.param('components', components)
         main_path.add_module(geometry_module)
-
-        # Progress module
-        progress_module = basf2.register_module('Progress')
-        main_path.add_module(progress_module)
 
         return main_path
 

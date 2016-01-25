@@ -5,8 +5,7 @@ import basf2
 
 from tracking.run.event_generation import ReadOrGenerateEventsRun
 from tracking.modules import (
-    StandardTrackingReconstructionModule,
-    CDCFullFinder
+    StandardTrackingReconstructionModule
 )
 
 from tracking.metamodules import IfMCParticlesPresentModule
@@ -14,6 +13,7 @@ from tracking.metamodules import IfMCParticlesPresentModule
 import tracking.utilities as utilities
 
 import logging
+from trackfindingcdc.modules import add_cdc_tracking
 
 
 def get_logger():
@@ -166,7 +166,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
             elif self.finder_module == "CDCFullFinder":
                 track_finder_module = CDCFullFinder()
-                main_path.add_module(track_finder_module)
+                add_cdc_tracking(main_path)
 
             else:
                 track_finder_module = self.get_basf2_module(self.finder_module)

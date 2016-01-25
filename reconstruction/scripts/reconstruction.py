@@ -4,12 +4,33 @@
 from basf2 import *
 from ROOT import Belle2
 
+from tracking import (
+    add_mc_tracking_reconstruction,
+    add_tracking_reconstruction,
+    add_mc_track_finding,
+    add_track_finding,
+    add_prune_tracks,
+)
 
-def add_posttracking_reconstruction(path, components=None):
+
+def add_posttracking_reconstruction(path, components=None, pruneTracks=True):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
     """
+    # CDC dE/dx PID
+    if components is None or 'CDC' in components:
+        CDCdEdxPID = register_module('CDCDedxPID')
+        path.add_module(CDCdEdxPID)
+
+    # VXD dE/dx PID
+    if components is None or 'SVD' in components or 'PXD' in components:
+        VXDdEdxPID = register_module('VXDDedxPID')
+        path.add_module(VXDdEdxPID)
+
+    # Prune tracks as soon as the intermediate states at each measurement are not needed anymore.
+    if pruneTracks:
+        add_prune_tracks(path)
 
     # track extrapolation
     if components is None or 'CDC' in components:
@@ -78,218 +99,37 @@ def add_posttracking_reconstruction(path, components=None):
         path.add_module(mdstPID)
 
 
-def add_track_finding(path, components=None):
-    """
-    Adds the realistic track finding to the path.
-    """
-
-    from trackfindingcdc.modules import add_cdc_tracking
-
-    if components and not ('SVD' in components or 'CDC' in components):
-        return
-
-    use_vxd = components is None or 'SVD' in components
-    use_cdc = components is None or 'CDC' in components
-
-    # CDC track finder: trasan
-    if use_cdc:
-        cdc_trackcands = ''
-        if use_vxd:
-            cdc_trackcands = 'CDCGFTrackCands'
-        trackcands = cdc_trackcands
-        add_cdc_tracking(path, trackcands)
-
-    # VXD track finder
-    if use_vxd:
-        vxd_trackcands = ''
-        if use_cdc:
-            vxd_trackcands = 'VXDGFTrackCands'
-        vxd_trackfinder = register_module('VXDTF')
-        vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
-        # WARNING: workaround for possible clashes between fitting and VXDTF - stays until the redesign of the VXDTF is finished.
-        vxd_trackfinder.param('TESTERexpandedTestingRoutines', False)
-        if components is not None and 'PXD' not in components:
-            vxd_trackfinder.param('sectorSetup',
-                                  ['shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
-                                   'shiftedL3IssueTestSVDStd-100to400MeV_SVD',
-                                   'shiftedL3IssueTestSVDStd-25to100MeV_SVD'
-                                   ])
-            vxd_trackfinder.param('tuneCutoffs', 0.06)
-        else:
-            vxd_trackfinder.param('sectorSetup',
-                                  ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',
-                                   'shiftedL3IssueTestVXDStd-100to400MeV_PXDSVD',
-                                   'shiftedL3IssueTestVXDStd-25to100MeV_PXDSVD'
-                                   ])
-            vxd_trackfinder.param('tuneCutoffs', 0.22)
-        path.add_module(vxd_trackfinder)
-
-    # track merging
-    if use_vxd and use_cdc:
-        vxd_tracklets = 'VXDGFTracks'
-        cdc_tracklets = 'CDCGFTracks'
-    # track fitting
-        VXDtrackFitter = register_module('GenFitter')
-        VXDtrackFitter.param('GFTrackCandidatesColName', vxd_trackcands)
-        VXDtrackFitter.param('BuildBelle2Tracks', False)
-        VXDtrackFitter.param("PDGCodes", [211])
-        VXDtrackFitter.param('GFTracksColName', vxd_tracklets)
-        VXDtrackFitter.param('PruneFlags', "FL")
-        VXDtrackFitter.set_name('VXD-only GenFitter')
-
-        CDCtrackFitter = register_module('GenFitter')
-        CDCtrackFitter.param('GFTrackCandidatesColName', cdc_trackcands)
-        CDCtrackFitter.param('BuildBelle2Tracks', False)
-        CDCtrackFitter.param("PDGCodes", [211])
-        CDCtrackFitter.param('PruneFlags', "FL")
-        CDCtrackFitter.param('GFTracksColName', cdc_tracklets)
-        CDCtrackFitter.set_name('CDC-only GenFitter')
-
-        vxd_cdcTracksMerger = register_module('VXDCDCTrackMerger')
-        vxd_cdcTracksMerger_param = {
-            'VXDGFTrackCandsColName': vxd_trackcands,
-            'VXDGFTracksColName': vxd_tracklets,
-            'CDCGFTrackCandsColName': cdc_trackcands,
-            'CDCGFTracksColName': cdc_tracklets,
-            'relMatchedTracks': 'MatchedTracksIdx',
-            'chi2_max': 100,
-            'recover': 1
-        }
-        vxd_cdcTracksMerger.param(vxd_cdcTracksMerger_param)
-
-        path.add_module(VXDtrackFitter)
-        path.add_module(CDCtrackFitter)
-        path.add_module(vxd_cdcTracksMerger)
-
-
-def add_mc_track_finding(path, components=None):
-    # tracking
-    if components and not ('PXD' in components or 'SVD' in components or 'CDC'
-                           in components):
-        return
-
-    # find MCTracks in CDC, SVD, and PXD
-    mc_trackfinder = register_module('TrackFinderMCTruth')
-    # Default setting in the module may be either way, therefore
-    # accomodate both cases explicitly.
-    if components is None or 'PXD' in components:
-        mc_trackfinder.param('UsePXDHits', 1)
-    else:
-        mc_trackfinder.param('UsePXDHits', 0)
-    if components is None or 'SVD' in components:
-        mc_trackfinder.param('UseSVDHits', 1)
-    else:
-        mc_trackfinder.param('UseSVDHits', 0)
-    if components is None or 'CDC' in components:
-        mc_trackfinder.param('UseCDCHits', 1)
-    else:
-        mc_trackfinder.param('UseCDCHits', 0)
-    path.add_module(mc_trackfinder)
-
-
-def add_tracking_reconstruction(path, components=None, pruneTracks=True, mcTrackFinding=False):
-    """
-    This function adds the standard reconstruction modules for tracking
-    to a path.  If mcTrackFinding is set it uses MC truth based track finding,
-    realistic track finding otherwise.
-    """
-
-    if components and not ('SVD' in components or 'CDC' in components):
-        return
-
-    use_vxd = components is None or 'SVD' in components
-    use_cdc = components is None or 'CDC' in components
-
-    # check for detector geometry, necessary for track extrapolation in genfit
-    if 'Geometry' not in path:
-        geometry = register_module('Geometry')
-        if components:
-            geometry.param('components', components)
-        path.add_module(geometry)
-
-    # Material effects for all track extrapolations
-    material_effects = register_module('SetupGenfitExtrapolation')
-    path.add_module(material_effects)
-
-    if mcTrackFinding:
-        add_mc_track_finding(path, components)
-    else:
-        add_track_finding(path, components)
-
-    # Match the tracks to the MC truth.  The matching works based on
-    # the output of the TrackFinderMCTruth.
-    mctrackfinder = register_module('TrackFinderMCTruth')
-    mctrackfinder.param('GFTrackCandidatesColName', 'MCTrackCands')
-    path.add_module(mctrackfinder)
-    mctrackmatcher = register_module('MCMatcherTracks')
-    mctrackmatcher.param('MCGFTrackCandsColName', 'MCTrackCands')
-    # FIXME 2015/10/30: Stopgap for the release, ideally the module
-    # would not care whether the PXD / SVD clusters are available.
-    mctrackmatcher.param('UsePXDHits', use_vxd)
-    mctrackmatcher.param('UseSVDHits', use_vxd)
-    path.add_module(mctrackmatcher)
-
-    # track fitting
-    trackfitter = register_module('GenFitter')
-    trackfitter.param({'BuildBelle2Tracks': False,
-                       "PDGCodes": [211]})
-    trackfitter.set_name('combined GenFitter')
-    path.add_module(trackfitter)
-
-    # create Belle2 Tracks from the genfit Tracks
-    trackbuilder = register_module('TrackBuilder')
-    path.add_module(trackbuilder)
-
-    # V0 finding
-    v0finder = register_module('V0Finder')
-    path.add_module(v0finder)
-
-    if components is None or 'CDC' in components:
-        # CDC dE/dx PID
-        CDCdEdxPID = register_module('CDCDedxPID')
-        path.add_module(CDCdEdxPID)
-
-    if components is None or 'SVD' in components or 'PXD' in components:
-        # VXD dE/dx PID
-        VXDdEdxPID = register_module('VXDDedxPID')
-        path.add_module(VXDdEdxPID)
-
-    # prune genfit tracks
-    if pruneTracks:
-        path.add_module("PruneGenfitTracks")
-
-
-def add_mc_tracking_reconstruction(path, components=None, pruneTracks=True):
-    """
-    This function adds the standard reconstruction modules for MC tracking
-    to a path.
-    """
-    add_tracking_reconstruction(path, components, pruneTracks, True)
-
-
-def add_reconstruction(path, components=None, pruneTracks=1):
+def add_reconstruction(path, components=None, pruneTracks=True):
     """
     This function adds the standard reconstruction modules to a path.
     """
 
     # tracking
-    add_tracking_reconstruction(path, components, pruneTracks)
+    add_tracking_reconstruction(path,
+                                components=components,
+                                pruneTracks=False)
 
     # add further reconstruction modules
-    add_posttracking_reconstruction(path, components)
+    add_posttracking_reconstruction(path,
+                                    components=components,
+                                    pruneTracks=pruneTracks)
 
 
-def add_mc_reconstruction(path, components=None, pruneTracks=1):
+def add_mc_reconstruction(path, components=None, pruneTracks=True):
     """
     This function adds the standard reconstruction modules with MC tracking
     to a path.
     """
 
     # tracking
-    add_tracking_reconstruction(path, components, pruneTracks, True)
+    add_mc_tracking_reconstruction(path,
+                                   components=components,
+                                   pruneTracks=False)
 
     # add further reconstruction modules
-    add_posttracking_reconstruction(path, components)
+    add_posttracking_reconstruction(path,
+                                    components=components,
+                                    pruneTracks=pruneTracks)
 
 
 def add_mdst_output(

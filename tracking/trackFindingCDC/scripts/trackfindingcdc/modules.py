@@ -7,57 +7,6 @@ import logging
 from ROOT import Belle2
 
 
-def add_cdc_tracking(path, cdc_trackcands="TrackCands"):
-    """
-    Convenience function for adding all cdc track finder modules
-    to the path
-
-    Arguments
-    ---------
-    path: basf2 path
-    cdc_trackcands: Name of the output genfit TrackCands. Defaults to TrackCands.
-    """
-
-    # Init the geometry for cdc tracking and the hits
-    path.add_module("WireHitTopologyPreparer")
-
-    # Find segments and reduce background hits
-    path.add_module("SegmentFinderCDCFacetAutomaton",
-                    ClusterFilter="tmva",
-                    ClusterFilterParameters={"cut": 0.2})
-
-    # Find axial tracks
-    path.add_module("TrackFinderCDCLegendreTracking",
-                    WriteGFTrackCands=False)
-
-    # Improve the quality of the axial tracks
-    path.add_module("TrackQualityAsserterCDC",
-                    WriteGFTrackCands=False,
-                    TracksStoreObjNameIsInput=True,
-                    corrections=["B2B"])
-
-    # Find the stereo hits to those axial tracks
-    path.add_module('StereoHitFinderCDCLegendreHistogramming',
-                    TracksStoreObjNameIsInput=True,
-                    WriteGFTrackCands=False)
-
-    # Combine segments with axial tracks
-    path.add_module('SegmentTrackCombinerDev',
-                    TracksStoreObjNameIsInput=True,
-                    WriteGFTrackCands=False,
-                    SegmentTrackFilterFirstStepFilter="tmva",
-                    SegmentTrackFilterFirstStepFilterParameters={"cut": 0.75},
-                    TrackFilter="tmva",
-                    TrackFilterParameters={"cut": 0.1})
-
-    # Improve the quality of all tracks and output
-    path.add_module("TrackQualityAsserterCDC",
-                    GFTrackCandsStoreArrayName=cdc_trackcands,
-                    WriteGFTrackCands=True,
-                    TracksStoreObjNameIsInput=True,
-                    corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"])
-
-
 class CDCHitUniqueAssumer(basf2.Module):
 
     """

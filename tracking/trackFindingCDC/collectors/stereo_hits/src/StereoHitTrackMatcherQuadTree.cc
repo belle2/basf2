@@ -23,7 +23,7 @@ void StereoHitTrackMatcherQuadTree::exposeParameters(ModuleParamList* modulePara
 
 }
 
-Weight StereoHitTrackMatcherQuadTree::getWeight(const CDCRecoHit3D& recoHit, const Z0TanLambdaBox& node,
+Weight StereoHitTrackMatcherQuadTree::getWeight(const CDCRecoHit3D& recoHit, const Z0TanLambdaBox&,
                                                 const CDCTrack& track) const
 {
   return m_stereoHitFilter->operator()({&recoHit, &track});

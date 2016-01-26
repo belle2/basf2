@@ -26,13 +26,23 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHBadChannels(): m_hapdSerial(""), m_febSerial(0), m_hapdCutChannels(), m_hapdBadChannels(), m_febDeadChannels(),
+    ARICHBadChannels(): m_id(-1), m_hapdSerial(""), m_febSerial(0), m_hapdCutChannels(), m_hapdBadChannels(), m_febDeadChannels(),
       m_asicDeadChannels(), m_asicBadConnChannels(), m_asicBadOffsetChannels(), m_asicBadLinChannels() {};
 
     /**
      * Destructor
      */
     ~ARICHBadChannels() {};
+
+    /** Return global ID
+     * @return global ID
+     */
+    int getID() const {return m_id; }
+
+    /** Set global ID
+     * @param global ID
+     */
+    void setID(const int id) {m_id = id; }
 
     /** Return Hapd Serial number
      * @return Hapd Serial number
@@ -311,6 +321,7 @@ namespace Belle2 {
 
 
   private:
+    int m_id;                   /**< global ID */
     std::string m_hapdSerial;   /**< serial number of the sensor */
     int m_febSerial;            /**< serial number of the FEB */
 

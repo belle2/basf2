@@ -7,5 +7,4 @@
 
 #pragma link C++ class Belle2::ARICHDatabaseImporter+;
 
-
 #endif

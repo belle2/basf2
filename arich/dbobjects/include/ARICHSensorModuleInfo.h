@@ -25,18 +25,18 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHSensorModuleInfo(): m_id(0), m_FEB(NULL), m_HAPD(NULL), m_timeStamp(), m_comment("") {};
+    ARICHSensorModuleInfo(): m_id(0), m_FEB(ARICHFEBoardInfo()), m_HAPD(ARICHHapdInfo()), m_timeStamp(), m_comment("") {};
 
     /**
      * Constructor
      */
-    ARICHSensorModuleInfo(int id, ARICHFEBoardInfo* FEB, ARICHHapdInfo* HAPD, TTimeStamp timeStamp): m_id(id), m_FEB(FEB), m_HAPD(HAPD),
+    ARICHSensorModuleInfo(int id, ARICHFEBoardInfo FEB, ARICHHapdInfo HAPD, TTimeStamp timeStamp): m_id(id), m_FEB(FEB), m_HAPD(HAPD),
       m_timeStamp(timeStamp), m_comment("") {};
 
     /**
      * Constructor
      */
-    ARICHSensorModuleInfo(int id, ARICHFEBoardInfo* FEB, ARICHHapdInfo* HAPD, TTimeStamp timeStamp, std::string comment): m_id(id),
+    ARICHSensorModuleInfo(int id, ARICHFEBoardInfo FEB, ARICHHapdInfo HAPD, TTimeStamp timeStamp, std::string comment): m_id(id),
       m_FEB(FEB), m_HAPD(HAPD), m_timeStamp(timeStamp), m_comment(comment) {};
 
     /**
@@ -57,22 +57,22 @@ namespace Belle2 {
     /** Get FEBoard Identifier
      * @return FEBoard Identifier
      */
-    ARICHFEBoardInfo* getFEBoardID() const {return m_FEB; }
+    ARICHFEBoardInfo getFEBoardID() const {return m_FEB; }
 
     /** Set FEBoard Identifier
      * @param FEBoard Identifier
      */
-    void setFEBoardID(ARICHFEBoardInfo* FEB) {m_FEB = FEB; }
+    void setFEBoardID(ARICHFEBoardInfo FEB) {m_FEB = FEB; }
 
     /** Get HAPD Identifier
      * @return HAPD Identifier
      */
-    ARICHHapdInfo* getHapdID() const {return m_HAPD; }
+    ARICHHapdInfo getHapdID() const {return m_HAPD; }
 
     /** Set HAPD Identifier
      * @param HAPD Identifier
      */
-    void setHapdID(ARICHHapdInfo* HAPD) {m_HAPD = HAPD; }
+    void setHapdID(ARICHHapdInfo HAPD) {m_HAPD = HAPD; }
 
     /** Get Production date
      * @return Production date
@@ -95,9 +95,9 @@ namespace Belle2 {
     void setSensorModuleComment(const std::string& comment) {m_comment = comment; }
 
   private:
-    int m_id;                    /**< Sensor Module identifier */
-    ARICHFEBoardInfo* m_FEB;     /**< HapdInfo Sensor identifier */
-    ARICHHapdInfo* m_HAPD;       /**< FEBoardInfo Front End Board identifier */
+    int m_id;                    /**< Sensor Module identifier: m_id = n_ring * nModulesInRing + n_column */
+    ARICHFEBoardInfo m_FEB;      /**< HapdInfo Sensor identifier */
+    ARICHHapdInfo m_HAPD;        /**< FEBoardInfo Front End Board identifier */
     TTimeStamp m_timeStamp;      /**< Production Date */
     std::string m_comment;       /**< optional comment */
 

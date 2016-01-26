@@ -16,14 +16,14 @@ using namespace std;
 
 ClassImp(ARICHFEBoardInfo);
 
-ARICHAsicInfo* ARICHFEBoardInfo::getAsicInfo(unsigned int i) const
+ARICHAsicInfo ARICHFEBoardInfo::getAsicInfo(unsigned int i) const
 {
   if (i < 4) return m_asicInfo[i];
-  else return NULL;
+  else return ARICHAsicInfo();
 }
 
 
-void ARICHFEBoardInfo::setAsicInfo(unsigned int i, ARICHAsicInfo* asicInfo)
+void ARICHFEBoardInfo::setAsicInfo(unsigned int i, ARICHAsicInfo asicInfo)
 {
   if (i < 4) m_asicInfo[i] = asicInfo;
 }

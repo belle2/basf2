@@ -10,9 +10,9 @@ import subprocess
 from fnmatch import fnmatch
 
 # use_local_database()
-use_local_database("test_database.txt", "test_payloads")
+# use_local_database("test_database.txt", "test_payloads")
 # use use_central_database for uploading data to PNNL
-# use_central_database("ARICHdata", LogLevel.ERROR);
+use_central_database("ARICH", LogLevel.ERROR)
 # use_central_database("test_ARICHReconstruction", LogLevel.ERROR)
 
 
@@ -20,6 +20,7 @@ use_local_database("test_database.txt", "test_payloads")
 # get rid of an error message with gearbox
 eventinfo = register_module('EventInfoSetter')
 eventinfo.initialize()
+
 
 # download data if it is not available locally
 # make sure you change paths
@@ -29,9 +30,9 @@ if not os.path.isfile('hapd_hamamatsuData/hapdData.xml'):
     subprocess.call(['svn', 'co', 'https://belle2.cc.kek.jp/svn/groups/arich/database/data/hapd_hamamatsuData/'])
 if not os.path.isfile('AllData/ArichData.xml'):
     subprocess.call(['svn', 'co', 'https://belle2.cc.kek.jp/svn/groups/arich/database/data/AllData/'])
-if not os.path.isfile('asicData/ASIC_status.xml'):
-    subprocess.call(['svn', 'co', 'https://belle2.cc.kek.jp/svn/groups/arich/database/data/asicData/'])
-if not os.path.isfile('hapdQA_test/KA0152_data.root'):
+# if not os.path.isfile('asicData/ASIC_status.xml'):
+#    subprocess.call(['svn', 'co', 'https://belle2.cc.kek.jp/svn/groups/arich/database/data/asicData/'])
+if not os.path.isfile('hapdQA/KA0152_data.root'):
     subprocess.call(['svn', 'co', 'https://belle2.cc.kek.jp/svn/groups/arich/database/data/hapdQA_test/'])
 if not os.path.isfile('febTest/SN_dna.xml'):
     subprocess.call(['svn', 'co', 'https://belle2.cc.kek.jp/svn/groups/arich/database/data/febTest/'])
@@ -50,7 +51,7 @@ paramloader.initialize()
 # create a std::vector<string>
 rootFilesHapdQA = ROOT.vector('string')()
 # and add the files we want to read
-xdirHapdQA = '%s/hapdQA_test/' % (os.getcwd())
+xdirHapdQA = '%s/hapdQA/' % (os.getcwd())
 for path, subdirs, files in os.walk(xdirHapdQA):
     for name in files:
         if fnmatch(name, "*.root"):
@@ -71,7 +72,7 @@ rootFilesAsics = ROOT.vector('string')()
 txtFilesAsics = ROOT.vector('string')()
 # create path to directory
 number = '00'
-xdir = ('%s/asicData' + number + '/') % (os.getcwd())
+xdir = ('%s/asicData/asicData' + number + '/') % (os.getcwd())
 # and add the files we want to read
 for path, subdirs, files in os.walk(xdir):
     for name in files:
@@ -86,20 +87,25 @@ process(main)
 
 # and run the importer
 dbImporter = ARICHDatabaseImporter(rootFilesHapdQA, rootFilesAsics, txtFilesAsics, rootFilesHapdQE)
-# dbImporter.importAerogelInfo()
+dbImporter.importAerogelInfo()
 # dbImporter.exportAerogelInfo()
-# dbImporter.importHapdQA()
+# dbImporter.importAerogelInfoEventDep()
+# dbImporter.exportAerogelInfoEventDep()
+dbImporter.importHapdQA()
 # dbImporter.exportHapdQA()
 # dbImporter.importAsicInfo()
 # dbImporter.exportAsicInfo()
 # dbImporter.importFebTest()
 # dbImporter.exportFebTest()
-# dbImporter.importHapdInfo()
+dbImporter.importHapdInfo()
 # dbImporter.exportHapdInfo()
-# dbImporter.importHapdQE()
+dbImporter.importHapdQE()
 # dbImporter.exportHapdQE()
-# dbImporter.importBadChannels()
+dbImporter.importBadChannels()
 # dbImporter.exportBadChannels()
 
-# simple example that shows how to read data from databse and use it
+# simple example that shows how to read data from database and use it
 # dbImporter.getBiasVoltagesForHapdChip("KA0167")
+
+# simple example that shows how to extract aerogel recontruction data from database
+# dbImporter.getMyParams("A165")

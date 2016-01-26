@@ -14,6 +14,7 @@
 #pragma link C++ class Belle2::ARICHCableInfo+;
 #pragma link C++ class Belle2::ARICHComponentTest+;
 #pragma link C++ class Belle2::ARICHFEBoardInfo+;
+#pragma link C++ class Belle2::ARICHFebHapdChannelMap+;
 #pragma link C++ class Belle2::ARICHFebTest+;
 #pragma link C++ class Belle2::ARICHFirmware+;
 #pragma link C++ class Belle2::ARICHHapdChipInfo+;

@@ -9,7 +9,7 @@ import glob
 import subprocess
 from fnmatch import fnmatch
 
-use_central_database("test_ARICHReconstruction", LogLevel.ERROR)
+use_central_database("newtest3", LogLevel.ERROR)
 # use_central_database("test_param", LogLevel.WARNING)
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
@@ -17,16 +17,13 @@ use_central_database("test_ARICHReconstruction", LogLevel.ERROR)
 eventinfo = register_module('EventInfoSetter')
 eventinfo.initialize()
 
+
 main = create_path()
 main.add_module(eventinfo)
 process(main)
 
 # and run the importer
-dbImporter = ARICHDatabaseImporter(
-    ROOT.vector('string')(),
-    ROOT.vector('string')(),
-    ROOT.vector('string')(),
-    ROOT.vector('string')())
+dbImporter = ARICHDatabaseImporter()
 
 dbImporter.exportAerogelInfo()
 # dbImporter.exportHapdQA()

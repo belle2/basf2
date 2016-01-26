@@ -102,8 +102,8 @@ namespace Belle2 {
 
 
   private:
-    int m_position;              /**< Position in the detector */
-    int m_sextant;               /**< Sextant identification   */
+    int m_position;             /**< Position in the detector */
+    int m_sextant;              /**< Sextant identification   */
     ARICHMergerInfo m_merger;   /**< Merger Board identifier */
     ARICHB2LinkInfo m_b2Link;   /**< B2Link Identifier */
     ARICHCableInfo  m_cable;    /**< Cable Identifier */

@@ -66,7 +66,7 @@ namespace Belle2 {
 
   private:
 
-    int m_id;      /**< Belle2Link Identifier */
+    int m_id;        /**< Belle2Link Identifier */
     int m_address;   /**< Belle2Link address */
     int m_port;      /**< integer Belle2Link port */
 

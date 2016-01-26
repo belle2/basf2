@@ -28,15 +28,15 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHHapdQA(): m_serial(""), m_measurementDate(), m_leakCurrent(), m_hitData2D(NULL), m_noise(), m_hitCount(),
+    ARICHHapdQA(): m_serial(""), m_arrivalDate(), m_leakCurrent(), m_hitData2D(NULL), m_noise(), m_hitCount(),
       m_comment("") {};
 
     /**
      * Constructor
      */
 
-    ARICHHapdQA(std::string serial, TTimeStamp measurementDate, std::vector<TGraph*> leakCurrent, TH2F* hitData2D,
-                std::vector<TGraph*> noise, std::vector<TH1S*> hitCount): m_serial(serial), m_measurementDate(measurementDate),
+    ARICHHapdQA(std::string serial, TTimeStamp arrivalDate, std::vector<TGraph*> leakCurrent, TH2F* hitData2D,
+                std::vector<TGraph*> noise, std::vector<TH1S*> hitCount): m_serial(serial), m_arrivalDate(arrivalDate),
       m_leakCurrent(leakCurrent), m_hitData2D(hitData2D), m_noise(noise), m_hitCount(hitCount), m_comment("") { };
 
 
@@ -60,12 +60,12 @@ namespace Belle2 {
     /** Return HAPD measurement date
      * @return HAPD measurement date
      */
-    TTimeStamp getHapdMeasurementDate() const {return m_measurementDate; }
+    TTimeStamp getHapdArrivalDate() const {return m_arrivalDate; }
 
     /** Set HAPD measurement date
      * @param HAPD measurement date
      */
-    void setHapdMeasurementDate(TTimeStamp measurementDate) {m_measurementDate = measurementDate; }
+    void setHapdArrivalDate(TTimeStamp arrivalDate) {m_arrivalDate = arrivalDate; }
 
     /**
      * Return Leakeage Current as a function of bias voltage
@@ -128,7 +128,7 @@ namespace Belle2 {
 
   private:
     std::string m_serial;                 /**< serial number of the sensor */
-    TTimeStamp m_measurementDate;         /**< date of measurement */
+    TTimeStamp m_arrivalDate;             /**< date of HAPD's arrival */
     std::vector<TGraph*> m_leakCurrent;   /**< Leakege Current as a function of bias voltage */
     TH2F* m_hitData2D;                    /**< 2D hit data */
     std::vector<TGraph*> m_noise;         /**< Noise level vs. bias voltage for each channel */

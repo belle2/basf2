@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <arich/dbobjects/ARICHAerogelInfo.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace std;

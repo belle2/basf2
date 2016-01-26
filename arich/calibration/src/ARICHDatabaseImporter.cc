@@ -20,9 +20,12 @@
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <framework/database/EventDependency.h>
 
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
+#include <framework/database/DBStore.h>
+#include <framework/database/LocalDatabase.h>
 #include <framework/database/DBArray.h>
 
 #include <TH1.h>
@@ -30,6 +33,7 @@
 #include <TH3.h>
 #include <TF1.h>
 #include <TGraph.h>
+#include <TCanvas.h>
 #include <TFile.h>
 #include <TKey.h>
 #include <string>
@@ -38,7 +42,8 @@
 #include <fstream>
 #include <iostream>
 #include <TClonesArray.h>
-
+#include <TTree.h>
+#include <tuple>
 
 using namespace std;
 using namespace Belle2;
@@ -84,19 +89,52 @@ void ARICHDatabaseImporter::importAerogelInfo()
     agel++;
   }
 
+  // define interval of validity
+//  IntervalOfValidity iov(0, 0, 1, 99);
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
 
   // store under default name:
-  //Database::Instance().storeData(&agelConstants, iov);
-
+  // Database::Instance().storeData(&agelConstants, iov);
   // store under user defined name:
   Database::Instance().storeData("ARICHAerogelInfo", &agelConstants, iov);
 }
 
-
 void ARICHDatabaseImporter::exportAerogelInfo()
 {
 
+  // Definition:
+  // This function extracts data from the database for chosen event.
+
+  /*
+    // Extract data from payload with bounded validity
+
+    // Define event, run and experiment numbers
+    EventMetaData event = EventMetaData(1200,4,0); // (event, run, exp)
+
+    // Extract object and IOV from database
+    std::pair<TObject*, IntervalOfValidity> podatki = Database::Instance().getData(event, "dbstore", "ARICHAerogelInfo");
+
+    // print interval of validity
+  //  IntervalOfValidity iov = std::get<1>(podatki);
+  //  B2INFO("iov = " << iov);
+
+    // Convert between different class types and extract TClonesArray
+    // for chosen event
+    TObject* data;
+    data = std::get<0>(podatki);
+    TClonesArray* elements = static_cast<TClonesArray*>(data);
+
+    // Get entries from TClonesArray and print aerogel info
+    (*elements).GetEntries();
+    for (int i = 0; i < elements->GetSize(); i++) {
+      ARICHAerogelInfo* myelement = (ARICHAerogelInfo*)elements->At(i);
+      B2INFO("Version = " << myelement->getAerogelVersion() << ", SN = " << myelement->getAerogelSerial() << ", n = " << myelement->getAerogelRefractiveIndex() << ", trl = " << myelement->getAerogelTransmissionLength() << ", thickness = " << myelement->getAerogelThickness());
+    }
+  */
+
+
+
+  // Extract data from payload with unbounded validity
   DBArray<ARICHAerogelInfo> elements("ARICHAerogelInfo");
   elements.getEntries();
 
@@ -107,6 +145,126 @@ void ARICHDatabaseImporter::exportAerogelInfo()
            ", id = " << element.getAerogelID() << ", n = " << element.getAerogelRefractiveIndex() << ", transmLength = " <<
            element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness())
   }
+
+}
+
+
+
+void ARICHDatabaseImporter::importAerogelInfoEventDep()
+{
+  GearDir content = GearDir("/ArichData/AllData/AerogelData/Content");
+
+  // define data arrays
+  TClonesArray agelConstantsA("Belle2::ARICHAerogelInfo");
+  TClonesArray agelConstantsB("Belle2::ARICHAerogelInfo");
+  TClonesArray agelConstantsC("Belle2::ARICHAerogelInfo");
+
+
+  for (int someint = 0; someint < 3; someint++) {
+    int agel = 0;
+    // loop over xml files and extract the data
+    for (const auto& aerogel : content.getNodes("aerogel")) {
+      // different version is made up - only used to check performance
+      // of intrarun dependat function
+      float version = 0;
+      if (someint == 0)     version = (float) aerogel.getDouble("version");
+      if (someint == 1)     version = 4.0;
+      if (someint == 2)     version = 5.0;
+
+      string serial = aerogel.getString("serial");
+      string id = aerogel.getString("id");
+      float index = (float) aerogel.getDouble("index");
+      float trlen = (float) aerogel.getDouble("translength");
+      float thickness = (float) aerogel.getDouble("thick");
+      vector<int> lambdas;
+      vector<float> transmittances;
+      for (const auto& transmittance : aerogel.getNodes("transmittance/transpoint")) {
+        int lambda = transmittance.getInt("@lambda");
+        float val = (float) transmittance.getDouble(".");
+        lambdas.push_back(lambda);
+        transmittances.push_back(val);
+      }
+
+      // save data as an element of the array
+      if (someint == 0)    new(agelConstantsA[agel]) ARICHAerogelInfo(version, serial, id, index, trlen, thickness, lambdas,
+            transmittances);
+      if (someint == 1)    new(agelConstantsB[agel]) ARICHAerogelInfo(version, serial, id, index, trlen, thickness, lambdas,
+            transmittances);
+      if (someint == 2)    new(agelConstantsC[agel]) ARICHAerogelInfo(version, serial, id, index, trlen, thickness, lambdas,
+            transmittances);
+      agel++;
+    }
+  }
+
+  // set interval of validity
+  IntervalOfValidity iov(0, 0, 0, 99);
+//  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+
+  // convert pointers to ARICHAerogelInfo into pointers to TObject
+  TObject* agelObj[3];
+  agelObj[0] = static_cast<TObject*>(&agelConstantsA);
+  agelObj[1] = static_cast<TObject*>(&agelConstantsB);
+  agelObj[2] = static_cast<TObject*>(&agelConstantsC);
+
+  // add objects with different validity
+  EventDependency intraRun(agelObj[0]);
+  intraRun.add(500, agelObj[1]);   // valid from event number 500
+  intraRun.add(1000, agelObj[2]);  // valid from event number 1000
+
+  // store under user defined name
+  Database::Instance().storeData("ARICHAerogelInfoEventDep", &intraRun, iov);
+
+}
+
+void ARICHDatabaseImporter::exportAerogelInfoEventDep()
+{
+  // Definition:
+  // This function extracts intrarun dependant data from the database.
+  // It converts between different class types to get the saved
+  // TClonesArray for chosen event, run and experiment.
+
+
+  // Define event, run and experiment numbers
+  EventMetaData event = EventMetaData(1200, 4, 0); // (event, run, exp)
+
+  // Extract object and IOV from database
+  std::pair<TObject*, IntervalOfValidity> podatki = Database::Instance().getData(event, "dbstore", "ARICHAerogelInfoEventDep");
+
+  // print interval of validity
+//  IntervalOfValidity iov = std::get<1>(podatki);
+//  B2INFO("iov = " << iov);
+
+  // Convert between different class types and extract TClonesArray
+  // for chosen event
+  TObject* data = std::get<0>(podatki);
+  EventDependency* data2 = static_cast<EventDependency*>(data);
+  TObject* myobject = data2->getObject(event);
+  TClonesArray* elements = static_cast<TClonesArray*>(myobject);
+
+  // Get entries from TClonesArray and print aerogel info
+  (*elements).GetEntries();
+  for (int i = 0; i < elements->GetSize(); i++) {
+    ARICHAerogelInfo* myelement = (ARICHAerogelInfo*)elements->At(i);
+    B2INFO("Version = " << myelement->getAerogelVersion() << ", SN = " << myelement->getAerogelSerial() << ", n = " <<
+           myelement->getAerogelRefractiveIndex() << ", trl = " << myelement->getAerogelTransmissionLength() << ", thickness = " <<
+           myelement->getAerogelThickness());
+  }
+
+  /*
+
+    // Extract data from the last added payload
+    DBArray<ARICHAerogelInfo> elements("ARICHAerogelInfo");
+    elements.getEntries();
+
+    // Print aerogel info
+
+    for (const auto& element : elements) {
+      B2INFO("Version = " << element.getAerogelVersion() << ", serial = " << element.getAerogelSerial() <<
+             ", id = " << element.getAerogelID() << ", n = " << element.getAerogelRefractiveIndex() << ", transmLength = " <<
+             element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness())
+    }
+
+  */
 }
 
 
@@ -118,7 +276,6 @@ void ARICHDatabaseImporter::importHapdQA()
 
   // loop over root riles
   for (const string& inputFile : m_inputFilesHapdQA) {
-
     TFile* f = TFile::Open(inputFile.c_str(), "READ");
 
     int size = inputFile.length();
@@ -128,6 +285,9 @@ void ARICHDatabaseImporter::importHapdQA()
     TH2F* hitData2D = 0;
     vector<TGraph*> noise;
     vector<TH1S*> hitCount;
+    TTimeStamp arrivalDate;
+    int arrival;
+    TTree* tree = 0;
 
     // extract data
     TIter next(f->GetListOfKeys());
@@ -137,8 +297,8 @@ void ARICHDatabaseImporter::importHapdQA()
       string strime = key->GetName();
 
       if (strime.find("gcurrent") == 0) {
-        TGraph* hhist1 = (TGraph*)f->Get(strime.c_str());
-        leakCurrent.push_back(hhist1);
+        TGraph* graphcurrent = (TGraph*)f->Get(strime.c_str());
+        leakCurrent.push_back(graphcurrent);
       }
 
       else if (strime.find("h2dscan") == 0) {
@@ -147,8 +307,8 @@ void ARICHDatabaseImporter::importHapdQA()
       }
 
       else if (strime.find("gnoise_ch") == 0) {
-        TGraph* hhist2 = (TGraph*)f->Get(strime.c_str());
-        noise.push_back(hhist2);
+        TGraph* graphnoise = (TGraph*)f->Get(strime.c_str());
+        noise.push_back(graphnoise);
       }
 
       else if (strime.find("hchscan") == 0) {
@@ -166,16 +326,22 @@ void ARICHDatabaseImporter::importHapdQA()
         }
         hhist3short->SetDirectory(0);
         hitCount.push_back(hhist3short);
-
       }
 
-      else { B2INFO("Key name does not match any of the following: gcurrent, 2dscan, gnoise, hchscan!"); }
+      else if (strime.find("tree") == 0) {
+        tree = (TTree*)f->Get(strime.c_str());
+        tree->SetBranchAddress("arrival", &arrival);
+        tree->GetEntry(0);
+        arrivalDate = TTimeStamp(arrival, 0);
+      }
+
+      else { B2INFO("Key name does not match any of the following: gcurrent, 2dscan, gnoise, hchscan, tree_ts! - serial number: " << hapdSerial << "; key name = " << strime.c_str()); }
     }
 
-    TTimeStamp measurementDate = {};
+
 
     // save data as an element of the array
-    new(hapdQAConstants[hapd]) ARICHHapdQA(hapdSerial, measurementDate, leakCurrent, hitData2D, noise, hitCount);
+    new(hapdQAConstants[hapd]) ARICHHapdQA(hapdSerial, arrivalDate, leakCurrent, hitData2D, noise, hitCount);
     hapd++;
   }
 
@@ -193,7 +359,7 @@ void ARICHDatabaseImporter::exportHapdQA()
   // Print serial numbers of HAPDs
   unsigned int el = 0;
   for (const auto& element : elements) {
-    B2INFO("Element Number: " << el << "; serial = " << element.getHapdSerialNumber());
+    B2INFO("Serial number = " << element.getHapdSerialNumber() << "; arrival date = " << element.getHapdArrivalDate());
     el++;
   }
 }
@@ -407,7 +573,6 @@ void ARICHDatabaseImporter::importFebTest()
   GearDir content1 = GearDir("/ArichData/AllData/febmapping");
   GearDir content2 = GearDir("/ArichData/AllData/FEBData/Content");
   GearDir content2HV = GearDir("/ArichData/AllData/FEBDataHV/Content");
-  GearDir content2LV = GearDir("/ArichData/AllData/FEBDataLV/Content");
 
   // find matching sn and dna
   for (const auto& febmap : content1.getNodes("feb")) {
@@ -469,48 +634,26 @@ void ARICHDatabaseImporter::importFebTest()
       }
     }
 
-    // high voltage test data
-    for (const auto& testFEBhv : content2HV.getNodes("febtest")) {
-      string timeHV = testFEBhv.getString("time");
-      for (const auto& testFEBhv_sn : testFEBhv.getNodes("hvtest/feb")) {
-        int serial_hv = testFEBhv_sn.getInt("sn");
-        if (serial_hv == serial) {
-          for (const auto& testFEBhv_i : testFEBhv_sn.getNodes("febhv/n")) {
-            int n_id = testFEBhv_i.getInt("@id");
-            if (n_id == 9) {
-              float currentV99p = (float) testFEBhv_i.getDouble("n1470/I");
-              febConst->setTimeHV(ARICHDatabaseImporter::timedate2(timeHV));
-              febConst->setCurrentV99p(currentV99p);
-            }
-          }
-        }
-      }
-    }
+    // high voltage test data std::tuple funkcija!
+    std::tuple<std::string, float> HVtest = ARICHDatabaseImporter::getFebHVtestData(serial);
+    febConst->setTimeHV(ARICHDatabaseImporter::timedate2(std::get<0>(HVtest)));
+    febConst->setCurrentV99p(std::get<1>(HVtest));
 
-    // low voltage test data
-    for (const auto& testFEBlv : content2LV.getNodes("febtest")) {
-      string timeLV = testFEBlv.getString("time");
-      for (const auto& testFEBlv_sn : testFEBlv.getNodes("lvtest/feb")) {
-        int serial_lv = testFEBlv_sn.getInt("sn");
-        if (serial_lv == serial) {
-          for (const auto& testFEBlv_i : testFEBlv_sn.getNodes("febps/n")) {
-            int n_id = testFEBlv_i.getInt("@id");
-            if (n_id == 14) {
-              float currentV20p = 0.0, currentV21n = 0.0, currentV38p = 0.0;
-              for (const auto& testFEBlv_pw : testFEBlv_i.getNodes("pw18")) {
-                if (testFEBlv_pw.getInt("@id") == 0) {  currentV20p = (float) testFEBlv_pw.getDouble("I");  }
-                if (testFEBlv_pw.getInt("@id") == 1) {  currentV21n = (float) testFEBlv_pw.getDouble("I");  }
-                if (testFEBlv_pw.getInt("@id") == 2) {  currentV38p = (float) testFEBlv_pw.getDouble("I");  }
-              }
-              febConst->setTimeLV(ARICHDatabaseImporter::timedate2(timeLV));
-              febConst->setCurrentV20p(currentV20p);
-              febConst->setCurrentV21n(currentV21n);
-              febConst->setCurrentV38p(currentV38p);
-            }
-          }
-        }
-      }
-    }
+    // low voltage test data std::tuple funkcija!
+
+    std::tuple<std::string, float, float, float> LVtest = ARICHDatabaseImporter::getFebLVtestData(serial);
+    febConst->setTimeLV(ARICHDatabaseImporter::timedate2(std::get<0>(LVtest)));
+    febConst->setCurrentV20p(std::get<1>(LVtest));
+    febConst->setCurrentV21n(std::get<2>(LVtest));
+    febConst->setCurrentV38p(std::get<3>(LVtest));
+
+
+//    febConst->setSlopesFine(slopesFine); // std::vector<float>
+//    febConst->setSlopesRough(slopesRough); // std::vector<float>
+//    febConst->setOffsetFine3D(offsetFine); // TH3F*
+//    febConst->setOffsetRough3D(offsetRough); // TH3F*
+//    febConst->setTestPulse2D(testPulse); // TH2F*
+
 
     feb++;
   }
@@ -518,6 +661,58 @@ void ARICHDatabaseImporter::importFebTest()
   // define IOV and store data to the DB
   IntervalOfValidity iov(0, 0, -1, -1);
   Database::Instance().storeData("ARICHFebTest", &febConstants, iov);
+}
+
+std::tuple<std::string, float, float, float> ARICHDatabaseImporter::getFebLVtestData(int serial)
+{
+  GearDir content2LV = GearDir("/ArichData/AllData/FEBDataLV/Content");
+  std::tuple<std::string, float, float, float> LVtest;
+
+  for (const auto& testFEBlv : content2LV.getNodes("febtest")) {
+    string timeLV = testFEBlv.getString("time");
+    for (const auto& testFEBlv_sn : testFEBlv.getNodes("lvtest/feb")) {
+      int serial_lv = testFEBlv_sn.getInt("sn");
+      if (serial_lv == serial) {
+        for (const auto& testFEBlv_i : testFEBlv_sn.getNodes("febps/n")) {
+          int n_id = testFEBlv_i.getInt("@id");
+          if (n_id == 14) {
+            float currentV20p = 0.0, currentV21n = 0.0, currentV38p = 0.0;
+            for (const auto& testFEBlv_pw : testFEBlv_i.getNodes("pw18")) {
+              if (testFEBlv_pw.getInt("@id") == 0) {  currentV20p = (float) testFEBlv_pw.getDouble("I");  }
+              if (testFEBlv_pw.getInt("@id") == 1) {  currentV21n = (float) testFEBlv_pw.getDouble("I");  }
+              if (testFEBlv_pw.getInt("@id") == 2) {  currentV38p = (float) testFEBlv_pw.getDouble("I");  }
+            }
+            LVtest = std::make_tuple(timeLV, currentV20p, currentV21n, currentV38p);
+          }
+        }
+      }
+    }
+  }
+  return LVtest;
+}
+
+
+std::tuple<std::string, float> ARICHDatabaseImporter::getFebHVtestData(int serial)
+{
+  GearDir content2HV = GearDir("/ArichData/AllData/FEBDataHV/Content");
+  std::tuple<std::string, float> HVtest;
+
+  for (const auto& testFEBhv : content2HV.getNodes("febtest")) {
+    string timeHV = testFEBhv.getString("time");
+    for (const auto& testFEBhv_sn : testFEBhv.getNodes("hvtest/feb")) {
+      int serial_hv = testFEBhv_sn.getInt("sn");
+      if (serial_hv == serial) {
+        for (const auto& testFEBhv_i : testFEBhv_sn.getNodes("febhv/n")) {
+          int n_id = testFEBhv_i.getInt("@id");
+          if (n_id == 9) {
+            float currentV99p = (float) testFEBhv_i.getDouble("n1470/I");
+            HVtest = std::make_tuple(timeHV, currentV99p);
+          }
+        }
+      }
+    }
+  }
+  return HVtest;
 }
 
 std::vector<int> ARICHDatabaseImporter::getDeadChFEB(std::string dna)
@@ -533,7 +728,6 @@ std::vector<int> ARICHDatabaseImporter::getDeadChFEB(std::string dna)
     }
   } else { B2INFO("No file FEBdeadChannels.txt"); }
   fileFEB.close();
-
 
   return listCHs;
 }
@@ -1044,23 +1238,35 @@ void ARICHDatabaseImporter::importBadChannels()
     channelConst->setHapdSerial(hapdSerial[l]);
     channelConst->setHapdBadChannel(hapdBadlist[l]);
     channelConst->setHapdCutChannel(hapdCutlist[l]);
+    channelConst->setID(l);
   }
 
   // fill FEB data to ARICHBadChannels class
-  for (int k = l; k < (i + j); k++) {
+  for (int k = i; k < (i + j); k++) {
     new(channelConstants[k])  ARICHBadChannels();
     auto* channelConst = static_cast<ARICHBadChannels*>(channelConstants[k]);
-    channelConst->setFebSerial(febSerial[k - l]);
-    channelConst->setFebDeadChannels(febDeadlist[k - l]);
-    channelConst->setAsicDeadChannels(asicNosignalCHs[k - l]);
-    channelConst->setAsicBadConnChannels(asicBadconnCHs[k - l]);
-    channelConst->setAsicBadOffsetChannels(asicBadoffsetCHs[k - l]);
-    channelConst->setAsicBadLinChannels(asicBadlinCHs[k - l]);
+    channelConst->setFebSerial(febSerial[k - i]);
+    channelConst->setFebDeadChannels(febDeadlist[k - i]);
+    channelConst->setAsicDeadChannels(asicNosignalCHs[k - i]);
+    channelConst->setAsicBadConnChannels(asicBadconnCHs[k - i]);
+    channelConst->setAsicBadOffsetChannels(asicBadoffsetCHs[k - i]);
+    channelConst->setAsicBadLinChannels(asicBadlinCHs[k - i]);
+    channelConst->setID(k);
   }
 
   // define IOV and store data to the DB
   IntervalOfValidity iov(0, 0, -1, -1);
+  //Database::Instance().storeData("ARICHBadChannels", &channelConstants, iov);
+
+  /*  TObject* channelObj = static_cast<TObject*>(&channelConstants);
+
+    EventDependency intraRun(channelObj);
+    intraRun.add(500, channelObj);  // configuration B is valid staring from event number 500
+    intraRun.add(1000, channelObj);  // configuration C is valid staring from event number 1000
+
+    Database::Instance().storeData("ARICHBadChannels", &intraRun, iov);*/
   Database::Instance().storeData("ARICHBadChannels", &channelConstants, iov);
+
 
 }
 
@@ -1179,4 +1385,38 @@ void ARICHDatabaseImporter::getBiasVoltagesForHapdChip(std::string serialNumber)
     }
   }
 }
+
+
+
+void ARICHDatabaseImporter::getMyParams(std::string aeroSerialNumber)
+{
+  map<string, float> aerogelParams = ARICHDatabaseImporter::getAerogelParams(aeroSerialNumber);
+
+  B2INFO("SN = " << aeroSerialNumber << "; n = " << aerogelParams.find("refractiveIndex")->second << "; transLen = " <<
+         aerogelParams.find("transmissionLength")->second << "; thickness = " << aerogelParams.find("thickness")->second);
+}
+
+
+std::map<std::string, float> ARICHDatabaseImporter::getAerogelParams(std::string aeroSerialNumber)
+{
+  // Description:
+  // This function loops over aerogel tiles and returns refractive index,
+  // thickness and transmission length of aerogel for serial number
+
+  std::map<std::string, float> aerogelParams;
+  DBArray<ARICHAerogelInfo> elements("ARICHAerogelInfo");
+  elements.getEntries();
+  for (const auto& element : elements) {
+    if ((element.getAerogelSerial()) == aeroSerialNumber) {
+      aerogelParams = {
+        { "refractiveIndex", element.getAerogelRefractiveIndex() },
+        { "transmissionLength", element.getAerogelTransmissionLength() },
+        { "thickness", element.getAerogelThickness() }
+      };
+    }
+  }
+  return aerogelParams;
+}
+
+
 

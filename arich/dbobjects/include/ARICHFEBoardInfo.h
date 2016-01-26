@@ -27,14 +27,14 @@ namespace Belle2 {
      */
     ARICHFEBoardInfo(): m_id(0), m_timeStamp(), m_currentLocation("")
     {
-      for (unsigned i = 0; i < 4; i++) m_asicInfo[i] = NULL;
+      for (unsigned i = 0; i < 4; i++) m_asicInfo[i] = ARICHAsicInfo();
       for (unsigned i = 0; i < 4; i++) m_asicsFEB[i] = ("");
     };
 
     /**
      * Constructor
      */
-    ARICHFEBoardInfo(int id, ARICHAsicInfo** asicInfo, std::string asicsFEB, TTimeStamp timeStamp): m_id(id), m_timeStamp(timeStamp),
+    ARICHFEBoardInfo(int id, ARICHAsicInfo* asicInfo, std::string asicsFEB, TTimeStamp timeStamp): m_id(id), m_timeStamp(timeStamp),
       m_currentLocation("")
     {
       for (unsigned i = 0; i < 4; i++) m_asicInfo[i] = asicInfo[i];
@@ -59,12 +59,12 @@ namespace Belle2 {
     /** Get Asic Info
      * @return Asic Info
      */
-    ARICHAsicInfo* getAsicInfo(unsigned int i) const;
+    ARICHAsicInfo getAsicInfo(unsigned int i) const;
 
     /** Set Asic Info
      * @param Asic Info
      */
-    void setAsicInfo(unsigned int i, ARICHAsicInfo* asic);
+    void setAsicInfo(unsigned int i, ARICHAsicInfo asic);
 
     /** Get Asic Info
      * @return Asic Info
@@ -98,7 +98,7 @@ namespace Belle2 {
 
   private:
     int m_id;                        /**< FrontEndBoard Identfier */
-    ARICHAsicInfo* m_asicInfo[4];    /**< id of the i-th chip in the FEB */
+    ARICHAsicInfo m_asicInfo[4];     /**< id of the i-th chip in the FEB */
     std::string m_asicsFEB[4];       /**< serial numbers of ASICs on FEB board */
     TTimeStamp m_timeStamp;          /**< Production Date */
     std::string m_currentLocation;   /**< Current Location of the FEB */

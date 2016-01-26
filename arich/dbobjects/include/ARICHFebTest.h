@@ -13,9 +13,10 @@
 #include <TObject.h>
 #include <string>
 #include <cmath>
-#include <framework/logging/Logger.h>
 #include <vector>
 #include <TTimeStamp.h>
+#include <TH2F.h>
+#include <TH3F.h>
 
 #include <TROOT.h>
 #include <TClass.h>
@@ -34,14 +35,17 @@ namespace Belle2 {
      */
     ARICHFebTest(): m_serial(0), m_dna(""), m_timeSlowC(), m_tmon0(0.0), m_tmon1(0.0), m_vdd(0.0), m_v2p(0.0), m_v2n(0.0), m_vss(0.0),
       m_vth1(0.0), m_vth2(0.0), m_vcc12(0.0), m_vcc15(0.0), m_vcc25(0.0), m_v38p(0.0), m_timeLV(), m_currentV20p(0.0), m_currentV21n(0.0),
-      m_currentV38p(0.0), m_timeHV(), m_currentV99p(0.0) {};
+      m_currentV38p(0.0), m_timeHV(), m_currentV99p(0.0), m_deadChannel(), m_testPulse(NULL), m_offsetRough(NULL), m_offsetFine(NULL),
+      m_slopesRough(), m_slopesFine() {};
+
 
     /**
      * Constructor
      */
     explicit ARICHFebTest(int serial): m_serial(serial), m_dna(""), m_timeSlowC(), m_tmon0(0.0), m_tmon1(0.0), m_vdd(0.0), m_v2p(0.0),
       m_v2n(0.0), m_vss(0.0), m_vth1(0.0), m_vth2(0.0), m_vcc12(0.0), m_vcc15(0.0), m_vcc25(0.0), m_v38p(0.0), m_timeLV(),
-      m_currentV20p(0.0), m_currentV21n(0.0), m_currentV38p(0.0), m_timeHV(), m_currentV99p(0.0) {};
+      m_currentV20p(0.0), m_currentV21n(0.0), m_currentV38p(0.0), m_timeHV(), m_currentV99p(0.0), m_deadChannel(), m_testPulse(NULL),
+      m_offsetRough(NULL), m_offsetFine(NULL), m_slopesRough(), m_slopesFine() {};
 
     /**
      * Destructor
@@ -285,6 +289,91 @@ namespace Belle2 {
      */
     int getDeadChannelsSize() const {return m_deadChannel.size();}
 
+    /**
+     * Return test pulse
+     * @return 2D test pulse
+     */
+    TH2F* getTestPulse2D() const {return m_testPulse;}
+
+    /**
+     * Set test pulse
+     * @param 2D test pulse
+     */
+    void setTestPulse2D(TH2F* testPulse) { m_testPulse = testPulse;}
+
+    /**
+     * Return threshold scans with rough offset settings
+     * @return 3D threshold scans with rough offset settings
+     */
+    TH3F* getOffsetRough3D() const {return m_offsetRough;}
+
+    /**
+     * Set threshold scans with rough offset settings
+     * @param 3D threshold scans with rough offset settings
+     */
+    void setOffsetRough3D(TH3F* offsetRough) { m_offsetRough = offsetRough;}
+
+    /**
+     * Return threshold scans with fine offset settings
+     * @return 3D threshold scans with fine offset settings
+     */
+    TH3F* getOffsetFine3D() const {return m_offsetFine;}
+
+    /**
+     * Set threshold scans with fine offset settings
+     * @param 3D threshold scans with fine offset settings
+     */
+    void setOffsetFine3D(TH3F* offsetFine) { m_offsetFine = offsetFine;}
+
+    /**
+     * Return slope[mV/offset step] for i-th channel (rough settings)
+     * @param i FEB channel number
+     * @return slope[mV/offset step]
+     */
+    float getSlopeRough(unsigned int i) const;
+
+    /**
+     * Add slope[mV/offset step] for i-th channel (rough settings)
+     * @param slope[mV/offset step]
+     */
+    void appendSlopeRough(float slope) {m_slopesRough.push_back(slope); }
+
+    /**
+     * Set vector of slopes (rough settings)
+     * @param vector of slopes[mV/offset step]
+     */
+    void setSlopesRough(std::vector<float> slopesRough) {m_slopesRough = slopesRough; }
+
+    /**
+     * Return size of the list of slopes (rough settings)
+     * @return size
+     */
+    int getSlopesRoughSize() const {return m_slopesRough.size();}
+
+    /**
+     * Return slope[mV/offset step] for i-th channel (fine settings)
+     * @param i FEB channel number
+     * @return slope[mV/offset step]
+     */
+    float getSlopeFine(unsigned int i) const;
+
+    /**
+     * Add slope[mV/offset step] for i-th channel (fine settings)
+     * @param slope[mV/offset step]
+     */
+    void appendSlopeFine(float slope) {m_slopesFine.push_back(slope); }
+
+    /**
+     * Set vector of slopes (fine settings)
+     * @param vector of slopes[mV/offset step]
+     */
+    void setSlopesFine(std::vector<float> slopesFine) {m_slopesFine = slopesFine; }
+
+    /**
+     * Return size of the list of slopes (fine settings)
+     * @return size
+     */
+    int getSlopesFineSize() const {return m_slopesFine.size();}
 
 
   private:
@@ -311,7 +400,11 @@ namespace Belle2 {
     TTimeStamp m_timeHV;      /**< Test Date of FEB high voltage test */
     float m_currentV99p;      /**< Current at 99 V */
     std::vector<int> m_deadChannel;    /**< List of dead channels on the FEB */
-
+    TH2F* m_testPulse;        /**< Test pulse scan */
+    TH3F* m_offsetRough;      /**< Threshold scans with rough offset settings */
+    TH3F* m_offsetFine;       /**< Threshold scans with fine offset settings */
+    std::vector<float> m_slopesRough;  /**< Slopes for each channel (rough settings) [mV/step] */
+    std::vector<float> m_slopesFine;   /**< Slopes for each channel (fine settings) [mV/step] */
 
     ClassDef(ARICHFebTest, 1);  /**< ClassDef */
   };

@@ -13,7 +13,6 @@
 #include <TObject.h>
 #include <string>
 #include <cmath>
-#include <framework/logging/Logger.h>
 #include <vector>
 
 #include <TROOT.h>
@@ -48,13 +47,6 @@ namespace Belle2 {
                      std::vector<int> lambda, std::vector<float> transmittance): m_version(version), m_serial(serial), m_id(id),
       m_refractiveIndex(index), m_transmissionLength(trlen), m_thickness(thickness), m_lambda(lambda), m_transmittance(transmittance),
       m_comment("") {};
-
-    /**
-     * Constructor
-     */
-    ARICHAerogelInfo(float version, std::string serial, std::string id, float index, float trlen,
-                     float thickness): m_version(version), m_serial(serial), m_id(id), m_refractiveIndex(index), m_transmissionLength(trlen),
-      m_thickness(thickness), m_lambda(), m_transmittance(), m_comment("") {};
 
     /**
      * Destructor
@@ -170,9 +162,9 @@ namespace Belle2 {
 
   private:
 
-    float c_lambdaMin = 200.0;
-    float c_lambdaMax = 700.0;
-    float c_lambdaStep = 10.0;
+    float c_lambdaMin = 200.0;            /**< Min value of lambda */
+    float c_lambdaMax = 700.0;            /**< Max value of lambda */
+    float c_lambdaStep = 10.0;            /**< Lambda - steps */
 
     float m_version;                      /**< Aerogel data version (measurement number) */
     std::string m_serial;                 /**< Aerogel Serial number */

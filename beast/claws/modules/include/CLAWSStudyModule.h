@@ -138,6 +138,22 @@ namespace Belle2 {
       /** Energy vs x vs y */
       TH2F* h_rvzvedepWT[2];
 
+      /** reads data from CLAW.xml */
+      virtual void getXMLData();
+      /** Energy threshold */
+      double m_Ethres;
+
+      /** Energy deposited vs TOF */
+      TH2F* h_claws_Evtof1[8];
+      /** Energy deposited vs TOF */
+      TH2F* h_claws_Evtof2[8];
+      /** Energy deposited vs TOF */
+      TH2F* h_claws_Evtof3[8];
+      /** Energy deposited vs TOF */
+      TH2F* h_claws_Evtof4[8];
+      /** Energy deposited */
+      TH1F* h_claws_edep[8];
+
     };
 
   }

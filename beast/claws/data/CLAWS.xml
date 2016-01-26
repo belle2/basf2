@@ -2,6 +2,7 @@
 <DetectorComponent name="CLAWS">
   <Creator library="beast">CLAWSCreator</Creator>
   <Content>
+    <Ethres>0.05</Ethres>
     <stepLength unit="um">50</stepLength>
     <shape name="CLAWS" type="box">
       <length unit="mm">200</length>

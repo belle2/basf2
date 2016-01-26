@@ -14,6 +14,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <cmath>
 #include <boost/foreach.hpp>
@@ -53,6 +55,7 @@ CLAWSStudyModule::CLAWSStudyModule() : HistoModule()
   // Set module properties
   setDescription("Study module for Claws (BEAST)");
 
+  addParam("Ethres", m_Ethres, "Energy threshold in MeV", 0.0);
 }
 
 CLAWSStudyModule::~CLAWSStudyModule()
@@ -150,6 +153,18 @@ void CLAWSStudyModule::defineHisto()
     h_rvzvedepWT[i] = new TH2F(TString::Format("h_rvzvedepWT_%d", i) , "edep [MeV] vs. z [cm]", 2000, 0., 25., 2000, -25., 25.);
     h_rvzvedepWT[i]->Sumw2();
   }
+
+  for (int i = 0; i < 20; i++) {
+    h_claws_Evtof1[i] = new TH2F(TString::Format("h_claws_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 5000, 0., 1000.,
+                                 1000, 0., 10.);
+    h_claws_Evtof2[i] = new TH2F(TString::Format("h_claws_Evtof2_%d", i), "Energy deposited [MeV] vs TOF [ns] - only photons", 5000, 0.,
+                                 1000., 1000, 0., 10.);
+    h_claws_Evtof3[i] = new TH2F(TString::Format("h_claws_Evtof3_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
+                                 1000., 1000, 0., 10.);
+    h_claws_Evtof4[i] = new TH2F(TString::Format("h_claws_Evtof4_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
+                                 1000., 1000, 0., 10.);
+    h_claws_edep[i] = new TH1F(TString::Format("h_claws_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
+  }
 }
 
 
@@ -185,10 +200,19 @@ void CLAWSStudyModule::event()
     double adep = aHit->getEnergyVisible();
     double timeBin = aHit->getTime();
     int  pdg = aHit->getPDG();
+    double Edep = aHit->getEnergyVisible() * 1e3; // GeV -> MeV
+    double tof = aHit->getTime(); //ns
 
     TVector3 position = aHit->getPosEntry();
     double r = sqrt(position.X() * position.X() + position.Y() * position.Y());
     int detNB = (lad - 1) * 8 + sen - 1;
+
+    h_claws_Evtof1[detNB]->Fill(tof, Edep);
+    if (pdg == 22) h_claws_Evtof2[detNB]->Fill(tof, Edep);
+    else if (fabs(pdg) == 11) h_claws_Evtof3[detNB]->Fill(tof, Edep);
+    else h_claws_Evtof4[detNB]->Fill(tof, Edep);
+    if (Edep > m_Ethres)h_claws_edep[detNB]->Fill(Edep);
+
     //cout <<" lad " << lad << " sen " << sen << " detNB " << detNB << " time " << timeBin << " edep " << adep*1e3 << endl;
     //cout <<" x " << position.X()  << " y " << position.Y() << " z " << position.Z()  << endl;
     h_time->Fill(detNB, timeBin);
@@ -252,6 +276,15 @@ void CLAWSStudyModule::event()
     }
   }
   eventNum++;
+}
+
+//read energy threshold from CLAW.xml
+void CLAWSStudyModule::getXMLData()
+{
+  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"CLAW\"]/Content/");
+  m_Ethres = content.getDouble("Ethres");
+
+  B2INFO("ClawStudy");
 }
 
 void CLAWSStudyModule::endRun()

@@ -412,7 +412,6 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
   fann_set_activation_function_hidden(ann, FANN_SIGMOID_SYMMETRIC);
   fann_set_activation_function_output(ann, FANN_SIGMOID_SYMMETRIC);
   double bestRMS = 999.;
-  vector<fann_type> bestWeights = {};
   vector<double> bestTrainLog = {};
   vector<double> bestValidLog = {};
   // repeat training several times with different random start weights

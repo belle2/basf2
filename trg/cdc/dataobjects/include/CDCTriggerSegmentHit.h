@@ -30,15 +30,21 @@ namespace Belle2 {
     ~CDCTriggerSegmentHit() { }
 
     //modifiers
+    /** set left/right information (e.g. if left/right is updated during fit) */
     void setLeftRight(unsigned short LR) { m_leftRight = LR; }
 
     //accessors
+    /** get continuous ID of the track segment [0, 2335] */
     unsigned short getSegmentID() const { return m_segmentID; }
+    /** get position of the priority cell within the track segment
+     *  (0: no hit, 3: 1st priority, 1: 2nd right, 2: 2nd left) */
     unsigned short getPriorityPosition() const { return m_priorityPosition; }
+    /** get position of the priority cell relative to the track
+     *  (0: no hit, 1: right, 2: left, 3: not determined) */
     unsigned short getLeftRight() const { return m_leftRight; }
     /** get TDC count without offset.
      * default offset and binwidth are current values applied by the CDCDigitizer. */
-    short getTDCCountWithoutOffset(short offset = 8192, double binwidth = 1. / 1.016) const
+    short getTDCCountWithoutOffset(short offset = 8192, double binwidth = 1. / 1.017774) const
     {
       return offset - m_tdcCount * binwidth;
     }

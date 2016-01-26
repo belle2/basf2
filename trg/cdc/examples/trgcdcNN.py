@@ -114,14 +114,25 @@ main.add_module(neuro)
 
 
 class TestModule(basf2.Module):
+    """
+    short test module to demonstrate the readout of the neurotrigger
+    """
 
     def initialize(self):
+        """
+        initialize lists to store results
+        """
+        #: list of output values of the neurotrigger
         self.zNN = []
+        #: list of MC z values (targets for the neurotrigger)
         self.zMC = []
+        #: list of MC pt values (of pt dependent evaluation)
         self.ptMC = []
-        self.zrange = particlegun_params['zVertexParams']
 
     def event(self):
+        """
+        get neurotrigger results and corresponding MC values
+        """
         tracksmc = Belle2.PyStoreArray("MCParticles")
         tracks2d = Belle2.PyStoreArray("CDCTriggerTracks")
         for itrack, track in enumerate(tracks2d):
@@ -136,13 +147,16 @@ class TestModule(basf2.Module):
                     mctrack = mcrel[irel]
             if wmax < 0.5:
                 continue
-            if (self.zrange[0] <= mctrack.getProductionVertex().Z() <= self.zrange[1]):
-                if track.hasNNZ():
-                    self.zNN.append(track.getNNZ())
-                    self.zMC.append(mctrack.getProductionVertex().Z())
-                    self.ptMC.append(mctrack.getMomentum().Pt())
+            if track.hasNNZ():
+                self.zNN.append(track.getNNZ())
+                self.zMC.append(mctrack.getProductionVertex().Z())
+                self.ptMC.append(mctrack.getMomentum().Pt())
 
     def terminate(self):
+        """
+        evaluate results (very superficial, more for demonstration than real validation)
+        prints the standard deviation and efficiency for a certain cut on z
+        """
         self.zNN = np.array(self.zNN)
         self.zMC = np.array(self.zMC)
         self.ptMC = np.array(self.ptMC)
@@ -155,7 +169,7 @@ class TestModule(basf2.Module):
             # RMS
             zNN = self.zNN[inbin]
             zMC = self.zMC[inbin]
-            print("RMS:", np.std(zNN - zMC))
+            print("sigma:", np.std(zNN - zMC))
             # efficiency
             ip = np.where(abs(zMC) <= 1)[0]
             if len(ip) > 0:

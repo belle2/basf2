@@ -31,6 +31,7 @@
 #include <G4Transform3D.hh>
 #include <G4UserLimits.hh>
 #include <G4VisAttributes.hh>
+#include <G4String.hh>
 
 using namespace std;
 using namespace CLHEP;
@@ -53,7 +54,7 @@ namespace Belle2 {
 
     GeoBKLMCreator::GeoBKLMCreator()
     {
-      m_Sensitive = dynamic_cast<G4VSensitiveDetector*>(new SensitiveDetector());
+      m_Sensitive = dynamic_cast<G4VSensitiveDetector*>(new SensitiveDetector(G4String("BKLM")));
       m_GeoPar = NULL;
       m_SectorDphi = 0.0;
       m_SectorDz = 0.0;
@@ -65,7 +66,7 @@ namespace Belle2 {
       m_InnerAirSolid = NULL;
       m_InnerAirLogical[0] = m_InnerAirLogical[1] = m_InnerAirLogical[2] = m_InnerAirLogical[3] = NULL;
       m_SupportLogical[0] = m_SupportLogical[1] = NULL;
-      m_BracketsLogical = NULL;
+      m_BracketLogical = NULL;
       for (int layer = 0; layer <= NLAYER; ++layer) {
         m_LayerIronSolid[layer] = NULL;
         m_LayerIronLogical[layer] = NULL;
@@ -79,13 +80,18 @@ namespace Belle2 {
       m_ScintLogicals.clear();
       m_VisAttributes.clear();
       m_VisAttributes.push_back(new G4VisAttributes(false)); // for "invisible"
+      m_Names.clear();
     }
 
     GeoBKLMCreator::~GeoBKLMCreator()
     {
+      // This is never called so its memory leaks :(
       delete m_Sensitive;
+      m_ScintLogicals.clear();
       for (G4VisAttributes* visAttr : m_VisAttributes) delete visAttr;
       m_VisAttributes.clear();
+      for (G4String* name : m_Names) delete name;
+      m_Names.clear();
     }
 
     //-----------------------------------------------------------------
@@ -129,6 +135,14 @@ namespace Belle2 {
                         m_GeoPar->doOverlapCheck()
                        );
 
+      // Get rid of the pointers used while creating the geometry
+      m_ScintLogicals.clear(); // the G4LogicalVolumes themselves are needed to end of job
+      m_ScintLogicals.resize(0);
+      m_VisAttributes.clear(); // ... as are the G4VisAttributes
+      m_VisAttributes.resize(0);
+      for (G4String* name : m_Names) delete name; // ... but G4Strings are not needed anymore
+      m_Names.clear();
+      m_Names.resize(0);
     }
 
     void GeoBKLMCreator::putEndsInEnvelope(G4LogicalVolume* envelopeLogical)
@@ -234,7 +248,7 @@ namespace Belle2 {
         cablesLogical->SetVisAttributes(m_VisAttributes.front()); // invisible
         new G4PVPlacement(G4Translate3D(0.5 * (ri + ro), -(0.5 * dyBrace + dy), 0.0),
                           cablesLogical,
-                          physicalName(cablesLogical) + "_L",
+                          physicalName(cablesLogical).append(G4String("_L")),
                           m_CapLogical[newLvol],
                           false,
                           1,
@@ -242,7 +256,7 @@ namespace Belle2 {
                          );
         new G4PVPlacement(G4Translate3D(0.5 * (ri + ro), +(0.5 * dyBrace + dy), 0.0),
                           cablesLogical,
-                          physicalName(cablesLogical) + "_R",
+                          physicalName(cablesLogical).append(G4String("_R")),
                           m_CapLogical[newLvol],
                           false,
                           2,
@@ -382,7 +396,7 @@ namespace Belle2 {
     void GeoBKLMCreator::putLayer1BracketsInInnerVoid(G4LogicalVolume* innerAirLogical, bool hasChimney)
     {
 
-      if (m_BracketsLogical == NULL) {
+      if (m_BracketLogical == NULL) {
         const Hep3Vector size = m_GeoPar->getSupportPlateHalfSize(hasChimney) * cm;
         const double dz = 0.5 * m_GeoPar->getBracketLength() * cm;
         const double r = m_GeoPar->getLayerInnerRadius(1) * cm - m_RibShift - 2.0 * size.x();
@@ -433,41 +447,41 @@ namespace Belle2 {
                     rOuter[1] * tan(0.5 * m_SectorDphi) - m_GeoPar->getBracketWidth() * cm,
                     z[1] + 1.5 * cm
                    );
-        G4VSolid* temp1 =
-          new G4SubtractionSolid("BKLM.BracketsTemp1",
+        G4VSolid* polygon1 =
+          new G4SubtractionSolid("BKLM.BracketPolygon1",
                                  bracketPolygon,
                                  bracketCutout4
                                 );
-        G4VSolid* temp2 =
-          new G4SubtractionSolid("BKLM.BracketsTemp2",
+        G4VSolid* polygon2 =
+          new G4SubtractionSolid("BKLM.BracketPolygon2",
                                  bracketCutout2,
                                  bracketCutout3
                                 );
-        G4VSolid* temp3 =
-          new G4SubtractionSolid("BKLM.BracketsTemp3",
-                                 temp1,
-                                 temp2,
+        G4VSolid* polygon3 =
+          new G4SubtractionSolid("BKLM.BracketPolygon3",
+                                 polygon1,
+                                 polygon2,
                                  G4TranslateX3D(bracketShift)
                                 );
-        G4VSolid* bracketsSolid =
-          new G4SubtractionSolid("BKLM.BracketsSolid",
-                                 temp3,
+        G4VSolid* bracketSolid =
+          new G4SubtractionSolid("BKLM.BracketSolid",
+                                 polygon3,
                                  bracketCutout1
                                 );
-        m_BracketsLogical =
-          new G4LogicalVolume(bracketsSolid,
+        m_BracketLogical =
+          new G4LogicalVolume(bracketSolid,
                               Materials::get("G4_Al"),
-                              "BKLM.BracketsLogical"
+                              "BKLM.BracketLogical"
                              );
         m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0.6, 0.6, 0.6)));
-        m_BracketsLogical->SetVisAttributes(m_VisAttributes.back());
+        m_BracketLogical->SetVisAttributes(m_VisAttributes.back());
       }
       char name[80] = "";
       for (int bracket = 0; bracket < (hasChimney ? 2 : 3); ++bracket) {
-        sprintf(name, "%s%d", (hasChimney ? "Chimney" : ""), bracket);
+        sprintf(name, "BKLM.Bracket%d%sPhysical", bracket, (hasChimney ? "Chimney" : ""));
         new G4PVPlacement(G4TranslateZ3D(m_GeoPar->getBracketZPosition(bracket, hasChimney) * cm),
-                          m_BracketsLogical,
-                          physicalName(m_BracketsLogical) + name,
+                          m_BracketLogical,
+                          name,
                           innerAirLogical,
                           false,
                           bracket,
@@ -1006,18 +1020,16 @@ namespace Belle2 {
 
     G4String GeoBKLMCreator::logicalName(G4VSolid* solid)
     {
-      G4String name = solid->GetName();
-      name.resize(name.size() - 5); // strip "Solid" from end
-      name.append("Logical");
-      return name;
+      G4String* name = new G4String(solid->GetName().substr(0, solid->GetName().size() - 5) + "Logical");
+      m_Names.push_back(name);
+      return *name;
     }
 
     G4String GeoBKLMCreator::physicalName(G4LogicalVolume* lvol)
     {
-      G4String name = lvol->GetName();
-      name.resize(name.size() - 7); // strip "Logical" from end
-      name.append("Physical");
-      return name;
+      G4String* name = new G4String(lvol->GetName().substr(0, lvol->GetName().size() - 7) + "Physical");
+      m_Names.push_back(name);
+      return *name;
     }
 
   } // namespace bklm

@@ -30,7 +30,7 @@ namespace Belle2 {
     public:
 
       //! Constructor
-      SensitiveDetector();
+      SensitiveDetector(const G4String name);
 
       //! Process each step in the BKLM
       bool step(G4Step*, G4TouchableHistory*);

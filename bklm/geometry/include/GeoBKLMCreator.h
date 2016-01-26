@@ -139,8 +139,8 @@ namespace Belle2 {
       //! Pointer to logical volumes for support structure
       G4LogicalVolume* m_SupportLogical[2];
 
-      //! Pointer to logical volumes for brackets
-      G4LogicalVolume* m_BracketsLogical;
+      //! Pointer to logical volume for bracket
+      G4LogicalVolume* m_BracketLogical;
 
       //! Pointers to solids for iron in each layer
       G4Polyhedra* m_LayerIronSolid[NLAYER + 1];
@@ -162,6 +162,9 @@ namespace Belle2 {
 
       //! Vector of pointers to G4VisAttributes objects
       std::vector<G4VisAttributes*> m_VisAttributes;
+
+      //! Vector of pointers to G4String objects (volume names)
+      std::vector<G4String*> m_Names;
 
     };
 

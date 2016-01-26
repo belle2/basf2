@@ -143,7 +143,7 @@ void BKLMUnpackerModule::event()
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         //addendum: There is always an additional word (count) in the end
         int numDetNwords = rawKLM[i]->GetDetectorNwords(j, finesse_num);
-        int numHits = rawKLM[i]->GetDetectorNwords(j, finesse_num) / hitLength;
+        int numHits = numDetNwords / hitLength;
         int* buf_slot = rawKLM[i]->GetDetectorBuffer(j, finesse_num);
         ////        cout << "data in finesse num: " << finesse_num << "( " << rawKLM[i]->GetDetectorNwords(j,             finesse_num) << " words, " << numHits << " hits)" << endl;
         //if (numDetNwords > 0)
@@ -153,7 +153,7 @@ void BKLMUnpackerModule::event()
         //we should get two words of 32 bits...
 
 
-        for (int k = 0; k < rawKLM[i]->GetDetectorNwords(j, finesse_num); k++) {
+        for (int k = 0; k < numDetNwords; k++) {
           char buffer[200] = "";
           sprintf(buffer, "%.8x\n", buf_slot[k]);
           B2INFO(buffer);
@@ -161,11 +161,11 @@ void BKLMUnpackerModule::event()
           //Brandon uses 4 16 bit words
           //          int firstBrandonWord;
           //          int secondBrandonWord;
-          char buffer1[100] = "";
-          char buffer2[100] = "";
+          //char buffer1[100] = "";
+          //char buffer2[100] = "";
 
-          sprintf(buffer1, "%.4x\n", buf_slot[k] & 0xffff);
-          sprintf(buffer2, "%.4x\n", (buf_slot[k] >> 16) & 0xffff);
+          //sprintf(buffer1, "%.4x\n", buf_slot[k] & 0xffff);
+          //sprintf(buffer2, "%.4x\n", (buf_slot[k] >> 16) & 0xffff);
 
           ////          cout << buffer2 << buffer1;
 
@@ -188,9 +188,7 @@ void BKLMUnpackerModule::event()
         //either no data (finesse not connected) or with the count word
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
           if (!m_keepEvenPackages) {
-            char buffer[200] = "";
-            sprintf(buffer, "word count incorrect: %d\n", rawKLM[i]->GetDetectorNwords(j, finesse_num));
-            B2ERROR(buffer);
+            B2ERROR("word count incorrect: " << numDetNwords)
             continue;
           }
         }

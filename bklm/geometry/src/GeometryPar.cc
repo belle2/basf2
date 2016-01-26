@@ -45,10 +45,13 @@ namespace Belle2 {
 
     GeometryPar::~GeometryPar()
     {
+      clear();
     }
 
     void GeometryPar::clear()
     {
+      for (std::map<int, Module*>::iterator m = m_Modules.begin(); m != m_Modules.end(); ++m) { delete m->second; }
+      m_Modules.clear();
     }
 
     void GeometryPar::read(const GearDir& content)

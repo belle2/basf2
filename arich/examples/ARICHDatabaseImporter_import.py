@@ -10,10 +10,10 @@ import subprocess
 from fnmatch import fnmatch
 
 # use_local_database()
-# use_local_database("test_database.txt", "test_payloads")
+use_local_database("test_database.txt", "test_payloads")
 # use use_central_database for uploading data to PNNL
-use_central_database("ARICH", LogLevel.ERROR)
-# use_central_database("test_ARICHReconstruction", LogLevel.ERROR)
+# use_central_database("ARICHdata", LogLevel.ERROR)
+# use_central_database("test_ARICHReconstruction2", LogLevel.ERROR)
 
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
@@ -30,8 +30,8 @@ if not os.path.isfile('hapd_hamamatsuData/hapdData.xml'):
     subprocess.call(['svn', 'co', 'https://belle2.cc.kek.jp/svn/groups/arich/database/data/hapd_hamamatsuData/'])
 if not os.path.isfile('AllData/ArichData.xml'):
     subprocess.call(['svn', 'co', 'https://belle2.cc.kek.jp/svn/groups/arich/database/data/AllData/'])
-# if not os.path.isfile('asicData/ASIC_status.xml'):
-#    subprocess.call(['svn', 'co', 'https://belle2.cc.kek.jp/svn/groups/arich/database/data/asicData/'])
+if not os.path.isfile('asicData00/ASIC_status.xml'):
+    subprocess.call(['svn', 'co', 'https://belle2.cc.kek.jp/svn/groups/arich/database/data/asicData/asicData00/'])
 if not os.path.isfile('hapdQA/KA0152_data.root'):
     subprocess.call(['svn', 'co', 'https://belle2.cc.kek.jp/svn/groups/arich/database/data/hapdQA_test/'])
 if not os.path.isfile('febTest/SN_dna.xml'):
@@ -87,21 +87,21 @@ process(main)
 
 # and run the importer
 dbImporter = ARICHDatabaseImporter(rootFilesHapdQA, rootFilesAsics, txtFilesAsics, rootFilesHapdQE)
-dbImporter.importAerogelInfo()
+# dbImporter.importAerogelInfo()
 # dbImporter.exportAerogelInfo()
 # dbImporter.importAerogelInfoEventDep()
 # dbImporter.exportAerogelInfoEventDep()
-dbImporter.importHapdQA()
+# dbImporter.importHapdQA()
 # dbImporter.exportHapdQA()
 # dbImporter.importAsicInfo()
 # dbImporter.exportAsicInfo()
-# dbImporter.importFebTest()
+dbImporter.importFebTest()
 # dbImporter.exportFebTest()
-dbImporter.importHapdInfo()
+# dbImporter.importHapdInfo()
 # dbImporter.exportHapdInfo()
-dbImporter.importHapdQE()
+# dbImporter.importHapdQE()
 # dbImporter.exportHapdQE()
-dbImporter.importBadChannels()
+# dbImporter.importBadChannels()
 # dbImporter.exportBadChannels()
 
 # simple example that shows how to read data from database and use it

@@ -585,7 +585,6 @@ void ARICHDatabaseImporter::importFebTest()
 
     febConst->setFebSerial(serial);
     febConst->setFebDna(dna);
-
     febConst->setDeadChannels(ARICHDatabaseImporter::getDeadChFEB(dna));
 
     // slow control data
@@ -633,27 +632,25 @@ void ARICHDatabaseImporter::importFebTest()
         positionOld = position;
       }
     }
-
-    // high voltage test data std::tuple funkcija!
+    // high voltage test data
     std::tuple<std::string, float> HVtest = ARICHDatabaseImporter::getFebHVtestData(serial);
     febConst->setTimeHV(ARICHDatabaseImporter::timedate2(std::get<0>(HVtest)));
     febConst->setCurrentV99p(std::get<1>(HVtest));
 
-    // low voltage test data std::tuple funkcija!
-
-    std::tuple<std::string, float, float, float> LVtest = ARICHDatabaseImporter::getFebLVtestData(serial);
-    febConst->setTimeLV(ARICHDatabaseImporter::timedate2(std::get<0>(LVtest)));
-    febConst->setCurrentV20p(std::get<1>(LVtest));
-    febConst->setCurrentV21n(std::get<2>(LVtest));
-    febConst->setCurrentV38p(std::get<3>(LVtest));
-
+    // low voltage test data
+    if (serial < 84) {
+      std::tuple<std::string, float, float, float> LVtest = ARICHDatabaseImporter::getFebLVtestData(serial);
+      febConst->setTimeLV(ARICHDatabaseImporter::timedate2(std::get<0>(LVtest)));
+      febConst->setCurrentV20p(std::get<1>(LVtest));
+      febConst->setCurrentV21n(std::get<2>(LVtest));
+      febConst->setCurrentV38p(std::get<3>(LVtest));
+    }
 
 //    febConst->setSlopesFine(slopesFine); // std::vector<float>
 //    febConst->setSlopesRough(slopesRough); // std::vector<float>
 //    febConst->setOffsetFine3D(offsetFine); // TH3F*
 //    febConst->setOffsetRough3D(offsetRough); // TH3F*
 //    febConst->setTestPulse2D(testPulse); // TH2F*
-
 
     feb++;
   }
@@ -719,7 +716,7 @@ std::vector<int> ARICHDatabaseImporter::getDeadChFEB(std::string dna)
 {
   vector<int> listCHs;
   string line;
-  ifstream fileFEB("FEBdeadChannels.txt");
+  ifstream fileFEB("febTest/FEBdeadChannels.txt");
   if (fileFEB.is_open()) {
     while (getline(fileFEB, line)) {
       string ch2 = line.substr(line.find(",") + 1);
@@ -1276,65 +1273,65 @@ void ARICHDatabaseImporter::exportBadChannels()
   elements.getEntries();
 
   // Print bad channels
-  for (const auto& element : elements) {
-    if (!(element.getHapdSerial()).empty()) {
-      B2INFO("HAPD sn = " << element.getHapdSerial());
-      if (element.getHapdListOfBadChannelsSize() != 0) B2INFO("all bad CHs: ");
-      for (int i = 0; i < element.getHapdListOfBadChannelsSize(); i++) {
-        B2INFO(element.getHapdListOfBadChannel(i));
-      }
-      if (element.getHapdCutChannelsSize() != 0) {
-        B2INFO("cut CHs: ");
-        for (int i = 0; i < element.getHapdCutChannelsSize(); i++) {
-          B2INFO(element.getHapdCutChannel(i));
+  /*  for (const auto& element : elements) {
+      if (!(element.getHapdSerial()).empty()) {
+        B2INFO("HAPD sn = " << element.getHapdSerial());
+        if (element.getHapdListOfBadChannelsSize() != 0) B2INFO("all bad CHs: ");
+        for (int i = 0; i < element.getHapdListOfBadChannelsSize(); i++) {
+          B2INFO(element.getHapdListOfBadChannel(i));
+        }
+        if (element.getHapdCutChannelsSize() != 0) {
+          B2INFO("cut CHs: ");
+          for (int i = 0; i < element.getHapdCutChannelsSize(); i++) {
+            B2INFO(element.getHapdCutChannel(i));
+          }
+        }
+        if (element.getHapdBadChannelsSize() != 0) {
+          B2INFO("bad CHs: ");
+          for (int i = 0; i < element.getHapdBadChannelsSize(); i++) {
+            B2INFO(element.getHapdBadChannel(i));
+          }
+        }
+      } else {
+        B2INFO("FEB sn = " << element.getFebSerial());
+        int numAllCh = element.getFebDeadChannelsSize() + element.getAsicDeadChannelsSize() + element.getAsicBadConnChannelsSize() +
+                       element.getAsicBadOffsetChannelsSize() + element.getAsicBadLinChannelsSize();
+        if (numAllCh != 0) B2INFO("all bad CHs: ");
+        for (int i = 0; i < numAllCh; i++) {
+          B2INFO(element.getFebListOfBadChannel(i));
+        }
+        if (element.getFebDeadChannelsSize() != 0) {
+          B2INFO("dead CHs (FEB test): ");
+          for (int i = 0; i < element.getFebDeadChannelsSize(); i++) {
+            B2INFO(element.getFebDeadChannel(i));
+          }
+        }
+        if (element.getAsicDeadChannelsSize() != 0) {
+          B2INFO("dead CHs (asic): ");
+          for (int i = 0; i < element.getAsicDeadChannelsSize(); i++) {
+            B2INFO(element.getAsicDeadChannel(i));
+          }
+        }
+        if (element.getAsicBadConnChannelsSize() != 0) {
+          B2INFO("bad conn CHs (asic): ");
+          for (int i = 0; i < element.getAsicBadConnChannelsSize(); i++) {
+            B2INFO(element.getAsicBadConnChannel(i));
+          }
+        }
+        if (element.getAsicBadOffsetChannelsSize() != 0) {
+          B2INFO("bad offset CHs (asic): ");
+          for (int i = 0; i < element.getAsicBadOffsetChannelsSize(); i++) {
+            B2INFO(element.getAsicBadOffsetChannel(i));
+          }
+        }
+        if (element.getAsicBadLinChannelsSize() != 0) {
+          B2INFO("bad lin CHs (asic): ");
+          for (int i = 0; i < element.getAsicBadLinChannelsSize(); i++) {
+            B2INFO(element.getAsicBadLinChannel(i));
+          }
         }
       }
-      if (element.getHapdBadChannelsSize() != 0) {
-        B2INFO("bad CHs: ");
-        for (int i = 0; i < element.getHapdBadChannelsSize(); i++) {
-          B2INFO(element.getHapdBadChannel(i));
-        }
-      }
-    } else {
-      B2INFO("FEB sn = " << element.getFebSerial());
-      int numAllCh = element.getFebDeadChannelsSize() + element.getAsicDeadChannelsSize() + element.getAsicBadConnChannelsSize() +
-                     element.getAsicBadOffsetChannelsSize() + element.getAsicBadLinChannelsSize();
-      if (numAllCh != 0) B2INFO("all bad CHs: ");
-      for (int i = 0; i < numAllCh; i++) {
-        B2INFO(element.getFebListOfBadChannel(i));
-      }
-      if (element.getFebDeadChannelsSize() != 0) {
-        B2INFO("dead CHs (FEB test): ");
-        for (int i = 0; i < element.getFebDeadChannelsSize(); i++) {
-          B2INFO(element.getFebDeadChannel(i));
-        }
-      }
-      if (element.getAsicDeadChannelsSize() != 0) {
-        B2INFO("dead CHs (asic): ");
-        for (int i = 0; i < element.getAsicDeadChannelsSize(); i++) {
-          B2INFO(element.getAsicDeadChannel(i));
-        }
-      }
-      if (element.getAsicBadConnChannelsSize() != 0) {
-        B2INFO("bad conn CHs (asic): ");
-        for (int i = 0; i < element.getAsicBadConnChannelsSize(); i++) {
-          B2INFO(element.getAsicBadConnChannel(i));
-        }
-      }
-      if (element.getAsicBadOffsetChannelsSize() != 0) {
-        B2INFO("bad offset CHs (asic): ");
-        for (int i = 0; i < element.getAsicBadOffsetChannelsSize(); i++) {
-          B2INFO(element.getAsicBadOffsetChannel(i));
-        }
-      }
-      if (element.getAsicBadLinChannelsSize() != 0) {
-        B2INFO("bad lin CHs (asic): ");
-        for (int i = 0; i < element.getAsicBadLinChannelsSize(); i++) {
-          B2INFO(element.getAsicBadLinChannel(i));
-        }
-      }
-    }
-  }
+    }*/
 }
 
 

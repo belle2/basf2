@@ -9,8 +9,9 @@ import glob
 import subprocess
 from fnmatch import fnmatch
 
-use_central_database("newtest3", LogLevel.ERROR)
-# use_central_database("test_param", LogLevel.WARNING)
+# use_local_database("test_database.txt", "test_payloads")
+# use_central_database("test_ARICHReconstruction2", LogLevel.ERROR)
+use_central_database("ARICHdata", LogLevel.WARNING)
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
 # get rid of an error message with gearbox
@@ -25,12 +26,11 @@ process(main)
 # and run the importer
 dbImporter = ARICHDatabaseImporter()
 
-dbImporter.exportAerogelInfo()
+# dbImporter.exportAerogelInfo()
 # dbImporter.exportHapdQA()
 # dbImporter.exportAsicInfo()
 # dbImporter.exportFebTest()
 # dbImporter.exportHapdInfo()
-# dbImporter.exportHapdChipInfo()
 # dbImporter.exportHapdQE()
 # dbImporter.exportBadChannels()
 

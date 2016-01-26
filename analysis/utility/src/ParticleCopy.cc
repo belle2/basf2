@@ -8,6 +8,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
+#include <iostream>
 
 using namespace Belle2;
 using namespace std;
@@ -43,10 +44,8 @@ Particle* ParticleCopy::copyParticle(const Particle* original)
 void ParticleCopy::copyDaughters(Belle2::Particle* mother)
 {
   unsigned nDaughters = mother->getNDaughters();
-
   for (unsigned iOld = 0; iOld < nDaughters; iOld++) {
-    const Particle* originalDaughter = mother->getDaughter(iOld);
-
+    const Particle* originalDaughter = mother->getDaughter(0);
     Particle* daughterCopy = copyParticle(originalDaughter);
 
     // remove original daughter

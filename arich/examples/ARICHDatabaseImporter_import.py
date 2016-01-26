@@ -95,7 +95,7 @@ dbImporter = ARICHDatabaseImporter(rootFilesHapdQA, rootFilesAsics, txtFilesAsic
 # dbImporter.exportHapdQA()
 # dbImporter.importAsicInfo()
 # dbImporter.exportAsicInfo()
-dbImporter.importFebTest()
+# dbImporter.importFebTest()
 # dbImporter.exportFebTest()
 # dbImporter.importHapdInfo()
 # dbImporter.exportHapdInfo()

@@ -210,19 +210,19 @@ main(int argc, char * argv[]) {
     cout << "    Text file  :" << tFilename << endl;
     ofstream tFile(tFilename.c_str(), ios::out);
     if (! tFile.is_open()) {
- 	cout << "    !!! can not open file : " << tFile << endl;
+ 	cout << "    !!! can not open file : " << tFilename << endl;
  	exit(-2);
     }
     cout << "    Input file :" << iFilename << endl;
     ofstream iFile(iFilename.c_str(), ios::out);
     if (! iFile.is_open()) {
- 	cout << "    !!! can not open file : " << iFile << endl;
+ 	cout << "    !!! can not open file : " << iFilename << endl;
  	exit(-2);
     }
     cout << "    Output file:" << oFilename << endl;
     ofstream oFile(oFilename.c_str(), ios::out);
     if (! oFile.is_open()) {
- 	cout << "    !!! can not open file : " << oFile << endl;
+ 	cout << "    !!! can not open file : " << oFilename << endl;
  	exit(-2);
     }
     tFile << "----- relations -----------------------" << endl;
@@ -258,7 +258,7 @@ main(int argc, char * argv[]) {
     cout << "    alg file   :" << aFilename << endl;
     ofstream aFile(aFilename.c_str(), ios::out);
     if (! aFile.is_open()) {
- 	cout << "    !!! can not open file : " << aFile << endl;
+ 	cout << "    !!! can not open file : " << aFilename << endl;
  	exit(-3);
     }
     for (unsigned i = 0; i < expanded2.size(); i++) {
@@ -273,7 +273,7 @@ main(int argc, char * argv[]) {
     cout << "    c++ file   :" << cFilename << endl;
     ofstream cFile(cFilename.c_str(), ios::out);
     if (! cFile.is_open()) {
- 	cout << "    !!! can not open file : " << cFile << endl;
+ 	cout << "    !!! can not open file : " << cFilename << endl;
  	exit(-3);
     }
     cFile << "namespace Belle2 {" << endl;
@@ -290,7 +290,7 @@ main(int argc, char * argv[]) {
     cout << "    kumac file :" << kFilename << endl;
     ofstream kFile(kFilename.c_str(), ios::out);
     if (! kFile.is_open()) {
- 	cout << "    !!! can not open file : " << kFile << endl;
+ 	cout << "    !!! can not open file : " << kFilename << endl;
  	exit(-3);
     }
     kFile << "macro main wait=wait baseRise=197 baseFall=293" << endl;

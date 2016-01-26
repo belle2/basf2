@@ -47,8 +47,8 @@ main(int argc, char * argv[]) {
     }
 
     //...Date...
-    string ts0 = TRGUtil::dateStringF();
-    string ts1 = TRGUtil::dateString();
+    // string ts0 = TRGUtil::dateStringF();
+    // string ts1 = TRGUtil::dateString();
 
     //...Get a path to data...
 //  const string path = getenv(ENV_PATH);
@@ -118,7 +118,7 @@ main(int argc, char * argv[]) {
     memset(bm, 0, sizeof(unsigned) * 48);
     for (map<unsigned, unsigned>::iterator i = signals.begin();
 	 i != signals.end();
-	 i++) {
+	 ++i) {
 
 	bm[i->first] |= (1 << i->second);
 

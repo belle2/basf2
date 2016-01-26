@@ -283,7 +283,7 @@ TrgEclFAM::digitization01(void)
   double fam_sampling_interval = 96; // [ns]
   int NSampling = 80; // # of sampling array
 
-  double noise_plileup[576][80] = {{0}};  // [GeV]
+  // double noise_plileup[576][80] = {{0}};  // [GeV]
   double noise_parallel[576][80] = {{0}};  // [GeV]
   double noise_serial[576][80] = {{0}};  // [GeV]
   // (Make sampling time random between FAM sampling intervals)
@@ -331,13 +331,13 @@ TrgEclFAM::digitization01(void)
   // (01)noise embedding
   //==================
   double tmin_noise = -nbin_pedestal * fam_sampling_interval * 0.001; // [us]
-  double tgen = NSampling * fam_sampling_interval * 0.001 - tmin_noise; // [us]
+  // double tgen = NSampling * fam_sampling_interval * 0.001 - tmin_noise; // [us]
   tmin_noise = -4; // orignal
-  tgen = 10.3;   // orignal
+  double tgen = 10.3;   // orignal
   int bkg_level = 1030;
   double ttt0 = 0; // [us]
-  double ttt1 = 0; // [us]
-  double ttt2 = 0; // [us]
+  // double ttt1 = 0; // [us]
+  // double ttt2 = 0; // [us]
   //
   double frac_pileup   = 0.035; // pileup noise fraction?
   double frac_parallel = 0.023; // parralel noise fraction?
@@ -356,8 +356,8 @@ TrgEclFAM::digitization01(void)
       if (TCEnergy_tot[iTCIdm] < cut_energy_tot) { continue; }   // TC energy_tot cut
       for (int jjj = 0; jjj < bkg_level; jjj++) {
         ttt0 = -(tmin_noise + tgen * gRandom->Rndm()); // [us]
-        ttt1 = -(tmin_noise + tgen * gRandom->Rndm());  // [us]
-        ttt2 = -(tmin_noise + tgen * gRandom->Rndm());  // [us]
+        double ttt1 = -(tmin_noise + tgen * gRandom->Rndm());  // [us]
+        double ttt2 = -(tmin_noise + tgen * gRandom->Rndm());  // [us]
         for (int iSampling = 0; iSampling < NSampling; iSampling++) {
           // (pile-up noise)
           if (ttt0 > 0) { TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(0, ttt0) * corr_pileup * 0.001; }
@@ -393,6 +393,7 @@ TrgEclFAM::digitization01(void)
 
       for (int iSampling = 0; iSampling < NSampling; iSampling++) {
 
+	double noise_plileup[576][80] = {{0}};  // [GeV]
         TCDigiE[iTCIdm][iSampling] += noise_plileup[iTCIdm][iSampling] + noise_parallel[iTCIdm][iSampling] +
                                       noise_serial[iTCIdm][iSampling];
       }
@@ -471,7 +472,7 @@ TrgEclFAM::digitization02(void)
   double fam_sampling_interval = 96; //@ [ns]
   int NSampling = 80;
 
-  double noise_plileup[576][80] = {{0}};  // [GeV]
+  // double noise_plileup[576][80] = {{0}};  // [GeV]
   double noise_parallel[576][80] = {{0}};  // [GeV]
   double noise_serial[576][80] = {{0}};  // [GeV]
   //@ Make sampling time random between FAM sampling intervals
@@ -502,13 +503,13 @@ TrgEclFAM::digitization02(void)
   // (02)noise embedding
   //==================
   double tmin_noise = -nbin_pedestal * fam_sampling_interval * 0.001; // [us]
-  double tgen =  NSampling * fam_sampling_interval * 0.001 - tmin_noise; // [us]
+  // double tgen =  NSampling * fam_sampling_interval * 0.001 - tmin_noise; // [us]
   tmin_noise = -4; // orignal
-  tgen = 10.3;   //
+  double tgen = 10.3;   //
   int bkg_level = 1030;
   double ttt0 = 0; //@ [us]
-  double ttt1 = 0; //@ [us]
-  double ttt2 = 0; //@ [us]
+  // double ttt1 = 0; //@ [us]
+  // double ttt2 = 0; //@ [us]
   double frac_pileup   = 0.035; // pileup noise fraction?
   double frac_parallel = 0.023; // parralel noise fraction?
   double frac_serial   = 0.055; // serial noise fraction?
@@ -527,8 +528,8 @@ TrgEclFAM::digitization02(void)
       if (TCEnergy_tot[iTCIdm] < cut_energy_tot) { continue; }   // TC energy_tot cut
       for (int jjj = 0; jjj < bkg_level; jjj++) {
         ttt0 = -(tmin_noise + tgen * gRandom->Rndm());  //@ [us]
-        ttt1 = -(tmin_noise + tgen * gRandom->Rndm());  //@ [us]
-        ttt2 = -(tmin_noise + tgen * gRandom->Rndm());  //@ [us]
+        double ttt1 = -(tmin_noise + tgen * gRandom->Rndm());  //@ [us]
+        double ttt2 = -(tmin_noise + tgen * gRandom->Rndm());  //@ [us]
         for (int iSampling = 0; iSampling < NSampling; iSampling++) {
           //@ (pile-up noise)
           if (ttt0 > 0) { TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(0, ttt0) * corr_pileup * 0.001; }
@@ -564,6 +565,7 @@ TrgEclFAM::digitization02(void)
 
       for (int iSampling = 0; iSampling < NSampling; iSampling++) {
 
+	double noise_plileup[576][80] = {{0}};  // [GeV]
         TCDigiE[iTCIdm][iSampling] += noise_plileup[iTCIdm][iSampling] + noise_parallel[iTCIdm][iSampling] +
                                       noise_serial[iTCIdm][iSampling];
       }
@@ -722,9 +724,9 @@ TrgEclFAM::digitization03(void)
   // (03)noise embedding
   //==================
   double tmin_noise = -nbin_pedestal * fam_sampling_interval * 0.001; // [us]
-  double tgen = NSampling * fam_sampling_interval * 0.001 - tmin_noise; // [us]
+  // double tgen = NSampling * fam_sampling_interval * 0.001 - tmin_noise; // [us]
   tmin_noise = -4; // orignal
-  tgen = 10.3;   //
+  double tgen = 10.3;   //
   int bkg_level = 1030;
   double ttt0 = 0; // [us]
   double ttt1 = 0; // [us]
@@ -735,12 +737,12 @@ TrgEclFAM::digitization03(void)
   double times_pileup   =  1;   // noise scale based on Belle noise.
   double times_parallel =  1;   // noise scale
   double times_serial   =  1;   // noise scale
-  double corr_pileup   = times_pileup   * frac_pileup   * sqrt(fam_sampling_interval * 0.001);
-  double corr_parallel = times_parallel * frac_parallel * sqrt(fam_sampling_interval * 0.001);
-  double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval * 0.001);
-  corr_pileup   = 0.011068;
-  corr_parallel = 0.00727324;
-  corr_serial   = 0.0173925;
+  // double corr_pileup   = times_pileup   * frac_pileup   * sqrt(fam_sampling_interval * 0.001);
+  // double corr_parallel = times_parallel * frac_parallel * sqrt(fam_sampling_interval * 0.001);
+  // double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval * 0.001);
+  double corr_pileup   = 0.011068;
+  double corr_parallel = 0.00727324;
+  double corr_serial   = 0.0173925;
 
 
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
@@ -1347,7 +1349,7 @@ TrgEclFAM::FAMFit(int nbin_pedestal,
   int pedFlag = 0;
   double CoeffAAA = 0;
   double CoeffBBB = 0;
-  double CoeffPPP = 0;
+  // double CoeffPPP = 0;
   int dTBin = 0;
   int ShiftdTBin = 0;
   int Nsmalldt = 96;
@@ -1385,11 +1387,11 @@ TrgEclFAM::FAMFit(int nbin_pedestal,
 
     CoeffAAA = 0;
     CoeffBBB = 0;
-    CoeffPPP = 0;
+    // CoeffPPP = 0;
     for (int iFitSample = 0; iFitSample < 14; iFitSample++) {
       CoeffAAA += CoeffNoise31[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
       CoeffBBB += CoeffNoise32[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
-      CoeffPPP += CoeffNoise33[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
+      // CoeffPPP += CoeffNoise33[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
     }
     double deltaT = CoeffBBB / CoeffAAA; // deltaT [us]
 

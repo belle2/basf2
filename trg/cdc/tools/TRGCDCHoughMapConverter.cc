@@ -42,7 +42,7 @@ main(int argc, char * argv[]) {
 
     //...Date...
     string ts0 = TRGUtil::dateStringF();
-    string ts1 = TRGUtil::dateString();
+    // string ts1 = TRGUtil::dateString();
 
     //...1st argument : input Hough mapping file name...
     const string iname = argv[1];

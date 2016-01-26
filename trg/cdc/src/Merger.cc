@@ -63,10 +63,10 @@ int
 TRGCDCMerger::implementation(const TRGCDCMerger::unitType & type,
                                ofstream & outfile) {
 
-  string cname = "UNKNOWN";
+  // string cname = "UNKNOWN";
   //    if (_type == innerType) 
   outfile << "-- inner type" << endl;
-  cname = "TRGCDCMergerInner";
+  string cname = "TRGCDCMergerInner";
   //     }                    
   //     else {  
   //         outfile << "-- outer type" << endl;
@@ -76,14 +76,14 @@ TRGCDCMerger::implementation(const TRGCDCMerger::unitType & type,
   outfile << "--" << endl;
   outfile << endl;
   outfile << "    component " << cname << endl;
-  int err = implementationPort(type, outfile);
+  // int err = implementationPort(type, outfile);
   outfile << "    end component;" << endl;
 
   outfile << "--------------------------------------------------------------"
 	  << endl;
 
   outfile << "entity " << cname << "is" << endl;
-  err = implementationPort(type, outfile);
+  int err = implementationPort(type, outfile);
   outfile << "end " << cname << ";" << endl;
   outfile << endl;
   outfile << "architecture Behavioral of " << cname << " is" << endl;

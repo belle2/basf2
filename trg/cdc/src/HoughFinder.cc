@@ -1174,7 +1174,7 @@ TRGCDCHoughFinder::doFitting2(std::vector<TRGCDCTrack *> & trackList2D,
         trackList2DFitted.push_back(& aTrack);
 
 	CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
-	double phi02D, pt2D, Trg_PI;
+	double phi02D, Trg_PI;
 	vector<double> nWires(9);
 	vector<double> rr(9);
 	vector<double> rr2D;
@@ -1277,11 +1277,11 @@ TRGCDCHoughFinder::doFitting2(std::vector<TRGCDCTrack *> & trackList2D,
 	}//End superlayer loop
 	// 2D fit values from IW 2D fitter
 	phi02D = aTrack.helix().phi0();
-	pt2D = aTrack.helix().curv()*0.01*0.3*1.5;
+	// pt2D = aTrack.helix().curv()*0.01*0.3*1.5;
 	if(aTrack.charge()<0) {
             phi02D = phi02D-Trg_PI;
 	    if(phi02D < 0) phi02D = phi02D + 2 * Trg_PI;
-	    pt2D = pt2D * -1;
+	    // pt2D = pt2D * -1;
 	}
 //cout << "#######" <<endl;
 //cout << "phi2D= " << phi02D << endl;
@@ -1339,13 +1339,13 @@ TRGCDCHoughFinder::doFitting2(std::vector<TRGCDCTrack *> & trackList2D,
 //ofstream dout("/home/belle2/kaiyu/2DFit/den", fstream::app);
 //      dout<<den<<endl;
 
-        /// LUT values
-	double rhoMin = 67;
-	double rhoMax = 1600;
-        int phiBitSize = 12;
-	int rhoBitSize = 12;
 	// Change to Signals
         {
+	  /// LUT values
+	  double rhoMin = 67;
+	  double rhoMax = 1600;
+	  int phiBitSize = 12;
+	  int rhoBitSize = 12;
             vector<tuple<string, double, int, double, double, int> > t_values = {
                 make_tuple("phi_0", phi2D[0], phiBitSize, -2*M_PI, 2*M_PI, 0),
                 make_tuple("phi_1", phi2D[1], phiBitSize, -2*M_PI, 2*M_PI, 0),
@@ -1399,7 +1399,7 @@ TRGCDCHoughFinder::doFitting2(std::vector<TRGCDCTrack *> & trackList2D,
                         _commonData->buffersVhdlCode();
                         _commonData->printToFile();
                         // Print LUTs.
-                        for(map<string,TRGCDCJLUT*>::iterator it=m_mLutStorage.begin(); it!=m_mLutStorage.end(); it++){
+                        for(map<string,TRGCDCJLUT*>::iterator it=m_mLutStorage.begin(); it!=m_mLutStorage.end(); ++it){
                             //it->second->makeCOE("./VHDL/LutData/"+it->first+".coe");
                             it->second->makeCOE(it->first+".coe");
                         }

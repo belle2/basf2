@@ -89,7 +89,7 @@ void
 TRGCDCWireHit::operator delete(void * t) {
     for (vector<TRGCDCWireHit *>::iterator it = _all.begin();
 	 it != _all.end();
-	 it++) {
+	 ++it) {
 	if ((* it) == (TRGCDCWireHit *) t) {
 	    _all.erase(it);
 	    break;

@@ -177,14 +177,14 @@ bool
 TrgEclCluster::getBeamBkgVeto(void)
 {
 
-  bool boolBeamBkgVeto = false;
+  // bool boolBeamBkgVeto = false;
   bool boolForward =
     ((_icnquadrant[0][0] && _icnquadrant[0][2]) ||
      (_icnquadrant[0][1] && _icnquadrant[0][3]));
   bool boolBarrel =
     ((_icnquadrant[1][0] && _icnquadrant[1][2]) ||
      (_icnquadrant[1][1] && _icnquadrant[1][3]));
-  boolBeamBkgVeto = (boolForward || boolBarrel);
+  bool boolBeamBkgVeto = (boolForward || boolBarrel);
 
   return boolBeamBkgVeto;
 }

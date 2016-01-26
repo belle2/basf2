@@ -212,7 +212,7 @@ TrgEclMapping::getTCThetaIdFromTCId(int TCId)
   else if (TCId0 < 512) {_tcthetaid = (TCId0 - 80) % 12 + 3;}
   else {
     if (TCId0 == 512) {_tcthetaid = 16;}
-    else             {_tcthetaid = ((TCId0 - 513) / 2) % 2 ? 16 : 15;}
+    else             {_tcthetaid = (((TCId0 - 513) / 2) % 2) ? 16 : 15;}
   }
   if (_tcthetaid < 0 || _tcthetaid > 16) {
     B2ERROR("TrgEclMapping> output TCThetaId is wrong!!!");
@@ -237,7 +237,7 @@ TrgEclMapping::getTCPhiIdFromTCId(int TCId)
   // Backward-endcap [Xtal=7777-8736, TC=513-576(64)]
   if (TCId0 <  80) {_tcphiid = (TCId0 % 5 < 3) ? (TCId0 / 5) * 2 : 1 + (TCId0 / 5) * 2;}
   else if (TCId0 < 512) {_tcphiid = (TCId0 - 80) / 12;}
-  else                 {_tcphiid = ((TCId0 - 512) / 2) % 2 ? (TCId0 - 512) / 2 - 1 : (TCId0 - 512) / 2 + 1;}
+  else                 {_tcphiid = (((TCId0 - 512) / 2) % 2) ? (TCId0 - 512) / 2 - 1 : (TCId0 - 512) / 2 + 1;}
   if (_tcphiid < 0 || _tcphiid > 35) {
     B2ERROR("TrgEclMapping> output TCPhiId is wrong!!!");
   }

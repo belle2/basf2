@@ -58,10 +58,10 @@ int
 TRGCDCFrontEnd::implementation(const TRGCDCFrontEnd::boardType & type,
                                ofstream & outfile) {
 
-    string cname = "UNKNOWN";
+  //string cname = "UNKNOWN";
     //    if (_type == innerInside) {
     outfile << "-- inner type" << endl;
-    cname = "TRGCDCFrontEndInnerInside";
+    string cname = "TRGCDCFrontEndInnerInside";
     //     }
     //     else {
     //         outfile << "-- outer type" << endl;
@@ -71,14 +71,14 @@ TRGCDCFrontEnd::implementation(const TRGCDCFrontEnd::boardType & type,
     outfile << "--" << endl;
     outfile << endl;
     outfile << "    component " << cname << endl;
-    int err = implementationPort(type, outfile);
+    // int err = implementationPort(type, outfile);
     outfile << "    end component;" << endl;
 
     outfile << "--------------------------------------------------------------"
             << endl;
 
     outfile << "entity " << cname << "is" << endl;
-    err = implementationPort(type, outfile);
+    int err = implementationPort(type, outfile);
     outfile << "end " << cname << ";" << endl;
     outfile << endl;
     outfile << "architecture Behavioral of " << cname << " is" << endl;

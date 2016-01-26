@@ -29,7 +29,7 @@ int
 main() {
 
     cout << NAME << " ... " << VERSION << endl;
-    const string tab = "    ";
+    // const string tab = "    ";
 
     //...Clock...
     TRGClock c("127MHz", 0, 127);

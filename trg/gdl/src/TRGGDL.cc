@@ -358,7 +358,7 @@ TRGGDL::getInput(ifstream & ifs) {
         ifs.getline(b, 800);
 
         //...The first word should be input bit number...
-        const string w0 = TRGUtilities::carstring(b);
+        // const string w0 = TRGUtilities::carstring(b);
 
         //...Bit name...
         string cdr = TRGUtilities::cdrstring(b);
@@ -390,7 +390,7 @@ TRGGDL::getOutput(ifstream & ifs) {
         ifs.getline(b, 800);
 
         //...The first word should be input bit number...
-        const string w0 = TRGUtilities::carstring(b);
+        // const string w0 = TRGUtilities::carstring(b);
 
         //...Bit name...
         string cdr = TRGUtilities::cdrstring(b);
@@ -421,11 +421,11 @@ TRGGDL::getAlgorithm(ifstream & ifs) {
         ifs.getline(b, 800);
 
         //...The first word should be input bit number...
-        const string w0 = TRGUtilities::carstring(b);
+        // const string w0 = TRGUtilities::carstring(b);
 
         //...':'...
         string cdr = TRGUtilities::cdrstring(b);
-        const string w1 = TRGUtilities::carstring(cdr);
+        // const string w1 = TRGUtilities::carstring(cdr);
 
         //...Algorithm...
         cdr = TRGUtilities::cdrstring(cdr);

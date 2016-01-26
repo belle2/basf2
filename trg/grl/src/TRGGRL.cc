@@ -180,7 +180,7 @@ TRGGRL::simulate(void) {
 //	if (TRGDebug::level() > 2) cout <<"yt_grl "<< n_cluster << " " << n_track << endl;
 
         for (unsigned i = 0; i < n_track; i++) {
-		vector<TRGGRLMatch *> match_i;
+	  // vector<TRGGRLMatch *> match_i;
 		if (n_cluster == 0) break;
 		else if (n_cluster == 1) {
 			TRGGRLMatch * match = new TRGGRLMatch(trackList[i], ClusterArray[0], 0);
@@ -198,7 +198,7 @@ TRGGRL::simulate(void) {
 	}
 
         for (unsigned i = 0; i < n_track3D; i++) {
-		vector<TRGGRLMatch *> match_i;
+	  // vector<TRGGRLMatch *> match_i;
 		if (n_cluster == 0) break;
 		else if (n_cluster == 1) {
 			TRGGRLMatch * match = new TRGGRLMatch(trackList3D[i], ClusterArray[0], 1);

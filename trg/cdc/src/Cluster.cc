@@ -9,7 +9,7 @@ using namespace std;
 
 
 int main()
-{   int i=1,j=1,t,k,u,z=0,c=1,js,ts,a,b;
+{   int i=1,j=1,z=0,c=1,js,ts,a;
         ofstream outputp("UT3_0_Cluster_M.vhd");
         ofstream outputpp("UT3_0_Cluster_P.vhd");
 
@@ -183,6 +183,8 @@ for(js=1;js<16;js+=2)
 			outputpp<<"	SL0_TS(80 downto 0)=>SL0_TS(80 downto 0),"<<endl;
 			outputpp<<"	SL2_TS(96 downto 0)=>SL2_TS(96 downto 0),"<<endl;
 			outputpp<<"	SL4_TS(128 downto 0)=>SL4_TS(128 downto 0),"<<endl;
+
+
 			outputpp<<"	SL6_TS(160 downto 0)=>SL6_TS(160 downto 0),"<<endl;
 			outputpp<<"	SL8_TS(192 downto 0)=>SL8_TS(192 downto 0),"<<endl;
 			outputpp<<"	Top_clkData_s =>Top_clkData_s "<<endl;
@@ -201,7 +203,7 @@ for(js=1;js<16;js+=2)
 
         for(j;j<16;j+=2)
         {
-            t=z%160;
+            int t=z%160;
             for(t;t<80;t+=2)
                 {
 

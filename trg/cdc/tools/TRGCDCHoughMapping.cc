@@ -42,7 +42,6 @@ int
 main(int, char **) {
 
     cout << NAME << " ... " << VERSION << endl;
-    const string tab = "    ";
 
     //...Date...
     string ts = TRGUtil::dateString();
@@ -303,9 +302,9 @@ superLayer(const unsigned id) {
         for(int t=0 ; t<160 ; t++) {
             double  j=t%160;
             double  ff=0;
-            double  ii=0;
+            // double  ii=0;
             double  ffp=0;
-            double  iip=0;
+            // double  iip=0;
 
             if(j>39 && j<80)
             outputf <<"SL"<<SL<<"_row"<<k+1<<"("<<j<<")<=";
@@ -370,7 +369,7 @@ superLayer(const unsigned id) {
                                 }
 
 			        ff++;
-                                ii=i;
+                                // ii=i;
 				 if(j>39 && j<80)
                                 outputf<<"SL"<<SL<<"_TS("<<i<<") ";
 
@@ -397,7 +396,7 @@ superLayer(const unsigned id) {
                                  	   outputf<<"or ";
 					}
                                     ff++;
-                                    ii=i;
+                                    // ii=i;
 				 if(j>39 && j<80)
                                 outputf<<"SL"<<SL<<"_TS("<<i<<") ";
 
@@ -425,7 +424,7 @@ superLayer(const unsigned id) {
                                            		 outputfp<<"or ";
 						  }
                                             ffp++;
-                                            iip=i;
+                                            // iip=i;
 						if(j>=0 && j<40)
                                             	outputfp<<"SL"<<SL<<"_TS("<<i<<") ";
 
@@ -453,7 +452,7 @@ superLayer(const unsigned id) {
                                        			     outputfp<<"or ";
 						      }
                                             ffp++;
-                                            iip=i;
+                                            // iip=i;
 					    if(j>=0 && j<40)
                                             outputfp<<"SL"<<SL<<"_TS("<<i<<") ";
 

@@ -57,7 +57,7 @@ int
 main(int argc, char * argv[]) {
 
     cout << PROGRAM_NAME << " ... " << PROGRAM_VERSION << endl;
-    const string tab = "    ";
+    // const string tab = "    ";
 
     //...Arguments...
     const unsigned dl = stoi(string(argv[1]));
@@ -206,9 +206,9 @@ readFile(const string & fn,
         if (b[0] == '#') continue;
         if (b[0] == 'S') continue;
 
-        string clock = TRGUtil::carstring(l);
+        // string clock = TRGUtil::carstring(l);
         l = TRGUtil::cdrstring(l);
-        const string g = TRGUtil::carstring(l);
+        // const string g = TRGUtil::carstring(l);
         l = TRGUtil::cdrstring(l);
         const string dat = TRGUtil::carstring(l);
         l = TRGUtil::cdrstring(l);

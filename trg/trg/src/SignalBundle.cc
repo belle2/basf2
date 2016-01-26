@@ -271,7 +271,7 @@ TRGSignalBundle::ored(void) const {
     TRGSignal ored;
 
     //...Loop over all states...
-    vector<TRGState *> outputStates;
+    // vector<TRGState *> outputStates;
     for (unsigned i = 0; i < nStates; i++) {
         // if (TRGDebug::level())
         //     cout << TRGDebug::tab() << "Clock=" << states[i] << endl;

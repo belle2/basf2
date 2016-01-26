@@ -831,7 +831,7 @@ void
 TRGCDCLink::operator delete(void * t) {
     for (vector<TRGCDCLink *>::iterator it = _all.begin();
 	 it != _all.end();
-	 it++) {
+	 ++it) {
 	if ((* it) == (TRGCDCLink *) t) {
 	    _all.erase(it);
 	    break;

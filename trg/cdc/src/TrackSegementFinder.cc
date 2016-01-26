@@ -200,7 +200,7 @@ void TRGCDCTrackSegmentFinder::simulateBoard(void){
 
     //... Make input signal bundle
     TRGSignalVector inputv(name()+"inputMerger",dClock);
-    const string ni= name()+"InputSignalBundle";
+    // const string ni= name()+"InputSignalBundle";
 //    _tisb = new TRGSignalBundle(ni, dClock);
 
     //TRGSignalVector *inputM= new TRGSignalVector(*( (*(*this)[0]->output())[0]));
@@ -771,7 +771,7 @@ void TRGCDCTrackSegmentFinder::saveTSFResults(std::vector<TRGCDCSegmentHit* >* s
         map<int, unsigned> particleNHitTS;
         // Loop over all hit TSs
         for( int iSuperLayer = 0; iSuperLayer < 9; iSuperLayer++) {
-            map<int, bool> particleHitTS;
+	  // map<int, bool> particleHitTS;
             for( unsigned iTS = 0; iTS < segmentHitsSL[iSuperLayer].size(); iTS++) {
                 const TCSegment & ts = segmentHitsSL[iSuperLayer][iTS]->segment();
                 unsigned nWires = ts.wires().size();
@@ -1940,7 +1940,7 @@ TRGCDCTrackSegmentFinder::fastestTimingInner(unsigned t,
         t1.push_back(* _edg4Map[n * 4 + 2]);
         t1.push_back(* _edg4Map[n * 4 + 3]);
 
-        ht0 = s[0 + 1];
+        // ht0 = s[0 + 1];
         ht0 = s[1 + 1];
         ht0 |= s[2 + 1];
         ht0 |= s[3 + 1];

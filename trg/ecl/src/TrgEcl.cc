@@ -490,10 +490,9 @@ void TrgEcl::getEventTiming(int method)
   double fluctuation = 0;
 
   int nBin = 0;
-  double FastestTCHit = 0;
+  // double FastestTCHit = 0;
   double MaxE = 0;
 
-  double Etop5[5] = {0};
   double Ttop5[5] = {0};
 
   if (method == 1) { //belle1 method
@@ -503,7 +502,7 @@ void TrgEcl::getEventTiming(int method)
     WindowEnd = WindowStart;// + TimeWindow;
 
     while (WindowEnd < 4000) {
-      FastestTCHit = 9999;
+      double FastestTCHit = 9999;
       EventTiming[nBin] = 0;
       for (int iTCId = 0; iTCId < 576; iTCId++) {//Find fastest TC Hit
         for (int itime = 0 ; itime < 80 ; itime++) {
@@ -579,6 +578,8 @@ void TrgEcl::getEventTiming(int method)
 
 
   if (method == 3) { // Energy weighted
+
+    double Etop5[5] = {0};
     TimeWindow = 200;
     OverlapWindow = 100;
     nBin = 2 * 8000 / TimeWindow ;

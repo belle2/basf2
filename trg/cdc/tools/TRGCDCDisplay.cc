@@ -43,7 +43,6 @@ int
 main(int , char ** ) {
 
     cout << PROGRAM_NAME << " ... " << PROGRAM_VERSION << endl;
-    const string tab = "    ";
 
 #ifdef TRGCDC_DISPLAY
     //...Gearbox...

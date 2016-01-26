@@ -101,7 +101,7 @@ main(int argc, char **) { // argv[]) {
     }
 
     //...Date...
-    const string ts0 = TRGUtil::dateStringF();
+    // const string ts0 = TRGUtil::dateStringF();
     const string ts1 = TRGUtil::dateString();
 
     //...Get path to include directory...
@@ -256,7 +256,7 @@ Parser(ifstream & ifs) {
 void
 Parser0(const string & line) {
     string l = line;
-    const string car0 = TRGUtil::carstring(l);
+    // const string car0 = TRGUtil::carstring(l);
     l = TRGUtil::cdrstring(l);
     const string car1 = TRGUtil::carstring(l);
     l = TRGUtil::cdrstring(l);
@@ -295,13 +295,13 @@ ParserTS(const string & l) {
 void
 ParserTSV(const string & line) {
     string l = line;
-    const string car0 = TRGUtil::carstring(l);
+    // const string car0 = TRGUtil::carstring(l);
     l = TRGUtil::cdrstring(l);
-    const string car1 = TRGUtil::carstring(l);
+    // const string car1 = TRGUtil::carstring(l);
     l = TRGUtil::cdrstring(l);
-    const string car2 = TRGUtil::carstring(l);
+    // const string car2 = TRGUtil::carstring(l);
     l = TRGUtil::cdrstring(l);
-    const string car3 = TRGUtil::carstring(l);
+    // const string car3 = TRGUtil::carstring(l);
 
     //...Definition...
     string m = TRGUtil::cdrstring(l);

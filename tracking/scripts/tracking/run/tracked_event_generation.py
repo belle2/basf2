@@ -41,10 +41,8 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
             choices=utilities.NonstrictChoices(['StandardReco',
                                                 'VXDTF',
                                                 'TrackFinderCDCAutomaton',
-                                                'TrackFinderCDCLegendre',
-                                                'CDCLocalTracking',
+                                                'TrackFinderCDCLegendreTracking',
                                                 'Trasan',
-                                                'CDCFullFinder',
                                                 ]),
             default=self.finder_module,
             dest='finder_module',
@@ -92,7 +90,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                     'UseCDCHits': True,
                     'UseOnlyAxialCDCHits': True}
 
-        elif (finder_module_name in ('add_cdc_track_finding', 'CDCLocalTracking', 'CDCFullFinder', 'Trasan') or
+        elif (finder_module_name in ('add_cdc_track_finding', 'Trasan') or
                 finder_module_name.startswith('TrackFinderCDC')):
             return {'UsePXDHits': False,
                     'UseSVDHits': False,

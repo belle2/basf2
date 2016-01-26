@@ -4,6 +4,8 @@
 import os
 import tracking.modules as modules
 from tracking.run.event_generation import StandardEventGenerationRun
+from tracking import add_cdc_track_finding
+
 import logging
 import sys
 
@@ -20,14 +22,12 @@ class BackgroundSegmentsRecordingRun(StandardEventGenerationRun):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
         main_path = StandardEventGenerationRun.create_path(self)
-        main_path.add_module("WireHitTopologyPreparer")
+        add_cdc_track_finding(main_path)
 
-        main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name="TrackCands",
-                                                   background_filter="recording",
-                                                   new_segments_filter="none",
-                                                   second_filter="none",
-                                                   track_filter="none",
-                                                   use_pair_finder=False))
+        for m in main_path.modules():
+            if m.name().startswith("SegmentTrackCombinerDev"):
+                m.param("BackgroundSegmentsFilter", "recording")
+                
         return main_path
 
 

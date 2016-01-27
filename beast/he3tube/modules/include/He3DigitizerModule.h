@@ -15,6 +15,9 @@
 #include <string>
 #include <vector>
 
+#include <TFile.h>
+#include <TTree.h>
+
 namespace Belle2 {
   namespace he3tube {
     /**
@@ -49,62 +52,51 @@ namespace Belle2 {
       /**  */
       virtual void terminate();
 
-      /** struct containing time and energy deposit, for sorting */
-      struct hit {
-        double time;
-        double edep;
-      };
-
-      /** sorter for above struct */
-      struct byTime {
-        bool operator()(hit const& a, hit const& b)
-        {
-          return a.time < b.time;
-        }
-      };
-
-
-
     private:
 
-      //creates waveform, returns peak
-      double WaveformMaker(std::vector<hit> hits, double lowTime);
-
-      /** Reads drift data from file */
-      virtual void getDriftData();
-
-      /** interpolates the drift time for a given distance from the wire */
-      double getDriftTime(double R);
-
+      /** creates waveform, returns peak */
+      double WaveformMaker(std::vector<double> edepVec, std::vector<double> timeVec, std::vector<double> RVec, double lowTime);
+      /** loads the simulated signals from a root file */
+      void loadGarfieldData();
       /** Produces the impulse response function */
       virtual void impulseResponse();
-
       /** reads data from HE3TUBE.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();
 
-      /** filename of drift datafile */
-      std::string m_driftDataFile;
-      /** distance from center of tube */
-      std::vector<double> radius_drift;
-      /** drift time for each distance from center of tube */
-      std::vector<double> time_drift;
+      /** filename of Garfield datafile */
+      std::string m_GarfDataFile;
       /** size of waveforms */
-      static const int waveformSize = 8000;
+      static const int waveformSize = 5500;
       /** size of impulse response */
       static const int iResponseLength = 5500;
-      /** number of detectors. Read from HE3TUBE.xml*/
+      /** number of different radius values in the simulated signal file */
+      static const int numRadii = 1000;
+      /** size of the garfield simulated signals */
+      static const int garfSignalSize = 5000;
+      /** garfied simulated signal variable */
+      double garfSignal[garfSignalSize];
+      /** number of detectors. Read from the gearbox*/
       int numOfTubes = 0;
       /** X coordinate of tube center */
       std::vector<double> TubeCenterX;
       /** Y coordinate of tube center */
       std::vector<double> TubeCenterY;
+      /** inner radius of the tube, read from the gearbox*/
+      double rTube;
+      /** radius of the sense wire */
+      double rWire = 0.030;
       /** Impulse response function */
       double iResponse[iResponseLength];
       /** Event counter */
       int Event = 0;
       /** Conversion to ADC counts, set in steering file*/
       double m_ConversionFactor;
-
+      /** ionization energy of He3 */
+      double IonizationE = 1;
+      /** TFile containing garfield signals */
+      TFile* f_sim;
+      /** TTree containing garfield signals */
+      TTree* t_sim;
 
     };
 

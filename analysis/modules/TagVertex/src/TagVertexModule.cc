@@ -217,18 +217,7 @@ namespace Belle2 {
     if ((ok == false || m_fitPval < 0.001) || m_useFitAlgorithm == "standard" || m_useFitAlgorithm == "breco"
         || m_useFitAlgorithm == "boost" || m_useFitAlgorithm == "noConstraint") {
       ok = getTagTracks_standardAlgorithm(Breco, 0);
-
-      if (ok) {
-        try {
-          ok = makeGeneralFit();
-        } catch (rave::CheckedFloatException) {
-          B2ERROR("Invalid inputs (nan/inf)?");
-          ok = false;
-        }
-      }
-
-      // if (ok) ok = makeGeneralFit();
-
+      if (ok) ok = makeGeneralFit();
     }
 
     return ok;
@@ -892,7 +881,9 @@ namespace Belle2 {
       if (trak1) trak1Res = trak1->getTrackFitResult(Const::pion);
       TVector3 mom1;
       if (trak1Res) mom1 = trak1Res->getMomentum();
-      if (std::isinf(mom1.Mag2()) == true || std::isnan(mom1.Mag2()) == true) continue;
+      if (std::isinf(mom1.Mag2()) == true || std::isnan(mom1.Mag2()) == true) {
+        continue;
+      }
       if (!trak1Res) continue;
 
       bool isKsDau = false;
@@ -915,7 +906,11 @@ namespace Belle2 {
         }
 
       }
-      if (!isKsDau) rFit.addTrack(trak1Res); // Temporal fix: some mom go to Inf
+      try {
+        if (!isKsDau) rFit.addTrack(trak1Res); // Temporal fix: some mom go to Inf
+      } catch (rave::CheckedFloatException) {
+        B2ERROR("Exception caught in TagVertexModule::makeGeneralFit(): Invalid inputs (nan/inf)?");
+      }
     }
 
     int isGoodFit = rFit.fit("avf");

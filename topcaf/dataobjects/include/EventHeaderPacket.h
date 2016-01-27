@@ -23,16 +23,17 @@ namespace Belle2 {
     EventHeaderPacket(const unsigned int* temp_buffer, int nwords);
 
     //--- Getters ---//
-    unsigned int GetFreezeDate() const {return m_freeze_date;}
-    int GetEventNumber() const {return m_evt_num;}
-    bool GetEventTrigger() const {return (MASK_TRIGGER & m_trigger);} //use only 1st byte
-    bool GetEventFlag() const {return (MASK_FLAG & m_flag);} //use only 1st byte
-    int GetNumWaveformPackets() const {return m_nwaves;}
-    int GetNumAuxiliaryPackets() const {return m_aux;}
-    double GetFTSW() {return m_ftsw;}
+    inline unsigned int GetFreezeDate() const {return m_freeze_date;}
+    inline int GetEventNumber() const {return m_evt_num;}
+    inline bool GetEventTrigger() const {return (MASK_TRIGGER & m_trigger);} //use only 1st byte
+    inline packet_word_t GetEventFlag() const {return (m_flag);}
+    inline int GetNumWaveformPackets() const {return m_nwaves;}
+    inline int GetNumAuxiliaryPackets() const {return m_aux;}
+    inline double GetFTSW() {return m_ftsw;}
 
     //--- Setters ---//
-    void SetFTSW(double ftsw) {m_ftsw = ftsw;}
+    inline void SetFTSW(double ftsw) {m_ftsw = ftsw;}
+    inline void SetFlag(packet_word_t flag) {m_flag = flag;}
 
   private:
     packet_word_t m_freeze_date;

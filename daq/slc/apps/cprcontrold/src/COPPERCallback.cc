@@ -92,12 +92,10 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       const DBObject& o_hslb(obj("hslb", i));
       if (m_dummymode || !m_fee[i] || !o_hslb.getBool("used")) continue;
       HSLB& hslb(m_hslb[i]);
-      /*
       hslb.open(i);
       if (!(o_hslb.hasValue("dummyhslb") && o_hslb.getBool("dummyhslb"))) {
         m_fee[i]->init(*this, hslb);
       }
-      */
       std::string vname = StringUtil::form("hslb[%d]", i);
       add(new NSMVHandlerHSLBBelle2LinkDown(*this, vname + ".err.b2linkdown", i));
       add(new NSMVHandlerHSLBCOPPERFifoFull(*this, vname + ".err.cprfifofull", i));

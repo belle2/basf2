@@ -35,8 +35,8 @@ from stdLooseFSParticles import *
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \
     [
-        '/hsm/belle2/bdata/MC/signal/B2JpsiKs_mu/mcprod1405/BGx1/mc35_B2JpsiKs_mu_BGx1_s00/' +
-        'B2JpsiKs_mu_e0001r001*_s00_BGx1.mdst.root'
+        '/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000103/s00/e0000/4S/' +
+        'r00000/1111440100/sub00/mdst_00000*_prod00000103_task0000000*.root'
     ]
 
 inputMdstList(filelistSIG)
@@ -109,9 +109,7 @@ FlavorTagger(
 # FlavorTagger(mode = 'Teacher', weightFiles='B2JpsiKs_mu', categories=['Electron', 'Muon', 'Kaon', ... etc.])
 #
 # Instead of the default name 'B2JpsiKs_mu' is better to use the abbreviation of your decay channel.
-# If you do not specify any category combination, the default one is choosed either in 'Teacher' or 'Expert' mode:
-#
-# ['Electron', 'Muon', 'KinLepton', 'Kaon', 'SlowPion', 'FastPion', 'Lambda', 'FSC', 'MaximumPstar', 'KaonPion']
+# If you do not specify any category combination, the default one (all categories) is choosed either in 'Teacher' or 'Expert' mode:
 #
 # All available categories are:
 # [

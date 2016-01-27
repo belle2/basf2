@@ -31,6 +31,7 @@ namespace Belle2 {
       m_CellId   = 0;
       m_Charge   = 0;
       m_Baseline = 0;
+      m_MaxVal   = 0;
       m_Time     = 0;
       m_TrueEdep = 0;
       m_PDG = 0;

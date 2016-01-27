@@ -85,7 +85,7 @@ void PinDigitizerModule::beginRun()
 
 void PinDigitizerModule::event()
 {
-
+  /*
   StoreArray<MCParticle> particles;
   StoreArray<PindiodeSimHit> PinSimHits;
   StoreArray<PindiodeHit> PinHits;
@@ -134,11 +134,11 @@ void PinDigitizerModule::event()
       PinHits.appendNew(PindiodeHit(edep[i], volt[i], time[i], i, pdg[i]));
     }
   }
-
+  */
   //Event++;
 
 }
-//read tube centers, impulse response, and garfield drift data filename from PINDIODE.xml
+//read from PINDIODE.xml
 void PinDigitizerModule::getXMLData()
 {
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"PINDIODE\"]/Content/");

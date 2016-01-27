@@ -83,7 +83,7 @@ void BeamDigitizerModule::beginRun()
 
 void BeamDigitizerModule::event()
 {
-
+  /*
   StoreArray<MCParticle> particles;
   StoreArray<BeamabortSimHit> BeamSimHits;
   StoreArray<BeamabortHit> BeamHits;
@@ -125,11 +125,11 @@ void BeamDigitizerModule::event()
       BeamHits.appendNew(BeamabortHit(i, edep[i], volt[i], time[i], pdg[i]));
     }
   }
-
+  */
   Event++;
 
 }
-//read tube centers, impulse response, and garfield drift data filename from BEAMABORT.xml
+//read from BEAMABORT.xml
 void BeamDigitizerModule::getXMLData()
 {
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"BEAMABORT\"]/Content/");

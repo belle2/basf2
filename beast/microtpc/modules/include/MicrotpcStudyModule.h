@@ -87,6 +87,7 @@ namespace Belle2 {
 
       /** Charged density vs z vs section */
       TH1F* h_z[8];
+      /** Charged density vs x vs y */
       TH2F* h_xy[8];
       /** Charged density vs z vs r */
       TH2F* h_zr[8];

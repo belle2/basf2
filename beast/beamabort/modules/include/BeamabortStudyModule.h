@@ -69,11 +69,11 @@ namespace Belle2 {
       virtual void getXMLData();
 
       /** number of detectors. Read from BEAMABORT.xml*/
-      int nDIA = 0;
+      //int nDIA = 0;
       /** PIN coordinate */
-      std::vector<TVector3> PINCenter;
+      //std::vector<TVector3> PINCenter;
       /** Event counter */
-      int Event = 0;
+      //int Event = 0;
       /** Work function */
       double m_WorkFunction;
       /** Fano Factor */

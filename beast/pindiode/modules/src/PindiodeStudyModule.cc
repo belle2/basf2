@@ -117,7 +117,7 @@ void PindiodeStudyModule::event()
     int detNb = aHit->getCellId();
     double edep = aHit->getEnergyDep();
     double time = aHit->getFlightTime();
-    int PDG = aHit->getPDGCode();
+    //int PDG = aHit->getPDGCode();
     const double meanEl = edep / m_WorkFunction * 1e9; //GeV to eV
     const double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
     const int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number

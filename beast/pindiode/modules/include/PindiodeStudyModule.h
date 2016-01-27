@@ -69,11 +69,11 @@ namespace Belle2 {
       virtual void getXMLData();
 
       /** number of detectors. Read from PINDIODE.xml*/
-      int nPIN = 0;
+      //int nPIN = 0;
       /** PIN coordinate */
-      std::vector<TVector3> PINCenter;
+      //std::vector<TVector3> PINCenter;
       /** Event counter */
-      int Event = 0;
+      //int Event = 0;
       /** Cremat gain */
       double m_CrematGain;
       /** Work function */

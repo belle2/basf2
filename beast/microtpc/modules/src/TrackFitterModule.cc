@@ -150,7 +150,7 @@ void TrackFitterModule::event()
   //auto rowArray = new vector<int>[nTPC](); //row
   //auto bcidArray = new vector<int>[nTPC](); //BCID
   //auto totArray = new vector<int>[nTPC](); //TOT
-  int i_tpc[8];
+  //int i_tpc[8];
   //int i_tpc1[8];
   //int i_tpc2[8];
   if (nentries > 0) {
@@ -186,7 +186,7 @@ void TrackFitterModule::event()
       for (int j = 0; j < nentries; j++) {
         MicrotpcHit* aHit = TpcHits[j];
         int detNb = aHit->getdetNb();
-        int trkID = aHit->gettrkID();
+        //int trkID = aHit->gettrkID();
         int col = aHit->getcolumn();
         int row = aHit->getrow();
         int tot = aHit->getTOT();
@@ -239,7 +239,7 @@ void TrackFitterModule::event()
             //bcid
             int bcid = std::get<2>(key2);
             //tot
-            int tot = m_dchip[std::tuple<int, int, int>(col2, row2, bcid)];
+            //int tot = m_dchip[std::tuple<int, int, int>(col2, row2, bcid)];
             time[fpxhits] = bcid;
             fpxhits++;
           }

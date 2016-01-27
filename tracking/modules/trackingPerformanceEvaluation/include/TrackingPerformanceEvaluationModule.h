@@ -199,9 +199,6 @@ namespace Belle2 {
     TH3F* m_h3_TracksPerMCTrackCand_minus;
 
     //histograms used for purity plots
-    TH1F* m_h1_HitsMCTrackCandPerTrackCand;
-    TH1F* m_h1_HitsTrackCand;
-
     TH3F* m_h3_MCParticlesPerTrack;
     TH3F* m_h3_Tracks;
 

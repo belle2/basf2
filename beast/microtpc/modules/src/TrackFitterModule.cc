@@ -239,8 +239,8 @@ void TrackFitterModule::event()
             //bcid
             int bcid = std::get<2>(key2);
             //tot
-            //int tot = m_dchip[std::tuple<int, int, int>(col2, row2, bcid)];
-            time[fpxhits] = bcid;
+            int tot = m_dchip[std::tuple<int, int, int>(col2, row2, bcid)];
+            if (tot >= 0)time[fpxhits] = bcid;
             fpxhits++;
           }
         }

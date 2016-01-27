@@ -39,6 +39,8 @@
 #include <TH2.h>
 #include <TH3.h>
 #include <TFile.h>
+#include <TTree.h>
+#include <TString.h>
 
 
 using namespace std;
@@ -60,11 +62,11 @@ He3DigitizerModule::He3DigitizerModule() : Module()
   // Set module properties
   setDescription("He3tube digitizer module");
 
-  //Default values of these exist in HE3TUBE.xml. If the user prefers, they can try different drift data files or impulse responses.
-  addParam("driftDataFile", m_driftDataFile,
-           "File containing Garfield generated drift data. If no file is specified, data from HE3TUBE.xml is used.", string(""));
+  addParam("garfieldDataFile", m_GarfDataFile,
+           "Root file containing Garfield generated signals at different radii",
+           std::string("$BELLE2_LOCAL_DIR/beast/he3tube/data/GarfieldSimulatedSignals.root"));
   addParam("conversionFactor", m_ConversionFactor,
-           "Conversion factor for pulse heights", 1.);
+           "Conversion factor for pulse heights", -1.e8);
 
 }
 
@@ -77,10 +79,12 @@ void He3DigitizerModule::initialize()
   B2INFO("He3Digitizer: Initializing");
   StoreArray<He3tubeHit>::registerPersistent();
 
-  //get the garfield drift data and create impulse response function
+  //get the tube dimentions and locations
   getXMLData();
-  if (m_driftDataFile != "") getDriftData();
+  //load the electronics transfer function
   impulseResponse();
+  //load the root file containing the garfield simulated signals
+  loadGarfieldData();
 
 }
 
@@ -103,7 +107,12 @@ void He3DigitizerModule::event()
     return;
   }
 
-  auto Hits = new vector<hit>[numOfTubes]();
+  //vectors for energy deposit, time, and radius for each tube
+  auto edepVec = new vector<double>[numOfTubes]();
+  auto timeVec = new vector<double>[numOfTubes]();
+  auto RVec = new vector<double>[numOfTubes]();
+
+
   auto lowTime = new double[numOfTubes]();  //earliest deposit in each tube
   std::fill_n(lowTime, numOfTubes, 9999999);
   auto edepDet = new double[numOfTubes]();  //total energy deposited per tube
@@ -121,19 +130,17 @@ void He3DigitizerModule::event()
     TVector3 posn = aHit->gettkPos();
     double x = posn.X() / 100.;
     double y = posn.Y() / 100.;
+    double time = aHit->getGlTime();
+
 
     double r = sqrt((x - TubeCenterX[detNB]) * (x - TubeCenterX[detNB]) + (y - TubeCenterY[detNB]) *
                     (y - TubeCenterY[detNB])); //find radius of the energy deposit
-    double driftTime = getDriftTime(
-                         r);                                                                                         //get drift time
-    double time = (aHit->getGlTime() +
-                   driftTime);                                                                      //time when energy drifts to the wire
 
 
-    hit thisHit;
-    thisHit.edep = edep;
-    thisHit.time = time;
-    Hits[detNB].push_back(thisHit);
+    edepVec[detNB].push_back(edep);
+    timeVec[detNB].push_back(time);
+    RVec[detNB].push_back(r);
+
 
     //find earliest time in each tube
     if (time < lowTime[detNB]) lowTime[detNB] = time;
@@ -147,8 +154,8 @@ void He3DigitizerModule::event()
 
   for (int detNB = 0; detNB < numOfTubes; detNB++) {
     if (numInDet[detNB] > 0) {
-      std::sort(Hits[detNB].begin(), Hits[detNB].end(), byTime());        //sort the energy deposits by time
-      peak[detNB] = WaveformMaker(Hits[detNB], lowTime[detNB]) * m_ConversionFactor;
+      //create a waveform and get the peak
+      peak[detNB] = WaveformMaker(edepVec[detNB], timeVec[detNB], RVec[detNB], lowTime[detNB]) * m_ConversionFactor;
     }
   }
 
@@ -168,114 +175,78 @@ void He3DigitizerModule::event()
   //delete arrays
   delete[] peak;
   delete[] lowTime;
-  delete[] Hits;
   delete[] edepDet;
   delete[] numInDet;
+  delete[] edepVec;
+  delete[] timeVec;
+  delete[] RVec;
+
 
 }
 
-//read Garfield generated file containing drift time vs radius
-void He3DigitizerModule::getDriftData()
+void He3DigitizerModule::loadGarfieldData()
+{
+  TString file = m_GarfDataFile;
+  f_sim = new TFile(file);
+  t_sim = (TTree*)gDirectory->Get("garfSignals");
+  t_sim->SetBranchAddress("signalData", &garfSignal);
+}
+
+
+
+//create a waveform, convolve with impulse response, return peak.
+double He3DigitizerModule::WaveformMaker(vector<double> edepVec, vector<double> timeVec, vector<double> RVec, double lowTime)
 {
 
-  B2INFO("He3Digitizer: Reading drift data from: " << m_driftDataFile);
+  //create an empty waveform
+  auto waveform = new double[waveformSize]();
 
-  ifstream InFile;
-  InFile.open(m_driftDataFile);
-  if (!InFile) {
-    B2WARNING("He3Digitizer: Drift data file " << m_driftDataFile << " not found, using default in HE3TUBE.xml");
-    return;
-  } else {
-    radius_drift.clear();
-    time_drift.clear();
-    for (int i = 0; i < 248; i++) {
-      double r;
-      double t;
-      InFile >> r;
-      InFile >> t;
-      radius_drift.push_back(r);
-      time_drift.push_back(t);
+  for (int i = 0; i < (int)timeVec.size(); i++) {
+    double t = (timeVec.at(i) - lowTime); //this ensures that the first energy deposit is at t=0
+    double edep = edepVec.at(i);
+    double R = RVec.at(i);
+
+    //convert the radius to an index to get the appropriate leaf from the ttree.
+    int k = round((R - rWire) / (rTube - rWire) * numRadii);
+
+    t_sim->GetEntry(k);
+
+    int SigTime = round(t);
+    for (int j = 0; j < garfSignalSize; j++) {
+      //add the signal induced by an electron dropped at this radius to the waveform, scale the waveform by the energy deposit
+      waveform[j + SigTime] = waveform[j + SigTime] + garfSignal[j] * edep / IonizationE;
     }
   }
-  InFile.close();
-}
 
-//returns drift time for a given radius from the wire
-double He3DigitizerModule::getDriftTime(double R)
-{
+  double peak = 99;
+  double conv;
 
-  //int lowIndex = -1;
-  std::vector<double>::iterator it;
-  it = lower_bound(radius_drift.begin(), radius_drift.end(), R);
-  int lowIndex = (it - 1) - radius_drift.begin();
-
-  if (lowIndex == 247) return time_drift[247];
-
-  //interpolate the drift time from the nearest entries in time_drift[]
-  double drift = time_drift[lowIndex] + (time_drift[lowIndex + 1] - time_drift[lowIndex]) * (R - radius_drift[lowIndex]) /
-                 (radius_drift[lowIndex + 1] - radius_drift[lowIndex]);
-  return drift;
-
-
-}
-
-//integrate all energy deposits, then convolve with impulse response, returning peak.
-double He3DigitizerModule::WaveformMaker(std::vector<hit> hits, double lowTime)
-{
-
-  if (hits.size() == 0) return -10;
-  auto integratedSignal = new double[waveformSize]();
-
-  int nextTime = (int)(hits.at(0).time - lowTime);
-  int k = 1;
-  double sum = 0;
-  double peak = 0;
-  double thisTime;
-
-  for (int i = 0; i < waveformSize; i++) {
-
-    if (i >= nextTime) {
-      if (k >= (int)hits.size()) {
-        break;
-      } else {
-        thisTime = nextTime;
-        while (thisTime == nextTime) {
-          sum = sum + hits.at(k).edep;
-          nextTime = hits.at(k).time - lowTime;
-          k++;
-          if (k >= (int)hits.size()) break;
-        }
-      }
-    }
-    integratedSignal[i] = sum;
-  }
-
-
-  double result;
-  int min, max, m;
+  //convolve the waveform with the transfer function and find the peak value
   for (int i = 0; i < waveformSize + iResponseLength - 1; i++) {
-
-    result = 0;
+    conv = 0;
+    int min, max, m;
     min = (i >= iResponseLength - 1) ? i - (iResponseLength - 1) : 0;
     max = (i < waveformSize - 1) ? i : waveformSize - 1;
-
     for (m = min; m <= max; m++) {
-      result += integratedSignal[m] * iResponse[i - m];
+
+
+      conv += waveform[m] * iResponse[i - m];
+      if (conv < peak) peak = conv;
     }
-    if (result > peak) peak = result;
-    if (result == 0 && i > 1000) break;
   }
 
+  //delete the waveform
+  delete[] waveform;
 
-
-  //delete waveforms
-  delete[] integratedSignal;
-
+  //return the peak value
   return peak;
+
+
+
 }
 
 
-//read tube centers, impulse response, and garfield drift data filename from HE3TUBE.xml
+//read tube centers and tube radius from Gearbox
 void He3DigitizerModule::getXMLData()
 {
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"HE3TUBE\"]/Content/");
@@ -285,17 +256,13 @@ void He3DigitizerModule::getXMLData()
 
     TubeCenterX.push_back(activeParams.getLength("x_he3tube"));
     TubeCenterY.push_back(activeParams.getLength("y_he3tube"));
+    rTube = activeParams.getLength("tube_innerRadius");
+
 
     numOfTubes++;
   }
 
-  //drift data
-  radius_drift = content.getArray("DriftRadius");
-  time_drift = content.getArray("DriftTime");
-
-  //if (m_impulseSigma == -1.) m_impulseSigma = content.getDouble("impulseSigma");
-
-  B2INFO("He3Digitizer: Aquired tube locations and drift data from HE3TUBE.xml. There are " << numOfTubes << " tubes implemented");
+  B2INFO("He3Digitizer: Aquired tube locations from HE3TUBE.xml. There are " << numOfTubes << " tubes implemented");
 
 }
 
@@ -308,7 +275,7 @@ void He3DigitizerModule::terminate()
 }
 
 
-
+//the impulse response.
 void He3DigitizerModule::impulseResponse()
 {
 

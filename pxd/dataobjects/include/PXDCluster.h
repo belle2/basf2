@@ -178,6 +178,22 @@ namespace Belle2 {
      */
     void setShape(short NewClsShape) { m_clsShape = NewClsShape; }
 
+    /** Set u coordinate of hit position.
+     */
+    void setU(float NewuPosition) { m_uPosition = NewuPosition; }
+
+    /** Set v coordinate of hit position.
+     */
+    void setV(float NewvPosition) { m_vPosition = NewvPosition; }
+
+    /** Set error of u coordinate of hit position.
+     */
+    void setUSigma(float NewuError) { m_uPositionSigma = NewuError; }
+
+    /** Set error in v coordinate of hit position.
+     */
+    void setVSigma(float NewvError) { m_vPositionSigma = NewvError; }
+
   protected:
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/
     float m_uPosition;         /**< Absolute cell position in r-phi. */

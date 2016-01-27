@@ -69,6 +69,9 @@ PXDClusterizerModule::PXDClusterizerModule() :
 
   addParam("TanLorentz", m_tanLorentzAngle, "Tangent of the Lorentz angle",
            double(-1.0));
+
+  addParam("useClusterShape", m_useClusterShape,
+           "Apply recognition of cluster shape and set it as ID", false);
 }
 
 void PXDClusterizerModule::initialize()
@@ -136,6 +139,7 @@ void PXDClusterizerModule::initialize()
   B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
   B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
   B2INFO(" -->  TanLorentz:         " << m_tanLorentzAngle);
+  B2INFO(" -->  useClusterShape:    " << m_useClusterShape);
 
   //This is still static noise for all pixels, should be done more sophisticated in the future
   if (m_useADC) m_elNoise = m_elNoise / m_eToADU;
@@ -239,12 +243,13 @@ void PXDClusterizerModule::createRelationLookup(const RelationArray& relation, R
   if (!relation) return;
   //Resize to number of digits and set all values
   lookup.resize(digits);
-  for (const RelationElement & element : relation) {
+  for (const RelationElement& element : relation) {
     lookup[element.getFromIndex()] = &element;
   }
 }
 
-void PXDClusterizerModule::fillRelationMap(const RelationLookup& lookup, std::map<unsigned int, float>& relation, unsigned int index)
+void PXDClusterizerModule::fillRelationMap(const RelationLookup& lookup, std::map<unsigned int, float>& relation,
+                                           unsigned int index)
 {
   //If the lookup table is not empty and the element is set
   if (!lookup.empty() && lookup[index]) {
@@ -286,7 +291,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
   vector<pair<unsigned int, float> > digit_weights;
 
 
-  for (ClusterCandidate & cls : *m_cache) {
+  for (ClusterCandidate& cls : *m_cache) {
     //Check for noise cuts
     if (!(cls.size() > 0 && m_noiseMap(cls.getCharge(), m_cutCluster) && m_noiseMap(cls.getSeed(), m_cutSeed))) continue;
 
@@ -299,7 +304,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
 
     const Pixel& seed = cls.getSeed();
 
-    for (const PXD::Pixel & px : cls.pixels()) {
+    for (const PXD::Pixel& px : cls.pixels()) {
       //Add the Pixel information to the two projections
       projU.add(px.getU(), info.getUCellPosition(px.getU()), px.getCharge());
       projV.add(px.getV(), info.getVCellPosition(px.getV()), px.getCharge());
@@ -322,7 +327,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
       double posUU = cls.getCharge() * pitchU * pitchU / 12.0;
       double posVV = cls.getCharge() * pitchV * pitchV / 12.0;
       double posUV(0);
-      for (const Pixel & px : cls.pixels()) {
+      for (const Pixel& px : cls.pixels()) {
         const double du = info.getUCellPosition(px.getU()) - projU.getPos();
         const double dv = info.getVCellPosition(px.getV()) - projV.getPos();
         posUU += px.getCharge() * du * du;
@@ -342,11 +347,17 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     projV.setPos(projV.getPos() - lorentzShift.Y());
     B2DEBUG(100, "Lorentz shift: " << lorentzShift.X() << " " << lorentzShift.Y());
 
+    short clsShapeID = (short)pxdClusterShapeType::no_shape_set;
+    PXDClusterShape cs;
+    if (m_useClusterShape) {
+      clsShapeID = (short)cs.setClsShape(cls, sensorID);
+    }
+
     //Store Cluster into Datastore ...
     int clsIndex = storeClusters.getEntries();
     storeClusters.appendNew(sensorID, projU.getPos(), projV.getPos(), projU.getError(), projV.getError(),
                             rho, cls.getCharge(), seed.getCharge(),
-                            cls.size(), projU.getSize(), projV.getSize(), projU.getMinCell(), projV.getMinCell()
+                            cls.size(), projU.getSize(), projV.getSize(), projU.getMinCell(), projV.getMinCell(), clsShapeID
                            );
 
     //Create Relations to this Digit
@@ -358,7 +369,8 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
   m_cache->clear();
 }
 
-void PXDClusterizerModule::calculatePositionError(const ClusterCandidate& cls, ClusterProjection& primary, const ClusterProjection& secondary, double minPitch, double centerPitch, double maxPitch)
+void PXDClusterizerModule::calculatePositionError(const ClusterCandidate& cls, ClusterProjection& primary,
+                                                  const ClusterProjection& secondary, double minPitch, double centerPitch, double maxPitch)
 {
   if (primary.getSize() >= static_cast<unsigned int>(m_sizeHeadTail)) { //Analog head tail
     //Average charge in the central area
@@ -374,7 +386,8 @@ void PXDClusterizerModule::calculatePositionError(const ClusterCandidate& cls, C
     primary.setError(0.5 * sqrt(1.0 / snHead / snHead + 1.0 / snTail / snTail
                                 + 0.5 * landauHead * landauHead + 0.5 * landauTail * landauTail));
   } else if (primary.getSize() <= 2) { // Add a phantom charge to second strip
-    primary.setError(centerPitch * (secondary.getSize() + 2) * m_cutElectrons / (primary.getCharge() + (secondary.getSize() + 3) * m_cutElectrons));
+    primary.setError(centerPitch * (secondary.getSize() + 2) * m_cutElectrons / (primary.getCharge() +
+                     (secondary.getSize() + 3) * m_cutElectrons));
   } else {
     const double sn = cls.getSeedCharge() / m_elNoise;
     primary.setError(2.0 * centerPitch / sn);

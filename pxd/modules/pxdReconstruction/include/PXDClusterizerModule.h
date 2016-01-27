@@ -17,12 +17,15 @@
 #include <pxd/reconstruction/ClusterCache.h>
 #include <pxd/reconstruction/ClusterProjection.h>
 #include <pxd/reconstruction/NoiseMap.h>
+#include <pxd/reconstruction/PXDClusterShape.h>
 #include <string>
 #include <memory>
 
 namespace Belle2 {
   class RelationArray;
   class RelationElement;
+  class PXDClusterShape;
+  class PXDClusterShapeType;
 
   namespace PXD {
 
@@ -83,7 +86,8 @@ namespace Belle2 {
        * @param centerPitch Pitch between pixel cells
        * @param maxPitch Pitch at the maximum cell of the cluster
        */
-      void calculatePositionError(const ClusterCandidate& cls, ClusterProjection& primary, const ClusterProjection& secondary, double minPitch, double centerPitch, double maxPitch);
+      void calculatePositionError(const ClusterCandidate& cls, ClusterProjection& primary, const ClusterProjection& secondary,
+                                  double minPitch, double centerPitch, double maxPitch);
 
       /** Noise in number of electrons */
       double m_elNoise;
@@ -122,6 +126,9 @@ namespace Belle2 {
       int m_sizeHeadTail;
       /** LorentzAngle , FIXME: should be determined directly from B-Field */
       double m_tanLorentzAngle;
+
+      /** Apply recognition of cluster shape and set its ID */
+      bool m_useClusterShape;
 
       /** Size of cluster Cache (0 = default) */
       int m_clusterCacheSize;

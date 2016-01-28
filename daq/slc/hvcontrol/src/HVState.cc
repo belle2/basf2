@@ -11,6 +11,8 @@ const HVState HVState::TRANSITION_TS(31, "TRANSITION");
 const HVState HVState::RAMPINGUP_TS(32, "RAMPINGUP");
 const HVState HVState::RAMPINGDOWN_TS(33, "RAMPINGDOWN");
 const HVState HVState::RECOVERING_TS(34, "RECOVERING");
+const HVState HVState::TURNINGON_TS(35, "TURNINGON");
+const HVState HVState::TURNINGOFF_TS(35, "TURNINGOFF");
 const HVState HVState::ERROR_ES(41, "ERROR");
 const HVState HVState::TRIP_ES(42, "TRIP");
 const HVState HVState::OVER_CURRENT_ES(43, "OVER_CURRENT");
@@ -31,6 +33,8 @@ const HVState& HVState::operator=(const std::string& label) throw()
   else if (label == TRANSITION_TS.getLabel()) *this = TRANSITION_TS;
   else if (label == RAMPINGUP_TS.getLabel()) *this = RAMPINGUP_TS;
   else if (label == RAMPINGDOWN_TS.getLabel()) *this = RAMPINGDOWN_TS;
+  else if (label == TURNINGON_TS.getLabel()) *this = TURNINGON_TS;
+  else if (label == TURNINGOFF_TS.getLabel()) *this = TURNINGOFF_TS;
   else if (label == RECOVERING_TS.getLabel()) *this = RECOVERING_TS;
   else if (label == ERROR_ES.getLabel()) *this = ERROR_ES;
   else if (label == TRIP_ES.getLabel()) *this = TRIP_ES;
@@ -58,6 +62,8 @@ const HVState& HVState::operator=(int id) throw()
   else if (id == RAMPINGUP_TS.getId()) *this = RAMPINGUP_TS;
   else if (id == RAMPINGDOWN_TS.getId()) *this = RAMPINGDOWN_TS;
   else if (id == RECOVERING_TS.getId()) *this = RECOVERING_TS;
+  else if (id == TURNINGON_TS.getId()) *this = TURNINGON_TS;
+  else if (id == TURNINGOFF_TS.getId()) *this = TURNINGOFF_TS;
   else if (id == ERROR_ES.getId()) *this = ERROR_ES;
   else if (id == TRIP_ES.getId()) *this = TRIP_ES;
   else if (id == OVER_CURRENT_ES.getId()) *this = OVER_CURRENT_ES;

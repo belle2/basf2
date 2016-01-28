@@ -13,8 +13,6 @@ namespace Belle2 {
 
   class HVControlCallback : public HVCallback {
 
-    friend class HVNodeMonitor;
-
   public:
     HVControlCallback(const NSMNode& node)
     throw() : HVCallback(), m_db(NULL)

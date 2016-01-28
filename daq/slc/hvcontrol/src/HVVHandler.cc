@@ -11,15 +11,18 @@ using namespace Belle2;
 
 #define HV_HANDLE_PRE       \
   m_callback.lock();        \
+  m_callback.paramLock();        \
   try {
 
 #define HV_HANDLE_POST              \
   } catch (const IOException& e) {          \
     LogFile::error(e.what());           \
     m_callback.reply(NSMMessage(NSMCommand::ERROR, e.what()));    \
+    m_callback.paramUnlock();           \
     m_callback.unlock();            \
     return false;             \
   }                 \
+  m_callback.paramUnlock();        \
   m_callback.unlock();              \
   return true
 
@@ -71,7 +74,6 @@ bool NSMVHandlerHVState::handleGetText(std::string& val)
 {
   HV_HANDLE_PRE;
   val = HVMessage::getStateText((HVMessage::State)m_callback.getState(m_crate, m_slot, m_channel));
-  LogFile::info("NSMVHandlerHVState::handleSetText : " + val);
   HV_HANDLE_POST;
 }
 
@@ -94,10 +96,7 @@ bool NSMVHandlerHVSwitch::handleSetText(const std::string& val)
   HV_HANDLE_PRE;
   m_callback.setSwitch(m_crate, m_slot, m_channel, (val == "ON"));
   std::string state = HVMessage::getStateText((HVMessage::State)m_callback.getState(m_crate, m_slot, m_channel));
-  //std::string vname = StringUtil::replace(getName(), "switch", "state");
-  LogFile::info("NSMVHandlerHVSwitch::handleSetText : " + val);
   m_callback.set(m_name, val);
-  //m_callback.set(vname, state);
   HV_HANDLE_POST;
 }
 

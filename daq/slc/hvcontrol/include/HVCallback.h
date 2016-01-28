@@ -77,6 +77,9 @@ namespace Belle2 {
     void addAll(const HVConfig& config) throw();
     void lock() { m_mutex.lock(); }
     void unlock() { m_mutex.unlock(); }
+    void paramLock() { m_param_mutex.lock(); }
+    void paramUnlock() { m_param_mutex.unlock(); }
+    void setHVState(const HVState& state);
 
   protected:
     virtual void dbload(HVConfig& config, const std::string& confignames) throw(IOException) = 0;
@@ -93,6 +96,7 @@ namespace Belle2 {
     std::string m_configname_standby;
     std::string m_configname_shoulder;
     std::string m_configname_peak;
+    Mutex m_param_mutex;
 
   protected:
     HVState m_state_demand;

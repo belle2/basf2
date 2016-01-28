@@ -70,21 +70,38 @@ throw(HVHandlerException)
         int ch = channel.getChannel();
         std::string vname = StringUtil::form("crate[%d].slot[%d].channel[%d].", crateid, slot, ch);
         if (alloff) {
+          paramLock();
           setSwitch(crateid, slot, ch, false);
+          paramUnlock();
           set(vname + "switch", "OFF");
         } else if (loadpars) {
+          paramLock();
+          if (channel.isTurnOn()) {
+            if (m_state_demand.isOn() && !getSwitch(crateid, slot, ch)) {
+              setSwitch(crateid, slot, ch, true);
+              set(vname + "switch", "ON");
+            }
+          } else {
+            if (getSwitch(crateid, slot, ch)) {
+              setSwitch(crateid, slot, ch, false);
+              set(vname + "switch", "OFF");
+            }
+          }
           setRampUpSpeed(crateid, slot, ch, channel.getRampUpSpeed());
           setRampDownSpeed(crateid, slot, ch, channel.getRampDownSpeed());
           setVoltageDemand(crateid, slot, ch, (channel.isTurnOn()) ? channel.getVoltageDemand() : -1);
           setVoltageLimit(crateid, slot, ch, channel.getVoltageLimit());
           setCurrentLimit(crateid, slot, ch, channel.getCurrentLimit());
+          paramUnlock();
           set(vname + "rampup", channel.getRampUpSpeed());
           set(vname + "rampdown", channel.getRampDownSpeed());
           set(vname + "vdemand", (channel.isTurnOn()) ? channel.getVoltageDemand() : -1);
           set(vname + "vlimit", channel.getVoltageLimit());
           set(vname + "climit", channel.getCurrentLimit());
         } else {
+          paramLock();
           setSwitch(crateid, slot, ch, channel.isTurnOn());
+          paramUnlock();
           set(vname + "switch", channel.isTurnOn() ? "ON" : "OFF");
         }
       }
@@ -133,13 +150,19 @@ void HVControlCallback::monitor() throw()
         const HVChannel& channel(*ichannel);
         int slot = channel.getSlot();
         int ch = channel.getChannel();
+        paramLock();
         int state = getState(crateid, slot, ch);
         std::string state_s = HVMessage::getStateText((HVMessage::State)state);
         float vmon = getVoltageMonitor(crateid, slot, ch);
         float cmon = getCurrentMonitor(crateid, slot, ch);
+        paramUnlock();
         std::string vname = StringUtil::form("crate[%d].slot[%d].channel[%d].", crateid, slot, ch);
-        if ((m_state_demand == HVState::OFF_S && state != HVMessage::OFF) ||
-            (m_state_demand != HVState::OFF_S && state != HVMessage::ON)) {
+        if (m_state_demand == HVState::OFF_S) {
+          if (state != HVMessage::OFF) {
+            isstable = false;
+          }
+        } else  if ((!channel.isTurnOn() && state != HVMessage::OFF) ||
+                    (channel.isTurnOn() && state != HVMessage::ON)) {
           isstable = false;
         }
         if (m_mon_tmp[crateid][i].state != state) {
@@ -159,8 +182,7 @@ void HVControlCallback::monitor() throw()
     }
     if (isstable && m_state_demand != getNode().getState()) {
       log(LogFile::NOTICE, "State transit : %s", m_state_demand.getLabel());
-      getNode().setState(m_state_demand);
-      set("hvstate", m_state_demand.getLabel());
+      setHVState(m_state_demand);
       reply(NSMMessage(NSMCommand::OK, m_state_demand.getLabel()));
     }
   } catch (const std::exception& e) {

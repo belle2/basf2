@@ -68,7 +68,7 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
     addNode(NSMNode(msg.getNodeName()));
     if (cmd == HVCommand::TURNOFF) {
       m_state_demand = HVState::OFF_S;
-      getNode().setState(tstate);
+      setHVState(HVState::TURNINGOFF_TS);
       m_config = FLAG_STANDBY;
       turnoff();
     } else if (state.isOff()) {
@@ -123,7 +123,7 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         get("config.standby", m_configname_standby);
         dbload(m_config_standby, m_configname_standby);
         addAll(m_config_standby);
-        getNode().setState(tstate);
+        setHVState(tstate);
         m_state_demand = HVState::STANDBY_S;
         m_config = FLAG_STANDBY;
         lock();
@@ -135,6 +135,7 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         dbload(m_config_shoulder, m_configname_shoulder);
         addAll(m_config_shoulder);
         getNode().setState(tstate);
+        setHVState(tstate);
         m_state_demand = HVState::SHOULDER_S;
         m_config = FLAG_SHOULDER;
         lock();
@@ -145,7 +146,7 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         get("config.peak", m_configname_peak);
         dbload(m_config_peak, m_configname_peak);
         addAll(m_config_peak);
-        getNode().setState(tstate);
+        setHVState(tstate);
         m_state_demand = HVState::PEAK_S;
         m_config = FLAG_PEAK;
         lock();
@@ -157,7 +158,6 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
   } catch (const HVHandlerException& e) {
     reply(NSMMessage(NSMCommand::ERROR, e.what()));
   }
-  set("state", getNode().getState().getLabel());
   return true;
 }
 
@@ -211,5 +211,11 @@ void HVCallback::addAll(const HVConfig& config) throw()
       add(new NSMVHandlerHVCurrentMonitor(*this, vname + ".cmon", crateid, slot, ch));
     }
   }
+}
+
+void HVCallback::setHVState(const HVState& state)
+{
+  getNode().setState(state);
+  set("hvstate", state.getLabel());
 }
 

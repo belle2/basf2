@@ -1,146 +1,335 @@
-/* This root macro will create a TFile that contains the data for the topcaf/dataobjects/TopConfigurations dataobject. */
-/* Formulae are taken from https://belle2.cc.kek.jp/~twiki/bin/view/Archive/Belle2note0026 version 1. */
-/* Note that this only seems to work if compiled in ROOT interactive mode. 
-i.e.
-root [0] .x CreateTopConfigurations.C+
-*/
+#include <topcaf/modules/iTopRawConverterV3Module/iTopRawConverterV3Module.h>
 
 #include <iostream>
-#include <map>
-#include <string>
+#include <iomanip>
 
-#include "TFile.h"
-#include "iTopUtils.h"   // Basic functions for number mapping are here.
-#include "iTopTypedef.h" // Type definitions.
+using namespace Belle2;
+
+REG_MODULE(iTopRawConverterV3)
 
 
-void CreateTopConfigurations(void){
 
-  const unsigned int NumberOfPixels = 512;
+//Constructor
+iTopRawConverterV3Module::iTopRawConverterV3Module() : Module()
+{
+  setDescription("This module is used to upack the raw data from the testbeam and crt data");
+  addParam("inputFileName", m_input_filename, "Raw input filename");
+  addParam("inputDirectory", m_input_directory, "Raw input file directory");
+  addParam("selectiveReadout", m_selective, "Selective read out enabled.", true);
 
-  std::string outputFile = "../data/TopConfigurations.root";
+  m_WfPacket = nullptr;
+  m_EvtPacket = nullptr;
+}
 
-  vector<TopElectronicConstructionName> TopModuleElectronicConstructions;
+iTopRawConverterV3Module::~iTopRawConverterV3Module()
+{
+  m_WfPacket = nullptr;
+  m_EvtPacket = nullptr;
 
-  // specific to CRT November 2014, see https://belle2.cc.kek.jp/~twiki/bin/view/Detector/TOP/CRTSetup2014#CRT_PMT_and_board_stack_configur
-  TopElectronicConstructionName CRTHybridConstruction("CRTHybridConstruction1");
-  TopModuleElectronicConstructions.push_back(CRTHybridConstruction);
+  m_input_file.close();
+}
 
-  TopElectronicConstructionName June2013LepsConstruction("June2013LEPSConstruction1");
-  TopModuleElectronicConstructions.push_back(June2013LepsConstruction);
+/////////////////////
+// Module function //
+/////////////////////
+void iTopRawConverterV3Module::initialize()
+{
+  std::string m_input_fileandpath = m_input_directory + m_input_filename;
+  LoadRawFile(m_input_fileandpath.c_str());
 
-  TopElectronicConstructionName ModuleC01Construction("ModuleC01");
-  TopModuleElectronicConstructions.push_back(ModuleC01Construction);
+  //output
+  m_evtheader_ptr.registerInDataStore();
+  m_evtwaves_ptr.registerInDataStore();
+  m_filedata_ptr.registerInDataStore();
+}
 
-  TopElectronicRefMap ElectronicModuletoScrod;
-  TopElectronicRetMap ScrodtoElectronicModule;
-  TopUnsignedMap   ScrodtoElectronicModuleNumber;
-  for(vector<TopElectronicConstructionName>::const_iterator i = TopModuleElectronicConstructions.begin();
-      i!=TopModuleElectronicConstructions.end();
-      ++i){
+void iTopRawConverterV3Module::beginRun()
+{
+  m_filedata_ptr.create();
+  m_filedata_ptr->set(m_input_directory, m_input_filename);
+  m_evt_no = 0;
+}
 
-    if( (*i) == CRTHybridConstruction ){
-      ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 67;
-      ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 65;
-      ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 66;
-      ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 59;
-    }
+void iTopRawConverterV3Module::event()
+{
+  //output
+  m_evtheader_ptr.create();
+  //  m_evtheader_ptr.clear();
+  //  m_evtwaves_ptr.create();
+  m_evtwaves_ptr.clear();
+  m_evt_no++;
 
-    if( (*i) == June2013LepsConstruction ){
-      ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 36;
-      ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 35;
-      ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 32;
-      ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 37;
-    }
+  //  int packet_type = 0;
+  //  int lastWindow = 0;
+  int readoutWindow = 0;
+  //  int carrier = 0;
+  int channel = 0;
+  const int WAVE_HEADER_SIZE = 6;
+  const int WAVE_PACKET_SIZE = WAVE_HEADER_SIZE + WORDS_PER_WINDOW;
+  const int EVENT_PACKET_SIZE = 8;
+  packet_word_t eventPacket[EVENT_PACKET_SIZE];
+  packet_word_t wavePacket[WAVE_PACKET_SIZE];
 
-    if ( (*i) == ModuleC01Construction ) {
-	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 14;
-      	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 15;
-      	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 16;
-      	ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 13;
-    }
-    
-    ScrodtoElectronicModuleNumber[ElectronicModuletoScrod[TopElectronicModule(*i,0)]] = 0;
-    ScrodtoElectronicModuleNumber[ElectronicModuletoScrod[TopElectronicModule(*i,1)]] = 1;
-    ScrodtoElectronicModuleNumber[ElectronicModuletoScrod[TopElectronicModule(*i,2)]] = 2;
-    ScrodtoElectronicModuleNumber[ElectronicModuletoScrod[TopElectronicModule(*i,3)]] = 3;
+  packet_word_t word;
 
-    ScrodtoElectronicModule[ElectronicModuletoScrod[TopElectronicModule(*i,0)]] = TopElectronicModule(*i,0);
-    ScrodtoElectronicModule[ElectronicModuletoScrod[TopElectronicModule(*i,1)]] = TopElectronicModule(*i,1);
-    ScrodtoElectronicModule[ElectronicModuletoScrod[TopElectronicModule(*i,2)]] = TopElectronicModule(*i,2);
-    ScrodtoElectronicModule[ElectronicModuletoScrod[TopElectronicModule(*i,3)]] = TopElectronicModule(*i,3);
-    
+  if(m_input_file.eof()) {
+    B2WARNING("Reached end of file...");
+    return;
   }
 
+  m_input_file.read((char*)&cpr_hdr, sizeof(cpr_hdr));
+  B2DEBUG(1, "cpr_hdr\n\tformat: 0x" << std::hex << (int)cpr_hdr.version
+          << "\n\tblock words: 0x" << (int)cpr_hdr.block_words
+          << "\n\trun: 0x" << cpr_hdr.exprun
+          << "\n\tevent: " << cpr_hdr.event << " (" << std::dec << cpr_hdr.event << ")"
+          << "\n\theader (0x7f7f): 0x" << std::hex << cpr_hdr.CPR_hdr << std::dec);
 
-  TopPixelRefMap PixeltoRow;
-  TopPixelRefMap PixeltoColumn;
-  TopPixelRefMap PixeltoPMT;
-  TopPixelRefMap PixeltoPMTChannel;
-  TopPixelRefMap PixeltoScrod;
-  TopPixelRefMap PixeltoAsicRow;
-  TopPixelRefMap PixeltoAsicColumn;
-  TopPixelRefMap PixeltoAsicChannel;
-
-  TopPixelRetMap HardwareIDtoPixel;
-
-  TopPixelRefElectronicRetMap PixeltoElectronicModule;
-
-  /* Map the pixel to various items. */
-  for(vector<std::string>::const_iterator i = TopModuleElectronicConstructions.begin();
-      i!=TopModuleElectronicConstructions.end();
-      ++i){
-    for( TopPixelNumber c=1 ; c <= NumberOfPixels ; c++ ){
-      TopPixel myPixel(TopElectronicModule(*i,c));
-
-      PixeltoRow[myPixel] = pixelNumber_to_pixelRow(c);
-      PixeltoColumn[myPixel] = pixelNumber_to_pixelColumn(c);
-      PixeltoPMT[myPixel] = pixelNumber_to_PMTNumber(c);
-      PixeltoPMTChannel[myPixel] = pixelNumber_to_channelNumber(c);
-      PixeltoElectronicModule[myPixel] = TopElectronicModule(*i,pixel_to_electronicsModuleNumber(c));
-      PixeltoAsicRow[myPixel] = pixel_to_asicRow(c);
-      PixeltoAsicColumn[myPixel] = pixel_to_asicColumn(c);
-      PixeltoAsicChannel[myPixel] = pixel_to_asicChannel(c);      
-      PixeltoScrod[myPixel] = ElectronicModuletoScrod[PixeltoElectronicModule[myPixel]];
-      
-      unsigned int HardwareID = PixeltoScrod[myPixel] * 1E8
-	+ PixeltoAsicRow[myPixel] * 1E6
-	+ PixeltoAsicColumn[myPixel] * 1E4
-	+ PixeltoAsicChannel[myPixel] * 1E2;
-      
-
-
-      HardwareIDtoPixel[HardwareID] = myPixel;
-      
-    } 
+  if (cpr_hdr.CPR_hdr != 0x7f7f) {
+    unsigned short x = 0;
+    int c = 0;
+    while (x != 0x7f7f) {
+      m_input_file.read(reinterpret_cast<char*>(&x), sizeof(unsigned short));
+      //      B2INFO("c: "<<c<<"X: 0x"<<std::hex<<x<<std::dec);
+      c++;
+      if (c > 1e5) {
+        B2FATAL("Could not recover from data corruption... giving up.");
+      }
+    }
+    m_prev_pos = m_input_file.tellg();
+    m_input_file.seekg(m_prev_pos - 2 * sizeof(int));
+    m_input_file.read((char*)&cpr_hdr, sizeof(cpr_hdr));
+    B2DEBUG(1, "cpr_hdr\n\tformat: 0x" << std::hex << (int)cpr_hdr.version
+            << "\n\tblock words: 0x" << (int)cpr_hdr.block_words
+            << "\n\trun: 0x" << cpr_hdr.exprun
+            << "\n\tevent: " << cpr_hdr.event << " (" << std::dec << cpr_hdr.event << ")"
+            << "\n\theader (0x7f7f): 0x" << std::hex << cpr_hdr.CPR_hdr << std::dec);
   }
 
-  TopParameter TDCUnit_ns(.001,"ns"); // lets use picoseconds for now.
+  // identify HSLB buffer sizes
+  // determine number of HSLBs in the data stream
+  unsigned short asic, win, hslb, maxhslb;
+  int bufsize[4];
+  bufsize[0] = cpr_hdr.offset_block2 - cpr_hdr.offset_block1;
+  bufsize[1] = cpr_hdr.offset_block3 - cpr_hdr.offset_block2;
+  bufsize[2] = cpr_hdr.offset_block4 - cpr_hdr.offset_block3;
+  bufsize[3] = cpr_hdr.num_words - cpr_hdr.block_words - cpr_hdr.offset_block4 + 125; // not quite right?
+
+  // determine number of HSLBs in the data stream
+  if (!bufsize[0])    maxhslb = 0;
+  else if (!bufsize[1])  maxhslb = 1;
+  else if (!bufsize[2])  maxhslb = 2;
+  else if (!bufsize[3])  maxhslb = 3;
+  else          maxhslb = 4;
+  B2DEBUG(1, "max hslb: " << maxhslb);
 
 
-  TFile f(outputFile.c_str(), "recreate");
-  f.WriteObject(&HardwareIDtoPixel,"HardwareIDtoPixel");
-  f.WriteObject(&ScrodtoElectronicModule,"ScrodtoElectronicModule");
-  f.WriteObject(&ScrodtoElectronicModuleNumber,"ScrodtoElectronicModuleNumber");
-  f.WriteObject(&ElectronicModuletoScrod,"ElectronicModuletoScrod");
-  f.WriteObject(&PixeltoRow,"PixeltoRow");
-  f.WriteObject(&PixeltoColumn,"PixeltoColumn");
-  f.WriteObject(&PixeltoPMT,"PixeltoPMT");
-  f.WriteObject(&PixeltoPMTChannel,"PixeltoPMTChannel");
-  f.WriteObject(&PixeltoAsicRow,"PixeltoAsicRow");
-  f.WriteObject(&PixeltoAsicColumn,"PixeltoAsicColumn");
-  f.WriteObject(&PixeltoAsicChannel,"PixeltoAsicChannel");
-  f.WriteObject(&PixeltoScrod,"PixeltoScrod");
-  f.WriteObject(&PixeltoElectronicModule,"PixeltoElectronicModule");
-  f.WriteObject(&TopModuleElectronicConstructions,"TopModuleElectronicConstructions");
-  f.WriteObject(&TDCUnit_ns,"TDCUnit_ns");
-  
+  eventPacket[0] = 1001;
+  eventPacket[1] = m_scrod;
+  eventPacket[2] = cpr_hdr.version;
+  eventPacket[3] = m_evt_no;
+  eventPacket[4] = cpr_hdr.event;
+  eventPacket[5] = 0;
+  eventPacket[6] = cpr_hdr.block_words;
+  eventPacket[7] = cpr_hdr.exprun;
 
-  f.Close();
 
-  unsigned int testID = 3500000100;
-  std::cout<<"hardware id["<<testID<<"]: "<<HardwareIDtoPixel[testID].second<<std::endl;
 
+  m_EvtPacket = new EventHeaderPacket(eventPacket,
+                                      EVENT_PACKET_SIZE);
+  m_evtheader_ptr.assign(m_EvtPacket, true);
+  wavePacket[0] = 1011;
+
+  for (hslb = 0; hslb < maxhslb; hslb++) {
+
+    m_input_file.read((char*)&hslb_hdr, sizeof(hslb_hdr));
+    if (hslb_hdr.B2L_hdr != HSLB_B2L_HEADER) {
+      B2WARNING("Bad HSLB header... 0x" << std::hex << hslb_hdr.B2L_hdr << " ... aborting event");
+      m_evtheader_ptr->SetFlag(1000);
+      break;
+    }
+    m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
+    unsigned int eventSize = word;
+    m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
+    word = swap_endianess(word);
+    unsigned int trigPattern = (word >> 28) & 0xF;
+    if (!m_selective) trigPattern = 0xF;
+    unsigned int numWindows  = (word >> 19) & 0x1FF;
+    unsigned int timeStamp   = (word) & 0x7FFFF;
+    B2DEBUG(1, "FEE header...(" << std::hex << word << std::dec << ") eventSize: " << eventSize << "\ttrigPattern: 0x" << std::hex <<
+            trigPattern
+            << "\tnumWindows: 0x" << numWindows
+            << "\ttimestamp: 0x" << timeStamp << std::dec);
+
+    bool repeatedCheck = false;
+
+    for (win = 0; win <= numWindows ; win++) {
+      word = readWordUnique(word);
+
+      m_carrier = (word >> 30) & 0x3;
+      asic = (word >> 28) & 0x3;
+      unsigned int lastWrAddr = (word >> 16) & 0xFF;
+      m_scrod = (word >> 9) & 0x7F;
+      readoutWindow = (word) & 0x1FF;
+
+      B2DEBUG(1, "window header (0x" << std::hex << word << std::dec << "... carrier: " << m_carrier << "\tirsx: " << asic
+              << "\tlastWrAddr: 0x" << std::hex << lastWrAddr
+              << "\tscrod id: 0x" << m_scrod <<" ("<<std::dec<<m_scrod<<std::hex<<")"
+              << "\tconvAddr: 0x" << readoutWindow << std::dec);
+
+
+      int row = m_carrier;
+      int col = -1;
+      for (channel = 0; channel < 8; channel++) {
+        int halfChannel = channel / 2;
+        if ((trigPattern & (0x1 << halfChannel)) > 0) {
+          if (((asic == 2) && (channel < 4)) || ((asic == 3) && (channel > 3))) {
+            col = 3;
+          } else if (((asic == 2) && (channel > 3)) || ((asic == 3) && (channel < 4))) {
+            col = 2;
+          } else if (((asic == 0) && (channel < 4)) || ((asic == 1) && (channel > 3))) {
+            col = 1;
+          } else if (((asic == 0) && (channel > 3)) || ((asic == 1) && (channel < 4))) {
+            col = 0;
+          }
+          B2DEBUG(1, "trigPattern: " << trigPattern << "\tchannel: " << channel << "\tcol: " << col);
+	  wavePacket[1] = m_scrod;
+          wavePacket[2] = 0;
+          wavePacket[3] = m_evt_no;
+          wavePacket[4] = 1;
+          wavePacket[5] = (0x1FF & readoutWindow) + (channel << 9) + (row << 12) + (col << 14);
+          wavePacket[6] = NPOINTS;
+
+          for (int x = 0; x < NPOINTS / 2; x++) {
+            if (!repeatedCheck) {
+              word = readWordUnique(word);
+              repeatedCheck = true;
+            } else {
+              m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
+              word = swap_endianess(word);
+            }
+            wavePacket[WAVE_HEADER_SIZE + x + 1] = word;
+            B2DEBUG(1, "data[" << x << "]: 0x" << std::hex << word << std::dec);
+            if ((word & 0xF000F000) > 0) {
+              B2WARNING("data out of range... event " << m_evt_no);
+              m_evtheader_ptr->SetFlag(9999);
+            }
+          }
+          m_WfPacket = m_evtwaves_ptr.appendNew(EventWaveformPacket(wavePacket, WAVE_PACKET_SIZE));
+        }
+      }
+
+    }
+    int l = 0;
+    if ((m_evtheader_ptr->GetEventFlag()) >= (9999)) {
+      // must read a short at a time to get back on track...
+      unsigned short x1, x2;
+
+      while (word != PACKET_LAST && l < 30) {
+        x2 = x1;
+        m_input_file.read(reinterpret_cast<char*>(&x1), sizeof(unsigned short));
+        word = ((x1 << 16) & 0xFFFF0000) + x2;
+        B2DEBUG(1, "evt no: " << m_evt_no << "\tl: " << l << "\tx1: 0x" << std::hex << x1 << std::dec);
+        if (x1 == 0x616c) {
+          word = PACKET_LAST;
+        }
+        l++;
+      }
+      m_evtheader_ptr->SetFlag(1005);
+    }
+    // read ahead
+    while (word != PACKET_LAST) {
+      m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
+      word = swap_endianess(word);
+      B2DEBUG(1, "footer: 0x" << std::hex << word << std::dec);
+
+      if (word != PACKET_LAST) {
+        B2WARNING("Bad window footer (" << std::hex << word << "!=" << PACKET_LAST << std::dec << ")... marking event " << m_evt_no << ".");
+        m_evtheader_ptr->SetFlag(1002);
+        if (l > 30)  break;
+        l++;
+      }
+    }
+    m_input_file.read((char*)&b2l_ftr, sizeof(b2l_ftr));
+    B2DEBUG(1, "B2L footer ... B2L_crc16_errs: 0x" << std::hex << b2l_ftr.B2L_crc16_error_cnt << " ... B2L_crc16: 0x" <<
+            b2l_ftr.B2L_crc16 << std::dec);
+
+  }
+
+  m_input_file.read((char*)&cpr_ftr, sizeof(cpr_ftr));
+  B2DEBUG(1, "CPR footer ... word1: 0x" << std::hex << cpr_ftr.word1 << " ... CPR-ftr: 0x" << cpr_ftr.CPR_ftr);
+  if (cpr_ftr.CPR_ftr != COPPER_FOOTER) {
+    B2WARNING("Bad copper footer found.  Marking event as corrupt.");
+    m_evtheader_ptr->SetFlag(1003);
+  }
+  /*
+  if((m_evtheader_ptr->GetEventFlag())>=(1000)){
+    int l=0;
+    while(word!=COPPER_FOOTER){
+      //B2FATAL("quiting...");
+      m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
+      word = swap_endianess(word);
+      if(l%1==0)
+  B2DEBUG(1,"forwarding to good footer... "<<l<<"... word: 0x"<<std::hex<<word<<std::dec);
+      l++;
+      if(l>1e4) break;
+    }
+  }
+  */
+  m_prev_pos = m_input_file.tellg();
 
 }
 
+//Load file
+int iTopRawConverterV3Module::LoadRawFile(const char* argc)
+{
+  m_input_file.open(argc, std::ios::binary);
+  if (!m_input_file) {
+    B2ERROR("Couldn't open input file: " << argc);
+    return -9;
+  }  else {
+    return 0;
+  }
+  m_current_pos = m_input_file.tellg();
+}
+
+
+EventHeaderPacket* iTopRawConverterV3Module::GetEvtHeaderPacket()
+{
+  EventHeaderPacket* ret = new EventHeaderPacket(*m_EvtPacket);
+  return ret;
+}
+
+EventWaveformPacket* iTopRawConverterV3Module::GetWaveformPacket()
+{
+  EventWaveformPacket* ret = new EventWaveformPacket(*m_WfPacket);
+  return ret;
+}
+
+iTopRawConverterV3Module::packet_word_t iTopRawConverterV3Module::readWordUnique(packet_word_t prev_word)
+{
+
+  packet_word_t new_word;
+
+  m_input_file.read(reinterpret_cast<char*>(&new_word), sizeof(packet_word_t));
+  new_word = swap_endianess(new_word);
+
+  while ( (new_word == prev_word) && (new_word) ) {
+    //    B2WARNING("Repeated word found....("<<std::hex<<new_word<<std::dec<<")");
+    B2DEBUG(1,"Repeated word found...");
+    //    m_evtheader_ptr->SetFlag(901);
+    prev_word = new_word;
+    m_input_file.read(reinterpret_cast<char*>(&new_word), sizeof(packet_word_t));
+    new_word = swap_endianess(new_word);
+
+  }
+
+  return new_word;
+}
+
+iTopRawConverterV3Module::packet_word_t iTopRawConverterV3Module::swap_endianess(packet_word_t x)
+{
+  return ((((x) & (0xFF000000)) >> 24) |
+          (((x) & (0x00FF0000)) >>  8) |
+          (((x) & (0x0000FF00)) <<  8) |
+          (((x) & (0x000000FF)) << 24));
+}

@@ -75,6 +75,7 @@ void WaveMergingModule::event()
     EventWaveformPackets::iterator wave_it = corrected_waves.begin();
     for (; wave_it != corrected_waves.end(); ++wave_it) {
       evtwaves_ptr.appendNew(EventWaveformPacket(**wave_it));
+      delete *wave_it;
     }
 
   }
@@ -84,11 +85,3 @@ void WaveMergingModule::terminate()
 {
 
 }
-
-
-
-/*
-RawEvent* WaveMergingModule::MergeWavePackets(const RawEvent *raw_event){
-}
-
-*/

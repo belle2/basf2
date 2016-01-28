@@ -26,6 +26,7 @@ WaveTimingModule::~WaveTimingModule() {}
 void WaveTimingModule::defineHisto()
 {
   m_occupancy = new TH2F("WaveFormOccupancy", "WaveFormOccupancy", 64, 1, 65, 8, 1, 9);
+  m_tmp_h = new TH1D("wave_h", "wave_h", channel_samples, 0, channel_samples);
 }
 
 void WaveTimingModule::initialize()
@@ -36,7 +37,6 @@ void WaveTimingModule::initialize()
   m_rate = 1.0;
   m_crude_time = 0;
   m_cf_time = 0;
-  m_tmp_h = new TH1D("wave_h", "wave_h", channel_samples, 0, channel_samples);
   REG_HISTOGRAM
 }
 

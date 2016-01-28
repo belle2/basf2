@@ -72,6 +72,11 @@ void iTopRawConverterV3Module::event()
 
   packet_word_t word;
 
+  if (m_input_file.eof()) {
+    B2WARNING("Reached end of file...");
+    return;
+  }
+
   m_input_file.read((char*)&cpr_hdr, sizeof(cpr_hdr));
   B2DEBUG(1, "cpr_hdr\n\tformat: 0x" << std::hex << (int)cpr_hdr.version
           << "\n\tblock words: 0x" << (int)cpr_hdr.block_words
@@ -168,7 +173,7 @@ void iTopRawConverterV3Module::event()
 
       B2DEBUG(1, "window header (0x" << std::hex << word << std::dec << "... carrier: " << m_carrier << "\tirsx: " << asic
               << "\tlastWrAddr: 0x" << std::hex << lastWrAddr
-              << "\tscrod id: 0x" << m_scrod
+              << "\tscrod id: 0x" << m_scrod << " (" << std::dec << m_scrod << std::hex << ")"
               << "\tconvAddr: 0x" << readoutWindow << std::dec);
 
 
@@ -187,6 +192,7 @@ void iTopRawConverterV3Module::event()
             col = 0;
           }
           B2DEBUG(1, "trigPattern: " << trigPattern << "\tchannel: " << channel << "\tcol: " << col);
+          wavePacket[1] = m_scrod;
           wavePacket[2] = 0;
           wavePacket[3] = m_evt_no;
           wavePacket[4] = 1;
@@ -307,9 +313,9 @@ iTopRawConverterV3Module::packet_word_t iTopRawConverterV3Module::readWordUnique
   m_input_file.read(reinterpret_cast<char*>(&new_word), sizeof(packet_word_t));
   new_word = swap_endianess(new_word);
 
-  while (new_word == prev_word) {
+  while ((new_word == prev_word) && (new_word)) {
     //    B2WARNING("Repeated word found....("<<std::hex<<new_word<<std::dec<<")");
-    B2WARNING("Repeated word found...");
+    B2DEBUG(1, "Repeated word found...");
     //    m_evtheader_ptr->SetFlag(901);
     prev_word = new_word;
     m_input_file.read(reinterpret_cast<char*>(&new_word), sizeof(packet_word_t));

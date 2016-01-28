@@ -31,6 +31,7 @@ EventWaveformPacket::EventWaveformPacket(const unsigned int* temp_buffer,
                                          int nwords)
   : Packet(temp_buffer, nwords)
 {
+  m_scrod_id = m_packet_payload[1];
   m_asic_refwin = m_packet_payload[2];
   m_evt_num = m_packet_payload[3];
   m_nwave_seg = ((0x0000FFFF)&m_packet_payload[4]);

@@ -26,10 +26,17 @@
 #  source /sw/belle/local/neurobayes/belle_default_64bit/setup_neurobayes.sh
 #
 # Usage:
-#  ./B2A702-ContinuumSuppression_TMVATraining_Bd_KsPi0.py <test,full>
+#  basf2 B2A702-ContinuumSuppression_TMVATraining_Bd_KsPi0.py <test,full>
 #
 # This will produce /training_qq_<test,full> directories containing
 # the training output
+#
+# Important NOTE:
+#    This updated version sets the target to:
+#    teacher.param('target', 'isNotContinuumEvent')
+#    Previously, the target was set to 'isSignal', but this was incorrect,
+#    as it only set MCTruth matched signal as signal, and therefore characterized
+#    all misreconstructed signal as background.
 #
 # Contributors: P. Goldenzweig (January 2015)
 #
@@ -152,7 +159,7 @@ teacher = register_module('TMVAOnTheFlyTeacher')
 teacher.param('prefix', 'Bd_KsPi0_TMVA')
 teacher.param('methods', methods)
 teacher.param('variables', variables)
-teacher.param('target', 'isSignal')
+teacher.param('target', 'isNotContinuumEvent')
 teacher.param('listNames', ['B0'])
 teacher.param('workingDirectory', outDirForTMVA)
 analysis_main.add_module(teacher)

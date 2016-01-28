@@ -394,6 +394,9 @@ void CDCGeometryPar::readWirePositionParams(const GearDir gbxParams, EWirePositi
 // Read x-t params.
 void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
 {
+  m_linearInterpolationOfXT = true;
+  //  m_linearInterpolationOfXT = false;
+
   std::string fileName0 = gbxParams.getString("xtFileName");
   if (mode == 1) {
     fileName0 = gbxParams.getString("xt4ReconFileName");
@@ -415,17 +418,70 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
   int iL, lr;
   const int np = 9; //to be moved to appropriate place...
   double alpha, theta, dummy1, xt[np];
-  unsigned nalpha = 19; //to be moved to appropriate place...
-  unsigned ntheta = 7;  //to be moved to appropriate place...
+  //  unsigned nalpha = 19;  //to be moved to appropriate place...
+  //  unsigned ntheta = 7;  //to be moved to appropriate place...
+  double   oldTheta(-999), oldAlpha(-999);
+  unsigned noOfThetaPoints(0);
+  unsigned noOfAlphaPoints(1); //should start with one for alpha
+
+  //First read to check no.s of theta and alpha points
+  double alphaPoints[nAlphaPoints] = {0.};
+
+  int count = 0;
+  //  while (true) {
+  while (ifs >> iL) {
+    //    std::cout << count <<" "<<  ifs.eof() << std::endl;
+    ++count;
+    //    ifs >> iL >> theta >> alpha >> dummy1 >> lr;
+    ifs >> theta >> alpha >> dummy1 >> lr;
+    for (int i = 0; i < np - 1; ++i) {
+      ifs >> xt[i];
+    }
+
+    //    if (ifs.eof()) break;
+
+    if (theta != oldTheta) {
+      unsigned short iarg = std::min(noOfThetaPoints, nThetaPoints);
+      m_thetaPoints[iarg] = theta;
+      ++noOfThetaPoints;
+      oldTheta = theta;
+    }
+
+    if (noOfThetaPoints == 1 && alpha != oldAlpha) {
+      unsigned short iarg = std::min(noOfAlphaPoints, nAlphaPoints);
+      alphaPoints[iarg] = alpha;
+      ++noOfAlphaPoints;
+      oldAlpha = alpha;
+    }
+  }
+
+  if (noOfThetaPoints != nThetaPoints) B2FATAL("CDCGeometryPar: Inconsistent no. of theta points ! real= " << noOfThetaPoints <<
+                                                 " preset= " << nThetaPoints);
+  if (noOfAlphaPoints != nAlphaPoints) B2FATAL("CDCGeometryPar: Inconsistent no. of alpha points ! real in file= " << noOfAlphaPoints
+                                                 << " preset= " << nAlphaPoints);
+
+  //set alpha for arg=0;
+  m_alphaPoints[0] = -90.;
+  //sort in order of magnitude
+  for (unsigned i = 1; i < nAlphaPoints; ++i) {
+    m_alphaPoints[nAlphaPoints - i] = alphaPoints[i];
+  }
+
+  //Second read to set all the others
+  //  std::cout <<"before rewind" <<" "<< ifs.eof() << std::endl;
+  ifs.clear(); //necessary to make the next line work
+  ifs.seekg(0, ios_base::beg);
+  //  std::cout <<"after  rewind" <<" "<< ifs.eof() << std::endl;
   unsigned nRead = 0;
 
-  while (true) {
-
+  //  while (true) {
+  while (ifs >> iL) {
     //
     // Read a line of xt-parameter from Garfield calculations.
     //
 
-    ifs >> iL >> theta >> alpha >> dummy1 >> lr;
+    //    ifs >> iL >> theta >> alpha >> dummy1 >> lr;
+    ifs >> theta >> alpha >> dummy1 >> lr;
     for (int i = 0; i < np - 1; ++i) {
       ifs >> xt[i];
     }
@@ -434,25 +490,19 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
     //      std::cout <<"xt[1],xt[7]= " << xt[1] <<" "<< xt[7] << std::endl;
     //    }
 
-    if (ifs.eof()) break;
+    //    if (ifs.eof()) break;
 
     ++nRead;
 
-    const int ialpha = alpha / 10. + 9;
-
     int itheta = 0;
-    if (theta ==  40.) {
-      itheta = 1;
-    } else if (theta ==  60.) {
-      itheta = 2;
-    } else if (theta ==  90.) {
-      itheta = 3;
-    } else if (theta == 120.) {
-      itheta = 4;
-    } else if (theta == 130.) {
-      itheta = 5;
-    } else if (theta == 149.) {
-      itheta = 6;
+    for (unsigned i = 0; i < nThetaPoints; ++i) {
+      if (theta == m_thetaPoints[i]) itheta = i;
+    }
+
+    //    const int ialpha = alpha / 10. + 9;
+    int ialpha = 0;
+    for (unsigned i = 1; i < nAlphaPoints; ++i) {
+      if (alpha == m_alphaPoints[i]) ialpha = i;
     }
 
     for (int i = 0; i < np - 1; ++i) {
@@ -497,8 +547,8 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
 
   }
 
-  if (nRead != 2 * 18 * 7 * MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readXT: #lines read-in (=" << nRead <<
-                                                     ") is inconsistent with 2*18*7 x total #layers (=" << 2 * 18 * 7 * MAX_N_SLAYERS << ") !");
+  if (nRead != 2 * (nAlphaPoints - 1) * nThetaPoints * MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readXT: #lines read-in (=" << nRead <<
+        ") is inconsistent with 2*18*7 x total #layers (=" << 2 * (nAlphaPoints - 1) * nThetaPoints * MAX_N_SLAYERS << ") !");
 
   ifs.close();
 
@@ -507,7 +557,7 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
     for (int lr = 0; lr < 2; ++lr) {
       int lrp = 0;
       if (lr == 0) lrp = 1;
-      for (unsigned itheta = 0; itheta < ntheta; ++itheta) {
+      for (unsigned itheta = 0; itheta < nThetaPoints; ++itheta) {
         for (int i = 0; i < np; ++i) {
           m_XT[iL][lr][0][itheta][i] = m_XT[iL][lrp][18][itheta][i];
         }
@@ -518,7 +568,7 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
   //set xt(theta= 18) = xt(theta= 40) for the layers >= 20, since xt(theta=18) for these layers are unavailable
   for (unsigned iL = 20; iL < MAX_N_SLAYERS; ++iL) {
     for (int lr = 0; lr < 2; ++lr) {
-      for (unsigned ialpha = 0; ialpha < nalpha; ++ialpha) {
+      for (unsigned ialpha = 0; ialpha < nAlphaPoints; ++ialpha) {
         for (int i = 0; i < np; ++i) {
           m_XT[iL][lr][ialpha][0][i] = m_XT[iL][lr][ialpha][1][i];
         }
@@ -529,7 +579,7 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
   //set xt(theta=130) = xt(theta=120) for the layers >= 37, since xt(theta=130) for these layers are unavailable
   for (unsigned iL = 37; iL < MAX_N_SLAYERS; ++iL) {
     for (int lr = 0; lr < 2; ++lr) {
-      for (unsigned ialpha = 0; ialpha < nalpha; ++ialpha) {
+      for (unsigned ialpha = 0; ialpha < nAlphaPoints; ++ialpha) {
         for (int i = 0; i < np; ++i) {
           m_XT[iL][lr][ialpha][5][i] = m_XT[iL][lr][ialpha][4][i];
         }
@@ -540,12 +590,20 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
   //set xt(theta=149) = xt(theta=130) for the layers >= 13, since xt(theta=149) for these layers are unavailable
   for (unsigned iL = 13; iL < MAX_N_SLAYERS; ++iL) {
     for (int lr = 0; lr < 2; ++lr) {
-      for (unsigned ialpha = 0; ialpha < nalpha; ++ialpha) {
+      for (unsigned ialpha = 0; ialpha < nAlphaPoints; ++ialpha) {
         for (int i = 0; i < np; ++i) {
           m_XT[iL][lr][ialpha][6][i] = m_XT[iL][lr][ialpha][5][i];
         }
       }
     }
+  }
+
+  //convert unit
+  for (unsigned i = 0; i < nAlphaPoints; ++i) {
+    m_alphaPoints[i] *= M_PI / 180.;
+  }
+  for (unsigned i = 0; i < nThetaPoints; ++i) {
+    m_thetaPoints[i] *= M_PI / 180.;
   }
 
   /*
@@ -736,8 +794,8 @@ void CDCGeometryPar::readTW(const GearDir gbxParams, const int mode)
   while (true) {
     // Read board id and coefficient
     ifs >> iBoard >> coef;
-    m_timeWalkCoef[iBoard] = coef;
     if (ifs.eof()) break;
+    m_timeWalkCoef[iBoard] = coef;
     ++nRead;
   }
 
@@ -791,6 +849,7 @@ void CDCGeometryPar::Print() const
 
 const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID, EWirePosition set) const
 {
+  //  std::cout <<"cdcgeopar::fwdpos set= " << set << std::endl;
   TVector3 wPos(m_FWirPosAlign[layerID][cellID][0],
                 m_FWirPosAlign[layerID][cellID][1],
                 m_FWirPosAlign[layerID][cellID][2]);
@@ -1172,25 +1231,67 @@ void CDCGeometryPar::outputDesignWirParam(const unsigned layerID, const unsigned
 double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                  const double theta) const
 {
-
-  double dDdt;
-
-  int ialpha = getAlphaBin(alpha);
-  int itheta = getThetaBin(theta);
+  double dDdt = 0.;
 
   //convert incoming- to outgoing-lr
-  unsigned short lrp = (fabs(alpha) <= 0.5 * M_PI) ? lr : abs(lr - 1);
+  unsigned short lro = getOutgoingLR(lr, alpha);
 
-  const double boundary = m_XT[iCLayer][lrp][ialpha][itheta][6];
+  if (m_linearInterpolationOfXT) {
+    double wal(0.), wth(0.);
+    unsigned short ial[2] = {0};  getClosestAlphaPoints(alpha, wal, ial);
+    unsigned short ith[2] = {0};  getClosestThetaPoints(theta, wth, ith);
 
-  if (time < boundary) {
-    dDdt =    m_XT[iCLayer][lrp][ialpha][itheta][1] + time
-              * (2.*m_XT[iCLayer][lrp][ialpha][itheta][2] + time
-                 * (3.*m_XT[iCLayer][lrp][ialpha][itheta][3] + time
-                    * (4.*m_XT[iCLayer][lrp][ialpha][itheta][4] + time
-                       * (5.*m_XT[iCLayer][lrp][ialpha][itheta][5]))));
+    unsigned short jal(0), jth(0);
+    double w = 0.;
+
+    //compute linear interpolation (=weithed average over 4 points) in (alpha-theta) space
+    for (unsigned k = 0; k < 4; ++k) {
+      if (k == 0) {
+        jal = ial[0];
+        jth = ith[0];
+        w = (1. - wal) * (1. - wth);
+      } else if (k == 1) {
+        jal = ial[0];
+        jth = ith[1];
+        w = (1. - wal) * wth;
+      } else if (k == 2) {
+        jal = ial[1];
+        jth = ith[0];
+        w = wal * (1. - wth);
+      } else if (k == 3) {
+        jal = ial[1];
+        jth = ith[1];
+        w = wal * wth;
+      }
+
+      double boundary = m_XT[iCLayer][lro][jal][jth][6];
+
+      if (time < boundary) {
+        dDdt += w * (m_XT[iCLayer][lro][jal][jth][1] + time
+                     * (2.*m_XT[iCLayer][lro][jal][jth][2] + time
+                        * (3.*m_XT[iCLayer][lro][jal][jth][3] + time
+                           * (4.*m_XT[iCLayer][lro][jal][jth][4] + time
+                              * (5.*m_XT[iCLayer][lro][jal][jth][5])))));
+      } else {
+        dDdt += w * m_XT[iCLayer][lro][jal][jth][7];
+      }
+    }
+
   } else {
-    dDdt = m_XT[iCLayer][lrp][ialpha][itheta][7];
+    unsigned short ialpha = getClosestAlphaPoint(alpha);
+    unsigned short itheta = getClosestThetaPoint(theta);
+
+    const double boundary = m_XT[iCLayer][lro][ialpha][itheta][6];
+
+    if (time < boundary) {
+      dDdt =    m_XT[iCLayer][lro][ialpha][itheta][1] + time
+                * (2.*m_XT[iCLayer][lro][ialpha][itheta][2] + time
+                   * (3.*m_XT[iCLayer][lro][ialpha][itheta][3] + time
+                      * (4.*m_XT[iCLayer][lro][ialpha][itheta][4] + time
+                         * (5.*m_XT[iCLayer][lro][ialpha][itheta][5]))));
+    } else {
+      dDdt = m_XT[iCLayer][lro][ialpha][itheta][7];
+    }
   }
 
   //replaced with return fabs, since dDdt < 0 rarely; why happens ???
@@ -1203,30 +1304,81 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
 double CDCGeometryPar::getDriftLength(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                       const double theta) const
 {
-
   double dist = 0.;
 
-  int ialpha = getAlphaBin(alpha);
-  int itheta = getThetaBin(theta);
-  //  std::cout <<"iCLayer= " << iCLayer << std::endl;
-  //  std::cout <<"lr= " << lr << std::endl;
-  //  std::cout <<"alpha,ialpha= " << alpha <<" "<< ialpha << std::endl;
-
   //convert incoming- to outgoing-lr
-  unsigned short lrp = (fabs(alpha) <= 0.5 * M_PI) ? lr : abs(lr - 1);
+  unsigned short lro = getOutgoingLR(lr, alpha);
 
-  const double boundary = m_XT[iCLayer][lrp][ialpha][itheta][6];
-  //  std::cout <<"boundary= " << boundary << std::endl;
+  //  std::cout << m_linearInterpolationOfXT << std::endl;
+  //  exit(-1);
+  if (m_linearInterpolationOfXT) {
+    double wal(0.), wth(0.);
+    unsigned short ial[2] = {0};  getClosestAlphaPoints(alpha, wal, ial);
+    unsigned short ith[2] = {0};  getClosestThetaPoints(theta, wth, ith);
 
-  if (time < boundary) {
-    dist = m_XT[iCLayer][lrp][ialpha][itheta][0] + time
-           * (m_XT[iCLayer][lrp][ialpha][itheta][1] + time
-              * (m_XT[iCLayer][lrp][ialpha][itheta][2] + time
-                 * (m_XT[iCLayer][lrp][ialpha][itheta][3] + time
-                    * (m_XT[iCLayer][lrp][ialpha][itheta][4] + time
-                       * (m_XT[iCLayer][lrp][ialpha][itheta][5])))));
+    unsigned short jal(0), jth(0);
+    double w = 0.;
+
+    //    std::cout << "iCLayer,alpha,theta,lro= " << iCLayer <<" "<< (180./M_PI)*alpha <<" "<< (180./M_PI)*theta <<" "<< lro << std::endl;
+
+    //compute linear interpolation (=weithed average over 4 points) in (alpha-theta) space
+    for (unsigned k = 0; k < 4; ++k) {
+      if (k == 0) {
+        jal = ial[0];
+        jth = ith[0];
+        w = (1. - wal) * (1. - wth);
+      } else if (k == 1) {
+        jal = ial[0];
+        jth = ith[1];
+        w = (1. - wal) * wth;
+      } else if (k == 2) {
+        jal = ial[1];
+        jth = ith[0];
+        w = wal * (1. - wth);
+      } else if (k == 3) {
+        jal = ial[1];
+        jth = ith[1];
+        w = wal * wth;
+      }
+
+      //      std::cout << "k,w= " << k <<" "<< w << std::endl;
+      //      std::cout << "ial[0],[1],jal,wal= " << ial[0] <<" "<< ial[1] <<" "<< jal <<" "<< wal << std::endl;
+      //      std::cout << "ith[0],[1],jth,wth= " << ith[0] <<" "<< ith[1] <<" "<< jth <<" "<< wth << std::endl;
+
+      double boundary = m_XT[iCLayer][lro][jal][jth][6];
+
+      if (time < boundary) {
+        dist += w * (m_XT[iCLayer][lro][jal][jth][0] + time
+                     * (m_XT[iCLayer][lro][jal][jth][1] + time
+                        * (m_XT[iCLayer][lro][jal][jth][2] + time
+                           * (m_XT[iCLayer][lro][jal][jth][3] + time
+                              * (m_XT[iCLayer][lro][jal][jth][4] + time
+                                 * (m_XT[iCLayer][lro][jal][jth][5]))))));
+      } else {
+        dist += w * (m_XT[iCLayer][lro][jal][jth][7] * (time - boundary) + m_XT[iCLayer][lro][jal][jth][8]);
+      }
+    }
+
   } else {
-    dist = m_XT[iCLayer][lrp][ialpha][itheta][7] * (time - boundary) + m_XT[iCLayer][lrp][ialpha][itheta][8];
+    unsigned short ialpha = getClosestAlphaPoint(alpha);
+    unsigned short itheta = getClosestThetaPoint(theta);
+    //  std::cout <<"iCLayer= " << iCLayer << std::endl;
+    //  std::cout <<"lr= " << lr << std::endl;
+    //  std::cout <<"alpha,ialpha= " << alpha <<" "<< ialpha << std::endl;
+
+    const double boundary = m_XT[iCLayer][lro][ialpha][itheta][6];
+    //  std::cout <<"boundary= " << boundary << std::endl;
+
+    if (time < boundary) {
+      dist = m_XT[iCLayer][lro][ialpha][itheta][0] + time
+             * (m_XT[iCLayer][lro][ialpha][itheta][1] + time
+                * (m_XT[iCLayer][lro][ialpha][itheta][2] + time
+                   * (m_XT[iCLayer][lro][ialpha][itheta][3] + time
+                      * (m_XT[iCLayer][lro][ialpha][itheta][4] + time
+                         * (m_XT[iCLayer][lro][ialpha][itheta][5])))));
+    } else {
+      dist = m_XT[iCLayer][lro][ialpha][itheta][7] * (time - boundary) + m_XT[iCLayer][lro][ialpha][itheta][8];
+    }
   }
 
   return fabs(dist);
@@ -1245,7 +1397,7 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
   //  int itheta = getThetaBin(theta);
 
   //convert incoming- to outgoing-lr
-  //  unsigned short lrp = (fabs(alpha) <= 0.5 * M_PI) ? lr : abs(lr - 1);
+  //  unsigned short lrp = getOutgoingLR(lr, alpha);
 
   double maxTime = 5000.; //in ns
   //  if (m_XT[iCLayer][lrp][ialpha][itheta][7] == 0.) {
@@ -1373,44 +1525,112 @@ double CDCGeometryPar::getTheta(const TVector3& momentum) const
   return atan2(momentum.Perp(), momentum.z());
 }
 
-int CDCGeometryPar::getAlphaBin(const double alpha) const
+
+unsigned short CDCGeometryPar::getOutgoingLR(const unsigned short lr, const double alpha) const
+{
+  unsigned short lro = (fabs(alpha) <= 0.5 * M_PI) ? lr : abs(lr - 1);
+  return lro;
+}
+
+
+double CDCGeometryPar::getOutgoingAlpha(const double alpha) const
 {
   //convert incoming- to outgoing-alpha
-  double alphap = alpha;
+  double alphao = alpha;
   if (alpha >  0.5 * M_PI) {
-    alphap -= M_PI;
+    alphao -= M_PI;
   } else if (alpha < -0.5 * M_PI) {
-    alphap += M_PI;
+    alphao += M_PI;
   }
-  //tentative
-  int ialpha = (alphap >= 0.) ? (alphap * 180. / M_PI + 5.) / 10. : (alphap * 180. / M_PI - 5.) / 10.;
+
+  return alphao;
+}
+
+
+unsigned short CDCGeometryPar::getClosestAlphaPoint(const double alpha) const
+{
+  //convert incoming- to outgoing-alpha
+  double alphap = getOutgoingAlpha(alpha);
+
+  //tentative; should rewrite using m_alphaPoints later
+  unsigned ialpha = (alphap >= 0.) ? (alphap * 180. / M_PI + 5.) / 10. : (alphap * 180. / M_PI - 5.) / 10.;
   ialpha += 9;
-  ialpha = std::max(0, ialpha);
-  ialpha = std::min(18, ialpha);
+  ialpha = std::max(static_cast<unsigned>(0), ialpha);
+  ialpha = std::min(nAlphaPoints - 1, ialpha);
+
+  /*  std::cout <<" alpha, alphap, ialpha= " << alpha*180./M_PI <<" "<< alphap*180./M_PI <<" "<< ialpha << std::endl;
+  for (unsigned i=0; i <= nAlphaPoints - 1; ++i) {
+    std::cout << i <<" "<< m_alphaPoints[i]*180./M_PI  << std::endl;
+  }
+  */
+
   return ialpha;
 }
 
-int CDCGeometryPar::getThetaBin(const double theta) const
+
+void CDCGeometryPar::getClosestAlphaPoints(const double alpha, double& weight, unsigned short points[2]) const
 {
-  double th = 180. * theta / M_PI;
-  //hard-coded tentatively
-  int itheta = 0;
-  if (th < 29.0) {
-  } else if (th <  50.0) {
-    itheta = 1;
-  } else if (th <  75.0) {
-    itheta = 2;
-  } else if (th < 105.0) {
-    itheta = 3;
-  } else if (th < 125.0) {
-    itheta = 4;
-  } else if (th < 139.5) {
-    itheta = 5;
+  double alphao = getOutgoingAlpha(alpha);
+
+  if (alphao < m_alphaPoints[0]) {
+    points[0] = 0;
+    points[1] = 1;
+  } else if (m_alphaPoints[nAlphaPoints - 1] <= alphao) {
+    points[0] = nAlphaPoints - 2;
+    points[1] = nAlphaPoints - 1;
   } else {
-    itheta = 6;
+    for (unsigned i = 0; i <= nAlphaPoints - 2; ++i) {
+      if (m_alphaPoints[i] <= alphao && alphao < m_alphaPoints[i + 1]) {
+        points[0] = i;
+        points[1] = i + 1;
+        break;
+      }
+    }
   }
+  weight = (alphao - m_alphaPoints[points[0]]) / (m_alphaPoints[points[1]] - m_alphaPoints[points[0]]);
+}
+
+
+unsigned short CDCGeometryPar::getClosestThetaPoint(const double theta) const
+{
+  unsigned itheta = nThetaPoints - 1;
+  for (unsigned i = 0; i <= nThetaPoints - 2; ++i) {
+    if (theta < 0.5 * (m_thetaPoints[i] + m_thetaPoints[i + 1])) {
+      itheta = i;
+      break;
+    }
+  }
+
+  /*  std::cout <<" theta, itheta= " << theta*180./M_PI <<" "<< itheta << std::endl;
+  for (unsigned i=0; i <= nThetaPoints - 1; ++i) {
+    std::cout << i <<" "<< m_thetaPoints[i]*180./M_PI  << std::endl;
+  }
+  */
+
   return itheta;
 }
+
+
+void CDCGeometryPar::getClosestThetaPoints(const double theta, double& weight, unsigned short points[2]) const
+{
+  if (theta < m_thetaPoints[0]) {
+    points[0] = 0;
+    points[1] = 1;
+  } else if (m_thetaPoints[nThetaPoints - 1] <= theta) {
+    points[0] = nThetaPoints - 2;
+    points[1] = nThetaPoints - 1;
+  } else {
+    for (unsigned i = 0; i <= nThetaPoints - 2; ++i) {
+      if (m_thetaPoints[i] <= theta && theta < m_thetaPoints[i + 1]) {
+        points[0] = i;
+        points[1] = i + 1;
+        break;
+      }
+    }
+  }
+  weight = (theta - m_thetaPoints[points[0]]) / (m_thetaPoints[points[1]] - m_thetaPoints[points[0]]);
+}
+
 
 double CDCGeometryPar::ClosestApproach(const TVector3& bwp, const TVector3& fwp, const TVector3& posIn, const TVector3& posOut,
                                        TVector3& hitPosition, TVector3& wirePosition) const

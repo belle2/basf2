@@ -27,6 +27,8 @@ const unsigned MAX_N_FLAYERS =    55;
 const unsigned nSenseWires   = 14336;
 const unsigned nSuperLayers  =     9;
 const unsigned nBoards       =   300;
+const unsigned nAlphaPoints  =    19;
+const unsigned nThetaPoints  =     7;
 
 namespace Belle2 {
   namespace CDC {
@@ -475,7 +477,7 @@ namespace Belle2 {
       }
 
       /**
-       * Return TDC bin width (default: 1 nsec).
+       * Return TDC bin width (nsec).
        */
 
       inline double getTdcBinWidth() const
@@ -638,24 +640,50 @@ namespace Belle2 {
        * Returns track incident angle (theta in rad.).
        * @param momentum Track momentum at the closest point.
        */
-
       double getTheta(const TVector3& momentum) const;
 
 
       /**
-       * Returns bin no. corresponding to track incident angle (alpha).
-       * @param alpha in rad.
+       * Converts incoming-lr to outgoing-lr.
+       * @param lr    Left/Right flag.
+       * @param alpha Track incident angle in rphi-plane (rad).
        */
-
-      int getAlphaBin(const double alpha) const;
+      unsigned short getOutgoingLR(const unsigned short lr, const double alpha) const;
 
 
       /**
-       * Returns bin no. corresponding to track incident angle (theta).
+       * Converts incoming-  to outgoing-alpha.
+       * @param alpha in rad.
+       */
+      double getOutgoingAlpha(const double alpha) const;
+
+
+      /**
+       * Returns the closest alpha point for track incident angle (alpha).
+       * @param alpha in rad.
+       */
+      unsigned short getClosestAlphaPoint(const double alpha) const;
+
+
+      /**
+       * Returns the closest theta point for track incident angle (theta).
        * @param theta in rad.
        */
+      unsigned short getClosestThetaPoint(const double theta) const;
 
-      int getThetaBin(const double theta) const;
+
+      /**
+       * Returns the two closest alpha points range for the input track incident angle (alpha).
+       * @param alpha in rad.
+       */
+      void getClosestAlphaPoints(const double alpha, double& wal, unsigned short points[2]) const;
+
+
+      /**
+       * Returns the two closest theta points for the input track incident angle (theta).
+       * @param theta in rad.
+       */
+      void getClosestThetaPoints(const double theta, double& wth, unsigned short points[2]) const;
 
 
       /**
@@ -719,6 +747,7 @@ namespace Belle2 {
       CDCGeometryPar& operator=(const CDCGeometryPar&);
 
       bool m_debug;          /*!< Switch for debug printing. */
+      bool m_linearInterpolationOfXT;          /*!< Switch for linear interpolation of xt */
       bool m_XTetc;          /*!< Switch for reading x-t etc. params.. */
       bool m_Misalignment;   /*!< Switch for misalignment. */
       bool m_Alignment;      /*!< Switch for alignment. */
@@ -741,7 +770,6 @@ namespace Belle2 {
       double m_cellSize[MAX_N_SLAYERS];         /*!< The array to store cell size in each sense wire layer. */
       int m_nShifts[MAX_N_SLAYERS];             /*!< The array to store shifted cell number in each sense wire layer. */
       unsigned m_nWires[MAX_N_SLAYERS];         /*!< The array to store the wire number in each sense wire layre. */
-
 
       double m_senseWireDiameter;                   /*!< The diameter of sense wires. */
       double m_senseWireTension;                    /*!< The tension of sense wires. */
@@ -769,7 +797,10 @@ namespace Belle2 {
       float m_BWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the backward endplate for each cell; ibid. */
       float m_WireSagCoefAlign[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient incl. alignment for each cell; ibid. */
 
-      float m_XT[MAX_N_SLAYERS][2][19][7][9];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
+      float m_alphaPoints[nAlphaPoints]; /*!< alpha sampling points for xt (rad) */
+      float m_thetaPoints[nThetaPoints]; /*!< theta sampling points for xt (rad) */
+
+      float m_XT[MAX_N_SLAYERS][2][nAlphaPoints][nThetaPoints][9];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
       float m_Sigma[MAX_N_SLAYERS][7];      /*!< position resulution for each layer. */
       float m_PropSpeedInv[MAX_N_SLAYERS];  /*!< Inverse of propagation speed of the sense wire. */
       float m_t0[MAX_N_SLAYERS][MAX_N_SCELLS];  /*!< t0 for each sense-wire (in nsec). */

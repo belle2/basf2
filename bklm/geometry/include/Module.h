@@ -160,6 +160,12 @@ namespace Belle2 {
       //! Transform space-point within this module from local to global coordinates
       const CLHEP::Hep3Vector localToGlobal(const CLHEP::Hep3Vector& v) const { return m_Rotation * v + m_GlobalOrigin; }
 
+      //! Rotate a vector from global to local system
+      const CLHEP::Hep3Vector RotateToLocal(const CLHEP::Hep3Vector& v) const { return m_RotationInverse * v;  }
+
+      //! Rotate a vector from local to global system
+      const CLHEP::Hep3Vector RotateToGlobal(const CLHEP::Hep3Vector& v) const { return m_Rotation * v;  }
+
       //! Transform space-point within this module from global to local coordinates
       const CLHEP::Hep3Vector globalToLocal(const CLHEP::Hep3Vector& v) const { return m_RotationInverse * (v - m_GlobalOrigin); }
 

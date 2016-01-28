@@ -50,7 +50,7 @@ class ClusterEfficiency(Module):
             and descriptions"""
             prof = ROOT.TProfile(name, title, 60, -180, 180)
             prof.GetListOfFunctions().Add(ROOT.TNamed("Description", text))
-            prof.GetListOfFunctions().Add(ROOT.TNamed("Contact", "ritter"))
+            prof.GetListOfFunctions().Add(ROOT.TNamed("Contact", "martin.ritter@lmu.de"))
             prof.GetListOfFunctions().Add(ROOT.TNamed("Check", "Should be close to 1 everywhere"))
             # make a list of all profiles
             self.profiles.append(prof)

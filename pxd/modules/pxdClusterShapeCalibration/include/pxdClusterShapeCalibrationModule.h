@@ -57,6 +57,25 @@ namespace Belle2 {
     /** Region close edge where remove cluster shape corrections */
     int m_EdgeClose = 3;
 
+    /** To use track information (default) or simulations, default=True */
+    Bool_t m_UseTracks = kTRUE;
+
+    /**
+     * 1: standard calibration based on realistic physics or real data (default)
+     * 2: special, for full range of angles for every kind of pixel
+     */
+    int m_CalibrationKind = 1;
+
+    /** For CalibrationKind=2 set pixel kind (pixel size) in range 1..4, default=1 */
+    int m_PixelKind = 1;
+
+    /** For CalibrationKind=2 set Layer ID for special analysis, default=1 */
+    int m_SpecialLayerNo = 1;
+    /** For CalibrationKind=2 set Ladder ID for special analysis, default=3 */
+    int m_SpecialLadderNo = 3;
+    /** For CalibrationKind=2 set Sensor ID for special analysis, default=2 */
+    int m_SpecialSensorNo = 2;
+
     /** Current event id */
     int m_evt = -1;
     /** Current run id */

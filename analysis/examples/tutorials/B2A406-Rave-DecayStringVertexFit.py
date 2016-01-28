@@ -37,6 +37,7 @@ from stdLooseFSParticles import stdVeryLoosePi
 from stdLooseFSParticles import stdLoosePi
 from stdLooseFSParticles import stdLooseK
 
+
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \
     ['/hsm/belle2/bdata/MC/signal/cc2dstar/mcprod1405/BGx1/mc35_cc2dstar_BGx1_s00/cc2dstar_e0001r001*_s00_BGx1.mdst.root'
@@ -56,10 +57,17 @@ stdLooseK()
 # reconstruct D0 -> K- pi+ decay
 # keep only candidates with 1.8 < M(Kpi) < 1.9 GeV
 reconstructDecay('D0:kpi -> K-:loose pi+:loose', '1.8 < M < 1.9')
+reconstructDecay('D0:st -> K-:loose pi+:loose', '1.8 < M < 1.9')
 
 # perform D0 vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
 massVertexRave('D0:kpi', 0.0)
+
+# perform D0 single track fit (production vertex)
+# D0 vertex and covariance matrix must be defined
+vertexRave('D0:st', 0.0)
+# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
+vertexRave('D0:st', 0.0, '^D0 -> K- pi+', 'ipprofile')
 
 # reconstruct 3 times the D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
@@ -100,11 +108,18 @@ toolsDST += ['MCTruth', '^D*+ -> ^D0 ^pi+']
 toolsDST += ['MCFlightInfo', '^D*+ -> [^D0 -> K- pi+] pi+']
 toolsDST += ['FlightInfo', '^D*+ -> [^D0 -> K- pi+] pi+']
 
+# create flat Ntuple for D:st (single track vertex fit)
+toolsDSTst = ['EventMetaData', '^D0']
+toolsDSTst += ['Vertex', '^D0']
+toolsDSTst += ['MCVertex', '^D0']
+toolsDSTst += ['FlightInfo', '^D0 -> K- pi+']
+
 # write out the flat ntuples
 ntupleFile('B2A406-Rave-DecayStringVertexFit.root')
 ntupleTree('dsttree1', 'D*+:1', toolsDST)
 ntupleTree('dsttree2', 'D*+:2', toolsDST)
 ntupleTree('dsttree3', 'D*+:3', toolsDST)
+ntupleTree('d0tree1', 'D0:st', toolsDSTst)
 
 # Process the events
 process(analysis_main)

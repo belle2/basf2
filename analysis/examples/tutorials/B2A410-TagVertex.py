@@ -18,7 +18,7 @@
 # calculated
 #
 # Note: This example uses the signal MC sample created in
-# MC campaign 3.5, therefore it can be ran only on KEKCC computers.
+# MC campaign 5, therefore it can be ran only on KEKCC computers.
 #
 # Contributors: L. Li Gioi (October 2014)
 #
@@ -31,29 +31,29 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
-from modularAnalysis import vertexRave
+from vertex import vertexRave
 from modularAnalysis import buildRestOfEvent
-from modularAnalysis import TagV
+from modularAnalysis import fillParticleList
+from vertex import TagV
 from stdLooseFSParticles import stdLoosePi
 from stdLooseFSParticles import stdLooseMu
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \
-    ['/hsm/belle2/bdata/MC/signal/B2JpsiKs_mu/mcprod1405/BGx1/mc35_B2JpsiKs_mu_BGx1_s00/B2JpsiKs_mu_e0001r001*_s00_BGx1.mdst.root'
+    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/' +
+     'DBxxxxxxxx/MC5/prod00000103/s00/e0000/4S/r00000/1111440100/sub00/mdst_000001_prod00000103_task00000001.root'
      ]
 
 inputMdstList(filelistSIG)
 
 # use standard final state particle lists
 #
-# creates "pi+:loose" ParticleList (and c.c.)
-stdLoosePi()
 # creates "mu+:loose" ParticleList (and c.c.)
 stdLooseMu()
 
-# reconstruct Ks -> pi+ pi- decay
+# create Ks -> pi+ pi- list from V0
 # keep only candidates with 0.4 < M(pipi) < 0.6 GeV
-reconstructDecay('K_S0:pipi -> pi+:loose pi-:loose', '0.4 < M < 0.6')
+fillParticleList('K_S0:pipi', '0.4 < M < 0.6')
 
 # reconstruct J/psi -> mu+ mu- decay
 # keep only candidates with 3.0 < M(mumu) < 3.2 GeV

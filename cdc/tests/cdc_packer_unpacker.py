@@ -13,6 +13,7 @@ set_random_seed(42)
 
 
 class PackerUnpackerTestModule(Module):
+
     """
     module which checks if two collection of CDCHits are equal
     """

@@ -13,6 +13,18 @@ DQMViewCallback::DQMViewCallback(const NSMNode& node, ConfigFile& config)
   : NSMCallback(1), m_config(config)
 {
   setNode(node);
+  const std::string host = m_config.get("dqm.host");
+  const int port = m_config.getInt("dqm.port");
+  int ntmap = m_config.getInt("dqm.ntmap");
+  for (int i = 0; i < ntmap; i++) {
+    std::string vname = StringUtil::form("dqm[%d]", i);
+    const std::string map_name = m_config.get(vname + ".file");
+    std::string mapfile = /*map_path + "/" +*/ map_name;
+    add(new NSMVHandlerText(vname + ".map", true, false, map_name));
+    add(new NSMVHandlerText(vname + ".mapfile", true, false, mapfile));
+    m_memory.push_back(new DqmMemFile(mapfile));
+  }
+  PThread(new SocketAcceptor(host, port, this));
 }
 
 void DQMViewCallback::init(NSMCommunicator&) throw()
@@ -30,10 +42,8 @@ void DQMViewCallback::init(NSMCommunicator&) throw()
     std::string mapfile = /*map_path + "/" +*/ map_name;
     add(new NSMVHandlerText(vname + ".map", true, false, map_name));
     add(new NSMVHandlerText(vname + ".mapfile", true, false, mapfile));
-    m_memory.push_back(new DqmMemFile(mapfile));
   }
   update();
-  PThread(new SocketAcceptor(host, port, this));
 }
 
 void DQMViewCallback::timeout(NSMCommunicator&) throw()

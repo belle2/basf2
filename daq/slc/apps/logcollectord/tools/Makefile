@@ -20,7 +20,7 @@ endif
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.
 ifneq ($(NOT_USE_PSQL),yes)
-CFLAGS  += -$(PGSQL_INC_PATH) -lpq
+CFLAGS  += -I$(PGSQL_INC_PATH) -lpq
 endif
 
 MAINS   = $(wildcard *.cc)

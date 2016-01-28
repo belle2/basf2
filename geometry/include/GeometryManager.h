@@ -147,6 +147,8 @@ namespace Belle2 {
       GeometryManager(const GeometryManager&) = delete;
       /** Assignment operator declared private since class is a Singleton. */
       GeometryManager& operator=(const GeometryManager&) = delete;
+      /** Destructor: make sure we clean up memory at the end */
+      ~GeometryManager() { clear(); }
 
       /** Pointer to the top volume of the native geometry description */
       G4VPhysicalVolume* m_topVolume;

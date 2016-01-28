@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <geometry/modules/OverlapCheckerModule.h>
+#include <geometry/modules/overlapchecker/OverlapCheckerModule.h>
 #include <geometry/GeometryManager.h>
 #include <framework/gearbox/Unit.h>
 

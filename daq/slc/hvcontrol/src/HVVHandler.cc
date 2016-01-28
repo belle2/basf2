@@ -71,6 +71,7 @@ bool NSMVHandlerHVState::handleGetText(std::string& val)
 {
   HV_HANDLE_PRE;
   val = HVMessage::getStateText((HVMessage::State)m_callback.getState(m_crate, m_slot, m_channel));
+  LogFile::info("NSMVHandlerHVState::handleSetText : " + val);
   HV_HANDLE_POST;
 }
 
@@ -93,9 +94,10 @@ bool NSMVHandlerHVSwitch::handleSetText(const std::string& val)
   HV_HANDLE_PRE;
   m_callback.setSwitch(m_crate, m_slot, m_channel, (val == "ON"));
   std::string state = HVMessage::getStateText((HVMessage::State)m_callback.getState(m_crate, m_slot, m_channel));
-  std::string vname = StringUtil::replace(getName(), "switch", "state");
+  //std::string vname = StringUtil::replace(getName(), "switch", "state");
+  LogFile::info("NSMVHandlerHVSwitch::handleSetText : " + val);
   m_callback.set(m_name, val);
-  m_callback.set(vname, state);
+  //m_callback.set(vname, state);
   HV_HANDLE_POST;
 }
 

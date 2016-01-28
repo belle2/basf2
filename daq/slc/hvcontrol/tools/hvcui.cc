@@ -16,7 +16,10 @@ int main(int argc, char** argv)
     LogFile::debug("Usage : %s <config> [-n <cuiname>] [-c crateid]", argv[0]);
     return 1;
   }
-  std::string cuiname = getenv("USERNAME");
+  char* uiname = getenv("USER");
+  if (uiname == NULL) uiname = getenv("USERNAME");
+  std::string cuiname = (uiname != NULL) ? uiname : "HVCUI";
+  cuiname = StringUtil::replace(cuiname, "-", "_");
   for (int i = 1; i < argc; i++) {
     if (std::string(argv[i]) == "-c") {
       crate = atoi(argv[i + 1]);

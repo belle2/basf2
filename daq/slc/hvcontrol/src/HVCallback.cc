@@ -57,8 +57,9 @@ const HVConfig& HVCallback::getConfig() const throw()
 bool HVCallback::perform(NSMCommunicator& com) throw()
 {
   NSMMessage msg(com.getMessage());
-  if (NSMCallback::perform(com)) return true;
-  lock();
+  if (NSMCallback::perform(com)) {
+    return true;
+  }
   try {
     HVCommand cmd(msg.getRequestName());
     if (cmd == HVCommand::UNKNOWN) return false;
@@ -94,6 +95,7 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         LogFile::info("shoulder : %s", m_configname_shoulder.c_str());
         LogFile::info("peak     : %s", m_configname_peak.c_str());
         reset();
+        lock();
         dbload(m_config_standby, m_configname_standby);
         dbload(m_config_shoulder, m_configname_shoulder);
         dbload(m_config_peak, m_configname_peak);
@@ -102,12 +104,15 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         set("config.shoulder", m_configname_shoulder);
         set("config.peak", m_configname_peak);
         m_config = FLAG_STANDBY;
-        configure(getConfig());
         addAll(getConfig());
+        configure(getConfig());
+        unlock();
       } else if (cmd == HVCommand::TURNON) {
         get("config.standby", m_configname_standby);
+        lock();
         dbload(m_config_standby, m_configname_standby);
         addAll(m_config_standby);
+        unlock();
         getNode().setState(tstate);
         m_state_demand = HVState::STANDBY_S;
         m_config = FLAG_STANDBY;
@@ -121,7 +126,9 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         getNode().setState(tstate);
         m_state_demand = HVState::STANDBY_S;
         m_config = FLAG_STANDBY;
+        lock();
         configure(getConfig());
+        unlock();
         standby();
       } else if (cmd == HVCommand::SHOULDER && state != HVState::SHOULDER_S) {
         get("config.shoulder", m_configname_shoulder);
@@ -130,7 +137,9 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         getNode().setState(tstate);
         m_state_demand = HVState::SHOULDER_S;
         m_config = FLAG_SHOULDER;
+        lock();
         configure(getConfig());
+        unlock();
         shoulder();
       } else if (cmd == HVCommand::PEAK && state != HVState::PEAK_S) {
         get("config.peak", m_configname_peak);
@@ -139,7 +148,9 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         getNode().setState(tstate);
         m_state_demand = HVState::PEAK_S;
         m_config = FLAG_PEAK;
+        lock();
         configure(getConfig());
+        unlock();
         peak();
       }
     }
@@ -147,7 +158,6 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
     reply(NSMMessage(NSMCommand::ERROR, e.what()));
   }
   set("state", getNode().getState().getLabel());
-  unlock();
   return true;
 }
 

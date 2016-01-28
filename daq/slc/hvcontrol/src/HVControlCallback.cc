@@ -101,65 +101,77 @@ void HVControlCallback::init(NSMCommunicator&) throw()
   dbload(m_config_standby, m_configname_standby);
   dbload(m_config_shoulder, m_configname_shoulder);
   dbload(m_config_peak, m_configname_peak);
-
   m_config = FLAG_STANDBY;
-  configure(getConfig());
   addAll(getConfig());
+  configure(getConfig());
   initialize(getConfig());
+  PThread(new HVNodeMonitor(this));
 }
 
 void HVControlCallback::timeout(NSMCommunicator&) throw()
 {
-  update();
-  const HVConfig& config(getConfig());
-  const HVCrateList& crate_v(config.getCrates());
-  bool isstable = true;
-  for (size_t i = 0; i < crate_v.size(); i++) {
-    const HVCrate& crate(crate_v[i]);
-    const HVChannelList& channel_v(crate.getChannels());
-    int crateid = crate.getId();
-    for (HVChannelList::const_iterator ichannel = channel_v.begin();
-         ichannel != channel_v.end(); ichannel++) {
-      const HVChannel& channel(*ichannel);
-      int slot = channel.getSlot();
-      int ch = channel.getChannel();
-      int state = getState(crateid, slot, ch);
-      std::string state_s = HVMessage::getStateText((HVMessage::State)state);
-      float vmon = getVoltageMonitor(crateid, slot, ch);
-      float cmon = getCurrentMonitor(crateid, slot, ch);
-      std::string vname = StringUtil::form("crate[%d].slot[%d].channel[%d].", crateid, slot, ch);
-      if ((m_state_demand == HVState::OFF_S && state != HVMessage::OFF) ||
-          (m_state_demand != HVState::OFF_S && state != HVMessage::ON)) {
-        isstable = false;
-      }
-      if (m_mon_tmp[crateid][i].state != state) {
-        set(vname + "state", state_s);
-        m_mon_tmp[crateid][i].state = state;
-      }
-      if (m_mon_tmp[crateid][i].vmon != vmon) {
-        set(vname + "vmon", vmon);
-        m_mon_tmp[crateid][i].vmon = vmon;
-      }
-      if (m_mon_tmp[crateid][i].cmon != cmon) {
-        set(vname + "cmon", cmon);
-        m_mon_tmp[crateid][i].cmon = cmon;
-      }
-      i++;
-    }
-  }
-  if (isstable && m_state_demand != getNode().getState()) {
-    LogFile::notice("State transit : %s", m_state_demand.getLabel());
-    getNode().setState(m_state_demand);
-    set("hvstate", m_state_demand.getLabel());
-    reply(NSMMessage(NSMCommand::OK, m_state_demand.getLabel()));
-  }
 }
 
 void HVControlCallback::monitor() throw()
 {
+  lock();
+  try {
+    update();
+  } catch (const HVHandlerException& e) {
+    log(LogFile::ERROR, e.what());
+  }
+  try {
+    const HVConfig& config(getConfig());
+    const HVCrateList& crate_v(config.getCrates());
+    bool isstable = true;
+    for (size_t i = 0; i < crate_v.size(); i++) {
+      const HVCrate& crate(crate_v[i]);
+      const HVChannelList& channel_v(crate.getChannels());
+      int crateid = crate.getId();
+      for (HVChannelList::const_iterator ichannel = channel_v.begin();
+           ichannel != channel_v.end(); ichannel++) {
+        const HVChannel& channel(*ichannel);
+        int slot = channel.getSlot();
+        int ch = channel.getChannel();
+        int state = getState(crateid, slot, ch);
+        std::string state_s = HVMessage::getStateText((HVMessage::State)state);
+        float vmon = getVoltageMonitor(crateid, slot, ch);
+        float cmon = getCurrentMonitor(crateid, slot, ch);
+        std::string vname = StringUtil::form("crate[%d].slot[%d].channel[%d].", crateid, slot, ch);
+        if ((m_state_demand == HVState::OFF_S && state != HVMessage::OFF) ||
+            (m_state_demand != HVState::OFF_S && state != HVMessage::ON)) {
+          isstable = false;
+        }
+        if (m_mon_tmp[crateid][i].state != state) {
+          set(vname + "state", state_s);
+          m_mon_tmp[crateid][i].state = state;
+        }
+        if (m_mon_tmp[crateid][i].vmon != vmon) {
+          set(vname + "vmon", vmon);
+          m_mon_tmp[crateid][i].vmon = vmon;
+        }
+        if (m_mon_tmp[crateid][i].cmon != cmon) {
+          set(vname + "cmon", cmon);
+          m_mon_tmp[crateid][i].cmon = cmon;
+        }
+        i++;
+      }
+    }
+    if (isstable && m_state_demand != getNode().getState()) {
+      log(LogFile::NOTICE, "State transit : %s", m_state_demand.getLabel());
+      getNode().setState(m_state_demand);
+      set("hvstate", m_state_demand.getLabel());
+      reply(NSMMessage(NSMCommand::OK, m_state_demand.getLabel()));
+    }
+  } catch (const std::exception& e) {
+    log(LogFile::ERROR, e.what());
+  }
+  unlock();
 }
 
-void HVControlCallback::dbload(HVConfig& config, const std::string& configname_in) throw(IOException)
+void HVControlCallback::dbload(HVConfig& config,
+                               const std::string& configname_in)
+throw(IOException)
 {
   if (m_db) {
     DBInterface& db(*m_db);

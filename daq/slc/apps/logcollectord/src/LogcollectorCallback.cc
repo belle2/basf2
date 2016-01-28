@@ -58,7 +58,9 @@ void LogcollectorCallback::logset(const DAQLogMessage& msg) throw()
     std::vector<DAQLogMessage>::iterator it = m_msgs.begin();
     if (Date().get() - it->getDateInt() > 3600 * 2) {
       m_msgs.erase(it);
+      continue;
     }
+    break;
   }
 }
 

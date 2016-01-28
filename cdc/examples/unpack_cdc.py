@@ -20,7 +20,7 @@ input = register_module('SeqRootInput')
 # output
 unpacker = register_module('CDCUnpacker')
 # FE channel <-> CDC cell ID map.
-unpacker.param('xmlMapFileName', 'ch_map.dat')
+# unpacker.param('xmlMapFileName', 'ch_map.dat')
 # Enable/Disable to store the RawCDC Object.
 unpacker.param('enableStoreRawCDC', True)
 # Enable/Disable print out the ADC/TDC data to the terminal.

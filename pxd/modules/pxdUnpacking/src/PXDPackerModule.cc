@@ -17,6 +17,7 @@
 #include <boost/foreach.hpp>
 #include <boost/crc.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/algorithm/clamp.hpp>
 
 #include <boost/spirit/home/support/detail/endian.hpp>
 
@@ -185,7 +186,7 @@ void PXDPackerModule::event()
     }
   }
 
-  m_trigger_nr = evtPtr->getEvent();// m_packed_events;
+  m_trigger_nr = evtPtr->getEvent();
   m_run_nr_word1 = ((evtPtr->getRun() & 0xFF) << 8) | (evtPtr->getSubrun() & 0xFF);
   m_run_nr_word2 = ((evtPtr->getExperiment() & 0x3FF) << 6) | ((evtPtr->getRun() >> 8) & 0x3F);
   pack_event();
@@ -285,7 +286,7 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   append_int32(0xCAFE0000);// HLT HEADER
   append_int32(m_trigger_nr); // HLT Trigger Nr
   append_int32(m_run_nr_word1); // HLT Run NR etc
-  append_int32(0xCAFE0000);// DATCON HEADER ... do we want it here? t.b.d.
+  append_int32(0xCAFE0000);// DATCON HEADER ... one of them should be 0xCAFE2000, check! TODO
   append_int32(m_trigger_nr); // DATCON Trigger Nr
   append_int32(m_run_nr_word1); // DATCON Run NR etc
   add_frame_to_payload();
@@ -304,7 +305,6 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   add_frame_to_payload();
 
   // loop for each DHE in system
-  // we use events_packed as event number until we get it from somewhere else
   // Run & TTT etc are zero until better idea
 
   for (int i = 0; i < 5; i++) {
@@ -392,11 +392,8 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
           if (row < ladder_min_row || row > ladder_max_row || col < ladder_min_col || col > ladder_max_col) {
             B2ERROR("ROW/COL out of range col: " << col << " row: " << row);
           } else {
-            // fill ADC ... convert float to unsigned char, clip to 0 - 255 , no scaling ... and how about common mode?
-            long v = lrint(it->getCharge());
-            if (v > 255) v = 255;
-            if (v < 0) v = 0;
-            halfladder_pixmap[row][col] = (unsigned char) v;
+            // fill ADC ... convert float to unsigned char, clamp to 0 - 255 , no scaling ... and how about common mode?
+            halfladder_pixmap[row][col] = (unsigned char) boost::algorithm::clamp(lrint(it->getCharge()), 0, 255);
           }
         }
       }

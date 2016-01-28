@@ -38,13 +38,13 @@ namespace Belle2 {
     virtual ~RCEpicsCallback() throw() {}
 
   public:
-    virtual void initialize(const DBObject&) throw(RCHandlerException)
+    virtual void initialize(const DBObject& /*obj*/) throw(RCHandlerException)
     {
       add(new NSMVHandlerInt("expno", true, false));
       add(new NSMVHandlerInt("runno", true, false));
       add(new NSMVHandlerInt("subno", true, false));
     }
-    virtual void configure(const DBObject& obj) throw(RCHandlerException)
+    virtual void configure(const DBObject& /*obj*/) throw(RCHandlerException)
     {
       scanIoRequest(*g_pvt_config);
       setCommand(RCCommand::CONFIGURE);
@@ -67,15 +67,19 @@ namespace Belle2 {
     {
       setCommand(RCCommand::STOP);
     }
-    virtual void resume() throw(RCHandlerException)
+    virtual bool resume(int subno) throw(RCHandlerException)
     {
+      set("subno", subno);
+      scanIoRequest(*g_pvt_subno);
       setCommand(RCCommand::RESUME);
+      return true;
     }
-    virtual void pause() throw(RCHandlerException)
+    virtual bool pause() throw(RCHandlerException)
     {
       setCommand(RCCommand::PAUSE);
+      return true;
     }
-    virtual void recover() throw(RCHandlerException)
+    virtual void recover(const DBObject& /*obj*/) throw(RCHandlerException)
     {
       setCommand(RCCommand::RECOVER);
     }
@@ -259,7 +263,7 @@ long write_rc_state_stringout(stringoutRecord *record)
   RCState state(record->val);
   if (state != RCState::UNKNOWN) {
     g_callback->setState(state);
-    try {
+    try { 
       if (state.isStable()) {
 	g_callback->setCommand(RCCommand::UNKNOWN);
 	scanIoRequest(*g_pvt_request);

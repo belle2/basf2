@@ -39,6 +39,7 @@ void ECLFEE::init(RCCallback& callback, HSLB& hslb)
 
 void ECLFEE::boot(HSLB& hslb,  const DBObject& obj)
 {
+  /*
   int ver;
   if ((ver = hslb.readfee8(HSREG_HWVER)) != HSLB_HARDWARE_VERSION) {
     throw (IOException("Inconsitent HWVER (%d!=%d)",
@@ -48,6 +49,7 @@ void ECLFEE::boot(HSLB& hslb,  const DBObject& obj)
     throw (IOException("Inconsitent FWVER (%d!=%d)",
                        ver, HSLB_FIRMWARE_VERSION));
   }
+  */
   hslb.writefee8(0x30, 0x00);
 }
 

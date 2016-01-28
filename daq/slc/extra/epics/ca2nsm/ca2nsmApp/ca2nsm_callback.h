@@ -7,6 +7,7 @@ extern "C" {
 
 void init_ca2nsm(const char* confname);
 void add_ca2nsm(const char* pvname);
+void add_PVs();
 
 #ifdef __cplusplus
 }

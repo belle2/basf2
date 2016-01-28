@@ -31,7 +31,7 @@ copyinc:
 	@ mkdir -p include/nsm2
 	@ make nsmlib
 	@ mkdir -p include/mgt
-	@ make -C extra/mgt 
+	@ make -C extra/hsprogs -f Makefile.lib
 	@ mkdir -p include/ttrx
 	@ make -C extra/ttrx 
 	@ mkdir -p include/ecldaq

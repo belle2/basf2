@@ -6,6 +6,7 @@ include $(TOP)/configure/CONFIG
 #=============================
 
 PROD_HOST += ca2nsm
+ca2nsm_SRCS += CA2NSMCallback.cpp
 ca2nsm_SRCS += ca2nsm_callback.cpp
 ca2nsm_SRCS += ca2nsm.c
 ca2nsm_LIBS += $(EPICS_BASE_HOST_LIBS) 

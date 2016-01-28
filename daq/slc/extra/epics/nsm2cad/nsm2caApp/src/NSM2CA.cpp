@@ -2,6 +2,11 @@
 
 #include <dbScan.h>
 
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <unistd.h>
+
 using namespace Belle2;
 
 IOSCANPVT* NSM2CA::init_vget_in(const char* recordname)

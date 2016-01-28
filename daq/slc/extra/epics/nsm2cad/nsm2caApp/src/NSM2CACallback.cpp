@@ -40,7 +40,8 @@ void NSM2CACallback::timeout(NSMCommunicator&) throw()
       if (vname == "rcrequest" || vname == "hvrequest") continue;
       std::string node = var.getNode();
       try {
-	NSMCommunicator::send(NSMMessage(NSMNode(node), NSMCommand::VGET, vname));
+	NSMMessage msg(NSMNode(node), NSMCommand::VGET, vname);
+	NSMCommunicator::send(msg);
       } catch (const IOException& e) {
 	LogFile::warning(e.what());
       }
@@ -57,7 +58,8 @@ void NSM2CACallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
   m_nsm2ca->notify(name, var);
 }
 
-void NSM2CACallback::vreply(NSMCommunicator& com, const std::string& vname, bool success) throw()
+void NSM2CACallback::vreply(NSMCommunicator& com, 
+			    const std::string& vname, bool success) throw()
 {
   const NSMMessage& msg(com.getMessage());
   std::string name = std::string(msg.getNodeName()) + "." + vname;
@@ -74,11 +76,11 @@ void NSM2CACallback::error(const char* nodename, const char* data) throw()
       NSMVar& var((it->second).var);
       if (var.getNode() == nodename) {
 	if (var.getName() == "rcstate") {
-	  std::string name = std::string(var.getNode()) + "." + var.getName();
+	  std::string name = var.getNode() + "." + var.getName();
 	  m_nsm2ca->notify(name, NSMVar("rcstate", "NOTREADY"));
 	  return;
 	} else if (var.getName() == "state") {
-	  std::string name = std::string(var.getNode()) + "." + var.getName();
+	  std::string name = var.getNode() + "." + var.getName();
 	  m_nsm2ca->notify(name, NSMVar("state", "ERROR"));
 	  return;
 	}
@@ -100,11 +102,11 @@ void NSM2CACallback::ok(const char* nodename, const char* data) throw()
       NSMVar& var((it->second).var);
       if (var.getNode() == nodename) {
 	if (rcstate != RCState::UNKNOWN && var.getName() == "rcstate") {
-	  std::string name = std::string(var.getNode()) + "." + var.getName();
+	  std::string name = var.getNode() + "." + var.getName();
 	  m_nsm2ca->notify(name, NSMVar("rcstate", data));
 	  return;
 	} else if (var.getName() == "state") {
-	  std::string name = std::string(var.getNode()) + "." + var.getName();
+	  std::string name = var.getNode() + "." + var.getName();
 	  m_nsm2ca->notify(name, NSMVar("state", data));
 	  return;
 	}

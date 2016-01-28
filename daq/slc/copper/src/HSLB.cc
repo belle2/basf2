@@ -32,7 +32,7 @@ const char* HSLB::getFEEType(int type)
 int HSLB::open(int fin) throw(HSLBHandlerException)
 {
   if (m_hslb.fd < 0) {
-    m_hslb.fd = openfn(fin, false);
+    m_hslb.fd = openfn(fin, false, NULL);
     m_hslb.fin = (m_hslb.fd < 0) ? -1 : fin;
   }
   if (m_hslb.fd < 0) {
@@ -274,6 +274,7 @@ std::string HSLB::checkfee() throw(HSLBHandlerException)
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
   }
+  /*
   static const char* feetype[] = {
     "UNDEF", "SVD", "CDC", "BPID", "EPID", "ECL", "KLM", "TRG",
     "UNKNOWN-8", "UNKNOWN-9", "UNKNOWN-10", "UNKNOWN-11",
@@ -283,6 +284,7 @@ std::string HSLB::checkfee() throw(HSLBHandlerException)
     return StringUtil::form("FEE type: %s \nserial: %d \nfirm type: %d \nfirm version: %d",
                             feetype[m_hslb.feehw], m_hslb.feeserial, m_hslb.feetype, m_hslb.feever);
   }
+  */
   return std::string("UNKNOWN");
 }
 
@@ -293,9 +295,11 @@ std::string HSLB::test() throw(HSLBHandlerException)
   }
   char msg[256];
   memset(msg, 0, 256);
+  /*
   if (check_hslb(&m_hslb, msg) > 0) {
     throw (HSLBHandlerException("tesths failed : %s", msg));
   }
+  */
   return msg;
 }
 
@@ -337,7 +341,9 @@ void HSLB::bootfpga(const std::string& firmware) throw(HSLBHandlerException)
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
   }
+  /*
   if (::bootfpga(m_hslb.fd, firmware.c_str(), 0, 0, M012_SELECTMAP) < 0) {
     throw (HSLBHandlerException("Failed to boot FPGA on hslb-%c : %s", m_hslb.fin + 'a', hslberr()));
   }
+  */
 }

@@ -24,10 +24,6 @@
 #include <recGbl.h>
 
 #include <map>
-#include <cstdlib>
-#include <cstring>
-#include <iostream>
-#include <unistd.h>
 
 #define CAPITAL "B2_nsm"
 

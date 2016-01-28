@@ -17,9 +17,14 @@ int main(int argc, char **argv)
 {
   if (argc > 1) {
     init_ca2nsm(argv[1]);
-    SEVCHK(ca_pend_event(0.0),"ca_pend_event");
+    while (1) {
+      //SEVCHK(
+      ca_pend_event(0.1);
+      //,"ca_pend_event");
+      add_PVs();
+    }
   } else {
-    printf("Usage %s : <config>", argv[0]);
+    printf("Usage %s : <config>\n", argv[0]);
   }
   return 0;
 }

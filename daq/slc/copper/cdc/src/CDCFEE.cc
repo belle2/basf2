@@ -122,24 +122,24 @@ void CDCFEE::monitor(RCCallback& callback, HSLB& hslb)
   // VCCINT
   hslb.writefee32(0X0016, 0x80010000);
   callback.wait(0.5);
-  int ret = hslb.readfee32(0X0016);
-  int v0 = ret & 0xffff;
+  ret = hslb.readfee32(0X0016);
+  v0 = ret & 0xffff;
   float vccint = (v0 / 64.) * (3.0 / 1024.);
   callback.set(vname + ".vccint", vccint);
 
   // VCCAUX
   hslb.writefee32(0X0016, 0x80020000);
   callback.wait(0.5);
-  int ret = hslb.readfee32(0X0016);
-  int v0 = ret & 0xffff;
+  ret = hslb.readfee32(0X0016);
+  v0 = ret & 0xffff;
   float vccaux = (v0 / 64.) * (3.0 / 1024.);
   callback.set(vname + ".vccaux", vccaux);
 
   // VCC5V
   hslb.writefee32(0X0016, 0x80030000);
   callback.wait(0.5);
-  int ret = hslb.readfee32(0X0016);
-  int v0 = ret & 0xffff;
+  ret = hslb.readfee32(0X0016);
+  v0 = ret & 0xffff;
   float vcc5v = ((390. + 51. + 39.) * v0 / (64.*1024.)) / 51.;
   callback.set(vname + ".vcc5v", vcc5v);
 

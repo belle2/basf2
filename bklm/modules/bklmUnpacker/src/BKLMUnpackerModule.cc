@@ -152,20 +152,20 @@ void BKLMUnpackerModule::event()
         ////        cout << "ctime is : " << rawKLM[i]->GetTTCtime(j) << endl << endl;
         //we should get two words of 32 bits...
 
-
         for (int k = 0; k < numDetNwords; k++) {
+          int item = buf_slot[k];
           char buffer[200] = "";
-          sprintf(buffer, "%.8x\n", buf_slot[k]);
+          sprintf(buffer, "%.8x\n", item);
           B2INFO(buffer);
 
           //Brandon uses 4 16 bit words
           //          int firstBrandonWord;
           //          int secondBrandonWord;
-          //char buffer1[100] = "";
-          //char buffer2[100] = "";
+          char buffer1[100] = "";
+          char buffer2[100] = "";
 
-          //sprintf(buffer1, "%.4x\n", buf_slot[k] & 0xffff);
-          //sprintf(buffer2, "%.4x\n", (buf_slot[k] >> 16) & 0xffff);
+          sprintf(buffer1, "%.4x\n", item & 0xffff);
+          sprintf(buffer2, "%.4x\n", (item >> 16) & 0xffff);
 
           ////          cout << buffer2 << buffer1;
 

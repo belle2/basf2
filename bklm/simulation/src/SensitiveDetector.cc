@@ -45,7 +45,7 @@ namespace Belle2 {
 
   namespace bklm {
 
-    SensitiveDetector::SensitiveDetector(const G4String name) : SensitiveDetectorBase(name, Const::KLM)
+    SensitiveDetector::SensitiveDetector(const G4String& name) : SensitiveDetectorBase(name, Const::KLM)
     {
       m_FirstCall = true;
       m_NeutronPDG = 0;     // dummy initializer

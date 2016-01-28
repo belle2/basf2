@@ -546,8 +546,8 @@ bool EvtBSemiTauonicHelicityAmplitudeCalculator::chktauhel(int tauhel) const
   else return false;
 }
 
-bool EvtBSemiTauonicHelicityAmplitudeCalculator::chkcostau(double costau) const
-{
-  if (costau >= -1.0 && costau <= 1.0)return true;
-  else return false;
-}
+//bool EvtBSemiTauonicHelicityAmplitudeCalculator::chkcostau(double costau) const
+//{
+//  if (costau >= -1.0 && costau <= 1.0)return true;
+//  else return false;
+//}

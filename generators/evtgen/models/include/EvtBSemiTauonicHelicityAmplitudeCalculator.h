@@ -606,7 +606,7 @@ private:
   /** Function to check if costau is in the valid range.
    *@param costau    cosine of the angle between D(*) meson and the lepton in the (l+nu) rest frame.
    */
-  bool chkcostau(double costau) const;
+  //bool chkcostau(double costau) const;
 
 };
 

@@ -356,19 +356,19 @@ namespace Belle2 {
         m_UserLimits.push_back(new G4UserLimits(m_activeStepSize));
         active->SetUserLimits(m_UserLimits.back());
 
-        //Draw local axes to check orientation
-        //Beware: do not enable for simulation, this is purely for visualization
-        //{
-        //G4LogicalVolume* uBox = new G4LogicalVolume(new G4Box("u",5*mm,0.1*mm,0.1*mm), Materials::get(s.material), "u");
-        //G4LogicalVolume* vBox = new G4LogicalVolume(new G4Box("v",0.1*mm,5*mm,0.1*mm), Materials::get(s.material), "u");
-        //G4LogicalVolume* wBox = new G4LogicalVolume(new G4Box("w",0.1*mm,0.1*mm,5*mm), Materials::get(s.material), "u");
-        //setColor(*uBox,"#f00");
-        //setColor(*vBox,"#0f0");
-        //setColor(*wBox,"#00f");
-        //new G4PVPlacement(G4Translate3D(5*mm,0,0),uBox,"u",active,false,1);
-        //new G4PVPlacement(G4Translate3D(0,5*mm,0),vBox,"v",active,false,1);
-        //new G4PVPlacement(G4Translate3D(0,0,5*mm),wBox,"w",active,false,1);
-        //}
+        // Draw local axes to check orientation
+        // Beware: do not enable for simulation, this is purely for visualization
+        // {
+        //   G4LogicalVolume* uBox = new G4LogicalVolume(new G4Box("u",5*CLHEP::mm,0.1*CLHEP::mm,0.1*CLHEP::mm), Materials::get(s.material), "u");
+        //   G4LogicalVolume* vBox = new G4LogicalVolume(new G4Box("v",0.1*CLHEP::mm,5*CLHEP::mm,0.1*CLHEP::mm), Materials::get(s.material), "u");
+        //   G4LogicalVolume* wBox = new G4LogicalVolume(new G4Box("w",0.1*CLHEP::mm,0.1*CLHEP::mm,5*CLHEP::mm), Materials::get(s.material), "u");
+        //   setColor(*uBox,"#f00");
+        //   setColor(*vBox,"#0f0");
+        //   setColor(*wBox,"#00f");
+        //   new G4PVPlacement(G4Translate3D(5*CLHEP::mm,0,0),uBox,"u",active,false,1);
+        //   new G4PVPlacement(G4Translate3D(0,5*CLHEP::mm,0),vBox,"v",active,false,1);
+        //   new G4PVPlacement(G4Translate3D(0,0,5*CLHEP::mm),wBox,"w",active,false,1);
+        // }
 
         setColor(*active, s.activeArea.color);
         //The coordinates of the active region are given as the distance between the corners, not to the center

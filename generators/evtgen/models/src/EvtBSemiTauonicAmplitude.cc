@@ -100,7 +100,9 @@ double EvtBSemiTauonicAmplitude::CalcMaxProb(EvtId parent, EvtId meson,
 
   p_init.set(EvtPDL::getMass(parent), 0.0, 0.0, 0.0);
   scalar_part->init(parent, p_init);
-  root_part = (EvtParticle*)scalar_part;
+  //root_part = (EvtParticle*)scalar_part;
+  root_part = static_cast<EvtParticle*>(scalar_part);
+
   root_part->setDiagonalSpinDensity();
 
   EvtParticle* daughter, *lep, *trino;

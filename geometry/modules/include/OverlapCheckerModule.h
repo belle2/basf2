@@ -12,13 +12,15 @@
 #define OVERLAPCHECKERMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <display/dataobjects/DisplayData.h>
+#include <G4NavigationHistory.hh>
 
 #include <string>
 #include <vector>
 #include <set>
 
 class G4VPhysicalVolume;
-
 
 namespace Belle2 {
 
@@ -37,12 +39,11 @@ namespace Belle2 {
     /** Constructor of the module. */
     OverlapCheckerModule();
 
-    /**
-     * Initialize the module.
-     *
-     * This runs the overlap checker.
-     */
+    /** Initialize the module. */
     void initialize();
+
+    /** event function: this runs the overlap checker for each event */
+    void event();
 
   private:
 
@@ -56,12 +57,20 @@ namespace Belle2 {
      * @param path The path name identifying the mother volume.
      * @return True if the volume or one of its daughters is overlapping
      */
-    bool checkVolume(G4VPhysicalVolume* volume, const std::string& path);
+    bool checkVolume(G4VPhysicalVolume* volume, const std::string& path, int depth = 0);
 
-    int    m_points;     /**< number of test points */
-    double m_tolerance;  /**< tolerance of overlap check */
+    /** Handle a G4Exception with the overlap message issued by Geant4 */
+    void handleOverlap(const std::string& geant4Message);
+
+    int    m_points{10000}; /**< number of test points */
+    int    m_maxErrors{0}; /**< maximum number of errors before skipping current volume */
+    int    m_maxDepth{0}; /**< maximum depth to check */
+    double m_tolerance{0.}; /**< tolerance of overlap check */
+    std::string m_prefix{""}; /**< check only volumes beginning with prefix */
     std::vector<std::string> m_overlaps;  /**< list of overlapping volumes */
     std::set<G4VPhysicalVolume*> m_seen; /**< set of logical volumes we already checked */
+    G4NavigationHistory m_nav; /**< navigation history to remember coordinate transformations */
+    StoreObjPtr<DisplayData> m_displayData; /** Pointer to the DisplayData where we add the overlap points for rendering */
   };
 } //Belle2 namespace
 #endif

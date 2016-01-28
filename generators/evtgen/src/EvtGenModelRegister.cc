@@ -23,7 +23,7 @@ namespace Belle2 {
   list<EvtDecayBase*> EvtGenModelRegister::getModels()
   {
     list<EvtDecayBase*> modelList;
-    for (ModelFactory* factory : getInstance().m_models) {
+    for (auto factory : getInstance().m_models) {
       modelList.push_back(factory());
     }
     return modelList;

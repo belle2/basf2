@@ -27,8 +27,7 @@ function loadValidationPlots(package_load_name, data) {
     var revCompare_list = get_selected_revs_list()
     var comparisonLoadPath = "../comparisons/" + revCompare
     var createComparisonUrl = "../create_comparison"
-/*
-    $.get(comparisonLoadPath).done(function(data) {*/
+
         loaded_package = null
 
         console.log("Comparison data for package " + package_load_name + " loaded");
@@ -244,8 +243,6 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
                 }
             }
         }
-		
-        console.log(data);
 
         setupRactive("package", '#packages', data,
         // wire the clicks on package names
@@ -311,7 +308,7 @@ function loadSelectedRevisions(data) {
 function loadRevisions( rev_string , rev_list) {
     if (typeof rev_string === 'undefined') { rev_string = null; }
 
-    console.log("loading revs");
+    console.log("loading revisions from server");
     rev_load_path = "../revisions"
 
     $.get(rev_load_path).then(function(data) {
@@ -335,7 +332,5 @@ function loadRevisions( rev_string , rev_list) {
         }
 
         setupRactive("revision", '#revisions', data, null, setupRevisionLoader);
-
-        //setupRactiveFromRevision(data, rev_string);
     });
 }

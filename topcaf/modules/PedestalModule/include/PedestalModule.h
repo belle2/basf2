@@ -12,6 +12,7 @@
 
 
 #include <topcaf/dataobjects/EventWaveformPacket.h>
+#include <topcaf/dataobjects/EventHeaderPacket.h>
 
 namespace Belle2 {
   class PedestalModule : public Module {

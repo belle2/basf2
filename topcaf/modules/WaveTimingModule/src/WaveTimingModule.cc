@@ -61,7 +61,7 @@ void WaveTimingModule::event()
   evtheader_ptr.isRequired();
 
   //Output TOPDIgit
-  m_topdigits_ptr.clear();
+  //  m_topdigits_ptr.clear();
 
   double ftsw = 0;
   if (evtheader_ptr) {
@@ -143,8 +143,8 @@ void WaveTimingModule::event()
       }
       double time = (ftsw - coarse_t + at40_t* sample_dt);
       int TDC = (int)(time * m_time2tdc);
-      B2INFO("ChannelID: " << channelID << "\tHardwareID: " << hardwareID << "\t TDC(): " <<   TDC << "=(" << ftsw << "-" << coarse_t <<
-             "+" << at40_t << "*" <<  sample_dt << ")*" << m_time2tdc);
+      //      B2INFO("ChannelID: " << channelID << "\tHardwareID: " << hardwareID << "\t TDC(): " <<   TDC << "=(" << ftsw << "-" << coarse_t <<
+      //             "+" << at40_t << "*" <<  sample_dt << ")*" << m_time2tdc);
       //Create TOPDIGIT
       TOPDigit* this_topdigit = m_topdigits_ptr.appendNew(barID, channelID, TDC);
       this_topdigit->setADC(max_adc);

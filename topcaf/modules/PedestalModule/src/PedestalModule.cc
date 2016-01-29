@@ -112,8 +112,10 @@ void PedestalModule::beginRun()
 void PedestalModule::event()
 {
   //Get Waveform from datastore
+  StoreObjPtr<EventHeaderPacket> evthead_ptr;
   StoreArray<EventWaveformPacket> evtwaves_ptr;
   evtwaves_ptr.isRequired();
+  evthead_ptr.isRequired();
 
   if (evtwaves_ptr) {
     for (int c = 0; c < evtwaves_ptr.getEntries(); c++) {
@@ -152,7 +154,11 @@ void PedestalModule::event()
         //Look up reference pedestal and correct
         TProfile* ped_profile = m_sample2ped[channel_name];
         if (not ped_profile) {
-          B2WARNING("Problem retrieving itop pedestal data for channel " << channel_name << "!!!");
+          if (evthead_ptr->GetEventFlag() < 100) {
+            B2WARNING("Problem retrieving itop pedestal data for channel " << channel_name << "!!!");
+            evthead_ptr->SetFlag(405);
+          }
+
         } else {
           std::vector<double> v_pedcorr_samples;
           std::vector<double> v_samples = evtwave_ptr->GetSamples();

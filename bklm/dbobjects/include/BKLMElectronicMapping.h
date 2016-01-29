@@ -88,8 +88,8 @@ namespace Belle2 {
     int m_version;                             /**< map version (measurement number) */
     int m_copperId;                            /**< BKLM motherboard copper id */
     int m_slotId;                              /**< BKLM motherboard fission id should be 1,2,3 or 4*/
-    int m_axisId;                              /**< Axis id, should be 0 or 1 */
     int m_laneId;                              /**< lane id*/
+    int m_axisId;                              /**< Axis id, should be 0 or 1 */
     int m_isForward;                       /**< forward(1) or backward(0) */
     int m_sector;                              /**< which sector */
     int m_layer;                               /**< which layer*/

@@ -284,6 +284,17 @@ textarea {
 	width: 16px;
 }
 
+/* overwrite the general image size in menus */
+#menu_main_logo {
+	height: 48px !important;
+	width: 48px !important;
+}
+
+#menu_main_text {
+	font-weight: bold;
+	font-size: 120%;
+}
+
 #navigation {
 	/*box-sizing: border-box;*/
 	float: left;

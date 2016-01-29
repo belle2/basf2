@@ -144,7 +144,15 @@ class ValidationRoot(object):
     """
 
     def __init__(self, results_folder, comparison_folder):
+        """
+        class initializer, which takes the path to the folders containing the
+        validation run results and plots (aka comparison)
+        """
+
+        # folder where the results of one revision run are located
         self.results_folder = results_folder
+
+        # folder where the comparison plots and json result files are located
         self.comparison_folder = comparison_folder
 
     @cherrypy.expose
@@ -221,14 +229,13 @@ class ValidationRoot(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def comparisons(self, comparison_label=None):
+        """
+        return the json file of the comparison results of one specific comparison
+        """
 
-        if comparison_label is None:
-            comparison_list = get_json_object_list(self.comparison_folder, "comparison.json")
-            return comparison_list
-        else:
-            # todo: ensure this file is not outside of the webserver
-            full_path = os.path.join(self.comparison_folder, comparison_label, "comparison.json")
-            return deliver_json(full_path)
+        # todo: ensure this file is not outside of the webserver
+        full_path = os.path.join(self.comparison_folder, comparison_label, "comparison.json")
+        return deliver_json(full_path)
 
 
 def run_server():

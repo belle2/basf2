@@ -22,6 +22,11 @@
   margin: 20px auto;
 }
 
+.revision_label {
+    font-weight: bold;
+    font-size: 120%;
+}
+
 .fail_count_zero {
 	display: inline-block;
 	width: 30px;

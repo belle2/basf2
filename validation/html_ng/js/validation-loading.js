@@ -33,13 +33,22 @@ function loadValidationPlots(package_load_name, data) {
 
         console.log("Comparison data for package " + package_load_name + " loaded");
 
+
+        selected_list = get_selected_revs_list();
         // update the already displayed revision labels with the correct colors
         $( ".revision-label" ).each(function( index ) {
+            
+            label = $( this ).text();
             // find the revision with the same label
             for ( i in data["revisions"]) {
-                if (data["revisions"][i].label == $( this ).text()) {
+                if (data["revisions"][i].label == label) {
                     $(this).css("color", data["revisions"][i].color);
                 }
+            }
+
+            if (selected_list.indexOf(label) < 0) {
+                // the one which are not selected will be grayed out
+                $(this).css("color", "grey");            
             }
         });
 
@@ -273,8 +282,6 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
             });
     }).fail(function() {
 
-        // todo: make sure this works.
-        // failed to load, this comparison does not exist yet
         console.log("Comparison " + rev_string + " does not exist yet, requesting it")
 
         $.ajax({
@@ -288,7 +295,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
 			}).done( function(data)
             {
                 key = data["progress_key"];
-                beginCreatePlotWait( rev_list, key );
+                beginCreatePlotWait( rev_string, rev_list, key, rev_data );
         });
     });
 }
@@ -301,7 +308,9 @@ function loadSelectedRevisions(data) {
     setupRactiveFromRevision(data, rev_string, rev_list);
 }
 
-function loadRevisions() {
+function loadRevisions( rev_string , rev_list) {
+    if (typeof rev_string === 'undefined') { rev_string = null; }
+
     console.log("loading revs");
     rev_load_path = "../revisions"
 
@@ -311,7 +320,12 @@ function loadRevisions() {
         function setupRevisionLoader(ractive) {
 
             // load the defaults for the first time
-            loadSelectedRevisions(data);
+            if ( rev_string == null ) {
+                loadSelectedRevisions(data);
+            } else {
+                // otherwise, load a specific selection                
+                setupRactiveFromRevision(data, rev_string, rev_list);
+            }
 
             // be ready to load any other revision configuration if user desires
             ractive.on( 'loadSelectedRevisions', function () {

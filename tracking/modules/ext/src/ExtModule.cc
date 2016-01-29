@@ -54,6 +54,8 @@
 #include <G4StateManager.hh>
 #include <G4UImanager.hh>
 
+#define TWOPI (2.0*M_PI)
+
 using namespace std;
 using namespace Belle2;
 
@@ -407,23 +409,30 @@ void ExtModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
     int charge = gfTrackRep->getCharge(firstState);
     TVector3 firstDirection(firstMomentum.Unit());
 
+    TVector3 ipPosition(firstPosition);
+    TVector3 ipDirection(firstDirection);
     double Bz = genfit::FieldManager::getInstance()->getFieldVal(TVector3(0, 0, 0)).Z() * CLHEP::kilogauss / CLHEP::tesla;
-    double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) /
-                    (CLHEP::c_light / (CLHEP::m / CLHEP::s) * charge * Bz) * (CLHEP::m / CLHEP::cm);
-    double centerPhi = firstMomentum.Phi() - CLHEP::halfpi;
-    double centerX = firstPosition.X() + radius * cos(centerPhi);
-    double centerY = firstPosition.Y() + radius * sin(centerPhi);
-    double pocaPhi = atan2(charge * centerY, charge * centerX) + CLHEP::pi;
-    double dPhi = pocaPhi - centerPhi - CLHEP::pi;
-    if (dPhi >  CLHEP::pi) { dPhi -= CLHEP::twopi; }
-    if (dPhi < -CLHEP::pi) { dPhi += CLHEP::twopi; }
-    TVector3 ipPosition(centerX + radius * cos(pocaPhi),
-                        centerY + radius * sin(pocaPhi),
-                        firstPosition.Z() - dPhi * radius * firstDirection.Z() / firstDirection.Perp());
-    TVector3 ipDirection(sin(pocaPhi) * firstDirection.Perp(),
-                         -cos(pocaPhi) * firstDirection.Perp(),
-                         firstDirection.Z());
-    // or, approximately, ipPosition=(0,0,0) and ipDirection=(?,?,firstDirection.Z())
+    if (Bz > 0.0) {
+      double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) /
+                      (CLHEP::c_light / (CLHEP::m / CLHEP::s) * charge * Bz) *
+                      (CLHEP::m / CLHEP::cm);
+      double centerPhi = ipDirection.Phi() - M_PI_2;
+      double centerX = ipPosition.X() + radius * cos(centerPhi);
+      double centerY = ipPosition.Y() + radius * sin(centerPhi);
+      double pocaPhi = atan2(charge * centerY, charge * centerX) + M_PI;
+      double dPhi = pocaPhi - centerPhi - M_PI;
+      if (dPhi > M_PI) { dPhi -= TWOPI; }
+      if (dPhi < -M_PI) { dPhi  += TWOPI; }
+      ipPosition.SetX(centerX + radius * cos(pocaPhi));
+      ipPosition.SetY(centerY + radius * sin(pocaPhi));
+      double ipPerp = ipDirection.Perp();
+      if (ipPerp > 0.0) {
+        ipPosition.SetZ(ipPosition.Z() - dPhi * radius * ipDirection.Z() / ipPerp);
+        ipDirection.SetX(+sin(pocaPhi) * ipPerp);
+        ipDirection.SetY(-cos(pocaPhi) * ipPerp);
+      }
+      // or, approximately, ipPosition=(0,0,0) and ipDirection=(?,?,firstDirection.Z())
+    }
     firstLast = false;
     const genfit::TrackPoint* lastPoint = gfTrack->getPointWithMeasurementAndFitterInfo(-1, gfTrackRep);
     const genfit::AbsFitterInfo* lastFitterInfo = lastPoint->getFitterInfo(gfTrackRep);
@@ -441,13 +450,13 @@ void ExtModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
     if ((fabs(avgW) > 1.0E-10) && (ipDirection.Z()*lastDirection.Z() > 0.0)) {
       pathLength = fabs((lastPosition.Z() - ipPosition.Z()) / avgW);
     } else {
-      dPhi = lastDirection.Phi() - ipDirection.Phi();
-      if (dPhi < -CLHEP::pi) { dPhi += CLHEP::twopi; }
-      if (dPhi >  CLHEP::pi) { dPhi -= CLHEP::twopi; }
+      double deltaPhi = lastDirection.Phi() - ipDirection.Phi();
+      if (deltaPhi < -CLHEP::pi) { deltaPhi += CLHEP::twopi; }
+      if (deltaPhi >  CLHEP::pi) { deltaPhi -= CLHEP::twopi; }
       double dx = lastPosition.X() - ipPosition.X();
       double dy = lastPosition.Y() - ipPosition.Y();
       pathLength = sqrt(dx * dx + dy * dy) / (ipDirection.Perp() + lastDirection.Perp())
-                   * (dPhi / sin(0.5 * dPhi));
+                   * (deltaPhi / sin(0.5 * deltaPhi));
     }
     double mass = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetPDGMass() / CLHEP::GeV;
     // time of flight from I.P. (ns) at the last point on the Genfit track

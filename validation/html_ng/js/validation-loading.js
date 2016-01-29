@@ -19,6 +19,17 @@ function get_storage_id(keypath) {
     return storage_id
 }
 
+/* the popup must be installed when the user clicks the item. If the popup
+is installed once Ractive is done creating the template the popups do not work 
+any more if the user clicked on the "Overview" checkbox because new DOM items
+get created */
+function trigger_popup( item_id) {
+    $('#' + item_id).magnificPopup({
+      type:'inline',
+      midClick: true // Allow opening popup on middle mouse click. Always set it to true if you don't provide alternative source in href.
+    });
+}
+
 function loadValidationPlots(package_load_name, data) {
     console.log("Loading plots for package " + package_load_name);
 
@@ -115,11 +126,7 @@ function loadValidationPlots(package_load_name, data) {
                 if (count > 0 ){
                     $("#no_skipped_scripts").hide();
                 } 
-/*
-                $('.open-popup-link').magnificPopup({
-                  type:'inline',
-                  midClick: true // Allow opening popup on middle mouse click. Always set it to true if you don't provide alternative source in href.
-                });*/
+
             },
             // on teardown
             function(ractive) { 

@@ -138,9 +138,6 @@ class ValidationRoot(object):
     Root Validation class to handle non-static HTTP requests into the validation server.
     The two main functions are to hand out compiled json objects of revisions and comparisons
     and to start and monitor the creation of comparison plots.
-
-    @var results_folder: folder where the results of one revision run are located
-    @var comparison_folder: folder where the comparison plots and json result files are located
     """
 
     def __init__(self, results_folder, comparison_folder):
@@ -149,10 +146,10 @@ class ValidationRoot(object):
         validation run results and plots (aka comparison)
         """
 
-        # folder where the results of one revision run are located
+        #: folder where the results of one revision run are located
         self.results_folder = results_folder
 
-        # folder where the comparison plots and json result files are located
+        #: folder where the comparison plots and json result files are located
         self.comparison_folder = comparison_folder
 
     @cherrypy.expose

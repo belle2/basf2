@@ -376,7 +376,6 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return 404, json.dumps({}), 'application/json'
 
         ajax_command = path_items[ajax_location + 1]
-        print("got ajax command" + ajax_command)
 
         # Used to check if a web server is running
         if 'pingserver' == ajax_command:

@@ -436,11 +436,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
         # and now we create the table
         for el in sorted(ident):
             # split the package from the plot key
-
-            print("el" + str(el))
-
             plts = el.split(PackageSeperatorToken)[1]
-            print("plts" + str(plts))
             # prepare the ends of lines
             if (i % k) == 0:
                 end = "\n</tr>\n<tr>"

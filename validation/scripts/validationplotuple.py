@@ -67,7 +67,6 @@ class Plotuple:
         for root_object in self.list_of_root_objects:
             if root_object.is_reference:
                 self.reference = root_object
-                print(self.reference.rootfile)
                 break
 
         # If we couldn't find a reference element, add that to warnings

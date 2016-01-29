@@ -329,12 +329,10 @@ def dump_rec(top_object):
 
         # list which needs special handing ?
         if isinstance(v, list):
-            print("list " + str(type(v)) + " - " + str(v))
             obj_list = []
             for it in v:
                 # one of our object's in the list, which needs
                 # special treatment?
-                print("item  " + str(type(it)))
                 if isinstance(it, JsonBase):
                     # yen, recurse in to the object
                     obj_list.append(dump_rec(it))

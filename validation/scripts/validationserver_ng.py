@@ -218,7 +218,9 @@ class ValidationRoot(object):
             if c["most_recent"] is not None:
                 c["most_recent"] = False
 
-        newest_rev["most_recent"] = True
+        # if there are no revisions at all, this might also be just None
+        if newest_rev:
+            newest_rev["most_recent"] = True
 
         # topmost item must be dictionary for the ractive.os template to match
         return {"revisions": combined_list}

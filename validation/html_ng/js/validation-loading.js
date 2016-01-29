@@ -2,6 +2,9 @@
 
 
 function getDefaultPackageName( package_list ) {
+    if (package_list.length == 0)
+        return false;
+
    first_package_name = package_list[0].name
    if (first_package_name !='undefined') {
         return first_package_name;
@@ -220,41 +223,51 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
         // encrich the comparison data with the newest revision in this comparison
         data["newest_revision"] = newest_rev
         // update the packages with the information from the newest revision
-        for (var irev in newest_rev["packages"]) {
-            for (var ipkg in data["packages"]) {
-                if ( data["packages"][ipkg]["name"] == newest_rev["packages"][irev]["name"] ) {
-                    data["packages"][ipkg]["fail_count"] = newest_rev["packages"][irev]["fail_count"]
-                    data["packages"][ipkg]["scriptfiles"] = newest_rev["packages"][irev]["scriptfiles"]
+        // if there are no validation results at all, packages entry might not exist
+        if (newest_rev != null) {
+
+            for (var irev in newest_rev["packages"]) {
+                for (var ipkg in data["packages"]) {
+                    if ( data["packages"][ipkg]["name"] == newest_rev["packages"][irev]["name"] ) {
+                        data["packages"][ipkg]["fail_count"] = newest_rev["packages"][irev]["fail_count"]
+                        data["packages"][ipkg]["scriptfiles"] = newest_rev["packages"][irev]["scriptfiles"]
+                    }
                 }
             }
         }
 		
+        console.log(data);
+
         setupRactive("package", '#packages', data,
         // wire the clicks on package names
         function(ractive) {
-            // todo: load the package which was last time viewn by the users
-            first_package_name = getDefaultPackageName(data["packages"])
-            if (first_package_name != false)
-                loadValidationPlots(first_package_name, data);
 
+            if ( "packages" in data) {
+                // todo: load the package which was last time viewn by the users
+                first_package_name = getDefaultPackageName(data["packages"])
+                if (first_package_name != false)
+                    loadValidationPlots(first_package_name, data);
+            }
             ractive.on({
                 load_validation_plots : function( evt ) {
                     // hide all packages sub-e
                     ractive.set( 'packages.*.display_setting', 'none' );
                     
-                    pkgs =  ractive.get( 'packages');
+                    pkgs = ractive.get( 'packages');
                     
-                    for (var ipkg in pkgs) {
-                    	if ( pkgs[ipkg].name == evt.context.name ) {
-                    		// disaplay this one
-                    		ractive.set( 'packages.' + ipkg + '.display_setting', 'block' );
-                    		break;
-                    	}
+                    if (pkgs != null) {
+                        for (var ipkg in pkgs) {
+                        	if ( pkgs[ipkg].name == evt.context.name ) {
+                        		// disaplay this one
+                        		ractive.set( 'packages.' + ipkg + '.display_setting', 'block' );
+                        		break;
+                        	}
+                        }
+                        
+                        // the context will contain the json object which was
+                        // used to create this template instance
+                        loadValidationPlots( evt.context.name, data );
                     }
-                    
-                    // the context will contain the json object which was
-                    // used to create this template instance
-                    loadValidationPlots( evt.context.name, data );
                 }
                });
             });

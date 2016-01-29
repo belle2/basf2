@@ -196,10 +196,10 @@ namespace Belle2 {
     void finishTrack(Muid*, int);
 
     //! Convert GEANT4e covariance to phase-space covariance
-    TMatrixDSym fromG4eToPhasespace(const G4ErrorFreeTrajState*);
+    void fromG4eToPhasespace(const G4ErrorFreeTrajState*, TMatrixDSym&);
 
     //! Convert phase-space covariance to GEANT4e covariance
-    G4ErrorTrajErr fromPhasespaceToG4e(const TVector3&, const TMatrixDSym&);
+    void fromPhasespaceToG4e(const TVector3&, const TMatrixDSym&, G4ErrorTrajErr&);
 
     //! Pointer to the ExtManager singleton
     Simulation::ExtManager* m_ExtMgr;

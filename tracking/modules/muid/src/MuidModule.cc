@@ -541,23 +541,30 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
     int charge = gfTrackRep->getCharge(firstState);
     TVector3 firstDirection(firstMomentum.Unit());
 
+    TVector3 ipPosition(firstPosition);
+    TVector3 ipDirection(firstDirection);
     double Bz = genfit::FieldManager::getInstance()->getFieldVal(TVector3(0, 0, 0)).Z() * CLHEP::kilogauss / CLHEP::tesla;
-    double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) / (CLHEP::c_light / (CLHEP::m / CLHEP::s) * charge * Bz) *
-                    (CLHEP::m / CLHEP::cm);
-    double centerPhi = firstMomentum.Phi() - M_PI_2;
-    double centerX = firstPosition.X() + radius * cos(centerPhi);
-    double centerY = firstPosition.Y() + radius * sin(centerPhi);
-    double pocaPhi = atan2(charge * centerY, charge * centerX) + M_PI;
-    double dPhi = pocaPhi - centerPhi - M_PI;
-    if (dPhi > M_PI) { dPhi -= TWOPI; }
-    if (dPhi < -M_PI) { dPhi  += TWOPI; }
-    TVector3 ipPosition(centerX + radius * cos(pocaPhi),
-                        centerY + radius * sin(pocaPhi),
-                        firstPosition.Z() - dPhi * radius * firstDirection.Z() / firstDirection.Perp());
-    TVector3 ipDirection(sin(pocaPhi) * firstDirection.Perp(),
-                         -cos(pocaPhi) * firstDirection.Perp(),
-                         firstDirection.Z());
-    // or, approximately, ipPosition=(0,0,0) and ipDirection=(?,?,firstDirection.Z())
+    if (Bz > 0.0) {
+      double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) /
+                      (CLHEP::c_light / (CLHEP::m / CLHEP::s) * charge * Bz) *
+                      (CLHEP::m / CLHEP::cm);
+      double centerPhi = ipDirection.Phi() - M_PI_2;
+      double centerX = ipPosition.X() + radius * cos(centerPhi);
+      double centerY = ipPosition.Y() + radius * sin(centerPhi);
+      double pocaPhi = atan2(charge * centerY, charge * centerX) + M_PI;
+      double dPhi = pocaPhi - centerPhi - M_PI;
+      if (dPhi > M_PI) { dPhi -= TWOPI; }
+      if (dPhi < -M_PI) { dPhi  += TWOPI; }
+      ipPosition.SetX(centerX + radius * cos(pocaPhi));
+      ipPosition.SetY(centerY + radius * sin(pocaPhi));
+      double ipPerp = ipDirection.Perp();
+      if (ipPerp > 0.0) {
+        ipPosition.SetZ(ipPosition.Z() - dPhi * radius * ipDirection.Z() / ipPerp);
+        ipDirection.SetX(+sin(pocaPhi) * ipPerp);
+        ipDirection.SetY(-cos(pocaPhi) * ipPerp);
+      }
+      // or, approximately, ipPosition=(0,0,0) and ipDirection=(?,?,firstDirection.Z())
+    }
     firstLast = false;
     const genfit::TrackPoint* lastPoint = gfTrack->getPointWithMeasurementAndFitterInfo(-1, gfTrackRep);
     const genfit::AbsFitterInfo* lastFitterInfo = lastPoint->getFitterInfo(gfTrackRep);
@@ -575,19 +582,19 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
     if ((fabs(avgW) > 1.0E-10) && (ipDirection.Z()*lastDirection.Z() > 0.0)) {
       pathLength = fabs((lastPosition.Z() - ipPosition.Z()) / avgW);
     } else {
-      dPhi = lastDirection.Phi() - ipDirection.Phi();
-      if (dPhi < -M_PI) { dPhi += TWOPI; }
-      if (dPhi >  M_PI) { dPhi -= TWOPI; }
+      double deltaPhi = lastDirection.Phi() - ipDirection.Phi();
+      if (deltaPhi < -M_PI) { deltaPhi += TWOPI; }
+      if (deltaPhi >  M_PI) { deltaPhi -= TWOPI; }
       double dx = lastPosition.X() - ipPosition.X();
       double dy = lastPosition.Y() - ipPosition.Y();
       pathLength = sqrt(dx * dx + dy * dy) / (ipDirection.Perp() + lastDirection.Perp())
-                   * (dPhi / sin(0.5 * dPhi));
+                   * (deltaPhi / sin(0.5 * deltaPhi));
     }
     double mass = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetPDGMass() / CLHEP::GeV;
     // time of flight from I.P. (ns) at the last point on the Genfit track
     m_TOF = pathLength * (sqrt(lastMomMag * lastMomMag + mass * mass) / (lastMomMag * CLHEP::c_light / (CLHEP::cm / CLHEP::ns)));
 
-    covG4e = fromPhasespaceToG4e(lastMomentum, lastCov); // in Geant4e units (GeV/c, cm)
+    fromPhasespaceToG4e(lastMomentum, lastCov, covG4e); // covG4e in Geant4e units (GeV/c, cm)
     position.setX(lastPosition.X() * CLHEP::cm); // in Geant4 units (mm)
     position.setY(lastPosition.Y() * CLHEP::cm);
     position.setZ(lastPosition.Z() * CLHEP::cm);
@@ -703,7 +710,9 @@ void MuidModule::createEntryExitHit(const G4ErrorFreeTrajState* state, ExtHitSta
   Const::EDetector detID(Const::EDetector::invalidDetector);
   int copyID(0);
   getVolumeID(preTouch, detID, copyID);
-  ExtHit* extHit = extHits.appendNew(pdgCode, detID, copyID, status, m_TOF, pos, mom, fromG4eToPhasespace(state));
+  TMatrixDSym covariance(6);
+  fromG4eToPhasespace(state, covariance);
+  ExtHit* extHit = extHits.appendNew(pdgCode, detID, copyID, status, m_TOF, pos, mom, covariance);
   track->addRelationTo(extHit);
 
 }
@@ -732,7 +741,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track* track, int pdgCod
     // Did the track cross the inner midplane of a detector module?
     if (findBarrelIntersection(oldPosition, point)) {
       point.covariance.ResizeTo(6, 6);
-      point.covariance = fromG4eToPhasespace(state);
+      fromG4eToPhasespace(state, point.covariance);
       if (findMatchingBarrelHit(point, track)) {
         m_ExtLayerPattern |= (0x00000001 << point.layer);
         if (m_LastBarrelExtLayer < point.layer) {
@@ -766,7 +775,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track* track, int pdgCod
     // Did the track cross the inner midplane of a detector module?
     if (findEndcapIntersection(oldPosition, point)) {
       point.covariance.ResizeTo(6, 6);
-      point.covariance = fromG4eToPhasespace(state);
+      fromG4eToPhasespace(state, point.covariance);
       if (findMatchingEndcapHit(point, track)) {
         m_ExtLayerPattern |= (0x00008000 << point.layer);
         if (m_LastEndcapExtLayer < point.layer) {
@@ -806,7 +815,9 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track* track, int pdgCod
     state->SetPosition(newPos);
     G4Vector3D newMom(point.momentum.X() * CLHEP::GeV, point.momentum.Y() * CLHEP::GeV, point.momentum.Z() * CLHEP::GeV);
     state->SetMomentum(newMom);
-    state->SetError(fromPhasespaceToG4e(point.momentum, point.covariance));
+    G4ErrorTrajErr covG4e;
+    fromPhasespaceToG4e(point.momentum, point.covariance, covG4e);
+    state->SetError(covG4e);
     m_Chi2 += point.chi2;
     m_NPoint += 2; // two (orthogonal) independent hits per detector layer
     return true;
@@ -1095,9 +1106,11 @@ void MuidModule::adjustIntersection(Point& point, const double localVariance[2],
   jacobian[0][0] = nB.X()  - nA.X() * extDirBA;
   jacobian[0][1] = nB.Y()  - nA.Y() * extDirBA;
   jacobian[0][2] = nB.Z()  - nA.Z() * extDirBA;
+  jacobian[0][3] = jacobian[0][4] = jacobian[0][5] = 0.0;
   jacobian[1][0] = nC.X()  - nA.X() * extDirCA;
   jacobian[1][1] = nC.Y()  - nA.Y() * extDirCA;
   jacobian[1][2] = nC.Z()  - nA.Z() * extDirCA;
+  jacobian[1][3] = jacobian[1][4] = jacobian[1][5] = 0.0;
 
 // Residuals of EXT track and KLM hit on the nB-nC measurement plane
 
@@ -1266,7 +1279,7 @@ void MuidModule::finishTrack(Muid* muid, int charge)
 
 }
 
-TMatrixDSym MuidModule::fromG4eToPhasespace(const G4ErrorFreeTrajState* state)
+void MuidModule::fromG4eToPhasespace(const G4ErrorFreeTrajState* state, TMatrixDSym& covariance)
 {
 
   // Convert Geant4e covariance matrix with parameters 1/p, lambda, phi, yT, zT (in GeV/c, radians, cm)
@@ -1313,18 +1326,15 @@ TMatrixDSym MuidModule::fromG4eToPhasespace(const G4ErrorFreeTrajState* state)
   G4ErrorTrajErr g4eCov = state->GetError();
   G4ErrorSymMatrix phasespaceCov = g4eCov.similarity(jacobian);
 
-  TMatrixDSym covariance(6);
   for (int k = 0; k < 6; ++k) {
     for (int j = 0; j < 6; ++j) {
       covariance[j][k] = phasespaceCov[j][k];
     }
   }
 
-  return covariance;
-
 }
 
-G4ErrorTrajErr MuidModule::fromPhasespaceToG4e(const TVector3& momentum, const TMatrixDSym& covariance)
+void MuidModule::fromPhasespaceToG4e(const TVector3& momentum, const TMatrixDSym& covariance, G4ErrorTrajErr& covG4e)
 {
 
   // Convert phase-space covariance matrix with parameters x, y, z, px, py, pz (in GeV/c, cm)
@@ -1373,7 +1383,7 @@ G4ErrorTrajErr MuidModule::fromPhasespaceToG4e(const TVector3& momentum, const T
   jacobian(5, 2) = - sinLambda * sinPhi;                // @(zT)/@(y)
   jacobian(5, 3) =   cosLambda;                         // @(zT)/@(z)
 
-  return temp.similarity(jacobian);
+  covG4e = temp.similarity(jacobian);
 
 }
 

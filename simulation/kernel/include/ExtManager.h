@@ -19,12 +19,9 @@
 #include <G4ApplicationState.hh>
 #include <G4ErrorPropagatorData.hh>
 #include <G4ErrorPropagator.hh>
-// not needed #include <G4ApplicationState.hh>
 
-// not needed class G4ErrorRunManagerHelper;
 class G4ErrorTarget;
 class G4ErrorTrajState;
-
 class G4RunManager;
 class G4VUserDetectorConstruction;
 class G4VPhysicalVolume;
@@ -40,6 +37,7 @@ class G4ChordFinder;
 class G4Mag_UsualEqRhs;
 class G4VisManager;
 class G4Track;
+class G4VExceptionHandler;
 
 namespace Belle2 {
 
@@ -99,6 +97,9 @@ namespace Belle2 {
 
       //! Pointer to the simulation's SteppingAction (if any)
       G4UserSteppingAction* m_SteppingAction;
+
+      //! Pointer to the G4VExceptionHandler used in PropagateOneStep()
+      G4VExceptionHandler* m_StepExceptionHandler;
 
       //! Pointer to the (un)cached magnetic field
       G4MagneticField* m_MagneticField;

@@ -14,7 +14,6 @@
 #include <simulation/kernel/MagneticField.h>
 #include <simulation/kernel/DetectorConstruction.h>
 #include <simulation/kernel/ExtPhysicsList.h>
-// not needed #include <G4ErrorRunManagerHelper.hh>
 
 #include <vector>
 #include <string>
@@ -42,6 +41,7 @@
 #include <G4HadronicProcessStore.hh>
 #include <G4LossTableManager.hh>
 #include <G4VisExecutive.hh>
+#include <G4VExceptionHandler.hh>
 
 #include <framework/logging/Logger.h>
 
@@ -49,6 +49,26 @@ using namespace Belle2;
 using namespace Belle2::Simulation;
 
 ExtManager* ExtManager::m_Manager = NULL;
+
+//! Class to handle G4Exception raised during PropagateOneStep()
+class StepExceptionHandler: public G4VExceptionHandler {
+public:
+  //! Constructor
+  StepExceptionHandler() {}
+  //! Destructor
+  ~StepExceptionHandler() {}
+  //! G4VExceptionHandler method called when an exception is raised
+  virtual bool Notify(const char* origin, const char* code, G4ExceptionSeverity, const char* description)
+  {
+    // Is this an exception for low-momentum track that would over-curl in B field?
+    if (strstr(description, "Error returned: 3") != NULL) {
+      B2INFO("In " << origin << ", " << code << ": " << description)
+    } else {
+      B2ERROR("In " << origin << ", " << code << ": " << description)
+    }
+    return false;
+  }
+};
 
 ExtManager* ExtManager::GetManager()
 {
@@ -71,10 +91,13 @@ ExtManager::ExtManager() :
   // This flag will be PreInit if FullSimModule is not present
   m_G4State = G4StateManager::GetStateManager()->GetCurrentState();
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_PreInit);
+  // Create a private handler for G4Exceptions during PropagateOneStep
+  m_StepExceptionHandler = new StepExceptionHandler();
 }
 
 ExtManager::~ExtManager()
 {
+  delete m_StepExceptionHandler;
   if (m_Propagator) { delete m_Propagator; m_Propagator = NULL; }
   // not needed if (m_helper) delete m_helper;
   if (m_Manager) { delete m_Manager; m_Manager = NULL; }
@@ -94,7 +117,15 @@ void ExtManager::InitTrackPropagation()
 G4int ExtManager::PropagateOneStep(G4ErrorTrajState* currentTS, G4ErrorMode mode)
 {
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetMode(mode);
-  return m_Propagator->PropagateOneStep(currentTS);
+  // Remember the existing G4Exception handler
+  G4VExceptionHandler* savedHandler = G4StateManager::GetStateManager()->GetExceptionHandler();
+  // Set our own exception handler temporarily
+  G4StateManager::GetStateManager()->SetExceptionHandler(m_StepExceptionHandler);
+  // Propagate one step via geant4e
+  G4int result = m_Propagator->PropagateOneStep(currentTS);
+  // Restore the saved exception handler
+  G4StateManager::GetStateManager()->SetExceptionHandler(savedHandler);
+  return result;
 }
 
 void ExtManager::EventTermination()

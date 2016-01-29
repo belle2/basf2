@@ -49,7 +49,7 @@ from modularAnalysis import ntupleTree
 from stdLooseFSParticles import stdLoosePi
 from stdLooseFSParticles import stdLooseK
 from stdLooseFSParticles import stdLooseMu
-from stdFSParticles import stdPi0
+from stdFSParticles import goodPi0
 
 # load data
 inputMdst('B2A101-Y4SEventGeneration-gsim-BKGx1.root')
@@ -63,11 +63,11 @@ stdLooseK()
 # creates "mu+:loose" ParticleList (and c.c.)
 stdLooseMu()
 
-# creates "pi0:all", "pi0:loose" and "pi0:good" ParticleLists
+# creates "pi0:all" and "pi0:good" ParticleLists
 # pi0:all candidates are created form all good ECL clusters
-# while pi0:loose and pi0:good have to pass loose and good cut
+# while pi0:good have to pass good cut
 # on the BoostedDecisionTree output
-stdPi0()
+goodPi0()
 
 # 1. reconstruct D0 in multiple decay modes
 reconstructDecay('D0:ch1 -> K-:loose pi+:loose', '1.8 < M < 1.9', 1)

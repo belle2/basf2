@@ -25,7 +25,7 @@ from modularAnalysis import ntupleTree
 from modularAnalysis import analysis_main
 
 from stdV0s import stdKshorts
-from stdFSParticles import stdPi0
+from stdFSParticles import goodPi0
 
 # check if the required input file exists (from B2A101 example)
 import os.path
@@ -62,11 +62,11 @@ fillParticleList('p+:good', 'prid > 0.1')
 # another possibility is to use default functions
 # for example stdKshorts() from stdV0s.py that:
 # - takes all V0 candidates, performs vertex fit, and fills 'K_S0:all' ParticleList
-# or for example stdPi0() from stdFSParticles.py:
-# - that makes two-photon combinations and creates three pi0 lists with different signal efficiencies/purities
-# - the lists are 'pi0:all', 'pi0:loose', 'pi0:good'
+# or for example goodPi0() from stdFSParticles.py:
+# - that makes two-photon combinations and creates two pi0 lists with different signal efficiencies/purities
+# - the list are 'pi0:all' and 'pi0:good'
 stdKshorts()
-stdPi0()
+goodPi0()
 
 # print contents of the DataStore after loading Particles
 printDataStore()

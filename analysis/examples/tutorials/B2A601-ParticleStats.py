@@ -36,7 +36,7 @@ from modularAnalysis import analysis_main
 from modularAnalysis import summaryOfLists
 from stdLooseFSParticles import stdLoosePi
 from stdLooseFSParticles import stdLooseK
-from stdFSParticles import stdPi0
+from stdFSParticles import goodPi0
 
 filelistMIX = ['/hsm/belle2/bdata/MC/generic/mixed/mcprod1405/BGx1/mc35_mixed_BGx1_s01/mixed_e0001r0010_s01_BGx1.mdst.root']
 filelistCHG = ['/hsm/belle2/bdata/MC/generic/charged/mcprod1405/BGx1/mc35_charged_BGx1_s01/charged_e0001r0010_s01_BGx1.mdst.root']
@@ -54,11 +54,11 @@ stdLoosePi()
 # creates "K+:loose" ParticleList (and c.c.)
 stdLooseK()
 
-# creates "pi0:all", "pi0:loose" and "pi0:good" ParticleLists
+# creates "pi0:all" and "pi0:good" ParticleLists
 # pi0:all candidates are created form all good ECL clusters
-# while pi0:loose and pi0:good have to pass loose and good cut
+# while pi0:good have to pass good cut
 # on the BoostedDecisionTree output
-stdPi0()
+goodPi0()
 
 # 1. reconstruct D0 in multiple decay modes
 reconstructDecay('D0:ch1 -> K-:loose pi+:loose', '1.8 < M < 1.9 and 2.5 < useCMSFrame(p) < 5.5', 1)

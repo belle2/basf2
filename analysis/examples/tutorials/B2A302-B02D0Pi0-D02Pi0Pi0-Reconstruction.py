@@ -25,7 +25,7 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
-from stdFSParticles import stdPi0
+from stdFSParticles import goodPi0
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \
@@ -36,11 +36,11 @@ inputMdstList(filelistSIG)
 
 # use standard final state particle lists
 #
-# creates "pi0:all", "pi0:loose" and "pi0:good" ParticleLists
+# creates "pi0:all" and "pi0:good" ParticleLists
 # pi0:all candidates are created form all good ECL clusters
-# while pi0:loose and pi0:good have to pass loose and good cut
+# while pi0:good have to pass good cut
 # on the BoostedDecisionTree output
-stdPi0()
+goodPi0()
 
 # reconstruct D0 -> pi0 pi0 decay
 # keep only candidates with 1.7 < M(pi0pi0) < 2.0 GeV

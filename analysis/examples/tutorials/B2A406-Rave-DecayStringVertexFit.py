@@ -33,6 +33,7 @@ from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
 from modularAnalysis import vertexRave
 from modularAnalysis import massVertexRave
+from modularAnalysis import vertexRaveDaughtersUpdate
 from stdLooseFSParticles import stdVeryLoosePi
 from stdLooseFSParticles import stdLoosePi
 from stdLooseFSParticles import stdLooseK
@@ -58,6 +59,7 @@ stdLooseK()
 # keep only candidates with 1.8 < M(Kpi) < 1.9 GeV
 reconstructDecay('D0:kpi -> K-:loose pi+:loose', '1.8 < M < 1.9')
 reconstructDecay('D0:st -> K-:loose pi+:loose', '1.8 < M < 1.9')
+reconstructDecay('D0:du -> K-:loose pi+:loose', '1.8 < M < 1.9')
 
 # perform D0 vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
@@ -68,6 +70,10 @@ massVertexRave('D0:kpi', 0.0)
 vertexRave('D0:st', 0.0)
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
 vertexRave('D0:st', 0.0, '^D0 -> K- pi+', 'ipprofile')
+
+# perform D0 vertex fit updating daughters
+# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
+vertexRaveDaughtersUpdate('D0:du', 0.0)
 
 # reconstruct 3 times the D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
@@ -100,6 +106,7 @@ matchMCTruth('D*+:3')
 toolsDST = ['EventMetaData', '^D*+']
 toolsDST += ['InvMass[BeforeFit]', '^D*+ -> ^D0 pi+']
 toolsDST += ['CMSKinematics', '^D*+']
+toolsDST += ['Kinematics', 'D*+ -> [^D0 -> ^K- ^pi+] pi+']
 toolsDST += ['Vertex', '^D*+ -> ^D0 pi+']
 toolsDST += ['MCVertex', '^D*+ -> ^D0 pi+']
 toolsDST += ['PID', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
@@ -110,9 +117,13 @@ toolsDST += ['FlightInfo', '^D*+ -> [^D0 -> K- pi+] pi+']
 
 # create flat Ntuple for D:st (single track vertex fit)
 toolsDSTst = ['EventMetaData', '^D0']
+toolsDSTst = ['Kinematics', '^D0 -> ^K- ^pi+']
 toolsDSTst += ['Vertex', '^D0']
 toolsDSTst += ['MCVertex', '^D0']
 toolsDSTst += ['FlightInfo', '^D0 -> K- pi+']
+
+# create flat Ntuple for D:du (daughters update)
+toolsDSTdu = ['Kinematics', '^D0 -> ^K- ^pi+']
 
 # write out the flat ntuples
 ntupleFile('B2A406-Rave-DecayStringVertexFit.root')
@@ -120,6 +131,8 @@ ntupleTree('dsttree1', 'D*+:1', toolsDST)
 ntupleTree('dsttree2', 'D*+:2', toolsDST)
 ntupleTree('dsttree3', 'D*+:3', toolsDST)
 ntupleTree('d0tree1', 'D0:st', toolsDSTst)
+ntupleTree('d0tree2', 'D0:du', toolsDSTdu)
+
 
 # Process the events
 process(analysis_main)

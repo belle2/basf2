@@ -15,7 +15,6 @@ iTopRawConverterV3Module::iTopRawConverterV3Module() : Module()
   setDescription("This module is used to upack the raw data from the testbeam and crt data");
   addParam("inputFileName", m_input_filename, "Raw input filename");
   addParam("inputDirectory", m_input_directory, "Raw input file directory");
-  addParam("selectiveReadout", m_selective, "Selective read out enabled.", true);
 
   m_WfPacket = nullptr;
   m_EvtPacket = nullptr;
@@ -72,6 +71,7 @@ void iTopRawConverterV3Module::event()
 
   packet_word_t word;
 
+
   if (m_input_file.eof()) {
     B2WARNING("Reached end of file...");
     return;
@@ -102,7 +102,18 @@ void iTopRawConverterV3Module::event()
             << "\n\tblock words: 0x" << (int)cpr_hdr.block_words
             << "\n\trun: 0x" << cpr_hdr.exprun
             << "\n\tevent: " << cpr_hdr.event << " (" << std::dec << cpr_hdr.event << ")"
-            << "\n\theader (0x7f7f): 0x" << std::hex << cpr_hdr.CPR_hdr << std::dec);
+            << "\n\theader (0x7f7f): 0x" << std::hex << cpr_hdr.CPR_hdr
+            << "\n\ttrig_type: 0x" << cpr_hdr.trig_type
+            << "\n\tTT_ctime: 0x" << cpr_hdr.TT_ctime
+            << "\n\tTT_utime: 0x" << cpr_hdr.TT_utime
+            << "\n\tnode_id: 0x" << cpr_hdr.node_id
+            << "\n\tB2L1: 0x" << cpr_hdr.B2L1
+            << "\n\toffset_block1: 0x" << cpr_hdr.offset_block1
+            << "\n\toffset_block2: 0x" << cpr_hdr.offset_block2
+            << "\n\toffset_block3: 0x" << cpr_hdr.offset_block3
+            << "\n\toffset_block4: 0x" << cpr_hdr.offset_block4
+            << std::dec);
+
   }
 
   // identify HSLB buffer sizes
@@ -152,7 +163,6 @@ void iTopRawConverterV3Module::event()
     m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
     word = swap_endianess(word);
     unsigned int trigPattern = (word >> 28) & 0xF;
-    if (!m_selective) trigPattern = 0xF;
     unsigned int numWindows  = (word >> 19) & 0x1FF;
     unsigned int timeStamp   = (word) & 0x7FFFF;
     B2DEBUG(1, "FEE header...(" << std::hex << word << std::dec << ") eventSize: " << eventSize << "\ttrigPattern: 0x" << std::hex <<
@@ -161,6 +171,21 @@ void iTopRawConverterV3Module::event()
             << "\ttimestamp: 0x" << timeStamp << std::dec);
 
     bool repeatedCheck = false;
+
+    // Check to see if this looks like selective readout or not...
+    if (trigPattern == 0x0) {
+      m_prev_pos = m_input_file.tellg();
+      packet_word_t word1 = readWordUnique(word);
+      int scrod1 = (word1 >> 9) & 0x7F; // should be a scrod id...
+      packet_word_t word2 = readWordUnique(word1);
+      int scrod2 = (word2 >> 9) & 0x7F; // should be a scrod id if really a trig pattern =0, otherwise should be data...
+      if (scrod1 != scrod2) { // Then this looks like data, so guess it is older data and 0x0 actually is 0xF...
+        trigPattern = 0xF;
+        B2DEBUG(1, "Found older data, changing trigger pattern... word1: 0x"
+                << std::hex << word1 << "\t word2: " << word2 << std::dec);
+      }
+      m_input_file.seekg(m_prev_pos);
+    }
 
     for (win = 0; win <= numWindows ; win++) {
       word = readWordUnique(word);
@@ -192,6 +217,7 @@ void iTopRawConverterV3Module::event()
             col = 0;
           }
           B2DEBUG(1, "trigPattern: " << trigPattern << "\tchannel: " << channel << "\tcol: " << col);
+
           wavePacket[1] = m_scrod;
           wavePacket[2] = 0;
           wavePacket[3] = m_evt_no;
@@ -312,6 +338,7 @@ iTopRawConverterV3Module::packet_word_t iTopRawConverterV3Module::readWordUnique
 
   m_input_file.read(reinterpret_cast<char*>(&new_word), sizeof(packet_word_t));
   new_word = swap_endianess(new_word);
+
 
   while ((new_word == prev_word) && (new_word)) {
     //    B2WARNING("Repeated word found....("<<std::hex<<new_word<<std::dec<<")");

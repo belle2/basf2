@@ -154,9 +154,25 @@ namespace Belle2 {
     Manager::FunctionPtr missE(const std::vector<std::string>& arguments);
 
     /**
+     * Returns the angle between M and lepton in W rest frame in the decays of the type
+     * M -> h_1 ... h_n ell, where W 4-momentum is given as pW = p_ell + p_nu. The neutrino
+     * momentum is calculated from ROE taking into account the specified mask and setting
+     * E_nu = |p_miss|.
+     */
+    Manager::FunctionPtr cosThetaEll(const std::vector<std::string>& arguments);
+
+
+    /**
      * Returns custom variable missing mass squared over missing energy
      */
     Manager::FunctionPtr missM2OverMissE(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2,
+     * where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell
+     * The B meson momentum in CMS is assumed to be 0.
+     */
+    double q2Bh(const Particle* particle);
 
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables

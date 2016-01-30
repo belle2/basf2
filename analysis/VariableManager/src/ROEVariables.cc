@@ -384,7 +384,7 @@ namespace Belle2 {
 
       if (arguments.size() == 0) {
         maskName = "";
-        pi0CutString == "";
+        pi0CutString = "";
       } else if (arguments.size() == 1) {
         maskName = "";
         pi0CutString = arguments[0];
@@ -1023,6 +1023,79 @@ namespace Belle2 {
       return func;
     }
 
+    double q2Bh(const Particle* particle)
+    {
+      // calculates q^2 = (p_B - p_h) in decays of B -> h_1 .. h_n ell nu_ell,
+      // where p_h = Sum_i^n p_h_i is the 4-momentum of hadrons in the final
+      // state. The calculation is performed in the CMS system, where B-meson
+      // is assumed to be at rest p_B = (m_B, 0).
+
+      TLorentzVector hadron4vec;
+
+      // TODO: avoid hardocoded values
+      for (unsigned i = 0; i < particle->getNDaughters(); i++) {
+        int absPDG = abs(particle->getDaughter(i)->getPDGCode());
+        if (absPDG == 11 || absPDG == 13 || absPDG == 15)
+          continue;
+
+        hadron4vec += particle->getDaughter(i)->get4Vector();
+      }
+
+      // boost to CMS
+      PCmsLabTransform T;
+      TLorentzVector phCMS = T.rotateLabToCms() * hadron4vec;
+      TLorentzVector pBCMS;
+      pBCMS.SetXYZM(0.0, 0.0, 0.0, particle->getPDGMass());
+
+      return (pBCMS - phCMS).Mag2();
+    }
+
+    Manager::FunctionPtr cosThetaEll(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+
+      if (arguments.size() == 0)
+        maskName = "";
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("Wrong number of arguments (1 required) for meta function cosThetaEll");
+
+      auto func = [maskName](const Particle * particle) -> double {
+
+        PCmsLabTransform T;
+        TLorentzVector boostvec = T.getBoostVector();
+        TLorentzVector pNu = missing4Vector(particle, maskName, "6");
+
+        TLorentzVector pLep;
+        // TODO: avoid hardocoded values
+        for (unsigned i = 0; i < particle->getNDaughters(); i++)
+        {
+          int absPDG = abs(particle->getDaughter(i)->getPDGCode());
+          if (absPDG == 11 || absPDG == 13 || absPDG == 15) {
+            pLep = particle->getDaughter(i)->get4Vector();
+            break;
+          }
+        }
+
+        TLorentzVector pW = pNu + pLep;
+        TLorentzVector pB = particle->get4Vector() + pNu;
+
+        // boost lepton and B momentum to W frame
+        TVector3 boost2W = -(pW.BoostVector());
+        pLep.Boost(boost2W);
+        pB.Boost(boost2W);
+
+        TVector3 lep3Vector     = pLep.Vect();
+        TVector3 B3Vector       = pB.Vect();
+        double numerator   = lep3Vector.Dot(B3Vector);
+        double denominator = (lep3Vector.Mag()) * (B3Vector.Mag());
+
+        return numerator / denominator;
+      };
+      return func;
+    }
+
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------
@@ -1192,6 +1265,18 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("missE(maskName, opt)", missE,
                       "Returns the energy of the missing momentum (see possible options)");
+
+
+    REGISTER_VARIABLE("cosThetaEll(maskName)", cosThetaEll,
+                      "Returns the angle between M and lepton in W rest frame in the decays of the type\n"
+                      "M -> h_1 ... h_n ell, where W 4-momentum is given as pW = p_ell + p_nu. The neutrino\n"
+                      "momentum is calculated from ROE taking into account the specified mask and setting\n"
+                      "E_nu = |p_miss|.");
+
+    REGISTER_VARIABLE("q2Bh", q2Bh,
+                      "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"
+                      "where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell.\n"
+                      "The B meson momentum in CMS is assumed to be 0.");
 
     REGISTER_VARIABLE("missM2OverMissE(maskName)", missM2OverMissE,
                       "Returns custom variable missing mass squared over missing energy");

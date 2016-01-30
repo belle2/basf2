@@ -95,6 +95,23 @@ ExtManager::ExtManager() :
   m_StepExceptionHandler = new StepExceptionHandler();
 }
 
+// copy constructor (private: never used)
+ExtManager::ExtManager(ExtManager& e) :
+  m_G4State(e.m_G4State),
+  m_Propagator(e.m_Propagator),
+  m_G4RunMgr(e.m_G4RunMgr),
+  m_TrackingAction(e.m_TrackingAction),
+  m_SteppingAction(e.m_SteppingAction),
+  m_StepExceptionHandler(e.m_StepExceptionHandler),
+  m_MagneticField(e.m_MagneticField),
+  m_UncachedField(e.m_UncachedField),
+  m_MagFldEquation(e.m_MagFldEquation),
+  m_Stepper(e.m_Stepper),
+  m_ChordFinder(e.m_ChordFinder),
+  m_VisManager(e.m_VisManager)
+{
+}
+
 ExtManager::~ExtManager()
 {
   delete m_StepExceptionHandler;

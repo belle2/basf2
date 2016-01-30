@@ -78,8 +78,8 @@ namespace Belle2 {
       //! constructor is hidden: user calls ExtManager::GetManager() instead
       ExtManager();
 
-      //! copy constructor is hidden; avoid implicitly-declared copy constructor
-      ExtManager(ExtManager& e) = delete;
+      //! copy constructor is hidden; user calls ExtManager::GetManager() instead
+      ExtManager(ExtManager&);
 
     private:
 

@@ -14,6 +14,9 @@ env['LIBS'] = [
               'reconstruction_dataobjects',
               'top_dataobjects',
               'vxd_dataobjects',
+	      'pxd_dataobjects',
+	      'svd_dataobjects',
+	      'simulation_dataobjects',
 	          'genfit2',
               'skim_L1Emulator_dataobjects'
 	          ]

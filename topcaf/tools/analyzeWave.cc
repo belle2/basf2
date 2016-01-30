@@ -8,8 +8,10 @@
 #include <TH2F.h>
 #include <iostream>
 #include <string>
+#include <utility>
 
 using namespace std;
+using namespace Belle2;
 
 bool analyzeWave(const char* filename, int firstEvent = 0, int nEvents = 1)
 {
@@ -20,6 +22,9 @@ bool analyzeWave(const char* filename, int firstEvent = 0, int nEvents = 1)
   int iEvent = -1;
 
   TFile plotFile("plot.root", "RECREATE");
+  map<topcaf_channel_id_t, TH1F*> channelNoise; // stores the histogram of vector differences for each channel
+  map<topcaf_channel_id_t, int> channelEventMap; // stores the first occurence of a channel
+
   while (theReader.Next()) {
     iEvent += 1;
     if (iEvent < firstEvent) {
@@ -34,18 +39,29 @@ bool analyzeWave(const char* filename, int firstEvent = 0, int nEvents = 1)
     int iChannel = 0;
     int nSamples = 0;
     vector <string> channelLabels;
-    for (Belle2::EventWaveformPacket v : eventRV) {
-      channelLabels.push_back(to_string(v.GetChannelID()) + string(";") + to_string(v.GetASICWindow()));
+    for (EventWaveformPacket v : eventRV) {
       vector<double> y = v.GetSamples();
       if (y.empty()) {
         continue;
       }
+      auto channelID = v.GetChannelID();
+      channelLabels.push_back(to_string(channelID) + string(";") + to_string(v.GetASICWindow()));
+      if (channelNoise.find(channelID) == channelNoise.end()) {
+        string idName = string("noise_") + to_string(channelID);
+        channelNoise.insert(make_pair(channelID, new TH1F(idName.c_str(), idName.c_str(), 200, -100, 100)));
+        channelEventMap.insert(make_pair(channelID, iEvent));
+      }
+      TH1F* noise = channelNoise[channelID];
       if (nSamples == 0) {
         nSamples = y.size();
       }
       vector<double> x;
       // create the x axis
       for (size_t i = 0; i < y.size(); ++i) {
+        if (i < y.size() - 1) {
+          noise->Fill(y[i] - y[i + 1]);
+        }
+        // spread out y values for better plotting
         y[i] += iChannel * 1000;
         x.push_back(i);
       }
@@ -68,6 +84,13 @@ bool analyzeWave(const char* filename, int firstEvent = 0, int nEvents = 1)
     h->Draw();
     mg->Draw("P");
     plotFile.WriteTObject(c);
+  }
+  for (map<topcaf_channel_id_t, TH1F*>::iterator it = channelNoise.begin(); it != channelNoise.end(); ++it) {
+    plotFile.WriteTObject((*it).second);
+    // if more than 1% of ADC values differ by a large number from the previous value, consider channel noisy.
+    if ((*it).second->Integral(50, 150) < 0.98 * (*it).second->GetEntries()) {
+      cout << "Channel " << (*it).first << " (e.g. in event " << channelEventMap[(*it).first] << ") is noisy." << endl;
+    }
   }
   return true;
 }

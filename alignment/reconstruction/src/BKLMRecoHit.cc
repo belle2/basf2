@@ -107,12 +107,16 @@ std::vector<genfit::MeasurementOnPlane*> BKLMRecoHit::constructMeasurementsOnPla
 {
   TVectorD predFglo = state.get6DState();
   TVectorD correctedLocal(2);
+  CLHEP::Hep3Vector localmom(predFglo[3], predFglo[4], predFglo[5]);
+  localmom = module->RotateToLocal(localmom);
 
   //do correction for scintillators
   if (layer == 1 || layer == 2) {
     CLHEP::Hep3Vector global_shift_z(0, 0, predFglo[5]*halfheight_sci / sqrt(predFglo[3]*predFglo[3] + predFglo[4]*predFglo[4]));
     CLHEP::Hep3Vector local_corrected_z = module->globalToLocal(global - global_shift_z);
-    correctedLocal[0] = local_corrected_z[1];
+    double local_shift_u = localmom[1] / localmom[0] * halfheight_sci;
+    correctedLocal[0] = local_corrected_z[1] + local_shift_u;
+    //correctedLocal[0] = local_corrected_z[1];
     correctedLocal[1] = local_corrected_z[2];
   } else {
     correctedLocal[0] = rawHitCoords_[0];

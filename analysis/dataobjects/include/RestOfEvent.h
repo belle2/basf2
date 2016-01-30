@@ -96,7 +96,7 @@ namespace Belle2 {
      */
     void addKLMCluster(const KLMCluster* cluster);
 
-    /*
+    /**
      * Set the map of probabilities of ChargedStable particles. This is used whenever mass hypotheses are needed.
      * Default is pion-mass always.
      *
@@ -213,7 +213,8 @@ namespace Belle2 {
      * If fractions = {-1}, the true particle mass based on MC information will be used, if available.
      * Default is pion-mass always.
      */
-    std::map<std::string, std::vector<double>> m_fractionsSet;
+    std::map<std::string, std::vector<double>>
+                                            m_fractionsSet; /**< Map of a-priori charged FSP probabilities to be used whenever most-likely hypothesis is determined */
     std::map<std::string, std::map<unsigned int, bool>>
                                                      m_trackMasks; /**< Map of masks of values for each track to be used in ROE interpretation or not */
     std::map<std::string, std::map<unsigned int, bool>>

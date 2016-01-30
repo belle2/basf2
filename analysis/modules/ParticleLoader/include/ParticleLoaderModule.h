@@ -58,7 +58,14 @@ namespace Belle2 {
    */
   class ParticleLoaderModule : public Module {
 
+    /**
+     * tuple for collecting everything we know about the ParticlList to be created.
+     * The elements are: PDGCode, name, anti-list name, isListSelfConjugated, and the cut sequence
+     */
     typedef std::tuple<int, std::string, std::string, bool, std::shared_ptr<Variable::Cut>> PList;
+    /**
+     * Enum for describing each element in the above tuple
+     */
     enum PListIndex {
       c_PListPDGCode, c_PListName, c_AntiPListName, c_IsPListSelfConjugated, c_CutPointer
     };

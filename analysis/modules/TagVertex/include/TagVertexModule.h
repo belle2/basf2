@@ -65,7 +65,9 @@ namespace Belle2 {
      */
     virtual void event() override;
 
-
+    /**
+     * returns the BeamParameters object
+     */
     const BeamParameters& getBeamParameters() const { return *m_beamParams; }
 
 

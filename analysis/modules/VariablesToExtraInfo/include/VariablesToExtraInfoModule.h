@@ -50,20 +50,22 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
-    /**< name of input particle list. */
-    std::string m_inputListName;
-    /**< input particle list */
-    StoreObjPtr<ParticleList> m_inputList;
-    /** Map of variables and extraInfo names to save in the extra-info field. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
-    std::map<std::string, std::string> m_variables;
-    /**< Vector of function pointers corresponding to given variables. */
-    std::vector<Variable::Manager::FunctionPtr> m_functions;
-    /**< Vector of extra info names */
-    std::vector<std::string> m_extraInfoNames;
+    std::string m_inputListName; /**< name of input particle list. */
+    StoreObjPtr<ParticleList> m_inputList; /**< input particle list */
 
-    std::string m_decayString;  /**< DecayString specifying the daughter Particle to which the extra-info field will be added */
-    DecayDescriptor m_pDDescriptor;         /**< Decay descriptor of the particle being selected */
-    bool m_writeToDaughter = false;
+    /**
+     * Map of variables and extraInfo names to save in the extra-info field.
+     * Variables are taken from Variable::Manager, and are identical to those
+     * available to e.g. ParticleSelector.
+     */
+    std::map<std::string, std::string> m_variables;
+
+    std::vector<Variable::Manager::FunctionPtr> m_functions; /**< Vector of function pointers corresponding to given variables. */
+    std::vector<std::string> m_extraInfoNames; /**< Vector of extra info names */
+
+    std::string m_decayString;        /**< DecayString specifying the daughter Particle to which the extra-info field will be added */
+    DecayDescriptor m_pDDescriptor;   /**< Decay descriptor of the particle being selected */
+    bool m_writeToDaughter = false;   /**< write variable to daughter particle instead */
 
     /**
      * Adds extra info to the particle. The value is estimated for the source

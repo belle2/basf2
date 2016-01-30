@@ -732,9 +732,8 @@ namespace Belle2 {
               for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
                 Particle* pSlowPion = SlowPionList->getParticle(i);
                 if (pSlowPion != nullptr) {
-                  double probSlowPion = 0;
                   if (pSlowPion -> hasExtraInfo("isRightTrack(SlowPion)")) {
-                    probSlowPion = pSlowPion->getExtraInfo("isRightTrack(SlowPion)");
+                    double probSlowPion = pSlowPion->getExtraInfo("isRightTrack(SlowPion)");
                     if (probSlowPion > maximumProbSlowPion) {
                       maximumProbSlowPion = probSlowPion;
                       chargeTargetSlowPion =  pSlowPion -> getCharge();
@@ -772,13 +771,13 @@ namespace Belle2 {
           PCmsLabTransform T;
           TLorentzVector momSlowPion = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Slow Pion in CMS-System
           TLorentzVector momFastParticle;  //Momentum of Fast Pion in CMS-System
-          double maximumProbFastest = 0;
 
           double Output = 0.0;
 
           if ((requestedVariable == "pFastCMS") || (requestedVariable == "cosSlowFast") || (requestedVariable == "cosTPTOFast") || (requestedVariable == "SlowFastHaveOpositeCharges"))
           {
             if (FastParticleList.isValid()) {
+              double maximumProbFastest = 0;
               Particle* TargetFastParticle = nullptr;
               for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i) {
                 Particle* particlei = FastParticleList->getParticle(i);

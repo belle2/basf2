@@ -19,12 +19,14 @@ CDCFEE::CDCFEE()
 void CDCFEE::init(RCCallback& callback, HSLB& hslb)
 {
   std::string vname = StringUtil::form("cdc[%d]", hslb.get_finid());
+  LogFile::warning(vname);
   callback.add(new CDCDateHandler(vname + ".date", callback, hslb, *this));
   callback.add(new CDCFirmwareHandler(vname + ".fmver", callback, hslb, *this));
   callback.add(new CDCDataFormatHandler(vname + ".mode", callback, hslb, *this));
   callback.add(new CDCWindowHandler(vname + ".window", callback, hslb, *this));
   callback.add(new CDCDelayHandler(vname + ".delay", callback, hslb, *this));
   callback.add(new CDCADCThresholdHandler(vname + ".adcth", callback, hslb, *this));
+  callback.add(new CDCTDCThresholdHandler(vname + ".tdcth", callback, hslb, *this));
   callback.add(new CDCIndirectADCAccessHandler(vname + ".indirectadc", callback, hslb, *this));
   callback.add(new CDCDACControlHandler(vname + ".dac", callback, hslb, *this));
   callback.add(new CDCIndirectMonitorAccessHandler(vname + ".indirectmon", callback, hslb, *this));

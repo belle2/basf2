@@ -87,7 +87,7 @@ bool NSMVHandlerTTRXFirmware::handleSetText(const std::string& firmware)
 {
   if (File::exist(firmware)) {
     LogFile::info("Loading TTRX firmware: " + firmware);
-    bool ret;
+    bool ret = true;
     if ((ret = m_callback.getTTRX().boot(firmware))) {
       LogFile::info("Succeded");
     } else {
@@ -105,14 +105,43 @@ bool NSMVHandlerHSLBFirmware::handleSetText(const std::string& firmware)
   if (File::exist(firmware)) {
     LogFile::info("Loading HSLB firmware: " + firmware);
     try {
-      m_callback.getHSLB(m_hslb).bootfpga(firmware);
-      LogFile::info("Succeded");
+      std::string cmd = StringUtil::form("booths -%c ", ('a' + m_hslb)) + firmware;
+      system(cmd.c_str());
+      /*
+        m_callback.getHSLB(m_hslb).bootfpga(firmware);
+        LogFile::info("Succeded");
+      */
       return true;
     } catch (const HSLBHandlerException& e) {
       LogFile::error("Failed : %s", e.what());
     }
   } else {
     LogFile::error("HSLB firmware %s not exists", firmware.c_str());
+  }
+  return false;
+}
+
+bool NSMVHandlerHSLBBoot::handleSetText(const std::string& val)
+{
+  if (StringUtil::tolower(val) == "on") {
+    std::string vname = StringUtil::replace(getName(), ".boot", ".firm");
+    std::string firmware;
+    m_callback.get(vname, firmware);
+    if (File::exist(firmware)) {
+      LogFile::info("Loading HSLB firmware: " + firmware);
+      try {
+        std::string cmd = StringUtil::form("booths -%c ", ('a' + m_hslb)) + firmware;
+        system(cmd.c_str());
+        //m_callback.getHSLB(m_hslb).bootfpga(firmware);
+        m_callback.log(LogFile::INFO, "Loeded HSLB firm " + firmware);
+        return true;
+      } catch (const HSLBHandlerException& e) {
+        m_callback.log(LogFile::ERROR, "Failed to load HSLB firm " + firmware);
+      }
+    } else {
+      m_callback.log(LogFile::ERROR, "HSLB firmware %s not exists",
+                     firmware.c_str());
+    }
   }
   return false;
 }

@@ -11,6 +11,7 @@ int cprcdc02[] = { 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038 };
 int cprcdc03[] = { 2015, 9002, 9003, 9004, 9005, 9006, 9007 };
 int cprcdc04[] = { 2016, 2017, 2018, 2019, 2021, 2022, 2023 };
 int cprcdc05[] = { 2024, 2025, 2026, 2027, 2028, 2029, 2030 };
+int cprcdc07[] = { 2046, 2047, 2050, 2051, 2052 };
 
 int* getcopper(const char* hostname, int& ncpr, std::string& ropcname)
 {
@@ -30,6 +31,9 @@ int* getcopper(const char* hostname, int& ncpr, std::string& ropcname)
   } else if (strcmp(hostname, "cdc05") == 0) {
     ncpr = sizeof(cprcdc05) / sizeof(int);
     return cprcdc05;
+  } else if (strcmp(hostname, "cdc07") == 0) {
+    ncpr = sizeof(cprcdc07) / sizeof(int);
+    return cprcdc07;
   }
   ncpr = 0;
   return NULL;

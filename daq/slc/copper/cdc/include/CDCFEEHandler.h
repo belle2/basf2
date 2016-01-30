@@ -50,6 +50,7 @@ namespace Belle2 {
   CDC_HANDLER_INT(CDCWindowHandler);
   CDC_HANDLER_INT(CDCDelayHandler);
   CDC_HANDLER_INT(CDCADCThresholdHandler);
+  CDC_HANDLER_INT(CDCTDCThresholdHandler);
   CDC_HANDLER_INT(CDCIndirectADCAccessHandler);
   CDC_HANDLER_INT(CDCDACControlHandler);
   CDC_HANDLER_INT(CDCIndirectMonitorAccessHandler);

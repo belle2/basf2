@@ -1,6 +1,7 @@
 #include "daq/slc/copper/HSLB.h"
 
 #include <daq/slc/system/File.h>
+#include <daq/slc/system/LogFile.h>
 
 #include <daq/slc/base/StringUtil.h>
 
@@ -9,6 +10,7 @@
 
 #include <unistd.h>
 #include <cstring>
+#include <cstdlib>
 
 #define D(a,b,c) (((a)>>(c))&((1<<((b)+1-(c)))-1))
 #define B(a,b)   D(a,b,b)
@@ -54,9 +56,9 @@ void HSLB::load() throw(HSLBHandlerException)
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
   }
   linkfee();
-  if (checkfee() == "UNKNOWN") {
-    throw (HSLBHandlerException("fee on hslb-%c is not available", m_hslb.fin + 'a'));
-  }
+  //if (checkfee() == "UNKNOWN") {
+  //  throw (HSLBHandlerException("fee on hslb-%c is not available", m_hslb.fin + 'a'));
+  //}
 }
 
 bool HSLB::monitor() throw(HSLBHandlerException)
@@ -226,37 +228,51 @@ void HSLB::writefee8(int adr, int val) throw(HSLBHandlerException)
 
 int HSLB::readfee32(int adr) throw(HSLBHandlerException)
 {
+  //std::string cmd = StringUtil::form("reghs -%c fee32 0x%x", (m_hslb.fin + 'a'), adr);
+  //LogFile::info(cmd);
+  //system(cmd.c_str());
+  //return 0;
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
   }
-  writefn(HSREG_CSR,    0x05); /* reset read fifo */
-  writefn(HSREG_CSR,    0x0c); /* 32-bit parameter read */
+  /*
+  writefn(HSREG_CSR,    0x05);
+  writefn(HSREG_CSR,    0x0c);
   writefn(HSREG_SERIAL, (adr >> 8) & 0xff);
   writefn(HSREG_SERIAL, (adr >> 0) & 0xff);
-  writefn(HSREG_CSR,    0x08); /* end of stream */
+  writefn(HSREG_CSR,    0x08);
   hswait_quiet();
   return ((readfn(HSREG_D32D) & 0xff) << 24) |
          ((readfn(HSREG_D32C) & 0xff) << 16) |
          ((readfn(HSREG_D32B) & 0xff) <<  8) |
          ((readfn(HSREG_D32A) & 0xff) <<  0);
-  //return ::readfee32(m_hslb.fd, adr, valp);
+  */
+  int val;
+  ::readfee32(m_hslb.fd, adr, &val);
+  return val;
 }
 
 void HSLB::writefee32(int adr, int val) throw(HSLBHandlerException)
 {
+  //std::string cmd = StringUtil::form("reghs -%c fee32 0x%x 0x%x", (m_hslb.fin + 'a'), adr, val);
+  //LogFile::info(cmd);
+  //system(cmd.c_str());
+  //return;
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
   }
-  writefn(HSREG_CSR,    0x05); /* reset read fifo */
-  writefn(HSREG_CSR,    0x0b); /* 32-bit parameter write */
+  /*
+  writefn(HSREG_CSR,    0x05);
+  writefn(HSREG_CSR,    0x0b);
   writefn(HSREG_SERIAL, (adr >>  8) & 0xff);
   writefn(HSREG_SERIAL, (adr >>  0) & 0xff);
   writefn(HSREG_SERIAL, (val >> 24) & 0xff);
   writefn(HSREG_SERIAL, (val >> 16) & 0xff);
   writefn(HSREG_SERIAL, (val >>  8) & 0xff);
   writefn(HSREG_SERIAL, (val >>  0) & 0xff);
-  writefn(HSREG_CSR,    0x08); /* end of stream */
-  //return ::writefee32(m_hslb.fd, adr, val);
+  writefn(HSREG_CSR,    0x08);
+  */
+  ::writefee32(m_hslb.fd, adr, val);
 }
 
 void HSLB::writestream(const char* filename) throw(HSLBHandlerException)

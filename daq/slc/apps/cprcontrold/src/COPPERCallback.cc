@@ -93,18 +93,18 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       if (m_dummymode || !m_fee[i] || !o_hslb.getBool("used")) continue;
       HSLB& hslb(m_hslb[i]);
       hslb.open(i);
-      if (!(o_hslb.hasValue("dummyhslb") && o_hslb.getBool("dummyhslb"))) {
-        m_fee[i]->init(*this, hslb);
-      }
+      //if (!(o_hslb.hasValue("dummyhslb") && o_hslb.getBool("dummyhslb"))) {
+      m_fee[i]->init(*this, hslb);
+      //}
       std::string vname = StringUtil::form("hslb[%d]", i);
       add(new NSMVHandlerHSLBBelle2LinkDown(*this, vname + ".err.b2linkdown", i));
       add(new NSMVHandlerHSLBCOPPERFifoFull(*this, vname + ".err.cprfifofull", i));
       add(new NSMVHandlerHSLBCOPPERLengthFifoFull(*this, vname + ".err.cprlengthfifofull", i));
       add(new NSMVHandlerHSLBFifoFull(*this, vname + ".err.fifofull", i));
       add(new NSMVHandlerHSLBCRCError(*this, vname + ".err.crc", i));
-
       add(new NSMVHandlerHSLBFirmware(*this, vname + ".firm", i,
                                       o_hslb.hasText("firm") ? o_hslb.getText("firm") : ""));
+      add(new NSMVHandlerHSLBBoot(*this, vname + ".boot", i, "off"));
       vname = StringUtil::form("hslb[%d]", i);
       add(new NSMVHandlerInt(vname + ".reg.adr", true, true, -1));
       add(new NSMVHandlerInt(vname + ".reg.size", true, true, -1));
@@ -118,44 +118,46 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       if (m_fee[i] != NULL && obj.hasObject("fee")) {
         const DBObject& o_fee((obj("fee", i)));
         vname = StringUtil::form("fee[%d]", i);
-        if (!(o_hslb.hasValue("dummyhslb") && o_hslb.getBool("dummyhslb"))) {
-          add(new NSMVHandlerText(vname + ".name", true, false, m_fee[i]->getName()));
-          vname = StringUtil::form("fee[%d]", i);
-          if (o_fee.hasText("stream")) {
-            add(new NSMVHandlerFEEStream(*this, vname + ".stream", i,
-                                         o_fee.hasText("stream") ? o_fee.getText("stream") : ""));
-          }
-          add(new NSMVHandlerFEEBoot(*this, vname + ".boot", i));
-          add(new NSMVHandlerFEELoad(*this, vname + ".load", i));
-          vname = StringUtil::form("hslb[%d]", i);
-          add(new NSMVHandlerHSLBTest(*this, vname + ".test", i));
-          add(new NSMVHandlerHSLBCheckFee(*this, vname + ".checkfee", i));
-          bool checked = hslb.checkfee() != "UNKNOWN";
-          const hslb_info& info(hslb.getInfo());
-          add(new NSMVHandlerInt(vname + ".hw", true, false, checked ? info.feehw : -1));
-          add(new NSMVHandlerInt(vname + ".serial", true, false, checked ? info.feeserial : -1));
-          add(new NSMVHandlerText(vname + ".type", true, false,
-                                  checked ? HSLB::getFEEType(info.feehw) : "UNKNOWN"));
-          add(new NSMVHandlerInt(vname + ".ver", true, false, checked ? info.feever : -1));
-          add(new NSMVHandlerInt(vname + ".hslbid", true, false, checked ? info.hslbid : -1));
-          add(new NSMVHandlerInt(vname + ".hslbver", true, false, checked ? info.hslbver : -1));
-        } else if (initialized) {
-          if (!bootedttrx) {
-            LogFile::info("bootrx ~/run/ttrx/tt5r036.bit");
-            std::string ret = popen("bootrx ~/run/ttrx/tt5r036.bit");
-            LogFile::info(ret);
-            bootedttrx = true;
-          }
-          LogFile::info("booths -%c %s", (i + 'a'), o_hslb.getText("firm").c_str());
-          std::string ret = popen(StringUtil::form("booths -%c ", (i + 'a')) + o_hslb.getText("firm"));
-          LogFile::info(ret);
-          LogFile::info("/home/usr/b2daq/run/dumhslb/write-dumhslb -%c %s %s", (i + 'a'),
-                        o_fee.getText("randfile").c_str(), o_fee.getText("lengthfile").c_str());
-          ret = popen(StringUtil::form("/home/usr/b2daq/run/dumhslb/write-dumhslb -%c ",
-                                       (i + 'a')) + o_fee.getText("randfile") +
-                      " " + o_fee.getText("lengthfile"));
-          LogFile::info(ret);
+        //if (!(o_hslb.hasValue("dummyhslb") && o_hslb.getBool("dummyhslb"))) {
+        add(new NSMVHandlerText(vname + ".name", true, false, m_fee[i]->getName()));
+        vname = StringUtil::form("fee[%d]", i);
+        if (o_fee.hasText("stream")) {
+          add(new NSMVHandlerFEEStream(*this, vname + ".stream", i,
+                                       o_fee.hasText("stream") ? o_fee.getText("stream") : ""));
         }
+        add(new NSMVHandlerFEEBoot(*this, vname + ".boot", i));
+        add(new NSMVHandlerFEELoad(*this, vname + ".load", i));
+        vname = StringUtil::form("hslb[%d]", i);
+        add(new NSMVHandlerHSLBTest(*this, vname + ".test", i));
+        //add(new NSMVHandlerHSLBCheckFee(*this, vname + ".checkfee", i));
+        bool checked = hslb.checkfee() != "UNKNOWN";
+        const hslb_info& info(hslb.getInfo());
+        //add(new NSMVHandlerInt(vname + ".hw", true, false, checked ? info.feehw : -1));
+        //add(new NSMVHandlerInt(vname + ".serial", true, false, checked ? info.feeserial : -1));
+        //add(new NSMVHandlerText(vname + ".type", true, false,
+        //                        checked ? HSLB::getFEEType(info.feehw) : "UNKNOWN"));
+        //add(new NSMVHandlerInt(vname + ".ver", true, false, checked ? info.feever : -1));
+        //add(new NSMVHandlerInt(vname + ".hslbid", true, false, checked ? info.hslbid : -1));
+        //add(new NSMVHandlerInt(vname + ".hslbver", true, false, checked ? info.hslbver : -1));
+        /*
+            } else if (initialized) {
+              if (!bootedttrx) {
+                LogFile::info("bootrx ~/run/ttrx/tt5r036.bit");
+                std::string ret = popen("bootrx ~/run/ttrx/tt5r036.bit");
+                LogFile::info(ret);
+                bootedttrx = true;
+              }
+              LogFile::info("booths -%c %s", (i + 'a'), o_hslb.getText("firm").c_str());
+              std::string ret = popen(StringUtil::form("booths -%c ", (i + 'a')) + o_hslb.getText("firm"));
+              LogFile::info(ret);
+              LogFile::info("/home/usr/b2daq/run/dumhslb/write-dumhslb -%c %s %s", (i + 'a'),
+                            o_fee.getText("randfile").c_str(), o_fee.getText("lengthfile").c_str());
+              ret = popen(StringUtil::form("/home/usr/b2daq/run/dumhslb/write-dumhslb -%c ",
+                                           (i + 'a')) + o_fee.getText("randfile") +
+                          " " + o_fee.getText("lengthfile"));
+              LogFile::info(ret);
+            }
+        */
       }
     }
   } catch (const std::exception& e) {
@@ -220,20 +222,20 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
           HSLB& hslb(m_hslb[i]);
           hslb.open(i);
           if (!obj.hasObject("fee")) continue;
-          if (!(o_hslb.hasValue("dummyhslb") && o_hslb.getBool("dummyhslb"))) {
-            try {
-              hslb.test();
-              hslb.load();
-            } catch (const HSLBHandlerException& e) {
-              throw (RCHandlerException("Failed to load: %s", e.what()));
-            }
-            FEE& fee(*m_fee[i]);
-            try {
-              fee.load(hslb, (obj("fee", i)));
-            } catch (const IOException& e) {
-              throw (RCHandlerException(e.what()));
-            }
+          //if (!(o_hslb.hasValue("dummyhslb") && o_hslb.getBool("dummyhslb"))) {
+          try {
+            //hslb.test();
+            hslb.load();
+          } catch (const HSLBHandlerException& e) {
+            throw (RCHandlerException("Failed to load: %s", e.what()));
           }
+          FEE& fee(*m_fee[i]);
+          try {
+            fee.load(hslb, (obj("fee", i)));
+          } catch (const IOException& e) {
+            throw (RCHandlerException(e.what()));
+          }
+          //}
         }
       }
     } catch (const std::out_of_range& e) {

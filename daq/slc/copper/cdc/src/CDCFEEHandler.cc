@@ -85,6 +85,17 @@ bool CDCADCThresholdHandler::handleGetInt(int& val)
   return true;
 }
 
+bool CDCTDCThresholdHandler::handleGetInt(int& val)
+{
+  try {
+    val = (m_hslb.readfee32(0x0015)) & 0xFFFF;
+    LogFile::info("CDC FEE ADC threshold : %d", val);
+  } catch (const IOException& e) {
+    LogFile::error(e.what());
+  }
+  return true;
+}
+
 bool CDCIndirectADCAccessHandler::handleGetInt(int& val)
 {
   try {

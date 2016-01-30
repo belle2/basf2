@@ -49,7 +49,7 @@ namespace Belle2 {
     std::vector<float> ksfwFS1;
 
     std::vector<float> cleoConesAll;
-    std::vector<float> cleoConesRoe;
+    //std::vector<float> cleoConesRoe;
 
     double et[2];
 

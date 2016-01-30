@@ -98,9 +98,9 @@ namespace Belle2 {
     {
       const  Particle* t = NULL;
       StoreObjPtr<ParticleList> pionshlt("pi+:HLT");
-      double topp = -1.;
       if (pionshlt->getListSize() < 1) return t;
       else {
+        double topp = -1.;
         for (unsigned int i = 0; i < pionshlt->getListSize(); i++) {
           const Particle* t1 = pionshlt->getParticle(i);
           TLorentzVector V4p1 = t1->get4Vector();

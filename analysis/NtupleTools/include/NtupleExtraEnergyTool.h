@@ -30,7 +30,6 @@ namespace Belle2 {
   private:
 
     float* m_extraE;   /**< Energy detected in the ECL that is not associated to the given Particle. */
-    float* m_extraEGG;   /**< Energy detected in the ECL that is not associated to the given Particle (onlyECLClusters that pass goodGamma selection are used). */
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

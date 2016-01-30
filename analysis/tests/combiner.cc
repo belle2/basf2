@@ -231,7 +231,7 @@ namespace {
       return s;
     }
 
-    TestParticleList(std::string decayString) : decayString(decayString)
+    explicit TestParticleList(std::string decayString) : decayString(decayString)
     {
 
       DecayDescriptor decaydescriptor;

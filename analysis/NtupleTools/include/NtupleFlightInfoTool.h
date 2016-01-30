@@ -40,14 +40,17 @@ namespace Belle2 {
       , m_fD(0)
       , m_fDE(0)
       , m_fT(0)
-      , m_fTE(0) {
+      , m_fTE(0)
+    {
       setupTree();
     }
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
 
+    /** calculates the decay time */
     void evalFlightTime(const Particle* mother, const Particle* daughter);
 
+    /** calculates flight distance */
     void evalFlightDistance(const Particle* mother, const Particle* daughter);
   };
 

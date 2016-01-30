@@ -18,6 +18,7 @@ namespace Belle2 {
   /** Tool for NtupleMaker to write weight(s) to flat ntuple. */
   class NtupleEventWeightsTool : public NtupleFlatTool {
   private:
+    /** generated event weight */
     float m_fWeight;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

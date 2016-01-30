@@ -27,6 +27,7 @@ namespace Belle2 {
 
     /** helicity angles for A and B daughters in B-> A + B, where A and B decay 2 body */
     float m_helA;
+    /** helicity angle for second daughter */
     float m_helB;
 
     /** planar angle between the two decay planes */
@@ -39,7 +40,8 @@ namespace Belle2 {
 
     /** Constructor. */
     NtupleVVAnglesTool(TTree* tree, DecayDescriptor& decaydescriptor) :  NtupleFlatTool(tree, decaydescriptor)
-      , m_helA(0), m_helB(0), m_chi(0) {
+      , m_helA(0), m_helB(0), m_chi(0)
+    {
       setupTree();
     }
 

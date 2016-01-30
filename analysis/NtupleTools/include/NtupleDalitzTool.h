@@ -25,9 +25,11 @@ namespace Belle2 {
   class NtupleDalitzTool : public NtupleFlatTool {
   private:
 
-    /** invariant mass of daughters i and j in m_mij */
+    /** invariant mass of daughters 1 and 2 */
     float m_m12;
+    /** invariant mass of daughters 1 and 3 */
     float m_m13;
+    /** invariant mass of daughters 2 and 3 */
     float m_m23;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
@@ -37,7 +39,8 @@ namespace Belle2 {
 
     /** Constructor. */
     NtupleDalitzTool(TTree* tree, DecayDescriptor& decaydescriptor) :  NtupleFlatTool(tree, decaydescriptor)
-      , m_m12(0), m_m13(0), m_m23(0) {
+      , m_m12(0), m_m13(0), m_m23(0)
+    {
       setupTree();
     }
 

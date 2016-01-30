@@ -171,18 +171,22 @@ void BKLMRawPackerModule::event()
     for (int j = 0; j < nwords_1st; j++) {
       buf1[j] = data_words[i][0][j];
     }
+    buf1[nwords_1st] = 0; // DIVOT
 
     for (int j = 0; j < nwords_2nd; j++) {
       buf2[j] = data_words[i][1][j];
     }
+    buf2[nwords_2nd] = 0; // DIVOT
 
     for (int j = 0; j < nwords_3rd; j++) {
       buf3[j] = data_words[i][2][j];
     }
+    buf3[nwords_3rd] = 0; // DIVOT
 
     for (int j = 0; j < nwords_4th; j++) {
       buf4[j] = data_words[i][3][j];
     }
+    buf4[nwords_4th] = 0; // DIVOT
 
 
     raw_klm->PackDetectorBuf(buf1, nwords_1st + 1,

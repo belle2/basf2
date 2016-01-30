@@ -78,6 +78,9 @@ namespace Belle2 {
       //! constructor is hidden: user calls ExtManager::GetManager() instead
       ExtManager();
 
+      //! copy constructor is hidden; avoid implicitly-declared copy constructor
+      ExtManager(ExtManager& e) = delete;
+
     private:
 
       //! Stores pointer to the singleton class

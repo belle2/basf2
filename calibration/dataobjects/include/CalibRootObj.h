@@ -9,6 +9,7 @@
 #include <TList.h>
 #include <TTree.h>
 #include <TH1.h>
+#include <TH2.h>
 #include <alignment/dataobjects/MilleData.h>
 #include <framework/pcore/MapMergeable.h>
 #include <calibration/dataobjects/RunRange.h>

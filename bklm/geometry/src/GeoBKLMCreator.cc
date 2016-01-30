@@ -85,7 +85,6 @@ namespace Belle2 {
 
     GeoBKLMCreator::~GeoBKLMCreator()
     {
-      // This is never called so its memory leaks :(
       delete m_Sensitive;
       m_ScintLogicals.clear();
       for (G4VisAttributes* visAttr : m_VisAttributes) delete visAttr;
@@ -137,12 +136,10 @@ namespace Belle2 {
 
       // Get rid of the pointers used while creating the geometry
       m_ScintLogicals.clear(); // the G4LogicalVolumes themselves are needed to end of job
-      m_ScintLogicals.resize(0);
-      m_VisAttributes.clear(); // ... as are the G4VisAttributes
-      m_VisAttributes.resize(0);
-      for (G4String* name : m_Names) delete name; // ... but G4Strings are not needed anymore
+      for (G4VisAttributes* visAttr : m_VisAttributes) delete visAttr; // ... but not G4VisAttributes
+      m_VisAttributes.clear();
+      for (G4String* name : m_Names) delete name; // ... nor G4Strings
       m_Names.clear();
-      m_Names.resize(0);
     }
 
     void GeoBKLMCreator::putEndsInEnvelope(G4LogicalVolume* envelopeLogical)
@@ -473,7 +470,8 @@ namespace Belle2 {
                               Materials::get("G4_Al"),
                               "BKLM.BracketLogical"
                              );
-        m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0.6, 0.6, 0.6)));
+        m_VisAttributes.push_back(new G4VisAttributes(true));
+        m_VisAttributes.back()->SetColour(0.6, 0.6, 0.6);
         m_BracketLogical->SetVisAttributes(m_VisAttributes.back());
       }
       char name[80] = "";
@@ -608,7 +606,8 @@ namespace Belle2 {
                             Materials::get("G4_Fe"),
                             "BKLM.ChimneyHousingLogical"
                            );
-      m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0.4, 0.4, 0.4)));
+      m_VisAttributes.push_back(new G4VisAttributes(true));
+      m_VisAttributes.back()->SetColour(0.4, 0.4, 0.4);
       housingLogical->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(G4RotateY3D(M_PI_2),
                         housingLogical,
@@ -653,7 +652,8 @@ namespace Belle2 {
                             Materials::get("G4_Fe"),
                             "BKLM.ChimneyPipeLogical"
                            );
-      m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0.6, 0.6, 0.6)));
+      m_VisAttributes.push_back(new G4VisAttributes(true));
+      m_VisAttributes.back()->SetColour(0.6, 0.6, 0.6);
       pipeLogical->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(G4RotateY3D(M_PI_2),
                         pipeLogical,
@@ -789,7 +789,8 @@ namespace Belle2 {
                             m_Sensitive, // this is the only sensitive volume in BKLM
                             0 // no user limits
                            );
-      m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(1.0, 0.5, 0.0)));
+      m_VisAttributes.push_back(new G4VisAttributes(true));
+      m_VisAttributes.back()->SetColour(1.0, 0.5, 0.0);
       gasLogical->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(G4TranslateX3D(-0.5 * electrodeHalfSize.x()),
                         gasLogical,
@@ -963,7 +964,8 @@ namespace Belle2 {
       G4Box* activeBox = new G4Box(name, dx - dxTiO2, dy - dyTiO2, dz);
       G4LogicalVolume* activeLogical =
         new G4LogicalVolume(activeBox, Materials::get("G4_POLYSTYRENE"), logicalName(activeBox), 0, m_Sensitive, 0);
-      m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(1.0, 0.5, 0.0)));
+      m_VisAttributes.push_back(new G4VisAttributes(true));
+      m_VisAttributes.back()->SetColour(1.0, 0.5, 0.0);
       activeLogical->SetVisAttributes(m_VisAttributes.back());
       sprintf(name, "BKLM.ScintBoreType%dSolid", newLvol);
       G4Tubs* boreTube = new G4Tubs(name, 0.0, m_GeoPar->getScintBoreRadius() * cm, dz, 0.0, 2.0 * M_PI);
@@ -973,7 +975,8 @@ namespace Belle2 {
       sprintf(name, "BKLM.ScintFiberType%dSolid", newLvol);
       G4Tubs* fiberTube = new G4Tubs(name, 0.0, m_GeoPar->getScintFiberRadius() * cm, dz, 0.0, 2.0 * M_PI);
       G4LogicalVolume* scintFiberLogical = new G4LogicalVolume(fiberTube, Materials::get("G4_POLYSTYRENE"), logicalName(fiberTube));
-      m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0.0, 1.0, 0.0)));
+      m_VisAttributes.push_back(new G4VisAttributes(true));
+      m_VisAttributes.back()->SetColour(0.0, 1.0, 0.0);
       scintFiberLogical->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(G4TranslateZ3D(0.0),
                         scintFiberLogical,

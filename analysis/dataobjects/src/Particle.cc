@@ -14,6 +14,7 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
@@ -458,6 +459,15 @@ const Track* Particle::getTrack() const
   if (m_particleType == c_Track) {
     StoreArray<Track> tracks;
     return tracks[m_mdstIndex];
+  } else
+    return nullptr;
+}
+
+const PIDLikelihood* Particle::getPIDLikelihood() const
+{
+  if (m_particleType == c_Track) {
+    StoreArray<Track> tracks;
+    return tracks[m_mdstIndex]->getRelated<PIDLikelihood>();
   } else
     return nullptr;
 }

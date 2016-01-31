@@ -30,6 +30,7 @@ namespace Belle2 {
   class Track;
   class TrackFitResult;
   class MCParticle;
+  class PIDLikelihood;
 
   /**
    * Class to store reconstructed particles.
@@ -557,6 +558,16 @@ namespace Belle2 {
      * @return const pointer to the Track
      */
     const Track* getTrack() const;
+
+    /**
+     * Returns the pointer to the PIDLikelihood object that is related to the Track, which
+     * was used to create this Particle (ParticleType == c_Track).
+     * NULL pointer is returned, if the Particle was not made from Track or if the Track has no
+     * relation to the PIDLikelihood
+     *
+     * @return const pointer to the Track
+     */
+    const PIDLikelihood* getPIDLikelihood() const;
 
     /**
      * Returns the pointer to the ECLCluster object that was used to create this Particle (ParticleType == c_ECLCluster).

@@ -506,7 +506,7 @@ namespace Belle2 {
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, set](const Particle * particle) -> double {
-          const PIDLikelihood* pid = particle->getRelated<PIDLikelihood>();
+          const PIDLikelihood* pid = particle->getPIDLikelihood();
           if (!pid)
             return -999;
           if (not pid->isAvailable(set))

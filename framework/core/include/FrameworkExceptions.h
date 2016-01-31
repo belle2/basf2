@@ -9,10 +9,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-//(ifndef required for the rootcint dictionary building)
-#ifndef __CINT__
-
 #include <boost/format.hpp>
 
 namespace Belle2 {
@@ -53,8 +49,3 @@ namespace Belle2 {
     mutable std::string m_finalStr;\
   };
 }
-
-#else
-/** Dummy version for CINT. */
-#define BELLE2_DEFINE_EXCEPTION(ClassName, Message)
-#endif

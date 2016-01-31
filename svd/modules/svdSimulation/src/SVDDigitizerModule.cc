@@ -23,8 +23,9 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDDigit.h>
 #include <boost/tuple/tuple.hpp>
-#include <vector>
-#include <set>
+#include <algorithm>
+#include <numeric>
+#include <deque>
 #include <cmath>
 #include <root/TMath.h>
 #include <root/TRandom.h>
@@ -210,7 +211,7 @@ void SVDDigitizerModule::initialize()
     m_signalDist_u->GetXaxis()->SetTitle(
       "U strip position - TrueHit u [um]");
     m_signalDist_v = new TH1D("h_signalDist_v",
-                              "Strip signals vs. TrueHits, holes", 100, -400, 400);
+                              "Strip signals vs. TrueHits, holes", 400, -400, 400);
     m_signalDist_v->GetXaxis()->SetTitle(
       "V strip position - TrueHit v [um]");
 
@@ -371,6 +372,7 @@ void SVDDigitizerModule::processHit()
     if (m_currentHit->getGlobalTime() > stopSampling)
       return;
   }
+  StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
   // Set time of the event
   m_currentTime = m_currentHit->getGlobalTime();
 
@@ -382,7 +384,8 @@ void SVDDigitizerModule::processHit()
 
   if (m_currentHit->getPDGcode() == 22 || trackLength < 0.1 * Unit::um) {
     //Photons deposit the energy at the end of their step
-    driftCharge(stopPoint, m_currentHit->getElectrons());
+    driftCharge(stopPoint, m_currentHit->getElectrons(), SVD::SensorInfo::electron);
+    driftCharge(stopPoint, m_currentHit->getElectrons(), SVD::SensorInfo::hole);
   } else {
     //Otherwise, split into segments of (default) max. 5µm and
     //drift the charges from the center of each segment
@@ -400,245 +403,161 @@ void SVDDigitizerModule::processHit()
 
       //And drift charge from that position
       const TVector3 position = startPoint + f * direction;
-      driftCharge(position, e);
+      driftCharge(position, e, SVD::SensorInfo::electron);
+      driftCharge(position, e, SVD::SensorInfo::hole);
     }
   }
 }
 
 
-void SVDDigitizerModule::driftCharge(const TVector3& position,
-                                     double carriers)
+void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, SVD::SensorInfo::CarrierType carrierType)
 {
+  bool have_electrons = (carrierType == SVD::SensorInfo::electron);
+
+  string carrierName = (have_electrons) ? "electron" : "hole";
   B2DEBUG(30,
-          "Drifting " << carriers << " carriers at position (" << position.x() << ", " << position.y() << ", " << position.z() << ").");
+          "Drifting " << carriers << " " << carrierName << "s at position (" << position.x() << ", " << position.y() << ", " << position.z()
+          << ").");
 
   //Get references to current sensor/info for ease of use
   const SensorInfo& info = *m_currentSensorInfo;
-  Sensor& sensor = *m_currentSensor;
+  StripSignals& digits = (have_electrons) ? m_currentSensor->first : m_currentSensor->second;
 
-  double distanceToFrontPlane = 0.5 * m_sensorThickness - position.Z();
-  double distanceToBackPlane = 0.5 * m_sensorThickness + position.Z();
+  double distanceToPlane = (have_electrons) ?
+                           0.5 * m_sensorThickness - position.Z() :
+                           -0.5 * m_sensorThickness - position.Z();
 
   // Approximation: calculate drift velocity at the point halfway towards
   // the respective sensor surface.
-  TVector3 mean_e(position.X(), position.Y(), position.Z() + 0.5 * distanceToFrontPlane);
-  TVector3 mean_h(position.X(), position.Y(), position.Z() - 0.5 * distanceToBackPlane);
+  TVector3 mean_pos(position.X(), position.Y(), position.Z() + 0.5 * distanceToPlane);
 
   // Calculate drift times and widths of charge clouds.
-  // Electrons:
-  TVector3 v_e = info.getVelocity(info.electron, mean_e);
-  double driftTime_e = distanceToFrontPlane / v_e.Z();
-  TVector3 center_e = position + driftTime_e * v_e;
-  double D_e = Const::kBoltzmann * info.getTemperature() / Unit::e
-               * info.getElectronMobility(info.getEField(mean_e).Mag());
-  double sigma_e = sqrt(2.0 * D_e * driftTime_e);
-  double tanLorentz_e = v_e.X() / v_e.Z();
-  sigma_e *= sqrt(1.0 + tanLorentz_e * tanLorentz_e);
-  if (m_histLorentz_u)
-    m_histLorentz_u->Fill(tanLorentz_e);
+  TVector3 v = info.getVelocity(carrierType, mean_pos);
+  double driftTime = distanceToPlane / v.Z();
+  TVector3 center = position + driftTime * v;
+  double mobility = (have_electrons) ?
+                    info.getElectronMobility(info.getEField(mean_pos).Mag()) :
+                    info.getHoleMobility(info.getEField(mean_pos).Mag());
+  double D = Const::kBoltzmann * info.getTemperature() / Unit::e * mobility;
+  double sigma = std::max(1.0e-4, sqrt(2.0 * D * driftTime));
+  double tanLorentz = (have_electrons) ? v.X() / v.Z() : v.Y() / v.Z();
+  sigma *= sqrt(1.0 + tanLorentz * tanLorentz);
+  if (m_histLorentz_u && have_electrons) m_histLorentz_u->Fill(tanLorentz);
+  if (m_histLorentz_v && !have_electrons) m_histLorentz_v->Fill(tanLorentz);
 
-  // Holes
-  TVector3 v_h = info.getVelocity(info.hole, mean_h);
-  double driftTime_h = -distanceToBackPlane / v_h.Z();
-  TVector3 center_h = position + driftTime_h * v_h;
-  double D_h = Const::kBoltzmann * info.getTemperature() / Unit::e
-               * info.getElectronMobility(info.getEField(mean_h).Mag());
-  double sigma_h = sqrt(2.0 * D_h * driftTime_h);
-  double tanLorentz_h = v_h.Y() / v_h.Z();
-  sigma_h *= sqrt(1.0 + tanLorentz_h * tanLorentz_h);
-  if (m_histLorentz_v)
-    m_histLorentz_v->Fill(tanLorentz_h);
-
-  //Determine strips hit by the hole cloud
-  double vLow = center_h.Y() - m_widthOfDiffusCloud * sigma_h;
-  double vHigh = center_h.Y() + m_widthOfDiffusCloud * sigma_h;
-  int vIDLow = info.getVCellID(vLow, true);
-  int vIDHigh = info.getVCellID(vHigh, true);
-  B2DEBUG(30, "Size of diffusion cloud (h): " << sigma_h);
-  B2DEBUG(30, "vID from " << vIDLow << " to " << vIDHigh);
-
-  //Determine strips hit by the electron cloud
-  double uLow = center_e.X() - m_widthOfDiffusCloud * sigma_e;
-  double uHigh = center_e.X() + m_widthOfDiffusCloud * sigma_e;
-  int uIDLow = info.getUCellID(uLow, center_e.Y(), true);
-  int uIDHigh = info.getUCellID(uHigh, center_e.Y(), true);
-  B2DEBUG(30, "Size of diffusion cloud (e): " << sigma_e);
-  B2DEBUG(30, "uID from " << uIDLow << " to " << uIDHigh);
-
-  //Now loop over strips and calculate the integral of the gaussian charge distributions.
-  //Deposit the charge corresponding to the per strip integral in each strip.
-  //This is currently the only place where intermediate strips come into play:
-
-#define NORMAL_CDF(mean,sigma,x) TMath::Freq(((x)-(mean))/(sigma))
-
-  // Holes
-  // Add one more readout strip on each end of the region to make place for charges
-  // induced by capacitive coupling.
-  if (vIDLow > 0)
-    vIDLow--;
-  if (vIDHigh < info.getVCells() - 1)
-    vIDHigh++;
-  double vGeomPitch = 0.5 * info.getVPitch();
-  // We have to store the strip charges to calculate cross-talk.
-  double fraction = 0;
-  int nStrips_h = 2 * (vIDHigh - vIDLow) + 1;
-  std::vector<double> hStripCharges(nStrips_h);
-  double vPos = info.getVCellPosition(vIDLow);
-  double vLowerTail =
-    NORMAL_CDF(center_h.Y(), sigma_h, vPos - 0.5 * vGeomPitch);
-  for (int vID = 0; vID < nStrips_h; ++vID) {
-    double vUpperTail =
-      NORMAL_CDF(center_h.Y(), sigma_h, vPos + 0.5 * vGeomPitch);
-    double vIntegral = vUpperTail - vLowerTail;
-    // Can fail on far tails
-    if (TMath::IsNaN(vIntegral)) vIntegral = 0.0;
-    vLowerTail = vUpperTail;
-    double charge = carriers * vIntegral;
-    if (m_applyPoisson) {
-      //Actually, Poisson takes really long to calculate for large values.
-      //We use a (truncated) gaussian instead.
-      charge = gRandom->Gaus(charge, sqrt(info.c_fanoFactorSi * charge));
-      if (charge < 0.0) charge = 0.0;
-    }
-    hStripCharges[vID] = charge;
-    B2DEBUG(80, "Relative charge for strip (" << vIDLow + 0.5 * vID << "): " << vIntegral);
-    fraction += vIntegral;
-    if (m_histDiffusion_v && charge >= 1.0)
-      m_histDiffusion_v->Fill((vPos - center_h.Y()) / Unit::um, charge);
-    vPos += vGeomPitch;
+  //Distribute carrier cloud on strips
+  int vID = info.getVCellID(center.Y(), true);
+  int uID = info.getUCellID(center.X(), center.Y(), true);
+  int seedStrip = (have_electrons) ? uID : vID;
+  double seedPos = (have_electrons) ?
+                   info.getUCellPosition(seedStrip, vID) :
+                   info.getVCellPosition(seedStrip);
+  double geomPitch = (have_electrons) ? 0.5 * info.getUPitch(center.Y()) : 0.5 * info.getVPitch();
+  int nCells = (have_electrons) ? info.getUCells() : info.getVCells();
+  std::deque<double> stripCharges;
+  std::deque<double> strips; // intermediate strips will be half-integers, like 2.5.
+#define NORMAL_CDF(z) 0.5 * std::erfc( - (z) * 0.707107)
+  double current_pos = (have_electrons) ? seedPos - center.X() : seedPos - center.Y();
+  double current_strip = seedStrip;
+  double cdf_low = NORMAL_CDF((current_pos - 0.5 * geomPitch) / sigma);
+  double cdf_high = NORMAL_CDF((current_pos + 0.5 * geomPitch) / sigma);
+  double charge = carriers * (cdf_high - cdf_low);
+  stripCharges.push_back(charge);
+  strips.push_back(current_strip);
+  while (cdf_low > 1.0e-5) {
+    current_pos -= geomPitch;
+    current_strip -= 0.5;
+    double cdf_current = NORMAL_CDF((current_pos - 0.5 * geomPitch) / sigma);
+    charge = carriers * (cdf_low - cdf_current);
+    stripCharges.push_front(charge);
+    strips.push_front(current_strip);
+    cdf_low = cdf_current;
   }
-  B2DEBUG(30, "Fraction of charge (e): " << fraction);
-  // The strip signals combine due to capacitive coupling.
-  // FIXME: We have the same parameters for n and p strips. That can't be true,
-  // letting alone wedge sensors.
-  // Moreover, is it wise to combine things for each charglet?
-  double correctedCharge = 0;
+  current_pos = (have_electrons) ? seedPos - center.X() : seedPos - center.Y();
+  current_strip = seedStrip;
+  while (cdf_high < 1.0 - 1.0e-5) {
+    current_pos += geomPitch;
+    current_strip += 0.5;
+    double cdf_current = NORMAL_CDF((current_pos + 0.5 * geomPitch) / sigma);
+    charge = carriers * (cdf_current - cdf_high);
+    stripCharges.push_back(charge);
+    strips.push_back(current_strip);
+    cdf_high = cdf_current;
+  }
+#undef NORMAL_CDF
+  // Pad with zeros for smoothing
+  int npads = (strips.front() - floor(strips.front()) == 0) ? 4 : 3;
+  for (int i = 0; i < npads; ++i) {
+    strips.push_front(strips.front() - 0.5);
+    stripCharges.push_front(0);
+  }
+  npads = (strips.back() - floor(strips.back()) == 0) ? 4 : 3;
+  for (int i = 0; i < npads; ++i) {
+    strips.push_back(strips.back() + 0.5);
+    stripCharges.push_back(0);
+  }
+  // Cross-talk
   double cNeighbour2 = 0.5 * info.getInterstripCapacitance()
                        / (0.5 * info.getInterstripCapacitance()
                           + info.getBackplaneCapacitance()
                           + info.getCouplingCapacitance());
   double cNeighbour1 = 0.5;
   double cSelf = 1.0 - 2.0 * cNeighbour2;
-  //Leftmost strip (there must be at least one readout strip to the right):
-  int arrayIndex = 0;
-  if (vIDLow == 0) {
-    correctedCharge = (cNeighbour2 + cSelf) * hStripCharges[arrayIndex]
-                      + cNeighbour1 * hStripCharges[arrayIndex + 1]
-                      + cNeighbour2 * hStripCharges[arrayIndex + 2];
-  } else {
-    correctedCharge = cSelf * hStripCharges[arrayIndex]
-                      + cNeighbour1 * hStripCharges[arrayIndex + 1]
-                      + cNeighbour2 * hStripCharges[arrayIndex + 2];
+  std::deque<double> readoutCharges;
+  std::deque<int> readoutStrips;
+  for (int index = 2; index <  strips.size() - 2; index += 2) {
+    readoutCharges.push_back(
+      cNeighbour2 * stripCharges[index - 2]
+      + cNeighbour1 * stripCharges[index - 1]
+      + cSelf * stripCharges[index]
+      + cNeighbour1 * stripCharges[index + 1]
+      + cNeighbour2 * stripCharges[index + 2]
+    );
+    readoutStrips.push_back(static_cast<int>(strips[index]));
   }
-  sensor.second[vIDLow].add(m_currentTime + driftTime_h, correctedCharge,
-                            m_shapingTime, m_currentParticle, m_currentTrueHit);
-
-  for (int vID = vIDLow + 1; vID < vIDHigh; ++vID) {
-    arrayIndex = 2 * (vID - vIDLow);
-    correctedCharge = cNeighbour2 * hStripCharges[arrayIndex - 2]
-                      + cNeighbour1 * hStripCharges[arrayIndex - 1]
-                      + cSelf * hStripCharges[arrayIndex]
-                      + cNeighbour1 * hStripCharges[arrayIndex + 1]
-                      + cNeighbour2 * hStripCharges[arrayIndex + 2];
-    sensor.second[vID].add(m_currentTime + driftTime_h, correctedCharge,
-                           m_shapingTime, m_currentParticle, m_currentTrueHit);
+  // Trim at sensor edges
+  double tail = 0;
+  while (readoutStrips.size() > 0 && readoutStrips.front() < 0) {
+    readoutStrips.pop_front();
+    tail += readoutCharges.front();
+    readoutCharges.pop_front();
   }
-  // Rightmost strip (there must be at least one readout strip to the left):
-  arrayIndex = 2 * (vIDHigh - vIDLow);
-  if (vIDHigh == info.getVCells()) {
-    correctedCharge = cNeighbour2 * hStripCharges[arrayIndex - 2]
-                      + cNeighbour2 * hStripCharges[arrayIndex - 1]
-                      + (cSelf + cNeighbour2) * hStripCharges[arrayIndex];
-  } else {
-    correctedCharge = cNeighbour2 * hStripCharges[arrayIndex - 2]
-                      + cNeighbour2 * hStripCharges[arrayIndex - 1]
-                      + cNeighbour2 * hStripCharges[arrayIndex];
+  readoutCharges.front() += tail;
+  tail = 0;
+  while (readoutStrips.size() > 0 && readoutStrips.back() > nCells - 1) {
+    readoutStrips.pop_back();
+    tail += readoutCharges.back();
+    readoutCharges.pop_back();
   }
-  sensor.second[vIDHigh].add(m_currentTime + driftTime_h, correctedCharge,
-                             m_shapingTime, m_currentParticle, m_currentTrueHit);
-
-  //Electrons
-  // Add one more readout strip on each end of the region to make place for charges
-  // induced by capacitive coupling.
-  if (uIDLow > 0)
-    uIDLow--;
-  if (uIDHigh < info.getUCells() - 1)
-    uIDHigh++;
-  double uGeomPitch = 0.5 * info.getUPitch(center_e.Y());
-  // We have to store the strip charges to later calculate cross-talk.
-  fraction = 0;
-  int nStrips_e = 2 * (uIDHigh - uIDLow) + 1;
-  std::vector<double> eStripCharges(nStrips_e);
-  double uPos = info.getUCellPosition(uIDLow, info.getVCellID(center_e.Y()));
-  double uLowerTail =
-    NORMAL_CDF(center_e.X(), sigma_e, uPos - 0.5 * uGeomPitch);
-  for (int uID = 0; uID < nStrips_e; ++uID) {
-    double uUpperTail =
-      NORMAL_CDF(center_e.X(), sigma_e, uPos + 0.5 * uGeomPitch);
-    double uIntegral = uUpperTail - uLowerTail;
-    // Can fail on far tails
-    if (TMath::IsNaN(uIntegral)) uIntegral = 0.0;
-    uLowerTail = uUpperTail;
-    double charge = carriers * uIntegral;
-    if (m_applyPoisson) {
-      //Actually, Poisson takes really long to calculate for large values.
-      //We use a (truncated) gaussian instead.
-      charge = gRandom->Gaus(charge, sqrt(info.c_fanoFactorSi * charge));
-      if (charge < 0.0) charge = 0.0;
+  readoutCharges.back() += tail;
+  // Poisson smearing - Gaussian approximation
+  if (m_applyPoisson)
+    for (auto& c : readoutCharges)
+      c = (c <= 0) ? 0 : std::max(0.0, gRandom->Gaus(c, std::sqrt(info.c_fanoFactorSi * c)));
+  // Fill diagnostic charts
+  if (m_histDiffusion_u && m_histDiffusion_v) {
+    TH1D* histo = (have_electrons) ? m_histDiffusion_u : m_histDiffusion_v;
+    double d = (have_electrons) ? seedPos - center.X() : seedPos - center.Y();
+    for (int index = 0; index < readoutStrips.size(); ++ index) {
+      double dist = d + (readoutStrips[index] - seedStrip) * 2 * geomPitch;
+      histo->Fill(dist / Unit::um, readoutCharges[index]);
     }
-    eStripCharges[uID] = charge;
-    B2DEBUG(80, "Relative charge for strip (" << uIDLow + 0.5 * uID << "): " << uIntegral);
-    fraction += uIntegral;
-    if (m_histDiffusion_u && charge >= 1.0)
-      m_histDiffusion_u->Fill((uPos - center_e.X()) / Unit::um, charge);
-    uPos += uGeomPitch;
   }
-  B2DEBUG(30, "Fraction of charge (h): " << fraction);
-  // The strip signals combine due to capacitive coupling.
-  //Leftmost strip (there must be at least one readout strip to the right):
-  arrayIndex = 0;
-  if (uIDLow == 0) {
-    correctedCharge = cSelf * eStripCharges[arrayIndex]
-                      + cNeighbour1 * eStripCharges[arrayIndex + 1]
-                      + cNeighbour2 * eStripCharges[arrayIndex + 2];
-  } else {
-    correctedCharge = (cNeighbour2 + cSelf) * eStripCharges[arrayIndex]
-                      + cNeighbour1 * eStripCharges[arrayIndex + 1]
-                      + cNeighbour2 * eStripCharges[arrayIndex + 2];
+  // Store
+  double recoveredCharge = 0;
+  for (int index = 0; index <  readoutStrips.size(); index ++) {
+    digits[readoutStrips[index]].add(m_currentTime + driftTime, readoutCharges[index],
+                                     m_shapingTime, m_currentParticle, m_currentTrueHit);
+    recoveredCharge += readoutCharges[index];
+    B2DEBUG(30, "strip: " << readoutStrips[index] << " charge: " << readoutCharges[index]);
   }
-  sensor.first[uIDLow].add(m_currentTime + driftTime_e, correctedCharge,
-                           m_shapingTime, m_currentParticle, m_currentTrueHit);
-  for (int uID = uIDLow + 1; uID < uIDHigh; ++uID) {
-    arrayIndex = 2 * (uID - uIDLow);
-    correctedCharge = cNeighbour2 * eStripCharges[arrayIndex - 2]
-                      + cNeighbour1 * eStripCharges[arrayIndex - 1]
-                      + cSelf * eStripCharges[arrayIndex]
-                      + cNeighbour1 * eStripCharges[arrayIndex + 1]
-                      + cNeighbour2 * eStripCharges[arrayIndex + 2];
-    sensor.first[uID].add(m_currentTime + driftTime_e, correctedCharge,
-                          m_shapingTime, m_currentParticle, m_currentTrueHit);
-  }
-  // Rightmost strip (there must be at least one readout strip to the left):
-  arrayIndex = 2 * (uIDHigh - uIDLow);
-  if (uIDHigh == info.getUCells()) {
-    correctedCharge = cNeighbour2 * eStripCharges[arrayIndex - 2]
-                      + cNeighbour2 * eStripCharges[arrayIndex - 1]
-                      + (cSelf + cNeighbour2) * eStripCharges[arrayIndex];
-  } else {
-    correctedCharge = cNeighbour2 * eStripCharges[arrayIndex - 2]
-                      + cNeighbour2 * eStripCharges[arrayIndex - 1]
-                      + cSelf * eStripCharges[arrayIndex];
-  }
-  sensor.first[uIDHigh].add(m_currentTime + driftTime_e, correctedCharge,
-                            m_shapingTime, m_currentParticle, m_currentTrueHit);
-
-#undef NORMAL_CDF
+  B2DEBUG(30, "Digitized " << recoveredCharge << " of " << carriers << " original carriers.");
 }
 
 double SVDDigitizerModule::addNoise(double charge, double noise)
 {
   if (charge < 0) {
-    //Noise Pixel, add noise to exceed Noise Threshold;
+    //Noise digit, add noise to exceed Noise Threshold;
     double p = gRandom->Uniform(m_noiseFraction, 1.0);
     charge = TMath::NormQuantile(p) * noise;
   } else {

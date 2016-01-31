@@ -452,7 +452,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
         double phantomCharge = m_cutAdjacent * elNoise;
         clusterPositionError = pitch * phantomCharge / (clusterCharge + phantomCharge);
       } else {
-        double a = (clusterSize == 2) ? 1.414 : (clusterSize - 1);
+        double a = m_cutAdjacent;
         double sn = clusterCharge / elNoise;
         clusterPositionError = a * pitch / sn;
       }
@@ -467,7 +467,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
       // Rough estimates of Landau noise
       double landauHead = minStripCharge / centreCharge;
       double landauTail = maxStripCharge / centreCharge;
-      clusterPositionError = 0.5 * pitch * sqrt(2.0 / sn / sn +
+      clusterPositionError = 0.5 * pitch * sqrt(1.0 / sn / sn +
                                                 0.5 * landauHead * landauHead +
                                                 0.5 * landauTail * landauTail);
     }

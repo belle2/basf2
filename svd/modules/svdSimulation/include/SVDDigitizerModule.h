@@ -56,8 +56,9 @@ namespace Belle2 {
        * This method will drift the charge inside the silicon along the E/B fieldlines.
        * @param position start position of the charge
        * @param electrons number of electrons and holes to drift
+       * @param carrierType electrons or holes
        */
-      void driftCharge(const TVector3& position, double carriers);
+      void driftCharge(const TVector3& position, double carriers, SVD::SensorInfo::CarrierType carrierType);
 
       /** Calculate the noise contribution to one strip with given charge.
        * @param charge the original charge on the strip

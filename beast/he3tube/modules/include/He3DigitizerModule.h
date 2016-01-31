@@ -34,19 +34,14 @@ namespace Belle2 {
        * Constructor: Sets the description, the properties and the parameters of the module.
        */
       He3DigitizerModule();
-
       /**  */
       virtual ~He3DigitizerModule();
-
       /**  */
       virtual void initialize();
-
       /**  */
       virtual void beginRun();
-
       /**  */
       virtual void event();
-
       /**  */
       virtual void endRun();
       /**  */
@@ -55,18 +50,16 @@ namespace Belle2 {
     private:
 
       /** creates waveform, returns peak */
-      double WaveformMaker(std::vector<double> edepVec, std::vector<double> timeVec, std::vector<double> RVec, double lowTime);
+      double WaveformMaker(std::vector<double> edepVec, std::vector<double> timeVec, std::vector<double> RVec, double lowTime,
+                           double highTime);
       /** loads the simulated signals from a root file */
       void loadGarfieldData();
       /** Produces the impulse response function */
       virtual void impulseResponse();
       /** reads data from HE3TUBE.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();
-
       /** filename of Garfield datafile */
       std::string m_GarfDataFile;
-      /** size of waveforms */
-      static const int waveformSize = 5500;
       /** size of impulse response */
       static const int iResponseLength = 5500;
       /** number of different radius values in the simulated signal file */
@@ -74,7 +67,7 @@ namespace Belle2 {
       /** size of the garfield simulated signals */
       static const int garfSignalSize = 5000;
       /** garfied simulated signal variable */
-      double garfSignal[garfSignalSize];
+      double garfSignal[garfSignalSize] = {0};
       /** number of detectors. Read from the gearbox*/
       int numOfTubes = 0;
       /** X coordinate of tube center */

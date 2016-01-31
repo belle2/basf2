@@ -77,7 +77,7 @@ whitespace, comma or semi-colon -->
 <AngleZ unit="deg">90.0</AngleZ>
 <TPCpos_x unit="cm">45.64700</TPCpos_x>
 <TPCpos_y unit="cm">7.03894</TPCpos_y>
-<TPCpos_z unit="cm">0.40000</TPCpos_z>
+<TPCpos_z unit="cm">40.00000</TPCpos_z>
 </Active>
 <Active>
 <MaterialVessel>MICROTPC-Material</MaterialVessel>

@@ -25,7 +25,7 @@ whitespace, comma or semi-colon -->
 <MaterialGas>HE3TUBE-Material</MaterialGas>
 <x_he3tube unit="cm">48.46700</x_he3tube>
 <y_he3tube unit="cm">-10.55894</y_he3tube>
-<z_he3tube unit="cm">0.40000</z_he3tube>
+<z_he3tube unit="cm">40.00000</z_he3tube>
 <AngleX unit="deg">0.0</AngleX>
 <AngleY unit="deg">0.0</AngleY>
 <AngleZ unit="deg">0.0</AngleZ>

@@ -19,7 +19,7 @@ whitespace, comma or semi-colon -->
 <Material>PH1SUSTR-Material</Material>
 <x_tpcbeamR unit="cm">51.80000</x_tpcbeamR>
 <y_tpcbeamR unit="cm">0.80000</y_tpcbeamR>
-<z_tpcbeamR unit="cm">0.40000</z_tpcbeamR>
+<z_tpcbeamR unit="cm">40.00000</z_tpcbeamR>
 <x_tpcbeamL unit="cm">-53.20000</x_tpcbeamL>
 <y_tpcbeamL unit="cm">-0.30000</y_tpcbeamL>
 <z_tpcbeamL unit="cm">37.70000</z_tpcbeamL>

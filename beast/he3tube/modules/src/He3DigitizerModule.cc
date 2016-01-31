@@ -27,14 +27,16 @@
 #include <boost/foreach.hpp>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <vector>
+#include <stdlib.h>
 
 // ROOT
 #include <TVector3.h>
 #include <TFile.h>
 #include <TTree.h>
 #include <TString.h>
-
+#include <TSystem.h>
 
 using namespace std;
 using namespace Belle2;
@@ -194,13 +196,24 @@ void He3DigitizerModule::event()
 
 void He3DigitizerModule::loadGarfieldData()
 {
+  //expand any environment variables in the pathname
+  TString path = gSystem->ExpandPathName(m_GarfDataFile.c_str());
+
+  //check if file exists
+  ifstream infile(path);
+  if (!infile.good()) B2FATAL("Garfield data file " << m_GarfDataFile << " does not exist!");
+
+  //open the file and get the Ttree containing the waveforms
   TString file = m_GarfDataFile;
   f_sim = new TFile(file);
+
+  //check if the file contains the right TTree
+  if (!f_sim->GetListOfKeys()->Contains("garfSignals")) B2FATAL("TTree named garfSignals does not exist in " << m_GarfDataFile);
   t_sim = (TTree*)gDirectory->Get("garfSignals");
   t_sim->SetBranchAddress("signalData", &garfSignal);
-  B2DEBUG(250, "number of entries in t_sim:" << t_sim->GetEntries());
 
-  if (numRadii != t_sim->GetEntries()) B2WARNING("TTree in " << file << " does not have the correct number of entries!");
+  B2DEBUG(250, "number of entries in t_sim:" << t_sim->GetEntries());
+  if (numRadii != t_sim->GetEntries()) B2ERROR("TTree in " << file << " does not have the correct number of entries!");
 
 }
 

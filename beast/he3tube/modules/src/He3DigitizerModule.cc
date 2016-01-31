@@ -22,22 +22,15 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 
-
 //c++
 #include <cmath>
 #include <boost/foreach.hpp>
 #include <string>
-#include <sstream>
 #include <iostream>
-#include <fstream>
 #include <vector>
 
 // ROOT
 #include <TVector3.h>
-#include <TRandom.h>
-#include <TH1.h>
-#include <TH2.h>
-#include <TH3.h>
 #include <TFile.h>
 #include <TTree.h>
 #include <TString.h>
@@ -86,6 +79,7 @@ void He3DigitizerModule::initialize()
   //load the root file containing the garfield simulated signals
   loadGarfieldData();
 
+
 }
 
 void He3DigitizerModule::beginRun()
@@ -94,6 +88,7 @@ void He3DigitizerModule::beginRun()
 
 void He3DigitizerModule::event()
 {
+  B2DEBUG(250, "Beginning of event method");
 
   //there are two vectors used here that are declared in the header file:
   // TubeCenterX[] & TubeCenterY[]     - x,y coordinate of tube centers, taken from HE3TUBE.xml
@@ -101,11 +96,15 @@ void He3DigitizerModule::event()
   StoreArray<He3tubeSimHit> He3SimHits;
   StoreArray<He3tubeHit> He3Hits;
 
+
   //skip events with no He3SimHits, but continue the event counter
   if (He3SimHits.getEntries() == 0) {
+    B2DEBUG(250, "Skipping event #" << Event << " since there are no sim hits");
     Event++;
     return;
   }
+
+
 
   //vectors for energy deposit, time, and radius for each tube
   auto edepVec = new vector<double>[numOfTubes]();
@@ -114,16 +113,18 @@ void He3DigitizerModule::event()
 
 
   auto lowTime = new double[numOfTubes]();  //earliest deposit in each tube
-  std::fill_n(lowTime, numOfTubes, 9999999);
+  std::fill_n(lowTime, numOfTubes, 9999999999999);
+  auto highTime = new double[numOfTubes](); //latest deposit in each tube
   auto edepDet = new double[numOfTubes]();  //total energy deposited per tube
-  auto numInDet = new int[numOfTubes]();
 
+
+  B2DEBUG(250, "Beginning of He3tubeSimHit loop");
   int nentries = He3SimHits.getEntries();
   for (int i = 0; i < nentries; i++) {
     He3tubeSimHit* aHit = He3SimHits[i];
     double edep = aHit->getEnergyDep();
     int detNB = aHit->getdetNb();
-    if (detNB > numOfTubes) {
+    if (detNB >= numOfTubes) {
       B2WARNING("He3Digitizer: Detector number of He3tubeSimHit is greater than number implemented! Ignoring He3tubeSimHit.");
       break;
     }
@@ -131,7 +132,6 @@ void He3DigitizerModule::event()
     double x = posn.X() / 100.;
     double y = posn.Y() / 100.;
     double time = aHit->getGlTime();
-
 
     double r = sqrt((x - TubeCenterX[detNB]) * (x - TubeCenterX[detNB]) + (y - TubeCenterY[detNB]) *
                     (y - TubeCenterY[detNB])); //find radius of the energy deposit
@@ -144,43 +144,51 @@ void He3DigitizerModule::event()
 
     //find earliest time in each tube
     if (time < lowTime[detNB]) lowTime[detNB] = time;
+    if (time > highTime[detNB]) highTime[detNB] = time;
 
-    numInDet[detNB]++;
     edepDet[detNB] = edepDet[detNB] + edep;
+
+
   }
 
+  B2DEBUG(250, "End of He3tubeSimHit loop");
 
-  auto peak = new double[numOfTubes]();                                 //peak of waveform
+  //peak of waveform
+  auto peak = new double[numOfTubes]();
 
   for (int detNB = 0; detNB < numOfTubes; detNB++) {
-    if (numInDet[detNB] > 0) {
+    if (edepVec[detNB].size() > 0) {
       //create a waveform and get the peak
-      peak[detNB] = WaveformMaker(edepVec[detNB], timeVec[detNB], RVec[detNB], lowTime[detNB]) * m_ConversionFactor;
+      peak[detNB] = WaveformMaker(edepVec[detNB], timeVec[detNB], RVec[detNB], lowTime[detNB], highTime[detNB]) * m_ConversionFactor;
     }
   }
 
 
   for (int i = 0; i < numOfTubes; i++) {
-    if (numInDet[i] > 0) {
+    if (edepVec[i].size() > 0) {
       //create He3tubeHit
       He3Hits.appendNew(He3tubeHit(edepDet[i], i, peak[i], lowTime[i]));
 
       //if peak is likely from a neutron hit, print to console (only in debug mode)
-      B2DEBUG(80, "He3Digitizer: " << edepDet[i] << "MeV deposited in tube #" << i << " with waveform peak of " << peak[i]);
+      if (peak[i] > 1) B2DEBUG(80, "He3Digitizer: " << edepDet[i] << "MeV deposited in tube #" << i << " with waveform peak of " <<
+                                 peak[i]);
     }
   }
 
   Event++;
 
+
+
   //delete arrays
   delete[] peak;
   delete[] lowTime;
+  delete[] highTime;
   delete[] edepDet;
-  delete[] numInDet;
   delete[] edepVec;
   delete[] timeVec;
   delete[] RVec;
 
+  B2DEBUG(250, "End of event method");
 
 }
 
@@ -190,16 +198,24 @@ void He3DigitizerModule::loadGarfieldData()
   f_sim = new TFile(file);
   t_sim = (TTree*)gDirectory->Get("garfSignals");
   t_sim->SetBranchAddress("signalData", &garfSignal);
+  B2DEBUG(250, "number of entries in t_sim:" << t_sim->GetEntries());
+
+  if (numRadii != t_sim->GetEntries()) B2WARNING("TTree in " << file << " does not have the correct number of entries!");
+
 }
 
 
 
 //create a waveform, convolve with impulse response, return peak.
-double He3DigitizerModule::WaveformMaker(vector<double> edepVec, vector<double> timeVec, vector<double> RVec, double lowTime)
+double He3DigitizerModule::WaveformMaker(vector<double> edepVec, vector<double> timeVec, vector<double> RVec, double lowTime,
+                                         double highTime)
 {
+  B2DEBUG(250, "Beginning of WaveformMaker method");
 
-  //create an empty waveform
+  //create an empty waveform that's long enough for all the energy deposits
+  int waveformSize = (highTime - lowTime) + garfSignalSize + 100;
   auto waveform = new double[waveformSize]();
+
 
   for (int i = 0; i < (int)timeVec.size(); i++) {
     double t = (timeVec.at(i) - lowTime); //this ensures that the first energy deposit is at t=0
@@ -208,18 +224,27 @@ double He3DigitizerModule::WaveformMaker(vector<double> edepVec, vector<double> 
 
     //convert the radius to an index to get the appropriate leaf from the ttree.
     int k = round((R - rWire) / (rTube - rWire) * numRadii);
-
     t_sim->GetEntry(k);
+
 
     int SigTime = round(t);
     for (int j = 0; j < garfSignalSize; j++) {
       //add the signal induced by an electron dropped at this radius to the waveform, scale the waveform by the energy deposit
+      if (j + SigTime >= waveformSize) {
+        B2WARNING("Running over array in waveform maker!") ;
+        break;
+      }
+
       waveform[j + SigTime] = waveform[j + SigTime] + garfSignal[j] * edep / IonizationE;
     }
+
   }
+
+  B2DEBUG(250, "Raw waveform created");
 
   double peak = 99;
   double conv;
+
 
   //convolve the waveform with the transfer function and find the peak value
   for (int i = 0; i < waveformSize + iResponseLength - 1; i++) {
@@ -234,6 +259,8 @@ double He3DigitizerModule::WaveformMaker(vector<double> edepVec, vector<double> 
       if (conv < peak) peak = conv;
     }
   }
+
+  B2DEBUG(250, "raw waveform convolved with transfer function. peak of " << peak);
 
   //delete the waveform
   delete[] waveform;

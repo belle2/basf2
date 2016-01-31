@@ -135,338 +135,338 @@ Covariance Matrix (d0, phi0, omega, z0, lambda):     3.7e-05     -3e-05    3.5e-
 MCParticles:
 Charge=0, PDG=300553 (Upsilon(4S))
 pT=0.456209, pZ=2.99736
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Charge=0, PDG=511 (B0)
 pT=0.212243, pZ=1.33648
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=0, PDG=511 (B0)
 pT=0.354357, pZ=1.66088
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=-1, PDG=-413 (D*-)
 pT=0.80461, pZ=-0.0383369
-V=(0.00, 0.00, 0.01)
+V=(14.069, 16.061, 134.449) um
 Mother: MCParticles[1] (B0)
 Charge=1, PDG=211 (pi+)
 pT=0.162552, pZ=0.284466
-V=(0.00, 0.00, 0.01)
+V=(14.069, 16.061, 134.449) um
 Mother: MCParticles[1] (B0)
 Charge=0, PDG=2112 (n0)
 pT=0.599614, pZ=0.698901
-V=(0.00, 0.00, 0.01)
+V=(14.069, 16.061, 134.449) um
 Mother: MCParticles[1] (B0)
 Charge=-1, PDG=-2212 (anti-p-)
 pT=0.637435, pZ=0.228688
-V=(0.00, 0.00, 0.01)
+V=(14.069, 16.061, 134.449) um
 Mother: MCParticles[1] (B0)
 Charge=0, PDG=111 (pi0)
 pT=0.0503215, pZ=-0.0757336
-V=(0.00, 0.00, 0.01)
+V=(14.069, 16.061, 134.449) um
 Mother: MCParticles[1] (B0)
 Charge=1, PDG=211 (pi+)
 pT=0.0971986, pZ=0.238495
-V=(0.00, 0.00, 0.01)
+V=(14.069, 16.061, 134.449) um
 Mother: MCParticles[1] (B0)
 Charge=-1, PDG=-411 (D-)
 pT=0.575957, pZ=1.43852
-V=(0.01, -0.00, 0.05)
+V=(94.185, -47.531, 494.477) um
 Mother: MCParticles[2] (B0)
 Charge=1, PDG=211 (pi+)
 pT=0.129426, pZ=-0.135914
-V=(0.01, -0.00, 0.05)
+V=(94.185, -47.531, 494.477) um
 Mother: MCParticles[2] (B0)
 Charge=0, PDG=111 (pi0)
 pT=0.199519, pZ=0.195395
-V=(0.01, -0.00, 0.05)
+V=(94.185, -47.531, 494.477) um
 Mother: MCParticles[2] (B0)
 Charge=0, PDG=313 (K*0)
 pT=0.869108, pZ=0.290159
-V=(0.01, -0.00, 0.05)
+V=(94.185, -47.531, 494.477) um
 Mother: MCParticles[2] (B0)
 Charge=-1, PDG=-321 (K-)
 pT=0.514844, pZ=-0.396625
-V=(0.01, -0.00, 0.05)
+V=(94.185, -47.531, 494.477) um
 Mother: MCParticles[2] (B0)
 Charge=1, PDG=211 (pi+)
 pT=0.0693363, pZ=0.299906
-V=(0.01, -0.00, 0.05)
+V=(94.185, -47.531, 494.477) um
 Mother: MCParticles[2] (B0)
 Charge=-1, PDG=-411 (D-)
 pT=0.744774, pZ=-0.056751
-V=(0.00, 0.00, 0.01)
+V=(14.069, 16.061, 134.449) um
 Mother: MCParticles[3] (D*-)
 Charge=0, PDG=111 (pi0)
 pT=0.0682409, pZ=0.0184134
-V=(0.00, 0.00, 0.01)
+V=(14.069, 16.061, 134.449) um
 Mother: MCParticles[3] (D*-)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0157929, pZ=-0.0252615
-V=(-29.70, 137.57, 42.05)
+V=(-29.702, 137.569, 42.049) cm
 Mother: MCParticles[6] (anti-p-)
 Charge=1, PDG=-13 (mu+)
 pT=0.0157929, pZ=0.0252615
-V=(-29.70, 137.57, 42.05)
+V=(-29.702, 137.569, 42.049) cm
 Mother: MCParticles[6] (anti-p-)
 Charge=0, PDG=22 (gamma)
 pT=0.0498056, pZ=-0.0162386
-V=(-29.07, 134.56, 47.55)
+V=(-29.067, 134.558, 47.548) cm
 Mother: MCParticles[6] (anti-p-)
 Charge=0, PDG=22 (gamma)
 pT=0.0383392, pZ=0.135446
-V=(-29.07, 134.56, 47.55)
+V=(-29.067, 134.558, 47.548) cm
 Mother: MCParticles[6] (anti-p-)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0293449, pZ=-0.00514173
-V=(12.80, 112.56, 47.32)
+V=(12.798, 112.559, 47.324) cm
 Mother: MCParticles[6] (anti-p-)
 Charge=1, PDG=-13 (mu+)
 pT=0.0293449, pZ=0.00514173
-V=(12.80, 112.56, 47.32)
+V=(12.798, 112.559, 47.324) cm
 Mother: MCParticles[6] (anti-p-)
 Charge=0, PDG=22 (gamma)
 pT=0.0963778, pZ=-0.0398627
-V=(0.00, 0.00, 0.01)
+V=(14.070, 16.061, 134.448) um
 Mother: MCParticles[7] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0461526, pZ=-0.03587
-V=(0.00, 0.00, 0.01)
+V=(14.070, 16.061, 134.448) um
 Mother: MCParticles[7] (pi0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0324349, pZ=0.100601
-V=(19.79, -11.38, 364.28)
+V=(19.789, -11.377, 364.276) cm
 Mother: MCParticles[8] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.0706454, pZ=0.120832
-V=(19.79, -11.38, 364.28)
+V=(19.789, -11.377, 364.276) cm
 Mother: MCParticles[8] (pi+)
 Charge=0, PDG=313 (K*0)
 pT=0.456197, pZ=0.684448
-V=(0.01, -0.01, 0.06)
+V=(71.711, -57.954, 556.352) um
 Mother: MCParticles[9] (D-)
 Charge=-1, PDG=13 (mu-)
 pT=0.505691, pZ=0.897533
-V=(0.01, -0.01, 0.06)
+V=(71.711, -57.954, 556.352) um
 Mother: MCParticles[9] (D-)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.106305, pZ=-0.146913
-V=(0.01, -0.01, 0.06)
+V=(71.711, -57.954, 556.352) um
 Mother: MCParticles[9] (D-)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0143568, pZ=0.0261043
-V=(-51.39, -6.07, -96.85)
+V=(-51.391, -6.066, -96.851) cm
 Mother: MCParticles[10] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.0143568, pZ=-0.0261043
-V=(-51.39, -6.07, -96.85)
+V=(-51.391, -6.066, -96.851) cm
 Mother: MCParticles[10] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.167647, pZ=0.10728
-V=(0.01, -0.00, 0.05)
+V=(94.208, -47.570, 494.522) um
 Mother: MCParticles[11] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0677291, pZ=0.0881136
-V=(0.01, -0.00, 0.05)
+V=(94.208, -47.570, 494.522) um
 Mother: MCParticles[11] (pi0)
 Charge=0, PDG=311 (K0)
 pT=0.891619, pZ=-0.0659536
-V=(0.01, -0.00, 0.05)
+V=(94.185, -47.531, 494.477) um
 Mother: MCParticles[12] (K*0)
 Charge=0, PDG=111 (pi0)
 pT=0.181187, pZ=0.32557
-V=(0.01, -0.00, 0.05)
+V=(94.185, -47.531, 494.477) um
 Mother: MCParticles[12] (K*0)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.370361, pZ=-0.0320351
-V=(-66.36, 82.21, -84.59)
+V=(-66.362, 82.207, -84.595) cm
 Mother: MCParticles[13] (K-)
 Charge=-1, PDG=13 (mu-)
 pT=0.22941, pZ=-0.344436
-V=(-66.36, 82.21, -84.59)
+V=(-66.362, 82.207, -84.595) cm
 Mother: MCParticles[13] (K-)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0199685, pZ=0.118891
-V=(-0.44, -24.82, 248.11)
+V=(-0.441, -24.820, 248.107) cm
 Mother: MCParticles[14] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.045978, pZ=0.14567
-V=(-0.44, -24.82, 248.11)
+V=(-0.441, -24.820, 248.107) cm
 Mother: MCParticles[14] (pi+)
 Charge=0, PDG=311 (K0)
 pT=0.996551, pZ=-0.368455
-V=(-0.00, 0.00, 0.01)
+V=(-3.398, 5.869, 132.908) um
 Mother: MCParticles[15] (D-)
 Charge=-1, PDG=11 (e-)
 pT=0.106333, pZ=-0.222222
-V=(-0.00, 0.00, 0.01)
+V=(-3.398, 5.869, 132.908) um
 Mother: MCParticles[15] (D-)
 Charge=0, PDG=-12 (anti-nu_e)
 pT=0.25957, pZ=0.53394
-V=(-0.00, 0.00, 0.01)
+V=(-3.398, 5.869, 132.908) um
 Mother: MCParticles[15] (D-)
 Charge=0, PDG=22 (gamma)
 pT=6.84424e-06, pZ=-1.42547e-05
-V=(-0.00, 0.00, 0.01)
+V=(-3.398, 5.869, 132.908) um
 Mother: MCParticles[15] (D-)
 Charge=0, PDG=22 (gamma)
 pT=0.0688161, pZ=0.0383338
-V=(0.00, 0.00, 0.01)
+V=(14.062, 16.061, 134.452) um
 Mother: MCParticles[16] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0708431, pZ=-0.0199204
-V=(0.00, 0.00, 0.01)
+V=(14.062, 16.061, 134.452) um
 Mother: MCParticles[16] (pi0)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.023997, pZ=0.0123198
-V=(-29.71, 137.59, 42.10)
+V=(-29.715, 137.593, 42.103) cm
 Mother: MCParticles[18] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0191993, pZ=0.0184386
-V=(-29.71, 137.59, 42.10)
+V=(-29.715, 137.593, 42.103) cm
 Mother: MCParticles[18] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0411394, pZ=-0.0310648
-V=(-29.71, 137.59, 42.10)
+V=(-29.715, 137.593, 42.103) cm
 Mother: MCParticles[18] (mu+)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0311424, pZ=-0.0188304
-V=(12.70, 112.58, 47.34)
+V=(12.699, 112.575, 47.344) cm
 Mother: MCParticles[22] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.011298, pZ=0.03806
-V=(12.70, 112.58, 47.34)
+V=(12.699, 112.575, 47.344) cm
 Mother: MCParticles[22] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0214664, pZ=-0.0195708
-V=(12.70, 112.58, 47.34)
+V=(12.699, 112.575, 47.344) cm
 Mother: MCParticles[22] (mu+)
 Charge=1, PDG=321 (K+)
 pT=0.482485, pZ=0.628116
-V=(0.01, -0.01, 0.06)
+V=(71.711, -57.954, 556.352) um
 Mother: MCParticles[27] (K*0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.232928, pZ=0.0597669
-V=(0.01, -0.01, 0.06)
+V=(71.711, -57.954, 556.352) um
 Mother: MCParticles[27] (K*0)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0112622, pZ=-0.0215237
-V=(-51.32, -6.08, -96.98)
+V=(-51.320, -6.081, -96.975) cm
 Mother: MCParticles[31] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0333922, pZ=-0.00166886
-V=(-51.32, -6.08, -96.98)
+V=(-51.320, -6.081, -96.975) cm
 Mother: MCParticles[31] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0412178, pZ=0.0234439
-V=(-51.32, -6.08, -96.98)
+V=(-51.320, -6.081, -96.975) cm
 Mother: MCParticles[31] (mu+)
 Charge=0, PDG=130 (K_L0)
 pT=0.891619, pZ=-0.0659536
-V=(0.01, -0.00, 0.05)
+V=(94.185, -47.531, 494.477) um
 Mother: MCParticles[34] (K0)
 Charge=0, PDG=22 (gamma)
 pT=0.113401, pZ=0.0780022
-V=(0.01, -0.00, 0.05)
+V=(94.166, -47.483, 494.570) um
 Mother: MCParticles[35] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0748986, pZ=0.247567
-V=(0.01, -0.00, 0.05)
+V=(94.166, -47.483, 494.570) um
 Mother: MCParticles[35] (pi0)
 Charge=0, PDG=130 (K_L0)
 pT=0.996551, pZ=-0.368455
-V=(-0.00, 0.00, 0.01)
+V=(-3.398, 5.869, 132.908) um
 Mother: MCParticles[40] (K0)
 Charge=0, PDG=22 (gamma)
 pT=0.00924081, pZ=-0.0190607
-V=(0.83, 1.38, -3.36)
+V=(0.827, 1.378, -3.356) cm
 Mother: MCParticles[41] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000411775, pZ=-0.00083215
-V=(0.85, 1.41, -3.44)
+V=(0.850, 1.413, -3.443) cm
 Mother: MCParticles[41] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000207406, pZ=-0.000440285
-V=(0.98, 1.57, -3.82)
+V=(0.982, 1.569, -3.822) cm
 Mother: MCParticles[41] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.0014857, pZ=-0.00336971
-V=(1.06, 1.65, -4.06)
+V=(1.065, 1.654, -4.063) cm
 Mother: MCParticles[41] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.0391716, pZ=-0.0829229
-V=(1.09, 1.69, -4.16)
+V=(1.094, 1.687, -4.163) cm
 Mother: MCParticles[41] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000189913, pZ=-0.000434259
-V=(1.13, 1.72, -4.27)
+V=(1.128, 1.724, -4.272) cm
 Mother: MCParticles[41] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000807763, pZ=-0.00174622
-V=(1.13, 1.72, -4.27)
+V=(1.129, 1.725, -4.273) cm
 Mother: MCParticles[41] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.0301397, pZ=-0.0722892
-V=(1.16, 1.76, -4.37)
+V=(1.156, 1.755, -4.368) cm
 Mother: MCParticles[41] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000961145, pZ=-0.000463324
-V=(-2.29, 3.29, -21.28)
+V=(-2.292, 3.295, -21.275) cm
 Mother: MCParticles[41] (e-)
 Charge=1, PDG=-13 (mu+)
 pT=0.105607, pZ=0.144604
-V=(41.84, 139.50, 207.61)
+V=(41.841, 139.500, 207.605) cm
 Mother: MCParticles[52] (K+)
 Charge=0, PDG=14 (nu_mu)
 pT=0.127332, pZ=-0.00433317
-V=(41.84, 139.50, 207.61)
+V=(41.841, 139.500, 207.605) cm
 Mother: MCParticles[52] (K+)
 Charge=0, PDG=111 (pi0)
 pT=0.255438, pZ=0.159195
-V=(41.84, 139.50, 207.61)
+V=(41.841, 139.500, 207.605) cm
 Mother: MCParticles[52] (K+)
 Charge=-1, PDG=-211 (pi-)
 pT=0.197713, pZ=0.0463304
-V=(122.65, -50.86, -11.69)
+V=(122.649, -50.857, -11.693) cm
 Mother: MCParticles[57] (K_L0)
 Charge=1, PDG=211 (pi+)
 pT=0.221829, pZ=-0.0590659
-V=(122.65, -50.86, -11.69)
+V=(122.649, -50.857, -11.693) cm
 Mother: MCParticles[57] (K_L0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.0631625, pZ=-0.0865105
-V=(-58.45, -61.76, -31.43)
+V=(-58.454, -61.755, -31.426) cm
 Mother: MCParticles[60] (K_L0)
 Charge=1, PDG=-11 (e+)
 pT=0.369879, pZ=-0.0429189
-V=(-58.45, -61.76, -31.43)
+V=(-58.454, -61.755, -31.426) cm
 Mother: MCParticles[60] (K_L0)
 Charge=0, PDG=12 (nu_e)
 pT=0.577426, pZ=-0.239025
-V=(-58.45, -61.76, -31.43)
+V=(-58.454, -61.755, -31.426) cm
 Mother: MCParticles[60] (K_L0)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0333445, pZ=0.0164556
-V=(61.47, 161.47, 268.86)
+V=(61.467, 161.466, 268.864) cm
 Mother: MCParticles[70] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0246406, pZ=-0.0159279
-V=(61.47, 161.47, 268.86)
+V=(61.467, 161.466, 268.864) cm
 Mother: MCParticles[70] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.038616, pZ=-0.000534707
-V=(61.47, 161.47, 268.86)
+V=(61.467, 161.466, 268.864) cm
 Mother: MCParticles[70] (mu+)
 Charge=0, PDG=22 (gamma)
 pT=0.183968, pZ=0.110319
-V=(41.84, 139.50, 207.61)
+V=(41.841, 139.500, 207.605) cm
 Mother: MCParticles[72] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.104488, pZ=0.0488763
-V=(41.84, 139.50, 207.61)
+V=(41.841, 139.500, 207.605) cm
 Mother: MCParticles[72] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.000195435, pZ=-0.000150631
-V=(-92.87, -78.22, -40.31)
+V=(-92.868, -78.218, -40.313) cm
 Mother: MCParticles[76] (e+)
 ECLClusters:
 
@@ -754,322 +754,322 @@ Covariance Matrix (d0, phi0, omega, z0, lambda):      0.0027    0.00022   -1.7e-
 MCParticles:
 Charge=0, PDG=300553 (Upsilon(4S))
 pT=0.456663, pZ=3.00074
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Charge=1, PDG=521 (B+)
 pT=0.530996, pZ=1.55856
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=-1, PDG=-521 (B-)
 pT=0.22294, pZ=1.44219
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=0, PDG=-311 (anti-K0)
 pT=0.272489, pZ=-0.196633
-V=(0.00, -0.00, 0.00)
+V=(0.711, -0.326, 2.295) um
 Mother: MCParticles[1] (B+)
 Charge=-1, PDG=-4324 (anti-Xi_c*-)
 pT=1.18787, pZ=0.6351
-V=(0.00, -0.00, 0.00)
+V=(0.711, -0.326, 2.295) um
 Mother: MCParticles[1] (B+)
 Charge=2, PDG=2224 (Delta++)
 pT=0.733714, pZ=1.19997
-V=(0.00, -0.00, 0.00)
+V=(0.711, -0.326, 2.295) um
 Mother: MCParticles[1] (B+)
 Charge=0, PDG=423 (D*0)
 pT=0.922859, pZ=2.20056
-V=(-0.00, 0.00, 0.01)
+V=(-2.643, 22.542, 146.821) um
 Mother: MCParticles[2] (B-)
 Charge=-1, PDG=13 (mu-)
 pT=0.887627, pZ=-1.1417
-V=(-0.00, 0.00, 0.01)
+V=(-2.644, 22.542, 146.821) um
 Mother: MCParticles[2] (B-)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.82425, pZ=0.383354
-V=(-0.00, 0.00, 0.01)
+V=(-2.644, 22.542, 146.821) um
 Mother: MCParticles[2] (B-)
 Charge=0, PDG=22 (gamma)
 pT=6.12627e-05, pZ=-3.00168e-05
-V=(-0.00, 0.00, 0.01)
+V=(-2.644, 22.542, 146.821) um
 Mother: MCParticles[2] (B-)
 Charge=0, PDG=130 (K_L0)
 pT=0.272489, pZ=-0.196633
-V=(0.00, -0.00, 0.00)
+V=(0.711, -0.326, 2.295) um
 Mother: MCParticles[3] (anti-K0)
 Charge=-1, PDG=-4232 (anti-Xi_c-)
 pT=1.08903, pZ=0.488297
-V=(0.00, -0.00, 0.00)
+V=(0.711, -0.326, 2.295) um
 Mother: MCParticles[4] (anti-Xi_c*-)
 Charge=0, PDG=22 (gamma)
 pT=0.174055, pZ=0.146813
-V=(0.00, -0.00, 0.00)
+V=(0.711, -0.326, 2.295) um
 Mother: MCParticles[4] (anti-Xi_c*-)
 Charge=1, PDG=2212 (p+)
 pT=0.847786, pZ=1.18825
-V=(0.00, -0.00, 0.00)
+V=(0.711, -0.326, 2.295) um
 Mother: MCParticles[5] (Delta++)
 Charge=1, PDG=211 (pi+)
 pT=0.163139, pZ=-0.0681555
-V=(0.00, -0.00, 0.00)
+V=(0.711, -0.326, 2.295) um
 Mother: MCParticles[5] (Delta++)
 Charge=0, PDG=421 (D0)
 pT=0.842892, pZ=2.02237
-V=(-0.00, 0.00, 0.01)
+V=(-2.644, 22.542, 146.821) um
 Mother: MCParticles[6] (D*0)
 Charge=0, PDG=111 (pi0)
 pT=0.089676, pZ=0.178213
-V=(-0.00, 0.00, 0.01)
+V=(-2.644, 22.542, 146.821) um
 Mother: MCParticles[6] (D*0)
 Charge=-1, PDG=11 (e-)
 pT=0.00183211, pZ=-0.000976211
-V=(-1.98, -3.39, -5.04)
+V=(-1.978, -3.395, -5.037) cm
 Mother: MCParticles[7] (mu-)
 Charge=-1, PDG=-211 (pi-)
 pT=0.0909682, pZ=-0.194129
-V=(-6.32, -94.94, -68.66)
+V=(-6.324, -94.937, -68.660) cm
 Mother: MCParticles[10] (K_L0)
 Charge=1, PDG=-13 (mu+)
 pT=0.225688, pZ=0.0631871
-V=(-6.32, -94.94, -68.66)
+V=(-6.324, -94.937, -68.660) cm
 Mother: MCParticles[10] (K_L0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0578694, pZ=-0.0656918
-V=(-6.32, -94.94, -68.66)
+V=(-6.324, -94.937, -68.660) cm
 Mother: MCParticles[10] (K_L0)
 Charge=0, PDG=-3322 (anti-Xi0)
 pT=0.837342, pZ=1.20073
-V=(0.01, -0.00, 0.00)
+V=(80.916, -4.400, 38.304) um
 Mother: MCParticles[11] (anti-Xi_c-)
 Charge=-1, PDG=-211 (pi-)
 pT=0.267364, pZ=-0.712444
-V=(0.01, -0.00, 0.00)
+V=(80.916, -4.400, 38.304) um
 Mother: MCParticles[11] (anti-Xi_c-)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0291439, pZ=-0.00617984
-V=(-132.34, 42.73, 201.59)
+V=(-132.340, 42.730, 201.589) cm
 Mother: MCParticles[13] (p+)
 Charge=1, PDG=-13 (mu+)
 pT=0.0291439, pZ=0.00617984
-V=(-132.34, 42.73, 201.59)
+V=(-132.340, 42.730, 201.589) cm
 Mother: MCParticles[13] (p+)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0225624, pZ=-0.0194551
-V=(22.54, -46.57, -109.36)
+V=(22.543, -46.570, -109.357) cm
 Mother: MCParticles[14] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.0225624, pZ=0.0194551
-V=(22.54, -46.57, -109.36)
+V=(22.543, -46.570, -109.357) cm
 Mother: MCParticles[14] (pi+)
 Charge=-1, PDG=-321 (K-)
 pT=0.427911, pZ=0.513342
-V=(0.01, 0.01, 0.05)
+V=(135.349, 75.604, 501.544) um
 Mother: MCParticles[15] (D0)
 Charge=1, PDG=211 (pi+)
 pT=1.07771, pZ=1.00493
-V=(0.01, 0.01, 0.05)
+V=(135.349, 75.604, 501.544) um
 Mother: MCParticles[15] (D0)
 Charge=0, PDG=111 (pi0)
 pT=0.219533, pZ=0.504083
-V=(0.01, 0.01, 0.05)
+V=(135.349, 75.604, 501.544) um
 Mother: MCParticles[15] (D0)
 Charge=0, PDG=22 (gamma)
 pT=0.116696, pZ=0.0871903
-V=(-0.00, 0.00, 0.01)
+V=(-2.636, 22.541, 146.835) um
 Mother: MCParticles[16] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0279013, pZ=0.0910223
-V=(-0.00, 0.00, 0.01)
+V=(-2.636, 22.541, 146.835) um
 Mother: MCParticles[16] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.034687, pZ=-0.00171736
-V=(10.19, -92.34, -105.95)
+V=(10.188, -92.341, -105.947) cm
 Mother: MCParticles[18] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.11722, pZ=0.0791943
-V=(10.19, -92.34, -105.95)
+V=(10.188, -92.341, -105.947) cm
 Mother: MCParticles[18] (pi-)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0447935, pZ=0.00720005
-V=(-61.24, -115.32, -53.46)
+V=(-61.244, -115.322, -53.464) cm
 Mother: MCParticles[19] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0105754, pZ=0.0150115
-V=(-61.24, -115.32, -53.46)
+V=(-61.244, -115.322, -53.464) cm
 Mother: MCParticles[19] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0347761, pZ=-0.0224873
-V=(-61.24, -115.32, -53.46)
+V=(-61.244, -115.322, -53.464) cm
 Mother: MCParticles[19] (mu+)
 Charge=0, PDG=-3122 (anti-Lambda0)
 pT=0.75929, pZ=1.18903
-V=(1.00, -0.15, 1.44)
+V=(0.997, -0.145, 1.437) cm
 Mother: MCParticles[21] (anti-Xi0)
 Charge=0, PDG=111 (pi0)
 pT=0.101106, pZ=0.0117029
-V=(1.00, -0.15, 1.44)
+V=(0.997, -0.145, 1.437) cm
 Mother: MCParticles[21] (anti-Xi0)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0432274, pZ=-0.0203845
-V=(-132.33, 42.67, 201.59)
+V=(-132.332, 42.674, 201.589) cm
 Mother: MCParticles[24] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0312131, pZ=0.0259654
-V=(-132.33, 42.67, 201.59)
+V=(-132.332, 42.674, 201.589) cm
 Mother: MCParticles[24] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0157262, pZ=-0.00575388
-V=(-132.33, 42.67, 201.59)
+V=(-132.332, 42.674, 201.589) cm
 Mother: MCParticles[24] (mu+)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0484267, pZ=0.00970573
-V=(22.55, -46.52, -109.32)
+V=(22.545, -46.517, -109.323) cm
 Mother: MCParticles[26] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0393786, pZ=-0.0014105
-V=(22.55, -46.52, -109.32)
+V=(22.545, -46.517, -109.323) cm
 Mother: MCParticles[26] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0139261, pZ=-0.00855861
-V=(22.55, -46.52, -109.32)
+V=(22.545, -46.517, -109.323) cm
 Mother: MCParticles[26] (mu+)
 Charge=-1, PDG=11 (e-)
 pT=0.00116828, pZ=0.00135039
-V=(-9.95, -4.03, 13.03)
+V=(-9.952, -4.030, 13.031) cm
 Mother: MCParticles[27] (K-)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0227584, pZ=0.0192254
-V=(-52.41, -119.69, 192.77)
+V=(-52.413, -119.694, 192.766) cm
 Mother: MCParticles[27] (K-)
 Charge=1, PDG=-13 (mu+)
 pT=0.0227584, pZ=-0.0192254
-V=(-52.41, -119.69, 192.77)
+V=(-52.413, -119.694, 192.766) cm
 Mother: MCParticles[27] (K-)
 Charge=0, PDG=22 (gamma)
 pT=0.116331, pZ=-0.0477326
-V=(128.66, 20.85, 123.26)
+V=(128.665, 20.850, 123.256) cm
 Mother: MCParticles[28] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.0438301, pZ=-0.00484681
-V=(128.66, 20.85, 123.26)
+V=(128.665, 20.850, 123.256) cm
 Mother: MCParticles[28] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.0876261, pZ=0.0822564
-V=(0.01, 0.01, 0.05)
+V=(135.389, 75.600, 501.637) um
 Mother: MCParticles[29] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.144696, pZ=0.421827
-V=(0.01, 0.01, 0.05)
+V=(135.389, 75.600, 501.637) um
 Mother: MCParticles[29] (pi0)
 Charge=-1, PDG=-2212 (anti-p-)
 pT=0.737568, pZ=0.972082
-V=(4.06, -0.34, 6.24)
+V=(4.061, -0.344, 6.245) cm
 Mother: MCParticles[37] (anti-Lambda0)
 Charge=1, PDG=211 (pi+)
 pT=0.0269901, pZ=0.216946
-V=(4.06, -0.34, 6.24)
+V=(4.061, -0.344, 6.245) cm
 Mother: MCParticles[37] (anti-Lambda0)
 Charge=0, PDG=22 (gamma)
 pT=0.0999911, pZ=-0.0215887
-V=(1.00, -0.15, 1.44)
+V=(0.997, -0.145, 1.437) cm
 Mother: MCParticles[38] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0578615, pZ=0.0332916
-V=(1.00, -0.15, 1.44)
+V=(0.997, -0.145, 1.437) cm
 Mother: MCParticles[38] (pi0)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0267389, pZ=0.0392499
-V=(-52.43, -119.65, 192.72)
+V=(-52.427, -119.651, 192.721) cm
 Mother: MCParticles[47] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.00948858, pZ=-0.0383089
-V=(-52.43, -119.65, 192.72)
+V=(-52.427, -119.651, 192.721) cm
 Mother: MCParticles[47] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0181556, pZ=-0.000967828
-V=(-52.43, -119.65, 192.72)
+V=(-52.427, -119.651, 192.721) cm
 Mother: MCParticles[47] (mu+)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0216993, pZ=-0.0223409
-V=(81.91, 31.77, 150.57)
+V=(81.913, 31.771, 150.566) cm
 Mother: MCParticles[52] (anti-p-)
 Charge=1, PDG=-13 (mu+)
 pT=0.0481551, pZ=0.0283221
-V=(81.91, 31.77, 150.57)
+V=(81.913, 31.771, 150.566) cm
 Mother: MCParticles[52] (anti-p-)
 Charge=0, PDG=111 (pi0)
 pT=0.131012, pZ=0.0140375
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[52] (anti-p-)
 Charge=0, PDG=111 (pi0)
 pT=0.11018, pZ=0.0758059
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[52] (anti-p-)
 Charge=0, PDG=221 (eta)
 pT=0.0839975, pZ=-0.219129
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[52] (anti-p-)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.026824, pZ=-0.0110273
-V=(84.38, 30.40, 152.21)
+V=(84.383, 30.401, 152.214) cm
 Mother: MCParticles[60] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0344976, pZ=-0.010414
-V=(84.38, 30.40, 152.21)
+V=(84.383, 30.401, 152.214) cm
 Mother: MCParticles[60] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0337187, pZ=0.0217162
-V=(84.38, 30.40, 152.21)
+V=(84.383, 30.401, 152.214) cm
 Mother: MCParticles[60] (mu+)
 Charge=0, PDG=22 (gamma)
 pT=0.115255, pZ=-0.035878
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[61] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0460549, pZ=0.0499155
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[61] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.05995, pZ=0.0377891
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[62] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.112919, pZ=0.0380168
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[62] (pi0)
 Charge=0, PDG=111 (pi0)
 pT=0.0422836, pZ=-0.0733976
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[63] (eta)
 Charge=0, PDG=111 (pi0)
 pT=0.169297, pZ=-0.0573284
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[63] (eta)
 Charge=0, PDG=111 (pi0)
 pT=0.13854, pZ=-0.0884028
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[63] (eta)
 Charge=0, PDG=22 (gamma)
 pT=0.0717827, pZ=-0.084654
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[71] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0470348, pZ=0.0112565
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[71] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.116937, pZ=-0.00543999
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[72] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.09348, pZ=-0.0518884
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[72] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0217352, pZ=0.0350635
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[73] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.118905, pZ=-0.123466
-V=(95.21, 22.54, 131.80)
+V=(95.210, 22.544, 131.797) cm
 Mother: MCParticles[73] (pi0)
 ECLClusters:
 
@@ -1459,310 +1459,310 @@ Covariance Matrix (d0, phi0, omega, z0, lambda):     2.9e-05   -2.3e-05      2e-
 MCParticles:
 Charge=0, PDG=300553 (Upsilon(4S))
 pT=0.456168, pZ=2.99617
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Charge=0, PDG=511 (B0)
 pT=0.329393, pZ=1.42025
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=0, PDG=-511 (anti-B0)
 pT=0.302502, pZ=1.57593
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=-1, PDG=-411 (D-)
 pT=0.617458, pZ=0.621872
-V=(0.00, 0.00, 0.02)
+V=(33.660, 29.777, 193.771) um
 Mother: MCParticles[1] (B0)
 Charge=0, PDG=311 (K0)
 pT=0.712022, pZ=-0.567072
-V=(0.00, 0.00, 0.02)
+V=(33.660, 29.777, 193.771) um
 Mother: MCParticles[1] (B0)
 Charge=1, PDG=211 (pi+)
 pT=0.370786, pZ=1.31805
-V=(0.00, 0.00, 0.02)
+V=(33.660, 29.777, 193.771) um
 Mother: MCParticles[1] (B0)
 Charge=0, PDG=113 (rho0)
 pT=0.640498, pZ=0.0469878
-V=(0.00, 0.00, 0.02)
+V=(33.660, 29.777, 193.771) um
 Mother: MCParticles[1] (B0)
 Charge=0, PDG=445 (chi_c2)
 pT=0.264754, pZ=1.48383
-V=(0.00, -0.00, 0.00)
+V=(3.135, -3.267, 23.590) um
 Mother: MCParticles[2] (anti-B0)
 Charge=-1, PDG=-321 (K-)
 pT=0.483133, pZ=0.0434028
-V=(0.00, -0.00, 0.00)
+V=(3.135, -3.267, 23.590) um
 Mother: MCParticles[2] (anti-B0)
 Charge=1, PDG=211 (pi+)
 pT=0.95511, pZ=0.0486932
-V=(0.00, -0.00, 0.00)
+V=(3.135, -3.267, 23.590) um
 Mother: MCParticles[2] (anti-B0)
 Charge=0, PDG=311 (K0)
 pT=0.75037, pZ=0.764767
-V=(0.00, 0.00, 0.02)
+V=(27.030, 45.260, 210.735) um
 Mother: MCParticles[3] (D-)
 Charge=-1, PDG=13 (mu-)
 pT=0.420363, pZ=-0.364285
-V=(0.00, 0.00, 0.02)
+V=(27.030, 45.260, 210.735) um
 Mother: MCParticles[3] (D-)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.227291, pZ=0.221381
-V=(0.00, 0.00, 0.02)
+V=(27.030, 45.260, 210.735) um
 Mother: MCParticles[3] (D-)
 Charge=0, PDG=130 (K_L0)
 pT=0.712022, pZ=-0.567072
-V=(0.00, 0.00, 0.02)
+V=(33.660, 29.777, 193.771) um
 Mother: MCParticles[4] (K0)
 Charge=-1, PDG=11 (e-)
 pT=0.00140223, pZ=0.000874304
-V=(9.07, 3.56, 34.12)
+V=(9.072, 3.564, 34.117) cm
 Mother: MCParticles[5] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.089607, pZ=0.222174
-V=(56.39, 4.06, 203.52)
+V=(56.392, 4.063, 203.521) cm
 Mother: MCParticles[5] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.129638, pZ=0.206708
-V=(56.39, 4.06, 203.52)
+V=(56.392, 4.063, 203.521) cm
 Mother: MCParticles[5] (pi+)
 Charge=1, PDG=211 (pi+)
 pT=0.224223, pZ=-0.00430627
-V=(0.00, 0.00, 0.02)
+V=(33.660, 29.777, 193.771) um
 Mother: MCParticles[6] (rho0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.719246, pZ=0.0517085
-V=(0.00, 0.00, 0.02)
+V=(33.660, 29.777, 193.771) um
 Mother: MCParticles[6] (rho0)
 Charge=0, PDG=22 (gamma)
 pT=0.371055, pZ=-0.0820282
-V=(0.00, -0.00, 0.00)
+V=(3.135, -3.267, 23.590) um
 Mother: MCParticles[7] (chi_c2)
 Charge=0, PDG=443 (J/psi)
 pT=0.251135, pZ=1.56588
-V=(0.00, -0.00, 0.00)
+V=(3.135, -3.267, 23.590) um
 Mother: MCParticles[7] (chi_c2)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0280913, pZ=-0.00992146
-V=(99.59, -93.24, -90.75)
+V=(99.586, -93.244, -90.755) cm
 Mother: MCParticles[9] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.0280913, pZ=0.00992146
-V=(99.59, -93.24, -90.75)
+V=(99.586, -93.244, -90.755) cm
 Mother: MCParticles[9] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.121783, pZ=-0.0453177
-V=(36.29, -115.38, 6.39)
+V=(36.294, -115.382, 6.394) cm
 Mother: MCParticles[9] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.109569, pZ=-0.118849
-V=(36.29, -115.38, 6.39)
+V=(36.294, -115.382, 6.394) cm
 Mother: MCParticles[9] (pi+)
 Charge=0, PDG=130 (K_L0)
 pT=0.75037, pZ=0.764767
-V=(0.00, 0.00, 0.02)
+V=(27.030, 45.260, 210.735) um
 Mother: MCParticles[10] (K0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.120316, pZ=-0.192711
-V=(-103.19, -64.38, -112.54)
+V=(-103.188, -64.377, -112.543) cm
 Mother: MCParticles[13] (K_L0)
 Charge=1, PDG=211 (pi+)
 pT=0.0850499, pZ=0.191046
-V=(-103.19, -64.38, -112.54)
+V=(-103.188, -64.377, -112.543) cm
 Mother: MCParticles[13] (K_L0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0206761, pZ=0.0498089
-V=(15.57, -28.65, 75.32)
+V=(15.568, -28.648, 75.318) cm
 Mother: MCParticles[17] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.0515992, pZ=0.0936523
-V=(15.57, -28.65, 75.32)
+V=(15.568, -28.648, 75.318) cm
 Mother: MCParticles[17] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=7.51642e-05, pZ=4.75051e-05
-V=(5.90, -14.28, -9.73)
+V=(5.897, -14.277, -9.733) cm
 Mother: MCParticles[17] (pi+)
 Charge=0, PDG=-3212 (anti-Sigma0)
 pT=0.538083, pZ=0.655215
-V=(0.00, -0.00, 0.00)
+V=(3.135, -3.267, 23.590) um
 Mother: MCParticles[20] (J/psi)
 Charge=-1, PDG=-211 (pi-)
 pT=0.342042, pZ=0.610268
-V=(0.00, -0.00, 0.00)
+V=(3.135, -3.267, 23.590) um
 Mother: MCParticles[20] (J/psi)
 Charge=1, PDG=3222 (Sigma+)
 pT=0.438534, pZ=0.300376
-V=(0.00, -0.00, 0.00)
+V=(3.135, -3.267, 23.590) um
 Mother: MCParticles[20] (J/psi)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.042886, pZ=-0.00197898
-V=(99.54, -93.24, -90.72)
+V=(99.536, -93.242, -90.723) cm
 Mother: MCParticles[22] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0254774, pZ=-0.0188438
-V=(99.54, -93.24, -90.72)
+V=(99.536, -93.242, -90.723) cm
 Mother: MCParticles[22] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0219836, pZ=0.0211743
-V=(99.54, -93.24, -90.72)
+V=(99.536, -93.242, -90.723) cm
 Mother: MCParticles[22] (mu+)
 Charge=0, PDG=111 (pi0)
 pT=0.162942, pZ=-0.0608
-V=(52.10, 108.07, 122.31)
+V=(52.098, 108.069, 122.309) cm
 Mother: MCParticles[25] (K_L0)
 Charge=0, PDG=111 (pi0)
 pT=0.27597, pZ=0.052707
-V=(52.10, 108.07, 122.31)
+V=(52.098, 108.069, 122.309) cm
 Mother: MCParticles[25] (K_L0)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0146566, pZ=0.00904662
-V=(-97.06, -55.64, -355.53)
+V=(-97.057, -55.637, -355.534) cm
 Mother: MCParticles[26] (pi-)
 Charge=-1, PDG=13 (mu-)
 pT=0.0368778, pZ=-0.106206
-V=(-97.06, -55.64, -355.53)
+V=(-97.057, -55.637, -355.534) cm
 Mother: MCParticles[26] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.0676343, pZ=0.083674
-V=(0.00, -0.00, 0.00)
+V=(3.135, -3.267, 23.590) um
 Mother: MCParticles[31] (anti-Sigma0)
 Charge=0, PDG=-3122 (anti-Lambda0)
 pT=0.51626, pZ=0.571541
-V=(0.00, -0.00, 0.00)
+V=(3.135, -3.267, 23.590) um
 Mother: MCParticles[31] (anti-Sigma0)
 Charge=-1, PDG=11 (e-)
 pT=0.00135852, pZ=0.0027757
-V=(5.03, 8.88, 18.19)
+V=(5.030, 8.881, 18.195) cm
 Mother: MCParticles[32] (pi-)
 Charge=1, PDG=2212 (p+)
 pT=0.430706, pZ=0.0764363
-V=(2.47, 2.81, 2.54)
+V=(2.473, 2.811, 2.539) cm
 Mother: MCParticles[33] (Sigma+)
 Charge=0, PDG=111 (pi0)
 pT=0.0776603, pZ=0.213404
-V=(2.47, 2.81, 2.54)
+V=(2.473, 2.811, 2.539) cm
 Mother: MCParticles[33] (Sigma+)
 Charge=0, PDG=22 (gamma)
 pT=0.141685, pZ=0.0137342
-V=(52.10, 108.07, 122.31)
+V=(52.098, 108.069, 122.309) cm
 Mother: MCParticles[37] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0223003, pZ=-0.0745342
-V=(52.10, 108.07, 122.31)
+V=(52.098, 108.069, 122.309) cm
 Mother: MCParticles[37] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0320674, pZ=0.0542311
-V=(52.10, 108.07, 122.31)
+V=(52.098, 108.069, 122.309) cm
 Mother: MCParticles[38] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.248691, pZ=-0.00152402
-V=(52.10, 108.07, 122.31)
+V=(52.098, 108.069, 122.309) cm
 Mother: MCParticles[38] (pi0)
 Charge=0, PDG=-2112 (anti-n0)
 pT=0.432432, pZ=0.439258
-V=(-3.32, -2.79, 4.80)
+V=(-3.322, -2.788, 4.803) cm
 Mother: MCParticles[42] (anti-Lambda0)
 Charge=0, PDG=111 (pi0)
 pT=0.134547, pZ=0.132283
-V=(-3.32, -2.79, 4.80)
+V=(-3.322, -2.788, 4.803) cm
 Mother: MCParticles[42] (anti-Lambda0)
 Charge=0, PDG=22 (gamma)
 pT=0.0286317, pZ=0.188725
-V=(2.47, 2.81, 2.54)
+V=(2.473, 2.811, 2.539) cm
 Mother: MCParticles[45] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0690156, pZ=0.0246788
-V=(2.47, 2.81, 2.54)
+V=(2.473, 2.811, 2.539) cm
 Mother: MCParticles[45] (pi0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0297909, pZ=-0.000242083
-V=(-92.46, -118.00, 124.15)
+V=(-92.460, -117.997, 124.149) cm
 Mother: MCParticles[50] (anti-n0)
 Charge=1, PDG=-13 (mu+)
 pT=0.0297909, pZ=0.000242083
-V=(-92.46, -118.00, 124.15)
+V=(-92.460, -117.997, 124.149) cm
 Mother: MCParticles[50] (anti-n0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0295942, pZ=0.00342633
-V=(-148.98, -145.87, 44.16)
+V=(-148.983, -145.866, 44.158) cm
 Mother: MCParticles[50] (anti-n0)
 Charge=1, PDG=-13 (mu+)
 pT=0.0295942, pZ=-0.00342633
-V=(-148.98, -145.87, 44.16)
+V=(-148.983, -145.866, 44.158) cm
 Mother: MCParticles[50] (anti-n0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0287545, pZ=0.00779331
-V=(-84.11, -38.07, 202.44)
+V=(-84.106, -38.067, 202.444) cm
 Mother: MCParticles[50] (anti-n0)
 Charge=1, PDG=-13 (mu+)
 pT=0.0287545, pZ=-0.00779331
-V=(-84.11, -38.07, 202.44)
+V=(-84.106, -38.067, 202.444) cm
 Mother: MCParticles[50] (anti-n0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0255464, pZ=0.0153278
-V=(-113.50, -79.50, 135.52)
+V=(-113.502, -79.504, 135.523) cm
 Mother: MCParticles[50] (anti-n0)
 Charge=1, PDG=-13 (mu+)
 pT=0.0255464, pZ=-0.0153278
-V=(-113.50, -79.50, 135.52)
+V=(-113.502, -79.504, 135.523) cm
 Mother: MCParticles[50] (anti-n0)
 Charge=0, PDG=22 (gamma)
 pT=0.155229, pZ=0.140732
-V=(-3.32, -2.79, 4.80)
+V=(-3.322, -2.788, 4.803) cm
 Mother: MCParticles[51] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0208153, pZ=-0.00844915
-V=(-3.32, -2.79, 4.80)
+V=(-3.322, -2.788, 4.803) cm
 Mother: MCParticles[51] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.00059954, pZ=0.000376096
-V=(-34.07, 124.56, 48.10)
+V=(-34.074, 124.564, 48.095) cm
 Mother: MCParticles[53] (gamma)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0128183, pZ=0.0244378
-V=(-92.49, -118.05, 124.15)
+V=(-92.493, -118.047, 124.150) cm
 Mother: MCParticles[55] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0389866, pZ=-0.0233593
-V=(-92.49, -118.05, 124.15)
+V=(-92.493, -118.047, 124.150) cm
 Mother: MCParticles[55] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.03208, pZ=-0.00109584
-V=(-92.49, -118.05, 124.15)
+V=(-92.493, -118.047, 124.150) cm
 Mother: MCParticles[55] (mu+)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0331627, pZ=0.0299557
-V=(-148.97, -145.89, 44.16)
+V=(-148.972, -145.891, 44.161) cm
 Mother: MCParticles[57] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0188423, pZ=-0.0298172
-V=(-148.97, -145.89, 44.16)
+V=(-148.972, -145.891, 44.161) cm
 Mother: MCParticles[57] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.025181, pZ=-0.000141258
-V=(-148.97, -145.89, 44.16)
+V=(-148.972, -145.891, 44.161) cm
 Mother: MCParticles[57] (mu+)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0159492, pZ=-0.0208143
-V=(-84.17, -38.07, 202.43)
+V=(-84.166, -38.067, 202.427) cm
 Mother: MCParticles[59] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.00991389, pZ=-0.0244292
-V=(-84.17, -38.07, 202.43)
+V=(-84.166, -38.067, 202.427) cm
 Mother: MCParticles[59] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.025985, pZ=0.0456855
-V=(-84.17, -38.07, 202.43)
+V=(-84.166, -38.067, 202.427) cm
 Mother: MCParticles[59] (mu+)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.00706961, pZ=0.043246
-V=(-113.55, -79.52, 135.49)
+V=(-113.551, -79.517, 135.489) cm
 Mother: MCParticles[61] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0208091, pZ=-0.0107889
-V=(-113.55, -79.52, 135.49)
+V=(-113.551, -79.517, 135.489) cm
 Mother: MCParticles[61] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0187869, pZ=-0.0328978
-V=(-113.55, -79.52, 135.49)
+V=(-113.551, -79.517, 135.489) cm
 Mother: MCParticles[61] (mu+)
 ECLClusters:
 
@@ -2122,274 +2122,274 @@ Covariance Matrix (d0, phi0, omega, z0, lambda):       0.001    8.8e-05   -9.3e-
 MCParticles:
 Charge=0, PDG=300553 (Upsilon(4S))
 pT=0.456354, pZ=2.9946
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Charge=1, PDG=521 (B+)
 pT=0.298251, pZ=1.78978
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=-1, PDG=-521 (B-)
 pT=0.164153, pZ=1.20482
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=1, PDG=433 (D_s*+)
 pT=1.78915, pZ=0.340551
-V=(0.00, 0.00, 0.01)
+V=(13.624, 1.639, 82.347) um
 Mother: MCParticles[1] (B+)
 Charge=0, PDG=-421 (anti-D0)
 pT=1.49136, pZ=1.44924
-V=(0.00, 0.00, 0.01)
+V=(13.624, 1.639, 82.347) um
 Mother: MCParticles[1] (B+)
 Charge=1, PDG=413 (D*+)
 pT=1.22543, pZ=0.279125
-V=(0.00, -0.00, 0.03)
+V=(36.992, -8.226, 278.142) um
 Mother: MCParticles[2] (B-)
 Charge=0, PDG=3122 (Lambda0)
 pT=0.450178, pZ=0.592209
-V=(0.00, -0.00, 0.03)
+V=(36.993, -8.224, 278.142) um
 Mother: MCParticles[2] (B-)
 Charge=-2, PDG=-2224 (anti-Delta--)
 pT=1.06257, pZ=0.343057
-V=(0.00, -0.00, 0.03)
+V=(36.993, -8.224, 278.142) um
 Mother: MCParticles[2] (B-)
 Charge=1, PDG=431 (D_s+)
 pT=1.69385, pZ=0.301309
-V=(0.00, 0.00, 0.01)
+V=(13.624, 1.639, 82.347) um
 Mother: MCParticles[3] (D_s*+)
 Charge=0, PDG=22 (gamma)
 pT=0.170242, pZ=0.0392449
-V=(0.00, 0.00, 0.01)
+V=(13.624, 1.639, 82.347) um
 Mother: MCParticles[3] (D_s*+)
 Charge=1, PDG=321 (K+)
 pT=0.469055, pZ=0.728152
-V=(-0.02, -0.00, 0.03)
+V=(-175.252, -32.712, 268.899) um
 Mother: MCParticles[4] (anti-D0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.999993, pZ=0.0565637
-V=(-0.02, -0.00, 0.03)
+V=(-175.252, -32.712, 268.899) um
 Mother: MCParticles[4] (anti-D0)
 Charge=0, PDG=111 (pi0)
 pT=0.338878, pZ=0.651925
-V=(-0.02, -0.00, 0.03)
+V=(-175.252, -32.712, 268.899) um
 Mother: MCParticles[4] (anti-D0)
 Charge=0, PDG=22 (gamma)
 pT=0.0357902, pZ=0.0125855
-V=(-0.02, -0.00, 0.03)
+V=(-175.252, -32.712, 268.899) um
 Mother: MCParticles[4] (anti-D0)
 Charge=0, PDG=421 (D0)
 pT=1.17651, pZ=0.275845
-V=(0.00, -0.00, 0.03)
+V=(36.993, -8.224, 278.142) um
 Mother: MCParticles[5] (D*+)
 Charge=1, PDG=211 (pi+)
 pT=0.0511843, pZ=0.00328202
-V=(0.00, -0.00, 0.03)
+V=(36.993, -8.224, 278.142) um
 Mother: MCParticles[5] (D*+)
 Charge=1, PDG=2212 (p+)
 pT=0.406208, pZ=0.593378
-V=(-0.77, -0.32, 1.13)
+V=(-0.771, -0.316, 1.128) cm
 Mother: MCParticles[6] (Lambda0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.0757334, pZ=-0.0011677
-V=(-0.77, -0.32, 1.13)
+V=(-0.771, -0.316, 1.128) cm
 Mother: MCParticles[6] (Lambda0)
 Charge=-1, PDG=-2212 (anti-p-)
 pT=0.442118, pZ=0.0611546
-V=(0.00, -0.00, 0.03)
+V=(36.993, -8.224, 278.142) um
 Mother: MCParticles[7] (anti-Delta--)
 Charge=-1, PDG=-211 (pi-)
 pT=0.592201, pZ=0.272332
-V=(0.00, -0.00, 0.03)
+V=(36.993, -8.224, 278.142) um
 Mother: MCParticles[7] (anti-Delta--)
 Charge=0, PDG=221 (eta)
 pT=0.244406, pZ=0.0362195
-V=(0.01, 0.00, 0.01)
+V=(64.174, 14.597, 91.630) um
 Mother: MCParticles[8] (D_s+)
 Charge=1, PDG=-13 (mu+)
 pT=1.19103, pZ=0.299647
-V=(0.01, 0.00, 0.01)
+V=(64.174, 14.597, 91.630) um
 Mother: MCParticles[8] (D_s+)
 Charge=0, PDG=14 (nu_mu)
 pT=0.779911, pZ=-0.03456
-V=(0.01, 0.00, 0.01)
+V=(64.174, 14.597, 91.630) um
 Mother: MCParticles[8] (D_s+)
 Charge=-1, PDG=11 (e-)
 pT=0.0017571, pZ=0.00138614
-V=(-4.23, -13.65, 22.31)
+V=(-4.235, -13.649, 22.313) cm
 Mother: MCParticles[10] (K+)
 Charge=0, PDG=14 (nu_mu)
 pT=0.493744, pZ=0.362985
-V=(-56.88, -69.68, 145.68)
+V=(-56.875, -69.675, 145.683) cm
 Mother: MCParticles[10] (K+)
 Charge=1, PDG=-13 (mu+)
 pT=0.035881, pZ=0.359769
-V=(-56.88, -69.68, 145.68)
+V=(-56.875, -69.675, 145.683) cm
 Mother: MCParticles[10] (K+)
 Charge=0, PDG=22 (gamma)
 pT=0.0486315, pZ=0.0614673
-V=(-0.02, -0.00, 0.03)
+V=(-175.288, -32.705, 268.970) um
 Mother: MCParticles[12] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.313787, pZ=0.590457
-V=(-0.02, -0.00, 0.03)
+V=(-175.288, -32.705, 268.970) um
 Mother: MCParticles[12] (pi0)
 Charge=-1, PDG=-323 (K*-)
 pT=1.08302, pZ=0.353745
-V=(0.01, -0.01, 0.03)
+V=(124.756, -95.676, 307.191) um
 Mother: MCParticles[14] (D0)
 Charge=1, PDG=211 (pi+)
 pT=0.1494, pZ=-0.143903
-V=(0.01, -0.01, 0.03)
+V=(124.756, -95.676, 307.191) um
 Mother: MCParticles[14] (D0)
 Charge=0, PDG=111 (pi0)
 pT=0.504806, pZ=0.0651819
-V=(0.01, -0.01, 0.03)
+V=(124.756, -95.676, 307.191) um
 Mother: MCParticles[14] (D0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.019568, pZ=-0.0224645
-V=(3.11, -2.48, 0.33)
+V=(3.107, -2.482, 0.331) cm
 Mother: MCParticles[15] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.019568, pZ=0.0224645
-V=(3.11, -2.48, 0.33)
+V=(3.107, -2.482, 0.331) cm
 Mother: MCParticles[15] (pi+)
 Charge=0, PDG=111 (pi0)
 pT=0.118845, pZ=-0.0122359
-V=(0.01, 0.00, 0.01)
+V=(64.174, 14.597, 91.630) um
 Mother: MCParticles[20] (eta)
 Charge=0, PDG=111 (pi0)
 pT=0.199449, pZ=0.100309
-V=(0.01, 0.00, 0.01)
+V=(64.174, 14.597, 91.630) um
 Mother: MCParticles[20] (eta)
 Charge=0, PDG=111 (pi0)
 pT=0.0681505, pZ=-0.0518533
-V=(0.01, 0.00, 0.01)
+V=(64.174, 14.597, 91.630) um
 Mother: MCParticles[20] (eta)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0300892, pZ=0.0135243
-V=(228.07, -172.36, 52.77)
+V=(228.075, -172.361, 52.766) cm
 Mother: MCParticles[21] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0185499, pZ=-0.0138942
-V=(228.07, -172.36, 52.77)
+V=(228.075, -172.361, 52.766) cm
 Mother: MCParticles[21] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.048978, pZ=0.000373864
-V=(228.07, -172.36, 52.77)
+V=(228.075, -172.361, 52.766) cm
 Mother: MCParticles[21] (mu+)
 Charge=0, PDG=-311 (anti-K0)
 pT=1.10179, pZ=0.432277
-V=(0.01, -0.01, 0.03)
+V=(124.756, -95.676, 307.191) um
 Mother: MCParticles[28] (K*-)
 Charge=-1, PDG=-211 (pi-)
 pT=0.0245084, pZ=-0.0777135
-V=(0.01, -0.01, 0.03)
+V=(124.756, -95.676, 307.191) um
 Mother: MCParticles[28] (K*-)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0296828, pZ=-0.00254802
-V=(46.80, -42.76, -108.27)
+V=(46.804, -42.762, -108.270) cm
 Mother: MCParticles[29] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.0296828, pZ=0.00254802
-V=(46.80, -42.76, -108.27)
+V=(46.804, -42.762, -108.270) cm
 Mother: MCParticles[29] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.201326, pZ=0.0912734
-V=(0.01, -0.01, 0.03)
+V=(124.747, -95.696, 307.194) um
 Mother: MCParticles[30] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.304424, pZ=-0.0260915
-V=(0.01, -0.01, 0.03)
+V=(124.747, -95.696, 307.194) um
 Mother: MCParticles[30] (pi0)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0263699, pZ=0.0168
-V=(3.73, -1.71, 1.02)
+V=(3.727, -1.708, 1.015) cm
 Mother: MCParticles[32] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0217593, pZ=0.00292017
-V=(3.73, -1.71, 1.02)
+V=(3.727, -1.708, 1.015) cm
 Mother: MCParticles[32] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0479526, pZ=-0.0199152
-V=(3.73, -1.71, 1.02)
+V=(3.727, -1.708, 1.015) cm
 Mother: MCParticles[32] (mu+)
 Charge=0, PDG=22 (gamma)
 pT=0.12242, pZ=-0.0187516
-V=(0.01, 0.00, 0.01)
+V=(64.167, 14.584, 91.629) um
 Mother: MCParticles[33] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0560312, pZ=0.00651568
-V=(0.01, 0.00, 0.01)
+V=(64.167, 14.584, 91.629) um
 Mother: MCParticles[33] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.174248, pZ=0.0189043
-V=(0.01, 0.00, 0.01)
+V=(64.165, 14.599, 91.635) um
 Mother: MCParticles[34] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0265131, pZ=0.0814044
-V=(0.01, 0.00, 0.01)
+V=(64.165, 14.599, 91.635) um
 Mother: MCParticles[34] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.042902, pZ=-0.0070345
-V=(0.01, 0.00, 0.01)
+V=(64.180, 14.589, 91.623) um
 Mother: MCParticles[35] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.107398, pZ=-0.0448188
-V=(0.01, 0.00, 0.01)
+V=(64.180, 14.589, 91.623) um
 Mother: MCParticles[35] (pi0)
 Charge=0, PDG=310 (K_S0)
 pT=1.10179, pZ=0.432277
-V=(0.01, -0.01, 0.03)
+V=(124.756, -95.676, 307.191) um
 Mother: MCParticles[39] (anti-K0)
 Charge=0, PDG=22 (gamma)
 pT=0.000482501, pZ=-7.92362e-05
-V=(-0.40, 1.01, -3.74)
+V=(-0.397, 1.014, -3.743) cm
 Mother: MCParticles[40] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.00107923, pZ=-0.000897278
-V=(-0.40, 1.01, -3.74)
+V=(-0.397, 1.014, -3.743) cm
 Mother: MCParticles[40] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.0103912, pZ=-0.00191536
-V=(-0.40, 1.01, -3.74)
+V=(-0.397, 1.014, -3.743) cm
 Mother: MCParticles[40] (pi-)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0429827, pZ=-0.00457757
-V=(46.82, -42.82, -108.27)
+V=(46.823, -42.818, -108.267) cm
 Mother: MCParticles[42] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0426104, pZ=-0.00293488
-V=(46.82, -42.82, -108.27)
+V=(46.823, -42.818, -108.267) cm
 Mother: MCParticles[42] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0175855, pZ=0.00771502
-V=(46.82, -42.82, -108.27)
+V=(46.823, -42.818, -108.267) cm
 Mother: MCParticles[42] (mu+)
 Charge=-1, PDG=11 (e-)
 pT=0.00122458, pZ=-0.000545299
-V=(7.71, 7.67, -3.22)
+V=(7.715, 7.672, -3.224) cm
 Mother: MCParticles[47] (e+)
 Charge=-1, PDG=11 (e-)
 pT=0.00358306, pZ=-5.62603e-05
-V=(7.73, 7.68, -3.23)
+V=(7.728, 7.682, -3.230) cm
 Mother: MCParticles[47] (e+)
 Charge=1, PDG=211 (pi+)
 pT=0.281475, pZ=0.29405
-V=(19.39, -10.43, 8.66)
+V=(19.387, -10.430, 8.662) cm
 Mother: MCParticles[54] (K_S0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.830678, pZ=0.138228
-V=(19.39, -10.43, 8.66)
+V=(19.387, -10.430, 8.662) cm
 Mother: MCParticles[54] (K_S0)
 Charge=0, PDG=22 (gamma)
 pT=1.80588e-05, pZ=-1.51964e-05
-V=(7.47, 7.75, 17.33)
+V=(7.471, 7.749, 17.326) cm
 Mother: MCParticles[62] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.137721, pZ=-0.00119279
-V=(-17.24, -119.43, 160.78)
+V=(-17.245, -119.434, 160.785) cm
 Mother: MCParticles[63] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.206757, pZ=0.046051
-V=(-17.24, -119.43, 160.78)
+V=(-17.245, -119.434, 160.785) cm
 Mother: MCParticles[63] (pi+)
 ECLClusters:
 
@@ -2791,462 +2791,462 @@ Covariance Matrix (d0, phi0, omega, z0, lambda):     1.3e-05    1.2e-05    4.2e-
 MCParticles:
 Charge=0, PDG=300553 (Upsilon(4S))
 pT=0.456177, pZ=2.99489
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Charge=1, PDG=521 (B+)
 pT=0.474175, pZ=1.51761
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=-1, PDG=-521 (B-)
 pT=0.0208245, pZ=1.47728
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=0, PDG=-423 (anti-D*0)
 pT=0.947852, pZ=0.672637
-V=(0.00, 0.00, 0.01)
+V=(19.919, 0.449, 63.769) um
 Mother: MCParticles[1] (B+)
 Charge=1, PDG=211 (pi+)
 pT=0.85172, pZ=-0.271853
-V=(0.00, 0.00, 0.01)
+V=(19.919, 0.449, 63.769) um
 Mother: MCParticles[1] (B+)
 Charge=-1, PDG=-213 (rho-)
 pT=0.322204, pZ=0.633735
-V=(0.00, 0.00, 0.01)
+V=(19.919, 0.449, 63.769) um
 Mother: MCParticles[1] (B+)
 Charge=1, PDG=213 (rho+)
 pT=0.694423, pZ=0.525899
-V=(0.00, 0.00, 0.01)
+V=(19.919, 0.449, 63.769) um
 Mother: MCParticles[1] (B+)
 Charge=0, PDG=425 (D_2*0)
 pT=1.7695, pZ=0.0343249
-V=(-0.00, -0.00, 0.02)
+V=(-2.500, -1.493, 206.591) um
 Mother: MCParticles[2] (B-)
 Charge=-1, PDG=-213 (rho-)
 pT=1.74638, pZ=1.42827
-V=(-0.00, -0.00, 0.02)
+V=(-2.500, -1.494, 206.591) um
 Mother: MCParticles[2] (B-)
 Charge=0, PDG=-421 (anti-D0)
 pT=0.913798, pZ=0.597224
-V=(0.00, 0.00, 0.01)
+V=(19.919, 0.449, 63.769) um
 Mother: MCParticles[3] (anti-D*0)
 Charge=0, PDG=111 (pi0)
 pT=0.0342771, pZ=0.0754184
-V=(0.00, 0.00, 0.01)
+V=(19.919, 0.449, 63.769) um
 Mother: MCParticles[3] (anti-D*0)
 Charge=0, PDG=22 (gamma)
 pT=0.169271, pZ=0.103943
-V=(65.46, -113.53, -43.39)
+V=(65.456, -113.531, -43.387) cm
 Mother: MCParticles[4] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.02501, pZ=-0.0301659
-V=(65.46, -113.53, -43.39)
+V=(65.456, -113.531, -43.387) cm
 Mother: MCParticles[4] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.000493093, pZ=-0.000237191
-V=(50.21, -116.73, -41.64)
+V=(50.215, -116.731, -41.641) cm
 Mother: MCParticles[4] (pi+)
 Charge=-1, PDG=-211 (pi-)
 pT=0.214384, pZ=0.639726
-V=(0.00, 0.00, 0.01)
+V=(19.919, 0.449, 63.769) um
 Mother: MCParticles[5] (rho-)
 Charge=0, PDG=111 (pi0)
 pT=0.40392, pZ=-0.0443635
-V=(0.00, 0.00, 0.01)
+V=(19.919, 0.449, 63.769) um
 Mother: MCParticles[5] (rho-)
 Charge=1, PDG=211 (pi+)
 pT=0.46756, pZ=-0.0821345
-V=(0.00, 0.00, 0.01)
+V=(19.919, 0.449, 63.769) um
 Mother: MCParticles[6] (rho+)
 Charge=0, PDG=111 (pi0)
 pT=0.276023, pZ=0.603599
-V=(0.00, 0.00, 0.01)
+V=(19.919, 0.449, 63.769) um
 Mother: MCParticles[6] (rho+)
 Charge=0, PDG=22 (gamma)
 pT=1.63322e-06, pZ=1.12457e-07
-V=(0.00, 0.00, 0.01)
+V=(19.919, 0.449, 63.769) um
 Mother: MCParticles[6] (rho+)
 Charge=1, PDG=413 (D*+)
 pT=1.15474, pZ=-0.0287009
-V=(-0.00, -0.00, 0.02)
+V=(-2.500, -1.493, 206.591) um
 Mother: MCParticles[7] (D_2*0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.75065, pZ=0.0630258
-V=(-0.00, -0.00, 0.02)
+V=(-2.500, -1.494, 206.591) um
 Mother: MCParticles[7] (D_2*0)
 Charge=-1, PDG=-211 (pi-)
 pT=1.04665, pZ=1.17714
-V=(-0.00, -0.00, 0.02)
+V=(-2.500, -1.494, 206.591) um
 Mother: MCParticles[8] (rho-)
 Charge=0, PDG=111 (pi0)
 pT=0.759748, pZ=0.265812
-V=(-0.00, -0.00, 0.02)
+V=(-2.500, -1.494, 206.591) um
 Mother: MCParticles[8] (rho-)
 Charge=0, PDG=313 (K*0)
 pT=0.755437, pZ=0.0117043
-V=(-0.00, 0.01, 0.01)
+V=(-40.927, 95.524, 137.542) um
 Mother: MCParticles[9] (anti-D0)
 Charge=1, PDG=211 (pi+)
 pT=0.191541, pZ=0.213118
-V=(-0.00, 0.01, 0.01)
+V=(-40.927, 95.524, 137.542) um
 Mother: MCParticles[9] (anti-D0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.184569, pZ=-0.0133495
-V=(-0.00, 0.01, 0.01)
+V=(-40.927, 95.524, 137.542) um
 Mother: MCParticles[9] (anti-D0)
 Charge=0, PDG=111 (pi0)
 pT=0.143435, pZ=0.3858
-V=(-0.00, 0.01, 0.01)
+V=(-40.927, 95.524, 137.542) um
 Mother: MCParticles[9] (anti-D0)
 Charge=0, PDG=22 (gamma)
 pT=0.00722847, pZ=0.108889
-V=(0.00, 0.00, 0.01)
+V=(19.917, 0.452, 63.778) um
 Mother: MCParticles[10] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.036118, pZ=-0.033471
-V=(0.00, 0.00, 0.01)
+V=(19.917, 0.452, 63.778) um
 Mother: MCParticles[10] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.048173, pZ=0.052229
-V=(-5.62, 14.43, 46.75)
+V=(-5.620, 14.434, 46.754) cm
 Mother: MCParticles[14] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.255475, pZ=0.196826
-V=(-5.62, 14.43, 46.75)
+V=(-5.620, 14.434, 46.754) cm
 Mother: MCParticles[14] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.381183, pZ=-0.0598595
-V=(0.00, 0.00, 0.01)
+V=(19.733, 0.191, 63.734) um
 Mother: MCParticles[15] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0393875, pZ=0.015496
-V=(0.00, 0.00, 0.01)
+V=(19.733, 0.191, 63.734) um
 Mother: MCParticles[15] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.264269, pZ=0.604171
-V=(0.00, 0.00, 0.01)
+V=(20.035, 0.504, 64.050) um
 Mother: MCParticles[17] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0178536, pZ=-0.000572444
-V=(0.00, 0.00, 0.01)
+V=(20.035, 0.504, 64.050) um
 Mother: MCParticles[17] (pi0)
 Charge=0, PDG=421 (D0)
 pT=1.03317, pZ=-0.0457563
-V=(-0.00, -0.00, 0.02)
+V=(-2.500, -1.494, 206.591) um
 Mother: MCParticles[19] (D*+)
 Charge=1, PDG=211 (pi+)
 pT=0.121753, pZ=0.0170549
-V=(-0.00, -0.00, 0.02)
+V=(-2.500, -1.494, 206.591) um
 Mother: MCParticles[19] (D*+)
 Charge=0, PDG=22 (gamma)
 pT=0.354113, pZ=0.402117
-V=(192.14, -101.84, 250.15)
+V=(192.136, -101.837, 250.145) cm
 Mother: MCParticles[21] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.0809145, pZ=0.0322936
-V=(192.14, -101.84, 250.15)
+V=(192.136, -101.837, 250.145) cm
 Mother: MCParticles[21] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.631821, pZ=0.165459
-V=(-0.00, -0.00, 0.02)
+V=(-2.194, -1.674, 206.715) um
 Mother: MCParticles[22] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.128468, pZ=0.100353
-V=(-0.00, -0.00, 0.02)
+V=(-2.194, -1.674, 206.715) um
 Mother: MCParticles[22] (pi0)
 Charge=0, PDG=311 (K0)
 pT=0.613543, pZ=0.236475
-V=(-0.00, 0.01, 0.01)
+V=(-40.927, 95.524, 137.542) um
 Mother: MCParticles[23] (K*0)
 Charge=0, PDG=111 (pi0)
 pT=0.235675, pZ=-0.224826
-V=(-0.00, 0.01, 0.01)
+V=(-40.927, 95.524, 137.542) um
 Mother: MCParticles[23] (K*0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.02814, pZ=0.0097829
-V=(40.29, -37.29, 212.34)
+V=(40.288, -37.290, 212.336) cm
 Mother: MCParticles[24] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.02814, pZ=-0.0097829
-V=(40.29, -37.29, 212.34)
+V=(40.288, -37.290, 212.336) cm
 Mother: MCParticles[24] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.00241104, pZ=0.00166328
-V=(0.94, 6.31, -21.09)
+V=(0.939, 6.312, -21.086) cm
 Mother: MCParticles[25] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.00172586, pZ=0.0012318
-V=(0.94, 6.31, -21.09)
+V=(0.939, 6.312, -21.086) cm
 Mother: MCParticles[25] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.000456354, pZ=0.000728943
-V=(0.94, 6.31, -21.09)
+V=(0.939, 6.312, -21.086) cm
 Mother: MCParticles[25] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.000303887, pZ=0.000318544
-V=(0.94, 6.31, -21.09)
+V=(0.939, 6.312, -21.086) cm
 Mother: MCParticles[25] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.0848592, pZ=0.0645718
-V=(-0.00, 0.01, 0.01)
+V=(-40.919, 95.516, 137.573) um
 Mother: MCParticles[26] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0586261, pZ=0.321229
-V=(-0.00, 0.01, 0.01)
+V=(-40.919, 95.516, 137.573) um
 Mother: MCParticles[26] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.000486015, pZ=-0.000157826
-V=(-0.67, -0.62, 15.73)
+V=(-0.667, -0.623, 15.727) cm
 Mother: MCParticles[27] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000486015, pZ=0.000157826
-V=(-0.67, -0.62, 15.73)
+V=(-0.667, -0.623, 15.727) cm
 Mother: MCParticles[27] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000592715, pZ=-0.000756475
-V=(-0.45, -1.26, 20.51)
+V=(-0.446, -1.260, 20.508) cm
 Mother: MCParticles[27] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000487144, pZ=0.000154307
-V=(-0.44, -1.25, 20.49)
+V=(-0.436, -1.252, 20.493) cm
 Mother: MCParticles[27] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000914265, pZ=0.00137962
-V=(-0.67, -0.83, 15.65)
+V=(-0.669, -0.829, 15.654) cm
 Mother: MCParticles[27] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000575016, pZ=0.00109363
-V=(-0.67, -0.84, 15.68)
+V=(-0.667, -0.844, 15.682) cm
 Mother: MCParticles[27] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000438089, pZ=-2.57831e-05
-V=(-1.43, -1.18, 15.14)
+V=(-1.425, -1.184, 15.144) cm
 Mother: MCParticles[27] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.00117731, pZ=0.00167469
-V=(-1.45, -1.25, 15.17)
+V=(-1.447, -1.245, 15.173) cm
 Mother: MCParticles[27] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.00752371, pZ=-0.00432577
-V=(-0.72, -0.69, 15.15)
+V=(-0.720, -0.695, 15.153) cm
 Mother: MCParticles[27] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000257813, pZ=-0.000441194
-V=(28.84, -117.45, 52.45)
+V=(28.838, -117.451, 52.452) cm
 Mother: MCParticles[32] (gamma)
 Charge=1, PDG=20213 (a_1+)
 pT=0.541265, pZ=-0.561332
-V=(-0.00, 0.00, 0.02)
+V=(-13.038, 17.871, 205.614) um
 Mother: MCParticles[35] (D0)
 Charge=-1, PDG=-321 (K-)
 pT=0.39973, pZ=0.613956
-V=(-0.00, 0.00, 0.02)
+V=(-13.038, 17.871, 205.614) um
 Mother: MCParticles[35] (D0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0248197, pZ=0.0164786
-V=(1.66, -1.42, 24.93)
+V=(1.657, -1.418, 24.931) cm
 Mother: MCParticles[36] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.0248197, pZ=-0.0164786
-V=(1.66, -1.42, 24.93)
+V=(1.657, -1.418, 24.931) cm
 Mother: MCParticles[36] (pi+)
 Charge=0, PDG=130 (K_L0)
 pT=0.613543, pZ=0.236475
-V=(-0.00, 0.01, 0.01)
+V=(-40.927, 95.524, 137.542) um
 Mother: MCParticles[41] (K0)
 Charge=0, PDG=22 (gamma)
 pT=0.21143, pZ=-0.126524
-V=(-0.00, 0.01, 0.01)
+V=(-40.928, 95.550, 137.517) um
 Mother: MCParticles[42] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0401298, pZ=-0.0983015
-V=(-0.00, 0.01, 0.01)
+V=(-40.928, 95.550, 137.517) um
 Mother: MCParticles[42] (pi0)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.00418695, pZ=0.0354571
-V=(40.28, -37.35, 212.31)
+V=(40.280, -37.355, 212.314) cm
 Mother: MCParticles[44] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0289151, pZ=-0.0133679
-V=(40.28, -37.35, 212.31)
+V=(40.280, -37.355, 212.314) cm
 Mother: MCParticles[44] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0301866, pZ=-0.0223915
-V=(40.28, -37.35, 212.31)
+V=(40.280, -37.355, 212.314) cm
 Mother: MCParticles[44] (mu+)
 Charge=0, PDG=22 (gamma)
 pT=3.68779e-05, pZ=0.000179186
-V=(6.05, -5.97, 46.61)
+V=(6.046, -5.972, 46.605) cm
 Mother: MCParticles[50] (gamma)
 Charge=0, PDG=113 (rho0)
 pT=0.341013, pZ=-0.488417
-V=(-0.00, 0.00, 0.02)
+V=(-13.038, 17.871, 205.614) um
 Mother: MCParticles[61] (a_1+)
 Charge=1, PDG=211 (pi+)
 pT=0.269946, pZ=-0.134763
-V=(-0.00, 0.00, 0.02)
+V=(-13.038, 17.871, 205.614) um
 Mother: MCParticles[61] (a_1+)
 Charge=-1, PDG=11 (e-)
 pT=0.000651761, pZ=0.000145213
-V=(-5.45, 10.38, 18.16)
+V=(-5.455, 10.382, 18.165) cm
 Mother: MCParticles[62] (K-)
 Charge=-1, PDG=11 (e-)
 pT=0.204619, pZ=0.200478
-V=(-128.11, 39.09, 230.73)
+V=(-128.107, 39.093, 230.728) cm
 Mother: MCParticles[62] (K-)
 Charge=0, PDG=-12 (anti-nu_e)
 pT=0.135355, pZ=0.161233
-V=(-128.11, 39.09, 230.73)
+V=(-128.107, 39.093, 230.728) cm
 Mother: MCParticles[62] (K-)
 Charge=0, PDG=111 (pi0)
 pT=0.142027, pZ=0.0324998
-V=(-128.11, 39.09, 230.73)
+V=(-128.107, 39.093, 230.728) cm
 Mother: MCParticles[62] (K-)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0481763, pZ=0.00936801
-V=(1.64, -1.42, 24.92)
+V=(1.645, -1.423, 24.923) cm
 Mother: MCParticles[64] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0123215, pZ=-0.0147882
-V=(1.64, -1.42, 24.92)
+V=(1.645, -1.423, 24.923) cm
 Mother: MCParticles[64] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.036404, pZ=0.00549592
-V=(1.64, -1.42, 24.92)
+V=(1.645, -1.423, 24.923) cm
 Mother: MCParticles[64] (mu+)
 Charge=0, PDG=111 (pi0)
 pT=0.274436, pZ=0.308192
-V=(-11.75, 6.36, 5.04)
+V=(-11.752, 6.364, 5.038) cm
 Mother: MCParticles[65] (K_L0)
 Charge=0, PDG=111 (pi0)
 pT=0.339736, pZ=-0.10745
-V=(-11.75, 6.36, 5.04)
+V=(-11.752, 6.364, 5.038) cm
 Mother: MCParticles[65] (K_L0)
 Charge=0, PDG=22 (gamma)
 pT=0.00424206, pZ=0.0052425
-V=(-9.69, 4.50, 4.13)
+V=(-9.688, 4.496, 4.127) cm
 Mother: MCParticles[65] (K_L0)
 Charge=0, PDG=22 (gamma)
 pT=0.000823087, pZ=0.000150629
-V=(-9.69, 4.50, 4.13)
+V=(-9.688, 4.496, 4.127) cm
 Mother: MCParticles[65] (K_L0)
 Charge=0, PDG=22 (gamma)
 pT=0.000127125, pZ=0.000168287
-V=(-9.69, 4.50, 4.13)
+V=(-9.688, 4.496, 4.127) cm
 Mother: MCParticles[65] (K_L0)
 Charge=-1, PDG=11 (e-)
 pT=0.0296738, pZ=-0.0629959
-V=(-1.46, 1.17, -4.56)
+V=(-1.464, 1.173, -4.559) cm
 Mother: MCParticles[67] (gamma)
 Charge=1, PDG=211 (pi+)
 pT=0.421156, pZ=-0.552505
-V=(-0.00, 0.00, 0.02)
+V=(-13.038, 17.871, 205.614) um
 Mother: MCParticles[72] (rho0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.151662, pZ=0.0275561
-V=(-0.00, 0.00, 0.02)
+V=(-13.038, 17.871, 205.614) um
 Mother: MCParticles[72] (rho0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0200073, pZ=0.0220742
-V=(105.39, 45.75, -112.16)
+V=(105.385, 45.752, -112.159) cm
 Mother: MCParticles[73] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.0200073, pZ=-0.0220742
-V=(105.39, 45.75, -112.16)
+V=(105.385, 45.752, -112.159) cm
 Mother: MCParticles[73] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.136303, pZ=0.0177658
-V=(-128.11, 39.09, 230.73)
+V=(-128.107, 39.093, 230.728) cm
 Mother: MCParticles[77] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0593542, pZ=0.014734
-V=(-128.11, 39.09, 230.73)
+V=(-128.107, 39.093, 230.728) cm
 Mother: MCParticles[77] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=8.71952e-05, pZ=6.00397e-06
-V=(-11.23, -6.94, 26.11)
+V=(-11.230, -6.937, 26.115) cm
 Mother: MCParticles[80] (e+)
 Charge=0, PDG=22 (gamma)
 pT=0.00292282, pZ=-0.000997068
-V=(-2.26, -1.40, 26.80)
+V=(-2.257, -1.401, 26.795) cm
 Mother: MCParticles[80] (e+)
 Charge=0, PDG=22 (gamma)
 pT=0.000373862, pZ=-0.000135789
-V=(-2.14, -1.45, 26.75)
+V=(-2.139, -1.449, 26.752) cm
 Mother: MCParticles[80] (e+)
 Charge=0, PDG=22 (gamma)
 pT=2.35588e-05, pZ=-1.49794e-05
-V=(-3.22, -6.21, 14.36)
+V=(-3.222, -6.212, 14.356) cm
 Mother: MCParticles[80] (e+)
 Charge=-1, PDG=11 (e-)
 pT=0.00187122, pZ=-0.00328773
-V=(-6.98, -3.84, 10.22)
+V=(-6.983, -3.836, 10.217) cm
 Mother: MCParticles[80] (e+)
 Charge=0, PDG=22 (gamma)
 pT=0.165417, pZ=0.198541
-V=(-11.75, 6.36, 5.04)
+V=(-11.752, 6.364, 5.038) cm
 Mother: MCParticles[81] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.137367, pZ=0.109651
-V=(-11.75, 6.36, 5.04)
+V=(-11.752, 6.364, 5.038) cm
 Mother: MCParticles[81] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.320245, pZ=-0.0683428
-V=(-11.75, 6.36, 5.04)
+V=(-11.752, 6.364, 5.038) cm
 Mother: MCParticles[82] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0366194, pZ=-0.039107
-V=(-11.75, 6.36, 5.04)
+V=(-11.752, 6.364, 5.038) cm
 Mother: MCParticles[82] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.00148495, pZ=-0.00324305
-V=(-1.52, 1.21, -4.71)
+V=(-1.523, 1.208, -4.714) cm
 Mother: MCParticles[86] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000362793, pZ=-0.000113768
-V=(-1.96, 1.37, -5.19)
+V=(-1.962, 1.367, -5.188) cm
 Mother: MCParticles[86] (e-)
 Charge=0, PDG=22 (gamma)
 pT=4.96285e-05, pZ=-0.000120752
-V=(-1.64, 1.30, -5.07)
+V=(-1.644, 1.304, -5.073) cm
 Mother: MCParticles[86] (e-)
 Charge=-1, PDG=11 (e-)
 pT=0.000787462, pZ=-0.000231022
-V=(-7.97, 7.25, -14.17)
+V=(-7.973, 7.250, -14.166) cm
 Mother: MCParticles[87] (pi+)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0662496, pZ=-0.0685561
-V=(-24.63, 107.18, -163.46)
+V=(-24.635, 107.181, -163.458) cm
 Mother: MCParticles[87] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.190735, pZ=-0.343781
-V=(-24.63, 107.18, -163.46)
+V=(-24.635, 107.181, -163.458) cm
 Mother: MCParticles[87] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.000430859, pZ=-0.000562003
-V=(-0.95, 1.08, 43.63)
+V=(-0.946, 1.084, 43.633) cm
 Mother: MCParticles[88] (pi-)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0216687, pZ=-0.00516132
-V=(105.34, 45.78, -112.20)
+V=(105.345, 45.775, -112.200) cm
 Mother: MCParticles[90] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0307644, pZ=-0.0220638
-V=(105.34, 45.78, -112.20)
+V=(105.345, 45.775, -112.200) cm
 Mother: MCParticles[90] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0356058, pZ=0.0275359
-V=(105.34, 45.78, -112.20)
+V=(105.345, 45.775, -112.200) cm
 Mother: MCParticles[90] (mu+)
 Charge=-1, PDG=11 (e-)
 pT=0.00110544, pZ=0.00051813
-V=(-7.34, -3.32, 8.46)
+V=(-7.337, -3.316, 8.462) cm
 Mother: MCParticles[97] (e-)
 Charge=-1, PDG=11 (e-)
 pT=0.000476161, pZ=-0.00066979
-V=(-3.07, 2.39, -8.96)
+V=(-3.069, 2.387, -8.960) cm
 Mother: MCParticles[102] (gamma)
 Charge=-1, PDG=11 (e-)
 pT=4.24002e-05, pZ=3.27798e-05
-V=(-7.36, -3.19, 0.26)
+V=(-7.365, -3.188, 0.265) cm
 Mother: MCParticles[112] (e-)
 ECLClusters:
 
@@ -3585,510 +3585,510 @@ Covariance Matrix (d0, phi0, omega, z0, lambda):       0.049    -0.0016    3.9e-
 MCParticles:
 Charge=0, PDG=300553 (Upsilon(4S))
 pT=0.456528, pZ=2.99584
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Charge=0, PDG=511 (B0)
 pT=0.132917, pZ=1.44837
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=0, PDG=-511 (anti-B0)
 pT=0.535152, pZ=1.54747
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=1, PDG=213 (rho+)
 pT=1.39593, pZ=2.31448
-V=(-0.00, 0.00, 0.00)
+V=(-0.706, 1.232, 15.473) um
 Mother: MCParticles[1] (B0)
 Charge=-1, PDG=-413 (D*-)
 pT=1.38771, pZ=-0.90434
-V=(-0.00, 0.00, 0.00)
+V=(-0.706, 1.232, 15.473) um
 Mother: MCParticles[1] (B0)
 Charge=0, PDG=22 (gamma)
 pT=0.000125772, pZ=-8.71169e-06
-V=(-0.00, 0.00, 0.00)
+V=(-0.706, 1.232, 15.473) um
 Mother: MCParticles[1] (B0)
 Charge=0, PDG=22 (gamma)
 pT=0.0434186, pZ=0.0601427
-V=(-0.00, 0.00, 0.00)
+V=(-0.706, 1.232, 15.473) um
 Mother: MCParticles[1] (B0)
 Charge=1, PDG=411 (D+)
 pT=1.56639, pZ=-0.266679
-V=(0.00, -0.00, 0.00)
+V=(5.039, -1.112, 14.922) um
 Mother: MCParticles[2] (anti-B0)
 Charge=-1, PDG=11 (e-)
 pT=0.358551, pZ=1.93974
-V=(0.00, -0.00, 0.00)
+V=(5.039, -1.112, 14.922) um
 Mother: MCParticles[2] (anti-B0)
 Charge=0, PDG=-12 (anti-nu_e)
 pT=1.09423, pZ=-0.125592
-V=(0.00, -0.00, 0.00)
+V=(5.039, -1.112, 14.922) um
 Mother: MCParticles[2] (anti-B0)
 Charge=1, PDG=211 (pi+)
 pT=1.38347, pZ=1.86741
-V=(-0.00, 0.00, 0.00)
+V=(-0.706, 1.232, 15.473) um
 Mother: MCParticles[3] (rho+)
 Charge=0, PDG=111 (pi0)
 pT=0.144474, pZ=0.425159
-V=(-0.00, 0.00, 0.00)
+V=(-0.706, 1.232, 15.473) um
 Mother: MCParticles[3] (rho+)
 Charge=-1, PDG=-411 (D-)
 pT=1.28852, pZ=-0.801895
-V=(-0.00, 0.00, 0.00)
+V=(-0.706, 1.232, 15.473) um
 Mother: MCParticles[4] (D*-)
 Charge=0, PDG=111 (pi0)
 pT=0.0999162, pZ=-0.102455
-V=(-0.00, 0.00, 0.00)
+V=(-0.706, 1.232, 15.473) um
 Mother: MCParticles[4] (D*-)
 Charge=0, PDG=-313 (anti-K*0)
 pT=0.651154, pZ=0.328119
-V=(0.05, -0.01, -0.01)
+V=(482.598, -76.513, -67.390) um
 Mother: MCParticles[7] (D+)
 Charge=0, PDG=111 (pi0)
 pT=0.0583127, pZ=-0.022077
-V=(0.05, -0.01, -0.01)
+V=(482.598, -76.513, -67.390) um
 Mother: MCParticles[7] (D+)
 Charge=1, PDG=211 (pi+)
 pT=0.974914, pZ=-0.569288
-V=(0.05, -0.01, -0.01)
+V=(482.598, -76.513, -67.390) um
 Mother: MCParticles[7] (D+)
 Charge=0, PDG=22 (gamma)
 pT=0.000410474, pZ=0.000304354
-V=(1.02, 4.73, 23.71)
+V=(1.015, 4.730, 23.712) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000410474, pZ=-0.000304354
-V=(1.02, 4.73, 23.71)
+V=(1.015, 4.730, 23.712) cm
 Mother: MCParticles[8] (e-)
 Charge=-1, PDG=11 (e-)
 pT=0.0034151, pZ=0.00823785
-V=(0.15, 1.19, 6.45)
+V=(0.148, 1.188, 6.455) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000232979, pZ=0.00121746
-V=(0.21, 1.50, 8.11)
+V=(0.207, 1.503, 8.112) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=2.6285e-05, pZ=0.000168786
-V=(0.27, 1.88, 10.13)
+V=(0.274, 1.881, 10.133) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000480963, pZ=-0.000172609
-V=(0.26, 1.92, 10.16)
+V=(0.263, 1.921, 10.156) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000480963, pZ=0.000172609
-V=(0.26, 1.92, 10.16)
+V=(0.263, 1.921, 10.156) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=8.55828e-06, pZ=8.88827e-05
-V=(0.41, 2.32, 12.33)
+V=(0.409, 2.324, 12.331) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.00453755, pZ=0.00358264
-V=(0.36, 2.38, 12.54)
+V=(0.363, 2.381, 12.540) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000290786, pZ=0.000201905
-V=(0.30, 2.43, 12.57)
+V=(0.299, 2.433, 12.572) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=7.31221e-05, pZ=0.000356536
-V=(0.37, 2.17, 11.58)
+V=(0.366, 2.169, 11.581) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=2.9619e-05, pZ=0.000141245
-V=(0.21, 1.52, 8.23)
+V=(0.212, 1.525, 8.229) cm
 Mother: MCParticles[8] (e-)
 Charge=-1, PDG=11 (e-)
 pT=0.0254984, pZ=0.120201
-V=(0.39, 2.20, 11.59)
+V=(0.391, 2.201, 11.588) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=5.23471e-05, pZ=0.00025965
-V=(0.29, 1.84, 9.82)
+V=(0.293, 1.836, 9.823) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000651778, pZ=0.00343344
-V=(0.33, 1.95, 10.45)
+V=(0.326, 1.952, 10.450) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000265002, pZ=0.000151364
-V=(0.42, 2.30, 12.54)
+V=(0.418, 2.296, 12.542) cm
 Mother: MCParticles[8] (e-)
 Charge=1, PDG=-11 (e+)
 pT=0.00386178, pZ=0.0296057
-V=(0.47, 2.24, 12.37)
+V=(0.473, 2.239, 12.374) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000501172, pZ=-9.97332e-05
-V=(5.73, 5.49, 39.43)
+V=(5.732, 5.490, 39.425) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.0004494, pZ=0.000243228
-V=(3.30, 3.45, 24.50)
+V=(3.301, 3.451, 24.500) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.0004494, pZ=-0.000243228
-V=(3.30, 3.45, 24.50)
+V=(3.301, 3.451, 24.500) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000491889, pZ=-0.000138437
-V=(-0.34, 1.32, 17.20)
+V=(-0.336, 1.321, 17.204) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000953724, pZ=0.00117628
-V=(-0.28, 1.42, 13.66)
+V=(-0.282, 1.420, 13.656) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000702782, pZ=-8.09028e-05
-V=(-0.34, 1.28, 13.75)
+V=(-0.341, 1.277, 13.751) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=9.09117e-05, pZ=0.000203754
-V=(0.34, 1.86, 9.92)
+V=(0.341, 1.857, 9.924) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000719824, pZ=0.0021373
-V=(0.42, 1.90, 10.17)
+V=(0.417, 1.905, 10.166) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.00175324, pZ=0.00320356
-V=(0.53, 1.95, 10.44)
+V=(0.531, 1.951, 10.444) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.0004326, pZ=-0.000271988
-V=(0.56, 1.93, 12.45)
+V=(0.563, 1.934, 12.453) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=2.96346e-05, pZ=0.000127093
-V=(0.32, 2.00, 10.29)
+V=(0.316, 2.003, 10.287) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000342896, pZ=0.00037887
-V=(0.55, 2.39, 11.72)
+V=(0.551, 2.395, 11.724) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000342896, pZ=-0.00037887
-V=(0.55, 2.39, 11.72)
+V=(0.551, 2.395, 11.724) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000138704, pZ=4.77861e-05
-V=(0.67, 2.36, 12.33)
+V=(0.668, 2.361, 12.327) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000156783, pZ=0.000185534
-V=(0.71, 2.36, 12.35)
+V=(0.706, 2.362, 12.345) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000163149, pZ=0.000241582
-V=(1.99, 4.29, 23.40)
+V=(1.991, 4.292, 23.396) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.00125104, pZ=0.00176887
-V=(2.02, 4.30, 23.44)
+V=(2.018, 4.304, 23.443) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.0223722, pZ=0.0286611
-V=(2.15, 4.36, 23.61)
+V=(2.146, 4.360, 23.614) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000331962, pZ=0.000388485
-V=(2.42, 4.53, 23.95)
+V=(2.425, 4.531, 23.952) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000248132, pZ=0.000854953
-V=(0.42, 2.34, 12.23)
+V=(0.423, 2.340, 12.227) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.00049668, pZ=-0.000120122
-V=(-0.48, 1.29, 15.49)
+V=(-0.475, 1.286, 15.490) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.00106387, pZ=0.00275461
-V=(0.37, 2.19, 12.61)
+V=(0.371, 2.190, 12.606) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.00116077, pZ=0.000299089
-V=(-0.77, -1.00, 18.03)
+V=(-0.773, -0.998, 18.027) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000502188, pZ=0.000693188
-V=(0.94, 1.34, 14.83)
+V=(0.936, 1.343, 14.827) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000506615, pZ=-6.67891e-05
-V=(0.94, 1.28, 14.82)
+V=(0.944, 1.280, 14.816) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000618063, pZ=-0.000707551
-V=(0.49, 1.45, 14.40)
+V=(0.491, 1.447, 14.403) cm
 Mother: MCParticles[8] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.136538, pZ=0.464479
-V=(-119.05, 0.17, 161.82)
+V=(-119.049, 0.167, 161.817) cm
 Mother: MCParticles[10] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.199175, pZ=0.282188
-V=(-119.05, 0.17, 161.82)
+V=(-119.049, 0.167, 161.817) cm
 Mother: MCParticles[10] (pi+)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0604901, pZ=-0.0161071
-V=(-110.58, 9.59, 165.70)
+V=(-110.576, 9.587, 165.703) cm
 Mother: MCParticles[10] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.227042, pZ=0.083878
-V=(-110.58, 9.59, 165.70)
+V=(-110.576, 9.587, 165.703) cm
 Mother: MCParticles[10] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.108855, pZ=0.413053
-V=(-0.00, 0.00, 0.00)
+V=(-0.703, 1.222, 15.506) um
 Mother: MCParticles[11] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0399327, pZ=0.012106
-V=(-0.00, 0.00, 0.00)
+V=(-0.703, 1.222, 15.506) um
 Mother: MCParticles[11] (pi0)
 Charge=0, PDG=130 (K_L0)
 pT=0.356417, pZ=-0.660413
-V=(0.01, 0.00, -0.00)
+V=(77.143, 31.778, -36.571) um
 Mother: MCParticles[12] (D-)
 Charge=-1, PDG=-211 (pi-)
 pT=1.15818, pZ=0.00671019
-V=(0.01, 0.00, -0.00)
+V=(77.143, 31.778, -36.571) um
 Mother: MCParticles[12] (D-)
 Charge=0, PDG=111 (pi0)
 pT=0.275921, pZ=-0.148183
-V=(0.01, 0.00, -0.00)
+V=(77.143, 31.778, -36.571) um
 Mother: MCParticles[12] (D-)
 Charge=0, PDG=22 (gamma)
 pT=0.0660286, pZ=-0.0428482
-V=(-0.00, 0.00, 0.00)
+V=(-0.670, 1.241, 15.435) um
 Mother: MCParticles[13] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.101847, pZ=-0.0596063
-V=(-0.00, 0.00, 0.00)
+V=(-0.670, 1.241, 15.435) um
 Mother: MCParticles[13] (pi0)
 Charge=0, PDG=-311 (anti-K0)
 pT=0.149905, pZ=0.386638
-V=(0.05, -0.01, -0.01)
+V=(482.598, -76.513, -67.390) um
 Mother: MCParticles[14] (anti-K*0)
 Charge=0, PDG=111 (pi0)
 pT=0.497931, pZ=-0.0619486
-V=(0.05, -0.01, -0.01)
+V=(482.598, -76.513, -67.390) um
 Mother: MCParticles[14] (anti-K*0)
 Charge=0, PDG=22 (gamma)
 pT=0.0331188, pZ=-0.0653922
-V=(0.05, -0.01, -0.01)
+V=(482.588, -76.516, -67.394) um
 Mother: MCParticles[15] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0616943, pZ=0.0433152
-V=(0.05, -0.01, -0.01)
+V=(482.588, -76.516, -67.394) um
 Mother: MCParticles[15] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.000179497, pZ=0.000292099
-V=(0.14, 1.19, 6.47)
+V=(0.141, 1.193, 6.469) cm
 Mother: MCParticles[19] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000854286, pZ=0.00318725
-V=(0.41, 2.31, 12.10)
+V=(0.415, 2.305, 12.099) cm
 Mother: MCParticles[29] (e-)
 Charge=0, PDG=22 (gamma)
 pT=6.87518e-05, pZ=0.000207081
-V=(0.43, 2.33, 12.20)
+V=(0.435, 2.326, 12.201) cm
 Mother: MCParticles[29] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.00267616, pZ=0.00861941
-V=(0.46, 2.36, 12.33)
+V=(0.464, 2.355, 12.326) cm
 Mother: MCParticles[29] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.00240388, pZ=0.00658575
-V=(2.19, 7.14, 26.25)
+V=(2.188, 7.144, 26.249) cm
 Mother: MCParticles[29] (e-)
 Charge=0, PDG=22 (gamma)
 pT=9.27826e-06, pZ=2.51808e-05
-V=(2.19, 7.31, 26.72)
+V=(2.187, 7.312, 26.721) cm
 Mother: MCParticles[29] (e-)
 Charge=0, PDG=22 (gamma)
 pT=3.01198e-05, pZ=4.94753e-05
-V=(0.45, 2.25, 12.61)
+V=(0.446, 2.255, 12.615) cm
 Mother: MCParticles[33] (e+)
 Charge=0, PDG=22 (gamma)
 pT=0.000916275, pZ=0.000776345
-V=(4.92, 4.59, 31.33)
+V=(4.917, 4.595, 31.330) cm
 Mother: MCParticles[33] (e+)
 Charge=0, PDG=22 (gamma)
 pT=0.000130098, pZ=1.50091e-06
-V=(4.86, 4.38, 31.58)
+V=(4.858, 4.379, 31.582) cm
 Mother: MCParticles[33] (e+)
 Charge=0, PDG=22 (gamma)
 pT=0.000507254, pZ=-6.17535e-05
-V=(4.86, 4.39, 31.58)
+V=(4.862, 4.387, 31.578) cm
 Mother: MCParticles[33] (e+)
 Charge=0, PDG=22 (gamma)
 pT=0.000507254, pZ=6.17535e-05
-V=(4.86, 4.39, 31.58)
+V=(4.862, 4.387, 31.578) cm
 Mother: MCParticles[33] (e+)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0312282, pZ=-0.0268523
-V=(-32.87, -53.06, 219.99)
+V=(-32.866, -53.056, 219.992) cm
 Mother: MCParticles[63] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.00277054, pZ=0.0337147
-V=(-32.87, -53.06, 219.99)
+V=(-32.866, -53.056, 219.992) cm
 Mother: MCParticles[63] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0293096, pZ=-0.00697976
-V=(-32.87, -53.06, 219.99)
+V=(-32.866, -53.056, 219.992) cm
 Mother: MCParticles[63] (mu+)
 Charge=0, PDG=22 (gamma)
 pT=0.00455758, pZ=0.0163224
-V=(0.65, -1.58, 6.47)
+V=(0.649, -1.580, 6.474) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000140068, pZ=0.000519532
-V=(0.66, -1.60, 6.56)
+V=(0.659, -1.602, 6.555) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.00131503, pZ=-0.000772993
-V=(0.68, -1.65, 6.78)
+V=(0.684, -1.654, 6.783) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000190823, pZ=6.26016e-05
-V=(0.70, -1.78, 7.16)
+V=(0.699, -1.777, 7.161) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000279285, pZ=0.000344599
-V=(0.59, -1.70, 8.07)
+V=(0.587, -1.705, 8.066) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000482832, pZ=-0.000167311
-V=(1.20, -1.52, 8.49)
+V=(1.204, -1.516, 8.495) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000244498, pZ=0.001424
-V=(0.69, -1.74, 7.47)
+V=(0.691, -1.743, 7.470) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.00022965, pZ=-0.000456487
-V=(-0.24, -1.97, 12.57)
+V=(-0.242, -1.971, 12.573) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.00022965, pZ=0.000456487
-V=(-0.24, -1.97, 12.57)
+V=(-0.242, -1.971, 12.573) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.00183606, pZ=0.0027679
-V=(0.56, -1.79, 8.03)
+V=(0.558, -1.792, 8.029) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000156723, pZ=-9.19619e-05
-V=(0.65, -1.79, 8.24)
+V=(0.653, -1.788, 8.244) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000148911, pZ=0.000702746
-V=(0.70, -1.70, 6.98)
+V=(0.695, -1.696, 6.981) cm
 Mother: MCParticles[64] (gamma)
 Charge=-1, PDG=11 (e-)
 pT=0.0655491, pZ=0.305012
-V=(0.72, -1.75, 7.24)
+V=(0.718, -1.747, 7.241) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.00084789, pZ=0.00360889
-V=(0.75, -1.69, 7.48)
+V=(0.749, -1.690, 7.483) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000504488, pZ=-8.13099e-05
-V=(0.88, -1.74, 7.60)
+V=(0.876, -1.742, 7.601) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000504488, pZ=8.13099e-05
-V=(0.88, -1.74, 7.60)
+V=(0.876, -1.742, 7.601) cm
 Mother: MCParticles[64] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.205583, pZ=-0.0873342
-V=(0.01, 0.00, -0.00)
+V=(77.126, 31.734, -36.596) um
 Mother: MCParticles[68] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.100724, pZ=-0.0608489
-V=(0.01, 0.00, -0.00)
+V=(77.126, 31.734, -36.596) um
 Mother: MCParticles[68] (pi0)
 Charge=0, PDG=310 (K_S0)
 pT=0.149905, pZ=0.386638
-V=(0.05, -0.01, -0.01)
+V=(482.598, -76.513, -67.390) um
 Mother: MCParticles[71] (anti-K0)
 Charge=0, PDG=22 (gamma)
 pT=0.120362, pZ=0.0180285
-V=(0.05, -0.01, -0.01)
+V=(483.097, -76.578, -67.453) um
 Mother: MCParticles[72] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.389782, pZ=-0.0799771
-V=(0.05, -0.01, -0.01)
+V=(483.097, -76.578, -67.453) um
 Mother: MCParticles[72] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.000268805, pZ=0.000287042
-V=(0.78, -1.89, 8.12)
+V=(0.784, -1.886, 8.118) cm
 Mother: MCParticles[101] (e-)
 Charge=0, PDG=22 (gamma)
 pT=8.99984e-05, pZ=-4.92316e-05
-V=(2.07, 0.21, 8.76)
+V=(2.071, 0.208, 8.760) cm
 Mother: MCParticles[101] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000722158, pZ=0.000392579
-V=(0.80, -1.90, 8.24)
+V=(0.801, -1.902, 8.238) cm
 Mother: MCParticles[101] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000245304, pZ=0.00156707
-V=(1.23, -1.10, 15.16)
+V=(1.232, -1.099, 15.164) cm
 Mother: MCParticles[101] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000687915, pZ=-0.000168371
-V=(1.26, -1.18, 16.16)
+V=(1.257, -1.184, 16.159) cm
 Mother: MCParticles[101] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000482804, pZ=0.000644289
-V=(1.21, -1.06, 15.37)
+V=(1.206, -1.055, 15.367) cm
 Mother: MCParticles[101] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000347237, pZ=-4.9988e-05
-V=(1.22, -1.12, 15.50)
+V=(1.218, -1.123, 15.499) cm
 Mother: MCParticles[101] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000365849, pZ=0.000356755
-V=(1.22, -1.12, 15.50)
+V=(1.217, -1.123, 15.500) cm
 Mother: MCParticles[101] (e-)
 Charge=0, PDG=22 (gamma)
 pT=8.77441e-05, pZ=0.000208027
-V=(0.82, -1.88, 8.07)
+V=(0.817, -1.882, 8.070) cm
 Mother: MCParticles[101] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.00117635, pZ=-0.000406391
-V=(0.71, -1.88, 8.30)
+V=(0.714, -1.879, 8.304) cm
 Mother: MCParticles[101] (e-)
 Charge=0, PDG=22 (gamma)
 pT=0.000393343, pZ=0.00145347
-V=(5.43, -3.90, 27.02)
+V=(5.433, -3.899, 27.016) cm
 Mother: MCParticles[101] (e-)
 Charge=1, PDG=211 (pi+)
 pT=0.0987674, pZ=0.362811
-V=(0.12, -0.04, 0.20)
+V=(0.123, -0.037, 0.201) cm
 Mother: MCParticles[107] (K_S0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.201985, pZ=0.0238277
-V=(0.12, -0.04, 0.20)
+V=(0.123, -0.037, 0.201) cm
 Mother: MCParticles[107] (K_S0)
 Charge=-1, PDG=11 (e-)
 pT=0.00173327, pZ=0.00240061
-V=(0.26, 1.19, 4.71)
+V=(0.259, 1.187, 4.706) cm
 Mother: MCParticles[121] (pi+)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0186697, pZ=0.0408671
-V=(21.70, 21.86, 456.61)
+V=(21.699, 21.856, 456.612) cm
 Mother: MCParticles[121] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.0836936, pZ=0.212221
-V=(21.70, 21.86, 456.61)
+V=(21.699, 21.856, 456.612) cm
 Mother: MCParticles[121] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.00490322, pZ=-0.00166025
-V=(0.67, -1.26, 36.87)
+V=(0.668, -1.257, 36.868) cm
 Mother: MCParticles[122] (pi-)
 ECLClusters:
 
@@ -4427,306 +4427,306 @@ Covariance Matrix (d0, phi0, omega, z0, lambda):       0.001   -0.00015   -7.5e-
 MCParticles:
 Charge=0, PDG=300553 (Upsilon(4S))
 pT=0.456287, pZ=2.99328
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Charge=1, PDG=521 (B+)
 pT=0.385845, pZ=1.48842
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=-1, PDG=-521 (B-)
 pT=0.332625, pZ=1.50487
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=0, PDG=-421 (anti-D0)
 pT=2.07229, pZ=0.814044
-V=(0.00, -0.00, 0.02)
+V=(35.446, -36.177, 195.378) um
 Mother: MCParticles[1] (B+)
 Charge=1, PDG=211 (pi+)
 pT=0.813726, pZ=-0.211433
-V=(0.00, -0.00, 0.02)
+V=(35.446, -36.177, 195.378) um
 Mother: MCParticles[1] (B+)
 Charge=0, PDG=221 (eta)
 pT=1.39636, pZ=0.885817
-V=(0.00, -0.00, 0.02)
+V=(35.446, -36.177, 195.378) um
 Mother: MCParticles[1] (B+)
 Charge=1, PDG=413 (D*+)
 pT=0.398918, pZ=0.991732
-V=(0.00, 0.00, 0.01)
+V=(10.091, 14.933, 81.540) um
 Mother: MCParticles[2] (B-)
 Charge=0, PDG=111 (pi0)
 pT=1.05098, pZ=0.651902
-V=(0.00, 0.00, 0.01)
+V=(10.091, 14.933, 81.540) um
 Mother: MCParticles[2] (B-)
 Charge=-1, PDG=-211 (pi-)
 pT=0.819292, pZ=0.0224586
-V=(0.00, 0.00, 0.01)
+V=(10.091, 14.933, 81.540) um
 Mother: MCParticles[2] (B-)
 Charge=-1, PDG=-211 (pi-)
 pT=1.12715, pZ=-0.161228
-V=(0.00, 0.00, 0.01)
+V=(10.091, 14.933, 81.540) um
 Mother: MCParticles[2] (B-)
 Charge=0, PDG=130 (K_L0)
 pT=0.620329, pZ=-0.047958
-V=(-0.00, -0.02, 0.03)
+V=(-25.867, -210.387, 267.926) um
 Mother: MCParticles[3] (anti-D0)
 Charge=1, PDG=211 (pi+)
 pT=0.708395, pZ=0.418765
-V=(-0.00, -0.02, 0.03)
+V=(-25.867, -210.387, 267.926) um
 Mother: MCParticles[3] (anti-D0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.883856, pZ=0.324547
-V=(-0.00, -0.02, 0.03)
+V=(-25.867, -210.387, 267.926) um
 Mother: MCParticles[3] (anti-D0)
 Charge=0, PDG=111 (pi0)
 pT=0.266004, pZ=0.11868
-V=(-0.00, -0.02, 0.03)
+V=(-25.867, -210.387, 267.926) um
 Mother: MCParticles[3] (anti-D0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0267643, pZ=-0.0130854
-V=(72.29, 130.99, -13.16)
+V=(72.290, 130.987, -13.160) cm
 Mother: MCParticles[4] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.0267643, pZ=0.0130854
-V=(72.29, 130.99, -13.16)
+V=(72.290, 130.987, -13.160) cm
 Mother: MCParticles[4] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=1.19607, pZ=0.954182
-V=(0.00, -0.00, 0.02)
+V=(35.446, -36.177, 195.378) um
 Mother: MCParticles[5] (eta)
 Charge=0, PDG=22 (gamma)
 pT=0.20065, pZ=-0.0683635
-V=(0.00, -0.00, 0.02)
+V=(35.446, -36.177, 195.378) um
 Mother: MCParticles[5] (eta)
 Charge=0, PDG=421 (D0)
 pT=0.363221, pZ=0.893663
-V=(0.00, 0.00, 0.01)
+V=(10.091, 14.933, 81.540) um
 Mother: MCParticles[6] (D*+)
 Charge=1, PDG=211 (pi+)
 pT=0.0484232, pZ=0.0980782
-V=(0.00, 0.00, 0.01)
+V=(10.091, 14.933, 81.540) um
 Mother: MCParticles[6] (D*+)
 Charge=0, PDG=22 (gamma)
 pT=0.999641, pZ=0.615123
-V=(0.00, 0.00, 0.01)
+V=(10.154, 15.060, 81.627) um
 Mother: MCParticles[7] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0599702, pZ=0.0367798
-V=(0.00, 0.00, 0.01)
+V=(10.154, 15.060, 81.627) um
 Mother: MCParticles[7] (pi0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0129778, pZ=0.0268167
-V=(-44.05, -239.62, -32.75)
+V=(-44.049, -239.615, -32.755) cm
 Mother: MCParticles[9] (pi-)
 Charge=1, PDG=-13 (mu+)
 pT=0.0129778, pZ=-0.0268167
-V=(-44.05, -239.62, -32.75)
+V=(-44.049, -239.615, -32.755) cm
 Mother: MCParticles[9] (pi-)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0154983, pZ=0.0254433
-V=(22.10, -232.18, -25.38)
+V=(22.098, -232.176, -25.376) cm
 Mother: MCParticles[10] (K_L0)
 Charge=1, PDG=-13 (mu+)
 pT=0.0154983, pZ=-0.0254433
-V=(22.10, -232.18, -25.38)
+V=(22.098, -232.176, -25.376) cm
 Mother: MCParticles[10] (K_L0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.201459, pZ=-0.0280876
-V=(21.63, -231.18, -23.03)
+V=(21.629, -231.181, -23.029) cm
 Mother: MCParticles[10] (K_L0)
 Charge=1, PDG=211 (pi+)
 pT=0.204447, pZ=0.0423485
-V=(21.63, -231.18, -23.03)
+V=(21.629, -231.181, -23.029) cm
 Mother: MCParticles[10] (K_L0)
 Charge=0, PDG=22 (gamma)
 pT=0.129555, pZ=0.14569
-V=(-24.68, -127.62, 48.28)
+V=(-24.684, -127.616, 48.284) cm
 Mother: MCParticles[12] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.21395, pZ=0.0799356
-V=(-24.68, -127.62, 48.28)
+V=(-24.684, -127.616, 48.284) cm
 Mother: MCParticles[12] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.0699428, pZ=0.0355946
-V=(-0.00, -0.02, 0.03)
+V=(-25.850, -210.397, 267.935) um
 Mother: MCParticles[13] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.227879, pZ=0.0830851
-V=(-0.00, -0.02, 0.03)
+V=(-25.850, -210.397, 267.935) um
 Mother: MCParticles[13] (pi0)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0249595, pZ=0.00302325
-V=(72.34, 130.96, -13.13)
+V=(72.337, 130.958, -13.132) cm
 Mother: MCParticles[15] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0341018, pZ=-0.0277406
-V=(72.34, 130.96, -13.13)
+V=(72.337, 130.958, -13.132) cm
 Mother: MCParticles[15] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.025894, pZ=0.0250703
-V=(72.34, 130.96, -13.13)
+V=(72.337, 130.958, -13.132) cm
 Mother: MCParticles[15] (mu+)
 Charge=0, PDG=22 (gamma)
 pT=0.000503818, pZ=-8.53685e-05
-V=(111.24, 89.89, 113.34)
+V=(111.240, 89.894, 113.337) cm
 Mother: MCParticles[16] (gamma)
 Charge=0, PDG=310 (K_S0)
 pT=0.458792, pZ=0.572177
-V=(0.00, 0.00, 0.01)
+V=(9.377, 13.530, 85.412) um
 Mother: MCParticles[18] (D0)
 Charge=0, PDG=221 (eta)
 pT=0.249379, pZ=0.539196
-V=(0.00, 0.00, 0.01)
+V=(9.377, 13.530, 85.412) um
 Mother: MCParticles[18] (D0)
 Charge=0, PDG=111 (pi0)
 pT=0.3139, pZ=-0.217718
-V=(0.00, 0.00, 0.01)
+V=(9.377, 13.530, 85.412) um
 Mother: MCParticles[18] (D0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0265015, pZ=-0.0136099
-V=(-13.40, -9.01, 52.03)
+V=(-13.402, -9.007, 52.025) cm
 Mother: MCParticles[19] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.0265015, pZ=0.0136099
-V=(-13.40, -9.01, 52.03)
+V=(-13.402, -9.007, 52.025) cm
 Mother: MCParticles[19] (pi+)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0160697, pZ=-0.000918719
-V=(-44.05, -239.59, -32.82)
+V=(-44.049, -239.586, -32.823) cm
 Mother: MCParticles[23] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0230068, pZ=0.0318235
-V=(-44.05, -239.59, -32.82)
+V=(-44.049, -239.586, -32.823) cm
 Mother: MCParticles[23] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0387702, pZ=-0.0312236
-V=(-44.05, -239.59, -32.82)
+V=(-44.049, -239.586, -32.823) cm
 Mother: MCParticles[23] (mu+)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0285415, pZ=-0.00201365
-V=(22.15, -232.41, -25.74)
+V=(22.154, -232.412, -25.736) cm
 Mother: MCParticles[25] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0225681, pZ=0.0337411
-V=(22.15, -232.41, -25.74)
+V=(22.154, -232.412, -25.736) cm
 Mother: MCParticles[25] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0159969, pZ=-0.0321818
-V=(22.15, -232.41, -25.74)
+V=(22.154, -232.412, -25.736) cm
 Mother: MCParticles[25] (mu+)
 Charge=0, PDG=22 (gamma)
 pT=0.0663991, pZ=-0.0594184
-V=(-4.51, -233.82, -26.61)
+V=(-4.515, -233.821, -26.607) cm
 Mother: MCParticles[26] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.0378835, pZ=0.0467097
-V=(-4.51, -233.82, -26.61)
+V=(-4.515, -233.821, -26.607) cm
 Mother: MCParticles[26] (pi-)
 Charge=0, PDG=14 (nu_mu)
 pT=0.029723, pZ=-0.00202477
-V=(18.75, -233.80, -3.09)
+V=(18.751, -233.799, -3.090) cm
 Mother: MCParticles[27] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.029723, pZ=0.00202477
-V=(18.75, -233.80, -3.09)
+V=(18.751, -233.799, -3.090) cm
 Mother: MCParticles[27] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.000631204, pZ=9.57282e-05
-V=(23.06, -134.23, 68.87)
+V=(23.056, -134.227, 68.867) cm
 Mother: MCParticles[30] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000475155, pZ=-0.000125393
-V=(123.68, -35.53, 46.73)
+V=(123.676, -35.526, 46.729) cm
 Mother: MCParticles[31] (gamma)
 Charge=1, PDG=211 (pi+)
 pT=0.343757, pZ=0.451459
-V=(-6.97, 1.35, 8.86)
+V=(-6.966, 1.351, 8.859) cm
 Mother: MCParticles[36] (K_S0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.238979, pZ=0.120718
-V=(-6.97, 1.35, 8.86)
+V=(-6.966, 1.351, 8.859) cm
 Mother: MCParticles[36] (K_S0)
 Charge=0, PDG=22 (gamma)
 pT=0.0862814, pZ=0.152599
-V=(0.00, 0.00, 0.01)
+V=(9.377, 13.530, 85.412) um
 Mother: MCParticles[37] (eta)
 Charge=-1, PDG=-211 (pi-)
 pT=0.0789324, pZ=0.205761
-V=(0.00, 0.00, 0.01)
+V=(9.377, 13.530, 85.412) um
 Mother: MCParticles[37] (eta)
 Charge=1, PDG=211 (pi+)
 pT=0.293555, pZ=0.180836
-V=(0.00, 0.00, 0.01)
+V=(9.377, 13.530, 85.412) um
 Mother: MCParticles[37] (eta)
 Charge=0, PDG=22 (gamma)
 pT=0.0199774, pZ=-0.0533301
-V=(0.00, 0.00, 0.01)
+V=(9.383, 13.526, 85.407) um
 Mother: MCParticles[38] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.306963, pZ=-0.164388
-V=(0.00, 0.00, 0.01)
+V=(9.383, 13.526, 85.407) um
 Mother: MCParticles[38] (pi0)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0283835, pZ=0.0361344
-V=(-13.35, -9.03, 52.06)
+V=(-13.345, -9.032, 52.057) cm
 Mother: MCParticles[40] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.035591, pZ=-0.0336518
-V=(-13.35, -9.03, 52.06)
+V=(-13.345, -9.032, 52.057) cm
 Mother: MCParticles[40] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.00986479, pZ=-0.00261008
-V=(-13.35, -9.03, 52.06)
+V=(-13.345, -9.032, 52.057) cm
 Mother: MCParticles[40] (mu+)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0422805, pZ=0.0276105
-V=(18.73, -233.79, -3.09)
+V=(18.726, -233.787, -3.086) cm
 Mother: MCParticles[50] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0173104, pZ=-0.0211653
-V=(18.73, -233.79, -3.09)
+V=(18.726, -233.787, -3.086) cm
 Mother: MCParticles[50] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0265011, pZ=-0.00656689
-V=(18.73, -233.79, -3.09)
+V=(18.726, -233.787, -3.086) cm
 Mother: MCParticles[50] (mu+)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0619687, pZ=0.0501426
-V=(-101.10, -4.41, 66.81)
+V=(-101.100, -4.410, 66.809) cm
 Mother: MCParticles[54] (pi-)
 Charge=-1, PDG=13 (mu-)
 pT=0.180128, pZ=0.0688005
-V=(-101.10, -4.41, 66.81)
+V=(-101.100, -4.410, 66.809) cm
 Mother: MCParticles[54] (pi-)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.00473081, pZ=0.0667017
-V=(-8.74, 25.41, 437.41)
+V=(-8.743, 25.414, 437.415) cm
 Mother: MCParticles[56] (pi-)
 Charge=-1, PDG=13 (mu-)
 pT=0.0670822, pZ=0.0998849
-V=(-8.74, 25.41, 437.41)
+V=(-8.743, 25.414, 437.415) cm
 Mother: MCParticles[56] (pi-)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0184059, pZ=0.0234261
-V=(-51.26, -19.45, 216.84)
+V=(-51.256, -19.449, 216.842) cm
 Mother: MCParticles[57] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.0184059, pZ=-0.0234261
-V=(-51.26, -19.45, 216.84)
+V=(-51.256, -19.449, 216.842) cm
 Mother: MCParticles[57] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.000503993, pZ=-8.43256e-05
-V=(-12.47, -6.63, 22.31)
+V=(-12.473, -6.635, 22.309) cm
 Mother: MCParticles[62] (e+)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0305574, pZ=-0.0233628
-V=(-51.25, -19.48, 216.79)
+V=(-51.247, -19.482, 216.785) cm
 Mother: MCParticles[71] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0190563, pZ=0.0134613
-V=(-51.25, -19.48, 216.79)
+V=(-51.247, -19.482, 216.785) cm
 Mother: MCParticles[71] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0421741, pZ=0.0100189
-V=(-51.25, -19.48, 216.79)
+V=(-51.247, -19.482, 216.785) cm
 Mother: MCParticles[71] (mu+)
 ECLClusters:
 
@@ -5089,218 +5089,218 @@ Covariance Matrix (d0, phi0, omega, z0, lambda):     0.00077   -5.5e-05    7.2e-
 MCParticles:
 Charge=0, PDG=300553 (Upsilon(4S))
 pT=0.45661, pZ=3.00483
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Charge=1, PDG=521 (B+)
 pT=0.488914, pZ=1.56653
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=-1, PDG=-521 (B-)
 pT=0.254008, pZ=1.4383
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=0, PDG=-423 (anti-D*0)
 pT=0.651111, pZ=-0.203732
-V=(0.00, 0.00, 0.00)
+V=(10.129, 6.068, 37.833) um
 Mother: MCParticles[1] (B+)
 Charge=0, PDG=111 (pi0)
 pT=0.0641699, pZ=0.0735842
-V=(0.00, 0.00, 0.00)
+V=(10.129, 6.068, 37.833) um
 Mother: MCParticles[1] (B+)
 Charge=1, PDG=213 (rho+)
 pT=0.490004, pZ=1.96706
-V=(0.00, 0.00, 0.00)
+V=(10.129, 6.068, 37.833) um
 Mother: MCParticles[1] (B+)
 Charge=0, PDG=113 (rho0)
 pT=0.669179, pZ=-0.28702
-V=(0.00, 0.00, 0.00)
+V=(10.129, 6.068, 37.833) um
 Mother: MCParticles[1] (B+)
 Charge=-1, PDG=-323 (K*-)
 pT=1.77162, pZ=-0.776591
-V=(0.00, -0.00, 0.01)
+V=(2.259, -15.255, 87.322) um
 Mother: MCParticles[2] (B-)
 Charge=0, PDG=111 (pi0)
 pT=2.16971, pZ=1.81726
-V=(0.00, -0.00, 0.01)
+V=(2.259, -15.255, 87.322) um
 Mother: MCParticles[2] (B-)
 Charge=0, PDG=111 (pi0)
 pT=0.277142, pZ=0.405042
-V=(0.00, -0.00, 0.01)
+V=(2.259, -15.255, 87.322) um
 Mother: MCParticles[2] (B-)
 Charge=0, PDG=-421 (anti-D0)
 pT=0.562875, pZ=-0.203132
-V=(0.00, 0.00, 0.00)
+V=(10.129, 6.068, 37.833) um
 Mother: MCParticles[3] (anti-D*0)
 Charge=0, PDG=111 (pi0)
 pT=0.0882592, pZ=-0.000602546
-V=(0.00, 0.00, 0.00)
+V=(10.129, 6.068, 37.833) um
 Mother: MCParticles[3] (anti-D*0)
 Charge=0, PDG=22 (gamma)
 pT=0.0807113, pZ=0.00656671
-V=(0.00, 0.00, 0.00)
+V=(10.128, 6.071, 37.836) um
 Mother: MCParticles[4] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0532726, pZ=0.0670167
-V=(0.00, 0.00, 0.00)
+V=(10.128, 6.071, 37.836) um
 Mother: MCParticles[4] (pi0)
 Charge=1, PDG=211 (pi+)
 pT=0.559501, pZ=0.955151
-V=(0.00, 0.00, 0.00)
+V=(10.129, 6.068, 37.833) um
 Mother: MCParticles[5] (rho+)
 Charge=0, PDG=111 (pi0)
 pT=0.228618, pZ=1.02843
-V=(0.00, 0.00, 0.00)
+V=(10.129, 6.068, 37.833) um
 Mother: MCParticles[5] (rho+)
 Charge=1, PDG=211 (pi+)
 pT=0.361995, pZ=-0.413862
-V=(0.00, 0.00, 0.00)
+V=(10.129, 6.068, 37.833) um
 Mother: MCParticles[6] (rho0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.459616, pZ=0.126964
-V=(0.00, 0.00, 0.00)
+V=(10.129, 6.068, 37.833) um
 Mother: MCParticles[6] (rho0)
 Charge=0, PDG=-311 (anti-K0)
 pT=1.57783, pZ=-0.750832
-V=(0.00, -0.00, 0.01)
+V=(2.259, -15.255, 87.322) um
 Mother: MCParticles[7] (K*-)
 Charge=-1, PDG=-211 (pi-)
 pT=0.284016, pZ=-0.0331738
-V=(0.00, -0.00, 0.01)
+V=(2.259, -15.255, 87.322) um
 Mother: MCParticles[7] (K*-)
 Charge=0, PDG=22 (gamma)
 pT=1.53007, pZ=1.20965
-V=(0.00, -0.00, 0.01)
+V=(2.363, -15.889, 87.860) um
 Mother: MCParticles[8] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.640628, pZ=0.607608
-V=(0.00, -0.00, 0.01)
+V=(2.363, -15.889, 87.860) um
 Mother: MCParticles[8] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.241962, pZ=0.363344
-V=(0.00, -0.00, 0.01)
+V=(2.260, -15.254, 87.325) um
 Mother: MCParticles[9] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0592683, pZ=0.0416959
-V=(0.00, -0.00, 0.01)
+V=(2.260, -15.254, 87.325) um
 Mother: MCParticles[9] (pi0)
 Charge=1, PDG=321 (K+)
 pT=0.0717801, pZ=0.517317
-V=(0.01, 0.00, 0.00)
+V=(70.482, 12.514, 15.928) um
 Mother: MCParticles[10] (anti-D0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.677733, pZ=-0.807372
-V=(0.01, 0.00, 0.00)
+V=(70.482, 12.514, 15.928) um
 Mother: MCParticles[10] (anti-D0)
 Charge=0, PDG=111 (pi0)
 pT=0.0733481, pZ=0.0869246
-V=(0.01, 0.00, 0.00)
+V=(70.482, 12.514, 15.928) um
 Mother: MCParticles[10] (anti-D0)
 Charge=0, PDG=22 (gamma)
 pT=0.0252041, pZ=-0.041193
-V=(0.00, 0.00, 0.00)
+V=(10.133, 6.069, 37.833) um
 Mother: MCParticles[11] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.105437, pZ=0.0405904
-V=(0.00, 0.00, 0.00)
+V=(10.133, 6.069, 37.833) um
 Mother: MCParticles[11] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.188646, pZ=0.68002
-V=(0.00, 0.00, 0.00)
+V=(10.105, 6.110, 38.048) um
 Mother: MCParticles[15] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0752518, pZ=0.348408
-V=(0.00, 0.00, 0.00)
+V=(10.105, 6.110, 38.048) um
 Mother: MCParticles[15] (pi0)
 Charge=0, PDG=310 (K_S0)
 pT=1.57783, pZ=-0.750832
-V=(0.00, -0.00, 0.01)
+V=(2.259, -15.255, 87.322) um
 Mother: MCParticles[18] (anti-K0)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.00554183, pZ=-0.0100637
-V=(-51.99, 8.06, -6.57)
+V=(-51.995, 8.055, -6.572) cm
 Mother: MCParticles[19] (pi-)
 Charge=-1, PDG=13 (mu-)
 pT=0.283546, pZ=-0.0238752
-V=(-51.99, 8.06, -6.57)
+V=(-51.995, 8.055, -6.572) cm
 Mother: MCParticles[19] (pi-)
 Charge=0, PDG=14 (nu_mu)
 pT=0.147848, pZ=0.183347
-V=(0.80, 0.62, 9.21)
+V=(0.802, 0.622, 9.210) cm
 Mother: MCParticles[24] (K+)
 Charge=1, PDG=-13 (mu+)
 pT=0.147848, pZ=-0.183347
-V=(0.80, 0.62, 9.21)
+V=(0.802, 0.622, 9.210) cm
 Mother: MCParticles[24] (K+)
 Charge=0, PDG=22 (gamma)
 pT=0.000599411, pZ=-0.00247049
-V=(-0.46, -1.15, 9.11)
+V=(-0.462, -1.153, 9.113) cm
 Mother: MCParticles[24] (K+)
 Charge=0, PDG=22 (gamma)
 pT=0.00148367, pZ=0.000238998
-V=(-0.46, -1.15, 9.11)
+V=(-0.462, -1.153, 9.113) cm
 Mother: MCParticles[24] (K+)
 Charge=0, PDG=22 (gamma)
 pT=0.000349596, pZ=-0.000448235
-V=(-0.46, -1.15, 9.11)
+V=(-0.462, -1.153, 9.113) cm
 Mother: MCParticles[24] (K+)
 Charge=0, PDG=22 (gamma)
 pT=0.0376388, pZ=7.4912e-05
-V=(0.01, 0.00, 0.00)
+V=(70.460, 12.515, 15.954) um
 Mother: MCParticles[26] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.108357, pZ=0.0868497
-V=(0.01, 0.00, 0.00)
+V=(70.460, 12.515, 15.954) um
 Mother: MCParticles[26] (pi0)
 Charge=-1, PDG=11 (e-)
 pT=0.0196998, pZ=-0.0322614
-V=(-7.75, 7.89, -18.07)
+V=(-7.751, 7.887, -18.070) cm
 Mother: MCParticles[27] (gamma)
 Charge=1, PDG=-11 (e+)
 pT=0.00549589, pZ=-0.00891797
-V=(-7.75, 7.89, -18.07)
+V=(-7.751, 7.887, -18.070) cm
 Mother: MCParticles[27] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.000128128, pZ=0.000494122
-V=(-5.03, 0.95, 23.70)
+V=(-5.034, 0.953, 23.697) cm
 Mother: MCParticles[30] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=0.0002846, pZ=-7.84323e-05
-V=(-5.03, 0.92, 23.46)
+V=(-5.025, 0.916, 23.460) cm
 Mother: MCParticles[30] (gamma)
 Charge=-1, PDG=11 (e-)
 pT=0.00214479, pZ=0.00249736
-V=(-6.58, 1.27, 32.39)
+V=(-6.584, 1.265, 32.393) cm
 Mother: MCParticles[30] (gamma)
 Charge=0, PDG=22 (gamma)
 pT=3.90267e-05, pZ=0.000191568
-V=(-5.06, 0.96, 23.99)
+V=(-5.062, 0.960, 23.989) cm
 Mother: MCParticles[30] (gamma)
 Charge=1, PDG=211 (pi+)
 pT=0.528152, pZ=-0.180563
-V=(-0.22, 1.20, -0.57)
+V=(-0.225, 1.200, -0.573) cm
 Mother: MCParticles[31] (K_S0)
 Charge=-1, PDG=-211 (pi-)
 pT=1.0939, pZ=-0.570269
-V=(-0.22, 1.20, -0.57)
+V=(-0.225, 1.200, -0.573) cm
 Mother: MCParticles[31] (K_S0)
 Charge=-1, PDG=11 (e-)
 pT=0.000288337, pZ=-2.81215e-05
-V=(10.55, 0.82, -3.78)
+V=(10.554, 0.822, -3.784) cm
 Mother: MCParticles[35] (mu+)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0474961, pZ=0.0168735
-V=(12.72, -55.03, -114.73)
+V=(12.721, -55.030, -114.731) cm
 Mother: MCParticles[35] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0164405, pZ=-0.0130757
-V=(12.72, -55.03, -114.73)
+V=(12.721, -55.030, -114.731) cm
 Mother: MCParticles[35] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0335118, pZ=-0.00385581
-V=(12.72, -55.03, -114.73)
+V=(12.721, -55.030, -114.731) cm
 Mother: MCParticles[35] (mu+)
 Charge=0, PDG=22 (gamma)
 pT=0.000280199, pZ=0.000427327
-V=(-10.65, 0.91, -19.95)
+V=(-10.652, 0.912, -19.955) cm
 Mother: MCParticles[42] (e+)
 ECLClusters:
 
@@ -5657,306 +5657,306 @@ Covariance Matrix (d0, phi0, omega, z0, lambda):     2.2e-05   -1.5e-05   -9.3e-
 MCParticles:
 Charge=0, PDG=300553 (Upsilon(4S))
 pT=0.456559, pZ=3.00436
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Charge=1, PDG=521 (B+)
 pT=0.36524, pZ=1.49294
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=-1, PDG=-521 (B-)
 pT=0.406062, pZ=1.51142
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=1, PDG=433 (D_s*+)
 pT=0.287513, pZ=-0.897637
-V=(0.00, -0.00, 0.01)
+V=(8.406, -13.429, 64.758) um
 Mother: MCParticles[1] (B+)
 Charge=0, PDG=-423 (anti-D*0)
 pT=0.634996, pZ=2.39058
-V=(0.00, -0.00, 0.01)
+V=(8.406, -13.429, 64.758) um
 Mother: MCParticles[1] (B+)
 Charge=-1, PDG=-413 (D*-)
 pT=0.78483, pZ=0.330628
-V=(0.00, 0.00, 0.01)
+V=(24.702, 29.103, 142.085) um
 Mother: MCParticles[2] (B-)
 Charge=1, PDG=413 (D*+)
 pT=0.61293, pZ=0.972205
-V=(0.00, 0.00, 0.01)
+V=(24.702, 29.103, 142.085) um
 Mother: MCParticles[2] (B-)
 Charge=-1, PDG=-323 (K*-)
 pT=0.417237, pZ=0.208788
-V=(0.00, 0.00, 0.01)
+V=(24.701, 29.104, 142.085) um
 Mother: MCParticles[2] (B-)
 Charge=1, PDG=431 (D_s+)
 pT=0.227574, pZ=-0.741509
-V=(0.00, -0.00, 0.01)
+V=(8.406, -13.429, 64.758) um
 Mother: MCParticles[3] (D_s*+)
 Charge=0, PDG=22 (gamma)
 pT=0.120564, pZ=-0.156135
-V=(0.00, -0.00, 0.01)
+V=(8.406, -13.429, 64.758) um
 Mother: MCParticles[3] (D_s*+)
 Charge=0, PDG=-421 (anti-D0)
 pT=0.471033, pZ=2.07337
-V=(0.00, -0.00, 0.01)
+V=(8.406, -13.429, 64.758) um
 Mother: MCParticles[4] (anti-D*0)
 Charge=0, PDG=22 (gamma)
 pT=0.164098, pZ=0.317229
-V=(0.00, -0.00, 0.01)
+V=(8.406, -13.429, 64.758) um
 Mother: MCParticles[4] (anti-D*0)
 Charge=-1, PDG=-411 (D-)
 pT=0.748086, pZ=0.276669
-V=(0.00, 0.00, 0.01)
+V=(24.701, 29.104, 142.085) um
 Mother: MCParticles[5] (D*-)
 Charge=0, PDG=111 (pi0)
 pT=0.0389829, pZ=0.0539618
-V=(0.00, 0.00, 0.01)
+V=(24.701, 29.104, 142.085) um
 Mother: MCParticles[5] (D*-)
 Charge=0, PDG=421 (D0)
 pT=0.58666, pZ=0.871893
-V=(0.00, 0.00, 0.01)
+V=(24.701, 29.104, 142.085) um
 Mother: MCParticles[6] (D*+)
 Charge=1, PDG=211 (pi+)
 pT=0.0318478, pZ=0.100321
-V=(0.00, 0.00, 0.01)
+V=(24.701, 29.104, 142.085) um
 Mother: MCParticles[6] (D*+)
 Charge=0, PDG=-311 (anti-K0)
 pT=0.214417, pZ=0.368826
-V=(0.00, 0.00, 0.01)
+V=(24.701, 29.104, 142.085) um
 Mother: MCParticles[7] (K*-)
 Charge=-1, PDG=-211 (pi-)
 pT=0.280967, pZ=-0.160236
-V=(0.00, 0.00, 0.01)
+V=(24.701, 29.104, 142.085) um
 Mother: MCParticles[7] (K*-)
 Charge=1, PDG=323 (K*+)
 pT=0.639087, pZ=-0.34562
-V=(0.00, -0.00, 0.00)
+V=(11.723, -3.537, 30.766) um
 Mother: MCParticles[8] (D_s+)
 Charge=0, PDG=-311 (anti-K0)
 pT=0.719127, pZ=-0.397406
-V=(0.00, -0.00, 0.00)
+V=(11.723, -3.537, 30.766) um
 Mother: MCParticles[8] (D_s+)
 Charge=0, PDG=311 (K0)
 pT=0.362153, pZ=0.734412
-V=(0.00, -0.00, 0.01)
+V=(11.191, -20.731, 99.158) um
 Mother: MCParticles[10] (anti-D0)
 Charge=1, PDG=211 (pi+)
 pT=0.0880054, pZ=0.0636419
-V=(0.00, -0.00, 0.01)
+V=(11.191, -20.731, 99.158) um
 Mother: MCParticles[10] (anti-D0)
 Charge=-1, PDG=11 (e-)
 pT=0.593404, pZ=1.14122
-V=(0.00, -0.00, 0.01)
+V=(11.191, -20.731, 99.158) um
 Mother: MCParticles[10] (anti-D0)
 Charge=0, PDG=-12 (anti-nu_e)
 pT=0.38407, pZ=0.13407
-V=(0.00, -0.00, 0.01)
+V=(11.191, -20.731, 99.158) um
 Mother: MCParticles[10] (anti-D0)
 Charge=0, PDG=311 (K0)
 pT=0.547656, pZ=-0.269498
-V=(0.00, 0.00, 0.02)
+V=(39.221, 0.491, 153.952) um
 Mother: MCParticles[12] (D-)
 Charge=-1, PDG=11 (e-)
 pT=0.0876847, pZ=0.177168
-V=(0.00, 0.00, 0.02)
+V=(39.221, 0.491, 153.952) um
 Mother: MCParticles[12] (D-)
 Charge=0, PDG=-12 (anti-nu_e)
 pT=0.980304, pZ=0.368996
-V=(0.00, 0.00, 0.02)
+V=(39.221, 0.491, 153.952) um
 Mother: MCParticles[12] (D-)
 Charge=0, PDG=22 (gamma)
 pT=0.0612149, pZ=-0.0226066
-V=(0.00, 0.00, 0.01)
+V=(24.703, 29.089, 142.106) um
 Mother: MCParticles[13] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0374677, pZ=0.0765684
-V=(0.00, 0.00, 0.01)
+V=(24.703, 29.089, 142.106) um
 Mother: MCParticles[13] (pi0)
 Charge=1, PDG=20213 (a_1+)
 pT=0.295735, pZ=0.755643
-V=(0.00, 0.02, 0.03)
+V=(26.346, 161.094, 338.264) um
 Mother: MCParticles[14] (D0)
 Charge=-1, PDG=-321 (K-)
 pT=0.699921, pZ=-0.00450793
-V=(0.00, 0.02, 0.03)
+V=(26.346, 161.094, 338.264) um
 Mother: MCParticles[14] (D0)
 Charge=0, PDG=310 (K_S0)
 pT=0.214417, pZ=0.368826
-V=(0.00, 0.00, 0.01)
+V=(24.701, 29.104, 142.085) um
 Mother: MCParticles[16] (anti-K0)
 Charge=1, PDG=321 (K+)
 pT=0.644289, pZ=-0.282913
-V=(0.00, -0.00, 0.00)
+V=(11.723, -3.537, 30.766) um
 Mother: MCParticles[18] (K*+)
 Charge=0, PDG=111 (pi0)
 pT=0.255823, pZ=-0.0611823
-V=(0.00, -0.00, 0.00)
+V=(11.723, -3.537, 30.766) um
 Mother: MCParticles[18] (K*+)
 Charge=0, PDG=130 (K_L0)
 pT=0.719127, pZ=-0.397406
-V=(0.00, -0.00, 0.00)
+V=(11.723, -3.537, 30.766) um
 Mother: MCParticles[19] (anti-K0)
 Charge=0, PDG=130 (K_L0)
 pT=0.362153, pZ=0.734412
-V=(0.00, -0.00, 0.01)
+V=(11.191, -20.731, 99.158) um
 Mother: MCParticles[20] (K0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0295612, pZ=-0.00370129
-V=(-26.08, -17.84, 103.00)
+V=(-26.084, -17.841, 102.999) cm
 Mother: MCParticles[21] (pi+)
 Charge=1, PDG=-13 (mu+)
 pT=0.0295612, pZ=0.00370129
-V=(-26.08, -17.84, 103.00)
+V=(-26.084, -17.841, 102.999) cm
 Mother: MCParticles[21] (pi+)
 Charge=0, PDG=310 (K_S0)
 pT=0.547656, pZ=-0.269498
-V=(0.00, 0.00, 0.02)
+V=(39.221, 0.491, 153.952) um
 Mother: MCParticles[24] (K0)
 Charge=0, PDG=22 (gamma)
 pT=0.000447784, pZ=0.00089005
-V=(1.62, -0.35, 3.35)
+V=(1.619, -0.349, 3.346) cm
 Mother: MCParticles[25] (e-)
 Charge=-1, PDG=11 (e-)
 pT=0.00593037, pZ=-0.00200164
-V=(-6.60, -11.89, -5.01)
+V=(-6.604, -11.893, -5.011) cm
 Mother: MCParticles[27] (gamma)
 Charge=1, PDG=-11 (e+)
 pT=0.0552703, pZ=-0.0205694
-V=(-6.60, -11.89, -5.01)
+V=(-6.604, -11.893, -5.011) cm
 Mother: MCParticles[27] (gamma)
 Charge=1, PDG=213 (rho+)
 pT=0.314467, pZ=0.767246
-V=(0.00, 0.02, 0.03)
+V=(26.346, 161.094, 338.264) um
 Mother: MCParticles[29] (a_1+)
 Charge=0, PDG=111 (pi0)
 pT=0.0859935, pZ=0.0717385
-V=(0.00, 0.02, 0.03)
+V=(26.346, 161.094, 338.264) um
 Mother: MCParticles[29] (a_1+)
 Charge=-1, PDG=-211 (pi-)
 pT=0.0910649, pZ=0.0191464
-V=(-130.75, 78.00, -6.08)
+V=(-130.750, 78.004, -6.076) cm
 Mother: MCParticles[30] (K-)
 Charge=1, PDG=2212 (p+)
 pT=0.480575, pZ=-0.0284848
-V=(-130.75, 78.00, -6.08)
+V=(-130.750, 78.004, -6.076) cm
 Mother: MCParticles[30] (K-)
 Charge=0, PDG=22 (gamma)
 pT=0.102576, pZ=-0.0855996
-V=(-125.76, 80.57, -5.26)
+V=(-125.761, 80.571, -5.257) cm
 Mother: MCParticles[30] (K-)
 Charge=0, PDG=22 (gamma)
 pT=0.0436465, pZ=-0.00927251
-V=(-125.76, 80.57, -5.26)
+V=(-125.761, 80.571, -5.257) cm
 Mother: MCParticles[30] (K-)
 Charge=1, PDG=211 (pi+)
 pT=0.0669167, pZ=0.328993
-V=(-1.16, 0.88, 2.52)
+V=(-1.160, 0.884, 2.524) cm
 Mother: MCParticles[31] (K_S0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.253228, pZ=0.0398336
-V=(-1.16, 0.88, 2.52)
+V=(-1.160, 0.884, 2.524) cm
 Mother: MCParticles[31] (K_S0)
 Charge=-1, PDG=11 (e-)
 pT=0.000808227, pZ=-0.000264885
-V=(-13.27, -3.29, -6.00)
+V=(-13.271, -3.291, -6.000) cm
 Mother: MCParticles[32] (K+)
 Charge=0, PDG=111 (pi0)
 pT=0.0798002, pZ=-0.160583
-V=(-140.52, 39.67, -69.51)
+V=(-140.522, 39.666, -69.514) cm
 Mother: MCParticles[32] (K+)
 Charge=1, PDG=211 (pi+)
 pT=0.393251, pZ=0.0226556
-V=(-140.52, 39.67, -69.51)
+V=(-140.522, 39.666, -69.514) cm
 Mother: MCParticles[32] (K+)
 Charge=0, PDG=22 (gamma)
 pT=0.208, pZ=-0.10292
-V=(0.00, -0.00, 0.00)
+V=(11.718, -3.464, 30.748) um
 Mother: MCParticles[33] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0479575, pZ=0.0417381
-V=(0.00, -0.00, 0.00)
+V=(11.718, -3.464, 30.748) um
 Mother: MCParticles[33] (pi0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.00808942, pZ=-0.00110559
-V=(-252.65, -60.54, 736.64)
+V=(-252.654, -60.535, 736.644) cm
 Mother: MCParticles[35] (K_L0)
 Charge=1, PDG=-13 (mu+)
 pT=0.208079, pZ=0.357258
-V=(-252.65, -60.54, 736.64)
+V=(-252.654, -60.535, 736.644) cm
 Mother: MCParticles[35] (K_L0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.0872654, pZ=-0.0517618
-V=(-93.49, 46.11, 215.84)
+V=(-93.489, 46.109, 215.836) cm
 Mother: MCParticles[35] (K_L0)
 Charge=1, PDG=2212 (p+)
 pT=0.048872, pZ=0.143119
-V=(-93.49, 46.11, 215.84)
+V=(-93.489, 46.109, 215.836) cm
 Mother: MCParticles[35] (K_L0)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0208113, pZ=0.0202085
-V=(-26.10, -17.91, 103.00)
+V=(-26.103, -17.907, 103.004) cm
 Mother: MCParticles[37] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0377494, pZ=-0.0175612
-V=(-26.10, -17.91, 103.00)
+V=(-26.103, -17.907, 103.004) cm
 Mother: MCParticles[37] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.034396, pZ=-0.00268682
-V=(-26.10, -17.91, 103.00)
+V=(-26.103, -17.907, 103.004) cm
 Mother: MCParticles[37] (mu+)
 Charge=1, PDG=211 (pi+)
 pT=0.400317, pZ=-0.0395186
-V=(-4.49, -0.60, -2.22)
+V=(-4.494, -0.603, -2.218) cm
 Mother: MCParticles[38] (K_S0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.241815, pZ=-0.229979
-V=(-4.49, -0.60, -2.22)
+V=(-4.494, -0.603, -2.218) cm
 Mother: MCParticles[38] (K_S0)
 Charge=0, PDG=22 (gamma)
 pT=1.91069e-07, pZ=-6.86945e-07
-V=(-4.49, -0.60, -2.22)
+V=(-4.494, -0.603, -2.218) cm
 Mother: MCParticles[38] (K_S0)
 Charge=1, PDG=211 (pi+)
 pT=0.399179, pZ=0.500672
-V=(0.00, 0.02, 0.03)
+V=(26.346, 161.094, 338.264) um
 Mother: MCParticles[42] (rho+)
 Charge=0, PDG=111 (pi0)
 pT=0.307044, pZ=0.302899
-V=(0.00, 0.02, 0.03)
+V=(26.346, 161.094, 338.264) um
 Mother: MCParticles[42] (rho+)
 Charge=0, PDG=22 (gamma)
 pT=0.000820145, pZ=0.00108298
-V=(0.00, 0.02, 0.03)
+V=(26.346, 161.094, 338.264) um
 Mother: MCParticles[42] (rho+)
 Charge=0, PDG=22 (gamma)
 pT=0.0289794, pZ=0.0724918
-V=(0.00, 0.02, 0.03)
+V=(26.350, 161.076, 338.279) um
 Mother: MCParticles[43] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0973126, pZ=-0.000753348
-V=(0.00, 0.02, 0.03)
+V=(26.350, 161.076, 338.279) um
 Mother: MCParticles[43] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.106493, pZ=-0.157675
-V=(-140.52, 39.67, -69.51)
+V=(-140.522, 39.666, -69.514) cm
 Mother: MCParticles[51] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0340483, pZ=-0.00290863
-V=(-140.52, 39.67, -69.51)
+V=(-140.522, 39.666, -69.514) cm
 Mother: MCParticles[51] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0379013, pZ=-0.000719281
-V=(-73.47, 131.45, -34.18)
+V=(-73.472, 131.451, -34.185) cm
 Mother: MCParticles[52] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.147961, pZ=-0.0494526
-V=(-73.47, 131.45, -34.18)
+V=(-73.472, 131.451, -34.185) cm
 Mother: MCParticles[52] (pi+)
 Charge=0, PDG=22 (gamma)
 pT=0.164602, pZ=0.158269
-V=(0.00, 0.02, 0.03)
+V=(26.353, 161.253, 338.421) um
 Mother: MCParticles[66] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.170505, pZ=0.14463
-V=(0.00, 0.02, 0.03)
+V=(26.353, 161.253, 338.421) um
 Mother: MCParticles[66] (pi0)
 ECLClusters:
 
@@ -6352,222 +6352,222 @@ Covariance Matrix (d0, phi0, omega, z0, lambda):     0.00015    0.00012   -1.2e-
 MCParticles:
 Charge=0, PDG=300553 (Upsilon(4S))
 pT=0.456177, pZ=2.99401
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Charge=0, PDG=-511 (anti-B0)
 pT=0.428879, pZ=1.36169
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=0, PDG=511 (B0)
 pT=0.0370051, pZ=1.63232
-V=(0.00, 0.00, 0.00)
+V=(0.000, 0.000, 0.000) um
 Mother: MCParticles[0] (Upsilon(4S))
 Charge=1, PDG=413 (D*+)
 pT=1.33806, pZ=0.180929
-V=(0.00, 0.00, 0.00)
+V=(1.596, 0.090, 5.075) um
 Mother: MCParticles[1] (anti-B0)
 Charge=0, PDG=113 (rho0)
 pT=1.46238, pZ=0.652583
-V=(0.00, 0.00, 0.00)
+V=(1.596, 0.090, 5.075) um
 Mother: MCParticles[1] (anti-B0)
 Charge=-1, PDG=-211 (pi-)
 pT=1.14439, pZ=0.526588
-V=(0.00, 0.00, 0.00)
+V=(1.596, 0.090, 5.075) um
 Mother: MCParticles[1] (anti-B0)
 Charge=1, PDG=10433 (D'_s1+)
 pT=1.11701, pZ=0.149669
-V=(0.00, -0.00, 0.02)
+V=(3.315, -2.869, 193.385) um
 Mother: MCParticles[2] (B0)
 Charge=-1, PDG=-413 (D*-)
 pT=1.15401, pZ=1.48265
-V=(0.00, -0.00, 0.02)
+V=(3.315, -2.869, 193.385) um
 Mother: MCParticles[2] (B0)
 Charge=1, PDG=411 (D+)
 pT=1.2773, pZ=0.145399
-V=(0.00, 0.00, 0.00)
+V=(1.596, 0.090, 5.075) um
 Mother: MCParticles[3] (D*+)
 Charge=0, PDG=111 (pi0)
 pT=0.0618982, pZ=0.0355314
-V=(0.00, 0.00, 0.00)
+V=(1.596, 0.090, 5.075) um
 Mother: MCParticles[3] (D*+)
 Charge=1, PDG=211 (pi+)
 pT=1.24359, pZ=0.261179
-V=(0.00, 0.00, 0.00)
+V=(1.596, 0.090, 5.075) um
 Mother: MCParticles[4] (rho0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.278936, pZ=0.392995
-V=(0.00, 0.00, 0.00)
+V=(1.596, 0.090, 5.075) um
 Mother: MCParticles[4] (rho0)
 Charge=0, PDG=423 (D*0)
 pT=0.876938, pZ=0.261871
-V=(0.00, -0.00, 0.02)
+V=(3.315, -2.869, 193.385) um
 Mother: MCParticles[6] (D'_s1+)
 Charge=1, PDG=321 (K+)
 pT=0.259424, pZ=-0.112203
-V=(0.00, -0.00, 0.02)
+V=(3.315, -2.869, 193.385) um
 Mother: MCParticles[6] (D'_s1+)
 Charge=-1, PDG=-411 (D-)
 pT=1.06125, pZ=1.33652
-V=(0.00, -0.00, 0.02)
+V=(3.315, -2.869, 193.385) um
 Mother: MCParticles[7] (D*-)
 Charge=0, PDG=111 (pi0)
 pT=0.094356, pZ=0.146151
-V=(0.00, -0.00, 0.02)
+V=(3.315, -2.869, 193.385) um
 Mother: MCParticles[7] (D*-)
 Charge=0, PDG=130 (K_L0)
 pT=1.49867, pZ=0.56734
-V=(0.01, -0.01, 0.00)
+V=(115.151, -142.379, 25.814) um
 Mother: MCParticles[8] (D+)
 Charge=1, PDG=211 (pi+)
 pT=0.389561, pZ=-0.421942
-V=(0.01, -0.01, 0.00)
+V=(115.151, -142.379, 25.814) um
 Mother: MCParticles[8] (D+)
 Charge=0, PDG=22 (gamma)
 pT=0.0962701, pZ=-0.00288342
-V=(0.00, 0.00, 0.00)
+V=(1.597, 0.088, 5.076) um
 Mother: MCParticles[9] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0412555, pZ=0.0384148
-V=(0.00, 0.00, 0.00)
+V=(1.597, 0.088, 5.076) um
 Mother: MCParticles[9] (pi0)
 Charge=0, PDG=421 (D0)
 pT=0.840834, pZ=0.272499
-V=(0.00, -0.00, 0.02)
+V=(3.315, -2.869, 193.385) um
 Mother: MCParticles[12] (D*0)
 Charge=0, PDG=111 (pi0)
 pT=0.0431066, pZ=-0.0106252
-V=(0.00, -0.00, 0.02)
+V=(3.315, -2.869, 193.385) um
 Mother: MCParticles[12] (D*0)
 Charge=1, PDG=-11 (e+)
 pT=0.198908, pZ=-0.000957512
-V=(51.72, 89.56, -83.26)
+V=(51.719, 89.559, -83.261) cm
 Mother: MCParticles[13] (K+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0562742, pZ=-0.0310643
-V=(51.72, 89.56, -83.26)
+V=(51.719, 89.559, -83.261) cm
 Mother: MCParticles[13] (K+)
 Charge=0, PDG=111 (pi0)
 pT=0.184066, pZ=0.0320218
-V=(51.72, 89.56, -83.26)
+V=(51.719, 89.559, -83.261) cm
 Mother: MCParticles[13] (K+)
 Charge=0, PDG=130 (K_L0)
 pT=1.04488, pZ=0.38847
-V=(0.01, -0.01, 0.03)
+V=(73.164, -62.770, 309.269) um
 Mother: MCParticles[14] (D-)
 Charge=-1, PDG=-211 (pi-)
 pT=0.0650087, pZ=-0.0729809
-V=(0.01, -0.01, 0.03)
+V=(73.164, -62.770, 309.269) um
 Mother: MCParticles[14] (D-)
 Charge=0, PDG=111 (pi0)
 pT=0.489318, pZ=1.02101
-V=(0.01, -0.01, 0.03)
+V=(73.164, -62.770, 309.269) um
 Mother: MCParticles[14] (D-)
 Charge=0, PDG=22 (gamma)
 pT=0.0882859, pZ=0.160007
-V=(0.00, -0.00, 0.02)
+V=(3.343, -2.884, 193.435) um
 Mother: MCParticles[15] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0347796, pZ=-0.0138564
-V=(0.00, -0.00, 0.02)
+V=(3.343, -2.884, 193.435) um
 Mother: MCParticles[15] (pi0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.20297, pZ=0.07396
-V=(93.11, -198.35, 82.57)
+V=(93.110, -198.354, 82.575) cm
 Mother: MCParticles[16] (K_L0)
 Charge=1, PDG=211 (pi+)
 pT=0.135799, pZ=-0.213197
-V=(93.11, -198.35, 82.57)
+V=(93.110, -198.354, 82.575) cm
 Mother: MCParticles[16] (K_L0)
 Charge=-1, PDG=11 (e-)
 pT=0.0072793, pZ=-0.00633801
-V=(4.81, 9.38, -11.39)
+V=(4.812, 9.378, -11.387) cm
 Mother: MCParticles[17] (pi+)
 Charge=0, PDG=310 (K_S0)
 pT=0.229244, pZ=-0.17691
-V=(-0.00, 0.00, 0.02)
+V=(-10.397, 10.286, 199.543) um
 Mother: MCParticles[20] (D0)
 Charge=1, PDG=211 (pi+)
 pT=0.159085, pZ=0.221752
-V=(-0.00, 0.00, 0.02)
+V=(-10.397, 10.286, 199.543) um
 Mother: MCParticles[20] (D0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.568615, pZ=0.0426699
-V=(-0.00, 0.00, 0.02)
+V=(-10.397, 10.286, 199.543) um
 Mother: MCParticles[20] (D0)
 Charge=0, PDG=111 (pi0)
 pT=0.548509, pZ=0.184985
-V=(-0.00, 0.00, 0.02)
+V=(-10.397, 10.286, 199.543) um
 Mother: MCParticles[20] (D0)
 Charge=0, PDG=22 (gamma)
 pT=0.0533435, pZ=-0.0335613
-V=(0.00, -0.00, 0.02)
+V=(3.314, -2.863, 193.384) um
 Mother: MCParticles[21] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.075668, pZ=0.0229361
-V=(0.00, -0.00, 0.02)
+V=(3.314, -2.863, 193.384) um
 Mother: MCParticles[21] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.0213226, pZ=0.0292706
-V=(51.72, 89.56, -83.26)
+V=(51.719, 89.559, -83.261) cm
 Mother: MCParticles[24] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.194254, pZ=0.00275121
-V=(51.72, 89.56, -83.26)
+V=(51.719, 89.559, -83.261) cm
 Mother: MCParticles[24] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.00158518, pZ=-0.000793337
-V=(43.98, -125.42, 48.69)
+V=(43.979, -125.416, 48.688) cm
 Mother: MCParticles[25] (K_L0)
 Charge=0, PDG=14 (nu_mu)
 pT=0.0213659, pZ=-0.0207619
-V=(41.52, -121.22, 51.60)
+V=(41.524, -121.216, 51.599) cm
 Mother: MCParticles[25] (K_L0)
 Charge=1, PDG=-13 (mu+)
 pT=0.0213659, pZ=0.0207619
-V=(41.52, -121.22, 51.60)
+V=(41.524, -121.216, 51.599) cm
 Mother: MCParticles[25] (K_L0)
 Charge=0, PDG=22 (gamma)
 pT=0.0804152, pZ=0.285295
-V=(0.01, -0.01, 0.03)
+V=(73.261, -62.705, 309.513) um
 Mother: MCParticles[27] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.413212, pZ=0.735719
-V=(0.01, -0.01, 0.03)
+V=(73.261, -62.705, 309.513) um
 Mother: MCParticles[27] (pi0)
 Charge=1, PDG=211 (pi+)
 pT=0.147847, pZ=-0.282372
-V=(-0.15, -0.67, -0.51)
+V=(-0.148, -0.674, -0.513) cm
 Mother: MCParticles[33] (K_S0)
 Charge=-1, PDG=-211 (pi-)
 pT=0.145882, pZ=0.105462
-V=(-0.15, -0.67, -0.51)
+V=(-0.148, -0.674, -0.513) cm
 Mother: MCParticles[33] (K_S0)
 Charge=0, PDG=22 (gamma)
 pT=0.0155526, pZ=0.0902506
-V=(-89.80, 114.50, 10.59)
+V=(-89.804, 114.498, 10.589) cm
 Mother: MCParticles[35] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.145385, pZ=0.0506393
-V=(-89.80, 114.50, 10.59)
+V=(-89.804, 114.498, 10.589) cm
 Mother: MCParticles[35] (pi-)
 Charge=0, PDG=22 (gamma)
 pT=0.447741, pZ=0.198917
-V=(-0.00, 0.00, 0.02)
+V=(-10.458, 10.295, 199.564) um
 Mother: MCParticles[36] (pi0)
 Charge=0, PDG=22 (gamma)
 pT=0.103519, pZ=-0.0139317
-V=(-0.00, 0.00, 0.02)
+V=(-10.458, 10.295, 199.564) um
 Mother: MCParticles[36] (pi0)
 Charge=0, PDG=-14 (anti-nu_mu)
 pT=0.0442317, pZ=-0.0197028
-V=(41.51, -121.25, 51.64)
+V=(41.509, -121.252, 51.641) cm
 Mother: MCParticles[43] (mu+)
 Charge=0, PDG=12 (nu_e)
 pT=0.0268734, pZ=0.0166984
-V=(41.51, -121.25, 51.64)
+V=(41.509, -121.252, 51.641) cm
 Mother: MCParticles[43] (mu+)
 Charge=1, PDG=-11 (e+)
 pT=0.0248937, pZ=0.00306622
-V=(41.51, -121.25, 51.64)
+V=(41.509, -121.252, 51.641) cm
 Mother: MCParticles[43] (mu+)
 ECLClusters:
 

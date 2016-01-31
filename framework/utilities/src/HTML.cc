@@ -122,6 +122,9 @@ std::string HTML::htmlToPlainText(const std::string& html)
   replace_all(tmp, "</p>", "\n");
   replace_all(tmp, "</tr>", "\n");
 
+  //remove non-ascii \mu
+  replace_all(tmp, "\x0b5", "u");
+
   //remove all unknown tags (non-greedy match)
   const static boost::regex tagRegex("<.*?>");
   tmp = boost::regex_replace(tmp, tagRegex, "");

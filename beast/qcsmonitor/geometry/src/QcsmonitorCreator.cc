@@ -85,7 +85,7 @@ namespace Belle2 {
         double thetaZ = activeParams.getAngle("ThetaZ");
         G4VSolid* s_scint = new G4Box("s_scint", dx_scint, dy_scint, dz_scint);
         G4LogicalVolume* l_scint = new G4LogicalVolume(s_scint, geometry::Materials::get("G4_POLYSTYRENE"), "l_scint", 0, m_sensitive);
-        l_scint->SetVisAttributes(red);
+        l_scint->SetVisAttributes(green);
         //Lets limit the Geant4 stepsize inside the volume
         l_scint->SetUserLimits(new G4UserLimits(stepSize));
         double x_pos[100];

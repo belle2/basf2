@@ -60,6 +60,12 @@ namespace Belle2 {
     /** To use track information (default) or simulations, default=True */
     Bool_t m_UseTracks = kTRUE;
 
+    /** To use real data without simulations or simulations, default=False */
+    Bool_t m_UseRealData = kFALSE;
+
+    /** To compare true point and track position in simulations, default=False */
+    Bool_t m_CompareTruePointTracks = kFALSE;
+
     /**
      * 1: standard calibration based on realistic physics or real data (default)
      * 2: special, for full range of angles for every kind of pixel
@@ -112,25 +118,41 @@ namespace Belle2 {
     /** Name of variable for ID of Cluster Shape */
     short m_shape = 0;
     /** Name of variable for theta angle of track direction via sensor */
-    float m_theta = 0.0;
+    float m_thetaTrack = 0.0;
     /** Name of variable for phi angle of track direction via sensor */
-    float m_phi = 0.0;
+    float m_phiTrack = 0.0;
+    /** Name of variable for theta angle from true hit */
+    float m_thetaTrue = 0.0;
+    /** Name of variable for phi angle from true hit */
+    float m_phiTrue = 0.0;
     /** Name of variable for collected charge - signal */
     double m_signal = 0.0;
     /** Name of variable for seed - maximum of signal */
     double m_seed = 0.0;
-    /** Name of variable for in-pixel position U from track or simulation true hit */
+    /** Name of variable for in-pixel position U from track (if possible) or simulation true hit */
     double m_InPixUTrue = 0.0;
-    /** Name of variable for in-pixel position V from track or simulation true hit */
+    /** Name of variable for in-pixel position V from track (if possible) or simulation true hit */
     double m_InPixVTrue = 0.0;
     /** Name of variable for in-pixel reco position U */
-    double m_InPixUReco = 0.0;
+    double m_InPixU = 0.0;
     /** Name of variable for in-pixel reco position V */
-    double m_InPixVReco = 0.0;
-    /** Name of variable for defference in U between true and reco position */
-    double m_CorrU = 0.0;
-    /** Name of variable for defference in V between true and reco position */
-    double m_CorrV = 0.0;
+    double m_InPixV = 0.0;
+    /** Name of variable for difference in U: reco - true position */
+    double m_ResidUTrue = 0.0;
+    /** Name of variable for difference in V: reco - true position */
+    double m_ResidVTrue = 0.0;
+    /** Name of variable for estimated sigma in U from reco position */
+    double m_SigmaU = 0.0;
+    /** Name of variable for estimated sigma in V from reco position */
+    double m_SigmaV = 0.0;
+    /** Name of variable for defference in U: reco - track position */
+    double m_ResidUTrack = 0.0;
+    /** Name of variable for defference in V: reco - track position */
+    double m_ResidVTrack = 0.0;
+    /** Name of variable for estimated sigma in U of track position */
+    double m_SigmaUTrack = 0.0;
+    /** Name of variable for estimated sigma in V of track position */
+    double m_SigmaVTrack = 0.0;
 
   };
 }

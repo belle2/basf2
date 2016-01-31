@@ -14,6 +14,8 @@
 # and stores output in a root file.
 #
 # "UseTracks" to use track information (default) or simulations
+# "UseRealData" to use real data without simulations or simulations (default)
+# "CompareTruePointTracks" to compare true point and track position in simulations (default = False)
 # "CalibrationKind" to run this task:
 # 1) (default) standard calibration based on realistic physics or real data
 # 2) special calbration for full range of angles, only for simulation!
@@ -27,10 +29,14 @@
 #    PixelKind=3: 85 um pitch: sensor 2.4.2 , vertex: x: [-0.2050,-0.2], y: [2.18], z: [-2.0,-2.0085]
 #    TODO: Need to check influence of orientation of u & v axes for corections
 #
+# Parameters are not independent, there are some priorities:
+#   Priorities: UseRealData, UseTracks, rest is independent
+#   if you set UseRealData=True, UseTracks is set automatically to True (noe TrueHit data).
+#
 # There is possibility to call this macro with presets in parameters:
-#    basf2 PXDClasterShape_PrepareSources.py UseTracks CalibrationKind PixelKind
+#    basf2 PXDClasterShape_PrepareSources.py UseTracks UseRealData CalibrationKind PixelKind
 #    Example for defaults:
-#    basf2 PXDClasterShape_PrepareSources.py 0 1 0
+#    basf2 PXDClasterShape_PrepareSources.py 1 0 1 0
 #
 ##############################################################################
 from basf2 import *
@@ -38,9 +44,12 @@ from basf2 import *
 # show warnings during processing
 set_log_level(LogLevel.WARNING)
 
-# Presets:
+# Presets (defaults, no need to set if no change):
 EdgeClose = 3
-UseTracks = False
+UseTracks = True
+UseRealData = False
+CompareTruePointTracks = False
+# For special calibration, only for experts:
 CalibrationKind = 1
 PixelKind = 0
 SpecialLayerNo = 1
@@ -52,21 +61,36 @@ argvs = sys.argv
 argc = len(argvs)
 print("Number of arguments: ", argc - 1)
 if argc >= 2:
-    if (argvs[1] == 0):
+    if (argvs[1] == '0'):
         UseTracks = False
-    if (argvs[1] == 1):
+    if (argvs[1] == '1'):
         UseTracks = True
     print("first argument UseTracks: ", UseTracks)
 if argc >= 3:
-    print("second argument CalibrationKind: ", argvs[2])
-    CalibrationKind = int(argvs[2])
+    if (argvs[2] == '0'):
+        UseRealData = False
+    if (argvs[2] == '1'):
+        UseRealData = True
+    print("second argument UseRealData: ", UseRealData)
 if argc >= 4:
-    print("third argument PixelKind: ", argvs[3])
-    PixelKind = int(argvs[3])
+    CalibrationKind = int(argvs[3])
+    print("third argument CalibrationKind: ", CalibrationKind)
+if argc >= 5:
+    PixelKind = int(argvs[5])
+    print("fours argument PixelKind: ", PixelKind)
 
 # Crosscheck of presets:
-if UseTracks == 1:
+if UseTracks:
+    CompareTruePointTracks = True
     CalibrationKind = 1
+if (UseRealData is True):
+    UseTracks = True
+    CalibrationKind = 1
+    CompareTruePointTracks = False
+if (CalibrationKind == 2):
+    UseTracks = False
+    CompareTruePointTracks = False
+
 if PixelKind == 0:
     SpecialLayerNo = 1
     SpecialLadderNo = 3
@@ -84,8 +108,19 @@ if PixelKind == 3:
     SpecialLadderNo = 4
     SpecialSensorNo = 2
 
-outputFileName = 'pxdClShapeCalibrationSource_Track' + \
-    str(UseTracks) + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKind) + '.root'
+print("Final setting of arguments: ")
+print("                 EdgeClose: ", EdgeClose)
+print("                 UseTracks: ", UseTracks)
+print("               UseRealData: ", UseRealData)
+print("    CompareTruePointTracks: ", CompareTruePointTracks)
+print("           CalibrationKind: ", CalibrationKind)
+print("                      PixelKind: ", PixelKind)
+print("                 SpecialLayerNo: ", SpecialLayerNo)
+print("                SpecialLadderNo: ", SpecialLadderNo)
+print("                SpecialSensorNo: ", SpecialSensorNo)
+
+outputFileName = 'pxdClShapeCalibrationSource_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
+outputFileName = outputFileName + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKind) + '.root'
 
 # Register modules
 
@@ -106,9 +141,9 @@ PXDDIGI = register_module('PXDDigitizer')
 # PXD clusterizer
 PXDCLUST = register_module('PXDClusterizer')
 # SVD digitization module
-# SVDDIGI = register_module('SVDDigitizer')
+SVDDIGI = register_module('SVDDigitizer')
 # SVD clusterizer
-# SVDCLUST = register_module('SVDClusterizer')
+SVDCLUST = register_module('SVDClusterizer')
 # PXD shape calibration module
 PXDSHCAL = register_module('pxdClusterShapeCalibration')
 # Save output of simulation
@@ -268,6 +303,12 @@ PXDSHCAL.param('EdgeClose', EdgeClose)
 # To use track information (default) or simulations, default=True
 PXDSHCAL.param('UseTracks', UseTracks)
 
+# To use real data without simulations or simulations, default=False
+PXDSHCAL.param('UseRealData', UseRealData)
+
+# To compare true point and track position in simulations, default=False
+PXDSHCAL.param('CompareTruePointTracks', CompareTruePointTracks)
+
 # 1: standard calibration based on realistic physics or real data (default)
 # 2: special, for full range of angles for every kind of pixel
 PXDSHCAL.param('CalibrationKind', CalibrationKind)
@@ -283,6 +324,53 @@ PXDSHCAL.param('SpecialSensorNo', SpecialSensorNo)
 
 PXDSHCAL.set_log_level(LogLevel.INFO)
 
+secSetup = \
+    ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',
+     'shiftedL3IssueTestVXDStd-100to400MeV_PXDSVD',
+     'shiftedL3IssueTestVXDStd-25to100MeV_PXDSVD'
+     ]
+tuneValue = 0.22
+
+g4sim = register_module('FullSim')
+g4sim.param('StoreAllSecondaries', True)
+
+vxdtf = register_module('VXDTF')
+vxdtf.logging.log_level = LogLevel.DEBUG
+vxdtf.logging.debug_level = 1
+param_vxdtf = {'sectorSetup': secSetup,
+               'GFTrackCandidatesColName': 'caTracks',
+               'tuneCutoffs': tuneValue,
+               'displayCollector': 2
+               # 'calcQIType': 'kalman'
+               }
+
+vxdtf.param(param_vxdtf)
+
+doPXD = 1
+TrackFinderMCTruth = register_module('TrackFinderMCTruth')
+TrackFinderMCTruth.logging.log_level = LogLevel.INFO
+# select which detectors you would like to use
+param_TrackFinderMCTruth = {
+    'UseCDCHits': 0,
+    'UseSVDHits': 1,
+    'UsePXDHits': doPXD,
+    'MinimalNDF': 6,
+    'WhichParticles': ['primary'],
+    'GFTrackCandidatesColName': 'mcTracks',
+}
+TrackFinderMCTruth.param(param_TrackFinderMCTruth)
+
+setupGenfit = register_module('SetupGenfitExtrapolation')
+GenFitter = register_module('GenFitter')
+# GenFitter.logging.log_level = LogLevel.WARNING
+GenFitter.param('GFTrackCandidatesColName', 'caTracks')
+GenFitter.param('FilterId', 'Kalman')
+
+eventCounter = register_module('EventCounter')
+eventCounter.logging.log_level = LogLevel.INFO
+eventCounter.param('stepSize', 25)
+
+
 # ============================================================================
 # Do the simulation
 
@@ -291,10 +379,18 @@ main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)
+main.add_module(setupGenfit)
 main.add_module(particlegun)
 main.add_module(simulation)
 main.add_module(PXDDIGI)
 main.add_module(PXDCLUST)
+if (UseTracks is True):
+    main.add_module(SVDDIGI)
+    main.add_module(SVDCLUST)
+    main.add_module(eventCounter)
+    main.add_module(vxdtf)
+    main.add_module(TrackFinderMCTruth)
+    main.add_module(GenFitter)
 main.add_module(PXDSHCAL)
 
 main.add_module("PrintCollections")

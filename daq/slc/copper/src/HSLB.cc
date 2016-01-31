@@ -50,17 +50,6 @@ void HSLB::close() throw()
   m_hslb.fd = -1;
 }
 
-void HSLB::load() throw(HSLBHandlerException)
-{
-  if (m_hslb.fd < 0) {
-    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
-  }
-  linkfee();
-  //if (checkfee() == "UNKNOWN") {
-  //  throw (HSLBHandlerException("fee on hslb-%c is not available", m_hslb.fin + 'a'));
-  //}
-}
-
 bool HSLB::monitor() throw(HSLBHandlerException)
 {
   if (m_hslb.fd <= 0) {
@@ -164,14 +153,7 @@ int HSLB::readfn32(int adr) throw(HSLBHandlerException)
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
   }
-  //return ::readfn32(m_hslb.fd, adr);
-  int val = 0;
-  writefn(0x6f, adr & 0x7f);
-  val |= (readfn(0x6e) << 0);
-  val |= (readfn(0x6e) << 8);
-  val |= (readfn(0x6e) << 16);
-  val |= (readfn(0x6e) << 24);
-  return val;
+  return ::readfn32(m_hslb.fd, adr);
 }
 
 void HSLB::writefn32(int adr, int val) throw(HSLBHandlerException)
@@ -179,12 +161,7 @@ void HSLB::writefn32(int adr, int val) throw(HSLBHandlerException)
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
   }
-  writefn(0x6e, (val >> 24) & 0xff);
-  writefn(0x6e, (val >> 16) & 0xff);
-  writefn(0x6e, (val >>  8) & 0xff);
-  writefn(0x6e, (val >>  0) & 0xff);
-  writefn(0x6f, adr & 0xff);
-  //return ::writefn32(m_hslb.fd, adr, val);
+  ::writefn32(m_hslb.fd, adr, val);
 }
 
 void HSLB::hswait_quiet() throw(HSLBHandlerException)
@@ -207,12 +184,7 @@ int HSLB::readfee8(int adr) throw(HSLBHandlerException)
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
   }
-  writefn(HSREG_CSR, 0x05); /* reset read fifo */
-  writefn(adr, 0);          /* dummy value write to pass address */
-  writefn(HSREG_CSR, 0x07); /* parameter read */
-  hswait_quiet();
-  return readfn(adr);
-  //return ::readfee8(m_hslb.fd, adr);
+  return ::readfee8(m_hslb.fd, adr);
 }
 
 void HSLB::writefee8(int adr, int val) throw(HSLBHandlerException)
@@ -220,10 +192,7 @@ void HSLB::writefee8(int adr, int val) throw(HSLBHandlerException)
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
   }
-  writefn(HSREG_CSR, 0x05); /* reset read fifo */
-  writefn(adr, val & 0xff);
-  writefn(HSREG_CSR, 0x0a); /* parameter write */
-  //return ::writefee8(m_hslb.fd, adr, val);
+  ::writefee8(m_hslb.fd, adr, val);
 }
 
 int HSLB::readfee32(int adr) throw(HSLBHandlerException)
@@ -285,81 +254,175 @@ void HSLB::writestream(const char* filename) throw(HSLBHandlerException)
   }
 }
 
-std::string HSLB::checkfee() throw(HSLBHandlerException)
-{
-  if (m_hslb.fd <= 0) {
-    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
-  }
-  /*
-  static const char* feetype[] = {
-    "UNDEF", "SVD", "CDC", "BPID", "EPID", "ECL", "KLM", "TRG",
-    "UNKNOWN-8", "UNKNOWN-9", "UNKNOWN-10", "UNKNOWN-11",
-    "UNKNOWN-12", "UNKNOWN-13", "DEMO", "TEST"
-  };
-  if (::checkfee(&m_hslb) > 0 && m_hslb.feehw < 16 && m_hslb.feetype >= 0) {
-    return StringUtil::form("FEE type: %s \nserial: %d \nfirm type: %d \nfirm version: %d",
-                            feetype[m_hslb.feehw], m_hslb.feeserial, m_hslb.feetype, m_hslb.feever);
-  }
-  */
-  return std::string("UNKNOWN");
-}
-
-std::string HSLB::test() throw(HSLBHandlerException)
-{
-  if (m_hslb.fd <= 0) {
-    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
-  }
-  char msg[256];
-  memset(msg, 0, 256);
-  /*
-  if (check_hslb(&m_hslb, msg) > 0) {
-    throw (HSLBHandlerException("tesths failed : %s", msg));
-  }
-  */
-  return msg;
-}
-
-void HSLB::linkfee() throw(HSLBHandlerException)
-{
-  if (m_hslb.fd <= 0) {
-    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
-  }
-  writefn(HSREG_CSR,     0x05); // reset read fifo
-  writefn(HSREG_CSR,     0x06); // reset read ack
-  writefn(HSREG_FEECONT, 0x01); // HSREG_FEECONT
-  writefn(HSREG_CSR,     0x0a); // parameter write
-}
-
-void HSLB::trgofffee() throw(HSLBHandlerException)
-{
-  if (m_hslb.fd <= 0) {
-    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
-  }
-  writefn(HSREG_CSR,     0x05); // reset read fifo
-  writefn(HSREG_CSR,     0x06); // reset read ack
-  writefn(HSREG_FEECONT, 0x03); // HSREG_FEECONT
-  writefn(HSREG_CSR,     0x0a); // parameter write
-}
-
-void HSLB::trgonfee() throw(HSLBHandlerException)
-{
-  if (m_hslb.fd <= 0) {
-    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
-  }
-  writefn(HSREG_CSR,     0x05); // reset read fifo
-  writefn(HSREG_CSR,     0x06); // reset read ack
-  writefn(HSREG_FEECONT, 0x03); // HSREG_FEECONT
-  writefn(HSREG_CSR,     0x0a); // parameter write
-}
-
 void HSLB::bootfpga(const std::string& firmware) throw(HSLBHandlerException)
 {
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
   }
-  /*
-  if (::bootfpga(m_hslb.fd, firmware.c_str(), 0, 0, M012_SELECTMAP) < 0) {
+  if (::boot_fpga(m_hslb.fd, firmware.c_str(), 0, 0, M012_SELECTMAP) < 0) {
     throw (HSLBHandlerException("Failed to boot FPGA on hslb-%c : %s", m_hslb.fin + 'a', hslberr()));
   }
+}
+
+int HSLB::reset_b2l(int& csr)
+{
+  int i = 0;
+  int force = 1;
+  for (i = 0; i < 100; i++) {
+    int j = 0;
+    csr = readfn32(HSREGL_STAT); /* 0x83 */
+    if (csr & 0x80) {
+      writefn32(HSREGL_RESET, 0x100000);
+      usleep(100000);
+    } else if (csr & 0x20000000) {
+      writefn32(HSREGL_RESET, 0x10000);
+      usleep(100000);
+    }
+
+    for (j = 0; j < 100; j++) {
+      int csr2 = readfn32(HSREGL_STAT); /* 0x83 */
+      if ((csr ^ csr2) & 0x100) break;
+    }
+    if (j == 100) csr |= 0x20000000;
+
+    if ((csr & 0x200000e1) == 0 && force == 0) break;
+    force = 0;
+    writefn32(HSREGL_RESET, 0x1000);
+    usleep(100000);
+    writefn32(HSREGL_RESET, 0x10);
+    usleep(100000);
+  }
+  return i;
+}
+
+#define WHSLB_PLLLOST    (1)
+#define WHSLB_B2LDOWN    (2)
+#define WHSLB_CLOCKBAD   (3)
+#define WHSLB_PLL2LOST   (4)
+#define WHSLB_GTPPLL     (5)
+#define WHSLB_FFCLOCK    (6)
+
+int HSLB::test() throw (HSLBHandlerException)
+{
+  int warning = 0;
+  int id;
+  int ver;
+  int csr;
+  int j;
+
+  id  = readfn32(HSREGL_ID);   /* 0x80 */
+  ver = readfn32(HSREGL_VER);  /* 0x81 */
+  csr = readfn32(HSREGL_STAT); /* 0x83 */
+
+  if (id != 0x48534c42 && id != 0x48534c37) {
+    throw (HSLBHandlerException("hslb-%c not found (id=0x%08x != 0x48534c42)\n", 'a' + m_hslb.fin, id));
+  }
+  if (id == 0x48534c42 && ver < 34) {
+    throw (HSLBHandlerException("hslb-%c too old firmware (ver=0.%02d < 0.34)\n", 'a' + m_hslb.fin, ver));
+  }
+  if (id == 0x48534c37 && ver < 6) {
+    throw (HSLBHandlerException("hslb7-%c too old firmware (ver=0.%02d < 0.06)\n", 'a' + m_hslb.fin, ver));
+  }
+  if (csr & 0x20000000) {
+    int j;
+    int recvok = 0;
+    int uptime0 = readfn32(HSREGL_UPTIME);
+    int uptime1;
+    usleep(1000 * 1000);
+    uptime1 = readfn32(HSREGL_UPTIME);
+
+    if (uptime0 == 0) {
+      throw (HSLBHandlerException("hslb-%c clock is missing\n", 'a' + m_hslb.fin));
+    } else if (uptime0 == uptime1) {
+      throw (HSLBHandlerException("hslb-%c clock is lost or too slow\n", 'a' + m_hslb.fin));
+    } else if (uptime1 > uptime0 + 1) {
+      throw (HSLBHandlerException("hslb-%c clock is too fast\n", 'a' + m_hslb.fin));
+    }
+
+    for (j = 0; j < 100; j++) {
+      int recv = readfn32(HSREGL_RXDATA) & 0xffff;
+      if (recv == 0x00bc) recvok++;
+    }
+    if (recvok < 80) {
+      throw (HSLBHandlerException("hslb-%c PLL lost and can't receive data (csr=%08x)\n",
+                                  'a' + m_hslb.fin, csr));
+    }
+    throw (HSLBHandlerException("hslb-%c PLL lost (csr=%08x) is probably harmless and ignored\n",
+                                'a' + m_hslb.fin, csr));
+    csr &= ~0x20000000;
+    warning = WHSLB_PLLLOST;
+  }
+  for (j = 0; j < 100; j++) {
+    int csr2 = readfn32(HSREGL_STAT); /* 0x83 */
+    if ((csr ^ csr2) & 0x100) break;
+  }
+  if (j == 100) csr |= 0x20000000;
+
+  /*
+    bit 00000001 - link is not established
+    bit 00000002 - hslb is disabled
+    bit 00000020 - bad 127MHz detected
+    bit 00000040 - GTP PLL not locked (never happen?)
+    bit 00000080 - PLL2 not locked
+    bit 00000100 - LSB of statff, should be toggling
+    bit 20000000 - PLL1 not locked, but somehow not correctly working,
+    so it is reused for j=100 condition
+    bit 80000000 - link down happened in the past
   */
+
+  if ((csr & 0x200000e1)) {
+    int count;
+    int oldcsr = csr;
+
+    count = reset_b2l(csr);
+
+    if ((csr & 0x200000e1)) {
+      if (csr & 1) {
+        throw (HSLBHandlerException("hslb-%c Belle2link is down, csr=%08x\n", 'a' + m_hslb.fin, csr));
+      } else if (csr & 0x20) {
+        throw (HSLBHandlerException("hslb-%c bad clock detected, csr=%08x\n", 'a' + m_hslb.fin, csr));
+      } else if (csr & 0x80) {
+        throw (HSLBHandlerException("hslb-%c PLL2 lock lost, csr=%08x\n", 'a' + m_hslb.fin, csr));
+      } else if (csr & 0x40) {
+        throw (HSLBHandlerException("hslb-%c GTP PLL lock lost, csr=%08x\n", 'a' + m_hslb.fin, csr));
+      } else if (csr & 0x20000000) {
+        throw (HSLBHandlerException("hslb-%c FF clock is stopped, csr=%08x\n", 'a' + m_hslb.fin, csr));
+      }
+    } else {
+      if (oldcsr & 1) {
+        warning = WHSLB_B2LDOWN;
+        LogFile::warning("hslb-%c Belle2link recovered, csr=%08x (retry %d)\n", 'a' + m_hslb.fin, csr, count);
+      } else if (oldcsr & 0x20) {
+        warning = WHSLB_B2LDOWN;
+        LogFile::warning("hslb-%c bad clock recovered, csr=%08x (retry %d)\n", 'a' + m_hslb.fin, csr, count);
+      } else if (oldcsr & 0x80) {
+        warning = WHSLB_PLL2LOST;
+        LogFile::warning("hslb-%c PLL2 lock recovered, csr=%08x (retry %d)\n", 'a' + m_hslb.fin, csr, count);
+      } else if (oldcsr & 0x40) {
+        warning = WHSLB_GTPPLL;
+        throw (HSLBHandlerException("hslb-%c GTP PLL lock recovered, csr=%08x (retry %d)\n",
+                                    'a' + m_hslb.fin, csr, count));
+      } else if (oldcsr & 0x20000000) {
+        warning = WHSLB_FFCLOCK;
+        throw (HSLBHandlerException("hslb-%c FF clock is recovered, csr=%08x (retry %d)\n",
+                                    'a' + m_hslb.fin, csr, count));
+      }
+    }
+  }
+
+  /* 2015.0605.1524 this doesn't seem to be a solution when statepr != 0 */
+  /* 2015.0618.1408 although not perfect, still better than nothing */
+  if (csr & 0x000f0000) {
+    readfee32(0);
+    csr = readfn32(HSREGL_STAT); /* 0x83 */
+  }
+
+  if ((csr & 0x5fffeec1) != 0x18000000 && (csr & 0x200000e1) == 0) {
+    throw (HSLBHandlerException("hslb-%c hslb in bad state (csr=%08x)\n", 'a' + m_hslb.fin, csr));
+  }
+  if (csr & 2) {
+    throw (HSLBHandlerException("hslb-%c is disabled, ttrx reg 130 bit%d=0\n", 'a' + m_hslb.fin, csr));
+  }
+  //LogFile::info("hslb-%c 0.%02d %08x\n", 'a'+m_hslb.fin, ver, csr));
+  return warning;
 }

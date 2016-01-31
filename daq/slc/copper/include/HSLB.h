@@ -21,7 +21,6 @@ namespace Belle2 {
   public:
     int open(int fin) throw(HSLBHandlerException);
     void close() throw();
-    void load() throw(HSLBHandlerException);
     bool monitor() throw(HSLBHandlerException);
     void boot(const std::string& firmware) throw(HSLBHandlerException);
     bool isError() throw(HSLBHandlerException);
@@ -49,12 +48,9 @@ namespace Belle2 {
     int readfee32(int adr) throw(HSLBHandlerException);
     void writefee32(int adr, int val) throw(HSLBHandlerException);
     void writestream(const char* filename) throw(HSLBHandlerException);
-    std::string checkfee() throw(HSLBHandlerException);
-    std::string test() throw(HSLBHandlerException);
-    void linkfee() throw(HSLBHandlerException);
-    void trgofffee() throw(HSLBHandlerException);
-    void trgonfee() throw(HSLBHandlerException);
     void bootfpga(const std::string& firmware) throw(HSLBHandlerException);
+    int reset_b2l(int& csr);
+    int test() throw (HSLBHandlerException);
 
   private:
     hslb_info m_hslb;

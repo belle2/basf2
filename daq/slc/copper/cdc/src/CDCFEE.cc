@@ -43,6 +43,7 @@ void CDCFEE::init(RCCallback& callback, HSLB& hslb)
 void CDCFEE::boot(HSLB& hslb,  const DBObject& obj)
 {
   const std::string firmware = obj.getText("firm");
+  /*
   if (File::exist(firmware)) {
     LogFile::info("Loading CDC FEE firmware: %s", firmware.c_str());
     std::string cmd = "ssh ropc01 \"cd ~b2daq/run/cdc/; sh impact-batch.sh " +
@@ -51,14 +52,10 @@ void CDCFEE::boot(HSLB& hslb,  const DBObject& obj)
   } else {
     LogFile::debug("CDC FEE firmware not exists : %s", firmware.c_str());
   }
-  std::string s;
-  if ((s = hslb.checkfee()) != "UNKNOWN") {
-    StringList ss = StringUtil::split(s, '\n');
-    for (size_t i = 0; i < ss.size(); i++) {
-      LogFile::info(ss[i]);
-    }
-  } else {
-    LogFile::error("Check FEE error");
+  */
+  int err = 0;
+  if ((err = hslb.test()) > 0) {
+    LogFile::error("Test HSLB failed");
   }
 }
 

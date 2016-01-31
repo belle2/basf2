@@ -17,7 +17,7 @@ LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 LIBS    += -lm -lpthread -ldl -lrt
 LIBS    += -L$(BELLE2_LIB) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database\
  -ldaq_slc_nsm -ldaq_slc_runcontrol -ldaq_slc_readout -ldaq_slc_copper -ldaq_slc_apps_cprcontrold\
- -lmgt -lttrx
+ -lhs -lttrx
 LIBS    += -lnsm2_corelib -lnsm2_b2lib
 ifneq ($(NOT_USE_PSQL),yes)
 LIBS    += -L$(PGSQL_LIB_PATH) -lpq

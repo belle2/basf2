@@ -79,7 +79,6 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
     LogFile::info(obj.getName());
     m_dummymode = m_dummymode_org || (obj.hasValue("dummymode") && obj.getBool("dummymode"));
     add(new NSMVHandlerOutputPort(*this, "basf2.output.port"));
-    //add(new NSMVHandlerCOPPERROPID(*this, "basf2.pid"));
     add(new NSMVHandlerFifoEmpty(*this, "copper.err.fifoempty"));
     add(new NSMVHandlerFifoFull(*this, "copper.err.fifofull"));
     add(new NSMVHandlerLengthFifoFull(*this, "copper.err.lengthfifofull"));
@@ -87,15 +86,13 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
     const DBObject& o_ttrx(obj("ttrx"));
     add(new NSMVHandlerTTRXFirmware(*this, "ttrx.firm", 0,
                                     o_ttrx.hasText("firm") ? o_ttrx.getText("firm") : ""));
-    bool bootedttrx = false;
+    //bool bootedttrx = false;
     for (int i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj("hslb", i));
       if (m_dummymode || !m_fee[i] || !o_hslb.getBool("used")) continue;
       HSLB& hslb(m_hslb[i]);
       hslb.open(i);
-      //if (!(o_hslb.hasValue("dummyhslb") && o_hslb.getBool("dummyhslb"))) {
       m_fee[i]->init(*this, hslb);
-      //}
       std::string vname = StringUtil::form("hslb[%d]", i);
       add(new NSMVHandlerHSLBBelle2LinkDown(*this, vname + ".err.b2linkdown", i));
       add(new NSMVHandlerHSLBCOPPERFifoFull(*this, vname + ".err.cprfifofull", i));
@@ -106,9 +103,6 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
                                       o_hslb.hasText("firm") ? o_hslb.getText("firm") : ""));
       add(new NSMVHandlerHSLBBoot(*this, vname + ".boot", i, "off"));
       vname = StringUtil::form("hslb[%d]", i);
-      add(new NSMVHandlerInt(vname + ".reg.adr", true, true, -1));
-      add(new NSMVHandlerInt(vname + ".reg.size", true, true, -1));
-      add(new NSMVHandlerHSLBRegValue(*this, vname + ".par.val", i));
       add(new NSMVHandlerHSLBRegFixed(*this, vname + ".fmver", i, 0x81, 4));
       add(new NSMVHandlerHSLBRegFixed(*this, vname + ".b2lstat", i, 0x83, 4));
       add(new NSMVHandlerHSLBRegFixed(*this, vname + ".rxdata", i, 0x84, 4));
@@ -118,7 +112,6 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       if (m_fee[i] != NULL && obj.hasObject("fee")) {
         const DBObject& o_fee((obj("fee", i)));
         vname = StringUtil::form("fee[%d]", i);
-        //if (!(o_hslb.hasValue("dummyhslb") && o_hslb.getBool("dummyhslb"))) {
         add(new NSMVHandlerText(vname + ".name", true, false, m_fee[i]->getName()));
         vname = StringUtil::form("fee[%d]", i);
         if (o_fee.hasText("stream")) {
@@ -129,35 +122,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
         add(new NSMVHandlerFEELoad(*this, vname + ".load", i));
         vname = StringUtil::form("hslb[%d]", i);
         add(new NSMVHandlerHSLBTest(*this, vname + ".test", i));
-        //add(new NSMVHandlerHSLBCheckFee(*this, vname + ".checkfee", i));
-        bool checked = hslb.checkfee() != "UNKNOWN";
-        const hslb_info& info(hslb.getInfo());
-        //add(new NSMVHandlerInt(vname + ".hw", true, false, checked ? info.feehw : -1));
-        //add(new NSMVHandlerInt(vname + ".serial", true, false, checked ? info.feeserial : -1));
-        //add(new NSMVHandlerText(vname + ".type", true, false,
-        //                        checked ? HSLB::getFEEType(info.feehw) : "UNKNOWN"));
-        //add(new NSMVHandlerInt(vname + ".ver", true, false, checked ? info.feever : -1));
-        //add(new NSMVHandlerInt(vname + ".hslbid", true, false, checked ? info.hslbid : -1));
-        //add(new NSMVHandlerInt(vname + ".hslbver", true, false, checked ? info.hslbver : -1));
-        /*
-            } else if (initialized) {
-              if (!bootedttrx) {
-                LogFile::info("bootrx ~/run/ttrx/tt5r036.bit");
-                std::string ret = popen("bootrx ~/run/ttrx/tt5r036.bit");
-                LogFile::info(ret);
-                bootedttrx = true;
-              }
-              LogFile::info("booths -%c %s", (i + 'a'), o_hslb.getText("firm").c_str());
-              std::string ret = popen(StringUtil::form("booths -%c ", (i + 'a')) + o_hslb.getText("firm"));
-              LogFile::info(ret);
-              LogFile::info("/home/usr/b2daq/run/dumhslb/write-dumhslb -%c %s %s", (i + 'a'),
-                            o_fee.getText("randfile").c_str(), o_fee.getText("lengthfile").c_str());
-              ret = popen(StringUtil::form("/home/usr/b2daq/run/dumhslb/write-dumhslb -%c ",
-                                           (i + 'a')) + o_fee.getText("randfile") +
-                          " " + o_fee.getText("lengthfile"));
-              LogFile::info(ret);
-            }
-        */
+        //const hslb_info& info(hslb.getInfo());
       }
     }
   } catch (const std::exception& e) {
@@ -185,17 +150,18 @@ void COPPERCallback::boot(const DBObject& obj) throw(RCHandlerException)
       for (int i = 0; i < 4; i++) {
         const DBObject& o_hslb(obj("hslb", i));
         if (o_hslb.getBool("used") && m_fee[i] != NULL  && obj.hasObject("fee")) {
-          const DBObject& o_fee(obj("fee", i));
-          if (!(o_hslb.hasValue("dummyhslb") && o_hslb.getBool("dummyhslb"))) {
-            HSLB& hslb(m_hslb[i]);
-            hslb.open(i);
-            FEE& fee(*m_fee[i]);
-            try {
-              fee.boot(hslb, o_fee);
-            } catch (const IOException& e) {
-              throw (RCHandlerException(e.what()));
-            }
-          } else {
+          HSLB& hslb(m_hslb[i]);
+          hslb.open(i);
+          try {
+            std::string vname = StringUtil::form("hslb[%d].firm", i);
+            std::string firmware;
+            get(vname, firmware);
+            hslb.boot(firmware);
+            //const DBObject& o_fee(obj("fee", i));
+            //FEE& fee(*m_fee[i]);
+            //fee.boot(hslb, o_fee);
+          } catch (const IOException& e) {
+            throw (RCHandlerException(e.what()));
           }
         }
       }
@@ -222,12 +188,10 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
           HSLB& hslb(m_hslb[i]);
           hslb.open(i);
           if (!obj.hasObject("fee")) continue;
-          //if (!(o_hslb.hasValue("dummyhslb") && o_hslb.getBool("dummyhslb"))) {
           try {
-            //hslb.test();
-            hslb.load();
+            hslb.test();
           } catch (const HSLBHandlerException& e) {
-            throw (RCHandlerException("Failed to load: %s", e.what()));
+            throw (RCHandlerException("tesths failed : %s", e.what()));
           }
           FEE& fee(*m_fee[i]);
           try {
@@ -235,7 +199,6 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
           } catch (const IOException& e) {
             throw (RCHandlerException(e.what()));
           }
-          //}
         }
       }
     } catch (const std::out_of_range& e) {

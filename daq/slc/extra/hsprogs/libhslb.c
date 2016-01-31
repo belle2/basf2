@@ -14,6 +14,9 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <time.h>
+#include <ctype.h>
+
 #include "hslb.h"
 #include "hsreg.h"
 
@@ -370,4 +373,134 @@ writestream(int fd, char *filename)
   fclose(fp);
   
   return ret;
+}
+
+#define M012_SERIAL      7
+#define M012_SELECTMAP   6
+
+/* ---------------------------------------------------------------------- *\
+   write_fpga
+\* ---------------------------------------------------------------------- */
+void write_fpga(int fndev, int m012, int ch, int n, int verbose)
+{
+  int i, mask, data;
+
+  if (m012 == M012_SERIAL) {
+    for (mask = 0x80; mask > 0; mask >>= 1) {
+      data = (ch & mask) ? 1 : 0; // bit-0 = DIN
+      writefn(fndev, HSREG_CCLK, data);
+    }
+  } else if (m012 == M012_SELECTMAP) {
+    for (i=0; n == 0 && i<1000; i++) {
+      data = readfn(fndev, HSREG_CCLK);
+      mask = readfn(fndev, HSREG_CONF);
+      if (data == 0 && (mask & 0x0f) == 0x0e) break;
+      usleep(1);
+    }
+    if (i == 1000) {
+      printf("time out at byte %d\n", n);
+      exit(1);
+    }
+    if (i > 0 && verbose > 0) printf("wait %d at byte %d\n", i, n);
+    data = 0;
+    for (i = 0, mask = 0x80; mask > 0; mask >>= 1, i++) {
+      data |= (ch & mask) ? (1<<i) : 0;
+    }
+    writefn(fndev, HSREG_CCLK, data);
+  }
+}
+/* ---------------------------------------------------------------------- *\
+   dump_fpga
+\* ---------------------------------------------------------------------- */
+void dump_fpga(int conf, char *str)
+{
+  printf("CONF register=%02x M012=%d INIT=%d DONE=%d%s%s\n",
+	 conf&0xff, conf&7, (conf>>3)&1, (conf>>7)&1,
+	 str?" ":"", str?str:"");
+}
+/* ---------------------------------------------------------------------- *\
+   boot_fpga
+\* ---------------------------------------------------------------------- */
+int boot_fpga(int fndev, char *file, int verbose, int forced, int m012)
+{
+  int i, ch, conf;
+  int count = 1, length = 0;
+  FILE *fp;
+  int nbyte = 0;
+
+  /* -- open the file -- */
+  if (! (fp = fopen(file, "r"))) {
+    printf("cannot open file: %s\n", file);
+    return -1;
+  }
+  
+  /* -- initial condition -- */
+  conf = readfn(fndev, HSREG_CONF);
+  if (verbose > 1) dump_fpga(conf, 0);
+
+  /* -- download mode (set M012) -- */
+  writefn(fndev, HSREG_CONF, 0x08 | m012);
+  conf = readfn(fndev, HSREG_CONF) & 7;
+  if (verbose > 1 || conf != m012) dump_fpga(conf, "(set M012)");
+  if (conf != m012) {
+    printf("cannot set FPGA to the download mode (M012=%d?).\n", conf);
+    if (! forced) return -1;
+  }
+  
+  /* -- programming mode (CONF<=1) -- */
+  writefn(fndev, HSREG_CONF, 0x41);
+  writefn(fndev, HSREG_CONF, 0x87);
+  usleep(1000); /* not sure if this sleep is needed for COPPER */
+  
+  conf = readfn(fndev, HSREG_CONF);
+  if (verbose > 1 || (conf & 0x80)) dump_fpga(conf, "(PRGM<=1)");
+  if (conf & 0x80) {
+    printf("cannot set FPGA to the programming mode.\n");
+    if (! forced) return -1;
+  }
+
+  writefn(fndev, HSREG_CONF, 0x86);
+  if (verbose > 0) dump_fpga(conf, "(PRGM=0)");
+  usleep(1000); /* not sure if this sleep is needed for COPPER */
+  conf = readfn(fndev, HSREG_CONF);
+  if (verbose > 0) dump_fpga(conf, "(PRGM=0)");
+  
+  /* -- skip first 16 bytes -- */
+  for (i = 0; i<16; i++) ch = getc(fp);
+    
+  /* -- get and print header -- */
+  if (verbose > 1) printf("== file %s ==\n", file);
+  while ((ch = getc(fp)) != 0xff && ch != EOF) {
+    if (verbose > 1) putchar(isprint(ch) ? ch : ' ');
+  }
+  if (verbose > 1) putchar('\n');
+  if (ch == EOF) {
+    printf("immature EOF for %s\n", file);
+    return -1;
+  }
+
+  /* -- main part -- */
+  do {
+    write_fpga(fndev, m012, ch, nbyte++, verbose);
+    count++;
+  } while ((ch = getc(fp)) != EOF);
+  if (verbose > 1) printf("count = %d\n", count);
+
+  while (count++ < length / 8) {  /* -- is it needed? -- */
+    write_fpga(fndev, m012, 0xff, nbyte++, verbose);
+  }
+  
+  for (i=0; i<100; i++) write_fpga(fndev, m012, 0xff, nbyte++, verbose);
+  fclose(fp);
+
+  writefn(fndev, HSREG_CONF, 0x40); /* clear ce_b */
+  writefn(fndev, HSREG_CONF, 0x0f); /* clear m012 = 6 */
+
+  conf = readfn(fndev, HSREG_CONF);
+  if (verbose > 0 && ! (conf & 0x80)) dump_fpga(conf, "");
+  if (conf & 0x80) {
+    return 0;
+  } else {
+    return conf;
+  }
 }

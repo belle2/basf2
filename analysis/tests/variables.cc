@@ -1070,10 +1070,38 @@ namespace {
   {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<PIDLikelihood>::registerPersistent();
+    StoreArray<Particle>::registerPersistent();
+    StoreArray<Track>::registerPersistent();
+    StoreArray<TrackFitResult>::registerPersistent();
     StoreArray<PIDLikelihood> likelihood;
     StoreArray<Particle> particles;
-    particles.registerRelationTo(likelihood);
+    StoreArray<Track> tracks;
+    StoreArray<TrackFitResult> tfrs;
+    tracks.registerRelationTo(likelihood);
     DataStore::Instance().setInitializeActive(false);
+
+    // create tracks and trackFitResutls
+    TRandom3 generator;
+    const float pValue = 0.5;
+    const float bField = 1.5;
+    const int charge = 1;
+    TMatrixDSym cov6(6);
+    // Generate a random put orthogonal pair of vectors in the r-phi plane
+    TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+    TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+    d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
+    // Add a random z component
+    TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+
+    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
+    Track mytrack;
+    mytrack.setTrackFitResultIndex(Const::electron, 0);
+    Track* savedTrack1 = tracks.appendNew(mytrack);
+    Track* savedTrack2 = tracks.appendNew(mytrack);
+    Track* savedTrack3 = tracks.appendNew(mytrack);
+    Track* savedTrack4 = tracks.appendNew(mytrack);
 
     auto* l1 = likelihood.appendNew();
     l1->setLogLikelihood(Const::TOP, Const::electron, 0.5);
@@ -1082,32 +1110,29 @@ namespace {
     l1->setLogLikelihood(Const::TOP, Const::pion, 0.5);
     l1->setLogLikelihood(Const::ARICH, Const::pion, 0.5);
     l1->setLogLikelihood(Const::ECL, Const::pion, 0.5);
+    savedTrack1->addRelationTo(l1);
 
     auto* l2 = likelihood.appendNew();
     l2->setLogLikelihood(Const::TOP, Const::electron, 0.5);
     l2->setLogLikelihood(Const::ECL, Const::electron, 0.5);
     l2->setLogLikelihood(Const::TOP, Const::pion, 0.5);
     l2->setLogLikelihood(Const::ECL, Const::pion, 0.5);
+    savedTrack2->addRelationTo(l2);
 
     auto* l3 = likelihood.appendNew();
     l3->setLogLikelihood(Const::TOP, Const::electron, 0.5);
     l3->setLogLikelihood(Const::TOP, Const::pion, 0.5);
+    savedTrack3->addRelationTo(l3);
 
     auto* l4 = likelihood.appendNew();
     l4->setLogLikelihood(Const::ECL, Const::electron, 0.5);
     l4->setLogLikelihood(Const::ECL, Const::pion, 0.5);
+    savedTrack4->addRelationTo(l4);
 
-    auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
-    p1->addRelationTo(l1);
-
-    auto* p2 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
-    p2->addRelationTo(l2);
-
-    auto* p3 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
-    p3->addRelationTo(l3);
-
-    auto* p4 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
-    p4->addRelationTo(l4);
+    auto* p1 = particles.appendNew(savedTrack1, Const::electron);
+    auto* p2 = particles.appendNew(savedTrack2, Const::electron);
+    auto* p3 = particles.appendNew(savedTrack3, Const::electron);
+    auto* p4 = particles.appendNew(savedTrack4, Const::electron);
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("NBDeltaIfMissing(TOP, eid_TOP, 1)"));
     EXPECT_B2FATAL(Manager::Instance().getVariable("NBDeltaIfMissing(ECL, eid_ECL)"));
@@ -1268,11 +1293,15 @@ namespace {
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
       StoreArray<Particle>::registerPersistent();
+      StoreArray<Track>::registerPersistent();
+      StoreArray<TrackFitResult>::registerPersistent();
       StoreArray<MCParticle>::registerPersistent();
       StoreArray<PIDLikelihood>::registerPersistent();
       StoreArray<PIDLikelihood> likelihood;
       StoreArray<Particle> particles;
+      StoreArray<Track> tracks;
       particles.registerRelationTo(likelihood);
+      tracks.registerRelationTo(likelihood);
       DataStore::Instance().setInitializeActive(false);
     }
 
@@ -1287,6 +1316,28 @@ namespace {
   {
     StoreArray<PIDLikelihood> likelihood;
     StoreArray<Particle> particles;
+    StoreArray<Track> tracks;
+    StoreArray<TrackFitResult> tfrs;
+
+    // create tracks and trackFitResutls
+    TRandom3 generator;
+    const float pValue = 0.5;
+    const float bField = 1.5;
+    const int charge = 1;
+    TMatrixDSym cov6(6);
+    // Generate a random put orthogonal pair of vectors in the r-phi plane
+    TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+    TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+    d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
+    // Add a random z component
+    TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+
+    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
+    Track mytrack;
+    mytrack.setTrackFitResultIndex(Const::electron, 0);
+    Track* savedTrack = tracks.appendNew(mytrack);
 
     auto* l1 = likelihood.appendNew();
     l1->setLogLikelihood(Const::TOP, Const::electron, 0.18);
@@ -1319,16 +1370,13 @@ namespace {
     l1->setLogLikelihood(Const::CDC, Const::muon, 0.56);
     l1->setLogLikelihood(Const::SVD, Const::muon, 0.58);
 
-    auto* electron = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
-    electron->addRelationTo(l1);
-    auto* pion = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 211);
-    pion->addRelationTo(l1);
-    auto* muon = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
-    muon->addRelationTo(l1);
-    auto* kaon = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 321);
-    kaon->addRelationTo(l1);
-    auto* proton = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 2212);
-    proton->addRelationTo(l1);
+    savedTrack->addRelationTo(l1);
+
+    Particle* electron = particles.appendNew(savedTrack, Const::electron);
+    auto* pion = particles.appendNew(savedTrack, Const::pion);
+    auto* muon = particles.appendNew(savedTrack, Const::muon);
+    auto* kaon = particles.appendNew(savedTrack, Const::kaon);
+    auto* proton = particles.appendNew(savedTrack, Const::proton);
 
     EXPECT_FLOAT_EQ(particleDeltaLogLElectron(electron),  0.7 - 0.7);
     EXPECT_FLOAT_EQ(particleDeltaLogLPion(electron),  0.7 - 1.2);
@@ -1394,12 +1442,38 @@ namespace {
   {
     StoreArray<PIDLikelihood> likelihood;
     StoreArray<Particle> particles;
+    StoreArray<Track> tracks;
+    StoreArray<TrackFitResult> tfrs;
+
+    // create tracks and trackFitResutls
+    TRandom3 generator;
+    const float pValue = 0.5;
+    const float bField = 1.5;
+    const int charge = 1;
+    TMatrixDSym cov6(6);
+    // Generate a random put orthogonal pair of vectors in the r-phi plane
+    TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+    TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+    d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
+    // Add a random z component
+    TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+
+    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
+    Track mytrack;
+    mytrack.setTrackFitResultIndex(Const::electron, 0);
+    Track* savedTrack1 = tracks.appendNew(mytrack);
+    Track* savedTrack2 = tracks.appendNew(mytrack);
+    Track* savedTrack3 = tracks.appendNew(mytrack);
+    Track* savedTrack4 = tracks.appendNew(mytrack);
 
     auto* l1 = likelihood.appendNew();
     l1->setLogLikelihood(Const::TOP, Const::electron, 0.18);
     l1->setLogLikelihood(Const::ECL, Const::electron, 0.14);
-    auto* electron = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
-    electron->addRelationTo(l1);
+    savedTrack1->addRelationTo(l1);
+
+    auto* electron = particles.appendNew(savedTrack1, Const::electron);
 
     auto* l2 = likelihood.appendNew();
     l2->setLogLikelihood(Const::TOP, Const::pion, 0.2);
@@ -1407,22 +1481,26 @@ namespace {
     l2->setLogLikelihood(Const::ECL, Const::pion, 0.24);
     l2->setLogLikelihood(Const::CDC, Const::pion, 0.26);
     l2->setLogLikelihood(Const::SVD, Const::pion, 0.28);
-    auto* pion = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 211);
-    pion->addRelationTo(l2);
+    savedTrack2->addRelationTo(l2);
+
+    auto* pion = particles.appendNew(savedTrack2, Const::pion);
 
     auto* l3 = likelihood.appendNew();
     l3->setLogLikelihood(Const::TOP, Const::kaon, 0.3);
     l3->setLogLikelihood(Const::ARICH, Const::kaon, 0.32);
-    auto* kaon = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 321);
-    kaon->addRelationTo(l3);
+    savedTrack3->addRelationTo(l3);
+
+    auto* kaon = particles.appendNew(savedTrack3, Const::kaon);
 
     auto* l4 = likelihood.appendNew();
     l4->setLogLikelihood(Const::ARICH, Const::proton, 0.42);
     l4->setLogLikelihood(Const::ECL, Const::proton, 0.44);
     l4->setLogLikelihood(Const::CDC, Const::proton, 0.46);
     l4->setLogLikelihood(Const::SVD, Const::proton, 0.48);
-    auto* proton = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 2212);
-    proton->addRelationTo(l4);
+    savedTrack4->addRelationTo(l4);
+
+    auto* proton = particles.appendNew(savedTrack4, Const::proton);
+
 
     EXPECT_FLOAT_EQ(particleMissingTOPId(electron), 0.0);
     EXPECT_FLOAT_EQ(particleMissingTOPId(pion), 0.0);

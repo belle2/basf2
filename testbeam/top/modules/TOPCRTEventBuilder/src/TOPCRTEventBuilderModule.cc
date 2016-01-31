@@ -115,6 +115,7 @@ namespace Belle2 {
 
   void TOPCRTEventBuilderModule::beginRun()
   {
+
   }
 
   void TOPCRTEventBuilderModule::event()
@@ -124,6 +125,12 @@ namespace Belle2 {
     evtMetaData.create();
 
     if (m_entryCount >= m_numEntries) {
+      evtMetaData->setEndOfData();
+      return;
+    }
+
+    if (m_runNumber < 0) {
+      B2ERROR("Cannot proceed with unknown run number");
       evtMetaData->setEndOfData();
       return;
     }
@@ -192,7 +199,7 @@ namespace Belle2 {
     auto ii = fileName.rfind("run");
     if (ii == std::string::npos) {
       B2WARNING("Cannot deduce run number from file name");
-      return 0;
+      return -1;
     }
     auto i1 = ii + 3;
     auto i2 = fileName.rfind(".root");
@@ -203,14 +210,16 @@ namespace Belle2 {
     ss >> runNumber;
     if (ss.fail()) {
       B2WARNING("Cannot deduce run number from file name");
-      return 0;
+      return -1;
     }
-    return runNumber;
+    return abs(runNumber);
   }
 
 
   void TOPCRTEventBuilderModule::appendData(RawTOP& rawTOP, StoreArray<RawTOP>& rawData)
   {
+
+    const unsigned scrods[4] = {45, 50, 48, 46}; // fix for some runs
 
     vector<int> Buffer[4];
     for (int finesse = 0; finesse < 4; finesse++) {
@@ -230,6 +239,10 @@ namespace Belle2 {
       unsigned scrodID = (word >> 9) & 0x7F;
       unsigned dataFormat = 2;
       unsigned version = 2;
+      if (m_runNumber >= 1373) version = 3;
+      if (scrodID == 16 and m_runNumber >= 1700 and m_runNumber < 2220) {
+        scrodID = scrods[finesse]; // fix since ID is wrong
+      }
       Buffer[finesse].push_back(scrodID + (version << 16) + (dataFormat << 24));
       Buffer[finesse].push_back(1); // number of gigE packets
       for (int i = i0; i < size - 1; i++) {

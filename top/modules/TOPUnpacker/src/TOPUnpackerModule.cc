@@ -191,6 +191,12 @@ namespace Belle2 {
           B2ERROR("TOPUnpacker::unpackWaveformFormat: " << err <<
                   " words of data buffer not used");
         break;
+      case 3:
+        err = unpackWaveformFormatV3(array, feemap, waveforms);
+        if (err != 0)
+          B2ERROR("TOPUnpacker::unpackWaveformFormat: " << err <<
+                  " words of data buffer not used");
+        break;
       default:
         B2ERROR("TOPUnpacker::unpackWaveformFormat: unknown data format version "
                 << version);
@@ -277,6 +283,55 @@ namespace Belle2 {
         unsigned asic = (word >> 28) & 0x03; // used to be called asicCol
         unsigned carrier = (word >> 30) & 0x03; // used to be called asicRow
         for (unsigned chan = 0; chan < 8; chan++) {
+          std::vector<unsigned short> wfdata;
+          for (unsigned i = 0; i < 32; i++) {
+            unsigned data = array.getWord();
+            wfdata.push_back(data & 0xFFFF);
+            wfdata.push_back(data >> 16);
+          }
+          unsigned channel = mapper.getChannel(boardstack, carrier, asic, chan);
+          int pixelID = mapper.getPixelID(channel);
+          unsigned segmentASIC = convertedAddr + (chan << 9) + (carrier << 12) +
+                                 (asic << 14);
+          waveforms.appendNew(moduleID, pixelID, channel, scrod, 0,
+                              trigPattern, 0, lastWriteAddr, segmentASIC,
+                              mapper.getType(), mapper.getName(), wfdata);
+        } // chan
+      } // win
+    } // packet
+
+    return array.getRemainingWords();
+
+  }
+
+
+  int TOPUnpackerModule::unpackWaveformFormatV3(TOP::DataArray& array,
+                                                const TOPFrontEndMap* feemap,
+                                                StoreArray<TOPRawWaveform>& waveforms)
+  {
+
+    StoreObjPtr<EventMetaData> evtMetaData;
+    int moduleID = feemap->getModuleID();
+    int boardstack = feemap->getBoardstackNumber();
+    const auto& mapper = m_topgp->getChannelMapper(ChannelMapper::c_IRSX);
+
+    unsigned word = 0;
+    unsigned numPackets = array.getWord();
+    for (unsigned packet = 0; packet < numPackets; packet++) {
+      word = array.getWord();
+      // unsigned eventNumber = word & 0x7FFFF;
+      unsigned numWindows = (word >> 19) & 0x1FF; numWindows++; // should be incremented!
+      unsigned trigPattern = (word >> 28);
+      if (trigPattern != 0 and array.getRemainingWords() < 65) return 0; // quick fix
+      for (unsigned win = 0; win < numWindows; win++) {
+        word = array.getWord();
+        unsigned convertedAddr = word & 0x1FF; // storage window
+        unsigned scrod = (word >> 9) & 0x7F;
+        unsigned lastWriteAddr = (word >> 16) & 0x1FF; // reference window
+        unsigned asic = (word >> 28) & 0x03; // used to be called asicCol
+        unsigned carrier = (word >> 30) & 0x03; // used to be called asicRow
+        for (unsigned chan = 0; chan < 8; chan++) {
+          if ((trigPattern & (1 << (chan / 2))) == 0) continue;
           std::vector<unsigned short> wfdata;
           for (unsigned i = 0; i < 32; i++) {
             unsigned data = array.getWord();

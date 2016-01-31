@@ -144,7 +144,7 @@ namespace Belle2 {
                               StoreArray<TOPRawWaveform>& waveforms);
 
     /**
-     * Unpack raw data given in waveform format version 1
+     * Unpack raw data given in waveform format version 1 (Kurtis packets)
      * @param array raw data buffer
      * @param feemap front-end map
      * @param waveforms collection to unpack to
@@ -155,13 +155,24 @@ namespace Belle2 {
                                StoreArray<TOPRawWaveform>& waveforms);
 
     /**
-     * Unpack raw data given in waveform format version 2
+     * Unpack raw data given in waveform format version 2 (gigE format)
      * @param array raw data buffer
      * @param feemap front-end map
      * @param waveforms collection to unpack to
      * @return number of words remaining in data buffer
      */
     int unpackWaveformFormatV2(TOP::DataArray& array,
+                               const TOPFrontEndMap* feemap,
+                               StoreArray<TOPRawWaveform>& waveforms);
+
+    /**
+     * Unpack raw data given in waveform format version 3 (sparsified gigE format)
+     * @param array raw data buffer
+     * @param feemap front-end map
+     * @param waveforms collection to unpack to
+     * @return number of words remaining in data buffer
+     */
+    int unpackWaveformFormatV3(TOP::DataArray& array,
                                const TOPFrontEndMap* feemap,
                                StoreArray<TOPRawWaveform>& waveforms);
 

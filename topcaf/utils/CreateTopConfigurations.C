@@ -37,11 +37,23 @@ void iTopRawConverterV3Module::initialize()
   std::string m_input_fileandpath = m_input_directory + m_input_filename;
   LoadRawFile(m_input_fileandpath.c_str());
 
+<<<<<<< .mine
+  TopElectronicConstructionName ModuleC04Construction("ModuleC04");
+  TopModuleElectronicConstructions.push_back(ModuleC04Construction);
+
+  TopElectronicRefMap ElectronicModuletoScrod;
+  TopElectronicRetMap ScrodtoElectronicModule;
+  TopUnsignedMap   ScrodtoElectronicModuleNumber;
+  for(vector<TopElectronicConstructionName>::const_iterator i = TopModuleElectronicConstructions.begin();
+      i!=TopModuleElectronicConstructions.end();
+      ++i){
+=======
   //output
   m_evtheader_ptr.registerInDataStore();
   m_evtwaves_ptr.registerInDataStore();
   m_filedata_ptr.registerInDataStore();
 }
+>>>>>>> .r24778
 
 void iTopRawConverterV3Module::beginRun()
 {
@@ -147,6 +159,19 @@ void iTopRawConverterV3Module::event()
       m_evtheader_ptr->SetFlag(1000);
       break;
     }
+<<<<<<< .mine
+    if ( (*i) == ModuleC04Construction ) {
+	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 45;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 50;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 48;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 46;
+    }
+    
+    ScrodtoElectronicModuleNumber[ElectronicModuletoScrod[TopElectronicModule(*i,0)]] = 0;
+    ScrodtoElectronicModuleNumber[ElectronicModuletoScrod[TopElectronicModule(*i,1)]] = 1;
+    ScrodtoElectronicModuleNumber[ElectronicModuletoScrod[TopElectronicModule(*i,2)]] = 2;
+    ScrodtoElectronicModuleNumber[ElectronicModuletoScrod[TopElectronicModule(*i,3)]] = 3;
+=======
     m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
     unsigned int eventSize = word;
     m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
@@ -159,6 +184,7 @@ void iTopRawConverterV3Module::event()
             trigPattern
             << "\tnumWindows: 0x" << numWindows
             << "\ttimestamp: 0x" << timeStamp << std::dec);
+>>>>>>> .r24778
 
     bool repeatedCheck = false;
 

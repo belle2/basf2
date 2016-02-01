@@ -27,7 +27,7 @@ void TOPCAF_DataQualityModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
-  m_samples = new TH1F("ADCvalues", "ADC values ", 100, 0, 2000);
+  m_samples = new TH1F("ADCvalues", "ADC values ", 100, -50, 50);
   m_samples->GetXaxis()->SetTitle("ADC Value");
   m_samples->GetYaxis()->SetTitle("Number of Samples");
   oldDir->cd();

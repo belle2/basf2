@@ -11,6 +11,8 @@
 #pragma link C++ class Belle2::topFileMetaData+;
 #pragma link C++ class Belle2::CamacData+;
 #pragma link C++ class Belle2::TopConfigurations+;
+#pragma link C++ class Belle2::TOPCAFDigit+;
+
 
 #pragma link C++ class TopElectronicModule+;
 #pragma link C++ class TopPixel+;
@@ -36,5 +38,8 @@
 #pragma link C++ class std::pair<unsigned int, TopElectronicRetMap>+;
 
 #pragma link C++ class TopParameter+;
+
+#pragma link C++ class topcaf_hit_t+;
+#pragma link C++ class std::vector<topcaf_hit_t>+;
 
 #endif

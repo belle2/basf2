@@ -3,6 +3,7 @@
 #include <iomanip>
 
 using namespace Belle2;
+using namespace std;
 
 // default constructor
 // needs to be here to put this class into the object store
@@ -44,10 +45,10 @@ EventWaveformPacket::EventWaveformPacket(const unsigned int* temp_buffer,
   v_samples.resize(m_nsamples, 0);
 
   /*
-  std::cout << "Waveform Header" << std::endl;
+  cout << "Waveform Header" << endl;
   for (unsigned int c = 0 ; c < 7 ; c++) {
     packet_word_t myword = m_packet_payload[c];
-    std::cout << c << "\t...\t0x" << std::setfill('0') << std::setw(8) << std::hex << myword << std::dec << std::endl;
+    cout << c << "\t...\t0x" << setfill('0') << setw(8) << hex << myword << dec << endl;
   }
   */
 
@@ -70,10 +71,19 @@ EventWaveformPacket::EventWaveformPacket(const unsigned int* temp_buffer,
 }
 
 
-void EventWaveformPacket::SetSamples(std::vector< double > samples)
+void EventWaveformPacket::SetSamples(const vector< double >& samples)
 {
   v_samples = samples;
   m_nsamples = samples.size();
+}
+
+void EventWaveformPacket::SetHits(const vector< topcaf_hit_t >& hits)
+{
+  v_hits = hits;
+  m_nhits = hits.size();
+  for (unsigned int c = 0; c < m_nhits; c++)
+    cout << m_channel_id << "setting peak found adc:" << hits[c].adc_height << "\ttdc:" << hits[c].tdc_bin << "\twidth: " <<
+         hits[c].width << "\tchi2: " << hits[c].chi2 << endl;
 }
 
 // EventWaveformPacket::EventWaveformPacket(const EventWaveformPacket& in_wp)

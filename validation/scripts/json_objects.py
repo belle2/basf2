@@ -18,6 +18,10 @@ class Revision(JsonBase):
     """
 
     def __init__(self, label, creation_date, packages=None):
+        """
+        Create a new Revision object and fill all members
+        """
+
         #: label (or tag) used to display this revision
         self.label = label
         #: date when the validation output of this revision
@@ -37,6 +41,10 @@ class Revisions(JsonBase):
     """
 
     def __init__(self, revisions):
+        """
+        Create a new Revisions object and fill all members
+        """
+
         #: the actual list
         self.revisions = revisions
 
@@ -48,6 +56,10 @@ class Script(JsonBase):
     """
 
     def __init__(self, name, path, status, log_url=None, return_code=None):
+        """
+        Create a new Script object and fill all members
+        """
+
         #: the name of the script file
         self.name = name
         #: path the script file is located
@@ -72,6 +84,10 @@ class PlotFile(JsonBase):
     """
 
     def __init__(self, package, title, rootfile, plots):
+        """
+        Create a new PlotFile object and fill all members
+        """
+
         #: name of the package which created this file
         self.package = package
         #: Display name of this file
@@ -89,6 +105,10 @@ class Plot(JsonBase):
     """
 
     def __init__(self, is_expert=False, description=None, check=None, contact=None):
+        """
+        Create a new Plot object and fill all members
+        """
+
         #: true if this is marked as an expert-only plot
         self.is_expert = is_expert
         #: telling description for this plot
@@ -106,6 +126,10 @@ class NTuple(JsonBase):
     """
 
     def __init__(self, is_expert=False, description=None, check=None):
+        """
+        Create a new NTuple object and fill all members
+        """
+
         #: true if this is marked as an expert-only ntuple list
         self.is_expert = is_expert
         #: telling description for this ntuple
@@ -122,6 +146,10 @@ class Package(JsonBase):
     """
 
     def __init__(self, name, plotfiles=[], scriptfiles=[], fail_count=0):
+        """
+        Create a new NTuple object and fill all members
+        """
+
         #: name of the package
         self.name = name
         #: list of plotfiles which were produced by the scripts in this package
@@ -164,6 +192,10 @@ class ComparisonResult(JsonBase):
     """
 
     def __init__(self, state, chi2):
+        """
+        Create a new ComparisonResult object and fill all members
+        """
+
         #: a string containing a describtion of the comparison's outcome
         self.state = state
         #: the chi2 value computed during the comparison
@@ -178,6 +210,10 @@ class ComparisonPlotFile(PlotFile):
     """
 
     def __init__(self, package, title, rootfile, compared_revisions=None, plots=[], ntuples=[]):
+        """
+        Create a new ComparisonPlotFile object and fill all members
+        """
+
         super().__init__(package, title, rootfile, plots)
         #: label of the revision which were used in this comparison
         self.compared_revision = compared_revisions
@@ -209,6 +245,10 @@ class ComparisonPlot(Plot):
             plot_path=None,
             comparison_pvalue=None,
             comparison_text=None):
+        """
+        Create a new ComparisonPlot object and fill all members
+        """
+
         # todo: move more into the base class
         super().__init__(is_expert=is_expert, description=description, check=check, contact=contact)
         #: tile used to display this plot
@@ -241,6 +281,10 @@ class ComparisonNTuple(NTuple):
             check=None,
             is_expert=None,
             json_file_path=None):
+        """
+        Create a new ComparisonNTuple object and fill all members
+        """
+
         # todo: move more into the base class
         super().__init__(is_expert=is_expert, description=description, check=check)
         #: Text used as title for the ntuple item
@@ -258,6 +302,10 @@ class ComparisonPackage(Package):
     """
 
     def __init__(self, name, plotfiles=[], scriptfiles=[], ntuplefiles=[]):
+        """
+        Create a new ComparisonPackage object and fill all members
+        """
+
         super().__init__(name, plotfiles=plotfiles, scriptfiles=scriptfiles)
 
         # compute from the plotfiles ... and flatten list
@@ -275,6 +323,10 @@ class ComparisonRevision(Revision):
     """
 
     def __init__(self, label, creation_date=None, color=None):
+        """
+        Create a new ComparisonRevision object and fill all members
+        """
+
         # todo: creation_date
         super().__init__(label, creation_date=None)
         #: the color which was used for this revision in the
@@ -290,6 +342,10 @@ class Comparison(JsonBase):
     """
 
     def __init__(self, revisions=[], packages=[]):
+        """
+        Create a new ComparisonRevision object and fill all members
+        """
+
         #: the list of revisions used in this comparison
         self.revisions = revisions
         #: the list of packages looked at in this comparison

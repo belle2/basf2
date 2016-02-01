@@ -8,10 +8,10 @@
 #pragma link C++ class Belle2::Packet+;
 #pragma link C++ class Belle2::EventHeaderPacket+;
 #pragma link C++ class Belle2::EventWaveformPacket+;
+#pragma link C++ class Belle2::TOPCAFDigit+;
 #pragma link C++ class Belle2::topFileMetaData+;
 #pragma link C++ class Belle2::CamacData+;
 #pragma link C++ class Belle2::TopConfigurations+;
-#pragma link C++ class Belle2::TOPCAFDigit+;
 
 
 #pragma link C++ class TopElectronicModule+;

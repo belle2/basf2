@@ -10,6 +10,7 @@
 // Author: Malachi Schram (malachi.schram@pnnl.gov)                               //
 ////////////////////////////////////////////////////////////////////////////////////
 
+
 class topcaf_hit_t : public TObject {
 public:
   int channel_id; // pixel number 0-512..

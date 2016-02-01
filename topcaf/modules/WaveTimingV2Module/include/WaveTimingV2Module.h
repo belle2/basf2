@@ -24,11 +24,7 @@ namespace Belle2 {
   private:
     double m_fraction, m_time_delay, m_rate, m_sigma, m_thresh;
     double m_crude_time, m_cf_time;
-    TH1D* m_tmp_h;
-    //    TH2F* m_occupancy;
     StoreArray<TOPCAFDigit>  m_topcafdigits_ptr;
-
-    //
     double m_time2tdc;
   };
 

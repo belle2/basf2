@@ -41,7 +41,6 @@ void WaveTimingV2Module::initialize()
   m_rate = 1.0;
   m_crude_time = 0;
   m_cf_time = 0;
-  //  m_tmp_h = new TH1D("wave_h", "wave_h", channel_samples, 0, channel_samples);
   //  REG_HISTOGRAM
 }
 
@@ -93,13 +92,12 @@ void WaveTimingV2Module::event()
         // int coarse_int = refwin > win ? refwin - win : 64 - (win - refwin);
         // float coarse_t = float(coarse_int) * window_dt;
         //Find rough peak locations
-        if (m_tmp_h) delete m_tmp_h;
-        m_tmp_h = new TH1D("m_tmp_h", "m_tmp_h", (int)v_samples.size(), 0., (double)v_samples.size());
+        TH1D m_tmp_h("m_tmp_h", "m_tmp_h", (int)v_samples.size(), 0., (double)v_samples.size());
         for (unsigned int s = 0; s < v_samples.size(); s++) {
-          m_tmp_h->SetBinContent(s, v_samples.at(s));
+          m_tmp_h.SetBinContent(s, v_samples.at(s));
         }
         //      m_tmp_h->Smooth(2);
-        int search_peaks_found = spec->Search(m_tmp_h, m_sigma, "nodraw", 0.05);
+        int search_peaks_found = spec->Search(&m_tmp_h, m_sigma, "nodraw", 0.05);
         double* xpos = spec->GetPositionX();
         double* ypos = spec->GetPositionY();
 
@@ -128,7 +126,7 @@ void WaveTimingV2Module::event()
           if (ypos[c] > m_thresh) {
             peaks_found++;
             hitfit = new TF1("hitfit", "gaus", xpos[c] - 10, xpos[c] + 10);
-            m_tmp_h->Fit("hitfit", "RQ");
+            m_tmp_h.Fit("hitfit", "RQ");
             //    hit.adc_height = ypos[c];
             hit.adc_height = hitfit->GetParameter(0);
             //    hit.tdc_bin = xpos[c];

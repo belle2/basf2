@@ -237,6 +237,20 @@ class ValidationRoot(object):
         return deliver_json(full_path)
 
 
+def setup_gzip_compression(path, cherry_config):
+    """
+    enable GZip compression for all text-based content the
+    web-server will deliver
+    """
+
+    cherry_config[path].update({'tools.gzip.on': True,
+                                'tools.gzip.mime_types': ['text/html',
+                                                          'text/plain',
+                                                          'text/css',
+                                                          'application/javascript',
+                                                          'application/json']})
+
+
 def run_server():
 
     # Setup options for logging
@@ -257,7 +271,10 @@ def run_server():
     os.chdir('html')
 
     cherry_config = dict()
-    cherry_config["/"] = {'tools.gzip.on': False}
+    # just empty, will be filled below
+    cherry_config["/"] = {}
+    # will ensure also the json requests are gzipped
+    setup_gzip_compression("/", cherry_config)
 
     var_b2_local_dir = "BELLE2_LOCAL_DIR"
 
@@ -279,6 +296,7 @@ def run_server():
         # only serve js, css, html and png files
         'tools.staticdir.match': "^.*\.(js|css|html|png)$",
         'tools.staticdir.dir': static_folder}
+    setup_gzip_compression("/static", cherry_config)
 
     # export generated plots
     cherry_config["/plots"] = {
@@ -286,6 +304,7 @@ def run_server():
         # only serve json and png files
         'tools.staticdir.match': "^.*\.(png|json|pdf)$",
         'tools.staticdir.dir': comparison_folder}
+    setup_gzip_compression("/plots", cherry_config)
 
     # export generated results and raw root files
     cherry_config["/results"] = {
@@ -295,6 +314,7 @@ def run_server():
         'tools.staticdir.match': "^.*\.(log|root)$",
         # server the log files as plain text files
         'tools.staticdir.content_types': {'log': 'text/plain'}}
+    setup_gzip_compression("/results", cherry_config)
 
     cherrypy.quickstart(ValidationRoot(results_folder=results_folder, comparison_folder=comparison_folder), '/', cherry_config)
 

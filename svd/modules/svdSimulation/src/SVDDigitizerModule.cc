@@ -505,7 +505,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   double cSelf = 1.0 - 2.0 * cNeighbour2;
   std::deque<double> readoutCharges;
   std::deque<int> readoutStrips;
-  for (int index = 2; index <  strips.size() - 2; index += 2) {
+  for (std::size_t index = 2; index <  strips.size() - 2; index += 2) {
     readoutCharges.push_back(
       cNeighbour2 * stripCharges[index - 2]
       + cNeighbour1 * stripCharges[index - 1]
@@ -538,14 +538,14 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   if (m_histDiffusion_u && m_histDiffusion_v) {
     TH1D* histo = (have_electrons) ? m_histDiffusion_u : m_histDiffusion_v;
     double d = (have_electrons) ? seedPos - center.X() : seedPos - center.Y();
-    for (int index = 0; index < readoutStrips.size(); ++ index) {
+    for (std::size_t index = 0; index < readoutStrips.size(); ++ index) {
       double dist = d + (readoutStrips[index] - seedStrip) * 2 * geomPitch;
       histo->Fill(dist / Unit::um, readoutCharges[index]);
     }
   }
   // Store
   double recoveredCharge = 0;
-  for (int index = 0; index <  readoutStrips.size(); index ++) {
+  for (std::size_t index = 0; index <  readoutStrips.size(); index ++) {
     digits[readoutStrips[index]].add(m_currentTime + driftTime, readoutCharges[index],
                                      m_shapingTime, m_currentParticle, m_currentTrueHit);
     recoveredCharge += readoutCharges[index];

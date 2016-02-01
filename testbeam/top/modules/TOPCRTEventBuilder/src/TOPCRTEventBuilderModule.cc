@@ -57,7 +57,10 @@ namespace Belle2 {
                    " removal of repeated word and byte swapping.");
 
     // Add parameters
-    addParam("inputFileName", m_inputFileName, "input file name (basf2 root file)");
+    addParam("inputFileName", m_inputFileName,
+             "input file name (basf2 root file)", string(""));
+    addParam("inputFileNames", m_inputFileNames,
+             "list of input file names (basf2 root file)", m_inputFileNames);
 
   }
 
@@ -68,40 +71,70 @@ namespace Belle2 {
   void TOPCRTEventBuilderModule::initialize()
   {
 
-    // wildcarding is not allowed in the file name
-    if (TString(m_inputFileName.c_str()).Contains("*")) {
-      B2FATAL(m_inputFileName << ": wildcards in file name are not allowed!");
+    if (!m_inputFileName.empty()) m_inputFileNames.push_back(m_inputFileName);
+
+    if (m_inputFileNames.empty()) {
+      B2FATAL("No input files have been specified");
       return;
     }
 
-    // open the input file
-    m_file = TFile::Open(m_inputFileName.c_str(), "READ");
-    if (!m_file) {
-      B2FATAL(m_inputFileName << ": file not found");
-      return;
+    m_tree = new TChain("tree");
+
+    int numFiles = 0;
+    for (auto file : m_inputFileNames) {
+
+      // wildcarding is not allowed
+      if (TString(file.c_str()).Contains("*")) {
+        B2WARNING(file << ": skip it, wildcards in file name are not allowed!");
+        continue;
+      }
+
+      // check for the file existance
+      TFile* f = TFile::Open(file.c_str(), "READ");
+      if (!f) {
+        B2WARNING(file << ": file not found");
+        continue;
+      }
+      if (!f->IsOpen()) {
+        B2WARNING(file << ": can't open file");
+        continue;
+      }
+
+      // check for the existanece of 'tree'
+      TTree* tree = (TTree*)f->Get("tree");
+      if (!tree) {
+        B2WARNING(file << ": TTree 'tree' not found -> "
+                  << "skip it, not a basf2 root file");
+        continue;
+      }
+      // check for existence of a branch 'RawDataBlocks'
+      if (!tree->GetBranch("RawDataBlocks")) {
+        B2WARNING(file << ": TBranch 'RawDataBlocks' not found -> "
+                  << "skip it, not a PocketDAQ root file");
+        continue;
+      }
+
+      f->Close();
+
+      numFiles += m_tree->Add(file.c_str());
     }
-    if (!m_file->IsOpen()) {
-      B2FATAL(m_inputFileName << ": can't open file");
+    if (numFiles == 0) {
+      B2FATAL("no PocketDAQ file(s) in the list");
       return;
     }
 
-    // get 'tree'
-    m_tree = (TTree*)m_file->Get("tree");
-    if (!m_tree) {
-      B2FATAL(m_inputFileName << ": TTree 'tree' not found -> not a basf2 root file");
-      return;
-    }
     m_numEntries = m_tree->GetEntries();
 
     // set branch address
     if (!m_tree->GetBranch("RawDataBlocks")) {
-      B2FATAL(m_inputFileName << ": TBranch 'RawDataBlocks' not found -> "
-              << "not a PocketDAQ root file");
+      B2FATAL(": TBranch 'RawDataBlocks' not found in the 'tree' -> "
+              << "not PocketDAQ root file(s)");
       return;
     }
     m_tree->SetBranchAddress("RawDataBlocks", &m_cloneArray);
 
     // deduce run number from file name
+    m_inputFileName = m_inputFileNames[0]; // quick fix!!!!! TODO !!!
     m_runNumber = getRunNumber(m_inputFileName);
 
     // register in DataStore
@@ -190,7 +223,7 @@ namespace Belle2 {
 
   void TOPCRTEventBuilderModule::terminate()
   {
-    if (m_file) m_file->Close();
+    delete m_tree;
   }
 
 

@@ -225,6 +225,7 @@ namespace Belle2 {
     }
 
     B2RESULT("TOPWFCalibratorModule: module ID = " << m_moduleID <<
+             ", number of active windows " << numWindows <<
              ", number of calibrated channels " << all <<
              " incomplete: " << incomplete <<
              " bad samples: " << badSampl <<

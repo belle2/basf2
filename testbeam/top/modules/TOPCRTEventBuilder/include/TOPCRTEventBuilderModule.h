@@ -16,7 +16,7 @@
 #include <rawdata/dataobjects/RawTOP.h>
 
 #include "TFile.h"
-#include "TTree.h"
+#include "TChain.h"
 #include "TClonesArray.h"
 
 namespace Belle2 {
@@ -100,8 +100,8 @@ namespace Belle2 {
     }
 
     std::string m_inputFileName; /**< input file name */
-    TFile* m_file = 0; /**< root file ptr */
-    TTree* m_tree = 0; /**< tree ptr */
+    std::vector<std::string> m_inputFileNames; /**< list of input file names */
+    TChain* m_tree = 0; /**< tree ptr */
     int m_numEntries = 0; /**< number of tree entries */
     int m_entryCount = 0; /**< tree entry counter */
     TClonesArray* m_cloneArray = 0; /**< tree branch */

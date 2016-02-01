@@ -124,6 +124,7 @@ namespace Belle2 {
           m_NTDC++;
           k /= 2;
         } while (k > 0);
+        if (numSamples > (1 << (m_NTDC - subBits))) m_NTDC++;
         double samplingRate = tdcParams.getDouble("samplingRate");
         m_TDCwidth = 1.0 / samplingRate / (1 << subBits);
         m_TDCoffset = tdcParams.getTime("offset");

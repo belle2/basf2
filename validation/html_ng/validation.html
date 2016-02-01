@@ -62,7 +62,7 @@
 	<!-- all jquery related stuff -->
 	<script src="js/external/jquery-1.11.1.min.js" type="text/javascript"></script>
 	<script src="js/external/jquery-ui.min.js" type="text/javascript"></script>
-    <script src="js/external/jquery.sticky.js" type="text/javascript"></script>
+    <script src="js/external/jquery.sticky-kit.min.js" type="text/javascript"></script>
 	<script src="js/external/jquery.magnific-popup.min.js"></script>
 
 	<!-- own code -->
@@ -73,13 +73,14 @@
 
 
 	<script type="text/javascript">
-
-$( document ).ready(function() {
-    console.log("Document loaded, starting RestAPI calls");
-            // setup sticky
-            //$("#navigation").sticky({topSpacing:0});
-	loadRevisions();
-});
+	$( document ).ready(function() {
+	    console.log("Document loaded, starting RestAPI calls");
+	    // setup sticky
+	    // ensure the navigation box is sticky
+	     $("#navigation").stick_in_parent( {offset_top : -30} );
+	            
+		loadRevisions();
+	});
 	</script>
 </body>
 </html>

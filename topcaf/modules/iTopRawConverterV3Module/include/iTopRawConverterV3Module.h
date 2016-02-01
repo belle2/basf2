@@ -93,8 +93,7 @@ namespace Belle2 {
     std::ifstream m_input_file;
     std::string m_tmp;
     int m_current_pos, m_prev_pos;
-    int m_carrier, m_scrod, m_module, m_evt_no;
-    bool m_selective;
+    int m_carrier, m_scrod, m_evt_no;
     EventHeaderPacket* m_EvtPacket;
     EventWaveformPacket* m_WfPacket;
     StoreObjPtr<EventHeaderPacket>   m_evtheader_ptr;

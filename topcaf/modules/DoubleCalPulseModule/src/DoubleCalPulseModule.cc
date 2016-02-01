@@ -13,10 +13,9 @@
 
 
 using namespace Belle2;
+using namespace std;
 
 REG_MODULE(DoubleCalPulse);
-
-const int max_peaks = 320;
 
 DoubleCalPulseModule::DoubleCalPulseModule() : Module()
 {
@@ -55,11 +54,9 @@ void DoubleCalPulseModule::event()
   StoreObjPtr<EventHeaderPacket> evtheader_ptr;
   evtheader_ptr.isRequired();
 
-  std::map<topcaf_channel_id_t, double> asic_ref_time;
-
+  map<topcaf_channel_id_t, double> asic_ref_time;
 
   if (digit_ptr) {
-
     //Look over all waveforms for calibration times.
     for (int w = 0; w < digit_ptr.getEntries(); w++) {
 
@@ -87,12 +84,8 @@ void DoubleCalPulseModule::event()
       //      B2INFO(hardwareID<<"\ttdc: "<<digit_ptr[w]->GetTDCBin()<<"\tasicKey: "<<asicKey<<"\tasic_ref_time: "<<asic_ref_time[asicKey]<<"\tcorr_time: "<<corr_time);
 
     }
-
   }//End loop
-
 }
-
-
 
 
 void DoubleCalPulseModule::terminate()

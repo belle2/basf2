@@ -15,7 +15,6 @@ namespace Belle2 {
     DoubleCalPulseModule();
     ~DoubleCalPulseModule();
 
-    //
     void initialize();
     void beginRun();
     void event();
@@ -23,15 +22,7 @@ namespace Belle2 {
     //    void defineHisto();
 
   private:
-    double m_fraction, m_time_delay, m_rate, m_sigma, m_thresh;
-    double m_crude_time, m_cf_time;
     int m_cal_ch;
-    TH1D* m_tmp_h;
-
-    //    TH2F* m_occupancy;
-
-    //
-    double m_time2tdc;
   };
 
 }

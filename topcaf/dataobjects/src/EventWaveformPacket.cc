@@ -52,7 +52,7 @@ EventWaveformPacket::EventWaveformPacket(const unsigned int* temp_buffer,
   }
   */
 
-  for (unsigned int s = 0; s < (m_nsamples / 2); s++) {
+  for (size_t s = 0; s < (m_nsamples / 2); s++) {
     packet_word_t point = m_packet_payload[(7 + s)];
     v_samples[s * 2] = (point & (0x00000FFF));
     v_samples[s * 2 + 1] = ((point & (0x0FFF0000)) >> 16);
@@ -81,7 +81,7 @@ void EventWaveformPacket::SetHits(const vector< topcaf_hit_t >& hits)
 {
   v_hits = hits;
   m_nhits = hits.size();
-  for (unsigned int c = 0; c < m_nhits; c++)
+  for (size_t c = 0; c < m_nhits; c++)
     B2DEBUG(1, m_channel_id << "setting peak found adc:" << hits[c].adc_height << "\ttdc:" << hits[c].tdc_bin << "\twidth: " <<
             hits[c].width << "\tchi2: " << hits[c].chi2 << endl);
 }

@@ -283,16 +283,6 @@ namespace Belle2 {
      */
     double particleMCPrimaryParticle(const Particle* particle);
 
-    /**
-     * return the type of the particle decay (no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2, lower level leptonic = 3
-     */
-    double recoilParticleMCDecayType(const Particle* particle);
-
-    /**
-     * recursive helper function used by the particleMCDecayType variable
-     */
-    void checkMCParticleDecay(MCParticle* mcp, int& run, int& decayType);
-
     /*
      * return the true momentum transfer to lepton pair in a B (semi-) leptonic B meson decay
      */
@@ -403,6 +393,21 @@ namespace Belle2 {
      * return invarian mass squared of the system recoiling against given Particle
      */
     double recoilMassSquared(const Particle* particle);
+
+    /**
+     * Returns the decay type of recoil particle (meant for B mesons)
+     * No related mcparticle = -1
+     * Hadronic = 0
+     * Direct leptonic = 1
+     * Direct semileptonic = 2
+     * Lower level leptonic = 3
+     */
+    double recoilMCDecayType(const Particle* particle);
+
+    /**
+     * Helper function: Returns decay type of MCParticle
+     */
+    void checkMCParticleDecay(MCParticle* mcp, int& decayType, bool recursive);
 
     /**
      * return 1/2/3 if the ECL Cluster is detected in the forward/barrel/backward region

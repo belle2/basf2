@@ -68,10 +68,10 @@ void WaveTimingV2Module::event()
   //Output TOPCAFDigit
   m_topcafdigits_ptr.clear();
 
-  double ftsw = 0;
-  if (evtheader_ptr) {
-    ftsw = evtheader_ptr->GetFTSW();
-  }
+  // double ftsw = 0;
+  // if (evtheader_ptr) {
+  //   ftsw = evtheader_ptr->GetFTSW();
+  // }
 
 
   TSpectrum* spec = new TSpectrum(max_peaks);
@@ -84,14 +84,14 @@ void WaveTimingV2Module::event()
       //double win_time_shift = evtwaves_ptr[w]->GetTime();
       std::vector< double > v_samples = evtwaves_ptr[w]->GetSamples();
       if (v_samples.size() > 0) {
-        int refwin = evtwaves_ptr[w]->GetRefWindow();
-        int win = evtwaves_ptr[w]->GetASICWindow();
-        float window_dt = (1. / 0.0212) / 2.0; // need to check this.  I don't like hard coded numbers.
-        float sample_dt = window_dt / 64.0;
+        // int refwin = evtwaves_ptr[w]->GetRefWindow();
+        // int win = evtwaves_ptr[w]->GetASICWindow();
+        // float window_dt = (1. / 0.0212) / 2.0; // need to check this.  I don't like hard coded numbers.
+        // float sample_dt = window_dt / 64.0;
 
         //coarse time setup
-        int coarse_int = refwin > win ? refwin - win : 64 - (win - refwin);
-        float coarse_t = float(coarse_int) * window_dt;
+        // int coarse_int = refwin > win ? refwin - win : 64 - (win - refwin);
+        // float coarse_t = float(coarse_int) * window_dt;
         //Find rough peak locations
         if (m_tmp_h) delete m_tmp_h;
         m_tmp_h = new TH1D("m_tmp_h", "m_tmp_h", (int)v_samples.size(), 0., (double)v_samples.size());
@@ -150,7 +150,7 @@ void WaveTimingV2Module::event()
 
         //Create topcafDIGITs
 
-        for (int c = 0; c < hits.size(); c++) {
+        for (size_t c = 0; c < hits.size(); c++) {
           TOPCAFDigit* this_topcafdigit = m_topcafdigits_ptr.appendNew(evtwaves_ptr[w]);
 
           this_topcafdigit->SetHitValues(hits[c]);

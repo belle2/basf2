@@ -1,5 +1,7 @@
 Import('env')
 
+env['CONTINUE'] = True
+
 env['LIBS'] = ['framework',
 	       'cdc',
 	       'ecl',

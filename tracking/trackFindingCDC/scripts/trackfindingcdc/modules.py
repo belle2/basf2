@@ -29,20 +29,26 @@ class CDCHitUniqueAssumer(basf2.Module):
 
             for track in tracks:
                 # Unset all taken flags
-                for recoHit in list(track.items()):
+                for recoHit in track:
                     if not recoHit.getWireHit().getAutomatonCell().hasTakenFlag():
                         self.number_of_hits_with_wrong_flags += 1
 
-            for track in tracks:
+            for i, track in enumerate(tracks):
                 # Now check that we only have every wire hit once
-                for recoHit in list(track.items()):
+                for j, innerTrack in enumerate(tracks):
+                    if i == j:
+                        continue
+                    for recoHit in innerTrack:
+                        recoHit.getWireHit().getAutomatonCell().setAssignedFlag()
+
+                for recoHit in track:
                     self.number_of_total_hits += 1
                     if recoHit.getWireHit().getAutomatonCell().hasAssignedFlag():
                         self.number_of_doubled_hits += 1
                     recoHit.getWireHit().getAutomatonCell().setAssignedFlag()
 
                 for innerTrack in tracks:
-                    for recoHit in list(innerTrack.items()):
+                    for recoHit in innerTrack:
                         recoHit.getWireHit().getAutomatonCell().unsetAssignedFlag()
 
     def terminate(self):

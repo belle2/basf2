@@ -191,8 +191,8 @@ namespace Belle2 {
       // check if entry is already in network.
       auto nodeIter = isInNetwork(newEntry);
 
-      Node* outerNode = NULL;
-      Node* innerNode = NULL;
+      Node* outerNode = nullptr;
+      Node* innerNode = nullptr;
 
       // assign nodePointers, create new nodes if needed:
       if (newIsInner) {
@@ -237,8 +237,8 @@ namespace Belle2 {
 
     /** standard constructor for ROOT IO */
     DirectedNodeNetwork() :
-      m_lastOuterNode(NULL),
-      m_lastInnerNode(NULL) {}
+      m_lastOuterNode(nullptr),
+      m_lastInnerNode(nullptr) {}
 
 
     /** destructor taking care of cleaning up the pointer-mess - WARNING only needed when using classic pointers for the nodes! */
@@ -257,7 +257,14 @@ namespace Belle2 {
     /** to the last outerNode added, another innerNode will be attached */
     void addInnerToLastOuterNode(EntryType& innerEntry)
     {
-      if (m_lastOuterNode == NULL) { B2FATAL("addInnerToLastOuterNode() last OuterNode is not yet in this network! CurrentNetworkSize is: " << size()) }
+//    B2INFO("addInnerToLastOuterNode: inner: " << innerEntry) // TODO Jan8_2016: remove!
+      if (m_lastOuterNode == nullptr) { B2FATAL("addInnerToLastOuterNode() last OuterNode is not yet in this network! CurrentNetworkSize is: " << size()) }
+
+      // check if entries are identical (catch loops):
+      if (*m_lastOuterNode == innerEntry) {
+        B2ERROR("DirectedNodeNetwork::addInnerToLastOuterNode(): lastOuterNode and innerEntry are identical! Aborting linking-process");
+        return;
+      }
 
       bool wasSuccessful = addToExistingNode(m_lastOuterNode, innerEntry, true);
 
@@ -272,7 +279,12 @@ namespace Belle2 {
     /** to the last innerNode added, another outerNode will be attached */
     void addOuterToLastInnerNode(EntryType& outerEntry)
     {
-      if (m_lastOuterNode == NULL) { B2FATAL("addOuterToLastInnerNode() last InnerNode is not yet in this network! CurrentNetworkSize is: " << size()) }
+      if (m_lastOuterNode == nullptr) { B2FATAL("addOuterToLastInnerNode() last InnerNode is not yet in this network! CurrentNetworkSize is: " << size()) }
+      // check if entries are identical (catch loops):
+      if (outerEntry == *m_lastInnerNode) {
+        B2ERROR("DirectedNodeNetwork::addOuterToLastInnerNode(): outerEntry and lastInnerNode are identical! Aborting linking-process");
+        return;
+      }
 
       bool wasSuccessful = addToExistingNode(m_lastInnerNode, outerEntry, false);
 
@@ -284,12 +296,19 @@ namespace Belle2 {
     }
 
 
-    /** takes two entries and weaves them into the network */
+    /** takes two entries and weaves them into the network TODO: UMBENENNEN! */
     void linkTheseEntries(EntryType& outerEntry, EntryType& innerEntry)
     {
+      // check if entries are identical (catch loops):
+      if (outerEntry == innerEntry) {
+        B2ERROR("DirectedNodeNetwork::linkTheseEntries(): outerEntry and innerEntry are identical! Aborting linking-process");
+        return;
+      }
+
       // check if entries are already in network.
       auto outerNodeIter = isInNetwork(outerEntry);
       auto innerNodeIter = isInNetwork(innerEntry);
+//    B2INFO("linkTheseEntries: outer: " << outerEntry << ", inner: " << innerEntry) // TODO Jan8_2016: remove!
 
       /** case 1: none of the entries are added yet:
        *  create nodes for both and link with each other, where outerEntry will be carried by outer node and inner entry by inner node
@@ -419,22 +438,22 @@ namespace Belle2 {
     }
 
 
-    /** returns pointer to the node carrying the entry which is equal to given parameter. If no fitting entry was found, NULL is returned. */
+    /** returns pointer to the node carrying the entry which is equal to given parameter. If no fitting entry was found, nullptr is returned. */
     Node* getNode(EntryType& toBeFound)
     {
       auto iter = isInNetwork(toBeFound);
-      if (iter == m_nodes.rend()) return NULL;
+      if (iter == m_nodes.rend()) return nullptr;
 //    return iter->get();
       return *iter;
     }
 
 
-    /** returns pointer to the node carrying the entry which has the given index. If no fitting entry was found, NULL is returned. */
+    /** returns pointer to the node carrying the entry which has the given index. If no fitting entry was found, nullptr is returned. */
     Node* getNodeWithIndex(unsigned int index)
     {
 //    if (index < size()) { return m_nodes[index].get(); }
       if (index < size()) { return m_nodes[index]->getPtr(); }
-      return NULL;
+      return nullptr;
     }
 
 

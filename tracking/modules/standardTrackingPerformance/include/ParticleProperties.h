@@ -48,7 +48,8 @@ namespace Belle2 {
     double y_gen; /**< y value of generated position */
     double z_gen; /**< z value of generated position */
 
-    void setAllTo(double value) {
+    void setAllTo(double value)
+    {
       mass = value;
       px = value;
       py = value;
@@ -81,7 +82,8 @@ namespace Belle2 {
       z_gen = value;
     }
 
-    void operator=(double value) {
+    void operator=(double value)
+    {
       setAllTo(value);
     }
   };

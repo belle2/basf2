@@ -31,8 +31,10 @@ PXDdigiFilterModule::PXDdigiFilterModule() : Module()
 
   // Parameter definitions
   addParam("PXDDigitsName", m_PXDDigitsName, "The name of the StoreArray of PXDDigits to be filtered", std::string(""));
-  addParam("PXDDigitsInsideROIName", m_PXDDigitsInsideROIName, "The name of the StoreArray of Filtered PXDDigits", std::string("PXDDigitsIN"));
-  addParam("PXDDigitsOutsideROIName", m_PXDDigitsOutsideROIName, "The name of the StoreArray of Filtered PXDDigits", std::string("PXDDigitsOUT"));
+  addParam("PXDDigitsInsideROIName", m_PXDDigitsInsideROIName, "The name of the StoreArray of Filtered PXDDigits",
+           std::string("PXDDigitsIN"));
+  addParam("PXDDigitsOutsideROIName", m_PXDDigitsOutsideROIName, "The name of the StoreArray of Filtered PXDDigits",
+           std::string("PXDDigitsOUT"));
   addParam("ROIidsName", m_ROIidsName, "The name of the StoreArray of ROIs", std::string(""));
 
 }

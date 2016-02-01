@@ -16,6 +16,9 @@
 #include <type_traits>
 #include <iostream>
 
+
+#include <framework/logging/Logger.h>
+
 namespace Belle2 {
 
 
@@ -356,6 +359,9 @@ namespace Belle2 {
       typename Variable::variableType value = Variable::value(args ...);
       Observer::notify(Variable(), value, Filter< Variable, Range, Observer >::m_range,
                        args ...);
+
+//    bool enableCopy  = *m_enable;
+//    B2INFO("mrange.contains: " << ", enable (should be true): " << std::to_string(enableCopy) );
       return (!(*m_enable)) || Filter< Variable, Range, Observer >::m_range.contains(value);
     }
 

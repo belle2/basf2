@@ -8,6 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
+#include <tracking/trackFindingVXD/environment/FilterSetTypes.h>
 #include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
 
 #include <tracking/modules/VXDTFHelperTools/SecMapTrainerBaseModule.h>
@@ -65,7 +66,7 @@ void SecMapTrainerBaseModule::initialize()
   // What does it mean "Appendix"? E.P.
 
 
-  StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);
+  StoreObjPtr< SectorMap<SpacePoint, Belle2::TwoHitFilterSet> > sectorMap("", DataStore::c_Persistent);
   sectorMap.isRequired();
   for (auto setup : sectorMap->getAllSetups()) {
     auto config = setup.second->getConfig();
@@ -108,9 +109,10 @@ void SecMapTrainerBaseModule::event()
   unsigned nAccepted = 0;
   for (unsigned iTC = 0; iTC not_eq nSPTCs; ++ iTC) {
     const SpacePointTrackCand* currentTC = m_spacePointTrackCands[iTC];
-    B2DEBUG(10, "currens SPTC has got " << currentTC->getNHits() << " hits stored")
+    B2DEBUG(10, "current SPTC has got " << currentTC->getNHits() << " hits stored")
 
     for (auto& trainer : m_secMapTrainers) {
+      B2DEBUG(10, "current SPTC will now be checked with secMap " << trainer.getConfig().secMapName << " hits stored")
       bool accepted = trainer.storeTC(*currentTC, iTC);
       nAccepted += (accepted ? 1 : 0);
     }

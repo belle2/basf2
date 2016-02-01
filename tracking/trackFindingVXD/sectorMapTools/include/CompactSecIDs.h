@@ -156,22 +156,26 @@ namespace Belle2 {
       auto sensor = aSensorID.getSensorNumber();
 
       // assert for checking layer, ladder, sensor
-      B2DEBUG(1, "VXDTFFilters:getFullSecID @ layer/ladder/sensor: " << aSensorID.getLayerNumber() << "/" << aSensorID.getLadderNumber()
+      B2DEBUG(1, "VXDTFFilters:getFullSecID @ layer/ladder/sensor: " << aSensorID.getLayerNumber()
+              << "/" << aSensorID.getLadderNumber()
               << "/" << aSensorID.getSensorNumber());
-      B2DEBUG(1, "VXDTFFilters:getFullSecID : nLayers in Map: " << m_compactSectorsIDMap.size());
+      //       B2DEBUG(1, "VXDTFFilters:getFullSecID : nLayers in Map: " << m_compactSectorsIDMap.size());
       if (!(layer < m_compactSectorsIDMap.size())) throw(Bad_Input() << aSensorID << "layer" << layer << normalizedU << normalizedV);
-//    assert( ( layer < m_compactSectorsIDMap.size()));
-      B2DEBUG(1, "VXDTFFilters:getFullSecID : nLadders in layer: " << m_compactSectorsIDMap[layer].size());
+      //    assert( ( layer < m_compactSectorsIDMap.size()));
+      //       B2DEBUG(1, "VXDTFFilters:getFullSecID : nLadders in layer: " << m_compactSectorsIDMap[layer].size());
       if (!(ladder < m_compactSectorsIDMap[layer].size())) throw(Bad_Input() << aSensorID << "ladder" << ladder << normalizedU <<
                                                                    normalizedV);
-//    assert( ( ladder < m_compactSectorsIDMap[layer].size()));
-      B2DEBUG(1, "VXDTFFilters:getFullSecID @ : nSensors in ladder: " << m_compactSectorsIDMap[layer][ladder].size());
+      //    assert( ( ladder < m_compactSectorsIDMap[layer].size()));
+      //       B2DEBUG(1, "VXDTFFilters:getFullSecID @ : nSensors in ladder: " << m_compactSectorsIDMap[layer][ladder].size());
       if (!(sensor < m_compactSectorsIDMap[layer][ladder].size())) throw(Bad_Input() << aSensorID << "sensor" << sensor << normalizedU <<
             normalizedV);
-//    assert( ( sensor < m_compactSectorsIDMap[layer][ladder].size()));
+      //    assert( ( sensor < m_compactSectorsIDMap[layer][ladder].size()));
       return m_compactSectorsIDMap[layer][ladder][sensor](normalizedU, normalizedV);
 
+
     }
+
+
 
 
     /// check if using operator() would be safe (true if it is safe):
@@ -189,7 +193,6 @@ namespace Belle2 {
       // check u and v:
       return m_compactSectorsIDMap[layer][ladder][sensor].areCoordinatesValid(normalizedU, normalizedV);
     }
-
 
   private:
 
@@ -269,6 +272,11 @@ namespace Belle2 {
       return container[ index ];
     }
 
+
+  public:
+
+    /// JKL: for testing purposes only: get direct access to the container carrying all the sectors.
+    const LayersLookUpTable_t& getCompactSectorsIDMap() const { return m_compactSectorsIDMap; }
 
   };
 

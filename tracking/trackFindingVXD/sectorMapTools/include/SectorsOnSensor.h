@@ -121,6 +121,8 @@ namespace Belle2 {
     size_t size() const { return m_compactSecIDs.size(); };
     void resize(size_t n) { m_compactSecIDs.resize(n); };
 
+    /// JKL: for testing - get all compactSecIDs:
+    const std::vector< sectorID >& getCompactSecIDs() const { return m_compactSecIDs; }
   };
 
 }

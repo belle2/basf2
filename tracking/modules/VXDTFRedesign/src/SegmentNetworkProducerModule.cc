@@ -10,6 +10,8 @@
 
 #include <tracking/modules/VXDTFRedesign/SegmentNetworkProducerModule.h>
 
+#include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -62,6 +64,10 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
   addParam("sectorMapName",
            m_secMapName,
            "the name of the SectorMap used for this instance.", string("testMap"));
+
+  addParam("printNetworks",
+           m_printNetworks,
+           "If true for each event and each network created a file with a graph is created.", bool(false));
 }
 
 
@@ -80,7 +86,11 @@ void SegmentNetworkProducerModule::event()
 
   buildActiveSectorNetwork(collectedData);
 
+  if (m_PARAMCreateNeworks < 2) { B2DEBUG(10, "SegmentNetworkProducerModule:event: event " << m_eventCounter << ": finished work after creating activeSectorNetwork"); return; }
+
   buildTrackNodeNetwork(); // apply-two-hit-filters
+
+  if (m_PARAMCreateNeworks < 3) { B2DEBUG(10, "SegmentNetworkProducerModule:event: event " << m_eventCounter << ": finished work after creating trackNodeNetwork"); return; }
 
   buildSegmentNetwork(); // apply-three-hit-filters
 
@@ -95,8 +105,15 @@ void SegmentNetworkProducerModule::endRun()
   double invEvents = 1. / m_eventCounter;
 
   B2INFO("SegmentNetworkProducerModule:endRun: events: " << m_eventCounter << " and invEvents: " << invEvents)
-
-  // TODO debug output with counters!
+  B2WARNING("SegmentNetworkProducerModule:endRun: events: " << m_eventCounter << ", results:\n "
+            << "matchSpacePoints-nSPsFound/nSPsLost/nRawSectorsFound: " << m_nSPsFound << "/" << m_nSPsLost << "/" << m_nRawSectorsFound << "\n"
+            << ", buildActiveSectorNetwork-nBadSector InnerNotActive/NoInnerActive/NoInnerExisting: " << m_nBadSectorInnerNotActive << "/" <<
+            m_nBadSectorNoInnerActive << "/" << m_nBadSectorNoInnerExisting << ", nGoodSectors/nSectorsLinked: " << m_nGoodSectorsFound << "/"
+            << m_nSectorsLinked << "\n"
+            << ", buildTrackNodeNetwork-nTrackNodesAccepted/nTrackNodesRejected/nTrackNodeLinksCreated: " << m_nTrackNodesAccepted << "/" <<
+            m_nTrackNodesRejected << "/" << m_nTrackNodeLinksCreated << "\n"
+            << ", buildSegmentNetwork-nSegmentsAccepted/nSegmentsRejected/nSegmentLinksCreated: " << m_nSegmentsAccepted << "/" <<
+            m_nSegmentsRejected << "/" << m_nSegmentsLinksCreated << "\n")
 }
 
 
@@ -106,9 +123,9 @@ void SegmentNetworkProducerModule::endRun()
 /** for each SpacePoint given, find according sector and store them in a fast and intermediate way* */
 std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProducerModule::matchSpacePointToSectors()
 {
-  // TODO add counters!
-  std::vector< RawSectorData > collectedData;
+  std::vector< RawSectorData > collectedData; // contains the raw sectors to be activated
   std::vector<TrackNode* >& trackNodes = m_network->accessTrackNodes(); // collects trackNodes
+  int nSPsFound = 0, nSPsLost = 0;
 
   for (StoreArray<SpacePoint>& storeArray : m_spacePoints) {
 
@@ -118,9 +135,11 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
       const StaticSectorType* sectorFound = findSectorForSpacePoint(aSP);
 
       if (sectorFound == nullptr) {
-        B2WARNING("no sector found, SpacePoint discarded!");
+        B2WARNING("matchSpacePointToSectors: SP in sensor " << aSP.getVxdID() << " no sector found, SpacePoint discarded!");
+        nSPsLost++;
         continue;
       }
+      nSPsFound++;
 
       TrackNode* trackNode = new TrackNode();
       trackNode->spacePoint = &aSP;
@@ -128,6 +147,7 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
 
       // sector for SpacePoint exists:
       FullSecID foundSecID = sectorFound->getFullSecID();
+      B2INFO("matchSpacePointToSectors: SP found!: " << foundSecID.getFullSecString()) // TODO Jan8_2016: remove!
 
       vector<RawSectorData>::iterator iter =
         std::find_if(
@@ -143,10 +163,16 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
       } else {
         iter->hits.push_back(trackNode);
       }
+//    B2INFO("matchSpacePointToSectors: trackNode Found2: " << *trackNode) // TODO Jan8_2016: remove!
 
     } // loop over SpacePoints in StoreArray
   } // loop over StoreArrays
 
+  B2DEBUG(1, "SegmentNetworkProducerModule::matchSpacePointToSectors(): nSPs found/lost: " << nSPsFound << "/" << nSPsLost <<
+          ", nTrackNodes/nCollectedData(nSectors activated): " << trackNodes.size() << "/" << collectedData.size())
+  m_nSPsFound += nSPsFound;
+  m_nSPsLost += nSPsLost;
+  m_nRawSectorsFound += collectedData.size();
   // store IP-coordinates
   if (m_PARAMAddVirtualIP == true) {
     m_network->setVirtualInteractionPoint(); // TODO pass relevant parameters!
@@ -164,18 +190,20 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
 void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< SegmentNetworkProducerModule::RawSectorData >&
                                                             collectedData)
 {
-  // TODO add counters!
-
+  // access (yet) empty activeSectorNetwork:
   DirectedNodeNetwork<ActiveSector<StaticSectorType, TrackNode>, VoidMetaInfo>& activeSectorNetwork =
     m_network->accessActiveSectorNetwork();
+  // activeSectors are to be stored separately:
   vector<ActiveSector<StaticSectorType, TrackNode>*>& activeSectors = m_network->accessActiveSectors();
+  int nNoSPinThisInnerSector = 0, nNoValidOfAllInnerSectors = 0, nNoInnerExisting = 0, nSectorsLinked = 0;
 
+  // loop over all raw sectors found so far:
   for (RawSectorData& outerSectorData : collectedData) {
     ActiveSector<StaticSectorType, TrackNode>* outerSector = new ActiveSector<StaticSectorType, TrackNode>
     (outerSectorData.staticSector);
 
-    // skip double-adding of nodes into the network after first iteration -> speeding up the code:
-    bool isFirstIteration = true;
+    // skip double-adding of nodes into the network after first time found -> speeding up the code:
+    bool wasAnythingFoundSoFar = false;
     // find innerSectors of outerSector and add them to the network:
     const std::vector<FullSecID>& innerSecIDs = outerSector->getInner2spSecIDs();
 
@@ -185,11 +213,12 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
           collectedData.begin(),
           collectedData.end(),
           [&](const RawSectorData & entry) -> bool
-      { return (entry.wasCreated == false) and (entry.secID == innerSecID); }
+//       { return (entry.wasCreated == false) and (entry.secID == innerSecID); }
+      { return (entry.secID == innerSecID); }
         );
 
       // current inner sector has no SpacePoints in this event:
-      if (innerRawSecPos == collectedData.end()) { continue; }
+      if (innerRawSecPos == collectedData.end()) { B2DEBUG(1, "SegmentNetworkProducerModule::buildActiveSectorNetwork(): sector " << outerSectorData.secID.getFullSecString() << " had inner sector " << innerSecID.getFullSecString() << " but no inner hits - discarding combination..."); nNoSPinThisInnerSector++; continue; }
 
       // take care of inner sector first:
       ActiveSector<StaticSectorType, TrackNode>* innerSector = nullptr;
@@ -206,7 +235,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
       }
 
       // when accepting combination the first time, take care of outer sector:
-      if (isFirstIteration) {
+      if (!wasAnythingFoundSoFar) {
         outerSectorData.wasCreated = true;
         outerSectorData.sector = outerSector;
         for (Belle2::TrackNode* hit : outerSectorData.hits) { hit->sector = outerSector; }
@@ -215,29 +244,44 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
         activeSectors.push_back(outerSector);
 
         activeSectorNetwork.linkTheseEntries(*outerSector, *innerSector);
-        isFirstIteration = false;
+        wasAnythingFoundSoFar = true;
+        nSectorsLinked++;
         continue;
       }
       activeSectorNetwork.addInnerToLastOuterNode(*innerSector);
     } // inner sector loop
 
     // discard outerSector if no valid innerSector could be found
-    if (isFirstIteration == true) { delete outerSector; }
+    if (wasAnythingFoundSoFar == false) { B2DEBUG(1, "SegmentNetworkProducerModule::buildActiveSectorNetwork(): sector " << outerSectorData.secID.getFullSecString() << " had no matching inner sectors of " << innerSecIDs.size() << " stored in secMap - discarding as outer sector..."); nNoValidOfAllInnerSectors++; if (innerSecIDs.empty()) { nNoInnerExisting++; }; delete outerSector; }
     /** WARNING this could lead to the situation, that a sector can be created twice! (but time consuming hit-adding will only be done once)
      * - once as an innerEnd of a network, where it gets deleted here, since no valid inner Sectors exist
      * - then again when it is the innerSector of another outer one! shall this be optimized?
      * */
   } // outer sector loop
+  B2DEBUG(1,
+          "SegmentNetworkProducerModule::buildActiveSectorNetwork(): nNoSPinThisInnerSector/nNoValidOfAllInnerSectors/nNoInnerExisting: " <<
+          nNoSPinThisInnerSector << "/" << nNoValidOfAllInnerSectors << "/" << nNoInnerExisting <<
+          ", size of nActiveSectors/activeSectorNetwork: " << activeSectors.size() << "/" << activeSectorNetwork.size())
+  m_nGoodSectorsFound += activeSectors.size();
+  m_nSectorsLinked += nSectorsLinked;
+  m_nBadSectorInnerNotActive += nNoSPinThisInnerSector;
+  m_nBadSectorNoInnerActive += nNoValidOfAllInnerSectors;
+  m_nBadSectorNoInnerExisting += nNoInnerExisting;
+
+  if (!m_printNetworks) return;
+
+  std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_ActiveSector_Ev" + std::to_string(m_eventCounter);
+  DNN::printNetwork<ActiveSector<StaticSectorType, TrackNode>, VoidMetaInfo>(activeSectorNetwork, fileName);
 }
 
 
 /** old name: segFinder. use SpacePoints stored in ActiveSectors to store and link them in a DirectedNodeNetwork< SpacePoint > */
 void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 {
-  // TODO add counters!
   DirectedNodeNetwork<ActiveSector<StaticSectorType, Belle2::TrackNode>, VoidMetaInfo>& activeSectorNetwork =
     m_network->accessActiveSectorNetwork();
   DirectedNodeNetwork<Belle2::TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
+  int nAccepted = 0, nRejected = 0, nLinked = 0;;
 
   // loop over outer sectors to get their hits(->outerHits) and inner sectors
   for (auto* outerSector : activeSectorNetwork.getNodes()) {
@@ -251,8 +295,8 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
       if (innerHits.empty()) continue;
 
       for (TrackNode* outerHit : outerHits) {
-        // skip double-adding of nodes into the network after first iteration -> speeding up the code:
-        bool isFirstIteration = true;
+        // skip double-adding of nodes into the network after first time found -> speeding up the code:
+        bool wasAnythingFoundSoFar = false;
 
         for (TrackNode* innerHit : innerHits) {
           // applying filters provided by the sectorMap:
@@ -261,12 +305,14 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
                             *outerHit,
                             *innerHit);
 
-          if (accepted == false) continue; // skip combinations which weren't accepted
+          if (accepted == false) { nRejected++; continue; } // skip combinations which weren't accepted
+          nAccepted++;
 
           // store combination of hits in network:
-          if (isFirstIteration) {
+          if (!wasAnythingFoundSoFar) {
             hitNetwork.linkTheseEntries(*outerHit, *innerHit);
-            isFirstIteration = false;
+            nLinked++;
+            wasAnythingFoundSoFar = true;
             continue;
           }
           hitNetwork.addInnerToLastOuterNode(*innerHit);
@@ -274,6 +320,16 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
       } // outer hit loop
     } // inner sector loop
   } // outer sector loop
+  B2DEBUG(1, "SegmentNetworkProducerModule::buildTrackNodeNetwork(): nAccepted/nRejected: " << nAccepted << "/" << nRejected <<
+          ", size of nLinked/hitNetwork: " << nLinked << "/" << hitNetwork.size())
+  m_nTrackNodesAccepted += nAccepted;
+  m_nTrackNodesRejected += nRejected;
+  m_nTrackNodeLinksCreated += nLinked;
+
+  if (!m_printNetworks) return;
+
+  std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_TrackNode_Ev" + std::to_string(m_eventCounter);
+  DNN::printNetwork<Belle2::TrackNode, VoidMetaInfo>(hitNetwork, fileName);
 }
 
 
@@ -281,10 +337,10 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 /** old name: nbFinder. use connected SpacePoints to form segments which will stored and linked in a DirectedNodeNetwork< Segment > */
 void SegmentNetworkProducerModule::buildSegmentNetwork()
 {
-  // TODO add counters!
   DirectedNodeNetwork<Belle2::TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
   DirectedNodeNetwork<Segment< Belle2::TrackNode>, CACell>& segmentNetwork = m_network->accessSegmentNetwork();
   vector<Belle2::Segment<Belle2::TrackNode>* >& segments = m_network->accessSegments();
+  int nAccepted = 0, nRejected = 0, nLinked = 0;;
 
   for (DirectedNode<TrackNode, VoidMetaInfo>* outerHit : hitNetwork.getNodes()) {
     const vector<DirectedNode<TrackNode, VoidMetaInfo>*>& centerHits = outerHit->getInnerNodes();
@@ -294,8 +350,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
       const vector<DirectedNode<TrackNode, VoidMetaInfo>*>& innerHits = centerHit->getInnerNodes();
       if (innerHits.empty()) continue; // go to next centerHit
 
-      // skip double-adding of nodes into the network after first iteration -> speeding up the code:
-      bool isFirstIteration = true;
+      // skip double-adding of nodes into the network after first time found -> speeding up the code:
+      bool wasAnythingFoundSoFar = false;
       for (DirectedNode<TrackNode, VoidMetaInfo>* innerHit : innerHits) {
 
         // applying filters provided by the sectorMap:
@@ -306,44 +362,68 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
                           centerHit->getEntry(),
                           innerHit->getEntry());
 
-        if (accepted == false) continue; // skip combinations which weren't accepted
+        B2DEBUG(1, "buildSegmentNetwork: outer/Center/Inner: " << outerHit->getEntry().getName() << "/" << centerHit->getEntry().getName()
+                << "/" << innerHit->getEntry().getName() << ", accepted: " << std::to_string(accepted));
+
+        if (accepted == false) { nRejected++; continue; } // skip combinations which weren't accepted
+        nAccepted++;
 
         // create innerSegment first (order of storage in vector<segments> is irrelevant):
         Segment<TrackNode>* innerSegment = new Segment<TrackNode>(
-          outerHit->getEntry().sector->getFullSecID(),
           centerHit->getEntry().sector->getFullSecID(),
-          &outerHit->getEntry(),
-          &centerHit->getEntry());
-        DirectedNode<Segment<TrackNode>, CACell>* tempSegmentnode = segmentNetwork.getNode(*innerSegment);
-        if (tempSegmentnode == nullptr) {
+          innerHit->getEntry().sector->getFullSecID(),
+          &centerHit->getEntry(),
+          &innerHit->getEntry());
+        B2DEBUG(1, "buildSegmentNetwork: innerSegment: " << innerSegment->getName())
+        DirectedNode<Segment<TrackNode>, CACell>* tempInnerSegmentnode = segmentNetwork.getNode(*innerSegment);
+        if (tempInnerSegmentnode == nullptr) {
           segments.push_back(innerSegment);
         } else {
           delete innerSegment;
-          innerSegment = &tempSegmentnode->getEntry();
+          innerSegment = &(tempInnerSegmentnode->getEntry());
         }
 
         // store combination of hits in network:
-        if (isFirstIteration) {
+        if (!wasAnythingFoundSoFar) {
           // create outerSector:
           Segment<TrackNode>* outerSegment = new Segment<TrackNode>(
             outerHit->getEntry().sector->getFullSecID(),
             centerHit->getEntry().sector->getFullSecID(),
             &outerHit->getEntry(),
             &centerHit->getEntry());
-          DirectedNode<Segment<TrackNode>, CACell>* tempSegmentnode = segmentNetwork.getNode(*innerSegment);
-          if (tempSegmentnode == nullptr) {
+          B2DEBUG(1, "buildSegmentNetwork: outerSegment(freshly created): " << outerSegment->getName() << " to be linked with inner segment: "
+                  << innerSegment->getName())
+//      segmentNetwork.linkTheseEntries(*outerSegment, *innerSegment);
+          DirectedNode<Segment<TrackNode>, CACell>* tempOuterSegmentnode = segmentNetwork.getNode(*outerSegment);
+          if (tempOuterSegmentnode == nullptr) {
             segments.push_back(outerSegment);
           } else {
             delete outerSegment;
-            outerSegment = &tempSegmentnode->getEntry();
+            outerSegment = &(tempOuterSegmentnode->getEntry());
           }
 
+          B2DEBUG(1, "buildSegmentNetwork: outerSegment (after duplicate check): " << outerSegment->getName() <<
+                  " to be linked with inner segment: " << innerSegment->getName())
           segmentNetwork.linkTheseEntries(*outerSegment, *innerSegment);
-          isFirstIteration = false;
+          nLinked++;
+          wasAnythingFoundSoFar = true;
           continue;
         }
         segmentNetwork.addInnerToLastOuterNode(*innerSegment);
       } // innerHit-loop
     } // centerHit-loop
   } // outerHit-loop
+
+  B2DEBUG(1, "SegmentNetworkProducerModule::buildSegmentNetwork(): nAccepted/nRejected: " << nAccepted << "/" << nRejected <<
+          ", size of nLinked/hitNetwork: " << nLinked << "/" << segmentNetwork.size())
+  m_nSegmentsAccepted += nAccepted;
+  m_nSegmentsRejected += nRejected;
+  m_nSegmentsLinksCreated += nLinked;
+
+  if (!m_printNetworks) return;
+
+  std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_Segment_Ev" + std::to_string(m_eventCounter);
+  DNN::printNetwork<Segment< Belle2::TrackNode>, CACell>(segmentNetwork, fileName);
+  DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, "CA" + fileName);
+
 }

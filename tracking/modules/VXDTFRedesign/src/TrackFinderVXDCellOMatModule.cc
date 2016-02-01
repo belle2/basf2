@@ -10,6 +10,8 @@
 
 #include <tracking/modules/VXDTFRedesign/TrackFinderVXDCellOMatModule.h>
 
+#include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
+
 // fw:
 #include <framework/logging/Logger.h>
 
@@ -38,10 +40,19 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
            m_PARAMNetworkName,
            "name for StoreObjPtr< DirectedNodeNetwork> which contains the networks needed.",
            string(""));
+
   addParam("SpacePointTrackCandArrayName",
            m_PARAMSpacePointTrackCandArrayName,
            "name for StoreArray< SpacePointTrackCand> to be filled.",
            string(""));
+
+  addParam("sectorMapName",
+           m_PARAMsecMapName,
+           "the name of the SectorMap used for this instance.", string("testMap"));
+
+  addParam("printNetworks",
+           m_PARAMprintNetworks,
+           "If true for each event and each network created a file with a graph is created.", bool(false));
 }
 
 /** *************************************+************************************* **/
@@ -54,22 +65,26 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
 
 void TrackFinderVXDCellOMatModule::initialize()
 {
+  m_sectorMap.isRequired();
+  bool wasFound = false;
+  for (auto& setup : m_sectorMap->getAllSetups()) {
+    auto& filters = *(setup.second);
+
+    if (filters.getConfig().secMapName != m_PARAMsecMapName) { continue; }
+    B2INFO("TrackFinderVXDCellOMatModule::initialize(): loading mapName: " << m_PARAMsecMapName << ".");
+    m_config = filters.getConfig();
+    wasFound = true;
+    break; // have found our secMap no need for further searching
+  }
+  if (wasFound == false) B2FATAL("TrackFinderVXDCellOMatModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
+                                   "' does not exist! Can not continue...");
+
   m_network.isRequired(m_PARAMNetworkName);
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
 }
 
 
 
-/** *************************************+************************************* **/
-/** ***********************************+ + +*********************************** **/
-/** *******************************+  beginRun +******************************* **/
-/** ***********************************+ + +*********************************** **/
-/** *************************************+************************************* **/
-
-void TrackFinderVXDCellOMatModule::beginRun()
-{
-
-}
 
 /** *************************************+************************************* **/
 /** ***********************************+ + +*********************************** **/
@@ -90,6 +105,11 @@ void TrackFinderVXDCellOMatModule::event()
 
 
   DirectedNodeNetwork< Segment<TrackNode>, CACell >& segmentNetwork = m_network->accessSegmentNetwork();
+
+  if (m_PARAMprintNetworks) {
+    std::string fileName = m_PARAMsecMapName + "_CA_Ev" + std::to_string(m_eventCounter);
+    DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, fileName);
+  }
 
 
 /// apply CA algorithm:
@@ -134,31 +154,6 @@ void TrackFinderVXDCellOMatModule::event()
   B2DEBUG(10, " TrackFinderVXDCellOMat-event" << m_eventCounter <<
           ": " << nCreated <<
           " TCs created and stored into StoreArray!")
-
-}
-
-
-/** *************************************+************************************* **/
-/** ***********************************+ + +*********************************** **/
-/** ********************************+  endRun +******************************** **/
-/** ***********************************+ + +*********************************** **/
-/** *************************************+************************************* **/
-
-
-void TrackFinderVXDCellOMatModule::endRun()
-{
-
-}
-
-/** *************************************+************************************* **/
-/** ***********************************+ + +*********************************** **/
-/** *******************************+ terminate +******************************* **/
-/** ***********************************+ + +*********************************** **/
-/** *************************************+************************************* **/
-
-
-void TrackFinderVXDCellOMatModule::terminate()
-{
 
 }
 

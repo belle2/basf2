@@ -11,8 +11,9 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSectorDummy.h>
-// #include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
-// #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
+#include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
+#include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
+#include <tracking/trackFindingVXD/environment/FilterSetTypes.h>
 #include <tracking/trackFindingVXD/segmentNetwork/ActiveSector.h>
 
 #include <string>
@@ -26,8 +27,8 @@ namespace Belle2 {
   struct TrackNode {
 
     /** to improve readability of the code, here the definition of the static sector type. */
-    using StaticSectorType = StaticSectorDummy;
-    //    using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
+//     using StaticSectorType = StaticSectorDummy;
+    using StaticSectorType = VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>::staticSector_t;
 
     /** pointer to sector */
     ActiveSector<StaticSectorType, TrackNode>* sector;
@@ -37,7 +38,8 @@ namespace Belle2 {
 
     /** overloaded '=='-operator
      * TODO JKL: pretty ugly operator overload, should be fixed ASAP! (solution for null-ptr-issue needed)
-     * WARNING TODO write a test for that one! */
+     * WARNING TODO write a test for that one!
+    * TODO find good reasons why one would like to create TrackNodes without Hits and ActiveSectors linked to them! */
     bool operator==(const TrackNode& b) const
     {
       // simple case: no null-ptrs interfering:
@@ -68,7 +70,11 @@ namespace Belle2 {
 
 
     /** overloaded '!='-operator */
-    bool operator!=(const TrackNode& b) const { return !(*this == b); }
+    bool operator!=(const TrackNode& b) const
+    {
+      if (spacePoint == nullptr) B2FATAL("TrackNode::operator !=: spacePoint for Tracknode not set - aborting run.")
+        return !(*this == b);
+    }
 
 
     /** overloaded '<<' stream operator. Print secID to stream by converting it to string */
@@ -80,7 +86,33 @@ namespace Belle2 {
 
 
     /** returns reference to hit. */
-    const SpacePoint& getHit() const { return *spacePoint; }
+    const SpacePoint& getHit() const
+    {
+      if (spacePoint == nullptr) B2FATAL("TrackNode::getHit: spacePoint for Tracknode not set - aborting run.")
+        return *spacePoint;
+    }
+
+
+//  /** returns pointer to hit of the tracknode if set, returns nullptr if not. */
+//  const SpacePoint* getHit() const
+//  {
+//    if (spacePoint == nullptr) B2WARNING("TrackNode::getHit: spacePoint for Tracknode not set - returning nullptr instead!")
+//    return spacePoint;
+//  }
+
+//  /** returns pointer to activeSector of the tracknode if set, returns nullptr if not. */
+//  ActiveSector<StaticSectorType, TrackNode>* getActiveSector()
+//  {
+//    if (sector == nullptr) B2WARNING("TrackNode::getActiveSector: ActiveSector for Tracknode not set - returning nullptr instead!")
+//    return sector;
+//  }
+
+    /** returns reference to hit. */
+    ActiveSector<StaticSectorType, TrackNode>& getActiveSector()
+    {
+      if (sector == nullptr) B2FATAL("TrackNode::getActiveSector: ActiveSector for Tracknode not set - aborting run.")
+        return *sector;
+    }
 
 
     /** constructor WARNING: sector-pointing has still to be decided! */
@@ -94,7 +126,10 @@ namespace Belle2 {
     /** returns secID of this sector */
     std::string getName() const
     {
-      return "Sec: " + sector->getName() +  ", HitID: " + spacePoint->getName();
+      std::string out;
+      if (sector != nullptr) { out += "Sec: " + sector->getName(); } else {out += "no sector attached "; }
+      if (spacePoint != nullptr) { out += ", SP: " + spacePoint->getName(); } else {out += "no hit attached"; }
+      return out;
     }
   };
 

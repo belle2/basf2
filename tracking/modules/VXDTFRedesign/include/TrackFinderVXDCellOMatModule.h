@@ -16,9 +16,10 @@
 #include <framework/core/Module.h>
 
 // tracking
-#include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
+
 #include <tracking/dataobjects/FullSecID.h>
+#include <tracking/dataobjects/SectorMapConfig.h>
 
 #include <tracking/trackFindingVXD/algorithms/CellularAutomaton.h>
 #include <tracking/trackFindingVXD/algorithms/PathCollectorRecursive.h>
@@ -27,6 +28,9 @@
 #include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerPathCollector.h>
 
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
+#include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
+
+#include <tracking/trackFindingVXD/sectorMapTools/SectorMap.h>
 
 #include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
 
@@ -54,7 +58,7 @@ namespace Belle2 {
 
 
     /** beginRun */
-    virtual void beginRun();
+    virtual void beginRun() {}
 
 
     /** event */
@@ -62,18 +66,13 @@ namespace Belle2 {
 
 
     /** endRun */
-    virtual void endRun();
+    virtual void endRun() {}
 
 
     /** terminate */
-    virtual void terminate();
+    virtual void terminate() {}
 
 
-    /** initialize variables to avoid nondeterministic behavior */
-    void InitializeCounters()
-    {
-      m_eventCounter = 0;
-    }
 
     /** *************************************+************************************* **/
     /** ***********************************+ + +*********************************** **/
@@ -96,6 +95,13 @@ namespace Belle2 {
     std::string m_PARAMNetworkName;
 
 
+    /** the name of the SectorMap used for this instance. */
+    std::string m_PARAMsecMapName;
+
+
+    /** "If true for each event and each network created a file with a graph is created. */
+    bool m_PARAMprintNetworks;
+
 /// member variables
 
     /** CA algorithm */
@@ -113,19 +119,31 @@ namespace Belle2 {
     /** tool for creating SPTCs, fills storeArray directly */
     SpacePointTrackCandCreator<StoreArray<Belle2::SpacePointTrackCand>> m_sptcCreator;
 
+
     /// input containers
+
     /** access to the DirectedNodeNetwork, which contains the network needed for creating TrackCandidates */
     StoreObjPtr<Belle2::DirectedNodeNetworkContainer> m_network;
 
 
+    /** contains the sectorMap (only needed for loading the configuration). */
+    StoreObjPtr< SectorMap<SpacePoint, Belle2::TwoHitFilterSet> >
+    m_sectorMap; // = StoreObjPtr< SectorMap<SpacePoint> >("", DataStore::c_Persistent);
+
+
+    /** contains the configuration-settings for this run. */
+    SectorMapConfig m_config;
+
+
     /// output containers
+
     /** StoreArray for the TCs created in this module */
     StoreArray<Belle2::SpacePointTrackCand> m_TCs;
 
 
     /// counters and other debug stuff:
     /** counts event numbers */
-    unsigned int m_eventCounter;
+    unsigned int m_eventCounter = 0;
 
   private:
   };

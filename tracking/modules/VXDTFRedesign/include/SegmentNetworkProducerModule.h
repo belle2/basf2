@@ -24,7 +24,9 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/FullSecID.h>
 #include <tracking/dataobjects/SectorMapConfig.h>
-// #include <tracking/trackFindingVXD/sectorMapTools/SectorMap.h>
+#include "tracking/trackFindingVXD/environment/FilterSetTypes.h"
+#include <tracking/trackFindingVXD/sectorMapTools/SectorMap.h>
+#include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
 
 
 // stl
@@ -47,8 +49,8 @@ namespace Belle2 {
 
   public:
     /** to improve readability of the code, here the definition of the static sector type. */
-    using StaticSectorType = StaticSectorDummy;
-//  using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
+//     using StaticSectorType = StaticSectorDummy;
+    using StaticSectorType = VXDTFFilters<SpacePoint, TwoHitFilterSet>::staticSector_t;
 
     // TODO WARNING JKL
     /** dummy declaration to get the module compiling without real static sectorMaps */
@@ -106,17 +108,21 @@ namespace Belle2 {
       InitializeCounters();
 
       // load VXDTFFilters of secMap:
-// // // // // // // //     m_sectorMap.isRequired();
-// // // // // // // //     for (auto& setup : m_sectorMap->getAllSetups()) {
-// // // // // // // //     auto& filters = *(setup.second);
-// // // // // // // //
-// // // // // // // //     if (filters.getConfig().secMapName != m_secMapName) { continue; }
-// // // // // // // //     B2INFO("SegmentNetworkProducerModule::initialize(): loading mapName: " << m_secMapName << " with nCompactSecIDs: " << filters.size());
-// // // // // // // //
-// // // // // // // //     m_vxdtfFilters = &filters;
-// // // // // // // //     }
-// // // // // // // //     if (m_vxdtfFilters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_secMapName << "' does not exist! Can not continue...");
+      m_sectorMap.isRequired();
+      // searching for correct sectorMap:
+      for (auto& setup : m_sectorMap->getAllSetups()) {
+        auto& filters = *(setup.second);
 
+        if (filters.getConfig().secMapName != m_secMapName) { continue; }
+        B2INFO("SegmentNetworkProducerModule::initialize(): loading mapName: " << m_secMapName << " with nCompactSecIDs: " <<
+               filters.size());
+
+        m_vxdtfFilters = &filters;
+        SecMapHelper::printStaticSectorRelations(filters, filters.getConfig().secMapName + "segNetProducer", 2, true, true);
+        if (m_vxdtfFilters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_secMapName <<
+                                                 "' does not exist! Can not continue...");
+        break; // have found our secMap no need for further searching
+      }
 
       if (m_PARAMCreateNeworks < 1 or m_PARAMCreateNeworks > 3) {
         B2FATAL("SegmentNetworkProducerModule::Initialize(): parameter 'createNeworks' is set to " << m_PARAMCreateNeworks <<
@@ -131,6 +137,7 @@ namespace Belle2 {
       m_network.registerInDataStore(m_PARAMNetworkOutputName, DataStore::c_DontWriteOut);
 
       // TODO catch cases when m_network already existed in DataStore!
+
     }
 
 
@@ -154,11 +161,9 @@ namespace Belle2 {
     /** initialize variables to avoid nondeterministic behavior */
     void InitializeCounters()
     {
-      m_eventCounter = 0;
       m_nSpacePointsTotal = 0;
       m_nSpacePointsInSectors = 0;
       m_nSpacePointsAsNodes = 0;
-      m_nSectorsFound = 0;
       m_nSectorsAsNodes = 0;
       m_nSegmentsAsNodes = 0;
       m_nOuterSectorLinks = 0;
@@ -177,37 +182,41 @@ namespace Belle2 {
     /** returns a NULL-ptr if no sector found, returns pointer to the static sector if found */
     const StaticSectorType* findSectorForSpacePoint(const SpacePoint& aSP)
     {
-//    if (m_vxdtfFilters->areCoordinatesValid(aSP.getVxdID(), aSP.getNormalizedLocalU(), aSP.getNormalizedLocalV()) == false) {
-//    B2DEBUG(1, "SegmentNetworkProducerModule()::findSectorForSpacePoint(): spacepoint " << aSP.getArrayIndex() << " has no valid FullSecID: " << aSP);
-//    return nullptr;
-//    }
-//
-//    FullSecID spSecID = m_vxdtfFilters->getFullID(aSP.getVxdID(), aSP.getNormalizedLocalU(), aSP.getNormalizedLocalV());
-//    B2DEBUG(1, "SegmentNetworkProducerModule()::findSectorForSpacePoint(): spacepoint " << aSP.getArrayIndex() << " got valid FullSecID of " << spSecID.getFullSecString());
-//       // TODO function
-//       /** Pseudo code of actual function:
-//        *
-//        * for (StaticSectorDummy& aSector : m_secMap)
-//        *   if aSP->getVxdID() != aSector.getVxdID() {continue;}
-//        *
-//        *   if (aSector.getFullSecID(aSP->getNormalizedLocalU(), aSP->getNormalizedLocalV()) != isValid) { continue;}
-//        *
-//        *   return &aSector;
-//        *
-//        * return NULL;
-//        */
-//
-//    return m_vxdtfFilters->getStaticSector(spSecID);
+      if (m_vxdtfFilters->areCoordinatesValid(aSP.getVxdID(), aSP.getNormalizedLocalU(), aSP.getNormalizedLocalV()) == false) {
+        B2DEBUG(1, "SegmentNetworkProducerModule()::findSectorForSpacePoint(): spacepoint " << aSP.getArrayIndex() <<
+                " has no valid FullSecID: " << aSP);
+        return nullptr;
+      }
+
+      FullSecID spSecID = m_vxdtfFilters->getFullID(aSP.getVxdID(), aSP.getNormalizedLocalU(), aSP.getNormalizedLocalV());
+      const StaticSectorType* secPointer =  m_vxdtfFilters->getStaticSector(spSecID);
+      B2DEBUG(1, "SegmentNetworkProducerModule()::findSectorForSpacePoint(): spacepoint " << aSP.getArrayIndex() <<
+              " got valid FullSecID of " << spSecID.getFullSecString() <<
+              " with pointer-adress (if this is a nullptr, vxdtffilters does not have anything stored): " << secPointer);
+      // TODO function
+      /** Pseudo code of actual function:
+      *
+      * for (StaticSectorDummy& aSector : m_secMap)
+      *   if aSP->getVxdID() != aSector.getVxdID() {continue;}
+      *
+      *   if (aSector.getFullSecID(aSP->getNormalizedLocalU(), aSP->getNormalizedLocalV()) != isValid) { continue;}
+      *
+      *   return &aSector;
+      *
+      * return NULL;
+      */
+
+      return secPointer;
       // TODO WARNING JKL
 
 
 //       // dummy function here (for mockup):
-      for (StaticSectorDummy* aSector : m_secMap.sectors) {
-        if (FullSecID(aSP.getVxdID()) == *aSector) return aSector;
-      }
-
-      m_secMap.sectors.push_back(new StaticSectorDummy(FullSecID(aSP.getVxdID())));
-      return m_secMap.sectors.back();
+// // // //       for (StaticSectorDummy* aSector : m_secMap.sectors) {
+// // // //         if (FullSecID(aSP.getVxdID()) == *aSector) return aSector;
+// // // //       }
+// // // //
+// // // //       m_secMap.sectors.push_back(new StaticSectorDummy(FullSecID(aSP.getVxdID())));
+// // // //       return m_secMap.sectors.back();
     }
 
 
@@ -254,14 +263,18 @@ namespace Belle2 {
     /** the name of the SectorMap used for this instance. */
     std::string m_secMapName;
 
+    /** If true for each event and each network created a file with a graph is created. */
+    bool m_printNetworks;
+
 // member variables
 
     // input containers
     /** contains the sectorMap and with it the VXDTFFilters. */
-// // // // // // // // // // // //   StoreObjPtr< SectorMap<SpacePoint> > m_sectorMap = StoreObjPtr< SectorMap<SpacePoint> >("", DataStore::c_Persistent);
+    StoreObjPtr< SectorMap<SpacePoint, TwoHitFilterSet> >
+    m_sectorMap; // = StoreObjPtr< SectorMap<SpacePoint, TwoHitFilterSet> >("", DataStore::c_Persistent);
 
     /** contains all sectorCombinations and Filters including cuts. */
-// // // // // // // // // // // // //  VXDTFFilters<SpacePoint>* m_vxdtfFilters = nullptr;
+    VXDTFFilters<SpacePoint, TwoHitFilterSet>* m_vxdtfFilters = nullptr;
 
     /** contains storeArrays with SpacePoints in it */
     std::vector<StoreArray<Belle2::SpacePoint> > m_spacePoints;
@@ -280,10 +293,55 @@ namespace Belle2 {
 // counters
 
     /** knows current event number */
-    unsigned int m_eventCounter;
+    unsigned int m_eventCounter = 0;
 
-    /** counts total number of Sectors with SpacePoints attached to them found */
-    unsigned int m_nSectorsFound;
+    // spacePoint-matching:
+
+    /** counts number of spacePoints accepted by secMap (spacepoint-to-sector-matching only). */
+    unsigned int m_nSPsFound = 0;
+
+    /** counts number of spacePoints rejected by secMap (spacepoint-to-sector-matching only). */
+    unsigned int m_nSPsLost = 0;
+
+    /** counts total number of Sectors with SpacePoints attached to them found (double entries between several events are ignored.) - spacepoint-matching only */
+    unsigned int m_nRawSectorsFound = 0;
+
+    // buildActiveSectorNetwork:
+
+    /** counts accepted number of Sectors with SpacePoints attached to them found (double entries between several events are ignored.) - activeSector-creation only - this is one step after spacePointMatching. */
+    unsigned int m_nGoodSectorsFound = 0;
+
+    /** number of sectorCombinations which were successfully linked. */
+    unsigned int m_nSectorsLinked = 0;
+
+    /** counts number of times a sector had an inner sector without hits (does not mean that this sector had no other inner sectors with hits). */
+    unsigned int m_nBadSectorInnerNotActive = 0;
+
+    /** counts number of times a sector had inner sectors bot none of them had any spacePoints. */
+    unsigned int m_nBadSectorNoInnerActive = 0;
+
+    /** counts number of times a sector had spacePoints but no inner sectors was attached at all. */
+    unsigned int m_nBadSectorNoInnerExisting = 0;
+
+    // buildTrackNodeNetwork:
+    /** counts number of times a trackNode was accepted (same trackNode can be accepted/rejected more than once -> combinations relevant). */
+    unsigned int m_nTrackNodesAccepted = 0;
+
+    /** counts number of times a trackNode was rejected (same trackNode can be accepted/rejected more than once -> combinations relevant). */
+    unsigned int m_nTrackNodesRejected = 0;
+
+    /** counts number of times a link between tracknodes was created (unique per combination and map). */
+    unsigned int m_nTrackNodeLinksCreated = 0;
+
+    // buildSegmentNetwork:
+    /** counts number of times a Segment was accepted (same Segment can be accepted/rejected more than once -> combinations relevant). */
+    unsigned int m_nSegmentsAccepted = 0;
+
+    /** counts number of times a Segment was rejected (same Segment can be accepted/rejected more than once -> combinations relevant). */
+    unsigned int m_nSegmentsRejected = 0;
+
+    /** counts number of times a link between tracknodes was created (unique per combination and map). */
+    unsigned int m_nSegmentsLinksCreated = 0;
 
     /** counts number of Sectors which could be woven into the network */
     unsigned int m_nSectorsAsNodes;
@@ -321,3 +379,4 @@ namespace Belle2 {
   private:
   };
 }
+

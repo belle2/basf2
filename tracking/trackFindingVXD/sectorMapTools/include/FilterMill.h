@@ -155,7 +155,12 @@ namespace Belle2 {
           tempData.push_back({filterPack.first, result});
         }
       } catch (...) {
-        B2WARNING("FilterMill:grindData2Hit: an exception was thrown by one of the Filters/SelectionVariables, that indicates strange input data, no data collected!")
+        std::string filterNames;
+        for (const auto& filterPack : m_2Hitfilters) {
+          filterNames += filterPack.first + " ";
+        }
+        B2WARNING("FilterMill:grindData2Hit: an exception was thrown by one of the Filters/SelectionVariables, that indicates strange input data, no data collected! Filters "
+                  << filterNames << " were used and one of them did not work.")
         return;
       }
 
@@ -183,7 +188,12 @@ namespace Belle2 {
           tempData.push_back({filterPack.first, result});
         }
       } catch (...) {
-        B2WARNING("FilterMill:grindData3Hit: an exception was thrown by one of the Filters/SelectionVariables, that indicates strange input data, no data collected!")
+        std::string filterNames;
+        for (const auto& filterPack : m_2Hitfilters) {
+          filterNames += filterPack.first + " ";
+        }
+        B2WARNING("FilterMill:grindData3Hit: an exception was thrown by one of the Filters/SelectionVariables, that indicates strange input data, no data collected! Filters "
+                  << filterNames << " were used and one of them did not work.")
         return;
       }
       collectedData.insert(collectedData.end(), tempData.begin(), tempData.end());

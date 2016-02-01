@@ -1487,7 +1487,8 @@ void VXDTFModule::the_real_event()
   thisInfoPackage.sectionConsumption.hitSorting += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) {
-    B2DEBUG(3, "VXDTF- import hits: of " << nSvdClusters << " svdClusters, " << nClusterCombis << " svd2Dclusters, " << nPxdClusters  <<
+    B2DEBUG(3, "VXDTF event " << m_eventCounter << ": import hits: of " << nSvdClusters << " svdClusters, " << nClusterCombis <<
+            " svd2Dclusters, " << nPxdClusters  <<
             " pxdClusters and " << nTelClusters  << " telClusters, " << badSectorRangeCtr <<
             " hits had to be discarded because out of sector range")
   }
@@ -1541,7 +1542,8 @@ void VXDTFModule::the_real_event()
     [&](const VXDSector * secA, const VXDSector * secB) { return *secA == *secB; });
     currentPass->sectorVector.resize(std::distance(currentPass->sectorVector.begin(), newEndOfVector));
 
-    B2DEBUG(3, "Pass #" << passNumber << " - " << currentPass->sectorSetup << ": " << currentPass->sectorVector.size() <<
+    B2DEBUG(3, "event " << m_eventCounter << ": Pass #" << passNumber << " - " << currentPass->sectorSetup << ": " <<
+            currentPass->sectorVector.size() <<
             " sectors(sectorVector) activated with total of " << currentPass->hitVector.size() << " VXDTFhits, -> starting segFinder...");
 
     if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {
@@ -1671,7 +1673,7 @@ void VXDTFModule::the_real_event()
      */
     timeStamp = boostClock::now();
     int numRounds = cellularAutomaton(currentPass);
-    B2DEBUG(3, "pass " << passNumber << ": cellular automaton finished in " << numRounds << " rounds");
+    B2DEBUG(3, "event " << m_eventCounter << ": pass " << passNumber << ": cellular automaton finished in " << numRounds << " rounds");
     if (numRounds < 0) {
       B2ERROR(m_PARAMnameOfInstance << " event " << m_eventCounter <<
               ": cellular automaton entered an infinite loop, therefore aborted, terminating event! There were " << nTelClusters << "/" <<
@@ -1732,7 +1734,8 @@ void VXDTFModule::the_real_event()
     tcCollector(currentPass);                                     /// tcCollector
     int survivingTCs = currentPass->tcVector.size();
     totalTCs += survivingTCs;
-    B2DEBUG(3, "pass " << passNumber << ": track candidate collector generated " << survivingTCs << " TCs");
+    B2DEBUG(3, "event " << m_eventCounter << ": pass " << passNumber << ": track candidate collector generated " << survivingTCs <<
+            " TCs");
     thisInfoPackage.numTCsAfterTCC += survivingTCs;
 
 
@@ -1782,9 +1785,10 @@ void VXDTFModule::the_real_event()
     if (int(currentPass->tcVector.size()) != 0) {
       survivingTCs = tcFilter(currentPass, passNumber);
       thisInfoPackage.numTCsAfterTCCfilter += survivingTCs;
-      B2DEBUG(3, "pass " << passNumber << ": track candidate filter, " << survivingTCs << " TCs survived.");
+      B2DEBUG(3, "event " << m_eventCounter << ": pass " << passNumber << ": track candidate filter, " << survivingTCs <<
+              " TCs survived.");
     } else {
-      B2DEBUG(3, "pass " << passNumber << " has no TCs therefore not starting tcFilter()");
+      B2DEBUG(3, "event " << m_eventCounter << ": pass " << passNumber << " has no TCs therefore not starting tcFilter()");
     }
 
     stopTimer = boostClock::now();
@@ -1821,13 +1825,14 @@ void VXDTFModule::the_real_event()
     int countOverbookedClusters = 0, clustersReserved = 0;
     m_tcVectorOverlapped.clear(); // July13: should be filled freshly for each pass
     /// each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
-    B2DEBUG(3, " checking overlaps now: there are " << clustersOfEvent.size() << " clusters ...")
+    B2DEBUG(3, "event " << m_eventCounter << ": checking overlaps now: there are " << clustersOfEvent.size() << " clusters ...")
     for (ClusterInfo& aCluster : clustersOfEvent) {
       bool isOB = aCluster.isOverbooked();
       if (isOB == true) { countOverbookedClusters++; }
       if (aCluster.isReserved() == true) { clustersReserved++; }
     } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
-    B2DEBUG(3, "after checking overlaps: there are " << countOverbookedClusters << " clusters of " << clustersOfEvent.size() <<
+    B2DEBUG(3, "event " << m_eventCounter << ": after checking overlaps: there are " << countOverbookedClusters << " clusters of " <<
+            clustersOfEvent.size() <<
             " marked as 'overbooked'... (reserved: " << clustersReserved << ")")
 
     int countCurrentTCs = 0;
@@ -1971,7 +1976,8 @@ void VXDTFModule::the_real_event()
 
         totalKilledTCs += killedTCs;
       }
-      B2DEBUG(3, "out of funcCleanOverlappingSet: killed " << totalKilledTCs << " TCs within " << cleaningRepeatedCtr << " iterations")
+      B2DEBUG(3, "event " << m_eventCounter << ": out of funcCleanOverlappingSet: killed " << totalKilledTCs << " TCs within " <<
+              cleaningRepeatedCtr << " iterations")
       m_TESTERcleanOverlappingSetStartedCtr++;
       thisInfoPackage.numTCsKilledByCleanOverlap += totalKilledTCs;
     }
@@ -2031,7 +2037,8 @@ void VXDTFModule::the_real_event()
     m_TESTERtimeConsumption.checkOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
     thisInfoPackage.sectionConsumption.checkOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
 
-    B2DEBUG(3, "after checking overlaps again: there are " << countOverbookedClusters << " clusters of " << clustersOfEvent.size() <<
+    B2DEBUG(3, "event " << m_eventCounter << ": after checking overlaps again: there are " << countOverbookedClusters << " clusters of "
+            << clustersOfEvent.size() <<
             " still 'overbooked', tcVector: " << m_tcVector.size() << ", tcVectorOverlapped: " << totalOverlaps)
     /** Section 9b - end */
 
@@ -2105,7 +2112,8 @@ void VXDTFModule::the_real_event()
         nTCsAliveInOverlapped++;
       }
 
-      B2DEBUG(3, "before exporting TCs, length of m_tcVector: " << m_tcVector.size() << " with " << nTCsAlive << "/" << m_tcVector.size()
+      B2DEBUG(3, "event " << m_eventCounter << ": before exporting TCs, length of m_tcVector: " << m_tcVector.size() << " with " <<
+              nTCsAlive << "/" << m_tcVector.size()
               - nTCsAlive << " alive/dead TCs, m_tcVectorOverlapped: " << m_tcVectorOverlapped.size() << " with " << nTCsAliveInOverlapped << "/"
               << m_tcVectorOverlapped.size() - nTCsAliveInOverlapped << " alive/dead TCs");
     }
@@ -2998,7 +3006,8 @@ void VXDTFModule::hopfieldVectorized(TCsOfEvent& tcVector, double omega)
     nNcounter++;
   }
 
-  B2DEBUG(3, "Hopfield network - found subset of TCs within " << nNcounter << " iterations... with c=" << c);
+  B2DEBUG(3, "event " << m_eventCounter << ": Hopfield network - found subset of TCs within " << nNcounter << " iterations... with c="
+          << c);
   list<VXDTFHit*> allHits;
   int survivorCtr = 0;
 
@@ -3300,11 +3309,12 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
     nNcounter++;
   }
 
-  B2DEBUG(3, "Hopfield network - found subset of TCs within " << nNcounter << " iterations... with c=" << c);
+  B2DEBUG(3, "event " << m_eventCounter << ": Hopfield network - found subset of TCs within " << nNcounter << " iterations... with c="
+          << c);
   list<VXDTFHit*> allHits;
   int survivorCtr = 0;
 
-  for (int i = 0; i < nTCs; i++) { if (xMatrix(0, i) > 0.7) { survivorCtr++; } }
+  for (int i = 0; i < nTCs; i++) { if (xMatrix(0, i) > 0.7) { survivorCtr++; } /*std::cout << "JKL-event " << m_eventCounter << ": tc " << i << " - got final neuron value: " << xMatrix(0,i) << " while having " << int((tcVector.at(i)->getHits()).size()) << " hits and quality indicator " << tcVector.at(i)->getTrackQuality() << std::endl;*/ }
 
   if (survivorCtr == 0) {
     m_TESTERbadHopfieldCtr++;
@@ -3324,7 +3334,7 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
     } // should now have got some survivors
   } else {
     for (int i = 0; i < nTCs; i++) {
-      B2DEBUG(50, "tc " << i << " - got final neuron value: " << xMatrix(0,
+      B2DEBUG(50, "event " << m_eventCounter << ": tc " << i << " - got final neuron value: " << xMatrix(0,
               i) << " while having " << int((tcVector.at(i)->getHits()).size()) << " hits and quality indicator " << tcVector.at(
                 i)->getTrackQuality())
       if (xMatrix(0, i) > 0.7) { /// do we want to let this threshold hardcoded?
@@ -3374,9 +3384,10 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
         xMatrixBegin << xMatrixCopy(0, i) << " ";
         xMatrixEnd << xMatrix(0, i) << " ";
 
-        B2WARNING(m_PARAMnameOfInstance << " tc " << i << " - got final neuron value: " << xMatrix(0,
-                  i) << " while having " << int((tcVector.at(i)->getHits()).size()) << " hits and quality indicator " << tcVector.at(
-                    i)->getTrackQuality())
+        B2WARNING(m_PARAMnameOfInstance << " tc " << i
+                  << " - got final neuron value: " << xMatrix(0, i)
+                  << " while having " << int((tcVector.at(i)->getHits()).size())
+                  << " hits and quality indicator " << tcVector.at(i)->getTrackQuality())
       }
 
       noSurvivors << xMatrixBegin.str() << endl << xMatrixEnd.str() << endl << qiVec.str() << endl << weightMatrix.str() << endl;
@@ -3475,7 +3486,8 @@ void VXDTFModule::reserveHits(TCsOfEvent& tcVector, PassData* currentPass)
       limit2Go = int(double(tcsUnreserved) * threshold + 0.5), // nTCs allowed to reserve their hits
       count2Limit = 0,
       countSucceeded = 0;
-  B2DEBUG(3, "reserveHits - pass " << currentPass->sectorSetup << ": threshold " << threshold << ", total number of TCs " <<
+  B2DEBUG(3, "reserveHits - event " << m_eventCounter << ", pass " << currentPass->sectorSetup << ": threshold " << threshold <<
+          ", total number of TCs " <<
           tcVector.size() << ", alive " << countAlive << ", & unreserved " << tcsUnreserved << ", results in " << limit2Go <<
           " TCs to be allowed to reserve their hits")
 
@@ -3489,7 +3501,8 @@ void VXDTFModule::reserveHits(TCsOfEvent& tcVector, PassData* currentPass)
       B2FATAL(" reserveHits: iterator goes rampage!")
     }
   }
-  B2DEBUG(3, "reserveHits - pass " << currentPass->sectorSetup << ": threshold " << threshold << ", totalTcs: " << tcVector.size() <<
+  B2DEBUG(3, "reserveHits - event " << m_eventCounter << ", pass " << currentPass->sectorSetup << ": threshold " << threshold <<
+          ", totalTcs: " << tcVector.size() <<
           ", tcs alive&unreserved: " << allTCs.size() << ", allows " << limit2Go << " TCs to reserve their hits, managed " << countSucceeded
           << " to succeed")
 }
@@ -3539,7 +3552,8 @@ void VXDTFModule::greedy(TCsOfEvent& tcVector)
 
   greedyRecursive(overlappingTCs, totalSurvivingQI, countSurvivors, countKills);
 
-  B2DEBUG(3, "VXDTFModule::greedy: total number of TCs: " << tcVector.size() << " with totalQi " << totalQI <<
+  B2DEBUG(3, "VXDTFModule::greedy - event " << m_eventCounter << ": total number of TCs: " << tcVector.size() << " with totalQi " <<
+          totalQI <<
           ", TCs alive at begin of greedy algoritm: " << countTCsAliveAtStart << ", TCs survived: " << countSurvivors << ", TCs killed: " <<
           countKills)
 }
@@ -3815,10 +3829,15 @@ int VXDTFModule::segFinder(PassData* currentPass)
       if (nFriendHits == 0 && mainHit->getNumberOfSegments() == 0) {
         B2DEBUG(10, "event " << m_eventCounter << ": current Hit has no friendHits although layer is " << mainSecID.getLayerID() <<
                 " and secID: " << mainSecID)
+//    std::cout << "JKL-event " << m_eventCounter << ": FriendHit: no, skipped" << std::endl;
         continue;
       }
+//       std::cout << "JKL: FriendHit: yes, not skipped" << std::endl;
 
-      if (mainHit->isReserved() == true) { continue; }
+      if (mainHit->isReserved() == true) { /*std::cout << "JKL-event " << m_eventCounter << ": Reserved: yes, skipped" << std::endl;*/ continue; }
+//    std::cout << "JKL-event " << m_eventCounter << ": Reserved: no, not skipped" << std::endl;
+//    std::cout << "JKL-event " << m_eventCounter << ": mainHit isReserved(): " << mainHit->isReserved() << "x: " <<  mainHit->X() << "y: " <<  mainHit->Y() << "z: " <<
+//    +                mainHit->Z() << std::endl;
       currentCoords = mainHit->getHitCoordinates();
 
       B2DEBUG(20, "Sector " << mainSecID << " has got " << nCurrentHits << " hits in his area and " << nFriendHits <<

@@ -48,10 +48,14 @@ MCTrackCandCombinerModule::MCTrackCandCombinerModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //Parameter definition
-  addParam("CDCTrackCandidatesColName", m_cdcTrackCandColName, "Name of collection holding the genfit::TrackCandidates from CDC track finding (input)", string(""));
-  addParam("VXDTrackCandidatesColName", m_vxdTrackCandColName, "Name of collection holding the genfit::TrackCandidates from VXD track finding(input)", string(""));
-  addParam("OutputTrackCandidatesColName", m_combinedTrackCandColName, "Name of collection holding the combined genfit::TrackCandidates (output)", string(""));
-  addParam("HitsRatio", m_hitsRatio, "minimal ratio of hits belonging to one MCParticle to declare a track candidate coming from this MCParticle", 0.6);
+  addParam("CDCTrackCandidatesColName", m_cdcTrackCandColName,
+           "Name of collection holding the genfit::TrackCandidates from CDC track finding (input)", string(""));
+  addParam("VXDTrackCandidatesColName", m_vxdTrackCandColName,
+           "Name of collection holding the genfit::TrackCandidates from VXD track finding(input)", string(""));
+  addParam("OutputTrackCandidatesColName", m_combinedTrackCandColName,
+           "Name of collection holding the combined genfit::TrackCandidates (output)", string(""));
+  addParam("HitsRatio", m_hitsRatio,
+           "minimal ratio of hits belonging to one MCParticle to declare a track candidate coming from this MCParticle", 0.6);
   addParam("InsertCorrectPDGCode", m_useMCpdg, "set the correct PDG code from the MCParticle in the output track candidates", false);
 }
 
@@ -149,7 +153,8 @@ void MCTrackCandCombinerModule::event()
     const int nCdcHits = cdcHitsFromMcParticle.size();
 
 
-    RelationVector<PXDCluster> pxdRelations = aMcParticle->getRelationsFrom<PXDCluster>(); //yeah these are in the opposite direction :-P
+    RelationVector<PXDCluster> pxdRelations =
+      aMcParticle->getRelationsFrom<PXDCluster>(); //yeah these are in the opposite direction :-P
     // remove hits from seconday particles
     std::vector< PXDCluster* > pxdClusterFromMcParticle = removeHitsWithNegativeWeights< PXDCluster >(pxdRelations);
     const int nPxdHits = pxdClusterFromMcParticle.size();
@@ -187,7 +192,8 @@ void MCTrackCandCombinerModule::event()
       if (nMatchingHits >= nNeededHits) {
         goodCdcCands.push_back(aTC);
         matchingHitsInGoodCdcCands.push_back(nMatchingHits);
-        B2DEBUG(100, "found a CDC TC with index " << iTC << " and (" << nMatchingHits << " | " << aTC->getNHits() << ") number of (matching|total) hits. The TC belongs the MCParticle with index " << iPart);
+        B2DEBUG(100, "found a CDC TC with index " << iTC << " and (" << nMatchingHits << " | " << aTC->getNHits() <<
+                ") number of (matching|total) hits. The TC belongs the MCParticle with index " << iPart);
       }
     }
 
@@ -229,7 +235,8 @@ void MCTrackCandCombinerModule::event()
       if (nMatchingHits >= nNeededHits) {
         goodVxdCands.push_back(aTC);
         matchingHitsInGoodVxdCands.push_back(nMatchingHits);
-        B2DEBUG(100, "found a VXD TC with index " << iTC << " and (" << nMatchingHits << " | " << aTC->getNHits() << ") number of (matching|total) hits. The TC belongs the MCParticle with index " << iPart);
+        B2DEBUG(100, "found a VXD TC with index " << iTC << " and (" << nMatchingHits << " | " << aTC->getNHits() <<
+                ") number of (matching|total) hits. The TC belongs the MCParticle with index " << iPart);
       }
     }
 
@@ -260,7 +267,9 @@ void MCTrackCandCombinerModule::event()
       goodCdcCands.push_back(bestTC);
     }
     //easiest case; no curler finding yet
-    B2DEBUG(100, "The track caused by MCParticle with index " << iPart << " and PDG code " << truePdgCode << " that has p = " << aMcParticle->getMomentum().Mag() << " GeV and θ = " << aMcParticle->getMomentum().Theta() * 180 / TMath::Pi() << "° was found by at least one track finder.");
+    B2DEBUG(100, "The track caused by MCParticle with index " << iPart << " and PDG code " << truePdgCode << " that has p = " <<
+            aMcParticle->getMomentum().Mag() << " GeV and θ = " << aMcParticle->getMomentum().Theta() * 180 / TMath::Pi() <<
+            "° was found by at least one track finder.");
     B2DEBUG(100, "goodVxdCands.size() " << goodVxdCands.size() << " goodCdcCands.size() " << goodCdcCands.size());
 
     // Build the final track candidate for the output array.
@@ -301,7 +310,9 @@ void MCTrackCandCombinerModule::endRun()
 {
   B2INFO("Total number of input VXD track candidates: " << m_nVxdTcs);
   B2INFO("Total number of input CDC track candidates: " << m_nCdcTcs);
-  B2INFO("Total number of output track candidates: " << m_nOutputTcs << " . " <<  m_nVxdTcsWithoutPartner << " have only VXD hits. " << m_nCdcTcsWithoutPartner << " have only CDC hits and " <<  m_nOutputTcs - m_nVxdTcsWithoutPartner - m_nCdcTcsWithoutPartner << " have VXD and CDC hits");
+  B2INFO("Total number of output track candidates: " << m_nOutputTcs << " . " <<  m_nVxdTcsWithoutPartner << " have only VXD hits. "
+         << m_nCdcTcsWithoutPartner << " have only CDC hits and " <<  m_nOutputTcs - m_nVxdTcsWithoutPartner - m_nCdcTcsWithoutPartner <<
+         " have VXD and CDC hits");
   B2WARNING("Total number of ignored VXD track candidates: " << m_nIgnoredVxdTcs);
   B2WARNING("Total number of ignored CDC track candidates: " << m_nIgnoredCdcTcs);
 }

@@ -15,6 +15,7 @@
 
 #include "tracking/trackFindingVXD/FilterTools/Shortcuts.h"
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
+#include <tracking/trackFindingVXD/environment/FilterSetTypes.h>
 #include <tracking/dataobjects/SectorMapConfig.h>
 #include <tracking/trackFindingVXD/sectorMapTools/MinMaxCollector.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SectorMap.h>
@@ -54,7 +55,7 @@ namespace Belle2 {
   /** The RawSecMapMergerModule
    *
    * this module takes a root file containing a raw sectorMap created by the SecMapTrainerBaseModule
-   * and converts it to a sectormap which can be read by the VXDTF. Please check the parameters to be set...
+   * and converts it to a sectormap which can be read by the SegmentNetworkProducer (VXDTF redesigned). Please check the parameters to be set...
    *
    */
   class RawSecMapMergerModule : public Module {
@@ -135,24 +136,49 @@ namespace Belle2 {
       std::vector<BranchInterface<double>>& filterBranches);
 
 
+    /** for debugging purposes: print VXDTFFilters into a file of name of the sectorMapConfig. */
+    void printVXDTFFilters(const VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& filters, std::string configName,
+                           unsigned int nHitCombinations, bool print2File);
+
+
+
     /** returns all VxdIDs (sensors) compatible with given configData. */
     std::vector<VxdID> getCompatibleVxdIDs(const SectorMapConfig& config);
 
 
     /// WARNING TODO clean up and documentation!
-    template <class FilterType> VXDTFFilters<SpacePoint>* getSegmentFilters(const SectorMapConfig& config,
-        SectorGraph<FilterType>& mainGraph);
+    template <class FilterType> void getSegmentFilters(
+      const SectorMapConfig& config,
+      SectorGraph<FilterType>& mainGraph,
+      VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>* xHitFilters,
+      int nSecChainLength);
+
+
+    /// WARNING TODO clean up and documentation!
+    template <class FilterType> void add2HitFilters(VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& filterContainer,
+                                                    SubGraph<FilterType>& subGraph, const SectorMapConfig&  config);
+
+
+    /// WARNING TODO clean up and documentation!
+    template <class FilterType> void add3HitFilters(VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& filterContainer,
+                                                    SubGraph<FilterType>& subGraph, const SectorMapConfig&  config);
+
+
+    /// WARNING TODO clean up and documentation!
+    template <class FilterType> void add4HitFilters(VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& filterContainer,
+                                                    SubGraph<FilterType>& subGraph, const SectorMapConfig&  config);
 
 
     /// WARNING TODO clean up and documentation!
     template <class FilterType> unsigned addAllSectorsToSecMapThingy(const SectorMapConfig& config, SectorGraph<FilterType>& mainGraph,
-        VXDTFFilters<SpacePoint>& segFilters);
+        VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& segFilters);
 
 
     /// cross-check if everything is working as expected:
     template <class FilterType> void testSegmentFilters(const SectorMapConfig& config, SectorGraph<FilterType>& mainGraph,
-                                                        VXDTFFilters<SpacePoint>& segFilters)
+                                                        VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& segFilters)
     {
+      B2DEBUG(1, "testSegmentFilters - now testing config: " << config.secMapName);
 #include <vxd/geometry/SensorInfoBase.h>
       // store the dummy sensors and clusters:
       std::vector<VXD::SensorInfoBase> allSensors;
@@ -188,7 +214,7 @@ namespace Belle2 {
         SpacePoint outer = getSpacePoint(secIDs.at(0).getVxdID(), outerX, outerY, outerZ);
         SpacePoint inner = getSpacePoint(secIDs.at(1).getVxdID(), 1., 2., 3.);
         if (segFilters.getCompactID(secIDs.at(0)) != 0 and
-        segFilters.friendsSectorFilter(secIDs.at(0), secIDs.at(1)).accept(outer, inner))
+        segFilters.getTwoHitFilters(secIDs.at(0), secIDs.at(1)).accept(outer, inner))
         {
           B2DEBUG(1, "testSegmentFilters-" << fName << ": for secCombi o/i: " << secIDs.at(0).getFullSecString() << "/" << secIDs.at(
             1).getFullSecString() << " test " << cutName << "/" << cut << " was working fine!");
@@ -217,21 +243,22 @@ namespace Belle2 {
           testDistanceFilter(secIDs, "Distance3DSquared", "max", max, true, true, true);
         }
 
-        {
-          // Distance2DXYSquared:
-          double min = filterCutsMap.at("Distance2DXYSquared").getMin();
-          testDistanceFilter(secIDs, "Distance2DXYSquared", "min", min, true, true, false);
-          double max = filterCutsMap.at("Distance2DXYSquared").getMax();
-          testDistanceFilter(secIDs, "Distance2DXYSquared", "max", max, true, true, false);
-        }
-
-        {
-          // Distance1DZ:
-          double min = filterCutsMap.at("Distance3DSquared").getMin();
-          testDistanceFilter(secIDs, "Distance3DSquared", "min", min, false, false, true);
-          double max = filterCutsMap.at("Distance3DSquared").getMax();
-          testDistanceFilter(secIDs, "Distance3DSquared", "max", max, false, false, true);
-        }
+        // JKL JAN 2016: commented out for minimal working example - test
+//         {
+//           // Distance2DXYSquared:
+//           double min = filterCutsMap.at("Distance2DXYSquared").getMin();
+//           testDistanceFilter(secIDs, "Distance2DXYSquared", "min", min, true, true, false);
+//           double max = filterCutsMap.at("Distance2DXYSquared").getMax();
+//           testDistanceFilter(secIDs, "Distance2DXYSquared", "max", max, true, true, false);
+//         }
+//
+//         {
+//           // Distance1DZ:
+//           double min = filterCutsMap.at("Distance3DSquared").getMin();
+//           testDistanceFilter(secIDs, "Distance3DSquared", "min", min, false, false, true);
+//           double max = filterCutsMap.at("Distance3DSquared").getMax();
+//           testDistanceFilter(secIDs, "Distance3DSquared", "max", max, false, false, true);
+//         }
 
         {
           // SlopeRZ: WARNING: TODO  write a functioning test for that (b4: fix test-sample to have slopeRZ stored too)
@@ -249,11 +276,14 @@ namespace Belle2 {
       }
     }
 
+
+
     /// WARNING TODO: Filter-> String to big->unsigned is better (or FilterID)
     /** does everything needed for given chainLength of sectors (e.g.: 2 -> twoHitFilters)*/
-    VXDTFFilters<SpacePoint>* processSectorCombinations(const SectorMapConfig& config, unsigned secChainLength)
+    void processSectorCombinations(const SectorMapConfig& config, VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>* xHitFilters,
+                                   unsigned secChainLength)
     {
-      B2DEBUG(1, "processSectorCombinations: training map " << config.secMapName << " with secChainLength: " << secChainLength)
+      B2INFO("processSectorCombinations: training map " << config.secMapName << " with secChainLength: " << secChainLength)
 
       // branch-names sorted from outer to inner:
       std::vector<std::string> secBranchNames;
@@ -263,7 +293,7 @@ namespace Belle2 {
 
       // contains the raw data
       std::unique_ptr<TChain> chain = createTreeChain(config, nHit);
-      if (chain->GetEntries() == 0) { B2WARNING("raw data for map " << config.secMapName << " with " << nHit << " is empty! skipping"); return new VXDTFFilters<SpacePoint>(); }
+      if (chain->GetEntries() == 0) { B2WARNING("raw data for map " << config.secMapName << " with " << nHit << " is empty! skipping"); return; }
 
       // prepare links to branches branches:
       std::vector<BranchInterface<unsigned>> sectorBranches = getBranches<unsigned>(chain, secBranchNames);
@@ -278,7 +308,7 @@ namespace Belle2 {
       // use rareness-threshold to find sector-combinations which are very rare and remove them:
       unsigned nKilled = mainGraph.pruneGraph(config.rarenessThreshold);
 
-      B2DEBUG(1, "processSectorCombinations: nKilled " << nKilled)
+      B2INFO("processSectorCombinations: nKilled after graph-pruning: " << nKilled)
 
       // get the raw data and determine the cuts for the filters/selectionVariable
       for (auto& subgraph : mainGraph) {
@@ -301,17 +331,19 @@ namespace Belle2 {
       B2INFO("processSectorCombinations: training finished.\n" << mainGraph.print();)
 
       // TODO this is not yet capable of dealing with other than twoHitFilters. -> generalize!
-      VXDTFFilters<SpacePoint>* segmentFilters = getSegmentFilters(config, mainGraph);
+      getSegmentFilters(config, mainGraph, xHitFilters, secChainLength);
 
-      if (segmentFilters->size() == 0) {
-        delete segmentFilters;
+      if (xHitFilters->size() == 0) {
+        delete xHitFilters;
         B2FATAL("processSectorCombinations: an empty VXDTFFilters was returned, training data did not work!")
       }
 
       // some testing:
-      testSegmentFilters(config, mainGraph, *segmentFilters);
+      if (secChainLength == 2) {
+        testSegmentFilters(config, mainGraph, *xHitFilters);
+      }
 
-      return segmentFilters;
+      return;
 
 //    // get all sensors relevant for this secMap:
 //    std::vector<VxdID> vxdIDs = getCompatibleVxdIDs(config);
@@ -509,7 +541,7 @@ namespace Belle2 {
      */
     virtual void initialize()
     {
-      StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);
+      StoreObjPtr< SectorMap<SpacePoint, Belle2::TwoHitFilterSet> > sectorMap("", DataStore::c_Persistent);
       B2INFO("RawSecMapMerger::initialize():");
 
       // loop over all the setups in the sectorMap:
@@ -520,18 +552,28 @@ namespace Belle2 {
 
         if (config.secMapName != "lowTestRedesign") { continue; } // TODO WARNING DEBUG we do not want to run more than one run yet!
 
-        VXDTFFilters<SpacePoint>* twoHitFilters = processSectorCombinations(config, 2);
+        VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>* xHitFilters = new VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>;
 
-        // catching case of empty twoHitFilters:
-        if (twoHitFilters->size() == 0) {
-          delete twoHitFilters;
+        B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 2-hit-combinations:\n\n")
+        processSectorCombinations(config, xHitFilters, 2);
+
+        // for debugging:
+        printVXDTFFilters(*xHitFilters, config.secMapName, 2, true);
+
+
+        // catching case of empty xHitFilters:
+        if (xHitFilters->size() == 0) {
+          delete xHitFilters;
           B2FATAL("RawSecMapMerger:initialize: after processSectorCombinations an empty VXDTFFilters was returned, training data did not work!")
         }
-        sectorMap->assignFilters(config.secMapName, twoHitFilters);
-
+        B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 3-hit-combinations:\n\n")
+        processSectorCombinations(config, xHitFilters, 3);
+        sectorMap->assignFilters(config.secMapName, xHitFilters);
         return; // TODO WARNING DEBUG we do not want to run more than one run yet!
-        processSectorCombinations(config, 3);
-        processSectorCombinations(config, 4);
+
+        B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 4-hit-combinations:\n\n")
+        B2INFO(" assigning no filters to sectorMap: ")
+        processSectorCombinations(config, xHitFilters, 4);
 
       }
     }

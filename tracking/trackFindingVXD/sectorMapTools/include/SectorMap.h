@@ -14,6 +14,7 @@
 #include <TObject.h>
 #include <string>
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
+#include "tracking/trackFindingVXD/environment/FilterSetTypes.h"
 #include <unordered_map>
 #include <string>
 
@@ -25,12 +26,12 @@ namespace Belle2 {
   * 2 space points filters, 3 space points filters,  etc. etc.
   * It will be put in the datastore with duration RUN.
   * This class owns her members and she is in charge for their deletions. */
-  template<class point_t>
+  template<class point_t, class TwoHitFilterSet_t>
   class SectorMap : public TObject {
   public:
 
     /// typedef for better readability. Index is name of the setup.
-    using setupNameToFilters_t = std::unordered_map< std::string, Belle2::VXDTFFilters<point_t>*>;
+    using setupNameToFilters_t = std::unordered_map< std::string, Belle2::VXDTFFilters<point_t, TwoHitFilterSet_t>*>;
 
   private:
 
@@ -60,7 +61,7 @@ namespace Belle2 {
 
 
     /** returns filters. */
-    const VXDTFFilters<point_t>* getFilters(const std::string& setupName)
+    const VXDTFFilters<point_t, TwoHitFilterSet_t>* getFilters(const std::string& setupName)
     {
       auto  result = m_allSetupsFilters->find(setupName);
       if (result == m_allSetupsFilters->end())
@@ -78,7 +79,7 @@ namespace Belle2 {
 
     /** assigns filters. */
     void assignFilters(const std::string& setupName ,
-                       VXDTFFilters<point_t>* filters)
+                       VXDTFFilters<point_t, TwoHitFilterSet_t>* filters)
     {
       (*m_allSetupsFilters)[ setupName ] = filters;
     }

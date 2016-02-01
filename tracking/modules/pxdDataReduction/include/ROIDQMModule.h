@@ -64,12 +64,12 @@ namespace Belle2 {
     TDirectory* m_ROIDir; /**< ROI directory in the root file */
 
     /** typedef: histograms to be filled once per intercept + filling function*/
-    typedef std::pair< TH1*, std::function< void(TH1* , const PXDIntercept*) > > InterHistoAndFill;
+    typedef std::pair< TH1*, std::function< void(TH1*, const PXDIntercept*) > > InterHistoAndFill;
     /** map of histograms to be filled once per intercept */
     std::unordered_multimap<Belle2::VxdID, InterHistoAndFill, std::function<size_t (const Belle2::VxdID&)> > hInterDictionary;
 
     /** typedef: histograms to be filled once per roi + filling function*/
-    typedef std::pair< TH1*, std::function< void(TH1* , const ROIid*) > > ROIHistoAndFill;
+    typedef std::pair< TH1*, std::function< void(TH1*, const ROIid*) > > ROIHistoAndFill;
     /** map of histograms to be filled once per roi */
     std::unordered_multimap<Belle2::VxdID, ROIHistoAndFill, std::function<size_t (const Belle2::VxdID&)> > hROIDictionary;
 
@@ -81,7 +81,8 @@ namespace Belle2 {
       double value; /**< value used to fill*/
     };
     /** map of histograms to be filled once per event */
-    std::unordered_multimap<Belle2::VxdID, ROIHistoAccumulateAndFill&, std::function<size_t (const Belle2::VxdID&) > > hROIDictionaryEvt;
+    std::unordered_multimap<Belle2::VxdID, ROIHistoAccumulateAndFill&, std::function<size_t (const Belle2::VxdID&) > >
+    hROIDictionaryEvt;
 
     void createHistosDictionaries(); /**< create the dictionary*/
     void fillSensorROIHistos(const ROIid* roi); /**< fill histograms per sensor, filled once per ROI */

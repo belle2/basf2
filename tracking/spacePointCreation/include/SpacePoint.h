@@ -50,7 +50,7 @@ namespace Belle2 {
   public:
 
     /** setting the baseType for storing coordinate-related infos */
-    typedef float SpBaseType;
+    typedef double SpBaseType;
 
     /** exception for the case that the user filled an invalid number of Clusters into the Constructor */
     BELLE2_DEFINE_EXCEPTION(InvalidNumberOfClusters, "SpacePoint::Constructor: invalid numbers of Clusters given!");
@@ -166,11 +166,14 @@ namespace Belle2 {
     /** returns secID of this sector */
     std::string getName() const override
     {
-      return "Index: " + std::to_string(getArrayIndex()) +
-             "Sensor: " + std::string(VxdID(m_vxdID)) +
-             ", Pos: " + std::to_string(X()) +
-             "|" + std::to_string(Y()) +
-             "|" + std::to_string(Z());
+      // TODO revert to long version!
+      return "I: " + std::to_string(getArrayIndex());
+      /// long version
+//       return "I: " + std::to_string(getArrayIndex()) +
+//              ", VxdID: " + std::string(VxdID(m_vxdID)) +
+//              ", PosG: " + std::to_string(double(int(X()*100))*0.01) +
+//       "|" + std::to_string(double(int(Y()*100))*0.01) +
+//       "|" + std::to_string(double(int(Z()*100))*0.01);
     }
 
     /** return the x-value of the global position of the SpacePoint */
@@ -204,12 +207,12 @@ namespace Belle2 {
 
 
     /** return the position vector in global coordinates */
-    const B2Vector3F& getPosition() const { return m_position; }
+    const B2Vector3<SpBaseType>& getPosition() const { return m_position; }
 
 
 
     /** return the hitErrors in sigma of the global position */
-    const B2Vector3F& getPositionError() const { return m_positionError; }
+    const B2Vector3<SpBaseType>& getPositionError() const { return m_positionError; }
 
 
 
@@ -295,8 +298,8 @@ namespace Belle2 {
     *
     * ATTENTION: this function assumes, that for wedged sensors, the uCoordinate is already adapted to the vCoordinate!
      */
-    static B2Vector3F getGlobalCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal, VxdID vxdID,
-                                           const VXD::SensorInfoBase* aSensorInfo = NULL);
+    static B2Vector3<SpBaseType> getGlobalCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal, VxdID vxdID,
+                                                      const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
@@ -481,6 +484,6 @@ namespace Belle2 {
 
 
 
-    ClassDefOverride(SpacePoint, 9) // last member changed: m_ClustersAssigned
+    ClassDefOverride(SpacePoint, 10) // last member changed: SpBaseType float -> double!
   };
 }

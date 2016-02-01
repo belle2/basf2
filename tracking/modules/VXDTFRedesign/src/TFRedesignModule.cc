@@ -13,6 +13,7 @@
 #include "tracking/modules/VXDTFRedesign/TFRedesignModule.h"
 #include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
+#include "tracking/trackFindingVXD/environment/FilterSetTypes.h"
 
 // framework
 #include <framework/gearbox/Const.h>
@@ -1867,7 +1868,7 @@ unsigned int TFRedesignModule::segFinder(PassData* currentPass)
   unsigned int discardedSegmentsCounter = 0;
   unsigned int activatedSegmentsCounter = 0;
 
-  StoreObjPtr< SectorMap<VXDTFHit> > sectorMap("", DataStore::c_Persistent);;
+  StoreObjPtr< SectorMap<VXDTFHit, TwoHitFilterShowCase> > sectorMap("", DataStore::c_Persistent);;
   auto filters = sectorMap->getFilters(currentPass->getName());
 
   for (VXDSector* mainSector : currentPass->sectorVector) {
@@ -1923,7 +1924,7 @@ unsigned int TFRedesignModule::segFinder(PassData* currentPass)
         FullSecID friendSecID = FullSecID(currentFriendID);
 
         // Gene all the work is concentrated here
-        bool GeneAccepted = filters->friendsSectorFilter(mainSecID, friendSecID).accept(*mainHit , *friendHit);
+        bool GeneAccepted = filters->getTwoHitFilters(mainSecID, friendSecID).accept(*mainHit , *friendHit);
 
         friendCoords = friendHit->getHitCoordinates();
 

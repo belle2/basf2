@@ -18,11 +18,12 @@
 #include "tracking/trackFindingVXD/TwoHitFilters/Distance1DZSquared.h"
 #include "tracking/trackFindingVXD/TwoHitFilters/Distance2DXYSquared.h"
 #include "tracking/trackFindingVXD/TwoHitFilters/Distance3DSquared.h"
-#include "tracking/trackFindingVXD/FilterTools/Shortcuts.h"
-#include "tracking/trackFindingVXD/FilterTools/Observer.h"
 
-// #include "tracking/vxdCaTracking/VXDTFHit.h"
-// #include "tracking/dataobjects/FullSecID.h"
+#include "tracking/trackFindingVXD/ThreeHitFilters/Angle3DSimple.h"
+#include "tracking/trackFindingVXD/FilterTools/Shortcuts.h"
+//#include "tracking/trackFindingVXD/FilterTools/ObserverPrintResults.h"
+//#include "tracking/trackFindingVXD/FilterTools/Observer.h" // empty observer
+#include "tracking/trackFindingVXD/FilterTools/Observer3HitPrintResults.h"
 
 #include <tracking/dataobjects/SectorMapConfig.h>
 
@@ -38,27 +39,40 @@
 namespace Belle2 {
 
 
-  template<class point_t>
+  template<class point_t, class TwoHitFilterSet_t>
   class VXDTFFilters {
   public:
 
-//     typedef VXDTFHit point_t;
-    typedef
-    decltype((0. <= Distance3DSquared<point_t>()   <= 0.).observe(Observer()).enable()&&
-             (0. <= Distance2DXYSquared<point_t>() <= 0.).observe(Observer()).enable()&&
-             (0. <= Distance1DZ<point_t>()         <= 0.)/*.observe(Observer())*/.enable()&&
-             (0. <= SlopeRZ<point_t>()             <= 0.).observe(Observer()).enable()&&
-             (Distance3DNormed<point_t>()         <= 0.).enable()) filter2sp_t;
 //     typedef
+//     decltype((0. <= Distance3DSquared<point_t>()   <= 0.).observe(Observer()).enable()&&
+//              (0. <= Distance2DXYSquared<point_t>() <= 0.).observe(Observer()).enable()&&
+//              (0. <= Distance1DZ<point_t>()         <= 0.)/*.observe(Observer())*/.enable()&&
+//              (0. <= SlopeRZ<point_t>()             <= 0.).observe(Observer()).enable()&&
+//              (Distance3DNormed<point_t>()         <= 0.).enable()) filter2sp_t;
+
+/// minimal working example:
+//  typedef
+//  decltype((0. <= Distance3DSquared<point_t>()   <= 0.).observe(Observer()).enable()) filter2sp_t;
+
+// // //  /// minimal working example for 2-hits:
+// // //  typedef
+// // //  decltype((0. <= Distance3DSquared<point_t>()   <= 0.).observe(ObserverPrintResults())) twoHitFilter_t; // filter2sp_t
+
+    using twoHitFilter_t = TwoHitFilterSet_t;
+
+//      typedef
+//     typedef VXDTFHit point_t;
 //     decltype((0. < Distance3DSquared<point_t>()   < 0.).observe(Observer()).enable()&&
 //              (0. < Distance2DXYSquared<point_t>() < 0.).observe(Observer()).enable()&&
 //              (0. < Distance1DZ<point_t>()         < 0.)/*.observe(Observer())*/.enable()&&
 //              (0. < SlopeRZ<point_t>()             < 0.).observe(Observer()).enable()&&
 //              (Distance3DNormed<point_t>()         < 0.).enable()) filter2sp_t;
 
+    /// minimal working example for 2-hits:
+    typedef decltype((0. <= Angle3DSimple<point_t>()   <= 0.).observe(Observer3HitPrintResults())) threeHitFilter_t;
 
 
-    typedef StaticSector< point_t, filter2sp_t, int , int > staticSector_t;
+    typedef StaticSector< point_t, twoHitFilter_t, threeHitFilter_t , int > staticSector_t;
 
 
     VXDTFFilters(): m_testConfig() {m_staticSectors.resize(2);}
@@ -96,9 +110,9 @@ namespace Belle2 {
     }
 
 
-    int addFriendsSectorFilter(FullSecID outer,
-                               FullSecID inner,
-                               const filter2sp_t& filter)
+    int addTwoHitFilter(FullSecID outer,
+                        FullSecID inner,
+                        const twoHitFilter_t& filter)
     {
       // TODO add the friendship relation to the static sector
       if (m_staticSectors.size() < m_compactSecIDsMap[ outer ] or m_compactSecIDsMap[ outer ] == 0)
@@ -106,7 +120,21 @@ namespace Belle2 {
 
       m_staticSectors[m_compactSecIDsMap[outer]]->assign2spFilter(inner, filter);
       return 1;
+    }
 
+
+
+    int addThreeHitFilter(FullSecID outer,
+                          FullSecID center,
+                          FullSecID inner,
+                          const threeHitFilter_t& filter)
+    {
+      // TODO add the friendship relation to the static sector
+      if (m_staticSectors.size() < m_compactSecIDsMap[ outer ] or m_compactSecIDsMap[ outer ] == 0)
+        return 0;
+
+      m_staticSectors[m_compactSecIDsMap[outer]]->assign3spFilter(center, inner, filter);
+      return 1;
     }
 
 
@@ -128,11 +156,11 @@ namespace Belle2 {
     }
 
 
-    const filter2sp_t friendsSectorFilter(const FullSecID& outer,
+    const twoHitFilter_t getTwoHitFilters(const FullSecID& outer,
                                           const FullSecID& inner) const
     {
       // TODO: sanity checks
-      static filter2sp_t just_in_case;
+      static twoHitFilter_t just_in_case;
       const auto staticSector = m_staticSectors[ m_compactSecIDsMap[ outer ] ];
       // catch case when sector is not part of the sectorMap:
       if (staticSector == nullptr) return just_in_case;
@@ -157,9 +185,17 @@ namespace Belle2 {
     }
 
 
+    /// returns the configuration settings for this VXDTFFilters.
     const SectorMapConfig& getConfig(void) const { return m_testConfig; }
     void setConfig(const SectorMapConfig& config) { m_testConfig = config; }
 
+
+    /// JKL: intended for some checks only - returns CompactIDsMap storing the static sectors.
+    const CompactSecIDs& getCompactIDsMap() const { return m_compactSecIDsMap; }
+
+
+    /// JKL: intended for some checks only - returns CompactIDsMap storing the static sectors.
+    const std::vector< staticSector_t*>& getStaticSectors() const { return m_staticSectors; }
 
     /// returns number of compact secIDs stored for this filter-container.
     unsigned size() const { return m_compactSecIDsMap.getSize(); }

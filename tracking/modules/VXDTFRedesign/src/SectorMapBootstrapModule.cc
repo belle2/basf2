@@ -22,6 +22,7 @@
 
 #include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
+#include "tracking/trackFindingVXD/environment/FilterSetTypes.h"
 #include "tracking/modules/VXDTFRedesign/SectorMapBootstrapModule.h"
 #include "tracking/vxdCaTracking/PassData.h"
 #include "tracking/dataobjects/VXDTFSecMap.h"
@@ -52,7 +53,7 @@ SectorMapBootstrapModule::SectorMapBootstrapModule() : Module()
 void
 SectorMapBootstrapModule::initialize()
 {
-  StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);
+  StoreObjPtr< SectorMap<SpacePoint, Belle2::TwoHitFilterSet> > sectorMap("", DataStore::c_Persistent);
   sectorMap.registerInDataStore(DataStore::c_DontWriteOut);
   sectorMap.create();
   bootstrapSectorMap();
@@ -77,21 +78,28 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 {
   /// TODO nice interface for creating SectorMapConfig:
   SectorMapConfig config1;
-//   config1.pTCuts = {0.02, 0.08};
-  config1.pTmin = 0.02;
-  config1.pTmax = 0.08;
+//   config1.pTmin = 0.02;
+//   config1.pTmax = 0.08;
+  config1.pTmin = 0.02; // minimal relevant version
+  config1.pTmax = 0.15; // minimal relevant version
   config1.pTSmear = 0.;
   config1.allowedLayers = {0, 3, 4, 5, 6}; // TODO -> convert to vector containing all layerNumbers to be used; e.g.: {0, 3, 4, 5, 6};
-  config1.uSectorDivider = { .15, .5, .85, 1.};
-  config1.vSectorDivider = { .1, .3, .5, .7, .9, 1.};
+//   config1.uSectorDivider = { .15, .5, .85, 1.};
+//   config1.vSectorDivider = { .1, .3, .5, .7, .9, 1.};
+  config1.uSectorDivider = { .3, .7, 1.}; // standard relevant version
+  config1.vSectorDivider = { .3, .7, 1.}; // standard relevant version
+//   config1.uSectorDivider = { .5, 1.}; // small relevant version
+//   config1.vSectorDivider = { .5, 1.}; // small relevant version
+//   config1.uSectorDivider = { 1.}; // minimal relevant version
+//   config1.vSectorDivider = { 1.}; // minimal relevant version
   config1.pdgCodesAllowed = {};
   config1.seedMaxDist2IPXY = 23.5;
   config1.seedMaxDist2IPZ = 23.5;
   config1.nHitsMin = 3;
   config1.vIP = B2Vector3D(0, 0, 0);
   config1.secMapName = "lowTestRedesign";
-  config1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "SlopeRZ", "CircleDist2IPHighOccupancy"};
-  config1.threeHitFilters = { "Angle3DSimple", "DeltaSlopeRZ"};
+  config1.twoHitFilters = { "Distance3DSquared"/*, "Distance2DXYSquared", "SlopeRZ", "CircleDist2IPHighOccupancy"*/};
+  config1.threeHitFilters = { "Angle3DSimple"/*, "DeltaSlopeRZ"*/};
   config1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
   config1.mField = 1.5;
   config1.rarenessThreshold = 0.001;
@@ -114,8 +122,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config2.nHitsMin = 3;
   config2.vIP = B2Vector3D(0, 0, 0);
   config2.secMapName = "medTestRedesign";
-  config2.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "SlopeRZ", "CircleDist2IPHighOccupancy"};
-  config2.threeHitFilters = { "Angle3DSimple", "DeltaSlopeRZ"};
+  config2.twoHitFilters = { "Distance3DSquared"/*, "Distance2DXYSquared", "SlopeRZ", "CircleDist2IPHighOccupancy"*/};
+  config2.threeHitFilters = { "Angle3DSimple"/*, "DeltaSlopeRZ"*/};
   config2.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
   config2.mField = 1.5;
   config2.rarenessThreshold = 0.001;
@@ -136,8 +144,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config3.nHitsMin = 3;
   config3.vIP = B2Vector3D(0, 0, 0);
   config3.secMapName = "highTestRedesign";
-  config3.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "SlopeRZ"};
-  config3.threeHitFilters = { "Angle3DSimple", "DeltaCircleRadiusHighOccupancy"};
+  config3.twoHitFilters = { "Distance3DSquared"/*, "Distance2DXYSquared", "SlopeRZ"*/};
+  config3.threeHitFilters = { "Angle3DSimple"/*, "DeltaCircleRadiusHighOccupancy"*/};
   config3.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
   config3.mField = 1.5;
   config3.rarenessThreshold = 0.001;
@@ -150,8 +158,8 @@ void
 SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
 {
 
-  StoreObjPtr< SectorMap<SpacePoint> > newSectorMap("", DataStore::c_Persistent);
-  VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
+  StoreObjPtr< SectorMap<SpacePoint, Belle2::TwoHitFilterSet> > newSectorMap("", DataStore::c_Persistent);
+  VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>* segmentFilters = new VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>();
   segmentFilters->setConfig(config);
 
   CompactSecIDs compactSecIds;

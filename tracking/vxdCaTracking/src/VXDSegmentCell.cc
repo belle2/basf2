@@ -20,7 +20,7 @@ void VXDSegmentCell::kickFalseFriends(TVector3 primaryVertex)
 {
   std::list<VXDSegmentCell*>::iterator nbIter = m_innerNeighbours.begin();// iterator for the inner neighbours = nb
   TVector3* innerHit;
-  int nNBs = 0; // counting neighbours for safety check
+  int nNBs = 0, nNBsTotal = m_innerNeighbours.size(); // counting neighbours for safety check
   while (nbIter != m_innerNeighbours.end()) {
     VXDSegmentCell* pNextSeg = *nbIter;
     innerHit = pNextSeg->getInnerHit()->getHitCoordinates();
@@ -30,6 +30,6 @@ void VXDSegmentCell::kickFalseFriends(TVector3 primaryVertex)
       nbIter = this->eraseInnerNeighbour(nbIter);
     } else { ++nbIter; }
     nNBs++;
-    if (nNBs > int(m_innerNeighbours.size())) { B2FATAL("ClusterInfo::isOverbooked(): iterator crash! nIterations: " << nNBs << ", nNBs: " << m_innerNeighbours.size()) }
+    if (nNBs > int(nNBsTotal)) { B2FATAL("ClusterInfo::isOverbooked(): iterator crash! nIterations: " << nNBs << ", nNBs: " << nNBsTotal); }
   }
 }

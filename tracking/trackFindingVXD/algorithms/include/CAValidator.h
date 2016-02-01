@@ -16,7 +16,7 @@ namespace Belle2 {
   template<class CellType>
   struct CAValidator {
     /** checks if CA is still in valid area */
-    bool isValidRound(int caRound) { return caRound <= nMaxIterations and caRound >= 0; }
+    bool isValidRound(int caRound) { return !(caRound > nMaxIterations) and !(caRound < 0); }
 
     /** function to check the cell if seed-conditions are met. */
     bool checkSeed(CellType& aCell) { return !(aCell.getState() < seedThreshold); }

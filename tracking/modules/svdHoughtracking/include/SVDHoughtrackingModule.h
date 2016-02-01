@@ -124,7 +124,8 @@ namespace Belle2 {
     public:
       /** Constructor for hough ROI */
       SVDHoughROI(VxdID _sensorID, TVector2 _v1, TVector2 _v2): sensorID(_sensorID),
-        v1(_v1), v2(_v2) {
+        v1(_v1), v2(_v2)
+      {
       }
 
       ~SVDHoughROI() {}
@@ -149,7 +150,8 @@ namespace Belle2 {
     class SVDHoughTrackCand {
     public:
       /** Constructor for hough candidates */
-      SVDHoughTrackCand(std::vector<unsigned int>& _list, TVector2 _coord): hitList(_list), coord(_coord) {
+      SVDHoughTrackCand(std::vector<unsigned int>& _list, TVector2 _coord): hitList(_list), coord(_coord)
+      {
         hash = 0;
         hitSize = 0;
         for (unsigned int i = 0; i < hitList.size(); ++i) {
@@ -187,7 +189,8 @@ namespace Belle2 {
     class SVDHoughCand {
     public:
       /** Constructor for hough candidates */
-      SVDHoughCand(std::vector<unsigned int>& _list, coord2dPair _coord): hitList(_list), coord(_coord) {
+      SVDHoughCand(std::vector<unsigned int>& _list, coord2dPair _coord): hitList(_list), coord(_coord)
+      {
         hash = 0;
         hitSize = 0;
         for (unsigned int i = 0; i < hitList.size(); ++i) {
@@ -380,7 +383,8 @@ namespace Belle2 {
       void gplotClose(FILE*, int);
 
       /** Purify tracks for both sides.  */
-      bool hashSort(const SVDHoughCand& a, const SVDHoughCand& b) const {
+      bool hashSort(const SVDHoughCand& a, const SVDHoughCand& b) const
+      {
         if (a.getHitSize() == b.getHitSize() && a.getHash() == b.getHash())  {
           return (true);
         } else {

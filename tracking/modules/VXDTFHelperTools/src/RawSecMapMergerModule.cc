@@ -11,6 +11,7 @@
 #include <tracking/modules/VXDTFHelperTools/RawSecMapMergerModule.h>
 #include <tracking/trackFindingVXD/FilterTools/SelectionVariableType.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
+#include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
 
 using namespace std;
 using namespace Belle2;
@@ -48,7 +49,7 @@ std::vector<std::string> RawSecMapMergerModule::getRootFiles(std::string mapName
   vector<string> files4ThisMap;
   for (string& fileName : m_PARAMrootFileNames) {
     if (fileName.find(mapName) == string::npos) {
-      B2DEBUG(1, "getRootFiles: fileName " << fileName << " was _not_ for map " << mapName)
+      B2DEBUG(1, "getRootFiles: fileName " << fileName << " was _not_ accepted for map " << mapName)
       continue;
     }
     B2DEBUG(1, "getRootFiles: fileName " << fileName << " accepted for map " << mapName)
@@ -145,7 +146,7 @@ template <class FilterType> void RawSecMapMergerModule::trainGraph(
   auto percentMark = nEntries / 10; auto progressCounter = 0;
   // log all sector-combinations and determine their absolute number of appearances:
   for (auto i = 0 ;  i <= nEntries; i++) {
-    if ((i % percentMark) == 0) {
+    if (percentMark < 1 or (i % percentMark) == 0) {
       progressCounter += 10;
       B2INFO("RawSecMapMerger::trainGraph(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
              "% related, mainGraph has got " << mainGraph.size() << " sectors...")
@@ -184,13 +185,13 @@ template <class FilterType> SectorGraph<FilterType> RawSecMapMergerModule::build
   for (auto& entry : filterBranches) { filterNames.push_back(entry.name); }
   SectorGraph<FilterType> mainGraph(filterNames);
 
-  if (nEntries == 0) { B2WARNING("buildGraph: valid file but no data stored!"); return move(mainGraph); }
+  if (nEntries == 0) { B2WARNING("buildGraph: valid file but no data stored!"); return mainGraph; }
   auto percentMark = nEntries / 10;
   auto progressCounter = 0;
 
   // log all sector-combinations and determine their absolute number of appearances:
   for (auto i = 0 ;  i <= nEntries; i++) {
-    if ((i % percentMark) == 0) {
+    if (percentMark < 1 or (i % percentMark) == 0) {
       progressCounter += 10;
       B2INFO("RawSecMapMerger::buildGraph(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
              "% related, mainGraph has got " << mainGraph.size() << " sectors...")
@@ -242,7 +243,7 @@ void RawSecMapMergerModule::printData(
          " sector-/filter-branches")
 
   for (unsigned i = 0 ;  i < nEntries; i++) {
-    if ((i % percentMark) != 0) { continue; }
+    if (percentMark > 1 and (i % percentMark) != 0) { continue; }
     progressCounter += 2;
     B2INFO("RawSecMapMerger::printData(): entry " << i << " of " << nEntries << ":")
 
@@ -267,6 +268,13 @@ void RawSecMapMergerModule::printData(
 
 
 
+void RawSecMapMergerModule::printVXDTFFilters(const VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& filters,
+                                              std::string configName, unsigned int nHitCombinations, bool print2File)
+{
+  SecMapHelper::printStaticSectorRelations<SpacePoint, Belle2::TwoHitFilterSet>(filters , configName , nHitCombinations, print2File);
+}
+
+
 std::vector<VxdID> RawSecMapMergerModule::getCompatibleVxdIDs(const SectorMapConfig& config)
 {
   // TODO WARNING hardcoded values!
@@ -277,9 +285,9 @@ std::vector<VxdID> RawSecMapMergerModule::getCompatibleVxdIDs(const SectorMapCon
   std::vector<VxdID> vxdIDs;
 
   for (unsigned layerID : config.allowedLayers) {
-    for (unsigned ladderID = 0; ladderID < ladders.at(layerID); ladderID++) {
+    for (unsigned ladderID = 0; ladderID <= ladders.at(layerID); ladderID++) {
       if (ladderID == 0 and layerID != 0) continue; // only virtual IP (layer 0) has ladder 0
-      for (unsigned sensorID = 0; sensorID < sensors.at(layerID); sensorID++) {
+      for (unsigned sensorID = 0; sensorID <= sensors.at(layerID); sensorID++) {
         if (sensorID == 0 and layerID != 0) continue; // only virtual IP (layer 0) has sensor 0
         vxdIDs.push_back(VxdID(layerID, ladderID, sensorID));
       }
@@ -291,7 +299,7 @@ std::vector<VxdID> RawSecMapMergerModule::getCompatibleVxdIDs(const SectorMapCon
 
 
 template <class FilterType> unsigned RawSecMapMergerModule::addAllSectorsToSecMapThingy(const SectorMapConfig& config,
-    SectorGraph<FilterType>& mainGraph, VXDTFFilters<SpacePoint>& segFilters)
+    SectorGraph<FilterType>& mainGraph, VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& segFilters)
 {
   // get all sensors relevant for this secMap:
   std::vector<VxdID> vxdIDs = getCompatibleVxdIDs(config);
@@ -382,74 +390,151 @@ template <class FilterType> unsigned RawSecMapMergerModule::addAllSectorsToSecMa
 
 
 // TODO this is not yet capable of dealing with other than twoHitFilters. -> generalize!
-template <class FilterType> VXDTFFilters<SpacePoint>* RawSecMapMergerModule::getSegmentFilters(const SectorMapConfig& config,
-    SectorGraph<FilterType>& mainGraph)
+template <class FilterType> void RawSecMapMergerModule::getSegmentFilters(
+  const SectorMapConfig& config,
+  SectorGraph<FilterType>& mainGraph,
+  VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>* xHitFilters,
+  int nSecChainLength)
 {
-
-  VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
-
-  unsigned nSectors = addAllSectorsToSecMapThingy(config, mainGraph, *segmentFilters);
-  B2DEBUG(1, "RawSecMapMerger::getSegmentFilters: in addAllSectorsToSecMapThingy " << nSectors << " were added to secMap " <<
-          config.secMapName)
+  if (xHitFilters->size() == 0) {
+    unsigned nSectors = addAllSectorsToSecMapThingy(config, mainGraph, *xHitFilters);
+    B2DEBUG(1, "RawSecMapMerger::getSegmentFilters: in addAllSectorsToSecMapThingy " << nSectors << " were added to secMap " <<
+            config.secMapName)
+  } else {
+    B2DEBUG(1, "RawSecMapMerger::getSegmentFilters: in given xHitFilters-container has size of " << xHitFilters->size() <<
+            " and therefore no further sectors have to be added.")
+  }
+  B2DEBUG(1, "RawSecMapMerger::getSegmentFilters: secMap " << config.secMapName << " got the following sectors:\n" <<
+          mainGraph.print());
 
   for (auto& subGraph : mainGraph) {
-    // WARNING evil hack -> SelectionVariables themselves should be able to tell their own names!
-    std::string named3D = "Distance3DSquared", namedXY = "Distance2DXYSquared", nameddZ = "Distance1DZ", namesRZ = "SlopeRZ",
-                named3Dn = "Distance3DNormed";
-    const auto& filterCutsMap = subGraph.second.getFinalQuantileValues();
-    B2DEBUG(1, "mimimi")
-    /// TODO tune cutoffs
 
-    B2DEBUG(1, "min/max: " << named3D << ": " << filterCutsMap.at(named3D).getMin() << "/" << filterCutsMap.at(
-              named3D).getMax() << ", ")
-    B2DEBUG(1, namedXY << ": " << filterCutsMap.at(namedXY).getMin() << "/" << filterCutsMap.at(namedXY).getMax() << ", ")
-    B2DEBUG(1,  namesRZ << ": " << filterCutsMap.at(namesRZ).getMin() << "/" << filterCutsMap.at(namesRZ).getMax() << ", ")
-    VXDTFFilters<SpacePoint>::filter2sp_t friendSectorsSegmentFilter =
-      (
-        (
-          filterCutsMap.at(named3D).getMin() <= Distance3DSquared<SpacePoint>() <= filterCutsMap.at(named3D).getMax()
-        ).observe(Observer()).enable() &&
-
-        (
-          filterCutsMap.at(namedXY).getMin() <= Distance2DXYSquared<SpacePoint>() <= filterCutsMap.at(namedXY).getMax()
-        ).observe(Observer()).enable() &&
-
-//    (
-//    filterCutsMap.at(nameddZ).getMin() <
-//    Distance1DZ<SpacePoint>() <
-//    filterCutsMap.at(nameddZ).getMax()
-//    )/*.observe(Observer())*/.enable() &&
-        ( /// WARNING HACK:
-          /*filterCutsMap.at(named3D).getMin()*/std::numeric_limits< double >::min() <= Distance1DZ<SpacePoint>() <=
-          std::numeric_limits< double >::max()/*filterCutsMap.at(named3D).getMax()*/
-        )/*.observe(Observer())*/.enable() &&
-
-        (
-          filterCutsMap.at(namesRZ).getMin() <= SlopeRZ<SpacePoint>() <= filterCutsMap.at(namesRZ).getMax()
-        ).observe(Observer()).enable() &&
-
-//    (
-//    Distance3DNormed<SpacePoint>() <
-//    filterCutsMap.at(named3Dn).getMax()
-//    ).enable()
-        (Distance3DNormed<SpacePoint>() <= std::numeric_limits< double >::max()/*filterCutsMap.at(named3D).getMax()*/).enable()
-      );
-
-    auto secIDs = subGraph.second.getID().getFullSecIDs();
-
-    // WARNING hack:
-    if (secIDs.size() != 2) B2FATAL("RawSecMapMerger: only 2-hit-combis allowed at the moment!");
-    // secIDs are sorted from outer to inner:
-    B2DEBUG(1, "RawSecMapMerger::getSegmentFilters: now adding FriendSectorFilter for secIDs (outer/inner): " << secIDs.at(
-              0) << "/" << secIDs.at(1))
-    if (segmentFilters->addFriendsSectorFilter(secIDs.at(0), secIDs.at(1),
-                                               friendSectorsSegmentFilter) == 0)
-      B2WARNING("Problem adding the friendship relation from the inner sector:" <<
-                secIDs.at(1) << " -> " << secIDs.at(0) << " outer sector");
+    if (nSecChainLength == 2) {
+      add2HitFilters(*xHitFilters, subGraph.second, config);
+    } else if (nSecChainLength == 3) {
+      add3HitFilters(*xHitFilters, subGraph.second, config);
+    } else if (nSecChainLength == 4) {
+      add4HitFilters(*xHitFilters, subGraph.second, config);
+    } else { B2FATAL("nSecChainLength " << nSecChainLength << " is not within allowed range [2;4]!"); }
   }
+}
 
 
-  return segmentFilters;
+
+
+
+template <class FilterType> void RawSecMapMergerModule::add2HitFilters(VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>&
+    filterContainer, SubGraph<FilterType>& subGraph, const SectorMapConfig& config)
+{
+  // WARNING evil hack -> SelectionVariables themselves should be able to tell their own names!
+  std::string named3D = "Distance3DSquared", namedXY = "Distance2DXYSquared", nameddZ = "Distance1DZ", namesRZ = "SlopeRZ",
+              named3Dn = "Distance3DNormed";
+  const auto& filterCutsMap = subGraph.getFinalQuantileValues();
+  /// TODO tune cutoffs
+
+  std::string filterVals;
+  for (auto& filterName : config.twoHitFilters) {
+    filterVals += filterName + ": "
+                  + std::to_string(filterCutsMap.at(filterName).getMin())
+                  + "/"
+                  + std::to_string(filterCutsMap.at(filterName).getMax()) + ", ";
+  }
+  B2DEBUG(1, "SubGraph " << subGraph.getID().print() << " - filter:min/max: " << filterVals)
+
+//   B2DEBUG(1, "SubGraph " << subGraph.getID().print() << " - min/max: " << named3D << ": " << filterCutsMap.at(named3D).getMin() << "/" << filterCutsMap.at(
+//  named3D).getMax() << ", ")
+  // // // //     B2DEBUG(1, namedXY << ": " << filterCutsMap.at(namedXY).getMin() << "/" << filterCutsMap.at(namedXY).getMax() << ", ")
+  // // // //     B2DEBUG(1,  namesRZ << ": " << filterCutsMap.at(namesRZ).getMin() << "/" << filterCutsMap.at(namesRZ).getMax() << ", ")
+  VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>::twoHitFilter_t friendSectorsSegmentFilter =
+    // JKL Jan 2016 - minimal working example:
+    ((filterCutsMap.at(named3D).getMin() <= Distance3DSquared<SpacePoint>() <= filterCutsMap.at(named3D).getMax()
+     ).observe(ObserverPrintResults()));
+  // JKL Jan 2016 - standard version:
+  // // // // // // //       (
+  // // // // // // //         (
+  // // // // // // //           filterCutsMap.at(named3D).getMin() <= Distance3DSquared<SpacePoint>() <= filterCutsMap.at(named3D).getMax()
+  // // // // // // //         ).observe(Observer()).enable() &&
+  // // // // // // //
+  // // // // // // //         (
+  // // // // // // //           filterCutsMap.at(namedXY).getMin() <= Distance2DXYSquared<SpacePoint>() <= filterCutsMap.at(namedXY).getMax()
+  // // // // // // //         ).observe(Observer()).enable() &&
+  // // // // // // //
+  // // // // // // // //    (
+  // // // // // // // //    filterCutsMap.at(nameddZ).getMin() <
+  // // // // // // // //    Distance1DZ<SpacePoint>() <
+  // // // // // // // //    filterCutsMap.at(nameddZ).getMax()
+  // // // // // // // //    )/*.observe(Observer())*/.enable() &&
+  // // // // // // //         ( /// WARNING HACK:
+  // // // // // // //           /*filterCutsMap.at(named3D).getMin()*/std::numeric_limits< double >::min() <= Distance1DZ<SpacePoint>() <=
+  // // // // // // //           std::numeric_limits< double >::max()/*filterCutsMap.at(named3D).getMax()*/
+  // // // // // // //         )/*.observe(Observer())*/.enable() &&
+  // // // // // // //
+  // // // // // // //         (
+  // // // // // // //           filterCutsMap.at(namesRZ).getMin() <= SlopeRZ<SpacePoint>() <= filterCutsMap.at(namesRZ).getMax()
+  // // // // // // //         ).observe(Observer()).enable() &&
+  // // // // // // //
+  // // // // // // // //    (
+  // // // // // // // //    Distance3DNormed<SpacePoint>() <
+  // // // // // // // //    filterCutsMap.at(named3Dn).getMax()
+  // // // // // // // //    ).enable()
+  // // // // // // //         (Distance3DNormed<SpacePoint>() <= std::numeric_limits< double >::max()/*filterCutsMap.at(named3D).getMax()*/).enable()
+  // // // // // // //       );
+
+  auto secIDs = subGraph.getID().getFullSecIDs();
+
+  // secIDs are sorted from outer to inner:
+  B2DEBUG(1, "RawSecMapMerger::add2HitFilters: now adding FriendSectorFilter for secIDs (outer/inner): " << secIDs.at(
+            0) << "/" << secIDs.at(1))
+  if (filterContainer.addTwoHitFilter(secIDs.at(0), secIDs.at(1),
+                                      friendSectorsSegmentFilter) == 0)
+    B2WARNING("secMap: " << config.secMapName << "Problem adding the friendship relation from the inner sector:" <<
+              secIDs.at(1) << " -> " << secIDs.at(0) << " outer sector");
+}
+
+
+
+template <class FilterType> void RawSecMapMergerModule::add3HitFilters(VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>&
+    filterContainer, SubGraph<FilterType>& subGraph, const SectorMapConfig&  config)
+{
+  const auto& filterCutsMap = subGraph.getFinalQuantileValues();
+  /// TODO tune cutoffs
+
+  std::string filterVals;
+  for (auto& filterName : config.threeHitFilters) {
+    filterVals += filterName + ": "
+                  + std::to_string(filterCutsMap.at(filterName).getMin())
+                  + "/"
+                  + std::to_string(filterCutsMap.at(filterName).getMax()) + ", ";
+  }
+  B2DEBUG(1, "SubGraph " << subGraph.getID().print() << " - filter:min/max: " << filterVals)
+
+  VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>::threeHitFilter_t threeHitFilter =
+    // JKL Jan 2016 - minimal working example:
+    ((filterCutsMap.at("Angle3DSimple").getMin() <= Angle3DSimple<SpacePoint>() <= filterCutsMap.at("Angle3DSimple").getMax()
+     ).observe(Observer3HitPrintResults()));
+
+  auto secIDs = subGraph.getID().getFullSecIDs();
+
+  // secIDs are sorted from outer to inner:
+  B2DEBUG(1, "RawSecMapMerger::add3HitFilters: now adding FriendSectorFilter for secIDs (outer/center/inner): "
+          << secIDs.at(0) << "/"
+          << secIDs.at(1) << "/"
+          << secIDs.at(2));
+  if (filterContainer.addThreeHitFilter(secIDs.at(0), secIDs.at(1), secIDs.at(2),
+                                        threeHitFilter) == 0)
+    B2WARNING("secMap: " << config.secMapName << "Problem adding the friendship relation for the secIDs (outer/center/inner): "
+              << secIDs.at(0) << "/"
+              << secIDs.at(1) << "/"
+              << secIDs.at(2));
+}
+
+
+
+template <class FilterType> void RawSecMapMergerModule::add4HitFilters(
+  VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& /*filterContainer*/, SubGraph<FilterType>& /*subGraph*/,
+  const SectorMapConfig&  /*config*/)
+{
+
 }
 
 

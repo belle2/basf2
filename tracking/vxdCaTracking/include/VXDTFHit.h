@@ -12,6 +12,7 @@
 
 #include <TVector3.h>
 #include "tracking/vxdCaTracking/SharedFunctions.h"
+#include <framework/geometry/B2Vector3.h>
 
 // #include "ClusterInfo.h"
 #include <vxd/dataobjects/VxdID.h>
@@ -75,6 +76,12 @@ namespace Belle2 {
     bool operator>(const VXDTFHit& b) const; /**< overloaded '>'-operator for sorting algorithms */
 
     TVector3* getHitCoordinates() { return &(m_hit.hitPosition); } /**< returns global hit coordinates */
+
+    /** WARNING: temporary hack to enforce compatibility with spacePoints on some cases. */
+//  const B2Vector3F& getPosition() const { return B2Vector3F(m_hit.hitPosition); }
+
+    /** WARNING: temporary hack to enforce compatibility with spacePoints on some cases. */
+    int getArrayIndex() const { return -23; }
 
     /** returns x-variable of hit-position in global coordinates. */
     double X() const {return m_hit.hitPosition.X(); }

@@ -87,10 +87,13 @@ namespace Belle2 {
     /** returns secID of this sector */
     std::string getName() const
     {
-      return  "Outer: " + m_outerHit->getName() +
-              "(inSector: " + std::string(FullSecID(m_outerSector)) +
-              "), inner: " + m_innerHit->getName() +
-              "(inSector: " + std::string(FullSecID(m_innerSector)) + ")";
+      return  "Out: " + m_outerHit->getName()
+              //              + "(inSector: " + std::string(FullSecID(m_outerSector))
+              //              + ")"
+              + ",\nin: " + m_innerHit->getName()
+//             +   "(inSector: " + std::string(FullSecID(m_innerSector)) +
+//        +")"
+              ;
     }
 
 

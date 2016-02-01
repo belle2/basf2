@@ -15,6 +15,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
+#include <../framework/gearbox/include/Unit.h>
 
 #include <vxd/geometry/GeoCache.h>
 
@@ -113,8 +114,8 @@ void pxdClusterShapeCalibrationModule::prepare()
   tree->Branch<short>("shape", &m_shape);
   tree->Branch<float>("phiTrack", &m_phiTrack);
   tree->Branch<float>("thetaTrack", &m_thetaTrack);
-  tree->Branch<float>("phiTrue`", &m_phiTrue);
-  tree->Branch<float>("thetaTrue`", &m_thetaTrue);
+  tree->Branch<float>("phiTrue", &m_phiTrue);
+  tree->Branch<float>("thetaTrue", &m_thetaTrue);
   tree->Branch<double>("signal", &m_signal);
   tree->Branch<double>("seed", &m_seed);
   tree->Branch<double>("InPixUTrue", &m_InPixUTrue);
@@ -146,69 +147,83 @@ void pxdClusterShapeCalibrationModule::collect()
   m_run = emd->getRun();
   m_exp = emd->getExperiment();
 
+  char text[300];
+
   if (m_UseTracks == 1) {  // using tracks, for real experiment
     for (auto track : tracks) {  // over tracks
       for (unsigned int ipoint = 0; ipoint < track.getNumPointsWithMeasurement(); ++ipoint) {  // over track points
         if (PXDRecoHit* pxdhit = dynamic_cast<PXDRecoHit*>(track.getPointWithMeasurement(ipoint)->getRawMeasurement(0))) { // cluster
-          const PXDCluster* cluster = pxdhit->getCluster();
+          const PXDCluster& cluster = * pxdhit->getCluster();
           TVectorD state = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getFittedState().getState();
           // state 0=q/p, 1= track slope in local - U, 2: in V, 3: u position local, 4: v position local
           m_phiTrack = state[1];
           m_thetaTrack = state[2];
-          m_ResidUTrack = cluster->getU() - state[3];
-          m_ResidVTrack = cluster->getV() - state[4];
-          m_SigmaUTrack = 111222;  // TODO need to set
-          m_SigmaVTrack = 333444;  // TODO need to set
-
-          //printf("--> %f %f %f %f \n",m_phiTrack,m_thetaTrack,m_ResidUTrack,m_ResidVTrack);  // TODO delete it
+          m_ResidUTrack = cluster.getU() - state[3];
+          m_ResidVTrack = cluster.getV() - state[4];
+          TMatrixDSym covariance = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getFittedState().getCov();
+          m_SigmaUTrack = sqrt(covariance(3, 3));
+          m_SigmaVTrack = sqrt(covariance(4, 4));
 
           //Get Geometry information
-          sensorID = cluster->getSensorID();
+          sensorID = cluster.getSensorID();
           const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(
                                           sensorID));
-          m_SigmaU = cluster->getUSigma();
-          m_SigmaV = cluster->getVSigma();
-          m_signal = cluster->getCharge();
-          m_seed = cluster->getSeedCharge();
-          m_shape = cluster->getShape();
+          m_SigmaU = cluster.getUSigma();
+          m_SigmaV = cluster.getVSigma();
+          m_signal = cluster.getCharge();
+          m_seed = cluster.getSeedCharge();
+          m_shape = cluster.getShape();
+
+          sprintf(text,
+                  "--> phiTrack[deg] %f thetaTrack %f ResidUTrack[um] %f ResidVTrack %f SigmaUTrack %f SigmaVTrack %f SigmaU %f SigmaV %f \n",
+                  m_phiTrack / Unit::deg, m_thetaTrack / Unit::deg,
+                  m_ResidUTrack / Unit::um, m_ResidVTrack / Unit::um,
+                  m_SigmaUTrack / Unit::um, m_SigmaVTrack / Unit::um,
+                  m_SigmaU / Unit::um, m_SigmaV / Unit::um
+                 );
+          B2DEBUG(30, text);
+
           // TODO set it more systematically? m_closeEdge values
           int EdgePixelSizeV1 = 512;   // TODO assign correctly from geometry/design
           int EdgePixelSizeV2 = 256;   // TODO assign correctly from geometry/design
           int EdgePixelSizeU = 256;    // TODO assign correctly from geometry/design
           m_closeEdge = 0;  // 0: healthy, far from edge or masked, 1: close edge, 2: close masked pixel
-          if ((m_sensor == 2) && (abs(Info.getVCellID(cluster->getV()) - EdgePixelSizeV1) < m_EdgeClose)) m_closeEdge = 1;
-          else if ((m_sensor == 1) && (abs(Info.getVCellID(cluster->getV()) - EdgePixelSizeV2) < m_EdgeClose)) m_closeEdge = 1;
-          else if (Info.getVCellID(cluster->getV()) < m_EdgeClose) m_closeEdge = 1;
-          else if ((EdgePixelSizeV1 + EdgePixelSizeV2 - Info.getVCellID(cluster->getV())) < m_EdgeClose) m_closeEdge = 1;
-          else if (Info.getUCellID(cluster->getU()) < m_EdgeClose) m_closeEdge = 1;
-          else if (EdgePixelSizeU - Info.getUCellID(cluster->getU()) < m_EdgeClose) m_closeEdge = 1;
+          if ((m_sensor == 2) && (abs(Info.getVCellID(cluster.getV()) - EdgePixelSizeV1) < m_EdgeClose)) m_closeEdge = 1;
+          else if ((m_sensor == 1) && (abs(Info.getVCellID(cluster.getV()) - EdgePixelSizeV2) < m_EdgeClose)) m_closeEdge = 1;
+          else if (Info.getVCellID(cluster.getV()) < m_EdgeClose) m_closeEdge = 1;
+          else if ((EdgePixelSizeV1 + EdgePixelSizeV2 - Info.getVCellID(cluster.getV())) < m_EdgeClose) m_closeEdge = 1;
+          else if (Info.getUCellID(cluster.getU()) < m_EdgeClose) m_closeEdge = 1;
+          else if (EdgePixelSizeU - Info.getUCellID(cluster.getU()) < m_EdgeClose) m_closeEdge = 1;
 
           m_pixelKind = 0;  // 0: smaller pixelsize, 1: larger pixelsize TODO set it more systematically?
-          if ((m_sensor == 2) && (Info.getVCellID(cluster->getV()) < EdgePixelSizeV1)) m_pixelKind = 1;
-          else if ((m_sensor == 1) && (Info.getVCellID(cluster->getV()) >= EdgePixelSizeV2)) m_pixelKind = 1;
+          if ((m_sensor == 2) && (Info.getVCellID(cluster.getV()) < EdgePixelSizeV1)) m_pixelKind = 1;
+          else if ((m_sensor == 1) && (Info.getVCellID(cluster.getV()) >= EdgePixelSizeV2)) m_pixelKind = 1;
 
-          m_InPixU = (Info.getUCellPosition(Info.getUCellID(cluster->getU())) - cluster->getU()) / Info.getUPitch(cluster->getU());
-          m_InPixV = (Info.getVCellPosition(Info.getVCellID(cluster->getV())) - cluster->getV()) / Info.getVPitch(cluster->getV());
+          m_InPixU = (Info.getUCellPosition(Info.getUCellID(cluster.getU())) - cluster.getU()) / Info.getUPitch(cluster.getU());
+          m_InPixV = (Info.getVCellPosition(Info.getVCellID(cluster.getV())) - cluster.getV()) / Info.getVPitch(cluster.getV());
 
           if (m_InPixU < -0.5) m_InPixU += 1.0;  // TODO: remove, this kind of correction should not use
           if (m_InPixU > 0.5) m_InPixU -= 1.0;
           if (m_InPixV < -0.5) m_InPixV += 1.0;
           if (m_InPixV > 0.5) m_InPixV -= 1.0;
 
-          // TODO: use standard way for conversion to microns:
-          m_InPixU *= Info.getUPitch(cluster->getU()) * 10000.0;  // [um]
-          m_InPixV *= Info.getVPitch(cluster->getV()) * 10000.0;  // [um]
+          m_InPixU *= Info.getUPitch(cluster.getU()) / Unit::um;  // [um]
+          m_InPixV *= Info.getVPitch(cluster.getV()) / Unit::um;  // [um]
 
           if (m_UseRealData == 0) {  // there exist simulation, so use true points
-            for (auto truehit : cluster->getRelationsTo<PXDTrueHit>()) {  // true hit
-              m_ResidUTrue = cluster->getU() - truehit.getU();
-              m_ResidVTrue = cluster->getV() - truehit.getV();
+            for (auto truehit : cluster.getRelationsTo<PXDTrueHit>()) {  // true hit
+              m_ResidUTrue = cluster.getU() - truehit.getU();
+              m_ResidVTrue = cluster.getV() - truehit.getV();
 
               double EnExWidth = fabs(truehit.getExitW() - truehit.getEntryW()); // w-distance between entrance and end of path in sensor
               if (EnExWidth < 0.00000001) EnExWidth = 0.0075; // in cm, use in case particle is not going thrue
               m_phiTrue = TMath::ATan2(truehit.getExitU() - truehit.getEntryU(), EnExWidth);
               m_thetaTrue = TMath::ATan2(truehit.getExitV() - truehit.getEntryV(), EnExWidth);
-              //printf("True--> %f %f %f %f \n",m_phiTrue,m_thetaTrue,m_ResidUTrue,m_ResidVTrue);  // TODO delete it
+
+              sprintf(text, "--> phiTrue[deg] %f thetaTrue %f ResidUTrue[um] %f ResidVTrue %f \n",
+                      m_phiTrue / Unit::deg , m_thetaTrue / Unit::deg,
+                      m_ResidUTrue / Unit::um, m_ResidVTrue / Unit::um);
+              B2DEBUG(30, text);
 
               m_InPixUTrue = (Info.getUCellPosition(Info.getUCellID(truehit.getU())) - truehit.getU()) / Info.getUPitch(truehit.getU());
               m_InPixVTrue = (Info.getVCellPosition(Info.getVCellID(truehit.getV())) - truehit.getV()) / Info.getVPitch(truehit.getV());
@@ -218,9 +233,8 @@ void pxdClusterShapeCalibrationModule::collect()
               if (m_InPixVTrue < -0.5) m_InPixVTrue += 1.0;
               if (m_InPixVTrue > 0.5) m_InPixVTrue -= 1.0;
 
-              // TODO: use standard way for conversion to microns:
-              m_InPixUTrue *= Info.getUPitch(truehit.getU()) * 10000.0;  // [um]
-              m_InPixVTrue *= Info.getVPitch(truehit.getV()) * 10000.0;  // [um]
+              m_InPixUTrue *= Info.getUPitch(truehit.getU()) / Unit::um;  // [um]
+              m_InPixVTrue *= Info.getVPitch(truehit.getV()) / Unit::um;  // [um]
             }  // end of true hit
           }  // end of exist simulation
           getObject<TTree>("pxdCal").Fill();
@@ -254,13 +268,17 @@ void pxdClusterShapeCalibrationModule::collect()
         m_SigmaUTrack = 0.0;
         m_SigmaVTrack = 0.0;
 
-        //printf("Extra--> %f %f %f %f \n",m_phiTrack,m_thetaTrack,m_ResidUTrack,m_ResidVTrack);  // TODO delete it
-
         m_SigmaU = cluster.getUSigma();
         m_SigmaV = cluster.getVSigma();
         m_signal = cluster.getCharge();
         m_seed = cluster.getSeedCharge();
         m_shape = cluster.getShape();
+
+        sprintf(text, "--> SigmaU %f SigmaV %f \n",
+                m_SigmaU / Unit::um, m_SigmaV / Unit::um
+               );
+        B2DEBUG(30, text);
+
         // TODO set it more systematically? m_closeEdge values
         int EdgePixelSizeV1 = 512;   // TODO assign correctly from geometry/design
         int EdgePixelSizeV2 = 256;   // TODO assign correctly from geometry/design
@@ -285,9 +303,8 @@ void pxdClusterShapeCalibrationModule::collect()
         if (m_InPixV < -0.5) m_InPixV += 1.0;
         if (m_InPixV > 0.5) m_InPixV -= 1.0;
 
-        // TODO: use standard way for conversion to microns:
-        m_InPixU *= Info.getUPitch(cluster.getU()) * 10000.0;  // [um]
-        m_InPixV *= Info.getVPitch(cluster.getV()) * 10000.0;  // [um]
+        m_InPixU *= Info.getUPitch(cluster.getU()) / Unit::um;  // [um]
+        m_InPixV *= Info.getVPitch(cluster.getV()) / Unit::um;  // [um]
 
         for (auto truehit : cluster.getRelationsTo<PXDTrueHit>()) {  // true hit
           m_ResidUTrue = cluster.getU() - truehit.getU();
@@ -297,7 +314,12 @@ void pxdClusterShapeCalibrationModule::collect()
           if (EnExWidth < 0.00000001) EnExWidth = 0.0075; // in cm, use in case particle is not going thrue
           m_phiTrue = TMath::ATan2(truehit.getExitU() - truehit.getEntryU(), EnExWidth);
           m_thetaTrue = TMath::ATan2(truehit.getExitV() - truehit.getEntryV(), EnExWidth);
-          //printf("TrueExtra--> %f %f %f %f \n",m_phiTrue,m_thetaTrue,m_ResidUTrue,m_ResidVTrue);  // TODO delete it
+
+//          B2INFO(" ------INFO---->  useClusterShape:    " << m_phiTrue / Unit::deg);
+          sprintf(text, "--> phiTrue[deg] %f thetaTrue %f ResidUTrue[um] %f ResidVTrue %f \n",
+                  m_phiTrue / Unit::deg , m_thetaTrue / Unit::deg,
+                  m_ResidUTrue / Unit::um, m_ResidVTrue / Unit::um);
+          B2DEBUG(30, text);
 
           m_InPixUTrue = (Info.getUCellPosition(Info.getUCellID(truehit.getU())) - truehit.getU()) / Info.getUPitch(truehit.getU());
           m_InPixVTrue = (Info.getVCellPosition(Info.getVCellID(truehit.getV())) - truehit.getV()) / Info.getVPitch(truehit.getV());
@@ -307,9 +329,8 @@ void pxdClusterShapeCalibrationModule::collect()
           if (m_InPixVTrue < -0.5) m_InPixVTrue += 1.0;
           if (m_InPixVTrue > 0.5) m_InPixVTrue -= 1.0;
 
-          // TODO: use standard way for conversion to microns:
-          m_InPixUTrue *= Info.getUPitch(truehit.getU()) * 10000.0;  // [um]
-          m_InPixVTrue *= Info.getVPitch(truehit.getV()) * 10000.0;  // [um]
+          m_InPixUTrue *= Info.getUPitch(truehit.getU()) / Unit::um;  // [um]
+          m_InPixVTrue *= Info.getVPitch(truehit.getV()) / Unit::um;  // [um]
         }  // end of true hit
 
         getObject<TTree>("pxdCal").Fill();

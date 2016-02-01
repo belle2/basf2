@@ -322,7 +322,9 @@ PXDSHCAL.param('SpecialLadderNo', SpecialLadderNo)
 PXDSHCAL.param('SpecialSensorNo', SpecialSensorNo)
 
 
-PXDSHCAL.set_log_level(LogLevel.INFO)
+# PXDSHCAL.set_log_level(LogLevel.INFO)
+# PXDSHCAL.set_log_level(LogLevel.DEBUG)
+PXDSHCAL.set_debug_level(100)
 
 secSetup = \
     ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',

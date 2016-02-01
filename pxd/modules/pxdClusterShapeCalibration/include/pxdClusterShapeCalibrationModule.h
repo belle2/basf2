@@ -91,9 +91,6 @@ namespace Belle2 {
     /** Current process id */
     int m_procId = -1;
 
-    /** Spread of gaussian (mean=42) filling test histogram (range=<0,100>) - probability of algo iterations depend on it */
-//    int m_spread;
-
     /** Name of the collection to use for the PXDClusters */
     std::string m_storeClustersName;
     /** Name of the collection to use for the PXDTrueHits */

@@ -41,6 +41,7 @@ from modularAnalysis import buildRestOfEvent
 from modularAnalysis import rankByLowest
 from modularAnalysis import variableToSignalSideExtraInfo
 from modularAnalysis import variablesToExtraInfo
+from modularAnalysis import signalSideParticleFilter
 from modularAnalysis import fillSignalSideParticleList
 from modularAnalysis import printVariableValues
 
@@ -82,8 +83,19 @@ buildRestOfEvent('B0')
 # over each ROE, we effectively loop over signal B0 candidates
 
 roe_path = create_path()
+
+# The ROE objects might in general be related to Particle from multiple
+# particle lists therfore we need to check if the current ROE object
+# is related to the Particle from our signal decay. If it is not
+# the execution of roe_path will be finished (by starting empty,
+# dead end path). Note that in this example this x-check is not
+# neccessary, but is anyway added for sake of completness
+deadEndPath = create_path()
+
 # Note again: all actions (modules) included in roe_path will be
-# executed for each ROE (B0 candidate) in the event
+# executed for each ROE in the event
+# First we check that the current ROE is related to B0 candidate
+signalSideParticleFilter('B0', '', roe_path, deadEndPath)
 
 # create and fill gamma ParticleList that will contain
 # all photons found in ROE (not used to reconstruct current B0 candidate)

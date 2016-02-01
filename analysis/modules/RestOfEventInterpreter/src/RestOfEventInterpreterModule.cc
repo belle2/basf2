@@ -155,8 +155,8 @@ namespace Belle2 {
             if (!mcp) {
               B2WARNING("No related MCParticle found! Default will be used.");
               chargedStablePDG = Const::pion.getPDGCode();
-            }
-            chargedStablePDG = abs(mcp->getPDG());
+            } else
+              chargedStablePDG = abs(mcp->getPDG());
           } else
             B2FATAL("Size of fractions vector not appropriate! Check the fractions in the ROEInterpreter with mask name: " << maskName);
 

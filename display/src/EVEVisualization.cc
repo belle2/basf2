@@ -19,7 +19,7 @@
 */
 #include <display/EVEVisualization.h>
 
-#include <display/dataobjects/DisplayData.h>
+#include <framework/dataobjects/DisplayData.h>
 #include <display/VisualRepMap.h>
 #include <display/EveGeometry.h>
 #include <display/EveVisBField.h>

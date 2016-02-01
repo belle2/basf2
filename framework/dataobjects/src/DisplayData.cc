@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <display/dataobjects/DisplayData.h>
+#include <framework/dataobjects/DisplayData.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>

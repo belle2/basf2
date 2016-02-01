@@ -1,6 +1,6 @@
 #include <display/modules/display/DisplayModule.h>
 
-#include <display/dataobjects/DisplayData.h>
+#include <framework/dataobjects/DisplayData.h>
 #include <display/DisplayUI.h>
 #include <display/EVEVisualization.h>
 #include <display/EveGeometry.h>

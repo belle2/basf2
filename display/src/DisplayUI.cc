@@ -1,7 +1,7 @@
 //needs to be first
 #include <framework/core/ModuleParam.h>
 
-#include <display/dataobjects/DisplayData.h>
+#include <framework/dataobjects/DisplayData.h>
 #include <display/DisplayUI.h>
 #include <display/VisualRepMap.h>
 #include <display/BrowsableWrapper.h>

@@ -123,26 +123,17 @@ class PathViewer(Basf2Widget):
     Do not use it on your own.
     """
 
-    def __init__(self, path):
+    def __init__(self, path, standalone=False):
         """
         Create a new path viewer object with the path from the process
         """
         #: The path to show
-        self.path = path
+        try:
+            self.path = path.modules()
+        except:
+            self.path = path
 
-        #: Some styling we need
-        self.styling_text = """
-        <style>
-            .path-table table{
-              border-collapse: separate;
-              border-spacing: 50px;
-            }
-
-            .path-table td {
-              padding: 10px;
-              }
-
-        </style>"""
+        self.standalone = standalone
 
     def create(self):
         """
@@ -152,34 +143,105 @@ class PathViewer(Basf2Widget):
         import ipywidgets as widgets
 
         if self.path is None:
-            return widgets.HTML("")
+            return widgets.HTML("No modules in path.")
 
         a = widgets.Accordion()
         children = []
 
-        for i, module in enumerate(self.path.modules()):
-            html = widgets.HTML()
-            html.value = self.styling_text + "<table class=\"path-table\">"
-            if len(module.available_params()) == 0:
-                html.value += "<tr><td>No parameter available.</td></tr>"
+        for i, element in enumerate(self.path):
+            html = ModuleViewer(element, standalone=self.standalone)
+            children.append(html.create())
+            if isinstance(html.module.name, str):
+                a.set_title(i, html.module.name)
             else:
-                for param in module.available_params():
-                    if str(param.values) != str(param.default) and str(param.default) != "":
-                        color_text = " style='color: red;'"
-                    else:
-                        color_text = ""
-                    html.value += "<tr>" + "<td>" + param.name + "</td>" + "<td" + color_text + ">" + str(param.values) + "</td>" \
-                        + "<td style='color: gray'>" + str(param.default) + "</td>" + "</tr>"
-            html.value += "</table>"
-            children.append(html)
-            if isinstance(module.name, str):
-                a.set_title(i, module.name)
-            else:
-                a.set_title(i, module.name())
+                a.set_title(i, html.module.name())
 
         a.children = children
 
         return a
+
+
+class ModuleViewer(Basf2Widget):
+    """
+    A widget for showing module parameter with their content (not standalone)
+    or with their description (standalone).
+    """
+
+    def __init__(self, module, standalone=True):
+        """ Init with a module as a string or a registered one. """
+        if isinstance(module, str):
+            import basf2
+            self.module = basf2.register_module(module)
+        else:
+            self.module = module
+        self.standalone = standalone
+
+        self.table_beginning_html = """<table style="margin-left: auto; margin-right: auto;
+                                       border-collapse: separate; border-spacing: 0px;">"""
+
+        self.td_html = "style=\"padding: 10px;\""
+
+        self.table_row_parameters = """<tr><td {td_style}>{param.name}</td>
+                                      <td{color_text} {td_style}>{param.values}</td>
+                                      <td style="color: gray; {td_style}>{param.default}</td></tr>"""
+
+        self.table_row_help = """<tr><td {td_style}>{param.name}</td>
+                                      <td {td_style}>{param.type}</td>
+                                      <td {td_style}>{param.values}</td>
+                                      <td style="color: gray; {td_style}>{param.description}</td></tr>"""
+
+        self.table_row_html_single = """<tr><td colspan="4" {td_style}>{text}</td></tr>"""
+
+        self.table_title_html = """<thead><td colspan="4" style="text-align: center;
+                                   font-size: 18pt;" {td_style}>{module_name} ({package})</td></thead>"""
+
+    def get_color_code(self, param):
+        """
+         Handy function for getting a color based on a parameter:
+         if it has the default value, no color,
+         if not, red color.
+        """
+        if str(param.values) != str(param.default) and str(param.default) != "":
+            color_text = " style='color: red;'"
+        else:
+            color_text = ""
+        return color_text
+
+    def create(self):
+        """
+        Show the widget.
+        """
+        import ipywidgets as widgets
+
+        html = widgets.HTML()
+        html.value = self.table_beginning_html
+
+        if self.standalone:
+            if isinstance(self.module.name, str):
+                module_name = self.module.name
+            else:
+                module_name = self.module.name()
+
+            html.value += self.table_title_html.format(module_name=module_name, package=self.module.package(),
+                                                       td_style=self.td_html)
+
+            html.value += self.table_row_html_single.format(text=self.module.description(), td_style=self.td_html)
+
+        if len(self.module.available_params()) == 0:
+            html.value += self.table_row_html_single.format(text="No parameters available.", td_style=self.td_html)
+        else:
+            for param in self.module.available_params():
+                color_text = self.get_color_code(param)
+
+                if self.standalone:
+                    table_row_html = self.table_row_help
+                else:
+                    table_row_html = self.table_row_parameters
+
+                html.value += table_row_html.format(param=param, color_text=color_text, td_style=self.td_html)
+        html.value += "</table>"
+
+        return html
 
 
 class ProgressBarViewer(Basf2Widget):

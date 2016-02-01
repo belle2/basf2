@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from . import viewer
-from . import queue
+from ipython_tools import viewer
+from ipython_tools import queue
 import inspect
 import time
 

@@ -111,15 +111,13 @@
 	<div class="object">
     <!-- todo: ../ should be removed for final deployment -->
         <a target="_blank" href="../{{ plot_path }}{{ pdf_filename }}">
-    <img src="../{{ plot_path }}{{ png_filename }}">
+    <img width="{{width}}" height="{{height}}" src="../{{ plot_path }}{{ png_filename }}">
         </a>
     </div>
     {{>plot_description}}
     </div>
 	{{/if}}
 	{{/plots}}
-    <!-- This section does not contain any plots. -->
-	<div>end of package</div>
     </section>
 {{/partial}}
 

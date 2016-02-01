@@ -134,6 +134,12 @@ class Plotuple:
         # are stored (without the file extension!)
         self.file = None
 
+        #: width of the plotted image in pixels, will be set by the draw function
+        self.width = None
+
+        #: height of the plotted image in pixels, will be set by the draw function
+        self.height = None
+
         # Deal with incomplete information
         if self.description == '' or self.description is None:
             self.description = 'n/a'
@@ -285,10 +291,13 @@ class Plotuple:
         """
 
         # Create a ROOT canvas on which we will draw our histograms
+        self.width = 700
         if len(self.elements) > 4:
             canvas = ROOT.TCanvas('', '', 700, 1050)
+            self.height = 1050
         else:
             canvas = ROOT.TCanvas('', '', 700, 525)
+            self.height = 525
 
         # Split the canvas into enough parts to fit all image_objects
         # Find numbers x and y so that x*y = N (number of histograms to be
@@ -386,10 +395,13 @@ class Plotuple:
             return
 
         # Create a ROOT canvas on which we will draw our histograms
+        self.width = 700
         if mode == '2D' and len(self.elements) > 4:
             canvas = ROOT.TCanvas('', '', 700, 1050)
+            self.height = 1050
         else:
             canvas = ROOT.TCanvas('', '', 700, 525)
+            self.height = 525
 
         # Allow possibility to turn off the stats box
         if 'nostats' in self.metaoptions:

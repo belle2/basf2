@@ -104,7 +104,7 @@ class Plot(JsonBase):
     Wrapper for one specfic plot.
     """
 
-    def __init__(self, is_expert=False, description=None, check=None, contact=None):
+    def __init__(self, is_expert=False, description=None, check=None, contact=None, width=None, height=None):
         """
         Create a new Plot object and fill all members
         """
@@ -117,6 +117,10 @@ class Plot(JsonBase):
         self.check = check
         #: Who is the contact person for this plot ?
         self.contact = contact
+        #: width of the plot in pixels
+        self.width = width
+        #: height of the plot in pixels
+        self.height = height
 
 
 class NTuple(JsonBase):
@@ -244,13 +248,16 @@ class ComparisonPlot(Plot):
             is_expert=None,
             plot_path=None,
             comparison_pvalue=None,
-            comparison_text=None):
+            comparison_text=None,
+            height=None,
+            width=None):
         """
         Create a new ComparisonPlot object and fill all members
         """
 
         # todo: move more into the base class
-        super().__init__(is_expert=is_expert, description=description, check=check, contact=contact)
+        super().__init__(is_expert=is_expert, description=description, check=check, contact=contact,
+                         height=height, width=width)
         #: tile used to display this plot
         self.title = title
         #: text string for the comparison outcome

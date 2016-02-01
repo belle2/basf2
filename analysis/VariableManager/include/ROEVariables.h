@@ -11,7 +11,6 @@
 #pragma once
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <TLorentzVector.h>
 #include <map>
 #include <string>

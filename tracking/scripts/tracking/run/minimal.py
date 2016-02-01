@@ -28,6 +28,7 @@ class MinimalRun(object):
     root_input_file = None
     random_seed = None
     n_processes = 0
+    n_events_to_skip = None
 
     def __init__(self):
         super(MinimalRun, self).__init__()
@@ -113,12 +114,19 @@ class MinimalRun(object):
             event_info_setter_module = basf2.register_module('EventInfoSetter')
             event_info_setter_module.param({'evtNumList': [self.n_events],
                                             'runList': [1], 'expList': [1]})
+            if self.n_events_to_skip:
+                event_info_setter_module.param({'eventsToSkip': self.n_events_to_skip})
+
             main_path.add_module(event_info_setter_module)
 
         else:
             # Master module: RootInput
             root_input_module = basf2.register_module('RootInput')
             root_input_module.param({'inputFileName': self.root_input_file})
+
+            if self.n_events_to_skip:
+                root_input_module.param({'skipNEvents': self.n_events_to_skip})
+
             main_path.add_module(root_input_module)
 
             environment = Belle2.Environment.Instance()

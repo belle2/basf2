@@ -1,8 +1,8 @@
 import os
 from multiprocessing import Process, Pipe
 
-import python_modules
-import queue
+from ipython_tools import python_modules
+from ipython_tools import queue
 
 import basf2
 

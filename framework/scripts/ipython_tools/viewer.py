@@ -51,7 +51,21 @@ class StylingWidget(Basf2Widget):
         #header-container {
             width: 90%;
         }
-        ''
+
+        .stat-table tr:nth-child(even) {
+            background: #FFF
+        }
+        .stat-table tr:nth-child(2n+3) {
+            background: #EEE
+        }
+        .stat-table tr:first-child {
+            background: #AAA;
+            font-weight: bold
+        }
+        .stat-table tr:last-child {
+            border: 1px solid black;
+            font-weight: bold
+        }
         """
 
     """Create the styling widget."""
@@ -176,22 +190,28 @@ class ModuleViewer(Basf2Widget):
             self.module = module
         self.standalone = standalone
 
+        #: Template for the table beginning
         self.table_beginning_html = """<table style="margin-left: auto; margin-right: auto;
                                        border-collapse: separate; border-spacing: 0px;">"""
 
+        #: Template for the table cell
         self.td_html = "style=\"padding: 10px;\""
 
+        #: Template for the row of parameters
         self.table_row_parameters = """<tr><td {td_style}>{param.name}</td>
                                       <td{color_text} {td_style}>{param.values}</td>
                                       <td style="color: gray; {td_style}>{param.default}</td></tr>"""
 
+        #: Template for the row with help
         self.table_row_help = """<tr><td {td_style}>{param.name}</td>
                                       <td {td_style}>{param.type}</td>
                                       <td {td_style}>{param.values}</td>
                                       <td style="color: gray; {td_style}>{param.description}</td></tr>"""
 
+        #: Template for the simple row
         self.table_row_html_single = """<tr><td colspan="4" {td_style}>{text}</td></tr>"""
 
+        #: Template for the table title
         self.table_title_html = """<thead><td colspan="4" style="text-align: center;
                                    font-size: 18pt;" {td_style}>{module_name} ({package})</td></thead>"""
 
@@ -367,18 +387,9 @@ class CollectionsViewer(Basf2Widget):
         #: The collections to show
         self.collections = collections
 
-        #: Some styling we need
-        self.styling_text = """
-        <style>
-            .coll-table {
-              border-collapse: separate;
-              border-spacing: 50px 0;
-            }
-
-            .coll-table td {
-              padding: 10px 0;
-              }
-        </style>"""
+        #: Template for a table row
+        self.table_row_html = """<tr><td style="padding: 10px 0;">{name}</td>
+                                 <td style="padding: 10px 0;">{number}</td></tr>"""
 
     def create(self):
         """
@@ -395,9 +406,9 @@ class CollectionsViewer(Basf2Widget):
 
         for i, event in enumerate(self.collections):
             html = widgets.HTML()
-            html.value = self.styling_text + "<table class=\"coll-table\">"
+            html.value = """<table style="border-collapse: separate; border-spacing: 50px 0;">"""
             for store_array in event["store_content"]:
-                html.value += "<tr>" + "<td>" + store_array[0] + "</td>" + "<td>" + str(store_array[1]) + "</td>" + "</tr>"
+                html.value += self.table_row_html.format(name=store_array[0], number=store_array[1])
             html.value += "</table>"
             children.append(html)
             a.set_title(i, "Event " + str(event["number"]))
@@ -419,27 +430,10 @@ class StatisticsViewer(Basf2Widget):
         #: The statistics we want to show
         self.statistics = statistics
 
-        #: Some styling we need
-        self.styling_text = """
-        <style>
-            .stat-table {
-              border-collapse: collapsed;
-              border: 1px solid black;
-            }
-            .stat-table td {
-                padding: 5px;
-            }
-            .stat-table tr:nth-child(even) {background: #FFF}
-            .stat-table tr:nth-child(2n+3) {background: #EEE}
-            .stat-table tr:first-child {
-                background: #AAA;
-                font-weight: bold
-            }
-            .stat-table tr:last-child {
-                border: 1px solid black;
-                font-weight: bold
-            }
-        </style>"""
+        #: Template for a table cell
+        self.table_cell_html = """<td style="padding: 10px;">{content}</td>"""
+        self.table_cell_col_3_html = """<td colspan="3" style="padding: 10px;">{content}</td>"""
+        self.table_cell_left_html = """<td style="padding: 10px; text-align: left">{content}</td>"""
 
     def create(self):
         """
@@ -451,20 +445,20 @@ class StatisticsViewer(Basf2Widget):
             return widgets.HTML("")
 
         html = widgets.HTML()
-        html.value = self.styling_text + "<table class=\"stat-table\"><tr>"
-        html.value += "<td>Name</td>"
-        html.value += "<td>Calls</td>"
-        html.value += "<td>Memory(MB)</td>"
-        html.value += "<td>Time(s)</td>"
-        html.value += "<td colspan=\"3\">Time(ms)/call</td>"
+        html.value = """<table class="stat-table" style="border-collapse: collapsed; border: 1px solid black;"><tr>"""
+        html.value += self.table_cell_html.format(content="Name")
+        html.value += self.table_cell_html.format(content="Calls")
+        html.value += self.table_cell_html.format(content="Memory(MB)")
+        html.value += self.table_cell_html.format(content="Time(s)")
+        html.value += self.table_cell_col_3_html.format(content="Time(ms)/call")
         html.value += "</tr>"
 
         for module in self.statistics.module:
             html.value += "<tr>"
-            html.value += "<td>%s</td>" % module.name
-            html.value += "<td style=\"text-align: right\">%d</td>" % module.calls["EVENT"]
-            html.value += "<td style=\"text-align: right\">%d</td>" % (module.memory_sum["EVENT"] / 1024)
-            html.value += "<td style=\"text-align: right\">%.2f</td>" % (module.time_sum["EVENT"] / 1e9)
+            html.value += self.table_cell_left_html.format(content=module.name)
+            html.value += self.table_cell_left_html.format(content=module.calls["EVENT"])
+            html.value += self.table_cell_left_html.format(content=(module.memory_sum["EVENT"] / 1024))
+            html.value += self.table_cell_left_html.format(content=(module.time_sum["EVENT"] / 1e9))
             html.value += "<td style=\"text-align: right\">%.2f</td><td>&plusmn;</td><td>%.2f</td>" % (
                 module.time_mean["EVENT"] / 1e6, module.time_stddev["EVENT"] / 1e6)
             html.value += "</tr>"

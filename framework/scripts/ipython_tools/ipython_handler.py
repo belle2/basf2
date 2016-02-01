@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from ipython_tools import viewer, queue, calculation, information
+from ipython_tools import viewer, queue, calculation, information, process
 
 
 class IPythonHandler:
@@ -64,9 +64,9 @@ class IPythonHandler:
         if result_queue is None:
             result_queue = queue.Basf2CalculationQueue()
 
-        basf2_process = Basf2Process(path=path, result_queue=result_queue,
-                                     log_file_name=self.next_log_file_name(),
-                                     random_seed=random_seed)
+        basf2_process = process.Basf2Process(path=path, result_queue=result_queue,
+                                             log_file_name=self.next_log_file_name(),
+                                             random_seed=random_seed)
         return calculation.Basf2Calculation([basf2_process])
 
     def process_parameter_space(self, path_creator_function, **kwargs):
@@ -115,11 +115,11 @@ class IPythonHandler:
         else:
             all_seeds = [random_seeds] * len(all_paths)
 
-        process_list = [Basf2Process(path=path,
-                                     result_queue=q,
-                                     random_seed=random_seed,
-                                     parameters=parameters,
-                                     log_file_name=self.next_log_file_name())
+        process_list = [process.Basf2Process(path=path,
+                                             result_queue=q,
+                                             random_seed=random_seed,
+                                             parameters=parameters,
+                                             log_file_name=self.next_log_file_name())
                         for path, q, random_seed, parameters in zip(all_paths, all_queues, all_seeds, all_parameters)]
         return calculation.Basf2Calculation(process_list)
 

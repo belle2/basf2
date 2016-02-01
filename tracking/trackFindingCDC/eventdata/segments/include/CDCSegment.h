@@ -64,6 +64,15 @@ namespace Belle2 {
       void setTrajectory2D(const CDCTrajectory2D& trajectory2D) const
       { m_trajectory2D =  trajectory2D; }
 
+      /// Sort the recoHits according to their perpS information
+      void sortByArcLength2D()
+      {
+        std::stable_sort(std::vector<T>::begin(), std::vector<T>::end(),
+        [](const T & recoHit, const T & otherRecoHit) {
+          return recoHit.getArcLength2D() < otherRecoHit.getArcLength2D();
+        });
+      }
+
     private:
       /// Memory for the two dimensional trajectory fitted to this segment
       mutable CDCTrajectory2D m_trajectory2D;

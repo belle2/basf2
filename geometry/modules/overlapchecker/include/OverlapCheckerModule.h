@@ -13,7 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <display/dataobjects/DisplayData.h>
+#include <framework/dataobjects/DisplayData.h>
 #include <G4NavigationHistory.hh>
 
 #include <string>

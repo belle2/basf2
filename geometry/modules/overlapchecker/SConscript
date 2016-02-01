@@ -1,6 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'geometry', 'display_dataobjects']
-env['CONTINUE'] = env.get('HAS_TEVE', False)
+env['LIBS'] = ['framework', 'geometry']
 
 Return('env')

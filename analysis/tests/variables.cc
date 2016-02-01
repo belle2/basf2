@@ -523,12 +523,6 @@ namespace {
     var = Manager::Instance().getVariable("missM2(mask2,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), (2 * E0 - rec4vecCMS.E()) * (2 * E0 - rec4vecCMS.E()) - rec4vecCMS.Vect().Mag2());
-
-    EXPECT_FLOAT_EQ(1.0, nAllROETracks(part));
-    EXPECT_FLOAT_EQ(1.0, nAllROEECLClusters(part));
-    EXPECT_FLOAT_EQ(1.0, nAllROENeutralECLClusters(part));
-    EXPECT_FLOAT_EQ(1.0, nAllROEKLMClusters(part));
-
   }
 
 

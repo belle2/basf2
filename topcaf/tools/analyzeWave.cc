@@ -15,10 +15,13 @@ using namespace Belle2;
 
 bool analyzeWave(const char* filename, int firstEvent = 0, int nEvents = 1)
 {
+
+
   TFile fileIn(filename);
   TTreeReader theReader("tree", &fileIn);
   TTreeReaderArray<Belle2::EventWaveformPacket> eventRV(theReader, "EventWaveformPackets");
-  // TTreeReaderArray<Belle2::EventHeaderPacket> eventHDR(theReader, "EventHeaderPacket");
+
+
   int iEvent = -1;
 
   TFile plotFile("plot.root", "RECREATE");
@@ -55,6 +58,28 @@ bool analyzeWave(const char* filename, int firstEvent = 0, int nEvents = 1)
       if (nSamples == 0) {
         nSamples = y.size();
       }
+
+      TH1D* h = new TH1D(Form("%s_%s", evtnum.c_str(), to_string(channelID).c_str()), "h", y.size(), 0, y.size());
+      h->SetTitle(h->GetName());
+      for (unsigned int c = 0; c < y.size(); c++) {
+        h->SetBinContent(c, y[c]);
+      }
+
+      //      TF1 *f;
+      // cout<<evtnum<<"\tnumber of hits: "<<hits.size()<<endl;
+      // for(unsigned int c=0;c<hits.size();c++) {
+      //  //  string hitname = evtnum+"_"+to_string(channelID)+"_"+to_string(c);
+      //  //  f = new TF1(hitname.c_str(),"gaus",hits[c].tdc_bin-10,hits[c].tdc_bin+10);
+      //  //  f->SetParameter(0,hits[c].adc_height);
+      //  //  f->SetParameter(1,hits[c].tdc_bin);
+      //  //  f->SetParameter(2,hits[c].width);
+      //  //  h->Fit(hitname.c_str(),"R");
+      //  cout<<"c: "<<c<<"\tadc_height: "<<hits[c].adc_height<<"\ttdc_bin: "<<hits[c].tdc_bin<<"\twidth: "<<hits[c].width<<endl;
+      //  //  f->Write();
+      // }
+
+      h->Write();
+
       vector<double> x;
       // create the x axis
       for (size_t i = 0; i < y.size(); ++i) {
@@ -63,12 +88,18 @@ bool analyzeWave(const char* filename, int firstEvent = 0, int nEvents = 1)
         }
         // spread out y values for better plotting
         y[i] += iChannel * 1000;
+
         x.push_back(i);
       }
+
       TGraph* g = new TGraph(y.size(), &x[0], &y[0]);
+
+
+
       g->SetMarkerStyle(7);
       mg->Add(g);
       iChannel += 1;
+
     }
     if (iChannel == 0 or nSamples == 0) {
       continue;

@@ -440,6 +440,7 @@ class StatisticsViewer(Basf2Widget):
         Create the widget
         """
         import ipywidgets as widgets
+        import numpy as np
 
         if self.statistics is None:
             return widgets.HTML("")
@@ -448,7 +449,7 @@ class StatisticsViewer(Basf2Widget):
         html.value = """<table class="stat-table" style="border-collapse: collapsed; border: 1px solid black;"><tr>"""
         html.value += self.table_cell_html.format(content="Name")
         html.value += self.table_cell_html.format(content="Calls")
-        html.value += self.table_cell_html.format(content="Memory(MB)")
+        html.value += self.table_cell_html.format(content="VMemory(MB)")
         html.value += self.table_cell_html.format(content="Time(s)")
         html.value += self.table_cell_col_3_html.format(content="Time(ms)/call")
         html.value += "</tr>"
@@ -456,9 +457,9 @@ class StatisticsViewer(Basf2Widget):
         for module in self.statistics.module:
             html.value += "<tr>"
             html.value += self.table_cell_left_html.format(content=module.name)
-            html.value += self.table_cell_left_html.format(content=module.calls["EVENT"])
-            html.value += self.table_cell_left_html.format(content=(module.memory_sum["EVENT"] / 1024))
-            html.value += self.table_cell_left_html.format(content=(module.time_sum["EVENT"] / 1e9))
+            html.value += self.table_cell_left_html.format(content=int(module.calls["EVENT"]))
+            html.value += self.table_cell_left_html.format(content=np.round(module.memory_sum["EVENT"] / 1024, 2))
+            html.value += self.table_cell_left_html.format(content=np.round(module.time_sum["EVENT"] / 1e9, 2))
             html.value += "<td style=\"text-align: right\">%.2f</td><td>&plusmn;</td><td>%.2f</td>" % (
                 module.time_mean["EVENT"] / 1e6, module.time_stddev["EVENT"] / 1e6)
             html.value += "</tr>"

@@ -1,5 +1,5 @@
 #include <topcaf/dataobjects/EventWaveformPacket.h>
-#include <iostream>
+#include <framework/logging/Logger.h>
 #include <iomanip>
 
 using namespace Belle2;
@@ -82,36 +82,8 @@ void EventWaveformPacket::SetHits(const vector< topcaf_hit_t >& hits)
   v_hits = hits;
   m_nhits = hits.size();
   for (unsigned int c = 0; c < m_nhits; c++)
-    cout << m_channel_id << "setting peak found adc:" << hits[c].adc_height << "\ttdc:" << hits[c].tdc_bin << "\twidth: " <<
-         hits[c].width << "\tchi2: " << hits[c].chi2 << endl;
+    B2DEBUG(1, m_channel_id << "setting peak found adc:" << hits[c].adc_height << "\ttdc:" << hits[c].tdc_bin << "\twidth: " <<
+            hits[c].width << "\tchi2: " << hits[c].chi2 << endl);
 }
-
-// EventWaveformPacket::EventWaveformPacket(const EventWaveformPacket& in_wp)
-//   : Packet()
-//   , v_samples(in_wp.v_samples)
-// {
-//
-//   //From packet
-//   m_type = in_wp.m_type;
-//   m_scrod_rev = in_wp.m_scrod_rev;
-//   m_scrod_id = in_wp.m_scrod_id;
-//
-//   //Raw
-//   m_channel_id = in_wp.m_channel_id;
-//   m_evt_num = in_wp.m_evt_num;
-//   m_asic_refwin = in_wp.m_asic_refwin;
-//   m_nwave_seg = in_wp.m_nwave_seg;
-//   m_asic_win = in_wp.m_asic_win;
-//   m_asic_ch = in_wp.m_asic_ch;
-//   m_asic_row = in_wp.m_asic_row;
-//   m_asic_col = in_wp.m_asic_col;
-//   m_nsamples = in_wp.m_nsamples;
-//   //Reco
-//   m_time = in_wp.m_time;
-//   m_amp = in_wp.m_amp;
-//   m_rate = in_wp.m_rate;
-//   m_quality = in_wp.m_quality;
-//   m_time_bin = in_wp.m_time_bin;
-// }
 
 EventWaveformPacket::~EventWaveformPacket() {}

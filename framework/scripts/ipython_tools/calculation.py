@@ -289,6 +289,19 @@ class Basf2Calculation:
 
         self.create_widgets_for_all_processes(f, index)
 
+    def show_log(self, index=None):
+        """
+        Show the log of the underlaying process(es).
+        """
+
+        def f(process):
+            if self.is_running(process) or self.is_finished(process):
+                return viewer.LogViewer(process.get_log())
+            else:
+                raise AssertionError("Calculation has not been started.")
+
+        self.create_widgets_for_all_processes(f, index)
+
 
 class Basf2CalculationList:
 

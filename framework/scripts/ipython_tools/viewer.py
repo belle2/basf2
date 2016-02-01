@@ -509,3 +509,72 @@ class ProcessViewer(object):
             a = widgets.HTML("<strong>Calculation list empty. Nothing to show.</strong>")
 
         display(a)
+
+
+class LogViewer(Basf2Widget):
+
+    def __init__(self, log_content):
+        """ Initialize the log viewer.
+        """
+
+        #: The log content to show.
+        self.log_content = log_content
+
+        #: The info line
+        self.info_line = """<tr style="color: black;" class="log-line-info"><td>{content}</td></tr>"""
+
+        #: The debug line
+        self.debug_line = """<tr style="color: gray;" class="log-line-debug"><td>{content}</td></tr>"""
+
+        #: The result line
+        self.result_line = """<tr style="color: darkgreen;" class="log-line-result"><td>{content}</td></tr>"""
+
+        #: The warning line
+        self.warning_line = """<tr style="color: orange;" class="log-line-warning"><td>{content}</td></tr>"""
+
+        #: The error line
+        self.error_line = """<tr style="color: red;" class="log-line-error"><td>{content}</td></tr>"""
+
+        #: The fatal line
+        self.fatal_line = """<tr style="color: gray;" class="log-line-fatal"><td>{content}</td></tr>"""
+
+        #: The default line
+        self.default_line = """<tr class="log-line-default"><td>{content}</td></tr>"""
+
+        #: The toggle button
+        self.toggle_button_line = """<a onclick="$('.log-line-{type_lower}').toggle();"
+                                  " style="cursor: pointer; margin: 10px;">Toggle {type_upper}</a>"""
+
+    def create(self):
+        """
+        Create the log viewer.
+        """
+        from ipywidgets import HTML, Button
+        html = HTML()
+
+        html.value = """<div style="max-height: 400px; overflow-y: auto; padding: 5px;">"""
+
+        for type in ["INFO", "DEBUG", "WARNING", "ERROR", "RESULT", "FATAL", "default"]:
+            html.value += self.toggle_button_line.format(type_lower=type.lower(), type_upper=type.upper())
+
+        html.value += """<table style="word-break: break-all; margin: 10px;">"""
+
+        for line in self.log_content.split("\n"):
+            if line.startswith("[INFO]"):
+                html.value += self.info_line.format(content=line)
+            elif line.startswith("[DEBUG]"):
+                html.value += self.debug_line.format(content=line)
+            elif line.startswith("[RESULT]"):
+                html.value += self.result_line.format(content=line)
+            elif line.startswith("[WARNING]"):
+                html.value += self.warning_line.format(content=line)
+            elif line.startswith("[ERROR]"):
+                html.value += self.error_line.format(content=line)
+            elif line.startswith("[FATAL]"):
+                html.value += self.fatal_line.format(content=line)
+            else:
+                html.value += self.default_line.format(content=line)
+
+        html.value += "</table></div>"
+
+        return html

@@ -20,7 +20,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // dataobjects
-#include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -112,60 +111,7 @@ namespace Belle2 {
       return 0;
     }
 
-    double nAllROETracks(const Particle* particle)
-    {
-      // Get related ROE object
-      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-
-      if (!roe) {
-        B2ERROR("Relation between particle and ROE doesn't exist!");
-        return -1;
-      }
-
-      return roe->getNTracks();
-    }
-
-    double nAllROEECLClusters(const Particle* particle)
-    {
-      // Get related ROE object
-      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-
-      if (!roe) {
-        B2ERROR("Relation between particle and ROE doesn't exist!");
-        return -1;
-      }
-
-      return roe->getNECLClusters();
-    }
-
-    double nAllROENeutralECLClusters(const Particle* particle)
-    {
-      int nNeutrals = 0;
-
-      // Get related ROE object
-      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-
-      if (!roe) {
-        B2ERROR("Relation between particle and ROE doesn't exist!");
-        return -999;
-      }
-
-      // Get all ECLClusters in ROE
-      const std::vector<ECLCluster*> roeClusters = roe->getECLClusters();
-
-      // Select ECLClusters with no associated tracks
-      for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
-
-        if (!roeClusters[iEcl]->isNeutral())
-          continue;
-
-        nNeutrals++;
-      }
-
-      return nNeutrals;
-    }
-
-    double nAllROEKLMClusters(const Particle* particle)
+    double nROEKLMClusters(const Particle* particle)
     {
       // Get related ROE object
       const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
@@ -178,67 +124,65 @@ namespace Belle2 {
       return roe->getNKLMClusters();
     }
 
-    double ROEMCErrors(const Particle* particle)
+    Manager::FunctionPtr ROEMCMissingFlags(const std::vector<std::string>& arguments)
     {
-      StoreArray<Particle> particles;
+      std::string maskName;
 
-      //Get MC Particle of the other B meson
-      const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
-
-      if (!mcParticle)
-        return -999;
-
-      const MCParticle* mcMother = mcParticle->getMother();
-
-      if (!mcMother)
-        return -999;
-
-      const std::vector<MCParticle*> mcDaughters = mcMother->getDaughters();
-
-      if (mcDaughters.size() != 2)
-        return -999;
-
-      const MCParticle* mcROE;
-      if (mcDaughters[0]->getArrayIndex() == mcParticle->getArrayIndex())
-        mcROE = mcDaughters[1];
+      if (arguments.size() == 0)
+        maskName = "";
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
       else
-        mcROE = mcDaughters[0];
+        B2FATAL("Wrong number of arguments (1 required) for meta function nROETracks");
 
-      // Get related ROE object
-      RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+      auto func = [maskName](const Particle * particle) -> double {
 
-      // Load all Tracks and ECLClusters
-      const std::vector<Track*> roeTracks = roe->getTracks();
-      const std::vector<ECLCluster*> roeECL = roe->getECLClusters();
+        //Get MC Particle of the B meson
+        const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
 
-      // Create artificial particle
-      Particle p(mcROE->get4Vector(), mcROE->getPDG());
-      Particle* newPart = particles.appendNew(p);
-
-      // Loop through ROE objects, create particles on ROE side
-      for (unsigned iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
-        const PIDLikelihood* pid = roeTracks[iTrack]->getRelatedTo<PIDLikelihood>();
-
-        if (!pid) {
-          B2ERROR("No PID information for this track!");
+        if (!mcParticle)
           return -999;
-        }
 
-        Const::ChargedStable type(abs(pid->getMostLikely().getPDGCode()));
-        Particle p(roeTracks[iTrack], type);
-        Particle* tempPart = particles.appendNew(p);
-        newPart->appendDaughter(tempPart);
-      }
+        // Get Mother
+        MCParticle* mcMother = mcParticle->getMother();
 
-      for (unsigned iECL = 0; iECL < roeECL.size(); iECL++) {
-        if (roeECL[iECL]->isNeutral()) {
-          Particle p(roeECL[iECL]);
-          Particle* tempPart = particles.appendNew(p);
-          newPart->appendDaughter(tempPart);
-        }
-      }
+        if (!mcMother)
+          return -999;
 
-      return MCMatching::getMCErrors(newPart, mcROE);
+        // Get daughters
+        std::vector<MCParticle*> mcDaughters = mcMother->getDaughters();
+
+        if (mcDaughters.size() != 2)
+          return -999;
+
+        // Get the other B meson
+        MCParticle* mcROE;
+        if (mcDaughters[0]->getArrayIndex() == mcParticle->getArrayIndex())
+          mcROE = mcDaughters[1];
+        else
+          mcROE = mcDaughters[0];
+
+        // Get related ROE object
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+        // Load all ROE Tracks and ECLClusters
+        const std::vector<Track*> roeTracks = roe->getTracks(maskName);
+        //const std::vector<ECLCluster*> roeECL = roe->getECLClusters(maskName);
+        //const std::vector<KLMCluster*> roeKLM;
+
+        std::set<MCParticle*> mcROEObjects;
+
+        /*  for(unsigned i = 0; i < roeTracks.size(); i++)
+            if(roeTracks[i]->getRelated<MCParticle>())
+              mcROEObjects.insert(roeTracks[i]->getRelated<MCParticle>());*/
+
+        int flags = 0;
+
+        checkMCParticleMissingFlags(mcROE, mcROEObjects, flags);
+
+        return flags;
+      };
+      return func;
     }
 
     Manager::FunctionPtr nROETracks(const std::vector<std::string>& arguments)
@@ -255,7 +199,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -263,24 +207,7 @@ namespace Belle2 {
           return -1;
         }
 
-        // Get mask
-        std::map<unsigned int, bool> mask = roe->getTrackMask(maskName);
-
-        // Get all Tracks in ROE
-        std::vector<Track*> roeTracks = roe->getTracks();
-        int countTracks = 0;
-
-        for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++)
-        {
-
-          if (!mask.empty())
-            if (!mask.at(roeTracks[iTrack]->getArrayIndex()))
-              continue;
-
-          countTracks++;
-        }
-
-        return countTracks;
+        return roe->getNTracks(maskName);
       };
       return func;
     }
@@ -299,7 +226,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -307,24 +234,7 @@ namespace Belle2 {
           return -1;
         }
 
-        // Get mask
-        std::map<unsigned int, bool> mask = roe->getECLClusterMask(maskName);
-
-        // Get all ECLClusters in ROE
-        const std::vector<ECLCluster*> roeClusters = roe->getECLClusters();
-        int nClusters = 0;
-
-        // Loop through ECLClusters
-        for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
-        {
-          if (!mask.empty())
-            if (!mask.at(roeClusters[iEcl]->getArrayIndex()))
-              continue;
-
-          nClusters++;
-        }
-
-        return nClusters;
+        return roe->getNECLClusters(maskName);
       };
       return func;
     }
@@ -343,7 +253,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -351,26 +261,14 @@ namespace Belle2 {
           return -1;
         }
 
-        // Get mask
-        std::map<unsigned int, bool> mask = roe->getECLClusterMask(maskName);
-
-        // Get all ECLClusters in ROE
-        const std::vector<ECLCluster*> roeClusters = roe->getECLClusters();
+        // Get unused ECLClusters in ROE
+        const std::vector<ECLCluster*> roeClusters = roe->getECLClusters(maskName);
         int nNeutrals = 0;
 
         // Select ECLClusters with no associated tracks
         for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
-        {
-
-          if (!roeClusters[iEcl]->isNeutral())
-            continue;
-
-          if (!mask.empty())
-            if (!mask.at(roeClusters[iEcl]->getArrayIndex()))
-              continue;
-
-          nNeutrals++;
-        }
+          if (roeClusters[iEcl]->isNeutral())
+            nNeutrals++;
 
         return nNeutrals;
       };
@@ -397,7 +295,7 @@ namespace Belle2 {
       auto func = [maskName, pi0CutString](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -405,27 +303,20 @@ namespace Belle2 {
           return -1;
         }
 
-        // Get mask
-        std::map<unsigned int, bool> mask = roe->getECLClusterMask(maskName);
-
-        // Get all ECLClusters in ROE
-        const std::vector<ECLCluster*> roeClusters = roe->getECLClusters();
+        // Get ECLClusters in ROE
+        const std::vector<ECLCluster*> roeClusters = roe->getECLClusters(maskName);
         int nPi0 = 0;
 
         // Set cut criteria for pi0
         std::unique_ptr<Variable::Cut> pi0Cut = Variable::Cut::Compile(pi0CutString);
 
-        // Select pairs of good ECLClusters with no associated tracks which pass the mask and the pi0 cut
+        // Select pairs of neutral ECLClusters cut
         for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
-        {
-          for (unsigned int jEcl = 0; jEcl < iEcl; jEcl++) {
+          for (unsigned int jEcl = 0; jEcl < iEcl; jEcl++)
+          {
 
             if (!roeClusters[iEcl]->isNeutral() or !roeClusters[jEcl]->isNeutral())
               continue;
-
-            if (!mask.empty())
-              if (!mask.at(roeClusters[iEcl]->getArrayIndex()) or !mask.at(roeClusters[jEcl]->getArrayIndex()))
-                continue;
 
             Particle iP(roeClusters[iEcl]);
             Particle* iGamma = &iP;
@@ -437,12 +328,12 @@ namespace Belle2 {
             Particle* pizero = &p;
 
             pizero->set4Vector(iGamma->get4Vector() + jGamma->get4Vector());
+            pizero->appendDaughter(iGamma);
+            pizero->appendDaughter(jGamma);
 
             if (pi0Cut->check(pizero))
               nPi0++;
           }
-        }
-
         return nPi0;
       };
       return func;
@@ -462,7 +353,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -470,20 +361,12 @@ namespace Belle2 {
           return -1;
         }
 
-        // Get mask
-        std::map<unsigned int, bool> mask = roe->getTrackMask(maskName);
-
-        // Get all tracks in ROE
-        const std::vector<Track*> roeTracks = roe->getTracks();
+        // Get tracks in ROE
+        const std::vector<Track*> roeTracks = roe->getTracks(maskName);
         int roeCharge = 0;
 
         for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++)
         {
-
-          if (!mask.empty())
-            if (!mask.at(roeTracks[iTrack]->getArrayIndex()))
-              continue;
-
           const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(Const::pion);
           roeCharge += tfr->getChargeSign();
         }
@@ -507,7 +390,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -515,23 +398,175 @@ namespace Belle2 {
           return -1;
         }
 
-        // Get mask
-        std::map<unsigned int, bool> mask = roe->getECLClusterMask(maskName);
-
-        const std::vector<ECLCluster*> roeClusters = roe->getECLClusters();
+        const std::vector<ECLCluster*> roeClusters = roe->getECLClusters(maskName);
         double extraE = 0.0;
 
         for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
-        {
-
-          if (!mask.empty())
-            if (!mask.at(roeClusters[iEcl]->getArrayIndex()))
-              continue;
-
           extraE += roeClusters[iEcl]->getEnergy();
-        }
 
         return extraE;
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr ROEEnergy(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+
+      if (arguments.size() == 0)
+        maskName = "";
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_E");
+
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        return roe->get4Vector(maskName).Energy();
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr ROEInvariantMass(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+
+      if (arguments.size() == 0)
+        maskName = "";
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_M");
+
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        return roe->get4Vector(maskName).Mag();
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr ROEMomentum(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+
+      if (arguments.size() == 0)
+        maskName = "";
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_P");
+
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        return roe->get4Vector(maskName).Vect().Mag();
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr ROEMomentumX(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+
+      if (arguments.size() == 0)
+        maskName = "";
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Px");
+
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        return roe->get4Vector(maskName).Vect().X();
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr ROEMomentumY(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+
+      if (arguments.size() == 0)
+        maskName = "";
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Py");
+
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        return roe->get4Vector(maskName).Vect().Y();
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr ROEMomentumZ(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+
+      if (arguments.size() == 0)
+        maskName = "";
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Pz");
+
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        return roe->get4Vector(maskName).Vect().Z();
       };
       return func;
     }
@@ -545,12 +580,12 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROEDeltaE");
+        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_deltae");
 
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -559,7 +594,7 @@ namespace Belle2 {
         }
 
         PCmsLabTransform T;
-        TLorentzVector vec = T.rotateLabToCms() * roe->getROE4Vector(maskName);
+        TLorentzVector vec = T.rotateLabToCms() * roe->get4Vector(maskName);
 
         return T.getCMSEnergy() / 2 - vec.E();
       };
@@ -575,12 +610,12 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROEMbc");
+        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_mbc");
 
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -589,7 +624,7 @@ namespace Belle2 {
         }
 
         PCmsLabTransform T;
-        TLorentzVector vec = T.rotateLabToCms() * roe->getROE4Vector(maskName);
+        TLorentzVector vec = T.rotateLabToCms() * roe->get4Vector(maskName);
 
         double E = T.getCMSEnergy() / 2;
         double m2 = E * E - vec.Vect().Mag2();
@@ -612,7 +647,7 @@ namespace Belle2 {
         maskName = arguments[0];
         opt = arguments[1];
       } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function correctedBMesonDeltaE");
+        B2FATAL("Wrong number of arguments (2 required) for meta function correctedB_deltae");
 
       auto func = [maskName, opt](const Particle * particle) -> double {
 
@@ -642,7 +677,7 @@ namespace Belle2 {
         }
 
         else
-          B2FATAL("Option for correctedBMesonDeltaE variable should only be 0/1 (CMS/LAB)");
+          B2FATAL("Option for correctedB_deltae variable should only be 0/1 (CMS/LAB)");
 
         return deltaE;
       };
@@ -661,7 +696,7 @@ namespace Belle2 {
         maskName = arguments[0];
         opt = arguments[1];
       } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function correctedBMesonMbc");
+        B2FATAL("Wrong number of arguments (2 required) for meta function correctedB_mbc");
 
       auto func = [maskName, opt](const Particle * particle) -> double {
 
@@ -670,7 +705,7 @@ namespace Belle2 {
         TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
         TLorentzVector sig4vecLAB = particle->get4Vector();
         TLorentzVector neutrino4vec = missing4Vector(particle, maskName, "1");
-        TLorentzVector neutrino4vecLAB = missing4Vector(particle, maskName, "5");
+        TLorentzVector neutrino4vecLAB = missing4Vector(particle, maskName, "6");
 
         double mbc = -999.9;
 
@@ -694,7 +729,7 @@ namespace Belle2 {
         }
 
         else
-          B2FATAL("Option for correctedBMesonMbc variable should only be 0/1 (CMS/LAB)");
+          B2FATAL("Option for correctedB_mbc variable should only be 0/1 (CMS/LAB)");
 
         return mbc;
       };
@@ -713,99 +748,11 @@ namespace Belle2 {
         maskName = arguments[0];
         opt = arguments[1];
       } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function ROEMissingMass");
+        B2FATAL("Wrong number of arguments (2 required) for meta function missM2");
 
       auto func = [maskName, opt](const Particle * particle) -> double {
 
-        double missM2 = missing4Vector(particle, maskName, opt).Mag2();
-
-        return missM2;
-      };
-      return func;
-    }
-
-    Manager::FunctionPtr xiZ(const std::vector<std::string>& arguments)
-    {
-      std::string maskName;
-
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
-        maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function XiZ");
-
-      auto func = [maskName](const Particle * particle) -> double {
-
-        // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-
-        if (!roe)
-        {
-          B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
-        }
-
-        // Get mask
-        std::map<unsigned int, bool> mask = roe->getTrackMask(maskName);
-
-        // Get all Tracks on reconstructed side
-        std::vector<const Particle*> recTrackParticles = particle->getFinalStateDaughters();
-
-        // Get all Tracks in ROE
-        std::vector<Track*> roeTracks = roe->getTracks();
-
-        double pz = 0;
-        double energy = 0;
-
-        // Loop the reconstructed side
-        for (unsigned int i = 0; i < recTrackParticles.size(); i++)
-        {
-          pz += recTrackParticles[i]->getPz();
-          energy += recTrackParticles[i]->getEnergy();
-        }
-
-        // Loop the ROE side
-        for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++)
-        {
-          if (!mask.empty())
-            if (!mask.at(roeTracks[iTrack]->getArrayIndex()))
-              continue;
-
-          const PIDLikelihood* pid = roeTracks[iTrack]->getRelatedTo<PIDLikelihood>();
-
-          int particlePDG;
-          double fractions[6];
-          roe->fillFractions(fractions, maskName);
-
-          if (fractions[0] == -1) {
-            const MCParticle* mcp = roeTracks[iTrack]->getRelatedTo<MCParticle>();
-
-            if (!mcp) {
-              B2WARNING("No related MCParticle found! Default will be used.");
-              particlePDG = Const::pion.getPDGCode();
-            }
-
-            particlePDG = abs(mcp->getPDG());
-          } else {
-            particlePDG = pid->getMostLikely(fractions).getPDGCode();
-          }
-
-          Const::ChargedStable trackParticle = Const::ChargedStable(particlePDG);
-          const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(trackParticle);
-
-          // Update energy of tracks
-          float tempMass = trackParticle.getMass();
-          TVector3 tempMom = tfr->getMomentum();
-          TLorentzVector temp4Vector;
-          temp4Vector.SetVect(tempMom);
-          temp4Vector.SetE(TMath::Sqrt(tempMom.Mag2() + tempMass * tempMass));
-
-          pz += tfr->getMomentum().Pz();
-          energy += tfr->getEnergy();
-        }
-
-        return pz / energy;
+        return missing4Vector(particle, maskName, opt).Mag2();
       };
       return func;
     }
@@ -827,7 +774,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -857,7 +804,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -887,7 +834,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -917,7 +864,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -947,7 +894,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -977,7 +924,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -986,6 +933,53 @@ namespace Belle2 {
         }
 
         return missing4Vector(particle, maskName, opt).Energy();
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr xiZ(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+
+      if (arguments.size() == 0)
+        maskName = "";
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("Wrong number of arguments (1 required) for meta function xiZ");
+
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        // Get all Tracks on reconstructed side
+        std::vector<const Particle*> recTrackParticles = particle->getFinalStateDaughters();
+
+        // Get Tracks in ROE
+        std::vector<Track*> roeTracks = roe->getTracks(maskName);
+
+        double pz = 0;
+        double energy = 0;
+
+        // Loop the reconstructed side
+        for (unsigned int i = 0; i < recTrackParticles.size(); i++)
+        {
+          pz += recTrackParticles[i]->getPz();
+          energy += recTrackParticles[i]->getEnergy();
+        }
+
+        // "Loop" the ROE side
+        pz += roe->get4Vector(maskName).Vect().Pz();
+        energy += roe->get4Vector(maskName).Energy();
+
+        return pz / energy;
       };
       return func;
     }
@@ -999,12 +993,12 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function missMass2OverEmiss");
+        B2FATAL("Wrong number of arguments (1 required) for meta function missM2OverMissE");
 
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         if (!roe)
         {
@@ -1016,9 +1010,7 @@ namespace Belle2 {
         TLorentzVector missing4Momentum;
         TLorentzVector boostvec = T.getBoostVector();
 
-        missing4Momentum = boostvec - (particle->get4Vector() + roe->getROE4Vector(maskName));
-
-        return missing4Momentum.Mag2() / (2.0 * missing4Momentum.Energy());
+        return missing4Vector(particle, maskName, "5").Mag2() / (2.0 * missing4Vector(particle, maskName, "5").Energy());
       };
       return func;
     }
@@ -1103,7 +1095,7 @@ namespace Belle2 {
     TLorentzVector missing4Vector(const Particle* particle, std::string maskName, std::string opt)
     {
       // Get related ROE object
-      RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
       if (!roe) {
         B2ERROR("Relation between particle and ROE doesn't exist!");
@@ -1115,10 +1107,10 @@ namespace Belle2 {
       TLorentzVector boostvec = T.getBoostVector();
 
       TLorentzVector rec4vec = T.rotateLabToCms() * particle->get4Vector();
-      TLorentzVector roe4vec = T.rotateLabToCms() * roe->getROE4Vector(maskName);
+      TLorentzVector roe4vec = T.rotateLabToCms() * roe->get4Vector(maskName);
 
       TLorentzVector rec4vecLAB = particle->get4Vector();
-      TLorentzVector roe4vecLAB = roe->getROE4Vector(maskName);
+      TLorentzVector roe4vecLAB = roe->get4Vector(maskName);
 
       TLorentzVector miss4vec;
       double E_beam_cms = T.getCMSEnergy() / 2.0;
@@ -1167,7 +1159,7 @@ namespace Belle2 {
         miss4vec.SetE(miss4vec.Vect().Mag());
       }
 
-      // Definition 7: LAB, same as 6, correct pmiss 4vector with factor alpha
+      // Definition 7: LAB, same as 6, correct pmiss 4-momentum vector with factor alpha
       else if (opt == "7") {
         TLorentzVector miss4vecRaw;
         miss4vecRaw.SetVect(boostvec.Vect() - (rec4vecLAB.Vect() + roe4vecLAB.Vect()));
@@ -1184,6 +1176,50 @@ namespace Belle2 {
       return miss4vec;
     }
 
+    void checkMCParticleMissingFlags(MCParticle* mcp, std::set<MCParticle*> mcROEObjects, int& missingFlags)
+    {
+      std::vector<MCParticle*> daughters = mcp->getDaughters();
+
+      for (unsigned i = 0; i < daughters.size(); i++) {
+
+        if (MCMatching::isFSP(daughters[i]->getPDG()) and mcROEObjects.find(daughters[i]) == mcROEObjects.end()) {
+
+          // electrons
+          if (abs(daughters[i]->getPDG()) == 11 and (missingFlags & 1) == 0)
+            missingFlags += 1;
+
+          // muons
+          if (abs(daughters[i]->getPDG()) == 13 and (missingFlags & 2) == 0)
+            missingFlags += 2;
+
+          // pions
+          if (abs(daughters[i]->getPDG()) == 211 and (missingFlags & 4) == 0)
+            missingFlags += 4;
+
+          // kaons
+          if (abs(daughters[i]->getPDG()) == 321 and (missingFlags & 8) == 0)
+            missingFlags += 8;
+
+          // protons
+          if (abs(daughters[i]->getPDG()) == 2212 and (missingFlags & 16) == 0)
+            missingFlags += 16;
+
+          // neutrons
+          if (abs(daughters[i]->getPDG()) == 2112 and (missingFlags & 32) == 0)
+            missingFlags += 32;
+
+          // kshort
+          if (abs(daughters[i]->getPDG()) == 310 and (missingFlags & 64) == 0)
+            missingFlags += 64;
+
+          // klong
+          if (abs(daughters[i]->getPDG()) == 130 and (missingFlags & 128) == 0)
+            missingFlags += 128;
+        } else
+          checkMCParticleMissingFlags(daughters[i], mcROEObjects, missingFlags);
+      }
+    }
+
     VARIABLE_GROUP("Rest Of Event");
 
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
@@ -1197,20 +1233,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("pionVeto", pionVeto,
                       "Returns the Flag 1 if a combination of photons has the invariant mass of a neutral pion");
 
-    REGISTER_VARIABLE("nAllROETracks",  nAllROETracks,
-                      "Returns number of all tracks in the related RestOfEvent object.");
-
-    REGISTER_VARIABLE("nAllROEECLClusters", nAllROEECLClusters,
-                      "Returns number of all ECL clusters in the related RestOfEvent object.");
-
-    REGISTER_VARIABLE("nAllROENeutralECLClusters", nAllROENeutralECLClusters,
-                      "Returns number of all ECL clusters in the related RestOfEvent object.");
-
-    REGISTER_VARIABLE("nAllROEKLMClusters", nAllROEKLMClusters,
+    REGISTER_VARIABLE("nROEKLMClusters", nROEKLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
 
-    REGISTER_VARIABLE("ROE_mcErrors", ROEMCErrors,
-                      "Returns MC Errors for an artificial particle, which corresponds to the ROE object.");
+    REGISTER_VARIABLE("ROE_mcMissFlags", ROEMCMissingFlags,
+                      "Returns flags corresponding to missing particles on ROE side.");
 
     REGISTER_VARIABLE("nROETracks(maskName)",  nROETracks,
                       "Returns number of tracks in the related RestOfEvent object that pass the selection criteria.");
@@ -1228,7 +1255,25 @@ namespace Belle2 {
                       "Returns total charge of the related RestOfEvent object.");
 
     REGISTER_VARIABLE("ROE_eextra(maskName)", ROEExtraEnergy,
-                      "extra energy in the calorimeter that is not associated to the given Particle");
+                      "Returns extra energy in the calorimeter that is not associated to the given Particle");
+
+    REGISTER_VARIABLE("ROE_E(maskName)", ROEEnergy,
+                      "Returns energy of unused tracks and clusters in ROE");
+
+    REGISTER_VARIABLE("ROE_M(maskName)", ROEInvariantMass,
+                      "Returns invariant mass of unused tracks and clusters in ROE");
+
+    REGISTER_VARIABLE("ROE_P(maskName)", ROEMomentum,
+                      "Returns momentum of unused tracks and clusters in ROE");
+
+    REGISTER_VARIABLE("ROE_Px(maskName)", ROEMomentumX,
+                      "Returns x component of momentum of unused tracks and clusters in ROE");
+
+    REGISTER_VARIABLE("ROE_Py(maskName)", ROEMomentumY,
+                      "Returns y component of momentum of unused tracks and clusters in ROE");
+
+    REGISTER_VARIABLE("ROE_Pz(maskName)", ROEMomentumZ,
+                      "Returns z component of momentum of unused tracks and clusters in ROE");
 
     REGISTER_VARIABLE("ROE_deltae(maskName)", ROEDeltaE,
                       "Returns energy difference of the related RestOfEvent object with respect to E_cms/2.");
@@ -1244,9 +1289,6 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("missM2(maskName, opt)", missM2,
                       "Returns the invariant mass squared of the missing momentum (see possible options)");
-
-    REGISTER_VARIABLE("xiZ(maskName)", xiZ,
-                      "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)");
 
     REGISTER_VARIABLE("missPTheta(maskName, opt)", missPTheta,
                       "Returns the polar angle of the missing momentum (see possible options)");
@@ -1266,6 +1308,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("missE(maskName, opt)", missE,
                       "Returns the energy of the missing momentum (see possible options)");
 
+    REGISTER_VARIABLE("xiZ(maskName)", xiZ,
+                      "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)");
 
     REGISTER_VARIABLE("cosThetaEll(maskName)", cosThetaEll,
                       "Returns the angle between M and lepton in W rest frame in the decays of the type\n"

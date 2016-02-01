@@ -69,23 +69,23 @@ namespace Belle2 {
     void addTrack(const Track* track);
 
     /**
-     * Add given StoreArray indices to the list of unused tracks in the event.
+     * Add given StoreArray indices to the list of unused Tracks in the event.
      *
-     * @param vector of SoreArray indices of unused Tracks
+     * @param vector of StoreArray indices of unused Tracks
      */
     void addTracks(const std::vector<int>& indices);
 
     /**
-     * Add StoreArray index of given ECLCluster to the list of unused ECL showers in the event.
+     * Add StoreArray index of given ECLCluster to the list of unused ECLClusters in the event.
      *
-     * @param Pointer to the unused ECLCluster
+     * @param Pointer to the unused ECLClusters
      */
     void addECLCluster(const ECLCluster* shower);
 
     /**
-     * Add given StoreArray indices to the list of unused ECL Showers in the event.
+     * Add given StoreArray indices to the list of unused ECLClusters in the event.
      *
-     * @param vector of SoreArray indices of unused Showers
+     * @param vector of StoreArray indices of unused ECLClusters
      */
     void addECLClusters(const std::vector<int>& indices);
 
@@ -97,44 +97,50 @@ namespace Belle2 {
     void addKLMCluster(const KLMCluster* cluster);
 
     /**
-     * Set the map of probabilities of ChargedStable particles. This is used whenever mass hypotheses are needed.
+     * Append the map of a priori fractions of ChargedStable particles to the ROE object. This is used whenever mass hypotheses are needed.
      * Default is pion-mass always.
      *
-     * @param vector of probabilities of ChargedStable particles
+     * @param map of mask names and a priori fractions for each mask
      */
     void appendChargedStableFractionsSet(std::map<std::string, std::vector<double>> fractionsSet);
 
     /**
-     * Sets the map of masks for Tracks
+     * Append the Track mask (set of rules for tracks) to the ROE object.
+     *
+     * @param map of mask names and masks for Tracks
      */
     void appendTrackMasks(std::map<std::string, std::map<unsigned int, bool>> trackMasks);
 
     /**
-     * Sets the map of masks for ECLClusters
+     * Append the ECLCluster mask (set of rules for clusters) to the ROE object.
+     *
+     * @param map of mask names and masks for ECLClusters
      */
-    void appendECLClusterMasks(std::map<std::string, std::map<unsigned int, bool>> clusterMasks);
+    void appendECLClusterMasks(std::map<std::string, std::map<unsigned int, bool>> eclClusterMasks);
 
     /**
      * Add given StoreArray indices to the list of unused KLM Clusters in the event.
      *
-     * @param vector of SoreArray indices of unused Clusters
+     * @param vector of StoreArray indices of unused Clusters
      */
     void addKLMClusters(const std::vector<int>& indices);
 
     // getters
     /**
-     * Get vector of all unused Tracks.
+     * Get vector of all (no mask) or a subset (use mask) of all Tracks in ROE.
      *
-     * @return vector of pointers to unused tracks
+     * @param name of mask
+     * @return vector of pointers to unused Tracks
      */
-    const std::vector<Belle2::Track*> getTracks() const;
+    const std::vector<Belle2::Track*> getTracks(std::string maskName = "") const;
 
     /**
-     * Get vector of all unused ECLClusters.
+     * Get vector of all (no mask) or a subset (use mask) of all ECLClusters in ROE.
      *
+     * @param name of mask
      * @return vector of pointers to unused ECLClusters
      */
-    const std::vector<Belle2::ECLCluster*> getECLClusters() const;
+    const std::vector<Belle2::ECLCluster*> getECLClusters(std::string maskName = "") const;
 
     /**
      * Get vector of all unused KLMClusters.
@@ -144,31 +150,28 @@ namespace Belle2 {
     const std::vector<Belle2::KLMCluster*> getKLMClusters() const;
 
     /**
-     * Get 4-momentum vector in lab system of all tracks and clusters in ROE
+     * Get 4-momentum vector all (no mask) or a subset (use mask) of all Tracks and ECLClusters in ROE.
      *
-     * @return total TLorentzVector in lab system of all tracks and clusters in ROE
+     * @param name of mask
+     * @return 4-momentum of unused Tracks and ECLClusters in ROE
      */
-    TLorentzVector getROE4Vector(std::string maskName);
+    TLorentzVector get4Vector(std::string maskName = "") const;
 
     /**
-     * Get number of all remaining tracks.
+     * Get number of all (no mask) or a subset (use mask) of all Tracks in ROE.
      *
+     * @param name of mask
      * @return number of all remaining tracks
      */
-    int getNTracks(void) const
-    {
-      return int(m_trackIndices.size());
-    }
+    int getNTracks(std::string maskName = "") const;
 
     /**
-     * Get number of all remaining ECL showers.
+     * Get number of all (no mask) or a subset (use mask) of all ECLclusters in ROE.
      *
+     * @param name of mask
      * @return number of all remaining ECL showers
      */
-    int getNECLClusters(void) const
-    {
-      return int(m_eclClusterIndices.size());
-    }
+    int getNECLClusters(std::string maskName = "") const;
 
     /**
      * Get number of all remaining KLM clusters.
@@ -181,19 +184,28 @@ namespace Belle2 {
     }
 
     /**
-     * Getter for a specific mask for Tracks
+     * Get Track mask with specific a mask name
+     *
+     * @param name of mask
+     * @return mask
      */
-    std::map<unsigned int, bool> getTrackMask(std::string maskName);
+    std::map<unsigned int, bool> getTrackMask(std::string maskName) const;
 
     /**
-     * Getter for a specific mask for ECLClusters
+     * Get ECLCluster mask with a specific mask name
+     *
+     * @param name of mask
+     * @return mask
      */
-    std::map<unsigned int, bool> getECLClusterMask(std::string maskName);
+    std::map<unsigned int, bool> getECLClusterMask(std::string maskName) const;
 
     /**
-     * Getter for ChargedStable fractions with a specific mask name
+     * Fill input parameter with a priori ChargedStable fractions with a specific mask name
+     *
+     * @param a priori fractions container
+     * @param name of mask
      */
-    void fillFractions(double fractions[], std::string maskName);
+    void fillFractions(double fractions[], std::string maskName) const;
 
     /**
      * Prints the contents of a RestOfEvent object to screen
@@ -208,17 +220,11 @@ namespace Belle2 {
     std::set<int> m_eclClusterIndices; /**< StoreArray indices to unused ECLClusters */
     std::set<int> m_klmClusterIndices;  /**< StoreArray indices to unused KLMClusters */
 
-    /*
-     * A map of sets of probabilities of the ChargedStable particles in the process (to be used in ROE variables).
-     * If fractions = {-1}, the true particle mass based on MC information will be used, if available.
-     * Default is pion-mass always.
-     */
     std::map<std::string, std::vector<double>>
                                             m_fractionsSet; /**< Map of a-priori charged FSP probabilities to be used whenever most-likely hypothesis is determined */
+    std::map<std::string, std::map<unsigned int, bool>> m_trackMasks; /**< Map of Track masks (set of rules for Tracks) */
     std::map<std::string, std::map<unsigned int, bool>>
-                                                     m_trackMasks; /**< Map of masks of values for each track to be used in ROE interpretation or not */
-    std::map<std::string, std::map<unsigned int, bool>>
-                                                     m_eclClusterMasks; /**< Map of masks of values for each ECLCluster to be used in ROE interpretation or not */
+                                                     m_eclClusterMasks; /**< Map of ECLCLuster masks (set of rules for ECLClusters) */
     // TODO: add support for vee
 
     /**

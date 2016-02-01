@@ -5,6 +5,7 @@
 from . import python_modules
 from . import calculation
 from . import queue
+from . import viewer
 
 # System imports
 import os
@@ -88,6 +89,14 @@ class IPythonHandler:
         """
         self.log_files = []
         self.basf2 = Basf2Information()
+
+    @staticmethod
+    def style():
+        """
+        Show a nice styling :-)
+        """
+        styling_widget = viewer.StylingWidget()
+        styling_widget.show()
 
     def process(self, path, result_queue=None, random_seed=None):
         """

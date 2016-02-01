@@ -30,6 +30,38 @@ class Basf2Widget(object):
         display(a)
 
 
+class StylingWidget(Basf2Widget):
+    """The css string for styling the notebook."""
+    css_string = """
+        #notebook {
+            background-color: rgba(20, 166, 255, 0.3);
+            background-image: url("http://www-ekp.physik.uni-karlsruhe.de/~nbraun/belle.svg");
+            background-repeat: no-repeat;
+            background-position: right bottom;
+        }
+
+        #notebook-container {
+            width: 90%;
+        }
+
+        #menubar-container {
+            width: 90%;
+        }
+
+        #header-container {
+            width: 90%;
+        }
+        ''
+        """
+
+    """Create the styling widget."""
+
+    def create(self):
+        from IPython.core.display import HTML, display
+        html = HTML("<style>\n%s\n</style>" % self.css_string)
+        return html
+
+
 class ComparisonImageViewer(Basf2Widget):
 
     """

@@ -5,4 +5,4 @@ import validationserver_ng
 
 # Only execute if the file is not imported
 if __name__ == '__main__':
-    validationserver_ng.run_server()
+    validationserver_ng.run_server(parseCommandLine=True)

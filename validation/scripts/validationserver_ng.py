@@ -4,8 +4,10 @@ import json
 import json_objects
 import os.path
 import time
+import argparse
 import logging
 import queue
+import webbrowser
 from multiprocessing import Process, Queue
 from validationplots import create_plots
 import functools
@@ -24,7 +26,6 @@ def get_json_object_list(results_folder, json_file_name):
 
     search_string = results_folder + "/*/" + json_file_name
 
-    print("search string " + search_string)
     found_revs = glob(search_string)
     found_rev_labels = []
 
@@ -47,7 +48,6 @@ def get_revision_list(results_folder):
     """
     search_string = results_folder + "/*/revision.json"
 
-    print("search string " + search_string)
     found_revs = glob(search_string)
     found_rev_labels = []
 
@@ -166,6 +166,14 @@ class ValidationRoot(object):
         return {"progress_key": progress_key}
 
     @cherrypy.expose
+    def index(self):
+        """
+        forward to the static landing page if
+        the default url is used (like http://localhost:8080/)
+        """
+        raise cherrypy.HTTPRedirect("/static/validation.html")
+
+    @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
     def create_comparison_status(self):
@@ -251,7 +259,33 @@ def setup_gzip_compression(path, cherry_config):
                                                           'application/json']})
 
 
-def run_server():
+def parse_cmd_line_arguments():
+    """!
+    Sets up a parser for command line arguments,
+    parses them and returns the arguments.
+    @return: An object containing the parsed command line arguments.
+    Arguments are accessed like they are attributes of the object,
+    i.e. [name_of_object].[desired_argument]
+    """
+
+    # Set up the command line parser
+    parser = argparse.ArgumentParser()
+
+    # Define the accepted command line flags and read them in
+    parser.add_argument("-ip", "--ip", help="The IP address on which the"
+                        "server starts. Default is '127.0.0.1'.",
+                        type=str, default='127.0.0.1')
+    parser.add_argument("-p", "--port", help="The port number on which"
+                        " the server starts. Default is '8000'.",
+                        type=str, default=8000)
+    parser.add_argument("-v", "--view", help="Open validation website"
+                        " in the system's default browser.",
+                        action='store_true')
+    # Return the parsed arguments!
+    return parser.parse_args()
+
+
+def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False):
 
     # Setup options for logging
     logging.basicConfig(level=logging.DEBUG,
@@ -279,7 +313,7 @@ def run_server():
     var_b2_local_dir = "BELLE2_LOCAL_DIR"
 
     if var_b2_local_dir not in os.environ:
-        print("{} hast to be set, exiting".format(var_b2_local_dir))
+        logging.fatal("{} hast to be set, exiting".format(var_b2_local_dir))
         return
 
     # get local directory of the belle 2 release
@@ -316,7 +350,27 @@ def run_server():
         'tools.staticdir.content_types': {'log': 'text/plain'}}
     setup_gzip_compression("/results", cherry_config)
 
-    cherrypy.quickstart(ValidationRoot(results_folder=results_folder, comparison_folder=comparison_folder), '/', cherry_config)
+    # Define the server address and port
+    # only if we got some specific
+    if parseCommandLine:
+        # Parse command line arguments
+        cmd_arguments = parse_cmd_line_arguments()
+
+        ip = cmd_arguments.ip
+        port = int(cmd_arguments.port)
+        openSite = cmd_arguments.view
+
+    cherrypy.config.update({'server.socket_host': ip,
+                            'server.socket_port': port,
+                            })
+    logging.info("Server: Starting HTTP server on {0}:{1}".format(ip, port))
+
+    if openSite:
+        webbrowser.open("http://" + ip + ":" + str(port))
+
+    cherrypy.quickstart(ValidationRoot(results_folder=results_folder,
+                                       comparison_folder=comparison_folder),
+                        '/', cherry_config)
 
 
 if __name__ == '__main__':

@@ -35,7 +35,7 @@ namespace Belle2 {
         return varSet.at(m_chosenVariable);
       }
 
-      virtual void exposeParameters(ModuleParamList* parameterList, const std::string& prefix = "")
+      virtual void exposeParameters(ModuleParamList* parameterList, const std::string& prefix = "") override
       {
         parameterList->addParameter(prefix + "chosenVariable", m_chosenVariable,
                                     "Choose the name of the variable that will be put out as a weight.");

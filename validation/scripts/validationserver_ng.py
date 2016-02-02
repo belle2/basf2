@@ -11,8 +11,6 @@ import webbrowser
 from multiprocessing import Process, Queue
 from validationplots import create_plots
 import functools
-from cherrypy.lib.static import serve_file
-
 
 g_plottingProcesses = {}
 

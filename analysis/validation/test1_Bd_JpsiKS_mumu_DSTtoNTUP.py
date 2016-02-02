@@ -17,6 +17,9 @@ from stdCharged import *
 
 inputMdst('../Bd_JpsiKS_mumu_GENSIMRECtoDST.dst.root')
 loadStdCharged()
+# fillParticleList('mu-:all','')
+# fillParticleList('pi-:all','')
+
 
 reconstructDecay('J/psi -> mu-:all mu+:all', '2.8 < M < 3.3')
 matchMCTruth('J/psi')

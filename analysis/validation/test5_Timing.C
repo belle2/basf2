@@ -1,6 +1,6 @@
 /*
 <header>
-  <input>GenericB_GENSIMRECtoDST.dst.root,DSTtoMDST.mdst.root,MDSTtoUDST.udst.root,UDSTtoNTUP.ntup.root</input>
+  <input>GenericB_GENSIMRECtoDST.dst.root,DSTtoMDST.mdst.root,MDSTtoUDST.udst.root,UDSTtoNTUP.ntup.root,FileEventSizes.root</input>
   <output>Timing.root</output>
   <contact>Luis Pesantex, pesantez@uni-bonn.de</contact>
 </header>

@@ -225,6 +225,7 @@ int main(int argc, char** argv)
   nb->TrainNet();
 
   fflush(stdout);
+  fclose(log_stream);
   dup2(original, fileno(stdout));
   close(original);
 

@@ -105,7 +105,7 @@ void PXDClusterRescueNNModule::getPXDClusterTrainingVariables(const PXDCluster* 
 
   // get pixels charge as vector
   unsigned int pixelsNum = pixels.size();
-  float pixelsCharge[pixelsNum];
+  std::vector<float> pixelsCharge(pixelsNum);
 
   for (unsigned int p = 0; p < pixelsNum; p++) {
     pixelsCharge[p] = pixels[p]->getCharge();

@@ -85,7 +85,7 @@ void PXDClusterGetNNDataModule::event()
 
   // go through clusters
   int NumTrainingVariables = m_PXDClusterRescueNN.getNumTrainingVariables();
-  float pxdClusterVariables[NumTrainingVariables];
+  std::vector<float> pxdClusterVariables(NumTrainingVariables);
   bool isValid;
 
   for (auto && pxdCluster : pxdClusters) {
@@ -95,7 +95,7 @@ void PXDClusterGetNNDataModule::event()
     // if PXCluster is valid save training variables to file
     if (isValid) {
       // load trainings variables from PXDCluster
-      m_PXDClusterRescueNN.getPXDClusterTrainingVariables(&pxdCluster, pxdClusterVariables);
+      m_PXDClusterRescueNN.getPXDClusterTrainingVariables(&pxdCluster, pxdClusterVariables.data());
 
       // write training variables to file
       for (int p = 0; p < NumTrainingVariables; p++) {

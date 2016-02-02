@@ -48,7 +48,7 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
 
     with splinter.Browser() as browser:
         # Visit URL
-        url = "localhost:8080/static/validation.html"
+        url = "localhost:8000/static/validation.html"
         browser.visit(url)
 
         if len(browser.title) == 0:

@@ -237,7 +237,6 @@ void VXDCDCMergerAnalysisModule::event()
   TVector3 vxdmom(-10., -10., -10.);
   TVector3 vxd_xmin(-1000., -1000., -1000.);
   TVector3 vxd_pmin(-10., -10., -10.);
-  //double merge_radius = m_merge_radius;
 
   unsigned int matched_track = 0;
   unsigned int recovered_track = 0;

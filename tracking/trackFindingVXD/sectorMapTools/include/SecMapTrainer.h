@@ -292,7 +292,10 @@ namespace Belle2 {
         configData.vIP.Z(),
         configData.mField),
       m_filterMill(),
-      m_rootInterface(configData.secMapName, rngAppendix)
+      m_rootInterface(configData.secMapName, rngAppendix),
+      m_expNo(std::numeric_limits<unsigned>::max()),
+      m_runNo(std::numeric_limits<unsigned>::max()),
+      m_evtNo(std::numeric_limits<unsigned>::max())
     {
       // stretch the cuts:
 //       m_config.pTCuts.first -= m_config.pTCuts.first * m_config.pTSmear;

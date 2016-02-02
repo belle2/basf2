@@ -142,7 +142,12 @@ namespace Belle2 {
 /////////////////////////////////////////////////////////////////////////// member functions:
 
     /** constructor, expects to get a vector of names for filters. */
-    FilterValueDataSet(std::vector<std::string> filterNames)
+    FilterValueDataSet(std::vector<std::string> filterNames) :
+      expNo(std::numeric_limits<unsigned>::max()),
+      runNo(std::numeric_limits<unsigned>::max()),
+      evtNo(std::numeric_limits<unsigned>::max()),
+      trackNo(std::numeric_limits<unsigned>::max()),
+      pdg(std::numeric_limits<int>::max())
     {
       for (auto name : filterNames) {
         m_values.insert({name, std::numeric_limits<double>::max()});

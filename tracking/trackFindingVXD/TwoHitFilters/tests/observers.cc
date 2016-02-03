@@ -345,7 +345,7 @@ namespace VXDTFObserversTest {
 
       output += vec2str(aKey->second);
 
-      return std::move(output);
+      return output;
     }
 
 
@@ -358,7 +358,7 @@ namespace VXDTFObserversTest {
         output += " " + std::to_string(entry);
       }
 
-      return std::move(output);
+      return output;
     }
   protected:
     std::map< Key, AcceptRejectPair> m_container; /**< collects the data */
@@ -608,7 +608,7 @@ namespace VXDTFObserversTest {
       if (collectedIDS.size() == 1) {
         newKey.first = collectedIDS[0].first;
         newKey.second = { collectedIDS[0].second };
-        return std::move(newKey);
+        return newKey;
       }
 
       newKey.first = false;
@@ -617,7 +617,7 @@ namespace VXDTFObserversTest {
         newKey.second.push_back(entry.second);
       }
 
-      return std::move(newKey);
+      return newKey;
     }
 
 
@@ -658,7 +658,7 @@ namespace VXDTFObserversTest {
         output += " " + std::to_string(entry);
       }
 
-      return std::move(output);
+      return output;
     }
   };
 

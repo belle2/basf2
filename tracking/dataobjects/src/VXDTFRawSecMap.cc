@@ -519,7 +519,7 @@ VXDTFRawSecMapTypedef::IDVector VXDTFRawSecMap::getLayersOfSecMap()
   std::sort(layerIDs.begin(), layerIDs.end());
 
   // WARNING TODO: better: for each sector, know distance to origin, store secID and distance as pair (sorted by distance) and return that (-> another function can find out which layer jumps are acceptable...)
-  return std::move(layerIDs);
+  return layerIDs;
 }
 
 void VXDTFRawSecMap::addDistances(VXDTFRawSecMapTypedef::SectorDistancesMap& aMap)

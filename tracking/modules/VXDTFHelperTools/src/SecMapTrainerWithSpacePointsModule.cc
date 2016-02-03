@@ -1597,7 +1597,7 @@ SecMapTrainerWithSPNames::VXDTrack SecMapTrainerWithSpacePointsModule::convertSP
 
   newTrack.addHit(newVirtualHit);
 
-  return std::move(newTrack);
+  return newTrack;
 } /**< converts to internal data structure and attaches it to given secMap */
 
 

@@ -104,7 +104,7 @@ namespace Belle2 {
       for (unsigned iD : m_idChain) {
         out += FullSecID(iD).getFullSecString() + " ";
       }
-      return std::move(out);
+      return out;
     }
 
 
@@ -118,7 +118,7 @@ namespace Belle2 {
     {
       if (size() < b.size()) return 0;
 
-      unsigned nIdentical;
+      unsigned nIdentical = 0;
       for (unsigned idA : m_idChain) {
         for (unsigned idB : b) {
           if (areTheSameSector(idA, idB)) nIdentical++;
@@ -163,7 +163,7 @@ namespace Belle2 {
                   << FullSecID(m_idChain[i]).getFullSecString())
         }
       }
-      return std::move(outerOnes);
+      return outerOnes;
     }
 
 
@@ -189,7 +189,7 @@ namespace Belle2 {
       for (auto& id : m_idChain) {
         ids.push_back(FullSecID(id));
       }
-      return std::move(ids);
+      return ids;
     }
   }; // class SubGraphID
 

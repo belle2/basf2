@@ -87,7 +87,7 @@ namespace Belle2 {
       for (const auto& entry : m_minMaxValues) {
         out += entry.first + " " + entry.second.print() + " _||_ ";
       }
-      return std::move(out);
+      return out;
     }
 
     /** returns iD of this graph*/
@@ -157,7 +157,7 @@ namespace Belle2 {
         if (sensor != FullSecID(sector).getVxdID()) continue;
         foundIDs.push_back(FullSecID(sector));
       }
-      return std::move(foundIDs);
+      return foundIDs;
     }
   };
 }

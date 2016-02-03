@@ -110,7 +110,7 @@ namespace Belle2 {
         branch.update(entry);
         iDs.push_back(branch.value);
       }
-      return std::move(iDs);
+      return iDs;
     }
 
 

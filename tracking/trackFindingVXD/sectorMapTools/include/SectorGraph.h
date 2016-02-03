@@ -74,7 +74,7 @@ namespace Belle2 {
       for (const auto& entry : m_subgraphs) {
         out += entry.second.print() + "\n";
       }
-      return std::move(out);
+      return out;
     }
 
     /** returns removed occurances. */
@@ -221,7 +221,7 @@ namespace Belle2 {
         foundIDs.insert(foundIDs.end(), sectorsFound.begin(), sectorsFound.end());
       }
       B2DEBUG(1, "getAllFullSecIDsOfSensor: VxdID " << sensor << " has " << foundIDs.size() << " sectors in this graph")
-      return std::move(foundIDs);
+      return foundIDs;
     }
 
     /// returns a const reference to the filterTypes stored in this graph

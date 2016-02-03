@@ -99,7 +99,7 @@ namespace Belle2 {
       strippedRawSecMap.push_back(secPack);
     }
 
-    return std::move(strippedRawSecMap);
+    return strippedRawSecMap;
   }
 
 

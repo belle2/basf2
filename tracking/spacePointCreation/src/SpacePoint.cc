@@ -164,7 +164,7 @@ vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible() const
 
   B2DEBUG(50, "SpacePoint::getGenfitCompatible(): collected " << collectedMeasurements.size() << " meaturements")
 
-  return move(collectedMeasurements);
+  return collectedMeasurements;
 }
 
 
@@ -238,7 +238,7 @@ B2Vector3<SpacePoint::SpBaseType> SpacePoint::getGlobalCoordinates(const std::pa
                                                        0
                                                      )
                                                    );
-  return std::move(globalCoords);
+  return globalCoords;
 //   return aSensorInfo->pointToGlobal(
 //                 TVector3(
 //                   hitLocal.first,

@@ -268,8 +268,7 @@ namespace Belle2 {
         FullSecID fullSecID = secIDAndSPpair.first;
         B2DEBUG(20, "SecMapTrainer::convertSPTC: found fullSecID: " << fullSecID.getFullSecString())
 
-        newTrack.addHit(std::move(
-                          SecMapTrainerHit(fullSecID, secIDAndSPpair.second->getPosition())));
+        newTrack.addHit(SecMapTrainerHit(fullSecID, secIDAndSPpair.second->getPosition()));
       }
 
       // add vertex (but without real vertexPosition, since origin is assumed)

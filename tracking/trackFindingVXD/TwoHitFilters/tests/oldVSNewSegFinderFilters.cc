@@ -321,7 +321,7 @@ namespace VXDTFsegFinderTest {
     twoHitFilterBox.resetValues(outerHit2, innerHit);
 //  B2WARNING(" outerHit2 vs innerHit old/new: " << twoHitFilterBox.calcSlopeRZ() << "/" << SlopeRZ().value(outerSP2, innerSP))
     EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), sRZ.value(outerSP2, innerSP));
-    EXPECT_NE(twoHitFilterBox.calcSlopeRZ(), sRZ.value(outerSP2,
+    EXPECT_EQ(twoHitFilterBox.calcSlopeRZ(), sRZ.value(outerSP2,
                                                        innerSP)); // they are float equal but not double equal
 
 

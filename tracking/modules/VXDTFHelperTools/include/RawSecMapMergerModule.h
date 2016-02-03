@@ -15,7 +15,6 @@
 
 #include "tracking/trackFindingVXD/FilterTools/Shortcuts.h"
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
-#include <tracking/trackFindingVXD/environment/FilterSetTypes.h>
 #include <tracking/dataobjects/SectorMapConfig.h>
 #include <tracking/trackFindingVXD/sectorMapTools/MinMaxCollector.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SectorMap.h>
@@ -137,7 +136,7 @@ namespace Belle2 {
 
 
     /** for debugging purposes: print VXDTFFilters into a file of name of the sectorMapConfig. */
-    void printVXDTFFilters(const VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& filters, std::string configName,
+    void printVXDTFFilters(const VXDTFFilters<SpacePoint>& filters, std::string configName,
                            unsigned int nHitCombinations, bool print2File);
 
 
@@ -150,33 +149,33 @@ namespace Belle2 {
     template <class FilterType> void getSegmentFilters(
       const SectorMapConfig& config,
       SectorGraph<FilterType>& mainGraph,
-      VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>* xHitFilters,
+      VXDTFFilters<SpacePoint>* xHitFilters,
       int nSecChainLength);
 
 
     /// WARNING TODO clean up and documentation!
-    template <class FilterType> void add2HitFilters(VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& filterContainer,
+    template <class FilterType> void add2HitFilters(VXDTFFilters<SpacePoint>& filterContainer,
                                                     SubGraph<FilterType>& subGraph, const SectorMapConfig&  config);
 
 
     /// WARNING TODO clean up and documentation!
-    template <class FilterType> void add3HitFilters(VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& filterContainer,
+    template <class FilterType> void add3HitFilters(VXDTFFilters<SpacePoint>& filterContainer,
                                                     SubGraph<FilterType>& subGraph, const SectorMapConfig&  config);
 
 
     /// WARNING TODO clean up and documentation!
-    template <class FilterType> void add4HitFilters(VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& filterContainer,
+    template <class FilterType> void add4HitFilters(VXDTFFilters<SpacePoint>& filterContainer,
                                                     SubGraph<FilterType>& subGraph, const SectorMapConfig&  config);
 
 
     /// WARNING TODO clean up and documentation!
     template <class FilterType> unsigned addAllSectorsToSecMapThingy(const SectorMapConfig& config, SectorGraph<FilterType>& mainGraph,
-        VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& segFilters);
+        VXDTFFilters<SpacePoint>& segFilters);
 
 
     /// cross-check if everything is working as expected:
     template <class FilterType> void testSegmentFilters(const SectorMapConfig& config, SectorGraph<FilterType>& mainGraph,
-                                                        VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& segFilters)
+                                                        VXDTFFilters<SpacePoint>& segFilters)
     {
       B2DEBUG(1, "testSegmentFilters - now testing config: " << config.secMapName);
 #include <vxd/geometry/SensorInfoBase.h>
@@ -280,7 +279,7 @@ namespace Belle2 {
 
     /// WARNING TODO: Filter-> String to big->unsigned is better (or FilterID)
     /** does everything needed for given chainLength of sectors (e.g.: 2 -> twoHitFilters)*/
-    void processSectorCombinations(const SectorMapConfig& config, VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>* xHitFilters,
+    void processSectorCombinations(const SectorMapConfig& config, VXDTFFilters<SpacePoint>* xHitFilters,
                                    unsigned secChainLength)
     {
       B2INFO("processSectorCombinations: training map " << config.secMapName << " with secChainLength: " << secChainLength)
@@ -541,7 +540,7 @@ namespace Belle2 {
      */
     virtual void initialize()
     {
-      StoreObjPtr< SectorMap<SpacePoint, Belle2::TwoHitFilterSet> > sectorMap("", DataStore::c_Persistent);
+      StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);
       B2INFO("RawSecMapMerger::initialize():");
 
       // loop over all the setups in the sectorMap:
@@ -552,7 +551,7 @@ namespace Belle2 {
 
         if (config.secMapName != "lowTestRedesign") { continue; } // TODO WARNING DEBUG we do not want to run more than one run yet!
 
-        VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>* xHitFilters = new VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>;
+        VXDTFFilters<SpacePoint>* xHitFilters = new VXDTFFilters<SpacePoint>;
 
         B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 2-hit-combinations:\n\n")
         processSectorCombinations(config, xHitFilters, 2);

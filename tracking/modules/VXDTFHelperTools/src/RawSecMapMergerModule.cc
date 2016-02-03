@@ -268,10 +268,10 @@ void RawSecMapMergerModule::printData(
 
 
 
-void RawSecMapMergerModule::printVXDTFFilters(const VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& filters,
+void RawSecMapMergerModule::printVXDTFFilters(const VXDTFFilters<SpacePoint>& filters,
                                               std::string configName, unsigned int nHitCombinations, bool print2File)
 {
-  SecMapHelper::printStaticSectorRelations<SpacePoint, Belle2::TwoHitFilterSet>(filters , configName , nHitCombinations, print2File);
+  SecMapHelper::printStaticSectorRelations<SpacePoint>(filters , configName , nHitCombinations, print2File);
 }
 
 
@@ -299,7 +299,7 @@ std::vector<VxdID> RawSecMapMergerModule::getCompatibleVxdIDs(const SectorMapCon
 
 
 template <class FilterType> unsigned RawSecMapMergerModule::addAllSectorsToSecMapThingy(const SectorMapConfig& config,
-    SectorGraph<FilterType>& mainGraph, VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& segFilters)
+    SectorGraph<FilterType>& mainGraph, VXDTFFilters<SpacePoint>& segFilters)
 {
   // get all sensors relevant for this secMap:
   std::vector<VxdID> vxdIDs = getCompatibleVxdIDs(config);
@@ -393,7 +393,7 @@ template <class FilterType> unsigned RawSecMapMergerModule::addAllSectorsToSecMa
 template <class FilterType> void RawSecMapMergerModule::getSegmentFilters(
   const SectorMapConfig& config,
   SectorGraph<FilterType>& mainGraph,
-  VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>* xHitFilters,
+  VXDTFFilters<SpacePoint>* xHitFilters,
   int nSecChainLength)
 {
   if (xHitFilters->size() == 0) {
@@ -423,7 +423,7 @@ template <class FilterType> void RawSecMapMergerModule::getSegmentFilters(
 
 
 
-template <class FilterType> void RawSecMapMergerModule::add2HitFilters(VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>&
+template <class FilterType> void RawSecMapMergerModule::add2HitFilters(VXDTFFilters<SpacePoint>&
     filterContainer, SubGraph<FilterType>& subGraph, const SectorMapConfig& config)
 {
   // WARNING evil hack -> SelectionVariables themselves should be able to tell their own names!
@@ -445,7 +445,7 @@ template <class FilterType> void RawSecMapMergerModule::add2HitFilters(VXDTFFilt
 //  named3D).getMax() << ", ")
   // // // //     B2DEBUG(1, namedXY << ": " << filterCutsMap.at(namedXY).getMin() << "/" << filterCutsMap.at(namedXY).getMax() << ", ")
   // // // //     B2DEBUG(1,  namesRZ << ": " << filterCutsMap.at(namesRZ).getMin() << "/" << filterCutsMap.at(namesRZ).getMax() << ", ")
-  VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>::twoHitFilter_t friendSectorsSegmentFilter =
+  VXDTFFilters<SpacePoint>::twoHitFilter_t friendSectorsSegmentFilter =
     // JKL Jan 2016 - minimal working example:
     ((filterCutsMap.at(named3D).getMin() <= Distance3DSquared<SpacePoint>() <= filterCutsMap.at(named3D).getMax()
      ).observe(ObserverPrintResults()));
@@ -493,7 +493,7 @@ template <class FilterType> void RawSecMapMergerModule::add2HitFilters(VXDTFFilt
 
 
 
-template <class FilterType> void RawSecMapMergerModule::add3HitFilters(VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>&
+template <class FilterType> void RawSecMapMergerModule::add3HitFilters(VXDTFFilters<SpacePoint>&
     filterContainer, SubGraph<FilterType>& subGraph, const SectorMapConfig&  config)
 {
   const auto& filterCutsMap = subGraph.getFinalQuantileValues();
@@ -508,7 +508,7 @@ template <class FilterType> void RawSecMapMergerModule::add3HitFilters(VXDTFFilt
   }
   B2DEBUG(1, "SubGraph " << subGraph.getID().print() << " - filter:min/max: " << filterVals)
 
-  VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>::threeHitFilter_t threeHitFilter =
+  VXDTFFilters<SpacePoint>::threeHitFilter_t threeHitFilter =
     // JKL Jan 2016 - minimal working example:
     ((filterCutsMap.at("Angle3DSimple").getMin() <= Angle3DSimple<SpacePoint>() <= filterCutsMap.at("Angle3DSimple").getMax()
      ).observe(Observer3HitPrintResults()));
@@ -531,7 +531,7 @@ template <class FilterType> void RawSecMapMergerModule::add3HitFilters(VXDTFFilt
 
 
 template <class FilterType> void RawSecMapMergerModule::add4HitFilters(
-  VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>& /*filterContainer*/, SubGraph<FilterType>& /*subGraph*/,
+  VXDTFFilters<SpacePoint>& /*filterContainer*/, SubGraph<FilterType>& /*subGraph*/,
   const SectorMapConfig&  /*config*/)
 {
 

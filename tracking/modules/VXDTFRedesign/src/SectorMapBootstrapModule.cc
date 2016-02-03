@@ -22,7 +22,6 @@
 
 #include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
-#include "tracking/trackFindingVXD/environment/FilterSetTypes.h"
 #include "tracking/modules/VXDTFRedesign/SectorMapBootstrapModule.h"
 #include "tracking/vxdCaTracking/PassData.h"
 #include "tracking/dataobjects/VXDTFSecMap.h"
@@ -53,7 +52,7 @@ SectorMapBootstrapModule::SectorMapBootstrapModule() : Module()
 void
 SectorMapBootstrapModule::initialize()
 {
-  StoreObjPtr< SectorMap<SpacePoint, Belle2::TwoHitFilterSet> > sectorMap("", DataStore::c_Persistent);
+  StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);
   sectorMap.registerInDataStore(DataStore::c_DontWriteOut);
   sectorMap.create();
   bootstrapSectorMap();
@@ -158,8 +157,8 @@ void
 SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
 {
 
-  StoreObjPtr< SectorMap<SpacePoint, Belle2::TwoHitFilterSet> > newSectorMap("", DataStore::c_Persistent);
-  VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>* segmentFilters = new VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>();
+  StoreObjPtr< SectorMap<SpacePoint> > newSectorMap("", DataStore::c_Persistent);
+  VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
   segmentFilters->setConfig(config);
 
   CompactSecIDs compactSecIds;

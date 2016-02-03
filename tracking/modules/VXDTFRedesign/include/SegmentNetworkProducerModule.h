@@ -24,7 +24,6 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/FullSecID.h>
 #include <tracking/dataobjects/SectorMapConfig.h>
-#include "tracking/trackFindingVXD/environment/FilterSetTypes.h"
 #include <tracking/trackFindingVXD/sectorMapTools/SectorMap.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
 
@@ -50,7 +49,7 @@ namespace Belle2 {
   public:
     /** to improve readability of the code, here the definition of the static sector type. */
 //     using StaticSectorType = StaticSectorDummy;
-    using StaticSectorType = VXDTFFilters<SpacePoint, TwoHitFilterSet>::staticSector_t;
+    using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
 
     // TODO WARNING JKL
     /** dummy declaration to get the module compiling without real static sectorMaps */
@@ -270,11 +269,11 @@ namespace Belle2 {
 
     // input containers
     /** contains the sectorMap and with it the VXDTFFilters. */
-    StoreObjPtr< SectorMap<SpacePoint, TwoHitFilterSet> >
-    m_sectorMap; // = StoreObjPtr< SectorMap<SpacePoint, TwoHitFilterSet> >("", DataStore::c_Persistent);
+    StoreObjPtr< SectorMap<SpacePoint> >
+    m_sectorMap; // = StoreObjPtr< SectorMap<SpacePoint> >("", DataStore::c_Persistent);
 
     /** contains all sectorCombinations and Filters including cuts. */
-    VXDTFFilters<SpacePoint, TwoHitFilterSet>* m_vxdtfFilters = nullptr;
+    VXDTFFilters<SpacePoint>* m_vxdtfFilters = nullptr;
 
     /** contains storeArrays with SpacePoints in it */
     std::vector<StoreArray<Belle2::SpacePoint> > m_spacePoints;

@@ -3,7 +3,8 @@
  * Copyright(C) 2015 - Belle II Collaboration                                   *
  *                                                                              *
  * Author: The Belle II Collaboration                                           *
- * Contributors: Eugenio Paoloni                                                *
+ * Contributors: Eugenio Paoloni,                                               *
+ *               Jakob Lettenbichler                                            *
  *                                                                              *
  * This software is provided "as is" without any warranty.                      *
  *******************************************************************************/
@@ -11,6 +12,8 @@
 #define VXDTFFILTERS_HH
 
 #include "tracking/dataobjects/FullSecID.h"
+
+#include <tracking/spacePointCreation/SpacePoint.h>
 #include "tracking/trackFindingVXD/TwoHitFilters/Distance1DZ.h"
 #include "tracking/trackFindingVXD/TwoHitFilters/Distance1DZTemp.h"
 #include "tracking/trackFindingVXD/TwoHitFilters/Distance3DNormed.h"
@@ -21,8 +24,8 @@
 
 #include "tracking/trackFindingVXD/ThreeHitFilters/Angle3DSimple.h"
 #include "tracking/trackFindingVXD/FilterTools/Shortcuts.h"
-//#include "tracking/trackFindingVXD/FilterTools/ObserverPrintResults.h"
-//#include "tracking/trackFindingVXD/FilterTools/Observer.h" // empty observer
+#include "tracking/trackFindingVXD/FilterTools/ObserverPrintResults.h"
+#include "tracking/trackFindingVXD/FilterTools/Observer.h" // empty observer
 #include "tracking/trackFindingVXD/FilterTools/Observer3HitPrintResults.h"
 
 #include <tracking/dataobjects/SectorMapConfig.h>
@@ -39,7 +42,7 @@
 namespace Belle2 {
 
 
-  template<class point_t, class TwoHitFilterSet_t>
+  template<class point_t>
   class VXDTFFilters {
   public:
 
@@ -58,7 +61,10 @@ namespace Belle2 {
 // // //  typedef
 // // //  decltype((0. <= Distance3DSquared<point_t>()   <= 0.).observe(ObserverPrintResults())) twoHitFilter_t; // filter2sp_t
 
-    using twoHitFilter_t = TwoHitFilterSet_t;
+    /// minimal working 2-hits-example used for redesign of VXDTF.
+    typedef decltype((0. <= Distance3DSquared<Belle2::SpacePoint>() <= 0.).observe(ObserverPrintResults())) twoHitFilter_t;
+
+//     using twoHitFilter_t = TwoHitFilterSet_t;
 
 //      typedef
 //     typedef VXDTFHit point_t;

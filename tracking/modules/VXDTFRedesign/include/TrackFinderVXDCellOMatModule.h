@@ -127,7 +127,7 @@ namespace Belle2 {
 
 
     /** contains the sectorMap (only needed for loading the configuration). */
-    StoreObjPtr< SectorMap<SpacePoint, Belle2::TwoHitFilterSet> >
+    StoreObjPtr< SectorMap<SpacePoint> >
     m_sectorMap; // = StoreObjPtr< SectorMap<SpacePoint> >("", DataStore::c_Persistent);
 
 

@@ -28,7 +28,7 @@ namespace Belle2 {
 
     /** to improve readability of the code, here the definition of the static sector type. */
 //     using StaticSectorType = StaticSectorDummy;
-    using StaticSectorType = VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>::staticSector_t;
+    using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
 
     /** pointer to sector */
     ActiveSector<StaticSectorType, TrackNode>* sector;

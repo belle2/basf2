@@ -41,7 +41,7 @@ namespace Belle2 {
   public:
     /** to improve readability of the code, here the definition of the static sector type. */
 //     using StaticSectorType = StaticSectorDummy;
-    using StaticSectorType = VXDTFFilters<SpacePoint, Belle2::TwoHitFilterSet>::staticSector_t;
+    using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
   protected:
     /** ************************* DATA MEMBERS ************************* */
 
@@ -135,7 +135,7 @@ namespace Belle2 {
 
 
     // last member changed: added metaInfo for DirectedNodeNetwork
-    ClassDef(DirectedNodeNetworkContainer, 9)
+    ClassDef(DirectedNodeNetworkContainer, 10)
   };
 
 } //Belle2 namespace

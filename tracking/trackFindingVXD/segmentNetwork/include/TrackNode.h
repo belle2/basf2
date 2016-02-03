@@ -13,7 +13,6 @@
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSectorDummy.h>
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
-#include <tracking/trackFindingVXD/environment/FilterSetTypes.h>
 #include <tracking/trackFindingVXD/segmentNetwork/ActiveSector.h>
 
 #include <string>

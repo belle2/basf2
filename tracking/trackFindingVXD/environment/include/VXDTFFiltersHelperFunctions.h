@@ -70,8 +70,8 @@ namespace Belle2 {
     * - print2File prints to a file if yes or to screen if no
     * - suppressDeadSectors discards sectors without links if set to true
      */
-    template<class HitType, class TwoHitFilterSetType>
-    void printStaticSectorRelations(const VXDTFFilters<HitType, TwoHitFilterSetType>& filters, std::string configName,
+    template<class HitType>
+    void printStaticSectorRelations(const VXDTFFilters<HitType>& filters, std::string configName,
                                     unsigned int nHitCombinations = 2, bool print2File = true, bool suppressDeadSectors = true)
     {
       if (nHitCombinations <2 or nHitCombinations > 4)

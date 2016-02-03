@@ -30,7 +30,7 @@ input = register_module('SeqRootInput')
 # output
 output = register_module('PrintDataTemplate')
 
-unpack = register_module('CDCUnpacker')
+# unpack = register_module('CDCUnpacker')
 
 dump = register_module('RootOutput')
 prog = register_module('Progress')
@@ -40,8 +40,8 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(input)
-# main.add_module(output)
-main.add_module(dump)
+main.add_module(output)
+# main.add_module(dump)
 # main.add_module(unpack)
 main.add_module(prog)
 

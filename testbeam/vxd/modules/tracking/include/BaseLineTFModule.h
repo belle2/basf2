@@ -15,7 +15,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <testbeam/vxd/dataobjects/TelCluster.h>
 #include <vxd/dataobjects/VxdID.h>
 
 // tracking:
@@ -58,8 +57,8 @@ namespace genfit { class TrackCand; }
 namespace Belle2 {
   /** The BaseLineTFModule is a simplistic track finder for testbeams.
    *
-   * It can use both VXD Detectors (SVD and PXD) to search for tracks and test structures like telescope sensors as well.
-   * needed imput: PXD/SVDClusters and/or TelClusters
+   * It can use both VXD Detectors (SVD and PXD) to search for tracks.
+   * needed imput: PXD/SVDClusters.
    * output: genfit::TrackCand
    */
   class BaseLineTFModule : public Module {
@@ -70,14 +69,19 @@ namespace Belle2 {
 
 
     typedef std::pair<unsigned int, VXDSector* > secMapEntry; /**< represents an entry of the MapOfSectors */
-    typedef std::map<unsigned int, SensorStruct> ActiveSensorsOfEvent; /**< is map where adresses to each activated sensor (key->int = uniID/vxdID) are stored and all clusters which can be found on them */
-    typedef std::list<unsigned int> BrokenSensorsOfEvent; /**< atm a list containing the keys to all sensors where number of u and v clusters don't fit */
+    typedef std::map<unsigned int, SensorStruct>
+    ActiveSensorsOfEvent; /**< is map where adresses to each activated sensor (key->int = uniID/vxdID) are stored and all clusters which can be found on them */
+    typedef std::list<unsigned int>
+    BrokenSensorsOfEvent; /**< atm a list containing the keys to all sensors where number of u and v clusters don't fit */
 
     typedef std::vector<PassData*> PassSetupVector; /**< contains all passes used for track reconstruction */
-    typedef boost::chrono::high_resolution_clock boostClock; /**< used for measuring time comsumption */ // high_resolution_clock, process_cpu_clock
-    typedef boost::chrono::microseconds boostNsec; /**< defines time resolution (currently mictroseconds) */ // microseconds, milliseconds
+    typedef boost::chrono::high_resolution_clock
+    boostClock; /**< used for measuring time comsumption */ // high_resolution_clock, process_cpu_clock
+    typedef boost::chrono::microseconds
+    boostNsec; /**< defines time resolution (currently mictroseconds) */ // microseconds, milliseconds
 
-    typedef boost::tuple<double, double, VXDTFHit*> HitExtraTuple; /**< get<0>: distance to origin, get<1>: distance to seedHit, get<2> pointer to hit. SeedHit is outermost hit of detector and will be used for cosmic search */
+    typedef boost::tuple<double, double, VXDTFHit*>
+    HitExtraTuple; /**< get<0>: distance to origin, get<1>: distance to seedHit, get<2> pointer to hit. SeedHit is outermost hit of detector and will be used for cosmic search */
 
     /// will be moved to an extra file REDESIGN:
     /** SensorStruct needed for SVDCluster sorting, stores u and v clusters of Sensor  */
@@ -123,7 +127,6 @@ namespace Belle2 {
       /** StandardConstructor for the EventInfoPackage - sets all values to zero */
       EventInfoPackage():
         numPXDCluster(0),
-        numTELCluster(0),
         numSVDCluster(0),
         numSVDHits(0),
         segFinderActivated(0),
@@ -141,9 +144,9 @@ namespace Belle2 {
       std::string Print();
 
       /** clearing entries, nice after initialisation (TODO: convert into constructor for autoClear) */
-      void clear() {
+      void clear()
+      {
         numPXDCluster = 0;
-        numTELCluster = 0;
         numSVDCluster = 0;
         numSVDHits = 0;
         segFinderActivated = 0;
@@ -162,7 +165,6 @@ namespace Belle2 {
       TimeInfo sectionConsumption; /**< one-event-time-consumption */
       int evtNumber; /**< number of current event */
       int numPXDCluster; /**< number of pxdClusters (=number of pxd hits when tf in pxd is activated) */
-      int numTELCluster; /**< number of TELClusters (=number of TEL hits when tf in TEL is activated) */
       int numSVDCluster; /**< number of svdClusters */
       //
       int numSVDHits; /**< number of possible svd-cluster-combinations. every combination of any pass will be counted  */
@@ -221,7 +223,8 @@ namespace Belle2 {
     genfit::TrackCand generateGFTrackCand(VXDTFTrackCandidate* currentTC);
 
     /** reset all reused containers and delete others which are existing only for one event. */
-    void cleanEvent(PassData* currentPass) {
+    void cleanEvent(PassData* currentPass)
+    {
       /** REDESIGNCOMMENT FINDSENSORS4CLUSTER 1:
        * * short:
        *
@@ -238,12 +241,13 @@ namespace Belle2 {
        */
       currentPass->cleanPass();
 
-      for (VXDTFTrackCandidate * aTC : m_allTCsOfEvent) { delete  aTC; }
+      for (VXDTFTrackCandidate* aTC : m_allTCsOfEvent) { delete  aTC; }
       m_allTCsOfEvent.clear();
     }
 
     /** general Function to write data into a root file*/
-    void writeToRootFile(double pValue, double chi2, double circleRadius, int ndf) {
+    void writeToRootFile(double pValue, double chi2, double circleRadius, int ndf)
+    {
       /** REDESIGNCOMMENT FINDSENSORS4CLUSTER 1:
        * * short:
        *
@@ -290,7 +294,8 @@ namespace Belle2 {
     /** executes the calculations needed for the circleFit */
     bool doTheCircleFit(PassData* thisPass, VXDTFTrackCandidate* aTc, int nHits, int tcCtr, int addDegreesOfFreedom = 1);
 
-    void resetCountersAtBeginRun() {
+    void resetCountersAtBeginRun()
+    {
       /** REDESIGNCOMMENT FINDSENSORS4CLUSTER 1:
        * * short:
        *
@@ -365,10 +370,12 @@ namespace Belle2 {
 
 
   protected:
-    TCsOfEvent m_allTCsOfEvent; /**< carries links to really all track candidates found within event (used for deleting TrackCandidates at end of event) TODO: check whether use of m_tcVector can not be merged this one. Seems like redundant steps*/
+    TCsOfEvent
+    m_allTCsOfEvent; /**< carries links to really all track candidates found within event (used for deleting TrackCandidates at end of event) TODO: check whether use of m_tcVector can not be merged this one. Seems like redundant steps*/
 
     /// module_parameters:
-    std::string m_PARAMsectorSetup; /**< lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../testbeam/vxd/data/XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' or 'setupWeigh' instead.*/
+    std::string
+    m_PARAMsectorSetup; /**< lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../testbeam/vxd/data/XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' or 'setupWeigh' instead.*/
 
     bool m_PARAMactivateZigZagXY; /**< activates/deactivates current filter zzXY for each pass individually */
     bool m_PARAMactivateZigZagXYWithSigma; /**< activates/deactivates current filter zzXY with sigmas for each pass individually */
@@ -392,9 +399,8 @@ namespace Belle2 {
 
     int m_chargeSignFactor; /**< particle dependent. for leptons it is 1, for other particles it's -1... */
 
-    bool m_usePXDHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for PXD, this value is set to true */
-    bool m_useSVDHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for SVD, this value is set to true */
-    bool m_useTELHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for TEL, this value is set to true */
+    bool m_usePXDHits; /**< when having more than one pass per event, sector maps using PXD or SVD can be set independently. To produce TFHits for PXD, this value is set to true */
+    bool m_useSVDHits; /**< when having more than one pass per event, sector maps using PXD or SVD can be set independently. To produce TFHits for SVD, this value is set to true */
     bool m_BackwardFilter; /**< determines whether the kalman filter moves inwards or backwards, bool means inwards */
 
     double m_PARAMtuneCutoffs; /**< for rapid changes of cutoffs (no personal xml files needed), reduces/enlarges the range of the cutoffs in percent (lower and upper values are changed by this value). Only valid in range -50% < x < +1000% */
@@ -406,7 +412,8 @@ namespace Belle2 {
     double m_PARAMsmearSigma; /**< bigger values deliver broader distribution*/
     bool m_TESTERexpandedTestingRoutines; /**< set true if you want to export expanded infos of TCs for further analysis */
     bool m_PARAMwriteToRoot; /**< if true, a rootFile named by m_PARAMrootFileName will be filled with info */
-    std::vector<std::string> m_PARAMrootFileName; /**< only two entries accepted, first one is the root filename, second one is 'RECREATE' or 'UPDATE' which is the write mode for the root file, parameter is used only if 'writeToRoot' = true */
+    std::vector<std::string>
+    m_PARAMrootFileName; /**< only two entries accepted, first one is the root filename, second one is 'RECREATE' or 'UPDATE' which is the write mode for the root file, parameter is used only if 'writeToRoot' = true */
 
     TFile* m_rootFilePtr; /**< pointer at root file used for p-value-output */
     TTree* m_treeTrackWisePtr; /**< pointer at root tree used for information stored once per track (e.g. p-value-output) */
@@ -417,16 +424,18 @@ namespace Belle2 {
     double m_rootCircleRadius; /**< used for storing the circle radii calculated by the circle fitter in a root file */
     int m_rootNdf; /**< used for storing numbers of degrees of freedom in a root file */
 
-    std::string m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit' */
+    std::string
+    m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit' */
     int m_calcQiType; /**< is set by m_PARAMcalcQIType and defines which qi type shall be calculated */
-    std::string m_PARAMcalcSeedType; /**< allows you to chose the way, the seed-mometa of the TC's shall be calculated. currently supported: 'helixFit', 'straightLine' */
+    std::string
+    m_PARAMcalcSeedType; /**< allows you to chose the way, the seed-mometa of the TC's shall be calculated. currently supported: 'helixFit', 'straightLine' */
     int m_calcSeedType; /**< is set by m_PARAMcalcSeedType and defines which seed type shall be calculated */
     std::string m_PARAMgfTrackCandsColName;       /**< TrackCandidates collection name */
     std::string m_PARAMinfoBoardName;             /**< InfoContainer collection name */
     std::string m_PARAMpxdClustersName;         /** name of storeArray containing pxd clusters */
-    std::string m_PARAMtelClustersName;         /** name of storeArray containing tel clusters */
     std::string m_PARAMsvdClustersName;         /** name of storeArray containing svd clusters */
-    std::string m_PARAMnameOfInstance;           /**< Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names */
+    std::string
+    m_PARAMnameOfInstance;           /**< Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names */
 
     /// the following variables are nimimal testing routines within the TF
     int m_TESTERnoHitsAtEvent;  /**< counts number of times, where there were no hits at the event */
@@ -442,7 +451,8 @@ namespace Belle2 {
     int m_TESTERcountTotalUsedIndicesFinal; /**< counts number of indices used by TCs which survived until the end of event */
     int m_TESTERcountTotalUsedHitsFinal; /**< counts number of indices used by TCs which survived until the end of event */
     TimeInfo m_TESTERtimeConsumption; /**< a struct to store amount of time needed for special blocks of the program */
-    std::vector<EventInfoPackage> m_TESTERlogEvents; /**< a list containing some information about each event (time consumption and quality) */
+    std::vector<EventInfoPackage>
+    m_TESTERlogEvents; /**< a list containing some information about each event (time consumption and quality) */
     int m_TESTERbadSectorRangeCounterForClusters; /**< counts number of times when only 1 cluster has been found on a complete sensor (therefore no 2D hits possible) */
     int m_TESTERclustersPersSectorNotMatching; /**< counts number of times when numofUclusters and nVclusters per sensor do not match */
     int m_TESTERovercrowdedStrangeSensors; /**< counts number of times when there was a strange sensor (svd-only: mismatching number of u/v clusters) but too many hits on it to be able to try to rescue Clusters by forming 1D-VXDTFHits */

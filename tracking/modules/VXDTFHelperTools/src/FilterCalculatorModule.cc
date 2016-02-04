@@ -84,7 +84,7 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
 
 //   addParam("detectorType", m_PARAMdetectorType, "defines which detector type has to be exported. VXD: -1, PXD: 0, SVD: 1", int(1));
   addParam("detectorType", m_PARAMdetectorType,
-           "defines which detector type has to be exported. Like geometry, simply add the detector types you want to include in the track candidates. Currently supported: PXD, SVD, VXD and TEL",
+           "defines which detector type has to be exported. Like geometry, simply add the detector types you want to include in the track candidates. Currently supported: PXD, SVD and VXD",
            supportedDetectors);
 
   addParam("maxXYvertexDistance", m_PARAMmaxXYvertexDistance,
@@ -100,7 +100,7 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
            originVec);
 
   addParam("testBeam", m_PARAMtestBeam,
-           "if normal mode (0) does not produce a full sectormap, try setting it to testBeam-mode = 1 (testbeam 1 does not assume that the IP is at the origin and ignores curler) or even testBeam-mode = 2 (next to mode 1 features it ignores tracks jumping e.g. from layer 1 to 7 (telescopes), should only be used with care since some bad cases can not be caught that way)",
+           "if normal mode (0) does not produce a full sectormap, try setting it to testBeam-mode = 1 (testbeam 1 does not assume that the IP is at the origin and ignores curler) or even testBeam-mode = 2 (next to mode 1 features it ignores tracks jumping e.g. from layer 1 to 6, should only be used with care since some bad cases can not be caught that way)",
            int(0));
 
   addParam("multiHitsAllowed", m_PARAMmultiHitsAllowed,
@@ -306,12 +306,6 @@ void FilterCalculatorModule::initialize()
 
   m_numOfLayers = 0;
   stringstream detectorNames; // same as above but a little bit more readable for B2XY-output...
-  if (std::find(m_PARAMdetectorType.begin(), m_PARAMdetectorType.end(), "TEL") != m_PARAMdetectorType.end()) {
-    m_numOfLayers += 6; /// WARNING hardcoded values, is there a way to get this information automatically?
-    m_detectorName += "TEL";
-    detectorNames << "TEL ";
-    m_useTEL = true;
-  }
   if (std::find(m_PARAMdetectorType.begin(), m_PARAMdetectorType.end(), "PXD") != m_PARAMdetectorType.end()) {
     m_numOfLayers += 2; /// WARNING hardcoded values, is there a way to get this information automatically?
     m_detectorName += "PXD";
@@ -334,7 +328,6 @@ void FilterCalculatorModule::initialize()
 
 
   StoreArray<MCParticle>::required();
-  if (m_useTEL) { StoreArray<TelTrueHit>::required(); }
   if (m_usePXD) { StoreArray<PXDTrueHit>::required(); }
   if (m_useSVD) { StoreArray<SVDTrueHit>::required(); }
 
@@ -437,8 +430,6 @@ void FilterCalculatorModule::event()
   int numOfPxdTrueHits = aPxdTrueHitArray.getEntries();
   StoreArray<SVDTrueHit> aSvdTrueHitArray("");
   int numOfSvdTrueHits = aSvdTrueHitArray.getEntries();
-  StoreArray<TelTrueHit> aTelTrueHitArray("");
-  int numOfTelTrueHits = aTelTrueHitArray.getEntries();
 
 
   if (numOfMcParticles == 0) {
@@ -453,14 +444,9 @@ void FilterCalculatorModule::event()
     B2WARNING("event " << m_eventCounter << ": there are no SVDTrueHits")
     return;
   }
-  if (numOfTelTrueHits == 0 && m_useTEL == true) {
-    B2WARNING("event " << m_eventCounter << ": there are no TelTrueHits")
-    return;
-  }
 
   RelationIndex<MCParticle, PXDTrueHit> relationMcPxdTrueHit;
   RelationIndex<MCParticle, SVDTrueHit> relationMcSvdTrueHit;
-  RelationIndex<MCParticle, TelTrueHit> relationMcTelTrueHit;
 
   if (m_PARAMtracksPerEvent > numOfMcParticles) {
     B2ERROR("FilterCalculatorModule: input parameter wrong (tracks per event) - reset to maximum value")
@@ -468,7 +454,7 @@ void FilterCalculatorModule::event()
   }
 
   B2DEBUG(5, "FilterCalculatorModule, event " << m_eventCounter << ": size of arrays, SvdTrueHit: " << numOfSvdTrueHits <<
-          ", mcPart: " << numOfMcParticles << ", PxDTrueHits: " << numOfPxdTrueHits << ", TelTrueHits: " << numOfTelTrueHits /*<< endl*/);
+          ", mcPart: " << numOfMcParticles << ", PxDTrueHits: " << numOfPxdTrueHits);
 
 
   TVector3 oldpGlobal;
@@ -558,23 +544,6 @@ void FilterCalculatorModule::event()
         }
       } // now each hit knows in which direction the particle goes, in which sector it lies and where it is
     } // finished adding PXD-Hits
-
-    if (m_useTEL == true) { // want TELhits
-      B2DEBUG(20, "I'm in TEL and chosen detectorType is: " << Belle2::printMyStdVector(m_PARAMdetectorType))
-
-      RelationIndex<MCParticle, TelTrueHit>::range_from iterPairMcTel = relationMcTelTrueHit.getElementsFrom(aMcParticlePtr);
-      for (const auto& relElement : iterPairMcTel) {
-        const TelTrueHit* const aSiTrueHitPtr = relElement.to;
-
-        bool creatingHitSuccessfull = createSectorAndHit(Const::invalidDetector, pdg, aSiTrueHitPtr, newTrack,
-                                                         thisSecMap);/// createSectorAndHit
-
-        if (creatingHitSuccessfull == true) {
-          m_telHitCounter++;
-          B2DEBUG(20, "adding new TEL hit of track " << iPart)
-        }
-      } // now each hit knows in which direction the particle goes, in which sector it lies and where it is
-    } // finished adding TEL-Hits
 
     if (m_useSVD == true) { // want SVDhits
       B2DEBUG(20, "I'm in SVD and chosen detectorType is: " << Belle2::printMyStdVector(m_PARAMdetectorType))
@@ -1517,9 +1486,9 @@ void FilterCalculatorModule::terminate()
   B2INFO(m_badTrackletCounter <<
          " tracklets had to be discarded because of crazy flight (forward and backward movement all the time)")
 
-  B2INFO(" there were " << float(totalTrackletCounter) / float(m_eventCounter) << "/" << float(m_telHitCounter) / float(
-           m_eventCounter) << "/" << float(m_pxdHitCounter) / float(m_eventCounter) << "/" << float(m_svdHitCounter) / float(
-           m_eventCounter) << " tracklets/telHits/pxdHits/svdHits per event and " << m_totalHitCounter << " hits total")
+  B2INFO(" there were " << float(totalTrackletCounter) / float(m_eventCounter) << "/" << float(m_pxdHitCounter) / float(
+           m_eventCounter) << "/" << float(m_svdHitCounter) / float(
+           m_eventCounter) << " tracklets/pxdHits/svdHits per event and " << m_totalHitCounter << " hits total")
   B2INFO(" there were " << m_longTrackCounter << " Tracks having more than " << m_numOfLayers * 2 << " hits...")
   B2INFO(" there were " << m_longTrackletCounter << " Tracklets having more than " << m_numOfLayers * 2 << " hits!!!")
   B2INFO(m_badFilterValueCtr << " times, a filter produced invalid results ('nan')")

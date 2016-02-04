@@ -114,10 +114,6 @@ BaseLineTFModule::BaseLineTFModule() : Module()
            m_PARAMinfoBoardName,
            "Name of container used for data transfer to TFAnalyzer, only used when TESTERexpandedTestingRoutines == true",
            string(""));
-  addParam("telClustersName",
-           m_PARAMtelClustersName,
-           "Name of storeArray containing tel clusters (only valid when using secMap supporting tel clusters)",
-           string("TELClusters"));
   addParam("pxdClustersName",
            m_PARAMpxdClustersName,
            "Name of storeArray containing pxd clusters (only valid when using secMap supporting pxd clusters)",
@@ -297,11 +293,11 @@ void BaseLineTFModule::event()
    * this section does have dependencies of the testbeam package
    *
    ** dependency of module parameters (global):
-   * m_PARAMtelClustersName, m_PARAMpxdClustersName, m_PARAMsvdClustersName,
+   * m_PARAMpxdClustersName, m_PARAMsvdClustersName,
    * m_PARAMgfTrackCandsColName, m_TESTERexpandedTestingRoutines,
    *
    ** dependency of global in-module variables:
-   * m_useTELHits, m_usePXDHits, m_useSVDHits,
+   * m_usePXDHits, m_useSVDHits,
    * m_TESTERnoHitsAtEvent, m_TESTERtimeConsumption, m_TESTERlogEvents,
    *
    ** dependency of global stuff just because of B2XX-output or debugging only:
@@ -313,10 +309,6 @@ void BaseLineTFModule::event()
 
   // importing hits
 
-  StoreArray<TelCluster> aTelClusterArray(m_PARAMtelClustersName);
-  int nTelClusters = 0;
-  if (m_useTELHits == true) { nTelClusters = aTelClusterArray.getEntries(); }
-
   StoreArray<PXDCluster> aPxdClusterArray(m_PARAMpxdClustersName);
   int nPxdClusters = 0;
   if (m_usePXDHits == true) { nPxdClusters = aPxdClusterArray.getEntries(); }
@@ -327,11 +319,9 @@ void BaseLineTFModule::event()
 
   thisInfoPackage.numPXDCluster = nPxdClusters;
   thisInfoPackage.numSVDCluster = nSvdClusters;
-  thisInfoPackage.numTELCluster = nTelClusters;
-  int nTotalClusters = nPxdClusters + nSvdClusters + nTelClusters; // counts number of clusters total
+  int nTotalClusters = nPxdClusters + nSvdClusters; // counts number of clusters total
 
-  B2DEBUG(3, "event: " << m_eventCounter << ": nPxdClusters: " << nPxdClusters << ", nSvdClusters: " << nSvdClusters <<
-          ", nTelClusters: " << nTelClusters);
+  B2DEBUG(3, "event: " << m_eventCounter << ": nPxdClusters: " << nPxdClusters << ", nSvdClusters: " << nSvdClusters);
 
   boostClock::time_point stopTimer = boostClock::now();
   if (nTotalClusters == 0) {
@@ -367,7 +357,7 @@ void BaseLineTFModule::event()
   /// Section 3b
   /** REDESIGNCOMMENT EVENT 3:
    * * short:
-   * Section 3b - store ClusterInfo for all Clusters (PXD, Tel & SVD)
+   * Section 3b - store ClusterInfo for all Clusters (PXD & SVD)
    *
    ** long (+personal comments):
    *
@@ -383,19 +373,10 @@ void BaseLineTFModule::event()
    */
 
   boostClock::time_point timeStamp = boostClock::now();
-  vector<ClusterInfo> clustersOfEvent(nTelClusters + nPxdClusters + nSvdClusters); /// contains info which tc uses which clusters
-
-  for (int i = 0; i < nTelClusters; ++i) {
-    ClusterInfo newCluster(i, i , false, false, true, NULL, NULL, aTelClusterArray[i]);
-    B2DEBUG(50, "Tel clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())
-    clustersOfEvent[i] = newCluster;
-    B2DEBUG(50, " TELcluster " << i << " in position " << i << " stores real Cluster " << clustersOfEvent.at(
-              i).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent.at(
-              i).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
-  }
+  vector<ClusterInfo> clustersOfEvent(nPxdClusters + nSvdClusters); /// contains info which tc uses which clusters
 
   for (int i = 0; i < nPxdClusters; ++i) {
-    ClusterInfo newCluster(i, i + nTelClusters, true, false, false, aPxdClusterArray[i], NULL);
+    ClusterInfo newCluster(i, i, true, false, false, aPxdClusterArray[i], NULL);
     B2DEBUG(50, "Pxd clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())
     clustersOfEvent[i] = newCluster;
     B2DEBUG(50, " PXDcluster " << i << " in position " << i << " stores real Cluster " << clustersOfEvent.at(
@@ -407,12 +388,12 @@ void BaseLineTFModule::event()
 
 
   for (int i = 0; i < nSvdClusters; ++i) {
-    ClusterInfo newCluster(i, i + nPxdClusters + nTelClusters, false, true, false, NULL, aSvdClusterArray[i]);
+    ClusterInfo newCluster(i, i + nPxdClusters, false, true, false, NULL, aSvdClusterArray[i]);
     B2DEBUG(50, "Svd clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())
-    clustersOfEvent[i + nPxdClusters + nTelClusters] = newCluster;
-    B2DEBUG(50, " SVDcluster " << i << " in position " << i + nPxdClusters + nTelClusters << " stores real Cluster " <<
-            clustersOfEvent.at(i + nPxdClusters + nTelClusters).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " <<
-            clustersOfEvent.at(i + nPxdClusters + nTelClusters).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
+    clustersOfEvent[i + nPxdClusters] = newCluster;
+    B2DEBUG(50, " SVDcluster " << i << " in position " << i + nPxdClusters << " stores real Cluster " <<
+            clustersOfEvent.at(i + nPxdClusters).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " <<
+            clustersOfEvent.at(i + nPxdClusters).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
 
   } // the position in the vector is NOT the index it has stored (except if there are no PXDClusters)
 
@@ -458,7 +439,6 @@ void BaseLineTFModule::event()
 
   // count maximum number of allowed clusters to execute the baseline TF, is number of layers*2 (for svd it's number of Layers*4 because of 1D-Clusters):
   int nTotalClustersThreshold = 0;
-  if (m_useTELHits == true) { nTotalClustersThreshold += 7; }
   if (m_usePXDHits == true) { nTotalClustersThreshold += 4; }
   if (m_useSVDHits == true) { nTotalClustersThreshold += 16;}
 
@@ -477,8 +457,6 @@ void BaseLineTFModule::event()
       VxdID currentID;
       if (aCluster.isSVD() == true) {
         currentID = aCluster.getSVDCluster()->getSensorID();
-      } else if (aCluster.isTEL() == true) {
-        currentID = aCluster.getTELCluster()->getSensorID();
       } else if (aCluster.isPXD() == true) {
         currentID = aCluster.getPXDCluster()->getSensorID();
       }
@@ -529,7 +507,7 @@ void BaseLineTFModule::event()
       int nTotalIndices = 0, nTotalHitsInTCs = 0;
 
       for (VXDTFTrackCandidate* aTC : m_baselinePass.tcVector) {
-        nTotalIndices += aTC->getTELHitIndices().size() + aTC->getPXDHitIndices().size() + aTC->getSVDHitIndices().size();
+        nTotalIndices += aTC->getPXDHitIndices().size() + aTC->getSVDHitIndices().size();
         nTotalHitsInTCs += aTC->size();
         genfit::TrackCand gfTC = generateGFTrackCand(aTC);                                          /// generateGFTrackCand
 
@@ -743,22 +721,8 @@ void BaseLineTFModule::endRun()
       m_TESTERlogEvents; // copying original since we want to change the internal order now for several times and do not want to break the original
     vector<EventInfoPackage> infoQ(
       5); // for each value we want to find the key figures, we store one entry. first is min, third is median, last is max
-    stringstream telClusterStream, pxdClusterStream, svdClusterStream, svdHitStream, twoHitCombiStream, twoHitActivatedStream,
+    stringstream pxdClusterStream, svdClusterStream, svdHitStream, twoHitCombiStream, twoHitActivatedStream,
                  twoHitDiscardedStream;
-
-    // sort by nTelClusters:
-    std::sort(
-      logEventsCopy.begin(),
-      logEventsCopy.end(),
-      [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numTELCluster < b.numTELCluster; }
-    );
-    infoQ.at(0).numTELCluster = logEventsCopy.at(0).numTELCluster;
-    infoQ.at(1).numTELCluster = logEventsCopy.at(q25).numTELCluster;
-    infoQ.at(2).numTELCluster = logEventsCopy.at(median).numTELCluster;
-    infoQ.at(3).numTELCluster = logEventsCopy.at(q75).numTELCluster;
-    infoQ.at(4).numTELCluster = logEventsCopy.at(numLoggedEvents - 1).numTELCluster;
-    telClusterStream << infoQ[0].numTELCluster << " / " << infoQ[1].numTELCluster << " / " << infoQ[2].numTELCluster << " / " <<
-                     infoQ[3].numTELCluster << " / " << infoQ[4].numTELCluster << "\n";
 
     // sort by nPxdClusters:
     std::sort(
@@ -850,7 +814,6 @@ void BaseLineTFModule::endRun()
            "Mean track length (indices/hits): " << float(m_TESTERcountTotalUsedIndicesFinal) / float(m_TESTERcountTotalTCsFinal) << "/" <<
            float(m_TESTERcountTotalUsedHitsFinal) / float(m_TESTERcountTotalTCsFinal) << "\n\
 	min / q0.25 / median / q0.75 / max\n" <<
-           "nTelClusters           " << telClusterStream.str() <<
            "nPxdClusters           " << pxdClusterStream.str() <<
            "nSVDClusters           " << svdClusterStream.str() <<
            "nSVDClusterCombis      " << svdHitStream.str() <<
@@ -1034,14 +997,11 @@ genfit::TrackCand BaseLineTFModule::generateGFTrackCand(VXDTFTrackCandidate* cur
   TVectorD stateSeed(6); //(x,y,z,px,py,pz)
   TMatrixDSym covSeed(6);
   int pdgCode = currentTC->getPDGCode();
-  const vector<int>& telHits = currentTC->getTELHitIndices();
   const vector<int>& pxdHits = currentTC->getPXDHitIndices();
   const vector<int>& svdHits = currentTC->getSVDHitIndices();
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {
     stringstream printIndices;
-    printIndices << "TEL: ";
-    for (int index : telHits) { printIndices << index << " "; }
     printIndices << "PXD: ";
     for (int index : pxdHits) { printIndices << index << " "; }
     printIndices << ", SVD: ";
@@ -1067,8 +1027,6 @@ genfit::TrackCand BaseLineTFModule::generateGFTrackCand(VXDTFTrackCandidate* cur
   //newGFTrackCand.set6DSeedAndPdgCode(stateSeed, pdgCode, covSeed);
   if (gotNan == true) {
     stringstream hitIndices;
-    hitIndices << "TEL: ";
-    for (int index : telHits) { hitIndices << index << " "; }
     hitIndices << "PXD: ";
     for (int index : pxdHits) { hitIndices << index << " "; }
     hitIndices << ", SVD: ";
@@ -1100,7 +1058,7 @@ genfit::TrackCand BaseLineTFModule::generateGFTrackCand(VXDTFTrackCandidate* cur
         newGFTrackCand.addHit(Const::SVD, hitIndex);
 //        hitIDs.push_back(hitIndex);
       }
-    } else { // TEL and PXD behave the same
+    } else {
       hitIndex = aHit->getClusterIndexUV();
       if (hitIndex != -1) {
         newGFTrackCand.addHit(aHit->getDetectorType(), hitIndex);
@@ -1207,7 +1165,7 @@ bool BaseLineTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passI
 
   for (ClusterInfo& aClusterInfo : clusters) {
     bool isPXD = aClusterInfo.isPXD();
-    bool isTEL = aClusterInfo.isTEL();
+
     if (isPXD == true) { // there are pxdHits, only if PXDHits were allowed. pxd-hits are easy, can be stored right away
 
       hitLocal.SetXYZ(aClusterInfo.getPXDCluster()->getU(), aClusterInfo.getPXDCluster()->getV(), 0);
@@ -1227,23 +1185,6 @@ bool BaseLineTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passI
       VXDTFHit newHit = VXDTFHit(newPosition, 1, NULL, NULL, &aClusterInfo, Const::PXD, aSecID.getFullSecID(), aVxdID, 0);
       passInfo->fullHitsVector.push_back(newHit);
 
-    } else if (isTEL == true) {
-      hitLocal.SetXYZ(aClusterInfo.getTELCluster()->getU(), aClusterInfo.getTELCluster()->getV(), 0);
-      sigmaVec.SetXYZ(aClusterInfo.getTELCluster()->getUSigma(), aClusterInfo.getTELCluster()->getVSigma(), 9);
-
-      aVxdID = aClusterInfo.getTELCluster()->getSensorID();
-      aLayerID = aVxdID.getLayerNumber();
-      const VXD::SensorInfoBase& aSensorInfo = VXD::GeoCache::get(aVxdID);
-      newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
-      newPosition.hitSigma = aSensorInfo.vectorToGlobal(sigmaVec);
-      B2DEBUG(100, " baselineTF: pxdluster got global pos X/Y/Z: " << newPosition.hitPosition.X() << "/" << newPosition.hitPosition.Y() <<
-              "/" << newPosition.hitPosition.Z() << ", global var X/Y/Z: " << newPosition.hitSigma.X() << "/" << newPosition.hitSigma.Y() << "/"
-              << newPosition.hitSigma.Z())
-      newPosition.sigmaU = aClusterInfo.getTELCluster()->getUSigma();
-      newPosition.sigmaV = aClusterInfo.getTELCluster()->getVSigma();
-      FullSecID aSecID = FullSecID(aVxdID, false, 0);
-      VXDTFHit newHit = VXDTFHit(newPosition, 1, NULL, NULL, &aClusterInfo, Const::TEST, aSecID.getFullSecID(), aVxdID, 0);
-      passInfo->fullHitsVector.push_back(newHit);
     } else if ((m_useSVDHits == true) && (isPXD == false)) { // svd-hits are tricky, therefore several steps needed
       findSensor4Cluster(activatedSensors, aClusterInfo);                 /// findSensor4Cluster
     }
@@ -1871,7 +1812,7 @@ void BaseLineTFModule::prepareExternalTools()
    *
    ** dependency of module parameters (global):
    * m_PARAMgfTrackCandsColName, m_TESTERexpandedTestingRoutines, m_PARAMinfoBoardName,
-   * m_PARAMtelClustersName, m_PARAMpxdClustersName, m_PARAMsvdClustersName
+   * m_PARAMpxdClustersName, m_PARAMsvdClustersName
    *
    ** dependency of global in-module variables:
    *
@@ -1892,7 +1833,6 @@ void BaseLineTFModule::prepareExternalTools()
   }
 
 
-  StoreArray<TelCluster>::optional(m_PARAMtelClustersName);
   StoreArray<PXDCluster>::optional(m_PARAMpxdClustersName);
   StoreArray<SVDCluster>::optional(m_PARAMsvdClustersName);
 }
@@ -1919,7 +1859,7 @@ void BaseLineTFModule::setupBaseLineTF()
    * m_PARAMtuneDeltaPt, m_PARAMtuneCircleFit,
    *
    ** dependency of global in-module variables:
-   * m_usePXDHits, m_useSVDHits, m_useTELHits
+   * m_usePXDHits, m_useSVDHits
    *
    *
    ** dependency of global stuff just because of B2XX-output or debugging only:
@@ -1933,7 +1873,7 @@ void BaseLineTFModule::setupBaseLineTF()
   string detectorType;
   /// for each setup, fill parameters, calc numTotalLayers... TODO: failsafe implementation (currently no protection against bad user imput) lacks of style, longterm goal, export that procedure into a function
 
-  m_usePXDHits = false, m_useSVDHits = false, m_useTELHits = false;
+  m_usePXDHits = false, m_useSVDHits = false;
 
   m_baselinePass.sectorSetup = m_PARAMsectorSetup;
 
@@ -1985,13 +1925,7 @@ void BaseLineTFModule::setupBaseLineTF()
       2; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
 
   }
-  if (detectorType.find("TEL") != std::string::npos) { // using const::Test as Telescope setter
-    m_useTELHits = true;
-    m_baselinePass.useTELHits = true;
-    m_baselinePass.numTotalLayers +=
-      1; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
-  }
-  if (m_usePXDHits == false and m_useSVDHits == false and m_useTELHits == false) {
+  if (m_usePXDHits == false and m_useSVDHits == false) {
     B2ERROR(m_PARAMnameOfInstance << " with setting '" << chosenSetup << "': chosen detectorType via param 'detectorType' (" <<
             detectorType << ") is invalid, resetting value to standard (=VXD)")
     m_useSVDHits = true;

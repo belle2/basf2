@@ -44,12 +44,11 @@ namespace Belle2 {
       m_reserved(false),
       m_pxdCluster(NULL),
       m_svdCluster(NULL),
-      m_telCluster(NULL),
       m_collector_id(-1) {}
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use ThreeHitFilters when no sectormap is available */
     ClusterInfo(int clusterIndex, int ownIndex, bool isPXD, bool isSVD, bool isTEL, const PXDCluster* pCluster,
-                const SVDCluster* sCluster, const TelCluster* tCluster = NULL):
+                const SVDCluster* sCluster):
       m_bossTC(NULL),
       m_clusterIndex(clusterIndex),
       m_ownPositionInIndex(ownIndex),
@@ -59,7 +58,6 @@ namespace Belle2 {
       m_reserved(false),
       m_pxdCluster(pCluster),
       m_svdCluster(sCluster),
-      m_telCluster(tCluster),
       m_collector_id(-1)
     {
       /*
@@ -111,9 +109,6 @@ namespace Belle2 {
     /** returns pointer to the SVDCluster, is NULL if ->this is _not_ a SVDCluster */
     const SVDCluster* getSVDCluster() const { return m_svdCluster; }
 
-    /** returns pointer to the TELCluster, is NULL if ->this is _not_ a TELCluster */
-    const TelCluster* getTELCluster() const { return m_telCluster; }
-
     /** checks each TC whether it's alive or not. If there is more than one TC alive, it's overbooked and returned boolean is True*/
     bool isOverbooked();
 
@@ -150,7 +145,6 @@ namespace Belle2 {
     bool m_reserved; /**< means that an accepted TC uses this cluster and therefore no other TC is allowed to use it anymore */
     const PXDCluster* m_pxdCluster; /**< if isPXD = true, this member contains the pointer to the parenting PXDCluster */
     const SVDCluster* m_svdCluster; /**< if isSVD = true, this member contains the pointer to the parenting SVDCluster */
-    const TelCluster* m_telCluster; /**< if isTEL = true, this member contains the pointer to the parenting TELCluster */
 
     int m_collector_id; /**< Cluster in the Collector */
 

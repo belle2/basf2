@@ -18,7 +18,6 @@
 #include "tracking/dataobjects/FullSecID.h"
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <testbeam/vxd/dataobjects/TelTrueHit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <tracking/dataobjects/VXDTFRawSecMap.h> // needed for rootExport
@@ -125,7 +124,7 @@ namespace Belle2 {
       else { m_points2IP = false; }
     }
 
-    short int m_type;  /**< Const::PXD for PXD, Const::SVD for SVD, Const::IR for Primary vertex, Const::invalidDetector for Telescope */
+    short int m_type;  /**< Const::PXD for PXD, Const::SVD for SVD, Const::IR for Primary vertex */
     bool m_points2IP;  /**< true, if momentum vector of current hit points to the interaction point (particle is flying inwards at that moment), false if not*/
     std::string m_secID; /**< ID of sector containing this hit */
     int m_uniID; /**< ID of sensor containing this hit */
@@ -426,8 +425,6 @@ namespace Belle2 {
     {
       m_pxdHitCounter = 0;
       m_svdHitCounter = 0;
-      m_telHitCounter = 0;
-      m_useTEL = false;
       m_usePXD = false;
       m_useSVD = false;
       m_eventCounter = 0;
@@ -463,7 +460,7 @@ namespace Belle2 {
     int m_eventCounter; /**< knows current event number */
 //     int m_PARAMdetectorType; /**< sets detector type -1 for VXD, Const::PXD for PXD and Const::SVD for SVD */ WARNING OLD!
     std::vector<std::string>
-    m_PARAMdetectorType; /**< defines which detector type has to be exported. Like geometry, simply add the detector types you want to include in the track candidates. Currently supported: PXD, SVD, VXD and TEL */
+    m_PARAMdetectorType; /**< defines which detector type has to be exported. Like geometry, simply add the detector types you want to include in the track candidates. Currently supported: PXD, SVD and VXD */
     int m_longTrackCounter; /**< counts number of tracks having more than 30 hits */
     std::string m_detectorName; /**< string of accepted detector names */
     int m_longTrackletCounter; /**< counts tracklets having more than the theoretically possible number of hits (should therefore always be 0 )*/
@@ -569,10 +566,8 @@ namespace Belle2 {
     std::vector<int> m_trackLengthCounter; /**< counts the number of tracklets of each possible track-length occured during process */
     int m_pxdHitCounter; /**< counts total number of pxd true hits */
     int m_svdHitCounter; /**< counts total number of svd true hits */
-    int m_telHitCounter; /**< counts total number of telescope true hits */
     std::vector<int> m_trackletMomentumCounter;  /**< counts the number of tracklets for each sectorSetup */
     TVector3 m_origin; /**< this point in space is assumed to be the interaction point (no matter whether the real IP lies there) */
-    bool m_useTEL; /**< is set to true, if Telescope hits have to be used for tracking too */
     bool m_usePXD; /**< is set to true, if PXD hits have to be used for tracking too */
     bool m_useSVD; /**< is set to true, if SVD hits have to be used for tracking too */
   private:

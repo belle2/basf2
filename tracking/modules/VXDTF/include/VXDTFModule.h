@@ -15,7 +15,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <testbeam/vxd/dataobjects/TelCluster.h> /// WARNING produces dependency of testbeam package
 #include <vxd/dataobjects/VxdID.h>
 
 // tracking:
@@ -139,7 +138,6 @@ namespace Belle2 {
       EventInfoPackage():
         evtNumber(0),
         numPXDCluster(0),
-        numTELCluster(0),
         numSVDCluster(0),
         numSVDHits(0),
         segFinderActivated(0),
@@ -161,7 +159,6 @@ namespace Belle2 {
       {
         evtNumber = 0;
         numPXDCluster = 0;
-        numTELCluster = 0;
         numSVDCluster = 0;
         numSVDHits = 0;
         segFinderActivated = 0;
@@ -180,9 +177,7 @@ namespace Belle2 {
       TimeInfo sectionConsumption; /**< one-event-time-consumption */
       int evtNumber; /**< number of current event */
       int numPXDCluster; /**< number of pxdClusters (=number of pxd hits when tf in pxd is activated) */
-      int numTELCluster; /**< number of TELClusters (=number of TEL hits when tf in TEL is activated) */
       int numSVDCluster; /**< number of svdClusters */
-      //
       int numSVDHits; /**< number of possible svd-cluster-combinations. every combination of any pass will be counted  */
       int segFinderActivated; /**< number of segments which survived the segfinder. every segment of any pass will be counted  */
       int segFinderDiscarded; /**< number of segments which died in the segfinder. every segment of any pass will be counted  */
@@ -485,7 +480,6 @@ namespace Belle2 {
       m_TESTERclustersPersSectorNotMatching = 0;
       m_badFriendCounter = 0;
       m_totalPXDClusters = 0;
-      m_totalTELClusters = 0;
       m_totalSVDClusters = 0;
       m_totalSVDClusterCombis = 0;
       m_TESTERhighOccupancyCtr = 0;
@@ -741,7 +735,6 @@ namespace Belle2 {
 
     bool m_usePXDHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for PXD, this value is set to true */
     bool m_useSVDHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for SVD, this value is set to true */
-    bool m_useTELHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for TEL, this value is set to true */
 
     double m_PARAMtuneCutoffs; /**< for rapid changes of cutoffs (no personal xml files needed), reduces/enlarges the range of the cutoffs in percent (lower and upper values are changed by this value). Only valid in range -50% < x < +1000% */
 
@@ -749,7 +742,6 @@ namespace Belle2 {
     int m_badSectorRangeCounter; /**< counts number of hits which couldn't be attached to an existing sector of a pass */
     int m_badFriendCounter; /**< counts number of hits having no neighbour hits in friend sectors of current sector */
     int m_totalPXDClusters; /**< counts total number of PXDClusters during run */
-    int m_totalTELClusters; /**< counts total number of TELClusters during run */
     int m_totalSVDClusters; /**< counts total number of SVdClusters during run */
     int m_totalSVDClusterCombis; /**< counts total number of possible combinations of SVDClusters during run */
     int m_nSectorSetups; /**< stores info about number of sector setups loaded into the track finder */
@@ -796,7 +788,6 @@ namespace Belle2 {
     std::string m_PARAMgfTrackCandsColName;       /**< TrackCandidates collection name */
     std::string m_PARAMinfoBoardName;             /**< InfoContainer collection name */
     std::string m_PARAMpxdClustersName;         /**< name of storeArray containing pxd clusters */
-    std::string m_PARAMtelClustersName;         /**< name of storeArray containing tel clusters */
     std::string m_PARAMsvdClustersName;         /**< name of storeArray containing svd clusters */
     std::string
     m_PARAMnameOfInstance;           /**< Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names */

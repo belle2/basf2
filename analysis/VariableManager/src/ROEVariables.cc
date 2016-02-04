@@ -120,7 +120,7 @@ namespace Belle2 {
           return -999;
 
         // Get Mother
-        MCParticle* mcMother = mcParticle->getMother();
+        const MCParticle* mcMother = mcParticle->getMother();
 
         if (!mcMother)
           return -999;
@@ -132,7 +132,7 @@ namespace Belle2 {
           return -999;
 
         // Get the other B meson
-        MCParticle* mcROE;
+        MCParticle* mcROE = nullptr;
         if (mcDaughters[0]->getArrayIndex() == mcParticle->getArrayIndex())
           mcROE = mcDaughters[1];
         else
@@ -142,23 +142,26 @@ namespace Belle2 {
         const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         // Load unused ROE Tracks
-        const std::vector<Track*> roeTracks = roe->getTracks(maskName);
+        std::vector<Track*> roeTracks = roe->getTracks(maskName);
 
-        // Load ecl clusters
-        const std::vector<ECLCluster*> roeECL = roe->getECLClusters(maskName);
+        // Load unused ROE ECLClusters
+        std::vector<ECLCluster*> roeECL = roe->getECLClusters(maskName);
 
-        //const std::vector<KLMCluster*> roeKLM = roe->getNKLMClusters();
+        // TODO: in the future to load KLMClusters
+        //std::vector<const KLMCluster*> roeKLM = roe->getNKLMClusters();
 
-        std::set<MCParticle*> mcROEObjects;
+        StoreArray<MCParticle> mcParticles;
+        std::set<const MCParticle*> mcROEObjects;
 
+        // Fill Track MCParticles to std::set
         for (unsigned i = 0; i < roeTracks.size(); i++)
           if (roeTracks[i]->getRelated<MCParticle>())
             mcROEObjects.insert(roeTracks[i]->getRelated<MCParticle>());
 
-        // fill only photons with most likely MCParticle
+        // Fill only photon MCParticles which have good relations, copied from ParticleLoader until a better solution is established
         for (unsigned i = 0; i < roeECL.size(); i++)
-          if (roeECL[i]->isNeutral())
-          {
+        {
+          if (roeECL[i]->isNeutral()) {
             // ECLCluster can be matched to multiple MCParticles
             // order the relations by weights and set Particle -> multiple MCParticle relation
             // preserve the weight
@@ -169,20 +172,30 @@ namespace Belle2 {
               const MCParticle* relMCParticle = mcRelations[iMCParticle];
               double weight = mcRelations.weight(iMCParticle);
               if (relMCParticle)
-                if (relMCParticle->getPDG() == 22) // fill only photons
-                  weightsAndIndices.push_back(std::make_pair(relMCParticle->getArrayIndex(), weight));
+                weightsAndIndices.push_back(std::make_pair(relMCParticle->getArrayIndex(), weight));
             }
             // sort descending by weight
             std::sort(weightsAndIndices.begin(), weightsAndIndices.end(), [](const std::pair<int, double>& left,
             const std::pair<int, double>& right) {
               return left.second > right.second;
             });
-            // use first MCParticle
-            mcROEObjects.insert(roeECL[i]->getRelated<MCParticle>());
+
+            // insert MCParticle based on relation strength
+            for (unsigned int j = 0; j < weightsAndIndices.size(); j++) {
+              MCParticle* relMCParticle = mcParticles[weightsAndIndices[j].first];
+              double weight = weightsAndIndices[j].second;
+
+              // TODO: study this further and avoid hardcoded values
+              // set the relation only if the MCParticle's energy contribution
+              // to this cluster amounts to at least 25%
+              if (relMCParticle)
+                if (weight / roeECL[i]->getEnergy() > 0.20 &&  weight / relMCParticle->getEnergy() > 0.30 && relMCParticle->getPDG() == 22)
+                  mcROEObjects.insert(relMCParticle);
+            }
           }
+        }
 
         int flags = 0;
-
         checkMCParticleMissingFlags(mcROE, mcROEObjects, flags);
 
         return flags;
@@ -1181,55 +1194,71 @@ namespace Belle2 {
       return miss4vec;
     }
 
-    void checkMCParticleMissingFlags(MCParticle* mcp, std::set<MCParticle*> mcROEObjects, int& missingFlags)
+    void checkMCParticleMissingFlags(const MCParticle* mcp, std::set<const MCParticle*> mcROEObjects, int& missingFlags)
     {
       std::vector<MCParticle*> daughters = mcp->getDaughters();
       for (unsigned i = 0; i < daughters.size(); i++) {
-        if (MCMatching::isFSP(daughters[i]->getPDG())) {
-          if (mcROEObjects.find(daughters[i]) == mcROEObjects.end()) {
-            // electrons
-            if (abs(daughters[i]->getPDG()) == 11 and (missingFlags & 1) == 0)
-              missingFlags += 1;
 
-            // muons
-            else if (abs(daughters[i]->getPDG()) == 13 and (missingFlags & 2) == 0)
-              missingFlags += 2;
+        if (!daughters[i]->hasStatus(MCParticle::c_PrimaryParticle))
+          continue;
 
-            // pions
-            else if (abs(daughters[i]->getPDG()) == 211 and (missingFlags & 4) == 0)
-              missingFlags += 4;
+        if (mcROEObjects.find(daughters[i]) == mcROEObjects.end()) {
 
-            // kaons
-            else if (abs(daughters[i]->getPDG()) == 321 and (missingFlags & 8) == 0)
-              missingFlags += 8;
+          // photon
+          if (abs(daughters[i]->getPDG()) == 22 and (missingFlags & 1) == 0)
+            missingFlags += 1;
 
-            // protons
-            else if (abs(daughters[i]->getPDG()) == 2212 and (missingFlags & 16) == 0)
-              missingFlags += 16;
+          // electrons
+          else if (abs(daughters[i]->getPDG()) == 11 and (missingFlags & 2) == 0)
+            missingFlags += 2;
 
-            // neutrons
-            else if (abs(daughters[i]->getPDG()) == 2112 and (missingFlags & 32) == 0)
-              missingFlags += 32;
+          // muons
+          else if (abs(daughters[i]->getPDG()) == 13 and (missingFlags & 4) == 0)
+            missingFlags += 4;
 
-            // kshort
-            else if (abs(daughters[i]->getPDG()) == 310 and ((missingFlags & 64) == 0 or (missingFlags & 128) == 0)) {
-              std::vector<MCParticle*> ksDaug = daughters[i]->getDaughters();
-              if (ksDaug.size() == 2) {
-                // K_S0 -> pi+ pi-
-                if (abs(ksDaug[0]->getPDG()) == 211 and (missingFlags & 64) == 0)
-                  missingFlags += 64;
-                // K_S0 -> pi0 pi0
-                else if (abs(ksDaug[0]->getPDG()) == 111 and (missingFlags & 64) == 0)
+          // pions
+          else if (abs(daughters[i]->getPDG()) == 211 and (missingFlags & 8) == 0)
+            missingFlags += 8;
+
+          // kaons
+          else if (abs(daughters[i]->getPDG()) == 321 and (missingFlags & 16) == 0)
+            missingFlags += 16;
+
+          // protons
+          else if (abs(daughters[i]->getPDG()) == 2212 and (missingFlags & 32) == 0)
+            missingFlags += 32;
+
+          // neutrons
+          else if (abs(daughters[i]->getPDG()) == 2112 and (missingFlags & 64) == 0)
+            missingFlags += 64;
+
+          // kshort
+          else if (abs(daughters[i]->getPDG()) == 310 and ((missingFlags & 128) == 0 or (missingFlags & 256) == 0)) {
+            std::vector<MCParticle*> ksDaug = daughters[i]->getDaughters();
+            if (ksDaug.size() == 2) {
+              // K_S0 -> pi+ pi-
+              if (abs(ksDaug[0]->getPDG()) == 211 and (missingFlags & 128) == 0) {
+                if (mcROEObjects.find(ksDaug[0]) == mcROEObjects.end() or mcROEObjects.find(ksDaug[1]) == mcROEObjects.end())
                   missingFlags += 128;
               }
+              // K_S0 -> pi0 pi0
+              else if (abs(ksDaug[0]->getPDG()) == 111 and (missingFlags & 256) == 0) {
+                std::vector<MCParticle*> pi0Daug0 = ksDaug[0]->getDaughters();
+                std::vector<MCParticle*> pi0Daug1 = ksDaug[1]->getDaughters();
+                if (mcROEObjects.find(pi0Daug0[0]) == mcROEObjects.end() or
+                    mcROEObjects.find(pi0Daug0[1]) == mcROEObjects.end() or
+                    mcROEObjects.find(pi0Daug1[0]) == mcROEObjects.end() or
+                    mcROEObjects.find(pi0Daug1[1]) == mcROEObjects.end())
+                  missingFlags += 256;
+              }
             }
-
-            // klong
-            else if (abs(daughters[i]->getPDG()) == 130 and (missingFlags & 256) == 0)
-              missingFlags += 256;
           }
-        } else
-          checkMCParticleMissingFlags(daughters[i], mcROEObjects, missingFlags);
+
+          // klong
+          else if (abs(daughters[i]->getPDG()) == 130 and (missingFlags & 512) == 0)
+            missingFlags += 512;
+        }
+        checkMCParticleMissingFlags(daughters[i], mcROEObjects, missingFlags);
       }
     }
 

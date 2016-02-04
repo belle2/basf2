@@ -27,7 +27,7 @@ namespace Belle2 {
      */
     double isInRestOfEvent(const Particle* particle);
 
-    /**TODO:
+    /**
      * Returns number of tracks in the event minus in the current RestOfEvent object
      */
     double nRemainingTracksInRestOfEvent(const Particle* particle);
@@ -207,7 +207,7 @@ namespace Belle2 {
     /**
      * Helper function: Returns bit-pattern of flags corresponding to daughters of MCParticle missing in ROE
      */
-    void checkMCParticleMissingFlags(MCParticle* mcp, std::set<MCParticle*> mcROEObjects, int& missingFlags);
+    void checkMCParticleMissingFlags(const MCParticle* mcp, std::set<const MCParticle*> mcROEObjects, int& missingFlags);
 
   }
 } // Belle2 namespace

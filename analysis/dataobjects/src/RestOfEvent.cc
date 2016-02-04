@@ -28,7 +28,7 @@ void RestOfEvent::addTrack(const Track* track)
   m_trackIndices.insert(track->getArrayIndex());
 }
 
-void RestOfEvent::addTracks(const std::vector<int>& indices)
+void RestOfEvent::addTracks(std::vector<int>& indices)
 {
   addIndices(indices, m_trackIndices);
 }
@@ -38,7 +38,7 @@ void RestOfEvent::addECLCluster(const ECLCluster* shower)
   m_eclClusterIndices.insert(shower->getArrayIndex());
 }
 
-void RestOfEvent::addECLClusters(const std::vector<int>& indices)
+void RestOfEvent::addECLClusters(std::vector<int>& indices)
 {
   addIndices(indices, m_eclClusterIndices);
 }
@@ -48,7 +48,7 @@ void RestOfEvent::addKLMCluster(const KLMCluster* cluster)
   m_klmClusterIndices.insert(cluster->getArrayIndex());
 }
 
-void RestOfEvent::addKLMClusters(const std::vector<int>& indices)
+void RestOfEvent::addKLMClusters(std::vector<int>& indices)
 {
   addIndices(indices, m_klmClusterIndices);
 }
@@ -68,7 +68,7 @@ void RestOfEvent::appendECLClusterMasks(std::map<std::string, std::map<unsigned 
   m_eclClusterMasks.insert(masks.begin(), masks.end());
 }
 
-const std::vector<Belle2::Track*> RestOfEvent::getTracks(std::string maskName) const
+std::vector<Belle2::Track*> RestOfEvent::getTracks(std::string maskName) const
 {
   std::vector<Track*> remainTracks(getNTracks(maskName));
   StoreArray<Track> allTracks;
@@ -96,7 +96,7 @@ const std::vector<Belle2::Track*> RestOfEvent::getTracks(std::string maskName) c
   return remainTracks;
 }
 
-const std::vector<Belle2::ECLCluster*> RestOfEvent::getECLClusters(std::string maskName) const
+std::vector<Belle2::ECLCluster*> RestOfEvent::getECLClusters(std::string maskName) const
 {
   std::vector<ECLCluster*> remainECLClusters(getNECLClusters(maskName));
   StoreArray<ECLCluster> allECLClusters;
@@ -124,7 +124,7 @@ const std::vector<Belle2::ECLCluster*> RestOfEvent::getECLClusters(std::string m
   return remainECLClusters;
 }
 
-const std::vector<Belle2::KLMCluster*> RestOfEvent::getKLMClusters() const
+std::vector<Belle2::KLMCluster*> RestOfEvent::getKLMClusters() const
 {
   std::vector<KLMCluster*> remainKLMClusters(getNKLMClusters());
   StoreArray<KLMCluster> allKLMClusters;
@@ -197,7 +197,7 @@ TLorentzVector RestOfEvent::get4Vector(std::string maskName) const
 
 std::map<unsigned int, bool> RestOfEvent::getTrackMask(std::string maskName) const
 {
-  const std::map<unsigned int, bool> emptyMap;
+  std::map<unsigned int, bool> emptyMap;
 
   if (maskName == "")
     return emptyMap;
@@ -210,7 +210,7 @@ std::map<unsigned int, bool> RestOfEvent::getTrackMask(std::string maskName) con
 
 std::map<unsigned int, bool> RestOfEvent::getECLClusterMask(std::string maskName) const
 {
-  const std::map<unsigned int, bool> emptyMap;
+  std::map<unsigned int, bool> emptyMap;
 
   if (maskName == "")
     return emptyMap;

@@ -73,7 +73,7 @@ namespace Belle2 {
      *
      * @param vector of StoreArray indices of unused Tracks
      */
-    void addTracks(const std::vector<int>& indices);
+    void addTracks(std::vector<int>& indices);
 
     /**
      * Add StoreArray index of given ECLCluster to the list of unused ECLClusters in the event.
@@ -87,7 +87,7 @@ namespace Belle2 {
      *
      * @param vector of StoreArray indices of unused ECLClusters
      */
-    void addECLClusters(const std::vector<int>& indices);
+    void addECLClusters(std::vector<int>& indices);
 
     /**
      * Add StoreArray index of given KLMCluster to the list of unused KLM clusters in the event.
@@ -95,6 +95,13 @@ namespace Belle2 {
      * @param Pointer to the unused KLMCluster
      */
     void addKLMCluster(const KLMCluster* cluster);
+
+    /**
+     * Add given StoreArray indices to the list of unused KLM Clusters in the event.
+     *
+     * @param vector of StoreArray indices of unused Clusters
+     */
+    void addKLMClusters(std::vector<int>& indices);
 
     /**
      * Append the map of a priori fractions of ChargedStable particles to the ROE object. This is used whenever mass hypotheses are needed.
@@ -118,13 +125,6 @@ namespace Belle2 {
      */
     void appendECLClusterMasks(std::map<std::string, std::map<unsigned int, bool>> eclClusterMasks);
 
-    /**
-     * Add given StoreArray indices to the list of unused KLM Clusters in the event.
-     *
-     * @param vector of StoreArray indices of unused Clusters
-     */
-    void addKLMClusters(const std::vector<int>& indices);
-
     // getters
     /**
      * Get vector of all (no mask) or a subset (use mask) of all Tracks in ROE.
@@ -132,7 +132,7 @@ namespace Belle2 {
      * @param name of mask
      * @return vector of pointers to unused Tracks
      */
-    const std::vector<Belle2::Track*> getTracks(std::string maskName = "") const;
+    std::vector<Belle2::Track*> getTracks(std::string maskName = "") const;
 
     /**
      * Get vector of all (no mask) or a subset (use mask) of all ECLClusters in ROE.
@@ -140,14 +140,14 @@ namespace Belle2 {
      * @param name of mask
      * @return vector of pointers to unused ECLClusters
      */
-    const std::vector<Belle2::ECLCluster*> getECLClusters(std::string maskName = "") const;
+    std::vector<Belle2::ECLCluster*> getECLClusters(std::string maskName = "") const;
 
     /**
      * Get vector of all unused KLMClusters.
      *
      * @return vector of pointers to unused KLMClusters
      */
-    const std::vector<Belle2::KLMCluster*> getKLMClusters() const;
+    std::vector<Belle2::KLMCluster*> getKLMClusters() const;
 
     /**
      * Get 4-momentum vector all (no mask) or a subset (use mask) of all Tracks and ECLClusters in ROE.
@@ -222,9 +222,10 @@ namespace Belle2 {
 
     std::map<std::string, std::vector<double>>
                                             m_fractionsSet; /**< Map of a-priori charged FSP probabilities to be used whenever most-likely hypothesis is determined */
-    std::map<std::string, std::map<unsigned int, bool>> m_trackMasks; /**< Map of Track masks (set of rules for Tracks) */
     std::map<std::string, std::map<unsigned int, bool>>
-                                                     m_eclClusterMasks; /**< Map of ECLCLuster masks (set of rules for ECLClusters) */
+                                                     m_trackMasks; /**< Map of Track masks, where each mask is another map that contains track indices and boolean values based on selection criteria for each track */
+    std::map<std::string, std::map<unsigned int, bool>>
+                                                     m_eclClusterMasks; /**< Map of ECLCluster masks, where each mask is another map that contains cluster indices and boolean values based on selection criteria for each cluster */
     // TODO: add support for vee
 
     /**
@@ -235,7 +236,7 @@ namespace Belle2 {
     /**
      * Copies indices (elements) from "from" vector to "to" set
      */
-    void addIndices(const std::vector<int>& from, std::set<int>& to)
+    void addIndices(std::vector<int>& from, std::set<int>& to)
     {
       for (unsigned i = 0; i < from.size(); i++)
         to.insert(from[i]);

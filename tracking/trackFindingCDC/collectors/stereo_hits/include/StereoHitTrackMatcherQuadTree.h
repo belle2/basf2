@@ -59,7 +59,7 @@ namespace Belle2 {
       {
         QuadTreeBasedMatcher<HitZ0TanLambdaLegendre>::initialize();
 
-        m_stereoHitFilter = std::move(m_filterFactory.create());
+        m_stereoHitFilter = m_filterFactory.create();
         m_stereoHitFilter->initialize();
 
         if (m_stereoHitFilter->needsTruthInformation()) {

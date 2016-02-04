@@ -82,7 +82,9 @@ namespace Belle2 {
       double m_FanoFactor;
 
       /** histo dose */
-      TH1F* h_dose[100];
+      TH1F* h_dose1[100];
+      /** histo dose */
+      TH1F* h_dose2[100];
       /** histo volt */
       TH1F* h_volt[100];
       /** histo time */

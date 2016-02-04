@@ -70,7 +70,8 @@ void PindiodeStudyModule::defineHisto()
 {
   //Default values are set here. New values can be in PINDIODE.xml.
   for (int i = 0; i < 100; i++) {
-    h_dose[i] = new TH1F(TString::Format("h_dose_%d", i), "", 10000, 0., 1000.);
+    h_dose1[i] = new TH1F(TString::Format("h_dose1_%d", i), "", 10000, 0., 1000.);
+    h_dose2[i] = new TH1F(TString::Format("h_dose2_%d", i), "", 10000, 0., 1000.);
     h_volt[i] = new TH1F(TString::Format("h_volt_%d", i), "", 10000, 0., 100.);
     h_time[i] = new TH1F(TString::Format("h_time_%d", i), "", 1000, 0., 100.);
     h_vtime[i] = new TH1F(TString::Format("h_vtime_%d", i), "", 1000, 0., 100.);
@@ -122,10 +123,13 @@ void PindiodeStudyModule::event()
     const double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
     const int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
     double volt = NbEle * 1.602176565e-19 * m_CrematGain * 1e12; // volt
-    h_dose[detNb]->Fill(edep * 1e6); //GeV to keV
-    h_volt[detNb]->Fill(volt * 1e3); //V to mV
-    h_time[detNb]->Fill(time);
-    h_vtime[detNb]->Fill(time, volt);
+    h_dose1[detNb]->Fill(edep * 1e6); //GeV to keV
+    if ((edep * 1e9) > m_WorkFunction) {
+      h_dose2[detNb]->Fill(edep * 1e6); //GeV to keV
+      h_volt[detNb]->Fill(volt * 1e3); //V to mV
+      h_time[detNb]->Fill(time);
+      h_vtime[detNb]->Fill(time, volt);
+    }
   }
   int nHits = Hits.getEntries();
   for (int i = 0; i < nHits; i++) {

@@ -140,13 +140,15 @@ void CDCUnpackerModule::event()
   //
   StoreArray<RawCDC> rawCDCs;
   const int nEntries = rawCDCs.getEntries();
+
+  B2INFO("Nentries : " << nEntries);
   for (int i = 0; i < nEntries; ++i) {
     const int subDetectorId = rawCDCs[i]->GetNodeID(0);
     const int iNode = (subDetectorId & 0xFFFFFF);
     const int nEntries_rawCDC = rawCDCs[i]->GetNumEntries();
+
+    B2INFO("Nentries rawCDC: " << nEntries_rawCDC);
     for (int j = 0; j < nEntries_rawCDC; ++j) {
-
-
 
       int nWords[4];
       nWords[0] = rawCDCs[i]->Get1stDetectorNwords(j);
@@ -169,6 +171,7 @@ void CDCUnpackerModule::event()
       for (int iFiness = 0; iFiness < 4; ++iFiness) {
         int* ibuf = data32tab[iFiness];
         const int nWord = nWords[iFiness];
+        B2INFO("Nwords " << nWord);
 
 
         if (m_enablePrintOut == true) {
@@ -313,14 +316,11 @@ void CDCUnpackerModule::event()
           B2INFO("CDCUnpacker : Suppressed mode.");
 
           // convert int array -> short array.
-          //              unsigned short swbuf[480];
           m_buffer.clear();
           for (int it = 0; it < dataLength; ++it) {
             int index = it + c_headearWords;
             m_buffer.push_back(static_cast<unsigned short>((ibuf[index] & 0xffff0000) >> 16));
             m_buffer.push_back(static_cast<unsigned short>(ibuf[index] & 0xffff));
-            // for debug.
-            //    printf("%4d %4x %4x %8x \n", it, swbuf[it*2],swbuf[it*2+1],ibuf[index]);
           }
 
           const int bufSize = static_cast<int>(m_buffer.size());
@@ -329,10 +329,17 @@ void CDCUnpackerModule::event()
             unsigned short ch = (header & 0xff00) >> 8; // Channel ID in FE.
             unsigned short length = (header & 0xff) / 2; // Data length in short word.
 
+            if (header == 0xff02) {
+              it++;
+              continue;
+            }
+
             if (!((length == 4) || (length == 5))) {
               B2ERROR("CDCUnpacker : data length should be 4 or 5 words.");
+              B2ERROR("CDCUnpacker : length " << length << " words.");
               it += length;
-              return;
+              //        return;
+              continue;
             }
 
             unsigned short tot = m_buffer.at(it + 1);     // Time over threshold.

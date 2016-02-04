@@ -71,6 +71,7 @@ namespace Belle2 {
         }
 
         // Some safety checks from funky times - did not trigger for ages.
+        // cppcheck-suppress syntaxError
         for (int iHit = 0; iHit < useNHits; ++iHit) {
           CDCHit* ptrHit = hits[iHit];
           CDCHit& hit = *ptrHit;

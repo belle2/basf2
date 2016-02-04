@@ -19,15 +19,12 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Const.h>
-// #include <pxd/geometry/SensorInfo.h>
-// #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include "tracking/vxdCaTracking/SharedFunctions.h"
-// #include <testbeam/vxd/geometry/SensorInfo.h>
 #include <TObject.h>
 
 // #include <boost/foreach.hpp>

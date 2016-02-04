@@ -13,9 +13,7 @@
 
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <testbeam/vxd/dataobjects/TelCluster.h>
 
-// #include <vector>
 #include <list>
 #include "tracking/vxdCaTracking/VXDTFTrackCandidate.h"
 

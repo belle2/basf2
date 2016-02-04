@@ -87,30 +87,6 @@ namespace Belle2 {
       return roe_tracks - par_tracks;
     }
 
-    //TODO: fix usage of preset labels, make use of ROE masks
-    double pionVeto(const Particle* particle)
-    {
-      double pion0Mass = 0.135;           // neutral pion mass from PDG
-      double deltaE = 0.03;               // mass range around pion0Mass that will be accepted
-
-      StoreObjPtr<ParticleList> PhotonList("gamma:veto");
-
-      const Particle* sig_Photon = particle->getDaughter(1)->getDaughter(0);
-      TLorentzVector vec = sig_Photon->get4Vector();
-
-      for (unsigned int i = 0; i < PhotonList->getListSize(); i++) {
-        Particle* p_Photon = PhotonList->getParticle(i);
-        if ((p_Photon->getEnergy() >= 0.1) && (p_Photon->getMdstArrayIndex() != sig_Photon->getMdstArrayIndex())) {
-          double tempCombination = (p_Photon->get4Vector() + vec).M();
-          if (abs(tempCombination - pion0Mass) <= deltaE) {
-            return 1;
-          }
-        }
-      }
-
-      return 0;
-    }
-
     double nROEKLMClusters(const Particle* particle)
     {
       // Get related ROE object
@@ -1266,9 +1242,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent,
                       "Returns number of tracks in ROE - number of tracks of given particle"
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
-
-    REGISTER_VARIABLE("pionVeto", pionVeto,
-                      "Returns the Flag 1 if a combination of photons has the invariant mass of a neutral pion");
 
     REGISTER_VARIABLE("nROEKLMClusters", nROEKLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");

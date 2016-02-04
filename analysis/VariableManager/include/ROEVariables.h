@@ -32,12 +32,6 @@ namespace Belle2 {
      */
     double nRemainingTracksInRestOfEvent(const Particle* particle);
 
-    /**TODO: Remove this variable in the future, it's use is obsolete and too specific
-     * Returns 1 if the invariant mass of a combination of a photon in RestOfEvent with
-     * the signal photon yields the mass of the a neutral Pion.
-     */
-    double pionVeto(const Particle* particle);
-
     /**
      * Returns number of remaining KLM clusters in the related RestOfEvent object
      */

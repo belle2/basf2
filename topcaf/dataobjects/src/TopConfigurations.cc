@@ -58,9 +58,9 @@ void TopConfigurations::ReadTopConfigurations(std::string filename)
   fTopConfigurationsFile->GetObject("PixeltoAsicColumn",      PixeltoAsicColumnP);
   fTopConfigurationsFile->GetObject("PixeltoAsicChannel",     PixeltoAsicChannelP);
   fTopConfigurationsFile->GetObject("HardwareIDtoPixel",  HardwareIDtoPixelP);
-  fTopConfigurationsFile->GetObject("ScrodtoElectronicModuleP", ScrodtoElectronicModuleP);
-  fTopConfigurationsFile->GetObject("ElectronicModuletoScrodP", ElectronicModuletoScrodP);
-  fTopConfigurationsFile->GetObject("TopModuleElectronicConstructionsP", TopModuleElectronicConstructionsP);
+  fTopConfigurationsFile->GetObject("ScrodtoElectronicModule", ScrodtoElectronicModuleP);
+  fTopConfigurationsFile->GetObject("ElectronicModuletoScrod", ElectronicModuletoScrodP);
+  fTopConfigurationsFile->GetObject("TopModuleElectronicConstructions", TopModuleElectronicConstructionsP);
   fTopConfigurationsFile->GetObject("TDCUnit_ns", TDCUnit_ns);
 
   m_PixeltoRow =               *PixeltoRowP;
@@ -82,14 +82,14 @@ void TopConfigurations::ReadTopConfigurations(std::string filename)
   m_HardwareIDtoPixel =             *HardwareIDtoPixelP;
   m_TDCUnit_ns = *TDCUnit_ns;
 
-  B2INFO("TDCUnit_ns: " << m_TDCUnit_ns.first);
+  //  B2INFO("TDCUnit_ns: " << m_TDCUnit_ns.first);
 
-  /*
-    m_ScrodtoElectronicModule=          *ScrodtoElectronicModuleP;
-    m_ElectronicModuletoScrod=          *ElectronicModuletoScrodP;
-    m_TopModuleElectronicConstructions= *TopModuleElectronicConstructionsP;
 
-  */
+  m_ScrodtoElectronicModule =          *ScrodtoElectronicModuleP;
+  m_ElectronicModuletoScrod =          *ElectronicModuletoScrodP;
+  m_TopModuleElectronicConstructions = *TopModuleElectronicConstructionsP;
+
+
 }
 
 

@@ -26,6 +26,7 @@ namespace Belle2 {
     int GetRefWindow() const {return  m_asic_refwin;}
     size_t GetNumWaveSegments() const {return  m_nwave_seg;}
     int GetASICWindow()const {return m_asic_win;}
+    int GetASIC() const {return m_asic;}
     int GetASICChannel() const {return m_asic_ch;}
     int GetASICRow() const {return m_asic_row;}
     int GetASICColumn() const {return m_asic_col;}
@@ -35,10 +36,12 @@ namespace Belle2 {
 
     // Extra stuff not in the raw packet //
     double GetTime() const {return m_time;}
-    int GetTimeBin() const {return m_time_bin;}
+    int GetTimeBin() const {return m_tdc_bin;}
     double GetAmplitude() const {return m_amp;}
     double GetSamplingRate() const {return m_rate;}
     double GetQuality() const {return m_quality;}
+    int GetFlag() const {return m_flag;}
+    double GetCorrTime() const {return m_corr_time;}
     //--- Setters ---//
     void SetTime(double time) {m_time = time;}
     void SetTimeBin(int time_bin) {m_time_bin = time_bin;}
@@ -46,6 +49,9 @@ namespace Belle2 {
     void SetSamplingRate(double rate) {m_rate = rate;}
     void SetQuality(double quality) {m_quality = quality;}
     void SetHitValues(topcaf_hit_t& mydigit);
+    void SetFlag(int flag) {m_flag = flag;}
+    void SetCorrTime(double time) {m_corr_time = time;}
+    void SetBoardstack(double bs) {m_boardstack = bs;}
 
   private:
     topcaf_channel_id_t m_channel_id;
@@ -53,6 +59,7 @@ namespace Belle2 {
     packet_word_t m_asic_win;
     size_t m_nwave_seg;
     size_t m_nsamples;
+    unsigned short m_asic;
     unsigned short m_asic_ch;
     unsigned short m_asic_row;
     unsigned short m_asic_col;
@@ -69,6 +76,9 @@ namespace Belle2 {
     double m_adc_height;
     double m_width;
     double m_chi2;
+    double m_corr_time;
+    double m_boardstack;
+    int m_flag;
 
     ClassDef(TOPCAFDigit, 1);
   };

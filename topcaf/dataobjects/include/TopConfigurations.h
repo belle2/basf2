@@ -58,7 +58,10 @@ namespace Belle2 {
     {
       return (channel - 1) % 4 + (PMT - 1) * 4 + ((channel - 1) / 4) * 64 + ((PMT - 1) / 16) * 192 + 1;
     }
-
+    int electronics_to_pixel(int boardstack, int carrier, int asic, int channel)
+    {
+      return 1 + 128 * carrier + channel * (asic % 2) + (71 - channel) * ((asic + 1) % 2) + 8 * ((asic / 2) % 2) + 16 * boardstack;
+    }
     /** Channel Numbering, hardware ID to pixel */
     TopPixel hardwareID_to_pixel(unsigned int hardwareID) { return m_HardwareIDtoPixel[hardwareID]; }
     /** Channel Numbering, hardware ID to pixel number */

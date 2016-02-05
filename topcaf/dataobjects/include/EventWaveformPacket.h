@@ -44,6 +44,7 @@ namespace Belle2 {
     int GetASICWindow()const {return m_asic_win;}
     int GetASICChannel() const {return m_asic_ch;}
     int GetASICRow() const {return m_asic_row;}
+    int GetASIC() const {return m_asic;}
     int GetASICColumn() const {return m_asic_col;}
     size_t GetNumSamples() const {return m_nsamples;}
     std::vector< double > GetSamples() const {return v_samples;}
@@ -61,6 +62,7 @@ namespace Belle2 {
     void SetHits(const std::vector< topcaf_hit_t >& hits);
     void SetTime(double time) {m_time = time;}
     void SetTimeBin(int time_bin) {m_time_bin = time_bin;}
+    void SetASIC(unsigned short asic) {m_asic = asic;}
     void SetAmplitude(double amp) {m_amp = amp;}
     void SetSamplingRate(double rate) {m_rate = rate;}
     void SetQuality(double quality) {m_quality = quality;}
@@ -72,6 +74,7 @@ namespace Belle2 {
     size_t m_nwave_seg;
     size_t m_nsamples;
     size_t m_nhits;
+    unsigned short m_asic;
     unsigned short m_asic_ch;
     unsigned short m_asic_row;
     unsigned short m_asic_col;

@@ -66,7 +66,7 @@ EventWaveformPacket::EventWaveformPacket(const unsigned int* temp_buffer,
   m_amp = 0;
   m_time = 0;
   m_time_bin = 0;
-  m_rate = 2.7135;
+  m_rate = 1.;
   m_quality = 0;
 }
 

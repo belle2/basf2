@@ -80,6 +80,10 @@ void WaveTimingV2Module::event()
     for (int w = 0; w < evtwaves_ptr.getEntries(); w++) {
 
       topcaf_channel_id_t hardwareID = evtwaves_ptr[w]->GetChannelID();
+      unsigned int scrod = hardwareID / 100000000;
+      int row = evtwaves_ptr[w]->GetASICRow();
+      int asic = evtwaves_ptr[w]->GetASIC();
+      int asicch = evtwaves_ptr[w]->GetASICChannel();
       //double win_time_shift = evtwaves_ptr[w]->GetTime();
       std::vector< double > v_samples = evtwaves_ptr[w]->GetSamples();
       if (v_samples.size() > 0) {
@@ -105,12 +109,16 @@ void WaveTimingV2Module::event()
         int channelID = -9;
         int pmtID = -9;
         int pmtchID = -9;
+        int electronics = -9;
         StoreObjPtr<TopConfigurations> topconfig_ptr("", DataStore::c_Persistent);
         if (topconfig_ptr) {
+          electronics = (int)topconfig_ptr->scrod_to_electronicsModuleNumber(scrod);
           TopPixel p = topconfig_ptr->hardwareID_to_pixel(hardwareID);
+          p.second = topconfig_ptr->electronics_to_pixel(electronics, row, asic, asicch);
           channelID = p.second;
           pmtID = topconfig_ptr->pixel_to_PMTNumber(p);
           pmtchID = topconfig_ptr->pixel_to_channelNumber(p);
+          //    if(scrod==25) B2INFO("scrod: 25\tEMN: "<<topconfig_ptr->scrod_to_electronicsModuleNumber(scrod)<<"\tpix: "<<p.second);
         } else {
           B2WARNING("ITOP channel mapping not found, TOPDigit channel IDs will be incorrect.");
         }
@@ -152,6 +160,7 @@ void WaveTimingV2Module::event()
           TOPCAFDigit* this_topcafdigit = m_topcafdigits_ptr.appendNew(evtwaves_ptr[w]);
 
           this_topcafdigit->SetHitValues(hits[c]);
+          this_topcafdigit->SetBoardstack(electronics);
         }
 
       }

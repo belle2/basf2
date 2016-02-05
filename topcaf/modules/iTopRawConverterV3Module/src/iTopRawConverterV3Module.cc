@@ -241,6 +241,7 @@ void iTopRawConverterV3Module::event()
             }
           }
           m_WfPacket = m_evtwaves_ptr.appendNew(EventWaveformPacket(wavePacket, WAVE_PACKET_SIZE));
+          m_WfPacket->SetASIC(asic);
         }
       }
 

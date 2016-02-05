@@ -102,7 +102,7 @@ timeDict = {'time2TDC': 1.0}
 timemodule.param(timeDict)
 
 if args.s2s:
-    sampletimemodule = register_module('SampleTimeCalibration')
+    sampletimemodule = register_module('SampleTimeCalibrationV2')
     if args.s2s == 'Conditions':
         sampletimeDict = {'mode': 1,
                           'writeFile': 0,

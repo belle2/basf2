@@ -52,6 +52,9 @@ unsigned int asic_to_pixel(unsigned int electronicsModule, unsigned int asicRow,
 {
   return 4 - (asicChannel % 8) / 2 + (asicChannel % 2) * 64 + asicColumn * 4 + electronicsModule * 16 + asicRow * 128;
 }
-
+int electronics_to_pixel(int boardstack, int carrier, int asic, int channel)
+{
+  return 1 + 128 * carrier + channel * (asic % 2) + (71 - channel) * ((asic + 1) % 2) + 8 * ((asic / 2) % 2) + 16 * boardstack;
+}
 
 #endif

@@ -14,6 +14,7 @@ TOPCAFDigit::TOPCAFDigit()
   , m_asic_win(0)
   , m_nwave_seg(0)
   , m_nsamples(0)
+  , m_asic(0)
   , m_asic_ch(0)
   , m_asic_row(0)
   , m_asic_col(0)
@@ -23,6 +24,7 @@ TOPCAFDigit::TOPCAFDigit()
   , m_rate(0)
   , m_quality(0)
   , m_time_bin(0)
+  , m_flag(0)
 {
 }
 
@@ -84,10 +86,13 @@ TOPCAFDigit::TOPCAFDigit(const EventWaveformPacket* in_wp)
   m_asic_refwin = in_wp->GetRefWindow();
   m_nwave_seg = in_wp->GetNumWaveSegments();
   m_asic_win = in_wp->GetASICWindow();
+  m_asic = in_wp->GetASIC();
   m_asic_ch = in_wp->GetASICChannel();
   m_asic_row = in_wp->GetASICRow();
   m_asic_col = in_wp->GetASICColumn();
-  //  m_nsamples = in_wp.;
+  m_rate = in_wp->GetSamplingRate();
+
+  m_flag = 0;
 
 }
 

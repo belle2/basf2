@@ -134,14 +134,16 @@ void ECLDigitCalibratorModule::event()
 
     // perform the digit timing calibration
     const int time              = aECLDigit.getTimeFit();
-    const double calibratedTime = getCalibratedTime(cellid, time); //
+    const double calibratedTime = getCalibratedTime(cellid, time); // calibrated time
 
     // fill the ECLCalDigit with the cell id, the calibrated information and calibration status
     aECLCalDigit->setCellId(cellid);
     aECLCalDigit->setEnergy(calibratedEnergy);
     aECLCalDigit->addStatus(ECLCalDigit::c_IsEnergyCalibrated);
     aECLCalDigit->setTime(calibratedTime);
-    aECLCalDigit->addStatus(ECLCalDigit::c_IsTimeCalibrated);
+//     aECLCalDigit->addStatus(ECLCalDigit::c_IsTimeCalibrated);
+    aECLCalDigit->setTimeResolution(9999999.);
+//     aECLCalDigit->addStatus(ECLCalDigit::c_IsTimeCalibrated);
 
     // set a relation to the ECLDigit
     aECLCalDigit->addRelationTo(&aECLDigit);
@@ -196,7 +198,7 @@ double ECLDigitCalibratorModule::getCalibratedEnergy(int cellid, int amplitude)
 double ECLDigitCalibratorModule::getCalibratedTime(int cellid, int time)
 {
   if (cellid < 1 || cellid > c_nCrystals) {
-    B2FATAL("ECLDigitCalibrationModule:getCalibratedTime():" << cellid << " out od range!");
+    B2FATAL("ECLDigitCalibrationModule:getCalibratedTime():" << cellid << " out of range!");
   }
 
   double caltime = 1.0 * time;

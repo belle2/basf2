@@ -24,16 +24,18 @@ namespace Belle2 {
     enum StatusBit {
       c_IsEnergyCalibrated = 1 << 0,
       c_IsTimeCalibrated = 1 << 1,
-      c_IsCalibrated = c_IsEnergyCalibrated | c_IsTimeCalibrated,
+      c_IsTimeResolutionCalibrated = 1 << 2,
+      c_IsCalibrated = c_IsEnergyCalibrated | c_IsTimeCalibrated | c_IsTimeResolutionCalibrated,
     };
 
     /** default constructor for ROOT */
     ECLCalDigit()
     {
-      m_CellId = 0; /**< Cell ID */
-      m_Time   = 0; /**< Calibrated Time */
-      m_Energy = 0; /**< Calibrated Energy */
-      m_Status = 0; /**< Calibration Status */
+      m_CellId         = 0; /**< Cell ID */
+      m_Time           = 0; /**< Calibrated Time */
+      m_TimeResolution = 0; /**< Calibrated Time Resolution */
+      m_Energy         = 0; /**< Calibrated Energy */
+      m_Status         = 0; /**< Calibration Status */
     }
 
     /*! Set  Cell ID
@@ -47,6 +49,10 @@ namespace Belle2 {
     /*! Set Calibrated Time
      */
     void setTime(double Time) { m_Time = Time; }
+
+    /*! Set Calibrated Time Resolution
+     */
+    void setTimeResolution(double TimeResolution) { m_TimeResolution = TimeResolution; }
 
     /*! Set Calibration Status (overwrites previously set bits)
      */
@@ -75,6 +81,11 @@ namespace Belle2 {
      */
     double getTime() const { return m_Time; }
 
+    /*! Get Calibrated Time Resolution
+     * @return Calibrated Time Resolution
+     */
+    double getTimeResolution() const { return m_TimeResolution; }
+
     /*! Get Calibration Status
      * @return Calibration Status
      */
@@ -95,14 +106,20 @@ namespace Belle2 {
      */
     bool isTimeCalibrated() const;
 
+    /*! Get Boolean Time Resolution Calibration Status
+     * @return Time Resolution Calibration Status
+     */
+    bool isTimeResolutionCalibrated() const;
+
   private:
 
     int m_CellId;   /**< Cell ID */
     double m_Time;   /**< Calibrated Time */
+    double m_TimeResolution;   /**< Calibrated Time resolution*/
     double m_Energy; /**< Calibrated Energy */
     unsigned short int m_Status;   /**< Calibration Status */
 
-    ClassDef(ECLCalDigit, 1); /**< ClassDef */
+    ClassDef(ECLCalDigit, 2); /**< ClassDef */
 
   };
 
@@ -122,6 +139,12 @@ namespace Belle2 {
   inline bool ECLCalDigit::isTimeCalibrated() const
   {
     return hasStatus(c_IsTimeCalibrated);
+  }
+
+  // inline
+  inline bool ECLCalDigit::isTimeResolutionCalibrated() const
+  {
+    return hasStatus(c_IsTimeResolutionCalibrated);
   }
 
 } // end namespace Belle2

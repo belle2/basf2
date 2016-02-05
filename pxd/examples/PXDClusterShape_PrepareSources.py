@@ -76,7 +76,7 @@ if argc >= 4:
     CalibrationKind = int(argvs[3])
     print("third argument CalibrationKind: ", CalibrationKind)
 if argc >= 5:
-    PixelKindCal = int(argvs[5])
+    PixelKindCal = int(argvs[4])
     print("fours argument PixelKindCal: ", PixelKindCal)
 
 # Crosscheck of presets:

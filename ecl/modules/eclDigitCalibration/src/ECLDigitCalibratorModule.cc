@@ -56,7 +56,9 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() : m_calibrationLow("ECLCali
   m_calibrationHigh("ECLCalibrationDigitHigh")
 {
   // Set module properties
-  setDescription("Applies digit calibration to each ECL digit.");
+  setDescription("Applies digit energy, time and time-resolution calibration to each ECL digit. Counts number of out-of-time background digits to determine the event-by-event background level.");
+  addParam("BackgroundEnergyCut", m_backgroundEnergyCut, "Energy cut used to count background digits", 10.0 * Belle2::Unit::MeV);
+  addParam("BackgroundTimingCut", m_backgroundTimingCut, "Timing cut used to count background digits", 100.0 * Belle2::Unit::ns);
 
   // Parallel processing
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -87,6 +89,12 @@ void ECLDigitCalibratorModule::initialize()
   m_calibrationEnergiesHighEnergy.resize(c_nCrystals + 1);
   m_calibrationC0.resize(c_nCrystals + 1);
   m_calibrationC1.resize(c_nCrystals + 1);
+
+  // background information
+  m_eventInformationPtr.registerInDataStore(); //FIXME move to own module or do in EventInfoSetter?
+
+  m_backgroundEnergyCut = 10.0 * Belle2::Unit::MeV;  /**< Energy cut for background level counting. */
+  m_backgroundTimingCut = 100.0 * Belle2::Unit::ns;  /**< Timing window for background level counting. */
 
 }
 
@@ -138,6 +146,9 @@ void ECLDigitCalibratorModule::event()
     // set a relation to the ECLDigit
     aECLCalDigit->addRelationTo(&aECLDigit);
   }
+
+  // determine background level
+  determineBackgroundByECL();
 
 }
 
@@ -272,4 +283,31 @@ void ECLDigitCalibratorModule::prepareCalibrationConstants()
     m_calibrationC0[i] = (ghigh * std::log(ahigh) - glow * std::log(alow)) / (glow * ghigh * (std::log(ahigh) - std::log(alow)));
     m_calibrationC1[i] = (glow - ghigh) / (ghigh * std::log(ahigh) - glow * std::log(alow));
   }
+}
+
+// determine background level by event by counting out-of-time digits above threshold
+void ECLDigitCalibratorModule::determineBackgroundByECL()
+{
+  // Input Array(s)
+  StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
+
+  int backgroundcount = 0;
+  int totalcount = 0;
+  // Loop over the input array
+  for (auto& aECLCalDigit : eclCalDigits) {
+    if (abs(aECLCalDigit.getTime()) >= m_backgroundTimingCut) {
+      if (aECLCalDigit.getEnergy() >= m_backgroundEnergyCut) {
+        ++backgroundcount;
+      }
+    }
+    ++totalcount;
+  }
+
+  // if an event misses the ECL we will have zero digits in total, set background level to -1
+  if (totalcount < 0) backgroundcount = -1;
+
+  // put into EventInformation dataobject
+  m_eventInformationPtr.create();
+  m_eventInformationPtr->setBackgroundByECL(backgroundcount);
+
 }

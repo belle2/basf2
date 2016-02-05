@@ -13,6 +13,8 @@
 
 // FRAMEWORK
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <ecl/dataobjects/ECLEventInformation.h>
 
 // ECL
 #include <framework/database/DBArray.h>
@@ -67,6 +69,10 @@ namespace Belle2 {
 
     private:
 
+      double m_backgroundEnergyCut;  /**< Energy cut for background level counting. */
+      double m_backgroundTimingCut;  /**< Timing window for background level counting. */
+      StoreObjPtr<ECLEventInformation> m_eventInformationPtr; /**< Output object for event wide information. */
+
       const int c_nCrystals = 8736;  /**< Number of ECL crystals. */
       std::vector < float > m_calibrationAmplitudesLowEnergy;  /**< vector with single crystal calibration amplitudes low energy */
       std::vector < float > m_calibrationEnergiesLowEnergy;  /**< vector with single crystal calibration energy values low energy */
@@ -80,6 +86,8 @@ namespace Belle2 {
       double getCalibratedEnergy(int cellid, int energy); /**< log interpolated value from the calibration amplitudes and energies */
       double getCalibratedTime(int cellid, int time); /**< timing correction */
       void prepareCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
+
+      void determineBackgroundByECL();/**< count out of time digits to determine baclground levels */
 
     };
 

@@ -1,21 +1,16 @@
 #ifndef SVDBackgroundMODULE_H_
 #define SVDBackgroundMODULE_H_
 
-#include <framework/core/HistoModule.h>
+#include <framework/core/Module.h>
 #include <framework/gearbox/Unit.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
-#include <svd/background/HistogramFactory.h>
 #include <string>
 #include <vector>
 #include <memory>
-#include <TTree.h>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TCanvas.h>
-
+#include <map>
 #include <svd/background/niel_fun.h>
 
 namespace Belle2 {
@@ -41,7 +36,14 @@ namespace Belle2 {
      * Much of the statistics about doses is corrupt, it is sums or means of Landauian
      * contributions. Not speaking about error bounds.
      */
-    class SVDBackgroundModule: public HistoModule { // <- derived from HistoModule class
+
+    /* Modification Jan 2016:
+     * 1. Delete all histogramming, only produce n-tuples and text file
+     * with summaries. The HistogramFactory class is not used any longer.
+     * All drawing will be done in pandas.
+     * 2. Only process one background component at a time.
+     */
+    class SVDBackgroundModule: public Module {
 
     public:
       /** Number of VXD layers */
@@ -66,49 +68,6 @@ namespace Belle2 {
         double m_occupancyV;
       };
 
-      /** Struct to hold data of a background component */
-      struct BackgroundData {
-        /** Name of the component */
-        std::string m_componentName;
-        /** Time equivalent of background sample */
-        double m_componentTime;
-        /** Data by layer */
-        std::map<VxdID, SensorData> m_sensorData;
-        // Histograms by component: Fkuencies vs. particle kinetic energy
-        /** Raw neutron flux */
-        TH1F* m_neutronFlux[c_nVXDLayers];
-        /** NIEL-corrected neutron flux */
-        TH1F* m_neutronFluxNIEL[c_nVXDLayers];
-        /** Raw proton flux */
-        TH1F* m_protonFlux[c_nVXDLayers];
-        /** NIEL-corrected proton flux */
-        TH1F* m_protonFluxNIEL[c_nVXDLayers];
-        /** Raw pion flux */
-        TH1F* m_pionFlux[c_nVXDLayers];
-        /** NIEL-corrected pion flux */
-        TH1F* m_pionFluxNIEL[c_nVXDLayers];
-        /** Raw electron flux */
-        TH1F* m_electronFlux[c_nVXDLayers];
-        /** NIEL-corrected electron flux */
-        TH1F* m_electronFluxNIEL[c_nVXDLayers];
-        /** Raw photon flux */
-        TH1F* m_photonFlux[c_nVXDLayers];
-        /** NIEL-corrected summary flux */
-        TH1F* m_NIELFlux[c_nVXDLayers];
-        // Histograms for bar charts (bar per layer)
-        /** Bar chart for doses */
-        TH1F* m_doseBars;
-        /** Bar chart for NIEL flux */
-        TH1F* m_neutronFluxBars;
-        /** Bar chart for fired u-strips */
-        TH1F* m_uFiredBars;
-        /** Bar chart for fired v-strips */
-        TH1F* m_vFiredBars;
-        /** Bar chart for u-strip occupancy */
-        TH1F* m_uOccupancyBars;
-        /** Bar chart for v-strip occupancy */
-        TH1F* m_vOccupancyBars;
-      };
       /** Constructor */
       SVDBackgroundModule();
       /** Destructor */
@@ -125,12 +84,6 @@ namespace Belle2 {
       /* Final summary and cleanup */
       virtual void terminate();
 
-      /**
-       * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
-       * to be placed in this function.
-       */
-      virtual void defineHisto();
-
     private:
 
       // General
@@ -138,7 +91,7 @@ namespace Belle2 {
       const double c_smy = 1.0e7 * Unit::s;             /**< Seconds in snowmass year */
       // APV sampling
       const double c_APVSampleTime = 31.4 * Unit::ns;      /**< APV sampling time */
-      const int c_nAPVSamples = 6;                       /**< Number of APV samples */
+      // const int c_nAPVSamples = 6;                       /**< Number of APV samples */
 
       // NIEL file names - placed in svd/data, so needn't be module parameters.
       /** NIEL-correction file for neutrons */
@@ -200,13 +153,10 @@ namespace Belle2 {
       std::string m_storeEnergyDepositsName; /**< SVDEnergyDepositEvents StoreArray name */
       std::string m_storeNeutronFluxesName; /**< SVDNeutronFluxEvents StoreArray name */
 
-      std::vector<std::string> m_componentNames; /**< List of component names.*/
-      std::vector<unsigned long> m_componentTimes; /**< List of equivalent times for individual components */
-      std::string m_currentComponentName; /**< Name of the current component. */
-      std::string m_currentComponentTime; /**< Time of current component. */
+      std::string m_componentName; /**< Name of the current component. */
+      double m_componentTime; /**< Time of current component. */
 
-      std::map<std::string, BackgroundData> m_data; /**< Container for collected data and histograms by component */
-      TTree* m_treeSummary; /**< TTree containing aggregated background data */
+      std::map<VxdID, SensorData> m_sensorData; /**< Struct to hold sensor-wise background data. */
 
       // NIEL tables
       std::unique_ptr<TNiel> m_nielNeutrons;  /**< Pointer to Niel table for neutrons */
@@ -214,8 +164,6 @@ namespace Belle2 {
       std::unique_ptr<TNiel> m_nielPions;     /**< Pointer to Niel table for pions */
       std::unique_ptr<TNiel> m_nielElectrons; /**< Pointer to Niel table for electrons */
 
-      // Histogram factory
-      std::unique_ptr<HistogramFactory> m_histogramFactory; /**< Pointer to HistogramFactory class */
     };
 
     inline const SVD::SensorInfo& SVDBackgroundModule::getInfo(VxdID sensorID) const

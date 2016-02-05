@@ -158,6 +158,22 @@ namespace Belle2 {
     TLorentzVector get4Vector(std::string maskName = "") const;
 
     /**
+     * Get 4-momentum vector all (no mask) or a subset (use mask) of all Tracks in ROE.
+     *
+     * @param name of mask
+     * @return 4-momentum of unused Tracks and ECLClusters in ROE
+     */
+    TLorentzVector get4VectorTracks(std::string maskName = "") const;
+
+    /**
+     * Get 4-momentum vector all (no mask) or a subset (use mask) of all ECLClusters in ROE.
+     *
+     * @param name of mask
+     * @return 4-momentum of unused Tracks and ECLClusters in ROE
+     */
+    TLorentzVector get4VectorNeutralECLClusters(std::string maskName = "") const;
+
+    /**
      * Get number of all (no mask) or a subset (use mask) of all Tracks in ROE.
      *
      * @param name of mask

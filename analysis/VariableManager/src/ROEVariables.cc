@@ -977,14 +977,11 @@ namespace Belle2 {
           return -1;
         }
 
-        // Get all Tracks on reconstructed side
-        std::vector<const Particle*> recTrackParticles = particle->getFinalStateDaughters();
-
-        // Get Tracks in ROE
-        std::vector<const Track*> roeTracks = roe->getTracks(maskName);
-
         double pz = 0;
         double energy = 0;
+
+        // Get all Tracks on reconstructed side
+        std::vector<const Particle*> recTrackParticles = particle->getFinalStateDaughters();
 
         // Loop the reconstructed side
         for (unsigned int i = 0; i < recTrackParticles.size(); i++)
@@ -994,8 +991,8 @@ namespace Belle2 {
         }
 
         // "Loop" the ROE side
-        pz += roe->get4Vector(maskName).Vect().Pz();
-        energy += roe->get4Vector(maskName).Energy();
+        pz += roe->get4VectorTracks(maskName).Vect().Pz();
+        energy += roe->get4VectorTracks(maskName).Energy();
 
         return pz / energy;
       };

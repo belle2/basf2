@@ -143,9 +143,14 @@ std::vector<const KLMCluster*> RestOfEvent::getKLMClusters() const
 
 TLorentzVector RestOfEvent::get4Vector(std::string maskName) const
 {
+  TLorentzVector roe4Vector = RestOfEvent::get4VectorTracks(maskName) + RestOfEvent::get4VectorNeutralECLClusters(maskName);
+  return roe4Vector;
+}
+
+TLorentzVector RestOfEvent::get4VectorTracks(std::string maskName) const
+{
   std::vector<const Track*> roeTracks = RestOfEvent::getTracks(maskName);
-  std::vector<const ECLCluster*> roeClusters = RestOfEvent::getECLClusters(maskName);
-  TLorentzVector roe4Vector;
+  TLorentzVector roe4VectorTracks;
 
   const unsigned int n = Const::ChargedStable::c_SetSize;
   double fractions[n];
@@ -183,16 +188,24 @@ TLorentzVector RestOfEvent::get4Vector(std::string maskName) const
     temp4Vector.SetVect(tempMom);
     temp4Vector.SetE(TMath::Sqrt(tempMom.Mag2() + tempMass * tempMass));
 
-    roe4Vector += temp4Vector;
+    roe4VectorTracks += temp4Vector;
   }
+
+  return roe4VectorTracks;
+}
+
+TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(std::string maskName) const
+{
+  std::vector<const ECLCluster*> roeClusters = RestOfEvent::getECLClusters(maskName);
+  TLorentzVector roe4VectorECLClusters;
 
   // Add all momenta from neutral ECLClusters
   for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
     if (roeClusters[iEcl]->isNeutral())
-      roe4Vector += roeClusters[iEcl]->get4Vector();
+      roe4VectorECLClusters += roeClusters[iEcl]->get4Vector();
   }
 
-  return roe4Vector;
+  return roe4VectorECLClusters;
 }
 
 std::map<unsigned int, bool> RestOfEvent::getTrackMask(std::string maskName) const

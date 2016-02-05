@@ -125,8 +125,8 @@ m_isAssigned(false)
 
 
   // if sigma for a coordinate is not known, a uniform distribution over the whole sensor is asumed:
-  if (uSigma < 0) { uSigma = aSensorInfo->getUSize(vCoord) / sqrt(12.); }
-  if (vSigma < 0) { vSigma = aSensorInfo->getVSize() / sqrt(12.); }
+  if (!(uSigma > 0)) { uSigma = aSensorInfo->getUSize(vCoord) / sqrt(12.); }
+  if (!(vSigma > 0)) { vSigma = aSensorInfo->getVSize() / sqrt(12.); }
 
   setPositionError(uSigma, vSigma, aSensorInfo);
 

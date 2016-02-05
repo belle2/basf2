@@ -163,7 +163,9 @@ namespace Belle2 { // make seperate sub-namespace for this?
       std::vector<std::pair<int, double> > mcParticles;
       if (spacePoint->getType() == VXD::SensorInfoBase::PXD) mcParticles = getMCParticles<PXDTrueHit>(spacePoint);
       else if (spacePoint->getType() == VXD::SensorInfoBase::SVD) mcParticles = getMCParticles<SVDTrueHit>(spacePoint);
-      else B2ERROR("Unknown DetectorType in createPurityInfos! Skipping this SpacePoint");
+      else if (spacePoint->getType() == VXD::SensorInfoBase::VXD) {B2DEBUG(1, "found generic spacePoint, treating it as virtualIP")}
+      else B2FATAL("Unknown DetectorType (" << spacePoint->getType() << ") in createPurityInfos! Skipping this SpacePoint " <<
+                     spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
 
       for (const std::pair<int, double>& particle : mcParticles) {
         std::vector<size_t> accessors = getAccessorsFromWeight(particle.second);

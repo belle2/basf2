@@ -65,8 +65,10 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     SpacePoint() :
+      m_positionError(1., 1., 1.),
       m_clustersAssigned( {false, false}),
                         m_vxdID(0),
+                        m_sensorType(VXD::SensorInfoBase::SensorType::VXD), // type is set to generic VXD
                         m_qualityIndicator(0.5),
     m_isAssigned(false) {}
 

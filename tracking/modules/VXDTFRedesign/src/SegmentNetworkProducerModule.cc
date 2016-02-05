@@ -147,7 +147,7 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
 
       // sector for SpacePoint exists:
       FullSecID foundSecID = sectorFound->getFullSecID();
-      B2INFO("matchSpacePointToSectors: SP found!: " << foundSecID.getFullSecString()) // TODO Jan8_2016: remove!
+      B2DEBUG(1, "matchSpacePointToSectors: SP found!: " << foundSecID.getFullSecString()) // TODO Jan8_2016: remove!
 
       vector<RawSectorData>::iterator iter =
         std::find_if(
@@ -242,6 +242,9 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
         // add all SpacePoints of this sector to ActiveSector:
         outerSector->addHits(outerSectorData.hits);
         activeSectors.push_back(outerSector);
+
+        B2DEBUG(1, "SegmentNetworkProducerModule::buildActiveSectorNetwork(): sector " << outerSector->getName() <<
+                " will be combined with inner sector " << innerSector->getName())
 
         activeSectorNetwork.linkTheseEntries(*outerSector, *innerSector);
         wasAnythingFoundSoFar = true;

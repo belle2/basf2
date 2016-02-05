@@ -52,13 +52,16 @@ namespace Belle2 {
       covSeed(3, 3) = 0.01 ; covSeed(4, 4) = 0.01 ; covSeed(5, 5) = 0.04 ;
 
 
-      for (auto& aPath : allPaths) {
+      for (std::vector<const SpacePoint*>& aPath : allPaths) {
         nTCsCreated++;
 
         std::vector<PositionInfo> convertedPathrawData;
+        convertedPathrawData.reserve(aPath.size());
         std::vector<PositionInfo*> convertedPath;
+        convertedPath.reserve(aPath.size());
         // collecting actual hits
-        for (const auto* aNode : aPath) { // is a const SpacePoint* here
+        for (const SpacePoint* aNode : aPath) { // is a const SpacePoint* here
+//      B2WARNING("SpacePointTrackCandCreator: spacePoint has got PositionError: " << aNode->getPositionError().PrintString())
           PositionInfo convertedHit{
             TVector3(aNode->getPosition()),
             TVector3(aNode->getPositionError()),

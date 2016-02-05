@@ -132,7 +132,7 @@ namespace Belle2 {
         m_spacePoints.push_back(StoreArray<SpacePoint>(anArrayName));
         m_spacePoints.back().isRequired();
       }
-//    m_secMap.isRequired(m_PARAMStaticSectorMapName); // TODO add real SecMap!
+
       m_network.registerInDataStore(m_PARAMNetworkOutputName, DataStore::c_DontWriteOut);
 
       // TODO catch cases when m_network already existed in DataStore!
@@ -192,30 +192,8 @@ namespace Belle2 {
       B2DEBUG(1, "SegmentNetworkProducerModule()::findSectorForSpacePoint(): spacepoint " << aSP.getArrayIndex() <<
               " got valid FullSecID of " << spSecID.getFullSecString() <<
               " with pointer-adress (if this is a nullptr, vxdtffilters does not have anything stored): " << secPointer);
-      // TODO function
-      /** Pseudo code of actual function:
-      *
-      * for (StaticSectorDummy& aSector : m_secMap)
-      *   if aSP->getVxdID() != aSector.getVxdID() {continue;}
-      *
-      *   if (aSector.getFullSecID(aSP->getNormalizedLocalU(), aSP->getNormalizedLocalV()) != isValid) { continue;}
-      *
-      *   return &aSector;
-      *
-      * return NULL;
-      */
 
       return secPointer;
-      // TODO WARNING JKL
-
-
-//       // dummy function here (for mockup):
-// // // //       for (StaticSectorDummy* aSector : m_secMap.sectors) {
-// // // //         if (FullSecID(aSP.getVxdID()) == *aSector) return aSector;
-// // // //       }
-// // // //
-// // // //       m_secMap.sectors.push_back(new StaticSectorDummy(FullSecID(aSP.getVxdID())));
-// // // //       return m_secMap.sectors.back();
     }
 
 
@@ -247,9 +225,6 @@ namespace Belle2 {
     /** contains names for storeArray with spacePoints in it */
     std::vector<std::string> m_PARAMSpacePointsArrayNames;
 
-    /** sets the name of the sectorMap to be used. */
-    //  std::string m_PARAMStaticSectorMapName;  // TODO add real SecMap!
-
     /** defines the unique name given to the output of this module - WARNING two instances of this module with the same name set in this parameter will abort the run! */
     std::string m_PARAMNetworkOutputName;
 
@@ -269,8 +244,7 @@ namespace Belle2 {
 
     // input containers
     /** contains the sectorMap and with it the VXDTFFilters. */
-    StoreObjPtr< SectorMap<SpacePoint> >
-    m_sectorMap; // = StoreObjPtr< SectorMap<SpacePoint> >("", DataStore::c_Persistent);
+    StoreObjPtr< SectorMap<SpacePoint> > m_sectorMap = StoreObjPtr< SectorMap<SpacePoint> >("", DataStore::c_Persistent);
 
     /** contains all sectorCombinations and Filters including cuts. */
     VXDTFFilters<SpacePoint>* m_vxdtfFilters = nullptr;
@@ -279,8 +253,7 @@ namespace Belle2 {
     std::vector<StoreArray<Belle2::SpacePoint> > m_spacePoints;
 
     /** access to the static sectorMap, which will be used in this module */
-//      StoreObjPtr<StaticSectorMap> m_secMap;  // TODO add real SecMap!
-    StaticSectorMap m_secMap; // WARNING temporal dummy
+
 
 
     // output containers

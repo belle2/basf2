@@ -38,7 +38,7 @@ Const::ParticleType V0::getV0Hypothesis() const
     return Const::Kshort;
   }
   if ((posParticleType == Const::proton) && (negParticleType == Const::pion)) {
-    return Const::lambda;
+    return Const::Lambda;
   }
   if ((posParticleType == Const::pion) && (negParticleType == Const::proton)) {
     return Const::antiLambda;

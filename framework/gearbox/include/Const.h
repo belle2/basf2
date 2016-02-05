@@ -456,8 +456,7 @@ namespace Belle2 {
     static const ParticleType neutron;   /**< neutron particle */
     static const ParticleType Kshort;    /**< K^0_S particle */
     static const ParticleType Klong;     /**< K^0_L particle */
-    static const ParticleType lambda;    /**< Lambda particle */
-    static const ParticleType lambda_; /**< same as 'lambda', but that's a keyword in Python. */
+    static const ParticleType Lambda;    /**< Lambda particle */
     static const ParticleType antiLambda; /**< Anti-Lambda particle */
     static const ParticleType invalidParticle;     /**< Invalid particle, used internally. */
     /** Unspecified particle, used when no other particle type fits. (no valid PDG code, but different from invalidParticle) */

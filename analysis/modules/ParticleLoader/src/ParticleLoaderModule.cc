@@ -180,7 +180,7 @@ namespace Belle2 {
             m_KLMClusters2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
           }
 
-          if (abs(pdgCode) == abs(Const::lambda.getPDGCode())) {
+          if (abs(pdgCode) == abs(Const::Lambda.getPDGCode())) {
             B2INFO("   -> MDST source: V0 (-> TFR(p) + TFR(pi))");
             m_V02Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
           }
@@ -254,7 +254,7 @@ namespace Belle2 {
         if (v0Type.getPDGCode() == Const::Kshort.getPDGCode()) { // K0s -> pi+ pi-
           pTypeP = Const::pion;
           pTypeM = Const::pion;
-        } else if (v0Type.getPDGCode() == Const::lambda.getPDGCode()) { // Lambda -> p+ pi-
+        } else if (v0Type.getPDGCode() == Const::Lambda.getPDGCode()) { // Lambda -> p+ pi-
           pTypeP = Const::proton;
           pTypeM = Const::pion;
         } else if (v0Type.getPDGCode() == Const::antiLambda.getPDGCode()) { // anti-Lambda -> pi+ anti-p-
@@ -584,7 +584,7 @@ namespace Belle2 {
     if (abs(pdgCode) == abs(Const::Klong.getPDGCode()))
       return true;
 
-    if (abs(pdgCode) == abs(Const::lambda.getPDGCode()))
+    if (abs(pdgCode) == abs(Const::Lambda.getPDGCode()))
       return true;
 
     return result;

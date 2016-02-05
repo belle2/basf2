@@ -5,6 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class Belle2::ECLEventInformation+;
 #pragma link C++ class Belle2::ECLDigit+;
 #pragma link C++ class Belle2::ECLCalDigit+;
 #pragma link C++ class Belle2::ECLDsp+;

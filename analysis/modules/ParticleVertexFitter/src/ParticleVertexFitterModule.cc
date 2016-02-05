@@ -75,8 +75,11 @@ namespace Belle2 {
 
     // magnetic field
     m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
+
     // RAVE setup
-    analysis::RaveSetup::initialize(1, m_Bfield);
+    if (m_vertexFitter == "rave")
+      analysis::RaveSetup::initialize(1, m_Bfield);
+
     B2INFO("ParticleVertexFitterModule : magnetic field = " << m_Bfield);
 
 
@@ -107,9 +110,8 @@ namespace Belle2 {
       return;
     }
 
-    analysis::RaveSetup::initialize(1, m_Bfield);
-    //B2INFO("ParticleVertexFitterModule : magnetic field = " << m_Bfield);
-
+    if (m_vertexFitter == "rave")
+      analysis::RaveSetup::initialize(1, m_Bfield);
 
     m_BeamSpotCenter = m_beamParams->getVertex();
     m_beamSpotCov.ResizeTo(3, 3);
@@ -123,9 +125,6 @@ namespace Belle2 {
     if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut")
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
-
-    if (m_vertexFitter == "rave")
-      analysis::RaveSetup::initialize(1, m_Bfield);
 
     std::vector<unsigned int> toRemove;
     unsigned int n = plist->getListSize();

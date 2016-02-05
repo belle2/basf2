@@ -355,7 +355,7 @@ void SVDBackgroundModule::terminate()
   // Write out m_data
   ofstream outfile;
   string outfileName(m_outputDirectoryName + m_componentName + "_summary.txt");
-  outfile.open(outfileName.c_str(), ios::out | ios::app);
+  outfile.open(outfileName.c_str(), ios::out | ios::trunc);
   outfile << "component_name "
           << "component_time "
           << "layer "

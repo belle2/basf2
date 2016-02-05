@@ -249,7 +249,7 @@ namespace Belle2 {
 
     unsigned long long int m_time; /**< Time in ns since epoch (1970-01-01).  */
 
-    std::string m_parentLfn;  /** LFN of the parent file */
+    std::string m_parentLfn;  /**< LFN of the parent file */
 
     double m_generatedWeight; /**< Generated weight.  */
 

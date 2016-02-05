@@ -22,11 +22,11 @@
 #    this case is split for every kind of pixel size (4 cases)
 #    partical gun is locate close to sensor with giving pixel kind
 #    there are storing only data for giving pixel kind
-# "PixelKind" only for CalibrationKind=2 for every kind of pixel
-#    PixelKind=0: 55 um pitch: sensor 1.3.2 , vertex: x: [-0.2050,-0.2], y: [1.35], z: [0.7,0.7055]
-#    PixelKind=1: 60 um pitch: sensor 1.3.2 , vertex: x: [-0.2050,-0.2], y: [1.35], z: [-1.5,-1.5060]
-#    PixelKind=2: 70 um pitch: sensor 2.4.2 , vertex: x: [-0.2050,-0.2], y: [2.18], z: [0.9,0.9070]
-#    PixelKind=3: 85 um pitch: sensor 2.4.2 , vertex: x: [-0.2050,-0.2], y: [2.18], z: [-2.0,-2.0085]
+# "PixelKindCal" only for CalibrationKind=2 for every kind of pixel
+#    PixelKindCal=0: 55 um pitch: sensor 1.3.2 , vertex: x: [-0.2050,-0.2], y: [1.35], z: [0.7,0.7055]
+#    PixelKindCal=1: 60 um pitch: sensor 1.3.2 , vertex: x: [-0.2050,-0.2], y: [1.35], z: [-1.5,-1.5060]
+#    PixelKindCal=2: 70 um pitch: sensor 2.4.2 , vertex: x: [-0.2050,-0.2], y: [2.18], z: [0.9,0.9070]
+#    PixelKindCal=3: 85 um pitch: sensor 2.4.2 , vertex: x: [-0.2050,-0.2], y: [2.18], z: [-2.0,-2.0085]
 #    TODO: Need to check influence of orientation of u & v axes for corections
 #
 # Parameters are not independent, there are some priorities:
@@ -34,7 +34,7 @@
 #   if you set UseRealData=True, UseTracks is set automatically to True (noe TrueHit data).
 #
 # There is possibility to call this macro with presets in parameters:
-#    basf2 PXDClasterShape_PrepareSources.py UseTracks UseRealData CalibrationKind PixelKind
+#    basf2 PXDClasterShape_PrepareSources.py UseTracks UseRealData CalibrationKind PixelKindCal
 #    Example for defaults:
 #    basf2 PXDClasterShape_PrepareSources.py 1 0 1 0
 #
@@ -51,7 +51,7 @@ UseRealData = False
 CompareTruePointTracks = False
 # For special calibration, only for experts:
 CalibrationKind = 1
-PixelKind = 0
+PixelKindCal = 0
 SpecialLayerNo = 1
 SpecialLadderNo = 3
 SpecialSensorNo = 2
@@ -76,8 +76,8 @@ if argc >= 4:
     CalibrationKind = int(argvs[3])
     print("third argument CalibrationKind: ", CalibrationKind)
 if argc >= 5:
-    PixelKind = int(argvs[5])
-    print("fours argument PixelKind: ", PixelKind)
+    PixelKindCal = int(argvs[5])
+    print("fours argument PixelKindCal: ", PixelKindCal)
 
 # Crosscheck of presets:
 if UseTracks:
@@ -91,19 +91,19 @@ if (CalibrationKind == 2):
     UseTracks = False
     CompareTruePointTracks = False
 
-if PixelKind == 0:
+if PixelKindCal == 0:
     SpecialLayerNo = 1
     SpecialLadderNo = 3
     SpecialSensorNo = 2
-if PixelKind == 1:
+if PixelKindCal == 1:
     SpecialLayerNo = 1
     SpecialLadderNo = 3
     SpecialSensorNo = 2
-if PixelKind == 2:
+if PixelKindCal == 2:
     SpecialLayerNo = 2
     SpecialLadderNo = 4
     SpecialSensorNo = 2
-if PixelKind == 3:
+if PixelKindCal == 3:
     SpecialLayerNo = 2
     SpecialLadderNo = 4
     SpecialSensorNo = 2
@@ -114,13 +114,13 @@ print("                 UseTracks: ", UseTracks)
 print("               UseRealData: ", UseRealData)
 print("    CompareTruePointTracks: ", CompareTruePointTracks)
 print("           CalibrationKind: ", CalibrationKind)
-print("                      PixelKind: ", PixelKind)
+print("                   PixelKindCal: ", PixelKindCal)
 print("                 SpecialLayerNo: ", SpecialLayerNo)
 print("                SpecialLadderNo: ", SpecialLadderNo)
 print("                SpecialSensorNo: ", SpecialSensorNo)
 
 outputFileName = 'pxdClShapeCalibrationSource_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
-outputFileName = outputFileName + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKind) + '.root'
+outputFileName = outputFileName + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKindCal) + '.root'
 
 # Register modules
 
@@ -185,7 +185,7 @@ if CalibrationKind == 2:
     #  60 um pitch: sensor 1.3.2 , vertex: x: [-0.2050,-0.2], y: [1.35], z: [-1.5,-1.5060]
     #  70 um pitch: sensor 2.4.2 , vertex: x: [-0.2050,-0.2], y: [2.18], z: [0.9,0.9070]
     #  85 um pitch: sensor 2.4.2 , vertex: x: [-0.2050,-0.2], y: [2.18], z: [-2.0,-2.0085]
-    if PixelKind == 0:
+    if PixelKindCal == 0:
         # Pixel size v = 55 microns
 
         # Set parameters for particlegun
@@ -225,7 +225,7 @@ if CalibrationKind == 2:
             # 'zVertexParams': [-2.0085, -2.0],
             'independentVertices': False,
         })
-    if PixelKind == 1:
+    if PixelKindCal == 1:
         # Pixel size v = 60 microns
 
         particlegun.param({
@@ -241,7 +241,7 @@ if CalibrationKind == 2:
             # 'zVertexParams': [-2.0085, -2.0],
             'independentVertices': False,
         })
-    if PixelKind == 2:
+    if PixelKindCal == 2:
         # Pixel size v = 70 microns
 
         particlegun.param({
@@ -257,7 +257,7 @@ if CalibrationKind == 2:
             # 'zVertexParams': [-2.0085, -2.0],
             'independentVertices': False,
         })
-    if PixelKind == 3:
+    if PixelKindCal == 3:
         # Pixel size v = 85 microns
 
         particlegun.param({
@@ -314,7 +314,7 @@ PXDSHCAL.param('CompareTruePointTracks', CompareTruePointTracks)
 PXDSHCAL.param('CalibrationKind', CalibrationKind)
 
 # For CalibrationKind=2 set pixel kind (pixel size) in range 1..4, default=1
-PXDSHCAL.param('PixelKind', PixelKind)
+PXDSHCAL.param('PixelKindCal', PixelKindCal)
 
 # For CalibrationKind=2 set sensor ID for special analysis, default=1.3.2
 PXDSHCAL.param('SpecialLayerNo', SpecialLayerNo)

@@ -82,8 +82,8 @@ pxdClusterShapeCalibrationModule::pxdClusterShapeCalibrationModule() : Calibrati
   addParam("CalibrationKind", m_CalibrationKind,
            "1: realistic physics or real data (default), 2: special, for full range of angles", m_CalibrationKind);
 
-  addParam("PixelKind", m_PixelKind,
-           "For CalibrationKind=2 set pixel kind (pixel size) in range 1..4, default=1", m_PixelKind);
+  addParam("PixelKindCal", m_PixelKindCal,
+           "For CalibrationKind=2 set pixel kind (pixel size) in range 1..4 (smallest to biggest), default=0", m_PixelKindCal);
 
   addParam("SpecialLayerNo", m_SpecialLayerNo,
            "For CalibrationKind=2 set Layer ID for special analysis, default=1", m_SpecialLayerNo);
@@ -108,7 +108,6 @@ void pxdClusterShapeCalibrationModule::prepare()
   tree->Branch<int>("pid", &m_procId);
   tree->Branch<short int>("layer", &m_layer);
   tree->Branch<short int>("sensor", &m_sensor);
-  tree->Branch<short int>("segment", &m_segment);
   tree->Branch<short int>("pixelKind", &m_pixelKind);
   tree->Branch<short int>("closeEdge", &m_closeEdge);
   tree->Branch<short>("shape", &m_shape);
@@ -168,6 +167,9 @@ void pxdClusterShapeCalibrationModule::collect()
           sensorID = cluster.getSensorID();
           const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(
                                           sensorID));
+          m_layer = Info.getID().getLayerNumber();
+          m_sensor = Info.getID().getSensorNumber();
+
           m_SigmaU = cluster.getUSigma();
           m_SigmaV = cluster.getVSigma();
           m_signal = cluster.getCharge();
@@ -198,6 +200,10 @@ void pxdClusterShapeCalibrationModule::collect()
           m_pixelKind = 0;  // 0: smaller pixelsize, 1: larger pixelsize TODO set it more systematically?
           if ((m_sensor == 2) && (Info.getVCellID(cluster.getV()) < EdgePixelSizeV1)) m_pixelKind = 1;
           else if ((m_sensor == 1) && (Info.getVCellID(cluster.getV()) >= EdgePixelSizeV2)) m_pixelKind = 1;
+          if (m_layer == 2) m_pixelKind += 2;
+          if (m_sensor == 2) m_pixelKind += 4;
+//          printf("----> Layer %i sensor %i UPitch %i VPitch %i --- Vcell %i PixKind %i\n",
+//                 m_layer,m_sensor,(int)(Info.getUPitch(cluster.getU()) / Unit::um),(int)(Info.getVPitch(cluster.getV()) / Unit::um),Info.getVCellID(cluster.getV()),m_pixelKind);
 
           m_InPixU = (Info.getUCellPosition(Info.getUCellID(cluster.getU())) - cluster.getU()) / Info.getUPitch(cluster.getU());
           m_InPixV = (Info.getVCellPosition(Info.getVCellID(cluster.getV())) - cluster.getV()) / Info.getVPitch(cluster.getV());
@@ -251,7 +257,6 @@ void pxdClusterShapeCalibrationModule::collect()
                                         sensorID));
         m_layer = Info.getID().getLayerNumber();
         m_sensor = Info.getID().getSensorNumber();
-        m_segment = Info.getID().getSegmentNumber();
         int Conin = 1;
         if (m_CalibrationKind == 2) {
           int ladder = Info.getID().getLadderNumber();
@@ -294,6 +299,8 @@ void pxdClusterShapeCalibrationModule::collect()
         m_pixelKind = 0;  // 0: smaller pixelsize, 1: larger pixelsize TODO set it more systematically?
         if ((m_sensor == 2) && (Info.getVCellID(cluster.getV()) < EdgePixelSizeV1)) m_pixelKind = 1;
         else if ((m_sensor == 1) && (Info.getVCellID(cluster.getV()) >= EdgePixelSizeV2)) m_pixelKind = 1;
+        if (m_layer == 2) m_pixelKind += 2;
+        if (m_sensor == 2) m_pixelKind += 4;
 
         m_InPixU = (Info.getUCellPosition(Info.getUCellID(cluster.getU())) - cluster.getU()) / Info.getUPitch(cluster.getU());
         m_InPixV = (Info.getVCellPosition(Info.getVCellID(cluster.getV())) - cluster.getV()) / Info.getVPitch(cluster.getV());

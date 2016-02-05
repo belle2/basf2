@@ -72,8 +72,8 @@ namespace Belle2 {
      */
     int m_CalibrationKind = 1;
 
-    /** For CalibrationKind=2 set pixel kind (pixel size) in range 1..4, default=1 */
-    int m_PixelKind = 1;
+    /** For CalibrationKind=2 set pixel kind (pixel size) in range 0..3 (smallest to biggest), default=0 */
+    int m_PixelKindCal = 0;
 
     /** For CalibrationKind=2 set Layer ID for special analysis, default=1 */
     int m_SpecialLayerNo = 1;
@@ -106,9 +106,7 @@ namespace Belle2 {
     short m_layer = 0;
     /** Name of variable for sensor ID (1, 2) */
     short m_sensor = 0;
-    /** Name of variable for segment ID (1, 2) */
-    short m_segment = 0;
-    /** Name of variable for pixel kind ID (1..8) */
+    /** Name of variable for pixel kind ID (0..7) */
     short m_pixelKind = 0;
     /** Name of variable for mark, if cluster is touch edge or masked pixel  */
     short m_closeEdge = 0;

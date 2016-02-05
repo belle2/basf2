@@ -110,7 +110,7 @@ namespace Belle2 {
 
       // Charged tracks -> Pion
       //
-      std::vector<Belle2::Track*> roeTracks = roe->getTracks();
+      std::vector<const Track*> roeTracks = roe->getTracks();
 
       const Const::ChargedStable charged = Const::pion;
 
@@ -141,7 +141,7 @@ namespace Belle2 {
 
       // ECLCluster -> Gamma
       //
-      std::vector<Belle2::ECLCluster*> roeECLClusters = roe->getECLClusters();
+      std::vector<const ECLCluster*> roeECLClusters = roe->getECLClusters();
 
       for (int i = 0; i < roe->getNECLClusters(); i++) {
 
@@ -171,7 +171,7 @@ namespace Belle2 {
 
       // KLMCluster -> K0_L
       //
-      std::vector<Belle2::KLMCluster*> roeKLMClusters = roe->getKLMClusters();
+      std::vector<const KLMCluster*> roeKLMClusters = roe->getKLMClusters();
 
       for (int i = 0; i < roe->getNKLMClusters(); i++) {
 

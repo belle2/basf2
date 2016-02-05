@@ -496,14 +496,14 @@ namespace Belle2 {
   /*
    This function extracts MC information from the tracks performing the fit, and needs to be activated by the user.
    The function has been created to investigate the procedence of each track so the user can elaborate cuts and selection criterias
-   for the tracks when performing the vertex fit. It also extracts this information for the tracks inside the RestOfEvent.
+   for the tracks when performing the vertex fit. It also extracts this information for the tracks inside the const RestOfEvent.
    The MAIN interest is to know for a given track whether it comes directly from the B0 or from one of their immediately decaying daughters.
    Finally, the function saves this information in a codified form inside the FlavorTaggerInfo dataObject.
    */
   void TagVertexModule::FlavorTaggerInfoMCMatch(Particle* Breco)
   {
 
-    RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
+    const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
     FlavorTaggerInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
 
     if (!flavorTagInfo) return;
@@ -624,7 +624,7 @@ namespace Belle2 {
     // REST OF EVENT MC MATCHING
     /* In this part of the code the tracks from the RestOfEvent are taken into account. The same MC analysis is performed as
      before with the exact same criteria */
-    std::vector<Belle2::Track*> ROETracks = roe->getTracks();
+    std::vector<const Track*> ROETracks = roe->getTracks();
     int ROEGoodTracks = 0;
     bool exitROEWhile = false;
     int ROETotalTracks = roe->getNTracks();
@@ -698,12 +698,12 @@ namespace Belle2 {
    */
   bool TagVertexModule::getTagTracks_singleTrackAlgorithm(Particle* Breco, int reqPXDHits)
   {
-    RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
-    std::vector<Belle2::Track*> fitTracks; // Vector of track that will be returned after the selection. Now it must contain only 1
+    const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
+    std::vector<const Track*> fitTracks; // Vector of track that will be returned after the selection. Now it must contain only 1
 
     FlavorTaggerInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
     if (!flavorTagInfo) return false;
-    std::vector<Belle2::Track*> ROETracks = roe->getTracks();
+    std::vector<const Track*> ROETracks = roe->getTracks();
     std::vector<float> listMomentum = flavorTagInfo->getP(); // Momentum of the tracks
     std::vector<float> listTargetP = flavorTagInfo->getTargProb(); // Probability of a track to come directly from B_tag
     std::vector<float> listCategoryP = flavorTagInfo->getCatProb(); // Probability of a track to belong to a given category
@@ -843,11 +843,11 @@ namespace Belle2 {
    */
   bool TagVertexModule::getTagTracks_standardAlgorithm(Particle* Breco, int reqPXDHits)
   {
-    RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
+    const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
     if (!roe) return false;
-    std::vector<Belle2::Track*> ROETracks = roe->getTracks();
+    std::vector<const Track*> ROETracks = roe->getTracks();
     if (ROETracks.size() == 0) return false;
-    std::vector<Belle2::Track*> fitTracks;
+    std::vector<const Track*> fitTracks;
     for (unsigned i = 0; i < ROETracks.size(); i++) {
       if (!ROETracks[i]->getTrackFitResult(Const::pion)) {
         continue;

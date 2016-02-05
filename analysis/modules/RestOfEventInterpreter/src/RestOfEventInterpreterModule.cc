@@ -136,9 +136,9 @@ namespace Belle2 {
         std::map<unsigned int, bool> eclClusterMask;
 
         // Create track masks
-        std::vector<Track*> roeTracks = roe->getTracks();
+        std::vector<const Track*> roeTracks = roe->getTracks();
         for (unsigned i = 0; i < roeTracks.size(); i++) {
-          Track* track = roeTracks[i];
+          const Track* track = roeTracks[i];
           const PIDLikelihood* pid = track->getRelatedTo<PIDLikelihood>();
           int chargedStablePDG;
 
@@ -170,9 +170,9 @@ namespace Belle2 {
         }
 
         // Create cluster masks
-        std::vector<ECLCluster*> roeECLClusters = roe->getECLClusters();
+        std::vector<const ECLCluster*> roeECLClusters = roe->getECLClusters();
         for (unsigned i = 0; i < roeECLClusters.size(); i++) {
-          ECLCluster* cluster = roeECLClusters[i];
+          const ECLCluster* cluster = roeECLClusters[i];
           Particle p(cluster);
           Particle* tempPart = &p;
           if (m_eclClusterCuts[maskName]->check(tempPart))
@@ -180,6 +180,12 @@ namespace Belle2 {
           else
             eclClusterMask[cluster->getArrayIndex()] = false;
         }
+
+        // Final check, just in case
+        if (trackMask.size() != (unsigned) roe->getNTracks())
+          B2FATAL("Track mask size does not have appropriate size!");
+        if (eclClusterMask.size() != (unsigned) roe->getNECLClusters())
+          B2FATAL("ECLCluster mask size does not have appropriate size!");
 
         trackMasks[maskName] = trackMask;
         eclClusterMasks[maskName] = eclClusterMask;

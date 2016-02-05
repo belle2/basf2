@@ -142,10 +142,10 @@ namespace Belle2 {
         const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
         // Load unused ROE Tracks
-        std::vector<Track*> roeTracks = roe->getTracks(maskName);
+        std::vector<const Track*> roeTracks = roe->getTracks(maskName);
 
         // Load unused ROE ECLClusters
-        std::vector<ECLCluster*> roeECL = roe->getECLClusters(maskName);
+        std::vector<const ECLCluster*> roeECL = roe->getECLClusters(maskName);
 
         // TODO: in the future to load KLMClusters
         //std::vector<const KLMCluster*> roeKLM = roe->getNKLMClusters();
@@ -182,7 +182,7 @@ namespace Belle2 {
 
             // insert MCParticle based on relation strength
             for (unsigned int j = 0; j < weightsAndIndices.size(); j++) {
-              MCParticle* relMCParticle = mcParticles[weightsAndIndices[j].first];
+              const MCParticle* relMCParticle = mcParticles[weightsAndIndices[j].first];
               double weight = weightsAndIndices[j].second;
 
               // TODO: study this further and avoid hardcoded values
@@ -280,7 +280,7 @@ namespace Belle2 {
         }
 
         // Get unused ECLClusters in ROE
-        const std::vector<ECLCluster*> roeClusters = roe->getECLClusters(maskName);
+        std::vector<const ECLCluster*> roeClusters = roe->getECLClusters(maskName);
         int nNeutrals = 0;
 
         // Select ECLClusters with no associated tracks
@@ -322,7 +322,7 @@ namespace Belle2 {
         }
 
         // Get ECLClusters in ROE
-        const std::vector<ECLCluster*> roeClusters = roe->getECLClusters(maskName);
+        std::vector<const ECLCluster*> roeClusters = roe->getECLClusters(maskName);
         int nPi0 = 0;
 
         // Set cut criteria for pi0
@@ -380,7 +380,7 @@ namespace Belle2 {
         }
 
         // Get tracks in ROE
-        const std::vector<Track*> roeTracks = roe->getTracks(maskName);
+        std::vector<const Track*> roeTracks = roe->getTracks(maskName);
         int roeCharge = 0;
 
         for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++)
@@ -416,7 +416,7 @@ namespace Belle2 {
           return -1;
         }
 
-        const std::vector<ECLCluster*> roeClusters = roe->getECLClusters(maskName);
+        std::vector<const ECLCluster*> roeClusters = roe->getECLClusters(maskName);
         double extraE = 0.0;
 
         for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
@@ -981,7 +981,7 @@ namespace Belle2 {
         std::vector<const Particle*> recTrackParticles = particle->getFinalStateDaughters();
 
         // Get Tracks in ROE
-        std::vector<Track*> roeTracks = roe->getTracks(maskName);
+        std::vector<const Track*> roeTracks = roe->getTracks(maskName);
 
         double pz = 0;
         double energy = 0;

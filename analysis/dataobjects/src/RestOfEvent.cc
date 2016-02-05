@@ -68,9 +68,9 @@ void RestOfEvent::appendECLClusterMasks(std::map<std::string, std::map<unsigned 
   m_eclClusterMasks.insert(masks.begin(), masks.end());
 }
 
-std::vector<Belle2::Track*> RestOfEvent::getTracks(std::string maskName) const
+std::vector<const Track*> RestOfEvent::getTracks(std::string maskName) const
 {
-  std::vector<Track*> remainTracks(getNTracks(maskName));
+  std::vector<const Track*> remainTracks(getNTracks(maskName));
   StoreArray<Track> allTracks;
 
   if (allTracks.getEntries() < getNTracks(maskName))
@@ -96,9 +96,9 @@ std::vector<Belle2::Track*> RestOfEvent::getTracks(std::string maskName) const
   return remainTracks;
 }
 
-std::vector<Belle2::ECLCluster*> RestOfEvent::getECLClusters(std::string maskName) const
+std::vector<const ECLCluster*> RestOfEvent::getECLClusters(std::string maskName) const
 {
-  std::vector<ECLCluster*> remainECLClusters(getNECLClusters(maskName));
+  std::vector<const ECLCluster*> remainECLClusters(getNECLClusters(maskName));
   StoreArray<ECLCluster> allECLClusters;
 
   if (allECLClusters.getEntries() < getNECLClusters(maskName))
@@ -124,9 +124,9 @@ std::vector<Belle2::ECLCluster*> RestOfEvent::getECLClusters(std::string maskNam
   return remainECLClusters;
 }
 
-std::vector<Belle2::KLMCluster*> RestOfEvent::getKLMClusters() const
+std::vector<const KLMCluster*> RestOfEvent::getKLMClusters() const
 {
-  std::vector<KLMCluster*> remainKLMClusters(getNKLMClusters());
+  std::vector<const KLMCluster*> remainKLMClusters(getNKLMClusters());
   StoreArray<KLMCluster> allKLMClusters;
 
   if (allKLMClusters.getEntries() < getNKLMClusters())
@@ -143,8 +143,8 @@ std::vector<Belle2::KLMCluster*> RestOfEvent::getKLMClusters() const
 
 TLorentzVector RestOfEvent::get4Vector(std::string maskName) const
 {
-  std::vector<Track*> roeTracks = RestOfEvent::getTracks(maskName);
-  std::vector<ECLCluster*> roeClusters = RestOfEvent::getECLClusters(maskName);
+  std::vector<const Track*> roeTracks = RestOfEvent::getTracks(maskName);
+  std::vector<const ECLCluster*> roeClusters = RestOfEvent::getECLClusters(maskName);
   TLorentzVector roe4Vector;
 
   const unsigned int n = Const::ChargedStable::c_SetSize;

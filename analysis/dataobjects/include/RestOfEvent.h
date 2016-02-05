@@ -132,7 +132,7 @@ namespace Belle2 {
      * @param name of mask
      * @return vector of pointers to unused Tracks
      */
-    std::vector<Belle2::Track*> getTracks(std::string maskName = "") const;
+    std::vector<const Track*> getTracks(std::string maskName = "") const;
 
     /**
      * Get vector of all (no mask) or a subset (use mask) of all ECLClusters in ROE.
@@ -140,14 +140,14 @@ namespace Belle2 {
      * @param name of mask
      * @return vector of pointers to unused ECLClusters
      */
-    std::vector<Belle2::ECLCluster*> getECLClusters(std::string maskName = "") const;
+    std::vector<const ECLCluster*> getECLClusters(std::string maskName = "") const;
 
     /**
      * Get vector of all unused KLMClusters.
      *
      * @return vector of pointers to unused KLMClusters
      */
-    std::vector<Belle2::KLMCluster*> getKLMClusters() const;
+    std::vector<const KLMCluster*> getKLMClusters() const;
 
     /**
      * Get 4-momentum vector all (no mask) or a subset (use mask) of all Tracks and ECLClusters in ROE.

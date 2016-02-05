@@ -80,7 +80,7 @@ namespace Belle2 {
     std::string m_useFitAlgorithm;    /**< Choose constraint: from Breco or tube in the boost direction w/wo cut */
 
     double m_Bfield;              /**< magnetic field from data base */
-    std::vector<Belle2::Track*> m_tagTracks;  /**< tracks of the rest of the event */
+    std::vector<const Track*> m_tagTracks;  /**< tracks of the rest of the event */
     double m_fitPval;             /**< P value of the tag side fit result */
     TVector3 m_tagV;              /**< tag side fit result */
     TMatrixDSym m_tagVErrMatrix;  /**< Error matrix of the tag side fit result */

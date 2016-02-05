@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['framework','topcaf_dataobjects', 'top_dataobjects']
+	
+Return('env')
+

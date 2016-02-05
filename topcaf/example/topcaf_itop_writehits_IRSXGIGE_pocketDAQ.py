@@ -117,6 +117,8 @@ if args.s2s:
 
 timecalibmodule = register_module('DoubleCalPulse')
 
+timeCorrection = register_module("TimeBasedCorrection")
+timeCorrection.param('correctionFileName', path.join(os.environ['BELLE2_LOCAL_DIR'], 'topcaf/data/M03_M04_dT.dat'))
 
 main = create_path()
 main.add_module(histomanager)
@@ -126,6 +128,7 @@ main.add_module(eventinfoprinter)
 main.add_module(itopconfig)
 main.add_module(itopeventconverter)
 main.add_module(pedmodule)
+main.add_module(timeCorrection)
 main.add_module(mergemodule)
 main.add_module(timemodule)
 main.add_module(timecalibmodule)

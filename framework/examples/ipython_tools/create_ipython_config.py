@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 # Skript to create or edit your ipython config to use a port and a password and not open a browser
 # when starting.
-# Please ensure you have the newest ipython-notebook version installed (greater/equal than 4.0.0).
+# Please ensure you have the newest jupyter notebook version installed (greater/equal than 4.0.0).
 #
 
 from jinja2 import Template
 from IPython.lib import passwd
 import os
 from subprocess import check_output
+from ROOT import Belle2
 
 
 def main():
@@ -32,8 +33,8 @@ def main():
 
     print("Will now write your notebook config.")
 
-    base_name = os.path.dirname(os.path.realpath('__file__'))
-    with open(os.path.join(base_name, "jupyter_notebook_config.py.j2"), 'r+') as f:
+    jupyter_template_file = Belle2.FileSystem.findFile("framework/examples/ipython_tools/jupyter_notebook_config.py.j2")
+    with open(jupyter_template_file, 'r+') as f:
         template = Template(f.read())
 
         try:
@@ -43,7 +44,15 @@ def main():
             raise
 
         if not os.path.isdir(jupyter_folder):
-            check_output(['jupyter', 'notebook', '--generate-config'])
+            try:
+                check_output(['jupyter', 'notebook', '--generate-config'])
+            except:
+                print("Could not start jupyter notebook. There are many possible reasons for this.\n"
+                      "\t1) Have you installed jupyter properly?\n"
+                      "\t2) Is there something like \"ImportError: No module named '_sqlite3'\" in the error message?"
+                      "Then please see https://belle2.cc.kek.jp/~twiki/bin/view/Software/IPython for help on that.\n"
+                      "\t3) For every other errors not listed on https://belle2.cc.kek.jp/~twiki/bin/view/Software/IPython,"
+                      "please feel free to contact nils.braun@kit.edu.")
 
         config_file = template.render(port=port, password=password)
         jupyter_config_file = os.path.join(jupyter_folder, 'jupyter_notebook_config.py')

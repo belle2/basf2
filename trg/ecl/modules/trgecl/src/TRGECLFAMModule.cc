@@ -148,6 +148,8 @@ namespace Belle2 {
     //
     //
     m_nEvent++;
+    delete obj_trgeclfam;
+
     //
     //
     //

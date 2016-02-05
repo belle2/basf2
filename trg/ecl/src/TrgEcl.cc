@@ -45,7 +45,7 @@ TrgEcl::TrgEcl():
   bitECLtoGDL(0)
 {
   for (int iTCId = 0; iTCId < 576; iTCId++) {
-    for (int iTimeindex = 0; iTimeindex < 80; iTimeindex++) {
+    for (int iTimeindex = 0; iTimeindex < 64; iTimeindex++) {
       Timing[iTCId][iTimeindex] = 0;
       Energy[iTCId][iTimeindex] = 0;
       for (int ibin = 0; ibin < 160; ibin++) {
@@ -53,7 +53,18 @@ TrgEcl::TrgEcl():
       }
     }
   }
+  for (int iii = 0; iii < 5; iii++) {
+    Etop5[iii] = 0;
+    Ttop5[iii] = 0;
 
+  }
+
+  obj_cluster = new TrgEclCluster();
+
+}
+TrgEcl::~TrgEcl()
+{
+  delete obj_cluster;
 }
 //
 //
@@ -120,14 +131,14 @@ TrgEcl::setPRS(int iBin)
   //----------------------------------------
   //
   for (int iTCThetaId = 0; iTCThetaId < 17; iTCThetaId++) {
-    for (int itime = 0; itime < 80 ; itime++) {
+    for (int itime = 0; itime < 64 ; itime++) {
       _PhiRingSum[iTCThetaId] = 0;
     }
   }
   TrgEclMapping* map = new TrgEclMapping();
 
   for (int iTCId = 0; iTCId < 576; iTCId++) {
-    for (int itime = 0; itime < 80; itime++) {
+    for (int itime = 0; itime < 64; itime++) {
       for (int iTCThetaId = 0; iTCThetaId < 17; iTCThetaId++) {
         if (HitTC[iBin][iTCId][itime] == 1) {
           if (iTCThetaId == map ->getTCThetaIdFromTCId(iTCId + 1)) {
@@ -168,7 +179,7 @@ TrgEcl::simulate(int m_nEvent)
   //-----------------------------------------
 
   for (int iTCId = 0; iTCId < 576; iTCId++) {
-    for (int iTimeindex = 0; iTimeindex < 80; iTimeindex++) {
+    for (int iTimeindex = 0; iTimeindex < 64; iTimeindex++) {
       Timing[iTCId][iTimeindex] = 0;
       Energy[iTCId][iTimeindex] = 0;
       for (int ibin = 0; ibin < 160; ibin++) {
@@ -194,13 +205,13 @@ TrgEcl::simulate(int m_nEvent)
 
 
 
-  for (int iBin = 0; iBin < 80 ; iBin ++) {
+  for (int iBin = 0; iBin < 64 ; iBin ++) {
     EventTiming[iBin] = 0;
   }
 
   getEventTiming(1); //1: belle , 2: Energetic , 3 : Energy weighted
 
-  for (int iBin = 0 ; iBin < 80; iBin ++) {
+  for (int iBin = 0 ; iBin < 64; iBin ++) {
 
     if (EventTiming[iBin] == 0) {continue;}
     //  cout << "hmm???" << endl;
@@ -219,27 +230,29 @@ TrgEcl::simulate(int m_nEvent)
     // // Threshold for each combination of PRS
     // //
 
-    int k01[] = {5,  1, 2, 3 , 16, 17};    // (1)  F1+F2 + F3 + B1+B2
-    int k02[] = {2,  3, 15}; // (2)  F3 + C12
-    int k03[] = {2,  2, 3};                // (3)  F2 + F3
-    int k04[] = {1,  4};    // (4)  C1 + backward gap
-    int k05[] = {3,  4, 14, 15};        // (5)  C1+C11+C12
-    int k06[] = {3,  5, 14, 15};         // (6)  C2+C11+C12
-    int k07[] = {3,  4, 5, 14};        // (7)  C1+C2+C11
-    int k08[] = {3,  5, 13, 14};        // (8)  C2+C10+C11
-    int k09[] = {3,  5, 12, 13};         // (9)  C2+C9+C10
-    int k10[] = {3,  5, 6, 13};             // (10) C2+C3+C10
-    int k11[] = {3,  5, 6, 12};                // (11) C2+C3+C9
-    int k12[] = {3,  6, 7, 12};         // (9)  C3+C4+C9
-    int k13[] = {3,  6, 7, 11};             // (10) C3+C4+C8
-    int k14[] = {3,  7, 8, 11};                // (11) C4+C5+C8
-    int k15[] = {3,  8, 10, 11};         // (9)  C5+C7+C8
-    int k16[] = {2,  8, 9, 10};             // (10) C5+C6+C7
-    int k17[] = {1, 14, 15};                // (11) C11+C12 +forward gap
-    int k18[] = {1, 16};                // (11) B1 + forward gap
 
-    double vct_bhabha[18];
-    for (int iii = 0; iii < 18; iii++) {vct_bhabha[iii] = 0.0;}
+
+    vector<int> k01 = {5,  1, 2, 3 , 16, 17};    // (1)  F1+F2 + F3 + B1+B2
+    vector<int> k02 = {2,  3, 15}; // (2)  F3 + C12
+    vector<int> k03 = {2,  2, 3};                // (3)  F2 + F3
+    vector<int> k04 = {1,  4};    // (4)  C1 + backward gap
+    vector<int> k05 = {3,  4, 14, 15};        // (5)  C1+C11+C12
+    vector<int> k06 = {3,  5, 14, 15};         // (6)  C2+C11+C12
+    vector<int> k07 = {3,  4, 5, 14};        // (7)  C1+C2+C11
+    vector<int> k08 = {3,  5, 13, 14};        // (8)  C2+C10+C11
+    vector<int> k09 = {3,  5, 12, 13};         // (9)  C2+C9+C10
+    vector<int> k10 = {3,  5, 6, 13};             // (10) C2+C3+C10
+    vector<int> k11 = {3,  5, 6, 12};                // (11) C2+C3+C9
+    vector<int> k12 = {3,  6, 7, 12};         // (9)  C3+C4+C9
+    vector<int> k13 = {3,  6, 7, 11};             // (10) C3+C4+C8
+    vector<int> k14 = {3,  7, 8, 11};                // (11) C4+C5+C8
+    vector<int> k15 = {3,  8, 10, 11};         // (9)  C5+C7+C8
+    vector<int> k16 = {2,  8, 9, 10};             // (10) C5+C6+C7
+    vector<int> k17 = {1, 14, 15};                // (11) C11+C12 +forward gap
+    vector<int> k18 = {1, 16};                // (11) B1 + forward gap
+
+    vector<double> vct_bhabha;
+    for (int iii = 0; iii < 18; iii++) {vct_bhabha.push_back(0.0);}
     for (int iii = 1; iii <= k01[0]; iii++) { vct_bhabha[0]  += _PhiRingSum[k01[iii] - 1];}
     for (int iii = 1; iii <= k02[0]; iii++) { vct_bhabha[1]  += _PhiRingSum[k02[iii] - 1]; }
     for (int iii = 1; iii <= k03[0]; iii++) { vct_bhabha[2]  += _PhiRingSum[k03[iii] - 1]; }
@@ -284,26 +297,26 @@ TrgEcl::simulate(int m_nEvent)
     // ICN
     //----------
     //
-    TrgEclCluster objCluster;
-    objCluster.setICN(HitTC[iBin]);
+    // TrgEclCluster obj_cluster;
+    obj_cluster->setICN(HitTC[iBin]);
 
 
-    int ICN = objCluster.getICNFwBr();
-    int ICNForward  = objCluster.getICNSub(0);
-    int ICNBarrel   = objCluster.getICNSub(1);
-    int ICNBackward = objCluster.getICNSub(2);
+    int ICN = obj_cluster->getICNFwBr();
+    int ICNForward  = obj_cluster->getICNSub(0);
+    int ICNBarrel   = obj_cluster->getICNSub(1);
+    int ICNBackward = obj_cluster->getICNSub(2);
 
 
     int m_hitNum = 0;
-    int NofCluster =  objCluster.getNofCluster();
+    int NofCluster =  obj_cluster->getNofCluster();
     for (int incluster = 0; incluster < NofCluster ; incluster++) {
 
-      int NofTCinCluster = objCluster.getNofTCinCluster(incluster);
-      double ClusterEnergy = objCluster.getClusterEnergy(incluster);
-      double ClusterTiming = objCluster.getClusterTiming(incluster);
-      double ClusterPositionX = (objCluster.getClusterPosition(incluster)).X();
-      double ClusterPositionY = (objCluster.getClusterPosition(incluster)).Y();
-      double ClusterPositionZ = (objCluster.getClusterPosition(incluster)).Z();
+      int NofTCinCluster = obj_cluster->getNofTCinCluster(incluster);
+      double ClusterEnergy = obj_cluster->getClusterEnergy(incluster);
+      double ClusterTiming = obj_cluster->getClusterTiming(incluster);
+      double ClusterPositionX = (obj_cluster->getClusterPosition(incluster)).X();
+      double ClusterPositionY = (obj_cluster->getClusterPosition(incluster)).Y();
+      double ClusterPositionZ = (obj_cluster->getClusterPosition(incluster)).Z();
 
       if (ClusterEnergy == 0 && ClusterTiming == 0) {continue;}
 
@@ -362,8 +375,8 @@ TrgEcl::simulate(int m_nEvent)
     if (E_tot > 1.0) boolEtot[1] = true;
     bool boolBhabha = (boolBhabhaStar && ICN > 4);
     bool boolPreBhabha = false;
-    bool boolForwardICN = objCluster.getICNSub(0);
-    bool boolBeamBkgVeto = objCluster.getBeamBkgVeto();
+    bool boolForwardICN = obj_cluster->getICNSub(0);
+    bool boolBeamBkgVeto = obj_cluster->getBeamBkgVeto();
     //
     // bit 5-7
     bitECLtoGDL = (ICN >= 7) ? 0x0007 : ICN;
@@ -475,8 +488,8 @@ void TrgEcl::getEventTiming(int method)
   //-------------------------------------------------------------------------------------------------------
 
   for (int iTCId = 0; iTCId < 576; iTCId++) {
-    for (int iTimeindex = 0; iTimeindex < 80; iTimeindex++) {
-      for (int ibin = 0; ibin < 80; ibin++) {
+    for (int iTimeindex = 0; iTimeindex < 64; iTimeindex++) {
+      for (int ibin = 0; ibin < 64; ibin++) {
         HitTC[ibin][iTCId][iTimeindex] = 0;
       }
     }
@@ -493,11 +506,18 @@ void TrgEcl::getEventTiming(int method)
   // double FastestTCHit = 0;
   double MaxE = 0;
 
-  double Ttop5[5] = {0};
+  <<< <<< < .mine
+//   double *Etop5 = new double [5];
+//   double *Ttop5 = new double [5]
+  == == == =
+    double Ttop5[5] = {0};
+  >>> >>> > .r25080
+
+
 
   if (method == 1) { //belle1 method
     nBin = 0;
-    TimeWindow = 500;
+    TimeWindow = 250;
     WindowStart = -4000;
     WindowEnd = WindowStart;// + TimeWindow;
 
@@ -505,7 +525,7 @@ void TrgEcl::getEventTiming(int method)
       double FastestTCHit = 9999;
       EventTiming[nBin] = 0;
       for (int iTCId = 0; iTCId < 576; iTCId++) {//Find fastest TC Hit
-        for (int itime = 0 ; itime < 80 ; itime++) {
+        for (int itime = 0 ; itime < 64 ; itime++) {
           if (Timing[iTCId][itime] == 0 && Energy[iTCId][itime] == 0) {continue;}
           if (Timing[iTCId][itime] > WindowEnd) {
             if (Timing[iTCId][itime] < FastestTCHit) {
@@ -518,7 +538,7 @@ void TrgEcl::getEventTiming(int method)
       WindowStart = FastestTCHit;
       WindowEnd = WindowStart + TimeWindow;
       for (int iTCId = 0; iTCId < 576; iTCId++) {
-        for (int itime = 0 ; itime < 80 ; itime++) {
+        for (int itime = 0 ; itime < 64 ; itime++) {
           if (Timing[iTCId][itime] >= WindowStart &&  Timing[iTCId][itime] < WindowEnd) {
             if (Energy[iTCId][itime] > 0.1) {
               HitTC[nBin][iTCId][itime] = 1;
@@ -534,8 +554,8 @@ void TrgEcl::getEventTiming(int method)
 
 
   if (method == 2) { // Energetic TC
-    TimeWindow = 200;
-    OverlapWindow = 100;
+    TimeWindow = 250;
+    OverlapWindow = 125;
     nBin = 2 * 8000 / TimeWindow ;
     WindowStart = 0;
     WindowEnd = 0;
@@ -550,7 +570,7 @@ void TrgEcl::getEventTiming(int method)
 
       for (int iTCId = 0; iTCId < 576; iTCId++) {
 
-        for (int itime = 0 ; itime < 80 ; itime++) {
+        for (int itime = 0 ; itime < 64 ; itime++) {
 
           if (Timing[iTCId][itime] > (WindowStart) &&
               Timing[iTCId][itime] < (WindowEnd)) {
@@ -578,14 +598,19 @@ void TrgEcl::getEventTiming(int method)
 
 
   if (method == 3) { // Energy weighted
+    <<< <<< < .mine
+    TimeWindow = 250;
+    OverlapWindow = 125;
+    == == == =
 
-    double Etop5[5] = {0};
+      double Etop5[5] = {0};
     TimeWindow = 200;
     OverlapWindow = 100;
+    >>> >>> > .r25080
     nBin = 2 * 8000 / TimeWindow ;
     WindowStart = 0;
     WindowEnd = 0;
-    fluctuation = ((gRandom ->Uniform(-1, 0))) * 100;
+    fluctuation = ((gRandom ->Uniform(-1, 0))) * 125;
 
 
     for (int iTime = 0; iTime < nBin; iTime++) {
@@ -602,7 +627,7 @@ void TrgEcl::getEventTiming(int method)
 
       for (int iTCId = 0; iTCId < 576; iTCId++) {
 
-        for (int itime = 0 ; itime < 80 ; itime++) {
+        for (int itime = 0 ; itime < 64 ; itime++) {
 
           if (Timing[iTCId][itime] > (WindowStart) &&
               Timing[iTCId][itime] < (WindowEnd)) {
@@ -619,17 +644,17 @@ void TrgEcl::getEventTiming(int method)
             } else if (Energy[iTCId][itime] > Etop5[2]) {
               Etop5[2] = Energy[iTCId][itime];
               Ttop5[2] = Timing[iTCId][itime];
-            } else if (Energy[iTCId][itime] > Etop5[3]) {
-              Etop5[3] = Energy[iTCId][itime];
-              Ttop5[3] = Timing[iTCId][itime];
-            } else if (Energy[iTCId][itime] > Etop5[4]) {
-              Etop5[4] = Energy[iTCId][itime];
-              Ttop5[4] = Timing[iTCId][itime];
+//             } else if (Energy[iTCId][itime] > Etop5[3]) {
+//               Etop5[3] = Energy[iTCId][itime];
+//               Ttop5[3] = Timing[iTCId][itime];
+//             } else if (Energy[iTCId][itime] > Etop5[4]) {
+//               Etop5[4] = Energy[iTCId][itime];
+//               Ttop5[4] = Timing[iTCId][itime];
             }
           }
         }
       }
-      for (int i = 0; i < 5; i++) {
+      for (int i = 0; i < 3; i++) {
         MaxE += Etop5[i];
         EventTiming[iTime] += Etop5[i] * Ttop5[i];
       }

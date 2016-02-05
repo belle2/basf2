@@ -32,6 +32,7 @@ TrgEclCluster::TrgEclCluster(): _BRICN(0), _FWDICN(0), _BWDICN(0)
 {
 
   for (int iii = 0; iii < 3; iii++) {
+    _icnfwbrbw[iii] = 0;
     for (int jjj = 0; jjj < 4; jjj++) {
       _icnquadrant[iii][jjj] = 0;
     }
@@ -59,7 +60,7 @@ TrgEclCluster::TrgEclCluster(): _BRICN(0), _FWDICN(0), _BWDICN(0)
 
 
   for (int iTCId = 0; iTCId < 576; iTCId++) {
-    for (int iTimeindex = 0; iTimeindex < 80; iTimeindex++) {
+    for (int iTimeindex = 0; iTimeindex < 64; iTimeindex++) {
       Timing[iTCId][iTimeindex] = 0;
       Energy[iTCId][iTimeindex] = 0;
     }
@@ -160,7 +161,7 @@ TrgEclCluster::getFwICNCluster(int ICNId, int location)
 //
 //
 void
-TrgEclCluster::setICN(int HitTC[][80])
+TrgEclCluster::setICN(int HitTC[][64])
 {
   _icnfwbrbw[1] = setBarrelICN(HitTC);
   _icnfwbrbw[0] = setForwardICN(HitTC);
@@ -192,7 +193,7 @@ TrgEclCluster::getBeamBkgVeto(void)
 //
 //
 int
-TrgEclCluster::setBarrelICN(int HitTC[][80])
+TrgEclCluster::setBarrelICN(int HitTC[][64])
 {
 
   int TCFire[432] = { 0 };
@@ -217,7 +218,7 @@ TrgEclCluster::setBarrelICN(int HitTC[][80])
   for (int iTCId0 = 0; iTCId0 < 576 ; iTCId0++) {
     int TCId = iTCId0 + 1;
 
-    for (int itime = 0 ; itime < 80 ; itime++) {
+    for (int itime = 0 ; itime < 64 ; itime++) {
       if (HitTC[iTCId0][itime] > 0) {
         if (TCId >= 81 && TCId <= 512) {
           TCFire[TCId - 81] = TCId;
@@ -425,7 +426,7 @@ TrgEclCluster::setBarrelICN(int HitTC[][80])
 //
 //
 int
-TrgEclCluster::setForwardICN(int HitTC[][80])
+TrgEclCluster::setForwardICN(int HitTC[][64])
 {
 
   int TCFire[96] = { 0 };
@@ -447,7 +448,7 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
   for (int iTCId0 = 0; iTCId0 < 80 ; iTCId0++) {
     int TCId = iTCId0 + 1;
 
-    for (int itime = 0 ; itime < 80 ; itime++) {
+    for (int itime = 0 ; itime < 64 ; itime++) {
       if (HitTC[TCId - 1][itime] == 0) {continue;}
       if (TCId > 80) { continue; }
       // TCFire[TCId-1] = TCId;
@@ -831,7 +832,7 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
 //
 //
 //
-int TrgEclCluster::setBackwardICN(int HitTC[][80])
+int TrgEclCluster::setBackwardICN(int HitTC[][64])
 {
 
   int TCFire[64] = { 0 };
@@ -856,7 +857,7 @@ int TrgEclCluster::setBackwardICN(int HitTC[][80])
   }
   for (int iTCId0 = 0; iTCId0 < 64 ; iTCId0++) {
     int TCId = iTCId0 + 513;
-    for (int itime = 0 ; itime < 80 ; itime++) {
+    for (int itime = 0 ; itime < 64 ; itime++) {
       if (HitTC[TCId - 1][itime] == 0) {continue;}
       if (TCId < 513) { continue; }
       //  TCFire[TCId-1] = TCId;

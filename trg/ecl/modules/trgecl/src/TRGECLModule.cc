@@ -21,7 +21,7 @@
 #include <framework/logging/Logger.h>
 
 #include <G4RunManager.hh>
-
+#include "trg/ecl/TrgEcl.h"
 //trg package headers
 #include "trg/trg/Debug.h"
 #include "trg/ecl/modules/trgecl/TRGECLModule.h"
@@ -54,7 +54,7 @@ namespace Belle2 {
 //
   TRGECLModule::TRGECLModule()
     : Module::Module(),
-      _debugLevel(0), _ecl(0)
+      _debugLevel(0)
   {
 
     string desc = "TRGECLModule(" + version() + ")";
@@ -118,7 +118,7 @@ namespace Belle2 {
     if (TRGDebug::level()) {
       std::cout << "TRGECLModule ... beginRun called " << std::endl;
     }
-    _ecl = TrgEcl::getTrgEcl();
+    //  _ecl = TrgEcl::getTrgEcl();
 
   }
 //
@@ -134,6 +134,8 @@ namespace Belle2 {
     //
     // simulation
     //
+    TrgEcl* _ecl = new TrgEcl();
+
     _ecl->initialize(m_nEvent);
     _ecl->simulate(m_nEvent);
     printf("TRGECLModule> bitECLtoGDL = %i \n", _ecl->getECLtoGDL());
@@ -144,6 +146,9 @@ namespace Belle2 {
     //
     //
     //
+
+    delete _ecl;
+
   }
 //
 //

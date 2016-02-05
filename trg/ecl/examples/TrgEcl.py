@@ -1,13 +1,12 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# ------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------
 #           TSim-ecl example code.
-# ------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------
 #       In order to test Tsim-ecl code, you need a root file which has ECLHit table.(after Gsim)
 #       ex)
 #       commend > basf2 TrgEcl.py [Name of Gsim root file] [Name of output root file]
-# ------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------
 import os
 from basf2 import *
 
@@ -20,13 +19,13 @@ if argc != 3:
 if argc == 3:
     f_in_root = argvs[1]
     f_out_root = argvs[2]
-print()
-print('f_in_root  = %s' % f_in_root)
-print('f_out_root = %s\n' % f_out_root)
+# print
+# print 'f_in_root  = %s' % f_in_root
+# print 'f_out_root = %s\n' % f_out_root
 
 ################
-# f_in_root1 = f_in_root+ "1.root";
-# f_in_root2 = f_in_root+ "2.root";
+#f_in_root1 = f_in_root+ "1.root";
+#f_in_root2 = f_in_root+ "2.root";
 
 # suppress messages and warnings during processing:
 # level: LogLevel.DEBUG/INFO/WARNING/ERROR/FATALls
@@ -35,7 +34,7 @@ set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.DEBUG)
 
 # one event
-# eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
+#eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 
 
 gearbox = register_module('Gearbox')
@@ -80,5 +79,5 @@ process(main)
 ###
 ###
 ###
-print(statistics)
+# print statistics
 # ===<END>

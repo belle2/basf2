@@ -32,8 +32,8 @@ namespace Belle2 {
 
     //! The # of output of TC.
     int m_noutput;
-
-
+    //
+    int m_beambkgtag;
     //! Deposited energy of this hit.
     double m_edep;
 
@@ -49,6 +49,7 @@ namespace Belle2 {
     //! The method to set # of output per TC
     void setTCOutput(int noutput) { m_noutput = noutput; }
 
+    void setBeamBkgTag(int beambkgtag) { m_beambkgtag = beambkgtag; }
 
     //! The method to set deposited energy
     void setEnergyDep(double edep) { m_edep = edep; }
@@ -67,6 +68,7 @@ namespace Belle2 {
 
     //! The method to get hit average time
     double getTimeAve() const {return m_TimeAve;}
+    int getBeamBkgTag() const {return m_beambkgtag; }
 
 
     // Empty constructor

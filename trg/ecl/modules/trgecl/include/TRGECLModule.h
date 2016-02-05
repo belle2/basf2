@@ -20,7 +20,7 @@
 
 namespace Belle2 {
 
-/// A module to process ECL trigger data
+  /*! A module of ETM */
   class TRGECLModule : public Module {
 
 
@@ -30,44 +30,43 @@ namespace Belle2 {
     //      ModulePtr nm(new TRGECLModule(false)); return nm;
     //    };
 
-    // Constructor
+    /** Constructor */
     TRGECLModule();
-    //    TRGECLModule(bool selfReg = true);
-    //  TRGECLModule(const std::string & type);
 
-    // Destructor
+
+    /** Destructor  */
     virtual ~TRGECLModule();
 
-    // Initilizes TRGECLModule.
+    /** Initilizes TRGECLModule.*/
     virtual void initialize();
 
-    // Called when new run started.
+    /** Called when new run started.*/
     virtual void beginRun();
 
-    // Called event by event.
+    /** Called event by event.*/
     virtual void event();
 
-    // Called when run ended.
+    /** Called when run ended.*/
     virtual void endRun();
 
-    // Called when processing ended.
+    /** Called when processing ended.*/
     virtual void terminate();
 
   public:
 
-    // returns version of TRGECLModule.
+    /** returns version of TRGECLModule.*/
     std::string version(void) const;
 
   private: // Parameters
 
-    // Debug level.
+    /** Debug level.*/
     int _debugLevel;
 
-    // Config. file name.
+    /** Config. file name.*/
     std::string _configFilename;
 
-    /// A pointer to a TRGECL;
-    TrgEcl* _ecl;
+    /// A pointer to a TRGECL;*/
+    //    TrgEcl* _ecl; */
 
   protected:
 

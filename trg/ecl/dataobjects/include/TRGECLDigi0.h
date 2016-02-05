@@ -19,43 +19,59 @@
 
 namespace Belle2 {
 
-  //! Example Detector
+  //! Raw TC result nefor digitizing
   class TRGECLDigi0 : public TObject {
   public:
 
-    // Event Id
+    //! Event Id
     int m_eventid;
-    // TC id
+    //! TC id
     int m_tcid;
-    //
+    //! time bin
     int m_ibintime;
-    // TC Energy and Timing
+    //! beam background tag
+    int m_beambkgtag;
+    //! TC Energy and Timing
+    //!  Raw TC energy
     double m_raw_energy;
+    //! Raw TC timing
     double m_raw_timing;
-    // Set event id
-    void setEventId(int eventid) { m_eventid = eventid; }
-    // Set TC id
-    void setTCId(int tcid) { m_tcid = tcid; }
-    //
-    void setiBinTime(int ibintime) { m_ibintime = ibintime; }
-    // Set Energy and Timing
-    void setRawEnergy(double raw_energy) { m_raw_energy = raw_energy; }
-    void setRawTiming(double raw_timing) { m_raw_timing = raw_timing; }
-    // Get event id
-    int getEventId() const { return m_eventid; }
-    // Get TC id
-    int getTCId() const { return m_tcid; }
-    //
-    int getiBinTime() const { return m_ibintime; }
-    // Get Energy and Timing
-    double getRawEnergy() const {return m_raw_energy; }
-    double getRawTiming() const {return m_raw_timing; }
 
-    // Empty constructor
-    // Recommended for ROOT IO
+
+    //! Set event id
+    void setEventId(int eventid) { m_eventid = eventid; }
+    //! Set TC id
+    void setTCId(int tcid) { m_tcid = tcid; }
+    //! Set time bin
+    void setiBinTime(int ibintime) { m_ibintime = ibintime; }
+    //! Set Energy and Timing
+    //! set raw energy
+    void setRawEnergy(double raw_energy) { m_raw_energy = raw_energy; }
+    //! Set raw timing
+    void setRawTiming(double raw_timing) { m_raw_timing = raw_timing; }
+    //! Set beam background tag
+    void setBeamBkgTag(int beambkgtag) { m_beambkgtag = beambkgtag; }
+
+
+    //! Get event id
+    int getEventId() const { return m_eventid; }
+    //! Get TC id
+    int getTCId() const { return m_tcid; }
+    //! get time bin
+    int getiBinTime() const { return m_ibintime; }
+    //! Get Energy and Timing
+    //! Get raw TC energy
+    double getRawEnergy() const {return m_raw_energy; }
+    //! Get raw TC timing
+    double getRawTiming() const {return m_raw_timing; }
+    //!  Get beam background tag
+    int getBeamBkgTag() const {return m_beambkgtag; }
+
+    //! Empty constructor
+    //! Recommended for ROOT IO
     TRGECLDigi0() {;}
 
-    // Useful Constructor
+    //! Useful Constructor
     TRGECLDigi0(
       int eventid,
       int tcid,
@@ -70,8 +86,9 @@ namespace Belle2 {
       m_raw_energy = raw_energy;
       m_raw_timing = raw_timing;
     }
+    //! the class title
     ClassDef(TRGECLDigi0, 1); /*< the class title */
   };
-} // end namespace Belle2
+} //! end namespace Belle2
 
 #endif

@@ -80,8 +80,89 @@ namespace Belle2 {
     int    m_nRun;
     /** Event number */
     int    m_nEvent;
-
+    /** object of TC Mapping*/
     TrgEclMapping* _TCMap;
+    /** TCId  */
+    int TCId[100];
+    /**TC raw energy */
+    double TCRawEnergy[100];
+    /** TC raw timing */
+    double TCRawTiming[100];
+    /** Signal Contibution in a TC*/
+    double SignalContribution[100];
+    /** Backgroun Contribution in a TC  */
+    double BKGContribution[100];
+    /** Energy of maximum contribtion particle  */
+    double maxEnergy[100][3] ;
+    /**  particles contribution  */
+    double contribution[100][3];
+    /** Primary Index in TC hit  */
+    int TCPrimaryIndex[100][3] ;
+    /** XtalId in TC  */
+    int XtalId[100][3] ;
+    /** Momentum X of particle */
+    double px[100][3] ;
+    /** Momentum Y of particle */
+    double py[100][3] ;
+    /** Momentum Z of particle */
+    double pz[100][3] ;
+    /** Track Id */
+    int trackId[100][3];
+    /** Beam background tag */
+    int background_tag[100][3];
+    /** Particle ID */
+    int pid[100][3];
+    /** Mother ID   */
+    int mother[100][3]  ;
+    /** Grand mother ID   */
+    int gmother[100][3] ;
+    /** Grand Grand Mother ID   */
+    int ggmother[100][3] ;
+    /** Grand Grand Grand Mother ID   */
+    int gggmother[100][3] ;
+
+    /** Raw Energy of particle    */
+    double MCEnergy[100][3];
+    /** eclhit id  */
+    int ieclhit[100][3];
+    /** TCId  */
+    int TCIdHit[100];
+    /** TC Hit energy  */
+    double TCHitEnergy[100];
+    /** TC Hit Timking  */
+    double TCHitTiming[100];
+    /** Primary Index in TC hit  */
+    int TCPrimaryIndexHit[100][3] ;
+    /** XtalId in TC  */
+    int XtalIdHit[100][3] ;
+    /** Momentum X of particle */
+    double pxHit[100][3] ;
+    /** Momentum X of particle */
+    double pyHit[100][3] ;
+    /** Momentum X of particle */
+    double pzHit[100][3] ;
+    /** Track Id */
+    int trackIdHit[100][3];
+    /** Beam background tag */
+    int background_tagHit[100][3];
+    /** Particle ID */
+    int pidHit[100][3];
+    /** Mother ID   */
+    int motherHit[100][3]  ;
+    /** Grand mother ID   */
+    int gmotherHit[100][3] ;
+    /** Grand Grand Mother ID   */
+    int ggmotherHit[100][3] ;
+    /** Grand Grand Grand Mother ID   */
+    int gggmotherHit[100][3] ;
+    /** Raw Energy of particle    */
+    double MCEnergyHit[100][3];
+    /** Signal Contibution in a TC*/
+    double SignalContributionHit[100];
+    /** Backgroun Contribution in a TC  */
+    double BKGContributionHit[100];
+    /**  particles contribution  */
+    double contributionHit[100][3];
 
 
   };

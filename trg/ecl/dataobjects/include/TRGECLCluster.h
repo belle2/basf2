@@ -34,17 +34,20 @@ namespace Belle2 {
     int m_NofTCinCluster;
 
     //! icn_flag -  perfect icn : 1 , icn : 2
-    // int m_ICNFlag;
-
+    /*!
+      int m_ICNFlag;
+    */
     //! Deposited energy of this hit.
     double m_edep;
 
     //! Hit average time
     double m_TimeAve;
 
-    //! energy weighted position
+    //! energy weighted position X
     double m_X;
+    //! energy weighted position Y
     double m_Y;
+    //! energy weighted position Z
     double m_Z;
 
 
@@ -64,8 +67,12 @@ namespace Belle2 {
     //! The method to set hit average time
     void setTimeAve(double TimeAve) { m_TimeAve = TimeAve; }
 
+
+    //! Set Energy weighted position X
     void setPositionX(double X) { m_X = X; }
+    //! Set Energy weighted position Y
     void setPositionY(double Y) { m_Y = Y; }
+    //! Set Energy weighted position Z
     void setPositionZ(double Z) { m_Z = Z; }
 
 
@@ -85,28 +92,42 @@ namespace Belle2 {
     double getTimeAve() const {return m_TimeAve;}
 
     //! The method to get hit average time
+    //! Get Energy weighted position X
     double getPositionX() const {return m_X;}
+    //! Set Energy weighted position Y
     double getPositionY() const {return m_Y;}
+    //! Set Energy weighted position Z
     double getPositionZ() const {return m_Z;}
 
 
     // Empty constructor
-    // Recommended for ROOT IO
+    //! Recommended for ROOT IO
     TRGECLCluster() {;}
 
     //! Useful Constructor
     TRGECLCluster(
       int eventId,
-      int cellId,
+      int clusterId,
       double edep,
-      double TimeAve
+      double TimeAve,
+      int noftchit,
+      int x,
+      int y,
+      int z
     )
     {
       m_eventId = eventId;
-      m_ClusterId = cellId;
+      m_ClusterId = clusterId;
       m_edep = edep;
       m_TimeAve = TimeAve;
+      m_NofTCinCluster = noftchit;
+      m_X = x;
+      m_Y = y;
+      m_Z = z;
+
+
     }
+    //! The Class title
     ClassDef(TRGECLCluster, 1); /*< the class title */
 
   };

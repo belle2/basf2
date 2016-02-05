@@ -20,7 +20,7 @@
 
 namespace Belle2 {
 
-/// A module to process ECL trigger data
+  /*! A module of FAM */
   class TRGECLFAMModule : public Module {
 
 
@@ -30,46 +30,47 @@ namespace Belle2 {
     //      ModulePtr nm(new TRGECLModule(false)); return nm;
     //    };
 
-    // Constructor
+    /** Constructor */
     TRGECLFAMModule();
-    //    TRGECLFAMModule(bool selfReg = true);
-    //  TRGECLFAMModule(const std::string & type);
 
-    // Destructor
+    /** Destructor */
     virtual ~TRGECLFAMModule();
-    // Initilizes TRGECLFAMModule.
+    /** Initilizes TRGECLFAMModule. */
     virtual void initialize();
-    // Called when new run started.
+    /** Called when new run started.*/
     virtual void beginRun();
-    // Called event by event.
+    /** Called event by event. */
     virtual void event();
-    // Called when run ended.
+    /** Called when run ended. */
     virtual void endRun();
-    // Called when processing ended.
+    /** Called when processing ended.*/
     virtual void terminate();
 
   public:
 
-    // returns version of TRGECLFAMModule.
+    /** returns version of TRGECLFAMModule.*/
     std::string version(void) const;
 
-  private: // Parameters
+  private: /** Parameters*/
 
-    // Debug level.
+    /** Debug level.*/
     int _debugLevel;
-    //
+    /** fam Method*/
     int _famMethod;
+    /** Time interval */
     int _binTimeInterval;
 
-    // Config. file name.
+    /** Config. file name. */
     std::string _configFilename;
+
 
   protected:
 
+
   private:
 
-    int    m_nRun;           //  Run number
-    int    m_nEvent;         //  Event number
+    int    m_nRun;           /**  Run number */
+    int    m_nEvent;         /**  Event number */
 
   };
 

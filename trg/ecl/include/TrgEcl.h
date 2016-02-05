@@ -18,13 +18,17 @@
 #include <string>
 #include <vector>
 #include "trg/ecl/TrgEclFAM.h"
+#include "trg/ecl/TrgEclCluster.h"
 //
+//
+//
+using namespace std;
 //
 //
 namespace Belle2 {
 //
 //
-//
+  /*! ETM class */
   class TrgEcl;
 //
 //
@@ -33,57 +37,67 @@ namespace Belle2 {
 
   public:
 
-    // get pointer of TrgEcl object
+    /**  get pointer of TrgEcl object  */
+
     static TrgEcl* getTrgEcl(void);
 
-  private:
 
-    /// Constructor
+    /** Constructor */
     TrgEcl(void);
 
-    /// Destructor
-    virtual ~TrgEcl() {};
+    /** Destructor */
+    virtual ~TrgEcl();
 
   public:
 
-    // initialize
+    /** initialize */
     void initialize(int);
-    // simulates ECL trigger.
+    /**simulates ECL trigger. */
     void simulate(int);
 
   public:
 
-    /// returns name.
+    /** returns name. */
     std::string name(void) const;
 
-    // returns version.
+    /** returns version. */
     std::string version(void) const;
-
-    // ECL bit information for GDL
+    /** ECL bit information for GDL */
     int getECLtoGDL(void) { return bitECLtoGDL; }
 
-    //
+    /** Set Phi Ring Sum  */
     void setPRS(int iBin);
+    /** Get Event timing */
     void getEventTiming(int option);
 
 
   private:
-    int   HitTC[160][576][80];
+    /** Hitted TC  */
+    int   HitTC[160][576][64];
+    /** Event timing */
     double EventTiming[160];
-    double Timing[576][80];
-    double Energy[576][80];
-
-
-
+    /** TC Timing */
+    double Timing[576][64];
+    /**  TC Energy */
+    double Energy[576][64];
+    /**  5 top TCs */
+    double Etop5[5];
+    /** 5 top TCs  */
+    double Ttop5[5];
+    /** ecl object */
     static TrgEcl* _ecl;
-
+    /**  bit inforamtion */
     int bitECLtoGDL;
+    /**  Phi ring sum */
     double _PhiRingSum[17];
+    /**  Cluster object */
+    TrgEclCluster* obj_cluster;
+
 
   };
 //
 //
 //
-} // namespace Belle2
+} /// namespace Belle2
 
 #endif /* TRGECL_FLAG_ */

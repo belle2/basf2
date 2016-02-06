@@ -131,7 +131,7 @@ main.add_module(itopeventconverter)
 main.add_module(pedmodule)
 # main.add_module(camacconverter)
 main.add_module(mergemodule)
-main.add_module(timemodule)
+# main.add_module(timemodule)
 main.add_module(dataQuality)
 
 if args.s2s:

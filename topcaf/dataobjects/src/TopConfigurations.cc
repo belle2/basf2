@@ -1,6 +1,5 @@
 #include <topcaf/dataobjects/TopConfigurations.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <TSQLServer.h>
 #include <TSQLResult.h>
@@ -91,5 +90,3 @@ void TopConfigurations::ReadTopConfigurations(std::string filename)
 
 
 }
-
-

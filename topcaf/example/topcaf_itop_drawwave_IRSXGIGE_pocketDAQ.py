@@ -61,7 +61,7 @@ print('Writing output root file to ' + OutputFile)
 histomanager = register_module("HistoManager")
 histomanager.param("histoFileName", "histos.root")
 
-eventinfosetter = register_module('EventInfoSetter')
+# eventinfosetter = register_module('EventInfoSetter')
 eventinfoprinter = register_module('EventInfoPrinter')
 
 # run_info = args.inputRun.split('-')
@@ -80,11 +80,11 @@ output.param(outputDict)
 # register topcaf modules
 itopconfig = register_module('TopConfiguration')
 itopconfig.param('filename', args.topConfiguration)
+
 itopeventconverter = register_module('iTopRawConverterV3')
 evtconvDict = {'inputDirectory': args.inputDir,
                'inputFileName': args.inputRun + '.dat'}
 itopeventconverter.param(evtconvDict)
-
 
 pedmodule = register_module('Pedestal')
 pedmodule.param('mode', 1)
@@ -123,11 +123,11 @@ dataQuality = register_module("TOPCAF_DataQuality")
 
 main = create_path()
 main.add_module(histomanager)
-main.add_module(eventinfosetter)
-main.add_module(eventinfoprinter)
+# main.add_module(eventinfosetter)
 # main.add_module(conditions)
 main.add_module(itopconfig)
 main.add_module(itopeventconverter)
+# main.add_module(eventinfoprinter)
 main.add_module(pedmodule)
 # main.add_module(camacconverter)
 main.add_module(mergemodule)

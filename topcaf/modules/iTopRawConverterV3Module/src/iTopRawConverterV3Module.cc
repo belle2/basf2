@@ -1,5 +1,5 @@
 #include <topcaf/modules/iTopRawConverterV3Module/iTopRawConverterV3Module.h>
-
+#include <framework/dataobjects/EventMetaData.h>
 #include <iostream>
 #include <iomanip>
 
@@ -24,8 +24,6 @@ iTopRawConverterV3Module::~iTopRawConverterV3Module()
 {
   m_WfPacket = nullptr;
   m_EvtPacket = nullptr;
-
-  m_input_file.close();
 }
 
 /////////////////////
@@ -40,6 +38,8 @@ void iTopRawConverterV3Module::initialize()
   m_evtheader_ptr.registerInDataStore();
   m_evtwaves_ptr.registerInDataStore();
   m_filedata_ptr.registerInDataStore();
+  // data store objects registration
+  StoreObjPtr<EventMetaData>::registerPersistent();
 }
 
 void iTopRawConverterV3Module::beginRun()
@@ -49,8 +49,15 @@ void iTopRawConverterV3Module::beginRun()
   m_evt_no = 0;
 }
 
+void iTopRawConverterV3Module::terminate()
+{
+  m_input_file.close();
+}
+
 void iTopRawConverterV3Module::event()
 {
+  StoreObjPtr<EventMetaData> evtMetaData;
+  evtMetaData.create();
   //output
   m_evtheader_ptr.create();
   //  m_evtheader_ptr.clear();
@@ -72,8 +79,9 @@ void iTopRawConverterV3Module::event()
   packet_word_t word;
 
 
-  if (m_input_file.eof()) {
+  if (not m_input_file) {
     B2WARNING("Reached end of file...");
+    evtMetaData->setEndOfData(); // stop event processing
     return;
   }
 
@@ -142,8 +150,6 @@ void iTopRawConverterV3Module::event()
   eventPacket[5] = 0;
   eventPacket[6] = cpr_hdr.block_words;
   eventPacket[7] = cpr_hdr.exprun;
-
-
 
   m_EvtPacket = new EventHeaderPacket(eventPacket,
                                       EVENT_PACKET_SIZE);
@@ -264,7 +270,7 @@ void iTopRawConverterV3Module::event()
       m_evtheader_ptr->SetFlag(1005);
     }
     // read ahead
-    while (word != PACKET_LAST) {
+    while (word != PACKET_LAST && m_input_file) {
       m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
       word = swap_endianess(word);
       B2DEBUG(1, "footer: 0x" << std::hex << word << std::dec);
@@ -277,31 +283,28 @@ void iTopRawConverterV3Module::event()
       }
     }
     m_input_file.read((char*)&b2l_ftr, sizeof(b2l_ftr));
+    if (not m_input_file) {
+      B2WARNING("File ended prematurely. Marking event as corrupt.");
+      m_evtheader_ptr->SetFlag(1003);
+      return;
+    }
     B2DEBUG(1, "B2L footer ... B2L_crc16_errs: 0x" << std::hex << b2l_ftr.B2L_crc16_error_cnt << " ... B2L_crc16: 0x" <<
             b2l_ftr.B2L_crc16 << std::dec);
 
   }
 
   m_input_file.read((char*)&cpr_ftr, sizeof(cpr_ftr));
+  if (not m_input_file) {
+    B2WARNING("File ended prematurely. Marking event as corrupt.");
+    m_evtheader_ptr->SetFlag(1003);
+    evtMetaData->setEndOfData(); // stop event processing
+    return;
+  }
   B2DEBUG(1, "CPR footer ... word1: 0x" << std::hex << cpr_ftr.word1 << " ... CPR-ftr: 0x" << cpr_ftr.CPR_ftr);
   if (cpr_ftr.CPR_ftr != COPPER_FOOTER) {
     B2WARNING("Bad copper footer found.  Marking event as corrupt.");
     m_evtheader_ptr->SetFlag(1003);
   }
-  /*
-  if((m_evtheader_ptr->GetEventFlag())>=(1000)){
-    int l=0;
-    while(word!=COPPER_FOOTER){
-      //B2FATAL("quiting...");
-      m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
-      word = swap_endianess(word);
-      if(l%1==0)
-  B2DEBUG(1,"forwarding to good footer... "<<l<<"... word: 0x"<<std::hex<<word<<std::dec);
-      l++;
-      if(l>1e4) break;
-    }
-  }
-  */
   m_prev_pos = m_input_file.tellg();
 
 }

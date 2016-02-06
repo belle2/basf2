@@ -74,6 +74,7 @@ namespace Belle2 {
 
 //Module function (only to be used when running as a module!!!)
     void initialize();
+    void terminate();
     void beginRun();
     void event();
 

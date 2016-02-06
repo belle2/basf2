@@ -61,8 +61,8 @@ print('Writing output root file to ' + OutputFile)
 
 histomanager = register_module("HistoManager")
 
-eventinfosetter = register_module('EventInfoSetter')
-eventinfoprinter = register_module('EventInfoPrinter')
+# eventinfosetter = register_module('EventInfoSetter')
+# eventinfoprinter = register_module('EventInfoPrinter')
 
 # run_info = args.inputRun.split('-')
 # conditionsDict = {'experimentName': run_info[0] + '-' + run_info[2][0:7],
@@ -117,18 +117,18 @@ if args.s2s:
 
 timecalibmodule = register_module('DoubleCalPulse')
 
-timeCorrection = register_module("TimeBasedCorrection")
-timeCorrection.param('correctionFileName', path.join(os.environ['BELLE2_LOCAL_DIR'], 'topcaf/data/M03_M04_dT.dat'))
+# timeCorrection = register_module("TimeBasedCorrection")
+# timeCorrection.param('correctionFileName', path.join(os.environ['BELLE2_LOCAL_DIR'], 'topcaf/data/M03_M04_dT.dat'))
 
 main = create_path()
 main.add_module(histomanager)
-main.add_module(eventinfosetter)
-main.add_module(eventinfoprinter)
+# main.add_module(eventinfosetter)
+# main.add_module(eventinfoprinter)
 # main.add_module(conditions)
 main.add_module(itopconfig)
 main.add_module(itopeventconverter)
 main.add_module(pedmodule)
-main.add_module(timeCorrection)
+# main.add_module(timeCorrection)
 main.add_module(mergemodule)
 main.add_module(timemodule)
 main.add_module(timecalibmodule)

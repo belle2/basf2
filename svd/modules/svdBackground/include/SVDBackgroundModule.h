@@ -42,6 +42,7 @@ namespace Belle2 {
      * with summaries. The HistogramFactory class is not used any longer.
      * All drawing will be done in pandas.
      * 2. Only process one background component at a time.
+     * 3. Add occupancy estimates and a separate ntuple to hold the data.
      */
     class SVDBackgroundModule: public Module {
 
@@ -89,10 +90,6 @@ namespace Belle2 {
       // General
       const double c_densitySi = 2.3290 * Unit::g_cm3; /**< Density of crystalline Silicon */
       const double c_smy = 1.0e7 * Unit::s;             /**< Seconds in snowmass year */
-      // APV sampling
-      const double c_APVSampleTime = 31.4 * Unit::ns;      /**< APV sampling time */
-      // const int c_nAPVSamples = 6;                       /**< Number of APV samples */
-
       // NIEL file names - placed in svd/data, so needn't be module parameters.
       /** NIEL-correction file for neutrons */
       const std::string c_niel_neutronFile = "/svd/data/neutrons.csv";
@@ -123,16 +120,8 @@ namespace Belle2 {
 
       /** Get number of sensors in a layer */
       inline int getNumSensors(int layerNum);
-      /** Get layer area */
-      inline double getLayerArea(int layerNum);
-      /** Get layer mass */
-      inline double getLayerMass(int layerNum);
       /** Get total number of sensors */
       inline int getTotalSensors();
-      /** Get total area of sensors */
-      inline double getTotalArea();
-      /** Get total mass of sensors */
-      inline double getTotalMass();
 
       // Output directory
       std::string m_outputDirectoryName; /**< Path to directory where output data will be stored */
@@ -152,9 +141,12 @@ namespace Belle2 {
 
       std::string m_storeEnergyDepositsName; /**< SVDEnergyDepositEvents StoreArray name */
       std::string m_storeNeutronFluxesName; /**< SVDNeutronFluxEvents StoreArray name */
+      std::string m_storeOccupancyEventsName; /**< SVDOccupancyEvents StoreArray name */
 
       std::string m_componentName; /**< Name of the current component. */
       double m_componentTime; /**< Time of current component. */
+      double m_triggerWidth; /**< RMS of trigger time measurement.*/
+      double m_acceptanceWidth; /**< A hit is accepted if arrived within +/- m_acceptanceWidth * RMS(hit time - trigger time). */
 
       std::map<VxdID, SensorData> m_sensorData; /**< Struct to hold sensor-wise background data. */
 
@@ -198,30 +190,6 @@ namespace Belle2 {
       return result;
     }
 
-    /** Get layer area */
-    inline double SVDBackgroundModule::getLayerArea(int layerNum)
-    {
-      VxdID layerID;
-      layerID.setLayerNumber(layerNum);
-      double result = 0;
-      for (auto ladderID : VXD::GeoCache::getInstance().getLadders(layerID))
-        for (auto sensorID : VXD::GeoCache::getInstance().getSensors(ladderID))
-          result += getSensorArea(sensorID);
-      return result;
-    }
-
-    /** Get layer mass */
-    inline double SVDBackgroundModule::getLayerMass(int layerNum)
-    {
-      VxdID layerID;
-      layerID.setLayerNumber(layerNum);
-      double result = 0;
-      for (auto ladderID : VXD::GeoCache::getInstance().getLadders(layerID))
-        for (auto sensorID : VXD::GeoCache::getInstance().getSensors(ladderID))
-          result += getSensorMass(sensorID);
-      return result;
-    }
-
     /** Get total number of sensors */
     inline int SVDBackgroundModule::getTotalSensors()
     {
@@ -230,24 +198,6 @@ namespace Belle2 {
         result += getNumSensors(layerID.getLayerNumber());
       return result;
     }
-
-    /** Get total area of sensors */
-    inline double SVDBackgroundModule::getTotalArea()
-    {
-      int result = 0;
-      for (auto layerID : VXD::GeoCache::getInstance().getLayers(VXD::SensorInfoBase::SVD))
-        result += getLayerArea(layerID.getLayerNumber());
-      return result;
-    }
-    /** Get total mass of sensors */
-    inline double SVDBackgroundModule::getTotalMass()
-    {
-      int result = 0;
-      for (auto layerID : VXD::GeoCache::getInstance().getLayers(VXD::SensorInfoBase::SVD))
-        result += getLayerMass(layerID.getLayerNumber());
-      return result;
-    }
-
   } // namespace SVD
 } // namespace Belle2
 #endif

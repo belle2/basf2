@@ -18,8 +18,7 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDEnergyDepositionEvent.h>
 #include <svd/dataobjects/SVDNeutronFluxEvent.h>
-#include <svd/background/HistogramFactory.h>
-
+#include <svd/dataobjects/SVDOccupancyEvent.h>
 #include <cmath>
 #include <fstream>
 #include <set>
@@ -37,6 +36,17 @@ using namespace Belle2;
 using namespace Belle2::SVD;
 
 //-----------------------------------------------------------------
+// A small helper function to convert between electons and ADU
+// ----------------------------------------------------------------
+double eToADU(double charge)
+{
+  double minADC = -96000;
+  double maxADC = 288000;
+  double unitADC = (maxADC - minADC) / 1024.0;
+  return round(std::min(maxADC, std::max(minADC, charge)) / unitADC);
+}
+
+//-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
 REG_MODULE(SVDBackground)
@@ -48,6 +58,7 @@ REG_MODULE(SVDBackground)
 
 SVDBackgroundModule::SVDBackgroundModule() :
   Module(), m_outputDirectoryName(""), m_componentName(""), m_componentTime(0),
+  m_triggerWidth(5), m_acceptanceWidth(1.5), // keeps 87%
   m_nielNeutrons(new TNiel(c_niel_neutronFile)),
   m_nielProtons(new TNiel(c_niel_protonFile)),
   m_nielPions(new TNiel(c_niel_pionFile)),
@@ -59,6 +70,9 @@ SVDBackgroundModule::SVDBackgroundModule() :
   // FIXME: This information can in principle be extracted from bg files, though not trivially.
   addParam("componentName", m_componentName, "Background component name to process", m_componentName);
   addParam("componentTime", m_componentTime, "Background component time", m_componentTime);
+  addParam("triggerWidth", m_triggerWidth, "RMS of trigger time estimate in ns", m_triggerWidth);
+  addParam("acceptanceWidth", m_acceptanceWidth,
+           "A hit is accepted if arrived within +/- accpetanceWidth * RMS(hit time - trigger time) of trigger; in ns", m_acceptanceWidth);
   addParam("outputDirectory", m_outputDirectoryName, "Name of output directory", m_outputDirectoryName);
 }
 
@@ -105,6 +119,8 @@ void SVDBackgroundModule::initialize()
   storeEnergyDeposits.registerInDataStore();
   StoreArray<SVDNeutronFluxEvent> storeNeutronFluxes(m_storeNeutronFluxesName);
   storeNeutronFluxes.registerInDataStore();
+  StoreArray<SVDOccupancyEvent> storeOccupancyEvents(m_storeOccupancyEventsName);
+  storeOccupancyEvents.registerInDataStore();
 
   //Store names to speed up creation later
   m_storeFileMetaDataName = storeFileMetaData.getName();
@@ -120,8 +136,9 @@ void SVDBackgroundModule::initialize()
   m_storeEnergyDepositsName = storeEnergyDeposits.getName();
   m_storeNeutronFluxesName = storeNeutronFluxes.getName();
 
-  // Initialize m_data:
   m_componentTime *= Unit::us;
+  m_acceptanceWidth *= Unit::ns;
+  m_triggerWidth *= Unit::ns;
 }
 
 void SVDBackgroundModule::beginRun()
@@ -142,6 +159,7 @@ void SVDBackgroundModule::event()
   // Add two new StoreArrays
   StoreArray<SVDEnergyDepositionEvent> storeEnergyDeposits(m_storeEnergyDepositsName);
   StoreArray<SVDNeutronFluxEvent> storeNeutronFluxes(m_storeNeutronFluxesName);
+  StoreArray<SVDOccupancyEvent> storeOccupancyEvents(m_storeOccupancyEventsName);
 
   // Relations
   RelationArray relDigitsMCParticles(storeDigits, storeMCParticles, m_relDigitsMCParticlesName);
@@ -187,7 +205,7 @@ void SVDBackgroundModule::event()
     globalPos.GetXYZ(globalPosXYZ);
     storeEnergyDeposits.appendNew(
       sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-      hit.getBackgroundTag(), hit.getPDGcode(), hit.getGlobalTime(),
+      hit.getPDGcode(), hit.getGlobalTime(),
       localPos.X(), localPos.Y(), globalPosXYZ, hitEnergy,
       (hitEnergy / Unit::J) / (currentSensorMass / 1000) / (currentComponentTime / Unit::s),
       (hitEnergy / Unit::J) / currentSensorArea / (currentComponentTime / Unit::s)
@@ -276,7 +294,7 @@ void SVDBackgroundModule::event()
     globalMom.GetXYZ(globalMomXYZ);
     storeNeutronFluxes.appendNew(
       sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-      simhit->getBackgroundTag(), simhit->getPDGcode(), simhit->getGlobalTime(),
+      simhit->getPDGcode(), simhit->getGlobalTime(),
       hit.getU(), hit.getV(), globalPosXYZ, globalMomXYZ, kineticEnergy,
       stepLength, nielWeight,
       stepLength / currentSensorThickness / currentSensorArea / (currentComponentTime / Unit::s),
@@ -287,12 +305,20 @@ void SVDBackgroundModule::event()
   // Fired strips
   B2DEBUG(100, "Fired strips")
   currentSensorID.setID(0);
+  double currentSensorUCut = 0;
+  double currentSensorVCut = 0;
   // Store fired strips: set counts give occupancies, no double-counting
   std::map<VxdID, std::set<int> > firedStrips;
   for (const SVDDigit& digit : storeDigits) {
     // Filter out digits that give less than 1 ADU
-    if (digit.getCharge() < 1) continue;
     VxdID sensorID = digit.getSensorID();
+    if (sensorID != currentSensorID) {
+      currentSensorID = sensorID;
+      auto info = getInfo(sensorID);
+      currentSensorUCut = eToADU(3 * info.getElectronicNoiseU());
+      currentSensorVCut = eToADU(3 * info.getElectronicNoiseV());
+    }
+    if (digit.getCharge() < (digit.isUStrip()) ? currentSensorUCut : currentSensorVCut) continue;
     // Economize writing u- and v- strips by re-using the Segment field of VxdID
     VxdID writeID(sensorID);
     if (!digit.isUStrip())
@@ -318,30 +344,51 @@ void SVDBackgroundModule::event()
 
   // Occupancy
   //
-  // Take clusters, assign them random arrival times within an event,
-  // and calculate probability that they would be accepted as being signal data.
-  // We simply adjust acceptance window by amplitude-dependent resolution:
-  // tau_acceptance > 2 * sigma(amplitude)
-  // w_acceptance = n_cls/t_bg x tau_acceptance
-  // (clusters / event) * (p cluster in sensor id) * (p cluster accepted) * (cluster strips / sensor strips), average over total clusters
-  // #cls/t_sim * t_evt * #cls_id/#cls * t_acc / t_evt * occ / #cls_id =
-  // t_acc / t_sim * occ
+  // We assume a S/N dependent acceptance window of size
+  //   W = 2 * acceptanceWidth * RMS(hit_time - trigger_time)
+  // that is used to keep most of signal hits.
+  // occupancy for a cluster with S/N = sn and size sz on sensor id =
+  //  cluster_rate(sn,sz,id) * W * sz / #strips(id)
+  // Cluster rate is number of clusters / sample time, and as we expect
+  // clusters to be justly represented in the sample as to S/N, size, and
+  // sensor they appear on, we calculate occupancy on sensor id as
+  //
+  // occupancy(id) = Sum_over_clusters_in_id (
+  //  W(sn) / t_simulation * sz / #strips(id)
+  // )
+  //
   B2DEBUG(100, "Occupancy")
+  currentSensorID.setID(0);
+  double currentNoiseU = 0;
+  double currentNoiseV = 0;
+  int nStripsU = 0;
+  int nStripsV = 0;
   for (auto cluster : storeClsuters) {
     VxdID sensorID = cluster.getSensorID();
-    auto info = getInfo(sensorID);
+    if (currentSensorID != sensorID) {
+      currentSensorID = sensorID;
+      auto info = getInfo(sensorID);
+      currentNoiseU = eToADU(info.getElectronicNoiseU());
+      currentNoiseV = eToADU(info.getElectronicNoiseV());
+      nStripsU = info.getUCells();
+      nStripsV = info.getVCells();
+    }
     bool isU = cluster.isUCluster();
-    double snr = (isU) ? cluster.getCharge() / info.getElectronicNoiseU() : cluster.getCharge() / info.getElectronicNoiseV();
-    int nStrips = (isU) ? info.getUCells() : info.getVCells();
+    double snr = (isU) ? cluster.getCharge() / currentNoiseU : cluster.getCharge() / currentNoiseV;
+    int nStrips = (isU) ? nStripsU : nStripsV;
     double tau_error = 45 / snr * Unit::ns;
-    tau_error = sqrt(c_APVSampleTime * c_APVSampleTime + tau_error * tau_error);
-    double tau_acceptance = 2 * tau_error;
+    tau_error = sqrt(m_triggerWidth * m_triggerWidth + tau_error * tau_error);
+    double tau_acceptance = 2 * m_acceptanceWidth * tau_error;
     double w_acceptance =  tau_acceptance / currentComponentTime;
     double occupancy = 1.0 / nStrips * cluster.getSize();
     if (isU)
       m_sensorData[sensorID].m_occupancyU += w_acceptance * occupancy;
     else
       m_sensorData[sensorID].m_occupancyV += w_acceptance * occupancy;
+    storeOccupancyEvents.appendNew(sensorID.getLayerNumber(),
+                                   sensorID.getLadderNumber(), sensorID.getSensorNumber(), cluster.getClsTime(),
+                                   cluster.isUCluster(), cluster.getPosition(), cluster.getSize(), cluster.getCharge(),
+                                   snr, w_acceptance, w_acceptance * occupancy);
   }
 }
 

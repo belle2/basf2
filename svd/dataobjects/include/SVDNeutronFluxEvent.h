@@ -29,9 +29,10 @@ namespace Belle2 {
 
     /** default constructor for ROOT */
     SVDNeutronFluxEvent(): m_layer(0), m_ladder(0), m_sensor(0),
-      m_backgroundTag(0), m_pdg(0), m_time(0.0), m_u(0.0), m_v(0.0),
+      m_pdg(0), m_time(0.0), m_u(0.0), m_v(0.0),
       m_kineticEnergy(0.0), m_stepLength(0.0), m_nielFactor(0.0), m_rawFlux(0.0),
-      m_nielFlux(0.0) {
+      m_nielFlux(0.0)
+    {
       std::fill_n(m_globalPos, 3, 0.0);
       std::fill_n(m_globalMom, 3, 0.0);
     }
@@ -40,7 +41,6 @@ namespace Belle2 {
      * @param layer Layer number
      * @param ladder Ladder number
      * @param sensor Sensor number
-     * @param backgroundTag BackgroundTag of the particle
      * @param pdg PDG Code of the particle producing the Hit
      * @param time Time of energy deposition
      * @param u Local u coordinate of the event
@@ -54,13 +54,14 @@ namespace Belle2 {
      * @param nielFlux Scaled contribution to flux by the event
      */
     SVDNeutronFluxEvent(unsigned short layer, unsigned short ladder, unsigned short sensor,
-                        unsigned short backgroundTag, int pdg, float time, float u, float v,
+                        int pdg, float time, float u, float v,
                         const float* globalPos, const float* globalMom, float kineticEnergy,
                         float stepLength, float nielFactor, float rawFlux, float nielFlux):
-      m_layer(layer), m_ladder(ladder), m_sensor(sensor), m_backgroundTag(backgroundTag),
+      m_layer(layer), m_ladder(ladder), m_sensor(sensor),
       m_pdg(pdg), m_time(time), m_u(u), m_v(v), m_kineticEnergy(kineticEnergy),
       m_stepLength(stepLength), m_nielFactor(nielFactor), m_rawFlux(rawFlux),
-      m_nielFlux(nielFlux) {
+      m_nielFlux(nielFlux)
+    {
       std::copy_n(globalPos, 3, m_globalPos);
       std::copy_n(globalMom, 3, m_globalMom);
     }
@@ -68,7 +69,6 @@ namespace Belle2 {
     unsigned short m_layer; /**< layer number */
     unsigned short m_ladder;  /**< ladder number */
     unsigned short m_sensor; /**< sensor number */
-    unsigned short m_backgroundTag;  /**< background tag of the event */
     int m_pdg;      /**< PDG number of generating particle */
     float m_time;   /**< time of particle crossing */
     float m_u;      /**< local u-coordinate of particle crossing */

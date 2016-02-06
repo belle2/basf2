@@ -12,5 +12,6 @@
 #pragma link C++ class Belle2::SVDTrueHit+;
 #pragma link C++ class Belle2::SVDEnergyDepositionEvent+;
 #pragma link C++ class Belle2::SVDNeutronFluxEvent+;
+#pragma link C++ class Belle2::SVDOccupancyEvent+;
 
 #endif

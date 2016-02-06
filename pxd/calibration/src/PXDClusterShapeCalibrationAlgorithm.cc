@@ -490,6 +490,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   saveCalibration(Correction_ErrorEstimation[0], nameEE);
   saveCalibration(InPixelPosition[0], nameIP);
 
+  delete [] ValueCors;
+  delete [] ValueInPix;
   delete ValueCors;
   delete ValueInPix;
   return c_OK;

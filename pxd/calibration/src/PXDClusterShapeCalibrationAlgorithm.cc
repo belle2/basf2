@@ -518,6 +518,7 @@ void PXDClusterShapeCalibrationAlgorithm::Table2Vector(map_typeCorrs& TCorrectio
 //  B2DEBUG(30, "--> Inside Table2Vector " << TCorrection[1][0][0][0][8]);
 //  B2DEBUG(30, "--> Inside Table2Vector " << CorVector->GetMatrixArray()[3]);
 
+  delete [] ValueCors;
   delete ValueCors;
 
 
@@ -543,6 +544,7 @@ void PXDClusterShapeCalibrationAlgorithm::Table2Vector(map_typeInPics& TInPix, T
               ValueInPix[i_vector] = data;
             }
   InPixVector->SetElements(ValueInPix);
+  delete [] ValueInPix;
   delete ValueInPix;
 }
 

@@ -82,8 +82,8 @@ pedestalDict = {
 pedmodule.param(pedestalDict)
 
 main = create_path()
-main.add_module(eventinfosetter)
-main.add_module(eventinfoprinter)
+# main.add_module(eventinfosetter)
+# main.add_module(eventinfoprinter)
 main.add_module(itopeventconverter)
 main.add_module(pedmodule)
 process(main)

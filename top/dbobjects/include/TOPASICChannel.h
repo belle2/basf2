@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -25,16 +25,10 @@ namespace Belle2 {
   public:
 
     /**
-     * time axis size (time axis is for 4 ASIC windows!)
-     */
-    enum {c_TimeAxisSize = TOPASICPedestals::c_WindowSize * 4};
-
-    /**
      * Default constructor
      */
     TOPASICChannel()
     {
-      for (unsigned i = 0; i < c_TimeAxisSize; i++) m_timeAxis[i] = 0;
     }
 
     /**
@@ -47,7 +41,6 @@ namespace Belle2 {
       m_moduleID(moduleID), m_channel(channel)
     {
       for (int i = 0; i < numWindows; i++) m_pedestals.push_back(NULL);
-      setTimeAxis();
     }
 
     /**
@@ -105,32 +98,6 @@ namespace Belle2 {
     }
 
     /**
-     * Set equidistant time axis.
-     * Time axis is differential: each time is with respect to the previous sample,
-     * the first one is with respect to the last sample of previous ASIC window.
-     * @param timeBin time bin
-     */
-    void setTimeAxis(float timeBin = 1 / 2.72)
-    {
-      for (unsigned i = 0; i < c_TimeAxisSize; i++) m_timeAxis[i] = timeBin;
-    }
-
-    /**
-     * Set time axis from calibration.
-     * Time axis is differential: each time is with respect to the previous sample,
-     * the first one is with respect to the last sample of previous ASIC window.
-     * @param timsDiffs vector of 256 elements of time differences btw. samples
-     */
-    void setTimeAxis(std::vector<float> timeDiffs)
-    {
-      for (unsigned i = 0; i < c_TimeAxisSize; i++) {
-        if (i < timeDiffs.size()) m_timeAxis[i] = timeDiffs[i];
-      }
-      if (timeDiffs.size() < c_TimeAxisSize)
-        B2WARNING("TOPASICChannel::setTimeAxis: vector too short")
-      }
-
-    /**
      * Return module ID
      * @return module ID
      */
@@ -141,19 +108,6 @@ namespace Belle2 {
      * @return channel number
      */
     unsigned getChannel() const {return m_channel;}
-
-
-    /**
-     * Return sample time in respect to previous sample
-     * @param window ASIC window number
-     * @param i sample number within ASIC window
-     */
-    float getSampleTime(unsigned window, unsigned i) const
-    {
-      unsigned k = (window % 4) * TOPASICPedestals::c_WindowSize +
-                   (i % TOPASICPedestals::c_WindowSize);
-      return m_timeAxis[k];
-    }
 
     /**
      * Return number of ASIC windows
@@ -201,15 +155,14 @@ namespace Belle2 {
 
   private:
 
-    int m_moduleID = 0;          /**< module ID */
-    unsigned m_channel = 0;   /**< hardware channel number */
-    float m_timeAxis[c_TimeAxisSize]; /**< differential time axis */
+    int m_moduleID = 0;                         /**< module ID */
+    unsigned m_channel = 0;                     /**< hardware channel number */
     std::vector<TOPASICPedestals*> m_pedestals; /**< pedestals */
     std::vector<TOPASICGains*> m_gains;         /**< gains */
 
-    TOPASICGains m_defaultGain; /**< default gain */
+    TOPASICGains m_defaultGain;                 /**< default gain */
 
-    ClassDef(TOPASICChannel, 3); /**< ClassDef */
+    ClassDef(TOPASICChannel, 4); /**< ClassDef */
 
   };
 

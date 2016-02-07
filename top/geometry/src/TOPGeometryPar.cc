@@ -115,18 +115,19 @@ namespace Belle2 {
 
       GearDir tdcParams(content, "TDC");
       if (tdcParams) {
-        int numWindows = tdcParams.getInt("numWindows");
-        int numSamples = numWindows * c_WindowSize;
-        int subBits = tdcParams.getInt("subBits");
-        m_NTDC = subBits - 1;
+        m_numWindows = tdcParams.getInt("numWindows");
+        int numSamples = m_numWindows * c_WindowSize;
+        m_subBits = tdcParams.getInt("subBits");
+        m_NTDC = m_subBits - 1;
         int k = numSamples;
         do {
           m_NTDC++;
           k /= 2;
         } while (k > 0);
-        if (numSamples > (1 << (m_NTDC - subBits))) m_NTDC++;
-        double samplingRate = tdcParams.getDouble("samplingRate");
-        m_TDCwidth = 1.0 / samplingRate / (1 << subBits);
+        if (numSamples > (1 << (m_NTDC - m_subBits))) m_NTDC++;
+        m_syncTimeBase = tdcParams.getTime("syncTimeBase");
+        int syncSamples = c_syncWindows * c_WindowSize;
+        m_TDCwidth = m_syncTimeBase / syncSamples / (1 << m_subBits);
         m_TDCoffset = tdcParams.getTime("offset");
         m_pileupTime = tdcParams.getTime("pileupTime");
         m_doubleHitResolution = tdcParams.getTime("doubleHitResolution");

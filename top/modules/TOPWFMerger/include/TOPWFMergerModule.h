@@ -16,6 +16,7 @@
 
 #include <framework/database/DBArray.h>
 #include <top/dbobjects/TOPASICChannel.h>
+#include <top/dbobjects/TOPSampleTime.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPWaveform.h>
 #include <top/geometry/TOPGeometryPar.h>
@@ -72,7 +73,7 @@ namespace Belle2 {
   private:
 
     /**
-     * Return a key used in m_map
+     * Return a key used in m_pedestalMap
      * @param moduleID module ID
      * @param channel hardware channel number
      * @return a key
@@ -83,23 +84,23 @@ namespace Belle2 {
     }
 
     /**
-     * Return the mapped value
-     * @param moduleID module ID
-     * @param channel hardware channel number
-     * @return mapped value or NULL
+     * Return module ID from key
+     * @param key a key number
+     * @return module ID
      */
-    const TOPASICChannel* getConstants(int moduleID, unsigned channel) const
-    {
-      unsigned key = getKey(moduleID, channel);
-      std::map<unsigned, const TOPASICChannel*>::const_iterator it = m_map.find(key);
-      if (it == m_map.end()) return 0;
-      return it->second;
-    }
+    int getModuleID(unsigned key) const {return (key >> 16);}
+
+    /**
+     * Return channel number from key
+     * @param key a key number
+     * @return channel number
+     */
+    int getChannel(unsigned key) const {return (key & 0xFFFF);}
 
     /**
      * Appends raw waveform to waveform
      * @param rawWaveform raw waveform
-     * @param calibration ASIC channel calibration constants
+     * @param calibration ASIC channel calibration constants (pedestals, gains)
      * @param waveform waveform to append to
      * @return true on success
      */
@@ -122,11 +123,20 @@ namespace Belle2 {
     int m_minWidth;    /**< minimal width of a digital pulse in number of samlpes */
     double m_fraction;    /**< constant fraction discrimination: fraction */
     bool m_useFTSW;  /**< if true add FTSW time to hit times when making TOPDigits */
+    int m_activeWindows; /**< number of active ASIC windows */
 
-    DBArray<TOPASICChannel> m_asicChannels; /**< ASIC calibration constants */
-    std::map<unsigned, const TOPASICChannel*> m_map; /**< map of (module, channel) to */
+    DBArray<TOPASICChannel> m_asicChannels; /**< pedestal calibration constants */
+    /** map of (module, channel) and pedestals */
+    std::map<unsigned, const TOPASICChannel*> m_pedestalMap;
+
+    DBArray<TOPSampleTime> m_sampleTimes;  /**< sample time calibration */
+    /** map of (module, channel) and sample time calibration */
+    std::map<unsigned, const TOPSampleTime*> m_sampleTimeMap;
+    TOPSampleTime* m_sampleTime = 0; /**< default in case no calibration available */
 
     TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance();  /**< geometry */
+
+    unsigned m_falseWindows = 0; /**< false ASIC window count */
 
   };
 

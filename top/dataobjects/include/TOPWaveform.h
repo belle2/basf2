@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -26,7 +26,7 @@ namespace Belle2 {
      * Waveform sample (basic waveform element)
      */
     struct WFSample {
-      float time = 0; /**< time */
+      float time = 0; /**< time expressed in samples */
       float adc = 0;  /**< adc value */
       float err = 0;  /**< uncertainty of adc value */
     };
@@ -35,7 +35,7 @@ namespace Belle2 {
      * Reconstructed hit
      */
     struct Hit {
-      float time = 0;    /**< time */
+      float time = 0;    /**< time expressed in samples */
       float height = 0;  /**< pulse height */
       float width = 0;   /**< pulse width */
       float area = 0;    /**< pulse area */
@@ -68,11 +68,7 @@ namespace Belle2 {
      */
     void appendSample(WFSample sample)
     {
-      if (m_data.empty()) {
-        sample.time = 0;
-      } else {
-        sample.time += m_data[m_data.size() - 1].time;
-      }
+      sample.time = m_data.size();
       m_data.push_back(sample);
     }
 

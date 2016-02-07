@@ -67,12 +67,15 @@ namespace Belle2 {
              "the fraction for constant fraction discrimination", 0.5);
     addParam("useFTSW", m_useFTSW,
              "add or not add FTSW time to hit times when making TOPDigits", true);
+    addParam("activeWindows", m_activeWindows,
+             "number of active ASIC windows (used for logger only)", 64);
 
   }
 
 
   TOPWFMergerModule::~TOPWFMergerModule()
   {
+    if (m_sampleTime) delete m_sampleTime;
   }
 
   void TOPWFMergerModule::initialize()
@@ -99,20 +102,44 @@ namespace Belle2 {
     if (m_fraction >= 1) B2ERROR("TOPWFMerger: fraction must be less that 1");
     if (m_fraction <= 0) B2ERROR("TOPWFMerger: fraction must be greater that 0");
 
+    // default sample times in case calibration is not available
+    m_sampleTime = new TOPSampleTime(0, 0, m_topgp->getSyncTimeBase());
+
   }
 
   void TOPWFMergerModule::beginRun()
   {
 
-    if (!m_asicChannels.hasChanged()) return;
+    if (m_asicChannels.hasChanged()) {
 
-    m_map.clear();
-    for (const auto& asic : m_asicChannels) {
-      auto key = getKey(asic.getModuleID(), asic.getChannel());
-      m_map[key] = &asic;
+      m_pedestalMap.clear();
+      for (const auto& asic : m_asicChannels) {
+        auto key = getKey(asic.getModuleID(), asic.getChannel());
+        m_pedestalMap[key] = &asic;
+      }
+
+      B2INFO("TOPWFMerger: new ASIC pedestal calibration map of size "
+             << m_pedestalMap.size() << " created");
+    }
+    if (m_pedestalMap.empty()) {
+      B2FATAL("TOPWFMerger: cannot proceed - no ASIC pedestals available");
+      return;
     }
 
-    B2INFO("TOPWFMerger: new ASIC calibration map of size " << m_map.size() << " created");
+    if (m_sampleTimes.hasChanged()) {
+
+      m_sampleTimeMap.clear();
+      for (const auto& asic : m_sampleTimes) {
+        auto key = getKey(asic.getModuleID(), asic.getChannel());
+        m_sampleTimeMap[key] = &asic;
+      }
+
+      B2INFO("TOPWFMerger: new ASIC sample time calibration map of size "
+             << m_sampleTimeMap.size() << " created");
+    }
+    if (m_sampleTimeMap.empty())
+      B2ERROR("TOPWFMerger: no sample time calibration available - "
+              "will use equidistant sample times");
 
   }
 
@@ -136,9 +163,10 @@ namespace Belle2 {
 
     for (const auto& element : map) {
       auto key = element.first;
-      const auto* calibration = m_map[key]; // ASIC channel calibration constants
+      const auto* calibration = m_pedestalMap[key];
       if (!calibration) {
-        B2WARNING("TOPWFMerger: no calibration available for " << key);
+        B2WARNING("TOPWFMerger: no pedestal calibration available for module " <<
+                  getModuleID(key) << " channel " << getChannel(key));
         continue;
       }
       int numWindows = calibration->getNumofWindows();
@@ -160,15 +188,18 @@ namespace Belle2 {
 
     // convert to hits
 
-    double t0 = 0;
+    float t0 = 0;
     if (m_useFTSW) {
       StoreObjPtr<TOPTimeZero> timeZero;
       t0 = timeZero->getTime();
     }
 
+    int sampleDivisions = (0x1 << m_topgp->getSubBits());
     StoreArray<TOPDigit> digits;
     for (auto& waveform : waveforms) {
-      int nDig = waveform.setDigital(m_threshold, m_threshold - m_hysteresis, m_minWidth);
+      int nDig = waveform.setDigital(m_threshold,
+                                     m_threshold - m_hysteresis,
+                                     m_minWidth);
       if (nDig == 0) continue;
       int nHit = waveform.convertToHits(m_fraction);
       if (nHit == 0) continue;
@@ -177,11 +208,22 @@ namespace Belle2 {
       auto channel = waveform.getChannel();
       auto firstWindow = waveform.getFirstWindow();
       auto refWindow = waveform.getReferenceWindow();
+      const auto* sampleTime = m_sampleTime; // default calibration
+      if (!m_sampleTimeMap.empty()) {
+        auto key = getKey(moduleID, channel);
+        sampleTime = m_sampleTimeMap[key];
+        if (!sampleTime) {
+          sampleTime = m_sampleTime; // use default calibration
+          B2WARNING("TOPWFMerger: no sample time calibration available for module "
+                    << getModuleID(key) << " channel " << getChannel(key));
+        }
+      }
       const auto& hits = waveform.getHits();
       for (const auto& hit : hits) {
-        auto tdc = m_topgp->getTDCcount(hit.time);
+        int tdc = int(hit.time * sampleDivisions);
+        float time = sampleTime->getTimeDifference(firstWindow, hit.time);
         auto* digit = digits.appendNew(moduleID, pixelID, tdc);
-        digit->setTime(hit.time + t0);
+        digit->setTime(time + t0);
         digit->setADC(hit.height);
         digit->setPulseWidth(hit.width);
         digit->setChannel(channel);
@@ -200,6 +242,11 @@ namespace Belle2 {
 
   void TOPWFMergerModule::terminate()
   {
+    if (m_falseWindows > 0)
+      B2ERROR("TOPWFMerger: " << m_falseWindows <<
+              " ASIC windows found with window number > " << m_activeWindows - 1 <<
+              " and no pedestals");
+
   }
 
 
@@ -214,9 +261,13 @@ namespace Belle2 {
     auto window = rawWaveform->getStorageWindow();
     const auto* pedestals = calibration->getPedestals(window);
     if (!pedestals) {
-      B2WARNING("TOPWFMerger: no calibration available for module " <<
-                calibration->getModuleID() << " channel " <<
-                calibration->getChannel() << " window " << window);
+      if (window < (unsigned) m_activeWindows) {
+        B2WARNING("TOPWFMerger: no calibration available for module " <<
+                  calibration->getModuleID() << " channel " <<
+                  calibration->getChannel() << " window " << window);
+      } else {
+        m_falseWindows++;
+      }
       return false;
     }
     const auto* gains = calibration->getGains(window);
@@ -241,7 +292,6 @@ namespace Belle2 {
       sample.adc = (rawADC - pedestals->getValue(i) - offset) * gain;
       sample.err = (pedestals->getError(i)) * gain;
       if (sample.err == 0) sample.adc = 0; // undefined pedestal
-      sample.time = calibration->getSampleTime(window, i);
       waveform->appendSample(sample);
       i++;
     }

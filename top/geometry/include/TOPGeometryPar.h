@@ -41,7 +41,8 @@ namespace Belle2 {
       /**
        * Various constants
        */
-      enum {c_WindowSize = 64 /**< number of samples per ASIC window */
+      enum {c_WindowSize = 64, /**< number of samples per ASIC window */
+            c_syncWindows = 2  /**< number of windows corresponding to timeBase */
            };
 
       /**
@@ -333,6 +334,18 @@ namespace Belle2 {
        * @return number of sub-bits
        */
       int getSubBits() const {return m_subBits;}
+
+      /**
+       * Returns number of ASIC windows per waveform
+       * @return number of windows
+       */
+      int getNumWindows() const {return m_numWindows;}
+
+      /**
+       * Returns synchronization time with accelerator for IRSX readout
+       * @return synchronization time
+       */
+      double getSyncTimeBase() const {return m_syncTimeBase;}
 
       /**
        * Returns width of TDC bin
@@ -653,7 +666,9 @@ namespace Belle2 {
       // TDC parameters
 
       int m_NTDC = 0;                 /**< number of TDC bits */
+      int m_numWindows = 0;           /**< number of ASIC windows per waveform */
       int m_subBits = 0;              /**< number of bits per ASIC sample */
+      double m_syncTimeBase = 0;      /**< sinchronization time base [ns] */
       double m_TDCwidth = 0;          /**< width of a bit in [ns] */
       double m_TDCoffset = 0;         /**< offset to be subtracted [ns] */
       double m_pileupTime = 0;        /**< pile-up time [ns] */

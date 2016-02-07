@@ -24,18 +24,12 @@ bool plotCalibrationChannel(const char* filename)
   int iEvent = -1;
 
   TFile plotFile("calibrationChannels.root", "RECREATE");
-  map<topcaf_channel_id_t, int> channelEventMap; // stores the first occurence of a channel
 
-  TMultiGraph* mg = new TMultiGraph("calibChannels", "calibChannels");
-  TCanvas* c = new TCanvas("calib", "calib");
+  map<int, TMultiGraph*> calibrationChannels;
+  map<int, vector <string>> channelLabels;
   size_t nSamples = 0;
-  int iChannel = 0;
-  vector <string> channelLabels;
   while (theReader.Next()) {
     iEvent += 1;
-    if (iEvent > 16) {
-      break;
-    }
     for (EventWaveformPacket v : eventRV) {
       if (v.GetASICChannel() != CALIBRATIONCHANNEL) {
         continue;
@@ -45,14 +39,18 @@ bool plotCalibrationChannel(const char* filename)
         continue;
       }
       auto channelID = v.GetChannelID();
-      channelLabels.push_back(to_string(channelID));
-      if (channelEventMap.find(channelID) == channelEventMap.end()) {
-        string idName = string("noise_") + to_string(channelID);
-        channelEventMap.insert(make_pair(channelID, iEvent));
-      }
       if (y.size() > nSamples) {
         nSamples = y.size();
       }
+
+      int scrodid = v.GetScrodID();
+      if (calibrationChannels.find(scrodid) == calibrationChannels.end()) {
+        string gname = string("calibChannels") + to_string(scrodid);
+        calibrationChannels.insert(make_pair(scrodid, new TMultiGraph(gname.c_str(), gname.c_str())));
+      }
+      channelLabels[scrodid].push_back(to_string(channelID));
+      TMultiGraph* mg = calibrationChannels[scrodid];
+      int iChannel = mg->GetListOfGraphs() ? mg->GetListOfGraphs()->GetEntries() : 0;
 
       vector<double> x;
       // create the x axis
@@ -61,26 +59,42 @@ bool plotCalibrationChannel(const char* filename)
         y[i] += iChannel * 1000;
         x.push_back(i);
       }
-
       TGraph* g = new TGraph(y.size(), &x[0], &y[0]);
       g->SetMarkerStyle(7);
       mg->Add(g);
-      iChannel += 1;
     }
-    if (iChannel == 0 or nSamples == 0) {
-      continue;
+
+    // check all scrods: if we have not seen 16 calibration channels from each, keep going, else we're done
+    bool done = true;
+    for (auto it = channelLabels.begin(); it != channelLabels.end(); ++it) {
+      if ((*it).second.size() < 16) {
+        done = false;
+        break;
+      }
+    }
+    if (done) {
+      break;
     }
   }
-  TH2F* h = new TH2F("calibrationChannels", "calibrationChannels", nSamples, 0, nSamples, iChannel, -500, -500 + iChannel * 1000);
-  for (int ibin = 0; ibin < iChannel; ibin++) {
-    h->GetYaxis()->SetBinLabel(ibin + 1, channelLabels[ibin].c_str());
+
+  for (auto graph_it = calibrationChannels.begin(); graph_it != calibrationChannels.end(); ++graph_it) {
+    int scrodid = (*graph_it).first;
+    string name = string("scrod_") + to_string(scrodid) + string("calib");
+    TMultiGraph* mg = (*graph_it).second;
+    TCanvas* c = new TCanvas(name.c_str(), name.c_str());
+    name += string("Channels");
+    int iChannel = mg->GetListOfGraphs() ? mg->GetListOfGraphs()->GetEntries() : 0;
+    TH2F* h = new TH2F(name.c_str(), name.c_str(), nSamples, 0, nSamples, iChannel, -500, -500 + iChannel * 1000);
+    for (int ibin = 0; ibin < iChannel; ibin++) {
+      h->GetYaxis()->SetBinLabel(ibin + 1, channelLabels[scrodid][ibin].c_str());
+    }
+    h->GetYaxis()->SetTickSize(0);
+    h->GetYaxis()->SetTickLength(0);
+    h->SetStats(0);
+    h->Draw();
+    mg->Draw("P");
+    plotFile.WriteTObject(c);
   }
-  h->GetYaxis()->SetTickSize(0);
-  h->GetYaxis()->SetTickLength(0);
-  h->SetStats(0);
-  h->Draw();
-  mg->Draw("P");
-  plotFile.WriteTObject(c);
   return true;
 }
 

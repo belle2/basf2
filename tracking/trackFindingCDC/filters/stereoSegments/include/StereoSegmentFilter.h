@@ -29,7 +29,7 @@ namespace Belle2 {
     using BaseStereoSegmentFilter = Filter<std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>, const CDCTrack&>>;
 
     /// MC filter for stereo segment - track relations.
-    using MCStereoSegmentFilter = MCFilter<VariadicUnionVarSet<StereoSegmentTruthVarSet, StereoSegmentVarSet>>;
+    using MCStereoSegmentFilter = MCFilter<StereoSegmentTruthVarSet>;
 
     /// Recording filter for stereo segment - track relations.
     using RecordingStereoSegmentFilter =

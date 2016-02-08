@@ -35,8 +35,9 @@ namespace Belle2 {
       "number_of_hits_in_same_region",
       "number_of_hits_out_of_cdc",
       "number_of_hits_on_wrong_side",
-      "sum_distance_to_track",
-      "number_of_hits_in_common"
+      //"number_of_hits_in_common",
+      "sum_distance_using_2d",
+      "sum_distance_using_z",
     };
 
     /** Class that specifies the names of the variables

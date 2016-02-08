@@ -49,27 +49,31 @@ bool StereoSegmentVarSet::extract(const std::pair<std::pair<const CDCRecoSegment
   // Count the number of hits with reconstruction position out of the CDC
   unsigned int numberOfHitsOutOfCDC = 0;
   unsigned int numberOfHitsOnWrongSide = 0;
-  double sumDistanceToTrack = 0;
+  double sumDistanceZReconstructed2D = 0;
+  double sumDistance2DReconstructedZ = 0;
 
   std::vector<double> arcLength2DList(recoSegment3D.size());
 
   for (const CDCRecoHit3D& recoHit3D : recoSegment3D.items()) {
     const CDCWire& wire = recoHit3D.getWire();
-    const Vector3D& reconstructedPosition = recoHit3D.getRecoPos3D();
+    const Vector3D& reconstructedPositionTo2D = recoHit3D.getRecoPos3D();
 
-    if (not wire.isInCellZBounds(reconstructedPosition)) {
+    if (not wire.isInCellZBounds(reconstructedPositionTo2D)) {
       numberOfHitsOutOfCDC++;
     }
 
-    const double arcLength2D = recoHit3D.getArcLength2D();
+    double arcLength2D = recoHit3D.getArcLength2D();
     if (arcLength2D < 0 and not isCurler) {
       numberOfHitsOnWrongSide++;
-      arcLength2DList.push_back(arcLength2D + 2 * TMath::Pi() * radius);
-      sumDistanceToTrack += trajectorySZ.getZDist(arcLength2D + 2 * TMath::Pi() * radius, reconstructedPosition.z());
-    } else {
-      arcLength2DList.push_back(arcLength2D);
-      sumDistanceToTrack += trajectorySZ.getZDist(arcLength2D, reconstructedPosition.z());
+      arcLength2D += 2 * TMath::Pi() * radius;
     }
+
+    sumDistanceZReconstructed2D += abs(trajectorySZ.getZDist(arcLength2D, reconstructedPositionTo2D.z()));
+    arcLength2DList.push_back(arcLength2D);
+
+    const double reconstructedZ = trajectorySZ.mapSToZ(arcLength2D);
+    const Vector2D& reconstructedPositionToZ = recoHit3D.getWire().getWireLine().pos2DAtZ(reconstructedZ);
+    sumDistance2DReconstructedZ += (reconstructedPositionToZ - reconstructedPositionTo2D.xy()).norm();
   }
 
   std::sort(arcLength2DList.begin(), arcLength2DList.end());
@@ -87,7 +91,6 @@ bool StereoSegmentVarSet::extract(const std::pair<std::pair<const CDCRecoSegment
     }) != recoSegment3D.end();
   });
 
-
   ////////
 
   var<named("track_size")>() = size;
@@ -103,9 +106,10 @@ bool StereoSegmentVarSet::extract(const std::pair<std::pair<const CDCRecoSegment
   var<named("number_of_hits_in_same_region")>() = numberOfHitsInSameRegion;
   var<named("number_of_hits_out_of_cdc")>() = numberOfHitsOutOfCDC;
   var<named("number_of_hits_on_wrong_side")>() = numberOfHitsOnWrongSide;
-  var<named("number_of_hits_in_common")>() = numberOfHitsInCommon;
+  //var<named("number_of_hits_in_common")>() = numberOfHitsInCommon;
 
-  setVariableIfNotNaN<named("sum_distance_to_track")>(sumDistanceToTrack);
+  setVariableIfNotNaN<named("sum_distance_using_2d")>(sumDistanceZReconstructed2D);
+  setVariableIfNotNaN<named("sum_distance_using_z")>(sumDistance2DReconstructedZ);
 
   var<named("superlayer_id")>() = recoSegment3D.getISuperLayer();
 

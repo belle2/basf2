@@ -34,7 +34,7 @@ namespace Belle2 {
         AHitInBoxAlgorithm hitInBoxAlgorithm;
         double sumOfWeights = 0;
         double numberOfPassedItems = 0;
-        for (const auto& item : *rangeObject) {
+        for (const auto& item : rangeObject) {
           const double hitWeight = hitInBoxAlgorithm(item, box);
           if (not std::isnan(hitWeight)) {
             numberOfPassedItems++;
@@ -42,14 +42,14 @@ namespace Belle2 {
           }
         }
 
-        if (numberOfPassedItems > minimalRatio * static_cast<double>(rangeObject->size())) {
+        if (numberOfPassedItems > minimalRatio * static_cast<double>(rangeObject.size())) {
           return sumOfWeights;
         } else {
           return NAN;
         }
       }
 
-      const double minimalRatio = 0.8;
+      const double minimalRatio = 0.6;
     };
   }
 }

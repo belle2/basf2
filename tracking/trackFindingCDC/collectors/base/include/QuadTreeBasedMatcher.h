@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 #include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -26,11 +27,11 @@ namespace Belle2 {
       /** Expose the quad tree relevant parameters. **/
       virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "")
       {
-        moduleParameters->addParameter(prefix + "quadTreeLevel", m_param_quadTreeLevel,
+        moduleParameters->addParameter(prefixed(prefix, "level"), m_param_quadTreeLevel,
                                        "The number of levels for the quad tree search.",
                                        m_param_quadTreeLevel);
 
-        moduleParameters->addParameter(prefix + "minimumNumberOfHits", m_param_minimumNumberOfHits,
+        moduleParameters->addParameter(prefixed(prefix, "minimumNumberOfHits"), m_param_minimumNumberOfHits,
                                        "The minimum number of hits in a quad tree bin to be called as result.",
                                        m_param_minimumNumberOfHits);
       }
@@ -57,6 +58,19 @@ namespace Belle2 {
 
       /// Quad tree instance
       AQuadTree m_quadTreeInstance;
+
+      /// Use the writeDebugInformation function of the quad tree to write the tree into a root file with a ascending number.
+      void writeDebugInformation()
+      {
+        std::string outputFileName = "quadTreeContent_call_" + std::to_string(m_numberOfPassedDebugCalls) + ".root";
+        m_quadTreeInstance.writeDebugInfoToFile(outputFileName);
+
+        m_numberOfPassedDebugCalls++;
+      }
+
+    private:
+      /// Store the number of passed calls to the debug function.
+      unsigned int m_numberOfPassedDebugCalls = 0;
     };
   }
 }

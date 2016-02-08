@@ -364,7 +364,8 @@ class IdempotentGeneratorRun(ReadOrGenerateEventsRun):
         generator_parameters = {param.name: str(param.values) for param in self.generator_module.available_params()}
         generator_parameters.update({"n_events": str(self.n_events)})
 
-        generator_parameters_as_string = "".join(generator_parameters.values())
+        sorted_generator_parameters = sorted(key + ":" + value for key, value in generator_parameters.items())
+        generator_parameters_as_string = "".join(sorted_generator_parameters)
 
         hashed_generator_parameters = hashlib.md5(generator_parameters_as_string.encode("utf8")).hexdigest()
         self.root_input_file = os.path.join(self.root_output_directory, hashed_generator_parameters + ".root")
@@ -374,7 +375,6 @@ class IdempotentGeneratorRun(ReadOrGenerateEventsRun):
         else:
             self.root_output_file = self.root_input_file
             self.root_input_file = None
-            main_path = ReadOrGenerateEventsRun.create_path(self)
 
         main_path = ReadOrGenerateEventsRun.create_path(self)
 

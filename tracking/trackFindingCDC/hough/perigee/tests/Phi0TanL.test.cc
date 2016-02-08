@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/hough/perigee/SimpleRLTaggedWireHitHoughTree.h>
 #include <tracking/trackFindingCDC/hough/perigee/SimpleSegmentHoughTree.h>
 
-#include <tracking/trackFindingCDC/hough/perigee/InPhi0TanLBox.h>
+#include <tracking/trackFindingCDC/hough/algorithms/InPhi0TanLBox.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/Phi0Rep.h>
 #include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>

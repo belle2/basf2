@@ -11,7 +11,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 #include <tracking/trackFindingCDC/hough/boxes/Z0TanLambdaBox.h>
-#include <tracking/trackFindingCDC/hough/SameSignChecker.h>
+#include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

@@ -10,8 +10,8 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/trees/DynTree.h>
-#include <tracking/trackFindingCDC/hough/WithWeightedItems.h>
-#include <tracking/trackFindingCDC/hough/WithSharedMark.h>
+#include <tracking/trackFindingCDC/hough/baseelements/WithWeightedItems.h>
+#include <tracking/trackFindingCDC/hough/baseelements/WithSharedMark.h>
 
 #include <framework/logging/Logger.h>
 

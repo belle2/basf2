@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
 
-#include <tracking/trackFindingCDC/hough/perigee/InPhi0CurvBox.h>
+#include <tracking/trackFindingCDC/hough/algorithms/InPhi0CurvBox.h>
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
 
 

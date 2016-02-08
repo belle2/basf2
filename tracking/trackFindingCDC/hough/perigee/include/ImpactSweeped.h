@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/hough/perigee/ImpactRep.h>
 #include <tracking/trackFindingCDC/hough/boxes/SweepBox.h>
-#include <tracking/trackFindingCDC/hough/SameSignChecker.h>
+#include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
 #include <tracking/trackFindingCDC/topology/ILayer.h>
 
 namespace Belle2 {

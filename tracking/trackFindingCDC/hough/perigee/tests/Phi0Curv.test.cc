@@ -16,7 +16,7 @@
 #include <tracking/trackFindingCDC/hough/perigee/SimpleSegmentHoughTree.h>
 #include <tracking/trackFindingCDC/hough/perigee/StandardBinSpec.h>
 
-#include <tracking/trackFindingCDC/hough/perigee/InPhi0CurvBox.h>
+#include <tracking/trackFindingCDC/hough/algorithms/InPhi0CurvBox.h>
 
 #include <vector>
 

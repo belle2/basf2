@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/hough/perigee/SimpleSegmentHoughTree.h>
 #include <tracking/trackFindingCDC/hough/perigee/StandardBinSpec.h>
 
-#include <tracking/trackFindingCDC/hough/perigee/InPhi0ImpactCurvBox.h>
+#include <tracking/trackFindingCDC/hough/algorithms/InPhi0ImpactCurvBox.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>

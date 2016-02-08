@@ -10,8 +10,9 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/perigee/Phi0Rep.h>
+#include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
 #include <tracking/trackFindingCDC/hough/boxes/Box.h>
-#include <tracking/trackFindingCDC/hough/SameSignChecker.h>
+#include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
 #include <tracking/trackFindingCDC/topology/ILayer.h>
 
 #include <array>
@@ -20,22 +21,20 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Checker if a position is contained in a family of curves over phi0
-    class InPhi0Box {
+    /// Checker if a position is contained in a family of curves over phi0 and curvature
+    class InPhi0CurvBox {
 
     public:
-      /// Constructor taking the curler curvature - pass a value greater 0 to activate one arm exclusive finding.
-      InPhi0Box(float curlCurv = NAN) : m_curlCurv(std::fabs(curlCurv)) {}
+      /** Constructor taking the curler curvature
+       *  Curlers with high curvature than the curler curvature may obtain hits from both arms*/
+      InPhi0CurvBox(float curlCurv = NAN) : m_curlCurv(curlCurv) {}
 
     public:
       /// The box to which this object correspondes.
-      typedef Box<DiscretePhi0> HoughBox;
+      typedef Box<DiscretePhi0, DiscreteCurv> HoughBox;
 
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the familiy of curves
-       *  @param x x coordinate of the center of the drift circle
-       *  @param y y coordinate of the center of the drift circle
-       *  @param l the signed drift length of the drift circle - sign is the right left passage hypotheses
        *  @returns
        *   * ESign::c_Plus if the drift circle is always on the positive / right site
        *   * ESign::c_Minus means the drift circle is always on the negative / left site
@@ -51,30 +50,42 @@ namespace Belle2 {
                                    ILayer /*iCLayer*/ = -1) const
       {
         const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
+        const std::array<DiscreteCurv, 2>& curv = houghBox.getBounds<DiscreteCurv>();
 
         std::array<float, 2> xRot;
         xRot[0] = x * phi0Vec[0]->x() + y * phi0Vec[0]->y();
         xRot[1] = x * phi0Vec[1]->x() + y * phi0Vec[1]->y();
 
-        const bool onlyPositiveArm = 0 < m_curlCurv;
+        const bool isNonCurler = static_cast<float>(curv[1]) <= m_curlCurv and static_cast<float>(curv[0]) >= -m_curlCurv;
+        const bool onlyPositiveArm = isNonCurler;
         if (onlyPositiveArm) {
           // Reject hit if it is on the inward going branch but the curvature suggest it is no curler
           if (xRot[0] < 0 and xRot[1] < 0) return ESign::c_Invalid;
         }
 
         std::array<float, 2> yRotPlusL;
-        yRotPlusL[0] = -x * phi0Vec[0]->y() + y * phi0Vec[0]->x() - l;
-        yRotPlusL[1] = -x * phi0Vec[1]->y() + y * phi0Vec[1]->x() - l;
+        yRotPlusL[0] = -x * phi0Vec[0]->y() + y * phi0Vec[0]->x() + l;
+        yRotPlusL[1] = -x * phi0Vec[1]->y() + y * phi0Vec[1]->x() + l;
 
-        std::array<float, 2> dist;
-        dist[0] = - yRotPlusL[0];
-        dist[1] = - yRotPlusL[1];
+        const float r2 =  x * x + y * y - l * l;
+        std::array<float, 2> r2TimesHalfCurv;
+        r2TimesHalfCurv[0] = r2 * (static_cast<float>(curv[0]) / 2.0);
+        r2TimesHalfCurv[1] = r2 * (static_cast<float>(curv[1]) / 2.0);
 
-        return ESignUtil::common(dist[0], dist[1]);
+        // Using binary notation encoding lower and upper box bounds to fill the flat array.
+        std::array<float, 4> dist;
+
+        dist[0b00] = r2TimesHalfCurv[0] - yRotPlusL[0];
+        dist[0b10] = r2TimesHalfCurv[0] - yRotPlusL[1];
+
+        dist[0b01] = r2TimesHalfCurv[1] - yRotPlusL[0];
+        dist[0b11] = r2TimesHalfCurv[1] - yRotPlusL[1];
+
+        return ESignUtil::common(dist);
       }
 
     private:
-      /// Curler curvature - set a value greater zero to activate one arm exclusive finding.
+      /// Curler curvature - set to value greater zero to activate on arm exclusive finding.
       float m_curlCurv;
     };
   } // end namespace TrackFindingCDC

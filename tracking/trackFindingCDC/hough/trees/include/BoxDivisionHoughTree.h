@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/hough/trees/WeightedFastHoughTree.h>
-#include <tracking/trackFindingCDC/hough/LinearDivision.h>
+#include <tracking/trackFindingCDC/hough/baseelements/LinearDivision.h>
 
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 #include <tracking/trackFindingCDC/utilities/GenIndices.h>

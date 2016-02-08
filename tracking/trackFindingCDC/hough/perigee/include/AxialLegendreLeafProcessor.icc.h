@@ -14,8 +14,8 @@
 
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
 #include <tracking/trackFindingCDC/hough/perigee/OffOrigin.h>
-#include <tracking/trackFindingCDC/hough/perigee/InPhi0CurvBox.h>
-#include <tracking/trackFindingCDC/hough/WithSharedMark.h>
+#include <tracking/trackFindingCDC/hough/algorithms/InPhi0CurvBox.h>
+#include <tracking/trackFindingCDC/hough/baseelements/WithSharedMark.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>

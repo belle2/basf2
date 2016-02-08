@@ -10,6 +10,7 @@
 
 #include <tracking/trackFindingCDC/collectors/stereo_segments/StereoSegmentTrackMatcherQuadTree.h>
 
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -26,6 +27,10 @@ void StereoSegmentTrackMatcherQuadTree::exposeParameters(ModuleParamList* module
   moduleParameters->addParameter(prefixed(prefix, "checkForB2BTracks"), m_param_checkForB2BTracks,
                                  "Set to false to skip the check for back-2-back tracks (good for cosmics)",
                                  m_param_checkForB2BTracks);
+
+  moduleParameters->addParameter(prefixed(prefix, "writeDebugInformation"), m_param_writeDebugInformation,
+                                 "Set to true to output debug information.",
+                                 m_param_writeDebugInformation);
 }
 
 bool StereoSegmentTrackMatcherQuadTree::checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D, const bool isCurler,
@@ -62,7 +67,9 @@ std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherQuadTr
                                               const std::vector<CDCRecoSegment2D>& recoSegments)
 {
 
-  typedef std::pair<CDCRecoSegment3D, const CDCRecoSegment2D*> CDCRecoSegment3DWithPointer;
+  const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
+
+  typedef std::pair<std::pair<CDCRecoSegment3D, CDCTrajectorySZ>, const CDCRecoSegment2D*> CDCRecoSegment3DWithPointer;
   std::vector<CDCRecoSegment3DWithPointer> recoSegmentsWithPointer;
   recoSegmentsWithPointer.reserve(recoSegments.size());
 
@@ -78,20 +85,24 @@ std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherQuadTr
       CDCRecoSegment3D recoSegment3D = CDCRecoSegment3D::reconstruct(recoSegment2D, trajectory2D);
 
       if (checkRecoSegment3D(recoSegment3D, isCurler, shiftValue)) {
-        recoSegmentsWithPointer.emplace_back(recoSegment3D, &recoSegment2D);
+        const CDCTrajectorySZ& trajectorySZ = szFitter.fitUsingSimplifiedTheilSen(recoSegment3D);
+        recoSegmentsWithPointer.emplace_back(std::make_pair(recoSegment3D, trajectorySZ), &recoSegment2D);
       }
 
       CDCRecoSegment3D recoSegment3DReversed = CDCRecoSegment3D::reconstruct(recoSegment2D.reversed(), trajectory2D);
 
       if (checkRecoSegment3D(recoSegment3DReversed, isCurler, shiftValue)) {
-        recoSegmentsWithPointer.emplace_back(recoSegment3DReversed, &recoSegment2D);
+        const CDCTrajectorySZ& trajectorySZ = szFitter.fitUsingSimplifiedTheilSen(recoSegment3DReversed);
+        recoSegmentsWithPointer.emplace_back(std::make_pair(recoSegment3DReversed, trajectorySZ), &recoSegment2D);
       }
     }
   }
 
   m_quadTreeInstance.seed(recoSegmentsWithPointer);
 
-  writeDebugInformation();
+  if (m_param_writeDebugInformation) {
+    writeDebugInformation();
+  }
 
   const auto& foundStereoSegmentsWithNode = m_quadTreeInstance.findSingleBest(m_param_minimumNumberOfHits);
   m_quadTreeInstance.fell();

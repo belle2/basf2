@@ -10,6 +10,7 @@
 #pragma once
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/Z0TanLambdaLegendre.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFindingCDC/hough/algorithms/RangeInBox.h>
 #include <tracking/trackFindingCDC/hough/algorithms/FirstOfPairInBox.h>
 #include <tracking/trackFindingCDC/hough/algorithms/SegmentInZ0TanLambdaBox.h>
@@ -25,7 +26,9 @@ namespace Belle2 {
      * and typical maximum values for z0 (+- 120) and s-z-slope (+- 75°) with 2 divisions for each step.
      * This class is only a typedef. The real algorithm can be found in SimpeBoxDivisionHoughTree.
      */
+    using SegmentInZ0TanLambdaAlgorithm =
+      FirstOfPairInBox<TwoHitInBoxAlgorithm<SegmentInZ0TanLambdaBox, FirstOfPairInBox<RangeInBox<HitInZ0TanLambdaBox>>>>;
     using SegmentZ0TanLambdaLegendre =
-      Z0TanLambdaLegendre<std::pair<CDCRecoSegment3D, const CDCRecoSegment2D*>, FirstOfPairInBox<TwoHitInBoxAlgorithm<SegmentInZ0TanLambdaBox, RangeInBox<HitInZ0TanLambdaBox>>>, 2, 2>;
+      Z0TanLambdaLegendre<std::pair<std::pair<CDCRecoSegment3D, CDCTrajectorySZ>, const CDCRecoSegment2D*>, SegmentInZ0TanLambdaAlgorithm, 2, 2>;
   }
 }

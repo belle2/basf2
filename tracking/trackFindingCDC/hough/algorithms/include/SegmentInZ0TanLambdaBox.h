@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFindingCDC/hough/boxes/Z0TanLambdaBox.h>
 #include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
 
@@ -31,18 +31,17 @@ namespace Belle2 {
        *  Checks if the wire hit is contained in a z0 tan lambda hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
-      inline Weight operator()(const CDCRecoSegment3D& recoSegment,
+      inline Weight operator()(const std::pair<CDCRecoSegment3D, CDCTrajectorySZ>& recoSegmentWithTrajectorySZ,
                                const HoughBox* z0TanLambdaBox)
       {
-        const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
-
         const float& lowerZ0 = z0TanLambdaBox->getLowerZ0();
         const float& upperZ0 = z0TanLambdaBox->getUpperZ0();
 
         const float& lowerTanLambda = z0TanLambdaBox->getLowerTanLambda();
         const float& upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
 
-        const CDCTrajectorySZ& szTrajectory = szFitter.fitUsingSimplifiedTheilSen(recoSegment);
+        const CDCTrajectorySZ& szTrajectory = recoSegmentWithTrajectorySZ.second;
+        const CDCRecoSegment3D& recoSegment = recoSegmentWithTrajectorySZ.first;
 
         const float& trajectoryZ0 = szTrajectory.getStartZ();
         const float& trajectoryTanLambda = szTrajectory.getTanLambda();

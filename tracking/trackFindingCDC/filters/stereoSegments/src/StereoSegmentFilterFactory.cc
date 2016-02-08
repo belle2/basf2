@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/stereoSegments/SimpleStereoSegmentFilter.h>
 
 using namespace std;
 using namespace Belle2;

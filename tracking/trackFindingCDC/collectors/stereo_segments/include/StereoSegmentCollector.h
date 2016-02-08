@@ -23,6 +23,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Shortcut for the used stereo segment collector for single match.
-    using StereoSegmentCollectorSingleMatch = SingleMatchCollector<StereoSegmentTrackMatcherQuadTree, StereoSegmentTrackAdder>;
+    using StereoSegmentCollectorSingleMatchQuadTree = FirstMatchCollector<StereoSegmentTrackMatcherQuadTree, StereoSegmentTrackAdder>;
+    using StereoSegmentCollectorSingleMatchFilter = SingleMatchCollector<StereoSegmentTrackMatcherFilter, StereoSegmentTrackAdder>;
   }
 }

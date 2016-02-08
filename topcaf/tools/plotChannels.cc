@@ -17,7 +17,7 @@ using namespace Belle2;
 const int CALIBRATIONCHANNEL = 7;
 const int ASIC_PER_SCROD = 16;
 
-bool plotCalibrationChannel(const char* filename, const char* outputname)
+bool plotChannels(const char* filename, const char* outputname)
 {
   TFile fileIn(filename);
   TTreeReader theReader("tree", &fileIn);
@@ -42,6 +42,10 @@ bool plotCalibrationChannel(const char* filename, const char* outputname)
         nSamples = y.size();
       }
       int scrodid = v.GetScrodID();
+      // skip broken events
+      if (scrodid == 0) {
+        continue;
+      }
       int asicid = v.GetASICRow() + 4 * v.GetASICColumn();
       //   cerr << v.GetASIC() << "\t" << v.GetASICRow() << "\t" << v.GetASICColumn() << endl;
       if (channelLabels[scrodid].find(asicid) == channelLabels[scrodid].end()) {
@@ -126,17 +130,17 @@ bool plotCalibrationChannel(const char* filename, const char* outputname)
 }
 
 
-bool plotCalibrationChannel(const char* filename)
+bool plotChannels(const char* filename)
 {
-  return plotCalibrationChannel(filename, "channels.root");
+  return plotChannels(filename, "channels.root");
 }
 
 int main(int argc, char* argv[])
 {
   if (argc == 2) {
-    plotCalibrationChannel(argv[1]);
+    plotChannels(argv[1]);
   } else if (argc == 3) {
-    plotCalibrationChannel(argv[1], argv[2]);
+    plotChannels(argv[1], argv[2]);
   } else {
     cerr << "Usage: plotCalibrationChannel <filename> [output.root]" << endl;
   }

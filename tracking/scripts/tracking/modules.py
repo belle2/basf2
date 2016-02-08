@@ -121,12 +121,14 @@ class CDCMCFinder(metamodules.WrapperModule):
             use_svd=False,
             use_pxd=False,
             only_primaries=False,
+            only_axials=False,
             track_candidates_store_array_name="MCTrackCands"):
         mc_track_finder_module = StandardEventGenerationRun.get_basf2_module(
             'TrackFinderMCTruth',
             UseCDCHits=use_cdc,
             UseSVDHits=use_svd,
             UsePXDHits=use_pxd,
+            UseOnlyAxialCDCHits=only_axials,
             GFTrackCandidatesColName=track_candidates_store_array_name)
 
         if only_primaries:

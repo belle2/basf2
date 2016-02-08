@@ -30,6 +30,8 @@ namespace Belle2 {
    *
    * The numbering scheme just in this class is equivalent to the one defined in [BELLE2-NOTE-TE-2015-022].
    * --> https://d2comp.kek.jp/record/256/files/BELLE2-NOTE-TE-2015-022.pdf
+   *
+   * @sa HitPatternVXD
    */
   class HitPatternCDC {
     friend class HitPatternCDCTest_settersNGetters_Test;

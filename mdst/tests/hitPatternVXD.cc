@@ -50,26 +50,31 @@ namespace Belle2 {
     HitPatternVXD myHitPattern(0);
 
     for (unsigned int pxdLayer = 0; pxdLayer <= 1; ++pxdLayer) {
-      for (unsigned int mode = 0; mode <= 1; ++mode) {
-        for (unsigned int nHits = 0; nHits <= 3; ++nHits) {
-          myHitPattern.setPXDLayer(pxdLayer, nHits, mode);
-          EXPECT_EQ(nHits, myHitPattern.getPXDLayer(pxdLayer, mode));
-          myHitPattern.resetPXDLayer(pxdLayer, mode);
-          EXPECT_EQ(0, myHitPattern.getPXDLayer(pxdLayer, mode));
-        }
+      for (unsigned int nHits = 0; nHits <= 3; ++nHits) {
+        myHitPattern.setPXDLayer(pxdLayer, nHits, HitPatternVXD::PXDMode::normal);
+        EXPECT_EQ(nHits, myHitPattern.getPXDLayer(pxdLayer, HitPatternVXD::PXDMode::normal));
+        myHitPattern.resetPXDLayer(pxdLayer, HitPatternVXD::PXDMode::normal);
+        EXPECT_EQ(0, myHitPattern.getPXDLayer(pxdLayer, HitPatternVXD::PXDMode::normal));
+
+        myHitPattern.setPXDLayer(pxdLayer, nHits, HitPatternVXD::PXDMode::gated);
+        EXPECT_EQ(nHits, myHitPattern.getPXDLayer(pxdLayer, HitPatternVXD::PXDMode::gated));
+        myHitPattern.resetPXDLayer(pxdLayer, HitPatternVXD::PXDMode::gated);
+        EXPECT_EQ(0, myHitPattern.getPXDLayer(pxdLayer, HitPatternVXD::PXDMode::gated));
       }
     }
 
     for (unsigned int pxdLayer = 0; pxdLayer <= 1; ++pxdLayer) {
-      for (unsigned int mode = 0; mode <= 1; ++mode) {
-        unsigned int nHits = 4;
-        myHitPattern.setPXDLayer(pxdLayer, nHits, mode);
-        EXPECT_EQ(3, myHitPattern.getPXDLayer(pxdLayer, mode));
-        myHitPattern.resetPXDLayer(pxdLayer, mode);
-        EXPECT_EQ(0, myHitPattern.getPXDLayer(pxdLayer, mode));
-      }
-    }
+      unsigned int nHits = 4;
+      myHitPattern.setPXDLayer(pxdLayer, nHits, HitPatternVXD::PXDMode::normal);
+      EXPECT_EQ(3, myHitPattern.getPXDLayer(pxdLayer, HitPatternVXD::PXDMode::normal));
+      myHitPattern.resetPXDLayer(pxdLayer, HitPatternVXD::PXDMode::normal);
+      EXPECT_EQ(0, myHitPattern.getPXDLayer(pxdLayer, HitPatternVXD::PXDMode::normal));
 
+      myHitPattern.setPXDLayer(pxdLayer, nHits, HitPatternVXD::PXDMode::gated);
+      EXPECT_EQ(3, myHitPattern.getPXDLayer(pxdLayer, HitPatternVXD::PXDMode::gated));
+      myHitPattern.resetPXDLayer(pxdLayer, HitPatternVXD::PXDMode::gated);
+      EXPECT_EQ(0, myHitPattern.getPXDLayer(pxdLayer, HitPatternVXD::PXDMode::gated));
+    }
   }
 
   /** Test total number of hit getters. */
@@ -92,25 +97,24 @@ namespace Belle2 {
     const unsigned short nSVD = 3;
     const unsigned short nPXDnormal = 2;
     const unsigned short nPXDgated = 1;
-    const unsigned short normalMode = 0;
-    const unsigned short gatedMode = 1;
+
     // set SVD
     myHitPattern.setSVDLayer(0, 1, 3);
     myHitPattern.setSVDLayer(1, 0, 0);
     myHitPattern.setSVDLayer(2, 1, 1);
     myHitPattern.setSVDLayer(3, 0, 1);
     // set PXD normal
-    myHitPattern.setPXDLayer(0, 1, normalMode);
-    myHitPattern.setPXDLayer(1, 2, normalMode);
+    myHitPattern.setPXDLayer(0, 1, HitPatternVXD::PXDMode::normal);
+    myHitPattern.setPXDLayer(1, 2, HitPatternVXD::PXDMode::normal);
     // set PXD gated
-    myHitPattern.setPXDLayer(0, 0, gatedMode);
-    myHitPattern.setPXDLayer(1, 2, gatedMode);
+    myHitPattern.setPXDLayer(0, 0, HitPatternVXD::PXDMode::gated);
+    myHitPattern.setPXDLayer(1, 2, HitPatternVXD::PXDMode::gated);
 
     EXPECT_EQ(nSVD, myHitPattern.getNSVDLayers());
-    EXPECT_EQ(nPXDnormal, myHitPattern.getNPXDLayers(normalMode));
-    EXPECT_EQ(nPXDgated, myHitPattern.getNPXDLayers(gatedMode));
-    EXPECT_EQ(nSVD + nPXDnormal, myHitPattern.getNVXDLayers(normalMode));
-    EXPECT_EQ(nSVD + nPXDgated, myHitPattern.getNVXDLayers(gatedMode));
+    EXPECT_EQ(nPXDnormal, myHitPattern.getNPXDLayers(HitPatternVXD::PXDMode::normal));
+    EXPECT_EQ(nPXDgated, myHitPattern.getNPXDLayers(HitPatternVXD::PXDMode::gated));
+    EXPECT_EQ(nSVD + nPXDnormal, myHitPattern.getNVXDLayers(HitPatternVXD::PXDMode::normal));
+    EXPECT_EQ(nSVD + nPXDgated, myHitPattern.getNVXDLayers(HitPatternVXD::PXDMode::gated));
 
   }
 
@@ -124,25 +128,23 @@ namespace Belle2 {
     const unsigned short firstLayerSVD = 1;
     const unsigned short lastLayerSVD = 3;
 
-    const unsigned short normalMode = 0;
-    const unsigned short gatedMode = 1;
     // set SVD
     myHitPattern.setSVDLayer(0, 0, 0);
     myHitPattern.setSVDLayer(1, 3, 0);
     myHitPattern.setSVDLayer(2, 0, 1);
     myHitPattern.setSVDLayer(3, 1, 1);
     // set PXD normal
-    myHitPattern.setPXDLayer(0, 1, normalMode);
-    myHitPattern.setPXDLayer(1, 2, normalMode);
+    myHitPattern.setPXDLayer(0, 1, HitPatternVXD::PXDMode::normal);
+    myHitPattern.setPXDLayer(1, 2, HitPatternVXD::PXDMode::normal);
     // set PXD gated
-    myHitPattern.setPXDLayer(0, 1, gatedMode);
-    myHitPattern.setPXDLayer(1, 2, gatedMode);
+    myHitPattern.setPXDLayer(0, 1, HitPatternVXD::PXDMode::gated);
+    myHitPattern.setPXDLayer(1, 2, HitPatternVXD::PXDMode::gated);
 
     EXPECT_EQ(firstLayerSVD, myHitPattern.getFirstSVDLayer());
     EXPECT_EQ(lastLayerSVD, myHitPattern.getLastSVDLayer());
-    EXPECT_EQ(firstLayerPXD, myHitPattern.getFirstPXDLayer(normalMode));
-    EXPECT_EQ(lastLayerPXD, myHitPattern.getLastPXDLayer(normalMode));
-    EXPECT_EQ(firstLayerPXD, myHitPattern.getFirstPXDLayer(gatedMode));
-    EXPECT_EQ(lastLayerPXD, myHitPattern.getLastPXDLayer(gatedMode));
+    EXPECT_EQ(firstLayerPXD, myHitPattern.getFirstPXDLayer(HitPatternVXD::PXDMode::normal));
+    EXPECT_EQ(lastLayerPXD, myHitPattern.getLastPXDLayer(HitPatternVXD::PXDMode::normal));
+    EXPECT_EQ(firstLayerPXD, myHitPattern.getFirstPXDLayer(HitPatternVXD::PXDMode::gated));
+    EXPECT_EQ(lastLayerPXD, myHitPattern.getLastPXDLayer(HitPatternVXD::PXDMode::gated));
   }
 }

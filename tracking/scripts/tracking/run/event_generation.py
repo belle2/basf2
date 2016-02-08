@@ -332,6 +332,7 @@ class StandardEventGenerationRun(ReadOrGenerateEventsRun):
 
 
 class IdempotentGeneratorRun(ReadOrGenerateEventsRun):
+
     """
     A special setup in which the given self.root_input_file is either used as input (if it is present)
     or generated using the generator specified in self.generator_module (if it is not present).
@@ -343,16 +344,25 @@ class IdempotentGeneratorRun(ReadOrGenerateEventsRun):
     """
 
     root_output_file = None
+    root_output_directory = None
 
     def add_computation(self, main_path):
         return main_path
 
     def create_path(self, *args, **kwargs):
-        if not self.root_input_file:
-            raise ValueError("root_input_file needs to be declared for this class!")
+        if self.root_input_file:
+            raise ValueError("root_input_file should not be declared for this class!")
+
+        if not self.root_output_directory:
+            raise ValueError("root_output_directory needs to be declared for this class!")
 
         if not self.generator_module:
             raise ValueError("generator_module needs to be declared for this class!")
+
+        generator_parameters = {param.name: str(param.values) for param in self.generator_module.available_params()}
+        generator_parameters.update({"n_events": str(self.n_events)})
+
+        self.root_input_file = os.path.join(self.root_output_directory, str(hash("".join(generator_parameters.values()))) + ".root")
 
         if os.path.exists(self.root_input_file):
             self.generator_module = None

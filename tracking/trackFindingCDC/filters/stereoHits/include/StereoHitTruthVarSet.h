@@ -21,7 +21,7 @@ namespace Belle2 {
     constexpr
     static char const* const stereoHitTruthNames[] = {
       "truth",
-      "truth_but_reversed",
+      "truth_may_reversed",
       "track_is_fake_truth"
     };
 

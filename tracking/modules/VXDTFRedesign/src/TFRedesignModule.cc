@@ -1109,8 +1109,9 @@
 // //            "and " << float(m_TESTERcountTotalTCsFinal) * invNEvents << " TCs per event" <<
 // //            "(" << m_TESTERbrokenEventsCtr << " events killed for high occupancy).\n" <<
 // //            "Mean track length (indices/hits): " << float(m_TESTERcountTotalUsedIndicesFinal) / float(m_TESTERcountTotalTCsFinal) << "/" <<
-// //            float(m_TESTERcountTotalUsedHitsFinal) / float(m_TESTERcountTotalTCsFinal) << "\n\
-// //       min / q0.25 / median / q0.75 / max\n" <<
+// //            float(m_TESTERcountTotalUsedHitsFinal)
+// //      / float(m_TESTERcountTotalTCsFinal) <<
+// //          "\n min / q0.25 / median / q0.75 / max\n" <<
 // //            "nPxdClusters           " << pxdClusterStream.str() <<
 // //            "nSVDClusters           " << svdClusterStream.str() <<
 // //            "nSVDClusterCombis      " << svdHitStream.str() <<

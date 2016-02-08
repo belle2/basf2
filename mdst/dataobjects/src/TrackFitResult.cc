@@ -1,5 +1,5 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
+x * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2013, 2014, 2015 - Belle II Collaboration                 *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -101,7 +101,18 @@ HitPatternVXD TrackFitResult::getHitPatternVXD() const
 std::string TrackFitResult::getInfoHTML() const
 {
   std::stringstream out;
-  out << "<b>PDG</b>: " << m_pdg << "<br>";
-  out << "<b>Covariance Matrix (d0, phi0, omega, z0, lambda)</b>: " << HTML::getString(getCovariance5()) << "<br>";
+  out << "<b>Fit Hypothesis (PDG)</b>: " << m_pdg << "<br>";
+  out << "<b>nPXDHits</b>: " << getHitPatternVXD().getNPXDHits() << "<br>";
+  out << "<b>nSVDHits</b>: " << getHitPatternVXD().getNSVDHits() << "<br>";
+  out << "<b>nCDCHits</b>: " << getHitPatternCDC().getNHits() << "<br>";
+  out << " <br>";
+  out << "<b>d0</b>: " << m_tau[iD0] << " cm <br>";
+  out << "<b>phi0</b>: " << m_tau[iPhi0] << " rad <br>";
+  out << "<b>omega</b>: " << m_tau[iOmega] << " 1/GeV<br>";
+  out << "<b>z0</b>: " << m_tau[iZ0] << " cm <br>";
+  out << "<b>tanLambda</b>: " << m_tau[iTanLambda] << "<br>";
+  out << " <br>";
+  out << "<b>Covariance Matrix (d0, phi0, omega, z0, tanLambda)</b>: " << HTML::getString(getCovariance5()) << "<br>";
+  out << "<b>pValue</b>: " << m_pValue << "<br>";
   return out.str();
 }

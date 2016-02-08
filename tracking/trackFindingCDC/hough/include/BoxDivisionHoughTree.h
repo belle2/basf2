@@ -102,7 +102,7 @@ namespace Belle2 {
         B2ASSERT("Width " << width << "is not bigger than overlap " << overlap, overlap < width);
 
         const auto nPositions = (width - overlap) * nBins + overlap + 1;
-        std::get<I>(m_arrays) = Array<I>(lowerBound, upperBound, nPositions);
+        std::get<I>(m_arrays) = linspace<float>(lowerBound, upperBound, nPositions);
         std::get<I>(m_overlaps) = overlap;
 
         const Array<I>& array  = std::get<I>(m_arrays);

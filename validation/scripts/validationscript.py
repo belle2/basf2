@@ -141,7 +141,7 @@ class Script:
             string_status = "waiting"
 
         return json_objects.Script(self.name_not_sanitized, self.path, string_status,
-                                   log_url=os.path.join(current_tag, self.package, self.name_not_sanitized) + ".log",
+                                   log_url=os.path.join(self.package, self.name_not_sanitized) + ".log",
                                    return_code=self.returncode)
 
     def get_recursive_dependencies(self, list_of_scripts, level=0):

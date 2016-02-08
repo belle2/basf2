@@ -15,6 +15,19 @@ import functools
 g_plottingProcesses = {}
 
 
+def get_revision_label_from_json_filename(json_filename):
+    """
+    Gets the label of a revision from the path to the revision.json file
+    for example results/r121/revision.json
+    will result in the label r121
+    This is useful if the results folder has been moved by the user
+    """
+    folder_part = os.path.split(json_filename)[0]
+    last_folder = os.path.basename(folder_part)
+
+    return last_folder
+
+
 def get_json_object_list(results_folder, json_file_name):
     """
     Searches one folder's sub-folder for json files of a
@@ -32,30 +45,8 @@ def get_json_object_list(results_folder, json_file_name):
         with open(r_file) as json_file:
             data = json.load(json_file)
 
-            if "label" in data:
-                found_rev_labels.append(data["label"])
-
-    return found_rev_labels
-
-
-def get_revision_list(results_folder):
-    """
-    Searches one folder's sub-folder for json files of a
-    revision and returns a combined list of the
-    json file's content
-    """
-    search_string = results_folder + "/*/revision.json"
-
-    found_revs = glob(search_string)
-    found_rev_labels = []
-
-    for r_file in found_revs:
-        # try loading json file
-        with open(r_file) as json_file:
-            data = json.load(json_file)
-
-            if "label" in data:
-                found_rev_labels.append(data["label"])
+            # always use the folder name as label
+            found_rev_labels.append(get_revision_label_from_json_filename(r_file))
 
     return found_rev_labels
 
@@ -202,7 +193,11 @@ class ValidationRoot(object):
         # load and combine
         for r in rev_list:
             full_path = os.path.join(self.results_folder, r, "revision.json")
+
+            # update label, if dir has been moved
+            lbl_folder = get_revision_label_from_json_filename(full_path)
             j = deliver_json(full_path)
+            j["label"] = lbl_folder
             combined_list.append(j)
 
         # Set the most recent one ...

@@ -85,7 +85,7 @@ function loadValidationPlots(package_load_name, data) {
             }
         }        
 
-        wrapped_package = {packages: [loaded_package]}
+        wrapped_package = {packages: [loaded_package]};
 
         setupRactive("plot_container", '#content', wrapped_package, null,
             // on complete
@@ -235,7 +235,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
         // log files
         newest_rev = getNewestRevision(rev_data);
 
-        // encrich the comparison data with the newest revision in this comparison
+        // enrich the comparison data with the newest revision in this comparison
         data["newest_revision"] = newest_rev
         // update the packages with the information from the newest revision
         // if there are no validation results at all, packages entry might not exist
@@ -246,6 +246,9 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
                     if ( data["packages"][ipkg]["name"] == newest_rev["packages"][irev]["name"] ) {
                         data["packages"][ipkg]["fail_count"] = newest_rev["packages"][irev]["fail_count"]
                         data["packages"][ipkg]["scriptfiles"] = newest_rev["packages"][irev]["scriptfiles"]
+                        // also store the label of the newest revision as this is needed
+                        // to stich together the loading path of log files
+                        data["packages"][ipkg]["newest_revision"] = newest_rev["label"]
                     }
                 }
             }

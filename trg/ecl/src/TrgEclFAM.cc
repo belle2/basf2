@@ -146,13 +146,14 @@ void
 TrgEclFAM::getTCHit(int TableFlag)
 {
   //
-  float (*E_cell)[80]  = new float[8736][80];
-  float (*T_ave)[80]   = new float[8736][80]; // (1)Averaged time[ns] between hit point in Xtal and PD.
-  float (*Tof_ave)[80] = new float[8736][80]; // (2)Averaged time[ns] between hit point in Xtal and IP.
-  int (*beambkg_tag)[80] = new int[8736][80]; // (2)Averaged time[ns] between hit point in Xtal and IP.
+  // float (*E_cell)[80]  = new float[8736][80];
+  // float (*T_ave)[80]   = new float[8736][80]; // (1)Averaged time[ns] between hit point in Xtal and PD.
+  // float (*Tof_ave)[80] = new float[8736][80]; // (2)Averaged time[ns] between hit point in Xtal and IP.
+  // int (*beambkg_tag)[80] = new int[8736][80]; // (2)Averaged time[ns] between hit point in Xtal and IP.
 
 
   //  int nBinTime = 80; // "80" covers t=-4 ~ 4us even for 100ns binning.
+  /*
   for (int iXCell = 0; iXCell < 8736; iXCell++) {
     for (int iBinTime = 0; iBinTime < 80; iBinTime++) {
       E_cell[iXCell][iBinTime] = 0;
@@ -164,6 +165,12 @@ TrgEclFAM::getTCHit(int TableFlag)
     }
 
   }
+  */
+  float E_cell[8736][80]  = {{0}};
+  float T_ave[8736][80]   = {{0}};
+  float Tof_ave[8736][80] = {{0}};
+  float beambkg_tag[8736][80] = {{0}};
+
   int nBinTime = 80;
   TimeRange = 4000; // -4us ~ 4us
   ////-------------------------------------------------------------------
@@ -331,10 +338,10 @@ TrgEclFAM::getTCHit(int TableFlag)
 
 
   //
-  delete [] beambkg_tag;
-  delete [] E_cell;
-  delete [] T_ave;
-  delete [] Tof_ave;
+  // delete [] beambkg_tag;
+  // delete [] E_cell;
+  // delete [] T_ave;
+  // delete [] Tof_ave;
   return;
 }
 //

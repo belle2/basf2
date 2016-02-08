@@ -350,6 +350,8 @@ class IdempotentGeneratorRun(ReadOrGenerateEventsRun):
         return main_path
 
     def create_path(self, *args, **kwargs):
+        import hashlib
+
         if self.root_input_file:
             raise ValueError("root_input_file should not be declared for this class!")
 
@@ -362,7 +364,10 @@ class IdempotentGeneratorRun(ReadOrGenerateEventsRun):
         generator_parameters = {param.name: str(param.values) for param in self.generator_module.available_params()}
         generator_parameters.update({"n_events": str(self.n_events)})
 
-        self.root_input_file = os.path.join(self.root_output_directory, str(hash("".join(generator_parameters.values()))) + ".root")
+        generator_parameters_as_string = "".join(generator_parameters.values())
+
+        hashed_generator_parameters = hashlib.md5(generator_parameters_as_string.encode("utf8")).hexdigest()
+        self.root_input_file = os.path.join(self.root_output_directory, hashed_generator_parameters + ".root")
 
         if os.path.exists(self.root_input_file):
             self.generator_module = None

@@ -42,7 +42,7 @@ namespace Belle2 {
         const float& lowerTanLambda = z0TanLambdaBox->getLowerTanLambda();
         const float& upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
 
-        const CDCTrajectorySZ& szTrajectory = szFitter.fitUsingStrangeFunction(recoSegment);
+        const CDCTrajectorySZ& szTrajectory = szFitter.fitUsingSimplifiedTheilSen(recoSegment);
 
         const float& trajectoryZ0 = szTrajectory.getStartZ();
         const float& trajectoryTanLambda = szTrajectory.getTanLambda();

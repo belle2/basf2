@@ -44,6 +44,50 @@ namespace Belle2 {
         return trajectorySZ;
       }
 
+      /**
+       * Fit a linear sz trajectory to the reconstructed stereo segment.
+       * It uses the normal fitting algorithm but does so multiple times:
+       * In every iteration, one hit is excluded from the observation set and the rest is fitted. In the end, the mean over the
+       * fitting parameters is built and returned.
+       *
+       * TODO:
+       *   - Use the median.
+       *   - Use RANSAC instead of Theil-Sen.
+       *   - Think about the parameters better.
+       */
+      CDCTrajectorySZ fitUsingSimplifiedTheilSen(const CDCRecoSegment3D& segment3D) const
+      {
+        CDCTrajectorySZ trajectorySZ;
+        CDCObservations2D observationsSZ;
+        appendSZ(observationsSZ, segment3D);
+
+
+        if (observationsSZ.size() > 4) {
+          CDCObservations2D observationsSZFiltered;
+
+          double meanTanLambda = 0;
+          double meanStartZ = 0;
+
+          for (unsigned int i = 0; i < observationsSZ.size(); i++) {
+            for (unsigned int j = 0; j < observationsSZ.size(); j++) {
+              if (i != j) {
+                observationsSZFiltered.fill(observationsSZ.getX(j), observationsSZ.getY(j), observationsSZ.getDriftLength(j),
+                                            observationsSZ.getWeight(j));
+              }
+
+            }
+
+            update(trajectorySZ, observationsSZFiltered);
+            meanTanLambda += trajectorySZ.getTanLambda();
+            meanStartZ += trajectorySZ.getStartZ();
+          }
+
+          return CDCTrajectorySZ(meanTanLambda / observationsSZ.size(), meanStartZ / observationsSZ.size());
+        } else {
+          return CDCTrajectorySZ::basicAssumption();
+        }
+      }
+
       /// Updates the trajectory of the axial stereo segment pair inplace
       void update(const CDCSegmentPair& segmentPair) const;
 

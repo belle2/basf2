@@ -51,6 +51,12 @@ namespace Belle2 {
       const float& getUpperZ0() const
       { return *(getUpperBound<DiscreteZ0>()); }
 
+      float getUnderLowerZ0() const
+      { return 2 * getLowerZ0() - getUpperZ0(); }
+
+      float getOverUpperZ0() const
+      { return 2 * getUpperZ0() - getLowerZ0(); }
+
       /// Concise getter for the lower tan lambda bound.
       const float& getLowerTanLambda() const
       { return *(getLowerBound<DiscreteTanLambda>()); }
@@ -58,6 +64,12 @@ namespace Belle2 {
       /// Concise getter for the lower tan lambda bound.
       const float& getUpperTanLambda() const
       { return *(getUpperBound<DiscreteTanLambda>()); }
+
+      float getUnderLowerTanLambda() const
+      { return 2 * getLowerTanLambda() - getUpperTanLambda(); }
+
+      float getOverUpperTanLambda() const
+      { return 2 * getUpperTanLambda() - getLowerTanLambda(); }
 
     };
   } // end namespace TrackFindingCDC

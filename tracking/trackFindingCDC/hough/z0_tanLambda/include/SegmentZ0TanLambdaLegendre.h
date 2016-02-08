@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/hough/algorithms/FirstOfPairInBox.h>
 #include <tracking/trackFindingCDC/hough/algorithms/SegmentInZ0TanLambdaBox.h>
 #include <tracking/trackFindingCDC/hough/algorithms/HitInZ0TanLambdaBox.h>
+#include <tracking/trackFindingCDC/hough/algorithms/TwoHitInBoxAlgorithms.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -25,6 +26,6 @@ namespace Belle2 {
      * This class is only a typedef. The real algorithm can be found in SimpeBoxDivisionHoughTree.
      */
     using SegmentZ0TanLambdaLegendre =
-      Z0TanLambdaLegendre<std::pair<CDCRecoSegment3D, const CDCRecoSegment2D*>, FirstOfPairInBox<SegmentInZ0TanLambdaBox>, 2, 2>;
+      Z0TanLambdaLegendre<std::pair<CDCRecoSegment3D, const CDCRecoSegment2D*>, FirstOfPairInBox<TwoHitInBoxAlgorithm<SegmentInZ0TanLambdaBox, RangeInBox<HitInZ0TanLambdaBox>>>, 2, 2>;
   }
 }

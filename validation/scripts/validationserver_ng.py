@@ -339,8 +339,10 @@ def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False
         'tools.staticdir.dir': results_folder,
         # only serve root files
         'tools.staticdir.match': "^.*\.(log|root)$",
-        # server the log files as plain text files
-        'tools.staticdir.content_types': {'log': 'text/plain'}}
+        # server the log files as plain text files, and make sure to use
+        # utf-8 encoding. Firefox might decide different, if the files
+        # are located on a .jp domain and use Shift_JIS
+        'tools.staticdir.content_types': {'log': 'text/plain; charset=utf-8'}}
     setup_gzip_compression("/results", cherry_config)
 
     # Define the server address and port

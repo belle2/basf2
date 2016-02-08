@@ -537,20 +537,32 @@ class LogViewer(Basf2Widget):
         self.log_line = """<tr style="color: {color};" class="log-line-{type_lower}"><td>{content}</td></tr>"""
 
         #: The toggle button
-        self.toggle_button_line = """<a onclick="$('.log-line-{type_lower}').toggle();"
-                                  " style="cursor: pointer; margin: 10px;">Toggle {type_upper}</a>"""
+        self.toggle_button_line = """<a onclick="$('.log-line-{type_lower}').hide();
+                                                 $('.log-line-{type_lower}-hide-button').hide();
+                                                 $('.log-line-{type_lower}-show-button').show();"
+                                        style="cursor: pointer; margin: 0px 10px;"
+                                        class="log-line-{type_lower}-hide-button">Hide {type_upper}</a>
+                                     <a onclick="$('.log-line-{type_lower}').show();
+                                                 $('.log-line-{type_lower}-hide-button').show();
+                                                 $('.log-line-{type_lower}-show-button').hide();"
+                                        style="cursor: pointer; margin: 0px 10px; display: none;"
+                                        class="log-line-{type_lower}-show-button">Show {type_upper}</a>"""
 
     def create(self):
         """
         Create the log viewer.
         """
-        from ipywidgets import HTML, Button
+        from ipywidgets import HTML, HBox, VBox
         html = HTML()
 
-        html.value = """<div style="max-height: 400px; overflow-y: auto; padding: 5px;">"""
+        html.value = """<div style="max-height: 400px; overflow-y: auto; width: 100%";>"""
 
+        buttons = []
         for type in self.log_levels:
-            html.value += self.toggle_button_line.format(type_lower=type.lower(), type_upper=type.upper())
+            buttons.append(HTML(self.toggle_button_line.format(type_lower=type.lower(), type_upper=type.upper())))
+
+        buttons_view = HBox(buttons)
+        buttons_view.margin = "10px 0px"
 
         html.value += """<table style="word-break: break-all; margin: 10px;">"""
 
@@ -570,5 +582,9 @@ class LogViewer(Basf2Widget):
                                                    color=self.log_color_codes["DEFAULT"])
 
         html.value += "</table></div>"
+        html.width = "100%"
+        html.margin = "5px"
 
-        return html
+        result_vbox = VBox((buttons_view, html))
+
+        return result_vbox

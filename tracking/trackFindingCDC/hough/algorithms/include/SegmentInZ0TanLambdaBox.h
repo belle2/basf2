@@ -39,27 +39,21 @@ namespace Belle2 {
         const float& lowerZ0 = z0TanLambdaBox->getLowerZ0();
         const float& upperZ0 = z0TanLambdaBox->getUpperZ0();
 
-        const float& underLowerZ0 = z0TanLambdaBox->getUnderLowerZ0();
-        const float& overUpperZ0 = z0TanLambdaBox->getOverUpperZ0();
-
         const float& lowerTanLambda = z0TanLambdaBox->getLowerTanLambda();
         const float& upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
 
-        const float& underLowerTanLambda = z0TanLambdaBox->getUnderLowerTanLambda();
-        const float& overUpperTanLambda = z0TanLambdaBox->getOverUpperTanLambda();
-
         const CDCTrajectorySZ& szTrajectory = szFitter.fitUsingStrangeFunction(recoSegment);
+
         const float& trajectoryZ0 = szTrajectory.getStartZ();
         const float& trajectoryTanLambda = szTrajectory.getTanLambda();
 
+        if (std::isnan(trajectoryZ0) or std::isnan(trajectoryTanLambda)) {
+          return NAN;
+        }
+
         if (SameSignChecker::isIn(trajectoryZ0, trajectoryTanLambda, lowerZ0, upperZ0, lowerTanLambda, upperTanLambda)) {
-          return 1.0;
+          return 0.7 * recoSegment.size();
         }
-
-        if (SameSignChecker::isIn(trajectoryZ0, trajectoryTanLambda, underLowerZ0, overUpperZ0, underLowerTanLambda, overUpperTanLambda)) {
-          return 0.5;
-        }
-
 
         return NAN;
       }

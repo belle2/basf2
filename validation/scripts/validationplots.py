@@ -5,7 +5,7 @@
 import argparse
 import glob
 import datetime
-import fnmatch
+import glob
 import math
 import os
 import pickle
@@ -181,19 +181,24 @@ def get_plot_files(list_of_revisions):
     # This is where we store the paths of plot ROOT files we've found
     results = []
 
-    # Loop over all requested revisions
+    results_foldername = "./results"
+
+    # Loop over all requested revisions and look for root files
+    # in their package folders
     for revision in list_of_revisions:
-        # Loop through the results-folder
-        for root, dirs, files in os.walk('./results'):
-            # Loop over all files in the subfolders of the results-folder
-            for current_file in files:
-                # If the files is a ROOT file in a subfolder of a revision,
-                # collect it (subfolders are package names, i.e. we expect
-                # the plot files for the analysis package in
-                # 'revision/analysis/some_plot_file.root'
-                if fnmatch.fnmatch(root + '/' + current_file,
-                                   '*/' + revision + '/*/*.root'):
-                    results.append(os.path.abspath(root + '/' + current_file))
+
+        rev_result_folder = os.path.join(results_foldername, revision)
+        if not os.path.isdir(rev_result_folder):
+            continue
+
+        packages = os.listdir(rev_result_folder)
+
+        for p in packages:
+            package_folder = os.path.join(rev_result_folder, p)
+            # find all root files within this package
+            root_files = glob.glob(package_folder + "/*.root")
+            # append with absolute path
+            results = results + [os.path.abspath(rf) for rf in root_files]
 
     return results
 

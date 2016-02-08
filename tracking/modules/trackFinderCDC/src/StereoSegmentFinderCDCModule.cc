@@ -16,15 +16,22 @@ StereoSegmentFinderCDCModule::StereoSegmentFinderCDCModule() :
 {
   setDescription("Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree.");
 
+  addParam("useQuadTree", m_param_useQuadTree, "Whether to use the quad tree implementation or not.", m_param_useQuadTree);
+
   ModuleParamList paramList = this->getParamList();
-  m_collector.exposeParameters(&paramList);
+  m_collectorFilter.exposeParameters(&paramList, "filter");
+  m_collectorQuadTree.exposeParameters(&paramList, "quadTree");
   setParamList(paramList);
 }
 
 /** Initialize the stereo quad trees */
 void StereoSegmentFinderCDCModule::initialize()
 {
-  m_collector.initialize();
+  if (m_param_useQuadTree) {
+    m_collectorQuadTree.initialize();
+  } else {
+    m_collectorFilter.initialize();
+  }
 
   TrackFinderCDCFromSegmentsModule::initialize();
 }
@@ -32,7 +39,11 @@ void StereoSegmentFinderCDCModule::initialize()
 /** Terminate the stereo quad trees */
 void StereoSegmentFinderCDCModule::terminate()
 {
-  m_collector.terminate();
+  if (m_param_useQuadTree) {
+    m_collectorQuadTree.terminate();
+  } else {
+    m_collectorFilter.terminate();
+  }
 
   TrackFinderCDCFromSegmentsModule::terminate();
 }
@@ -40,7 +51,11 @@ void StereoSegmentFinderCDCModule::terminate()
 void StereoSegmentFinderCDCModule::generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments,
                                             std::vector<TrackFindingCDC::CDCTrack>& tracks)
 {
-  m_collector.collect(tracks, segments);
+  if (m_param_useQuadTree) {
+    m_collectorQuadTree.collect(tracks, segments);
+  } else {
+    m_collectorFilter.collect(tracks, segments);
+  }
 
   // Postprocess each track (=fit)
   for (CDCTrack& track : tracks) {

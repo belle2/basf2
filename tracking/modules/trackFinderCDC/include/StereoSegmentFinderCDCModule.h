@@ -38,12 +38,16 @@ namespace Belle2 {
       void terminate() override;
 
     private:
+
+      bool m_param_useQuadTree = true;
+
+      TrackFindingCDC::StereoSegmentCollectorSingleMatchQuadTree m_collectorQuadTree;
+      TrackFindingCDC::StereoSegmentCollectorSingleMatchFilter m_collectorFilter;
+
       /**
        * Try to combine the segments and the tracks.
        */
       void generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks) override;
-
-      TrackFindingCDC::StereoSegmentCollectorSingleMatch m_collector;
     };
   }
 }

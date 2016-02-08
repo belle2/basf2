@@ -14,7 +14,7 @@ using namespace std;
 
 REG_MODULE(WaveTimingV3);
 
-const int max_peaks = 20;
+const int max_peaks = 200;
 
 WaveTimingV3Module::WaveTimingV3Module() : Module()
 {

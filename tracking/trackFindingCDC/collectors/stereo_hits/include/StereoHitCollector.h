@@ -10,6 +10,7 @@
 #pragma once
 #include <tracking/trackFindingCDC/collectors/base/FirstMatchCollector.h>
 #include <tracking/trackFindingCDC/collectors/base/BestMatchCollector.h>
+#include <tracking/trackFindingCDC/collectors/base/SingleMatchCollector.h>
 #include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackAdder.h>
 
 #include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackMatcherFilter.h>
@@ -20,7 +21,9 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Shortcut for the used stereo hit collector.
-    using StereoHitCollector = FirstMatchCollector<StereoHitTrackMatcherQuadTree, StereoHitTrackAdder>;
+    /// Shortcut for the used stereo hit collector for first match.
+    using StereoHitCollectorFirstMatch = FirstMatchCollector<StereoHitTrackMatcherQuadTree, StereoHitTrackAdder>;
+    /// Shortcut for the used stereo hit collector for best match.
+    using StereoHitCollectorBestMatch = BestMatchCollector<StereoHitTrackMatcherFilter, StereoHitTrackAdder>;
   }
 }

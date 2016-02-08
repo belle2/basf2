@@ -14,7 +14,7 @@ using namespace TrackFindingCDC;
 
 void StereoHitTrackMatcherFilter::exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix)
 {
-  m_filterFactory.exposeParameters(moduleParameters, prefix);
+  FilterBasedMatcher<StereoHitFilterFactory>::exposeParameters(moduleParameters, prefix);
 
   moduleParameters->addParameter(prefix + "checkForB2BTracks", m_param_checkForB2BTracks,
                                  "Set to false to skip the check for back-2-back tracks (good for cosmics)",
@@ -25,7 +25,7 @@ void StereoHitTrackMatcherFilter::exposeParameters(ModuleParamList* moduleParame
 std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherFilter::match(const CDCTrack& track,
                                                 const std::vector<CDCRLTaggedWireHit>& rlWireHits)
 {
-  if (m_stereoHitFilter->needsTruthInformation()) {
+  if (m_filter->needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
   }
 
@@ -61,7 +61,7 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherFilter::
       }
       CDCRecoHit3D reconstructedHit(rlWireHit, recoPos3D, perpS);
 
-      const Weight weight = m_stereoHitFilter->operator()({&reconstructedHit, &track});
+      const Weight weight = m_filter->operator()({&reconstructedHit, &track});
       if (not std::isnan(weight)) {
         matches.emplace_back(&rlWireHit, weight);
       }

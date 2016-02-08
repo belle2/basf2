@@ -32,7 +32,7 @@ namespace Belle2 {
       /// Initialize the filter.
       virtual void initialize()
       {
-        m_filter = std::move(m_filterFactory.create());
+        m_filter = m_filterFactory.create();
         m_filter->initialize();
 
         if (m_filter->needsTruthInformation()) {

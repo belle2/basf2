@@ -51,21 +51,6 @@ class StylingWidget(Basf2Widget):
         #header-container {
             width: 90%;
         }
-
-        .stat-table tr:nth-child(even) {
-            background: #FFF
-        }
-        .stat-table tr:nth-child(2n+3) {
-            background: #EEE
-        }
-        .stat-table tr:first-child {
-            background: #AAA;
-            font-weight: bold
-        }
-        .stat-table tr:last-child {
-            border: 1px solid black;
-            font-weight: bold
-        }
         """
 
     """Create the styling widget."""
@@ -446,16 +431,22 @@ class StatisticsViewer(Basf2Widget):
             return widgets.HTML("")
 
         html = widgets.HTML()
-        html.value = """<table class="stat-table" style="border-collapse: collapsed; border: 1px solid black;"><tr>"""
+        html.value = """<table class="stat-table" style="border-collapse: collapsed; border: 1px solid black;">
+                        <thead><tr style="background: #AAA; font-weight: bold">"""
         html.value += self.table_cell_html.format(content="Name")
         html.value += self.table_cell_html.format(content="Calls")
         html.value += self.table_cell_html.format(content="VMemory(MB)")
         html.value += self.table_cell_html.format(content="Time(s)")
         html.value += self.table_cell_col_3_html.format(content="Time(ms)/call")
-        html.value += "</tr>"
+        html.value += "</tr></thead><tbody>"
 
-        for module in self.statistics.module:
-            html.value += "<tr>"
+        for n, module in enumerate(self.statistics.module):
+            if n + 1 == len(self.statistics.module):
+                html.value += """<tr style="border: 1px solid black; font-weight: bold">"""
+            elif n % 2 == 1:
+                html.value += """<tr style="background: #EEE;">"""
+            else:
+                html.value += """<tr>"""
             html.value += self.table_cell_left_html.format(content=module.name)
             html.value += self.table_cell_left_html.format(content=int(module.calls["EVENT"]))
             html.value += self.table_cell_left_html.format(content=np.round(module.memory_sum["EVENT"] / 1024, 2))
@@ -464,7 +455,8 @@ class StatisticsViewer(Basf2Widget):
                 module.time_mean["EVENT"] / 1e6, module.time_stddev["EVENT"] / 1e6)
             html.value += "</tr>"
 
-        html.value += "</table>"
+        html.value += "</tbody></table>"
+        html.margin = "10px"
         return html
 
 

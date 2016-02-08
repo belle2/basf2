@@ -16,22 +16,35 @@ StereoHitFinderCDCLegendreHistogrammingModule::StereoHitFinderCDCLegendreHistogr
 {
   setDescription("Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree.");
 
+  addParam("useBestMatch", m_param_useBestMatch, "Use the best-match algorithm instead of the first match.", m_param_useBestMatch);
+
   ModuleParamList paramList = this->getParamList();
-  m_stereohitsCollector.exposeParameters(&paramList);
+  m_stereohitsCollectorBestMatch.exposeParameters(&paramList, "bestMatch");
+  m_stereohitsCollectorFirstMatch.exposeParameters(&paramList, "firstMatch");
   setParamList(paramList);
 }
 
 /** Initialize the stereo quad trees */
 void StereoHitFinderCDCLegendreHistogrammingModule::initialize()
 {
-  m_stereohitsCollector.initialize();
+  if (m_param_useBestMatch) {
+    m_stereohitsCollectorBestMatch.initialize();
+  } else {
+    m_stereohitsCollectorFirstMatch.initialize();
+  }
+
   TrackFinderCDCBaseModule::initialize();
 }
 
 /** Terminate the stereo quad trees */
 void StereoHitFinderCDCLegendreHistogrammingModule::terminate()
 {
-  m_stereohitsCollector.terminate();
+  if (m_param_useBestMatch) {
+    m_stereohitsCollectorBestMatch.terminate();
+  } else {
+    m_stereohitsCollectorFirstMatch.terminate();
+  }
+
   TrackFinderCDCBaseModule::terminate();
 }
 
@@ -49,7 +62,11 @@ void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2:
   }
 
   // Collect the hits for each track
-  m_stereohitsCollector.collect(tracks, rlTaggedWireHits);
+  if (m_param_useBestMatch) {
+    m_stereohitsCollectorBestMatch.collect(tracks, rlTaggedWireHits);
+  } else {
+    m_stereohitsCollectorFirstMatch.collect(tracks, rlTaggedWireHits);
+  }
 
   // Postprocess each track (=fit)
   for (CDCTrack& track : tracks) {

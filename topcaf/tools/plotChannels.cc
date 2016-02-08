@@ -8,6 +8,7 @@
 #include <TH2F.h>
 #include <iostream>
 #include <string>
+#include <set>
 #include <utility>
 
 using namespace std;
@@ -27,7 +28,7 @@ bool plotCalibrationChannel(const char* filename)
   TFile plotFile("channels.root", "RECREATE");
 
   map<int, map<int, TMultiGraph*>> channels; // per board stack, per asic
-  map<int, map<int, vector <string>>> channelLabels; // per board stack, per asic
+  map<int, map<int, set<int>>> channelLabels; // per board stack, per asic
   size_t nSamples = 0;
   while (theReader.Next()) {
     iEvent += 1;
@@ -40,11 +41,7 @@ bool plotCalibrationChannel(const char* filename)
       if (y.size() > nSamples) {
         nSamples = y.size();
       }
-      //FIXME the scrodID is not set properly... nor is the ASIC ID
-      int scrodid = v.GetASIC();
-      //   if (channels.find(scrodid) == channels.end()) {
-      //       channels.insert(make_pair(scrodid, map<int, TMultiGraph*>));
-      //   }
+      int scrodid = v.GetScrodID();
       int asicid = v.GetASICRow() + 4 * v.GetASICColumn();
       //   cerr << v.GetASIC() << "\t" << v.GetASICRow() << "\t" << v.GetASICColumn() << endl;
       if (channelLabels[scrodid].find(asicid) == channelLabels[scrodid].end()) {
@@ -53,13 +50,13 @@ bool plotCalibrationChannel(const char* filename)
         channels[scrodid].insert(make_pair(asicid, new TMultiGraph(gname.c_str(), gname.c_str())));
       }
       // for plotting purposes, only look at one waveform per channel
-      if (channelLabels[scrodid][asicid].size() == ASIC_PER_SCROD) {
+      // The data doesn't come in order, so we need to make sure we haven's see this particular channel, yet
+      int iChannel = v.GetASICChannel();
+      if (channelLabels[scrodid][asicid].find(iChannel) != channelLabels[scrodid][asicid].end()) {
         continue;
       }
-      int iChannel = v.GetASICChannel();
-      channelLabels[scrodid][asicid].push_back(to_string(iChannel));
+      channelLabels[scrodid][asicid].insert(iChannel);
       TMultiGraph* mg = channels[scrodid][asicid];
-
 
       vector<double> x;
       // create the x axis
@@ -110,13 +107,12 @@ bool plotCalibrationChannel(const char* filename)
     for (auto graph_it : scrod_it.second) {
       int asicid = graph_it.first;
       c->cd(asicid + 1);
-      cerr << "ASIC ID " << asicid << endl;
       TMultiGraph* mg = graph_it.second;
-      name += string("Channels");
+      string gname = name + string("asic_") + to_string(asicid);
       // 8 channels per asic
-      TH2F* h = new TH2F(name.c_str(), name.c_str(), nSamples, 0, nSamples, 8, -500, -500 + 8 * 1000);
+      TH2F* h = new TH2F(gname.c_str(), gname.c_str(), nSamples, 0, nSamples, 8, -500, -500 + 8 * 1000);
       for (int ibin = 0; ibin < 8; ibin++) {
-        h->GetYaxis()->SetBinLabel(ibin + 1, channelLabels[scrodid][asicid][ibin].c_str());
+        h->GetYaxis()->SetBinLabel(ibin + 1, to_string(ibin).c_str());
       }
       h->GetYaxis()->SetTickSize(0);
       h->GetYaxis()->SetTickLength(0);

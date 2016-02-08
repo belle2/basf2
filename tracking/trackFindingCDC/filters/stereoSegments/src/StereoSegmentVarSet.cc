@@ -85,12 +85,6 @@ bool StereoSegmentVarSet::extract(const std::pair<std::pair<const CDCRecoSegment
     return recoHit.getArcLength2D() < maximumArcLength2D and recoHit.getArcLength2D() > minimumArcLength2D;
   });
 
-  size_t numberOfHitsInCommon = std::count_if(track.begin(), track.end(), [&](const CDCRecoHit3D & lhs) -> bool {
-    return std::find_if(recoSegment3D.begin(), recoSegment3D.end(), [&](const CDCRecoHit3D & rhs) -> bool {
-      return lhs.getWireHit() == rhs.getWireHit();
-    }) != recoSegment3D.end();
-  });
-
   ////////
 
   var<named("track_size")>() = size;

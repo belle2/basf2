@@ -51,7 +51,7 @@ namespace Belle2 {
         }
 
         if (SameSignChecker::isIn(trajectoryZ0, trajectoryTanLambda, lowerZ0, upperZ0, lowerTanLambda, upperTanLambda)) {
-          return 0.7 * recoSegment.size();
+          return 0.6 * recoSegment.size();
         }
 
         return NAN;

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/hough/SimpleBoxDivisionHoughTree.h>
+#include <tracking/trackFindingCDC/hough/DebugableSimpleBoxDivisionHoughTree.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -24,11 +24,11 @@ namespace Belle2 {
              size_t z0Divisions = 2,
              size_t tanLambdaDivisions = 2>
     class Z0TanLambdaLegendre : public
-      SimpeBoxDivisionHoughTree<AHitPointerType, AHitDecisionAlgorithm, z0Divisions, tanLambdaDivisions> {
+      DebugableSimpleBoxDivisionHoughTree<AHitPointerType, AHitDecisionAlgorithm, z0Divisions, tanLambdaDivisions> {
 
     private:
       /// Super type
-      typedef SimpeBoxDivisionHoughTree<AHitPointerType, AHitDecisionAlgorithm, z0Divisions, tanLambdaDivisions> Super;
+      typedef DebugableSimpleBoxDivisionHoughTree<AHitPointerType, AHitDecisionAlgorithm, z0Divisions, tanLambdaDivisions> Super;
     public:
       /// Constructor using the given maximal level setting the maximal values.
       Z0TanLambdaLegendre() : Super(120, std::tan(75.0 * M_PI / 180.0)) {}

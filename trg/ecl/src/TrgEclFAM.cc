@@ -357,13 +357,21 @@ TrgEclFAM::digitization01(void)
   int NSampling = 64; // # of sampling array
 
 
+  /*
   float (*noise_pileup)[64] = new float [576][64];  // [GeV]
   float (*noise_parallel)[64] = new float [576][64];  // [GeV]
   float (*noise_serial)[64] =  new float [576][64];  // [GeV]
   float* X_pr = new float [64];
   float* X_sr = new float [64];
+  */
+  float noise_pileup[576][64] = {0};  // [GeV]
+  float noise_parallel[576][64] = {0};  // [GeV]
+  float noise_serial[576][64] = {0};  // [GeV]
+  float X_pr[64] = {0};
+  float X_sr[64] = {0};
 
 
+  /*
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
     for (int iSampling = 0; iSampling < NSampling; iSampling++) {
       noise_pileup[iTCIdm][iSampling] = 0;
@@ -371,9 +379,9 @@ TrgEclFAM::digitization01(void)
       noise_serial[iTCIdm][iSampling] = 0;
       X_pr[iSampling] = 0;
       X_sr[iSampling] = 0;
-
     }
   }
+  */
 
   // (Make sampling time random between FAM sampling intervals)
   double random_sampling_correction = 0; // [ns]
@@ -551,11 +559,13 @@ TrgEclFAM::digitization01(void)
   //
   //
   //
+/*
   delete [] X_pr;
   delete [] X_sr;
   delete [] noise_pileup;
   delete [] noise_serial;
   delete [] noise_parallel;
+*/
 
 
   return;
@@ -573,12 +583,17 @@ TrgEclFAM::digitization02(void)
   double fam_sampling_interval = 125; //@ [ns]
   int NSampling = 64;
 
+  double noise_pileup[576][64] = {0};  // [GeV]
+  double noise_parallel[576][64] = {0};  // [GeV]
+  double noise_serial[576][64] = {0};  // [GeV]
+  double X_pr[64] = {0};
+  double X_sr[64] = {0};
+  /*
   double (*noise_pileup)[64] = new double [576][64];  // [GeV]
   double (*noise_parallel)[64] = new double [576][64];  // [GeV]
   double (*noise_serial)[64] =  new double [576][64];  // [GeV]
   double* X_pr = new double [64];
   double* X_sr = new double [64];
-
 
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
     for (int iSampling = 0; iSampling < NSampling; iSampling++) {
@@ -590,6 +605,7 @@ TrgEclFAM::digitization02(void)
 
     }
   }
+  */
 
 
 
@@ -802,11 +818,13 @@ TrgEclFAM::digitization02(void)
   //
   //
   return;
+  /*
   delete [] X_pr;
   delete [] X_sr;
   delete [] noise_pileup;
   delete [] noise_serial;
   delete [] noise_parallel;
+  */
 
 }
 //
@@ -822,6 +840,9 @@ TrgEclFAM::digitization03(void)
   int nbin_pedestal = 100;
   float fam_sampling_interval = 12; // [ns]
 
+  float TCDigiEnergy[576][666] = {0};  // [GeV]
+  float TCDigiTiming[576][666] = {0};  // [ns]
+  /*
   float (*TCDigiEnergy)[666] = new  float [576][666];  // [GeV]
   float (*TCDigiTiming)[666] = new float [576][666];  // [ns]
 
@@ -830,6 +851,7 @@ TrgEclFAM::digitization03(void)
 
     }
   }
+  */
 
 
 
@@ -971,9 +993,10 @@ TrgEclFAM::digitization03(void)
     }
   }
 
+  /*
   delete []  TCDigiEnergy;
-
   delete []  TCDigiTiming;
+  */
 
 
   return;

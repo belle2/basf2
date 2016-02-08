@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/hough/DebugableSimpleBoxDivisionHoughTree.h>
+#include <tracking/trackFindingCDC/hough/trees/DebugableSimpleBoxDivisionHoughTree.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

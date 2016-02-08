@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/Box.h>
+#include <tracking/trackFindingCDC/hough/boxes/Box.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

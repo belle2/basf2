@@ -9,19 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/DiscreteValue.h>
-
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    /// Phantom type tag for the discrete phi0 representation
-    class Phi0Tag;
-
-    /// Type for discrete phi0 values
-    using DiscretePhi0 = DiscreteValue<Vector2D, Phi0Tag>;
-
     /// Strategy to construct discrete phi0 points from discrete overlap specifications.
     class Phi0BinsSpec {
     public:

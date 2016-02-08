@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
-#include <tracking/trackFindingCDC/hough/BoxDivisionHoughTree.h>
+#include <tracking/trackFindingCDC/hough/trees/BoxDivisionHoughTree.h>
 #include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
 
 #include <vector>

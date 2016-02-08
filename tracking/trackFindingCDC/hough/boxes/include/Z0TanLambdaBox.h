@@ -8,35 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/hough/Box.h>
-#include <tracking/trackFindingCDC/hough/DiscreteValue.h>
+#include <tracking/trackFindingCDC/hough/boxes/Box.h>
+#include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Tag for z0 direction
-    class Z0Tag;
-
-    /// Type for discrete float values in z0 direction
-    typedef DiscreteValue<float, Z0Tag> DiscreteZ0;
-
-    /// Tag for z slope direction.
-    class TanLambdaTag;
-
-    /// Type for discrete float values in inverse z slope direction
-    typedef DiscreteValue<float, TanLambdaTag> DiscreteTanLambda;
-
-    /// Type for the container of the discrete values in z0 direction
-    typedef DiscreteZ0::Array DiscreteZ0Array;
-
-    /// Type for the container of the discrete values in inverse z slope direction
-    typedef DiscreteTanLambda::Array DiscreteTanLambdaArray;
-
     /// A rectangular domain for the hough space over phi0 and two dimensional curvature.
-    class Z0TanLambdaBox : public Box<DiscreteZ0, DiscreteTanLambda> {
+    class Z0TanLambdaBox : public Box<DiscreteZ0, DiscreteTanL> {
 
     private:
       /// Type of the base class
-      using Super = Box<DiscreteZ0, DiscreteTanLambda>;
+      using Super = Box<DiscreteZ0, DiscreteTanL>;
 
     public:
       /// Using the constructors of the base class
@@ -59,11 +41,11 @@ namespace Belle2 {
 
       /// Concise getter for the lower tan lambda bound.
       const float& getLowerTanLambda() const
-      { return *(getLowerBound<DiscreteTanLambda>()); }
+      { return *(getLowerBound<DiscreteTanL>()); }
 
       /// Concise getter for the lower tan lambda bound.
       const float& getUpperTanLambda() const
-      { return *(getUpperBound<DiscreteTanLambda>()); }
+      { return *(getUpperBound<DiscreteTanL>()); }
 
       float getUnderLowerTanLambda() const
       { return 2 * getLowerTanLambda() - getUpperTanLambda(); }

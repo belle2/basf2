@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/hough/z0_tanLambda/Z0TanLambdaBox.h>
+#include <tracking/trackFindingCDC/hough/boxes/Z0TanLambdaBox.h>
 #include <tracking/trackFindingCDC/hough/SameSignChecker.h>
 
 namespace Belle2 {

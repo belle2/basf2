@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/hough/BoxDivisionHoughTree.h>
+#include <tracking/trackFindingCDC/hough/trees/BoxDivisionHoughTree.h>
 #include <TTree.h>
 #include <TFile.h>
 

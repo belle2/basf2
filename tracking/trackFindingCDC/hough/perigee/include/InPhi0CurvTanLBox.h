@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
 #include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
 #include <tracking/trackFindingCDC/hough/perigee/Phi0Rep.h>
-#include <tracking/trackFindingCDC/hough/Box.h>
+#include <tracking/trackFindingCDC/hough/boxes/Box.h>
 #include <tracking/trackFindingCDC/hough/SameSignChecker.h>
 #include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
 #include <tracking/trackFindingCDC/topology/ILayer.h>

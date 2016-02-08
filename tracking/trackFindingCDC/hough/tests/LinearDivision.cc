@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/hough/LinearDivision.h>
-#include <tracking/trackFindingCDC/hough/Box.h>
+#include <tracking/trackFindingCDC/hough/boxes/Box.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <framework/logging/Logger.h>

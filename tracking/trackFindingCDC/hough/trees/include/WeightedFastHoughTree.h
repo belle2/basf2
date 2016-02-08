@@ -9,7 +9,7 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/DynTree.h>
+#include <tracking/trackFindingCDC/hough/trees/DynTree.h>
 #include <tracking/trackFindingCDC/hough/WithWeightedItems.h>
 #include <tracking/trackFindingCDC/hough/WithSharedMark.h>
 

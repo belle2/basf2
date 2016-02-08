@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/hough/perigee/Phi0Rep.h>
 #include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
-#include <tracking/trackFindingCDC/hough/SweepBox.h>
+#include <tracking/trackFindingCDC/hough/boxes/SweepBox.h>
 #include <tracking/trackFindingCDC/hough/SameSignChecker.h>
 #include <tracking/trackFindingCDC/topology/ILayer.h>
 

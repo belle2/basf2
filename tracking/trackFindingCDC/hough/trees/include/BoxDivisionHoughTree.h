@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/hough/WeightedFastHoughTree.h>
+#include <tracking/trackFindingCDC/hough/trees/WeightedFastHoughTree.h>
 #include <tracking/trackFindingCDC/hough/LinearDivision.h>
 
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>

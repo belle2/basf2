@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <utility>
 
@@ -26,7 +27,7 @@ void StereoSegmentTrackMatcherQuadTree::exposeParameters(ModuleParamList* module
 {
   QuadTreeBasedMatcher<SegmentZ0TanLambdaLegendre>::exposeParameters(moduleParameters, prefix);
 
-  moduleParameters->addParameter(prefix + "checkForB2BTracks", m_param_checkForB2BTracks,
+  moduleParameters->addParameter(prefixed(prefix, "checkForB2BTracks"), m_param_checkForB2BTracks,
                                  "Set to false to skip the check for back-2-back tracks (good for cosmics)",
                                  m_param_checkForB2BTracks);
 }
@@ -79,8 +80,12 @@ std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherQuadTr
   }
 
   m_quadTreeInstance.seed(recoSegmentsWithPointer);
+
+  writeDebugInformation();
+
   const auto& foundStereoSegmentsWithNode = m_quadTreeInstance.findSingleBest(m_param_minimumNumberOfHits);
   m_quadTreeInstance.fell();
+
 
   if (foundStereoSegmentsWithNode.size() != 1) {
     return {};

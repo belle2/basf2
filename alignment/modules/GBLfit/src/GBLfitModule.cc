@@ -1127,7 +1127,7 @@ HitPatternVXD GBLfitModule::getHitPatternVXD(genfit::Track track)
   //fill PXD hits
   for (int l = 0; l < 2; l++)
     //maximum number of hits checked inside the HitPatternVXD
-    aHitPatternVXD.setPXDLayer(l, PXD_Hits[l], 0); //normal/gated mode not retireved
+    aHitPatternVXD.setPXDLayer(l, PXD_Hits[l], HitPatternVXD::PXDMode::normal); //normal/gated mode not retireved
 
 
   //fill SVD hits

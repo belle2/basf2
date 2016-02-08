@@ -30,7 +30,7 @@ void SegmentTrackCombinerImplModule::generate(std::vector<TrackFindingCDC::CDCRe
 
   // Delete all taken segments
   segments.erase(std::remove_if(segments.begin(), segments.end(), [](const CDCRecoSegment2D & segment) {
-    return segment.getAutomatonCell().hasTakenFlag();
+    return segment.getAutomatonCell().hasTakenFlag() or segment.isFullyTaken();
   }), segments.end());
 
 }

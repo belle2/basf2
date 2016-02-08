@@ -51,6 +51,8 @@ namespace Belle2 {
       /// Parameters
       /// Set to false to skip the B2B check (good for curlers).
       bool m_param_checkForB2BTracks = true;
+      /// Set to true to output debug information.
+      bool m_param_writeDebugInformation = false;
 
       bool checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D, const bool isCurler, const double shiftValue) const;
     };

@@ -34,3 +34,4 @@ void StereoSegmentTrackAdder::add(CDCTrack& track, const std::vector<WithWeight<
       }
     }
   }
+}

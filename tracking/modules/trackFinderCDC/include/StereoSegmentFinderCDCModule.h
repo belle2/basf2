@@ -39,9 +39,12 @@ namespace Belle2 {
 
     private:
 
+      /// Whether to use the quad tree matcher or the simple filter.
       bool m_param_useQuadTree = true;
 
-      TrackFindingCDC::StereoSegmentCollectorSingleMatchQuadTree m_collectorQuadTree;
+      /// Collector hiding the implementation.
+      TrackFindingCDC::StereoSegmentCollectorFirstMatchQuadTree m_collectorQuadTree;
+      /// Collector hiding the implementation.
       TrackFindingCDC::StereoSegmentCollectorSingleMatchFilter m_collectorFilter;
 
       /**

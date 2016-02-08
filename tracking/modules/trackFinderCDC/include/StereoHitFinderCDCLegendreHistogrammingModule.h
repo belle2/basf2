@@ -48,6 +48,7 @@ namespace Belle2 {
 
     /// Collector hiding the implementation.
     TrackFindingCDC::StereoHitCollectorFirstMatch m_stereohitsCollectorFirstMatch;
+    /// Collector hiding the implementation.
     TrackFindingCDC::StereoHitCollectorBestMatch m_stereohitsCollectorBestMatch;
 
     /// Parameter

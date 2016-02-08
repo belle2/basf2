@@ -3,13 +3,15 @@ Import('env')
 env['LIBS'] = [
     'boost_chrono',
     'framework', 
-    'geometry',
-    'pxd', 'pxd_dataobjects',
-    'svd', 'svd_dataobjects',
+#    'geometry',
+    # 'pxd',
+    'pxd_dataobjects',
+    # 'svd',
+    'svd_dataobjects',
     'vxd', 'vxd_dataobjects',
     'genfit2',
     'tracking', 'tracking_dataobjects',
-    'testbeam_vxd_dataobjects',
+#    'testbeam_vxd_dataobjects',
     ]
 Return('env')
 # ', 'tracking_sharedClasses'

@@ -15,6 +15,10 @@
 #include <tracking/trackFindingCDC/collectors/base/QuadTreeBasedMatcher.h>
 #include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentFilterFactory.h>
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -47,6 +51,8 @@ namespace Belle2 {
       /// Parameters
       /// Set to false to skip the B2B check (good for curlers).
       bool m_param_checkForB2BTracks = true;
+
+      bool checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D, const bool isCurler, const double shiftValue) const;
     };
   }
 }

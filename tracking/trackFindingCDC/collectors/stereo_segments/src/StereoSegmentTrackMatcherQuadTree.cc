@@ -10,10 +10,6 @@
 
 #include <tracking/trackFindingCDC/collectors/stereo_segments/StereoSegmentTrackMatcherQuadTree.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -32,6 +28,36 @@ void StereoSegmentTrackMatcherQuadTree::exposeParameters(ModuleParamList* module
                                  m_param_checkForB2BTracks);
 }
 
+bool StereoSegmentTrackMatcherQuadTree::checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D, const bool isCurler,
+                                                           const double shiftValue) const
+{
+  unsigned int numberOfHitsNotInCDCBounds = 0;
+  unsigned int numberOfHitsOnWrongSide = 0;
+
+  for (CDCRecoHit3D& recoHit : recoSegment3D) {
+    if (not recoHit.isInCellZBounds(1.5)) {
+      numberOfHitsNotInCDCBounds++;
+    }
+
+    if (recoHit.getArcLength2D() < 0) {
+      if (not isCurler) {
+        numberOfHitsOnWrongSide++;
+      }
+      recoHit.shiftArcLength2D(shiftValue);
+    }
+  }
+
+  if (numberOfHitsNotInCDCBounds > 3) {
+    return false;
+  }
+
+  if (m_param_checkForB2BTracks and numberOfHitsOnWrongSide > 1) {
+    return false;
+  }
+
+  return true;
+}
+
 std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherQuadTree::match(const CDCTrack& track,
                                               const std::vector<CDCRecoSegment2D>& recoSegments)
 {
@@ -47,35 +73,19 @@ std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherQuadTr
   const double shiftValue = 2 * TMath::Pi() * radius;
 
   for (const CDCRecoSegment2D& recoSegment2D : recoSegments) {
-    if ((recoSegment2D.getStereoKind() == EStereoKind::c_StereoU or recoSegment2D.getStereoKind() == EStereoKind::c_StereoV)
-        and not recoSegment2D.getAutomatonCell().hasTakenFlag() and not recoSegment2D.isFullyTaken(2)) {
+    if (not(recoSegment2D.getStereoKind() == EStereoKind::c_Axial or recoSegment2D.getAutomatonCell().hasTakenFlag()
+            or recoSegment2D.isFullyTaken(2))) {
       CDCRecoSegment3D recoSegment3D = CDCRecoSegment3D::reconstruct(recoSegment2D, trajectory2D);
 
-      unsigned int numberOfHitsNotInCDCBounds = 0;
-      unsigned int numberOfHitsOnWrongSide = 0;
-
-      for (CDCRecoHit3D& recoHit : recoSegment3D) {
-        if (not recoHit.isInCellZBounds(1.1)) {
-          numberOfHitsNotInCDCBounds++;
-        }
-
-        if (recoHit.getArcLength2D() < 0) {
-          if (not isCurler) {
-            numberOfHitsOnWrongSide++;
-          }
-          recoHit.shiftArcLength2D(shiftValue);
-        }
+      if (checkRecoSegment3D(recoSegment3D, isCurler, shiftValue)) {
+        recoSegmentsWithPointer.emplace_back(recoSegment3D, &recoSegment2D);
       }
 
-      if (numberOfHitsNotInCDCBounds > 1) {
-        continue;
-      }
+      CDCRecoSegment3D recoSegment3DReversed = CDCRecoSegment3D::reconstruct(recoSegment2D.reversed(), trajectory2D);
 
-      if (m_param_checkForB2BTracks and numberOfHitsOnWrongSide > 1) {
-        continue;
+      if (checkRecoSegment3D(recoSegment3DReversed, isCurler, shiftValue)) {
+        recoSegmentsWithPointer.emplace_back(recoSegment3DReversed, &recoSegment2D);
       }
-
-      recoSegmentsWithPointer.emplace_back(recoSegment3D, &recoSegment2D);
     }
   }
 
@@ -95,12 +105,16 @@ std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherQuadTr
 
   // List of matches
   std::vector<WithWeight<const CDCRecoSegment2D*>> matches;
-
   const auto& foundStereoSegments = foundStereoSegmentWithNode.second;
 
-  for (const CDCRecoSegment3DWithPointer& segment3DWthPointer : foundStereoSegments) {
-    matches.emplace_back(segment3DWthPointer.second, 1.0);
+  matches.reserve(foundStereoSegments.size());
+
+  for (const CDCRecoSegment3DWithPointer& segment3DWithPointer : foundStereoSegments) {
+    matches.emplace_back(segment3DWithPointer.second, 1.0);
   }
+
+  std::sort(matches.begin(), matches.end());
+  matches.erase(std::unique(matches.begin(), matches.end()), matches.end());
 
 
   return matches;

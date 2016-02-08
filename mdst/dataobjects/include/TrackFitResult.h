@@ -132,14 +132,11 @@ namespace Belle2 {
     /** Getter for ParticleType of the mass hypothesis of the track fit. */
     Const::ParticleType getParticleType() const { return Const::ParticleType(m_pdg); }
 
-    /** Getter for PDG of the mass hypothesis of the track fit. */
-    int getPDG() const { return m_pdg; }
-
     /** Return track charge (1 or -1).
      *
      *  @TODO For very small values, we might be unsure and return zero.
      */
-    short getChargeSign() const { return getOmega() >= 0 ? 1 : -1; }
+    short getChargeSign() const { return (getOmega() > 0) - (getOmega() < 0); }
 
     /** Getter for Chi2 Probability of the track fit. */
     double getPValue() const { return m_pValue; }

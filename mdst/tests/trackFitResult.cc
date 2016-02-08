@@ -66,7 +66,6 @@ namespace Belle2 {
       EXPECT_EQ(charge, myResult.getChargeSign());
       EXPECT_EQ(pValue, myResult.getPValue());
       EXPECT_EQ(pType, myResult.getParticleType());
-      EXPECT_EQ(pType.getPDGCode(), myResult.getPDG());
 
     }
   } // Testcases for getters
@@ -139,5 +138,29 @@ namespace Belle2 {
 
     }
   } // Testcases error propagation
+
+  /** Test get charge. */
+  TEST_F(TrackFitResultTest, Charge)
+  {
+    auto bField = 1.5;
+    auto pValue = 0.45;
+    TVector3 position(0., 0., 0.);
+    TVector3 momentum(1., 1., 1.);
+    TMatrixDSym cov6(6);
+    auto pType = Belle2::Const::electron;
+
+    auto charge = -1.0;
+    Belle2::TrackFitResult myResultMinus(position, momentum, cov6, charge, pType, pValue, bField, 0, 0);
+    EXPECT_EQ(myResultMinus.getChargeSign(), charge);
+
+    charge = 0;
+    Belle2::TrackFitResult myResultNull(position, momentum, cov6, charge, pType, pValue, bField, 0, 0);
+    EXPECT_EQ(myResultNull.getChargeSign(), charge);
+
+    charge = +1.0;
+    Belle2::TrackFitResult myResultPlus(position, momentum, cov6, charge, pType, pValue, bField, 0, 0);
+    EXPECT_EQ(myResultPlus.getChargeSign(), charge);
+  }
+
 
 }  // namespace

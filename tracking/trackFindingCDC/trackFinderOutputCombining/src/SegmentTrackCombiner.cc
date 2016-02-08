@@ -27,27 +27,24 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackChooserFirs
   // Mark the segments which are fully found by the legendre track finder as taken
   for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
     for (SegmentInformation* segment : segments) {
-      const bool isFullyTaken = segment->getSegment()->isFullyTaken();
+      const bool isFullyTaken = segment->getSegment()->isFullyTaken(2);
 
       if (isFullyTaken) {
         // Ensure that all hits belong to the same track!
-        std::set<TrackInformation*> tracksWithHitsInCommon;
+        TrackInformation* tracksWithHitsInCommon = nullptr;
         for (const CDCRecoHit2D& recoHit : * (segment->getSegment())) {
           TrackInformation* trackWithHit = m_trackLookUp.findTrackForHit(recoHit);
           if (trackWithHit != nullptr) {
-            tracksWithHitsInCommon.insert(trackWithHit);
+            if (tracksWithHitsInCommon == nullptr) {
+              tracksWithHitsInCommon = trackWithHit;
+            } else if (tracksWithHitsInCommon != trackWithHit) {
+              continue;
+            }
           }
         }
 
-        if (tracksWithHitsInCommon.size() == 1) {
-          segment->getSegment()->getAutomatonCell().setTakenFlag();
-          for (const CDCRecoHit2D& recoHit : * (segment->getSegment())) {
-            TrackInformation* trackWithHit = m_trackLookUp.findTrackForHit(recoHit);
-            if (trackWithHit != nullptr) {
-              trackWithHit->getTrackCand()->setHasMatchingSegment();
-              break;
-            }
-          }
+        if (tracksWithHitsInCommon != nullptr) {
+          addSegmentToTrack(*(segment->getSegment()), *(tracksWithHitsInCommon->getTrackCand()));
         }
       }
     }

@@ -116,8 +116,8 @@ namespace Belle2 {
         setISuperCluster(iSuperCluster);
       }
 
-      /// Returns false, if there is one hit in the range which does not have a taken flag.
-      bool isFullyTaken() const;
+      /// Returns false, if there are more than N hits in the range which does not have a taken flag.
+      bool isFullyTaken(unsigned int maxNotTaken = 0) const;
 
     private:
       /** Memory for the automaton cell.

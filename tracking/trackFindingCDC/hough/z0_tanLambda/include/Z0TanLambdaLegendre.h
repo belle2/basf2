@@ -31,7 +31,7 @@ namespace Belle2 {
       typedef DebugableSimpleBoxDivisionHoughTree<AHitPointerType, AHitDecisionAlgorithm, z0Divisions, tanLambdaDivisions> Super;
     public:
       /// Constructor using the given maximal level setting the maximal values.
-      Z0TanLambdaLegendre() : Super(120, std::tan(75.0 * M_PI / 180.0)) {}
+      Z0TanLambdaLegendre() : Super(140, std::tan(75.0 * M_PI / 180.0), 0.5, 0.5) {}
     };
   }
 }

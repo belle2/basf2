@@ -27,13 +27,14 @@ namespace Belle2 {
       typedef typename AInBoxAlgorithm::HoughBox HoughBox;
     public:
       /// Constructor using the given maximal level.
-      SimpleBoxDivisionHoughTree(const float maximumX, const float maximumY) : Super(0),
-        m_maximumX(maximumX), m_maximumY(maximumY) {}
+      SimpleBoxDivisionHoughTree(const float maximumX, const float maximumY, const float overlapX = 0, const float overlapY = 0) :
+        Super(0), m_maximumX(maximumX), m_maximumY(maximumY), m_overlapX(overlapX), m_overlapY(overlapY) {}
 
+      /// Initialize the tree with the given values.
       void initialize()
       {
-        Super::template constructArray<0>(-getMaximumX(), getMaximumX(), 0);
-        Super::template constructArray<0>(-getMaximumY(), getMaximumY(), 0);
+        Super::template constructArray<0>(-getMaximumX(), getMaximumX(), getOverlapX());
+        Super::template constructArray<1>(-getMaximumY(), getMaximumY(), getOverlapY());
 
         Super::initialize();
       }
@@ -68,11 +69,27 @@ namespace Belle2 {
         return m_maximumY;
       }
 
+      /// Return the overlap in x direction.
+      const float& getOverlapX() const
+      {
+        return m_overlapX;
+      }
+
+      /// Return the overlap in y direction.
+      const float& getOverlapY() const
+      {
+        return m_overlapY;
+      }
+
     private:
       /// The maximum value in X direction.
       float m_maximumX = 0;
       /// The maximum value in y direction.
       float m_maximumY = 0;
+      /// The overlap in X direction.
+      float m_overlapX = 0;
+      /// The overlap in Y direction.
+      float m_overlapY = 0;
     };
   }
 }

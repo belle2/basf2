@@ -17,7 +17,7 @@ using namespace Belle2;
 const int CALIBRATIONCHANNEL = 7;
 const int ASIC_PER_SCROD = 16;
 
-bool plotCalibrationChannel(const char* filename)
+bool plotCalibrationChannel(const char* filename, const char* outputname)
 {
   TFile fileIn(filename);
   TTreeReader theReader("tree", &fileIn);
@@ -25,7 +25,7 @@ bool plotCalibrationChannel(const char* filename)
 
   int iEvent = -1;
 
-  TFile plotFile("channels.root", "RECREATE");
+  TFile plotFile(outputname, "RECREATE");
 
   map<int, map<int, TMultiGraph*>> channels; // per board stack, per asic
   map<int, map<int, set<int>>> channelLabels; // per board stack, per asic
@@ -125,12 +125,20 @@ bool plotCalibrationChannel(const char* filename)
   return true;
 }
 
+
+bool plotCalibrationChannel(const char* filename)
+{
+  return plotCalibrationChannel(filename, "channels.root");
+}
+
 int main(int argc, char* argv[])
 {
   if (argc == 2) {
     plotCalibrationChannel(argv[1]);
+  } else if (argc == 3) {
+    plotCalibrationChannel(argv[1], argv[2]);
   } else {
-    cerr << "Usage: plotCalibrationChannel <filename>" << endl;
+    cerr << "Usage: plotCalibrationChannel <filename> [output.root]" << endl;
   }
   return 0;
 }

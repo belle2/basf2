@@ -11,7 +11,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <TObject.h>
+#include <Rtypes.h>
 
 #include <bitset>
 #include <algorithm>
@@ -20,203 +20,135 @@
 #include <utility>
 
 namespace Belle2 {
-  /** Hit pattern of CDC hits within a track and efficient getters.
+
+  /**
+   * Hit pattern of CDC hits within a track.
+   * The pattern is stored using a std::bitset. This allows to use the STL, which is very efficiently programmed.
    *
-   *  The pattern is stored using a std::bitset. This allows to use some stuff from the
-   *  STL, which most likely is very efficiently programmed rather than implementing the
-   *  stuff oneself with integer types.
-   *  For each layer there is one bit. In addition there is a bit for the superLayers 2-8,
-   *  which can be set to indicate, that at least one of the layers has two hits for the track.
-   *  This is the idea at the moment. Perhaps we will later decide to switch this to some
-   *  better description of the outermost super-layer...
-   *  Note, that super Layer counting goes from 0 to 8.
-   *  GENERAL COMMENT: I think the non-static members and the interface are largely OK,
-   *                   but the back-end implementation maybe not so great.
+   * For each layer there is one bit. The layer counting is from 0 to 55.
+   * Super-layer information is generated on demand. The super-layer counting goes from 0 to 8.
+   *
+   * The numbering scheme just in this class is equivalent to the one defined in [BELLE2-NOTE-TE-2015-022].
+   * --> https://d2comp.kek.jp/record/256/files/BELLE2-NOTE-TE-2015-022.pdf
    */
-  class HitPatternCDC : public TObject {
+  class HitPatternCDC {
+    friend class HitPatternCDCTest_settersNGetters_Test;
+    friend class HitPatternCDCTest_getFirstLastLayer_Test;
+
   public:
     /** Create empty pattern.*/
-    HitPatternCDC() {}
+    HitPatternCDC() : m_pattern(0) {}
 
-    /** Initialize the pattern with some long int.*/
-    explicit HitPatternCDC(ULong64_t initValue) : m_pattern(initValue)
-    {}
+    /** Initialize the pattern with an integer.*/
+    explicit HitPatternCDC(ULong64_t initValue) : m_pattern(initValue) {}
 
     /** Getter for underlying integer type. */
-    ULong64_t getInteger() const
-    {
-      if (sizeof(unsigned long) >= 8) {
-        return m_pattern.to_ulong();
-      } else {
-        return m_pattern.to_ullong();
-      }
-    }
+    ULong64_t getInteger() const;
 
-    /** Getter for underlying bit set. */
-    std::bitset<64> getBitSet() const
-    {
-      return m_pattern;
-    }
+    /**
+     * Get the total Number of CDC hits in the fit.
+     * Nota Bene: The maximum value returned here is 255. This is because only
+     * 8 bits are available to store the information. If the track had more than 255
+     * hits, e.g. because it was a curler, the returned value may be to small.
+     * @return Number of hits in the CDC.
+     * */
+    unsigned short getNHits() const;
 
-    /** Get the approximate total Number of CDC hits in the fit. */
-    unsigned short getNHits() const
-    {
-      // Shift the 8 MSBs to the right and return their value as integer.
-      return static_cast<unsigned short int>((m_pattern >> 56).to_ulong());
-    }
-
-    /** Sets the 8 MSBs to the total number of hits in the CDC.*/
-    void setNHits(unsigned short nHits)
-    {
-      if (nHits > 256) {
-        // Maximum with 8 available bits
-        nHits = 255;
-      }
-      // Reset the 8 MSBs to zero.
-      m_pattern = m_pattern & ~s_infoLayerMask;
-      // Set the total number of hits as the 8 MSBs
-      std::bitset<64> numberOfHits(nHits);
-      numberOfHits <<= 56;
-      // Set the 8 MSBs to the total number of hits.
-      // The 8 MSBs have to be zero, otherwise this breaks.
-      m_pattern = numberOfHits | m_pattern;
-    }
+    /**
+     * Sets the 8 MSBs to the total number of hits in the CDC.
+     * Nota Bene: If the whole track has more than 255 hits, e.g. because it is
+     * a curler, the value is set to 255.
+     * @param nHits Number of hits in the CDC.
+     * */
+    void setNHits(unsigned short nHits);
 
     // ----------------------------------------------------------------
     // ---------------- LAYER FUNCTIONS -------------------------------
     // ----------------------------------------------------------------
 
-    /** Set bit corresponding to layer to true.
-     *
-     *  This function may throw an out-of-range exception.
+    /**
+     * Set bit corresponding to layer to true.
+     * This function may throw an out-of-range exception.
+     * @param layer Layer index.
      */
-    void setLayer(const unsigned short layer)
-    {
-      B2ASSERT("Layer is out of range.", layer <= 55);
-      m_pattern.set(layer);
-    }
+    void setLayer(const unsigned short layer);
 
-    /** Set bit corresponding to layer to false.
-     *
-     *  This function may throw an out-of-range exception.
+    /**
+     * Set bit corresponding to layer to false.
+     * This function may throw an out-of-range exception.
+     * @param layer Layer index.
      */
-    void resetLayer(const unsigned short layer)
-    {
-      B2ASSERT("Layer is out of range.", layer <= 55);
-      m_pattern.reset(layer);
-    }
+    void resetLayer(const unsigned short layer);
 
-    /** Getter for single layer.*/
-    bool hasLayer(const unsigned short layer) const
-    {
-      B2ASSERT("Layer is out of range.", layer <= 55);
-      return m_pattern[layer];
-    }
+    /**
+     * Getter for single layer.
+     * @param layer Layer index.
+     * @return Boolean if layer is hit or not.
+     * */
+    bool hasLayer(const unsigned short layer) const;
 
-
-    /** Returns the index of the first layer with a hit.
+    /**
+     * Returns the index of the first layer with a hit.
      * If there is no hit in the whole pattern, -1 is returned.
+     * @return Index of last layer.
      */
-    short getFirstLayer() const
-    {
-      for (unsigned int i = 0; i < m_pattern.size(); ++i) {
-        if ((m_pattern & ~s_infoLayerMask).test(i)) return i;
-      }
-      return -1;
-    }
+    short getFirstLayer() const;
 
-    /** Returns the index of the last layer with a hit.
+    /**
+     * Returns the index of the last layer with a hit.
      * If there is no hit in the whole pattern, -1 is returned.
+     * @return Index of last layer.
      */
-    short getLastLayer() const
-    {
-      // m_pattern.size()-8 because the first 8 bits are not pattern
-      for (unsigned int i = m_pattern.size() - 8; i > 0; --i) {
-        // -1 because of the index couting...
-        if ((m_pattern & ~s_infoLayerMask).test(i - 1)) return i - 1;
-      }
-      return -1;
-    }
+    short getLastLayer() const;
+
     // ----------------------------------------------------------------
     // ---------------- SUPER LAYER FUNCTIONS -------------------------
     // ----------------------------------------------------------------
 
-    /** Getter for Super-Layer match.*/
-    bool hasSLayer(const unsigned short sLayer) const
-    {
-      B2ASSERT("Super layer outof range.", sLayer <= 8);
-      return ((m_pattern & s_sLayerMasks[sLayer]).any());
-    }
+    /**
+     * Getter for super-layer match.
+     * @param sLayer super-layer index.
+     * */
+    bool hasSLayer(const unsigned short sLayer) const;
 
-    /** Reset complete superLayer, e.g. because segment shouldn't belong to that track.*/
-    void resetSLayer(const unsigned short sLayer)
-    {
-      B2ASSERT("Super layer outof range.", sLayer <= 8);
-      for (unsigned short int ii = 0; ii < m_pattern.size(); ++ii) {
-        if ((s_sLayerMasks[sLayer])[ii]) {resetLayer(ii);}
-      }
-    }
+    /**
+     * Reset complete superLayer, e.g. because segment shouldn't belong to that track.
+     * @param sLayer Super-layer index.
+     * */
+    void resetSLayer(const unsigned short sLayer);
 
-    /** Get the pattern in a specific super layer. */
-    std::bitset<64> getSLayerPattern(const unsigned short sLayer)
-    {
-      return m_pattern & s_sLayerMasks[sLayer];
-    }
+    /**
+     * Get the bit pattern in a specific super layer.
+     * @param sLayer Super-layer index.
+     * @return Super-layer bit pattern.
+     * */
+    std::bitset<64> getSLayerPattern(const unsigned short sLayer);
 
-    /** Getter for the approximate number of hits in one super-layer.
-     *
-     *  In case of multiple layers with two or more hits or
-     *  any layers with more than two hits leads to under-counting.
+    /**
+     * Getter for the number of hits in one super-layer.
+     * Nota Bene: As only a bitwise information is available if a layer is hit, under-counting
+     * is possible if in at least one layer more than one wire is hit.
+     * @param sLayer Super-layer index.
+     * @return Number of hits in super-layer.
      */
-    unsigned short getSLayerNHits(const unsigned short sLayer) const
-    {
-      B2ASSERT("Super layer outof range.", sLayer <= 8);
-      return static_cast<unsigned short>((m_pattern & s_sLayerMasks[sLayer]).count());
-    }
+    unsigned short getSLayerNHits(const unsigned short sLayer) const;
 
-    /** Getter for longest run of consecutive layers with hits in the Super-Layer.
-     * TODO: Maybe a better solution can be found here*/
-    unsigned short getLongestContRunInSL(const unsigned short sLayer) const
-    {
-      B2ASSERT("Super layer outof range.", sLayer <= 8);
-      unsigned short max = 0;
-      unsigned short counter = 0;
-      std::pair<unsigned short, unsigned short> indices = s_superLayerIndices.at(sLayer);
-      for (unsigned short i = indices.first; i <= indices.second; ++i) {
-        counter += m_pattern[i];
-        if (m_pattern[i] == 0) {
-          if (counter > max) {
-            max = counter;
-          }
-          counter = 0;
-        }
-      }
-      return std::max(max, counter);
-    }
+    /**
+     * Getter for longest run of consecutive layers with hits within the given Super-layer.
+     * @param sLayer Super-layer index.
+     * @return Length of longest run.
+     * */
+    unsigned short getLongestContRunInSL(const unsigned short sLayer) const;
 
     // ----------------------------------------------------------------
     // ---------------- Others ----------------------------------------
     // ----------------------------------------------------------------
 
-    /** Reset the complete hit pattern. */
-    void resetPattern()
-    {
-      m_pattern.reset();
-    }
+    /** True, if at least one axial layer is true.*/
+    bool hasAxialLayer() const;
 
     /** True, if at least one axial layer is true.*/
-    bool hasAxialLayer() const
-    {
-      return ((s_sLayerMasks[0] | s_sLayerMasks[2] | s_sLayerMasks[4] | s_sLayerMasks[6] | s_sLayerMasks[8])
-              & m_pattern).any();
-    }
-
-    /** True, if at least one axial layer is true.*/
-    bool hasStereoLayer() const
-    {
-      return ((s_sLayerMasks[1] | s_sLayerMasks[3] | s_sLayerMasks[5] | s_sLayerMasks[7])
-              & m_pattern).any();
-    }
+    bool hasStereoLayer() const;
 
 
   private:
@@ -227,12 +159,11 @@ namespace Belle2 {
     /** Holds the indices for super layer access. */
     static const std::map<unsigned short, std::pair<unsigned short, unsigned short>> s_superLayerIndices;
 
-    //-----------------------------------------------------------------------------------
-    /** Make it a ROOT object.
-     *
-     *  ClassVersionID is set to 0, as there is no need for streamer,
-     *  as this the integer equivalent of the bitset is used as object member.
-     */
-    ClassDef(HitPatternCDC, 0);
+    /** Getter for underlying bit set. Just for testing. */
+    std::bitset<64> getBitSet() const { return m_pattern; }
+
+    /** Reset the complete hit pattern. Just for testing. */
+    void resetPattern() { m_pattern.reset(); }
+
   };
 }

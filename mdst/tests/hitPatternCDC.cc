@@ -16,7 +16,7 @@ namespace Belle2 {
     EXPECT_EQ(initValue, hitPatternCDC.getInteger());
 
     HitPatternCDC hitPatternCDC2;
-    //EXPECT_EQ(0,  hitPatternCDC2.getNHits());
+    EXPECT_EQ(0,  hitPatternCDC2.getNHits());
 
     // Test setting and getting individual bits
     short layer = 5;

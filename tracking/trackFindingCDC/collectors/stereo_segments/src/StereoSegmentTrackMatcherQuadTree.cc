@@ -34,7 +34,8 @@ void StereoSegmentTrackMatcherQuadTree::exposeParameters(ModuleParamList* module
 }
 
 bool StereoSegmentTrackMatcherQuadTree::checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D, const bool isCurler,
-                                                           const double shiftValue) const
+                                                           const double shiftValue, const ISuperLayer lastSuperLayer,
+                                                           const double lastArcLength2D) const
 {
   unsigned int numberOfHitsNotInCDCBounds = 0;
   unsigned int numberOfHitsOnWrongSide = 0;
@@ -56,8 +57,18 @@ bool StereoSegmentTrackMatcherQuadTree::checkRecoSegment3D(CDCRecoSegment3D& rec
     return false;
   }
 
+  if (recoSegment3D.size() <= 3 and numberOfHitsNotInCDCBounds > 1) {
+    return false;
+  }
+
   if (m_param_checkForB2BTracks and numberOfHitsOnWrongSide > 1) {
     return false;
+  }
+
+  if (recoSegment3D.back().getArcLength2D() > lastArcLength2D) {
+    if (abs(lastSuperLayer - recoSegment3D.getISuperLayer()) > 1) {
+      return false;
+    }
   }
 
   return true;
@@ -78,20 +89,22 @@ std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherQuadTr
   const bool isCurler = trajectory2D.isCurler();
   const double radius = trajectory2D.getLocalCircle().absRadius();
   const double shiftValue = 2 * TMath::Pi() * radius;
+  const ISuperLayer lastSuperLayer = track.back().getISuperLayer();
+  const double lastArcLength2D = track.back().getArcLength2D();
 
   for (const CDCRecoSegment2D& recoSegment2D : recoSegments) {
     if (not(recoSegment2D.getStereoKind() == EStereoKind::c_Axial or recoSegment2D.getAutomatonCell().hasTakenFlag()
             or recoSegment2D.isFullyTaken(2))) {
       CDCRecoSegment3D recoSegment3D = CDCRecoSegment3D::reconstruct(recoSegment2D, trajectory2D);
 
-      if (checkRecoSegment3D(recoSegment3D, isCurler, shiftValue)) {
+      if (checkRecoSegment3D(recoSegment3D, isCurler, shiftValue, lastSuperLayer, lastArcLength2D)) {
         const CDCTrajectorySZ& trajectorySZ = szFitter.fitUsingSimplifiedTheilSen(recoSegment3D);
         recoSegmentsWithPointer.emplace_back(std::make_pair(recoSegment3D, trajectorySZ), &recoSegment2D);
       }
 
       CDCRecoSegment3D recoSegment3DReversed = CDCRecoSegment3D::reconstruct(recoSegment2D.reversed(), trajectory2D);
 
-      if (checkRecoSegment3D(recoSegment3DReversed, isCurler, shiftValue)) {
+      if (checkRecoSegment3D(recoSegment3DReversed, isCurler, shiftValue, lastSuperLayer, lastArcLength2D)) {
         const CDCTrajectorySZ& trajectorySZ = szFitter.fitUsingSimplifiedTheilSen(recoSegment3DReversed);
         recoSegmentsWithPointer.emplace_back(std::make_pair(recoSegment3DReversed, trajectorySZ), &recoSegment2D);
       }

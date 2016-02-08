@@ -54,7 +54,8 @@ namespace Belle2 {
       /// Set to true to output debug information.
       bool m_param_writeDebugInformation = false;
 
-      bool checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D, const bool isCurler, const double shiftValue) const;
+      bool checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D, const bool isCurler, const double shiftValue,
+                              const ISuperLayer lastSuperLayer, const double lastArcLength2D) const;
     };
   }
 }

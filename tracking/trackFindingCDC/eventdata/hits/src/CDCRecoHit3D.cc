@@ -127,7 +127,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
 CDCRecoHit3D CDCRecoHit3D::reconstructNearest(const CDCWireHit* wireHit,
                                               const CDCTrajectory2D& trackTrajectory2D)
 {
-  B2ASSERT(wireHit->isAxial(), "This function can only be used with axial hits.");
+  B2ASSERT("This function can only be used with axial hits.", wireHit->isAxial());
   ERightLeft rlInfo = trackTrajectory2D.isRightOrLeft(wireHit->getRefPos2D());
   CDCRLTaggedWireHit rlWireHit(wireHit, rlInfo);
   return CDCRecoHit3D::reconstruct(rlWireHit, trackTrajectory2D);

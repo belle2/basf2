@@ -24,7 +24,7 @@ void StereoHitTrackAdder::add(CDCTrack& track, const std::vector<WithWeight<cons
       arcLength2D += 2 * TMath::Pi() * radius;
     }
 
-    B2ASSERT(not rlWireHitWithWeight->getWireHit().getAutomatonCell().hasTakenFlag(), "A stereo hit should not be added twice!");
+    B2ASSERT("A stereo hit should not be added twice!", not rlWireHitWithWeight->getWireHit().getAutomatonCell().hasTakenFlag());
     track.emplace_back(*rlWireHitWithWeight, recoPos3D, arcLength2D);
     rlWireHitWithWeight->getWireHit().getAutomatonCell().setTakenFlag();
   }

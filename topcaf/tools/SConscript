@@ -5,4 +5,5 @@ env['TOOLS_LIBS']['pedestalStability'] = ['framework', 'topcaf_dataobjects', '$R
 env['TOOLS_LIBS']['analyzeHits'] = ['$ROOT_LIBS', 'TreePlayer', 'topcaf_dataobjects'];
 env['TOOLS_LIBS']['analyzeTopDigits'] = ['$ROOT_LIBS', 'TreePlayer', 'topcaf_dataobjects'];
 env['TOOLS_LIBS']['plotCalibrationChannel'] = ['$ROOT_LIBS', 'TreePlayer', 'topcaf_dataobjects'];
+env['TOOLS_LIBS']['plotChannels'] = ['$ROOT_LIBS', 'TreePlayer', 'topcaf_dataobjects'];
 Return('env')

@@ -110,6 +110,6 @@ namespace Belle2 {
 
 
     /** returns outer secID of current Segment */
-    inline FullSecID::BaseType* getOuterSecID() const { return m_outerSector; }
+    inline FullSecID::BaseType getOuterSecID() const { return m_outerSector; }
   };
 } //Belle2 namespace

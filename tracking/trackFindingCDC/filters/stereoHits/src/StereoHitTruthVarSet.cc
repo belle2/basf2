@@ -30,8 +30,10 @@ bool StereoHitTruthVarSet::extract(const std::pair<const CDCRecoHit3D*, const CD
   const CDCMCTrackLookUp& mcTrackLookup = CDCMCTrackLookUp::getInstance();
   const CDCMCHitLookUp& hitLookup = CDCMCHitLookUp::getInstance();
 
+  const Belle2::CDCHit* hit = recoHit->getWireHit().getHit();
+
   ITrackType trackMCMatch = mcTrackLookup.getMCTrackId(track);
-  ITrackType hitMCMatch = hitLookup.getMCTrackId(recoHit->getWireHit().getHit());
+  ITrackType hitMCMatch = hitLookup.getMCTrackId(hit);
   ERightLeft hitMCRLInfo = hitLookup.getRLInfo(recoHit->getWireHit().getHit());
 
   if (trackMCMatch == INVALID_ITRACK) {

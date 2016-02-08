@@ -9,8 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/DiscreteValue.h>
-#include <tracking/trackFindingCDC/topology/ILayer.h>
+#include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
 #include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 #include <tracking/trackFindingCDC/utilities/EnableIf.h>
@@ -18,48 +17,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    /// Phantom type tag for the discrete curvature representation
-    class CurvTag;
-
-    /// Type for discrete curv values
-    using DiscreteCurv = DiscreteValue<float, CurvTag>;
-
-    /** Class representing a curvature value that also caches two dimensional arc length
-     *  to each layer in the CDC
-     */
-    class CurvWithArcLength2DCache {
-    public:
-      /// Make cache for one curvature value
-      CurvWithArcLength2DCache(const float& curv);
-
-      /// Unpack the curvature
-      explicit operator float() const
-      { return m_curv; }
-
-      /// Return the two dimensional arc length to the given layer id
-      float getArcLength2D(ILayer iCLayer, bool secondArm = false) const
-      { return secondArm ? m_secondaryArcLength2DByICLayer[iCLayer] : m_arcLength2DByICLayer[iCLayer]; }
-
-      /// Output operator for debugging
-      friend std::ostream& operator<<(std::ostream& output,
-                                      const CurvWithArcLength2DCache& value)
-      { return output << value.m_curv; }
-
-    private:
-      /// Memory for the curvature
-      float m_curv;
-
-      /// Memory for two dimensional arc length at each layer.
-      std::array<float, 55> m_arcLength2DByICLayer;
-
-      /// Memory for two dimensional arc length at each layer on the second arm.
-      std::array<float, 55> m_secondaryArcLength2DByICLayer;
-    };
-
-    /// Type for discrete curv values
-    using DiscreteCurvWithArcLength2DCache = DiscreteValue<CurvWithArcLength2DCache, CurvTag>;
-
 
     /// Strategy to construct discrete curv points from discrete overlap specifications.
     class CurvBinsSpec {
@@ -125,7 +82,6 @@ namespace Belle2 {
       /// Width of the leaves at the maximal level in curv counted in number of discrete values.
       size_t m_nWidth = 3;
     };
-
 
     /// Functor to get the lower curvature bound of a hough box.
     struct GetLowerCurv {

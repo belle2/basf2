@@ -9,23 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/DiscreteValue.h>
-#include <tracking/trackFindingCDC/hough/ContinuousValue.h>
+#include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
 
 #include <array>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    /// Phantom type tag for the discrete impact representation
-    class ImpactTag;
-
-    /// Type for discrete impact values
-    using DiscreteImpact = DiscreteValue<float, ImpactTag>;
-
-    /// Type to have explicit impact values
-    using ContinuousImpact = ContinuousValue<double, ImpactTag>;
-
     /// Strategy to construct discrete impact points from discrete overlap specifications.
     class ImpactBinsSpec {
     public:

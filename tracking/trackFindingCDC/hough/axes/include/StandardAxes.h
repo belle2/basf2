@@ -1,0 +1,84 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Oliver Frost, Nils Braun                                 *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#pragma once
+
+#include <tracking/trackFindingCDC/hough/DiscreteValue.h>
+#include <tracking/trackFindingCDC/hough/ContinuousValue.h>
+
+#include <tracking/trackFindingCDC/topology/ILayer.h>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+    /// Phantom type tag for the discrete impact representation
+    class ImpactTag;
+
+    /// Type for discrete impact values
+    using DiscreteImpact = DiscreteValue<float, ImpactTag>;
+
+    /// Type to have explicit impact values
+    using ContinuousImpact = ContinuousValue<double, ImpactTag>;
+
+    /// Phantom type tag for the discrete curvature representation
+    class CurvTag;
+
+    /// Type for discrete curv values
+    using DiscreteCurv = DiscreteValue<float, CurvTag>;
+
+    /** Class representing a curvature value that also caches two dimensional arc length
+     *  to each layer in the CDC
+     */
+    class CurvWithArcLength2DCache {
+    public:
+      /// Make cache for one curvature value
+      CurvWithArcLength2DCache(const float& curv);
+
+      /// Unpack the curvature
+      explicit operator float() const
+      { return m_curv; }
+
+      /// Return the two dimensional arc length to the given layer id
+      float getArcLength2D(ILayer iCLayer, bool secondArm = false) const
+      { return secondArm ? m_secondaryArcLength2DByICLayer[iCLayer] : m_arcLength2DByICLayer[iCLayer]; }
+
+      /// Output operator for debugging
+      friend std::ostream& operator<<(std::ostream& output,
+                                      const CurvWithArcLength2DCache& value)
+      { return output << value.m_curv; }
+
+    private:
+      /// Memory for the curvature
+      float m_curv;
+
+      /// Memory for two dimensional arc length at each layer.
+      std::array<float, 55> m_arcLength2DByICLayer;
+
+      /// Memory for two dimensional arc length at each layer on the second arm.
+      std::array<float, 55> m_secondaryArcLength2DByICLayer;
+    };
+
+    /// Type for discrete curv values
+    using DiscreteCurvWithArcLength2DCache = DiscreteValue<CurvWithArcLength2DCache, CurvTag>;
+
+    /// Phantom type tag for the discrete tan lambda representation
+    class TanLTag;
+
+    /// Type for discrete tan lambda values
+    using DiscreteTanL = DiscreteValue<float, TanLTag>;
+
+    /// Type to have continuous tan lambda values
+    using ContinuousTanL = ContinuousValue<double, TanLTag>;
+
+    /// Phantom type tag for the discrete z0 representation
+    class Z0Tag;
+
+    /// Type for discrete phi0 values
+    using DiscreteZ0 = DiscreteValue<float, Z0Tag>;
+  } // end namespace TrackFindingCDC
+} // end namespace Belle2

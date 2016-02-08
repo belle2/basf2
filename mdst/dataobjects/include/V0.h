@@ -21,6 +21,9 @@ namespace Belle2 {
    *  This object only holds the indices of the Tracks used to create the V0 and
    *  the indices of the TrackFitResults belonging to that Tracks, but material effects
    *  and hits as appropriate for the point of the intersection of the Tracks.
+   *
+   *  For additional information see [BELLE2-NOTE-TE-2015-034].
+   *  --> https://d2comp.kek.jp/record/307/files/BELLE2-NOTE-TE-2015-034.pdf
    */
   class V0 : public RelationsObject {
   public:

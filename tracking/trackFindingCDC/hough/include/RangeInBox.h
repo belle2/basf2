@@ -49,7 +49,7 @@ namespace Belle2 {
         }
       }
 
-      const double minimalRatio = 0.6;
+      const double minimalRatio = 0.3;
     };
   }
 }

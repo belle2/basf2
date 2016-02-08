@@ -64,7 +64,7 @@ namespace Belle2 {
     }
 
     /** Returns the number of fitted hypothesis which are stored in this track. */
-    unsigned int getNumberOfFittedHypothesis() const;
+    unsigned int getNumberOfFittedHypotheses() const;
 
   private:
     /** Index list of the TrackFitResults associated with this Track. */

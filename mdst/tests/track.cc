@@ -45,7 +45,7 @@ namespace Belle2 {
     mytrack1.setTrackFitResultIndex(Const::pion, 0);
     mytrack1.setTrackFitResultIndex(Const::muon, 3);
     mytrack1.setTrackFitResultIndex(Const::kaon, 2);
-    EXPECT_EQ(mytrack1.getNumberOfFittedHypothesis(), 3);
+    EXPECT_EQ(mytrack1.getNumberOfFittedHypotheses(), 3);
     // If the index of the corresponding particel is set, the correct particle should be returned.
     EXPECT_EQ(mytrack1.getTrackFitResult(Const::pion)->getParticleType(), Const::pion);
 

@@ -32,7 +32,7 @@ const TrackFitResult* Track::getTrackFitResult(const Const::ChargedStable& charg
   return trackFitResults[m_trackFitIndices[chargedStable.getIndex()]];
 }
 
-unsigned int Track::getNumberOfFittedHypothesis() const
+unsigned int Track::getNumberOfFittedHypotheses() const
 {
   unsigned int fittedHypothesis = 0;
   for (const auto& hyp : m_trackFitIndices) {

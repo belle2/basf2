@@ -38,9 +38,6 @@ namespace Belle2 {
     /// All filter for stereo segment - track relations.
     using AllStereoSegmentFilter = AllFilter<BaseStereoSegmentFilter>;
 
-    /// Simple and configurable filter for stereo segment - track relations.
-    using SimpleStereoSegmentFilter = NamedChoosableVarSetFilter<StereoSegmentTruthVarSet>;
-
     /// Random filter for stereo segment - track relations.
     using RandomStereoSegmentFilter = RandomFilter<BaseStereoSegmentFilter>;
 

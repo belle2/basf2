@@ -430,21 +430,23 @@ namespace Belle2 {
      * Takes care of cleaning event-dependent TCs. */
     unsigned processTracks()
     {
-      unsigned nTwoHitResults = 0;
-      unsigned nThreeHitResults = 0;
-      unsigned nFourHitResults = 0;
+      unsigned n2HitResults = 0;
+      unsigned n3HitResults = 0;
+      unsigned n4HitResults = 0;
       unsigned nTracksProcessed = m_tcs.size();
 
       for (const auto& tc : m_tcs) {
         // two hit:
-        nTwoHitResults += process2HitCombinations(tc);
+        n2HitResults += process2HitCombinations(tc);
         // three hit:
-        nThreeHitResults += process3HitCombinations(tc);
+        n3HitResults += process3HitCombinations(tc);
         //four hit:
-        nFourHitResults += process4HitCombinations(tc);
+        n4HitResults += process4HitCombinations(tc);
       }
 
       m_tcs.clear();
+      B2DEBUG(25, "SecMapTrainer::processTracks: nStoredValues for 2-/3-/4-hit: " << n2HitResults << "/" << n3HitResults << "/" <<
+              n4HitResults);
 
       return nTracksProcessed;
     }

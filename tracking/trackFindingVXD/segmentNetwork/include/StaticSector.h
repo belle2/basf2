@@ -141,7 +141,7 @@ namespace Belle2 {
     * (this Sector and sector with passed fullSecID) on given hits,
     * sorting of parameters: from outer to inner, independently for SecID and Hits
     * returns true if accepted */
-    bool accept(const FullSecID innerID,
+    bool accept(const FullSecID& innerID,
                 const HitType& spOnThisSec,
                 const HitType& spOnInnerSec) const
     {
@@ -157,7 +157,7 @@ namespace Belle2 {
     * (this Sector and sector with passed fullSecID) on given hits,
     * sorting of parameters: from outer to inner, independently for SecID and Hits
     * returns true if accepted */
-    bool accept(const FullSecID centerID, const  FullSecID innerID,
+    bool accept(const FullSecID& centerID, const  FullSecID& innerID,
                 const HitType& outerSp, const HitType& centerSp, const HitType& innerSp) const
     {
       auto filter = m_3spFilters.find(m_compactSecIDsMap->getCompactID(centerID, innerID));
@@ -177,7 +177,7 @@ namespace Belle2 {
     * (this Sector and sector with passed fullSecID) on given hits,
     * sorting of parameters: from outer to inner, independently for SecID and Hits
     * returns true if accepted */
-    bool accept(const FullSecID outerCenterID, const FullSecID innerCenterID, const FullSecID innerID,
+    bool accept(const FullSecID& outerCenterID, const FullSecID& innerCenterID, const FullSecID& innerID,
                 const HitType& /*outerSp*/, const HitType& /*outerCenterSp*/,
                 const HitType& /*innerCenterSp*/, const HitType& /*innerSp*/) const
     {

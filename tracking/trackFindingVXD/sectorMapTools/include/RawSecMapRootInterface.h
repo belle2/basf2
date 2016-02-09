@@ -80,6 +80,10 @@ namespace Belle2 {
     ~RawSecMapRootInterface() { /*delete m_file;*/ }
 
 
+    /** That class shall not be copied. */
+    RawSecMapRootInterface(const RawSecMapRootInterface& rawSecMapInterFace)  = delete;
+
+
     /** initialize the RawSecMapRootInterface for two-hit-combinations (to be called in Module::initialize(). */
     void initialize2Hit(std::vector<std::string> filterNames)
     {

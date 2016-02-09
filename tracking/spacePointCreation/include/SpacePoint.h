@@ -342,7 +342,7 @@ namespace Belle2 {
      * This is only relevant for wedged/slanted sensors because of their trapezoidal shape, for rectangular shapes, the value does not change
      *
      */
-    static SpBaseType getUWedged(const std::pair<SpBaseType, SpBaseType> hitLocalUnwedged, VxdID vxdID,
+    static SpBaseType getUWedged(const std::pair<SpBaseType, SpBaseType>& hitLocalUnwedged, VxdID vxdID,
                                  const VXD::SensorInfoBase* aSensorInfo = NULL)
     {
       if (aSensorInfo == NULL) { aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID); }
@@ -357,7 +357,7 @@ namespace Belle2 {
      * The returned value shall be like the value delivered by a uCluster without information of v (== aCluster.getPosition() ).
      * This is only relevant for wedged/slanted sensors because of their trapezoidal shape, for rectangular shapes, the value does not change
      */
-    static SpBaseType getUUnwedged(const std::pair<SpBaseType, SpBaseType> hitLocalWedged, VxdID::baseType vxdID,
+    static SpBaseType getUUnwedged(const std::pair<SpBaseType, SpBaseType>& hitLocalWedged, VxdID::baseType vxdID,
                                    const VXD::SensorInfoBase* aSensorInfo = NULL)
     {
       if (aSensorInfo == NULL) { aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID); }

@@ -98,7 +98,7 @@ namespace Belle2 {
       /// question JKL: what happens here for virtual IP, where layer, ladder, sensorID and secID is 0? does this return zero (which is also returned when having a fullID which is not stored in this CompactSecID-thingy?
     }
 
-    secPairID_t getCompactID(const FullSecID id1, const FullSecID id2) const
+    secPairID_t getCompactID(const FullSecID& id1, const FullSecID& id2) const
     {
 
       return (secPairID_t)getCompactID(id1) +
@@ -106,8 +106,8 @@ namespace Belle2 {
 
     }
 
-    secTripletID_t getCompactID(const FullSecID id1, const FullSecID id2 ,
-                                const FullSecID id3) const
+    secTripletID_t getCompactID(const FullSecID& id1, const FullSecID& id2 ,
+                                const FullSecID& id3) const
     {
 
       return
@@ -117,8 +117,8 @@ namespace Belle2 {
 
     }
 
-    secQuadrupletID_t getCompactID(const FullSecID id1, const FullSecID id2 ,
-                                   const FullSecID id3, const FullSecID id4) const
+    secQuadrupletID_t getCompactID(const FullSecID& id1, const FullSecID& id2 ,
+                                   const FullSecID& id3, const FullSecID& id4) const
     {
 
       return

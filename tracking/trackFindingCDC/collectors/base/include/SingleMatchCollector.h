@@ -43,7 +43,7 @@ namespace Belle2 {
 
           if (matchedCollectorItems.size() == 1) {
             const WithWeight<CollectorItem*>& singleElement = matchedCollectorItems[0];
-            CollectorItem* bestCollectorItem = singleElement;
+            CollectorItem* bestCollectorItem = static_cast<CollectorItem*>(singleElement);
             const Weight bestWeight = singleElement.getWeight();
 
             WithWeight<const CollectionItem*> newElement(collectionItem, bestWeight);

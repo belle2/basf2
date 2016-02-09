@@ -47,7 +47,7 @@ namespace Belle2 {
 
           // "Transpose" the relation collector -> weighted collections to collection -> weighted collectors
           for (const auto& matchedCollectionItemWithWeight : matchesForCollector) {
-            const CollectionItem* collectionItem = matchedCollectionItemWithWeight;
+            const CollectionItem* collectionItem = static_cast<const CollectionItem*>(matchedCollectionItemWithWeight);
             const Weight weight = matchedCollectionItemWithWeight.getWeight();
 
             WithWeight<CollectorItem*> newElement(&collectorItem, weight);

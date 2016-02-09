@@ -55,7 +55,7 @@ namespace Belle2 {
             return lhs.getWeight() < rhs.getWeight();
           });
 
-          CollectorItem* bestCollectorItem = *maximalElement;
+          CollectorItem* bestCollectorItem = static_cast<CollectorItem*>(*maximalElement);
           const Weight bestWeight = maximalElement->getWeight();
 
           WithWeight<const CollectionItem*> newElement(collectionItem, bestWeight);

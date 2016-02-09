@@ -51,9 +51,9 @@ NeuroTriggerModule::event()
 {
   StoreArray<CDCTriggerTrack> tracks("CDCTriggerTracks");
   for (int itrack = 0; itrack < tracks.getEntries(); ++itrack) {
+    m_NeuroTrigger.updateTrack(*tracks[itrack]);
     int isector = m_NeuroTrigger.selectMLP(*tracks[itrack]);
     if (isector >= 0) {
-      m_NeuroTrigger.updateTrack(*tracks[itrack]);
       std::vector<float> MLPinput = m_NeuroTrigger.getInputVector(isector);
       std::vector<float> target = m_NeuroTrigger.runMLP(isector, MLPinput);
       int zIndex = m_NeuroTrigger[isector].zIndex();

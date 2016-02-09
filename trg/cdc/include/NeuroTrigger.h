@@ -63,6 +63,8 @@ namespace Belle2 {
       /** Theta region for which MLP is trained in degree for all networks.
        *  Can be larger than use range to avoid edge effects. */
       std::vector<std::vector<float>> thetaRangeTrain = {{17., 150.}};
+      /** Super layer pattern for which MLP is trained for all networks. */
+      std::vector<unsigned int> SLpattern = {0};
       /** Maximal drift time, identical for all networks. */
       unsigned tMax = 512;
     };
@@ -124,6 +126,12 @@ namespace Belle2 {
     /** Calculate phi position of a hit relative to 2D track
      * (scaled to number of wires). */
     double getRelId(const CDCTriggerSegmentHit& hit);
+
+    /** Calculate input pattern for MLP.
+     * @param isector index of the MLP that will use the input
+     * @return super layer pattern of hits in the current track
+     */
+    unsigned short getInputPattern(unsigned isector);
 
     /** Calculate input values for MLP.
      * @param isector index of the MLP that will use the input

@@ -17,6 +17,7 @@ namespace Belle2 {
                   std::vector<float> phiRange,
                   std::vector<float> invptRange,
                   std::vector<float> thetaRange,
+                  unsigned short SLpattern,
                   unsigned short tMax);
 
     /** destructor, empty because we don't allocate memory anywhere. */
@@ -49,6 +50,8 @@ namespace Belle2 {
     std::vector<float> getInvptRange() const { return invptRange; }
     /** get theta range for which this expert is trained */
     std::vector<float> getThetaRange() const { return thetaRange; }
+    /** get super layer pattern */
+    unsigned short getSLpattern() const { return SLpattern; }
     /** get maximal drift time */
     unsigned short getTMax() const { return tMax; }
 
@@ -95,6 +98,11 @@ namespace Belle2 {
     /** Theta region in radian for which this expert is trained. */
     std::vector<float> thetaRange;
 
+    /** Super layer pattern for which this expert is trained.
+      * Binary pattern of 9 bits (on/off for each SL).
+      * 0 means no restriction rather than no inputs. */
+    unsigned short SLpattern;
+
     /** Maximal drift time (for scaling), hits with larger values are ignored. */
     unsigned short tMax;
     /** Hits must be within ID region around 2D track to be used as input.
@@ -103,7 +111,7 @@ namespace Belle2 {
     std::vector<float> relevantID;
 
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerMLP, 2);
+    ClassDef(CDCTriggerMLP, 3);
   };
 }
 #endif

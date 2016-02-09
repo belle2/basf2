@@ -6,8 +6,9 @@ using namespace Belle2;
 ClassImp(CDCTriggerMLP);
 
 CDCTriggerMLP::CDCTriggerMLP():
-  nNodes({27, 27, 1}), targetVars(1), outputScale({ -1., 1.}), phiRange({0., 2. * M_PI}),
-  invptRange({ -5., 5.}), thetaRange({0., M_PI}), tMax(512),
+  nNodes({27, 27, 2}), targetVars(3), outputScale({ -1., 1., -1., 1.}),
+  phiRange({0., 2. * M_PI}), invptRange({ -5., 5.}), thetaRange({0., M_PI}),
+  SLpattern(0), tMax(512),
   relevantID({ -1., 1.,
                -10., 1.,
                -1., 1.,
@@ -27,9 +28,11 @@ CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short> nNodes,
                              std::vector<float> phiRange,
                              std::vector<float> invptRange,
                              std::vector<float> thetaRange,
+                             unsigned short SLpattern,
                              unsigned short tMax):
-  nNodes(nNodes), targetVars(targetVars), outputScale(outputScale), phiRange(phiRange),
-  invptRange(invptRange), thetaRange(thetaRange), tMax(tMax),
+  nNodes(nNodes), targetVars(targetVars), outputScale(outputScale),
+  phiRange(phiRange), invptRange(invptRange), thetaRange(thetaRange),
+  SLpattern(SLpattern), tMax(tMax),
   relevantID({ -1., 1.,
                -10., 1.,
                -1., 1.,

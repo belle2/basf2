@@ -85,15 +85,15 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
   addParam("phiRange", m_parameters.phiRange,
            "Phi region in degree for which experts are trained. "
            "1 value pair, nMLP value pairs or nPhi value pairs "
-           "with nPhi * nPt * nTheta = nMLP.", m_parameters.phiRange);
+           "with nPhi * nPt * nTheta * nPattern = nMLP.", m_parameters.phiRange);
   addParam("invptRange", m_parameters.invptRange,
            "Charge / Pt region in 1/GeV for which experts are trained. "
            "1 value pair, nMLP value pairs or nPt value pairs "
-           "with nPhi * nPt * nTheta = nMLP.", m_parameters.invptRange);
+           "with nPhi * nPt * nTheta * nPattern = nMLP.", m_parameters.invptRange);
   addParam("thetaRange", m_parameters.thetaRange,
            "Theta region in degree for which experts are trained. "
            "1 value pair, nMLP value pairs or nTheta value pairs "
-           "with nPhi * nPt * nTheta = nMLP.", m_parameters.thetaRange);
+           "with nPhi * nPt * nTheta * nPattern = nMLP.", m_parameters.thetaRange);
   addParam("phiRangeTrain", m_parameters.phiRangeTrain,
            "Phi region in degree from which training events are taken. "
            "Can be larger than phiRange to avoid edge effect.", m_parameters.phiRangeTrain);
@@ -103,6 +103,10 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
   addParam("thetaRangeTrain", m_parameters.thetaRangeTrain,
            "Theta region in degree from which training events are taken. "
            "Can be larger than phiRange to avoid edge effect.", m_parameters.thetaRangeTrain);
+  addParam("SLpattern", m_parameters.SLpattern,
+           "Super layer pattern for which experts are trained. "
+           "1 value, nMLP values or nPattern values "
+           "with nPhi * nPt * nTheta * nPattern = nMLP.", m_parameters.SLpattern);
   addParam("tMax", m_parameters.tMax,
            "Maximal drift time (for scaling).", m_parameters.tMax);
   addParam("selectSectorByMC", m_selectSectorByMC,
@@ -282,6 +286,14 @@ void NeuroTriggerTrainerModule::event()
         if (m_trainSets[isector].nSamples() > (nTrainMax + m_nValid + m_nTest)) {
           continue;
         }
+        // check hit pattern
+        unsigned short hitPattern = m_NeuroTrigger.getInputPattern(isector);
+        unsigned short sectorPattern = m_NeuroTrigger[isector].getSLpattern();
+        B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
+        if (sectorPattern > 0 && (sectorPattern & hitPattern) != sectorPattern) {
+          B2DEBUG(250, "hitPattern not matching " << (sectorPattern & hitPattern));
+          continue;
+        }
         // get training data
         m_trainSets[isector].addSample(m_NeuroTrigger.getInputVector(isector), target);
         if (m_saveDebug) {
@@ -354,14 +366,14 @@ NeuroTriggerTrainerModule::updateRelevantID(unsigned isector)
   for (unsigned iSL = 0; iSL < 9; ++iSL) {
     int nWires = cdc.nWiresInLayer(layerId);
     layerId += (iSL > 0 ? 6 : 7);
-    B2DEBUG(120, "SL " << iSL << " (" <<  nWires << " wires)");
+    B2DEBUG(90, "SL " << iSL << " (" <<  nWires << " wires)");
     // get maximum hit counter
     unsigned maxCounter = 0;
     int maxId = 0;
     unsigned counterSum = 0;
     for (int iTS = 0; iTS < nWires; ++iTS) {
       if (m_trainSets[isector].getHitCounter(iSL, iTS) > 0)
-        B2DEBUG(120, iTS << " " << m_trainSets[isector].getHitCounter(iSL, iTS));
+        B2DEBUG(90, iTS << " " << m_trainSets[isector].getHitCounter(iSL, iTS));
       if (m_trainSets[isector].getHitCounter(iSL, iTS) > maxCounter) {
         maxCounter = m_trainSets[isector].getHitCounter(iSL, iTS);
         maxId = iTS;

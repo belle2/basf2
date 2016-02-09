@@ -34,7 +34,7 @@ NeuroTrigger::initialize(const Parameters& p)
     B2ERROR("Number of outputScale lists should be 1 or " << p.nMLP);
     okay = false;
   }
-  bool rangeProduct = (p.phiRange.size() * p.invptRange.size() * p.thetaRange.size() == p.nMLP);
+  bool rangeProduct = (p.phiRange.size() * p.invptRange.size() * p.thetaRange.size() * p.SLpattern.size() == p.nMLP);
   if (!rangeProduct) {
     if (p.phiRange.size() != 1 && p.phiRange.size() != p.nMLP) {
       B2ERROR("Number of phiRange lists should be 1 or " << p.nMLP);
@@ -46,6 +46,10 @@ NeuroTrigger::initialize(const Parameters& p)
     }
     if (p.thetaRange.size() != 1 && p.thetaRange.size() != p.nMLP) {
       B2ERROR("Number of thetaRange lists should be 1 or " << p.nMLP);
+      okay = false;
+    }
+    if (p.SLpattern.size() != 1 && p.SLpattern.size() != p.nMLP) {
+      B2ERROR("Number of SLpattern lists should be 1 or " << p.nMLP);
       okay = false;
     }
   }
@@ -180,6 +184,12 @@ NeuroTrigger::initialize(const Parameters& p)
     vector<float> phiRange = p.phiRangeTrain[indices[0]];
     vector<float> invptRange = p.invptRangeTrain[indices[1]];
     vector<float> thetaRange = p.thetaRangeTrain[indices[2]];
+    unsigned short SLpattern = p.SLpattern[indices[3]];
+    B2DEBUG(50, "Ranges for sector " << iMLP
+            << ": phiRange [" << phiRange[0] << ", " << phiRange[1]
+            << "], invptRange [" << invptRange[0] << ", " << invptRange[1]
+            << "], thetaRange [" << thetaRange[0] << ", " << thetaRange[1]
+            << "], SLpattern " << SLpattern);
     //get scaling values
     vector<float> outputScale = (p.outputScale.size() == 1) ? p.outputScale[0] : p.outputScale[iMLP];
     //convert phi and theta from degree to radian
@@ -192,7 +202,8 @@ NeuroTrigger::initialize(const Parameters& p)
       outputScale[2 * int(p.targetZ) + 1] *= Unit::deg;
     }
     //create new MLP
-    m_MLPs.push_back(CDCTriggerMLP(nNodes, targetVars, outputScale, phiRange, invptRange, thetaRange, p.tMax));
+    m_MLPs.push_back(CDCTriggerMLP(nNodes, targetVars, outputScale,
+                                   phiRange, invptRange, thetaRange, SLpattern, p.tMax));
   }
   // load some values from the geometry that will be needed for the input
   CDCGeometryPar& cdc = CDCGeometryPar::Instance();
@@ -212,15 +223,17 @@ NeuroTrigger::initialize(const Parameters& p)
 vector<unsigned>
 NeuroTrigger::getRangeIndices(const Parameters& p, unsigned isector)
 {
-  std::vector<unsigned> indices = {0, 0, 0};
-  if (p.phiRange.size() * p.invptRange.size() * p.thetaRange.size() == p.nMLP) {
+  std::vector<unsigned> indices = {0, 0, 0, 0};
+  if (p.phiRange.size() * p.invptRange.size() * p.thetaRange.size() * p.SLpattern.size() == p.nMLP) {
     indices[0] = isector % p.phiRange.size();
     indices[1] = (isector / p.phiRange.size()) % p.invptRange.size();
-    indices[2] = isector / (p.phiRange.size() * p.invptRange.size());
+    indices[2] = (isector / (p.phiRange.size() * p.invptRange.size())) % p.thetaRange.size();
+    indices[3] = isector / (p.phiRange.size() * p.invptRange.size() * p.thetaRange.size());
   } else {
     indices[0] = (p.phiRange.size() == 1) ? 0 : isector;
     indices[1] = (p.invptRange.size() == 1) ? 0 : isector;
     indices[2] = (p.thetaRange.size() == 1) ? 0 : isector;
+    indices[3] = (p.SLpattern.size() == 1) ? 0 : isector;
   }
   return indices;
 }
@@ -254,14 +267,26 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
   }
 
   // find sector
-  // should be unique
+  // ranges should be unique
   // if several sectors match, first in the list is taken
   int bestIndex = -1;
   for (unsigned isector = 0; isector < m_MLPs.size(); ++isector) {
     if (m_MLPs[isector].inPhiRange(phi0) && m_MLPs[isector].inPtRange(pt)
         && m_MLPs[isector].inThetaRange(theta)) {
-      bestIndex = isector;
-      break;
+      unsigned short hitPattern = getInputPattern(isector);
+      unsigned short sectorPattern = m_MLPs[isector].getSLpattern();
+      B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
+      // no hit pattern restriction -> keep looking for exact match
+      if (sectorPattern == 0) {
+        B2DEBUG(250, "found match for general sector");
+        bestIndex = isector;
+      }
+      // exact match -> keep this sector
+      if (hitPattern == sectorPattern) {
+        B2DEBUG(250, "found match for hit pattern " << hitPattern);
+        bestIndex = isector;
+        break;
+      }
     }
   }
 
@@ -338,6 +363,31 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
   return relId;
 }
 
+unsigned short
+NeuroTrigger::getInputPattern(unsigned isector)
+{
+  StoreArray<CDCTriggerSegmentHit> hits("CDCTriggerSegmentHits");
+  CDCTriggerMLP& expert = m_MLPs[isector];
+  CDCGeometryPar& cdc = CDCGeometryPar::Instance(); // to transform TDCCount
+  unsigned short hitPattern = 0;
+  // loop over hits
+  for (int ihit = 0; ihit < hits.getEntries(); ++ ihit) {
+    unsigned short iSL = hits[ihit]->getISuperLayer();
+    // get drift time from TDCCount
+    // tentative, should use trigger event time
+    int t = hits[ihit]->getTDCCountWithoutOffset(cdc.getT0(WireID(hits[ihit]->getID())),
+                                                 cdc.getTdcBinWidth());
+    if (t < 0 || t > expert.getTMax()) continue;
+    double relId = getRelId(*hits[ihit]);
+    if (expert.isRelevant(relId, iSL)) {
+      hitPattern |= 1 << iSL;
+      B2DEBUG(250, "hit in SL " << iSL);
+    }
+  }
+  B2DEBUG(250, "hitPattern " << hitPattern);
+  return hitPattern;
+}
+
 vector<float>
 NeuroTrigger::getInputVector(unsigned isector)
 {
@@ -355,6 +405,10 @@ NeuroTrigger::getInputVector(unsigned isector)
   for (int ihit = 0; ihit < hits.getEntries(); ++ ihit) {
     unsigned short iSL = hits[ihit]->getISuperLayer();
     if (inputVector.size() <= 3 * iSL) continue;
+    if (expert.getSLpattern() > 0 && !((expert.getSLpattern() >> iSL) & 1)) {
+      B2DEBUG(250, "skipping hit in SL " << iSL);
+      continue;
+    }
     int priority = hits[ihit]->getPriorityPosition();
     // get drift time from TDCCount
     // tentative, should use trigger event time

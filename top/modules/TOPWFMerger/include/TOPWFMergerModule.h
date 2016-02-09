@@ -124,6 +124,7 @@ namespace Belle2 {
     double m_fraction;    /**< constant fraction discrimination: fraction */
     bool m_useFTSW;  /**< if true add FTSW time to hit times when making TOPDigits */
     int m_activeWindows; /**< number of active ASIC windows */
+    bool m_useSampleTimeCalibration; /**< use sample time calibration */
 
     DBArray<TOPASICChannel> m_asicChannels; /**< pedestal calibration constants */
     /** map of (module, channel) and pedestals */

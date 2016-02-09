@@ -69,6 +69,9 @@ namespace Belle2 {
              "add or not add FTSW time to hit times when making TOPDigits", true);
     addParam("activeWindows", m_activeWindows,
              "number of active ASIC windows (used for logger only)", 64);
+    addParam("useSampleTimeCalibration", m_useSampleTimeCalibration,
+             "if true, use sample time calibration constants from database, "
+             "otherwise use equidistant time axis", false);
 
   }
 
@@ -126,20 +129,24 @@ namespace Belle2 {
       return;
     }
 
-    if (m_sampleTimes.hasChanged()) {
+    if (m_useSampleTimeCalibration) {
+      if (m_sampleTimes.hasChanged()) {
 
-      m_sampleTimeMap.clear();
-      for (const auto& asic : m_sampleTimes) {
-        auto key = getKey(asic.getModuleID(), asic.getChannel());
-        m_sampleTimeMap[key] = &asic;
+        m_sampleTimeMap.clear();
+        for (const auto& asic : m_sampleTimes) {
+          auto key = getKey(asic.getModuleID(), asic.getChannel());
+          m_sampleTimeMap[key] = &asic;
+        }
+
+        B2INFO("TOPWFMerger: new ASIC sample time calibration map of size "
+               << m_sampleTimeMap.size() << " created");
       }
-
-      B2INFO("TOPWFMerger: new ASIC sample time calibration map of size "
-             << m_sampleTimeMap.size() << " created");
+      if (m_sampleTimeMap.empty())
+        B2ERROR("TOPWFMerger: no sample time calibration available - "
+                "will use equidistant sample times");
+    } else {
+      B2INFO("TOPWFMerger: sample time calibration turned OFF");
     }
-    if (m_sampleTimeMap.empty())
-      B2ERROR("TOPWFMerger: no sample time calibration available - "
-              "will use equidistant sample times");
 
   }
 
@@ -209,7 +216,7 @@ namespace Belle2 {
       auto firstWindow = waveform.getFirstWindow();
       auto refWindow = waveform.getReferenceWindow();
       const auto* sampleTime = m_sampleTime; // default calibration
-      if (!m_sampleTimeMap.empty()) {
+      if (m_useSampleTimeCalibration and !m_sampleTimeMap.empty()) {
         auto key = getKey(moduleID, channel);
         sampleTime = m_sampleTimeMap[key];
         if (!sampleTime) {

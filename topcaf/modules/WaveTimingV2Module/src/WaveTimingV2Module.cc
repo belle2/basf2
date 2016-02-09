@@ -12,6 +12,7 @@
 
 
 using namespace Belle2;
+using namespace std;
 
 REG_MODULE(WaveTimingV2);
 
@@ -30,11 +31,6 @@ WaveTimingV2Module::WaveTimingV2Module() : Module()
 
 WaveTimingV2Module::~WaveTimingV2Module() {}
 
-//void WaveTimingV2Module::defineHisto()
-//{
-//  m_occupancy = new TH2F("WaveFormOccupancy", "WaveFormOccupancy", 64, 1, 65, 8, 1, 9);
-//}
-
 void WaveTimingV2Module::initialize()
 {
   m_topcafdigits_ptr.registerInDataStore();
@@ -43,13 +39,10 @@ void WaveTimingV2Module::initialize()
   m_rate = 1.0;
   m_crude_time = 0;
   m_cf_time = 0;
-  //  REG_HISTOGRAM
-
 }
 
 void WaveTimingV2Module::beginRun()
 {
-
   StoreObjPtr<TopConfigurations> topconfig_ptr("", DataStore::c_Persistent);
   if (topconfig_ptr) {
     m_time2tdc = 1. / (topconfig_ptr->getTDCUnit_ns());
@@ -75,8 +68,7 @@ void WaveTimingV2Module::event()
   //   ftsw = evtheader_ptr->GetFTSW();
   // }
 
-
-  TSpectrum* spec = new TSpectrum(max_peaks);
+  TSpectrum spec(max_peaks);
   if (evtwaves_ptr) {
 
     //Look over all waveforms
@@ -88,11 +80,11 @@ void WaveTimingV2Module::event()
       int asic = evtwaves_ptr[w]->GetASIC();
       int asicch = evtwaves_ptr[w]->GetASICChannel();
       //double win_time_shift = evtwaves_ptr[w]->GetTime();
-      std::vector< double > v_samples = evtwaves_ptr[w]->GetSamples();
+      vector<double> v_samples = evtwaves_ptr[w]->GetSamples();
       if (v_samples.size() > 0) {
         // float window_dt = (1. / 0.0212) / 2.0; // need to check this.  I don't like hard coded numbers.
         // float sample_dt = window_dt / 64.0;
-        std::vector<double> v_times;
+        vector<double> v_times;
         //Find rough peak locations
         TH1D m_tmp_h("m_tmp_h", "m_tmp_h", (int)v_samples.size(), 0., (double)v_samples.size());
         /*
@@ -120,9 +112,9 @@ void WaveTimingV2Module::event()
           m_tmp_h.SetBinContent(s, v_samples.at(s));
         }
         //      m_tmp_h->Smooth(2);
-        int search_peaks_found = spec->Search(&m_tmp_h, m_sigma, "nodraw", 0.05);
-        double* xpos = spec->GetPositionX();
-        double* ypos = spec->GetPositionY();
+        int search_peaks_found = spec.Search(&m_tmp_h, m_sigma, "nodraw", 0.05);
+        double* xpos = spec.GetPositionX();
+        double* ypos = spec.GetPositionY();
 
         //Create TOPDigit
         int channelID = -9;

@@ -23,6 +23,8 @@ namespace Belle2 {
 
   private:
     int m_cal_ch;
+    double m_tmin, m_tmax;
+    double m_wmin, m_wmax;
   };
 
 }

@@ -22,6 +22,10 @@ DoubleCalPulseModule::DoubleCalPulseModule() : Module()
   setDescription("This module adjusts the timing of itop hits by searhing for a double calibration pulse in channel 7 of each asic.");
 
   addParam("calibrationChannel", m_cal_ch, "Channel in each ASIC that holds the calibration pulse", 7);
+  addParam("calibrationTimeMin", m_tmin, "Earliest time to look for a calibration pulse", 0.);
+  addParam("calibrationTimeMax", m_tmax, "Latest time to look for a calibration pulse", 2000.);
+  addParam("calibrationWidthMin", m_wmin, "Minimum width of a calibration pulse", 1.3);
+  addParam("calibrationWidthMax", m_wmax, "Maximum width of a calibration pulse", 2000.);
 
 }
 
@@ -67,7 +71,8 @@ void DoubleCalPulseModule::event()
       asicKey += asic * 10000;
       int asic_ch = digit_ptr[w]->GetASICChannel();
 
-      if ((digit_ptr[w]->GetTDCBin() > 0) && (digit_ptr[w]->GetTDCBin() < 1900))
+      if ((digit_ptr[w]->GetTDCBin() > m_tmin) && (digit_ptr[w]->GetTDCBin() < m_tmax) && (digit_ptr[w]->GetWidth() > m_wmin)
+          && (digit_ptr[w]->GetWidth() < m_wmax))
         if ((asic_ch == m_cal_ch) && ((digit_ptr[w]->GetTDCBin() < asic_ref_time[asicKey]) || (asic_ref_time[asicKey] == 0))) {
           asic_ref_time[asicKey] = digit_ptr[w]->GetTDCBin();
           digit_ptr[w]->SetFlag(10);

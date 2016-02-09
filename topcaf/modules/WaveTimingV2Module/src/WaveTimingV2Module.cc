@@ -170,12 +170,12 @@ void WaveTimingV2Module::event()
             while ((v_samples.at(d) > ypos[c]*m_frac) && (d < v_samples.size())) {
               d++;
             }
-            first = v_samples.at(d);
-            second = v_samples.at(d - 1);
-            dV = second - first;
-            double backTime = (d - ((ypos[c] * m_frac) - first) / dV);
-            if (d == v_samples.size()) {
-              backTime = v_samples.size();
+            double backTime = v_samples.size();
+            if (d < v_samples.size()) {
+              first = v_samples.at(d);
+              second = v_samples.at(d - 1);
+              dV = second - first;
+              backTime = (d - ((ypos[c] * m_frac) - first) / dV);
             }
             hit.width = backTime - frontTime;
             hit.chi2 = 0.;

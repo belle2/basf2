@@ -1058,13 +1058,13 @@ namespace Belle2 {
   {
 
     if (_doit == 0 || _doit == 1)
-      doit1(trackList2D, trackList2DFitted);
+      return doit1(trackList2D, trackList2DFitted);
     else if (_doit == 2)
-      doit2(trackList2D, trackList2DFitted);
+      return doit2(trackList2D, trackList2DFitted);
     else if (_doit == 3)
-      doit3(trackList2D, trackList2DFitted);
+      return doit3(trackList2D, trackList2DFitted);
     else
-      doit2(trackList2D, trackList2DFitted);
+      return doit2(trackList2D, trackList2DFitted);
   }
 
   int
@@ -1342,16 +1342,17 @@ namespace Belle2 {
         }
       }
       // Fit2D
-      double rho, phi0, pt;
+      double rho, phi0, pt, chi2;
       rho = 0;
       phi0 = 0;
       pt = 0;
+      chi2 = 0;
       vector<double>phi2DInvError(5);
       for (unsigned iAx = 0; iAx < 5; iAx++) {
         phi2DInvError[iAx] = 1 / phi2DError[iAx];
       }
 
-      Fitter3DUtility::rPhiFitter(&rr2D[0], &phi2D[0], &phi2DInvError[0], rho, phi0); // By JB
+      Fitter3DUtility::rPhiFitter(&rr2D[0], &phi2D[0], &phi2DInvError[0], rho, phi0, chi2); // By JB
       //Fitter3DUtility::rPhiFit(&rr2D[0],&phi2D[0],&phi2DError[0],rho, phi0);
 
       pt = 0.3 * 1.5 * rho / 100;
@@ -1360,6 +1361,18 @@ namespace Belle2 {
         cout << TRGDebug::tab() << "rho: " << rho << endl;
         cout << TRGDebug::tab() << "pt:  " << pt << endl;
       }
+
+      // update track parameters
+      TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5, 0), CLHEP::HepSymMatrix(5, 0));
+      CLHEP::HepVector a(5);
+      a = aTrack.helix().a();
+      a[1] = (aTrack.charge() < 0) ? fmod(phi0 + M_PI, 2 * M_PI) : phi0;
+      a[2] = 1 / pt * aTrack.charge();
+      helix.a(a);
+      aTrack.setFitted(1);
+      aTrack.setHelix(helix);
+      aTrack.set2DFitChi2(chi2);
+
 //ofstream fitout("/home/belle2/kaiyu/2DFit/Pt", fstream::app);//test
 //  fitout<<pt<<endl;
 //ofstream dout("/home/belle2/kaiyu/2DFit/den", fstream::app);

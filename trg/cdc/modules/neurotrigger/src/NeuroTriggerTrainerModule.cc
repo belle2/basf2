@@ -101,6 +101,9 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
            "Can be larger than phiRange to avoid edge effect.", m_parameters.thetaRangeTrain);
   addParam("tMax", m_parameters.tMax,
            "Maximal drift time (for scaling).", m_parameters.tMax);
+  addParam("selectSectorByMC", m_selectSectorByMC,
+           "If true, track parameters for sector selection are taken "
+           "from MCParticle instead of CDCTriggerTrack.", false);
   // parameters for training data preparation
   addParam("nTrainPrepare", m_nTrainPrepare,
            "Number of samples for preparation of relevant ID ranges "
@@ -201,7 +204,8 @@ void NeuroTriggerTrainerModule::event()
     m_NeuroTrigger.updateTrack(*tracks[itrack]);
 
     // find all matching sectors
-    vector<int> sectors = m_NeuroTrigger.selectMLPs(*tracks[itrack]);
+    vector<int> sectors = m_NeuroTrigger.selectMLPs(*tracks[itrack], *mcTrack,
+                                                    m_selectSectorByMC);
     if (sectors.size() == 0) continue;
     // get target values
     vector<float> targetRaw = {};
@@ -442,7 +446,7 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
       }
       // break when validation error increases
       if (epoch > m_checkInterval && valid_mse > validLog[epoch - m_checkInterval]) {
-        B2INFO("Training stopped in epoch " << epoch);
+        B2INFO("Training run " << irun << " stopped in epoch " << epoch);
         B2INFO("Train error: " << mse << ", valid error: " << valid_mse <<
                ", best valid: " << bestValid);
         breakEpoch = epoch;

@@ -71,6 +71,8 @@ namespace Belle2 {
     bool m_load;
     /** Parameters for the NeuroTrigger. */
     NeuroTrigger::Parameters m_parameters;
+    /** Switch for sector selection during training. */
+    bool m_selectSectorByMC;
     /** Number of samples to prepare input ranges. */
     int m_nTrainPrepare;
     /** Cut on the hit counters to get relevant ID ranges. */

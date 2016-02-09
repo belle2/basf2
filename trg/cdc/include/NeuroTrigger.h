@@ -7,6 +7,7 @@ namespace Belle2 {
 
   class CDCTriggerSegmentHit;
   class CDCTriggerTrack;
+  class MCParticle;
 
   /** Class to represent the CDC Neurotrigger.
    *
@@ -108,12 +109,14 @@ namespace Belle2 {
      */
     int selectMLP(const CDCTriggerTrack& track);
 
-    /** Select all matching expert MLPs based on the track parameters of the given track.
+    /** Select all matching expert MLPs based on the track parameters
+     * of the given track estimate or MC particle.
      * This function is used only during training to train overlapping sectors.
      * At the end of the training, sectors are redefined to be unique.
      * @return indices of the selected MLPs, empty if the track does not fit any sector
      */
-    std::vector<int> selectMLPs(const CDCTriggerTrack& track);
+    std::vector<int> selectMLPs(const CDCTriggerTrack& track,
+                                const MCParticle& mcparticle, bool selectByMC);
 
     /** Calculate 2D phi position and arclength for the given track and store them. */
     void updateTrack(const CDCTriggerTrack& track);

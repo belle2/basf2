@@ -274,7 +274,8 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
 }
 
 vector<int>
-NeuroTrigger::selectMLPs(const CDCTriggerTrack& track)
+NeuroTrigger::selectMLPs(const CDCTriggerTrack& track,
+                         const MCParticle& mcparticle, bool selectByMC)
 {
   vector<int> indices = {};
 
@@ -287,20 +288,10 @@ NeuroTrigger::selectMLPs(const CDCTriggerTrack& track)
   float pt = track.getHoughPt() * track.getCharge();
   float theta = M_PI_2;
 
-  //get theta of related MC track
-  RelationVector<MCParticle> mcParticles = track.getRelationsTo<MCParticle>();
-  if (mcParticles.size() > 0) {
-    MCParticle* mcTrack = mcParticles[0];
-    if (mcParticles.size() > 1) {
-      double maxWeight = mcParticles.weight(0);
-      for (unsigned imc = 1; imc < mcParticles.size(); ++imc) {
-        if (mcParticles.weight(imc) > maxWeight) {
-          mcTrack = mcParticles[imc];
-          maxWeight = mcParticles.weight(imc);
-        }
-      }
-    }
-    theta = mcTrack->getMomentum().Theta();
+  if (selectByMC) {
+    phi0 = mcparticle.getMomentum().Phi();
+    pt = mcparticle.getMomentum().Pt() * mcparticle.getCharge();
+    theta = mcparticle.getMomentum().Theta();
   }
 
   // find all matching sectors

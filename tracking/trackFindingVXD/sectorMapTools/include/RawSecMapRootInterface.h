@@ -81,7 +81,7 @@ namespace Belle2 {
 
 
     /** That class shall not be copied. */
-    RawSecMapRootInterface(const RawSecMapRootInterface& rawSecMapInterFace)  = delete;
+//     RawSecMapRootInterface(const RawSecMapRootInterface& rawSecMapInterFace)  = delete;
 
 
     /** initialize the RawSecMapRootInterface for two-hit-combinations (to be called in Module::initialize(). */

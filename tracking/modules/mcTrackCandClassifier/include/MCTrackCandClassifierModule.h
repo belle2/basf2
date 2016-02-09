@@ -83,9 +83,13 @@ namespace Belle2 {
     bool m_applyAnnulus;
     bool m_applySemiplane;
     bool m_applyLap;
-    bool m_mustHaveCluster;
+    bool m_applyWedge;
+    bool m_removeBadHits;
     int m_minHit;
     double m_fraction;
+
+    int nWedge;
+    int nBarrel;
 
     TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
 
@@ -103,6 +107,10 @@ namespace Belle2 {
     TH1F* m_h1_hitRadius_rejected;
     TH1F* m_h1_hitDistance_accepted;
     TH1F* m_h1_hitDistance_rejected;
+
+    TH1F* m_h1_MCTrackCandNhits;
+    TH1F* m_h1_firstRejectedHit;
+    TH1F* m_h1_firstRejectedOVERMCHit;
 
     TH1F* m_h1_lapTime;
     TH1F* m_h1_timeDifference;

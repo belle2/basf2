@@ -66,11 +66,13 @@ MCTrackCandClassifierModule::MCTrackCandClassifierModule() : Module()
   addParam("isInAnnulusCriterium", m_applyAnnulus, " require that the hit is in the expected annulus", bool(true));
   addParam("isInSemiplaneCriterium", m_applySemiplane, " require that the hit is in the expected semiplane", bool(true));
   addParam("isInFirstLapCriterium", m_applyLap, " require that the hit belong to the first lap in the transverse plane", bool(true));
+  addParam("isInWedgePartCriterium", m_applyWedge, " require that the hit belong to the barrel part of the SVD", bool(true));
+  addParam("removeBadHits", m_removeBadHits, " remove the clusters that do not satisfy the criteria from the idealMCTrackCands",
+           bool(true));
 
-  addParam("mustHaveCluster", m_mustHaveCluster, " require that the TrueHit is related to a Cluster ", bool(true));
 
   addParam("minNhits", m_minHit,
-           " minimum number of 1D Clusters (or TrueHits if mustHaveClusters = False) to classify the MCTrackCand as ideal", int(5));
+           " minimum number of 1D Clusters to classify the MCTrackCand as ideal", int(5));
 
   addParam("nSigma_dR", m_nSigma, " n sigma dR", int(3));
 
@@ -117,7 +119,7 @@ void MCTrackCandClassifierModule::initialize()
 
   for (int bin = 0; bin < 10 + 1; bin++) {
     bins_lambda[bin] = - TMath::Pi() / 2 + bin * width_lambda;
-    cout <<  bins_lambda[bin] << "   " <<  bins_theta[bin] << endl;
+    B2DEBUG(1, bins_lambda[bin] << "   " <<  bins_theta[bin]);
   }
 
   m_h3_MCParticle = createHistogram3D("h3MCParticle", "entry per MCParticle",
@@ -195,10 +197,23 @@ void MCTrackCandClassifierModule::initialize()
   m_histoList->Add(m_h1_nBad1dInfo);
   m_h1_nBad1dInfo->GetXaxis()->SetTitle("number of hits");
 
+  m_h1_firstRejectedHit = new TH1F("h1idealMCTCnHit", "idealMCTrackCands number of hits", 40, 0, 40);
+  m_histoList->Add(m_h1_firstRejectedHit);
+  m_h1_firstRejectedHit->GetXaxis()->SetTitle("# idealMCTrackCands hits");
+
+  m_h1_firstRejectedOVERMCHit = new TH1F("h1FirstRejOVERmc", "# idealMCTrackCands hits / # MCTrackCands hits", 100, 0, 1);
+  m_histoList->Add(m_h1_firstRejectedOVERMCHit);
+  m_h1_firstRejectedOVERMCHit->GetXaxis()->SetTitle("# idealMCTrackCands hits / # MCTrackCands hits");
+
+  m_h1_MCTrackCandNhits = (TH1F*)duplicateHistogram("h1MCTrackCandNhits", "number of MCTrackCands hits", m_h1_firstRejectedHit,
+                                                    m_histoList);
+
 }
 void MCTrackCandClassifierModule::beginRun()
 {
 
+  nWedge = 0;
+  nBarrel = 0;
 }
 
 
@@ -232,7 +247,7 @@ void MCTrackCandClassifierModule::event()
     RelationVector<MCParticle> MCParticles_fromMCTrackCand = DataStore::getRelationsFromObj<MCParticle>(&mcTrackCand);
 
     B2DEBUG(1, "~~~ " << MCParticles_fromMCTrackCand.size() << " MCParticles related to this MCTrackCand");
-    for (int mcp = 0; mcp < (int)MCParticles_fromMCTrackCand.size(); mcp++) {
+    for (int mcp = 0; mcp < (int)MCParticles_fromMCTrackCand.size(); mcp++) { //should be ONE
 
       MCParticle mcParticle = *MCParticles_fromMCTrackCand[mcp];
 
@@ -261,9 +276,12 @@ void MCTrackCandClassifierModule::event()
 
       //recover Clusters and loop on them
       int Nhits = mcTrackCand.getNHits();
+      m_h1_MCTrackCandNhits->Fill(Nhits);
 
       int cluster = 0;
+      bool hasTrueHit = true;
       bool isAccepted = true;
+      int firstRejectedHit =  Nhits + 1;
       double prevHitRadius = abs(1 / omega);
 
       double lapTime = 2 * M_PI * mcParticle.getEnergy() / 0.299792 / magField.Z();
@@ -272,7 +290,7 @@ void MCTrackCandClassifierModule::event()
 
       bool isFirstSVDhit = true;
 
-      while (cluster < Nhits && isAccepted) {
+      while (cluster < Nhits && isAccepted && hasTrueHit) {
 
         int detId, hitId;
         mcTrackCand.getHit(cluster, detId, hitId);
@@ -293,6 +311,7 @@ void MCTrackCandClassifierModule::event()
           RelationVector<PXDTrueHit> PXDTrueHit_fromPXDCluster = DataStore::getRelationsFromObj<PXDTrueHit>(aPXDCluster);
           if (PXDTrueHit_fromPXDCluster.size() == 0) {
             B2WARNING("What's happening?!? no True Hit associated to the PXD Cluster");
+            hasTrueHit = false;
             isAccepted = false;
             continue;
           }
@@ -316,6 +335,7 @@ void MCTrackCandClassifierModule::event()
           RelationVector<SVDTrueHit> SVDTrueHit_fromSVDCluster = DataStore::getRelationsFromObj<SVDTrueHit>(aSVDCluster);
           if (SVDTrueHit_fromSVDCluster.size() == 0) {
             B2WARNING("What's happening?!? no True Hit associated to the SVD Cluster");
+            hasTrueHit = false;
             isAccepted = false;
             continue;
           }
@@ -345,6 +365,15 @@ void MCTrackCandClassifierModule::event()
         }
 
         const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
+        bool accepted4 = true;
+        if (m_applyWedge) {
+          if (aSensorInfo.getForwardWidth() != aSensorInfo.getBackwardWidth()) {
+            nWedge++;
+            accepted4 = false;
+          } else
+            nBarrel++;
+        }
+
         TVector3 globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
         double hitRadius = theDistance(center, globalHit);
 
@@ -386,7 +415,7 @@ void MCTrackCandClassifierModule::event()
           B2DEBUG(1, "     lapTime: REJECTED, next track");
         }
 
-        if (accepted2 && accepted1 && accepted3) {
+        if (accepted2 && accepted1 && accepted3 && accepted4) {
           nGoodTrueHits ++;
           m_h1_hitDistance_accepted->Fill(theDistance(TVector3(0, 0, 0), globalHit));
           m_h1_hitRadius_accepted->Fill(hitRadius);
@@ -394,7 +423,8 @@ void MCTrackCandClassifierModule::event()
           nBadTrueHits ++;
           m_h1_hitDistance_rejected->Fill(theDistance(TVector3(0, 0, 0), globalHit));
           m_h1_hitRadius_rejected->Fill(hitRadius);
-
+          if (m_removeBadHits)
+            firstRejectedHit = cluster;
           isAccepted = false;
           continue;
         }
@@ -418,37 +448,38 @@ void MCTrackCandClassifierModule::event()
 
       }//close loop on clusters
 
-      if (m_mustHaveCluster) {
-        if (nGood1Dinfo >= m_minHit) {
-          B2DEBUG(1, "  idealMCTrackCand FOUND!! " << nGood1Dinfo << " 1D infos (" << nGoodTrueHits << " good true hits)");
-          m_h3_idealMCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getLambda(), mcParticleInfo.getPphi());
-          m_h1_nGoodTrueHits->Fill(nGoodTrueHits);
-          m_h1_nGood1dInfo->Fill(nGood1Dinfo);
-          idealMCTrackCands.appendNew(mcTrackCand);
-          //    m_selector.select( [](const genfit::TrackCand *){ return true;} );
-        } else {
-          B2DEBUG(1, "  too few good hits (" << nGood1Dinfo << ") to track this one ( vs " << nGoodTrueHits << " true hits)");
-          m_h1_nBadTrueHits->Fill(nGoodTrueHits);
-          m_h1_nBad1dInfo->Fill(nGood1Dinfo);
+      if (nGood1Dinfo >= m_minHit) {
+        B2DEBUG(1, "  idealMCTrackCand FOUND!! " << nGood1Dinfo << " 1D infos (" << nGoodTrueHits << " good true hits)");
+        m_h3_idealMCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getLambda(), mcParticleInfo.getPphi());
+        m_h1_nGoodTrueHits->Fill(nGoodTrueHits);
+        m_h1_nGood1dInfo->Fill(nGood1Dinfo);
+
+        genfit::TrackCand* tmpTrackCand = new genfit::TrackCand(mcTrackCand);
+
+        if ((int)firstRejectedHit <= (int)mcTrackCand.getNHits()) {
+          tmpTrackCand->reset();
+          for (int hit = 0; hit < firstRejectedHit; hit++)
+            if (mcTrackCand.getHit(hit))
+              tmpTrackCand->addHit(mcTrackCand.getHit(hit));
+          tmpTrackCand->sortHits();
         }
+        idealMCTrackCands.appendNew(*tmpTrackCand);
+
+        m_h1_firstRejectedHit->Fill(tmpTrackCand->getNHits());
+        m_h1_firstRejectedOVERMCHit->Fill((float)tmpTrackCand->getNHits() / mcTrackCand.getNHits());
+
+        //    m_selector.select( [](const genfit::TrackCand *){ return true;} );
+
       } else {
-        if (nGoodTrueHits >= m_minHit) {
-          B2DEBUG(1, "  idealMCTrackCand FOUND!! " << nGoodTrueHits << " TrueHits (" << nGood1Dinfo << " good 1D info)");
-          m_h3_idealMCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getLambda(), mcParticleInfo.getPphi());
-          m_h1_nGoodTrueHits->Fill(nGoodTrueHits);
-          idealMCTrackCands.appendNew(mcTrackCand);
-          //    m_selector.select( [](const genfit::TrackCand *){ return true;} );
-        } else {
-          B2INFO("  too few good true hits " << nGoodTrueHits);
-          m_h1_nBadTrueHits->Fill(nGoodTrueHits);
-        }
+        B2DEBUG(1, "  too few good hits (" << nGood1Dinfo << ") to track this one ( vs " << nGoodTrueHits << " true hits)");
+        m_h1_nBadTrueHits->Fill(nGoodTrueHits);
+        m_h1_nBad1dInfo->Fill(nGood1Dinfo);
       }
 
       B2DEBUG(1, "");
 
-    } //close loop on MCParticles
+    }//close loop on MCParticles
   }//close loop on MCTrackCands
-
 }
 
 void MCTrackCandClassifierModule::endRun()
@@ -458,15 +489,14 @@ void MCTrackCandClassifierModule::endRun()
   B2INFO("rootfilename = " << m_rootFileName);
   B2INFO("use PXD informations = " << m_usePXD);
   B2INFO("--> classification criteria:")
-  if (m_mustHaveCluster)
-    B2INFO("  -)  a 1D or 2D Cluster must be related to the TrueHit");
   if (m_applyAnnulus)
     B2INFO("  -)  |d - R| < " << m_nSigma << " dL thetaMS");
   if (m_applySemiplane)
     B2INFO("  -)  hit in the expected semiplane");
   if (m_applyLap)
     B2INFO("  -)  HitTime < " << m_fraction << " lap time");
-
+  if (m_applyWedge)
+    B2INFO("  -)  hit must be in the barrel part of the VXD");
   B2INFO("");
 
   double num = 0;
@@ -489,7 +519,8 @@ void MCTrackCandClassifierModule::endRun()
   B2INFO("        # MCTrackCand = " << den);
   B2INFO("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
   B2INFO("");
-
+  B2DEBUG(1, "  nWedge = " << nWedge);
+  B2DEBUG(1, " nBarrel = " << nBarrel);
 }
 
 

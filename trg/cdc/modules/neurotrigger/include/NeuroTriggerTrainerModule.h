@@ -6,7 +6,7 @@
 #include <trg/cdc/NeuroTrigger.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPData.h>
 
-#include <parallel_fann.hpp>
+#include <TH1D.h>
 
 namespace Belle2 {
   /** The NeuroTriggerTrainer module of the CDC trigger.
@@ -67,6 +67,8 @@ namespace Belle2 {
     std::string m_arrayname;
     /** Name of the TObjArray holding the training samples. */
     std::string m_trainArrayname;
+    /** If true, save training curve and parameter distribution of training data. */
+    bool m_saveDebug;
     /** Switch to load saved parameters from a previous run. */
     bool m_load;
     /** Parameters for the NeuroTrigger. */
@@ -109,6 +111,14 @@ namespace Belle2 {
     NeuroTrigger m_NeuroTrigger;
     /** Sets of training data for all sectors. */
     std::vector<CDCTriggerMLPData> m_trainSets;
+
+    //monitoring histograms
+    std::vector<TH1D*> phiHistsMC;
+    std::vector<TH1D*> ptHistsMC;
+    std::vector<TH1D*> thetaHistsMC;
+    std::vector<TH1D*> zHistsMC;
+    std::vector<TH1D*> phiHists2D;
+    std::vector<TH1D*> ptHists2D;
   };
 }
 

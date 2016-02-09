@@ -1,4 +1,5 @@
 #include "trg/cdc/modules/neurotrigger/NeuroTriggerTrainerModule.h"
+#include <parallel_fann.hpp>
 
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -54,6 +55,9 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
   addParam("trainArrayname", m_trainArrayname,
            "Name of the TObjArray to hold the training samples.",
            string("trainSets"));
+  addParam("saveDebug", m_saveDebug,
+           "If true, save parameter distribution of training data "
+           "in train file and training curve in log file.", true);
   addParam("load", m_load,
            "Switch to load saved parameters if existing. "
            "Take care not to duplicate training sets!", false);
@@ -178,6 +182,36 @@ void NeuroTriggerTrainerModule::initialize()
     m_nTrainMin = m_nTrainMax;
     B2WARNING("nTrainMin set to " << m_nTrainMin << " (was larger than nTrainMax)");
   }
+
+  // initialize monitoring histograms
+  if (m_saveDebug) {
+    for (unsigned iMLP = 0; iMLP < m_NeuroTrigger.nSectors(); ++iMLP) {
+      phiHistsMC.push_back(
+        new TH1D(("phiMC" + to_string(iMLP)).c_str(),
+                 ("MC phi in sector " + to_string(iMLP)).c_str(),
+                 100, -2 * M_PI, 2 * M_PI));
+      ptHistsMC.push_back(
+        new TH1D(("ptMC" + to_string(iMLP)).c_str(),
+                 ("MC charge / pt in sector " + to_string(iMLP)).c_str(),
+                 100, -5., 5.));
+      thetaHistsMC.push_back(
+        new TH1D(("thetaMC" + to_string(iMLP)).c_str(),
+                 ("MC theta in sector " + to_string(iMLP)).c_str(),
+                 100, 0., M_PI));
+      zHistsMC.push_back(
+        new TH1D(("zMC" + to_string(iMLP)).c_str(),
+                 ("MC z in sector " + to_string(iMLP)).c_str(),
+                 200, -100., 100.));
+      phiHists2D.push_back(
+        new TH1D(("phi2D" + to_string(iMLP)).c_str(),
+                 ("2D phi in sector " + to_string(iMLP)).c_str(),
+                 100, -2 * M_PI, 2 * M_PI));
+      ptHists2D.push_back(
+        new TH1D(("pt2D" + to_string(iMLP)).c_str(),
+                 ("2D charge / pt in sector " + to_string(iMLP)).c_str(),
+                 100, -5., 5.));
+    }
+  }
 }
 
 void NeuroTriggerTrainerModule::event()
@@ -250,6 +284,14 @@ void NeuroTriggerTrainerModule::event()
         }
         // get training data
         m_trainSets[isector].addSample(m_NeuroTrigger.getInputVector(isector), target);
+        if (m_saveDebug) {
+          phiHistsMC[isector]->Fill(mcTrack->getMomentum().Phi());
+          ptHistsMC[isector]->Fill(mcTrack->getCharge() / mcTrack->getMomentum().Pt());
+          thetaHistsMC[isector]->Fill(mcTrack->getMomentum().Theta());
+          zHistsMC[isector]->Fill(mcTrack->getProductionVertex().Z());
+          phiHists2D[isector]->Fill(tracks[itrack]->getHoughPhiVertex());
+          ptHists2D[isector]->Fill(tracks[itrack]->getCharge() / tracks[itrack]->getHoughPt());
+        }
       }
     }
   }
@@ -492,11 +534,13 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
     }
   }
   // save training log
-  ofstream logstream(m_logFilename + "_" + to_string(isector) + ".log");
-  for (unsigned i = 0; i < bestTrainLog.size(); ++i) {
-    logstream << bestTrainLog[i] << " " << bestValidLog[i] << endl;
+  if (m_saveDebug) {
+    ofstream logstream(m_logFilename + "_" + to_string(isector) + ".log");
+    for (unsigned i = 0; i < bestTrainLog.size(); ++i) {
+      logstream << bestTrainLog[i] << " " << bestValidLog[i] << endl;
+    }
+    logstream.close();
   }
-  logstream.close();
   // free memory
   fann_destroy_train(train_data);
   fann_destroy_train(valid_data);
@@ -512,11 +556,33 @@ NeuroTriggerTrainerModule::saveTraindata(const string& filename, const string& a
   TObjArray* trainSets = new TObjArray(m_trainSets.size());
   for (unsigned isector = 0; isector < m_trainSets.size(); ++isector) {
     trainSets->Add(&m_trainSets[isector]);
+    if (m_saveDebug) {
+      phiHistsMC[isector]->Write(phiHistsMC[isector]->GetName(), TObject::kOverwrite);
+      ptHistsMC[isector]->Write(ptHistsMC[isector]->GetName(), TObject::kOverwrite);
+      thetaHistsMC[isector]->Write(thetaHistsMC[isector]->GetName(), TObject::kOverwrite);
+      zHistsMC[isector]->Write(zHistsMC[isector]->GetName(), TObject::kOverwrite);
+      phiHists2D[isector]->Write(phiHists2D[isector]->GetName(), TObject::kOverwrite);
+      ptHists2D[isector]->Write(ptHists2D[isector]->GetName(), TObject::kOverwrite);
+    }
   }
   trainSets->Write(arrayname.c_str(), TObject::kSingleKey | TObject::kOverwrite);
   datafile.Close();
   trainSets->Clear();
   delete trainSets;
+  for (unsigned isector = 0; isector < phiHistsMC.size(); ++ isector) {
+    delete phiHistsMC[isector];
+    delete ptHistsMC[isector];
+    delete thetaHistsMC[isector];
+    delete zHistsMC[isector];
+    delete phiHists2D[isector];
+    delete ptHists2D[isector];
+  }
+  phiHistsMC.clear();
+  ptHistsMC.clear();
+  thetaHistsMC.clear();
+  zHistsMC.clear();
+  phiHists2D.clear();
+  ptHists2D.clear();
 }
 
 bool

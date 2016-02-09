@@ -23,6 +23,8 @@ WaveTimingV2Module::WaveTimingV2Module() : Module()
   addParam("time2TDC", m_time2tdc, "Conversion factor to match iTOPDigit time scale [time unit/ns]", 40.0);
   addParam("sigma", m_sigma, "Sigma of searched peaks (see TSpectrum)", 2.);
   addParam("threshold", m_thresh, "Threshold for peak search", 50.);
+  addParam("fraction", m_frac, "Fraction of peak height to use for hit timing parameters [0,1]", 0.5);
+  addParam("dTcalib", m_dTcalib, "Apply dT calibration.  Data must be in topcaf/data/ directory.", false);
 }
 
 
@@ -42,6 +44,7 @@ void WaveTimingV2Module::initialize()
   m_crude_time = 0;
   m_cf_time = 0;
   //  REG_HISTOGRAM
+
 }
 
 void WaveTimingV2Module::beginRun()
@@ -87,16 +90,32 @@ void WaveTimingV2Module::event()
       //double win_time_shift = evtwaves_ptr[w]->GetTime();
       std::vector< double > v_samples = evtwaves_ptr[w]->GetSamples();
       if (v_samples.size() > 0) {
-        // int refwin = evtwaves_ptr[w]->GetRefWindow();
-        // int win = evtwaves_ptr[w]->GetASICWindow();
         // float window_dt = (1. / 0.0212) / 2.0; // need to check this.  I don't like hard coded numbers.
         // float sample_dt = window_dt / 64.0;
-
-        //coarse time setup
-        // int coarse_int = refwin > win ? refwin - win : 64 - (win - refwin);
-        // float coarse_t = float(coarse_int) * window_dt;
+        std::vector<double> v_times;
         //Find rough peak locations
         TH1D m_tmp_h("m_tmp_h", "m_tmp_h", (int)v_samples.size(), 0., (double)v_samples.size());
+        /*
+        i/f(dTcalib) {
+
+         int win = evtwaves_ptr[w]->GetASICWindow(); // 1st window in waveform.
+         double winDt = 47.163878;  // ns
+         double dt    = winDt/128.;
+         double t     = 0.;
+         double zerot = tOffset = (win/4)*(2*winDt);
+         double dtcorr;
+
+         for(int c=0;c<vsamples.size();c++){
+           win = c/64;
+           tOffset = (win/4)*(2*winDt);  // winDt = 47.163878 ns
+           dtcorr = dT[iNTM][iBS][iCar][iASIC][iCH][iDT];
+         }
+
+        }
+        else{
+        TH1D m_tmp_h("m_tmp_h", "m_tmp_h", (int)v_samples.size(), 0., (double)v_samples.size());
+        }
+        */
         for (unsigned int s = 0; s < v_samples.size(); s++) {
           m_tmp_h.SetBinContent(s, v_samples.at(s));
         }
@@ -129,22 +148,42 @@ void WaveTimingV2Module::event()
         hit.pmt_id = pmtID;
         hit.pmtch_id = pmtchID;
         int peaks_found = 0;
-        TF1* hitfit;
         for (int c = 0; c < search_peaks_found; c++) {
           if (ypos[c] > m_thresh) {
             peaks_found++;
-            hitfit = new TF1("hitfit", "gaus", xpos[c] - 10, xpos[c] + 10);
-            m_tmp_h.Fit("hitfit", "RQ");
-            //    hit.adc_height = ypos[c];
-            hit.adc_height = hitfit->GetParameter(0);
-            //    hit.tdc_bin = xpos[c];
-            hit.tdc_bin = hitfit->GetParameter(1);
-            hit.width = hitfit->GetParameter(2);
-            hit.chi2 = hitfit->GetChisquare();
+            hit.adc_height = ypos[c];
+            unsigned int d = (xpos[c] + 0.5); // First measure front edge.
+            while ((v_samples.at(d) > ypos[c]*m_frac) && (d > 0)) {
+              d--;
+            }
+
+            double first = v_samples.at(d);
+            double second = v_samples.at(d + 1);
+            double dV = second - first;
+            double frontTime = (d + ((ypos[c] * m_frac) - first) / dV);
+            if (d == 0) {
+              frontTime = 0.;
+            }
+            hit.tdc_bin = frontTime;
+
+            d = (xpos[c] + 0.5); // Now measure back edge.
+            while ((v_samples.at(d) > ypos[c]*m_frac) && (d < v_samples.size())) {
+              d++;
+            }
+            first = v_samples.at(d);
+            second = v_samples.at(d - 1);
+            dV = second - first;
+            double backTime = (d - ((ypos[c] * m_frac) - first) / dV);
+            if (d == v_samples.size()) {
+              backTime = v_samples.size();
+            }
+            hit.width = backTime - frontTime;
+            hit.chi2 = 0.;
+
             hits.push_back(hit);
 
-            B2DEBUG(1, hardwareID << " peak found (" << xpos[c] << "," << ypos[c] << ")\twidth: " << hit.width << "\tchi2: " << hit.chi2);
-            delete hitfit;
+            B2DEBUG(1, hardwareID << " peak found (" << xpos[c] << "," << ypos[c] << ")\twidth: " << hit.width << "\ttdc: " << hit.tdc_bin <<
+                    "\tfrontTime: " << frontTime << "\tbackTime: " << backTime);
           }
 
         }

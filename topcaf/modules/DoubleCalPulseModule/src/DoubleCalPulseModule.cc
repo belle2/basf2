@@ -67,7 +67,7 @@ void DoubleCalPulseModule::event()
       asicKey += asic * 10000;
       int asic_ch = digit_ptr[w]->GetASICChannel();
 
-      if ((digit_ptr[w]->GetTDCBin() > 600) && (digit_ptr[w]->GetTDCBin() < 1100))
+      if ((digit_ptr[w]->GetTDCBin() > 0) && (digit_ptr[w]->GetTDCBin() < 1900))
         if ((asic_ch == m_cal_ch) && ((digit_ptr[w]->GetTDCBin() < asic_ref_time[asicKey]) || (asic_ref_time[asicKey] == 0))) {
           asic_ref_time[asicKey] = digit_ptr[w]->GetTDCBin();
           digit_ptr[w]->SetFlag(10);

@@ -2121,7 +2121,7 @@ namespace Belle2 {
                               track3D->get3DFitChi2());
       // relation to SegmentHits (from track3D to include both axial and stereo TS)
       vector<TRGCDCLink*> links = track3D->links();
-      vector<unsigned> *relParticleIds = new vector<unsigned> [nAxialSuperLayers()];
+      vector<unsigned>* relParticleIds = new vector<unsigned> [nAxialSuperLayers()];
       for (unsigned its = 0; its < links.size(); ++its) {
         TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
         track->addRelationTo(segment->storeHit());
@@ -2141,7 +2141,7 @@ namespace Belle2 {
           track->addRelationTo(particles[relParticleIds[iax][imc]], weight);
         }
       }
-      delete relParticleIds;
+      delete[] relParticleIds;
 
       RelationArray tracksToParticles(storeTracks, particles);
       if (tracksToParticles.getEntries() > 0)

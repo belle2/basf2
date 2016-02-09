@@ -319,8 +319,8 @@ void PXDDataRedAnalysisModule::initialize()
   //analysis
   Double_t lowBin[6 + 1];
   for (int i = 0; i < 6; i++)
-    lowBin[i] = pt[6 - 1 - i] - ptErr[6 - 1 - i];
-  lowBin[6] = pt[0] + ptErr[0];
+    lowBin[i] = pt[i] - ptErr[i];
+  lowBin[6] = pt[5] + ptErr[5];
 
   m_h1digiIn = new TH1F("hDigiIn", "PXDDigits contained in a ROI", 6, lowBin);
   m_h1digiOut2 = new TH1F("hDigiOut2", "lost PXDDigits: ROI exists with right VxdID", 6, lowBin);

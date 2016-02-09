@@ -31,4 +31,11 @@ an entry within this list has to be added after adding the friendList-file to th
 	<!-- tests june7 - run 470 -->
 	<xi:include href="testBeamMini6GeVJune08MagnetOnSVD-moreThan1500MeV_SVD.xml"/>
 	<xi:include href="testBeamMini6GeVJune08MagnetOffSVD-moreThan1500MeV_SVD.xml"/>
+
+  <!-- 2016 test beam geometry -->
+  <xi:include href="TB2016Test8Feb2016MagnetOffPXDSVD-moreThan1500MeV_PXDSVD.xml"/>
+  <xi:include href="TB2016Test8Feb2016MagnetOffSVD-moreThan1500MeV_SVD.xml"/>
+  <xi:include href="TB2016Test8Feb2016MagnetOnPXDSVD-moreThan1500MeV_PXDSVD.xml"/>
+  <xi:include href="TB2016Test8Feb2016MagnetOnSVD-moreThan1500MeV_SVD.xml"/>
+
 </CATFParameters>

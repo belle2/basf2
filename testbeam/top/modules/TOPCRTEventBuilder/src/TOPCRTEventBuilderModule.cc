@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -81,43 +81,51 @@ namespace Belle2 {
     m_tree = new TChain("tree");
 
     int numFiles = 0;
-    for (auto file : m_inputFileNames) {
+    for (const auto& fileName : m_inputFileNames) {
 
       // wildcarding is not allowed
-      if (TString(file.c_str()).Contains("*")) {
-        B2WARNING(file << ": skip it, wildcards in file name are not allowed!");
+      if (TString(fileName.c_str()).Contains("*")) {
+        B2WARNING(fileName << ": skip it, wildcards in file name are not allowed!");
         continue;
       }
 
       // check for the file existance
-      TFile* f = TFile::Open(file.c_str(), "READ");
+      TFile* f = TFile::Open(fileName.c_str(), "READ");
       if (!f) {
-        B2WARNING(file << ": file not found");
+        B2WARNING(fileName << ": file not found");
         continue;
       }
       if (!f->IsOpen()) {
-        B2WARNING(file << ": can't open file");
+        B2WARNING(fileName << ": can't open file");
         continue;
       }
 
       // check for the existanece of 'tree'
       TTree* tree = (TTree*)f->Get("tree");
       if (!tree) {
-        B2WARNING(file << ": TTree 'tree' not found -> "
+        B2WARNING(fileName << ": TTree 'tree' not found -> "
                   << "skip it, not a basf2 root file");
         continue;
       }
       // check for existence of a branch 'RawDataBlocks'
       if (!tree->GetBranch("RawDataBlocks")) {
-        B2WARNING(file << ": TBranch 'RawDataBlocks' not found -> "
+        B2WARNING(fileName << ": TBranch 'RawDataBlocks' not found -> "
                   << "skip it, not a PocketDAQ root file");
         continue;
       }
 
       f->Close();
 
-      numFiles += m_tree->Add(file.c_str());
+      int num = m_tree->Add(fileName.c_str());
+      numFiles += num;
+
+      if (num != 0) {
+        m_runNumbers.push_back(getRunNumber(fileName));
+      } else {
+        B2WARNING(fileName << ": not added to TChain");
+      }
     }
+
     if (numFiles == 0) {
       B2FATAL("no PocketDAQ file(s) in the list");
       return;
@@ -132,10 +140,6 @@ namespace Belle2 {
       return;
     }
     m_tree->SetBranchAddress("RawDataBlocks", &m_cloneArray);
-
-    // deduce run number from file name
-    m_inputFileName = m_inputFileNames[0]; // quick fix!!!!! TODO !!!
-    m_runNumber = getRunNumber(m_inputFileName);
 
     // register in DataStore
     StoreObjPtr<EventMetaData> evtMetaData;
@@ -173,6 +177,8 @@ namespace Belle2 {
 
     while (m_entryCount < m_numEntries) {
       m_tree->GetEntry(m_entryCount);
+      m_runNumber = m_runNumbers[m_tree->GetTreeNumber()];
+
       int numEntries = m_cloneArray->GetEntriesFast();
       if (numEntries != 1)
         B2ERROR("RawDataBlocks: expect single entry, got " << numEntries <<
@@ -229,7 +235,7 @@ namespace Belle2 {
 
   int TOPCRTEventBuilderModule::getRunNumber(const std::string& fileName)
   {
-    auto ii = fileName.rfind("run");
+    auto ii = fileName.find("run");
     if (ii == std::string::npos) {
       B2WARNING("Cannot deduce run number from file name");
       return -1;
@@ -239,6 +245,12 @@ namespace Belle2 {
     auto substr = fileName.substr(i1, i2 - i1);
     std::stringstream ss;
     int runNumber = 0;
+    ss << substr;
+    ss >> runNumber;
+    if (!ss.fail()) return abs(runNumber);
+
+    i2 = substr.find("_");
+    substr = substr.substr(i1, i2 - i1);
     ss << substr;
     ss >> runNumber;
     if (ss.fail()) {

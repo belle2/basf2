@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -101,6 +101,7 @@ namespace Belle2 {
 
     std::string m_inputFileName; /**< input file name */
     std::vector<std::string> m_inputFileNames; /**< list of input file names */
+
     TChain* m_tree = 0; /**< tree ptr */
     int m_numEntries = 0; /**< number of tree entries */
     int m_entryCount = 0; /**< tree entry counter */
@@ -109,6 +110,7 @@ namespace Belle2 {
     int m_evtNumber = 0; /**< current event number */
     int m_runNumber = 0; /**< run number */
     int m_expNumber = 0; /**< experiment number */
+    std::vector<int> m_runNumbers; /**< run numbers deduced from file names */
 
   };
 

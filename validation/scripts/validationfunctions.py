@@ -164,7 +164,7 @@ def parse_cmd_line_arguments():
                         type=str, nargs='*')
     parser.add_argument("-s", "--select", help="The file name of one or more "
                         "comma separated validation scripts that should be "
-                        "executed exclusively. All dependant scripts will also"
+                        "executed exclusively. All dependent scripts will also "
                         "be executed. E.g. -s ECL2D.C",
                         type=str, nargs='*')
     parser.add_argument("-si", "--select-ignore-dependencies", help="The file "

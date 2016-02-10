@@ -44,17 +44,16 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    FlavorTaggerInfoMap()
-    {
-      m_targetTrackLevel = {};
-      m_probTrackLevel = {};
-      m_targetEventLevel = {};
-      m_probEventLevel = {};
-      m_qrCategory = {};
-      m_qrCombined = -2;
-      m_B0Probability = -2;
-      m_B0barProbability = -2;
-    };
+    FlavorTaggerInfoMap():
+      m_targetTrackLevel( {}),
+                        m_probTrackLevel({}),
+                        m_targetEventLevel({}),
+                        m_probEventLevel({}),
+                        m_qrCategory({}),
+                        m_qrCombined(-2),
+                        m_B0Probability(-2),
+                        m_B0barProbability(-2)
+    {}
 
 
     /**
@@ -154,17 +153,17 @@ namespace Belle2 {
     */
     std::map<std::string, float> getQrCategory();
 
-    /**< qr Output of the Combiner
+    /**qr Output of the Combiner. Output of the FlavorTagger after the complete process.
     * @return qr
     */
     float getQrCombined();
 
-    /**Probability of being a B0.
+    /**Probability of being a B0. Output of the FlavorTagger after the complete process.
     * @return B0Probability
     */
     float getB0Probability();
 
-    /**Probability of being a B0bar.
+    /**Probability of being a B0bar. Output of the FlavorTagger after the complete process.
     * @return B0barProbability
     */
     float getB0barProbability(); /**< Direct Output of the Combiner: Probability of being a B0bar).*/

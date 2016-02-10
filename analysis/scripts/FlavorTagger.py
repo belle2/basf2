@@ -19,15 +19,22 @@ import os
 class FlavorTaggerInfoFiller(Module):
 
     """
-    Creates a new FlavorTaggerInfo DataObject and saves there all the relevant information of the
-    FlavorTagging:
-    - Track probability of being the right target for every category (right target means
-      coming directly from the B)
-    - Highest probability track's pointer
-    - Event probability of belonging to a given category
+    Creates a new FlavorTaggerInfoMap DataObject for a specific method. Saves there all the relevant information of the
+    FlavorTagger:
+    -The pointer to the track with highest target probability in Track Level for each category*/
+    -The highest target track probability in Track Level for each category*/
+    -The pointer to the track with highest category probability in Event Level*/
+    -The highest category probability in Event Level for each category*/
+    -The qr Output of each category, i.e. the Combiner input values. They could be used for independent tags.*/
+
+    -qr Output of the Combiner.
+    -Direct Output of the Combiner: Probability of being a B0.*/
+    -Direct Output of the Combiner: Probability of being a B0bar).*/
     """
 
     def event(self):
+        """ Process for each event """
+
         path = analysis_main
         info = Belle2.PyStoreObj('EventExtraInfo')  # Calls the event extra info were all Flavor Tagging Info is saved
         weightFiles = 'B2JpsiKs_mu'
@@ -105,6 +112,7 @@ class RemoveEmptyROEModule(Module):
     """
 
     def event(self):
+        """ Process for each event """
         self.return_value(0)
         roe = Belle2.PyStoreObj('RestOfEvent')
         B0 = roe.obj().getRelated('Particles')
@@ -122,6 +130,7 @@ class RemoveWrongMCMatchedROEs(Module):
     """
 
     def event(self):
+        """ Process for each event """
         self.return_value(0)
         someParticle = Belle2.Particle(None)
         if mc_variables.variables.evaluate('qrCombined', someParticle) < 0:
@@ -137,6 +146,7 @@ class RemoveExtraInfoModule(Module):
     """
 
     def event(self):
+        """ Process for each event """
         ModeCode = GetModeCode()
         for particleList in EventLevelParticleLists:
             plist = Belle2.PyStoreObj(particleList[0])

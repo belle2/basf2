@@ -31,11 +31,19 @@ namespace Belle2 {
 
   private:
 
-    bool m_useFANN;    /** Flag to save the Flavor Tagger Output using the TMVA Output. Default is to use the TMVA Output. */
+    /** Flag to save the Flavor Tagger Output using the TMVA Output. Default is to use the TMVA Output. */
+    bool m_useFANN;
 
+    /**< Direct Output of the Combiner: Probability of being a B0.*/
     float* B0Probability;
+
+    /**< Direct Output of the Combiner: Probability of being a B0bar).*/
     float* B0barProbability;
+
+    /**< qr Output of the Combiner. Output of the FlavorTagger after the complete process*/
     float* qrCombined;
+
+    /**< q Flavor of the B0-Meson related to the RestOfEvent. Only saved if there is MC Info.*/
     float* qrMC;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */

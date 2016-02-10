@@ -74,8 +74,9 @@ namespace Belle2 {
     int m_rootEvent;   /**<  event number*/
 
     //graphs & histos - results
-    Double_t pt[6]  = {1.5, 0.75, 0.4, 0.25, 0.15, 0.05}; /**< bin edges (in pt = transverse momentum)*/
-    Double_t ptErr[6]    = { 0.5, 0.25, 0.1, 0.05, 0.05, 0.05}; /**< bin widths (transverse momentum) */
+    Double_t pt[6]  = {0.05, 0.15, 0.25, 0.4, 0.75, 1.5}; /**< bin edges (in pt = transverse momentum)*/
+    Double_t ptErr[6] = { 0.05, 0.05, 0.05, 0.1, 0.25, 0.5}; /**< bin widths (transverse momentum) */
+
     TGraphErrors* m_gEff; /**< efficiency graph */
     TH1F* m_h1digiIn; /**< digits contained in ROI histogram*/
     TH1F* m_h1digiOut2; /**< lost digit: ROI exist with right vxdID */

@@ -318,7 +318,7 @@ void PXDDataRedAnalysisModule::initialize()
 
   //analysis
   Double_t lowBin[6 + 1];
-  for (int i = 0; i < 6; i++)
+  for (int i = 5; i < -1; i++)
     lowBin[i] = pt[i] - ptErr[i];
   lowBin[6] = pt[5] + ptErr[5];
 

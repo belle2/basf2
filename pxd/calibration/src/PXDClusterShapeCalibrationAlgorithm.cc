@@ -490,10 +490,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   saveCalibration(Correction_ErrorEstimation[0], nameEE);
   saveCalibration(InPixelPosition[0], nameIP);
 
-  delete [] ValueCors;
-  delete [] ValueInPix;
-  delete ValueCors;
-  delete ValueInPix;
+  delete[] ValueCors;
+  delete[] ValueInPix;
   return c_OK;
 }
 
@@ -518,9 +516,7 @@ void PXDClusterShapeCalibrationAlgorithm::Table2Vector(map_typeCorrs& TCorrectio
 //  B2DEBUG(30, "--> Inside Table2Vector " << TCorrection[1][0][0][0][8]);
 //  B2DEBUG(30, "--> Inside Table2Vector " << CorVector->GetMatrixArray()[3]);
 
-  delete [] ValueCors;
-  delete ValueCors;
-
+  delete[] ValueCors;
 
 }
 
@@ -544,8 +540,8 @@ void PXDClusterShapeCalibrationAlgorithm::Table2Vector(map_typeInPics& TInPix, T
               ValueInPix[i_vector] = data;
             }
   InPixVector->SetElements(ValueInPix);
-  delete [] ValueInPix;
-  delete ValueInPix;
+  delete[] ValueInPix;
+
 }
 
 void PXDClusterShapeCalibrationAlgorithm::Vector2Table(TVectorD* CorVector, map_typeCorrs& TCorrection)

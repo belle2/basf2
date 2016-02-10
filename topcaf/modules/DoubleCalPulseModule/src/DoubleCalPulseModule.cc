@@ -25,7 +25,7 @@ DoubleCalPulseModule::DoubleCalPulseModule() : Module()
   addParam("calibrationTimeMin", m_tmin, "Earliest time to look for a calibration pulse", 0.);
   addParam("calibrationTimeMax", m_tmax, "Latest time to look for a calibration pulse", 2000.);
   addParam("calibrationWidthMin", m_wmin, "Minimum width of a calibration pulse", 1.3);
-  addParam("calibrationWidthMax", m_wmax, "Maximum width of a calibration pulse", 2000.);
+  addParam("calibrationWidthMax", m_wmax, "Maximum width of a calibration pulse", 3.0);
 
 }
 
@@ -94,7 +94,8 @@ void DoubleCalPulseModule::event()
       digit_ptr[w]->SetQuality(asic_ref_time[asicKey]);
       if (asic_ref_time[asicKey] > 0) {
         if (digit_ptr[w]->GetFlag() != 10) digit_ptr[w]->SetFlag(1); // i.e. calibrated to a pulse.
-        if ((corr_time > 45.) && (corr_time < 65.) && (asic_ch == m_cal_ch)) { // then mark this as the second calibration pulse.
+        if ((corr_time > 45.) && (corr_time < 65.)
+            && (asic_ch == m_cal_ch)) { // then mark this as the second calibration pulse. hard coded numbers again...
           digit_ptr[w]->SetFlag(11); // second calibration pulse.
         }
       }

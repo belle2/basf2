@@ -82,32 +82,10 @@ void WaveTimingV2Module::event()
       //double win_time_shift = evtwaves_ptr[w]->GetTime();
       vector<double> v_samples = evtwaves_ptr[w]->GetSamples();
       if (v_samples.size() > 0) {
-        // float window_dt = (1. / 0.0212) / 2.0; // need to check this.  I don't like hard coded numbers.
-        // float sample_dt = window_dt / 64.0;
-        vector<double> v_times;
+
         //Find rough peak locations
         TH1D m_tmp_h("m_tmp_h", "m_tmp_h", (int)v_samples.size(), 0., (double)v_samples.size());
-        /*
-        i/f(dTcalib) {
 
-         int win = evtwaves_ptr[w]->GetASICWindow(); // 1st window in waveform.
-         double winDt = 47.163878;  // ns
-         double dt    = winDt/128.;
-         double t     = 0.;
-         double zerot = tOffset = (win/4)*(2*winDt);
-         double dtcorr;
-
-         for(int c=0;c<vsamples.size();c++){
-           win = c/64;
-           tOffset = (win/4)*(2*winDt);  // winDt = 47.163878 ns
-           dtcorr = dT[iNTM][iBS][iCar][iASIC][iCH][iDT];
-         }
-
-        }
-        else{
-        TH1D m_tmp_h("m_tmp_h", "m_tmp_h", (int)v_samples.size(), 0., (double)v_samples.size());
-        }
-        */
         for (unsigned int s = 0; s < v_samples.size(); s++) {
           m_tmp_h.SetBinContent(s, v_samples.at(s));
         }
@@ -129,7 +107,6 @@ void WaveTimingV2Module::event()
           channelID = p.second;
           pmtID = topconfig_ptr->pixel_to_PMTNumber(p);
           pmtchID = topconfig_ptr->pixel_to_channelNumber(p);
-          //    if(scrod==25) B2INFO("scrod: 25\tEMN: "<<topconfig_ptr->scrod_to_electronicsModuleNumber(scrod)<<"\tpix: "<<p.second);
         } else {
           B2WARNING("ITOP channel mapping not found, TOPDigit channel IDs will be incorrect.");
         }

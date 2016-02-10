@@ -61,8 +61,8 @@ print('Writing output root file to ' + OutputFile)
 
 histomanager = register_module("HistoManager")
 
-# eventinfosetter = register_module('EventInfoSetter')
-# eventinfoprinter = register_module('EventInfoPrinter')
+eventinfosetter = register_module('EventInfoSetter')
+eventinfoprinter = register_module('EventInfoPrinter')
 
 # run_info = args.inputRun.split('-')
 # conditionsDict = {'experimentName': run_info[0] + '-' + run_info[2][0:7],

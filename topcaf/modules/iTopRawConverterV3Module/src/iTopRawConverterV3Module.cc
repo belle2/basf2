@@ -225,7 +225,7 @@ void iTopRawConverterV3Module::event()
           B2DEBUG(1, "trigPattern: " << trigPattern << "\tchannel: " << channel << "\tcol: " << col);
 
           wavePacket[1] = m_scrod;
-          wavePacket[2] = 0;
+          wavePacket[2] = lastWrAddr;
           wavePacket[3] = m_evt_no;
           wavePacket[4] = 1;
           wavePacket[5] = (0x1FF & readoutWindow) + (channel << 9) + (row << 12) + (col << 14);

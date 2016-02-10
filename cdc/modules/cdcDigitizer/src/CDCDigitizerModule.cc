@@ -71,8 +71,9 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 
   addParam("2015AprRun", m_2015AprRun, "Cosmic runs in April 2015 (i.e. only super-layer #4 on) ?", false);
 
-  addParam("SimTrigTimeJitterIn2015Apr", m_simTrigTimeJitterIn2015Apr, "Simulate trigger timing jitter in cosmic runs in Apr. 2015.",
-           false);
+  addParam("TrigTimeJitter", m_trigTimeJitter,
+           "Magnitude of trigger timing jitter (ns). If it is set to a non-zero value (w), the trigger timing is randuminzed uniformly in a time window of [-w/2, +h/2].",
+           0.);
   //Switches to control time information handling
   addParam("AddInWirePropagationDelay",   m_addInWirePropagationDelay,
            "A switch used to control adding propagation delay in the wire into the final drift time or not; this is for signal hits.", true);
@@ -171,7 +172,8 @@ void CDCDigitizerModule::event()
   map<WireID, SignalInfo>::iterator iterSignalMap;
 
   // Set trigger timing jitter for this event
-  double trigTiming = m_simTrigTimeJitterIn2015Apr ? 8.*(gRandom->Uniform() - 0.5) : 0.;
+  double trigTiming = m_trigTimeJitter == 0. ? 0. : m_trigTimeJitter * (gRandom->Uniform() - 0.5);
+  //  std::cout << "trigTiming= " << trigTiming << std::endl;
   // Loop over all hits
   int nHits = simHits.getEntries();
   B2DEBUG(250, "Number of CDCSimHits in the current event: " << nHits);

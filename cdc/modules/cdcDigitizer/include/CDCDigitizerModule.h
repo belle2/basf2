@@ -115,6 +115,7 @@ namespace Belle2 {
     double m_tMaxOuter;         /**< Upper edge of time window in ns for the outer layers*/
     double m_tMaxInner;         /**< Upper edge of time window in ns for the inner layers */
     //    unsigned short m_tdcOffset; /**< Offset of TDC count (in ns)*/
+    double m_trigTimeJitter;   /**< Magnitude of trigger timing jitter (ns). */
 
     CDC::CDCGeometryPar* m_cdcp;  /**< Pointer to CDCGeometryPar */
     CDCSimHit* m_aCDCSimHit;    /**< Pointer to CDCSimHit */
@@ -137,7 +138,6 @@ namespace Belle2 {
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
     bool m_2015AprRun; /**< A flag indicates cosmic runs in April 2015. */
-    bool m_simTrigTimeJitterIn2015Apr; /**< A switch to simulate trigger timing jitter for cosmic runs in April 2015. */
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
     bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
     bool m_addInWirePropagationDelay4Bg; /**< A switch used to control adding propagation delay into the total drift time or not for beam bg. */

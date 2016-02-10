@@ -25,22 +25,27 @@
 	<br>
 	{{#plotfiles}}
     <a name="{{package}}-{{rootfile}}"></a>
-    <h2>{{rootfile}}</h2>
+    <div class="wrap_rootfile">
+    <h2>Result File: {{rootfile}}</h2>
+    <br>
 
     {{#ntuples}}
-    <div>NTuple: {{title}}</div>
+    <div class="wrap_boxes">
+    <h2 class="persistent-header">NTuple: {{title}}</h2>
     <table id={{title}}></table>
     <script type="text/javascript">
         fill_ntuple_table("{{title}}","{{json_file_path}}");
     </script>
     {{>ntuple_description}}
+    </div>
     {{/ntuples}}
 
     {{#if !show_overview}}
     {{>plot_full_view}}
     {{else}}
     {{>plot_matrix}}
-    {{/if}}
+    {{/if}}    
+    </div>
 	{{/plotfiles}}
 </div>
 {{/packages}}
@@ -106,8 +111,8 @@
 	{{#plots}}
 	{{#if !is_expert || show_expert_plots }}
     <!-- put in extra div -->
-    <div>
-    <h2 class="persistent-header">{{ title }}</h2>
+    <div class="wrap_boxes">
+    <h2 class="persistent-header">Plot: {{ title }}</h2>
 	<div class="object">
     <!-- todo: ../ should be removed for final deployment -->
         <a target="_blank" href="../{{ plot_path }}{{ pdf_filename }}">

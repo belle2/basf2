@@ -110,18 +110,13 @@ ROIGeometry::fillPlaneList()
     while (itPxdLadders != pxdLadders.end()) {
 
       std::set<Belle2::VxdID> pxdSensors = aGeometry.getSensors(*itPxdLadders);
-      std::set<Belle2::VxdID>::iterator itPxdSensors = pxdSensors.begin();
+      B2DEBUG(1, "    pxd sensor info " << * (pxdSensors.begin()));
 
-      while (itPxdSensors != pxdSensors.end()) {
-        B2DEBUG(1, "    pxd sensor info " << *itPxdSensors);
+      ROIDetPlane plane(* (pxdSensors.begin()));
 
-        ROIDetPlane plane(*itPxdSensors);
+      plane.Print();
+      m_planeList.push_back(plane);
 
-        plane.Print();
-        m_planeList.push_back(plane);
-
-        itPxdSensors++;
-      }
       itPxdLadders++;
     }
     itPxdLayers++;

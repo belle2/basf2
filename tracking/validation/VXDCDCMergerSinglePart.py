@@ -270,11 +270,11 @@ class HighlighterModule(Module):
             break  # only one
 
 
-display = register_module('Display')
-display.param('useClusters', True)
-display.param('showTrackLevelObjects', True)
+# display = register_module('Display')
+# display.param('useClusters', True)
+# display.param('showTrackLevelObjects', True)
 # 'showTrackCandidates' : True)
-display.param('options', 'DHMPS')
+# display.param('options', 'DHMPS')
 # display.param(display_param)
 
 # ...MCPrinter...

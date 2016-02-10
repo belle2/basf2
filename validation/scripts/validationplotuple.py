@@ -130,6 +130,14 @@ class Plotuple:
         # The p-value that the Chi^2-Test returned.
         self.pvalue = 'n/a'
 
+        #: an comparison error will be shown if the p-value is smaller than this number
+        #: will bet set by the chi2test function
+        self.pvalue_error = None
+
+        #: an comparison warning will be shown if the p-value is smaller than this number
+        #: will bet set by the chi2test function
+        self.pvalue_warn = None
+
         # The file, in which the histogram or the HMTL-table (for n-tuples)
         # are stored (without the file extension!)
         self.file = None
@@ -226,20 +234,20 @@ class Plotuple:
 
         if pvalue is not None:
             # check if there is a custom setting for pvalue sensitivity
-            pvalue_warn = mop.pvalue_warn()
-            pvalue_error = mop.pvalue_error()
+            self.pvalue_warn = mop.pvalue_warn()
+            self.pvalue_error = mop.pvalue_error()
 
-            if pvalue_warn is None:
-                pvalue_warn = 1.0
-            if pvalue_error is None:
-                pvalue_error = 0.01
+            if self.pvalue_warn is None:
+                self.pvalue_warn = 1.0
+            if self.pvalue_error is None:
+                self.pvalue_error = 0.01
 
             # If pvalue < 0.01: Very strong presumption against neutral hypothesis
-            if pvalue < pvalue_error:
+            if pvalue < self.pvalue_error:
                 canvas.SetFillColor(ROOT.kRed)
                 self.comparison_result = "error"
             # If pvalue < 1: Deviations at least exists
-            elif pvalue < pvalue_warn:
+            elif pvalue < self.pvalue_warn:
                 self.comparison_result = "warning"
                 canvas.SetFillColor(ROOT.kOrange)
             else:

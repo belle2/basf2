@@ -16,6 +16,7 @@ parser.add_argument(
     '--inputFile',
     metavar='InputFile (i.e. file name = /path/to/xxx_writehits.root)',
     required=True,
+    nargs='*',
     help='the path/name for the input data files. This parameter is REQUIRED.')
 
 parser.add_argument(
@@ -24,7 +25,7 @@ parser.add_argument(
     required=True,
     help='the path/name for the input sample calibration file. This parameter is REQUIRED.')
 
-parser.add_argument('--Output', metavar='Output File (path/filename)',
+parser.add_argument('--outputFile', metavar='Output File (path/filename)',
                     help='the output file name.  A default based on the input will be created if this argument is not supplied'
                     )
 
@@ -49,15 +50,16 @@ else:
     Conditions = 0
 
 WriteFile = 1
-if args.Output:
-    OutputFile = args.Output
+if args.outputFile:
+    OutputFile = args.outputFile
 else:
-    OutputFile = os.path.splitext(args.inputFile)[0] + '_timecalibrated.root'
+    OutputFile = 'calibratedhits.root'
+#    OutputFile = os.path.splitext(args.inputFile)[0] + '_timecalibrated.root'
 
 # print('Writing output calibration file to ' + OutputFile)
 
 input = register_module('RootInput')
-input.param('inputFileName', args.inputFile)
+input.param('inputFileNames', args.inputFile)
 
 eventinfosetter = register_module('EventInfoSetter')
 eventinfoprinter = register_module('EventInfoPrinter')

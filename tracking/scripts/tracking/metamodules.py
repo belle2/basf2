@@ -251,6 +251,10 @@ class IfStoreArrayPresentModule(IfModule):
         #: Flag that the StoreArray is present (bool).
         self.storearray_is_present = None
 
+    def initialize(self):
+        if self.condition():
+            super().initialize()
+
     def condition(self):
         """Returns true if the StoreArray is present.
 

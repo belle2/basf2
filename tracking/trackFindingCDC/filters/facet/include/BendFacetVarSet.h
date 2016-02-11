@@ -29,7 +29,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const facetFitNames[] = {
+    static char const* const facetBendNames[] = {
       "start_phi",
       "start_phi_sigma",
       "start_phi_pull",
@@ -46,35 +46,32 @@ namespace Belle2 {
     /** Class that specifies the names of the variables
      *  that should be generated from a facet
      */
-    class FitFacetVarNames : public VarNames<CDCFacet> {
+    class BendFacetVarNames : public VarNames<CDCFacet> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetFitNames);
+      static const size_t nNames = size(facetBendNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return facetFitNames[iName];
+        return facetBendNames[iName];
       }
-
-      /// Marking that the basic facet variables should be included.
-      typedef FitlessFacetVarSet NestedVarSet;
     };
 
     /** Class that computes floating point variables from a facet.
      *  that can be forwarded to a flat TNtuple or a TMVA method
      */
-    class FitFacetVarSet : public VarSet<FitFacetVarNames> {
+    class BendFacetVarSet : public VarSet<BendFacetVarNames> {
 
     private:
       /// Type of the base class
-      using Super = VarSet<FitFacetVarNames>;
+      using Super = VarSet<BendFacetVarNames>;
 
     public:
       /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      explicit FitFacetVarSet(const std::string& prefix = "");
+      explicit BendFacetVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the facet
       virtual bool extract(const CDCFacet* facet) override final;

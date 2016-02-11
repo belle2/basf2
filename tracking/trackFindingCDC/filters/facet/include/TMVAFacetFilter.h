@@ -20,7 +20,7 @@ namespace Belle2 {
     class TMVAFacetFilter: public TMVAFilter<TMVAFacetVarSet> {
 
     public:
-      using Super = TMVAFilter<FitFacetVarSet>;
+      using Super = TMVAFilter<TMVAFacetVarSet>;
 
     public:
       /// Constructor initialising the TMVAFilter with standard training name for this filter.

@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/facet/FitFacetVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet/BendFacetVarSet.h>
 #include <assert.h>
 
 namespace {
@@ -22,12 +22,12 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FitFacetVarSet::FitFacetVarSet(const std::string& prefix)
+BendFacetVarSet::BendFacetVarSet(const std::string& prefix)
   : Super(prefix)
 {
 }
 
-bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
+bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
 {
   bool extracted = extractNested(ptrFacet);
   if (not extracted or not ptrFacet) return false;

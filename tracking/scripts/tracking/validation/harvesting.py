@@ -14,10 +14,11 @@ from ROOT import Belle2  # make Belle2 namespace available
 
 from tracking.modules import BrowseTFileOnTerminateModule
 from tracking.utilities import coroutine
-from tracking.root_utils import root_cd
+from tracking.root_utils import root_cd, root_browse
 from tracking.validation.refiners import Refiner
 
 import tracking.run.tracked_event_generation
+
 
 import tracking.metamodules as metamodules
 
@@ -48,7 +49,7 @@ class AttributeDict(dict):
         return self[name]
 
 
-def harvest(foreach="", pick=None, name=None, output_file_name=None):
+def harvest(foreach="", pick=None, name=None, output_file_name=None, show_results=False):
     """Decorator to turn a function into a HarvestingModule instance.
 
     The decorated function becomes the peel method of the module.
@@ -83,7 +84,8 @@ def harvest(foreach="", pick=None, name=None, output_file_name=None):
         output_file_name_or_default = output_file_name or "{}.root".format(name)
         harvesting_module = HarvestingModule(foreach=foreach,
                                              output_file_name=output_file_name_or_default,
-                                             name=name_or_default)
+                                             name=name_or_default,
+                                             show_results=show_results)
         harvesting_module.peel = peel_func
         if pick:
             harvesting_module.pick = pick
@@ -171,7 +173,8 @@ class HarvestingModule(basf2.Module):
                  name=None,
                  title=None,
                  contact=None,
-                 expert_level=None):
+                 expert_level=None,
+                 show_results=False):
         """Constructor of the harvesting module.
 
         Parameters
@@ -195,7 +198,9 @@ class HarvestingModule(basf2.Module):
             Generally the higher the more detailed to analysis.
             Meaning depends entirely on the subclass implementing a certain policy.
             Defaults to default_expert_level.
-            """
+        show_results : bool, optional
+           Indicator to show the refined results at termination of the path
+           """
 
         super(HarvestingModule, self).__init__()
 
@@ -223,6 +228,9 @@ class HarvestingModule(basf2.Module):
         #: A list of additional refiner instances to be executed
         #: on top of the refiner methods that are members of this class
         self.refiners = []
+
+        #: Switch to show the result ROOT file in a TBrowser on terminate
+        self.show_results = show_results
 
     @property
     def id(self):
@@ -320,6 +328,16 @@ class HarvestingModule(basf2.Module):
         self.stash.close()
         del self.stash
         self.refine(self.crops)
+
+        if self.show_results and self.output_file_name:
+            if isinstance(self.output_file_name, str):
+                output_tfile = ROOT.TFile(self.output_file_name)
+                root_browse(output_tfile)
+                input("Press enter to close")
+                output_tfile.Close()
+            else:
+                root_browse(self.output_file_name)
+                input("Press enter to close")
 
     @staticmethod
     def create_crop_part_collection():

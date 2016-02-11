@@ -121,18 +121,11 @@ namespace Belle2 {
 
       }
 
-      /** Legacy method */
-      inline Weight isGoodNeighbor(const CDCWireHit* fromWireHit,
-                                   const CDCWireHit* toWireHit)
-      {
-        assert(fromWireHit);
-        assert(toWireHit);
-        return 0;
-      }
-
-      /** Main filter method overriding the filter interface method.
+      /**
+       *  Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
-       *  the method implementing the rejection.*/
+       *  the method implementing the rejection.
+       */
       inline Weight operator()(const Relation<const CDCWireHit>& relation) override final
       {
         const CDCWireHit* ptrFrom(relation.first);

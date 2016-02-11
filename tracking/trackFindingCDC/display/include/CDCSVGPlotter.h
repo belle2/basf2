@@ -1,11 +1,10 @@
-#ifndef CDCSVGPLOTTER_H_
-#define CDCSVGPLOTTER_H_
+#pragma once
 
 #include <tracking/trackFindingCDC/display/EventDataPlotter.h>
 
-
 namespace Belle2 {
   namespace TrackFindingCDC {
+
     template<class T>
     class StoreWrappedObjPtr;
 
@@ -58,7 +57,9 @@ namespace Belle2 {
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
-      void drawCDCHits(const std::string& storeArrayName, const std::string& stroke, const std::string& strokeWidth);
+      void drawCDCHits(const std::string& storeArrayName,
+                       const std::string& stroke,
+                       const std::string& strokeWidth);
 
       /**
        * Draws CDCSimHits.
@@ -66,7 +67,9 @@ namespace Belle2 {
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCSimHit and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCSimHit and its id to a stroke-width.
        */
-      void drawCDCSimHits(const std::string& storeArrayName, const std::string& stroke, const std::string& strokeWidth);
+      void drawCDCSimHits(const std::string& storeArrayName,
+                          const std::string& stroke,
+                          const std::string& strokeWidth);
 
       /**
        * Draw the CDCSimHits connected in the order of their getFlightTime for each Monte Carlo particle.
@@ -74,31 +77,41 @@ namespace Belle2 {
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCSimHit and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCSimHit and its id to a stroke-width.
        */
-      void drawCDCSimHitsConnectByToF(const std::string& storeArrayName, const std::string& stroke, const std::string& strokeWidth);
+      void drawCDCSimHitsConnectByToF(const std::string& storeArrayName,
+                                      const std::string& stroke,
+                                      const std::string& strokeWidth);
 
       /**
        * Draw GFTrackCands.
        * @param storeArrayName The name of the StoreArray containing the GFTrackCands.
        */
-      void drawGFTrackCands(const std::string& storeArrayName, const std::string& stroke, const std::string& strokeWidth);
+      void drawGFTrackCands(const std::string& storeArrayName,
+                            const std::string& stroke,
+                            const std::string& strokeWidth);
 
       /**
        * Draw GFTrackCandTrajectories.
        * @param storeArrayName The name of the StoreArray containing the GFTrackCands.
        */
-      void drawGFTrackCandTrajectories(const std::string& storeArrayName, const std::string& stroke, const std::string& strokeWidth);
+      void drawGFTrackCandTrajectories(const std::string& storeArrayName,
+                                       const std::string& stroke,
+                                       const std::string& strokeWidth);
 
       /**
        * Draw GFTracks.
        * @param storeArrayName The name of the StoreArray containing the GFTracks.
        */
-      void drawGFTracks(const std::string& storeArrayName, const std::string& stroke, const std::string& strokeWidth);
+      void drawGFTracks(const std::string& storeArrayName,
+                        const std::string& stroke,
+                        const std::string& strokeWidth);
 
       /**
        * Draws GFTrackTrajectories.
        * @param storeArrayName The name of the StoreArray containing the CDCTracks.
        */
-      void drawGFTrackTrajectories(const std::string& storeObjName, const std::string& stroke, const std::string& strokeWidth);
+      void drawGFTrackTrajectories(const std::string& storeObjName,
+                                   const std::string& stroke,
+                                   const std::string& strokeWidth);
 
       /**
        * Draw the axial to stereo segment pairs from Monte Carlo truth.
@@ -106,7 +119,9 @@ namespace Belle2 {
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCSegmentPair and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCSegmentPair and its id to a stroke-width.
        */
-      void drawAxialStereoPairs(const std::string& storeObjName, const std::string& stroke, const std::string& strokeWidth);
+      void drawAxialStereoPairs(const std::string& storeObjName,
+                                const std::string& stroke,
+                                const std::string& strokeWidth);
 
       /**
        * Draws CDCTracks.
@@ -114,7 +129,9 @@ namespace Belle2 {
        * specific compile time flags enable the transportation of this data:
        * @param storeObjName The name of the StoreVector containing the CDCTracks.
        */
-      void drawCDCTracks(const std::string& storeObjName, const std::string& stroke, const std::string& strokeWidth);
+      void drawCDCTracks(const std::string& storeObjName,
+                         const std::string& stroke,
+                         const std::string& strokeWidth);
 
       /**
        * Draws CDCWireHitClusters.
@@ -124,7 +141,9 @@ namespace Belle2 {
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
-      void drawCDCWireHitClusters(const std::string& storeObjName, const std::string& stroke, const std::string& strokeWidth);
+      void drawCDCWireHitClusters(const std::string& storeObjName,
+                                  const std::string& stroke,
+                                  const std::string& strokeWidth);
 
       /**
        * Draws AxialStereoSegmentPairs.
@@ -134,7 +153,9 @@ namespace Belle2 {
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
-      void drawAxialStereoSegmentPairs(const std::string& storeObjName, const std::string& stroke, const std::string& strokeWidth);
+      void drawAxialStereoSegmentPairs(const std::string& storeObjName,
+                                       const std::string& stroke,
+                                       const std::string& strokeWidth);
 
       /**
        * Draws MCAxialAxialPairs.
@@ -145,7 +166,9 @@ namespace Belle2 {
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
       //does probably work correctly (check Filter)
-      void drawMCAxialAxialPairs(const std::string& storeObjName, const std::string& stroke, const std::string& strokeWidth);
+      void drawMCAxialAxialPairs(const std::string& storeObjName,
+                                 const std::string& stroke,
+                                 const std::string& strokeWidth);
 
       /**
        * Draws MCSegmentTriples.
@@ -156,7 +179,9 @@ namespace Belle2 {
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
       //does not work correctly (Filter does not accept triples as argument
-      void drawMCSegmentTriples(const std::string& storeObjName, const std::string& stroke, const std::string& strokeWidth);
+      void drawMCSegmentTriples(const std::string& storeObjName,
+                                const std::string& stroke,
+                                const std::string& strokeWidth);
 
       /**
        * Draws CDCRecoSegments.
@@ -166,7 +191,9 @@ namespace Belle2 {
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
-      void drawCDCRecoSegments(const std::string& storeObjName, const std::string& stroke, const std::string& strokeWidth);
+      void drawCDCRecoSegments(const std::string& storeObjName,
+                               const std::string& stroke,
+                               const std::string& strokeWidth);
 
       /**
        * Draws SegmentTrajectories.
@@ -176,7 +203,9 @@ namespace Belle2 {
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
-      void drawSegmentTrajectories(const std::string& storeObjName, const std::string& stroke, const std::string& strokeWidth);
+      void drawSegmentTrajectories(const std::string& storeObjName,
+                                   const std::string& stroke,
+                                   const std::string& strokeWidth);
 
 
       /**
@@ -194,7 +223,9 @@ namespace Belle2 {
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the object and its id to a stroke-width.
        */
       template<class AColorizer, class AObject>
-      void drawStoreArray(const StoreArray<AObject>& storeArray, const std::string& storeArrayName, const std::string& stroke = "",
+      void drawStoreArray(const StoreArray<AObject>& storeArray,
+                          const std::string& storeArrayName,
+                          const std::string& stroke = "",
                           const std::string& strokeWidth = "");
 
       /**
@@ -205,7 +236,8 @@ namespace Belle2 {
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the object and its id to a stroke-width.
        */
       template<class AColorizer, class AItem>
-      void drawStoreVector(const StoreWrappedObjPtr<std::vector<AItem>>& storeVector, const std::string& storeObjName,
+      void drawStoreVector(const StoreWrappedObjPtr<std::vector<AItem>>& storeVector,
+                           const std::string& storeObjName,
                            const std::string& stroke = "",
                            const std::string& strokeWidth = "");
 
@@ -215,7 +247,9 @@ namespace Belle2 {
        * @param obj_attributes
        */
       template<class AObject>
-      void draw(const AObject& obj, const std::map<std::string, std::string>& obj_attributes);
+      void draw(const AObject& obj,
+                const std::map<std::string,
+                std::string>& obj_attributes);
 
       /**
        * Draw every element of an iterable object.
@@ -226,12 +260,12 @@ namespace Belle2 {
       void drawIterable(const AIterable& iterable, AColorizer& colorizer);
 
     private:
+      /// Switch to activate the uncovering of hits by their (mc) time of flight.
       bool m_animate = false;
+
+      /// The plotter instance to translate event data objects to svg expressions.
       TrackFindingCDC::EventDataPlotter m_eventdataPlotter;
 
-    };
-  }//TrackFindingCDC
-}//Belle2
-
-
-#endif // CDCSVGPLOTTER_H_
+    }; // class
+  } // namespace TrackFindingCDC
+} // namespace Belle2

@@ -7,8 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
+
+#include <tracking/trackFindingCDC/filters/facet/BasicFacetVarSet.h>
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
 #include <tracking/trackFindingCDC/filters/facet/FitFacetVarSet.h>
 #include <tracking/trackFindingCDC/filters/facet/TMVAFacetVarSet.h>

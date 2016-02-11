@@ -27,50 +27,65 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const facetFitlessNames[] = {
+    static char const* const facetBasicNames[] = {
       "superlayer_id",
-      "oclock_delta",
-      "abs_oclock_delta",
-      "cell_extend",
-      "short_arm_is_crossing",
-      "long_arm_is_crossing",
-      "stable_twist",
-      "abs_layer_id_difference",
-      "layer_id_difference",
-      "crossing_id",
-      "shape_id",
-      "is_forward_progression",
+
+      "start_wire_id",
+      "start_layer_id",
+      "start_ref_x",
+      "start_ref_y",
+      "start_rlinfo",
+      "start_drift_length",
+      "start_drift_length_sigma",
+
+      "middle_wire_id",
+      "middle_layer_id",
+      "middle_ref_x",
+      "middle_ref_y",
+      "middle_rlinfo",
+      "middle_drift_length",
+      "middle_drift_length_sigma",
+
+      "end_wire_id",
+      "end_layer_id",
+      "end_ref_x",
+      "end_ref_y",
+      "end_rlinfo",
+      "end_drift_length",
+      "end_drift_length_sigma",
     };
 
-    /** Class that specifies the names of the variables
+    /**
+     *  Class that specifies the names of the variables
      *  that should be generated from a facet
      */
-    class FitlessFacetVarNames : public VarNames<CDCFacet> {
+    class BasicFacetVarNames : public VarNames<CDCFacet> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetFitlessNames);
+      static const size_t nNames = size(facetBasicNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return facetFitlessNames[iName];
+        return facetBasicNames[iName];
       }
     };
 
-    /** Class that computes floating point variables from a facet.
+    /**
+     *  Class that computes floating point variables from a facet.
      *  that can be forwarded to a flat TNtuple or a TMVA method
      */
-    class FitlessFacetVarSet : public VarSet<FitlessFacetVarNames> {
+    class BasicFacetVarSet : public VarSet<BasicFacetVarNames> {
 
     private:
       /// Type of the base class
-      using Super = VarSet<FitlessFacetVarNames>;
+      using Super = VarSet<BasicFacetVarNames>;
 
     public:
       /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      explicit FitlessFacetVarSet(const std::string& prefix = "");
+      explicit BasicFacetVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the cluster
       virtual bool extract(const CDCFacet* facet) override final;

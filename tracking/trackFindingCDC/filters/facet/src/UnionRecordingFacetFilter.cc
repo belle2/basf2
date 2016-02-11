@@ -19,15 +19,16 @@ using namespace TrackFindingCDC;
 std::vector<std::string> UnionRecordingFacetFilter::getValidVarSetNames() const
 {
   std::vector<std::string> varSetNames = Super::getValidVarSetNames();
-  varSetNames.insert(varSetNames.end(), {"fitless", "fit", "truth"});
+  varSetNames.insert(varSetNames.end(), {"basic", "fitless", "fit", "tmva", "truth"});
   return varSetNames;
 }
-
 
 std::unique_ptr<BaseVarSet<CDCFacet> >
 UnionRecordingFacetFilter::createVarSet(const std::string& name) const
 {
-  if (name == "fitless") {
+  if (name == "basic") {
+    return std::unique_ptr<BaseVarSet<CDCFacet> >(new BasicFacetVarSet());
+  } else if (name == "fitless") {
     return std::unique_ptr<BaseVarSet<CDCFacet> >(new FitlessFacetVarSet());
   } else if (name == "fit") {
     return std::unique_ptr<BaseVarSet<CDCFacet> >(new FitFacetVarSet());

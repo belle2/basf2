@@ -27,18 +27,16 @@ bool FitlessFacetVarSet::extract(const CDCFacet* ptrFacet)
 
   /// Fitless variables
   CDCFacet::Shape shape = facet.getShape();
-  ISuperLayer superlayerID = facet.getISuperLayer();
+
+  short cellExtend = shape.getCellExtend();
+  short oClockDelta = shape.getOClockDelta();
+  short absOClockDelta = std::abs(oClockDelta);
 
   const ERightLeft startRLInfo = facet.getStartRLInfo();
   const ERightLeft middleRLInfo = facet.getMiddleRLInfo();
   const ERightLeft endRLInfo = facet.getEndRLInfo();
 
-  short oClockDelta = shape.getOClockDelta();
-
-  short cellExtend = shape.getCellExtend();
-
   short stableTwist = -sign(shape.getOClockDelta()) * middleRLInfo;
-  short absOClockDelta = std::abs(oClockDelta);
   bool startToMiddleIsCrossing = startRLInfo != middleRLInfo;
   bool middleToEndIsCrossing = middleRLInfo != endRLInfo;
 
@@ -49,24 +47,10 @@ bool FitlessFacetVarSet::extract(const CDCFacet* ptrFacet)
   short iLayerDifference = facet.getStartWire().getILayer() - facet.getEndWire().getILayer();
   short absILayerDifference = std::abs(iLayerDifference);
 
-  const CDCRLTaggedWireHit& startRLWirehit = facet.getStartRLWireHit();
-  const double startDriftLength = startRLWirehit.getRefDriftLength();
-  const double startDriftLengthVar = startRLWirehit.getRefDriftLengthVariance();
-  const double startDriftLengthSigma = sqrt(startDriftLengthVar);
-
-  const CDCRLTaggedWireHit& middleRLWirehit = facet.getMiddleRLWireHit();
-  const double middleDriftLength = middleRLWirehit.getRefDriftLength();
-  const double middleDriftLengthVar = middleRLWirehit.getRefDriftLengthVariance();
-  const double middleDriftLengthSigma = sqrt(middleDriftLengthVar);
-
-  const CDCRLTaggedWireHit& endRLWirehit = facet.getEndRLWireHit();
-  const double endDriftLength = endRLWirehit.getRefDriftLength();
-  const double endDriftLengthVar = endRLWirehit.getRefDriftLengthVariance();
-  const double endDriftLengthSigma = sqrt(endDriftLengthVar);
-
-  var<named("superlayer_id")>() = superlayerID;
-  var<named("abs_oclock_delta")>() = absOClockDelta;
   var<named("cell_extend")>() = cellExtend;
+  var<named("oclock_delta")>() = shape.getOClockDelta();
+  var<named("abs_oclock_delta")>() = absOClockDelta;
+
   var<named("long_arm_is_crossing")>() = longArmIsCrossing;
   var<named("short_arm_is_crossing")>() = shortArmIsCrossing;
   var<named("stable_twist")>() = stableTwist;
@@ -79,19 +63,6 @@ bool FitlessFacetVarSet::extract(const CDCFacet* ptrFacet)
   // funny formula, but basically checks the triple to be a progressing forward and not turning in itself.
 
   var<named("layer_id_difference")>() = iLayerDifference;
-  var<named("oclock_delta")>() = shape.getOClockDelta();
-
-  var<named("start_rlinfo")>() = startRLInfo;
-  var<named("start_drift_length")>() = startDriftLength;
-  var<named("start_drift_length_sigma")>() = startDriftLengthSigma;
-
-  var<named("middle_rlinfo")>() = middleRLInfo;
-  var<named("middle_drift_length")>() = middleDriftLength;
-  var<named("middle_drift_length_sigma")>() = middleDriftLengthSigma;
-
-  var<named("end_rlinfo")>() = endRLInfo;
-  var<named("end_drift_length")>() = endDriftLength;
-  var<named("end_drift_length_sigma")>() = endDriftLengthSigma;
 
   return true;
 }

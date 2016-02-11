@@ -233,12 +233,8 @@ class SaveHistogramsRefiner(Refiner):
                 histogram.write(tdirectory)
 
 
-class SaveProfilesRefiner(Refiner):
-    default_name = "{module.id}_{y_part_name}_by_{x_part_name}_profile"
-    default_title = "Profile of {y_part_name} by {x_part_name} in {module.title}"
-    default_contact = "{module.contact}"
-    default_description = "This is a profile of {y_part_name} over {x_part_name}."
-    default_check = "Check if the trend line is resonable."
+class Plot2DRefiner(Refiner):
+    plot_kind = "profile"
 
     def __init__(self,
                  y,
@@ -257,7 +253,7 @@ class SaveProfilesRefiner(Refiner):
                  skip_single_valued=False,
                  allow_discrete=False):
 
-        super(SaveProfilesRefiner, self).__init__()
+        super().__init__()
 
         self.name = name
         self.title = title
@@ -346,13 +342,31 @@ class SaveProfilesRefiner(Refiner):
 
                 profile_plot = ValidationPlot(name)
 
-                profile_plot.profile(x_parts,
-                                     y_parts,
-                                     lower_bound=self.lower_bound,
-                                     upper_bound=self.upper_bound,
-                                     bins=self.bins,
-                                     outlier_z_score=self.outlier_z_score,
-                                     allow_discrete=self.allow_discrete)
+                plot_kind = self.plot_kind
+                if plot_kind == "profile":
+                    profile_plot.profile(x_parts,
+                                         y_parts,
+                                         lower_bound=self.lower_bound,
+                                         upper_bound=self.upper_bound,
+                                         bins=self.bins,
+                                         outlier_z_score=self.outlier_z_score,
+                                         allow_discrete=self.allow_discrete)
+
+                    if self.fit:
+                        fit_method_name = 'fit_' + str(self.fit)
+                        try:
+                            fit_method = getattr(profile_plot, fit_method_name)
+                        except:
+                            profile_plot.fit(str(fit))
+                        else:
+                            fit_method()
+
+                elif plot_kind == "scatter":
+                    profile_plot.scatter(x_parts,
+                                         y_parts,
+                                         lower_bound=self.lower_bound,
+                                         upper_bound=self.upper_bound,
+                                         outlier_z_score=self.outlier_z_score)
 
                 profile_plot.title = title
                 profile_plot.contact = contact
@@ -362,14 +376,6 @@ class SaveProfilesRefiner(Refiner):
                 profile_plot.xlabel = compose_axis_label(x_part_name)
                 profile_plot.ylabel = compose_axis_label(y_part_name, self.y_unit)
 
-                if self.fit:
-                    fit_method_name = 'fit_' + str(self.fit)
-                    try:
-                        fit_method = getattr(profile_plot, fit_method_name)
-                    except:
-                        profile_plot.fit(str(fit))
-                    else:
-                        fit_method()
                 if tdirectory:
                     profile_plot.write(tdirectory)
 
@@ -381,6 +387,26 @@ class SaveProfilesRefiner(Refiner):
                 return True
         else:
             return False
+
+
+class SaveProfilesRefiner(Plot2DRefiner):
+    default_name = "{module.id}_{y_part_name}_by_{x_part_name}_profile"
+    default_title = "Profile of {y_part_name} by {x_part_name} in {module.title}"
+    default_contact = "{module.contact}"
+    default_description = "This is a profile of {y_part_name} over {x_part_name}."
+    default_check = "Check if the trend line is resonable."
+
+    plot_kind = "profile"
+
+
+class SaveScatterRefiner(Plot2DRefiner):
+    default_name = "{module.id}_{y_part_name}_by_{x_part_name}_scatter"
+    default_title = "Scatter of {y_part_name} by {x_part_name} in {module.title}"
+    default_contact = "{module.contact}"
+    default_description = "This is a scatter of {y_part_name} over {x_part_name}."
+    default_check = "Check if the distributions is reasonable."
+
+    plot_kind = "scatter"
 
 
 class SaveClassificationAnalysisRefiner(Refiner):
@@ -926,6 +952,11 @@ def save_histograms(**kwds):
 @refiner_with_context
 def save_profiles(**kwds):
     return SaveProfilesRefiner(**kwds)
+
+
+@refiner_with_context
+def save_scatters(**kwds):
+    return SaveScatterRefiner(**kwds)
 
 
 @refiner_with_context

@@ -205,7 +205,7 @@ class PullAnalysis(object):
             pulls_hist_name = formatter.format(plot_name, subplot_name="pulls")
             pulls_hist = ValidationPlot(pulls_hist_name)
             pulls_hist.hist(pulls, outlier_z_score=outlier_z_score)
-            pulls_hist.xlabel = axis_label
+            pulls_hist.xlabel = "pull (" + quantity_name + ")"
             pulls_hist.title = formatter.format(plot_title, subplot_title='Pull distribution')
             pulls_hist.fit_gaus(z_score=1)
 
@@ -219,7 +219,7 @@ class PullAnalysis(object):
             p_values_hist_name = formatter.format(plot_name, subplot_name="p-values")
             p_values_hist = ValidationPlot(p_values_hist_name)
             p_values_hist.hist(p_values, lower_bound=0, upper_bound=1)
-            p_values_hist.xlabel = axis_label
+            p_values_hist.xlabel = "p-value (" + quantity_name + ")"
             p_values_hist.title = formatter.format(plot_title, subplot_title='P-value distribution')
             p_values_hist.fit_const()
 

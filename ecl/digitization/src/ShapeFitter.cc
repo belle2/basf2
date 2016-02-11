@@ -109,7 +109,7 @@ void Belle2::ECL::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg
 
   A2 += (1 << (k_a - 1));
   A2 >>= k_a;
-  T = 0;
+  T = -2048;
   //too large amplitude
   if (A2 > 262143) {
     A1 = A2 >> 3;
@@ -203,8 +203,7 @@ void Belle2::ECL::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg
 
         T = T > 2047 ?  T - 4096 * ((T + 2048) / 4096) : T;
 
-        T = T < -2048 ? T + 4096 * ((-T + 2048) / 4096) : T;
-
+        T = T < -2047 ? T + 4096 * ((-T + 2048) / 4096) : T;
 
         C1 = (*(fg33 + it * 16) * z00);
 

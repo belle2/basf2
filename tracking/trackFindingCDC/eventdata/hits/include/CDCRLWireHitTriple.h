@@ -21,32 +21,6 @@ namespace Belle2 {
      *  since the projection to the last pair can be done by reference.*/
     class CDCRLWireHitTriple {
     public:
-      /** Type for the different shapes of three neighboring hits
-       *  (up to mirror and rotational symmetries).
-       *  Note: The names are inspired by the xylene molecules. Some illustrations can be found
-       *  <a href="https://belle2.cc.kek.jp/~twiki/bin/view/Software/CDCTrackFindingStrategy#hits">here</a>.
-       */
-      enum EShape : short {
-        /// Constant for an ill shaped wire hit triple
-        c_Invalid = SHRT_MIN,
-
-        /// Constant for ortho arrangement with clockwise twist
-        c_OrthoCW = -4,
-
-        /// Constant for meta arrangement with clockwise twist
-        c_MetaCW = -2,
-
-        /// Constant for para arrangement, no twist here
-        c_Para = 0,
-
-        /// Constant for meta arrangement with counterclockwise twist
-        c_MetaCCW = 2,
-
-        /// Constant for ortho arrangement with counterclockwise twist
-        c_OrthoCCW = 4
-      };
-
-
       /// Type for the different shapes of a triple of neighboring wire hits
       class Shape {
 

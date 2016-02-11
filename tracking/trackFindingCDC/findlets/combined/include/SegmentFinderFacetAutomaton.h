@@ -142,7 +142,7 @@ namespace Belle2 {
       SuperClusterCreator m_superClusterCreator;
 
       /// Creates the clusters from super clusters
-      ClusterRefiner<PrimaryWireHitRelationFilter> m_clusterRefiner;
+      ClusterRefiner<> m_clusterRefiner;
 
       /// Marks the clusters as background
       ClusterBackgroundDetector<AClusterFilter> m_clusterBackgroundDetector;

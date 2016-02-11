@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/wireHitRelation/PrimaryWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
@@ -31,7 +31,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Refines the clustering of wire hits from super clusters to clustexrs
-    template<class AWireHitRelationFilter = PrimaryWireHitRelationFilter>
+    template<class AWireHitRelationFilter = BridgingWireHitRelationFilter>
     class ClusterRefiner:
       public Findlet<const CDCWireHitCluster, CDCWireHitCluster> {
 

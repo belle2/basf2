@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/filters/wireHitRelation/PrimaryWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
@@ -180,7 +180,7 @@ namespace Belle2 {
 
     private:
       /// The filter for the hit neighborhood.
-      PrimaryWireHitRelationFilter m_wireHitRelationFilter;
+      BridgingWireHitRelationFilter m_wireHitRelationFilter;
 
       /// The filter to be used for the facet generation.
       AFacetFilter m_facetFilter;

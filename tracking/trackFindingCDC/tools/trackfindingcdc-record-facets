@@ -16,8 +16,8 @@ class CDCFacetRecordingRun(RecordingRun):
     n_events = 50
     # bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
-    output_file_name = "CDCFacetTruthRecords.root"
-    varsets = ["fitless", "filter(truth)", ]
+    output_file_name = "FacetFilter.root"
+    varsets = ["tmva", "filter(truth)", ]
 
     recording_filter_parameter_name = "FacetFilterParameters"
 

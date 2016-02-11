@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/filters/facet/FitFacetVarSet.h>
 #include <tracking/trackFindingCDC/filters/facet/BendFacetVarSet.h>
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
 #include <tracking/trackFindingCDC/filters/facet/BasicFacetVarSet.h>
@@ -20,7 +21,10 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Variable set used in the application of tmva methods for facet filtering
-    using TMVAFacetVarSet = VariadicUnionVarSet<BendFacetVarSet, FitlessFacetVarSet, BasicFacetVarSet>;
+    using TMVAFacetVarSet = VariadicUnionVarSet<BasicFacetVarSet,
+          FitlessFacetVarSet,
+          BendFacetVarSet,
+          FitFacetVarSet>;
 
   }
 }

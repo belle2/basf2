@@ -30,27 +30,15 @@ namespace Belle2 {
     static char const* const facetBasicNames[] = {
       "superlayer_id",
 
-      "start_wire_id",
       "start_layer_id",
-      "start_ref_x",
-      "start_ref_y",
-      "start_rlinfo",
       "start_drift_length",
       "start_drift_length_sigma",
 
-      "middle_wire_id",
       "middle_layer_id",
-      "middle_ref_x",
-      "middle_ref_y",
-      "middle_rlinfo",
       "middle_drift_length",
       "middle_drift_length_sigma",
 
-      "end_wire_id",
       "end_layer_id",
-      "end_ref_x",
-      "end_ref_y",
-      "end_rlinfo",
       "end_drift_length",
       "end_drift_length_sigma",
     };

@@ -47,22 +47,22 @@ bool FitlessFacetVarSet::extract(const CDCFacet* ptrFacet)
   short iLayerDifference = facet.getStartWire().getILayer() - facet.getEndWire().getILayer();
   short absILayerDifference = std::abs(iLayerDifference);
 
+  var<named("superlayer_id")>() = facet.getISuperLayer();
   var<named("cell_extend")>() = cellExtend;
-  var<named("oclock_delta")>() = shape.getOClockDelta();
+  // var<named("oclock_delta")>() = shape.getOClockDelta();
   var<named("abs_oclock_delta")>() = absOClockDelta;
-
-  var<named("long_arm_is_crossing")>() = longArmIsCrossing;
-  var<named("short_arm_is_crossing")>() = shortArmIsCrossing;
-  var<named("stable_twist")>() = stableTwist;
-  var<named("abs_layer_id_difference")>() = absILayerDifference;
-
-  var<named("crossing_id")>() = std::copysign(100.0 * std::abs(stableTwist) + 10.0 * shortArmIsCrossing + 1.0 * longArmIsCrossing,
-                                              stableTwist);
-  var<named("shape_id")>() = 100.0 * cellExtend + absOClockDelta;
-  var<named("is_forward_progression")>() = (cellExtend + abs(oClockDelta)) <= 6;
-  // funny formula, but basically checks the triple to be a progressing forward and not turning in itself.
-
   var<named("layer_id_difference")>() = iLayerDifference;
+  //var<named("abs_layer_id_difference")>() = absILayerDifference;
 
+  // var<named("long_arm_is_crossing")>() = longArmIsCrossing;
+  // var<named("short_arm_is_crossing")>() = shortArmIsCrossing;
+  // var<named("stable_twist")>() = stableTwist;
+
+  var<named("crossing_id")>() = std::copysign(100.0 * std::abs(stableTwist) +
+                                              10.0 * shortArmIsCrossing +
+                                              1.0 * longArmIsCrossing,
+                                              stableTwist);
+
+  var<named("shape_id")>() = 100.0 * cellExtend + absOClockDelta;
   return true;
 }

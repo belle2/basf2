@@ -64,8 +64,11 @@ namespace Belle2 {
       /// Getter for the vector of wires the hits of this segment are based on in the same order.
       std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const;
 
-      /// Getter for the vector of wires the hits of this segment are based on in the same order.
+      /// Getter for the vector of the wire hits of this segment are based on in the same order.
       CDCWireHitSegment getWireHitSegment() const;
+
+      /// Getter for the vector of right left oriented the hits of this segment.
+      CDCRLWireHitSegment getRLWireHitSegment() const;
 
       /** Fill the hit content of this segment into a genfit::TrackCand.
        *  @return true, if the trajectory information is valid, false otherwise.

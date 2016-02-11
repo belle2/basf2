@@ -48,7 +48,7 @@ namespace Belle2 {
       {
         moduleParamList->addParameter(prefixed(prefix, "karimakiFit"),
                                       m_param_karimakiFit,
-                                      "Switch be selection Karimaki method for fitting instead of Riemann fit",
+                                      "Switch to select Karimaki method for fitting instead of Riemann fit",
                                       m_param_karimakiFit);
 
         moduleParamList->addParameter(prefixed(prefix, "fitPos"),

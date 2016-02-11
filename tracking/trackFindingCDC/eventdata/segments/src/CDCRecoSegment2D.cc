@@ -265,14 +265,24 @@ vector<const CDCWire*> CDCRecoSegment2D::getWireSegment() const
   return wireSegment;
 }
 
-
 CDCWireHitSegment CDCRecoSegment2D::getWireHitSegment() const
 {
   CDCWireHitSegment wireHitSegment;
   for (const CDCRecoHit2D& recoHit2D : *this) {
     wireHitSegment.push_back(&(recoHit2D.getWireHit()));
   }
+  wireHitSegment.setTrajectory2D(getTrajectory2D());
   return wireHitSegment;
+}
+
+CDCRLWireHitSegment CDCRecoSegment2D::getRLWireHitSegment() const
+{
+  CDCRLWireHitSegment rlWireHitSegment;
+  for (const CDCRecoHit2D& recoHit2D : *this) {
+    rlWireHitSegment.push_back(recoHit2D.getRLWireHit());
+  }
+  rlWireHitSegment.setTrajectory2D(getTrajectory2D());
+  return rlWireHitSegment;
 }
 
 

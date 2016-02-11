@@ -14,10 +14,17 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <vector>
+#include <string>
+
 
 
 namespace Belle2 {
@@ -32,6 +39,17 @@ namespace Belle2 {
       using Super = Findlet<const CDCWireHit, CDCRecoSegment2D>;
 
     public:
+
+      /** Add the parameters of the filter to the module */
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
+      {
+        moduleParamList->addParameter(prefixed(prefix, "reconstructedPositions"),
+                                      m_param_recostructedPositions,
+                                      "Switch to reconstruct the positions in the segments "
+                                      "immitating the facet ca picking up all correct hits.",
+                                      m_param_recostructedPositions);
+      }
+
       /// Short description of the findlet
       virtual std::string getDescription() override
       {
@@ -56,6 +74,10 @@ namespace Belle2 {
       virtual void apply(const std::vector<CDCWireHit>& inputWireHits,
                          std::vector<CDCRecoSegment2D>& outputSegments) override final;
 
+
+    private:
+      /// Switch to reconstruct the positions in the segments immitating the facet ca picking up all correct hits.
+      bool m_param_recostructedPositions = false;
     }; // end class SegmentCreator
 
     void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
@@ -86,6 +108,13 @@ namespace Belle2 {
             CDCRecoHit2D recoHit2D = simHitLookUp.getClosestPrimaryRecoHit2D(ptrHit, inputWireHits);
             recoSegment2D.push_back(recoHit2D);
           }
+        }
+      }
+
+      if (m_param_recostructedPositions) {
+        for (CDCRecoSegment2D& segment : outputSegments) {
+          CDCRLWireHitSegment rlWireHitSegment = segment.getRLWireHitSegment();
+          segment = CDCRecoSegment2D::reconstructUsingFacets(rlWireHitSegment);
         }
       }
     }

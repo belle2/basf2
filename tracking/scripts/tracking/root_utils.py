@@ -2,6 +2,7 @@
 
 import ROOT
 import contextlib
+from functools import singledispatch
 
 
 def root_walk(tdirectory):
@@ -163,3 +164,39 @@ def root_browse(tobject):
     else:
         raise ValueError("Can only browse ROOT objects inheriting from TObject.")
     return tbrowser
+
+
+@singledispatch
+def root_ls(obj):
+    """Returns a list of names that are contained in the given obj.
+
+    This is a convinience function to invesitigate the content of ROOT objects,
+    that dispatches on to object type and retieves different things depending on the type.
+    If the obj is a string it is interpreted as a filename.
+    """
+    return list(obj)
+
+
+@root_ls.register(str)
+def __(filename):
+    rootFile = ROOT.TFile(filename)
+    result = ls(rootInputFile)
+
+    rootFile.Close()
+    del rootFile
+    return result
+
+
+@root_ls.register(ROOT.TDirectory)
+def __(tDirectory):
+    tKeys = list(tDirectory.GetListOfKeys())
+    result = sorted([tKey.GetName() for tKey in tKeys])
+    return result
+
+
+@root_ls.register(ROOT.TTree)
+@root_ls.register(ROOT.TNtuple)
+def __(tTree):
+    tBranches = list(tTree.GetListOfBranches())
+    result = sorted([tBranch.GetName() for tBranch in tBranches])
+    return result

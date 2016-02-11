@@ -181,6 +181,10 @@ namespace Belle2 {
       bool areNeighbors(const WireID& wire, const WireID& other) const
       { return getNeighborKind(wire, other).isValid(); }
 
+      /// Getter for the primary neighbor of the given wire id
+      MayBePtr<const CDCWire> getPrimaryNeighbor(short oClockDirection, const WireID& wireID) const
+      { return getPrimaryNeighbor(oClockDirection, wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
+
       /// Getter for the two closest neighbors in the layer outwards.
       WireNeighborPair getNeighborsOutwards(const WireID& wireID) const
       { return getNeighborsOutwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
@@ -222,6 +226,14 @@ namespace Belle2 {
        *  In case the neighbor asked for does not exist the function return nullptr instead. \n
        */
       /**@{*/
+
+      /// Getter for the primary neighbor of the given wire id following the direction on the clock
+      MayBePtr<const CDCWire> getPrimaryNeighbor(short oClockDirection,
+                                                 ISuperLayer iSuperLayer,
+                                                 ILayer iLayer,
+                                                 IWire iWire) const
+      { return getWireSuperLayer(iSuperLayer).getPrimaryNeighbor(oClockDirection, iLayer, iWire);}
+
 
       /// Getter for the two closest neighbors in the layer outwards.
       WireNeighborPair getNeighborsOutwards(ISuperLayer iSuperLayer,
@@ -285,7 +297,7 @@ namespace Belle2 {
        */
       /**@{*/
 
-      /// Getter for the secondary neighbors of the given wire id
+      /// Getter for the secondary neighbor of the given wire id
       MayBePtr<const CDCWire> getSecondaryNeighbor(short oClockDirection, const WireID& wireID) const
       { return getSecondaryNeighbor(oClockDirection, wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
@@ -350,7 +362,7 @@ namespace Belle2 {
        */
       /**@{*/
 
-      /// Getter for the secondary neighbors of the given wire id following the direction on the clock
+      /// Getter for the secondary neighbor of the given wire id following the direction on the clock
       MayBePtr<const CDCWire> getSecondaryNeighbor(short oClockDirection,
                                                    ISuperLayer iSuperLayer,
                                                    ILayer iLayer,

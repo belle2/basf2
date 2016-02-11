@@ -154,6 +154,33 @@ namespace Belle2 {
                                        ILayer iOtherLayer,
                                        IWire iOtherWire) const;
 
+      /**
+       *  Getter for the two closest neighbors in the given o'clock direction.
+       *  Valid values for the o clock direction are 1, 3, 5, 7, 9, 11.
+       */
+      MayBePtr<const CDCWire> getPrimaryNeighbor(short oClockDirection,
+                                                 ILayer iLayer,
+                                                 IWire iWire) const
+      {
+        oClockDirection = modulo(oClockDirection, 12);
+        switch (oClockDirection) {
+          case 1:
+            return getNeighborCWOutwards(iLayer, iWire);
+          case 3:
+            return getNeighborCW(iLayer, iWire);
+          case 5:
+            return getNeighborCWInwards(iLayer, iWire);
+          case 7:
+            return getNeighborCCWInwards(iLayer, iWire);
+          case 9:
+            return getNeighborCCW(iLayer, iWire);
+          case 11:
+            return getNeighborCCWOutwards(iLayer, iWire);
+          default:
+            return nullptr;
+        }
+      }
+
       /// Getter for the two closest neighbors in the layer outwards of the given on
       WireNeighborPair getNeighborsOutwards(ILayer iLayer, IWire iWire) const;
 

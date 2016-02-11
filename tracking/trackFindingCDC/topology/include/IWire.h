@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/numerics/Modulo.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -31,7 +33,7 @@ namespace Belle2 {
        *  @return        Normalised wire index brought to the valid range.
        */
       static IWire wrappedAround(IWire iWire, IWire nWires)
-      { return (iWire % nWires + nWires) % nWires; }
+      { return modulo(iWire, nWires); }
 
       /// Gets the next counter clockwise wire id properly wrapping near wire of highest index.
       static IWire getNextCCW(IWire iWire, IWire nWires)

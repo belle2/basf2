@@ -130,6 +130,9 @@ namespace Belle2 {
       /// Draw the outer wall of the CDC.
       void drawOuterCDCWall(const AttributeMap& attributeMap = AttributeMap());
 
+      /// Draw the super layer bounds of the CDC.
+      void drawSuperLayerBoundaries(const AttributeMap& attributeMap = AttributeMap());
+
       ///Draws a straight Line.
       void drawLine(const float& startX, const float& startY, const float& endX, const float& endY,
                     const AttributeMap& attributeMap = AttributeMap());

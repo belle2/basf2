@@ -450,19 +450,45 @@ void CDCSVGPlotter::drawSegmentTrajectories(const std::string& storeObjName, con
   if (storedRecoSegments) {
     std::vector<CDCRecoSegment2D>& recoSegments = *storedRecoSegments;
 
-    B2INFO("#2D Trajectories " << recoSegments.size() << "from segments");
+    B2INFO("#2D Trajectories " << recoSegments.size() << " from segments");
 
-    std::vector<CDCTrajectory2D> iterTrajectories;
+    std::vector<CDCTrajectory2D> trajectories;
 
     for (auto segment : recoSegments) {
-      iterTrajectories.push_back(segment.getTrajectory2D());
+      trajectories.push_back(segment.getTrajectory2D());
     }
 
     InputValueColorizer<CDCTrajectory2D> colorizer;
-    drawIterable(iterTrajectories, colorizer);
+    drawIterable(trajectories, colorizer);
   } else
     B2INFO(storeObjName << "does not exist in current DataStore");
 }
+
+void CDCSVGPlotter::drawTrackTrajectories(const std::string& storeObjName,
+                                          const std::string&,
+                                          const std::string&)
+{
+  B2INFO("Drawing the fits to the selected RecoHit2DSegments");
+
+  StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(storeObjName);
+  if (storedTracks) {
+    std::vector<CDCTrack>& tracks = *storedTracks;
+
+    B2INFO("#2D Trajectories " << tracks.size() << " from tracks");
+
+    std::vector<CDCTrajectory2D> trajectories;
+
+    for (auto track : tracks) {
+      trajectories.push_back(track.getStartTrajectory3D().getTrajectory2D());
+    }
+
+    InputValueColorizer<CDCTrajectory2D> colorizer;
+    drawIterable(trajectories, colorizer);
+  } else
+    B2INFO(storeObjName << "does not exist in current DataStore");
+}
+
+
 
 template<class AObject>
 void CDCSVGPlotter::draw(const AObject& obj, const std::map<std::string, std::string>& obj_attributes)

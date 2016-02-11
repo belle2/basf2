@@ -241,6 +241,22 @@ void EventDataPlotter::drawOuterCDCWall(const AttributeMap& attributeMap)
   primitivePlotter.drawCircle(centerX, centerY, outerR, attributeMap);
 }
 
+void EventDataPlotter::drawSuperLayerBoundaries(const AttributeMap& attributeMap)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+
+  for (const CDCWireSuperLayer& wireSuperLayer : wireTopology.getWireSuperLayers()) {
+    float centerX = 0.0;
+    float centerY = 0.0;
+    float outerR = wireSuperLayer.getInnerCylindricalR();
+    primitivePlotter.drawCircle(centerX, centerY, outerR, attributeMap);
+  }
+  drawOuterCDCWall(attributeMap);
+}
+
 void EventDataPlotter::drawLine(const float& startX, const float& startY, const float& endX, const float& endY,
                                 const AttributeMap& attributeMap)
 {

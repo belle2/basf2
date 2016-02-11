@@ -199,7 +199,7 @@ namespace Belle2 {
        * Draws SegmentTrajectories.
        * Is only available if the local track finder is in the module chain and
        * specific compile time flags enable the transportation of this data:
-       * @param storeObjName The name of the StoreVector containing the SegmentTrajectories.
+       * @param storeObjName The name of the StoreVector containing the CDCRecoSegments.
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
@@ -207,6 +207,17 @@ namespace Belle2 {
                                    const std::string& stroke,
                                    const std::string& strokeWidth);
 
+      /**
+       * Draws trajectories of the tracks.
+       * Is only available if the local track finder is in the module chain and
+       * specific compile time flags enable the transportation of this data:
+       * @param storeObjName The name of the StoreVector containing the CDCTracks.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
+       */
+      void drawTrackTrajectories(const std::string& storeObjName,
+                                 const std::string& stroke,
+                                 const std::string& strokeWidth);
 
       /**
        * Save the current dom object representation to disk.

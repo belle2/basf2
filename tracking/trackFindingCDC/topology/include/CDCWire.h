@@ -197,24 +197,24 @@ namespace Belle2 {
       { return isInCell(pos3D) ? getDistance(pos3D) : NAN; }
 
       /**
-      *  Getter for the wire reference position.
-      *  Gives the wire's reference position
-      *  which is the point of closest approach to the beam axes.
-      */
+       *  Getter for the wire reference position.
+       *  Gives the wire's reference position
+       *  which is the point of closest approach to the beam axes.
+       */
       const Vector3D& getRefPos3D() const
       { return getWireLine().refPos3D(); }
 
       /**
-      *  Getter for the wire reference position for 2D tracking
-      * Gives the wire's reference position projected to the xy plane.
-      */
+       *  Getter for the wire reference position for 2D tracking
+       *  Gives the wire's reference position projected to the xy plane.
+       */
       const Vector2D& getRefPos2D() const
       { return getWireLine().refPos2D(); }
 
       /**
-      *  Getter for the wire reference z coordinate
-      *  Gives the wire's reference z coordinate
-      */
+       *  Getter for the wire reference z coordinate
+       *  Gives the wire's reference z coordinate
+       */
       double getRefZ() const
       { return getWireLine().refZ(); }
 
@@ -257,6 +257,14 @@ namespace Belle2 {
       /// Getter for the z coordinate at the backward joint points of the wires
       double getBackwardZ() const
       { return getWireLine().backwardZ(); }
+
+      /// Getter for the forward joint point of the wire with the wall.
+      Vector3D getForwardPos3D() const
+      { return getWireLine().forward3D(); }
+
+      /// Getter for the forward joint point of the wire with the wall.
+      Vector3D getBackwardPos3D() const
+      { return getWireLine().backward3D(); }
 
       /// Checks whether the position is in the drift cell surrounding the wire
       bool isInCell(const Vector3D& pos3D) const;

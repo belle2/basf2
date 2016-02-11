@@ -12,6 +12,7 @@
 
 #include <cdc/translators/SimpleTDCCountTranslator.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <cdc/translators/LinearGlobalADCCountTranslator.h>
 
 #include <cmath>
 
@@ -26,11 +27,19 @@ TDCCountTranslatorBase& CDCWireHit::getTDCCountTranslator()
   return s_tdcCountTranslator;
 }
 
+ADCCountTranslatorBase& CDCWireHit::getADCCountTranslator()
+{
+  static CDC::LinearGlobalADCCountTranslator s_adcCountTranslator;
+  return s_adcCountTranslator;
+}
+
 CDCWireHit::CDCWireHit() :
   m_automatonCell(1)
 {}
 
-CDCWireHit::CDCWireHit(const CDCHit* const ptrHit, TDCCountTranslatorBase* ptrTranslator):
+CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
+                       TDCCountTranslatorBase* ptrTDCCountTranslator,
+                       ADCCountTranslatorBase* ptrADCCountTranslator):
   m_automatonCell(1),
   m_wire(ptrHit ? CDCWire::getInstance(*ptrHit) : nullptr),
   m_hit(ptrHit)
@@ -41,30 +50,37 @@ CDCWireHit::CDCWireHit(const CDCHit* const ptrHit, TDCCountTranslatorBase* ptrTr
   }
   const CDCHit& hit = *ptrHit;
 
-  TDCCountTranslatorBase& translator = ptrTranslator ? *ptrTranslator : getTDCCountTranslator();
+  TDCCountTranslatorBase& tdcCountTranslator = ptrTDCCountTranslator ? *ptrTDCCountTranslator : getTDCCountTranslator();
+  ADCCountTranslatorBase& adcCountTranslator = ptrADCCountTranslator ? *ptrADCCountTranslator : getADCCountTranslator();
 
   float initialTOFEstimate = 0;
 
-  float refDriftLengthRight = translator.getDriftLength(hit.getTDCCount(),
-                                                        getWireID(),
-                                                        initialTOFEstimate,
-                                                        false, //bool leftRight
-                                                        getWire().getRefZ());
+  float refDriftLengthRight = tdcCountTranslator.getDriftLength(hit.getTDCCount(),
+                              getWireID(),
+                              initialTOFEstimate,
+                              false, //bool leftRight
+                              getWire().getRefZ());
 
-  float refDriftLengthLeft = translator.getDriftLength(hit.getTDCCount(),
-                                                       getWireID(),
-                                                       initialTOFEstimate,
-                                                       true, //bool leftRight
-                                                       getWire().getRefZ());
-
+  float refDriftLengthLeft = tdcCountTranslator.getDriftLength(hit.getTDCCount(),
+                             getWireID(),
+                             initialTOFEstimate,
+                             true, //bool leftRight
+                             getWire().getRefZ());
 
   m_refDriftLength = (refDriftLengthLeft + refDriftLengthRight) / 2.0;
 
-  m_refDriftLengthVariance = translator.getDriftLengthResolution(m_refDriftLength,
+  m_refDriftLengthVariance = tdcCountTranslator.getDriftLengthResolution(m_refDriftLength,
                              getWireID(),
                              false, //bool leftRight ?
                              getWire().getRefZ());
+
+  m_refCharge = adcCountTranslator.getCharge(hit.getADCCount(),
+                                             getWireID(),
+                                             false, //bool leftRight
+                                             getWire().getRefZ(),
+                                             0); //theta
 }
+
 
 CDCWireHit::CDCWireHit(const WireID& wireID,
                        const double driftLength,

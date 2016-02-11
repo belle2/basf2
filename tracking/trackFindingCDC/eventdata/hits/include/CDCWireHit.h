@@ -17,6 +17,7 @@
 #include <tracking/trackFindingCDC/numerics/Index.h>
 
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
+#include <cdc/dataobjects/ADCCountTranslatorBase.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <assert.h>
@@ -39,6 +40,9 @@ namespace Belle2 {
       /// Return an instance of the used TDC count translator.
       static CDC::TDCCountTranslatorBase& getTDCCountTranslator();
 
+      /// Return an instance of the used ADC count translator.
+      static CDC::ADCCountTranslatorBase& getADCCountTranslator();
+
       /// A default value for the drift length variance if no variance from the drift length translation is available.
       static constexpr const double c_simpleDriftLengthVariance  = 0.000169;
 
@@ -54,7 +58,9 @@ namespace Belle2 {
        *  @param  ptrTranslator   Optional xt relation used to translate the tdc count to a drift length.
        *                          If omitted use the default from the CDCWireHit.
        */
-      CDCWireHit(const CDCHit* const ptrHit, CDC::TDCCountTranslatorBase* ptrTranslator = nullptr);
+      CDCWireHit(const CDCHit* const ptrHit,
+                 CDC::TDCCountTranslatorBase* = nullptr,
+                 CDC::ADCCountTranslatorBase* = nullptr);
 
       /// Constructor that takes a wire ID and a driftlength at the reference. For testing only!
       CDCWireHit(const WireID& wireID,
@@ -178,6 +184,10 @@ namespace Belle2 {
       double getRefDriftLengthVariance() const
       { return m_refDriftLengthVariance; }
 
+      /// Getter for the charge due to energy deposit in the drift cell
+      double getRefCharge() const
+      { return m_refCharge; }
+
       /// Checks if the wire hit is based on the given wire.
       bool isOnWire(const CDCWire& wire) const
       { return getWire() == wire; }
@@ -236,6 +246,9 @@ namespace Belle2 {
 
       /// Memory for the variance of the drift length at the wire reference point.
       double m_refDriftLengthVariance = c_simpleDriftLengthVariance;
+
+      /// Memory for the charge induced by the energy deposit in the drift cell.
+      double m_refCharge = 0.0;
 
       /// Memory for the CDCWire pointer.
       const CDCWire* m_wire = nullptr;

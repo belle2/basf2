@@ -125,7 +125,7 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
 
       const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
 
-      if (wireTopology.areNeighbors(primarySimHit.getWireID(), wireID) or primarySimHit.getWireID() == wireID) {
+      if (wireTopology.arePrimaryNeighbors(primarySimHit.getWireID(), wireID) or primarySimHit.getWireID() == wireID) {
 
         // Found a hit on the same wire from the primary particle.
         primarySimHitsOnSameOrNeighborWire.push_back(ptrPrimarySimHit);

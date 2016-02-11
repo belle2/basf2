@@ -121,7 +121,7 @@ namespace Belle2 {
                 checkNext.push_back(neighborCellHolderPtr);
 
               } else if (neighborICluster != iCluster) {
-                B2WARNING("Neighboring hit was already assigned to different cluster. Check if the neighborhood is symmetric.");
+                B2WARNING("Clusterizer: Neighboring item was already assigned to different cluster. Check if the neighborhood is symmetric.");
 
               } else {
 

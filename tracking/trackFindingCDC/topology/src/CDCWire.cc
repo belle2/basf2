@@ -108,9 +108,9 @@ WireNeighborKind CDCWire::getNeighborKind(const CDCWire& wire) const
   return CDCWireTopology::getInstance().getNeighborKind(getWireID(), wire.getWireID());
 }
 
-bool CDCWire::isNeighborWith(const CDCWire& wire) const
+bool CDCWire::isPrimaryNeighborWith(const CDCWire& wire) const
 {
-  return CDCWireTopology::getInstance().areNeighbors(getWireID(), wire.getWireID());
+  return CDCWireTopology::getInstance().arePrimaryNeighbors(getWireID(), wire.getWireID());
 }
 
 WireNeighborPair CDCWire::getNeighborsInwards() const

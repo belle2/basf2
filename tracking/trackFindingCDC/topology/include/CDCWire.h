@@ -281,7 +281,7 @@ namespace Belle2 {
       WireNeighborKind getNeighborKind(const CDCWire& wire) const;
 
       /// Returns whether the give wire is a neighbor of this wire
-      bool isNeighborWith(const CDCWire& wire) const;
+      bool isPrimaryNeighborWith(const CDCWire& wire) const;
 
       /**
        *  Gives the two wires in the next layer inward.

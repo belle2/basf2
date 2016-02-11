@@ -178,8 +178,12 @@ namespace Belle2 {
       WireNeighborKind getNeighborKind(const WireID& wire, const WireID& other) const;
 
       /// Checks if two wires are primary neighbors.
-      bool areNeighbors(const WireID& wire, const WireID& other) const
-      { return getNeighborKind(wire, other).isValid(); }
+      bool arePrimaryNeighbors(const WireID& wire, const WireID& other) const
+      { return getNeighborKind(wire, other).getCellDistance() == 1; }
+
+      /// Checks if two wires are secondary neighbors.
+      bool areSeconaryNeighbors(const WireID& wire, const WireID& other) const
+      { return getNeighborKind(wire, other).getCellDistance() == 2; }
 
       /// Getter for the primary neighbor of the given wire id
       MayBePtr<const CDCWire> getPrimaryNeighbor(short oClockDirection, const WireID& wireID) const

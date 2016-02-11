@@ -166,7 +166,9 @@ void CDCMCTrackStore::fillMCSegments()
                               neighborHit.getILayer(),
                               neighborHit.getIWire());
 
-        if (wireTopology.areNeighbors(wireID, neighborWireID) or wireID == neighborWireID) {
+        if (wireTopology.arePrimaryNeighbors(wireID, neighborWireID) or
+            wireTopology.areSeconaryNeighbors(wireID, neighborWireID) or
+            wireID == neighborWireID) {
           HitWithCell* ptrHitWithCell = &hitWithCell;
           HitWithCell* ptrNeighborHitWithCell = &neighborHitWithCell;
           hitNeighborhood.emplace(ptrHitWithCell, ptrNeighborHitWithCell);

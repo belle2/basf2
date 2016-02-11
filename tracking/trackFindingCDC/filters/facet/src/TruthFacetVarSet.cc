@@ -35,17 +35,16 @@ bool TruthFacetVarSet::extract(const CDCFacet* ptrFacet)
 
   const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
-  const CDCWireHit& startWireHit = rlWireHitTriple.getStartWireHit();
   const CDCWireHit& middleWireHit = rlWireHitTriple.getMiddleWireHit();
-  const CDCWireHit& endWireHit = rlWireHitTriple.getEndWireHit();
 
-  const CDCSimHit* startSimHit = mcHitLookUp.getSimHit(startWireHit.getHit());
   const CDCSimHit* middleSimHit = mcHitLookUp.getSimHit(middleWireHit.getHit());
-  const CDCSimHit* endSimHit = mcHitLookUp.getSimHit(endWireHit.getHit());
-
-  var<named("startThetaTruth")>() = startSimHit->getPosTrack().Theta();
-  var<named("middleThetaTruth")>() = middleSimHit->getPosTrack().Theta();
-  var<named("endThetaTruth")>() = endSimHit->getPosTrack().Theta();
+  if (middleSimHit) {
+    var<named("truth_pos_theta")>() = middleSimHit->getPosTrack().Theta();
+    var<named("truth_mom_phi")>() = middleSimHit->getMomentum().Phi();
+  } else {
+    var<named("truth_pos_theta")>() = NAN;
+    var<named("truth_mom_phi")>() = NAN;
+  }
 
   return true;
 }

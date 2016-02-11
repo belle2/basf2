@@ -20,9 +20,8 @@ namespace Belle2 {
     constexpr
     static char const* const facetTruthNames[] = {
       "truth",
-      "startThetaTruth",
-      "middleThetaTruth",
-      "endThetaTruth",
+      "truth_pos_theta",
+      "truth_mom_phi",
     };
 
     /** Class that specifies the names of the variables

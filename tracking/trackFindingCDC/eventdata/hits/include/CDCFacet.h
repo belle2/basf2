@@ -69,6 +69,19 @@ namespace Belle2 {
       const ParameterLine2D& getMiddleToEndLine() const
       { return m_middleToEnd; }
 
+      /// Setter for the tangential line from the first to the second hit.
+      void setStartToMiddleLine(const ParameterLine2D& startToMiddle) const
+      { m_startToMiddle = startToMiddle; }
+
+      /// Setter for the tangential line from the first to the third hit.
+      void setStartToEndLine(const ParameterLine2D& startToEnd) const
+      { m_startToEnd = startToEnd; }
+
+      /// Setter for the tangential line from the second to the third hit.
+      void setMiddleToEndLine(const ParameterLine2D& middleToEnd) const
+      { m_middleToEnd = middleToEnd; }
+
+
       /// Construct and stores the three tangential lines corresponding to the three pairs of wire hits.
       void adjustLines() const;
 

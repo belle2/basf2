@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/numerics/numerics.h>
+#include <tracking/trackFindingCDC/numerics/Modulo.h>
 
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>

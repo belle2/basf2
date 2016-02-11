@@ -18,15 +18,6 @@
 namespace Belle2 {
 
   namespace TrackFindingCDC {
-    ///Checks if an integer is even
-    template<class AInt>
-    inline bool isEven(const AInt& x)
-    { return (x % 2) == 0; }
-
-    ///Checks if an integer is odd
-    template<class AInt>
-    inline bool isOdd(const AInt& x)
-    { return (x % 2) != 0; }
 
     /// Computes the square of an input value, and allows for operations like
     /// TVector3 * TVector3, which results in a double return type

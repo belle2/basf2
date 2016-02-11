@@ -11,6 +11,7 @@
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
 #include <ecl/digitization/algorithms.h>
 #include <ecl/digitization/shaperdsp.h>
+#include <ecl/digitization/EclConfiguration.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
@@ -40,6 +41,82 @@ REG_MODULE(ECLDigitizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
+void ECLDigitizerModule::signalsample_t::InitSample(const double* MPd)
+{
+  const int N = m_ns * m_nl;
+  vector<double> MP(MPd, MPd + 10);
+  ShaperDSP_t dsp(MP);
+  dsp.settimestride(m_tick / m_ns);
+  dsp.fillarray(0.0, N, m_ft);
+
+  double sum = 0;
+  for (int i = 0; i < N; i++) sum += m_ft[i];
+  m_sumscale = m_ns / sum;
+}
+
+void ECLDigitizerModule::signalsample_t::InitSample(const float* MP)
+{
+  double MPd[10];
+  for (int i = 0; i < 10; i++) MPd[i] = MP[i];
+  InitSample(MPd);
+}
+
+void ECLDigitizerModule::adccounts_t::AddHit(const double a, const double t0, const ECLDigitizerModule::signalsample_t& s)
+{
+  total += s.Accumulate(a, t0, c);
+}
+
+double ECLDigitizerModule::signalsample_t::Accumulate(const double a, const double t0, double* s) const
+{
+  // input parameters
+  // a -- signal amplitude
+  // t -- signal offset
+  // output parameter
+  // s -- output array with added signal
+  const double itick = 1 / m_tick;          // reciprocal to avoid division in usec^-1 (has to be evaluated at compile time)
+  const double  tlen = m_nl - 1.0 / m_ns;   // length of the sampled signal in ADC clocks units
+  const double  tmax = m_tmin + m_nsmp - 1; // upper range of the fit region
+
+  double t = t0 * itick; // rescale time in usec to ADC clocks
+  double x0 = t, x1 = t + tlen;
+
+  if (x0 > tmax) return 0; // signal starts after the upper range of output array -- do nothing
+  if (x0 < m_tmin) {
+    if (x1 < m_tmin) return 0; // signal ends before lower range of output array -- do nothing
+    x0 = m_tmin; // adjust signal with range of output array
+  }
+
+  int imax = m_nsmp; // length of sampled signal is long enough so
+  // the last touched element is the last element
+  // of the output array
+  if (x1 < tmax) { // if initial time is too early we need to adjust
+    // the last touched element of output array to avoid
+    // out-of-bound situation in m_ft
+    imax = x1 - m_tmin; // imax is always positive so floor can be
+    // replace by simple typecast
+    imax += 1; // like s.end()
+  }
+
+  double imind = ceil(x0 - m_tmin); // store result in double to avoid int->double conversion below
+  // the ceil function today at modern CPUs is surprisingly fast (before it was horribly slow)
+  int imin = imind; // starting point to fill output array
+  double w = ((m_tmin - t) + imind) * double(m_ns);
+  int jmin = w; // starting point in sampled signal array
+  w -= jmin;
+
+  // use linear interpolation between samples. Since signal samples
+  // are aligned with output samples only two weights are need to
+  // calculate to fill output array
+  const double w1 = a * w, w0 = a - w1;
+  double sum = 0;
+  for (int i = imin, j = jmin; i < imax; i++, j += m_ns) {
+    double amp = w0 * m_ft[j] + w1 * m_ft[j + 1];
+    s[i] += amp;
+    sum  += amp;
+  }
+  return sum * m_sumscale;
+}
+
 ECLDigitizerModule::ECLDigitizerModule() : Module()
 {
   //Set module properties
@@ -61,12 +138,9 @@ void ECLDigitizerModule::initialize()
   StoreArray<ECLDigit> ecldigi; ecldigi.registerInDataStore();
   StoreArray<ECLTrig>  ecltrig; ecltrig.registerInDataStore();
 
-  StoreArray<ECLHit> hitList;
-  ecldigi.registerRelationTo(hitList);
-
   readDSPDB();
 
-  m_adc.resize(EclConfiguration::m_nch);
+  m_adc.resize(m_nch);
 
   EclConfiguration::get().setBackground(m_background);
 
@@ -78,7 +152,7 @@ void ECLDigitizerModule::beginRun()
 
 // interface to C shape fitting function function
 void ECLDigitizerModule::shapeFitterWrapper(const int j, const int* FitA, const int ttrig,
-                                            int& m_lar, int& m_ltr, int& m_lq) const
+                                            int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const
 {
   const int n16 = 16; // number of points before signal n16 = 16
   const crystallinks_t& t = m_tbl[j]; //lookup table [0,8735]
@@ -86,7 +160,7 @@ void ECLDigitizerModule::shapeFitterWrapper(const int j, const int* FitA, const 
   shapeFitter((short int*)m_idn[t.idn].id, (int*)r.f, (int*)r.f1, (int*)r.fg41, (int*)r.fg43,
               (int*)r.fg31, (int*)r.fg32, (int*)r.fg33,
               (int*)FitA, (int*)&ttrig, (int*)&n16,
-              &m_lar, &m_ltr, &m_lq);
+              &m_lar, &m_ltr, &m_lq , &m_chi);
 }
 
 void ECLDigitizerModule::event()
@@ -102,8 +176,8 @@ void ECLDigitizerModule::event()
   StoreArray<ECLDsp> eclDsps;
   StoreArray<ECLTrig> eclTrigs;
 
-  const double trgtick = EclConfiguration::m_tick / EclConfiguration::m_ntrg;   // trigger tick
-  const double  DeltaT = gRandom->Uniform(0, double(EclConfiguration::m_ntrg)); // trigger decision can come in any time ???
+  const double trgtick = m_tick / m_ntrg;   // trigger tick
+  const double  DeltaT = gRandom->Uniform(0, double(m_ntrg)); // trigger decision can come in any time ???
   const double timeInt = DeltaT * trgtick;
   const int      ttrig = int(DeltaT);
 
@@ -112,18 +186,17 @@ void ECLDigitizerModule::event()
 
   // clear the storage for the event
   memset(m_adc.data(), 0, m_adc.size()*sizeof(adccounts_t));
-  vector< vector< const ECLHit*> > hitmap(EclConfiguration::m_nch);
+
   // emulate response for ECL hits after ADC measurements
   for (const auto& eclHit : eclHits) {
     int j = eclHit.getCellId() - 1; //0~8735
     double hitE       = eclHit.getEnergyDep() / Unit::GeV;
     double hitTimeAve = eclHit.getTimeAve() / Unit::us;
     m_adc[j].AddHit(hitE, hitTimeAve + timeInt - 0.32, m_ss[m_tbl[j].iss]);
-    if (eclHit.getBackgroundTag() == ECLHit::bg_none) hitmap[j].push_back(&eclHit);
   }
 
   // loop over entire calorimeter
-  for (int j = 0; j < EclConfiguration::m_nch; j++) {
+  for (int j = 0; j < m_nch; j++) {
     adccounts_t& a = m_adc[j];
 
     if (m_calibration) {
@@ -135,22 +208,24 @@ void ECLDigitizerModule::event()
       continue;
 
     //Noise generation
-    float z[EclConfiguration::m_nsmp];
-    for (int i = 0; i < EclConfiguration::m_nsmp; i++)
+    float z[m_nsmp];
+    for (int i = 0; i < m_nsmp; i++)
       z[i] = gRandom->Gaus(0, 1);
 
-    float AdcNoise[EclConfiguration::m_nsmp];
+    float AdcNoise[m_nsmp];
     m_noise[m_tbl[j].inoise].generateCorrelatedNoise(z, AdcNoise);
 
-    int FitA[EclConfiguration::m_nsmp];
-    for (int  i = 0; i < EclConfiguration::m_nsmp; i++)
+    int FitA[m_nsmp];
+    for (int  i = 0; i < m_nsmp; i++)
       FitA[i] = 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000;
 
     int  energyFit = 0; // fit output : Amplitude 18 bits
     int       tFit = 0; // fit output : T_ave     12 bits
     int qualityFit = 0; // fit output : quality    2 bits
+    int        chi = 0; // fit output : chi square   it is not available in the experiment
 
-    shapeFitterWrapper(j, FitA, ttrig, energyFit, tFit, qualityFit);
+
+    shapeFitterWrapper(j, FitA, ttrig, energyFit, tFit, qualityFit, chi);
 
     if (energyFit > 0) {
       int CellId = j + 1;
@@ -163,8 +238,8 @@ void ECLDigitizerModule::event()
       eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
       eclDigit->setTimeFit(tFit);  // t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
       eclDigit->setQuality(qualityFit);
-      for (const auto& hit : hitmap[j])
-        eclDigit->addRelationTo(hit);
+      eclDigit->setChi(chi);
+
     }
   } //store each crystal hit
 
@@ -198,7 +273,7 @@ void ECLDigitizerModule::readDSPDB()
 
   if (tree == 0 || tree2 == 0 || tree3 == 0) B2FATAL("Data not found");
 
-  m_tbl.resize(EclConfiguration::m_nch);
+  m_tbl.resize(m_nch);
 
   const int maxncellid = 512;
   int ncellId;
@@ -207,7 +282,7 @@ void ECLDigitizerModule::readDSPDB()
   tree->SetBranchAddress("ncellId", &ncellId);
   tree->SetBranchAddress("cellId", cellId.data());
 
-  vector<int> eclWaveformDataTable(EclConfiguration::m_nch);
+  vector<int> eclWaveformDataTable(m_nch);
   for (Long64_t j = 0, jmax = tree->GetEntries(); j < jmax; j++) {
     tree->GetEntry(j);
     assert(ncellId <= maxncellid);
@@ -245,7 +320,7 @@ void ECLDigitizerModule::readDSPDB()
     assert(ncellId <= maxncellid);
     m_noise.push_back(*noise);
     if (ncellId == 0) {
-      for (int i = 0; i < EclConfiguration::m_nch; i++)
+      for (int i = 0; i < m_nch; i++)
         m_tbl[i].inoise = 0;
       break;
     } else {
@@ -262,7 +337,7 @@ void ECLDigitizerModule::readDSPDB()
     repack(eclWFAlgoParams[i], m_idn[i]);
 
   vector<uint_pair_t> pairIdx;
-  for (int i = 0; i < EclConfiguration::m_nch; i++) {
+  for (int i = 0; i < m_nch; i++) {
     unsigned int   wfIdx = eclWaveformDataTable[i];
     unsigned int algoIdx = m_tbl[i].idn;
     uint_pair_t p(wfIdx, algoIdx);
@@ -296,7 +371,7 @@ void ECLDigitizerModule::readDSPDB()
   m_ss.resize(1);
   float MP[10]; eclWFData->getWaveformParArray(MP);
   m_ss[0].InitSample(MP);
-  for (int i = 0; i < EclConfiguration::m_nch; i++) m_tbl[i].iss = 0;
+  for (int i = 0; i < m_nch; i++) m_tbl[i].iss = 0;
   B2INFO("ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
 
   if (eclWFData) delete eclWFData;
@@ -340,6 +415,8 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
   eclWFData.getWaveformParArray(MP.data());
 
   // shape function parameters
+  int iff = 14;   //Alex Bobrov for correct chi square
+
   int ia = 1 << eclWFAlgo.getka();
   int ib = 1 << eclWFAlgo.getkb();
   int ic = 1 << eclWFAlgo.getkc();
@@ -353,11 +430,11 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
   int_array_24x16_t&  ref_fg43 = p.fg43;
 
   ShaperDSP_t dsp(MP);
-  dsp.settimestride(EclConfiguration::m_tick);
-  dsp.setseedoffset(EclConfiguration::m_tick / EclConfiguration::m_ndt);
-  dsp.settimeseed(-(EclConfiguration::m_tick - (EclConfiguration::m_tick / EclConfiguration::m_ndt)));
+  dsp.settimestride(m_tick);
+  dsp.setseedoffset(m_tick / m_ndt);
+  dsp.settimeseed(-(m_tick - (m_tick / m_ndt)));
   vector<dd_t> f(16);
-  for (int k = 0; k < 2 * EclConfiguration::m_ndt; k++, dsp.nextseed()) { // calculate fit parameters around 0 +- 1 ADC tick
+  for (int k = 0; k < 2 * m_ndt; k++, dsp.nextseed()) { // calculate fit parameters around 0 +- 1 ADC tick
     dsp.fillvector(f);
 
     double g0g0 = 0, g0g1 = 0, g1g1 = 0, g0g2 = 0, g1g2 = 0, g2g2 = 0;
@@ -394,8 +471,8 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
     for (int i = 0; i < 16; i++) {
       double w = i ? 1.0 : 1. / 16.;
 
-      ref_f   [k][i] = lrint(f[i].first  * ia * w);
-      ref_f1  [k][i] = lrint(f[i].second * ia * w * sd);
+      ref_f   [k][i] = lrint(f[i].first  * iff * w);
+      ref_f1  [k][i] = lrint(f[i].second * iff * w * sd);
 
       double fg31 = (a00 * sg0[i] + a01 * sg1[i] + a02 * sg2[i]) * igg2;
       double fg32 = (a01 * sg0[i] + a11 * sg1[i] + a12 * sg2[i]) * igg2;

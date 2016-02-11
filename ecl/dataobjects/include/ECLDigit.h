@@ -22,11 +22,13 @@ namespace Belle2 {
   class ECLDigit : public RelationsObject {
   public:
     /** default constructor for ROOT */
-    ECLDigit() {
+    ECLDigit()
+    {
       m_CellId = 0;    /**< Cell ID */
       m_Amp = 0;       /**< Fitting Amplitude */
       m_TimeFit = 0;   /**< Fitting Time */
       m_Quality = 0;   /**< Fitting Quality */
+      m_Chi = 0;      /**< Fitting chisquared */
 
       ;
     }
@@ -48,6 +50,10 @@ namespace Belle2 {
     /*! Set Fitting Quality
      */
     void setQuality(int Quality) { m_Quality = Quality; }
+
+    /*! Set Chi-squared
+    */
+    void setChi(int Chi) { m_Chi = Chi; }
 
 
     /*! Get Cell ID
@@ -71,13 +77,19 @@ namespace Belle2 {
      */
     int getQuality() const { return m_Quality; }
 
+    /*! Get Chi-squared
+     * @return Chi-squared
+     */
+    int getChi() const { return m_Chi; }
+
+
   private:
 
     int m_CellId;      /**< Cell ID */
     int m_Amp;         /**< Fitting Amplitude */
     int m_TimeFit;     /**< Fitting Time */
     int m_Quality;     /**< Fitting Quality */
-
+    int m_Chi;    /**< Fitting chi2-squared */
 
     ClassDef(ECLDigit, 1);/**< ClassDef */
 

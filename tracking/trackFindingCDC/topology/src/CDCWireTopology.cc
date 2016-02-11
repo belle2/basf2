@@ -81,11 +81,11 @@ ISuperLayer CDCWireTopology::getISuperLayerAtCylindricalR(const double cylindric
   return ISuperLayerUtil::c_OuterVolume;
 }
 
-EWireNeighborKind CDCWireTopology::getNeighborKind(const WireID& wireID, const WireID& otherID) const
+WireNeighborKind CDCWireTopology::getNeighborKind(const WireID& wireID, const WireID& otherID) const
 {
   if (wireID.getISuperLayer() !=  otherID.getISuperLayer() and
       isValidISuperLayer(wireID.getISuperLayer())) {
-    return EWireNeighborKind::c_None;
+    return WireNeighborKind();
   } else {
     const CDCWireSuperLayer& superlayer = getWireSuperLayer(wireID.getISuperLayer());
     return superlayer.getNeighborKind(wireID.getILayer(), wireID.getIWire(),

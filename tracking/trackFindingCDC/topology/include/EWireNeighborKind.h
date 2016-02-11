@@ -16,7 +16,7 @@ namespace Belle2 {
     /// Namespace hiding the constants of the enum
     namespace NWireNeighborKind {
       /// Type for the neighbor relationship from in wire to an other, imagined in the clock
-      enum class EWireNeighborKind :  signed short {
+      enum class EWireNeighborKind : signed short {
 
         /// Constant to indicate that two wires are not neighbors.
         c_None = 0,

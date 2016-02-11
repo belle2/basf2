@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 #include <tracking/trackFindingCDC/topology/ILayer.h>
 #include <tracking/trackFindingCDC/topology/IWire.h>
-#include <tracking/trackFindingCDC/topology/EWireNeighborKind.h>
+#include <tracking/trackFindingCDC/topology/WireNeighborKind.h>
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
@@ -148,24 +148,11 @@ namespace Belle2 {
        *  Checks if two wires are closest neighbors. see details.
        *  Returns the relation of the first wire to the second wire give by their
        *  layer id within the superlayer and the wire id.
-       *  If they are not neighbors zero is returned.
-       *  If they are neighbors the return value indicates
-       *  the direction to go from the first wire to the second. \n
-       *  The return value is one of \n
-       *  EWireNeighborKind::c_None for the wires being no neighbors \n
-       *  EWireNeighborKind::c_CWOut = 1  for clockwise outwards \n
-       *  EWireNeighborKind::c_CW = 3 for clockwise \n
-       *  EWireNeighborKind::c_CWIn = 5 for clockwise inwards \n
-       *  EWireNeighborKind::c_CCWIn = 7 for counterclockwise inwards \n
-       *  EWireNeighborKind::c_CCW = 9 for counterclockwise \n
-       *  EWireNeighborKind::c_CCWOut = 11 for counterclockwise outwards \n
-       *  The values are choosen to have an assoziation with the numbers on a regular clock.
-       *  ( compare secondary neighborhood )
        */
-      EWireNeighborKind getNeighborKind(ILayer iLayer,
-                                        IWire iWire,
-                                        ILayer iOtherLayer,
-                                        IWire iOtherWire) const;
+      WireNeighborKind getNeighborKind(ILayer iLayer,
+                                       IWire iWire,
+                                       ILayer iOtherLayer,
+                                       IWire iOtherWire) const;
 
       /// Getter for the two closest neighbors in the layer outwards of the given on
       WireNeighborPair getNeighborsOutwards(ILayer iLayer, IWire iWire) const;
@@ -210,6 +197,40 @@ namespace Belle2 {
        *  In case the neighbor asked for does not exist, the functions return nullptr instead.
        */
       /**@{*/
+      MayBePtr<const CDCWire> getSecondaryNeighbor(short oClockDirection,
+                                                   ILayer iLayer,
+                                                   IWire iWire) const
+      {
+        oClockDirection = modulo(oClockDirection, 12);
+        switch (oClockDirection) {
+          case 0:
+            return getSecondNeighborTwelveOClock(iLayer, iWire);
+          case 1:
+            return getSecondNeighborOneOClock(iLayer, iWire);
+          case 2:
+            return getSecondNeighborTwoOClock(iLayer, iWire);
+          case 3:
+            return getSecondNeighborThreeOClock(iLayer, iWire);
+          case 4:
+            return getSecondNeighborFourOClock(iLayer, iWire);
+          case 5:
+            return getSecondNeighborFiveOClock(iLayer, iWire);
+          case 6:
+            return getSecondNeighborSixOClock(iLayer, iWire);
+          case 7:
+            return getSecondNeighborSevenOClock(iLayer, iWire);
+          case 8:
+            return getSecondNeighborEightOClock(iLayer, iWire);
+          case 9:
+            return getSecondNeighborNineOClock(iLayer, iWire);
+          case 10:
+            return getSecondNeighborTenOClock(iLayer, iWire);
+          case 11:
+            return getSecondNeighborElevenOClock(iLayer, iWire);
+          default:
+            return nullptr;
+        }
+      }
 
       /// Getter for secondary neighbor at the one o'clock position
       MayBePtr<const CDCWire> getSecondNeighborOneOClock(ILayer iLayer, IWire iWire) const

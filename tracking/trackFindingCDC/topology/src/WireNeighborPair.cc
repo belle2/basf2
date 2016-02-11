@@ -14,9 +14,9 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-EWireNeighborKind WireNeighborPair::getNeighborKind() const
+WireNeighborKind WireNeighborPair::getNeighborKind() const
 {
-  if (not getFirst() or not getSecond()) return EWireNeighborKind::c_None;
+  if (not getFirst() or not getSecond()) return WireNeighborKind();
 
   return CDCWireTopology::getInstance().getNeighborKind(*getFirst(), *getSecond());
 }

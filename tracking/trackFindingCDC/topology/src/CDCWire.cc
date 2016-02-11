@@ -103,7 +103,7 @@ bool CDCWire::isInCell(const Vector3D& pos3D) const
   return inPhi;
 }
 
-EWireNeighborKind CDCWire::getNeighborKind(const CDCWire& wire) const
+WireNeighborKind CDCWire::getNeighborKind(const CDCWire& wire) const
 {
   return CDCWireTopology::getInstance().getNeighborKind(getWireID(), wire.getWireID());
 }
@@ -151,4 +151,10 @@ MayBePtr<const CDCWire> CDCWire::getNeighborCCWOutwards() const
 MayBePtr<const CDCWire> CDCWire::getNeighborCWOutwards() const
 {
   return CDCWireTopology::getInstance().getNeighborCWOutwards(getWireID());
+}
+
+
+MayBePtr<const CDCWire> CDCWire::getSecondaryNeighbor(short oClockDirection) const
+{
+  return CDCWireTopology::getInstance().getSecondaryNeighbor(oClockDirection, getWireID());
 }

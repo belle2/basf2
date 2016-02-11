@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
+#include <tracking/trackFindingCDC/numerics/Modulo.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -26,61 +27,52 @@ void CDCWireSuperLayer::initialize()
 {
 }
 
-EWireNeighborKind CDCWireSuperLayer::getNeighborKind(ILayer iLayer,
-                                                     IWire iWire,
-                                                     ILayer iOtherLayer,
-                                                     IWire iOtherWire) const
+WireNeighborKind CDCWireSuperLayer::getNeighborKind(ILayer iLayer,
+                                                    IWire iWire,
+                                                    ILayer iOtherLayer,
+                                                    IWire iOtherWire) const
 {
-  if (not isValidILayer(iLayer)) return EWireNeighborKind::c_None;
-  if (not isValidILayer(iOtherLayer)) return EWireNeighborKind::c_None;
+  if (not isValidILayer(iLayer)) return WireNeighborKind();
+  if (not isValidILayer(iOtherLayer)) return WireNeighborKind();
 
   const ILayer iLayerDifference = iOtherLayer - iLayer;
+  const ILayer absILayerDifference = abs(iLayerDifference);
   const CDCWireLayer& layer = getWireLayer(iLayer);
   const CDCWireLayer& otherLayer = getWireLayer(iOtherLayer);
   const ERotation deltaShift = otherLayer.getShiftDelta(layer);
   const IWire nWires = layer.size();
 
-  if (iLayerDifference == 0) {
-    if (IWireUtil::getNextCW(iWire, nWires) == iOtherWire) return EWireNeighborKind::c_CW;
-    else if (IWireUtil::getNextCCW(iWire, nWires) == iOtherWire) return EWireNeighborKind::c_CCW;
-    else return EWireNeighborKind::c_None;
+  int iRow = 2 * iWire;
+  int iOtherRow = 2 * iOtherWire + deltaShift;
+  int iRowDelta = symmetricModulo(iOtherRow - iRow, nWires);
+  int absIRowDelta = abs(iRowDelta);
 
-  } else if (iLayerDifference == -1) {
+  if ((absILayerDifference + absIRowDelta) > 4 or absILayerDifference > 2) return WireNeighborKind(); // Invalid case
+  if (absILayerDifference + absIRowDelta == 0) return WireNeighborKind(0, 0);
 
-    if (iWire == iOtherWire) {
-      if (deltaShift == ERotation::c_Clockwise) return EWireNeighborKind::c_CWIn;
-      else if (deltaShift == ERotation::c_CounterClockwise) return EWireNeighborKind::c_CCWIn;
-      else return EWireNeighborKind::c_None;
+  int cellDistance = absILayerDifference == 2 ? 2 : (absILayerDifference + absIRowDelta) / 2;
 
-    } else if (IWireUtil::getNextCW(iWire, nWires) == iOtherWire) {
-      if (deltaShift == ERotation::c_CounterClockwise) return EWireNeighborKind::c_CWIn;
-      else return EWireNeighborKind::c_None;
+  int slope = 0;
+  if (iRowDelta == 0) {
+    slope = 3;
+  } else if (iLayerDifference == 0) {
+    slope = 0;
+  } else if (absIRowDelta == 3) {
+    slope = 1;
+  } else {
+    slope = 2;
+  }
 
-    } else if (IWireUtil::getNextCCW(iWire, nWires) == iOtherWire) {
-      if (deltaShift == ERotation::c_Clockwise) return EWireNeighborKind::c_CCWIn;
-      else return EWireNeighborKind::c_None;
+  if (iRowDelta > 0) {
+    slope = 6 - slope;
+  }
 
-    } else return EWireNeighborKind::c_None;
+  if (iLayerDifference > 0) {
+    slope = -slope;
+  }
 
-  } else if (iLayerDifference == 1) {
-
-    if (iWire == iOtherWire) {
-      if (deltaShift == ERotation::c_Clockwise) return EWireNeighborKind::c_CWOut;
-      else if (deltaShift == ERotation::c_CounterClockwise) return EWireNeighborKind::c_CCWOut;
-      else return EWireNeighborKind::c_None;
-
-    } else if (IWireUtil::getNextCW(iWire, nWires) == iOtherWire) {
-      if (deltaShift == ERotation::c_CounterClockwise) return EWireNeighborKind::c_CWOut;
-      else return EWireNeighborKind::c_None;
-
-    } else if (IWireUtil::getNextCCW(iWire, nWires) == iOtherWire) {
-      if (deltaShift == ERotation::c_Clockwise) return EWireNeighborKind::c_CCWOut;
-      else return EWireNeighborKind::c_None;
-
-    } else return EWireNeighborKind::c_None;
-
-  } else return EWireNeighborKind::c_None;
-
+  int oClockDirection = modulo(slope + 3 , 12);
+  return WireNeighborKind(cellDistance, oClockDirection);
 }
 
 WireNeighborPair CDCWireSuperLayer::getNeighborsInwards(ILayer iLayer, IWire iWire) const

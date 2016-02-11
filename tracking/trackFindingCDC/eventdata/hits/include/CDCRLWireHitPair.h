@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/topology/WireNeighborKind.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -63,8 +64,8 @@ namespace Belle2 {
       const CDCRLWireHitPair* operator->() const
       { return this; }
 
-      /// Getter for the EWireNeighborKind of the two underlying wires - zero for none neighbors.
-      EWireNeighborKind getNeighborKind() const
+      /// Getter for the WireNeighborKind of the two underlying wires
+      WireNeighborKind getNeighborKind() const
       { return getFromWire().getNeighborKind(getToWire()); }
 
       /// Getter for the common superlayer id of the pair.

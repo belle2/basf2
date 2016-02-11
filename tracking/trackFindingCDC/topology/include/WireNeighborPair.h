@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/topology/EWireNeighborKind.h>
+#include <tracking/trackFindingCDC/topology/WireNeighborKind.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 #include <utility>
 
@@ -42,7 +42,7 @@ namespace Belle2 {
       { return this->second; }
 
       /// Getter for the kind of neighbor hood relation the first wire has with the second
-      EWireNeighborKind getNeighborKind() const;
+      WireNeighborKind getNeighborKind() const;
 
     }; // class
 

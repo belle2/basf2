@@ -47,16 +47,21 @@ CDCRLWireHitTriple::EShape CDCRLWireHitTriple::getShape() const
   const CDCWire& middleWire = getMiddleWire();
   const CDCWire& endWire = getEndWire();
 
-  EWireNeighborKind startToMiddleNeighborKind = startWire.getNeighborKind(middleWire);
-  EWireNeighborKind middleToEndNeighborKind   = middleWire.getNeighborKind(endWire);
+  WireNeighborKind startToMiddleNeighborKind = startWire.getNeighborKind(middleWire);
+  WireNeighborKind middleToEndNeighborKind   = middleWire.getNeighborKind(endWire);
 
-  if (startToMiddleNeighborKind == EWireNeighborKind::c_None or
-      middleToEndNeighborKind == EWireNeighborKind::c_None) {
+  if (not startToMiddleNeighborKind.isValid() or
+      not middleToEndNeighborKind.isValid()) {
+    return EShape::c_Invalid;
+  }
+
+  if (startToMiddleNeighborKind.getCellDistance() != 1 or
+      middleToEndNeighborKind.getCellDistance() != 1) {
     return EShape::c_Invalid;
   }
 
   // Neighbor types are marked on the clock. Difference is so to say an angular value apart from a 12 / (2 * pi) factor
-  const int clockDifference = (int)startToMiddleNeighborKind - (int)middleToEndNeighborKind;
+  const int clockDifference = (int)startToMiddleNeighborKind.getOClockDirection() - (int)middleToEndNeighborKind.getOClockDirection();
 
   // Difference on the clock modulus 12 such that it is between -6 and 6.
   EShape shape = EShape((clockDifference + 18) % 12 - 6);

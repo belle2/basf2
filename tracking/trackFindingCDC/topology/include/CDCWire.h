@@ -16,7 +16,7 @@
 #include <tracking/trackFindingCDC/topology/ILayer.h>
 #include <tracking/trackFindingCDC/topology/IWire.h>
 
-#include <tracking/trackFindingCDC/topology/EWireNeighborKind.h>
+#include <tracking/trackFindingCDC/topology/WireNeighborKind.h>
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
@@ -277,19 +277,8 @@ namespace Belle2 {
       /**
        *  Returns gives the kind of neighborhood relation from this wire to the given wire.
        *  Gives the information if the given wire is a neighbor of this wire.
-       *  A return value unequal zero states that the two are  indeed neighbors.
-       *  Moreover the return value also gives the direction in which you have to go to get to the neighbor.
-       *  Possible return values are: \n
-       *  EWireNeighborKind::c_None = 0 for wires that are not neighbors \n
-       *  EWireNeighborKind::c_CWOut = 1 for clockwise outwards \n
-       *  EWireNeighborKind::c_CW = 3 for clockwise \n
-       *  EWireNeighborKind::c_CWIn = 5 for clockwise inwards \n
-       *  EWireNeighborKind::c_CCWIn = 7 for counterclockwise inwards \n
-       *  EWireNeighborKind::c_CCW = 9 for counterclockwise \n
-       *  EWireNeighborKind::c_CCWOut = 11 for counterclockwise outwards \n
-       *  The values are choosen to have an assoziation with the numbers on a regular clock.
        */
-      EWireNeighborKind getNeighborKind(const CDCWire& wire) const;
+      WireNeighborKind getNeighborKind(const CDCWire& wire) const;
 
       /// Returns whether the give wire is a neighbor of this wire
       bool isNeighborWith(const CDCWire& wire) const;
@@ -362,6 +351,9 @@ namespace Belle2 {
        */
       MayBePtr<const CDCWire> getNeighborCWOutwards() const;
       /**@}*/
+
+      /// Getter for the secondary neighbors of this wire id following the direction on the clock
+      MayBePtr<const CDCWire> getSecondaryNeighbor(short oClockDirection) const;
 
       /// Sting output operator for wire objects to help debugging
       friend std::ostream& operator<<(std::ostream& output, const CDCWire& wire)

@@ -3,6 +3,7 @@ from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 from tracking.validation.harvesting import HarvestingModule
 from trackfindingcdc.quadtree.quadTreePlotter import StereoQuadTreePlotter
 import os
+import multiprocessing
 
 
 class QueueDrawer(CDCSVGDisplayModule):
@@ -12,7 +13,7 @@ class QueueDrawer(CDCSVGDisplayModule):
     writes its output files as a list to the queue
     """
 
-    def __init__(self, queue, label, *args, **kwargs):
+    def __init__(self, queue=None, label=None, *args, **kwargs):
         """ The same as the base class, except:
 
         Arguments
@@ -23,19 +24,27 @@ class QueueDrawer(CDCSVGDisplayModule):
         """
         #: The queue to handle
         self.queue = queue
+
         #: The label for writing to the queue
         self.label = label
+
         CDCSVGDisplayModule.__init__(self, interactive=False, *args, **kwargs)
+
         #: We want to use cpp for sure
         self.use_cpp = True
 
+        self.manager = multiprocessing.Manager()
+
         #: The list of created paths
-        self.file_list = []
+        self.file_list = self.manager.list([])
 
     def terminate(self):
         """ Overwrite the terminate to put the list to the queue"""
         CDCSVGDisplayModule.terminate(self)
-        self.queue.put(self.label, self.file_list)
+        file_list = self.file_list
+        files = [file_list[i] for i in range(len(file_list))]
+        if self.queue:
+            self.queue.put(self.label, files)
 
     def new_output_filename(self):
         """ Overwrite the function to listen for every new filename """

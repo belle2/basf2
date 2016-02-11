@@ -40,6 +40,7 @@ namespace {
         EXPECT_EQ(*neighbor_of_neighbor, wire);
 
         WireNeighborKind neighborKind = wire.getNeighborKind(*neighbor);
+        EXPECT_TRUE(neighborKind.isValid());
         EXPECT_EQ(testNeighborKind.getCellDistance(), neighborKind.getCellDistance());
         EXPECT_EQ(oClockDirection, neighborKind.getOClockDirection());
         EXPECT_EQ(neighbor->getILayer() - wire.getILayer(), neighborKind.getILayerDifference());

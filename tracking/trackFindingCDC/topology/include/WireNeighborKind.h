@@ -66,8 +66,8 @@ namespace Belle2 {
         return
           m_cellDistance >= 1 and
           m_cellDistance <= 2 and
-          m_oClockDirection > 0 and
-          m_oClockDirection <= 12;
+          m_oClockDirection >= 0 and
+          m_oClockDirection < 12;
       }
 
     private:

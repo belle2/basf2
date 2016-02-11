@@ -84,7 +84,7 @@ class PtBinnedMCSideTrackingValidationModule(MCSideTrackingValidationModule):
         y='finding efficiency',
         outlier_z_score=5.0,
         allow_discrete=True,
-        name="{module.name}_{y_part_name}_by_{x_part_name}_profile_PtBin_{groupby_value}",
+        name="{module.id}_{y_part_name}_by_{x_part_name}_profile_PtBin_{groupby_value}",
         title="Profile of {y_part_name} by {x_part_name} in {module.title} Pt = {groupby_value} GeV",
         # folder_name=".", #Dummy everything in the top level folder
     )
@@ -115,7 +115,7 @@ class PtBinnedPRSideTrackingValidationModule(PRSideTrackingValidationModule):
         quantity_name="tan #lambda",
         groupby="pt_value",
         part_name="tan_lambda",
-        name="{module.name}_{quantity_name}_PtBin_{groupby_value}",
+        name="{module.id}_{quantity_name}_PtBin_{groupby_value}",
         title_postfix=" Pt = {groupby_value} GeV",
         # folder_name=".", #Dummy everything in the top level folder
     )

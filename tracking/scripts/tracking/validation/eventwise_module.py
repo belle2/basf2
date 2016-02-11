@@ -159,7 +159,7 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
     save_tree = refiners.save_tree(folder_name="event_tree", name="event_tree", above_expert_level=1)
 
     save_clone_rate = refiners.save_fom(
-        name="{module.name}_hit_figures_of_merit",
+        name="{module.id}_hit_figures_of_merit",
         title="Hit sums in {module.title}",
         description="",  # to be given
         select=["number_of_total_hits",

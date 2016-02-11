@@ -54,7 +54,7 @@ class Refiner(object):
 
 
 class SaveFiguresOfMeritRefiner(Refiner):
-    default_name = "{module.name}_figures_of_merit"
+    default_name = "{module.id}_figures_of_merit"
     default_title = "Figures of merit in {module.title}"
     default_contact = "{module.contact}"
     default_description = "Figures of merit are the {aggregation.__name__} of {keys}"
@@ -140,7 +140,7 @@ class SaveFiguresOfMeritRefiner(Refiner):
 
 
 class SaveHistogramsRefiner(Refiner):
-    default_name = "{module.name}_{part_name}_histogram{stacked_by_indication}{stackby}"
+    default_name = "{module.id}_{part_name}_histogram{stacked_by_indication}{stackby}"
     default_title = "Histogram of {part_name}{stacked_by_indication}{stackby} in {module.title}"
     default_contact = "{module.contact}"
     default_description = "This is a histogram of {part_name}{stacked_by_indication}{stackby}."
@@ -234,7 +234,7 @@ class SaveHistogramsRefiner(Refiner):
 
 
 class SaveProfilesRefiner(Refiner):
-    default_name = "{module.name}_{y_part_name}_by_{x_part_name}_profile"
+    default_name = "{module.id}_{y_part_name}_by_{x_part_name}_profile"
     default_title = "Profile of {y_part_name} by {x_part_name} in {module.title}"
     default_contact = "{module.contact}"
     default_description = "This is a profile of {y_part_name} over {x_part_name}."
@@ -470,9 +470,9 @@ class SaveClassificationAnalysisRefiner(Refiner):
 
 
 class SavePullAnalysisRefiner(Refiner):
-    default_name = "{module.name}_{quantity_name}"
+    default_name = "{module.id}_{quantity_name}"
     default_contact = "{module.contact}"
-    default_title_postfix = " in {module.name}"
+    default_title_postfix = " in {module.id}"
 
     default_truth_name = "{part_name}_truth"
     default_estimate_name = "{part_name}_estimate"
@@ -575,8 +575,8 @@ class SavePullAnalysisRefiner(Refiner):
 
 
 class SaveTreeRefiner(Refiner):
-    default_name = "{module.name}_tree"
-    default_title = "Tree of {module.name}"
+    default_name = "{module.id}_tree"
+    default_title = "Tree of {module.id}"
 
     def __init__(self,
                  name=None,

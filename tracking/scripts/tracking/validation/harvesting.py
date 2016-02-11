@@ -209,10 +209,10 @@ class HarvestingModule(basf2.Module):
             raise TypeError("output_file_name is allowed to be a string or a ROOT.TFile object")
 
         #: Name of this harvest
-        self.name = name or self.__class__.__name__
+        self.set_name(name or self.__class__.__name__)
 
         #: Title particle of this harvest
-        self.title = title or self.name
+        self.title = title or self.name()
 
         #: Contact email address to be displayed on the validation page
         self.contact = contact
@@ -223,6 +223,14 @@ class HarvestingModule(basf2.Module):
         #: A list of additional refiner instances to be executed
         #: on top of the refiner methods that are members of this class
         self.refiners = []
+
+    @property
+    def id(self):
+        """Working around that name() is a method.
+
+        Exposing the name as a property using a different name
+        """
+        return self.name()
 
     def run(self,
             input_root_file,

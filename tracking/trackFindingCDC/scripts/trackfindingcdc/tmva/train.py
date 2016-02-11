@@ -211,11 +211,19 @@ class ClassificationOverview:
 
     """
 
-    def __init__(self, output_file_name, truth_name=None, select=[], exclude=[]):
+    def __init__(self,
+                 output_file_name,
+                 truth_name=None,
+                 select=[],
+                 exclude=[],
+                 groupbys=[],
+                 filters=[]):
         self.output_file_name = output_file_name
         self.truth_name = truth_name
         self.select = select
         self.exclude = exclude
+        self.groupbys = groupbys
+        self.filters = filters
 
         self.classification_analyses = []
 
@@ -255,12 +263,20 @@ class ClassificationOverview:
 
         exclude = self.exclude
         select = self.select
+        groupbys = self.groupbys
+        filters = self.filters
 
         if select:
             variable_names = [name for name in variable_names if name in select]
 
         if exclude:
             variable_names = [name for name in variable_names if name not in exclude]
+
+        if groupbys:
+            variable_names = [name for name in variable_names if name not in groupbys]
+
+        if filters:
+            variable_names = [name for name in variable_names if name not in filters]
 
         # Remove the variables that have Monte Carlo truth information unless explicitly selected
         variable_names = [name for name
@@ -272,29 +288,55 @@ class ClassificationOverview:
 
         import root_numpy
         print("Loading tree")
-        branch_names = variable_names + [truth_name]
+        branch_names = {*variable_names, truth_name, *groupbys, *filters}
+        branch_names = [name for name in branch_names if name]
         input_record_array = root_numpy.tree2rec(input_tree, branches=branch_names)
+        if filters:
+            for filter in filters:
+                filter_values = input_record_array[filter]
+                input_record_array = input_record_array[np.nonzero(filter_values)]
+
         print("Loaded tree")
         truths = input_record_array[truth_name]
 
-        for variable_name in variable_names:
-            print('Analyse', variable_name)
+        if not groupbys:
+            groupbys = [None]
 
-            # Get the truths as a numpy array
-            estimates = input_record_array[variable_name]
+        for groupby in groupbys:
+            if groupby is None or groupby == "":
+                groupby_parts = [(None, slice(None))]
+            else:
+                groupby_parts = []
+                groupby_values = input_record_array[groupby]
+                unique_values, indices = np.unique(groupby_values, return_inverse=True)
+                for idx, value in enumerate(unique_values):
+                    groupby_parts.append((value, indices == idx))
 
-            classification_analysis = classification.ClassificationAnalysis(
-                contact="",
-                quantity_name=variable_name,
-                outlier_z_score=5.0,
-                allow_discrete=True,
-            )
-            classification_analysis.analyse(estimates, truths)
+            for groupby_value, groupby_select in groupby_parts:
+                if groupby is None:
+                    groupby_folder_name = '.'
+                else:
+                    groupby_folder_name = "groupby_{name}_{value}".format(name=groupby, value=groupby_value)
 
-            with root_cd(variable_name) as tdirectory:
-                classification_analysis.write(tdirectory)
+                with root_cd(groupby_folder_name) as tdirectory:
+                    for variable_name in variable_names:
+                        print('Analyse', variable_name, 'groupby', groupby, '=', groupby_value)
 
-            self.classification_analyses.append(classification_analysis)
+                        # Get the truths as a numpy array
+                        estimates = input_record_array[variable_name]
+
+                        classification_analysis = classification.ClassificationAnalysis(
+                            contact="",
+                            quantity_name=variable_name,
+                            outlier_z_score=5.0,
+                            allow_discrete=True,
+                        )
+                        classification_analysis.analyse(estimates[groupby_select], truths[groupby_select])
+
+                        with root_cd(variable_name) as tdirectory:
+                            classification_analysis.write(tdirectory)
+
+                    self.classification_analyses.append(classification_analysis)
 
         if isinstance(self.output_file_name, str):
             output_file.Close()

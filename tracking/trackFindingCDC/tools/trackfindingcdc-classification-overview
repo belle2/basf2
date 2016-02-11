@@ -31,6 +31,30 @@ def main():
     )
 
     argument_parser.add_argument(
+        "-v",
+        "--vars",
+	nargs="*",
+	default=[],
+        help="Variables to use for the classification",
+    )
+
+    argument_parser.add_argument(
+        "-f",
+        "--filters",
+	nargs="*",
+	default=[],
+        help="Variables on which the input shall be filter before making the classification.",
+    )
+
+    argument_parser.add_argument(
+        "-g",
+        "--groupbys",
+	nargs="*",
+	default=[],
+        help="Variable names to group by and to execute the classification over each subgroup",
+    )
+
+    argument_parser.add_argument(
         "-s",
         "--show",
         action="store_true",
@@ -51,7 +75,11 @@ def main():
         overview_file_name = records_file_basename + ".overview" + ext
         overview_file_path = os.path.join(records_folder_path, overview_file_name)
 
-        overview = ClassificationOverview(overview_file_path)
+        overview = ClassificationOverview(overview_file_path, 
+                                          select=arguments.vars,
+                                          groupbys=arguments.groupbys,
+                                          filters=arguments.filters,
+                                          )
         overview.train(input_tree)
 
     if arguments.show:

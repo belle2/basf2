@@ -60,7 +60,7 @@ class CDCDisplayRun(ReadOrGenerateTrackedEventsRun):
             )
 
         argument_parser.add_argument(
-            "-p",
+            "-pf",
             '--filename_prefix',
             default="",
             help='Prefix to the names of the generated files'

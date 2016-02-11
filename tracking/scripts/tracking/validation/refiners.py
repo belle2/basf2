@@ -399,6 +399,7 @@ class SaveClassificationAnalysisRefiner(Refiner):
                  lower_bound=None,
                  upper_bound=None,
                  outlier_z_score=None,
+                 allow_discrete=False,
                  unit=None):
 
         self.part_name = part_name
@@ -412,6 +413,7 @@ class SaveClassificationAnalysisRefiner(Refiner):
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
         self.outlier_z_score = outlier_z_score
+        self.allow_discrete = allow_discrete
         self.unit = unit
 
     def refine(self,
@@ -461,6 +463,7 @@ class SaveClassificationAnalysisRefiner(Refiner):
                                                              lower_bound=self.lower_bound,
                                                              upper_bound=self.upper_bound,
                                                              outlier_z_score=self.outlier_z_score,
+                                                             allow_discrete=self.allow_discrete,
                                                              unit=self.unit)
 
             classification_analysis.analyse(estimates, truths)

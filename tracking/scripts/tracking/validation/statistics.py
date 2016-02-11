@@ -59,10 +59,8 @@ def rice_n_bin(n_data):
 
 def rice_exceptional_values(xs):
     """Returns a array of exceptionally frequent values according to the rice rule."""
-    unique_xs, indices = np.unique(xs, return_inverse=True)
+    unique_xs, indices, unique_xs_count = np.unique(xs, return_inverse=True, return_counts=True)
     # Note: The indices are such that unique_xs[indices] == xs
-
-    unique_xs_count = np.bincount(indices)
 
     exceptional_xs = []
 

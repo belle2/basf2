@@ -41,7 +41,8 @@ void CDCRLWireHitTriple::reverse()
   setEndRLWireHit(newEndRLWireHit);
 }
 
-CDCRLWireHitTriple::EShape CDCRLWireHitTriple::getShape() const
+
+CDCRLWireHitTriple::Shape CDCRLWireHitTriple::getShape() const
 {
   const CDCWire& startWire = getStartWire();
   const CDCWire& middleWire = getMiddleWire();
@@ -52,19 +53,14 @@ CDCRLWireHitTriple::EShape CDCRLWireHitTriple::getShape() const
 
   if (not startToMiddleNeighborKind.isValid() or
       not middleToEndNeighborKind.isValid()) {
-    return EShape::c_Invalid;
-  }
-
-  if (startToMiddleNeighborKind.getCellDistance() != 1 or
-      middleToEndNeighborKind.getCellDistance() != 1) {
-    return EShape::c_Invalid;
+    return Shape();
   }
 
   // Neighbor types are marked on the clock. Difference is so to say an angular value apart from a 12 / (2 * pi) factor
-  const int clockDifference = (int)startToMiddleNeighborKind.getOClockDirection() - (int)middleToEndNeighborKind.getOClockDirection();
-
-  // Difference on the clock modulus 12 such that it is between -6 and 6.
-  EShape shape = EShape((clockDifference + 18) % 12 - 6);
-
-  return shape;
+  const short oClockDelta = middleToEndNeighborKind.getOClockDirection() - startToMiddleNeighborKind.getOClockDirection();
+  const short startToMiddleCellDistance = startToMiddleNeighborKind.getCellDistance();
+  const short middleToEndCellDistance =  middleToEndNeighborKind.getCellDistance();
+  return Shape(startToMiddleCellDistance,
+               middleToEndCellDistance,
+               symmetricModulo(oClockDelta, 12));
 }

@@ -26,9 +26,9 @@ namespace Belle2 {
        *  Note: The names are inspired by the xylene molecules. Some illustrations can be found
        *  <a href="https://belle2.cc.kek.jp/~twiki/bin/view/Software/CDCTrackFindingStrategy#hits">here</a>.
        */
-      enum EShape : signed int {
+      enum EShape : short {
         /// Constant for an ill shaped wire hit triple
-        c_Invalid = -999,
+        c_Invalid = SHRT_MIN,
 
         /// Constant for ortho arrangement with clockwise twist
         c_OrthoCW = -4,
@@ -45,6 +45,59 @@ namespace Belle2 {
         /// Constant for ortho arrangement with counterclockwise twist
         c_OrthoCCW = 4
       };
+
+
+      /// Type for the different shapes of a triple of neighboring wire hits
+      class Shape {
+
+      public:
+        /// Default constructor for an invalid shape
+        Shape()
+          : m_startToMiddleCellDistance(CHAR_MAX / 2),
+            m_middleToEndCellDistance(CHAR_MAX / 2),
+            m_oClockDelta(SHRT_MIN)
+        {}
+
+        /// Constructor from cell extend and o'clock direction change
+        Shape(const short startToMiddleCellDistance,
+              const short middleToEndCellDistance,
+              const short oClockDelta)
+          : m_startToMiddleCellDistance(startToMiddleCellDistance),
+            m_middleToEndCellDistance(middleToEndCellDistance),
+            m_oClockDelta(oClockDelta)
+        {}
+
+        /// Getter for the start to middle cell distance
+        short getStartToMiddleCellDistance() const
+        { return m_startToMiddleCellDistance; }
+
+        /// Getter for the middle to end cell distance
+        short getMiddleToEndCellDistance() const
+        { return m_middleToEndCellDistance; }
+
+        /// Getter for the sum of cell distances from start to middle and middle to end.
+        short getCellExtend() const
+        { return m_startToMiddleCellDistance + m_middleToEndCellDistance; }
+
+        /// Getter for the o'clock direction difference from start to middle compared to middle to end.
+        short getOClockDelta() const
+        { return m_oClockDelta; }
+
+        /// Check if the shape is considered valid.
+        bool isValid() const
+        { return getCellExtend() >= 2 and getCellExtend() <= 4; }
+
+      private:
+        /// The cell distances from start to middle.
+        char m_startToMiddleCellDistance = 0;
+
+        /// The cell distances from middle to end.
+        char m_middleToEndCellDistance = 0;
+
+        /// The o'clock direction difference from start to middle compared to middle to end.
+        short m_oClockDelta = 0;
+      };
+
 
       /// Constructor taking three oriented wire hits.
       CDCRLWireHitTriple(const CDCRLTaggedWireHit& startRLWireHit,
@@ -120,7 +173,7 @@ namespace Belle2 {
       { return this; }
 
       /// Getter for the shape of this tiple if all three oriented wire hits are neighbors. Else ILLSHAPE
-      EShape getShape() const;
+      Shape getShape() const;
 
       /// Getter for the common superlayer id of the pair
       ISuperLayer getISuperLayer() const

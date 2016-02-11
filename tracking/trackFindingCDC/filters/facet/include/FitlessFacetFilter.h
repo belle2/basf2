@@ -52,6 +52,9 @@ namespace Belle2 {
         return m_param_hardCut;
       }
 
+    private:
+      /// Check if the hit triplet is a feasible combination for shape and rl passage information.
+      bool isFeasible(const CDCRLWireHitTriple& rlWireHitTriple) const;
 
     private:
       /// Switch for hard selection.

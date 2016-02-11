@@ -45,7 +45,7 @@ bool FitlessFacetVarSet::extract(const CDCFacet* ptrFacet)
   bool longArmIsCrossing = startToMiddleIsLong ? startToMiddleIsCrossing : middleToEndIsCrossing;
   bool shortArmIsCrossing = startToMiddleIsLong ? middleToEndIsCrossing : startToMiddleIsCrossing;
   short iLayerDifference = facet.getStartWire().getILayer() - facet.getEndWire().getILayer();
-  short absILayerDifference = std::abs(iLayerDifference);
+  // short absILayerDifference = std::abs(iLayerDifference);
 
   var<named("superlayer_id")>() = facet.getISuperLayer();
   var<named("cell_extend")>() = cellExtend;

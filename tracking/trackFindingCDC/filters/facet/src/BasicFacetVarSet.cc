@@ -26,9 +26,6 @@ bool BasicFacetVarSet::extract(const CDCFacet* ptrFacet)
   const CDCFacet& facet = *ptrFacet;
 
   ISuperLayer superlayerID = facet.getISuperLayer();
-  const ERightLeft startRLInfo = facet.getStartRLInfo();
-  const ERightLeft middleRLInfo = facet.getMiddleRLInfo();
-  const ERightLeft endRLInfo = facet.getEndRLInfo();
 
   const CDCRLTaggedWireHit& startRLWirehit = facet.getStartRLWireHit();
   const double startDriftLength = startRLWirehit.getSignedRefDriftLength();

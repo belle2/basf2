@@ -101,7 +101,10 @@ print("    CompareTruePointTracks: ", CompareTruePointTracks)
 print("           CalibrationKind: ", CalibrationKind)
 print("                 PixelKind: ", PixelKind)
 
-inputFileName = 'pxdClShapeCalibrationSource_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
+# inputFileName = 'pxdClShapeCalibrationSource_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
+# inputFileName = inputFileName + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKind) + '.root'
+
+inputFileName = 'pxdClShCalSrc_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
 inputFileName = inputFileName + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKind) + '.root'
 
 # Only initialize RootInput, as we do not loop over events,

@@ -77,12 +77,12 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
   sprintf(name_Case, "_RealData%i_Track%i_Calib%i_Pixel%i",
           (int)m_UseRealData, (int)m_UseTracks, m_CalibrationKind, m_PixelKind);
-  sprintf(name_OutFileDQM, "pxdClShapeCalibrationDQM%s.root", name_Case);
-  sprintf(name_OutFileCalibrations, "pxdClShapeCalibration%s.root", name_Case);
-  sprintf(name_OutDoExpertHistograms, "pxdClShapeCalibrationHistos%s.root", name_Case);
+  sprintf(name_OutFileDQM, "pxdClShCalDQM%s.root", name_Case);
+  sprintf(name_OutFileCalibrations, "pxdClShCal%s.root", name_Case);
+  sprintf(name_OutDoExpertHistograms, "pxdClShCalHistos%s.root", name_Case);
   sprintf(name_SourceTree, "pxdCal");
 
-  B2INFO("-----> name of files: DQM " << name_OutFileDQM << ", callibration " << name_OutFileCalibrations);
+  B2INFO("Name of files: DQM: " << name_OutFileDQM << ", callibration: " << name_OutFileCalibrations);
 
   if (m_DoExpertHistograms) {
     sprintf(nameh_phi, "h1_phi");
@@ -100,12 +100,12 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
     h2_CorMatrixV = new TH2F(nameh_CorMatrixV, nameh_CorMatrixV, 18, -90, 90, 18, -90, 90);
   }
 
-  B2INFO("-----> calibrate --> Entries: " << getObject<TTree>("pxdCal").GetEntries());
-  B2INFO("-----> SettingImport: UseTracks:" << m_UseTracks <<
-         " UseRealData:" << m_UseRealData <<
-         " CompareTruePointTracks:" << m_CompareTruePointTracks <<
-         " CalibrationKind:" << m_CalibrationKind <<
-         " PixelKind:" << m_PixelKind
+  B2INFO("Entries: " << getObject<TTree>("pxdCal").GetEntries());
+  B2INFO("UseTracks: " << m_UseTracks <<
+         ", UseRealData: " << m_UseRealData <<
+         ", CompareTruePointTracks: " << m_CompareTruePointTracks <<
+         ", CalibrationKind: " << m_CalibrationKind <<
+         ", PixelKind: " << m_PixelKind
         );
 
   getObject<TTree>(name_SourceTree).SetBranchAddress("event", &m_evt);

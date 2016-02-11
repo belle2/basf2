@@ -119,7 +119,10 @@ print("                 SpecialLayerNo: ", SpecialLayerNo)
 print("                SpecialLadderNo: ", SpecialLadderNo)
 print("                SpecialSensorNo: ", SpecialSensorNo)
 
-outputFileName = 'pxdClShapeCalibrationSource_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
+# outputFileName = 'pxdClShapeCalibrationSource_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
+# outputFileName = outputFileName + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKindCal) + '.root'
+
+outputFileName = 'pxdClShCalSrc_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
 outputFileName = outputFileName + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKindCal) + '.root'
 
 # Register modules
@@ -148,6 +151,7 @@ SVDCLUST = register_module('SVDClusterizer')
 PXDSHCAL = register_module('pxdClusterShapeCalibration')
 # Save output of simulation
 output = register_module('RootOutput')
+output.param('branchNames', ['EventMetaData'])  # cannot be removed, but of only small effect on file size
 
 # ============================================================================
 # Set a fixed random seed for particle generation:

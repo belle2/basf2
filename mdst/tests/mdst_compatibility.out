@@ -1417,7 +1417,7 @@ MCParticle#60:
   isInitial(): False
   isVirtual(): False
 Track#0:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#7 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -1432,7 +1432,7 @@ Track#0:
   getTrackFitResult(<type: p+>): -> TrackFitResults#0
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
 Track#1:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#9 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -1447,7 +1447,7 @@ Track#1:
   getTrackFitResult(<type: p+>): -> TrackFitResults#1
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
 Track#2:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#29 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -1462,7 +1462,7 @@ Track#2:
   getTrackFitResult(<type: p+>): -> TrackFitResults#2
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
 Track#3:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#15 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -1477,7 +1477,7 @@ Track#3:
   getTrackFitResult(<type: p+>): -> TrackFitResults#3
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
 Track#4:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -1491,7 +1491,7 @@ Track#4:
   getTrackFitResult(<type: p+>): -> TrackFitResults#4
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
 Track#5:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#4 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -1506,7 +1506,7 @@ Track#5:
   getTrackFitResult(<type: p+>): -> TrackFitResults#5
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
 Track#6:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#1 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -1521,7 +1521,7 @@ Track#6:
   getTrackFitResult(<type: p+>): -> TrackFitResults#6
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
 Track#7:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#3 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -1536,7 +1536,7 @@ Track#7:
   getTrackFitResult(<type: p+>): -> TrackFitResults#7
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
 Track#8:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -1595,7 +1595,6 @@ TrackFitResult#0:
   getEnergy(): 0.708338
   getMomentum(): (-0.568719,0.212935,0.336869)
   getOmega(): 0.00740503
-  getPDG(): 211
   getPValue(): 0.187071
   getPhi(): 2.78334
   getPhi0(): 2.78334
@@ -1646,7 +1645,6 @@ TrackFitResult#1:
   getEnergy(): 1.35037
   getMomentum(): (-0.993538,-0.645019,0.633138)
   getOmega(): -0.00379627
-  getPDG(): 211
   getPValue(): 0.959833
   getPhi(): -2.56577
   getPhi0(): -2.56577
@@ -1697,7 +1695,6 @@ TrackFitResult#2:
   getEnergy(): 1.41879
   getMomentum(): (0.584944,-1.24769,-0.30756)
   getOmega(): -0.00326333
-  getPDG(): 211
   getPValue(): 0.515269
   getPhi(): -1.1324
   getPhi0(): -1.1324
@@ -1748,7 +1745,6 @@ TrackFitResult#3:
   getEnergy(): 0.865331
   getMomentum(): (-0.497021,0.666795,0.194093)
   getOmega(): 0.00540717
-  getPDG(): 211
   getPValue(): 0.94671
   getPhi(): 2.21134
   getPhi0(): 2.21134
@@ -1799,7 +1795,6 @@ TrackFitResult#4:
   getEnergy(): 1.12047
   getMomentum(): (-0.514044,-0.233245,0.957773)
   getOmega(): -0.00796633
-  getPDG(): 211
   getPValue(): 0.840158
   getPhi(): -2.71563
   getPhi0(): -2.71563
@@ -1850,7 +1845,6 @@ TrackFitResult#5:
   getEnergy(): 0.647272
   getMomentum(): (0.36258,0.0634629,0.513799)
   getOmega(): 0.0122167
-  getPDG(): 211
   getPValue(): 0.573613
   getPhi(): 0.173276
   getPhi0(): 0.173276
@@ -1901,7 +1895,6 @@ TrackFitResult#6:
   getEnergy(): 0.412219
   getMomentum(): (-0.164353,-0.0719266,0.343889)
   getOmega(): -0.0250659
-  getPDG(): 211
   getPValue(): 0.233701
   getPhi(): -2.72907
   getPhi0(): -2.72907
@@ -1952,7 +1945,6 @@ TrackFitResult#7:
   getEnergy(): 0.568478
   getMomentum(): (-0.308266,-0.0163963,0.456498)
   getOmega(): -0.0145671
-  getPDG(): 211
   getPValue(): 0.914037
   getPhi(): -3.08845
   getPhi0(): -3.08845
@@ -2003,7 +1995,6 @@ TrackFitResult#8:
   getEnergy(): 0.292421
   getMomentum(): (0.235063,0.10294,0.0133909)
   getOmega(): -0.0175239
-  getPDG(): 211
   getPValue(): 0.858204
   getPhi(): 0.412769
   getPhi0(): 0.412769
@@ -2054,7 +2045,6 @@ TrackFitResult#9:
   getEnergy(): 0.647272
   getMomentum(): (0.36258,0.0634629,0.513799)
   getOmega(): 0.0122167
-  getPDG(): 211
   getPValue(): 0.573613
   getPhi(): 0.173276
   getPhi0(): 0.173276
@@ -2105,7 +2095,6 @@ TrackFitResult#10:
   getEnergy(): 0.292421
   getMomentum(): (0.235063,0.10294,0.0133909)
   getOmega(): -0.0175239
-  getPDG(): 211
   getPValue(): 0.858204
   getPhi(): 0.412769
   getPhi0(): 0.412769
@@ -5052,7 +5041,7 @@ MCParticle#48:
   isInitial(): False
   isVirtual(): False
 Track#0:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5066,7 +5055,7 @@ Track#0:
   getTrackFitResult(<type: p+>): -> TrackFitResults#0
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
 Track#1:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#16 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -5081,7 +5070,7 @@ Track#1:
   getTrackFitResult(<type: p+>): -> TrackFitResults#1
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
 Track#2:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#14 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -5096,7 +5085,7 @@ Track#2:
   getTrackFitResult(<type: p+>): -> TrackFitResults#2
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
 Track#3:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5110,7 +5099,7 @@ Track#3:
   getTrackFitResult(<type: p+>): -> TrackFitResults#3
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
 Track#4:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5124,7 +5113,7 @@ Track#4:
   getTrackFitResult(<type: p+>): -> TrackFitResults#4
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
 Track#5:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#6 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -5139,7 +5128,7 @@ Track#5:
   getTrackFitResult(<type: p+>): -> TrackFitResults#5
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
 Track#6:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5153,7 +5142,7 @@ Track#6:
   getTrackFitResult(<type: p+>): -> TrackFitResults#6
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
 Track#7:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5167,7 +5156,7 @@ Track#7:
   getTrackFitResult(<type: p+>): -> TrackFitResults#7
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
 Track#8:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(2)
     -> ECLClusters#2 (weight: 1)
     -> ECLClusters#3 (weight: 1)
@@ -5237,7 +5226,6 @@ TrackFitResult#0:
   getEnergy(): 0.286671
   getMomentum(): (-0.0971877,0.191066,-0.129418)
   getOmega(): -0.0209778
-  getPDG(): 211
   getPValue(): 0.243199
   getPhi(): 2.04135
   getPhi0(): 2.04135
@@ -5288,7 +5276,6 @@ TrackFitResult#1:
   getEnergy(): 1.06722
   getMomentum(): (-0.727389,0.709608,-0.294694)
   getOmega(): 0.00442525
-  getPDG(): 211
   getPValue(): 0.69037
   getPhi(): 2.36857
   getPhi0(): 2.36857
@@ -5339,7 +5326,6 @@ TrackFitResult#2:
   getEnergy(): 1.22023
   getMomentum(): (0.991143,-0.68798,0.117515)
   getOmega(): -0.00372717
-  getPDG(): 211
   getPValue(): 0.821351
   getPhi(): -0.606774
   getPhi0(): -0.606774
@@ -5390,7 +5376,6 @@ TrackFitResult#3:
   getEnergy(): 0.439166
   getMomentum(): (-0.28225,-0.102143,0.288598)
   getOmega(): 0.0149815
-  getPDG(): 211
   getPValue(): 1.48593e-09
   getPhi(): -2.79437
   getPhi0(): -2.79437
@@ -5441,7 +5426,6 @@ TrackFitResult#4:
   getEnergy(): 0.171068
   getMomentum(): (-0.0527582,0.00590594,-0.0834631)
   getOmega(): -0.0847067
-  getPDG(): 211
   getPValue(): 0.350411
   getPhi(): 3.03011
   getPhi0(): 3.03011
@@ -5492,7 +5476,6 @@ TrackFitResult#5:
   getEnergy(): 0.948138
   getMomentum(): (0.00543231,-0.787738,0.508847)
   getOmega(): 0.00570847
-  getPDG(): 211
   getPValue(): 0.601241
   getPhi(): -1.5639
   getPhi0(): -1.5639
@@ -5543,7 +5526,6 @@ TrackFitResult#6:
   getEnergy(): 0.855451
   getMomentum(): (-0.6457,0.443278,0.314472)
   getOmega(): -0.00574158
-  getPDG(): 211
   getPValue(): 0.230207
   getPhi(): 2.53998
   getPhi0(): 2.53998
@@ -5594,7 +5576,6 @@ TrackFitResult#7:
   getEnergy(): 0.164048
   getMomentum(): (0.00668345,0.0859313,0.00178797)
   getOmega(): 0.0521736
-  getPDG(): 211
   getPValue(): 5.59361e-37
   getPhi(): 1.49318
   getPhi0(): 1.49318
@@ -5645,7 +5626,6 @@ TrackFitResult#8:
   getEnergy(): 0.392637
   getMomentum(): (-0.2786,0.136918,0.195754)
   getOmega(): -0.0144862
-  getPDG(): 211
   getPValue(): 0.132134
   getPhi(): 2.68481
   getPhi0(): 2.68481
@@ -5696,7 +5676,6 @@ TrackFitResult#9:
   getEnergy(): 1.06722
   getMomentum(): (-0.727389,0.709608,-0.294694)
   getOmega(): 0.00442525
-  getPDG(): 211
   getPValue(): 0.69037
   getPhi(): 2.36857
   getPhi0(): 2.36857
@@ -5747,7 +5726,6 @@ TrackFitResult#10:
   getEnergy(): 0.171068
   getMomentum(): (-0.0527582,0.00590594,-0.0834631)
   getOmega(): -0.0847067
-  getPDG(): 211
   getPValue(): 0.350411
   getPhi(): 3.03011
   getPhi0(): 3.03011
@@ -5798,7 +5776,6 @@ TrackFitResult#11:
   getEnergy(): 0.164048
   getMomentum(): (0.00668345,0.0859313,0.00178797)
   getOmega(): 0.0521736
-  getPDG(): 211
   getPValue(): 5.59361e-37
   getPhi(): 1.49318
   getPhi0(): 1.49318
@@ -5849,7 +5826,6 @@ TrackFitResult#12:
   getEnergy(): 0.855451
   getMomentum(): (-0.6457,0.443278,0.314472)
   getOmega(): -0.00574158
-  getPDG(): 211
   getPValue(): 0.230207
   getPhi(): 2.53998
   getPhi0(): 2.53998
@@ -8920,7 +8896,7 @@ MCParticle#82:
   isInitial(): False
   isVirtual(): False
 Track#0:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#11 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -8935,7 +8911,7 @@ Track#0:
   getTrackFitResult(<type: p+>): -> TrackFitResults#0
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
 Track#1:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#7 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -8950,7 +8926,7 @@ Track#1:
   getTrackFitResult(<type: p+>): -> TrackFitResults#1
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
 Track#2:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -8964,7 +8940,7 @@ Track#2:
   getTrackFitResult(<type: p+>): -> TrackFitResults#2
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
 Track#3:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -8978,7 +8954,7 @@ Track#3:
   getTrackFitResult(<type: p+>): -> TrackFitResults#3
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
 Track#4:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#0 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -8993,7 +8969,7 @@ Track#4:
   getTrackFitResult(<type: p+>): -> TrackFitResults#4
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
 Track#5:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -9007,7 +8983,7 @@ Track#5:
   getTrackFitResult(<type: p+>): -> TrackFitResults#5
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
 Track#6:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -9021,7 +8997,7 @@ Track#6:
   getTrackFitResult(<type: p+>): -> TrackFitResults#6
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
 Track#7:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#8 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -9036,7 +9012,7 @@ Track#7:
   getTrackFitResult(<type: p+>): -> TrackFitResults#7
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
 Track#8:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -9050,7 +9026,7 @@ Track#8:
   getTrackFitResult(<type: p+>): -> TrackFitResults#8
   getTrackFitResult(<type: pi+>): -> TrackFitResults#8
 Track#9:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -9064,7 +9040,7 @@ Track#9:
   getTrackFitResult(<type: p+>): -> TrackFitResults#9
   getTrackFitResult(<type: pi+>): -> TrackFitResults#9
 Track#10:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -9078,7 +9054,7 @@ Track#10:
   getTrackFitResult(<type: p+>): -> TrackFitResults#10
   getTrackFitResult(<type: pi+>): -> TrackFitResults#10
 Track#11:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -9092,7 +9068,7 @@ Track#11:
   getTrackFitResult(<type: p+>): -> TrackFitResults#11
   getTrackFitResult(<type: pi+>): -> TrackFitResults#11
 Track#12:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -9106,7 +9082,7 @@ Track#12:
   getTrackFitResult(<type: p+>): -> TrackFitResults#12
   getTrackFitResult(<type: pi+>): -> TrackFitResults#12
 Track#13:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#4 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -9175,7 +9151,6 @@ TrackFitResult#0:
   getEnergy(): 0.605541
   getMomentum(): (-0.0460851,-0.587372,-0.00841157)
   getOmega(): -0.00763249
-  getPDG(): 211
   getPValue(): 0.523141
   getPhi(): -1.6491
   getPhi0(): -1.6491
@@ -9226,7 +9201,6 @@ TrackFitResult#1:
   getEnergy(): 1.93232
   getMomentum(): (0.50507,1.83794,0.285032)
   getOmega(): 0.00235924
-  getPDG(): 211
   getPValue(): 0.562382
   getPhi(): 1.30261
   getPhi0(): 1.30261
@@ -9277,7 +9251,6 @@ TrackFitResult#2:
   getEnergy(): 0.450257
   getMomentum(): (0.149659,0.131279,0.378972)
   getOmega(): -0.0225885
-  getPDG(): 211
   getPValue(): 2.166e-14
   getPhi(): 0.720068
   getPhi0(): 0.720068
@@ -9328,7 +9301,6 @@ TrackFitResult#3:
   getEnergy(): 0.373355
   getMomentum(): (0.269732,-0.00288442,0.217142)
   getOmega(): -0.0166707
-  getPDG(): 211
   getPValue(): 0.925247
   getPhi(): -0.0106933
   getPhi0(): -0.0106933
@@ -9379,7 +9351,6 @@ TrackFitResult#4:
   getEnergy(): 0.458431
   getMomentum(): (0.190674,-0.136588,0.368329)
   getOmega(): 0.0191726
-  getPDG(): 211
   getPValue(): 0.0222111
   getPhi(): -0.621612
   getPhi0(): -0.621612
@@ -9430,7 +9401,6 @@ TrackFitResult#5:
   getEnergy(): 0.208414
   getMomentum(): (0.141853,-0.0254702,0.0564425)
   getOmega(): -0.0312021
-  getPDG(): 211
   getPValue(): 0.0389955
   getPhi(): -0.177661
   getPhi0(): -0.177661
@@ -9481,7 +9451,6 @@ TrackFitResult#6:
   getEnergy(): 0.407588
   getMomentum(): (-0.146058,0.333399,0.118996)
   getOmega(): 0.0123545
-  getPDG(): 211
   getPValue(): 4.27886e-09
   getPhi(): 1.9837
   getPhi0(): 1.9837
@@ -9532,7 +9501,6 @@ TrackFitResult#7:
   getEnergy(): 1.03995
   getMomentum(): (-0.97824,-0.0314836,0.322617)
   getOmega(): 0.00459454
-  getPDG(): 211
   getPValue(): 0.975189
   getPhi(): -3.10942
   getPhi0(): -3.10942
@@ -9583,7 +9551,6 @@ TrackFitResult#8:
   getEnergy(): 0.309815
   getMomentum(): (0.0912645,0.0521126,0.255853)
   getOmega(): -0.0427888
-  getPDG(): 211
   getPValue(): 2.407e-09
   getPhi(): 0.518828
   getPhi0(): 0.518828
@@ -9634,7 +9601,6 @@ TrackFitResult#9:
   getEnergy(): 0.332411
   getMomentum(): (-0.194439,-0.160672,-0.165515)
   getOmega(): 0.0178283
-  getPDG(): 211
   getPValue(): 7.23707e-05
   getPhi(): -2.451
   getPhi0(): -2.451
@@ -9685,7 +9651,6 @@ TrackFitResult#10:
   getEnergy(): 0.231962
   getMomentum(): (-0.0732306,0.164632,0.0431275)
   getOmega(): -0.0249571
-  getPDG(): 211
   getPValue(): 0.147717
   getPhi(): 1.98933
   getPhi0(): 1.98933
@@ -9736,7 +9701,6 @@ TrackFitResult#11:
   getEnergy(): 0.239628
   getMomentum(): (0.0534158,-0.185052,-0.029058)
   getOmega(): 0.0233475
-  getPDG(): 211
   getPValue(): 0
   getPhi(): -1.28978
   getPhi0(): -1.28978
@@ -9787,7 +9751,6 @@ TrackFitResult#12:
   getEnergy(): 0.226234
   getMomentum(): (0.0125762,0.0821226,0.15748)
   getOmega(): 0.0541272
-  getPDG(): 211
   getPValue(): 0.794554
   getPhi(): 1.41884
   getPhi0(): 1.41884
@@ -9838,7 +9801,6 @@ TrackFitResult#13:
   getEnergy(): 1.19365
   getMomentum(): (-0.157871,-1.06159,0.503405)
   getOmega(): -0.00418991
-  getPDG(): 211
   getPValue(): 0.584664
   getPhi(): -1.71843
   getPhi0(): -1.71843
@@ -9889,7 +9851,6 @@ TrackFitResult#14:
   getEnergy(): 0.351854
   getMomentum(): (-0.207765,-0.172497,-0.177199)
   getOmega(): 0.0166527
-  getPDG(): 211
   getPValue(): 7.23707e-05
   getPhi(): -2.44868
   getPhi0(): -2.44868
@@ -9940,7 +9901,6 @@ TrackFitResult#15:
   getEnergy(): 0.206251
   getMomentum(): (0.139109,-0.0253375,0.0553759)
   getOmega(): -0.0318031
-  getPDG(): 211
   getPValue(): 0.0389955
   getPhi(): -0.180166
   getPhi0(): -0.180166
@@ -9991,7 +9951,6 @@ TrackFitResult#16:
   getEnergy(): 0.239628
   getMomentum(): (0.0534158,-0.185052,-0.029058)
   getOmega(): 0.0233475
-  getPDG(): 211
   getPValue(): 0
   getPhi(): -1.28978
   getPhi0(): -1.28978
@@ -10042,7 +10001,6 @@ TrackFitResult#17:
   getEnergy(): 1.19365
   getMomentum(): (-0.157871,-1.06159,0.503405)
   getOmega(): -0.00418991
-  getPDG(): 211
   getPValue(): 0.584664
   getPhi(): -1.71843
   getPhi0(): -1.71843
@@ -12869,7 +12827,7 @@ MCParticle#70:
   isInitial(): False
   isVirtual(): False
 Track#0:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -12883,7 +12841,7 @@ Track#0:
   getTrackFitResult(<type: p+>): -> TrackFitResults#0
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
 Track#1:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -12897,7 +12855,7 @@ Track#1:
   getTrackFitResult(<type: p+>): -> TrackFitResults#1
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
 Track#2:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(2)
     -> ECLClusters#20 (weight: 1)
     -> ECLClusters#21 (weight: 1)
@@ -12913,7 +12871,7 @@ Track#2:
   getTrackFitResult(<type: p+>): -> TrackFitResults#2
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
 Track#3:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -12927,7 +12885,7 @@ Track#3:
   getTrackFitResult(<type: p+>): -> TrackFitResults#3
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
 Track#4:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#0 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -12942,7 +12900,7 @@ Track#4:
   getTrackFitResult(<type: p+>): -> TrackFitResults#4
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
 Track#5:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -12956,7 +12914,7 @@ Track#5:
   getTrackFitResult(<type: p+>): -> TrackFitResults#5
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
 Track#6:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#23 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -12971,7 +12929,7 @@ Track#6:
   getTrackFitResult(<type: p+>): -> TrackFitResults#6
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
 Track#7:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(2)
     -> ECLClusters#13 (weight: 1)
     -> ECLClusters#14 (weight: 1)
@@ -12987,7 +12945,7 @@ Track#7:
   getTrackFitResult(<type: p+>): -> TrackFitResults#7
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
 Track#8:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -13001,7 +12959,7 @@ Track#8:
   getTrackFitResult(<type: p+>): -> TrackFitResults#8
   getTrackFitResult(<type: pi+>): -> TrackFitResults#8
 Track#9:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#19 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -13089,7 +13047,6 @@ TrackFitResult#0:
   getEnergy(): 0.331192
   getMomentum(): (0.164227,0.124569,0.218451)
   getOmega(): 0.0218162
-  getPDG(): 211
   getPValue(): 0.723173
   getPhi(): 0.648931
   getPhi0(): 0.648931
@@ -13140,7 +13097,6 @@ TrackFitResult#1:
   getEnergy(): 0.362133
   getMomentum(): (0.121318,0.262246,0.167837)
   getOmega(): 0.0155629
-  getPDG(): 211
   getPValue(): 0.0210657
   getPhi(): 1.1375
   getPhi0(): 1.1375
@@ -13191,7 +13147,6 @@ TrackFitResult#2:
   getEnergy(): 0.352895
   getMomentum(): (0.299118,-0.124637,0.00703895)
   getOmega(): -0.0138773
-  getPDG(): 211
   getPValue(): 0.244619
   getPhi(): -0.394803
   getPhi0(): -0.394803
@@ -13242,7 +13197,6 @@ TrackFitResult#3:
   getEnergy(): 0.225237
   getMomentum(): (-0.105972,-0.105763,0.0940005)
   getOmega(): -0.0300354
-  getPDG(): 211
   getPValue(): 0.035767
   getPhi(): -2.35718
   getPhi0(): -2.35718
@@ -13293,7 +13247,6 @@ TrackFitResult#4:
   getEnergy(): 0.430235
   getMomentum(): (0.0814298,-0.084003,0.389788)
   getOmega(): 0.0384373
-  getPDG(): 211
   getPValue(): 1.57277e-05
   getPhi(): -0.800951
   getPhi0(): -0.800951
@@ -13344,7 +13297,6 @@ TrackFitResult#5:
   getEnergy(): 0.392039
   getMomentum(): (0.0101385,0.329961,0.158864)
   getOmega(): -0.0136221
-  getPDG(): 211
   getPValue(): 0.851481
   getPhi(): 1.54008
   getPhi0(): 1.54008
@@ -13395,7 +13347,6 @@ TrackFitResult#6:
   getEnergy(): 0.402358
   getMomentum(): (0.354703,0.127873,-0.0157129)
   getOmega(): 0.0119266
-  getPDG(): 211
   getPValue(): 0.435061
   getPhi(): 0.346005
   getPhi0(): 0.346005
@@ -13446,7 +13397,6 @@ TrackFitResult#7:
   getEnergy(): 0.626926
   getMomentum(): (-0.475481,0.312641,0.223002)
   getOmega(): -0.00790234
-  getPDG(): 211
   getPValue(): 0.85222
   getPhi(): 2.55995
   getPhi0(): 2.55995
@@ -13497,7 +13447,6 @@ TrackFitResult#8:
   getEnergy(): 0.328293
   getMomentum(): (0.209315,0.210892,-0.00289069)
   getOmega(): 0.0151343
-  getPDG(): 211
   getPValue(): 0.763086
   getPhi(): 0.789151
   getPhi0(): 0.789151
@@ -13548,7 +13497,6 @@ TrackFitResult#9:
   getEnergy(): 0.544234
   getMomentum(): (0.482035,-0.210079,0.0148197)
   getOmega(): -0.00855207
-  getPDG(): 211
   getPValue(): 0.0965782
   getPhi(): -0.410998
   getPhi0(): -0.410998
@@ -13599,7 +13547,6 @@ TrackFitResult#10:
   getEnergy(): 0.362133
   getMomentum(): (0.121318,0.262246,0.167837)
   getOmega(): 0.0155629
-  getPDG(): 211
   getPValue(): 0.0210657
   getPhi(): 1.1375
   getPhi0(): 1.1375
@@ -13650,7 +13597,6 @@ TrackFitResult#11:
   getEnergy(): 0.225237
   getMomentum(): (-0.105972,-0.105763,0.0940005)
   getOmega(): -0.0300354
-  getPDG(): 211
   getPValue(): 0.035767
   getPhi(): -2.35718
   getPhi0(): -2.35718
@@ -13701,7 +13647,6 @@ TrackFitResult#12:
   getEnergy(): 0.430235
   getMomentum(): (0.0814298,-0.084003,0.389788)
   getOmega(): 0.0384373
-  getPDG(): 211
   getPValue(): 1.57277e-05
   getPhi(): -0.800951
   getPhi0(): -0.800951
@@ -13752,7 +13697,6 @@ TrackFitResult#13:
   getEnergy(): 0.352895
   getMomentum(): (0.299118,-0.124637,0.00703895)
   getOmega(): -0.0138773
-  getPDG(): 211
   getPValue(): 0.244619
   getPhi(): -0.394803
   getPhi0(): -0.394803
@@ -13803,7 +13747,6 @@ TrackFitResult#14:
   getEnergy(): 0.402358
   getMomentum(): (0.354703,0.127873,-0.0157129)
   getOmega(): 0.0119266
-  getPDG(): 211
   getPValue(): 0.435061
   getPhi(): 0.346005
   getPhi0(): 0.346005
@@ -13854,7 +13797,6 @@ TrackFitResult#15:
   getEnergy(): 0.392039
   getMomentum(): (0.0101385,0.329961,0.158864)
   getOmega(): -0.0136221
-  getPDG(): 211
   getPValue(): 0.851481
   getPhi(): 1.54008
   getPhi0(): 1.54008
@@ -13905,7 +13847,6 @@ TrackFitResult#16:
   getEnergy(): 0.328282
   getMomentum(): (0.209306,0.210884,-0.00289057)
   getOmega(): 0.0151349
-  getPDG(): 211
   getPValue(): 0.763086
   getPhi(): 0.789153
   getPhi0(): 0.789153
@@ -13956,7 +13897,6 @@ TrackFitResult#17:
   getEnergy(): 0.543897
   getMomentum(): (0.481712,-0.209948,0.0148099)
   getOmega(): -0.00855774
-  getPDG(): 211
   getPValue(): 0.0965782
   getPhi(): -0.411014
   getPhi0(): -0.411014
@@ -17607,7 +17547,7 @@ MCParticle#80:
   isInitial(): False
   isVirtual(): False
 Track#0:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#12 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -17622,7 +17562,7 @@ Track#0:
   getTrackFitResult(<type: p+>): -> TrackFitResults#0
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
 Track#1:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -17636,7 +17576,7 @@ Track#1:
   getTrackFitResult(<type: p+>): -> TrackFitResults#1
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
 Track#2:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -17650,7 +17590,7 @@ Track#2:
   getTrackFitResult(<type: p+>): -> TrackFitResults#2
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
 Track#3:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#25 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -17665,7 +17605,7 @@ Track#3:
   getTrackFitResult(<type: p+>): -> TrackFitResults#3
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
 Track#4:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#17 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -17680,7 +17620,7 @@ Track#4:
   getTrackFitResult(<type: p+>): -> TrackFitResults#4
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
 Track#5:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -17694,7 +17634,7 @@ Track#5:
   getTrackFitResult(<type: p+>): -> TrackFitResults#5
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
 Track#6:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -17708,7 +17648,7 @@ Track#6:
   getTrackFitResult(<type: p+>): -> TrackFitResults#6
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
 Track#7:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#20 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -17723,7 +17663,7 @@ Track#7:
   getTrackFitResult(<type: p+>): -> TrackFitResults#7
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
 Track#8:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -17737,7 +17677,7 @@ Track#8:
   getTrackFitResult(<type: p+>): -> TrackFitResults#8
   getTrackFitResult(<type: pi+>): -> TrackFitResults#8
 Track#9:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#0 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -17752,7 +17692,7 @@ Track#9:
   getTrackFitResult(<type: p+>): -> TrackFitResults#9
   getTrackFitResult(<type: pi+>): -> TrackFitResults#9
 Track#10:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#18 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -17767,7 +17707,7 @@ Track#10:
   getTrackFitResult(<type: p+>): -> TrackFitResults#10
   getTrackFitResult(<type: pi+>): -> TrackFitResults#10
 Track#11:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -17781,7 +17721,7 @@ Track#11:
   getTrackFitResult(<type: p+>): -> TrackFitResults#11
   getTrackFitResult(<type: pi+>): -> TrackFitResults#11
 Track#12:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -17858,7 +17798,6 @@ TrackFitResult#0:
   getEnergy(): 0.716633
   getMomentum(): (0.487175,0.425494,0.275132)
   getOmega(): 0.00695223
-  getPDG(): 211
   getPValue(): 0.859885
   getPhi(): 0.717918
   getPhi0(): 0.717918
@@ -17909,7 +17848,6 @@ TrackFitResult#1:
   getEnergy(): 1.16706
   getMomentum(): (0.0196035,0.524733,-1.03286)
   getOmega(): 0.00856388
-  getPDG(): 211
   getPValue(): 0.580529
   getPhi(): 1.53345
   getPhi0(): 1.53345
@@ -17960,7 +17898,6 @@ TrackFitResult#2:
   getEnergy(): 0.185297
   getMomentum(): (-0.0640926,0.0559991,0.0872438)
   getOmega(): 0.052836
-  getPDG(): 211
   getPValue(): 0.776
   getPhi(): 2.42349
   getPhi0(): 2.42349
@@ -18011,7 +17948,6 @@ TrackFitResult#3:
   getEnergy(): 0.345339
   getMomentum(): (-0.203593,0.101188,-0.219294)
   getOmega(): -0.0197794
-  getPDG(): 211
   getPValue(): 0.137064
   getPhi(): 2.68034
   getPhi0(): 2.68034
@@ -18062,7 +17998,6 @@ TrackFitResult#4:
   getEnergy(): 0.414542
   getMomentum(): (0.360982,-0.1464,0.0249803)
   getOmega(): -0.0115441
-  getPDG(): 211
   getPValue(): 0.823945
   getPhi(): -0.385291
   getPhi0(): -0.385291
@@ -18113,7 +18048,6 @@ TrackFitResult#5:
   getEnergy(): 0.439974
   getMomentum(): (0.310327,0.0442065,0.275392)
   getOmega(): -0.014346
-  getPDG(): 211
   getPValue(): 0.02513
   getPhi(): 0.141499
   getPhi0(): 0.141499
@@ -18164,7 +18098,6 @@ TrackFitResult#6:
   getEnergy(): 0.152123
   getMomentum(): (0.0352425,0.0481232,0.0101878)
   getOmega(): -0.0753904
-  getPDG(): 211
   getPValue(): 1
   getPhi(): 0.938694
   getPhi0(): 0.938694
@@ -18215,7 +18148,6 @@ TrackFitResult#7:
   getEnergy(): 0.347929
   getMomentum(): (0.128937,-0.272607,-0.10313)
   getOmega(): 0.014912
-  getPDG(): 211
   getPValue(): 0.0848813
   getPhi(): -1.129
   getPhi0(): -1.129
@@ -18266,7 +18198,6 @@ TrackFitResult#8:
   getEnergy(): 1.38856
   getMomentum(): (0.307674,-0.43304,1.27532)
   getOmega(): -0.00846533
-  getPDG(): 211
   getPValue(): 0.7711
   getPhi(): -0.953059
   getPhi0(): -0.953059
@@ -18317,7 +18248,6 @@ TrackFitResult#9:
   getEnergy(): 0.280428
   getMomentum(): (-0.042651,-0.121223,0.206509)
   getOmega(): -0.0349933
-  getPDG(): 211
   getPValue(): 0.419358
   getPhi(): -1.90911
   getPhi0(): -1.90911
@@ -18368,7 +18298,6 @@ TrackFitResult#10:
   getEnergy(): 0.678685
   getMomentum(): (-0.635974,0.191342,-0.00766489)
   getOmega(): -0.00677105
-  getPDG(): 211
   getPValue(): 0.101459
   getPhi(): 2.84934
   getPhi0(): 2.84934
@@ -18419,7 +18348,6 @@ TrackFitResult#11:
   getEnergy(): 0.2565
   getMomentum(): (-0.0985338,-0.00792082,0.191156)
   getOmega(): -0.0454913
-  getPDG(): 211
   getPValue(): 0.998813
   getPhi(): -3.06138
   getPhi0(): -3.06138
@@ -18470,7 +18398,6 @@ TrackFitResult#12:
   getEnergy(): 0.190226
   getMomentum(): (-0.0597117,-0.0159011,0.113525)
   getOmega(): 0.0727738
-  getPDG(): 211
   getPValue(): 0.108387
   getPhi(): -2.88133
   getPhi0(): -2.88133
@@ -18521,7 +18448,6 @@ TrackFitResult#13:
   getEnergy(): 0.185297
   getMomentum(): (-0.0640926,0.0559991,0.0872438)
   getOmega(): 0.052836
-  getPDG(): 211
   getPValue(): 0.776
   getPhi(): 2.42349
   getPhi0(): 2.42349
@@ -18572,7 +18498,6 @@ TrackFitResult#14:
   getEnergy(): 0.414542
   getMomentum(): (0.360982,-0.1464,0.0249803)
   getOmega(): -0.0115441
-  getPDG(): 211
   getPValue(): 0.823945
   getPhi(): -0.385291
   getPhi0(): -0.385291
@@ -18623,7 +18548,6 @@ TrackFitResult#15:
   getEnergy(): 0.190226
   getMomentum(): (-0.0597117,-0.0159011,0.113525)
   getOmega(): 0.0727738
-  getPDG(): 211
   getPValue(): 0.108387
   getPhi(): -2.88133
   getPhi0(): -2.88133
@@ -18674,7 +18598,6 @@ TrackFitResult#16:
   getEnergy(): 0.414542
   getMomentum(): (0.360982,-0.1464,0.0249803)
   getOmega(): -0.0115441
-  getPDG(): 211
   getPValue(): 0.823945
   getPhi(): -0.385291
   getPhi0(): -0.385291
@@ -18725,7 +18648,6 @@ TrackFitResult#17:
   getEnergy(): 0.190226
   getMomentum(): (-0.0597117,-0.0159011,0.113525)
   getOmega(): 0.0727738
-  getPDG(): 211
   getPValue(): 0.108387
   getPhi(): -2.88133
   getPhi0(): -2.88133
@@ -18776,7 +18698,6 @@ TrackFitResult#18:
   getEnergy(): 0.678685
   getMomentum(): (-0.635974,0.191342,-0.00766489)
   getOmega(): -0.00677105
-  getPDG(): 211
   getPValue(): 0.101459
   getPhi(): 2.84934
   getPhi0(): 2.84934
@@ -22116,7 +22037,7 @@ MCParticle#70:
   isInitial(): False
   isVirtual(): False
 Track#0:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22130,7 +22051,7 @@ Track#0:
   getTrackFitResult(<type: p+>): -> TrackFitResults#0
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
 Track#1:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#2 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -22145,7 +22066,7 @@ Track#1:
   getTrackFitResult(<type: p+>): -> TrackFitResults#1
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
 Track#2:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#6 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -22160,7 +22081,7 @@ Track#2:
   getTrackFitResult(<type: p+>): -> TrackFitResults#2
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
 Track#3:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22174,7 +22095,7 @@ Track#3:
   getTrackFitResult(<type: p+>): -> TrackFitResults#3
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
 Track#4:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#8 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -22189,7 +22110,7 @@ Track#4:
   getTrackFitResult(<type: p+>): -> TrackFitResults#4
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
 Track#5:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22203,7 +22124,7 @@ Track#5:
   getTrackFitResult(<type: p+>): -> TrackFitResults#5
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
 Track#6:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#0 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -22218,7 +22139,7 @@ Track#6:
   getTrackFitResult(<type: p+>): -> TrackFitResults#6
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
 Track#7:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22232,7 +22153,7 @@ Track#7:
   getTrackFitResult(<type: p+>): -> TrackFitResults#7
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
 Track#8:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#13 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -22247,7 +22168,7 @@ Track#8:
   getTrackFitResult(<type: p+>): -> TrackFitResults#8
   getTrackFitResult(<type: pi+>): -> TrackFitResults#8
 Track#9:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22261,7 +22182,7 @@ Track#9:
   getTrackFitResult(<type: p+>): -> TrackFitResults#9
   getTrackFitResult(<type: pi+>): -> TrackFitResults#9
 Track#10:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22331,7 +22252,6 @@ TrackFitResult#0:
   getEnergy(): 0.274727
   getMomentum(): (0.0877179,0.167228,0.142603)
   getOmega(): 0.0238135
-  getPDG(): 211
   getPValue(): 0.0103542
   getPhi(): 1.08771
   getPhi0(): 1.08771
@@ -22382,7 +22302,6 @@ TrackFitResult#1:
   getEnergy(): 0.632825
   getMomentum(): (-0.0738407,0.304291,0.531923)
   getOmega(): 0.0143615
-  getPDG(): 211
   getPValue(): 0.149571
   getPhi(): 1.80886
   getPhi0(): 1.80886
@@ -22433,7 +22352,6 @@ TrackFitResult#2:
   getEnergy(): 0.863719
   getMomentum(): (-0.649694,-0.0192889,0.551412)
   getOmega(): -0.00691849
-  getPDG(): 211
   getPValue(): 0.350827
   getPhi(): -3.11191
   getPhi0(): -3.11191
@@ -22484,7 +22402,6 @@ TrackFitResult#3:
   getEnergy(): 0.334766
   getMomentum(): (-0.17326,-0.24981,-0.0128299)
   getOmega(): 0.0147917
-  getPDG(): 211
   getPValue(): 0.00230815
   getPhi(): -2.17719
   getPhi0(): -2.17719
@@ -22535,7 +22452,6 @@ TrackFitResult#4:
   getEnergy(): 0.612531
   getMomentum(): (-0.507261,0.141791,0.279815)
   getOmega(): 0.00853777
-  getPDG(): 211
   getPValue(): 0.297513
   getPhi(): 2.86903
   getPhi0(): 2.86903
@@ -22586,7 +22502,6 @@ TrackFitResult#5:
   getEnergy(): 0.342243
   getMomentum(): (-0.252503,0.112706,-0.145569)
   getOmega(): -0.0162628
-  getPDG(): 211
   getPValue(): 0.0769021
   getPhi(): 2.72177
   getPhi0(): 2.72177
@@ -22637,7 +22552,6 @@ TrackFitResult#6:
   getEnergy(): 2.33131
   getMomentum(): (0.664737,-0.562693,2.15802)
   getOmega(): -0.00516339
-  getPDG(): 211
   getPValue(): 0.753741
   getPhi(): -0.702453
   getPhi0(): -0.702453
@@ -22688,7 +22602,6 @@ TrackFitResult#7:
   getEnergy(): 0.246863
   getMomentum(): (-0.00279554,0.0964685,-0.179298)
   getOmega(): 0.0465955
-  getPDG(): 211
   getPValue(): 0.483638
   getPhi(): 1.59977
   getPhi0(): 1.59977
@@ -22739,7 +22652,6 @@ TrackFitResult#8:
   getEnergy(): 0.881507
   getMomentum(): (-0.425026,0.716014,-0.253481)
   getOmega(): -0.00540063
-  getPDG(): 211
   getPValue(): 0.0385195
   getPhi(): 2.1065
   getPhi0(): 2.1065
@@ -22790,7 +22702,6 @@ TrackFitResult#9:
   getEnergy(): 0.248891
   getMomentum(): (0.0822163,0.188262,-0.0162696)
   getOmega(): -0.02189
-  getPDG(): 211
   getPValue(): 3.24563e-06
   getPhi(): 1.15905
   getPhi0(): 1.15905
@@ -22841,7 +22752,6 @@ TrackFitResult#10:
   getEnergy(): 0.1719
   getMomentum(): (-0.0180239,0.0133833,-0.0978045)
   getOmega(): -0.200313
-  getPDG(): 211
   getPValue(): 0.966607
   getPhi(): 2.50289
   getPhi0(): 2.50289
@@ -22892,7 +22802,6 @@ TrackFitResult#11:
   getEnergy(): 0.611871
   getMomentum(): (-0.506686,0.141624,0.279497)
   getOmega(): 0.00854749
-  getPDG(): 211
   getPValue(): 0.297513
   getPhi(): 2.86904
   getPhi0(): 2.86904
@@ -22943,7 +22852,6 @@ TrackFitResult#12:
   getEnergy(): 0.34137
   getMomentum(): (-0.251722,0.112376,-0.145123)
   getOmega(): -0.0163127
-  getPDG(): 211
   getPValue(): 0.0769021
   getPhi(): 2.72171
   getPhi0(): 2.72171
@@ -22994,7 +22902,6 @@ TrackFitResult#13:
   getEnergy(): 0.246863
   getMomentum(): (-0.00279554,0.0964685,-0.179298)
   getOmega(): 0.0465955
-  getPDG(): 211
   getPValue(): 0.483638
   getPhi(): 1.59977
   getPhi0(): 1.59977
@@ -23045,7 +22952,6 @@ TrackFitResult#14:
   getEnergy(): 0.881507
   getMomentum(): (-0.425026,0.716014,-0.253481)
   getOmega(): -0.00540063
-  getPDG(): 211
   getPValue(): 0.0385195
   getPhi(): 2.1065
   getPhi0(): 2.1065
@@ -26284,7 +26190,7 @@ MCParticle#85:
   isInitial(): False
   isVirtual(): False
 Track#0:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -26298,7 +26204,7 @@ Track#0:
   getTrackFitResult(<type: p+>): -> TrackFitResults#0
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
 Track#1:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -26312,7 +26218,7 @@ Track#1:
   getTrackFitResult(<type: p+>): -> TrackFitResults#1
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
 Track#2:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#25 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -26327,7 +26233,7 @@ Track#2:
   getTrackFitResult(<type: p+>): -> TrackFitResults#2
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
 Track#3:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -26341,7 +26247,7 @@ Track#3:
   getTrackFitResult(<type: p+>): -> TrackFitResults#3
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
 Track#4:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#19 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -26356,7 +26262,7 @@ Track#4:
   getTrackFitResult(<type: p+>): -> TrackFitResults#4
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
 Track#5:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#11 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -26371,7 +26277,7 @@ Track#5:
   getTrackFitResult(<type: p+>): -> TrackFitResults#5
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
 Track#6:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#5 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -26386,7 +26292,7 @@ Track#6:
   getTrackFitResult(<type: p+>): -> TrackFitResults#6
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
 Track#7:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -26400,7 +26306,7 @@ Track#7:
   getTrackFitResult(<type: p+>): -> TrackFitResults#7
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
 Track#8:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -26414,7 +26320,7 @@ Track#8:
   getTrackFitResult(<type: p+>): -> TrackFitResults#8
   getTrackFitResult(<type: pi+>): -> TrackFitResults#8
 Track#9:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#8 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -26429,7 +26335,7 @@ Track#9:
   getTrackFitResult(<type: p+>): -> TrackFitResults#9
   getTrackFitResult(<type: pi+>): -> TrackFitResults#9
 Track#10:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -26443,7 +26349,7 @@ Track#10:
   getTrackFitResult(<type: p+>): -> TrackFitResults#10
   getTrackFitResult(<type: pi+>): -> TrackFitResults#10
 Track#11:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -26493,7 +26399,6 @@ TrackFitResult#0:
   getEnergy(): 0.349206
   getMomentum(): (-0.0583897,-0.172351,0.263345)
   getOmega(): 0.0247118
-  getPDG(): 211
   getPValue(): 3.31775e-07
   getPhi(): -1.89744
   getPhi0(): -1.89744
@@ -26544,7 +26449,6 @@ TrackFitResult#1:
   getEnergy(): 0.186809
   getMomentum(): (0.0261607,0.0736061,-0.0965161)
   getOmega(): 0.0575662
-  getPDG(): 211
   getPValue(): 0.759865
   getPhi(): 1.22931
   getPhi0(): 1.22931
@@ -26595,7 +26499,6 @@ TrackFitResult#2:
   getEnergy(): 0.612901
   getMomentum(): (0.46082,0.275434,-0.260671)
   getOmega(): 0.00837627
-  getPDG(): 211
   getPValue(): 0.000132891
   getPhi(): 0.53873
   getPhi0(): 0.53873
@@ -26646,7 +26549,6 @@ TrackFitResult#3:
   getEnergy(): 0.711671
   getMomentum(): (-0.110035,-0.179761,0.665262)
   getOmega(): -0.021336
-  getPDG(): 211
   getPValue(): 0.410671
   getPhi(): -2.12008
   getPhi0(): -2.12008
@@ -26697,7 +26599,6 @@ TrackFitResult#4:
   getEnergy(): 0.474248
   getMomentum(): (0.413714,0.168006,-0.0777545)
   getOmega(): 0.0100708
-  getPDG(): 211
   getPValue(): 0.680002
   getPhi(): 0.385748
   getPhi0(): 0.385748
@@ -26748,7 +26649,6 @@ TrackFitResult#5:
   getEnergy(): 0.51925
   getMomentum(): (0.481478,0.126352,0.0485297)
   getOmega(): -0.00903387
-  getPDG(): 211
   getPValue(): 0.051368
   getPhi(): 0.256638
   getPhi0(): 0.256638
@@ -26799,7 +26699,6 @@ TrackFitResult#6:
   getEnergy(): 1.56999
   getMomentum(): (-0.61951,1.14924,0.860722)
   getOmega(): 0.00344435
-  getPDG(): 211
   getPValue(): 0.91928
   getPhi(): 2.0652
   getPhi0(): 2.0652
@@ -26850,7 +26749,6 @@ TrackFitResult#7:
   getEnergy(): 0.327122
   getMomentum(): (0.109771,0.272954,0.0312404)
   getOmega(): -0.0152852
-  getPDG(): 211
   getPValue(): 0.639033
   getPhi(): 1.18843
   getPhi0(): 1.18843
@@ -26901,7 +26799,6 @@ TrackFitResult#8:
   getEnergy(): 0.245627
   getMomentum(): (0.0795561,-0.169592,0.0759103)
   getOmega(): -0.0240058
-  getPDG(): 211
   getPValue(): 0.126791
   getPhi(): -1.13217
   getPhi0(): -1.13217
@@ -26952,7 +26849,6 @@ TrackFitResult#9:
   getEnergy(): 0.779687
   getMomentum(): (0.681515,-0.166921,0.310012)
   getOmega(): 0.00640894
-  getPDG(): 211
   getPValue(): 0.167218
   getPhi(): -0.240197
   getPhi0(): -0.240197
@@ -27003,7 +26899,6 @@ TrackFitResult#10:
   getEnergy(): 0.289705
   getMomentum(): (0.0928764,0.236242,0.00358163)
   getOmega(): -0.0177152
-  getPDG(): 211
   getPValue(): 0.00262596
   getPhi(): 1.19622
   getPhi0(): 1.19622
@@ -27054,7 +26949,6 @@ TrackFitResult#11:
   getEnergy(): 0.25672
   getMomentum(): (-0.0496565,-0.168871,0.124267)
   getOmega(): 0.0255476
-  getPDG(): 211
   getPValue(): 0.337137
   getPhi(): -1.85679
   getPhi0(): -1.85679
@@ -29931,7 +29825,7 @@ MCParticle#54:
   isInitial(): False
   isVirtual(): False
 Track#0:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#10 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -29946,7 +29840,7 @@ Track#0:
   getTrackFitResult(<type: p+>): -> TrackFitResults#0
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
 Track#1:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -29960,7 +29854,7 @@ Track#1:
   getTrackFitResult(<type: p+>): -> TrackFitResults#1
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
 Track#2:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#5 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -29975,7 +29869,7 @@ Track#2:
   getTrackFitResult(<type: p+>): -> TrackFitResults#2
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
 Track#3:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -29989,7 +29883,7 @@ Track#3:
   getTrackFitResult(<type: p+>): -> TrackFitResults#3
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
 Track#4:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -30003,7 +29897,7 @@ Track#4:
   getTrackFitResult(<type: p+>): -> TrackFitResults#4
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
 Track#5:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(2)
     -> ECLClusters#8 (weight: 1)
     -> ECLClusters#9 (weight: 1)
@@ -30019,7 +29913,7 @@ Track#5:
   getTrackFitResult(<type: p+>): -> TrackFitResults#5
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
 Track#6:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -30033,7 +29927,7 @@ Track#6:
   getTrackFitResult(<type: p+>): -> TrackFitResults#6
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
 Track#7:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#11 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -30048,7 +29942,7 @@ Track#7:
   getTrackFitResult(<type: p+>): -> TrackFitResults#7
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
 Track#8:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -30062,7 +29956,7 @@ Track#8:
   getTrackFitResult(<type: p+>): -> TrackFitResults#8
   getTrackFitResult(<type: pi+>): -> TrackFitResults#8
 Track#9:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -30076,7 +29970,7 @@ Track#9:
   getTrackFitResult(<type: p+>): -> TrackFitResults#9
   getTrackFitResult(<type: pi+>): -> TrackFitResults#9
 Track#10:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#4 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -30091,7 +29985,7 @@ Track#10:
   getTrackFitResult(<type: p+>): -> TrackFitResults#10
   getTrackFitResult(<type: pi+>): -> TrackFitResults#10
 Track#11:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#2 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -30106,7 +30000,7 @@ Track#11:
   getTrackFitResult(<type: p+>): -> TrackFitResults#11
   getTrackFitResult(<type: pi+>): -> TrackFitResults#11
 Track#12:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#2 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -30212,7 +30106,6 @@ TrackFitResult#0:
   getEnergy(): 1.6012
   getMomentum(): (1.04764,-0.942239,-0.747662)
   getOmega(): 0.00319147
-  getPDG(): 211
   getPValue(): 0.959333
   getPhi(): -0.732478
   getPhi0(): -0.732478
@@ -30263,7 +30156,6 @@ TrackFitResult#1:
   getEnergy(): 0.834843
   getMomentum(): (-0.413533,-0.627011,0.336646)
   getOmega(): -0.00598706
-  getPDG(): 211
   getPValue(): 0.0668314
   getPhi(): -2.15384
   getPhi0(): -2.15384
@@ -30314,7 +30206,6 @@ TrackFitResult#2:
   getEnergy(): 0.743092
   getMomentum(): (-0.355852,-0.555383,0.312451)
   getOmega(): -0.00681753
-  getPDG(): 211
   getPValue(): 0.110614
   getPhi(): -2.14063
   getPhi0(): -2.14063
@@ -30365,7 +30256,6 @@ TrackFitResult#3:
   getEnergy(): 0.775967
   getMomentum(): (0.166409,0.148281,0.730045)
   getOmega(): 0.0201755
-  getPDG(): 211
   getPValue(): 0.22936
   getPhi(): 0.727856
   getPhi0(): 0.727856
@@ -30416,7 +30306,6 @@ TrackFitResult#4:
   getEnergy(): 0.475817
   getMomentum(): (0.121732,0.374743,-0.227313)
   getOmega(): -0.0114129
-  getPDG(): 211
   getPValue(): 0.270459
   getPhi(): 1.25671
   getPhi0(): 1.25671
@@ -30467,7 +30356,6 @@ TrackFitResult#5:
   getEnergy(): 0.678582
   getMomentum(): (0.626368,0.150513,-0.161256)
   getOmega(): 0.0069806
-  getPDG(): 211
   getPValue(): 0.453689
   getPhi(): 0.235823
   getPhi0(): 0.235823
@@ -30518,7 +30406,6 @@ TrackFitResult#6:
   getEnergy(): 0.27887
   getMomentum(): (0.221272,-0.0278946,-0.0924622)
   getOmega(): 0.0201633
-  getPDG(): 211
   getPValue(): 0.994174
   getPhi(): -0.125403
   getPhi0(): -0.125403
@@ -30569,7 +30456,6 @@ TrackFitResult#7:
   getEnergy(): 0.790473
   getMomentum(): (-0.323054,0.469674,-0.529537)
   getOmega(): -0.00788857
-  getPDG(): 211
   getPValue(): 0.00864394
   getPhi(): 2.17331
   getPhi0(): 2.17331
@@ -30620,7 +30506,6 @@ TrackFitResult#8:
   getEnergy(): 0.693322
   getMomentum(): (0.12622,0.161034,0.647574)
   getOmega(): 0.0219783
-  getPDG(): 211
   getPValue(): 0.786436
   getPhi(): 0.906005
   getPhi0(): 0.906005
@@ -30671,7 +30556,6 @@ TrackFitResult#9:
   getEnergy(): 0.241128
   getMomentum(): (-0.027615,0.105997,0.163293)
   getOmega(): -0.0410541
-  getPDG(): 211
   getPValue(): 0.725858
   getPhi(): 1.82566
   getPhi0(): 1.82566
@@ -30722,7 +30606,6 @@ TrackFitResult#10:
   getEnergy(): 0.693014
   getMomentum(): (-0.492111,0.343974,0.316698)
   getOmega(): 0.00748971
-  getPDG(): 211
   getPValue(): 0.285496
   getPhi(): 2.53155
   getPhi0(): 2.53155
@@ -30773,7 +30656,6 @@ TrackFitResult#11:
   getEnergy(): 0.631862
   getMomentum(): (0.293053,0.0133864,0.541951)
   getOmega(): 0.015329
-  getPDG(): 211
   getPValue(): 0.0978556
   getPhi(): 0.0456472
   getPhi0(): 0.0456472
@@ -30824,7 +30706,6 @@ TrackFitResult#12:
   getEnergy(): 0.842161
   getMomentum(): (0.0587471,-0.355856,0.748111)
   getOmega(): -0.0124681
-  getPDG(): 211
   getPValue(): 0.225862
   getPhi(): -1.40719
   getPhi0(): -1.40719
@@ -30875,7 +30756,6 @@ TrackFitResult#13:
   getEnergy(): 0.27887
   getMomentum(): (0.221272,-0.0278946,-0.0924622)
   getOmega(): 0.0201633
-  getPDG(): 211
   getPValue(): 0.994174
   getPhi(): -0.125403
   getPhi0(): -0.125403
@@ -30926,7 +30806,6 @@ TrackFitResult#14:
   getEnergy(): 0.475817
   getMomentum(): (0.121732,0.374743,-0.227313)
   getOmega(): -0.0114129
-  getPDG(): 211
   getPValue(): 0.270459
   getPhi(): 1.25671
   getPhi0(): 1.25671
@@ -30977,7 +30856,6 @@ TrackFitResult#15:
   getEnergy(): 0.27887
   getMomentum(): (0.221272,-0.0278946,-0.0924622)
   getOmega(): 0.0201633
-  getPDG(): 211
   getPValue(): 0.994174
   getPhi(): -0.125403
   getPhi0(): -0.125403
@@ -31028,7 +30906,6 @@ TrackFitResult#16:
   getEnergy(): 0.241128
   getMomentum(): (-0.027615,0.105997,0.163293)
   getOmega(): -0.0410541
-  getPDG(): 211
   getPValue(): 0.725858
   getPhi(): 1.82566
   getPhi0(): 1.82566
@@ -31079,7 +30956,6 @@ TrackFitResult#17:
   getEnergy(): 0.694972
   getMomentum(): (0.126532,0.161435,0.64918)
   getOmega(): 0.0219239
-  getPDG(): 211
   getPValue(): 0.786436
   getPhi(): 0.906012
   getPhi0(): 0.906012
@@ -31130,7 +31006,6 @@ TrackFitResult#18:
   getEnergy(): 0.742193
   getMomentum(): (-0.35541,-0.554683,0.312059)
   getOmega(): -0.0068261
-  getPDG(): 211
   getPValue(): 0.110614
   getPhi(): -2.14064
   getPhi0(): -2.14064
@@ -31181,7 +31056,6 @@ TrackFitResult#19:
   getEnergy(): 0.69311
   getMomentum(): (0.12618,0.160983,0.647367)
   getOmega(): 0.0219853
-  getPDG(): 211
   getPValue(): 0.786436
   getPhi(): 0.906005
   getPhi0(): 0.906005
@@ -31232,7 +31106,6 @@ TrackFitResult#20:
   getEnergy(): 0.841758
   getMomentum(): (0.0587168,-0.355681,0.747743)
   getOmega(): -0.0124742
-  getPDG(): 211
   getPValue(): 0.225862
   getPhi(): -1.40719
   getPhi0(): -1.40719
@@ -31283,7 +31156,6 @@ TrackFitResult#21:
   getEnergy(): 0.63254
   getMomentum(): (0.293383,0.0134129,0.542562)
   getOmega(): 0.0153117
-  getPDG(): 211
   getPValue(): 0.0978556
   getPhi(): 0.0456863
   getPhi0(): 0.0456863
@@ -31334,7 +31206,6 @@ TrackFitResult#22:
   getEnergy(): 0.741983
   getMomentum(): (-0.355311,-0.554518,0.311968)
   getOmega(): -0.00682809
-  getPDG(): 211
   getPValue(): 0.110614
   getPhi(): -2.14065
   getPhi0(): -2.14065
@@ -31385,7 +31256,6 @@ TrackFitResult#23:
   getEnergy(): 0.63185
   getMomentum(): (0.293047,0.0133862,0.54194)
   getOmega(): 0.0153293
-  getPDG(): 211
   getPValue(): 0.0978556
   getPhi(): 0.0456476
   getPhi0(): 0.0456476
@@ -31436,7 +31306,6 @@ TrackFitResult#24:
   getEnergy(): 0.841746
   getMomentum(): (0.0587159,-0.355676,0.747733)
   getOmega(): -0.0124744
-  getPDG(): 211
   getPValue(): 0.225862
   getPhi(): -1.40719
   getPhi0(): -1.40719
@@ -34615,7 +34484,7 @@ MCParticle#95:
   isInitial(): False
   isVirtual(): False
 Track#0:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#27 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -34630,7 +34499,7 @@ Track#0:
   getTrackFitResult(<type: p+>): -> TrackFitResults#0
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
 Track#1:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#5 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -34645,7 +34514,7 @@ Track#1:
   getTrackFitResult(<type: p+>): -> TrackFitResults#1
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
 Track#2:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -34659,7 +34528,7 @@ Track#2:
   getTrackFitResult(<type: p+>): -> TrackFitResults#2
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
 Track#3:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(2)
     -> ECLClusters#13 (weight: 1)
     -> ECLClusters#14 (weight: 1)
@@ -34675,7 +34544,7 @@ Track#3:
   getTrackFitResult(<type: p+>): -> TrackFitResults#3
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
 Track#4:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -34689,7 +34558,7 @@ Track#4:
   getTrackFitResult(<type: p+>): -> TrackFitResults#4
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
 Track#5:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(2)
     -> ECLClusters#10 (weight: 1)
     -> ECLClusters#11 (weight: 1)
@@ -34705,7 +34574,7 @@ Track#5:
   getTrackFitResult(<type: p+>): -> TrackFitResults#5
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
 Track#6:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#18 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -34720,7 +34589,7 @@ Track#6:
   getTrackFitResult(<type: p+>): -> TrackFitResults#6
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
 Track#7:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#15 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -34735,7 +34604,7 @@ Track#7:
   getTrackFitResult(<type: p+>): -> TrackFitResults#7
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
 Track#8:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(2)
     -> ECLClusters#24 (weight: 1)
     -> ECLClusters#25 (weight: 1)
@@ -34751,7 +34620,7 @@ Track#8:
   getTrackFitResult(<type: p+>): -> TrackFitResults#8
   getTrackFitResult(<type: pi+>): -> TrackFitResults#8
 Track#9:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -34765,7 +34634,7 @@ Track#9:
   getTrackFitResult(<type: p+>): -> TrackFitResults#9
   getTrackFitResult(<type: pi+>): -> TrackFitResults#9
 Track#10:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -34779,7 +34648,7 @@ Track#10:
   getTrackFitResult(<type: p+>): -> TrackFitResults#10
   getTrackFitResult(<type: pi+>): -> TrackFitResults#10
 Track#11:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#32 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -34794,7 +34663,7 @@ Track#11:
   getTrackFitResult(<type: p+>): -> TrackFitResults#11
   getTrackFitResult(<type: pi+>): -> TrackFitResults#11
 Track#12:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#8 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -34854,7 +34723,6 @@ TrackFitResult#0:
   getEnergy(): 1.12185
   getMomentum(): (1.08,-0.0478847,-0.265304)
   getOmega(): -0.00415972
-  getPDG(): 211
   getPValue(): 0.585781
   getPhi(): -0.0443089
   getPhi0(): -0.0443089
@@ -34905,7 +34773,6 @@ TrackFitResult#1:
   getEnergy(): 0.372182
   getMomentum(): (-0.189884,0.11224,0.265304)
   getOmega(): 0.020387
-  getPDG(): 211
   getPValue(): 0.181813
   getPhi(): 2.60774
   getPhi0(): 2.60774
@@ -34956,7 +34823,6 @@ TrackFitResult#2:
   getEnergy(): 0.173801
   getMomentum(): (0.0645396,0.0131253,-0.0799338)
   getOmega(): -0.0682787
-  getPDG(): 211
   getPValue(): 0.737901
   getPhi(): 0.200632
   getPhi0(): 0.200632
@@ -35007,7 +34873,6 @@ TrackFitResult#3:
   getEnergy(): 0.428615
   getMomentum(): (-0.0151616,0.366915,0.171392)
   getOmega(): 0.0122455
-  getPDG(): 211
   getPValue(): 0.223974
   getPhi(): 1.61209
   getPhi0(): 1.61209
@@ -35058,7 +34923,6 @@ TrackFitResult#4:
   getEnergy(): 0.334184
   getMomentum(): (-0.107172,-0.229641,0.167267)
   getOmega(): 0.0177449
-  getPDG(): 211
   getPValue(): 3.93611e-05
   getPhi(): -2.00745
   getPhi0(): -2.00745
@@ -35109,7 +34973,6 @@ TrackFitResult#5:
   getEnergy(): 0.675794
   getMomentum(): (-0.143464,0.485596,0.425244)
   getOmega(): 0.00888107
-  getPDG(): 211
   getPValue(): 0.0173964
   getPhi(): 1.85806
   getPhi0(): 1.85806
@@ -35160,7 +35023,6 @@ TrackFitResult#6:
   getEnergy(): 0.478472
   getMomentum(): (0.375649,-0.255629,0.0547442)
   getOmega(): -0.00989682
-  getPDG(): 211
   getPValue(): 0.897142
   getPhi(): -0.597519
   getPhi0(): -0.597519
@@ -35211,7 +35073,6 @@ TrackFitResult#7:
   getEnergy(): 1.18553
   getMomentum(): (-0.8228,-0.768242,0.344674)
   getOmega(): -0.00399475
-  getPDG(): 211
   getPValue(): 0.92517
   getPhi(): -2.39047
   getPhi0(): -2.39047
@@ -35262,7 +35123,6 @@ TrackFitResult#8:
   getEnergy(): 0.383884
   getMomentum(): (0.26677,0.232706,-0.0506835)
   getOmega(): 0.0127029
-  getPDG(): 211
   getPValue(): 0.0613489
   getPhi(): 0.717304
   getPhi0(): 0.717304
@@ -35313,7 +35173,6 @@ TrackFitResult#9:
   getEnergy(): 0.20172
   getMomentum(): (-0.00950419,0.133127,0.0582925)
   getOmega(): 0.0336932
-  getPDG(): 211
   getPValue(): 0.680826
   getPhi(): 1.64207
   getPhi0(): 1.64207
@@ -35364,7 +35223,6 @@ TrackFitResult#10:
   getEnergy(): 0.546224
   getMomentum(): (0.0341106,0.487569,-0.199985)
   getOmega(): -0.00920059
-  getPDG(): 211
   getPValue(): 0.118935
   getPhi(): 1.50095
   getPhi0(): 1.50095
@@ -35415,7 +35273,6 @@ TrackFitResult#11:
   getEnergy(): 0.319287
   getMomentum(): (-0.232272,-0.0450134,-0.16275)
   getOmega(): 0.0190068
-  getPDG(): 211
   getPValue(): 0.261058
   getPhi(): -2.95017
   getPhi0(): -2.95017
@@ -35466,7 +35323,6 @@ TrackFitResult#12:
   getEnergy(): 0.535702
   getMomentum(): (0.208431,-0.315325,0.35302)
   getOmega(): -0.011897
-  getPDG(): 211
   getPValue(): 0.739997
   getPhi(): -0.986725
   getPhi0(): -0.986725
@@ -35517,7 +35373,6 @@ TrackFitResult#13:
   getEnergy(): 0.372182
   getMomentum(): (-0.189884,0.11224,0.265304)
   getOmega(): 0.020387
-  getPDG(): 211
   getPValue(): 0.181813
   getPhi(): 2.60774
   getPhi0(): 2.60774
@@ -35568,7 +35423,6 @@ TrackFitResult#14:
   getEnergy(): 0.173801
   getMomentum(): (0.0645396,0.0131253,-0.0799338)
   getOmega(): -0.0682787
-  getPDG(): 211
   getPValue(): 0.737901
   getPhi(): 0.200632
   getPhi0(): 0.200632
@@ -39790,7 +39644,7 @@ MCParticle#98:
   isInitial(): False
   isVirtual(): False
 Track#0:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -39804,7 +39658,7 @@ Track#0:
   getTrackFitResult(<type: p+>): -> TrackFitResults#0
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
 Track#1:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#22 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -39819,7 +39673,7 @@ Track#1:
   getTrackFitResult(<type: p+>): -> TrackFitResults#1
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
 Track#2:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -39833,7 +39687,7 @@ Track#2:
   getTrackFitResult(<type: p+>): -> TrackFitResults#2
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
 Track#3:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -39847,7 +39701,7 @@ Track#3:
   getTrackFitResult(<type: p+>): -> TrackFitResults#3
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
 Track#4:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#24 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -39862,7 +39716,7 @@ Track#4:
   getTrackFitResult(<type: p+>): -> TrackFitResults#4
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
 Track#5:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(3)
     -> ECLClusters#17 (weight: 1)
     -> ECLClusters#18 (weight: 1)
@@ -39879,7 +39733,7 @@ Track#5:
   getTrackFitResult(<type: p+>): -> TrackFitResults#5
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
 Track#6:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(2)
     -> ECLClusters#27 (weight: 1)
     -> ECLClusters#28 (weight: 1)
@@ -39895,7 +39749,7 @@ Track#6:
   getTrackFitResult(<type: p+>): -> TrackFitResults#6
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
 Track#7:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#2 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -39910,7 +39764,7 @@ Track#7:
   getTrackFitResult(<type: p+>): -> TrackFitResults#7
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
 Track#8:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(2)
     -> ECLClusters#8 (weight: 1)
     -> ECLClusters#9 (weight: 1)
@@ -39926,7 +39780,7 @@ Track#8:
   getTrackFitResult(<type: p+>): -> TrackFitResults#8
   getTrackFitResult(<type: pi+>): -> TrackFitResults#8
 Track#9:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -39940,7 +39794,7 @@ Track#9:
   getTrackFitResult(<type: p+>): -> TrackFitResults#9
   getTrackFitResult(<type: pi+>): -> TrackFitResults#9
 Track#10:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#12 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -39955,7 +39809,7 @@ Track#10:
   getTrackFitResult(<type: p+>): -> TrackFitResults#10
   getTrackFitResult(<type: pi+>): -> TrackFitResults#10
 Track#11:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#1 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -39970,7 +39824,7 @@ Track#11:
   getTrackFitResult(<type: p+>): -> TrackFitResults#11
   getTrackFitResult(<type: pi+>): -> TrackFitResults#11
 Track#12:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
     -> ECLClusters#32 (weight: 1)
   getRelationsWith(KLMClusters): size(0)
@@ -39985,7 +39839,7 @@ Track#12:
   getTrackFitResult(<type: p+>): -> TrackFitResults#12
   getTrackFitResult(<type: pi+>): -> TrackFitResults#12
 Track#13:
-  getNumberOfFittedHypothesis(): 1
+  getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
   getRelationsWith(KLMClusters): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -40072,7 +39926,6 @@ TrackFitResult#0:
   getEnergy(): 0.476853
   getMomentum(): (-0.217722,0.29928,-0.26634)
   getOmega(): 0.0121506
-  getPDG(): 211
   getPValue(): 1.57882e-14
   getPhi(): 2.19973
   getPhi0(): 2.19973
@@ -40123,7 +39976,6 @@ TrackFitResult#1:
   getEnergy(): 0.61968
   getMomentum(): (-0.578944,0.105995,0.134579)
   getOmega(): 0.0076404
-  getPDG(): 211
   getPValue(): 0.0288829
   getPhi(): 2.96051
   getPhi0(): 2.96051
@@ -40174,7 +40026,6 @@ TrackFitResult#2:
   getEnergy(): 0.432842
   getMomentum(): (-0.260063,0.193122,0.250885)
   getOmega(): -0.0138824
-  getPDG(): 211
   getPValue(): 0.403223
   getPhi(): 2.50284
   getPhi0(): 2.50284
@@ -40225,7 +40076,6 @@ TrackFitResult#3:
   getEnergy(): 0.275014
   getMomentum(): (0.205012,-0.0889105,0.0788519)
   getOmega(): 0.0201238
-  getPDG(): 211
   getPValue(): 0.847663
   getPhi(): -0.409203
   getPhi0(): -0.409203
@@ -40276,7 +40126,6 @@ TrackFitResult#4:
   getEnergy(): 0.350188
   getMomentum(): (0.0315601,0.318833,0.0223877)
   getOmega(): 0.0140356
-  getPDG(): 211
   getPValue(): 0.437364
   getPhi(): 1.47213
   getPhi0(): 1.47213
@@ -40327,7 +40176,6 @@ TrackFitResult#5:
   getEnergy(): 0.456395
   getMomentum(): (0.411932,0.0601259,0.124551)
   getOmega(): 0.0108021
-  getPDG(): 211
   getPValue(): 0.0357815
   getPhi(): 0.144937
   getPhi0(): 0.144937
@@ -40378,7 +40226,6 @@ TrackFitResult#6:
   getEnergy(): 0.599935
   getMomentum(): (-0.394009,-0.423774,-0.0749291)
   getOmega(): -0.00777144
-  getPDG(): 211
   getPValue(): 0.110437
   getPhi(): -2.31981
   getPhi0(): -2.31981
@@ -40429,7 +40276,6 @@ TrackFitResult#7:
   getEnergy(): 0.441461
   getMomentum(): (-0.20686,-0.135634,0.337964)
   getOmega(): -0.0181794
-  getPDG(): 211
   getPValue(): 0.088532
   getPhi(): -2.56123
   getPhi0(): -2.56123
@@ -40480,7 +40326,6 @@ TrackFitResult#8:
   getEnergy(): 0.739062
   getMomentum(): (0.42401,0.497166,0.31587)
   getOmega(): -0.00688207
-  getPDG(): 211
   getPValue(): 0.384699
   getPhi(): 0.864648
   getPhi0(): 0.864648
@@ -40531,7 +40376,6 @@ TrackFitResult#9:
   getEnergy(): 0.220764
   getMomentum(): (-0.154672,-0.017058,0.0710118)
   getOmega(): -0.0288985
-  getPDG(): 211
   getPValue(): 0.112781
   getPhi(): -3.03175
   getPhi0(): -3.03175
@@ -40582,7 +40426,6 @@ TrackFitResult#10:
   getEnergy(): 0.597292
   getMomentum(): (-0.414625,0.296038,0.278793)
   getOmega(): -0.00882672
-  getPDG(): 211
   getPValue(): 0.550804
   getPhi(): 2.52154
   getPhi0(): 2.52154
@@ -40633,7 +40476,6 @@ TrackFitResult#11:
   getEnergy(): 0.288136
   getMomentum(): (0.130002,-0.0676951,0.205083)
   getOmega(): 0.0306805
-  getPDG(): 211
   getPValue(): 0.305874
   getPhi(): -0.480088
   getPhi0(): -0.480088
@@ -40684,7 +40526,6 @@ TrackFitResult#12:
   getEnergy(): 0.39406
   getMomentum(): (-0.0348348,-0.342162,-0.132346)
   getOmega(): 0.013075
-  getPDG(): 211
   getPValue(): 0.684147
   getPhi(): -1.67225
   getPhi0(): -1.67225
@@ -40735,7 +40576,6 @@ TrackFitResult#13:
   getEnergy(): 0.193666
   getMomentum(): (0.118873,0.0562225,0.0271114)
   getOmega(): -0.0341974
-  getPDG(): 211
   getPValue(): 0.0112129
   getPhi(): 0.441785
   getPhi0(): 0.441785
@@ -40786,7 +40626,6 @@ TrackFitResult#14:
   getEnergy(): 0.476853
   getMomentum(): (-0.217722,0.29928,-0.26634)
   getOmega(): 0.0121506
-  getPDG(): 211
   getPValue(): 1.57882e-14
   getPhi(): 2.19973
   getPhi0(): 2.19973
@@ -40837,7 +40676,6 @@ TrackFitResult#15:
   getEnergy(): 0.220764
   getMomentum(): (-0.154672,-0.017058,0.0710118)
   getOmega(): -0.0288985
-  getPDG(): 211
   getPValue(): 0.112781
   getPhi(): -3.03175
   getPhi0(): -3.03175
@@ -40888,7 +40726,6 @@ TrackFitResult#16:
   getEnergy(): 0.350188
   getMomentum(): (0.0315601,0.318833,0.0223877)
   getOmega(): 0.0140356
-  getPDG(): 211
   getPValue(): 0.437364
   getPhi(): 1.47213
   getPhi0(): 1.47213
@@ -40939,7 +40776,6 @@ TrackFitResult#17:
   getEnergy(): 0.432842
   getMomentum(): (-0.260063,0.193122,0.250885)
   getOmega(): -0.0138824
-  getPDG(): 211
   getPValue(): 0.403223
   getPhi(): 2.50284
   getPhi0(): 2.50284
@@ -40990,7 +40826,6 @@ TrackFitResult#18:
   getEnergy(): 0.456395
   getMomentum(): (0.411932,0.0601259,0.124551)
   getOmega(): 0.0108021
-  getPDG(): 211
   getPValue(): 0.0357815
   getPhi(): 0.144937
   getPhi0(): 0.144937
@@ -41041,7 +40876,6 @@ TrackFitResult#19:
   getEnergy(): 0.739062
   getMomentum(): (0.42401,0.497166,0.31587)
   getOmega(): -0.00688207
-  getPDG(): 211
   getPValue(): 0.384699
   getPhi(): 0.864648
   getPhi0(): 0.864648
@@ -41092,7 +40926,6 @@ TrackFitResult#20:
   getEnergy(): 0.393654
   getMomentum(): (-0.0347887,-0.341759,-0.13219)
   getOmega(): 0.0130904
-  getPDG(): 211
   getPValue(): 0.684147
   getPhi(): -1.67224
   getPhi0(): -1.67224
@@ -41143,7 +40976,6 @@ TrackFitResult#21:
   getEnergy(): 0.194162
   getMomentum(): (0.119506,0.0565195,0.0272556)
   getOmega(): -0.0340165
-  getPDG(): 211
   getPValue(): 0.0112129
   getPhi(): 0.441769
   getPhi0(): 0.441769

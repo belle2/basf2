@@ -272,7 +272,7 @@ mdst_dataobjects = [
         "getSecondaryPhysicsProcess", "getSeenInDetector",
         "isVirtual", "isInitial"
     ]),
-    DataStorePrinter("Track", ["getNumberOfFittedHypothesis"], {
+    DataStorePrinter("Track", ["getNumberOfFittedHypotheses"], {
         "getTrackFitResult": const_stable,
         "getRelationsWith": ["ECLClusters", "KLMClusters", "MCParticles", "PIDLikelihoods"],
     }),
@@ -281,7 +281,7 @@ mdst_dataobjects = [
     }),
     DataStorePrinter("TrackFitResult", [
         "getPosition", "getMomentum", "get4Momentum", "getEnergy", "getTransverseMomentum",
-        "getCovariance6", "getPDG", "getChargeSign", "getPValue", "getD0", "getPhi0",
+        "getCovariance6", "getChargeSign", "getPValue", "getD0", "getPhi0",
         "getPhi", "getOmega", "getZ0", "getTanLambda", "getCotTheta",
         "getTau", "getCov", "getCovariance5"
     ]),

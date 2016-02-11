@@ -52,6 +52,12 @@ namespace Belle2 {
         return "Breaks bigger wire hit super cluster into smaller wire hit clusters";
       }
 
+      /** Add the parameters of the filter to the module */
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
+      {
+        m_wireHitRelationFilter.exposeParameters(moduleParamList, prefix);
+      }
+
     public:
       /// Main algorithm applying the cluster refinement
       virtual void apply(const std::vector<CDCWireHitCluster>& inputSuperClusters,

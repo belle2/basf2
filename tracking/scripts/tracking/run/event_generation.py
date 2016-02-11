@@ -58,7 +58,7 @@ default_generator_params_by_generator_name = {
         'momentumGeneration': 'uniform',
         'momentumParams': [0.6, 1.4],
         'thetaGeneration': 'uniform',
-        'thetaParams': [17., 150.],
+        'thetaParams': [20., 145.],
     },
     'simple_gun': {
         'pdgCodes': [muon_pdg_code, -muon_pdg_code],
@@ -105,6 +105,7 @@ class ReadOrGenerateEventsRun(MinimalRun):
     simulate_only = False
     components = ['PXD', 'SVD', 'CDC', 'BeamPipe',
                   'MagneticFieldConstant4LimitedRCDC']
+    disable_deltas = False
 
     def create_argument_parser(self, **kwds):
         argument_parser = super(ReadOrGenerateEventsRun, self).create_argument_parser(**kwds)
@@ -138,6 +139,12 @@ class ReadOrGenerateEventsRun(MinimalRun):
             metavar='BACKGROUND_DIRECTORY',
             help='Path to folder of files or to a file containing the background to be used. ' +
                  'Can be given multiple times.',
+        )
+
+        argument_parser.add_argument(
+            '--disable-deltas',
+            action='store_true',
+            help='Disable the generation of delta rays in the simulation'
         )
 
         return argument_parser
@@ -178,6 +185,10 @@ class ReadOrGenerateEventsRun(MinimalRun):
                                       components=components,
                                       bkgfiles=bkg_file_paths)
 
+            for module in main_path.modules():
+                if module.type() == 'FullSim':
+                    if self.disable_deltas:
+                        module.param('ProductionCut', 1000000.)
             # Catch if no generator is added, no background should be simulated and events
             # are not read from a file.
             if not bkg_file_paths and generator_module is None:

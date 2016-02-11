@@ -162,7 +162,8 @@ namespace Belle2 {
 
     private:
       /// Parameter: A map from o'clock direction to the number of missing primary drift cells
-      std::map<int, int> m_param_missingPrimaryNeighborThresholdMap = {{2, 2}, {4, 2}, {8, 2}, {10, 2}};
+      std::map<int, int> m_param_missingPrimaryNeighborThresholdMap =
+      {{0, 2}, {2, 2}, {4, 2}, {6, 2}, {8, 2}, {10, 2}};
 
       //// Array for the number of primary drift cells to be included for the o'clock position at each index.
       std::array<short, 12> m_missingPrimaryNeighborThresholds;

@@ -72,7 +72,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("2015AprRun", m_2015AprRun, "Cosmic runs in April 2015 (i.e. only super-layer #4 on) ?", false);
 
   addParam("TrigTimeJitter", m_trigTimeJitter,
-           "Magnitude of trigger timing jitter (ns). If it is set to a non-zero value (w), the trigger timing is randuminzed uniformly in a time window of [-w/2, +h/2].",
+           "Magnitude (w) of trigger timing jitter (ns). The trigger timing is randuminzed uniformly in a time window of [-w/2, +w/2].",
            0.);
   //Switches to control time information handling
   addParam("AddInWirePropagationDelay",   m_addInWirePropagationDelay,

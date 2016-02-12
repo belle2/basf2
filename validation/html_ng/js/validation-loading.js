@@ -156,22 +156,42 @@ function fill_ntuple_table(dom_id, json_loading_path ) {
         items.push("<th>tag</th>");
 
         // get the name of each value which is plotted
-        for ( var key in data) {
-            $.each(data[key], function (name_val, val_float) {
-                items.push("<th>"+name_val+"</th>");
-            });
+        for ( var rev in data) {
+        	for ( var fig in data[rev]) {
+        		val_pair = data[rev][fig];
+        		console.log(val_pair);
+        		items.push("<th>"+val_pair[0]+"</th>");
+        	}
             break;
         };
 
         items.push("</tr>");
 
+        	// reference first, if available
           $.each( data, function( key, val ) {
+        	  
+        	if (key == "reference") {
             items.push("<tr>");
             items.push("<td>" + key + "</td>");
-            $.each(val, function (name_val, val_float) {
-                items.push("<td>" + val_float + "</td>");            
-            });
-            items.push("</tr>");
+        	for ( var fig in data[key]) {
+        		val_pair = data[key][fig];
+        		console.log(val_pair);
+        		items.push("<td>" + val_pair[1] + "</td>");    
+        	}            
+            items.push("</tr>");}
+          });
+        
+          // now the rest
+          $.each( data, function( key, val ) {
+        	if (key != "reference") {
+            items.push("<tr>");
+            items.push("<td>" + key + "</td>");
+        	for ( var fig in data[key]) {
+        		val_pair = data[key][fig];
+        		console.log(val_pair);
+        		items.push("<td>" + val_pair[1] + "</td>");    
+        	}            
+            items.push("</tr>");}
           });
 
         $("#" + dom_id).after(items);

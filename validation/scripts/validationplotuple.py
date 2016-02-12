@@ -656,17 +656,25 @@ class Plotuple:
         # If there is a reference object, print the reference values as the
         # first row of the table
         if self.reference and 'reference' in self.list_of_revisions:
-            json_nutple['reference'] = {}
-            for key in list(self.reference.object.keys()):
-                json_nutple['reference'][key] = self.reference.object[key]
+            json_nutple['reference'] = []
+
+            key_list = list(self.reference.object.keys())
+            for column in colum_names:
+                if column in key_list:
+                    json_nutple['reference'].append((column, self.reference.object[column]))
+                else:
+                    json_nutple['reference'].append((column, None))
 
         # Now print the values for all other revisions
         for ntuple in self.elements:
             if ntuple.revision not in json_nutple:
-                json_nutple[ntuple.revision] = {}
+                json_nutple[ntuple.revision] = []
 
             for column in colum_names:
-                json_nutple[ntuple.revision][column] = ntuple.object[column]
+                if column in ntuple.object:
+                    json_nutple[ntuple.revision].append((column, ntuple.object[column]))
+                else:
+                    json_nutple[ntuple.revision].append((column, None))
 
         # Create the folder in which the plot is then stored
         path = ('./plots/{0}/'

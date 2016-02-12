@@ -185,10 +185,9 @@ class ValidationRoot(object):
         # get list of available revision
         rev_list = get_json_object_list(self.results_folder, "revision.json")
 
-        combined_list = []
-
         # always add the reference revision
-        combined_list = [json.loads(json_objects.dumps(json_objects.Revision("reference", None, "black")))]
+        combined_list = []
+        reference_revision = json.loads(json_objects.dumps(json_objects.Revision("reference", None, "black")))
 
         # load and combine
         for r in rev_list:
@@ -199,6 +198,11 @@ class ValidationRoot(object):
             j = deliver_json(full_path)
             j["label"] = lbl_folder
             combined_list.append(j)
+
+        # sort by name
+        combined_list.sort(key=lambda rev: rev["label"])
+        # reference always on top
+        combined_list = [reference_revision] + combined_list
 
         # Set the most recent one ...
         newest_date = None

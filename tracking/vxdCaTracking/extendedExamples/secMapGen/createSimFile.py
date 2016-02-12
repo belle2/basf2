@@ -31,8 +31,8 @@ usePXD = False
 
 
 # Important parameters:
-numEvents = 2  # can be overridden by the parameters given via terminal
-initialValue = 57  # want random events, if set to 0
+numEvents = 100  # can be overridden by the parameters given via terminal
+initialValue = 2  # want random events, if set to 0
 
 
 # flags for the pGun
@@ -41,10 +41,10 @@ numTracks = 10
 momentumMin = 0.1  # GeV/c
 momentumMax = 0.145  # %
 # theta: starting angle of particle direction in r-z-plane
-thetaMin = 65.0  # degrees
+thetaMin = 60.0  # degrees
 thetaMax = 85.  # degrees
 # phi: starting angle of particle direction in x-y-plane (r-phi-plane)
-phiMin = 315.  # degrees
+phiMin = 0.  # degrees
 phiMax = 360.  # degrees
 # 13: muons, 211: charged pions
 pdgCODES = [13]
@@ -206,18 +206,9 @@ if useSimpleClusterizer:
     main.add_module(simpleClusterizer)
 else:
     setup_realClusters(main, usePXD=True)  # needed since 2gftc-converter does not work without it
-setup_spCreatorSVD(path=main, nameOutput='nosingleSP', createSingleClusterSPs=False, logLevel=LogLevel.INFO)
-setup_spCreatorPXD(path=main, nameOutput='pxdOnly', logLevel=LogLevel.INFO)  # needed since 2gftc-converter does not work without it
+
 setup_mcTF(path=main, nameOutput='mcTracks', usePXD=usePXD, logLevel=LogLevel.INFO)
 
-setup_gfTCtoSPTCConverters(
-    path=main,
-    pxdSPs='pxdOnly',
-    svdSPs='nosingleSP',
-    gfTCinput='mcTracks',
-    sptcOutput='checkedSPTCs',
-    usePXD=False,
-    logLevel=LogLevel.WARNING)
 
 main.add_module(rootOutputM)
 

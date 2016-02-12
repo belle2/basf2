@@ -17,11 +17,11 @@ namespace Belle2 {
      * A templated collector algorithm which only does the adding algorithm in cases where there is only one possibility
      * for a single collection item to be added to a collector item.
      */
-    template <class AMatherAlgorithm, class AAdderAlgorithm>
-    class SingleMatchCollector : public ManyMatchCollector<AMatherAlgorithm, AAdderAlgorithm> {
+    template <class AMatcherAlgorithm, class AAdderAlgorithm, class Compare = std::less<const typename AMatcherAlgorithm::CollectionItem*>>
+    class SingleMatchCollector : public ManyMatchCollector<AMatcherAlgorithm, AAdderAlgorithm, Compare> {
     public:
       /// The super (parent) class.
-      typedef ManyMatchCollector<AMatherAlgorithm, AAdderAlgorithm> Super;
+      typedef ManyMatchCollector<AMatcherAlgorithm, AAdderAlgorithm, Compare> Super;
       /// Copy the CollectorItem definition.
       typedef typename Super::CollectorItem CollectorItem;
       /// Copy the CollectionItem definition.
@@ -32,7 +32,7 @@ namespace Belle2 {
       /// Do the collection process.
       virtual void collect(std::vector<CollectorItem>& collectorItems, const std::vector<CollectionItem>& collectionItems) override
       {
-        const MapOfList<const CollectionItem*, WithWeight<CollectorItem*>>& matches = Super::constructMatchLookup(collectorItems,
+        const MapOfList<const CollectionItem*, WithWeight<CollectorItem*>, Compare>& matches = Super::constructMatchLookup(collectorItems,
             collectionItems);
 
         MapOfList<CollectorItem*, WithWeight<const CollectionItem*>> bestMatches;

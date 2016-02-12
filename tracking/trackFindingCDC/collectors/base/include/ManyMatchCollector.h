@@ -17,11 +17,11 @@ namespace Belle2 {
      * A templated collector algorithm which does not use the first match but runs the matching algorithm with all collection/collector
      * item pairs to search for the best etc. afterwards.
      */
-    template <class AMatherAlgorithm, class AAdderAlgorithm>
-    class ManyMatchCollector : public Collector<AMatherAlgorithm, AAdderAlgorithm> {
+    template <class AMatcherAlgorithm, class AAdderAlgorithm, class Compare = std::less<const typename AMatcherAlgorithm::CollectionItem*>>
+    class ManyMatchCollector : public Collector<AMatcherAlgorithm, AAdderAlgorithm> {
     public:
       /// The super (parent) class.
-      typedef Collector<AMatherAlgorithm, AAdderAlgorithm> Super;
+      typedef Collector<AMatcherAlgorithm, AAdderAlgorithm> Super;
       /// Copy the CollectorItem definition.
       typedef typename Super::CollectorItem CollectorItem;
       /// Copy the CollectionItem definition.
@@ -37,10 +37,11 @@ namespace Belle2 {
        * Helper function for testing each pair of collector-collection-items with the match function.
        * It returns a map collectionItem->list of possible collector item matches with weight.
       */
-      const MapOfList<const CollectionItem*, WithWeight<CollectorItem*>> constructMatchLookup(std::vector<CollectorItem>& collectorItems,
-          const std::vector<CollectionItem>& collectionItems)
+      const MapOfList<const CollectionItem*, WithWeight<CollectorItem*>, Compare> constructMatchLookup(
+        std::vector<CollectorItem>& collectorItems,
+        const std::vector<CollectionItem>& collectionItems)
       {
-        MapOfList<const CollectionItem*, WithWeight<CollectorItem*>> matches;
+        MapOfList<const CollectionItem*, WithWeight<CollectorItem*>, Compare> matches;
 
         for (CollectorItem& collectorItem : collectorItems) {
           const std::vector<MatchedCollectionItem>& matchesForCollector = this->m_matcherInstance.match(collectorItem, collectionItems);

@@ -15,13 +15,15 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     /**
      * A helper class for a map of vectors with a convenience function for adding items.
+     * Compare can be given for replacing the std::less as the default comparer function
+     * in the map.
      * TODO: Better replace this by a eigen::matrix?
      */
-    template<class FromItem, class ToItem>
-    class MapOfList : public std::map<FromItem, std::vector<ToItem>> {
+    template<class FromItem, class ToItem, class Compare = std::less<FromItem>>
+    class MapOfList : public std::map<FromItem, std::vector<ToItem>, Compare> {
     private:
       /// The super (parent) class.
-      typedef typename std::map<FromItem, std::vector<ToItem>> Super;
+      typedef typename std::map<FromItem, std::vector<ToItem>, Compare> Super;
     public:
       /**
        * Add a new relation to the list. If the fromItem is already there,

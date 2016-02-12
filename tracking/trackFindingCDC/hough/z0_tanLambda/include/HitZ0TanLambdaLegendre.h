@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 #include <tracking/trackFindingCDC/hough/algorithms/HitInZ0TanLambdaBox.h>
+#include <tracking/trackFindingCDC/hough/algorithms/HitInZ0TanLambdaBoxUsingZ.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -25,5 +26,8 @@ namespace Belle2 {
      */
     using HitZ0TanLambdaLegendre =
       Z0TanLambdaLegendre<std::pair<CDCRecoHit3D, const CDCRLTaggedWireHit*>, FirstOfPairInBox<HitInZ0TanLambdaBox>, 2, 2>;
+
+    using HitZ0TanLambdaLegendreUsingZ =
+      Z0TanLambdaLegendre<std::pair<CDCRecoHit3D, const CDCRLTaggedWireHit*>, FirstOfPairInBox<HitInZ0TanLambdaBoxUsingZ>, 2, 2>;
   }
 }

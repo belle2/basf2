@@ -16,19 +16,19 @@ StereoHitFinderCDCLegendreHistogrammingModule::StereoHitFinderCDCLegendreHistogr
 {
   setDescription("Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree.");
 
-  addParam("useBestMatch", m_param_useBestMatch, "Use the best-match algorithm instead of the first match.", m_param_useBestMatch);
+  addParam("useSingleMatchAlgorithm", m_param_useSingleMatchAlgorithm,
+           "If true, use the single match instead of the first match algorithm.", m_param_useSingleMatchAlgorithm);
 
   ModuleParamList paramList = this->getParamList();
-  m_stereohitsCollectorBestMatch.exposeParameters(&paramList, "bestMatch");
-  m_stereohitsCollectorFirstMatch.exposeParameters(&paramList, "firstMatch");
+  m_stereohitsCollectorSingleMatch.exposeParameters(&paramList, "singleMatch");
   setParamList(paramList);
 }
 
 /** Initialize the stereo quad trees */
 void StereoHitFinderCDCLegendreHistogrammingModule::initialize()
 {
-  if (m_param_useBestMatch) {
-    m_stereohitsCollectorBestMatch.initialize();
+  if (m_param_useSingleMatchAlgorithm) {
+    m_stereohitsCollectorSingleMatch.initialize();
   } else {
     m_stereohitsCollectorFirstMatch.initialize();
   }
@@ -39,8 +39,8 @@ void StereoHitFinderCDCLegendreHistogrammingModule::initialize()
 /** Terminate the stereo quad trees */
 void StereoHitFinderCDCLegendreHistogrammingModule::terminate()
 {
-  if (m_param_useBestMatch) {
-    m_stereohitsCollectorBestMatch.terminate();
+  if (m_param_useSingleMatchAlgorithm) {
+    m_stereohitsCollectorSingleMatch.terminate();
   } else {
     m_stereohitsCollectorFirstMatch.terminate();
   }
@@ -56,14 +56,16 @@ void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2:
   std::vector<CDCRLTaggedWireHit> rlTaggedWireHits;
   rlTaggedWireHits.reserve(2 * wireHits.size());
   for (const CDCWireHit& wireHit : wireHits) {
-    for (ERightLeft rlInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
-      rlTaggedWireHits.emplace_back(&wireHit, rlInfo);
+    if (not wireHit.getAutomatonCell().hasTakenFlag() and not wireHit.isAxial()) {
+      for (ERightLeft rlInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
+        rlTaggedWireHits.emplace_back(&wireHit, rlInfo);
+      }
     }
   }
 
   // Collect the hits for each track
-  if (m_param_useBestMatch) {
-    m_stereohitsCollectorBestMatch.collect(tracks, rlTaggedWireHits);
+  if (m_param_useSingleMatchAlgorithm) {
+    m_stereohitsCollectorSingleMatch.collect(tracks, rlTaggedWireHits);
   } else {
     m_stereohitsCollectorFirstMatch.collect(tracks, rlTaggedWireHits);
   }

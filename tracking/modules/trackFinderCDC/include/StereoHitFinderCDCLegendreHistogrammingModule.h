@@ -47,12 +47,13 @@ namespace Belle2 {
     void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) override;
 
     /// Collector hiding the implementation.
-    TrackFindingCDC::StereoHitCollectorFirstMatch m_stereohitsCollectorFirstMatch;
+    TrackFindingCDC::StereoHitCollectorSingleMatch m_stereohitsCollectorSingleMatch;
     /// Collector hiding the implementation.
-    TrackFindingCDC::StereoHitCollectorBestMatch m_stereohitsCollectorBestMatch;
+    TrackFindingCDC::StereoHitCollectorFirstMatch m_stereohitsCollectorFirstMatch;
 
     /// Parameter
-    bool m_param_useBestMatch = false;
+    /// If true, use the single match instead of the first match algorithm.
+    bool m_param_useSingleMatchAlgorithm = false;
   };
 
 }

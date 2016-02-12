@@ -13,23 +13,29 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void StereoHitTrackMatcherQuadTree::exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix)
+template <class HoughTree>
+void StereoHitTrackMatcherQuadTree<HoughTree>::exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix)
 {
-  QuadTreeBasedMatcher<HitZ0TanLambdaLegendre>::exposeParameters(moduleParameters, prefix);
+  QuadTreeBasedMatcher<HoughTree>::exposeParameters(moduleParameters, prefix);
   m_filterFactory.exposeParameters(moduleParameters, prefix);
 
   moduleParameters->addParameter(prefixed(prefix, "checkForB2BTracks"), m_param_checkForB2BTracks,
-                                 "Set to false to skip the check for back-2-back tracks (good for cosmics)",
+                                 "Set to false to skip the check for back-2-back tracks (good for cosmics).",
                                  m_param_checkForB2BTracks);
+  moduleParameters->addParameter(prefixed(prefix, "checkForInWireBoundsFactor"), m_param_checkForInWireBoundsFactor,
+                                 "Used to scale the CDC, before checking of a hit is in the CDC z bounds.",
+                                 m_param_checkForInWireBoundsFactor);
 }
 
-Weight StereoHitTrackMatcherQuadTree::getWeight(const CDCRecoHit3D& recoHit, const Z0TanLambdaBox&,
-                                                const CDCTrack& track) const
+template <class HoughTree>
+Weight StereoHitTrackMatcherQuadTree<HoughTree>::getWeight(const CDCRecoHit3D& recoHit, const Z0TanLambdaBox&,
+                                                           const CDCTrack& track) const
 {
   return m_stereoHitFilter->operator()({&recoHit, &track});
 }
 
-std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree::match(const CDCTrack& track,
+template <class HoughTree>
+std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree<HoughTree>::match(const CDCTrack& track,
                                                 const std::vector<CDCRLTaggedWireHit>& rlWireHits)
 {
   if (m_stereoHitFilter->needsTruthInformation()) {
@@ -43,18 +49,18 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree
 
   typedef std::pair<CDCRecoHit3D, const CDCRLTaggedWireHit*> CDCRecoHitWithRLPointer;
   std::vector<CDCRecoHitWithRLPointer> recoHits;
-  recoHits.reserve(rlWireHits.size());
+  recoHits.reserve(rlWireHits.size() + track.size());
 
   /*
    * Use the given trajectory to reconstruct the 2d hits in the vector in z direction
    * to match the trajectory perfectly. Then add the newly created reconstructed 3D hit to the given list.
    */
   for (const CDCRLTaggedWireHit& rlWireHit : rlWireHits) {
-    if (rlWireHit.getStereoKind() != EStereoKind::c_Axial and not rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
+    if (not rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
       Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
       const CDCWire& wire = rlWireHit.getWire();
       // Skip hits out of CDC
-      if (not wire.isInCellZBounds(recoPos3D)) {
+      if (not wire.isInCellZBounds(recoPos3D, m_param_checkForInWireBoundsFactor)) {
         continue;
       }
 
@@ -71,15 +77,23 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree
     }
   }
 
-  // Do the tree finding
-  m_quadTreeInstance.seed(recoHits);
-
-  if (m_param_writeDebugInformation) {
-    writeDebugInformation();
+  for (const CDCRecoHit3D& recoHit : track) {
+    if (not recoHit.isAxial()) {
+      recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
+      const CDCRLTaggedWireHit& rlWireHit = recoHit.getRLWireHit();
+      recoHits.emplace_back(recoHit, &rlWireHit);
+    }
   }
 
-  const auto& foundStereoHitsWithNode = m_quadTreeInstance.findSingleBest(m_param_minimumNumberOfHits);
-  m_quadTreeInstance.fell();
+  // Do the tree finding
+  Super::m_quadTreeInstance.seed(recoHits);
+
+  if (Super::m_param_writeDebugInformation) {
+    Super::writeDebugInformation();
+  }
+
+  const auto& foundStereoHitsWithNode = Super::m_quadTreeInstance.findSingleBest(Super::m_param_minimumNumberOfHits);
+  Super::m_quadTreeInstance.fell();
 
   if (foundStereoHitsWithNode.size() != 1)
     return {};
@@ -104,7 +118,7 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree
     const CDCWireHit& currentWireHitOuter = currentRLWireHitOuter->getWireHit();
     const CDCHit* currentHitOuter = currentWireHitOuter.getHit();
 
-    if (currentWireHitOuter.getAutomatonCell().hasMaskedFlag()) {
+    if (currentWireHitOuter.getAutomatonCell().hasMaskedFlag() or currentWireHitOuter.getAutomatonCell().hasAssignedFlag()) {
       continue;
     }
 
@@ -114,7 +128,7 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree
       const CDCWireHit& currentWireHitInner = currentRLWireHitInner->getWireHit();
       const CDCHit* currentHitInner = currentWireHitInner.getHit();
 
-      if (currentWireHitInner.getAutomatonCell().hasMaskedFlag()) {
+      if (currentWireHitInner.getAutomatonCell().hasMaskedFlag() or currentWireHitInner.getAutomatonCell().hasAssignedFlag()) {
         continue;
       }
 
@@ -155,7 +169,11 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree
 
   for (const auto& recoHit : foundStereoHits) {
     recoHit.first.getWireHit().getAutomatonCell().unsetMaskedFlag();
+    recoHit.first.getWireHit().getAutomatonCell().unsetAssignedFlag();
   }
 
   return matches;
 }
+
+template class Belle2::TrackFindingCDC::StereoHitTrackMatcherQuadTree<HitZ0TanLambdaLegendre>;
+template class Belle2::TrackFindingCDC::StereoHitTrackMatcherQuadTree<HitZ0TanLambdaLegendreUsingZ>;

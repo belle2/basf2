@@ -35,7 +35,10 @@ namespace Belle2 {
      * to tracks. After the quad tree has given a yes to a match, the configured filter is used to
      * give a weight to the relation.
      */
-    class StereoHitTrackMatcherQuadTree : public QuadTreeBasedMatcher<HitZ0TanLambdaLegendre> {
+    template <class HoughTree>
+    class StereoHitTrackMatcherQuadTree : public QuadTreeBasedMatcher<HoughTree> {
+      /// Super class
+      typedef QuadTreeBasedMatcher<HoughTree> Super;
     public:
       /// Use tracks as collector items.
       typedef CDCTrack CollectorItem;
@@ -57,7 +60,7 @@ namespace Belle2 {
       /** Initialize the filter and the quad tree. */
       virtual void initialize() override
       {
-        QuadTreeBasedMatcher<HitZ0TanLambdaLegendre>::initialize();
+        Super::initialize();
 
         m_stereoHitFilter = m_filterFactory.create();
         m_stereoHitFilter->initialize();
@@ -71,15 +74,19 @@ namespace Belle2 {
       /** Terminate the filter and the quad tree. */
       virtual void terminate() override
       {
-        QuadTreeBasedMatcher<HitZ0TanLambdaLegendre>::terminate();
+        Super::terminate();
 
         m_stereoHitFilter->terminate();
       }
 
     private:
       /// Parameters
-      /// Set to false to skip the B2B check (good for curlers)
+      /// Set to false to skip the B2B check (good for curlers).
       bool m_param_checkForB2BTracks = true;
+      /// Set to false to skip the in-wire-bound check (good for second stage).
+      double m_param_checkForInWireBoundsFactor = 1.0;
+
+
       StereoHitFilterFactory m_filterFactory;
       /// The used filter.
       std::unique_ptr<BaseStereoHitFilter> m_stereoHitFilter;

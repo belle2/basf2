@@ -34,6 +34,10 @@ namespace Belle2 {
         moduleParameters->addParameter(prefixed(prefix, "minimumNumberOfHits"), m_param_minimumNumberOfHits,
                                        "The minimum number of hits in a quad tree bin to be called as result.",
                                        m_param_minimumNumberOfHits);
+
+        moduleParameters->addParameter(prefixed(prefix, "writeDebugInformation"), m_param_writeDebugInformation,
+                                       "Set to true to output debug information.",
+                                       m_param_writeDebugInformation);
       }
 
       /** Prepare the hough algorithm: initialize the quad tree. */
@@ -55,6 +59,8 @@ namespace Belle2 {
       unsigned int m_param_quadTreeLevel = 6;
       /// Minimal number of hits a quad tree node must have to be called a found bin
       unsigned int m_param_minimumNumberOfHits = 5;
+      /// Set to true to output debug information.
+      bool m_param_writeDebugInformation = false;
 
       /// Quad tree instance
       AQuadTree m_quadTreeInstance;

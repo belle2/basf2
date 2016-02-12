@@ -6,6 +6,7 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <utility>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackMatcherQuadTree.h>
 
 using namespace std;
@@ -17,10 +18,9 @@ void StereoHitTrackMatcherQuadTree::exposeParameters(ModuleParamList* modulePara
   QuadTreeBasedMatcher<HitZ0TanLambdaLegendre>::exposeParameters(moduleParameters, prefix);
   m_filterFactory.exposeParameters(moduleParameters, prefix);
 
-  moduleParameters->addParameter(prefix + "checkForB2BTracks", m_param_checkForB2BTracks,
+  moduleParameters->addParameter(prefixed(prefix, "checkForB2BTracks"), m_param_checkForB2BTracks,
                                  "Set to false to skip the check for back-2-back tracks (good for cosmics)",
                                  m_param_checkForB2BTracks);
-
 }
 
 Weight StereoHitTrackMatcherQuadTree::getWeight(const CDCRecoHit3D& recoHit, const Z0TanLambdaBox&,
@@ -73,6 +73,11 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree
 
   // Do the tree finding
   m_quadTreeInstance.seed(recoHits);
+
+  if (m_param_writeDebugInformation) {
+    writeDebugInformation();
+  }
+
   const auto& foundStereoHitsWithNode = m_quadTreeInstance.findSingleBest(m_param_minimumNumberOfHits);
   m_quadTreeInstance.fell();
 

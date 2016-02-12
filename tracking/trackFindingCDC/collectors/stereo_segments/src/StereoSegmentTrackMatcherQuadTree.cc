@@ -27,10 +27,6 @@ void StereoSegmentTrackMatcherQuadTree::exposeParameters(ModuleParamList* module
   moduleParameters->addParameter(prefixed(prefix, "checkForB2BTracks"), m_param_checkForB2BTracks,
                                  "Set to false to skip the check for back-2-back tracks (good for cosmics)",
                                  m_param_checkForB2BTracks);
-
-  moduleParameters->addParameter(prefixed(prefix, "writeDebugInformation"), m_param_writeDebugInformation,
-                                 "Set to true to output debug information.",
-                                 m_param_writeDebugInformation);
 }
 
 bool StereoSegmentTrackMatcherQuadTree::checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D, const bool isCurler,

@@ -104,7 +104,7 @@ timemodule.param(timeDict)
 
 timecalibmodule = register_module('DoubleCalPulse')
 
-sampletimemodule = register_module('SampleTimeCalibrationV2')
+sampletimemodule = register_module('SampleTimeCalibrationV3')
 
 sampletimeDict = {
     'outputFileName': OutputFile,

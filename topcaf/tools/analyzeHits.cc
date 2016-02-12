@@ -90,6 +90,7 @@ bool analyzeHits(const char* filename)
   t->Draw("(TOPCAFDigits.m_pixel_id-1)/64:(TOPCAFDigits.m_pixel_id-1)%64>>pmtxy", width_cut && qual_cut && laser_primary_cut
           && height_cut);
   t->Draw("TOPCAFDigits.m_pixel_id>>laser_occupancy", width_cut && qual_cut && laser_primary_cut && height_cut);
+
   for (int c = 0; c < 4; c++) {
     t->Draw(Form("(TOPCAFDigits.m_asic_row*100+TOPCAFDigits.m_asic*10+TOPCAFDigits.m_asic_ch)>>asic_occupancy%d", c), width_cut
             && qual_cut && laser_primary_cut && Form("TOPCAFDigits.m_boardstack==%d", c));

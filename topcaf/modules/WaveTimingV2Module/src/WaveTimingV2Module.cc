@@ -136,7 +136,7 @@ void WaveTimingV2Module::event()
             hit.tdc_bin = frontTime;
 
             d = (xpos[c] + 0.5); // Now measure back edge.
-            while ((v_samples.at(d) > (ypos[c]*m_frac)) && ((d + 1) < v_samples.size())) {
+            while (((d + 1) < v_samples.size()) && (v_samples.at(d) > (ypos[c]*m_frac))) {
               d++;
             }
             first = v_samples.at(d);

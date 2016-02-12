@@ -109,7 +109,7 @@ timemodule.param(timeDict)
 
 timecalibmodule = register_module('DoubleCalPulse')
 
-sampletimemodule = register_module('SampleTimeCalibrationV2')
+sampletimemodule = register_module('SampleTimeCalibrationV3')
 
 sampletimeDict = {
     'inputFileName': args.timeCalibFile,
@@ -129,8 +129,9 @@ main.add_module(eventinfoprinter)
 # main.add_module(pedmodule)
 # main.add_module(mergemodule)
 # main.add_module(timemodule)
-# main.add_module(timecalibmodule)
 main.add_module(sampletimemodule)
+main.add_module(timecalibmodule)
+
 main.add_module(output)  # this is for debugging using values of individual events.
 
 process(main)

@@ -45,6 +45,8 @@ namespace Belle2 {
     //--- Setters ---//
     void SetTime(double time) {m_time = time;}
     void SetTimeBin(int time_bin) {m_time_bin = time_bin;}
+    void SetTDCBin(double tdc_bin) {m_tdc_bin = tdc_bin;}
+    void SetWidth(int width) {m_width = width;}
     void SetAmplitude(double amp) {m_amp = amp;}
     void SetSamplingRate(double rate) {m_rate = rate;}
     void SetQuality(double quality) {m_quality = quality;}

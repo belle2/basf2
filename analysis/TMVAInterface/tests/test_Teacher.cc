@@ -105,6 +105,54 @@ namespace {
     EXPECT_EQ(given_samples, received_samples);
   }
 
+  TEST(TeacherTest, TestFastBDTLoading)
+  {
+    // Test if the FastBDT TMVA Plugin can be properly loaded
+    // A fail in this test might indicate a problem with header
+    // distribution in via the externals
+
+    TestHelpers::TempDirCreator tempdir;
+
+    StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
+
+    std::string target = "extraInfo(target)";
+    std::string weight = "extraInfo(weight)";
+    std::vector<std::string> variables = {"p", "extraInfo(someInput)"};
+    std::vector<std::string> spectators = {"M", weight, target};
+
+    std::vector<TMVAInterface::Method> methods;
+    methods.push_back(TMVAInterface::Method("FastBDT", "Plugin", "!H:!V:CreateMVAPdfs"));
+
+    TeacherConfig config("unittest_plugin_load", "unittest_tree_plugin_load", ".", variables, spectators, methods);
+    Teacher teacher(config);
+
+    std::string factoryOption = "!V:Silent:Color:DrawProgressBar:AnalysisType=Classification";
+    std::string prepareOption = "!V:SplitMode=block:NormMode=None";
+
+    gRandom->SetSeed(23);
+
+    //add sample
+    unsigned int n = 1000;
+    std::set<std::vector<float>> given_samples;
+    for (unsigned int i = 0; i < n; i++) {
+      float target = (i % 2 == 0) * 1.0;
+      TLorentzVector v;
+      v.SetPtEtaPhiM((i % 900) * 0.1, 0.1, i * 0.1, 0.139);
+      Particle p(v, 211);
+      float momentum = v.P();
+      float weight = 1.0f;
+      p.addExtraInfo("target", target);
+      p.addExtraInfo("weight", weight);
+      teacher.addSample(&p);
+      if (i < n / 2) {
+        given_samples.insert({momentum, target, weight});
+      }
+    }
+
+    EXPECT_NO_B2ERROR(teacher.trainClassification(factoryOption, prepareOption, Variable::makeROOTCompatible(target),
+                                                  Variable::makeROOTCompatible(weight)));
+  }
+
   TEST(TMVAInterfaceTest, TeacherDropsConstantVariable)
   {
     TestHelpers::TempDirCreator tempdir;

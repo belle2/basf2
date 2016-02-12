@@ -544,7 +544,9 @@ namespace Belle2 {
       factory.PrepareTrainingAndTestTree("", prepareOption);
 
       for (const auto& method : m_config.getMethods()) {
-        factory.BookMethod(method.getTypeAsString(), method.getName(), method.getConfig());
+        if (!factory.BookMethod(method.getTypeAsString(), method.getName(), method.getConfig())) {
+          B2ERROR("TMVA Method with name " + method.getName() + " cannot be booked.");
+        }
       }
 
       factory.TrainAllMethods();

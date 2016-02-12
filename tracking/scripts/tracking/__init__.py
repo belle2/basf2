@@ -223,8 +223,12 @@ def add_cdc_track_finding(path, cdc_trackcands="TrackCands"):
 
     # Find the stereo hits to those axial tracks
     path.add_module('StereoHitFinderCDCLegendreHistogramming',
+                    useSingleMatchAlgorithm=True,
                     TracksStoreObjNameIsInput=True,
                     WriteGFTrackCands=False)
+
+    # Delete segments which where fully used in the last events
+    path.add_module("UsedSegmentsDeleter")
 
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombinerDev',

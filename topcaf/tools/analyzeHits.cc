@@ -6,6 +6,7 @@
 #include <topcaf/dataobjects/TOPCAFDigit.h>
 #include <TCanvas.h>
 #include <TGraph.h>
+#include <TChain.h>
 #include <TMultiGraph.h>
 #include <TH1F.h>
 #include <TH2F.h>
@@ -19,15 +20,9 @@ using namespace Belle2;
 
 bool analyzeHits(const char* filename)
 {
-
-
+  TChain t("tree");
+  t.Add(filename);
   int maxadc = 2000;
-
-  TFile fileIn(filename);
-
-  TTree* t;
-
-  fileIn.GetObject("tree", t);
 
   TFile fout("hits.root", "RECREATE");
 
@@ -80,23 +75,21 @@ bool analyzeHits(const char* filename)
   TCut qual_cut("TOPCAFDigits.m_flag>0&&TOPCAFDigits.m_corr_time!=0");
   TCut laser_primary_cut("TOPCAFDigits.m_time>190&&TOPCAFDigits.m_time<210");
 
-  t->Draw("TOPCAFDigits.m_scrod_id>>scrods");
-  t->Draw("TOPCAFDigits.m_width:TOPCAFDigits.m_pixel_id>>ch_widths", qual_cut && height_cut);
-  t->Draw("TOPCAFDigits.m_adc_height:TOPCAFDigits.m_pixel_id>>ch_heights", width_cut && qual_cut);
-  t->Draw("TOPCAFDigits.m_width:TOPCAFDigits.m_tdc_bin>>width_time", qual_cut && height_cut);
-  t->Draw("TOPCAFDigits.m_tdc_bin:TOPCAFDigits.m_pixel_id>>ch_tdcbin", width_cut && qual_cut && height_cut);
-  t->Draw("TOPCAFDigits.m_time:TOPCAFDigits.m_tdc_bin>>tdcbin_time", width_cut && qual_cut && height_cut);
-  t->Draw("TOPCAFDigits.m_time:TOPCAFDigits.m_pixel_id>>ch_time", width_cut && qual_cut && height_cut);
-  t->Draw("(TOPCAFDigits.m_pixel_id-1)/64:(TOPCAFDigits.m_pixel_id-1)%64>>pmtxy", width_cut && qual_cut && laser_primary_cut
-          && height_cut);
-  t->Draw("TOPCAFDigits.m_pixel_id>>laser_occupancy", width_cut && qual_cut && laser_primary_cut && height_cut);
+  t.Draw("TOPCAFDigits.m_scrod_id>>scrods");
+  t.Draw("TOPCAFDigits.m_width:TOPCAFDigits.m_pixel_id>>ch_widths", qual_cut && height_cut);
+  t.Draw("TOPCAFDigits.m_adc_height:TOPCAFDigits.m_pixel_id>>ch_heights", width_cut && qual_cut);
+  t.Draw("TOPCAFDigits.m_width:TOPCAFDigits.m_tdc_bin>>width_time", qual_cut && height_cut);
+  t.Draw("TOPCAFDigits.m_tdc_bin:TOPCAFDigits.m_pixel_id>>ch_tdcbin", width_cut && qual_cut && height_cut);
+  t.Draw("TOPCAFDigits.m_time:TOPCAFDigits.m_tdc_bin>>tdcbin_time", width_cut && qual_cut && height_cut);
+  t.Draw("TOPCAFDigits.m_time:TOPCAFDigits.m_pixel_id>>ch_time", width_cut && qual_cut && height_cut);
+  t.Draw("(TOPCAFDigits.m_pixel_id-1)/64:(TOPCAFDigits.m_pixel_id-1)%64>>pmtxy", width_cut && qual_cut && laser_primary_cut
+         && height_cut);
+  t.Draw("TOPCAFDigits.m_pixel_id>>laser_occupancy", width_cut && qual_cut && laser_primary_cut && height_cut);
 
   for (int c = 0; c < 4; c++) {
-    t->Draw(Form("(TOPCAFDigits.m_asic_row*100+TOPCAFDigits.m_asic*10+TOPCAFDigits.m_asic_ch)>>asic_occupancy%d", c), width_cut
-            && qual_cut && laser_primary_cut && Form("TOPCAFDigits.m_boardstack==%d", c));
+    t.Draw(Form("(TOPCAFDigits.m_asic_row*100+TOPCAFDigits.m_asic*10+TOPCAFDigits.m_asic_ch)>>asic_occupancy%d", c), width_cut
+           && qual_cut && laser_primary_cut && Form("TOPCAFDigits.m_boardstack==%d", c));
   }
-
-
 
   fout.cd();
   scrods->Write();

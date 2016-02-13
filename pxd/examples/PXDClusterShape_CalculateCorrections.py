@@ -120,6 +120,7 @@ algo.setCompareTruePointTracks(CompareTruePointTracks)
 algo.setCalibrationKind(CalibrationKind)
 algo.setPixelKind(PixelKind)
 algo.setDoExpertHistograms(False)
+# algo.setDoExpertHistograms(True)
 
 # algo.set_log_level(LogLevel.INFO)
 # algo.set_log_level(LogLevel.DEBUG)

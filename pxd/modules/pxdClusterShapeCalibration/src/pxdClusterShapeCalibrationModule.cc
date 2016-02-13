@@ -146,7 +146,7 @@ void pxdClusterShapeCalibrationModule::collect()
   m_run = emd->getRun();
   m_exp = emd->getExperiment();
 
-  char text[300];
+  TString text;
 
   if (m_UseTracks == 1) {  // using tracks, for real experiment
     for (auto track : tracks) {  // over tracks
@@ -176,14 +176,13 @@ void pxdClusterShapeCalibrationModule::collect()
           m_seed = cluster.getSeedCharge();
           m_shape = cluster.getShape();
 
-          sprintf(text,
-                  "--> phiTrack[deg] %f thetaTrack %f ResidUTrack[um] %f ResidVTrack %f SigmaUTrack %f SigmaVTrack %f SigmaU %f SigmaV %f \n",
-                  m_phiTrack / Unit::deg, m_thetaTrack / Unit::deg,
-                  m_ResidUTrack / Unit::um, m_ResidVTrack / Unit::um,
-                  m_SigmaUTrack / Unit::um, m_SigmaVTrack / Unit::um,
-                  m_SigmaU / Unit::um, m_SigmaV / Unit::um
-                 );
-          B2DEBUG(30, text);
+          text = Form("--> phiTrack[deg] %f thetaTrack %f ResidUTrack[um] %f ResidVTrack %f SigmaUTrack %f SigmaVTrack %f SigmaU %f SigmaV %f \n",
+                      m_phiTrack / Unit::deg, m_thetaTrack / Unit::deg,
+                      m_ResidUTrack / Unit::um, m_ResidVTrack / Unit::um,
+                      m_SigmaUTrack / Unit::um, m_SigmaVTrack / Unit::um,
+                      m_SigmaU / Unit::um, m_SigmaV / Unit::um
+                     );
+          B2DEBUG(30, text.Data());
 
           // TODO set it more systematically? m_closeEdge values
           int EdgePixelSizeV1 = 512;   // TODO assign correctly from geometry/design
@@ -226,10 +225,10 @@ void pxdClusterShapeCalibrationModule::collect()
               m_phiTrue = TMath::ATan2(truehit.getExitU() - truehit.getEntryU(), EnExWidth);
               m_thetaTrue = TMath::ATan2(truehit.getExitV() - truehit.getEntryV(), EnExWidth);
 
-              sprintf(text, "--> phiTrue[deg] %f thetaTrue %f ResidUTrue[um] %f ResidVTrue %f \n",
-                      m_phiTrue / Unit::deg , m_thetaTrue / Unit::deg,
-                      m_ResidUTrue / Unit::um, m_ResidVTrue / Unit::um);
-              B2DEBUG(30, text);
+              text = Form("--> phiTrue[deg] %f thetaTrue %f ResidUTrue[um] %f ResidVTrue %f \n",
+                          m_phiTrue / Unit::deg , m_thetaTrue / Unit::deg,
+                          m_ResidUTrue / Unit::um, m_ResidVTrue / Unit::um);
+              B2DEBUG(30, text.Data());
 
               m_InPixUTrue = (Info.getUCellPosition(Info.getUCellID(truehit.getU())) - truehit.getU()) / Info.getUPitch(truehit.getU());
               m_InPixVTrue = (Info.getVCellPosition(Info.getVCellID(truehit.getV())) - truehit.getV()) / Info.getVPitch(truehit.getV());
@@ -279,10 +278,10 @@ void pxdClusterShapeCalibrationModule::collect()
         m_seed = cluster.getSeedCharge();
         m_shape = cluster.getShape();
 
-        sprintf(text, "--> SigmaU %f SigmaV %f \n",
-                m_SigmaU / Unit::um, m_SigmaV / Unit::um
-               );
-        B2DEBUG(30, text);
+        text = Form("--> SigmaU %f SigmaV %f \n",
+                    m_SigmaU / Unit::um, m_SigmaV / Unit::um
+                   );
+        B2DEBUG(30, text.Data());
 
         // TODO set it more systematically? m_closeEdge values
         int EdgePixelSizeV1 = 512;   // TODO assign correctly from geometry/design
@@ -323,10 +322,10 @@ void pxdClusterShapeCalibrationModule::collect()
           m_thetaTrue = TMath::ATan2(truehit.getExitV() - truehit.getEntryV(), EnExWidth);
 
 //          B2INFO(" ------INFO---->  useClusterShape:    " << m_phiTrue / Unit::deg);
-          sprintf(text, "--> phiTrue[deg] %f thetaTrue %f ResidUTrue[um] %f ResidVTrue %f \n",
-                  m_phiTrue / Unit::deg , m_thetaTrue / Unit::deg,
-                  m_ResidUTrue / Unit::um, m_ResidVTrue / Unit::um);
-          B2DEBUG(30, text);
+          text = Form("--> phiTrue[deg] %f thetaTrue %f ResidUTrue[um] %f ResidVTrue %f \n",
+                      m_phiTrue / Unit::deg , m_thetaTrue / Unit::deg,
+                      m_ResidUTrue / Unit::um, m_ResidVTrue / Unit::um);
+          B2DEBUG(30, text.Data());
 
           m_InPixUTrue = (Info.getUCellPosition(Info.getUCellID(truehit.getU())) - truehit.getU()) / Info.getUPitch(truehit.getU());
           m_InPixVTrue = (Info.getVCellPosition(Info.getVCellID(truehit.getV())) - truehit.getV()) / Info.getVPitch(truehit.getV());

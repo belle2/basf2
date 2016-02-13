@@ -11,6 +11,7 @@
 #pragma once
 
 #include <calibration/CalibrationAlgorithm.h>
+#include <pxd/reconstruction/PXDClusterShape.h>
 #include <iostream>
 #include <tuple>
 #include <unordered_map>
@@ -116,7 +117,7 @@ namespace Belle2 {
     const int m_in_pixelU = 7;  // 9 x 9 = 81 (in-pixel positions)
     const int m_in_pixelV = 7;
 
-    const int m_MinHitsInPixels = 100;      // TODO set to > 5000
+    const int m_MinHitsInPixels = -1;      // TODO set to > 5000, deactivate this function: set to -1
     const int m_MinHitsAcceptInPixels = 5;  // TODO set to > 5
 
     const int m_cases = m_shapes * m_pixelkinds *
@@ -152,7 +153,7 @@ namespace Belle2 {
     int getThetaIndex(float theta);
 
     /** Calculate mean value and its error from array of values */
-    int CalculateCorrection(int CorCase, int n, double* array, double* val, double* valError);
+    int CalculateCorrection(int CorCase, int n, double* array, double* val, double* valError, double* rms);
 
   protected:
 

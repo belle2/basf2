@@ -21,42 +21,82 @@ using namespace Belle2;
 
 PXDClusterShapeCalibrationAlgorithm::PXDClusterShapeCalibrationAlgorithm() : CalibrationAlgorithm("pxdClusterShapeCalibration")
 {
-  setDescription("Calibration of position/error corrections based on cluster shape in PXD");
+  setDescription("Calibration of position/estimated error corrections based on cluster shape in PXD");
 }
 
 
 Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calibrate()
 {
-  // cluster will be check if:
-  //   is with non-corrected cluster shape, otheway remove from corrections (to prevent multiple-corrections)
-  //   is not close borders, otheway remove from corrections
-  //   for givig kind of pixel type, u and v angle direction:
-  //     is in in-pixel hitmap for giving cluster shape and giving angle, otheway if hitmap is fully empty:
-  //        do those steps for full range simulation in-pixel hitmap
-  //        if still not in in-pixel hitmap - remove from corrections
-  //     look for bias and estimated error to angle in 3 most closes points in calibration tables
-  //     apply correction with weigh dependent of distances to table points
-  // Tables for every pixel type (8 types for PXD):
-  //   2 sets of tables: - for selection of angles and shapes for real data
-  //                     - for full range of angles and shapes from simulations
-  //   in every set of tables are:
-  //       - in-pixel 2D hitmaps for angles and shapes
-  //       - u+v corrections of bias for angles and shapes
-  //       - u+v error estimations for angles and shapes
-  // so we expect u+v directions, 8 kinds of pixels, 18 x 18 angles, 15 shapes = 77760 cases
-  //   for Bias correction
-  //   for Error estimation (EstimError/Residual)
-  // so we expect 8 kinds of pixels, 18 x 18 angles, 15 shapes = 38880 cases
-  //   for in-pixel positions 2D maps, each map has 9x9 bins with binary value (0/1)
-  // For ~1000 points per histogram we expect 25 millions events (1 event = 2x sensors, u+v coordinates)
-  // We expect set of histograms mostly empty so no need any correction for giving parameters
-  // Finaly we store for 2 sets of tables:
-  //   - for Bias correction:      77760 short values
-  //   - for Error estimation:     77760 short values
-  //   - for in-pixel positions: 3149280 binary values
-  //
-  // Storring in database will be in TVectorT format
-  // Using will be on boost/multi_array format in unordered map and hash table
+// cluster will be check if:
+//   is with non-corrected cluster shape, otheway remove from corrections (to prevent multiple-corrections)
+//   is not close borders, otheway remove from corrections
+//   for givig kind of pixel type, u and v angle direction:
+//     is in in-pixel hitmap for giving cluster shape and giving angle, otheway if hitmap is fully empty:
+//        do those steps for full range simulation in-pixel hitmap
+//        if still not in in-pixel hitmap - remove from corrections
+//     look for bias and estimated error to angle in 3 most closes points in calibration tables
+//     apply correction with weigh dependent of distances to table points
+// Tables for every pixel type (8 types for PXD):
+//   2 sets of tables: - for selection of angles and shapes for real data
+//                     - for full range of angles and shapes from simulations
+//   in every set of tables are:
+//       - in-pixel 2D hitmaps for angles and shapes
+//       - u+v corrections of bias for angles and shapes
+//       - u+v error estimations for angles and shapes
+// so we expect u+v directions, 8 kinds of pixels, 18 x 18 angles, 15 shapes = 77760 cases
+//   for Bias correction
+//   for Error estimation (EstimError/Residual)
+// so we expect 8 kinds of pixels, 18 x 18 angles, 15 shapes = 38880 cases
+//   for in-pixel positions 2D maps, each map has 9x9 bins with binary value (0/1)
+// For ~1000 points per histogram we expect 25 millions events (1 event = 2x sensors, u+v coordinates)
+// We expect set of histograms mostly empty so no need any correction for giving parameters
+// Finaly we store for 2 sets of tables:
+//   - for Bias correction:      77760 short values
+//   - for Error estimation:     77760 short values
+//   - for in-pixel positions: 3149280 binary values
+//
+// Storring in database will be in TVectorT format
+// Using will be on boost/multi_array format in unordered map and hash table
+//
+// There are following combinations:
+//   1) Real data:              phiTrack, thetaTrack, InPixU, InPixV, ResidUTrack, ResidVTrack, SigmaU, SigmaV, // SigmaUTrack, SigmaVTrack
+//   2) Simulation from tracks: phiTrack, thetaTrack, InPixU, InPixV, ResidUTrack, ResidVTrack, SigmaU, SigmaV, // SigmaUTrack, SigmaVTrack
+//   3) Simulation from TrueP.: phiTrue, thetaTrue, InPixUTrue, InPixVTrue, ResidUTrue, ResidVTrue, SigmaU, SigmaV
+//   4) SpecialSimulation:      phiTrue, thetaTrue, InPixUTrue, InPixVTrue, ResidUTrue, ResidVTrue, SigmaU, SigmaV
+//
+//  1) m_UseRealData == kTRUE --> m_UseTracks == kTRUE
+//  2) m_UseTracks == kTRUE
+//  3) m_UseTracks == kFALSE
+//  4) m_CalibrationKind == 2 --> m_UseTracks == kFALSE
+// so the combination will be use: m_UseTracks == kTRUE / kFALSE
+//
+// For calibration need to have: InPix, Residual, Sigma
+//
+// There is general question if we use in-pixel information for selections:
+//    - from true prack there is significant and useful information
+//    - from tracking information has spread in level sigma 9 microns (preliminary)
+//   in-pixel filter will be prepared but not use.
+//
+//
+// ***** DQM AND EXPERT HISTOGRAMS:  *****
+//
+// All histograms are optional only for request.
+//
+// Histograms: m_shapes * m_pixelkinds = 15 x 8 = 120 u+v = 240 (1D)
+// Binning: angleU x angleV (18 x 18)
+// Monitoring values:      BiasCorrection U + V (residual mean)
+//                         ResidualRMS U + V (residual RMS)
+//                         BiasCorrectionError U + V (error of residual mean)
+//                         ErrorEstimation U + V (RMS of (residual / estimated error))
+//                         nClusters, nClusterFraction
+//
+// Special histograms case 2):     2D SigmaUTrack + SigmaVTrack
+//                                 2D phiTrack - phiTrue + thetaTrack - thetaTrue
+//                                 2D InPixU - InPixUTrue + InPixV - InPixVTrue
+//                                 2D ResidUTrack - ResidUTrue + ResidVTrack - ResidVTrue
+//
+//
+
 
   TString name_Case;
   TString name_SourceTree;
@@ -65,6 +105,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
                    (int)m_UseRealData, (int)m_UseTracks, m_CalibrationKind, m_PixelKind);
   name_SourceTree = Form("pxdCal");
   name_OutFileCalibrations = Form("pxdClShCal%s.root", name_Case.Data());
+  int SummariesInfo[20];
+  for (int i = 0; i < 20; i++) SummariesInfo[i] = 0;
 
   // START - section for variables for DQM and expert histograms
   TString name_OutFileDQM;
@@ -73,6 +115,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   TFile* fExpertHistograms = NULL;
   TString DirPixelKind;
   TString DirShape;
+  TH1F* m_histSummariesInfo = NULL;
   TH2F** m_histBiasCorrectionU = NULL;
   TH2F** m_histBiasCorrectionV = NULL;
   TH2F** m_histResidualRMSU = NULL;
@@ -92,20 +135,12 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
          ", ExpertHistograms: " << name_OutDoExpertHistograms.Data());
 
   if (m_DoExpertHistograms) {
-// Histograms: m_shapes * m_pixelkinds = 15 x 8 = 120 u+v = 240 (1D)
-// Binning: angleU x angleV (18 x 18)
-// Monitoring values:      BiasCorrection U + V (residual mean)
-//                         ResidualRMS U + V (residual RMS)
-//                         BiasCorrectionError U + V (error of residual mean)
-//                         ErrorEstimation U + V (RMS of (residual / estimated error))
-//                         nClusters, nClusterFraction
-//
-// Special histograms case 2):     2D SigmaUTrack + SigmaVTrack
-//                                 2D phiTrack - phiTrue + thetaTrack - thetaTrue
-//                                 2D InPixU - InPixUTrue + InPixV - InPixVTrue
-//                                 2D ResidUTrack - ResidUTrue + ResidVTrack - ResidVTrue
     fDQM = new TFile(name_OutFileDQM.Data(), "recreate");
     fDQM->mkdir("NoSorting");
+    fDQM->cd("NoSorting");
+
+    m_histSummariesInfo = new TH1F("SummariesInfo", "Summaries Info", 20, 0, 20);
+
     fExpertHistograms = new TFile(name_OutDoExpertHistograms.Data(), "recreate");
     fExpertHistograms->mkdir("NoSorting");
 
@@ -125,23 +160,23 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
       fDQM->mkdir(DirPixelKind.Data());
       fExpertHistograms->mkdir(DirPixelKind.Data());
       for (int i_shape = 0; i_shape < m_shapes; i_shape++) {
-        DirShape = Form("%s/Shape_%02i_%s", DirPixelKind.Data(), i_shape,
-                        Belle2::PXD::PXDClusterShape::pxdClusterShapeDescription[(Belle2::PXD::pxdClusterShapeType)i_shape].c_str());
+        DirShape = Form("%s/Shape_%02i_%s", DirPixelKind.Data(), i_shape + 1,
+                        Belle2::PXD::PXDClusterShape::pxdClusterShapeDescription[(Belle2::PXD::pxdClusterShapeType)(i_shape + 1)].c_str());
         DirShape.ReplaceAll(":", "");
         DirShape.ReplaceAll(" ", "_");
         fDQM->mkdir(DirShape.Data());
         fDQM->cd(DirShape.Data());
 
         // Bias Correction
-        TString HistoName = Form("BiasCorrectionU_PK%01i_Sh%02i", i_pk, i_shape);
-        TString HistoTitle = Form("Bias Correction U, pixel kind %01i, shape %02i", i_pk, i_shape);
+        TString HistoName = Form("BiasCorrectionU_PK%01i_Sh%02i", i_pk, i_shape + 1);
+        TString HistoTitle = Form("Bias Correction U, pixel kind %01i, shape %02i", i_pk, i_shape + 1);
         m_histBiasCorrectionU[i_pk * m_shapes + i_shape] = new TH2F(HistoName.Data(), HistoTitle.Data(),
                                                                     m_anglesU, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg,
                                                                     m_anglesV, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg);
         m_histBiasCorrectionU[i_pk * m_shapes + i_shape]->GetXaxis()->SetTitle("Angle in u [deg]");
         m_histBiasCorrectionU[i_pk * m_shapes + i_shape]->GetYaxis()->SetTitle("Angle in v [deg]");
-        HistoName = Form("BiasCorrectionV_PK%01i_Sh%02i", i_pk, i_shape);
-        HistoTitle = Form("Bias Correction V, pixel kind %01i, shape %02i", i_pk, i_shape);
+        HistoName = Form("BiasCorrectionV_PK%01i_Sh%02i", i_pk, i_shape + 1);
+        HistoTitle = Form("Bias Correction V, pixel kind %01i, shape %02i", i_pk, i_shape + 1);
         m_histBiasCorrectionV[i_pk * m_shapes + i_shape] = new TH2F(HistoName.Data(), HistoTitle.Data(),
                                                                     m_anglesU, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg,
                                                                     m_anglesV, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg);
@@ -149,15 +184,15 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
         m_histBiasCorrectionV[i_pk * m_shapes + i_shape]->GetYaxis()->SetTitle("Angle in v [deg]");
 
         // Residual RMS
-        HistoName = Form("ResidualRMSU_PK%01i_Sh%02i", i_pk, i_shape);
-        HistoTitle = Form("Residual RMS U, pixel kind %01i, shape %02i", i_pk, i_shape);
+        HistoName = Form("ResidualRMSU_PK%01i_Sh%02i", i_pk, i_shape + 1);
+        HistoTitle = Form("Residual RMS U, pixel kind %01i, shape %02i", i_pk, i_shape + 1);
         m_histResidualRMSU[i_pk * m_shapes + i_shape] = new TH2F(HistoName.Data(), HistoTitle.Data(),
                                                                  m_anglesU, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg,
                                                                  m_anglesV, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg);
         m_histResidualRMSU[i_pk * m_shapes + i_shape]->GetXaxis()->SetTitle("Angle in u [deg]");
         m_histResidualRMSU[i_pk * m_shapes + i_shape]->GetYaxis()->SetTitle("Angle in v [deg]");
-        HistoName = Form("ResidualRMSV_PK%01i_Sh%02i", i_pk, i_shape);
-        HistoTitle = Form("Residual RMS V, pixel kind %01i, shape %02i", i_pk, i_shape);
+        HistoName = Form("ResidualRMSV_PK%01i_Sh%02i", i_pk, i_shape + 1);
+        HistoTitle = Form("Residual RMS V, pixel kind %01i, shape %02i", i_pk, i_shape + 1);
         m_histResidualRMSV[i_pk * m_shapes + i_shape] = new TH2F(HistoName.Data(), HistoTitle.Data(),
                                                                  m_anglesU, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg,
                                                                  m_anglesV, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg);
@@ -165,15 +200,15 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
         m_histResidualRMSV[i_pk * m_shapes + i_shape]->GetYaxis()->SetTitle("Angle in v [deg]");
 
         // Bias Correction Error
-        HistoName = Form("BiasCorrectionErrorU_PK%01i_Sh%02i", i_pk, i_shape);
-        HistoTitle = Form("Bias Correction Error U, pixel kind %01i, shape %02i", i_pk, i_shape);
+        HistoName = Form("BiasCorrectionErrorU_PK%01i_Sh%02i", i_pk, i_shape + 1);
+        HistoTitle = Form("Bias Correction Error U, pixel kind %01i, shape %02i", i_pk, i_shape + 1);
         m_histBiasCorrectionErrorU[i_pk * m_shapes + i_shape] = new TH2F(HistoName.Data(), HistoTitle.Data(),
             m_anglesU, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg,
             m_anglesV, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg);
         m_histBiasCorrectionErrorU[i_pk * m_shapes + i_shape]->GetXaxis()->SetTitle("Angle in u [deg]");
         m_histBiasCorrectionErrorU[i_pk * m_shapes + i_shape]->GetYaxis()->SetTitle("Angle in v [deg]");
-        HistoName = Form("BiasCorrectionErrorV_PK%01i_Sh%02i", i_pk, i_shape);
-        HistoTitle = Form("Bias Correction Error V, pixel kind %01i, shape %02i", i_pk, i_shape);
+        HistoName = Form("BiasCorrectionErrorV_PK%01i_Sh%02i", i_pk, i_shape + 1);
+        HistoTitle = Form("Bias Correction Error V, pixel kind %01i, shape %02i", i_pk, i_shape + 1);
         m_histBiasCorrectionErrorV[i_pk * m_shapes + i_shape] = new TH2F(HistoName.Data(), HistoTitle.Data(),
             m_anglesU, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg,
             m_anglesV, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg);
@@ -181,15 +216,15 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
         m_histBiasCorrectionErrorV[i_pk * m_shapes + i_shape]->GetYaxis()->SetTitle("Angle in v [deg]");
 
         // Error Estimation
-        HistoName = Form("ErrorEstimationU_PK%01i_Sh%02i", i_pk, i_shape);
-        HistoTitle = Form("Error Estimation U, pixel kind %01i, shape %02i", i_pk, i_shape);
+        HistoName = Form("ErrorEstimationU_PK%01i_Sh%02i", i_pk, i_shape + 1);
+        HistoTitle = Form("Error Estimation U, pixel kind %01i, shape %02i", i_pk, i_shape + 1);
         m_histErrorEstimationU[i_pk * m_shapes + i_shape] = new TH2F(HistoName.Data(), HistoTitle.Data(),
             m_anglesU, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg,
             m_anglesV, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg);
         m_histErrorEstimationU[i_pk * m_shapes + i_shape]->GetXaxis()->SetTitle("Angle in u [deg]");
         m_histErrorEstimationU[i_pk * m_shapes + i_shape]->GetYaxis()->SetTitle("Angle in v [deg]");
-        HistoName = Form("ErrorEstimationV_PK%01i_Sh%02i", i_pk, i_shape);
-        HistoTitle = Form("Error Estimation V, pixel kind %01i, shape %02i", i_pk, i_shape);
+        HistoName = Form("ErrorEstimationV_PK%01i_Sh%02i", i_pk, i_shape + 1);
+        HistoTitle = Form("Error Estimation V, pixel kind %01i, shape %02i", i_pk, i_shape + 1);
         m_histErrorEstimationV[i_pk * m_shapes + i_shape] = new TH2F(HistoName.Data(), HistoTitle.Data(),
             m_anglesU, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg,
             m_anglesV, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg);
@@ -197,15 +232,15 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
         m_histErrorEstimationV[i_pk * m_shapes + i_shape]->GetYaxis()->SetTitle("Angle in v [deg]");
 
         // nCluster, nClusterFraction
-        HistoName = Form("nClusters_PK%01i_Sh%02i", i_pk, i_shape);
-        HistoTitle = Form("Clusters, pixel kind %01i, shape %02i", i_pk, i_shape);
+        HistoName = Form("nClusters_PK%01i_Sh%02i", i_pk, i_shape + 1);
+        HistoTitle = Form("Clusters, pixel kind %01i, shape %02i", i_pk, i_shape + 1);
         m_histnClusters[i_pk * m_shapes + i_shape] = new TH2F(HistoName.Data(), HistoTitle.Data(),
                                                               m_anglesU, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg,
                                                               m_anglesV, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg);
         m_histnClusters[i_pk * m_shapes + i_shape]->GetXaxis()->SetTitle("Angle in u [deg]");
         m_histnClusters[i_pk * m_shapes + i_shape]->GetYaxis()->SetTitle("Angle in v [deg]");
-        HistoName = Form("nClusterFraction_PK%01i_Sh%02i", i_pk, i_shape);
-        HistoTitle = Form("Cluster Fraction V, pixel kind %01i, shape %02i", i_pk, i_shape);
+        HistoName = Form("nClusterFraction_PK%01i_Sh%02i", i_pk, i_shape + 1);
+        HistoTitle = Form("Cluster Fraction V, pixel kind %01i, shape %02i", i_pk, i_shape + 1);
         m_histnClusterFraction[i_pk * m_shapes + i_shape] = new TH2F(HistoName.Data(), HistoTitle.Data(),
             m_anglesU, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg,
             m_anglesV, -TMath::Pi() * 0.5 / Unit::deg, TMath::Pi() * 0.5 / Unit::deg);
@@ -305,6 +340,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   int nEntries = getObject<TTree>(name_SourceTree.Data()).GetEntries();
 
   B2INFO("Entries: " << nEntries);
+  SummariesInfo[0] = nEntries;
   B2INFO("UseTracks: " << m_UseTracks <<
          ", UseRealData: " << m_UseRealData <<
          ", CompareTruePointTracks: " << m_CompareTruePointTracks <<
@@ -437,24 +473,31 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
     TCut c4b;
     TCut c5;
     TCut cFin;
-    cCat = Form("shape == %i", i_shape);
+    cCat = Form("shape == %i", i_shape + 1);
     c1.SetTitle(cCat.Data());
-    if (!m_DoExpertHistograms) {
+    B2INFO("---> Processing cluster shape: " << i_shape + 1 <<
+           ", description: " << Belle2::PXD::PXDClusterShape::pxdClusterShapeDescription[(Belle2::PXD::pxdClusterShapeType)(
+                 i_shape + 1)].c_str()
+          );
+    if (!m_DoExpertHistograms) {  // acceleration of calibration process
       getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrack:ResidVTrack", c1, "goff");
       nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
-      printf("--> sh %i rows %i\n", i_shape, nSelRowsTemp);
-      if (nSelRowsTemp < 10000) continue;
+      printf("--> sh %i rows %i\n", i_shape + 1, nSelRowsTemp);
+      if (nSelRowsTemp < m_MinClustersCorrections) continue;
     }
     for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++) {
       cCat = Form("pixelKind == %i", i_pk);
       c2.SetTitle(cCat.Data());
-      if (!m_DoExpertHistograms) {
+      if (!m_DoExpertHistograms) {  // acceleration of calibration process
         getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrack:ResidVTrack", c1 + c2, "goff");
         nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
-        if (nSelRowsTemp < 1000) continue;
+        if (nSelRowsTemp < m_MinClustersCorrections) continue;
       }
-      B2DEBUG(130, "--> Calibration for: " << i_shape << ", " << i_pk);
-      printf(".");
+      B2INFO("   ---> Processing pixel kind: " << i_pk <<
+             ", Layer: " << (int)((i_pk % 4) / 2) + 1 <<
+             ", Sensor: " << (int)(i_pk / 4) + 1 <<
+             ", Size: " << i_pk % 2
+            );
       for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++) {
         double PhiMi = ((TMath::Pi() * i_angleU) / m_anglesU) - (TMath::Pi() / 2.0);
         double PhiMa = ((TMath::Pi() * (i_angleU + 1)) / m_anglesU) - (TMath::Pi() / 2.0);
@@ -469,47 +512,14 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
           cCat = Form("phiTrue < %f", PhiMa);
           c3b.SetTitle(cCat.Data());
         }
-        if (!m_DoExpertHistograms) {
+        if (!m_DoExpertHistograms) {  // acceleration of calibration process
           getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrack:ResidVTrack", c1 + c2 + c3a + c3b, "goff");
           nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
-          if (nSelRowsTemp < 500) continue;
+          if (nSelRowsTemp < m_MinClustersCorrections) continue;
         }
         for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
+          SummariesInfo[1]++;
           B2DEBUG(130, "  --> AngleCalibration for: " << i_angleU << ", " << i_angleV);
-
-// there are following combinations:
-//   1) Real data:              phiTrack, thetaTrack, InPixU, InPixV, ResidUTrack, ResidVTrack, SigmaU, SigmaV, // SigmaUTrack, SigmaVTrack
-//   2) Simulation from tracks: phiTrack, thetaTrack, InPixU, InPixV, ResidUTrack, ResidVTrack, SigmaU, SigmaV, // SigmaUTrack, SigmaVTrack
-//   3) Simulation from TrueP.: phiTrue, thetaTrue, InPixUTrue, InPixVTrue, ResidUTrue, ResidVTrue, SigmaU, SigmaV
-//   4) SpecialSimulation:      phiTrue, thetaTrue, InPixUTrue, InPixVTrue, ResidUTrue, ResidVTrue, SigmaU, SigmaV
-//
-//  1) m_UseRealData == kTRUE --> m_UseTracks == kTRUE
-//  2) m_UseTracks == kTRUE
-//  3) m_UseTracks == kFALSE
-//  4) m_CalibrationKind == 2 --> m_UseTracks == kFALSE
-// so the combination will be use: m_UseTracks == kTRUE / kFALSE
-//
-// For calibration need to have: InPix, Residual, Sigma
-//
-// There is general question if we use in-pixel information for selections:
-//    - from true prack there is significant and useful information
-//    - from tracking information has spread in level sigma 9 microns (preliminary)
-//   in-pixel filter will be prepared but not use.
-//
-// All histograms are optional only for request.
-//
-// Histograms: m_shapes * m_pixelkinds = 15 x 8 = 120 u+v = 240 (1D)
-// Binning: angleU x angleV (18 x 18)
-// Monitoring values:      BiasCorrection U + V (residual mean)
-//                         ResidualRMS U + V (residual RMS)
-//                         BiasCorrectionError U + V (error of residual mean)
-//                         ErrorEstimation U + V (RMS of (residual / estimated error))
-//                         nClusters, nClusterFraction
-//
-// Special histograms case 2):     2D SigmaUTrack + SigmaVTrack
-//                                 2D phiTrack - phiTrue + thetaTrack - thetaTrue
-//                                 2D InPixU - InPixUTrue + InPixV - InPixVTrue
-//                                 2D ResidUTrack - ResidUTrue + ResidVTrack - ResidVTrue
 
           double ThetaMi = ((TMath::Pi() * i_angleV) / m_anglesV) - (TMath::Pi() / 2.0);
           double ThetaMa = ((TMath::Pi() * (i_angleV + 1)) / m_anglesV) - (TMath::Pi() / 2.0);
@@ -524,25 +534,36 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
             cCat = Form("thetaTrue < %f", ThetaMa);
             c4b.SetTitle(cCat.Data());
           }
-          if (!m_DoExpertHistograms) {
+          if (!m_DoExpertHistograms) {  // acceleration of calibration process
             getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrack:ResidVTrack", c1 + c2 + c3a + c3b + c4a + c4b, "goff");
             nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
-            if (nSelRowsTemp < 500) continue;
+            if (nSelRowsTemp < m_MinClustersCorrections) continue;
           }
           cCat = Form("closeEdge == 0");
           c5.SetTitle(cCat.Data());
 
           cFin = c1 && c2 && c3a && c3b && c4a && c4b && c5;
 
-          B2DEBUG(130, "--> Selection criteria: " << cFin.GetTitle());
+          // B2DEBUG(10, "0--> Selection criteria: ");
+
+          // streambuf *old = cout.rdbuf(); // <-- save  (prevent to warning from root in selected raws = 0)
+          // stringstream ss;
+          // cout.rdbuf (ss.rdbuf());       // <-- redirect
+
+          // B2DEBUG(10, "1--> Selection criteria: ");
+
           if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {
             getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrack:ResidVTrack:ResidUTrack/SigmaU:ResidVTrack/SigmaV", cFin, "goff");
           } else if ((m_CalibrationKind == 2) || (m_UseTracks == kFALSE)) {
             getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrue:ResidVTrue:ResidUTrue/SigmaU:ResidVTrue/SigmaV", cFin, "goff");
           }
-          //getObject<TTree>(name_SourceTree).GetReadEntry();
+
+          // B2DEBUG(10, "2--> Selection criteria: ");
+          // cout.rdbuf (old);              // <-- restore
+          // B2DEBUG(10, "3--> Selection criteria: ");
+
           int nSelRows = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
-          if (nSelRows) {
+          if (nSelRows >= m_MinClustersCorrections) {
             B2DEBUG(30, "--> Selected raws " << nSelRows);
             double* Col1 = getObject<TTree>(name_SourceTree.Data()).GetV1();
             double* Col2 = getObject<TTree>(name_SourceTree.Data()).GetV2();
@@ -559,6 +580,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
             if (CalculateCorrection(1, nSelRows, Col1, &RetVal, &RetValError, &RetRMS)) {
               TCorrection_BiasMap[make_tuple(i_shape, i_pk, 0, i_angleU, i_angleV)] = RetVal;
               TCorrection_BiasMapErr[make_tuple(i_shape, i_pk, 0, i_angleU, i_angleV)] = RetValError;
+              SummariesInfo[2]++;
+              SummariesInfo[4] += nSelRows;
               if (m_DoExpertHistograms) {
                 m_histBiasCorrectionU[i_pk * m_shapes + i_shape]->SetBinContent(i_angleU + 1, i_angleV + 1, RetVal);
                 m_histBiasCorrectionErrorU[i_pk * m_shapes + i_shape]->SetBinContent(i_angleU + 1, i_angleV + 1, RetValError);
@@ -570,6 +593,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
             if (CalculateCorrection(1, nSelRows, Col2, &RetVal, &RetValError, &RetRMS)) {
               TCorrection_BiasMap[make_tuple(i_shape, i_pk, 1, i_angleU, i_angleV)] = RetVal;
               TCorrection_BiasMapErr[make_tuple(i_shape, i_pk, 1, i_angleU, i_angleV)] = RetValError;
+              SummariesInfo[3]++;
+              SummariesInfo[5] += nSelRows;
               if (m_DoExpertHistograms) {
                 m_histBiasCorrectionV[i_pk * m_shapes + i_shape]->SetBinContent(i_angleU + 1, i_angleV + 1, RetVal);
                 m_histBiasCorrectionErrorV[i_pk * m_shapes + i_shape]->SetBinContent(i_angleU + 1, i_angleV + 1, RetValError);
@@ -580,6 +605,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
             }
             if (CalculateCorrection(2, nSelRows, Col3, &RetVal, &RetValError, &RetRMS)) {
               TCorrection_ErrorEstimationMap[make_tuple(i_shape, i_pk, 0, i_angleU, i_angleV)] = RetRMS;
+              SummariesInfo[6]++;
+              SummariesInfo[8] += nSelRows;
               if (m_DoExpertHistograms) {
                 m_histErrorEstimationU[i_pk * m_shapes + i_shape]->SetBinContent(i_angleU + 1, i_angleV + 1, RetRMS);
                 m_histErrorEstimationU[m_pixelkinds * m_shapes]->SetBinContent(i_angleU + 1, i_angleV + 1,
@@ -588,6 +615,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
             }
             if (CalculateCorrection(2, nSelRows, Col4, &RetVal, &RetValError, &RetRMS)) {
               TCorrection_ErrorEstimationMap[make_tuple(i_shape, i_pk, 1, i_angleU, i_angleV)] = RetRMS;
+              SummariesInfo[7]++;
+              SummariesInfo[9] += nSelRows;
               if (m_DoExpertHistograms) {
                 m_histErrorEstimationV[i_pk * m_shapes + i_shape]->SetBinContent(i_angleU + 1, i_angleV + 1, RetRMS);
                 m_histErrorEstimationV[m_pixelkinds * m_shapes]->SetBinContent(i_angleU + 1, i_angleV + 1,
@@ -687,6 +716,34 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
   B2DEBUG(30, "--> Save calibration to vectors done. ");
 
+  if (m_DoExpertHistograms) {
+    for (int i = 0; i < 20; i++) m_histSummariesInfo->SetBinContent(i + 1, SummariesInfo[i]);
+  }
+
+
+  B2INFO("*******************************************************************");
+  B2INFO("**");
+  B2INFO("**            Using Clusters: " << SummariesInfo[0]);
+  B2INFO("**                     Cases: " << SummariesInfo[1]);
+  B2INFO("**");
+  B2INFO("**    Corrected bias U cases: " << SummariesInfo[2] << ", V cases: " << SummariesInfo[3]);
+  B2INFO("**     Not corrected U cases: " << SummariesInfo[1] - SummariesInfo[2] << ", V cases: " << SummariesInfo[1] -
+         SummariesInfo[3]);
+  B2INFO("**       Clusters in U cases: " << SummariesInfo[4] << ", V cases: " << SummariesInfo[5]);
+  B2INFO("** Fraction of clusters in U: " << (float)SummariesInfo[4] / SummariesInfo[0] << ", in V: " <<
+         (float)SummariesInfo[5] / SummariesInfo[0]);
+  B2INFO("**");
+  B2INFO("**   Estimated Error U cases: " << SummariesInfo[6] << ", V cases: " << SummariesInfo[7]);
+  B2INFO("**     Not corrected U cases: " << SummariesInfo[1] - SummariesInfo[6] << ", V cases: " << SummariesInfo[1] -
+         SummariesInfo[7]);
+  B2INFO("**       Clusters in U cases: " << SummariesInfo[8] << ", V cases: " << SummariesInfo[9]);
+  B2INFO("** Fraction of clusters in U: " << (float)SummariesInfo[8] / SummariesInfo[0] << ", in V: " <<
+         (float)SummariesInfo[9] / SummariesInfo[0]);
+  B2INFO("**");
+  B2INFO("**");
+  B2INFO("**");
+  B2INFO("**");
+  B2INFO("*******************************************************************");
   /*
     printf("--> %f <--\n", Correction_Bias[55]->GetMatrixArray()[3]);
       if (i==55) printf("%f \n", Correction_Bias[i][3]);
@@ -838,8 +895,8 @@ int PXDClusterShapeCalibrationAlgorithm::CalculateCorrection(int CorCase, int n,
     double* valError, double* rms)
 {
   // CorCase: correction case for:
-  //   1: Correction_Bias:            MinSamples: 100,  preset = 0, minCorrection = 0.5 micron, MinDistanceInErrors = 3
-  //   2: Correction_ErrorEstimation  MinSamples: 100,  preset = 1, minCorrection = 0.05,       MinDistanceInErrors = 3
+  //   1: Correction_Bias:            MinSamples: m_MinClustersCorrections,  preset = 0, minCorrection = 0.5 micron, MinDistanceInErrors = 3
+  //   2: Correction_ErrorEstimation  MinSamples: m_MinClustersCorrections,  preset = 1, minCorrection = 0.05,       MinDistanceInErrors = 3
 
   int ret = 1;
 
@@ -847,7 +904,7 @@ int PXDClusterShapeCalibrationAlgorithm::CalculateCorrection(int CorCase, int n,
   double preset;
   double minCorrection;
   double MinDistanceInErrors;
-  MinSamples = 100;
+  MinSamples = m_MinClustersCorrections;
   MinDistanceInErrors = 3.0;
   if (CorCase == 1) {
     preset = 0.0;

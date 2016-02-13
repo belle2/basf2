@@ -109,15 +109,16 @@ namespace Belle2 {
 
     /// Set external parameters and functions
 
-    const int m_shapes = 15;
+    const int m_shapes = 15;    // 1 .. 15, shapeID = 0: not setting shape
     const int m_pixelkinds = 8;
     const int m_dimensions = 2; // cases: 15 x 8 x 2 = 240
-    const int m_anglesU = 4;   // 18 x 18 = 324 (angles)
-    const int m_anglesV = 4;
+    const int m_anglesU = 18;   // 18 x 18 = 324 (angles)
+    const int m_anglesV = 18;
     const int m_in_pixelU = 7;  // 9 x 9 = 81 (in-pixel positions)
     const int m_in_pixelV = 7;
+    const int m_MinClustersCorrections = 100; // Minimum clusters for calculation of corrections
 
-    const int m_MinHitsInPixels = -1;      // TODO set to > 5000, deactivate this function: set to -1
+    const int m_MinHitsInPixels = -1;       // TODO set to > 5000, deactivate this function: set to -1
     const int m_MinHitsAcceptInPixels = 5;  // TODO set to > 5
 
     const int m_cases = m_shapes * m_pixelkinds *

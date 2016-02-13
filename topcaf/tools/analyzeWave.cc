@@ -21,7 +21,6 @@ bool analyzeWave(const char* filename, int firstEvent = 0, int nEvents = 1)
   TTreeReader theReader("tree", &fileIn);
   TTreeReaderArray<Belle2::EventWaveformPacket> eventRV(theReader, "EventWaveformPackets");
 
-
   int iEvent = -1;
 
   TFile plotFile("plot.root", "RECREATE");
@@ -65,19 +64,6 @@ bool analyzeWave(const char* filename, int firstEvent = 0, int nEvents = 1)
         h->SetBinContent(c, y[c]);
       }
 
-      //      TF1 *f;
-      // cout<<evtnum<<"\tnumber of hits: "<<hits.size()<<endl;
-      // for(unsigned int c=0;c<hits.size();c++) {
-      //  //  string hitname = evtnum+"_"+to_string(channelID)+"_"+to_string(c);
-      //  //  f = new TF1(hitname.c_str(),"gaus",hits[c].tdc_bin-10,hits[c].tdc_bin+10);
-      //  //  f->SetParameter(0,hits[c].adc_height);
-      //  //  f->SetParameter(1,hits[c].tdc_bin);
-      //  //  f->SetParameter(2,hits[c].width);
-      //  //  h->Fit(hitname.c_str(),"R");
-      //  cout<<"c: "<<c<<"\tadc_height: "<<hits[c].adc_height<<"\ttdc_bin: "<<hits[c].tdc_bin<<"\twidth: "<<hits[c].width<<endl;
-      //  //  f->Write();
-      // }
-
       h->Write();
 
       vector<double> x;
@@ -93,9 +79,6 @@ bool analyzeWave(const char* filename, int firstEvent = 0, int nEvents = 1)
       }
 
       TGraph* g = new TGraph(y.size(), &x[0], &y[0]);
-
-
-
       g->SetMarkerStyle(7);
       mg->Add(g);
       iChannel += 1;

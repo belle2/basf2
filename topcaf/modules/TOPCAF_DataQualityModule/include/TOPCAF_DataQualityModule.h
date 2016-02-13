@@ -2,6 +2,7 @@
 
 #include <framework/core/Module.h>
 #include "TH1F.h"
+#include "TH2F.h"
 #include <string>
 
 namespace Belle2 {
@@ -21,6 +22,10 @@ namespace Belle2 {
     //FIXME temporarily need to keep track of events in a file until event builder works
     int m_iEvent; // keep track of iterations within run
     TH1F* m_samples;//Plot all ADC sample values.
+    TH1F* scrod;
+    TH1F* m_asics;
+    TH1F* m_channel;
+    TH2F* m_hitmap;
     std::map<topcaf_channel_id_t, TH1F*> m_channelNoiseMap; // histogram of the values after correction;
     std::map<topcaf_channel_id_t, int> m_channelEventMap; // to find in which chunk a given channel is
     std::string m_histogramDirectoryName;

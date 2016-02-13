@@ -30,6 +30,7 @@ void TOPCAF_DataQualityModule::defineHisto()
   m_samples = new TH1F("ADCvalues", "ADC values ", 100, -50, 50);
   m_samples->GetXaxis()->SetTitle("ADC Value");
   m_samples->GetYaxis()->SetTitle("Number of Samples");
+  m_hitmap = new TH2F("Hitmap", "carrier vs. row", 4, 0, 4, 4, 0, 4);
   oldDir->cd();
 }
 
@@ -54,7 +55,6 @@ void TOPCAF_DataQualityModule::event()
   if (not evtwaves_ptr) {
     return;
   }
-
   for (int c = 0; c < evtwaves_ptr.getEntries(); c++) {
     EventWaveformPacket* evtwave_ptr = evtwaves_ptr[c];
     auto channelID = evtwave_ptr->GetChannelID();
@@ -82,13 +82,6 @@ void TOPCAF_DataQualityModule::event()
 
 void TOPCAF_DataQualityModule::endRun()
 {
-  for (map<topcaf_channel_id_t, TH1F*>::iterator it = m_channelNoiseMap.begin(); it != m_channelNoiseMap.end(); ++it) {
-    // if more than 1% of ADC values differ by a large number from the previous value, consider channel noisy.
-    if ((*it).second->Integral(50, 150) < 0.98 * (*it).second->GetEntries()) {
-      B2INFO("Channel " << (*it).first << " (e.g. in event " << m_channelEventMap[(*it).first] + 1 << ") is noisy.");
-    }
-  }
-
 }
 
 

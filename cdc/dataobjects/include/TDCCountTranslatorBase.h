@@ -46,14 +46,14 @@ namespace Belle2 {
        *
        *  @return  Best estimation of closest distance between the track and the wire.
        */
-      virtual float getDriftLength(unsigned short tdcCount     = 0,
-                                   const WireID& wireID        = WireID(),
-                                   float timeOfFlightEstimator = 0.,
-                                   bool ambiguityDiscrimiator  = false,
-                                   float z = 0,
-                                   float alpha = 0,
-                                   float theta = static_cast<float>(TMath::Pi() / 2.),
-                                   unsigned short adcCount = 0) = 0;
+      virtual double getDriftLength(unsigned short tdcCount     = 0,
+                                    const WireID& wireID        = WireID(),
+                                    double timeOfFlightEstimator = 0.,
+                                    bool ambiguityDiscrimiator  = false,
+                                    double z = 0,
+                                    double alpha = 0,
+                                    double theta = static_cast<double>(TMath::Pi() / 2.),
+                                    unsigned short adcCount = 0) = 0;
 
       /** Uncertainty corresponding to drift length from getDriftLength of this class.
        *
@@ -63,12 +63,12 @@ namespace Belle2 {
        *  @param alpha                   Track incident angle in r-phi plane.
        *  @param theta                   Track incident angle in s-z plane (=polar angle).
        */
-      virtual float getDriftLengthResolution(float driftLength          = 0.,
-                                             const WireID& wireID       = WireID(),
-                                             bool ambiguityDiscrimiator = false,
-                                             float z = 0,
-                                             float alpha = 0,
-                                             float theta = static_cast<float>(TMath::Pi() / 2.)) = 0;
+      virtual double getDriftLengthResolution(double driftLength          = 0.,
+                                              const WireID& wireID       = WireID(),
+                                              bool ambiguityDiscrimiator = false,
+                                              double z = 0,
+                                              double alpha = 0,
+                                              double theta = static_cast<double>(TMath::Pi() / 2.)) = 0;
     };
   }
 }

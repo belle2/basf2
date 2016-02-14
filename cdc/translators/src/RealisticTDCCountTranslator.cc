@@ -30,18 +30,18 @@ RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagati
 #endif
 }
 
-float RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
-                                                  const WireID& wireID,
-                                                  float timeOfFlightEstimator,
-                                                  bool leftRight,
-                                                  float z,
-                                                  float alpha,
-                                                  float theta,
-                                                  unsigned short adcCount)
+double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
+                                                   const WireID& wireID,
+                                                   double timeOfFlightEstimator,
+                                                   bool leftRight,
+                                                   double z,
+                                                   double alpha,
+                                                   double theta,
+                                                   unsigned short adcCount)
 {
   // translate TDC Count into time information:
   // N.B. No correction (+ or -0.5 count) is needed in the translation since no bias is in the real TDC count on average (info. from KEK electronics division).
-  float driftTime = m_cdcp.getT0(wireID) - tdcCount * m_tdcBinWidth;
+  double driftTime = m_cdcp.getT0(wireID) - tdcCount * m_tdcBinWidth;
   //  std::cout << "t0,tdcbinw= " << m_cdcp.getT0(wireID) <<" "<< m_tdcBinWidth << std::endl;
 
   unsigned short layer = wireID.getICLayer();
@@ -66,8 +66,8 @@ float RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
 
   //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
   //Need to reverse calculate the relation between drift lenght and drift time.
-  float driftL = (driftTime >= 0.) ? m_cdcp.getDriftLength(driftTime, layer, leftRight, alpha,
-                                                           theta) : m_vFactor * driftTime;
+  double driftL = (driftTime >= 0.) ? m_cdcp.getDriftLength(driftTime, layer, leftRight, alpha,
+                                                            theta) : m_vFactor * driftTime;
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -84,14 +84,14 @@ float RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
 
 /** this function returns the variance that is used as the CDC measurment resolution in track fitting */
 
-float RealisticTDCCountTranslator::getDriftLengthResolution(float driftLength,
-                                                            const WireID&  wireID,
-                                                            bool,
-                                                            float,
-                                                            float,
-                                                            float)
+double RealisticTDCCountTranslator::getDriftLengthResolution(double driftLength,
+    const WireID&  wireID,
+    bool,
+    double,
+    double,
+    double)
 {
-  float resol = m_cdcp.getSigma(driftLength, wireID.getICLayer());
+  double resol = m_cdcp.getSigma(driftLength, wireID.getICLayer());
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;

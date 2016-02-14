@@ -47,14 +47,14 @@ namespace Belle2 {
         *
         */
 
-      float getDriftLength(unsigned short tdcCount,
-                           const WireID& wireID        = WireID(),
-                           float timeOfFlightEstimator = 0,
-                           bool leftRight = false,
-                           float z = 0,
-                           float = 0,
-                           float = 0,
-                           unsigned short = 0);
+      double getDriftLength(unsigned short tdcCount,
+                            const WireID& wireID        = WireID(),
+                            double timeOfFlightEstimator = 0,
+                            bool leftRight = false,
+                            double z = 0,
+                            double = 0,
+                            double = 0,
+                            unsigned short = 0);
 
 
       /** Uncertainty corresponding to drift length from getDriftLength of this class.
@@ -63,12 +63,12 @@ namespace Belle2 {
        *
        *  @return Uncertainty on the drift length, currently 1.69e-4.
        */
-      float getDriftLengthResolution(float,
-                                     const WireID& = WireID(),
-                                     bool = false,
-                                     float = 0,
-                                     float = 0,
-                                     float = 0);
+      double getDriftLengthResolution(double,
+                                      const WireID& = WireID(),
+                                      bool = false,
+                                      double = 0,
+                                      double = 0,
+                                      double = 0);
 
     private:
       /**
@@ -87,7 +87,7 @@ namespace Belle2 {
        * Event timing.
        * If this is not simulated, m_eventTime is set to be 0.
        */
-      float m_eventTime;
+      double m_eventTime;
     };
   }
 }

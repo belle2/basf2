@@ -29,7 +29,7 @@ namespace Belle2 {
       ~RealisticTDCCountTranslator() {};
 
       /** If trigger jitter was simulated, in every event one has to give an estimate of the effect. */
-      void setEventTime(float eventTime = 0)
+      void setEventTime(double eventTime = 0)
       {
         m_eventTime = eventTime;
       }
@@ -46,14 +46,14 @@ namespace Belle2 {
        * @param adcCount              ADC count.
        * @return Drift length (cm) if drift time >= 0; v*(drift time) (i.e. negative value) otherwise, where v is set to one (cm/ns) for simplicity.
        */
-      float getDriftLength(unsigned short tdcCount,
-                           const WireID& wireID        = WireID(),
-                           float timeOfFlightEstimator = 0,
-                           bool leftRight = false,
-                           float z = 0,
-                           float alpha = 0,
-                           float = static_cast<float>(TMath::Pi() / 2.),
-                           unsigned short adcCount = 0);
+      double getDriftLength(unsigned short tdcCount,
+                            const WireID& wireID        = WireID(),
+                            double timeOfFlightEstimator = 0,
+                            bool leftRight = false,
+                            double z = 0,
+                            double alpha = 0,
+                            double = static_cast<double>(TMath::Pi() / 2.),
+                            unsigned short adcCount = 0);
 
       /**
        * Get position resolution^2 corresponding to the drift length
@@ -66,12 +66,12 @@ namespace Belle2 {
        * @param  theta        Track incident angle in s-z plane (=polar angle) (rad).
        * @return Uncertainty^2 (cm^2) on the drift length.
        */
-      float getDriftLengthResolution(float driftLength,
-                                     const WireID& wireID = WireID(),
-                                     bool leftRight = false,
-                                     float z = 0,
-                                     float alpha = 0,
-                                     float = static_cast<float>(TMath::Pi() / 2.));
+      double getDriftLengthResolution(double driftLength,
+                                      const WireID& wireID = WireID(),
+                                      bool leftRight = false,
+                                      double z = 0,
+                                      double alpha = 0,
+                                      double = static_cast<double>(TMath::Pi() / 2.));
 
     private:
       /**
@@ -90,7 +90,7 @@ namespace Belle2 {
        * Event timing.
        * If this is not simulated, m_eventTime is set to be 0.
        */
-      float m_eventTime;
+      double m_eventTime;
 
       /**
        * Reference to CDC GeometryPar object.
@@ -106,12 +106,12 @@ namespace Belle2 {
        * TDC bin width (ns).
        * N.B. The declaration should be after m_cdcp for proper initialization.
        */
-      const float m_tdcBinWidth;
+      const double m_tdcBinWidth;
 
       /**
        * Conv. factor to 'drift length' (cm/ns) when drift time < 0.
        */
-      const float m_vFactor;
+      const double m_vFactor;
     };
   }
 }

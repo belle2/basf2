@@ -15,18 +15,18 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-float SimpleTDCCountTranslator::getDriftLength(unsigned short tdcCount,
-                                               const WireID& wireID,
-                                               float timeOfFlightEstimator,
-                                               bool,
-                                               float z,
-                                               float,
-                                               float,
-                                               unsigned short)
+double SimpleTDCCountTranslator::getDriftLength(unsigned short tdcCount,
+                                                const WireID& wireID,
+                                                double timeOfFlightEstimator,
+                                                bool,
+                                                double z,
+                                                double,
+                                                double,
+                                                unsigned short)
 {
   // translate TDC Count into time information:
   CDCGeometryPar& geometryPar = CDCGeometryPar::Instance();
-  float driftTime = (static_cast<float>(geometryPar.getTdcOffset() - (tdcCount + 0.5))); // 1 Unit in the TDC count equals 1 ns
+  double driftTime = (static_cast<double>(geometryPar.getTdcOffset() - (tdcCount + 0.5))); // 1 Unit in the TDC count equals 1 ns
 
   // Need to undo everything the simple digitization does in reverse order.
   // First: Undo propagation in wire, if it was used:
@@ -46,7 +46,7 @@ float SimpleTDCCountTranslator::getDriftLength(unsigned short tdcCount,
 
   //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
   //Need to reverse calculate the relation between drift lenght and drift time.
-  float driftL = (driftTime >= 0.) ? driftTime * 4e-3 : -999.;
+  double driftL = (driftTime >= 0.) ? driftTime * 4e-3 : -999.;
   return driftL;
 }
 
@@ -57,12 +57,12 @@ this variance is calculated by sigam_cdcHit^2 + sigma_translationError^2
 sigma_translationError is an additional (non-gaussian) smearing is introduced due to driftlength to TDC conversio  and
 can be (partially) corrected by adding sigma_translationError^2 = (40/sqrt(12) µm)^2 to sigam_cdcHit^2
 see Ozaki's mail: [belle2_tracking:0515] */
-float SimpleTDCCountTranslator::getDriftLengthResolution(float,
-                                                         const WireID&,
-                                                         bool,
-                                                         float,
-                                                         float,
-                                                         float)
+double SimpleTDCCountTranslator::getDriftLengthResolution(double,
+                                                          const WireID&,
+                                                          bool,
+                                                          double,
+                                                          double,
+                                                          double)
 {
 //  return 0.000169 + 1.3333333E-6; // (130 µm)^2 in cm^2 + (40/sqrt(12) µm)^2 also in cm
   return 0.000169;  //the above should be taken into account in the digitizer, not here

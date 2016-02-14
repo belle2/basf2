@@ -257,7 +257,7 @@ void CDCPackerModule::event()
                              buf[2], nwords[2],
                              buf[3], nwords[3],
                              rawcprpacker_info);
-    for (int j = 0; j < 3; j++) {
+    for (int j = 0; j < 4; j++) {
       if (buf[j] != NULL) delete [] buf[j];
     }
   }

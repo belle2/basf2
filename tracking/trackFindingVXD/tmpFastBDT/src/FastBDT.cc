@@ -8,7 +8,7 @@
 #include <iostream>
 #include <algorithm>
 
-namespace FastBDT {
+namespace tmpFastBDT {
 
   std::vector<double> EventWeights::GetSums(unsigned int nSignals) const
   {

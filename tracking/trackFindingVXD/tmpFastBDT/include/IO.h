@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <type_traits>
 
-namespace FastBDT {
+namespace tmpFastBDT {
 
   /**
    * This template saves a vector to an std::ostream

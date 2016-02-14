@@ -5,7 +5,7 @@
 #include <tracking/trackFindingVXD/tmpFastBDT/IO.h>
 #include <iomanip>
 
-namespace FastBDT {
+namespace tmpFastBDT {
 
   template<>
   std::ostream& operator<<(std::ostream& stream, const std::vector<float>& vector)

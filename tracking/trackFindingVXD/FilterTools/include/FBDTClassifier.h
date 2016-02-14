@@ -47,7 +47,7 @@ namespace Belle2 {
     FBDTClassifier() { ; }// = default; /**< default constructor */
 
     /** constructor from three main parts. (for testing purposes mainly) */
-    FBDTClassifier(FastBDT::Forest forest, std::vector<FastBDT::FeatureBinning<double> > fB, Belle2::DecorrelationMatrix<9> dM) :
+    FBDTClassifier(tmpFastBDT::Forest forest, std::vector<tmpFastBDT::FeatureBinning<double> > fB, Belle2::DecorrelationMatrix<9> dM) :
       m_forest(forest), m_featBins(fB), m_decorrMat(dM) { ; }
 
     ~FBDTClassifier() { ; } /**< TODO destructor */
@@ -73,19 +73,19 @@ namespace Belle2 {
     void writeToStream(std::ostream& os) const;
 
     /** get the forest */
-    FastBDT::Forest getForest() const { return m_forest; }
+    tmpFastBDT::Forest getForest() const { return m_forest; }
 
     /** get the feature binnings */
-    std::vector<FastBDT::FeatureBinning<double> > getFeatureBinnings()  const { return m_featBins; }
+    std::vector<tmpFastBDT::FeatureBinning<double> > getFeatureBinnings()  const { return m_featBins; }
 
     /** get the decorrelation matrix */
     Belle2::DecorrelationMatrix<9> getDecorrelationMatrix() const { return m_decorrMat; }
 
   private:
 
-    FastBDT::Forest m_forest{}; /**< the forest used for classification */
+    tmpFastBDT::Forest m_forest{}; /**< the forest used for classification */
 
-    std::vector<FastBDT::FeatureBinning<double> > m_featBins{}; /**< the feature binnings corresponding to the BDT */
+    std::vector<tmpFastBDT::FeatureBinning<double> > m_featBins{}; /**< the feature binnings corresponding to the BDT */
 
     Belle2::DecorrelationMatrix<9> m_decorrMat{}; /**< the decorrelation matrix used in this classifier */
 

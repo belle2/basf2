@@ -22,7 +22,7 @@ using namespace std;
 template<typename PointType>
 void FBDTClassifier<PointType>::readFromStream(std::istream& is)
 {
-  m_forest = FastBDT::readForestFromStream(is);
+  m_forest = tmpFastBDT::readForestFromStream(is);
   m_featBins.clear(); // clear possibly present feature Binning
   is >> m_featBins;
   if (!m_decorrMat.readFromStream(is)) {
@@ -63,11 +63,11 @@ void FBDTClassifier<PointType>::train(const std::vector<Belle2::FBDTTrainSample<
 
   std::vector<unsigned int> nBinningLevels;
   for (auto dataIt = data.begin(); dataIt != data.end(); ++dataIt) {
-    m_featBins.push_back(FastBDT::FeatureBinning<double>(nBinCuts, dataIt->begin(), dataIt->end()));
+    m_featBins.push_back(tmpFastBDT::FeatureBinning<double>(nBinCuts, dataIt->begin(), dataIt->end()));
     nBinningLevels.push_back(nBinCuts);
   }
 
-  FastBDT::EventSample eventSample(samples.size(), nFeatures, nBinningLevels);
+  tmpFastBDT::EventSample eventSample(samples.size(), nFeatures, nBinningLevels);
   for (const auto& event : samples) {
     std::vector<unsigned> bins(nFeatures);
     for (size_t iSP = 0; iSP < event.hits.size(); ++iSP) {
@@ -78,8 +78,8 @@ void FBDTClassifier<PointType>::train(const std::vector<Belle2::FBDTTrainSample<
     eventSample.AddEvent(bins, 1, event.signal);
   }
 
-  FastBDT::ForestBuilder fbdt(eventSample, nTrees, shrinkage, ratio, depth); // train FastBDT
-  FastBDT::Forest forest(fbdt.GetF0(), fbdt.GetShrinkage());
+  tmpFastBDT::ForestBuilder fbdt(eventSample, nTrees, shrinkage, ratio, depth); // train FastBDT
+  tmpFastBDT::Forest forest(fbdt.GetF0(), fbdt.GetShrinkage());
   for (const auto& tree : fbdt.GetForest()) {
     forest.AddTree(tree);
   }

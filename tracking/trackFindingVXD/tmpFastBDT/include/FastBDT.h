@@ -2,6 +2,7 @@
  * Thomas Keck 2014
  */
 
+
 #pragma once
 
 #define FastBDT_VERSION_MAJOR 1
@@ -14,7 +15,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace FastBDT {
+namespace tmpFastBDT {
 
   /**
    * Compare function which sorts all NaN values to the left

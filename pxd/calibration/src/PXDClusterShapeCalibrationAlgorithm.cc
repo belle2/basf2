@@ -107,6 +107,10 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   name_OutFileCalibrations = Form("pxdClShCal%s.root", name_Case.Data());
   int SummariesInfo[20];
   for (int i = 0; i < 20; i++) SummariesInfo[i] = 0;
+  int SummariesInfoSh[m_shapes];
+  for (int i = 0; i < m_shapes; i++) SummariesInfoSh[i] = 0;
+  int SummariesInfoAng[m_anglesU * m_anglesV];
+  for (int i = 0; i < m_anglesU * m_anglesV; i++) SummariesInfoAng[i] = 0;
 
   // START - section for variables for DQM and expert histograms
   TString name_OutFileDQM;
@@ -116,6 +120,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   TString DirPixelKind;
   TString DirShape;
   TH1F* m_histSummariesInfo = NULL;
+  TH1F* m_histSummariesInfoSh = NULL;
+  TH2F* m_histSummariesInfoAng = NULL;
   TH2F** m_histBiasCorrectionU = NULL;
   TH2F** m_histBiasCorrectionV = NULL;
   TH2F** m_histResidualRMSU = NULL;
@@ -126,6 +132,18 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   TH2F** m_histErrorEstimationV = NULL;
   TH2F** m_histnClusters = NULL;
   TH2F** m_histnClusterFraction = NULL;
+
+  m_histBiasCorrectionU = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
+  m_histBiasCorrectionV = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
+  m_histResidualRMSU = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
+  m_histResidualRMSV = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
+  m_histBiasCorrectionErrorU = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
+  m_histBiasCorrectionErrorV = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
+  m_histErrorEstimationU = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
+  m_histErrorEstimationV = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
+  m_histnClusters = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
+  m_histnClusterFraction = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
+
   name_OutFileDQM = Form("pxdClShCalDQM%s.root", name_Case.Data());
   name_OutDoExpertHistograms = Form("pxdClShCalHistos%s.root", name_Case.Data());
   // END - section for variables for DQM and expert histograms
@@ -140,20 +158,12 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
     fDQM->cd("NoSorting");
 
     m_histSummariesInfo = new TH1F("SummariesInfo", "Summaries Info", 20, 0, 20);
+    m_histSummariesInfoSh = new TH1F("SummariesInfoSh", "Summaries Info Over Shapes", m_shapes, 1, m_shapes + 1);
+    m_histSummariesInfoAng = new TH2F("SummariesInfoAng", "Summaries Info Over Angle Distribution", m_anglesU, -m_anglesU / 2,
+                                      m_anglesU / 2, m_anglesV, -m_anglesV / 2, m_anglesV / 2);
 
     fExpertHistograms = new TFile(name_OutDoExpertHistograms.Data(), "recreate");
     fExpertHistograms->mkdir("NoSorting");
-
-    m_histBiasCorrectionU = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
-    m_histBiasCorrectionV = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
-    m_histResidualRMSU = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
-    m_histResidualRMSV = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
-    m_histBiasCorrectionErrorU = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
-    m_histBiasCorrectionErrorV = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
-    m_histErrorEstimationU = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
-    m_histErrorEstimationV = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
-    m_histnClusters = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
-    m_histnClusterFraction = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
 
     for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++) {
       DirPixelKind = Form("PixelKind_%01i_Layer_%i_Sensor_%i_Size_%i", i_pk, (int)((i_pk % 4) / 2) + 1, (int)(i_pk / 4) + 1, i_pk % 2);
@@ -461,6 +471,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
   // presets of vectors and tables:
 
+  freopen("/dev/null", "w", stderr);
+
   //int n_Events = getObject<TTree>(name_SourceTree).GetEntries();
   int nSelRowsTemp = 0;
   for (int i_shape = 0; i_shape < m_shapes; i_shape++) {
@@ -482,7 +494,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
     if (!m_DoExpertHistograms) {  // acceleration of calibration process
       getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrack:ResidVTrack", c1, "goff");
       nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
-      printf("--> sh %i rows %i\n", i_shape + 1, nSelRowsTemp);
+      //printf("--> sh %i rows %i\n", i_shape + 1, nSelRowsTemp);
       if (nSelRowsTemp < m_MinClustersCorrections) continue;
     }
     for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++) {
@@ -563,6 +575,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
           // B2DEBUG(10, "3--> Selection criteria: ");
 
           int nSelRows = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
+          SummariesInfoSh[i_shape] += nSelRows;
+          SummariesInfoAng[i_angleU * m_anglesV + i_angleV] += nSelRows;
           if (nSelRows >= m_MinClustersCorrections) {
             B2DEBUG(30, "--> Selected raws " << nSelRows);
             double* Col1 = getObject<TTree>(name_SourceTree.Data()).GetV1();
@@ -718,8 +732,13 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
   if (m_DoExpertHistograms) {
     for (int i = 0; i < 20; i++) m_histSummariesInfo->SetBinContent(i + 1, SummariesInfo[i]);
+    for (int i = 0; i < m_shapes; i++) m_histSummariesInfoSh->SetBinContent(i + 1, SummariesInfoSh[i]);
+    for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++) {
+      for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
+        m_histSummariesInfoAng->SetBinContent(i_angleU + 1, i_angleV + 1, SummariesInfoAng[i_angleU * m_anglesV + i_angleV]);
+      }
+    }
   }
-
 
   B2INFO("*******************************************************************");
   B2INFO("**");
@@ -741,6 +760,50 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
          (float)SummariesInfo[9] / SummariesInfo[0]);
   B2INFO("**");
   B2INFO("**");
+  B2INFO("*******************************************************************");
+  B2INFO("**          Occupancy in Shapes");
+  B2INFO("**");
+  TString TextSh;
+  for (int i_shape = 0; i_shape < m_shapes; i_shape++) {
+    TextSh = Form("**      ShapeID %02i: %7i  (%6.2f %%)   (%s)", i_shape, SummariesInfoSh[i_shape],
+                  (float)SummariesInfoSh[i_shape] * 100.0 / SummariesInfo[0],
+                  Belle2::PXD::PXDClusterShape::pxdClusterShapeDescription[(Belle2::PXD::pxdClusterShapeType)(i_shape + 1)].c_str());
+    B2INFO(TextSh);
+  }
+  B2INFO("**");
+  B2INFO("**");
+  B2INFO("*******************************************************************");
+  B2INFO("**          Occupancy in Angles");
+  B2INFO("**");
+  TextSh = Form("**    AngleV: ");
+  for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
+    TextSh = Form("%s     %02i: ", TextSh.Data(), i_angleV);
+  }
+  B2INFO(TextSh);
+  for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++) {
+    TextSh = Form("** AngleU %02i: ", i_angleU);
+    for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
+      TextSh = Form("%s%7i, ", TextSh.Data(), SummariesInfoAng[i_angleU * m_anglesV + i_angleV]);
+    }
+    B2INFO(TextSh);
+  }
+  B2INFO("**");
+  B2INFO("**");
+  B2INFO("*******************************************************************");
+  B2INFO("**          Occupancy in Angles in %");
+  B2INFO("**");
+  TextSh = Form("**    AngleV: ");
+  for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
+    TextSh = Form("%s     %02i: ", TextSh.Data(), i_angleV);
+  }
+  B2INFO(TextSh);
+  for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++) {
+    TextSh = Form("** AngleU %02i: ", i_angleU);
+    for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
+      TextSh = Form("%s%7.2f, ", TextSh.Data(), (float)SummariesInfoAng[i_angleU * m_anglesV + i_angleV] * 100.0 / SummariesInfo[0]);
+    }
+    B2INFO(TextSh);
+  }
   B2INFO("**");
   B2INFO("**");
   B2INFO("*******************************************************************");
@@ -763,6 +826,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
     fDQM->Close();
     fExpertHistograms->Write();
     fExpertHistograms->Close();
+
   }
 
   // Here to save corrections in TVectorT format, could change later
@@ -780,6 +844,40 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   saveCalibration(Correction_Bias[0], nameB.Data());
   saveCalibration(Correction_ErrorEstimation[0], nameEE.Data());
   saveCalibration(InPixelPosition[0], nameIP.Data());
+
+  // Save corrections to asci file:
+  FILE* AscFile = fopen("Corrections.txt", "w");
+  for (int i_shape = 0; i_shape < m_shapes; i_shape++)
+    for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++)
+      for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++)
+        for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++)
+          for (int i_axis = 0; i_axis < m_dimensions; i_axis++) {
+            if (TCorrection_BiasMap[make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] != 0)
+              fprintf(AscFile, "Bias Sh %i PixKind %i AngU %i AngV %i Dir %i : %f\n", i_shape, i_pk, i_angleU, i_angleV, i_axis,
+                      TCorrection_BiasMap[make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)]);
+            if (TCorrection_ErrorEstimationMap[make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] != 1)
+              fprintf(AscFile, "ErEs Sh %i PixKind %i AngU %i AngV %i Dir %i : %f\n", i_shape, i_pk, i_angleU, i_angleV, i_axis,
+                      TCorrection_ErrorEstimationMap[make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)]);
+//            if (TCorrection_Bias[i_shape][i_pk][i_axis][i_angleU][i_angleV] != 0)
+//              fprintf(AscFile,"Bias Sh %i PixKind %i AngU %i AngV %i Dir %i : %f\n",i_shape,i_pk,i_angleU,i_angleV,i_axis,TCorrection_Bias[i_shape][i_pk][i_axis][i_angleU][i_angleV]);
+//            if (TCorrection_ErrorEstimation[i_shape][i_pk][i_axis][i_angleU][i_angleV] != 1)
+//              fprintf(AscFile,"ErEs Sh %i PixKind %i AngU %i AngV %i Dir %i : %f\n",i_shape,i_pk,i_angleU,i_angleV,i_axis,TCorrection_ErrorEstimation[i_shape][i_pk][i_axis][i_angleU][i_angleV]);
+          }
+  fclose(AscFile);
+
+  for (int i = 0; i < m_pixelkinds * m_shapes + 1; i++) {
+    //  if (m_histBiasCorrectionU[i]) delete m_histBiasCorrectionU[i];
+  }
+  delete[] m_histBiasCorrectionU;
+  delete[] m_histBiasCorrectionV;
+  delete[] m_histResidualRMSU;
+  delete[] m_histResidualRMSV;
+  delete[] m_histBiasCorrectionErrorU;
+  delete[] m_histBiasCorrectionErrorV;
+  delete[] m_histErrorEstimationU;
+  delete[] m_histErrorEstimationV;
+  delete[] m_histnClusters;
+  delete[] m_histnClusterFraction;
 
   delete[] ValueCors;
   delete[] ValueInPix;
@@ -948,11 +1046,15 @@ int PXDClusterShapeCalibrationAlgorithm::CalculateCorrection(int CorCase, int n,
   double SEM = ErrNew / sqrt(n);
 
   // condition for using correction:
-  if (DevNew < minCorrection) ret = 0;
-  if (CorCase == 1) if (DevNew < (MinDistanceInErrors * SEM)) ret = 0;  // apply only for bias
-
-  if (CorCase == 1) printf("----->dev %f err %f sem %f \n", DevNew / Unit::um, ErrNew / Unit::um, SEM / Unit::um);
-  else printf("----->dev %f err %f sem %f \n", DevNew, ErrNew, SEM);
+  if (CorCase == 1) {
+    if (fabs(DevNew) < minCorrection) ret = 0;
+    if (CorCase == 1) if (fabs(DevNew) < (MinDistanceInErrors * SEM)) ret = 0;  // apply only for bias
+  }
+  if (CorCase == 2) {
+    if (fabs(ErrNew - 1) < minCorrection) ret = 0;
+  }
+//  if (CorCase == 1) printf("----->dev %f err %f sem %f \n", DevNew / Unit::um, ErrNew / Unit::um, SEM / Unit::um);
+//  else printf("----->dev %f err %f sem %f \n", DevNew, ErrNew, SEM);
   *val = DevNew;
   *valError = SEM;
   *rms = ErrNew;

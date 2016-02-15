@@ -65,7 +65,6 @@ analysis_main.add_module(track_merger)
 trackfitter2 = register_module('GenFitter')
 trackfitter2.param("GFTrackCandidatesColName", "TrkMerge")
 trackfitter2.param("GFTracksColName", "TrkGFTs")
-trackfitter2.param("BuildBelle2Tracks", False)
 # trackfitter2.param("StoreFailedTracks", True)
 if debug:
     trackfitter2.logging.log_level = LogLevel.DEBUG

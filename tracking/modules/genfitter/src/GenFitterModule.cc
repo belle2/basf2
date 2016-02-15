@@ -47,7 +47,6 @@
 #include <cdc/dataobjects/WireID.h>
 
 #include <framework/dataobjects/Helix.h>
-#include <mdst/dataobjects/Track.h>
 
 #include <genfit/Track.h>
 #include <genfit/TrackCand.h>
@@ -77,12 +76,6 @@
 #include <TMath.h>
 #include <TGeoManager.h>
 #include <TDatabasePDG.h>
-
-// FIXME 2015-05-26 Only temporarily, until the Belle2::Track building
-// functionality is removed.  This is needed for the hit pattern
-// functionality.
-#include <tracking/modules/genfitter/TrackBuilderModule.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -129,9 +122,6 @@ GenFitterModule::GenFitterModule() :
   addParam("StoreFailedTracks", m_storeFailed,
            "Set true if the tracks where the fit failed should also be stored in the output",
            bool(false));
-  addParam("BuildBelle2Tracks", m_buildBelle2Tracks,
-           "Backward compatibility option to build Belle2::Tracks.  Will be removed soon.",
-           bool(true));
   addParam("UseClusters", m_useClusters,
            "If set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used",
            true);
@@ -163,9 +153,6 @@ GenFitterModule::GenFitterModule() :
   addParam("GFTracksColName", m_gfTracksColName,
            "Name of collection holding the final genfit::Tracks (will be created by this module)",
            string(""));
-  addParam("TracksColName", m_tracksColName,
-           "Name of collection holding the final Tracks (will be created by this module). NOT IMPLEMENTED!",
-           string(""));
 
   addParam("DAFTemperatures", m_dafTemperatures,
            "Set the annealing scheme (temperatures) for the DAF.  Length of vector will determine DAF iterations.",
@@ -178,11 +165,6 @@ GenFitterModule::GenFitterModule() :
            "the Kalman filter), or 'unweightedClosestToPrediction' (default "
            "for the Kalman filter without reference track).",
            string("default"));
-
-  addParam("beamSpot", m_beamSpot,
-           "Point on line parallel z to which the fitted track will be "
-           "extrapolated in order to put together the TrackFitResults.",
-           vector<double>(3, 0.0));
 
   addParam("suppressGFExceptionOutput", m_suppressGFExceptionOutput, "Suppress error messages in GenFit.", true);
 
@@ -213,30 +195,8 @@ void GenFitterModule::initialize()
   StoreArray<genfit::Track> gftracks(m_gfTracksColName);
   gftracks.registerInDataStore();
 
-  if (!m_tracksColName.empty() and m_tracksColName != "Tracks") {
-    B2ERROR("Setting a collection name with TracksColName is not implemented.");
-    //TODO: implementation might also need different name for TrackFitResults?
-  }
-
   gftracks.registerRelationTo(mcParticles);
   trackCandidates.registerRelationTo(gftracks);
-
-  if (m_buildBelle2Tracks) {
-    StoreArray<Track> tracks;
-    StoreArray<TrackFitResult> trackfitresults;
-
-    tracks.registerInDataStore();
-    trackfitresults.registerInDataStore();
-
-    tracks.registerRelationTo(mcParticles);
-    trackCandidates.registerRelationTo(trackfitresults);
-    gftracks.registerRelationTo(trackfitresults);
-
-    B2WARNING("Please update your option file to use the TrackBuilderModule to build "
-              "Belle2::Tracks and set the BuildBelle2Tracks option of the "
-              "GenFitterModule to false as this will become the default and the "
-              "functionality will be removed soon.");
-  }
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
     B2FATAL("Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
@@ -331,22 +291,9 @@ void GenFitterModule::event()
   //Create a relation between the gftracks and their most probable 'mother' MC particle
   RelationArray gfTracksToMCPart(gfTracks, mcParticles);
 
-  //counter for fitted tracks, the number of fitted tracks may differ from the number of trackCandidates if the fit fails for some of them
+  //counter for fitted tracks
   int trackCounter = -1;
-  int trackFitResultCounter = 0;
 
-  //Relations for Tracks
-  //StoreArrays to store the fit results
-  StoreArray < Track > tracks;
-  StoreArray <TrackFitResult> trackFitResults;
-  RelationArray tracksToMcParticles(tracks, mcParticles);
-  RelationArray gfTracksToTrackFitResults(gfTracks, trackFitResults);
-  RelationArray gfTrackCandidatesToTrackFitResults(trackCandidates, trackFitResults);
-
-  if (m_buildBelle2Tracks) {
-    tracks.create();
-    trackFitResults.create();
-  }
 
   for (int iCand = 0; iCand < trackCandidates.getEntries(); ++iCand) { //loop over all track candidates
     B2DEBUG(99, "#############  Fit track candidate Nr. : " << iCand << "  ################");
@@ -599,12 +546,6 @@ void GenFitterModule::event()
           ++trackCounter;
 
           candFitted = true;
-          //fill hit patterns VXD and CDC
-          HitPatternVXD theHitPatternVXD = TrackBuilderModule::getHitPatternVXD(gfTrack);
-          uint32_t hitPatternVXDInitializer = (uint32_t)theHitPatternVXD.getInteger();
-
-          HitPatternCDC theHitPatternCDC = TrackBuilderModule::getHitPatternCDC(gfTrack);
-          long long int hitPatternCDCInitializer = (long long int)theHitPatternCDC.getInteger();
 
           //Create output tracks
           gfTrack.prune(m_pruneFlags.c_str());
@@ -616,69 +557,6 @@ void GenFitterModule::event()
             gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
           }
 
-          if (!m_buildBelle2Tracks)
-            continue;
-
-          // Only build Belle 2 Tracks if explicitly requested.
-          tracks.appendNew(); //Track is created empty, parameters are set later on
-          // To calculate the correct starting helix parameters, one
-          // has to extrapolate the track to its 'start' (here: take
-          // point of closest approach to the origin)
-
-          TVector3 pos(m_beamSpot.at(0), m_beamSpot.at(1), m_beamSpot.at(2)); //origin
-          TVector3 lineDirection(0, 0, 1); // beam axis
-          TVector3 poca(0., 0., 0.); //point of closest approach
-          TVector3 dirInPoca(0., 0., 0.); //direction of the track at the point of closest approach
-          TMatrixDSym cov(6);
-
-          try {
-            //extrapolate the track to the origin, the results are stored directly in poca and dirInPoca
-            genfit::MeasuredStateOnPlane mop = gfTrack.getFittedState();
-            mop.extrapolateToLine(pos, lineDirection);
-            mop.getPosMomCov(poca, dirInPoca, cov);
-
-            B2DEBUG(149, "Point of closest approach: " << poca.x() << "  " << poca.y() << "  " << poca.z());
-            B2DEBUG(149, "Track direction in POCA: " << dirInPoca.x() << "  " << dirInPoca.y() << "  " << dirInPoca.z());
-
-            tracks[trackCounter]->setTrackFitResultIndex(chargedStable, trackFitResultCounter);
-
-            //Create relations
-            if (aTrackCandPointer->getMcTrackId() >= 0) {
-              tracksToMcParticles.add(trackCounter, aTrackCandPointer->getMcTrackId());
-            }
-
-            int charge = fs->getCharge();
-            double pVal = fs->getPVal();
-            double Bx, By, Bz;
-            genfit::FieldManager::getInstance()->getFieldVal(poca.X(), poca.Y(), poca.Z(),
-                                                             Bx, By, Bz);
-            trackFitResults.appendNew(poca, dirInPoca, cov, charge, chargedStable,
-                                      pVal, Bz / 10.,  hitPatternCDCInitializer, hitPatternVXDInitializer);
-
-            gfTracksToTrackFitResults.add(trackCounter, trackFitResultCounter);
-            gfTrackCandidatesToTrackFitResults.add(iCand, trackFitResultCounter);
-            trackFitResultCounter++;
-
-            //store position errors
-            double xErr = sqrt(cov(0, 0));
-            double yErr = sqrt(cov(1, 1));
-            double zErr = sqrt(cov(2, 2));
-            B2DEBUG(99, "Position standard deviation: " << xErr << "  " << yErr << "  " << zErr);
-
-            //store momentum errors
-            double pxErr = sqrt(cov(3, 3));
-            double pyErr = sqrt(cov(4, 4));
-            double pzErr = sqrt(cov(5, 5));
-            B2DEBUG(99, "Momentum standard deviation: " << pxErr << "  " << pyErr << "  " << pzErr);
-          }
-
-          catch (...) {
-            B2WARNING("Something went wrong during the extrapolation of fit results!");
-            //Create relations
-            if (aTrackCandPointer->getMcTrackId() >= 0) {
-              tracksToMcParticles.add(trackCounter, aTrackCandPointer->getMcTrackId());
-            }
-          }
         }// end else for successful fits
       } catch (...) {
         B2WARNING("Something went wrong during the fit!");

@@ -62,8 +62,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
 
     # track fitting
     trackfitter = register_module('GenFitter')
-    trackfitter.param({'BuildBelle2Tracks': False,
-                       "PDGCodes": [211]})
+    trackfitter.param({"PDGCodes": [211]})
     trackfitter.set_name('combined GenFitter')
     path.add_module(trackfitter)
 
@@ -137,7 +136,6 @@ def add_track_finding(path, components=None):
     # track fitting
         VXDtrackFitter = register_module('GenFitter')
         VXDtrackFitter.param('GFTrackCandidatesColName', vxd_trackcands)
-        VXDtrackFitter.param('BuildBelle2Tracks', False)
         VXDtrackFitter.param("PDGCodes", [211])
         VXDtrackFitter.param('GFTracksColName', vxd_tracklets)
         VXDtrackFitter.param('PruneFlags', 'FL')
@@ -145,7 +143,6 @@ def add_track_finding(path, components=None):
 
         CDCtrackFitter = register_module('GenFitter')
         CDCtrackFitter.param('GFTrackCandidatesColName', cdc_trackcands)
-        CDCtrackFitter.param('BuildBelle2Tracks', False)
         CDCtrackFitter.param("PDGCodes", [211])
         CDCtrackFitter.param('GFTracksColName', cdc_tracklets)
         CDCtrackFitter.param('PruneFlags', 'FL')

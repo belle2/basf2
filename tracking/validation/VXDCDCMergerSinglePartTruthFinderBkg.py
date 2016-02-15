@@ -184,8 +184,7 @@ fitting_param = {  # ---    'FilterId': 1,
     'GFTrackCandidatesColName': 'TracksCand',
     'GFTracksColName': 'GFTracks',
     'NMaxIterations': 10,
-    'ProbCut': 0.001,
-    'BuildBelle2Tracks': 0
+    'ProbCut': 0.001
 }
 fitting.logging.log_level = LogLevel.WARNING
 fitting.param(fitting_param)

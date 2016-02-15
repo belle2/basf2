@@ -185,8 +185,7 @@ fitting_param = {  # ---    'FilterId': 1,
     'GFTrackCandidatesColName': 'TrackCands',
     'GFTracksColName': 'GFTracks',
     'NMaxIterations': 10,
-    'ProbCut': 0.001,
-    'BuildBelle2Tracks': 0
+    'ProbCut': 0.001
 }
 fitting.logging.log_level = LogLevel.WARNING
 fitting.param(fitting_param)
@@ -303,14 +302,12 @@ matcher2.param('PRGFTrackCandsColName', 'CDCTrackCands')
 
 VXDtrackFitter = register_module('GenFitter')
 VXDtrackFitter.param('GFTrackCandidatesColName', 'VXDTrackCands')
-VXDtrackFitter.param('BuildBelle2Tracks', False)
 VXDtrackFitter.param("PDGCodes", [211])
 VXDtrackFitter.param('GFTracksColName', 'VXDTracks')
 VXDtrackFitter.set_name('VXD-only')
 
 CDCtrackFitter = register_module('GenFitter')
 CDCtrackFitter.param('GFTrackCandidatesColName', 'CDCTrackCands')
-CDCtrackFitter.param('BuildBelle2Tracks', False)
 CDCtrackFitter.param("PDGCodes", [211])
 CDCtrackFitter.param('GFTracksColName', 'CDCTracks')
 CDCtrackFitter.set_name('CDC-only')

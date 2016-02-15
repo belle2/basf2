@@ -68,8 +68,7 @@ track_finder_mc_truth.param(param_track_finder_mc_truth)
 setupGenfit = register_module('SetupGenfitExtrapolation')
 
 trackfitter = register_module('GenFitter')
-trackfitter.param({'BuildBelle2Tracks': False,
-                   "GFTracksColName": 'mcTracks',
+trackfitter.param({"GFTracksColName": 'mcTracks',
                    "PDGCodes": [211],
                    'GFTrackCandidatesColName': 'mcTrackCands'})
 trackfitter.set_name('SVD-only GenFitter')

@@ -227,8 +227,7 @@ class CDCFitter(metamodules.PathModule):
         setup_genfit_extrapolation_module = StandardEventGenerationRun.get_basf2_module('SetupGenfitExtrapolation',
                                                                                         whichGeometry=fit_geometry)
         gen_fitter_module = StandardEventGenerationRun.get_basf2_module('GenFitter',
-                                                                        PDGCodes=[211],
-                                                                        BuildBelle2Tracks=False)
+                                                                        PDGCodes=[211])
 
         track_builder = StandardEventGenerationRun.get_basf2_module('TrackBuilder')
 

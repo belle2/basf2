@@ -126,6 +126,12 @@ def configure_system(conf):
         conf.env['HAS_CALLGRIND'] = True
         conf.env.Append(CPPDEFINES='-DHAS_CALLGRIND')
 
+    # check for OpenMP
+    conf.env['HAS_OPENMP'] = False
+    if conf.CheckHeader('omp.h'):
+        conf.env['HAS_OPENMP'] = True
+        conf.env.Append(CPPDEFINES='-DHAS_OPENMP')
+
     return True
 
 

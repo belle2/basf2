@@ -371,6 +371,8 @@ void GenFitterModule::event()
           B2WARNING("Fixing calculated seed Time " << timeSeed << " to zero.");
           timeSeed = 0;
         }
+        // Update the TrackCand in case we estimated the time.
+        aTrackCandPointer->setTimeSeed(timeSeed);
       }
 
       B2DEBUG(99, "Fit track with start values: ");

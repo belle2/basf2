@@ -249,6 +249,113 @@ const genfit::HMatrixU* CDCRecoHit::constructHMatrix(const genfit::AbsTrackRep* 
 }
 
 
+std::vector<double> CDCRecoHit::timeDerivativesMeasurementsOnPlane(const genfit::StateOnPlane& state) const
+{
+  double z = state.getPos().Z();
+  const TVector3& p = state.getMom();
+  // Calculate alpha and theta.  A description was given by H. Ozaki in
+  // https://indico.mpp.mpg.de/getFile.py/access?contribId=5&sessionId=3&resId=0&materialId=slides&confId=3195
+
+//Comment out the following 2 lines since they introduce dependence on cdclib (or circular dependence betw. cdc_objects and cdclib).
+//  double alpha = CDCGeometryPar::Instance().getAlpha(state.getPlane()->getO(), p);
+//  double theta = CDCGeometryPar::Instance().getTheta(p);
+
+//N.B. The folowing 8 lines are tentative to avoid the circular dependence mentioned above ! The definitions of alpha and theta should be identical to those defined in CDCGeometryPar.
+  const double wx = state.getPlane()->getO().x();
+  const double wy = state.getPlane()->getO().y();
+  const double px = p.x();
+  const double py = p.y();
+  const double cross = wx * py - wy * px;
+  const double dot   = wx * px + wy * py;
+  double alpha = atan2(cross, dot);
+  double theta = atan2(p.Perp(), p.z());
+  /*
+  double alpha0 =  CDCGeometryPar::Instance().getAlpha(state.getPlane()->getO(), p);
+  double theta0 =  CDCGeometryPar::Instance().getTheta(p);
+  if (alpha != alpha0) {
+    std::cout <<"alpha,alpha0= " << alpha <<" "<< alpha0 << std::endl;
+    exit(-1);
+  }
+  if (theta != theta0) {;
+    std::cout <<"theta,theta0= " << theta <<" "<< theta0 << std::endl;
+    exit(-2);
+  }
+  */
+
+  double trackTime = s_useTrackTime ? state.getTime() : 0;
+
+  // The meaning of the left / right flag (called
+  // 'ambiguityDiscriminator' in TDCCounTranslatorBase) is inferred
+  // from CDCGeometryPar::getNewLeftRightRaw().
+  auto fL = [&](const double & t) -> double {
+    return s_tdcCountTranslator->getDriftLength(m_tdcCount, m_wireID, t,
+    false, //left
+    z, alpha, theta, m_adcCount); };
+  auto fR = [&](const double & t) -> double {
+    return s_tdcCountTranslator->getDriftLength(m_tdcCount, m_wireID, t,
+    true, //right
+    z, alpha, theta, m_adcCount); };
+
+  // Calculate derivative for all left and right mirror hit.
+  //
+  // It's a polynomial, but let's not meddle with the innard of the
+  // CDC code for now.
+  //
+  // The algorithm follows the one in TF1::Derivative() :
+  //   df(x) = (4 D(h/2) - D(h)) / 3
+  // with D(h) = (f(x + h) - f(x - h)) / (2 h).
+  double rightShort[2], rightFull[2];
+  double leftShort[2], leftFull[2];
+  const double defaultStepT = 1e-3 * trackTime;
+  double stepT;
+  {
+    double temp = trackTime + defaultStepT / 2;
+    // Find the actual size of the step, which will differ from
+    // defaultStepX due to roundoff.  This is the step-size we will
+    // use for this direction.  Idea taken from Numerical Recipes,
+    // 3rd ed., section 5.7.
+    //
+    // Note that if a number is exactly representable, it's double
+    // will also be exact.  Outside denormals, this also holds for
+    // halving.  Unless the exponent changes (which it only will in
+    // the vicinity of zero) adding or subtracing doesn't make a
+    // difference.
+    //
+    // We determine the roundoff error for the half-step.  If this
+    // is exactly representable, the full step will also be.
+    stepT = 2 * (temp - trackTime);
+
+    rightShort[0] = fL(trackTime + .5 * stepT);
+    rightShort[1] = fR(trackTime + .5 * stepT);
+  }
+  {
+    leftShort[0] = fL(trackTime - .5 * stepT);
+    leftShort[1] = fR(trackTime - .5 * stepT);
+  }
+  {
+    rightFull[0] = fL(trackTime + stepT);
+    rightFull[1] = fR(trackTime + stepT);
+  }
+  {
+    leftFull[0] = fL(trackTime - stepT);
+    leftFull[1] = fR(trackTime - stepT);
+  }
+
+  // Calculate the derivatives for the individual components of
+  // the track parameters.
+  double derivFull[2];
+  double derivShort[2];
+  for (size_t j = 0; j < 2; ++j) {
+    derivFull[j] = (rightFull[j] - leftFull[j]) / (2.*stepT);
+    derivShort[j] = (rightShort[j] - leftShort[j]) / stepT;
+  }
+  //std::cout << rightShort[0] << " " << derivShort[0] << " " << trackTime << std::endl;
+  return { +(4.*derivShort[0] - derivFull[0]) / 3.,
+           -(4.*derivShort[1] - derivFull[1]) / 3.};
+}
+
+
+
 bool CDCRecoHit::getFlyByDistanceVector(B2Vector3D& pointingVector,
                                         B2Vector3D& trackDir,
                                         const genfit::AbsTrackRep* rep,

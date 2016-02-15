@@ -62,6 +62,8 @@ namespace Belle2 {
     std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const override;
     virtual const genfit::HMatrixU* constructHMatrix(const genfit::AbsTrackRep*) const override;
 
+    /** Get the time derivative of the MesuredStateOnPlane (derived from the track fit).  */
+    std::vector<double> timeDerivativesMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
 
     /**
      * Get the vector pointing from the wire to the fitted trajectory

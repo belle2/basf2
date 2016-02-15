@@ -1,5 +1,9 @@
 #include "trg/cdc/modules/neurotrigger/NeuroTriggerTrainerModule.h"
+#ifdef HAS_OPENMP
 #include <parallel_fann.hpp>
+#else
+#include <fann.h>
+#endif
 
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -429,7 +433,11 @@ NeuroTriggerTrainerModule::updateRelevantID(unsigned isector)
 
 void NeuroTriggerTrainerModule::train(unsigned isector)
 {
-  B2INFO("Training network for sector " << isector);
+#ifdef HAS_OPENMP
+  B2INFO("Training network for sector " << isector << " with OpenMP");
+#else
+  B2INFO("Training network for sector " << isector << " without OpenMP");
+#endif
   // initialize network
   unsigned nLayers = m_NeuroTrigger[isector].nLayers();
   unsigned* nNodes = new unsigned[nLayers];
@@ -469,6 +477,7 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
   // set network parameters
   fann_set_activation_function_hidden(ann, FANN_SIGMOID_SYMMETRIC);
   fann_set_activation_function_output(ann, FANN_SIGMOID_SYMMETRIC);
+  fann_set_training_algorithm(ann, FANN_TRAIN_RPROP);
   double bestRMS = 999.;
   vector<double> bestTrainLog = {};
   vector<double> bestValidLog = {};
@@ -485,11 +494,19 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
     fann_randomize_weights(ann, -0.1, 0.1);
     // train and save the network
     for (int epoch = 1; epoch <= m_maxEpochs; ++epoch) {
+#ifdef HAS_OPENMP
       double mse = parallel_fann::train_epoch_irpropm_parallel(ann, train_data, m_nThreads);
+#else
+      double mse = fann_train_epoch(ann, train_data);
+#endif
       trainLog[epoch - 1] = mse;
       // evaluate validation set
       fann_reset_MSE(ann);
+#ifdef HAS_OPENMP
       double valid_mse = parallel_fann::test_data_parallel(ann, valid_data, m_nThreads);
+#else
+      double valid_mse = fann_test_data(ann, valid_data);
+#endif
       validLog[epoch - 1] = valid_mse;
       // keep weights for lowest validation error
       if (valid_mse < bestValid) {

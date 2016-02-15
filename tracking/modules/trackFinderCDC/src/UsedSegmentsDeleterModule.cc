@@ -34,6 +34,7 @@ void UsedSegmentsDeleterModule::event()
 
 UsedSegmentsDeleterModule::UsedSegmentsDeleterModule()
 {
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("SegmentsStoreObjName",
            m_param_segmentsStoreObjName,
            "Name of the output StoreObjPtr of the segments to be handled by this module.",

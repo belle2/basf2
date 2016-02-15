@@ -60,7 +60,7 @@ ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
         lambda = state.extrapolateToPlane(plane);
       }  catch (...) {
         B2WARNING("extrapolation failed");
-        itPlanes++;
+        ++itPlanes;
         continue;
       }
 
@@ -81,7 +81,7 @@ ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
 
       gfTrackToPXDIntercepts->add(theGFTrackIndex, listToBeFilled->getEntries() - 1);
 
-      itPlanes++;
+      ++itPlanes;
 
     }
   }
@@ -120,11 +120,11 @@ ROIGeometry::fillPlaneList()
         plane.Print();
         m_planeList.push_back(plane);
 
-        itPxdSensors++;
+        ++itPxdSensors;
       }
-      itPxdLadders++;
+      ++itPxdLadders;
     }
-    itPxdLayers++;
+    ++itPxdLayers;
   }
 
 };

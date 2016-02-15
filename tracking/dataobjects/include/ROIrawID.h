@@ -23,7 +23,7 @@ namespace Belle2 {
 
   public:
     //    typedef unsigned long baseType;
-    typedef uint64_t baseType;
+    typedef uint64_t baseType; /**< base type*/
     enum {
       UnusedBits = 21,
       SystemFlagBits = 1,
@@ -43,11 +43,13 @@ namespace Belle2 {
     };
 
 
-    ROIrawID(baseType id = 0) {
+    ROIrawID(baseType id = 0)
+    {
       m_rawID.id = id;
-    };
+    }; /**< constructor setting the id */
 
-    ROIrawID(baseType SystemFlag, baseType DHHID, baseType RowMin, baseType ColMin, baseType RowMax, baseType ColMax) {
+    ROIrawID(baseType SystemFlag, baseType DHHID, baseType RowMin, baseType ColMin, baseType RowMax, baseType ColMax)
+    {
 
       m_rawID.parts.unused = 0;
       m_rawID.parts.systemFlag = SystemFlag;
@@ -56,37 +58,36 @@ namespace Belle2 {
       m_rawID.parts.colMin = ColMin;
       m_rawID.parts.rowMax = RowMax;
       m_rawID.parts.colMax = ColMax;
-    }
+    } /**< constructor */
 
-    baseType getSystemFlag() const {return m_rawID.parts.systemFlag;}
-    baseType getDHHID() const {return m_rawID.parts.DHHID;}
-    baseType getRowMin() const {return m_rawID.parts.rowMin;}
-    baseType getColMin() const {return m_rawID.parts.colMin;}
-    baseType getRowMax() const {return m_rawID.parts.rowMax;}
-    baseType getColMax() const {return m_rawID.parts.colMax;}
-    baseType getID() const {return m_rawID.id;}
+    baseType getSystemFlag() const {return m_rawID.parts.systemFlag;} /**< get system flag */
+    baseType getDHHID() const {return m_rawID.parts.DHHID;} /**< get DHH ID*/
+    baseType getRowMin() const {return m_rawID.parts.rowMin;} /**< get row min*/
+    baseType getColMin() const {return m_rawID.parts.colMin;} /**< get col min*/
+    baseType getRowMax() const {return m_rawID.parts.rowMax;} /**< get row max*/
+    baseType getColMax() const {return m_rawID.parts.colMax;} /**< get col max*/
+    baseType getID() const {return m_rawID.id;} /**< get ROIrawID*/
 
-    baseType getBigEndian() const;
+    baseType getBigEndian() const; /**< get bigEndian*/
 
 
-    void setSystemFlag(baseType  SystemFlag) {m_rawID.parts.systemFlag = SystemFlag;}
-    void setDHHID(baseType DHHID) {m_rawID.parts.DHHID = DHHID;}
-    void setRowMin(baseType RowMin) {m_rawID.parts.rowMin = RowMin;}
-    void setColMin(baseType ColMin) {m_rawID.parts.colMin = ColMin;}
-    void setRowMax(baseType RowMax) {m_rawID.parts.rowMax = RowMax;}
-    void setColMax(baseType ColMax) {m_rawID.parts.colMax = ColMax;}
-    void setID(baseType id) {m_rawID.id = id;}
+    void setSystemFlag(baseType  SystemFlag) {m_rawID.parts.systemFlag = SystemFlag;} /**< set system flag*/
+    void setDHHID(baseType DHHID) {m_rawID.parts.DHHID = DHHID;} /**< set DHH ID*/
+    void setRowMin(baseType RowMin) {m_rawID.parts.rowMin = RowMin;} /**< set row min*/
+    void setColMin(baseType ColMin) {m_rawID.parts.colMin = ColMin;} /**< set col min*/
+    void setRowMax(baseType RowMax) {m_rawID.parts.rowMax = RowMax;} /**< set row max*/
+    void setColMax(baseType ColMax) {m_rawID.parts.colMax = ColMax;} /**< set col max*/
+    void setID(baseType id) {m_rawID.id = id;} /**< set ROIrawID*/
 
 
     ~ROIrawID() {};
 
-    //operator used to order the ROIs (ascending DHHID)
-    inline bool operator()(const ROIrawID& roi1, const ROIrawID& roi2) const {
+    inline bool operator()(const ROIrawID& roi1, const ROIrawID& roi2) const
+    {
       if (roi1.getDHHID() == roi2.getDHHID())
         return roi1.getID() < roi2.getID();
       else return roi1.getDHHID() < roi2.getDHHID();
-
-    }
+    } /**< operator used to order the ROIs (ascending DHHID)*/
 
   private:
 
@@ -102,7 +103,8 @@ baseType systemFlag: SystemFlagBits;
 baseType unused: UnusedBits;
       } parts;
 
-    } m_rawID;
+    } m_rawID; /**< raw ID*/
+
 
   };
 }

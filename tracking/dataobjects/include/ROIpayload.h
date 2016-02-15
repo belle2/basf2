@@ -33,31 +33,31 @@ namespace Belle2 {
      */
     virtual ~ROIpayload() { delete[] m_rootdata; };
 
-    int m_packetLengthByte;
-    int m_length;
-    int*  m_rootdata; //[m_length]
+    int m_packetLengthByte; /**< packet length  in byte*/
+    int m_length; /**< packet length*/
+    int*  m_rootdata; //[m_length] /**< */
 
-    int m_index; //! transient value
-    uint32_t* m_data32; //! transient value
-    ROIrawID::baseType* m_data64; //! transient value
+    int m_index; //! transient value /**< index*/
+    uint32_t* m_data32; //! transient value /**< data32*/
+    ROIrawID::baseType* m_data64; //! transient value /**< data64*/
 
-    void setPayloadLength(int length);
-    void setPayloadLength();
-    void setHeader();
-    void setTriggerNumber(unsigned long int triggerNumber);
+    void setPayloadLength(int length); /**< set payload length*/
+    void setPayloadLength(); /**< set payload length*/
+    void setHeader(); /**< set header*/
+    void setTriggerNumber(unsigned long int triggerNumber); /**< set trigger number*/
 
     //! set run/ subrun/exp number
-    void setRunSubrunExpNumber(int run , int subrun , int exp);
+    void setRunSubrunExpNumber(int run , int subrun , int exp); /**< set run, subrun and experiment number*/
 
     //    void addROIraw(ROIrawID roiraw);
-    void addROIraw(unsigned long int roiraw);
-    void setCRC();
+    void addROIraw(unsigned long int roiraw); /**< add a ROIrawID */
+    void setCRC(); /**< set CRC */
 
-    int getPacketLengthByte() {return m_packetLengthByte;};
-    int getLength() {return m_length;};
-    int* getRootdata() {return m_rootdata;}; //[m_length]
+    int getPacketLengthByte() {return m_packetLengthByte;}; /**< get packet length in byte*/
+    int getLength() {return m_length;}; /**< get length*/
+    int* getRootdata() {return m_rootdata;}; //[m_length] /**< */
 
-    void init(int length);
+    void init(int length); /**< initializer*/
 
   private:
     //! Needed to make the ROOT object storable

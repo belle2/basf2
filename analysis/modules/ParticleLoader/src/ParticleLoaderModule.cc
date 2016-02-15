@@ -350,6 +350,16 @@ namespace Belle2 {
         StoreObjPtr<ParticleList> plist(listName);
 
         Const::ChargedStable type(abs(pdgCode));
+
+        // skip tracks with charge = 0
+        const TrackFitResult* trackFit = track->getTrackFitResult(type);
+        int charge = trackFit->getChargeSign();
+        if (charge == 0) {
+          B2WARNING("Track with charge = 0 skipped!");
+          continue;
+        }
+
+        // create particle and add it to the Particle list
         Particle particle(track, type);
         if (particle.getParticleType() == Particle::c_Track) { // should always hold but...
 

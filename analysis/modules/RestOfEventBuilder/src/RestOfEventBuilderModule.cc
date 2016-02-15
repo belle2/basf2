@@ -14,6 +14,7 @@
 #include <analysis/dataobjects/Particle.h>
 
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -94,6 +95,14 @@ void RestOfEventBuilderModule::addRemainingTracks(const Particle* particle, Rest
 
   for (int i = 0; i < tracks.getEntries(); i++) {
     const Track* track = tracks[i];
+
+    // ignore tracks with charge = 0
+    const TrackFitResult* trackFit = track->getTrackFitResult(Const::pion);
+    int charge = trackFit->getChargeSign();
+    if (charge == 0) {
+      B2WARNING("Track with charge = 0 not added to ROE!");
+      continue;
+    }
 
     bool remainingTrack = true;
     for (unsigned j = 0; j < fspTracks.size(); j++) {

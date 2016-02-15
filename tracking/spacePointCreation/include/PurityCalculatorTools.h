@@ -136,16 +136,14 @@ namespace Belle2 { // make seperate sub-namespace for this?
     return std::vector<size_t>(); // empty vector else
   }
 
-  /**
-   * create a vector of MCVXDPurityInfos objects for any given container holding SpacePoints and providing a getHits() method
-   * each MCParticle that is in the container gets its own object
-   * NOTE: negative MCParticleIds are possible und used as follows:
-   * + -1 -> there was a TrueHit (i.e. Cluster) related to a SpacePoint in the container that did not have relation to a MCParticle
+  /** create a vector of MCVXDPurityInfos objects for a std::vector<Belle2::SpacePoints>.
+   * each MCParticle that is in the vector gets its own object
+   * NOTE: negative MCParticleIds are possible and used as follows:
+   * + -1 -> there was a TrueHit (i.e. Cluster) related to a SpacePoint in the vector that did not have a relation to a MCParticle
    * + -2 -> there was a SpacePoint with a Cluster that was not related to a TrueHit (noise Cluster)
    * @returns sorted vector of MCVXDPurityInfo (sorted by overall purity)
    */
-  template<typename SPContainer>
-  std::vector<Belle2::MCVXDPurityInfo> createPurityInfos(const SPContainer* container)
+  std::vector<Belle2::MCVXDPurityInfo> createPurityInfosVec(const std::vector<const Belle2::SpacePoint*>& spacePoints)
   {
     std::array<unsigned, 3> totalClusters = { {0, 0, 0 } };
     // WARNING: relying on the fact here that all array entries will be initialized to 0
@@ -153,8 +151,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
 
     unsigned nClusters = 0; // NOTE: only needed for DEBUG output -> remove?
 
-    // collect all information
-    for (const Belle2::SpacePoint* spacePoint : container->getHits()) {
+    for (const Belle2::SpacePoint* spacePoint : spacePoints) {
       B2DEBUG(4999, "Now processing SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
       increaseClusterCounters(spacePoint, totalClusters);
 
@@ -174,7 +171,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
         }
       }
     }
-    B2DEBUG(4999, "container contained " << container->getNHits() << " SpacePoint with " << nClusters << " Clusters");
+    B2DEBUG(4999, "container contained " << spacePoints.size() << " SpacePoint with " << nClusters << " Clusters");
 
     // create MCVXDPurityInfos and add them to the return vector
     std::vector<Belle2::MCVXDPurityInfo> purityInfos;
@@ -187,6 +184,20 @@ namespace Belle2 { // make seperate sub-namespace for this?
     [](const MCVXDPurityInfo & left, const MCVXDPurityInfo & right) { return left > right; }
              );
     return purityInfos;
+  }
+
+  /**
+   * create a vector of MCVXDPurityInfos objects for any given container holding SpacePoints and providing a getHits() method
+   * each MCParticle that is in the container gets its own object
+   * NOTE: negative MCParticleIds are possible und used as follows:
+   * + -1 -> there was a TrueHit (i.e. Cluster) related to a SpacePoint in the container that did not have a relation to a MCParticle
+   * + -2 -> there was a SpacePoint with a Cluster that was not related to a TrueHit (noise Cluster)
+   * @returns sorted vector of MCVXDPurityInfo (sorted by overall purity)
+   */
+  template<typename SPContainer>
+  std::vector<Belle2::MCVXDPurityInfo> createPurityInfos(const SPContainer* container)
+  {
+    return createPurityInfosVec(container->getHits());
   }
 
   /**

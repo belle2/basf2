@@ -220,7 +220,7 @@ void TrackTimeExtractionModule::event()
       }
     }
 
-    for (int i = 0; i < gfTrack->getNumPointsWithMeasurement(); ++i) {
+    for (size_t i = 0; i < gfTrack->getNumPointsWithMeasurement(); ++i) {
       if (!dynamic_cast<const CDCRecoHit*>(gfTrack->getPointWithMeasurement(i))) {
         B2DEBUG(200, "No CDC hits in track.");
         continue;
@@ -360,7 +360,7 @@ TrackTimeExtractionModule::getMeasurementDimensions(const genfit::Track* tr,
                                                     std::vector<int>& vDimMeas)
 {
   vDimMeas.resize(tr->getNumPointsWithMeasurement());
-  for (int i = 0; i < tr->getNumPointsWithMeasurement(); ++i) {
+  for (size_t i = 0; i < tr->getNumPointsWithMeasurement(); ++i) {
     vDimMeas.push_back(tr->getPointWithMeasurement(i)->getRawMeasurement(0)->getDim());
   }
 }

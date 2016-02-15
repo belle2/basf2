@@ -15,6 +15,7 @@
 #include <framework/datastore/RelationArray.h>
 
 #include <genfit/TrackCand.h>
+#include <genfit/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDSimHit.h>
@@ -43,7 +44,7 @@ REG_MODULE(PXDDataRedAnalysis)
 
 PXDDataRedAnalysisModule::PXDDataRedAnalysisModule()
   : Module(),
-    m_gfTrackCandsColName(),  /**< TrackCand list name */
+    m_gfTrackListName(),  /**< Track list name */
     m_PXDInterceptListName(), /**< Intercept list name */
     m_ROIListName(),          /**< ROI list name */
 
@@ -186,7 +187,7 @@ PXDDataRedAnalysisModule::PXDDataRedAnalysisModule()
            "fileName used for . Will be ignored if parameter 'writeToRoot' is false (standard)",
            string("pxdDataRedAnalysis"));
 
-  addParam("trackCandCollName", m_gfTrackCandsColName,
+  addParam("gfTrackListName", m_gfTrackListName,
            "name of the input collection of track candidates", std::string(""));
 
   addParam("PXDInterceptListName", m_PXDInterceptListName,
@@ -206,7 +207,7 @@ PXDDataRedAnalysisModule::~PXDDataRedAnalysisModule()
 void PXDDataRedAnalysisModule::initialize()
 {
 
-  StoreArray<genfit::TrackCand>::required(m_gfTrackCandsColName);
+  StoreArray<genfit::Track>::required(m_gfTrackListName);
   StoreArray<ROIid>::required(m_ROIListName);
   StoreArray<PXDIntercept>::required(m_PXDInterceptListName);
 
@@ -218,7 +219,6 @@ void PXDDataRedAnalysisModule::initialize()
 
   m_nNoMCPart = 0;
 
-
   NtrackHit = 0;
   NtrackNoHit2 = 0;
   NtrackNoHit3 = 0;
@@ -228,10 +228,6 @@ void PXDDataRedAnalysisModule::initialize()
   for (int i = 0; i < 6; i++) {
     npxdDigit[i] = 0;
     npxdDigitInROI[i] = 0;
-    nnoHit2[i] = 0;
-    nnoHit3[i] = 0;
-    nnoROI4[i] = 0;
-    nnoROI5[i] = 0;
   }
 
   if (m_writeToRoot == true) {
@@ -257,8 +253,8 @@ void PXDDataRedAnalysisModule::initialize()
   m_h1PullUNoROI = new TH1F("hPullUNoROI", "U pulls for intercepts when no ROI exists", 100, -6, 6);
   m_h1PullVNoROI = new TH1F("hPullVNoROI", "V pulls for intercepts when no ROI exists", 100, -6, 6);
 
-  m_h1ResidU = new TH1F("hResidU", "U resid for PXDDigits contained in ROI", 100, -6, 6);
-  m_h1ResidV = new TH1F("hResidV", "V resid for PXDDigits contained in ROI", 100, -6, 6);
+  m_h1ResidU = new TH1F("hResidU", "U resid for PXDDigits contained in ROI", 100, -0.5, 0.5);
+  m_h1ResidV = new TH1F("hResidV", "V resid for PXDDigits contained in ROI", 100, -0.5, 0.5);
   m_h1ResidUFail = new TH1F("hResidUFail", "U resid for intercepts NOT contained in ROI", 100, -10, 10);
   m_h1ResidVFail = new TH1F("hResidVFail", "V resid for intercepts NOT contained in ROI", 100, -10, 10);
   m_h1ResidUNoROI = new TH1F("hResidUNoROI", "U resid for intercepts when no ROI exists", 100, -6, 6);
@@ -279,7 +275,7 @@ void PXDDataRedAnalysisModule::initialize()
   m_h1totROIs = new TH1F("htotNrois", "number of ROIs", 100, 0, 100);
   m_h1nROIs = new TH1F("hNrois", "number of ROIs", 100, 0, 100);
   m_h1nROIs_all = new TH1F("hNrois_all", "number of ROIs", 100, 0, 100);
-  m_h1totarea = new TH1F("hTotArea", "Total Areas of ROIs", 100, 0, 100000);
+  m_h1totarea = new TH1F("hTotArea", "Total Areas of ROIs", 100, 0, 5000000);
   m_h1area = new TH1F("hArea", "Areas of ROIs", 100, 0, 10000);
   m_h1areaFail = new TH1F("hAreaFail", "Areas of ROIs when PXDDigit is not contained", 100, 0, 10000);
 
@@ -342,426 +338,402 @@ void PXDDataRedAnalysisModule::event()
   int nROIs_all = 0;
   int totArea = 0;
   B2DEBUG(1, "  ++++++++++++++ PXDDataRedAnalysisModule");
-  StoreArray<genfit::TrackCand> trackCandList(m_gfTrackCandsColName);
+
+  StoreArray<genfit::Track> trackList(m_gfTrackListName);
   StoreArray<PXDIntercept> PXDInterceptList(m_PXDInterceptListName);
   StoreArray<ROIid> ROIList(m_ROIListName);
 
   m_h1totROIs->Fill(ROIList.getEntries());
 
-  StoreArray<MCParticle> mcParticles;
+  //  StoreArray<PXDDigit> pxdDigits;
+  //  StoreArray<PXDSimHit> pxdSimHits;
+  //  StoreArray<PXDTrueHit> pxdTrueHits;
 
-  StoreArray<PXDDigit> pxdDigits;
-  StoreArray<PXDSimHit> pxdSimHits;
-  StoreArray<PXDTrueHit> pxdTrueHits;
+  RelationIndex < genfit::Track, PXDIntercept >
+  gfTrackToPXDIntercept(DataStore::relationName(m_gfTrackListName, m_PXDInterceptListName));
 
-  RelationIndex < genfit::TrackCand, PXDIntercept >
-  gfTrackCandToPXDIntercept(DataStore::relationName(m_gfTrackCandsColName, m_PXDInterceptListName));
+  if (! gfTrackToPXDIntercept)
+    B2FATAL("No genfit::Track -> PXDIntercept relation found! :'(");
 
-  if (! gfTrackCandToPXDIntercept)
-    B2FATAL("No genfit::TrackCand -> PXDIntercept relation found! :'(");
-
-  typedef RelationIndex < genfit::TrackCand, PXDIntercept>::range_from PXDInterceptsFromGFTracks;
-  typedef RelationIndex < genfit::TrackCand, PXDIntercept>::iterator_from PXDInterceptIteratorType;
-
+  typedef RelationIndex < genfit::Track, PXDIntercept>::range_from PXDInterceptsFromGFTracks;
+  typedef RelationIndex < genfit::Track, PXDIntercept>::iterator_from PXDInterceptIteratorType;
   typedef RelationIndex < PXDDigit, PXDTrueHit>::range_from PXDTrueHitFromPXDDigit;
   typedef RelationIndex < PXDDigit, PXDTrueHit>::iterator_from PXDTrueHitIteratorType;
 
-  RelationIndex < PXDDigit, PXDTrueHit > relDigitTrueHit(DataStore::relationName(
-                                                           DataStore::arrayName<PXDDigit>(""),
-                                                           DataStore::arrayName<PXDTrueHit>(""))
-                                                        );
+  RelationIndex < PXDDigit, PXDTrueHit >
+  relDigitTrueHit(DataStore::relationName(DataStore::arrayName<PXDDigit>(""),
+                                          DataStore::arrayName<PXDTrueHit>("")));
+
   double tmpGlobalTime;
   int tmpNGlobalTime;
 
-  //  for(int iMCPart =0; iMCPart < mcParticles.getEntries(); iMCPart++){
-  //    const MCParticle* aPart = mcParticles[iMCPart];
-  const MCParticle* aPart = mcParticles[0];
+  for (int i = 0; i < (int)trackList.getEntries(); i++) { //loop on input tracks
 
-  double momX = (aPart->getMomentum()).X();
-  double momY = (aPart->getMomentum()).Y();
-  double momZ = (aPart->getMomentum()).Z();
+    bool onceHit;
+    bool onceNoHit2;
+    bool onceNoHit3;
+    bool onceNoROI4;
+    bool onceNoROI5;
 
-  m_costhetaMCPart = TMath::Cos(3.1415 / 2 - atan(momZ / sqrt(TMath::Power(momX, 2) + TMath::Power(momY, 2))));
-  m_h1CosThetaMCPart->Fill(m_costhetaMCPart);
+    RelationVector<MCParticle> MCParticles_fromTrack = DataStore::getRelationsFromObj<MCParticle>(trackList[i]);
 
-  //  }
-
-  for (int i = 0; i < trackCandList.getEntries(); i++) {
+    B2DEBUG(2, "Number of MCParticles related to this Track = " << MCParticles_fromTrack.size());
 
     n_tracks ++;
 
-    bool onceHit(false);
-    bool onceNoHit2(false);
-    bool onceNoHit3(false);
-    bool onceNoROI4(false);
-    bool onceNoROI5(false);
-
-    int McId = trackCandList[i]->getMcTrackId();
-
-    m_hNhits->Fill(trackCandList[i]->getNHits());
-
-    if (McId < 0) {
-      m_nNoMCPart++;
+    if (MCParticles_fromTrack.size() == 0)
       continue;
-    }
 
-    MCParticle* aMcParticle = mcParticles[McId];
+    for (int j = 0; j < (int)MCParticles_fromTrack.size(); j++) {
 
-    RelationVector<PXDDigit> pxdRelations = aMcParticle->getRelationsFrom<PXDDigit>();
+      MCParticle* aMcParticle = MCParticles_fromTrack[j];
 
-    PXDInterceptsFromGFTracks  PXDIntercepts = gfTrackCandToPXDIntercept.getElementsFrom(trackCandList[i]);
+      RelationVector<PXDDigit> pxdRelations = aMcParticle->getRelationsFrom<PXDDigit>();
 
-    // m_rootMomXmc = (aMcParticle->getMomentum()).X();
-    // m_rootMomYmc = (aMcParticle->getMomentum()).Y();
-    // m_rootMomZmc = (aMcParticle->getMomentum()).Z();
+      PXDInterceptsFromGFTracks  PXDIntercepts = gfTrackToPXDIntercept.getElementsFrom(trackList[i]);
 
-    bool theROI(false);
-    bool interceptRightVxdID = false;
-    bool roiRightVxdID = false;
+      //    m_hNhits->Fill(trackCandList[i]->getNHits());
 
-    if (pxdRelations.size() >= 1)
-      n_tracksWithDigits++;
+      bool theROI(false);
+      bool interceptRightVxdID = false;
+      bool roiRightVxdID = false;
 
-    m_momXmc = (aMcParticle->getMomentum()).X();
-    m_momYmc = (aMcParticle->getMomentum()).Y();
-    m_momZmc = (aMcParticle->getMomentum()).Z();
-    m_phimc =  atan2(m_momYmc, m_momXmc) * 180 / 3.1415;
-    m_lambdamc = atan(m_momZmc / sqrt(TMath::Power(m_momXmc, 2) + TMath::Power(m_momYmc, 2))) * 180 / 3.1415;
-    m_thetamc = 90 - m_lambdamc;
-    m_costhetamc = TMath::Cos(m_thetamc / 180 * 3.1415);
+      if (pxdRelations.size() >= 1)
+        n_tracksWithDigits++;
 
-    pT = sqrt(TMath::Power(m_momXmc, 2) + TMath::Power(m_momYmc, 2));
+      m_momXmc = (aMcParticle->getMomentum()).X();
+      m_momYmc = (aMcParticle->getMomentum()).Y();
+      m_momZmc = (aMcParticle->getMomentum()).Z();
+      m_phimc =  atan2(m_momYmc, m_momXmc) * 180 / 3.1415;
+      m_lambdamc = atan(m_momZmc / sqrt(TMath::Power(m_momXmc, 2) + TMath::Power(m_momYmc, 2))) * 180 / 3.1415;
+      m_thetamc = 90 - m_lambdamc;
+      m_costhetamc = TMath::Cos(m_thetamc / 180 * 3.1415);
 
-    for (unsigned int iPXDDigit = 0; iPXDDigit < pxdRelations.size(); iPXDDigit++) {
-
-      n_pxdDigit ++ ;
-
-      PXDTrueHitFromPXDDigit  PXDTrueHits = relDigitTrueHit.getElementsFrom(*pxdRelations[iPXDDigit]);
-      PXDTrueHitIteratorType thePXDTrueHitIterator = PXDTrueHits.begin();
-      PXDTrueHitIteratorType thePXDTrueHitIteratorEnd = PXDTrueHits.end();
-      tmpGlobalTime = 0;
-      tmpNGlobalTime = 0;
-
-      for (; thePXDTrueHitIterator != thePXDTrueHitIteratorEnd; thePXDTrueHitIterator++) {
-        tmpGlobalTime = tmpGlobalTime + thePXDTrueHitIterator->to->getGlobalTime();
-        tmpNGlobalTime++;
-      }
-      m_globalTime = tmpGlobalTime / tmpNGlobalTime;
-
-      //      m_coorUmc = thePXDTrueHitIterator->to->getU(); //
-      //      m_coorVmc = thePXDTrueHitIterator->to->getV();
-      m_coorUmc = pxdRelations[iPXDDigit]->getUCellPosition();
-      m_coorVmc = pxdRelations[iPXDDigit]->getVCellPosition();
-      m_Uidmc = pxdRelations[iPXDDigit]->getUCellID();
-      m_Vidmc = pxdRelations[iPXDDigit]->getVCellID();
-      m_vxdIDmc = pxdRelations[iPXDDigit]->getSensorID();
+      pT = sqrt(TMath::Power(m_momXmc, 2) + TMath::Power(m_momYmc, 2));
 
 
-      //giulia
-      VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
-      TVector3 local(m_coorUmc, m_coorVmc, 0);
-      //      TVector3 local(2, 3, 0);
-      //      TVector3 uVector(1, 0, 0);
-      //      TVector3 vVector(0, 1, 0);
+      for (unsigned int iPXDDigit = 0; iPXDDigit < pxdRelations.size(); iPXDDigit++) {
 
-      const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(pxdRelations[iPXDDigit]->getSensorID());
-      TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local);
-      //      TVector3 globaluVector = aSensorInfo.vectorToGlobal(uVector);
-      //      TVector3 globalvVector = aSensorInfo.vectorToGlobal(vVector);
+        n_pxdDigit ++ ;
 
-      //      if( ( pxdRelations[iPXDDigit]->getSensorID() ).getLayerNumber() == 1) //L1
-      //m_hTest->Fill( globalSensorPos.Mag() , globalSensorPos.Phi());
-      m_h2Map->Fill(globalSensorPos.Perp() , globalSensorPos.Phi());
+        PXDTrueHitFromPXDDigit  PXDTrueHits = relDigitTrueHit.getElementsFrom(*pxdRelations[iPXDDigit]);
+        PXDTrueHitIteratorType thePXDTrueHitIterator = PXDTrueHits.begin();
+        PXDTrueHitIteratorType thePXDTrueHitIteratorEnd = PXDTrueHits.end();
+        tmpGlobalTime = 0;
+        tmpNGlobalTime = 0;
+
+        for (; thePXDTrueHitIterator != thePXDTrueHitIteratorEnd; thePXDTrueHitIterator++) {
+          tmpGlobalTime = tmpGlobalTime + thePXDTrueHitIterator->to->getGlobalTime();
+          tmpNGlobalTime++;
+        }
+        m_globalTime = tmpGlobalTime / tmpNGlobalTime;
+
+        m_coorUmc = pxdRelations[iPXDDigit]->getUCellPosition();
+        m_coorVmc = pxdRelations[iPXDDigit]->getVCellPosition();
+        m_Uidmc = pxdRelations[iPXDDigit]->getUCellID();
+        m_Vidmc = pxdRelations[iPXDDigit]->getVCellID();
+        m_vxdIDmc = pxdRelations[iPXDDigit]->getSensorID();
 
 
+        //giulia
+        VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+        TVector3 local(m_coorUmc, m_coorVmc, 0);
 
-      m_h1ptAll->Fill(pT);
-      if (pT > 1) npxdDigit[5]++;
-      if (pT <= 1 && pT > 0.5) npxdDigit[4]++;
-      if (pT <= 0.5 && pT > 0.3) npxdDigit[3]++;
-      if (pT <= 0.3 && pT > 0.2) npxdDigit[2]++;
-      if (pT <= 0.2 && pT > 0.1) npxdDigit[1]++;
-      if (pT <= 0.1) npxdDigit[0]++;
+        const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(pxdRelations[iPXDDigit]->getSensorID());
+        TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local);
 
-      PXDInterceptIteratorType thePXDInterceptIterator = PXDIntercepts.begin();
-      PXDInterceptIteratorType thePXDInterceptIteratorEnd = PXDIntercepts.end();
-      bool MissingHit(true);
+        m_h2Map->Fill(globalSensorPos.Perp() , globalSensorPos.Phi());
 
-      double tmpPullU = 0;
-      double tmpPullV = 0;
-      double tmpResidU = 0;
-      double tmpResidV = 0;
-      double tmpSigmaU = 0;
-      double tmpSigmaV = 0;
-      int tmpDistU = 0 ;
-      int tmpDistV = 0 ;
-      double tmpArea = 0;
+        m_h1ptAll->Fill(pT);
+        if (pT > 1) npxdDigit[5]++;
+        if (pT <= 1 && pT > 0.5) npxdDigit[4]++;
+        if (pT <= 0.5 && pT > 0.3) npxdDigit[3]++;
+        if (pT <= 0.3 && pT > 0.2) npxdDigit[2]++;
+        if (pT <= 0.2 && pT > 0.1) npxdDigit[1]++;
+        if (pT <= 0.1) npxdDigit[0]++;
 
-      double distance = 100000;
-      double distanceROI = 100000;
+        PXDInterceptIteratorType thePXDInterceptIterator = PXDIntercepts.begin();
+        PXDInterceptIteratorType thePXDInterceptIteratorEnd = PXDIntercepts.end();
 
-      for (; thePXDInterceptIterator != thePXDInterceptIteratorEnd; thePXDInterceptIterator++) {
+        bool MissingHit(true);
 
-        theROI = false;
-        interceptRightVxdID = false;
-        roiRightVxdID = false;
+        double tmpPullU = 0;
+        double tmpPullV = 0;
+        double tmpResidU = 0;
+        double tmpResidV = 0;
+        double tmpSigmaU = 0;
+        double tmpSigmaV = 0;
+        int tmpDistU = 0 ;
+        int tmpDistV = 0 ;
+        double tmpArea = 0;
 
-        const PXDIntercept* theIntercept = thePXDInterceptIterator->to;
+        double distance = 100000;
+        double distanceROI = 100000;
 
-        if (theIntercept) {
+        for (; thePXDInterceptIterator != thePXDInterceptIteratorEnd; thePXDInterceptIterator++) {
 
-          m_coorU = theIntercept->getCoorU();
-          m_coorV = theIntercept->getCoorV();
-          m_sigmaU = theIntercept->getSigmaU();
-          m_sigmaV = theIntercept->getSigmaV();
-          m_vxdID = theIntercept->getSensorID();
-          // m_lambda = theIntercept->getLambda();
+          theROI = false;
+          interceptRightVxdID = false;
+          roiRightVxdID = false;
 
-          if (m_vxdID == m_vxdIDmc) {
+          const PXDIntercept* theIntercept = thePXDInterceptIterator->to;
 
-            interceptRightVxdID = true;
+          if (theIntercept) {
 
-            if (distance >  TMath::Sqrt(TMath::Power(m_coorU - m_coorUmc, 2) + TMath::Power(m_coorU - m_coorUmc, 2))) {
+            m_coorU = theIntercept->getCoorU();
+            m_coorV = theIntercept->getCoorV();
+            m_sigmaU = theIntercept->getSigmaU();
+            m_sigmaV = theIntercept->getSigmaV();
+            m_vxdID = theIntercept->getSensorID();
 
-              tmpPullU = (m_coorU - m_coorUmc) / m_sigmaU;
-              tmpPullV = (m_coorV - m_coorVmc) / m_sigmaV;
+            if (m_vxdID == m_vxdIDmc) {
 
-              tmpResidU = m_coorU - m_coorUmc;
-              tmpResidV = m_coorV - m_coorVmc;
+              interceptRightVxdID = true;
 
-              tmpSigmaU = m_sigmaU;
-              tmpSigmaV = m_sigmaV;
+              if (distance >  TMath::Sqrt(TMath::Power(m_coorU - m_coorUmc, 2) + TMath::Power(m_coorU - m_coorUmc, 2))) {
 
-              distance = TMath::Power(m_coorU - m_coorUmc, 2) + TMath::Power(m_coorV - m_coorVmc, 2);
-            }
-          }
+                tmpPullU = (m_coorU - m_coorUmc) / m_sigmaU;
+                tmpPullV = (m_coorV - m_coorVmc) / m_sigmaV;
 
-          const ROIid* theROIid = theIntercept->getRelatedTo<ROIid>(m_ROIListName);
+                tmpResidU = m_coorU - m_coorUmc;
+                tmpResidV = m_coorV - m_coorVmc;
 
-          if (theROIid) {
-            nROIs_all++;
+                tmpSigmaU = m_sigmaU;
+                tmpSigmaV = m_sigmaV;
 
-            theROI = true;
-
-            if ((int)theROIid->getSensorID() == m_vxdIDmc) {
-
-              roiRightVxdID = true;
-
-              if (distanceROI > TMath::Power(tmpDistU, 2) + TMath::Power(tmpDistV, 2)) {
-
-                if (m_Uidmc < theROIid->getMinUid())
-                  tmpDistU = m_Uidmc - theROIid->getMinUid();
-                else
-                  tmpDistU = m_Uidmc - theROIid->getMaxUid();
-
-                if (m_Vidmc < theROIid->getMinVid())
-                  tmpDistV = m_Vidmc - theROIid->getMinVid();
-                else
-                  tmpDistV = m_Vidmc - theROIid->getMaxVid();
-
-                tmpArea = (theROIid->getMaxUid() - theROIid->getMinUid()) * (theROIid->getMaxVid() - theROIid->getMinVid());
-
-                distanceROI = TMath::Power(tmpDistU, 2) + TMath::Power(tmpDistV, 2);
-
+                distance = TMath::Power(m_coorU - m_coorUmc, 2) + TMath::Power(m_coorV - m_coorVmc, 2);
               }
             }
 
-            if (theROIid->Contains(*(pxdRelations[iPXDDigit]))) { //CASO1
+            const ROIid* theROIid = theIntercept->getRelatedTo<ROIid>(m_ROIListName);
 
-              onceHit = true;
+            if (theROIid) {
+              nROIs_all++;
 
-              m_h1GlobalTime->Fill(m_globalTime);
+              theROI = true;
 
-              m_h1PullU->Fill((m_coorU - m_coorUmc) / m_sigmaU);
-              m_h1PullV->Fill((m_coorV - m_coorVmc) / m_sigmaV);
+              if ((int)theROIid->getSensorID() == m_vxdIDmc) {
 
-              m_h1ResidU->Fill(m_coorU - m_coorUmc);
-              m_h1ResidV->Fill(m_coorV - m_coorVmc);
+                roiRightVxdID = true;
 
-              m_h1SigmaU->Fill(m_sigmaU);
-              m_h1SigmaV->Fill(m_sigmaV);
+                if (distanceROI > TMath::Power(tmpDistU, 2) + TMath::Power(tmpDistV, 2)) {
 
-              m_h1area->Fill(tmpArea);
-              totArea = totArea + tmpArea;
-              nROIs++;
+                  if (m_Uidmc < theROIid->getMinUid())
+                    tmpDistU = m_Uidmc - theROIid->getMinUid();
+                  else
+                    tmpDistU = m_Uidmc - theROIid->getMaxUid();
 
-              m_h1Phi->Fill(m_phimc);
-              m_h1Theta->Fill(m_thetamc);
-              m_h1CosTheta->Fill(m_costhetamc);
-              m_h1Lambda->Fill(m_lambdamc);
-              m_h1pt->Fill(pT);
+                  if (m_Vidmc < theROIid->getMinVid())
+                    tmpDistV = m_Vidmc - theROIid->getMinVid();
+                  else
+                    tmpDistV = m_Vidmc - theROIid->getMaxVid();
 
-              if (pT > 1) npxdDigitInROI[5]++;
-              if (pT <= 1 && pT > 0.5) npxdDigitInROI[4]++;
-              if (pT <= 0.5 && pT > 0.3) npxdDigitInROI[3]++;
-              if (pT <= 0.3 && pT > 0.2) npxdDigitInROI[2]++;
-              if (pT <= 0.2 && pT > 0.1) npxdDigitInROI[1]++;
-              if (pT <= 0.1) npxdDigitInROI[0]++;
+                  tmpArea = (theROIid->getMaxUid() - theROIid->getMinUid()) * (theROIid->getMaxVid() - theROIid->getMinVid());
 
+                  distanceROI = TMath::Power(tmpDistU, 2) + TMath::Power(tmpDistV, 2);
 
-              MissingHit = false;
+                }
+              }
 
-              break; // To avoid double counting
+              if (theROIid->Contains(*(pxdRelations[iPXDDigit]))) { //CASO1
 
-            } //if theROIid contains
-          } //if (theROIid)
-        } //if (theintercept)
-      } //(end loop on intercept list)
+                onceHit = true;
 
+                m_h1GlobalTime->Fill(m_globalTime);
 
-      if (MissingHit) {
+                m_h1PullU->Fill((m_coorU - m_coorUmc) / m_sigmaU);
+                m_h1PullV->Fill((m_coorV - m_coorVmc) / m_sigmaV);
 
-        if (theROI && roiRightVxdID) { //CASO2
+                m_h1ResidU->Fill(m_coorU - m_coorUmc);
+                m_h1ResidV->Fill(m_coorV - m_coorVmc);
 
-          onceNoHit2 = true;
-          m_h1GlobalTimeFail->Fill(m_globalTime);
+                m_h1SigmaU->Fill(m_sigmaU);
+                m_h1SigmaV->Fill(m_sigmaV);
 
-          m_h1PullUFail->Fill(tmpPullU);
-          m_h1PullVFail->Fill(tmpPullV);
+                m_h1area->Fill(tmpArea);
+                totArea = totArea + tmpArea;
+                nROIs++;
 
-          m_h1ResidUFail->Fill(tmpResidU);
-          m_h1ResidVFail->Fill(tmpResidV);
+                m_h1Phi->Fill(m_phimc);
+                m_h1Theta->Fill(m_thetamc);
+                m_h1CosTheta->Fill(m_costhetamc);
+                m_h1Lambda->Fill(m_lambdamc);
+                m_h1pt->Fill(pT);
 
-          m_h1SigmaUFail->Fill(tmpSigmaU);
-          m_h1SigmaVFail->Fill(tmpSigmaV);
-
-          m_h1DistUFail->Fill(tmpDistU);
-          m_h1DistVFail->Fill(tmpDistV);
-          m_h2DistUVFail->Fill(tmpDistU, tmpDistV);
-
-          m_h1areaFail->Fill(tmpArea);
-
-          n_noHit2 ++;
-
-          if (pT > 1) nnoHit2[5]++;
-          if (pT <= 1 && pT > 0.5) nnoHit2[4]++;
-          if (pT <= 0.5 && pT > 0.3) nnoHit2[3]++;
-          if (pT <= 0.3 && pT > 0.2) nnoHit2[2]++;
-          if (pT <= 0.2 && pT > 0.1) nnoHit2[1]++;
-          if (pT <= 0.1) nnoHit2[0]++;
+                if (pT > 1) npxdDigitInROI[5]++;
+                if (pT <= 1 && pT > 0.5) npxdDigitInROI[4]++;
+                if (pT <= 0.5 && pT > 0.3) npxdDigitInROI[3]++;
+                if (pT <= 0.3 && pT > 0.2) npxdDigitInROI[2]++;
+                if (pT <= 0.2 && pT > 0.1) npxdDigitInROI[1]++;
+                if (pT <= 0.1) npxdDigitInROI[0]++;
 
 
-          cout << "@";
-        }
+                MissingHit = false;
 
-        if (theROI && !roiRightVxdID) { //CASO3
-          onceNoHit3 = true;
-          if (pT > 1) nnoHit3[5]++;
-          if (pT <= 1 && pT > 0.5) nnoHit3[4]++;
-          if (pT <= 0.5 && pT > 0.3) nnoHit3[3]++;
-          if (pT <= 0.3 && pT > 0.2) nnoHit3[2]++;
-          if (pT <= 0.2 && pT > 0.1) nnoHit3[1]++;
-          if (pT <= 0.1) nnoHit3[0]++;
+                break; // To avoid double counting
 
-          n_noHit3 ++;
-          cout << "#";
-        }
-
-        if (!theROI && interceptRightVxdID) { //CASO4
-          onceNoROI4 = true;
-          if (pT > 1) nnoROI4[5]++;
-          if (pT <= 1 && pT > 0.5) nnoROI4[4]++;
-          if (pT <= 0.5 && pT > 0.3) nnoROI4[3]++;
-          if (pT <= 0.3 && pT > 0.2) nnoROI4[2]++;
-          if (pT <= 0.2 && pT > 0.1) nnoROI4[1]++;
-          if (pT <= 0.1) nnoROI4[0]++;
-
-          m_h1GlobalTimeNoROI->Fill(m_globalTime);
-
-          m_h1PullUNoROI->Fill(tmpPullU);
-          m_h1PullVNoROI->Fill(tmpPullV);
-
-          m_h1ResidUNoROI->Fill(tmpResidU);
-          m_h1ResidVNoROI->Fill(tmpResidV);
-
-          m_h1SigmaUNoROI->Fill(tmpSigmaU);
-          m_h1SigmaVNoROI->Fill(tmpSigmaV);
-
-          cout << "$";
-          n_noROI4 ++;
-        }
-        if (!theROI && !interceptRightVxdID) { //CASO5
-
-          //    if((pxdRelations[iPXDDigit]->getSensorID()).getLayerNumber() == 1)
-          m_h2MapBad_L1->Fill(globalSensorPos.Perp() , globalSensorPos.Phi());
-          //    else
-          //      m_h2MapBad_L2->Fill( globalSensorPos.Perp() , globalSensorPos.Phi());
+              } //if theROIid contains
+            } //if (theROIid)
+          } //if (theintercept)
+        } //(end loop on intercept list)
 
 
 
-          if (!onceNoROI5) {
-            m_hNhitsBad->Fill(trackCandList[i]->getNHits());
-            if ((pxdRelations[iPXDDigit]->getSensorID()).getLayerNumber() == 1) {
-              m_h1PhiBad_L1->Fill(m_phimc);
-              if (abs(m_lambdamc) < 10)
-                m_h1PhiBadLambda0_L1->Fill(m_phimc);
-              if (m_lambdamc > 55)
-                m_h1PhiBadLambdaF_L1->Fill(m_phimc);
-            } else {
-              m_h1PhiBad_L2->Fill(m_phimc);
-              if (abs(m_lambdamc) < 10)
-                m_h1PhiBadLambda0_L2->Fill(m_phimc);
-              if (m_lambdamc > 55)
-                m_h1PhiBadLambdaF_L2->Fill(m_phimc);
-            }
+        if (MissingHit) {
+
+          if (theROI && roiRightVxdID) { //CASO2
+
+            onceNoHit2 = true;
+            m_h1GlobalTimeFail->Fill(m_globalTime);
+
+            m_h1PullUFail->Fill(tmpPullU);
+            m_h1PullVFail->Fill(tmpPullV);
+
+            m_h1ResidUFail->Fill(tmpResidU);
+            m_h1ResidVFail->Fill(tmpResidV);
+
+            m_h1SigmaUFail->Fill(tmpSigmaU);
+            m_h1SigmaVFail->Fill(tmpSigmaV);
+
+            m_h1DistUFail->Fill(tmpDistU);
+            m_h1DistVFail->Fill(tmpDistV);
+            m_h2DistUVFail->Fill(tmpDistU, tmpDistV);
+
+            m_h1areaFail->Fill(tmpArea);
+
+            n_noHit2 ++;
+
+            if (pT > 1) nnoHit2[5]++;
+            if (pT <= 1 && pT > 0.5) nnoHit2[4]++;
+            if (pT <= 0.5 && pT > 0.3) nnoHit2[3]++;
+            if (pT <= 0.3 && pT > 0.2) nnoHit2[2]++;
+            if (pT <= 0.2 && pT > 0.1) nnoHit2[1]++;
+            if (pT <= 0.1) nnoHit2[0]++;
+
+
+            cout << "@";
           }
-          onceNoROI5 = true;
 
-          if (pT > 1) nnoROI5[5]++;
-          if (pT <= 1 && pT > 0.5) nnoROI5[4]++;
-          if (pT <= 0.5 && pT > 0.3) nnoROI5[3]++;
-          if (pT <= 0.3 && pT > 0.2) nnoROI5[2]++;
-          if (pT <= 0.2 && pT > 0.1) nnoROI5[1]++;
-          if (pT <= 0.1) nnoROI5[0]++;
+          if (theROI && !roiRightVxdID) { //CASO3
+            onceNoHit3 = true;
+            if (pT > 1) nnoHit3[5]++;
+            if (pT <= 1 && pT > 0.5) nnoHit3[4]++;
+            if (pT <= 0.5 && pT > 0.3) nnoHit3[3]++;
+            if (pT <= 0.3 && pT > 0.2) nnoHit3[2]++;
+            if (pT <= 0.2 && pT > 0.1) nnoHit3[1]++;
+            if (pT <= 0.1) nnoHit3[0]++;
 
-          // m_h1PhiBad->Fill(m_phimc);
-          // m_h1ThetaBad->Fill(m_thetamc);
-          // m_h1CosThetaBad->Fill(m_costhetamc);
-          // m_h1LambdaBad->Fill(m_lambdamc);
+            n_noHit3 ++;
+            cout << "#";
+          }
 
-          // m_h1ptBad->Fill(pT);
+          if (!theROI && interceptRightVxdID) { //CASO4
+            onceNoROI4 = true;
+            if (pT > 1) nnoROI4[5]++;
+            if (pT <= 1 && pT > 0.5) nnoROI4[4]++;
+            if (pT <= 0.5 && pT > 0.3) nnoROI4[3]++;
+            if (pT <= 0.3 && pT > 0.2) nnoROI4[2]++;
+            if (pT <= 0.2 && pT > 0.1) nnoROI4[1]++;
+            if (pT <= 0.1) nnoROI4[0]++;
 
-          //digits stuff
-          if (m_globalTime < 1)
-            m_h1LambdaBad_timeL1->Fill(m_lambdamc);
-          else
-            m_h1LambdaBad_timeG1->Fill(m_lambdamc);
+            m_h1GlobalTimeNoROI->Fill(m_globalTime);
 
-          m_h1GlobalTimeBad->Fill(m_globalTime);
-          m_h1CoorUBad->Fill(m_coorUmc);
-          m_h1CoorVBad->Fill(m_coorVmc);
-          m_h2CoorUVBad->Fill(m_coorUmc, m_coorVmc);
+            m_h1PullUNoROI->Fill(tmpPullU);
+            m_h1PullVNoROI->Fill(tmpPullV);
 
-          cout << "%";
-          n_noROI5 ++;
+            m_h1ResidUNoROI->Fill(tmpResidU);
+            m_h1ResidVNoROI->Fill(tmpResidV);
+
+            m_h1SigmaUNoROI->Fill(tmpSigmaU);
+            m_h1SigmaVNoROI->Fill(tmpSigmaV);
+
+            cout << "$";
+            n_noROI4 ++;
+          }
+          if (!theROI && !interceptRightVxdID) { //CASO5
+
+            //    if((pxdRelations[iPXDDigit]->getSensorID()).getLayerNumber() == 1)
+            m_h2MapBad_L1->Fill(globalSensorPos.Perp() , globalSensorPos.Phi());
+            //    else
+            //      m_h2MapBad_L2->Fill( globalSensorPos.Perp() , globalSensorPos.Phi());
+
+
+
+            if (!onceNoROI5) {
+              //            m_hNhitsBad->Fill(trackCandList[i]->getNHits());
+              if ((pxdRelations[iPXDDigit]->getSensorID()).getLayerNumber() == 1) {
+                m_h1PhiBad_L1->Fill(m_phimc);
+                if (abs(m_lambdamc) < 10)
+                  m_h1PhiBadLambda0_L1->Fill(m_phimc);
+                if (m_lambdamc > 55)
+                  m_h1PhiBadLambdaF_L1->Fill(m_phimc);
+              } else {
+                m_h1PhiBad_L2->Fill(m_phimc);
+                if (abs(m_lambdamc) < 10)
+                  m_h1PhiBadLambda0_L2->Fill(m_phimc);
+                if (m_lambdamc > 55)
+                  m_h1PhiBadLambdaF_L2->Fill(m_phimc);
+              }
+            }
+            onceNoROI5 = true;
+
+            if (pT > 1) nnoROI5[5]++;
+            if (pT <= 1 && pT > 0.5) nnoROI5[4]++;
+            if (pT <= 0.5 && pT > 0.3) nnoROI5[3]++;
+            if (pT <= 0.3 && pT > 0.2) nnoROI5[2]++;
+            if (pT <= 0.2 && pT > 0.1) nnoROI5[1]++;
+            if (pT <= 0.1) nnoROI5[0]++;
+
+            // m_h1PhiBad->Fill(m_phimc);
+            // m_h1ThetaBad->Fill(m_thetamc);
+            // m_h1CosThetaBad->Fill(m_costhetamc);
+            // m_h1LambdaBad->Fill(m_lambdamc);
+
+            // m_h1ptBad->Fill(pT);
+
+            //digits stuff
+            if (m_globalTime < 1)
+              m_h1LambdaBad_timeL1->Fill(m_lambdamc);
+            else
+              m_h1LambdaBad_timeG1->Fill(m_lambdamc);
+
+            m_h1GlobalTimeBad->Fill(m_globalTime);
+            m_h1CoorUBad->Fill(m_coorUmc);
+            m_h1CoorVBad->Fill(m_coorVmc);
+            m_h2CoorUVBad->Fill(m_coorUmc, m_coorVmc);
+
+            cout << "%";
+            n_noROI5 ++;
+          }
+        } else {
+          n_pxdDigitInROI ++;
+          cout << "+";
         }
-      } else {
-        n_pxdDigitInROI ++;
-        cout << "+";
       }
-    }
 
-    if (onceHit) NtrackHit++;
-    if (onceNoHit2) NtrackNoHit2++;
-    if (onceNoHit3) NtrackNoHit3++;
-    if (onceNoROI4) NtrackNoROI4++;
-    if (onceNoROI5) { // && onceHit) {
-      //    if(onceNoROI5 && !onceHit && !onceNoHit2 && !onceNoHit3 && !onceNoROI4) {
-      NtrackNoROI5++;
-      /*      if (pT > 1) nnoROI5[5]++;
-      if (pT <= 1 && pT > 0.5) nnoROI5[4]++;
-      if (pT <= 0.5 && pT > 0.3) nnoROI5[3]++;
-      if (pT <= 0.3 && pT > 0.2) nnoROI5[2]++;
-      if (pT <= 0.2 && pT > 0.1) nnoROI5[1]++;
-      if (pT <= 0.1) nnoROI5[0]++;*/
-      m_h1PhiBad->Fill(m_phimc);
-      m_h1ThetaBad->Fill(m_thetamc);
-      m_h1CosThetaBad->Fill(m_costhetamc);
-      m_h1LambdaBad->Fill(m_lambdamc);
+      if (onceHit) NtrackHit++;
+      if (onceNoHit2) NtrackNoHit2++;
+      if (onceNoHit3) NtrackNoHit3++;
+      if (onceNoROI4) NtrackNoROI4++;
+      if (onceNoROI5) { // && onceHit) {
+        //    if(onceNoROI5 && !onceHit && !onceNoHit2 && !onceNoHit3 && !onceNoROI4) {
+        NtrackNoROI5++;
+//            if (pT > 1) nnoROI5[5]++;
+//      if (pT <= 1 && pT > 0.5) nnoROI5[4]++;
+//      if (pT <= 0.5 && pT > 0.3) nnoROI5[3]++;
+//      if (pT <= 0.3 && pT > 0.2) nnoROI5[2]++;
+//      if (pT <= 0.2 && pT > 0.1) nnoROI5[1]++;
+//      if (pT <= 0.1) nnoROI5[0]++;
+        m_h1PhiBad->Fill(m_phimc);
+        m_h1ThetaBad->Fill(m_thetamc);
+        m_h1CosThetaBad->Fill(m_costhetamc);
+        m_h1LambdaBad->Fill(m_lambdamc);
 
-      m_h1ptBad->Fill(pT);
-    }
-  }
+        m_h1ptBad->Fill(pT);
+      }
+
+    }// close loop on MCParticlet
+  }// close loop on trackList
 
   m_rootEvent++;
   m_h1totarea->Fill(totArea);
@@ -802,13 +774,14 @@ void PXDDataRedAnalysisModule::terminate()
   B2INFO("         wrong vxdID: " << n_noROI5);
   B2INFO("");
 
+
   B2INFO(" N tracks hit = " << NtrackHit);
   B2INFO(" N tracks No Hit = " << NtrackNoHit2 << " + " << NtrackNoHit3);
   B2INFO(" N tracks No ROI = " << NtrackNoROI4 << " + " << NtrackNoROI5);
   B2INFO("overlap = " << NtrackHit + NtrackNoHit2 + NtrackNoHit3 + NtrackNoROI4 + NtrackNoROI5 - n_tracks);
   B2INFO("");
 
-  B2INFO(" pT > 1");
+  B2INFO(" pT > 1 : " << pt[5]);
   B2INFO("       no hit: " << nnoHit2[5] << " + " << nnoHit3[5]);
   B2INFO("       no ROI: " << nnoROI4[5] << " + " << nnoROI5[5]);
   B2INFO("    pxdDigit : " << npxdDigit[5]);
@@ -818,7 +791,7 @@ void PXDDataRedAnalysisModule::terminate()
   B2INFO("  efficiency : " << epsilon[5] << " +/- " << epsilonErr[5]);
 
   B2INFO("");
-  B2INFO(" 0.5 < pT < 1");
+  B2INFO(" 0.5 < pT < 1 : " << pt[4]);
   B2INFO("       no hit: " << nnoHit2[4] << " + " << nnoHit3[4]);
   B2INFO("       no ROI: " << nnoROI4[4] << " + " << nnoROI5[4]);
   B2INFO("    pxdDigit : " << npxdDigit[4]);
@@ -828,7 +801,7 @@ void PXDDataRedAnalysisModule::terminate()
   B2INFO("  efficiency : " << epsilon[4] << " +/- " << epsilonErr[4]);
 
   B2INFO("");
-  B2INFO(" 0.3 < pT < 0.5");
+  B2INFO(" 0.3 < pT < 0.5 : " << pt[3]);
   B2INFO("       no hit: " << nnoHit2[3] << " + " << nnoHit3[3]);
   B2INFO("       no ROI: " << nnoROI4[3] << " + " << nnoROI5[3]);
   B2INFO("    pxdDigit : " << npxdDigit[3]);
@@ -839,7 +812,7 @@ void PXDDataRedAnalysisModule::terminate()
 
 
   B2INFO("");
-  B2INFO(" 0.2 < pT < 0.3");
+  B2INFO(" 0.2 < pT < 0.3 : " << pt[2]);
   B2INFO("       no hit: " << nnoHit2[2] << " + " << nnoHit3[2]);
   B2INFO("       no ROI: " << nnoROI4[2] << " + " << nnoROI5[2]);
   B2INFO("    pxdDigit : " << npxdDigit[2]);
@@ -850,7 +823,7 @@ void PXDDataRedAnalysisModule::terminate()
 
 
   B2INFO("");
-  B2INFO(" 0.1 < pT < 0.2");
+  B2INFO(" 0.1 < pT < 0.2 : " << pt[1]);
 
   B2INFO("       no hit: " << nnoHit2[1] << " + " << nnoHit3[1]);
   B2INFO("       no ROI: " << nnoROI4[1] << " + " << nnoROI5[1]);
@@ -862,7 +835,7 @@ void PXDDataRedAnalysisModule::terminate()
 
 
   B2INFO("");
-  B2INFO(" pT < 0.1");
+  B2INFO(" pT < 0.1 : " << pt[0]);
   B2INFO("       no hit: " << nnoHit2[0] << " + " << nnoHit3[0]);
   B2INFO("       no ROI: " << nnoROI4[0] << " + " << nnoROI5[0]);
   B2INFO("    pxdDigit : " << npxdDigit[0]);
@@ -870,6 +843,13 @@ void PXDDataRedAnalysisModule::terminate()
   epsilon[0] = (double)npxdDigitInROI[0] / (double) npxdDigit[0];
   epsilonErr[0] = sqrt(epsilon[0] * (1 - epsilon[0]) / npxdDigit[0]);
   B2INFO("  efficiency : " << epsilon[0] << " +/- " << epsilonErr[0]);
+
+
+  B2INFO("legend:");
+  B2INFO(" CASO2:  if (theROI && roiRightVxdID)");
+  B2INFO(" CASO3:  if (theROI && !roiRightVxdID)");
+  B2INFO(" CASO4:  if (!theROI && interceptRightVxdID)");
+  B2INFO(" CASO5:  if (!theROI && !interceptRightVxdID)");
 
   m_gEff = new TGraphErrors(6, pt, epsilon, ptErr, epsilonErr);
   m_gEff->SetName("g_eff");
@@ -964,7 +944,7 @@ void PXDDataRedAnalysisModule::terminate()
 
 
 
-  cout << "****TrackCand wth no MCPart = " << m_nNoMCPart << endl;
+  cout << "****Trackcandlistand wth no MCPart = " << m_nNoMCPart << endl;
 
 
 

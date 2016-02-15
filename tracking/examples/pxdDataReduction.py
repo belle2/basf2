@@ -35,6 +35,10 @@ eventinfosetter.param('evtNumList', [numEvents])
 eventinfoprinter = register_module('EventInfoPrinter')
 gearbox = register_module('Gearbox')
 
+eventCounter = register_module('EventCounter')
+eventCounter.logging.log_level = LogLevel.INFO
+eventCounter.param('stepSize', 25)
+
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.logging.log_level = LogLevel.INFO
 
@@ -50,28 +54,31 @@ track_finder_mc_truth.logging.log_level = LogLevel.INFO
 
 # select which detectors you would like to use
 param_track_finder_mc_truth = {
-    'UseCDCHits': 0,
+    'UseCDCHits': 1,
     'UseSVDHits': 1,
     'UsePXDHits': 0,
     'MinimalNDF': 6,
     'UseClusters': 1,
     'WhichParticles': ['PXD', 'SVD'],
-    'GFTrackCandidatesColName': 'mcTracks',
+    'GFTrackCandidatesColName': 'mcTrackCands',
 }
 track_finder_mc_truth.param(param_track_finder_mc_truth)
 
-eventCounter = register_module('EventCounter')
-eventCounter.logging.log_level = LogLevel.INFO
-eventCounter.param('stepSize', 25)
-
-rootOutput = register_module('RootOutput')
-
+# track fitting
 setupGenfit = register_module('SetupGenfitExtrapolation')
+
+trackfitter = register_module('GenFitter')
+trackfitter.param({'BuildBelle2Tracks': False,
+                   "GFTracksColName": 'mcTracks',
+                   "PDGCodes": [211],
+                   'GFTrackCandidatesColName': 'mcTrackCands'})
+trackfitter.set_name('SVD-only GenFitter')
+
 
 pxdDataRed = register_module('PXDDataReduction')
 pxdDataRed.logging.log_level = LogLevel.INFO
 param_pxdDataRed = {
-    'trackCandCollName': 'mcTracks',
+    'gfTrackListName': 'mcTracks',
     'PXDInterceptListName': 'PXDIntercepts',
     'ROIListName': 'ROIs',
     'sigmaSystU': 0.02,
@@ -84,15 +91,17 @@ param_pxdDataRed = {
 pxdDataRed.param(param_pxdDataRed)
 
 pxdDataRedAnalysis = register_module('PXDDataRedAnalysis')
-pxdDataRedAnalysis.logging.log_level = LogLevel.INFO
+pxdDataRedAnalysis.logging.log_level = LogLevel.DEBUG
 param_pxdDataRedAnalysis = {
-    'trackCandCollName': 'mcTracks',
+    'gfTrackListName': 'mcTracks',
     'PXDInterceptListName': 'PXDIntercepts',
     'ROIListName': 'ROIs',
     'writeToRoot': True,
-    'rootFileName': 'pxdDataRedAnalysis_original',
+    'rootFileName': 'pxdDataRedAnalysis_SVDCDC_MCTF',
 }
 pxdDataRedAnalysis.param(param_pxdDataRedAnalysis)
+
+rootOutput = register_module('RootOutput')
 
 # Create paths
 main = create_path()
@@ -112,9 +121,10 @@ main.add_module(evtgeninput)
 add_simulation(main)
 main.add_module(track_finder_mc_truth)
 main.add_module(setupGenfit)
+main.add_module(trackfitter)
 main.add_module(pxdDataRed)
 main.add_module(pxdDataRedAnalysis)
-main.add_module(rootOutput)
+# main.add_module(rootOutput)
 
 # Process events
 process(main)

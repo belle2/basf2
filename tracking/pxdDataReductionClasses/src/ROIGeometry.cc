@@ -36,12 +36,10 @@ ROIGeometry::~ROIGeometry()
 
 void
 ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
-                              genfit::Track* theTrack, int theGFTrackCandIndex,
-                              RelationArray* gfTrackCandToPXDIntercepts)
+                              genfit::Track* theTrack, int theGFTrackIndex,
+                              RelationArray* gfTrackToPXDIntercepts)
 {
 
-  //  TVectorD predictedIntersect(theTrack->getCardinalRep()->getDim());
-  //  TMatrixDSym covMatrix(theTrack->getCardinalRep()->getDim());
   PXDIntercept tmpPXDIntercept;
 
   std::list<ROIDetPlane>::iterator itPlanes = m_planeList.begin();
@@ -81,7 +79,7 @@ ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
 
       listToBeFilled->appendNew(tmpPXDIntercept);
 
-      gfTrackCandToPXDIntercepts->add(theGFTrackCandIndex, listToBeFilled->getEntries() - 1);
+      gfTrackToPXDIntercepts->add(theGFTrackIndex, listToBeFilled->getEntries() - 1);
 
       itPlanes++;
 
@@ -110,13 +108,20 @@ ROIGeometry::fillPlaneList()
     while (itPxdLadders != pxdLadders.end()) {
 
       std::set<Belle2::VxdID> pxdSensors = aGeometry.getSensors(*itPxdLadders);
+      std::set<Belle2::VxdID>::iterator itPxdSensors = pxdSensors.begin();
       B2DEBUG(1, "    pxd sensor info " << * (pxdSensors.begin()));
 
-      ROIDetPlane plane(* (pxdSensors.begin()));
+      while (itPxdSensors != pxdSensors.end()) {
+        B2DEBUG(1, "    pxd sensor info " << *itPxdSensors);
 
-      plane.Print();
-      m_planeList.push_back(plane);
+        ROIDetPlane plane(*itPxdSensors);
 
+
+        plane.Print();
+        m_planeList.push_back(plane);
+
+        itPxdSensors++;
+      }
       itPxdLadders++;
     }
     itPxdLayers++;

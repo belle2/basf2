@@ -39,7 +39,7 @@ namespace Belle2 {
     /** Append the PXDIntercept infos related to the track theTrack to the listToBeFilled.
      */
     void appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled, genfit::Track* theTrack,
-                          int theGFTrackCandIndex, RelationArray* gfTrackCandToPXDIntercepts);
+                          int theGFTrackIndex, RelationArray* gfTrackToPXDIntercepts);
 
     std::list<ROIDetPlane> m_planeList; /**< list of planes*/
 

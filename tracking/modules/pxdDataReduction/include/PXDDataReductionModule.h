@@ -66,7 +66,6 @@ namespace Belle2 {
 
     ROIPixelTranslator* m_thePixelTranslator; /**< the pixel translator object*/
     PXDInterceptor* m_thePXDInterceptor; /**< the pxd interceptor object*/
-    std::string m_gfTrackCandsColName; /**< TrackCand list name*/
     std::string m_PXDInterceptListName; /**< intercept list name*/
     std::string m_ROIListName; /**< ROI list name*/
     std::string m_badTracksListName; /**< bad track list name*/
@@ -82,13 +81,6 @@ namespace Belle2 {
     double m_maxWidthV;  /**< maximum V width of the ROI */
 
     ROIinfo m_ROIinfo; /**< contains the parameters that can be changed by the user*/
-
-    /*    inline double getSigmaSystU(){return m_sigmaSystU;};
-    inline double getSigmaSystV(){return m_sigmaSystV;};
-    inline double getNumSigmaTotU(){return m_numSigmaTotU;};
-    inline double getNumSigmaTotV(){return m_numSigmaTotV;};
-    inline double getMaxWidthU(){return m_maxWidthU;};
-    inline double getMaxWidthV(){return m_maxWidthV;};*/
 
   private:
 

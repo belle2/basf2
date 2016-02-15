@@ -63,7 +63,7 @@ namespace Belle2 {
 
   private:
 
-    std::string m_gfTrackCandsColName; /**< TrackCand list name */
+    std::string m_gfTrackListName; /**< Track list name */
     std::string m_PXDInterceptListName; /**< Intercept list name */
     std::string m_ROIListName; /**< ROI list name */
 

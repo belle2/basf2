@@ -45,13 +45,14 @@ namespace Belle2 {
     /** Fill the list of PXD intecepts corresponding to the list of track candidates.
      */
     void fillInterceptList(StoreArray<PXDIntercept>* listToBeFilled,
-                           const StoreArray<genfit::TrackCand>& trackCandList,
-                           RelationArray* gfTrackCandToPXDIntercepts);
+                           const StoreArray<genfit::Track>& trackList,
+                           RelationArray* gfTrackToPXDIntercepts);
 
     /**
      * Set the nuber of iterations of the Kalman Filter to numIterKalmanFilter
      */
-    void setNumIterKalmanFilter(int numIterKalmanFilter) {
+    void setNumIterKalmanFilter(int numIterKalmanFilter)
+    {
       m_kalmanFilter.setMinIterations(numIterKalmanFilter);
     };
 

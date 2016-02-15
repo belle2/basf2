@@ -29,18 +29,16 @@
 #include <genfit/WireTrackCandHit.h>
 
 #include <boost/foreach.hpp>
-#include <boost/math/special_functions/sign.hpp>
 
 #include <TRandom.h>
 
-#include <utility>
+#include <vector>
+#include <string>
 #include <sstream>
 #include <cmath>
 
 
-using namespace std;
 using namespace Belle2;
-using boost::math::sign;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -112,7 +110,7 @@ TrackFinderMCTruthModule::TrackFinderMCTruthModule() : Module()
            "\"PXD\", \"SVD\", \"CDC\", \"TOP\", \"ARICH\", \"ECL\" or \"KLM\" particle must have hits in the subdetector with that name. "
            "\"is:X\" where X is a PDG code: particle must have this code. "
            "\"from:X\" any of the particles's ancestors must have this (X) code",
-           vector<string>(1, "primary"));
+           std::vector<std::string>(1, "primary"));
 
   addParam("EnergyCut",
            m_energyCut,
@@ -137,12 +135,12 @@ TrackFinderMCTruthModule::TrackFinderMCTruthModule() : Module()
            "This matrix will also passed to Genfit as the initial covarance matrix. "
            "If any diagonal value is negative this feature will not be used. "
            "OFF DIAGNOLA ELEMENTS DO NOT HAVE AN EFFECT AT THE MOMENT",
-           vector<double>(36, -1.0));
+           std::vector<double>(36, -1.0));
   // names of output containers
   addParam("GFTrackCandidatesColName",
            m_gfTrackCandsColName,
            "Name of collection holding the genfit::TrackCandidates (output)",
-           string(""));
+           std::string(""));
 
   addParam("TrueHitMustExist",
            m_enforceTrueHit,
@@ -190,13 +188,13 @@ void TrackFinderMCTruthModule::initialize()
     } else if (m_whichParticles[i] == "KLM") {
       m_particleProperties += 128;
     } else if (m_whichParticles[i].substr(0, 3) == "is:") {
-      string pdgCodeString = m_whichParticles[i].substr(3);
-      stringstream(pdgCodeString) >> aPdgCode;
+      std::string pdgCodeString = m_whichParticles[i].substr(3);
+      std::stringstream(pdgCodeString) >> aPdgCode;
       B2DEBUG(100, "PDG code added to m_particlePdgCodes " << aPdgCode << " *******");
       m_particlePdgCodes.push_back(aPdgCode);
     } else if (m_whichParticles[i].substr(0, 5) == "from:") {
-      string pdgCodeString = m_whichParticles[i].substr(5);
-      stringstream(pdgCodeString) >> aPdgCode;
+      std::string pdgCodeString = m_whichParticles[i].substr(5);
+      std::stringstream(pdgCodeString) >> aPdgCode;
       B2DEBUG(100, "PDG code added to m_fromPdgCodes " << aPdgCode << " *******");
       m_fromPdgCodes.push_back(aPdgCode);
     } else {
@@ -307,13 +305,15 @@ void TrackFinderMCTruthModule::event()
   trackCandidates.create();
   RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
 
-  //an auxiliary variable to discard neutrals if necessary (assume that no particles with charge -999 exist)
-  float forbiddenCharge = -999;
-  if (m_neutrals == false) {forbiddenCharge = 0;}
-
   // loop over MCParticles. And check several user selected properties. Make a track candidate only if MCParticle has properties wanted by user options.
   for (int iPart = 0; iPart < nMcParticles; ++iPart) {
     MCParticle* aMcParticlePtr = mcParticles[iPart];
+    // Ignore particles that didn't propagate significantly, they cannot make tracks.
+    if ((aMcParticlePtr->getDecayVertex() - aMcParticlePtr->getProductionVertex()).Mag() < 1 * Unit::cm) {
+      B2DEBUG(200, "Particle that did not propagate significantly cannot make track.");
+      continue;
+    }
+
     //set the property mask for this particle and compare it to the one generated from user input
     int mcParticleProperties = 0;
     if (aMcParticlePtr->hasStatus(MCParticle::c_PrimaryParticle)) {
@@ -346,9 +346,9 @@ void TrackFinderMCTruthModule::event()
               " demanded property mask " << m_particleProperties);
       continue; //goto next mcParticle, do not make track candidate
     }
-    //make links only for interesting MCParticles: energy cut and check for neutrals
-    if (aMcParticlePtr->getEnergy() < m_energyCut || aMcParticlePtr->getCharge() == forbiddenCharge) {
-      B2DEBUG(100, "particle energy too low or does not have the right charge. mc particle will be skiped");
+    //make links only for interesting MCParticles: energy cut
+    if (aMcParticlePtr->getEnergy() < m_energyCut) {
+      B2DEBUG(100, "particle energy too low.  MC particle will be skipped");
       continue; //goto next mcParticle, do not make track candidate
     }
 
@@ -371,7 +371,6 @@ void TrackFinderMCTruthModule::event()
 
 
     //check if particle has an ancestor selected by the user. If user did not set any pdg code every code is fine for track candidate creation
-    //cerr << "check" << endl;
     const int nFromPdgCodes = m_fromPdgCodes.size();
     if (nFromPdgCodes not_eq 0) {
       MCParticle* currentMother = aMcParticlePtr->getMother();
@@ -379,24 +378,34 @@ void TrackFinderMCTruthModule::event()
       int nAncestor = 0;
       while (currentMother not_eq NULL) {
         int currentMotherPdgCode = currentMother->getPDG();
-        //cerr << "pdg code outer loop " << currentMotherPdgCode << endl;
         for (int i = 0; i not_eq nFromPdgCodes; ++i) {
-          //cerr << "m_fromPdgCodes[i] " << m_fromPdgCodes[i] << endl;
           if (m_fromPdgCodes[i] not_eq currentMotherPdgCode) {
-            //cerr << "waaaa" << endl;
             ++nFalsePdgCodes;
           }
         }
 
         currentMother = currentMother->getMother();
         ++nAncestor;
-        //cerr << currentMother << " " << nAncestor << endl;
       }
-      //cerr << "nFalsePdgCodes " << nFalsePdgCodes << " nAncestor " << nAncestor << " nFromPdgCodes " << nFromPdgCodes<< endl;
       if (nFalsePdgCodes == (nAncestor * nFromPdgCodes)) {
         B2DEBUG(100, "particle does not have and ancestor with one of the user provided pdg codes and will therefore be skipped");
         continue; //goto next mcParticle, do not make track candidate
       }
+    }
+
+    // Ignore baryons, except for deuteron.  The purpose is mainly to
+    // avoid an error message when getCharge() is called below.
+    if (abs(aMcParticlePtr->getPDG()) > 1000000000
+        && abs(aMcParticlePtr->getPDG()) != 1000010020) {
+      B2DEBUG(200, "Skipped Baryon.");
+      continue; //goto next mcParticle, do not make track candidate
+
+    }
+
+    // ignore neutrals (unless requested)
+    if (!m_neutrals && aMcParticlePtr->getCharge() == 0) {
+      B2DEBUG(100, "particle does not have the right charge. MC particle will be skipped");
+      continue; //goto next mcParticle, do not make track candidate
     }
 
 
@@ -404,7 +413,7 @@ void TrackFinderMCTruthModule::event()
 
     int ndf = 0; // cout the ndf of one track candidate
     // create a list containing the indices to the PXDHits that belong to one track
-    vector<int> pxdHitsIndices;
+    std::vector<int> pxdHitsIndices;
     if (m_usePXDHits == true) {
       if (m_useClusters == false) {
         for (int i = 0; i < nMcPartToPXDHits; ++i) {
@@ -433,7 +442,7 @@ void TrackFinderMCTruthModule::event()
       continue; //goto next mcParticle, do not make track candidate
     }
     // create a list containing the indices to the SVDHits that belong to one track
-    vector<int> svdHitsIndices;
+    std::vector<int> svdHitsIndices;
     if (m_useSVDHits == true) {
       if (m_useClusters == false) {
         for (int i = 0; i < nMcPartToSVDHits; ++i) {
@@ -465,7 +474,7 @@ void TrackFinderMCTruthModule::event()
     // create a list containing the indices to the CDCHits that belong to one track
     int nAxialHits = 0;
     int nStereoHits = 0;
-    vector<int> cdcHitsIndices;
+    std::vector<int> cdcHitsIndices;
     if (m_useCDCHits == true) {
       for (int i = 0; i < nMcPartToCDCHits; ++i) {
         if (mcPartToCDCHits[i].getFromIndex() == unsigned(iPart)) {

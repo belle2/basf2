@@ -50,6 +50,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
     # the output of the TrackFinderMCTruth.
     mctrackfinder = register_module('TrackFinderMCTruth')
     mctrackfinder.param('GFTrackCandidatesColName', 'MCTrackCands')
+    mctrackfinder.param('WhichParticles', [])
     path.add_module(mctrackfinder)
     mctrackmatcher = register_module('MCMatcherTracks')
     mctrackmatcher.param('MCGFTrackCandsColName', 'MCTrackCands')

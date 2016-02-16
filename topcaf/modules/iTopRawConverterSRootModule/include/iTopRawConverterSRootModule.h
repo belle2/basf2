@@ -1,8 +1,9 @@
 #ifndef iTopRawConverterSRootModule_H
 #define iTopRawConverterSRootModule_H
 
-#include <framework/core/Module.h>
+#include <istream>
 
+#include <framework/core/Module.h>
 #include <topcaf/dataobjects/EventHeaderPacket.h>
 #include <topcaf/dataobjects/EventWaveformPacket.h>
 // #include <topcaf/dataobjects/topFileMetaData.h>
@@ -24,7 +25,7 @@ namespace Belle2 {
 #define HSLB_B2L_HEADER 0xFFAA
 
   // struct for copper header
-  typedef struct {
+  struct CPR_hdr {
     unsigned int num_words;
     unsigned char block_words;
     unsigned char version;
@@ -40,26 +41,26 @@ namespace Belle2 {
     unsigned int offset_block2;
     unsigned int offset_block3;
     unsigned int offset_block4;
-  } CPR_hdr;
+  };
 
 // struct for HLSB header
-  typedef struct {
+  struct HSLB_hdr {
     unsigned short HSLB_tag;
     unsigned short B2L_hdr;  // should be 0xFFAA
-  } HSLB_hdr;
+  };
 
-  typedef struct {
+  struct CPR_ftr {
     unsigned int word1;
     unsigned int CPR_ftr;  // should be 0x7FFF0006
-  } CPR_ftr;
+  };
 
-  typedef struct {
+  struct B2L_ftr {
 //unsigned int TT_ctime;  // removed in PreRawCOPPER format
 //unsigned int TT_type;    // removed in PreRawCOPPER format
 //unsigned short TT_tag;  // replaced in PreRawCOPPER format by crc16 error count...?
     unsigned short B2L_crc16;
     unsigned short B2L_crc16_error_cnt;  // added in PocketDAQ, only one of TT_tag/B2L_crc16_error_cnt is valid
-  } B2L_ftr;
+  } ;
 
 //Class used to process raw events
   class iTopRawConverterSRootModule : public Module {
@@ -75,14 +76,15 @@ namespace Belle2 {
     void terminate();
     void beginRun();
     void event();
+    int parseData(std::istream&);
 
 //Original function
     EventHeaderPacket* GetEvtHeaderPacket();
     EventWaveformPacket* GetWaveformPacket();
 
   private:
-    packet_word_t readWordUnique(packet_word_t prev_word);
-    packet_word_t swap_endianess(packet_word_t x);
+    packet_word_t readWordUnique(std::istream&, packet_word_t);
+    packet_word_t swap_endianess(packet_word_t);
 
     int m_carrier, m_scrod, m_evt_no;
     EventHeaderPacket* m_EvtPacket;

@@ -43,6 +43,11 @@ template<typename PointType>
 void FBDTClassifier<PointType>::train(const std::vector<Belle2::FBDTTrainSample<PointType> >& samples,
                                       int nTrees, int depth, double shrinkage, double ratio)
 {
+  if (samples.empty()) {
+    B2ERROR("No samples passed for training a FBDTClassifier.");
+    return;
+  }
+
   unsigned int nFeatures = samples[0].hits.size() * 3; // three coordinates per hit
   unsigned int nBinCuts = 8;
 
@@ -88,5 +93,5 @@ void FBDTClassifier<PointType>::train(const std::vector<Belle2::FBDTTrainSample<
 }
 
 // explicit instantiation for SpacePoint in order to have .h and .cc file separated
-template class FBDTClassifier<Belle2::SpacePoint>;
-template class FBDTClassifier<VXDTFFilterTest::TestSpacePoint>; // for tests TODO: make the TestSpacePoint known here
+template class Belle2::FBDTClassifier<Belle2::SpacePoint>;
+template class Belle2::FBDTClassifier<VXDTFFilterTest::TestSpacePoint>; // for tests TODO: make the TestSpacePoint known here

@@ -724,7 +724,7 @@ namespace Belle2 {
   }
 
 
-  int
+  void
   CDCSensitiveDetector::saveSimHit(const G4int layerId,
                                    const G4int wireId,
                                    const G4int trackID,
@@ -746,7 +746,8 @@ namespace Belle2 {
   {
 
     // Discard the hit below Edep_th
-    if (edep <= m_thresholdEnergyDeposit) return 0;
+    //    if (edep <= m_thresholdEnergyDeposit) return 0;
+    if (edep <= m_thresholdEnergyDeposit) return;
 
     //compute tof at the closest point; linear approx.
     const G4double CorrectTof = tof + (posTrack - posIn).mag() / speed;
@@ -809,10 +810,10 @@ namespace Belle2 {
     //    if (hitWeight > 0) m_nPosHits++;
     //    if (hitWeight < 0) m_nNegHits++;
     //    std::cout <<"trackID,HitNumber,weight,driftL,edep= "<< trackID <<" "<< m_hitNumber <<" "<< hitWeight <<" "<< distance <<" "<< edep << std::endl;
-    return (m_hitNumber);
+    //    return (m_hitNumber);
   }
 
-  int
+  void
   CDCSensitiveDetector::saveEBSimHit(const G4int layerId,
                                      const G4double phi,
                                      const G4int trackID,
@@ -836,7 +837,7 @@ namespace Belle2 {
     simEBHit->setMomentum(momentum);
 
     B2DEBUG(150, "HitNumber: " << m_EBhitNumber);
-    return (m_EBhitNumber);
+    //    return (m_EBhitNumber);
   }
 
   /*

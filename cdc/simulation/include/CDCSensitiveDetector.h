@@ -56,32 +56,32 @@ namespace Belle2 {
       void reAssignLeftRightInfo();
 
       //! Save CDCSimHit into datastore
-      int saveSimHit(const G4int layerId,
-                     const G4int wireId,
-                     const G4int trackID,
-                     const G4int pid,
-                     const G4double distance,
-                     const G4double tof,
-                     const G4double edep,
-                     const G4double stepLength,
-                     const G4ThreeVector& mom,
-                     const G4ThreeVector& posW,
-                     const G4ThreeVector& posIn,
-                     const G4ThreeVector& posOut,
-                     const G4ThreeVector& posTrack,
-                     const G4int lr,
-                     const G4int NewLrRaw,
-                     const G4int NewLr,
-                     const G4double speed,
-                     const G4double hitWeight);
+      void saveSimHit(const G4int layerId,
+                      const G4int wireId,
+                      const G4int trackID,
+                      const G4int pid,
+                      const G4double distance,
+                      const G4double tof,
+                      const G4double edep,
+                      const G4double stepLength,
+                      const G4ThreeVector& mom,
+                      const G4ThreeVector& posW,
+                      const G4ThreeVector& posIn,
+                      const G4ThreeVector& posOut,
+                      const G4ThreeVector& posTrack,
+                      const G4int lr,
+                      const G4int NewLrRaw,
+                      const G4int NewLr,
+                      const G4double speed,
+                      const G4double hitWeight);
 
       //! Save CDCEBSimHit into datastore
-      int saveEBSimHit(const G4int layerId,
-                       const G4double phi,
-                       const G4int trackID,
-                       const G4int pid,
-                       const G4double edep,
-                       const G4ThreeVector& mom);
+      void saveEBSimHit(const G4int layerId,
+                        const G4double phi,
+                        const G4int trackID,
+                        const G4int pid,
+                        const G4double edep,
+                        const G4ThreeVector& mom);
 
       //void AddbgOne(bool doit);
 

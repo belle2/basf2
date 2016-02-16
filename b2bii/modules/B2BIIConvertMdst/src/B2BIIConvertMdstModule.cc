@@ -230,7 +230,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
 
 void B2BIIConvertMdstModule::beginRun()
 {
-  B2INFO("B2BIIConvertMdst: beginRun called.");
+  B2DEBUG(99, "B2BIIConvertMdst: beginRun called.");
 
   //BeamEnergy class updated by fixmdst module in beginRun()
   Belle::BeamEnergy::begin_run();
@@ -242,7 +242,7 @@ void B2BIIConvertMdstModule::beginRun()
   convertIPProfile(true);
   Belle::IpProfile::dump();
   bool usableIP = Belle::IpProfile::usable();
-  B2INFO("B2BIIConvertMdst: IpProfile is usable = " << usableIP);
+  B2DEBUG(99, "B2BIIConvertMdst: IpProfile is usable = " << usableIP);
 
   //init eID
 #ifdef HAVE_EID
@@ -307,7 +307,7 @@ void B2BIIConvertMdstModule::convertBeamEnergy()
   m_beamParams->setLER(Eler, angleLer, covariance);
   m_beamParams->setHER(Eher, angleHer, covariance);
 
-  B2INFO("Beam Energy: E_HER = " << Eher << "; E_LER = " << Eler << "; angle = " << crossingAngle);
+  B2DEBUG(99, "Beam Energy: E_HER = " << Eher << "; E_LER = " << Eler << "; angle = " << crossingAngle);
 }
 
 void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
@@ -1324,7 +1324,7 @@ void B2BIIConvertMdstModule::convertHelix(Belle::Helix& helix, std::vector<float
         error5x5[i][j] *= KAPPA2OMEGA;
 
       if (std::isinf(error5x5[i][j])) {
-        B2INFO("Helix covariance matrix element found to be infinite. Setting value to DBL_MAX/2.0.");
+        B2DEBUG(99, "Helix covariance matrix element found to be infinite. Setting value to DBL_MAX/2.0.");
         error5x5[i][j] = DBL_MAX / 2.0;
       }
     }
@@ -1922,12 +1922,12 @@ double B2BIIConvertMdstModule::atcPID(const PIDLikelihood* pid, int sigHyp, int 
 
 void B2BIIConvertMdstModule::endRun()
 {
-  B2INFO("B2BIIConvertMdst: endRun done.");
+  B2DEBUG(99, "B2BIIConvertMdst: endRun done.");
 }
 
 
 void B2BIIConvertMdstModule::terminate()
 {
-  B2INFO("B2BIIConvertMdst: terminate called")
+  B2DEBUG(99, "B2BIIConvertMdst: terminate called")
 }
 

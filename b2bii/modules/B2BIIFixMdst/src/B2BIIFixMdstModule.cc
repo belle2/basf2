@@ -266,7 +266,7 @@ namespace Belle2 {
         setReturnValue(1);
       } else {
         setReturnValue(-1);
-        B2INFO("B2BIIFixMdst: Not a good event");
+        B2DEBUG(99, "B2BIIFixMdst: Not a good event");
         return;
       }
     } else {
@@ -279,7 +279,7 @@ namespace Belle2 {
           (struct l4_summary*) BsGetEnt(L4_SUMMARY, 1, BBS_No_Index);
         if (l->m_type == 0) {
           setReturnValue(-1);
-          B2INFO("B2BIIFixMdst: L4 cut");
+          B2DEBUG(99, "B2BIIFixMdst: L4 cut");
           return;
         }
       }
@@ -291,7 +291,7 @@ namespace Belle2 {
       if (it1 != EvtFlagMgr.end() && *it1) {
         if ((*it1).flag(0) < 10) {
           setReturnValue(-1);
-          B2INFO("B2BIIFixMdst: HadA cut");
+          B2DEBUG(99, "B2BIIFixMdst: HadA cut");
           return;
         }
       }
@@ -304,7 +304,7 @@ namespace Belle2 {
       if (ith != HadMgr.end() && *ith) {
         if ((*ith).hadronic_flag(2) <= 0) {
           setReturnValue(-1);
-          B2INFO("B2BIIFixMdst: HadB cut");
+          B2DEBUG(99, "B2BIIFixMdst: HadB cut");
           return;
         }
       }

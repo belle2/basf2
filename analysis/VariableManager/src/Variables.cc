@@ -751,6 +751,15 @@ namespace Belle2 {
       }
     }
 
+    double particleMCMatchDecayTime(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getDecayTime();
+    }
+
     double particleMCMatchPX(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -1381,6 +1390,8 @@ namespace Belle2 {
                       "The weight of the Particle -> MCParticle relation (only for the first Relation = largest weight).");
     REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch,
                       "The number of relations of this Particle to MCParticle.");
+    REGISTER_VARIABLE("mcDecayTime", particleMCMatchDecayTime,
+                      "The decay time of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.")
     REGISTER_VARIABLE("mcPX", particleMCMatchPX,
                       "The px of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcPY", particleMCMatchPY,

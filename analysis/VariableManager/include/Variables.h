@@ -289,6 +289,11 @@ namespace Belle2 {
     double particleMCMomentumTransfer2(const Particle* part);
 
     /**
+     * return decay time of matched MCParticle (-999.0 if the particle is not matched)
+     */
+    double particleMCMatchDecayTime(const Particle* particle);
+
+    /**
      * return px of matched MCParticle (-999.0 if the particle is not matched)
      */
     double particleMCMatchPX(const Particle* particle);

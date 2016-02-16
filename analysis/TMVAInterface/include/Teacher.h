@@ -91,6 +91,12 @@ namespace Belle2 {
        */
       std::set<int> getDistinctIntegerValues(const std::string& branchName);
 
+      /**
+       * Reduced basket and cache sizes of TTree, if one uses a lot of TMVATeacher modules
+       * in a path the memory consumption of O(10MB) of a TTree can be too much to run the path on a fast low memory queue.
+       * This method helps to reduce the memory print.
+       */
+      void enableLowMemoryProfile();
 
       /**
        * Writes tree to a file

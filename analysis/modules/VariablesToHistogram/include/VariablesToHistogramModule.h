@@ -50,11 +50,15 @@ namespace Belle2 {
     std::string m_fileName;
     /** Name of the TTree. */
     std::string m_treeName;
+    /** Two dimensional flag */
+    bool m_2d;
 
     /** ROOT file for output. */
     TFile* m_file;
-    /** The ROOT TH1Fs for output. */
+    /** The ROOT TH1Ds for output. */
     std::vector<std::unique_ptr<StoreObjPtr<RootMergeable<TH1D>>>> m_hists;
+    /** The ROOT TH2Ds for output. */
+    std::vector<std::unique_ptr<StoreObjPtr<RootMergeable<TH2D>>>> m_2d_hists;
     /** List of function pointers corresponding to given variables. */
     std::vector<Variable::Manager::FunctionPtr> m_functions;
 

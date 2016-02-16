@@ -112,6 +112,14 @@ namespace Belle2 {
 
       setBranchAddresses();
 
+
+    }
+
+    void Teacher::enableLowMemoryProfile()
+    {
+
+      m_tree->get().SetBasketSize("*", 1600);
+
     }
 
     void Teacher::setBranchAddresses()

@@ -6,42 +6,36 @@
 #
 
 from basf2 import *
+from modularAnalysis import *
+
 import ROOT
+ROOT.gSystem.Load('libanalysis.so')
+from ROOT import Belle2
 
-import modularAnalysis
 import pdg
-
-from fei import preCutDetermination
 import pickle
-
-
-def removeJPsiSlash(string):
-    return string.replace('/', '')
-
-
-def joinCuts(*cuts):
-    """
-    Join given cut string together using correct cut-syntax with and and brackets
-    @param cuts cut string
-    """
-    notempty = sum(cut != '' for cut in cuts)
-    if notempty == 0:
-        return ''
-    if notempty == 1:
-        for cut in cuts:
-            if cut != '':
-                return cut
-    return '[' + '] and ['.join(cut for cut in cuts if cut != '') + ']'
-
 
 import re
 import os
 import subprocess
-import json
-from string import Template
+
+import typing
+import fei.dag
+import fei.config
+
+Hash = str
+Filename = str
+ParticleList = str
+
+MaximumNumberOfMVASamples = int(3e6)
+MinimumNumberOfMVASamples = int(5e2)
 
 
-def HashRequirements(resource):
+def removeJPsiSlash(string: str) -> str:
+    return string.replace('/', '')
+
+
+def HashRequirements(resource: fei.dag.Resource) -> Hash:
     """
     Returns the hash of all requirments
         @param resource object
@@ -50,7 +44,7 @@ def HashRequirements(resource):
     return resource.hash
 
 
-def PDGConjugate(resource, particleList):
+def PDGConjugate(resource: fei.dag.Resource, particleList: ParticleList) -> ParticleList:
     """
     Returns the pdg conjugated list
         @param resource object
@@ -63,106 +57,129 @@ def PDGConjugate(resource, particleList):
     return pdg.conjugate(name) + ':' + label
 
 
-def LoadGearbox(resource):
+def LoadParticles(resource: fei.dag.Resource, names: typing.Sequence[str]) -> Hash:
     """
-    Loads Gearbox module
-        @param resource object
-    """
-    gearbox = register_module('Gearbox')
-    resource.path.add_module(gearbox)
-
-
-def LoadGeometry(resource):
-    """
-    Loads Geometry module
-        @param resource object
-    """
-    resource.path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
-
-
-def LoadParticles(resource):
-    """
-    Load Particle module
+    Load FSP and V0 Particles
+    Restricts loading to Particles contained in current Rest Of Event if specific FEI mode is used.
         @param resource object
     """
     resource.cache = True
-    modularAnalysis.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                       ('mu+:FSP', ''), ('gamma:FSP', ''), ('K_S0:V0', ''),
-                                       ('p+:FSP', ''), ('K_L0:FSP', ''), ('Lambda0:FSP', '')], writeOut=True, path=resource.path)
-    modularAnalysis.fillConvertedPhotonsList('gamma:V0', '', writeOut=True, path=resource.path)
-    return 'Dummy'
+    cut = 'isInRestOfEvent > 0.5' if resource.env['ROE'] else ''
+    fillParticleLists([('K+:FSP', cut), ('pi+:FSP', cut), ('e+:FSP', cut),
+                       ('mu+:FSP', cut), ('gamma:FSP', cut), ('K_S0:V0', cut),
+                       ('p+:FSP', cut), ('K_L0:FSP', cut), ('Lambda0:FSP', cut)], writeOut=True, path=resource.path)
+    fillConvertedPhotonsList('gamma:V0', cut, writeOut=True, path=resource.path)
+
+    if resource.env['monitor']:
+        hist_filename = 'Monitor_MCCounts.root'
+        unique_abs_pdgs = set([abs(pdg.from_name(name)) for name in names])
+        hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5) for pdgcode in unique_abs_pdgs]
+        variablesToHistogram('', variables=hist_variables,
+                             two_dimensional=False,
+                             filename=removeJPsiSlash(hist_filename), path=resource.path)
+    return resource.hash
 
 
-def MatchParticleList(resource, particleList, mvaTarget):
-    """
-    Match MC truth of the given ParticleList
-        @param resource object
-        @param particleList raw ParticleList
-        @return name of matched ParticleList
-        @param mvaTarget which distinguishs between signal and background
-    """
-    resource.cache = True
-    if particleList is None:
-        return
-    resource.condition = ('EventType', '==0')
-    modularAnalysis.matchMCTruth(particleList, path=resource.path)
-
-    cut = ''
-    if resource.env['ROE']:
-        sigmc = 'eventCached(countInList(' + resource.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1))'
-        cut = '[{sigmc} > 0 and {target} == 1] or {sigmc} == 0'.format(sigmc=sigmc, target=mvaTarget)
-    modularAnalysis.applyCuts(particleList, cut, path=resource.path)
-    # If the MatchedParticleList is different from the RawParticleList the CPU Statistics will work not correctly,
-    # because the name of the MatchedParticleList is used to identify all modules which process this channel.
-    # You have to fix this issue before changing the returned value in this function.
-    return particleList
-
-
-def MakeParticleList(resource, particleName, daughterParticleLists, preCut, userCut, decayModeID):
+def MakeParticleList(resource: fei.dag.Resource, particleName: str, daughterParticleLists: typing.Sequence[ParticleList],
+                     preCutConfig: fei.config.PreCutConfiguration,
+                     mvaConfig: fei.config.MVAConfiguration, decayModeID: int) -> ParticleList:
     """
     Creates a ParticleList by combining other ParticleLists via the ParticleCombiner module or
     if only one daughter particle is given all FSP particles with the given corresponding name are gathered up.
         @param resource object
         @param particleName valid pdg particle name
         @param daughterParticleLists list of ParticleList name of every daughter particles
-        @param preCut dictionary containing 'cutstring', a string which defines the cut which is applied
-               before the combination of the daughter particles.
-        @param userCut user-defined cut
+        @param preCutConfig PreCutConfiguration object for this channel
         @param decayModeID integer ID of this decay channel, added to extra-info of Particles
         @return name of new ParticleList
     """
     resource.cache = True
-    if preCut is None:
+    if any(p is None for p in daughterParticleLists):
         return
 
     particleList = particleName + ':' + resource.hash
     if len(daughterParticleLists) == 1:
-        cut = joinCuts(userCut, 'isInRestOfEvent > 0.5' if resource.env['ROE'] else '', preCut['cutstring'])
-        modularAnalysis.cutAndCopyList(particleList, daughterParticleLists[0], cut, writeOut=True, path=resource.path)
-        modularAnalysis.variablesToExtraInfo(particleList, {'constant({dmID})'.format(dmID=decayModeID): 'decayModeID'},
-                                             path=resource.path)
+        cutAndCopyList(particleList, daughterParticleLists[0], preCutConfig.userCut, writeOut=True, path=resource.path)
+        variablesToExtraInfo(particleList, {'constant({dmID})'.format(dmID=decayModeID): 'decayModeID'}, path=resource.path)
     else:
         decayString = particleList + ' ==> ' + ' '.join(daughterParticleLists)
-        pmake = register_module('ParticleCombiner')
-        pmake.set_name('ParticleCombiner_' + decayString)
-        pmake.param('decayString', decayString)
-        pmake.param('cut', joinCuts(userCut, preCut['cutstring']))
-        pmake.param('maximumNumberOfCandidates', 1000)
-        pmake.param('decayMode', decayModeID)
-        pmake.param('writeOut', True)
-        resource.path.add_module(pmake)
+        reconstructDecay(decayString, preCutConfig.userCut, decayModeID, writeOut=True, path=resource.path)
+
+    if resource.env['monitor']:
+        matchMCTruth(particleList, path=resource.path)
+        if preCutConfig.bestCandidateVariable is None:
+            hist_variables = ['mcErrors', 'mcParticleStatus', mvaConfig.target]
+        else:
+            hist_variables = ['mcErrors', 'mcParticleStatus', mvaConfig.target, preCutConfig.bestCandidateVariable]
+        hist_filename = 'Monitor_MakeParticleList_BeforeRanking_' + particleList + '.root'
+        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
+                             two_dimensional=True,
+                             filename=removeJPsiSlash(hist_filename), path=resource.path)
+
+    if preCutConfig.bestCandidateVariable is not None:
+        if preCutConfig.bestCandidateMode == 'lowest':
+            rankByLowest(particleList, preCutConfig.bestCandidateVariable, preCutConfig.bestCandidateCut,
+                         'preCut_rank', path=resource.path)
+        elif preCutConfig.bestCandidateMode == 'highest':
+            rankByHighest(particleList, preCutConfig.bestCandidateVariable, preCutConfig.bestCandidateCut,
+                          'preCut_rank', path=resource.path)
+        else:
+            raise RuntimeError("Unkown bestCandidateMode " + repr(preCutConfig.bestCandidateMode))
+
+    if resource.env['monitor']:
+        hist_filename = 'Monitor_MakeParticleList_AfterRanking_' + particleList + '.root'
+        hist_variables += ['extraInfo(preCut_rank)']
+        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
+                             two_dimensional=True,
+                             filename=removeJPsiSlash(hist_filename), path=resource.path)
 
     return particleList
 
 
-def CopyParticleLists(resource, particleName, particleLabel, particleLists, postCut, signalProbabilities):
+def MatchParticleList(resource: fei.dag.Resource, particleList: ParticleList,
+                      mvaConfig: fei.config.MVAConfiguration) -> ParticleList:
+    """
+    Match MC truth of the given ParticleList
+        @param resource object
+        @param particleList raw ParticleList
+        @param mvaConfig MVA configuration object
+        @return name of matched ParticleList
+    """
+    resource.cache = True
+    if particleList is None:
+        return
+    resource.condition = ('EventType', '==0')
+    matchMCTruth(particleList, path=resource.path)
+
+    if resource.env['ROE']:
+        sigmc = 'eventCached(countInList(' + resource.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1))'
+        cut = '[{sigmc} > 0 and {target} == 1] or {sigmc} == 0'.format(sigmc=sigmc, target=mvaConfig.target)
+        applyCuts(particleList, cut, path=resource.path)
+
+    if resource.env['monitor']:
+        hist_variables = ['mcErrors', 'mcParticleStatus', mvaConfig.target]
+        hist_filename = 'Monitor_MatchParticleList_AfterMatch_' + particleList + '.root'
+        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
+                             two_dimensional=True,
+                             filename=removeJPsiSlash(hist_filename), path=resource.path)
+    # If the MatchedParticleList is different from the RawParticleList the CPU Statistics will work not correctly,
+    # because the name of the MatchedParticleList is used to identify all modules which process this channel.
+    # You have to fix this issue before changing the returned value in this function.
+    return particleList
+
+
+def CopyParticleLists(resource: fei.dag.Resource, particleName: str, particleLabel: str,
+                      particleLists: typing.Sequence[ParticleList],
+                      postCutConfig: fei.config.PostCutConfiguration,
+                      mvaConfig: fei.config.MVAConfiguration,
+                      signalProbabilities: typing.Sequence[str]) -> ParticleList:
     """
     Creates a ParticleList gathering up all particles in the given inputLists
         @param resource object
         @param particleName valid pdg particle name
         @param particleLabel user defined label
         @param particleLists list of ParticleLists name defning which ParticleLists are copied to the new list
-        @param postCut dictionary containing 'cutstring'
+        @param postCutConfig postCutConfig
         @param signalProbabilities signal probability of the particle lists
         @return name of new ParticleList
     """
@@ -171,17 +188,43 @@ def CopyParticleLists(resource, particleName, particleLabel, particleLists, post
     if particleLists == []:
         return
 
+    cutstring = ''
+    if postCutConfig.value > 0.0:
+        cutstring = str(postCutConfig.value) + ' < extraInfo(SignalProbability)'
+
     particleList = particleName + ':' + resource.hash
-    modularAnalysis.cutAndCopyLists(
-        particleList,
-        particleLists,
-        postCut['cutstring'],
-        writeOut=True,
-        path=resource.path)
+    copyLists(particleList, particleLists, writeOut=True, path=resource.path)
+
+    if resource.env['monitor']:
+        hist_variables = ['mcErrors', 'mcParticleStatus', mvaConfig.target, 'extraInfo(SignalProbability)']
+        hist_filename = 'Monitor_CopyParticleList_BeforeCut_' + particleList + '.root'
+        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
+                             two_dimensional=True,
+                             filename=removeJPsiSlash(hist_filename), path=resource.path)
+
+    applyCuts(particleList, cutstring, path=resource.path)
+
+    if resource.env['monitor']:
+        hist_filename = 'Monitor_CopyParticleList_BeforeRanking_' + particleList + '.root'
+        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
+                             two_dimensional=True,
+                             filename=removeJPsiSlash(hist_filename), path=resource.path)
+
+    rankByHighest(particleList, 'extraInfo(SignalProbability)', postCutConfig.bestCandidateCut, 'postCut_rank', path=resource.path)
+
+    if resource.env['monitor']:
+        hist_filename = 'Monitor_CopyParticleList_AfterRanking_' + particleList + '.root'
+        hist_variables += ['extraInfo(postCut_rank)']
+        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
+                             two_dimensional=True,
+                             filename=removeJPsiSlash(hist_filename), path=resource.path)
+
     return particleList
 
 
-def CopyIntoHumanReadableParticleList(resource, particleName, particleLabel, particleList):
+def CopyIntoHumanReadableParticleList(resource: fei.dag.Resource, particleName: str, particleLabel: str,
+                                      mvaConfig: fei.config.MVAConfiguration,
+                                      particleList: ParticleList) -> ParticleList:
     """
     Copys a ParticleList into a new ParticleList with a human readable name
         @param resource object
@@ -194,17 +237,27 @@ def CopyIntoHumanReadableParticleList(resource, particleName, particleLabel, par
     if particleList is None:
         return
     humanReadableParticleList = particleName + ':' + particleLabel
-    modularAnalysis.cutAndCopyLists(humanReadableParticleList, particleList, '', writeOut=True, path=resource.path)
+    copyLists(humanReadableParticleList, particleList, writeOut=True, path=resource.path)
+
+    if resource.env['monitor']:
+        variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', mvaConfig.target,
+                     'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)']
+        filename = 'Monitor_Final_' + humanReadableParticleList + '.root'
+        variablesToNTuple(humanReadableParticleList, variables, treename='variables',
+                          filename=removeJPsiSlash(filename), path=resource.path)
+
     return humanReadableParticleList
 
 
-def FitVertex(resource, channelName, particleList, vertexCut):
+def FitVertex(resource: fei.dag.Resource, channelName: str, particleList: ParticleList,
+              mvaConfig: fei.config.MVAConfiguration,
+              preCutConfig: fei.config.PreCutConfiguration) -> Hash:
     """
     Fit secondary vertex of all particles in this ParticleList
         @param resource object
         @param channelName unique name describing the channel
         @param particleList ParticleList name
-        @param vertexCut user-defined vertex cut
+        @param preCutConfig preCutConfig
         @return hash
     """
     resource.cache = True
@@ -215,154 +268,36 @@ def FitVertex(resource, channelName, particleList, vertexCut):
         B2INFO("Ignoring vertex fit for this channel because multiple pi0 are not supported yet {c}.".format(c=channelName))
         return
 
+    if resource.env['monitor']:
+        hist_variables = ['mcErrors', 'mcParticleStatus', mvaConfig.target]
+        hist_filename = 'Monitor_FitVertex_Before_' + particleList + '.root'
+        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
+                             two_dimensional=True,
+                             filename=removeJPsiSlash(hist_filename), path=resource.path)
+
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + particleList)
     pvfit.param('listName', particleList)
-    pvfit.param('confidenceLevel', vertexCut)
+    pvfit.param('confidenceLevel', preCutConfig.vertexCut)
     pvfit.param('vertexFitter', 'kfitter')
-    # pvfit.param('vertexFitter', 'rave')
     pvfit.param('fitType', 'vertex')
     pvfit.set_log_level(logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
     resource.path.add_module(pvfit)
 
+    if resource.env['monitor']:
+        hist_variables = ['mcErrors', 'chiProb', 'mcParticleStatus', mvaConfig.target]
+        hist_filename = 'Monitor_FitVertex_After_' + particleList + '.root'
+        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
+                             two_dimensional=True,
+                             filename=removeJPsiSlash(hist_filename), path=resource.path)
+
     return resource.hash
 
 
-def CreatePreCutHistogram(resource, particleName, channelName, mvaTarget, preCutConfig, userCut, daughterParticleLists,
-                          additionalDependencies):
-    """
-    Creates ROOT file with chosen pre cut variable histogram of this channel (signal/background)
-    for a given particle, before any intermediate cuts are applied.
-        @param resource object
-        @param particleName valid pdg particle name
-        @param channelName unique name describing the channel
-        @param mvaTarget variable which defines signal and background
-        @param preCutConfig intermediate cut configuration
-        @param userCut user-defined cut
-        @param daughterParticleLists list of ParticleList names defining all daughter particles
-        @param additionalDependencies Additional dependencies on signal probability if necessary
-        @return ROOT filename 'CutHistograms_{channelName}:{hash}.root' and tree key {particleName}:{hash}
-    """
-    resource.cache = True
-    if any([daughterParticleList is None for daughterParticleList in daughterParticleLists]) or\
-            any([x is None for x in additionalDependencies]):
-        return
-
-    filename = removeJPsiSlash('CutHistograms_{c}:{h}.root'.format(c=channelName, h=resource.hash))
-
-    if os.path.isfile(filename):
-        return (filename, particleName + ':' + resource.hash)
-
-    outputList = particleName + ':' + resource.hash + ' ==> ' + ' '.join(daughterParticleLists)
-    pmake = register_module('PreCutHistMaker')
-    pmake.set_name('PreCutHistMaker_{c}'.format(c=channelName))
-    pmake.param('fileName', filename)
-    pmake.param('decayString', outputList)
-    pmake.param('cut', userCut)
-    pmake.param('maximumNumberOfCandidates', 1000)
-    pmake.param('target', mvaTarget)
-    pmake.param('variable', preCutConfig.variable)
-    if isinstance(preCutConfig.binning, tuple):
-        pmake.param('histParams', preCutConfig.binning)
-    else:
-        pmake.param('customBinning', preCutConfig.binning)
-    resource.path.add_module(pmake)
-
-    resource.condition = ('EventType', '==0')
-    resource.halt = True
-    return
-
-
-def PreCutDeterminationPerChannel(resource, channelName, preCut):
-    """
-    Returns the preCut for given channel as Resource
-        @param resource object
-        @param channelName unique name describing the channel
-        @param preCut global pre cut dictionary
-        @param dictionary providing a key 'cutstring', 'nSignal', 'nBackground'
-    """
-    resource.cache = True
-    if preCut is None:
-        return None
-    return preCut[channelName]
-
-
-def PreCutDetermination(resource, channelNames, preCutConfig, preCutHistograms):
-    """
-    Determines the PreCuts for all the channels of a particle.
-        @param resource object
-        @param channelNames list of unique names describing the channels
-        @param preCutConfig configuration for PreCut determination
-        @param preCutHistograms filenames of the histogram files created for every channel by CreatePreCutHistogram
-        @param dictionary containing  preCut for each channel
-    """
-    resource.cache = True
-    if all(p is None for p in preCutHistograms):
-        return None
-
-    # Remove all channelsNames and PreCutHistograms which are ignored
-    results = {c: None for c in channelNames}
-    channelNames, preCutHistograms = list(zip(*[(c, p) for c, p in zip(channelNames, preCutHistograms) if p is not None]))
-
-    # Calculate common PreCuts
-    commonPreCuts = preCutDetermination.CalculatePreCuts(preCutConfig, channelNames, preCutHistograms)
-    for (channelName, cut) in commonPreCuts.items():
-        results[channelName] = None if cut['isIgnored'] else cut
-    return results
-
-
-def PostCutDetermination(resource, postCutConfig):
-    """
-    Determines the PostCut for all the channels of a particle.
-        @param resource object
-        @param postCutConfig configurations for post cut determination
-        @param dictionary with the key 'cutstring' and 'range'
-    """
-    resource.cache = True
-    if postCutConfig.value <= 0.0:
-        return {'cutstring': '', 'range': (0, 1)}
-    return {'cutstring': str(postCutConfig.value) + ' < extraInfo(SignalProbability)',
-            'range': (postCutConfig.value, 1)}
-
-
-def CalculateInverseSamplingRate(resource, distribution):
-    """
-    Calculates the inverse sampling rates used in the MVC training
-        @param resource object
-        @param distribution information about number of background an signal events
-        @return dictionary of inverseSampling Rates for signal (1) and background (0)
-    """
-    resource.cache = True
-    if distribution is None:
-        return
-    maxEvents = int(1e7)
-    inverseSamplingRates = {}
-    if distribution['nBackground'] > maxEvents:
-        inverseSamplingRates[0] = int(distribution['nBackground'] / maxEvents) + 1
-    if distribution['nSignal'] > maxEvents:
-        inverseSamplingRates[1] = int(distribution['nSignal'] / maxEvents) + 1
-    return inverseSamplingRates
-
-
-def CalculateNumberOfBins(resource, distribution):
-    """
-    Calculates the number of bins used in the MVC training pdfs
-        @param resource object
-        @param distribution information about number of background an signal events
-        @return int number of bins
-    """
-    resource.cache = True
-    if distribution is None:
-        return
-    Nbins = 'CreateMVAPdfs:NbinsMVAPdf=50:'
-    if distribution['nSignal'] > 1e5:
-        Nbins = 'CreateMVAPdfs:NbinsMVAPdf=100:'
-    if distribution['nSignal'] > 1e6:
-        Nbins = 'CreateMVAPdfs:NbinsMVAPdf=200:'
-    return Nbins
-
-
-def GenerateTrainingData(resource, particleList, mvaConfig, inverseSamplingRates, additionalDependencies):
+def GenerateTrainingData(resource: fei.dag.Resource, particleName: str, particleList: ParticleList,
+                         mcCounts: typing.Mapping[int, typing.Mapping[str, float]],
+                         preCutConfig: fei.config.PreCutConfiguration,
+                         mvaConfig: fei.config.MVAConfiguration) -> Filename:
     """
     Generates the training data for the training of an MVC
         @param resource object
@@ -371,150 +306,97 @@ def GenerateTrainingData(resource, particleList, mvaConfig, inverseSamplingRates
         @param inverseSamplingRates dictionary of inverseSampling Rates for signal (1) and background (0)
         @return string ROOT filename
     """
+    global MaximumNumberOfMVASamples
+
     resource.cache = True
-    if particleList is None or (additionalDependencies is not None and any([d is None for d in additionalDependencies])):
+    if particleList is None:
         return
+
+    if preCutConfig.bestCandidateVariable is None:
+        B2WARNING("Best Candidate variable for particle {} not set.".format(particleName) +
+                  "cannot calculate inverse sampling rates correctly")
+
+    pdgcode = abs(pdg.from_name(particleName))
+    nSignal = mcCounts[pdgcode]['sum']
+    # HACK For everything above D-Mesons we usually have a branching fraction of 10**(-3)
+    if pdgcode > 400:
+        nSignal /= 300
+    nBackground = mcCounts[0]['sum'] * preCutConfig.bestCandidateCut
+
+    inverseSamplingRates = {}
+    if nBackground > MaximumNumberOfMVASamples:
+        inverseSamplingRates[0] = int(nBackground / MaximumNumberOfMVASamples) + 1
+    if nSignal > MaximumNumberOfMVASamples:
+        inverseSamplingRates[1] = int(nSignal / MaximumNumberOfMVASamples) + 1
 
     rootFilename = removeJPsiSlash('{particleList}_{hash}.root'.format(particleList=particleList, hash=resource.hash))
 
     if not os.path.isfile(rootFilename):
+        spectators = [mvaConfig.target]
+        if mvaConfig.sPlotVariable is not None:
+            spectators.append(mvaConfig.sPlotVariable)
+
+        if resource.env['monitor']:
+            hist_variables = ['mcErrors', 'mcParticleStatus'] + mvaConfig.variables + spectators
+            hist_filename = 'Monitor_GenerateTrainingData_' + particleList + '.root'
+            variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
+                                 filename=removeJPsiSlash(hist_filename), path=resource.path)
+
         teacher = register_module('TMVATeacher')
         teacher.set_name('TMVATeacher_' + particleList)
         teacher.param('prefix', removeJPsiSlash(particleList + '_' + resource.hash))
         teacher.param('variables', mvaConfig.variables)
         teacher.param('sample', mvaConfig.target)
-        teacher.param('spectators', [mvaConfig.target])
+        teacher.param('spectators', spectators)
         teacher.param('listNames', [particleList])
         teacher.param('inverseSamplingRates', inverseSamplingRates)
-        teacher.param('maxSamples', int(2e7))
+        teacher.param('lowMemoryProfile', True)
+        teacher.param('maxSamples', int(2*MaximumNumberOfMVASamples))
         resource.path.add_module(teacher)
-        resource.condition = ('EventType', '==0')
+        if mvaConfig.sPlotVariable is None:
+            resource.condition = ('EventType', '==0')
         resource.halt = True
         return
-    return rootFilename
+    return rootFilename[:-5]
 
 
-def GenerateSPlotModel(resource, name, mvaConfig, distribution):
-    """
-    Generates the SPlot model for the training of an MVC
-        @param resource object
-        @param name of the particle or channel
-        @param mvaConfig configuration for the multivariate analysis
-        @param distribution information about number of background an signal events
-        @return dict sPlotTeacher parameters in a dictionary
-    """
-    if mvaConfig.model != 'M':
-        raise RuntimeError('SPlot is only supported for M model')
-
-    resource.cache = True
-
-    if distribution is None:
-        return
-
-    from ROOT import (RooRealVar, RooGaussian, RooChebychev, RooAddPdf, RooArgList, RooFit, RooAbsReal, kFALSE, kTRUE)
-
-    # Parameters for TMVASPlotTeacher
-    # TODO allow user to specify modelFileName using the model parameter
-    # TODO Set Initial Fit values using Monte Carlo!
-    modelFileName = removeJPsiSlash('model_{name}_{hash}.root'.format(name=name, hash=resource.hash))
-
-    low = max(distribution['range'][0], distribution['signalPeak'] - 3 * distribution['signalWidth'])
-    high = min(distribution['signalPeak'] + 3 * distribution['signalWidth'], distribution['range'][1])
-    var = distribution['variable']
-
-    if not os.path.isfile(modelFileName):
-        # observable
-        M = RooRealVar(var, var, low, high)
-        M.setBins(250)
-
-        # Setup component PDFs
-        m = RooRealVar("m", "Mass", distribution['signalPeak'])
-        sigma = RooRealVar("sigma", "Width of Gaussian", distribution['signalWidth'])
-        sig = RooGaussian("sig", "Model", M, m, sigma)
-        m.setConstant(kTRUE)
-        sigma.setConstant(kFALSE)
-
-        a0 = RooRealVar("a0", "a0", -0.69)
-        a1 = RooRealVar("a1", "a1", 0.1)
-        a0.setConstant(kFALSE)
-        a1.setConstant(kFALSE)
-        bkg = RooChebychev("bkg", "Background", M, RooArgList(a0, a1))
-
-        # Add signal and background
-        # initial value and maximal value will be set inside TMVASPlotTeacher
-        total = float(distribution['nBackground'] + distribution['nSignal'])
-        bkgfrac = RooRealVar("background", "fraction of background", distribution['nBackground'] / total)
-        sigfrac = RooRealVar("signal", "fraction of background", distribution['nSignal'] / total)
-
-        bkgfrac.setConstant(kFALSE)
-        sigfrac.setConstant(kFALSE)
-
-        model = RooAddPdf("model", "bkg+sig", RooArgList(bkg, sig), RooArgList(bkgfrac, sigfrac))
-
-        # Write model to file and close the file, so TMVASPlotTeacher can open it
-        # It's important to use ROOT.TFile here, otherwise the test will fail
-        modelFile = ROOT.TFile(modelFileName, "RECREATE")
-        model.Write("model")
-        modelFile.ls()
-        modelFile.Close()
-
-    model = [{'cut': '{} < {} < {}'.format(low, var, high)},
-             {'modelFileName': modelFileName,
-              'discriminatingVariables': [var]}]
-    return model
-
-
-def GenerateTrainingDataUsingSPlot(resource, particleList, mvaConfig, sPlotParameters, additionalDependencies):
-    """
-    Generates the training data for the training of an MVC
-        @param resource object
-        @param particleList the particleList which is used for training and classification
-        @param mvaConfig configuration for the multivariate analysis
-        @param sPlotParameters dictionary containing the sPlot parameters, like the model filename
-        @param Nbins number of bins
-        @return string ROOT filename
-    """
-    resource.cache = True
-    if particleList is None or (additionalDependencies is not None and any([d is None for d in additionalDependencies])):
-        return
-
-    rootFilename = removeJPsiSlash('{particleList}_{hash}.root'.format(particleList=particleList, hash=resource.hash))
-
-    if not os.path.isfile(rootFilename):
-        modularAnalysis.cutAndCopyList(particleList + '_tmp', particleList, sPlotParameters[0]['cut'],
-                                       path=resource.path, writeOut=False)
-        teacher = register_module('TMVATeacher')
-        teacher.set_name('TMVATeacher_' + particleList)
-        teacher.param('prefix', removeJPsiSlash(particleList + '_' + resource.hash))
-        teacher.param('variables', mvaConfig.variables)
-        teacher.param('listNames', [particleList + '_tmp'])
-        teacher.param('spectators', sPlotParameters[1]['discriminatingVariables'])
-        teacher.param('maxSamples', int(2e7))
-        resource.path.add_module(teacher)
-
-        B2WARNING("SPlot is still using MC-data! Otherwise we couldn't test it, due to the lack of real data!")
-        resource.condition = ('EventType', '==0')  # TODO Replace 0 with 1
-        resource.halt = True
-        return
-    return rootFilename
-
-
-def TrainMultivariateClassifier(resource, mvaConfig, Nbins, trainingData):
+def TrainMultivariateClassifier(resource: fei.dag.Resource, mvaConfig: fei.config.MVAConfiguration,
+                                trainingData: Filename) -> Filename:
     """
     Train multivariate classifier using the trainingData
         @param resource object
         @param mvaConfig configuration for the multivariate analysis
-        @param Nbins number of bins
         @param trainingData name of ROOT-File which contains training data
         @return string config filename
     """
+    global MinimumNumberOfMVASamples
+
     resource.cache = True
     if trainingData is None:
         return
 
-    configFilename = trainingData[:-5] + '_1.config'
+    Nbins = 'CreateMVAPdfs:NbinsMVAPdf=100:'
+    configFilename = trainingData + '_1.config'
 
     if not os.path.isfile(configFilename):
+        f = ROOT.TFile(trainingData + '.root')
+        if not f:
+            B2WARNING("Training of MVC failed. Couldn't find ROOT file. Ignoring channel.")
+            return
+        l = [m for m in f.GetListOfKeys()]
+        if not l:
+            B2WARNING("Training of MVC failed. ROOT file does not contain a tree. Ignoring channel.")
+            return
+        tree = l[0].ReadObj()
+        nSig = tree.GetEntries(mvaConfig.target + ' == 1.0')
+        nBg = tree.GetEntries(mvaConfig.target + ' != 1.0')
+        if nSig < MinimumNumberOfMVASamples:
+            B2WARNING("Training of MVC failed. Tree contains to few signal events {}. Ignoring channel.".format(nSig))
+            return
+        if nBg < MinimumNumberOfMVASamples:
+            B2WARNING("Training of MVC failed. Tree contains to few bckgrd events {}. Ignoring channel.".format(nBg))
+            return
+
         command = (
             "{externTeacher} --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
             " --variables '{variables}' --prefix '{prefix}' > '{prefix}'.log 2>&1".format(
@@ -524,7 +406,7 @@ def TrainMultivariateClassifier(resource, mvaConfig, Nbins, trainingData):
                 config=Nbins + mvaConfig.config,
                 target=mvaConfig.target,
                 variables="' '".join(mvaConfig.variables),
-                prefix=trainingData[:-5]))
+                prefix=trainingData))
         B2INFO("Used following command to invoke teacher\n" + command)
         # The training of the MVC can run in parallel!
         # FIXME Bug? Because subprocess is not thread-safe, did not cause any problems so far.
@@ -532,27 +414,28 @@ def TrainMultivariateClassifier(resource, mvaConfig, Nbins, trainingData):
             subprocess.call(command, shell=True)
 
     if not os.path.isfile(configFilename):
-        B2ERROR("Training of MVC failed. Ignoring channel.")
+        B2WARNING("Training of MVC failed. Ignoring channel.")
         return
 
-    return configFilename
+    return trainingData
 
 
-def SignalProbability(resource, particleList, mvaConfig, configFilename):
+def SignalProbability(resource: fei.dag.Resource, particleList: ParticleList,
+                      mvaConfig: fei.config.MVAConfiguration, tmvaPrefix: str) -> Hash:
     """
     Calculates the SignalProbability of a ParticleList using the previously trained MVC
         @param resource object
         @param particleList the particleList which is used for training and classification
         @param mvaConfig configuration for the multivariate analysis
-        @param configFilename name of file which contains the weights of thhe previously trained MVC
+        @param tmvaPrefix used to train teh TMVA classifier
         @return string config filename
     """
     resource.cache = True
-    if configFilename is None or particleList is None:
+    if tmvaPrefix is None or particleList is None:
         return
     expert = register_module('TMVAExpert')
     expert.set_name('TMVAExpert_' + particleList)
-    expert.param('prefix', configFilename[:-9])  # without _1.config suffix
+    expert.param('prefix', tmvaPrefix)
     expert.param('method', mvaConfig.name)
     expert.param('signalFraction', -1)  # Use signalFraction from training
     expert.param('transformToProbability', True)
@@ -560,16 +443,25 @@ def SignalProbability(resource, particleList, mvaConfig, configFilename):
     expert.param('signalClass', 1)
     expert.param('listNames', [particleList])
     resource.path.add_module(expert)
+
+    if resource.env['monitor']:
+        hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(SignalProbability)', mvaConfig.target]
+        hist_filename = 'Monitor_SignalProbability_' + particleList + '.root'
+        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
+                             two_dimensional=True,
+                             filename=removeJPsiSlash(hist_filename), path=resource.path)
+
     return resource.hash
 
 
-def TagUniqueSignal(resource, particleList, signalProbability, target):
+def TagUniqueSignal(resource: fei.dag.Resource, particleList: ParticleList, signalProbability: Hash,
+                    mvaConfig: fei.config.MVAConfiguration) -> Hash:
     """
     Saves the calculated signal probability for this particle list
         @param resource object
         @param particleList the particleList
         @param signalProbability signalProbability as additional dependency
-        @param target target variable
+        @param mvaConfig multivariate analysis configuration object
         @return string variable name that provides tag
     """
     resource.cache = True
@@ -578,49 +470,28 @@ def TagUniqueSignal(resource, particleList, signalProbability, target):
 
     uniqueSignal = register_module('TagUniqueSignal')
     uniqueSignal.param('particleList', particleList)
-    uniqueSignal.param('target', target)
+    uniqueSignal.param('target', mvaConfig.target)
     uniqueSignal.param('extraInfoName', 'uniqueSignal')
     uniqueSignal.set_name('TagUniqueSignal_' + particleList)
     resource.path.add_module(uniqueSignal)
-    return 'extraInfo(uniqueSignal)'
+
+    if resource.env['monitor']:
+        hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', mvaConfig.target]
+        hist_filename = 'Monitor_TagUniqueSignal_' + particleList + '.root'
+        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
+                             two_dimensional=True,
+                             filename=removeJPsiSlash(hist_filename), path=resource.path)
+
+    resource.condition = ('EventType', '==0')
+    return resource.hash
 
 
-def VariablesToNTuple(resource, particleList, signalProbability, target):
-    """
-    Saves the calculated signal probability for this particle list
-        @param resource object
-        @param particleList the particleList
-        @param signalProbability signalProbability as additional dependency
-        @param target target variable
-        @return Resource named VariablesToNTuple_{particleIdentifier} providing root filename
-    """
-    resource.cache = True
-    if particleList is None or signalProbability is None:
-        return
-
-    filename = removeJPsiSlash('var_{i}_{h}.root'.format(i=particleList, h=resource.hash))
-
-    if not os.path.isfile(filename):
-        output = register_module('VariablesToNtuple')
-        output.set_name('VariablesToNtuple_' + particleList)
-        output.param('particleList', particleList)
-        variables = [target, 'extraInfo(SignalProbability)', 'Mbc', 'mcErrors',
-                     'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)']
-        output.param('variables', variables)
-        output.param('fileName', filename)
-        output.param('treeName', 'variables')
-        resource.path.add_module(output)
-        resource.condition = ('EventType', '==0')
-        resource.halt = True
-        return
-    return filename
-
-
-def SaveModuleStatistics(resource):
+def SaveModuleStatistics(resource: fei.dag.Resource) -> typing.Mapping[str, float]:
     """
     Creates .root file that contains statistics for all modules running in final execution.
+    And converts it into a dictionary of ModuleName: UsedCpuTime
         @param resource object
-        @return root file name
+        @return cpu time statistic
     """
     resource.cache = True
     filename = 'moduleStatistics_' + resource.hash + '.root'
@@ -633,10 +504,25 @@ def SaveModuleStatistics(resource):
         resource.path.add_module(output)
         resource.halt = True
         return
-    return filename
+
+    root_file = ROOT.TFile(filename)
+    persistentTree = root_file.Get('persistent')
+    persistentTree.GetEntry(0)
+    # Clone() needed so we actually own the object (original dies when tfile is deleted)
+    stats = persistentTree.ProcessStatistics.Clone()
+
+    # merge statistics from all persistent trees into 'stats'
+    numEntries = persistentTree.GetEntriesFast()
+    for i in range(1, numEntries):
+        persistentTree.GetEntry(i)
+        stats.merge(persistentTree.ProcessStatistics)
+
+    # TODO .getTimeSum returns always 0 at the moment ?!
+    statistic = {m.getName(): m.getTimeSum(m.c_Event) / 1e9 for m in stats.getAll()}
+    return statistic
 
 
-def CountMCParticles(resource, names):
+def CountMCParticles(resource: fei.dag.Resource, names: typing.Sequence[str]) -> typing.Mapping[int, typing.Mapping[str, float]]:
     """
     Counts the number of MC Particles for every pdg code in all events
         @param resource object
@@ -656,55 +542,47 @@ def CountMCParticles(resource, names):
         resource.condition = ('EventType', '==0')
         resource.halt = True
         return
-    return filename
+
+    root_file = ROOT.TFile(filename)
+    mc_counts = {}
+
+    Belle2.Variable.Manager
+
+    for key in root_file.GetListOfKeys():
+        variable = Belle2.Variable.invertMakeROOTCompatible(key.GetName())
+        pdgcode = abs(int(variable[len('NumberOfMCParticlesInEvent('):-len(")")]))
+        hist = key.ReadObj()
+        mc_counts[pdgcode] = {}
+        mc_counts[pdgcode]['sum'] = sum(hist.GetXaxis().GetBinCenter(bin + 1) * hist.GetBinContent(bin + 1)
+                                        for bin in range(hist.GetNbinsX()))
+        mc_counts[pdgcode]['std'] = hist.GetStdDev()
+        mc_counts[pdgcode]['avg'] = hist.GetMean()
+        mc_counts[pdgcode]['max'] = hist.GetXaxis().GetBinCenter(hist.FindLastBinAbove(0.0))
+        mc_counts[pdgcode]['min'] = hist.GetXaxis().GetBinCenter(hist.FindFirstBinAbove(0.0))
+
+    mc_counts[0] = {}
+    mc_counts[0]['sum'] = hist.GetEntries()
+    return mc_counts
 
 
-def CountParticleLists(resource, targets, lists):
-    """
-    Counts the number of particles in all given mc-matched lists.
-        @param resource object
-        @param targets mva target variable
-        @param lists list of all FSP particles and channels
-    """
-    resource.cache = True
-    filename = 'listCounts.root'
-
-    if not os.path.isfile(filename):
-        output = register_module('VariablesToHistogram')
-        output.set_name("VariablesToHistogram_ListCount")
-        output.param('variables', [('countInList({l})'.format(l=l), 1000, -0.5, 999.5)
-                                   for l in lists if l is not None] +
-                                  [('countInList({l}, {t} == 1)'.format(l=l, t=target), 1000, -0.5, 999.5)
-                                   for l, target in zip(lists, targets) if l is not None] +
-                                  [('countInList({l}, {t} == 0)'.format(l=l, t=target), 1000, -0.5, 999.5)
-                                   for l, target in zip(lists, targets) if l is not None])
-        output.param('fileName', filename)
-        resource.path.add_module(output)
-        resource.condition = ('EventType', '==0')
-        resource.halt = True
-        return
-    return filename
-
-
-def SaveSummary(resource, mcCounts, listCounts, moduleStatistics, particles, ntuples, preCuts, postCuts,
-                plists, clists, mlists, mothers, cnames, preCutHistograms, inverseSamplingRates, trainingData):
+def SaveSummary(resource: fei.dag.Resource, mcCounts: typing.Mapping[int, typing.Mapping[str, float]],
+                moduleStatistics: typing.Mapping[str, float],
+                particles: typing.Sequence[fei.config.Particle],
+                plists: typing.Sequence[ParticleList],
+                clists: typing.Sequence[ParticleList],
+                mlists: typing.Sequence[ParticleList],
+                cnames: typing.Sequence[str],
+                trainingData: typing.Sequence[Filename]) -> Filename:
     """
     Save all important files, determined cuts and the all configurations objects in a pickled file,
     so we can use it later to produce a compact or a detailed training report
         @param resource object
         @param mcCounts filename containing mcCounts
-        @param listCount filename containing list counts
         @param particles all particle objects given by the user
-        @param ntuples filenames of ntuples produced for each particle
-        @param preCuts determined preCut object for each particle
-        @param postCuts deterined postCut object for each particle
         @param plists particle list names
         @param clists raw channel list names
         @param mlists matched channel list names
-        @param mothers mother particle identifier of each channel
         @param cnames channel names of each channel
-        @param preCutHistograms filename of preCutHistogram for each channel
-        @param inverseSamplingRates inverse sampling rates for each channel
         @param trainingData filename of TMVA training data input for each channel
     """
 
@@ -712,22 +590,12 @@ def SaveSummary(resource, mcCounts, listCounts, moduleStatistics, particles, ntu
     filename = 'Summary_' + resource.hash + '.pickle'
 
     obj = {'mc_counts': mcCounts,
-           'list_counts': listCounts,
            'module_statistics': moduleStatistics,
            'particles': particles,
-           'ntuples': ntuples,
-           'pre_cuts': preCuts,
-           'post_cuts': postCuts,
-           'plists': plists,
-           'clists': clists,
-           'mlists': mlists,
-           'mothers': mothers,
-           'cnames': cnames,
-           'pre_cut_histograms': preCutHistograms,
-           'inverse_sampling_rates': inverseSamplingRates,
-           'training_data': trainingData}
+           'particle2list': {n: l for n, l in zip([p.identifier for p in particles], plists)},
+           'channel2lists': {n: (c, m, t) for n, c, m, t in zip(cnames, clists, mlists, trainingData)}}
 
-    out = open(filename, 'wb')
-    pickle.dump(obj, out)
+    with open(filename, 'wb') as out:
+        pickle.dump(obj, out)
 
     return filename

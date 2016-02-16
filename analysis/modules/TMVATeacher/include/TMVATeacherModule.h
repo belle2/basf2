@@ -86,6 +86,7 @@ namespace Belle2 {
     unsigned long int m_maxSamples; /**< Maximum number of samples */
     unsigned long int m_nSamples; /**< Current number of samples */
 
+    bool m_lowMemoryProfile; /**< Flag which indicates if the low memory version of the TMVAInterface::Teacher should be used */
   };
 
 } // Belle2 namespace

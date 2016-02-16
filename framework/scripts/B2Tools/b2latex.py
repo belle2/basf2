@@ -251,6 +251,7 @@ class Itemize(LatexObject):
         Calls super-class init and begins itemize
         """
         super(Itemize, self).__init__()
+        self.amount = 0
         self.output += r"\begin{itemize}"
 
     def add(self, item):
@@ -258,10 +259,13 @@ class Itemize(LatexObject):
         Adds another item.
             @param item string or object with implicit string conversion used as item
         """
+        self.amount += 1
         self.output += r"\item " + str(item) + '\n'
         return self
 
     def finish(self):
+        if self.amount == 0:
+            return ''
         self.output += r"\end{itemize}"
         return self
 

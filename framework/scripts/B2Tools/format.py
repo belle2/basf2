@@ -48,6 +48,7 @@ def decayDescriptor(decay_string):
         ('pi-', r'$\pi^-$'),
         ('pi0', r'$\pi^0$'),
         ('K_S0', r'$K^0_S$'),
+        ('K_L0', r'$K^0_L$'),
         ('mu+', r'$\mu^+$'),
         ('mu-', r'$\mu^-$'),
         ('tau+', r'$\tau^+$'),

@@ -56,6 +56,9 @@ namespace Belle2 {
     std::map<int, unsigned int> defaultInverseSamplingRates;
     addParam("inverseSamplingRates", m_inverseSamplingRates, "Map of class id and inverse sampling rate for this class.",
              defaultInverseSamplingRates);
+    addParam("lowMemoryProfile", m_lowMemoryProfile,
+             "Enables low memory footprint. The internal TTree uses usually O(10MB) of memory, sometimes this is too much, this option tries to reduce the memory footprint of the TMVATeacher module by reducing the basket and cache size of the TTree",
+             false);
 
   }
 
@@ -94,6 +97,9 @@ namespace Belle2 {
 
     TMVAInterface::TeacherConfig config(m_prefix, m_treeName, m_workingDirectory, m_variables, m_spectators, methods);
     m_teacher = std::unique_ptr<TMVAInterface::Teacher>(new TMVAInterface::Teacher(config, false));
+    if (m_lowMemoryProfile) {
+      m_teacher->enableLowMemoryProfile();
+    }
 
   }
 

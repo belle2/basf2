@@ -25,11 +25,12 @@ import shutil
 import decimal
 import collections
 import contextlib
+import typing
 
 global_lock = threading.RLock()
 
 
-def create_hash(arguments):
+def create_hash(arguments: typing.Sequence[typing.Any]):
     """
     Creates a unique hash which depends on the given arguments
         @param arguments the hash depends on
@@ -46,6 +47,7 @@ def create_hash(arguments):
             return tuple(makeNonAmbiguous(v) for v in x)
         else:
             return x
+    # print(str([str(makeNonAmbiguous(v)) for v in arguments if v is not None]))
     return hashlib.sha1(str([str(makeNonAmbiguous(v)) for v in arguments if v is not None]).encode()).hexdigest()
 
 
@@ -78,7 +80,7 @@ class Resource(object):
           variables, which should not be included in the dependency graph.
     """
 
-    def __init__(self, env, identifier, provider, *args, **kwargs):
+    def __init__(self, env: typing.Mapping[str, typing.Any], identifier: str, provider, *args, **kwargs):
         """
         Creates a new Resource
             @param env dag environment dictionary
@@ -95,8 +97,8 @@ class Resource(object):
         self.automatic_requirements = []
         if isinstance(self.provider, collections.Callable):
             #    try:
-            argspec = inspect.getargspec(self.provider)
-            for arg in argspec.args[1:]:
+            signature = inspect.signature(self.provider)
+            for arg in [p.name for p in signature.parameters.values()][1:]:
                 if arg not in self.keyword_requirements:
                     self.automatic_requirements.append(arg)
         # except Exception as e:
@@ -145,7 +147,7 @@ class Resource(object):
         self.path = basf2.deserialize_path(serialized_path) if serialized_path is not None else None
         self.loaded_from_cache = True
 
-    def __call__(self, arguments):
+    def __call__(self, arguments: typing.Mapping[str, typing.Any]):
         """
         Calls the underlying function of this actor with the required arguments
             @arguments dictionary of arguments which were required (addtional entries are ignored)
@@ -215,7 +217,7 @@ class DAG(object):
         #: All original needed resources
         self.user_flaged_needed = []
 
-    def add(self, identifier, provider, *args, **kwargs):
+    def add(self, identifier: str, provider, *args, **kwargs):
         """
         Adds a new Resource to the DAG
             @param identifier unique identifier of the Resource
@@ -225,7 +227,7 @@ class DAG(object):
         """
         self.resources[identifier] = Resource(self.env, identifier, provider, *args, **kwargs)
 
-    def addNeeded(self, identifier):
+    def addNeeded(self, identifier: str):
         """
         Mark a resource as needed
             @param identifier of the resource
@@ -233,7 +235,7 @@ class DAG(object):
         self.user_flaged_needed.append(identifier)
         self.resources[identifier].needed = True
 
-    def load_cached_resources(self, cacheFile):
+    def load_cached_resources(self, cacheFile: str):
         """
         Fills self.resources from given cache file
         """
@@ -248,7 +250,7 @@ class DAG(object):
                     #    continue
                     self.resources[resource.identifier] = resource
 
-    def save_cached_resources(self, cacheFile):
+    def save_cached_resources(self, cacheFile: str):
         """
         Saves self.resources to cacheFile
         """

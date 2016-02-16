@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from fei.dagFramework import *
+from fei.dag import *
 import os
 import pickle
 from basf2 import *

@@ -6,11 +6,15 @@
 from fei import *
 from basf2 import *
 from modularAnalysis import *
+from beamparameters import add_beamparameters
 
 particles = get_default_channels()
 
 path = create_path()
 path.add_module('RootInput')
+path.add_module('Gearbox')
+path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
+beamparameters = add_beamparameters(path, 'Y4S')
 feistate = fullEventInterpretation(None, path, particles)
 
 if feistate.is_trained:

@@ -69,6 +69,28 @@ namespace Belle2 {
       return 0;
     }
 
+    Manager::FunctionPtr currentROEIsInList(const std::vector<std::string>& arguments)
+    {
+      std::string listName;
+
+      if (arguments.size() != 1)
+        B2FATAL("Wrong number of arguments (1 required) for meta function currentROEIsInList");
+
+      auto func = [listName](const Particle*) -> double {
+
+        StoreObjPtr<ParticleList> particleList(listName);
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+
+        if (not roe.isValid())
+          return 0;
+
+        Particle* particle = roe->getRelatedTo<Particle>();
+        return particleList->contains(particle) ? 1 : 0;
+
+      };
+      return func;
+    }
+
     double nRemainingTracksInRestOfEvent(const Particle* particle)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
@@ -1264,6 +1286,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
                       "Returns 1 if a track, ecl or klmCluster associated to particle is in the current RestOfEvent object, 0 otherwise."
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
+
+    REGISTER_VARIABLE("currentROEIsInList(particleList)", currentROEIsInList,
+                      "[EventBased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."
+                      "Useful to restrict the for_each loop over ROEs to ROEs of a certain ParticleList.");
 
     REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent,
                       "Returns number of tracks in ROE - number of tracks of given particle"

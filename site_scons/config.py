@@ -128,7 +128,7 @@ def configure_system(conf):
 
     # check for OpenMP
     conf.env['HAS_OPENMP'] = False
-    if conf.CheckHeader('omp.h'):
+    if conf.CheckHeader('omp.h', language="C++"):
         conf.env['HAS_OPENMP'] = True
         conf.env.Append(CPPDEFINES='-DHAS_OPENMP')
 

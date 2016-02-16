@@ -53,6 +53,7 @@ void Belle2::ECL::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg
   int it_h, it_l;
   long long A1, B1, A2, C1, ch1, ch2, B2, B3, B5 ;
   int low_ampl, i, T, iter;
+  ch1 = -1;
 
   ttrig = *ttrig2 / 6;
 

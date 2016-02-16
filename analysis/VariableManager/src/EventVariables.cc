@@ -110,6 +110,13 @@ namespace Belle2 {
       return exp_no;
     }
 
+    double productionIdentifier(const Particle*)
+    {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      int eventProduction = evtMetaData->getProduction();
+      return eventProduction;
+    }
+
     double evtNum(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
@@ -209,6 +216,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("expNum", expNum, "[Eventbased] experiment number");
     REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] event number");
     REGISTER_VARIABLE("runNum", runNum, "[Eventbased] run number");
+    REGISTER_VARIABLE("productionIdentifier", productionIdentifier, "[Eventbased] production identifier");
 
     REGISTER_VARIABLE("Eher", getHEREnergy, "[Eventbased] HER energy");
     REGISTER_VARIABLE("Eler", getLEREnergy, "[Eventbased] LER energy");

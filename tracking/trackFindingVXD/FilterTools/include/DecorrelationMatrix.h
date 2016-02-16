@@ -59,6 +59,9 @@ namespace Belle2 {
     /** "decorrelate" one measurement (i.e. apply the transformation that has previously been determined). */
     std::vector<double> decorrelate(const std::vector<double>& inputVec) const;
 
+    /** "decorrelate" one measurement (i.e. apply the transformation that has previously been determined). */
+    std::vector<double> decorrelate(const std::array<double, Ndims>& inputs) const;
+
     /** decorrelate M measurements (i.e. apply the transformation that has previously been determined).
      * NOTE: the transformation has to be calculated prior to the call of this function!
      */
@@ -89,7 +92,9 @@ namespace Belle2 {
   template<size_t Ndims>
   void DecorrelationMatrix<Ndims>::calculateDecorrMatrix(std::array<std::vector<double>, Ndims> inputData, bool normalise)
   {
-    calculateDecorrMatrix(Belle2::calculateCovMatrix(inputData), normalise);
+    auto covMatrix = calculateCovMatrix(inputData);
+    std::cout << covMatrix << std::endl;
+    calculateDecorrMatrix(covMatrix, normalise);
   }
 
   template<size_t Ndims>
@@ -118,6 +123,12 @@ namespace Belle2 {
     const RVector transform = input * m_matrix;
 
     return std::vector<double>(transform.data(), transform.data() + transform.size());
+  }
+
+  template<size_t Ndims>
+  std::vector<double> DecorrelationMatrix<Ndims>::decorrelate(const std::array<double, Ndims>& input) const
+  {
+    return decorrelate(std::vector<double>(input.begin(), input.end()));
   }
 
   template<size_t Ndims>

@@ -19,25 +19,23 @@ namespace Belle2 {
   /**
    * SelectionVariable that is used for the Machine Learning (ML) based filters.
    *
-   * Does nothing else than handing over the 3 Hits to the MLRange, where all the ML magic happens. This has to be done this way
-   * since this class provides only a static function and we need different instances of ML classifiers. We do however have access
-   * to the constructor of the Range classes.
-   *
-   * NOTE: could use std::reference_wrapper instead of bare pointers to gain some safety. This should only impact the performance
-   * minorly, since std::reference_wrapper uses pointers internally and (almost) all function calls are inlined. The difference in
-   * usage can be seen here and in the test-case for this SelectionVariable. For the moment keeping the pointers!
+   * Does nothing else than handing over the 3x3 git coordinates to the MLRange, where all the ML magic happens. This has to be done
+   * this way since this class provides only a static function and we need different instances of ML classifiers. We do however have
+   * access to the constructor of the Range classes.
    */
-  template<typename PointType>
-  class MLHandover : public SelectionVariable<PointType, std::array<const PointType*, 3> > {
-    // class MLHandover : public SelectionVariable<PointType, std::array<std::reference_wrapper<const PointType>, 3> > {
+  template<typename PointType, size_t Ndims = 9>
+  class MLHandover : public SelectionVariable<PointType, std::array<double, Ndims> > {
+
   public:
 
-    static std::array<const PointType*, 3> value(const PointType& innerHit, const PointType& centerHit, const PointType& outerHit)
-    // static std::array<std::reference_wrapper<const PointType>, 3>
-    // value(const PointType& innerHit, const PointType& centerHit, const PointType& outerHit)
+    static std::array<double, Ndims> value(const PointType& innerHit, const PointType& centerHit, const PointType& outerHit)
     {
-      // return std::array<std::reference_wrapper<const PointType>, 3> {{ innerHit, centerHit, outerHit }};
-      return std::array<const PointType*, 3> {{ &innerHit, &centerHit, &outerHit }};
+      return std::array<double, Ndims> {{
+          innerHit.X(), innerHit.Y(), innerHit.Z(),
+          centerHit.X(), centerHit.Y(), centerHit.Z(),
+          outerHit.X(), outerHit.Y(), outerHit.Z()
+        }
+      };
     }
   };
 }

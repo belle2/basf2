@@ -25,7 +25,7 @@ namespace Belle2 {
    * easily possible if there should be different ML classifiers for different detector regions. Thus, the SelectionVariable
    * simply passes down the hits and this Range is responsible for the calculation and the comparison.
    */
-  template<typename PointType, typename ClassifierType, typename CutType = double>
+  template<typename ClassifierType, size_t Ndims = 9, typename CutType = double>
   class MLRange {
     ClassifierType* m_classifier;
     CutType m_cut;
@@ -39,7 +39,7 @@ namespace Belle2 {
      * @param hits is the three hit combination (for the moment, maybe this will get templated in the future) that gets
      * passed down from the MLHandover selection variable.
      */
-    inline bool contains(std::array<const PointType*, 3> hits) const { return !(m_classifier->analyze(hits) < m_cut); }
+    inline bool contains(std::array<double, Ndims> hits) const { return !(m_classifier->analyze(hits) < m_cut); }
 
     /**
      * For Storing this range

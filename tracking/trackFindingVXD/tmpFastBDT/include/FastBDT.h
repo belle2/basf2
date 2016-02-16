@@ -93,6 +93,8 @@ namespace tmpFastBDT {
       }
     }
 
+    FeatureBinning() = default; /**< default constructor needed for ROOT */
+
     unsigned int ValueToBin(const Value& value) const
     {
 

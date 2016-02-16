@@ -23,23 +23,23 @@
 namespace Belle2 {
 
   /** small helper struct */
-  template<typename PointType>
+  template<size_t Ndims = 9>
   struct FBDTTrainSample {
-    std::array<const PointType*, 3> hits;
+    explicit FBDTTrainSample(const std::array<double, Ndims>& values, bool sig) : hits(values), signal(sig) {}
+
+    std::array<double, Ndims> hits;
     bool signal;
   };
 
   /**
    * FastBDT as RelationsObject to make it storeable and accesible on/via the DataStore
    *
-   * PointType: HitType that provides at least accessors to its coordinats via X(), Y() and Z()
+   * Ndims: number of inputs (dimension of input vector)
    *
    * TODO-List:
-   * + Implement Decorrelation efficiently (i.e. matrix-vector multiplication) and store them here
-   * + Implement Tests
    * + Longterm: template this properly
    */
-  template<typename PointType>
+  template<size_t Ndims = 9>
   class FBDTClassifier : public RelationsObject {
 
   public:
@@ -53,13 +53,13 @@ namespace Belle2 {
     ~FBDTClassifier() { ; } /**< TODO destructor */
 
     /** calculate the output of the FastBDT. At the moment fixed to 3 hits */
-    double analyze(const std::array<const PointType*, 3>& hits) const;
+    double analyze(const std::array<double, Ndims>& hits) const;
 
     /** train the BDT
      * NOTE overwrites a currently existing classifier internally
      * TODO does not work at the moment, look in FastBDT/src/main.cxx how to solve this in all generality
      */
-    void train(const std::vector<Belle2::FBDTTrainSample<PointType> >& samples,
+    void train(const std::vector<Belle2::FBDTTrainSample<Ndims> >& samples,
                int nTree, int depth, double shrinkage = 0.15, double ratio = 0.5);
 
     /** read all the necessary data from stream and fill the Forest and the FeatureBinnings
@@ -87,41 +87,25 @@ namespace Belle2 {
 
     std::vector<tmpFastBDT::FeatureBinning<double> > m_featBins{}; /**< the feature binnings corresponding to the BDT */
 
-    Belle2::DecorrelationMatrix<9> m_decorrMat{}; /**< the decorrelation matrix used in this classifier */
+    Belle2::DecorrelationMatrix<Ndims> m_decorrMat{}; /**< the decorrelation matrix used in this classifier */
 
     // TODO: make this work with the externals -> tell Thomas Keck what is needed for this stuff to work in the externals
-    // TODO: there is still some linking problem here. I do not know at the moment how to solve this
-    // ClassDef(FBDTClassifier, 1); // first version: only Forest and FeatureBinnings present
+    ClassDef(FBDTClassifier, 1); // first version: only Forest and FeatureBinnings present
   };
 
 
 
   // =================================== IMPLEMENTATION ==============================
 
-  template<typename PointType>
-  double FBDTClassifier<PointType>::analyze(const std::array<const PointType*, 3>& hits) const
+  template<size_t Ndims>
+  double FBDTClassifier<Ndims>::analyze(const std::array<double, Ndims>& hits) const
   {
-    std::vector<double> positions(9); // NOTE: hardcoded at the moment
-    for (size_t iSP = 0; iSP < hits.size(); ++iSP) {
-      positions[iSP * 3] = hits[iSP]->X();
-      positions[iSP * 3 + 1] = hits[iSP]->Y();
-      positions[iSP * 3 + 2] = hits[iSP]->Z();
-    }
-    positions = m_decorrMat.decorrelate(positions); // decorrelate the input
+    std::vector<double> positions = m_decorrMat.decorrelate(hits);
 
-    // std::cout << "[";
-    // for(double d : positions) std::cout << std::setprecision(20) << d << " ";
-    // std::cout << "]" << std::endl;
-
-    size_t nInputs = m_featBins.size();
-    std::vector<unsigned> bins(nInputs);
-    for (size_t i = 0; i < nInputs; ++i) {
+    std::vector<unsigned> bins(Ndims);
+    for (size_t i = 0; i < Ndims; ++i) {
       bins[i] = m_featBins[i].ValueToBin(positions[i]);
     }
-
-    // std::cout << "[";
-    // for(auto b : bins) std::cout << b << " ";
-    // std::cout << "]" << std::endl;
 
     return m_forest.Analyse(bins);
   }

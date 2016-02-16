@@ -73,6 +73,7 @@ def reconstructBPD0YPS0(q):  # reconstruct B+ -> anti-D0 Y+(S=0) decays
     applyCuts('B+:antiD0Y+S0', 'isSignal>0.5')
     # prevent double counting of different channels with same particle output
     applyCuts('B+:antiD0Y+S0', 'abs(daughter(0,genMotherPDG)) != 423')
+    applyCuts('B+:antiD0Y+S0', 'abs(daughter(0,genMotherPDG)) != 413')
 
 
 def reconstructBPD0YPS1(q):  # reconstruct B+ -> anti-D0 Y+(S=1) decays
@@ -332,12 +333,17 @@ def reconstructBPmisc(q):  # miscellaneous modes
     # decay modes in the top ~98 % most frequent of all included
     reconstructDecay('B+:120 -> D-:all pi+:all pi+:all pi0:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 120)
+    applyCuts('B+:120', 'abs(daughter(0,genMotherPDG)) != 413')
     reconstructDecay('B+:121 -> anti-D*0:all D_s*+:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 121)
     reconstructDecay('B+:122 -> D-:all pi+:all pi+:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 122)
+    reconstructDecay('B+:123 -> D*-:all pi+:all pi+:all',
+                     'Mbc>5.24 and -0.1 < deltaE < 0.1', 123)
+    reconstructDecay('B+:124 -> D*-:all pi+:all pi+:all pi0:all',
+                     'Mbc>5.24 and -0.1 < deltaE < 0.1', 124)
     mmin = 112
-    mmax = 122
+    mmax = 124
 
     # merge individual B+ lists into one list
     copyListFun(mmin, mmax, 'B+:misc')

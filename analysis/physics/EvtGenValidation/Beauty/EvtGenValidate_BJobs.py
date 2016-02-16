@@ -18,11 +18,12 @@
 import os
 import sys
 
-if len(sys.argv) != 3:
-    sys.exit('Must provide enough arguments: [input directory] [0/1]')
+if len(sys.argv) != 4:
+    sys.exit('Must provide enough arguments: [input directory] [0/1] [type = B0/BP]')
 
 inputDir = sys.argv[1]
 recLong = int(sys.argv[2])
+BType = sys.argv[3]
 
 logDirectory = 'log/'
 if not os.path.exists(logDirectory):
@@ -42,6 +43,6 @@ for fileName in os.listdir(inputDir):
         logFile = logDirectory + 'nTuple-' + logName + '.log'
         command = 'bsub -q l -o ' + logFile + ' basf2 EvtGenValidate_B.py ' \
             + inputDir + fileName + ' ' + rootDirectory + 'nTuple-' + fileName \
-            + ' ' + str(recLong)
+            + ' ' + str(recLong) + ' ' + BType
         print(command)  # this prints out the command
-        os.system(command)  # this evaluates it in the terminal
+        # os.system(command)  # this evaluates it in the terminal

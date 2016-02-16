@@ -354,10 +354,15 @@ def reconstructB0misc(q):  # miscellaneous modes
     applyCuts('B0:120',
               'abs(daughter(0,genMotherPDG)) < 413 or abs(daughter(0,genMotherPDG)) > 413'
               )
+    applyCuts('B0:120', 'abs(daughter(0,genMotherPDG)) != 423')
     reconstructDecay('B0:121 -> D*-:all D0:all K+:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 121)
+    reconstructDecay('B0:122 -> anti-D*0:all pi+:all pi-:all',
+                     'Mbc>5.24 and -0.1 < deltaE < 0.1', 122)
+    reconstructDecay('B0:123 -> anti-D*0:all pi+:all pi-:all pi0:all',
+                     'Mbc>5.24 and -0.1 < deltaE < 0.1', 123)
     mmin = 112
-    mmax = 121
+    mmax = 123
 
     # merge individual B0 lists into one list
     copyListFun(mmin, mmax, 'B0:misc')

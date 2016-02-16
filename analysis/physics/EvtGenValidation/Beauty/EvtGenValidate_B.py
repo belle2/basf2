@@ -35,8 +35,8 @@ from imp_BN_decayRec import *
 import sys
 import os
 
-if len(sys.argv) != 4:
-    sys.exit('Must provide enough arguments: [input file] [output file] [0/1]')
+if len(sys.argv) != 5:
+    sys.exit('Must provide enough arguments: [input file] [output file] [0/1] [type = B0/BP]')
 
 # input parameters: e.g. basf2 VA101-BBValidate.py input.root output.root 0/1
 # this loads selected input file(s) and created an output file with
@@ -45,6 +45,10 @@ if len(sys.argv) != 4:
 inputName = sys.argv[1]
 outputName = sys.argv[2]
 recLong = sys.argv[3]
+type = sys.argv[4]
+
+if type != 'B0' and type != 'BP':
+    sys.exit('Invalid type = ' + type + '! Valid types are B0 or BP')
 
 inputFiles = [inputName]
 
@@ -52,13 +56,13 @@ inputFiles = [inputName]
 inputMdstList(inputFiles)
 
 # create FSP maps
-pions = ('pi+:all', '')
-kaons = ('K+:all', '')
-gammas = ('gamma:all', '')
-electrons = ('e-:all', '')
-muons = ('mu+:all', '')
-pi0 = ('pi0:all', '')
-kshort = ('K_S0:all', '')
+pions = ('pi+:all', 'mcPrimary == 1')
+kaons = ('K+:all', 'mcPrimary == 1')
+# gammas    = ('gamma:all', 'mcPrimary == 1')
+# electrons = ('e-:all', 'mcPrimary == 1')
+# muons     = ('mu+:all', 'mcPrimary == 1')
+pi0 = ('pi0:all', 'mcPrimary == 1')
+kshort = ('K_S0:all', 'mcPrimary == 1')
 
 # charm map
 d0 = ('D0:all', '')
@@ -83,9 +87,9 @@ b0gen = ('B0:gen', '')
 fillParticleListsFromMC([
     pions,
     kaons,
-    gammas,
-    electrons,
-    muons,
+    #    gammas,
+    #    electrons,
+    #    muons,
     pi0,
     kshort,
     d0,
@@ -99,7 +103,7 @@ fillParticleListsFromMC([
     chic0,
     chic1,
     chic2,
-    ], True)
+], True)
 fillParticleListsFromMC([bpgen, b0gen])
 
 # reconstruct B mesons: argument 0 for short, argument 1 for reconstruction of all included decays
@@ -107,33 +111,35 @@ q = int(recLong)
 if q != 0 and q != 1:
     sys.exit('Must provide argument (0/1)')
 
-reconstructBPD0YPS0(q)
-reconstructBPD0YPS1(q)
-reconstructBPDST0YPS0(q)
-reconstructBPDST0YPS1(q)
-reconstructBPccbarYPS1(q)
-reconstructBPmisc(q)
+if type == 'BP':
+    reconstructBPD0YPS0(q)
+    reconstructBPD0YPS1(q)
+    reconstructBPDST0YPS0(q)
+    reconstructBPDST0YPS1(q)
+    reconstructBPccbarYPS1(q)
+    reconstructBPmisc(q)
 
-reconstructB0DMYPS0(q)
-reconstructB0DMYPS1(q)
-reconstructB0DSTMYPS0(q)
-reconstructB0DSTMYPS1(q)
-reconstructB0ccbarY0S1(q)
-reconstructB0misc(q)
+    # merge individual B+ lists
+    copyLists('B+:antiD0Y+', ['B+:antiD0Y+S0', 'B+:antiD0Y+S1'])
+    copyLists('B+:antiD*0Y+', ['B+:antiD*0Y+S0', 'B+:antiD*0Y+S1'])
+    copyLists('B+:rest', ['B+:ccbarYPS1', 'B+:misc'])
 
-# merge individual B+ lists
-copyLists('B+:antiD0Y+', ['B+:antiD0Y+S0', 'B+:antiD0Y+S1'])
-copyLists('B+:antiD*0Y+', ['B+:antiD*0Y+S0', 'B+:antiD*0Y+S1'])
-copyLists('B+:rest', ['B+:ccbarYPS1', 'B+:misc'])
+    copyLists('B+:all', ['B+:antiD0Y+', 'B+:antiD*0Y+', 'B+:rest'])
 
-copyLists('B+:all', ['B+:antiD0Y+', 'B+:antiD*0Y+', 'B+:rest'])
+if type == 'B0':
+    reconstructB0DMYPS0(q)
+    reconstructB0DMYPS1(q)
+    reconstructB0DSTMYPS0(q)
+    reconstructB0DSTMYPS1(q)
+    reconstructB0ccbarY0S1(q)
+    reconstructB0misc(q)
 
-# merge individual B0 lists
-copyLists('B0:D-Y+', ['B0:D-Y+S0', 'B0:D-Y+S1'])
-copyLists('B0:D*-Y+', ['B0:D*-Y+S0', 'B0:D*-Y+S1'])
-copyLists('B0:rest', ['B0:ccbarY0S1', 'B0:misc'])
+    # merge individual B0 lists
+    copyLists('B0:D-Y+', ['B0:D-Y+S0', 'B0:D-Y+S1'])
+    copyLists('B0:D*-Y+', ['B0:D*-Y+S0', 'B0:D*-Y+S1'])
+    copyLists('B0:rest', ['B0:ccbarY0S1', 'B0:misc'])
 
-copyLists('B0:all', ['B0:D-Y+', 'B0:D*-Y+', 'B0:rest'])
+    copyLists('B0:all', ['B0:D-Y+', 'B0:D*-Y+', 'B0:rest'])
 
 # create and fill flat Ntuple with other information
 toolsBP = ['EventMetaData', '^B+']
@@ -146,10 +152,13 @@ toolsB0gen = ['EventMetaData', '^B0']
 
 # nTuple OUTPUT
 ntupleFile(outputName)
-ntupleTree('bp', 'B+:all', toolsBP)
-ntupleTree('bpgen', 'B+:gen', toolsBPgen)
-ntupleTree('b0', 'B0:all', toolsB0)
-ntupleTree('b0gen', 'B0:gen', toolsB0gen)
+if type == 'BP':
+    ntupleTree('bp', 'B+:all', toolsBP)
+    ntupleTree('bpgen', 'B+:gen', toolsBPgen)
+
+if type == 'B0':
+    ntupleTree('b0', 'B0:all', toolsB0)
+    ntupleTree('b0gen', 'B0:gen', toolsB0gen)
 
 # process the events
 process(analysis_main)

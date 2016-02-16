@@ -6,7 +6,7 @@
 #include <framework/core/Module.h>
 #include <topcaf/dataobjects/EventHeaderPacket.h>
 #include <topcaf/dataobjects/EventWaveformPacket.h>
-// #include <topcaf/dataobjects/topFileMetaData.h>
+#include <topcaf/dataobjects/topFileMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -91,7 +91,7 @@ namespace Belle2 {
     EventWaveformPacket* m_WfPacket;
     StoreObjPtr<EventHeaderPacket>   m_evtheader_ptr;
     StoreArray<EventWaveformPacket>  m_evtwaves_ptr;
-    // StoreObjPtr<topFileMetaData>     m_filedata_ptr;
+    StoreObjPtr<topFileMetaData>     m_filedata_ptr;
 
     CPR_hdr cpr_hdr;
     HSLB_hdr hslb_hdr;

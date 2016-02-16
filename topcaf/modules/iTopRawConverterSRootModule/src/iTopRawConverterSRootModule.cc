@@ -1,5 +1,6 @@
 #include <topcaf/modules/iTopRawConverterSRootModule/iTopRawConverterSRootModule.h>
 #include <iomanip>
+#include <sstream>
 
 using namespace Belle2;
 using namespace std;
@@ -29,7 +30,6 @@ public:
 iTopRawConverterSRootModule::iTopRawConverterSRootModule() : Module()
 {
   setDescription("This module is used to upack the raw data from the testbeam and crt data");
-
   m_WfPacket = nullptr;
   m_EvtPacket = nullptr;
 }
@@ -49,14 +49,13 @@ iTopRawConverterSRootModule::initialize()
   //output
   m_evtheader_ptr.registerInDataStore();
   m_evtwaves_ptr.registerInDataStore();
-  // m_filedata_ptr.registerInDataStore();
+  m_filedata_ptr.registerInDataStore();
 }
 
 void
 iTopRawConverterSRootModule::beginRun()
 {
-  // m_filedata_ptr.create();
-  // m_filedata_ptr->set(m_input_directory, m_input_filename);
+  m_filedata_ptr.create();
   m_evt_no = 0;
 }
 
@@ -174,10 +173,10 @@ iTopRawConverterSRootModule::parseData(istream& in)
     unsigned int trigPattern = (word >> 28) & 0xF;
     unsigned int numWindows  = (word >> 19) & 0x1FF;
     unsigned int timeStamp   = (word) & 0x7FFFF;
-    B2DEBUG(1, "FEE header...(" << std::hex << word << std::dec << ") eventSize: " << eventSize << "\ttrigPattern: 0x" << std::hex <<
+    B2DEBUG(1, "FEE header...(" << hex << word << dec << ") eventSize: " << eventSize << "\ttrigPattern: 0x" << hex <<
             trigPattern
             << "\tnumWindows: 0x" << numWindows
-            << "\ttimestamp: 0x" << timeStamp << std::dec);
+            << "\ttimestamp: 0x" << timeStamp << dec);
 
     bool repeatedCheck = false;
 
@@ -191,7 +190,7 @@ iTopRawConverterSRootModule::parseData(istream& in)
       if (scrod1 != scrod2) { // Then this looks like data, so guess it is older data and 0x0 actually is 0xF...
         trigPattern = 0xF;
         B2DEBUG(1, "Found older data, changing trigger pattern... word1: 0x"
-                << std::hex << word1 << "\t word2: " << word2 << std::dec);
+                << hex << word1 << "\t word2: " << word2 << dec);
       }
       in.seekg(prev_pos);
     }
@@ -205,10 +204,10 @@ iTopRawConverterSRootModule::parseData(istream& in)
       m_scrod = (word >> 9) & 0x7F;
       readoutWindow = (word) & 0x1FF;
 
-      B2DEBUG(1, "window header (0x" << std::hex << word << std::dec << "... carrier: " << m_carrier << "\tirsx: " << asic
-              << "\tlastWrAddr: 0x" << std::hex << lastWrAddr
-              << "\tscrod id: 0x" << m_scrod << " (" << std::dec << m_scrod << std::hex << ")"
-              << "\tconvAddr: 0x" << readoutWindow << std::dec);
+      B2DEBUG(1, "window header (0x" << hex << word << dec << "... carrier: " << m_carrier << "\tirsx: " << asic
+              << "\tlastWrAddr: 0x" << hex << lastWrAddr
+              << "\tscrod id: 0x" << m_scrod << " (" << dec << m_scrod << hex << ")"
+              << "\tconvAddr: 0x" << readoutWindow << dec);
 
 
       int row = m_carrier;
@@ -243,7 +242,7 @@ iTopRawConverterSRootModule::parseData(istream& in)
               word = swap_endianess(word);
             }
             wavePacket[WAVE_HEADER_SIZE + x + 1] = word;
-            B2DEBUG(1, "data[" << x << "]: 0x" << std::hex << word << std::dec);
+            B2DEBUG(1, "data[" << x << "]: 0x" << hex << word << dec);
             if ((word & 0xF000F000) > 0) {
               B2WARNING("data out of range... event " << m_evt_no);
               m_evtheader_ptr->SetFlag(9999);
@@ -256,7 +255,7 @@ iTopRawConverterSRootModule::parseData(istream& in)
 
     }
     int l = 0;
-    if ((m_evtheader_ptr->GetEventFlag()) >= (9999)) {
+    if (m_evtheader_ptr->GetEventFlag() >= 9999) {
       // must read a short at a time to get back on track...
       unsigned short x1, x2;
 
@@ -264,7 +263,7 @@ iTopRawConverterSRootModule::parseData(istream& in)
         x2 = x1;
         in.read(reinterpret_cast<char*>(&x1), sizeof(unsigned short));
         word = ((x1 << 16) & 0xFFFF0000) + x2;
-        B2DEBUG(1, "evt no: " << m_evt_no << "\tl: " << l << "\tx1: 0x" << std::hex << x1 << std::dec);
+        B2DEBUG(1, "evt no: " << m_evt_no << "\tl: " << l << "\tx1: 0x" << hex << x1 << dec);
         if (x1 == 0x616c) {
           word = PACKET_LAST;
         }
@@ -276,32 +275,41 @@ iTopRawConverterSRootModule::parseData(istream& in)
     while (word != PACKET_LAST && in) {
       in.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
       word = swap_endianess(word);
-      B2DEBUG(1, "footer: 0x" << std::hex << word << std::dec);
+      B2DEBUG(1, "footer: 0x" << hex << word << dec);
 
       if (word != PACKET_LAST) {
-        B2WARNING("Bad window footer (" << std::hex << word << "!=" << PACKET_LAST << std::dec << ")... marking event " << m_evt_no << ".");
+        B2WARNING("Bad window footer (" << hex << word << "!=" << PACKET_LAST << dec << ")... marking event " << m_evt_no << ".");
         m_evtheader_ptr->SetFlag(1002);
         if (l > 30)  break;
         l++;
       }
     }
-    in.read((char*)&b2l_ftr, sizeof(b2l_ftr));
     if (not in) {
-      B2WARNING("File ended prematurely. Marking event as corrupt.");
+      return 0;
+    }
+    in.read(reinterpret_cast<char*>(&b2l_ftr), sizeof(b2l_ftr));
+    if (not in) {
+      stringstream error(string("File ended prematurely in loop. Last read: "));
+      string ftr(reinterpret_cast<char*>(&b2l_ftr), sizeof(b2l_ftr));
+      for (size_t i = 0; i < sizeof(b2l_ftr); i++) {
+        error << hex << ftr[i] << dec;
+      }
+      error << " Marking event as corrupt.";
+      B2WARNING(error.str());
       m_evtheader_ptr->SetFlag(1003);
       return -1;
     }
-    B2DEBUG(1, "B2L footer ... B2L_crc16_errs: 0x" << std::hex << b2l_ftr.B2L_crc16_error_cnt << " ... B2L_crc16: 0x" <<
-            b2l_ftr.B2L_crc16 << std::dec);
+    B2DEBUG(1, "B2L footer ... B2L_crc16_errs: 0x" << hex << b2l_ftr.B2L_crc16_error_cnt << " ... B2L_crc16: 0x" <<
+            b2l_ftr.B2L_crc16 << dec);
   }
 
   in.read((char*)&cpr_ftr, sizeof(cpr_ftr));
   if (not in) {
-    B2WARNING("File ended prematurely. Marking event as corrupt.");
+    B2WARNING("File ended prematurely after loop. Marking event as corrupt.");
     m_evtheader_ptr->SetFlag(1003);
     return -2;
   }
-  B2DEBUG(1, "CPR footer ... word1: 0x" << std::hex << cpr_ftr.word1 << " ... CPR-ftr: 0x" << cpr_ftr.CPR_ftr);
+  B2DEBUG(1, "CPR footer ... word1: 0x" << hex << cpr_ftr.word1 << " ... CPR-ftr: 0x" << cpr_ftr.CPR_ftr);
   if (cpr_ftr.CPR_ftr != COPPER_FOOTER) {
     B2WARNING("Bad copper footer found.  Marking event as corrupt.");
     m_evtheader_ptr->SetFlag(1003);
@@ -354,7 +362,7 @@ iTopRawConverterSRootModule::readWordUnique(istream& in, packet_word_t prev_word
   packet_word_t new_word;
   in.read(reinterpret_cast<char*>(&new_word), sizeof(packet_word_t));
   new_word = swap_endianess(new_word);
-  while ((new_word == prev_word) && (new_word)) {
+  while (in && (new_word == prev_word) && (new_word)) {
     B2DEBUG(1, "Repeated word found...");
     m_evtheader_ptr->SetFlag(901);
     prev_word = new_word;

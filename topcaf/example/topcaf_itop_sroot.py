@@ -45,7 +45,7 @@ histomanager = register_module("HistoManager")
 
 WriteFile = 1
 if args.output:
-    outputFile = args.Output
+    outputFile = args.output
 else:
     outputFile = args.inputRun.replace('.sroot', '_writehits.root')
 print('Writing output root file to ' + outputFile)

@@ -37,7 +37,7 @@ namespace Belle2 {
     using MatrixT = Eigen::Matrix<double, Ndims, Ndims, Eigen::RowMajor>;
 
     /** default constructor: initializes to identity matrix or to passed matrix */
-    DecorrelationMatrix(const MatrixT& matrix = MatrixT::Identity()) : m_matrix(matrix) { }
+    explicit DecorrelationMatrix(const MatrixT& matrix = MatrixT::Identity()) : m_matrix(matrix) { }
 
     /** copy constructor */
     DecorrelationMatrix(const DecorrelationMatrix& matrix) : m_matrix(matrix.getMatrix()) { }

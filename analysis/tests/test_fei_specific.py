@@ -97,12 +97,12 @@ assert feistate.is_trained
 assert len(glob.glob('Monitor_MCCounts.root')) == 1
 assert len(glob.glob('Monitor_TagUniqueSignal_*')) == 7
 assert len(glob.glob('Monitor_FitVertex_*')) == 12
-assert len(glob.glob('Monitor_Final_*')) == 2
+assert len(glob.glob('Monitor_Final_*')) == 7
 assert len(glob.glob('Monitor_CopyParticleList_*')) == 21
 assert len(glob.glob('Monitor_MatchParticleList_*')) == 11
 assert len(glob.glob('Monitor_SignalProbability_*')) == 10
 assert len(glob.glob('Monitor_MakeParticleList_*')) == 22
-assert len(glob.glob('Monitor_*')) == 86
+assert len(glob.glob('Monitor_*')) == 91
 
 sys.argv.append('-dump-path')
 feistate = fullEventInterpretation('B+:signal', selection_path, particles)
@@ -185,14 +185,14 @@ assert len(glob.glob('cache.pickle.bkp4')) == 1
 assert len(glob.glob('Monitor_MCCounts.root')) == 1
 assert len(glob.glob('Monitor_TagUniqueSignal_*')) == 7
 assert len(glob.glob('Monitor_FitVertex_*')) == 12
-assert len(glob.glob('Monitor_Final_*')) == 2
+assert len(glob.glob('Monitor_Final_*')) == 7
 assert len(glob.glob('Monitor_CopyParticleList_*')) == 21
 assert len(glob.glob('Monitor_MatchParticleList_*')) == 11
 assert len(glob.glob('Monitor_SignalProbability_*')) == 10
 assert len(glob.glob('Monitor_MakeParticleList_*')) == 22
 # Additional monitoring stuff during training
 assert len(glob.glob('Monitor_GenerateTrainingData_*')) == 11
-assert len(glob.glob('Monitor_*')) == 97
+assert len(glob.glob('Monitor_*')) == 102
 assert feistate.is_trained
 
 sys.argv.pop()

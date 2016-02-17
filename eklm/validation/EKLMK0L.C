@@ -9,6 +9,7 @@
 
 void EKLMK0L()
 {
+  const char contact[] = "Kirill Chilikin &lt;chilikin@lebedev.ru&gt;";
   TList *l;
   TFile* fin = new TFile("../EKLMK0LOutput.root");
   TTree* tree = (TTree*) fin->Get("tree");
@@ -106,31 +107,31 @@ void EKLMK0L()
   l = xres->GetListOfFunctions();
   l->Add(new TNamed("Description", "X resolution"));
   l->Add(new TNamed("Check", "No bias, resolution ~ 10 cm."));
-  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l->Add(new TNamed("Contact", contact));
   l = yres->GetListOfFunctions();
   l->Add(new TNamed("Description", "Y resolution"));
   l->Add(new TNamed("Check", "No bias, resolution ~ 10 cm."));
-  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l->Add(new TNamed("Contact", contact));
   l = zres->GetListOfFunctions();
   l->Add(new TNamed("Description", "Z resolution"));
   l->Add(new TNamed("Check", "No bias, resolution ~ 10 cm."));
-  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l->Add(new TNamed("Contact", contact));
   l = tres->GetListOfFunctions();
   l->Add(new TNamed("Description", "Time resolution"));
   l->Add(new TNamed("Check", "No bias."));
-  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l->Add(new TNamed("Contact", contact));
   l = pres->GetListOfFunctions();
   l->Add(new TNamed("Description", "Momentum resolution"));
   l->Add(new TNamed("Check", "No bias."));
-  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l->Add(new TNamed("Contact", contact));
   l = ptres->GetListOfFunctions();
   l->Add(new TNamed("Description", "Momentum theta resolution"));
   l->Add(new TNamed("Check", "No bias, resolution ~ 0.03"));
-  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l->Add(new TNamed("Contact", contact));
   l = ppres->GetListOfFunctions();
   l->Add(new TNamed("Description", "Momentum phi resolution"));
   l->Add(new TNamed("Check", "No bias, resolution ~ 0.05"));
-  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l->Add(new TNamed("Contact", contact));
   xres->Write();
   yres->Write();
   zres->Write();

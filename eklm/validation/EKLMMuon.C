@@ -8,6 +8,7 @@
 
 void EKLMMuon()
 {
+  const char contact[] = "Kirill Chilikin &lt;chilikin@lebedev.ru&gt;";
   TList *l;
   TFile* fin = new TFile("../EKLMMuonOutput.root");
   TTree* tree = (TTree*) fin->Get("tree");
@@ -25,11 +26,11 @@ void EKLMMuon()
   l = h1dtres->GetListOfFunctions();
   l->Add(new TNamed("Description", "Time resolution")); 
   l->Add(new TNamed("Check", "No bias.")); 
-  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l->Add(new TNamed("Contact", contact));
   l = h2dtres->GetListOfFunctions();
   l->Add(new TNamed("Description", "Time resolution")); 
   l->Add(new TNamed("Check", "No bias.")); 
-  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l->Add(new TNamed("Contact", contact));
   // This plot needs new creation procedure.
   // h1dtres->Write();
   h2dtres->Write();

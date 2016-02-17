@@ -266,7 +266,7 @@ def MonitorCosBDLPlot(particle, filename):
     canvas = ROOT.TCanvas(filename, 'Cosine of Theta between B and Dl system', 1600, 1200)
     canvas.cd()
 
-    if particle.final_ntuple.valid:
+    if particle.final_ntuple.valid and particle.mc_count['sum'] > 0:
         ntuple = particle.final_ntuple.tree
 
         color = ROOT.kRed + 4
@@ -301,7 +301,7 @@ def MonitorMbcPlot(particle, filename):
     canvas = ROOT.TCanvas(filename, 'Beam constrained Mass', 1600, 1200)
     canvas.cd()
 
-    if particle.final_ntuple.valid:
+    if particle.final_ntuple.valid and particle.mc_count['sum'] > 0:
         ntuple = particle.final_ntuple.tree
 
         color = ROOT.kRed + 4
@@ -334,7 +334,7 @@ def MonitorROCPlot(particle, filename):
     canvas = ROOT.TCanvas(filename, "ROC curve", 1600, 1200)
     canvas.cd()
 
-    if particle.final_ntuple.valid:
+    if particle.final_ntuple.valid and particle.mc_count['sum'] > 0:
         ntuple = particle.final_ntuple.tree
 
         nbins = 100
@@ -360,19 +360,15 @@ def MonitorROCPlot(particle, filename):
                 nSignal = signal.Integral(cutBin, nbins + 1)
                 nBckgrd = bckgrd.Integral(cutBin, nbins + 1)
 
-                efficiency = nSignal / particle.mc_count['sum']
-                efficiencyErr = efficiencyError(nSignal, particle.mc_count['sum'])
-                try:
-                    purity = nSignal / (nSignal + nBckgrd)
-                    purityErr = efficiencyError(nSignal, nSignal + nBckgrd)
-                except ZeroDivisionError:
-                    purity = 0
-                    purityErr = 0
+                eff = efficiency(nSignal, particle.mc_count['sum'])
+                effErr = efficiencyError(nSignal, particle.mc_count['sum'])
+                pur = purity(nSignal, nBckgrd)
+                purErr = purityError(nSignal, nBckgrd)
 
-                x.append(100 * purity)
-                y.append(100 * efficiency)
-                xerr.append(100 * purityErr)
-                yerr.append(100 * efficiencyErr)
+                x.append(100 * pur)
+                y.append(100 * eff)
+                xerr.append(100 * purErr)
+                yerr.append(100 * effErr)
 
             rocgraph = ROOT.TGraphErrors(len(x), x, y, xerr, yerr)
             rocgraph.SetLineColor(ROOT.kBlue - 2 - i)
@@ -394,7 +390,7 @@ def MonitorDiagPlot(particle, filename):
     canvas = ROOT.TCanvas(filename, 'Diagonal plot', 1600, 1200)
     canvas.cd()
 
-    if particle.final_ntuple.valid:
+    if particle.final_ntuple.valid and particle.mc_count['sum'] > 0:
         ntuple = particle.final_ntuple.tree
 
         bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)

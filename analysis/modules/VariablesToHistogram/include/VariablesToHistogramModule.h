@@ -46,6 +46,8 @@ namespace Belle2 {
     std::string m_particleList;
     /** List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
     std::vector<std::tuple<std::string, int, float, float>> m_variables;
+    /** List of pairs of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
+    std::vector<std::tuple<std::string, int, float, float, std::string, int, float, float>> m_variables_2d;
     /** Name of ROOT file for output. */
     std::string m_fileName;
     /** Name of the TTree. */
@@ -61,6 +63,10 @@ namespace Belle2 {
     std::vector<std::unique_ptr<StoreObjPtr<RootMergeable<TH2D>>>> m_2d_hists;
     /** List of function pointers corresponding to given variables. */
     std::vector<Variable::Manager::FunctionPtr> m_functions;
+    /** List of function pointers corresponding to given variables. */
+    std::vector<Variable::Manager::FunctionPtr> m_functions_2d_1;
+    /** List of function pointers corresponding to given variables. */
+    std::vector<Variable::Manager::FunctionPtr> m_functions_2d_2;
 
   };
 } // end namespace Belle2

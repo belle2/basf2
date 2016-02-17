@@ -34,14 +34,16 @@ VariablesToHistogramModule::VariablesToHistogramModule() :
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   std::vector<std::tuple<std::string, int, float, float>> emptylist;
+  std::vector<std::tuple<std::string, int, float, float, std::string, int, float, float>> emptylist_2d;
   addParam("particleList", m_particleList,
            "Name of particle list with reconstructed particles. If no list is provided the variables are saved once per event (only possible for event-type variables)",
            std::string(""));
   addParam("variables", m_variables,
            "List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
            emptylist);
-  addParam("two_dimensional", m_2d,
-           "If true all variables are saved pairwise as two dimensional histograms as well.", false);
+  addParam("variables_2d", m_variables_2d,
+           "List of variable pairs to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
+           emptylist_2d);
 
   addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToHistogram.root"));
 
@@ -61,8 +63,6 @@ void VariablesToHistogramModule::initialize()
   }
   delete m_file;
 
-
-  unsigned int i = 0;
   for (const auto& varTuple : m_variables) {
     std::string varStr;
     int varNbins = 0;
@@ -78,29 +78,6 @@ void VariablesToHistogramModule::initialize()
     (*ptr)->get().SetDirectory(0);
     m_hists.push_back(std::move(ptr));
 
-    if (m_2d) {
-      unsigned int j = 0;
-      for (const auto& otherTuple : m_variables) {
-        if (j > i) {
-          std::string otherStr;
-          int otherNbins = 0;
-          float otherLow = 0;
-          float otherHigh = 0;
-          std::tie(otherStr, otherNbins, otherLow, otherHigh) = otherTuple;
-          std::string otherCompatibleName = Variable::makeROOTCompatible(otherStr);
-
-          auto ptr2d = std::unique_ptr<StoreObjPtr<RootMergeable<TH2D>>>(new StoreObjPtr<RootMergeable<TH2D>>("", DataStore::c_Persistent));
-          ptr2d->registerInDataStore(m_fileName + varStr + otherStr, DataStore::c_DontWriteOut);
-          ptr2d->construct((compatibleName + otherCompatibleName).c_str(), (compatibleName + otherCompatibleName).c_str(), varNbins, low,
-                           high, otherNbins, otherLow, otherHigh);
-          // Create histogram in memory and do not associate them with a TFile
-          (*ptr2d)->get().SetDirectory(0);
-          m_2d_hists.push_back(std::move(ptr2d));
-        }
-        ++j;
-      }
-    }
-
     //also collection function pointers
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);
     if (!var) {
@@ -108,7 +85,43 @@ void VariablesToHistogramModule::initialize()
     } else {
       m_functions.push_back(var->function);
     }
-    ++i;
+  }
+
+  for (const auto& varTuple : m_variables_2d) {
+    std::string varStr1;
+    int varNbins1 = 0;
+    float low1 = 0;
+    float high1 = 0;
+    std::string varStr2;
+    int varNbins2 = 0;
+    float low2 = 0;
+    float high2 = 0;
+    std::tie(varStr1, varNbins1, low1, high1, varStr2, varNbins2, low2, high2) = varTuple;
+    std::string compatibleName1 = Variable::makeROOTCompatible(varStr1);
+    std::string compatibleName2 = Variable::makeROOTCompatible(varStr2);
+
+    auto ptr2d = std::unique_ptr<StoreObjPtr<RootMergeable<TH2D>>>(new StoreObjPtr<RootMergeable<TH2D>>("", DataStore::c_Persistent));
+    ptr2d->registerInDataStore(m_fileName + varStr1 + varStr2, DataStore::c_DontWriteOut);
+    ptr2d->construct((compatibleName1 + compatibleName2).c_str(), (compatibleName1 + compatibleName2).c_str(),
+                     varNbins1, low1, high1, varNbins2, low2, high2);
+    (*ptr2d)->get().SetDirectory(0);
+    m_2d_hists.push_back(std::move(ptr2d));
+
+    //also collection function pointers
+    const Variable::Manager::Var* var1 = Variable::Manager::Instance().getVariable(varStr1);
+    if (!var1) {
+      B2ERROR("Variable '" << varStr1 << "' is not available in Variable::Manager!");
+    } else {
+      m_functions_2d_1.push_back(var1->function);
+    }
+
+    //also collection function pointers
+    const Variable::Manager::Var* var2 = Variable::Manager::Instance().getVariable(varStr2);
+    if (!var2) {
+      B2ERROR("Variable '" << varStr2 << "' is not available in Variable::Manager!");
+    } else {
+      m_functions_2d_2.push_back(var2->function);
+    }
   }
 
 }
@@ -116,21 +129,20 @@ void VariablesToHistogramModule::initialize()
 void VariablesToHistogramModule::event()
 {
   unsigned int nVars = m_variables.size();
+  unsigned int nVars_2d = m_variables_2d.size();
   std::vector<float> vars(nVars);
+  std::vector<float> vars_2d_1(nVars_2d);
+  std::vector<float> vars_2d_2(nVars_2d);
 
   if (m_particleList.empty()) {
     for (unsigned int iVar = 0; iVar < nVars; iVar++) {
       vars[iVar] = m_functions[iVar](nullptr);
       (*m_hists[iVar])->get().Fill(vars[iVar]);
     }
-    if (m_2d) {
-      unsigned int i = 0;
-      for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-        for (unsigned int jVar = iVar + 1; jVar < nVars; jVar++) {
-          (*m_2d_hists[i])->get().Fill(vars[iVar], vars[jVar]);
-          ++i;
-        }
-      }
+    for (unsigned int iVar = 0; iVar < nVars_2d; iVar++) {
+      vars_2d_1[iVar] = m_functions_2d_1[iVar](nullptr);
+      vars_2d_2[iVar] = m_functions_2d_2[iVar](nullptr);
+      (*m_2d_hists[iVar])->get().Fill(vars_2d_1[iVar], vars_2d_2[iVar]);
     }
 
   } else {
@@ -142,14 +154,10 @@ void VariablesToHistogramModule::event()
         vars[iVar] = m_functions[iVar](particle);
         (*m_hists[iVar])->get().Fill(vars[iVar]);
       }
-      if (m_2d) {
-        unsigned int i = 0;
-        for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-          for (unsigned int jVar = iVar + 1; jVar < nVars; jVar++) {
-            (*m_2d_hists[i])->get().Fill(vars[iVar], vars[jVar]);
-            ++i;
-          }
-        }
+      for (unsigned int iVar = 0; iVar < nVars_2d; iVar++) {
+        vars_2d_1[iVar] = m_functions_2d_1[iVar](particle);
+        vars_2d_2[iVar] = m_functions_2d_2[iVar](particle);
+        (*m_2d_hists[iVar])->get().Fill(vars_2d_1[iVar], vars_2d_2[iVar]);
       }
     }
   }
@@ -168,16 +176,14 @@ void VariablesToHistogramModule::terminate()
 
     m_file->cd();
     unsigned int nVars = m_variables.size();
-    unsigned int i = 0;
     for (unsigned int iVar = 0; iVar < nVars; iVar++) {
       (*m_hists[iVar])->write(m_file);
-      if (m_2d) {
-        for (unsigned int jVar = iVar + 1; jVar < nVars; jVar++) {
-          (*m_2d_hists[i])->write(m_file);
-          ++i;
-        }
-      }
     }
+    unsigned int nVars_2d = m_variables_2d.size();
+    for (unsigned int iVar = 0; iVar < nVars_2d; iVar++) {
+      (*m_2d_hists[iVar])->write(m_file);
+    }
+
     B2INFO("Closing file " << m_fileName);
     delete m_file;
   }

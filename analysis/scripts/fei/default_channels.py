@@ -21,13 +21,13 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
                             'atcPIDBelle(3,2)', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
                             'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
                             'muIDBelle', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
-                            'p', 'pt', 'pz', 'dr', 'dz', 'chiProb']
+                            'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
     else:
         chargedVariables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',
                             'Kid', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
                             'prid', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
                             'muid', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
-                            'p', 'pt', 'pz', 'dr', 'dz', 'chiProb']
+                            'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
 
     pion = Particle('pi+',
                     MVAConfiguration(variables=chargedVariables,
@@ -70,7 +70,7 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
     muon.addChannel(['mu+:FSP'])
 
     gamma = Particle('gamma',
-                     MVAConfiguration(variables=['clusterReg', 'clusterNHits', 'clusterTiming',
+                     MVAConfiguration(variables=['clusterReg', 'clusterNHits', 'clusterTiming', 'extraInfo(preCut_rank)',
                                                  'clusterE9E25', 'pt', 'E', 'pz', 'goodGamma'],
                                       target='isPrimarySignal'),
                      PreCutConfiguration(userCut='',
@@ -84,8 +84,8 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
                                       target='isPrimarySignal'))
 
     pi0 = Particle('pi0',
-                   MVAConfiguration(variables=['M', 'daughter({},extraInfo(SignalProbability))',
-                                               'daughterAngle(0,1)', 'pt', 'pz', 'E'],
+                   MVAConfiguration(variables=['M', 'daughter({},extraInfo(SignalProbability))', 'extraInfo(preCut_rank)',
+                                               'daughterAngle(0,1)', 'pt', 'pz', 'E', 'abs(dM)'],
                                     target='isSignal'),
                    PreCutConfiguration(userCut='0.08 < M < 0.18',
                                        bestCandidateVariable='abs(dM)',
@@ -94,10 +94,10 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
     pi0.addChannel(['gamma', 'gamma'])
 
     KS0 = Particle('K_S0',
-                   MVAConfiguration(variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M',
+                   MVAConfiguration(variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
                                                'useCMSFrame(E)', 'daughterAngle(0,1)', 'daughter({},extraInfo(SignalProbability))',
                                                'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
-                                               'daughter({}, dz)', 'daughter({}, dr)'],
+                                               'daughter({}, dz)', 'daughter({}, dr)', 'extraInfo(preCut_rank)'],
                                     target='isSignal'),
                    PreCutConfiguration(userCut='0.4 < M < 0.6',
                                        bestCandidateVariable='abs(dM)',
@@ -107,7 +107,7 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
     KS0.addChannel(['pi0', 'pi0'])
     KS0.addChannel(['K_S0:V0'],
                    MVAConfiguration(variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M',
-                                               'useCMSFrame(E)', 'daughterAngle(0,1)',
+                                               'useCMSFrame(E)', 'daughterAngle(0,1)', 'extraInfo(preCut_rank)', 'abs(dM)',
                                                'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
                                                'daughter({}, dz)', 'daughter({}, dr)'],
                                     target='isSignal'))
@@ -123,7 +123,7 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
 
     # variables for D mesons and J/Psi
     intermediate_vars = ['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
-                         'chiProb', 'daughter({}, chiProb)',
+                         'chiProb', 'daughter({}, chiProb)', 'extraInfo(preCut_rank)', 'abs(dM)',
                          'useRestFrame(daughter({}, p))',
                          'useRestFrame(daughter({}, distance))',
                          'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
@@ -370,7 +370,7 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
 
     # note: these should not be correlated to Mbc (weak correlation of deltaE is OK)
     B_vars = ['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
-              'chiProb', 'daughter({}, chiProb)',
+              'chiProb', 'daughter({}, chiProb)', 'extraInfo(preCut_rank)',
               'useRestFrame(daughter({}, p))',
               'useRestFrame(daughter({}, distance))',
               'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
@@ -704,7 +704,7 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
 
 
 def get_unittest_channels():
-    chargedVariables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',
+    chargedVariables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL', 'extraInfo(preCut_rank)',
                         'Kid', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
                         'prid', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
                         'muid', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
@@ -742,7 +742,7 @@ def get_unittest_channels():
 
     gamma = Particle('gamma',
                      MVAConfiguration(variables=['clusterReg', 'clusterNHits', 'clusterTiming', 'clusterE9E25',
-                                                 'pt', 'E', 'pz', 'goodGamma'],
+                                                 'pt', 'E', 'pz', 'goodGamma', 'extraInfo(preCut_rank)'],
                                       target='isPrimarySignal'),
                      PreCutConfiguration(userCut='',
                                          bestCandidateMode='highest',
@@ -755,8 +755,8 @@ def get_unittest_channels():
                                       target='isPrimarySignal'))
 
     pi0 = Particle('pi0',
-                   MVAConfiguration(variables=['M', 'daughter({},extraInfo(SignalProbability))',
-                                               'daughterAngle(0,1)', 'pt', 'pz', 'E'],
+                   MVAConfiguration(variables=['M', 'daughter({},extraInfo(SignalProbability))', 'extraInfo(preCut_rank)',
+                                               'daughterAngle(0,1)', 'pt', 'pz', 'E', 'abs(dM)'],
                                     target='isSignal'),
                    PreCutConfiguration(userCut='0.08 < M < 0.18',
                                        bestCandidateVariable='abs(dM)',
@@ -765,7 +765,7 @@ def get_unittest_channels():
     pi0.addChannel(['gamma', 'gamma'])
 
     intermediate_vars = ['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
-                         'chiProb', 'daughter({}, chiProb)',
+                         'chiProb', 'daughter({}, chiProb)', 'extraInfo(preCut_rank)', 'abs(dM)',
                          'useRestFrame(daughter({}, p))',
                          'useRestFrame(daughter({}, distance))',
                          'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',

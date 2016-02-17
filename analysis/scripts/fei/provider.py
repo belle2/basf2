@@ -196,7 +196,8 @@ def CopyParticleLists(resource: fei.dag.Resource, particleName: str, particleLab
     copyLists(particleList, particleLists, writeOut=True, path=resource.path)
 
     if resource.env['monitor']:
-        hist_variables = ['mcErrors', 'mcParticleStatus', mvaConfig.target, 'extraInfo(SignalProbability)']
+        hist_variables = ['mcErrors', 'mcParticleStatus', mvaConfig.target, 'extraInfo(SignalProbability)',
+                          'extraInfo(decayModeID)']
         hist_filename = 'Monitor_CopyParticleList_BeforeCut_' + particleList + '.root'
         variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
                              two_dimensional=True,
@@ -241,7 +242,7 @@ def CopyIntoHumanReadableParticleList(resource: fei.dag.Resource, particleName: 
 
     if resource.env['monitor']:
         variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', mvaConfig.target,
-                     'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)']
+                     'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
         filename = 'Monitor_Final_' + humanReadableParticleList + '.root'
         variablesToNTuple(humanReadableParticleList, variables, treename='variables',
                           filename=removeJPsiSlash(filename), path=resource.path)
@@ -476,7 +477,8 @@ def TagUniqueSignal(resource: fei.dag.Resource, particleList: ParticleList, sign
     resource.path.add_module(uniqueSignal)
 
     if resource.env['monitor']:
-        hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', mvaConfig.target]
+        hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', mvaConfig.target,
+                          'extraInfo(decayModeID)']
         hist_filename = 'Monitor_TagUniqueSignal_' + particleList + '.root'
         variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
                              two_dimensional=True,

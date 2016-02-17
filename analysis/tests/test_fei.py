@@ -508,7 +508,7 @@ class TestCopyParticleLists(unittest.TestCase):
         self.assertEqual(fei.provider.CopyParticleLists(resource, 'D0', 'generic', ['D0:1', 'D0:2', 'D0:3'],
                                                         postCutConfig, mvaConfig, ['S1', 'S2', 'S3']), 'D0:42')
         path = basf2.create_path()
-        hist_variables = ['mcErrors', 'mcParticleStatus', 'isSignal', 'extraInfo(SignalProbability)']
+        hist_variables = ['mcErrors', 'mcParticleStatus', 'isSignal', 'extraInfo(SignalProbability)', 'extraInfo(decayModeID)']
         path.add_module('ParticleListManipulator', outputListName='D0:42', inputListNames=['D0:1', 'D0:2', 'D0:3'], writeOut=True)
         path.add_module('VariablesToHistogram', particleList='D0:42', variables=fei.config.variables2binnings(hist_variables),
                         two_dimensional=True,
@@ -608,7 +608,7 @@ class TestCopyIntoHumanReadableParticleList(unittest.TestCase):
         path = basf2.create_path()
         path.add_module('ParticleListManipulator', outputListName='D0:human', inputListNames=['D0:123'], writeOut=True)
         hist_variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', 'isSignal',
-                          'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)']
+                          'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
         path.add_module('VariablesToNtuple', particleList='D0:human', variables=hist_variables, treeName='variables',
                         fileName='Monitor_Final_D0:human.root')
         self.assertEqual(resource.path, path)
@@ -1033,7 +1033,7 @@ class TestTagUniqueSignal(unittest.TestCase):
 
         path = basf2.create_path()
         path.add_module('TagUniqueSignal', particleList='D0:1', target='isSignal', extraInfoName='uniqueSignal')
-        hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', 'isSignal']
+        hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', 'isSignal', 'extraInfo(decayModeID)']
         path.add_module('VariablesToHistogram', particleList='D0:1',
                         two_dimensional=True,
                         variables=fei.config.variables2binnings(hist_variables),

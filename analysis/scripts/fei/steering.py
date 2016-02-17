@@ -160,6 +160,7 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
 
         # Copy particle list into a list with a human readable name
         dag.add('HumanReadableParticleList_' + particle.identifier, provider.CopyIntoHumanReadableParticleList,
+                'TagUniqueSignal_' + particle.identifier,
                 particleName='Name_' + particle.identifier,
                 particleLabel='Label_' + particle.identifier,
                 mvaConfig='MVAConfig_' + channel.name,
@@ -243,6 +244,9 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
                 signalProbability='SignalProbability_' + particle.identifier,
                 mvaConfig='MVAConfig_' + particle.identifier)
         dag.addNeeded('TagUniqueSignal_' + particle.identifier)
+        dag.addNeeded('SignalProbability_' + particle.identifier)
+        dag.addNeeded('ParticleList_' + particle.identifier)
+        dag.addNeeded('HumanReadableParticleList_' + particle.identifier)
 
     dag.add('SaveSummary', provider.SaveSummary,
             mcCounts='mcCounts',
@@ -254,11 +258,6 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
             mlists=['MatchedParticleList_' + channel.name for particle in particles for channel in particle.channels],
             trainingData=['TrainingData_' + channel.name for particle in particles for channel in particle.channels])
 
-    # Finally we add the final particles (normally B+ B0) as needed to the dag
-    for finalParticle in finalParticles:
-        dag.addNeeded('SignalProbability_' + finalParticle.identifier)
-        dag.addNeeded('ParticleList_' + finalParticle.identifier)
-        dag.addNeeded('HumanReadableParticleList_' + finalParticle.identifier)
     dag.addNeeded('SaveSummary')
 
     fei_path = create_path()

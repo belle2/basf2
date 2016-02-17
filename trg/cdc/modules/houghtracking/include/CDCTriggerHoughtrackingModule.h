@@ -145,6 +145,8 @@ namespace Belle2 {
 
   protected:
 
+    /** Name of the StoreArray containing the tracks found by the Hough tracking. */
+    std::string m_outputCollectionName;
     /** number of Hough cells in phi */
     unsigned m_nCellsPhi;
     /** number of Hough cells in 1/r */

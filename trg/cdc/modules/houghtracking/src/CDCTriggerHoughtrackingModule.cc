@@ -12,7 +12,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -37,10 +36,13 @@ REG_MODULE(CDCTriggerHoughtracking)
 CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
 {
   //Set module properties
-  setDescription("Hough tracking algorithm for SVD data");
+  setDescription("Hough tracking algorithm for CDC trigger.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Define module parameters
+  addParam("outputCollection", m_outputCollectionName,
+           "Name of the StoreArray holding the tracks found in the Hough tracking.",
+           string("Trg2DFinderTracks"));
   addParam("nCellsPhi", m_nCellsPhi,
            "Number of Hough cells in phi (limits: [-180, 180]). Must be an even number.",
            (unsigned)(160));
@@ -77,14 +79,12 @@ void
 CDCTriggerHoughtrackingModule::initialize()
 {
   StoreArray<CDCTriggerSegmentHit>::required();
-  StoreArray<CDCTriggerTrack>::registerPersistent("CDCTriggerTracks");
+  StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
 
   StoreArray<CDCTriggerSegmentHit> segmentHits;
-  StoreArray<CDCTriggerTrack> tracks("CDCTriggerTracks");
-  StoreArray<MCParticle> mcparticles;
+  StoreArray<CDCTriggerTrack> tracks(m_outputCollectionName);
 
   tracks.registerRelationTo(segmentHits);
-  tracks.registerRelationTo(mcparticles);
 
   if (m_storePlane > 0) StoreObjPtr<TMatrix>::registerPersistent("HoughPlane");
 
@@ -106,8 +106,7 @@ void
 CDCTriggerHoughtrackingModule::event()
 {
   StoreArray<CDCTriggerSegmentHit> tsHits("CDCTriggerSegmentHits");
-  StoreArray<CDCTriggerTrack> storeTracks("CDCTriggerTracks");
-  StoreArray<MCParticle> particles("MCParticles");
+  StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
 
   /* Clean hits */
   hitMap.clear();
@@ -165,8 +164,6 @@ CDCTriggerHoughtrackingModule::event()
   /* write tracks to datastore */
   vector<unsigned> idList;
   TVector2 coord;
-  double pt, phi;
-  int charge;
 
   if (!storeTracks.isValid()) {
     storeTracks.create();
@@ -177,36 +174,13 @@ CDCTriggerHoughtrackingModule::event()
   for (auto it = houghTrack.begin(); it != houghTrack.end(); ++it) {
     idList = it->getIdList();
     coord = it->getCoord();
-
-    pt = 0.5 / abs(coord.Y()) * Const::speedOfLight * 1.5e-4;
-    charge = coord.Y() / abs(coord.Y());
-    phi = coord.X();
-
-    CDCTriggerTrack* track = storeTracks.appendNew();
-    /* Hough transformation was defined to give phi of momentum vector
-     * current track definition takes phi of circle center as input */
-    track->add2DHoughResult(charge, pt, remainder(phi - M_PI_2, 2. * M_PI));
-    //track->add2DHoughResult(charge, pt, phi);
+    const CDCTriggerTrack* track =
+      storeTracks.appendNew(coord.X(), 2. * coord.Y(), 0.);
 
     // relations
-    vector<unsigned> relParticleIds[5];
     for (unsigned i = 0; i < idList.size(); ++i) {
       unsigned its = idList[i];
       track->addRelationTo(tsHits[its]);
-      unsigned iax = tsHits[its]->getISuperLayer() / 2;
-      RelationVector<MCParticle> mcrel = tsHits[its]->getRelationsFrom<MCParticle>();
-      for (unsigned imc = 0; imc < mcrel.size(); ++imc) {
-        relParticleIds[iax].push_back(mcrel[imc]->getArrayIndex());
-      }
     }
-    for (unsigned iax = 0; iax < 5; ++iax) {
-      double weight = 1. / (5 * relParticleIds[iax].size());
-      for (unsigned imc = 0; imc < relParticleIds[iax].size(); ++imc) {
-        track->addRelationTo(particles[relParticleIds[iax][imc]], weight);
-      }
-    }
-    RelationArray tracksToParticles(storeTracks, particles);
-    if (tracksToParticles.getEntries() > 0)
-      tracksToParticles.consolidate();
   }
 }

@@ -193,6 +193,15 @@ namespace Belle2 {
              _trgCDCDataInputMode,
              "Flag for TRG CDC input mode",
              _trgCDCDataInputMode);
+    addParam("2DfinderCollection", m_2DfinderCollectionName,
+             "Name of the StoreArray holding the tracks made by the 2D finder.",
+             string("Trg2DFinderTracks"));
+    addParam("2DfitterCollection", m_2DfitterCollectionName,
+             "Name of the StoreArray holding the tracks made by the 2D fitter.",
+             string("Trg2DFitterTracks"));
+    addParam("3DfitterCollection", m_3DfitterCollectionName,
+             "Name of the StoreArray holding the tracks made by the 3D fitter.",
+             string("Trg3DFitterTracks"));
 
 
     if (TRGDebug::level())
@@ -243,14 +252,19 @@ namespace Belle2 {
     // register DataStore elements
     StoreArray<CDCTriggerSegmentHit>::registerPersistent();
     StoreArray<CDCTriggerSegmentHit> segmentHits;
-    StoreArray<CDCTriggerTrack>::registerPersistent();
-    StoreArray<CDCTriggerTrack> tracks;
+    StoreArray<CDCTriggerTrack>::registerPersistent(m_2DfinderCollectionName);
+    StoreArray<CDCTriggerTrack>::registerPersistent(m_2DfitterCollectionName);
+    StoreArray<CDCTriggerTrack>::registerPersistent(m_3DfitterCollectionName);
+    StoreArray<CDCTriggerTrack> tracks2Dfinder(m_2DfinderCollectionName);
+    StoreArray<CDCTriggerTrack> tracks2Dfitter(m_2DfitterCollectionName);
+    StoreArray<CDCTriggerTrack> tracks3Dfitter(m_3DfitterCollectionName);
     StoreArray<CDCHit> cdcHits;
     StoreArray<MCParticle> mcparticles;
     segmentHits.registerRelationTo(cdcHits);
     mcparticles.registerRelationTo(segmentHits);
-    tracks.registerRelationTo(segmentHits);
-    tracks.registerRelationTo(mcparticles);
+    tracks2Dfinder.registerRelationTo(segmentHits); // hits related over Hough cell
+    tracks2Dfitter.registerRelationTo(segmentHits); // hits used for the 2D fit
+    tracks3Dfitter.registerRelationTo(segmentHits); // hits used for the 2D and 3D fit
   }
 
   void
@@ -300,6 +314,11 @@ namespace Belle2 {
     //...CDC trigger simulation...
     _cdc->update(true);
     _cdc->simulate();
+
+    // save the results to DataStore
+    _cdc->storeSimulationResults(m_2DfinderCollectionName,
+                                 m_2DfitterCollectionName,
+                                 m_3DfitterCollectionName);
   }
 
   void

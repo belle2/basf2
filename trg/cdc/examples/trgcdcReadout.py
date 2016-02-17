@@ -101,24 +101,28 @@ class TestModule(basf2.Module):
         """
         print output values of the different stages in the CDC trigger
         """
-        tracks = Belle2.PyStoreArray("CDCTriggerTracks")
-        print("CDC trigger found", len(tracks), "tracks.")
-        for track in tracks:
-            print("2D finder estimate: phi0 =", track.getHoughPhiVertex() * 180. / np.pi,
-                  "pt =", track.getHoughPt(),
-                  "charge =", track.getCharge())
-            print("2D fitter estimate: phi0 =", track.getFitPhiVertex() * 180. / np.pi,
-                  "pt =", track.getFitPt())
-            print("3D fitter estimate: theta =", track.getFitTheta() * 180. / np.pi,
-                  "z =", track.getFitZ())
-            print("Neural net estimate: theta =", track.getNNTheta() * 180. / np.pi,
-                  "z =", track.getNNZ())
-            particle = track.getRelatedTo("MCParticles")
-            print("related MCParticle: phi0 =", particle.getMomentum().Phi() * 180. / np.pi,
-                  "pt =", particle.getMomentum().Pt(),
-                  "charge =", particle.getCharge(),
-                  "theta =", particle.getMomentum().Theta() * 180. / np.pi,
-                  "z =", particle.getProductionVertex().Z())
+        print("CDC trigger readout")
+        tracks2Dfinder = Belle2.PyStoreArray("Trg2DFinderTracks")
+        tracks2Dfitter = Belle2.PyStoreArray("Trg2DFitterTracks")
+        tracks3Dfitter = Belle2.PyStoreArray("Trg3DFitterTracks")
+        tracks3Dneuro = Belle2.PyStoreArray("TrgNNTracks")
+        listnames = ["2D finder", "2D fitter", "3D fitter", "Neurotrigger"]
+        for i, tracks in enumerate([tracks2Dfinder, tracks2Dfitter,
+                                    tracks3Dfitter, tracks3Dneuro]):
+            print(listnames[i], "has", len(tracks), "tracks.")
+            for track in tracks:
+                print("phi0[deg] = %.2f" % (track.getPhi0() * 180. / np.pi),
+                      "pt[GeV] = %.3f" % track.getTransverseMomentum(),
+                      "charge = %d" % track.getChargeSign(),
+                      "theta[deg] = %.2f" % (np.arctan2(1., track.getCotTheta()) * 180. / np.pi),
+                      "z[cm] = %.2f" % track.getZ0())
+        print(len(Belle2.PyStoreArray("MCParticles")), "MCParticles.")
+        for particle in Belle2.PyStoreArray("MCParticles"):
+            print("phi0[deg] = %.2f" % (particle.getMomentum().Phi() * 180. / np.pi),
+                  "pt[GeV] = %.3f" % particle.getMomentum().Pt(),
+                  "charge = %d" % particle.getCharge(),
+                  "theta[deg] = %.2f" % (particle.getMomentum().Theta() * 180. / np.pi),
+                  "z[cm] = %.2f" % particle.getProductionVertex().Z())
 
 main.add_module(TestModule())
 

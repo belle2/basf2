@@ -1981,32 +1981,6 @@ namespace Belle2 {
                     _segmentHits,
                     _segmentHitsSL);
 
-    // write hits to datastore
-    StoreArray<CDCTriggerSegmentHit> storeSegmentHits;
-    StoreArray<CDCHit> cdcHits;
-    for (unsigned its = 0; its < _segmentHits.size(); ++its) {
-      const CDCHit* priorityHit = cdcHits[_segmentHits[its]->iCDCHit()];
-      const TCSegment* segment = static_cast<const TCSegment*>(&_segmentHits[its]->cell());
-      const CDCTriggerSegmentHit* storeHit =
-        storeSegmentHits.appendNew(*priorityHit,
-                                   segment->id(),
-                                   segment->priorityPosition(),
-                                   segment->LUT()->getValue(segment->lutPattern()));
-      _tss[segment->id()]->storeHit(storeHit);
-      // relation to all CDCHits in segment
-      for (unsigned iw = 0; iw < segment->wires().size(); ++iw) {
-        const TRGCDCWire* wire = (TRGCDCWire*)(*segment)[iw];
-        if (wire->signal().active()) {
-          storeHit->addRelationTo(cdcHits[wire->hit()->iCDCHit()]);
-        }
-      }
-      // relation to MCParticles (same as priority hit)
-      RelationVector<MCParticle> mcrel = priorityHit->getRelationsFrom<MCParticle>();
-      for (unsigned imc = 0; imc < mcrel.size(); ++imc) {
-        mcrel[imc]->addRelationTo(storeHit, mcrel.weight(imc));
-      }
-    }
-
     if (trackSegmentSimulationOnly) {
       TRGDebug::leaveStage("TRGCDC fastSimulation");
       return;
@@ -2030,46 +2004,6 @@ namespace Belle2 {
       _pFinder->doit(_trackList2DFitted);
     else
       _hFinder->doit(_trackList2D, _trackList2DFitted);
-
-    //...Check MC relations...
-    // for (unsigned iTrack = 0; iTrack < trackList.size(); iTrack++) {
-    // const TCRelation & trackRelation = trackList[iTrack]->relation();
-    // const MCParticle & trackMCParticle = trackRelation.mcParticle(0);
-
-    // if (TRGDebug::level())
-    // cout << TRGDebug::tab() << "Pt : "
-    // << trackMCParticle.getMomentum().Pt() << endl;
-
-    // //...Whose code?...
-    // if (0) {
-    // ofstream vhdlxOut("/home/ph202/p1p2/MCpt", fstream::app);//test
-    // vhdlxOut << trackMCParticle.getMomentum().Pt() <<endl;
-    // ofstream phiout("/home/ph202/p1p2/MCphi", fstream::app);
-    // if (trackMCParticle.getCharge()>0)
-    // {phiout << (trackMCParticle.getMomentum().Phi()-M_PI/2)
-    // *360/(2*M_PI)<< endl;}
-    // if (trackMCParticle.getCharge()<0 &&
-    // (trackMCParticle.getMomentum().Phi()+M_PI/2)<0)
-    // {phiout << ((trackMCParticle.getMomentum().Phi()+M_PI/2)+
-    // 2*M_PI)*360/(2*M_PI)<< endl;}
-    // else if(trackMCParticle.getCharge()<0 &&
-    // (trackMCParticle.getMomentum().Phi()+M_PI/2)>0)
-    // {phiout << (trackMCParticle.getMomentum().Phi()+M_PI/2)
-    // *360/(2*M_PI)<< endl;}
-    // }
-
-    // //...Perfect position test...
-    // if (trackList.size()) {
-    // vector<HepGeom::Point3D<double> > ppos =
-    // trackList[0]->perfectPosition();
-    // if (TRGDebug::level()) {
-    // if (ppos.size() != 9) {
-    // cout << TRGDebug::tab() << "There are only " << ppos.size()
-    // << " perfect positions" << endl;
-    // }
-    // }
-    // }
-    // }
 
     //...Stereo finder...
     _h3DFinder->doit(_trackList2DFitted, _trackList3D, m_eventNum);
@@ -2098,56 +2032,6 @@ namespace Belle2 {
     //...3D tracker...
     _fitter3D->doit(_trackList3D);
     //_fitter3D->doitComplex(_trackList3D);
-
-    // write tracks to datastore
-    StoreArray<CDCTriggerTrack> storeTracks;
-    StoreArray<MCParticle> particles;
-    for (unsigned itr = 0; itr < _trackList2DFitted.size(); ++itr) {
-      const TCTrack* track2D;
-      if (_trackList2D.size() > 0) {
-        track2D = _trackList2D[itr];
-      } else {
-        track2D = _trackList2DFitted[itr]; // in case of perfect finder
-      }
-      const TCTrack* track2DFitted = _trackList2DFitted[itr];
-      const TCTrack* track3D = _trackList3D[itr];
-      CDCTriggerTrack* track = storeTracks.appendNew();
-      track->add2DHoughResult(track2D->charge(), track2D->pt(), track2D->helix().phi0());
-      if (track2DFitted->fitted())
-        track->add2DFitResult(track2DFitted->pt(), track2DFitted->helix().phi0(),
-                              track2DFitted->get2DFitChi2());
-      if (track3D->fitted())
-        track->add3DFitResult(track3D->helix().dz(), track3D->helix().tanl(),
-                              track3D->get3DFitChi2());
-      // relation to SegmentHits (from track3D to include both axial and stereo TS)
-      vector<TRGCDCLink*> links = track3D->links();
-      vector<unsigned>* relParticleIds = new vector<unsigned> [nAxialSuperLayers()];
-      for (unsigned its = 0; its < links.size(); ++its) {
-        TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
-        track->addRelationTo(segment->storeHit());
-        // get relation to MCParticles (derived from axial TS hits)
-        if (segment->axial()) {
-          unsigned iax = segment->storeHit()->getISuperLayer() / 2;
-          RelationVector<MCParticle> mcrel = segment->storeHit()->getRelationsFrom<MCParticle>();
-          for (unsigned imc = 0; imc < mcrel.size(); ++imc) {
-            relParticleIds[iax].push_back(mcrel[imc]->getArrayIndex());
-          }
-        }
-      }
-      // make relations to MCParticles with proper weights
-      for (unsigned iax = 0; iax < nAxialSuperLayers(); ++iax) {
-	unsigned deno = nAxialSuperLayers() * relParticleIds[iax].size();
-        double weight = (deno == 0) ? 0 : 1. / (double)deno;
-        for (unsigned imc = 0; imc < relParticleIds[iax].size(); ++imc) {
-          track->addRelationTo(particles[relParticleIds[iax][imc]], weight);
-        }
-      }
-      delete[] relParticleIds;
-
-      RelationArray tracksToParticles(storeTracks, particles);
-      if (tracksToParticles.getEntries() > 0)
-        tracksToParticles.consolidate();
-    }
 
     if (TRGDebug::level() > 1) {
       for (unsigned iTrack = 0; iTrack < _trackList3D.size(); iTrack++) {
@@ -2237,6 +2121,98 @@ namespace Belle2 {
 #endif
 
     TRGDebug::leaveStage("TRGCDC fastSimulation");
+    return;
+  }
+
+  void
+  TRGCDC::storeSimulationResults(string collection2Dfinder,
+                                 string collection2Dfitter,
+                                 string collection3Dfitter)
+  {
+    TRGDebug::enterStage("TRGCDC storeSimulationResults");
+
+    // hits
+    StoreArray<CDCTriggerSegmentHit> storeSegmentHits;
+    StoreArray<CDCHit> cdcHits;
+    for (unsigned its = 0; its < _segmentHits.size(); ++its) {
+      const TCSHit* segmentHit = _segmentHits[its];
+      const CDCHit* priorityHit = cdcHits[segmentHit->iCDCHit()];
+      const TCSegment* segment = static_cast<const TCSegment*>(&segmentHit->cell());
+      const CDCTriggerSegmentHit* storeHit =
+        storeSegmentHits.appendNew(*priorityHit,
+                                   segment->id(),
+                                   segment->priorityPosition(),
+                                   segment->LUT()->getValue(segment->lutPattern()));
+      _tss[segment->id()]->storeHit(storeHit);
+      // relation to all CDCHits in segment
+      for (unsigned iw = 0; iw < segment->wires().size(); ++iw) {
+        const TRGCDCWire* wire = (TRGCDCWire*)(*segment)[iw];
+        if (wire->signal().active()) {
+          // priority wire has relation weight 2
+          double weight = (wire == &(segment->priority())) ? 2. : 1.;
+          storeHit->addRelationTo(cdcHits[wire->hit()->iCDCHit()], weight);
+        }
+      }
+      // relation to MCParticles (same as priority hit)
+      RelationVector<MCParticle> mcrel = priorityHit->getRelationsFrom<MCParticle>();
+      for (unsigned imc = 0; imc < mcrel.size(); ++imc) {
+        mcrel[imc]->addRelationTo(storeHit, mcrel.weight(imc));
+      }
+    }
+    // 2D finder tracks
+    StoreArray<CDCTriggerTrack> storeTracks2Dfinder(collection2Dfinder);
+    for (unsigned itr = 0; itr < _trackList2D.size(); ++itr) {
+      const TCTrack* track2D = _trackList2D[itr];
+      double phi0 = remainder(track2D->helix().phi0() + M_PI_2, 2. * M_PI);
+      double omega = track2D->charge() / track2D->helix().radius();
+      const CDCTriggerTrack* track =
+        storeTracks2Dfinder.appendNew(phi0, omega, 0.);
+      // relation to SegmentHits
+      vector<TRGCDCLink*> links = track2D->links();
+      for (unsigned its = 0; its < links.size(); ++its) {
+        TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
+        track->addRelationTo(segment->storeHit());
+      }
+    }
+    // 2D fitter tracks
+    StoreArray<CDCTriggerTrack> storeTracks2Dfitter(collection2Dfitter);
+    for (unsigned itr = 0; itr < _trackList2DFitted.size(); ++itr) {
+      const TCTrack* track2D = _trackList2DFitted[itr];
+      if (!track2D->fitted()) continue;
+      double phi0 = remainder(track2D->helix().phi0() + M_PI_2, 2. * M_PI);
+      double omega = track2D->charge() / track2D->helix().radius();
+      double chi2 = track2D->get2DFitChi2();
+      const CDCTriggerTrack* track =
+        storeTracks2Dfitter.appendNew(phi0, omega, chi2);
+      // relation to SegmentHits
+      vector<TRGCDCLink*> links = track2D->links();
+      for (unsigned its = 0; its < links.size(); ++its) {
+        TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
+        track->addRelationTo(segment->storeHit());
+      }
+    }
+    // 3D tracks
+    StoreArray<CDCTriggerTrack> storeTracks3Dfitter(collection3Dfitter);
+    for (unsigned itr = 0; itr < _trackList3D.size(); ++itr) {
+      const TCTrack* track3D = _trackList3D[itr];
+      if (!track3D->fitted()) continue;
+      double phi0 = remainder(track3D->helix().phi0() + M_PI_2, 2. * M_PI);
+      double omega = track3D->charge() / track3D->helix().radius();
+      double chi2 = track3D->get2DFitChi2();
+      double z = track3D->helix().dz();
+      double cot = track3D->helix().tanl();
+      double chi3 = track3D->get3DFitChi2();
+      const CDCTriggerTrack* track =
+        storeTracks3Dfitter.appendNew(phi0, omega, chi2, z, cot, chi3);
+      // relation to SegmentHits
+      vector<TRGCDCLink*> links = track3D->links();
+      for (unsigned its = 0; its < links.size(); ++its) {
+        TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
+        track->addRelationTo(segment->storeHit());
+      }
+    }
+
+    TRGDebug::leaveStage("TRGCDC storeSimulationResults");
     return;
   }
 

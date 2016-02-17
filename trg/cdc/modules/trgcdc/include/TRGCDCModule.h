@@ -174,12 +174,19 @@ class TRGCDCModule : public Module {
 
     /// Sets mode of 3DFinder.
     int _finder3DMode;
-    
+
     /// Switch for Fitter3D.root file.
     bool _fileFitter3D;
 
     /// Switch for TRG CDC input mode
     int _trgCDCDataInputMode;
+
+    /** Name of the StoreArray holding the tracks made by the 2D finder. */
+    std::string m_2DfinderCollectionName;
+    /** Name of the StoreArray holding the tracks made by the 2D fitter. */
+    std::string m_2DfitterCollectionName;
+    /** Name of the StoreArray holding the tracks made by the 3D fitter. */
+    std::string m_3DfitterCollectionName;
 
   private:
 

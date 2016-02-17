@@ -37,6 +37,10 @@ namespace Belle2 {
     std::string m_filename;
     /** Name of the TObjArray holding the networks. */
     std::string m_arrayname;
+    /** Name of the StoreArray containing the input 2D tracks. */
+    std::string m_inputCollectionName;
+    /** Name of the StoreArray containing the resulting NN tracks. */
+    std::string m_outputCollectionName;
     /** Instance of the NeuroTrigger. */
     NeuroTrigger m_NeuroTrigger;
     /** Switch to execute the network with fixed point calculation.

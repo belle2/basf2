@@ -33,6 +33,12 @@ NeuroTriggerModule::NeuroTriggerModule() : Module()
            "Name of the TObjArray holding the NeuroTrigger parameters "
            "(compare NeuroTriggerTrainer).",
            string("MLPs"));
+  addParam("inputCollection", m_inputCollectionName,
+           "Name of the StoreArray holding the 2D input tracks.",
+           string("Trg2DFinderTracks"));
+  addParam("outputCollection", m_outputCollectionName,
+           "Name of the StoreArray holding the output tracks with neural network estimates.",
+           string("TrgNNTracks"));
 }
 
 
@@ -40,32 +46,43 @@ void
 NeuroTriggerModule::initialize()
 {
   StoreArray<CDCTriggerSegmentHit>::required();
-  StoreArray<CDCTriggerTrack>::required();
+  StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
   if (!m_NeuroTrigger.load(m_filename, m_arrayname))
     B2ERROR("NeuroTrigger could not be loaded correctly.");
+  StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
+
+  StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
+  StoreArray<CDCTriggerTrack> tracksNN(m_outputCollectionName);
+  tracksNN.registerRelationTo(tracks2D);
+  StoreArray<CDCTriggerSegmentHit> segmentHits;
+  tracksNN.registerRelationTo(segmentHits);
 }
 
 
 void
 NeuroTriggerModule::event()
 {
-  StoreArray<CDCTriggerTrack> tracks("CDCTriggerTracks");
-  for (int itrack = 0; itrack < tracks.getEntries(); ++itrack) {
-    m_NeuroTrigger.updateTrack(*tracks[itrack]);
-    int isector = m_NeuroTrigger.selectMLP(*tracks[itrack]);
+  StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
+  StoreArray<CDCTriggerTrack> tracksNN(m_outputCollectionName);
+  for (int itrack = 0; itrack < tracks2D.getEntries(); ++itrack) {
+    m_NeuroTrigger.updateTrack(*tracks2D[itrack]);
+    int isector = m_NeuroTrigger.selectMLP(*tracks2D[itrack]);
     if (isector >= 0) {
       std::vector<float> MLPinput = m_NeuroTrigger.getInputVector(isector);
       std::vector<float> target = m_NeuroTrigger.runMLP(isector, MLPinput);
       int zIndex = m_NeuroTrigger[isector].zIndex();
-      if (zIndex >= 0) tracks[itrack]->setNNZ(target[zIndex]);
+      double z = (zIndex >= 0) ? target[zIndex] : 0.;
       int thetaIndex = m_NeuroTrigger[isector].thetaIndex();
-      if (thetaIndex >= 0) tracks[itrack]->setNNTheta(target[thetaIndex]);
+      double cot = (thetaIndex >= 0) ? cos(target[thetaIndex]) / sin(target[thetaIndex]) : 0.;
+      const CDCTriggerTrack* NNtrack =
+        tracksNN.appendNew(tracks2D[itrack]->getPhi0(),
+                           tracks2D[itrack]->getOmega(),
+                           tracks2D[itrack]->getChi2D(),
+                           z, cot, 0.);
+      NNtrack->addRelationTo(tracks2D[itrack]);
+      // TODO: add hit relations
     } else {
-      //give general warning (to get only one message in summary)
       B2WARNING("No MLP trained for this track.");
-      //give specific information as debug
-      B2DEBUG(100, "pt=" << tracks[itrack]->getHoughPt()
-              << ", phi=" << tracks[itrack]->getHoughPhiVertex() * 180. / M_PI);
     }
   }
 }

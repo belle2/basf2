@@ -149,6 +149,15 @@ class TRGCDC {
     /// fast trigger simulation.
     void simulate(void);
 
+    /** Save results of fast simulation to data store (segment hits & tracks).
+     *  @param collection2Dfinder  name of the StoreArray for the 2D finder tracks
+     *  @param collection2Dfitter  name of the StoreArray for the 2D fitter tracks
+     *  @param collection3Dfitter  name of the StoreArray for the 3D fitter tracks
+     */
+    void storeSimulationResults(std::string collection2Dfinder,
+                                std::string collection2Dfitter,
+                                std::string collection3Dfitter);
+
     /// terminates when run is finished
     void terminate(void);
 

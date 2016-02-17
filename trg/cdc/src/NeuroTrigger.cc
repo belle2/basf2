@@ -246,25 +246,9 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
     return -1;
   }
 
-  float phi0 = track.getHoughPhiVertex();
-  float pt = track.getHoughPt() * track.getCharge();
-  float theta = M_PI_2;
-
-  //get theta of related MC track
-  RelationVector<MCParticle> mcParticles = track.getRelationsTo<MCParticle>();
-  if (mcParticles.size() > 0) {
-    MCParticle* mcTrack = mcParticles[0];
-    if (mcParticles.size() > 1) {
-      double maxWeight = mcParticles.weight(0);
-      for (unsigned imc = 1; imc < mcParticles.size(); ++imc) {
-        if (mcParticles.weight(imc) > maxWeight) {
-          mcTrack = mcParticles[imc];
-          maxWeight = mcParticles.weight(imc);
-        }
-      }
-    }
-    theta = mcTrack->getMomentum().Theta();
-  }
+  float phi0 = track.getPhi0();
+  float pt = track.getTransverseMomentum() * track.getChargeSign();
+  float theta = atan2(1., track.getCotTheta());
 
   // find sector
   // ranges should be unique
@@ -309,9 +293,9 @@ NeuroTrigger::selectMLPs(const CDCTriggerTrack& track,
     return indices;
   }
 
-  float phi0 = track.getHoughPhiVertex();
-  float pt = track.getHoughPt() * track.getCharge();
-  float theta = M_PI_2;
+  float phi0 = track.getPhi0();
+  float pt = track.getTransverseMomentum() * track.getChargeSign();
+  float theta = atan2(1., track.getCotTheta());
 
   if (selectByMC) {
     phi0 = mcparticle.getMomentum().Phi();
@@ -338,16 +322,16 @@ NeuroTrigger::selectMLPs(const CDCTriggerTrack& track,
 void
 NeuroTrigger::updateTrack(const CDCTriggerTrack& track)
 {
-  double r = track.getHoughPt() / Const::speedOfLight / 1.5e-4;
+  double omega = track.getOmega(); // signed track curvature
   for (int iSL = 0; iSL < 9; ++iSL) {
     for (int priority = 0; priority < 2; ++priority) {
       double phiPt = M_PI_2;
-      if (m_radius[iSL][priority] < 2. * r)
-        phiPt = asin(m_radius[iSL][priority] / 2. / r);
-      m_idRef[iSL][priority] = remainder(((track.getHoughPhiVertex() - track.getCharge() * phiPt) *
+      if (m_radius[iSL][priority] < 2. / abs(omega))
+        phiPt = asin(m_radius[iSL][priority] * omega / 2.);
+      m_idRef[iSL][priority] = remainder(((track.getPhi0() - phiPt) *
                                           (m_TSoffset[iSL + 1] - m_TSoffset[iSL]) / 2. / M_PI),
                                          (m_TSoffset[iSL + 1] - m_TSoffset[iSL]));
-      m_arclength[iSL][priority] = 2. * r * phiPt;
+      m_arclength[iSL][priority] = 2. * phiPt / omega;
     }
   }
 }

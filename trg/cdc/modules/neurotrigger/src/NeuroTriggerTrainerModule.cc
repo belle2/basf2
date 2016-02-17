@@ -43,6 +43,12 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
     "Target data is collected from a MCParticle related to the 2D track."
   );
   // parameters for saving / loading
+  addParam("inputCollection", m_inputCollectionName,
+           "Name of the StoreArray holding the 2D input tracks.",
+           string("Trg2DFinderTracks"));
+  addParam("targetCollection", m_targetCollectionName,
+           "Name of the MCParticle collection used as target values.",
+           string("MCParticles"));
   addParam("filename", m_filename,
            "Name of the root file where the NeuroTrigger parameters will be saved.",
            string("NeuroTrigger.root"));
@@ -166,8 +172,8 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
 void NeuroTriggerTrainerModule::initialize()
 {
   StoreArray<CDCTriggerSegmentHit>::required();
-  StoreArray<CDCTriggerTrack>::required();
-  StoreArray<MCParticle>::required();
+  StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
+  StoreArray<MCParticle>::required(m_targetCollectionName);
   if (!m_load ||
       !loadTraindata(m_trainFilename, m_trainArrayname) ||
       !m_NeuroTrigger.load(m_filename, m_arrayname)) {
@@ -224,10 +230,11 @@ void NeuroTriggerTrainerModule::initialize()
 
 void NeuroTriggerTrainerModule::event()
 {
-  StoreArray<CDCTriggerTrack> tracks("CDCTriggerTracks");
+  StoreArray<CDCTriggerTrack> tracks(m_inputCollectionName);
   for (int itrack = 0; itrack < tracks.getEntries(); ++itrack) {
     // get related MC track for target
-    RelationVector<MCParticle> mcParticles = tracks[itrack]->getRelationsTo<MCParticle>("MCTracks");
+    RelationVector<MCParticle> mcParticles =
+      tracks[itrack]->getRelationsTo<MCParticle>(m_targetCollectionName);
     if (mcParticles.size() == 0) {
       B2DEBUG(150, "Skipping CDCTriggerTrack without relation to MCParticle.");
       continue;
@@ -235,7 +242,6 @@ void NeuroTriggerTrainerModule::event()
     MCParticle* mcTrack = mcParticles[0];
     double maxWeight = mcParticles.weight(0);
     if (mcParticles.size() > 1) {
-      //double maxWeight = mcParticles.weight(0);
       for (unsigned imc = 1; imc < mcParticles.size(); ++imc) {
         if (mcParticles.weight(imc) > maxWeight) {
           mcTrack = mcParticles[imc];
@@ -310,8 +316,8 @@ void NeuroTriggerTrainerModule::event()
           ptHistsMC[isector]->Fill(mcTrack->getCharge() / mcTrack->getMomentum().Pt());
           thetaHistsMC[isector]->Fill(mcTrack->getMomentum().Theta());
           zHistsMC[isector]->Fill(mcTrack->getProductionVertex().Z());
-          phiHists2D[isector]->Fill(tracks[itrack]->getHoughPhiVertex());
-          ptHists2D[isector]->Fill(tracks[itrack]->getCharge() / tracks[itrack]->getHoughPt());
+          phiHists2D[isector]->Fill(tracks[itrack]->getPhi0());
+          ptHists2D[isector]->Fill(tracks[itrack]->getKappa());
         }
       }
     }

@@ -1,0 +1,197 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""\
+Run basf2 tests of the given packages or sub-directories.
+If no argument is given all tests are run.
+"""
+
+import sys
+import os
+import glob
+import subprocess
+import difflib
+from concurrent.futures import ThreadPoolExecutor
+import argparse
+import re
+
+
+def compare_log(template_file, log, ignore_lines=0, diff_lines=10):
+    """Compare the log output to the content of a template file"""
+
+    if os.path.isfile(template_file):
+        diff = list(difflib.unified_diff(
+            open(template_file).read().splitlines()[ignore_lines:],
+            log.decode().splitlines()[ignore_lines:],
+            fromfile='template',
+            tofile='current',
+            lineterm='',
+            n=0,
+            ))
+        if len(diff) > 0:
+            if diff_lines > 0:
+                print('\n'.join(diff[2:2 + diff_lines]))
+            return False
+        else:
+            return True
+
+    return None
+
+
+def run_test(argument):
+    """Run the test for the given steering file"""
+
+    global options
+
+    name, release_dir = argument
+    steering = os.path.join(release_dir, name)
+    # print 'starting test %s' % name
+    process = subprocess.Popen(['basf2', steering], stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    (out, err) = process.communicate()
+    result = None
+    message = None
+    if process.returncode != 0:
+        # check for skipped test
+        skipped = re.search(b"^TEST SKIPPED:\s*(.+)$", err, re.MULTILINE)
+        if skipped:
+            result = None
+            message = skipped.group(1).decode()
+        else:
+            result = False
+            message = "return code %d" % process.returncode
+            printOutput = True
+
+    else:
+        log_tests = [compare_log(steering[:-2] + 'out', out, 1, options.diff_lines),
+                     compare_log(steering[:-2] + 'err', err, 0, options.diff_lines)]
+        if log_tests[0] is None and log_tests[1] is None:
+            result = True
+            message = "finished successfully"
+        elif not (log_tests[0] == False or log_tests[1] == False):
+            result = True
+            message = "logs ok"
+        else:
+            result = False
+            message = "logs differ"
+
+    extra = ""
+    if not options.quiet and process.returncode != 0:
+        output = []
+        if out.strip():
+            output += ["=== stdout of %s ===\n" % name, out.decode()]
+        if err.strip():
+            output += ["=== stderr of %s ===\n" % name, err.decode()]
+        if len(output):
+            output.append("=== end %s ===\n" % name)
+        extra = "".join(output)
+
+    print("%sfinished test %s\n     -> %s: %s" % (extra, name, {True: "passed", None: "skipped", False: "FAILED"}[result], message))
+    return (result, message)
+
+
+def process_dir(dir, release_dir):
+    """Search a directory for test steering files"""
+
+    exclude_dirs = ['include', 'src', 'tools', 'scripts', 'data', 'doc', 'examples']
+    tests = []
+    for entry in os.listdir(dir):
+        dir_entry = os.path.join(dir, entry)
+        if entry.find('.') > -1 or not os.path.isdir(dir_entry) or entry in exclude_dirs:
+            continue
+        if entry == 'tests':
+            for steering in glob.glob(os.path.join(dir_entry, '*.py')):
+                name = steering[len(release_dir):]
+                name = name.lstrip('/')
+                tests.append((name, release_dir))
+        else:
+            tests += process_dir(dir_entry, release_dir)
+
+    return tests
+
+
+def process_top_dir(release_dir, directories, processed_dirs):
+    """Loop over folders in the top release directory"""
+
+    dirs = os.listdir(release_dir)
+    if len(directories) > 0:
+        dirs = directories
+
+    exclude_dirs = ['build', 'include', 'lib', 'bin', 'modules', 'data', 'externals']
+    tests = []
+    for entry in dirs:
+        if entry in processed_dirs or entry in processed_dirs:
+            continue
+        dir_entry = os.path.join(release_dir, entry)
+        if entry.find('.') > -1 or not os.path.isdir(dir_entry):
+            continue
+        tests += process_dir(dir_entry, release_dir)
+        processed_dirs.append(entry)
+
+    return tests
+
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("-j", type=int, default=1, help="Number of processes", dest="nprocess", metavar="N")
+parser.add_argument("--xml", type=str, default=None, help="Save results into given file as xml")
+parser.add_argument("-n", "--diff-lines", type=int, default=10, help="Number of lines to show if output is different from template")
+parser.add_argument("-q", "--quiet", action="store_true", default=False, help="if given don't print output of failed tests")
+parser.add_argument("directories", nargs="*", help="run all tests included in these directories. "
+                    "If none are specified run all tests")
+options = parser.parse_args()
+
+# check whether a release is set up
+if not ('BELLE2_LOCAL_DIR' in os.environ or 'BELLE2_RELEASE_DIR' in os.environ):
+    sys.stderr.write('Error: no release is set up.\n')
+    sys.exit(-1)
+
+# first let's collect all tests
+all_tests = []
+processed_dirs = []
+if "BELLE2_LOCAL_DIR" in os.environ:
+    all_tests += process_top_dir(os.environ['BELLE2_LOCAL_DIR'], options.directories, processed_dirs)
+if "BELLE2_RELEASE_DIR" in os.environ:
+    all_tests += process_top_dir(os.environ['BELLE2_RELEASE_DIR'], options.directories, processed_dirs)
+
+all_tests.sort()
+print("Collected %d tests..." % len(all_tests))
+
+# now let's run them, either in multiprocessing or in a single process
+if options.nprocess > 1:
+    with ThreadPoolExecutor(max_workers=options.nprocess) as pool:
+        results = pool.map(run_test, all_tests)
+else:
+    results = map(run_test, all_tests)
+
+tests_passed = 0
+tests_failed = 0
+tests_skipped = 0
+# and present the results
+for passed, message in results:
+    if passed is True:
+        tests_passed += 1
+    elif passed is False:
+        tests_failed += 1
+    else:
+        tests_skipped += 1
+
+if options.xml and len(all_tests):
+    total_tests = len(all_tests)
+    xml_file = open(options.xml, 'w')
+    xml_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+    xml_file.write('<testsuites tests="%d" failures="%d" skipped="%d">\n' %
+                   (total_tests, tests_failed, tests_skipped))
+    for (name, release_dir), (passed, message) in zip(all_tests, results):
+        xml_file.write('  <testcase name="%s"' % name)
+        if passed is False:
+            xml_file.write('>\n    <failure message="%s">\n    </failure>\n  </testcase>\n' % message)
+        elif passed is None:
+            xml_file.write('>\n    <skipped message="%s">\n    </skipped>\n  </testcase>\n' % message)
+        else:
+            xml_file.write(' />\n')
+    xml_file.write('</testsuites>\n')
+    xml_file.close()
+
+# print summary and exit
+print('\n %d out of %d tests failed, %d where skipped' % (tests_failed, len(all_tests), tests_skipped))
+sys.exit(tests_failed)

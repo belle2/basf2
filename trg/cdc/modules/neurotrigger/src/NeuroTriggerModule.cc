@@ -53,7 +53,7 @@ NeuroTriggerModule::initialize()
 
   StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> tracksNN(m_outputCollectionName);
-  tracksNN.registerRelationTo(tracks2D);
+  tracks2D.registerRelationTo(tracksNN);
   StoreArray<CDCTriggerSegmentHit> segmentHits;
   tracksNN.registerRelationTo(segmentHits);
 }
@@ -80,7 +80,7 @@ NeuroTriggerModule::event()
                            tracks2D[itrack]->getOmega(),
                            tracks2D[itrack]->getChi2D(),
                            z, cot, 0.);
-      NNtrack->addRelationTo(tracks2D[itrack]);
+      tracks2D[itrack]->addRelationTo(NNtrack);
       // relations to hits used in MLP
       std::vector<unsigned> hitIds = m_NeuroTrigger.getSelectedHitIds();
       for (unsigned i = 0; i < hitIds.size(); ++i) {

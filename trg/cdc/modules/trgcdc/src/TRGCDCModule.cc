@@ -265,6 +265,8 @@ namespace Belle2 {
     tracks2Dfinder.registerRelationTo(segmentHits); // hits related over Hough cell
     tracks2Dfitter.registerRelationTo(segmentHits); // hits used for the 2D fit
     tracks3Dfitter.registerRelationTo(segmentHits); // hits used for the 2D and 3D fit
+    tracks2Dfinder.registerRelationTo(tracks2Dfitter);
+    tracks2Dfinder.registerRelationTo(tracks3Dfitter);
   }
 
   void

@@ -2190,6 +2190,9 @@ namespace Belle2 {
         TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
         track->addRelationTo(segment->storeHit());
       }
+      // relation to 2D finder, assuming same order in tracklist
+      if (storeTracks2Dfinder.getEntries() > 0)
+        storeTracks2Dfinder[itr]->addRelationTo(track);
     }
     // 3D tracks
     StoreArray<CDCTriggerTrack> storeTracks3Dfitter(collection3Dfitter);
@@ -2210,6 +2213,9 @@ namespace Belle2 {
         TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
         track->addRelationTo(segment->storeHit());
       }
+      // relation to 2D finder, assuming same order in tracklist
+      if (storeTracks2Dfinder.getEntries() > 0)
+        storeTracks2Dfinder[itr]->addRelationTo(track);
     }
 
     TRGDebug::leaveStage("TRGCDC storeSimulationResults");

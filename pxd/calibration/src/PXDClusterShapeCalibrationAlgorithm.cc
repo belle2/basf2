@@ -143,6 +143,20 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   m_histErrorEstimationV = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
   m_histnClusters = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
   m_histnClusterFraction = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
+  for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++) {
+    for (int i_shape = 0; i_shape < m_shapes + 1; i_shape++) {
+      m_histBiasCorrectionU[i_pk * m_shapes + i_shape] = NULL;
+      m_histBiasCorrectionV[i_pk * m_shapes + i_shape] = NULL;
+      m_histResidualRMSU[i_pk * m_shapes + i_shape] = NULL;
+      m_histResidualRMSV[i_pk * m_shapes + i_shape] = NULL;
+      m_histBiasCorrectionErrorU[i_pk * m_shapes + i_shape] = NULL;
+      m_histBiasCorrectionErrorV[i_pk * m_shapes + i_shape] = NULL;
+      m_histErrorEstimationU[i_pk * m_shapes + i_shape] = NULL;
+      m_histErrorEstimationV[i_pk * m_shapes + i_shape] = NULL;
+      m_histnClusters[i_pk * m_shapes + i_shape] = NULL;
+      m_histnClusterFraction[i_pk * m_shapes + i_shape] = NULL;
+    }
+  }
 
   name_OutFileDQM = Form("pxdClShCalDQM%s.root", name_Case.Data());
   name_OutDoExpertHistograms = Form("pxdClShCalHistos%s.root", name_Case.Data());
@@ -342,9 +356,11 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
     m_histnClusterFraction[m_pixelkinds * m_shapes]->GetXaxis()->SetTitle("Angle in u [deg]");
     m_histnClusterFraction[m_pixelkinds * m_shapes]->GetYaxis()->SetTitle("Angle in v [deg]");
 
-    fDQM->cd();
-    fExpertHistograms->cd();
+//    fDQM->cd();
+//    fExpertHistograms->cd();
 
+    fDQM->cd("NoSorting");
+    fExpertHistograms->cd("NoSorting");
   }
 
   int nEntries = getObject<TTree>(name_SourceTree.Data()).GetEntries();
@@ -389,26 +405,40 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
   // create vector for storing on database:
 
-  std::vector<TVectorD*> Correction_Bias(1);
-  std::vector<TVectorD*> Correction_ErrorEstimation(1);
-  std::vector<TVectorD*> Correction_BiasErr(1);
-  std::vector<TVectorD*> InPixelPosition(1);
+  TVectorD* Correction_Bias;
+//  std::vector<TVectorD*> Correction_Bias(1);
+  TVectorD* Correction_ErrorEstimation;
+  TVectorD* Correction_BiasErr;
+  TVectorD* InPixelPosition;
 
-  Correction_Bias[0] = new TVectorD(m_shapes * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV);
-  Correction_ErrorEstimation[0] = new TVectorD(m_shapes * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV);
-  Correction_BiasErr[0] = new TVectorD(m_shapes * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV);
-  InPixelPosition[0] = new TVectorD(m_shapes * m_pixelkinds * m_anglesU * m_anglesV * m_in_pixelU * m_in_pixelV);
+  TVectorD* PXDShCalibrationBasicSetting;
+  PXDShCalibrationBasicSetting = new TVectorD(50);
+  double fPXDShCalibrationBasicSetting[50];
+  for (int i = 0; i < 50; i++) fPXDShCalibrationBasicSetting[i] = 0.0;
+  fPXDShCalibrationBasicSetting[0] = m_shapes;
+  fPXDShCalibrationBasicSetting[1] = m_pixelkinds;
+  fPXDShCalibrationBasicSetting[2] = m_dimensions;
+  fPXDShCalibrationBasicSetting[3] = m_anglesU;
+  fPXDShCalibrationBasicSetting[4] = m_anglesV;
+  fPXDShCalibrationBasicSetting[5] = m_in_pixelU;
+  fPXDShCalibrationBasicSetting[6] = m_in_pixelV;
+  PXDShCalibrationBasicSetting->SetElements(fPXDShCalibrationBasicSetting);
+
+  Correction_Bias = new TVectorD(m_shapes * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV);
+  Correction_ErrorEstimation = new TVectorD(m_shapes * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV);
+  Correction_BiasErr = new TVectorD(m_shapes * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV);
+  InPixelPosition = new TVectorD(m_shapes * m_pixelkinds * m_anglesU * m_anglesV * m_in_pixelU * m_in_pixelV);
 
 
   // create tables for filling and normal using:
 
-  typedef boost::multi_array<double, 5> correction_table_type;
-  typedef boost::multi_array<double, 6> inpixel_table_type;
+//  typedef boost::multi_array<double, 5> correction_table_type;
+//  typedef boost::multi_array<double, 6> inpixel_table_type;
 
-  correction_table_type TCorrection_Bias(boost::extents[m_shapes][m_pixelkinds][m_dimensions][m_anglesU][m_anglesV]);
-  correction_table_type TCorrection_ErrorEstimation(boost::extents[m_shapes][m_pixelkinds][m_dimensions][m_anglesU][m_anglesV]);
-  correction_table_type TCorrection_BiasErr(boost::extents[m_shapes][m_pixelkinds][m_dimensions][m_anglesU][m_anglesV]);
-  inpixel_table_type TInPixelPosition(boost::extents[m_shapes][m_pixelkinds][m_anglesU][m_anglesV][m_in_pixelU][m_in_pixelV]);
+//  correction_table_type TCorrection_Bias(boost::extents[m_shapes][m_pixelkinds][m_dimensions][m_anglesU][m_anglesV]);
+//  correction_table_type TCorrection_ErrorEstimation(boost::extents[m_shapes][m_pixelkinds][m_dimensions][m_anglesU][m_anglesV]);
+//  correction_table_type TCorrection_BiasErr(boost::extents[m_shapes][m_pixelkinds][m_dimensions][m_anglesU][m_anglesV]);
+//  inpixel_table_type TInPixelPosition(boost::extents[m_shapes][m_pixelkinds][m_anglesU][m_anglesV][m_in_pixelU][m_in_pixelV]);
 
 
   // presets of vectors and tables:
@@ -417,31 +447,32 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   Double_t* ValueInPix = new Double_t[m_shapes * m_pixelkinds * m_anglesU * m_anglesV * m_in_pixelU * m_in_pixelV];
   for (int i = 0; i < m_shapes * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV; i++)
     ValueCors[i] = 0.0;
-  Correction_Bias[0]->SetElements(ValueCors);
-  Correction_BiasErr[0]->SetElements(ValueCors);
+  Correction_Bias->SetElements(ValueCors);
+  Correction_BiasErr->SetElements(ValueCors);
   for (int i = 0; i < m_shapes * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV; i++)
     ValueCors[i] = 1.0;
-  Correction_ErrorEstimation[0]->SetElements(ValueCors);
+  Correction_ErrorEstimation->SetElements(ValueCors);
   for (int i = 0; i < m_shapes * m_pixelkinds * m_anglesU * m_anglesV * m_in_pixelU * m_in_pixelV; i++)
     ValueInPix[i] = 0.0;
-  InPixelPosition[0]->SetElements(ValueInPix);
+  InPixelPosition->SetElements(ValueInPix);
 
   for (int i_shape = 0; i_shape < m_shapes; i_shape++)
     for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++)
       for (int i_axis = 0; i_axis < m_dimensions; i_axis++)
         for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++)
           for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
-            TCorrection_Bias[i_shape][i_pk][i_axis][i_angleU][i_angleV] = 0.0;
-            TCorrection_ErrorEstimation[i_shape][i_pk][i_axis][i_angleU][i_angleV] = 1.0;
-            TCorrection_BiasErr[i_shape][i_pk][i_axis][i_angleU][i_angleV] = 0.0;
+//            TCorrection_Bias[i_shape][i_pk][i_axis][i_angleU][i_angleV] = 0.0;
+//            TCorrection_ErrorEstimation[i_shape][i_pk][i_axis][i_angleU][i_angleV] = 1.0;
+//            TCorrection_BiasErr[i_shape][i_pk][i_axis][i_angleU][i_angleV] = 0.0;
           }
   for (int i_shape = 0; i_shape < m_shapes; i_shape++)
     for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++)
       for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++)
         for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++)
           for (int i_ipU = 0; i_ipU < m_in_pixelU; i_ipU++)
-            for (int i_ipV = 0; i_ipV < m_in_pixelV; i_ipV++)
-              TInPixelPosition[i_shape][i_pk][i_angleU][i_angleV][i_ipU][i_ipV] = 0.0;
+            for (int i_ipV = 0; i_ipV < m_in_pixelV; i_ipV++) {
+//              TInPixelPosition[i_shape][i_pk][i_angleU][i_angleV][i_ipU][i_ipV] = 0.0;
+            }
 
   B2DEBUG(30, "--> Presets done. ");
 
@@ -514,6 +545,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
         double PhiMi = ((TMath::Pi() * i_angleU) / m_anglesU) - (TMath::Pi() / 2.0);
         double PhiMa = ((TMath::Pi() * (i_angleU + 1)) / m_anglesU) - (TMath::Pi() / 2.0);
         if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {
+          PhiMi = TMath::Tan(PhiMi);  // TODO remeove those two lines - now correction of error in input datas (slope insteed angle)
+          PhiMa = TMath::Tan(PhiMa);  // TODO remeove those two lines - now correction of error in input datas (slope insteed angle)
           cCat = Form("phiTrack > %f", PhiMi);
           c3a.SetTitle(cCat.Data());
           cCat = Form("phiTrack < %f", PhiMa);
@@ -536,6 +569,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
           double ThetaMi = ((TMath::Pi() * i_angleV) / m_anglesV) - (TMath::Pi() / 2.0);
           double ThetaMa = ((TMath::Pi() * (i_angleV + 1)) / m_anglesV) - (TMath::Pi() / 2.0);
           if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {
+            ThetaMi = TMath::Tan(ThetaMi);  // TODO remeove those two lines - now correction of error in input datas (slope insteed angle)
+            ThetaMa = TMath::Tan(ThetaMa);  // TODO remeove those two lines - now correction of error in input datas (slope insteed angle)
             cCat = Form("thetaTrack > %f", ThetaMi);
             c4a.SetTitle(cCat.Data());
             cCat = Form("thetaTrack < %f", ThetaMa);
@@ -713,20 +748,20 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
   B2DEBUG(30, "--> Presets2b done. ");
 
-  auto key = make_tuple(1, 1, 0, 1, 0);
-  double& data = TCorrection_BiasMap[key];
-  cout << "Test - Old: table " << data << ", vector" << Correction_Bias[0]->GetMatrixArray()[3] << endl;
+//  auto key = make_tuple(1, 1, 0, 1, 0);
+//  double& data = TCorrection_BiasMap[key];
+//  cout << "Test - Old: table " << data << ", vector" << Correction_Bias->GetMatrixArray()[3] << endl;
 
-  Table2Vector(TCorrection_BiasMap, Correction_Bias[0]);
-  Table2Vector(TCorrection_ErrorEstimationMap, Correction_ErrorEstimation[0]);
-  Table2Vector(TCorrection_BiasMapErr, Correction_BiasErr[0]);
-  Table2Vector(TInPixelPositionMap, InPixelPosition[0]);
+  Table2Vector(TCorrection_BiasMap, Correction_Bias);
+  Table2Vector(TCorrection_ErrorEstimationMap, Correction_ErrorEstimation);
+  Table2Vector(TCorrection_BiasMapErr, Correction_BiasErr);
+  Table2Vector(TInPixelPositionMap, InPixelPosition);
 //  Vector2Table(Correction_Bias[0], TCorrection_BiasMap);
 //  Vector2Table(Correction_ErrorEstimation[0], TCorrection_ErrorEstimationMap);
 //  Vector2Table(InPixelPosition[0], TInPixelPositionMap);
 
-  cout << "Test - New: table " << data << " or " << TCorrection_BiasMap[key] << ", vector " << Correction_Bias[0]->GetMatrixArray()[3]
-       << endl;
+//  cout << "Test - New: table " << data << " or " << TCorrection_BiasMap[key] << ", vector " << Correction_Bias->GetMatrixArray()[3]
+//       << endl;
 
   B2DEBUG(30, "--> Save calibration to vectors done. ");
 
@@ -832,42 +867,23 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   // Here to save corrections in TVectorT format, could change later
   // Use TFile for temporary use,
   // Final use with saveCalibration and database.
+  TString nameBS = Form("PXDShCalibrationBasicSetting");
   TString nameB = Form("Correction_Bias");
+  TString nameBE = Form("Correction_BiasErr");
   TString nameEE = Form("Correction_ErrorEstimation");
   TString nameIP = Form("InPixelPosition");
   TFile* f = new TFile(name_OutFileCalibrations.Data(), "recreate");
-  Correction_Bias[0]->Write(nameB.Data());
-  Correction_ErrorEstimation[0]->Write(nameEE.Data());
-  InPixelPosition[0]->Write(nameIP.Data());
+  PXDShCalibrationBasicSetting->Write(nameBS.Data());
+  Correction_Bias->Write(nameB.Data());
+  Correction_BiasErr->Write(nameBE.Data());
+  Correction_ErrorEstimation->Write(nameEE.Data());
+  InPixelPosition->Write(nameIP.Data());
   f->Close();
 
-  saveCalibration(Correction_Bias[0], nameB.Data());
-  saveCalibration(Correction_ErrorEstimation[0], nameEE.Data());
-  saveCalibration(InPixelPosition[0], nameIP.Data());
+  saveCalibration(Correction_Bias, nameB.Data());
+  saveCalibration(Correction_ErrorEstimation, nameEE.Data());
+  saveCalibration(InPixelPosition, nameIP.Data());
 
-  // Save corrections to asci file:
-  FILE* AscFile = fopen("Corrections.txt", "w");
-  for (int i_shape = 0; i_shape < m_shapes; i_shape++)
-    for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++)
-      for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++)
-        for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++)
-          for (int i_axis = 0; i_axis < m_dimensions; i_axis++) {
-            if (TCorrection_BiasMap[make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] != 0)
-              fprintf(AscFile, "Bias Sh %i PixKind %i AngU %i AngV %i Dir %i : %f\n", i_shape, i_pk, i_angleU, i_angleV, i_axis,
-                      TCorrection_BiasMap[make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)]);
-            if (TCorrection_ErrorEstimationMap[make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] != 1)
-              fprintf(AscFile, "ErEs Sh %i PixKind %i AngU %i AngV %i Dir %i : %f\n", i_shape, i_pk, i_angleU, i_angleV, i_axis,
-                      TCorrection_ErrorEstimationMap[make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)]);
-//            if (TCorrection_Bias[i_shape][i_pk][i_axis][i_angleU][i_angleV] != 0)
-//              fprintf(AscFile,"Bias Sh %i PixKind %i AngU %i AngV %i Dir %i : %f\n",i_shape,i_pk,i_angleU,i_angleV,i_axis,TCorrection_Bias[i_shape][i_pk][i_axis][i_angleU][i_angleV]);
-//            if (TCorrection_ErrorEstimation[i_shape][i_pk][i_axis][i_angleU][i_angleV] != 1)
-//              fprintf(AscFile,"ErEs Sh %i PixKind %i AngU %i AngV %i Dir %i : %f\n",i_shape,i_pk,i_angleU,i_angleV,i_axis,TCorrection_ErrorEstimation[i_shape][i_pk][i_axis][i_angleU][i_angleV]);
-          }
-  fclose(AscFile);
-
-  for (int i = 0; i < m_pixelkinds * m_shapes + 1; i++) {
-    //  if (m_histBiasCorrectionU[i]) delete m_histBiasCorrectionU[i];
-  }
   delete[] m_histBiasCorrectionU;
   delete[] m_histBiasCorrectionV;
   delete[] m_histResidualRMSU;
@@ -886,14 +902,14 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
 void PXDClusterShapeCalibrationAlgorithm::Table2Vector(map_typeCorrs& TCorrection, TVectorD* CorVector)
 {
-  Double_t* ValueCors = new Double_t[m_shapes * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV];
+  Double_t* ValueCors;
+  ValueCors = new Double_t[m_shapes * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV];
   for (int i_shape = 0; i_shape < m_shapes; i_shape++)
     for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++)
       for (int i_axis = 0; i_axis < m_dimensions; i_axis++)
         for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++)
           for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
-            auto key = make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV);
-            auto& data = TCorrection[key];
+            double data = TCorrection[make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)];
             int i_vector = i_shape * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV;
             i_vector += i_pk * m_dimensions * m_anglesU * m_anglesV;
             i_vector += i_axis * m_anglesU * m_anglesV;
@@ -902,10 +918,11 @@ void PXDClusterShapeCalibrationAlgorithm::Table2Vector(map_typeCorrs& TCorrectio
             ValueCors[i_vector] = data;
           }
   CorVector->SetElements(ValueCors);
+
 //  B2DEBUG(30, "--> Inside Table2Vector " << TCorrection[1][0][0][0][8]);
 //  B2DEBUG(30, "--> Inside Table2Vector " << CorVector->GetMatrixArray()[3]);
 
-  delete[] ValueCors;
+//  delete[] ValueCors;
 
 }
 

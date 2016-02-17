@@ -155,8 +155,8 @@ void pxdClusterShapeCalibrationModule::collect()
           const PXDCluster& cluster = * pxdhit->getCluster();
           TVectorD state = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getFittedState().getState();
           // state 0=q/p, 1= track slope in local - U, 2: in V, 3: u position local, 4: v position local
-          m_phiTrack = state[1];
-          m_thetaTrack = state[2];
+          m_phiTrack = TMath::ATan2(state[1], 1.0);
+          m_thetaTrack = TMath::ATan2(state[2], 1.0);
           m_ResidUTrack = cluster.getU() - state[3];
           m_ResidVTrack = cluster.getV() - state[4];
           TMatrixDSym covariance = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getFittedState().getCov();

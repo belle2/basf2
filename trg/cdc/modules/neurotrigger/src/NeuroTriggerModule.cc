@@ -64,6 +64,7 @@ NeuroTriggerModule::event()
 {
   StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> tracksNN(m_outputCollectionName);
+  StoreArray<CDCTriggerSegmentHit> segmentHits;
   for (int itrack = 0; itrack < tracks2D.getEntries(); ++itrack) {
     m_NeuroTrigger.updateTrack(*tracks2D[itrack]);
     int isector = m_NeuroTrigger.selectMLP(*tracks2D[itrack]);
@@ -80,7 +81,11 @@ NeuroTriggerModule::event()
                            tracks2D[itrack]->getChi2D(),
                            z, cot, 0.);
       NNtrack->addRelationTo(tracks2D[itrack]);
-      // TODO: add hit relations
+      // relations to hits used in MLP
+      std::vector<unsigned> hitIds = m_NeuroTrigger.getSelectedHitIds();
+      for (unsigned i = 0; i < hitIds.size(); ++i) {
+        NNtrack->addRelationTo(segmentHits[hitIds[i]]);
+      }
     } else {
       B2WARNING("No MLP trained for this track.");
     }

@@ -139,6 +139,9 @@ namespace Belle2 {
      */
     std::vector<float> getInputVector(unsigned isector);
 
+    /** Get list of indices for the hits that are selected as input for the MLP. */
+    std::vector<unsigned> getSelectedHitIds() { return m_selectedHitIds; }
+
     /** Run an expert MLP.
      * @param isector index of the MLP
      * @param input vector of input values
@@ -156,6 +159,8 @@ namespace Belle2 {
     double m_idRef[9][2];
     /** 2D arclength of current track */
     double m_arclength[9][2];
+    /** List of indices for the hits that are selected as input for the MLP */
+    std::vector<unsigned> m_selectedHitIds = {};
   };
 }
 #endif

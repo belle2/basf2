@@ -385,6 +385,8 @@ NeuroTrigger::getInputVector(unsigned isector)
   tMin.assign(9, expert.getTMax());
   vector<bool> LRknown;
   LRknown.assign(9, false);
+  vector<int> hitIds;
+  hitIds.assign(9, -1);
   // loop over hits, choosing only 1 per superlayer
   for (int ihit = 0; ihit < hits.getEntries(); ++ ihit) {
     unsigned short iSL = hits[ihit]->getISuperLayer();
@@ -413,6 +415,7 @@ NeuroTrigger::getInputVector(unsigned isector)
         // keep drift time and LR
         LRknown[iSL] = hits[ihit]->LRknown();
         tMin[iSL] = t;
+        hitIds[iSL] = ihit;
         // get scaled input values: (relId, t, 2D arclength)
         inputVector[3 * iSL] = expert.scaleId(relId, iSL);
         inputVector[3 * iSL + 1] = (((LR >> 1) & 1) - (LR & 1)) * t / float(expert.getTMax());
@@ -420,6 +423,11 @@ NeuroTrigger::getInputVector(unsigned isector)
                                    / (M_PI_2 * m_radius[iSL][1] - m_radius[iSL][0]) - 1.;
       }
     }
+  }
+  // save selected hit Ids (for making relations to track)
+  m_selectedHitIds.clear();
+  for (unsigned iSL = 0; iSL < 9; ++iSL) {
+    if (hitIds[iSL] >= 0) m_selectedHitIds.push_back(hitIds[iSL]);
   }
   return inputVector;
 }

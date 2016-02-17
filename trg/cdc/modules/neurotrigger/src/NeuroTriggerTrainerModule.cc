@@ -227,20 +227,25 @@ void NeuroTriggerTrainerModule::event()
   StoreArray<CDCTriggerTrack> tracks("CDCTriggerTracks");
   for (int itrack = 0; itrack < tracks.getEntries(); ++itrack) {
     // get related MC track for target
-    RelationVector<MCParticle> mcParticles = tracks[itrack]->getRelationsTo<MCParticle>();
+    RelationVector<MCParticle> mcParticles = tracks[itrack]->getRelationsTo<MCParticle>("MCTracks");
     if (mcParticles.size() == 0) {
       B2DEBUG(150, "Skipping CDCTriggerTrack without relation to MCParticle.");
       continue;
     }
     MCParticle* mcTrack = mcParticles[0];
+    double maxWeight = mcParticles.weight(0);
     if (mcParticles.size() > 1) {
-      double maxWeight = mcParticles.weight(0);
+      //double maxWeight = mcParticles.weight(0);
       for (unsigned imc = 1; imc < mcParticles.size(); ++imc) {
         if (mcParticles.weight(imc) > maxWeight) {
           mcTrack = mcParticles[imc];
           maxWeight = mcParticles.weight(imc);
         }
       }
+    }
+    if (maxWeight <= 0) {
+      B2DEBUG(150, "Skipping CDCTriggerTrack with negative weight relation to MCParticle.");
+      continue;
     }
     // update 2D track variables
     m_NeuroTrigger.updateTrack(*tracks[itrack]);

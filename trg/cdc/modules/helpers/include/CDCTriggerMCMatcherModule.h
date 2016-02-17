@@ -1,0 +1,39 @@
+#ifndef CDCTRIGGERMCMATCHERMODULE_H
+#define CDCTRIGGERMCMATCHERMODULE_H
+
+#include <framework/core/Module.h>
+
+namespace Belle2 {
+
+  /** A module to match CDCTriggerTracks to MCParticles.
+   */
+  class CDCTriggerMCMatcherModule : public Module {
+  public:
+    /** Constructor, for setting module description and parameters. */
+    CDCTriggerMCMatcherModule();
+
+    /** Destructor. */
+    virtual ~CDCTriggerMCMatcherModule() {}
+
+    /** Initialize the module. */
+    virtual void initialize();
+
+    /** Called once for each event. */
+    virtual void event();
+
+  protected:
+    /** minimum number of axial hits to consider a MCParticle as trackable */
+    int m_minAxial;
+    /** minimum number of stereo hits to consider a MCParticle as trackable */
+    int m_minStereo;
+    /** minimum purity */
+    double m_minPurity;
+    /** minimum efficiency */
+    double m_minEfficiency;
+    /** switch for ignoring secondary particles */
+    bool m_onlyPrimaries;
+    /** switch for creating relations for clones and merged tracks */
+    bool m_relateClonesAndMerged;
+  };
+}
+#endif

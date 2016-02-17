@@ -252,21 +252,24 @@ namespace Belle2 {
     // register DataStore elements
     StoreArray<CDCTriggerSegmentHit>::registerPersistent();
     StoreArray<CDCTriggerSegmentHit> segmentHits;
-    StoreArray<CDCTriggerTrack>::registerPersistent(m_2DfinderCollectionName);
-    StoreArray<CDCTriggerTrack>::registerPersistent(m_2DfitterCollectionName);
-    StoreArray<CDCTriggerTrack>::registerPersistent(m_3DfitterCollectionName);
-    StoreArray<CDCTriggerTrack> tracks2Dfinder(m_2DfinderCollectionName);
-    StoreArray<CDCTriggerTrack> tracks2Dfitter(m_2DfitterCollectionName);
-    StoreArray<CDCTriggerTrack> tracks3Dfitter(m_3DfitterCollectionName);
     StoreArray<CDCHit> cdcHits;
     StoreArray<MCParticle> mcparticles;
     segmentHits.registerRelationTo(cdcHits);
     mcparticles.registerRelationTo(segmentHits);
-    tracks2Dfinder.registerRelationTo(segmentHits); // hits related over Hough cell
-    tracks2Dfitter.registerRelationTo(segmentHits); // hits used for the 2D fit
-    tracks3Dfitter.registerRelationTo(segmentHits); // hits used for the 2D and 3D fit
-    tracks2Dfinder.registerRelationTo(tracks2Dfitter);
-    tracks2Dfinder.registerRelationTo(tracks3Dfitter);
+    // register tracks only for full simulation (not for TSF simulation)
+    if (!(_fastSimulationMode & 1)) {
+      StoreArray<CDCTriggerTrack>::registerPersistent(m_2DfinderCollectionName);
+      StoreArray<CDCTriggerTrack>::registerPersistent(m_2DfitterCollectionName);
+      StoreArray<CDCTriggerTrack>::registerPersistent(m_3DfitterCollectionName);
+      StoreArray<CDCTriggerTrack> tracks2Dfinder(m_2DfinderCollectionName);
+      StoreArray<CDCTriggerTrack> tracks2Dfitter(m_2DfitterCollectionName);
+      StoreArray<CDCTriggerTrack> tracks3Dfitter(m_3DfitterCollectionName);
+      tracks2Dfinder.registerRelationTo(segmentHits); // hits related over Hough cell
+      tracks2Dfitter.registerRelationTo(segmentHits); // hits used for the 2D fit
+      tracks3Dfitter.registerRelationTo(segmentHits); // hits used for the 2D and 3D fit
+      tracks2Dfinder.registerRelationTo(tracks2Dfitter);
+      tracks2Dfinder.registerRelationTo(tracks3Dfitter);
+    }
   }
 
   void

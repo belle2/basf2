@@ -42,19 +42,8 @@ namespace Belle2 {
     : Module::Module(),
       _debugLevel(0),
       _configFilename("TRGCDCConfig.dat"),
-//      _innerTSLUTDataFilename("undefined"),
-//      _outerTSLUTDataFilename("undefined"),
       _innerTSLUTFilename("undefined"),
       _outerTSLUTFilename("undefined"),
-//      _tsfLUTSL0DataFilename("undefined"),
-//      _tsfLUTSL1DataFilename("undefined"),
-//      _tsfLUTSL2DataFilename("undefined"),
-//      _tsfLUTSL3DataFilename("undefined"),
-//      _tsfLUTSL4DataFilename("undefined"),
-//      _tsfLUTSL5DataFilename("undefined"),
-//      _tsfLUTSL6DataFilename("undefined"),
-//      _tsfLUTSL7DataFilename("undefined"),
-//      _tsfLUTSL8DataFilename("undefined"),
       _rootTRGCDCFilename("undefined"),
       _rootFitter3DFilename("undefined"),
       _curlBackStop(0),
@@ -64,11 +53,7 @@ namespace Belle2 {
       _fileTRGCDC(0),
       _perfect2DFinder(false),
       _perfect3DFinder(false),
-//    _hFinderMeshX(96),
-//    _hFinderMeshX(180),
       _hFinderMeshX(160),
-//    _hFinderMeshY(96),
-//    _hFinderMeshY(24),
       _hFinderMeshY(26),
       _hFinderPeakMin(5),
       _hFinderMappingFilePlus("HoughMappingPlus20160217.dat"),
@@ -89,7 +74,6 @@ namespace Belle2 {
 
     string desc = "TRGCDCModule(" + version() + ")";
     setDescription(desc);
-//    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
     setPropertyFlags(c_ParallelProcessingCertified);
 
     addParam("DebugLevel", _debugLevel, "TRGCDC debug level", _debugLevel);
@@ -97,14 +81,6 @@ namespace Belle2 {
              _configFilename,
              "The filename of CDC trigger config file",
              _configFilename);
-//    addParam("InnerTSLUTDataFile",
-//             _innerTSLUTDataFilename,
-//             "The filename of LUT for the inner-most track segments",
-//             _innerTSLUTDataFilename);
-//    addParam("OuterTSLUTDataFile",
-//             _outerTSLUTDataFilename,
-//             "The filename of LUT for outer track segments",
-//             _outerTSLUTDataFilename);
     addParam("InnerTSLUTFile",
              _innerTSLUTFilename,
              "The filename of LUT for inner-most track segments",
@@ -113,42 +89,6 @@ namespace Belle2 {
              _outerTSLUTFilename,
              "The filename of LUT for outer track segments",
              _outerTSLUTFilename);
-//    addParam("TSFLUTSL0DataFile",
-//             _tsfLUTSL0DataFilename,
-//             "The filename of LUT for TSF SL0",
-//             _tsfLUTSL0DataFilename);
-//    addParam("TSFLUTSL1DataFile",
-//             _tsfLUTSL1DataFilename,
-//             "The filename of LUT for TSF SL1",
-//             _tsfLUTSL1DataFilename);
-//    addParam("TSFLUTSL2DataFile",
-//             _tsfLUTSL2DataFilename,
-//             "The filename of LUT for TSF SL2",
-//             _tsfLUTSL2DataFilename);
-//    addParam("TSFLUTSL3DataFile",
-//             _tsfLUTSL3DataFilename,
-//             "The filename of LUT for TSF SL3",
-//             _tsfLUTSL3DataFilename);
-//    addParam("TSFLUTSL4DataFile",
-//             _tsfLUTSL4DataFilename,
-//             "The filename of LUT for TSF SL4",
-//             _tsfLUTSL4DataFilename);
-//    addParam("TSFLUTSL5DataFile",
-//             _tsfLUTSL5DataFilename,
-//             "The filename of LUT for TSF SL5",
-//             _tsfLUTSL5DataFilename);
-//    addParam("TSFLUTSL6DataFile",
-//             _tsfLUTSL6DataFilename,
-//             "The filename of LUT for TSF SL6",
-//             _tsfLUTSL6DataFilename);
-//    addParam("TSFLUTSL7DataFile",
-//             _tsfLUTSL7DataFilename,
-//             "The filename of LUT for TSF SL7",
-//             _tsfLUTSL7DataFilename);
-//    addParam("TSFLUTSL8DataFile",
-//             _tsfLUTSL8DataFilename,
-//             "The filename of LUT for TSF SL8",
-//             _tsfLUTSL8DataFilename);
     addParam("RootTRGCDCFile",
              _rootTRGCDCFilename,
              "The filename of root file for TRGCDC",
@@ -261,13 +201,8 @@ namespace Belle2 {
 
   TRGCDCModule::~TRGCDCModule()
   {
-
     if (_cdc)
       TRGCDC::getTRGCDC("good-bye");
-
-    //...Maybe G4RunManager delete it, so don't delete _sa.
-//  if (_sa)
-//         delete _sa;
 
     if (TRGDebug::level())
       cout << "TRGCDCModule ... destructed " << endl;
@@ -321,7 +256,6 @@ namespace Belle2 {
   void
   TRGCDCModule::beginRun()
   {
-
     //...CDC trigger config. name...
     static string cfn = _configFilename;
 
@@ -334,19 +268,8 @@ namespace Belle2 {
                                _fileTRGCDC,
                                _perfect2DFinder,
                                _perfect3DFinder,
-//         _innerTSLUTDataFilename,
-//         _outerTSLUTDataFilename,
                                _innerTSLUTFilename,
                                _outerTSLUTFilename,
-//         _tsfLUTSL0DataFilename,
-//         _tsfLUTSL1DataFilename,
-//         _tsfLUTSL2DataFilename,
-//         _tsfLUTSL3DataFilename,
-//         _tsfLUTSL4DataFilename,
-//         _tsfLUTSL5DataFilename,
-//         _tsfLUTSL6DataFilename,
-//         _tsfLUTSL7DataFilename,
-//         _tsfLUTSL8DataFilename,
                                _rootTRGCDCFilename,
                                _rootFitter3DFilename,
                                _hFinderMeshX,
@@ -374,12 +297,6 @@ namespace Belle2 {
   void
   TRGCDCModule::event()
   {
-
-    if (TRGDebug::level()) {
-//      _cdc->dump("geometry superLayers layers wires detail");
-//      _cdc->dump("geometry superLayers layers detail");
-    }
-
     //...CDC trigger simulation...
     _cdc->update(true);
     _cdc->simulate();

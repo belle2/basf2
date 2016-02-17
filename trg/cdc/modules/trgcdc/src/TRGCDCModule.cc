@@ -30,14 +30,15 @@ using namespace std;
 
 namespace Belle2 {
 
-REG_MODULE(TRGCDC);
+  REG_MODULE(TRGCDC);
 
-string
-TRGCDCModule::version() const {
+  string
+  TRGCDCModule::version() const
+  {
     return string("TRGCDCModule 5.07");
-}
+  }
 
-TRGCDCModule::TRGCDCModule()
+  TRGCDCModule::TRGCDCModule()
     : Module::Module(),
       _debugLevel(0),
       _configFilename("TRGCDCConfig.dat"),
@@ -83,7 +84,8 @@ TRGCDCModule::TRGCDCModule()
       _fileFitter3D(0),
       _trgCDCDataInputMode(0),
       _cdc(0),
-      _sa(0) {
+      _sa(0)
+  {
 
     string desc = "TRGCDCModule(" + version() + ")";
     setDescription(desc);
@@ -104,13 +106,13 @@ TRGCDCModule::TRGCDCModule()
 //             "The filename of LUT for outer track segments",
 //             _outerTSLUTDataFilename);
     addParam("InnerTSLUTFile",
-	     _innerTSLUTFilename,
-	     "The filename of LUT for inner-most track segments",
-	     _innerTSLUTFilename);
+             _innerTSLUTFilename,
+             "The filename of LUT for inner-most track segments",
+             _innerTSLUTFilename);
     addParam("OuterTSLUTFile",
-	     _outerTSLUTFilename,
-	     "The filename of LUT for outer track segments",
-	     _outerTSLUTFilename);
+             _outerTSLUTFilename,
+             "The filename of LUT for outer track segments",
+             _outerTSLUTFilename);
 //    addParam("TSFLUTSL0DataFile",
 //             _tsfLUTSL0DataFilename,
 //             "The filename of LUT for TSF SL0",
@@ -160,17 +162,17 @@ TRGCDCModule::TRGCDCModule()
              "Curl back stop parameter",
              _curlBackStop);
     addParam("SimulationMode",
-	     _simulationMode,
-	     "TRGCDC simulation switch",
-	     _simulationMode);
+             _simulationMode,
+             "TRGCDC simulation switch",
+             _simulationMode);
     addParam("FastSimulationMode",
-	     _fastSimulationMode,
-	     "TRGCDC fast simulation mode",
-	     _fastSimulationMode);
+             _fastSimulationMode,
+             "TRGCDC fast simulation mode",
+             _fastSimulationMode);
     addParam("FirmwareSimulationMode",
-	     _firmwareSimulationMode,
-	     "TRGCDC firmware simulation mode",
-	     _firmwareSimulationMode);
+             _firmwareSimulationMode,
+             "TRGCDC firmware simulation mode",
+             _firmwareSimulationMode);
     addParam("TRGCDCRootFile",
              _fileTRGCDC,
              "Flag for making TRGCDC.root",
@@ -224,9 +226,9 @@ TRGCDCModule::TRGCDCModule()
              "Using new Zi error",
              _fzierror);
     addParam("MCLR",
-	     _fmclr,
-	     "Using MC L/R information",
-	     _fmclr);
+             _fmclr,
+             "Using MC L/R information",
+             _fmclr);
     addParam("wireHitInefficiency",
              _wireHitInefficiency,
              "wire hit inefficiency",
@@ -254,51 +256,53 @@ TRGCDCModule::TRGCDCModule()
 
 
     if (TRGDebug::level())
-	cout << "TRGCDCModule ... created" << endl;
-}
+      cout << "TRGCDCModule ... created" << endl;
+  }
 
-TRGCDCModule::~TRGCDCModule() {
+  TRGCDCModule::~TRGCDCModule()
+  {
 
     if (_cdc)
-        TRGCDC::getTRGCDC("good-bye");
+      TRGCDC::getTRGCDC("good-bye");
 
     //...Maybe G4RunManager delete it, so don't delete _sa.
 //  if (_sa)
 //         delete _sa;
 
     if (TRGDebug::level())
-        cout << "TRGCDCModule ... destructed " << endl;
-}
+      cout << "TRGCDCModule ... destructed " << endl;
+  }
 
-void
-TRGCDCModule::initialize() {
+  void
+  TRGCDCModule::initialize()
+  {
 
     //...Stop curl buck...
     if (_curlBackStop) {
-	G4RunManager* g4rm = G4RunManager::GetRunManager();
-	if(g4rm!=0){
-	    if(g4rm->GetUserPhysicsList()!=0){
-		_sa = new TCSAction();
-		g4rm->SetUserAction(_sa);
-	    }
-	}
+      G4RunManager* g4rm = G4RunManager::GetRunManager();
+      if (g4rm != 0) {
+        if (g4rm->GetUserPhysicsList() != 0) {
+          _sa = new TCSAction();
+          g4rm->SetUserAction(_sa);
+        }
+      }
     }
     TRGDebug::level(_debugLevel);
 
     if (TRGDebug::level()) {
-	cout << "TRGCDCModule::initialize ... options" << endl;
-	cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
-	     << endl;
-	cout << TRGDebug::tab(4) << "back stop = " << _curlBackStop << endl;
-	cout << TRGDebug::tab(4) << "2D finder perfect = " << _perfect2DFinder
-	     << endl;
-	cout << TRGDebug::tab(4) << "Hough finder Mesh X = " << _hFinderMeshX
-	     << endl;
-	cout << TRGDebug::tab(4) << "Hough finder Mesh Y = " << _hFinderMeshY
-	     << endl;
-        cout << TRGDebug::tab(4) << "Hough finder Min. Peak = "
-             << _hFinderPeakMin
-             << endl;
+      cout << "TRGCDCModule::initialize ... options" << endl;
+      cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
+           << endl;
+      cout << TRGDebug::tab(4) << "back stop = " << _curlBackStop << endl;
+      cout << TRGDebug::tab(4) << "2D finder perfect = " << _perfect2DFinder
+           << endl;
+      cout << TRGDebug::tab(4) << "Hough finder Mesh X = " << _hFinderMeshX
+           << endl;
+      cout << TRGDebug::tab(4) << "Hough finder Mesh Y = " << _hFinderMeshY
+           << endl;
+      cout << TRGDebug::tab(4) << "Hough finder Min. Peak = "
+           << _hFinderPeakMin
+           << endl;
     }
 
     // register DataStore elements
@@ -312,62 +316,64 @@ TRGCDCModule::initialize() {
     mcparticles.registerRelationTo(segmentHits);
     tracks.registerRelationTo(segmentHits);
     tracks.registerRelationTo(mcparticles);
-}
+  }
 
-void
-TRGCDCModule::beginRun() {
+  void
+  TRGCDCModule::beginRun()
+  {
 
     //...CDC trigger config. name...
     static string cfn = _configFilename;
 
     //...CDC trigger...
     if ((cfn != _configFilename) || (_cdc == 0))
-	_cdc = TRGCDC::getTRGCDC(_configFilename,
-				 _simulationMode,
-				 _fastSimulationMode,
-				 _firmwareSimulationMode,
-                                 _fileTRGCDC,
-				 _perfect2DFinder,
-				 _perfect3DFinder,
-//				 _innerTSLUTDataFilename,
-//				 _outerTSLUTDataFilename,
-				 _innerTSLUTFilename,
-				 _outerTSLUTFilename,
-//				 _tsfLUTSL0DataFilename,
-//				 _tsfLUTSL1DataFilename,
-//				 _tsfLUTSL2DataFilename,
-//				 _tsfLUTSL3DataFilename,
-//				 _tsfLUTSL4DataFilename,
-//				 _tsfLUTSL5DataFilename,
-//				 _tsfLUTSL6DataFilename,
-//				 _tsfLUTSL7DataFilename,
-//				 _tsfLUTSL8DataFilename,
-				 _rootTRGCDCFilename,
-				 _rootFitter3DFilename,
-				 _hFinderMeshX,
-				 _hFinderMeshY,
-				 _hFinderPeakMin,
-                                 _hFinderMappingFilePlus,
-                                 _hFinderMappingFileMinus,
-                                 _hFinderDoit,
-                                 _fLogicLUTTSF,
-				 _fLRLUT,
-				 _fevtTime,
-				 _fzierror,
-				 _fmclr,
-				 _wireHitInefficiency,
-                                 _fileTSF,
-                                 _fileHough3D,
-                                 _finder3DMode,
-                                 _fileFitter3D,
-                                 _trgCDCDataInputMode);
+      _cdc = TRGCDC::getTRGCDC(_configFilename,
+                               _simulationMode,
+                               _fastSimulationMode,
+                               _firmwareSimulationMode,
+                               _fileTRGCDC,
+                               _perfect2DFinder,
+                               _perfect3DFinder,
+//         _innerTSLUTDataFilename,
+//         _outerTSLUTDataFilename,
+                               _innerTSLUTFilename,
+                               _outerTSLUTFilename,
+//         _tsfLUTSL0DataFilename,
+//         _tsfLUTSL1DataFilename,
+//         _tsfLUTSL2DataFilename,
+//         _tsfLUTSL3DataFilename,
+//         _tsfLUTSL4DataFilename,
+//         _tsfLUTSL5DataFilename,
+//         _tsfLUTSL6DataFilename,
+//         _tsfLUTSL7DataFilename,
+//         _tsfLUTSL8DataFilename,
+                               _rootTRGCDCFilename,
+                               _rootFitter3DFilename,
+                               _hFinderMeshX,
+                               _hFinderMeshY,
+                               _hFinderPeakMin,
+                               _hFinderMappingFilePlus,
+                               _hFinderMappingFileMinus,
+                               _hFinderDoit,
+                               _fLogicLUTTSF,
+                               _fLRLUT,
+                               _fevtTime,
+                               _fzierror,
+                               _fmclr,
+                               _wireHitInefficiency,
+                               _fileTSF,
+                               _fileHough3D,
+                               _finder3DMode,
+                               _fileFitter3D,
+                               _trgCDCDataInputMode);
 
     if (TRGDebug::level())
-	cout << "TRGCDCModule ... beginRun called " << endl;
-}
+      cout << "TRGCDCModule ... beginRun called " << endl;
+  }
 
-void
-TRGCDCModule::event() {
+  void
+  TRGCDCModule::event()
+  {
 
     if (TRGDebug::level()) {
 //      _cdc->dump("geometry superLayers layers wires detail");
@@ -377,21 +383,23 @@ TRGCDCModule::event() {
     //...CDC trigger simulation...
     _cdc->update(true);
     _cdc->simulate();
-}
+  }
 
-void
-TRGCDCModule::endRun() {
+  void
+  TRGCDCModule::endRun()
+  {
     if (TRGDebug::level())
-        cout << "TRGCDCModule ... endRun called " << endl;
-}
+      cout << "TRGCDCModule ... endRun called " << endl;
+  }
 
-void
-TRGCDCModule::terminate() {
+  void
+  TRGCDCModule::terminate()
+  {
 
     _cdc->terminate();
 
     if (TRGDebug::level())
-	cout << "TRGCDCModule ... terminate called " << endl;
-}
+      cout << "TRGCDCModule ... terminate called " << endl;
+  }
 
 } // namespace Belle2

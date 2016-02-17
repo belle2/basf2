@@ -22,6 +22,12 @@ namespace Belle2 {
     virtual void event();
 
   protected:
+    /** Name of the MCParticle StoreArray to be matched */
+    std::string m_MCParticleCollectionName;
+    /** Name of the CDCTriggerTrack Store Array to be matched */
+    std::string m_TrgTrackCollectionName;
+    /** Name of a new StoreArray holding MCParticles considered as trackable */
+    std::string m_MCTrackableCollectionName;
     /** minimum number of axial hits to consider a MCParticle as trackable */
     int m_minAxial;
     /** minimum number of stereo hits to consider a MCParticle as trackable */

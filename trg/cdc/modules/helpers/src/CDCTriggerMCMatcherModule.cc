@@ -47,6 +47,15 @@ CDCTriggerMCMatcherModule::CDCTriggerMCMatcherModule() : Module()
                  "and makes relations from MCTracks to CDCTriggerTracks "
                  "and vice-versa.");
 
+  addParam("MCParticleCollectionName", m_MCParticleCollectionName,
+           "Name of the MCParticle StoreArray to be matched.",
+           string("MCParticles"));
+  addParam("TrgTrackCollectionName", m_TrgTrackCollectionName,
+           "Name of the CDCTriggerTrack StoreArray to be matched.",
+           string("Trg2DFinderTracks"));
+  addParam("MCTrackableCollectionName", m_MCTrackableCollectionName,
+           "Name of a new StoreArray holding MCParticles considered as trackable.",
+           string("MCTracks"));
   addParam("minAxial", m_minAxial,
            "Minimum number of axial hits in different super layers.",
            0);
@@ -61,7 +70,7 @@ CDCTriggerMCMatcherModule::CDCTriggerMCMatcherModule() : Module()
            0.1);
   addParam("onlyPrimaries", m_onlyPrimaries,
            "If true, MCTracks are only made from primary particles.",
-           true);
+           false);
   addParam("relateClonesAndMerged", m_relateClonesAndMerged,
            "If true, create relations for clones and merged tracks "
            "(will get negative weight).",
@@ -73,14 +82,14 @@ void
 CDCTriggerMCMatcherModule::initialize()
 {
   StoreArray<CDCTriggerSegmentHit>::required();
-  StoreArray<CDCTriggerTrack>::required();
-  StoreArray<MCParticle>::required();
-  StoreArray<MCParticle>::registerPersistent("MCTracks");
+  StoreArray<CDCTriggerTrack>::required(m_TrgTrackCollectionName);
+  StoreArray<MCParticle>::required(m_MCParticleCollectionName);
+  StoreArray<MCParticle>::registerPersistent(m_MCTrackableCollectionName);
 
   StoreArray<CDCTriggerSegmentHit> segmentHits;
-  StoreArray<CDCTriggerTrack> tracks;
-  StoreArray<MCParticle> mcparticles;
-  StoreArray<MCParticle> mctracks("MCTracks");
+  StoreArray<CDCTriggerTrack> tracks(m_TrgTrackCollectionName);
+  StoreArray<MCParticle> mcparticles(m_MCParticleCollectionName);
+  StoreArray<MCParticle> mctracks(m_MCTrackableCollectionName);
 
   mcparticles.requireRelationTo(segmentHits);
   tracks.requireRelationTo(segmentHits);
@@ -95,9 +104,9 @@ void
 CDCTriggerMCMatcherModule::event()
 {
   StoreArray<CDCTriggerSegmentHit> segmentHits;
-  StoreArray<CDCTriggerTrack> prTracks;
-  StoreArray<MCParticle> mcParticles;
-  StoreArray<MCParticle> mcTracks("MCTracks");
+  StoreArray<CDCTriggerTrack> prTracks(m_TrgTrackCollectionName);
+  StoreArray<MCParticle> mcParticles(m_MCParticleCollectionName);
+  StoreArray<MCParticle> mcTracks(m_MCTrackableCollectionName);
 
   // get all trackable particles
   for (int imc = 0; imc < mcParticles.getEntries(); ++imc) {
@@ -395,5 +404,5 @@ CDCTriggerMCMatcherModule::event()
     }
   }
 
-  B2DEBUG(100, "########## End MCMatcherTracksModule ############");
+  B2DEBUG(100, "########## end MC matching ############");
 }

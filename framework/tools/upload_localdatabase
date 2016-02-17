@@ -128,6 +128,8 @@ if __name__ == "__main__":
         B2WARNING("-j must be larger than zero, ignoring")
         args.nprocess = 1
 
+    B2INFO("Using %d simultaneous connections" % args.nprocess)
+
     # create conditions db interface
     db = ConditionsDB(args.base_url, args.nprocess, args.retries)
 
@@ -293,7 +295,7 @@ if __name__ == "__main__":
         return entry
 
     with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
-        results = map(upload, entries)
+        results = pool.map(upload, entries)
         # let's loop over the result to see any exceptions
         for entry in results:
             # nothing to do, just need to iterate to get execptions to execute.

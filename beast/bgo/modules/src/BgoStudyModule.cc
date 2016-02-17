@@ -66,14 +66,14 @@ void BgoStudyModule::defineHisto()
 {
   for (int i = 0; i < 8; i++) {
     h_bgos_Evtof1[i] = new TH2F(TString::Format("h_bgos_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 5000, 0., 1000.,
-                                1000, 0., 10.);
+                                1000, 0., 400.);
     h_bgos_Evtof2[i] = new TH2F(TString::Format("h_bgos_Evtof2_%d", i), "Energy deposited [MeV] vs TOF [ns] - only photons", 5000, 0.,
-                                1000., 1000, 0., 10.);
+                                1000., 1000, 0., 400.);
     h_bgos_Evtof3[i] = new TH2F(TString::Format("h_bgos_Evtof3_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
-                                1000., 1000, 0., 10.);
+                                1000., 1000, 0., 400.);
     h_bgos_Evtof4[i] = new TH2F(TString::Format("h_bgos_Evtof4_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
-                                1000., 1000, 0., 10.);
-    h_bgos_edep[i] = new TH1F(TString::Format("h_bgos_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
+                                1000., 1000, 0., 400.);
+    h_bgos_edep[i] = new TH1F(TString::Format("h_bgos_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
   }
 
 }
@@ -112,7 +112,7 @@ void BgoStudyModule::event()
     int detNB = aHit->getCellId();
     //int trkID = aHit->getTrackId();
     int pdg = aHit->getPDGCode();
-    double Edep = aHit->getEnergyDep(); //GeV
+    double Edep = aHit->getEnergyDep() * 1e3; //GeV -> MeV
     double tof = aHit->getFlightTime(); //ns
 
     h_bgos_Evtof1[detNB]->Fill(tof, Edep);

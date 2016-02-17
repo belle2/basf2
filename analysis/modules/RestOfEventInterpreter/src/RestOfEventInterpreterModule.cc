@@ -83,9 +83,9 @@ namespace Belle2 {
         B2FATAL("ROE mask with name \'" << maskName << "\' already exists!");
 
       m_allMaskNames.push_back(maskName);
-      m_trackCuts[maskName] = trackCut;
-      m_eclClusterCuts[maskName] = eclClusterCut;
-      m_setOfFractions[maskName] = fractions;
+      m_trackCuts.insert(stringAndCutMap::value_type(maskName, trackCut));
+      m_eclClusterCuts.insert(stringAndCutMap::value_type(maskName, eclClusterCut));
+      m_setOfFractions.insert(stringAndVectorMap::value_type(maskName, fractions));
 
       B2INFO("RestOfEventInterpreter added ROEMask with default fractions under name \'" << maskName << "\' with track cuts: " <<
              trackSelection << " and eclCluster cuts: " << eclClusterSelection);
@@ -105,14 +105,13 @@ namespace Belle2 {
         B2FATAL("ROE mask with name \'" << maskName << "\' already exists!");
 
       m_allMaskNames.push_back(maskName);
-      m_trackCuts[maskName] = trackCut;
-      m_eclClusterCuts[maskName] = eclClusterCut;
-      m_setOfFractions[maskName] = fractions;
+      m_trackCuts.insert(stringAndCutMap::value_type(maskName, trackCut));
+      m_eclClusterCuts.insert(stringAndCutMap::value_type(maskName, eclClusterCut));
+      m_setOfFractions.insert(stringAndVectorMap::value_type(maskName, fractions));
 
       B2INFO("RestOfEventInterpreter added ROEMask with specific fractions under name \'" << maskName << "\' with track cuts: " <<
              trackSelection << " and eclCluster cuts: " << eclClusterSelection);
     }
-
   }
 
   void RestOfEventInterpreterModule::event()
@@ -126,21 +125,24 @@ namespace Belle2 {
       const Particle* particle = plist->getParticle(i);
       RestOfEvent* roe = particle->getRelated<RestOfEvent>();
 
-      std::map<std::string, std::map<unsigned int, bool>> trackMasks;
-      std::map<std::string, std::map<unsigned int, bool>> eclClusterMasks;
+      stringAndMapOfIntAndBoolMap trackMasks;
+      stringAndMapOfIntAndBoolMap eclClusterMasks;
 
       // Create track and cluster masks for all interpretations
       for (auto maskName : m_allMaskNames) {
 
-        std::map<unsigned int, bool> trackMask;
-        std::map<unsigned int, bool> eclClusterMask;
+        // Check if two tracks are matched to the same particle
+        std::vector<const Track*> roeTracks1 = roe->getTracks();
+
+        intAndBoolMap trackMask;
+        intAndBoolMap eclClusterMask;
 
         // Create track masks
         std::vector<const Track*> roeTracks = roe->getTracks();
         for (unsigned i = 0; i < roeTracks.size(); i++) {
           const Track* track = roeTracks[i];
           const PIDLikelihood* pid = track->getRelatedTo<PIDLikelihood>();
-          int chargedStablePDG;
+          int particlePDG = Const::pion.getPDGCode();
 
           std::vector<double> tempVector = m_setOfFractions[maskName];
           const int n = Const::ChargedStable::c_SetSize;
@@ -149,36 +151,50 @@ namespace Belle2 {
             double tempFractionsArray[n];
             for (unsigned int i = 0; i < n; i++)
               tempFractionsArray[i] = tempVector[i];
-            chargedStablePDG = pid->getMostLikely(tempFractionsArray).getPDGCode();
+            particlePDG = pid->getMostLikely(tempFractionsArray).getPDGCode();
           } else if (tempVector.size() == 1 and tempVector[0] == -1) {
             const MCParticle* mcp = track->getRelatedTo<MCParticle>();
-            if (!mcp) {
-              B2WARNING("No related MCParticle found! Default will be used.");
-              chargedStablePDG = Const::pion.getPDGCode();
-            } else
-              chargedStablePDG = abs(mcp->getPDG());
+            // Use pion as default if not MC particle is found
+            if (mcp)
+              particlePDG = abs(mcp->getPDG());
           } else
             B2FATAL("Size of fractions vector not appropriate! Check the fractions in the ROEInterpreter with mask name: " << maskName);
 
-          Particle p(track, Const::ChargedStable(chargedStablePDG));
+          // TODO: THIS IS A TEMPORARY FIX SO NO CRASH OCCURS
+          if (particlePDG != 11 and particlePDG != 13 and particlePDG != 211 and particlePDG != 321 and particlePDG != 2212
+              and particlePDG != 1000010020)
+            particlePDG = Const::pion.getPDGCode();
+          Particle p(track, Const::ChargedStable(particlePDG));
           Particle* tempPart = &p;
 
+          std::pair<intAndBoolMap::iterator, bool> ret;
+
           if (m_trackCuts[maskName]->check(tempPart))
-            trackMask[track->getArrayIndex()] = true;
+            ret = trackMask.insert(intAndBoolMap::value_type(track->getArrayIndex(), true));
           else
-            trackMask[track->getArrayIndex()] = false;
+            ret = trackMask.insert(intAndBoolMap::value_type(track->getArrayIndex(), false));
+
+          if (!ret.second)
+            B2FATAL("Failed to add Track with ID '" << track->getArrayIndex() << "' to this Track mask! Something is wrong.");
         }
 
         // Create cluster masks
         std::vector<const ECLCluster*> roeECLClusters = roe->getECLClusters();
         for (unsigned i = 0; i < roeECLClusters.size(); i++) {
           const ECLCluster* cluster = roeECLClusters[i];
+
           Particle p(cluster);
           Particle* tempPart = &p;
+
+          std::pair<intAndBoolMap::iterator, bool> ret;
+
           if (m_eclClusterCuts[maskName]->check(tempPart))
-            eclClusterMask[cluster->getArrayIndex()] = true;
+            ret = eclClusterMask.insert(intAndBoolMap::value_type(cluster->getArrayIndex(), true));
           else
-            eclClusterMask[cluster->getArrayIndex()] = false;
+            ret = eclClusterMask.insert(intAndBoolMap::value_type(cluster->getArrayIndex(), false));
+
+          if (!ret.second)
+            B2FATAL("Failed to add ECLCluster with ID '" << cluster->getArrayIndex() << "' to this ECLCluster mask! Something is wrong.");
         }
 
         // Final check, just in case
@@ -187,8 +203,18 @@ namespace Belle2 {
         if (eclClusterMask.size() != (unsigned) roe->getNECLClusters())
           B2FATAL("ECLCluster mask size does not have appropriate size!");
 
-        trackMasks[maskName] = trackMask;
-        eclClusterMasks[maskName] = eclClusterMask;
+        // Insert mask to map of masks
+        std::pair<stringAndMapOfIntAndBoolMap::iterator, bool> retT;
+        std::pair<stringAndMapOfIntAndBoolMap::iterator, bool> retE;
+
+        retT = trackMasks.insert(stringAndMapOfIntAndBoolMap::value_type(maskName, trackMask));
+        retE = eclClusterMasks.insert(stringAndMapOfIntAndBoolMap::value_type(maskName, eclClusterMask));
+
+        if (!retT.second)
+          B2ERROR("Mask with name '" << maskName << "' already exists in map of Track masks! Ignoring this mask.");
+
+        if (!retE.second)
+          B2ERROR("Mask with name '" << maskName << "' already exists in map of ECLClusters masks! Ignoring this mask.");
       }
 
       roe->appendTrackMasks(trackMasks);

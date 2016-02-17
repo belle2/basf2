@@ -58,14 +58,29 @@ void RestOfEvent::appendChargedStableFractionsSet(std::map<std::string, std::vec
   m_fractionsSet.insert(fractionsSet.begin(), fractionsSet.end());
 }
 
+void RestOfEvent::updateChargedStableFractions(std::string maskName, std::vector<double> fractions)
+{
+  m_fractionsSet[maskName] = fractions;
+}
+
 void RestOfEvent::appendTrackMasks(std::map<std::string, std::map<unsigned int, bool>> masks)
 {
   m_trackMasks.insert(masks.begin(), masks.end());
 }
 
+void RestOfEvent::updateTrackMask(std::string maskName, std::map<unsigned int, bool> trackMask)
+{
+  m_trackMasks[maskName] = trackMask;
+}
+
 void RestOfEvent::appendECLClusterMasks(std::map<std::string, std::map<unsigned int, bool>> masks)
 {
   m_eclClusterMasks.insert(masks.begin(), masks.end());
+}
+
+void RestOfEvent::updateECLClusterMask(std::string maskName, std::map<unsigned int, bool> eclClusterMask)
+{
+  m_eclClusterMasks[maskName] = eclClusterMask;
 }
 
 std::vector<const Track*> RestOfEvent::getTracks(std::string maskName) const
@@ -173,11 +188,13 @@ TLorentzVector RestOfEvent::get4VectorTracks(std::string maskName) const
     if (fractions[0] == -1) {
       if (mcp)
         particlePDG = abs(mcp->getPDG());
-      else
-        B2WARNING("No related MCParticle found! Default will be used.");
     } else
       particlePDG = pid->getMostLikely(fractions).getPDGCode();
 
+    // TODO: THIS IS A TEMPORARY FIX SO NO CRASH OCCURS
+    if (particlePDG != 11 and particlePDG != 13 and particlePDG != 211 and particlePDG != 321 and particlePDG != 2212
+        and particlePDG != 1000010020)
+      particlePDG = Const::pion.getPDGCode();
     Const::ChargedStable trackParticle = Const::ChargedStable(particlePDG);
     const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(trackParticle);
 
@@ -298,6 +315,16 @@ int RestOfEvent::getNECLClusters(std::string maskName) const
   return nROEECLClusters;
 }
 
+std::vector<std::string> RestOfEvent::getMaskNames() const
+{
+  std::vector<std::string> maskNames;
+
+  for (auto& it : m_trackMasks) {
+    maskNames.push_back(it.first);
+  }
+
+  return maskNames;
+}
 void RestOfEvent::print() const
 {
   B2INFO(" - Tracks[" << m_trackIndices.size() << "] : ");

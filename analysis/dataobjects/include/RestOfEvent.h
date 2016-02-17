@@ -112,6 +112,14 @@ namespace Belle2 {
     void appendChargedStableFractionsSet(std::map<std::string, std::vector<double>> fractionsSet);
 
     /**
+     * Update or add a priori ChargedStable fractions for a specific mask name in the ROE object.
+     *
+     * @param name of mask
+     * @param a priori fractions
+     */
+    void updateChargedStableFractions(std::string maskName, std::vector<double> fractions);
+
+    /**
      * Append the Track mask (set of rules for tracks) to the ROE object.
      *
      * @param map of mask names and masks for Tracks
@@ -119,11 +127,27 @@ namespace Belle2 {
     void appendTrackMasks(std::map<std::string, std::map<unsigned int, bool>> trackMasks);
 
     /**
+     * Update or add a new Track mask (set of rules for tracks) with a specific mask name in the ROE object.
+     *
+     * @param name of mask
+     * @param masks for Tracks
+     */
+    void updateTrackMask(std::string maskName, std::map<unsigned int, bool> trackMask);
+
+    /**
      * Append the ECLCluster mask (set of rules for clusters) to the ROE object.
      *
      * @param map of mask names and masks for ECLClusters
      */
     void appendECLClusterMasks(std::map<std::string, std::map<unsigned int, bool>> eclClusterMasks);
+
+    /**
+     * Update or add a new ECLCluster mask (set of rules for eclClusters) with a specific mask name in the ROE object.
+     *
+     * @param name of mask
+     * @param masks for ECLClusters
+     */
+    void updateECLClusterMask(std::string maskName, std::map<unsigned int, bool> eclClusterMask);
 
     // getters
     /**
@@ -224,6 +248,12 @@ namespace Belle2 {
     void fillFractions(double fractions[], std::string maskName) const;
 
     /**
+     * Get vector of all mask names of the ROE object
+     */
+    std::vector<std::string> getMaskNames() const;
+
+
+    /**
      * Prints the contents of a RestOfEvent object to screen
      */
     void print() const;
@@ -241,8 +271,7 @@ namespace Belle2 {
     std::map<std::string, std::map<unsigned int, bool>>
                                                      m_trackMasks; /**< Map of Track masks, where each mask is another map that contains track indices and boolean values based on selection criteria for each track */
     std::map<std::string, std::map<unsigned int, bool>>
-                                                     m_eclClusterMasks; /**< Map of ECLCluster masks, where each mask is another map that contains cluster indices and boolean values based on selection criteria for each cluster */
-    // TODO: add support for vee
+                                                     m_eclClusterMasks; /**< Map of ECLCluster masks, where each mask is another map that contains cluster indices and boolean values based on selection criteria for each cluster */    // TODO: add support for vee
 
     /**
      * Prints indices in the given set in a single line

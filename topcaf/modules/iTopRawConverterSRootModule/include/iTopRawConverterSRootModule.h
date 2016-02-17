@@ -76,7 +76,7 @@ namespace Belle2 {
     void terminate();
     void beginRun();
     void event();
-    int parseData(std::istream&);
+    int parseData(std::istream&, size_t = 0);
 
 //Original function
     EventHeaderPacket* GetEvtHeaderPacket();

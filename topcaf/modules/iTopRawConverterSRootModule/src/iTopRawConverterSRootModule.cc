@@ -24,6 +24,15 @@ public:
            ? traits_type::eof()
            : traits_type::to_int_type(*gptr());
   }
+  virtual pos_type seekoff(off_type off,
+                           std::ios_base::seekdir dir,
+                           std::ios_base::openmode)
+  {
+    if (dir == std::ios_base::cur) {
+      gbump(off);
+    }
+    return gptr() - eback();
+  }
 };
 
 //Constructor
@@ -66,7 +75,7 @@ iTopRawConverterSRootModule::terminate()
 
 
 int
-iTopRawConverterSRootModule::parseData(istream& in)
+iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
 {
   //
   // //output
@@ -88,7 +97,11 @@ iTopRawConverterSRootModule::parseData(istream& in)
   packet_word_t wavePacket[WAVE_PACKET_SIZE];
 
   packet_word_t word;
-  int prev_pos = 0;
+  int prev_pos = in.tellg();
+  // in.seekg(0, in.end);
+  // int length = in.tellg();
+  // in.seekg(prev_pos);
+  // B2DEBUG(1, "Data size is " << streamSize << " == " << length/sizeof(int));
   in.read(reinterpret_cast<char*>(&cpr_hdr), sizeof(cpr_hdr));
   B2DEBUG(1, "cpr_hdr\n\tformat: 0x" << hex << (int)cpr_hdr.version
           << "\n\tblock words: 0x" << (int)cpr_hdr.block_words
@@ -109,7 +122,7 @@ iTopRawConverterSRootModule::parseData(istream& in)
     }
     prev_pos = in.tellg();
     in.seekg(prev_pos - 2 * sizeof(int));
-    in.read((char*)&cpr_hdr, sizeof(cpr_hdr));
+    in.read(reinterpret_cast<char*>(&cpr_hdr), sizeof(cpr_hdr));
     B2DEBUG(1, "cpr_hdr\n\tformat: 0x" << hex << (int)cpr_hdr.version
             << "\n\tblock words: 0x" << (int)cpr_hdr.block_words
             << "\n\trun: 0x" << cpr_hdr.exprun
@@ -161,6 +174,7 @@ iTopRawConverterSRootModule::parseData(istream& in)
   wavePacket[0] = 1011;
   for (hslb = 0; hslb < maxhslb; hslb++) {
     in.read(reinterpret_cast<char*>(&hslb_hdr), sizeof(hslb_hdr));
+    B2DEBUG(1, "Header: " << hex << hslb_hdr.B2L_hdr << "(" << HSLB_B2L_HEADER << ")" << dec)
     if (hslb_hdr.B2L_hdr != HSLB_B2L_HEADER) {
       B2WARNING("Bad HSLB header... 0x" << hex << hslb_hdr.B2L_hdr << " ... aborting event");
       m_evtheader_ptr->SetFlag(1000);
@@ -176,7 +190,9 @@ iTopRawConverterSRootModule::parseData(istream& in)
     B2DEBUG(1, "FEE header...(" << hex << word << dec << ") eventSize: " << eventSize << "\ttrigPattern: 0x" << hex <<
             trigPattern
             << "\tnumWindows: 0x" << numWindows
-            << "\ttimestamp: 0x" << timeStamp << dec);
+            << "\ttimestamp: 0x" << timeStamp << dec
+            << "\tstream state: " << in.good()
+            << "\tend of data: " << in.eof());
 
     bool repeatedCheck = false;
 
@@ -194,8 +210,8 @@ iTopRawConverterSRootModule::parseData(istream& in)
       }
       in.seekg(prev_pos);
     }
-
-    for (win = 0; win <= numWindows ; win++) {
+    B2DEBUG(1, "Reading windows. State " << in.good() << " EOF: " << in.eof() << "size: " << streamSize << "pos: " << in.tellg())
+    for (win = 0; in && win <= numWindows ; win++) {
       word = readWordUnique(in, word);
 
       m_carrier = (word >> 30) & 0x3;
@@ -300,7 +316,8 @@ iTopRawConverterSRootModule::parseData(istream& in)
       return -1;
     }
     B2DEBUG(1, "B2L footer ... B2L_crc16_errs: 0x" << hex << b2l_ftr.B2L_crc16_error_cnt << " ... B2L_crc16: 0x" <<
-            b2l_ftr.B2L_crc16 << dec);
+            b2l_ftr.B2L_crc16 << dec << " state: " << in.rdstate() << " eof: " << in.eof() << " good: " << in.good() << " fail: " << in.fail()
+            << " bad" << in.bad());
   }
 
   in.read((char*)&cpr_ftr, sizeof(cpr_ftr));
@@ -321,7 +338,6 @@ iTopRawConverterSRootModule::parseData(istream& in)
 void
 iTopRawConverterSRootModule::event()
 {
-
   StoreArray<RawDataBlock> raw_dblkarray;
 
   size_t array_entries = raw_dblkarray.getEntries();
@@ -335,9 +351,11 @@ iTopRawConverterSRootModule::event()
     // There should only be one "event" in the block
     int* data = raw->GetWholeBuffer();
     size_t nWords = raw->TotalBufNwords();
-    intbuf buffer(data, nWords);
-    istream in(&buffer);
-    parseData(in);
+    // intbuf buffer(data, nWords);
+    // istream in(&buffer);
+    string buffer(reinterpret_cast<char*>(data), nWords * sizeof(int));
+    istringstream in(buffer);
+    parseData(in, nWords);
   }
 }
 

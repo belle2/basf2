@@ -15,6 +15,46 @@ import os
 import math
 import functools
 import copy
+import pdb
+
+
+def purity(nSig, nBg):
+    if nSig == 0:
+        return 0.0
+    if nSig + nBg == 0:
+        return 0.0
+    return nSig / float(nSig + nBg)
+
+
+def efficiency(nSig, nTrueSig):
+    if nSig == 0:
+        return 0.0
+    if nTrueSig == 0:
+        return float('inf')
+    return nSig / float(nTrueSig)
+
+
+def efficiencyError(nSig, nTrueSig):
+    """
+    for an efficiency eps = nSig/nTrueSig, this function calculates the
+    standard deviation according to http://arxiv.org/abs/physics/0701199 .
+    """
+    if nTrueSig == 0:
+        return float('inf')
+
+    k = float(nSig)
+    n = float(nTrueSig)
+    variance = (k + 1) * (k + 2) / ((n + 2) * (n + 3)) - (k + 1) ** 2 / ((n + 2) ** 2)
+    if variance <= 0:
+        return 0.0
+    return math.sqrt(variance)
+
+
+def purityError(nSig, nBg):
+    nTot = nSig + nBg
+    if nTot == 0:
+        return 0.0
+    return efficiencyError(nSig, nTot)
 
 
 def removeJPsiSlash(string):
@@ -116,6 +156,33 @@ class MonitoringHist(object):
                 self.values[name] = np.array([hist.GetBinContent(i) for i in range(nbins+2)])
                 self.nbins[name] = nbins
 
+    def mean(self, name):
+        if name not in self.centers:
+            return np.nan
+        return np.average(self.centers[name], weights=self.values[name])
+
+    def std(self, name):
+        if name not in self.centers:
+            return np.nan
+        avg = np.average(self.centers[name], weights=self.values[name])
+        return np.sqrt(np.average((self.centers[name]-avg)**2, weights=self.values[name]))
+
+    def min(self, name):
+        if name not in self.centers:
+            return np.nan
+        nonzero = np.nonzero(self.values[name])[0]
+        if len(nonzero) == 0:
+            return np.nan
+        return self.centers[name][nonzero[0]]
+
+    def max(self, name):
+        if name not in self.centers:
+            return np.nan
+        nonzero = np.nonzero(self.values[name])[0]
+        if len(nonzero) == 0:
+            return np.nan
+        return self.centers[name][nonzero[-1]]
+
 
 class MonitoringNTuple(object):
     def __init__(self, filename):
@@ -182,7 +249,7 @@ class MonitoringModuleStatistics(object):
                        (lists[1] is not None and lists[1] in key) or
                        (lists[2] is not None and lists[2] in key)):
                         self.channel_time[channel.name] += time
-                        for k in self.channel_time_per_module:
+                        for k in self.channel_time_per_module[channel.name]:
                             if k in key:
                                 self.channel_time_per_module[channel.name][k] += time
 
@@ -191,6 +258,182 @@ class MonitoringModuleStatistics(object):
             if particle.identifier in particle2list:
                 if particle2list[particle.identifier] in key:
                     self.particle_time += time
+
+
+def MonitorCosBDLPlot(particle, filename):
+    ROOT.gROOT.SetBatch(True)
+    ROOT.gStyle.SetOptStat(0)
+    canvas = ROOT.TCanvas(filename, 'Cosine of Theta between B and Dl system', 1600, 1200)
+    canvas.cd()
+
+    if particle.final_ntuple.valid:
+        ntuple = particle.final_ntuple.tree
+
+        color = ROOT.kRed + 4
+        first_plot = True
+        common = 'extraInfo__bouniqueSignal__bc == 1 && abs(cosThetaBetweenParticleAndTrueB) < 10'
+        common += ' && extraInfo__boSignalProbability__bc > '
+        for cut in [0.01, 0.1, 0.5]:
+            ntuple.SetLineColor(int(color))
+            ntuple.SetLineStyle(ROOT.kSolid)
+            ntuple.Draw('cosThetaBetweenParticleAndTrueB', common + str(cut), '' if first_plot else 'same')
+            first_plot = False
+
+            ntuple.SetLineStyle(ROOT.kDotted)
+            ntuple.Draw('cosThetaBetweenParticleAndTrueB', common + str(cut) + ' && !' + particle.mvaConfig.target, 'same')
+            color -= 1
+
+        l = canvas.GetListOfPrimitives()
+        for i in range(l.GetEntries()):
+            hist = l[i]
+            if isinstance(hist, ROOT.TH1D):
+                hist.GetXaxis().SetRangeUser(-10, 10)
+                break
+
+        legend = canvas.BuildLegend(0.1, 0.65, 0.6, 0.9)
+        legend.SetFillStyle(0)
+    canvas.SaveAs(filename)
+
+
+def MonitorMbcPlot(particle, filename):
+    ROOT.gROOT.SetBatch(True)
+    ROOT.gStyle.SetOptStat(0)
+    canvas = ROOT.TCanvas(filename, 'Beam constrained Mass', 1600, 1200)
+    canvas.cd()
+
+    if particle.final_ntuple.valid:
+        ntuple = particle.final_ntuple.tree
+
+        color = ROOT.kRed + 4
+        first_plot = True
+        for cut in [0.01, 0.1, 0.5]:
+            ntuple.SetLineColor(int(color))
+            ntuple.SetLineStyle(ROOT.kSolid)
+            common = 'Mbc > 5.23 && extraInfo__boSignalProbability__bc > '
+            ntuple.Draw('Mbc', common + str(cut), '' if first_plot else 'same')
+            first_plot = False
+
+            ntuple.SetLineStyle(ROOT.kDotted)
+            ntuple.Draw('Mbc', common + str(cut) + ' && !' + particle.mvaConfig.target, 'same')
+            color -= 1
+
+        l = canvas.GetListOfPrimitives()
+        for i in range(l.GetEntries()):
+            hist = l[i]
+            if isinstance(hist, ROOT.TH1D):
+                hist.GetXaxis().SetRangeUser(5.24, 5.29)
+                break
+
+        legend = canvas.BuildLegend(0.1, 0.65, 0.6, 0.9)
+        legend.SetFillStyle(0)
+    canvas.SaveAs(filename)
+
+
+def MonitorROCPlot(particle, filename):
+    ROOT.gROOT.SetBatch(True)
+    canvas = ROOT.TCanvas(filename, "ROC curve", 1600, 1200)
+    canvas.cd()
+
+    if particle.final_ntuple.valid:
+        ntuple = particle.final_ntuple.tree
+
+        nbins = 100
+        import array
+        bckgrdHist = ROOT.TH1D('ROCbackground', 'background', nbins, 0.0, 1.0)
+        signalHist = ROOT.TH1D('ROCsignal', 'signal', nbins, 0.0, 1.0)
+        uniqueBckgrdHist = ROOT.TH1D('ROCuniqueBackground', 'background', nbins, 0.0, 1.0)
+        uniqueSignalHist = ROOT.TH1D('ROCuniqueSignal', 'signal', nbins, 0.0, 1.0)
+
+        probabilityVar = 'extraInfo__boSignalProbability__bc'
+        ntuple.Project('ROCbackground', probabilityVar, '!' + particle.mvaConfig.target)
+        ntuple.Project('ROCsignal', probabilityVar, particle.mvaConfig.target)
+        ntuple.Project('ROCuniqueBackground', probabilityVar, '!' + particle.mvaConfig.target)
+        ntuple.Project('ROCuniqueSignal', probabilityVar, particle.mvaConfig.target + '  && extraInfo__bouniqueSignal__bc == 1')
+
+        for i, (signal, bckgrd) in enumerate([(signalHist, bckgrdHist)]):  # , (uniqueSignalHist, uniqueBckgrdHist)]):
+            x = array.array('d')
+            y = array.array('d')
+            xerr = array.array('d')
+            yerr = array.array('d')
+
+            for cutBin in range(nbins + 1):
+                nSignal = signal.Integral(cutBin, nbins + 1)
+                nBckgrd = bckgrd.Integral(cutBin, nbins + 1)
+
+                efficiency = nSignal / particle.mc_count['sum']
+                efficiencyErr = efficiencyError(nSignal, particle.mc_count['sum'])
+                try:
+                    purity = nSignal / (nSignal + nBckgrd)
+                    purityErr = efficiencyError(nSignal, nSignal + nBckgrd)
+                except ZeroDivisionError:
+                    purity = 0
+                    purityErr = 0
+
+                x.append(100 * purity)
+                y.append(100 * efficiency)
+                xerr.append(100 * purityErr)
+                yerr.append(100 * efficiencyErr)
+
+            rocgraph = ROOT.TGraphErrors(len(x), x, y, xerr, yerr)
+            rocgraph.SetLineColor(ROOT.kBlue - 2 - i)
+            rocgraph.SetTitle(';purity (%);efficiency (%)')
+            rocgraph.GetXaxis().SetTitleSize(0.05)
+            rocgraph.GetXaxis().SetLabelSize(0.05)
+            rocgraph.GetYaxis().SetTitleSize(0.05)
+            rocgraph.GetYaxis().SetLabelSize(0.05)
+            rocgraph.Draw('ALPZ')
+
+    canvas.SaveAs(filename)
+
+
+def MonitorDiagPlot(particle, filename):
+    ROOT.gROOT.SetBatch(True)
+    nbins = 100
+    probabilityVar = ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(SignalProbability)')
+
+    canvas = ROOT.TCanvas(filename, 'Diagonal plot', 1600, 1200)
+    canvas.cd()
+
+    if particle.final_ntuple.valid:
+        ntuple = particle.final_ntuple.tree
+
+        bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
+        signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
+
+        ntuple.Project('background' + probabilityVar, probabilityVar, '!' + particle.mvaConfig.target)
+        ntuple.Project('signal' + probabilityVar, probabilityVar, particle.mvaConfig.target)
+
+        import array
+        x = array.array('d')
+        y = array.array('d')
+        xerr = array.array('d')
+        yerr = array.array('d')
+
+        for i in range(1, nbins + 1):  # no under/overflow bins
+            nSig = 1.0 * signalHist.GetBinContent(i)
+            nBg = 1.0 * bgHist.GetBinContent(i)
+            binCenter = signalHist.GetXaxis().GetBinCenter(i)
+            x.append(binCenter)
+            y.append(purity(nSig, nBg))
+            xerr.append(signalHist.GetXaxis().GetBinWidth(i) / 2)
+            yerr.append(purityError(nSig, nBg))
+
+        purityPerBin = ROOT.TGraphErrors(len(x), x, y, xerr, yerr)
+
+        plotLabel = ';classifier output;purity per bin'
+        purityPerBin.SetTitle(plotLabel)
+        purityPerBin.GetXaxis().SetRangeUser(0.0, 1.0)
+        purityPerBin.GetYaxis().SetRangeUser(0.0, 1.0)
+        purityPerBin.GetXaxis().SetTitleSize(0.05)
+        purityPerBin.GetXaxis().SetLabelSize(0.05)
+        purityPerBin.GetYaxis().SetTitleSize(0.05)
+        purityPerBin.GetYaxis().SetLabelSize(0.05)
+        purityPerBin.Draw('APZ')
+        diagonal = ROOT.TLine(0.0, 0.0, 1.0, 1.0)
+        diagonal.SetLineColor(ROOT.kAzure)
+        diagonal.SetLineWidth(2)
+        diagonal.Draw()
+    canvas.SaveAs(filename)
 
 
 def MonitoringMCCount(particle, summary):
@@ -227,7 +470,7 @@ class MonitoringBranchingFractions(object):
         return self.getBranchingFraction(particle, self.exclusive_branching_fractions)
 
     def getInclusive(self, particle):
-        return self.getBranchingFraction(particle, self.exclusive_branching_fractions)
+        return self.getBranchingFraction(particle, self.inclusive_branching_fractions)
 
     def getBranchingFraction(self, particle, branching_fractions):
         result = {c.name: 0.0 for c in particle.channels}
@@ -360,6 +603,7 @@ class MonitoringParticle(object):
         self.before_vertex = {}
         self.after_vertex = {}
         self.after_classifier = {}
+        self.training_data = {}
         self.feature_importance = {}
 
         self.ignored_channels = {}
@@ -384,6 +628,7 @@ class MonitoringParticle(object):
                 self.ignored_channels[channel.name] = True
             self.after_classifier[channel.name] = self.calculateStatistic(hist, channel.mvaConfig.target)
             hist = MonitoringHist('Monitor_GenerateTrainingData_{}.root'.format(clist[0]))
+            self.training_data[channel.name] = hist
             self.feature_importance[channel.name] = MonitoringMVARanking(clist[2])
 
         nTrueSig = self.mc_count['sum']

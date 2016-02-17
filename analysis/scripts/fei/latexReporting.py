@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import ROOT
+from ROOT import Belle2
+
 from fei import monitoring
 
 from B2Tools import b2latex
@@ -47,7 +50,7 @@ if __name__ == '__main__':
                                    r' & \multicolumn{3}{c}{pre-cut}  &  \multicolumn{3}{c}{post-cut} \\'
                                    r' & exc & inc  & user & ranking & vertex '
                                    r' & absolute & ranking & unique',
-                              format_string=r'{name} & {exc_br:.3f} & {inc_br:2.3f} & {user_pre_cut:.3f} & {ranking_pre_cut:.3f}'
+                              format_string=r'{name} & {exc_br:.3f} & {inc_br:.3f} & {user_pre_cut:.3f} & {ranking_pre_cut:.3f}'
                                             r' & {vertex_pre_cut:.3f}  & {absolute_post_cut:.3f}'
                                             r' & {ranking_post_cut:.3f} & {after_tag:.3f}')
 
@@ -118,7 +121,7 @@ if __name__ == '__main__':
 
             percents = [p.time_per_channel_per_module[channel.name][key] / float(time) * 100.0 if time > 0 else 0.0
                         for key in moduleTypes[:-1]]
-            percents.append(1.0 - sum(percents))
+            percents.append(100.0 - sum(percents))
 
             table.add(name=format.decayDescriptor(channel.name),
                       bargraph=r'\plotbar{ %g/, %g/, %g/, %g/, %g/, %g/, }' % tuple(percents),
@@ -131,28 +134,105 @@ if __name__ == '__main__':
 
     for p in monitoringParticle:
         print(p.identifier)
+        # TODO Print config
 
         o += b2latex.Section(format.decayDescriptor(p.identifier)).finish()
-        o += b2latex.SubSection("Channels").finish()
         string = b2latex.String(r"In the reconstruction of {name} {nChannels} out of {max_nChannels} possible channels were used. "
-                                r"The covered inclusive / exclusive branching fractions is {inc_br:.3f} / {exc_br:.3f}")
+                                r"The covered inclusive / exclusive branching fractions is {inc_br:.5f} / {exc_br:.5f}."
+                                r"The final unqiue efficiency and purity was {eff:.5f} / {pur:.5f}")
 
         o += string.finish(name=format.decayDescriptor(p.identifier),
                            nChannels=p.reconstructed_number_of_channels,
                            max_nChannels=p.total_number_of_channels,
                            exc_br=sum(p.exc_br_per_channel.values()),
-                           inc_br=sum(p.inc_br_per_channel.values()))
+                           inc_br=sum(p.inc_br_per_channel.values()),
+                           eff=p.after_tag.efficiency,
+                           pur=p.after_tag.purity)
 
-        itemize = b2latex.Itemize()
+        roc_plot_filename = monitoring.removeJPsiSlash(p.identifier + '_ROC.png')
+        monitoring.MonitorROCPlot(p, roc_plot_filename)
+        diag_plot_filename = monitoring.removeJPsiSlash(p.identifier + '_Diag.png')
+        monitoring.MonitorDiagPlot(p, diag_plot_filename)
+        o += b2latex.Graphics().add(diag_plot_filename, width=0.49).add(roc_plot_filename, width=0.49).finish()
+
+        if p.identifier in ['B+:generic', 'B0:generic']:
+            money_plot_filename = monitoring.removeJPsiSlash(p.identifier + '_Money.png')
+            monitoring.MonitorMbcPlot(p, money_plot_filename)
+            o += b2latex.Graphics().add(money_plot_filename, width=0.8).finish()
+        if p.identifier in ['B+:semileptonic', 'B0:semileptonic']:
+            money_plot_filename = monitoring.removeJPsiSlash(p.identifier + '_Money.png')
+            monitoring.MonitorCosBDLPlot(p, money_plot_filename)
+            o += b2latex.Graphics().add(money_plot_filename, width=0.8).finish()
+
+        table = b2latex.LongTable(columnspecs=r'c|rr|rrr',
+                                  caption='Per-channel efficiency before and after the applied pre-cut.',
+                                  head=r'Particle & \multicolumn{2}{c}{Covered BR} '
+                                       r' & \multicolumn{3}{c}{pre-cut} \\'
+                                       r' & exc & inc  & user & ranking & vertex ',
+                                  format_string=r'{name} & {exc_br:.3f} & {inc_br:.3f} & {user_pre_cut:.5f} & '
+                                                r'{ranking_pre_cut:.5f} & {vertex_pre_cut:.5f}')
+
         for channel in p.channels:
-            niceDecayChannel = format.decayDescriptor(channel.name)
-            text = r"{name} (BR: {inc:.4f} /  {exc:.4f})".format(name=niceDecayChannel,
-                                                                 inc=p.inc_br_per_channel[channel.name],
-                                                                 exc=p.exc_br_per_channel[channel.name])
+            table.add(name=format.decayDescriptor(channel.name),
+                      exc_br=p.exc_br_per_channel[channel.name],
+                      inc_br=p.inc_br_per_channel[channel.name],
+                      user_pre_cut=p.before_ranking[channel.name].efficiency,
+                      ranking_pre_cut=p.after_ranking[channel.name].efficiency,
+                      vertex_pre_cut=p.after_vertex[channel.name].efficiency,
+                      absolute_post_cut=p.after_abs_postcut.efficiency,
+                      ranking_post_cut=p.after_ranking_postcut.efficiency,
+                      after_tag=p.after_tag.efficiency)
+        o += table.finish()
+
+        table = b2latex.LongTable(columnspecs=r'c|c|rrr',
+                                  caption='Per-channel purity before and after the applied pre-cut.',
+                                  head=r'Particle & Ignored '
+                                       r' & \multicolumn{3}{c}{pre-cut} \\'
+                                       r' &&  user & ranking & vertex ',
+                                  format_string=r'{name} & {ignored} & {user_pre_cut:.5f} & {ranking_pre_cut:.5f}'
+                                                r' & {vertex_pre_cut:.5f}')
+
+        for channel in p.channels:
+            table.add(name=format.decayDescriptor(channel.name),
+                      ignored=r'\textcolor{red}{$\blacksquare$}' if p.ignored_channels[channel.name] else '',
+                      user_pre_cut=p.before_ranking[channel.name].purity,
+                      ranking_pre_cut=p.after_ranking[channel.name].purity,
+                      vertex_pre_cut=p.after_vertex[channel.name].purity)
+        o += table.finish()
+
+        for channel in p.channels:
+            # TODO print config
             if p.ignored_channels[channel.name]:
-                itemize.add(text + ' \t was ignored')
-            else:
-                itemize.add(text)
-        o += itemize.finish()
+                continue
+            niceDecayChannel = format.decayDescriptor(channel.name)
+            o += b2latex.SubSection(niceDecayChannel).finish()
+
+            if p.feature_importance[channel.name].valid and p.training_data[channel.name].valid:
+                table = b2latex.LongTable(columnspecs=r'lp{5cm}rrrrr',
+                                          caption='List of variables used in the training',
+                                          head=r'No. & Name & Importance & mean & std & min & max \\',
+                                          format_string=r'{no} & {name} & ${v:.2f}$ & $ {mean:.3f} $ & $ {std:.3f} $ '
+                                                        r' & $ {min:.3f} $ & $ {max:.3f} $')
+
+                variable_list = []
+                for number, (n, value) in enumerate(p.feature_importance[channel.name].ranking):
+                    variable_list.append(n)
+                    table.add(no=number+1,
+                              name=format.variable(format.string(n)),
+                              v=value,
+                              mean=p.training_data[channel.name].mean(n),
+                              std=p.training_data[channel.name].std(n),
+                              min=p.training_data[channel.name].min(n),
+                              max=p.training_data[channel.name].max(n))
+                for n in particle.mvaConfig.variables:
+                    if n not in variable_list:
+                        table.add(no='---',
+                                  name=format.variable(format.string(n)),
+                                  v=float('nan'),
+                                  mean=p.training_data[channel.name].mean(n),
+                                  std=p.training_data[channel.name].std(n),
+                                  min=p.training_data[channel.name].min(n),
+                                  max=p.training_data[channel.name].max(n))
+                o += table.finish()
 
     o.save(sys.argv[2], compile=True)

@@ -13,6 +13,13 @@ def bold(text):
 
 
 def print_summary(p):
+    monitoring.MonitorROCPlot(p, monitoring.removeJPsiSlash(p.identifier + '_ROC.png'))
+    monitoring.MonitorDiagPlot(p, monitoring.removeJPsiSlash(p.identifier + '_Diag.png'))
+    if p.identifier in ['B+:generic', 'B0:generic']:
+        monitoring.MonitorMbcPlot(p, monitoring.removeJPsiSlash(p.identifier + '_Money.png'))
+    if p.identifier in ['B+:semileptonic', 'B0:semileptonic']:
+        monitoring.MonitorCosBDLPlot(p, monitoring.removeJPsiSlash(p.identifier + '_Money.png'))
+
     print(bold(p.identifier))
     print('Total cpu time spent reconstructing this particle: ', p.total_time)
     print('Total amount of Monte Carlo particles in training sample: ', p.mc_count)

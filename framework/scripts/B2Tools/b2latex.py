@@ -62,6 +62,7 @@ class LatexObject(object):
             \usepackage{hyperref} %adds links (also in TOC), should be loaded at the very end
             \usepackage{caption}
             \usepackage{longtable}
+            \usepackage{color}
             \usepackage[load-configurations=abbreviations]{siunitx}
             \begin{document}
             """

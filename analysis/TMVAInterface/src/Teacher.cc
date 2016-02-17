@@ -119,6 +119,7 @@ namespace Belle2 {
     {
 
       m_tree->get().SetBasketSize("*", 1600);
+      m_tree->get().SetCacheSize(100000);
 
     }
 

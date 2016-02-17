@@ -75,7 +75,6 @@ def LoadParticles(resource: fei.dag.Resource, names: typing.Sequence[str]) -> Ha
         unique_abs_pdgs = set([abs(pdg.from_name(name)) for name in names])
         hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5) for pdgcode in unique_abs_pdgs]
         variablesToHistogram('', variables=hist_variables,
-                             two_dimensional=False,
                              filename=removeJPsiSlash(hist_filename), path=resource.path)
     return resource.hash
 
@@ -109,11 +108,16 @@ def MakeParticleList(resource: fei.dag.Resource, particleName: str, daughterPart
         matchMCTruth(particleList, path=resource.path)
         if preCutConfig.bestCandidateVariable is None:
             hist_variables = ['mcErrors', 'mcParticleStatus', mvaConfig.target]
+            hist_variables_2d = []
         else:
             hist_variables = ['mcErrors', 'mcParticleStatus', mvaConfig.target, preCutConfig.bestCandidateVariable]
+            hist_variables_2d = [(preCutConfig.bestCandidateVariable, mvaConfig.target),
+                                 (preCutConfig.bestCandidateVariable, 'mcErrors'),
+                                 (preCutConfig.bestCandidateVariable, 'mcParticleStatus')]
         hist_filename = 'Monitor_MakeParticleList_BeforeRanking_' + particleList + '.root'
-        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
-                             two_dimensional=True,
+        variablesToHistogram(particleList,
+                             variables=fei.config.variables2binnings(hist_variables),
+                             variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                              filename=removeJPsiSlash(hist_filename), path=resource.path)
 
     if preCutConfig.bestCandidateVariable is not None:
@@ -129,8 +133,12 @@ def MakeParticleList(resource: fei.dag.Resource, particleName: str, daughterPart
     if resource.env['monitor']:
         hist_filename = 'Monitor_MakeParticleList_AfterRanking_' + particleList + '.root'
         hist_variables += ['extraInfo(preCut_rank)']
-        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
-                             two_dimensional=True,
+        hist_variables_2d += [('extraInfo(preCut_rank)', mvaConfig.target),
+                              ('extraInfo(preCut_rank)', 'mcErrors'),
+                              ('extraInfo(preCut_rank)', 'mcParticleStatus')]
+        variablesToHistogram(particleList,
+                             variables=fei.config.variables2binnings(hist_variables),
+                             variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                              filename=removeJPsiSlash(hist_filename), path=resource.path)
 
     return particleList
@@ -158,9 +166,11 @@ def MatchParticleList(resource: fei.dag.Resource, particleList: ParticleList,
 
     if resource.env['monitor']:
         hist_variables = ['mcErrors', 'mcParticleStatus', mvaConfig.target]
+        hist_variables_2d = []
         hist_filename = 'Monitor_MatchParticleList_AfterMatch_' + particleList + '.root'
-        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
-                             two_dimensional=True,
+        variablesToHistogram(particleList,
+                             variables=fei.config.variables2binnings(hist_variables),
+                             variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                              filename=removeJPsiSlash(hist_filename), path=resource.path)
     # If the MatchedParticleList is different from the RawParticleList the CPU Statistics will work not correctly,
     # because the name of the MatchedParticleList is used to identify all modules which process this channel.
@@ -198,17 +208,22 @@ def CopyParticleLists(resource: fei.dag.Resource, particleName: str, particleLab
     if resource.env['monitor']:
         hist_variables = ['mcErrors', 'mcParticleStatus', mvaConfig.target, 'extraInfo(SignalProbability)',
                           'extraInfo(decayModeID)']
+        hist_variables_2d = [('extraInfo(decayModeID)', mvaConfig.target),
+                             ('extraInfo(decayModeID)', 'mcErrors'),
+                             ('extraInfo(decayModeID)', 'mcParticleStatus')]
         hist_filename = 'Monitor_CopyParticleList_BeforeCut_' + particleList + '.root'
-        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
-                             two_dimensional=True,
+        variablesToHistogram(particleList,
+                             variables=fei.config.variables2binnings(hist_variables),
+                             variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                              filename=removeJPsiSlash(hist_filename), path=resource.path)
 
     applyCuts(particleList, cutstring, path=resource.path)
 
     if resource.env['monitor']:
         hist_filename = 'Monitor_CopyParticleList_BeforeRanking_' + particleList + '.root'
-        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
-                             two_dimensional=True,
+        variablesToHistogram(particleList,
+                             variables=fei.config.variables2binnings(hist_variables),
+                             variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                              filename=removeJPsiSlash(hist_filename), path=resource.path)
 
     rankByHighest(particleList, 'extraInfo(SignalProbability)', postCutConfig.bestCandidateCut, 'postCut_rank', path=resource.path)
@@ -216,8 +231,13 @@ def CopyParticleLists(resource: fei.dag.Resource, particleName: str, particleLab
     if resource.env['monitor']:
         hist_filename = 'Monitor_CopyParticleList_AfterRanking_' + particleList + '.root'
         hist_variables += ['extraInfo(postCut_rank)']
-        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
-                             two_dimensional=True,
+        hist_variables_2d += [('extraInfo(decayModeID)', 'extraInfo(postCut_rank)'),
+                              (mvaConfig.target, 'extraInfo(postCut_rank)'),
+                              ('mcErrors', 'extraInfo(postCut_rank)'),
+                              ('mcParticleStatus', 'extraInfo(postCut_rank)')]
+        variablesToHistogram(particleList,
+                             variables=fei.config.variables2binnings(hist_variables),
+                             variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                              filename=removeJPsiSlash(hist_filename), path=resource.path)
 
     return particleList
@@ -273,7 +293,7 @@ def FitVertex(resource: fei.dag.Resource, channelName: str, particleList: Partic
         hist_variables = ['mcErrors', 'mcParticleStatus', mvaConfig.target]
         hist_filename = 'Monitor_FitVertex_Before_' + particleList + '.root'
         variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
-                             two_dimensional=True,
+                             variables_2d=fei.config.variables2binnings_2d([]),
                              filename=removeJPsiSlash(hist_filename), path=resource.path)
 
     pvfit = register_module('ParticleVertexFitter')
@@ -287,9 +307,12 @@ def FitVertex(resource: fei.dag.Resource, channelName: str, particleList: Partic
 
     if resource.env['monitor']:
         hist_variables = ['mcErrors', 'chiProb', 'mcParticleStatus', mvaConfig.target]
+        hist_variables_2d = [('chiProb', mvaConfig.target),
+                             ('chiProb', 'mcErrors'),
+                             ('chiProb', 'mcParticleStatus')]
         hist_filename = 'Monitor_FitVertex_After_' + particleList + '.root'
         variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
-                             two_dimensional=True,
+                             variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                              filename=removeJPsiSlash(hist_filename), path=resource.path)
 
     return resource.hash
@@ -339,8 +362,11 @@ def GenerateTrainingData(resource: fei.dag.Resource, particleName: str, particle
 
         if resource.env['monitor']:
             hist_variables = ['mcErrors', 'mcParticleStatus'] + mvaConfig.variables + spectators
+            hist_variables_2d = [(x, mvaConfig.target) for x in mvaConfig.variables + spectators if x is not mvaConfig.target]
             hist_filename = 'Monitor_GenerateTrainingData_' + particleList + '.root'
-            variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
+            variablesToHistogram(particleList,
+                                 variables=fei.config.variables2binnings(hist_variables),
+                                 variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                                  filename=removeJPsiSlash(hist_filename), path=resource.path)
 
         teacher = register_module('TMVATeacher')
@@ -447,9 +473,12 @@ def SignalProbability(resource: fei.dag.Resource, particleList: ParticleList,
 
     if resource.env['monitor']:
         hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(SignalProbability)', mvaConfig.target]
+        hist_variables_2d = [('extraInfo(SignalProbability)', mvaConfig.target),
+                             ('extraInfo(SignalProbability)', 'mcErrors'),
+                             ('extraInfo(SignalProbability)', 'mcParticleStatus')]
         hist_filename = 'Monitor_SignalProbability_' + particleList + '.root'
         variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
-                             two_dimensional=True,
+                             variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                              filename=removeJPsiSlash(hist_filename), path=resource.path)
 
     return resource.hash
@@ -479,9 +508,14 @@ def TagUniqueSignal(resource: fei.dag.Resource, particleList: ParticleList, sign
     if resource.env['monitor']:
         hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', mvaConfig.target,
                           'extraInfo(decayModeID)']
+        hist_variables_2d = [('extraInfo(decayModeID)', mvaConfig.target),
+                             ('extraInfo(decayModeID)', 'mcErrors'),
+                             ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
+                             ('extraInfo(decayModeID)', 'mcParticleStatus')]
         hist_filename = 'Monitor_TagUniqueSignal_' + particleList + '.root'
-        variablesToHistogram(particleList, variables=fei.config.variables2binnings(hist_variables),
-                             two_dimensional=True,
+        variablesToHistogram(particleList,
+                             variables=fei.config.variables2binnings(hist_variables),
+                             variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                              filename=removeJPsiSlash(hist_filename), path=resource.path)
 
     resource.condition = ('EventType', '==0')

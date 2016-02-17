@@ -88,6 +88,18 @@ def variables2binnings(variables):
     return [MonitoringVariableBinning[v] if v in MonitoringVariableBinning else (v, 100, -10.0, 10.0) for v in variables]
 
 
+def variables2binnings_2d(variables):
+    """
+    Convert given variables into a tuples which can be given to VariableToHistogram
+    """
+    result = []
+    for v1, v2 in variables:
+        b1 = MonitoringVariableBinning[v1] if v1 in MonitoringVariableBinning else (v1, 100, -10.0, 10.0)
+        b2 = MonitoringVariableBinning[v2] if v2 in MonitoringVariableBinning else (v2, 100, -10.0, 10.0)
+        result.append(b1 + b2)
+    return result
+
+
 class Particle(object):
 
     """

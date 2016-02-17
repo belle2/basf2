@@ -224,9 +224,16 @@ class TestParticle(unittest.TestCase):
 
 class TestVariables2MonitoringBinning(unittest.TestCase):
 
-    def test_Variables2MonitoringBinning(self):
+    def test_Variables2MonitoringBinning1D(self):
         self.assertEqual(fei.config.variables2binnings(['mcErrors']), [('mcErrors', 513, -0.5, 512.5)])
         self.assertEqual(fei.config.variables2binnings(['default']), [('default', 100, -10.0, 10.0)])
+
+    def test_Variables2MonitoringBinning2D(self):
+        self.assertEqual(fei.config.variables2binnings_2d([('mcErrors', 'default')]),
+                         [('mcErrors', 513, -0.5, 512.5, 'default', 100, -10.0, 10.0)])
+        self.assertEqual(fei.config.variables2binnings_2d([('default', 'default'), ('mcErrors', 'mcErrors')]),
+                         [('default', 100, -10.0, 10.0, 'default', 100, -10.0, 10.0),
+                          ('mcErrors', 513, -0.5, 512.5, 'mcErrors', 513, -0.5, 512.5)])
 
 
 class TestHashRequirements(unittest.TestCase):
@@ -294,7 +301,6 @@ class TestLoadParticles(unittest.TestCase):
         hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5) for pdgcode in [321, 13, 421]]
         path.add_module('VariablesToHistogram', particleList='',
                         variables=hist_variables,
-                        two_dimensional=False,
                         fileName='Monitor_MCCounts.root')
         self.assertEqual(resource.path, path)
         self.assertEqual(resource.cache, True)
@@ -388,16 +394,25 @@ class TestMakeParticleList(unittest.TestCase):
         path.add_module('ParticleCombiner', decayString='D0:42 ==> K- pi+', writeOut=True,
                         decayMode=23, cut='1.5 < M < 2.0')
         path.add_module('MCMatcherParticles', listName='D0:42')
+
+        hist_variables = ['mcErrors', 'mcParticleStatus', 'isSignal', 'dM']
+        hist_variables_2d = [('dM', mvaConfig.target),
+                             ('dM', 'mcErrors'),
+                             ('dM', 'mcParticleStatus')]
         path.add_module('VariablesToHistogram', particleList='D0:42',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'isSignal', 'dM']),
-                        two_dimensional=True,
+                        variables=fei.config.variables2binnings(hist_variables),
+                        variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                         fileName='Monitor_MakeParticleList_BeforeRanking_D0:42.root')
         path.add_module('BestCandidateSelection', particleList='D0:42', variable='dM',
                         selectLowest=True, numBest=10, outputVariable='preCut_rank')
+
+        hist_variables += ['extraInfo(preCut_rank)']
+        hist_variables_2d += [('extraInfo(preCut_rank)', mvaConfig.target),
+                              ('extraInfo(preCut_rank)', 'mcErrors'),
+                              ('extraInfo(preCut_rank)', 'mcParticleStatus')]
         path.add_module('VariablesToHistogram', particleList='D0:42',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'isSignal',
-                                                                 'dM', 'extraInfo(preCut_rank)']),
-                        two_dimensional=True,
+                        variables=fei.config.variables2binnings(hist_variables),
+                        variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                         fileName='Monitor_MakeParticleList_AfterRanking_D0:42.root')
         self.assertEqual(resource.path, path)
         self.assertEqual(resource.cache, True)
@@ -414,14 +429,21 @@ class TestMakeParticleList(unittest.TestCase):
         path.add_module('ParticleCombiner', decayString='D0:42 ==> K- pi+', writeOut=True,
                         decayMode=23, cut='1.5 < M < 2.0')
         path.add_module('MCMatcherParticles', listName='D0:42')
+
+        hist_variables = ['mcErrors', 'mcParticleStatus', 'isSignal']
+        hist_variables_2d = []
         path.add_module('VariablesToHistogram', particleList='D0:42',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'isSignal']),
-                        two_dimensional=True,
+                        variables=fei.config.variables2binnings(hist_variables),
+                        variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                         fileName='Monitor_MakeParticleList_BeforeRanking_D0:42.root')
+
+        hist_variables += ['extraInfo(preCut_rank)']
+        hist_variables_2d += [('extraInfo(preCut_rank)', mvaConfig.target),
+                              ('extraInfo(preCut_rank)', 'mcErrors'),
+                              ('extraInfo(preCut_rank)', 'mcParticleStatus')]
         path.add_module('VariablesToHistogram', particleList='D0:42',
-                        variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'isSignal',
-                                                                 'extraInfo(preCut_rank)']),
-                        two_dimensional=True,
+                        variables=fei.config.variables2binnings(hist_variables),
+                        variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                         fileName='Monitor_MakeParticleList_AfterRanking_D0:42.root')
         self.assertEqual(resource.path, path)
         self.assertEqual(resource.cache, True)
@@ -461,7 +483,7 @@ class TestMatchParticleList(unittest.TestCase):
         path.add_module('MCMatcherParticles', listName='e+:generic')
         path.add_module('VariablesToHistogram', particleList='e+:generic',
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'isSignal']),
-                        two_dimensional=True,
+                        variables_2d=fei.config.variables2binnings_2d([]),
                         fileName='Monitor_MatchParticleList_AfterMatch_e+:generic.root')
         self.assertEqual(resource.path, path)
         self.assertEqual(resource.cache, True)
@@ -509,19 +531,28 @@ class TestCopyParticleLists(unittest.TestCase):
                                                         postCutConfig, mvaConfig, ['S1', 'S2', 'S3']), 'D0:42')
         path = basf2.create_path()
         hist_variables = ['mcErrors', 'mcParticleStatus', 'isSignal', 'extraInfo(SignalProbability)', 'extraInfo(decayModeID)']
+        hist_variables_2d = [('extraInfo(decayModeID)', mvaConfig.target),
+                             ('extraInfo(decayModeID)', 'mcErrors'),
+                             ('extraInfo(decayModeID)', 'mcParticleStatus')]
         path.add_module('ParticleListManipulator', outputListName='D0:42', inputListNames=['D0:1', 'D0:2', 'D0:3'], writeOut=True)
-        path.add_module('VariablesToHistogram', particleList='D0:42', variables=fei.config.variables2binnings(hist_variables),
-                        two_dimensional=True,
+        path.add_module('VariablesToHistogram', particleList='D0:42',
+                        variables=fei.config.variables2binnings(hist_variables),
+                        variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                         fileName='Monitor_CopyParticleList_BeforeCut_D0:42.root')
         path.add_module('ParticleSelector', decayString='D0:42', cut='0.1 < extraInfo(SignalProbability)')
         path.add_module('VariablesToHistogram', particleList='D0:42', variables=fei.config.variables2binnings(hist_variables),
-                        two_dimensional=True,
+                        variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                         fileName='Monitor_CopyParticleList_BeforeRanking_D0:42.root')
         path.add_module('BestCandidateSelection', particleList='D0:42', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
+
+        hist_variables_2d += [('extraInfo(decayModeID)', 'extraInfo(postCut_rank)'),
+                              ('isSignal', 'extraInfo(postCut_rank)'),
+                              ('mcErrors', 'extraInfo(postCut_rank)'),
+                              ('mcParticleStatus', 'extraInfo(postCut_rank)')]
         path.add_module('VariablesToHistogram', particleList='D0:42',
-                        two_dimensional=True,
                         variables=fei.config.variables2binnings(hist_variables + ['extraInfo(postCut_rank)']),
+                        variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                         fileName='Monitor_CopyParticleList_AfterRanking_D0:42.root')
         self.assertEqual(resource.path, path)
         self.assertEqual(resource.cache, True)
@@ -647,15 +678,18 @@ class TestFitVertex(unittest.TestCase):
         self.assertEqual(fei.provider.FitVertex(resource, 'D0 -> K+ pi-', 'D0:23', mvaConfig, preCutConfig), '42')
         path = basf2.create_path()
         path.add_module('VariablesToHistogram', particleList='D0:23',
-                        two_dimensional=True,
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'isSignal']),
+                        variables_2d=fei.config.variables2binnings_2d([]),
                         fileName='Monitor_FitVertex_Before_D0:23.root')
         path.add_module('ParticleVertexFitter', listName='D0:23', confidenceLevel=-2,
                         vertexFitter='kfitter', fitType='vertex')
         hist_variables = ['mcErrors', 'chiProb', 'mcParticleStatus', 'isSignal']
+        hist_variables_2d = [('chiProb', 'isSignal'),
+                             ('chiProb', 'mcErrors'),
+                             ('chiProb', 'mcParticleStatus')]
         path.add_module('VariablesToHistogram', particleList='D0:23',
-                        two_dimensional=True,
                         variables=fei.config.variables2binnings(hist_variables),
+                        variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                         fileName='Monitor_FitVertex_After_D0:23.root')
         self.assertEqual(resource.path, path)
         self.assertEqual(resource.cache, True)
@@ -709,7 +743,10 @@ class TestGenerateTrainingData(unittest.TestCase):
 
         path = basf2.create_path()
         hist_variables = ['mcErrors', 'mcParticleStatus', 'p', 'pt', 'isSignal']
-        path.add_module('VariablesToHistogram', particleList='D0:1', variables=fei.config.variables2binnings(hist_variables),
+        hist_variables_2d = [('p', 'isSignal'), ('pt', 'isSignal')]
+        path.add_module('VariablesToHistogram', particleList='D0:1',
+                        variables=fei.config.variables2binnings(hist_variables),
+                        variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                         fileName='Monitor_GenerateTrainingData_D0:1.root')
         path.add_module('TMVATeacher', prefix='D0:1_42', variables=['p', 'pt'], sample='isSignal',
                         spectators=['isSignal'], listNames=['D0:1'], inverseSamplingRates={},
@@ -980,9 +1017,12 @@ class TestSignalProbability(unittest.TestCase):
                         signalFraction=-1, expertOutputName='SignalProbability',
                         signalClass=1, transformToProbability=True, listNames=['D0:1'])
         hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(SignalProbability)', 'isSignal']
+        hist_variables_2d = [('extraInfo(SignalProbability)', 'isSignal'),
+                             ('extraInfo(SignalProbability)', 'mcErrors'),
+                             ('extraInfo(SignalProbability)', 'mcParticleStatus')]
         path.add_module('VariablesToHistogram', particleList='D0:1',
-                        two_dimensional=True,
                         variables=fei.config.variables2binnings(hist_variables),
+                        variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                         fileName='Monitor_SignalProbability_D0:1.root')
         self.assertEqual(resource.path, path)
         self.assertEqual(resource.cache, True)
@@ -1034,9 +1074,13 @@ class TestTagUniqueSignal(unittest.TestCase):
         path = basf2.create_path()
         path.add_module('TagUniqueSignal', particleList='D0:1', target='isSignal', extraInfoName='uniqueSignal')
         hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', 'isSignal', 'extraInfo(decayModeID)']
+        hist_variables_2d = [('extraInfo(decayModeID)', mvaConfig.target),
+                             ('extraInfo(decayModeID)', 'mcErrors'),
+                             ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
+                             ('extraInfo(decayModeID)', 'mcParticleStatus')]
         path.add_module('VariablesToHistogram', particleList='D0:1',
-                        two_dimensional=True,
                         variables=fei.config.variables2binnings(hist_variables),
+                        variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                         fileName='Monitor_TagUniqueSignal_D0:1.root')
         self.assertEqual(resource.path, path)
         self.assertEqual(resource.cache, True)

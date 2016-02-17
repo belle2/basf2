@@ -870,16 +870,16 @@ def variablesToNTuple(
 def variablesToHistogram(
     decayString,
     variables,
+    variables_2d=[],
     filename='ntuple.root',
-    two_dimensional=False,
     path=analysis_main,
 ):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager
     @param decayString  specifies type of Particles and determines the name of the ParticleList
-    @param variables variables which must be registered in the VariableManager
+    @param variables variables + binning which must be registered in the VariableManager
+    @param variables_2d pair of variables + binning for each which must be registered in the VariableManager
     @param filename which is used to store the variables
-    @param two_dimensional set to true if pairwise two dimensional histograms should be saved
     @param path basf2 path
     """
 
@@ -887,7 +887,7 @@ def variablesToHistogram(
     output.set_name('VariablesToHistogram_' + decayString)
     output.param('particleList', decayString)
     output.param('variables', variables)
-    output.param('two_dimensional', two_dimensional)
+    output.param('variables_2d', variables_2d)
     output.param('fileName', filename)
     path.add_module(output)
 

@@ -15,8 +15,6 @@ using namespace Belle2;
 
 bool analyzeWave(const char* filename, int firstEvent = 0, int nEvents = 1)
 {
-
-
   TFile fileIn(filename);
   TTreeReader theReader("tree", &fileIn);
   TTreeReaderArray<Belle2::EventWaveformPacket> eventRV(theReader, "EventWaveformPackets");

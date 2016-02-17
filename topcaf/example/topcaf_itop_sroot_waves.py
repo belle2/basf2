@@ -63,23 +63,15 @@ else:
     pedmodule.param('conditions', 1)
 
 mergemodule = register_module('WaveMerging')
-
-timemodule = register_module('WaveTimingV2')
-timeDict = {'time2TDC': 1.0}
-timemodule.param(timeDict)
-
-timecalibmodule = register_module('DoubleCalPulse')
+plotsmodule = register_module("TOPCAF_DataQuality")
 
 main = create_path()
 main.add_module(SRootReader)
 main.add_module(histomanager)
-
 main.add_module(itopconfig)
 main.add_module(itopeventconverter)
 main.add_module(pedmodule)
 main.add_module(mergemodule)
-main.add_module(timemodule)
-main.add_module(timecalibmodule)
-
+main.add_module(plotsmodule)
 main.add_module(output)
 process(main)

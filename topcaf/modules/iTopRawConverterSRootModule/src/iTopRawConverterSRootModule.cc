@@ -210,10 +210,10 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
       }
       in.seekg(prev_pos);
     }
-    B2DEBUG(1, "Reading windows. State " << in.good() << " EOF: " << in.eof() << "size: " << streamSize << "pos: " << in.tellg())
+    B2DEBUG(1, "Reading windows. State " << in.good() << " EOF: " << in.eof() << "size: " << sizeof(
+              int)*streamSize << "pos: " << in.tellg())
     for (win = 0; in && win <= numWindows ; win++) {
       word = readWordUnique(in, word);
-
       m_carrier = (word >> 30) & 0x3;
       asic = (word >> 28) & 0x3;
       unsigned int lastWrAddr = (word >> 16) & 0xFF;
@@ -223,7 +223,9 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
       B2DEBUG(1, "window header (0x" << hex << word << dec << "... carrier: " << m_carrier << "\tirsx: " << asic
               << "\tlastWrAddr: 0x" << hex << lastWrAddr
               << "\tscrod id: 0x" << m_scrod << " (" << dec << m_scrod << hex << ")"
-              << "\tconvAddr: 0x" << readoutWindow << dec);
+              << "\tconvAddr: 0x" << readoutWindow << dec
+              << "\tposition: " << in.tellg()
+             );
 
 
       int row = m_carrier;
@@ -275,7 +277,7 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
       // must read a short at a time to get back on track...
       unsigned short x1, x2;
 
-      while (word != PACKET_LAST && l < 30) {
+      while (in && word != PACKET_LAST && l < 30) {
         x2 = x1;
         in.read(reinterpret_cast<char*>(&x1), sizeof(unsigned short));
         word = ((x1 << 16) & 0xFFFF0000) + x2;
@@ -331,7 +333,7 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
     B2WARNING("Bad copper footer found.  Marking event as corrupt.");
     m_evtheader_ptr->SetFlag(1003);
   }
-  prev_pos = in.tellg();
+  // prev_pos = in.tellg();
   return 0;
 }
 

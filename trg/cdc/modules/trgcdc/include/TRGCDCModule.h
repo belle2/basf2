@@ -25,7 +25,7 @@ namespace Belle2 {
 /// simulation data or trigger data taken by real hardwares. The
 /// output is the reconstructed track parameters.
 
-class TRGCDCModule : public Module {
+  class TRGCDCModule : public Module {
 
   public:
 
@@ -191,11 +191,11 @@ class TRGCDCModule : public Module {
   private:
 
     /// A pointer to a TRGCDC;
-    TRGCDC * _cdc;
+    TRGCDC* _cdc;
 
     /// A pointer to a TRGCDCSteppingAction which stops curl backs.
-    TRGCDCSteppingAction * _sa;
-};
+    TRGCDCSteppingAction* _sa;
+  };
 
 } // namespace Belle2
 

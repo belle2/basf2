@@ -2136,7 +2136,8 @@ namespace Belle2 {
       }
       // make relations to MCParticles with proper weights
       for (unsigned iax = 0; iax < nAxialSuperLayers(); ++iax) {
-        double weight = 1. / (nAxialSuperLayers() * relParticleIds[iax].size());
+	unsigned deno = nAxialSuperLayers() * relParticleIds[iax].size();
+        double weight = (deno == 0) ? 0 : 1. / (double)deno;
         for (unsigned imc = 0; imc < relParticleIds[iax].size(); ++imc) {
           track->addRelationTo(particles[relParticleIds[iax][imc]], weight);
         }

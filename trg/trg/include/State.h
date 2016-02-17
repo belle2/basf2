@@ -264,6 +264,7 @@ TRGState::copy2bool(bool * a) const {
 inline
 const TRGState &
 TRGState::set(unsigned p, unsigned n, const bool * const a) {
+  if(a){
     for (unsigned i = 0; i < n; i++) {
 	const unsigned wp = (p + i) / _bsu;
 	const unsigned bp = (p + i) % _bsu;
@@ -272,6 +273,11 @@ TRGState::set(unsigned p, unsigned n, const bool * const a) {
 	else
 	    _state[wp] &= ~(1 << bp);
     }
+  }
+#ifdef TRG_DEBUG
+  else std::cout << "NULL pointer found in TRGState::set"
+		 << std::endl;
+#endif
     return * this;
 }
 

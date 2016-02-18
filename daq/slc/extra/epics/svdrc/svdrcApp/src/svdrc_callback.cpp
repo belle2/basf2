@@ -80,7 +80,7 @@ void eventCallback(struct event_handler_args eha)
       RCState state_target = g_callback->getStateTarget();
       g_callback->set(pvname, pvdata);
       std::string val = pvdata;
-      if (pvname == "GPSC.SVD.State.Act") {
+      if (pvname == "GRC.SVD.State.Act") {
 	if (val == "NotReady") {
 	  g_callback->setState(RCState::NOTREADY_S);
 	} else if (val == "Ready") {
@@ -96,7 +96,7 @@ void eventCallback(struct event_handler_args eha)
 	} else if (val == "Error") {
 	  g_callback->setState(RCState::ERROR_ES);
 	}
-      } else if (pvname == "GPSC.SVD.State.Rqs") {
+      } else if (pvname == "GRC.SVD.State.Rqs") {
       } 
     } else {
       LogFile::warning("Unknown PV (chid=%d)", eha.chid);

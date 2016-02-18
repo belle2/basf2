@@ -27,6 +27,7 @@ SVDRCCallback::SVDRCCallback(const NSMNode& node)
   : RCCallback()
 {
   setNode(node);
+  setAutoReply(false);
 }
 
 void SVDRCCallback::init(NSMCommunicator&) throw()

@@ -107,6 +107,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   name_OutFileCalibrations = Form("pxdClShCal%s.root", name_Case.Data());
   int SummariesInfo[20];
   for (int i = 0; i < 20; i++) SummariesInfo[i] = 0;
+  int SummariesInfoPK[m_pixelkinds];
+  for (int i = 0; i < m_pixelkinds; i++) SummariesInfoPK[i] = 0;
   int SummariesInfoSh[m_shapes];
   for (int i = 0; i < m_shapes; i++) SummariesInfoSh[i] = 0;
   int SummariesInfoAng[m_anglesU * m_anglesV];
@@ -121,6 +123,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   TString DirShape;
   TH1F* m_histSummariesInfo = NULL;
   TH1F* m_histSummariesInfoSh = NULL;
+  TH1F* m_histSummariesInfoPK = NULL;
   TH2F* m_histSummariesInfoAng = NULL;
   TH2F** m_histBiasCorrectionU = NULL;
   TH2F** m_histBiasCorrectionV = NULL;
@@ -173,6 +176,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
     m_histSummariesInfo = new TH1F("SummariesInfo", "Summaries Info", 20, 0, 20);
     m_histSummariesInfoSh = new TH1F("SummariesInfoSh", "Summaries Info Over Shapes", m_shapes, 1, m_shapes + 1);
+    m_histSummariesInfoPK = new TH1F("SummariesInfoPK", "Summaries Info Over Pixel Kinds", m_pixelkinds, 0, m_pixelkinds);
     m_histSummariesInfoAng = new TH2F("SummariesInfoAng", "Summaries Info Over Angle Distribution", m_anglesU, -m_anglesU / 2,
                                       m_anglesU / 2, m_anglesV, -m_anglesV / 2, m_anglesV / 2);
 
@@ -525,7 +529,6 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
     if (!m_DoExpertHistograms) {  // acceleration of calibration process
       getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrack:ResidVTrack", c1, "goff");
       nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
-      //printf("--> sh %i rows %i\n", i_shape + 1, nSelRowsTemp);
       if (nSelRowsTemp < m_MinClustersCorrections) continue;
     }
     for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++) {
@@ -545,8 +548,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
         double PhiMi = ((TMath::Pi() * i_angleU) / m_anglesU) - (TMath::Pi() / 2.0);
         double PhiMa = ((TMath::Pi() * (i_angleU + 1)) / m_anglesU) - (TMath::Pi() / 2.0);
         if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {
-          PhiMi = TMath::Tan(PhiMi);  // TODO remeove those two lines - now correction of error in input datas (slope insteed angle)
-          PhiMa = TMath::Tan(PhiMa);  // TODO remeove those two lines - now correction of error in input datas (slope insteed angle)
+          //PhiMi = TMath::Tan(PhiMi);  // TODO remeove those two lines - now correction of error in input datas (slope insteed angle)
+          //PhiMa = TMath::Tan(PhiMa);  // TODO remeove those two lines - now correction of error in input datas (slope insteed angle)
           cCat = Form("phiTrack > %f", PhiMi);
           c3a.SetTitle(cCat.Data());
           cCat = Form("phiTrack < %f", PhiMa);
@@ -569,8 +572,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
           double ThetaMi = ((TMath::Pi() * i_angleV) / m_anglesV) - (TMath::Pi() / 2.0);
           double ThetaMa = ((TMath::Pi() * (i_angleV + 1)) / m_anglesV) - (TMath::Pi() / 2.0);
           if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {
-            ThetaMi = TMath::Tan(ThetaMi);  // TODO remeove those two lines - now correction of error in input datas (slope insteed angle)
-            ThetaMa = TMath::Tan(ThetaMa);  // TODO remeove those two lines - now correction of error in input datas (slope insteed angle)
+            //ThetaMi = TMath::Tan(ThetaMi);  // TODO remeove those two lines - now correction of error in input datas (slope insteed angle)
+            //ThetaMa = TMath::Tan(ThetaMa);  // TODO remeove those two lines - now correction of error in input datas (slope insteed angle)
             cCat = Form("thetaTrack > %f", ThetaMi);
             c4a.SetTitle(cCat.Data());
             cCat = Form("thetaTrack < %f", ThetaMa);
@@ -612,6 +615,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
           int nSelRows = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
           SummariesInfoSh[i_shape] += nSelRows;
           SummariesInfoAng[i_angleU * m_anglesV + i_angleV] += nSelRows;
+          SummariesInfoPK[i_pk] += nSelRows;
+
           if (nSelRows >= m_MinClustersCorrections) {
             B2DEBUG(30, "--> Selected raws " << nSelRows);
             double* Col1 = getObject<TTree>(name_SourceTree.Data()).GetV1();
@@ -768,6 +773,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   if (m_DoExpertHistograms) {
     for (int i = 0; i < 20; i++) m_histSummariesInfo->SetBinContent(i + 1, SummariesInfo[i]);
     for (int i = 0; i < m_shapes; i++) m_histSummariesInfoSh->SetBinContent(i + 1, SummariesInfoSh[i]);
+    for (int i = 0; i < m_pixelkinds; i++) m_histSummariesInfoPK->SetBinContent(i + 1, SummariesInfoPK[i]);
+
     for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++) {
       for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
         m_histSummariesInfoAng->SetBinContent(i_angleU + 1, i_angleV + 1, SummariesInfoAng[i_angleU * m_anglesV + i_angleV]);
@@ -775,83 +782,125 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
     }
   }
 
-  B2INFO("*******************************************************************");
-  B2INFO("**");
-  B2INFO("**            Using Clusters: " << SummariesInfo[0]);
-  B2INFO("**                     Cases: " << SummariesInfo[1]);
-  B2INFO("**");
-  B2INFO("**    Corrected bias U cases: " << SummariesInfo[2] << ", V cases: " << SummariesInfo[3]);
-  B2INFO("**     Not corrected U cases: " << SummariesInfo[1] - SummariesInfo[2] << ", V cases: " << SummariesInfo[1] -
-         SummariesInfo[3]);
-  B2INFO("**       Clusters in U cases: " << SummariesInfo[4] << ", V cases: " << SummariesInfo[5]);
-  B2INFO("** Fraction of clusters in U: " << (float)SummariesInfo[4] / SummariesInfo[0] << ", in V: " <<
-         (float)SummariesInfo[5] / SummariesInfo[0]);
-  B2INFO("**");
-  B2INFO("**   Estimated Error U cases: " << SummariesInfo[6] << ", V cases: " << SummariesInfo[7]);
-  B2INFO("**     Not corrected U cases: " << SummariesInfo[1] - SummariesInfo[6] << ", V cases: " << SummariesInfo[1] -
-         SummariesInfo[7]);
-  B2INFO("**       Clusters in U cases: " << SummariesInfo[8] << ", V cases: " << SummariesInfo[9]);
-  B2INFO("** Fraction of clusters in U: " << (float)SummariesInfo[8] / SummariesInfo[0] << ", in V: " <<
-         (float)SummariesInfo[9] / SummariesInfo[0]);
-  B2INFO("**");
-  B2INFO("**");
-  B2INFO("*******************************************************************");
-  B2INFO("**          Occupancy in Shapes");
-  B2INFO("**");
+  // ******************* Show some statistcs and save to asci file: ********************************
   TString TextSh;
+  TextSh = Form("CorrectionsStatistics_CK%i_PK%i.log", m_CalibrationKind, m_PixelKind);
+  FILE* AscFile = fopen(TextSh.Data(), "w");
+
+  TextSh = Form("*******************************************************************");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**            Using Clusters: %i", SummariesInfo[0]);
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**                     Cases: %i", SummariesInfo[1]);
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**    Corrected bias U cases: %i, V cases: %i", SummariesInfo[2], SummariesInfo[3]);
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**     Not corrected U cases: %i, V cases: %i", SummariesInfo[1] - SummariesInfo[2],
+                SummariesInfo[1] - SummariesInfo[3]);
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**       Clusters in U cases: %i, V cases: %i", SummariesInfo[4], SummariesInfo[5]);
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("** Fraction of clusters in U: %6.4f, in V: %6.4f", (float)SummariesInfo[4] / SummariesInfo[0],
+                (float)SummariesInfo[5] / SummariesInfo[0]);
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**   Estimated Error U cases: %i, V cases: %i", SummariesInfo[6], SummariesInfo[7]);
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**     Not corrected U cases: %i, V cases: %i", SummariesInfo[1] - SummariesInfo[6],
+                SummariesInfo[1] - SummariesInfo[7]);
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**       Clusters in U cases: %i, V cases: %i", SummariesInfo[8], SummariesInfo[9]);
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("** Fraction of clusters in U: %6.4f, in V: %6.4f", (float)SummariesInfo[8] / SummariesInfo[0],
+                (float)SummariesInfo[9] / SummariesInfo[0]);
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("*******************************************************************");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**          Occupancy in Pixel Kinds");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++) {
+    TextSh = Form("**      Pixel kind %i (Layer %i, Sensor %i, Size %i): %7i  (%6.2f %%)", i_pk,
+                  (int)((i_pk % 4) / 2) + 1, (int)(i_pk / 4) + 1, i_pk % 2, SummariesInfoPK[i_pk],
+                  (float)SummariesInfoPK[i_pk] * 100.0 / SummariesInfo[0]);
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  }
+  TextSh = Form("**");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("*******************************************************************");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**          Occupancy in Shapes");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
   for (int i_shape = 0; i_shape < m_shapes; i_shape++) {
     TextSh = Form("**      ShapeID %02i: %7i  (%6.2f %%)   (%s)", i_shape, SummariesInfoSh[i_shape],
                   (float)SummariesInfoSh[i_shape] * 100.0 / SummariesInfo[0],
                   Belle2::PXD::PXDClusterShape::pxdClusterShapeDescription[(Belle2::PXD::pxdClusterShapeType)(i_shape + 1)].c_str());
-    B2INFO(TextSh);
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
   }
-  B2INFO("**");
-  B2INFO("**");
-  B2INFO("*******************************************************************");
-  B2INFO("**          Occupancy in Angles");
-  B2INFO("**");
+  TextSh = Form("**");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("*******************************************************************");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**          Occupancy in Angles");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
   TextSh = Form("**    AngleV: ");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
   for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
     TextSh = Form("%s     %02i: ", TextSh.Data(), i_angleV);
   }
-  B2INFO(TextSh);
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
   for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++) {
     TextSh = Form("** AngleU %02i: ", i_angleU);
     for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
       TextSh = Form("%s%7i, ", TextSh.Data(), SummariesInfoAng[i_angleU * m_anglesV + i_angleV]);
     }
-    B2INFO(TextSh);
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
   }
-  B2INFO("**");
-  B2INFO("**");
-  B2INFO("*******************************************************************");
-  B2INFO("**          Occupancy in Angles in %");
-  B2INFO("**");
+  TextSh = Form("**");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("*******************************************************************");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**          Occupancy in Angles in %%");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("**");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
   TextSh = Form("**    AngleV: ");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
   for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
     TextSh = Form("%s     %02i: ", TextSh.Data(), i_angleV);
   }
-  B2INFO(TextSh);
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
   for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++) {
     TextSh = Form("** AngleU %02i: ", i_angleU);
     for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
       TextSh = Form("%s%7.2f, ", TextSh.Data(), (float)SummariesInfoAng[i_angleU * m_anglesV + i_angleV] * 100.0 / SummariesInfo[0]);
     }
-    B2INFO(TextSh);
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
   }
-  B2INFO("**");
-  B2INFO("**");
-  B2INFO("*******************************************************************");
-  /*
-    printf("--> %f <--\n", Correction_Bias[55]->GetMatrixArray()[3]);
-      if (i==55) printf("%f \n", Correction_Bias[i][3]);
-    TFile *ff = new TFile("Test.root", "recreate");
-    for (int i = 0; i < m_shapes * m_pixelkinds * m_dimensions; i++) {
-    }
-    ff->Close();
+  TextSh = Form("**");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  TextSh = Form("*******************************************************************");
+  B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+  fclose(AscFile);
+  // ******************* END show some statistcs and save to asci file: ********************************
 
-    printf("--> %i %i %i - %i\n",(int)Correction_Bias[55]->GetLwb(), Correction_Bias[55]->GetNrows(), Correction_Bias[55]->GetUpb(), Correction_Bias[55]->GetNoElements());
-  */
 
   if (m_DoExpertHistograms) {
     //  getObject<TTree>(name_SourceTree).Write(name_SourceTree);

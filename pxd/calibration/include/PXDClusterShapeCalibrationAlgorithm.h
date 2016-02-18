@@ -113,9 +113,9 @@ namespace Belle2 {
     const int m_shapes = 15;    // 1 .. 15, shapeID = 0: not setting shape
     const int m_pixelkinds = 8;
     const int m_dimensions = 2; // cases: 15 x 8 x 2 = 240
-    const int m_anglesU = 4;   // 18 x 18 = 324 (angles)
-    const int m_anglesV = 4;
-    const int m_in_pixelU = 7;  // 9 x 9 = 81 (in-pixel positions)
+    const int m_anglesU = 18;   // 18 x 18 = 324 (angles)
+    const int m_anglesV = 18;
+    const int m_in_pixelU = 7;  // 7 x 7 = 49 (in-pixel positions)
     const int m_in_pixelV = 7;
     const int m_MinClustersCorrections = 100; // Minimum clusters for calculation of corrections
 

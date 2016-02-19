@@ -10,7 +10,7 @@
 #pragma once
 
 #include <framework/database/Database.h>
-
+#include <boost/bimap.hpp>
 
 namespace Belle2 {
   /**
@@ -60,6 +60,19 @@ namespace Belle2 {
      */
     virtual bool storeData(const std::string& package, const std::string& module, TObject* object, IntervalOfValidity& iov);
 
+    /** set a mapping from experiment name to experiment number.
+     * The experiment numbers and names need to be unique as we have to
+     * transform the mapping in both directions. So a experiment number cannot
+     * have multiple names different experiment numbers cannot have the same
+     * name.
+     *
+     * @param experiment experiment number as used in the EventMetaData
+     * @param name       name of that experiment in the ConditionsDB
+     * @return           true if the mapping could be added, false if there's a
+     *                   conflict with an existing entry.
+     */
+    bool addExperimentName(int experiment, const std::string& name);
+
   private:
     /**
      * Hidden constructor, as it is a singleton.
@@ -87,5 +100,9 @@ namespace Belle2 {
 
     /** Run number for which the payloads were obtained. */
     int m_currentRun;
+
+    /** bidirectional mapping from experiment number to name in the central database */
+    boost::bimap<int, std::string> m_mapping;
+
   };
 } // namespace Belle2

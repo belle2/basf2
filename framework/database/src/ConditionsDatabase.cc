@@ -70,7 +70,13 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
   if ((m_currentExperiment != event.getExperiment()) || (m_currentRun != event.getRun())) {
     m_currentExperiment = event.getExperiment();
     m_currentRun = event.getRun();
-    ConditionsService::getInstance()->getPayloads(m_globalTag, std::to_string(m_currentExperiment), std::to_string(m_currentRun));
+    std::string experimentName = std::to_string(m_currentExperiment);
+    // check if we have a name defined for the current experiment number
+    auto it = m_mapping.left.find(m_currentExperiment);
+    if (it != m_mapping.left.end()) {
+      experimentName = it->second;
+    }
+    ConditionsService::getInstance()->getPayloads(m_globalTag, experimentName, std::to_string(m_currentRun));
   }
 
   if (!ConditionsService::getInstance()->payloadExists(package + module)) {
@@ -105,9 +111,22 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
     return result;
   }
 
-  conditionsPayload paylodInfo = ConditionsService::getInstance()->getPayloadInfo(package, module);
-  result.second = IntervalOfValidity(stoi(paylodInfo.expInitial), stoi(paylodInfo.runInitial), stoi(paylodInfo.expFinal),
-                                     stoi(paylodInfo.runFinal));
+  conditionsPayload payloadInfo = ConditionsService::getInstance()->getPayloadInfo(package, module);
+  // we possibly need to convert the experiment names back to numbers so we
+  // have to check for both if a name is defined and if so just use the number
+  // associated, otherwise try to convert to int. We need this two times so
+  // let's use a small lambda to save some copy pasta
+  auto getExpNumber = [&](const std::string & exp) {
+    auto it = m_mapping.right.find(exp);
+    if (it != m_mapping.right.end()) return it->second;
+    try {
+      return stoi(exp);
+    } catch (std::invalid_argument& e) {
+      B2FATAL("Invalid experiment number: '" << exp << "'. Please define the experiment name using 'set_experiment_name'");
+    }
+  };
+  result.second = IntervalOfValidity(getExpNumber(payloadInfo.expInitial), stoi(payloadInfo.runInitial),
+                                     getExpNumber(payloadInfo.expFinal), stoi(payloadInfo.runFinal));
 
   // Update database local cache file
   std::string revision = filename.substr(filename.find_last_of("_") + 1);
@@ -151,4 +170,14 @@ bool ConditionsDatabase::storeData(const std::string& package, const std::string
   remove("payload.root");
 
   return true;
+}
+
+bool ConditionsDatabase::addExperimentName(int experiment, const std::string& name)
+{
+  auto it = m_mapping.insert(boost::bimap<int, std::string>::value_type(experiment, name));
+  if (!it.second) {
+    B2ERROR("Cannot set experiment name " << experiment << "->'" << name << "': conflict with "
+            << it.first->left << "->'" << it.first->right << "'");
+  }
+  return it.second;
 }

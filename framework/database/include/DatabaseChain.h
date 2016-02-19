@@ -59,6 +59,9 @@ namespace Belle2 {
      */
     virtual bool storeData(const std::string& package, const std::string& module, TObject* object, IntervalOfValidity& iov);
 
+    /** Return the list of registered databases. */
+    std::vector<Database*> getDatabases() { return m_databases; }
+
   private:
     /** Hidden constructor, as it is a singleton. */
     explicit DatabaseChain(bool resetIoVs) : m_resetIoVs(resetIoVs) {};

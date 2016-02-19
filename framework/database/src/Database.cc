@@ -168,6 +168,29 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(condition_createInstance_overloads, ConditionsDa
 #pragma GCC diagnostic pop
 #endif
 
+namespace {
+  void Database_addExperimentName(int experiment, const std::string& name)
+  {
+    B2INFO("Map Experiment " << experiment << " to '" << name << "'");
+    std::vector<Database*> databases{&Database::Instance()};
+    DatabaseChain* chain = dynamic_cast<DatabaseChain*>(databases[0]);
+    if (chain) {
+      databases = chain->getDatabases();
+    }
+    bool found{false};
+    for (Database* db : databases) {
+      ConditionsDatabase* cond = dynamic_cast<ConditionsDatabase*>(db);
+      if (cond) {
+        cond->addExperimentName(experiment, name);
+        found = true;
+      }
+    }
+    if (!found) {
+      B2WARNING("No central database configured, experiment name ignored");
+    }
+  }
+}
+
 void Database::exposePythonAPI()
 {
   using namespace boost::python;
@@ -177,6 +200,21 @@ void Database::exposePythonAPI()
   //don't show c++ signature in python doc to keep it simple
   docstring_options options(true, true, false);
 
+  def("set_experiment_name", &Database_addExperimentName, args("experiment", "name"), R"DOCSTRING(
+Set a name for the given experiment number when looking up payloads in the
+central database. A central database needs to be set up before using "use_central_database".
+
+The experiment and numbers and names need to be unique because the mapping
+needs to be performed in both directions so different experiment numbers cannot
+be mapped to the same name or vice versa.
+
+Example:
+    >>> set_experiment_name(4, "BELLE_exp4")
+
+Args:
+    experiment (int): Experiment number from EventMetaData
+    name (str): name of the experiment when looking up payloads
+)DOCSTRING");
   def("reset_database", &Database::reset, "Reset the database setup to have no database sources");
   def("use_database_chain", &DatabaseChain::createInstance, chain_createInstance_overloads(args("resetIoVs", "loglevel"), R"DOCSTRING(
 Use a database chain: Multiple database sources are used on a first found

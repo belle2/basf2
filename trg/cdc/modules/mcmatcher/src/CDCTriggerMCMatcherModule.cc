@@ -1,4 +1,4 @@
-#include "trg/cdc/modules/helpers/CDCTriggerMCMatcherModule.h"
+#include "trg/cdc/modules/mcmatcher/CDCTriggerMCMatcherModule.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>

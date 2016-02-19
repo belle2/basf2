@@ -31,10 +31,11 @@ using namespace std;
 using namespace Belle2;
 namespace fs = boost::filesystem;
 
-void ConditionsDatabase::createDefaultInstance(const std::string& globalTag, LogConfig::ELogLevel logLevel)
+void ConditionsDatabase::createDefaultInstance(const std::string& globalTag, LogConfig::ELogLevel logLevel,
+                                               const std::string& payloadDir)
 {
-  ConditionsDatabase* database = new ConditionsDatabase(globalTag, "centraldb");
-  ConditionsService::getInstance()->setFILEbaselocal("centraldb/");
+  ConditionsDatabase* database = new ConditionsDatabase(globalTag, payloadDir);
+  ConditionsService::getInstance()->setFILEbaselocal(payloadDir + "/");
   database->setLogLevel(logLevel);
   Database::setInstance(database);
 }

@@ -23,9 +23,12 @@ namespace Belle2 {
      * Method to set the database instance to the central database with default parameters.
      *
      * @param globalTag   The name of the global tag
+     * @param logLevel    The level of log messages about not-found payloads.
+     * @param payloadDir  Directory for local copies of the payloads
      * @return            A pointer to the created database instance
      */
-    static void createDefaultInstance(const std::string& globalTag, LogConfig::ELogLevel logLevel = LogConfig::c_Warning);
+    static void createDefaultInstance(const std::string& globalTag, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
+                                      const std::string& payloadDir = "centraldb");
 
     /**
      * Method to set the database instance to the central database.

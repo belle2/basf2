@@ -133,6 +133,12 @@ void pxdClusterShapeCalibrationModule::prepare()
 
 }
 
+void pxdClusterShapeCalibrationModule::terminate()
+{
+
+  // not need action on the end.
+}
+
 void pxdClusterShapeCalibrationModule::collect()
 {
   StoreObjPtr<EventMetaData> emd;
@@ -345,3 +351,5 @@ void pxdClusterShapeCalibrationModule::collect()
   } // end of "if" not use tracks, for simulations only
 
 }
+
+

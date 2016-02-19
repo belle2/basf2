@@ -52,6 +52,8 @@ namespace Belle2 {
     virtual void prepare();
     /** Extract parameters for pxd cluster shape calibration of cluster reconstruction using true position */
     virtual void collect();
+    /** write file */
+    virtual void terminate();
 
   private:
     /** Region close edge where remove cluster shape corrections */

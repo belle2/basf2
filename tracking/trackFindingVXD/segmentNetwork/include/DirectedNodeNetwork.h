@@ -487,8 +487,10 @@ namespace Belle2 {
 
 
     /** check if a given entry is already in the network */
-    bool isEntryInNetwork(const EntryType& entry) const
+    bool isEntryInNetwork(const EntryType& entry) //const
     {
+      // isInNetwork() cannot be declared const at the moment
+      // TODO: make isInNetwork() const and declare this as const too
       return (isInNetwork(entry) != m_nodes.rend());
     }
   };

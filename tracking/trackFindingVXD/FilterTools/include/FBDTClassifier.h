@@ -14,6 +14,7 @@
 // #include <inc/FBDT.h> // externals version (needs an update!)
 #include <tracking/trackFindingVXD/tmpFastBDT/FastBDT.h> // temporary copy with necessary changes
 
+#include <tracking/trackFindingVXD/FilterTools/FBDTClassifierHelper.h>
 #include <tracking/trackFindingVXD/FilterTools/DecorrelationMatrix.h>
 #include <array>
 #include <vector>
@@ -21,15 +22,6 @@
 #include <iomanip>
 
 namespace Belle2 {
-
-  /** small helper struct */
-  template<size_t Ndims = 9>
-  struct FBDTTrainSample {
-    explicit FBDTTrainSample(const std::array<double, Ndims>& values, bool sig) : hits(values), signal(sig) {}
-
-    std::array<double, Ndims> hits;
-    bool signal;
-  };
 
   /**
    * FastBDT as RelationsObject to make it storeable and accesible on/via the DataStore

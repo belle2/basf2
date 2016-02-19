@@ -92,9 +92,7 @@ namespace Belle2 {
   template<size_t Ndims>
   void DecorrelationMatrix<Ndims>::calculateDecorrMatrix(std::array<std::vector<double>, Ndims> inputData, bool normalise)
   {
-    auto covMatrix = calculateCovMatrix(inputData);
-    std::cout << covMatrix << std::endl;
-    calculateDecorrMatrix(covMatrix, normalise);
+    calculateDecorrMatrix(calculateCovMatrix(inputData), normalise);
   }
 
   template<size_t Ndims>

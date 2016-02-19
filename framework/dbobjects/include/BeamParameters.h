@@ -47,10 +47,13 @@ namespace Belle2 {
     /** equality operator */
     bool operator==(const BeamParameters& b)
     {
+      // since we only save the covariance matrices with float precision we
+      // need to also do the comparison with float precision.
+      auto floatcmp = [](double a, double b) { return (float)a == (float)b; };
       return MCInitialParticles::operator==(b) &&
-             std::equal(m_covHER, m_covHER + 6, b.m_covHER) &&
-             std::equal(m_covLER, m_covLER + 6, b.m_covLER) &&
-             std::equal(m_covVertex, m_covVertex + 6, b.m_covVertex);
+             std::equal(m_covHER, m_covHER + 6, b.m_covHER, floatcmp) &&
+             std::equal(m_covLER, m_covLER + 6, b.m_covLER, floatcmp) &&
+             std::equal(m_covVertex, m_covVertex + 6, b.m_covVertex, floatcmp);
     }
 
     /** Set the covariance matrix for HER (E, theta_x, theta_y) where E is the

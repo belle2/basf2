@@ -11,7 +11,6 @@
 #pragma once
 
 #include <top/geometry/TOPGeometryPar.h>
-#include <TObject.h>
 #include <string>
 
 namespace Belle2 {
@@ -46,10 +45,15 @@ namespace Belle2 {
     {}
 
     /**
-     * Import sample time calibration to database
+     * Import sample time calibration constants to database
      * @param fileName text file name with calibration constants
      */
     void importSampleTimeCalibration(std::string fileName);
+
+    /**
+     * Print sample time calibration constants stored in database
+     */
+    void printSampleTimeCalibration();
 
     /**
      * Export sample time calibration from database

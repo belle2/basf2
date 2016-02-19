@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -18,8 +18,9 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework - Database
-#include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/database/DBImportArray.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -31,11 +32,9 @@
 #include <top/dataobjects/TOPRawWaveform.h>
 
 // database classes
-#include <framework/database/DBStore.h>
 #include <top/dbobjects/TOPASICChannel.h>
 
 #include "TFile.h"
-#include <TClonesArray.h>
 #include <iostream>
 #include <sstream>
 
@@ -180,14 +179,11 @@ namespace Belle2 {
     B2INFO("TOPWFCalibratorModule: number of active ASIC storage windows: " <<
            numWindows);
 
-    TClonesArray constants("Belle2::TOPASICChannel");
-    const auto name = DBStore::arrayName<TOPASICChannel>("");
-
+    DBImportArray<TOPASICChannel> constants;
     int badPed = 0;
     int badSampl = 0;
     for (int channel = 0; channel < c_NumChannels; channel++) {
-      new(constants[channel]) TOPASICChannel(m_moduleID, channel, numWindows);
-      auto* channelConstants = static_cast<TOPASICChannel*>(constants[channel]);
+      auto* channelConstants = constants.appendNew(m_moduleID, channel, numWindows);
       auto* baseline = m_baseline[channel];
       for (int window = 0; window < c_NumWindows; window++) {
         TProfile* prof = m_profile[channel][window];
@@ -214,14 +210,12 @@ namespace Belle2 {
 
     auto expNo = evtMetaData->getExperiment();
     IntervalOfValidity iov(expNo, m_runLow, expNo, m_runHigh);
-    Database::Instance().storeData(name, &constants, iov);
+    constants.import(iov);
 
-    int all = 0;
+    int all = constants.getEntries();
     int incomplete = 0;
-    for (int channel = 0; channel < constants.GetEntriesFast(); channel++) {
-      const auto* chan = static_cast<TOPASICChannel*>(constants[channel]);
-      all++;
-      if (chan->getNumofGoodWindows() != chan->getNumofWindows()) incomplete++;
+    for (const auto& chan : constants) {
+      if (chan.getNumofGoodWindows() != chan.getNumofWindows()) incomplete++;
     }
 
     B2RESULT("TOPWFCalibratorModule: module ID = " << m_moduleID <<

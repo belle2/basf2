@@ -14,6 +14,7 @@
 // framework - Database
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
+#include <framework/database/DBImportArray.h>
 
 // framework - xml
 #include <framework/gearbox/GearDir.h>
@@ -23,11 +24,8 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-// db objects
+// DB objects
 #include <top/dbobjects/TOPSampleTime.h>
-
-// root
-#include <TClonesArray.h>
 
 #include <iostream>
 #include <fstream>
@@ -37,6 +35,7 @@ using namespace Belle2;
 
 void TOPDatabaseImporter::importSampleTimeCalibration(std::string fileName)
 {
+
 
   if (!m_topgp->isInitialized()) {
     B2ERROR("TOPGeometryPar was not initialized");
@@ -54,18 +53,13 @@ void TOPDatabaseImporter::importSampleTimeCalibration(std::string fileName)
   }
   B2INFO(fileName << ": open for reading");
 
-  TClonesArray constants("Belle2::TOPSampleTime");
-  int index = 0;
+  DBImportArray<TOPSampleTime> timeBases;
 
   for (int moduleID = 3; moduleID < 5; moduleID++) {
     for (int boardStack = 0; boardStack < 4; boardStack++) {
       for (int carrierBoard = 0; carrierBoard < 4; carrierBoard++) {
         for (int asic = 0; asic < 4; asic++) {
           for (int chan = 0; chan < 8; chan++) {
-            auto channel = mapper.getChannel(boardStack, carrierBoard, asic, chan);
-            new(constants[index]) TOPSampleTime(moduleID, channel, syncTimeBase);
-            auto* topSampleTimes = static_cast<TOPSampleTime*>(constants[index]);
-            index++;
             std::vector<double> sampleTimes;
             for (int sample = 0; sample < 256; sample++) {
               double data = 0;
@@ -76,7 +70,9 @@ void TOPDatabaseImporter::importSampleTimeCalibration(std::string fileName)
               }
               sampleTimes.push_back(data);
             }
-            topSampleTimes->setTimeAxis(sampleTimes, syncTimeBase);
+            auto channel = mapper.getChannel(boardStack, carrierBoard, asic, chan);
+            auto* timeBase = timeBases.appendNew(moduleID, channel, syncTimeBase);
+            timeBase->setTimeAxis(sampleTimes, syncTimeBase);
           }
         }
       }
@@ -84,14 +80,28 @@ void TOPDatabaseImporter::importSampleTimeCalibration(std::string fileName)
   }
 
   stream.close();
-  int ndata = index * 256;
-  B2INFO(fileName << ": file closed, " << ndata << " constants read from file");
+  int ndataRead = timeBases.getEntries() * 256;
+  B2INFO(fileName << ": file closed, " << ndataRead << " constants read from file");
 
-  const auto name = DBStore::arrayName<TOPSampleTime>("");
   IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
-  Database::Instance().storeData(name, &constants, iov);
+  timeBases.import(iov);
 
   B2RESULT("Sample time calibration constants imported to database");
 
 }
 
+
+void TOPDatabaseImporter::printSampleTimeCalibration()
+{
+
+  DBArray<TOPSampleTime> sampleTimes;
+
+  for (const auto& timeBase : sampleTimes) {
+    cout << timeBase.getModuleID() << " " << timeBase.getChannel() << endl;
+    for (const auto& time : timeBase.getTimeAxis()) {
+      cout << time << " ";
+    }
+    cout << endl;
+  }
+
+}

@@ -10,12 +10,12 @@
 
 #include <generators/utilities/InitialParticleGeneration.h>
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 
   void InitialParticleGeneration::initialize()
   {
-    m_beamParams.required("", DataStore::c_Persistent);
     m_event.registerInDataStore();
   }
 
@@ -74,11 +74,14 @@ namespace Belle2 {
     if (!m_event) {
       m_event.create();
     }
-    /*if(m_beamParams.hasChanged()){
+    if (!m_beamParams.isValid()) {
+      B2FATAL("Cannot generate beam without valid BeamParameters");
+    }
+    if (m_beamParams.hasChanged()) {
       m_generateHER.reset();
       m_generateLER.reset();
       m_generateVertex.reset();
-    }*/
+    }
     m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & m_allowedFlags);
     TLorentzVector her = generateBeam(m_beamParams->getHER(), m_beamParams->getCovHER(), m_generateHER);
     TLorentzVector ler = generateBeam(m_beamParams->getLER(), m_beamParams->getCovLER(), m_generateLER);

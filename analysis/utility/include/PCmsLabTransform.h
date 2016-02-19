@@ -11,8 +11,8 @@
 #ifndef PCMSLABTRANSFORM_H
 #define PCMSLABTRANSFORM_H
 
-#include <framework/dataobjects/BeamParameters.h>
-#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dbobjects/BeamParameters.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <TLorentzRotation.h>
 #include <TLorentzVector.h>
@@ -83,7 +83,7 @@ namespace Belle2 {
     const BeamParameters& getBeamParams() const;
 
   private:
-    const StoreObjPtr<BeamParameters> m_beamParams; /**< actually performs calculations. */
+    const DBObjPtr<BeamParameters> m_beamParams; /**< actually performs calculations. */
   };
 
 } // Belle2 namespace

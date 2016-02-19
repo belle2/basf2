@@ -1,6 +1,6 @@
 #include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
-#include <framework/dataobjects/BeamParameters.h>
+#include <framework/dbobjects/BeamParameters.h>
 #include <TRandom.h>
 #include <TMath.h>
 

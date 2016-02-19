@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/dataobjects/BeamParameters.h>
+#include <framework/dbobjects/BeamParameters.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 

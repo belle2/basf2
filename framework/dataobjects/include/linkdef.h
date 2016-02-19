@@ -11,7 +11,6 @@
 #pragma link C++ class Belle2::FileMetaData+;
 #pragma link C++ class Belle2::ProfileInfo+;
 #pragma link C++ class Belle2::MCInitialParticles+;
-#pragma link C++ class Belle2::BeamParameters+;
 #pragma link C++ class Belle2::DigitBase+;
 
 #pragma link C++ class Belle2::SimpleVec<int>+;

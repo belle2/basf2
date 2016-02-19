@@ -25,7 +25,7 @@
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <framework/dataobjects/BeamParameters.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 #include <algorithm>
 

@@ -12,7 +12,6 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/dataobjects/BeamParameters.h>
 
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
@@ -222,8 +221,6 @@ void B2BIIConvertMdstModule::initializeDataStore()
   particles.registerRelationTo(mcParticles);
   particles.registerRelationTo(m_pidLikelihoods);
 
-  m_beamParams.registerInDataStore();
-
   B2DEBUG(99, "[B2BIIConvertMdstModule::initializeDataStore] initialization of DataStore ended");
 }
 
@@ -302,7 +299,7 @@ void B2BIIConvertMdstModule::convertBeamEnergy()
 
   std::vector<double> covariance; //0 entries = no error
 
-  if (!m_beamParams) m_beamParams.create();
+  if (!m_beamParams) B2FATAL("No BeamParameters found");
 
   m_beamParams->setLER(Eler, angleLer, covariance);
   m_beamParams->setHER(Eher, angleHer, covariance);

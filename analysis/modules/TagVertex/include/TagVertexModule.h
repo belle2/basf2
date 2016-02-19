@@ -14,7 +14,7 @@
 #include <framework/core/Module.h>
 
 // DataStore
-#include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 
 // rave
 #include <analysis/raveInterface/RaveSetup.h>
@@ -25,7 +25,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
-#include <framework/dataobjects/BeamParameters.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 #include <string>
 
@@ -93,7 +93,7 @@ namespace Belle2 {
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     bool m_MCInfo;                /**< true if user wants to retrieve MC information out from the tracks used    in the fit */
     double m_shiftZ;              /**< parameter for testing the systematic errror from the IP measurement*/
-    StoreObjPtr<BeamParameters> m_beamParams{"", DataStore::c_Persistent}; /**< Beam parameters */
+    DBObjPtr<BeamParameters> m_beamParams; /**< Beam parameters */
 
     /** central method for the tag side vertex fit */
     bool doVertexFit(Particle* Breco);

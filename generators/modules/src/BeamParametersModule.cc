@@ -11,7 +11,6 @@
 #include <generators/modules/BeamParametersModule.h>
 #include <framework/database/Database.h>
 
-
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -61,41 +60,40 @@ BeamParametersModule::BeamParametersModule() : Module()
            "generating initial events", true);
   addParam("generateCMS", m_generateCMS, "if true, generate events in CMS, not "
            "lab system", false);
-  addParam("overwrite", m_overwrite, "if true overwrite existing beam"
-           "parameters, otherwise do nothing", false);
+  addParam("createPayload", m_createPayload, "if true create a database payload "
+           "with the iov given with the payloadIov parameter", false);
+  addParam("payloadIov", m_payloadIov, "iov of the payload to be created. List "
+           "of four numbers: first experiment, first run, last experiment, "
+           "last run", m_payloadIov);
+}
+
+void BeamParametersModule::event()
+{
+  if (m_beamParamsDB.hasChanged()) {
+    *m_beamParamsDB = m_beamParams;
+  }
 }
 
 void BeamParametersModule::initialize()
 {
-  StoreObjPtr<BeamParameters> beamParams("", DataStore::c_Persistent);
-  beamParams.registerInDataStore();
-  // Check if we already have a beamparameter object
-  if (!beamParams.isValid()) {
-    beamParams.create();
-  } else {
-    if (!m_overwrite) {
-      B2WARNING("BeamParameters already exist, doing nothing");
-    } else {
-      B2WARNING("overwriting existing BeamParameters");
-    }
-  }
-  beamParams->setHER(m_energyHER, m_angleHER, m_covHER);
-  beamParams->setLER(m_energyLER, m_angleLER, m_covLER);
+  m_beamParams.setHER(m_energyHER, m_angleHER, m_covHER);
+  m_beamParams.setLER(m_energyLER, m_angleLER, m_covLER);
   TVector3 vertex;
   if (m_vertex.size() == 3) {
     vertex.SetXYZ(m_vertex[0], m_vertex[1], m_vertex[2]);
   } else {
     B2ERROR("Vertex position needs to have 3 entries");
   }
-  beamParams->setVertex(vertex, m_covVertex);
+  m_beamParams.setVertex(vertex, m_covVertex);
   int flags = 0;
   if (m_generateCMS) flags |= BeamParameters::c_generateCMS;
   if (m_smearEnergy) flags |= BeamParameters::c_smearBeamEnergy;
   if (m_smearDirection) flags |= BeamParameters::c_smearBeamDirection;
   if (m_smearVertex) flags |= BeamParameters::c_smearVertex;
-  beamParams->setGenerationFlags(flags);
+  m_beamParams.setGenerationFlags(flags);
 
-  //BeamParameter params;
-  //IntervalOfValidity iov(1, 1);
-  //Database::Instance().storeData("BeamParameter", &params, iov);
+  if (m_createPayload) {
+    IntervalOfValidity iov(m_payloadIov[0], m_payloadIov[1], m_payloadIov[2], m_payloadIov[3]);
+    Database::Instance().storeData(&m_beamParams, iov);
+  }
 }

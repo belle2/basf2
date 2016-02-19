@@ -22,7 +22,8 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/dataobjects/BeamParameters.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/BeamParameters.h>
 #include <mdst/dataobjects/Track.h>
 #include <genfit/Track.h>
 
@@ -201,7 +202,7 @@ void MillepedeCollectorModule::collect()
 
         extDerivatives.UnitMatrix();
 
-        StoreObjPtr<BeamParameters> beam("", DataStore::c_Persistent);
+        DBObjPtr<BeamParameters> beam;
         TVector3 vertexResidual = mother->getVertex() - beam->getVertex();
 
 

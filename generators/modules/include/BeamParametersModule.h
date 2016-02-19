@@ -13,10 +13,9 @@
 #define GENERATORS_MODULES_BEAMPARAMETERSMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/BeamParameters.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/BeamParameters.h>
 #include <vector>
-#include <generators/utilities/InitialParticleGeneration.h>
 
 
 namespace Belle2 {
@@ -32,10 +31,15 @@ namespace Belle2 {
      */
     BeamParametersModule();
 
-    /** Set the Beamparameters*/
+    /** Create the Beamparameters*/
     virtual void initialize();
 
+    /** Set the Beamparameters*/
+    virtual void event();
+
   private:
+    BeamParameters m_beamParams; /**< Copy of the beamparameters created from the parameters */
+    DBObjPtr<BeamParameters> m_beamParamsDB; /**< DB Store of the parameters to be overwritten */
     double m_energyHER;  /**< Energy of the High Energy Ring */
     double m_angleHER;  /**< theta angle of the High Energy Ring */
     std::vector<double> m_covHER; /**< Covariance matrix for the High Energy Ring */
@@ -44,12 +48,14 @@ namespace Belle2 {
     std::vector<double> m_covLER; /**< Covariance matrix for the Low Energy Ring */
     std::vector<double> m_vertex; /**< nominal vertex position */
     std::vector<double> m_covVertex; /**< covariance matrix for the vertex position */
+    std::vector<int> m_payloadIov{0, 0, -1, -1}; /**< iov when creating a database payload */
 
     bool m_smearEnergy; /**< if true, smear energy when generating initial events */
     bool m_smearDirection; /**< if true, smear beam direction when generating initial events */
     bool m_smearVertex; /**< if true, smear vertex position when generating initial events */
     bool m_generateCMS; /**< if true, generate events in CMS, not lab system */
     bool m_overwrite; /**< if true, overwrite existing beamparameters. Otherwise do nothing */
+    bool m_createPayload; /**< if true create a new payload with the given parameters */
   };
 }
 

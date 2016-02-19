@@ -28,7 +28,7 @@
 
 //
 #include <analysis/utility/PCmsLabTransform.h>
-#include <framework/dataobjects/BeamParameters.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 #include <framework/logging/Logger.h>
 

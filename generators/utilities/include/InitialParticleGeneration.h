@@ -13,9 +13,9 @@
 #define GENERATORS_UTILITIES_INITIALPARTICLEGENERATION_H
 
 #include <framework/datastore/StoreObjPtr.h>
-//#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/utilities/MultivariateNormalGenerator.h>
-#include <framework/dataobjects/BeamParameters.h>
+#include <framework/dbobjects/BeamParameters.h>
 #include <framework/dataobjects/MCInitialParticles.h>
 
 namespace Belle2 {
@@ -59,7 +59,7 @@ namespace Belle2 {
      */
     TLorentzVector generateBeam(const TLorentzVector& initial, const TMatrixDSym& cov, MultivariateNormalGenerator& gen);
     /** Datastore object containing the nominal beam parameters */
-    StoreObjPtr<BeamParameters> m_beamParams{"", DataStore::c_Persistent};
+    DBObjPtr<BeamParameters> m_beamParams;
     /** Datastore object containing the generated event */
     StoreObjPtr<MCInitialParticles> m_event;
     /** Generator for HER */

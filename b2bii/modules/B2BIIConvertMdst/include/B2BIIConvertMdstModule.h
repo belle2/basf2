@@ -33,10 +33,10 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-#include <framework/dataobjects/BeamParameters.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/Const.h>
 
 #include "CLHEP/Vector/ThreeVector.h"
@@ -299,8 +299,8 @@ namespace Belle2 {
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;
 
-    /** BeamParameters, currently in datastore */
-    StoreObjPtr<BeamParameters> m_beamParams{"", DataStore::c_Persistent};
+    /** BeamParameters */
+    DBObjPtr<BeamParameters> m_beamParams;
 
     /** CONVERSION OF TRACK ERROR MATRIX ELEMENTS */
     /** Belle error matrix elements are in the following order

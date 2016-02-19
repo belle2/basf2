@@ -133,7 +133,7 @@ namespace Belle2 {
     {
       return std::find_if(m_nodes.rbegin(),
                           m_nodes.rend(),
-                          [&](const Node * vecEntry) -> bool
+                          [&toBeFound](const Node * vecEntry) -> bool
       { return *vecEntry == toBeFound; }
                          );
     }
@@ -484,5 +484,12 @@ namespace Belle2 {
 
     /** returns number of nodes to be found in the network */
     unsigned int size() const { return m_nodes.size(); }
+
+
+    /** check if a given entry is already in the network */
+    bool isEntryInNetwork(const EntryType& entry) const
+    {
+      return (isInNetwork(entry) != m_nodes.rend());
+    }
   };
 }

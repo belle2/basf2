@@ -32,6 +32,14 @@ void TOPCAF_DataQualityModule::defineHisto()
   m_samples->GetXaxis()->SetTitle("ADC Value");
   m_samples->GetYaxis()->SetTitle("Number of Samples");
   m_hitmap = new TH2F("Hitmap", "carrier vs. row", 4, 0, 4, 4, 0, 4);
+  m_scrod_id = new TH1F("scrodID", "scrodID", 100, 0, 100);
+  m_asic_row = new TH1F("asicRow", "asic row", 4, 0, 4);
+  m_asic_col = new TH1F("asicCol", "asic col", 4, 0, 4);
+  m_asic_ch = new TH1F("asicCh", "channel", 8, 0, 8);
+  m_errorFlag = new TH1F("errorFlag", "errorFlag", 1000, 0, 1000);
+  m_flag = new TH1F("flag", "parser flag", 4, 0, 4);
+  m_asic_win = new TH1F("window", "window", 4, 0, 4);
+  m_entries = new TH1F("entries", "entries", 100, 0, 2600);
   oldDir->cd();
 }
 
@@ -46,6 +54,17 @@ void TOPCAF_DataQualityModule::initialize()
 void TOPCAF_DataQualityModule::beginRun()
 {
   m_DRAWWAVES = true;
+  m_DEBUGGING = true;
+}
+
+void TOPCAF_DataQualityModule::basicDebuggingPlots(EventWaveformPacket* ewp)
+{
+  m_scrod_id->Fill(ewp->GetScrodID());
+  m_asic_ch->Fill(ewp->GetASICChannel());
+  m_asic_row->Fill(ewp->GetASICRow());
+  m_asic_col->Fill(ewp->GetASICColumn());
+  m_asic_win->Fill(ewp->GetASICWindow());
+  m_entries->Fill(ewp->GetSamples().size());
 }
 
 void
@@ -101,6 +120,9 @@ void TOPCAF_DataQualityModule::event()
     EventWaveformPacket* evtwave_ptr = evtwaves_ptr[c];
     if (m_DRAWWAVES) {
       drawWaveforms(evtwave_ptr);
+    }
+    if (m_DEBUGGING) {
+      basicDebuggingPlots(evtwave_ptr);
     }
     auto channelID = evtwave_ptr->GetChannelID();
     const vector<double> v_samples = evtwave_ptr->GetSamples();

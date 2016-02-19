@@ -31,7 +31,31 @@ parser.add_argument(
 parser.add_argument('--output', metavar='Output File (path/filename)',
                     help='the output file name.  A default based on the input will be created if this argument is not supplied')
 
+parser.add_argument(
+    '--timeCalibFile',
+    metavar='Time Calibration File (i.e. file name = /path/to/xxx_SampleCalibration.root)',
+    required=True,
+    help='the path/name for the input sample calibration file. This parameter is REQUIRED.')
+
+parser.add_argument('--Conditions', action='store_true',
+                    help='Use the conditions service to store this calibration.'
+                    )
+
 args = parser.parse_args()
+
+if args.Conditions:
+    print('Using conditions service with IOVi = ' + args.IOVi + ' and IOVf = ' + args.IOVf)
+    Conditions = 1
+else:
+    print('Not using conditions service.')
+    Conditions = 0
+
+if args.output:
+    outputFile = args.output
+else:
+    outputFile = args.inputRun.replace('.sroot', '_writehits.root')
+print('Writing output root file to ' + outputFile)
+
 
 SRootReader = register_module('SeqRootInput')
 SRootReader.param('inputFileName', args.inputRun)
@@ -43,12 +67,6 @@ itopeventconverter = register_module('iTopRawConverterSRoot')
 
 histomanager = register_module("HistoManager")
 
-WriteFile = 1
-if args.output:
-    outputFile = args.output
-else:
-    outputFile = args.inputRun.replace('.sroot', '_writehits.root')
-print('Writing output root file to ' + outputFile)
 output = register_module('RootOutput')
 outputDict = {'outputFileName': outputFile,
               'excludeBranchNames': ["EventWaveformPackets"]}
@@ -70,6 +88,17 @@ timemodule.param(timeDict)
 
 timecalibmodule = register_module('DoubleCalPulse')
 
+sampletimemodule = register_module('SampleTimeCalibrationV3')
+
+sampletimeDict = {
+    'inputFileName': args.timeCalibFile,
+    'mode': 1,
+    'writeFile': 0,
+    'conditions': Conditions,
+}
+sampletimemodule.param(sampletimeDict)
+
+
 main = create_path()
 main.add_module(SRootReader)
 main.add_module(histomanager)
@@ -79,6 +108,7 @@ main.add_module(itopeventconverter)
 main.add_module(pedmodule)
 main.add_module(mergemodule)
 main.add_module(timemodule)
+main.add_module(sampletimemodule)
 main.add_module(timecalibmodule)
 
 main.add_module(output)

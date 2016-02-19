@@ -420,6 +420,7 @@ public:
 
     if (length > 65536 * 2) {
       B2WARNING("DHC ONSEN HLT/ROI Frame CRC FAIL bacause of too large packet (>128kB)!");
+      return 0;
     } else {
       for (unsigned int k = 0; k < length - 4; k += 2) { // -4
         crcbuffer[k] = d[k + 1];

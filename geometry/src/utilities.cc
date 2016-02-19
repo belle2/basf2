@@ -214,10 +214,10 @@ namespace Belle2 {
       vector<double> rMin;
       vector<double> rMax;
 
-      double innerZ;
-      double innerX;
-      double outerZ(0);
-      double outerX;
+      double innerZ{0};
+      double innerX{0};
+      double outerZ{0};
+      double outerX{0};
       //We go through both lists until both are empty
       while (!(innerPoints.empty() && outerPoints.empty())) {
         bool popInner = false;

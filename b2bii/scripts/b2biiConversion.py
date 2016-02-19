@@ -9,6 +9,40 @@ import requests
 import http
 
 
+def setupB2BIIDatabase(isMC=False):
+    """
+    Setup the database for B2BII
+
+    This automatically chooses the correct global tag and sets the experiment names accordingly
+
+    Args:
+        mc (bool): should be True for MC data and False for real data
+    """
+    # we only want the central database with the B2BII content
+    tagname = "B2BII%s" % ("_MC" if isMC else "")
+    # and we want to cache them in a meaningful but separate directory
+    payloaddir = tagname + "_database"
+    reset_database()
+    use_database_chain()
+    # fallback to previously downloaded payloads if offline
+    if not isMC:
+        use_local_database("%s/dbcache.txt" % payloaddir, payloaddir, True, LogLevel.ERROR)
+    # get payloads from central database
+    use_central_database(tagname, LogLevel.INFO if isMC else LogLevel.WARNING, payloaddir)
+    # unless they are already found locally
+    if isMC:
+        use_local_database("%s/dbcache.txt" % payloaddir, payloaddir, False, LogLevel.WARNING)
+    # and we need to map the experiment numbers to names for now. So let's
+    # temporarily disable the logging output
+    previous_loglevel = logging.log_level
+    logging.log_level = LogLevel.WARNING
+    # set all the names, doesn't matter if some don't exist so we just set 0-99
+    for exp in range(100):
+        set_experiment_name(exp, "BELLE_exp%d" % exp)
+    # and restore the logging output
+    logging.log_level = previous_loglevel
+
+
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True, path=analysis_main):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST

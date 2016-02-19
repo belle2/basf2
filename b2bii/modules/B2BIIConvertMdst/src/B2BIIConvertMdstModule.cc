@@ -12,6 +12,7 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/database/Database.h>
 
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
@@ -263,6 +264,26 @@ void B2BIIConvertMdstModule::event()
   // 0. Convert IPProfile
   convertIPProfile();
 
+  // Make sure beam parameters are correct: if they are not found in the
+  // database or different from the ones in the database we need to override them
+  if (!m_beamParamsDB || !(m_beamParams == *m_beamParamsDB)) {
+    if (!m_beamParamsDB && !m_realData) {
+      B2INFO("No database entry for this run yet, create one");
+      StoreObjPtr<EventMetaData> event;
+      IntervalOfValidity iov(event->getExperiment(), event->getRun(), event->getExperiment(), event->getRun());
+      Database::Instance().storeData("BeamParameters", &m_beamParams, iov);
+      B2INFO("store");
+    }
+    if (m_realData) {
+      B2ERROR("BeamParameters from condition database are different from converted "
+              "ones, overriding database. Did you call setupB2BIIDatabase()?");
+    } else {
+      B2INFO("BeamParameters from condition database are different from converted "
+             "ones, overriding database");
+    }
+    DBStore::Instance().addConstantOverride("dbstore", "BeamParameters", new BeamParameters(m_beamParams), true);
+  }
+
   // 1. Convert MC information
   convertGenHepEvtTable();
 
@@ -299,10 +320,8 @@ void B2BIIConvertMdstModule::convertBeamEnergy()
 
   std::vector<double> covariance; //0 entries = no error
 
-  if (!m_beamParams) B2FATAL("No BeamParameters found");
-
-  m_beamParams->setLER(Eler, angleLer, covariance);
-  m_beamParams->setHER(Eher, angleHer, covariance);
+  m_beamParams.setLER(Eler, angleLer, covariance);
+  m_beamParams.setHER(Eher, angleHer, covariance);
 
   B2DEBUG(99, "Beam Energy: E_HER = " << Eher << "; E_LER = " << Eler << "; angle = " << crossingAngle);
 }
@@ -313,7 +332,7 @@ void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
     // No IPProfile for this run ...
     if (beginRun) {
       // no IPProfile, set vertex to NaN without errors for the full run
-      m_beamParams->setVertex(
+      m_beamParams.setVertex(
         TVector3(std::numeric_limits<double>::quiet_NaN(),
                  std::numeric_limits<double>::quiet_NaN(),
                  std::numeric_limits<double>::quiet_NaN()
@@ -346,8 +365,8 @@ void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
       cov(i, j) = ipErr(i + 1, j + 1);
     }
   }
-  m_beamParams->setVertex(TVector3(ip.x(), ip.y(), ip.z()));
-  m_beamParams->setCovVertex(cov);
+  m_beamParams.setVertex(TVector3(ip.x(), ip.y(), ip.z()));
+  m_beamParams.setCovVertex(cov);
 }
 
 void B2BIIConvertMdstModule::convertMdstChargedTable()

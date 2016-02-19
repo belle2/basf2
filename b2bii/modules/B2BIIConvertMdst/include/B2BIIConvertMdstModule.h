@@ -300,7 +300,8 @@ namespace Belle2 {
     StoreArray<PIDLikelihood> m_pidLikelihoods;
 
     /** BeamParameters */
-    DBObjPtr<BeamParameters> m_beamParams;
+    DBObjPtr<BeamParameters> m_beamParamsDB;
+    BeamParameters m_beamParams;
 
     /** CONVERSION OF TRACK ERROR MATRIX ELEMENTS */
     /** Belle error matrix elements are in the following order

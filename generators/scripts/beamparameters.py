@@ -119,6 +119,18 @@ beamparameter_presets = {
 }
 
 
+def __get_4vector(energy, angle):
+    """Calculate an 4vector for electron/positron from energy and angle"""
+    import ROOT
+    m = 0.511e-3
+    pz = (energy ** 2 - m ** 2) ** .5
+    v = ROOT.TLorentzVector(0, 0, pz, energy)
+    if angle < 0:
+        angle = math.pi + angle
+    v.RotateY(angle)
+    return v
+
+
 def rot_matrix_y(angle):
     """Return rotation matrix for a rotation of angle around the y-axis"""
     c = math.cos(angle)
@@ -174,12 +186,14 @@ def calculate_beamspot(pos_her, pos_ler, size_her, size_ler, angle_her, angle_le
     return beampos_spot, cov_spot
 
 
-def add_beamparameters(path, name, **argk):
+def add_beamparameters(path, name, E_cms=None, **argk):
     """Add BeamParameter module to a given path
 
     Args:
         path (basf2.Path instance): path to add the module to
-        name: name of the beamparameter settings to use
+        name (str): name of the beamparameter settings to use
+        E_cms (float): center of mass energy. If not None the beamenergies will
+            be scaled accordingly to achieve E_cms
 
     Additional keyword arguments will be passed directly to the module as parameters.
     """
@@ -224,6 +238,15 @@ def add_beamparameters(path, name, **argk):
             [0, 0, 0], [0, 0, 0], her_size, ler_size, her_angle, ler_angle
         )
         values["covVertex"] = list(cov.flat)
+
+    if E_cms is not None:
+        ler = __get_4vector(values["energyLER"], values["angleLER"])
+        her = __get_4vector(values["energyHER"], values["angleHER"])
+        mass = (her + ler).M()
+        scale = E_cms / mass
+        B2INFO("Scaling beam energies by %g to obtain E_cms = %g GeV" % (scale, E_cms))
+        values["energyHER"] *= scale
+        values["energyLER"] *= scale
 
     # finally, set all parameters and return the module
     module.param(values)
@@ -277,7 +300,6 @@ if __name__ == "__main__":
     except ImportError:
         pass
 
-    import ROOT
     #: nominal SuperKEKB HER energy
     eher = values["energyHER"]
     #: nominal SuperKEKB LER energy
@@ -286,16 +308,6 @@ if __name__ == "__main__":
     aher = values["angleHER"]
     #: nominal SuperKEKB LER angle
     aler = values["angleLER"]
-
-    def __get_4vector(energy, angle):
-        """Calculate an 4vector for electron/positron from energy and angle"""
-        m = 0.511e-3
-        pz = (energy ** 2 - m ** 2) ** .5
-        v = ROOT.TLorentzVector(0, 0, pz, energy)
-        if angle < 0:
-            angle = math.pi + angle
-        v.RotateY(angle)
-        return v
 
     # calculate beam energies for Y1S - Y4S by scaling them from the nominal
     # beam energies for the SuperKEKB preset

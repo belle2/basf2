@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Small tool to create beam parameter payloads for local usage.
+
+This tool can be used to create database payloads for custom beam parameters. It
+will not check if a payload for the given iov is already present in the local
+database, that is up to the user.
+
+You can supply all the arguments you can supply to the BeamParameters module and
+in addition choose a predefined preset (one of %s) and scale the beam energies
+to achieve a selected cms energy.
+"""
+
+from basf2 import *
+from beamparameters import beamparameter_presets, add_beamparameters
+import argparse
+
+
+def __parse_floatlist(string):
+    """Small helper function to parse a comma separated list of floats"""
+    try:
+        return [float(e) for e in string.split(",")]
+    except:
+        raise argparse.ArgumentTypeError("'%s' is not a valid list of comma separated float values" % string)
+
+
+def __parse_bool(string):
+    """Small helper function to parse a bool"""
+    is_true = string.lower() in ["1", "true", "yes", "on"]
+    is_false = string.lower() in ["0", "false", "no", "off"]
+    if not is_true and not is_false:
+        raise argparse.ArgumentTypeError("'%s' is not a valid bool value" % string)
+    return is_true
+
+
+def __parse_iov(string):
+    """Small helper function to check validity of iov argument"""
+    try:
+        iov = [int(e) for e in string.split(",")]
+        if len(iov) != 4:
+            raise ValueError()
+    except:
+        raise argparse.ArgumentTypeError(
+            "'%s' is not a valid iov. It should be of the format "
+            "'firstExp,firstRun,lastExp,lastRun'" % string)
+
+    if iov[0] > iov[2]:
+        raise argparse.ArgumentTypeError("first experiment cannot be larger than final experiment")
+    if (iov[0] == iov[2] and iov[1] > iov[3]):
+        raise argparse.ArgumentTypeError("first run cannot be larger than final run")
+    return iov
+
+
+if __name__ == "__main__":
+    #: command line parser
+    parser = argparse.ArgumentParser(
+        description=__doc__ % ", ".join(sorted(beamparameter_presets.keys())),
+        epilog="Arguments of type bool can be anything out of [1, true, on, yes] "
+        "for true and [0, false, off, no] for false. list(float) should be a "
+        "comma separated list of values"
+    )
+    parser.add_argument("dbfile", nargs="?", metavar="DATABASEFILE",
+                        default="localdb/database.txt",
+                        help="Database file containing local list of iovs "
+                        "(default: %(default)s)")
+    parser.add_argument("dbdir", nargs="?", metavar="DATABASEDIR",
+                        help="Directory for the payloads. Defaults to the "
+                        "directory of the database file")
+    parser.add_argument("--preset", default="Y4S", metavar="PRESET",
+                        choices=sorted(beamparameter_presets.keys()),
+                        help="Name of the preset to use (default: %(default)s)")
+    parser.add_argument("--cms", default=None, type=float,
+                        help="CMS energy to aim for, selected preset will be "
+                        "scaled accordingly to achieve desired center of mass. "
+                        "If energyHER or energyLER are supplied this option "
+                        "scaling will have no effect on them")
+    parser.add_argument("--iov", type=__parse_iov, default=[0, 0, -1, -1],
+                        help="Interval of validity. Needs to be a list of four "
+                        "numbers separated by comma specifing the initial "
+                        "experiment, initial run, final experiment and final run "
+                        "for which this payload should be valid. If no iov is "
+                        "given the payload will be valid for everything. "
+                        "Example: --iov=0,0,1,12 will create a payload valid "
+                        "from experiment 0, run 0 up to and including experiment "
+                        "1, run 12.")
+
+    #: temporary BeamParameters module to get list of parameters
+    bp = register_module("BeamParameters")
+    for param in bp.available_params():
+        if param.name in ["payloadIov", "createPayload"]:
+            continue
+        #: argument type conversion to parse them correctly
+        argument_type = {"float": float, "int": int, "bool": __parse_bool,
+                         "list(float)": __parse_floatlist}[param.type]
+        # add a new argument to override the parameter
+        parser.add_argument("--%s" % param.name, type=argument_type, help=param.description + ". Type: " + param.type,
+                            metavar=param.name.upper(), dest="param_" + param.name)
+
+    #: command line arguments
+    arguments = parser.parse_args()
+
+    # make sure directory is set
+    if arguments.dbdir is None:
+        arguments.dbdir = os.path.dirname(arguments.dbfile)
+
+    # set database to local with the correct arguments
+    reset_database()
+    use_local_database(arguments.dbfile, arguments.dbdir, False)
+    #: processing path
+    main = create_path()
+    # add processing of one event
+    main.add_module("EventInfoSetter")
+    # add the beamparameters module and tell it to create an iov
+    bpmodule = add_beamparameters(main, arguments.preset, arguments.cms,
+                                  createPayload=True, payloadIov=arguments.iov)
+
+    # now loop over all the arguments and pass the ones starting with param_
+    # directly to the Beamparameters if they are set
+    for arg, value in arguments.__dict__.items():
+        if arg.startswith("param_") and value is not None:
+            bpmodule.param(arg[6:], value)
+
+    # make the framework shut up
+    set_log_level(LogLevel.ERROR)
+    # and process the one event
+    process(main)

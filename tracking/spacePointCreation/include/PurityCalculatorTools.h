@@ -34,7 +34,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
    * NOTE: the criteria for finding are rather loose (i.e. actual value and desired value must not differ by more than 1e-4) as
    * the values that are encountered lie rather far apart!
    */
-  bool findWeightInVector(std::vector<std::pair<int, double> >& vec, double weight)
+  static bool findWeightInVector(std::vector<std::pair<int, double> >& vec, double weight)
   {
     const double epsilon = 1e-4; // no real need for accuracy here since weights are rather far apart!
     return (std::find_if(vec.begin(), vec.end(),
@@ -50,7 +50,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
    * .second is the relation weight between SpacePoint and TrueHit (encodes additional information that is needed afterwards)
    */
   template<typename TrueHitType>
-  std::vector<std::pair<int, double> > getMCParticles(const Belle2::SpacePoint* spacePoint)
+  static std::vector<std::pair<int, double> > getMCParticles(const Belle2::SpacePoint* spacePoint)
   {
     // CAUTION: getting all TrueHits here (i.e. from all StoreArrays)
     Belle2::RelationVector<TrueHitType> trueHits = spacePoint->getRelationsTo<TrueHitType>("ALL");
@@ -105,7 +105,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
   /**
    * increase the appropriate Cluster counter by asking the SpacePoint which type he has and which Clusters are assigned
    */
-  void increaseClusterCounters(const Belle2::SpacePoint* spacePoint, std::array<unsigned, 3>& clusterCtr)
+  static void increaseClusterCounters(const Belle2::SpacePoint* spacePoint, std::array<unsigned, 3>& clusterCtr)
   {
     if (spacePoint->getType() == Belle2::VXD::SensorInfoBase::PXD) {
       clusterCtr[0]++;
@@ -126,7 +126,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
   /**
    * convert the relation weight (SpacePoint <-> TrueHit) to a type that can be used to access arrays
    */
-  std::vector<size_t> getAccessorsFromWeight(double weight)
+  static std::vector<size_t> getAccessorsFromWeight(double weight)
   {
     if (weight < 1.5 && weight > 0) return {0}; // weight 1 -> PXD
     if (weight < 2.5 && weight > 0) return { 1, 2 }; // weight 2 -> both Clusters with relation to MCParticle
@@ -143,7 +143,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
    * + -2 -> there was a SpacePoint with a Cluster that was not related to a TrueHit (noise Cluster)
    * @returns sorted vector of MCVXDPurityInfo (sorted by overall purity)
    */
-  std::vector<Belle2::MCVXDPurityInfo> createPurityInfosVec(const std::vector<const Belle2::SpacePoint*>& spacePoints)
+  static std::vector<Belle2::MCVXDPurityInfo> createPurityInfosVec(const std::vector<const Belle2::SpacePoint*>& spacePoints)
   {
     std::array<unsigned, 3> totalClusters = { {0, 0, 0 } };
     // WARNING: relying on the fact here that all array entries will be initialized to 0
@@ -160,7 +160,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
       std::vector<std::pair<int, double> > mcParticles;
       if (spacePoint->getType() == VXD::SensorInfoBase::PXD) mcParticles = getMCParticles<PXDTrueHit>(spacePoint);
       else if (spacePoint->getType() == VXD::SensorInfoBase::SVD) mcParticles = getMCParticles<SVDTrueHit>(spacePoint);
-      else if (spacePoint->getType() == VXD::SensorInfoBase::VXD) {B2DEBUG(1, "found generic spacePoint, treating it as virtualIP")}
+      else if (spacePoint->getType() == VXD::SensorInfoBase::VXD) {B2DEBUG(100, "found generic spacePoint, treating it as virtualIP")}
       else B2FATAL("Unknown DetectorType (" << spacePoint->getType() << ") in createPurityInfos! Skipping this SpacePoint " <<
                      spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
 
@@ -195,7 +195,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
    * @returns sorted vector of MCVXDPurityInfo (sorted by overall purity)
    */
   template<typename SPContainer>
-  std::vector<Belle2::MCVXDPurityInfo> createPurityInfos(const SPContainer* container)
+  static std::vector<Belle2::MCVXDPurityInfo> createPurityInfos(const SPContainer* container)
   {
     return createPurityInfosVec(container->getHits());
   }
@@ -211,7 +211,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
    * wrapper taking a const reference instead of a const pointer for use in e.g. C++11 for loops
    */
   template<typename SPContainer>
-  std::vector<Belle2::MCVXDPurityInfo> createPurityInfos(const SPContainer& container)
+  static std::vector<Belle2::MCVXDPurityInfo> createPurityInfos(const SPContainer& container)
   {
     return createPurityInfos(&container);
   }

@@ -16,7 +16,7 @@ using namespace Belle2;
 //#define NO_ERROR_STOP
 //#define WO_FIRST_EVENUM_CHECK
 
-ClassImp(PreRawCOPPERFormat_latest);
+//ClassImp(PreRawCOPPERFormat_latest);
 
 PreRawCOPPERFormat_latest::PreRawCOPPERFormat_latest()
 {

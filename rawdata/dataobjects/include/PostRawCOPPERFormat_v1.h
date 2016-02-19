@@ -203,7 +203,7 @@ namespace Belle2 {
 
   protected :
     ///ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
-    ClassDef(PostRawCOPPERFormat_v1, 2);
+    //    ClassDef(PostRawCOPPERFormat_v1, 2);
 
   };
 

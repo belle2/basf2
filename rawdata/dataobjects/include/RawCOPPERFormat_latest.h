@@ -14,13 +14,14 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-#include <framework/datastore/DataStore.h>
+
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 #include <rawdata/dataobjects/RawHeader_latest.h>
 #include <rawdata/dataobjects/RawTrailer_latest.h>
 #include <rawdata/CRCCalculator.h>
 
-#include <TObject.h>
+/* #include <framework/datastore/DataStore.h> */
+/* #include <TObject.h> */
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
@@ -32,6 +33,7 @@ namespace Belle2 {
    * This class stores data received by COPPER via belle2linkt
    * Data from all detectors except PXD are stored in this class
    */
+
   class RawCOPPERFormat_latest : public RawCOPPERFormat {
   public:
     //! Default constructor
@@ -158,7 +160,7 @@ namespace Belle2 {
 
   protected :
     ///ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
-    ClassDef(RawCOPPERFormat_latest, 2);
+    //    ClassDef(RawCOPPERFormat_latest, 2);
   };
 
 

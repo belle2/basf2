@@ -12,7 +12,7 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(RawHeader_latest);
+//ClassImp(RawHeader_latest);
 
 RawHeader_latest::RawHeader_latest()
 {

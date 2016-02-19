@@ -11,7 +11,7 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(RawTrailer_v1);
+//ClassImp(RawTrailer_v1);
 
 RawTrailer_v1::RawTrailer_v1()
 {

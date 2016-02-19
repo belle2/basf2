@@ -9,11 +9,12 @@
 #ifndef RAWHEADER_V0_H
 #define RAWHEADER_V0_H
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <TObject.h>
+//#include <TObject.h>
 
-#include <framework/datastore/DataStore.h>
+//#include <framework/datastore/DataStore.h>
 
 
 //#define HEADER_SIZE 16
@@ -26,7 +27,8 @@ namespace Belle2 {
    * and used for extracting header info from RawCOPPER object
    */
 
-  class RawHeader_v0 : public TObject {
+  //  class RawHeader_v0 : public TObject {
+  class RawHeader_v0  {
   public:
     //! Default constructor
     RawHeader_v0();
@@ -218,7 +220,7 @@ namespace Belle2 {
 
     /// To derive from TObject
     // ver.2 Do not record m_buffer pointer. (Dec.19, 2014)
-    ClassDef(RawHeader_v0, 2);
+    //    ClassDef(RawHeader_v0, 2);
   };
 
 

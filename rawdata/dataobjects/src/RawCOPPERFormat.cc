@@ -13,7 +13,7 @@ using namespace std;
 using namespace Belle2;
 
 
-ClassImp(RawCOPPERFormat);
+//ClassImp(RawCOPPERFormat);
 
 
 RawCOPPERFormat::RawCOPPERFormat()

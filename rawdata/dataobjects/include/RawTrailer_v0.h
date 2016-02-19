@@ -9,10 +9,12 @@
 #ifndef RAWTRAILER_V0_H
 #define RAWTRAILER_V0_H
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <framework/datastore/DataStore.h>
-#include <TObject.h>
+
+/* #include <framework/datastore/DataStore.h> */
+/* #include <TObject.h> */
 
 //#define TRAILER_SIZE 16
 /* #define   POS_CHKSUM 0 */
@@ -27,7 +29,8 @@ namespace Belle2 {
    * This class defines the format of the trailer of RawCOPPER class data
    * and used for extracting trailer info from RawCOPPER object
    */
-  class RawTrailer_v0 : public TObject {
+  //  class RawTrailer_v0 : public TObject {
+  class RawTrailer_v0  {
   public:
     RawTrailer_v0();     /// Default constructor
 
@@ -70,7 +73,7 @@ namespace Belle2 {
 
     /// To derive from TObject
     // ver.2 Do not record m_buffer pointer. (Dec.19, 2014)
-    ClassDef(RawTrailer_v0, 2);
+    //    ClassDef(RawTrailer_v0, 2);
   };
 
 

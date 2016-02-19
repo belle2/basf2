@@ -15,7 +15,7 @@ using namespace Belle2;
 //#define DESY
 //#define NO_ERROR_STOP
 
-ClassImp(PostRawCOPPERFormat_latest);
+//ClassImp(PostRawCOPPERFormat_latest);
 
 PostRawCOPPERFormat_latest::PostRawCOPPERFormat_latest()
 {

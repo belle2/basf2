@@ -16,7 +16,7 @@ using namespace Belle2;
 //#define NO_DATA_CHECK
 //#define WO_FIRST_EVENUM_CHECK
 
-ClassImp(RawCOPPERFormat_v0);
+//ClassImp(RawCOPPERFormat_v0);
 
 RawCOPPERFormat_v0::RawCOPPERFormat_v0()
 {

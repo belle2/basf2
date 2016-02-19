@@ -10,14 +10,14 @@
 
 // Includes
 #include <stdio.h>
+#include <string>
 #include <stdlib.h>
 #include <sys/time.h>
 
-//#include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/RawCOPPERPackerInfo.h>
 
-#include <framework/datastore/DataStore.h>
-#include <TObject.h>
+/* #include <framework/datastore/DataStore.h> */
+/* #include <TObject.h> */
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
@@ -46,7 +46,8 @@ namespace Belle2 {
    * This class stores data received by COPPER via belle2linkt
    * Data from all detectors except PXD are stored in this class
    */
-  class RawCOPPERFormat : public TObject {
+  //  class RawCOPPERFormat : public TObject {
+  class RawCOPPERFormat  {
   public:
     /*     //! Default constructor */
     RawCOPPERFormat();
@@ -334,7 +335,7 @@ namespace Belle2 {
     int* m_buffer; //! not recorded
 
     ///ver.3 : Separate from RawDataBLock to avoid a memory leak ( July 24, 2014)
-    ClassDef(RawCOPPERFormat, 3);
+    //    ClassDef(RawCOPPERFormat, 3);
 
   };
 

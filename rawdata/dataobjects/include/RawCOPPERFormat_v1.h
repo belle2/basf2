@@ -14,13 +14,14 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-#include <framework/datastore/DataStore.h>
+
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 #include <rawdata/dataobjects/RawHeader_v1.h>
 #include <rawdata/dataobjects/RawTrailer_v1.h>
 #include <rawdata/CRCCalculator.h>
 
-#include <TObject.h>
+/* #include <framework/datastore/DataStore.h> */
+/* #include <TObject.h> */
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
@@ -158,7 +159,7 @@ namespace Belle2 {
 
   protected :
     ///ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
-    ClassDef(RawCOPPERFormat_v1, 2);
+    //    ClassDef(RawCOPPERFormat_v1, 2);
   };
 
 

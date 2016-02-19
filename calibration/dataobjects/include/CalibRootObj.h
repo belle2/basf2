@@ -38,6 +38,7 @@ namespace Belle2 {
     /// Destructor
     virtual ~CalibRootObj()
     {
+      removeSideEffects();
       for (auto obj : m_objects)
         delete obj;
 
@@ -45,6 +46,7 @@ namespace Belle2 {
       m_iovs.clear();
 
       if (m_object) {
+        m_object->SetDirectory(nullptr);
         delete m_object;
         m_object = nullptr;
       }
@@ -141,7 +143,7 @@ namespace Belle2 {
         m_object = nullptr;
       }
 
-      object->SetDirectory(nullptr);
+      //object->SetDirectory(nullptr);
       m_object = object;
     }
 
@@ -195,7 +197,7 @@ namespace Belle2 {
       //else if (cl && cl->GetMethodWithPrototype("clear", ""))
       //  newobj->Execute("clear", "");
 
-      newobj->SetDirectory(nullptr);
+      //newobj->SetDirectory(nullptr);
       newobj->Reset();
 
       // Add object to list
@@ -251,7 +253,7 @@ namespace Belle2 {
     {
       if (m_object)
         delete m_object;
-      newobj->SetDirectory(nullptr);
+      //newobj->SetDirectory(nullptr);
       m_object = newobj;
     }
 

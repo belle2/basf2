@@ -8,17 +8,31 @@ from sys import argv
 
 from VXDTF.setup_modules import (setup_gfTCtoSPTCConverters,
                                  setup_spCreatorPXD,
-                                 setup_spCreatorSVD)
+                                 setup_spCreatorSVD,
+                                 setup_sp2thConnector)
 
+from VXDTF.setup_modules_ml import *
 
 # ################
 rootInputFileName = "seed2nEv100pGun1_10T.root"
+
+# file name into which the segNetAnalize stores its stuff
+segNetAnaRFN = 'SegNetAnalyzer_SM_train.root'
+fbdtSamplesFN = 'FBDTClassifier_samples_train_10k.dat'
+fbdtFN = 'FBDTClassifier_1000_3.dat'
+
 
 usePXD = False
 useDisplay = False
 newTrain = False  # if true, rawSecMap-Data is collected. IF false, new TF will be executed
 printNetworks = False  # creates graphs for each network for each event if true
+trainFBDT = False  # with the current settings: collects samples but does not train a FastBDT!
+useFBDT = False  # use the ML Filter for creating the SegmentNetwork instead of the SectorMap filters
 
+if useFBDT:
+    cNetworks = int(2)
+else:
+    cNetworks = int(3)
 
 # Important parameters:
 # seed42nEv1000pGun1_10T.root
@@ -31,16 +45,16 @@ initialValue = int(stringInitialValue[1])
 set_log_level(LogLevel.ERROR)
 set_random_seed(initialValue)
 
-trainerVXDTFLogLevel = LogLevel.INFO
+trainerVXDTFLogLevel = LogLevel.ERROR
 trainerVXDTFDebugLevel = 10
 
-TFlogLevel = LogLevel.DEBUG
+TFlogLevel = LogLevel.ERROR
 TFDebugLevel = 1
 
-CAlogLevel = LogLevel.DEBUG
+CAlogLevel = LogLevel.ERROR
 CADebugLevel = 1
 
-AnalizerlogLevel = LogLevel.INFO
+AnalizerlogLevel = LogLevel.ERROR
 AnalizerDebugLevel = 1
 
 
@@ -105,7 +119,7 @@ print('')
 
 rootInputM = register_module('RootInput')
 rootInputM.param('inputFileName', rootInputFileName)
-
+# rootInputM.param('skipNEvents', int(10000))
 
 eventinfoprinter = register_module('EventInfoPrinter')
 
@@ -137,22 +151,27 @@ geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
 
 
 eventCounter = register_module('EventCounter')
-eventCounter.logging.log_level = LogLevel.INFO
+eventCounter.logging.log_level = LogLevel.ERROR
 eventCounter.param('stepSize', 1)
 
 
 segNetProducer = register_module('SegmentNetworkProducer')
-segNetProducer.param('CreateNeworks', 3)
+segNetProducer.param('CreateNeworks', cNetworks)
 segNetProducer.param('NetworkOutputName', 'test2Hits')
 segNetProducer.param('printNetworks', printNetworks)
 # segNetProducer.param('SpacePointsArrayNames', ['pxdOnly', 'nosingleSP'])
-segNetProducer.param('SpacePointsArrayNames', ['nosingleSP'])
+segNetProducer.param('SpacePointsArrayNames', ['nosingleSP_relTH'])
 segNetProducer.logging.log_level = TFlogLevel
 segNetProducer.logging.debug_level = TFDebugLevel
 
+segNetAnalyzer = register_module('SegmentNetworkAnalyzer')
+segNetAnalyzer.param('networkInputName', 'test2Hits')
+segNetAnalyzer.param('rootFileName', segNetAnaRFN)
+segNetAnalyzer.logging.log_level = LogLevel.INFO
+segNetAnalyzer.logging.debug_level = 100
 
 cellOmat = register_module('TrackFinderVXDCellOMat')
-cellOmat.param('printNetworks', True)
+cellOmat.param('printNetworks', False)
 cellOmat.param('SpacePointTrackCandArrayName', 'caSPTCs')
 cellOmat.param('NetworkName', 'test2Hits')
 cellOmat.logging.log_level = CAlogLevel
@@ -192,11 +211,22 @@ setup_gfTCtoSPTCConverters(
     usePXD=usePXD,
     logLevel=LogLevel.WARNING)
 
+# connect all SpacePoints to all possible TrueHits and store them in a new
+# StoreArray (to not interfere with the SpacePoints of the reference
+# TrackCands)
+setup_sp2thConnector(main, 'pxdOnly', 'nosingleSP', '_relTH', True, LogLevel.ERROR, 1)
+
 if newTrain:
     main.add_module(newSecMapTrainerBase)
 else:
     main.add_module(merger)
     main.add_module(segNetProducer)
+    if trainFBDT:  # collect in this step
+        add_fbdtclassifier_training(main, 'test2Hits', 'FBDTClassifier.dat', False, True,
+                                    False, fbdtSamplesFN, 100, 3, 0.15, 0.5, LogLevel.DEBUG, 10)
+    if useFBDT:  # apply the filters
+        add_ml_threehitfilters(main, 'test2Hits', fbdtFN, 0.989351, True)
+    main.add_module(segNetAnalyzer)
     main.add_module(cellOmat)
     main.add_module(vxdAnal)
 

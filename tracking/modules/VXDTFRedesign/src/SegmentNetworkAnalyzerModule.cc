@@ -27,7 +27,7 @@ SegmentNetworkAnalyzerModule::SegmentNetworkAnalyzerModule() :
   m_rFilePtr(nullptr),
   m_treePtr(nullptr)
 {
-  setDescription("module analyzing the segment network");
+  setDescription("Module for analyzing the SegmentNetwork.");
 
   addParam("networkInputName", m_PARAMnetworkName, "name of the StoreObjPtr to the DNN Container");
   addParam("rootFileName", m_PARAMrootFileName, "name of the output root file name",
@@ -52,14 +52,39 @@ void SegmentNetworkAnalyzerModule::event()
 {
   m_rootVariables = RootVariables(); // clear rootVariables
 
+  auto& hitNetwork = m_network->accessHitNetwork();
   auto& segmentNetwork = m_network->accessSegmentNetwork();
   m_rootVariables.networkSize = segmentNetwork.size();
+  m_rootVariables.networkConnections = getNConnections(segmentNetwork);
 
-  for (const auto& segmentNode : segmentNetwork.getNodes()) { // loop over all nodes
-    for (const auto& innerSegmentNode : segmentNode->getInnerNodes()) { // loop over all inner segments
-      analyzeCombination(segmentNode->getEntry(), innerSegmentNode->getEntry());
-    } // end loop inner Segments
-  } // end segments loop
+  for (const auto& outerHit : hitNetwork.getNodes()) {
+    for (const auto& centerHit : outerHit->getInnerNodes()) {
+      for (const auto& innerHit : centerHit->getInnerNodes()) {
+
+        Segment<TrackNode>* innerSegment = new Segment<TrackNode>(centerHit->getEntry().sector->getFullSecID(),
+                                                                  innerHit->getEntry().sector->getFullSecID(),
+                                                                  &centerHit->getEntry(),
+                                                                  &innerHit->getEntry());
+        Segment<TrackNode>* outerSegment = new Segment<TrackNode>(outerHit->getEntry().sector->getFullSecID(),
+                                                                  centerHit->getEntry().sector->getFullSecID(),
+                                                                  &outerHit->getEntry(),
+                                                                  &centerHit->getEntry());
+
+        bool passed = false;
+        // check if the outerSegment is in the network and then look if the inner is connected to it
+        if (auto outerNode = segmentNetwork.getNode(*outerSegment)) {
+          for (const auto& connectedNode : outerNode->getInnerNodes()) {
+            if (connectedNode->getEntry() == *innerSegment) {
+              passed = true;
+              break;
+            }
+          }
+        }
+        analyzeCombination(*innerSegment, *outerSegment, passed);
+
+      } // end inner loop
+    } // end center loop
+  } // end outer loop
 
   m_treePtr->Fill();
 }
@@ -80,14 +105,19 @@ void SegmentNetworkAnalyzerModule::makeBranches()
   m_treePtr->Branch("theta", &m_rootVariables.theta);
   m_treePtr->Branch("pT", &m_rootVariables.pT);
   m_treePtr->Branch("signal", &m_rootVariables.signal);
+  m_treePtr->Branch("passed", &m_rootVariables.passed);
   m_treePtr->Branch("pdg", &m_rootVariables.pdg);
   m_treePtr->Branch("virtualIP", &m_rootVariables.virtualIP);
   m_treePtr->Branch("networkSize", &m_rootVariables.networkSize);
+  m_treePtr->Branch("networkConns", &m_rootVariables.networkConnections);
 }
 
 void SegmentNetworkAnalyzerModule::analyzeCombination(const Belle2::Segment<Belle2::TrackNode>& outer,
-                                                      const Belle2::Segment<Belle2::TrackNode>& inner)
+                                                      const Belle2::Segment<Belle2::TrackNode>& inner,
+                                                      bool passed)
 {
+  m_rootVariables.passed.push_back(passed);
+
   std::vector<const Belle2::SpacePoint*> combinationSPs; // order in which they are stored does not really matter
   combinationSPs.push_back(outer.getOuterHit()->spacePoint);
   combinationSPs.push_back(outer.getInnerHit()->spacePoint);
@@ -111,11 +141,28 @@ void SegmentNetworkAnalyzerModule::analyzeCombination(const Belle2::Segment<Bell
   m_rootVariables.pdg.push_back(pdg);
   m_rootVariables.pT.push_back(pT);
 
-  // angles are determined from inner most hit in combination
-  auto position = inner.getInnerHit()->spacePoint->getPosition();
+  // check if the innermost hit is virtualIP, if so get the outer hit to retrieve the position information from it
+  auto spacePoint = inner.getInnerHit()->spacePoint;
+  if (spacePoint->getType() == VXD::SensorInfoBase::VXD) {
+    m_rootVariables.virtualIP.push_back(1);
+    spacePoint = inner.getOuterHit()->spacePoint;
+  } else m_rootVariables.virtualIP.push_back(0);
+
+  // angles are determined from inner most (accessible) hit in combination
+  auto position = spacePoint->getPosition();
   m_rootVariables.phi.push_back(position.Phi());
   m_rootVariables.theta.push_back(position.Theta());
 
   B2DEBUG(100, "Collected combination with: phi " << position.Phi() << ", theta " << position.Theta() <<
-          ", pdg " << pdg << ", pT " << pT << ", signal " << signal << ", mcId " << mcId.first);
+          ", pdg " << pdg << ", pT " << pT << ", signal " << signal << ", passed " << passed << ", mcId " << mcId.first);
+}
+
+template<typename EntryType, typename MetaInfoType >
+size_t SegmentNetworkAnalyzerModule::getNConnections(Belle2::DirectedNodeNetwork<EntryType, MetaInfoType>& network) const
+{
+  size_t nLinks{};
+  for (const auto& outerNodes : network) {
+    nLinks += outerNodes->getInnerNodes().size();
+  }
+  return nLinks;
 }

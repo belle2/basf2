@@ -67,13 +67,6 @@ BeamParametersModule::BeamParametersModule() : Module()
            "last run", m_payloadIov);
 }
 
-void BeamParametersModule::event()
-{
-  if (m_beamParamsDB.hasChanged()) {
-    *m_beamParamsDB = m_beamParams;
-  }
-}
-
 void BeamParametersModule::initialize()
 {
   m_beamParams.setHER(m_energyHER, m_angleHER, m_covHER);
@@ -91,6 +84,9 @@ void BeamParametersModule::initialize()
   if (m_smearDirection) flags |= BeamParameters::c_smearBeamDirection;
   if (m_smearVertex) flags |= BeamParameters::c_smearVertex;
   m_beamParams.setGenerationFlags(flags);
+
+  // Now make sure the database interface always returns the values we just set
+  DBStore::Instance().addConstantOverride("dbstore", "BeamParameters", new BeamParameters(m_beamParams));
 
   if (m_createPayload) {
     IntervalOfValidity iov(m_payloadIov[0], m_payloadIov[1], m_payloadIov[2], m_payloadIov[3]);

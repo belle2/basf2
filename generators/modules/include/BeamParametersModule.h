@@ -13,7 +13,6 @@
 #define GENERATORS_MODULES_BEAMPARAMETERSMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/BeamParameters.h>
 #include <vector>
 
@@ -34,12 +33,8 @@ namespace Belle2 {
     /** Create the Beamparameters*/
     virtual void initialize();
 
-    /** Set the Beamparameters*/
-    virtual void event();
-
   private:
     BeamParameters m_beamParams; /**< Copy of the beamparameters created from the parameters */
-    DBObjPtr<BeamParameters> m_beamParamsDB; /**< DB Store of the parameters to be overwritten */
     double m_energyHER;  /**< Energy of the High Energy Ring */
     double m_angleHER;  /**< theta angle of the High Energy Ring */
     std::vector<double> m_covHER; /**< Covariance matrix for the High Energy Ring */

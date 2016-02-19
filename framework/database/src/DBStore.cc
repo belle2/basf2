@@ -174,6 +174,7 @@ void DBStore::reset()
   for (auto& packageEntry : m_dbEntries) {
     for (auto& moduleEntry : packageEntry.second) {
       DBEntry& dbEntry = moduleEntry.second;
+      //delete dbEntry.object;
       dbEntry.object = 0;
       dbEntry.intraRunDependency = 0;
       dbEntry.iov = IntervalOfValidity();
@@ -182,4 +183,33 @@ void DBStore::reset()
 
   StoreObjPtr<EventMetaData> event;
   m_event = event;
+}
+
+void DBStore::addConstantOverride(const std::string& package, const std::string& module, TObject* obj, bool oneRun)
+{
+  // Add the DBStore entry
+  DBEntry& dbEntry = m_dbEntries[package][module];
+  dbEntry.package = package;
+  dbEntry.module = module;
+  dbEntry.objClass = obj->Class();
+  if (!dbEntry.intraRunDependency) delete dbEntry.object;
+  dbEntry.object = obj;
+  dbEntry.isArray = dynamic_cast<TClonesArray*>(obj) != nullptr;
+  dbEntry.iov = IntervalOfValidity(0, 0, -1, -1);
+  if (oneRun) {
+    const int exp = m_event->getExperiment();
+    const int run = m_event->getRun();
+    dbEntry.iov = IntervalOfValidity(exp, run, exp, run);
+  }
+  // we need to remove this entry from the intraRunDependencies list now.
+  // Otherwise it will reset the object on the next event call
+  delete dbEntry.intraRunDependency;
+  dbEntry.intraRunDependency = nullptr;
+  for (auto it = m_intraRunDependencies.begin(); it != m_intraRunDependencies.end(); ++it) {
+    if (*it == &dbEntry) {
+      m_intraRunDependencies.erase(it);
+      break;
+    }
+  }
+  B2WARNING("An override for DBEntry " << package << "/" << module << " was created.");
 }

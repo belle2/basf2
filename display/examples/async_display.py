@@ -9,7 +9,6 @@
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-from beamparameters import add_beamparameters
 
 # register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -38,8 +37,6 @@ main.add_module('ProgressBar')
 
 main.add_module(gearbox)
 main.add_module(geometry)
-
-add_beamparameters(main, "Y4S")
 
 main.add_module(evtgeninput)
 

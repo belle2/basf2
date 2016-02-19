@@ -5,7 +5,6 @@ from basf2 import *
 import os
 import sys
 import inspect
-from beamparameters import add_beamparameters
 from vertex import *
 from analysisPath import *
 
@@ -103,7 +102,6 @@ def generateY4S(noEvents, decayTable=None, path=analysis_main):
     @param path       modules are added to this path
     """
 
-    add_beamparameters(path, "Y4S")
     evtnumbers = register_module('EventInfoSetter')
     evtnumbers.param('evtNumList', [noEvents])
     evtnumbers.param('runList', [1])

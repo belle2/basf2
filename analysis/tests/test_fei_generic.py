@@ -10,7 +10,6 @@ import sys
 from basf2 import *
 from modularAnalysis import *
 from ROOT import Belle2
-from beamparameters import add_beamparameters
 
 from fei.default_channels import get_unittest_channels
 from fei.steering import fullEventInterpretation
@@ -24,7 +23,6 @@ selection_path = create_path()
 selection_path.add_module('RootInput', inputFileName=inputFile, inputFileNames=[])
 selection_path.add_module('Gearbox')
 selection_path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
-beamparameters = add_beamparameters(selection_path, 'Y4S')
 
 particles = get_unittest_channels()
 

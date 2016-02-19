@@ -16,7 +16,6 @@ import ROOT
 # Import basf2
 from basf2 import *
 from modularAnalysis import applyCuts, buildRestOfEvent
-from beamparameters import add_beamparameters
 # Should come after basf2 import
 import pdg
 
@@ -299,7 +298,6 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
         path.add_module('RootInput', excludeBranchNamesPersistent=[])
         path.add_module('Gearbox')
         path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
-        beamparameters = add_beamparameters(path, 'Y4S')
         path.add_path(fei_path)
 
     # with RestOfEvent path, this will be the first module inside for_each

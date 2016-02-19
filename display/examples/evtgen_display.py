@@ -29,8 +29,6 @@ main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 
 main.add_module(gearbox)
-from beamparameters import add_beamparameters
-add_beamparameters(main, "Y4S")
 main.add_module(evtgeninput)
 
 add_simulation(main)

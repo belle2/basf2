@@ -21,7 +21,6 @@ validation script but due to this problem it was moved to examples
 
 import os
 from basf2 import *
-from beamparameters import add_beamparameters
 import ROOT
 
 if os.environ.get("BELLE2_EXTERNALS_OPTION", "opt") != "debug":
@@ -36,8 +35,6 @@ set_nprocesses(0)
 main = create_path()
 # create 100 events
 main.add_module("EventInfoSetter", evtNumList=[100])
-# on the Y4S resonance
-add_beamparameters(main, "Y4S")
 # using standard evtgen
 main.add_module("EvtGenInput")
 # and parameters

@@ -5,7 +5,6 @@ from basf2 import *
 import os
 import sys
 import inspect
-from beamparameters import add_beamparameters
 from analysisPath import *
 
 
@@ -18,7 +17,6 @@ def fitVertex(
     constraint='',
     daughtersUpdate=False,
     path=analysis_main,
-    evtType='Y4S',
 ):
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
@@ -31,16 +29,12 @@ def fitVertex(
     @param constraint   type of additional constraints (valid options are empty string/ipprofile/iptube)
     @updateDaughters    meke copy of the daughters and update them after the vertex fit
     @param path         modules are added to this path
-    @param evtType      Temporary: event type for loading beam parameters
     """
 
     if 'Geometry' in path:
         B2INFO('fitVertex: Geometry already in path')
     else:
         path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
-
-    beamparameters = add_beamparameters(path, evtType)
-    B2INFO('fitVertex: Evt Type: ' + evtType)
 
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + list_name)
@@ -363,7 +357,6 @@ def TagV(
     useFitAlgorithm='standard_PXD',
     askMCInfo=False,
     path=analysis_main,
-    evtType='Y4S',
 ):
     """
     For each Particle in the given Breco ParticleList:
@@ -375,16 +368,12 @@ def TagV(
     @param MCassociation: use standard MC association or the internal one
     @param useConstraint: choose constraint for the tag vertes fit
     @param path      modules are added to this path
-    @param evtType   Temporary: event type for loading beam parameters
     """
 
     if 'Geometry' in path:
         B2INFO('TagV: Geometry already in path')
     else:
         path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
-
-    beamparameters = add_beamparameters(path, evtType)
-    B2INFO('tagVertex: Evt Type: ' + evtType)
 
     tvfit = register_module('TagVertex')
     tvfit.set_name('TagVertex_' + list_name)

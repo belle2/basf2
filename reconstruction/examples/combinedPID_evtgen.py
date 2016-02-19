@@ -18,7 +18,6 @@
 from basf2 import *
 from simulation import *
 from reconstruction import *
-from beamparameters import add_beamparameters
 from ROOT import Belle2
 
 # create path
@@ -28,7 +27,6 @@ main = create_path()
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [50])
 main.add_module(eventinfosetter)
-add_beamparameters(main, "Y4S")
 
 # generate ccbar events
 evtgeninput = register_module('EvtGenInput')

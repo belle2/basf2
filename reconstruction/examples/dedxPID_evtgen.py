@@ -18,7 +18,7 @@ import os
 import random
 from basf2 import *
 from simulation import add_simulation
-from beamparameters import add_beamparameters
+from tracking import *
 
 # change to True if you want to use PXD hits (fairly small benefit, if any)
 use_pxd = False
@@ -26,7 +26,10 @@ use_pxd = False
 # register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
 
-# generate one event
+# --------------------
+# generation
+# --------------------
+
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [50])
@@ -40,22 +43,19 @@ geometry.param('excludedComponents', ['EKLM'])
 # EvtGen to provide generic BB events
 evtgeninput = register_module('EvtGenInput')
 
+
+# --------------------
 # simulation
+# --------------------
+
 g4sim = register_module('FullSim')
 # make the simulation less noisy
 g4sim.logging.log_level = LogLevel.ERROR
 
-# run the MC track finder
-mctrackfinder = register_module('TrackFinderMCTruth')
-mctrackfinder.param('UsePXDHits', use_pxd)
-mctrackfinder.param('UseSVDHits', True)
-mctrackfinder.param('UseCDCHits', True)
-mctrackfinder.param('UseClusters', True)
 
-# set up genfit
-genfitextrap = register_module('SetupGenfitExtrapolation')
-genfit = register_module('GenFitter')
-# genfit.param('UseClusters', True)
+# -------------------
+# dE/dx reconstruction
+# --------------------
 
 # set up the CDC dE/dx module
 cdcdedx = register_module('CDCDedxPID')
@@ -99,7 +99,6 @@ main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
 
-add_beamparameters(main, "Y4S")
 main.add_module(evtgeninput)
 main.add_module(g4sim)
 
@@ -110,9 +109,8 @@ main.add_module(register_module('SVDDigitizer'))
 main.add_module(register_module('SVDClusterizer'))
 main.add_module(register_module('CDCDigitizer'))
 
-main.add_module(mctrackfinder)
-main.add_module(genfitextrap)
-main.add_module(genfit)
+# tracking reconstruction does not include dE/dx measurements
+add_tracking_reconstruction(main)
 
 main.add_module(cdcdedx)
 main.add_module(svddedx)

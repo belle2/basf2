@@ -27,8 +27,6 @@ eventinfosetter.param('evtNumList', [10])  # we want to process 10 events
 main.add_module(eventinfosetter)
 
 # generate BBbar events
-from beamparameters import add_beamparameters
-add_beamparameters(main, "Y4S")
 main.add_module('EvtGenInput')
 
 # detector simulation

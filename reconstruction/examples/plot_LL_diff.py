@@ -117,10 +117,6 @@ main = create_path()
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [20])
 main.add_module(eventinfosetter)
-
-# set up beam parameters
-from beamparameters import add_beamparameters
-add_beamparameters(main, "Y4S")
 main.add_module('EvtGenInput')
 
 # do full simulation and reconstruction

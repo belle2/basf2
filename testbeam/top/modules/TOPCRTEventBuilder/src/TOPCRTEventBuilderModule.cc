@@ -48,9 +48,9 @@ namespace Belle2 {
 
   {
     // set module description (e.g. insert text)
-    setDescription("Event builder for PocketDAQ output root files of winter 2016 CRT tests."
-                   "These files are gigE packet based: one basf2 event consists of"
-                   " 4 scrod packets. Module opens the root file, reads 'tree' entries"
+    setDescription("Event builder for PocketDAQ root files of winter 2016 CRT tests."
+                   " These files are readout-frame based."
+                   " Module opens the root file, reads 'tree' entries"
                    " until it detects next event, converts RawDataBlocks branches into"
                    " RawTOP objects, fix the raw data format and appends objects to"
                    " StoreArray<RawTOP>. Format fix includes adding of header word,"
@@ -235,6 +235,9 @@ namespace Belle2 {
 
   int TOPCRTEventBuilderModule::getRunNumber(const std::string& fileName)
   {
+
+    m_expNumber = 0; // Fuji tests
+
     auto ii = fileName.find("run");
     if (ii == std::string::npos) {
       B2WARNING("Cannot deduce run number from file name");
@@ -257,6 +260,7 @@ namespace Belle2 {
       B2WARNING("Cannot deduce run number from file name");
       return -1;
     }
+    if (fileName.rfind("cpr3015") != std::string::npos) m_expNumber = 1; // Tsukuba tests
     return abs(runNumber);
   }
 
@@ -282,10 +286,10 @@ namespace Belle2 {
       if (data[0] == data[1]) i0 = 1;
       int word = swap32(data[i0 + 1]);
       unsigned scrodID = (word >> 9) & 0x7F;
-      unsigned dataFormat = 2;
-      unsigned version = 2;
-      if (m_runNumber >= 1373) version = 3;
-      if (scrodID == 16 and m_runNumber >= 1700 and m_runNumber < 2220) {
+      unsigned dataFormat = 2; // waveforms
+      unsigned version = 2; // gigE (sparsified or unsparsified)
+      if (scrodID == 16 and m_expNumber == 0 and
+          m_runNumber >= 1700 and m_runNumber < 2220) {
         scrodID = scrods[finesse]; // fix since ID is wrong
       }
       Buffer[finesse].push_back(scrodID + (version << 16) + (dataFormat << 24));

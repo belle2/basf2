@@ -13,6 +13,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/database/Database.h>
+#include <framework/pcore/ProcHandler.h>
 
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
@@ -280,6 +281,10 @@ void B2BIIConvertMdstModule::event()
     } else {
       B2INFO("BeamParameters from condition database are different from converted "
              "ones, overriding database");
+    }
+    if (ProcHandler::parallelProcessingUsed()) {
+      B2FATAL("Cannot reliably override the Database content in parallel processing "
+              "mode, please run the conversion in single processing mode");
     }
     DBStore::Instance().addConstantOverride("dbstore", "BeamParameters", new BeamParameters(m_beamParams), true);
   }

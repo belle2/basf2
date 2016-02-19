@@ -17,11 +17,12 @@ custom scripts can be used to distingush between good and bad commits.
 The syntaxn of the --check-quantity option is the following:
 <root filename>:<quantity>:<compare op>:<value>
 
-<quantity> is the name of a histogram in the given root file. For histograms, three values are
-           extracted, which can be selected vial the number given in bracktets []:
-           0 = mean of the histogram
-           1 = average of the bin content
-           2 = zero-suppressed average of the bin content
+<quantity> is the name of a histogram in the given root file. For histograms, the quantity to check
+           for can be given in square brackets, for regular histograms, this is one of this strings:
+           "mean_x" = mean of the histogram
+           "entries" = number of entries in all bins
+           "mean_y" = the mean of the bin content
+           "mean_y_zero_suppressed" = the mean of the bin content, only with bins with > 0 filling
 <compare op> can be ">" or "<"
 <value> is the reference value as a float to compare to
 
@@ -31,7 +32,7 @@ following snippet can be used:
 git bisect good <last good release>
 git bisect bad <first bad release>
 git bisect run bisect_validation.py --script 13_trackingEfficiency_createPlots.py
-    --check-quantity "results/current/tracking/TrackingValidation.root:hEfficiency[2]:>:0.93"
+    --check-quantity "results/current/tracking/TrackingValidation.root:hEfficiency[mean_y]:>:0.93"
 
  Author: The Belle II Collaboration
  Contributors: Thomas Hauth
@@ -48,50 +49,33 @@ import ROOT
 import argparse
 from functools import reduce
 
-# this is a 1:1 copy of tracking/scripts/tracking/validation/extract_information_from_tracking_validation_output.py
-# which is made necessary at the moment, because the method was recently improved and git bisect might checkout
-# older version of this code, where this method is not present.
-# us the tracking/scripts version, once the implementation of this function has stabilized
+import quantity_extract
 
 
 def extract_information_from_file(file_name, results):
-    # Read in the given root file and export the information to the results
+    """
+    Read in the given root file and export the information to the results
+    """
+
     root_file = ROOT.TFile(file_name)
     if not root_file.IsOpen():
         return None
 
+    qe = quantity_extract.RootQuantityExtract()
+
     keys = root_file.GetListOfKeys()
     for graph_or_table in keys:
         name = graph_or_table.GetName()
-        # As the naming convention is that simple in the validation output, this single line should do the job
-        root_obj = root_file.Get(name)
 
-        if "overview_figures_of_merit" in str(name):
-            root_obj.GetEntry(0)
-            for branch in graph_or_table.GetListOfBranches():
-                branch_name = branch.GetName()
-                if branch_name in results:
-                    results[branch_name].append(100.0 * float(getattr(root_obj, branch.GetName())))
+        if name in results.keys():
+            # As the naming convention is that simple in the validation output, this single line should do the job
+            root_obj = root_file.Get(name)
+            values = qe.extract(root_obj)
 
-        # also support histograms
-        if root_obj.IsA().GetName() == "TH1F":
-            if root_obj.GetName() in results:
-                # compute the y average across bins
-                # useful for efficiency over <X> plots
-                nbinsx = root_obj.GetNbinsX()
-                sum = 0.0
-                sumZeroSuppressed = 0.0
-                countZeroSuppressed = 0
-                for i in range(nbinsx):
-                    v = root_obj.GetBinContent(i + 1)
-                    sum = sum + v  # from first bin, ignored underflow (i=0) and overflow (i=nbinsx+1) bins
-                    if v > 0.0:
-                        sumZeroSuppressed = sumZeroSuppressed + v
-                        countZeroSuppressed = countZeroSuppressed + 1
-                meanY = sum / nbinsx
-                meanYzeroSuppressed = sum / countZeroSuppressed
-
-                results[root_obj.GetName()] = (root_obj.GetMean(), meanY, meanYzeroSuppressed)
+            # only fill if at least one result was found,
+            # otherwise the results will stay None
+            if len(values) > 0:
+                results[name] = values
 
     root_file.Close()
 
@@ -141,6 +125,8 @@ parser.add_argument(
          'error code != 0. By default, this is reported to git.')
 parser.add_argument('--check-quantity', action="append",
                     help='Check for a quantity in validation files')
+parser.add_argument('--test-check', action='store_true', default=False,
+                    help='Just check for the quantity, but do not run any git or compile commands')
 parser.add_argument('--execute', action="append",
                     help='File to execute after the compile and before the quantity check')
 parser.add_argument('--script', action="append",
@@ -150,57 +136,61 @@ parser.add_argument('--script', action="append",
 args = parser.parse_args()
 argsVar = vars(args)
 
-# output current git commit and svn revision
-os.system("echo -n 'git commit ' && git rev-parse HEAD")
-os.system("echo -n 'SVN revsion ' && git svn find-rev `git rev-parse HEAD`")
-
-# see if quantities must be checkd and
-# make sure the expression can be properly parsed
-if argsVar["check_quantity"] is None:
-    argsVar["check_quantity"] = []
-
 c_parsed = []
-for c_string in argsVar["check_quantity"]:
-    c_parsed = c_parsed + [parseCheckQuantity(c_string)]
+if not argsVar["check_quantity"] is None:
+    for c_string in argsVar["check_quantity"]:
+        c_parsed = c_parsed + [parseCheckQuantity(c_string)]
 
-if argsVar["skip_compile"] is False:
-    print("Compiling revision ...")
-    exitCode = os.system("scons -j8")
-    print("Exit code of compile was " + str(exitCode))
-    if exitCode > 0 and argsVar["report_compile_fail"]:
-        sys.exit(125)  # tell git to ignore this failed build
+if argsVar["test_check"] is False:
+    # output current git commit and svn revision
+    os.system("echo -n 'git commit ' && git rev-parse HEAD")
+    os.system("echo -n 'SVN revsion ' && git svn find-rev `git rev-parse HEAD`")
 
-# execute validation script
-if argsVar["script"] is None:
-    argsVar["script"] = []
+    # see if quantities must be checkd and
+    # make sure the expression can be properly parsed
+    if argsVar["check_quantity"] is None:
+        argsVar["check_quantity"] = []
 
-validation_scripts = reduce(lambda x, y: x + " " + y, argsVar["script"], "")
-if len(validation_scripts) > 0:
-    validation_call = "validate_basf2.py -s " + validation_scripts
-    exitCode = os.system(validation_call)
+    if argsVar["skip_compile"] is False:
+        print("Compiling revision ...")
+        exitCode = os.system("scons -j8")
+        print("Exit code of compile was " + str(exitCode))
+        if exitCode > 0 and argsVar["report_compile_fail"]:
+            sys.exit(125)  # tell git to ignore this failed build
 
-    print("Exit code of " + validation_call + " was " + str(exitCode))
+    # execute validation script
+    if argsVar["script"] is None:
+        argsVar["script"] = []
 
-    if exitCode > 0:
-        if argsVar["report_execution_fail"]:
-            sys.exit(1)  # tell git about this failed run ...
-        else:
-            sys.exit(125)  # tell git to ignore this failed validation
+    validation_scripts = reduce(lambda x, y: x + " " + y, argsVar["script"], "")
+    if len(validation_scripts) > 0:
+        validation_call = "validate_basf2 -s " + validation_scripts
+        exitCode = os.system(validation_call)
 
-# execute provided file
-if argsVar["execute"] is None:
-    argsVar["execute"] = []
+        print("Exit code of " + validation_call + " was " + str(exitCode))
 
-for ex in argsVar["execute"]:
-    print("Executing " + str(ex))
-    exitCode = os.system(ex.strip('"'))
-    print("Exit code of " + str(ex) + " was " + str(exitCode))
+        if exitCode > 0:
+            if argsVar["report_execution_fail"]:
+                sys.exit(1)  # tell git about this failed run ...
+            else:
+                sys.exit(125)  # tell git to ignore this failed validation
 
-    if exitCode > 0:
-        if argsVar["report_execution_fail"]:
-            sys.exit(1)  # tell git about this failed run ...
-        else:
-            sys.exit(125)  # tell git to ignore this failed validation
+    # execute provided file
+    if argsVar["execute"] is None:
+        argsVar["execute"] = []
+
+    for ex in argsVar["execute"]:
+        print("Executing " + str(ex))
+        exitCode = os.system(ex.strip('"'))
+        print("Exit code of " + str(ex) + " was " + str(exitCode))
+
+        if exitCode > 0:
+            if argsVar["report_execution_fail"]:
+                sys.exit(1)  # tell git about this failed run ...
+            else:
+                sys.exit(125)  # tell git to ignore this failed validation
+else:
+    print("Skipping checkout and compile, performing only check")
 
 # perform checks
 for c in c_parsed:
@@ -226,8 +216,8 @@ for c in c_parsed:
     if c[1][1] is None:
         valValue = results[refObjKey]
     else:
-        subKeyNumber = int(c[1][1])
-        valValue = results[refObjKey][subKeyNumber]
+        keyName = c[1][1]
+        valValue = results[refObjKey][keyName]
     print("Retrieved value " + str(valValue))
 
     compareResult = None

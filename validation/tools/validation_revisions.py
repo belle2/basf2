@@ -35,12 +35,15 @@ import argparse
 import pickle
 
 import pandas as pd
+import quantity_extract
 
 
 def extract_fom_from_histogram(file_name, fom_name):
     # Read in the given root file and export the information to the results
     root_file = ROOT.TFile(file_name)
+    print(file_name)
     if not root_file.IsOpen():
+        print("Cannot open ROOT file {}".format(file_name))
         return None
 
     results = {}
@@ -48,27 +51,10 @@ def extract_fom_from_histogram(file_name, fom_name):
     for result_key in fom_name:
         root_obj = root_file.Get(result_key)
 
-        if root_obj is not None:
-            if root_obj.IsA().GetName() in ["TH1F", "TH1", "TH1D"]:
-                # compute the y average across bins
-                # useful for efficiency over <X> plots
-                nbinsx = root_obj.GetNbinsX()
-                sum = 0.0
-                sumZeroSuppressed = 0.0
-                countZeroSuppressed = 0
-                for i in range(nbinsx):
-                    v = root_obj.GetBinContent(i + 1)
-                    sum = sum + v  # from first bin, ignored underflow (i=0) and overflow (i=nbinsx+1) bins
-                    if v > 0.0:
-                        sumZeroSuppressed = sumZeroSuppressed + v
-                        countZeroSuppressed = countZeroSuppressed + 1
-                meanY = sum / nbinsx
-                meanYzeroSuppressed = sum / countZeroSuppressed
-
-                results.update({result_key +
-                                "_meanX": root_obj.GetMean(), result_key +
-                                "_meanY": meanY, result_key +
-                                "_meanYZeroSuppressed": meanYzeroSuppressed})
+        qe = quantity_extract.RootQuantityExtract()
+        results = qe.extract(root_obj)
+        # update keys with the fom's name
+        results = {result_key + "_" + key: value for (key, value) in results.items()}
 
     root_file.Close()
     return results
@@ -103,10 +89,16 @@ def get_fom_from_file(script_name, file_names_and_fom, git_commit_hash, skip_com
             return results
 
     # Receive svn information
-    svn_number = check_output(["git", "svn", "find-rev", git_commit_hash]).decode("utf-8").split("\n")[0]
-    svn_log = check_output(["git", "log", "--pretty=format:%s", "--max-count=1", git_commit_hash]).decode("utf-8")
+    svn_number = None
+    svn_log = None
 
-    print("This is svn number {svn}.".format(svn=svn_number))
+    # make this optional as no subversion information might be available for local git branches
+    try:
+        svn_number = check_output(["git", "svn", "find-rev", git_commit_hash]).decode("utf-8").split("\n")[0]
+        svn_log = check_output(["git", "log", "--pretty=format:%s", "--max-count=1", git_commit_hash]).decode("utf-8")
+        print("This is svn number {svn}.".format(svn=svn_number))
+    except CalledProcessError:
+        print("Cannot retrieve subversion information")
 
     results.update({"svn_number": svn_number, "svn_log": svn_log, "git_hash": git_commit_hash})
 

@@ -9,6 +9,8 @@ import glob
 from ROOT import gROOT, Belle2
 gROOT.ProcessLine("gErrorIgnoreLevel = 4000;")  # ignore endless root errors for background files...
 
+from cdctrigger import add_cdc_trigger
+
 """
 Example script for the CDC trigger.
 The path contains a particle gun with single tracks,
@@ -38,12 +40,11 @@ particlegun_params = {
     'xVertexParams': [0, 0.0],
     'yVertexParams': [0, 0.0],
     'zVertexParams': [-50.0, 50.0]}
-basf2datadir = os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None), 'data')
 bkgdir = '/sw/belle2/bkg/'
 
-# ------------------------------ #
-# create path up to neurotrigger #
-# ------------------------------ #
+# ------------------------- #
+# create path up to trigger #
+# ------------------------- #
 
 # set random seed
 basf2.set_random_seed(seed)
@@ -74,18 +75,12 @@ cdcdigitizer_params = {
     'DoSmearing': not simplext}
 cdcdigitizer.param(cdcdigitizer_params)
 main.add_module(cdcdigitizer)
-trgcdc = basf2.register_module('TRGCDC')
-trgcdc_params = {
-    'ConfigFile': os.path.join(basf2datadir, "trg/cdc/TRGCDCConfig_0_20101111.dat"),
-    'InnerTSLUTFile': os.path.join(basf2datadir, "trg/cdc/innerLUT_v2.2.coe"),
-    'OuterTSLUTFile': os.path.join(basf2datadir, "trg/cdc/outerLUT_v2.2.coe"),
-    'HoughFinderMappingFileMinus': os.path.join(basf2datadir, "trg/cdc/HoughMappingMinus20160217.dat"),
-    'HoughFinderMappingFilePlus': os.path.join(basf2datadir, "trg/cdc/HoughMappingPlus20160217.dat")}
-trgcdc.param(trgcdc_params)
-main.add_module(trgcdc)
-neuro = basf2.register_module('NeuroTrigger')
-neuro.param('filename', os.path.join(basf2datadir, "trg/cdc/Neuro20160118Nonlin.root"))
-main.add_module(neuro)
+
+# ----------- #
+# CDC trigger #
+# ----------- #
+
+add_cdc_trigger(main)
 
 
 # ----------- #

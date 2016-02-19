@@ -24,6 +24,11 @@ namespace Belle2 {
   template<class T> class DBImportArray {
   public:
 
+    /** STL-like iterator over the T objects (not T* ). */
+    typedef ArrayIterator<DBImportArray<T>, T> iterator;
+    /** STL-like const_iterator over the T objects (not T* ). */
+    typedef ArrayIterator<DBImportArray<T>, const T> const_iterator;
+
     /**
      * Constructor
      * @param module  Name under which the array will be stored in the database
@@ -75,6 +80,42 @@ namespace Belle2 {
     {
       return new(nextFreeAdress()) T(std::forward<Args>(params)...);
     }
+
+    /**
+     * Access to the stored objects.
+     * Out-of-bounds accesses throw an std::out_of_range exception.
+     * @param i  Array index, should be in 0..getEntries()-1
+     * @return   pointer to the object
+     */
+    inline T* operator [](int i) const
+    {
+      TObject* obj = m_array->At(i);
+      if (obj == nullptr)
+        throw std::out_of_range("Out-of-range access in DBImportArray::operator[], for "
+                                + m_package + "/" + m_module + ", index "
+                                + std::to_string(i));
+      return static_cast<T*>(obj);
+    }
+
+    /**
+     * Return iterator to first entry.
+     */
+    iterator begin() { return iterator(this, 0); }
+
+    /**
+     * Return iterator to last entry +1.
+     */
+    iterator end() { return iterator(this, getEntries()); }
+
+    /**
+     * Return const_iterator to first entry.
+     */
+    const_iterator begin() const { return const_iterator(this, 0); }
+
+    /**
+     * Return const_iterator to last entry +1.
+     */
+    const_iterator end() const { return const_iterator(this, getEntries()); }
 
     /**
      * Import the array to database

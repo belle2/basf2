@@ -53,8 +53,9 @@ void Database::setInstance(Database* database)
       chain->addDatabase(database);
     } else if (replacement) {
       B2DEBUG(200, "Replacing Database with DatabaseChain: adding existing database to chain");
-      replacement->addDatabase(s_instance);
+      Database* old = s_instance;
       s_instance = replacement;
+      replacement->addDatabase(old);
     } else {
       B2WARNING("The already created database instance is replaced by a new instance.");
       delete s_instance;

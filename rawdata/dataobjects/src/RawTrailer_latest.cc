@@ -8,7 +8,6 @@
 
 #include <rawdata/dataobjects/RawTrailer_latest.h>
 
-using namespace std;
 using namespace Belle2;
 
 //ClassImp(RawTrailer_latest);

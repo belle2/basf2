@@ -9,7 +9,7 @@
 #include <rawdata/dataobjects/RawHeader_v1.h>
 
 
-using namespace std;
+
 using namespace Belle2;
 
 //ClassImp(RawHeader_v1);

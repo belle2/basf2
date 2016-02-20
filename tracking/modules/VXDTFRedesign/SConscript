@@ -11,6 +11,7 @@ env['LIBS'] = [
     'vxd', 'vxd_dataobjects',
     'genfit2',
     'tracking', 'tracking_dataobjects',
+    'mdst_dataobjects',
 #    'testbeam_vxd_dataobjects',
     ]
 Return('env')

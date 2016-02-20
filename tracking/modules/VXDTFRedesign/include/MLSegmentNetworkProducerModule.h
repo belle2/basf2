@@ -75,9 +75,6 @@ namespace Belle2 {
     /** cut value to be used with classifier */
     double m_PARAMcutVal;
 
-    /** enable/disable recording of all presented samples */
-    bool m_PARAMrecord;
-
     /** internal three hit filter*/
     std::unique_ptr<MLFilter> m_filter{nullptr};
 
@@ -86,12 +83,6 @@ namespace Belle2 {
 
     /** StoreObjPtr to access the DNNs that are used in this module. */
     Belle2::StoreObjPtr<Belle2::DirectedNodeNetworkContainer> m_network;
-
-    /** pointer to the TFile which is used for storing (if enabled) */
-    TFile* m_rootFilePtr{nullptr};
-
-    /** pointer to the TTree used for recording (if enabled) */
-    TTree* m_treePtr{nullptr};
 
     /** construct the classifier from file */
     void setupClassifier(const std::string& filename);

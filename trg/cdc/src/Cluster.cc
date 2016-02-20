@@ -10,7 +10,7 @@ using namespace std;
 
 int main()
 {   
-  int i=1,j=1,z=0,c=1,js,ts,a;
+
   ofstream outputp("UT3_0_Cluster_M.vhd");
   ofstream outputpp("UT3_0_Cluster_P.vhd");
   
@@ -28,7 +28,7 @@ int main()
   outputp<<"Port (";
   outputpp<<"Port (";
   
-  for( a=1;a<=16;a++){
+  for(unsigned a=1;a<=16;a++){
     outputp<< "     Minus_row"<<a<<"   : out  STD_LOGIC_VECTOR (79 downto 40);"<<endl;
     outputpp<<"     Plus_row"<<a<<"   : out  STD_LOGIC_VECTOR (39 downto 0);"<<endl;
   }
@@ -59,35 +59,33 @@ int main()
   outputpp<<" "<<endl;
   outputp<<" "<<endl;
   ///////signal///////////////////////////////////////////////////////////////////////
-  for( a=1;a<=16;a++){
+  for(unsigned a=1;a<=16;a++){
     outputp<<"signal  row"<<a<<"   :   STD_LOGIC_VECTOR (79 downto 40);"<<endl;
     outputpp<<"signal  row"<<a<<"   :   STD_LOGIC_VECTOR (0 to 39);"<<endl;
     outputpp<<"signal  row"<<a<<"_s   :   STD_LOGIC_VECTOR (39 downto 0);"<<endl;
   }
   outputpp<<" "<<endl;
   outputp<<" "<<endl;
-  for(js=1;js<16;js+=2)
-    {
-      for(ts=0;ts<80;ts+=2)
-	{
-	  if (ts>=0 && ts<40){
-	    outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_A  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
-	    outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_B  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
-	    outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_D  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
-	    outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_E  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
-	    outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_G  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
-	    outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_H  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
-	  }
-	  if (ts>=40 && ts<80){
-	    outputp<<"signal	patternI_"<<ts%160<<"_"<<js<<"_A  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
-	    outputp<<"signal	patternI_"<<ts%160<<"_"<<js<<"_B  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
-	    outputp<<"signal	patternI_"<<ts%160<<"_"<<js<<"_D  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
-	    outputp<<"signal	patternI_"<<ts%160<<"_"<<js<<"_E  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
-	    outputp<<"signal	patternI_"<<ts%160<<"_"<<js<<"_G  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
-	    outputp<<"signal	patternI_"<<ts%160<<"_"<<js<<"_H  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
-	  }
-	}
+  for(unsigned js=1;js<16;js+=2){
+    for(unsigned ts=0;ts<80;ts+=2){
+      if (ts>=0 && ts<40){
+	outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_A  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
+	outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_B  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
+	outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_D  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
+	outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_E  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
+	outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_G  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
+	outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_H  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
+      }
+      if (ts>=40 && ts<80){
+	outputp<<"signal	patternI_"<<ts%160<<"_"<<js<<"_A  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
+	outputp<<"signal	patternI_"<<ts%160<<"_"<<js<<"_B  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
+	outputp<<"signal	patternI_"<<ts%160<<"_"<<js<<"_D  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
+	outputp<<"signal	patternI_"<<ts%160<<"_"<<js<<"_E  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
+	outputp<<"signal	patternI_"<<ts%160<<"_"<<js<<"_G  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
+	outputp<<"signal	patternI_"<<ts%160<<"_"<<js<<"_H  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
+      }
     }
+  }
   outputpp<<" "<<endl;
   outputp<<" "<<endl;
   ///////component///////////////////////////////////////////////////////////////////////
@@ -96,7 +94,7 @@ int main()
   outputp<<"  Port ( ";
   outputpp<<" COMPONENT UT3_0_HoughVoting_P"<<endl;
   outputpp<<" Port ( ";
-  for(a=1;a<=16;a++){
+  for(unsigned a=1;a<=16;a++){
     outputp<<"      row"<<a<<"   : out  STD_LOGIC_VECTOR (79 downto 40);"<<endl;
     outputpp<<"     row"<<a<<"   : out  STD_LOGIC_VECTOR (39 downto 0);"<<endl;
   }
@@ -170,7 +168,7 @@ int main()
   outputp<<"	Port map("<<endl;
   outputpp<<"Center_1: UT3_0_HoughVoting_P"<<endl;
   outputpp<<"	Port map("<<endl;
-  for(a=1;a<=16;a++){
+  for(unsigned a=1;a<=16;a++){
     outputp<<"	row"<<a<<"(79 downto 40) =>row"<<a<<"(79 downto 40),"<<endl;
     outputpp<<"	row"<<a<<"(39 downto 0) =>row"<<a<<"_s(39 downto 0),"<<endl;
   }
@@ -194,7 +192,7 @@ int main()
   outputp<<" "<<endl;
   
   outputpp<<"ss : for i in 0 to 39 generate"<<endl;
-  for(a=1;a<=16;a++){
+  for(unsigned a=1;a<=16;a++){
     outputpp<<"row"<<a<<"(i)<=row"<<a<<"_s(i);"<<endl;
   }
   outputpp<<"end generate;"<<endl;
@@ -202,18 +200,18 @@ int main()
   
   //////Clust_part1////////////////////////////////////////////////////////////////////
   
-  for(j;j<16;j+=2){
-    int t=z%160;
-    for(t;t<80;t+=2){
+  int i=1, c=1, z=0;
+  for(unsigned j=1;j<16;j+=2){
+    for(unsigned t=z%160;t<80;t+=2){
       
       if (t>=40&&t<80){ 
-	i=i++;
+	++i;
 	outputp<<"Center_"<<i<<" :cluster_center"<<endl;
 	outputp<<"port map ("<<endl;
       }
       
       if (t>=0&&t<40){ 
-	c=c++;
+	++c;
 	outputpp<<"Center_"<<c<<" :cluster_center"<<endl;
 	outputpp<<"port map ("<<endl;
       }

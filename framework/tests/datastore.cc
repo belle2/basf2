@@ -51,6 +51,7 @@ namespace {
         evtDataDifferentName.appendNew(newObj2);
 
         //fancy constructors
+        // cppcheck-suppress memleak
         newobj = evtDataDifferentDurability.appendNew(30 + i);
 
         //copy-construct ProfileInfo objects

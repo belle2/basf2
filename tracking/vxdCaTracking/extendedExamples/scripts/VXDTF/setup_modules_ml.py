@@ -47,13 +47,10 @@ def add_fbdtclassifier_training(path,
     path.add_module(fbdtTrainer)
 
 
-# NOTE: some of these parameters can be disabled by a preprocessor flag in the module code!
 def add_ml_threehitfilters(path,
                            networkInputName,
                            fbdtFileName='FBDTClassifier.dat',
                            cutVal=0.5,
-                           rec=False,  # this on
-                           rFN='MLSegmentProducer_samples.root',  # and this on
                            logLevel=LogLevel.INFO,
                            dbgLvl=1):
     """This function adds the MLSegmentNetworkProducerModule to the given path and exposes its parameters
@@ -67,8 +64,6 @@ def add_ml_threehitfilters(path,
     ml_segment.param({'networkInputName': networkInputName,
                       'FBDTFileName': fbdtFileName,
                       'cutValue': cutVal,
-                      'record': rec,  # don't forget them here
-                      'rootFileName': rFN  # ...
                       })
 
     path.add_module(ml_segment)

@@ -310,6 +310,9 @@ PXDSHCAL.param('UseTracks', UseTracks)
 # To use real data without simulations or simulations, default=False
 PXDSHCAL.param('UseRealData', UseRealData)
 
+# Use excluded residuals (non-biased), default=1
+PXDSHCAL.param('ExcludedResiduals', 1)
+
 # To compare true point and track position in simulations, default=False
 PXDSHCAL.param('CompareTruePointTracks', CompareTruePointTracks)
 

@@ -92,6 +92,10 @@ pxdClusterShapeCalibrationModule::pxdClusterShapeCalibrationModule() : Calibrati
   addParam("SpecialSensorNo", m_SpecialSensorNo,
            "For CalibrationKind=2 set Sensor ID for special analysis, default=2", m_SpecialSensorNo);
 
+  addParam("ExcludedResiduals", m_ExcludedResiduals,
+           "Use excluded residuals (non-biased), default=1", m_ExcludedResiduals);
+
+
 }
 
 void pxdClusterShapeCalibrationModule::prepare()
@@ -160,14 +164,26 @@ void pxdClusterShapeCalibrationModule::collect()
         if (PXDRecoHit* pxdhit = dynamic_cast<PXDRecoHit*>(track.getPointWithMeasurement(ipoint)->getRawMeasurement(0))) { // cluster
           const PXDCluster& cluster = * pxdhit->getCluster();
           TVectorD state = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getFittedState().getState();
+          bool biased = true;
+          if (m_ExcludedResiduals == 1) biased = false;
+          TVectorD residual = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getState();
+          TMatrixDSym covarianceTR = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getCov();
           // state 0=q/p, 1= track slope in local - U, 2: in V, 3: u position local, 4: v position local
           m_phiTrack = TMath::ATan2(state[1], 1.0);
           m_thetaTrack = TMath::ATan2(state[2], 1.0);
-          m_ResidUTrack = cluster.getU() - state[3];
-          m_ResidVTrack = cluster.getV() - state[4];
-          TMatrixDSym covariance = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getFittedState().getCov();
-          m_SigmaUTrack = sqrt(covariance(3, 3));
-          m_SigmaVTrack = sqrt(covariance(4, 4));
+          // m_ResidUTrack = cluster.getU() - state[3];
+          // m_ResidVTrack = cluster.getV() - state[4];
+          m_ResidUTrack = residual.GetMatrixArray()[0];
+          m_ResidVTrack = residual.GetMatrixArray()[1];
+          // TMatrixDSym covariance = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getFittedState().getCov();
+          // m_SigmaUTrack = sqrt(covariance(3, 3));
+          // m_SigmaVTrack = sqrt(covariance(4, 4));
+          m_SigmaUTrack = sqrt(covarianceTR(0, 0) - cluster.getUSigma() * cluster.getUSigma());
+          m_SigmaVTrack = sqrt(covarianceTR(1, 1) - cluster.getVSigma() * cluster.getVSigma());
+          // printf("----->%f %f | %f %f err: %f %f - %f %f - true %f %f  -- %f %f<------------\n",m_ResidUTrack, m_ResidVTrack, residual.GetMatrixArray()[0], residual.GetMatrixArray()[1],
+          //       m_SigmaUTrack, m_SigmaVTrack, sqrt(covarianceTR(0, 0)), sqrt(covarianceTR(1, 1)), cluster.getUSigma(), cluster.getVSigma(),
+          //       sqrt(covarianceTR(0, 0) - cluster.getUSigma() * cluster.getUSigma()),
+          //       sqrt(covarianceTR(1, 1) - cluster.getVSigma() * cluster.getVSigma()));
 
           //Get Geometry information
           sensorID = cluster.getSensorID();

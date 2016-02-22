@@ -68,6 +68,9 @@ namespace Belle2 {
     /** To compare true point and track position in simulations, default=False */
     Bool_t m_CompareTruePointTracks = kFALSE;
 
+    /** Use excluded residuals (non-biased), default=1 */
+    int m_ExcludedResiduals = 1;
+
     /**
      * 1: standard calibration based on realistic physics or real data (default)
      * 2: special, for full range of angles for every kind of pixel

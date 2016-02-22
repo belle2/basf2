@@ -92,6 +92,7 @@ namespace Belle2 {
     StoreObjPtr<EventHeaderPacket>   m_evtheader_ptr;
     StoreArray<EventWaveformPacket>  m_evtwaves_ptr;
     StoreObjPtr<topFileMetaData>     m_filedata_ptr;
+    bool m_forceTrigger0xF;
 
     CPR_hdr cpr_hdr;
     HSLB_hdr hslb_hdr;

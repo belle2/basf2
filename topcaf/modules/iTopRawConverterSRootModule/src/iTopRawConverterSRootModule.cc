@@ -39,6 +39,8 @@ public:
 iTopRawConverterSRootModule::iTopRawConverterSRootModule() : Module()
 {
   setDescription("This module is used to upack the raw data from the testbeam and crt data");
+  addParam("forceTrigger0xF", m_forceTrigger0xF, "Forcing all trigger bits to 0xF", false);
+
   m_WfPacket = nullptr;
   m_EvtPacket = nullptr;
 }
@@ -185,6 +187,9 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
     in.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
     word = swap_endianess(word);
     unsigned int trigPattern = (word >> 28) & 0xF;
+    if (m_forceTrigger0xF) {
+      trigPattern = 0xF;
+    }
     unsigned int numWindows  = (word >> 19) & 0x1FF;
     unsigned int timeStamp   = (word) & 0x7FFFF;
     B2DEBUG(1, "FEE header...(" << hex << word << dec << ") eventSize: " << eventSize << "\ttrigPattern: 0x" << hex <<

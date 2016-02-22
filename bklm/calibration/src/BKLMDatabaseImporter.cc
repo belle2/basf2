@@ -10,6 +10,7 @@
 
 #include <bklm/calibration/BKLMDatabaseImporter.h>
 #include <bklm/dbobjects/BKLMElectronicMapping.h>
+#include <bklm/dbobjects/BKLMGeometryPar.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -17,6 +18,7 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <string>
 #include <vector>
@@ -92,4 +94,34 @@ void BKLMDatabaseImporter::exportBklmElectronicMapping()
            ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
            " plane(z/phi) = " << element.getPlane());
   }
+}
+
+void BKLMDatabaseImporter::importBklmGeometryPar()
+{
+  GearDir content("/Detector/DetectorComponent/Geometry/BKLM/Content");
+
+  // define the data
+  // TObject bklmGeometryPar("Belle2::BKLMGeometryPar");
+  BKLMGeometryPar bklmGeometryPar;
+
+  // Get Gearbox parameters for BKLM
+  bklmGeometryPar.setVersion(0);
+  bklmGeometryPar.read(content);
+
+  // define IOV and store data to the DB
+  IntervalOfValidity iov(0, 0, -1, -1);
+  Database::Instance().storeData("BKLMGeometryPar", &bklmGeometryPar, iov);
+
+}
+
+void BKLMDatabaseImporter::exportBklmGeometryPar()
+{
+  DBObjPtr<BKLMGeometryPar> element("BKLMGeometryPar");
+
+  B2INFO("BKLMGeometryPar version: " << element->getVersion() << ", global rotation angle " << element->getRotation() <<
+         ", module height: " << element->getModuleHeight() << ", module frame width: " << element->getModuleFrameWidth() <<
+         ", module frame thickness: " << element->getModuleFrameThickness() << ", local reconstructure shift (x,y,z) of sector.1 layer.1: ("
+         <<
+         element->getLocalReconstructionShiftX(1, 1) << ", " << element->getLocalReconstructionShiftY(1,
+             1) << ", " << element->getLocalReconstructionShiftZ(1, 1) << ")");
 }

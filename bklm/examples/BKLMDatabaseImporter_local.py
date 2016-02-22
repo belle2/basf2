@@ -42,4 +42,6 @@ process(main)
 # and run the importer
 dbImporter = BKLMDatabaseImporter()
 dbImporter.importBklmElectronicMapping()
-# dbImporter.exportBklmElectronicMapping()
+dbImporter.importBklmGeometryPar()
+dbImporter.exportBklmElectronicMapping()
+dbImporter.exportBklmGeometryPar()

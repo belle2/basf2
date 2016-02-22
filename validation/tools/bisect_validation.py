@@ -44,6 +44,8 @@ http://git-scm.com/docs/git-bisect
 
 import os
 import sys
+import shutil
+import subprocess
 import ROOT
 
 import argparse
@@ -133,6 +135,8 @@ parser.add_argument('--script', action="append",
                     help='Name of validation script to run after the compile '
                          'and before the quantity check. Only this validation script and '
                          'all scripts it depends on are executed.')
+parser.add_argument('--keep', action='store_true', default=False,
+                    help='Keep the result folder of each bisect step for later examination')
 args = parser.parse_args()
 argsVar = vars(args)
 
@@ -140,6 +144,15 @@ c_parsed = []
 if not argsVar["check_quantity"] is None:
     for c_string in argsVar["check_quantity"]:
         c_parsed = c_parsed + [parseCheckQuantity(c_string)]
+
+# try to get git revision
+current_git_commit = None
+try:
+    current_git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode()
+except subprocess.CalledProcessError:
+    current_git_commit = None
+    print("Cannot get git commit hash of HEAD")
+
 
 if argsVar["test_check"] is False:
     # output current git commit and svn revision
@@ -192,6 +205,16 @@ if argsVar["test_check"] is False:
 else:
     print("Skipping checkout and compile, performing only check")
 
+# preserve results folder, if requested
+if argsVar["keep"] is True:
+    if current_git_commit is None:
+        print("Cannot retrieve git commit hash, no archival possible")
+    else:
+        archive_folder_name = "results_" + current_git_commit
+        # remove a previously archieved folder, if present
+        shutil.rmtree(archive_folder_name, true)
+        shutil.copytree("results", archive_folder_name)
+
 # perform checks
 for c in c_parsed:
 
@@ -202,6 +225,7 @@ for c in c_parsed:
     refObjKey = c[1][0]
     results = {refObjKey: None}
     results = extract_information_from_file(file_name, results)
+
     print("results " + str(results))
     if results is None:
         print("result file " + str(file_name) + " not found")

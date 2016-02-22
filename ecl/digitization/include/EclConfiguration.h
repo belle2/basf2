@@ -13,7 +13,8 @@ namespace Belle2 {
     void setBackground(bool val) { m_background = val; }
 
     static constexpr int        m_nch = 8736; // total number of electronic channels (crystals) in calorimeter
-    static constexpr double    m_tick = 24.*12. / 508.; // == 72/127 digitization clock tick (in microseconds ???)
+    static constexpr double    m_rf = 508.887; // accelerating RF, http://ptep.oxfordjournals.org/content/2013/3/03A006.full.pdf
+    static constexpr double    m_tick = 24.*12. / m_rf; // == 72/127 digitization clock tick (in microseconds ???)
     static constexpr int       m_ntrg = 144; // number of trigger counts per ADC clock tick
 
     static constexpr int       m_nsmp = 31; // number of ADC measurements for signal fitting

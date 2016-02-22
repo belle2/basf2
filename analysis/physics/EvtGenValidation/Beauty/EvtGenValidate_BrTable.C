@@ -15,9 +15,9 @@ void EvtGenValidate_BrTable()
   
   Char_t* trees[len] = {"bp", "b0"};
   Char_t* gtrees[len] = {"bpgen", "b0gen"};
-  Char_t* branches[len] = {"B__extraInfodecayModeID", "B0__extraInfodecayModeID"};
+  Char_t* branches[len] = {"B____bodecayModeID__bc", "B0____bodecayModeID__bc"};
   Char_t* particle[len] = {"B+", "B0"};
-  Int_t decModes[len] = {122, 121};
+  Int_t decModes[len] = {124, 123};
 
   Int_t k, toggle;
   cout << "Produce LaTeX table? (0/1/2 = no/yes/exit):" << endl;

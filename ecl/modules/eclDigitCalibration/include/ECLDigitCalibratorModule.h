@@ -87,7 +87,7 @@ namespace Belle2 {
       double getCalibratedTime(int cellid, int time); /**< timing correction */
       void prepareCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
 
-      void determineBackgroundByECL();/**< count out of time digits to determine baclground levels */
+      void determineBackgroundECL();/**< count out of time digits to determine baclground levels */
 
     };
 

@@ -21,17 +21,16 @@ namespace Belle2 {
   public:
 
     /** Constructor. */
-    ECLEventInformation(int backgroundbyecl = 0)
-      : m_backgroundByECL(backgroundbyecl) {}
-
+    ECLEventInformation(int backgroundecl = 0)
+      : m_backgroundECL(backgroundecl) {}
 
     /** Background by ECL Setter.
      *
-     *  @param backgroundbyecl Background measured by ECL (out of time digits above threshold).
+     *  @param backgroundecl Background measured by ECL (out of time digits above threshold).
      */
-    void setBackgroundByECL(int backgroundbyecl)
+    void setBackgroundECL(int backgroundecl)
     {
-      m_backgroundByECL = backgroundbyecl;
+      m_backgroundECL = backgroundecl;
     }
 
 
@@ -39,16 +38,17 @@ namespace Belle2 {
      *
      *  @return Background measured by ECL.
      */
-    int getBackgroundByECL() const
+    int getBackgroundECL() const
     {
-      return m_backgroundByECL;
+      return m_backgroundECL;
     }
 
   private:
 
-    int m_backgroundByECL; /**< Background measured by ECL.  */
+    int m_backgroundECL; /**< Background measured by ECL.  */
 
-    ClassDef(ECLEventInformation, 1); /**< Beam Background measured in situ by ECL. */
+    // 2: changed name of getters, setters and member variable
+    ClassDef(ECLEventInformation, 2); /**< Beam Background measured in situ by ECL. */
   }; //class
 } // namespace Belle2
 #endif // EVENTINFORMATION

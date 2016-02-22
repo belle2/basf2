@@ -57,8 +57,8 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() : m_calibrationLow("ECLCali
 {
   // Set module properties
   setDescription("Applies digit energy, time and time-resolution calibration to each ECL digit. Counts number of out-of-time background digits to determine the event-by-event background level.");
-  addParam("BackgroundEnergyCut", m_backgroundEnergyCut, "Energy cut used to count background digits", 10.0 * Belle2::Unit::MeV);
-  addParam("BackgroundTimingCut", m_backgroundTimingCut, "Timing cut used to count background digits", 100.0 * Belle2::Unit::ns);
+  addParam("BackgroundEnergyCut", m_backgroundEnergyCut, "Energy cut used to count background digits", 7.0 * Belle2::Unit::MeV);
+  addParam("BackgroundTimingCut", m_backgroundTimingCut, "Timing cut used to count background digits", 150.0 * Belle2::Unit::ns);
 
   // Parallel processing
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -93,8 +93,8 @@ void ECLDigitCalibratorModule::initialize()
   // background information
   m_eventInformationPtr.registerInDataStore(); //FIXME move to own module or do in EventInfoSetter?
 
-  m_backgroundEnergyCut = 10.0 * Belle2::Unit::MeV;  /**< Energy cut for background level counting. */
-  m_backgroundTimingCut = 100.0 * Belle2::Unit::ns;  /**< Timing window for background level counting. */
+  m_backgroundEnergyCut = 7.0 * Belle2::Unit::MeV;  /**< Energy cut for background level counting. */
+  m_backgroundTimingCut = 150.0 * Belle2::Unit::ns;  /**< Timing window for background level counting. */
 
 }
 
@@ -150,7 +150,7 @@ void ECLDigitCalibratorModule::event()
   }
 
   // determine background level
-  determineBackgroundByECL();
+  determineBackgroundECL();
 
 }
 
@@ -288,7 +288,7 @@ void ECLDigitCalibratorModule::prepareCalibrationConstants()
 }
 
 // determine background level by event by counting out-of-time digits above threshold
-void ECLDigitCalibratorModule::determineBackgroundByECL()
+void ECLDigitCalibratorModule::determineBackgroundECL()
 {
   // Input Array(s)
   StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
@@ -310,6 +310,6 @@ void ECLDigitCalibratorModule::determineBackgroundByECL()
 
   // put into EventInformation dataobject
   m_eventInformationPtr.create();
-  m_eventInformationPtr->setBackgroundByECL(backgroundcount);
+  m_eventInformationPtr->setBackgroundECL(backgroundcount);
 
 }

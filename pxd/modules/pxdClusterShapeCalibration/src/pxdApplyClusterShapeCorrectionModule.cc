@@ -284,27 +284,75 @@ void pxdApplyClusterShapeCorrectionModule::initialize()
   FILE* AscFile = fopen("Corrections.txt", "w");
   fprintf(AscFile,
           "Storring of all nonZero corrections for Bias and its error (in microns), and ErrorEstimation Corrections different from 1.0\n\n");
-  for (int i = 0; i < 5; i++) {
-    fprintf(AscFile, "\n  ***********  Correction case %i:  ***********\n", i);
-    for (int i_shape = 0; i_shape < m_shapes; i_shape++)
-      for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++)
-        for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++)
-          for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++)
-            for (int i_axis = 0; i_axis < m_dimensions; i_axis++) {
-              if (TCorrection_BiasMap[i][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] != 0) {
-                fprintf(AscFile, "Bias Sh %i PixKind %i AngU %i AngV %i Dir %i : %f +- %f\n", i_shape, i_pk, i_angleU, i_angleV, i_axis,
+//    fprintf(AscFile, "\n  ***********  Correction case %i:  ***********\n", i);
+  for (int i_pk = 0; i_pk < m_pixelkinds / 2; i_pk++) {
+    for (int i_shape = 0; i_shape < m_shapes; i_shape++) {
+      for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++) {
+        for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
+          for (int i_axis = 0; i_axis < m_dimensions; i_axis++) {
+//            if ((TCorrection_BiasMap[0][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] == 0.0) ||
+//              (TCorrection_BiasMap[0][make_tuple(i_shape, i_pk + 4, i_axis, i_angleU, i_angleV)] == 0.0)) {
+//              continue;
+//            }
+            if (TCorrection_BiasMap[0][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)]  == 0.0) {
+              continue;
+            }
+            if (TCorrection_BiasMap[i_pk + 1][make_tuple(i_shape, i_pk + 4, i_axis, i_angleU, i_angleV)]  == 0.0) {
+              continue;
+            }
+            if ((fabs(TCorrection_BiasMap[0][make_tuple(i_shape, i_pk, i_axis, i_angleU,
+                                                        i_angleV)] - TCorrection_BiasMap[i_pk + 1][make_tuple(i_shape, i_pk + 4, i_axis, i_angleU, i_angleV)]) < .0003) ||
+                (fabs(TCorrection_BiasMap[0][make_tuple(i_shape, i_pk + 4, i_axis, i_angleU,
+                                                        i_angleV)] - TCorrection_BiasMap[i_pk + 1][make_tuple(i_shape, i_pk + 4, i_axis, i_angleU, i_angleV)]) < .0003)) {
+              continue;
+            }
+            fprintf(AscFile, "PixKind %1i Sh %2i AngU %2i AngV %2i Dir %1i : Bias", i_pk, i_shape, i_angleU, i_angleV, i_axis);
+            for (int i = 0; i < 5; i++) {
+              //if (TCorrection_BiasMap[i][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] != 0) {
+              if (i == 0) {
+                fprintf(AscFile, " case %i : %7.2f +- %7.2f ,", i,
                         TCorrection_BiasMap[i][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] / Unit::um,
                         TCorrection_BiasMapErr[i][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] / Unit::um);
+                fprintf(AscFile, " case %i : %7.2f +- %7.2f ,", i,
+                        TCorrection_BiasMap[i][make_tuple(i_shape, i_pk + 4, i_axis, i_angleU, i_angleV)] / Unit::um,
+                        TCorrection_BiasMapErr[i][make_tuple(i_shape, i_pk + 4, i_axis, i_angleU, i_angleV)] / Unit::um);
               }
-              if (TCorrection_ErrorEstimationMap[i][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] != 1.0)
-                fprintf(AscFile, "ErEs Sh %i PixKind %i AngU %i AngV %i Dir %i : %f\n", i_shape, i_pk, i_angleU, i_angleV, i_axis,
-                        TCorrection_ErrorEstimationMap[i][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)]);
-              //            if (TCorrection_Bias[i_shape][i_pk][i_axis][i_angleU][i_angleV] != 0)
-              //              fprintf(AscFile,"Bias Sh %i PixKind %i AngU %i AngV %i Dir %i : %f\n",i_shape,i_pk,i_angleU,i_angleV,i_axis,TCorrection_Bias[i_shape][i_pk][i_axis][i_angleU][i_angleV]);
-              //            if (TCorrection_ErrorEstimation[i_shape][i_pk][i_axis][i_angleU][i_angleV] != 1)
-              //              fprintf(AscFile,"ErEs Sh %i PixKind %i AngU %i AngV %i Dir %i : %f\n",i_shape,i_pk,i_angleU,i_angleV,i_axis,TCorrection_ErrorEstimation[i_shape][i_pk][i_axis][i_angleU][i_angleV]);
+              if (i > 0) {
+                if (i == i_pk - 4 + 1) {
+                  fprintf(AscFile, " case %i : %7.2f +- %7.2f ,", i,
+                          TCorrection_BiasMap[i][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] / Unit::um,
+                          TCorrection_BiasMapErr[i][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] / Unit::um);
+                } else if (i == i_pk + 1) {
+                  fprintf(AscFile, " case %i : %7.2f +- %7.2f ,", i,
+                          TCorrection_BiasMap[i][make_tuple(i_shape, i_pk + 4, i_axis, i_angleU, i_angleV)] / Unit::um,
+                          TCorrection_BiasMapErr[i][make_tuple(i_shape, i_pk + 4, i_axis, i_angleU, i_angleV)] / Unit::um);
+                }
+              }
+              //}
             }
-  }
+            fprintf(AscFile, "\n");
+            fprintf(AscFile, "                                      : ErEs");
+            for (int i = 0; i < 5; i++) {
+              if (i == 0) {
+                fprintf(AscFile, " case %i : %7.2f            ,", i,
+                        TCorrection_ErrorEstimationMap[i][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)]);
+              }
+              if (i > 0) {
+                if (i == i_pk - 4 + 1) {
+                  fprintf(AscFile, " case %i : %7.2f            ,", i,
+                          TCorrection_ErrorEstimationMap[i][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)]);
+                } else if (i == i_pk + 1) {
+                  fprintf(AscFile, " case %i : %7.2f            ,", i,
+                          TCorrection_ErrorEstimationMap[i][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)]);
+                }
+              }
+            }
+            fprintf(AscFile, "\n");
+          }  // dimension (axis U, V)
+        }  // angle V
+      }  // angle U
+    }  // pixel kind
+  }  // shape
   fclose(AscFile);
 
   for (int i_shape = 0; i_shape < m_shapes; i_shape++)
@@ -363,13 +411,15 @@ void pxdApplyClusterShapeCorrectionModule::initialize()
       if (i_UseCor == 1) UseCorrs = Form("AfterCors");
       for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++) {  // Pixel Kind
         DirPixelKind = Form("PixelKind_%01i_Layer_%i_Sensor_%i_Size_%i", i_pk, (int)((i_pk % 4) / 2) + 1, (int)(i_pk / 4) + 1, i_pk % 2);
-        fExpertHistograms->mkdir(DirPixelKind.Data());
+        if (i_UseCor == 0)
+          fExpertHistograms->mkdir(DirPixelKind.Data());
         for (int i_shape = 0; i_shape < m_shapes; i_shape++) {  // shapes
           DirShape = Form("%s/Shape_%02i_%s", DirPixelKind.Data(), i_shape + 1,
                           Belle2::PXD::PXDClusterShape::pxdClusterShapeDescription[(Belle2::PXD::pxdClusterShapeType)(i_shape + 1)].c_str());
           DirShape.ReplaceAll(":", "");
           DirShape.ReplaceAll(" ", "_");
-          fExpertHistograms->mkdir(DirShape.Data());
+          if (i_UseCor == 0)
+            fExpertHistograms->mkdir(DirShape.Data());
           fExpertHistograms->cd(DirShape.Data());
           TString HistoName = Form("%sResidualsU_PK%01i_Sh%02i", UseCorrs.Data(), i_pk, i_shape + 1);
           TString HistoTitle = Form("%sResiduals U, pixel kind %01i, shape %02i", UseCorrs.Data(), i_pk, i_shape + 1);
@@ -469,7 +519,6 @@ void pxdApplyClusterShapeCorrectionModule::event()
   //Obtain all StoreArrays
   //const StoreArray<PXDCluster> storeClusters;
   if (m_ExistCorrectionBasic == 0) return;
-  //B2INFO("--------------------------------> exist correction file Basic: " << m_CalFileBasicName.c_str());
   StoreArray<genfit::Track> tracks(m_storeTrackName);
   VxdID sensorID(0);
 
@@ -525,12 +574,14 @@ void pxdApplyClusterShapeCorrectionModule::event()
         if (i_sensor == 2) i_pixelKind += 4;
 
         if (m_closeEdge  == 0) {
+          NClusters++;
           if (m_DoExpertHistograms) {
             float ResU = f_TrackU - cluster->getU();
             float ResV = f_TrackV - cluster->getV();
-            B2INFO("--------------------------------> before: " << cluster->getU() << ", ResU " << ResU << ", ResV " << ResV << ", ind1 " <<
-                   0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape <<
-                   ", ind2 " << 0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes);
+            B2DEBUG(130, "--------------------------------> before: " << cluster->getU() << ", ResU " << ResU << ", ResV " << ResV << ", ind1 "
+                    <<
+                    0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape <<
+                    ", ind2 " << 0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes);
             m_histResidualU[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um);
             m_histResidualV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResV / Unit::um);
             m_histResidualUV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um, ResV / Unit::um);
@@ -549,9 +600,9 @@ void pxdApplyClusterShapeCorrectionModule::event()
           }
           for (int i_axis = 0; i_axis < m_dimensions; i_axis++) {
             if (TCorrection_BiasMap[0][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)] != 0.0) {
-              TString text;
-              text = Form("Bias Sh %i PixKind %i AngU %i AngV %i Dir %i : %f\n", i_shape, i_pixelKind, iIndexPhi, iIndexTheta, i_axis,
-                          TCorrection_BiasMap[0][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)]);
+              // TString text;
+              // text = Form("Bias Sh %i PixKind %i AngU %i AngV %i Dir %i : %f\n", i_shape, i_pixelKind, iIndexPhi, iIndexTheta, i_axis,
+              //             TCorrection_BiasMap[0][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)]);
               if (i_axis == 0) {
                 float u = cluster->getU() - TCorrection_BiasMap[0][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
                 cluster->setU(u);
@@ -575,9 +626,10 @@ void pxdApplyClusterShapeCorrectionModule::event()
           if (m_DoExpertHistograms) {
             float ResU = f_TrackU - cluster->getU();
             float ResV = f_TrackV - cluster->getV();
-            B2INFO("--------------------------------> After: " << cluster->getU() << ", ResU " << ResU << ", ResV " << ResV << ", ind1 " <<
-                   1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape <<
-                   ", ind2 " << 1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes);
+            B2DEBUG(130, "--------------------------------> After: " << cluster->getU() << ", ResU " << ResU << ", ResV " << ResV << ", ind1 "
+                    <<
+                    1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape <<
+                    ", ind2 " << 1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes);
             m_histResidualU[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um);
             m_histResidualV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResV / Unit::um);
             m_histResidualUV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um, ResV / Unit::um);
@@ -604,9 +656,86 @@ void pxdApplyClusterShapeCorrectionModule::event()
 void pxdApplyClusterShapeCorrectionModule::terminate()
 {
   if (m_DoExpertHistograms) {
+
+    // ******************* Show some statistcs and save to asci file: ********************************
+    TString TextSh;
+    TextSh = Form("CorrectionsApplyingStatistics.log");
+    FILE* AscFile = fopen(TextSh.Data(), "w");
+
+    TextSh = Form("*******************************************************************");
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+    TextSh = Form("**");
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+    TextSh = Form("**            Using Clusters: %i", NClusters);
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+
+
+
+    TextSh = Form("**");
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+    TextSh = Form("*******************************************************************");
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+    TextSh = Form("**          Mean and RMS for Pixel Kinds in Shapes");
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+    TextSh = Form("**");
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+    //if (i_UseCor == 0) UseCorrs = Form("BeforeCors");
+    //if (i_UseCor == 1) UseCorrs = Form("AfterCors");
+    TString UseCorrs;
+    for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++) {
+      TextSh = Form("**  Pixel Kind %i (Layer %i, Sensor %i, Size %i)", i_pk, (int)((i_pk % 4) / 2) + 1, (int)(i_pk / 4) + 1, i_pk % 2);
+      B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+      for (int i_shape = 0; i_shape < m_shapes + 1; i_shape++) {
+        TextSh = Form("**   %s ShapeID %02i: events %7i  (%6.2f %%) (%s)",
+                      m_histResidualU[0 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetName(),
+                      i_shape + 1,
+                      (int)m_histResidualU[0 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetEntries(),
+                      (float)m_histResidualU[0 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetEntries() / NClusters,
+                      Belle2::PXD::PXDClusterShape::pxdClusterShapeDescription[(Belle2::PXD::pxdClusterShapeType)(i_shape + 1)].c_str());
+        B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+        if ((int)m_histResidualU[0 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetEntries() > 1) {
+          TextSh = Form("**       RMS Before: U  %5.2f , V %5.2f , After: U %5.2f , V %5.2f",
+                        m_histNormErrorU[0 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetRMS(),
+                        m_histNormErrorV[0 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetRMS(),
+                        m_histNormErrorU[1 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetRMS(),
+                        m_histNormErrorV[1 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetRMS());
+        } else {
+          TextSh = Form("**       RMS Before: U  %5.2f , V %5.2f , After: U %5.2f , V %5.2f",
+                        0.0, 0.0, 0.0, 0.0);
+        }
+        B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+        if ((int)m_histResidualU[0 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetEntries() > 1) {
+          TextSh = Form("**       Bias Before: U %5.2f +- %5.2f um, V %5.2f +- %5.2f um, After: U %5.2f +- %5.2f um, V %5.2f +- %5.2f um",
+                        m_histResidualU[0 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetMean(),
+                        m_histResidualU[0 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetRMS(),
+                        m_histResidualV[0 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetMean(),
+                        m_histResidualV[0 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetRMS(),
+                        m_histResidualU[1 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetMean(),
+                        m_histResidualU[1 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetRMS(),
+                        m_histResidualV[1 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetMean(),
+                        m_histResidualV[1 * (m_pixelkinds * m_shapes + 1) + i_pk * m_shapes + i_shape]->GetRMS());
+        } else {
+          TextSh = Form("**       Bias Before: U %5.2f +- %5.2f um, V %5.2f +- %5.2f um, After: U %5.2f +- %5.2f um, V %5.2f +- %5.2f um",
+                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        }
+        B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+        TextSh = Form("**");
+        B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+      }
+      TextSh = Form("**");
+      B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+    }
+    TextSh = Form("**");
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+    TextSh = Form("*******************************************************************");
+    B2INFO(TextSh.Data()); fprintf(AscFile, "%s\n", TextSh.Data());
+    fclose(AscFile);
+    // ******************* END show some statistcs and save to asci file: ********************************
+
     fExpertHistograms->Write();
     fExpertHistograms->Close();
-
   }
 }
 

@@ -91,6 +91,9 @@ namespace Belle2 {
       TH1F** m_histNormErrorV = NULL;
       TH2F** m_histNormErrorUV = NULL;
 
+      /** Processed Number od clusters */
+      int NClusters = 0;
+
       /** To use track information (default) or simulations, default=True */
       Bool_t m_UseTracks = kTRUE;
 

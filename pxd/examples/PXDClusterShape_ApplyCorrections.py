@@ -69,23 +69,12 @@ PixelKindCal = 0
 outputFileName = 'pxdClShCalApply_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
 outputFileName = outputFileName + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKindCal) + '.root'
 
-inputCalFileName = 'pxdClShCalSrc_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
-inputCalFileName = inputCalFileName + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKindCal) + '.root'
 inputCalFileName = "pxdClShCal_RealData0_Track1_Calib1_Pixel0.root"
 
-inputCalFileNamePK0 = 'pxdClShCalSrc_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
-inputCalFileNamePK0 = inputCalFileNamePK0 + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKindCal) + '.root'
-inputCalFileNamePK1 = 'pxdClShCalSrc_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
-inputCalFileNamePK1 = inputCalFileNamePK1 + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKindCal) + '.root'
-inputCalFileNamePK2 = 'pxdClShCalSrc_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
-inputCalFileNamePK2 = inputCalFileNamePK2 + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKindCal) + '.root'
-inputCalFileNamePK3 = 'pxdClShCalSrc_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
-inputCalFileNamePK3 = inputCalFileNamePK3 + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKindCal) + '.root'
-
-inputCalFileNamePK0 = "pxdClShCal_RealData0_Track1_Calib1_Pixel0.root"
-inputCalFileNamePK1 = "pxdClShCal_RealData0_Track1_Calib1_Pixel0.root"
-inputCalFileNamePK2 = "pxdClShCal_RealData0_Track1_Calib1_Pixel0.root"
-inputCalFileNamePK3 = "pxdClShCal_RealData0_Track1_Calib1_Pixel0.root"
+inputCalFileNamePK0 = "pxdClShCal_RealData0_Track0_Calib2_Pixel0.root"
+inputCalFileNamePK1 = "pxdClShCal_RealData0_Track0_Calib2_Pixel1.root"
+inputCalFileNamePK2 = "pxdClShCal_RealData0_Track0_Calib2_Pixel2.root"
+inputCalFileNamePK3 = "pxdClShCal_RealData0_Track0_Calib2_Pixel3.root"
 
 # Register modules
 

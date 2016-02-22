@@ -69,7 +69,8 @@ PixelKindCal = 0
 outputFileName = 'pxdClShCalApply_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
 outputFileName = outputFileName + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKindCal) + '.root'
 
-inputCalFileName = "pxdClShCal_RealData0_Track1_Calib1_Pixel0.root"
+# inputCalFileName = "pxdClShCal_RealData0_Track1_Calib1_Pixel0.root"
+inputCalFileName = "pxdClShCal_RealData0_Track0_Calib1_Pixel0.root"
 
 inputCalFileNamePK0 = "pxdClShCal_RealData0_Track0_Calib2_Pixel0.root"
 inputCalFileNamePK1 = "pxdClShCal_RealData0_Track0_Calib2_Pixel1.root"

@@ -301,9 +301,9 @@ void pxdApplyClusterShapeCorrectionModule::initialize()
               continue;
             }
             if ((fabs(TCorrection_BiasMap[0][make_tuple(i_shape, i_pk, i_axis, i_angleU,
-                                                        i_angleV)] - TCorrection_BiasMap[i_pk + 1][make_tuple(i_shape, i_pk + 4, i_axis, i_angleU, i_angleV)]) < .0003) ||
+                                                        i_angleV)] - TCorrection_BiasMap[i_pk + 1][make_tuple(i_shape, i_pk + 4, i_axis, i_angleU, i_angleV)]) > .0003) ||
                 (fabs(TCorrection_BiasMap[0][make_tuple(i_shape, i_pk + 4, i_axis, i_angleU,
-                                                        i_angleV)] - TCorrection_BiasMap[i_pk + 1][make_tuple(i_shape, i_pk + 4, i_axis, i_angleU, i_angleV)]) < .0003)) {
+                                                        i_angleV)] - TCorrection_BiasMap[i_pk + 1][make_tuple(i_shape, i_pk + 4, i_axis, i_angleU, i_angleV)]) > .0003)) {
               continue;
             }
             fprintf(AscFile, "PixKind %1i Sh %2i AngU %2i AngV %2i Dir %1i : Bias", i_pk, i_shape, i_angleU, i_angleV, i_axis);

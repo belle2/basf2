@@ -5,7 +5,6 @@ from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from reconstruction import add_mdst_output
-from beamparameters import add_beamparameters
 import glob
 from ROOT import Belle2
 
@@ -30,9 +29,6 @@ eventinfosetter.param('evtNumList', [100])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)
-
-# beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
 
 # Event generator (B0 -> K+pi- + cc, other B0 generic)
 evtgeninput = register_module('EvtGenInput')

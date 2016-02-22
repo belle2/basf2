@@ -12,7 +12,6 @@
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-from beamparameters import add_beamparameters
 from ROOT import Belle2
 import glob
 
@@ -26,9 +25,6 @@ eventinfosetter.param('evtNumList', [1000])
 eventinfosetter.param('runList', [2])
 eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)
-
-# beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
 
 # generate events (B0 -> K+pi- + cc, other B0 generic)
 evtgeninput = register_module('EvtGenInput')

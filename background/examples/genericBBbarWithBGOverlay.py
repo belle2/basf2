@@ -5,7 +5,6 @@ from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from reconstruction import add_mdst_output
-from beamparameters import add_beamparameters
 import glob
 import sys
 
@@ -39,9 +38,6 @@ main.add_module(eventinfosetter)
 bginput = register_module('BGOverlayInput')
 bginput.param('inputFileNames', [bg])
 main.add_module(bginput)
-
-# beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
 
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')

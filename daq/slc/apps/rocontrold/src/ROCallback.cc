@@ -102,7 +102,7 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
       m_node.insert(std::make_pair(nodename, NSMNode(nodename)));
     }
     for (size_t i = 0; i < m_stream0.size(); i++) {
-      std::string vname = stream0[i].getText("name");
+      std::string vname = stream0[i].hasText("name") ? stream0[i].getText("name") : stream0[i].getText("host");
       m_stream0[i].init(this, i + 2, vname, obj);
       vname = StringUtil::toupper(vname);
       add(new NSMVHandlerCOPPERState(m_node[vname], *this, "rcstate"));

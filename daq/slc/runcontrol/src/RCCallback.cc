@@ -212,7 +212,7 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
   return true;
 }
 
-void RCCallback::timeout(NSMCommunicator& com) throw()
+void RCCallback::timeout(NSMCommunicator& /*com*/) throw()
 {
   try {
     monitor();

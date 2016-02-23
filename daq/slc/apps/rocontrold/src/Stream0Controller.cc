@@ -26,7 +26,7 @@ bool Stream0Controller::loadArguments(const DBObject& obj)
     return false;
   }
   int port = cobj.getInt("port");
-  std::string nodename = StringUtil::tolower(cobj.getText("name"));
+  std::string nodename = StringUtil::tolower(cobj.hasText("name") ? cobj.getText("name") : cobj.getText("host"));
   m_host = StringUtil::tolower(cobj.getText("host"));
   std::string script = cobj.getText("script");
   try {

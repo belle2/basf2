@@ -1,5 +1,7 @@
 #include "daq/slc/readout/IOInfo.h"
 
+#include "daq/slc/system/LogFile.h"
+
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
@@ -34,42 +36,7 @@ int IOInfo::checkTCP(std::vector<IOInfo>& info)
   std::string line;
   std::stringstream ss;
   std::string sl, local_address, rem_address, st, queue;
-  std::ifstream fin("/proc/net/tcp6");
-  getline(fin, line);
-  while (fin && getline(fin, line)) {
-    ss.str("");
-    ss << line;
-    ss >> sl >> local_address >> rem_address >> st >> queue;
-    unsigned int addr = strtoul(local_address.substr(24, 8).c_str(), NULL, 16);
-    int port = strtoul(local_address.substr(24 + 9).c_str(), NULL, 16);
-    unsigned int raddr = strtoul(rem_address.substr(24, 8).c_str(), NULL, 16);
-    int rport = strtoul(rem_address.substr(24 + 9).c_str(), NULL, 16);
-    for (size_t i = 0; i < info.size(); i++) {
-      if (info[i].getState() > 0) continue;
-      int sti = strtoul(st.substr(0).c_str(), NULL, 16);
-      if (addr == info[i].getLocalAddress() &&
-          port == info[i].getLocalPort() && sti == 1) {
-        info[i].setRemoteAddress(raddr);
-        info[i].setRemotePort(rport);
-        info[i].setState(sti);
-        info[i].setTXQueue(strtoul(queue.substr(0, 8).c_str(), NULL, 16));
-        info[i].setRXQueue(strtoul(queue.substr(9).c_str(), NULL, 16));
-        count++;
-      } else if (raddr == info[i].getRemoteAddress() &&
-                 rport == info[i].getRemotePort() && sti == 1) {
-        info[i].setLocalAddress(addr);
-        info[i].setLocalPort(port);
-        info[i].setState(sti);
-        info[i].setTXQueue(strtoul(queue.substr(0, 8).c_str(), NULL, 16));
-        info[i].setRXQueue(strtoul(queue.substr(9).c_str(), NULL, 16));
-        count++;
-      }
-      if (count == info.size()) return count;
-    }
-  }
-  fin.close();
-
-  fin.open("/proc/net/tcp");
+  std::ifstream fin("/proc/net/tcp");
   getline(fin, line);
   while (fin && getline(fin, line)) {
     ss.str("");
@@ -82,8 +49,8 @@ int IOInfo::checkTCP(std::vector<IOInfo>& info)
     for (size_t i = 0; i < info.size(); i++) {
       if (info[i].getState() > 0) continue;
       int sti = strtoul(st.substr(0).c_str(), NULL, 16);
-      if (addr == info[i].getLocalAddress() &&
-          port == info[i].getLocalPort() && sti == 1) {
+      if (//addr == info[i].getLocalAddress() &&
+        port == info[i].getLocalPort() && sti == 1) {
         info[i].setRemoteAddress(raddr);
         info[i].setRemotePort(rport);
         info[i].setState(sti);

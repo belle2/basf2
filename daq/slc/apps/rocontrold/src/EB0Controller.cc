@@ -49,15 +49,15 @@ bool EB0Controller::loadArguments(const DBObject& obj)
   for (int i = 0; i < nsenders; i++) {
     const DBObject& o_stream0(obj("stream0", i));
     const int port = o_stream0.getInt("port");
-    const std::string host = StringUtil::tolower(o_stream0.getText("name"));
+    const std::string nodename = o_stream0.hasText("name") ? o_stream0.getText("name") : o_stream0.getText("host");
     int used = 0;
     try {
-      m_callback->get(m_callback->getRC(), host + ".used", used);
+      m_callback->get(m_callback->getRC(), nodename + ".used", used);
     } catch (const std::exception& e) {
-      m_callback->log(LogFile::ERROR, "error on reading %s.used %s", host.c_str(), e.what());
+      m_callback->log(LogFile::ERROR, "error on reading %s.used %s", nodename.c_str(), e.what());
     }
     if (used) {
-      m_con.addArgument("%s:%d", (stream0_used ? "localhost" : host.c_str()), port);
+      m_con.addArgument("%s:%d", (stream0_used ? "localhost" : nodename.c_str()), port);
     }
   }
   return true;

@@ -51,7 +51,11 @@ bool EB0Controller::loadArguments(const DBObject& obj)
     const int port = o_stream0.getInt("port");
     const std::string host = StringUtil::tolower(o_stream0.getText("name"));
     int used = 0;
-    m_callback->get(m_callback->getRC(), host + ".used", used);
+    try {
+      m_callback->get(m_callback->getRC(), host + ".used", used);
+    } catch (const std::exception& e) {
+      m_callback->log(LogFile::ERROR, "error on reading %s.used %s", host.c_str(), e.what());
+    }
     if (used) {
       m_con.addArgument("%s:%d", (stream0_used ? "localhost" : host.c_str()), port);
     }

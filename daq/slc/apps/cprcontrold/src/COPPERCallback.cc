@@ -82,7 +82,8 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
     add(new NSMVHandlerFifoEmpty(*this, "copper.err.fifoempty"));
     add(new NSMVHandlerFifoFull(*this, "copper.err.fifofull"));
     add(new NSMVHandlerLengthFifoFull(*this, "copper.err.lengthfifofull"));
-    add(new NSMVHandlerTTRXBelle2LinkError(*this, "ttrx.err.b2linkerr"));
+    add(new NSMVHandlerInt("ttrx.err.b2link", true, false, 0));
+    add(new NSMVHandlerInt("ttrx.err.linkup", true, false, 0));
     const DBObject& o_ttrx(obj("ttrx"));
     add(new NSMVHandlerTTRXFirmware(*this, "ttrx.firm", 0,
                                     o_ttrx.hasText("firm") ? o_ttrx.getText("firm") : ""));
@@ -94,11 +95,12 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       hslb.open(i);
       m_fee[i]->init(*this, hslb);
       std::string vname = StringUtil::form("hslb[%d]", i);
-      add(new NSMVHandlerHSLBBelle2LinkDown(*this, vname + ".err.b2linkdown", i));
-      add(new NSMVHandlerHSLBCOPPERFifoFull(*this, vname + ".err.cprfifofull", i));
-      add(new NSMVHandlerHSLBCOPPERLengthFifoFull(*this, vname + ".err.cprlengthfifofull", i));
-      add(new NSMVHandlerHSLBFifoFull(*this, vname + ".err.fifofull", i));
-      add(new NSMVHandlerHSLBCRCError(*this, vname + ".err.crc", i));
+      add(new NSMVHandlerInt(vname + ".err.fifoempty", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".err.b2linkdown", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".err.cprfifofull", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".err.cprlengthfifofull", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".err.fifofull", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".err.crc", true, false, 0));
       add(new NSMVHandlerHSLBFirmware(*this, vname + ".firm", i,
                                       o_hslb.hasText("firm") ? o_hslb.getText("firm") : ""));
       add(new NSMVHandlerHSLBBoot(*this, vname + ".boot", i, "off"));
@@ -150,18 +152,17 @@ void COPPERCallback::boot(const DBObject& obj) throw(RCHandlerException)
       for (int i = 0; i < 4; i++) {
         const DBObject& o_hslb(obj("hslb", i));
         if (o_hslb.getBool("used") && m_fee[i] != NULL  && obj.hasObject("fee")) {
-          HSLB& hslb(m_hslb[i]);
-          hslb.open(i);
-          try {
-            std::string vname = StringUtil::form("hslb[%d].firm", i);
-            std::string firmware;
-            get(vname, firmware);
-            hslb.boot(firmware);
-            //const DBObject& o_fee(obj("fee", i));
-            //FEE& fee(*m_fee[i]);
-            //fee.boot(hslb, o_fee);
-          } catch (const IOException& e) {
-            throw (RCHandlerException(e.what()));
+          const DBObject& o_fee(obj("fee", i));
+          if (!(o_hslb.hasValue("dummyhslb") && o_hslb.getBool("dummyhslb"))) {
+            HSLB& hslb(m_hslb[i]);
+            hslb.open(i);
+            FEE& fee(*m_fee[i]);
+            try {
+              fee.boot(hslb, o_fee);
+            } catch (const IOException& e) {
+              throw (RCHandlerException(e.what()));
+            }
+          } else {
           }
         }
       }
@@ -290,9 +291,11 @@ void COPPERCallback::logging(bool err, LogFile::Priority pri,
 
 void COPPERCallback::monitor() throw(RCHandlerException)
 {
-  if (!m_dummymode) {
-    try {
-      RCState state = getNode().getState();
+  RCState state = getNode().getState();
+  try {
+    int dummymode = 0;
+    get("dummymode", dummymode);
+    if (!dummymode) {
       try {
         m_ttrx.monitor();
       } catch (const IOException& e) {
@@ -303,12 +306,10 @@ void COPPERCallback::monitor() throw(RCHandlerException)
       } catch (const IOException& e) {
         return;
       }
-      int dummymode = 0;
-      get("dummymode", dummymode);
-      if (!dummymode && state == RCState::RUNNING_S && state.isStable()) {
-        logging(m_copper.isFifoEmpty(), LogFile::NOTICE, "COPPER FIFO empty");
+      if (state == RCState::RUNNING_S && state.isStable()) {
         logging(m_copper.isFifoFull(), LogFile::WARNING, "COPPER FIFO full");
         logging(m_copper.isLengthFifoFull(), LogFile::WARNING, "COPPER length FIFO full");
+        set("copper.err.fifoempty", m_copper.isFifoEmpty());
         for (int i = 0; i < 4; i++) {
           if (!m_fee[i]) continue;
           int used = 0;
@@ -326,15 +327,23 @@ void COPPERCallback::monitor() throw(RCHandlerException)
             logging(hslb.isCRCError(), LogFile::WARNING, "HSLB %c CRC error", (char)(i + 'a'));
             FEE& fee(*m_fee[i]);
             fee.monitor(*this, hslb);
+            std::string vname = StringUtil::form("hslb[%d]", i);
+            set(vname + ".err.b2linkdown", hslb.isBelle2LinkDown());
+            set(vname + ".err.cprfifofull", hslb.isCOPPERFifoFull());
+            set(vname + ".err.cprlengthfifofull", hslb.isCOPPERLengthFifoFull());
+            set(vname + ".err.fifofull", hslb.isFifoFull());
+            set(vname + ".err.crc", hslb.isCRCError());
           }
         }
-        logging(m_ttrx.isBelle2LinkError(), LogFile::ERROR, "TTRX Belle2 link error");
-        logging(m_ttrx.isLinkUpError(), LogFile::ERROR, "TTRX Link up error");
+        logging(m_ttrx.isBelle2LinkError(), LogFile::WARNING, "TTRX Belle2 link error");
+        logging(m_ttrx.isLinkUpError(), LogFile::WARNING, "TTRX Link up error");
+        set("ttrx.err.b2link", m_ttrx.isBelle2LinkError());
+        set("ttrx.err.linkup", m_ttrx.isLinkUpError());
       }
       NSMData& data(getData());
       if (data.isAvailable()) {
         ronode_status* nsm = (ronode_status*)data.get();
-        if (m_flow.isAvailable()/* && m_con.isAlive()*/) {
+        if (m_flow.isAvailable()) {
           ronode_status& status(m_flow.monitor());
           memcpy(nsm, &status, sizeof(ronode_status));
         } else {
@@ -348,13 +357,11 @@ void COPPERCallback::monitor() throw(RCHandlerException)
         }
         data.flush();
       }
-    } catch (const std::exception& e) {
-
     }
+  } catch (const std::exception& e) {
+
   }
-  if (getNode().getState() == RCState::RUNNING_S ||
-      getNode().getState() == RCState::READY_S ||
-      getNode().getState() == RCState::PAUSED_S) {
+  if (getNode().getState() == RCState::RUNNING_S) {
     if (!m_con.isAlive()) {
       setState(RCState::ERROR_ES);
       log(LogFile::ERROR, "basf2 was down");
@@ -375,12 +382,11 @@ void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)
     m_con.clearArguments();
     m_con.setExecutable("basf2");
     script = obj.getObject("basf2").getText("script");
-    m_con.addArgument("%s/%s", getenv("BELLE2_LOCAL_DIR"),
-                      script.c_str());
+    m_con.addArgument("%s/%s", getenv("BELLE2_LOCAL_DIR"), script.c_str());
     m_con.addArgument(obj.getText("hostname"));
     std::string copperid_s = obj.getText("copperid");
     int id = atoi(copperid_s.substr(3).c_str());
-    int copperid = id % 1000;//atoi(copperid_s.substr(4).c_str());
+    int copperid = id % 1000;
     int detectorid = id / 1000;
     char str[64];
     sprintf(str, "0x%d000000", detectorid);
@@ -413,3 +419,4 @@ bool COPPERCallback::isError() throw()
     return true;
   return false;
 }
+

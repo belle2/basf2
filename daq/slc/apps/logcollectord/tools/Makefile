@@ -8,7 +8,7 @@ INCDIR  = $(BELLE2_DAQ_SLC)/include
 TMPDIR  = $(BELLE2_DAQ_SLC)/tmp
 LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 
-LIBS    += -lm -lpthread -ldl -lrt -lreadline
+LIBS    += -lm -lpthread -ldl -lrt #-lreadline
 LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system \
 -ldaq_slc_database -ldaq_slc_nsm -ldaq_slc_runcontrol \
 -ldaq_slc_apps_logcollectord

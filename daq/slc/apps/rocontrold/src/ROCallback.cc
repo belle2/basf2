@@ -158,7 +158,6 @@ void ROCallback::start(int /*expno*/, int /*runno*/) throw(RCHandlerException)
     throw (RCHandlerException("Faield to start stream1"));
   }
   */
-  //m_eb1tx.start(expno, runno);
 }
 
 bool ROCallback::pause() throw(RCHandlerException)

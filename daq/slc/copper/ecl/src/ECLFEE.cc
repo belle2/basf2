@@ -49,12 +49,13 @@ void ECLFEE::boot(HSLB& hslb,  const DBObject& obj)
     throw (IOException("Inconsitent FWVER (%d!=%d)",
                        ver, HSLB_FIRMWARE_VERSION));
   }
-  */
   hslb.writefee8(0x30, 0x00);
+  */
 }
 
 void ECLFEE::load(HSLB& hslb, const DBObject& obj)
 {
+  /*
   if (obj.hasValue("shaper_mask_low")) {
     hslb.writefee8(0x20, obj.getInt("shaper_mask_low"));       // SHAPER_MASK_LOW
     hslb.writefee8(0x21, obj.getInt("shaper_mask_high"));      // SHAPER_MASK_HIGH
@@ -132,6 +133,7 @@ void ECLFEE::load(HSLB& hslb, const DBObject& obj)
 
   printf("%x\n", hslb.readfee8(0x30));
   printf("%x\n", hslb.readfee8(0x30));
+  */
 }
 
 extern "C" {

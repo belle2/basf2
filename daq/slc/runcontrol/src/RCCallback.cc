@@ -62,6 +62,7 @@ RCCallback::RCCallback(int timeout) throw()
   reg(RCCommand::RESUME);
   reg(RCCommand::PAUSE);
   reg(RCCommand::ABORT);
+  reg(NSMCommand::FATAL);
   m_auto = true;
   m_db = NULL;
   m_showall = true;
@@ -121,12 +122,15 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
   NSMMessage msg(com.getMessage());
   const RCCommand cmd = msg.getRequestName();
   RCState state(getNode().getState());
+  /*
   if (cmd == NSMCommand::VSET &&
       (state != RCState::OFF_S && state != RCState::UNKNOWN &&
-       state != RCState::RECOVERING_RS && state != RCState::ABORTING_RS &&
-       state != RCState::NOTREADY_S && state != RCState::READY_S)) {
+       state != RCState::ERROR_ES && state != RCState::RECOVERING_RS &&
+       state != RCState::ABORTING_RS && state != RCState::NOTREADY_S &&
+       state != RCState::READY_S)) {
     return false;
   }
+  */
   if (NSMCallback::perform(com)) return true;
   if (cmd.isAvailable(state) ==  NSMCommand::DISABLED) {
     return false;

@@ -173,8 +173,13 @@ if argsVar["test_check"] is False:
         print("Compiling revision ...")
         exitCode = os.system("scons -j8")
         print("Exit code of compile was " + str(exitCode))
-        if exitCode > 0 and argsVar["report_compile_fail"]:
-            sys.exit(125)  # tell git to ignore this failed build
+        if exitCode > 0:
+            if argsVar["report_compile_fail"]:
+                # mark this as a bad revision
+                sys.exit(1)
+            else:
+                # tell git to ignore this failed build
+                sys.exit(125)
 
     # execute validation script
     if argsVar["script"] is None:

@@ -26,7 +26,7 @@ namespace Belle2 {
      * Constructor for intra run depenent conditions.
      * @param object   the first valid object in the run.
      */
-    IntraRunDependency(TObject* object = 0) {if (object) m_objects.Add(object);};
+    explicit IntraRunDependency(TObject* object = 0) {if (object) m_objects.Add(object);};
 
     /**
      * Destructor.

@@ -90,7 +90,7 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::tryDefault(const std::string& 
 
   std::string defaultName = payloadFileName(m_payloadDir, package, module, 0);
   if (FileSystem::fileExists(defaultName)) {
-    result.first = readPayload(defaultName, module.c_str());
+    result.first = readPayload(defaultName, module);
     if (!result.first) return result;
     result.second = IntervalOfValidity(0, -1, -1, -1);
     return result;
@@ -116,7 +116,7 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& e
   for (auto& entry : boost::adaptors::reverse(moduleEntry->second)) {
     if (entry.second.contains(event)) {
       int revision = entry.first;
-      result.first = readPayload(payloadFileName(m_payloadDir, package, module, revision), module.c_str());
+      result.first = readPayload(payloadFileName(m_payloadDir, package, module, revision), module);
       if (!result.first) return result;
       result.second = entry.second;
       return result;

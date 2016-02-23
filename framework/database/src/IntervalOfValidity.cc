@@ -151,11 +151,10 @@ namespace Belle2 {
     iov = IntervalOfValidity();
     if (input.eof()) return input;
 
-    char c;
     std::string str[4];
     int index = 0;
     while (!input.eof()) {
-      c = input.get();
+      char c = input.get();
       if ((index == 0) && (c == ' ')) continue;
       if ((index == 3) && ((c == ' ') || (c == '\n'))) break;
       if (c == ',') {

@@ -26,7 +26,7 @@ namespace Belle2 {
      * Constructor for event depenent conditions.
      * @param object   the first valid object in the run.
      */
-    EventDependency(TObject* object = 0): IntraRunDependency(object) {};
+    explicit EventDependency(TObject* object = 0): IntraRunDependency(object) {};
 
     /**
      * Add an object to the intra run dependency.

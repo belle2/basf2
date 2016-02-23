@@ -32,7 +32,7 @@ namespace Belle2 {
      *
      * @param logConnection The log connection that actually prints the messages.
      */
-    LogConnectionFilter(LogConnectionBase* logConnection);
+    explicit LogConnectionFilter(LogConnectionBase* logConnection);
 
     /**
      * The LogConnectionFilter destructor.

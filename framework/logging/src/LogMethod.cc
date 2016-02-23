@@ -18,13 +18,9 @@ using namespace std;
 using namespace Belle2;
 
 
-LogMethod::LogMethod(const char* package, const string& function, const string& file, unsigned int line)
+LogMethod::LogMethod(const char* package, const string& function, const string& file, unsigned int line): m_package(package),
+  m_function(function), m_file(file), m_line(line)
 {
-  m_package = package;
-  m_function = function;
-  m_file = file;
-  m_line = line;
-
   //Send message for entering the method
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Info)) {
     string messageText = "--> Entering method '" + m_function + "'";

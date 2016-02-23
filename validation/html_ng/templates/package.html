@@ -19,7 +19,7 @@
 <!--iterate over plot files contained in this package -->
 		{{#plotfiles}}
 		<!-- This span prevents a newline btw. the status graphic and the name -->
-		<span style="white-space: nowrap">
+		<span class="package_root_file">
 		{{#if comparison_error > 0 }}
 		<span class="fail_count_greater_zero_rootfile" title="{{comparison_error}} comparisons failed" > {{comparison_error}} </span>
 		{{else}}

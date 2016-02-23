@@ -60,6 +60,13 @@
 	color: red;
 }
 
+.package_root_file {
+	white-space: nowrap;
+	overflow: hidden;
+	width: 100%;
+	display: inline-block;	
+}
+
 html, button, input, select, textarea {
 	color: #222;
 }

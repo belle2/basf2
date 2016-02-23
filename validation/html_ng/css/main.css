@@ -165,26 +165,62 @@ textarea {
 ;
 }
 }
-#content {
-	background: #FFF;
-	border: 1px solid gray;
-	border-radius: 4px;
-	/*box-sizing: border-box;*/
-	/*float: left;*/
-	margin-bottom: 20px;
-	/*margin-left: 220px;*/
-	padding: 10px 20px;
-	/* offset size of navigation bar here */
-	margin-left: 220px;
-	/*width: 722px;*/
+
+/* main page elements use flex-based layouting */
+
+/* setup flex reisze and 100% space used for all elements */
+#wrap, #content_scroll, #navigation_scroll {
+	flex : 1 100%;
 }
 
-#content .object_wrap img {
+/* enable flex for topmost wrap */
+#wrap {
+	display: flex;
+	flex-flow: row nowrap;
+}
+
+/* no resizing of the navigation scroll box */
+#navigation_scroll {
+	flex: 0 auto; 
+	order: 1;
+
+	/* shows scrollbar on y-axis, if required */
+    overflow-y:auto;
+    overflow-x:hidden;
+    
+    /* use all viewport space */
+	height:100vh;
+	/* fixed width for now */
+	width:280px;
+}
+
+#content_scroll {
+	flex: 1 0px;
+	order: 2;
+
+	/* shows scrollbar on y-axis, if required */
+    overflow-y:auto;
+    overflow-x:hidden;
+
+	/* use only the maximum height of the viewport */    
+	height:100vh;
+}
+
+/* two box containers for the actual items, share the same style */
+#content, #navigation {
+	margin: 8px;
+	padding: 8px;
+	background:white;
+	border: 1px solid gray;
+	border-radius: 4px;	
+}
+
+.object_wrap img {
 	min-width: 688px;
 	min-height: 491px;
 }
 
-#content .object_wrap:last-child {
+.object_wrap:last-child {
 	border: 0;
 }
 
@@ -295,15 +331,6 @@ textarea {
 	font-size: 120%;
 }
 
-#navigation {
-	/*box-sizing: border-box;*/
-	float: left;
-	margin-right: 20px;
-	/*position: fixed;*/
-	width: 200px !important;
-	height: 100%;
-	overflow-y: auto;
-}
 
 #navigation a {
 	color: black;
@@ -386,14 +413,7 @@ textarea {
 	width: 100%;
 }
 
-#wrap {
-	box-sizing: border-box;
-	margin: 30px;
-	/* this makes sure the content box never wraps around and is below the navigation box */
-    min-width: 1000px;
 
-	/*width: 920px;*/
-}
 
 .alert {
 	background-color: #fcf8e3;

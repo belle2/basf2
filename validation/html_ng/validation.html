@@ -16,6 +16,7 @@
 <body>
 	<div id='wrap'>
 
+		<div id='navigation_scroll'>
 		<div id='navigation'>
 			<div id='menu'>
 				<div>
@@ -46,7 +47,10 @@
 			</div>
 
 		</div>
+		</div>
+		<div id='content_scroll'>
 		<div id='content'>Loading ...</div>
+		</div>
 	</div>
 
 	<!-- external library code -->
@@ -58,7 +62,6 @@
 	<!-- all jquery related stuff -->
 	<script src="js/external/jquery-1.11.1.min.js" type="text/javascript"></script>
 	<script src="js/external/jquery-ui.min.js" type="text/javascript"></script>
-    <script src="js/external/jquery.sticky-kit.min.js" type="text/javascript"></script>
 	<script src="js/external/jquery.magnific-popup.min.js"></script>
 
 	<!-- own code -->
@@ -70,11 +73,7 @@
 
 	<script type="text/javascript">
 	$( document ).ready(function() {
-	    console.log("Document loaded, starting RestAPI calls");
-	    // setup sticky
-	    // ensure the navigation box is sticky
-	     $("#navigation").stick_in_parent( {offset_top : -30} );
-	            
+	    console.log("Document loaded, starting RestAPI calls");            
 		loadRevisions();
 	});
 	</script>

@@ -9,9 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/database/Database.h>
-#include <framework/database/IntervalOfValidity.h>
-
+#include <framework/database/DBImportBase.h>
 #include <TClonesArray.h>
 #include <stdexcept>
 
@@ -21,7 +19,7 @@ namespace Belle2 {
    * Class for importing array of objects to the database.
    * Note that the array is NOT parked at DBStore, but allocated internally.
    */
-  template<class T> class DBImportArray {
+  template<class T> class DBImportArray: public  DBImportBase {
   public:
 
     /** STL-like iterator over the T objects (not T* ). */
@@ -36,10 +34,9 @@ namespace Belle2 {
      */
     explicit DBImportArray(const std::string& module = "",
                            const std::string& package = "dbstore"):
-      m_module(DBStore::arrayName<T>(module)),
-      m_package(package)
+      DBImportBase(DBStore::arrayName<T>(module), package)
     {
-      m_array = new TClonesArray(T::Class());
+      m_object = new TClonesArray(T::Class());
     }
 
     /**
@@ -47,13 +44,16 @@ namespace Belle2 {
      */
     ~DBImportArray()
     {
-      delete m_array;
+      delete m_object;
     }
 
     /**
      * Return number of objects in the array.
      */
-    inline int getEntries() const { return m_array->GetEntriesFast();}
+    inline int getEntries() const
+    {
+      return static_cast<TClonesArray*>(m_object)->GetEntriesFast();
+    }
 
     /**
      * Construct a new T object at the end of the array.
@@ -89,7 +89,7 @@ namespace Belle2 {
      */
     inline T* operator [](int i) const
     {
-      TObject* obj = m_array->At(i);
+      TObject* obj = static_cast<TClonesArray*>(m_object)->At(i);
       if (obj == nullptr)
         throw std::out_of_range("Out-of-range access in DBImportArray::operator[], for "
                                 + m_package + "/" + m_module + ", index "
@@ -117,23 +117,8 @@ namespace Belle2 {
      */
     const_iterator end() const { return const_iterator(this, getEntries()); }
 
-    /**
-     * Import the array to database
-     * @param iov interval of validity
-     */
-    inline bool import(IntervalOfValidity& iov)
-    {
-      return Database::Instance().storeData(m_package, m_module, m_array, iov);
-    }
-
 
   private:
-
-    /**
-     * Hidden copy constructor.
-     * To prevent making copies, since the class contains pointer to allocated memory.
-     */
-    DBImportArray(const DBImportArray&);
 
     /**
      * Returns address of the next free position of the array.
@@ -141,12 +126,8 @@ namespace Belle2 {
      */
     inline T* nextFreeAdress()
     {
-      return static_cast<T*>(m_array->AddrAt(getEntries()));
+      return static_cast<T*>(static_cast<TClonesArray*>(m_object)->AddrAt(getEntries()));
     }
-
-    std::string m_module;      /**< array name in database */
-    std::string m_package;     /**< package name */
-    TClonesArray* m_array = 0; /**< pointer to allocated array */
 
   };
 }

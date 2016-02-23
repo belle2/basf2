@@ -9,50 +9,59 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/database/DBImportBase.h>
+#include <framework/database/Database.h>
+#include <framework/database/IntervalOfValidity.h>
 
 namespace Belle2 {
 
   /**
-   * Class for importing a single object to the database.
+   * Base class for importing objects to the database.
    * Note that the object is NOT parked at DBStore, but allocated internally.
    */
-  template<class T> class DBImportObjPtr: public DBImportBase {
+  class DBImportBase {
   public:
 
     /**
-     * Constructor:
-     * the object itself is not allocated here, but in construct(...) function.
+     * Constructor
      * @param module  Name under which the object will be stored in the database
      * @param package Package name
      */
-    explicit DBImportObjPtr(const std::string& module = "",
-                            const std::string& package = "dbstore"):
-      DBImportBase(DBStore::objectName<T>(module), package)
+    DBImportBase(const std::string& module, const std::string& package):
+      m_module(module),
+      m_package(package)
     {}
 
     /**
      * Destructor
      */
-    ~DBImportObjPtr()
-    {
-      if (m_object) delete m_object;
-    }
+    ~DBImportBase()
+    {}
+
 
     /**
-     * Construct an object of type T in this DBImportObjPtr
-     * using the provided constructor arguments.
+     * Import the object to database
+     * @param iov interval of validity
      */
-    template<class ...Args> void construct(Args&& ... params)
+    virtual bool import(IntervalOfValidity& iov)
     {
-      if (m_object) delete m_object;
-      m_object = new T(std::forward<Args>(params)...);
+      if (!m_object) return false;
+      return Database::Instance().storeData(m_package, m_module, m_object, iov);
     }
 
+
+  protected:
+
+    std::string m_module;      /**< object or array name in database */
+    std::string m_package;     /**< package name */
+    TObject* m_object = 0;     /**< pointer to allocated object or array */
+
+  private:
+
     /**
-     * Imitate pointer functionality.
+     * Hidden copy constructor.
+     * To prevent making copies, since the class contains pointer to allocated memory.
      */
-    inline T* operator ->() const {return static_cast<T*>(m_object);}
+    DBImportBase(const DBImportBase&);
 
   };
 }

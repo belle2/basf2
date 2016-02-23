@@ -26,10 +26,14 @@ bool Stream0Controller::loadArguments(const DBObject& obj)
     return false;
   }
   int port = cobj.getInt("port");
+  std::string nodename = StringUtil::tolower(cobj.getText("name"));
   m_host = StringUtil::tolower(cobj.getText("host"));
   std::string script = cobj.getText("script");
   try {
-    m_callback->get(m_callback->getRC().getName(), m_host + ".used", used);
+    LogFile::info(nodename + ".used");
+    m_callback->get(m_callback->getRC(), nodename + ".used", used);
+  } catch (const TimeoutException& e) {
+    LogFile::error(e.what());
   } catch (const RCHandlerException& e) {
     LogFile::error(e.what());
   }
@@ -41,7 +45,7 @@ bool Stream0Controller::loadArguments(const DBObject& obj)
     m_con.addArgument(m_host);
     m_con.addArgument("1");
     m_con.addArgument(port);
-    const std::string nodename = StringUtil::tolower(m_callback->getNode().getName());
+    nodename = StringUtil::tolower(m_callback->getNode().getName());
     m_con.addArgument(nodename + "_" + m_name);
   }
   return used > 0;
@@ -51,7 +55,7 @@ void Stream0Controller::check() throw()
 {
   try {
     int used = 0;
-    m_callback->get(m_callback->getRC(), m_host + ".used", used);
+    m_callback->get(m_callback->getRC(), m_name + ".used", used);
   } catch (const std::exception& e) {
     LogFile::warning("timeout");
   }

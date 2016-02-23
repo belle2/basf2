@@ -101,7 +101,6 @@ bool AbstractNSMCallback::get(const NSMNode& node, NSMVHandler* handler,
     double tout = timeout;
     while (true) {
       double t1 = (tout - (t - t0) > 0 ? tout - (t - t0) : 0);
-      LogFile::info("%d wait VSET from %s", __LINE__, node.getName().c_str());
       NSMCommunicator& com(wait(NSMNode(), NSMCommand::UNKNOWN, t1));
       NSMMessage msg = com.getMessage();
       NSMCommand cmd(msg.getRequestName());
@@ -172,7 +171,6 @@ bool AbstractNSMCallback::set(const NSMNode& node, const NSMVar& var,
       if (cmd == NSMCommand::VREPLY && var.getName() == msg.getData()) {
         return msg.getParam(0) > 0;
       }
-      LogFile::debug("%s:%d %s", __FILE__, __LINE__, msg.getRequestName());
       com.pushQueue(msg);
       t = Time().get();
     }

@@ -49,13 +49,11 @@ bool EB0Controller::loadArguments(const DBObject& obj)
   for (int i = 0; i < nsenders; i++) {
     const DBObject& o_stream0(obj("stream0", i));
     const int port = o_stream0.getInt("port");
-    const std::string host = StringUtil::tolower(o_stream0.getText("host"));
+    const std::string host = StringUtil::tolower(o_stream0.getText("name"));
     int used = 0;
     m_callback->get(m_callback->getRC(), host + ".used", used);
     if (used) {
       m_con.addArgument("%s:%d", (stream0_used ? "localhost" : host.c_str()), port);
-      //const std::string nodename = StringUtil::tolower(m_callback->getNode().getName());
-      //m_con.addArgument(nodename+"_"+m_name);
     }
   }
   return true;

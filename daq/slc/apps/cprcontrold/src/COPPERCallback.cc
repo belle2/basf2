@@ -173,7 +173,7 @@ void COPPERCallback::boot(const DBObject& obj) throw(RCHandlerException)
 
 void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
-  m_dummymode = obj.hasValue("dummymode") && obj.getBool("dummymode");
+  //m_dummymode = obj.hasValue("dummymode") && obj.getBool("dummymode");
   if (!m_dummymode) {
     m_ttrx.open();
     m_ttrx.monitor();
@@ -262,10 +262,9 @@ bool COPPERCallback::resume(int /*subno*/) throw(RCHandlerException)
   return true;
 }
 
-void COPPERCallback::recover(const DBObject& obj) throw(RCHandlerException)
+void COPPERCallback::recover(const DBObject& /*obj*/) throw(RCHandlerException)
 {
-  abort();
-  load(obj);
+  //abort();
 }
 
 void COPPERCallback::abort() throw(RCHandlerException)
@@ -357,7 +356,7 @@ void COPPERCallback::monitor() throw(RCHandlerException)
       getNode().getState() == RCState::READY_S ||
       getNode().getState() == RCState::PAUSED_S) {
     if (!m_con.isAlive()) {
-      setState(RCState::NOTREADY_S);
+      setState(RCState::ERROR_ES);
       log(LogFile::ERROR, "basf2 was down");
     }
   }

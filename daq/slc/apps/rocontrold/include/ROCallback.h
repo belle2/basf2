@@ -43,6 +43,7 @@ namespace Belle2 {
     std::vector<Stream0Controller> m_stream0;
     Stream1Controller m_stream1;
     EB1TXController m_eb1tx;
+    std::map<std::string, NSMNode> m_node;
 
   };
 

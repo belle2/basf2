@@ -116,7 +116,7 @@ void RunControlCallback::error(const char* nodename, const char* data) throw()
     RCNode& node(findNode(nodename));
     logging(node, LogFile::ERROR, data);
     setState(RCState::ERROR_ES);
-    reply(NSMMessage(RCCommand::ERROR, "Error due to error on " + node.getName()));
+    reply(NSMMessage(RCCommand::STOP, "Error due to error on " + node.getName()));
     m_starttime = -1;
     m_restarting = false;
   } catch (const std::out_of_range& e) {
@@ -257,8 +257,7 @@ void RunControlCallback::monitor() throw(RCHandlerException)
         }
       } else {
         bool all_ready = true;
-        for (RCNodeIterator it = m_node_v.begin(); it != m_node_v.end(); it++) {
-          RCNode& node(*it);
+        for (auto& node : m_node_v) {
           if (!node.isUsed()) continue;
           RCState cstate(node.getState());
           if (cstate != RCState::READY_S) {
@@ -279,8 +278,7 @@ void RunControlCallback::monitor() throw(RCHandlerException)
   }
   RCState state_new = state.next();
   bool failed = false;
-  for (RCNodeIterator it = m_node_v.begin(); it != m_node_v.end(); it++) {
-    RCNode& node(*it);
+  for (auto& node : m_node_v) {
     if (!node.isUsed()) continue;
     RCState cstate(node.getState());
     try {
@@ -351,17 +349,17 @@ void RunControlCallback::postRun() throw()
 
 RCNode& RunControlCallback::findNode(const std::string& name) throw(std::out_of_range)
 {
-  for (RCNodeIterator it = m_node_v.begin(); it != m_node_v.end(); it++) {
-    if (it->getName() == name) return *it;
+  for (auto& node : m_node_v) {
+    if (node.getName() == name) return node;
   }
   throw (std::out_of_range(StringUtil::form("no node %s was found", name.c_str())));
 }
 
 bool RunControlCallback::check(const std::string& node, const RCState& state) throw()
 {
-  for (RCNodeIterator it = m_node_v.begin(); it != m_node_v.end(); it++) {
-    if (it->getName() == node) return true;
-    if (it->isUsed() && it->getState() != state) {
+  for (auto cnode : m_node_v) {
+    if (cnode.getName() == node) return true;
+    if (cnode.isUsed() && cnode.getState() != state) {
       return false;
     }
   }
@@ -398,8 +396,7 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
   try {
     obj.print();
     const DBObjectList& objs(obj.getObjects("node"));
-    for (DBObjectList::const_iterator it = objs.begin(); it != objs.end(); it++) {
-      const DBObject& o_node(*it);
+    for (const auto& o_node : objs) {
       RCNode node(o_node.getText("name"));
       try {
         RCNode& node_i(findNode(node.getName()));
@@ -440,14 +437,12 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
       get(node, "dbtable", table, 1);
     } catch (const TimeoutException& e) {}
     add(new NSMVHandlerRCConfig(*this, vname + ".rcconfig", node));
-    //add(new NSMVHandlerText(vname + ".rcconfig", true, true, node.getConfig()));
     add(new NSMVHandlerRCState(*this, vname + ".rcstate", node));
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));
     add(new NSMVHandlerRCNodeUsed(*this, vname + ".used", node));
     vname = StringUtil::form("%s", StringUtil::tolower(node.getName()).c_str());
     add(new NSMVHandlerText(vname + ".dbtable", true, false, table));
     add(new NSMVHandlerRCConfig(*this, vname + ".rcconfig", node));
-    //add(new NSMVHandlerText(vname + ".rcconfig", true, true, node.getConfig()));
     add(new NSMVHandlerRCState(*this, vname + ".rcstate", node));
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));
     add(new NSMVHandlerRCNodeUsed(*this, vname + ".used", node));
@@ -580,6 +575,7 @@ bool RunControlCallback::setRCUsed(int val) throw()
 
 void RunControlCallback::setLocalRunControls(const StringList& rc)
 {
+  m_lrc_v.clear();
   for (size_t i = 0; i < rc.size(); i++) {
     m_lrc_v.push_back(RCNode(rc[i]));
   }

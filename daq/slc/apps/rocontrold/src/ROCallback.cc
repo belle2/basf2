@@ -15,24 +15,11 @@
 #include <cstring>
 #include <sstream>
 #include <iostream>
+#include <map>
 
 #include <unistd.h>
 
 namespace Belle2 {
-
-  class NSMVHandlerROPID : public NSMVHandlerInt {
-  public:
-    NSMVHandlerROPID(ROController& con, const std::string& name)
-      : NSMVHandlerInt(name, true, false), m_con(con) {}
-    virtual ~NSMVHandlerROPID() throw() {}
-    bool handleGetInt(int& val)
-    {
-      val = m_con.getControl().getProcess().get_id();
-      return true;
-    }
-  private:
-    ROController& m_con;
-  };
 
   class NSMVHandlerROInputPort : public NSMVHandlerInt {
   public:
@@ -62,6 +49,31 @@ namespace Belle2 {
     ROController& m_con;
   };
 
+  class NSMVHandlerCOPPERState : public NSMVHandlerText {
+  public:
+    NSMVHandlerCOPPERState(NSMNode& node, ROCallback& callback,
+                           const std::string& name)
+      : NSMVHandlerText(node.getName(), name, true, true, "UNKNOWN"),
+        m_callback(callback), m_node(node) {}
+    virtual ~NSMVHandlerCOPPERState() throw() {}
+    virtual bool handleSetText(const std::string& val)
+    {
+      RCState state(val);
+      if (state != RCState::UNKNOWN) {
+        m_node.setState(state);
+        if (state == RCState::ERROR_ES) {
+          m_callback.setState(RCState::RECOVERING_RS);
+          m_callback.recover(m_callback.getDBObject());
+        }
+      }
+      return true;
+    }
+  private:
+    ROCallback& m_callback;
+    NSMNode& m_node;
+
+  };
+
 }
 
 using namespace Belle2;
@@ -83,22 +95,21 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
   try {
     const DBObjectList& stream0(obj.getObjects("stream0"));
     m_eb0.init(this, 0, "eb0", obj);
-    if (obj.hasObject("stream1")) {
-      m_stream1.init(this, 1, "stream1", obj);
-      add(new NSMVHandlerROInputPort(m_stream1, "stream1.input.port"));
-      add(new NSMVHandlerROOutputPort(m_stream1, "stream1.output.port"));
-    }
     m_stream0 = std::vector<Stream0Controller>();
     for (size_t i = 0; i < stream0.size(); i++) {
       m_stream0.push_back(Stream0Controller());
+      std::string nodename = StringUtil::toupper(stream0[i].getText("name"));
+      m_node.insert(std::make_pair(nodename, NSMNode(nodename)));
     }
     for (size_t i = 0; i < m_stream0.size(); i++) {
-      std::string vname = (m_stream0.size() == 1) ? "stream0" : StringUtil::form("stream0[%d]", (int)i);
+      std::string vname = stream0[i].getText("name");
       m_stream0[i].init(this, i + 2, vname, obj);
+      vname = StringUtil::toupper(vname);
+      add(new NSMVHandlerCOPPERState(m_node[vname], *this, "rcstate"));
+      vname = (m_stream0.size() == 1) ? "stream0" : StringUtil::form("stream0[%d]", (int)i);
       add(new NSMVHandlerROInputPort(m_stream0[i], vname + ".input.port"));
       add(new NSMVHandlerROOutputPort(m_stream0[i], vname + ".output.port"));
     }
-    //m_eb1tx.init(this, 0, "eb1tx", obj);
   } catch (const std::out_of_range& e) {
     throw (RCHandlerException(e.what()));
   }
@@ -106,12 +117,10 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
 
 void ROCallback::term() throw()
 {
-  //m_stream1.term();
   m_eb0.term();
   for (size_t i = 0; i < m_stream0.size(); i++) {
     m_stream0[0].term();
   }
-  //m_eb1tx.term();
 }
 
 void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
@@ -128,18 +137,7 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
     log(LogFile::INFO, "Booted %d-th stream0", i);
     try_wait();
   }
-  /*
-  if (obj.hasObject("stream1")) {
-    if (!m_stream1.load(obj, 10)) {
-      throw (RCHandlerException("Faield to boot stream1"));
-    }
-  }
-  if (!m_eb1tx.load(obj, 0)) {
-    throw (RCHandlerException("Faield to boot eb1tx"));
-  }
-  */
   LogFile::debug("Booted stream1");
-  try_wait();
 }
 
 void ROCallback::start(int /*expno*/, int /*runno*/) throw(RCHandlerException)
@@ -197,7 +195,6 @@ bool ROCallback::resume(int subno) throw(RCHandlerException)
 
 void ROCallback::stop() throw(RCHandlerException)
 {
-  //m_stream1.stop();
   for (size_t i = 0; i < m_stream0.size(); i++) {
     m_stream0[i].stop();
   }
@@ -206,8 +203,84 @@ void ROCallback::stop() throw(RCHandlerException)
 
 void ROCallback::recover(const DBObject& obj) throw(RCHandlerException)
 {
-  //abort();
+  for (auto it : m_node) {
+    LogFile::info(it.second.getName());
+    NSMCommunicator::send(NSMMessage(it.second, RCCommand::ABORT));
+  }
+  abort();
+  while (true) {
+    bool notready_all = true;
+    for (auto it : m_node) {
+      if (it.second.getState() != RCState::NOTREADY_S) {
+        notready_all = false;
+        break;
+      }
+    }
+    if (notready_all) break;
+    try {
+      NSMCommunicator& com(wait(NSMNode(), NSMCommand::UNKNOWN, 10));
+      NSMMessage msg(com.getMessage());
+      RCCommand cmd(msg.getRequestName());
+      if (cmd == NSMCommand::OK) {
+        std::string nodename = msg.getNodeName();
+        if (m_node.find(nodename) != m_node.end() && msg.getLength() > 0) {
+          RCState s(msg.getData());
+          if (s != NSMState::UNKNOWN)
+            m_node[nodename].setState(s);
+        }
+      } else if (cmd == RCCommand::ABORT) {
+        abort();
+        setState(RCState::NOTREADY_S);
+        return;
+      } else if (cmd == RCCommand::STOP) {
+      } else {
+        perform(com);
+      }
+    } catch (const TimeoutException& e) {
+      LogFile::debug("Timeout for wait OK from COPPERs");
+    }
+  }
+
+  for (auto it : m_node) {
+    NSMCommunicator::send(NSMMessage(it.second, RCCommand::LOAD));
+  }
   load(obj);
+
+  while (true) {
+    bool ready_all = true;
+    for (auto it : m_node) {
+      if (it.second.getState() != RCState::READY_S) {
+        ready_all = false;
+        break;
+      }
+    }
+    if (ready_all) {
+      setState(RCState::READY_S);
+      return;
+    }
+    try {
+      NSMCommunicator& com(wait(NSMNode(), NSMCommand::UNKNOWN, 10));
+      NSMMessage msg(com.getMessage());
+      RCCommand cmd(msg.getRequestName());
+      if (cmd == NSMCommand::OK) {
+        std::string nodename = msg.getNodeName();
+        if (m_node.find(nodename) != m_node.end() && msg.getLength() > 0) {
+          RCState s(msg.getData());
+          if (s != NSMState::UNKNOWN)
+            m_node[nodename].setState(s);
+        } else if (cmd == RCCommand::ABORT) {
+          abort();
+          setState(RCState::NOTREADY_S);
+          return;
+        } else if (cmd == RCCommand::STOP) {
+        } else {
+          perform(com);
+        }
+      }
+    } catch (const TimeoutException& e) {
+      LogFile::debug("Timeout for wait OK from COPPERs");
+    }
+  }
 }
 
 void ROCallback::abort() throw(RCHandlerException)
@@ -217,8 +290,6 @@ void ROCallback::abort() throw(RCHandlerException)
     m_stream0[i].abort();
   }
   m_eb0.abort();
-  //m_eb1tx.abort();
-  //set("eb1tx.pid", -1);
 }
 
 void ROCallback::monitor() throw(RCHandlerException)
@@ -244,16 +315,19 @@ void ROCallback::monitor() throw(RCHandlerException)
     data.flush();
   }
   const RCState state(getNode().getState());
-  if (state == RCState::RUNNING_S || state == RCState::LOADING_TS ||
-      state == RCState::STARTING_TS) {
+  if (state == RCState::RUNNING_S || state == RCState::STARTING_TS) {
     if (m_eb0.isUsed() && !m_eb0.getControl().isAlive()) {
-      setState(RCState::NOTREADY_S);
       log(LogFile::ERROR, "eb0 was crashed");
+      setState(RCState::RECOVERING_RS);
+      recover(getDBObject());
+      return;
     }
     for (size_t i = 0; i < m_stream0.size(); i++) {
       if (m_stream0[i].isUsed() && !m_stream0[i].getControl().isAlive()) {
-        setState(RCState::NOTREADY_S);
         log(LogFile::ERROR, "basf2 stream0-%d was crashed", (int)i);
+        setState(RCState::RECOVERING_RS);
+        recover(getDBObject());
+        return;
       }
     }
   }

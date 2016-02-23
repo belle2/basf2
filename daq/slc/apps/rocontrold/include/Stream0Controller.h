@@ -17,6 +17,10 @@ namespace Belle2 {
     virtual void initArguments(const DBObject& obj);
     virtual bool loadArguments(const DBObject& obj);
 
+  public:
+    const std::string& getHost() const throw() { return m_host; }
+
+
   private:
     std::string m_host;
 

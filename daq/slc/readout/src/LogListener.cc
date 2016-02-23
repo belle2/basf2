@@ -33,7 +33,6 @@ void LogListener::run()
   std::stringstream ss;
   std::string s;
   LogFile::Priority priority = LogFile::UNKNOWN;
-  NSMNode& node(m_con->getCallback()->getNode());
   try {
     int count = 0;
     while (true) {
@@ -49,11 +48,7 @@ void LogListener::run()
         if (priority == LogFile::ERROR) {
           m_con->getCallback()->reply(NSMMessage(NSMCommand::ERROR, s));
         } else if (priority == LogFile::FATAL) {
-          m_con->getCallback()->reply(NSMMessage(NSMCommand::FATAL, s));
-        }
-        if (node.getState() != RCState::STOPPING_TS &&
-            node.getState() != RCState::ABORTING_RS &&
-            node.getState() != RCState::RECOVERING_RS) {
+          m_con->getCallback()->reply(NSMMessage(NSMCommand::ERROR, s));
         }
         m_con->unlock();
         count = 0;
@@ -91,6 +86,7 @@ void LogListener::run()
       }
     }
   } catch (const IOException& e) {
+    LogFile::debug(e.what());
   }
   close(m_pipe[0]);
 }

@@ -42,21 +42,23 @@ void LogcollectorCallback::logset(const DAQLogMessage& msg) throw()
     m_db.close();
     LogFile::error("DB errir : %s", e.what());
   }
-  for (NSMNodeList::iterator i = m_nodes.begin();
-       i != m_nodes.end(); i++) {
-    try {
-      NSMCommunicator::send(NSMMessage(i->second, msg, NSMCommand::LOGSET));
-    } catch (const NSMHandlerException& e) {
-      LogFile::error(e.what());
+  if (msg.getPriority() > LogFile::DEBUG) {
+    for (NSMNodeList::iterator i = m_nodes.begin();
+         i != m_nodes.end(); i++) {
+      try {
+        NSMCommunicator::send(NSMMessage(i->second, msg, NSMCommand::LOGSET));
+      } catch (const NSMHandlerException& e) {
+        LogFile::error(e.what());
+      }
     }
+    m_msgs.push_back(msg);
   }
-  m_msgs.push_back(msg);
   if (m_msgs.size() > 1000) {
     m_msgs.erase(m_msgs.begin());
   }
   while (m_msgs.size() > 0) {
     std::vector<DAQLogMessage>::iterator it = m_msgs.begin();
-    if (Date().get() - it->getDateInt() > 3600 * 2) {
+    if (Date().get() - it->getDateInt() > 3600 * 24) {
       m_msgs.erase(it);
       continue;
     }
@@ -67,23 +69,32 @@ void LogcollectorCallback::logset(const DAQLogMessage& msg) throw()
 void LogcollectorCallback::logget(const std::string& nodename,
                                   LogFile::Priority pri) throw()
 {
+  NSMNode node(nodename);
   if (m_nodes.find(nodename) == m_nodes.end()) {
     LogFile::info("Added listner node " + nodename);
     m_nodes.insert(NSMNodeList::value_type(nodename, NSMNode(nodename)));
     m_pris.insert(PriorityList::value_type(nodename, pri));
     try {
-      NSMNode node(nodename);
       NSMCommunicator::send(NSMMessage(node, DAQLogMessage(getNode().getName(), LogFile::DEBUG,
                                                            "Registered in log collector"), NSMCommand::LOG));
     } catch (const NSMHandlerException& e) {
       LogFile::error(e.what());
     }
+  } else {
+    try {
+      NSMCommunicator::send(NSMMessage(node, DAQLogMessage(getNode().getName(), LogFile::DEBUG,
+                                                           "Registered again in log collector"), NSMCommand::LOG));
+    } catch (const NSMHandlerException& e) {
+      LogFile::error(e.what());
+    }
   }
   try {
-    NSMNode node(nodename);
     for (std::vector<DAQLogMessage>::reverse_iterator it = m_msgs.rbegin();
          it != m_msgs.rend(); it++) {
-      NSMCommunicator::send(NSMMessage(node, *it, NSMCommand::LOGSET));
+      DAQLogMessage& msg(*it);
+      if (msg.getPriority() > LogFile::DEBUG) {
+        NSMCommunicator::send(NSMMessage(node, *it, NSMCommand::LOGSET));
+      }
     }
   } catch (const NSMHandlerException& e) {
     LogFile::error(e.what());

@@ -136,6 +136,27 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   TH2F** m_histnClusters = NULL;
   TH2F** m_histnClusterFraction = NULL;
 
+  TH1F** m_histSignal = NULL;
+  TH1F** m_histSeed = NULL;
+  TH1F** m_histTrackSigmaU = NULL;
+  TH1F** m_histTrackSigmaV = NULL;
+  TH2F** m_histTrackSigmaUV = NULL;
+
+  m_histTrackSigmaUV = (TH2F**) new TH2F*[m_anglesU * m_anglesV + 1];
+  m_histTrackSigmaU = (TH1F**) new TH1F*[m_anglesU * m_anglesV + 1];
+  m_histTrackSigmaV = (TH1F**) new TH1F*[m_anglesU * m_anglesV + 1];
+  m_histSignal = (TH1F**) new TH1F*[m_shapes + 1];
+  m_histSeed = (TH1F**) new TH1F*[m_shapes + 1];
+  for (int i_angle = 0; i_angle < m_anglesU * m_anglesV + 1; i_angle++) {
+    m_histTrackSigmaU[i_angle] = NULL;
+    m_histTrackSigmaV[i_angle] = NULL;
+    m_histTrackSigmaUV[i_angle] = NULL;
+  }
+  for (int i_shape = 0; i_shape < m_shapes + 1; i_shape++) {
+    m_histSignal[i_shape] = NULL;
+    m_histSeed[i_shape] = NULL;
+  }
+
   m_histBiasCorrectionU = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
   m_histBiasCorrectionV = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
   m_histResidualRMSU = (TH2F**) new TH2F*[m_pixelkinds * m_shapes + 1];
@@ -179,6 +200,39 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
     m_histSummariesInfoPK = new TH1F("SummariesInfoPK", "Summaries Info Over Pixel Kinds", m_pixelkinds, 0, m_pixelkinds);
     m_histSummariesInfoAng = new TH2F("SummariesInfoAng", "Summaries Info Over Angle Distribution", m_anglesU, -m_anglesU / 2,
                                       m_anglesU / 2, m_anglesV, -m_anglesV / 2, m_anglesV / 2);
+
+    m_histSignal[m_shapes] = new TH1F("Signal", "Signal", 100, 0, 100);
+    m_histSeed[m_shapes] = new TH1F("Seed", "Seed", 100, 0, 100);
+    m_histTrackSigmaU[m_anglesU * m_anglesV] = new TH1F("TrackSigmaU", "Track Sigma U", 200, 0, 100);
+    m_histTrackSigmaV[m_anglesU * m_anglesV] = new TH1F("TrackSigmaV", "Track Sigma V", 200, 0, 100);
+    m_histTrackSigmaUV[m_anglesU * m_anglesV] = new TH2F("TrackSigmaUV", "Track Sigma UV", 100, 0, 100, 100, 0, 100);
+
+    fDQM->mkdir("TrackSigma");
+    fDQM->cd("TrackSigma");
+    for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++) {
+      for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
+        TString HistoName = Form("TrackSigmaU_AngU%02i_AngV%02i", i_angleU, i_angleV);
+        TString HistoTitle = Form("Track Sigma U, angle U %02i, angle V %02i", i_angleU, i_angleV);
+        m_histTrackSigmaU[i_angleU * m_anglesV + i_angleV] = new TH1F(HistoName.Data(), HistoTitle.Data(), 200, 0, 100);
+        HistoName = Form("TrackSigmaV_AngU%02i_AngV%02i", i_angleU, i_angleV);
+        HistoTitle = Form("Track Sigma V, angle U %02i, angle V %02i", i_angleU, i_angleV);
+        m_histTrackSigmaV[i_angleU * m_anglesV + i_angleV] = new TH1F(HistoName.Data(), HistoTitle.Data(), 200, 0, 100);
+        HistoName = Form("TrackSigmaUV_AngU%02i_AngV%02i", i_angleU, i_angleV);
+        HistoTitle = Form("Track Sigma UV, angle U %02i, angle V %02i", i_angleU, i_angleV);
+        m_histTrackSigmaUV[i_angleU * m_anglesV + i_angleV] = new TH2F(HistoName.Data(), HistoTitle.Data(), 100, 0, 100, 100, 0, 100);
+      }
+    }
+
+    fDQM->mkdir("Energies");
+    fDQM->cd("Energies");
+    for (int i_shape = 0; i_shape < m_shapes; i_shape++) {
+      TString HistoName = Form("Signal_Sh%02i", i_shape + 1);
+      TString HistoTitle = Form("Signal, shape %02i", i_shape + 1);
+      m_histSignal[i_shape] = new TH1F(HistoName.Data(), HistoTitle.Data(), 100, 0, 100);
+      HistoName = Form("Seed_Sh%02i", i_shape + 1);
+      HistoTitle = Form("Seed, shape %02i", i_shape + 1);
+      m_histSeed[i_shape] = new TH1F(HistoName.Data(), HistoTitle.Data(), 100, 0, 100);
+    }
 
     fExpertHistograms = new TFile(name_OutDoExpertHistograms.Data(), "recreate");
     fExpertHistograms->mkdir("NoSorting");
@@ -503,6 +557,33 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
               TInPixelPositionMap[make_tuple(i_shape, i_pk, i_angleU, i_angleV, i_ipU, i_ipV)] = 0.0;
 
   B2DEBUG(30, "--> Ordering done. ");
+
+  if (m_DoExpertHistograms) {
+    for (int i_ev = 0; i_ev < nEntries; i_ev++) {
+      getObject<TTree>(name_SourceTree.Data()).GetEntry(i_ev);
+      m_histSignal[m_shape - 1]->Fill(m_signal);
+      m_histSignal[m_shapes]->Fill(m_signal);
+      m_histSeed[m_shape - 1]->Fill(m_seed);
+      m_histSeed[m_shapes]->Fill(m_seed);
+
+      int AngU = m_anglesU / 2 + (int)(m_phiTrack * m_anglesU / TMath::Pi());
+      int AngV = m_anglesV / 2 + (int)(m_thetaTrack * m_anglesV / TMath::Pi());
+      if (AngU < 0) AngU = 0;
+      if (AngU >= m_anglesU) AngU = m_anglesU - 1;
+      if (AngV < 0) AngV = 0;
+      if (AngV >= m_anglesV) AngV = m_anglesV - 1;
+
+      m_histTrackSigmaU[AngU * m_anglesV + AngV]->Fill(m_SigmaUTrack / Unit::um);
+      m_histTrackSigmaU[m_anglesU * m_anglesV]->Fill(m_SigmaUTrack / Unit::um);
+      m_histTrackSigmaV[AngU * m_anglesV + AngV]->Fill(m_SigmaVTrack / Unit::um);
+      m_histTrackSigmaV[m_anglesU * m_anglesV]->Fill(m_SigmaVTrack / Unit::um);
+      m_histTrackSigmaUV[AngU * m_anglesV + AngV]->Fill(m_SigmaUTrack / Unit::um, m_SigmaVTrack / Unit::um);
+      m_histTrackSigmaUV[m_anglesU * m_anglesV]->Fill(m_SigmaUTrack / Unit::um, m_SigmaVTrack / Unit::um);
+
+    }
+    B2DEBUG(30, "--> Filling of histos done. ");
+  }
+
 
   // presets of vectors and tables:
 
@@ -932,6 +1013,12 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   saveCalibration(Correction_Bias, nameB.Data());
   saveCalibration(Correction_ErrorEstimation, nameEE.Data());
   saveCalibration(InPixelPosition, nameIP.Data());
+
+  delete[] m_histSignal;
+  delete[] m_histSeed;
+  delete[] m_histTrackSigmaU;
+  delete[] m_histTrackSigmaV;
+  delete[] m_histTrackSigmaUV;
 
   delete[] m_histBiasCorrectionU;
   delete[] m_histBiasCorrectionV;

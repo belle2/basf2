@@ -149,11 +149,11 @@ if not argsVar["check_quantity"] is None:
 # try to get git revision
 current_git_commit = None
 try:
-    current_git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode()
+    # get git rev, decode and remove possible newline at end
+    current_git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().rstrip()
 except subprocess.CalledProcessError:
     current_git_commit = None
     print("Cannot get git commit hash of HEAD")
-
 
 if argsVar["test_check"] is False:
     # output current git commit and svn revision
@@ -222,7 +222,7 @@ if argsVar["keep"] is True:
     else:
         archive_folder_name = "results_" + current_git_commit
         # remove a previously archieved folder, if present
-        shutil.rmtree(archive_folder_name, true)
+        shutil.rmtree(archive_folder_name, True)
         shutil.copytree("results", archive_folder_name)
 
 # perform checks

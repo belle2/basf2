@@ -36,9 +36,9 @@ namespace Belle2 {
      */
     explicit DBImportArray(const std::string& module = "",
                            const std::string& package = "dbstore"):
+      m_module(DBStore::arrayName<T>(module)),
       m_package(package)
     {
-      m_module = DBStore::arrayName<T>(module);
       m_array = new TClonesArray(T::Class());
     }
 
@@ -47,7 +47,7 @@ namespace Belle2 {
      */
     ~DBImportArray()
     {
-      delete m_array; // does this delete also allocated elements?
+      delete m_array;
     }
 
     /**
@@ -128,6 +128,12 @@ namespace Belle2 {
 
 
   private:
+
+    /**
+     * Hidden copy constructor.
+     * To prevent making copies, since the class contains pointer to allocated memory.
+     */
+    DBImportArray(const DBImportArray&);
 
     /**
      * Returns address of the next free position of the array.

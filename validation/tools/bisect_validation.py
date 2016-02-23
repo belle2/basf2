@@ -52,6 +52,7 @@ import argparse
 from functools import reduce
 
 import quantity_extract
+import validationtools
 
 
 def extract_information_from_file(file_name, results):
@@ -159,7 +160,11 @@ if argsVar["test_check"] is False:
     os.system("echo -n 'git commit ' && git rev-parse HEAD")
     os.system("echo -n 'SVN revsion ' && git svn find-rev `git rev-parse HEAD`")
 
-    # see if quantities must be checkd and
+    # make sure the proper environment is setup. If for example
+    # the externals version was changed between two commits, this is required
+    validationtools.update_env()
+
+    # see if quantities must be checked and
     # make sure the expression can be properly parsed
     if argsVar["check_quantity"] is None:
         argsVar["check_quantity"] = []

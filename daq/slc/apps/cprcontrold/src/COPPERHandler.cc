@@ -298,6 +298,7 @@ bool NSMVHandlerHSLBTest::handleGetText(std::string& val)
   return false;
 }
 
+/*
 bool NSMVHandlerHSLBCheckFee::handleGetText(std::string& val)
 {
   LogFile::info("check FEE (HSLB:%c)", m_hslb + 'a');
@@ -317,4 +318,4 @@ bool NSMVHandlerHSLBCheckFee::handleGetText(std::string& val)
   }
   return true;
 }
-
+*/

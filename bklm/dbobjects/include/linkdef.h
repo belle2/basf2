@@ -7,5 +7,6 @@
 
 #pragma link C++ class Belle2::BKLMElectronicMapping+;
 #pragma link C++ class Belle2::BKLMGeometryPar+;
+#pragma link C++ class Belle2::BKLMSimulationPar+;
 
 #endif

@@ -51,6 +51,12 @@ namespace Belle2 {
     //! Export BKLM geometry parameters from the database
     void exportBklmGeometryPar();
 
+    //! Import BKLM simulation parameters into the database
+    void importBklmSimulationPar();
+
+    //! Export BKLM simulation parameters from the database
+    void exportBklmSimulationPar();
+
   private:
 
     ClassDef(BKLMDatabaseImporter, 0); /**< ClassDef */

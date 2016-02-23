@@ -11,6 +11,7 @@
 #include <bklm/calibration/BKLMDatabaseImporter.h>
 #include <bklm/dbobjects/BKLMElectronicMapping.h>
 #include <bklm/dbobjects/BKLMGeometryPar.h>
+#include <bklm/dbobjects/BKLMSimulationPar.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -124,4 +125,37 @@ void BKLMDatabaseImporter::exportBklmGeometryPar()
          <<
          element->getLocalReconstructionShiftX(1, 1) << ", " << element->getLocalReconstructionShiftY(1,
              1) << ", " << element->getLocalReconstructionShiftZ(1, 1) << ")");
+}
+
+void BKLMDatabaseImporter::importBklmSimulationPar()
+{
+  GearDir content("/Detector/DetectorComponent/Geometry/BKLM/Content/SimulationParameters");
+
+  // define the data
+  // TObject bklmGeometryPar("Belle2::BKLMGeometryPar");
+  BKLMSimulationPar bklmSimulationPar;
+
+  // Get Gearbox simulation parameters for BKLM
+  bklmSimulationPar.setVersion(0);
+  bklmSimulationPar.read(content);
+
+  // define IOV and store data to the DB
+  IntervalOfValidity iov(0, 0, -1, -1);
+  Database::Instance().storeData("BKLMSimulationPar", &bklmSimulationPar, iov);
+
+}
+
+void BKLMDatabaseImporter::exportBklmSimulationPar()
+{
+
+  DBObjPtr<BKLMSimulationPar> element("BKLMSimulationPar");
+
+  B2INFO("DoBackgroundStudy: " << element->getDoBackgroundStudy());
+  B2INFO("weight table: ");
+  for (int ii = 0; ii < element->getNPhiDivision(); ii++) {
+    for (int jj = 1; jj <= element->getNPhiMultiplicity(ii); jj++) {
+      B2INFO(ii << ", " << jj << ", :" << element->getPhiWeight(ii, jj) << endl);
+    }
+  }
+
 }

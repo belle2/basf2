@@ -26,22 +26,18 @@ void CalibrationCollectorModule::initialize()
 void CalibrationCollectorModule::event()
 {
   StoreObjPtr<EventMetaData> emd;
-  std::pair<int, int> exprun = {emd->getExperiment(), emd->getRun()};
+  pair<int, int> exprun = {emd->getExperiment(), emd->getRun()};
 
   // Granularity=all removes data spliting by runs by setting
   // always the same exp, run for calibration data objects
   if (m_granularity == "all")
-    exprun = std::make_pair(-1, -1);
+    exprun = { -1, -1};
 
-  if (exprun != m_currentExpRun) {
-    m_currentExpRun = exprun;
-    // Even for granularity=all, we want to remember all runs...
-    getObject<RunRange>(CalibrationAlgorithm::RUN_RANGE_OBJ_NAME).add(emd->getExperiment(), emd->getRun());
-  } else {
-    // This ensures the object is created for each collect() call
-    // Just to be sure...
-    getObject<RunRange>(CalibrationAlgorithm::RUN_RANGE_OBJ_NAME);
-  }
+  // For getObject<> to work
+  m_currentExpRun = exprun;
+
+  // Even for granularity=all, we want to remember all runs...
+  getObject<RunRange>(CalibrationAlgorithm::RUN_RANGE_OBJ_NAME).add(emd->getExperiment(), emd->getRun());
 
   collect();
 }

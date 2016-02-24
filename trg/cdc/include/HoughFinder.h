@@ -83,10 +83,6 @@ namespace Belle2 {
     int doit2(std::vector<TRGCDCTrack*>& trackList2D,
               std::vector<TRGCDCTrack*>& trackList2DFitted);
 
-    /// do track finding and fitting (development version)
-    int doit3(std::vector<TRGCDCTrack*>& trackList2D,
-              std::vector<TRGCDCTrack*>& trackList2DFitted);
-
     /// selects the best(fastest) hits in each super layer.
     std::vector<TRGCDCLink*> selectBestHits(
       const std::vector<TRGCDCLink*>& links) const;
@@ -113,10 +109,6 @@ namespace Belle2 {
 
     /// do track fitting. (kaiyu original)
     int doFitting2(std::vector<TRGCDCTrack*>& trackList2D,
-                   std::vector<TRGCDCTrack*>& trackList2DFitted);
-
-    /// do track fitting.
-    int doFitting3(std::vector<TRGCDCTrack*>& trackList2D,
                    std::vector<TRGCDCTrack*>& trackList2DFitted);
 
     /// Make a track from serial ID in Hough plane. (no fit, segment

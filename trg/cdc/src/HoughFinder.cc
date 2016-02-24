@@ -910,10 +910,6 @@ namespace Belle2 {
 
     if (_doit == 0 || _doit == 1)
       return doit1(trackList2D, trackList2DFitted);
-    else if (_doit == 2)
-      return doit2(trackList2D, trackList2DFitted);
-    else if (_doit == 3)
-      return doit3(trackList2D, trackList2DFitted);
     else
       return doit2(trackList2D, trackList2DFitted);
   }
@@ -946,23 +942,6 @@ namespace Belle2 {
     vector<vector<unsigned>> peaks[2];
     doFinding2(peaks, trackList2D);
     doFitting2(trackList2D, trackList2DFitted);
-
-    TRGDebug::leaveStage(sn);
-
-    return 0;
-  }
-
-  int
-  TRGCDCHoughFinder::doit3(std::vector<TRGCDCTrack*>& trackList2D,
-                           std::vector<TRGCDCTrack*>& trackList2DFitted)
-  {
-
-    const string sn = "HoughFinder::doit3 (dev version)";
-    TRGDebug::enterStage(sn);
-
-    vector<vector<unsigned>> peaks[2];
-    doFinding2(peaks, trackList2D);
-    doFitting3(trackList2D, trackList2DFitted);
 
     TRGDebug::leaveStage(sn);
 
@@ -1276,19 +1255,6 @@ namespace Belle2 {
       D->run();
 #endif
     }
-
-    TRGDebug::leaveStage(sn);
-
-    return 0;
-  }
-
-  int
-  TRGCDCHoughFinder::doFitting3(std::vector<TRGCDCTrack*>& trackList2D,
-                                std::vector<TRGCDCTrack*>& trackList2DFitted)
-  {
-
-    const string sn = "Hough Finder Fitting3";
-    TRGDebug::enterStage(sn);
 
     TRGDebug::leaveStage(sn);
 

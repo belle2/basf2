@@ -46,12 +46,6 @@ class TRGCDCPeakFinder {
     std::string version(void) const;
 
     /// do peak finding. This is a copy from "trasan".
-    void peaks5(std::vector<TRGCDCCircle *> & circles,
-                TRGCDCHoughPlane & hp,
-                const unsigned threshold,
-                const bool centerIsPeak) const;
-
-    /// do peak finding. This is a copy from "trasan".
     void peaks6(TRGCDCHoughPlaneMulti2 & hp,
                 const unsigned threshold,
                 const bool centerIsPeak,
@@ -66,11 +60,6 @@ class TRGCDCPeakFinder {
 
     /// Makes regions.
     void regions(TRGCDCHoughPlane & hp, const unsigned threshold) const;
-
-    /// Kaiyu's logic (original).
-    void p1p2(TRGCDCHoughPlane & hp,
-              const unsigned threshold,
-              std::vector<std::vector<unsigned>> & peaks) const;
 
     /// Kaiyu's logic.
     void p1p2Methode(TRGCDCHoughPlane & hp,

@@ -93,13 +93,16 @@ namespace Belle2 {
         for (const CDCRecoSegment2D& segment : outputSegments) {
           CDCObservations2D observations2D(m_fitPos, m_fitVariance);
           observations2D.appendRange(segment);
-
-          if (m_param_karimakiFit) {
-            CDCTrajectory2D trajectory2D = m_karimakiFitter.fit(observations2D);
-            segment.setTrajectory2D(trajectory2D);
+          if (observations2D.size() < 4) {
+            segment.getTrajectory2D().clear();
           } else {
-            CDCTrajectory2D trajectory2D = m_riemannFitter.fit(observations2D);
-            segment.setTrajectory2D(trajectory2D);
+            if (m_param_karimakiFit) {
+              CDCTrajectory2D trajectory2D = m_karimakiFitter.fit(observations2D);
+              segment.setTrajectory2D(trajectory2D);
+            } else {
+              CDCTrajectory2D trajectory2D = m_riemannFitter.fit(observations2D);
+              segment.setTrajectory2D(trajectory2D);
+            }
           }
         }
       }

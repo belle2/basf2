@@ -87,13 +87,9 @@ namespace Belle2 {
     std::vector<TRGCDCLink*> selectBestHits(
       const std::vector<TRGCDCLink*>& links) const;
 
-    /// creates mappings by a file. (Kaiyu's original)
+    /// creates mappings by a file.
     void mappingByFile(const std::string& mappingFilePlus,
                        const std::string& mappingFileMinus);
-
-    /// creates mappings by a file.
-    void mappingByFile2(const std::string& mappingFilePlus,
-                        const std::string& mappingFileMinus);
 
     /// do track finding. (trasan version)
     int doFindingTrasan(std::vector<unsigned> peaks[],

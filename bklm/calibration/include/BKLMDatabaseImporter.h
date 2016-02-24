@@ -57,6 +57,12 @@ namespace Belle2 {
     //! Export BKLM simulation parameters from the database
     void exportBklmSimulationPar();
 
+    //! Import BKLM bad channels into the database
+    void importBklmBadChannels();
+
+    //! Export BKLM bad channels from the database
+    void exportBklmBadChannels();
+
   private:
 
     ClassDef(BKLMDatabaseImporter, 0); /**< ClassDef */

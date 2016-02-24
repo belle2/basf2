@@ -12,11 +12,18 @@
 
 #include <TObject.h>
 #include <vector>
+#include <bklm/dataobjects/BKLMStatus.h>
 
 namespace Belle2 {
 
   /**
    *   Contains bad(dead/hot) channels
+   *   The channel ID is defined according to the geometry position on the detector
+   *   isForward[0,1], 0 is backward, 1 is forward
+   *   sector[1-8], 1 is on +x axis, 2 is on +y axis
+   *   layer[1-15], 1 is the innemost
+   *   plane[0, 1], 0 phiReadout plane, not always the inner plane according to the real detector geometry
+   *   strip[1-48]
    */
 
   class BKLMBadChannels: public TObject {
@@ -59,15 +66,54 @@ namespace Belle2 {
     void appendDeadChannel(int channel) {m_DeadChannels.push_back(channel); }
 
     /**
+     * Add a channel number to the list of dead channels
+     */
+    void appendDeadChannel(int isForward, int sector, int layer, int plane, int strip)
+    {
+      int channel = geometryToChannelId(isForward, sector, layer, plane, strip);
+      m_DeadChannels.push_back(channel);
+    }
+
+    /**
      * Add a channel number to the list of hot channels
      */
     void appendHotChannel(int channel) {m_HotChannels.push_back(channel); }
+
+    /**
+     * Add a channel number to the list of hot channels
+     */
+    void appendHotChannel(int isForward, int sector, int layer, int plane, int strip)
+    {
+      int channel = geometryToChannelId(isForward, sector, layer, plane, strip);
+      m_HotChannels.push_back(channel);
+    }
+
+    //! retrun if the channel is hot or not
+    bool isHotChannel(int channel);
+
+    //! retrun if the channel is dead or not
+    bool isDeadChannel(int channel);
+
+    //! retrun if the channel is hot or not
+    bool isHotChannel(int isForward, int sector, int layer, int plane, int strip);
+
+    //! retrun if the channel is dead or not
+    bool isDeadChannel(int isForward, int sector, int layer, int plane, int strip);
 
     //! Get comment
     std::string getComment() const {return m_comment; }
 
     //! Set comment
     void setComment(const std::string& comment) {m_comment = comment;}
+
+    //! convert geometry position to a channel ID
+    int geometryToChannelId(int isForward, int sector, int layer, int plane, int strip);
+
+    //! print hot channels
+    void printHotChannels();
+
+    //! print dead channels
+    void printDeadChannels();
 
 
   private:

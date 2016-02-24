@@ -12,6 +12,7 @@
 #include <bklm/dbobjects/BKLMElectronicMapping.h>
 #include <bklm/dbobjects/BKLMGeometryPar.h>
 #include <bklm/dbobjects/BKLMSimulationPar.h>
+#include <bklm/dbobjects/BKLMBadChannels.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -157,5 +158,30 @@ void BKLMDatabaseImporter::exportBklmSimulationPar()
       B2INFO(ii << ", " << jj << ", :" << element->getPhiWeight(ii, jj) << endl);
     }
   }
+
+}
+
+void BKLMDatabaseImporter::importBklmBadChannels()
+{
+
+  BKLMBadChannels bklmBadChannels;
+  //bklmBadChannels.appendDeadChannel(1, 1, 1, 0, 20);
+  //bklmBadChannels.appendHotChannel(1, 1, 1, 0, 21);
+
+  // define IOV and store data to the DB
+  IntervalOfValidity iov(0, 0, -1, -1);
+  Database::Instance().storeData("BKLMBadChannels", &bklmBadChannels, iov);
+
+}
+
+void BKLMDatabaseImporter::exportBklmBadChannels()
+{
+  DBObjPtr<BKLMBadChannels> element("BKLMBadChannels");
+
+  element->printHotChannels();
+  element->printDeadChannels();
+
+  B2INFO("is (1,1,1,0,20) dead ? " << element->isDeadChannel(1, 1, 1, 0, 20) << "; is (1,1,1,0,21) hot ? " << element->isHotChannel(1,
+         1, 1, 0, 21));
 
 }

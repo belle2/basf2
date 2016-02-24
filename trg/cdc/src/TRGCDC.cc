@@ -2003,7 +2003,7 @@ namespace Belle2 {
     if (_perfect2DFinder)
       _pFinder->doit(_trackList2DFitted);
     else
-      _hFinder->doit(_trackList2D, _trackList2DFitted);
+      _hFinder->FindAndFit(_trackList2D, _trackList2DFitted);
 
     //...Stereo finder...
     _h3DFinder->doit(_trackList2DFitted, _trackList3D, m_eventNum);

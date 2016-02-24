@@ -207,8 +207,8 @@ namespace Belle2 {
   }
 
   int
-  TRGCDCHoughFinder::doFinding(vector<unsigned> peaks[],
-                               vector<TCTrack*>& trackList2D) const
+  TRGCDCHoughFinder::doFindingTrasan(vector<unsigned> peaks[],
+                                     vector<TCTrack*>& trackList2D) const
   {
 
     const string sn = "Hough Finder Finding (trasan version)";
@@ -318,8 +318,8 @@ namespace Belle2 {
   }
 
   int
-  TRGCDCHoughFinder::doFitting(vector<unsigned> peaks[],
-                               vector<TRGCDCTrack*>& trackList2DFitted) const
+  TRGCDCHoughFinder::doFittingTrasan(vector<unsigned> peaks[],
+                                     vector<TRGCDCTrack*>& trackList2DFitted) const
   {
 
     const string sn = "Hough Finder Fitting (trasan version)";
@@ -904,27 +904,27 @@ namespace Belle2 {
   }
 
   int
-  TRGCDCHoughFinder::doit(std::vector<TRGCDCTrack*>& trackList2D,
-                          std::vector<TRGCDCTrack*>& trackList2DFitted)
+  TRGCDCHoughFinder::FindAndFit(std::vector<TRGCDCTrack*>& trackList2D,
+                                std::vector<TRGCDCTrack*>& trackList2DFitted)
   {
 
     if (_doit == 0 || _doit == 1)
-      return doit1(trackList2D, trackList2DFitted);
+      return doFindingAndFittingTrasan(trackList2D, trackList2DFitted);
     else
-      return doit2(trackList2D, trackList2DFitted);
+      return doFindingAndFitting(trackList2D, trackList2DFitted);
   }
 
   int
-  TRGCDCHoughFinder::doit1(std::vector<TRGCDCTrack*>& trackList2D,
-                           std::vector<TRGCDCTrack*>& trackList2DFitted)
+  TRGCDCHoughFinder::doFindingAndFittingTrasan(std::vector<TRGCDCTrack*>& trackList2D,
+                                               std::vector<TRGCDCTrack*>& trackList2DFitted)
   {
 
-    const string sn = "HoughFinder::doit1 (trasan version)";
+    const string sn = "HoughFinder::doFindingAndFitting (trasan version)";
     TRGDebug::enterStage(sn);
 
     vector<unsigned> peaks[2];
-    doFinding(peaks, trackList2D);
-    doFitting(peaks, trackList2DFitted);
+    doFindingTrasan(peaks, trackList2D);
+    doFittingTrasan(peaks, trackList2DFitted);
 
     TRGDebug::leaveStage(sn);
 
@@ -932,16 +932,16 @@ namespace Belle2 {
   }
 
   int
-  TRGCDCHoughFinder::doit2(std::vector<TRGCDCTrack*>& trackList2D,
-                           std::vector<TRGCDCTrack*>& trackList2DFitted)
+  TRGCDCHoughFinder::doFindingAndFitting(std::vector<TRGCDCTrack*>& trackList2D,
+                                         std::vector<TRGCDCTrack*>& trackList2DFitted)
   {
 
-    const string sn = "HoughFinder::doit2 (kaiyu version)";
+    const string sn = "HoughFinder::doFindingAndFitting (kaiyu version)";
     TRGDebug::enterStage(sn);
 
     vector<vector<unsigned>> peaks[2];
-    doFinding2(peaks, trackList2D);
-    doFitting2(trackList2D, trackList2DFitted);
+    doFinding(peaks, trackList2D);
+    doFitting(trackList2D, trackList2DFitted);
 
     TRGDebug::leaveStage(sn);
 
@@ -949,11 +949,11 @@ namespace Belle2 {
   }
 
   int
-  TRGCDCHoughFinder::doFinding2(std::vector<std::vector<unsigned>> peaks[],
-                                std::vector<TRGCDCTrack*>& trackList2D)
+  TRGCDCHoughFinder::doFinding(std::vector<std::vector<unsigned>> peaks[],
+                               std::vector<TRGCDCTrack*>& trackList2D)
   {
 
-    const string sn = "HoughFinder::doFinding2";
+    const string sn = "HoughFinder::doFinding";
     TRGDebug::enterStage(sn);
 
     //...Initialization...
@@ -987,7 +987,7 @@ namespace Belle2 {
 #ifdef TRGCDC_DISPLAY_HOUGH
         vector<const TCTrack*> cc;
         cc.push_back(t);
-        const string stg = "doFinding2 : track made";
+        const string stg = "doFinding : track made";
         const string inf = "   ";
         D->clear();
         D->stage(stg);
@@ -1006,11 +1006,11 @@ namespace Belle2 {
   }
 
   int
-  TRGCDCHoughFinder::doFitting2(std::vector<TRGCDCTrack*>& trackList2D,
-                                std::vector<TRGCDCTrack*>& trackList2DFitted)
+  TRGCDCHoughFinder::doFitting(std::vector<TRGCDCTrack*>& trackList2D,
+                               std::vector<TRGCDCTrack*>& trackList2DFitted)
   {
 
-    const string sn = "Hough Finder Fitting2";
+    const string sn = "Hough Finder Fitting";
     TRGDebug::enterStage(sn);
 
     if (_commonData == 0) {
@@ -1243,7 +1243,7 @@ namespace Belle2 {
 #ifdef TRGCDC_DISPLAY_HOUGH
       vector<const TCTrack*> cc;
       cc.push_back(& aTrack);
-      const string stg = "doFitting2 : Kaiyu method";
+      const string stg = "doFitting : Kaiyu method";
       const string inf = "   ";
       D->clear();
       D->stage(stg);

@@ -64,9 +64,9 @@ namespace Belle2 {
     /// termination.
     void terminate();
 
-    /// do track finding and fitting.
-    int doit(std::vector<TRGCDCTrack*>& trackList2D,
-             std::vector<TRGCDCTrack*>& trackList2DFitted);
+    /// do track finding and fitting (wrapper that can choose between different versions).
+    int FindAndFit(std::vector<TRGCDCTrack*>& trackList2D,
+                   std::vector<TRGCDCTrack*>& trackList2DFitted);
 
   public:
 
@@ -76,12 +76,12 @@ namespace Belle2 {
   private:
 
     /// do track finding and fitting (Trasan version).
-    int doit1(std::vector<TRGCDCTrack*>& trackList2D,
-              std::vector<TRGCDCTrack*>& trackList2DFitted);
+    int doFindingAndFittingTrasan(std::vector<TRGCDCTrack*>& trackList2D,
+                                  std::vector<TRGCDCTrack*>& trackList2DFitted);
 
     /// do track finding and fitting (Kaiyu version).
-    int doit2(std::vector<TRGCDCTrack*>& trackList2D,
-              std::vector<TRGCDCTrack*>& trackList2DFitted);
+    int doFindingAndFitting(std::vector<TRGCDCTrack*>& trackList2D,
+                            std::vector<TRGCDCTrack*>& trackList2DFitted);
 
     /// selects the best(fastest) hits in each super layer.
     std::vector<TRGCDCLink*> selectBestHits(
@@ -96,20 +96,20 @@ namespace Belle2 {
                         const std::string& mappingFileMinus);
 
     /// do track finding. (trasan version)
-    int doFinding(std::vector<unsigned> peaks[],
-                  std::vector<TRGCDCTrack*>& trackList2D) const;
+    int doFindingTrasan(std::vector<unsigned> peaks[],
+                        std::vector<TRGCDCTrack*>& trackList2D) const;
 
     /// do track finding. (kaiyu version)
-    int doFinding2(std::vector<std::vector<unsigned>> peaks[],
-                   std::vector<TRGCDCTrack*>& trackList2D);
+    int doFinding(std::vector<std::vector<unsigned>> peaks[],
+                  std::vector<TRGCDCTrack*>& trackList2D);
 
     /// do track fitting. (old trasan version)
-    int doFitting(std::vector<unsigned> peaks[],
-                  std::vector<TRGCDCTrack*>& trackList2DFitted) const;
+    int doFittingTrasan(std::vector<unsigned> peaks[],
+                        std::vector<TRGCDCTrack*>& trackList2DFitted) const;
 
     /// do track fitting. (kaiyu original)
-    int doFitting2(std::vector<TRGCDCTrack*>& trackList2D,
-                   std::vector<TRGCDCTrack*>& trackList2DFitted);
+    int doFitting(std::vector<TRGCDCTrack*>& trackList2D,
+                  std::vector<TRGCDCTrack*>& trackList2DFitted);
 
     /// Make a track from serial ID in Hough plane. (no fit, segment
     /// hit attached)

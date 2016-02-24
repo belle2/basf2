@@ -13,23 +13,31 @@ using namespace std;
 using namespace Belle2;
 
 #define NAME          "HoughMapping"
-#define VERSION       "version 0.00"
+#define VERSION       "version 0.01"
 
-struct XY {double x ; double y ;};
-struct Plane { unsigned x;  unsigned y ;};
+struct XY {double x; double y;};
+struct Plane {unsigned x; unsigned y;};
 void superLayer(const unsigned id);
 
+//Hough Plane Parameter
+//Theta Range (X Axial)
+const double PI2 = 2 * M_PI;
+//log10(r/cm) Range (Y Axial)
+const double minY = 1.823908740944321;
+const double maxY = 3.204119982655926;
+//cell number
+const unsigned nX = 160;
+const unsigned nY = 16;
+
 vector<int> TS;
-vector<vector<int> > HPcellx(160, TS);
-vector<vector<vector<int> > >HPcelly(16, HPcellx);
+vector<vector<int>> HPcellx(nX, TS);
+vector<vector<vector<int>>> HPcelly(nY, HPcellx);
 ofstream outputm("minus_total.dat");
 
 vector<int> pTS;
-vector<vector<int> > pHPcellx(160, pTS);
-vector<vector<vector<int> > >pHPcelly(16, pHPcellx);
+vector<vector<int>> pHPcellx(nX, pTS);
+vector<vector<vector<int>>> pHPcelly(nY, pHPcellx);
 ofstream outputmp("plus_total.dat");
-
-
 
 
 //...C++ for TSIM...
@@ -41,7 +49,6 @@ ofstream outcp(fncp);
 int
 main(int, char**)
 {
-
   cout << NAME << " ... " << VERSION << endl;
 
   //...Date...
@@ -87,36 +94,29 @@ main(int, char**)
   outc << "    //...Hough cells..." << endl;
   outcp << "    //...Hough cells..." << endl;
 
-  for (unsigned i = 0; i < 5; i++)
-    for (unsigned j = 1; j < 17; j++) {
-      outc << "    TRGState SL" << to_string(i * 2) << "_row"
-           << to_string(j) << "(160);" << endl;
+  for (unsigned isl = 0; isl < 5; isl++)
+    for (unsigned iy = 1; iy < nY + 1; iy++) {
+      outc << "    TRGState SL" << to_string(isl * 2) << "_row"
+           << to_string(iy) << "(160);" << endl;
 
-      outcp << "    TRGState SL" << to_string(i * 2) << "_row"
-            << to_string(j) << "(160);" << endl;
+      outcp << "    TRGState SL" << to_string(isl * 2) << "_row"
+            << to_string(iy) << "(160);" << endl;
     }
 
-  for (unsigned sl = 0; sl < 5 ; sl++)
-    superLayer(sl);
+  for (unsigned isl = 0; isl < 5 ; isl++)
+    superLayer(isl);
 
-  for (int a = 0; a < 16; a++) {
-
-    for (int b = 0; b < 160; b++) {
-      outputm << b << " " << a + 1 << " ";
-
-      for (int c = 0; c < HPcelly[a][b].size(); c++) {
-        outputm << HPcelly[a][b][c] << " ";
+  for (unsigned iy = 0; iy < nY; iy++) {
+    for (unsigned ix = 0; ix < nX; ix++) {
+      outputm << ix << " " << iy + 1 << " ";
+      outputmp << ix << " " << iy + 1 << " ";
+      for (unsigned c = 0; c < HPcelly[iy][ix].size(); c++) {
+        outputm << HPcelly[iy][ix][c] << " ";
+      }
+      for (unsigned c = 0; c < pHPcelly[iy][ix].size(); c++) {
+        outputmp << pHPcelly[iy][ix][c] << " ";
       }
       outputm << " " << endl;
-    }
-  }
-  for (int d = 0; d < 16; d++) {
-
-    for (int e = 0; e < 160; e++) {
-      outputmp << e << " " << d + 1 << " ";
-      for (int f = 0; f < pHPcelly[d][e].size(); f++) {
-        outputmp << pHPcelly[d][e][f] << " ";
-      }
       outputmp << " " << endl;
     }
   }
@@ -129,74 +129,50 @@ main(int, char**)
   //...Date...
   outc.close();
 
-
   //...Termination...
   cout << "Files generated" << endl;
   cout << "    c++ for tsim firmware : " << fnc << endl;
   cout << "    c++ for tsim firmware : " << fncp << endl;
-//  cout << "    text file for axial super layer : " <<
-
 }
+
 void
 superLayer(const unsigned id)
 {
-  double tmp = 0;
-  int tmpi = 0;
-  int tmpj = 0;
+  //Radius of SL_center cell
+  double r_SL = 0;
+  //Number of TS each SL
+  int N_TS_SL = 0;
+  int SL = 2 * id;
 
   if (id == 0) {
-    tmp = 19.8;
-    tmpi = 160;
-    tmpj = 0;
+    r_SL = 19.8;
+    N_TS_SL = 160;
   } else if (id == 1) {
-    tmp = 40.16;
-    tmpi = 192;
-    tmpj = 2;
+    r_SL = 40.16;
+    N_TS_SL = 192;
   } else if (id == 2) {
-    tmp = 62.0;
-    tmpi = 256;
-    tmpj = 4;
+    r_SL = 62.0;
+    N_TS_SL = 256;
   } else if (id == 3) {
-    tmp = 83.84;
-    tmpi = 320;
-    tmpj = 6;
+    r_SL = 83.84;
+    N_TS_SL = 320;
   } else if (id == 4) {
-    tmp = 105.68;
-    tmpi = 384;
-    tmpj = 8;
+    r_SL = 105.68;
+    N_TS_SL = 384;
   } else {
     cout << NAME << " !!! bad super layer ID" << endl;
     exit(-1);
   }
 
-  //Hough Plane Parameter
-  //Theta Range (X Axial)
-  const double PI2 = 2 * M_PI;
-  //log10(r) Range (Y Axial)
-  //cm
-  const double minY = 1.823908740944321;
-  const double maxY = 3.204119982655926;
-  const int SL = tmpj;
-  //other const
-  const unsigned nX = 160;
-  const unsigned nY = 16;
-  //const unsigned oder=1000;
-
-  //Radious of SL_center cell
-  const double r_SL0 = tmp;
-
-  //Number of TS each SL
-  const int N_TS_SL0 = tmpi;
-
-  //Hough Plane database SL-0
-  vector <XY> xymatrix;
+  //Hough Plane database
+  vector<XY> xymatrix;
   XY xy = {0, 0};
 
 /////////////////////////////////////////////////base of ts
 
-  for (int i = 0 ; i < N_TS_SL0 ; i++) {
-    xy.x = r_SL0 * cos((PI2 / N_TS_SL0) * i);
-    xy.y = r_SL0 * sin((PI2 / N_TS_SL0) * i);
+  for (int i = 0; i < N_TS_SL; ++i) {
+    xy.x = r_SL * cos((PI2 / N_TS_SL) * i);
+    xy.y = r_SL * sin((PI2 / N_TS_SL) * i);
     xymatrix.push_back(xy);
   }
 ///////////////////////////////////////////////////HP to TS
@@ -204,17 +180,15 @@ superLayer(const unsigned id)
   const double r0 = minY;
   const double theta0 = 0;
   const double dr = (maxY - minY) / nY;
-  const float dtheta = PI2 / nX;
-  double r1 ;
-  double r2 ;
-  double rminus ;
-  double rplus ;
-  double theta1 ;
-  double theta2 ;
-  double minus1 ;
-  double minus2 ;
-  double plus1 ;
-  double plus2 ;
+  const double dtheta = PI2 / nX;
+  double r1;
+  double r2;
+  double theta1;
+  double theta2;
+  double minus1;
+  double minus2;
+  double plus1;
+  double plus2;
 
   const string vh = "UT3_0_SL" + to_string(id * 2) + ".vhd";
   const string vhp = "UT3_0_SL" + to_string(id * 2) + "_p.vhd";
@@ -245,7 +219,7 @@ superLayer(const unsigned id)
   outputf << "		  SL" << SL << "_row14 : out  STD_LOGIC_VECTOR (79 downto 40);" << endl;
   outputf << "		  SL" << SL << "_row15 : out  STD_LOGIC_VECTOR (79 downto 40);" << endl;
   outputf << "		  SL" << SL << "_row16 : out  STD_LOGIC_VECTOR (79 downto 40);" << endl;
-  outputf << "		  SL" << SL << "_TS    : in   STD_LOGIC_VECTOR (" << tmpi / 2 << " downto 0));" << endl;
+  outputf << "		  SL" << SL << "_TS    : in   STD_LOGIC_VECTOR (" << N_TS_SL / 2 << " downto 0));" << endl;
 
   outputf << "end UT3_0_SL" << SL << ";" << endl;
   outputf << " " << endl;
@@ -255,7 +229,7 @@ superLayer(const unsigned id)
   outputf << "begin" << endl;
   outputf << " " << endl;
 
-  //generate firware code(Plus)
+  //generate firmware code(Plus)
   outputfp << "library IEEE;" << endl;
   outputfp << "use IEEE.STD_LOGIC_1164.ALL;" << endl;
   outputfp << " " << endl;
@@ -279,7 +253,7 @@ superLayer(const unsigned id)
   outputfp << "           SL" << SL << "_row14 : out  STD_LOGIC_VECTOR (39 downto 0);" << endl;
   outputfp << "           SL" << SL << "_row15 : out  STD_LOGIC_VECTOR (39 downto 0);" << endl;
   outputfp << "           SL" << SL << "_row16 : out  STD_LOGIC_VECTOR (39 downto 0);" << endl;
-  outputfp << "           SL" << SL << "_TS    : in   STD_LOGIC_VECTOR (" << tmpi / 2 << " downto 0));" << endl;
+  outputfp << "           SL" << SL << "_TS    : in   STD_LOGIC_VECTOR (" << N_TS_SL / 2 << " downto 0));" << endl;
 
   outputfp << "end UT3_0_SL" << SL << "_P;" << endl;
   outputfp << " " << endl;
@@ -291,19 +265,15 @@ superLayer(const unsigned id)
 
 
   //vertical
-  for (int k = 0 ; k < 16 ; k++) {
-
+  for (unsigned k = 0 ; k < nY ; ++k) {
     //horizontal
-    for (int t = 0 ; t < 160 ; t++) {
-      double  j = t % 160;
+    for (unsigned j = 0 ; j < nX ; ++j) {
       double  ff = 0;
-      // double  ii=0;
       double  ffp = 0;
-      // double  iip=0;
 
       if (j > 39 && j < 80)
         outputf << "SL" << SL << "_row" << k + 1 << "(" << j << ")<=";
-      if (j >= 0 && j < 40)
+      if (j < 40)
         outputfp << "SL" << SL << "_row" << k + 1 << "(" << j << ")<=";
       outc << "    SL" << SL << "_row" << k + 1 << ".set(" << j << ", ";
       outcp << "    SL" << SL << "_row" << k + 1 << ".set(" << j << ", ";
@@ -314,153 +284,130 @@ superLayer(const unsigned id)
       theta2 = theta0 + (j + 1) * dtheta;
 
       //TS
-      for (int i = 0 ; i < N_TS_SL0 ; i++) { //HP_0(0,0) to TS_SL_0  Save Date
+      for (int i = 0 ; i < N_TS_SL ; i++) {
+        // calculate r(phi) at Hough cell borders phi1 and phi2
+        r1 = ((xymatrix[i].x * xymatrix[i].x) + (xymatrix[i].y * xymatrix[i].y)) /
+             ((2 * xymatrix[i].x * cos(theta1)) + (2 * xymatrix[i].y * sin(theta1)));
+        r2 = ((xymatrix[i].x * xymatrix[i].x) + (xymatrix[i].y * xymatrix[i].y)) /
+             ((2 * xymatrix[i].x * cos(theta2)) + (2 * xymatrix[i].y * sin(theta2)));
 
+        /* Check whether f(phi) = log(r(phi)) crosses the Hough cell
+         * defined by (phi1, phi2, log(r1), log(r2))
+         * The slope determines the charge of the track.
+         *
+         * Since f is not defined for all phi, 3 cases can occur:
+         * 1. f(phi1) and f(phi2) both defined:
+         *    compare f(phi1) and f(phi2) to log(r1) and log(r2),
+         *    get slope from f(phi2) - f(phi1)
+         * 2. f(phi1) defined, f(phi2) not defined (or vice-versa):
+         *    compare f(phi1) to log(r1) and log(r2),
+         *    slope is known
+         * 3. f(phi1) and f(phi2) both not defined: no entry
+         */
 
-        r1 = (((xymatrix[i].x) * (xymatrix[i].x)) + ((xymatrix[i].y) * (xymatrix[i].y))) / ((2 * xymatrix[i].x * cos(theta1)) +
-             (2 * xymatrix[i].y * sin(theta1)));
-        r2 = (((xymatrix[i].x) * (xymatrix[i].x)) + ((xymatrix[i].y) * (xymatrix[i].y))) / ((2 * xymatrix[i].x * cos(theta2)) +
-             (2 * xymatrix[i].y * sin(theta2)));
+        //...minus...
+        if (r1 >= 0 && r2 >= 0 && r1 < r2) {
+          /* positive slope:
+           * crossing if f(phi1) < log(r2) and f(phi2) > log(r1)
+           */
+          minus1 = r0 + (k + 1) * dr - log10(r1);
+          minus2 = r0 + k * dr - log10(r2);
+          if (minus1 * minus2 <= 0.0) {
+            HPcelly[k][j].push_back(SL);
+            HPcelly[k][j].push_back(i);
 
-        rplus = (((xymatrix[i].x) * (xymatrix[i].x)) + ((xymatrix[i].y) * (xymatrix[i].y))) / (2 * xymatrix[i].x * cos(
-                  theta1 + dtheta / 10000) + (2 * xymatrix[i].y * sin(theta1 + dtheta / 10000)));
-        rminus = (((xymatrix[i].x) * (xymatrix[i].x)) + ((xymatrix[i].y) * (xymatrix[i].y))) / (2 * xymatrix[i].x * cos(
-                   theta2 + dtheta / 10000) + (2 * xymatrix[i].y * sin(theta2 + dtheta / 10000)));
+            if (! first)
+              outc << " or ";
 
-        if (r1 < 0) {
-          r1 = 1;
-        }
-        if (r2 < 0) {
-          r2 = 1;
-        }
-        if (rminus < 0) {
-          rminus = 1;
-        }
-        if (rplus < 0) {
-          rplus = 1;
-        }
-
-        minus1 = r0 + (k + 1) * dr - log10(r1);
-        minus2 = r0 + k * dr - log10(r2);
-
-        plus1 = r0 + (k + 1) * dr - log10(r2);
-        plus2 = r0 + k * dr - log10(r1);
-
-
-
-//minus
-////////////////////////////////////////////////////////////////
-
-        if (r1 != 1 && r2 != 1) {
-          if (r2 <= rminus) {
-            if (minus1 * minus2 <= 0.0) {
-
-              HPcelly[k][j].push_back(SL);
-              HPcelly[k][j].push_back(i);
-
-              if (! first)
-                outc << " or ";
-
-              if (ff != 0) {
-                if (j > 39 && j < 80)
-                  outputf << "or ";
-              }
-
-              ff++;
-              // ii=i;
+            if (ff != 0) {
               if (j > 39 && j < 80)
-                outputf << "SL" << SL << "_TS(" << i << ") ";
-
-              outc << "SL" << SL << "_TS[" << i << "]";
-              first = false;
+                outputf << "or ";
             }
+
+            ff++;
+            if (j > 39 && j < 80)
+              outputf << "SL" << SL << "_TS(" << i << ") ";
+
+            outc << "SL" << SL << "_TS[" << i << "]";
+            first = false;
           }
-        }
+        } else if (r2 < 0 && r1 >= 0) {
+          /* positive slope, f(phi2) = inf:
+           * crossing if f(phi1) < log(r2)
+           */
+          minus1 = r0 + (k + 1) * dr - log10(r1);
+          if (minus1 > 0) {
+            HPcelly[k][j].push_back(SL);
+            HPcelly[k][j].push_back(i);
 
+            if (! first)
+              outc << " or ";
 
-        else if (r2 == 1 && r1 != 1) {
-
-          if (r2 <= rminus) {
-            if (r2 == 1 && minus1 > 0) {
-              HPcelly[k][j].push_back(SL);
-              HPcelly[k][j].push_back(i);
-
-              if (! first)
-                outc << " or ";
-
-              if (ff != 0) {
-                if (j > 39 && j < 80)
-                  outputf << "or ";
-              }
-              ff++;
-              // ii=i;
+            if (ff != 0) {
               if (j > 39 && j < 80)
-                outputf << "SL" << SL << "_TS(" << i << ") ";
-
-              outc << "SL" << SL << "_TS[" << i << "]";
-              first = false;
+                outputf << "or ";
             }
+            ff++;
+            if (j > 39 && j < 80)
+              outputf << "SL" << SL << "_TS(" << i << ") ";
+
+            outc << "SL" << SL << "_TS[" << i << "]";
+            first = false;
           }
         }
 
+        //plus
+        if (r1 >= 0 && r2 >= 0 && r2 < r1) {
+          /* negative slope:
+           * crossing if f(phi2) < log(r2) and f(phi1) > log(r1)
+           */
+          plus1 = r0 + (k + 1) * dr - log10(r2);
+          plus2 = r0 + k * dr - log10(r1);
+          if (plus1 * plus2 <= 0.0) {
+            pHPcelly[k][j].push_back(SL);
+            pHPcelly[k][j].push_back(i);
+            if (! firstp)
+              outcp << " or ";
 
-//plus
-        if (r1 != 1 && r2 != 1) {
-          if (r1 >= rplus) {
-            if (plus1 * plus2 <= 0.0) {
-              pHPcelly[k][j].push_back(SL);
-              pHPcelly[k][j].push_back(i);
-              if (! firstp)
-                outcp << " or ";
-
-              if (ffp != 0) {
-                if (j >= 0 && j < 40)
-                  outputfp << "or ";
-              }
-              ffp++;
-              // iip=i;
-              if (j >= 0 && j < 40)
-                outputfp << "SL" << SL << "_TS(" << i << ") ";
-
-              outcp << "SL" << SL << "_TS[" << i << "]";
-              firstp = false;
+            if (ffp != 0) {
+              if (j < 40)
+                outputfp << "or ";
             }
+            ffp++;
+            if (j < 40)
+              outputfp << "SL" << SL << "_TS(" << i << ") ";
 
+            outcp << "SL" << SL << "_TS[" << i << "]";
+            firstp = false;
           }
+        } else if (r1 < 0 && r2 >= 0) {
+          /* negative slope, f(phi1) = inf:
+           * crossing if f(phi2) < log(r2)
+           */
+          plus1 = r0 + (k + 1) * dr - log10(r2);
+          if (plus1 > 0) {
+            pHPcelly[k][j].push_back(SL);
+            pHPcelly[k][j].push_back(i);
+            if (! firstp)
+              outcp << " or ";
 
-        }
-
-        else if (r1 == 1 && r2 != 1) {
-          if (r1 >= rplus) {
-            if (r1 == 1 && plus1 > 0) {
-              pHPcelly[k][j].push_back(SL);
-              pHPcelly[k][j].push_back(i);
-              if (! firstp)
-                outcp << " or ";
-
-              if (ffp != 0) {
-                if (j >= 0 && j < 40)
-                  outputfp << "or ";
-              }
-              ffp++;
-              // iip=i;
-              if (j >= 0 && j < 40)
-                outputfp << "SL" << SL << "_TS(" << i << ") ";
-
-              outcp << "SL" << SL << "_TS[" << i << "]";
-              firstp = false;
+            if (ffp != 0) {
+              if (j < 40)
+                outputfp << "or ";
             }
+            ffp++;
+            if (j < 40)
+              outputfp << "SL" << SL << "_TS(" << i << ") ";
+
+            outcp << "SL" << SL << "_TS[" << i << "]";
+            firstp = false;
           }
         }
       }
 
-
-
-
-
       if (j > 39 && j < 80)
         outputf << ";" << endl;
-      if (j >= 0 && j < 40)
+      if (j < 40)
         outputfp << ";" << endl;
       outc << ");" << endl;
       outcp << ");" << endl;
@@ -471,7 +418,7 @@ superLayer(const unsigned id)
   outputf << "end Behavioral;" << endl;
   outputfp << " " << endl;
   outputfp << "end Behavioral;" << endl;
-  return  ;
+  return;
 }
 
 

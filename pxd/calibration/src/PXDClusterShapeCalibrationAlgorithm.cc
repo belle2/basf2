@@ -561,9 +561,13 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   if (m_DoExpertHistograms) {
     for (int i_ev = 0; i_ev < nEntries; i_ev++) {
       getObject<TTree>(name_SourceTree.Data()).GetEntry(i_ev);
-      m_histSignal[m_shape - 1]->Fill(m_signal);
+      int iShp = m_shape;
+      if (iShp < 1) iShp = 1;
+      if (iShp > m_shapes) iShp = m_shapes;
+
+      m_histSignal[iShp - 1]->Fill(m_signal);
       m_histSignal[m_shapes]->Fill(m_signal);
-      m_histSeed[m_shape - 1]->Fill(m_seed);
+      m_histSeed[iShp - 1]->Fill(m_seed);
       m_histSeed[m_shapes]->Fill(m_seed);
 
       int AngU = m_anglesU / 2 + (int)(m_phiTrack * m_anglesU / TMath::Pi());

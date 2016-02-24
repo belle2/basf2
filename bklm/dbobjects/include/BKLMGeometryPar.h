@@ -48,8 +48,11 @@ namespace Belle2 {
     //!Default constructor
     BKLMGeometryPar() {};
 
+    //! Constructor
+    explicit BKLMGeometryPar(const GearDir&);
+
     //! Destructor
-    ~BKLMGeometryPar() {};
+    ~BKLMGeometryPar();
 
     //! Returen BKLM geometry version
     int getVersion() const {return m_version; }

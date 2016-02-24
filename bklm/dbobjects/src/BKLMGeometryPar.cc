@@ -34,19 +34,20 @@ BKLMGeometryPar* BKLMGeometryPar::instance(const GearDir& content)
   if (!m_Instance) m_Instance = new BKLMGeometryPar(content);
   return m_Instance;
 }
+*/
 
 BKLMGeometryPar::BKLMGeometryPar(const GearDir& content)
 {
-  clear();
+  //clear();
   read(content);
 }
 
 BKLMGeometryPar::~BKLMGeometryPar()
 {
-  clear();
+  //clear();
 }
 
-void BKLMGeometryPar::clear()
+/*void BKLMGeometryPar::clear()
 {
   //for (std::map<int, Module>::iterator m = m_Modules.begin(); m != m_Modules.end(); ++m) { delete m->second; }
   //m_Modules.clear();

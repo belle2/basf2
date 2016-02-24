@@ -26,7 +26,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    BKLMBadChannels() {};
+    BKLMBadChannels(): m_DeadChannels(), m_HotChannels() {};
 
     /**
      * Default destructor

@@ -68,7 +68,7 @@ int main()
   outputp<<" "<<endl;
   for(unsigned js=1;js<16;js+=2){
     for(unsigned ts=0;ts<80;ts+=2){
-      if (ts>=0 && ts<40){
+      if (ts<40){
 	outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_A  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
 	outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_B  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
 	outputpp<<"signal	patternI_"<<ts%160+1<<"_"<<js<<"_D  :   STD_LOGIC_VECTOR (3 downto 0);"<<endl;
@@ -210,7 +210,7 @@ int main()
 	outputp<<"port map ("<<endl;
       }
       
-      if (t>=0&&t<40){ 
+      if (t<40){ 
 	++c;
 	outputpp<<"Center_"<<c<<" :cluster_center"<<endl;
 	outputpp<<"port map ("<<endl;
@@ -526,7 +526,7 @@ int main()
 	}
       }
       //////Plus//////////////////////////////////////////////////////////////////////////
-      if(t>=0&&t<=38){
+      if(t<=38){
 	if (t==0){
 	  if(j==1){
 	    outputpp<<setw(21)<<"X =>\"0000\","<<endl;
@@ -812,7 +812,7 @@ int main()
 	outputp<<setw(40)<<"top_clkData_s =>top_clkData_s );"<<endl;
 	outputp<<" "<<endl;
       }
-      if (t>=0 && t<40){
+      if (t<40){
 	outputpp<<setw(40)<<"top_clkData_s =>top_clkData_s );"<<endl;
 	outputpp<<" "<<endl;
       }

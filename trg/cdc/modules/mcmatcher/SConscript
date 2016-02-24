@@ -1,5 +1,8 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'cdc', 'trg_cdc']
+env['LIBS'] = ['framework',
+               'mdst_dataobjects',
+               'cdc_dataobjects',
+               'trg_cdc_dataobjects']
 
 Return('env')

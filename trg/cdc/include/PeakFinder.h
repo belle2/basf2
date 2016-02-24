@@ -23,16 +23,16 @@
 
 namespace Belle2 {
 
-class TRGCDCCircle;
-class TRGCDCHoughPlaneMulti2;
+  class TRGCDCCircle;
+  class TRGCDCHoughPlaneMulti2;
 
 /// A class to find peaks in Hough Plane
-class TRGCDCPeakFinder {
+  class TRGCDCPeakFinder {
 
   public:
 
     /// Contructor.
-    TRGCDCPeakFinder(const std::string & name);
+    TRGCDCPeakFinder(const std::string& name);
 
     /// Destructor
     virtual ~TRGCDCPeakFinder();
@@ -46,39 +46,40 @@ class TRGCDCPeakFinder {
     std::string version(void) const;
 
     /// do peak finding. This is a copy from "trasan".
-    void peaks6(TRGCDCHoughPlaneMulti2 & hp,
+    void peaks6(TRGCDCHoughPlaneMulti2& hp,
                 const unsigned threshold,
                 const bool centerIsPeak,
-		std::vector<unsigned> & peakSerialIds) const;
+                std::vector<unsigned>& peakSerialIds) const;
 
     /// do peak finding. Kaiyu's version.
-    void peaks7(TRGCDCHoughPlaneMulti2 & hp,
+    void peaks7(TRGCDCHoughPlaneMulti2& hp,
                 const unsigned threshold,
-                std::vector<std::vector<unsigned>> & peaks) const;
+                std::vector<std::vector<unsigned>>& peaks) const;
 
   private:
 
     /// Makes regions.
-    void regions(TRGCDCHoughPlane & hp, const unsigned threshold) const;
+    void regions(TRGCDCHoughPlane& hp, const unsigned threshold) const;
 
     /// Kaiyu's logic.
-    void p1p2Methode(TRGCDCHoughPlane & hp,
+    void p1p2Methode(TRGCDCHoughPlane& hp,
                      const unsigned threshold,
-                     std::vector<std::vector<unsigned>> & peaks) const;
+                     std::vector<std::vector<unsigned>>& peaks) const;
 
   private:
 
     /// Name
     const std::string _name;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-std::string
-TRGCDCPeakFinder::name(void) const {
+  inline
+  std::string
+  TRGCDCPeakFinder::name(void) const
+  {
     return _name;
-}
+  }
 
 } // namespace Belle2
 

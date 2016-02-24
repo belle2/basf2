@@ -355,13 +355,13 @@ namespace Belle2 {
   }
 
   void
-  TRGCDCPeakFinder::peaks6(TCHPlaneMulti2& hp,
-                           const unsigned threshold,
-                           const bool centerIsPeak,
-                           vector<unsigned>& peakSerialIds) const
+  TRGCDCPeakFinder::findPeaksTrasan(TCHPlaneMulti2& hp,
+                                    const unsigned threshold,
+                                    const bool centerIsPeak,
+                                    vector<unsigned>& peakSerialIds) const
   {
 
-    TRGDebug::enterStage("Peak Finding (peaks6)");
+    TRGDebug::enterStage("Peak Finding (trasan methode)");
     if (TRGDebug::level())
       cout << TRGDebug::tab() << "threshold=" << threshold
            << ",plane name=[" << hp.name() << "]" << endl;
@@ -468,17 +468,17 @@ namespace Belle2 {
       cout << TRGDebug::tab() << peakSerialIds.size() << " peak(s)"
            << " found in total" << endl;
 
-    TRGDebug::leaveStage("Peak Finding (peaks6)");
+    TRGDebug::leaveStage("Peak Finding (trasan methode)");
     return;
   }
 
   void
-  TRGCDCPeakFinder::peaks7(TCHPlaneMulti2& hp,
-                           const unsigned threshold,
-                           vector<vector<unsigned>>& peaks) const
+  TRGCDCPeakFinder::findPeaks(TCHPlaneMulti2& hp,
+                              const unsigned threshold,
+                              vector<vector<unsigned>>& peaks) const
   {
 
-    const string sn = "Peak Finding (peaks7)";
+    const string sn = "Peak Finding";
     TRGDebug::enterStage(sn);
 
     if (TRGDebug::level())

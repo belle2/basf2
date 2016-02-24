@@ -239,8 +239,8 @@ namespace Belle2 {
 #endif
 
     //...Look for peaks which have 5 hits...
-    _peakFinder.peaks6(* _plane[0], _peakMin, false, peaks[0]);
-    _peakFinder.peaks6(* _plane[1], _peakMin, false, peaks[1]);
+    _peakFinder.findPeaksTrasan(* _plane[0], _peakMin, false, peaks[0]);
+    _peakFinder.findPeaksTrasan(* _plane[1], _peakMin, false, peaks[1]);
 
     //...Peak loop to pick up segment hits...
     // (no fit, using peak position only)
@@ -828,8 +828,8 @@ namespace Belle2 {
     _plane[1]->merge();
 
     //...Look for peaks which have 5 hits...
-    _peakFinder.peaks7(* _plane[0], _peakMin, peaks[0]);
-    _peakFinder.peaks7(* _plane[1], _peakMin, peaks[1]);
+    _peakFinder.findPeaks(* _plane[0], _peakMin, peaks[0]);
+    _peakFinder.findPeaks(* _plane[1], _peakMin, peaks[1]);
 
     //...Peak loop to make tracks (no fit, using hough position only)...
     for (unsigned pm = 0; pm < 2; pm++) {

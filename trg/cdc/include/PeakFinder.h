@@ -46,22 +46,22 @@ namespace Belle2 {
     std::string version(void) const;
 
     /// do peak finding. This is a copy from "trasan".
-    void peaks6(TRGCDCHoughPlaneMulti2& hp,
-                const unsigned threshold,
-                const bool centerIsPeak,
-                std::vector<unsigned>& peakSerialIds) const;
+    void findPeaksTrasan(TRGCDCHoughPlaneMulti2& hp,
+                         const unsigned threshold,
+                         const bool centerIsPeak,
+                         std::vector<unsigned>& peakSerialIds) const;
 
-    /// do peak finding. Kaiyu's version.
-    void peaks7(TRGCDCHoughPlaneMulti2& hp,
-                const unsigned threshold,
-                std::vector<std::vector<unsigned>>& peaks) const;
+    /// do peak finding. Kaiyu's version using p1p2Methode.
+    void findPeaks(TRGCDCHoughPlaneMulti2& hp,
+                   const unsigned threshold,
+                   std::vector<std::vector<unsigned>>& peaks) const;
 
   private:
 
     /// Makes regions.
     void regions(TRGCDCHoughPlane& hp, const unsigned threshold) const;
 
-    /// Kaiyu's logic.
+    /// Kaiyu's logic. Finds peaks from nested patterns.
     void p1p2Methode(TRGCDCHoughPlane& hp,
                      const unsigned threshold,
                      std::vector<std::vector<unsigned>>& peaks) const;

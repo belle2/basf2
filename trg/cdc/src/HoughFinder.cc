@@ -85,8 +85,6 @@ namespace Belle2 {
 
   TRGCDCHoughFinder::TRGCDCHoughFinder(const string& name,
                                        const TRGCDC& TRGCDC,
-                                       unsigned nX,
-                                       unsigned nY,
                                        unsigned peakMin,
                                        const string& mappingFilePlus,
                                        const string& mappingFileMinus,
@@ -101,25 +99,38 @@ namespace Belle2 {
 
     _commonData = 0;
 
-    //...Make Hough lanes...
-    _plane[0] = new TCHPlaneMulti2("circle hough plus",
-                                   _circleH,
-                                   nX,
-                                   0,
-                                   2 * M_PI,
-                                   nY,
-                                   1.0475399174815,
-                                   3.2903831852691,//due to the top of hough disply has been cut
-                                   5);
-    _plane[1] = new TCHPlaneMulti2("circle hough minus",
-                                   _circleH,
-                                   nX,
-                                   0,
-                                   2 * M_PI,
-                                   nY,
-                                   1.0475399174815,
-                                   3.2903831852691,
-                                   5);
+    //...Read Hough plane parameters from file
+    const string fMap[2] = {mappingFilePlus, mappingFileMinus};
+    const string fName[2] = {string("circle hough plus"), string("circle hough minus")};
+
+    for (unsigned f = 0; f < 2; f++) {
+      const string fn = fMap[f];
+      ifstream infile(fn.c_str(), ios::in);
+      if (infile.fail()) {
+        B2FATAL("Cannot open Hough mapping file " << fn);
+        return;
+      }
+
+      //...Ignore lines not starting with a digit...
+      string ignore;
+      while (!isdigit(infile.peek())) {
+        getline(infile, ignore);
+      }
+
+      //...Read Hough plane cell number and limits...
+      unsigned nX = 0;
+      unsigned nY = 0;
+      double Ymin = 0.;
+      double Ymax = 0.;
+
+      infile >> nX >> nY >> Ymin >> Ymax;
+      infile.close();
+
+      _plane[f] = new TCHPlaneMulti2(fName[f], _circleH,
+                                     nX, 0, 2 * M_PI,
+                                     nY, Ymin, Ymax,
+                                     5);
+    }
 
     //...Set charge...
     _plane[0]->charge(1);
@@ -166,24 +177,6 @@ namespace Belle2 {
           _plane[1]->clear();
           _plane[1]->vote(x, y, -1, axialSuperLayerId, 1);
           _plane[1]->registerPattern(axialSuperLayerId, j);
-
-#ifdef TRGCDC_DISPLAY_HOUGH
-//             string stg = "Hough Pattern Regstration";
-//             string inf = "   ";
-//             _plane[0]->merge();
-//             _plane[1]->merge();
-//             H0->stage(stg);
-//             H0->information(inf);
-//             H0->clear();
-//             H0->area().append(_plane[0]);
-//             H0->show();
-//             H1->stage(stg);
-//             H1->information(inf);
-//             H1->clear();
-//             H1->area().append(_plane[1]);
-//             H1->show();
-//             H1->run();
-#endif
         }
         ++axialSuperLayerId;
       }
@@ -696,6 +689,14 @@ namespace Belle2 {
       vector<unsigned> y;
       vector<vector<unsigned>> tsf;
 
+      //...Ignore lines not starting with a digit...
+      string ignore;
+      while (!isdigit(infile.peek())) {
+        getline(infile, ignore);
+      }
+      //...Skip the first line (read in constructor)...
+      getline(infile, ignore);
+
       //...Read map file...
       string car;
       while (getline(infile, car)) {
@@ -708,8 +709,8 @@ namespace Belle2 {
           unsigned j = i % 2;
           if (i == 1)              // cell position x
             x.push_back(b);
-          if (i == 2)              // cell positioy y
-            y.push_back(b);
+          if (i == 2)              // cell position y (stored with offset 1)
+            y.push_back(b - 1);
           if (j != 0 && i != 1)    // TSF SL
             slts.push_back(b);
           if (j != 1 && i != 2)    // TSF local ID
@@ -737,7 +738,7 @@ namespace Belle2 {
           for (unsigned k = 0; k < n; k++) {
             const int ix = x[k];
             const int iy = y[k];
-            const unsigned sid = _plane[f]->serialId(ix, iy + 9);
+            const unsigned sid = _plane[f]->serialId(ix, iy);
             for (unsigned itsf = 0; itsf < tsf[k].size();) {
               const unsigned sl = tsf[k][itsf];
               const unsigned id = tsf[k][itsf + 1];

@@ -16,8 +16,8 @@ def add_cdc_trigger(path):
         'ConfigFile': Belle2.FileSystem.findFile("data/trg/cdc/TRGCDCConfig_0_20101111.dat"),
         'InnerTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v2.2.coe"),
         'OuterTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v2.2.coe"),
-        'HoughFinderMappingFileMinus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingMinus20160217.dat"),
-        'HoughFinderMappingFilePlus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingPlus20160217.dat")}
+        'HoughFinderMappingFileMinus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingMinus20160223.dat"),
+        'HoughFinderMappingFilePlus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingPlus20160223.dat")}
     trgcdc.param(trgcdc_params)
     path.add_module(trgcdc)
     # neurotrigger

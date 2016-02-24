@@ -53,11 +53,9 @@ namespace Belle2 {
       _fileTRGCDC(0),
       _perfect2DFinder(false),
       _perfect3DFinder(false),
-      _hFinderMeshX(160),
-      _hFinderMeshY(26),
       _hFinderPeakMin(5),
-      _hFinderMappingFilePlus("HoughMappingPlus20160217.dat"),
-      _hFinderMappingFileMinus("HoughMappingMinus20160217.dat"),
+      _hFinderMappingFilePlus("HoughMappingPlus20160223.dat"),
+      _hFinderMappingFileMinus("HoughMappingMinus20160223.dat"),
       _hFinderDoit(2),
       _fLogicLUTTSF(1),
       _fLRLUT(1),
@@ -129,14 +127,6 @@ namespace Belle2 {
              _perfect3DFinder,
              "3D finder perfect option",
              _perfect3DFinder);
-    addParam("HoughFinderMeshX",
-             _hFinderMeshX,
-             "Hough finder # mesh in x",
-             _hFinderMeshX);
-    addParam("HoughFinderMeshY",
-             _hFinderMeshY,
-             "Hough finder # mesh in y",
-             _hFinderMeshY);
     addParam("HoughFinderPeakMin",
              _hFinderPeakMin,
              "Hough finder min. peak height",
@@ -240,10 +230,6 @@ namespace Belle2 {
       cout << TRGDebug::tab(4) << "back stop = " << _curlBackStop << endl;
       cout << TRGDebug::tab(4) << "2D finder perfect = " << _perfect2DFinder
            << endl;
-      cout << TRGDebug::tab(4) << "Hough finder Mesh X = " << _hFinderMeshX
-           << endl;
-      cout << TRGDebug::tab(4) << "Hough finder Mesh Y = " << _hFinderMeshY
-           << endl;
       cout << TRGDebug::tab(4) << "Hough finder Min. Peak = "
            << _hFinderPeakMin
            << endl;
@@ -291,8 +277,6 @@ namespace Belle2 {
                                _outerTSLUTFilename,
                                _rootTRGCDCFilename,
                                _rootFitter3DFilename,
-                               _hFinderMeshX,
-                               _hFinderMeshY,
                                _hFinderPeakMin,
                                _hFinderMappingFilePlus,
                                _hFinderMappingFileMinus,

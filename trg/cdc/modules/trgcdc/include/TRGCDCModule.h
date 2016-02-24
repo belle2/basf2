@@ -130,12 +130,6 @@ namespace Belle2 {
     /// Switch to activate perfect 3D finder.
     bool _perfect3DFinder;
 
-    /// \# of X mesh for the Hough finder.
-    int _hFinderMeshX;
-
-    /// \# of Y mesh for the Hough finder.
-    int _hFinderMeshY;
-
     /// Min. peak height for the Hough finder.
     int _hFinderPeakMin;
 

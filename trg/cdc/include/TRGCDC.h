@@ -78,8 +78,6 @@ namespace Belle2 {
                              const std::string& outerTSLUTFile = "?",
                              const std::string& rootTRGCDCFile = "?",
                              const std::string& rootFitter3DFile = "?",
-                             unsigned houghFinderMeshX = 96,
-                             unsigned houghFinderMeshY = 96,
                              unsigned houghFinderPeakMin = 5,
                              const std::string& houghMappingFilePlus = "?",
                              const std::string& houghMappingFileMinus = "?",
@@ -114,8 +112,6 @@ namespace Belle2 {
            const std::string& outerTSLUTFile,
            const std::string& rootTRGCDCFile,
            const std::string& rootFitter3DFile,
-           unsigned houghFinderMeshX,
-           unsigned houghFinderMeshY,
            unsigned houghFinderPeakMin,
            const std::string& houghMappingFilePlus,
            const std::string& houghMappingFileMinus,
@@ -136,9 +132,7 @@ namespace Belle2 {
     virtual ~TRGCDC();
 
     /// initializes CDC geometry.
-    void initialize(unsigned houghFinderMeshX,
-                    unsigned houghFinderMeshY,
-                    unsigned houghFinderPeakMin,
+    void initialize(unsigned houghFinderPeakMin,
                     const std::string& houghMappingFilePlus,
                     const std::string& houghMappingFileMinus,
                     unsigned houghDoit);

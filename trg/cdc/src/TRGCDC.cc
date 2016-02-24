@@ -107,8 +107,6 @@ namespace Belle2 {
                     const string& outerTSLUTFile,
                     const string& rootTRGCDCFile,
                     const string& rootFitter3DFile,
-                    unsigned houghFinderMeshX,
-                    unsigned houghFinderMeshY,
                     unsigned houghFinderPeakMin,
                     const string& houghMappingFilePlus,
                     const string& houghMappingFileMinus,
@@ -142,8 +140,6 @@ namespace Belle2 {
                         outerTSLUTFile,
                         rootTRGCDCFile,
                         rootFitter3DFile,
-                        houghFinderMeshX,
-                        houghFinderMeshY,
                         houghFinderPeakMin,
                         houghMappingFilePlus,
                         houghMappingFileMinus,
@@ -205,8 +201,6 @@ namespace Belle2 {
                  const string& outerTSLUTFile,
                  const string& rootTRGCDCFile,
                  const string& rootFitter3DFile,
-                 unsigned houghFinderMeshX,
-                 unsigned houghFinderMeshY,
                  unsigned houghFinderPeakMin,
                  const string& houghMappingFilePlus,
                  const string& houghMappingFileMinus,
@@ -287,9 +281,7 @@ namespace Belle2 {
            << " mode=0x" << hex << _simulationMode << dec << endl;
     }
 
-    initialize(houghFinderMeshX,
-               houghFinderMeshY,
-               houghFinderPeakMin,
+    initialize(houghFinderPeakMin,
                houghMappingFilePlus,
                houghMappingFileMinus,
                houghDoit);
@@ -302,9 +294,7 @@ namespace Belle2 {
   }
 
   void
-  TRGCDC::initialize(unsigned houghFinderMeshX,
-                     unsigned houghFinderMeshY,
-                     unsigned houghFinderPeakMin,
+  TRGCDC::initialize(unsigned houghFinderPeakMin,
                      const string& houghMappingFilePlus,
                      const string& houghMappingFileMinus,
                      unsigned houghDoit)
@@ -601,8 +591,6 @@ namespace Belle2 {
     //...Hough 2D Finder...
     _hFinder = new TCHFinder("HoughFinder",
                              *this,
-                             houghFinderMeshX,
-                             houghFinderMeshY,
                              houghFinderPeakMin,
                              houghMappingFilePlus,
                              houghMappingFileMinus,

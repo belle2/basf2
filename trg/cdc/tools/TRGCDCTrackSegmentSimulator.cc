@@ -88,8 +88,6 @@ main(int argc, char * argv[]) {
     const string outerTSLUTFile = patht + "outerLUT_v2.2.coe";
     const string rootTRGCDCFile = "TRGCDC.root";
     const string rootFitter3DFile = "Fitter3D.root";
-    const unsigned houghFinderMeshX = 160;
-    const unsigned houghFinderMeshY = 16;
     const unsigned houghFinderPeakMin = 5;
     const string houghMappingFilePlus = patht + "HoughMappingPlus20140807.dat";
     const string houghMappingFileMinus = patht +
@@ -119,8 +117,6 @@ main(int argc, char * argv[]) {
                                      outerTSLUTFile,
                                      rootTRGCDCFile,
                                      rootFitter3DFile,
-                                     houghFinderMeshX,
-                                     houghFinderMeshY,
                                      houghFinderPeakMin,
                                      houghMappingFilePlus,
                                      houghMappingFileMinus,
@@ -185,7 +181,7 @@ readFile(const string & fn,
         cout << PROGRAM_NAME << " !!! can not open file" << endl
              << "    " << fn << endl;
         exit(-1);
-    }    
+    }
 
     //...Preparations...
     const TRGClock & dc = TRGCDC::getTRGCDC()->dataClock();

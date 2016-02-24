@@ -43,8 +43,6 @@ namespace Belle2 {
     /// Contructor.
     TRGCDCHoughFinder(const std::string& name,
                       const TRGCDC&,
-                      unsigned nX,
-                      unsigned nY,
                       unsigned peakMin,
                       const std::string& mappingFilePlus,
                       const std::string& mappingFileMinus,

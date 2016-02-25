@@ -44,7 +44,7 @@ void RunControlCallback::initialize(const DBObject& obj) throw(RCHandlerExceptio
   if (!addAll(obj)) {
     throw (RCHandlerException("Failed to initialize (config=%s)", obj.getName().c_str()));
   }
-  distribute_r(NSMMessage(RCCommand::ABORT));
+  //distribute_r(NSMMessage(RCCommand::ABORT));
   for (size_t i = 0; i < m_lrc_v.size(); i++) {
     try {
       set(m_lrc_v[i], "used", 0);
@@ -147,10 +147,8 @@ void RunControlCallback::boot(const DBObject& obj) throw(RCHandlerException)
 
 void RunControlCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
-  obj.print();
   m_runno.setConfig(obj.getName());
   distribute(NSMMessage(RCCommand::LOAD));
-  obj.print();
 }
 
 void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
@@ -458,15 +456,29 @@ void RunControlCallback::Distributor::operator()(RCNode& node) throw()
   RCCommand cmd(m_msg.getRequestName());
   if (m_msg.getNodeName() == node.getName()) {
     if (node.isUsed()) {
-      if (cmd == RCCommand::CONFIGURE)
-        m_msg.setData(node.getConfig());
       try {
-        if (cmd == RCCommand::LOAD ||
-            cmd == RCCommand::BOOT) {
+        if (cmd == RCCommand::CONFIGURE) {
+          m_msg.setData(node.getConfig());
+        } else if (cmd == RCCommand::LOAD) {
           while (node.isSequential() &&
                  !m_callback.check(node.getName(), RCState::READY_S)) {
             try {
-              m_callback.wait(node, RCCommand::OK, 1);
+              //NSMCommunicator& com(m_callback.wait(node, RCCommand::OK, 1));
+              NSMCommunicator& com(m_callback.wait(NSMNode(), RCCommand::UNKNOWN, 1));
+              NSMMessage msg = com.getMessage();
+              RCCommand cmd2(msg.getRequestName());
+              LogFile::debug("%s %s", msg.getNodeName(), msg.getRequestName());
+              if (msg.getNodeName() == node.getName() && cmd2 == NSMCommand::OK) {
+                continue;
+              } else if (cmd2 == RCCommand::ABORT) {
+                LogFile::debug("ABORTING");
+                m_callback.setState(RCState::ABORTING_RS);
+                m_callback.abort();
+                m_enabled = false;
+                return;
+              } else {
+                continue;
+              }
             } catch (const TimeoutException& e) {
               continue;
             } catch (const IOException& e) {

@@ -49,7 +49,6 @@ namespace Belle2 {
     bool m_smearDirection; /**< if true, smear beam direction when generating initial events */
     bool m_smearVertex; /**< if true, smear vertex position when generating initial events */
     bool m_generateCMS; /**< if true, generate events in CMS, not lab system */
-    bool m_overwrite; /**< if true, overwrite existing beamparameters. Otherwise do nothing */
     bool m_createPayload; /**< if true create a new payload with the given parameters */
   };
 }

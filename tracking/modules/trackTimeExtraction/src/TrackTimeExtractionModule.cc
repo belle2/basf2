@@ -3,7 +3,7 @@
  * Copyright(C) 2015-2016 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Tobias Schlüter                                          *
+ * Contributors: Tobias Schlüter, Thomas Hauth                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -31,6 +31,7 @@
 #include "tracking/modules/trackTimeExtraction/TrackTimeExtractionModule.h"
 
 #include <algorithm>
+#include <cstdlib>
 
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
@@ -213,7 +214,7 @@ void TrackTimeExtractionModule::event()
     if (mcParts.getEntries() > 0) {
       part = DataStore::getRelated<MCParticle>(gfTrack);
       if (part) {
-        correctHypot = part && (fabs(part->getPDG()) == fabs(gfTrack->getCardinalRep()->getPDG()));
+        correctHypot = part && (std::abs(part->getPDG()) == std::abs(gfTrack->getCardinalRep()->getPDG()));
         td.mcPDG[td.nTracks] = part->getPDG();
         if (part->getMother())
           td.parentPDG[td.nTracks] = part->getMother()->getPDG();

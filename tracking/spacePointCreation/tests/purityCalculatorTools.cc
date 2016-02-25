@@ -167,6 +167,8 @@ namespace PurityCalcTests {
       m_assignedClusters.push_back(1);
 
       // add a PXD (non-ideal case: no TrueHit)
+      // false positive due to new with placement (cppcheck issue #7163)
+      // cppcheck-suppress memleak
       spacePoint = m_spacePoints.appendNew(createSpacePoint(pxdId, true));
       m_assignedClusters.push_back(1);
 
@@ -246,6 +248,8 @@ namespace PurityCalcTests {
       m_assignedClusters.push_back(1);
       spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 1)); // add U-Cluster set only
       m_assignedClusters.push_back(1);
+      // false positive due to new with placement (cppcheck issue #7163)
+      // cppcheck-suppress memleak
     }
 
     /** tear down environment after test -> clear datastore */

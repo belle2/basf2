@@ -237,6 +237,7 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
     else
       stripHit->isGood(false);
     delete fes;
+    /* cppcheck-suppress memleak */
   }
 }
 

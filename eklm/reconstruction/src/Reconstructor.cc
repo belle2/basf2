@@ -147,6 +147,7 @@ void EKLM::Reconstructor::create2dHits()
         hit2d->setMCTime(((*it4)->getMCTime() + (*it5)->getMCTime()) / 2);
         hit2d->addRelationTo(*it4);
         hit2d->addRelationTo(*it5);
+        /* cppcheck-suppress memleak */
       }
     }
     it = it3;

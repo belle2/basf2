@@ -353,6 +353,11 @@ namespace Belle2 {
 
         // skip tracks with charge = 0
         const TrackFitResult* trackFit = track->getTrackFitResult(type);
+        if (!trackFit) {
+          B2WARNING("Track returned null TrackFitResult pointer for ChargedStable::getPDGCode()  = " << type.getPDGCode());
+          continue;
+        }
+
         int charge = trackFit->getChargeSign();
         if (charge == 0) {
           B2WARNING("Track with charge = 0 skipped!");

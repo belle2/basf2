@@ -192,7 +192,7 @@ void ECLDigitizerModule::event()
     int j = eclHit.getCellId() - 1; //0~8735
     double hitE       = eclHit.getEnergyDep() / Unit::GeV;
     double hitTimeAve = eclHit.getTimeAve() / Unit::us;
-    m_adc[j].AddHit(hitE, hitTimeAve + timeInt , m_ss[m_tbl[j].iss]);
+    m_adc[j].AddHit(hitE, hitTimeAve + timeInt - 0.32 , m_ss[m_tbl[j].iss]);
   }
 
   // loop over entire calorimeter
@@ -203,7 +203,7 @@ void ECLDigitizerModule::event()
       // This has been added by Alex Bobrov for calibration
       // of covariance matrix artificially generate 100 MeV in time for each crystal
       double hitE = 0.1, hitTimeAve = 0.0;
-      a.AddHit(hitE, hitTimeAve + timeInt , m_ss[m_tbl[j].iss]);
+      a.AddHit(hitE, hitTimeAve + timeInt - 0.32 , m_ss[m_tbl[j].iss]);
     } else if (a.total < 0.0001)
       continue;
 

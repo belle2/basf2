@@ -33,6 +33,11 @@ BKLMSimulationPar::BKLMSimulationPar()
   m_IsValid = false;
 }
 
+BKLMSimulationPar::BKLMSimulationPar(const GearDir& content)
+{
+  read(content);
+}
+
 BKLMSimulationPar::~BKLMSimulationPar()
 {
 }

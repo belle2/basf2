@@ -9,7 +9,7 @@
  **************************************************************************/
 
 
-#include <analysis/modules/DeepFEIExtractor/DeepFEIExtractorModule.h>
+#include <analysis/modules/MVClassifier/CustomTrainingDataModule.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -39,15 +39,15 @@
 namespace Belle2 {
 
 
-  REG_MODULE(DeepFEIExtractor)
+  REG_MODULE(CustomTrainingData)
 
-  DeepFEIExtractorModule::DeepFEIExtractorModule() : Module()
+  CustomTrainingDataModule::CustomTrainingDataModule() : Module()
   {
     setDescription("Writes out information about the current ROE object in the datastore which can than later be used in a deep neural network to train the deepFEI algorithm.");
     addParam("filename", m_filename, "Name of output file.");
   }
 
-  void DeepFEIExtractorModule::initialize()
+  void CustomTrainingDataModule::initialize()
   {
 
     m_file.open(m_filename, std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
@@ -57,7 +57,7 @@ namespace Belle2 {
 
   }
 
-  void DeepFEIExtractorModule::terminate()
+  void CustomTrainingDataModule::terminate()
   {
     m_file.close();
   }
@@ -68,7 +68,7 @@ namespace Belle2 {
     stream.write(reinterpret_cast<char*>(&x), sizeof(T));
   }
 
-  void DeepFEIExtractorModule::event()
+  void CustomTrainingDataModule::event()
   {
     StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 

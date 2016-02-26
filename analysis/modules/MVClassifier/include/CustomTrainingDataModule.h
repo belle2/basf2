@@ -22,13 +22,13 @@ namespace Belle2 {
    * which can than later be used in a deep neural network to train the deepFEI algorithm.
    */
 
-  class DeepFEIExtractorModule : public Module {
+  class CustomTrainingDataModule : public Module {
   public:
 
     /**
      * Constructor
      */
-    DeepFEIExtractorModule();
+    CustomTrainingDataModule();
 
     /**
      * Initialize the module.

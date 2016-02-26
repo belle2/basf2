@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import types
 
 
 def setup_rawSecMapMerger(path=0, rootFileNames='dummy.root', logLevel=LogLevel.INFO, debugVal=1):
@@ -223,6 +224,74 @@ def setup_spCreatorSVD(path=0, nameOutput='nosingleSP', createSingleClusterSPs=F
         return spCreatorSVD
     else:
         path.add_module(spCreatorSVD)
+        return None
+
+
+def setup_sp2thConnector(path=0,
+                         pxdSPs='pxdOnly',
+                         svdSPs='nosingleSP',
+                         suffix='_relTH',
+                         usePXD=True,
+                         logLevel=LogLevel.INFO,
+                         dbgLvl=1):
+    """This function adds the SpacePoint2TrueHitConnector module with the setting that are needed vor the
+    PurityCalculatorTools to work properly. NOTE: it will crate a new StoreArray of SpacePoints, where all
+    SpacePoints are related to all possible TrueHits.
+
+    @param path the path to which the module will be added. Set to 0 (default) if the module should be returned instead.
+    @param pxdSPs name(s) of the StoreArray(s) containing the PXD SpacePoints
+
+    @param svdSPs name(s) of the StoreArrays(s) containing the SVD SpacePoints
+
+    @param suffix suffix that will be added to the SpacePoint StoreArray names for the new StoreArrays
+    (use these SapcePoints if you need relations to TrueHits!)
+
+    @param usePXD switch of usage of the PXD
+
+    @param logLevel the chosen LogLevel
+
+    @param dbgLevel the chosen debugLevel
+    """
+    # get the number of PXD SpacePoint arrays
+    nPXDs = 1
+    if not isinstance(pxdSPs, str):
+        nPXDs = len(pxdSPs)
+
+    spacePointNames = []
+    detectorTypes = []
+    clusterNames = []
+    trueHitNames = []
+    if usePXD:
+        spacePointNames.append(pxdSPs)
+        detectorTypes = ['PXD'] * nPXDs
+        clusterNames = [''] * nPXDs
+        trueHitNames = [''] * nPXDs
+    spacePointNames.append(svdSPs)
+    detectorTypes.append('SVD')
+    clusterNames.append('')
+    trueHitNames.append('')
+
+    sp2thConnector = register_module('SpacePoint2TrueHitConnector')
+    sp2thConnector.logging.log_level = logLevel
+    sp2thConnector.logging.debug_level = dbgLvl  # set to little output for debug
+    sp2thConnector.param('DetectorTypes', detectorTypes)
+    sp2thConnector.param('TrueHitNames', trueHitNames)
+    sp2thConnector.param('ClusterNames', clusterNames)
+    sp2thConnector.param('SpacePointNames', spacePointNames)
+    # fixed params
+    sp2thConnector.param('registerAll', True)
+    sp2thConnector.param('outputSuffix', suffix)
+    sp2thConnector.param('storeSeperate', True)
+    sp2thConnector.param('maxGlobalPosDiff', 0.05)
+    sp2thConnector.param('maxPosSigma', 5)
+    sp2thConnector.param('minWeight', 0)
+    sp2thConnector.param('requirePrimary', False)
+    sp2thConnector.param('positionAnalysis', False)
+    sp2thConnector.param('requireProximity', True)
+    if path is 0:
+        return sp2thConnector
+    else:
+        path.add_module(sp2thConnector)
         return None
 
 

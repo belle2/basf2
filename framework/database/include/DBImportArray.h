@@ -48,7 +48,7 @@ namespace Belle2 {
     }
 
     /**
-     * Return number of objects in the array.
+     * Returns number of objects in the array.
      */
     inline int getEntries() const
     {
@@ -98,24 +98,63 @@ namespace Belle2 {
     }
 
     /**
-     * Return iterator to first entry.
+     * Returns iterator to first entry.
      */
     iterator begin() { return iterator(this, 0); }
 
     /**
-     * Return iterator to last entry +1.
+     * Returns iterator to last entry +1.
      */
     iterator end() { return iterator(this, getEntries()); }
 
     /**
-     * Return const_iterator to first entry.
+     * Returns const_iterator to first entry.
      */
     const_iterator begin() const { return const_iterator(this, 0); }
 
     /**
-     * Return const_iterator to last entry +1.
+     * Returns const_iterator to last entry +1.
      */
     const_iterator end() const { return const_iterator(this, getEntries()); }
+
+    /**
+     * add event dependency
+     * @param eventNumber event number
+     */
+    void addEventDependency(unsigned int eventNumber)
+    {
+      addIntraRunDependency(eventNumber, c_Event);
+      m_object = new TClonesArray(T::Class());
+    }
+
+    /**
+     * add time stamp dependency
+     * @param timeStamp time stamp
+     */
+    void addTimeStampDependency(unsigned long long int timeStamp)
+    {
+      addIntraRunDependency(timeStamp, c_TimeStamp);
+      m_object = new TClonesArray(T::Class());
+    }
+
+    /**
+     * add subrun dependency
+     * @param subrun subrun number
+     */
+    void addSubrunDependency(int subrun)
+    {
+      addIntraRunDependency(subrun, c_Subrun);
+      m_object = new TClonesArray(T::Class());
+    }
+
+    /**
+     * Clear the content, e.g. destroy allocated objects and prepare for the new DB import.
+     */
+    void clear()
+    {
+      DBImportBase::clear();
+      m_object = new TClonesArray(T::Class());
+    }
 
 
   private:

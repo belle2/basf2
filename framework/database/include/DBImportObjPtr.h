@@ -10,6 +10,7 @@
 #pragma once
 
 #include <framework/database/DBImportBase.h>
+#include <stdexcept>
 
 namespace Belle2 {
 
@@ -52,7 +53,14 @@ namespace Belle2 {
     /**
      * Imitate pointer functionality.
      */
-    inline T* operator ->() const {return static_cast<T*>(m_object);}
+    inline T* operator ->() const
+    {
+      if (!m_object)
+        throw std::out_of_range("DBImportObjPtr::operator ->, for "
+                                + m_package + "/" + m_module + ", "
+                                "object does not exist or is invisible");
+      return static_cast<T*>(m_object);
+    }
 
   };
 }

@@ -433,17 +433,17 @@ void TrackingPerformanceEvaluationModule::event()
       if (fitResult->getHitPatternCDC().hasLayer(layer))
         m_h1_nCDChitsUsed->Fill(layer);
     }
-    for (int layer = 0; layer < 2; layer++) {
+    for (int layer = 1; layer <= 2; layer++) {
       for (int i = 0; i < fitResult->getHitPatternVXD().getPXDLayer(layer); i++)
-        m_h1_nVXDhitsUsed->Fill(layer + 1);
+        m_h1_nVXDhitsUsed->Fill(layer);
     }
-    for (int layer = 0; layer < 4; layer++) {
+    for (int layer = 3; layer <= 6; layer++) {
       int n1 = fitResult->getHitPatternVXD().getSVDLayer(layer).first;
       int n2 = fitResult->getHitPatternVXD().getSVDLayer(layer).second;
       int N = n1 + n2;
 
       for (int i = 0; i < N; i++)
-        m_h1_nVXDhitsUsed->Fill(layer + 3);
+        m_h1_nVXDhitsUsed->Fill(layer);
     }
 
 

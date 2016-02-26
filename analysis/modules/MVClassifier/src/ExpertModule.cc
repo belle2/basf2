@@ -232,6 +232,7 @@ namespace Belle2 {
       case NeuroBayesExpert: return analyseNeuroBayes();
       case UnkownType: throw std::runtime_error("Unkown expert type");
     }
+    return 0.0;
 
   }
 

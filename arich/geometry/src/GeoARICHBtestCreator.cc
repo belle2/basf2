@@ -567,7 +567,7 @@ namespace Belle2 {
 
       for (unsigned int ilayer = 0; ilayer < m_agelthickness.size(); ilayer++) {
         char aeroname[100];
-        sprintf(aeroname, "Aerogel%d", ilayer + 1);
+        sprintf(aeroname, "Aerogel%u", ilayer + 1);
         G4Material* tileMaterial = createAerogel(aeroname, m_agelrefind[ilayer],  m_ageltrlen[ilayer]);
         double sizeZ = m_agelthickness[ilayer] * CLHEP::mm / Unit::mm;
 

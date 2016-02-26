@@ -52,8 +52,6 @@ namespace Belle2 {
     std::string m_fileName;
     /** Name of the TTree. */
     std::string m_treeName;
-    /** Two dimensional flag */
-    bool m_2d;
 
     /** ROOT file for output. */
     TFile* m_file;

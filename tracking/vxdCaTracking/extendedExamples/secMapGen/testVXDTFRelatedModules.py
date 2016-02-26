@@ -14,20 +14,29 @@ from VXDTF.setup_modules import (setup_gfTCtoSPTCConverters,
 from VXDTF.setup_modules_ml import *
 
 # ################
-rootInputFileName = "seed2nEv100pGun1_10T.root"
+# rootInputFileName = "seed4nEv100000pGun1_1T.root"
+# rootInputFileName = "evtGenseed6nEv100000.root" #evtGenSinglePassTest-TrainSample. skipCluster = False
+# rootInputFileName = "evtGenseed5nEv10000.root" #testSample. skipCluster = False
+# rootInputFileName = "evtGenseed7nEv10000.root" #testSample. skipCluster = True
+# rootInputFileName = "evtGenseed8nEv200000.root" # trainSample. skipCluster = False
+# rootInputFileName = "evtGenseed8nEv100000.root" #evtGenSinglePassTest-TrainSample. skipCluster = True (TODO)
 
 # file name into which the segNetAnalize stores its stuff
 segNetAnaRFN = 'SegNetAnalyzer_SM_train.root'
 fbdtSamplesFN = 'FBDTClassifier_samples_train_10k.dat'
 fbdtFN = 'FBDTClassifier_1000_3.dat'
 
+# epTest:
+rootInputFileName = "seed10nEv1000pGun1_1T.root"
 
 usePXD = False
 useDisplay = False
 newTrain = False  # if true, rawSecMap-Data is collected. IF false, new TF will be executed
 printNetworks = False  # creates graphs for each network for each event if true
+useOldTFinstead = False  # if true, the old vxdtf is used instead of the new one.
 trainFBDT = False  # with the current settings: collects samples but does not train a FastBDT!
 useFBDT = False  # use the ML Filter for creating the SegmentNetwork instead of the SectorMap filters
+
 
 if useFBDT:
     cNetworks = int(2)
@@ -35,69 +44,58 @@ else:
     cNetworks = int(3)
 
 # Important parameters:
-# seed42nEv1000pGun1_10T.root
+
 tempStringList = rootInputFileName.split('nEv', 1)
 stringInitialValue = tempStringList[0].split("seed", 1)
 print("found seed: " + stringInitialValue[1])
-numEvents = 2  # WARNING has to be identical with the value named in rootInputFileName!
-initialValue = int(stringInitialValue[1])
+numEvents = 10000  # WARNING has to be identical with the value named in rootInputFileName!
+# initialValue = int(stringInitialValue[1])
+initialValue = 10
 
 set_log_level(LogLevel.ERROR)
 set_random_seed(initialValue)
 
-trainerVXDTFLogLevel = LogLevel.ERROR
+trainerVXDTFLogLevel = LogLevel.INFO
 trainerVXDTFDebugLevel = 10
 
-TFlogLevel = LogLevel.ERROR
+TFlogLevel = LogLevel.INFO
 TFDebugLevel = 1
 
-CAlogLevel = LogLevel.ERROR
+CAlogLevel = LogLevel.DEBUG
 CADebugLevel = 1
 
-AnalizerlogLevel = LogLevel.ERROR
+AnalizerlogLevel = LogLevel.INFO
 AnalizerDebugLevel = 1
 
-
+# acceptedRawSecMapFiles = ['lowTestRedesign_202608818.root']
 if (initialValue == 2):
     print("chosen initialvalue 2! " + rootInputFileName)
     acceptedRawSecMapFiles = ['lowTestRedesign_1373026662.root']  # 42
-elif (initialValue == 23):
-    print("chosen initialvalue 23!")
-    acceptedRawSecMapFiles = ['lowTestRedesign_216235540.root']  # 23
-elif (initialValue == 24):
-    print("chosen initialvalue 24!")
-    acceptedRawSecMapFiles = ['lowTestRedesign_374830533.root']  # 24
-elif (initialValue == 25):
-    print("chosen initialvalue 25!")
-    acceptedRawSecMapFiles = ['lowTestRedesign_753986291.root']  # 25
-elif (initialValue == 26):
-    print("chosen initialvalue 26! setup remark: single track, single event raw data")
-    # acceptedRawSecMapFiles = ['lowTestRedesign_1667035383.root'] # 26 - single track, single event raw data
-    acceptedRawSecMapFiles = ['lowTestRedesign_249371033.root']  # 26 - single track, single event raw data
-elif (initialValue == 27):
-    print("chosen initialvalue 27! setup remark: single track, single event raw data")
+elif (initialValue == 3):
+    print("chosen initialvalue 3! " + rootInputFileName)
+    acceptedRawSecMapFiles = ['lowTestRedesign_202608818.root']  # 23
+elif (initialValue == 4):
+    print("chosen initialvalue 4!! " + rootInputFileName)
+    acceptedRawSecMapFiles = ['lowTestRedesign_293660864.root']  # 24
+# elif (initialValue == 5):
+    # print("chosen initialvalue 5! (with background)" + rootInputFileName)
+    # acceptedRawSecMapFiles = ['lowTestRedesign_753986291.root']  # 25
+elif (initialValue == 5):
+    print("chosen initialvalue 5 (skipCluster-setting=False)! " + rootInputFileName)
+    acceptedRawSecMapFiles = ['lowTestRedesign_1120112796.root']
+elif (initialValue == 6):
+    print("chosen initialvalue 6 (skipCluster-setting=False)! " + rootInputFileName)
+    acceptedRawSecMapFiles = ['lowTestRedesign_1120112796.root']
+    # acceptedRawSecMapFiles = ['lowTestRedesign_1667035383.root'] # 26 - single track, single event  raw data
+elif (initialValue == 7):
+    print("chosen initialvalue 7!  (skipCluster-setting=True)")
     acceptedRawSecMapFiles = ['lowTestRedesign_1865959838.root']  # 27 - single track, single event raw data
-elif (initialValue == 28):
+elif (initialValue == 8):
     print("chosen initialvalue 28! setup remark: single track, single event raw data")
     acceptedRawSecMapFiles = ['lowTestRedesign_1406543755.root']  # 28 - single track, single event raw data
-elif (initialValue == 29):
-    print("chosen initialvalue 29! setup remark: single track, single event raw data")
-    acceptedRawSecMapFiles = ['lowTestRedesign_985902979.root']  # 29 - single track, single event raw data
-elif (initialValue == 30):
-    print("chosen initialvalue 30! setup remark: single track, single event raw data")
-    acceptedRawSecMapFiles = ['lowTestRedesign_1987088791.root']  # 30 - single track, single event raw data
-elif (initialValue == 31):
-    print("chosen initialvalue 31! setup remark: single track, single event raw data")
-    acceptedRawSecMapFiles = ['lowTestRedesign_713253727.root']  # 31 - single track, single event raw data
-elif (initialValue == 32):
-    print("chosen initialvalue 32! setup remark: single track, single event raw data")
-    acceptedRawSecMapFiles = ['lowTestRedesign_1403360988.root']  # 32 - single track, single event raw data
-elif (initialValue == 33):
-    print("chosen initialvalue 33! setup remark: single track, single event raw data")
-    acceptedRawSecMapFiles = ['lowTestRedesign_574263477.root']  # 33 - single track, single event raw data
-elif (initialValue == 55):
-    print("chosen initialvalue 55! setup remark: single track, 10 events raw data")
-    acceptedRawSecMapFiles = ['lowTestRedesign_1138928103.root']  # 55 - single track, single event raw data
+elif (initialValue == 10):
+    print("chosen initialvalue 10! setup remark: single track, 1000 event raw data")
+    acceptedRawSecMapFiles = ['lowTestRedesign_1332084337.root']  # 29 - single track, single event raw data
 elif (initialValue == 56):
     print("chosen initialvalue 56! setup remark: single track, 1000 events raw data")
     acceptedRawSecMapFiles = ['lowTestRedesign_922296899.root']  # 55 - single track, single event raw data
@@ -119,6 +117,7 @@ print('')
 
 rootInputM = register_module('RootInput')
 rootInputM.param('inputFileName', rootInputFileName)
+
 # rootInputM.param('skipNEvents', int(10000))
 
 eventinfoprinter = register_module('EventInfoPrinter')
@@ -131,12 +130,16 @@ secMapBootStrap = register_module('SectorMapBootstrap')
 
 
 secMapBootStrap = register_module('SectorMapBootstrap')
+
+evtStepSize = 1
 if newTrain:
     newSecMapTrainerBase = register_module('SecMapTrainerBase')
     newSecMapTrainerBase.logging.log_level = trainerVXDTFLogLevel
     newSecMapTrainerBase.logging.debug_level = trainerVXDTFDebugLevel
     newSecMapTrainerBase.param('spTCarrayName', 'checkedSPTCs')
     newSecMapTrainerBase.param('allowTraining', True)
+
+    evtStepSize = 100
 else:
     merger = register_module('RawSecMapMerger')
     merger.logging.log_level = trainerVXDTFLogLevel
@@ -144,6 +147,8 @@ else:
     merger.param('rootFileNames', acceptedRawSecMapFiles)
     # merger.param('spTCarrayName', 'checkedSPTCs')
 
+if useOldTFinstead:
+    evtStepSize = 100
 
 geometry = register_module('Geometry')
 geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
@@ -151,36 +156,79 @@ geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
 
 
 eventCounter = register_module('EventCounter')
-eventCounter.logging.log_level = LogLevel.ERROR
-eventCounter.param('stepSize', 1)
+eventCounter.logging.log_level = LogLevel.INFO
+eventCounter.param('stepSize', evtStepSize)
 
 
-segNetProducer = register_module('SegmentNetworkProducer')
-segNetProducer.param('CreateNeworks', cNetworks)
-segNetProducer.param('NetworkOutputName', 'test2Hits')
-segNetProducer.param('printNetworks', printNetworks)
-# segNetProducer.param('SpacePointsArrayNames', ['pxdOnly', 'nosingleSP'])
-segNetProducer.param('SpacePointsArrayNames', ['nosingleSP_relTH'])
-segNetProducer.logging.log_level = TFlogLevel
-segNetProducer.logging.debug_level = TFDebugLevel
+if useOldTFinstead:
+    tuneValue = 0.06
+    secSetup = [
+        'shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
+        'shiftedL3IssueTestSVDStd-100to400MeV_SVD',
+        'shiftedL3IssueTestSVDStd-25to100MeV_SVD']
+    if usePXD:
+        secSetup = \
+            ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',
+             'shiftedL3IssueTestVXDStd-100to400MeV_PXDSVD',
+             'shiftedL3IssueTestVXDStd-25to100MeV_PXDSVD'
+             ]
+        tuneValue = 0.22
+    vxdtf = register_module('VXDTF')  # VXDTF TFRedesign
+    vxdtf.logging.log_level = LogLevel.DEBUG
+    vxdtf.logging.debug_level = 1
+    param_vxdtf = {'sectorSetup': secSetup,
+                   'GFTrackCandidatesColName': 'caTracks',
+                   'tuneCutoffs': tuneValue,
+                   'displayCollector': 2
+                   }
+    vxdtf.param(param_vxdtf)
 
-segNetAnalyzer = register_module('SegmentNetworkAnalyzer')
-segNetAnalyzer.param('networkInputName', 'test2Hits')
-segNetAnalyzer.param('rootFileName', segNetAnaRFN)
-segNetAnalyzer.logging.log_level = LogLevel.INFO
-segNetAnalyzer.logging.debug_level = 100
+    oldAnalyzer = register_module('TFAnalizer')
+    oldAnalyzer.logging.log_level = LogLevel.INFO
+    oldAnalyzer.param('printExtentialAnalysisData', False)
+    oldAnalyzer.param('caTCname', 'caTracks')
+    oldAnalyzer.param('acceptedTCname', 'VXDTFoldAcceptedTCS')
+    oldAnalyzer.param('lostTCname', 'VXDTFoldLostTCS')
 
-cellOmat = register_module('TrackFinderVXDCellOMat')
-cellOmat.param('printNetworks', False)
-cellOmat.param('SpacePointTrackCandArrayName', 'caSPTCs')
-cellOmat.param('NetworkName', 'test2Hits')
-cellOmat.logging.log_level = CAlogLevel
-cellOmat.logging.debug_level = CADebugLevel
+    # TCConverter, genfit -> SPTC
+    trackCandConverter = register_module('GFTC2SPTCConverter')
+    trackCandConverter.logging.log_level = LogLevel.WARNING
+    trackCandConverter.param('genfitTCName', 'caTracks')
+    trackCandConverter.param('SpacePointTCName', 'caSPTCs')
+    trackCandConverter.param('NoSingleClusterSVDSP', 'nosingleSP')
+    trackCandConverter.param('PXDClusterSP', 'pxdOnly')
+    trackCandConverter.param('checkNoSingleSVDSP', True)
+    trackCandConverter.param('checkTrueHits', False)
+    trackCandConverter.param('useSingleClusterSP', False)
+    trackCandConverter.param('skipCluster', True)
+else:
+    segNetProducer = register_module('SegmentNetworkProducer')
+    segNetProducer.param('CreateNeworks', cNetworks)
+    segNetProducer.param('NetworkOutputName', 'test2Hits')
+    segNetProducer.param('printNetworks', printNetworks)
+    # segNetProducer.param('SpacePointsArrayNames', ['pxdOnly', 'nosingleSP'])
+    segNetProducer.param('SpacePointsArrayNames', ['nosingleSP_relTH'])
+    segNetProducer.logging.log_level = TFlogLevel
+    segNetProducer.logging.debug_level = TFDebugLevel
+
+    segNetAnalyzer = register_module('SegmentNetworkAnalyzer')
+    segNetAnalyzer.param('networkInputName', 'test2Hits')
+    segNetAnalyzer.param('rootFileName', segNetAnaRFN)
+    segNetAnalyzer.logging.log_level = LogLevel.INFO
+    segNetAnalyzer.logging.debug_level = 100
+
+    cellOmat = register_module('TrackFinderVXDCellOMat')
+    cellOmat.param('printNetworks', printNetworks)
+    cellOmat.param('SpacePointTrackCandArrayName', 'caSPTCs')
+    cellOmat.param('NetworkName', 'test2Hits')
+    cellOmat.logging.log_level = CAlogLevel
+    cellOmat.logging.debug_level = CADebugLevel
 
 
 vxdAnal = register_module('TrackFinderVXDAnalizer')
 vxdAnal.param('referenceTCname', 'SPTracks')
 vxdAnal.param('testTCname', 'caSPTCs')
+vxdAnal.param('purityThreshold', 0.7)
 vxdAnal.logging.log_level = AnalizerlogLevel
 vxdAnal.logging.debug_level = AnalizerDebugLevel
 
@@ -215,19 +263,24 @@ setup_gfTCtoSPTCConverters(
 # StoreArray (to not interfere with the SpacePoints of the reference
 # TrackCands)
 setup_sp2thConnector(main, 'pxdOnly', 'nosingleSP', '_relTH', True, LogLevel.ERROR, 1)
-
 if newTrain:
     main.add_module(newSecMapTrainerBase)
 else:
-    main.add_module(merger)
-    main.add_module(segNetProducer)
-    if trainFBDT:  # collect in this step
-        add_fbdtclassifier_training(main, 'test2Hits', 'FBDTClassifier.dat', False, True,
-                                    False, fbdtSamplesFN, 100, 3, 0.15, 0.5, LogLevel.DEBUG, 10)
-    if useFBDT:  # apply the filters
-        add_ml_threehitfilters(main, 'test2Hits', fbdtFN, 0.989351, True)
-    main.add_module(segNetAnalyzer)
-    main.add_module(cellOmat)
+    if useOldTFinstead:
+        main.add_module(register_module('SetupGenfitExtrapolation'))
+        main.add_module(vxdtf)
+        main.add_module(oldAnalyzer)
+        main.add_module(trackCandConverter)
+    else:
+        main.add_module(merger)
+        main.add_module(segNetProducer)
+        if trainFBDT:  # collect in this step
+            add_fbdtclassifier_training(main, 'test2Hits', 'FBDTClassifier.dat', False, True,
+                                        False, fbdtSamplesFN, 100, 3, 0.15, 0.5, LogLevel.DEBUG, 10)
+        if useFBDT:  # apply the filters
+            add_ml_threehitfilters(main, 'test2Hits', fbdtFN, 0.989351, True)
+        main.add_module(segNetAnalyzer)
+        main.add_module(cellOmat)
     main.add_module(vxdAnal)
 
 if useDisplay:

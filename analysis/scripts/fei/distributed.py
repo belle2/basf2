@@ -18,11 +18,13 @@ def getCommandLineOptions():
                         help='Steering file')
     parser.add_argument('-w', '--workingDirectory', dest='directory', type=str, required=True,
                         help='Directory file')
+    parser.add_argument('-l', '--largeDirectory', dest='large_dir', type=str, default='',
+                        help='Large Directory file')
     parser.add_argument('-n', '--nJobs', dest='nJobs', type=int, default=100,
                         help='Number of jobs')
     parser.add_argument('-d', '--data', dest='data', type=str, required=True, action='append', nargs='+',
                         help='Data files in bash expansion syntax')
-    parser.add_argument('-x', '--skip-setup', dest='skip', action='store_true',
+    parser.add_argument('-x', '--skip-to', dest='skip', type=str, default='',
                         help='Skip setup of directories')
     parser.add_argument('-o', '--once', dest='once', action='store_true',
                         help='Execute just once time, instead of waiting until a Summary is produced.')
@@ -86,9 +88,11 @@ def run_basf2(args):
     os.chdir(args.directory + '/collection')
     if args.site == 'kekcc':
         ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_path.pickle', '-i', 'dummy.root', '--', '-monitor',
+                               '--prune',
                                '--verbose', '--nThreads', '4', '--cache', 'cache.pkl', '--externTeacher', 'externClusterTeacher'])
     else:
         ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_path.pickle', '-i', 'dummy.root', '--',
+                               '--prune',
                                '--verbose', '--nThreads', '4', '--cache', 'cache.pkl', '-monitor', '-prune'])
     os.chdir(args.directory)
     return ret == 0
@@ -124,7 +128,7 @@ def submit_job(args, i):
             os.symlink(f, link)
 
     if args.site == 'kekcc':
-        ret = subprocess.call("bsub -q s -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
+        ret = subprocess.call("bsub -q b2_fei -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
     elif args.site == 'kitekp':
         ret = subprocess.call("qsub -cwd -q express,short,medium,long -e error.log -o output.log -V basf2_script.sh | cut -f 3 -d ' ' > basf2_jobid", shell=True)  # noqa
     elif args.site == 'local':
@@ -172,8 +176,16 @@ def merge_root_files(args):
 
 def update_input_files(args):
     for i in range(args.nJobs):
-        path = args.directory + '/jobs/' + str(i)
-        shutil.move(path + '/basf2_output.root', path + '/basf2_input.root')
+        output_file = args.directory + '/jobs/' + str(i) + '/basf2_output.root'
+        input_file = args.directory + '/jobs/' + str(i) + '/basf2_input.root'
+        if args.large_dir:
+            real_input_file = args.large_dir + '/basf2_input_' + str(i) + '.root'
+            shutil.move(output_file, real_input_file)
+            if os.path.isfile(input_file):
+                os.remove(input_file)
+            os.symlink(real_input_file, input_file)
+        else:
+            shutil.move(output_file, input_file)
 
 
 def clean_job_directory(args):
@@ -191,6 +203,45 @@ if __name__ == '__main__':
 
     if args.skip:
         print('Skipping setup')
+        start = 0
+        if args.skip == 'clean':
+            start = 1
+        elif args.skip == 'update':
+            start = 2
+        elif args.skip == 'merge':
+            start = 3
+        elif args.skip == 'wait':
+            start = 4
+        elif args.skip == 'submit':
+            start = 5
+        elif args.skip == 'run':
+            start = 0
+        else:
+            raise RuntimeError('Unkown skip parameter {}'.format(args.skip))
+
+        if start >= 5:
+            print('Submitting jobs')
+            for i in range(args.nJobs):
+                if not submit_job(args, i):
+                    raise RuntimeError('Error during submiting job')
+
+        if start >= 4:
+            print('Wait for jobs to end')
+            while not jobs_finished(args):
+                time.sleep(40)
+
+        if start >= 3:
+            print('Merge ROOT files')
+            merge_root_files(args)
+
+        if start >= 2:
+            print('Update input files')
+            update_input_files(args)
+
+        if start >= 1:
+            print('Clean job directory')
+            clean_job_directory(args)
+
     else:
         setup(args)
 

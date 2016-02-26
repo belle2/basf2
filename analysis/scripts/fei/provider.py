@@ -27,7 +27,7 @@ Hash = str
 Filename = str
 ParticleList = str
 
-MaximumNumberOfMVASamples = int(3e6)
+MaximumNumberOfMVASamples = int(1e7)
 MinimumNumberOfMVASamples = int(5e2)
 
 

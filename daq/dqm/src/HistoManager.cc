@@ -65,8 +65,8 @@ bool HistoManager::update(string& subdir, string& name, int pid, TH1* histo)
   map<int, TH1*>& hlist = dirlist[name];
 
   // Replace histogram
-  //   TH1* prevhisto = hlist[pid];
-  //  delete prevhisto;
+  TH1* prevhisto = hlist[pid];
+  delete prevhisto;
   hlist[pid] = histo;
   //  printf ( "HistoManager: histogram %s replaced in subdir %s, entry = %f\n",
   //     name.c_str(), subdir.c_str(), histo->GetEntries());

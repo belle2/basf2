@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-import types
 
 
 def setup_rawSecMapMerger(path=0, rootFileNames='dummy.root', logLevel=LogLevel.INFO, debugVal=1):
@@ -17,6 +16,7 @@ def setup_rawSecMapMerger(path=0, rootFileNames='dummy.root', logLevel=LogLevel.
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
     """
+    print("setup RawSecMapMerger...")
     merger = register_module('RawSecMapMerger')
     merger.logging.log_level = logLevel
     merger.logging.debug_level = debugVal
@@ -54,6 +54,7 @@ def setup_mcTF(
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
     """
+    print("setup TrackFinderMCTruth...")
     doPXD = 0
     if usePXD:
         doPXD = 1
@@ -105,6 +106,7 @@ def setup_gfTCtoSPTCConverters(
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
     """
+    print("setup gfTCtoSPTCConverters...")
     doPXD = 0
     spacePointNames = []
     detectorTypes = []
@@ -147,6 +149,7 @@ def setup_gfTCtoSPTCConverters(
     trackCandConverter.param('checkTrueHits', True)
     trackCandConverter.param('useSingleClusterSP', False)
     trackCandConverter.param('checkNoSingleSVDSP', True)
+    trackCandConverter.param('skipCluster', True)
 
     # SpacePointTrackCand referee
     sptcReferee = register_module('SPTCReferee')
@@ -170,74 +173,6 @@ def setup_gfTCtoSPTCConverters(
         return None
 
 
-def setup_sp2thConnector(path=0,
-                         pxdSPs='pxdOnly',
-                         svdSPs='nosingleSP',
-                         suffix='_relTH',
-                         usePXD=True,
-                         logLevel=LogLevel.INFO,
-                         dbgLvl=1):
-    """This function adds the SpacePoint2TrueHitConnector module with the setting that are needed vor the
-    PurityCalculatorTools to work properly. NOTE: it will crate a new StoreArray of SpacePoints, where all
-    SpacePoints are related to all possible TrueHits.
-
-    @param path the path to which the module will be added. Set to 0 (default) if the module should be returned instead.
-    @param pxdSPs name(s) of the StoreArray(s) containing the PXD SpacePoints
-
-    @param svdSPs name(s) of the StoreArrays(s) containing the SVD SpacePoints
-
-    @param suffix suffix that will be added to the SpacePoint StoreArray names for the new StoreArrays
-    (use these SapcePoints if you need relations to TrueHits!)
-
-    @param usePXD switch of usage of the PXD
-
-    @param logLevel the chosen LogLevel
-
-    @param dbgLevel the chosen debugLevel
-    """
-    # get the number of PXD SpacePoint arrays
-    nPXDs = 1
-    if not isinstance(pxdSPs, str):
-        nPXDs = len(pxdSPs)
-
-    spacePointNames = []
-    detectorTypes = []
-    clusterNames = []
-    trueHitNames = []
-    if usePXD:
-        spacePointNames.append(pxdSPs)
-        detectorTypes = ['PXD'] * nPXDs
-        clusterNames = [''] * nPXDs
-        trueHitNames = [''] * nPXDs
-    spacePointNames.append(svdSPs)
-    detectorTypes.append('SVD')
-    clusterNames.append('')
-    trueHitNames.append('')
-
-    sp2thConnector = register_module('SpacePoint2TrueHitConnector')
-    sp2thConnector.logging.log_level = logLevel
-    sp2thConnector.logging.debug_level = dbgLvl  # set to little output for debug
-    sp2thConnector.param('DetectorTypes', detectorTypes)
-    sp2thConnector.param('TrueHitNames', trueHitNames)
-    sp2thConnector.param('ClusterNames', clusterNames)
-    sp2thConnector.param('SpacePointNames', spacePointNames)
-    # fixed params
-    sp2thConnector.param('registerAll', True)
-    sp2thConnector.param('outputSuffix', suffix)
-    sp2thConnector.param('storeSeperate', True)
-    sp2thConnector.param('maxGlobalPosDiff', 0.05)
-    sp2thConnector.param('maxPosSigma', 5)
-    sp2thConnector.param('minWeight', 0)
-    sp2thConnector.param('requirePrimary', False)
-    sp2thConnector.param('positionAnalysis', False)
-    sp2thConnector.param('requireProximity', True)
-    if path is 0:
-        return sp2thConnector
-    else:
-        path.add_module(sp2thConnector)
-        return None
-
-
 def setup_spCreatorPXD(path=0, nameOutput='pxdOnly', logLevel=LogLevel.INFO, debugVal=1):
     """This function adds the SpacePointCreatorPXD-module to given path.
 
@@ -250,6 +185,7 @@ def setup_spCreatorPXD(path=0, nameOutput='pxdOnly', logLevel=LogLevel.INFO, deb
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
     """
+    print("setup SpacePointCreatorPXD...")
     spCreatorPXD = register_module('SpacePointCreatorPXD')
     spCreatorPXD.logging.log_level = logLevel
     spCreatorPXD.logging.debug_level = debugVal
@@ -276,6 +212,7 @@ def setup_spCreatorSVD(path=0, nameOutput='nosingleSP', createSingleClusterSPs=F
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
     """
+    print("setup SpacePointCreatorSVD...")
     spCreatorSVD = register_module('SpacePointCreatorSVD')
     spCreatorSVD.logging.log_level = logLevel
     spCreatorSVD.logging.debug_level = debugVal
@@ -315,6 +252,7 @@ def setup_pGun(
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
     """
     # fixed, uniform, normal, polyline, uniformPt, normalPt, inversePt, polylinePt or discrete
+    print("setup ParticleGun...")
     param_pGun = {
         'pdgCodes': pdgCODES,
         'nTracks': numTracks,
@@ -363,7 +301,7 @@ def setup_secMapTrainerWithSpacePoints(
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
     """
-
+    print("setup SecMapTrainerWithSpacePoints...")
     param_filterCalc = {
         'detectorType': ['SVD'],
         'maxXYvertexDistance': 1.,
@@ -409,6 +347,7 @@ def setup_realClusters(path=0, usePXD=False, logLevel=LogLevel.INFO, debugVal=1)
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
     """
+    print("setup realistic Clusterizer...")
     moduleList = []
 
     if usePXD is True:
@@ -444,6 +383,7 @@ def setup_simpleClusters(path=0, onlyPrimaries=False, useEDeposit=True, logLevel
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
     """
+    print("setup VXDSimpleClusterizer...")
     simpleClusterizer = register_module('VXDSimpleClusterizer')
     simpleClusterizer.logging.log_level = logLevel
     simpleClusterizer.logging.debug_level = debugVal
@@ -460,6 +400,46 @@ def setup_simpleClusters(path=0, onlyPrimaries=False, useEDeposit=True, logLevel
         return None
 
 
+def setup_bg(path=0, bgFilesFolder="", usePXD=False, logLevel=LogLevel.INFO, debugVal=1):
+    """This function adds the background to given path.
+
+    @param path if set to 0 (standard) g4sim will not be added, but returned.
+    If a path is given, 'None' is returned but will be added to given path instead.
+
+    @param useBkg if set to True (standard = False) additional background is added to the simulation.
+
+    @param bkgFiles if set to 0 (standard) g4sim will not be added, but returned.
+    If a path is given, 'None' is returned but will be added to given path instead.
+
+    @param logLevel set to logLevel level of your choice.
+
+    @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
+    """
+    print("setup BeamBkgMixer...")
+    import glob
+
+    bg = glob.glob(bgFilesFolder + '*.root')
+    print("setup_BeamBkgMixer - files to be imported:")
+    print(bg)
+    bkgmixer = register_module('BeamBkgMixer')
+    bkgmixer.logging.log_level = logLevel
+    bkgmixer.logging.debug_level = debugVal
+    components = ['SVD']
+    if usePXD:
+        components.append('PXD')
+    bkgmixer.param('backgroundFiles', bg)  # specify BG files
+    bkgmixer.param('components', components)  # mix BG only for those components
+    # bkgmixer.param('minTime', -5000)  # set time window start time [ns]
+    # bkgmixer.param('maxTime', 15000)  # set time window stop time [ns]
+    # bkgmixer.param('scaleFactors', [('Coulomb_LER', 1.05), ('Coulomb_HER',
+    # 1.08), ('RBB_LER', 0.8)])  # scale rates of some backgrounds
+    if (path is 0):
+        return bkgmixer
+    else:
+        path.add_module(bkgmixer)
+        return None
+
+
 def setup_sim(path=0, useEDeposit=True):
     """This function adds the g4simulation to given path.
 
@@ -470,6 +450,7 @@ def setup_sim(path=0, useEDeposit=True):
     useEDeposit: If you want to work w/o E-deposit, edit pxd/data/PXD.xml and svd/data/SVD.xml,
     where you have to activate see neutrons = true.
     """
+    print("setup FullSim...")
     g4sim = register_module('FullSim')
     g4sim.param('StoreAllSecondaries', True)
     if useEDeposit is False:

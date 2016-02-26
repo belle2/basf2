@@ -4,7 +4,7 @@
 from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
 
 
-def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, convertedFromBelle=False):
+def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, convertedFromBelle=False):
     """
     returns list of Particle objects with all default channels for running
     FEI on Upsilon(4S). For a training with analysis-specific signal selection,
@@ -29,10 +29,12 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
                             'muid', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
                             'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
 
+    charged_user_cut = '[dr < 2] and [abs(dz) < 4]'
+
     pion = Particle('pi+',
                     MVAConfiguration(variables=chargedVariables,
                                      target='isPrimarySignal'),
-                    PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]',
+                    PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
                                         bestCandidateVariable='piid',
                                         bestCandidateCut=20),
@@ -42,7 +44,7 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
     kaon = Particle('K+',
                     MVAConfiguration(variables=chargedVariables,
                                      target='isPrimarySignal'),
-                    PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]',
+                    PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
                                         bestCandidateVariable='Kid',
                                         bestCandidateCut=20),
@@ -52,7 +54,7 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
     electron = Particle('e+',
                         MVAConfiguration(variables=chargedVariables,
                                          target='isPrimarySignal'),
-                        PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]',
+                        PreCutConfiguration(userCut=charged_user_cut,
                                             bestCandidateMode='highest',
                                             bestCandidateVariable='eid',
                                             bestCandidateCut=10),
@@ -62,7 +64,7 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
     muon = Particle('mu+',
                     MVAConfiguration(variables=chargedVariables,
                                      target='isPrimarySignal'),
-                    PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]',
+                    PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
                                         bestCandidateVariable='muid',
                                         bestCandidateCut=10),
@@ -129,6 +131,11 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
                          'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
                          'daughterInvariantMass({},{})', 'daughterInvariantMass({},{},{})', 'daughterInvariantMass({},{},{},{})',
                          'daughterInvariantMass({},{},{},{},{})', 'dQ', 'Q', 'dM', 'daughter({},extraInfo(decayModeID))']
+
+    # TODO if specific:
+    # We can not do this in the generic case (because this would heavily influence our performance on the unkown signal events
+    # but in the specific case this could work well
+    #    intermediate_vars = ['nRemainingTracksInEvent']
 
     D0 = Particle('D0',
                   MVAConfiguration(variables=intermediate_vars,
@@ -376,14 +383,14 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
               'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
               'dr', 'dz', 'dx', 'dy', 'distance', 'significanceOfDistance', 'deltaE', 'daughter({},extraInfo(decayModeID))']
 
-    hadronicUserCut = 'Mbc > 5.2 and abs(deltaE) < 0.5'
-    if BlevelExtraCut != '':
-        hadronicUserCut += ' and [' + BlevelExtraCut + ']'
+    hadronic_user_cut = 'Mbc > 5.2 and abs(deltaE) < 0.5'
+    if B_extra_cut is not None:
+        hadronic_user_cut += ' and [' + B_extra_cut + ']'
 
     BP = Particle('B+',
                   MVAConfiguration(variables=B_vars,
                                    target='isSignal'),
-                  PreCutConfiguration(userCut=hadronicUserCut,
+                  PreCutConfiguration(userCut=hadronic_user_cut,
                                       bestCandidateMode='highest',
                                       bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
                                       bestCandidateCut=20),
@@ -424,10 +431,14 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
         target='isSignalAcceptMissingNeutrino',
     )
 
+    semileptonic_user_cut = ''
+    if B_extra_cut is not None:
+        semileptonic_user_cut += B_extra_cut
+
     BP_SL = Particle('B+:semileptonic',
                      MVAConfiguration(variables=B_vars,
                                       target='isSignalAcceptMissingNeutrino'),
-                     PreCutConfiguration(userCut='',
+                     PreCutConfiguration(userCut=semileptonic_user_cut,
                                          bestCandidateMode='highest',
                                          bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
                                          bestCandidateCut=20),
@@ -478,7 +489,7 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
     BP_KL = Particle('B+:KL',
                      MVAConfiguration(variables=B_vars,
                                       target='isSignal'),
-                     PreCutConfiguration(userCut='',
+                     PreCutConfiguration(userCut=semileptonic_user_cut,
                                          bestCandidateMode='highest',
                                          bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
                                          bestCandidateCut=20),
@@ -529,7 +540,7 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
     B0 = Particle('B0',
                   MVAConfiguration(variables=B_vars,
                                    target='isSignal'),
-                  PreCutConfiguration(userCut=hadronicUserCut,
+                  PreCutConfiguration(userCut=hadronic_user_cut,
                                       bestCandidateMode='highest',
                                       bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
                                       bestCandidateCut=20),
@@ -564,7 +575,7 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
     B0_SL = Particle('B0:semileptonic',
                      MVAConfiguration(variables=B_vars,
                                       target='isSignalAcceptMissingNeutrino'),
-                     PreCutConfiguration(userCut='',
+                     PreCutConfiguration(userCut=semileptonic_user_cut,
                                          bestCandidateMode='highest',
                                          bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
                                          bestCandidateCut=20),
@@ -612,7 +623,7 @@ def get_default_channels(BlevelExtraCut='', semileptonic=True, KLong=True, conve
     B0_KL = Particle('B0:KL',
                      MVAConfiguration(variables=B_vars,
                                       target='isSignal'),
-                     PreCutConfiguration(userCut='',
+                     PreCutConfiguration(userCut=semileptonic_user_cut,
                                          bestCandidateMode='highest',
                                          bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
                                          bestCandidateCut=20),

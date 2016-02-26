@@ -159,11 +159,6 @@ def MatchParticleList(resource: fei.dag.Resource, particleList: ParticleList,
     resource.condition = ('EventType', '==0')
     matchMCTruth(particleList, path=resource.path)
 
-    if resource.env['ROE']:
-        sigmc = 'eventCached(countInList(' + resource.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1))'
-        cut = '[{sigmc} > 0 and {target} == 1] or {sigmc} == 0'.format(sigmc=sigmc, target=mvaConfig.target)
-        applyCuts(particleList, cut, path=resource.path)
-
     if resource.env['monitor']:
         hist_variables = ['mcErrors', 'mcParticleStatus', mvaConfig.target]
         hist_variables_2d = []

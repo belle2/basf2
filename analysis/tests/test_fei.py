@@ -489,21 +489,6 @@ class TestMatchParticleList(unittest.TestCase):
         self.assertEqual(resource.cache, True)
         self.assertEqual(resource.condition, ('EventType', '==0'))
 
-    def test_Specific(self):
-        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, env={'monitor': False, 'ROE': 'B+'},
-                                                 path=basf2.create_path(), hash='42')
-        mvaConfig = unittest.mock.NonCallableMock(spec=fei.config.MVAConfiguration, target='isSignal')
-        self.assertEqual(fei.provider.MatchParticleList(resource, 'e+:generic', mvaConfig), 'e+:generic')
-
-        path = basf2.create_path()
-        path.add_module('MCMatcherParticles', listName='e+:generic')
-        cut = '[eventCached(countInList(B+, isSignalAcceptMissingNeutrino == 1)) > 0 and isSignal == 1] or '
-        cut += 'eventCached(countInList(B+, isSignalAcceptMissingNeutrino == 1)) == 0'
-        path.add_module('ParticleSelector', decayString='e+:generic', cut=cut)
-        self.assertEqual(resource.path, path)
-        self.assertEqual(resource.cache, True)
-        self.assertEqual(resource.condition, ('EventType', '==0'))
-
 
 class TestCopyParticleLists(unittest.TestCase):
 

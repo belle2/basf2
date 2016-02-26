@@ -67,21 +67,6 @@ def charge_conjugated_identifier(particle):
     return pdg.conjugate(particle.name) + ':' + particle.label
 
 
-def inclusiveCuts(signalParticleList, path):
-    """
-    Do inklusive Cuts on number of tracks, Mbc, and deltaE.
-    As well cuts which remove background from signal MC
-    """
-    # TODO SignalMC with no correct signal-candidate will be still used as background component
-    # We have to fix this cut! (Other FEI-UserCuts should be fine, as soon as this one is fixed)
-    # Although the cut is not 100% correct at the moment, it still a big step in the right direction.
-    cut = 'isSignalAcceptMissingNeutrino == 1'
-    cut += ' or eventCached(countInList(' + signalParticleList + ', isSignalAcceptMissingNeutrino == 1)) == 0'
-    # Use MCDecayFinder here :-)
-    applyCuts(signalParticleList, cut, path=path)
-    applyCuts(signalParticleList, 'nTracks <= 12', path=path)
-
-
 def fullEventInterpretation(signalParticleList, selection_path, particles):
     """
     The Full Event Interpretation algorithm has to be executed multiple times, because of the dependencies between
@@ -285,7 +270,10 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
     if is_first_run:
         path.add_path(selection_path)
         if signalParticleList:
-            inclusiveCuts(signalParticleList, path)
+            isSignal = 'isSignalAcceptMissingNeutrino'
+            signalMC = 'eventCached(countInList(B+:FEIMC))'
+            cut = '[[{mc} > 0 and {sig} == 1] or [{mc} == 0 and {sig} != 1]]'.format(mc=signalMC, sig=isSignal)
+            applyCuts(signalParticleList, cut, path=path)
             roe_path = create_path()
             cond_module = register_module('SignalSideParticleFilter')
             cond_module.param('particleListName', signalParticleList)

@@ -1125,16 +1125,18 @@ HitPatternVXD GBLfitModule::getHitPatternVXD(genfit::Track track)
   }
 
   //fill PXD hits
-  for (int l = 0; l < 2; l++)
+  for (int layerId = 1; layerId <= 2; ++layerId) {
     //maximum number of hits checked inside the HitPatternVXD
-    aHitPatternVXD.setPXDLayer(l, PXD_Hits[l], HitPatternVXD::PXDMode::normal); //normal/gated mode not retireved
-
+    int arrayId = layerId - 1;
+    aHitPatternVXD.setPXDLayer(layerId, PXD_Hits[arrayId], HitPatternVXD::PXDMode::normal); //normal/gated mode not retireved
+  }
 
   //fill SVD hits
-  for (int l = 0; l < 4; l++)
+  for (int layerId = 3; layerId <= 6; ++layerId) {
     //maximum number of hits checked inside the HitPatternVXD
-    aHitPatternVXD.setSVDLayer(l, SVD_uHits[l], SVD_vHits[l]);
-
+    int arrayId = layerId - 3;
+    aHitPatternVXD.setSVDLayer(layerId, SVD_uHits[arrayId], SVD_vHits[arrayId]);
+  }
 
   return aHitPatternVXD;
 }

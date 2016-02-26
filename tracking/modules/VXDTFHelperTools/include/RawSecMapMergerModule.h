@@ -173,7 +173,7 @@ namespace Belle2 {
         VXDTFFilters<SpacePoint>& segFilters);
 
 
-    /// cross-check if everything is working as expected:
+    /// cross-check if everything is working as expected. WARNING TODO find out if this does fulfill its purpose!
     template <class FilterType> void testSegmentFilters(const SectorMapConfig& config, SectorGraph<FilterType>& mainGraph,
                                                         VXDTFFilters<SpacePoint>& segFilters)
     {
@@ -219,7 +219,7 @@ namespace Belle2 {
             1).getFullSecString() << " test " << cutName << "/" << cut << " was working fine!");
           return true;
         }
-        B2WARNING("testSegmentFilters-" << fName <<
+        B2DEBUG(1, "testSegmentFilters-" << fName <<
         ": forsecCombi o/i: " << secIDs.at(0).getFullSecString() <<
         "/" << secIDs.at(1).getFullSecString() <<
         " test " << cutName <<

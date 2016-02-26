@@ -80,7 +80,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 //   config1.pTmin = 0.02;
 //   config1.pTmax = 0.08;
   config1.pTmin = 0.02; // minimal relevant version
-  config1.pTmax = 0.15; // minimal relevant version
+//   config1.pTmax = 0.15; // minimal relevant version
+  config1.pTmax = 3.15; // minimal relevant version // Feb18-onePass-Test
   config1.pTSmear = 0.;
   config1.allowedLayers = {0, 3, 4, 5, 6}; // TODO -> convert to vector containing all layerNumbers to be used; e.g.: {0, 3, 4, 5, 6};
 //   config1.uSectorDivider = { .15, .5, .85, 1.};
@@ -97,15 +98,14 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1.nHitsMin = 3;
   config1.vIP = B2Vector3D(0, 0, 0);
   config1.secMapName = "lowTestRedesign";
-  config1.twoHitFilters = { "Distance3DSquared"/*, "Distance2DXYSquared", "SlopeRZ", "CircleDist2IPHighOccupancy"*/};
-  config1.threeHitFilters = { "Angle3DSimple"/*, "DeltaSlopeRZ"*/};
+  config1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
+  config1.threeHitFilters = { "Angle3DSimple", "AngleXYSimple", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
   config1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
   config1.mField = 1.5;
   config1.rarenessThreshold = 0.001;
   config1.quantiles = {0.005, 1. - 0.005};
   // TODO: still missing: minimal sample-size, quantiles for smaller samplesizes, threshshold small <-> big sampleSize.
   bootstrapSectorMap(config1);
-
 
   SectorMapConfig config2;
 //   config2.pTCuts = {0.075, 0.300};

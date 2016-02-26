@@ -14,6 +14,7 @@
 #include "tracking/dataobjects/FullSecID.h"
 
 #include <tracking/spacePointCreation/SpacePoint.h>
+
 #include "tracking/trackFindingVXD/TwoHitFilters/Distance1DZ.h"
 #include "tracking/trackFindingVXD/TwoHitFilters/Distance1DZTemp.h"
 #include "tracking/trackFindingVXD/TwoHitFilters/Distance3DNormed.h"
@@ -23,9 +24,21 @@
 #include "tracking/trackFindingVXD/TwoHitFilters/Distance3DSquared.h"
 
 #include "tracking/trackFindingVXD/ThreeHitFilters/Angle3DSimple.h"
+#include "tracking/trackFindingVXD/ThreeHitFilters/AngleXYSimple.h"
+#include "tracking/trackFindingVXD/ThreeHitFilters/AngleRZSimple.h"
+#include "tracking/trackFindingVXD/ThreeHitFilters/CircleDist2IP.h"
+#include "tracking/trackFindingVXD/ThreeHitFilters/DeltaSlopeRZ.h"
+#include "tracking/trackFindingVXD/ThreeHitFilters/DeltaSlopeZoverS.h"
+#include "tracking/trackFindingVXD/ThreeHitFilters/DeltaSoverZ.h"
+#include "tracking/trackFindingVXD/ThreeHitFilters/HelixParameterFit.h"
+#include "tracking/trackFindingVXD/ThreeHitFilters/Pt.h"
+#include "tracking/trackFindingVXD/ThreeHitFilters/CircleRadius.h"
+
 #include "tracking/trackFindingVXD/FilterTools/Shortcuts.h"
 #include "tracking/trackFindingVXD/FilterTools/ObserverPrintResults.h"
 #include "tracking/trackFindingVXD/FilterTools/Observer.h" // empty observer
+#include "tracking/trackFindingVXD/FilterTools/VoidObserver.h" // empty observer
+
 #include "tracking/trackFindingVXD/FilterTools/Observer3HitPrintResults.h"
 
 #include <tracking/dataobjects/SectorMapConfig.h>
@@ -46,38 +59,41 @@ namespace Belle2 {
   class VXDTFFilters {
   public:
 
-//     typedef
-//     decltype((0. <= Distance3DSquared<point_t>()   <= 0.).observe(Observer()).enable()&&
-//              (0. <= Distance2DXYSquared<point_t>() <= 0.).observe(Observer()).enable()&&
-//              (0. <= Distance1DZ<point_t>()         <= 0.)/*.observe(Observer())*/.enable()&&
-//              (0. <= SlopeRZ<point_t>()             <= 0.).observe(Observer()).enable()&&
-//              (Distance3DNormed<point_t>()         <= 0.).enable()) filter2sp_t;
-
-/// minimal working example:
-//  typedef
-//  decltype((0. <= Distance3DSquared<point_t>()   <= 0.).observe(Observer()).enable()) filter2sp_t;
-
-// // //  /// minimal working example for 2-hits:
-// // //  typedef
-// // //  decltype((0. <= Distance3DSquared<point_t>()   <= 0.).observe(ObserverPrintResults())) twoHitFilter_t; // filter2sp_t
 
     /// minimal working 2-hits-example used for redesign of VXDTF.
-    typedef decltype((0. <= Distance3DSquared<Belle2::SpacePoint>() <= 0.).observe(ObserverPrintResults())) twoHitFilter_t;
-
-//     using twoHitFilter_t = TwoHitFilterSet_t;
-
-//      typedef
-//     typedef VXDTFHit point_t;
-//     decltype((0. < Distance3DSquared<point_t>()   < 0.).observe(Observer()).enable()&&
-//              (0. < Distance2DXYSquared<point_t>() < 0.).observe(Observer()).enable()&&
-//              (0. < Distance1DZ<point_t>()         < 0.)/*.observe(Observer())*/.enable()&&
-//              (0. < SlopeRZ<point_t>()             < 0.).observe(Observer()).enable()&&
-//              (Distance3DNormed<point_t>()         < 0.).enable()) filter2sp_t;
-
-    /// minimal working example for 2-hits:
-    typedef decltype((0. <= Angle3DSimple<point_t>()   <= 0.).observe(Observer3HitPrintResults())) threeHitFilter_t;
+//     typedef decltype((0. <= Distance3DSquared<Belle2::SpacePoint>() <= 0.).observe(ObserverPrintResults())) twoHitFilter_t;
 
 
+    /// big working 2-hits-example used for redesign of VXDTF.
+    typedef decltype(
+      (0. <= Distance3DSquared<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())&&
+      (0. <= Distance2DXYSquared<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())&&
+      (0. <= Distance1DZ<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())&&
+      (0. <= SlopeRZ<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())&&
+      (0. <= Distance3DNormed<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())
+    ) twoHitFilter_t;
+
+
+    /// minimal working example for 3-hits:
+//  typedef decltype((0. <= Angle3DSimple<point_t>()   <= 0.).observe(Observer3HitPrintResults())) threeHitFilter_t;
+
+
+    /// big working example for 3-hits:
+    typedef decltype(
+      (0. <= Angle3DSimple<point_t>()   <= 0.).observe(VoidObserver())&&
+      (0. <= AngleXYSimple<point_t>()   <= 0.).observe(VoidObserver())&&
+      (0. <= AngleRZSimple<point_t>()   <= 0.).observe(VoidObserver())&&
+      (CircleDist2IP<point_t>()   <= 0.).observe(VoidObserver())&&
+      (0. <= DeltaSlopeRZ<point_t>()   <= 0.).observe(VoidObserver())&&
+      (0. <= DeltaSlopeZoverS<point_t>()   <= 0.).observe(VoidObserver())&&
+      (0. <= DeltaSoverZ<point_t>()   <= 0.).observe(VoidObserver())&&
+      (0. <= HelixParameterFit<point_t>()   <= 0.).observe(VoidObserver())&&
+      (0. <= Pt<point_t>()   <= 0.).observe(VoidObserver())&&
+      (0. <= CircleRadius<point_t>()   <= 0.).observe(VoidObserver())
+    ) threeHitFilter_t;
+
+
+    /// typedef to make a static sector type more readable.
     typedef StaticSector< point_t, twoHitFilter_t, threeHitFilter_t , int > staticSector_t;
 
 

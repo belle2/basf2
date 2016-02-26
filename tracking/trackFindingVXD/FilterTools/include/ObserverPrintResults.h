@@ -55,11 +55,13 @@ namespace Belle2 {
                    << "/"
                    << range.getSup();
 
-      if (range.contains(fResult)) {
-        B2INFO(outputStream.str())
-      } else {
-        B2WARNING(outputStream.str())
-      }
+      B2DEBUG(5, outputStream.str())
+      /// for debugging:
+//       if (range.contains(fResult)) {
+//         B2INFO(outputStream.str())
+//       } else {
+//         B2WARNING(outputStream.str())
+//       }
     }
 
 

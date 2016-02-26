@@ -304,7 +304,7 @@ namespace Belle2 {
         B2ERROR("DirectedNodeNetwork::linkTheseEntries(): outerEntry and innerEntry are identical! Aborting linking-process");
         return;
       }
-      B2DEBUG(1, "DNN:linkEntriesDEBUG: outer: " << outerEntry << ", inner: " << outerEntry)
+      B2DEBUG(10, "DNN:linkEntriesDEBUG: outer: " << outerEntry << ", inner: " << outerEntry)
 
       // check if entries are already in network.
       auto outerNodeIter = isInNetwork(outerEntry);
@@ -359,11 +359,11 @@ namespace Belle2 {
        *  add outerNode to outerEnds, if innerNode was in outerEnds before, replace old one with new outerNode
        * */
       if (outerNodeIter == m_nodes.rend() and innerNodeIter != m_nodes.rend()) {
-        B2DEBUG(1, "DNN:linkEntriesDEBUG CASE 3: outer: " << outerEntry << ", inner: " << innerEntry)
+        B2DEBUG(10, "DNN:linkEntriesDEBUG CASE 3: outer: " << outerEntry << ", inner: " << innerEntry)
         Node& innerNode = **innerNodeIter; // has to come first to prevent-realloc-issues
         Node& newOuterNode = addNode(outerEntry);
-        B2DEBUG(1, "DNN:linkEntriesDEBUG CASE 3: inner: " << innerNode.getEntry())
-        B2DEBUG(1, "DNN:linkEntriesDEBUG CASE 3: NEW outer: " << newOuterNode.getEntry())
+        B2DEBUG(10, "DNN:linkEntriesDEBUG CASE 3: inner: " << innerNode.getEntry())
+        B2DEBUG(10, "DNN:linkEntriesDEBUG CASE 3: NEW outer: " << newOuterNode.getEntry())
 
         linkNodes(newOuterNode, innerNode);
         m_lastInnerNode = &innerNode;

@@ -74,7 +74,7 @@ namespace Belle2 {
     //  void addInnerNode(std::shared_ptr<DirectedNode<EntryType, MetaInfoType> > newNode)
     void addInnerNode(DirectedNode<EntryType, MetaInfoType>& newNode)
     {
-      B2DEBUG(1, "DirectedNode::addInnerNode(): was called! OwnIndex/newInnerNodeIndex: " << m_index << "/" << newNode.getIndex() <<
+      B2DEBUG(10, "DirectedNode::addInnerNode(): was called! OwnIndex/newInnerNodeIndex: " << m_index << "/" << newNode.getIndex() <<
               " and innerNodesSize: " << m_innerNodes.size() << ")!")
       m_innerNodes.push_back(&newNode);
 //    auto* newPtr(&newNode);
@@ -89,9 +89,9 @@ namespace Belle2 {
     /** adds new links to the outward direction */
     void addOuterNode(DirectedNode<EntryType, MetaInfoType>& newNode)
     {
-      B2DEBUG(1, "DirectedNode::addOuterNode(): was called! OwnIndex/outerNodeIndex: " << m_index << "/" << newNode.getIndex() <<
+      B2DEBUG(10, "DirectedNode::addOuterNode(): was called! OwnIndex/outerNodeIndex: " << m_index << "/" << newNode.getIndex() <<
               " and outerNodesSize: " << m_outerNodes.size() << ")!")
-      B2DEBUG(1, "m_index is: " << m_index)
+      B2DEBUG(10, "m_index is: " << m_index)
       m_outerNodes.push_back(&newNode);
       B2DEBUG(250, "push_back of nodeIndex: " << m_index << " is over and has now innerNodesSize: " << m_outerNodes.size())
     }

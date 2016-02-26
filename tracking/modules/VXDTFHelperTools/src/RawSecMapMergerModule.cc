@@ -445,10 +445,28 @@ template <class FilterType> void RawSecMapMergerModule::add2HitFilters(VXDTFFilt
 //  named3D).getMax() << ", ")
   // // // //     B2DEBUG(1, namedXY << ": " << filterCutsMap.at(namedXY).getMin() << "/" << filterCutsMap.at(namedXY).getMax() << ", ")
   // // // //     B2DEBUG(1,  namesRZ << ": " << filterCutsMap.at(namesRZ).getMin() << "/" << filterCutsMap.at(namesRZ).getMax() << ", ")
+
+
+  /// JKL Jan 2016 - minimal working example:
+//   VXDTFFilters<SpacePoint>::twoHitFilter_t friendSectorsSegmentFilter =
+//   ((filterCutsMap.at("Distance3DSquared").getMin() <= Distance3DSquared<SpacePoint>() <= filterCutsMap.at("Distance3DSquared").getMax()).observe(ObserverPrintResults()));
+
+
+  /// JKL Feb 2016 - big working example:
   VXDTFFilters<SpacePoint>::twoHitFilter_t friendSectorsSegmentFilter =
-    // JKL Jan 2016 - minimal working example:
-    ((filterCutsMap.at(named3D).getMin() <= Distance3DSquared<SpacePoint>() <= filterCutsMap.at(named3D).getMax()
-     ).observe(ObserverPrintResults()));
+    (
+      (filterCutsMap.at("Distance3DSquared").getMin() <= Distance3DSquared<SpacePoint>() <=
+       filterCutsMap.at("Distance3DSquared").getMax()).observe(VoidObserver()) &&
+      (filterCutsMap.at("Distance2DXYSquared").getMin() <= Distance2DXYSquared<SpacePoint>() <=
+       filterCutsMap.at("Distance2DXYSquared").getMax()).observe(VoidObserver()) &&
+      (filterCutsMap.at("Distance1DZ").getMin() <= Distance1DZ<SpacePoint>() <= filterCutsMap.at("Distance1DZ").getMax()).observe(
+        VoidObserver()) &&
+      (filterCutsMap.at("SlopeRZ").getMin() <= SlopeRZ<SpacePoint>() <= filterCutsMap.at("SlopeRZ").getMax()).observe(VoidObserver()) &&
+      (filterCutsMap.at("Distance3DNormed").getMin() <= Distance3DNormed<SpacePoint>() <=
+       filterCutsMap.at("Distance3DNormed").getMax()).observe(VoidObserver())
+    );
+
+
   // JKL Jan 2016 - standard version:
   // // // // // // //       (
   // // // // // // //         (
@@ -508,10 +526,37 @@ template <class FilterType> void RawSecMapMergerModule::add3HitFilters(VXDTFFilt
   }
   B2DEBUG(1, "SubGraph " << subGraph.getID().print() << " - filter:min/max: " << filterVals)
 
+
+  /// JKL Jan 2016 - minimal working example:
+//   VXDTFFilters<SpacePoint>::threeHitFilter_t threeHitFilter =
+//     (
+//       (filterCutsMap.at("Angle3DSimple").getMin() <= Angle3DSimple<SpacePoint>() <= filterCutsMap.at("Angle3DSimple").getMax()).observe(Observer3HitPrintResults())
+//       );
+
+
+  /// JKL Feb 2016 - big working example:
   VXDTFFilters<SpacePoint>::threeHitFilter_t threeHitFilter =
-    // JKL Jan 2016 - minimal working example:
-    ((filterCutsMap.at("Angle3DSimple").getMin() <= Angle3DSimple<SpacePoint>() <= filterCutsMap.at("Angle3DSimple").getMax()
-     ).observe(Observer3HitPrintResults()));
+    (
+      (filterCutsMap.at("Angle3DSimple").getMin() <= Angle3DSimple<SpacePoint>() <= filterCutsMap.at("Angle3DSimple").getMax()).observe(
+        VoidObserver()) &&
+      (filterCutsMap.at("AngleXYSimple").getMin() <= AngleXYSimple<SpacePoint>() <= filterCutsMap.at("AngleXYSimple").getMax()).observe(
+        VoidObserver()) &&
+      (filterCutsMap.at("AngleRZSimple").getMin() <= AngleRZSimple<SpacePoint>() <= filterCutsMap.at("AngleRZSimple").getMax()).observe(
+        VoidObserver()) &&
+      (CircleDist2IP<SpacePoint>() <= filterCutsMap.at("CircleDist2IP").getMax()).observe(VoidObserver()) &&
+      (filterCutsMap.at("DeltaSlopeRZ").getMin() <= DeltaSlopeRZ<SpacePoint>()).observe(VoidObserver()) <=
+      filterCutsMap.at("DeltaSlopeRZ").getMax() &&
+      (filterCutsMap.at("DeltaSlopeZoverS").getMin() <= DeltaSlopeZoverS<SpacePoint>() <=
+       filterCutsMap.at("DeltaSlopeZoverS").getMax()).observe(VoidObserver()) &&
+      (filterCutsMap.at("DeltaSoverZ").getMin() <= DeltaSoverZ<SpacePoint>() <= filterCutsMap.at("DeltaSoverZ").getMax()).observe(
+        VoidObserver()) &&
+      (filterCutsMap.at("HelixParameterFit").getMin() <= HelixParameterFit<SpacePoint>() <=
+       filterCutsMap.at("HelixParameterFit").getMax()).observe(VoidObserver()) &&
+      (filterCutsMap.at("Pt").getMin() <= Pt<SpacePoint>() <= filterCutsMap.at("Pt").getMax()).observe(VoidObserver()) &&
+      (filterCutsMap.at("CircleRadius").getMin() <= CircleRadius<SpacePoint>() <= filterCutsMap.at("CircleRadius").getMax()).observe(
+        VoidObserver())
+    );
+
 
   auto secIDs = subGraph.getID().getFullSecIDs();
 

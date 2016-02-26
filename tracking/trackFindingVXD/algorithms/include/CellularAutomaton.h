@@ -120,14 +120,10 @@ namespace Belle2 {
       std::vector<unsigned int> nCellsOfState = countCellsOfState(caRound, aNetworkContainer);
 
       BaseClass::m_log.passResults.push_back({ caRound, nCellsOfState});   // .first int, second vector<unsigned int>
-      B2DEBUG(15, "Pass " << BaseClass::m_log.nPasses <<
+      B2DEBUG(1, "Pass " << BaseClass::m_log.nPasses <<
               " is finished with " << caRound <<
               " rounds (negative numbers indicate fail)! Of " << aNetworkContainer.size() <<
-              " cells total, their states were:\n" << BaseClass::m_log.getStringCellsOfState(nCellsOfState))
-      B2WARNING("Pass " << BaseClass::m_log.nPasses <<
-                " is finished with " << caRound <<
-                " rounds (negative numbers indicate fail)! Of " << aNetworkContainer.size() <<
-                " cells total, their states were:\n" << BaseClass::m_log.getStringCellsOfState(nCellsOfState))
+              " cells total, their states were:\n" << BaseClass::m_log.getStringCellsOfState(nCellsOfState));
       return caRound;
     }
 

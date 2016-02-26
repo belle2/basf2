@@ -12,6 +12,7 @@
 
 #include <TObject.h>
 #include <vector>
+#include <algorithm>
 #include <bklm/dataobjects/BKLMStatus.h>
 
 namespace Belle2 {
@@ -63,30 +64,22 @@ namespace Belle2 {
     /**
      * Add a channel number to the list of dead channels
      */
-    void appendDeadChannel(int channel) {m_DeadChannels.push_back(channel); }
+    void appendDeadChannel(int channel);
 
     /**
      * Add a channel number to the list of dead channels
      */
-    void appendDeadChannel(int isForward, int sector, int layer, int plane, int strip)
-    {
-      int channel = geometryToChannelId(isForward, sector, layer, plane, strip);
-      m_DeadChannels.push_back(channel);
-    }
+    void appendDeadChannel(int isForward, int sector, int layer, int plane, int strip);
 
     /**
      * Add a channel number to the list of hot channels
      */
-    void appendHotChannel(int channel) {m_HotChannels.push_back(channel); }
+    void appendHotChannel(int channel);
 
     /**
      * Add a channel number to the list of hot channels
      */
-    void appendHotChannel(int isForward, int sector, int layer, int plane, int strip)
-    {
-      int channel = geometryToChannelId(isForward, sector, layer, plane, strip);
-      m_HotChannels.push_back(channel);
-    }
+    void appendHotChannel(int isForward, int sector, int layer, int plane, int strip);
 
     //! retrun if the channel is hot or not
     bool isHotChannel(int channel);

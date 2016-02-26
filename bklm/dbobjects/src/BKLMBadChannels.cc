@@ -16,6 +16,41 @@ using namespace std;
 
 ClassImp(BKLMBadChannels);
 
+void BKLMBadChannels::appendDeadChannel(int channel)
+{
+  /*bool isexist=false;
+  for(unsigned int ii=0;ii<m_DeadChannels.size(); ii++)
+  {
+  if(channel==m_DeadChannels[ii]) { isexis=true; std::cout<<"dead channel " <<channel<< " is already in DataBase"<<std::endl;}
+  }
+  if(!isexist)
+  */
+  m_DeadChannels.push_back(channel);
+  std::sort(m_DeadChannels.begin(), m_DeadChannels.end());
+  m_DeadChannels.erase(std::unique(m_DeadChannels.begin(), m_DeadChannels.end()),
+                       m_DeadChannels.end());
+}
+
+void BKLMBadChannels::appendDeadChannel(int isForward, int sector, int layer, int plane, int strip)
+{
+  int channel = geometryToChannelId(isForward, sector, layer, plane, strip);
+  appendDeadChannel(channel);
+}
+
+void BKLMBadChannels::appendHotChannel(int channel)
+{
+  m_HotChannels.push_back(channel);
+  std::sort(m_HotChannels.begin(), m_HotChannels.end());
+  m_HotChannels.erase(std::unique(m_HotChannels.begin(), m_HotChannels.end()),
+                      m_HotChannels.end());
+}
+
+void BKLMBadChannels::appendHotChannel(int isForward, int sector, int layer, int plane, int strip)
+{
+  int channel = geometryToChannelId(isForward, sector, layer, plane, strip);
+  appendHotChannel(channel);
+}
+
 bool BKLMBadChannels::isHotChannel(int channel)
 {
   bool isHot = false;

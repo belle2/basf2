@@ -9,28 +9,36 @@ using namespace Belle2;
 // also needs to be here so all members can be explicitly initialized, otherwise Cppcheck complains
 TOPCAFDigit::TOPCAFDigit()
   : Packet()
-  , m_channel_id(0)
-  , m_evt_num(0)
-  , m_asic_win(0)
-  , m_nwave_seg(0)
-  , m_nsamples(0)
-  , m_asic(0)
-  , m_asic_ch(0)
-  , m_asic_row(0)
-  , m_asic_col(0)
-  , m_asic_refwin(0)
+  , m_channel_id(-1)
+  , m_evt_num(-1)
+  , m_asic_win(-1)
+  , m_nwave_seg(-1)
+  , m_nsamples(-1)
+  , m_asic(-1)
+  , m_asic_ch(-1)
+  , m_asic_row(-1)
+  , m_asic_col(-1)
+  , m_asic_refwin(-1)
   , m_time(0)
   , m_amp(0)
   , m_rate(0)
   , m_quality(0)
   , m_time_bin(0)
+  , m_pixel_id(0)
+  , m_pmt_id(0)
+  , m_pmtch_id(0)
+  , m_tdc_bin(0)
+  , m_adc_height(0)
+  , m_width(0)
+  , m_chi2(0)
+  , m_corr_time(0)
+  , m_boardstack(-1)
   , m_flag(0)
 {
 }
 
 TOPCAFDigit::TOPCAFDigit(const EventWaveformPacket* in_wp)
 {
-
   //From packet
   m_type = in_wp->GetPacketType();
   m_scrod_rev = in_wp->GetScrodRev();
@@ -48,8 +56,19 @@ TOPCAFDigit::TOPCAFDigit(const EventWaveformPacket* in_wp)
   m_asic_col = in_wp->GetASICColumn();
   m_rate = in_wp->GetSamplingRate();
 
+// default values
+  m_quality = -1;
+  m_time_bin = -1;
+  m_pixel_id = -1;
+  m_pmt_id = -1;
+  m_pmtch_id = -1;
+  m_tdc_bin = -1;
+  m_adc_height = -1;
+  m_width = -1;
+  m_chi2 = -1;
+  m_corr_time = -1;
+  m_boardstack = -1; // has to be set when the top config object is available.
   m_flag = 0;
-
 }
 
 void TOPCAFDigit::SetHitValues(topcaf_hit_t& mydigit)

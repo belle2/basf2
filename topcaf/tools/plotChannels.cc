@@ -14,7 +14,7 @@
 using namespace std;
 using namespace Belle2;
 
-const int CALIBRATIONCHANNEL = 7;
+// const int CALIBRATIONCHANNEL = 7;
 const int ASIC_PER_SCROD = 16;
 
 bool plotChannels(const char* filename, const char* outputname)

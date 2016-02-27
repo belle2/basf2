@@ -10,6 +10,7 @@
 #pragma once
 
 #include <framework/database/DBImportBase.h>
+#include <framework/utilities/ArrayIterator.h>
 #include <TClonesArray.h>
 #include <stdexcept>
 

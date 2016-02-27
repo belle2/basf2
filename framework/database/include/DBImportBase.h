@@ -11,7 +11,6 @@
 
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
-#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 

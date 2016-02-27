@@ -10,6 +10,7 @@
 
 #include <framework/database/DBImportBase.h>
 #include <framework/database/EventDependency.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;

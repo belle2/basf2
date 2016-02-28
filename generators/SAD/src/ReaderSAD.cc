@@ -37,7 +37,8 @@ ReaderSAD::ReaderSAD(): m_file(NULL), m_tree(NULL), m_transMatrix(NULL),
 
 ReaderSAD::~ReaderSAD()
 {
-  if (m_file != NULL) m_file->Close();
+  // comment out the following line for the march 16 build (TF)
+  //  if (m_file != NULL) m_file->Close();
 }
 
 

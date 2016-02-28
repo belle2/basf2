@@ -10,16 +10,12 @@
 #define PRERAWCOPPERFORMAT_LATEST_H
 
 // Includes
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-
-#include <framework/datastore/DataStore.h>
-#include <rawdata/dataobjects/RawDataBlock.h>
+//#include <framework/datastore/DataStore.h>
+//#include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/PostRawCOPPERFormat_latest.h>
 #include <rawdata/CRCCalculator.h>
 
-#include <TObject.h>
+//#include <TObject.h>
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
 
@@ -139,11 +135,12 @@ namespace Belle2 {
     int CheckB2LHSLBMagicWords(int* finesse_buf, int finesse_nwords);
 
     //! reduce and merge header/trailer
-    int CalcReducedDataSize(RawDataBlock* raw_datablk);
+    int CalcReducedDataSize(int* bufin, int nwords, int num_events, int num_nodes);
+    //    int CalcReducedDataSize(RawDataBlock* raw_datablk);
 
     //! reduce and merge header/trailer
-    void CopyReducedData(RawDataBlock* raw_datablk, int* buf_to,
-                         int delete_flag_from);
+    void CopyReducedData(int* bufin, int nwords, int num_events, int num_nodes, int* buf_to, int* nwords_to);
+    //    void CopyReducedData(RawDataBlock* raw_datablk, int* buf_to, int delete_flag_from);
 
     //! calculate reduced data size
     int CalcReducedNwords(int n);
@@ -161,6 +158,9 @@ namespace Belle2 {
                          int* detector_buf_3rd, int nwords_3rd,
                          int* detector_buf_4th, int nwords_4th,
                          RawCOPPERPackerInfo rawcprpacker_info);
+
+    //! Copy one datablock to buffer
+
 
     //
     // size of "COPPER front header" and "COPPER trailer"

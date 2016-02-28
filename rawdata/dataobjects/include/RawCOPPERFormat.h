@@ -11,6 +11,7 @@
 // Includes
 #include <stdio.h>
 #include <string>
+#include <string.h>
 #include <stdlib.h>
 #include <sys/time.h>
 
@@ -86,6 +87,14 @@ namespace Belle2 {
 
     //! print out data
     virtual void PrintData(int* buf, int nwords);
+
+    //! get FTSW ID to check whether this data block is FTSW data or not
+    virtual int CheckFTSWID(int n);
+
+    //! get FTSW ID to check whether this data block is FTSW data or not
+    virtual int CheckTLUID(int n);
+
+    virtual void CopyBlock(int n, int* buf_to);
 
     enum {
       POS_NWORDS = 0,

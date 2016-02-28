@@ -762,28 +762,31 @@ void PreRawCOPPERFormat_v1::CheckB2LFEEHeaderVersion(int n)
 #endif
 
 
-int PreRawCOPPERFormat_v1::CalcReducedDataSize(RawDataBlock* raw_datablk)
+//int PreRawCOPPERFormat_v1::CalcReducedDataSize(RawDataBlock* raw_datablk)
+int PreRawCOPPERFormat_v1::CalcReducedDataSize(int* bufin, int nwords, int num_events, int num_nodes)
 {
   //
   // Calculate reduced length for a total RawDataBlock (containing multiple data blocks)
   //
-
+  PreRawCOPPERFormat_v1 rawcpr_fmt;
+  int delete_flag = 0;
+  rawcpr_fmt.SetBuffer(bufin, nwords, delete_flag, num_events, num_nodes);
 
   int reduced_nwords = 0;
-  for (int k = 0; k < raw_datablk->GetNumEvents(); k++) {
-    int num_nodes_in_sendblock = raw_datablk->GetNumNodes();
+  for (int k = 0; k < rawcpr_fmt.GetNumEvents(); k++) {
+    int num_nodes_in_sendblock = rawcpr_fmt.GetNumNodes();
     for (int l = 0; l < num_nodes_in_sendblock; l++) {
       int entry_id = l + k * num_nodes_in_sendblock;
-      if (raw_datablk->CheckFTSWID(entry_id) || raw_datablk->CheckTLUID(entry_id)) {
+      if (rawcpr_fmt.CheckFTSWID(entry_id) || rawcpr_fmt.CheckTLUID(entry_id)) {
         // No size reduction for non-COPPER data ( FTSW and TLU data blocks )
-        reduced_nwords += raw_datablk->GetBlockNwords(entry_id);
+        reduced_nwords += rawcpr_fmt.GetBlockNwords(entry_id);
       } else {
         PreRawCOPPERFormat_v1 temp_prerawcpr;
         int temp_delete_flag = 0, temp_num_eve = 1, temp_num_nodes = 1;
 
         // Call CalcReducedNwords
-        temp_prerawcpr.SetBuffer(raw_datablk->GetBuffer(entry_id),
-                                 raw_datablk->GetBlockNwords(entry_id),
+        temp_prerawcpr.SetBuffer(rawcpr_fmt.GetBuffer(entry_id),
+                                 rawcpr_fmt.GetBlockNwords(entry_id),
                                  temp_delete_flag, temp_num_eve,
                                  temp_num_nodes);
         reduced_nwords += temp_prerawcpr.CalcReducedNwords(0);
@@ -794,28 +797,29 @@ int PreRawCOPPERFormat_v1::CalcReducedDataSize(RawDataBlock* raw_datablk)
 
 }
 
-void PreRawCOPPERFormat_v1::CopyReducedData(RawDataBlock* raw_datablk, int* buf_to,
-                                            int delete_flag_from)
+//void PreRawCOPPERFormat_v1::CopyReducedData(RawDataBlock* raw_datablk, int* buf_to, int delete_flag_from)
+void PreRawCOPPERFormat_v1::CopyReducedData(int* bufin, int nwords, int num_events, int num_nodes, int* buf_to, int* nwords_to)
 {
   //
   // Make a reduced buffer a total RawDataBlock (containing multiple data blocks)
   //
-
-
+  PreRawCOPPERFormat_v1 rawcpr_fmt;
+  int delete_flag = 0;
+  rawcpr_fmt.SetBuffer(bufin, nwords, delete_flag, num_events, num_nodes);
 
   int pos_nwords_to = 0;
-  for (int k = 0; k < raw_datablk->GetNumEvents(); k++) {
-    int num_nodes_in_sendblock = raw_datablk->GetNumNodes();
+  for (int k = 0; k < rawcpr_fmt.GetNumEvents(); k++) {
+    int num_nodes_in_sendblock = rawcpr_fmt.GetNumNodes();
     for (int l = 0; l < num_nodes_in_sendblock; l++) {
       int entry_id = l + k * num_nodes_in_sendblock;
-      if (raw_datablk->CheckFTSWID(entry_id) ||
-          raw_datablk->CheckTLUID(entry_id)) {
-        raw_datablk->CopyBlock(entry_id, buf_to + pos_nwords_to);
-        pos_nwords_to += raw_datablk->GetBlockNwords(entry_id);
+      if (rawcpr_fmt.CheckFTSWID(entry_id) ||
+          rawcpr_fmt.CheckTLUID(entry_id)) {
+        rawcpr_fmt.CopyBlock(entry_id, buf_to + pos_nwords_to);
+        pos_nwords_to += rawcpr_fmt.GetBlockNwords(entry_id);
 
       } else {
-        SetBuffer(raw_datablk->GetBuffer(entry_id),
-                  raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
+        SetBuffer(rawcpr_fmt.GetBuffer(entry_id),
+                  rawcpr_fmt.GetBlockNwords(entry_id), 0, 1, 1);
 
         pos_nwords_to += CopyReducedBuffer(0, buf_to + pos_nwords_to);
 
@@ -824,11 +828,11 @@ void PreRawCOPPERFormat_v1::CopyReducedData(RawDataBlock* raw_datablk, int* buf_
     }
   }
 
-  int* buf_from = raw_datablk->GetWholeBuffer();
-  raw_datablk->SetBuffer(buf_to, pos_nwords_to, 0,
-                         raw_datablk->GetNumEvents(), raw_datablk->GetNumNodes());
-
-  if (delete_flag_from == 1) { delete[] buf_from;}
+//   int* buf_from = raw_datablk->GetWholeBuffer();
+//   raw_datablk->SetBuffer(buf_to, pos_nwords_to, 0,
+//                          raw_datablk->GetNumEvents(), raw_datablk->GetNumNodes());
+//   if (delete_flag_from == 1) { delete[] buf_from;}
+  *nwords_to = pos_nwords_to;
   return ;
 }
 

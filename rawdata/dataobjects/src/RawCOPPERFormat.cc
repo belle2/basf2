@@ -264,5 +264,35 @@ unsigned int RawCOPPERFormat::GetB2LHeaderWord(int n, int finesse_buffer_pos)
 
 }
 
+int RawCOPPERFormat::CheckFTSWID(int n)
+{
+  int pos = POS_NODE_ID;
+  if (m_buffer[ GetBufferPos(n) + TEMP_POS_NWORDS_HEADER ] == OLD_FTSW_NWORDS_HEADER) {
+    pos =  POS_FTSW_ID_OLD;
+  }
 
+  if (m_buffer[ GetBufferPos(n) + pos ] == 0x54544420) { // "TTD "
+    return 1;
+  } else {
+    return 0;
+  }
+}
 
+int RawCOPPERFormat::CheckTLUID(int n)
+{
+  int pos = POS_NODE_ID;
+  if (m_buffer[ GetBufferPos(n) + TEMP_POS_NWORDS_HEADER ] == OLD_FTSW_NWORDS_HEADER) {
+    pos =  POS_FTSW_ID_OLD;
+  }
+  if (m_buffer[ GetBufferPos(n) + pos ] == 0x544c5520) { // "TLU "
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+void RawCOPPERFormat::CopyBlock(int n, int* buf_to)
+{
+  memcpy(buf_to, GetBuffer(n), GetBlockNwords(n) * sizeof(int));
+  return;
+}

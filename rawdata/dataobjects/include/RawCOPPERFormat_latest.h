@@ -10,11 +10,6 @@
 #define RAWCOPPERFORMAT_LATEST_H
 
 // Includes
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-
-
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 #include <rawdata/dataobjects/RawHeader_latest.h>
 #include <rawdata/dataobjects/RawTrailer_latest.h>

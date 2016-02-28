@@ -729,7 +729,10 @@ void DesSerPrePC::DataAcquisition()
       // Receive data from COPPER
       //
       eve_copper_0 = 0;
-      int delete_flag_from = 0, delete_flag_to = 0;
+      int delete_flag_from =
+        0; // Delete flag for temp_rawdatablk.It can be set to 1 by setRecvdBuffer if the buffer size is larger than that of pre-allocated buffer.
+      int delete_flag_to =
+        0; // Delete flag for raw_datablk[i]. It can be set to 1 by getNewBuffer if the buffer size is larger than that of pre-allocated buffer.
       RawDataBlock temp_rawdatablk;
       try {
         setRecvdBuffer(&temp_rawdatablk, &delete_flag_from);
@@ -743,25 +746,50 @@ void DesSerPrePC::DataAcquisition()
       //                                    0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
       ////     pre_rawcopper_latest.CheckCRC16( 0, 0 );
 
+      int temp_num_events, temp_num_nodes;
+      int temp_nwords_to;
+      int* buf_to = NULL;
 #ifdef REDUCED_RAWCOPPER
       //
       // Copy reduced buffer
       //
-      int* buf_to = getNewBuffer(m_pre_rawcpr.CalcReducedDataSize(&temp_rawdatablk), &delete_flag_to);
-      m_pre_rawcpr.CopyReducedData(&temp_rawdatablk, buf_to, delete_flag_from);
+      //      int* buf_to = getNewBuffer(m_pre_rawcpr.CalcReducedDataSize(&temp_rawdatablk), &delete_flag_to); // basf2-dependent style
+      int* temp_bufin = temp_rawdatablk.GetWholeBuffer();
+      int temp_nwords_from = temp_rawdatablk.TotalBufNwords();
+      temp_num_events = temp_rawdatablk.GetNumEvents();
+      temp_num_nodes = temp_rawdatablk.GetNumNodes();
+      int calced_temp_nwords_to = m_pre_rawcpr.CalcReducedDataSize(temp_bufin, temp_nwords_from, temp_num_events, temp_num_nodes);
+      buf_to = getNewBuffer(calced_temp_nwords_to, &delete_flag_to);
+
+      //      m_pre_rawcpr.CopyReducedData(&temp_rawdatablk, buf_to, delete_flag_from); // basf2-dependent style
+      m_pre_rawcpr.CopyReducedData(temp_bufin, temp_nwords_from, temp_num_events, temp_num_nodes, buf_to, &temp_nwords_to);
+      if (calced_temp_nwords_to != temp_nwords_to) {
+        char err_buf[500];
+        sprintf(err_buf,
+                "CORRUPTED DATA: Estimations of reduced event size are inconsistent. CalcReducedDataSize = %d. CopyReducedData = %d. Exiting...",
+                calced_temp_nwords_to, temp_nwords_to);
+        print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        exit(1);
+      }
       m_status.copyEventHeader(buf_to);
 #else
+      buf_to = temp_rawdatablk.GetWholeBuffer();
+      temp_nwords_to = temp_rawdatablk.TotalBufNwords();
+      temp_num_events = temp_rawdatablk.GetNumEvents();
+      temp_num_nodes = temp_rawdatablk.GetNumNodes();
       delete_flag_to = delete_flag_from;
+      delete_flag_from = 0; // to avoid double delete
 #endif
 
       //
       // Set buffer to the RawData class stored in DataStore
       //
       //    RawDataBlock* raw_datablk = raw_datablkarray.appendNew();
+//       raw_datablk[ j ].SetBuffer( (int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
+//                                  delete_flag_to, temp_rawdatablk.GetNumEvents(),
+//                                  temp_rawdatablk.GetNumNodes());
+      raw_datablk[ j ].SetBuffer(buf_to, temp_nwords_to, delete_flag_to, temp_num_events, temp_num_nodes);
 
-      raw_datablk[ j ].SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
-                                 delete_flag_to, temp_rawdatablk.GetNumEvents(),
-                                 temp_rawdatablk.GetNumNodes());
 
       //
       // CRC16 check after data reduction
@@ -769,8 +797,10 @@ void DesSerPrePC::DataAcquisition()
 #ifdef REDUCED_RAWCOPPER
       PostRawCOPPERFormat_latest post_rawcopper_latest;
 
-      post_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
-                                      0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
+//       post_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
+//                                       0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
+      post_rawcopper_latest.SetBuffer(raw_datablk[ j ].GetWholeBuffer(), raw_datablk[ j ].TotalBufNwords(),
+                                      0, raw_datablk[ j ].GetNumEvents(), raw_datablk[ j ].GetNumNodes());
 
       for (int i_finesse_num = 0; i_finesse_num < 4; i_finesse_num ++) {
         int block_num = 0;

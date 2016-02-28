@@ -743,6 +743,9 @@ void DeSerializerPCModule::event()
     pre_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
                                    0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
     buf_rc = temp_rawdatablk.GetWholeBuffer();
+
+
+
 #ifdef REDUCED_RAWCOPPER
     //
     // Copy reduced buffer
@@ -767,6 +770,7 @@ void DeSerializerPCModule::event()
     buf_rc = temp_rawdatablk.GetWholeBuffer();
 
 #ifndef USE_DESERIALIZER_PREPC
+    Do not use this option..
 #ifdef REDUCED_RAWCOPPER
     PostRawCOPPERFormat_latest post_rawcopper_latest;
     post_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
@@ -779,6 +783,7 @@ void DeSerializerPCModule::event()
       }
     }
 #endif
+
 #endif
   }
   if (buf_rc != NULL) {

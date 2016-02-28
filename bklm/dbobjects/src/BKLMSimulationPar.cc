@@ -26,12 +26,12 @@ ClassImp(BKLMSimulationPar);
   if (!m_Instance) m_Instance = new BKLMSimulationPar();
   return m_Instance;
 }
-*/
 
 BKLMSimulationPar::BKLMSimulationPar()
 {
   m_IsValid = false;
 }
+*/
 
 BKLMSimulationPar::BKLMSimulationPar(const GearDir& content)
 {

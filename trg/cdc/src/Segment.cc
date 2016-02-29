@@ -350,7 +350,8 @@ TCSegment::simulateWithoutClock(bool logicLUTFlag) {
 
 float
 TCSegment::fastestTime(void)const{
-  if((this->LUT()->getValue(this->lutPattern()))&&(this->priority().hit())){
+  //if((this->LUT()->getValue(this->lutPattern()))&&(this->priority().hit())){
+  if((this->LUT()->getValue(this->lutPattern()))){
     float tmpFastTime = 9999;
     for(unsigned i=0;i<_wires.size();i++){
       if(_wires[i]->hit()){
@@ -361,6 +362,83 @@ TCSegment::fastestTime(void)const{
       }
     }
     return tmpFastTime;
+  }
+  else 
+    return -1;
+}
+
+float
+TCSegment::foundTime(void)const{
+  if((this->LUT()->getValue(this->lutPattern()))){
+    float tmpFoundTime[5] = {9999,9999,9999,9999,9999};
+    for(unsigned i=0;i<_wires.size();i++){
+      if(_wires.size()==11){
+        if(i<3){
+          if(_wires[i]->hit()){
+            float dt= _wires[i]->signal()[0]->time();
+            if(tmpFoundTime[0]>dt) tmpFoundTime[0]=dt;
+          }
+        }
+        else if(2<i && i<5){
+          if(_wires[i]->hit()){
+            float dt= _wires[i]->signal()[0]->time();
+            if(tmpFoundTime[1]>dt) tmpFoundTime[1]=dt;
+          }
+        }
+        else if(i==3){
+          if(_wires[i]->hit()){
+            float dt= _wires[i]->signal()[0]->time();
+            if(tmpFoundTime[2]>dt) tmpFoundTime[2]=dt;
+          }
+        }
+        else if(5<i && i<8){
+          if(_wires[i]->hit()){
+            float dt= _wires[i]->signal()[0]->time();
+            if(tmpFoundTime[3]>dt) tmpFoundTime[3]=dt;
+          }
+        }
+        else{
+          if(_wires[i]->hit()){
+            float dt= _wires[i]->signal()[0]->time();
+            if(tmpFoundTime[4]>dt) tmpFoundTime[4]=dt;
+          }
+        }
+      }
+      else{
+        if(i==0){
+          if(_wires[i]->hit()){
+            float dt= _wires[i]->signal()[0]->time();
+            if(tmpFoundTime[0]>dt) tmpFoundTime[0]=dt;
+          }
+        }
+        else if(0<i && i<3){
+          if(_wires[i]->hit()){
+            float dt= _wires[i]->signal()[0]->time();
+            if(tmpFoundTime[1]>dt) tmpFoundTime[1]=dt;
+          }
+        }
+        else if(2<i && i<6){
+          if(_wires[i]->hit()){
+            float dt= _wires[i]->signal()[0]->time();
+            if(tmpFoundTime[2]>dt) tmpFoundTime[2]=dt;
+          }
+        }
+        else if(5<i && i<10){
+          if(_wires[i]->hit()){
+            float dt= _wires[i]->signal()[0]->time();
+            if(tmpFoundTime[3]>dt) tmpFoundTime[3]=dt;
+          }
+        }
+        else{
+          if(_wires[i]->hit()){
+            float dt= _wires[i]->signal()[0]->time();
+            if(tmpFoundTime[4]>dt) tmpFoundTime[4]=dt;
+          }
+        }
+      }
+    }
+    sort(tmpFoundTime, tmpFoundTime + 5);
+    return tmpFoundTime[3];
   }
   else 
     return -1;

@@ -31,7 +31,7 @@ DesSerPrePCMainModule::DesSerPrePCMainModule() : Module()
   addParam("HostNameFrom", m_host_recv, "hostname from", string("cpr001"));
 
   addParam("PortTo", m_port_send, "port number", 34001);
-  addParam("HostNameTo", m_host_send, "hostname from", string("localhost"));
+  addParam("HostNameTo", m_host_send, "hostname from", string("0.0.0.0."));
 
   addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
   addParam("NodeName", m_nodename, "Node(subsystem) name", std::string(""));

@@ -88,7 +88,7 @@ const TRGCDCWire & fasterWire(const TRGCDCWire*, const TRGCDCWire*)const;
 float fastestTime(void)const;
 
 /// return found time in TSHit.
-float foundtTime(void)const;
+float foundTime(void)const;
 
 /// return priority time in TSHit.
 float priorityTime(void);

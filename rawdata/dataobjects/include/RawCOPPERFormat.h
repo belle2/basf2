@@ -94,6 +94,7 @@ namespace Belle2 {
     //! get FTSW ID to check whether this data block is FTSW data or not
     virtual int CheckTLUID(int n);
 
+    //! Copy nth block to buf_to
     virtual void CopyBlock(int n, int* buf_to);
 
     enum {

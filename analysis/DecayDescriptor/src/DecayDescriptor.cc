@@ -213,22 +213,28 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
       for (vector< pair< int, int > >::iterator itSingle = singlematch.begin(); itSingle != singlematch.end(); ++itSingle) {
         // try to remove particle from the multimatch list
         if (itMulti->second.erase(itSingle->second)) {
-          // if multimatch list contains only one particle candidate, move the entry to the singlematch list
-          if (itMulti->second.size() == 1) {
-            int iDaughter_d = itMulti->first;
-            int iDaughter_p = *(itMulti->second.begin());
-            singlematch.push_back(make_pair(iDaughter_d, iDaughter_p));
-            multimatch.erase(itMulti);
-            // call match function again to set the correct daughter
-            if (!isAmbiguities) {
-              const T* daughter = daughterList[iDaughter_p];
-              if (!daughter) continue;
-              m_daughters[iDaughter_d].match(daughter, iDaughter_p);
-            }
-            --itMulti;
-            isModified = true;
-            break;
-          }
+          B2FATAL("Trying to excute part of the code with known bug, which is not fixed yet! Send email to anze.zupanc@ijs.si with notification that this happens!");
+          /*
+            This part of the code is commented, because of the following error:
+            Iterator 'itMulti' used after element has been erased.
+
+                // if multimatch list contains only one particle candidate, move the entry to the singlematch list
+                if (itMulti->second.size() == 1) {
+                  int iDaughter_d = itMulti->first;
+                  int iDaughter_p = *(itMulti->second.begin());
+                  singlematch.push_back(make_pair(iDaughter_d, iDaughter_p));
+                  multimatch.erase(itMulti);
+                  // call match function again to set the correct daughter
+                  if (!isAmbiguities) {
+                    const T* daughter = daughterList[iDaughter_p];
+                    if (!daughter) continue;
+                    m_daughters[iDaughter_d].match(daughter, iDaughter_p);
+                  }
+                  --itMulti;
+                  isModified = true;
+                  break;
+                }
+          */
         }
       }
     }

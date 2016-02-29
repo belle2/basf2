@@ -45,6 +45,9 @@ namespace Belle2 {
       m_Grade = 0;         /**< Grade, inherit from Belle */
       m_UncEnergy = 0;   /**< UncEnergy, inherit from Belle */
       m_Time = 0;        /**< Time, new parameter for Belle2, wait for more stude */
+
+      m_UniqueShowerId = 0; /**< Unique Shower ID (TF) */
+      m_HighestEnergy = 0.0; /**< Highest energy in Shower (TF) */
     }
 
 
@@ -93,6 +96,13 @@ namespace Belle2 {
     /*! Set Time
      */
     void setTime(float Time) { m_Time = Time; }
+    /*! Set Unique Shower ID (TF)
+     */
+    void setUniqueShowerId(int UniqueShowerId) { m_UniqueShowerId = UniqueShowerId; }
+    /*! Set Highest Energy (TF)
+     */
+    void setHighestEnergy(float HighestEnergy) { m_HighestEnergy = HighestEnergy; }
+
 
     /*! Get Shower Id
      * @return Shower Id
@@ -167,6 +177,16 @@ namespace Belle2 {
      */
     float getTime() const { return m_Time; }
 
+    /*! Get Unique Shower Id
+     * @return Unique Shower Id
+     */
+    int getUniqueShowerId() const { return m_UniqueShowerId; }
+
+    /*! Get Highest Energy in Shower
+     * @return Highest Energy
+     */
+    float getHighestEnergy() const { return m_HighestEnergy; }
+
     //! The method to get return  TVector3 Momentum
     TVector3 getMomentum() const
     {
@@ -176,6 +196,8 @@ namespace Belle2 {
                m_Energy * cos(m_Theta)
              );
     }
+
+
 
 
   private:
@@ -195,7 +217,11 @@ namespace Belle2 {
     float m_UncEnergy;     /**< UncEnergy, inherit from Belle */
     float m_Time;          /**< Time, new parameter for Belle2, wait for more stude */
 
-    ClassDef(ECLShower, 1);/**< ClassDef */
+    int m_UniqueShowerId;  /**< Unique Shower ID (TF) */
+    float m_HighestEnergy; /**< Highest Energy in Shower (GeV) (TF) */
+
+    // 2: added uniqueID and highestE (TF)
+    ClassDef(ECLShower, 2);/**< ClassDef */
 
   };
 } // end namespace Belle2

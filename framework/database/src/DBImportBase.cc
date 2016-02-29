@@ -21,7 +21,7 @@ void DBImportBase::addIntraRunDependency(unsigned long long int tag,
 
   if (!m_object) return;
 
-  if (dependency == c_None) m_dependency = dependency;
+  if (m_dependency == c_None) m_dependency = dependency;
   if (dependency == m_dependency) {
     m_objects.push_back(m_object);
     m_tags.push_back(tag);

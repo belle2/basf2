@@ -261,6 +261,7 @@ namespace Belle2 {
       return -1;
     }
     if (fileName.rfind("cpr3015") != std::string::npos) m_expNumber = 1; // Tsukuba tests
+    if (fileName.rfind("cpr3006") != std::string::npos) m_expNumber = 2; // BelleII tests
     return abs(runNumber);
   }
 

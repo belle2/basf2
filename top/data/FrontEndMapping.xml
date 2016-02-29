@@ -63,7 +63,7 @@
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
-      <SCRODid>30</SCRODid> <!-- from run 1292: 34 -->
+      <SCRODid>34</SCRODid> <!-- up to run 1291: 30 -->
       <COPPERid>1003</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
@@ -120,24 +120,24 @@
     </Boardstack>
   </TOPModule>
 
-  <TOPModule moduleID="6"> <!-- dummy SCRODid's-->
+  <TOPModule moduleID="6">
     <Boardstack col="0">
-      <SCRODid>601</SCRODid>
+      <SCRODid>62</SCRODid>
       <COPPERid>1006</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
-      <SCRODid>602</SCRODid>
+      <SCRODid>54</SCRODid>
       <COPPERid>1006</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
-      <SCRODid>603</SCRODid>
+      <SCRODid>63</SCRODid>
       <COPPERid>1006</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
-      <SCRODid>604</SCRODid>
+      <SCRODid>60</SCRODid>
       <COPPERid>1006</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
@@ -201,7 +201,7 @@
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
-      <SCRODid>56</SCRODid>
+      <SCRODid>99</SCRODid>
       <COPPERid>1009</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
@@ -281,24 +281,24 @@
     </Boardstack>
   </TOPModule>
 
-  <TOPModule moduleID="13"> <!-- dummy SCRODid's-->
+  <TOPModule moduleID="13">
     <Boardstack col="0">
-      <SCRODid>1301</SCRODid>
+      <SCRODid>87</SCRODid>
       <COPPERid>1013</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
-      <SCRODid>1302</SCRODid>
+      <SCRODid>98</SCRODid>
       <COPPERid>1013</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
-      <SCRODid>1303</SCRODid>
+      <SCRODid>84</SCRODid>
       <COPPERid>1013</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
-      <SCRODid>1304</SCRODid>
+      <SCRODid>36</SCRODid>
       <COPPERid>1013</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>

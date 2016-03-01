@@ -578,10 +578,10 @@ std::vector<std::string> DataStore::getListOfObjects(const TClass* objClass, EDu
   for (const auto& entrypair : map) {
     if (!entrypair.second.isArray) {
       const TObject* obj = entrypair.second.object;
-      if (obj and dynamic_cast<const RelationContainer*>(obj))
+      if (dynamic_cast<const RelationContainer*>(obj))
         continue; //ignore relations in list
 
-      if (obj->IsA()->InheritsFrom(objClass))
+      if (obj and obj->IsA()->InheritsFrom(objClass))
         list.emplace_back(entrypair.first);
     }
   }

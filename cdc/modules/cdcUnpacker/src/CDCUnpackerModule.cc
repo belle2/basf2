@@ -53,7 +53,7 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("fadcThreshold", m_fadcThreshold, "Threshold voltage (mV).", 10);
   addParam("tdcOffset", m_tdcOffset, "TDC offset (in TDC count).", 0);
   addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string("/cdc/data/ch_map.dat"));
-  addParam("enableStoreCDCRawHit", m_enableStoreCDCRawHit, "Enable to store to the RawCDC object", true);
+  addParam("enableStoreCDCRawHit", m_enableStoreCDCRawHit, "Enable to store to the CDCRawHit object", false);
   addParam("enablePrintOut", m_enablePrintOut, "Enable to print out the data to the terminal", true);
   addParam("setRelationRaw2Hit", m_setRelationRaw2Hit, "Set/unset relation between CDCHit and RawCDC.", false);
 

@@ -21,18 +21,13 @@ input = register_module('RootInput')
 unpacker = register_module('CDCUnpacker')
 # FE channel <-> CDC cell ID map.
 unpacker.param('xmlMapFileName', 'ch_map.dat')
-# Enable/Disable to store the CDCRawHit Object.
-unpacker.param('enableStoreCDCRawHit', True)
 # Enable/Disable print out the ADC/TDC data to the terminal.
 unpacker.param('enablePrintOut', True)
 # Set/Unset the relation between RawCDC and CDCHit.
 unpacker.param('setRelationRaw2Hit', False)
-# unpacker.logging.log_level = LogLevel.DEBUG
-# unpacker.logging.debug_level = 100
 
 output = register_module('RootOutput')
 output.param('outputFileName', 'UnpackerOutput.root')
-# output.param('branchNames', ['CDCHits', 'CDCRawHits'])
 
 
 # Create main path

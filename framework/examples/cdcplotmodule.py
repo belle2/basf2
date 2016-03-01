@@ -68,7 +68,7 @@ class CDCPlotModule(Module):
     matplotlib. The result is saved as a PNG.
     """
 
-    # event counter
+    #: event counter
     num_events = 0
 
     def event(self):

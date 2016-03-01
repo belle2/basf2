@@ -60,7 +60,7 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
            "Objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event'. (Note that this won't work for objects somewhere deep in the tree, only for those immediately below 'Event'.)", {});
 
   //create gApplication so we can use graphics support. Needs to be done before ROOT has a chance to do it for us.
-  if ((!gApplication) || (gApplication && gApplication->TestBit(TApplication::kDefaultApplication))) {
+  if ((!gApplication) || (gApplication->TestBit(TApplication::kDefaultApplication))) {
     new TApplication("ROOT_application", 0, 0);
   }
 }

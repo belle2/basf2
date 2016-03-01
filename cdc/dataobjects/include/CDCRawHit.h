@@ -37,7 +37,8 @@ namespace Belle2 {
     CDCRawHit(unsigned short status, int trgNumber, unsigned short node,
               unsigned short finess, unsigned short board,
               unsigned short channel, unsigned short trgTime,
-              unsigned short adc, unsigned short tdc);
+              unsigned short adc, unsigned short tdc,
+              unsigned short tdc2, unsigned short tot);
 
     /**
      * Getter for status.
@@ -113,6 +114,14 @@ namespace Belle2 {
     }
 
     /**
+     * Getter for TOT value.
+     */
+    inline unsigned short getTOT(void) const
+    {
+      return m_tot;
+    }
+
+    /**
      * Destructor.
      */
     virtual ~CDCRawHit();
@@ -156,8 +165,18 @@ namespace Belle2 {
      */
     unsigned short m_tdc;
 
+    /**
+     * 2nd TDC count (not subtracted by trigger time).
+     */
+    unsigned short m_tdc2nd;
+
+    /**
+     * Time over threshold.
+     */
+    unsigned short m_tot;
+
     /// To derive from TObject
-    ClassDef(CDCRawHit, 1);
+    ClassDef(CDCRawHit, 2);
   };
 }
 

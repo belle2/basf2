@@ -53,7 +53,7 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("fadcThreshold", m_fadcThreshold, "Threshold voltage (mV).", 10);
   addParam("tdcOffset", m_tdcOffset, "TDC offset (in TDC count).", 0);
   addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string("/cdc/data/ch_map.dat"));
-  addParam("enableStoreRawCDC", m_enableStoreCDCRawHit, "Enable to store to the RawCDC object", true);
+  addParam("enableStoreCDCRawHit", m_enableStoreCDCRawHit, "Enable to store to the RawCDC object", true);
   addParam("enablePrintOut", m_enablePrintOut, "Enable to print out the data to the terminal", true);
   addParam("setRelationRaw2Hit", m_setRelationRaw2Hit, "Set/unset relation between CDCHit and RawCDC.", false);
 
@@ -135,20 +135,21 @@ void CDCUnpackerModule::event()
   } else {
     cdcHits.getPtr()->Clear();
   }
+
   //
   // Proccess RawCDC data block.
   //
   StoreArray<RawCDC> rawCDCs;
   const int nEntries = rawCDCs.getEntries();
 
-  B2INFO("Nentries : " << nEntries);
+  B2DEBUG(99, "nEntries of RawCDCs : " << nEntries);
   for (int i = 0; i < nEntries; ++i) {
     const int subDetectorId = rawCDCs[i]->GetNodeID(0);
     const int iNode = (subDetectorId & 0xFFFFFF);
-    const int nEntries_rawCDC = rawCDCs[i]->GetNumEntries();
+    const int nEntriesRawCDC = rawCDCs[i]->GetNumEntries();
 
-    B2INFO("Nentries rawCDC: " << nEntries_rawCDC);
-    for (int j = 0; j < nEntries_rawCDC; ++j) {
+    B2DEBUG(99, "nEntries of rawCDC[i] : " << nEntriesRawCDC);
+    for (int j = 0; j < nEntriesRawCDC; ++j) {
 
       int nWords[4];
       nWords[0] = rawCDCs[i]->Get1stDetectorNwords(j);
@@ -171,7 +172,7 @@ void CDCUnpackerModule::event()
       for (int iFiness = 0; iFiness < 4; ++iFiness) {
         int* ibuf = data32tab[iFiness];
         const int nWord = nWords[iFiness];
-        B2INFO("Nwords " << nWord);
+        B2DEBUG(99, "nWords (from COPPER header) : " << nWord);
 
 
         if (m_enablePrintOut == true) {
@@ -325,8 +326,8 @@ void CDCUnpackerModule::event()
 
           const int bufSize = static_cast<int>(m_buffer.size());
           for (int it = 0; it < bufSize;) {
-            unsigned short header = m_buffer.at(it);        // Header.
-            unsigned short ch = (header & 0xff00) >> 8; // Channel ID in FE.
+            unsigned short header = m_buffer.at(it);     // Header.
+            unsigned short ch = (header & 0xff00) >> 8;  // Channel ID in FE.
             unsigned short length = (header & 0xff) / 2; // Data length in short word.
 
             if (header == 0xff02) {
@@ -338,7 +339,6 @@ void CDCUnpackerModule::event()
               B2ERROR("CDCUnpacker : data length should be 4 or 5 words.");
               B2ERROR("CDCUnpacker : length " << length << " words.");
               it += length;
-              //        return;
               continue;
             }
 
@@ -366,15 +366,11 @@ void CDCUnpackerModule::event()
               const unsigned short status = 0;
               // Store to the CDCHit.
               const WireID  wireId = getWireID(board, ch);
-              //        if(tdc1+m_tdcOffset>8191){
-              //    tdc1 = 2630;
-              //        }
-              //              CDCHit* hit = cdcHits.appendNew(tdc1 + m_tdcOffset, fadcSum, wireId, tdc2);
               CDCHit* hit = cdcHits.appendNew(tdc1, fadcSum, wireId, tdc2);
 
               if (m_enableStoreCDCRawHit == true) {
                 // Store to the CDCRawHit object.
-                const CDCRawHit* raw = cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch, trgTime, fadcSum, tdc1);
+                const CDCRawHit* raw = cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch, trgTime, fadcSum, tdc1, tdc2, tot);
                 if (m_setRelationRaw2Hit == true) {
                   hit->addRelationTo(raw);
                 }

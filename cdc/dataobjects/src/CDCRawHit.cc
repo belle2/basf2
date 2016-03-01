@@ -18,7 +18,7 @@ ClassImp(CDCRawHit);
 
 CDCRawHit::CDCRawHit() :
   m_status(0), m_triggerNumber(0), m_node(0), m_finess(0), m_board(0),
-  m_channel(0), m_triggerTime(0), m_adc(), m_tdc()
+  m_channel(0), m_triggerTime(0), m_adc(0), m_tdc(0), m_tdc2nd(0), m_tot(0)
 {
 }
 
@@ -31,7 +31,9 @@ CDCRawHit::CDCRawHit(unsigned short status,
                      unsigned short channel,
                      unsigned short trgTime,
                      unsigned short adc,
-                     unsigned short tdc)
+                     unsigned short tdc,
+                     unsigned short tdc2,
+                     unsigned short tot)
 {
   m_status = status;
   m_triggerNumber = trgNumber;
@@ -42,6 +44,8 @@ CDCRawHit::CDCRawHit(unsigned short status,
   m_triggerTime = trgTime;
   m_adc = adc;
   m_tdc = tdc;
+  m_tdc2nd = tdc2;
+  m_tot = tot;
 }
 
 CDCRawHit::~CDCRawHit()

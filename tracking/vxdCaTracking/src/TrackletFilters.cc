@@ -606,9 +606,9 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
     if (T(k, 0) < 0) {
 
       //Console Output:
-      B2DEBUG(1, "T" << k << " was " << T(k, 0) << " and will manually be set to 0.");
+      B2DEBUG(5, "T" << k << " was " << T(k, 0) << " and will manually be set to 0.");
       if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) {
-        B2DEBUG(3, "The following hits were part of this TC: \n" << printHits(m_hits) << "\n'T' had following entries: " <<
+        B2DEBUG(10, "The following hits were part of this TC: \n" << printHits(m_hits) << "\n'T' had following entries: " <<
                 printMyMatrixstring(T));
       }
 

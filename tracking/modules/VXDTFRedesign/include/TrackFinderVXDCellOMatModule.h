@@ -99,8 +99,15 @@ namespace Belle2 {
     std::string m_PARAMsecMapName;
 
 
-    /** "If true for each event and each network created a file with a graph is created. */
+    /** If true for each event and each network created a file with a graph is created. */
     bool m_PARAMprintNetworks;
+
+
+    /** Regulates if every subset of sufficient length of a path shall be collected as separate path or not.
+     *
+     * if true, only one path per possibility is collected, if false subsets are collected too. */
+    bool m_PARAMstrictSeeding;
+
 
 /// member variables
 

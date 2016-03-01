@@ -53,6 +53,11 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
   addParam("printNetworks",
            m_PARAMprintNetworks,
            "If true for each event and each network created a file with a graph is created.", bool(false));
+
+  addParam("strictSeeding",
+           m_PARAMstrictSeeding,
+           "Regulates if every subset of sufficient length of a path shall be collected as separate path or not (if true, only one path per possibility is collected, if false subsets are collected too.",
+           bool(true));
 }
 
 /** *************************************+************************************* **/
@@ -118,7 +123,7 @@ void TrackFinderVXDCellOMatModule::event()
 
 
 /// mark valid Cells as Seeds:
-  unsigned int nSeeds = m_cellularAutomaton.findSeeds(segmentNetwork);
+  unsigned int nSeeds = m_cellularAutomaton.findSeeds(segmentNetwork, m_PARAMstrictSeeding);
   if (nSeeds == 0) { B2WARNING("TrackFinderVXDCellOMatModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
 
 

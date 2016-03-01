@@ -42,7 +42,7 @@ QualityEstimatorVXDRandomModule::QualityEstimatorVXDRandomModule() : Module()
 void QualityEstimatorVXDRandomModule::event()
 {
   m_eventCounter++;
-  B2INFO("\n" << "QualityEstimatorVXDRandomModule:event: event " << m_eventCounter << "\n")
+  B2DEBUG(1, "\n" << "QualityEstimatorVXDRandomModule:event: event " << m_eventCounter << "\n")
   m_nTCsTotal += m_spacePointTrackCands.getEntries();
 
 
@@ -50,7 +50,7 @@ void QualityEstimatorVXDRandomModule::event()
   if (m_PARAMuseTimeSeedAsQI) {
     for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
       double qi = aTC.getRelatedTo<genfit::TrackCand>("ALL")->getTimeSeed();
-      B2INFO("in event " << m_eventCounter << ", for aTC " << aTC.getArrayIndex() << ": retrieved QI using getTimeSeed is " << qi);
+      B2DEBUG(1, "in event " << m_eventCounter << ", for aTC " << aTC.getArrayIndex() << ": retrieved QI using getTimeSeed is " << qi);
       aTC.setQualityIndex(qi);
     }
     return;

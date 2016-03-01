@@ -129,6 +129,8 @@ namespace Belle2 {
       double m_PARAMpurityThreshold; /**<  chose value to filter TCs found by VXDTF. TCs having purities lower than this value won't be marked as reconstructed (value 0-1). e.g. having a TC with 4 hits, 1 foreign, 3 good ones. would mean 0.75, a m_PARAMpurityThresholdThreshold with 0.7 would mark the track as 'reconstructed', a threshold of 0.8 would neglect this TC */
       unsigned int
       m_PARAMminNDFThreshold; /**< defines how many measurements (numbers of degrees of freedom) the TC must have to be accepted as reconstructed, standard is 5, values lower than 5 wouldn't make sense because of minimal info needed for track parameters */
+
+      bool m_PARAMignoreDeadTCs; /**< if true, test-tc whose activation-state is set to false are skipped for analysis. */
       unsigned int m_countReconstructedTCs; /**< counts number of reconstructed TCs */
       unsigned int
       m_countAcceptedGFTCs; /**< counts number of accepted TCs which are stored in separate container for external tests (e.g. trackFitChecker) in storaArray with name m_PARAMacceptedTCname */

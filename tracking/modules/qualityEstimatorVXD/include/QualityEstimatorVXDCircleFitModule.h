@@ -20,11 +20,8 @@
 
 namespace Belle2 {
 
-  /** The quality estimator module for SpacePointTrackCandidates using random values.
-   *
-   * This module is to be used for comparison and testing purposes.
-   */
-  class QualityEstimatorVXDRandomModule : public Module {
+  /** The quality estimator module for SpacePointTrackCandidates using a circleFit. */
+  class QualityEstimatorVXDCircleFitModule : public Module {
 
   public:
 
@@ -32,7 +29,7 @@ namespace Belle2 {
     /**
      * Constructor of the module.
      */
-    QualityEstimatorVXDRandomModule();
+    QualityEstimatorVXDCircleFitModule();
 
 
     /** Initializes the Module.
@@ -53,7 +50,7 @@ namespace Belle2 {
     }
 
 
-    /** Adds a random qi at given sets of TCs. */
+    /** Applies the circleFit at given sets of TCs. */
     virtual void event();
 
 
@@ -72,9 +69,6 @@ namespace Belle2 {
 
     /** sets the name of expected StoreArray with SpacePointTrackCand in it. */
     std::string m_PARAMtcArrayName;
-
-
-    bool m_PARAMuseTimeSeedAsQI; /**< JKL - WARNING evil hack: uses an ugly workaround to be able to use realistically determined quality indicators */
 
 
     // member variables

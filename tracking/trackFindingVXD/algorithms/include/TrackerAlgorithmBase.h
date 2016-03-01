@@ -45,8 +45,8 @@ namespace Belle2 {
     /** applies actual algorithm on parameter passed, returns some debuging results */
     virtual int apply(ContainerType&) { return 0; }
 
-    /** searches for seeds among the entries of parameter passed, uses m_validator for determining them, returns number of seeds found */
-    virtual unsigned int findSeeds(ContainerType&) { return 0; }
+    /** searches for seeds among the entries of parameter passed (bool sets strictnes for finding seeds), uses m_validator for determining them, returns number of seeds found */
+    virtual unsigned int findSeeds(ContainerType&, bool) { return 0; }
   };
 
 } //Belle2 namespace

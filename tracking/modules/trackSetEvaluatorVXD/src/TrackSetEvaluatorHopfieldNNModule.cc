@@ -47,8 +47,8 @@ void TrackSetEvaluatorHopfieldNNModule::event()
   m_nTCsOverlapping += nCompetitors;
   m_nTCsCleanAtStart += nCleanTCsAtStart;
 
-  B2INFO("TrackSetEvaluatorHopfieldNNModule - in event " << m_eventCounter << ": got " << nTCs <<
-         " TC of which " << nCompetitors << " are overlapping")
+  B2DEBUG(10, "TrackSetEvaluatorHopfieldNNModule - in event " << m_eventCounter << ": got " << nTCs <<
+          " TC of which " << nCompetitors << " are overlapping")
 
   m_tcNetwork->replaceTrackSetEvaluator(new TrackSetEvaluatorHopfieldNN<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard>
                                         (m_tcNetwork->getNodes(), m_tcNetwork->getObserver()));
@@ -75,8 +75,8 @@ void TrackSetEvaluatorHopfieldNNModule::event()
   m_totalQI += m_tcNetwork->accessEvaluator()->getTotalQI();
   m_totalSurvivingQI += m_tcNetwork->accessEvaluator()->getTotalSurvivingQI();
 
-  B2INFO("TrackSetEvaluatorHopfieldNNModule - in event " << m_eventCounter << ": after cleanOverlaps: network now looks like this:")
-  m_tcNetwork->print();
+//   B2INFO("TrackSetEvaluatorHopfieldNNModule - in event " << m_eventCounter << ": after cleanOverlaps: network now looks like this:")
+//   m_tcNetwork->print();
 
   m_nFinalTCs += m_tcNetwork->accessEvaluator()->getNSurvivors();
   m_nRejectedTCs += nTCs - m_tcNetwork->accessEvaluator()->getNSurvivors();

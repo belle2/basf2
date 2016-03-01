@@ -62,8 +62,8 @@ void SPTCNetworkProducerModule::event()
           << "are linked to each other (overlapping)..."
          )
 
-  B2INFO("in event " << m_eventCounter << " the network looks like this:")
-  m_tcNetwork->print();
+  B2DEBUG(10, "in event " << m_eventCounter << " the network looks like this:")
+//   m_tcNetwork->print();
 
   m_nNodesNetwork += m_tcNetwork->size();
   m_nLinksNetwork += m_tcNetwork->getNCompetitors();

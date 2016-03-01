@@ -129,11 +129,14 @@ namespace Belle2 {
 
 
 
-    /** checks network given for seeds, returns number of seeds found*/
-    unsigned int findSeeds(ContainerType& aNetworkContainer) override
+    /** checks network given for seeds, returns number of seeds found (if strictSeeding is set to true, no subset of paths are stored, only unique ones).
+    * WARNING: requires outerNodes to be set! (bidirectional network, not only directed to inner!). */
+    unsigned int findSeeds(ContainerType& aNetworkContainer,  bool strictSeeding = false) override
     {
       unsigned int nSeeds = 0;
       for (auto* aNode : aNetworkContainer) {
+        if (strictSeeding && !(aNode->getOuterNodes().empty())) continue;
+
         if (BaseClass::m_validator.checkSeed(aNode->getMetaInfo()) == true) {
           aNode->getMetaInfo().setSeed(true);
           nSeeds++;

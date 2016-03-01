@@ -88,19 +88,13 @@ namespace Belle2 {
     class Manager {
 
     public:
-#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
-      //hide C++11 things from root.
-      typedef void* FunctionPtr;
-      typedef void* ParameterFunctionPtr;
-      typedef void* MetaFunctionPtr;
-#else
       /** functions stored take a const Particle* and return double. */
       typedef std::function<double(const Particle*)> FunctionPtr;
       /** parameter functions stored take a const Particle*, const std::vector<double>& and return double. */
       typedef std::function<double(const Particle*, const std::vector<double>&)> ParameterFunctionPtr;
       /** meta functions stored take a const std::vector<std::string>& and return a FunctionPtr. */
       typedef std::function<FunctionPtr(const std::vector<std::string>&)> MetaFunctionPtr;
-#endif
+
       /** Base class for information common to all types of variables. */
       struct VarBase {
         std::string name; /**< Unique identifier of the function, used as key. */
@@ -153,8 +147,6 @@ namespace Belle2 {
       /** Return list of all variables (in order registered). */
       std::vector<const Belle2::Variable::Manager::VarBase*> getVariables() const { return m_variablesInRegistrationOrder; }
 
-#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
-#else
 
       /** All variables registered after VARIABLE_GROUP(groupName) will be added to this group. */
       void setVariableGroup(const std::string& groupName);
@@ -165,7 +157,6 @@ namespace Belle2 {
       void registerVariable(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description);
       /** Register a meta-variable that takes string arguments and returns a variable(see Variable::Manager::MetaFunctionPtr). */
       void registerVariable(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description);
-#endif
 
       /** evaluate variable 'varName' on given Particle.
        *
@@ -196,8 +187,6 @@ namespace Belle2 {
       /** List of variables in registration order. */
       std::vector<const VarBase*> m_variablesInRegistrationOrder;
 
-#if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
-#else
       /** List of registered variables. */
       std::map<std::string, std::string> m_alias;
       /** List of registered variables. */
@@ -206,12 +195,8 @@ namespace Belle2 {
       std::map<std::string, std::shared_ptr<ParameterVar>> m_parameter_variables;
       /** List of registered variables. */
       std::map<std::string, std::shared_ptr<MetaVar>> m_meta_variables;
-#endif
-      //NOTE: do not put any data members between the endif and end of class! this would change the class layout in memory
     };
 
-#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
-#else
     /** Internal class that registers a variable with Manager when constructed. */
     class Proxy {
     public:
@@ -247,7 +232,6 @@ namespace Belle2 {
     {
       return { t };
     }
-#endif
 
 
     /** \def VARMANAGER_CONCATENATE_DETAIL(x, y)

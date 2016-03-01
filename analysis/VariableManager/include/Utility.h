@@ -85,10 +85,7 @@ namespace Belle2 {
        * @param cut the string defining the cut
        * @return std::unique_ptr<Cut>
        */
-#if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
-#else
       static std::unique_ptr<Cut> Compile(std::string cut);
-#endif
       /**
        * Check if the current cuts are passed by the given particle
        * @param p pointer to the particle object
@@ -108,8 +105,6 @@ namespace Belle2 {
        */
       explicit Cut(std::string str);
 
-#if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
-#else
       /**
        * Delete Copy constructor
        */
@@ -119,7 +114,6 @@ namespace Belle2 {
        * Delete assign operator
        */
       Cut& operator=(const Cut&) = delete;
-#endif
 
       /**
        * Preprocess cut string. Trim string and delete global parenthesis
@@ -166,12 +160,8 @@ namespace Belle2 {
       float number; /**< literal number contained in the cut */
       bool isNumeric; /**< if there was a literal number in this cut */
       const Variable::Manager::Var* var; /**< set if there was a valid variable in this cut */
-#if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
-#else
       std::unique_ptr<Cut> left; /**< Left-side cut */
       std::unique_ptr<Cut> right; /**< Right-side cut */
-#endif
-      //NOTE: do not put any data members between the endif and end of class! this would change the class layout in memory
     };
   }
 }

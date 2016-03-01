@@ -53,12 +53,8 @@ namespace Belle2 {
    */
   template <class T> class RootMergeable : public Mergeable {
   public:
-#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
-    RootMergeable() : m_wrapped(nullptr) {  }
-#else
     /** Constructor, forwards all arguments to T constructor. */
     template<class ...Args> explicit RootMergeable(Args&& ... params) : m_wrapped(new T(std::forward<Args>(params)...)) { }
-#endif
 
     virtual ~RootMergeable() { delete m_wrapped; }
 

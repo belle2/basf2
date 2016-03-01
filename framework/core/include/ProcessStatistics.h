@@ -105,10 +105,6 @@ namespace Belle2 {
     /** Get entire statistics map. */
     const std::vector<Belle2::ModuleStatistics>& getAll() const { return m_stats; }
 
-//We don't want CINT to see anything about Module
-#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
-#else
-
     /** Start timer for global measurement */
     void startGlobal() { setCounters(m_globalTime, m_globalMemory); }
 
@@ -168,7 +164,6 @@ namespace Belle2 {
 
     /** get m_stats index for given module, inserting it if not found. */
     int getIndex(const Module* module);
-#endif
 
     /** Merge other ProcessStatistics object into this one. */
     virtual void merge(const Mergeable* other);
@@ -180,12 +175,8 @@ namespace Belle2 {
     virtual TObject* Clone(const char* newname = "") const; /* override */
 
   private:
-#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
-    ProcessStatistics(const ProcessStatistics&);
-#else
     /** Hide copy constructor */
     ProcessStatistics(const ProcessStatistics&) = default;
-#endif
     /** Prohibit assignment operator */
     ProcessStatistics& operator=(ProcessStatistics&);
 

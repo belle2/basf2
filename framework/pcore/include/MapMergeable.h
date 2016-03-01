@@ -35,11 +35,8 @@ namespace Belle2 {
     MapMergeable() : m_wrapped() {  }
 
     virtual ~MapMergeable() { }
-#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
-#else
     /** Constructor, forwards all arguments to T constructor. */
     template<class ...Args> explicit MapMergeable(Args&& ... params) : m_wrapped(std::forward<Args>(params)...) { }
-#endif
 
     /** Get the wrapped standard object. */
     T& get() { return m_wrapped; }

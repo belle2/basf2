@@ -11,7 +11,7 @@
 
 #include <framework/datastore/StoreEntry.h>
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
-//CINT doesn't like forward declarations
+//a few methods use these, but are only included in dictionaries
 #include <framework/datastore/RelationVector.h>
 #include <framework/datastore/RelationEntry.h>
 #endif

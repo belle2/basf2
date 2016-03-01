@@ -9,7 +9,9 @@ from sys import argv
 from VXDTF.setup_modules import (setup_gfTCtoSPTCConverters,
                                  setup_spCreatorPXD,
                                  setup_spCreatorSVD,
-                                 setup_sp2thConnector)
+                                 setup_sp2thConnector,
+                                 setup_qualityEstimators,
+                                 setup_trackSetEvaluators)
 
 from VXDTF.setup_modules_ml import *
 
@@ -17,8 +19,8 @@ from VXDTF.setup_modules_ml import *
 # rootInputFileName = "seed4nEv100000pGun1_1T.root"
 # rootInputFileName = "evtGenseed6nEv100000.root" #evtGenSinglePassTest-TrainSample. skipCluster = False
 # rootInputFileName = "evtGenseed5nEv10000.root" #testSample. skipCluster = False
-# rootInputFileName = "evtGenseed7nEv10000.root" #testSample. skipCluster = True
-# rootInputFileName = "evtGenseed8nEv200000.root" # trainSample. skipCluster = False
+rootInputFileName = "evtGenseed7nEv10000.root"  # testSample. skipCluster = True
+# rootInputFileName = "evtGenseed8nEv200000.root" # trainSample. skipCluster = True
 # rootInputFileName = "evtGenseed8nEv100000.root" #evtGenSinglePassTest-TrainSample. skipCluster = True (TODO)
 
 # file name into which the segNetAnalize stores its stuff
@@ -26,17 +28,17 @@ segNetAnaRFN = 'SegNetAnalyzer_SM_train.root'
 fbdtSamplesFN = 'FBDTClassifier_samples_train_10k.dat'
 fbdtFN = 'FBDTClassifier_1000_3.dat'
 
-# epTest:
-rootInputFileName = "seed10nEv1000pGun1_1T.root"
 
 usePXD = False
 useDisplay = False
 newTrain = False  # if true, rawSecMap-Data is collected. IF false, new TF will be executed
 printNetworks = False  # creates graphs for each network for each event if true
 useOldTFinstead = False  # if true, the old vxdtf is used instead of the new one.
+ignoreDeadTCs = True  # if true, the TrackFinderVXDAnalizer will not add dead TCs to the efficiencies
+
 trainFBDT = False  # with the current settings: collects samples but does not train a FastBDT!
 useFBDT = False  # use the ML Filter for creating the SegmentNetwork instead of the SectorMap filters
-
+activateSegNetAnalizer = False  # only needed when studying FastBDT-behavior
 
 if useFBDT:
     cNetworks = int(2)
@@ -50,7 +52,7 @@ stringInitialValue = tempStringList[0].split("seed", 1)
 print("found seed: " + stringInitialValue[1])
 numEvents = 10000  # WARNING has to be identical with the value named in rootInputFileName!
 # initialValue = int(stringInitialValue[1])
-initialValue = 10
+initialValue = 7
 
 set_log_level(LogLevel.ERROR)
 set_random_seed(initialValue)
@@ -89,16 +91,10 @@ elif (initialValue == 6):
     # acceptedRawSecMapFiles = ['lowTestRedesign_1667035383.root'] # 26 - single track, single event  raw data
 elif (initialValue == 7):
     print("chosen initialvalue 7!  (skipCluster-setting=True)")
-    acceptedRawSecMapFiles = ['lowTestRedesign_1865959838.root']  # 27 - single track, single event raw data
+    acceptedRawSecMapFiles = ['lowTestRedesign_1332084337.root']  # 27 - single track, single event raw data
 elif (initialValue == 8):
-    print("chosen initialvalue 28! setup remark: single track, single event raw data")
-    acceptedRawSecMapFiles = ['lowTestRedesign_1406543755.root']  # 28 - single track, single event raw data
-elif (initialValue == 10):
-    print("chosen initialvalue 10! setup remark: single track, 1000 event raw data")
-    acceptedRawSecMapFiles = ['lowTestRedesign_1332084337.root']  # 29 - single track, single event raw data
-elif (initialValue == 56):
-    print("chosen initialvalue 56! setup remark: single track, 1000 events raw data")
-    acceptedRawSecMapFiles = ['lowTestRedesign_922296899.root']  # 55 - single track, single event raw data
+    print("chosen initialvalue 8! (skipCluster-setting=True): 200k evtGen events")
+    acceptedRawSecMapFiles = ['lowTestRedesign_1332084337.root']  # 28 - single track, single event raw data
 elif (initialValue == 57):
     print("chosen initialvalue 57! setup remark: train: 10k events, 10 tracks per event, theta 60-85°, phi 0-360°, pT 100-145MeV.")
     thetaMin = 60.0  # degrees
@@ -211,11 +207,12 @@ else:
     segNetProducer.logging.log_level = TFlogLevel
     segNetProducer.logging.debug_level = TFDebugLevel
 
-    segNetAnalyzer = register_module('SegmentNetworkAnalyzer')
-    segNetAnalyzer.param('networkInputName', 'test2Hits')
-    segNetAnalyzer.param('rootFileName', segNetAnaRFN)
-    segNetAnalyzer.logging.log_level = LogLevel.INFO
-    segNetAnalyzer.logging.debug_level = 100
+    if activateSegNetAnalizer:
+        segNetAnalyzer = register_module('SegmentNetworkAnalyzer')
+        segNetAnalyzer.param('networkInputName', 'test2Hits')
+        segNetAnalyzer.param('rootFileName', segNetAnaRFN)
+        segNetAnalyzer.logging.log_level = LogLevel.INFO
+        segNetAnalyzer.logging.debug_level = 100
 
     cellOmat = register_module('TrackFinderVXDCellOMat')
     cellOmat.param('printNetworks', printNetworks)
@@ -229,6 +226,7 @@ vxdAnal = register_module('TrackFinderVXDAnalizer')
 vxdAnal.param('referenceTCname', 'SPTracks')
 vxdAnal.param('testTCname', 'caSPTCs')
 vxdAnal.param('purityThreshold', 0.7)
+vxdAnal.param('ignoreDeadTCs', ignoreDeadTCs)
 vxdAnal.logging.log_level = AnalizerlogLevel
 vxdAnal.logging.debug_level = AnalizerDebugLevel
 
@@ -279,8 +277,17 @@ else:
                                         False, fbdtSamplesFN, 100, 3, 0.15, 0.5, LogLevel.DEBUG, 10)
         if useFBDT:  # apply the filters
             add_ml_threehitfilters(main, 'test2Hits', fbdtFN, 0.989351, True)
-        main.add_module(segNetAnalyzer)
+        if activateSegNetAnalizer:
+            main.add_module(segNetAnalyzer)
         main.add_module(cellOmat)
+        setup_qualityEstimators(main, 'circleFit', 'caSPTCs', LogLevel.DEBUG, 1)
+
+        tcNetworkProducer = register_module('SPTCNetworkProducer')
+        tcNetworkProducer.param('tcArrayName', 'caSPTCs')
+        tcNetworkProducer.param('tcNetworkName', 'tcNetwork')
+        main.add_module(tcNetworkProducer)
+
+        setup_trackSetEvaluators(main, 'hopfield', 'caSPTCs', 'tcNetwork')
     main.add_module(vxdAnal)
 
 if useDisplay:

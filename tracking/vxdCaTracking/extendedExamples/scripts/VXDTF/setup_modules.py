@@ -29,6 +29,75 @@ def setup_rawSecMapMerger(path=0, rootFileNames='dummy.root', logLevel=LogLevel.
         return None
 
 
+def setup_qualityEstimators(path=0, estimatorType="random", sptcName="", logLevel=LogLevel.INFO, debugVal=1):
+    """This function adds the a qualityEstimator-Module to given path.
+
+    @param path if set to 0 (standard) the created modules will not be added, but returned.
+    If a path is given, 'None' is returned but will be added to given path instead.
+
+    @param estimatorType needs the name of the quality estimator to be used
+      - currently supported: "random", "circleFit", TODO "kalman", "daf" and optionally "lineFit" & "helixFit".
+
+    @param sptcName sets the name of the sptcStoreArray on which the quality should be estimated.
+
+    @param logLevel set to logLevel level of your choice.
+
+    @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
+    """
+    print("setup qualityEstimators...")
+    if estimatorType is "random":
+        qEstimator = register_module('QualityEstimatorVXDRandom')
+        qEstimator.param('tcArrayName', sptcName)
+    elif estimatorType is "circleFit":
+        qEstimator = register_module('QualityEstimatorVXDCircleFit')
+        qEstimator.param('tcArrayName', sptcName)
+    else:
+        print("ERROR! unknown estimatorType " + estimatorType + " is given - can not proceed!")
+        exit
+    qEstimator.logging.log_level = logLevel
+    qEstimator.logging.debug_level = debugVal
+    if path is 0:
+        return qEstimator
+    else:
+        path.add_module(qEstimator)
+        return None
+
+
+def setup_trackSetEvaluators(path=0, evaluatorType="hopfield", sptcName="", networkName="", logLevel=LogLevel.INFO, debugVal=1):
+    """This function adds the a trackSetEvaluator-Module to given path.
+
+    @param path if set to 0 (standard) the created modules will not be added, but returned.
+    If a path is given, 'None' is returned but will be added to given path instead.
+
+    @param evaluatorType needs the name of the trackset evaluator to be used - currently supported: "greedy", "hopfield".
+
+    @param sptcName sets the name of the sptcStoreArray on which the subset shall be found.
+
+    @param sptcName sets the name of the sptcNetwork on which the subset shall be found.
+
+    @param logLevel set to logLevel level of your choice.
+
+    @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
+    """
+    print("setup trackSetEvaluators...")
+    if evaluatorType is "hopfield":
+        tsEvaluator = register_module('TrackSetEvaluatorHopfieldNN')
+    elif evaluatorType is "greedy":
+        tsEvaluator = register_module('TrackSetEvaluatorGreedy')
+    else:
+        print("ERROR! unknown evaluatorType " + evaluatorType + " is given - can not proceed!")
+        exit
+    tsEvaluator.param('tcArrayName', sptcName)
+    tsEvaluator.param('tcNetworkName', networkName)
+    tsEvaluator.logging.log_level = logLevel
+    tsEvaluator.logging.debug_level = debugVal
+    if path is 0:
+        return tsEvaluator
+    else:
+        path.add_module(tsEvaluator)
+        return None
+
+
 def setup_mcTF(
         path=0,
         whichParticles=['primary'],

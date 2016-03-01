@@ -14,7 +14,8 @@ from VXDTF.setup_modules import (setup_sim,
                                  setup_realClusters,
                                  setup_spCreatorPXD,
                                  setup_spCreatorSVD,
-                                 setup_mcTF)
+                                 setup_mcTF,
+                                 setup_bg)
 
 
 # ################
@@ -27,16 +28,18 @@ useEDeposit = True
 # usePXD: useful only for generateSecMap = false, activates secMaps for PXD+SVD and changes settings for the
 # TrackFinderMCTruth too.
 usePXD = False
+useBG = False
+bgFolder = "~/FW/bkgFiles/campaign12th/"
 # ################
 
 
 # Important parameters:
-numEvents = 100  # can be overridden by the parameters given via terminal
-initialValue = 2  # want random events, if set to 0
+numEvents = 1000  # can be overridden by the parameters given via terminal
+initialValue = 10  # want random events, if set to 0
 
 
 # flags for the pGun
-numTracks = 10
+numTracks = 1
 # transverseMomentum:
 momentumMin = 0.1  # GeV/c
 momentumMax = 0.145  # %
@@ -107,8 +110,6 @@ eventinfoprinter = register_module('EventInfoPrinter')
 
 gearbox = register_module('Gearbox')
 
-
-setupGenfit = register_module('SetupGenfitExtrapolation')
 
 if (numTracks != 0 and usePGun is True):
     particlegun = setup_pGun(
@@ -198,14 +199,16 @@ else:
         main.add_module(particlegun)
     if (numTracks2 != 0):
         main.add_module(particlegun2)
+if useBG:
+    setup_bg(path=main, bgFilesFolder=bgFolder, usePXD=usePXD, logLevel=LogLevel.INFO)
 main.add_module(gearbox)
 main.add_module(geometry)
-main.add_module(setupGenfit)
+
 main.add_module(g4sim)
 if useSimpleClusterizer:
     main.add_module(simpleClusterizer)
 else:
-    setup_realClusters(main, usePXD=True)  # needed since 2gftc-converter does not work without it
+    setup_realClusters(main, usePXD=True)  # usePXD=True: needed since 2gftc-converter does not work without it
 
 setup_mcTF(path=main, nameOutput='mcTracks', usePXD=usePXD, logLevel=LogLevel.INFO)
 

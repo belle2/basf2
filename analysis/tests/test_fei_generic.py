@@ -18,7 +18,15 @@ import fei.provider
 fei.provider.MaximumNumberOfMVASamples = int(1e7)
 fei.provider.MinimumNumberOfMVASamples = int(10)
 
-inputFile = Belle2.FileSystem.findFile('analysis/tests/mdst5.root')
+filepath = 'analysis/tests/mdst5.root'
+inputFile = Belle2.FileSystem.findFile(filepath)
+if len(inputFile) == 0:
+    sys.stderr.write(
+        "TEST SKIPPED: input file " +
+        filepath +
+        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~cpulvermacher/mdst5.root'\n")
+    sys.exit(-1)
+
 selection_path = create_path()
 selection_path.add_module('RootInput', inputFileName=inputFile, inputFileNames=[])
 selection_path.add_module('Gearbox')

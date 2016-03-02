@@ -70,7 +70,7 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   const int maxbins = 40;
   const int nbins = 25;
   int i, j, n2, bin;
-  float mint[maxbins], time, dist, *timeArray, *distArray;
+  float mint[nbins], time, dist, *timeArray, *distArray;
   float p0, p1, maxval;
   char str[128];
   double len;
@@ -83,7 +83,8 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   fcn = new TF1("fcn", CrystalBall, 0, 10, 6);
   fcn2 = new TF1("fcn2", Pol1, 0, 10, 2);
   for (i = 0; i < m_nStripDifferent; i++) {
-    len = m_GeoDat->getStripLength(m_GeoDat->getStripLengthIndex(i) + 1);
+    len = m_GeoDat->getStripLength(m_GeoDat->getStripPositionIndex(i) + 1) /
+          CLHEP::mm * Unit::mm;
     for (j = 0; j < nbins; j++) {
       mint[j] = 200;
     }

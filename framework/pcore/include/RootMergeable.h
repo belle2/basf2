@@ -53,6 +53,8 @@ namespace Belle2 {
    */
   template <class T> class RootMergeable : public Mergeable {
   public:
+    /** default constructor for root. */
+    RootMergeable() : m_wrapped(nullptr) { }
     /** Constructor, forwards all arguments to T constructor. */
     template<class ...Args> explicit RootMergeable(Args&& ... params) : m_wrapped(new T(std::forward<Args>(params)...)) { }
 

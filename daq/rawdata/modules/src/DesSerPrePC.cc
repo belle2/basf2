@@ -6,9 +6,10 @@
 // Date : 2 - Aug - 2013
 //-
 
+#include <rawdata/dataobjects/RawCOPPER.h>
+#include <rawdata/dataobjects/RawFTSW.h>
+#include <rawdata/dataobjects/RawTLU.h>
 #include <daq/rawdata/modules/DesSerPrePC.h>
-#include <daq/dataobjects/SendHeader.h>
-#include <daq/dataobjects/SendTrailer.h>
 
 #include <sys/mman.h>
 //#define MAXEVTSIZE 400000000

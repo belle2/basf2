@@ -12,7 +12,7 @@
 
 #define REDUCED_RAWCOPPER
 
-#define NONSTOP
+//#define NONSTOP
 //#define NONSTOP_DEBUG
 //#define NONSTOP_SLC
 

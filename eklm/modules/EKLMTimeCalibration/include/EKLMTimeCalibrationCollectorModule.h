@@ -20,6 +20,7 @@
 
 /* Belle2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
+#include <eklm/calibration/EKLMTimeCalibrationAlgorithm.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
 
@@ -30,14 +31,6 @@ namespace Belle2 {
    */
   class EKLMTimeCalibrationCollectorModule :
     public CalibrationCollectorModule {
-
-    /**
-     * Event (hit): time, distance from hit to SiPM.
-     */
-    struct event {
-      float time;   /**< Time. */
-      float dist;   /**< Distance. */
-    };
 
   public:
 
@@ -78,7 +71,10 @@ namespace Belle2 {
     int m_nStripDifferent;
 
     /** Event (for tree branches). */
-    struct event m_ev;
+    struct EKLMTimeCalibrationAlgorithm::Event m_ev;
+
+    /** Number of strip (for tree branch). */
+    int m_Strip;
 
   };
 

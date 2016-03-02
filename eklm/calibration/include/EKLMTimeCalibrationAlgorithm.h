@@ -25,6 +25,14 @@ namespace Belle2 {
   public:
 
     /**
+     * Event (hit): time, distance from hit to SiPM.
+     */
+    struct Event {
+      float time;   /**< Time. */
+      float dist;   /**< Distance. */
+    };
+
+    /**
      * Constructor.
      */
     EKLMTimeCalibrationAlgorithm();
@@ -44,8 +52,8 @@ namespace Belle2 {
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 
-    /** Number of strips with different lengths. */
-    int m_nStripDifferent;
+    /** Maximal strip number (= total number of strips). */
+    int m_maxStrip;
 
     /** To make objects storable. */
     ClassDef(EKLMTimeCalibrationAlgorithm, 1);

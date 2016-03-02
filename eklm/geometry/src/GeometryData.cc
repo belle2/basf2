@@ -709,7 +709,7 @@ int EKLM::GeometryData::detectorLayerNumber(int endcap, int layer) const
   if (endcap <= 0 || endcap > 2)
     B2FATAL(c_EndcapErr);
   if (layer <= 0)
-    B2FATAL("Number of layer must be nonnegative.");
+    B2FATAL("Number of layer must be positive.");
   if (endcap == 1) {
     if (layer > m_nLayerBackward)
       B2FATAL("Number of layer must be less than or equal to the number of "
@@ -726,7 +726,7 @@ int EKLM::GeometryData::sectorNumber(int endcap, int layer, int sector) const
 {
   if (sector <= 0 || sector > 4)
     B2FATAL("Number of sector must be from 1 to 4.");
-  return 4 * detectorLayerNumber(endcap, layer) + sector;
+  return 4 * (detectorLayerNumber(endcap, layer) - 1) + sector;
 }
 
 int EKLM::GeometryData::planeNumber(int endcap, int layer, int sector,
@@ -734,7 +734,7 @@ int EKLM::GeometryData::planeNumber(int endcap, int layer, int sector,
 {
   if (plane <= 0 || plane > 2)
     B2FATAL(c_PlaneErr);
-  return 2 * sectorNumber(endcap, layer, sector) + plane;
+  return 2 * (sectorNumber(endcap, layer, sector) - 1) + plane;
 }
 
 int EKLM::GeometryData::segmentNumber(int endcap, int layer, int sector,
@@ -742,7 +742,7 @@ int EKLM::GeometryData::segmentNumber(int endcap, int layer, int sector,
 {
   if (segment <= 0 || segment > 5)
     B2FATAL(c_SegmentErr);
-  return 5 * planeNumber(endcap, layer, sector, plane);
+  return 5 * (planeNumber(endcap, layer, sector, plane) - 1) + segment;
 }
 
 int EKLM::GeometryData::stripNumber(int endcap, int layer, int sector,
@@ -750,7 +750,15 @@ int EKLM::GeometryData::stripNumber(int endcap, int layer, int sector,
 {
   if (strip <= 0 || strip > 75)
     B2FATAL(c_StripErr);
-  return 75 * planeNumber(endcap, layer, sector, plane);
+  return 75 * (planeNumber(endcap, layer, sector, plane) - 1) + strip;
+}
+
+int EKLM::GeometryData::stripLocalNumber(int strip) const
+{
+  static int maxStrip = getMaximalStripNumber();
+  if (strip <= 0 || strip > maxStrip)
+    B2FATAL("Number of strip must be from 1 to getMaximalStripNumber().");
+  return strip % 75 + 1;
 }
 
 int EKLM::GeometryData::getMaximalStripNumber() const

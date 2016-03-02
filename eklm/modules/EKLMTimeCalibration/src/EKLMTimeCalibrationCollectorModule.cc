@@ -40,6 +40,7 @@ EKLMTimeCalibrationCollectorModule::EKLMTimeCalibrationCollectorModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
   m_nStripDifferent = -1;
   m_ev = {0, 0};
+  m_Strip = 0;
   m_TransformData = NULL;
   m_GeoDat = NULL;
 }
@@ -52,8 +53,6 @@ EKLMTimeCalibrationCollectorModule::~EKLMTimeCalibrationCollectorModule()
 
 void EKLMTimeCalibrationCollectorModule::prepare()
 {
-  int i;
-  char str[128];
   TTree* t;
   m_GeoDat = &(EKLM::GeometryData::Instance());
   m_nStripDifferent = m_GeoDat->getNStripsDifferentLength();
@@ -62,20 +61,17 @@ void EKLMTimeCalibrationCollectorModule::prepare()
   StoreArray<Track>::required();
   StoreArray<ExtHit>::required();
   m_TransformData = new EKLM::TransformData(true, NULL);
-  for (i = 0; i < m_nStripDifferent; i++) {
-    snprintf(str, 128, "t%d", i);
-    t = new TTree(str, "");
-    t->Branch("time", &m_ev.time, "time/F");
-    t->Branch("dist", &m_ev.dist, "dist/F");
-    registerObject<TTree>(str, t);
-  }
+  t = new TTree("calibration_data", "");
+  t->Branch("time", &m_ev.time, "time/F");
+  t->Branch("dist", &m_ev.dist, "dist/F");
+  t->Branch("strip", &m_Strip, "strip/I");
+  registerObject<TTree>("calibration_data", t);
 }
 
 void EKLMTimeCalibrationCollectorModule::collect()
 {
-  int i, j, k, n, n2, vol;
+  int i, j, n, n2, vol;
   double l, hitTime;
-  char str[128];
   TVector3 hitPosition;
   HepGeom::Point3D<double> hitGlobal, hitLocal;
   StoreArray<Track> tracks;
@@ -150,9 +146,11 @@ void EKLMTimeCalibrationCollectorModule::collect()
       hitLocal = (*tr) * hitGlobal;
       m_ev.time = digits[j]->getTime() - hitTime;
       m_ev.dist = 0.5 * l - hitLocal.x() / CLHEP::mm * Unit::mm;
-      k = m_GeoDat->getStripLengthIndex(digits[j]->getStrip() - 1);
-      snprintf(str, 128, "t%d", k);
-      getObject<TTree>(str).Fill();
+      m_Strip =
+        m_GeoDat->stripNumber(digits[j]->getEndcap(), digits[j]->getLayer(),
+                              digits[j]->getSector(), digits[j]->getPlane(),
+                              digits[j]->getStrip());
+      getObject<TTree>("calibration_data").Fill();
     }
   }
 }

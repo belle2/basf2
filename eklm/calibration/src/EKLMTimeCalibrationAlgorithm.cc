@@ -56,7 +56,7 @@ EKLMTimeCalibrationAlgorithm::EKLMTimeCalibrationAlgorithm() :
   CalibrationAlgorithm("EKLMTimeCalibrationCollector")
 {
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  m_nStripDifferent = m_GeoDat->getNStripsDifferentLength();
+  m_maxStrip = m_GeoDat->getMaximalStripNumber();
 }
 
 EKLMTimeCalibrationAlgorithm::~EKLMTimeCalibrationAlgorithm()
@@ -69,54 +69,55 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   TTree* tOut = new TTree("t_calibration", "");
   const int maxbins = 40;
   const int nbins = 25;
-  int i, j, n2, bin;
-  float mint[nbins], time, dist, *timeArray, *distArray;
+  int i, j, n, bin, strip;
+  float mint[nbins];
   float p0, p1, maxval;
   char str[128];
   double len;
+  struct Event ev;
+  std::vector<struct Event>* stripEvents;
+  std::vector<struct Event>::iterator it;
   TH1F* h[50], *h2[maxbins], *h3;
   TF1* fcn, *fcn2;
-  TTree* t2;
+  TTree* t;
   TCanvas* c1 = new TCanvas();
   tOut->Branch("p0", &p0, "p0/F");
   tOut->Branch("p1", &p1, "p1/F");
   fcn = new TF1("fcn", CrystalBall, 0, 10, 6);
   fcn2 = new TF1("fcn2", Pol1, 0, 10, 2);
-  for (i = 0; i < m_nStripDifferent; i++) {
-    len = m_GeoDat->getStripLength(m_GeoDat->getStripPositionIndex(i) + 1) /
+  stripEvents = new std::vector<struct Event>[m_maxStrip];
+  t = &getObject<TTree>("calibration_data");
+  t->SetBranchAddress("time", &ev.time);
+  t->SetBranchAddress("dist", &ev.dist);
+  t->SetBranchAddress("strip", &strip);
+  n = t->GetEntries();
+  for (i = 0; i < n; i++) {
+    t->GetEntry(i);
+    stripEvents[strip - 1].push_back(ev);
+  }
+  for (i = 0; i < m_maxStrip; i++) {
+    len = m_GeoDat->getStripLength(m_GeoDat->stripLocalNumber(i + 1)) /
           CLHEP::mm * Unit::mm;
     for (j = 0; j < nbins; j++) {
       mint[j] = 200;
     }
     h[i] = new TH1F("h", "", nbins, 0, len);
-    snprintf(str, 128, "t%d", i);
-    t2 = &getObject<TTree>(str);;
-    t2->SetBranchAddress("time", &time);
-    t2->SetBranchAddress("dist", &dist);
-    n2 = t2->GetEntries();
-    timeArray = new float[n2];
-    distArray = new float[n2];
-    for (j = 0; j < n2; j++) {
-      t2->GetEntry(j);
-      timeArray[j] = time;
-      distArray[j] = dist;
-    }
-    for (j = 0; j < n2; j++) {
-      if (distArray[j] >= len || distArray[j] < 0)
+    for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
+      if (it->dist >= len || it->dist < 0)
         continue;
-      bin = floor(distArray[j] / len * nbins);
-      if (mint[bin] > timeArray[j])
-        mint[bin] = timeArray[j];
+      bin = floor(it->dist / len * nbins);
+      if (mint[bin] > it->time)
+        mint[bin] = it->time;
     }
     for (j = 0; j < nbins; j++) {
       snprintf(str, 128, "h2_%d", j);
       h2[j] = new TH1F(str, "", 100, mint[j], mint[j] + 10);
     }
-    for (j = 0; j < n2; j++) {
-      if (distArray[j] >= len || distArray[j] < 0)
+    for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
+      if (it->dist >= len || it->dist < 0)
         continue;
-      bin = floor(distArray[j] / len * nbins);
-      h2[bin]->Fill(timeArray[j]);
+      bin = floor(it->dist / len * nbins);
+      h2[bin]->Fill(it->time);
     }
     for (j = 0; j < nbins; j++) {
       fcn->SetParameter(0, h2[j]->Integral());
@@ -143,10 +144,10 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
      * the distribution for the entire strip.
      */
     h3 = new TH1F("h3", "", 130, -3., 10.);
-    for (j = 0; j < n2; j++) {
-      if (distArray[j] >= len || distArray[j] < 0)
+    for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
+      if (it->dist >= len || it->dist < 0)
         continue;
-      h3->Fill(timeArray[j] - distArray[j] * p0);
+      h3->Fill(it->time - it->dist * p0);
     }
     maxval = -1;
     for (j = 1; j <= 130; j++) {
@@ -156,10 +157,12 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
       }
     }
     tOut->Fill();
-    delete[] timeArray;
-    delete[] distArray;
-    snprintf(str, 128, "time - (%g * dist + %g)", p0, p1);
-    t2->Draw(str, (std::string(str) + "< 10").c_str());
+    h3->Reset();
+    for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
+      if (it->dist >= len || it->dist < 0)
+        continue;
+      h3->Fill(it->time - (it->dist * p0 + p1));
+    }
     snprintf(str, 128, "corrtime%d.eps", i);
     c1->Print(str);
   }
@@ -167,6 +170,7 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   tOut->Write();
   delete tOut;
   delete fOut;
+  delete[] stripEvents;
   return CalibrationAlgorithm::c_OK;
 }
 

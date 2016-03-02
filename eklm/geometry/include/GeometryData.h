@@ -439,6 +439,12 @@ namespace Belle2 {
                       int strip) const;
 
       /**
+       * Strip local number (in a plane).
+       * @param[in] strip Global strip number.
+       */
+      int stripLocalNumber(int strip) const;
+
+      /**
        * Get maximal strip number.
        */
       int getMaximalStripNumber() const;

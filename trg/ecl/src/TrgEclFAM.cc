@@ -38,7 +38,7 @@ using namespace Belle2;
 //
 //
 //
-TrgEclFAM::TrgEclFAM(): TimeRange(0), bin(0)
+TrgEclFAM::TrgEclFAM(): TimeRange(0)//, bin(0)
 {
 
   CoeffSigPDF0.clear();
@@ -364,9 +364,9 @@ TrgEclFAM::digitization01(void)
   float* X_pr = new float [64];
   float* X_sr = new float [64];
   */
-  float noise_pileup[576][64] = {0};  // [GeV]
-  float noise_parallel[576][64] = {0};  // [GeV]
-  float noise_serial[576][64] = {0};  // [GeV]
+  float noise_pileup[576][64] = {{0}};  // [GeV]
+  float noise_parallel[576][64] = {{0}};  // [GeV]
+  float noise_serial[576][64] = {{0}};  // [GeV]
   float X_pr[64] = {0};
   float X_sr[64] = {0};
 
@@ -583,9 +583,9 @@ TrgEclFAM::digitization02(void)
   double fam_sampling_interval = 125; //@ [ns]
   int NSampling = 64;
 
-  double noise_pileup[576][64] = {0};  // [GeV]
-  double noise_parallel[576][64] = {0};  // [GeV]
-  double noise_serial[576][64] = {0};  // [GeV]
+  double noise_pileup[576][64] = {{0}};  // [GeV]
+  double noise_parallel[576][64] = {{0}};  // [GeV]
+  double noise_serial[576][64] = {{0}};  // [GeV]
   double X_pr[64] = {0};
   double X_sr[64] = {0};
   /*
@@ -840,8 +840,8 @@ TrgEclFAM::digitization03(void)
   int nbin_pedestal = 100;
   float fam_sampling_interval = 12; // [ns]
 
-  float TCDigiEnergy[576][666] = {0};  // [GeV]
-  float TCDigiTiming[576][666] = {0};  // [ns]
+  float TCDigiEnergy[576][666] = {{0}};  // [GeV]
+  float TCDigiTiming[576][666] = {{0}};  // [ns]
   /*
   float (*TCDigiEnergy)[666] = new  float [576][666];  // [GeV]
   float (*TCDigiTiming)[666] = new float [576][666];  // [ns]

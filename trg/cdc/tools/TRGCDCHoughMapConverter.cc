@@ -97,7 +97,7 @@ main(int argc, char * argv[]) {
     }
 
     //...Make a mirror image...
-    vector<unsigned> tsf2hm[9][400];  // [super layer][local id]
+    // vector<unsigned> tsf2hm[9][400];  // [super layer][local id]
     for (unsigned tsl = 0; tsl < 9; tsl += 2) {
         for (unsigned tsi = 0; tsi < 400; tsi++) {
 

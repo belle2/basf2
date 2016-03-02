@@ -1476,10 +1476,10 @@ namespace Belle2{
 
     if(result.m_type != 1) {
       result.m_type = 1;
-      result.m_int = abs(first.m_int);
+      result.m_int = llabs(first.m_int);
       if(first.m_minInt<0 && first.m_maxInt > 0) result.m_minInt = 0;
-      else result.m_minInt = min(abs(first.m_maxInt), abs(first.m_minInt));
-      result.m_maxInt = max(abs(first.m_maxInt), abs(first.m_minInt));
+      else result.m_minInt = min(llabs(first.m_maxInt), llabs(first.m_minInt));
+      result.m_maxInt = max(llabs(first.m_maxInt), llabs(first.m_minInt));
       result.m_actual = fabs(first.m_actual);
       if(first.m_minActual<0 && first.m_maxActual > 0) result.m_minActual = 0;
       else result.m_minActual = min(fabs(first.m_maxActual), fabs(first.m_minActual));

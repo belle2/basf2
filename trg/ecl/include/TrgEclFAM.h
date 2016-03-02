@@ -96,7 +96,7 @@ namespace Belle2 {
     /** TC timing[ns] which is weighted by E ( = sum(Ei*Ti)/sum(Ei)). */
     double TCTiming[576][80];
     /** bin */
-    int bin;///bin
+    // int bin;///bin
     /** TC enegry[GeV] and timing for all t=-4000~4000[ns]*/
     double TCEnergy_tot[576];
     /** TC enegry[GeV] and timing for all t=-4000~4000[ns] */

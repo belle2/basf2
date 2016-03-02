@@ -81,7 +81,7 @@ namespace Belle2 {
 
   private:
 
-    double m_timeCPU;        //  CPU time
+    // double m_timeCPU;        //  CPU time
     int    m_nRun;           //  Run number
     int    m_nEvent;         //  Event number
 

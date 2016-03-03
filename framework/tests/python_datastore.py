@@ -8,9 +8,10 @@ import unittest
 
 
 class PythonDataStoreTests(unittest.TestCase):
+
     def test_PyStoreObj(self):
         testObj = Belle2.PyStoreObj("TestObj")
-        persistentObj = Belle2.PyStoreObj("PersistentObj", 1)
+        persistentObj = Belle2.PyStoreObj("PersistentObj", Belle2.DataStore.c_Persistent)
         objList = (testObj, persistentObj)
 
         nEventObj = len(Belle2.PyStoreObj.list())
@@ -27,7 +28,7 @@ class PythonDataStoreTests(unittest.TestCase):
             self.assertTrue(not obj)
 
         self.assertEqual(nEventObj, len(Belle2.PyStoreObj.list()))
-        self.assertEqual(nPersistentObj, len(Belle2.PyStoreObj.list(1)))
+        self.assertEqual(nPersistentObj, len(Belle2.PyStoreObj.list(Belle2.DataStore.c_Persistent)))
 
     # arrays with explicit class
     def test_PyStoreObj_with_known_class(self):
@@ -51,15 +52,15 @@ class PythonDataStoreTests(unittest.TestCase):
 
         # One persistent object was created in the process
         self.assertEqual(nEventObj + 1, len(Belle2.PyStoreObj.list()))
-        self.assertEqual(nPersistentObj, len(Belle2.PyStoreObj.list(1)))
+        self.assertEqual(nPersistentObj, len(Belle2.PyStoreObj.list(Belle2.DataStore.c_Persistent)))
 
     def test_PyStoreArray(self):
         # arrays
         arrayList = (Belle2.PyStoreArray("TestArray"),
-                     Belle2.PyStoreArray("PersistentArray", 1))
+                     Belle2.PyStoreArray("PersistentArray", Belle2.DataStore.c_Persistent))
 
         self.assertEqual(0, len(Belle2.PyStoreArray.list()))
-        self.assertEqual(0, len(Belle2.PyStoreArray.list(1)))
+        self.assertEqual(0, len(Belle2.PyStoreArray.list(Belle2.DataStore.c_Persistent)))
 
         for array in arrayList:
             self.assertTrue(not array)
@@ -69,6 +70,10 @@ class PythonDataStoreTests(unittest.TestCase):
             self.assertTrue(not array[1234])
             self.assertTrue(not array.appendNew())
             self.assertEqual(0, len(array))
+
+    def test_EnumBackwardsCompatibility(self):
+        self.assertEqual(0, Belle2.DataStore.c_Event)
+        self.assertEqual(1, Belle2.DataStore.c_Persistent)
 
     # arrays with explicit class
     def test_PyStoreArray_with_known_class(self):
@@ -122,3 +127,4 @@ class PythonDataStoreTests(unittest.TestCase):
 if __name__ == "__main__":
     B2INFO("Following error messages are expected, please ignore.")
     unittest.main()
+    B2INFO("Previous errors are expected, please ignore.")

@@ -6,13 +6,13 @@ from ROOT import gSystem
 gSystem.Load('libanalysis_dataobjects')
 from ROOT import Belle2
 
-bminus = Belle2.PyStoreObj("B-:test")
-assert bminus.registerInDataStore("ParticleList")
+bminus = Belle2.PyStoreObj(Belle2.ParticleList.Class(), "B-:test")
+assert bminus.registerInDataStore()
 assert bminus.create()
 bminus.obj().initialize(-521, "B-:test")
 
-bplus = Belle2.PyStoreObj("B+:test")
-assert bplus.registerInDataStore("ParticleList")
+bplus = Belle2.PyStoreObj(Belle2.ParticleList.Class(), "B+:test")
+assert bplus.registerInDataStore()
 assert bplus.create()
 bplus.obj().initialize(521, "B+:test")
 bplus.obj().bindAntiParticleList(bminus.obj())

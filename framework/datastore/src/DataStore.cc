@@ -102,6 +102,29 @@ void DataStore::setInitializeActive(bool active)
   }
 }
 
+TClass* DataStore::getTClassFromDefaultObjectName(const std::string& objectName)
+{
+  // First look for an name without the namespace Belle2::
+  TClass* cl = TClass::GetClass(("Belle2::" + objectName).c_str());
+  if (not cl) {
+    // If this fails look for a name that already has the full namespace.
+    cl = TClass::GetClass(objectName.c_str());
+  }
+  return cl;
+}
+
+TClass* DataStore::getTClassFromDefaultArrayName(const std::string& arrayName)
+{
+  if (arrayName.empty()) {
+    return nullptr;
+  } else if ('s' == arrayName.back()) {
+    std::string objectName = arrayName.substr(0, arrayName.size() - 1);
+    return getTClassFromDefaultObjectName(objectName);
+  } else {
+    return nullptr;
+  }
+}
+
 std::string DataStore::defaultObjectName(const std::string& classname)
 {
   const static string gfclass = "genfit::Track";
@@ -119,6 +142,7 @@ std::string DataStore::defaultObjectName(const std::string& classname)
 
 std::string DataStore::defaultObjectName(const TClass* t)
 {
+  B2ASSERT("Cannot deduce default object name from null pointer TClass", t)
   const std::string s = defaultObjectName(t->GetName());
   return s;
 }

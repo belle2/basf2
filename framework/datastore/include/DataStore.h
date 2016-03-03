@@ -106,6 +106,15 @@ namespace Belle2 {
     static DataStore& Instance();
 
     //--------------------------------- default name stuff -----------------------------------------------------
+
+    /** Tries to deduce the TClass from a default object name, which is generally the name of the C++ class.
+     *  The namespace qualification Belle2:: can be ommitted. */
+    static TClass* getTClassFromDefaultObjectName(const std::string& objectName);
+
+    /** Tries to deduce the TClass from a default array name, which is generally the name of the C++ class with an appended 's'.
+     *  The namespace qualification Belle2:: can be ommitted */
+    static TClass* getTClassFromDefaultArrayName(const std::string& arrayName);
+
     /** Return the default storage name for given class name. */
     static std::string defaultObjectName(const std::string& classname);
 

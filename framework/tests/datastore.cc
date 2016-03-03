@@ -92,6 +92,16 @@ namespace {
     EXPECT_EQ("EventMetaDatasToProfileInfos", relname);
   }
 
+  TEST_F(DataStoreTest, GetTClass)
+  {
+    EXPECT_EQ(Belle2::EventMetaData::Class(), DataStore::getTClassFromDefaultObjectName("Belle2::EventMetaData"));
+    EXPECT_EQ(Belle2::EventMetaData::Class(), DataStore::getTClassFromDefaultObjectName("EventMetaData"));
+
+    EXPECT_EQ(Belle2::EventMetaData::Class(), DataStore::getTClassFromDefaultArrayName("Belle2::EventMetaDatas"));
+    EXPECT_EQ(Belle2::EventMetaData::Class(), DataStore::getTClassFromDefaultArrayName("EventMetaDatas"));
+  }
+
+
   /** Tests the creation of arrays/objects and whether they're attached correctly. */
   TEST_F(DataStoreTest, AttachTest)
   {

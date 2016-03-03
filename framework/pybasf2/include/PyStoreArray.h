@@ -13,7 +13,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
 
-#include "TCollection.h"
+#include <TCollection.h> //for TIter
 
 class TClonesArray;
 class TClass;
@@ -94,8 +94,7 @@ namespace Belle2 {
     /** Register the array in the data store.
      *  This must be called in the initialization phase.
      *
-     *  @param name        Name of the StoreArray. If no TClass was provided to the constructor this must be the
-     *                     C++ name of class such that the Class can be deduced (Belle2:: prefix may be omitted)
+     *  @param name        Name of the entry to be registered. Empty for default name.
      *  @param storeFlags  ORed combination of DataStore::EStoreFlag flags. (default: c_WriteOut)
      *  @return            True if the registration succeeded.
      */

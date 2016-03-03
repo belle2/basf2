@@ -63,7 +63,7 @@ bool PyStoreArray::registerInDataStore(std::string name,
                                        DataStore::EStoreFlags storeFlags)
 {
   if (not hasValidClass()) {
-    B2ERROR("Refrained from registering PyStoreArray with unknown TClass.");
+    B2ERROR("Cannot register PyStoreArray '" << name << "' with unknown TClass. Please supply one to the PyStoreArray constructor.");
     return false;
   }
 

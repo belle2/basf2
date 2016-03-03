@@ -197,5 +197,5 @@ if options.xml and len(all_tests):
     xml_file.close()
 
 # print summary and exit
-print('\n %d out of %d tests failed, %d where skipped' % (tests_failed, len(all_tests), tests_skipped))
+print('\n %d out of %d tests failed, %d were skipped' % (tests_failed, len(all_tests), tests_skipped))
 sys.exit(tests_failed)

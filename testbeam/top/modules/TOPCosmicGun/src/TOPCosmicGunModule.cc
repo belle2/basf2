@@ -55,25 +55,31 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    vector<double> defaultPad;
-    std::string defaultString("Null");
     addParam("upperPad", m_upperPad, "Upper rectangular surface (z,x,Dz,Dx,y) in cm",
-             defaultPad);
+             m_upperPad);
     addParam("lowerPad", m_lowerPad, "Lower rectangular surface (z,x,Dz,Dx,y) in cm",
-             defaultPad);
+             m_lowerPad);
     addParam("startTime", m_startTime, "Start time in nsec (time at upperPad)", 0.0);
-
-    addParam("momentum", m_momentum, "Muon Momentum in GeV/c (for mono-energetic muons).", 3.14159);
+    addParam("momentum", m_momentum,
+             "Muon Momentum in GeV/c (for mono-energetic muons).", 3.14159);
     addParam("momentumCutOff", m_momentumCutOff, "Minimum muon momentum in GeV/c", 0.0);
-    addParam("momentumDistributionType",  m_momentumDistributionType,  "Type of momentum distribution to use",
-             std::string("monoEnergetic"));
-    addParam("momentumHistogramFileName", m_momentumHistogramFileName, "Name of file containing momentum histogram", defaultString);
-    addParam("momentumHistogramName",     m_momentumHistogramName,     "Name of momentum histogram in file", defaultString);
-
-    addParam("angularDistributionType",  m_angularDistributionType,  "Type of angular distribution to use", std::string("None"));
-    addParam("angularHistogramFileName", m_angularHistogramFileName, "Name of file containing angular histogram", defaultString);
-    addParam("angularHistogramName",     m_angularHistogramName,     "Name of angular histogram in file", defaultString);
-
+    addParam("momentumDistributionType",  m_momentumDistributionType,
+             "Type of momentum distribution to use (monoEnergetic, histogram, polyline)",
+             string("monoEnergetic"));
+    addParam("momentumHistogramFileName", m_momentumHistogramFileName,
+             "Name of root file containing momentum histogram", string(""));
+    addParam("momentumHistogramName", m_momentumHistogramName,
+             "Name of momentum histogram in file", string(""));
+    addParam("momentumPolyline", m_momentumPolyline,
+             "momentum distribution given as polyline "
+             "(momentum points first, then distribution values)", m_momentumPolyline);
+    addParam("angularDistributionType",  m_angularDistributionType,
+             "Type of angular distribution to use (None, cosSquared, histogram)",
+             string("cosSquared"));
+    addParam("angularHistogramFileName", m_angularHistogramFileName,
+             "Name of root file containing angular histogram", string(""));
+    addParam("angularHistogramName", m_angularHistogramName,
+             "Name of angular histogram in file", string(""));
 
   }
 
@@ -92,49 +98,96 @@ namespace Belle2 {
     if (m_lowerPad[4] >= m_upperPad[4]) {B2INFO("lowerPad is not below UpperPad");}
 
     if ("monoEnergetic" == m_momentumDistributionType) {
-      B2INFO("Generating mono-energetic cosmic ray muons with a momentum of " << m_momentum << " GeV/c");
-    }
+      B2INFO("Generating mono-energetic cosmic ray muons with a momentum of "
+             << m_momentum << " GeV/c");
 
-    if ("histogram" == m_momentumDistributionType) {
+    } else if ("histogram" == m_momentumDistributionType) {
       B2INFO("Generating cosmic muon momentum distribution from a histogram.");
-
-      B2INFO("Using histogram file" << m_momentumHistogramFileName << " to obtain momentum histogram.");
+      B2INFO("Using histogram file" << m_momentumHistogramFileName <<
+             " to obtain momentum histogram.");
       m_momentumHistogramFile = new TFile(TString(m_momentumHistogramFileName));
-      if (m_momentumHistogramFile->IsZombie()) {B2ERROR("Could not open ROOT file " << m_momentumHistogramFileName)};
+      if (m_momentumHistogramFile->IsZombie()) {
+        B2ERROR("Could not open ROOT file " << m_momentumHistogramFileName);
+        return;
+      }
 
-      B2INFO("Reading histogram " << m_momentumHistogramName << " from ROOT file " << m_momentumHistogramFileName << ".");
-      m_momentumDistribution = (TH1F*) m_momentumHistogramFile->Get(TString(m_momentumHistogramName));
-      if (!m_momentumDistribution) {B2ERROR("Could not read histogram " << m_momentumHistogramName << " from ROOT file " << m_momentumHistogramFileName << ".");}
-    }
+      B2INFO("Reading histogram " << m_momentumHistogramName <<
+             " from ROOT file " << m_momentumHistogramFileName << ".");
+      m_momentumDistribution = (TH1F*) m_momentumHistogramFile->Get(m_momentumHistogramName.c_str());
+      if (!m_momentumDistribution) {
+        B2ERROR("Could not read histogram " << m_momentumHistogramName <<
+                " from ROOT file " << m_momentumHistogramFileName << ".");
+        return;
+      }
+      double sum = 0;
+      unsigned np = m_momentumDistribution->GetNbinsX();
+      for (unsigned i = 1; i <= np; i++) {
+        if (m_momentumDistribution->GetXaxis()->GetBinCenter(i) > m_momentumCutOff)
+          sum += m_momentumDistribution->GetBinContent(i);
+      }
+      if (sum <= 0) {
+        B2ERROR("Distribution is zero above the momentum cutoff");
+        return;
+      }
 
-    if ("monoEnergetic" != m_momentumDistributionType && "histogram" != m_momentumDistributionType) {
-      B2ERROR("Unknown momentum distribution type: " << m_momentumDistributionType << std::endl <<
-              "        Recognised types: \"monoEnergetic\", \"histogram\".");
+    } else if ("polyline" == m_momentumDistributionType) {
+      B2INFO("Generating cosmic muon momentum distribution from a polyline.");
+      if (m_momentumPolyline.empty()) {
+        B2FATAL("polyline is empty - did you forgot to define it?");
+      }
+      if (m_momentumPolyline.size() % 2 != 0) {
+        B2ERROR("polyline size must be an even number");
+        return;
+      }
+      if (m_momentumPolyline.size() < 4) {
+        B2ERROR("polyline size must be at least 4");
+        return;
+      }
+      double sum = 0;
+      unsigned np = m_momentumPolyline.size() / 2;
+      for (unsigned i = 0; i < np; i++) {
+        if (m_momentumPolyline[i] > m_momentumCutOff) sum += m_momentumPolyline[i + np];
+      }
+      if (sum <= 0) {
+        B2ERROR("Distribution is zero above the momentum cutoff");
+        return;
+      }
+
+    } else {
+      B2ERROR("Unknown momentum distribution type: " << m_momentumDistributionType);
+      return;
     }
 
     if ("None" == m_angularDistributionType) {
-      B2INFO("Generating cosmic ray muons with no angular dependence - geometrical acceptance only.");
-    }
+      B2INFO("Generating cosmic ray muons with no angular dependence - "
+             "geometrical acceptance only.");
 
-    if ("cosSquared" == m_angularDistributionType) {
+    } else if ("cosSquared" == m_angularDistributionType) {
       B2INFO("Generating cosmic ray muons with a cosine squared angular distribution.");
-    }
 
-    if ("histogram" == m_angularDistributionType) {
+    } else if ("histogram" == m_angularDistributionType) {
       B2INFO("Generating cosmic muon angular distribution from a histogram.");
 
-      B2INFO("Using histogram file" << m_angularHistogramFileName << " to obtain angular histogram.");
+      B2INFO("Using histogram file" << m_angularHistogramFileName <<
+             " to obtain angular histogram.");
       m_angularHistogramFile = new TFile(TString(m_angularHistogramFileName));
-      if (m_angularHistogramFile->IsZombie()) {B2ERROR("Could not open ROOT file " << m_angularHistogramFileName)};
+      if (m_angularHistogramFile->IsZombie()) {
+        B2ERROR("Could not open ROOT file " << m_angularHistogramFileName);
+        return;
+      }
 
-      B2INFO("Reading histogram " << m_angularHistogramName << " from ROOT file " << m_angularHistogramFileName << ".");
-      m_angularDistribution = (TH1F*) m_angularHistogramFile->Get(TString(m_angularHistogramName));
-      if (!m_angularDistribution) {B2ERROR("Could not read histogram " << m_angularHistogramName << " from ROOT file " << m_angularHistogramFileName << ".");}
-    }
+      B2INFO("Reading histogram " << m_angularHistogramName <<
+             " from ROOT file " << m_angularHistogramFileName << ".");
+      m_angularDistribution = (TH1F*) m_angularHistogramFile->Get(m_angularHistogramName.c_str());
+      if (!m_angularDistribution) {
+        B2ERROR("Could not read histogram " << m_angularHistogramName <<
+                " from ROOT file " << m_angularHistogramFileName << ".");
+        return;
+      }
 
-    if ("None" != m_angularDistributionType && "histogram" != m_angularDistributionType && "cosSquared" != m_angularDistributionType) {
-      B2ERROR("Unknown angular distribution type: " << m_angularDistributionType << std::endl <<
-              "        Recognised types: \"None\", \"histogram\", \"cosSquared\".");
+    } else {
+      B2ERROR("Unknown angular distribution type: " << m_angularDistributionType);
+      return;
     }
 
   }
@@ -203,6 +256,13 @@ namespace Belle2 {
     if ("histogram" == m_momentumDistributionType) {
       p = m_momentumDistribution->GetRandom();
       while (p < m_momentumCutOff) {p = m_momentumDistribution->GetRandom();}
+    } else if ("polyline" == m_momentumDistributionType) {
+      p = randomPolyline(m_momentumPolyline.size() / 2, m_momentumPolyline.data(),
+                         m_momentumPolyline.data() + m_momentumPolyline.size() / 2);
+      while (p < m_momentumCutOff) {
+        p = randomPolyline(m_momentumPolyline.size() / 2, m_momentumPolyline.data(),
+                           m_momentumPolyline.data() + m_momentumPolyline.size() / 2);
+      }
     }
 
     // calculate momentum vector
@@ -246,6 +306,33 @@ namespace Belle2 {
 
   void TOPCosmicGunModule::terminate()
   {
+  }
+
+
+  double TOPCosmicGunModule::randomPolyline(size_t n, const double* x, const double* y)
+  {
+    std::vector<double> weights(n - 1);
+    double sumw(0);
+    for (size_t i = 0; i < n - 1; ++i) {
+      weights[i] = (x[i + 1] - x[i]) * max(y[i], y[i + 1]);
+      sumw += weights[i];
+    }
+    while (true) {
+      double weight = gRandom->Uniform(0, sumw);
+      size_t segment(0);
+      for (; segment < n - 1; ++segment) {
+        weight -= weights[segment];
+        if (weight <= 0) break;
+      }
+      const double x1 = x[segment];
+      const double x2 = x[segment + 1];
+      const double x = gRandom->Uniform(x1, x2);
+      const double y1 = y[segment];
+      const double y2 = y[segment + 1];
+      const double y = (y2 == y1) ? y1 : y1 + (x - x1) / (x2 - x1) * (y2 - y1);
+      const double randY = gRandom->Uniform(0, max(y1, y2));
+      if (randY < y) return x;
+    }
   }
 
 

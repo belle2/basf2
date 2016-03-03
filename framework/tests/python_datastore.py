@@ -13,8 +13,8 @@ class PythonDataStoreTests(unittest.TestCase):
         persistentObj = Belle2.PyStoreObj("PersistentObj", 1)
         objList = (testObj, persistentObj)
 
-        self.assertEqual(len(Belle2.PyStoreObj.list()), 0)
-        self.assertEqual(len(Belle2.PyStoreObj.list(1)), 0)
+        nEventObj = len(Belle2.PyStoreObj.list())
+        nPersistentObj = len(Belle2.PyStoreObj.list())
 
         for obj in objList:
             self.assertTrue(not obj)
@@ -23,19 +23,35 @@ class PythonDataStoreTests(unittest.TestCase):
             # class unknown
             self.assertTrue(not obj.registerInDataStore())
 
-            self.assertTrue(obj.registerInDataStore("EventMetaData"))
-
             # Object not yet created
             self.assertTrue(not obj)
 
-            # Object creation successful
-            self.assertTrue(obj.create())
+        self.assertEqual(nEventObj, len(Belle2.PyStoreObj.list()))
+        self.assertEqual(nPersistentObj, len(Belle2.PyStoreObj.list(1)))
 
-            # Object created
-            self.assertTrue(obj)
+    # arrays with explicit class
+    def test_PyStoreObj_with_known_class(self):
+        nEventObj = len(Belle2.PyStoreObj.list())
+        nPersistentObj = len(Belle2.PyStoreObj.list())
 
-        self.assertEqual(1, len(Belle2.PyStoreObj.list()))
-        self.assertEqual(1, len(Belle2.PyStoreObj.list(1)))
+        eventMetaData = Belle2.PyStoreObj("EventMetaData")
+        self.assertTrue(eventMetaData.registerInDataStore())
+
+        self.assertFalse(eventMetaData.isValid())
+        eventMetaData.create()
+        self.assertTrue(eventMetaData.isValid())
+
+        # Test direct access to contained object
+        eventMetaData.setExperiment(17)
+
+        # Retrieve from other module
+        eventMetaData2 = Belle2.PyStoreObj(Belle2.EventMetaData.Class())
+        self.assertTrue(eventMetaData2.isValid())
+        self.assertEqual(17, eventMetaData.getExperiment())
+
+        # One persistent object was created in the process
+        self.assertEqual(nEventObj + 1, len(Belle2.PyStoreObj.list()))
+        self.assertEqual(nPersistentObj, len(Belle2.PyStoreObj.list(1)))
 
     def test_PyStoreArray(self):
         # arrays

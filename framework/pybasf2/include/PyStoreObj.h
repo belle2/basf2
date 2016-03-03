@@ -11,6 +11,9 @@
 #ifndef PYSTOREOBJ_H
 #define PYSTOREOBJ_H
 
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreAccessorBase.h>
+
 #include <string>
 #include <vector>
 
@@ -28,11 +31,12 @@ namespace Belle2 {
   * using Python's built-in type() function.
   *
   * <h1>Usage example</h1>
-  * Inside a Python module's event() function, you can access data store
+  * Inside a Python module's event() function, you can access DataStore
   * objects like this:
   * \code{.py}
     from ROOT import Belle2
     evtmetadata = Belle2.PyStoreObj('EventMetaData')
+    # Alternatively: evtmetadata = Belle2.PyStoreObj(Belle2.EventMetaData.Class())
     if not evtmetadata:
       B2ERROR("No EventMetaData found");
     else:
@@ -53,67 +57,115 @@ namespace Belle2 {
   */
   class PyStoreObj {
   public:
+    /** Return list of available objects for given durability. */
+    static std::vector<std::string> list(DataStore::EDurability durability = DataStore::EDurability::c_Event);
+
+    /** Print list of available objects for given durability. */
+    static void printList(DataStore::EDurability durability = DataStore::EDurability::c_Event);
+
     /** constructor.
     * @param name Name of the entry to be accessed
     * @param durability 0: event, 1: persistent
     */
-    explicit PyStoreObj(const std::string& name, int durability = 0);
+    explicit PyStoreObj(const std::string& name,
+                        DataStore::EDurability durability =  DataStore::EDurability::c_Event);
 
-    ~PyStoreObj() { }
+    /** constructor.
+    * @param objClass Class of the object to be accessed
+    * @param durability 0: event, 1: persistent
+    */
+    explicit PyStoreObj(const TClass* objClass,
+                        DataStore::EDurability durability =  DataStore::EDurability::c_Event);
 
-    /** Return list of available objects for given durability. */
-    static std::vector<std::string> list(int durability = 0);
+    /** constructor.
+    * @param objClass Class of the object to be accessed
+    * @param name Name of the entry to be accessed
+    * @param durability 0: event, 1: persistent
+    */
+    explicit PyStoreObj(const TClass* objClass,
+                        const std::string& name,
+                        DataStore::EDurability durability =  DataStore::EDurability::c_Event);
 
-    /** Print list of available objects for given durability. */
-    static void printList(int durability = 0);
-
-    /** Create a default object in the data store.
-     *
-     *  The object created will be of the type given by the 'name' argument of the ctor
-     *  (assuming it's in the Belle2 namespace).
-     *
-     *  @param replace   Should an existing object be replaced?
-     *  @return          True if the creation succeeded.
-     **/
-    bool create(bool replace = false);
-
-    /** Register the object in the data store.
+    /** Register the object in the DataStore.
      *  This must be called in the initialization phase.
      *
      *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. (default: c_WriteOut)
      *  @return            True if the registration succeeded.
      */
-    bool registerInDataStore(int storeFlags = 0) { return registerInDataStore(m_name, storeFlags); }
+    bool registerInDataStore(DataStore::EStoreFlags storeFlags);
 
-    /** Register the object in the data store.
+    /** Register the object in the DataStore.
      *  This must be called in the initialization phase.
      *
      *  @param className   C++ name of class (Belle2:: prefix may be omitted)
      *  @param storeFlags  ORed combination of DataStore::EStoreFlag flags. (default: c_WriteOut)
      *  @return            True if the registration succeeded.
      */
-    bool registerInDataStore(std::string className, int storeFlags = 0);
+    bool registerInDataStore(std::string className = "",
+                             DataStore::EStoreFlags storeFlags = DataStore::EStoreFlag::c_WriteOut);
+
+    /** Ensure this object has been registered previously.
+     *  Will cause an ERROR if it does not exist.
+     *  This must be called in the initialization phase.
+     *
+     *  @param name  If not empty, use non-default name for this object.
+     *  @return      True if the object exists.
+     */
+    bool isRequired(const std::string& name = "");
+
+    /** Tell the DataStore about an optional input.
+     *
+     *  Mainly useful for creating diagrams of module inputs and outputs.
+     *  This must be called in the initialization phase.
+     *
+     *  @param name  If not empty, use non-default name for this object.
+     *  @return      True if the object exists.
+     */
+    bool isOptional(const std::string& name = "");
+
+    /** Check whether a TClass for the contained object could be determined. */
+    bool hasValidClass() const;
+
+    /** Check whether the object was registered and created. */
+    bool isValid() const;
 
     /** Does this PyStoreObj contain a valid datastore object?
      *
      * Accessing the object's data is UNSAFE if this returns false.
      */
-    operator bool() const { return m_storeObjPtr && *m_storeObjPtr; }
+    operator bool() const { return isValid(); }
 
-    /** Returns the attached data store object, or NULL if no valid object exists. */
-    TObject* obj() const { return (m_storeObjPtr ? (*m_storeObjPtr) : NULL); }
+    /** Returns the attached DataStore object, or nullptr if no valid object exists. */
+    TObject* obj() const { ensureAttached(); return isValid() ? m_storeEntry->ptr : nullptr; }
+
+    /** Returns the attached DataStore object, or nullptr if no valid object exists. */
+    TObject* operator->() const { return obj(); }
 
   private:
-    /** Return TClass for given name; or NULL if not found. */
-    static TClass* getClass(const std::string& name);
+    /** Ensure that contained TObject has been created on the DataStore. */
+    void ensureCreated();
 
-    /** Attach to object in DataStore, if possible. */
-    void attach();
+  public:
+    /** Create default constructed object in the DataStore.
+     *
+     *  @param replace   Should an existing object be replaced?
+     *  @return          True if the creation succeeded.
+     **/
+    bool create(bool replace = false);
 
-    TObject** m_storeObjPtr; /**< Pointer to pointer to object */
-    const TClass* m_class; /**< Class of this object. */
-    std::string m_name; /**< Name of data store entry. */
-    int m_durability; /**< Durability of data store entry. */
+  private:
+    /** Ensure that contained TObject has been attached to a memory location on the DataStore.*/
+    void ensureAttached() const;
+
+    /** Lookup the store entry and cache a pointer to it */
+    void attach() const;
+
+  private:
+    /// Store accessor to retrive the object.
+    StoreAccessorBase m_storeAccessor;
+
+    /// Pointer to the DataStore entry - serves as an internal cache omitting repeated look up from the DataStore.
+    mutable StoreEntry* m_storeEntry = nullptr;
   };
 }
 #endif

@@ -10,66 +10,139 @@
 using namespace Belle2;
 using namespace std;
 
-PyStoreObj::PyStoreObj(const std::string& name, int durability):
-  m_storeObjPtr(nullptr),
-  m_class(nullptr),
-  m_name(name),
-  m_durability(durability)
+namespace {
+  template<class T>
+  T* replaceNullPtr(T* value, T* fallback)
+  {
+    return value ? value : fallback;
+  }
+}
+
+vector<string> PyStoreObj::list(DataStore::EDurability durability)
 {
+  return DataStore::Instance().getListOfObjects(TObject::Class(), durability);
+}
+
+void PyStoreObj::printList(DataStore::EDurability durability)
+{
+  for (auto n : list(durability))
+    B2INFO(n);
+}
+
+
+PyStoreObj::PyStoreObj(const std::string& name,
+                       DataStore::EDurability durability):
+  PyStoreObj(replaceNullPtr(DataStore::getTClassFromDefaultObjectName(name),
+                            TObject::Class()),
+             /* Default to TObject for unknown class for backwards compatability */
+             name,
+             durability)
+{
+}
+
+PyStoreObj::PyStoreObj(const TClass* objClass,
+                       DataStore::EDurability durability) :
+  PyStoreObj(objClass, DataStore::defaultObjectName(objClass), durability)
+{
+}
+
+PyStoreObj::PyStoreObj(const TClass* objClass,
+                       const std::string& name,
+                       DataStore::EDurability durability) :
+  m_storeAccessor(name, durability, objClass, false)
+{
+  // Attach if already created
   attach();
 }
 
-void PyStoreObj::attach()
+bool PyStoreObj::registerInDataStore(DataStore::EStoreFlags storeFlags)
 {
-  DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(m_name, DataStore::EDurability(m_durability),
-                                 TObject::Class(), false));
-  if (entry) {
-    m_storeObjPtr = &(entry->ptr);
-    m_class = entry->objClass;
-  }
+  return registerInDataStore(m_storeAccessor.getName(), storeFlags);
 }
 
-TClass* PyStoreObj::getClass(const std::string& name)
+bool PyStoreObj::registerInDataStore(std::string name, int storeFlags)
 {
-  TClass* cl = TClass::GetClass(("Belle2::" + name).c_str());
-  if (!cl)
-    cl = TClass::GetClass(name.c_str());
-  if (!cl) {
-    B2ERROR("Class 'Belle2::" << name << "' (or '" << name <<
-            "') not found! Note that you may need to load the corresponding library first, e.g. for some PXD object:\n  from ROOT import gSystem\n  gSystem.Load('libpxd_dataobjects')\nAfterwards, creating objects of this type should work.");
+  // If the class of the object has not been determined before
+  // we try here again, mainly for backwards compatability
+  if (not hasValidClass() and not name.empty()) {
+    const TClass* objClass = replaceNullPtr(DataStore::getTClassFromDefaultObjectName(name),
+                                            TObject::Class());
+
+    m_storeAccessor = StoreAccessorBase(name,
+                                        m_storeAccessor.getDurability(),
+                                        objClass,
+                                        false);
   }
-  return cl;
+
+  if (not hasValidClass()) {
+    B2ERROR("Refrained from registering PyStoreObj with unknown TClass.");
+    return false;
+  }
+
+  bool success = m_storeAccessor.registerInDataStore(name, storeFlags);
+  if (success) attach();
+  return success;
+}
+
+bool PyStoreObj::isRequired(const std::string& name)
+{
+  return m_storeAccessor.isRequired(name);
+}
+
+bool PyStoreObj::isOptional(const std::string& name)
+{
+  return m_storeAccessor.isOptional(name);
+}
+
+bool PyStoreObj::isValid() const
+{
+  return m_storeEntry and m_storeEntry->ptr;
+}
+
+bool PyStoreObj::hasValidClass() const
+{
+  const TClass* objClass = m_storeAccessor.getClass();
+  return objClass and objClass != TObject::Class();
+}
+
+void PyStoreObj::ensureCreated()
+{
+  create(false);
 }
 
 bool PyStoreObj::create(bool replace)
 {
-  if (!m_class)
+  ensureAttached();
+  if (not m_storeEntry) {
+    // Attaching failed
+    B2ERROR("Cannot create unregistered PyStoreObj.");
     return false;
+  }
 
-  if (!DataStore::Instance().createObject(0, replace, StoreAccessorBase(m_name, DataStore::EDurability(m_durability), m_class,
-                                          false)))
+  // Short cut when an object has been created and no replacement is requested.
+  if (isValid() and not replace) return true;
+
+  if (not isValid() and not hasValidClass()) {
+    B2ERROR("Cannot create PyStoreObj with unknown TClass.");
     return false;
-
-  attach();
-  return true;
+  } else {
+    // StoreObj has been created before or has a valid class
+    // Go ahead and (re)create it
+    return m_storeAccessor.create(replace);
+  }
 }
 
-bool PyStoreObj::registerInDataStore(std::string className, int storeFlags)
+void PyStoreObj::ensureAttached() const
 {
-  m_class = getClass(className);
-  if (!m_class)
-    return false;
-
-  return DataStore::Instance().registerEntry(m_name, DataStore::EDurability(m_durability), m_class, false, storeFlags);
+  if (not m_storeEntry) {
+    attach();
+  }
+  if (not m_storeEntry) {
+    B2ERROR("PyStoreObj " << m_storeAccessor.readableName() << " has not been registered!");
+  }
 }
 
-vector<string> PyStoreObj::list(int durability)
+void PyStoreObj::attach() const
 {
-  return DataStore::Instance().getListOfObjects(TObject::Class(), DataStore::EDurability(durability));
-}
-
-void PyStoreObj::printList(int durability)
-{
-  for (auto n : list(durability))
-    B2INFO(n);
+  m_storeEntry = DataStore::Instance().getEntry(m_storeAccessor);
 }

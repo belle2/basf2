@@ -148,9 +148,9 @@ class DataStorePrinter(object):
             for i, obj in enumerate(data):
                 self._printObj(obj, i)
         else:
-            obj = Belle2.PyStoreObj(self.name).obj()
+            obj = Belle2.PyStoreObj(self.name)
             if obj:
-                self._printObj(obj)
+                self._printObj(obj.obj())
 
     def _printObj(self, obj, index=None):
         """Print all defined members for each object with given index.

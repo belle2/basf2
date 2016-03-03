@@ -4,6 +4,7 @@
 # ******** Imports ********
 import os
 import math
+import random
 
 import basf2
 import ROOT
@@ -28,7 +29,16 @@ class SillyGeneratorModule(basf2.Module):
 
         # Fill one test muon for demonstration
         vertex = ROOT.TVector3(0, 0, 0)
-        momentum = ROOT.TVector3(1, 0, 0)
+
+        # Sample a random momentum vector of
+        # gaus distributed length and uniform distibuted  direction
+        phi = ROOT.gRandom.Uniform(0.0, 2.0 * math.pi)
+        costheta = ROOT.gRandom.Uniform(-1.0, 1.0)
+        theta = math.acos(costheta)
+        r = max(0, ROOT.gRandom.Gaus(1, 0.2))
+        momentum = ROOT.TVector3(0, 0, 0)
+        momentum.SetMagThetaPhi(1, theta, phi)
+
         mcParticle.setPDG(13)
         mcParticle.setMassFromPDG()
         mcParticle.addStatus(Belle2.MCParticle.c_PrimaryParticle)
@@ -39,28 +49,86 @@ class SillyGeneratorModule(basf2.Module):
         mcParticle.setEnergy(math.sqrt(momentum * momentum + m * m))
         mcParticle.setDecayTime(float("inf"))
 
+
+class ParticleStatisticsModule(basf2.Module):
+
+    def initialize(self):
+        self.tfile = ROOT.TFile("ParticleStatistics.root", "recreate")
+
+        ntuple = Belle2.PyStoreObj(Belle2.RootMergeable("TNtuple").Class(), "ParticleMomenta")
+        print("IsAttached", ntuple.isAttached())
+        ntuple.registerInDataStore()
+        print("IsAttached", ntuple.isAttached())
+        print("IsValid", ntuple.isValid())
+        ntuple.create()
+        print("IsValid", ntuple.isValid())
+        ntuple.obj().assign(ROOT.TNtuple("Particles",  # ROOT name
+                                         "Momentum compontents of the particles",  # ROOT title
+                                         "px:py:pz"  # Var list
+                                         ))
+
+        hist = Belle2.PyStoreObj(Belle2.RootMergeable("TH1D").Class(), "AbsMomentum")
+        print("IsAttached", hist.isAttached())
+        hist.registerInDataStore()
+        print("IsAttached", hist.isAttached())
+        print("IsValid", hist.isValid())
+        hist.create()
+        print("IsValid", hist.isValid())
+        hist.obj().assign(ROOT.TH1D("AbsMomentum",  # ROOT name
+                                    "Absolute momentum of particles",  # ROOT title
+                                    20,  # n bins
+                                    0,  # upper bound
+                                    2  # lower bound
+                                    ))
+
+        print("IsValid", ntuple.isValid())
+        print("IsValid", hist.isValid())
+
+    def event(self):
+        ntuple = Belle2.PyStoreObj("ParticleMomenta")
+        hist = Belle2.PyStoreObj("AbsMomentum")
+
+        print("IsValid", ntuple.isValid())
+        print("IsValid", hist.isValid())
+
+        print("IsAttached", ntuple.isAttached())
+        print("IsAttached", hist.isAttached())
+
+        mcParticles = Belle2.PyStoreArray(Belle2.MCParticle.Class())
+
+        for mcParticle in mcParticles:
+            momentum = mcParticle.getMomentum()
+            ntuple.get().Fill(momentum.X(), momentum.Y(), momentum.Z())
+            hist.get().Fill(momentum.Mag())
+
+    def terminate(self):
+        ntuple = Belle2.PyStoreObj("ParticleMomenta")
+        ntuple.write(self.tfile)
+        hist = Belle2.PyStoreObj("AbsMomentum")
+        hist.write(self.tfile)
+        self.tfile.Close()
+
+
 # ******** Register modules  **********
 eventInfoSetterModule = basf2.register_module('EventInfoSetter')
 eventInfoSetterModule.param(dict(
-    evtNumList=[1],
+    evtNumList=[1000],
     runList=[1],
     expList=[1]
 ))
 
 printCollectionsModule = basf2.register_module('PrintCollections')
 sillyGeneratorModule = SillyGeneratorModule()
-displayModule = basf2.register_module('Display')
+particleStatisticsModule = ParticleStatisticsModule()
 
 # ******** Create paths and add modules  **********
 main = basf2.create_path()
 main.add_module(eventInfoSetterModule)
 main.add_module(sillyGeneratorModule)
-
+main.add_module(particleStatisticsModule)
 simulation.add_simulation(main)
 
 main.add_module(printCollectionsModule)
-main.add_module(displayModule)
-
 basf2.process(main)
 
 # Print call statistics

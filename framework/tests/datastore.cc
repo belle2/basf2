@@ -72,12 +72,19 @@ namespace {
     EXPECT_EQ("JustSomeStuff", DataStore::defaultObjectName("JustSomeStuff"));
     EXPECT_EQ("JustSomeStuff", DataStore::defaultObjectName("Belle2::Foo::JustSomeStuff"));
     EXPECT_EQ("JustSomeStuffs", DataStore::defaultArrayName("Belle2::Foo::JustSomeStuff"));
-    EXPECT_EQ("MyOwnName", DataStore::arrayName<TObject>("MyOwnName"));
-    EXPECT_EQ("TObjects", DataStore::arrayName<TObject>(""));
-    EXPECT_EQ("MyOwnName", DataStore::objectName<TObject>("MyOwnName"));
-    EXPECT_EQ("TObject", DataStore::objectName<TObject>(""));
-    EXPECT_EQ("EventMetaDatas", DataStore::arrayName<EventMetaData>(""));
 
+    EXPECT_EQ("MyOwnName", DataStore::arrayName<TObject>("MyOwnName"));
+    EXPECT_EQ("MyOwnName", DataStore::arrayName(TObject::Class(), "MyOwnName"));
+    EXPECT_EQ("TObjects", DataStore::arrayName<TObject>(""));
+    EXPECT_EQ("TObjects", DataStore::arrayName(TObject::Class(), ""));
+
+    EXPECT_EQ("MyOwnName", DataStore::objectName<TObject>("MyOwnName"));
+    EXPECT_EQ("MyOwnName", DataStore::objectName(TObject::Class(), "MyOwnName"));
+
+    EXPECT_EQ("TObject", DataStore::objectName<TObject>(""));
+    EXPECT_EQ("TObject", DataStore::objectName(TObject::Class(), ""));
+
+    EXPECT_EQ("EventMetaDatas", DataStore::arrayName<EventMetaData>(""));
     EXPECT_EQ("GF2Track", DataStore::defaultObjectName("genfit::Track"));
 
     EXPECT_EQ("AToB", DataStore::relationName("A", "B"));

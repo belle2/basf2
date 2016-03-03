@@ -117,6 +117,32 @@ std::string DataStore::defaultObjectName(const std::string& classname)
 }
 
 
+std::string DataStore::defaultObjectName(const TClass* t)
+{
+  const std::string s = defaultObjectName(t->GetName());
+  return s;
+}
+
+
+std::string DataStore::objectName(const TClass* t, const std::string& name)
+{
+  return ((name.empty()) ? defaultObjectName(t) : name);
+}
+
+
+std::string DataStore::defaultArrayName(const TClass* t)
+{
+  const std::string s = defaultArrayName(defaultObjectName(t));
+  return s;
+}
+
+
+std::string DataStore::arrayName(const TClass* t, const std::string& name)
+{
+  return ((name.empty()) ? defaultArrayName(t) : name);
+}
+
+
 bool DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& accessor) const
 {
   // Check whether the existing entry and the requested object are both arrays or both single objects

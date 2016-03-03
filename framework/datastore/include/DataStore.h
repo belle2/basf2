@@ -109,12 +109,18 @@ namespace Belle2 {
     /** Return the default storage name for given class name. */
     static std::string defaultObjectName(const std::string& classname);
 
+    /** Return the default storage name for an object of the given TClass. */
+    static std::string defaultObjectName(const TClass* t);
+
     /** Return the default storage name for an object of the given type. */
     template<class T> static std::string defaultObjectName()
     {
       const static std::string s = defaultObjectName(T::Class_Name());
       return s;
     }
+
+    /** Return the storage name for an object of the given TClass and name. */
+    static std::string objectName(const TClass* t, const std::string& name);
 
     /** Return the storage name for an object of the given type and name. */
     template<class T> static std::string objectName(const std::string& name)
@@ -133,12 +139,18 @@ namespace Belle2 {
       return s;
     }
 
+    /** Return the default storage name for an array of the given TClass. */
+    static std::string defaultArrayName(const TClass* t);
+
     /** Return the default storage name for an array of the given type. */
     template<class T> static std::string defaultArrayName()
     {
       const static std::string s = defaultArrayName(defaultObjectName<T>());
       return s;
     }
+
+    /** Return the storage name for an object of the given TClass and name. */
+    static std::string arrayName(const TClass* t, const std::string& name);
 
     /** Return the storage name for an object of the given type and name. */
     template<class T> static std::string arrayName(const std::string& name)

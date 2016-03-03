@@ -95,13 +95,13 @@ namespace Belle2 {
     bool registerInDataStore(DataStore::EStoreFlags storeFlags);
 
     /** Register the object in the DataStore.
-     *  This must be called in the initialization phase.
+     *  This must be called in the initialization phase, and a TClass or name=class name must have been supplied during construction.
      *
-     *  @param className   C++ name of class (Belle2:: prefix may be omitted)
+     *  @param name        Name of the entry to be registered. Empty for default name.
      *  @param storeFlags  ORed combination of DataStore::EStoreFlag flags. (default: c_WriteOut)
      *  @return            True if the registration succeeded.
      */
-    bool registerInDataStore(std::string className = "",
+    bool registerInDataStore(std::string name = "",
                              DataStore::EStoreFlags storeFlags = DataStore::EStoreFlag::c_WriteOut);
 
     /** Ensure this object has been registered previously.

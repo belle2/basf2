@@ -62,20 +62,8 @@ bool PyStoreObj::registerInDataStore(DataStore::EStoreFlags storeFlags)
 
 bool PyStoreObj::registerInDataStore(std::string name, int storeFlags)
 {
-  // If the class of the object has not been determined before
-  // we try here again, mainly for backwards compatability
-  if (not hasValidClass() and not name.empty()) {
-    const TClass* objClass = replaceNullPtr(DataStore::getTClassFromDefaultObjectName(name),
-                                            TObject::Class());
-
-    m_storeAccessor = StoreAccessorBase(name,
-                                        m_storeAccessor.getDurability(),
-                                        objClass,
-                                        false);
-  }
-
   if (not hasValidClass()) {
-    B2ERROR("Refrained from registering PyStoreObj with unknown TClass.");
+    B2ERROR("Cannot register PyStoreObj '" << name << "' with unknown TClass. Please supply one to the PyStoreObj constructor.");
     return false;
   }
 

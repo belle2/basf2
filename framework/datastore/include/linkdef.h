@@ -12,5 +12,6 @@
 #pragma link C++ class Belle2::RelationVector<TObject>-;
 #pragma link C++ class Belle2::DataStore::StoreEntry-;
 #pragma link C++ class Belle2::DataStore-;
+#pragma link C++ class Belle2::StoreAccessorBase-;
 
 #endif

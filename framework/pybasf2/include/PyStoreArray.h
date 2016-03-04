@@ -156,8 +156,8 @@ namespace Belle2 {
     bool optionalRelationTo(const PyStoreArray& toArray,
                             DataStore::EDurability durability = DataStore::c_Event) const;
 
-    std::string getName() const
-    { return m_storeAccessor.getName(); }
+    /** Return name under which the object is saved in the DataStore. */
+    std::string getName() const { return m_storeAccessor.getName(); }
 
     /** Check whether a TClass of the objects in this PyStoreArray could be determined. */
     bool hasValidClass() const;

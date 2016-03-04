@@ -17,12 +17,12 @@ class SillyGeneratorModule(basf2.Module):
     """Small module to demonstrate how the registration of StoreArrays works from Python"""
 
     def initialize(self):
-        # Register a StoreArray on the DataStore
+        """ Register a StoreArray on the DataStore"""
         mcParticles = Belle2.PyStoreArray(Belle2.MCParticle.Class())
         mcParticles.registerInDataStore()
 
     def event(self):
-        # Access and fill the registered StoreArray
+        """ Access and fill the registered StoreArray """
         # Alternative access by name
         mcParticles = Belle2.PyStoreArray("MCParticles")
         mcParticle = mcParticles.appendNew()
@@ -51,14 +51,15 @@ class SillyGeneratorModule(basf2.Module):
 
 
 class ParticleStatisticsModule(basf2.Module):
+    """Collect statistics on particles"""
 
     def initialize(self):
+        """init"""
+        #: save statistics in here
         self.tfile = ROOT.TFile("ParticleStatistics.root", "recreate")
 
-        ntuple = Belle2.PyStoreObj(Belle2.RootMergeable("TNtuple").Class(), "ParticleMomenta")
-        print("IsAttached", ntuple.isAttached())
+        ntuple = Belle2.PyStoreObj(Belle2.RootMergeable("TNtuple").Class(), "ParticleMomenta", Belle2.DataStore.c_Persistent)
         ntuple.registerInDataStore()
-        print("IsAttached", ntuple.isAttached())
         print("IsValid", ntuple.isValid())
         ntuple.create()
         print("IsValid", ntuple.isValid())
@@ -67,10 +68,8 @@ class ParticleStatisticsModule(basf2.Module):
                                          "px:py:pz"  # Var list
                                          ))
 
-        hist = Belle2.PyStoreObj(Belle2.RootMergeable("TH1D").Class(), "AbsMomentum")
-        print("IsAttached", hist.isAttached())
+        hist = Belle2.PyStoreObj(Belle2.RootMergeable("TH1D").Class(), "AbsMomentum", Belle2.DataStore.c_Persistent)
         hist.registerInDataStore()
-        print("IsAttached", hist.isAttached())
         print("IsValid", hist.isValid())
         hist.create()
         print("IsValid", hist.isValid())
@@ -85,26 +84,25 @@ class ParticleStatisticsModule(basf2.Module):
         print("IsValid", hist.isValid())
 
     def event(self):
-        ntuple = Belle2.PyStoreObj("ParticleMomenta")
-        hist = Belle2.PyStoreObj("AbsMomentum")
+        """actually collect info"""
+        ntuple = Belle2.PyStoreObj("ParticleMomenta", Belle2.DataStore.c_Persistent)
+        hist = Belle2.PyStoreObj("AbsMomentum", Belle2.DataStore.c_Persistent)
 
         print("IsValid", ntuple.isValid())
         print("IsValid", hist.isValid())
-
-        print("IsAttached", ntuple.isAttached())
-        print("IsAttached", hist.isAttached())
 
         mcParticles = Belle2.PyStoreArray(Belle2.MCParticle.Class())
 
         for mcParticle in mcParticles:
             momentum = mcParticle.getMomentum()
-            ntuple.get().Fill(momentum.X(), momentum.Y(), momentum.Z())
-            hist.get().Fill(momentum.Mag())
+            ntuple.obj().get().Fill(momentum.X(), momentum.Y(), momentum.Z())
+            hist.obj().get().Fill(momentum.Mag())
 
     def terminate(self):
-        ntuple = Belle2.PyStoreObj("ParticleMomenta")
-        ntuple.write(self.tfile)
-        hist = Belle2.PyStoreObj("AbsMomentum")
+        """terminate"""
+        ntuple = Belle2.PyStoreObj("ParticleMomenta", Belle2.DataStore.c_Persistent)
+        ntuple.obj().write(self.tfile)
+        hist = Belle2.PyStoreObj("AbsMomentum", Belle2.DataStore.c_Persistent)
         hist.write(self.tfile)
         self.tfile.Close()
 

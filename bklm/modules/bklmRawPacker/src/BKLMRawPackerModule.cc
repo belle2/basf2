@@ -8,6 +8,8 @@
 #include <bklm/modules/bklmRawPacker/BKLMRawPackerModule.h>
 #include <bklm/dataobjects/BKLMDigit.h>
 
+#include <framework/logging/Logger.h>
+
 using namespace std;
 using namespace Belle2;
 #define NUM_BKLM_COPPER 4
@@ -33,7 +35,7 @@ BKLMRawPackerModule::BKLMRawPackerModule() : Module()
   ///  maximum # of events to produce( -1 : inifinite)
   addParam("NodeID", m_nodeid, "Node ID", 0);
 
-  B2INFO("BKLMRawPackerModule: Constructor done.");
+  B2DEBUG(1, "BKLMRawPackerModule: Constructor done.")
 
   // initialize event #
   n_basf2evt = 0;
@@ -51,7 +53,7 @@ BKLMRawPackerModule::~BKLMRawPackerModule()
 
 void BKLMRawPackerModule::initialize()
 {
-  B2INFO("BKLMRawPackerModule: initialize() started.");
+  B2DEBUG(1, "BKLMRawPackerModule: initialize() started.")
 
   // Open message handler
   //  m_msghandler = new MsgHandler(m_compressionLevel);
@@ -61,7 +63,7 @@ void BKLMRawPackerModule::initialize()
 
   rawklmarray.registerPersistent();
 
-  B2INFO("BKLMRawPackerModule: initialize() done.");
+  B2DEBUG(1, "BKLMRawPackerModule: initialize() done.")
   loadMap();
 }
 
@@ -70,13 +72,13 @@ void BKLMRawPackerModule::initialize()
 
 void BKLMRawPackerModule::event()
 {
-  B2INFO("pack the event.." << endl);
+  B2DEBUG(1, "pack the event..")
   StoreArray<BKLMDigit> digits;
   vector<uint32_t> data_words[4][4];//4 copper, 16 finesse
   data_words[4][4].clear();
   //int tot_num_hits=digits.getEntries();
 
-  B2INFO("BKLMRawPackerModule:: entries of bklmdigits " << digits.getEntries());
+  B2DEBUG(1, "BKLMRawPackerModule:: entries of bklmdigits " << digits.getEntries())
   ///fill data_words
   for (int d = 0; d < digits.getEntries(); d++) {
     int* buf = new int[2];//for one hit, hit length is 2;
@@ -100,11 +102,11 @@ void BKLMRawPackerModule::event()
     int electId = 0;
     if (m_ModuleIdToelectId.find(moduleId) == m_ModuleIdToelectId.end()) {
       if (m_useDefaultElectId) {
-        B2INFO("BKLMRawPacker::can not find in mapping. Use the default ElectId " << endl);
+        B2DEBUG(1, "BKLMRawPacker::can not find in mapping. Use the default ElectId")
         electId = 1;
       } else {
-        B2INFO("BKLMRawPacker::can not find in mapping for moduleId " << moduleId << " isForward? " << isForward << " , sector " << iSector
-               << endl);
+        B2DEBUG(1, "BKLMRawPacker::can not find in mapping for moduleId " << moduleId << " isForward? " << isForward << " , sector " <<
+                iSector)
         continue;
       }
     } else {
@@ -116,8 +118,8 @@ void BKLMRawPackerModule::event()
     int lane;
     intToElectCoo(electId, copperId, finesse, lane);
 
-    B2INFO("BKLMRawPacker::copperId " << copperId << " " << isForward << " " << iSector << " " << iLayer << " " << iAx << " " <<
-           iChannelNr << " " << iTdc << " " << icharge << " " << iCTime << " " << endl);
+    B2DEBUG(1, "BKLMRawPacker::copperId " << copperId << " " << isForward << " " << iSector << " " << iLayer << " " << iAx << " " <<
+            iChannelNr << " " << iTdc << " " << icharge << " " << iCTime)
 
     unsigned short bword1 = 0;
     unsigned short bword2 = 0;
@@ -252,7 +254,7 @@ void BKLMRawPackerModule::loadMap()
     for (GearDir& slot : copper.getNodes("Slot")) {
       int slotId = slot.getInt("@id");
       //      cout << "slotid : " << slotId << endl;
-      B2INFO("slotid: " << slotId << endl;);
+      B2DEBUG(1, "slotid: " << slotId)
       for (GearDir& lane : slot.getNodes("Lane")) {
         int laneId = lane.getInt("@id");
         for (GearDir& axis : lane.getNodes("Axis")) {
@@ -266,16 +268,16 @@ void BKLMRawPackerModule::loadMap()
           int moduleId = 0;
 
 
-          B2INFO("reading xml file...");
-          B2INFO(" copperId: " << copperId << " slotId: " << slotId << " laneId: " << laneId << " axisId: " << axisId);
-          B2INFO(" sector: " << sector << " isforward: " << isForward << " layer: " << layer << " plane: " << plane << endl);
+          B2DEBUG(1, "reading xml file...")
+          B2DEBUG(1, " copperId: " << copperId << " slotId: " << slotId << " laneId: " << laneId << " axisId: " << axisId)
+          B2DEBUG(1, " sector: " << sector << " isforward: " << isForward << " layer: " << layer << " plane: " << plane)
           moduleId = (isForward ? BKLM_END_MASK : 0)
                      | ((sector - 1) << BKLM_SECTOR_BIT)
                      | ((layer - 1) << BKLM_LAYER_BIT)
                      | ((plane) << BKLM_PLANE_BIT);
           //m_ModuleIdToelectId[elecId] = moduleId;
           m_ModuleIdToelectId[moduleId] = elecId;
-          B2INFO(" electId: " << elecId << " modId: " << moduleId << endl);
+          B2DEBUG(1, " electId: " << elecId << " modId: " << moduleId)
         }
       }
     }

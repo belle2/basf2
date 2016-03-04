@@ -15,11 +15,7 @@
 
 namespace Belle2 {
 
-  /**
-   * Module BKLMK0LReconstructorModule.
-   * @details
-   * Module for K0L reconstruction.
-   */
+  // Reconstruct K0L-meson clusters; add relation to collinear ECL cluster.
   class BKLMK0LReconstructorModule : public Module {
 
   public:

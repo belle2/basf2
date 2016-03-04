@@ -9,7 +9,6 @@ namespace Belle2 {
     class GeometryPar;
   }
 
-  //! Module BKLMReconstructorModule.
   /*!
     Create BKLMHit1ds from BKLMDigits then create BKLMHit2ds from BKLMHit1ds.
     Store relations among these.

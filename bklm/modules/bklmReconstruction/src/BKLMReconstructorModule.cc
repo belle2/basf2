@@ -14,6 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 
 #include <bklm/geometry/GeometryPar.h>
 #include <bklm/geometry/Module.h>

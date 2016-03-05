@@ -101,9 +101,9 @@ void ECLShowerCorrectorModule::event()
   for (auto& eclShower : eclShowers) {
 
     // example how to get the hypothesis of the eclShower
-    const int hypothesis = SID.getHypothesis(eclShower.getUniqueShowerId());
-    const int cr = SID.getCRID(eclShower.getUniqueShowerId());
-    const int seed = SID.getSeed(eclShower.getUniqueShowerId());
+    //const int hypothesis = SID.getHypothesis(eclShower.getUniqueShowerId());
+    //const int cr = SID.getCRID(eclShower.getUniqueShowerId());
+    //    const int seed = SID.getSeed(eclShower.getUniqueShowerId());
 //    B2INFO("ECLShowerCorrectorModule: hypothesis = " << hypothesis);
 //    B2INFO("ECLShowerCorrectorModule: cr = " << cr);
 //    B2INFO("ECLShowerCorrectorModule: seed = " << seed << "\n");
@@ -187,7 +187,7 @@ void ECLShowerCorrectorModule::ReadCorrection()
   }
   m_ranges[Nbins] = ranges[Nbins - 1].second;
 
-  if (abs(m_ranges[0]) > 1e-7 || abs(m_ranges[Nbins] - M_PI) > 1e-7) // Sanity check
+  if (std::abs(m_ranges[0]) > 1e-7 || std::abs(m_ranges[Nbins] - M_PI) > 1e-7) // Sanity check
     B2ERROR("Energy correction does not cover full theta range! Theta_min = " << m_ranges[0] << " Theta_max = " << m_ranges[Nbins]);
 }
 

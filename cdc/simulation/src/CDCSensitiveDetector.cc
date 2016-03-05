@@ -772,6 +772,7 @@ namespace Belle2 {
 
     m_hitNumber = cdcArray.getEntries();
 
+    // cppcheck-suppress memleak
     CDCSimHit* simHit =  cdcArray.appendNew();
 
     simHit->setWireID(layerId, wireId);
@@ -826,6 +827,7 @@ namespace Belle2 {
 
 
     m_EBhitNumber = cdcEBArray.getEntries();
+    // cppcheck-suppress memleak
     CDCEBSimHit* simEBHit = cdcEBArray.appendNew();
 
     simEBHit->setLayerId(layerId);

@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 #include <framework/logging/Logger.h>
 
@@ -65,7 +66,7 @@ int main(int argc, char** argv)
       if (use_info) info.setInputPort(port);
       SharedEventBuffer::Header hdr;
       while (true) {
-        long long nbyte = ibuf.read(evtbuf, false, &hdr);
+        long long nbyte = (ibuf.read(evtbuf, false, &hdr)) * sizeof(int);
         if (expno < hdr.expno || runno < hdr.runno) {
           expno = hdr.expno;
           runno = hdr.runno;
@@ -87,15 +88,15 @@ int main(int argc, char** argv)
           info.setInputCount(count_in);
           info.addInputNBytes(nbyte_in);
         }
-        EvtMessage* msg = new EvtMessage((char*)evtbuf);
         try {
-          nbyte = writer.write((char*)msg->buffer(), msg->size());
+          int nbyte = htonl(evtbuf[0]);
+          unsigned long long onbyte = writer.write(&nbyte, sizeof(int));
+          onbyte += writer.write(evtbuf, evtbuf[0]);
+          //B2INFO("In : "<< nbyte << " evtbuf[0] : " << evtbuf[0]);
         } catch (const IOException& e) {
-          B2WARNING("Lost connection to expreco");
+          B2WARNING("Lost connection to expreco " << e.what());
           break;
         }
-        //nbyte = socket->send(msg);
-        delete msg;
         if (nbyte <= 0) {
           B2WARNING("Connection to expreco broken.");
           if (use_info) info.setInputPort(0);
@@ -111,7 +112,6 @@ int main(int argc, char** argv)
         }
       }
       B2INFO("Closing sender socket");
-      //delete socket;
       socket.close();
     }
   } catch (const std::exception& e) {

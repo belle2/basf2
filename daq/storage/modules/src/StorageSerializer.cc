@@ -128,8 +128,7 @@ void StorageSerializerModule::event()
   EvtMessage* msg = StorageDeserializerModule::streamDataStore();
   int nword = (msg->size() - 1) / 4 + 1;
   m_obuf.lock();
-  m_obuf.write((int*)msg->buffer(), nword,
-               false, 0, true);
+  m_obuf.write((int*)msg->buffer(), nword, false, 0, true);
   m_obuf.unlock();
   m_nbyte += msg->size();
   delete msg;

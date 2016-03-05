@@ -55,18 +55,30 @@ int main(int argc, char** argv)
   double datasize = 0;
   int* evtbuf = new int[10000000];
   BinData data;
-  data.setBuffer(evtbuf);
+  //data.setBuffer(evtbuf);
+  bool newrun = true;
   while (true) {
-    int sstat = read(fd, data.getBuffer(), sizeof(int));
+    //int sstat = read(fd, data.getBuffer(), sizeof(int));
+    int sstat = read(fd, evtbuf, sizeof(int));
     if (sstat <= 0) {
       lseek(fd, 0, SEEK_SET);
       continue;
     }
-    unsigned int nbyte = data.getByteSize() - sizeof(int);
-    int rstat = read(fd, (data.getBuffer() + 1), nbyte);
+    if (newrun) {
+      newrun = false;
+      continue;
+    }
+    //unsigned int nbyte = data.getByteSize() - sizeof(int);
+    //int rstat = read(fd, (data.getBuffer() + 1), nbyte);
+    unsigned int nbyte = evtbuf[0];
+    int rstat = read(fd, (evtbuf + 1), nbyte - sizeof(int));
     if (rstat <= 0) continue;
-    if (sstat + rstat != data.getByteSize()) continue;
-    socket.write(data.getBuffer(), nbyte + sizeof(int));
+    if (sstat + rstat != evtbuf[0]) continue;
+    unsigned int nbyte_hton = htonl(nbyte);
+    //socket.write(data.getBuffer()+1, nbyte + sizeof(int));
+    printf("nbyte = %d\n", nbyte);
+    socket.write(&nbyte_hton, sizeof(int));
+    socket.write(evtbuf, nbyte);
     nrec++;
     datasize += sstat;
     datasize += rstat;
@@ -81,7 +93,8 @@ int main(int argc, char** argv)
       t0 = t;
       datasize = 0;
     }
-    if (ninterval > 0 && nrec % ninterval == 0) usleep(1000);
+    //if (ninterval > 0 && nrec % ninterval == 0) usleep(1000);
+    sleep(1);
   }
   socket.close();
   return 0;

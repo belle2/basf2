@@ -8,6 +8,10 @@
 
 #include <unistd.h>
 #include <cstdlib>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/pcore/SeqFile.h>
@@ -52,8 +56,7 @@ public:
               const char* host, const char* dbtmp)
     : m_db(db), m_runtype(runtype), m_host(host), m_dbtmp(dbtmp)
   {
-    m_file = NULL;
-    m_buf = NULL;
+    m_file = -1;
     m_filesize = 0;
   }
   ~FileHandler() throw()
@@ -124,14 +127,11 @@ public:
       sprintf(filename, "%s%02d/storage/%s.%4.4d.%6.6d.sroot",
               dir.c_str(), m_diskid, m_runtype.c_str(), expno, runno);
     }
-    if ((m_file = fopen(filename, "r")) != NULL) {
-      B2FATAL("File : " << filename << " already exists!");
-    }
-    m_file = fopen(filename, "w");
+    m_file = ::open(filename,  O_WRONLY | O_CREAT | O_EXCL, 0664);
     m_path = filename;
-    if (m_file == NULL) {
+    if (m_file < 0) {
       B2ERROR("Failed to open file : " << filename);
-      return -1;
+      exit(1);
     } else {
       char sql[1000];
       sprintf(sql, "insert into %s (path_daq, runtype, expno, runno, fileid, diskid, time_create)"
@@ -151,16 +151,14 @@ public:
         return -1;
       }
     }
-    m_buf = (char*)malloc(MAX_FILE_SIZE / 100);
-    setvbuf(m_file, m_buf, _IOFBF, MAX_FILE_SIZE / 4000);
     B2INFO("New file " << filename << " is opened");
     return m_id;
   }
 
   void close()
   {
-    if (m_file != NULL) {
-      fclose(m_file);
+    if (m_file > 0) {
+      ::close(m_file);
       char sql[1000];
       sprintf(sql, "update %s set time_close = current_timestamp, "
               "filesize = %u where id = %d", g_table, m_filesize, m_id);
@@ -174,24 +172,19 @@ public:
         fout << sql << std::endl;
         fout.close();
       }
-      m_file = NULL;
-    }
-    if (m_buf != NULL) {
-      free(m_buf);
-      m_buf = NULL;
     }
   }
 
   int write(char* evbuf, int nbyte)
   {
-    int ret = fwrite(evbuf, nbyte, 1, m_file);
+    int ret = ::write(m_file, evbuf, nbyte);
     m_filesize += nbyte;
     return ret;
   }
 
   operator bool()
   {
-    return m_file != NULL;
+    return m_file > 0;
   }
 
 private:
@@ -203,8 +196,7 @@ private:
   std::string m_path;
   int m_diskid;
   int m_fileid;
-  FILE* m_file;
-  char* m_buf;
+  int m_file;
   unsigned int m_filesize;
 
 };
@@ -224,6 +216,7 @@ int main(int argc, char** argv)
            "<filepath_dbtmp> [ <obufname> <obufsize> nodename, nodeid]\n", argv[0]);
     return 1;
   }
+  const unsigned interval = 1;
   const char* ibufname = argv[1];
   const int ibufsize = atoi(argv[2]);
   const char* hostname = argv[3];
@@ -241,13 +234,13 @@ int main(int argc, char** argv)
   SharedEventBuffer ibuf;
   ibuf.open(ibufname, ibufsize * 1000000, true);
   signal(SIGINT, signalHandler);
+  signal(SIGKILL, signalHandler);
   ConfigFile config("slowcontrol");
   PostgreSQLInterface db(config.get("database.host"),
                          config.get("database.dbname"),
                          config.get("database.user"),
                          config.get("database.password"),
                          config.getInt("database.port"));
-  const unsigned interval = 10;
   unsigned int expno_tmp = 0;
   unsigned int runno_tmp = 0;
   SharedEventBuffer obuf;
@@ -260,18 +253,20 @@ int main(int argc, char** argv)
   unsigned int expno = 0;
   unsigned int runno = 0;
   unsigned int subno = 0;
-  bool newrun = false;
   g_file = new FileHandler(db, runtype, hostname, file_dbtmp);
   FileHandler& file(*g_file);
   SharedEventBuffer::Header iheader;
   int ecount = 0;
+  bool newrun = false;
   while (true) {
     ibuf.read(evtbuf, true, &iheader);
     if (use_info) info.reportRunning();
     int nbyte = evtbuf[0];
     int nword = (nbyte - 1) / 4 + 1;
+    bool isnew = false;
     if (!newrun || expno < iheader.expno || runno < iheader.runno) {
       newrun = true;
+      isnew = true;
       expno = iheader.expno;
       runno = iheader.runno;
       if (use_info) {
@@ -309,7 +304,7 @@ int main(int argc, char** argv)
       }
       file.write((char*)evtbuf, nbyte);
       nbyte_out += nbyte;
-      if (obufsize > 0 && count_out % interval == 0 && obuf.isWritable(nword)) {
+      if (!isnew && obufsize > 0 && count_out % interval == 0 && obuf.isWritable(nword)) {
         obuf.write(evtbuf, nword, true);
       }
       count_out++;

@@ -27,45 +27,45 @@ PreRawCOPPERFormat_v1::~PreRawCOPPERFormat_v1()
 }
 
 
-int PreRawCOPPERFormat_v1::GetBufferPos(int n)
-{
-  if (m_buffer == NULL || m_nwords <= 0) {
-    char err_buf[500];
-    sprintf(err_buf, "[DEBUG] [ERROR] RawPacket buffer(%p) is not available or length(%d) is not set.\n %s %s %d\n",
-            m_buffer, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;     throw (err_str);
-  }
+// int PreRawCOPPERFormat_v1::GetBufferPos(int n)
+// {
+//   if (m_buffer == NULL || m_nwords <= 0) {
+//     char err_buf[500];
+//     sprintf(err_buf, "[DEBUG] [ERROR] RawPacket buffer(%p) is not available or length(%d) is not set.\n %s %s %d\n",
+//             m_buffer, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     printf("%s", err_buf); fflush(stdout);
+//     string err_str = err_buf;     throw (err_str);
+//   }
 
-  if (n >= (m_num_events * m_num_nodes)) {
-    char err_buf[500];
-    sprintf(err_buf, "[DEBUG] Invalid COPPER block No. (%d : max %d ) is specified. Exiting... \n %s %s %d\n",
-            n, (m_num_events * m_num_nodes), __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;     throw (err_str);
+//   if (n >= (m_num_events * m_num_nodes)) {
+//     char err_buf[500];
+//     sprintf(err_buf, "[DEBUG] Invalid COPPER block No. (%d : max %d ) is specified. Exiting... \n %s %s %d\n",
+//             n, (m_num_events * m_num_nodes), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     printf("%s", err_buf); fflush(stdout);
+//     string err_str = err_buf;     throw (err_str);
 
-  }
-  int pos_nwords = 0;
-  for (int i = 1; i <= n ; i++) {
-    int size = tmp_header.RAWHEADER_NWORDS
-               + m_buffer[ pos_nwords + tmp_header.RAWHEADER_NWORDS + POS_DATA_LENGTH ]
-               + SIZE_COPPER_DRIVER_HEADER
-               + SIZE_COPPER_DRIVER_TRAILER
-               + tmp_trailer.RAWTRAILER_NWORDS;
-    // COPPER's data length include one word from COPPER trailer. so -1 is needed.
-    pos_nwords +=  size;
-    if (pos_nwords >= m_nwords) {
-      char err_buf[500];
+//   }
+//   int pos_nwords = 0;
+//   for (int i = 1; i <= n ; i++) {
+//     int size = tmp_header.RAWHEADER_NWORDS
+//                + m_buffer[ pos_nwords + tmp_header.RAWHEADER_NWORDS + POS_DATA_LENGTH ]
+//                + SIZE_COPPER_DRIVER_HEADER
+//                + SIZE_COPPER_DRIVER_TRAILER
+//                + tmp_trailer.RAWTRAILER_NWORDS;
+//     // COPPER's data length include one word from COPPER trailer. so -1 is needed.
+//     pos_nwords +=  size;
+//     if (pos_nwords >= m_nwords) {
+//       char err_buf[500];
 
-      sprintf(err_buf, "CORRUPTED DATA: value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
-              pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      printf("%s", err_buf); fflush(stdout);
-      string err_str = err_buf;     throw (err_str);
-      //      exit(1);
-    }
-  }
-  return pos_nwords;
-}
+//       sprintf(err_buf, "CORRUPTED DATA: value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
+//               pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//       printf("%s", err_buf); fflush(stdout);
+//       string err_str = err_buf;     throw (err_str);
+//       //      exit(1);
+//     }
+//   }
+//   return pos_nwords;
+// }
 
 
 

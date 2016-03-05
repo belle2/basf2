@@ -11,11 +11,11 @@
 // Includes
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <stdlib.h>
 #include <sys/time.h>
 
 #include <rawdata/RawCOPPERPackerInfo.h>
+#include <rawdata/dataobjects/RawDataBlockFormat.h>
 
 /* #include <framework/datastore/DataStore.h> */
 /* #include <TObject.h> */
@@ -48,7 +48,7 @@ namespace Belle2 {
    * Data from all detectors except PXD are stored in this class
    */
   //  class RawCOPPERFormat : public TObject {
-  class RawCOPPERFormat  {
+  class RawCOPPERFormat : public RawDataBlockFormat {
   public:
     /*     //! Default constructor */
     RawCOPPERFormat();
@@ -62,52 +62,43 @@ namespace Belle2 {
     // Functions for  RawDataBlock
     //
     //! set buffer ( delete_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
-    void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes);
+    /*     void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes); */
 
-    //! Get total length of m_buffer
-    virtual int TotalBufNwords();
+    /*     //! Get total length of m_buffer */
+    /*     virtual int TotalBufNwords(); */
 
-    //! get nth buffer pointer
-    virtual int* GetBuffer(int n);
+    /*     //! get nth buffer pointer */
+    /*     virtual int* GetBuffer(int n); */
 
-    //! get pointer to  buffer(m_buffer)
-    virtual int* GetWholeBuffer();
+    /*     //! get pointer to  buffer(m_buffer) */
+    /*     virtual int* GetWholeBuffer(); */
 
-    //! get # of data blocks = (# of nodes)*(# of events)
-    virtual int GetNumEntries() { return m_num_events * m_num_nodes; }
+    /*     //! get # of data blocks = (# of nodes)*(# of events) */
+    /*     virtual int GetNumEntries() { return m_num_events * m_num_nodes; } */
 
-    //! get # of data sources(e.g. # of COPPER boards) in m_buffer
-    virtual int GetNumNodes() { return m_num_nodes; }
+    /*     //! get # of data sources(e.g. # of COPPER boards) in m_buffer */
+    /*     virtual int GetNumNodes() { return m_num_nodes; } */
 
-    //! get # of events in m_buffer
-    virtual int GetNumEvents() { return m_num_events; }
+    /*     //! get # of events in m_buffer */
+    /*     virtual int GetNumEvents() { return m_num_events; } */
 
-    //! get size of a data block
-    virtual int GetBlockNwords(int n);
+    /*     //! get size of a data block */
+    /*     virtual int GetBlockNwords(int n); */
 
-    //! print out data
-    virtual void PrintData(int* buf, int nwords);
+    /*      //! print out data  */
+    /*     virtual void PrintData(int* buf, int nwords); */
 
-    //! get FTSW ID to check whether this data block is FTSW data or not
-    virtual int CheckFTSWID(int n);
+    /*     enum { */
+    /*       POS_NWORDS = 0, */
+    /*       POS_NODE_ID = 6 */
+    /*     }; */
 
-    //! get FTSW ID to check whether this data block is FTSW data or not
-    virtual int CheckTLUID(int n);
-
-    //! Copy nth block to buf_to
-    virtual void CopyBlock(int n, int* buf_to);
-
-    enum {
-      POS_NWORDS = 0,
-      POS_NODE_ID = 6
-    };
-
-    enum {
-      // Tentatively needed to distinguish new and old FTSW format, which will be changed in Nov. 2013
-      POS_FTSW_ID_OLD = 5,
-      TEMP_POS_NWORDS_HEADER = 1,
-      OLD_FTSW_NWORDS_HEADER = 6
-    };
+    /*     enum { */
+    /*       // Tentatively needed to distinguish new and old FTSW format, which will be changed in Nov. 2013 */
+    /*       POS_FTSW_ID_OLD = 5, */
+    /*       TEMP_POS_NWORDS_HEADER = 1, */
+    /*       OLD_FTSW_NWORDS_HEADER = 6 */
+    /*     }; */
 
     //
     // Functions for RawCOPPER
@@ -147,8 +138,8 @@ namespace Belle2 {
     virtual int* Get4thDetectorBuffer(int n) = 0;
     ///////////////////////////////////////////////////////////////////////////////////////
 
-    //! get posistion of COPPER block in unit of word
-    virtual int GetBufferPos(int n) = 0;
+    /*     //! get posistion of COPPER block in unit of word */
+    /*     virtual int GetBufferPos(int n) = 0; */
 
     //! get buffer pointer of rawcopper header(Currently same as GetBufferPos)
     virtual int* GetRawHdrBufPtr(int n);
@@ -332,17 +323,17 @@ namespace Belle2 {
 
   protected :
 
-    /// number of words of buffer
-    int m_nwords;
+    /*     /// number of words of buffer */
+    /*     int m_nwords; */
 
-    /// number of nodes in this object
-    int m_num_nodes;
+    /*     /// number of nodes in this object */
+    /*     int m_num_nodes; */
 
-    /// number of events in this object
-    int m_num_events;
+    /*     /// number of events in this object */
+    /*     int m_num_events; */
 
-    /// Buffer to access data
-    int* m_buffer; //! not recorded
+    /*     /// Buffer to access data */
+    /*     int* m_buffer; //! not recorded */
 
     ///ver.3 : Separate from RawDataBLock to avoid a memory leak ( July 24, 2014)
     //    ClassDef(RawCOPPERFormat, 3);

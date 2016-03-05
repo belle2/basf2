@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <framework/datastore/DataStore.h>
 #include <TObject.h>
+#include <rawdata/dataobjects/RawDataBlockFormat.h>
 
 
 namespace Belle2 {
@@ -26,8 +27,7 @@ namespace Belle2 {
   public:
     //! Default constructor
     RawDataBlock();
-    //! Constructor using existing pointer to raw data buffer
-//    RawDataBlock(int* bufin, int nwords);
+
     //! Destructor
     virtual ~RawDataBlock();
 
@@ -35,56 +35,109 @@ namespace Belle2 {
     virtual void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes);
 
     //! Get total length of m_buffer
-    virtual int TotalBufNwords();
+    virtual int TotalBufNwords()
+    {
+      m_access_dblk->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access_dblk->TotalBufNwords();
+    }
 
     //! get position of data block in word
-    virtual int GetBufferPos(int n);
+    virtual int GetBufferPos(int n)
+    {
+      m_access_dblk->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access_dblk->GetBufferPos(n);
+    }
 
     //! get nth buffer pointer
-    virtual int* GetBuffer(int n);
+    virtual int* GetBuffer(int n)
+    {
+      m_access_dblk->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access_dblk->GetBuffer(n);
+    }
 
     //! get pointer to  buffer(m_buffer)
-    virtual int* GetWholeBuffer();
+    virtual int* GetWholeBuffer()
+    {
+      m_access_dblk->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access_dblk->GetWholeBuffer();
+    }
 
     //! get # of data blocks = (# of nodes)*(# of events)
-    virtual int GetNumEntries() { return m_num_events * m_num_nodes; }
+    virtual int GetNumEntries()
+    {
+      m_access_dblk->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access_dblk->GetNumEntries();
+    }
 
     //! get # of data sources(e.g. # of COPPER boards) in m_buffer
-    virtual int GetNumNodes() { return m_num_nodes; }
+    virtual int GetNumNodes()
+    {
+      m_access_dblk->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access_dblk->GetNumNodes();
+    }
 
     //! get # of events in m_buffer
-    virtual int GetNumEvents() { return m_num_events; }
+    virtual int GetNumEvents()
+    {
+      m_access_dblk->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access_dblk->GetNumEvents();
+    }
 
     //! get malloc_flag
-    virtual int GetPreAllocFlag() { return m_use_prealloc_buf; }
+    virtual int GetPreAllocFlag()
+    {
+      return m_use_prealloc_buf;
+    }
 
     //! get size of a data block
-    virtual int GetBlockNwords(int n);
-
+    virtual int GetBlockNwords(int n)
+    {
+      m_access_dblk->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access_dblk->GetBlockNwords(n);
+    }
 
     //! get FTSW ID to check whether this data block is FTSW data or not
-    virtual int CheckFTSWID(int n);
+    virtual int CheckFTSWID(int n)
+    {
+      m_access_dblk->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access_dblk->CheckFTSWID(n);
+    }
 
     //! get FTSW ID to check whether this data block is FTSW data or not
-    virtual int CheckTLUID(int n);
+    virtual int CheckTLUID(int n)
+    {
+      m_access_dblk->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access_dblk->CheckTLUID(n);
+    }
 
     //! Copy one datablock to buffer
-    virtual void CopyBlock(int n, int* buf_to);
+    virtual void CopyBlock(int n, int* buf_to)
+    {
+      m_access_dblk->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access_dblk->CopyBlock(n, buf_to);
+    }
 
     //! print data
-    virtual void PrintData(int* buf, int nwords);
+    virtual void PrintData(int* buf, int nwords)
+    {
+      m_access_dblk->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access_dblk->PrintData(buf, nwords);
+    }
 
-    enum {
-      POS_NWORDS = 0,
-      POS_NODE_ID = 6
-    };
+    /*     enum { */
+    /*       POS_NWORDS = 0, */
+    /*       POS_NODE_ID = 6 */
+    /*     }; */
 
-    enum {
-      // Tentatively needed to distinguish new and old FTSW format, which will be changed in Nov. 2013
-      POS_FTSW_ID_OLD = 5,
-      TEMP_POS_NWORDS_HEADER = 1,
-      OLD_FTSW_NWORDS_HEADER = 6
-    };
+    /*     enum { */
+    /*       // Tentatively needed to distinguish new and old FTSW format, which will be changed in Nov. 2013 */
+    /*       POS_FTSW_ID_OLD = 5, */
+    /*       TEMP_POS_NWORDS_HEADER = 1, */
+    /*       OLD_FTSW_NWORDS_HEADER = 6 */
+    /*     }; */
+
+    //! class to access
+    RawDataBlockFormat* m_access_dblk; //! do not record
 
   protected :
     /// number of words of buffer
@@ -104,7 +157,7 @@ namespace Belle2 {
     int m_use_prealloc_buf; //! not record
 
     /// To drive from TObject
-    ClassDef(RawDataBlock, 2);
+    ClassDef(RawDataBlock, 3);
   };
 
 }

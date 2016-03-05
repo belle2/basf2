@@ -27,46 +27,46 @@ PreRawCOPPERFormat_latest::~PreRawCOPPERFormat_latest()
 }
 
 
-int PreRawCOPPERFormat_latest::GetBufferPos(int n)
-{
-  if (m_buffer == NULL || m_nwords <= 0) {
-    char err_buf[500];
-    sprintf(err_buf, "[DEBUG] [ERROR] RawPacket buffer(%p) is not available or length(%d) is not set.\n %s %s %d\n",
-            m_buffer, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;     throw (err_str);
-  }
+// int PreRawCOPPERFormat_latest::GetBufferPos(int n)
+// {
+//   if (m_buffer == NULL || m_nwords <= 0) {
+//     char err_buf[500];
+//     sprintf(err_buf, "[DEBUG] [ERROR] RawPacket buffer(%p) is not available or length(%d) is not set.\n %s %s %d\n",
+//             m_buffer, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     printf("%s", err_buf); fflush(stdout);
+//     string err_str = err_buf;     throw (err_str);
+//   }
 
-  if (n >= (m_num_events * m_num_nodes)) {
-    char err_buf[500];
-    sprintf(err_buf, "[DEBUG] Invalid COPPER block No. (%d : max %d ) is specified. Exiting... \n %s %s %d\n",
-            n, (m_num_events * m_num_nodes), __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;     throw (err_str);
+//   if (n >= (m_num_events * m_num_nodes)) {
+//     char err_buf[500];
+//     sprintf(err_buf, "[DEBUG] Invalid COPPER block No. (%d : max %d ) is specified. Exiting... \n %s %s %d\n",
+//             n, (m_num_events * m_num_nodes), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     printf("%s", err_buf); fflush(stdout);
+//     string err_str = err_buf;     throw (err_str);
 
-  }
-  int pos_nwords = 0;
-  for (int i = 1; i <= n ; i++) {
-    int size = tmp_header.RAWHEADER_NWORDS
-               + m_buffer[ pos_nwords + tmp_header.RAWHEADER_NWORDS + POS_DATA_LENGTH ]
-               + SIZE_COPPER_DRIVER_HEADER
-               + SIZE_COPPER_DRIVER_TRAILER
-               + tmp_trailer.RAWTRAILER_NWORDS;
-    // COPPER's data length include one word from COPPER trailer. so -1 is needed.
-    pos_nwords +=  size;
-    if (pos_nwords >= m_nwords) {
-      char err_buf[500];
+//   }
+//   int pos_nwords = 0;
+//   for (int i = 1; i <= n ; i++) {
+//     int size = tmp_header.RAWHEADER_NWORDS
+//                + m_buffer[ pos_nwords + tmp_header.RAWHEADER_NWORDS + POS_DATA_LENGTH ]
+//                + SIZE_COPPER_DRIVER_HEADER
+//                + SIZE_COPPER_DRIVER_TRAILER
+//                + tmp_trailer.RAWTRAILER_NWORDS;
+//     // COPPER's data length include one word from COPPER trailer. so -1 is needed.
+//     pos_nwords +=  size;
+//     if (pos_nwords >= m_nwords) {
+//       char err_buf[500];
 
-      sprintf(err_buf, "CORRUPTED DATA: value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
-              pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      PrintData(m_buffer, m_nwords);
-      printf("%s", err_buf); fflush(stdout);
-      string err_str = err_buf;     throw (err_str);
-      //      exit(1);
-    }
-  }
-  return pos_nwords;
-}
+//       sprintf(err_buf, "CORRUPTED DATA: value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
+//               pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//       PrintData(m_buffer, m_nwords);
+//       printf("%s", err_buf); fflush(stdout);
+//       string err_str = err_buf;     throw (err_str);
+//       //      exit(1);
+//     }
+//   }
+//   return pos_nwords;
+// }
 
 
 
@@ -795,25 +795,25 @@ int PreRawCOPPERFormat_latest::CalcReducedDataSize(int* bufin, int nwords, int n
   //
   // Calculate reduced length for a total RawDataBlock (containing multiple data blocks)
   //
-  PreRawCOPPERFormat_latest rawcpr_fmt;
+  RawDataBlockFormat radblk_fmt;
   int delete_flag = 0;
-  rawcpr_fmt.SetBuffer(bufin, nwords, delete_flag, num_events, num_nodes);
+  radblk_fmt.SetBuffer(bufin, nwords, delete_flag, num_events, num_nodes);
 
   int reduced_nwords = 0;
-  for (int k = 0; k < rawcpr_fmt.GetNumEvents(); k++) {
-    int num_nodes_in_sendblock = rawcpr_fmt.GetNumNodes();
+  for (int k = 0; k < radblk_fmt.GetNumEvents(); k++) {
+    int num_nodes_in_sendblock = radblk_fmt.GetNumNodes();
     for (int l = 0; l < num_nodes_in_sendblock; l++) {
       int entry_id = l + k * num_nodes_in_sendblock;
 
-      if (rawcpr_fmt.CheckFTSWID(entry_id) || rawcpr_fmt.CheckTLUID(entry_id)) {
-        reduced_nwords += rawcpr_fmt.GetBlockNwords(entry_id);
+      if (radblk_fmt.CheckFTSWID(entry_id) || radblk_fmt.CheckTLUID(entry_id)) {
+        reduced_nwords += radblk_fmt.GetBlockNwords(entry_id);
       } else {
         PreRawCOPPERFormat_latest temp_prerawcpr;
         int temp_delete_flag = 0, temp_num_eve = 1, temp_num_nodes = 1;
 
         // Call CalcReducedNwords
-        temp_prerawcpr.SetBuffer(rawcpr_fmt.GetBuffer(entry_id),
-                                 rawcpr_fmt.GetBlockNwords(entry_id),
+        temp_prerawcpr.SetBuffer(radblk_fmt.GetBuffer(entry_id),
+                                 radblk_fmt.GetBlockNwords(entry_id),
                                  temp_delete_flag, temp_num_eve,
                                  temp_num_nodes);
         reduced_nwords += temp_prerawcpr.CalcReducedNwords(0);
@@ -830,23 +830,23 @@ void PreRawCOPPERFormat_latest::CopyReducedData(int* bufin, int nwords, int num_
   //
   // Make a reduced buffer a total RawDataBlock (containing multiple data blocks)
   //
-  PreRawCOPPERFormat_latest rawcpr_fmt;
+  RawDataBlockFormat radblk_fmt;
   int delete_flag = 0;
-  rawcpr_fmt.SetBuffer(bufin, nwords, delete_flag, num_events, num_nodes);
+  radblk_fmt.SetBuffer(bufin, nwords, delete_flag, num_events, num_nodes);
 
   int pos_nwords_to = 0;
-  for (int k = 0; k < rawcpr_fmt.GetNumEvents(); k++) {
-    int num_nodes_in_sendblock = rawcpr_fmt.GetNumNodes();
+  for (int k = 0; k < radblk_fmt.GetNumEvents(); k++) {
+    int num_nodes_in_sendblock = radblk_fmt.GetNumNodes();
     for (int l = 0; l < num_nodes_in_sendblock; l++) {
       int entry_id = l + k * num_nodes_in_sendblock;
-      if (rawcpr_fmt.CheckFTSWID(entry_id) ||
-          rawcpr_fmt.CheckTLUID(entry_id)) {
-        rawcpr_fmt.CopyBlock(entry_id, buf_to + pos_nwords_to);
-        pos_nwords_to += rawcpr_fmt.GetBlockNwords(entry_id);
+      if (radblk_fmt.CheckFTSWID(entry_id) ||
+          radblk_fmt.CheckTLUID(entry_id)) {
+        radblk_fmt.CopyBlock(entry_id, buf_to + pos_nwords_to);
+        pos_nwords_to += radblk_fmt.GetBlockNwords(entry_id);
 
       } else {
-        SetBuffer(rawcpr_fmt.GetBuffer(entry_id),
-                  rawcpr_fmt.GetBlockNwords(entry_id), 0, 1, 1);
+        SetBuffer(radblk_fmt.GetBuffer(entry_id),
+                  radblk_fmt.GetBlockNwords(entry_id), 0, 1, 1);
 
         pos_nwords_to += CopyReducedBuffer(0, buf_to + pos_nwords_to);
 

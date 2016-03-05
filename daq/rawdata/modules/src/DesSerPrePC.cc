@@ -6,7 +6,8 @@
 // Date : 2 - Aug - 2013
 //-
 
-#include <rawdata/dataobjects/RawCOPPER.h>
+
+//#include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawTLU.h>
 #include <daq/rawdata/modules/DesSerPrePC.h>
@@ -593,27 +594,26 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
         //
         // RawCOPPER
         //
-
-        RawCOPPER* temp_rawcopper = new RawCOPPER;
-        temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
+        PreRawCOPPERFormat_latest* pre_rawcpr_fmt = new PreRawCOPPERFormat_latest;
+        pre_rawcpr_fmt->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
 
 #ifdef DUMHSLB
         int block_id = 0;
         "do not use the following for actual DAQ"
-        (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_EXP_RUN_NO ] = exp_run_ftsw;
-        (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
-        (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTUTIME ] = utime_ftsw;
+        (pre_rawcpr_fmt->GetBuffer(block_id))[ RawHeader_latest::POS_EXP_RUN_NO ] = exp_run_ftsw;
+        (pre_rawcpr_fmt->GetBuffer(block_id))[ RawHeader_latest::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
+        (pre_rawcpr_fmt->GetBuffer(block_id))[ RawHeader_latest::POS_TTUTIME ] = utime_ftsw;
 #endif
 
 #ifndef NO_DATA_CHECK
         try {
-          temp_rawcopper->CheckData(0, m_prev_evenum, &cur_evenum,
+          pre_rawcpr_fmt->CheckData(0, m_prev_evenum, &cur_evenum,
                                     m_prev_copper_ctr, &cur_copper_ctr,
                                     m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
         } catch (string err_str) {
-          temp_rawcopper->PrintData(temp_rawcopper->GetWholeBuffer(), temp_rawcopper->TotalBufNwords());
+          pre_rawcpr_fmt->PrintData(pre_rawcpr_fmt->GetWholeBuffer(), pre_rawcpr_fmt->TotalBufNwords());
           char err_buf[500];
           strcpy(err_buf, err_str.c_str());
           print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -621,8 +621,8 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
         }
 #endif
 
-        utime_array[ entry_id ] = temp_rawcopper->GetTTUtime(0);
-        ctime_type_array[ entry_id ] = temp_rawcopper->GetTTCtimeTRGType(0);
+        utime_array[ entry_id ] = pre_rawcpr_fmt->GetTTUtime(0);
+        ctime_type_array[ entry_id ] = pre_rawcpr_fmt->GetTTCtimeTRGType(0);
 
         if (cpr_num == 0) {
           //          data_size_copper_0 = raw_datablk->GetBlockNwords(entry_id);
@@ -631,7 +631,7 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
           //          data_size_copper_1 = raw_datablk->GetBlockNwords(entry_id);
         }
         cpr_num++;
-        delete temp_rawcopper;
+        delete pre_rawcpr_fmt;
       }
     }
 

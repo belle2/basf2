@@ -77,8 +77,8 @@ namespace Belle2 {
     int* Get4thDetectorBuffer(int n);
     ///////////////////////////////////////////////////////////////////////////////////////
 
-    //! get posistion of COPPER block in unit of word
-    virtual int GetBufferPos(int n);
+    /*     //! get posistion of COPPER block in unit of word */
+    /*     virtual int GetBufferPos(int n); */
 
     //! get buffer pointer of rawcopper trailer
     virtual int* GetRawTrlBufPtr(int n);

@@ -16,6 +16,7 @@
 #include <sys/time.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
+#include <rawdata/dataobjects/RawDataBlockFormat.h>
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 #include <rawdata/dataobjects/RawCOPPERFormat_latest.h>
 #include <rawdata/dataobjects/RawCOPPERFormat_v0.h>

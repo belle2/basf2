@@ -68,7 +68,7 @@ namespace Belle2 {
     ///////////////////////////////////////////////////////////////////////////////////////
 
     //! get posistion of COPPER block in unit of word
-    virtual int GetBufferPos(int n);
+    //    virtual int GetBufferPos(int n);
 
     //
     // Get information from 13words "COPPER header" attached by COPPER board

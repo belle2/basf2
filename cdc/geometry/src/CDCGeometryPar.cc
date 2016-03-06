@@ -497,18 +497,24 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
     int itheta = 0;
     for (unsigned i = 0; i < nThetaPoints; ++i) {
       if (theta == m_thetaPoints[i]) itheta = i;
+      //      std::cout << m_thetaPoints[i] << std::endl;
     }
 
     //    const int ialpha = alpha / 10. + 9;
     int ialpha = 0;
     for (unsigned i = 1; i < nAlphaPoints; ++i) {
       if (alpha == m_alphaPoints[i]) ialpha = i;
+      //      std::cout << m_alphaPoints[i] << std::endl;
     }
 
     for (int i = 0; i < np - 1; ++i) {
       m_XT[iL][lr][ialpha][itheta][i] = xt[i];
     }
 
+    if (m_XT[iL][lr][ialpha][itheta][1] * m_XT[iL][lr][ialpha][itheta][7] < 0.) {
+      //      B2WARNING("CDCGeometryPar: xt[7] sign is inconsistent with xt[1] sign -> set xt[7]=0");
+      m_XT[iL][lr][ialpha][itheta][7] = 0.;
+    }
     //    m_XT[iL][lr][ialpha][itheta][6] *= -1;
     double bound = m_XT[iL][lr][ialpha][itheta][6];
     int i = np - 1;
@@ -555,8 +561,9 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
   //set xt(L/R,alpha=-90deg) = xt(R/L,alpha=90deg)
   for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
     for (int lr = 0; lr < 2; ++lr) {
-      int lrp = 0;
-      if (lr == 0) lrp = 1;
+      int lrp = lr;
+      //      int lrp = 0;
+      //      if (lr == 0) lrp = 1;
       for (unsigned itheta = 0; itheta < nThetaPoints; ++itheta) {
         for (int i = 0; i < np; ++i) {
           m_XT[iL][lr][0][itheta][i] = m_XT[iL][lrp][18][itheta][i];
@@ -1345,6 +1352,15 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
       //      std::cout << "ial[0],[1],jal,wal= " << ial[0] <<" "<< ial[1] <<" "<< jal <<" "<< wal << std::endl;
       //      std::cout << "ith[0],[1],jth,wth= " << ith[0] <<" "<< ith[1] <<" "<< jth <<" "<< wth << std::endl;
 
+      /*
+      std::cout <<"iCLayer= " << iCLayer << std::endl;
+      std::cout <<"lr= " << lr << std::endl;
+      std::cout <<"jal,jth= " << jal <<" "<< jth << std::endl;
+      std::cout <<"wal,wth= " << wal <<" "<< wth << std::endl;
+      for (int i=0; i<9; ++i) {
+      std::cout <<"a= "<< i <<" "<< m_XT[iCLayer][lro][jal][jth][i] << std::endl;
+      }
+      */
       double boundary = m_XT[iCLayer][lro][jal][jth][6];
 
       if (time < boundary) {
@@ -1357,17 +1373,22 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
       } else {
         dist += w * (m_XT[iCLayer][lro][jal][jth][7] * (time - boundary) + m_XT[iCLayer][lro][jal][jth][8]);
       }
+      //      std::cout <<"k,w,dist= " << k <<" "<< w <<" "<< dist << std::endl;
     }
 
   } else {
     unsigned short ialpha = getClosestAlphaPoint(alpha);
     unsigned short itheta = getClosestThetaPoint(theta);
-    //  std::cout <<"iCLayer= " << iCLayer << std::endl;
-    //  std::cout <<"lr= " << lr << std::endl;
-    //  std::cout <<"alpha,ialpha= " << alpha <<" "<< ialpha << std::endl;
+    /*
+    std::cout <<"iCLayer= " << iCLayer << std::endl;
+    std::cout <<"lr= " << lr << std::endl;
+    std::cout <<"alpha,ialpha= " << alpha <<" "<< ialpha << std::endl;
+    for (int i=0; i<9; ++i) {
+      std::cout <<"a= "<< i <<" "<< m_XT[iCLayer][lro][ialpha][itheta][i] << std::endl;
+    }
+    */
 
     const double boundary = m_XT[iCLayer][lro][ialpha][itheta][6];
-    //  std::cout <<"boundary= " << boundary << std::endl;
 
     if (time < boundary) {
       dist = m_XT[iCLayer][lro][ialpha][itheta][0] + time
@@ -1413,6 +1434,7 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
   while (((t1 - t0) > eps) && (i < maxTrials)) {
     time = 0.5 * (t0 + t1);
     double d1 = getDriftLength(time, iCLayer, lr, alpha, theta) - dist;
+    //    std::cout <<"i,dist,t0,t1,d0,d1= " << i <<" "<< dist <<" "<< t0 <<" "<< t1 <<" "<< d0 <<" "<< d1 << std::endl;
     if (d0 * d1 > 0.) {
       t0 = time;
     } else {
@@ -1573,21 +1595,28 @@ void CDCGeometryPar::getClosestAlphaPoints(const double alpha, double& weight, u
   double alphao = getOutgoingAlpha(alpha);
 
   if (alphao < m_alphaPoints[0]) {
+    //    points[0] = 0;
+    //    points[1] = 1;
     points[0] = 0;
-    points[1] = 1;
+    points[1] = 0;
+    weight = 1.;
   } else if (m_alphaPoints[nAlphaPoints - 1] <= alphao) {
-    points[0] = nAlphaPoints - 2;
+    //    points[0] = nAlphaPoints - 2;
+    //    points[1] = nAlphaPoints - 1;
+    points[0] = nAlphaPoints - 1;
     points[1] = nAlphaPoints - 1;
+    weight = 1.;
   } else {
     for (unsigned i = 0; i <= nAlphaPoints - 2; ++i) {
       if (m_alphaPoints[i] <= alphao && alphao < m_alphaPoints[i + 1]) {
         points[0] = i;
         points[1] = i + 1;
+        weight = (alphao - m_alphaPoints[points[0]]) / (m_alphaPoints[points[1]] - m_alphaPoints[points[0]]);
         break;
       }
     }
   }
-  weight = (alphao - m_alphaPoints[points[0]]) / (m_alphaPoints[points[1]] - m_alphaPoints[points[0]]);
+  //  weight = (alphao - m_alphaPoints[points[0]]) / (m_alphaPoints[points[1]] - m_alphaPoints[points[0]]);
 }
 
 
@@ -1614,21 +1643,28 @@ unsigned short CDCGeometryPar::getClosestThetaPoint(const double theta) const
 void CDCGeometryPar::getClosestThetaPoints(const double theta, double& weight, unsigned short points[2]) const
 {
   if (theta < m_thetaPoints[0]) {
+    //    points[0] = 0;
+    //    points[1] = 1;
     points[0] = 0;
-    points[1] = 1;
+    points[1] = 0;
+    weight = 1.;
   } else if (m_thetaPoints[nThetaPoints - 1] <= theta) {
-    points[0] = nThetaPoints - 2;
+    //    points[0] = nThetaPoints - 2;
+    //    points[1] = nThetaPoints - 1;
+    points[0] = nThetaPoints - 1;
     points[1] = nThetaPoints - 1;
+    weight = 1.;
   } else {
     for (unsigned i = 0; i <= nThetaPoints - 2; ++i) {
       if (m_thetaPoints[i] <= theta && theta < m_thetaPoints[i + 1]) {
         points[0] = i;
         points[1] = i + 1;
+        weight = (theta - m_thetaPoints[points[0]]) / (m_thetaPoints[points[1]] - m_thetaPoints[points[0]]);
         break;
       }
     }
   }
-  weight = (theta - m_thetaPoints[points[0]]) / (m_thetaPoints[points[1]] - m_thetaPoints[points[0]]);
+  //  weight = (theta - m_thetaPoints[points[0]]) / (m_thetaPoints[points[1]] - m_thetaPoints[points[0]]);
 }
 
 

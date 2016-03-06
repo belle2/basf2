@@ -812,6 +812,7 @@ namespace Belle2 {
     //    if (hitWeight < 0) m_nNegHits++;
     //    std::cout <<"trackID,HitNumber,weight,driftL,edep= "<< trackID <<" "<< m_hitNumber <<" "<< hitWeight <<" "<< distance <<" "<< edep << std::endl;
     //    return (m_hitNumber);
+    // cppcheck-suppress memleak
   }
 
   void
@@ -840,6 +841,7 @@ namespace Belle2 {
 
     B2DEBUG(150, "HitNumber: " << m_EBhitNumber);
     //    return (m_EBhitNumber);
+    // cppcheck-suppress memleak
   }
 
   /*

@@ -569,11 +569,11 @@ namespace Belle2 {
 
       /**
        * Get the realistic drift velocity.
-       * @param[in] dt Drift time.
+       * @param[in] dt Drift time (ns).
        * @param[in] layer Layer ID.
        * @param[in] lr Left/Right
-       * @param[in] alpha incident angle (in rphi plane) w.r.t. the cell.
-       * @param[in] theta incident angle (polar angle).
+       * @param[in] alpha incident angle (in rphi plane) w.r.t. the cell (rad).
+       * @param[in] theta incident angle (polar angle) (rad).
        *
        */
 
@@ -581,22 +581,22 @@ namespace Belle2 {
 
       /**
        * Return the drift dength to the sense wire.
-       * @param[in] dt Drift time.
+       * @param[in] dt Drift time (ns).
        * @param[in] layer Layer ID.
        * @param[in] lr Left/Right
-       * @param[in] alpha incident angle (in rphi plane) w.r.t. the cell.
-       * @param[in] theta incident angle (polar angle).
+       * @param[in] alpha incident angle (in rphi plane) w.r.t. the cell (rad).
+       * @param[in] theta incident angle (polar angle) (rad).
        */
 
       double getDriftLength(double dt, unsigned short layer, unsigned short lr, double alpha = 0., double theta = 0.5 * M_PI) const;
 
       /**
        * Return the drift time to the sense wire.
-       * @param dist Drift length.
+       * @param dist Drift length (cm).
        * @param layer Layer ID.
        * @param lr Left/Right
-       * @param alpha incident angle (in rphi plane) w.r.t. the cell.
-       * @param theta incident angle (polar angle).
+       * @param alpha incident angle (in rphi plane) w.r.t. the cell (rad).
+       * @param theta incident angle (polar angle) (rad).
        */
 
       double getDriftTime(double dist, unsigned short layer, unsigned short lr, double alpha, double theta) const;

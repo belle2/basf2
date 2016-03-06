@@ -16,11 +16,22 @@ using namespace Belle2;
 RawDataBlockFormat::RawDataBlockFormat()
 {
   m_nwords = 0;
-  //  m_use_prealloc_buf = 0;
+  m_use_prealloc_buf = 0;
   m_buffer = NULL;
   m_num_nodes = 0;
   m_num_events = 0;
 }
+
+
+RawDataBlockFormat::~RawDataBlockFormat()
+{
+  if (!m_use_prealloc_buf && m_buffer != NULL) {
+    delete[] m_buffer;
+  }
+}
+
+
+
 
 int RawDataBlockFormat::GetBufferPos(int n)
 {
@@ -122,14 +133,22 @@ int* RawDataBlockFormat::GetBuffer(int n)
 
 void RawDataBlockFormat::SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes)
 {
-  if (delete_flag  == 1) {
-    printf("RawCOPPER format class does not delete m_buffer. Please specify 0 for delete_flag. Exiting...\n");
-    exit(1);
-  }
+//   if (delete_flag  == 1) {
+//     printf("RawCOPPER format class does not delete m_buffer. Please specify 0 for delete_flag. Exiting...\n");
+//     exit(1);
+//   }
 
   if (bufin == NULL) {
     printf("[DEBUG] bufin is NULL. Exting...\n");
     exit(1);
+  }
+
+  if (!m_use_prealloc_buf && m_buffer != NULL) delete[] m_buffer;
+
+  if (delete_flag == 0) {
+    m_use_prealloc_buf = true;
+  } else {
+    m_use_prealloc_buf = false;
   }
 
   m_nwords = nwords;

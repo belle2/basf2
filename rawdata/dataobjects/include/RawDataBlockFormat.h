@@ -27,7 +27,7 @@ namespace Belle2 {
     RawDataBlockFormat();
 
     //! Destructor
-    virtual ~RawDataBlockFormat() {};
+    virtual ~RawDataBlockFormat();
 
     //! set buffer ( delete_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
     virtual void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes);
@@ -53,8 +53,8 @@ namespace Belle2 {
     //! get # of events in m_buffer
     virtual int GetNumEvents() { return m_num_events; }
 
-    /*     //! get malloc_flag */
-    /*     virtual int GetPreAllocFlag() { return m_use_prealloc_buf; } */
+    //! get malloc_flag
+    virtual int GetPreAllocFlag() { return m_use_prealloc_buf; }
 
     //! get size of a data block
     virtual int GetBlockNwords(int n);
@@ -95,6 +95,10 @@ namespace Belle2 {
 
     /// Buffer
     int* m_buffer; //! not recorded
+
+    //! flag for deleting m_buffer in destructer( 0:delete, 1: not delete)
+    //! When using pre-allocated buffer, the buffer should be reused and not deleted in the destructer
+    int m_use_prealloc_buf; //! not record
 
     /*     /// To drive from TObject */
     /*     ClassDef(RawDataBlockFormat, 1); */

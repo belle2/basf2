@@ -54,9 +54,9 @@ void ECLDatabaseImporter::importDigitCalibration()
 
       string histconstants = key->GetName();
 
-      if (histconstants.find("energy") == 0) {
+      if (histconstants.compare("energy") == 0) {
         energy = (TH1F*)f->Get(histconstants.c_str());
-      } else  if (histconstants.find("amplitude") == 0) {
+      } else  if (histconstants.compare("amplitude") == 0) {
         amplitude = (TH1F*)f->Get(histconstants.c_str());
       }
 

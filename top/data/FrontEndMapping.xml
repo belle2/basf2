@@ -304,24 +304,24 @@
     </Boardstack>
   </TOPModule>
 
-  <TOPModule moduleID="14"> <!-- dummy SCRODid's-->
+  <TOPModule moduleID="14">
     <Boardstack col="0">
-      <SCRODid>1401</SCRODid>
+      <SCRODid>37</SCRODid>
       <COPPERid>1014</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
-      <SCRODid>1402</SCRODid>
+      <SCRODid>55</SCRODid>
       <COPPERid>1014</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
-      <SCRODid>1403</SCRODid>
+      <SCRODid>57</SCRODid>
       <COPPERid>1014</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
-      <SCRODid>1404</SCRODid>
+      <SCRODid>71</SCRODid>
       <COPPERid>1014</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>

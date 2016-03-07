@@ -79,7 +79,7 @@ def skimOutputUdst(skimname, particleLists=[], path=analysis_main):
     skimfilter = register_module('SkimFilter')
     skimfilter.set_name('SkimFilter_' + skimname)
     skimfilter.param('particleLists', particleLists)
-    analysis_main.add_module(skimfilter)
+    path.add_module(skimfilter)
     skim_path = create_path()
     skimfilter.if_value('=1', skim_path, AfterConditionPath.CONTINUE)
     outputUdst(skimname + '.udst.root', particleLists, path=skim_path)

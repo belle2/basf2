@@ -13,12 +13,15 @@
 #include <vector>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <netdb.h>
+#include <signal.h>
 
 #include <daq/slc/readout/RunInfoBuffer.h>
 #include <daq/rawdata/CprErrorMessage.h>
+
 //#include <daq/rawdata/modules/DeSerializer.h>
 #include <daq/rawdata/modules/DAQConsts.h>
-#include <daq/dataflow/EvtSocket.h>
+//#include <daq/dataflow/EvtSocket.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 
 #include <sys/socket.h>
@@ -257,7 +260,7 @@ namespace Belle2 {
     int m_num_connections;
 
     //! Reciever basf2 Socket
-    std::vector<EvtSocketRecv*> m_recv;
+    //    std::vector<EvtSocketRecv*> m_recv;
 
     //! hostname of upstream Data Sources
     std::vector<std::string> m_hostname_from;
@@ -300,7 +303,7 @@ namespace Belle2 {
     int m_port_to;
 
     //! EvtSocket
-    EvtSocketSend* m_sock;
+    //    EvtSocketSend* m_sock;
 
     //! How to handle data
     std::string p_method;

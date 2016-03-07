@@ -10,7 +10,7 @@
 #include <rawdata/dataobjects/RawFTSWFormat.h>
 #include <rawdata/dataobjects/RawTLUFormat.h>
 #include <daq/rawdata/modules/DesSerPrePC.h>
-
+#include <unistd.h>
 #include <sys/mman.h>
 //#define MAXEVTSIZE 400000000
 #define CHECKEVT 5000

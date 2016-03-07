@@ -91,7 +91,8 @@ namespace Belle2 {
     int m_Quality;     /**< Fitting Quality */
     int m_Chi;    /**< Fitting chi2-squared */
 
-    ClassDef(ECLDigit, 1);/**< ClassDef */
+    // 2: r25301, data member changed to ints
+    ClassDef(ECLDigit, 2);/**< ClassDef */
 
   };
 } // end namespace Belle2

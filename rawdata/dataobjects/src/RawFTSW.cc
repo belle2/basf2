@@ -61,10 +61,10 @@ void RawFTSW::GetTTTimeVal(int n, struct timeval* tv)
 }
 
 
-int RawFTSW::GetNwords(int n)
-{
-  return  m_buffer[ GetBufferPos(n) +  POS_NWORDS ];
-}
+// int RawFTSW::GetNwords(int n)
+// {
+//   return  m_buffer[ GetBufferPos(n) +  POS_NWORDS ];
+// }
 
 int RawFTSW::GetNwordsHeader(int n)
 {
@@ -113,9 +113,9 @@ void RawFTSW::CheckData(int n,
   }
 #endif
 
-  if (GetNwords(n) != SIZE_FTSW_PACKET) {
+  if (GetBlockNwords(n) != SIZE_FTSW_PACKET) {
     sprintf(err_buf, "CORRUPTED DATA: invalid FTSW packet length : block %d nwords %d must be %d : Exiting...\n %s %s %d\n",
-            n, GetNwords(n), SIZE_FTSW_PACKET, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+            n, GetBlockNwords(n), SIZE_FTSW_PACKET, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
 
@@ -124,8 +124,6 @@ void RawFTSW::CheckData(int n,
             n, GetMagicTrailer(n), FTSW_MAGIC_TRAILER, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
-
-
 
   if (err_flag == 1) {
     printf("[DEBUG] ========== dump a data block : block # %d==========\n", n);

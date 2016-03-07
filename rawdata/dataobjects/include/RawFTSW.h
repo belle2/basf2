@@ -35,8 +35,8 @@ namespace Belle2 {
     //! Destructor
     virtual ~RawFTSW();
 
-    //! Get # of words in this buffer
-    int GetNwords(int n);
+    /*     //! Get # of words in this buffer */
+    /*     int GetNwords(int n); */
 
     //! Get # of words of header
     int GetNwordsHeader(int n);

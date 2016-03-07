@@ -183,7 +183,7 @@ void PrintDataModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
   printf("eve %d TLU %d: %d %d %.8x: tv %d %d\n",
          rawftsw.GetEveNo(n),
          rawftsw.Get15bitTLUTag(n),
-         rawftsw.GetNwords(n),
+         rawftsw.GetBlockNwords(n),
          rawftsw.GetNwordsHeader(n),
          rawftsw.GetFTSWNodeID(n),
          tv.tv_sec, (int)(tv.tv_usec)

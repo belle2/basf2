@@ -21,10 +21,10 @@ RawTLU::~RawTLU()
 }
 
 
-int RawTLU::GetNwords(int n)
-{
-  return  m_buffer[ GetBufferPos(n) +  POS_NWORDS ];
-}
+// int RawTLU::GetNwords(int n)
+// {
+//   return  m_buffer[ GetBufferPos(n) +  POS_NWORDS ];
+// }
 
 int RawTLU::GetNwordsHeader(int n)
 {
@@ -84,9 +84,9 @@ void RawTLU::CheckData(int n,
   }
 
 
-  if (GetNwords(n) != SIZE_TLU_PACKET) {
+  if (GetBlockNwords(n) != SIZE_TLU_PACKET) {
     sprintf(err_buf, "invalid TLU packet length : block %d nwords %d must be %d : Exiting...\n %s %s %d\n",
-            n, GetNwords(n), SIZE_TLU_PACKET, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+            n, GetBlockNwords(n), SIZE_TLU_PACKET, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
 

@@ -34,9 +34,8 @@ namespace Belle2 {
     //! Destructor
     virtual ~RawTLU();
 
-
-    //! Get # of words in this data packet
-    int GetNwords(int n);
+    /*     //! Get # of words in this data packet */
+    /*     int GetNwords(int n); */
 
     //!Get the size of the header
     int GetNwordsHeader(int n);

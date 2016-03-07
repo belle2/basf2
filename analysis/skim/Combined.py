@@ -36,55 +36,50 @@ loadStdDplus()
 loadStdDstar0()
 loadStdDstarPlus()
 
+
+def add_skim(label, lists):
+    """
+    create uDST skim for given lists, saving into $label.udst.root
+    Particles not necessary for the given particle lists are not saved.
+    """
+    skimpath = create_path()
+    removeParticlesNotInLists(lists, path=skimpath)
+    skimOutputUdst(label, lists, path=skimpath)
+    summaryOfLists(lists, path=skimpath)
+    analysis_main.add_skim_path(skimpath, "skim_" + label)
+
+
 # Double Charm Skim
 from DoubleCharm_List import *
-DCList = DoubleCharmList()
-skimOutputUdst('DC', DCList)
-summaryOfLists(DCList)
+add_skim('DC', DoubleCharmList())
 
 # Tau Skim
 from Tau_List import *
-tauList = TauLFVList()
-skimOutputUdst('TauLFV', tauList)
-summaryOfLists(tauList)
+add_skim('TauLFV', TauLFVList())
 
 # EWP Skim
 from EWP_List import *
-XgammaList = B2XgammaList()
-skimOutputUdst('BtoXgamma', XgammaList)
-summaryOfLists(XgammaList)
+add_skim('BtoXgamma', B2XgammaList())
 
-XllList = B2XllList()
-skimOutputUdst('BtoXll', XllList)
-summaryOfLists(XllList)
+add_skim('BtoXll', B2XllList())
 
 # Had Skim
 from CharmlessHad_List import *
-HadList = CharmlessHadList()
-skimOutputUdst('CharmlessHad', HadList)
-summaryOfLists(HadList)
+add_skim('CharmlessHad', CharmlessHadList())
 
 # TCPV Skim
 from TCPV_List import *
-tcpvList = TCPVList()
-skimOutputUdst('TCPV', tcpvList)
-summaryOfLists(tcpvList)
+add_skim('TCPV', TCPVList())
 
 # SL Skim
 from Semileptonic_List import *
-SLList = SemileptonicList()
-skimOutputUdst('SLUntagged', SLList)
-summaryOfLists(SLList)
+add_skim('SLUntagged', SemileptonicList())
 
-lepList = LeptonicList()
-skimOutputUdst('LeptonicUntagged', lepList)
-summaryOfLists(lepList)
+add_skim('LeptonicUntagged', LeptonicList())
 
 # Charm Skim
 from Charm_List import *
-CharmList = CharmRareList()
-skimOutputUdst('CharmRare', CharmList)
-summaryOfLists(CharmList)
+add_skim('CharmRare', CharmRareList())
 
 # FEI Skim
 

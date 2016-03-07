@@ -31,7 +31,7 @@ def inputMdstList(filelist, path=analysis_main):
     roinput = register_module('RootInput')
     roinput.param('inputFileNames', filelist)
     path.add_module(roinput)
-    progress = register_module('Progress')
+    progress = register_module('ProgressBar')
     path.add_module(progress)
 
     gearbox = register_module('Gearbox')

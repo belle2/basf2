@@ -90,6 +90,7 @@ class ModulesInformation:
         Initialize with the module list from the framework.
         """
         from basf2 import fw
+        #: The cached list of modules the framework offers.
         self.module_list = fw.list_available_modules()
 
     def search(self, regex_string):

@@ -31,7 +31,8 @@ class Basf2Widget(object):
 
 
 class StylingWidget(Basf2Widget):
-    """The css string for styling the notebook."""
+    """ Style the notebooks with this widget. """
+    # The css string for styling the notebook.
     css_string = """
         #notebook {
             background-color: rgba(20, 166, 255, 0.3);
@@ -53,9 +54,8 @@ class StylingWidget(Basf2Widget):
         }
         """
 
-    """Create the styling widget."""
-
     def create(self):
+        """Create the styling widget."""
         from IPython.core.display import HTML, display
         html = HTML("<style>\n%s\n</style>" % self.css_string)
         return html
@@ -132,6 +132,7 @@ class PathViewer(Basf2Widget):
         except:
             self.path = path
 
+        # If true, show full information on the modules, else show the current used parameters.
         self.standalone = standalone
 
     def create(self):
@@ -168,11 +169,17 @@ class ModuleViewer(Basf2Widget):
 
     def __init__(self, module, standalone=True):
         """ Init with a module as a string or a registered one. """
+
+        #: The basf2 module this viewer is related to
+        self.module = None
+
         if isinstance(module, str):
             import basf2
             self.module = basf2.register_module(module)
         else:
             self.module = module
+
+        #: Same principle as in the path viewer
         self.standalone = standalone
 
         #: Template for the table beginning
@@ -417,7 +424,9 @@ class StatisticsViewer(Basf2Widget):
 
         #: Template for a table cell
         self.table_cell_html = """<td style="padding: 10px;">{content}</td>"""
+        #: Template for a 3-column table cell
         self.table_cell_col_3_html = """<td colspan="3" style="padding: 10px;">{content}</td>"""
+        #: Template for a left-aligned table cell
         self.table_cell_left_html = """<td style="padding: 10px; text-align: left">{content}</td>"""
 
     def create(self):

@@ -16,6 +16,10 @@ class Basf2Process(Process):
     """
 
     def __init__(self, path, result_queue, log_file_name, random_seed=None, parameters=None, **kwargs):
+        """
+        Create a new process. Variables are the basf2 path, the queue used for results,
+        the file name for the logs and the random seed (which can be left empty).
+        """
         if result_queue is None:
             raise ValueError("Invalid result_queue")
 
@@ -33,6 +37,10 @@ class Basf2Process(Process):
         self.path = path
         #: Parameters in process_parameter_space
         self.parameters = parameters
+        #: The queue used for progress bar communication (local end)
+        self.progress_queue_local = None
+        #: The queue used for progress bar communication (remote end)
+        self.progress_queue_remote = None
 
         if path:
             # Append the needed ToFileLogger module
@@ -47,7 +55,7 @@ class Basf2Process(Process):
 
             self.path = created_path
 
-            # Create the queue for the progress python module
+            #: Create the queue for the progress python module
             self.progress_queue_local, self.progress_queue_remote = Pipe()
 
             # Add the progress python module

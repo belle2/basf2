@@ -87,6 +87,9 @@ class ModuleStatistics:
     """
 
     def __init__(self, stats, categories):
+        """
+        Create new module statistics based on basf2 statistics.
+        """
         #: Name property
         self.name = stats.name
         #: Time sum property

@@ -31,7 +31,6 @@ loadStdLightMesons()
 from Tau_List import *
 tauList = TauLFVList()
 
-removeParticlesNotInLists(tauList)
 skimOutputUdst('TauLFV_Standalone', tauList)
 summaryOfLists(tauList)
 

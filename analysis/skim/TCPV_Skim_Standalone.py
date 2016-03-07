@@ -33,7 +33,6 @@ loadStdKS()
 # TCPV Skim
 from TCPV_List import *
 tcpvList = TCPVList()
-removeParticlesNotInLists(tcpvList)
 skimOutputUdst('TCPV_Standalone', tcpvList)
 summaryOfLists(tcpvList)
 

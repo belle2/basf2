@@ -39,12 +39,15 @@ reconstructDecay('B+:signal -> tau+:signal', '', writeOut=True, path=selection_p
 matchMCTruth('B+:signal', path=selection_path)
 buildRestOfEvent('B+:signal', path=selection_path)
 
+selection_path.add_module('MCDecayFinder', decayString='B+ ==> tau+ nu_tau', listName='B+:FEIMC', writeOut=True)
+
 particles = get_unittest_channels()
 
 tempdir = tempfile.mkdtemp()
 os.chdir(tempdir)
 
 sys.argv.append('-verbose')
+sys.argv.append('-prune')
 
 # MCCount Histograms,
 feistate = fullEventInterpretation('B+:signal', selection_path, particles)

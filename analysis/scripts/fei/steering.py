@@ -255,8 +255,20 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
         dag.save_cached_resources(args.cache)
 
     if args.prune:
-        listNames = ['RawParticleList_' + channel.name for particle in particles for channel in particle.channels]
+        listNames = []
+        for particle in particles:
+            sig = 'SignalProbability_' + particle.identifier
+            if sig in dag.resources and dag.resources[sig].value is not None:
+                listNames += ['ParticleList_' + particle.identifier]
+            else:
+                listNames += ['RawParticleList_' + channel.name for channel in particle.channels]
         particleLists = [dag.resources[i].value for i in listNames if i in dag.resources and dag.resources[i].value is not None]
+        if signalParticleList:
+            particleLists += [signalParticleList]  # , 'B+:FEIMC'] FEIMC uses different particle array
+        if args.verbose:
+            print("Removing particles which aren't in the following lists")
+            print(listNames)
+            print(particleLists)
         fei_path.add_module("RemoveParticlesNotInLists", particleLists=particleLists)
 
     path = create_path()

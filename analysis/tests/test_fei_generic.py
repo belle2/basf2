@@ -38,6 +38,7 @@ tempdir = tempfile.mkdtemp()
 os.chdir(tempdir)
 
 sys.argv.append('-verbose')
+sys.argv.append('-prune')
 
 # MCCount Histograms,
 feistate = fullEventInterpretation(None, selection_path, particles)
@@ -191,18 +192,6 @@ assert len(glob.glob('Monitor_GenerateTrainingData_*')) == 11
 assert len(glob.glob('Monitor_*')) == 102
 assert feistate.is_trained
 
-sys.argv.append('-prune')
-
-feistate = fullEventInterpretation(None, selection_path, particles)
-feistate.path.modules()[0].param('inputFileName', 'RootInput.root')
-feistate.path.modules()[0].param('inputFileNames', [])
-feistate.path.add_module('RootOutput')
-process(feistate.path)
-assert len(glob.glob('cache.pickle.bkp5')) == 1
-assert feistate.is_trained
-assert os.path.getsize('RootOutput.root') < os.path.getsize('RootInput.root')
-
-sys.argv.pop()
 sys.argv.pop()
 sys.argv.pop()
 

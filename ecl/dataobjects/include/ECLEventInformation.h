@@ -21,7 +21,7 @@ namespace Belle2 {
   public:
 
     /** Constructor. */
-    ECLEventInformation(int backgroundecl = 0)
+    explicit ECLEventInformation(int backgroundecl = 0)
       : m_backgroundECL(backgroundecl) {}
 
     /** Background by ECL Setter.

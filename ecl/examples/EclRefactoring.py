@@ -20,11 +20,11 @@ import sys
 import glob
 
 # user input
-withbg = 0  # add beam background boolean
-bgfolder = '.'  # folder that holds beam background
-bgfrac = 0.5  # fracion of nominal background
+withbg = 1  # add beam background boolean
+bgfolder = '/gs/project/belle2-mcgill/users/belle2/background/campaign12'  # folder that holds beam background
+bgfrac = 1.0  # fracion of nominal background
 seed = 12345  # seed for random numbers
-mdstfile = 'out.root'  # output file
+mdstfile = 'refactoring.root'  # output file
 
 # set log level
 set_log_level(LogLevel.INFO)
@@ -46,7 +46,7 @@ main.add_module(evtgeninput)
 # add default full simulation and digitization
 if (withbg == 1):
     bg = glob.glob(bgfolder + '/*.root')
-    add_simulation(main, bkgfiles=bg, bkgfraction=bgfrac)
+    add_simulation(main, bkgfiles=bg, bkgscale=bgfrac)
 else:
     add_simulation(main)
 
@@ -78,14 +78,37 @@ main.add_module(top_rec)
 arich_rec = register_module('ARICHReconstructor')
 main.add_module(arich_rec)
 
+# --------------------------------------------------
+# --------------------------------------------------
 # ECL digit calibration
 ecl_digit_calibration = register_module('ECLDigitCalibrator')
 main.add_module(ecl_digit_calibration)
 
-# ECL shower reconstruction
-ecl_shower_rec = register_module('ECLReconstructor')
-main.add_module(ecl_shower_rec)
+# ECL Shower Reconstruction
+ecl_reco = register_module('ECLCRFinderAndSplitter')
+main.add_module(ecl_reco)
 
+# ECL Shower Correction
+ecl_showercorrection = register_module('ECLShowerCorrector')
+main.add_module(ecl_showercorrection)
+
+# ECL Shower Calibration
+ecl_showercalibration = register_module('ECLShowerCalibrator')
+main.add_module(ecl_showercalibration)
+
+# ECL Shower Shape
+ecl_showershape = register_module('ECLShowerShape')
+main.add_module(ecl_showershape)
+
+# ECL covariance matrix
+ecl_covariance = register_module('ECLCovarianceMatrix')
+main.add_module(ecl_covariance)
+
+# ECL finalize
+ecl_finalize = register_module('ECLFinalizer')
+main.add_module(ecl_finalize)
+
+# OLD MODULES STILL USING ECLHITASSIGNMENT
 # ECL track shower matching
 ecl_track_match = register_module('ECLTrackShowerMatch')
 main.add_module(ecl_track_match)
@@ -97,6 +120,9 @@ main.add_module(electron_id)
 # ECL MC matching
 ecl_mc = register_module('MCMatcherECLClusters')
 main.add_module(ecl_mc)
+
+# --------------------------------------------------
+# --------------------------------------------------
 
 # EKLM
 eklm_rec = register_module('EKLMReconstructor')

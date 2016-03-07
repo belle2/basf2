@@ -104,8 +104,8 @@ void WaveTimingV3Module::event()
 
     //      m_tmp_h->Smooth(2);
     int search_peaks_found = spec->Search(&m_tmp_h, m_sigma, "nodraw", 0.1);
-    double* xpos = spec->GetPositionX();
-    double* ypos = spec->GetPositionY();
+    float* xpos = spec->GetPositionX();
+    float* ypos = spec->GetPositionY();
 
     //Create TOPDigit
     int channelID = -9;

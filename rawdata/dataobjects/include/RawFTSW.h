@@ -153,7 +153,7 @@ namespace Belle2 {
     /// To derive from TObject
     /// ver.2 Remove m_FTSW_header and introduce a new data format on Nov. 20, 2013
     /// ver.3 Add m_access on Mar. 7 2016
-    ClassDef(RawFTSW, 3);
+    ClassDef(RawFTSW, 2);
 
   };
 }

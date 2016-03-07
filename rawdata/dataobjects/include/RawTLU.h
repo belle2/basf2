@@ -14,6 +14,7 @@
 #include <sys/time.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
+#include <rawdata/dataobjects/RawTLUFormat.h>
 #include <framework/datastore/DataStore.h>
 
 #include <TObject.h>
@@ -38,53 +39,59 @@ namespace Belle2 {
     /*     int GetNwords(int n); */
 
     //!Get the size of the header
-    int GetNwordsHeader(int n);
+    int GetNwordsHeader(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetNwordsHeader(n);
+    }
 
     //! Get Node ID
-    unsigned int GetNodeID(int n);
+    unsigned int GetNodeID(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetNodeID(n);
+    }
 
     //! Get Event #
-    unsigned int GetEveNo(int n);
+    unsigned int GetEveNo(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetEveNo(n);
+    }
 
     //! Get Magic Trailer #
-    unsigned int GetMagicTrailer(int n);
+    unsigned int GetMagicTrailer(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetMagicTrailer(n);
+    }
 
     //! Get Run #
-    int GetRunNo(int n);
+    int GetRunNo(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetRunNo(n);
+    }
 
     //! Get TLU event tag
-    unsigned int GetTLUEventTag(int n);
+    unsigned int GetTLUEventTag(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetTLUEventTag(n);
+    }
 
     //! check data contents
-    void CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenum);
+    void CheckData(int n, unsigned int prev_evenum, unsigned int* cur_evenum)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->CheckData(n, prev_evenum, cur_evenum);
+    }
 
-
-    enum {
-      POS_NWORDS = 0,
-      POS_HDR_NWORDS = 1,
-      POS_NUMEVE_NUMNODES = 2,
-      POS_RUN_NO = 3,
-      POS_EVE_NO = 4,
-      POS_NA_1 = 5,
-      POS_NODE_ID = 6,
-      POS_NA_2 = 7,
-      POS_TLU_EVENTTAG = 8,
-      POS_NA_3 = 9,
-      POS_TLU_TIME_1 = 10,
-      POS_TLU_TIME_2 = 11,
-      POS_RSVD_1 = 12,
-      POS_MAGIC_1 = 13
-    };
-
-    enum {
-      SIZE_TLU_PACKET = 14
-    };
-
-    enum {
-      TLU_MAGIC_TRAILER = 0x7FFF0000
-    };
+    //! class to access
+    RawTLUFormat* m_access; //! do not record
 
   protected :
+
     /// To derive from TObject
     ClassDef(RawTLU, 1);
 

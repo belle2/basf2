@@ -210,6 +210,17 @@ void PrintDataTemplateModule::event()
   }
 
   //
+  // TLU data
+  //
+  StoreArray<RawTLU> raw_tluarray;
+  for (int i = 0; i < raw_tluarray.getEntries(); i++) {
+    for (int j = 0; j < raw_tluarray[ i ]->GetNumEntries(); j++) {
+      printf("\n===== DataBlock(RawTLU) : Block # %d ", i);
+      printFTSWEvent(raw_tluarray[ i ], j);
+    }
+  }
+
+  //
   // FTSW data
   //
   StoreArray<RawFTSW> raw_ftswarray;

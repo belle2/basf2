@@ -8,11 +8,6 @@
 
 #ifndef RAWFTSWFORMAT_H
 #define RAWFTSWFORMAT_H
-
-// Includes
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
 #include <rawdata/dataobjects/RawDataBlockFormat.h>
 
 namespace Belle2 {

@@ -19,7 +19,8 @@
 namespace Belle2 {
 
   //  class SendTrailer{
-  class SendTrailer : public TObject {
+  //  class SendTrailer : public TObject {
+  class SendTrailer {
   public:
     //! Default constructor
     SendTrailer();
@@ -59,7 +60,7 @@ namespace Belle2 {
     };
 
     int m_buffer[ SENDTRL_NWORDS ];
-    ClassDef(SendTrailer, 1);
+    //    ClassDef(SendTrailer, 1);
   };
 }
 

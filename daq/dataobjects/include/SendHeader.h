@@ -11,7 +11,7 @@
 
 #include <string.h>
 #include <framework/datastore/DataStore.h>
-#include <TObject.h>
+//#include <TObject.h>
 #include <daq/rawdata/modules/DAQConsts.h>
 
 #include "rawdata/dataobjects/RawHeader_latest.h"
@@ -19,7 +19,8 @@
 
 namespace Belle2 {
 
-  class SendHeader : public TObject {
+  //  class SendHeader : public TObject {
+  class SendHeader {
   public:
 
     //! Default constructor
@@ -87,7 +88,7 @@ namespace Belle2 {
 
     int m_buffer[ SENDHDR_NWORDS ];
 
-    ClassDef(SendHeader, 1);
+    //    ClassDef(SendHeader, 1);
   };
 
 

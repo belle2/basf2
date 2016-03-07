@@ -11,11 +11,11 @@ from basf2 import *
 # time when the upper surface is crossed and time resolutions
 # (numbers below are arbitrary!)
 # ----------------------------------------------------------------------------------
-upperPad = [17.2, 0, 25, 30, 37]  # upper trig. paddle: z, x, size_z, size_x, y [cm]
+upperPad = [14.7, 0, 25, 30, 37]  # upper trig. paddle: z, x, size_z, size_x, y [cm]
 lowerPad = [14.7, 0, 25, 25, -63]  # lower trig. paddle: z, x, size_z, size_x, y [cm]
 startTime = 0  # time at crossing the upperPad [ns]
-sigmaAsic = 2.5  # electronic time resolution [ns]
-sigmaTrig = 1.5  # trigger paddles time resolution [ns]
+sigmaAsic = 1.5  # electronic time resolution [ns]
+sigmaTrig = 2.5  # trigger paddles time resolution [ns]
 # ----------------------------------------------------------------------------------
 
 

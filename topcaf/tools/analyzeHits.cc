@@ -1,8 +1,6 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TCut.h>
-#include <TTreeReader.h>
-#include <TTreeReaderArray.h>
 #include <topcaf/dataobjects/TOPCAFDigit.h>
 #include <TCanvas.h>
 #include <TGraph.h>

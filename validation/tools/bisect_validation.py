@@ -43,6 +43,7 @@ http://git-scm.com/docs/git-bisect
 """
 
 import os
+import json
 import sys
 import shutil
 import subprocess
@@ -53,6 +54,17 @@ from functools import reduce
 
 import quantity_extract
 import validationtools
+
+
+def get_error_count_from_json(file_name):
+    """
+    Get the number of failed comparisons for the json file
+    """
+    with open(file_name, 'r') as fp:
+        jdata = json.load(fp)
+        packages = jdata["packages"]
+        error_count = packages[0]["comparison_error"]
+        return error_count
 
 
 def extract_information_from_file(file_name, results):
@@ -128,6 +140,10 @@ parser.add_argument(
          'error code != 0. By default, this is reported to git.')
 parser.add_argument('--check-quantity', action="append",
                     help='Check for a quantity in validation files')
+parser.add_argument('--check-failed-comparison', action='store_true', default=False,
+                    help='Check if one comparison to a reference plot failed')
+parser.add_argument('--max-failed-comparison', type=int, default=0,
+                    help='Maximum number of comparisons allowed to fail')
 parser.add_argument('--test-check', action='store_true', default=False,
                     help='Just check for the quantity, but do not run any git or compile commands')
 parser.add_argument('--execute', action="append",
@@ -224,6 +240,29 @@ if argsVar["keep"] is True:
         # remove a previously archieved folder, if present
         shutil.rmtree(archive_folder_name, True)
         shutil.copytree("results", archive_folder_name)
+
+# check if comparison failed ?!?
+if argsVar["check_failed_comparison"]:
+    plots_result_folder = "html/plots/"
+    comparsion_json_filename = "comparison.json"
+
+    comparison_folders = [(x, os.lstat(os.path.join(plots_result_folder, x, comparsion_json_filename)))
+                          for x in os.listdir(plots_result_folder) if os.path.isdir(os.path.join(plots_result_folder, x))]
+    if len(comparison_folders) > 0:
+        # sort by newest folder
+        comparison_folders = sorted(comparison_folders, key=lambda x: x[1].st_mtime)
+
+        # taking the newest (last in list) folder
+        result_file_name = os.path.join(plots_result_folder, comparison_folders[-1][0], comparsion_json_filename)
+        ecount = get_error_count_from_json(result_file_name)
+
+        print("This revision has {} failed comparisons".format(ecount))
+
+        # one comparison error found, tell git
+        if ecount > argsVar["max_failed_comparison"]:
+            sys.exit(1)
+    else:
+        print("Cannot check for failed comparisons, no output folder in {}".format(plots_result_folder))
 
 # perform checks
 for c in c_parsed:

@@ -42,11 +42,8 @@ def add_skim(label, lists):
     create uDST skim for given lists, saving into $label.udst.root
     Particles not necessary for the given particle lists are not saved.
     """
-    skimpath = create_path()
-    removeParticlesNotInLists(lists, path=skimpath)
-    skimOutputUdst(label, lists, path=skimpath)
-    summaryOfLists(lists, path=skimpath)
-    analysis_main.add_skim_path(skimpath, "skim_" + label)
+    skimOutputUdst(label, lists)
+    summaryOfLists(lists)
 
 
 # Double Charm Skim

@@ -51,6 +51,9 @@ def outputUdst(filename, particleLists=[], path=analysis_main):
     """
     Save uDST (micro-Data Summary Tables) = MDST + Particles + ParticleLists
     The charge-conjugate lists of those given in particleLists are also stored.
+
+    Note that this does not reduce the amount of Particle objects saved,
+    see skimOutputUdst() for a function that does.
     """
 
     import reconstruction
@@ -71,7 +74,8 @@ def outputUdst(filename, particleLists=[], path=analysis_main):
 def skimOutputUdst(skimname, particleLists=[], path=analysis_main):
     """
     Create a new path for events that contain a non-empty particle list.
-    Write the accepted events as a udst file.
+    Write the accepted events as a udst file, saving only necessary particles.
+
     Currently mdst are also written. This is for testing purposes
     and will be removed in the future.
     """
@@ -80,10 +84,15 @@ def skimOutputUdst(skimname, particleLists=[], path=analysis_main):
     skimfilter.set_name('SkimFilter_' + skimname)
     skimfilter.param('particleLists', particleLists)
     path.add_module(skimfilter)
+    filter_path = create_path()
+    skimfilter.if_value('=1', filter_path, AfterConditionPath.CONTINUE)
+
+    # add_skim_path() is rather expensive, only do this for skimmed events
     skim_path = create_path()
-    skimfilter.if_value('=1', skim_path, AfterConditionPath.CONTINUE)
+    removeParticlesNotInLists(particleLists, path=skim_path)
     outputUdst(skimname + '.udst.root', particleLists, path=skim_path)
     outputMdst(skimname + '.mdst.root', path=skim_path)
+    filter_path.add_skim_path(skim_path, "skim_" + skimname)
 
 
 def generateY4S(noEvents, decayTable=None, path=analysis_main):

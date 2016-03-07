@@ -444,6 +444,35 @@ def _add_module(self, module, logLevel=None, debugLevel=None, **kwargs):
 Path.add_module = _add_module
 
 
+def _add_skim_path(self, skim_path, ds_ID=''):
+    """
+    Add given path at the end of this path and ensure all modules there
+    do not influence the main DataStore. You can thus use modules in
+    skim_path to clean up e.g. the list of particles, save a skimmed uDST file,
+    and continue working with the unmodified DataStore contents outside of
+    skim_path.
+    ds_ID can be specified to give a defined ID to the temporary DataStore,
+    otherwise, a random name will be generated.
+    """
+    if not ds_ID:
+        import random
+        ds_ID = 'skim' + str(random.randint(0, 4000000))
+    switchStart = self.add_module('SwitchDs', toID=ds_ID, doCopy=True)
+    self.add_path(skim_path)
+    switchEnd = self.add_module('SwitchDs', toID="", doCopy=False)
+
+    switchStart.set_name("SwitchDs ('' -> '" + ds_ID + "')")
+    switchEnd.set_name("SwitchDs ('' <- '" + ds_ID + "')")
+
+    # this can be set if all modules in between also have the flag
+    flag = ModulePropFlags.PARALLELPROCESSINGCERTIFIED
+    if all([mod.has_properties(flag) for mod in skim_path.modules()]):
+        switchStart.set_property_flags(flag)
+        switchEnd.set_property_flags(flag)
+
+Path.add_skim_path = _add_skim_path
+
+
 def serialize_value(module, parameter):
     if parameter.name == 'path' and module.type() == 'SubEvent':
         return serialize_path(parameter.values)

@@ -16,6 +16,7 @@
 #include <framework/datastore/RelationEntry.h>
 #endif
 
+#include <array>
 #include <vector>
 #include <string>
 #include <map>
@@ -31,7 +32,7 @@ namespace Belle2 {
 
   /** In the store you can park objects that have to be accessed by various modules.
    *
-   *  Normal users should to access the store via StoreAccessorBase-derived classes like
+   *  Normal users should access the store via StoreAccessorBase-derived classes like
    *  StoreObjPtr or StoreArray.
    *
    *  Nomenclature:
@@ -87,6 +88,8 @@ namespace Belle2 {
     typedef std::map<std::string, StoreEntry> StoreEntryMap;  /**< Map for StoreEntries. */
     typedef StoreEntryMap::iterator StoreEntryIter;              /**< Iterator for a StoreEntry map. */
     typedef StoreEntryMap::const_iterator StoreEntryConstIter;   /**< const_iterator for a StoreEntry map. */
+    typedef std::array<StoreEntryMap, c_NDurabilityTypes> DataStoreContents; /**< StoreEntry maps for each durability. */
+
 
     /** Global flag to to decide if we can do normal cleanup.
      *
@@ -539,7 +542,7 @@ namespace Belle2 {
      */
     void invalidateData(EDurability durability);
 
-    /** Frees memory occopied by data store items and removes all objects from the map.
+    /** Frees memory occupied by data store items and removes all objects from the map.
      *
      *  Afterwards, m_storeEntryMap[durability] is empty.
      *  Called by the framework. Users should usually not use this function without good reason.
@@ -556,11 +559,20 @@ namespace Belle2 {
     DependencyMap& getDependencyMap() { return *m_dependencyMap; }
 
 
+    /** creates new datastore with given id, copying the registered objects/arrays from the current one. */
+    void createNewDataStoreID(const std::string& id);
+    /** returns ID of current DataStore. */
+    std::string currentID() const;
+    /** switch to DataStore with given ID. */
+    void switchID(const std::string& id);
+    /** copy contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
+    void copyContentsTo(const std::string& id);
+
   private:
     /** Hidden constructor, as it is a singleton.*/
     explicit DataStore();
-    /** same for copy constructor */
-    DataStore(const DataStore&);
+    /** no copy constructor */
+    DataStore(const DataStore&) = delete;
     /** Destructor. */
     ~DataStore();
 
@@ -588,8 +600,46 @@ namespace Belle2 {
      */
     static void updateRelationsObjectCache(StoreEntry& entry);
 
+    /** Encapsulates DataStoreContents, but allows transparently switching between different versions ('DataStore IDs').
+     *
+     * Accessed only through operator[].
+     */
+    class SwitchableDataStoreContents {
+    public:
+      SwitchableDataStoreContents();
+      /** same as calling reset() for all durabilities + all non-default datastore IDs are removed. */
+      void clear();
+      /** Frees memory occupied by data store items and removes all objects from the map. */
+      void reset(EDurability durability);
+      /** Clears all registered StoreEntry objects of a specified durability, invalidating all objects. */
+      void invalidateData(EDurability durability);
+      /** Get StoreEntry map for given durability (and current DataStore ID). */
+      const StoreEntryMap& operator [](int durability) const { return m_entries[m_currentIdx][durability]; }
+      /** Get StoreEntry map for given durability (and current DataStore ID). */
+      StoreEntryMap& operator [](int durability)
+      {
+        //reuse const implementation
+        const SwitchableDataStoreContents* this2 = this;
+        return const_cast<StoreEntryMap&>((*this2)[durability]);
+      }
+
+      /** switch to DataStore with given ID. */
+      void switchID(const std::string& id);
+      /** returns ID of current DataStore. */
+      const std::string& currentID() const { return m_currentID; }
+      /** copy contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
+      void copyContentsTo(const std::string& id);
+      /** creates new datastore with given id, copying the registered objects/arrays from the current one. */
+      void createNewDataStoreID(const std::string& id);
+    private:
+      std::vector<DataStoreContents> m_entries; /**< wrapped DataStoreContents. */
+      std::map<std::string, int> m_idToIndexMap; /**< Maps DataStore ID to index in m_entries. */
+      std::string m_currentID = ""; /**< currently active DataStore ID. */
+      int m_currentIdx = 0; /**< index of currently active DataStore. */
+    };
     /** Maps (name, durability) key to StoreEntry objects. */
-    StoreEntryMap m_storeEntryMap[c_NDurabilityTypes];
+    SwitchableDataStoreContents m_storeEntryMap;
+
 
     /** True if modules are currently being initialized.
      *

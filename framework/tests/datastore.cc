@@ -65,6 +65,30 @@ namespace {
       DataStore::Instance().reset();
     }
 
+    /** verify contents created in SetUp(). */
+    static void verifyContents()
+    {
+      StoreObjPtr<EventMetaData> evtPtr;
+      EXPECT_EQ(evtPtr->getEvent(), (unsigned long)42);
+
+      StoreArray<EventMetaData> evtData;
+      StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
+      StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Persistent);
+      StoreArray<ProfileInfo> profileInfo;
+      EXPECT_EQ(evtData.getEntries(), 10);
+      EXPECT_EQ(evtDataDifferentName.getEntries(), 10);
+      EXPECT_EQ(evtDataDifferentDurability.getEntries(), 10);
+      EXPECT_EQ(profileInfo.getEntries(), 10);
+      for (int i = 0; i < 10; ++i) {
+        EXPECT_EQ((int)evtData[i]->getEvent(), 10 + i);
+        EXPECT_EQ((int)evtDataDifferentName[i]->getEvent(), 20 + i);
+        EXPECT_EQ((int)evtDataDifferentDurability[i]->getEvent(), 30 + i);
+
+        EXPECT_EQ(profileInfo[i]->getVirtualMemory(), 128u);
+        EXPECT_FLOAT_EQ(profileInfo[i]->getTimeInSec(), 60.0);
+      }
+    }
+
   };
 
   TEST_F(DataStoreTest, EntryNames)
@@ -189,27 +213,10 @@ namespace {
   /** read data */
   TEST_F(DataStoreTest, VerifyContents)
   {
-    StoreObjPtr<EventMetaData> evtPtr;
-    EXPECT_EQ(evtPtr->getEvent(), (unsigned long)42);
-
-    StoreArray<EventMetaData> evtData;
-    StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
-    StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Persistent);
-    StoreArray<ProfileInfo> profileInfo;
-    EXPECT_EQ(evtData.getEntries(), 10);
-    EXPECT_EQ(evtDataDifferentName.getEntries(), 10);
-    EXPECT_EQ(evtDataDifferentDurability.getEntries(), 10);
-    EXPECT_EQ(profileInfo.getEntries(), 10);
-    for (int i = 0; i < 10; ++i) {
-      EXPECT_EQ((int)evtData[i]->getEvent(), 10 + i);
-      EXPECT_EQ((int)evtDataDifferentName[i]->getEvent(), 20 + i);
-      EXPECT_EQ((int)evtDataDifferentDurability[i]->getEvent(), 30 + i);
-
-      EXPECT_EQ(profileInfo[i]->getVirtualMemory(), 128u);
-      EXPECT_FLOAT_EQ(profileInfo[i]->getTimeInSec(), 60.0);
-    }
+    verifyContents();
 
     //test removing data
+    StoreArray<EventMetaData> evtData;
     evtData.clear();
     EXPECT_TRUE(evtData.isValid());
     EXPECT_EQ(evtData.getEntries(), 0);
@@ -552,5 +559,38 @@ namespace {
       EXPECT_EQ(0, evtData.getEntries());
       EXPECT_EQ(0, evtDataB.getEntries());
     }
+  }
+
+  TEST_F(DataStoreTest, SwitchDataStore)
+  {
+    EXPECT_TRUE("" == DataStore::Instance().currentID());
+    //not created yet
+    EXPECT_THROW(DataStore::Instance().copyContentsTo("foo"), std::out_of_range);
+
+    //create new DS ID
+    DataStore::Instance().createNewDataStoreID("foo");
+    EXPECT_TRUE("" == DataStore::Instance().currentID());
+    DataStore::Instance().copyContentsTo("foo");
+    EXPECT_TRUE("" == DataStore::Instance().currentID());
+    verifyContents();
+    DataStore::Instance().switchID("foo");
+    EXPECT_TRUE("foo" == DataStore::Instance().currentID());
+    verifyContents(); //still unmodified
+
+    //change something
+    StoreObjPtr<EventMetaData> a;
+    a->setEvent(1234567);
+
+    //and restore
+    DataStore::Instance().switchID("");
+    EXPECT_TRUE("" == DataStore::Instance().currentID());
+    verifyContents(); //back to normal
+
+    //register another object in ""
+    //and try copying (this catches insufficient checks during copying)
+    StoreArray<EventMetaData> evtDataB("otherArray");
+    DataStore::Instance().setInitializeActive(true);
+    evtDataB.registerInDataStore();
+    DataStore::Instance().copyContentsTo("foo");
   }
 }  // namespace

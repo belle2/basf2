@@ -78,15 +78,14 @@ void DataStore::reset()
 
   for (int i = 0; i < c_NDurabilityTypes; i++)
     reset((EDurability)i);
+
+  m_storeEntryMap.clear();
 }
 
 void DataStore::reset(EDurability durability)
 {
-  for (auto& mapEntry : m_storeEntryMap[durability]) {
-    //delete stored object/array
-    delete mapEntry.second.object;
-  }
-  m_storeEntryMap[durability].clear();
+  m_storeEntryMap.reset(durability);
+
   //invalidate any cached relations (expect RelationArrays to remain valid)
   RelationIndexManager::Instance().clear();
 }
@@ -322,22 +321,20 @@ void DataStore::replaceData(const StoreAccessorBase& from, const StoreAccessorBa
     B2FATAL("No " << from.readableName() << " exists in the DataStore!");
   if (!toEntry)
     B2FATAL("No " << to.readableName() << " exists in the DataStore!");
-
-  if (from.isArray() != to.isArray() or from.getClass() != to.getClass()) {
+  if (from.isArray() != to.isArray() or from.getClass() != to.getClass())
     B2FATAL("cannot replace " << to.readableName() << " with " << from.readableName() << " (incompatible types)!");
-  }
 
   if (!fromEntry->ptr) {
     //since we don't need to move any data, just invalidate toEntry instead.
     toEntry->ptr = nullptr;
-  } else if (from.isArray()) {
+  } else if (fromEntry->isArray) {
     if (!toEntry->ptr)
       toEntry->ptr = toEntry->object;
     toEntry->getPtrAsArray()->Delete();
 
     fixAbsorbObjects(fromEntry->getPtrAsArray(), toEntry->getPtrAsArray());
     updateRelationsObjectCache(*toEntry);
-  } else if (from.getClass() == RelationContainer::Class()) {
+  } else if (fromEntry->objClass == RelationContainer::Class()) {
     if (!toEntry->ptr)
       toEntry->ptr = toEntry->object;
     RelationContainer* fromRel = static_cast<RelationContainer*>(fromEntry->ptr);
@@ -641,9 +638,7 @@ std::vector<std::string> DataStore::getListOfObjects(const TClass* objClass, EDu
 void DataStore::invalidateData(EDurability durability)
 {
   B2DEBUG(100, "Invalidating objects for durability " << durability);
-  for (auto& mapEntry : m_storeEntryMap[durability]) {
-    mapEntry.second.ptr = nullptr;
-  }
+  m_storeEntryMap.invalidateData(durability);
 }
 
 bool DataStore::requireInput(const StoreAccessorBase& accessor)
@@ -690,4 +685,130 @@ bool DataStore::optionalRelation(const StoreAccessorBase& fromArray, const Store
 
   const std::string& relName = relationName(fromArray.getName(), toArray.getName());
   return DataStore::Instance().optionalInput(StoreAccessorBase(relName, durability, RelationContainer::Class(), false));
+}
+
+
+void DataStore::createNewDataStoreID(const std::string& id)
+{
+  m_storeEntryMap.createNewDataStoreID(id);
+}
+
+std::string DataStore::currentID() const
+{
+  return m_storeEntryMap.currentID();
+}
+
+void DataStore::switchID(const std::string& id)
+{
+  if (id == m_storeEntryMap.currentID())
+    return;
+
+  //remember to clear caches
+  RelationIndexManager::Instance().clear();
+
+  m_storeEntryMap.switchID(id);
+}
+
+void DataStore::copyContentsTo(const std::string& id) { m_storeEntryMap.copyContentsTo(id); }
+
+
+DataStore::SwitchableDataStoreContents::SwitchableDataStoreContents():
+  m_entries(1)
+{
+  m_idToIndexMap[""] = 0;
+}
+
+void DataStore::SwitchableDataStoreContents::createNewDataStoreID(const std::string& id)
+{
+  //does this id already exist?
+  if (m_idToIndexMap.count(id) > 0)
+    return;
+
+  int newidx = m_entries.size();
+  m_idToIndexMap[id] = newidx;
+
+  //copy entries
+  m_entries.push_back(m_entries[m_currentIdx]);
+  //fix duplicate pointers
+  for (auto& map : m_entries[newidx]) {
+    for (auto& entrypair : map) {
+      if (not entrypair.second.object)
+        B2FATAL("createNewDataStoreID(): object '" << entrypair.first << " already null (this should never happen).");
+
+      entrypair.second.object = nullptr; //remove duplicate ownership
+      entrypair.second.ptr = nullptr;
+    }
+  }
+  //copy actual contents, fixing pointers
+  copyContentsTo(id);
+}
+
+void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& id)
+{
+  int targetidx = m_idToIndexMap.at(id);
+  auto& targetMaps = m_entries[targetidx];
+  const auto& sourceMaps = m_entries[m_currentIdx];
+
+  for (int iDurability = 0; iDurability < c_NDurabilityTypes; iDurability++) {
+    for (const auto& entrypair : sourceMaps[iDurability]) {
+      const StoreEntry& fromEntry = entrypair.second;
+      //does this exist in target?
+      if (targetMaps[iDurability].count(fromEntry.name) == 0)
+        continue;
+
+      StoreEntry& target = targetMaps[iDurability][fromEntry.name];
+
+      //copy contents into target object
+      if (not fromEntry.ptr) {
+        if (!target.object)
+          target.recoverFromNullObject();
+        target.ptr = nullptr;
+      } else {
+        //TODO there is some optimisation opportunity here, e.g. by only cloning the entries of a TClonesArray instead of the array itself
+        delete target.object;
+        target.object = fromEntry.object->Clone();
+        target.ptr = target.object;
+      }
+    }
+  }
+
+}
+
+void DataStore::SwitchableDataStoreContents::switchID(const std::string& id)
+{
+  //switch
+  m_currentID = id;
+  m_currentIdx = m_idToIndexMap.at(id);
+
+  if ((unsigned int)m_currentIdx >= m_entries.size())
+    B2FATAL("out of bounds in SwitchableDataStoreContents::switchID(): " << m_currentIdx << " >= size " << m_entries.size());
+}
+
+void DataStore::SwitchableDataStoreContents::clear()
+{
+  for (int i = 0; i < c_NDurabilityTypes; i++)
+    reset((EDurability)i);
+
+  m_entries.clear();
+  m_entries.resize(1);
+  m_idToIndexMap.clear();
+  m_idToIndexMap[""] = 0;
+  m_currentID = "";
+  m_currentIdx = 0;
+}
+
+void DataStore::SwitchableDataStoreContents::reset(EDurability durability)
+{
+  for (auto& map : m_entries) {
+    for (auto& mapEntry : map[durability])
+      delete mapEntry.second.object;
+    map[durability].clear();
+  }
+}
+
+void DataStore::SwitchableDataStoreContents::invalidateData(EDurability durability)
+{
+  for (auto& map : m_entries)
+    for (auto& mapEntry : map[durability])
+      mapEntry.second.ptr = nullptr;
 }

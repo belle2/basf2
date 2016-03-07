@@ -305,7 +305,7 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
 
   map<string, straightElement> straights;
   map<string, bendingElement> bendings;
-  BOOST_FOREACH(const GearDir & element, content.getNodes("Straight")) {
+  for (const GearDir& element : content.getNodes("Straight")) {
 
     string name = element.getString("@name");
     string type = element.getString("@type");
@@ -323,12 +323,12 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
   }
 
   string str_checklist[] = {"LHR1", "LHR2", "LLR1", "LLR2", "LLR3", "LLR4", "LLR5", "LHL1", "LHL2", "LLL1", "LLL2", "LLL3", "LLL4"};
-  BOOST_FOREACH(const string & str, str_checklist) {
+  for (const string& str : str_checklist) {
     if (straights.count(str) == 0)
       B2FATAL("You need FarBeamLine.xml to run SADInput module. Please include FarBeamLine.xml in Belle2.xml. You also need to change 'length' in Belle2.xml to be 40m.");
   }
 
-  BOOST_FOREACH(const GearDir & element, content.getNodes("Bending")) {
+  for (const GearDir& element : content.getNodes("Bending")) {
 
     string name = element.getString("@name");
     string type = element.getString("@type");
@@ -347,7 +347,7 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
   }
 
   string bend_checklist[] = {"BLC2RE", "BC1RP", "BLCWRP", "BLC1RP", "BLC2RP", "BLC1LE", "BC1LP", "BLC1LP", "BLC2LP"};
-  BOOST_FOREACH(const string & bnd, bend_checklist) {
+  for (const string& bnd : bend_checklist) {
     if (bendings.count(bnd) == 0)
       B2FATAL("You need FarBeamLine.xml to run SADInput module. Please include FarBeamLine.xml in Belle2.xml. You also need to change 'length' in Belle2.xml to be 40m.");
   }

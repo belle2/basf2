@@ -10,14 +10,9 @@
 #define RAWFTSW_H
 
 // Includes
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-
 #include <rawdata/dataobjects/RawDataBlock.h>
-#include <framework/datastore/DataStore.h>
+#include <rawdata/dataobjects/RawFTSWFormat.h>
 
-#include <TObject.h>
 
 namespace Belle2 {
 
@@ -30,165 +25,137 @@ namespace Belle2 {
   public:
     //! Default constructor
     RawFTSW();
+
     //! Constructor using existing pointer to raw data buffer
     //RawFTSW(int* bufin, int nwords);
     //! Destructor
     virtual ~RawFTSW();
 
-    /*     //! Get # of words in this buffer */
-    /*     int GetNwords(int n); */
-
     //! Get # of words of header
-    int GetNwordsHeader(int n);
+    int GetNwordsHeader(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetNwordsHeader(n);
+    }
 
     //! Get Node # ( should be "TTD " )
-    unsigned int GetFTSWNodeID(int n);
+    unsigned int GetFTSWNodeID(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetFTSWNodeID(n);
+    }
 
     //! Get event #
-    unsigned int GetEveNo(int n);
+    unsigned int GetEveNo(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetEveNo(n);
+    }
 
     //! Get a word containing ctime and trigger type info
-    unsigned int GetTTCtimeTRGType(int n);
+    unsigned int GetTTCtimeTRGType(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetTTCtimeTRGType(n);
+    }
 
     //! get unixtime of the trigger
-    unsigned int GetTTUtime(int n);
+    unsigned int GetTTUtime(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetTTUtime(n);
+    }
 
     //! Get ctime of the trigger
-    int GetTTCtime(int n);
+    int GetTTCtime(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetTTCtime(n);
+    }
 
     //! Get trgtype
-    int GetTRGType(int n);
+    int GetTRGType(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetTRGType(n);
+    }
 
     //! Get timeval from ctime and utime
-    void GetTTTimeVal(int n, struct timeval* tv);
+    void GetTTTimeVal(int n, struct timeval* tv)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetTTTimeVal(n, tv);
+    }
 
     //! Get magic number for data corruption check
-    unsigned int GetMagicTrailer(int n);
-
-
+    unsigned int GetMagicTrailer(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetMagicTrailer(n);
+    }
 
     //! check the data contents
     void CheckData(int n,
                    unsigned int prev_evenum, unsigned int* cur_evenum,
-                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no);
+                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->CheckData(n, prev_evenum, cur_evenum, prev_exprunsubrun_no, cur_exprunsubrun_no);
+    }
 
     //! Exp# (10bit) run# (14bit) restart # (8bit)
-    unsigned int GetExpRunSubrun(int n);
+    unsigned int GetExpRunSubrun(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetExpRunSubrun(n);
+    }
 
     //! Get run #
-    int GetRunNo(int n);
+    int GetRunNo(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetRunNo(n);
+    }
 
 
     //! Get subrun #
-    int GetSubRunNo(int n);
+    int GetSubRunNo(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetSubRunNo(n);
+    }
 
     //! get a word cotaining run # and subrun #
-    int GetRunNoSubRunNo(int n);
+    int GetRunNoSubRunNo(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetRunNoSubRunNo(n);
+    }
 
     //! Get Exp #
-    int GetExpNo(int n);
+    int GetExpNo(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->GetExpNo(n);
+    }
 
     //! DESY test only
-    int Get15bitTLUTag(int n);
+    int Get15bitTLUTag(int n)
+    {
+      m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+      return m_access->Get15bitTLUTag(n);
+    }
 
-
-    /* #ifdef READ_OLD_B2LFEE_FORMAT_FILE */
-    /*     Warning!!! You are about to use the old format!!!! // it causes compile error */
-    /*     enum { */
-    /*       POS_NWORDS = 0, */
-    /*       POS_HDR_NWORDS = 1, */
-    /*       POS_NUMEVE_NUMNODES = 2, */
-    /*       POS_EXP_RUN_NO = 3, */
-    /*       POS_EVE_NO = 4, */
-    /*       POS_NODE_ID = 5, */
-    /*       POS_FTSW_1 = 6, */
-    /*       POS_FTSW_2 = 7, */
-    /*       POS_FTSW_3 = 8, */
-    /*       POS_FTSW_4 = 9, */
-    /*       POS_RSVD_1 = 10, */
-    /*       POS_MAGIC_1 = 11 */
-    /*     }; */
-
-    /*     enum { */
-    /*       SIZE_FTSW_PACKET = 12 */
-    /*     }; */
-    /* #else */
-    //
-
-    enum {
-      POS_NWORDS = 0,
-      POS_HDR_NWORDS = 1,
-      POS_NUMEVE_NUMNODES = 2,
-      POS_EXP_RUN_NO = 3,
-      POS_EVE_NO = 4,
-      POS_NA_1 = 5,
-      POS_NODE_ID = 6,
-      POS_NA_2 = 7,
-      POS_TT_CTIME_TRGTYPE = 8,
-      POS_TT_UTIME = 9,
-      POS_FTSW_3 = 10,
-      POS_FTSW_4 = 11,
-      POS_RSVD_1 = 12,
-      POS_MAGIC_1 = 13
-    };
-
-    enum {
-      EXP_MASK = 0xFFC00000,
-      EXP_SHIFT = 22,
-      RUNNO_MASK = 0x003FFF00,
-      RUNNO_SHIFT = 8,
-      SUBRUNNO_MASK = 0x000000FF,
-      TTCTIME_MASK = 0x7FFFFFF0,
-      TTCTIME_SHIFT = 4,
-      TRGTYPE_MASK = 0xF
-    };
-
-    enum {
-      SIZE_FTSW_PACKET = 14
-    };
-    //#endif
-
-    enum {
-      FTSW_MAGIC_TRAILER = 0x7FFF0000
-    };
+    //! class to access
+    RawFTSWFormat* m_access; //! do not record
 
   protected :
     /// To derive from TObject
     /// ver.2 Remove m_FTSW_header and introduce a new data format on Nov. 20, 2013
-    ClassDef(RawFTSW, 2);
+    /// ver.3 Add m_access on Mar. 7 2016
+    ClassDef(RawFTSW, 3);
 
   };
-
-  inline unsigned int RawFTSW::GetExpRunSubrun(int n)
-  {
-    return (unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]);
-
-  }
-
-
-  inline int RawFTSW::GetRunNo(int n)
-  {
-    return (((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) & RUNNO_MASK)
-            >> RUNNO_SHIFT);
-  }
-
-  inline int RawFTSW::GetSubRunNo(int n)
-  {
-    return (m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ] & SUBRUNNO_MASK);
-  }
-
-  inline int RawFTSW::GetRunNoSubRunNo(int n)
-  {
-    return ((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) &
-            (RUNNO_MASK | SUBRUNNO_MASK));
-  }
-
-  inline int RawFTSW::GetExpNo(int n)
-  {
-    return (((unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]) & EXP_MASK)
-            >> EXP_SHIFT);
-  }
-
 }
 
 #endif

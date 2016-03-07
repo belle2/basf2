@@ -89,11 +89,13 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
   printBuffer(buf, nwords);
 
 
+
   RawFTSW rawftsw;
   int delete_flag = 0; // No need to free the buffer
   int num_event = 1;
   int num_nodes = 1;
   rawftsw.SetBuffer(buf, nwords, delete_flag, num_event, num_nodes);
+
 
 
   timeval tv;

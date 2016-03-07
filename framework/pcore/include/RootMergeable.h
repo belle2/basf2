@@ -12,6 +12,7 @@
 #include <framework/pcore/Mergeable.h>
 #include <framework/logging/Logger.h>
 
+#include <TROOT.h>
 #include <TFile.h>
 #include <TList.h>
 #include <TH1F.h>
@@ -20,7 +21,7 @@
 #include <TNtuple.h>
 
 namespace Belle2 {
-  /** Wrap a root histogram or TNtuple to make them mergeable.
+  /** Wrap a root histogram or TNtuple to make it mergeable.
    *
    * To use it to save data in your module:
    * \code
@@ -47,7 +48,10 @@ namespace Belle2 {
    * which may take a significant fraction of total processing time. Trees or Ntuples will however
    * only transfer the newly added data, which is probably manageable.
    *
-   * TODO: after construction, I should probably do SetDirectory(null) directly, and offer a function to set it explicitly.
+   * To deal with ownership issues arising from objects belonging to TFiles, each
+   * RootMergeable object is added to the global list gROOT->GetListOfCleanups(),
+   * which will ensure RootMergeable::RecursiveRemove() is called when m_wrapped is
+   * deleted.
    *
    * \sa Mergeable
    */
@@ -56,15 +60,24 @@ namespace Belle2 {
     /** default constructor for root. */
     RootMergeable() : m_wrapped(nullptr) { }
     /** Constructor, forwards all arguments to T constructor. */
-    template<class ...Args> explicit RootMergeable(Args&& ... params) : m_wrapped(new T(std::forward<Args>(params)...)) { }
+    template<class ...Args> explicit RootMergeable(Args&& ... params) : m_wrapped(new T(std::forward<Args>(params)...))
+    {
+      m_wrapped->SetBit(TObject::kMustCleanup); //ensure RecursiveRemove() is called
+      gROOT->GetListOfCleanups()->Add(this);
+    }
 
-    virtual ~RootMergeable() { delete m_wrapped; }
+    virtual ~RootMergeable()
+    {
+      gROOT->GetListOfCleanups()->Remove(this);
+      delete m_wrapped;
+    }
 
     /** Replace wrapped object with p (takes ownership). */
     void assign(T* p)
     {
       delete m_wrapped;
       m_wrapped = p;
+      m_wrapped->SetBit(TObject::kMustCleanup);
     }
 
     /** Get the wrapped root object. */
@@ -86,7 +99,7 @@ namespace Belle2 {
       }
       file->cd();
       m_wrapped->Write(nullptr, TObject::kOverwrite);
-      m_wrapped->SetDirectory(nullptr);
+      removeSideEffects();
     }
 
     /** Merge object 'other' into this one.
@@ -96,7 +109,7 @@ namespace Belle2 {
      *
      * Note that 'other' will be deleted after the merge, so make sure you copy all data from it that you will need.
      */
-    virtual void merge(const Mergeable* other)
+    virtual void merge(const Mergeable* other) override
     {
       auto* otherMergeable = const_cast<RootMergeable<T>*>(static_cast<const RootMergeable<T>*>(other));
       TList list;
@@ -111,7 +124,7 @@ namespace Belle2 {
      * Called after sending the objects to another process. If no clearing is performed, the same data (e.g. histogram
      * entries) might be added again and again in each event.
      */
-    virtual void clear()
+    virtual void clear() override
     {
       m_wrapped->Reset();
     }
@@ -121,10 +134,22 @@ namespace Belle2 {
      * Main use case is to detach any attached TFile from this object. In the output process,
      * it can stay attached (and grow as much as it likes).
      */
-    virtual void removeSideEffects()
+    virtual void removeSideEffects() override
     {
+      if (!m_wrapped) return;
+
       m_wrapped->SetDirectory(NULL);
+      //if we are the only owner, this becomes unnecessary
+      gROOT->GetListOfCleanups()->Remove(this);
     }
+
+    /** Called from ROOT if obj is deleted. Kill pointer to avoid double free. */
+    virtual void RecursiveRemove(TObject* obj) override
+    {
+      if (obj == m_wrapped)
+        m_wrapped = nullptr;
+    }
+
   private:
     /** Wrapped root object. */
     T* m_wrapped;

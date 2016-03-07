@@ -86,7 +86,7 @@ void ECLShowerShapeModule::event()
     for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
       const auto aECLCalDigit = relatedDigitsPairs.object(iRel);
       const auto weight = relatedDigitsPairs.weight(iRel);
-      B2INFO("ECLShowerShapeModule: ECLCalDigit pointer: " << aECLCalDigit << " weight: " << weight);
+      B2DEBUG(150, "ECLShowerShapeModule: ECLCalDigit pointer: " << aECLCalDigit << " weight: " << weight);
     }
 
   }

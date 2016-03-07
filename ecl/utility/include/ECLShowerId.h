@@ -60,8 +60,13 @@ namespace Belle2 {
 
 
   private:
+    /** Connected Region Multiplier */
     const int m_CRMultiplier = 100000;
+
+    /** Hypothesis Multiplier     */
     const int m_HypothesisMultiplier = 1000;
+
+    /** Seed Multiplier     */
     const int m_SeedMultiplier = 1;
   };
 

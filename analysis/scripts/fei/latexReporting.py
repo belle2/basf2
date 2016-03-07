@@ -224,7 +224,7 @@ if __name__ == '__main__':
                               std=p.training_data[channel.name].std(n),
                               min=p.training_data[channel.name].min(n),
                               max=p.training_data[channel.name].max(n))
-                for n in particle.mvaConfig.variables:
+                for n in channel.mvaConfig.variables:
                     if n not in variable_list:
                         table.add(no='---',
                                   name=format.variable(format.string(n)),

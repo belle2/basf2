@@ -7,9 +7,8 @@
 //-
 
 
-//#include <rawdata/dataobjects/RawCOPPER.h>
-#include <rawdata/dataobjects/RawFTSW.h>
-#include <rawdata/dataobjects/RawTLU.h>
+#include <rawdata/dataobjects/RawFTSWFormat.h>
+#include <rawdata/dataobjects/RawTLUFormat.h>
 #include <daq/rawdata/modules/DesSerPrePC.h>
 
 #include <sys/mman.h>
@@ -69,7 +68,8 @@ DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int 
   m_run_error = 0;
 #endif
 
-  B2INFO("DeSerializerPrePC: Constructor done.");
+  //  B2INFO("DeSerializerPrePC: Constructor done.");
+  printf("[INFO] DeSerializerPrePC: Constructor done.\n"); fflush(stdout);
 }
 
 
@@ -126,7 +126,8 @@ int* DesSerPrePC::getNewBuffer(int nwords, int* delete_flag)
 
 void DesSerPrePC::initialize()
 {
-  B2INFO("DesSerPrePC: initialize() started.");
+  printf("[INFO] DesSerPrePC: initialize() started.\n"); fflush(stdout);
+  //  B2INFO("DesSerPrePC: initialize() started.");
 
   signal(SIGPIPE , SIG_IGN);
   //
@@ -186,7 +187,8 @@ void DesSerPrePC::initialize()
     m_status.setOutputCount(0);
   }
 
-  B2INFO("DesSerPrePC: initialize() was done.");
+  //  B2INFO("DesSerPrePC: initialize() was done.");
+  printf("[INFO] DesSerPrePC: initialize() was done.\n"); fflush(stdout);
 
 }
 
@@ -274,13 +276,16 @@ int DesSerPrePC::Connect()
     timeout.tv_usec = 0;
     setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, &timeout, (socklen_t)sizeof(timeout));
 
-    B2INFO("[DEBUG] Connecting to " << m_hostname_from[ i ].c_str() << " port " << m_port_from[ i ]);
+    //    B2INFO("[DEBUG] Connecting to " << m_hostname_from[ i ].c_str() << " port " << m_port_from[ i ]);
+    printf("[DEBUG] Connecting to %s port %d\n" , m_hostname_from[ i ].c_str(), m_port_from[ i ]); fflush(stdout);
+
     while (1) {
       if (connect(sd, (struct sockaddr*)(&socPC), sizeof(socPC)) < 0) {
         perror("Failed to connect. Retrying...");
         usleep(500000);
       } else {
-        B2INFO("Done");
+        //        B2INFO("Done");
+        printf("[INFO] Done\n"); fflush(stdout);
         break;
       }
     }
@@ -310,7 +315,8 @@ int DesSerPrePC::Connect()
     }
 
   }
-  B2INFO("[DEBUG] Initialization finished");
+  //  B2INFO("[DEBUG] Initialization finished");
+  printf("[DEBUG] Initialization finished\n"); fflush(stdout);
   return 0;
 }
 
@@ -404,7 +410,8 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
                                  each_buf_nwords[ i ] * sizeof(int), flag);
     } catch (string err_str) {
       if (*delete_flag) {
-        B2WARNING("Delete buffer before going to Run-pause state");
+        //        B2WARNING("Delete buffer before going to Run-pause state");
+        printf("[WARNING] Delete buffer before going to Run-pause state\n"); fflush(stdout);
         delete temp_buf;
       }
       throw (err_str);
@@ -448,7 +455,8 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
       recvFD(m_socket_recv[ i ], (char*)send_trl_buf, SendTrailer::SENDTRL_NWORDS * sizeof(int), flag);
     } catch (string err_str) {
       if (*delete_flag) {
-        B2WARNING("Delete buffer before going to Run-pause state");
+        //        B2WARNING("Delete buffer before going to Run-pause state");
+        printf("[WARNING] Delete buffer before going to Run-pause state\n"); fflush(stdout);
         delete temp_buf;
       }
       throw (err_str);
@@ -459,7 +467,7 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
 }
 
 
-void DesSerPrePC::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* delete_flag)
+void DesSerPrePC::setRecvdBuffer(RawDataBlockFormat* temp_raw_datablk, int* delete_flag)
 {
   //
   // Get data from socket
@@ -468,11 +476,15 @@ void DesSerPrePC::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* delete_fla
   int num_events_in_sendblock = 0;
   int num_nodes_in_sendblock = 0;
 
-  if (m_start_flag == 0) B2INFO("DeSerializerPrePC: Reading the 1st packet from eb0...");
+  if (m_start_flag == 0) {
+    //    B2INFO("DeSerializerPrePC: Reading the 1st packet from eb0...");
+    printf("DeSerializerPrePC: Reading the 1st packet from eb0...\n"); fflush(stdout);
+  }
   int* temp_buf = recvData(delete_flag, &total_buf_nwords, &num_events_in_sendblock,
                            &num_nodes_in_sendblock);
   if (m_start_flag == 0) {
-    B2INFO("DeSerializerPrePC: Done. the size of the 1st packet " << total_buf_nwords << " words");
+    //    B2INFO("DeSerializerPrePC: Done. the size of the 1st packet " << total_buf_nwords << " words");
+    printf("DeSerializerPrePC: Done. the size of the 1st packet %d words\n", total_buf_nwords); fflush(stdout);
     m_start_flag = 1;
   }
   m_recvd_totbytes += total_buf_nwords * sizeof(int);
@@ -501,7 +513,7 @@ void DesSerPrePC::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* delete_fla
 
 
 
-void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0)
+void DesSerPrePC::checkData(RawDataBlockFormat* raw_datablk, unsigned int* eve_copper_0)
 {
   //  int data_size_copper_0 = -1;
   //  int data_size_copper_1 = -1;
@@ -533,7 +545,7 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
       // RawFTSW
       //
       if (raw_datablk->CheckFTSWID(entry_id)) {
-        RawFTSW* temp_rawftsw = new RawFTSW;
+        RawFTSWFormat* temp_rawftsw = new RawFTSWFormat;
         int block_id = 0;
         temp_rawftsw->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                 raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
@@ -569,7 +581,7 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
         //
       } else if (raw_datablk->CheckTLUID(entry_id)) {
 
-        RawTLU* temp_rawtlu = new RawTLU;
+        RawTLUFormat* temp_rawtlu = new RawTLUFormat;
         temp_rawtlu->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
         if (temp_rawtlu->GetEveNo(0) < 10
@@ -676,10 +688,12 @@ void DesSerPrePC::DataAcquisition()
 {
   // For data check
   unsigned int eve_copper_0 = 0;
-  B2INFO("initializing...");
+  //  B2INFO("initializing...");
+  printf("[INFO] initializing...\n"); fflush(stdout);
   initialize();
 
-  B2INFO("Done.");
+  //  B2INFO("Done.");
+  printf("[INFO] Done.\n"); fflush(stdout);
 
   if (m_start_flag == 0) {
     //
@@ -687,7 +701,8 @@ void DesSerPrePC::DataAcquisition()
     //
     Connect();
     if (m_status.isAvailable()) {
-      B2INFO("DeSerializerPrePC: Waiting for Start...\n");
+      //      B2INFO("DeSerializerPrePC: Waiting for Start...\n");
+      printf("[INFO] DeSerializerPrePC: Waiting for Start...\n"); fflush(stdout);
       m_status.reportRunning();
     }
     m_start_time = getTimeSec();
@@ -720,7 +735,8 @@ void DesSerPrePC::DataAcquisition()
 #endif
 
     clearNumUsedBuf();
-    RawDataBlock raw_datablk[ NUM_EVT_PER_BASF2LOOP_PC ];
+    //    RawDataBlock raw_datablk[ NUM_EVT_PER_BASF2LOOP_PC ];
+    RawDataBlockFormat raw_datablk[ NUM_EVT_PER_BASF2LOOP_PC ];
 
     //
     // Recv loop
@@ -734,7 +750,7 @@ void DesSerPrePC::DataAcquisition()
         0; // Delete flag for temp_rawdatablk.It can be set to 1 by setRecvdBuffer if the buffer size is larger than that of pre-allocated buffer.
       int delete_flag_to =
         0; // Delete flag for raw_datablk[i]. It can be set to 1 by getNewBuffer if the buffer size is larger than that of pre-allocated buffer.
-      RawDataBlock temp_rawdatablk;
+      RawDataBlockFormat temp_rawdatablk;
       try {
         setRecvdBuffer(&temp_rawdatablk, &delete_flag_from);
         checkData(&temp_rawdatablk, &eve_copper_0);
@@ -785,7 +801,6 @@ void DesSerPrePC::DataAcquisition()
       //
       // Set buffer to the RawData class stored in DataStore
       //
-      //    RawDataBlock* raw_datablk = raw_datablkarray.appendNew();
 //       raw_datablk[ j ].SetBuffer( (int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
 //                                  delete_flag_to, temp_rawdatablk.GetNumEvents(),
 //                                  temp_rawdatablk.GetNumNodes());
@@ -835,7 +850,8 @@ void DesSerPrePC::DataAcquisition()
       // Send data
       //
       if (m_start_flag == 0) {
-        B2INFO("SerializerPC: Sending the 1st packet...");
+        //        B2INFO("SerializerPC: Sending the 1st packet...");
+        printf("[INFO] SerializerPC: Sending the 1st packet...\n"); fflush(stdout);
       }
 
       try {
@@ -848,7 +864,8 @@ void DesSerPrePC::DataAcquisition()
         exit(1);
       }
       if (m_start_flag == 0) {
-        B2INFO("Done. ");
+        //        B2INFO("Done. ");
+        printf("[INFO] Done.\n"); fflush(stdout);
         m_start_flag = 1;
       }
     }
@@ -907,8 +924,8 @@ void DesSerPrePC::DataAcquisition()
 //   From Serializer.cc
 /////////////////////////////////////////////////////
 
-void DesSerPrePC::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
-                                        RawDataBlock* rawdblk)
+//void DesSerPrePC::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawDataBlock* rawdblk)
+void DesSerPrePC::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawDataBlockFormat* rawdblk)
 {
 
   int total_send_nwords =
@@ -963,7 +980,8 @@ void DesSerPrePC::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
 }
 
 
-int DesSerPrePC::sendByWriteV(RawDataBlock* rawdblk)
+//int DesSerPrePC::sendByWriteV(RawDataBlock* rawdblk)
+int DesSerPrePC::sendByWriteV(RawDataBlockFormat* rawdblk)
 {
   SendHeader send_header;
   SendTrailer send_trailer;
@@ -1030,7 +1048,10 @@ int DesSerPrePC::sendByWriteV(RawDataBlock* rawdblk)
   // Retry sending
   //
   if (n != total_send_bytes) {
-    B2WARNING("Serializer: Sent byte(" << n << "bytes) is not same as the event size (" << total_send_bytes << "bytes). Retryring...");
+    //    B2WARNING("Serializer: Sent byte(" << n << "bytes) is not same as the event size (" << total_send_bytes << "bytes). Retryring...");
+    printf("[WARNING] Serializer: Sent byte( %d bytes) is not same as the event size ( %d bytes). Retryring...\n", n, total_send_bytes);
+    fflush(stdout);
+
     double retry_start = getTimeSec();
     // Send Header
     if (n < (int)(iov[ 0 ].iov_len)) {
@@ -1046,7 +1067,8 @@ int DesSerPrePC::sendByWriteV(RawDataBlock* rawdblk)
                 iov[ 2 ].iov_len - (n - iov[ 0 ].iov_len - iov[ 1 ].iov_len));
     }
     double retry_end = getTimeSec();
-    B2WARNING("Resending ends. It takes " << retry_end - retry_start << "(s)");
+    //    B2WARNING("Resending ends. It takes " << retry_end - retry_start << "(s)");
+    printf("Resending ends. It takes %lf (s)\n", retry_end - retry_start); fflush(stdout);
   }
   //   printf( "[DEBUG] n %d total %d\n", n, total_send_bytes);
   //  delete temp_buf;
@@ -1147,18 +1169,17 @@ void DesSerPrePC::Accept()
   //
   int fd_accept;
   struct sockaddr_in sock_accept;
-  printf("Accepting... : port %d server %s\n", m_port_to, m_hostname_local.c_str());
+  printf("[INFO] Accepting... : port %d server %s\n", m_port_to, m_hostname_local.c_str());
   fflush(stdout);
-  //  B2INFO("Accepting... : port " << m_port_to << " server " << m_hostname_local.c_str() );
-  B2INFO("Accepting...");
+
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
     char err_buf[500];
     sprintf(err_buf, "Failed to accept(%s). Exiting...", strerror(errno));
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   } else {
-    //    B2INFO("Connection is established: port " << htons(sock_accept.sin_port) << " address " <<  sock_accept.sin_addr.s_addr );
-    B2INFO("Done.");
+    //    B2INFO("Done.");
+    printf("[INFO] Done.\n"); fflush(stdout);
 
     //    set timepout option
     struct timeval timeout;
@@ -1180,7 +1201,8 @@ void DesSerPrePC::Accept()
   if (m_status.isAvailable()) {
     m_status.setOutputPort(ntohs(sock_listen.sin_port));
     m_status.setOutputAddress(sock_listen.sin_addr.s_addr);
-    B2INFO("Accepted " << (int)ntohs(sock_listen.sin_port) << " " << (int)sock_listen.sin_addr.s_addr);
+    //    B2INFO("Accepted " << (int)ntohs(sock_listen.sin_port) << " " << (int)sock_listen.sin_addr.s_addr);
+    printf("Accepted. port %d address %u\n", (int)ntohs(sock_listen.sin_port), (int)sock_listen.sin_addr.s_addr); fflush(stdout);
   }
 
   return;

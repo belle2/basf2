@@ -14,10 +14,11 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-#include <daq/rawdata/modules/DeSerializer.h>
+#include <daq/slc/readout/RunInfoBuffer.h>
+#include <daq/rawdata/CprErrorMessage.h>
+//#include <daq/rawdata/modules/DeSerializer.h>
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/dataflow/EvtSocket.h>
-#include <daq/slc/readout/RunInfoBuffer.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 
 #include <sys/socket.h>
@@ -137,7 +138,7 @@ namespace Belle2 {
 
 
     //! Messaage handler
-    MsgHandler* m_msghandler;
+    //    MsgHandler* m_msghandler;
 
     //! Node(PC or COPPER) ID
     int m_nodeid;
@@ -206,11 +207,14 @@ namespace Belle2 {
     void endRun();
     void terminate();
 
-    int sendByWriteV(RawDataBlock* rawdblk);
+    //    int sendByWriteV(RawDataBlock* rawdblk);
+    int sendByWriteV(RawDataBlockFormat* rawdblk);
     //    void Connect(const char* hostname, const int port);
     void Accept();
 
-    void fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawDataBlock* rawdblk);
+    //    void fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawDataBlock* rawdblk);
+    void fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawDataBlockFormat* rawdblk);
+
     // Data members
 
     //! send buffer
@@ -240,10 +244,10 @@ namespace Belle2 {
     int* recvData(int* delete_flag, int* total_m_size_word, int* num_events_in_sendblock, int* num_nodes_in_sendblock);
 
     //! attach buffer to RawDataBlock
-    void setRecvdBuffer(RawDataBlock* raw_datablk, int* delete_flag);
+    void setRecvdBuffer(RawDataBlockFormat* raw_datablk, int* delete_flag);
 
     //! check data contents
-    void checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0);
+    void checkData(RawDataBlockFormat* raw_datablk, unsigned int* eve_copper_0);
 
 
     //! check data contents

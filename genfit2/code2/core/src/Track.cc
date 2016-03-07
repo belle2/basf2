@@ -1606,6 +1606,18 @@ void Track::Streamer(TBuffer &R__b)
    }
 }
 
+void Track::deleteTrackPointsAndFitStatus() {
+  for (TrackPoint* trackPoint : trackPoints_) {
+    delete trackPoint;
+  }
 
+  trackPoints_.clear();
+  trackPointsWithMeasurement_.clear();
+
+  for (const std::pair<const AbsTrackRep*, FitStatus*>& repWithFitStatus : fitStatuses_) {
+    delete repWithFitStatus.second;
+  }
+  fitStatuses_.clear();
+}
 
 } /* End of namespace genfit */

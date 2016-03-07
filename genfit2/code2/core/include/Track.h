@@ -128,6 +128,8 @@ class Track : public TObject {
   const MeasuredStateOnPlane& getFittedState(int id = 0, const AbsTrackRep* rep = NULL, bool biased = true) const;
 
   AbsTrackRep* getTrackRep(int id) const {return trackReps_.at(id);}
+  /// Return the track representations as a list of pointers.
+  const std::vector<genfit::AbsTrackRep*>& getTrackReps() const {return trackReps_;}
   unsigned int getNumReps() const {return trackReps_.size();}
 
   //! This is used when streaming TrackPoints.
@@ -194,6 +196,8 @@ class Track : public TObject {
   //! Creates a new TrackPoint containing the measurement, and adds it to the track
   void insertMeasurement(AbsMeasurement* measurement, int id = -1);
 
+  //! Delete all measurement information and the track points of the track. Does not delete fit status or track representations.
+  void deleteTrackPointsAndFitStatus();
   /**
    * @brief Merge two tracks.
    *

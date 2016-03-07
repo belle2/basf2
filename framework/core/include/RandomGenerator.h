@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 #include <TRandom.h>
-#include <algorithm>
+#include <vector>
 
 namespace Belle2 {
   /** Fast Random number Generator using on xorshift1024* [arXiv:1402.6246].

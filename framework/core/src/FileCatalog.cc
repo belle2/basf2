@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <framework/core/FileCatalog.h>
+#include <framework/dataobjects/FileMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <boost/filesystem.hpp>

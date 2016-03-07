@@ -11,14 +11,11 @@
 #ifndef FILECATALOG_H
 #define FILECATALOG_H
 
-#include <framework/dataobjects/FileMetaData.h>
-
 #include <map>
-#include <vector>
 #include <string>
 
-
 namespace Belle2 {
+  class FileMetaData;
 
   /**
    * This class provides an interface to the file (metadata) catalog.

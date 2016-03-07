@@ -72,10 +72,10 @@ void ECLShowerCalibratorModule::event()
   StoreArray<ECLShower> eclShowers(eclShowerArrayName());
 
   // loop over all ECLShowers
-  for (const auto& eclShower : eclShowers) {
-    // check hypothesis, do other things...
+//  for (const auto& eclShower : eclShowers) {
+  // check hypothesis, do other things...
 
-  }
+//  }
 
 }
 

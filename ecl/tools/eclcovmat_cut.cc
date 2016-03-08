@@ -95,7 +95,7 @@ void cut(const char* inputRootFilename, const char* outputCutFilename,
 
   // open output pdf file
 
-  TCanvas* plot;
+  TCanvas* plot = nullptr;
   if (doplot) {
     plot = new TCanvas;
     plot->SaveAs((outputpdffile + string("[")).c_str());

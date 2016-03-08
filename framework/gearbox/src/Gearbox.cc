@@ -59,10 +59,8 @@ namespace Belle2 {
   {
     xmlInitParser();
     LIBXML_TEST_VERSION;
-    xmlRegisterInputCallbacks(gearbox::matchXmlUri, gearbox::openXmlUri,
-                              gearbox::readXmlData, gearbox::closeXmlContext);
-
   }
+
   Gearbox::~Gearbox()
   {
     close();
@@ -129,8 +127,12 @@ namespace Belle2 {
     //Check if we have at least one backend
     if (m_handlers.empty())
       B2FATAL("No backends defined, please use Gearbox::setBackends() first to specify how to access XML files.");
-    //Open document
 
+    // register input callbacks for opening the files
+    xmlRegisterInputCallbacks(gearbox::matchXmlUri, gearbox::openXmlUri,
+                              gearbox::readXmlData, gearbox::closeXmlContext);
+
+    //Open document
     m_xmlDocument = xmlParseFile(name.c_str());
 #if LIBXML_VERSION >= 20700
     //libxml >= 2.7.0 introduced some limits on node size etc. which breaks reading VXDTF files
@@ -138,6 +140,9 @@ namespace Belle2 {
 #else
     xmlXIncludeProcess(m_xmlDocument);
 #endif
+
+    // reset input callbacks
+    xmlPopInputCallbacks();
 
     if (!m_xmlDocument) B2FATAL("Could not connect gearbox to " << name);
     m_xpathContext = xmlXPathNewContext(m_xmlDocument);

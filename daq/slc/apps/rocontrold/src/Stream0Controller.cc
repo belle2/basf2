@@ -54,8 +54,8 @@ bool Stream0Controller::loadArguments(const DBObject& obj)
 void Stream0Controller::check() throw()
 {
   try {
-    int used = 0;
-    m_callback->get(m_callback->getRC(), m_name + ".used", used);
+    //int used = 0;
+    // m_callback->get(m_callback->getRC(), m_name + ".used", used);
   } catch (const std::exception& e) {
     LogFile::warning("timeout");
   }

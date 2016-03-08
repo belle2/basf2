@@ -57,6 +57,7 @@ namespace Belle2 {
     void postRun() throw();
     RCNode& findNode(const std::string& nodename) throw(std::out_of_range);
     bool check(const std::string& nodename, const RCState& state) throw();
+    bool checkAll(const std::string& nodename, const RCState& state) throw();
     void logging(const NSMNode& node, LogFile::Priority pri,
                  const char* text, ...);
     void logging_imp(const NSMNode& node, LogFile::Priority pri,

@@ -300,20 +300,24 @@ void RunControlCallback::monitor() throw(RCHandlerException)
     setState(state_new);
   }
   const std::string nodename = m_node_v[m_node_v.size() - 1].getName();
+  if (getNode().getState() != RCState::NOTREADY_S &&
+      checkAll(nodename, RCState::NOTREADY_S)) {
+    setState(RCState::NOTREADY_S);
+  }
   if (getNode().getState() != RCState::READY_S &&
-      check(nodename, RCState::READY_S)) {
+      checkAll(nodename, RCState::READY_S)) {
     setState(RCState::READY_S);
   }
   if (getNode().getState() != RCState::PAUSED_S &&
-      check(nodename, RCState::PAUSED_S)) {
+      checkAll(nodename, RCState::PAUSED_S)) {
     setState(RCState::PAUSED_S);
   }
   if (getNode().getState() != RCState::RUNNING_S &&
-      check(nodename, RCState::RUNNING_S)) {
+      checkAll(nodename, RCState::RUNNING_S)) {
     setState(RCState::RUNNING_S);
   }
   if (getNode().getState() == RCState::RUNNING_S &&
-      !check(nodename, RCState::RUNNING_S)) {
+      !checkAll(nodename, RCState::RUNNING_S)) {
     setState(RCState::ERROR_ES);
     stop();
   }
@@ -360,6 +364,17 @@ bool RunControlCallback::check(const std::string& node, const RCState& state) th
     if (cnode.isUsed() && cnode.getState() != state) {
       return false;
     }
+  }
+  return true;
+}
+
+bool RunControlCallback::checkAll(const std::string& node, const RCState& state) throw()
+{
+  for (auto& cnode : m_node_v) {
+    if (cnode.isUsed() && cnode.getState() != state) {
+      return false;
+    }
+    if (cnode.getName() == node) return true;
   }
   return true;
 }

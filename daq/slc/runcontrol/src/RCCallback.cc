@@ -66,6 +66,7 @@ RCCallback::RCCallback(int timeout) throw()
   m_auto = true;
   m_db = NULL;
   m_showall = true;
+  m_expno = m_runno = 0;
 }
 
 void RCCallback::init(NSMCommunicator&) throw()
@@ -166,14 +167,17 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
         get(m_obj);
         load(m_obj);
       } else if (cmd == RCCommand::START) {
-        int expno = (msg.getNParams() > 0) ? msg.getParam(0) : 0;
-        int runno = (msg.getNParams() > 1) ? msg.getParam(1) : 0;
-        start(expno, runno);
-        if (expno > 0 && runno > 0) {
-          dbrecord(m_obj, expno, runno);
+        m_expno = (msg.getNParams() > 0) ? msg.getParam(0) : 0;
+        m_runno = (msg.getNParams() > 1) ? msg.getParam(1) : 0;
+        start(m_expno, m_runno);
+        if (m_expno > 0 && m_runno > 0) {
+          dbrecord(m_obj, m_expno, m_runno, true);
         }
       } else if (cmd == RCCommand::STOP) {
         stop();
+        if (m_expno > 0 && m_runno > 0) {
+          dbrecord(m_obj, m_expno, m_runno, false);
+        }
       } else if (cmd == RCCommand::RESUME) {
         if (!resume(msg.getParam(0))) {
           setState(RCState::NOTREADY_S);
@@ -302,11 +306,11 @@ throw(IOException)
   add(m_obj);
 }
 
-void RCCallback::dbrecord(DBObject obj, int expno, int runno)
+void RCCallback::dbrecord(DBObject obj, int expno, int runno, bool isstart)
 throw(IOException)
 {
   if (m_table.size() > 0 && m_rcconfig.size() > 0) {
-    std::string confname = StringUtil::form("%04d:%06d=", expno, runno) + m_rcconfig;
+    std::string confname = StringUtil::form("%04d:%06d:%s=", expno, runno, (isstart ? "s" : "e")) + m_rcconfig;
     obj.setName(confname);
     std::string table = m_table + "_log";
     if (getDB()) {

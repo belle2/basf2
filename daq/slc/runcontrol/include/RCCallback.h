@@ -67,7 +67,7 @@ namespace Belle2 {
     void dbload(int length, const char* data) throw(IOException);
 
   protected:
-    void dbrecord(DBObject obj, int expno, int runno) throw(IOException);
+    void dbrecord(DBObject obj, int expno, int runno, bool isstart) throw(IOException);
 
   private:
     RCState m_state_demand;
@@ -79,6 +79,8 @@ namespace Belle2 {
     std::string m_rcconfig;
     std::string m_provider_host;
     int m_provider_port;
+    int m_expno;
+    int m_runno;
 
   protected:
     bool m_showall;

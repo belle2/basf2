@@ -198,7 +198,7 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
         std::string operators;
         get("operators", operators);
         obj.addText("opeeators", operators);
-        dbrecord(obj, expno, runno);
+        dbrecord(obj, expno, runno, true);
       } else {
         throw (RCHandlerException("DB is not available"));
       }

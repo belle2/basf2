@@ -37,6 +37,7 @@ void LogListener::run()
     int count = 0;
     while (true) {
       c = preader.readChar();
+      if (c != '\n' && iscntrl(c)) continue;
       if (c == '\n' && count > 0) {
         s = m_con->getParName() + " : " + ss.str();
         ss.str("");

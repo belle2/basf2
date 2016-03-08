@@ -205,6 +205,7 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
     reply(NSMMessage(NSMCommand::FATAL, e.what()));
   } catch (const RCHandlerException& e) {
     LogFile::error(e.what());
+    setState(RCState::ERROR_ES);
     reply(NSMMessage(NSMCommand::ERROR, e.what()));
   } catch (const std::exception& e) {
     LogFile::fatal("Unknown exception: %s. terminating process", e.what());
@@ -218,9 +219,11 @@ void RCCallback::timeout(NSMCommunicator& /*com*/) throw()
     monitor();
   } catch (const RCHandlerFatalException& e) {
     LogFile::fatal(e.what());
+    setState(RCState::ERROR_ES);
     reply(NSMMessage(NSMCommand::FATAL, e.what()));
   } catch (const RCHandlerException& e) {
     LogFile::error(e.what());
+    setState(RCState::ERROR_ES);
     reply(NSMMessage(NSMCommand::ERROR, e.what()));
   } catch (const std::exception& e) {
     LogFile::fatal("Unknown exception: %s. terminating process", e.what());

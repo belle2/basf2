@@ -105,8 +105,12 @@ void RunControlCallback::ok(const char* nodename, const char* data) throw()
       } else {
         setState(node, state);
       }
+    } else {
+      LogFile::debug("node used");
     }
-  } catch (const std::out_of_range& e) {}
+  } catch (const std::out_of_range& e) {
+    LogFile::debug(e.what());
+  }
   monitor();
 }
 
@@ -115,8 +119,9 @@ void RunControlCallback::error(const char* nodename, const char* data) throw()
   try {
     RCNode& node(findNode(nodename));
     logging(node, LogFile::ERROR, data);
-    setState(RCState::ERROR_ES);
     reply(NSMMessage(RCCommand::STOP, "Error due to error on " + node.getName()));
+    stop();
+    setState(RCState::ERROR_ES);
     m_starttime = -1;
     m_restarting = false;
   } catch (const std::out_of_range& e) {
@@ -172,7 +177,10 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
       node.setConfig(val);
       std::string vname = StringUtil::form("node[%d]", (int)i);
       set(vname + ".rcconfig", val);
-      (obj("node", i))("rcconfig").setPath(val);
+      DBObject& o_node(obj("node", i));
+      if (o_node.hasObject("rcconfig")) {
+        o_node("rcconfig").setPath(val);
+      }
     }
     if (expno == 0 || runno == 0) {
       if (getDB()) {
@@ -245,62 +253,37 @@ void RunControlCallback::abort() throw(RCHandlerException)
 void RunControlCallback::monitor() throw(RCHandlerException)
 {
   RCState state(getNode().getState());
-  if (m_restarttime > 0) {
-    try {
-      if (!m_restarting) {
-        if (m_starttime > 0 && Time().get() - m_starttime > m_restarttime) {
-          log(LogFile::NOTICE, "Run automatically stopped due to exceeding run length");
-          stop();
-          m_restarting = true;
-        }
-      } else {
-        bool all_ready = true;
-        for (auto& node : m_node_v) {
-          if (!node.isUsed()) continue;
-          RCState cstate(node.getState());
-          if (cstate != RCState::READY_S) {
-            all_ready = false;
-            break;
-          }
-        }
-        if (all_ready) {
-          m_restarting = false;
-          m_starttime = -1;
-          log(LogFile::NOTICE, "Run automatically starting");
-          start(0, 0);
-        }
-      }
-    } catch (const IOException& e) {
-      LogFile::error("%s %s:%d", e.what(), __FILE__, __LINE__);
-    }
-  }
   RCState state_new = state.next();
   bool failed = false;
   for (auto& node : m_node_v) {
     if (!node.isUsed()) continue;
     RCState cstate(node.getState());
+    RCState cstate_new;
     try {
       NSMCommunicator::connected(node.getName());
-      if (cstate == Enum::UNKNOWN) {
-        try {
-          std::string s;
-          get(node, "rcstate", s, 1);
-          if ((cstate = RCState(s)) != Enum::UNKNOWN) {
+      try {
+        std::string s;
+        get(node, "rcstate", s, 1);
+        cstate_new = RCState(s);
+        if (cstate_new != cstate) {
+          if (cstate == Enum::UNKNOWN) {
             log(LogFile::INFO, "%s got up (state=%s).",
-                node.getName().c_str(), cstate.getLabel());
-            setState(node, cstate);
-            std::string table = "";
-            get(node, "dbtable", table, 1);
-            set(StringUtil::tolower(node.getName()) + ".dbtable", table);
+                node.getName().c_str(), cstate_new.getLabel());
           }
-        } catch (const TimeoutException& e) {
-          LogFile::debug("%s timeout", node.getName().c_str());
+          setState(node, cstate_new);
+          cstate = cstate_new;
         }
+      } catch (const TimeoutException& e) {
+        LogFile::debug("%s timeout", node.getName().c_str());
       }
     } catch (const NSMNotConnectedException&) {
       if (cstate != Enum::UNKNOWN) {
         log(LogFile::ERROR, "%s got down.", node.getName().c_str());
         setState(node, Enum::UNKNOWN);
+        if (state == RCState::RUNNING_S) {
+          stop();
+        }
+        setState(RCState::ERROR_ES);
         failed = true;
       }
     }
@@ -315,7 +298,24 @@ void RunControlCallback::monitor() throw(RCHandlerException)
   if (failed) state_new = RCState::NOTREADY_S;
   if (state_new != RCState::UNKNOWN && state != state_new) {
     setState(state_new);
-    reply(NSMMessage(NSMCommand::OK, state_new.getLabel()));
+  }
+  const std::string nodename = m_node_v[m_node_v.size() - 1].getName();
+  if (getNode().getState() != RCState::READY_S &&
+      check(nodename, RCState::READY_S)) {
+    setState(RCState::READY_S);
+  }
+  if (getNode().getState() != RCState::PAUSED_S &&
+      check(nodename, RCState::PAUSED_S)) {
+    setState(RCState::PAUSED_S);
+  }
+  if (getNode().getState() != RCState::RUNNING_S &&
+      check(nodename, RCState::RUNNING_S)) {
+    setState(RCState::RUNNING_S);
+  }
+  if (getNode().getState() == RCState::RUNNING_S &&
+      !check(nodename, RCState::RUNNING_S)) {
+    setState(RCState::ERROR_ES);
+    stop();
   }
 }
 
@@ -355,7 +355,7 @@ RCNode& RunControlCallback::findNode(const std::string& name) throw(std::out_of_
 
 bool RunControlCallback::check(const std::string& node, const RCState& state) throw()
 {
-  for (auto cnode : m_node_v) {
+  for (auto& cnode : m_node_v) {
     if (cnode.getName() == node) return true;
     if (cnode.isUsed() && cnode.getState() != state) {
       return false;
@@ -467,8 +467,14 @@ void RunControlCallback::Distributor::operator()(RCNode& node) throw()
               NSMCommunicator& com(m_callback.wait(NSMNode(), RCCommand::UNKNOWN, 1));
               NSMMessage msg = com.getMessage();
               RCCommand cmd2(msg.getRequestName());
-              LogFile::debug("%s %s", msg.getNodeName(), msg.getRequestName());
-              if (msg.getNodeName() == node.getName() && cmd2 == NSMCommand::OK) {
+              if (cmd2 == NSMCommand::OK) {
+                m_callback.ok(msg.getNodeName(), msg.getData());
+                continue;
+              } else if (cmd2 == NSMCommand::VSET) {
+                m_callback.perform(com);
+                continue;
+              } else if (cmd2 == NSMCommand::VGET) {
+                m_callback.perform(com);
                 continue;
               } else if (cmd2 == RCCommand::ABORT) {
                 LogFile::debug("ABORTING");

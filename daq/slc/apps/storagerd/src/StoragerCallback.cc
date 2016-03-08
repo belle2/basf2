@@ -303,12 +303,12 @@ void StoragerCallback::monitor() throw(RCHandlerException)
       state == RCState::PAUSED_S || state == RCState::LOADING_TS ||
       state == RCState::STARTING_TS) {
     if (!m_eb2rx.isAlive()) {
-      setState(RCState::NOTREADY_S);
+      setState(RCState::ERROR_ES);
       throw (RCHandlerException(m_eb2rx.getParName() + " : crashed"));
     }
     for (size_t i = 0; i < m_con.size(); i++) {
-      if (!m_con[i].isAlive()) {
-        setState(RCState::NOTREADY_S);
+      if (i != 2 && !m_con[i].isAlive()) {
+        setState(RCState::ERROR_ES);
         throw (RCHandlerException(m_con[i].getParName() + " : crashed"));
       }
     }

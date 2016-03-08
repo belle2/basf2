@@ -71,11 +71,9 @@ int RCCommand::isAvailable(const RCState& state) const throw()
     return ENABLED;
   } else if (cmd == RESUME && state == RCState::PAUSED_S) {
     return ENABLED;
-  } else if (cmd == RECOVER || cmd == ABORT || cmd == BOOT) {
+  } else if (cmd == ABORT) {
     return ENABLED;
-  } else if (cmd == ABORT && state != RCState::ABORTING_RS) {
-    return ENABLED;
-  } else if (state == RCState::ERROR_ES) {
+  } else if (cmd == RECOVER && state == RCState::ERROR_ES) {
     return ENABLED;
   } else {
     return DISABLED;

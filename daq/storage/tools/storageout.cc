@@ -89,10 +89,10 @@ int main(int argc, char** argv)
           info.addInputNBytes(nbyte_in);
         }
         try {
-          int nbyte = htonl(evtbuf[0]);
+          unsigned int nbyte = htonl(evtbuf[0]);
           unsigned long long onbyte = writer.write(&nbyte, sizeof(int));
           onbyte += writer.write(evtbuf, evtbuf[0]);
-          //B2INFO("In : "<< nbyte << " evtbuf[0] : " << evtbuf[0]);
+          //std::cout << "[DEBUG] In : "<< ntohl(nbyte) << " evtbuf[0] : " << evtbuf[0] << std::endl;
         } catch (const IOException& e) {
           B2WARNING("Lost connection to expreco " << e.what());
           break;

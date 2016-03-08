@@ -27,6 +27,7 @@
 #include <arich/dataobjects/ARICHDigit.h>
 #include <rawdata/dataobjects/RawARICH.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <bitset>
 
 using namespace std;
 

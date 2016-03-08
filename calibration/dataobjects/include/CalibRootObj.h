@@ -143,7 +143,7 @@ namespace Belle2 {
         m_object = nullptr;
       }
 
-      //object->SetDirectory(nullptr);
+      object->SetDirectory(nullptr);
       m_object = object;
     }
 
@@ -197,7 +197,7 @@ namespace Belle2 {
       //else if (cl && cl->GetMethodWithPrototype("clear", ""))
       //  newobj->Execute("clear", "");
 
-      //newobj->SetDirectory(nullptr);
+      newobj->SetDirectory(nullptr);
       newobj->Reset();
 
       // Add object to list
@@ -253,7 +253,7 @@ namespace Belle2 {
     {
       if (m_object)
         delete m_object;
-      //newobj->SetDirectory(nullptr);
+      newobj->SetDirectory(nullptr);
       m_object = newobj;
     }
 

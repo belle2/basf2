@@ -181,7 +181,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
 
   int cid, group;
   bool readerr = false;
-  vector<int> grmap[252];
+//  vector<int> grmap[252]; // TF: Commented unused variable to silence compiler warning
   while (! ctoecldatafile.eof()) {
     ctoecldatafile >> cid >> group;
 

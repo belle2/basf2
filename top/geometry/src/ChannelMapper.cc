@@ -11,6 +11,7 @@
 #include <top/geometry/ChannelMapper.h>
 #include <unordered_set>
 #include <framework/logging/LogSystem.h>
+#include <iostream>
 
 using namespace std;
 

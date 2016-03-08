@@ -88,6 +88,7 @@ void ROCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
   allocData(getNode().getName(), "ropc", ropc_revision);
   configure(obj);
+  setState(RCState::NOTREADY_S);
 }
 
 void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
@@ -105,12 +106,13 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
       std::string vname = stream0[i].hasText("name") ? stream0[i].getText("name") : stream0[i].getText("host");
       m_stream0[i].init(this, i + 2, vname, obj);
       vname = StringUtil::toupper(vname);
-      add(new NSMVHandlerCOPPERState(m_node[vname], *this, "rcstate"));
+      //add(new NSMVHandlerCOPPERState(m_node[vname], *this, "rcstate"));
       vname = (m_stream0.size() == 1) ? "stream0" : StringUtil::form("stream0[%d]", (int)i);
       add(new NSMVHandlerROInputPort(m_stream0[i], vname + ".input.port"));
       add(new NSMVHandlerROOutputPort(m_stream0[i], vname + ".output.port"));
     }
   } catch (const std::out_of_range& e) {
+    LogFile::error(e.what());
     throw (RCHandlerException(e.what()));
   }
 }
@@ -317,15 +319,17 @@ void ROCallback::monitor() throw(RCHandlerException)
   if (state == RCState::RUNNING_S || state == RCState::STARTING_TS) {
     if (m_eb0.isUsed() && !m_eb0.getControl().isAlive()) {
       log(LogFile::ERROR, "eb0 was crashed");
-      setState(RCState::RECOVERING_RS);
-      recover(getDBObject());
+      setState(RCState::ERROR_ES);
+      //setState(RCState::RECOVERING_RS);
+      //recover(getDBObject());
       return;
     }
     for (size_t i = 0; i < m_stream0.size(); i++) {
       if (m_stream0[i].isUsed() && !m_stream0[i].getControl().isAlive()) {
         log(LogFile::ERROR, "basf2 stream0-%d was crashed", (int)i);
-        setState(RCState::RECOVERING_RS);
-        recover(getDBObject());
+        setState(RCState::ERROR_ES);
+        //setState(RCState::RECOVERING_RS);
+        //recover(getDBObject());
         return;
       }
     }

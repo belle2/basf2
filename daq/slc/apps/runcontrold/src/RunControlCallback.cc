@@ -262,9 +262,13 @@ void RunControlCallback::monitor() throw(RCHandlerException)
     try {
       NSMCommunicator::connected(node.getName());
       try {
-        std::string s;
-        get(node, "rcstate", s, 1);
-        cstate_new = RCState(s);
+        if (cstate == Enum::UNKNOWN || state.isStable()) {
+          std::string s;
+          get(node, "rcstate", s, 1);
+          cstate_new = RCState(s);
+        } else {
+          cstate_new = cstate;
+        }
         if (cstate_new != cstate) {
           if (cstate == Enum::UNKNOWN) {
             log(LogFile::INFO, "%s got up (state=%s).",

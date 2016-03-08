@@ -50,9 +50,9 @@ bool EB0Controller::loadArguments(const DBObject& obj)
     const DBObject& o_stream0(obj("stream0", i));
     const int port = o_stream0.getInt("port");
     const std::string nodename = StringUtil::tolower(o_stream0.hasText("name") ? o_stream0.getText("name") : o_stream0.getText("host"));
-    int used = 0;
+    int used = 1;
     try {
-      m_callback->get(m_callback->getRC(), nodename + ".used", used);
+      m_callback->get(m_callback->getRC(), nodename + ".used", used, 5);
     } catch (const std::exception& e) {
       m_callback->log(LogFile::ERROR, "error on reading %s.used %s", nodename.c_str(), e.what());
     }

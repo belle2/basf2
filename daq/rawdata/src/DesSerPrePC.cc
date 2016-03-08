@@ -9,9 +9,11 @@
 
 #include <rawdata/dataobjects/RawFTSWFormat.h>
 #include <rawdata/dataobjects/RawTLUFormat.h>
-#include <daq/rawdata/modules/DesSerPrePC.h>
+//#include <daq/rawdata/modules/DesSerPrePC.h>
+#include <daq/rawdata/DesSerPrePC.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#include <fcntl.h>
 //#define MAXEVTSIZE 400000000
 #define CHECKEVT 5000
 
@@ -213,7 +215,8 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
                 read_size, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
         g_run_error = 1;
-        B2ERROR(err_buf);
+        //        B2ERROR(err_buf);
+        printf("[ERROR] %s\n", err_buf); fflush(stdout);
         string err_str = "RUN_ERROR";
         throw (err_str);
 #endif
@@ -227,7 +230,8 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
               strerror(errno), read_size, errno, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
       m_run_error = 1;
-      B2ERROR(err_buf);
+      //      B2ERROR(err_buf);
+      printf("[ERROR] %s\n", err_buf); fflush(stdout);
       string err_str = "RUN_ERROR";
       throw (err_str);
 #endif
@@ -1023,7 +1027,8 @@ int DesSerPrePC::sendByWriteV(RawDataBlockFormat* rawdblk)
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
 #ifdef NONSTOP
         m_run_error = 1;
-        B2ERROR(err_buf);
+        //        B2ERROR(err_buf);
+        printf("[ERROR] %s\n", err_buf); fflush(stdout);
         string err_str = "RUN_ERROR";
         throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
 #endif
@@ -1098,7 +1103,8 @@ int DesSerPrePC::Send(int socket, char* buf, int size_bytes)
         sprintf(err_buf, "SEND ERROR.(%s) Exiting...", strerror(errno));
 #ifdef NONSTOP
         m_run_error = 1;
-        B2ERROR(err_buf);
+        //        B2ERROR(err_buf);
+        printf("[ERROR] %s\n", err_buf); fflush(stdout);
         string err_str = "RUN_ERROR";
         throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
 #endif

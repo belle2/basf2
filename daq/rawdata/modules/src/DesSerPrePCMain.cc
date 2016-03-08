@@ -7,7 +7,8 @@
 //-
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/rawdata/modules/DesSerPrePCMain.h>
-#include <daq/rawdata/modules/DesSerPrePC.h>
+//#include <daq/rawdata/modules/DesSerPrePC.h>
+#include <daq/rawdata/DesSerPrePC.h>
 
 //#define MAXEVTSIZE 400000000
 

@@ -29,6 +29,7 @@
 
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawFTSW.h>
+#include <rawdata/dataobjects/RawTLU.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <rawdata/dataobjects/RawCDC.h>

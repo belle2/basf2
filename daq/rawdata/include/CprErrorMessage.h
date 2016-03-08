@@ -34,7 +34,8 @@ namespace Belle2 {
     void PrintError(char* err_message, const char* file, const char* func_name, const int line);
 
     //!
-    void PrintError(const int shmflag, RunInfoBuffer* nsm_status, char* err_message, const char* file, const char* func_name, const int line);
+    void PrintError(const int shmflag, RunInfoBuffer* nsm_status, char* err_message, const char* file, const char* func_name,
+                    const int line);
 
     //!
     void PrintError(const int shmflag, RunInfoBuffer* nsm_status, std::string err_str);

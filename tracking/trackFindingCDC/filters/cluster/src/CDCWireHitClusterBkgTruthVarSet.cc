@@ -27,6 +27,11 @@ CDCWireHitClusterBkgTruthVarSet::CDCWireHitClusterBkgTruthVarSet(const std::stri
 {
 }
 
+void CDCWireHitClusterBkgTruthVarSet::beginEvent()
+{
+  CDCMCHitLookUp::getInstance().fill();
+}
+
 bool CDCWireHitClusterBkgTruthVarSet::extract(const CDCWireHitCluster* ptrCluster)
 {
   bool extracted = extractNested(ptrCluster);

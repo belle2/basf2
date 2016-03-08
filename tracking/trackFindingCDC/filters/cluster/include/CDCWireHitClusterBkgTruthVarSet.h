@@ -58,6 +58,9 @@ namespace Belle2 {
       /// Construct the peeler and take an optional prefix.
       explicit CDCWireHitClusterBkgTruthVarSet(const std::string& prefix = "");
 
+      /// Signal the beginning of a new event - loads the Monte Carlo information
+      virtual void beginEvent() override;
+
       /// Generate and assign the variables from the cluster
       virtual bool extract(const CDCWireHitCluster* cluster) override final;
 

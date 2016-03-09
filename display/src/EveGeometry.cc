@@ -14,7 +14,12 @@
 
 using namespace Belle2;
 
-void EveGeometry::addGeometry(bool fullgeo)
+namespace {
+  static TEveGeoTopNode* s_eveTopNode = nullptr;
+  static TEveGeoShape* s_simplifiedShape = nullptr;
+}
+
+void EveGeometry::addGeometry()
 {
   if (!gGeoManager)
     return;
@@ -66,34 +71,41 @@ void EveGeometry::addGeometry(bool fullgeo)
 
   TGeoNode* top_node = gGeoManager->GetTopNode();
   assert(top_node != NULL);
-  TEveGeoTopNode* eve_top_node = new TEveGeoTopNode(gGeoManager, top_node);
-  eve_top_node->IncDenyDestroy();
-  eve_top_node->SetVisLevel(2);
-  gEve->AddGlobalElement(eve_top_node);
+  s_eveTopNode = new TEveGeoTopNode(gGeoManager, top_node);
+  s_eveTopNode->IncDenyDestroy();
+  s_eveTopNode->SetVisLevel(2);
+  gEve->AddGlobalElement(s_eveTopNode);
 
   //don't show full geo unless turned on by user
-  eve_top_node->SetRnrSelfChildren(fullgeo, fullgeo);
+  bool fullgeo = false;
+  s_eveTopNode->SetRnrSelfChildren(fullgeo, fullgeo);
 
   //expand geometry in eve list (otherwise one needs three clicks to see that it has children)
-  eve_top_node->ExpandIntoListTreesRecursively();
+  s_eveTopNode->ExpandIntoListTreesRecursively();
 
   B2DEBUG(100, "Loading geometry projections...");
 
   const std::string extractPath = FileSystem::findFile("/data/display/geometry_extract.root");
   TFile* f = TFile::Open(extractPath.c_str(), "READ");
   TEveGeoShapeExtract* gse = dynamic_cast<TEveGeoShapeExtract*>(f->Get("Extract"));
-  TEveGeoShape* gs = TEveGeoShape::ImportShapeExtract(gse, 0);
-  gs->SetRnrSelf(false);
-  gs->IncDenyDestroy();
-  gs->SetName("Minimal geometry extract");
+  s_simplifiedShape = TEveGeoShape::ImportShapeExtract(gse, 0);
+  s_simplifiedShape->SetRnrSelf(false);
+  s_simplifiedShape->IncDenyDestroy();
+  s_simplifiedShape->SetName("Minimal geometry extract");
   delete f;
 
   //I want to show full geo in unprojected view,
   //but I still need to add the extract to the geometry scene...
-  gEve->AddGlobalElement(gs);
+  gEve->AddGlobalElement(s_simplifiedShape);
 
-  gs->SetRnrSelfChildren(false, !fullgeo);
+  s_simplifiedShape->SetRnrSelfChildren(false, !fullgeo);
   B2DEBUG(100, "Done.");
+}
+void EveGeometry::setVisualisationMode(EType visMode)
+{
+  bool fullgeo = (visMode == c_Full);
+  s_eveTopNode->SetRnrSelfChildren(fullgeo, fullgeo);
+  s_simplifiedShape->SetRnrSelfChildren(false, !fullgeo);
 }
 
 void EveGeometry::enableVolume(const char* name, bool only_daughters, bool enable)
@@ -143,16 +155,15 @@ double EveGeometry::getMaxR()
 void EveGeometry::saveExtract()
 {
   TGeoManager* my_tgeomanager = gGeoManager;
-  TEveGeoTopNode* eve_top_node = dynamic_cast<TEveGeoTopNode*>(gEve->GetGlobalScene()->FirstChild());
-  if (!eve_top_node) {
+  if (!s_eveTopNode) {
     B2ERROR("Couldn't find TEveGeoTopNode");
     return;
   }
-  eve_top_node->ExpandIntoListTrees();
-  eve_top_node->SaveExtract("geometry_extract.root", "Extract", false);
+  s_eveTopNode->ExpandIntoListTrees();
+  s_eveTopNode->SaveExtract("geometry_extract.root", "Extract", false);
 
   //this doesn't work too well (i.e. crashes when geometry is drawn)
-  //eve_top_node->ExpandIntoListTreesRecursively();
-  //eve_top_node->SaveExtract("display_geometry_full.root", "Extract", false);
+  //s_eveTopNode->ExpandIntoListTreesRecursively();
+  //s_eveTopNode->SaveExtract("display_geometry_full.root", "Extract", false);
   gGeoManager = my_tgeomanager;
 }

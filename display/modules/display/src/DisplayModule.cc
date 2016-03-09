@@ -105,6 +105,7 @@ void DisplayModule::initialize()
 
   m_display = new DisplayUI(m_automatic);
   //pass some parameters to DisplayUI to be able to change them at run time
+  m_display->addParameter("Show full geometry", getParam<bool>("fullGeometry"), 0);
   m_display->addParameter("Show MC info", getParam<bool>("showMCInfo"), 0);
   {
     //MC-specific parameters
@@ -120,7 +121,7 @@ void DisplayModule::initialize()
 
   m_visualizer = new EVEVisualization();
   m_visualizer->setOptions(m_options);
-  EveGeometry::addGeometry(m_fullGeometry);
+  EveGeometry::addGeometry();
 
   m_display->hideObjects(m_hideObjects);
 }
@@ -133,6 +134,8 @@ void DisplayModule::event()
     B2WARNING("Display window closed, continuing with next module. (hit Ctrl+C to exit)");
     return;
   }
+
+  EveGeometry::setVisualisationMode(m_fullGeometry ? EveGeometry::c_Full : EveGeometry::c_Simplified);
 
   //secondaries cannot be shown if they are merged into primaries
   m_visualizer->setAssignToPrimaries(m_assignToPrimaries && !m_showNeutrals && !m_showCharged);

@@ -5,9 +5,16 @@
 namespace Belle2 {
   /** Handles manipulation of detector geometry for the display. */
   namespace EveGeometry {
-
+    /** Type of geometry shown. */
+    enum EType {
+      c_Full, /**< Full geometry converted from Geant4 (use this for non-standard Belle II setups!). */
+      c_Simplified /**< a simplified Belle II geometry. */
+    };
     /** Add TGeo geometry to Eve (only needs to be done once.) */
-    void addGeometry(bool fullgeo);
+    void addGeometry();
+
+    /** switch to given visualisation mode. */
+    void setVisualisationMode(EType visMode);
 
     /** enable/disable rendering of the volume 'name', or only its daughters if only_daughters is set. */
     void enableVolume(const char* name, bool only_daughters = false, bool enable = true);

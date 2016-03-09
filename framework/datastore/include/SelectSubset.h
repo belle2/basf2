@@ -39,7 +39,7 @@ namespace Belle2 {
     virtual StoreAccessorBase* getSubSet() = 0;
 
   protected:
-    SelectSubsetBase(): m_inheritToSelf(false), m_reduceExistingSet(false) { }
+    SelectSubsetBase() { }
     virtual ~SelectSubsetBase() { }
 
     /** Swap set and subset (+relations), and keep only the reduced set.
@@ -53,9 +53,9 @@ namespace Belle2 {
     /** array names we inherit relations to. */
     std::vector<std::string> m_inheritToArrays;
     /** If true, relations from set objects to set objects are copied. (if both objects are selected!). */
-    bool m_inheritToSelf;
+    bool m_inheritToSelf = false;
     /** If true, non-selected candidates are removed from m_set, m_subset only exists temporarily. */
-    bool m_reduceExistingSet;
+    bool m_reduceExistingSet = false;
   };
 
   /** Class to create a subset of a given StoreArray together with the relations with other StoreArrays.
@@ -193,8 +193,7 @@ namespace Belle2 {
                   "SelectSubset<T> only works with classes T inheriting from RelationsObject.");
   public:
     /** Constructor */
-    SelectSubset(): SelectSubsetBase(), m_set(nullptr), m_subset(nullptr)
-    {};
+    SelectSubset(): SelectSubsetBase() {};
 
     /** Destructor */
     ~SelectSubset()
@@ -207,11 +206,15 @@ namespace Belle2 {
      * TODO: consider moving this into StoreArray itself
      *
      *  @param set         The StoreArray<StoredClass> from which to retain only selected elements
+     *  @param storeFlags  flags used for temporary arrays and relations. Should be changed
+     *                     from the default if you want multiple instances.
+     *                     c_DontWriteOut is always used.
      */
-    void registerSubset(const StoreArray< StoredClass >& set)
+    void registerSubset(const StoreArray< StoredClass >& set,
+                        DataStore::EStoreFlags storeFlags = DataStore::c_ErrorIfAlreadyRegistered)
     {
       m_reduceExistingSet = true;
-      registerSubset(set, set.getName() + "_tmpSubset", DataStore::c_DontWriteOut);
+      registerSubset(set, set.getName() + "_tmpSubset", storeFlags | DataStore::c_DontWriteOut);
 
       inheritAllRelations();
     }
@@ -232,6 +235,7 @@ namespace Belle2 {
 
       m_subset = new StoreArray<StoredClass>(subsetName, m_set->getDurability());
       m_subset->registerInDataStore(storeFlags);
+      m_subsetFlags = storeFlags;
 
       set.registerRelationTo(*m_subset, m_subset->getDurability(), storeFlags);
     }
@@ -249,7 +253,7 @@ namespace Belle2 {
       } else {
         const_cast<StoreArray<T>&>(array).isRequired();
 
-        DataStore::EStoreFlags flags = DataStore::c_ErrorIfAlreadyRegistered;
+        DataStore::EStoreFlags flags = m_subsetFlags;
         if (m_subset->notWrittenOut() or array.notWrittenOut())
           flags |= DataStore::c_DontWriteOut;
         array.registerRelationTo(*m_subset, m_subset->getDurability(), flags);
@@ -274,7 +278,7 @@ namespace Belle2 {
       } else {
         const_cast<StoreArray<T>&>(array).isRequired();
 
-        DataStore::EStoreFlags flags = DataStore::c_ErrorIfAlreadyRegistered;
+        DataStore::EStoreFlags flags = m_subsetFlags;
         if (m_subset->notWrittenOut() or array.notWrittenOut())
           flags |= DataStore::c_DontWriteOut;
         m_subset->registerRelationTo(array, m_subset->getDurability(), flags);
@@ -335,9 +339,11 @@ namespace Belle2 {
     void inheritRelationsTo() { }
 
     /** The array we use as input. */
-    StoreArray<StoredClass>* m_set;
+    StoreArray<StoredClass>* m_set = nullptr;
     /** The array we create. */
-    StoreArray<StoredClass>* m_subset;
+    StoreArray<StoredClass>* m_subset = nullptr;
+    /** Flags used for m_subset. */
+    DataStore::EStoreFlags m_subsetFlags = 0;
   };
 
   template < class StoredClass>

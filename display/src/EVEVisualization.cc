@@ -1241,9 +1241,60 @@ void EVEVisualization::addECLCluster(const ECLCluster* cluster)
   VisualRepMap::getInstance()->addCluster(cluster, m_eclData, id);
 }
 
+void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
+{
+  const double layerThicknessCm = 3.16; //TDR, Fig 10.2
+  const double layerDistanceCm = 9.1 - layerThicknessCm;
+
+  TVector3 startPos = cluster->getClusterPosition(); //position of first RPC plane
+  TVector3 dir; //direction of cluster stack, Mag() == distance between planes
+  TVector3 a, b; //defines RPC plane
+  bool isBarrel = (startPos.Z() > -175.0 and startPos.Z() < 270.0);
+  if (isBarrel) {
+    //barrel
+    b = TVector3(0, 0, 1);
+    a = startPos.Cross(b).Unit();
+    double c = M_PI / 4.0;
+    double offset = c / 2.0 + M_PI;
+    a.SetPhi(int((a.Phi() + offset) / (c))*c - M_PI);
+    TVector3 perp = b.Cross(a);
+
+    const double barrelRadiusCm = 204.0;
+    startPos.SetMag(barrelRadiusCm / perp.Dot(startPos.Unit()));
+
+    dir = startPos.Unit();
+    dir.SetMag((layerDistanceCm + layerThicknessCm) / perp.Dot(dir));
+  } else {
+    //endcap
+    b = TVector3(startPos.x(), startPos.y(), 0).Unit();
+    a = startPos.Cross(b).Unit();
+    double endcapStartZ = 284;
+    if (startPos.z() < 0)
+      endcapStartZ = -189.5;
+
+    double scaleFac = endcapStartZ / startPos.z();
+    startPos.SetMag(startPos.Mag() * scaleFac);
+
+    dir = startPos.Unit();
+    dir.SetMag((layerDistanceCm + layerThicknessCm) / fabs(dir.z()));
+  }
+
+  for (int i = 0; i < cluster->getLayers(); i++) {
+    TVector3 layerPos = startPos;
+    layerPos += (cluster->getInnermostLayer() + i) * dir;
+    auto* layer = boxCreator(layerPos, a, b, 20.0, 20.0, layerThicknessCm / 2);
+    layer->SetMainColor(c_klmClusterColor);
+    layer->SetMainTransparency(70);
+    layer->SetName(ObjectInfo::getIdentifier(cluster));
+    layer->SetTitle(ObjectInfo::getTitle(cluster));
+
+    addToGroup(std::string("KLMClusters/") + ObjectInfo::getIdentifier(cluster).Data(), layer);
+    addObject(cluster, layer);
+  }
+}
+
 void EVEVisualization::addROI(const ROIid* roi)
 {
-
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   VxdID sensorID = roi->getSensorID();
@@ -1271,7 +1322,6 @@ void EVEVisualization::addROI(const ROIid* roi)
 
   addToGroup("ROIs", ROIbox);
   addObject(roi, ROIbox);
-
 }
 
 void EVEVisualization::addRecoHit(const SVDCluster* hit, TEveStraightLineSet* lines)

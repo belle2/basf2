@@ -4,6 +4,7 @@
 #include <display/ObjectInfo.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <simulation/dataobjects/MCParticleTrajectory.h>
@@ -95,6 +96,8 @@ namespace Belle2 {
     const static int c_trackMarkerColor = kSpring;
     /** Color for unassigned (reco)hits. */
     const static int c_unassignedHitColor = kViolet - 5;
+    /** Color for KLMCluster objects. */
+    const static int c_klmClusterColor = kSpring - 2;
 
   public:
     /** Constructor.
@@ -166,6 +169,9 @@ namespace Belle2 {
 
     /** Add a reconstructed cluster in the ECL. */
     void addECLCluster(const ECLCluster* cluster);
+
+    /** Add a reconstructed cluster in the KLM. */
+    void addKLMCluster(const KLMCluster* cluster);
 
     /** Add a Region Of Interest, computed by the PXDDataReduction module */
     void addROI(const ROIid* roi);

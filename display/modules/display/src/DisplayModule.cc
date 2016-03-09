@@ -82,6 +82,7 @@ void DisplayModule::initialize()
   StoreArray<BKLMSimHit>::optional();
   StoreArray<EKLMSimHit>::optional();
   StoreArray<ECLCluster>::optional();
+  StoreArray<KLMCluster>::optional();
   StoreArray<Track>::optional();
   StoreArray<TrackFitResult>::optional();
   StoreArray<genfit::Track>::optional();
@@ -242,6 +243,18 @@ void DisplayModule::event()
       }
 
       m_visualizer->addECLCluster(&cluster);
+    }
+
+    StoreArray<KLMCluster> klmclusters;
+    for (const KLMCluster& cluster : klmclusters) {
+      if (m_showMCInfo) {
+        //make sure we add particles producing these
+        const MCParticle* mcpart = cluster.getRelated<MCParticle>();
+        if (mcpart)
+          m_visualizer->addMCParticle(mcpart);
+      }
+
+      m_visualizer->addKLMCluster(&cluster);
     }
   }
 

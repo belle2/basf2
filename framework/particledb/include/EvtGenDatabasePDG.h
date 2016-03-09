@@ -17,6 +17,7 @@
 #include <iosfwd>
 
 namespace Belle2 {
+  /** Replacement for TDatabasePDG that is filled from EvtGen's evt.pdl. */
   class EvtGenDatabasePDG : public TDatabasePDG {
   public:
     /** Instance method that loads the EvtGen table. */
@@ -46,7 +47,7 @@ namespace Belle2 {
     /** singleton, make sure there's no assignment operator */
     EvtGenDatabasePDG& operator=(const EvtGenDatabasePDG&) = delete;
 
-    ClassDef(EvtGenDatabasePDG, 1);
+    ClassDef(EvtGenDatabasePDG, 1); /**< Replacement for TDatabasePDG that is filled from EvtGen's evt.pdl. */
   };
 } //Belle2 namespace
 

@@ -40,8 +40,20 @@ outputBelle2ROOTFile = sys.argv[3]
 # set the location of the Belle DB server
 # options are: ekpbelle.physik.uni-karlsruhe.de
 # or ekpbelle.physik.uni-karlsruhe.de (if you're running outside KEKCC computers)
-os.putenv('BELLE_POSTGRES_SERVER', 'can51')
-os.putenv('USE_GRAND_REPROCESS_DATA', '1')
+os.environ['BELLE_POSTGRES_SERVER'] = 'can51'
+os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
+
+print('BELLE2_EXTERNALS_DIR     = ' + str(os.getenv('BELLE2_EXTERNALS_DIR')))
+print('BELLE2_EXTERNALS_SUBDIR  = ' + str(os.getenv('BELLE2_EXTERNALS_SUBDIR')))
+print('BELLE2_EXTERNALS_OPTION  = ' + str(os.getenv('BELLE2_EXTERNALS_OPTION')))
+print('BELLE2_EXTERNALS_VERSION = ' + str(os.getenv('BELLE2_EXTERNALS_VERSION')))
+print('BELLE2_LOCAL_DIR         = ' + str(os.getenv('BELLE2_LOCAL_DIR')))
+print('BELLE2_RELEASE           = ' + str(os.getenv('BELLE2_RELEASE')))
+print('BELLE2_OPTION            = ' + str(os.getenv('BELLE2_OPTION')))
+print('BELLE_POSTGRES_SERVER    = ' + str(os.getenv('BELLE_POSTGRES_SERVER')))
+print('USE_GRAND_REPROCESS_DATA = ' + str(os.getenv('USE_GRAND_REPROCESS_DATA')))
+print('PANTHER_TABLE_DIR        = ' + str(os.getenv('PANTHER_TABLE_DIR')))
+print('PGUSER                   = ' + str(os.getenv('PGUSER')))
 
 # Convert
 convertBelleMdstToBelleIIMdst(inputBelleMDSTFile)

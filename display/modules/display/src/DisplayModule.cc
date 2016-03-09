@@ -10,6 +10,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Gearbox.h>
 
 #include <genfit/Track.h>
 #include <genfit/GFRaveVertex.h>
@@ -123,6 +124,12 @@ void DisplayModule::initialize()
   m_visualizer = new EVEVisualization();
   m_visualizer->setOptions(m_options);
   EveGeometry::addGeometry();
+
+  std::string detectorName = Gearbox::getInstance().getString("Detector/Name");
+  if (detectorName != "Belle2Detector") {
+    B2INFO("Non-standard detector '" << detectorName << "' used, switching to full geometry.");
+    m_fullGeometry = true;
+  }
 
   m_display->hideObjects(m_hideObjects);
 }

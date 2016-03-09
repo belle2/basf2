@@ -14,6 +14,9 @@ int main(int argc, char** argv)
     RCNode ttd(config.get("ttd"));
     TTDACallback callback(ttd);
     callback.setFTSWID(config.getInt("ftsw"));
+    callback.setTriggerType(config.get("trigger_type"));
+    callback.setDummyRate(config.getInt("dummy_rate"));
+    callback.setTriggerLimit(config.getInt("trigger_limit"));
     TTDMasterCallback callback2(&callback);
     RCNodeDaemon(config, &callback, &callback2).run();
   }

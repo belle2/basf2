@@ -63,10 +63,7 @@ void NSMNodeDaemon::run() throw()
       }
     }
     double t0 = Time().get();
-    double t = t0;
-    double tout = m_timeout;
     while (true) {
-      double t1 = (tout - (t - t0) > 0 ? tout - (t - t0) : 0);
       try {
         NSMCommunicator& com(NSMCommunicator::select(m_timeout));
         com.getCallback().perform(com);
@@ -78,7 +75,8 @@ void NSMNodeDaemon::run() throw()
           com.getCallback().perform(com);
         }
       }
-      if (t1 <= 0) {
+      double t = Time().get();
+      if (t - t0 >= m_timeout) {
         for (size_t i = 0; i < com_v.size(); i++) {
           NSMCommunicator& com(*com_v[i]);
           com.getCallback().timeout(com);
@@ -86,7 +84,6 @@ void NSMNodeDaemon::run() throw()
         }
         t0 = t;
       }
-      t = Time().get();
     }
   } catch (const std::exception& e) {
     LogFile::fatal("NSM node brdge : Caught exception %s\n"

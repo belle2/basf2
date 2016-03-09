@@ -30,13 +30,17 @@ namespace Belle2 {
     virtual void ok(const char* nodename, const char* data) throw();
     virtual void error(const char* nodename, const char* data) throw();
     void trigft() throw(RCHandlerException);
+    void setFTSWID(int id);
     bool setTriggerType(const std::string& type) throw();
-    void setFTSWID(int id) { m_ftswid = id; }
+    void setTriggerLimit(int limit) throw() { m_trigger_limit = limit; }
+    void setDummyRate(int rate) throw() { m_dummy_rate = rate; }
 
   private:
     RCNode m_ttdnode;
     std::map<std::string, int> m_trgcommands;
     std::string m_trigger_type;
+    int m_dummy_rate;
+    int m_trigger_limit;
     int m_ftswid;
 
   private:

@@ -43,7 +43,7 @@ namespace Belle2 {
      */
     const TObject* getDataStoreObject(TEveElement* elem) const;
 
-    /** Get visual representation of given object. */
+    /** Get (first) visual representation of given object. */
     TEveElement* getEveElement(const TObject* obj) const;
 
     /** Remove all contents in map. (call this after each event) */

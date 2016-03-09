@@ -10,15 +10,15 @@
 #include <TEveManager.h>
 
 #include <boost/bimap/bimap.hpp>
-#include <boost/bimap/unordered_set_of.hpp>
+#include <boost/bimap/unordered_multiset_of.hpp>
 
 using namespace Belle2;
 
 namespace {
   /** defines a bidirectional mapping between TObjects in DataStore and their visual representation. */
   typedef boost::bimaps::bimap <
-  boost::bimaps::unordered_set_of<const TObject*>,
-        boost::bimaps::unordered_set_of<TEveElement*>
+  boost::bimaps::unordered_multiset_of<const TObject*>,
+        boost::bimaps::unordered_multiset_of<TEveElement*>
         > DataStoreEveElementMap_Base;
 }
 
@@ -81,17 +81,20 @@ void VisualRepMap::select(const TObject* object) const
   if (m_currentlySelecting)
     B2FATAL("recursive select() call detected. Please check isCurrentlySelecting().");
   m_currentlySelecting = true;
-  TEveElement* elem = getEveElement(object);
-  if (elem and !gEve->GetSelection()->HasChild(elem)) {
-    //select this object in addition to existing selection
-    gEve->GetSelection()->UserPickedElement(elem, true);
+  auto range = m_dataStoreEveElementMap->left.equal_range(object);
+  for (auto it = range.first; it != range.second; ++it) {
+    TEveElement* elem = it->second;
+    if (elem and !gEve->GetSelection()->HasChild(elem)) {
+      //select this object in addition to existing selection
+      gEve->GetSelection()->UserPickedElement(elem, true);
+    }
   }
   m_currentlySelecting = false;
 }
 
 void VisualRepMap::selectOnly(TEveElement* eveObj) const
 {
-  //copy current selection
+  //copy current selection, then deselect each element
   const std::list<TEveElement*> sel(gEve->GetSelection()->BeginChildren(), gEve->GetSelection()->EndChildren());
   for (TEveElement* el : sel) {
     if (el == eveObj or el->IsA() == EveTower::Class())

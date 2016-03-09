@@ -37,7 +37,7 @@ const BeamParameters& PCmsLabTransform::getBeamParams() const
     return *beamParamsFromGearbox.get();
   }
 
-  //check if any BeamParameters are available in the DataStore
+  //check if any BeamParameters are available in the database
   if (m_beamParams) {
     return *m_beamParams;
   }

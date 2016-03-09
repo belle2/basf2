@@ -167,7 +167,7 @@ class Plotuple:
         Creates the histogram/table/image that belongs to this Plotuble-object.
         """
 
-        if self.type == 'TH1':
+        if self.type == 'TH1' or self.type == 'TEfficiency':
             self.create_histogram_plot('1D')
         elif self.type == 'TH2':
             self.create_histogram_plot('2D')
@@ -494,11 +494,21 @@ class Plotuple:
                             additional_options += ' ' + _
 
                     # Draw the reference on the canvas
-                    plot.object.DrawCopy(plot.object.GetOption() +
+                    if self.type == 'TEfficiency':
+                        # TEff does not provide DrawCopy
+                        plot.object.Draw(plot.object.GetOption() +
                                          additional_options)
+                    else:
+                        plot.object.DrawCopy(plot.object.GetOption() +
+                                             additional_options)
+
                     drawn = True
                 else:
-                    plot.object.DrawCopy("SAME")
+                    if self.type == 'TEfficiency':
+                        # TEff does not provide DrawCopy
+                        plot.object.Draw("SAME")
+                    else:
+                        plot.object.DrawCopy("SAME")
 
                 # redraw grid ontop of histogram, if selected
                 if 'nogrid' not in self.metaoptions:

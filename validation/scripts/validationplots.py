@@ -843,13 +843,16 @@ def create_RootObjects_from_file(root_file, is_reference):
                 root_object_type = 'TH2'
             else:
                 root_object_type = 'TH1'
+        # TEfficiency barks and quarks like a TProfile, but is unfortunately not
+        elif root_object.InheritsFrom('TEfficiency'):
+            root_object_type = 'TEfficiency'
         elif root_object.InheritsFrom('TASImage'):
             root_object_type = 'TASImage'
         else:
             root_object_type = None
 
         # If we are dealing with a histogram:
-        if root_object_type in ['TH1', 'TH2']:
+        if root_object_type in ['TH1', 'TH2', 'TEfficiency']:
 
             # Ensure that the data read from the ROOT files lives on even
             # after the ROOT file is closed

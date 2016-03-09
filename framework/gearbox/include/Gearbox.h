@@ -203,9 +203,6 @@ namespace Belle2 {
     /** Return the (cached) value of a given path */
     PathValue getPathValue(const std::string& path) const;
 
-    /** Flag indicating whether the last load operation used the database */
-    bool m_database;
-
     /** Pointer to the libxml Document structure */
     xmlDocPtr m_xmlDocument;
     /** Pointer to the libxml XPath context */

@@ -9,6 +9,17 @@ import requests
 import http
 
 
+def setupBelleMagneticField(path=analysis_main):
+    """
+    Sets up the Belle Magnetic field (constant).
+    """
+    gearbox = register_module('Gearbox')
+    gearbox.param('fileName', 'b2bii/Belle.xml')
+    path.add_module(gearbox)
+
+    path.add_module('Geometry', ignoreIfPresent=False, components=['MagneticField'])
+
+
 def setupB2BIIDatabase(isMC=False):
     """
     Setup the database for B2BII

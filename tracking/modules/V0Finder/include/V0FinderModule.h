@@ -74,6 +74,9 @@ namespace Belle2 {
     double m_vertexChi2CutInside;
     double m_massWindowKshortInside;
     double m_vertexChi2CutOutside;
+
+    bool m_validation;
+    std::string m_V0ValidationVertexColName;
   };
 }
 #endif

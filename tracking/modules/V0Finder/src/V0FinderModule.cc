@@ -8,10 +8,9 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/V0.h>
-
+#include <tracking/dataobjects/V0ValidationVertex.h>
 #include <TMath.h>
 #include <TLorentzVector.h>
-
 #include "genfit/Track.h"
 #include "genfit/GFRaveVertexFactory.h"
 #include "genfit/GFRaveTrackParameters.h"
@@ -65,6 +64,9 @@ V0FinderModule::V0FinderModule() : Module()
 
   // output: V0s
   addParam("V0ColName", m_V0ColName, "V0 collection name (output)", std::string(""));
+  addParam("Validation", m_validation, "Create output for validation.", bool(false));
+  addParam("V0ValidationVertexColName", m_V0ValidationVertexColName, "V0ValidationVertex collection name (optional output)",
+           std::string(""));
 
   addParam("beamPipeRadius", m_beamPipeRadius,
            "Radius at which we switch between the two classes of cuts.  The "
@@ -102,6 +104,12 @@ void V0FinderModule::initialize()
 
   StoreArray<V0> v0s(m_V0ColName);
   v0s.registerInDataStore(DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+
+  if (m_validation) {
+    B2DEBUG(300, "Register DataStore for validation.");
+    StoreArray<V0ValidationVertex> validationV0s(m_V0ValidationVertexColName);
+    validationV0s.registerInDataStore(DataStore::c_WriteOut);
+  }
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
     B2FATAL("Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
@@ -235,6 +243,7 @@ void V0FinderModule::event()
 
       const genfit::GFRaveVertex& vert = *vertexVector[0];
       const TVector3& posVert(vert.getPos());
+      TLorentzVector lv0, lv1;
 
       // Apply cuts.  We have one set of cuts inside the beam pipe,
       // the other outside.
@@ -262,7 +271,6 @@ void V0FinderModule::event()
           continue;
         }
 
-        TLorentzVector lv0, lv1;
         lv0.SetVectM(tr0->getMom(), Const::pionMass);
         lv1.SetVectM(tr1->getMom(), Const::pionMass);
 
@@ -318,6 +326,21 @@ void V0FinderModule::event()
       B2DEBUG(100, "Creating new V0.");
       v0s.appendNew(std::make_pair(trackPlusPair.first, tfrPlusVtx),
                     std::make_pair(trackMinusPair.first, tfrMinusVtx));
+
+      if (m_validation) {
+        B2DEBUG(300, "Create StoreArray and Output for validation.");
+        StoreArray<V0ValidationVertex> validationV0s(m_V0ValidationVertexColName);
+        validationV0s.appendNew(
+          std::make_pair(trackPlusPair.first, tfrPlusVtx),
+          std::make_pair(trackMinusPair.first, tfrMinusVtx),
+          vert.getPos(),
+          vert.getCov(),
+          (lv0 + lv1).P(),
+          (lv0 + lv1).M(),
+          vert.getChi2()
+        );
+
+      }
     }
   }
 }

@@ -10,7 +10,7 @@ import basf2
 import array
 import numpy as np
 from datetime import datetime
-from ROOT import TFile, TNtuple, TH1F, TF1, TH2F, TF2, TRandom3, gRandom, TNamed
+from ROOT import TFile, TNtuple, TH1F, TF1, TH2F, TF2, TRandom3, gRandom, TNamed, TEfficiency
 
 
 def generateTestPlots(prefix):
@@ -97,3 +97,25 @@ def generateTestPlots(prefix):
     hist2d.GetListOfFunctions().Add(TNamed('MetaOptions', "contz"))
 
     hist2d.Write()
+
+    # add TEfficiency plot
+    gaus_passed = TH1F("gaus_passed", "gaus_passed", 50, -0.5, 49.5)
+    gaus_total = TH1F("gaus_total", "gaus_total", 50, -0.5, 49.5)
+
+    for i in range(5000):
+        # shifted to more passed at larger positions
+        ratio = float(i) / 5000.0
+        passed = gRandom.Uniform(ratio * 0.45, 1.0)
+        pos = gRandom.Uniform(ratio * 30.0, 49.5)
+
+        gaus_total.Fill(pos)
+        if passed > 0.5:
+            gaus_passed.Fill(pos)
+
+    teff = TEfficiency(gaus_passed, gaus_total)
+    teff.SetName("TEfficiency")
+    teff.GetListOfFunctions().Add(TNamed('Description', "Efficiency plot of something"))
+    teff.GetListOfFunctions().Add(TNamed('Check', "Check For Something"))
+    teff.GetListOfFunctions().Add(TNamed('Contact', "Contact Someone"))
+
+    teff.Write()

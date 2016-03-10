@@ -42,7 +42,7 @@ namespace Belle2 {
 
       /// Constructor from another range
       template<class Ts>
-      explicit SortedRange(EnableIf<IsIterable<Ts>() == true, Ts&> ts)
+      explicit SortedRange(EnableIf<IsIterable<Ts>::value == true, Ts&> ts)
         : Super(AIterator(std::begin(ts)), AIterator(std::end(ts)))
       {}
 

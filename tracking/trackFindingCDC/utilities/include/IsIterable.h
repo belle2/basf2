@@ -22,7 +22,7 @@ namespace Belle2 {
      *  Therefore, the expression is currently limited to be used within enable_if type expressions.
      */
     template<class Ts>
-    using IsIterable = std::integral_constant<bool, not std::is_void<GetIterator<Ts> >() >;
+    using IsIterable = std::integral_constant<bool, not std::is_void<GetIterator<Ts> >::value >;
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

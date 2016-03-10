@@ -43,7 +43,7 @@ namespace Belle2 {
 
       /// Constructor from another range
       template<class Ts>
-      explicit Range(EnableIf<IsIterable<Ts>() == true, Ts&> ts)
+      explicit Range(EnableIf<IsIterable<Ts>::value == true, Ts&> ts)
         : Super(AIterator(std::begin(ts)), AIterator(std::end(ts)))
       {}
 

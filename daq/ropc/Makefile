@@ -10,7 +10,7 @@ SLCPATH=${BELLE2_LOCAL_DIR}/daq/slc/readout/src:${BELLE2_LOCAL_DIR}/daq/slc/syst
 VPATH = ${RAWDATAPATH}:${DAQPATH}:${SLCPATH}
 
 RAWDATAOBJS = RawDataBlockFormat.o RawCOPPERFormat.o RawCOPPERFormat_latest.o PreRawCOPPERFormat_latest.o PostRawCOPPERFormat_latest.o RawHeader_latest.o RawTrailer_latest.o RawTLUFormat.o RawFTSWFormat.o CRCCalculator.o 
-DAQOBJS = DesSerPrePC.o CprErrorMessage.o DesSerCOPPER.o SendHeader.o SendTrailer.o
+DAQOBJS = DesSer.o DesSerPrePC.o DesSerCOPPER.o CprErrorMessage.o SendHeader.o SendTrailer.o
 SLCOBJS = RunInfoBuffer.o SharedMemory.o MMutex.o MCond.o LogFile.o Mutex.o Date.o ConfigFile.o StringUtil.o
 OBJS = ${RAWDATAOBJS} ${DAQOBJS} ${SLCOBJS}
 

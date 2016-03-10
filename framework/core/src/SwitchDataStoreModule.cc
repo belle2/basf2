@@ -8,28 +8,34 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/modules/switchds/SwitchDsModule.h>
+#include <framework/core/SwitchDataStoreModule.h>
 #include <framework/datastore/DataStore.h>
 
 
 using namespace Belle2;
 
-REG_MODULE(SwitchDs)
+//Note: should not appear in module list since we're not in the right directory
+REG_MODULE(SwitchDataStore)
 
-SwitchDsModule::SwitchDsModule() : Module()
+SwitchDataStoreModule::SwitchDataStoreModule() : Module()
 {
-  setDescription("Internal module used by Path.add_skim_path(). Don't use it directly.");
+  setDescription("Internal module used by Path.add_skim_path(). This shouldn't appear in 'basf2 -m' output. If it does, check REG_MODULE() handling.");
 
-  addParam("toID", m_to, "active DataStore id after this module");
+  addParam("toID", m_to, "active DataStore id after this module", std::string(""));
   addParam("doCopy", m_doCopy,
-           "should data be copied to DataStore 'toID'? This should be true only when toID refers to a _new_ DataStore ID");
+           "should data be copied to DataStore 'toID'? This should be true only when toID refers to a _new_ DataStore ID", false);
 }
 
-SwitchDsModule::~SwitchDsModule()
+SwitchDataStoreModule::~SwitchDataStoreModule()
 {
 }
+void SwitchDataStoreModule::init(std::string to, bool doCopy)
+{
+  m_to = to;
+  m_doCopy = doCopy;
+}
 
-void SwitchDsModule::initialize()
+void SwitchDataStoreModule::initialize()
 {
   m_from = DataStore::Instance().currentID();
   if (m_from == m_to)
@@ -47,7 +53,7 @@ void SwitchDsModule::initialize()
   //switch
   DataStore::Instance().switchID(m_to);
 }
-void SwitchDsModule::terminate()
+void SwitchDataStoreModule::terminate()
 {
   if (not m_doCopy) {
     //copy contents over
@@ -58,15 +64,15 @@ void SwitchDsModule::terminate()
   DataStore::Instance().switchID(m_from);
 }
 
-void SwitchDsModule::beginRun()
+void SwitchDataStoreModule::beginRun()
 {
   event();
 }
-void SwitchDsModule::endRun()
+void SwitchDataStoreModule::endRun()
 {
   event();
 }
-void SwitchDsModule::event()
+void SwitchDataStoreModule::event()
 {
   if (m_doCopy) {
     //copy contents over

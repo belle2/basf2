@@ -130,6 +130,17 @@ namespace Belle2 {
      */
     void forEach(std::string loopObjectName, std::string arrayName, PathPtr path);
 
+    /**
+     * Add given path at the end of this path and ensure all modules there
+     * do not influence the main DataStore. You can thus use modules in
+     * skim_path to clean up e.g. the list of particles, save a skimmed uDST file,
+     * and continue working with the unmodified DataStore contents outside of
+     * skim_path.
+     * ds_ID can be specified to give a defined ID to the temporary DataStore,
+     * otherwise, a random name will be generated.
+     */
+    void addSkimPath(PathPtr skim_path, std::string ds_ID);
+
     /** Create an independent copy of this path, recreating all contained modules with the same parameters.
      *
      * Note that parameters are shared, so changing them on a module in the cloned path will also affect

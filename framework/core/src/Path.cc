@@ -16,6 +16,7 @@
 #include <framework/core/Module.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/core/SubEventModule.h>
+#include <framework/core/SwitchDataStoreModule.h>
 
 using namespace Belle2;
 using namespace boost::python;
@@ -99,6 +100,34 @@ void Path::forEach(std::string loopObjectName, std::string arrayName, PathPtr pa
   addModule(module);
 }
 
+void Path::addSkimPath(PathPtr skim_path, std::string ds_ID)
+{
+  ModulePtr switchStart = ModuleManager::Instance().registerModule("SwitchDataStore");
+  static_cast<SwitchDataStoreModule&>(*switchStart).init(ds_ID, true);
+  ModulePtr switchEnd = ModuleManager::Instance().registerModule("SwitchDataStore");
+  static_cast<SwitchDataStoreModule&>(*switchEnd).init("", false);
+  switchStart->setName("SwitchDataStore ('' -> '" + ds_ID + "')");
+  switchEnd->setName("SwitchDataStore ('' <- '" + ds_ID + "')");
+
+  auto flag = Module::c_ParallelProcessingCertified;
+  //set c_ParallelProcessingCertified flag if _all_ modules have it set
+  bool allCertified = true;
+  for (const auto& mod : buildModulePathList()) {
+    if (!mod->hasProperties(flag)) {
+      allCertified = false;
+      break;
+    }
+  }
+  if (allCertified) {
+    switchStart->setPropertyFlags(flag);
+    switchEnd->setPropertyFlags(flag);
+  }
+
+  addModule(switchStart);
+  addPath(skim_path);
+  addModule(switchEnd);
+}
+
 bool Path::contains(std::string moduleType) const
 {
   const std::list<ModulePtr>& modules = getModules();
@@ -157,7 +186,6 @@ boost::python::list _getModulesPython(const Path* path)
   return returnList;
 }
 
-
 void Path::exposePythonAPI()
 {
   class_<Path>("Path", no_init)
@@ -166,6 +194,7 @@ void Path::exposePythonAPI()
   .def("add_path", &Path::addPath)
   .def("modules", &_getModulesPython)
   .def("for_each", &Path::forEach)
+  .def("_add_skim_path", &Path::addSkimPath)
   .def("__contains__", &Path::contains)
   ;
 

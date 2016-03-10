@@ -457,18 +457,7 @@ def _add_skim_path(self, skim_path, ds_ID=''):
     if not ds_ID:
         import random
         ds_ID = 'skim' + str(random.randint(0, 4000000))
-    switchStart = self.add_module('SwitchDs', toID=ds_ID, doCopy=True)
-    self.add_path(skim_path)
-    switchEnd = self.add_module('SwitchDs', toID="", doCopy=False)
-
-    switchStart.set_name("SwitchDs ('' -> '" + ds_ID + "')")
-    switchEnd.set_name("SwitchDs ('' <- '" + ds_ID + "')")
-
-    # this can be set if all modules in between also have the flag
-    flag = ModulePropFlags.PARALLELPROCESSINGCERTIFIED
-    if all([mod.has_properties(flag) for mod in skim_path.modules()]):
-        switchStart.set_property_flags(flag)
-        switchEnd.set_property_flags(flag)
+    self._add_skim_path(skim_path, ds_ID)
 
 Path.add_skim_path = _add_skim_path
 

@@ -14,7 +14,7 @@
 
 namespace Belle2 {
   /** Internal module used by Path.add_skim_path(). Don't use it directly. */
-  class SwitchDsModule : public Module {
+  class SwitchDataStoreModule : public Module {
 
   public:
 
@@ -22,9 +22,11 @@ namespace Belle2 {
      * Constructor.
      * Sets the description, the properties and the parameters of the module.
      */
-    SwitchDsModule();
+    SwitchDataStoreModule();
+    /** setter for Path. */
+    void init(std::string to, bool doCopy);
 
-    ~SwitchDsModule();
+    ~SwitchDataStoreModule();
 
     virtual void initialize();
     virtual void beginRun();

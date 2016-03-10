@@ -64,14 +64,16 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
 #endif
         continue;
       } else {
+        perror("ERRNOUM");
         char err_buf[500];
         sprintf(err_buf, "recv() returned error; ret = %d. : %s %s %d",
                 read_size, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
-        g_run_error = 1;
+        m_run_error = 1;
         //        B2ERROR(err_buf);
         printf("[ERROR] %s\n", err_buf); fflush(stdout);
         string err_str = "RUN_ERROR";
+        printf("AIUEO********************\n"); fflush(stdout);
         throw (err_str);
 #endif
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -238,11 +240,11 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
     //
     // Data size check1
     //
-    if (rawblk_nwords > (int)(2.5e6)) {
+    if (rawblk_nwords > (int)(2.5e6) || rawblk_nwords <= 0) {
       printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
       char err_buf[500];
-      sprintf(err_buf, "CORRUPTED DATA: Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes,
-              send_hdr.GetTotalNwords());
+      sprintf(err_buf, "CORRUPTED DATA: Too large event : Header %d %d %d %d :block size %d words\n", i, temp_num_events, temp_num_nodes,
+              send_hdr.GetTotalNwords(), rawblk_nwords);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(123456);
       exit(1);
@@ -576,18 +578,6 @@ void DesSerPrePC::DataAcquisition()
     //
 #ifdef NONSTOP
     if (m_run_pause > 0 || m_run_error > 0) {
-      if (m_run_pause == 0) {
-        while (true) {
-          if (checkRunPause()) break;
-#ifdef NONSTOP_DEBUG
-          printf("\033[31m");
-          printf("###########(DesSerPrePC) Waiting for Runstop()  ###############\n");
-          fflush(stdout);
-          printf("\033[0m");
-#endif
-          sleep(1);
-        }
-      }
       waitResume();
     }
 #endif
@@ -784,10 +774,20 @@ void DesSerPrePC::DataAcquisition()
 
 
 #ifdef NONSTOP
-
-
 void DesSerPrePC::waitResume()
 {
+  if (m_run_pause == 0) {
+    while (true) {
+      if (checkRunPause()) break;
+#ifdef NONSTOP_DEBUG
+      printf("\033[31m");
+      printf("###########(DesSerPrePC) Waiting for Runstop()  ###############\n");
+      fflush(stdout);
+      printf("\033[0m");
+#endif
+      sleep(1);
+    }
+  }
 
   while (true) {
 #ifdef NONSTOP_DEBUG
@@ -806,12 +806,14 @@ void DesSerPrePC::waitResume()
 
   printf("Done!\n"); fflush(stdout);
 
+  printf("Checking connection to eb0\n"); fflush(stdout);
   if (CheckConnection(m_socket_send) < 0) {
     printf("Trying Accept1\n"); fflush(stdout);
     Accept();
     printf("Trying Accept2\n"); fflush(stdout);
   }
 
+  printf("Checking connection to COPPER\n"); fflush(stdout);
   for (int i = 0; i < m_num_connections; i++) {
     if (CheckConnection(m_socket_recv[ i ]) < 0)  m_socket_recv[ i ] = -1;
   }

@@ -330,7 +330,7 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
     //
     // Data size check1
     //
-    if (rawblk_nwords > (int)(2.5e6)) {
+    if (rawblk_nwords > (int)(2.5e6) || rawblk_nwords <= 0) {
       printf("[DEBUG] *******HDR**********\n");
       //      printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
       printData(send_hdr_buf, 100);

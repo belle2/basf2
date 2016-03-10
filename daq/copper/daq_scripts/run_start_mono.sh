@@ -26,5 +26,5 @@
 # basf2 program AFTER eb0(event builder 0) on a readout PC
 #
 #    print 'Usage : RecvStream1.py <Use NSM(Network Shared Memory)? yes=1/no=0> <port # of eb0> <NSM nodename>
-#${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream1.sh 0 5101 hogehoge1000
+#${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream1.sh 0 34007 hogehoge1000
 

@@ -50,7 +50,7 @@ main = create_path()
 main.add_module(receiver)
 main.add_module(converter)
 # main.add_module(dump)
-# main.add_module(sender)
+main.add_module(sender)
 
 # Process all events
 process(main)

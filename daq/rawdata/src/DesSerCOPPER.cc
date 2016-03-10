@@ -12,11 +12,7 @@
 using namespace std;
 using namespace Belle2;
 
-#ifdef NONSTOP
-int g_run_resuming = 0;
-int g_run_pause = 0;
-int g_run_error = 0;
-#endif
+
 
 //----------------------------------------------------------------
 //                 Implementation
@@ -93,18 +89,6 @@ void DesSerCOPPER::DataAcquisition()
     //
 #ifdef NONSTOP
     if (m_run_pause > 0 || m_run_error > 0) {
-      if (m_run_pause == 0) {
-        while (true) {
-          if (checkRunPause()) break;
-#ifdef NONSTOP_DEBUG
-          printf("\033[31m");
-          printf("###########(DesSerCOPPER) Waiting for Runstop()  ###############\n");
-          fflush(stdout);
-          printf("\033[0m");
-#endif
-          sleep(1);
-        }
-      }
       waitResume();
     }
 #endif
@@ -266,6 +250,22 @@ void DesSerCOPPER::DataAcquisition()
 #ifdef NONSTOP
 void DesSerCOPPER::waitResume()
 {
+  if (m_run_pause == 0) {
+    while (true) {
+      if (checkRunPause()) break;
+#ifdef NONSTOP_DEBUG
+      printf("\033[31m");
+      printf("###########(DesSerCOPPER) Waiting for Runstop()  ###############\n");
+      fflush(stdout);
+      printf("\033[0m");
+#endif
+      sleep(1);
+    }
+  }
+
+  // close COPPER FIFO
+  if (m_cpr_fd != -1) close(m_cpr_fd);
+  m_cpr_fd = -1;
 
   while (true) {
 #ifdef NONSTOP_DEBUG
@@ -276,11 +276,12 @@ void DesSerCOPPER::waitResume()
 #endif
     if (checkRunRecovery()) {
       m_run_pause = 0;
+      m_run_error = 0;
+
       break;
     }
     sleep(1);
   }
-
 
   printf("Done!\n"); fflush(stdout);
 
@@ -293,6 +294,23 @@ void DesSerCOPPER::waitResume()
   resumeRun();
   return;
 }
+
+
+
+void DesSerCOPPER::resumeRun()
+{
+  initializeCOPPER();
+#ifdef NONSTOP_DEBUG
+  printf("\033[34m");
+  printf("###########(Ser) the 1st event sicne the resume  ###############\n");
+  fflush(stdout);
+  printf("\033[0m");
+#endif
+  m_run_error = 0;
+  m_run_pause = 0;
+  return;
+}
+
 
 
 #endif
@@ -557,7 +575,7 @@ int DesSerCOPPER::readFD(int fd, char* buf, int data_size_byte, int delete_flag)
         sprintf(err_buf, "Failed to read data from COPPER. %s %s %d",
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
-        g_run_error = 1;
+        m_run_error = 1;
         //        B2ERROR(err_buf);
         printf("[ERROR] %s", err_buf); fflush(stdout);
         string err_str = "RUN_ERROR";

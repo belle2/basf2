@@ -69,6 +69,9 @@ namespace Belle2 {
 #ifdef NONSTOP
     //! for nonstop DAQ
     void waitResume();
+
+    //! for nonstop DAQ
+    void resumeRun();
 #endif
   };
 

@@ -40,9 +40,7 @@ class CosmicsHough(TrackingValidationRun):
     cdc_stereo_combiner_module = basf2.register_module('StereoHitFinderCDCLegendreHistogramming')
     cdc_stereo_combiner_module.param(dict(TracksStoreObjNameIsInput=True,
                                           WriteGFTrackCands=True,
-                                          TracksStoreObjName="AxialCDCTracks",
-                                          quadTreeLevel=6,
-                                          minimumNumberOfHits=20))
+                                          TracksStoreObjName="AxialCDCTracks"))
 
     finder_module = [wire_hit_topology_preparer, segment_finder_module, axial_hough_module, cdc_stereo_combiner_module]
 

@@ -120,7 +120,6 @@ namespace VXDTFfilterTest {
     {
       counter<Var>::N ++ ;
     }
-
   };
 
 

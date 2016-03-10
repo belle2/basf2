@@ -24,6 +24,7 @@ namespace Belle2 {
 
   template< typename ... typePack >
   class Filter { /* Empty: just specialized templates are interesting */
+
   };
 
   template< typename ... types >
@@ -114,9 +115,7 @@ namespace Belle2 {
 
     }
 
-
-
-    /** This method persists the range.
+    /** argTypes method persists the range.
      * @param t is the TTree under which the TBranch will be created
      * @param branchname is the name of the TBranch holding m_range
      */
@@ -452,9 +451,17 @@ namespace Belle2 {
               argsType ... >::value, bool >::type
               accept(const argsType& ... args) const
     {
+      templateObserverType::prepare(args ...);
+      bool returnValue =  m_filterA.accept(args ...) && m_filterB.accept(args ...);
+      templateObserverType::collect(args ...);
+      return returnValue;
+    }
 
-      return m_filterA.accept(args ...) && m_filterB.accept(args ...);
-
+    template< class otherObserver >
+    Filter<  Belle2::OperatorAnd, FilterA, FilterB, otherObserver>
+    observe(const otherObserver&)
+    {
+      return Filter< Belle2::OperatorAnd, FilterA, FilterB, otherObserver >(m_filterA, m_filterB);
     }
 
     void persist(TTree* t, const string& branchName)
@@ -563,6 +570,37 @@ namespace Belle2 {
            Filter< types2...>, VoidObserver > (filter1, filter2);
   }
 
+  /** Initilize all the observers in a binary boolean Filter. */
+  template< class booleanBinaryOperator,
+            typename ... types1,
+            typename ... types2,
+            class observer,
+            typename ... argsTypes>
+  bool initializeObservers(Filter< booleanBinaryOperator,
+                           Belle2::Filter< types1...>, Belle2::Filter< types2...> , observer>,
+                           argsTypes ... args)
+  {
+    return observer::initialize(args ...) &&
+           initializeObservers(Belle2::Filter< types1...>(), args...) &&
+           initializeObservers(Belle2::Filter< types2...>(), args ...);
+  }
 
+  /** Initilize all the observers in a unary boolean Filter. */
+  template< class booleanUnaryOperator,
+            typename ... types1,
+            class observer,
+            typename ... argsTypes>
+  bool initializeObservers(Filter< booleanUnaryOperator,
+                           Belle2::Filter< types1...>, observer>, argsTypes ... args)
+  {
+    return observer::initialize(args ...) && initializeObservers(Belle2::Filter< types1...>(), args...);
+  }
 
+  /** Initilize the observer of a Range Filter. */
+
+  template< class Variable, class Range, class observer, typename ... argsTypes>
+  bool initializeObservers(Belle2::Filter<Variable, Range, observer> filter, argsTypes ... args)
+  {
+    return observer::initialize(Variable(), filter.getRange(), args ...);
+  }
 }

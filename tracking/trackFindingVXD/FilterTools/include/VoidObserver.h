@@ -29,9 +29,29 @@ namespace Belle2 {
   public:
 
     /** _static_ method used by the observed object to notify the observer
+     * it is called at each accept.
      */
     template <  typename ... types >
     static void notify(const types& ...) {};
+
+    /** _static_ method used by the observed object to initialize the observer
+     * it is called once usually from the user.
+     */
+    template <  typename ... types >
+    static void initialize(const types& ...) {};
+
+    /** _static_ method used by the observed object to prepare the observer
+     * it is called by the boolean filter operator.
+     */
+    template <  typename ... types >
+    static void prepare(const types& ...) {};
+
+    /** _static_ method used by the observed object to prepare the observer
+     * it is called by the boolean filter operator.
+     */
+    template <  typename ... types >
+    static void collect(const types& ...) {};
+
 
     /** An empty constructor for an empty class */
     VoidObserver() {};

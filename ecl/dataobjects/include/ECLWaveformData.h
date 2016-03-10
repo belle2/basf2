@@ -71,7 +71,8 @@ namespace Belle2 {
       }
     }
 
-    void storeMatrix(const float M[16][16])
+//    void storeMatrix(const float M[16][16])
+    void storeMatrix(const std::array<std::array<float, 16>, 16>& M) // using std::array for intel compiler (TF)
     {
       float* A = m_matrixElement;
       for (int i = 0; i < 16; i++) {
@@ -80,7 +81,8 @@ namespace Belle2 {
       }
     }
 
-    void storeMatrix(const double M[16][16])
+//    void storeMatrix(const double M[16][16])
+    void storeMatrix(const std::array<std::array<double, 16>, 16>& M) // using std::array for intel compiler (TF)
     {
       float* A = m_matrixElement;
       for (int i = 0; i < 16; i++) {

@@ -19,9 +19,12 @@ using namespace std;
 using namespace Belle2;
 //using namespace ECL;
 
-using matrix_16x16 = double[16][16];
-using fmatrix_16x16 = float[16][16];
-using vector_16 = double[16];
+//using matrix_16x16 = double[16][16];
+//using fmatrix_16x16 = float[16][16];
+//using vector_16 = double[16];
+using matrix_16x16 = std::array<std::array<double, 16>, 16>; // using std::array for intel compiler (TF)
+using fmatrix_16x16 = std::array<std::array<float, 16>, 16>; // using std::array for intel compiler (TF)
+using vector_16 = std::array<double, 16>; // using std::array for intel compiler (TF)
 
 void fillCrystalCat(vector<int>& crystalCat, vector< vector<int> >& grmap)
 {
@@ -131,7 +134,8 @@ void matrix_cal(const char* inputFilename,
   fillCrystalCat(crystalCat, grmap);
 
   Int_t           nhits;
-  using int_31 = int[31];
+//  using int_31 = int[31];
+  using int_31 = std::array<int, 31>;  // using std::array for intel compiler (TF)
   vector<int_31> hitA(8736);
   vector<Int_t> cellId(8736);
   TBranch*        b_nhits;

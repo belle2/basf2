@@ -23,6 +23,7 @@ void example()
   tree->Draw("TOPLikelihoods.getLogL_pi()-TOPLikelihoods.getLogL_K()>>hTopLHs");
   hTopLHs->GetListOfFunctions()->Add(new TNamed("Description", "This is an example of a validation plot."));
   hTopLHs->GetListOfFunctions()->Add(new TNamed("Check", "- There is a colored line for each revision/release.<br>- There is a histogram with black line and grey fill color as reference plot."));
+  hTopLHs->GetListOfFunctions()->Add(new TNamed("MetaOptions", "nocompare"));
   hTopLHs->Write();
 
   // an example of a 2D histogram
@@ -32,6 +33,7 @@ void example()
   tree->Draw("MCParticles.m_productionVertex_y:MCParticles.m_productionVertex_x>>hMCVertex");
   hMCVertex->GetListOfFunctions()->Add(new TNamed("Description", "This is an example of a 2D validation plot."));
   hMCVertex->GetListOfFunctions()->Add(new TNamed("Check", "There is a 2D plot for the reference and for each revision/release."));
+  hMCVertex->GetListOfFunctions()->Add(new TNamed("MetaOptions", "nocompare"));
   hMCVertex->Write();
 
   // an example of a numerical value

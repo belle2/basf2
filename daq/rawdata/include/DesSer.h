@@ -193,7 +193,7 @@ namespace Belle2 {
 
     //! report status to SLC
     //    static RunInfoBuffer g_status;
-    RunInfoBuffer g_status;
+    //    RunInfoBuffer g_status;
 
     PreRawCOPPERFormat_latest m_pre_rawcpr;
 

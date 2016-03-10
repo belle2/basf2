@@ -17,7 +17,7 @@ OBJS = ${RAWDATAOBJS} ${DAQOBJS} ${SLCOBJS}
 
 LIBDIR=$(BELLE2_LOCAL_DIR)/lib
 
-TARGET1=des_ser_prePC_main
+TARGET1=des_ser_ROPC_main
 TARGET2=des_ser_COPPER_main
 
 all: clean link ${LOCALLIB} ${TARGET1} ${TARGET2} cleanobj

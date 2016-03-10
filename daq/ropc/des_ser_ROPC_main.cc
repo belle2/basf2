@@ -6,7 +6,7 @@
 // Date : 2 - Aug - 2013
 //-
 //#include <daq/rawdata/modules/DAQConsts.h>
-#include "des_ser_prePC_main.h"
+#include "des_ser_ROPC_main.h"
 //#include <daq/rawdata/modules/DesSerPrePC.h>
 //#include <daq/rawdata/DesSerPrePC.h>
 #include <daq/rawdata/DesSerPrePC.h>

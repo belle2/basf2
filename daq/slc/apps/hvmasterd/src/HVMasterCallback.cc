@@ -143,13 +143,27 @@ void HVMasterCallback::load(const DBObject& obj) throw(RCHandlerException)
       HVNode& node(*it);
       if (!node.isUsed()) continue;
       HVState cstate(node.getState());
+      if (cstate != HVState::PEAK_S) {
+        try {
+          std::string s;
+          get(node, "hvstate", s, 1);
+          if ((cstate = HVState(s)) != Enum::UNKNOWN) {
+            setState(node, cstate);
+          }
+        } catch (const TimeoutException& e) {
+          LogFile::debug("%s timeout for state", node.getName().c_str());
+        }
+      }
+      cstate = node.getState();
       if (cstate == HVState::OFF_S) {
         NSMCommunicator::send(NSMMessage(node, HVCommand::TURNON));
-        node.setState(HVState::RAMPINGUP_TS);
+        log(LogFile::DEBUG, "TURNON >> " + node.getName());
+        setState(node, HVState::TURNINGON_TS);
         ready = false;
       } else if (cstate == HVState::STANDBY_S) {
         NSMCommunicator::send(NSMMessage(node, HVCommand::PEAK));
-        node.setState(HVState::RAMPINGUP_TS);
+        log(LogFile::DEBUG, "PEAK >> " + node.getName());
+        setState(node, HVState::RAMPINGUP_TS);
         ready = false;
       } else if (!cstate.isStable()) {
         ready = false;
@@ -197,6 +211,11 @@ void HVMasterCallback::recover(const DBObject& obj) throw(RCHandlerException)
 void HVMasterCallback::abort() throw(RCHandlerException)
 {
   LogFile::debug("Abort done");
+  for (HVNodeIterator it = m_node_v.begin(); it != m_node_v.end(); it++) {
+    HVNode& node(*it);
+    if (!node.isUsed()) continue;
+    //NSMCommunicator::send(NSMMessage(node, HVCommand::TURNOFF));
+  }
 }
 
 void HVMasterCallback::ok(const char* nodename, const char* data) throw()

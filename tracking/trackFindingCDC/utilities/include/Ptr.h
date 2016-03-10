@@ -25,20 +25,12 @@ namespace Belle2 {
       explicit Ptr(T* obj) : m_obj(obj)
       {}
 
-      /// Wrap the reference to an object. Constructing a pointer from a reference takes the address.
-      explicit Ptr(T& obj) : m_obj(&obj)
-      {}
-
-      /// Allow decay of the referenced object type from non-const to const.
-      operator Ptr<const T>() const
-      { return Ptr<const T>(m_obj); }
-
       /// Allow explicit unpacking.
-      explicit operator T*& ()&
+      operator T*& ()&
       { return m_obj; }
 
       /// Allow explicit unpacking.
-      explicit operator T* const& () const&
+      operator T* const& () const&
       { return m_obj; }
 
       /// Mimic the original item pointer access.

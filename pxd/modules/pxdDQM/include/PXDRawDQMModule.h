@@ -48,6 +48,11 @@ namespace Belle2 {
 
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
 
+      std::string m_storeRawPxdrarrayName;        /**< RawPXD StoreArray name */
+      std::string m_storeRawHitsName;             /**< PXDRawHits StoreArray name */
+      std::string m_storeRawAdcsName;             /**< RawAdcs StoreArray name */
+      std::string m_storeRawPedestalsName;        /**< RawPedestals StoreArray name */
+
       /** Storearray for raw data packets  */
       StoreArray<RawPXD> m_storeRawPxdrarray;
       /** Storearray for raw pixels   */

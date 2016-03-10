@@ -157,11 +157,17 @@ namespace Belle2 {
 
     /**
      * Returns the name of the module.
+     *
+     * This can be changed via e.g. set_name() in the steering file to give
+     * more useful names if there is more than one module of the same type.
+     *
+     * For identifying the type of a module, using  getType() (or type()
+     * in Python) is recommended.
      */
     const std::string& getName() const {return m_name;}
 
     /**
-     * Returns the type of the module.
+     * Returns the type of the module (i.e. class name minus 'Module')
      */
     const std::string& getType() const;
 
@@ -170,11 +176,28 @@ namespace Belle2 {
      */
     const std::string& getPackage() const {return m_package;}
 
-
     /**
      * Returns the description of the module.
      */
     const std::string& getDescription() const {return m_description;}
+
+    /**
+     * Set the name of the module.
+     *
+     * \note
+     * The module name is set when using the REG_MODULE macro,
+     * but the module can be renamed before calling process()
+     * using the set_name() function in your steering file.
+     *
+     * @param name The name of the module
+     */
+    void setName(const std::string& name) { m_name = name; };
+    /**
+     * Sets the flags for the module properties.
+     *
+     * @param propertyFlags bitwise OR of EModulePropFlags
+     */
+    void setPropertyFlags(unsigned int propertyFlags);
 
     /**
      * Returns the log system configuration.
@@ -384,13 +407,6 @@ namespace Belle2 {
 
 
     /**
-     * Sets the flags for the module properties.
-     *
-     * @param propertyFlags bitwise OR of EModulePropFlags
-     */
-    void setPropertyFlags(unsigned int propertyFlags);
-
-    /**
      * Sets the description of the module.
      *
      * @param description A description of the module.
@@ -440,18 +456,6 @@ namespace Belle2 {
      * @param value The value of the return value.
      */
     void setReturnValue(bool value);
-
-    /**
-     * Set the name of the module.
-     *
-     * \note
-     * The module name is set when using the REG_MODULE macro,
-     * but the module can be renamed before calling process()
-     * using the set_name() function in your steering file.
-     *
-     * @param name The name of the module
-     */
-    void setName(const std::string& name) { m_name = name; };
 
     /** Replace existing parameter list. */
     void setParamList(const ModuleParamList& params) { m_moduleParamList = params; }

@@ -32,7 +32,7 @@ class Basf2Widget(object):
 
 class StylingWidget(Basf2Widget):
     """ Style the notebooks with this widget. """
-    # The css string for styling the notebook.
+    #: The css string for styling the notebook.
     css_string = """
         #notebook {
             background-color: rgba(20, 166, 255, 0.3);
@@ -132,7 +132,7 @@ class PathViewer(Basf2Widget):
         except:
             self.path = path
 
-        # If true, show full information on the modules, else show the current used parameters.
+        #: If true, show full information on the modules, else show the current used parameters.
         self.standalone = standalone
 
     def create(self):

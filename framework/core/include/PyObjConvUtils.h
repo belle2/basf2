@@ -58,6 +58,7 @@ namespace Belle2 {
 
     template<typename Scalar>
     Scalar convertPythonObject(const boost::python::object& pyObject, Scalar defaultValue);
+    /** see other templates. */
     template<typename Key, typename Value>
     std::map<Key, Value> convertPythonObject(const boost::python::object& pyObject, std::map<Key, Value> defaultValue);
     template<typename Value>
@@ -356,6 +357,7 @@ namespace Belle2 {
      */
     class convertToPythonObjectVisitor : public boost::static_visitor<boost::python::object> {
     public:
+      /** actually convert a value. */
       template<class T>
       boost::python::object operator()(const T& value) const
       {

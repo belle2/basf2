@@ -8,6 +8,7 @@ class LatexObject(object):
     """
     Common base class of all Latex Wrapper objects
     """
+
     def __init__(self):
         """
         Constructor, initialize output with empty string
@@ -84,6 +85,7 @@ class LatexFile(LatexObject):
     Convinience class implementing += operator, can be used instead of raw LatexObject to collect
     all the latex code in your project which should go into a common file.
     """
+
     def add(self, text=''):
         """
         Adds an object to the output
@@ -106,12 +108,14 @@ class String(LatexObject):
     Used for wrapping conventionel text into latex-code.
     Has to possibility to handle python-style format-placeholders
     """
+
     def __init__(self, text=''):
         """
         Calls super-class initialize and adds initial text to output
             @param text intial text, usually you want to give a raw string r"some text"
         """
         super(String, self).__init__()
+        #: output string
         self.output += str(text)
 
     def add(self, text=''):
@@ -179,6 +183,7 @@ class Section(LatexObject):
     Adds a new section to your latex code with some additional commands
     to force a pagebreak and add a barrier for figure objects.
     """
+
     def __init__(self, name):
         """
         Calls super-class init and adds necessary latex commands to output.
@@ -194,6 +199,7 @@ class SubSection(LatexObject):
     """
     Adds a new subsection to your latex code.
     """
+
     def __init__(self, name):
         """
         Calls super-class init and adds necessary latex commands to output.
@@ -206,6 +212,7 @@ class SubSubSection(LatexObject):
     """
     Adds a new subsubsection to your latex code.
     """
+
     def __init__(self, name):
         """
         Calls super-class init and adds necessary latex commands to output.
@@ -218,6 +225,7 @@ class Graphics(LatexObject):
     """
     Includes a series of image files into your latex code and centers them.
     """
+
     def __init__(self):
         """
         Calls super-class init and begins centered environment.
@@ -247,11 +255,13 @@ class Itemize(LatexObject):
     """
     Creates a itemized list in latex.
     """
+
     def __init__(self):
         """
         Calls super-class init and begins itemize
         """
         super(Itemize, self).__init__()
+        #: number of items
         self.amount = 0
         self.output += r"\begin{itemize}"
 
@@ -265,6 +275,9 @@ class Itemize(LatexObject):
         return self
 
     def finish(self):
+        """
+        Finishes the generation of latex-code.
+        """
         if self.amount == 0:
             return ''
         self.output += r"\end{itemize}"
@@ -276,6 +289,7 @@ class LongTable(LatexObject):
     Creates a longtable in latex. A longtable can span multiple pages
     and is automatically wrapped.
     """
+
     def __init__(self, columnspecs, caption, format_string, head):
         """
         Calls super-class init, begins centered environment and longtable environment.
@@ -293,6 +307,7 @@ class LongTable(LatexObject):
         self.output += r"\toprule" + '\n'
         self.output += head + r"\\" + '\n'
         self.output += r"\midrule" + '\n'
+        #: python-style format-string used to generate a new row out of a given dictionary.
         self.format_string = format_string
 
     def add(self, **kwargs):
@@ -323,6 +338,7 @@ class TitlePage(LatexObject):
     Creates a latex title-page and optionally abstract and table-of-contents.
     You should include only one of these objects in your latex code.
     """
+
     def __init__(self, title, authors, abstract, add_table_of_contents=True):
         """
         Sets author, date, title property, calls maketitle, optionalla adds abstract and table-of-contents.
@@ -389,9 +405,9 @@ if __name__ == '__main__':
         sr += r
         sg += g
         sb += b
-        table.add(name='test' + str(i), bargraph=r'\plotbar{ %g/, %g/, %g/,}' % (r/n, g/n, b/n), r=r, g=g, b=b)
+        table.add(name='test' + str(i), bargraph=r'\plotbar{ %g/, %g/, %g/,}' % (r / n, g / n, b / n), r=r, g=g, b=b)
     n = (sr + sg + sb) / 100.0
-    o += table.finish(tail=r"Total & \plotbar{ %g/, %g/, %g/,} & %g & %g & %g" % (sr/n, sg/n, sb/n, sr, sg, sb))
+    o += table.finish(tail=r"Total & \plotbar{ %g/, %g/, %g/,} & %g & %g & %g" % (sr / n, sg / n, sb / n, sr, sg, sb))
 
     o += Section("Graphic section")
     graphics = Graphics()

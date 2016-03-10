@@ -35,6 +35,7 @@ DesSerCOPPER::DesSerCOPPER(string host_recv, int port_recv, string host_send, in
   m_port_to = port_send;
   //  m_hostname_local = "localhost";
   m_hostname_local = host_send;
+  m_nodename = nodename;
 
   m_shmflag = shmflag;
 

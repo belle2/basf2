@@ -34,6 +34,7 @@ DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int 
   m_port_to = port_send;
   //  m_hostname_local = "localhost";
   m_hostname_local = host_send;
+  m_nodename = nodename;
 
   m_shmflag = shmflag;
 

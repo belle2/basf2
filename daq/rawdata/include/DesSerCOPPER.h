@@ -47,13 +47,6 @@ namespace Belle2 {
     //! receive data
     int readFD(int fd, char* buf, int data_size_byte, int delete_flag);
 
-
-    //! Node(PC or COPPER) ID
-    int m_nodeid;
-
-    //! Node name
-    std::string m_nodename;
-
     //! file descripter for COPPER
     int m_cpr_fd;
 

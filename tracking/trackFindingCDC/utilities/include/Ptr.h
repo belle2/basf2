@@ -41,10 +41,6 @@ namespace Belle2 {
       explicit operator T* const& () const&
       { return m_obj; }
 
-      /// Allow automatic from temporary return values unpacking.
-      operator T* ()&&
-      { return m_obj; }
-
       /// Mimic the original item pointer access.
       T* operator->() const
       { return m_obj;}

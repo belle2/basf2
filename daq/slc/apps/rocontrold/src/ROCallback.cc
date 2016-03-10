@@ -211,15 +211,19 @@ void ROCallback::stop() throw(RCHandlerException)
 
 void ROCallback::recover(const DBObject& obj) throw(RCHandlerException)
 {
-  for (auto it : m_node) {
-    LogFile::info(it.second.getName());
-    NSMCommunicator::send(NSMMessage(it.second, RCCommand::ABORT));
+  for (std::map<std::string, NSMNode>::iterator it = m_node.begin();
+       it != m_node.end(); it++) {
+    NSMNode& node(it->second);
+    LogFile::info(node.getName());
+    NSMCommunicator::send(NSMMessage(node, RCCommand::ABORT));
   }
   abort();
   while (true) {
     bool notready_all = true;
-    for (auto it : m_node) {
-      if (it.second.getState() != RCState::NOTREADY_S) {
+    for (std::map<std::string, NSMNode>::iterator it = m_node.begin();
+         it != m_node.end(); it++) {
+      NSMNode& node(it->second);
+      if (node.getState() != RCState::NOTREADY_S) {
         notready_all = false;
         break;
       }
@@ -249,15 +253,19 @@ void ROCallback::recover(const DBObject& obj) throw(RCHandlerException)
     }
   }
 
-  for (auto it : m_node) {
-    NSMCommunicator::send(NSMMessage(it.second, RCCommand::LOAD));
+  for (std::map<std::string, NSMNode>::iterator it = m_node.begin();
+       it != m_node.end(); it++) {
+    NSMNode& node(it->second);
+    NSMCommunicator::send(NSMMessage(node, RCCommand::LOAD));
   }
   load(obj);
 
   while (true) {
     bool ready_all = true;
-    for (auto it : m_node) {
-      if (it.second.getState() != RCState::READY_S) {
+    for (std::map<std::string, NSMNode>::iterator it = m_node.begin();
+         it != m_node.end(); it++) {
+      NSMNode& node(it->second);
+      if (node.getState() != RCState::READY_S) {
         ready_all = false;
         break;
       }

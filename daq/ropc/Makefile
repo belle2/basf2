@@ -1,69 +1,72 @@
-CC = /usr/bin/gcc
-#CC = gcc
 CXX = g++
 INCDIR = ./include
 CFLAGS   = -g -O3 -Wall -fPIC -I ${INCDIR}
+#LOCALLIB  = CPRROPCDAQ
+LIBFLAG = -lrt -lpthread#-l${LOCALLIB}
 
+RAWDATAPATH=${BELLE2_LOCAL_DIR}/rawdata/src:${BELLE2_LOCAL_DIR}/rawdata/dataobjects/src
+DAQPATH=${BELLE2_LOCAL_DIR}/daq/dataobjects/src:${BELLE2_LOCAL_DIR}/daq/rawdata/src
+SLCPATH=${BELLE2_LOCAL_DIR}/daq/slc/readout/src:${BELLE2_LOCAL_DIR}/daq/slc/system/src:${BELLE2_LOCAL_DIR}/daq/slc/base/src
+VPATH = ${RAWDATAPATH}:${DAQPATH}:${SLCPATH}
 
-#INC = -I ${BELLE2_LOCAL_DIR}/include
-#INC = -I ${BELLE2_LOCAL_DIR}/rawdata/dataobjects/include
-
-OBJSRCDIR1 = ${BELLE2_LOCAL_DIR}/rawdata/dataobjects/src
-OBJSRCDIR2 = ${BELLE2_LOCAL_DIR}/rawdata/src
-
-
-OBJS1 = RawCOPPERFormat.o RawCOPPERFormat_latest.o PreRawCOPPERFormat_latest.o PostRawCOPPERFormat_latest.o RawHeader_latest.o RawTrailer_latest.o
-OBJS2 =  CRCCalculator.o 
-#OBJS = ${OBJSOURCES}/*.
-
-LIB  = librawdata.so
+RAWDATAOBJS = RawDataBlockFormat.o RawCOPPERFormat.o RawCOPPERFormat_latest.o PreRawCOPPERFormat_latest.o PostRawCOPPERFormat_latest.o RawHeader_latest.o RawTrailer_latest.o RawTLUFormat.o RawFTSWFormat.o CRCCalculator.o 
+DAQOBJS = DesSerPrePC.o CprErrorMessage.o DesSerCOPPER.o SendHeader.o SendTrailer.o
+SLCOBJS = RunInfoBuffer.o SharedMemory.o MMutex.o MCond.o LogFile.o Mutex.o Date.o ConfigFile.o StringUtil.o
+OBJS = ${RAWDATAOBJS} ${DAQOBJS} ${SLCOBJS}
 
 
 LIBDIR=$(BELLE2_LOCAL_DIR)/lib
-TARGET=daq_basf2_free
 
-#all: $(OBJS)
+TARGET1=des_ser_prePC_main
+TARGET2=des_ser_COPPER_main
 
+all: clean link ${LOCALLIB} ${TARGET1} ${TARGET2} cleanobj
 
-all: ${TARGET}
+${TARGET1}: ${TARGET1}.cc ${OBJS}
+	$(CXX) $(CFLAGS) ${LIBFLAG} -L./ $^ -o $@ 
 
+${TARGET2}: ${TARGET2}.cc ${OBJS}
+	$(CXX) $(CFLAGS) ${LIBFLAG} -L./ $^ -o $@ 
 
-#daq_basf2_free : daq_basf2_free.cc ${LIB}
-${TARGET}: ${TARGET}.cc ${OBJS1} ${OBJS2}
-	$(CXX) $(CFLAGS)  -L./ $^ -o $@
-
-
-$(LIB): $(OBJS1) $(OBJS2)
-	@ echo "<< linking shared library $@ >>"
-	@ $(CXX) -shared $(CFLAGS) $^ -o $@n
-
-$(OBJS1): %.o : ${OBJSRCDIR1}/%.cc
-	@ echo "<< making smylink $@ >>"
-	@if [ ! -d ${INCDIR} ]; then \
-	mkdir -p include/rawdata/dataobjects ; \
-	ln -s ${BELLE2_LOCAL_DIR}/rawdata/dataobjects/include/*.h ./include/rawdata/dataobjects/ ; \
-	ln -s ${BELLE2_LOCAL_DIR}/rawdata/include/*.h ./include/rawdata/ ; \
-	fi
+$(OBJS): %.o : %.cc
 	@ echo "<< compiling $@ >>"
 	@ $(CXX) -c $(CFLAGS) $<
 
-$(OBJS2): %.o : ${OBJSRCDIR2}/%.cc
-	@ echo "<< making smylink $@ >>"
-	@if [ ! -d ${INCDIR} ]; then \
-	mkdir -p include/rawdata/dataobjects ; \
-	ln -s ${BELLE2_LOCAL_DIR}/rawdata/dataobjects/include/*.h ./include/rawdata/dataobjects/ ; \
-	ln -s ${BELLE2_LOCAL_DIR}/rawdata/include/*.h ./include/rawdata/ ; \
-	fi
-	@ echo "<< compiling $@ >>"
-	@ $(CXX) -c $(CFLAGS) $<
+#${LOCALLIB}: $(OBJS)
+#	@ echo "<< linking shared library $@ >>"
+#	@ $(CXX) -shared $(CFLAGS) $^ -o lib$@.so
 
 #.c.o:
 #	$(CXX) $(CFLAGS) -c ${INC} $<
 
+.PHONY: link
+link:
+	@ echo "<< making smylink $@ >>"
+	@if [ ! -d ${INCDIR} ]; then \
+	mkdir -p include/daq/slc/system ; \
+	mkdir -p include/daq/slc/readout ; \
+	mkdir -p include/daq/slc/base ; \
+	mkdir -p include/daq/rawdata ; \
+	mkdir -p include/rawdata/dataobjects ; \
+	mkdir -p include/daq/rawdata/modules ; \
+	mkdir -p include/daq/dataobjects ; \
+	ln -s ${BELLE2_LOCAL_DIR}/rawdata/dataobjects/include/*.h ./include/rawdata/dataobjects/ ; \
+	ln -s ${BELLE2_LOCAL_DIR}/rawdata/include/*.h ./include/rawdata/ ; \
+	ln -s ${BELLE2_LOCAL_DIR}/daq/rawdata/include/*.h ./include/daq/rawdata/ ; \
+	ln -s ${BELLE2_LOCAL_DIR}/daq/rawdata/modules/include/*.h ./include/daq/rawdata/modules/ ; \
+	ln -s ${BELLE2_LOCAL_DIR}/daq/dataobjects/include/*.h ./include/daq/dataobjects/ ; \
+	ln -s ${BELLE2_LOCAL_DIR}/daq/slc/system/include/*.h ./include/daq/slc/system/ ; \
+	ln -s ${BELLE2_LOCAL_DIR}/daq/slc/readout/include/*.h ./include/daq/slc/readout/ ; \
+	ln -s ${BELLE2_LOCAL_DIR}/daq/slc/base/include/*.h ./include/daq/slc/base/ ; \
+	fi
 
 .PHONY:	clean
 clean:
 	@ echo "<< clearing directry >>"
-	@ rm -rf ${TARGET} *.so
-	@ rm -rf $(OBJS1) ${OBJS2} $(LIB) *~ .*~ \#*~
+	@ rm -rf ${TARGET1} ${TARGET2} $(OBJS) lib${LOCALLIB}.so *~ .*~ \#*~
 	@ rm -rf ${INCDIR}
+
+.PHONY:	cleanobj
+cleanobj:
+	@ echo "<< clearing object files >>"
+	@ rm -rf $(OBJS) 

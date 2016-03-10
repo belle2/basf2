@@ -14,6 +14,7 @@
 #include <daq/slc/nsm/NSMData.h>
 
 #include <daq/slc/system/LogFile.h>
+#include <daq/slc/system/SharedMemory.h>
 
 namespace Belle2 {
 
@@ -55,6 +56,7 @@ namespace Belle2 {
     bool m_force_boothslb;
     std::string m_hslb_firm;
     bool m_iserr;
+    SharedMemory m_memory;
 
   private:
     void bootBasf2(const DBObject& obj) throw(RCHandlerException);

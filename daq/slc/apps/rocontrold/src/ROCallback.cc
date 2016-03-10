@@ -89,6 +89,13 @@ void ROCallback::initialize(const DBObject& obj) throw(RCHandlerException)
   allocData(getNode().getName(), "ropc", ropc_revision);
   configure(obj);
   setState(RCState::NOTREADY_S);
+  const std::string path_shm = "/cpr_pause_resume";
+  if (!m_memory.open(path_shm, sizeof(int))) {
+    perror("shm_open");
+    LogFile::error("Failed to open %s", path_shm.c_str());
+  }
+  char* buf = (char*)m_memory.map(0, sizeof(int));
+  memset(buf, 0, sizeof(int));
 }
 
 void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)

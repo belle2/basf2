@@ -71,6 +71,13 @@ void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
   initialized = false;
   configure(obj);
   initialized = true;
+  const std::string path_shm = "/cpr_pause_resume";
+  if (!m_memory.open(path_shm, sizeof(int))) {
+    perror("shm_open");
+    LogFile::error("Failed to open %s", path_shm.c_str());
+  }
+  char* buf = (char*)m_memory.map(0, sizeof(int));
+  memset(buf, 0, sizeof(int));
 }
 
 void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
@@ -380,9 +387,10 @@ void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)
       if (m_fee[i] != NULL && o_hslb.getBool("used")) flag += 1 << i;
     }
     m_con.clearArguments();
-    m_con.setExecutable("basf2");
-    script = obj.getObject("basf2").getText("script");
-    m_con.addArgument("%s/%s", getenv("BELLE2_LOCAL_DIR"), script.c_str());
+    //m_con.setExecutable("basf2");
+    //script = obj.getObject("basf2").getText("script");
+    //m_con.addArgument("%s/%s", getenv("BELLE2_LOCAL_DIR"), script.c_str());
+    m_con.setExecutable(StringUtil::form("%s/daq/ropc/des_ser_COPPER_main", getenv("BELLE2_LOCAL_DIR")));
     m_con.addArgument(obj.getText("hostname"));
     std::string copperid_s = obj.getText("copperid");
     int id = atoi(copperid_s.substr(3).c_str());

@@ -255,7 +255,8 @@ void RunControlCallback::monitor() throw(RCHandlerException)
   RCState state(getNode().getState());
   RCState state_new = state.next();
   bool failed = false;
-  for (auto& node : m_node_v) {
+  for (size_t i = 0; i < m_node_v.size(); i++) {
+    RCNode& node(m_node_v[i]);
     if (!node.isUsed()) continue;
     RCState cstate(node.getState());
     RCState cstate_new;
@@ -355,7 +356,8 @@ void RunControlCallback::postRun() throw()
 
 RCNode& RunControlCallback::findNode(const std::string& name) throw(std::out_of_range)
 {
-  for (auto& node : m_node_v) {
+  for (size_t i = 0; i < m_node_v.size(); i++) {
+    RCNode& node(m_node_v[i]);
     if (node.getName() == name) return node;
   }
   throw (std::out_of_range(StringUtil::form("no node %s was found", name.c_str())));
@@ -363,7 +365,8 @@ RCNode& RunControlCallback::findNode(const std::string& name) throw(std::out_of_
 
 bool RunControlCallback::check(const std::string& node, const RCState& state) throw()
 {
-  for (auto& cnode : m_node_v) {
+  for (size_t i = 0; i < m_node_v.size(); i++) {
+    RCNode& cnode(m_node_v[i]);
     if (cnode.getName() == node) return true;
     if (cnode.isUsed() && cnode.getState() != state) {
       return false;
@@ -374,7 +377,8 @@ bool RunControlCallback::check(const std::string& node, const RCState& state) th
 
 bool RunControlCallback::checkAll(const std::string& node, const RCState& state) throw()
 {
-  for (auto& cnode : m_node_v) {
+  for (size_t i = 0; i < m_node_v.size(); i++) {
+    RCNode& cnode(m_node_v[i]);
     if (cnode.isUsed() && cnode.getState() != state) {
       return false;
     }
@@ -413,7 +417,8 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
   try {
     obj.print();
     const DBObjectList& objs(obj.getObjects("node"));
-    for (const auto& o_node : objs) {
+    for (size_t i = 0; i < objs.size(); i++) {
+      const DBObject& o_node(objs[i]);
       RCNode node(o_node.getText("name"));
       try {
         RCNode& node_i(findNode(node.getName()));

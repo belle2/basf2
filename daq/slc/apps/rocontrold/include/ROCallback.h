@@ -6,6 +6,8 @@
 #include "daq/slc/apps/rocontrold/Stream1Controller.h"
 #include "daq/slc/apps/rocontrold/EB1TXController.h"
 
+#include "daq/slc/system/SharedMemory.h"
+
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/nsm/NSMData.h>
 
@@ -44,6 +46,7 @@ namespace Belle2 {
     Stream1Controller m_stream1;
     EB1TXController m_eb1tx;
     std::map<std::string, NSMNode> m_node;
+    SharedMemory m_memory;
 
   };
 

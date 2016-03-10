@@ -70,7 +70,7 @@ namespace Belle2 {
     /*! Get CR identifieer
      * @return CRId
      */
-    bool getCRId() const { return m_CRId; }
+    int getCRId() const { return m_CRId; }
 
     /*! Get boolean to flag if a track is matched to the CR
      * @return IsTrack

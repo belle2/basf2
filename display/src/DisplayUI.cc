@@ -44,8 +44,6 @@
 
 using namespace Belle2;
 
-ClassImp(DisplayUI)
-
 DisplayUI::DisplayUI(bool automatic):
   m_currentEntry(0),
   m_guiInitialized(false),

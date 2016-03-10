@@ -6,8 +6,6 @@
 
 using namespace Belle2;
 
-ClassImp(BrowsableWrapper)
-
 std::map<TVirtualPad*, std::string> BrowsableWrapper::s_pads;
 
 void BrowsableWrapper::Browse(TBrowser* b)

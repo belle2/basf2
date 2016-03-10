@@ -14,8 +14,6 @@
 
 using namespace Belle2;
 
-ClassImp(DisplayData)
-
 DisplayData::~DisplayData()
 {
   m_pointSets.clear();

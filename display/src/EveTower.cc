@@ -7,8 +7,6 @@
 
 using namespace Belle2;
 
-ClassImp(EveTower);
-
 void EveTower::SelectElement(Bool_t state)
 {
   auto& cellVector = m_caloData->GetCellsSelected();

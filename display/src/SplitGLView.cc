@@ -20,8 +20,6 @@
 using namespace Belle2;
 
 
-ClassImp(SplitGLView)
-
 SplitGLView::SplitGLView() :
   m_activeViewer(-1),
   m_infoWidget(nullptr)

@@ -41,6 +41,9 @@ namespace Belle2 {
       virtual void event();
 
     private:
+      std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
+
+      std::string m_PXDRawROIsName;        /**< RawROI StoreArray name */
 
       /** Storearray for ROIs  */
       StoreArray<PXDRawROIs> m_storeROIs;

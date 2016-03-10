@@ -10,6 +10,7 @@
 
 #include <pxd/modules/pxdDQM/PXDROIDQMModule.h>
 
+#include "TDirectory.h"
 #include <string>
 
 using namespace std;
@@ -30,12 +31,18 @@ PXDROIDQMModule::PXDROIDQMModule() : HistoModule() , m_storeROIs()
   //Set module properties
   setDescription("Monitor ROIs");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+           std::string("pxdrawroi"));
+  addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of PXDRawROIs to be processed", std::string(""));
 }
 
 void PXDROIDQMModule::defineHisto()
 {
+  TDirectory* oldDir = gDirectory;
+  oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
+
   hrawROIcount = new TH1F("hrawROIcount", "ROI count;Nr per Event", 256, 0, 256);
-  hrawROItype = new TH1F("hrawROIytpe", "ROI type;Nr per Event", 2, 0, 2);
+  hrawROItype = new TH1F("hrawROItype", "ROI type;Nr per Event", 2, 0, 2);
 
   hrawROIHLTmap  = new TH2F("hrawROIHLTmap", "HLT ROI Middle Map ;column;row", 256, 0, 256, 786, 0, 786);
   hrawROIHLTsize  = new TH2F("hrawROIHLTsize", "HLT ROI Size Map ;column;row", 256, 0, 256, 786, 0, 786);
@@ -52,11 +59,15 @@ void PXDROIDQMModule::defineHisto()
   hrawROIDCrow2 = new TH1F("hrawROIDCrow2", "DATCON ROI row2;Nr per Event", 786, 0, 786);
   hrawROIDCcol1 = new TH1F("hrawROIDCcol1", "DATCON ROI col1;Nr per Event", 256, 0, 256);
   hrawROIDCcol2 = new TH1F("hrawROIDCcol2", "DATCON ROI col2;Nr per Event", 256, 0, 256);
+
+  // cd back to root directory
+  oldDir->cd();
 }
 
 void PXDROIDQMModule::initialize()
 {
   REG_HISTOGRAM
+  m_storeROIs.required(m_PXDRawROIsName);
 }
 
 void PXDROIDQMModule::beginRun()
@@ -84,7 +95,7 @@ void PXDROIDQMModule::beginRun()
 
 void PXDROIDQMModule::event()
 {
-  for (auto & it : m_storeROIs) {
+  for (auto& it : m_storeROIs) {
     int nr;
     nr = it.getNrROIs();
     //it.dump();

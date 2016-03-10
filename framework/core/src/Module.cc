@@ -350,6 +350,14 @@ void Module::exposePythonAPI()
   register_ptr_to_python<ModulePtr>();
 }
 
+bool Belle2::allModulesHaveFlag(const ModulePtrList& list, Module::EModulePropFlags flag)
+{
+  for (auto m : list) {
+    if (!m->hasProperties(flag))
+      return false;
+  }
+  return true;
+}
 
 //=====================================================================
 //                          ModuleProxyBase

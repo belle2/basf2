@@ -342,12 +342,8 @@ void pEventProcessor::analyzePath(const PathPtr& path)
     bool hasParallelFlag = module->hasProperties(Module::c_ParallelProcessingCertified);
     //entire conditional path must also be compatible
     if (hasParallelFlag and module->hasCondition()) {
-      for (auto m : module->getConditionPath()->getModules()) {
-        if (!m->hasProperties(Module::c_ParallelProcessingCertified)) {
-          hasParallelFlag = false;
-          break;
-        }
-      }
+      if (!allModulesHaveFlag(module->getConditionPath()->getModules(), Module::c_ParallelProcessingCertified))
+        hasParallelFlag = false;
     }
 
     if (module->hasProperties(Module::c_TerminateInAllProcesses))

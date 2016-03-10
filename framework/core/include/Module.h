@@ -548,6 +548,9 @@ namespace Belle2 {
   /** Defines a std::list of shared module pointers.*/
   typedef std::list<ModulePtr> ModulePtrList;
 
+  /** Returns true if and only if all modules in list have the given flag (or list is empty). */
+  bool allModulesHaveFlag(const ModulePtrList& list, Module::EModulePropFlags flag);
+
 
   //------------------------------------------------------
   //  Proxy class for creating an instance of the module

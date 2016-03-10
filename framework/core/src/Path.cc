@@ -109,16 +109,9 @@ void Path::addSkimPath(PathPtr skim_path, std::string ds_ID)
   switchStart->setName("SwitchDataStore ('' -> '" + ds_ID + "')");
   switchEnd->setName("SwitchDataStore ('' <- '" + ds_ID + "')");
 
-  auto flag = Module::c_ParallelProcessingCertified;
   //set c_ParallelProcessingCertified flag if _all_ modules have it set
-  bool allCertified = true;
-  for (const auto& mod : buildModulePathList()) {
-    if (!mod->hasProperties(flag)) {
-      allCertified = false;
-      break;
-    }
-  }
-  if (allCertified) {
+  auto flag = Module::c_ParallelProcessingCertified;
+  if (allModulesHaveFlag(buildModulePathList(), flag)) {
     switchStart->setPropertyFlags(flag);
     switchEnd->setPropertyFlags(flag);
   }

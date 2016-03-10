@@ -53,15 +53,9 @@ void SubEventModule::initSubEvent(const std::string& objectName, const std::stri
 
   m_moduleList = m_path->buildModulePathList();
   //set c_ParallelProcessingCertified flag if _all_ modules have it set
-  bool allCertified = true;
-  for (const auto& mod : m_moduleList) {
-    if (!mod->hasProperties(c_ParallelProcessingCertified)) {
-      allCertified = false;
-      break;
-    }
-  }
-  if (allCertified)
-    setPropertyFlags(c_TerminateInAllProcesses | c_ParallelProcessingCertified);
+  auto flag = Module::c_ParallelProcessingCertified;
+  if (allModulesHaveFlag(m_moduleList, flag))
+    setPropertyFlags(c_TerminateInAllProcesses | flag);
   else
     setPropertyFlags(c_TerminateInAllProcesses);
 }

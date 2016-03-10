@@ -3,7 +3,7 @@ Import('env')
 env['LIBS'] = ['$ROOT_LIBS',
                'EG', # for TDatabasePDG
                'XMLIO', # for TBufferXML
-               'boost_python3', 'boost_filesystem', 'boost_regex', 'boost_iostreams',
+               'boost_python', 'boost_filesystem', 'boost_regex', 'boost_iostreams',
                '$PYTHON_LIBS', '$XML_LIBS', '$SQLITE_LIBS', '$MYSQL_LIBS' , '$PGSQL_LIBS',
                'rt', # for clock_gettime() on some systems
                'curl' # for REST API access to the database

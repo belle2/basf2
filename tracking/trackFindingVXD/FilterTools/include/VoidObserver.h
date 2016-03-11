@@ -28,7 +28,7 @@ namespace Belle2 {
   class VoidObserver {
   public:
 
-    /** _static_ method used by the observed object to notify the observer
+    /** _static_ method used by the observed object to notify the observer.
      * it is called at each accept.
      */
     template <  typename ... types >
@@ -38,7 +38,7 @@ namespace Belle2 {
      * it is called once usually from the user.
      */
     template <  typename ... types >
-    static void initialize(const types& ...) {};
+    static bool initialize(const types& ...) { return true; };
 
     /** _static_ method used by the observed object to prepare the observer
      * it is called by the boolean filter operator.
@@ -58,5 +58,10 @@ namespace Belle2 {
 
     /** An empty destructor for an empty class */
     ~VoidObserver() {};
+
+
+    /** _static_ method used by the observed object to terminate the observer. */
+    template <  typename ... types >
+    static void terminate(const types& ...) {};
   };
 }

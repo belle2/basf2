@@ -23,7 +23,7 @@ namespace Belle2 {
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
   template <typename PointType >
-  class Angle3DFull : public SelectionVariable< PointType > {
+  class Angle3DFull : public SelectionVariable< PointType, double > {
   public:
 
     /** calculates the angle between the hits/vectors (3D), returning unit: angle in degrees */

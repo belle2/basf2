@@ -37,8 +37,9 @@ namespace Belle2 {
       AnalyzingAlgorithmValuePTheta,
       AnalyzingAlgorithmValuePPhi,
       AnalyzingAlgorithmValueDistSeed2IP,
-      AnalyzingAlgorithmValueDistSeed2IPXY,
       AnalyzingAlgorithmValueDistSeed2IPZ,
+      AnalyzingAlgorithmValueDistSeed2IPXY,
+      AnalyzingAlgorithmValueQI,
       /// residual type, stores double. defined in ..tracking/trackFindingVXD/analyzingTools/algorithms/AnalyzingAlgorithmResiduals.h:
       AnalyzingAlgorithmResidualPX,
       AnalyzingAlgorithmResidualPY,
@@ -109,7 +110,7 @@ namespace Belle2 {
 
     /** returns true if given AlgoritmType is a an algorithm which calculates a residual in double for each TC passed, false if not */
     static bool isResidualDoubleType(AlgoritmType::Type aType)
-    { return aType < AlgoritmType::AnalyzingAlgorithmLostUClusters and aType > AlgoritmType::AnalyzingAlgorithmValueDistSeed2IPXY; }
+    { return aType < AlgoritmType::AnalyzingAlgorithmLostUClusters and aType > AlgoritmType::AnalyzingAlgorithmValueQI; }
 
     /** returns true if given AlgoritmType is a an algorithm which calculates a value in int based on hits of each TC passed, false if not */
     static bool isHitValueIntType(AlgoritmType::Type aType)

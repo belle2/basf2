@@ -100,6 +100,9 @@ namespace Belle2 {
     if (algorithmID == AnalyzingAlgorithmValueDistSeed2IPZ<DataType, TCInfoType, VectorType>())
     { return new AnalyzingAlgorithmValueDistSeed2IPZ<DataType, TCInfoType, VectorType>(); }
 
+    if (algorithmID == AnalyzingAlgorithmValueQI<DataType, TCInfoType, VectorType>())
+    { return new AnalyzingAlgorithmValueQI<DataType, TCInfoType, VectorType>(); }
+
     if (!AlgoritmType::isValueDoubleType(algorithmID)
         and !AlgoritmType::isResidualDoubleType(algorithmID)
         and (AlgoritmType::isHitValueVecDoubleType(algorithmID)

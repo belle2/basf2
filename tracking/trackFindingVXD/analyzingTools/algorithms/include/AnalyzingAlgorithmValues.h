@@ -164,6 +164,20 @@ namespace Belle2 {
     { return (AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).posSeed.Z() - AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::s_origin.Z()); }
   };
 
+
+  /** Class for storing an algorithm determining the quality indicator of the TC */
+  template <class DataType, class TCInfoType, class VectorType>
+  class AnalyzingAlgorithmValueQI : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
+  public:
+    /** constructor */
+    AnalyzingAlgorithmValueQI() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
+      (AlgoritmType::AnalyzingAlgorithmValueQI) {}
+
+    /** returns the the quality indicator of the TC) */
+    DataType calcData(const TCInfoType& aTC) override
+    { return (aTC.tC->getQualityIndex()); }
+  };
+
   // TODO
   /**
    * next steps:

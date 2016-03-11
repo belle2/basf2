@@ -67,5 +67,17 @@ namespace Belle2 {
 
     /// empty constructor:
     ObserverPrintResults() {};
+
+
+    /** _static_ method used by the observed object to initialize the observer.
+     */
+    template <  typename ... types >
+    static void initialize(const types& ...) {};
+
+
+    /** _static_ method used by the observed object to terminate the observer.
+     */
+    template <  typename ... types >
+    static void terminate(const types& ...) {};
   };
 }

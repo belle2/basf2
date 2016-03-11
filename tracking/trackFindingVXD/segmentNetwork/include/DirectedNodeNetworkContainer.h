@@ -121,10 +121,10 @@ namespace Belle2 {
     std::vector<Belle2::TrackNode* >& accessTrackNodes() { return m_trackNodes; }
 
 
-    /** passes parameters for creating a virtual interaction point TODO pass coordinates-parameter (and all the other stuff needed for a proper vIP. like ActiveSector-Pointer and Stuff! */
-    void setVirtualInteractionPoint()
+    /** passes parameters for creating a virtual interaction point */
+    void setVirtualInteractionPoint(B2Vector3D& pos, B2Vector3D& posError)
     {
-      m_VIPSpacePoint = new SpacePoint();
+      m_VIPSpacePoint = new SpacePoint(pos, posError, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
       m_VirtualInteractionPoint = new Belle2::TrackNode();
       m_VirtualInteractionPoint->spacePoint = m_VIPSpacePoint;
     }

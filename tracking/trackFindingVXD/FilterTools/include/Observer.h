@@ -20,6 +20,17 @@ namespace Belle2 {
     template< class T, class someRangeType, class someHitType>
     static void notify(T , double,  someRangeType, const someHitType&, const someHitType&) {};
 
+    /** An empty constructor for an empty class */
     Observer() {};
+
+    /** _static_ method used by the observed object to initialize the observer.
+     */
+    template <  typename ... types >
+    static void initialize(const types& ...) {};
+
+    /** _static_ method used by the observed object to terminate the observer.
+     */
+    template <  typename ... types >
+    static void terminate(const types& ...) {};
   };
 }

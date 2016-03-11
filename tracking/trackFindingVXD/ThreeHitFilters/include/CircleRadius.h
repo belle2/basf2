@@ -25,7 +25,7 @@ namespace Belle2 {
   class CircleRadius : public SelectionVariable< PointType , double > {
   public:
 
-    /** calculates the estimation of the transverse momentum of the 3-hit-tracklet, returning unit: GeV/c */
+    /** calculates the estimation of the circle radius of the 3-hit-tracklet, returning unit: cm. */
     static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;

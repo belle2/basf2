@@ -12,10 +12,16 @@
 
 #include <TObject.h>
 
+#include <string>
+
 namespace Belle2 {
   /** Store event number, run number, and experiment number.
    *
-   *  Modules controlling the event-flow (e.g. EventInfoSetter, RootInput) have to create an object of this type!
+   *  An object of this type is registered by e.g. EventInfoSetter for newly generated data,
+   *  and updated with proper values for each event. Alternatively it can also be read from file.
+   *
+   *  This object is used for controlling the event-flow, e.g. via changing run-numbers
+   *  or setEndOfData() (see also EventProcessor).
    *
    *  @sa EventInfoSetterModule, EventInfoPrinterModule
    *  @author <a href="mailto:martin.heck@kit.edu?subject=EventMetaData">Martin Heck</a>
@@ -206,7 +212,7 @@ namespace Belle2 {
 
     /** Return LFN of the current parent file, or an empty string if not set.
      */
-    std::string getParentLfn() const
+    const std::string& getParentLfn() const
     {
       return m_parentLfn;
     }
@@ -253,7 +259,7 @@ namespace Belle2 {
 
     double m_generatedWeight; /**< Generated weight.  */
 
-    unsigned int m_errorFlag;  /**< Error flag.  */
+    unsigned int m_errorFlag;  /**< Error flag, ORed combination of EventErrorFlag values.  */
 
     ClassDef(EventMetaData, 4); /**< Store event number, run number, and experiment number. */
   }; //class

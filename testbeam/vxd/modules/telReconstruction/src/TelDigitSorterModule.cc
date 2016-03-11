@@ -97,7 +97,8 @@ void TelDigitSorterModule::event()
     const TelDigit* const digit = storeDigits[i];
     Pixel px(digit, i);
     VxdID sensorID = digit->getSensorID();
-    if (m_ignoredPixelsListName == "" || m_ignoredPixelsList->pixelOK(digit->getSensorID(), PXDIgnoredPixelsMap::map_pixel(digit->getUCellID(), digit->getVCellID()))) {
+    if (m_ignoredPixelsListName == ""
+        || m_ignoredPixelsList->pixelOK(digit->getSensorID(), PXDIgnoredPixelsMap::map_pixel(digit->getUCellID(), digit->getVCellID()))) {
       sensors[sensorID].insert(px);
     }
   }
@@ -109,9 +110,9 @@ void TelDigitSorterModule::event()
   // and a vector to remember which index changed into what
   unsigned int index(0);
   // And just loop over the sensors and assign the digits at the correct position
-  for (const auto & sensor : sensors) {
+  for (const auto& sensor : sensors) {
     const TEL::Pixel* lastpx(0);
-    for (const TEL::Pixel & px : sensor.second) {
+    for (const TEL::Pixel& px : sensor.second) {
       //Normal case: pixel has different address
       if (!lastpx || px > *lastpx) {
         //Overwrite the digit
@@ -125,7 +126,8 @@ void TelDigitSorterModule::event()
         if (m_mergeDuplicates) {
           //Merge the two pixels. As the TelDigit does not have setters we have to create a new object.
           const TelDigit& old = *storeDigits[index - 1];
-          *storeDigits[index - 1] = TelDigit(old.getSensorID(), old.getUCellID(), old.getVCellID(), old.getCharge() + m_digitcopy[px.getIndex()].getCharge());
+          *storeDigits[index - 1] = TelDigit(old.getSensorID(), old.getUCellID(), old.getVCellID(),
+                                             old.getCharge() + m_digitcopy[px.getIndex()].getCharge());
           relationIndices[px.getIndex()] = std::make_pair(index - 1, false);
         } else {
           //Otherwise delete the second pixel by omitting it here and removing relation elements on consolidation

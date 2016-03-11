@@ -44,7 +44,8 @@ TBSpacePoint::TBSpacePoint(const TelCluster* telCluster,
 
   SpacePoint::setPositionError(telCluster->getUSigma(), telCluster->getVSigma(), aSensorInfo);
 
-  SpacePoint::m_normalizedLocal = SpacePoint::convertLocalToNormalizedCoordinates({ telCluster->getU(), telCluster->getV() } , SpacePoint::m_vxdID, aSensorInfo);
+  SpacePoint::m_normalizedLocal = SpacePoint::convertLocalToNormalizedCoordinates({ telCluster->getU(), telCluster->getV() } ,
+                                  SpacePoint::m_vxdID, aSensorInfo);
 
   SpacePoint::m_sensorType = aSensorInfo->getType();
 }

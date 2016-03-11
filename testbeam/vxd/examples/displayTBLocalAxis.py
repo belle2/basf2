@@ -36,7 +36,7 @@ if argc >= 4:
 if argc >= 5:
     print(argvs[4])
 
-GeometryFileName = 'testbeam/vxd/FullTelescopeVXDTB_v2.xml'
+GeometryFileName = 'testbeam/vxd/FullVXDTB2016.xml'
 
 print("*****************************************************************")
 print("first arg: Show local coordinates:                 ", ShowLocal)
@@ -69,7 +69,7 @@ class DisplayAxis(Module):
     def initialize(self):
         """reimplementation of Module::initialize()."""
 
-        Belle2.PyStoreObj("DisplayData").registerAsPersistent()
+        Belle2.PyStoreObj("DisplayData").registerInDataStore()
 
     def event(self):
         """reimplementation of Module::event()."""
@@ -218,7 +218,7 @@ gearbox.param('fileName', GeometryFileName)
 # Create geometry
 geometry = register_module('Geometry')
 # You can specify components to be created
-geometry.param('components', ['MagneticField', 'TB'])
+# geometry.param('components', ['MagneticField', 'PXD', 'SVD', 'Magnet'])
 # To turn off magnetic field:
 # geometry.param('components', ['TB'])
 

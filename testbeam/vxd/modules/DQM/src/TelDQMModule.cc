@@ -43,7 +43,8 @@ TelDQMModule::TelDQMModule() : HistoModule()
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("Clusters", m_storeClustersName, "Name of the telescopes cluster collection",
            std::string("")); // always be explicit about this in case PXDClusters are used.
-  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed", std::string("eutel"));
+  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+           std::string("eutel"));
 }
 
 
@@ -153,14 +154,16 @@ void TelDQMModule::defineHisto()
       if (i == j) {  // hit maps
         string name = str(format("h2TELHitmapUV%1%") % iPlane2);
         string title = str(format("Hitmap TEL in U x V, plane %1%") % iPlane2);
-        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU2, 0, nStripsU2, nStripsV2, 0, nStripsV2);
+        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU2, 0, nStripsU2, nStripsV2, 0,
+                                                               nStripsV2);
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetXaxis()->SetTitle("u position [pitch units]");
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetYaxis()->SetTitle("v position [pitch units]");
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetZaxis()->SetTitle("hits");
       } else if (i < j) { // correlations for u
         string name = str(format("h2TELCorrelationmapU%1%%2%") % iPlane1 % iPlane2);
         string title = str(format("Correlationmap TEL in U, plane %1%, plane %2%") % iPlane1 % iPlane2);
-        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU1, 0, nStripsU1, nStripsU2, 0, nStripsU2);
+        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU1, 0, nStripsU1, nStripsU2, 0,
+                                                               nStripsU2);
         string axisxtitle = str(format("u position, plane %1% [pitch units]") % iPlane1);
         string axisytitle = str(format("u position, plane %1% [pitch units]") % iPlane2);
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
@@ -169,7 +172,8 @@ void TelDQMModule::defineHisto()
       } else {            // correlations for v
         string name = str(format("h2TELCorrelationmapV%1%%2%") % iPlane2 % iPlane1);
         string title = str(format("Correlationmap TEL in V, plane %1%, plane %2%") % iPlane2 % iPlane1);
-        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsV2, 0, nStripsV2, nStripsV1, 0, nStripsV1);
+        m_correlationsHitMaps[c_nTELPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsV2, 0, nStripsV2, nStripsV1, 0,
+                                                               nStripsV1);
         string axisxtitle = str(format("v position, plane %1% [pitch units]") % iPlane2);
         string axisytitle = str(format("v position, plane %1% [pitch units]") % iPlane1);
         m_correlationsHitMaps[c_nTELPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
@@ -238,7 +242,7 @@ void TelDQMModule::event()
   // Fired pixels
   vector<int> pixel_count(c_nTELPlanes);
   for (int i = 0; i < c_nTELPlanes; i++) pixel_count[i] = 0;
-  for (const TelDigit & digit : storeDigits) {
+  for (const TelDigit& digit : storeDigits) {
     int iPlane = digit.getSensorID().getSensorNumber();
     if ((iPlane < c_firstTELPlane) || (iPlane > c_lastTELPlane)) continue;
     int index = planeToIndex(iPlane);
@@ -283,7 +287,8 @@ void TelDQMModule::event()
     int index1 = planeToIndex(iPlane1);
     if ((getInfo(index1).getUCellID(cluster1.getU()) < -1) || (getInfo(index1).getVCellID(cluster1.getV()) < -1)) continue;
     // hit maps:
-    m_correlationsHitMaps[c_nTELPlanes * index1 + index1]->Fill(getInfo(index1).getUCellID(cluster1.getU()), getInfo(index1).getVCellID(cluster1.getV()));
+    m_correlationsHitMaps[c_nTELPlanes * index1 + index1]->Fill(getInfo(index1).getUCellID(cluster1.getU()),
+                                                                getInfo(index1).getVCellID(cluster1.getV()));
     for (int i2 = 0; i2 < storeClusters.getEntries(); i2++) {
       // preparing of second value for correlation plots with postfix "2":
       auto cluster2 = *storeClusters[i2];
@@ -296,10 +301,12 @@ void TelDQMModule::event()
       // ready to fill correlation histograms:
       if (index1 < index2) {
         // correlations for u
-        m_correlationsHitMaps[c_nTELPlanes * index2 + index1]->Fill(getInfo(index1).getUCellID(cluster1.getU()), getInfo(index2).getUCellID(cluster2.getU()));
+        m_correlationsHitMaps[c_nTELPlanes * index2 + index1]->Fill(getInfo(index1).getUCellID(cluster1.getU()),
+                                                                    getInfo(index2).getUCellID(cluster2.getU()));
       } else if (index1 > index2) {
         // correlations for v
-        m_correlationsHitMaps[c_nTELPlanes * index2 + index1]->Fill(getInfo(index2).getVCellID(cluster2.getV()), getInfo(index1).getVCellID(cluster1.getV()));
+        m_correlationsHitMaps[c_nTELPlanes * index2 + index1]->Fill(getInfo(index2).getVCellID(cluster2.getV()),
+                                                                    getInfo(index1).getVCellID(cluster1.getV()));
       }
     }
   }

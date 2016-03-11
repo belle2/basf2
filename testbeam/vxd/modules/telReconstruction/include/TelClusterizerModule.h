@@ -85,7 +85,8 @@ namespace Belle2 {
        * @param centerPitch Pitch between pixel cells
        * @param maxPitch Pitch at the maximum cell of the cluster
        */
-      void calculatePositionError(const ClusterCandidate& cls, ClusterProjection& primary, const ClusterProjection& secondary, double minPitch, double centerPitch, double maxPitch);
+      void calculatePositionError(const ClusterCandidate& cls, ClusterProjection& primary, const ClusterProjection& secondary,
+                                  double minPitch, double centerPitch, double maxPitch);
 
       /** Name of the collection to use for the TelDigits */
       std::string m_storeDigitsName;

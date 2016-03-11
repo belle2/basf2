@@ -34,12 +34,14 @@ namespace Belle2 {
         c_maxCapacity = 4 * c_defaultCapacity
       };
       /** Constructor to create an empty Cluster */
-      ClusterCandidate(): m_merged(0) {
+      ClusterCandidate(): m_merged(0)
+      {
         m_pixels.reserve(c_defaultCapacity);
       }
 
       /** Clear the Cluster information (to reuse the same cluster instance) */
-      void clear() {
+      void clear()
+      {
         m_merged = 0;
         m_pixels.clear();
       }

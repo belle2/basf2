@@ -174,7 +174,7 @@ void VXDTFDQMModule::defineHisto()
 
   string currentTitle;
   string currentHeadLine;
-  for (auto & anEntry : m_histoTCvsTotalHitsForEachSensor) {
+  for (auto& anEntry : m_histoTCvsTotalHitsForEachSensor) {
 
     VxdID thisID = anEntry.first;
     stringstream titleStream, headStream;
@@ -240,12 +240,14 @@ void VXDTFDQMModule::defineHisto()
     float length = getInfo(i).getLength();
     int nUStrips = getInfo(i).getUCells();
     int nVStrips = getInfo(i).getVCells();
-    m_correlationHitPositionU[i] = new TH2F(nameU.c_str(), titleU.c_str(), nUStrips, -0.5 * width, 0.5 * width, nUStrips, -0.5 * width, 0.5 * width);
+    m_correlationHitPositionU[i] = new TH2F(nameU.c_str(), titleU.c_str(), nUStrips, -0.5 * width, 0.5 * width, nUStrips, -0.5 * width,
+                                            0.5 * width);
     m_correlationHitPositionU[i]->GetXaxis()->SetTitle("total u position [cm]");
     m_correlationHitPositionU[i]->GetYaxis()->SetTitle("accepted u position [cm]");
     m_correlationHitPositionU[i]->SetOption("colz"); // lego2
 
-    m_correlationHitPositionV[i] = new TH2F(nameV.c_str(), titleV.c_str(), nVStrips, -0.5 * length, 0.5 * length, nVStrips, -0.5 * length, 0.5 * length);
+    m_correlationHitPositionV[i] = new TH2F(nameV.c_str(), titleV.c_str(), nVStrips, -0.5 * length, 0.5 * length, nVStrips,
+                                            -0.5 * length, 0.5 * length);
     m_correlationHitPositionV[i]->GetXaxis()->SetTitle("total v position [cm]");
     m_correlationHitPositionV[i]->GetYaxis()->SetTitle("accepted v position [cm]");
 //    m_correlationHitPositionV[i]->SetOption("colz"); // lego2 // test what happens if I don't set this value
@@ -310,16 +312,16 @@ void VXDTFDQMModule::beginRun()
   m_histoNHitsAtLayer7->Reset();
 //  m_hitPosUsedVshitPosTotalU->Reset();
 
-  for (auto & anEntry : m_histoTCvsTotalHitsForEachSensor) {
+  for (auto& anEntry : m_histoTCvsTotalHitsForEachSensor) {
     anEntry.second->Reset();
   }
-  for (auto & anEntry : m_hitMapHitsTotal) {
+  for (auto& anEntry : m_hitMapHitsTotal) {
     anEntry.second->Reset();
   }
-  for (auto & anEntry : m_hitMapTCsOnly) {
+  for (auto& anEntry : m_hitMapTCsOnly) {
     anEntry.second->Reset();
   }
-  for (auto & anEntry : m_hitMapReferenceTCs) {
+  for (auto& anEntry : m_hitMapReferenceTCs) {
     anEntry.second->Reset();
   }
 }
@@ -383,7 +385,8 @@ void VXDTFDQMModule::event()
           countedHitsInLayers.at(aVxdID.getLayerNumber()) += 1;
 
           const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(aVxdID);
-          m_hitMapTCsOnly.find(uint(aVxdID))->second->Fill(aSensorInfo->getUCellID(pxdClusters[hitID]->getU()), aSensorInfo->getVCellID(pxdClusters[hitID]->getV()));
+          m_hitMapTCsOnly.find(uint(aVxdID))->second->Fill(aSensorInfo->getUCellID(pxdClusters[hitID]->getU()),
+                                                           aSensorInfo->getVCellID(pxdClusters[hitID]->getV()));
         } else if (detectorID == Const::SVD) {
           ++nSVDhits;
           aVxdID = svdClusters[hitID]->getSensorID();
@@ -402,7 +405,8 @@ void VXDTFDQMModule::event()
           countedHitsInLayers.at(aVxdID.getLayerNumber()) += 1;
 
           const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(aVxdID);
-          m_hitMapTCsOnly.find(uint(aVxdID))->second->Fill(aSensorInfo->getUCellID(telClusters[hitID]->getU()), aSensorInfo->getVCellID(telClusters[hitID]->getV()));
+          m_hitMapTCsOnly.find(uint(aVxdID))->second->Fill(aSensorInfo->getUCellID(telClusters[hitID]->getU()),
+                                                           aSensorInfo->getVCellID(telClusters[hitID]->getV()));
         }
 
         if (m_countTCHitsForEachSensor.find(aVxdID) != m_countTCHitsForEachSensor.end()) {
@@ -447,7 +451,8 @@ void VXDTFDQMModule::event()
           aVxdID = pxdClusters[hitID]->getSensorID();
 
           const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(aVxdID);
-          m_hitMapReferenceTCs.find(uint(aVxdID))->second->Fill(aSensorInfo->getUCellID(pxdClusters[hitID]->getU()), aSensorInfo->getVCellID(pxdClusters[hitID]->getV()));
+          m_hitMapReferenceTCs.find(uint(aVxdID))->second->Fill(aSensorInfo->getUCellID(pxdClusters[hitID]->getU()),
+                                                                aSensorInfo->getVCellID(pxdClusters[hitID]->getV()));
         } else if (detectorID == Const::SVD) {
           aVxdID = svdClusters[hitID]->getSensorID();
 
@@ -462,14 +467,15 @@ void VXDTFDQMModule::event()
           aVxdID = telClusters[hitID]->getSensorID();
 
           const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(aVxdID);
-          m_hitMapReferenceTCs.find(uint(aVxdID))->second->Fill(aSensorInfo->getUCellID(telClusters[hitID]->getU()), aSensorInfo->getVCellID(telClusters[hitID]->getV()));
+          m_hitMapReferenceTCs.find(uint(aVxdID))->second->Fill(aSensorInfo->getUCellID(telClusters[hitID]->getU()),
+                                                                aSensorInfo->getVCellID(telClusters[hitID]->getV()));
         }
       }
     }
   }
 //  B2INFO("7")
   // collecting Info from Clusters
-  for (const SVDCluster & aCluster : svdClusters) {
+  for (const SVDCluster& aCluster : svdClusters) {
     VxdID aVxdID = aCluster.getSensorID();
     if (aCluster.isUCluster()) {
       m_histHitPosTotalU->Fill(aCluster.getPosition());
@@ -494,7 +500,7 @@ void VXDTFDQMModule::event()
     ++m_countAllHits;
   }
 
-  for (const PXDCluster & aCluster : pxdClusters) {
+  for (const PXDCluster& aCluster : pxdClusters) {
     VxdID aVxdID = aCluster.getSensorID();
     uint vxdInt = aVxdID;
 
@@ -511,7 +517,7 @@ void VXDTFDQMModule::event()
     m_hitMapHitsTotal.find(vxdInt)->second->Fill(aSensorInfo->getUCellID(aCluster.getU()), aSensorInfo->getVCellID(aCluster.getV()));
   }
 
-  for (const TelCluster & aCluster : telClusters) {
+  for (const TelCluster& aCluster : telClusters) {
     VxdID aVxdID = aCluster.getSensorID();
     uint vxdInt = aVxdID;
 
@@ -528,7 +534,7 @@ void VXDTFDQMModule::event()
     m_hitMapHitsTotal.find(vxdInt)->second->Fill(aSensorInfo->getUCellID(aCluster.getU()), aSensorInfo->getVCellID(aCluster.getV()));
   }
 
-  for (auto & anEntry : m_histoTCvsTotalHitsForEachSensor) {
+  for (auto& anEntry : m_histoTCvsTotalHitsForEachSensor) {
     VxdID thisID = anEntry.first;
     float result = -1, nTotalHits = 0, nTCHits = 0;
     if (m_countTotalHitsForEachSensor.find(thisID) != m_countTotalHitsForEachSensor.end()) {
@@ -571,7 +577,9 @@ void VXDTFDQMModule::endRun()
   for (uint iD : notCleaned) {
     vxdIDOutput << iD << "/" << VxdID(iD) << " ";
   }
-  B2WARNING("VXDTFDQMModule: there were " << m_countNoSensorFound << " of " << m_countAllHits << " cases where sensorID of Hit could not be found in sensorID-specific histograms. Total number of bad sensors before/after unique: " << before << "/" << m_badSensorIDs.size() << ", which were:\n" << vxdIDOutput.str())
+  B2WARNING("VXDTFDQMModule: there were " << m_countNoSensorFound << " of " << m_countAllHits <<
+            " cases where sensorID of Hit could not be found in sensorID-specific histograms. Total number of bad sensors before/after unique: "
+            << before << "/" << m_badSensorIDs.size() << ", which were:\n" << vxdIDOutput.str())
 }
 
 
@@ -583,7 +591,7 @@ void VXDTFDQMModule::terminate()
 
 void VXDTFDQMModule::Prepare2DHistMap(std::string headLine, std::string title, std::map<uint, TH2F*>& thisMap)
 {
-  for (auto & anEntry : thisMap) {
+  for (auto& anEntry : thisMap) {
     VxdID thisID = anEntry.first;
     stringstream titleStream, headStream;
     titleStream << title << thisID;
@@ -606,7 +614,7 @@ void VXDTFDQMModule::Prepare2DHistMap(std::string headLine, std::string title, s
 
 void VXDTFDQMModule::Prepare1DHistMap(std::string headLine, std::string title, std::map<uint, TH1F*>& thisMap, bool isU)
 {
-  for (auto & anEntry : thisMap) {
+  for (auto& anEntry : thisMap) {
     VxdID thisID = anEntry.first;
     stringstream titleStream, headStream;
     titleStream << title << thisID;

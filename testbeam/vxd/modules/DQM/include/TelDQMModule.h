@@ -54,10 +54,12 @@ namespace Belle2 {
     /** Utility functions to convert indices to plane numbers and v.v.,
      * and to protect against range errors.
      */
-    inline int indexToPlane(int index) const {
+    inline int indexToPlane(int index) const
+    {
       return c_firstTELPlane + index;
     }
-    inline int planeToIndex(int iPlane) const {
+    inline int planeToIndex(int iPlane) const
+    {
       return iPlane - c_firstTELPlane;
     }
     /** This is a shortcut to getting TEL::SensorInfo from the GeoCache.
@@ -79,7 +81,7 @@ namespace Belle2 {
     TH1F* m_sizeU[c_nTELPlanes];          /**< u size by plane */
     TH1F* m_sizeV[c_nTELPlanes];          /**< v size by plane */
     TH1F* m_size[c_nTELPlanes];           /**< size by plane */
-    TH2F* m_correlationsHitMaps[c_nTELPlanes* c_nTELPlanes];   /**< Correlations and hit maps */
+    TH2F* m_correlationsHitMaps[c_nTELPlanes * c_nTELPlanes];  /**< Correlations and hit maps */
   };
 
   inline const TEL::SensorInfo& TelDQMModule::getInfo(int index) const

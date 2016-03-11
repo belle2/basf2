@@ -21,7 +21,8 @@ namespace Belle2 {
      *
      *  @param event The current event number.
      */
-    void setEventNumber(ULong64_t event) {
+    void setEventNumber(ULong64_t event)
+    {
       m_event = event;
     }
 
@@ -29,7 +30,8 @@ namespace Belle2 {
      *
      *  @param triggerID The number of the current trigger ID.
      */
-    void setTriggerID(ULong64_t triggerID) {
+    void setTriggerID(ULong64_t triggerID)
+    {
       m_triggerID = triggerID;
     }
 
@@ -37,7 +39,8 @@ namespace Belle2 {
      *
      *  @param timeStamp The current time stamp.
      */
-    void setTimeStamp(ULong64_t timeStamp) {
+    void setTimeStamp(ULong64_t timeStamp)
+    {
       m_timeStamp = timeStamp;
     }
 
@@ -45,7 +48,8 @@ namespace Belle2 {
      *
      *  @return The number of the current event.
      */
-    ULong64_t getEventNumber() const {
+    ULong64_t getEventNumber() const
+    {
       return m_event;
     }
 
@@ -53,7 +57,8 @@ namespace Belle2 {
      *
      *  @return The number current trigger ID:
      */
-    ULong64_t getTriggerID() const {
+    ULong64_t getTriggerID() const
+    {
       return m_triggerID;
     }
 
@@ -61,7 +66,8 @@ namespace Belle2 {
      *
      *  @return The current time stamp:
      */
-    ULong64_t getTimeStamp() const {
+    ULong64_t getTimeStamp() const
+    {
       return m_timeStamp;
     }
 

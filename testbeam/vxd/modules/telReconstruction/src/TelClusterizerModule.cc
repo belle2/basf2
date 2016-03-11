@@ -221,12 +221,13 @@ void TelClusterizerModule::createRelationLookup(const RelationArray& relation, R
   if (!relation) return;
   //Resize to number of digits and set all values
   lookup.resize(digits);
-  for (const RelationElement & element : relation) {
+  for (const RelationElement& element : relation) {
     lookup[element.getFromIndex()] = &element;
   }
 }
 
-void TelClusterizerModule::fillRelationMap(const RelationLookup& lookup, std::map<unsigned int, float>& relation, unsigned int index)
+void TelClusterizerModule::fillRelationMap(const RelationLookup& lookup, std::map<unsigned int, float>& relation,
+                                           unsigned int index)
 {
   //If the lookuptable is not empty and the element is set
   if (!lookup.empty() && lookup[index]) {
@@ -268,7 +269,7 @@ void TelClusterizerModule::writeClusters(VxdID sensorID)
   map<unsigned int, float> truehit_relations;
   vector<pair<unsigned int, float> > digit_weights;
 
-  for (ClusterCandidate & cls : *m_cache) {
+  for (ClusterCandidate& cls : *m_cache) {
 
     double rho(0);
     ClusterProjection projU, projV;
@@ -277,7 +278,7 @@ void TelClusterizerModule::writeClusters(VxdID sensorID)
     digit_weights.clear();
     digit_weights.reserve(cls.size());
 
-    for (const Pixel & px : cls.pixels()) {
+    for (const Pixel& px : cls.pixels()) {
       //Add the Pixel information to the two projections
       projU.add(px.getU(), info.getUCellPosition(px.getU()));
       projV.add(px.getV(), info.getVCellPosition(px.getV()));
@@ -300,7 +301,7 @@ void TelClusterizerModule::writeClusters(VxdID sensorID)
       double posUU = cls.size() * pitchU * pitchU / 12.0;
       double posVV = cls.size() * pitchV * pitchV / 12.0;
       double posUV(0);
-      for (const Pixel & px : cls.pixels()) {
+      for (const Pixel& px : cls.pixels()) {
         const double du = info.getUCellPosition(px.getU()) - projU.getPos();
         const double dv = info.getVCellPosition(px.getV()) - projV.getPos();
         posUU += du * du;
@@ -334,7 +335,8 @@ void TelClusterizerModule::writeClusters(VxdID sensorID)
   m_cache->clear();
 }
 
-void TelClusterizerModule::calculatePositionError(const ClusterCandidate&, ClusterProjection& primary, const ClusterProjection& secondary, double minPitch, double centerPitch, double maxPitch)
+void TelClusterizerModule::calculatePositionError(const ClusterCandidate&, ClusterProjection& primary,
+                                                  const ClusterProjection& secondary, double minPitch, double centerPitch, double maxPitch)
 {
   if (primary.getSize() >= static_cast<unsigned int>(m_sizeHeadTail)) { //Analog head tail
     //Average charge in the central area
@@ -350,7 +352,8 @@ void TelClusterizerModule::calculatePositionError(const ClusterCandidate&, Clust
     primary.setError(0.5 * sqrt(1.0 / snHead / snHead + 1.0 / snTail / snTail
                                 + 0.5 * landauHead * landauHead + 0.5 * landauTail * landauTail));
   } else if (primary.getSize() <= 2) { // Add a phantom charge to second strip
-    primary.setError(centerPitch * (secondary.getSize() + 2) * m_cutElectrons / (primary.getCharge() + (secondary.getSize() + 3) * m_cutElectrons));
+    primary.setError(centerPitch * (secondary.getSize() + 2) * m_cutElectrons / (primary.getCharge() +
+                     (secondary.getSize() + 3) * m_cutElectrons));
   } else {
     const double sn = 10.0;
     primary.setError(2.0 * centerPitch / sn);

@@ -38,7 +38,7 @@
 #include <testbeam/vxd/reconstruction/TelRecoHit.h>
 
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
-#include <cdc/translators/SimpleTDCCountTranslator.h>
+#include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/translators/IdealCDCGeometryTranslator.h>
 
 #include <mdst/dataobjects/Track.h>
@@ -220,7 +220,8 @@ void GenFitterVXDTBModule::initialize()
 
   // Create new Translators and give them to the CDCRecoHits.
   // The way, I'm going to do it here will produce some small resource leak, but this will stop, once we go to ROOT 6 and have the possibility to use sharead_ptr
-  CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new IdealCDCGeometryTranslator(), new SimpleTDCCountTranslator());
+  CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new IdealCDCGeometryTranslator(),
+                             new RealisticTDCCountTranslator());
 }
 
 void GenFitterVXDTBModule::beginRun()

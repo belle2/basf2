@@ -59,7 +59,8 @@ namespace Belle2 {
        * @param charge charge in electrons to be added
        * @param particle Index of the particle contributing the charge, -1 for no particle/noise
        */
-      void add(double charge, int particle = -1, int truehit = -1) {
+      void add(double charge, int particle = -1, int truehit = -1)
+      {
         if (particle >= 0) m_particles[particle] += charge;
         if (truehit >= 0) m_truehits[truehit] += charge;
         m_charge += charge;

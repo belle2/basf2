@@ -144,7 +144,7 @@ void TelDigitizerModule::beginRun()
 void TelDigitizerModule::event()
 {
   //Clear sensors and process SimHits
-  for (Sensors::value_type & sensor : m_sensors) {
+  for (Sensors::value_type& sensor : m_sensors) {
     sensor.second.clear();
   }
   m_currentSensor = 0;
@@ -244,7 +244,7 @@ void TelDigitizerModule::processHit()
     double lastFraction {0};
     double lastElectrons {0};
 
-    for (auto & segment : segments) {
+    for (auto& segment : segments) {
       //Simhit returns step fraction and cumulative electrons. We want the
       //center of these steps and electrons in this step
       const double f = (segment.first + lastFraction) / 2;
@@ -348,7 +348,7 @@ double TelDigitizerModule::addNoise(double charge)
 void TelDigitizerModule::addNoiseDigits()
 {
   double fraction = 1 - m_noiseFraction;
-  for (Sensors::value_type & sensor : m_sensors) {
+  for (Sensors::value_type& sensor : m_sensors) {
     Sensor& s = sensor.second;
 
     //Calculate the number of pixels on an empty sensor which will exceed the noise cut
@@ -383,9 +383,9 @@ void TelDigitizerModule::saveDigits()
   //Zero supression cut in electrons
   double charge_threshold = m_SNThreshold * m_elNoise;
 
-  for (Sensors::value_type & sensor : m_sensors) {
+  for (Sensors::value_type& sensor : m_sensors) {
     int sensorID = sensor.first;
-    for (Sensor::value_type & digit : sensor.second) {
+    for (Sensor::value_type& digit : sensor.second) {
       const Digit& d = digit.first;
       const DigitValue& v = digit.second;
 

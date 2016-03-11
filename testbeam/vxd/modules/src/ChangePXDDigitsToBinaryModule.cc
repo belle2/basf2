@@ -62,7 +62,7 @@ void ChangePXDDigitsToBinaryModule::event()
 
   StoreArray<PXDDigit> PXDDigits(m_storeDigitsName);
 
-  for (PXDDigit & digit : PXDDigits) {
+  for (PXDDigit& digit : PXDDigits) {
     // Faster if digits are sorted by sensor...
     if (digit.getSensorID() != lastID) {
       // Is sensor of the digit in the list?

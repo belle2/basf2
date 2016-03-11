@@ -287,6 +287,7 @@
    <Snippet name="EUDET-SensitiveArea">
       <Material>Si</Material>
       <Shape>Box</Shape>
+      <DZ unit="mm">-4.85</DZ>
       <HalfX unit="mm">10.5984</HalfX>
       <HalfY unit="mm">5.2992</HalfY>
       <Phi unit="deg">90</Phi>
@@ -335,6 +336,7 @@
       <Volume name="EUDET-PCBoard">
          <Material>PCB-FR4</Material>
          <Shape>Box</Shape>
+         <DZ unit="mm">-4.85</DZ>
          <HalfX unit="mm">68</HalfX>
          <HalfY unit="mm">68</HalfY>
          <HalfZ unit="mm">0.75</HalfZ>

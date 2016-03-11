@@ -36,8 +36,11 @@ VXDTFTBAnalyzerModule::VXDTFTBAnalyzerModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("stepSize", m_stepSize, "e.g. 100 will highlight every 100th event", int(100));
-  addParam("nameContainerTCevaluate", m_PARAMnameContainerTCevaluate, "set here the first name of the containers to be compared (this one is the test-container)", string("caTracksJKL"));
-  addParam("nameContainerTCreference", m_PARAMnameContainerTCreference, "set here the second name of the containers to be compared (this one is used as reference for evaluating the first one)", string("bestCandidates"));
+  addParam("nameContainerTCevaluate", m_PARAMnameContainerTCevaluate,
+           "set here the first name of the containers to be compared (this one is the test-container)", string("caTracksJKL"));
+  addParam("nameContainerTCreference", m_PARAMnameContainerTCreference,
+           "set here the second name of the containers to be compared (this one is used as reference for evaluating the first one)",
+           string("bestCandidates"));
 
 }
 
@@ -89,10 +92,10 @@ void VXDTFTBAnalyzerModule::event()
   //collecting info about number of cluster-combinations (only guess since it will not be checked whether they are u or v clusters):
   vector<SensorAndCluster> clustersPerSensor, clusterCombinationsPerSensor;
 
-  for (SVDCluster & aCluster : aSvdClusterArray) {
+  for (SVDCluster& aCluster : aSvdClusterArray) {
     VxdID::baseType thisID = aCluster.getSensorID().getID();
     bool foundSensor = false;
-    for (SensorAndCluster & thisSensor : clustersPerSensor) {
+    for (SensorAndCluster& thisSensor : clustersPerSensor) {
       if (thisSensor.first == thisID) { thisSensor.second++; foundSensor = true; }
     }
 
@@ -101,7 +104,7 @@ void VXDTFTBAnalyzerModule::event()
   // now we now total number of clusters per sensor, calculating number of clusterCombinations:
   stringstream printCombinations;
   printCombinations << "Found the following SVD-combinations:\n";
-  for (SensorAndCluster & thisSensor : clustersPerSensor) {
+  for (SensorAndCluster& thisSensor : clustersPerSensor) {
     uShort halfNumber = static_cast<uShort>((float(thisSensor.second) + 0.5) * 0.5);
     uShort nCombinations = halfNumber * halfNumber;
     clusterCombinationsPerSensor.push_back({thisSensor.first, nCombinations});
@@ -109,7 +112,7 @@ void VXDTFTBAnalyzerModule::event()
     m_overallCombinationsCount.push_back(nCombinations);
 
     bool foundSensor = false;
-    for (SensorAndClusterCollection & anotherSensor : m_overallCombinationsPerSensor) {
+    for (SensorAndClusterCollection& anotherSensor : m_overallCombinationsPerSensor) {
       if (anotherSensor.first == thisSensor.first) { anotherSensor.second.push_back(nCombinations); foundSensor = true; }
     }
     if (foundSensor == false) {
@@ -131,7 +134,7 @@ void VXDTFTBAnalyzerModule::event()
 
   // collecting info about typical length of reference TCs
   int totalRefHits = 0, totalEvalHits = 0;
-  for (genfit::TrackCand & aTC : tcsReference) {
+  for (genfit::TrackCand& aTC : tcsReference) {
     int total = 0, svd = 0, tel = 0, pxd = 0;
     total = aTC.getHitIDs().size();
     svd = aTC.getHitIDs(Const::SVD).size();
@@ -155,7 +158,7 @@ void VXDTFTBAnalyzerModule::event()
 
   // collecting info about typical length of evaluate TCs
   bool found8ClusterTCs = false;
-  for (genfit::TrackCand & aTC : tcsEvaluate) {
+  for (genfit::TrackCand& aTC : tcsEvaluate) {
     int total = 0, svd = 0, tel = 0, pxd = 0;
     total = aTC.getHitIDs().size();
     svd = aTC.getHitIDs(Const::SVD).size();
@@ -192,9 +195,13 @@ void VXDTFTBAnalyzerModule::event()
 
   // eventWise output:
   if (m_eventCounter % m_stepSize == 0) {
-    B2INFO("VXDTFTBAnalyzerModule - Event: " << m_eventCounter << " having " << aPxdClusterArray.getEntries() << "/" << aSvdClusterArray.getEntries() << " pxd/svdClusters and " << tcsReference.getEntries() << "(" << meanRefTCHits << ")/" << tcsEvaluate.getEntries() << "(" << meanEvalTCHits << ") reference/evaluateTCs(hitsPerTC). " << printCombinations.str());
+    B2INFO("VXDTFTBAnalyzerModule - Event: " << m_eventCounter << " having " << aPxdClusterArray.getEntries() << "/" <<
+           aSvdClusterArray.getEntries() << " pxd/svdClusters and " << tcsReference.getEntries() << "(" << meanRefTCHits << ")/" <<
+           tcsEvaluate.getEntries() << "(" << meanEvalTCHits << ") reference/evaluateTCs(hitsPerTC). " << printCombinations.str());
   } else {
-    B2DEBUG(5, "VXDTFTBAnalyzerModule - Event: " << m_eventCounter << " having " << aPxdClusterArray.getEntries() << "/" << aSvdClusterArray.getEntries() << " pxd/svdClusters and " << tcsReference.getEntries() << "(" << meanRefTCHits << ")/" << tcsEvaluate.getEntries() << "(" << meanEvalTCHits << ") reference/evaluateTCs(hitsPerTC). " << printCombinations.str());
+    B2DEBUG(5, "VXDTFTBAnalyzerModule - Event: " << m_eventCounter << " having " << aPxdClusterArray.getEntries() << "/" <<
+            aSvdClusterArray.getEntries() << " pxd/svdClusters and " << tcsReference.getEntries() << "(" << meanRefTCHits << ")/" <<
+            tcsEvaluate.getEntries() << "(" << meanEvalTCHits << ") reference/evaluateTCs(hitsPerTC). " << printCombinations.str());
   }
 }
 
@@ -203,7 +210,9 @@ void VXDTFTBAnalyzerModule::endRun()
 {
   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
   double invEvents = 1. / m_eventCounter;
-  B2INFO("VXDTFTBAnalyzerModule: after " << m_eventCounter << " events there were " << m_pxdClusterCounter << "/" << m_svdClusterCounter << " pxd/svdClusters total and " << double(m_pxdClusterCounter)*invEvents << "/" << double(m_svdClusterCounter)*invEvents << " pxd/svdClusters per event");
+  B2INFO("VXDTFTBAnalyzerModule: after " << m_eventCounter << " events there were " << m_pxdClusterCounter << "/" <<
+         m_svdClusterCounter << " pxd/svdClusters total and " << double(m_pxdClusterCounter)*invEvents << "/" << double(
+           m_svdClusterCounter)*invEvents << " pxd/svdClusters per event");
 
   float invTotalVal = 1. / float(m_countBothTrue + m_countBothFalse + m_countEvalTrueRefFalse + m_countEvalFalseRefTrue);
   float diagonalEfficiency = float(m_countBothTrue + m_countBothFalse) * invTotalVal;
@@ -219,16 +228,20 @@ void VXDTFTBAnalyzerModule::endRun()
          << "\nEfficiency (caseBothYesOrNo/nTotal): " << diagonalEfficiency
          << "\nEfficiency ((caseBothYesOrNo+nCasesRefTCsFound)/nTotal): " << tunedEfficiency);
 
-  float invTotalValFull = 1. / float(m_countBothTrueFull + m_countBothFalseFull + m_countEvalTrueRefFalseFull + m_countEvalFalseRefTrueFull);
+  float invTotalValFull = 1. / float(m_countBothTrueFull + m_countBothFalseFull + m_countEvalTrueRefFalseFull +
+                                     m_countEvalFalseRefTrueFull);
   float diagonalEfficiencyFull = float(m_countBothTrueFull + m_countBothFalseFull) * invTotalValFull;
   if (std::isnan(diagonalEfficiencyFull) == true) { diagonalEfficiencyFull = 0; }
   float tunedEfficiencyFull = float(m_countBothTrueFull + m_countBothFalseFull + m_countEvalTrueRefFalseFull) * invTotalValFull;
   if (std::isnan(tunedEfficiencyFull) == true) { tunedEfficiencyFull = 0; }
 
-  B2INFO("VXDTFTBAnalyzerModule: after " << m_eventCounter << " events the congruence values for the 8-clustes-at-the-SVD are as follows:\n"
+  B2INFO("VXDTFTBAnalyzerModule: after " << m_eventCounter <<
+         " events the congruence values for the 8-clustes-at-the-SVD are as follows:\n"
          << "nCases when the reference source found a TC with 8 svdClusters and the evaluating source too: " << m_countBothTrueFull
-         << "\nnCases when the reference source found a TC with 8 svdClusters but the evaluating source didn't: " << m_countEvalFalseRefTrueFull
-         << "\nnCases when the evaluating source found a TC with 8 svdClusters but the reference source didn't: "  << m_countEvalTrueRefFalseFull
+         << "\nnCases when the reference source found a TC with 8 svdClusters but the evaluating source didn't: " <<
+         m_countEvalFalseRefTrueFull
+         << "\nnCases when the evaluating source found a TC with 8 svdClusters but the reference source didn't: "  <<
+         m_countEvalTrueRefFalseFull
          << "\nnCases when both source couldn't find a TC with 8 svdClusters: " << m_countBothFalseFull
          << "\nEfficiency8Cluster (caseBothYesOrNo/nTotal): " << diagonalEfficiencyFull
          << "\nEfficiency8Cluster ((caseBothYesOrNo+nCasesRefTCsFound)/nTotal): " << tunedEfficiencyFull);
@@ -249,7 +262,7 @@ void VXDTFTBAnalyzerModule::endRun()
 
   stringstream printCombinations;
   printCombinations << "Found the following SVD-combinations:\n";
-  for (SensorAndClusterCollection & entry : m_overallCombinationsPerSensor) {
+  for (SensorAndClusterCollection& entry : m_overallCombinationsPerSensor) {
     int q1 = 0, q5 = 0, q25 = 0, q50 = 0, q75 = 0, q95 = 0, q99 = 0; // index numbers for quantiles 1,5,25,median,75,95, 99
     int nEntries = entry.second.size();
     std::sort(entry.second.begin(), entry.second.end());
@@ -283,7 +296,8 @@ void VXDTFTBAnalyzerModule::endRun()
     countTotalClusterCombis += entry;
   }
   std::sort(m_overallCombinationsCount.begin(), m_overallCombinationsCount.end());
-  B2INFO("Distribution of Svd-Cluster-combinations (total/mean/median:" << countTotalClusterCombis << "/" << countTotalClusterCombis / nMeasurements << "/" << m_overallCombinationsCount.at(nMeasurements / 2) << ") per layer:\n" << printCombinations.str());
+  B2INFO("Distribution of Svd-Cluster-combinations (total/mean/median:" << countTotalClusterCombis << "/" << countTotalClusterCombis /
+         nMeasurements << "/" << m_overallCombinationsCount.at(nMeasurements / 2) << ") per layer:\n" << printCombinations.str());
 }
 
 

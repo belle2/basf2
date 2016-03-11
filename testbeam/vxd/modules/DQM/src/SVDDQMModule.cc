@@ -40,7 +40,8 @@ SVDDQMModule::SVDDQMModule() : HistoModule()
   //Set module properties
   setDescription("SVD DQM module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed", std::string("svd"));
+  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+           std::string("svd"));
 }
 
 
@@ -247,20 +248,23 @@ void SVDDQMModule::defineHisto()
       if (i == j) {  // hit maps
         string name = str(format("h2VXDHitmapUV%1%") % iPlane2);
         string title = str(format("Hitmap VXD in U x V, plane %1%") % iPlane2);
-        m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU2, 0, nStripsU2, nStripsV2, 0, nStripsV2);
+        m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU2, 0, nStripsU2, nStripsV2, 0,
+                                                               nStripsV2);
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle("u position [pitch units]");
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("v position [pitch units]");
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
         string nameSP = str(format("h2VXDHitmapSP%1%") % iPlane2);
         string titleSP = str(format("Hitmap VXD in space points, plane %1%") % iPlane2);
-        m_correlationsHitMapsSP[c_nVXDPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsU2, -0.5 * uSize2, 0.5 * uSize2, nStripsV2, -0.5 * vSize2, 0.5 * vSize2);
+        m_correlationsHitMapsSP[c_nVXDPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsU2, -0.5 * uSize2, 0.5 * uSize2,
+                                                                 nStripsV2, -0.5 * vSize2, 0.5 * vSize2);
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle("vertical y position [cm]");
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("horizontal z position [cm]");
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
       } else if (i < j) { // correlations for u
         string name = str(format("h2VXDCorrelationmapU%1%%2%") % iPlane1 % iPlane2);
         string title = str(format("Correlation map VXD in U, plane %1%, plane %2%") % iPlane1 % iPlane2);
-        m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU1, 0, nStripsU1, nStripsU2, 0, nStripsU2);
+        m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsU1, 0, nStripsU1, nStripsU2, 0,
+                                                               nStripsU2);
         string axisxtitle = str(format("u position, plane %1% [pitch units]") % iPlane1);
         string axisytitle = str(format("u position, plane %1% [pitch units]") % iPlane2);
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
@@ -268,7 +272,8 @@ void SVDDQMModule::defineHisto()
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
         string nameSP = str(format("h2VXDCorrelationmapSPU%1%%2%") % iPlane1 % iPlane2);
         string titleSP = str(format("Correlation map VXD space points in U, plane %1%, plane %2%") % iPlane1 % iPlane2);
-        m_correlationsHitMapsSP[c_nVXDPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsU1, -0.5 * uSize1, 0.5 * uSize1, nStripsU2, -0.5 * uSize2, 0.5 * uSize2);
+        m_correlationsHitMapsSP[c_nVXDPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsU1, -0.5 * uSize1, 0.5 * uSize1,
+                                                                 nStripsU2, -0.5 * uSize2, 0.5 * uSize2);
         axisxtitle = str(format("vertical y position, plane %1% [cm]") % iPlane1);
         axisytitle = str(format("vertical y position, plane %1% [cm]") % iPlane2);
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
@@ -277,7 +282,8 @@ void SVDDQMModule::defineHisto()
       } else {       // correlations for v
         string name = str(format("h2VXDCorrelationmapV%1%%2%") % iPlane2 % iPlane1);
         string title = str(format("Correlation map VXD in V, plane %1%, plane %2%") % iPlane2 % iPlane1);
-        m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsV2, 0, nStripsV2, nStripsV1, 0, nStripsV1);
+        m_correlationsHitMaps[c_nVXDPlanes * j + i] = new TH2F(name.c_str(), title.c_str(), nStripsV2, 0, nStripsV2, nStripsV1, 0,
+                                                               nStripsV1);
         string axisxtitle = str(format("v position, plane %1% [pitch units]") % iPlane2);
         string axisytitle = str(format("v position, plane %1% [pitch units]") % iPlane1);
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
@@ -285,7 +291,8 @@ void SVDDQMModule::defineHisto()
         m_correlationsHitMaps[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
         string nameSP = str(format("h2VXDCorrelationmapSPV%1%%2%") % iPlane2 % iPlane1);
         string titleSP = str(format("Correlation map VXD space points in V, plane %1%, plane %2%") % iPlane2 % iPlane1);
-        m_correlationsHitMapsSP[c_nVXDPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsV2, -0.5 * vSize2, 0.5 * vSize2, nStripsV1, -0.5 * vSize1, 0.5 * vSize1);
+        m_correlationsHitMapsSP[c_nVXDPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsV2, -0.5 * vSize2, 0.5 * vSize2,
+                                                                 nStripsV1, -0.5 * vSize1, 0.5 * vSize1);
         axisxtitle = str(format("horizontal z position, plane %1% [cm]") % iPlane1);
         axisytitle = str(format("horizontal z position, plane %1% [cm]") % iPlane2);
         m_correlationsHitMapsSP[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
@@ -362,7 +369,7 @@ void SVDDQMModule::event()
   // Fired strips
   vector< set<int> > uStrips(c_nSVDPlanes); // sets to eliminate multiple samples per strip
   vector< set<int> > vStrips(c_nSVDPlanes);
-  for (const SVDDigit & digit : storeDigits) {
+  for (const SVDDigit& digit : storeDigits) {
     int iPlane = digit.getSensorID().getLayerNumber();
     if ((iPlane < c_firstSVDPlane) || (iPlane > c_lastSVDPlane)) continue;
     int index = planeToIndex(iPlane);
@@ -382,7 +389,7 @@ void SVDDQMModule::event()
   for (int i = 0; i < c_nSVDPlanes; i++) {
     countsU[i] = 0; countsV[i] = 0;
   }
-  for (const SVDCluster & cluster : storeClusters) {
+  for (const SVDCluster& cluster : storeClusters) {
     int iPlane = cluster.getSensorID().getLayerNumber();
     if ((iPlane < c_firstSVDPlane) || (iPlane > c_lastSVDPlane)) continue;
     int index = planeToIndex(iPlane);
@@ -397,7 +404,7 @@ void SVDDQMModule::event()
   }
 
   // Hitmaps, Charge, Seed, Size, Time
-  for (const SVDCluster & cluster : storeClusters) {
+  for (const SVDCluster& cluster : storeClusters) {
     int iPlane = cluster.getSensorID().getLayerNumber();
     if ((iPlane < c_firstSVDPlane) || (iPlane > c_lastSVDPlane)) continue;
     int index = planeToIndex(iPlane);

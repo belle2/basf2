@@ -66,7 +66,8 @@ namespace Belle2 {
 
 
     /** returns sensorInfo for current index */
-    inline const SVD::SensorInfo& getInfo(int index) const { // VXDTFDQMModule::getInfo
+    inline const SVD::SensorInfo& getInfo(int index) const   // VXDTFDQMModule::getInfo
+    {
       int iPlane = indexToPlane(index);
       VxdID sensorID(iPlane, 1, iPlane);
       return dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
@@ -78,7 +79,8 @@ namespace Belle2 {
     // other stuff. REMARK: devilishly stolen from Tobias Schlüter
     /** returns 1D histogram */
     TH1* getHist(const char* name, const char* title,
-                 int nBins, double x0, double x1) {
+                 int nBins, double x0, double x1)
+    {
       TH1* h = new TH1D(name, title, nBins, x0, x1);
 //       m_allHistos.push_back(h);
       return h;
@@ -86,7 +88,8 @@ namespace Belle2 {
 
     /** returns TProfile */
     TProfile* getHistProfile(const char* name, const char* title,
-                             int nBins, double x0, double x1) {
+                             int nBins, double x0, double x1)
+    {
       TProfile* h = new TProfile(name, title, nBins, x0, x1);
 //       m_allHistos.push_back(h);
       return h;
@@ -95,7 +98,8 @@ namespace Belle2 {
     /** returns 2D histogram */
     TH2* getHist(const char* name, const char* title,
                  int nBinsX, double x0, double x1,
-                 int nBinsY, double y0, double y1) {
+                 int nBinsY, double y0, double y1)
+    {
       TH2* h = new TH2D(name, title, nBinsX, x0, x1, nBinsY, y0, y1);
 //       m_allHistos.push_back(h);
       return h;
@@ -103,37 +107,42 @@ namespace Belle2 {
 
     /** returns 1D histogram */
     TH1* getHist(const std::string& name, const std::string& title,
-                 int nBins, double x0, double x1) {
+                 int nBins, double x0, double x1)
+    {
       return getHist(name.c_str(), title.c_str(), nBins, x0, x1);
     }
 
     /** returns TProfile */
     TProfile* getHistProfile(const std::string& name, const std::string& title,
-                             int nBins, double x0, double x1) {
+                             int nBins, double x0, double x1)
+    {
       return getHistProfile(name.c_str(), title.c_str(), nBins, x0, x1);
     }
 
     /** returns 2D histogram */
     TH2* getHist(const std::string& name, const std::string& title,
                  int nBinsX, double x0, double x1,
-                 int nBinsY, double y0, double y1) {
+                 int nBinsY, double y0, double y1)
+    {
       return getHist(name.c_str(), title.c_str(), nBinsX, x0, x1, nBinsY, y0, y1);
     }
 
 
 
     /** returns plane for current index */
-    inline int indexToPlane(int index) const {
+    inline int indexToPlane(int index) const
+    {
       return c_firstSVDPlane + index;
     }
 
     /** resetting counters */
-    inline void resetCounters() {
-      for (auto & entry : m_countTCHitsForEachSensor) {
+    inline void resetCounters()
+    {
+      for (auto& entry : m_countTCHitsForEachSensor) {
         entry.second = 0;
       }
 
-      for (auto & entry : m_countTotalHitsForEachSensor) {
+      for (auto& entry : m_countTotalHitsForEachSensor) {
         entry.second = 0;
       }
     }
@@ -171,7 +180,8 @@ namespace Belle2 {
 
     TH1D* m_histHitPosFoundU; /**< Position (U) of hit at layer 5 of all TCs produced */
     TH1D* m_histHitPosTotalU; /**< Position (U) of hit at layer 5 of all hits produced  */
-    TGraphAsymmErrors* m_hitPosUsedVshitPosTotalU; /**< Position (U) of hit at a layer vs total position distribution. Total vs used for TCs, Layer5 */
+    TGraphAsymmErrors*
+    m_hitPosUsedVshitPosTotalU; /**< Position (U) of hit at a layer vs total position distribution. Total vs used for TCs, Layer5 */
 
     TH1I* m_histoNHitsAtPXD;         /**< Counted number of hits at the PXD per event added to the TCs  */
     TH1I* m_histoNHitsAtSVD;         /**< Counted number of hits at the SVD per event added to the TCs */
@@ -185,7 +195,8 @@ namespace Belle2 {
     TH1I* m_histoNHitsAtLayer6;      /**< Counted number of hits at layer 6 per event added to the TCs */
     TH1I* m_histoNHitsAtLayer7;      /**< Counted number of hits at layer 7 per event added to the TCs */
 
-    std::map<uint, TH1F*> m_histoTCvsTotalHitsForEachSensor; /**< for each sensor which occured, total number of hits added to TCs divided by total number of hits, is 0 if there were no TCs-hits, -1 (by definition) if there was no hit at all */
+    std::map<uint, TH1F*>
+    m_histoTCvsTotalHitsForEachSensor; /**< for each sensor which occured, total number of hits added to TCs divided by total number of hits, is 0 if there were no TCs-hits, -1 (by definition) if there was no hit at all */
 
     std::map<uint, uint> m_countTCHitsForEachSensor; /**< counts the hits per sensor of current event which were found by the TF */
     std::map<uint, uint> m_countTotalHitsForEachSensor; /**< counts the hits per sensor of current event */
@@ -197,14 +208,21 @@ namespace Belle2 {
     std::vector<uint> m_sensorIDs; /**< collects all sensorIDs */
     std::map<uint, TH2F*> m_hitMapHitsTotal; /**< Hit maps for each sensor, local uv coordinates - all hits which were there */
     std::map<uint, TH2F*> m_hitMapTCsOnly; /**< Hit maps for each sensor, local uv coordinates - all hits which were found by the TF */
-    std::map<uint, TH2F*> m_hitMapReferenceTCs; /**< Hit maps for each sensor, local uv coordinates - all hits which were found by a reference TF */
+    std::map<uint, TH2F*>
+    m_hitMapReferenceTCs; /**< Hit maps for each sensor, local uv coordinates - all hits which were found by a reference TF */
 
-    std::map<uint, TH1F*> m_hitMapHitsTotalSVDOnlyU; /**< Hit maps for each sensor, local uv coordinates - all hits which were there - SVDOnly */
-    std::map<uint, TH1F*> m_hitMapTCsOnlySVDOnlyU; /**< Hit maps for each sensor, local uv coordinates - all hits which were found by the TF - SVDOnly */
-    std::map<uint, TH1F*> m_hitMapReferenceTCsSVDOnlyU; /**< Hit maps for each sensor, local uv coordinates - all hits which were found by a reference TF - SVDOnly */
-    std::map<uint, TH1F*> m_hitMapHitsTotalSVDOnlyV; /**< Hit maps for each sensor, local uv coordinates - all hits which were there - SVDOnly */
-    std::map<uint, TH1F*> m_hitMapTCsOnlySVDOnlyV; /**< Hit maps for each sensor, local uv coordinates - all hits which were found by the TF - SVDOnly */
-    std::map<uint, TH1F*> m_hitMapReferenceTCsSVDOnlyV; /**< Hit maps for each sensor, local uv coordinates - all hits which were found by a reference TF - SVDOnly */
+    std::map<uint, TH1F*>
+    m_hitMapHitsTotalSVDOnlyU; /**< Hit maps for each sensor, local uv coordinates - all hits which were there - SVDOnly */
+    std::map<uint, TH1F*>
+    m_hitMapTCsOnlySVDOnlyU; /**< Hit maps for each sensor, local uv coordinates - all hits which were found by the TF - SVDOnly */
+    std::map<uint, TH1F*>
+    m_hitMapReferenceTCsSVDOnlyU; /**< Hit maps for each sensor, local uv coordinates - all hits which were found by a reference TF - SVDOnly */
+    std::map<uint, TH1F*>
+    m_hitMapHitsTotalSVDOnlyV; /**< Hit maps for each sensor, local uv coordinates - all hits which were there - SVDOnly */
+    std::map<uint, TH1F*>
+    m_hitMapTCsOnlySVDOnlyV; /**< Hit maps for each sensor, local uv coordinates - all hits which were found by the TF - SVDOnly */
+    std::map<uint, TH1F*>
+    m_hitMapReferenceTCsSVDOnlyV; /**< Hit maps for each sensor, local uv coordinates - all hits which were found by a reference TF - SVDOnly */
   };
 
 }

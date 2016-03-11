@@ -32,7 +32,8 @@ namespace Belle2 {
       void setID(VxdID id) { m_id = id; }
 
       /** Set the time window in which the sensor is active */
-      void setIntegrationWindow(double start, double end) {
+      void setIntegrationWindow(double start, double end)
+      {
         m_integrationStart = start;
         m_integrationEnd = end;
       }

@@ -78,10 +78,12 @@ namespace Belle2 {
     /** Utility functions to convert indices to plane numbers and v.v.,
      * and to protect against range errors.
      */
-    inline int indexToPlane(int index) const {
+    inline int indexToPlane(int index) const
+    {
       return c_firstPXDPlane + index;
     }
-    inline int planeToIndex(int iPlane) const {
+    inline int planeToIndex(int iPlane) const
+    {
       return iPlane - c_firstPXDPlane;
     }
 
@@ -103,35 +105,41 @@ namespace Belle2 {
     // care of deleting them, they will be reset on a new run, maybe
     // other stuff.
     TH1* getHist(const char* name, const char* title,
-                 int nBins, double x0, double x1) {
+                 int nBins, double x0, double x1)
+    {
       TH1* h = new TH1D(name, title, nBins, x0, x1);
       m_allHistos.push_back(h);
       return h;
     }
     TProfile* getHistProfile(const char* name, const char* title,
-                             int nBins, double x0, double x1) {
+                             int nBins, double x0, double x1)
+    {
       TProfile* h = new TProfile(name, title, nBins, x0, x1);
       m_allHistos.push_back(h);
       return h;
     }
     TH2* getHist(const char* name, const char* title,
                  int nBinsX, double x0, double x1,
-                 int nBinsY, double y0, double y1) {
+                 int nBinsY, double y0, double y1)
+    {
       TH2* h = new TH2D(name, title, nBinsX, x0, x1, nBinsY, y0, y1);
       m_allHistos.push_back(h);
       return h;
     }
     TH1* getHist(const std::string& name, const std::string& title,
-                 int nBins, double x0, double x1) {
+                 int nBins, double x0, double x1)
+    {
       return getHist(name.c_str(), title.c_str(), nBins, x0, x1);
     }
     TProfile* getHistProfile(const std::string& name, const std::string& title,
-                             int nBins, double x0, double x1) {
+                             int nBins, double x0, double x1)
+    {
       return getHistProfile(name.c_str(), title.c_str(), nBins, x0, x1);
     }
     TH2* getHist(const std::string& name, const std::string& title,
                  int nBinsX, double x0, double x1,
-                 int nBinsY, double y0, double y1) {
+                 int nBinsY, double y0, double y1)
+    {
       return getHist(name.c_str(), title.c_str(), nBinsX, x0, x1, nBinsY, y0, y1);
     }
 

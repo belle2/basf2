@@ -74,23 +74,36 @@ TrackFinderMCVXDTBModule::TrackFinderMCVXDTBModule() : Module()
   addParam("MinSVDHits", m_minSVDHits, "Minimum number of SVD hits needed to allow the created of a track candidate", 0);
   addParam("MinTelHits", m_minTelHits, "Minimum number of Telescope hits needed to allow the created of a track candidate", 0);
 
-  addParam("MinCDCAxialHits", m_minCDCAxialHits, "Minimum number of CDC hits form an axial wire needed to allow the created of a track candidate", 0);
-  addParam("MinCDCStereoHits", m_minCDCStereoHits, "Minimum number of CDC hits form a stereo wire needed to allow the created of a track candidate", 0);
-  addParam("MinimalNDF", m_minimalNdf, "Minimum number of total hits needed to allow the creation of a track candidate. It is called NDF (number of degrees of freedom) because it counts the dimensionality. 2D hits are counted as 2", 5);
+  addParam("MinCDCAxialHits", m_minCDCAxialHits,
+           "Minimum number of CDC hits form an axial wire needed to allow the created of a track candidate", 0);
+  addParam("MinCDCStereoHits", m_minCDCStereoHits,
+           "Minimum number of CDC hits form a stereo wire needed to allow the created of a track candidate", 0);
+  addParam("MinimalNDF", m_minimalNdf,
+           "Minimum number of total hits needed to allow the creation of a track candidate. It is called NDF (number of degrees of freedom) because it counts the dimensionality. 2D hits are counted as 2",
+           5);
 
   //choose for which particles a track candidate should be created
   //this is just an attempt to find out what is the most suitable way to select particles, if you have other/better ideas, communicate it to the tracking group...
-  addParam("WhichParticles", m_whichParticles, "List of keywords to mark what properties particles must have to get a track candidate. If several properties are given all of them must be true: \"primary\" particle must come from the generator, \"PXD\", \"SVD\", \"CDC\", \"TOP\", \"ARICH\", \"ECL\" or \"KLM\" particle must have hits in the subdetector with that name. \"is:X\" where X is a PDG code: particle must have this code. \"from:X\" any of the particles's ancestors must have this (X) code" , vector<string>(1, "primary"));
-  addParam("EnergyCut", m_energyCut, "Track candidates are only created for MCParticles with energy larger than this cut ", double(0.1));
+  addParam("WhichParticles", m_whichParticles,
+           "List of keywords to mark what properties particles must have to get a track candidate. If several properties are given all of them must be true: \"primary\" particle must come from the generator, \"PXD\", \"SVD\", \"CDC\", \"TOP\", \"ARICH\", \"ECL\" or \"KLM\" particle must have hits in the subdetector with that name. \"is:X\" where X is a PDG code: particle must have this code. \"from:X\" any of the particles's ancestors must have this (X) code"
+           , vector<string>(1, "primary"));
+  addParam("EnergyCut", m_energyCut, "Track candidates are only created for MCParticles with energy larger than this cut ",
+           double(0.1));
   addParam("Neutrals", m_neutrals, "Set true if track candidates should be created also for neutral particles", bool(false));
 
   //smearing of MCMomentum
-  addParam("Smearing", m_smearing, "Smearing of MCMomentum/MCVertex prior to storing it in genfit::TrackCandidate (in %). A negative value will switch off smearing. This is also the default.", -1.0);
-  addParam("SmearingCov", m_smearingCov, "Covariance matrix used to smear the true pos and mom before passed to track candidate. This matrix will also passed to Genfit as the initial covarance matrix. If any diagonal value is negative this feature will not be used. OFF DIAGNOLA ELEMENTS DO NOT HAVE AN EFFECT AT THE MOMENT", vector<double>(36, -1.0));
+  addParam("Smearing", m_smearing,
+           "Smearing of MCMomentum/MCVertex prior to storing it in genfit::TrackCandidate (in %). A negative value will switch off smearing. This is also the default.",
+           -1.0);
+  addParam("SmearingCov", m_smearingCov,
+           "Covariance matrix used to smear the true pos and mom before passed to track candidate. This matrix will also passed to Genfit as the initial covarance matrix. If any diagonal value is negative this feature will not be used. OFF DIAGNOLA ELEMENTS DO NOT HAVE AN EFFECT AT THE MOMENT",
+           vector<double>(36, -1.0));
   // names of output containers
-  addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the genfit::TrackCandidates (output)", string(""));
+  addParam("GFTrackCandidatesColName", m_gfTrackCandsColName, "Name of collection holding the genfit::TrackCandidates (output)",
+           string(""));
 
-  addParam("TrueHitMustExist", m_enforceTrueHit, "If set true only cluster hits that have a relation to a TrueHit will be included in the track candidate", false);
+  addParam("TrueHitMustExist", m_enforceTrueHit,
+           "If set true only cluster hits that have a relation to a TrueHit will be included in the track candidate", false);
 }
 
 
@@ -309,7 +322,8 @@ void TrackFinderMCVXDTBModule::event()
     }
     // check all "seen in" properties that the mcparticle should have in one line.
     if ((mcParticleProperties bitand m_particleProperties) != m_particleProperties) {
-      B2DEBUG(101, "PDG: " << aMcParticlePtr->getPDG() <<  " | property mask of particle " <<  mcParticleProperties << " demanded property mask " << m_particleProperties);
+      B2DEBUG(101, "PDG: " << aMcParticlePtr->getPDG() <<  " | property mask of particle " <<  mcParticleProperties <<
+              " demanded property mask " << m_particleProperties);
       continue; //goto next mcParticle, do not make track candidate
     }
     //make links only for interesting MCParticles: energy cut and check for neutrals
@@ -471,7 +485,8 @@ void TrackFinderMCVXDTBModule::event()
             cdcHitsIndices.push_back(cdcHitIndex);
             ndf += 1;
             int superLayerId = cdcHits[cdcHitIndex]->getISuperLayer();
-            if (superLayerId % 2 == 0) { //here it is hardcoded what superlayer has axial wires and what has stereo wires. Maybe it would be better if the WireId would know this
+            if (superLayerId % 2 ==
+                0) { //here it is hardcoded what superlayer has axial wires and what has stereo wires. Maybe it would be better if the WireId would know this
               ++nAxialHits;
             } else {
               ++nStereoHits;
@@ -494,7 +509,8 @@ void TrackFinderMCVXDTBModule::event()
     }
     //Now create TrackCandidate
     int counter = trackCandidates.getEntries();
-    B2DEBUG(100, "We came pass all filter of the MCPartile and hit properties. TrackCandidate " << counter << " will be created from the MCParticle with index: " << iPart << " (PDG: " << aMcParticlePtr->getPDG() << ")");
+    B2DEBUG(100, "We came pass all filter of the MCPartile and hit properties. TrackCandidate " << counter <<
+            " will be created from the MCParticle with index: " << iPart << " (PDG: " << aMcParticlePtr->getPDG() << ")");
 
     //create TrackCandidate
     trackCandidates.appendNew();
@@ -565,7 +581,8 @@ void TrackFinderMCVXDTBModule::event()
     if (m_usePXDHits && m_useClusters == false) {
       BOOST_FOREACH(int hitID, pxdHitsIndices) {
         float time = pxdTrueHits[hitID]->getGlobalTime();
-        trackCandidates[counter]->addHit(Const::PXD, hitID, -1, double(time)); // -1 means the hit will not compete with any other hit in the DAF
+        trackCandidates[counter]->addHit(Const::PXD, hitID, -1,
+                                         double(time)); // -1 means the hit will not compete with any other hit in the DAF
       }
       B2DEBUG(100, "     add " << pxdHitsIndices.size() << " PXDHits");
     }
@@ -575,15 +592,17 @@ void TrackFinderMCVXDTBModule::event()
       unsigned int hitCounter = 0;
       BOOST_FOREACH(int hitID, pxdHitsIndices) {
         RelationIndex<PXDCluster, PXDTrueHit>::range_from iterPairCluTr = relPxdClusterTrueHit.getElementsFrom(pxdClusters[hitID]);
-        if (iterPairCluTr.empty() && m_enforceTrueHit == true) { // there is not trueHit! trow away hit because there is no time information for sorting
+        if (iterPairCluTr.empty()
+            && m_enforceTrueHit == true) { // there is not trueHit! trow away hit because there is no time information for sorting
           ++m_noTrueHitCounter;
           continue;
         }
         float time = -1;
         RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcTr = relMcPxdTrueHit.getElementsFrom(aMcParticlePtr);
-        for (const auto & relElementCluTr : iterPairCluTr) { // make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
+        for (const auto& relElementCluTr :
+             iterPairCluTr) {  // make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
           if (time >= 0) break;
-          for (const auto & relElementMcTr : iterPairMcTr) {
+          for (const auto& relElementMcTr : iterPairMcTr) {
             if (relElementMcTr.to == relElementCluTr.to) {
               time = relElementCluTr.to->getGlobalTime();
               break;
@@ -594,13 +613,15 @@ void TrackFinderMCVXDTBModule::event()
         trackCandidates[counter]->addHit(Const::PXD, hitID, -1, double(time));
         ++hitCounter;
       }
-      B2DEBUG(100, "     add " << hitCounter << " PXDClusters. " << pxdHitsIndices.size() - hitCounter << " PXDClusters were not added because they do not have a corresponding PXDTrueHit");
+      B2DEBUG(100, "     add " << hitCounter << " PXDClusters. " << pxdHitsIndices.size() - hitCounter <<
+              " PXDClusters were not added because they do not have a corresponding PXDTrueHit");
     }
     // telescopes
     if (m_useTelHits && m_useClusters == false) {
       BOOST_FOREACH(int hitID, telHitsIndices) {
         float time = telTrueHits[hitID]->getGlobalTime();
-        trackCandidates[counter]->addHit(Const::TEST, hitID, -1, double(time)); // -1 means the hit will not compete with any other hit in the DAF
+        trackCandidates[counter]->addHit(Const::TEST, hitID, -1,
+                                         double(time)); // -1 means the hit will not compete with any other hit in the DAF
       }
       B2DEBUG(100, "     add " << telHitsIndices.size() << " TelHits");
     }
@@ -610,15 +631,17 @@ void TrackFinderMCVXDTBModule::event()
       unsigned int hitCounter = 0;
       BOOST_FOREACH(int hitID, telHitsIndices) {
         RelationIndex<TelCluster, TelTrueHit>::range_from iterPairCluTr = relTelClusterTrueHit.getElementsFrom(telClusters[hitID]);
-        if (iterPairCluTr.empty() && m_enforceTrueHit == true) { // there is not trueHit! trow away hit because there is no time information for sorting
+        if (iterPairCluTr.empty()
+            && m_enforceTrueHit == true) { // there is not trueHit! trow away hit because there is no time information for sorting
           ++m_noTrueHitCounter;
           continue;
         }
         float time = -1;
         RelationIndex<MCParticle, TelTrueHit>::range_from iterPairMcTr = relMcTelTrueHit.getElementsFrom(aMcParticlePtr);
-        for (const auto & relElementCluTr : iterPairCluTr) { // make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
+        for (const auto& relElementCluTr :
+             iterPairCluTr) {  // make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
           if (time >= 0) break;
-          for (const auto & relElementMcTr : iterPairMcTr) {
+          for (const auto& relElementMcTr : iterPairMcTr) {
             if (relElementMcTr.to == relElementCluTr.to) {
               time = relElementCluTr.to->getGlobalTime();
               break;
@@ -629,7 +652,8 @@ void TrackFinderMCVXDTBModule::event()
         trackCandidates[counter]->addHit(Const::TEST, hitID, -1, double(time));
         ++hitCounter;
       }
-      B2DEBUG(100, "     add " << hitCounter << " TelClusters. " << telHitsIndices.size() - hitCounter << " TelClusters were not added because they do not have a corresponding TelTrueHit");
+      B2DEBUG(100, "     add " << hitCounter << " TelClusters. " << telHitsIndices.size() - hitCounter <<
+              " TelClusters were not added because they do not have a corresponding TelTrueHit");
     }
     // end: telescopes
     if (m_useSVDHits && m_useClusters == false) {
@@ -644,15 +668,17 @@ void TrackFinderMCVXDTBModule::event()
       unsigned int hitCounter = 0;
       BOOST_FOREACH(int hitID, svdHitsIndices) {
         RelationIndex<SVDCluster, SVDTrueHit>::range_from iterPairCluTr = relSvdClusterTrueHit.getElementsFrom(svdClusters[hitID]);
-        if (iterPairCluTr.empty() && m_enforceTrueHit == true) { // there is not trueHit! throw away hit because there is no time information for sorting
+        if (iterPairCluTr.empty()
+            && m_enforceTrueHit == true) { // there is not trueHit! throw away hit because there is no time information for sorting
           ++m_noTrueHitCounter;
           continue;
         }
         float time = -1;
         RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcTr = relMcSvdTrueHit.getElementsFrom(aMcParticlePtr);
-        for (const auto & relElementCluTr : iterPairCluTr) { // make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
+        for (const auto& relElementCluTr :
+             iterPairCluTr) {  // make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
           if (time >= 0) break;
-          for (const auto & relElementMcTr : iterPairMcTr) {
+          for (const auto& relElementMcTr : iterPairMcTr) {
             if (relElementMcTr.to == relElementCluTr.to) {
               time = relElementCluTr.to->getGlobalTime();
               break;
@@ -662,7 +688,8 @@ void TrackFinderMCVXDTBModule::event()
         trackCandidates[counter]->addHit(Const::SVD, hitID, -1, double(time));
         ++hitCounter;
       }
-      B2DEBUG(100, "     add " << hitCounter << " SVDClusters. " << svdHitsIndices.size() - hitCounter << " SVDClusters were not added because they do not have a corresponding SVDTrueHit");
+      B2DEBUG(100, "     add " << hitCounter << " SVDClusters. " << svdHitsIndices.size() - hitCounter <<
+              " SVDClusters were not added because they do not have a corresponding SVDTrueHit");
     }
 
 
@@ -690,7 +717,8 @@ void TrackFinderMCVXDTBModule::event()
         TVector3 wireToSimHit = simHitPos - simHitPosOnWire;
         double scalarProduct = wireToSimHit * (wireDir.Cross(simMom));
         char lrAmbiSign = boost::math::sign(scalarProduct);
-        genfit::WireTrackCandHit* aCdcTrackCandHit = new genfit::WireTrackCandHit(Const::CDC, hitID, -1, time, lrAmbiSign); //do not delete! the genfit::TrackCand has ownership
+        genfit::WireTrackCandHit* aCdcTrackCandHit = new genfit::WireTrackCandHit(Const::CDC, hitID, -1, time,
+            lrAmbiSign); //do not delete! the genfit::TrackCand has ownership
         trackCandidates[counter]->addHit(aCdcTrackCandHit);
         B2DEBUG(101, "CDC hit " << hitID << " has reft/right sign " << int(lrAmbiSign));
       }
@@ -711,10 +739,12 @@ void TrackFinderMCVXDTBModule::event()
 void TrackFinderMCVXDTBModule::endRun()
 {
   if (m_notEnoughtHitsCounter != 0) {
-    B2WARNING(m_notEnoughtHitsCounter << " tracks had not enough hits to have at least " << m_minimalNdf << " number of degrees of freedom (NDF). No Track Candidates were created from them so they will not be passed to the track fitter");
+    B2WARNING(m_notEnoughtHitsCounter << " tracks had not enough hits to have at least " << m_minimalNdf <<
+              " number of degrees of freedom (NDF). No Track Candidates were created from them so they will not be passed to the track fitter");
   }
   if (m_noTrueHitCounter != 0) {
-    B2WARNING(m_noTrueHitCounter << " cluster hits did not have a relation to a true hit and were therefore not included in a track candidate");
+    B2WARNING(m_noTrueHitCounter <<
+              " cluster hits did not have a relation to a true hit and were therefore not included in a track candidate");
   }
   B2INFO("The MCTrackFinder created a total of " << m_nTrackCands << " track candidates")
 }

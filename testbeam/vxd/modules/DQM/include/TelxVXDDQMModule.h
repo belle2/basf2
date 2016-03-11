@@ -71,10 +71,12 @@ namespace Belle2 {
     /** Utility functions to convert indices to plane numbers and v.v.,
      * and to protect against range errors.
      */
-    inline int indexToPlane(int index) const {
+    inline int indexToPlane(int index) const
+    {
       return c_firstTBPlane + index;
     }
-    inline int planeToIndex(int iPlane) const {
+    inline int planeToIndex(int iPlane) const
+    {
       return iPlane - c_firstTBPlane;
     }
     /** This is a shortcut to getting SVD::SensorInfo from the GeoCache.

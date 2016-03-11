@@ -61,15 +61,18 @@ namespace Belle2 {
     // Data members
     std::string m_telClustersName; /**< TelCluster collection name */
 
-    StoreArray<TelCluster> m_telClusters; /**< the storeArray for telClusters as member, is faster than recreating link for each event */
+    StoreArray<TelCluster>
+    m_telClusters; /**< the storeArray for telClusters as member, is faster than recreating link for each event */
 
     std::string m_spacePointsName; /**< SpacePoints collection name */
 
-    StoreArray<TBSpacePoint> m_spacePoints; /**< the storeArray for TBspacePoints as member, is faster than recreating link for each event */
+    StoreArray<TBSpacePoint>
+    m_spacePoints; /**< the storeArray for TBspacePoints as member, is faster than recreating link for each event */
 
 
     // modification parameters
-    std::string m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
+    std::string
+    m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
 
 
     //counters for testing

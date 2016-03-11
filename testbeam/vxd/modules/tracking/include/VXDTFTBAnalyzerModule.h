@@ -29,7 +29,8 @@ namespace Belle2 {
   public:
     typedef unsigned short uShort; /**< shortcut for unsigned short */
     typedef std::pair<VxdID::baseType, uShort> SensorAndCluster; /**< .first is sensorID, .second is number of clusters */
-    typedef std::pair<VxdID::baseType, std::vector<uShort> > SensorAndClusterCollection; /**< .first is sensorID, .second is number of clusterCombinations */
+    typedef std::pair<VxdID::baseType, std::vector<uShort> >
+    SensorAndClusterCollection; /**< .first is sensorID, .second is number of clusterCombinations */
 
     /**
      * Constructor of the module.
@@ -63,7 +64,8 @@ namespace Belle2 {
 
   protected:
     /** resetting counters*/
-    void resetCounters() {
+    void resetCounters()
+    {
       m_countReferenceTrackLengthTotal = 0;
       m_countReferenceTrackLengthSvd = 0;
       m_countReferenceTrackLengthPxd = 0;
@@ -81,8 +83,10 @@ namespace Belle2 {
     int m_stepSize; /**< Informes the user that  event: (eventCounter-modulo(stepSize)) is currently executed */
     int m_pxdClusterCounter; /**< counts total number of pxd clusters occured */
     int m_svdClusterCounter; /**< counts total number of pxd clusters occured */
-    std::string m_PARAMnameContainerTCevaluate; /**< set here the first name of the containers to be compared (this one is the test-container) */
-    std::string m_PARAMnameContainerTCreference; /**< set here the second name of the containers to be compared (this one is used as reference for evaluating the first one) */
+    std::string
+    m_PARAMnameContainerTCevaluate; /**< set here the first name of the containers to be compared (this one is the test-container) */
+    std::string
+    m_PARAMnameContainerTCreference; /**< set here the second name of the containers to be compared (this one is used as reference for evaluating the first one) */
     int m_countBothTrue; /**< counts events where both (reference and evaluate) sources produced TCs */
     int m_countEvalTrueRefFalse; /**< counts events where the evaluate source produced TCs but the reference didn't */
     int m_countEvalFalseRefTrue; /**< counts events where the reference source produced TCs but the evaluate didn't */
@@ -109,7 +113,8 @@ namespace Belle2 {
     int m_countEvaluateTrackLengthTel; /**< counts the total number of cluster-indices of the TEL of each evaluate TC */
 
 
-    std::vector<SensorAndClusterCollection> m_overallCombinationsPerSensor; /**< collecting for each SVDsensor and event the number of clusterCombinations */
+    std::vector<SensorAndClusterCollection>
+    m_overallCombinationsPerSensor; /**< collecting for each SVDsensor and event the number of clusterCombinations */
     std::vector<uShort> m_overallCombinationsCount; /**< collecting for each event the number of clusterCombinations */
   private:
   };

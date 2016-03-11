@@ -44,7 +44,8 @@ TelxVXDModule::TelxVXDModule() : HistoModule()
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("Clusters", m_storeTelClustersName, "Name of the telescopes cluster collection",
            std::string("")); // always be explicit about this in case you use PXDClusters
-  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed", std::string("tel-vxd"));
+  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+           std::string("tel-vxd"));
 
   //----------------------------------------------------------------
   // define setting options for correlations
@@ -242,8 +243,10 @@ void TelxVXDModule::defineHisto()
     float PixelsVStart;
     float PixelsVEnd;
 
-    string name = str(format("hCorrelationsTel%1%SVD%2%%3%%4%") % (m_DUTTelFwd + 1) % (m_DUTSVDFwd - 3 + 1) % uAxis.data() % vAxis.data());
-    string title = str(format("Corelation Tel%1% SVD%2%, axis %3% %4%") % (m_DUTTelFwd + 1) % (m_DUTSVDFwd - 3 + 1) % uAxis.data() % vAxis.data());
+    string name = str(format("hCorrelationsTel%1%SVD%2%%3%%4%") % (m_DUTTelFwd + 1) % (m_DUTSVDFwd - 3 + 1) % uAxis.data() %
+                      vAxis.data());
+    string title = str(format("Corelation Tel%1% SVD%2%, axis %3% %4%") % (m_DUTTelFwd + 1) % (m_DUTSVDFwd - 3 + 1) % uAxis.data() %
+                       vAxis.data());
     string AxisU = str(format("%1% position Tel%2% [%3%]") % uAxis.data() % (m_DUTTelFwd + 1) % Unit.data());
     string AxisV = str(format("%1% position SVD%2% [%3%]") % vAxis.data() % (m_DUTSVDFwd - 3 + 1) % Unit.data());
     if (i) {
@@ -294,13 +297,15 @@ void TelxVXDModule::defineHisto()
       PixelsVEnd = PixelsVEnd - PixelsVStart;
     }
 
-    m_correlationsTel3SVD1[i] = new TH2F(name.c_str(), title.c_str(), nPixelsUExtend, PixelsUStart, PixelsUEnd, nPixelsVExtend, PixelsVStart, PixelsVEnd);
+    m_correlationsTel3SVD1[i] = new TH2F(name.c_str(), title.c_str(), nPixelsUExtend, PixelsUStart, PixelsUEnd, nPixelsVExtend,
+                                         PixelsVStart, PixelsVEnd);
     m_correlationsTel3SVD1[i]->GetXaxis()->SetTitle(AxisU.data());
     m_correlationsTel3SVD1[i]->GetYaxis()->SetTitle(AxisV.data());
     m_correlationsTel3SVD1[i]->GetZaxis()->SetTitle("hits");
 
     name = str(format("hCorrelationsTel%1%SVD%2%%3%%4%") % (m_DUTTelBwd - 6 + 1) % (m_DUTSVDBwd - 3 + 1) % uAxis.data() % vAxis.data());
-    title = str(format("Corelation Tel%1% SVD%2%, axis %3% %4%") % (m_DUTTelBwd - 6 + 1) % (m_DUTSVDBwd - 3 + 1) % uAxis.data() % vAxis.data());
+    title = str(format("Corelation Tel%1% SVD%2%, axis %3% %4%") % (m_DUTTelBwd - 6 + 1) % (m_DUTSVDBwd - 3 + 1) % uAxis.data() %
+                vAxis.data());
     AxisU = str(format("%1% position Tel%2% [%3%]") % uAxis.data() % (m_DUTTelBwd - 6 + 1) % Unit.data());
     AxisV = str(format("%1% position SVD%2% [%3%]") % vAxis.data() % (m_DUTSVDBwd - 3 + 1) % Unit.data());
     if (i) {
@@ -351,13 +356,15 @@ void TelxVXDModule::defineHisto()
       PixelsVEnd = PixelsVEnd - PixelsVStart;
     }
 
-    m_correlationsTel4SVD4[i] = new TH2F(name.c_str(), title.c_str(), nPixelsUExtend, PixelsUStart, PixelsUEnd, nPixelsVExtend, PixelsVStart, PixelsVEnd);
+    m_correlationsTel4SVD4[i] = new TH2F(name.c_str(), title.c_str(), nPixelsUExtend, PixelsUStart, PixelsUEnd, nPixelsVExtend,
+                                         PixelsVStart, PixelsVEnd);
     m_correlationsTel4SVD4[i]->GetXaxis()->SetTitle(AxisU.data());
     m_correlationsTel4SVD4[i]->GetYaxis()->SetTitle(AxisV.data());
     m_correlationsTel4SVD4[i]->GetZaxis()->SetTitle("hits");
 
     name = str(format("hCorrelationsTel%1%PXD%2%%3%%4%") % (m_DUTTelFwd + 1) % (m_DUTPXD - 3 + 1) % uAxis.data() % vAxis.data());
-    title = str(format("Corelation Tel%1% PXD%2%, axis %3% %4%") % (m_DUTTelFwd + 1) % (m_DUTPXD - 3 + 1) % uAxis.data() % vAxis.data());
+    title = str(format("Corelation Tel%1% PXD%2%, axis %3% %4%") % (m_DUTTelFwd + 1) % (m_DUTPXD - 3 + 1) % uAxis.data() %
+                vAxis.data());
     AxisU = str(format("%1% position Tel%2% [%3%]") % uAxis.data() % (m_DUTTelFwd + 1) % Unit.data());
     AxisV = str(format("%1% position PXD%2% [%3%]") % vAxis.data() % (m_DUTPXD - 3 + 1) % Unit.data());
     if (i) {
@@ -408,13 +415,15 @@ void TelxVXDModule::defineHisto()
       PixelsVEnd = PixelsVEnd - PixelsVStart;
     }
 
-    m_correlationsTel3PXD2[i] = new TH2F(name.c_str(), title.c_str(), nPixelsUExtend, PixelsUStart, PixelsUEnd, nPixelsVExtend, PixelsVStart, PixelsVEnd);
+    m_correlationsTel3PXD2[i] = new TH2F(name.c_str(), title.c_str(), nPixelsUExtend, PixelsUStart, PixelsUEnd, nPixelsVExtend,
+                                         PixelsVStart, PixelsVEnd);
     m_correlationsTel3PXD2[i]->GetXaxis()->SetTitle(AxisU.data());
     m_correlationsTel3PXD2[i]->GetYaxis()->SetTitle(AxisV.data());
     m_correlationsTel3PXD2[i]->GetZaxis()->SetTitle("hits");
 
     name = str(format("hCorrelationsSVD%1%PXD%2%%3%%4%") % (m_DUTSVDFwd - 3 + 1) % (m_DUTPXD - 3 + 1) % uAxis.data() % vAxis.data());
-    title = str(format("Corelation SVD%1% PXD%2%, axis %3% %4%") % (m_DUTSVDFwd - 3 + 1) % (m_DUTPXD - 3 + 1) % uAxis.data() % vAxis.data());
+    title = str(format("Corelation SVD%1% PXD%2%, axis %3% %4%") % (m_DUTSVDFwd - 3 + 1) % (m_DUTPXD - 3 + 1) % uAxis.data() %
+                vAxis.data());
     AxisU = str(format("%1% position SVD%2% [%3%]") % uAxis.data() % (m_DUTSVDFwd - 3 + 1) % Unit.data());
     AxisV = str(format("%1% position PXD%2% [%3%]") % vAxis.data() % (m_DUTPXD - 3 + 1) % Unit.data());
     if (i) {
@@ -465,7 +474,8 @@ void TelxVXDModule::defineHisto()
       PixelsVEnd = PixelsVEnd - PixelsVStart;
     }
 
-    m_correlationsSVD1PXD2[i] = new TH2F(name.c_str(), title.c_str(), nPixelsUExtend, PixelsUStart, PixelsUEnd, nPixelsVExtend, PixelsVStart, PixelsVEnd);
+    m_correlationsSVD1PXD2[i] = new TH2F(name.c_str(), title.c_str(), nPixelsUExtend, PixelsUStart, PixelsUEnd, nPixelsVExtend,
+                                         PixelsVStart, PixelsVEnd);
     m_correlationsSVD1PXD2[i]->GetXaxis()->SetTitle(AxisU.data());
     m_correlationsSVD1PXD2[i]->GetYaxis()->SetTitle(AxisV.data());
     m_correlationsSVD1PXD2[i]->GetZaxis()->SetTitle("hits");
@@ -550,7 +560,7 @@ void TelxVXDModule::event()
   const RelationArray relTelClusterDigits(storeTelClusters, storeTelDigits, m_relTelClusterDigitName);
 
   // m_chargeUSVD1, m_chargeVSVD1
-  for (const SVDCluster & cluster : storeSVDClusters) {
+  for (const SVDCluster& cluster : storeSVDClusters) {
     int iPlane = cluster.getSensorID().getLayerNumber();
     if ((iPlane + 3 < c_firstSVDPlane) || (iPlane + 3 > c_lastSVDPlane)) continue;
     int index = planeToIndex(iPlane + 3);
@@ -563,7 +573,7 @@ void TelxVXDModule::event()
   }
 
 //  m_chargePXD2, m_hitMapPXD2
-  for (const PXDCluster & cluster : storePXDClusters) {
+  for (const PXDCluster& cluster : storePXDClusters) {
     int iPlane = cluster.getSensorID().getLayerNumber();
     if ((iPlane + 3 < c_firstPXDPlane) || (iPlane + 3 > c_lastPXDPlane)) continue;
     int index = planeToIndex(iPlane + 3);

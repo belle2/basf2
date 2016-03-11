@@ -62,7 +62,7 @@ gearbox.param('fileName', 'testbeam/vxd/FullVXDTB2016.xml')
 
 # Create geometry
 geometry = register_module('Geometry')
-geometry.param('additionalComponents', ['Target_Pb_10mm'])
+# geometry.param('additionalComponents', ['Target_Pb_10mm'])
 if not fieldOn:
     # To turn off magnetic field:
     geometry.param('excludedComponents', ['MagneticField'])
@@ -79,17 +79,104 @@ simulation.param('StoreAllSecondaries', True)
 
 
 # Use truth information to create track candidates
-mctrackfinder = register_module('TrackFinderMCTruth')
+mctrackfinder = register_module('TrackFinderMCVXDTB')
 mctrackfinder.logging.log_level = LogLevel.WARNING
 param_mctrackfinder = {
     'UseCDCHits': 0,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
+    'UseTelHits': 1,
     'Smearing': 0,
     'UseClusters': True,
     'WhichParticles': ['SVD'],
 }
 mctrackfinder.param(param_mctrackfinder)
+
+filterOverlaps = 'hopfield'
+
+if fieldOn:
+    # SVD and PXD sec map
+    # secSetup = ['TB2016Test8Feb2016MagnetOnPXDSVD-moreThan1500MeV_PXDSVD']
+    # only SVD:
+    secSetup = ['TB2016Test8Feb2016MagnetOnSVD-moreThan1500MeV_SVD']
+    qiType = 'circleFit'  # circleFit
+else:
+    # To turn off magnetic field:
+    # SVD and PXD sec map:
+    # secSetup = ['TB2016Test8Feb2016MagnetOffPXDSVD-moreThan1500MeV_PXDSVD']
+    # only SVD
+    secSetup = ['TB2016Test8Feb2016MagnetOffSVD-moreThan1500MeV_SVD']
+    qiType = 'straightLine'  # straightLine
+
+vxdtf = register_module('VXDTF')
+vxdtf.logging.log_level = LogLevel.DEBUG
+vxdtf.logging.debug_level = 2
+# calcQIType:
+# Supports 'kalman', 'circleFit' or 'trackLength.
+# 'circleFit' has best performance at the moment
+
+# filterOverlappingTCs:
+# Supports 'hopfield', 'greedy' or 'none'.
+# 'hopfield' has best performance at the moment
+param_vxdtf = {  # normally we don't know the particleID, but in the case of the testbeam,
+                 # we can expect (anti-?)electrons...
+                 # True
+                 # 'artificialMomentum': 5., ## uncomment if there is no magnetic field!
+                 # 7
+                 # 'activateDistance3D': [False],
+                 # 'activateDistanceZ': [True],
+                 # 'activateAngles3D': [False],
+                 # 'activateAnglesXY': [True],  #### noMagnet
+                 # ### withMagnet
+                 # 'activateAnglesRZHioC': [True], #### noMagnet
+                 # ### withMagnet r51x
+                 # True
+    'activateBaselineTF': 1,
+    'debugMode': 0,
+    'tccMinState': [2],
+    'tccMinLayer': [3],
+    'reserveHitsThreshold': [0.],
+    'highestAllowedLayer': [6],
+    'standardPdgCode': -11,
+    'artificialMomentum': 3,
+    'sectorSetup': secSetup,
+    'calcQIType': qiType,
+    'killEventForHighOccupancyThreshold': 500,
+    'highOccupancyThreshold': 111,
+    'cleanOverlappingSet': False,
+    'filterOverlappingTCs': filterOverlaps,
+    'TESTERexpandedTestingRoutines': True,
+    'qiSmear': False,
+    'smearSigma': 0.000001,
+    'GFTrackCandidatesColName': 'TrackCands',
+    'tuneCutoffs': 0.51,
+    'activateDistanceXY': [False],
+    'activateDistance3D': [True],
+    'activateDistanceZ': [False],
+    'activateSlopeRZ': [False],
+    'activateNormedDistance3D': [False],
+    'activateAngles3D': [True],
+    'activateAnglesXY': [False],
+    'activateAnglesRZ': [False],
+    'activateDeltaSlopeRZ': [False],
+    'activateDistance2IP': [False],
+    'activatePT': [False],
+    'activateHelixParameterFit': [False],
+    'activateAngles3DHioC': [True],
+    'activateAnglesXYHioC': [True],
+    'activateAnglesRZHioC': [False],
+    'activateDeltaSlopeRZHioC': [False],
+    'activateDistance2IPHioC': [False],
+    'activatePTHioC': [False],
+    'activateHelixParameterFitHioC': [False],
+    'activateDeltaPtHioC': [False],
+    'activateDeltaDistance2IPHioC': [False],
+    'activateZigZagXY': [False],
+    'activateZigZagRZ': [False],
+    'activateDeltaPt': [False],
+    'activateCircleFit': [False],
+}
+vxdtf.param(param_vxdtf)
 
 # mctrackfinder.logging.log_level = LogLevel.DEBUG
 
@@ -106,8 +193,12 @@ main.add_module('PXDDigitizer')
 main.add_module('SVDDigitizer')
 main.add_module('PXDClusterizer')
 main.add_module('SVDClusterizer')
-main.add_module(mctrackfinder)
+main.add_module('TelDigitizer')
+main.add_module('TelClusterizer')
 main.add_module('SetupGenfitExtrapolation')
+main.add_module(vxdtf)
+# main.add_module(mctrackfinder)
+main.add_module('GenFitterVXDTB')
 main.add_module('ExportGeometry', Filename='TBGeometry.root')
 main.add_module('RootOutput', outputFileName='TBSimulation.root')
 main.add_module('OverlapChecker')

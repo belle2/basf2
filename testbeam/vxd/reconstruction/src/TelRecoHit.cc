@@ -129,7 +129,8 @@ void TelRecoHit::setDetectorPlane()
 
 std::vector<genfit::MeasurementOnPlane*> TelRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
-  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())));
+  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(),
+                                                  state.getRep(), this->constructHMatrix(state.getRep())));
 }
 
 TMatrixD TelRecoHit::derivatives(const genfit::StateOnPlane* sop)

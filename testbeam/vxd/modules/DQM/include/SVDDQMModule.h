@@ -59,22 +59,28 @@ namespace Belle2 {
     /** Utility functions to convert indices to plane numbers and v.v.,
      * and to protect against range errors.
      */
-    inline int indexToPlane(int index) const {
+    inline int indexToPlane(int index) const
+    {
       return c_firstSVDPlane + index;
     }
-    inline int planeToIndex(int iPlane) const {
+    inline int planeToIndex(int iPlane) const
+    {
       return iPlane - c_firstSVDPlane;
     }
-    inline int indexToPlanePXD(int indexPXD) const {
+    inline int indexToPlanePXD(int indexPXD) const
+    {
       return c_firstPXDPlane + indexPXD;
     }
-    inline int planeToIndexPXD(int iPlanePXD) const {
+    inline int planeToIndexPXD(int iPlanePXD) const
+    {
       return iPlanePXD - c_firstPXDPlane;
     }
-    inline int indexToPlaneVXD(int indexVXD) const {
+    inline int indexToPlaneVXD(int indexVXD) const
+    {
       return c_firstVXDPlane + indexVXD;
     }
-    inline int planeToIndexVXD(int iPlaneVXD) const {
+    inline int planeToIndexVXD(int iPlaneVXD) const
+    {
       return iPlaneVXD - c_firstVXDPlane;
     }
     /** This is a shortcut to getting SVD::SensorInfo from the GeoCache.
@@ -109,8 +115,8 @@ namespace Belle2 {
     TH1F* m_sizeV[c_nSVDPlanes];          /**< v size by plane */
     TH1F* m_timeU[c_nSVDPlanes];          /**< u time by plane */
     TH1F* m_timeV[c_nSVDPlanes];          /**< v time by plane */
-    TH2F* m_correlationsHitMaps[c_nVXDPlanes* c_nVXDPlanes];   /**< Correlations and hit maps from local uv coordinates*/
-    TH2F* m_correlationsHitMapsSP[c_nVXDPlanes* c_nVXDPlanes]; /**< Correlations and hit maps from space points */
+    TH2F* m_correlationsHitMaps[c_nVXDPlanes * c_nVXDPlanes];  /**< Correlations and hit maps from local uv coordinates*/
+    TH2F* m_correlationsHitMapsSP[c_nVXDPlanes * c_nVXDPlanes]; /**< Correlations and hit maps from space points */
   };
 
   inline const SVD::SensorInfo& SVDDQMModule::getInfo(int index) const

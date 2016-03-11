@@ -82,7 +82,8 @@ namespace Belle2 {
     int m_failedGFTrackCandFitCounter;               /**< Number of genfit::TrackCands with failed fits. */
     int m_successfulGFTrackCandFitCounter;           /**< Number of genfit::TracksCands with successfully fitted tracks. */
 
-    std::string m_filterId;                          /**< Select the filter: 'Kalman' for Kalman, 'DAF for DAF, 'simpleKalman' for the simple Kalman. */
+    std::string
+    m_filterId;                          /**< Select the filter: 'Kalman' for Kalman, 'DAF for DAF, 'simpleKalman' for the simple Kalman. */
     int m_nMinIter;                                  /**< Minimum number of iterations for the Kalman filter. */
     int m_nMaxIter;                                  /**< Maximum number of iterations for the Kalman filter. */
     int m_nMaxFailed;                                /**< Maximum number of failed hits before aborting the fit. */
@@ -90,11 +91,13 @@ namespace Belle2 {
 
     bool m_storeFailed;                              /**< Boolean to mark if failed track fits should also be stored as Tracks. */
     bool m_useClusters;                              /**< Boolean to mark if PXD/SVD cluster hits should be used instead of true hits in the.*/
-    std::vector<int> m_pdgCodes;                     /**< holds the PDG codes the user sets. If empty the PDG code from genfit::TrackCand will be written into it*/
+    std::vector<int>
+    m_pdgCodes;                     /**< holds the PDG codes the user sets. If empty the PDG code from genfit::TrackCand will be written into it*/
     bool m_usePdgCodeFromTrackCand;                  /**< flag to indicate if PDG code will be taken from genfit::TrackCand or from user input in m_pdgCodes*/
     std::ofstream HelixParam;                        /**< Text output file name */
     bool m_createTextFile;                           /**< Boolean to select if an output file with helix parameters should be created. */
-    std::vector<double> m_dafTemperatures;           /**< holds the annealing scheme for the DAF. The number of vector elements is the number of DAF iterations */
+    std::vector<double>
+    m_dafTemperatures;           /**< holds the annealing scheme for the DAF. The number of vector elements is the number of DAF iterations */
     bool m_energyLossBetheBloch;                     /**< Determines if calculation of energy loss is on/off in Genfit */
     bool m_noiseBetheBloch;                          /**< Determines if calculation of energy loss variance is on/off in Genfit */
     bool m_noiseCoulomb;                             /**< Determines if calculation of multiple scattering covariance matrix on/off in Genfit */
@@ -102,8 +105,10 @@ namespace Belle2 {
     bool m_noiseBrems;                               /**< Determines if calculation of bremsstrahlung energy loss variance is on/off in Genfit */
     bool m_noEffects;                                /**< switch on/off ALL material effects in Genfit. "true" overwrites "true" flags for the individual effects.*/
     std::string m_mscModel;                          /**< Multiple scattering model */
-    std::string m_resolveWireHitAmbi;                /**< Determines how the ambiguity of wire measurements should be dealt with.  If this is set to 'default', we use 'weightedAverage' for the DAF, the Kalman fit uses 'unweightedClosestToReference', and the simple Kalman (which doesn't have a reference) uses 'unweightedClosestToPrediction'. */
-    std::vector<double> m_beamSpot;                  /**< The coordinates of the point whose POCA will define the parameters of the TrackFitResults.  */
+    std::string
+    m_resolveWireHitAmbi;                /**< Determines how the ambiguity of wire measurements should be dealt with.  If this is set to 'default', we use 'weightedAverage' for the DAF, the Kalman fit uses 'unweightedClosestToReference', and the simple Kalman (which doesn't have a reference) uses 'unweightedClosestToPrediction'. */
+    std::vector<double>
+    m_beamSpot;                  /**< The coordinates of the point whose POCA will define the parameters of the TrackFitResults.  */
   };
 }
 

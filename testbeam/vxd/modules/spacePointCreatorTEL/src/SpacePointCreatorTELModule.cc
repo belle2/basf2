@@ -74,7 +74,8 @@ void SpacePointCreatorTELModule::event()
   storeSingleCluster(m_telClusters, m_spacePoints);
 
 
-  B2DEBUG(1, "SpacePointCreatorTELModule(" << m_nameOfInstance << ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<
+  B2DEBUG(1, "SpacePointCreatorTELModule(" << m_nameOfInstance <<
+          ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<
           "\ntelClusters: " << m_telClusters.getEntries() <<
           "\nspacePoints: " << m_spacePoints.getEntries())
 

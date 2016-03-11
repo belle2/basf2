@@ -282,8 +282,10 @@ void BeamDQMModule::endRun()
 
   for (int x = 1; x <= m_nBinX; x++) {
     for (int y = 1; y <= m_nBinY; y++) {
-      m_rmsY->Fill(((double(x) - 0.5)*binSizeX + m_minX), ((double(y) - 0.5)*binSizeY + m_minY), m_prof[1]->GetBinError(x, y) / fabs(m_prof[0]->GetBinContent(x, y)));
-      m_rmsZ->Fill(((double(x) - 0.5)*binSizeX + m_minX), ((double(y) - 0.5)*binSizeY + m_minY), m_prof[2]->GetBinError(x, y) / fabs(m_prof[0]->GetBinContent(x, y)));
+      m_rmsY->Fill(((double(x) - 0.5)*binSizeX + m_minX), ((double(y) - 0.5)*binSizeY + m_minY), m_prof[1]->GetBinError(x,
+                   y) / fabs(m_prof[0]->GetBinContent(x, y)));
+      m_rmsZ->Fill(((double(x) - 0.5)*binSizeX + m_minX), ((double(y) - 0.5)*binSizeY + m_minY), m_prof[2]->GetBinError(x,
+                   y) / fabs(m_prof[0]->GetBinContent(x, y)));
 
     }
   }
@@ -303,7 +305,7 @@ void BeamDQMModule::defineHisto()
   m_prof[0] = new TProfile2D("scanX", "Average momentum x [GeV]", m_nBinX, m_minX, m_maxX, m_nBinY, m_minY, m_maxY);
   m_prof[1] = new TProfile2D("scanY", "Average momentum y [GeV]", m_nBinX, m_minX, m_maxX, m_nBinY, m_minY, m_maxY);
   m_prof[2] = new TProfile2D("scanZ", "Average momentum z [GeV]", m_nBinX, m_minX, m_maxX, m_nBinY, m_minY, m_maxY);
-  for (auto & h : m_prof) {
+  for (auto& h : m_prof) {
     h->Sumw2();
     h->Approximate();
     h->SetErrorOption("s");

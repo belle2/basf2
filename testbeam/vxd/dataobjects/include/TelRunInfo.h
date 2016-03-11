@@ -24,7 +24,8 @@ namespace Belle2 {
      *
      *  @param run The number of the current run.
      */
-    void setRunNumber(ULong64_t run) {
+    void setRunNumber(ULong64_t run)
+    {
       m_run = run;
     }
 
@@ -32,7 +33,8 @@ namespace Belle2 {
      *
      *  @param numEvents The number of events of the current run.
      */
-    void setNumEvents(ULong64_t numEvents) {
+    void setNumEvents(ULong64_t numEvents)
+    {
       m_numEvents = numEvents;
     }
 
@@ -40,7 +42,8 @@ namespace Belle2 {
      *
      *  @param fileName The current file name.
      */
-    void setFileName(const std::string& fileName) {
+    void setFileName(const std::string& fileName)
+    {
       m_fileName = fileName;
     }
 
@@ -48,7 +51,8 @@ namespace Belle2 {
      *
      *  @param detectorName The current detector's name.
      */
-    void setDetectorName(const std::string& detectorName) {
+    void setDetectorName(const std::string& detectorName)
+    {
       m_detectorName = detectorName;
     }
 
@@ -56,7 +60,8 @@ namespace Belle2 {
      *
      *  @return The number of the current run.
      */
-    ULong64_t getRunNumber() const {
+    ULong64_t getRunNumber() const
+    {
       return m_run;
     }
 
@@ -65,7 +70,8 @@ namespace Belle2 {
      *
      *  @return The number of events of the current run.
      */
-    ULong64_t getNumEvents() const {
+    ULong64_t getNumEvents() const
+    {
       return m_numEvents;
     }
 
@@ -73,7 +79,8 @@ namespace Belle2 {
      *
      *  @return The current file name:
      */
-    std::string getFileName() const {
+    std::string getFileName() const
+    {
       return m_fileName;
     }
 
@@ -81,7 +88,8 @@ namespace Belle2 {
     *
     *  @return The current detector name:
     */
-    std::string getDetectorName() const {
+    std::string getDetectorName() const
+    {
       return m_detectorName;
     }
 

@@ -275,8 +275,8 @@ void RunControlCallback::monitor() throw(RCHandlerException)
             log(LogFile::INFO, "%s got up (state=%s).",
                 node.getName().c_str(), cstate_new.getLabel());
           }
-          setState(node, cstate_new);
           cstate = cstate_new;
+          setState(node, cstate);
         }
       } catch (const TimeoutException& e) {
         LogFile::debug("%s timeout", node.getName().c_str());

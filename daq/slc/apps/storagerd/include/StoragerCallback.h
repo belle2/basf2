@@ -53,6 +53,7 @@ namespace Belle2 {
     int m_nsenders;
     Time m_time;
     int m_errcount;
+    int m_expno, m_runno;
 
   };
 

@@ -1,7 +1,7 @@
 #include "daq/slc/apps/storagerd/StoragerCallback.h"
 #include "daq/slc/apps/storagerd/storage_status.h"
 
-#include "daq/slc/database/DBObjectLoader.h"
+#include "daq/slc/database/PostgreSQLInterface.h"
 
 #include "daq/slc/system/LogFile.h"
 #include "daq/slc/system/Time.h"
@@ -25,6 +25,8 @@ StoragerCallback::StoragerCallback()
   */
   m_eb_stat = NULL;
   m_errcount = 0;
+  m_expno = -1;
+  m_runno = -1;
 }
 
 StoragerCallback::~StoragerCallback() throw()
@@ -243,28 +245,52 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
   m_rbuf.open(rbuf.getText("name"), rbuf.getInt("size") * 1000000);
 }
 
-void StoragerCallback::start(int /*expno*/, int /*runno*/) throw(RCHandlerException)
+void StoragerCallback::start(int expno, int runno) throw(RCHandlerException)
 {
-  /*
-  storage_status* status = (storage_status*)m_data.get();
-  status->stime = Time().getSecond();
+  m_expno = expno;
+  m_runno = runno;
+  try {
+    storage_status* status = (storage_status*)m_data.get();
+    if (status != NULL)
+      status->stime = Time().getSecond();
+  } catch (const std::exception& e) {
+    LogFile::error(e.what());
+  }
   for (size_t i = 0; i < m_con.size(); i++) {
     std::string name = m_con[i].getName();
-    if (!m_con[i].start(expno, runno)) {
-      if (i != 2) {
-        throw (RCHandlerException(name[i] + " is not started"));
-      } else {
-        std::string emsg = "storageout: Not accepted connection from EXPRECO yet";
-        LogFile::warning(emsg);
-      }
+    try {
+      m_con[i].start(expno, runno);
+    } catch (const std::exception& e) {
+
     }
-    LogFile::debug(name[i] + " started");
   }
-  */
 }
 
 void StoragerCallback::stop() throw(RCHandlerException)
 {
+  for (size_t i = 0; i < m_con.size(); i++) {
+    m_con[i].stop();
+  }
+  if (m_expno >= 0 && m_runno >= 0) {
+    ConfigFile config("slowcontrol");
+    PostgreSQLInterface db(config.get("database.host"),
+                           config.get("database.dbname"),
+                           config.get("database.user"),
+                           config.get("database.password"),
+                           config.getInt("database.port"));
+    std::stringstream ss;
+    ss << "update fileinfo set time_runend = current_timestamp "
+       << "where expno = " << m_expno << " and runno = " << m_runno << " and time_runend is null;";
+    try {
+      db.connect();
+      db.execute(ss.str().c_str());
+    } catch (const DBHandlerException& e) {
+      LogFile::error("Failed to update : %s", e.what());
+    }
+    db.close();
+  }
+  m_expno = -1;
+  m_runno = -1;
 }
 
 void StoragerCallback::recover(const DBObject& obj) throw(RCHandlerException)
@@ -294,6 +320,29 @@ void StoragerCallback::abort() throw(RCHandlerException)
   }
   m_eb2rx.abort();
   set("eb2rx.pid", 0);
+  if (m_expno >= 0 && m_runno >= 0) {
+    ConfigFile config("slowcontrol");
+    PostgreSQLInterface db(config.get("database.host"),
+                           config.get("database.dbname"),
+                           config.get("database.user"),
+                           config.get("database.password"),
+                           config.getInt("database.port"));
+    std::stringstream ss;
+    ss << "update fileinfo set time_close = current_timestamp "
+       << "where expno = " << m_expno << " and runno = " << m_runno << " and time_close is null;";
+    try {
+      db.connect();
+      db.execute(ss.str().c_str());
+    } catch (const DBHandlerException& e) {
+      LogFile::error("Failed to update : %s", e.what());
+    }
+    db.close();
+  }
+  stop();
+  //std::string cmd = StringUtil::form("submit_filejob -e %d -r %d", m_expno, m_runno);
+  std::string cmd = StringUtil::form("submit_filejob -all");
+  system(cmd.c_str());
+  LogFile::debug(cmd);
 }
 
 void StoragerCallback::monitor() throw(RCHandlerException)

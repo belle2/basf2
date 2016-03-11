@@ -56,7 +56,7 @@ bool ProcessController::load(int timeout)
   close(iopipe[1]);
   if (timeout > 0) {
     if (!m_info.waitReady(timeout)) {
-      throw (RCHandlerException("Failed to boot " + m_name));
+      throw (RCHandlerException("Failed to boot " + m_parname));
       return false;
     }
   }
@@ -72,7 +72,7 @@ bool ProcessController::start(int expno, int runno)
   m_info.setSubNumber(0);
   if (m_info.getState() != RunInfoBuffer::RUNNING) {
     m_info.unlock();
-    throw (RCHandlerException(m_name + " is not running"));
+    throw (RCHandlerException(m_parname + " is not running"));
   }
   m_info.unlock();
   return true;

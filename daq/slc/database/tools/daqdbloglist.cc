@@ -23,8 +23,12 @@ int main(int argc, char** argv)
   std::string nodename;
   int expno = -1;
   int runno = -1;
+  bool runstart = false;
+  bool runend = false;
   for (int i = 2; i < argc; i++) {
-    if (strcmp(argv[i], "-e") == 0) {
+    if (strcmp(argv[i], "--end") == 0) {
+      runend = true;
+    } else if (strcmp(argv[i], "-e") == 0) {
       i++;
       if (i < argc) expno = atoi(argv[i]);
     }
@@ -36,11 +40,26 @@ int main(int argc, char** argv)
       i++;
       if (i < argc) nodename = argv[i];
     }
+    if (strcmp(argv[i], "--start") == 0) {
+      runstart = true;
+    }
   }
   std::stringstream prefix;
   if (expno >= 0) prefix << StringUtil::form("%04d:", expno);
-  if (runno >= 0) prefix << StringUtil::form("%06d=", runno);
-  if (nodename.size() > 0) prefix << nodename;
+  if (runno >= 0) prefix << StringUtil::form("%06d", runno);
+  if ((!runstart && !runend) || (runstart && runend)) {
+    prefix << ":_%";
+  } else if (runstart) {
+    prefix << ":s";
+  } else if (runend) {
+    prefix << ":e";
+  }
+  if (nodename.size() > 0) {
+    if (prefix.str().size() > 0) {
+      prefix << "=";
+    }
+    prefix << nodename;
+  }
 
   ConfigFile config("slowcontrol");
   PostgreSQLInterface db(config.get("database.host"),

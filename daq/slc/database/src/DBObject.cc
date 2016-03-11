@@ -321,14 +321,18 @@ void DBObject::printHTML(bool isfull) const throw()
   } else {
     printf("<tr><td>config</td><td>%s</td>\n", getName().c_str());
   }
-  std::string rcconfig, dbtable;
+  std::string rcconfig, dbtable, nodename;
   for (NameValueList::iterator it = map.begin();
        it != map.end(); it++) {
-    if (it->name.find("rcconfig") != std::string::npos) {
+    if (it->name.find("name") != std::string::npos) {
+      nodename = it->value;
+      printf("<tr><td>%s</td><td>%s</td>\n", it->name.c_str(), it->value.c_str());
+    } else if (it->name.find("rcconfig") != std::string::npos) {
       rcconfig = it->value;
     } else if (it->name.find("dbtable") != std::string::npos) {
       dbtable = it->value;
-      printf("<tr><td>rcconfig</td><td><a ref=\"./daqconfig.php&db=%s&config=%s\"></td>\n",
+      printf("<tr><td>%s</td><td><a href=\"./daqconfig.php?db=%s&config=%s@%s\" >%s/%s</a></td>\n",
+             it->name.c_str(), dbtable.c_str(), nodename.c_str(), rcconfig.c_str(),
              dbtable.c_str(), rcconfig.c_str());
     } else {
       printf("<tr><td>%s</td><td>%s</td>\n", it->name.c_str(), it->value.c_str());

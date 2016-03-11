@@ -321,9 +321,18 @@ void DBObject::printHTML(bool isfull) const throw()
   } else {
     printf("<tr><td>config</td><td>%s</td>\n", getName().c_str());
   }
+  std::string rcconfig, dbtable;
   for (NameValueList::iterator it = map.begin();
        it != map.end(); it++) {
-    printf("<tr><td>%s</td><td>%s</td>\n", it->name.c_str(), it->value.c_str());
+    if (it->name.find("rcconfig") != std::string::npos) {
+      rcconfig = it->value;
+    } else if (it->name.find("dbtable") != std::string::npos) {
+      dbtable = it->value;
+      printf("<tr><td>rcconfig</td><td><a ref=\"./daqconfig.php&db=%s&config=%s\"></td>\n",
+             dbtable.c_str(), rcconfig.c_str());
+    } else {
+      printf("<tr><td>%s</td><td>%s</td>\n", it->name.c_str(), it->value.c_str());
+    }
   }
   printf("</tbody>\n");
   printf("</table>\n");

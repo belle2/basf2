@@ -352,6 +352,27 @@ void RunControlCallback::distribute_r(NSMMessage msg) throw()
 void RunControlCallback::postRun() throw()
 {
   try {
+    int expno, runno;
+    get("expno", expno);
+    get("runno", runno);
+    DBObjectList& objs(getDBObject().getObjects("node"));
+    for (size_t i = 0; i < m_node_v.size(); i++) {
+      DBObject& o_node(objs[i]);
+      RCNode& node(m_node_v[i]);
+      if (node.isUsed()) {
+        std::string vname = StringUtil::form("node[%d]", i);
+        try {
+          std::string rcconfig;
+          std::string dbtable;
+          get(node, "dbtable", dbtable);
+          rcconfig = StringUtil::form("%04d:%06d:e", expno, runno);
+          o_node.addText("rcconfig", rcconfig);
+          o_node.addText("dbtable", dbtable);
+        } catch (const TimeoutException& e) {
+          LogFile::error(e.what());
+        }
+      }
+    }
     int ismaster = 0;
     get("ismaster", ismaster);
     if (ismaster && m_runno.isStart() && getDB()) {

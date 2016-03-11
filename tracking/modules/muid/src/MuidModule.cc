@@ -420,12 +420,9 @@ void MuidModule::event()
             m_ExtMgr->GetPropagator()->SetStepN(0);
           }
         }
-        // Detect radial escapes from the EKLM.  (Longitudinal escapes from
-        // EKLM and BKLM are detected elsewhere.)
-        if (m_Target->GetDistanceFromPoint(track->GetPosition()) < 0.0) m_Escaped = true;
         // Stop extrapolating as soon as the track escapes KLM or curls inward too much
         // or the momentum is too low
-        if (m_Escaped) break;
+        if (m_Target->GetDistanceFromPoint(track->GetPosition()) < 0.0) break;
         if (track->GetPosition().perp2() < m_MinRadiusSq) break;
         if (track->GetMomentum().mag2() < minPSq) break;
         if (errCode) break;

@@ -68,10 +68,13 @@ namespace Belle2 {
     }
 
     /** returns a string giving an overview of the graph. */
-    std::string print() const
+    std::string print(bool fullPrint = true) const
     {
-      std::string out = "graph has got " + std::to_string(m_subgraphs.size()) + " entries:\n";
+      unsigned nSubgraphs = m_subgraphs.size();
+      std::string out = "graph has got " + std::to_string(nSubgraphs) + " entries:\n";
+      out += "now printing " + (fullPrint ? std::string("full") : std::string("short version of the")) + " graph:\n";
       for (const auto& entry : m_subgraphs) {
+        if (!fullPrint and nSubgraphs % 100 != 0) continue; // printing only 100 subgraphs of mainGraph for the short version.
         out += entry.second.print() + "\n";
       }
       return out;

@@ -147,7 +147,7 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
     }
 
   } catch (FilterExceptions::Center_Is_Origin& anException) {
-    B2WARNING("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what())
+    B2INFO("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what())
     try {
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
     } catch (FilterExceptions::Straight_Up& anException) {
@@ -158,8 +158,8 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
       }
     }
   } catch (FilterExceptions::Invalid_result_Nan& anException) {
-    B2WARNING("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what() <<
-              "\nwhile using following hits:\n" << printHits(m_hits))
+    B2INFO("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what() <<
+           "\nwhile using following hits:\n" << printHits(m_hits))
     try {
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
     } catch (FilterExceptions::Straight_Up& anException) {

@@ -11,8 +11,6 @@
 #define FILEMETADATA_H
 
 #include <TObject.h>
-#include <TRandom3.h>
-#include <time.h>
 
 #include <iosfwd>
 #include <vector>
@@ -199,69 +197,37 @@ namespace Belle2 {
 
   private:
 
-    /** Logical file name.
-     */
-    std::string m_lfn;
+    std::string m_lfn; /**< Logical file name.  */
 
-    /** Number of events.
-     */
-    int m_nEvents;
+    int m_nEvents; /**< Number of events.  */
 
-    /** Lowest experiment number.
-     */
-    int m_experimentLow;
+    int m_experimentLow; /**< Lowest experiment number.  */
 
-    /** Lowest run number.
-     */
-    int m_runLow;
+    int m_runLow; /**< Lowest run number.  */
 
-    /** Lowest event number in lowest run.
-     */
-    unsigned int m_eventLow;
+    unsigned int m_eventLow; /**< Lowest event number in lowest run.  */
 
-    /** Highest experiment number.
-     */
-    int m_experimentHigh;
+    int m_experimentHigh; /**< Highest experiment number.  */
 
-    /** Highest run number.
-     */
-    int m_runHigh;
+    int m_runHigh; /**< Highest run number.  */
 
-    /** Highest event number in highest run.
-     */
-    unsigned int m_eventHigh;
+    unsigned int m_eventHigh; /**< Highest event number in highest run.  */
 
-    /** LFNs of parent files.
-     */
-    std::vector<std::string> m_parentLfns;
+    std::vector<std::string> m_parentLfns; /**< LFNs of parent files.  */
 
-    /** File creation date and time.
-     */
-    std::string m_date;
+    std::string m_date; /**< File creation date and time.  */
 
-    /** Site where the file was created.
-     */
-    std::string m_site;
+    std::string m_site; /**< Site where the file was created.  */
 
-    /** User who created the file.
-     */
-    std::string m_user;
+    std::string m_user; /**< User who created the file.  */
 
-    /** The random seed used when producing the file
-     */
-    std::string m_randomSeed;
+    std::string m_randomSeed; /**< The random seed used when producing the file */
 
-    /** Software release version.
-     */
-    std::string m_release;
+    std::string m_release; /**< Software release version.  */
 
-    /** The steering file content.
-     */
-    std::string m_steering;
+    std::string m_steering; /**< The steering file content.  */
 
-    /** Number of generated events, 0 for real data.
-     */
-    int m_mcEvents;
+    int m_mcEvents; /**< Number of generated events, 0 for real data.  */
 
     ClassDef(FileMetaData, 6); /**< Metadata information about a file. */
 

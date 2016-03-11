@@ -11,7 +11,6 @@
 #include <boost/python/class.hpp>
 
 #include <framework/dataobjects/FileMetaData.h>
-#include <framework/logging/Logger.h>
 
 #include <boost/algorithm/string.hpp>
 

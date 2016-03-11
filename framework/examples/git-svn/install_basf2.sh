@@ -33,14 +33,14 @@ fi
 
 if [ ! -d basf2 ]; then
   echo -n "Looking for current basf2 version..."
-  CURRENT_REV=`svn log https://belle2.cc.kek.jp/svn/trunk/software | head -2 | tail -1 | awk '{print $1}'`
+  CURRENT_REV=`svn log https://belle2.cc.kek.jp/svn/trunk/software  2> /dev/null | head -2 | tail -1 | awk '{print $1}'`
   echo " $CURRENT_REV"
 else
   echo "basf2/ already exists."
 fi
 
 echo -n "Looking for current externals version..."
-EXTERNALS_VERSION=`svn cat https://belle2.cc.kek.jp/svn/trunk/software/.externals`
+EXTERNALS_VERSION=`svn cat https://belle2.cc.kek.jp/svn/trunk/software/.externals 2> /dev/null`
 echo " $EXTERNALS_VERSION."
 
 if [ ! -d basf2 ]; then
@@ -58,9 +58,16 @@ then
   if [ "$EXTERNALS_VERSION" == "development" ]; then
     BINARY_VARIANT=""
   else
+    BINARY_OPTIONS=""
+    ARCH=`uname -m`
+    if [ "$ARCH" == "x86_64" ]; then
+      BINARY_OPTIONS="sl5 sl6 ubuntu1404"
+    elif [ "$ARCH" == "i686" ] || [ "$ARCH" == "i386" ]; then
+      BINARY_OPTIONS="sl5_32bit ubuntu1404_32bit"
+    fi
     echo "================================================================================"
-    echo "Select a binary variant of the externals for your system, or 'source' to compile them from source. All variants are for 64 bit unless mentioned otherwise. Press Ctrl-c to abort."
-    select BINARY_VARIANT in "source" sl5 sl6 ubuntu1404 ubuntu1404_32bit; do
+    echo "Select an appropriate binary variant of the externals for your operating system, or 'source' to compile them from source. For your architecture ($ARCH), the following options are available. Press Ctrl-c to abort."
+    select BINARY_VARIANT in "source" $BINARY_OPTIONS; do
       if [ "$BINARY_VARIANT" == "source" ]; then
         BINARY_VARIANT=""
       fi

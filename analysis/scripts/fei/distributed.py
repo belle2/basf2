@@ -58,7 +58,7 @@ def setup(args):
     n = int(len(data_files) / args.nJobs)
     if n < 1:
         raise RuntimeError('Too few MC files {} for the given number of jobs {}'.format(len(data_files), args.nJobs))
-    data_chunks = [data_files[i:i+n] for i in range(0, len(data_files), n)]
+    data_chunks = [data_files[i:i + n] for i in range(0, len(data_files), n)]
 
     # Create needed directories
     print('Create environment in {}'.format(args.directory))
@@ -68,6 +68,8 @@ def setup(args):
     os.mkdir('collection/weights')
     open('collection/basf2_path.pickle', 'w').close()
     os.mkdir('jobs')
+    if args.large_dir:
+        os.mkdir(args.large_dir)
 
     for i in range(args.nJobs):
         # Create job directory

@@ -73,6 +73,26 @@ namespace Belle2 {
     m_isAssigned(false) {}
 
 
+    /** Constructor for debugging or other special purposes.
+     *
+     * @param pos global SP-position.
+     * @param posError error of position.
+     * @param normalizedLocal normalized (element: [0;1]) coordinates of SP on given sensorID (.first is for u, .second is for v).
+     * @param clustersAssigned sets if u (.first) or v (.second) is assigned.
+     * @param sensorID the VxdID of the sensor it shall be on.
+     * @param detID the ID of the detector-type to be used.
+     */
+    SpacePoint(B2Vector3<SpBaseType> pos, B2Vector3<SpBaseType> posError, std::pair<SpBaseType, SpBaseType> normalizedLocal,
+               std::pair<bool, bool> clustersAssigned, VxdID sensorID, Belle2::VXD::SensorInfoBase::SensorType detID) :
+      m_position(pos),
+      m_positionError(posError),
+      m_normalizedLocal(normalizedLocal),
+      m_clustersAssigned(clustersAssigned),
+      m_vxdID(sensorID),
+      m_sensorType(detID),
+      m_qualityIndicator(0.5),
+      m_isAssigned(false) {}
+
 
     /** Constructor for the case of PXD Hits.
     *

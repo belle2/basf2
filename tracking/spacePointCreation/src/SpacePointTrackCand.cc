@@ -220,14 +220,24 @@ void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
   output << "estimates of Track Candidate: \n";
   output << "q = " << m_q << "\n";
   output << "pdgCode = " << m_pdg << "\n";
+  output << ", QI = " << m_qualityIndex << "\n";
 
-  for (unsigned int i = 0; i < m_trackSpacePoints.size(); ++i) {
+//   for (unsigned int i = 0; i < m_trackSpacePoints.size(); ++i) {
+//
+//     const SpacePoint* spacePoint = m_trackSpacePoints[i];
+//     // COULDDO: implement a print method for SpacePoints
+//     output << "SpacePoint " << i << " has Index " << spacePoint->getArrayIndex() << " in StoreArray " << spacePoint->getArrayName() <<
+//            ". Sorting Parameter: " << m_sortingParameters[i] << "\n";
+//   }
 
-    const SpacePoint* spacePoint = m_trackSpacePoints[i];
+  unsigned nSP = 0;
+  for (const SpacePoint* spacePoint : getHits()) {
     // COULDDO: implement a print method for SpacePoints
-    output << "SpacePoint " << i << " has Index " << spacePoint->getArrayIndex() << " in StoreArray " << spacePoint->getArrayName() <<
-           ". Sorting Parameter: " << m_sortingParameters[i] << "\n";
+    output << "SpacePoint " << nSP << " has Index " << spacePoint->getArrayIndex() << " in StoreArray " << spacePoint->getArrayName() <<
+           "." << "\n";
+    nSP++;
   }
+
   B2DEBUG(debuglevel, output.str());
 
   // reset the output stream

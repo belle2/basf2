@@ -67,8 +67,8 @@ namespace Belle2 { // make seperate sub-namespace for this?
         mcPartId = mcPart->getArrayIndex();
         B2DEBUG(4999, "TrueHit is related to MCParticle " << mcPartId);
       } else {
-        B2WARNING("Found no MCParticle related to TrueHit " << trueHits[iTH]->getArrayIndex() <<
-                  " from Array " << trueHits[iTH]->getArrayName());
+        B2DEBUG(1, "Found no MCParticle related to TrueHit " << trueHits[iTH]->getArrayIndex() <<
+                " from Array " << trueHits[iTH]->getArrayName());
       }
       mcParticles.push_back(std::make_pair(mcPartId, trueHits.weight(iTH)));
     }
@@ -78,7 +78,8 @@ namespace Belle2 { // make seperate sub-namespace for this?
     auto newEnd = std::unique(mcParticles.begin(), mcParticles.end(),
     [](const std::pair<int, double>& a, const std::pair<int, double>& b) { return a.first == b.first; }
                              );
-    if (newEnd != mcParticles.end()) B2ERROR("More than one TrueHits (related to one SpacePoint) are related to the same MCParticle!");
+    if (newEnd != mcParticles.end()) B2DEBUG(1,
+                                               "More than one TrueHits (related to one SpacePoint) are related to the same MCParticle!");
     mcParticles.resize(std::distance(mcParticles.begin(), newEnd));
 
     // check if there were noise Clusters in the SpacePoint

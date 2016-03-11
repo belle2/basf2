@@ -44,6 +44,7 @@
 #pragma link C++ class Belle2::RelationsInterface<genfit::Track>+; //implicit
 #pragma link C++ class Belle2::RecoTrack+;
 #pragma link C++ class Belle2::RecoHitInformation+;
+#pragma link C++ class Belle2::SectorMapConfig+;
 
 // #pragma link C++ class Belle2::BaseTFInfo+;
 // #pragma link C++ class Belle2::CellTFInfo+;

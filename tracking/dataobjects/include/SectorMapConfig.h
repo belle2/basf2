@@ -21,59 +21,51 @@
 namespace Belle2 {
 
   /** simple struct containing all the configuration data needed for the SecMapTrainer. */
-  struct SectorMapConfig {
-    // TODO:
-    // JAKOB will change the name of this class into SectorMapConfig which is
-    // more meaningful, and will put it among the dataobjects since it will be
-    // stored together with the cut values
+  class SectorMapConfig: public TObject {
 
-    /** stores pTCuts for min (.first) and max (.second) ptCut. */
-    // Eugenio: Why not use pTmin and pTmax instead of pTCuts.first and pTCuts.second which is awkward?
-//     std::pair<double, double> pTCuts = {0.02, 3.5};
+  public:
+
     /** stores pTCuts for min pT allowed for this . */
     double pTmin = 0.02;
     /** stores pTCuts for min (.first) and max (.second) ptCut. */
     double pTmax = 3.5;
 
-    /** allows smearing of the cuts. Values greater 0 stretch the cuts, values smaller 0 narrow them down. */
+    /** allows smearing of the cuts. Values greater 0 stretch the cuts,
+    values smaller 0 narrow them down. */
     double pTSmear = 0.;
 
     /** stores allowed layers to be used (including virtual IP with layer 0). */
     std::vector<int> allowedLayers = {0, 3, 4, 5, 6};
 
-    /** stores the cuts in u-direction in local relative coordinates of a sensor (0-1), to be used for determining the sectorID.
-     * First one has to be 0, last one has to be 1. */
-//     std::vector<double> uDirectionCuts = {0., .15, .5, .85, 1.};
-    /** stores the cuts in v-direction in local relative coordinates of a sensor (0-1), to be used for determining the sectorID.
-     * First one has to be 0, last one has to be 1. */
-//     std::vector<double> vDirectionCuts = {0., .1, .3, .5, .7, .9, 1.};
-    // TODO: These are not Cuts, perhaps upperValues Low values?
-    // Can we get rid og 0 and 1 since they are not conveing any information?
-    // Jakob: the 1.-part I want to keep to let the code be more readable (-> sectorDivider.size() == nSectors in that direction), this is imho more important than freeing the space of one double.
-
-    /** defines where to draw the lines between sectors in u direction of a sensor. only values 0-1 (-> relative local coordinates) are accepted, the last entry is the outer border of the rightmost sector, the innermost one is the outer border of the leftmost sector, */
+    /** Defines the sectors boundaries in normalized u coordinates (i.e. in (0,1) ).
+    The entries in this vectors are the upper limits of the sector */
     std::vector<double> uSectorDivider = {.15, .5, .85, 1.};
 
-    /** defines where to draw the lines between sectors in v direction of a sensor. only values 0-1 (-> relative local coordinates) are accepted, the last entry is the outer border of the rightmost sector, the innermost one is the outer border of the leftmost sector, */
+    /** Defines the sectors boundaries in normalized v coordinates (i.e. in (0,1) ).
+    The entries in this vectors are the upper limits of the sector */
     std::vector<double> vSectorDivider = {.1, .3, .5, .7, .9, 1.};
 
-    /** stores all the pdgCodes which are allowed to be used by the SecMap. if empty all types are allowed. */
+    /** Stores all the pdgCodes which are allowed to be used by the SecMap.
+    If empty all types are allowed. */
     std::vector<int> pdgCodesAllowed;
 
-    /** stores a cut for maximum distance of the seed in xy of the given virtual IP. WARNING only working if MC-TCs are used, VXDTF-TCs use innermost hit as seed != mctc-seed! */
+    /** Stores a cut for maximum distance of the seed in xy of the given virtual IP.
+    WARNING only working if MC-TCs are used,
+    VXDTF-TCs use innermost hit as seed != mctc-seed! */
     double seedMaxDist2IPXY = 23.5;
 
-    /** stores a cut for maximum distance of the seed in z of the given virtual IP. WARNING only working if MC-TCs are used, VXDTF-TCs use innermost hit as seed != mctc-seed!  */
+    /** Stores a cut for maximum distance of the seed in z of the given virtual IP.
+    WARNING only working if MC-TCs are used,
+    VXDTF-TCs use innermost hit as seed != mctc-seed!  */
     double seedMaxDist2IPZ = 23.5;
 
-    /** stores the minimal number of hits a TC must have to be accepted as TC (vIP-Hits are ignored). */
+    /** Stores the minimal number of hits a TC must have to be accepted as TC
+    (vIP-Hits are ignored). */
     unsigned nHitsMin = 3;
 
-    /** stores the position of the assumed position of the interaction point - the virtual IP. */
+    /** Stores the position of the assumed position of the interaction point -
+    The virtual IP. */
     B2Vector3D vIP = B2Vector3D(0, 0, 0);
-
-//     /** Hit specific: determines the range for min (.first) and max (.second) distance to the IP in 3D to. */
-//     std::pair<double, double> hitMinMaxDist2IP3D = { -1, -1};
 
     /** Sets the human readable proto-name of the sectorMap. */
     std::string secMapName = "testMap";
@@ -97,6 +89,11 @@ namespace Belle2 {
 
     /** the quantiles to be chosen in the end for determining the cuts first is quantile, second is 1-quantile. */
     std::pair<double, double> quantiles = {0.005, 1. - 0.005};
+
+    SectorMapConfig() {}
+
+    ClassDef(SectorMapConfig, 1);
+
   };
 }
 

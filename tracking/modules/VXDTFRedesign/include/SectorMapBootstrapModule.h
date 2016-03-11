@@ -1,16 +1,15 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Eugenio Paoloni                                          *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+/********************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                           *
+ * Copyright(C) 2015 - Belle II Collaboration                                   *
+ *                                                                              *
+ * Author: The Belle II Collaboration                                           *
+ * Contributors: Eugenio Paoloni                                                *
+ *                                                                              *
+ * This software is provided "as is" without any warranty.                      *
+ *******************************************************************************/
 
 #pragma once
 
-//framework:
 #include <framework/core/Module.h>
 
 #include <vector>
@@ -45,6 +44,11 @@ namespace Belle2 {
   private:
     void bootstrapSectorMap(void);
     void bootstrapSectorMap(const SectorMapConfig& config);
+    void persistSectorMap(void);
+    void retrieveSectorMap(void);
+
+    const std::string c_setupKeyNameTTreeName     = "Setups";
+    const std::string c_setupKeyNameBranchName      = "name";
 
   };
 } // Belle2 namespace

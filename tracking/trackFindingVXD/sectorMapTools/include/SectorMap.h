@@ -34,11 +34,12 @@ namespace Belle2 {
 
   private:
 
-    /** Contains all the Filters and configurations indexed by their setupNames. */
+    /** Container of all the Filters indexed by their setupNames. */
     setupNameToFilters_t* m_allSetupsFilters;
 
 
-    /// I do not want to copy this class which is a singleton so:
+    /// Copies of this class, which is a singleton, are not allowed so the
+    /// copy constructor method is deleted.
     SectorMap(const SectorMap& sectorMap)  = delete;
 
   public:
@@ -59,7 +60,7 @@ namespace Belle2 {
     }
 
 
-    /** returns filters. */
+    /// Gives access to the sector map and filters of a given setup
     const VXDTFFilters<point_t>* getFilters(const std::string& setupName)
     {
       auto  result = m_allSetupsFilters->find(setupName);
@@ -69,7 +70,7 @@ namespace Belle2 {
     }
 
 
-    /** returns setups. */
+    /** returns all the available setups. */
     const setupNameToFilters_t& getAllSetups(void)
     {
       return * m_allSetupsFilters;
@@ -82,7 +83,6 @@ namespace Belle2 {
     {
       (*m_allSetupsFilters)[ setupName ] = filters;
     }
-
 
     /** root class definition. */
     ClassDef(SectorMap , 14);

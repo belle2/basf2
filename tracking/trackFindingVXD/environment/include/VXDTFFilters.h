@@ -11,6 +11,7 @@
 #ifndef VXDTFFILTERS_HH
 #define VXDTFFILTERS_HH
 
+#include <iostream>
 #include "tracking/dataobjects/FullSecID.h"
 
 #include <tracking/spacePointCreation/SpacePoint.h>
@@ -83,30 +84,40 @@ namespace Belle2 {
       (0. <= Angle3DSimple<point_t>()   <= 0.).observe(VoidObserver())&&
       (0. <= AngleXYSimple<point_t>()   <= 0.).observe(VoidObserver())&&
       (0. <= AngleRZSimple<point_t>()   <= 0.).observe(VoidObserver())&&
-      (CircleDist2IP<point_t>()   <= 0.).observe(VoidObserver())&&
-      (0. <= DeltaSlopeRZ<point_t>()   <= 0.).observe(VoidObserver())&&
-      (0. <= DeltaSlopeZoverS<point_t>()   <= 0.).observe(VoidObserver())&&
-      (0. <= DeltaSoverZ<point_t>()   <= 0.).observe(VoidObserver())&&
-      (0. <= HelixParameterFit<point_t>()   <= 0.).observe(VoidObserver())&&
-      (0. <= Pt<point_t>()   <= 0.).observe(VoidObserver())&&
-      (0. <= CircleRadius<point_t>()   <= 0.).observe(VoidObserver())
+      (CircleDist2IP<point_t>()         <= 0.).observe(VoidObserver())&&
+      (0. <= DeltaSlopeRZ<point_t>()    <= 0.).observe(VoidObserver())&&
+      (0. <= DeltaSlopeZoverS<point_t>() <= 0.).observe(VoidObserver())&&
+      (0. <= DeltaSoverZ<point_t>()     <= 0.).observe(VoidObserver())&&
+      (0. <= HelixParameterFit<point_t>() <= 0.).observe(VoidObserver())&&
+      (0. <= Pt<point_t>()              <= 0.).observe(VoidObserver())&&
+      (0. <= CircleRadius<point_t>()    <= 0.).observe(VoidObserver())
     ) threeHitFilter_t;
 
 
     /// typedef to make a static sector type more readable.
-    typedef StaticSector< point_t, twoHitFilter_t, threeHitFilter_t , int > staticSector_t;
+    typedef StaticSector< point_t, twoHitFilter_t, threeHitFilter_t , int >
+    staticSector_t;
 
 
-    VXDTFFilters(): m_testConfig() {m_staticSectors.resize(2);}
+    VXDTFFilters(): m_testConfig()
+    {
+      m_staticSectors.resize(2);
+      // The first static sector is not used and will never be since the first
+      // compact id is 1.
+      m_staticSectors[0] = nullptr;
+      // initialize the first slot of the Static sector vector
+      m_staticSectors[1] = nullptr;
+    }
 
 
-    int addSectorsOnSensor(const vector<double>&                normalizedUsup,
-                           const vector<double>&                normalizedVsup,
+    int addSectorsOnSensor(const vector<double>&              normalizedUsup,
+                           const vector<double>&              normalizedVsup,
                            const vector< vector<FullSecID> >& sectorIds)
     {
 
       auto addedSectors = m_compactSecIDsMap.addSectors(normalizedUsup,
-                                                        normalizedVsup, sectorIds);
+                                                        normalizedVsup,
+                                                        sectorIds);
 
       if ((int) addedSectors != ((int) normalizedVsup.size() + 1) *
           ((int) normalizedUsup.size() + 1))
@@ -137,7 +148,8 @@ namespace Belle2 {
                         const twoHitFilter_t& filter)
     {
       // TODO add the friendship relation to the static sector
-      if (m_staticSectors.size() < m_compactSecIDsMap[ outer ] or m_compactSecIDsMap[ outer ] == 0)
+      if (m_staticSectors.size() <= m_compactSecIDsMap[ outer ] ||
+          m_compactSecIDsMap[ outer ] == 0)
         return 0;
 
       m_staticSectors[m_compactSecIDsMap[outer]]->assign2spFilter(inner, filter);
@@ -152,10 +164,15 @@ namespace Belle2 {
                           const threeHitFilter_t& filter)
     {
       // TODO add the friendship relation to the static sector
-      if (m_staticSectors.size() < m_compactSecIDsMap[ outer ] or m_compactSecIDsMap[ outer ] == 0)
+      if (m_staticSectors.size() <= m_compactSecIDsMap[ outer ] ||
+          m_compactSecIDsMap[ outer ] == 0 ||
+          m_compactSecIDsMap[ center ] == 0 ||
+          m_compactSecIDsMap[ inner ] == 0)
         return 0;
 
-      m_staticSectors[m_compactSecIDsMap[outer]]->assign3spFilter(center, inner, filter);
+      m_staticSectors[m_compactSecIDsMap[outer]]->assign3spFilter(center,
+                                                                  inner,
+                                                                  filter);
       return 1;
     }
 
@@ -185,27 +202,37 @@ namespace Belle2 {
       static twoHitFilter_t just_in_case;
       const auto staticSector = m_staticSectors[ m_compactSecIDsMap[ outer ] ];
       // catch case when sector is not part of the sectorMap:
-      if (staticSector == nullptr) return just_in_case;
+      if (staticSector == nullptr)
+        return just_in_case;
       const auto filter = staticSector->getFilter2sp(inner);
       return filter;
-//       return just_in_case;
+
     }
 
 
     /// check if using getFullID() would be safe (true if it is safe):
-    bool areCoordinatesValid(VxdID aSensorID, double normalizedU, double normalizedV) const
+    bool areCoordinatesValid(VxdID aSensorID,
+                             double normalizedU, double normalizedV) const
     {
-      return m_compactSecIDsMap.areCoordinatesValid(aSensorID, normalizedU, normalizedV);
+      return m_compactSecIDsMap.areCoordinatesValid(aSensorID,
+                                                    normalizedU, normalizedV);
     }
 
 
-    /// returns fullSecID for given sensorID and local coordinates. JKL: what happens here if no FullSecID could be found?
+    /// returns fullSecID for given sensorID and local coordinates.
+    // JKL: what happens here if no FullSecID could be found?
+    // EP: you get an exception
     FullSecID getFullID(VxdID aSensorID, double normalizedU, double normalizedV) const
     {
       // TODO WARNING how to catch bad cases?
       return m_compactSecIDsMap.getFullSecID(aSensorID, normalizedU, normalizedV);
     }
 
+    /// returns the FullSecId of @param compactSecId
+    FullSecID getFullID(CompactSecIDs::sectorID_t compactSecID) const
+    {
+      return m_staticSectors.at(compactSecID)->getFullSecID();
+    }
 
     /// returns the configuration settings for this VXDTFFilters.
     const SectorMapConfig& getConfig(void) const { return m_testConfig; }
@@ -221,13 +248,114 @@ namespace Belle2 {
 
     /// returns number of compact secIDs stored for this filter-container.
     unsigned size() const { return m_compactSecIDsMap.getSize(); }
+
+    /// Persists (i.e.: writes) on the current TDirectory the whole object.
+    bool persistOnRootFile(void) const
+    {
+
+      if (! m_testConfig.Write("config"))
+        return false;
+      if (! m_compactSecIDsMap.persist())
+        return false;
+
+      if (! persistStaticSectors())
+        return false;
+
+      return true;
+    };
+
+    /// Retrieves from the current TDirectory all the VXDTFFilters
+    bool retrieveFromRootFile(void)
+    {
+
+      if (! m_testConfig.Read("config"))
+        return false;
+
+      if (! m_compactSecIDsMap.read())
+        return false;
+
+      if (! retrieveStaticSectors())
+        return false;
+
+      return true;
+    };
+
   private:
 
-    vector< staticSector_t* > m_staticSectors;
+    /// Persists on the current TDirectory the StaticSectors.
+    bool persistStaticSectors(void) const
+    {
 
+      TTree* sp2tree = new TTree("SegmentFilters", "SegmentFilters");
+      twoHitFilter_t twoHitFilter;
+      twoHitFilter.persist(sp2tree, "filter");
+
+      unsigned int outerFullSecID2sp, innerFullSecID2sp;
+      sp2tree->Branch("outerFullSecID", & outerFullSecID2sp);
+      sp2tree->Branch("innerFullSecID", & innerFullSecID2sp);
+
+
+      TTree* sp3tree = new TTree("TripletsFilters", "TripletFilters");
+      threeHitFilter_t threeHitFilter;
+      threeHitFilter.persist(sp3tree, "filter");
+
+      unsigned int outerFullSecID3sp, centerFullSecID3sp,
+               innerFullSecID3sp;
+      sp3tree->Branch("outerFullSecID", & outerFullSecID3sp);
+      sp3tree->Branch("centerFullSecID", & centerFullSecID3sp);
+      sp3tree->Branch("innerFullSecID", & innerFullSecID3sp);
+
+      for (auto staticSector : m_staticSectors) {
+        if (staticSector == nullptr)
+          // Why there is an empty sector per layer?
+          continue;
+
+
+        outerFullSecID3sp = outerFullSecID2sp = staticSector->getFullSecID();
+        auto segmentFilters = staticSector->getAllFilters2sp();
+        for (auto compactIdFilterPair : segmentFilters) {
+          auto innerCompactId = compactIdFilterPair.first;
+          innerFullSecID2sp = getFullID(innerCompactId);
+          twoHitFilter = compactIdFilterPair.second;
+          sp2tree->Fill();
+        }
+
+        auto tripletFilters = staticSector->getAllFilters3sp();
+        for (auto compactIdFilterPair : tripletFilters) {
+          CompactSecIDs::sectorID_t id_center, id_inner;
+          CompactSecIDs::extractCompactID(compactIdFilterPair.first, id_center, id_inner);
+          centerFullSecID3sp = getFullID(id_center);
+          innerFullSecID3sp = getFullID(id_inner);
+          threeHitFilter = compactIdFilterPair.second;
+          sp3tree->Fill();
+        }
+
+
+      }
+
+      return true;
+    }
+
+    /// Retrieves from the current TDirectory the StaticSectors.
+    bool retrieveStaticSectors(void)
+    {
+      return true;
+    }
+
+    /**
+     * This member takes care of converting the [layer][ladder]
+     * [sensor][sector] multi index into a linear index on
+     * the m_staticSectors vector.
+     */
     CompactSecIDs m_compactSecIDsMap;
 
-    /** configuration  */
+    /** This vector contains all the static sectors on a sector map.
+     *  The index is the compact ID provided by the CompactSecIDs
+     */
+    vector< staticSector_t* > m_staticSectors;
+
+    /** Configuration: i.e. name of the sector map, tuning
+    parameters, etc.  */
     SectorMapConfig m_testConfig;
 
   };

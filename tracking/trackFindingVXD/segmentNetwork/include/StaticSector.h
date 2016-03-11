@@ -12,7 +12,6 @@
 #include <tracking/trackFindingVXD/sectorMapTools/CompactSecIDs.h>
 
 #include <unordered_map>
-#include <iostream>
 #include <tuple>
 #include <utility>
 
@@ -50,8 +49,11 @@ namespace Belle2 {
     StaticSector(FullSecID secID) : m_secID(secID), m_compactSecIDsMap(nullptr) {}
 
 
-    /// ACCESS FUNCTIONS
+    // ACCESSOR FUNCTIONS
 
+    /** Get the 2 Space Point filter assigned to the
+    friendship relation among this sector and the
+    @param innerSector one */
     Filter2sp getFilter2sp(FullSecID innerSector) const
     {
       static Filter2sp just_in_case;
@@ -59,18 +61,37 @@ namespace Belle2 {
       auto filter = m_2spFilters.find(m_compactSecIDsMap->getCompactID(innerSector));
       if (filter != m_2spFilters.end())
         return filter->second;
-      else
-        std::cout << " ??? " << std::endl;
       return just_in_case;
     }
 
-    /** assign the 2 space points filter */
+    /** Get constant access to the whole set of 2 Space Point filters.
+     */
+    const std::unordered_map<CompactSecIDs::sectorID_t    , Filter2sp >&
+    getAllFilters2sp() const
+    {return m_2spFilters;}
+
+    /** Get constant access to the whole set of 3 Space Point filters.
+     */
+    const std::unordered_map<CompactSecIDs::secPairID_t   , Filter3sp >&
+    getAllFilters3sp() const
+    {return m_3spFilters;}
+
+    /** Get constant access to the whole set of 4 Space Point filters.
+     */
+    const std::unordered_map<CompactSecIDs::secTripletID_t   , Filter4sp >&
+    getAllFilters4sp() const
+    {return m_4spFilters;}
+
+
+    /** Assign the compact sector ID to this sector */
     void assignCompactSecIDsMap(const CompactSecIDs& compactSecIDsMap)
     {
       m_compactSecIDsMap = & compactSecIDsMap;
     }
 
-    /** Parameters: pass the ID of the next inner sector and the filters you like to attach */
+
+    /** Assign the 2 space point @param filter to this static sector
+    which is friend of the sector whose FullSecID is @param inner. */
     void assign2spFilter(FullSecID inner, const Filter2sp  filter)
     {
       m_2spFilters[ m_compactSecIDsMap->getCompactID(inner) ] = filter;

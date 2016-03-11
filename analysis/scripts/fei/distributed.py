@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import shutil
@@ -17,9 +17,9 @@ def getCommandLineOptions():
     parser.add_argument('-f', '--steeringFile', dest='steering', type=str, required=True,
                         help='Steering file')
     parser.add_argument('-w', '--workingDirectory', dest='directory', type=str, required=True,
-                        help='Directory file')
+                        help='Working directory for basf2 jobs. On KEKCC, this must NOT be on HSM!')
     parser.add_argument('-l', '--largeDirectory', dest='large_dir', type=str, default='',
-                        help='Large Directory file')
+                        help='Directory to store large files')
     parser.add_argument('-n', '--nJobs', dest='nJobs', type=int, default=100,
                         help='Number of jobs')
     parser.add_argument('-d', '--data', dest='data', type=str, required=True, action='append', nargs='+',
@@ -62,8 +62,8 @@ def setup(args):
 
     # Create needed directories
     print('Create environment in {}'.format(args.directory))
-    shutil.rmtree('collection')
-    shutil.rmtree('jobs')
+    shutil.rmtree('collection', ignore_errors=True)
+    shutil.rmtree('jobs', ignore_errors=True)
     os.mkdir('collection')
     os.mkdir('collection/weights')
     open('collection/basf2_path.pickle', 'w').close()

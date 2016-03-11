@@ -314,7 +314,7 @@ throw(IOException)
 {
   if (m_table.size() > 0 && m_rcconfig.size() > 0) {
     //std::string confname = StringUtil::form("%04d:%06d:%s=", expno, runno, (isstart ? "s" : "e")) + m_rcconfig;
-    std::string confname = getNode().getName() + StringUtil::form("@%04d:%06d:%s", expno, runno, (isstart ? "s" : "e"));
+    std::string confname = getNode().getName() + StringUtil::form(".%04d:%06d:%s", expno, runno, (isstart ? "s" : "e"));
     obj.setName(confname);
     std::string table = m_table + "_log";
     if (getDB()) {

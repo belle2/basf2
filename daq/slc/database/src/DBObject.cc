@@ -305,6 +305,30 @@ void DBObject::print(bool isfull) const throw()
   printf("#\n");
 }
 
+void DBObject::printHTML(bool isfull) const throw()
+{
+  const std::string& name_in = "";
+  NameValueList map;
+  search(map, name_in, isfull);
+  printf("<table>\n");
+  printf("<caption><strong>%s</strong></caption>\n", getName().c_str());
+  printf("<thead><tr><th>Name</th><th>Value</th>\n</tr></thead>\n");
+  printf("<tbody>\n");
+  StringList s = StringUtil::split(getName(), '@');
+  if (s.size() > 1) {
+    printf("<tr><td>nodename</td><td>%s</td>\n", s[0].c_str());
+    printf("<tr><td>config</td><td>%s</td>\n", s[1].c_str());
+  } else {
+    printf("<tr><td>config</td><td>%s</td>\n", getName().c_str());
+  }
+  for (NameValueList::iterator it = map.begin();
+       it != map.end(); it++) {
+    printf("<tr><td>%s</td><td>%s</td>\n", it->name.c_str(), it->value.c_str());
+  }
+  printf("</tbody>\n");
+  printf("</table>\n");
+}
+
 StringList DBObject::getNameList(bool isfull) const throw()
 {
   const std::string& name_in = "";

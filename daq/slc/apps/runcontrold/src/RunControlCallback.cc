@@ -205,7 +205,7 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
           std::string rcconfig;
           std::string dbtable;
           get(node, "dbtable", dbtable);
-          rcconfig = dbtable + "/" + node.getName() + StringUtil::form("@%04d:%06d:s", expno, runno);
+          rcconfig = node.getName() + StringUtil::form(".%04d:%06d:s", expno, runno);
           o_node.addText("rcconfig", rcconfig);
           o_node.addText("dbtable", dbtable);
         } catch (const TimeoutException& e) {

@@ -29,6 +29,7 @@ bool NSMVHandlerRCConfig::handleGetText(std::string& val)
 
 bool NSMVHandlerRCConfig::handleSetText(const std::string& val)
 {
+  /*
   m_callback.setConfig(m_rcnode, val);
   try {
     NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::CONFIGURE, val));
@@ -37,6 +38,7 @@ bool NSMVHandlerRCConfig::handleSetText(const std::string& val)
   } catch (const IOException& e) {
     LogFile::error(e.what());
   }
+  */
   return false;
 }
 

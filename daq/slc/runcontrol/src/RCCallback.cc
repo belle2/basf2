@@ -192,6 +192,9 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
       try {
         if (cmd == RCCommand::ABORT) {
           abort();
+          if (m_expno > 0 && m_runno > 0) {
+            dbrecord(m_obj, m_expno, m_runno, false);
+          }
         } else if (cmd == RCCommand::RECOVER) {
           recover(m_obj);
         }
@@ -310,7 +313,8 @@ void RCCallback::dbrecord(DBObject obj, int expno, int runno, bool isstart)
 throw(IOException)
 {
   if (m_table.size() > 0 && m_rcconfig.size() > 0) {
-    std::string confname = StringUtil::form("%04d:%06d:%s=", expno, runno, (isstart ? "s" : "e")) + m_rcconfig;
+    //std::string confname = StringUtil::form("%04d:%06d:%s=", expno, runno, (isstart ? "s" : "e")) + m_rcconfig;
+    std::string confname = getNode().getName() + StringUtil::form("@%04d:%06d:%s", expno, runno, (isstart ? "s" : "e"));
     obj.setName(confname);
     std::string table = m_table + "_log";
     if (getDB()) {

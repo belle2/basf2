@@ -67,6 +67,8 @@ namespace Belle2 {
       m_expno = expno;
       m_runno = runno;
     }
+    int getExpNumber() const { return m_expno; }
+    int getRunNumber() const { return m_runno; }
 
   private:
     void dbload(int length, const char* data) throw(IOException);

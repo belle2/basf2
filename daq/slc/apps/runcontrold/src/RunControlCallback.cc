@@ -176,6 +176,7 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
         m_runno = RunNumberTable(db).add(m_runno.getConfig(), expno, runno, 0);
         expno = m_runno.getExpNumber();
         runno = m_runno.getRunNumber();
+        setRunNumbers(expno, runno);
         set("tstart", (int)m_runno.getRecordTime());
         obj.addInt("tstart", (int)m_runno.getRecordTime());
         set("ismaster", (int)true);
@@ -352,9 +353,7 @@ void RunControlCallback::distribute_r(NSMMessage msg) throw()
 void RunControlCallback::postRun() throw()
 {
   try {
-    int expno, runno;
-    get("expno", expno);
-    get("runno", runno);
+    int expno = getExpNumber(), runno = getRunNumber();
     DBObjectList& objs(getDBObject().getObjects("node"));
     for (size_t i = 0; i < m_node_v.size(); i++) {
       DBObject& o_node(objs[i]);

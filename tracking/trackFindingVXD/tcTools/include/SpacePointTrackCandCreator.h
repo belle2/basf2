@@ -33,8 +33,9 @@ namespace Belle2 {
   struct SpacePointTrackCandCreator {
 
     /** takes simple vectors of SpacePoints and convert them to real SpacePointTrackCand including realistic seed,
-     * returns number of TCs successfully created */
-    unsigned int createSPTCs(SPTCContainerType& tcContainer, std::vector<std::vector<const SpacePoint*> > allPaths)
+     * returns number of TCs successfully created. */
+    unsigned int createSPTCs(SPTCContainerType& tcContainer, std::vector<std::vector<const SpacePoint*> > allPaths,
+                             bool removeVirtualIP)
     {
       auto seedGenerator = TrackletFilters();
       seedGenerator.resetMagneticField(bFieldValue);
@@ -78,13 +79,23 @@ namespace Belle2 {
         // parameter means: false -> take last it as seed hit (true would be other end), 0: do not artificially force a momentum value onto the seed).
         seedValue = seedGenerator.calcMomentumSeed(false, 0);
 
-
         int pdgCode = seedValue.second * stdPdgCode * chargeSignFactor; // improved one for curved tracks
 
-        stateSeed(0) = (*aPath.back()).X(); stateSeed(1) = (*aPath.back()).Y(); stateSeed(2) = (*aPath.back()).Z();
-        stateSeed(3) = seedValue.first[0]; stateSeed(4) = seedValue.first[1]; stateSeed(5) = seedValue.first[2];
-
-        tcContainer.appendNew(aPath, pdgCode, chargeVal);
+        // remove virtualIP in tc if wanted to:
+        if (removeVirtualIP) {
+          std::vector<const SpacePoint*> newPath;
+          for (const SpacePoint* aNode : aPath) {
+            if (aNode->getType() == VXD::SensorInfoBase::SensorType::VXD) continue;
+            newPath.push_back(aNode);
+          }
+          stateSeed(0) = (*newPath.back()).X(); stateSeed(1) = (*newPath.back()).Y(); stateSeed(2) = (*newPath.back()).Z();
+          stateSeed(3) = seedValue.first[0]; stateSeed(4) = seedValue.first[1]; stateSeed(5) = seedValue.first[2];
+          tcContainer.appendNew(newPath, pdgCode, chargeVal);
+        } else { // keep vIP
+          stateSeed(0) = (*aPath.back()).X(); stateSeed(1) = (*aPath.back()).Y(); stateSeed(2) = (*aPath.back()).Z();
+          stateSeed(3) = seedValue.first[0]; stateSeed(4) = seedValue.first[1]; stateSeed(5) = seedValue.first[2];
+          tcContainer.appendNew(aPath, pdgCode, chargeVal);
+        }
       }
 
       return nTCsCreated;

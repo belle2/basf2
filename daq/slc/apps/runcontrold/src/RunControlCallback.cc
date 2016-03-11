@@ -207,7 +207,7 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
           get(node, "dbtable", dbtable);
           rcconfig = StringUtil::form("%04d:%06d:s", expno, runno);
           o_node.addText("rcconfig", rcconfig);
-          o_node.addText("dbtable", dbtable);
+          o_node.addText("dbtable", dbtable + "_log");
         } catch (const TimeoutException& e) {
           LogFile::error(e.what());
         }
@@ -367,7 +367,7 @@ void RunControlCallback::postRun() throw()
           get(node, "dbtable", dbtable);
           rcconfig = StringUtil::form("%04d:%06d:e", expno, runno);
           o_node.addText("rcconfig", rcconfig);
-          o_node.addText("dbtable", dbtable);
+          o_node.addText("dbtable", dbtable + "_log");
         } catch (const TimeoutException& e) {
           LogFile::error(e.what());
         }

@@ -324,7 +324,7 @@ throw(IOException)
         db.close();
       } catch (const DBHandlerException& e) {
         db.close();
-        throw (e);
+        //throw (e);
       }
     } else if (m_provider_host.size() > 0 && m_provider_port > 0) {
       TCPSocket socket(m_provider_host, m_provider_port);

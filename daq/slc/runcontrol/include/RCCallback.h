@@ -62,6 +62,11 @@ namespace Belle2 {
       m_provider_port = port;
     }
     DBObject& getDBObject() throw() { return m_obj; }
+    void setRunNumbers(int expno, int runno)
+    {
+      m_expno = expno;
+      m_runno = runno;
+    }
 
   private:
     void dbload(int length, const char* data) throw(IOException);

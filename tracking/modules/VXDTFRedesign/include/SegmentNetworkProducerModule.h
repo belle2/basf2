@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/Module.h>
 #include <framework/logging/Logger.h>
+#include <framework/geometry/B2Vector3.h>
 
 // tracking
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
@@ -112,13 +113,13 @@ namespace Belle2 {
       for (auto& setup : m_sectorMap->getAllSetups()) {
         auto& filters = *(setup.second);
 
-        if (filters.getConfig().secMapName != m_secMapName) { continue; }
-        B2INFO("SegmentNetworkProducerModule::initialize(): loading mapName: " << m_secMapName << " with nCompactSecIDs: " <<
+        if (filters.getConfig().secMapName != m_PARAMsecMapName) { continue; }
+        B2INFO("SegmentNetworkProducerModule::initialize(): loading mapName: " << m_PARAMsecMapName << " with nCompactSecIDs: " <<
                filters.size());
 
         m_vxdtfFilters = &filters;
         SecMapHelper::printStaticSectorRelations(filters, filters.getConfig().secMapName + "segNetProducer", 2, true, true);
-        if (m_vxdtfFilters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_secMapName <<
+        if (m_vxdtfFilters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
                                                  "' does not exist! Can not continue...");
         break; // have found our secMap no need for further searching
       }
@@ -146,6 +147,14 @@ namespace Belle2 {
     virtual void beginRun()
     {
       InitializeCounters();
+
+      if (m_PARAMVirtualIPCoordinates.size() != 3
+          or m_PARAMVirtualIPErrors.size() != 3)
+        B2FATAL("SegmentNetworkProducerModule:initialize: parameters for virtualIP are wrong - check basf2 -m!")
+
+        m_virtualIPCoordinates = B2Vector3D(m_PARAMVirtualIPCoordinates.at(0), m_PARAMVirtualIPCoordinates.at(1),
+                                            m_PARAMVirtualIPCoordinates.at(2));
+      m_virtualIPErrors = B2Vector3D(m_PARAMVirtualIPErrors.at(0), m_PARAMVirtualIPErrors.at(1), m_PARAMVirtualIPErrors.at(2));
     }
 
 
@@ -231,16 +240,29 @@ namespace Belle2 {
     /** if true, to the given SpacePoints a virtual interaction point at given coordinates with parameter 'virtualIPCoorindates' will be added */
     bool m_PARAMAddVirtualIP;
 
-    /** only valid if nEntries == 3, excpects X, Y, and Z coordinates for virtual IP in global coordinates. Only used if addVirtualIP == true */
-    std::vector<double> m_PARAMVirtualIPCoorindates;
+    /**  expects X, Y, and Z coordinates for virtual IP in global coordinates (only lists with 3 coordinates are allowed!). Only used if addVirtualIP == true. */
+    std::vector<double> m_PARAMVirtualIPCoordinates;
+
+    /** expects errors for X, Y, and Z coordinates for virtual IP in global coordinates (only lists with 3 coordinates are allowed!). Only used if addVirtualIP == true. */
+    std::vector<double> m_PARAMVirtualIPErrors;
 
     /** the name of the SectorMap used for this instance. */
-    std::string m_secMapName;
+    std::string m_PARAMsecMapName;
 
     /** If true for each event and each network created a file with a graph is created. */
-    bool m_printNetworks;
+    bool m_PARAMprintNetworks;
+
+    /** For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted. */
+    bool m_PARAMallFiltersOff;
+
 
 // member variables
+
+    /** vector containing global coordinates for virtual IP, is set using module parameters. */
+    B2Vector3D m_virtualIPCoordinates;
+
+    /** vector containing global errors for virtual IP, is set using module parameters. */
+    B2Vector3D m_virtualIPErrors;
 
     // input containers
     /** contains the sectorMap and with it the VXDTFFilters. */

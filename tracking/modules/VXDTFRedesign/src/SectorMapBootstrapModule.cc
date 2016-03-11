@@ -59,6 +59,17 @@ SectorMapBootstrapModule::initialize()
   sectorMap.registerInDataStore(DataStore::c_DontWriteOut);
   sectorMap.create();
   bootstrapSectorMap();
+  m_tfile = new TFile("observeTheSecMap.root", "RECREATE");
+  m_tfile->cd();
+  TTree* newTree = new TTree("twoHitTree", "reallyWeWantToHaveThatTTreeNow");
+
+  // take care of two-hit-filters:
+//   auto outerHit = new SpacePoint();
+//   auto innerHit = new SpacePoint();
+
+  VXDTFFilters<SpacePoint>::twoHitFilter_t aFilter;
+  initializeObservers(aFilter, newTree/*, outerHit, innerHit*/);
+//   ObserverCheckMCPurity::initialize< CircleRadius<SpacePoint>, ClosedRange<double, double>>(CircleRadius<SpacePoint>(), ClosedRange<double, double>());
 }
 
 void
@@ -87,7 +98,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 //   config1.pTmax = 0.15; // minimal relevant version
   config1.pTmax = 3.15; // minimal relevant version // Feb18-onePass-Test
   config1.pTSmear = 0.;
-  config1.allowedLayers = {0, 3, 4, 5, 6}; // TODO -> convert to vector containing all layerNumbers to be used; e.g.: {0, 3, 4, 5, 6};
+  config1.allowedLayers = {0, 3, 4, 5, 6};
 //   config1.uSectorDivider = { .15, .5, .85, 1.};
 //   config1.vSectorDivider = { .1, .3, .5, .7, .9, 1.};
   config1.uSectorDivider = { .3, .7, 1.}; // standard relevant version
@@ -106,8 +117,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1.threeHitFilters = { "Angle3DSimple", "AngleXYSimple", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
   config1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
   config1.mField = 1.5;
-  config1.rarenessThreshold = 0.001;
-  config1.quantiles = {0.005, 1. - 0.005};
+  config1.rarenessThreshold = 0.; //0.001;
+  config1.quantiles = {0., 1.};  //{0.005, 1. - 0.005};
   // TODO: still missing: minimal sample-size, quantiles for smaller samplesizes, threshshold small <-> big sampleSize.
   bootstrapSectorMap(config1);
 
@@ -325,4 +336,12 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
 
 }
 
+
+void
+SectorMapBootstrapModule::terminate()
+{
+  m_tfile->Write();
+  m_tfile->Close();
+  delete m_tfile;
+}
 

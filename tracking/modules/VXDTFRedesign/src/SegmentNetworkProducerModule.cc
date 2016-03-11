@@ -26,6 +26,8 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
 
   vector<double> ipCoords = {0, 0, 0};
 
+  vector<double> ipErrors = {0.2, 0.2, 1.};
+
   //Set module properties
   setDescription("The segment network producer module. \n This module takes a given sectorMap and storeArrays of spacePoints and creates a segmentNetwork (if activated).\nThe output: a StoreObjPtr of DirectedNodeNetworkContainer:\n - will contain a DirectedNodeNetwork< ActiveSector> (if parameter 'createNeworks' is [1;3])\n - will contain a DirectedNodeNetwork< SpacePoint > (if parameter 'createNeworks' is  [2;3])\n - will contain a DirectedNodeNetwork< Segment > (if parameter 'createNeworks' is [3])");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -57,17 +59,27 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            bool(true));
 
   addParam("virtualIPCoorindates",
-           m_PARAMVirtualIPCoorindates,
-           "only valid if nEntries == 3, excpects X, Y, and Z coordinates for virtual IP in global coordinates. Only used if addVirtualIP == true",
+           m_PARAMVirtualIPCoordinates,
+           "excpects X, Y, and Z coordinates for virtual IP in global coordinates (only lists with 3 coordinates are allowed!). Only used if addVirtualIP == true",
            ipCoords);
 
+  addParam("virtualIPErrors",
+           m_PARAMVirtualIPErrors,
+           "excpects errors for X, Y, and Z coordinates for virtual IP in global coordinates (only lists with 3 entries are allowed!). Only used if addVirtualIP == true",
+           ipErrors);
+
   addParam("sectorMapName",
-           m_secMapName,
+           m_PARAMsecMapName,
            "the name of the SectorMap used for this instance.", string("testMap"));
 
   addParam("printNetworks",
-           m_printNetworks,
+           m_PARAMprintNetworks,
            "If true for each event and each network created a file with a graph is created.", bool(false));
+
+  addParam("allFiltersOff",
+           m_PARAMallFiltersOff,
+           "For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted.",
+           bool(false));
 }
 
 
@@ -176,7 +188,7 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
   m_nRawSectorsFound += collectedData.size();
   // store IP-coordinates
   if (m_PARAMAddVirtualIP == true) {
-    m_network->setVirtualInteractionPoint(); // TODO pass relevant parameters!
+    m_network->setVirtualInteractionPoint(m_virtualIPCoordinates, m_virtualIPErrors);
     TrackNode* vIP = m_network->getVirtualInteractionPoint();
     const StaticSectorType* sectorFound = findSectorForSpacePoint((vIP->getHit()));
     collectedData.push_back({FullSecID(), false, nullptr, sectorFound, {vIP}}); // TODO: which FullSecID for the vIP?
@@ -273,7 +285,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
   m_nBadSectorNoInnerActive += nNoValidOfAllInnerSectors;
   m_nBadSectorNoInnerExisting += nNoInnerExisting;
 
-  if (!m_printNetworks) return;
+  if (!m_PARAMprintNetworks) return;
 
   std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_ActiveSector_Ev" + std::to_string(m_eventCounter);
   DNN::printNetwork<ActiveSector<StaticSectorType, TrackNode>, VoidMetaInfo>(activeSectorNetwork, fileName);
@@ -310,6 +322,8 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
                             *outerHit,
                             *innerHit);
 
+          if (m_PARAMallFiltersOff) accepted = true; // bypass all filters
+
           if (accepted == false) { nRejected++; continue; } // skip combinations which weren't accepted
           nAccepted++;
 
@@ -332,7 +346,7 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
   m_nTrackNodesRejected += nRejected;
   m_nTrackNodeLinksCreated += nLinked;
 
-  if (!m_printNetworks) return;
+  if (!m_PARAMprintNetworks) return;
 
   std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_TrackNode_Ev" + std::to_string(m_eventCounter);
   DNN::printNetwork<Belle2::TrackNode, VoidMetaInfo>(hitNetwork, fileName);
@@ -370,6 +384,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
 
         B2DEBUG(5, "buildSegmentNetwork: outer/Center/Inner: " << outerHit->getEntry().getName() << "/" << centerHit->getEntry().getName()
                 << "/" << innerHit->getEntry().getName() << ", accepted: " << std::to_string(accepted));
+
+        if (m_PARAMallFiltersOff) accepted = true; // bypass all filters
 
         if (accepted == false) { nRejected++; continue; } // skip combinations which weren't accepted
         nAccepted++;
@@ -427,7 +443,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
   m_nSegmentsRejected += nRejected;
   m_nSegmentsLinksCreated += nLinked;
 
-  if (!m_printNetworks) return;
+  if (!m_PARAMprintNetworks) return;
 
   std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_Segment_Ev" + std::to_string(m_eventCounter);
   DNN::printNetwork<Segment< Belle2::TrackNode>, CACell>(segmentNetwork, fileName);

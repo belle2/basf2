@@ -66,7 +66,6 @@ void QualityEstimatorVXDCircleFitModule::event()
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
 
     unsigned nHits = aTC.size();
-    unsigned nDF = 0; // counts numbers of degrees of freedom
 
     // prepare interface-container for TrackletFilters:
     std::vector<PositionInfo> convertedPathrawData;
@@ -85,7 +84,6 @@ void QualityEstimatorVXDCircleFitModule::event()
       convertedPath.push_back(&convertedPathrawData.back());
 
       auto assigned = aHit->getIfClustersAssigned();
-      nDF += (assigned.first ? 1 : 0) + (assigned.second ? 1 : 0);
     }
 
     fitter.resetValues(&convertedPath);
@@ -94,7 +92,8 @@ void QualityEstimatorVXDCircleFitModule::event()
     double chi2 = result.first;
 
     if (chi2 < 0) { B2WARNING("QualityEstimatorVXDCircleFitModule: event " << m_eventCounter << ": chi2 is reset to 0! (before: " << chi2 << ")"); chi2 = 0; }
-    double probability = TMath::Prob(chi2, nDF - 3); // -3: 3 parameters are estimated, which reduces the nDF
+    double probability = TMath::Prob(chi2, nHits -
+                                     3); // -3: 3 parameters are estimated, which reduces the nDF (number of Hits, since only one ndF per hit is added in a circleFit (unlike the situation for helix fits)
 
     B2DEBUG(1, "QualityEstimatorVXDCircleFitModule: event " << m_eventCounter
             << ": TC " << nTC
@@ -103,7 +102,7 @@ void QualityEstimatorVXDCircleFitModule::event()
             << ", chi^2: " << chi2
             << " and probability: " << probability);
 
-    aTC.setQualityIndex(probability); // TODO: do circleFit here!
+    aTC.setQualityIndex(probability);
     ++nTC;
   }
 }

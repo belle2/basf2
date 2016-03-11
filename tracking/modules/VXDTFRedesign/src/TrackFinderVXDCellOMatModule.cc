@@ -58,6 +58,12 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
            m_PARAMstrictSeeding,
            "Regulates if every subset of sufficient length of a path shall be collected as separate path or not (if true, only one path per possibility is collected, if false subsets are collected too.",
            bool(true));
+
+  addParam("removeVirtualIP",
+           m_PARAMremoveVirtualIP,
+           "If true, the virtual interaction Point will be removed from the track candidates.",
+           bool(true));
+
 }
 
 /** *************************************+************************************* **/
@@ -155,7 +161,7 @@ void TrackFinderVXDCellOMatModule::event()
 
 
   /// convert the raw paths to fullgrown SpacePoinTrackCands
-  unsigned int nCreated = m_sptcCreator.createSPTCs(m_TCs, collectedSpacePointPaths, true);
+  unsigned int nCreated = m_sptcCreator.createSPTCs(m_TCs, collectedSpacePointPaths, m_PARAMremoveVirtualIP);
   B2DEBUG(10, " TrackFinderVXDCellOMat-event" << m_eventCounter <<
           ": " << nCreated <<
           " TCs created and stored into StoreArray!")

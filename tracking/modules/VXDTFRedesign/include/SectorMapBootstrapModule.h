@@ -10,12 +10,14 @@
 
 #pragma once
 
+//framework:
 #include <framework/core/Module.h>
 
 #include <vector>
 #include <string>
 #include <tuple>
 
+#include <TFile.h>
 namespace Belle2 {
 
   class VXDTFSecMap;
@@ -39,7 +41,7 @@ namespace Belle2 {
     virtual void beginRun()     ;
     virtual void event()        ;
     virtual void endRun()       ;
-    virtual void terminate() { };
+    virtual void terminate()    ;
 
   private:
     void bootstrapSectorMap(void);
@@ -49,6 +51,7 @@ namespace Belle2 {
 
     const std::string c_setupKeyNameTTreeName     = "Setups";
     const std::string c_setupKeyNameBranchName      = "name";
+    TFile* m_tfile = nullptr;
 
   };
 } // Belle2 namespace

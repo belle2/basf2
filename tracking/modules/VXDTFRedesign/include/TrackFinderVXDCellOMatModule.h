@@ -108,6 +108,8 @@ namespace Belle2 {
      * if true, only one path per possibility is collected, if false subsets are collected too. */
     bool m_PARAMstrictSeeding;
 
+    /** If true, the virtual interaction Point will be removed from the track candidates. */
+    bool m_PARAMremoveVirtualIP = false;
 
 /// member variables
 

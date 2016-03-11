@@ -8,6 +8,7 @@
 
 #include <unistd.h>
 #include <cstdlib>
+#include <iostream>
 
 #include <framework/logging/Logger.h>
 
@@ -90,10 +91,12 @@ int main(int argc, char** argv)
           info.addInputNBytes(nbyte);
         }
         if (expno > data.getExpNumber() || runno > data.getRunNumber()) {
+          /*
           B2WARNING("storagein: old run event detected : exp="
                     << data.getExpNumber() << " runno="
                     << data.getRunNumber() << " current = ("
                     << expno << "," << runno << ")");
+          */
           continue;
         } else if (expno < data.getExpNumber() || runno < data.getRunNumber()) {
           expno = data.getExpNumber();
@@ -119,7 +122,7 @@ int main(int argc, char** argv)
                                 (count > 1000 && count < 10000 && count % 1000 == 0) ||
                                 (count > 10000 && count < 100000 && count % 10000 == 0) ||
                                 (count > 100000 && count < 1000000 && count % 100000 == 0))) {
-          B2INFO("Event count = " << count << " nword = " << nword);
+          std::cout << "[DEBUG] Event count = " << count << " nword = " << nword << std::endl;
         }
         count++;
         ibuf.write(data.getBuffer(), nword, true);

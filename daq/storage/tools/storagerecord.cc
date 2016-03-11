@@ -49,6 +49,24 @@ const unsigned long long GB = 1024 * 1024 * 1024;
 const unsigned long long MAX_FILE_SIZE = 2 * GB;
 const char* g_table = "fileinfo";
 
+std::string popen(const std::string& cmd)
+{
+  char buf[1000];
+  FILE* fp;
+  if ((fp = ::popen(cmd.c_str(), "r")) == NULL) {
+    perror("can not exec commad");
+    exit(EXIT_FAILURE);
+  }
+  std::stringstream ss;
+  while (!feof(fp)) {
+    memset(buf, 0, 1000);
+    fgets(buf, sizeof(buf), fp);
+    ss << buf << std::endl;
+  }
+  pclose(fp);
+  return ss.str();
+}
+
 class FileHandler {
 
 public:
@@ -75,7 +93,7 @@ public:
     try {
       m_db.connect();
       m_db.execute("select fileid, diskid from %s where expno = %d and runno = %d "
-                   "and path_daq like '%s:_%s' and runtype='%s' order by id desc;",
+                   "and path_sroot like '%s:_%s' and runtype='%s' order by id desc;",
                    g_table, expno, runno, m_host.c_str(), "%%", m_runtype.c_str());
       DBRecordList record_v(m_db.loadRecords());
       if (record_v.size() > 0) {
@@ -133,10 +151,22 @@ public:
       B2ERROR("Failed to open file : " << filename);
       exit(1);
     } else {
+      const char* belle2lib = getenv("BELLE2_LOCAL_DIR");
+      int rev = atoi(StringUtil::split(popen(StringUtil::form("svn info %s | grep \"Last Changed Rev:\"", belle2lib)), ':')[1].c_str());
+      int rev_daq = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/daq | grep \"Last Changed Rev:\"", belle2lib)),
+                                           ':')[1].c_str());
+      int rev_rawdata = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/rawdata | grep \"Last Changed Rev:\"", belle2lib)),
+                                               ':')[1].c_str());
+      int rev_svd = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/svd | grep \"Last Changed Rev:\"", belle2lib)),
+                                           ':')[1].c_str());
+      int rev_pxd = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/pxd | grep \"Last Changed Rev:\"", belle2lib)),
+                                           ':')[1].c_str());
       char sql[1000];
-      sprintf(sql, "insert into %s (path_daq, runtype, expno, runno, fileid, diskid, time_create)"
-              " values ('%s:%s', '%s', %d, %d, %d, %d, current_timestamp) returning id;",
-              g_table, m_host.c_str(), filename, m_runtype.c_str(), expno, runno, m_fileid, m_diskid);
+      sprintf(sql,
+              "insert into %s (path_sroot, runtype, expno, runno, fileid, diskid, rev, rev_daq, rev_rawdata, rev_svd, rev_pxd, time_create)"
+              " values ('%s:%s', '%s', %d, %d, %d, %d,  %d, %d, %d, %d, %d, current_timestamp) returning id;",
+              g_table, m_host.c_str(), filename, m_runtype.c_str(), expno, runno, m_fileid, m_diskid, rev, rev_daq, rev_rawdata, rev_svd,
+              rev_pxd);
       try {
         m_db.connect();
         m_db.execute(sql);
@@ -241,8 +271,6 @@ int main(int argc, char** argv)
                          config.get("database.user"),
                          config.get("database.password"),
                          config.getInt("database.port"));
-  unsigned int expno_tmp = 0;
-  unsigned int runno_tmp = 0;
   SharedEventBuffer obuf;
   if (obufsize > 0) obuf.open(obufname, obufsize * 1000000, true);
   if (use_info) info.reportReady();
@@ -267,6 +295,8 @@ int main(int argc, char** argv)
     if (!newrun || expno < iheader.expno || runno < iheader.runno) {
       newrun = true;
       isnew = true;
+      unsigned int expno_tmp = expno;
+      unsigned int runno_tmp = runno;
       expno = iheader.expno;
       runno = iheader.runno;
       if (use_info) {
@@ -285,12 +315,25 @@ int main(int argc, char** argv)
       oheader->expno = expno;
       oheader->runno = runno;
       obuf.unlock();
-      if (expno_tmp != expno || runno_tmp != runno) {
-        expno_tmp = 0;
-        runno_tmp = 0;
-      }
       if (file) file.close();
       file.open(path, ndisks, expno, runno);
+      if (expno_tmp > 0 || runno_tmp > 0) {
+        std::stringstream ss;
+        ss << "update " << g_table << " set time_runend = current_timestamp where expno = " << expno_tmp << " and runno = " << runno_tmp <<
+           " and time_runend is null;";
+        try {
+          db.connect();
+          db.execute(ss.str().c_str());
+          db.close();
+        } catch (const DBHandlerException& e) {
+          LogFile::error("Failed to update : %s", e.what());
+          return 1;
+        }
+        //std::string cmd = StringUtil::form("submit_filejob -e %d -r %d", expno_tmp, runno_tmp);
+        std::string cmd = StringUtil::form("submit_filejob -all");
+        system(cmd.c_str());
+        std::cout << "[INFO] " << cmd << std::endl;;
+      }
     }
     if (use_info) {
       info.addInputCount(1);

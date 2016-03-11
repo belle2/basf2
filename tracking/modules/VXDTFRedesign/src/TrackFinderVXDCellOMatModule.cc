@@ -155,7 +155,7 @@ void TrackFinderVXDCellOMatModule::event()
 
 
   /// convert the raw paths to fullgrown SpacePoinTrackCands
-  unsigned int nCreated = m_sptcCreator.createSPTCs(m_TCs, collectedSpacePointPaths);
+  unsigned int nCreated = m_sptcCreator.createSPTCs(m_TCs, collectedSpacePointPaths, true);
   B2DEBUG(10, " TrackFinderVXDCellOMat-event" << m_eventCounter <<
           ": " << nCreated <<
           " TCs created and stored into StoreArray!")

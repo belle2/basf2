@@ -152,14 +152,14 @@ public:
       exit(1);
     } else {
       const char* belle2lib = getenv("BELLE2_LOCAL_DIR");
-      int rev = atoi(StringUtil::split(popen(StringUtil::form("svn info %s | grep \"Last Changed Rev:\"", belle2lib)), ':')[1].c_str());
-      int rev_daq = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/daq | grep \"Last Changed Rev:\"", belle2lib)),
+      int rev = atoi(StringUtil::split(popen(StringUtil::form("svn info %s | grep Revision", belle2lib)), ':')[1].c_str());
+      int rev_daq = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/daq | grep Revision", belle2lib)),
                                            ':')[1].c_str());
-      int rev_rawdata = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/rawdata | grep \"Last Changed Rev:\"", belle2lib)),
+      int rev_rawdata = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/rawdata | grep Revision", belle2lib)),
                                                ':')[1].c_str());
-      int rev_svd = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/svd | grep \"Last Changed Rev:\"", belle2lib)),
+      int rev_svd = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/svd | grep Revision", belle2lib)),
                                            ':')[1].c_str());
-      int rev_pxd = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/pxd | grep \"Last Changed Rev:\"", belle2lib)),
+      int rev_pxd = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/pxd | grep Revision", belle2lib)),
                                            ':')[1].c_str());
       char sql[1000];
       sprintf(sql,

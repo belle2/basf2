@@ -35,7 +35,11 @@ RawSecMapMergerModule::RawSecMapMergerModule() : Module()
   addParam("rootFileNames", m_PARAMrootFileNames,
            "List of files (wildcards not allowed - use python glob.glob() to expand to list of files)", {"lowTestRedesign_454970355.root"});
 
-  addParam("mapNames", m_PARAMmapNames, "names of sectorMaps to be loaded. ", {""});
+  addParam("mapNames", m_PARAMmapNames, "names of sectorMaps to be loaded.", {""});
+
+  addParam("printFullGraphs", m_PARAMprintFullGraphs,
+           "If true, the full trained graphs will be printed to screen. WARNING: produces a lot of output for full detector-cases!",
+           bool(false));
 }
 
 
@@ -147,9 +151,9 @@ template <class FilterType> void RawSecMapMergerModule::trainGraph(
   // log all sector-combinations and determine their absolute number of appearances:
   for (auto i = 0 ;  i <= nEntries; i++) {
     if (percentMark < 1 or (i % percentMark) == 0) {
-      progressCounter += 10;
       B2INFO("RawSecMapMerger::trainGraph(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
              "% related, mainGraph has got " << mainGraph.size() << " sectors...")
+      progressCounter += 10;
     }
     auto thisEntry = chain->LoadTree(i);
 
@@ -192,9 +196,9 @@ template <class FilterType> SectorGraph<FilterType> RawSecMapMergerModule::build
   // log all sector-combinations and determine their absolute number of appearances:
   for (auto i = 0 ;  i <= nEntries; i++) {
     if (percentMark < 1 or (i % percentMark) == 0) {
-      progressCounter += 10;
       B2INFO("RawSecMapMerger::buildGraph(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
              "% related, mainGraph has got " << mainGraph.size() << " sectors...")
+      progressCounter += 10;
     }
     auto thisEntry = chain->LoadTree(i);
 
@@ -453,19 +457,33 @@ template <class FilterType> void RawSecMapMergerModule::add2HitFilters(VXDTFFilt
 
 
   /// JKL Feb 2016 - big working example:
+//   VXDTFFilters<SpacePoint>::twoHitFilter_t friendSectorsSegmentFilter =
+//     (
+//       (filterCutsMap.at("Distance3DSquared").getMin() <= Distance3DSquared<SpacePoint>() <=
+//        filterCutsMap.at("Distance3DSquared").getMax()).observe(VoidObserver()) &&
+//       (filterCutsMap.at("Distance2DXYSquared").getMin() <= Distance2DXYSquared<SpacePoint>() <=
+//        filterCutsMap.at("Distance2DXYSquared").getMax()).observe(VoidObserver()) &&
+//       (filterCutsMap.at("Distance1DZ").getMin() <= Distance1DZ<SpacePoint>() <= filterCutsMap.at("Distance1DZ").getMax()).observe(
+//         VoidObserver()) &&
+//       (filterCutsMap.at("SlopeRZ").getMin() <= SlopeRZ<SpacePoint>() <= filterCutsMap.at("SlopeRZ").getMax()).observe(VoidObserver()) &&
+//       (filterCutsMap.at("Distance3DNormed").getMin() <= Distance3DNormed<SpacePoint>() <=
+//        filterCutsMap.at("Distance3DNormed").getMax()).observe(VoidObserver())
+//     );
   VXDTFFilters<SpacePoint>::twoHitFilter_t friendSectorsSegmentFilter =
     (
-      (filterCutsMap.at("Distance3DSquared").getMin() <= Distance3DSquared<SpacePoint>() <=
-       filterCutsMap.at("Distance3DSquared").getMax()).observe(VoidObserver()) &&
-      (filterCutsMap.at("Distance2DXYSquared").getMin() <= Distance2DXYSquared<SpacePoint>() <=
-       filterCutsMap.at("Distance2DXYSquared").getMax()).observe(VoidObserver()) &&
-      (filterCutsMap.at("Distance1DZ").getMin() <= Distance1DZ<SpacePoint>() <= filterCutsMap.at("Distance1DZ").getMax()).observe(
-        VoidObserver()) &&
-      (filterCutsMap.at("SlopeRZ").getMin() <= SlopeRZ<SpacePoint>() <= filterCutsMap.at("SlopeRZ").getMax()).observe(VoidObserver()) &&
-      (filterCutsMap.at("Distance3DNormed").getMin() <= Distance3DNormed<SpacePoint>() <=
-       filterCutsMap.at("Distance3DNormed").getMax()).observe(VoidObserver())
+      (
+        (filterCutsMap.at("Distance3DSquared").getMin() <= Distance3DSquared<SpacePoint>() <=
+         filterCutsMap.at("Distance3DSquared").getMax()).observe(ObserverCheckMCPurity()) &&
+        (filterCutsMap.at("Distance2DXYSquared").getMin() <= Distance2DXYSquared<SpacePoint>() <=
+         filterCutsMap.at("Distance2DXYSquared").getMax()).observe(ObserverCheckMCPurity()) &&
+        (filterCutsMap.at("Distance1DZ").getMin() <= Distance1DZ<SpacePoint>() <= filterCutsMap.at("Distance1DZ").getMax()).observe(
+          ObserverCheckMCPurity()) &&
+        (filterCutsMap.at("SlopeRZ").getMin() <= SlopeRZ<SpacePoint>() <= filterCutsMap.at("SlopeRZ").getMax()).observe(
+          ObserverCheckMCPurity()) &&
+        (filterCutsMap.at("Distance3DNormed").getMin() <= Distance3DNormed<SpacePoint>() <=
+         filterCutsMap.at("Distance3DNormed").getMax()).observe(ObserverCheckMCPurity())
+      ).observe(ObserverCheckMCPurity())
     );
-
 
   // JKL Jan 2016 - standard version:
   // // // // // // //       (

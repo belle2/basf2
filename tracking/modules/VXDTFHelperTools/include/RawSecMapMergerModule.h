@@ -66,6 +66,8 @@ namespace Belle2 {
     /** contains names of sectorMaps to be loaded. */
     std::vector<std::string> m_PARAMmapNames;
 
+    /** If true, the full trained graphs will be printed to screen. WARNING: produces a lot of output for full detector-cases! */
+    bool m_PARAMprintFullGraphs;
     // ///////////////////////////////////////////////////////////////////////////////// member variables END:
   public:
 
@@ -327,7 +329,7 @@ namespace Belle2 {
       // checks for sectors which have inner neighbour and updates the sublayerID of the sensors.
       mainGraph.updateSubLayerIDs();
 
-      B2INFO("processSectorCombinations: training finished.\n" << mainGraph.print();)
+      B2INFO("processSectorCombinations: training finished.\n" << mainGraph.print(m_PARAMprintFullGraphs);)
 
       // TODO this is not yet capable of dealing with other than twoHitFilters. -> generalize!
       getSegmentFilters(config, mainGraph, xHitFilters, secChainLength);

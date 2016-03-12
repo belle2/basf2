@@ -39,6 +39,7 @@
 #include "tracking/trackFindingVXD/FilterTools/ObserverPrintResults.h"
 #include "tracking/trackFindingVXD/FilterTools/Observer.h" // empty observer
 #include "tracking/trackFindingVXD/FilterTools/VoidObserver.h" // empty observer
+#include "tracking/trackFindingVXD/FilterTools/ObserverCheckMCPurity.h"
 
 #include "tracking/trackFindingVXD/FilterTools/Observer3HitPrintResults.h"
 
@@ -67,13 +68,23 @@ namespace Belle2 {
 
     /// big working 2-hits-example used for redesign of VXDTF.
     typedef decltype(
-      (0. <= Distance3DSquared<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())&&
-      (0. <= Distance2DXYSquared<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())&&
-      (0. <= Distance1DZ<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())&&
-      (0. <= SlopeRZ<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())&&
-      (0. <= Distance3DNormed<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())
+      (
+        (0. <= Distance3DSquared<Belle2::SpacePoint>() <= 0.).observe(ObserverCheckMCPurity())&&
+        (0. <= Distance2DXYSquared<Belle2::SpacePoint>() <= 0.).observe(ObserverCheckMCPurity())&&
+        (0. <= Distance1DZ<Belle2::SpacePoint>() <= 0.).observe(ObserverCheckMCPurity())&&
+        (0. <= SlopeRZ<Belle2::SpacePoint>() <= 0.).observe(ObserverCheckMCPurity())&&
+        (0. <= Distance3DNormed<Belle2::SpacePoint>() <= 0.).observe(ObserverCheckMCPurity())
+      ).observe(ObserverCheckMCPurity())
     ) twoHitFilter_t;
 
+    // March9th2016: TODO: we want to use a big observer observing everything - Working title: MegaObserver.
+//  typedef decltype(
+//    ((0. <= Distance3DSquared<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())&&
+//    (0. <= Distance2DXYSquared<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())&&
+//    (0. <= Distance1DZ<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())&&
+//    (0. <= SlopeRZ<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())&&
+//    (0. <= Distance3DNormed<Belle2::SpacePoint>() <= 0.).observe(VoidObserver())).observe(VoidObserver())
+//  ) twoHitFilter_t;
 
     /// minimal working example for 3-hits:
 //  typedef decltype((0. <= Angle3DSimple<point_t>()   <= 0.).observe(Observer3HitPrintResults())) threeHitFilter_t;

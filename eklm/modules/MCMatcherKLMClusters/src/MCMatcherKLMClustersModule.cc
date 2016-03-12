@@ -34,6 +34,8 @@ MCMatcherKLMClustersModule::MCMatcherKLMClustersModule() : Module()
 {
   setDescription("Module for MC matching for KLM clusters.");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("Hit2dRelations", m_Hit2dRelations,
+           "Add also relations for BKLMHit2d and EKLMHit2d.", false);
 }
 
 MCMatcherKLMClustersModule::~MCMatcherKLMClustersModule()
@@ -44,7 +46,13 @@ void MCMatcherKLMClustersModule::initialize()
 {
   StoreArray<KLMCluster> klmClusters;
   StoreArray<MCParticle> mcParticles;
+  StoreArray<BKLMHit2d> bklmHit2ds;
+  StoreArray<EKLMHit2d> eklmHit2ds;
   klmClusters.registerRelationTo(mcParticles);
+  if (m_Hit2dRelations) {
+    bklmHit2ds.registerRelationTo(mcParticles);
+    eklmHit2ds.registerRelationTo(mcParticles);
+  }
 }
 
 void MCMatcherKLMClustersModule::beginRun()
@@ -55,7 +63,7 @@ void MCMatcherKLMClustersModule::event()
 {
   StoreArray<KLMCluster> klmClusters;
   int i1, i2, i3, i4, i5, i6, n1, n2, n3, n4, n5, n6;
-  std::set<MCParticle*> mcParticles;
+  std::set<MCParticle*> mcParticles, mcParticlesHit;
   std::set<MCParticle*>::iterator it;
   n1 = klmClusters.getEntries();
   for (i1 = 0; i1 < n1; i1++) {
@@ -64,6 +72,8 @@ void MCMatcherKLMClustersModule::event()
       klmClusters[i1]->getRelationsTo<BKLMHit2d>();
     n2 = bklmHit2ds.size();
     for (i2 = 0; i2 < n2; i2++) {
+      if (m_Hit2dRelations)
+        mcParticlesHit.clear();
       RelationVector<BKLMHit1d> bklmHit1ds =
         bklmHit2ds[i2]->getRelationsTo<BKLMHit1d>();
       n3 = bklmHit1ds.size();
@@ -79,19 +89,25 @@ void MCMatcherKLMClustersModule::event()
             RelationVector<MCParticle> bklmMCParticles =
               bklmSimHits[i5]->getRelationsFrom<MCParticle>();
             n6 = bklmMCParticles.size();
-            for (i6 = 0; i6 < n6; i6++)
+            for (i6 = 0; i6 < n6; i6++) {
               mcParticles.insert(bklmMCParticles[i6]);
+              if (m_Hit2dRelations)
+                mcParticlesHit.insert(bklmMCParticles[i6]);
+            }
           }
         }
       }
+      if (m_Hit2dRelations) {
+        for (it = mcParticlesHit.begin(); it != mcParticlesHit.end(); ++it)
+          bklmHit2ds[i2]->addRelationTo(*it);
+      }
     }
-    for (it = mcParticles.begin(); it != mcParticles.end(); ++it)
-      klmClusters[i1]->addRelationTo(*it);
-    mcParticles.clear();
     RelationVector<EKLMHit2d> eklmHit2ds =
       klmClusters[i1]->getRelationsTo<EKLMHit2d>();
     n2 = eklmHit2ds.size();
     for (i2 = 0; i2 < n2; i2++) {
+      if (m_Hit2dRelations)
+        mcParticlesHit.clear();
       RelationVector<EKLMDigit> eklmDigits =
         eklmHit2ds[i2]->getRelationsTo<EKLMDigit>();
       n3 = eklmDigits.size();
@@ -103,9 +119,16 @@ void MCMatcherKLMClustersModule::event()
           RelationVector<MCParticle> eklmMCParticles =
             eklmSimHits[i4]->getRelationsFrom<MCParticle>();
           n5 = eklmMCParticles.size();
-          for (i5 = 0; i5 < n5; i5++)
+          for (i5 = 0; i5 < n5; i5++) {
             mcParticles.insert(eklmMCParticles[i5]);
+            if (m_Hit2dRelations)
+              mcParticlesHit.insert(eklmMCParticles[i5]);
+          }
         }
+      }
+      if (m_Hit2dRelations) {
+        for (it = mcParticlesHit.begin(); it != mcParticlesHit.end(); ++it)
+          eklmHit2ds[i2]->addRelationTo(*it);
       }
     }
     for (it = mcParticles.begin(); it != mcParticles.end(); ++it)

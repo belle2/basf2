@@ -58,6 +58,11 @@ namespace Belle2 {
      */
     void terminate();
 
+  private:
+
+    /** Add relations for BKLMHit2d and EKLMHit2d. */
+    bool m_Hit2dRelations;
+
   };
 
 }

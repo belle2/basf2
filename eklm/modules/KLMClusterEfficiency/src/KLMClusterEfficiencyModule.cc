@@ -30,6 +30,9 @@ KLMClusterEfficiencyModule::KLMClusterEfficiencyModule() : Module()
   m_KL0Clusters = 0;
   m_PartlyKL0Clusters = 0;
   m_OtherClusters = 0;
+  m_ReconstructedKL0Clusters[0] = 0;
+  m_ReconstructedKL0Clusters[1] = 0;
+  m_ReconstructedKL0Clusters[2] = 0;
 }
 
 KLMClusterEfficiencyModule::~KLMClusterEfficiencyModule()
@@ -47,16 +50,17 @@ void KLMClusterEfficiencyModule::beginRun()
 void KLMClusterEfficiencyModule::event()
 {
   StoreArray<KLMCluster> klmClusters;
+  StoreArray<MCParticle> mcParticles;
   int i1, i2, n1, n2;
   bool haveKL0;
   n1 = klmClusters.getEntries();
   for (i1 = 0; i1 < n1; i1++) {
     haveKL0 = false;
-    RelationVector<MCParticle> mcParticles =
+    RelationVector<MCParticle> clusterMCParticles =
       klmClusters[i1]->getRelationsTo<MCParticle>();
-    n2 = mcParticles.size();
+    n2 = clusterMCParticles.size();
     for (i2 = 0; i2 < n2; i2++) {
-      if (mcParticles[i2]->getPDG() == 130)
+      if (clusterMCParticles[i2]->getPDG() == 130)
         haveKL0 = true;
     }
     if (haveKL0) {
@@ -67,6 +71,20 @@ void KLMClusterEfficiencyModule::event()
     } else
       m_OtherClusters++;
   }
+  n1 = mcParticles.getEntries();
+  for (i1 = 0; i1 < n1; i1++) {
+    if (mcParticles[i1]->getPDG() != 130)
+      continue;
+    RelationVector<KLMCluster> kl0Clusters =
+      mcParticles[i1]->getRelationsFrom<KLMCluster>();
+    n2 = kl0Clusters.size();
+    if (n2 == 0)
+      m_ReconstructedKL0Clusters[0]++;
+    else if (n2 == 1)
+      m_ReconstructedKL0Clusters[1]++;
+    else if (n2 >= 2)
+      m_ReconstructedKL0Clusters[2]++;
+  }
 }
 
 void KLMClusterEfficiencyModule::endRun()
@@ -75,7 +93,16 @@ void KLMClusterEfficiencyModule::endRun()
 
 void KLMClusterEfficiencyModule::terminate()
 {
-  printf("K_L0 clusters: %d\n(K_L0+other) clusters: %d\nOther clusters: %d\n",
-         m_KL0Clusters, m_PartlyKL0Clusters, m_OtherClusters);
+  B2INFO("Total number of KLM clusters: " << m_KL0Clusters +
+         m_PartlyKL0Clusters + m_OtherClusters);
+  B2INFO("K_L0 clusters: " << m_KL0Clusters);
+  B2INFO("(K_L0+other) clusters: " << m_PartlyKL0Clusters);
+  B2INFO("Other clusters: " << m_OtherClusters);
+  B2INFO("Total number of generated K_L0: " << m_ReconstructedKL0Clusters[0] +
+         m_ReconstructedKL0Clusters[1] + m_ReconstructedKL0Clusters[2]);
+  B2INFO("Nonreconstructed K_L0: " << m_ReconstructedKL0Clusters[0]);
+  B2INFO("K_L0 reconstructed as 1 cluster: " << m_ReconstructedKL0Clusters[1]);
+  B2INFO("K_L0 reconstructed as 2 or more clusters: " <<
+         m_ReconstructedKL0Clusters[2]);
 }
 

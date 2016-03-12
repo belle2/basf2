@@ -69,6 +69,9 @@ namespace Belle2 {
     /** Number of clusters from other particles. */
     int m_OtherClusters;
 
+    /** Number of K_L0 reconstructed as 0, 1, >= 2 clusters. */
+    int m_ReconstructedKL0Clusters[3];
+
   };
 
 }

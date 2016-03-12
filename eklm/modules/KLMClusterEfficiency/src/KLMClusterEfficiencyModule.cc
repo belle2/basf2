@@ -29,7 +29,10 @@ KLMClusterEfficiencyModule::KLMClusterEfficiencyModule() : Module()
 {
   int i;
   setDescription("Module for KLM cluster reconstruction efficiency studies.");
-  setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("OutputFile", m_OutputFileName, "Output file.",
+           std::string("KLMClusterEfficiency.root"));
+  m_OutputFile = NULL;
+  m_OutputTree = NULL;
   m_KL0Clusters = 0;
   m_PartlyKL0Clusters = 0;
   m_OtherClusters = 0;
@@ -44,6 +47,10 @@ KLMClusterEfficiencyModule::~KLMClusterEfficiencyModule()
 
 void KLMClusterEfficiencyModule::initialize()
 {
+  m_OutputFile = new TFile(m_OutputFileName.c_str(), "recreate");
+  m_OutputTree = new TTree("klm_cluster", "");
+  m_OutputTree->Branch("MaxClusterHitAngle", &m_MaxClusterHitAngle,
+                       "MaxClusterHitAngle/F");
 }
 
 void KLMClusterEfficiencyModule::beginRun()
@@ -54,7 +61,9 @@ void KLMClusterEfficiencyModule::event()
 {
   StoreArray<KLMCluster> klmClusters;
   StoreArray<MCParticle> mcParticles;
-  int i1, i2, n1, n2;
+  int i1, i2, i3, n1, n2, n3;
+  TVector3 clusterPosition, hitPosition;
+  float angle;
   bool haveKL0;
   n1 = klmClusters.getEntries();
   for (i1 = 0; i1 < n1; i1++) {
@@ -102,6 +111,29 @@ void KLMClusterEfficiencyModule::event()
         m_ReconstructedKL0ClustersEKLMBKLM++;
     } else if (n2 >= 3)
       m_ReconstructedKL0Clusters[3]++;
+    for (i2 = 0; i2 < n2; i2++) {
+      clusterPosition = kl0Clusters[i2]->getClusterPosition();
+      m_MaxClusterHitAngle = 0;
+      RelationVector<BKLMHit2d> bklmHit2ds =
+        kl0Clusters[i2]->getRelationsTo<BKLMHit2d>();
+      n3 = bklmHit2ds.size();
+      for (i3 = 0; i3 < n3; i3++) {
+        hitPosition = bklmHit2ds[i3]->getGlobalPosition();
+        angle = clusterPosition.Angle(hitPosition);
+        if (angle > m_MaxClusterHitAngle)
+          m_MaxClusterHitAngle = angle;
+      }
+      RelationVector<EKLMHit2d> eklmHit2ds =
+        kl0Clusters[i2]->getRelationsTo<EKLMHit2d>();
+      n3 = eklmHit2ds.size();
+      for (i3 = 0; i3 < n3; i3++) {
+        hitPosition = eklmHit2ds[i3]->getPosition();
+        angle = clusterPosition.Angle(hitPosition);
+        if (angle > m_MaxClusterHitAngle)
+          m_MaxClusterHitAngle = angle;
+      }
+    }
+    m_OutputTree->Fill();
   }
 }
 
@@ -126,5 +158,9 @@ void KLMClusterEfficiencyModule::terminate()
          m_ReconstructedKL0ClustersEKLMBKLM);
   B2INFO("K_L0 reconstructed as 3 or more clusters: " <<
          m_ReconstructedKL0Clusters[3]);
+  m_OutputFile->cd();
+  m_OutputTree->Write();
+  delete m_OutputTree;
+  delete m_OutputFile;
 }
 

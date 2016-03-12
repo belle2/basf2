@@ -11,6 +11,10 @@
 #ifndef KLMCLUSTEREFFICIENCYMODULE_H
 #define KLMCLUSTEREFFICIENCYMODULE_H
 
+/* External headers. */
+#include <TFile.h>
+#include <TTree.h>
+
 /* Belle2 headers. */
 #include <framework/core/Module.h>
 
@@ -59,6 +63,18 @@ namespace Belle2 {
     void terminate();
 
   private:
+
+    /** Output file name. */
+    std::string m_OutputFileName;
+
+    /** Output file. */
+    TFile* m_OutputFile;
+
+    /** Output tree. */
+    TTree* m_OutputTree;
+
+    /** Maximal angle between KLM cluster and its hits. */
+    float m_MaxClusterHitAngle;
 
     /** Number of clusters from a K_L0. */
     int m_KL0Clusters;

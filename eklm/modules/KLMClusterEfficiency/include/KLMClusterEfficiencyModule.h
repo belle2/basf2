@@ -67,6 +67,9 @@ namespace Belle2 {
     /** Output file name. */
     std::string m_OutputFileName;
 
+    /** Draw cluster histograms for this number of events. */
+    int m_EventsClusterHistograms;
+
     /** Output file. */
     TFile* m_OutputFile;
 

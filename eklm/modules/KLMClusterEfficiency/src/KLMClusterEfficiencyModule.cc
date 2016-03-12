@@ -11,6 +11,12 @@
 /* C++ headers. */
 #include <set>
 
+/* External headers. */
+#include <TH2F.h>
+#include <TMarker.h>
+#include <TCanvas.h>
+#include <TStyle.h>
+
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
@@ -31,6 +37,8 @@ KLMClusterEfficiencyModule::KLMClusterEfficiencyModule() : Module()
   setDescription("Module for KLM cluster reconstruction efficiency studies.");
   addParam("OutputFile", m_OutputFileName, "Output file.",
            std::string("KLMClusterEfficiency.root"));
+  addParam("EventsClusterHistograms", m_EventsClusterHistograms,
+           "Draw cluster histograms for this number of events.", 0);
   m_OutputFile = NULL;
   m_OutputTree = NULL;
   m_KL0Clusters = 0;
@@ -59,6 +67,7 @@ void KLMClusterEfficiencyModule::initialize()
   m_OutputTree->Branch("ClusterZ", &m_ClusterZ, "ClusterZ/F");
   m_OutputTree->Branch("MaxClusterHitAngle", &m_MaxClusterHitAngle,
                        "MaxClusterHitAngle/F");
+  gStyle->SetOptStat(0);
 }
 
 void KLMClusterEfficiencyModule::beginRun()
@@ -69,6 +78,8 @@ void KLMClusterEfficiencyModule::event()
 {
   StoreArray<KLMCluster> klmClusters;
   StoreArray<MCParticle> mcParticles;
+  static int nevent = 0;
+  char str[128];
   int i1, i2, i3, n1, n2, n3;
   TVector3 decayVertex, clusterPosition, hitPosition;
   float angle;
@@ -90,6 +101,92 @@ void KLMClusterEfficiencyModule::event()
         m_PartlyKL0Clusters++;
     } else
       m_OtherClusters++;
+  }
+  if (nevent < m_EventsClusterHistograms) {
+    static TH2F* hzx = new TH2F("hzx", "", 100, -300, 420, 100, -320, 320);
+    static TH2F* hzy = new TH2F("hzy", "", 100, -300, 420, 100, -320, 320);
+    static TH2F* hxy = new TH2F("hxy", "", 100, -320, 320, 100, -320, 320);
+    static TCanvas* c1 = new TCanvas();
+    static TMarker* clusterMarker = new TMarker(0, 0, 20);
+    static TMarker* hitMarker = new TMarker(0, 0, 21);
+    if (nevent == 0) {
+      hzx->GetXaxis()->SetTitle("z, cm");
+      hzx->GetYaxis()->SetTitle("x, cm");
+      hzy->GetXaxis()->SetTitle("z, cm");
+      hzy->GetYaxis()->SetTitle("y, cm");
+      hxy->GetXaxis()->SetTitle("x, cm");
+      hxy->GetYaxis()->SetTitle("y, cm");
+    }
+    hzx->Draw();
+    for (i1 = 0; i1 < n1; i1++) {
+      clusterMarker->SetMarkerColor(i1 + 1);
+      hitMarker->SetMarkerColor(i1 + 1);
+      clusterPosition = klmClusters[i1]->getClusterPosition();
+      clusterMarker->DrawMarker(clusterPosition.Z(), clusterPosition.X());
+      RelationVector<BKLMHit2d> bklmHit2ds =
+        klmClusters[i1]->getRelationsTo<BKLMHit2d>();
+      n2 = bklmHit2ds.size();
+      for (i2 = 0; i2 < n2; i2++) {
+        hitPosition = bklmHit2ds[i2]->getGlobalPosition();
+        hitMarker->DrawMarker(hitPosition.Z(), hitPosition.X());
+      }
+      RelationVector<EKLMHit2d> eklmHit2ds =
+        klmClusters[i1]->getRelationsTo<EKLMHit2d>();
+      n2 = eklmHit2ds.size();
+      for (i2 = 0; i2 < n2; i2++) {
+        hitPosition = eklmHit2ds[i2]->getPosition();
+        hitMarker->DrawMarker(hitPosition.Z(), hitPosition.X());
+      }
+    }
+    snprintf(str, 128, "clusters%dzx.eps", nevent);
+    c1->Print(str);
+    hzy->Draw();
+    for (i1 = 0; i1 < n1; i1++) {
+      clusterMarker->SetMarkerColor(i1 + 1);
+      hitMarker->SetMarkerColor(i1 + 1);
+      clusterPosition = klmClusters[i1]->getClusterPosition();
+      clusterMarker->DrawMarker(clusterPosition.Z(), clusterPosition.Y());
+      RelationVector<BKLMHit2d> bklmHit2ds =
+        klmClusters[i1]->getRelationsTo<BKLMHit2d>();
+      n2 = bklmHit2ds.size();
+      for (i2 = 0; i2 < n2; i2++) {
+        hitPosition = bklmHit2ds[i2]->getGlobalPosition();
+        hitMarker->DrawMarker(hitPosition.Z(), hitPosition.Y());
+      }
+      RelationVector<EKLMHit2d> eklmHit2ds =
+        klmClusters[i1]->getRelationsTo<EKLMHit2d>();
+      n2 = eklmHit2ds.size();
+      for (i2 = 0; i2 < n2; i2++) {
+        hitPosition = eklmHit2ds[i2]->getPosition();
+        hitMarker->DrawMarker(hitPosition.Z(), hitPosition.Y());
+      }
+    }
+    snprintf(str, 128, "clusters%dzy.eps", nevent);
+    c1->Print(str);
+    hxy->Draw();
+    for (i1 = 0; i1 < n1; i1++) {
+      clusterMarker->SetMarkerColor(i1 + 1);
+      hitMarker->SetMarkerColor(i1 + 1);
+      clusterPosition = klmClusters[i1]->getClusterPosition();
+      clusterMarker->DrawMarker(clusterPosition.X(), clusterPosition.Y());
+      RelationVector<BKLMHit2d> bklmHit2ds =
+        klmClusters[i1]->getRelationsTo<BKLMHit2d>();
+      n2 = bklmHit2ds.size();
+      for (i2 = 0; i2 < n2; i2++) {
+        hitPosition = bklmHit2ds[i2]->getGlobalPosition();
+        hitMarker->DrawMarker(hitPosition.X(), hitPosition.Y());
+      }
+      RelationVector<EKLMHit2d> eklmHit2ds =
+        klmClusters[i1]->getRelationsTo<EKLMHit2d>();
+      n2 = eklmHit2ds.size();
+      for (i2 = 0; i2 < n2; i2++) {
+        hitPosition = eklmHit2ds[i2]->getPosition();
+        hitMarker->DrawMarker(hitPosition.X(), hitPosition.Y());
+      }
+    }
+    snprintf(str, 128, "clusters%dxy.eps", nevent);
+    c1->Print(str);
+    nevent++;
   }
   n1 = mcParticles.getEntries();
   for (i1 = 0; i1 < n1; i1++) {

@@ -20,3 +20,4 @@ gearbox.initialize()
 
 algo = Belle2.EKLMTimeCalibrationAlgorithm()
 algo.execute()
+algo.commit()

@@ -24,14 +24,12 @@ EKLMAlignment::~EKLMAlignment()
 {
 }
 
-void EKLMAlignment::setAlignmentData(uint16_t segment,
-                                     EKLMAlignmentData* dat)
+void EKLMAlignment::setAlignmentData(uint16_t segment, EKLMAlignmentData* dat)
 {
   std::map<uint16_t, EKLMAlignmentData>::iterator it;
   it = m_data.find(segment);
   if (it == m_data.end())
-    m_data.insert(std::pair<uint16_t, EKLMAlignmentData>(
-                    segment, *dat));
+    m_data.insert(std::pair<uint16_t, EKLMAlignmentData>(segment, *dat));
   else
     B2WARNING("Alignment data for the segment already exists.");
 }

@@ -21,6 +21,7 @@
 
 /* Belle2 headers. */
 #include <eklm/calibration/EKLMTimeCalibrationAlgorithm.h>
+#include <eklm/dbobjects/EKLMTimeCalibration.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
@@ -47,11 +48,6 @@ static double CrystalBall(double* x, double* par)
   return par[0] * f;
 }
 
-static double Pol1(double* x, double* par)
-{
-  return *x * par[0] + par[1];
-}
-
 EKLMTimeCalibrationAlgorithm::EKLMTimeCalibrationAlgorithm() :
   CalibrationAlgorithm("EKLMTimeCalibrationCollector")
 {
@@ -65,27 +61,25 @@ EKLMTimeCalibrationAlgorithm::~EKLMTimeCalibrationAlgorithm()
 
 CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
 {
-  TFile* fOut = new TFile("TimeCalibration.root", "recreate");
-  TTree* tOut = new TTree("t_calibration", "");
-  const int maxbins = 40;
-  const int nbins = 25;
-  int i, j, n, bin, strip;
-  float mint[nbins];
-  float p0, p1, maxval;
-  char str[128];
-  double len;
+  int i, n, strip;
+  double s1, s2, k1, k2, dt, dl, effectiveLightSpeed;
+  double* averageDist, *averageTime, *timeShift, timeShift0;
   struct Event ev;
   std::vector<struct Event>* stripEvents;
   std::vector<struct Event>::iterator it;
-  TH1F* h[50], *h2[maxbins], *h3;
-  TF1* fcn, *fcn2;
+  EKLMTimeCalibration* calibration = new EKLMTimeCalibration();
+  EKLMTimeCalibrationData calibrationData;
+  bool* calibrateStrip;
+  TH1F* h, *h2;
+  TF1* fcn;
   TTree* t;
   TCanvas* c1 = new TCanvas();
-  tOut->Branch("p0", &p0, "p0/F");
-  tOut->Branch("p1", &p1, "p1/F");
   fcn = new TF1("fcn", CrystalBall, 0, 10, 6);
-  fcn2 = new TF1("fcn2", Pol1, 0, 10, 2);
   stripEvents = new std::vector<struct Event>[m_maxStrip];
+  averageDist = new double[m_maxStrip];
+  averageTime = new double[m_maxStrip];
+  timeShift = new double[m_maxStrip];
+  calibrateStrip = new bool[m_maxStrip];
   t = &getObject<TTree>("calibration_data");
   t->SetBranchAddress("time", &ev.time);
   t->SetBranchAddress("dist", &ev.dist);
@@ -95,82 +89,80 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
     t->GetEntry(i);
     stripEvents[strip - 1].push_back(ev);
   }
+  k1 = 0;
+  k2 = 0;
+  h = new TH1F("h", "", 200, -10., 10.);
+  h2 = new TH1F("h2", "", 200, -10., 10.);
   for (i = 0; i < m_maxStrip; i++) {
-    len = m_GeoDat->getStripLength(m_GeoDat->stripLocalNumber(i + 1)) /
-          CLHEP::mm * Unit::mm;
-    for (j = 0; j < nbins; j++) {
-      mint[j] = 200;
-    }
-    h[i] = new TH1F("h", "", nbins, 0, len);
+    n = stripEvents[i].size();
+    if (n < 2) {
+      B2WARNING("Not enough calibration data collected for strip "
+                << i + 1 << ".");
+      calibrateStrip[i] = false;
+      continue;
+    } else
+      calibrateStrip[i] = true;
+    averageDist[i] = 0;
+    averageTime[i] = 0;
     for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
-      if (it->dist >= len || it->dist < 0)
-        continue;
-      bin = floor(it->dist / len * nbins);
-      if (mint[bin] > it->time)
-        mint[bin] = it->time;
+      averageDist[i] = averageDist[i] + it->dist;
+      averageTime[i] = averageTime[i] + it->time;
     }
-    for (j = 0; j < nbins; j++) {
-      snprintf(str, 128, "h2_%d", j);
-      h2[j] = new TH1F(str, "", 100, mint[j], mint[j] + 10);
-    }
+    averageDist[i] = averageDist[i] / n;
+    averageTime[i] = averageTime[i] / n;
+    s1 = 0;
+    s2 = 0;
     for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
-      if (it->dist >= len || it->dist < 0)
-        continue;
-      bin = floor(it->dist / len * nbins);
-      h2[bin]->Fill(it->time);
+      dt = it->time - averageTime[i];
+      dl = it->dist - averageDist[i];
+      s1 = s1 + dt * dl;
+      s2 = s2 + dt * dt;
     }
-    for (j = 0; j < nbins; j++) {
-      fcn->SetParameter(0, h2[j]->Integral());
-      fcn->SetParameter(1, h2[j]->GetMean());
-      fcn->SetParameter(2, h2[j]->GetRMS());
-      fcn->SetParameter(3, h2[j]->GetRMS());
-      fcn->FixParameter(4, h2[j]->GetMean() + 1.0);
-      fcn->FixParameter(5, 1.0);
-      h2[j]->Fit("fcn");
-      fcn->ReleaseParameter(4);
-      fcn->ReleaseParameter(5);
-      h2[j]->Fit("fcn");
-      h[i]->SetBinContent(j + 1, fcn->GetParameter(1));
-      h[i]->SetBinError(j + 1, fcn->GetParError(1));
-      h2[j]->Draw();
-      c1->Print("fit1.eps");
-    }
-    h[i]->Fit("fcn2");
-    h[i]->Draw();
-    c1->Print("fit2.eps");
-    p0 = fcn2->GetParameter(0);
-    /*
-     * Shift of the most probable value is corrected from
-     * the distribution for the entire strip.
-     */
-    h3 = new TH1F("h3", "", 130, -3., 10.);
-    for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
-      if (it->dist >= len || it->dist < 0)
-        continue;
-      h3->Fill(it->time - it->dist * p0);
-    }
-    maxval = -1;
-    for (j = 1; j <= 130; j++) {
-      if (h3->GetBinContent(j) > maxval) {
-        maxval = h3->GetBinContent(j);
-        p1 =  h3->GetBinCenter(j);
-      }
-    }
-    tOut->Fill();
-    h3->Reset();
-    for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
-      if (it->dist >= len || it->dist < 0)
-        continue;
-      h3->Fill(it->time - (it->dist * p0 + p1));
-    }
-    snprintf(str, 128, "corrtime%d.eps", i);
-    c1->Print(str);
+    k1 = k1 + (n - 1) * s1;
+    k2 = k2 + (n - 1) * s2;
   }
-  fOut->cd();
-  tOut->Write();
-  delete tOut;
-  delete fOut;
+  effectiveLightSpeed = k1 / k2;
+  calibration->setEffectiveLightSpeed(effectiveLightSpeed);
+  for (i = 0; i < m_maxStrip; i++) {
+    if (!calibrateStrip[i])
+      continue;
+    timeShift[i] = averageTime[i] - averageDist[i] / effectiveLightSpeed;
+    for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
+      h->Fill(it->time - (timeShift[i] + it->dist / effectiveLightSpeed));
+    }
+  }
+  fcn->SetParameter(0, h->Integral());
+  fcn->SetParameter(1, h->GetMean());
+  fcn->SetParameter(2, h->GetRMS());
+  fcn->SetParameter(3, h->GetRMS());
+  fcn->FixParameter(4, h->GetMean() + 1.0);
+  fcn->FixParameter(5, 1.0);
+  h->Fit("fcn");
+  fcn->ReleaseParameter(4);
+  fcn->ReleaseParameter(5);
+  h->Fit("fcn");
+  timeShift0 = fcn->GetParameter(1);
+  h->Draw();
+  c1->Print("corrtime.eps");
+  for (i = 0; i < m_maxStrip; i++) {
+    if (!calibrateStrip[i])
+      continue;
+    timeShift[i] = timeShift[i] + timeShift0;
+    calibrationData.setTimeShift(timeShift[i]);
+    calibration->setTimeCalibrationData(i + 1, &calibrationData);
+    for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
+      h2->Fill(it->time - (timeShift[i] + it->dist / effectiveLightSpeed));
+    }
+  }
+  h2->Draw();
+  c1->Print("corrtime2.eps");
+  delete fcn;
   delete[] stripEvents;
+  delete[] averageDist;
+  delete[] averageTime;
+  delete[] timeShift;
+  delete[] calibrateStrip;
+  saveCalibration(calibration, "EKLMTimeCalibration", getIovFromData());
   return CalibrationAlgorithm::c_OK;
 }
 

@@ -12,10 +12,12 @@
 #define EKLMRECONSTRUCTORMODULE_H
 
 /* Belle2 headers. */
+#include <eklm/dbobjects/EKLMTimeCalibration.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
-#include <eklm/reconstruction/Reconstructor.h>
+#include <eklm/simulation/Digitizer.h>
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
 
@@ -63,13 +65,43 @@ namespace Belle2 {
      */
     virtual void terminate();
 
+    /**
+     * Get 2d hit time corresponding to EKLMDigit.
+     * @param[in] d    EKLMDigit.
+     * @param[in] dist Distance from 2d hit to SiPM.
+     */
+    double getTime(EKLMDigit* d, double dist);
+
+    /**
+     * Check whether hit has too small time.
+     * @param[in] pos  Hit position.
+     * @param[in] time HIt time.
+     */
+    bool fastHit(HepGeom::Point3D<double>& pos, double time);
+
+
   private:
+
+    /** Geometry data. */
+    const EKLM::GeometryData* m_GeoDat;
+
+    /** Number of strips. */
+    int m_nStrip;
 
     /** Transformation data. */
     EKLM::TransformData* m_TransformData;
 
-    /** Reconstructor. */
-    EKLM::Reconstructor* m_rec;
+    /** Digitization parameters. */
+    struct EKLM::DigitizationParams m_digPar;
+
+    /** Time calibration data. */
+    DBObjPtr<EKLMTimeCalibration> m_TimeCalibration;
+
+    /** Time calibration data for individual strips. */
+    EKLMTimeCalibrationData** m_TimeCalibrationData;
+
+    /** Default time calibration data. */
+    EKLMTimeCalibrationData m_DefaultTimeCalibrationData;
 
   };
 

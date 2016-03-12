@@ -66,39 +66,23 @@ static void merge2dClusters(std::vector<struct HitData>& hits,
                             std::vector<struct HitData>& newHits)
 {
   std::vector<struct HitData>::iterator it, it2, itStart, itEnd;
-  int layerRange[15];
-  int layer, currLayer;
-  int i, j;
+  int j;
   bool add;
   int s[2];
   int clust[2][2];
   double e, de;
   struct HitData dat;
   TVector3 newPosition;
-  /* Nothing to do. */
-  if (hits.size() <= 1)
-    return;
   dat.stat = c_Unknown;
-  /* Fill layer ranges. */
-  currLayer = 1;
-  layerRange[0] = 0;
-  for (it = hits.begin(); it != hits.end(); it++) {
-    layer = it->hit->getLayer();
-    if (layer > currLayer) {
-      for (i = currLayer; i < layer; i++)
-        layerRange[i] = it - hits.begin();
-      currLayer = layer;
-    }
-  }
-  for (i = currLayer; i < 15; i++)
-    layerRange[i] = hits.size();
   /* Clusterization. */
-  for (i = 0; i < 14; i++) {
-    itStart = hits.begin() + layerRange[i];
-    itEnd = hits.begin() + layerRange[i + 1];
-    /* Nothing to do. */
-    if (itEnd - itStart <= 1)
-      continue;
+  itStart = hits.begin();
+  while (itStart != hits.end()) {
+    itEnd = itStart;
+    while (itEnd != hits.end()) {
+      if (itStart->hit->getLayer() != itEnd->hit->getLayer())
+        break;
+      itEnd++;
+    }
     for (it = itStart; it != itEnd; it++) {
       if (it->stat != c_Unknown)
         continue;
@@ -156,6 +140,7 @@ static void merge2dClusters(std::vector<struct HitData>& hits,
       if (dat.hit != NULL)
         newHits.push_back(dat);
     }
+    itStart = itEnd;
   }
   /* Erase merged hits. */
   it = hits.begin();
@@ -185,6 +170,7 @@ static void findAssociatedHits(struct HitData* hit,
   CLHEP::Hep3Vector p;
   float mt, t, m;
   double v;
+  KLMCluster* klmCluster;
   /* Initially fill the cluster with the hit in question. */
   cluster.push_back(hit);
   hitPos.setX(hit->hit->getPositionX());
@@ -257,12 +243,9 @@ static void findAssociatedHits(struct HitData* hit,
   hit->stat = c_Cluster;
   /* Fill KLMClusters. */
   StoreArray<KLMCluster> klmClusters;
-  CLHEP::HepLorentzVector momentum4 =
-    CLHEP::HepLorentzVector(p, sqrt(p.mag2() + m * m));
-  KLMCluster* klmCluster = klmClusters.appendNew(
-                             hitPos.x(), hitPos.y(), hitPos.z(), mt, nLayers, nInnermostLayer,
-                             momentum4.x(), momentum4.y(), momentum4.z()
-                           );
+  klmCluster = klmClusters.appendNew(
+                 hitPos.x(), hitPos.y(), hitPos.z(), mt, nLayers,
+                 nInnermostLayer, p.x(), p.y(), p.z());
   /* Fill cluster-hit relation array */
   StoreArray<EKLMHit2d> hits2d;
   for (itClust = cluster.begin(); itClust != cluster.end(); ++itClust) {

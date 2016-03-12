@@ -73,8 +73,17 @@ namespace Belle2 {
     /** Output tree. */
     TTree* m_OutputTree;
 
-    /** Maximal angle between KLM cluster and its hits. */
-    float m_MaxClusterHitAngle;
+    /** MCParticle decay vertex X coordinate. */
+    float m_DecayVertexX;
+
+    /** MCParticle decay vertex Y coordinate. */
+    float m_DecayVertexY;
+
+    /** MCParticle decay vertex Z coordinate. */
+    float m_DecayVertexZ;
+
+    /** Maximal angle between MCParticle decay vertex and its hits. */
+    float m_MaxDecayVertexHitAngle;
 
     /** Cluster X coordinate. */
     float m_ClusterX;
@@ -84,6 +93,9 @@ namespace Belle2 {
 
     /** Cluster Z coordinate. */
     float m_ClusterZ;
+
+    /** Maximal angle between KLM cluster and its hits. */
+    float m_MaxClusterHitAngle;
 
     /** Number of clusters from a K_L0. */
     int m_KL0Clusters;

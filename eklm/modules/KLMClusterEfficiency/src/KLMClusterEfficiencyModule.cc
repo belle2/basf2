@@ -49,11 +49,16 @@ void KLMClusterEfficiencyModule::initialize()
 {
   m_OutputFile = new TFile(m_OutputFileName.c_str(), "recreate");
   m_OutputTree = new TTree("klm_cluster", "");
-  m_OutputTree->Branch("MaxClusterHitAngle", &m_MaxClusterHitAngle,
-                       "MaxClusterHitAngle/F");
+  m_OutputTree->Branch("DecayVertexX", &m_DecayVertexX, "DecayVertexX/F");
+  m_OutputTree->Branch("DecayVertexY", &m_DecayVertexY, "DecayVertexY/F");
+  m_OutputTree->Branch("DecayVertexZ", &m_DecayVertexZ, "DecayVertexZ/F");
+  m_OutputTree->Branch("MaxDecayVertexHitAngle", &m_MaxDecayVertexHitAngle,
+                       "MaxDecayVertexHitAngle/F");
   m_OutputTree->Branch("ClusterX", &m_ClusterX, "ClusterX/F");
   m_OutputTree->Branch("ClusterY", &m_ClusterY, "ClusterY/F");
   m_OutputTree->Branch("ClusterZ", &m_ClusterZ, "ClusterZ/F");
+  m_OutputTree->Branch("MaxClusterHitAngle", &m_MaxClusterHitAngle,
+                       "MaxClusterHitAngle/F");
 }
 
 void KLMClusterEfficiencyModule::beginRun()
@@ -65,7 +70,7 @@ void KLMClusterEfficiencyModule::event()
   StoreArray<KLMCluster> klmClusters;
   StoreArray<MCParticle> mcParticles;
   int i1, i2, i3, n1, n2, n3;
-  TVector3 clusterPosition, hitPosition;
+  TVector3 decayVertex, clusterPosition, hitPosition;
   float angle;
   bool haveKL0;
   n1 = klmClusters.getEntries();
@@ -90,6 +95,30 @@ void KLMClusterEfficiencyModule::event()
   for (i1 = 0; i1 < n1; i1++) {
     if (mcParticles[i1]->getPDG() != 130)
       continue;
+    decayVertex = mcParticles[i1]->getDecayVertex();
+    m_DecayVertexX = decayVertex.X();
+    m_DecayVertexY = decayVertex.Y();
+    m_DecayVertexZ = decayVertex.Z();
+    m_MaxDecayVertexHitAngle = 0;
+    RelationVector<BKLMHit2d> mcBKLMHit2ds =
+      mcParticles[i1]->getRelationsFrom<BKLMHit2d>();
+    n2 = mcBKLMHit2ds.size();
+    for (i2 = 0; i2 < n2; i2++) {
+      hitPosition = mcBKLMHit2ds[i2]->getGlobalPosition();
+      angle = decayVertex.Angle(hitPosition);
+      if (angle > m_MaxDecayVertexHitAngle)
+        m_MaxDecayVertexHitAngle = angle;
+    }
+    RelationVector<EKLMHit2d> mcEKLMHit2ds =
+      mcParticles[i1]->getRelationsFrom<EKLMHit2d>();
+    n2 = mcEKLMHit2ds.size();
+    for (i2 = 0; i2 < n2; i2++) {
+      hitPosition = mcEKLMHit2ds[i2]->getPosition();
+      angle = decayVertex.Angle(hitPosition);
+      if (angle > m_MaxDecayVertexHitAngle)
+        m_MaxDecayVertexHitAngle = angle;
+    }
+    n2 = mcEKLMHit2ds.size();
     RelationVector<KLMCluster> kl0Clusters =
       mcParticles[i1]->getRelationsFrom<KLMCluster>();
     n2 = kl0Clusters.size();

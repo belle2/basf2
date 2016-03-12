@@ -53,6 +53,7 @@ EKLMTimeCalibrationAlgorithm::EKLMTimeCalibrationAlgorithm() :
 {
   m_GeoDat = &(EKLM::GeometryData::Instance());
   m_maxStrip = m_GeoDat->getMaximalStripNumber();
+  m_Debug = false;
 }
 
 EKLMTimeCalibrationAlgorithm::~EKLMTimeCalibrationAlgorithm()
@@ -73,7 +74,9 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   TH1F* h, *h2;
   TF1* fcn;
   TTree* t;
-  TCanvas* c1 = new TCanvas();
+  TCanvas* c1;
+  if (m_Debug)
+    c1 = new TCanvas();
   fcn = new TF1("fcn", CrystalBall, 0, 10, 6);
   stripEvents = new std::vector<struct Event>[m_maxStrip];
   averageDist = new double[m_maxStrip];
@@ -137,13 +140,21 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   fcn->SetParameter(3, h->GetRMS());
   fcn->FixParameter(4, h->GetMean() + 1.0);
   fcn->FixParameter(5, 1.0);
-  h->Fit("fcn");
+  if (m_Debug)
+    h->Fit("fcn");
+  else
+    h->Fit("fcn", "n");
   fcn->ReleaseParameter(4);
   fcn->ReleaseParameter(5);
-  h->Fit("fcn");
+  if (m_Debug)
+    h->Fit("fcn");
+  else
+    h->Fit("fcn", "n");
   timeShift0 = fcn->GetParameter(1);
-  h->Draw();
-  c1->Print("corrtime.eps");
+  if (m_Debug) {
+    h->Draw();
+    c1->Print("corrtime.eps");
+  }
   for (i = 0; i < m_maxStrip; i++) {
     if (!calibrateStrip[i])
       continue;
@@ -154,8 +165,10 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
       h2->Fill(it->time - (timeShift[i] + it->dist / effectiveLightSpeed));
     }
   }
-  h2->Draw();
-  c1->Print("corrtime2.eps");
+  if (m_Debug) {
+    h2->Draw();
+    c1->Print("corrtime2.eps");
+  }
   delete fcn;
   delete[] stripEvents;
   delete[] averageDist;
@@ -164,5 +177,10 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   delete[] calibrateStrip;
   saveCalibration(calibration, "EKLMTimeCalibration", getIovFromData());
   return CalibrationAlgorithm::c_OK;
+}
+
+void EKLMTimeCalibrationAlgorithm::setDebug()
+{
+  m_Debug = true;
 }
 

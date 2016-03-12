@@ -19,5 +19,7 @@ gearbox = register_module('Gearbox')
 gearbox.initialize()
 
 algo = Belle2.EKLMTimeCalibrationAlgorithm()
+# Uncomment the following line to draw histograms.
+# algo.setDebug()
 algo.execute()
 algo.commit()

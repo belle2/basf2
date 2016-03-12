@@ -47,6 +47,11 @@ namespace Belle2 {
      */
     CalibrationAlgorithm::EResult calibrate();
 
+    /**
+     * Turn on debug mode (prints histograms).
+     */
+    void setDebug();
+
   private:
 
     /** Geometry data. */
@@ -55,8 +60,11 @@ namespace Belle2 {
     /** Maximal strip number (= total number of strips). */
     int m_maxStrip;
 
+    /** Debug mode. */
+    bool m_Debug;
+
     /** To make objects storable. */
-    ClassDef(EKLMTimeCalibrationAlgorithm, 1);
+    ClassDef(EKLMTimeCalibrationAlgorithm, 2);
 
   };
 

@@ -12,6 +12,8 @@
 #include <set>
 
 /* Belle2 headers. */
+#include <bklm/dataobjects/BKLMHit2d.h>
+#include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/modules/KLMClusterEfficiency/KLMClusterEfficiencyModule.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/datastore/RelationArray.h>
@@ -25,14 +27,15 @@ REG_MODULE(KLMClusterEfficiency)
 
 KLMClusterEfficiencyModule::KLMClusterEfficiencyModule() : Module()
 {
+  int i;
   setDescription("Module for KLM cluster reconstruction efficiency studies.");
   setPropertyFlags(c_ParallelProcessingCertified);
   m_KL0Clusters = 0;
   m_PartlyKL0Clusters = 0;
   m_OtherClusters = 0;
-  m_ReconstructedKL0Clusters[0] = 0;
-  m_ReconstructedKL0Clusters[1] = 0;
-  m_ReconstructedKL0Clusters[2] = 0;
+  for (i = 0; i < 4; i++)
+    m_ReconstructedKL0Clusters[i] = 0;
+  m_ReconstructedKL0ClustersEKLMBKLM = 0;
 }
 
 KLMClusterEfficiencyModule::~KLMClusterEfficiencyModule()
@@ -82,8 +85,23 @@ void KLMClusterEfficiencyModule::event()
       m_ReconstructedKL0Clusters[0]++;
     else if (n2 == 1)
       m_ReconstructedKL0Clusters[1]++;
-    else if (n2 >= 2)
+    else if (n2 == 2) {
       m_ReconstructedKL0Clusters[2]++;
+      RelationVector<BKLMHit2d> bklmHit2ds1 =
+        kl0Clusters[0]->getRelationsTo<BKLMHit2d>();
+      RelationVector<BKLMHit2d> bklmHit2ds2 =
+        kl0Clusters[1]->getRelationsTo<BKLMHit2d>();
+      RelationVector<EKLMHit2d> eklmHit2ds1 =
+        kl0Clusters[0]->getRelationsTo<EKLMHit2d>();
+      RelationVector<EKLMHit2d> eklmHit2ds2 =
+        kl0Clusters[1]->getRelationsTo<EKLMHit2d>();
+      if ((bklmHit2ds1.size() > 0 && eklmHit2ds1.size() == 0 &&
+           bklmHit2ds2.size() == 0 && eklmHit2ds2.size() > 0) ||
+          (bklmHit2ds1.size() == 0 && eklmHit2ds1.size() > 0 &&
+           bklmHit2ds2.size() > 0 && eklmHit2ds2.size() == 0))
+        m_ReconstructedKL0ClustersEKLMBKLM++;
+    } else if (n2 >= 3)
+      m_ReconstructedKL0Clusters[3]++;
   }
 }
 
@@ -99,10 +117,14 @@ void KLMClusterEfficiencyModule::terminate()
   B2INFO("(K_L0+other) clusters: " << m_PartlyKL0Clusters);
   B2INFO("Other clusters: " << m_OtherClusters);
   B2INFO("Total number of generated K_L0: " << m_ReconstructedKL0Clusters[0] +
-         m_ReconstructedKL0Clusters[1] + m_ReconstructedKL0Clusters[2]);
+         m_ReconstructedKL0Clusters[1] + m_ReconstructedKL0Clusters[2] +
+         m_ReconstructedKL0Clusters[3]);
   B2INFO("Nonreconstructed K_L0: " << m_ReconstructedKL0Clusters[0]);
   B2INFO("K_L0 reconstructed as 1 cluster: " << m_ReconstructedKL0Clusters[1]);
-  B2INFO("K_L0 reconstructed as 2 or more clusters: " <<
-         m_ReconstructedKL0Clusters[2]);
+  B2INFO("K_L0 reconstructed as 2 clusters: " << m_ReconstructedKL0Clusters[2]);
+  B2INFO("Including K_L0 reconstructed as 2 clusters (EKLM + BKLM): " <<
+         m_ReconstructedKL0ClustersEKLMBKLM);
+  B2INFO("K_L0 reconstructed as 3 or more clusters: " <<
+         m_ReconstructedKL0Clusters[3]);
 }
 

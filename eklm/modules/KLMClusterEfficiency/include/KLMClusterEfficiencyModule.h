@@ -70,7 +70,10 @@ namespace Belle2 {
     int m_OtherClusters;
 
     /** Number of K_L0 reconstructed as 0, 1, >= 2 clusters. */
-    int m_ReconstructedKL0Clusters[3];
+    int m_ReconstructedKL0Clusters[4];
+
+    /** Number of K_L0 reconstructed as 2 clusters, 1 in EKLM and 1 in BKLM. */
+    int m_ReconstructedKL0ClustersEKLMBKLM;
 
   };
 

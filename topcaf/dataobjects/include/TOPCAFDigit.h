@@ -22,14 +22,14 @@ namespace Belle2 {
 
     //--- Getters ---//
     topcaf_channel_id_t GetChannelID() const {return m_channel_id;}
-    int GetEventNumber() const {return m_evt_num;}
-    int GetRefWindow() const {return  m_asic_refwin;}
+    packet_word_t GetEventNumber() const {return m_evt_num;}
+    unsigned short GetRefWindow() const {return  m_asic_refwin;}
     size_t GetNumWaveSegments() const {return  m_nwave_seg;}
-    int GetASICWindow()const {return m_asic_win;}
-    int GetASIC() const {return m_asic;}
-    int GetASICChannel() const {return m_asic_ch;}
-    int GetASICRow() const {return m_asic_row;}
-    int GetASICColumn() const {return m_asic_col;}
+    packet_word_t GetASICWindow()const {return m_asic_win;}
+    unsigned short GetASIC() const {return m_asic;}
+    unsigned short GetASICChannel() const {return m_asic_ch;}
+    unsigned short GetASICRow() const {return m_asic_row;}
+    unsigned short GetASICColumn() const {return m_asic_col;}
     size_t GetNumSamples() const {return m_nsamples;}
     double GetTDCBin() const {return m_tdc_bin;}
     double GetWidth() const {return m_width;}

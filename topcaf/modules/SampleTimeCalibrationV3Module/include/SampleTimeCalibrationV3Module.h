@@ -14,15 +14,10 @@
 #include <topcaf/dataobjects/TOPCAFDigit.h>
 
 namespace Belle2 {
-
-  typedef struct {
+  struct hit_info {
     double sample1; // Sample number of first reference point
     double sample2; // sample number of second reference point
-  } hit_info;
-
-
-
-
+  };
 
   class SampleTimeCalibrationV3Module : public Module {
 

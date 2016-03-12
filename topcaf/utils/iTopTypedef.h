@@ -7,8 +7,6 @@
 #include <vector>
 
 
-
-
 //typedef unsigned int packet_word_t;
 typedef std::string TopElectronicConstructionName;
 typedef unsigned int TopPixelNumber;

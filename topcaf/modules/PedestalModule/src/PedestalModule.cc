@@ -91,7 +91,7 @@ void PedestalModule::beginRun()
       if (!cl->InheritsFrom("TProfile")) continue;
       TProfile* profile = (TProfile*)key->ReadObj();
       std::string name_key = profile->GetName();
-      topcaf_channel_id_t window_id = strtoul(name_key.c_str(), nullptr, 0);
+      topcaf_channel_id_t window_id = strtoull(name_key.c_str(), nullptr, 0);
       m_sample2ped[window_id] = profile;
     }
 

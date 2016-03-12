@@ -224,6 +224,7 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
     stripHit->setSiPMMCTime(fes->getMCTime());
     stripHit->setPosition(simHit->getPosition());
     stripHit->setGeneratedNPE(fes->getGeneratedNPE());
+    stripHit->addRelationTo(simHit);
     if (!fes->getFitStatus()) {
       stripHit->setTime(fes->getFitResults()->startTime);
       stripHit->setNPE(fes->getNPE());

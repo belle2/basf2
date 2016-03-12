@@ -39,7 +39,10 @@ EKLMDigitizerModule::~EKLMDigitizerModule()
 
 void EKLMDigitizerModule::initialize()
 {
-  StoreArray<EKLMDigit>::registerPersistent();
+  StoreArray<EKLMDigit> digits;
+  StoreArray<EKLMSimHit> simHits;
+  digits.registerInDataStore();
+  digits.registerRelationTo(simHits);
   if (m_CreateSim2Hits)
     StoreArray<EKLMSim2Hit>::registerPersistent();
   EKLM::setDefDigitizationParams(&m_digPar);

@@ -20,15 +20,15 @@ namespace Belle2 {
     // empty default constructor
     // do not remove. This is necessary to put this class in the event store
     EventHeaderPacket();
-    EventHeaderPacket(const unsigned int* temp_buffer, int nwords);
+    EventHeaderPacket(const packet_word_t* temp_buffer, int nwords);
 
     //--- Getters ---//
-    inline unsigned int GetFreezeDate() const {return m_freeze_date;}
-    inline int GetEventNumber() const {return m_evt_num;}
+    inline packet_word_t GetFreezeDate() const {return m_freeze_date;}
+    inline packet_word_t GetEventNumber() const {return m_evt_num;}
     inline bool GetEventTrigger() const {return (MASK_TRIGGER & m_trigger);} //use only 1st byte
     inline packet_word_t GetEventFlag() const {return (m_flag);}
-    inline int GetNumWaveformPackets() const {return m_nwaves;}
-    inline int GetNumAuxiliaryPackets() const {return m_aux;}
+    inline packet_word_t GetNumWaveformPackets() const {return m_nwaves;}
+    inline packet_word_t GetNumAuxiliaryPackets() const {return m_aux;}
     inline double GetFTSW() {return m_ftsw;}
 
     //--- Setters ---//

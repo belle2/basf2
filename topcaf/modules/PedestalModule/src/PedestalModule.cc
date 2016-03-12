@@ -35,11 +35,8 @@ PedestalModule::PedestalModule() : Module()
   addParam("outputFileName", m_out_ped_filename,
            "output filename written if mode==0 and writeFile==1, also used for conditions temporary output.",
            std::string("/tmp/temp_pedestal.root"));
-
-
   m_out_ped_file = nullptr;
   m_in_ped_file = nullptr;
-
 }
 
 PedestalModule::~PedestalModule() {}
@@ -58,7 +55,6 @@ void PedestalModule::initialize()
 
 void PedestalModule::beginRun()
 {
-
   StoreObjPtr<topFileMetaData> metadata_ptr;
   metadata_ptr.isRequired();
 
@@ -67,25 +63,19 @@ void PedestalModule::beginRun()
     m_run = metadata_ptr->getRun();
   }
 
-
   if (m_mode == 1) { // read pedestals
     TList* list;
-
     if (m_conditions == 1) { // read peds using conditions service
-
       B2INFO("Retrieving pedestal data from service.");
-
       std::string filename = (ConditionsService::getInstance()->getPayloadFileURL(this));
       m_in_ped_file = TFile::Open(filename.c_str(), "READ");
 
       B2INFO("Retrieving pedestal data from service. done");
     } else if (m_conditions == 0) { // read peds from local file
-
       m_in_ped_file = TFile::Open(m_in_ped_filename.c_str(), "READ");
-
     }
 
-    if (!m_in_ped_file) {
+    if (not m_in_ped_file) {
       list = nullptr;
       B2ERROR("Couldn't open input itop pedestal file: " << m_in_ped_filename);
     }  else {
@@ -119,15 +109,12 @@ void PedestalModule::event()
 
   if (evtwaves_ptr) {
     for (int c = 0; c < evtwaves_ptr.getEntries(); c++) {
-
       EventWaveformPacket* evtwave_ptr = evtwaves_ptr[c];
 
+      topcaf_channel_id_t channel_name = evtwave_ptr->GetChannelID() + evtwave_ptr->GetASICWindow();
       if (m_mode == 0) { // Calculate pedestals from waveform
-
-
-        topcaf_channel_id_t channel_name = evtwave_ptr->GetChannelID() + evtwave_ptr->GetASICWindow();
         const std::vector<double> v_samples = evtwave_ptr->GetSamples();
-        int nsamples = v_samples.size();
+        size_t nsamples = v_samples.size();
 
         B2DEBUG(1, "PedestalModule::GetChannelID(): " << evtwave_ptr->GetChannelID() << " ASIC Window: " << evtwave_ptr->GetASICWindow());
 
@@ -139,18 +126,10 @@ void PedestalModule::event()
                                        nsamples, 0, nsamples);
           m_sample2ped[channel_name] = channel_adc_h;
         }
-        for (int s = 0; s < nsamples; s++) {
-          double adc = (double) v_samples.at(s);
-          channel_adc_h->Fill(s, adc);
+        for (size_t s = 0; s < nsamples; s++) {
+          channel_adc_h->Fill(s, v_samples.at(s));
         }
       } else if (m_mode == 1) { // Apply pedestals to waveform
-
-        //      EventWaveformPacket *out_wp = new EventWaveformPacket(*evtwave_ptr);
-
-        //Bad channel ID need to improve!!!
-        topcaf_channel_id_t channel_name = evtwave_ptr->GetChannelID() + evtwave_ptr->GetASICWindow();
-        //      unsigned int window_id = GetWindowID(evtwave_ptr);
-
         //Look up reference pedestal and correct
         TProfile* ped_profile = m_sample2ped[channel_name];
         if (not ped_profile) {
@@ -158,24 +137,19 @@ void PedestalModule::event()
             B2WARNING("Problem retrieving itop pedestal data for channel " << channel_name << "!!!");
             evthead_ptr->SetFlag(405);
           }
-
         } else {
           std::vector<double> v_pedcorr_samples;
           std::vector<double> v_samples = evtwave_ptr->GetSamples();
-          for (unsigned int s = 0; s < v_samples.size(); s++) {
+          for (size_t s = 0; s < v_samples.size(); s++) {
             double this_ped = ped_profile->GetBinContent(s + 1);
             double this_sample = v_samples.at(s);
             double corr_sample = this_sample - this_ped;
             v_pedcorr_samples.push_back(corr_sample);
           }
           evtwave_ptr->SetSamples(v_pedcorr_samples);
-
         }
-
       }
-
     }
-
   }
 }
 
@@ -185,7 +159,6 @@ void  PedestalModule::terminate()
   if ((m_writefile == 1) || ((m_conditions == 1) && (m_mode == 0))) {
 
     //Save Channel sample adc info.
-
     if (m_conditions == 1) { // Use Conditions Service to save pedestals
 
       B2INFO("writing itop pedestals using Conditions Service - Payload Tag:" << GetPayloadTag()
@@ -209,39 +182,29 @@ void  PedestalModule::terminate()
         topcaf_channel_id_t key =  it_ct->first;
         m_sample2ped[key]->Write();
       }
-
       m_out_ped_file->Close();
-
-
       ConditionsService::getInstance()->writePayloadFile(tempFile, this);
-
     }
     if (m_writefile == 1) {
-
       B2INFO("writing itop pedestal file manually to " << m_out_ped_filename)
-
       m_out_ped_file = TFile::Open(m_out_ped_filename.c_str(), "recreate");
-
-      if (m_out_ped_file) {m_out_ped_file->cd();}
+      if (m_out_ped_file) {
+        m_out_ped_file->cd();
+      }
 
       std::map<topcaf_channel_id_t, TProfile*>::iterator it_ct = m_sample2ped.begin();
-
       for (; it_ct != m_sample2ped.end(); ++it_ct) {
         topcaf_channel_id_t key =  it_ct->first;
         m_sample2ped[key]->Write();
       }
-
     }
   }
-
   if (m_out_ped_file) {
     m_out_ped_file->Close();
     delete m_out_ped_file;
   }
-
   if (m_in_ped_file) {
     m_in_ped_file->Close();
     delete m_in_ped_file;
   }
-
 }

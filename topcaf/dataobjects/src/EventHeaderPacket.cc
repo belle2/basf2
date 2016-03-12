@@ -16,7 +16,7 @@ EventHeaderPacket::EventHeaderPacket()
 };
 
 
-EventHeaderPacket::EventHeaderPacket(const unsigned int* temp_buffer,
+EventHeaderPacket::EventHeaderPacket(const packet_word_t* temp_buffer,
                                      int nwords): Packet(temp_buffer, nwords)
 {
   m_type = m_packet_payload[0];

@@ -30,7 +30,7 @@ EventWaveformPacket::EventWaveformPacket()
 }
 
 
-EventWaveformPacket::EventWaveformPacket(const unsigned int* temp_buffer,
+EventWaveformPacket::EventWaveformPacket(const packet_word_t* temp_buffer,
                                          int nwords)
   : Packet(temp_buffer, nwords)
 {

@@ -2,32 +2,26 @@
 #define PedestalTool_H
 
 #include <framework/core/Module.h>
-
 #include <map>
 #include <string>
 #include <TH1D.h>
 #include <sstream>
 #include <TFile.h>
 #include <TProfile.h>
-
-
 #include <topcaf/dataobjects/EventWaveformPacket.h>
 #include <topcaf/dataobjects/EventHeaderPacket.h>
 
 namespace Belle2 {
   class PedestalModule : public Module {
-
   public:
 
     PedestalModule();
     ~PedestalModule();
 
-//
     void initialize();
     void beginRun();
     void event();
     void terminate();
-
 
     //Get the name and/or version of this algorithm
     std::string GetAlgName() {return getName();};
@@ -43,12 +37,7 @@ namespace Belle2 {
     //void SetPayloadTag(std::string newtag){m_payload_tag=newtag;};
     //void SetFinalRun(Int_t final_run){m_final_run=final_run;};
     //void SetInitialRun(Int_t initial_run){m_initial_run=initial_run;};
-
-
   private:
-
-    //method -- should be move to a util class (iTopUtils)
-    unsigned int GetWindowID(const EventWaveformPacket* wp);
 
     //var
     std::string m_out_ped_filename, m_in_ped_filename;
@@ -61,8 +50,6 @@ namespace Belle2 {
 
     std::string m_payload_tag, m_experiment, m_run;
     std::string m_initial_run, m_final_run;
-
-
   };
 }
 #endif

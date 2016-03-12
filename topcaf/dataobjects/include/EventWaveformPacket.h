@@ -32,20 +32,20 @@ namespace Belle2 {
 
   public:
     EventWaveformPacket();
-    EventWaveformPacket(const unsigned int* temp_buffer, int nwords);
+    EventWaveformPacket(const packet_word_t* temp_buffer, int nwords);
 
     ~EventWaveformPacket();
 
     //--- Getters ---//
     topcaf_channel_id_t GetChannelID() const {return m_channel_id;}
-    int GetEventNumber() const {return m_evt_num;}
-    int GetRefWindow() const {return  m_asic_refwin;}
+    packet_word_t GetEventNumber() const {return m_evt_num;}
+    unsigned short GetRefWindow() const {return  m_asic_refwin;}
     size_t GetNumWaveSegments() const {return  m_nwave_seg;}
-    int GetASICWindow()const {return m_asic_win;}
-    int GetASICChannel() const {return m_asic_ch;}
-    int GetASICRow() const {return m_asic_row;}
-    int GetASIC() const {return m_asic;}
-    int GetASICColumn() const {return m_asic_col;}
+    packet_word_t GetASICWindow()const {return m_asic_win;}
+    unsigned short GetASICChannel() const {return m_asic_ch;}
+    unsigned short GetASICRow() const {return m_asic_row;}
+    unsigned short GetASIC() const {return m_asic;}
+    unsigned short GetASICColumn() const {return m_asic_col;}
     size_t GetNumSamples() const {return m_nsamples;}
     std::vector< double > GetSamples() const {return v_samples;}
     std::vector< topcaf_hit_t > GetHits() const {return v_hits;}
@@ -89,9 +89,6 @@ namespace Belle2 {
 
     ClassDef(EventWaveformPacket, 1);
   };
-
-
-
 }
 
 

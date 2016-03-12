@@ -23,7 +23,7 @@ namespace Belle2 {
 
     Packet();
 
-    Packet(const unsigned int* temp_buffer, int nwords);
+    Packet(const packet_word_t* temp_buffer, int nwords);
 
     //--- Getters ---//
     int GetPacketType() const {return m_type;}

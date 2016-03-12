@@ -9,11 +9,11 @@ Packet::Packet()
   m_scrod_id = -1;
 }
 
-Packet::Packet(const unsigned int* temp_buffer, int nwords) : TObject()
+Packet::Packet(const packet_word_t* temp_buffer, int nwords) : TObject()
 {
-  for (int i = 0; i < nwords; i++)
+  for (int i = 0; i < nwords; i++) {
     m_packet_payload.push_back(temp_buffer[i]);
-
+  }
   m_type      = m_packet_payload[0];
   m_scrod_rev = (m_packet_payload[1] & MASK_SCROD_REV) >> 16;
   m_scrod_id  = (m_packet_payload[1] & MASK_SCROD_ID);

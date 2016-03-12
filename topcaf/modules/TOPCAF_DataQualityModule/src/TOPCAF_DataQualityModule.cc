@@ -81,19 +81,19 @@ TOPCAF_DataQualityModule::drawWaveforms(EventWaveformPacket* ewp)
   if (scrodid == 0) {
     return;
   }
-  int asicid = v.GetASICRow() + 4 * v.GetASICColumn();
-  if (m_channelLabels[scrodid].find(asicid) == m_channelLabels[scrodid].end()) {
-    string gname = string("channels") + to_string(scrodid) + string("_") + to_string(asicid);
-    m_channels[scrodid].insert(make_pair(asicid, new TMultiGraph(gname.c_str(), gname.c_str())));
+  string gname = string("scrod_") + to_string(scrodid) + string("_carrier") + to_string(v.GetASICRow()) + string("_asic") + to_string(
+                   v.GetASICColumn());
+  if (m_channelLabels[scrodid].find(gname) == m_channelLabels[scrodid].end()) {
+    m_channels[scrodid].insert(make_pair(gname, new TMultiGraph(gname.c_str(), gname.c_str())));
   }
   // for plotting purposes, only look at one waveform per channel
   // The data doesn't come in order, so we need to make sure we haven's see this particular channel, yet
   int iChannel = v.GetASICChannel();
-  if (m_channelLabels[scrodid][asicid].find(iChannel) != m_channelLabels[scrodid][asicid].end()) {
-    return;
-  }
-  m_channelLabels[scrodid][asicid].insert(iChannel);
-  TMultiGraph* mg = m_channels[scrodid][asicid];
+  // if (m_channelLabels[scrodid][asicid].find(iChannel) != m_channelLabels[scrodid][asicid].end()) {
+  //   return;
+  // }
+  m_channelLabels[scrodid][gname].insert(iChannel);
+  TMultiGraph* mg = m_channels[scrodid][gname];
 
   vector<double> x;
   // create the x axis
@@ -152,14 +152,14 @@ void TOPCAF_DataQualityModule::endRun()
   if (m_DRAWWAVES) {
     for (auto scrod_it : m_channels) {
       int scrodid = scrod_it.first;
-      string name = string("scrod_") + to_string(scrodid) + string("calib");
+      string name = string("scrod_") + to_string(scrodid);
       TCanvas* c = new TCanvas(name.c_str(), name.c_str());
       c->Divide(4, 4);
+      int asicid = 1;
       for (auto graph_it : scrod_it.second) {
-        int asicid = graph_it.first;
-        c->cd(asicid + 1);
+        string gname = graph_it.first;
+        c->cd(asicid);
         TMultiGraph* mg = graph_it.second;
-        string gname = name + string("asic_") + to_string(asicid);
         // 8 channels per asic
         int nSamples = 0;
         TIter next(mg->GetListOfGraphs());
@@ -177,6 +177,7 @@ void TOPCAF_DataQualityModule::endRun()
         h->SetStats(0);
         h->Draw();
         mg->Draw("P");
+        asicid += 1;
       }
       TDirectory* oldDir = gDirectory;
       m_directory->cd();

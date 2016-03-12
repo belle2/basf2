@@ -44,8 +44,8 @@ namespace Belle2 {
     std::map<topcaf_channel_id_t, TH1F*> m_channelNoiseMap; // histogram of the values after correction;
     std::map<topcaf_channel_id_t, int> m_channelEventMap; // to find in which chunk a given channel is
 
-    std::map<int, std::map<int, TMultiGraph*>> m_channels; // per board stack, per asic
-    std::map<int, std::map<int, std::set<int>>> m_channelLabels; // per board stack, per asic
+    std::map<int, std::map<std::string, TMultiGraph*>> m_channels; // per board stack, per asic
+    std::map<int, std::map<std::string, std::set<int>>> m_channelLabels; // per board stack, per asic
 
     bool m_DRAWWAVES;
     bool m_DEBUGGING;

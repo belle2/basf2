@@ -94,17 +94,20 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   }
   k1 = 0;
   k2 = 0;
-  h = new TH1F("h", "", 200, -10., 10.);
-  h2 = new TH1F("h2", "", 200, -10., 10.);
   for (i = 0; i < m_maxStrip; i++) {
     n = stripEvents[i].size();
     if (n < 2) {
       B2WARNING("Not enough calibration data collected for strip "
                 << i + 1 << ".");
-      calibrateStrip[i] = false;
-      continue;
-    } else
-      calibrateStrip[i] = true;
+      delete fcn;
+      delete[] stripEvents;
+      delete[] averageDist;
+      delete[] averageTime;
+      delete[] timeShift;
+      delete[] calibrateStrip;
+      return CalibrationAlgorithm::c_NotEnoughData;
+    }
+    calibrateStrip[i] = true;
     averageDist[i] = 0;
     averageTime[i] = 0;
     for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
@@ -140,6 +143,8 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   fcn->SetParameter(3, h->GetRMS());
   fcn->FixParameter(4, h->GetMean() + 1.0);
   fcn->FixParameter(5, 1.0);
+  h = new TH1F("h", "", 200, -10., 10.);
+  h2 = new TH1F("h2", "", 200, -10., 10.);
   if (m_Debug)
     h->Fit("fcn");
   else

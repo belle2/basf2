@@ -84,8 +84,8 @@ void EKLMReconstructorModule::beginRun()
       m_TimeCalibrationData[i] =
         m_TimeCalibration->getTimeCalibrationData(i + 1);
       if (m_TimeCalibrationData[i] == NULL) {
-        B2WARNING("EKLM time calibration data is missing for strip "
-                  << i + 1 << ".");
+        B2FATAL("EKLM time calibration data is missing for strip "
+                << i + 1 << ".");
         m_TimeCalibrationData[i] = &m_DefaultTimeCalibrationData;
       }
     }

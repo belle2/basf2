@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Generates default EKLM alignment data (zero misalignemnts).
+# Study of EKLM alignment limits.
 
 import os
 import random

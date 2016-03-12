@@ -76,6 +76,15 @@ namespace Belle2 {
     /** Maximal angle between KLM cluster and its hits. */
     float m_MaxClusterHitAngle;
 
+    /** Cluster X coordinate. */
+    float m_ClusterX;
+
+    /** Cluster Y coordinate. */
+    float m_ClusterY;
+
+    /** Cluster Z coordinate. */
+    float m_ClusterZ;
+
     /** Number of clusters from a K_L0. */
     int m_KL0Clusters;
 

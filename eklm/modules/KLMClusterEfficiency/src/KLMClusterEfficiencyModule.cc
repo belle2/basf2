@@ -51,6 +51,9 @@ void KLMClusterEfficiencyModule::initialize()
   m_OutputTree = new TTree("klm_cluster", "");
   m_OutputTree->Branch("MaxClusterHitAngle", &m_MaxClusterHitAngle,
                        "MaxClusterHitAngle/F");
+  m_OutputTree->Branch("ClusterX", &m_ClusterX, "ClusterX/F");
+  m_OutputTree->Branch("ClusterY", &m_ClusterY, "ClusterY/F");
+  m_OutputTree->Branch("ClusterZ", &m_ClusterZ, "ClusterZ/F");
 }
 
 void KLMClusterEfficiencyModule::beginRun()
@@ -113,6 +116,9 @@ void KLMClusterEfficiencyModule::event()
       m_ReconstructedKL0Clusters[3]++;
     for (i2 = 0; i2 < n2; i2++) {
       clusterPosition = kl0Clusters[i2]->getClusterPosition();
+      m_ClusterX = clusterPosition.X();
+      m_ClusterY = clusterPosition.Y();
+      m_ClusterZ = clusterPosition.Z();
       m_MaxClusterHitAngle = 0;
       RelationVector<BKLMHit2d> bklmHit2ds =
         kl0Clusters[i2]->getRelationsTo<BKLMHit2d>();
@@ -132,8 +138,8 @@ void KLMClusterEfficiencyModule::event()
         if (angle > m_MaxClusterHitAngle)
           m_MaxClusterHitAngle = angle;
       }
+      m_OutputTree->Fill();
     }
-    m_OutputTree->Fill();
   }
 }
 

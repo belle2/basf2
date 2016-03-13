@@ -82,8 +82,6 @@ void QualityEstimatorVXDCircleFitModule::event()
         0};
       convertedPathrawData.push_back(std::move(convertedHit));
       convertedPath.push_back(&convertedPathrawData.back());
-
-      auto assigned = aHit->getIfClustersAssigned();
     }
 
     fitter.resetValues(&convertedPath);

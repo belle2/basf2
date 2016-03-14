@@ -352,15 +352,12 @@ NeuroTrigger::getInputPattern(unsigned isector)
 {
   StoreArray<CDCTriggerSegmentHit> hits("CDCTriggerSegmentHits");
   CDCTriggerMLP& expert = m_MLPs[isector];
-  CDCGeometryPar& cdc = CDCGeometryPar::Instance(); // to transform TDCCount
   unsigned short hitPattern = 0;
   // loop over hits
   for (int ihit = 0; ihit < hits.getEntries(); ++ ihit) {
     unsigned short iSL = hits[ihit]->getISuperLayer();
-    // get drift time from TDCCount
-    // tentative, should use trigger event time
-    int t = hits[ihit]->getTDCCountWithoutOffset(cdc.getT0(WireID(hits[ihit]->getID())),
-                                                 cdc.getTdcBinWidth());
+    // get priority time (TODO: get event time)
+    int t = hits[ihit]->priorityTime();
     if (t < 0 || t > expert.getTMax()) continue;
     double relId = getRelId(*hits[ihit]);
     if (expert.isRelevant(relId, iSL)) {
@@ -377,7 +374,6 @@ NeuroTrigger::getInputVector(unsigned isector)
 {
   StoreArray<CDCTriggerSegmentHit> hits("CDCTriggerSegmentHits");
   CDCTriggerMLP& expert = m_MLPs[isector];
-  CDCGeometryPar& cdc = CDCGeometryPar::Instance(); // to transform TDCCount
   // prepare empty input vector and vectors to keep best drift times
   vector<float> inputVector;
   inputVector.assign(expert.nNodesLayer(0), 0.);
@@ -396,10 +392,8 @@ NeuroTrigger::getInputVector(unsigned isector)
       continue;
     }
     int priority = hits[ihit]->getPriorityPosition();
-    // get drift time from TDCCount
-    // tentative, should use trigger event time
-    int t = hits[ihit]->getTDCCountWithoutOffset(cdc.getT0(WireID(hits[ihit]->getID())),
-                                                 cdc.getTdcBinWidth());
+    // get priority time (TODO: get event time)
+    int t = hits[ihit]->priorityTime();
     if (t < 0) continue;
     int LR = hits[ihit]->getLeftRight();
     double relId = getRelId(*hits[ihit]);

@@ -85,13 +85,13 @@ const TRGCDCWire & fasterWire(const TRGCDCWire*, const TRGCDCWire*)const;
     unsigned lutPattern(void) const;
 
 /// return fastest time in TSHit.
-float fastestTime(void)const;
+float fastestTime(void) const;
 
 /// return found time in TSHit.
 float foundTime(void)const;
 
 /// return priority time in TSHit.
-float priorityTime(void);
+float priorityTime(void) const;
 
 /// return priority cell position in TSHit. 0: no hit, 3: 1st priority, 1: 2nd right, 2: 2nd left
 int priorityPosition(void)const;

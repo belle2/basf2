@@ -1010,16 +1010,11 @@ namespace Belle2 {
         TCWire& w = *(TCWire*) wire(layerId, wireId);
 
         //...TDC count...
-        // For common start mode. [For before r15735 revision]
-        //const int tdcCount = h.getTDCCount();
-        //[FIXME] For common stop mode. Should make a better solution.
-        const int tdcCount = (8192.) / m_cdcp->getTdcBinWidth() - h.getTDCCount();
-        // A more flexable fix, but not a goot solution.
-        //const int tdcCount = m_cdcp->getT0(WireID(h.getID())) - h.getTDCCount();
-        //cout<<"[TRGCDC] t0["<<h.getID()<<"]: "<<m_cdcp->getT0(WireID(h.getID()))<<endl;
+        const int tdcCount = floor((m_cdcp->getT0(WireID(h.getID())) / m_cdcp->getTdcBinWidth()
+                                    + 0.5 - h.getTDCCount()) / 2);
 
         //...Drift length from TDC...
-        const float driftLength = tdcCount * (40. / 10000.);
+        const float driftLength = tdcCount * 2 * m_cdcp->getTdcBinWidth() * m_cdcp->getNominalDriftV();
         const float driftLengthError = 0.013;
 
         //...Trigger timing...
@@ -2130,7 +2125,10 @@ namespace Belle2 {
         storeSegmentHits.appendNew(*priorityHit,
                                    segment->id(),
                                    segment->priorityPosition(),
-                                   segment->LUT()->getValue(segment->lutPattern()));
+                                   segment->LUT()->getValue(segment->lutPattern()),
+                                   segment->priorityTime(),
+                                   segment->fastestTime(),
+                                   segment->foundTime());
       _tss[segment->id()]->storeHit(storeHit);
       // relation to all CDCHits in segment
       for (unsigned iw = 0; iw < segment->wires().size(); ++iw) {

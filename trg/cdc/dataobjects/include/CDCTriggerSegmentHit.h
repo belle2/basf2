@@ -13,25 +13,25 @@ namespace Belle2 {
   public:
     /** default constructor. */
     CDCTriggerSegmentHit():
-      CDCHit(), m_segmentID(0), m_priorityPosition(0), m_leftRight(0)
+      CDCHit(), m_segmentID(0), m_priorityPosition(0), m_leftRight(0), m_priorityTime(0), m_fastestTime(0), m_foundTime(0)
     { }
 
     /** copy constructor. */
     CDCTriggerSegmentHit(const CDCHit& centerHit,
                          unsigned short segmentID,
                          unsigned short priorityPosition,
-                         unsigned short leftRight):
+                         unsigned short leftRight,
+                         short priorityTime,
+                         short fastestTime,
+                         short foundTime):
       CDCHit(centerHit.getTDCCount(), centerHit.getADCCount(),
              centerHit.getISuperLayer(), centerHit.getILayer(), centerHit.getIWire()),
-      m_segmentID(segmentID), m_priorityPosition(priorityPosition), m_leftRight(leftRight)
+      m_segmentID(segmentID), m_priorityPosition(priorityPosition), m_leftRight(leftRight),
+      m_priorityTime(priorityTime), m_fastestTime(fastestTime), m_foundTime(foundTime)
     { }
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerSegmentHit() { }
-
-    //modifiers
-    /** set left/right information (e.g. if left/right is updated during fit) */
-    void setLeftRight(unsigned short LR) { m_leftRight = LR; }
 
     //accessors
     /** get continuous ID of the track segment [0, 2335] */
@@ -42,14 +42,14 @@ namespace Belle2 {
     /** get position of the priority cell relative to the track
      *  (0: no hit, 1: right, 2: left, 3: not determined) */
     unsigned short getLeftRight() const { return m_leftRight; }
-    /** get TDC count without offset.
-     * default offset and binwidth are current values applied by the CDCDigitizer. */
-    short getTDCCountWithoutOffset(short offset = 8192, double binwidth = 1. / 1.017774) const
-    {
-      return offset - m_tdcCount * binwidth;
-    }
     /** true if LeftRight position is determined */
     bool LRknown() const { return (m_leftRight == 1 || m_leftRight == 2); }
+    /** get hit time of priority cell in trigger clocks */
+    short priorityTime() const { return m_priorityTime; }
+    /** get time of first hit in the track segment in trigger clocks */
+    short fastestTime() const { return m_fastestTime; }
+    /** get time when segment hit was found in trigger clocks */
+    short foundTime() const { return m_foundTime; }
 
   protected:
     /** continuous ID of the track segment */
@@ -60,9 +60,15 @@ namespace Belle2 {
     /** position of the priority cell relative to the track:
      *  0: no hit, 1: right, 2: left, 3: not determined */
     unsigned short m_leftRight;
+    /** hit time of priority cell in trigger clocks (~ 2ns) */
+    short m_priorityTime;
+    /** time of first hit in the track segment in trigger clocks (~ 2ns) */
+    short m_fastestTime;
+    /** time when segment hit was found in trigger clocks (~ 2ns) */
+    short m_foundTime;
 
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerSegmentHit, 2);
+    ClassDef(CDCTriggerSegmentHit, 3);
   };
 }
 #endif

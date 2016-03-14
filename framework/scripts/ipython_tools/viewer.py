@@ -192,12 +192,12 @@ class ModuleViewer(Basf2Widget):
         #: Template for the row of parameters
         self.table_row_parameters = """<tr><td {td_style}>{param.name}</td>
                                       <td{color_text} {td_style}>{param.values}</td>
-                                      <td style="color: gray; {td_style}>{param.default}</td></tr>"""
+                                      <td style="color: gray; {td_style}>{default}</td></tr>"""
 
         #: Template for the row with help
         self.table_row_help = """<tr><td {td_style}>{param.name}</td>
                                       <td {td_style}>{param.type}</td>
-                                      <td {td_style}>{param.values}</td>
+                                      <td {td_style}>{default}</td>
                                       <td style="color: gray; {td_style}>{param.description}</td></tr>"""
 
         #: Template for the simple row
@@ -245,12 +245,17 @@ class ModuleViewer(Basf2Widget):
             for param in self.module.available_params():
                 color_text = self.get_color_code(param)
 
+                if not param.default:
+                    default = "-"
+                else:
+                    default = param.default
+
                 if self.standalone:
                     table_row_html = self.table_row_help
                 else:
                     table_row_html = self.table_row_parameters
 
-                html.value += table_row_html.format(param=param, color_text=color_text, td_style=self.td_html)
+                html.value += table_row_html.format(param=param, color_text=color_text, td_style=self.td_html, default=default)
         html.value += "</table>"
 
         return html

@@ -19,7 +19,7 @@
 #define NW_RAW_HEADER 12
 #define NW_RAW_TRAILER 2
 
-#define REDUCED_DATA
+//#define REDUCED_DATA
 
 #ifdef REDUCED_DATA
 #define NW_COPPER_HEADER 0
@@ -215,6 +215,14 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
 
 int main(int argc, char** argv)
 {
+
+  printf("###################################################\n");
+#ifdef REDUCED_DATA
+  printf("#  Data after reduction (#define REDUCED_DATA)    #\n");
+#else
+  printf("#  Data before reduction (//#define REDUCED_DATA) #\n");
+#endif
+  printf("###################################################\n");
 
 #ifdef SERVER
   if (argc != 6) {

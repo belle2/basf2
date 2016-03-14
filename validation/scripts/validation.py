@@ -439,11 +439,11 @@ class Validation:
     def build_headers(self):
         """!
         This method loops over all Script objects in self.list_of_scripts and
-        calls their get_header()-method.
+        calls their load_header()-method.
         @return: None
         """
         for script_object in self.list_of_scripts:
-            script_object.get_header()
+            script_object.load_header()
 
     def skip_script(self, script_object):
         """!

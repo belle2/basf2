@@ -235,7 +235,7 @@ class Script:
                 predecessor = in_same_pkg[in_same_pkg.index(self) - 1]
                 self.dependencies.append(predecessor)
 
-    def get_header(self):
+    def load_header(self):
         """!
         This method opens the file given in self.path, tries to extract the
         XML-header of it and then parse it.

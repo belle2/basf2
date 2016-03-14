@@ -206,13 +206,15 @@ void MillepedeCollectorModule::collect()
         TVector3 vertexResidual = mother->getVertex() - beam->getVertex();
 
 
-        TMatrixDSymEigen vertexCov(beam->getCovVertex());
-        extPrecisions = vertexCov.GetEigenValues();
-        extPrecisions[0] = 1. / extPrecisions[0];
-        extPrecisions[1] = 1. / extPrecisions[1];
-        extPrecisions[2] = 1. / extPrecisions[2];
+        TMatrixDSym vertexCov(beam->getCovVertex());
+        TMatrixDSymEigen vertexPrec(vertexCov.Invert());
+        extPrecisions = vertexPrec.GetEigenValues();
 
-        extDerivatives = vertexCov.GetEigenVectors();
+        TMatrixD transformation = vertexPrec.GetEigenVectors();
+        transformation.T();
+
+        extDerivatives = transformation * extDerivatives;
+        vertexResidual = transformation * vertexResidual;
 
         extMeasurements[0] = vertexResidual[0];
         extMeasurements[1] = vertexResidual[1];

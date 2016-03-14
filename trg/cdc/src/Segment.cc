@@ -232,7 +232,7 @@ namespace Belle2 {
       signals.back().clock(systemClock);
 
       //...Widen it...
-      static const unsigned width = systemClock.unit(400);
+      static const unsigned width = systemClock.unit(1000);
       signals.back().widen(width);
 
       if (s.active())

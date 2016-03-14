@@ -127,6 +127,8 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
     k1 = k1 + (n - 1) * s1;
     k2 = k2 + (n - 1) * s2;
   }
+  h = new TH1F("h", "", 200, -10., 10.);
+  h2 = new TH1F("h2", "", 200, -10., 10.);
   effectiveLightSpeed = k1 / k2;
   calibration->setEffectiveLightSpeed(effectiveLightSpeed);
   for (i = 0; i < m_maxStrip; i++) {
@@ -143,8 +145,6 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   fcn->SetParameter(3, h->GetRMS());
   fcn->FixParameter(4, h->GetMean() + 1.0);
   fcn->FixParameter(5, 1.0);
-  h = new TH1F("h", "", 200, -10., 10.);
-  h2 = new TH1F("h2", "", 200, -10., 10.);
   if (m_Debug)
     h->Fit("fcn");
   else

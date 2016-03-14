@@ -24,28 +24,28 @@
 
 namespace Belle2 {
 
-class TRGSignal;
-class TRGCDCWire;
-class TRGCDCLayer;
-class TRGCDCLUT;
-class TRGCDCWireHit;
-class TRGCDCSegmentHit;
-class TRGCDCEventTime;
-class CDCTriggerSegmentHit;
+  class TRGSignal;
+  class TRGCDCWire;
+  class TRGCDCLayer;
+  class TRGCDCLUT;
+  class TRGCDCWireHit;
+  class TRGCDCSegmentHit;
+  class TRGCDCEventTime;
+  class CDCTriggerSegmentHit;
 
 /// A class to represent a wire in CDC.
-class TRGCDCSegment : public TRGCDCCell {
+  class TRGCDCSegment : public TRGCDCCell {
 
   public:
 
     /// Constructor.
     TRGCDCSegment(unsigned id,
-		  const TRGCDCLayer & layer,
-		  const TRGCDCWire & w,
-		  const TRGClock & clock,
-		  const TRGCDCEventTime * eventTime,
-		  const std::string & TSLUTFile,
-		  const std::vector<const TRGCDCWire *> & wires);
+                  const TRGCDCLayer& layer,
+                  const TRGCDCWire& w,
+                  const TRGClock& clock,
+                  const TRGCDCEventTime* eventTime,
+                  const std::string& TSLUTFile,
+                  const std::vector<const TRGCDCWire*>& wires);
 
     /// Destructor
     virtual ~TRGCDCSegment();
@@ -53,28 +53,28 @@ class TRGCDCSegment : public TRGCDCCell {
   public:// Selectors
 
     /// returns a vector containing pointers to a wire.
-    const std::vector<const TRGCDCWire *> & wires(void) const;
+    const std::vector<const TRGCDCWire*>& wires(void) const;
 
     /// returns name.
     std::string name(void) const;
 
     /// returns a wire.
-    const TRGCDCWire * operator[](unsigned id) const;
+    const TRGCDCWire* operator[](unsigned id) const;
 
     /// returns a center wire.
-    const TRGCDCWire & center(void) const;
+    const TRGCDCWire& center(void) const;
 
 /// returns priority wire.
-const TRGCDCWire & priority(void) const;
+    const TRGCDCWire& priority(void) const;
 
 /// compare 2 wires. return faster wire.
-const TRGCDCWire & fasterWire(const TRGCDCWire*, const TRGCDCWire*)const;
+    const TRGCDCWire& fasterWire(const TRGCDCWire*, const TRGCDCWire*)const;
 
     /// returns trigger output. Null will returned if no signal.
-    const TRGSignal & signal(void) const;
+    const TRGSignal& signal(void) const;
 
     /// returns a pointer to a TRGCDCSegmentHit.
-    const TRGCDCSegmentHit * hit(void) const;
+    const TRGCDCSegmentHit* hit(void) const;
 
     /// returns a pointer to a CDCTriggerSegmentHit.
     const CDCTriggerSegmentHit* storeHit(void) const;
@@ -85,47 +85,47 @@ const TRGCDCWire & fasterWire(const TRGCDCWire*, const TRGCDCWire*)const;
     unsigned lutPattern(void) const;
 
 /// return fastest time in TSHit.
-float fastestTime(void) const;
+    float fastestTime(void) const;
 
 /// return found time in TSHit.
-float foundTime(void)const;
+    float foundTime(void)const;
 
 /// return priority time in TSHit.
-float priorityTime(void) const;
+    float priorityTime(void) const;
 
 /// return priority cell position in TSHit. 0: no hit, 3: 1st priority, 1: 2nd right, 2: 2nd left
-int priorityPosition(void)const;
+    int priorityPosition(void)const;
 
     /// returns LUT
-    const TRGCDCLUT * LUT(void) const;
+    const TRGCDCLUT* LUT(void) const;
 
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
 
     /// initilize variables.
     void initialize(void);
     void initialize(bool fevtTime);
-    
+
     /// returns phi position.
     double phiPosition(void) const;
 
     /// returns event time.
-    const TRGCDCEventTime * EvtTime(void) const;
+    const TRGCDCEventTime* EvtTime(void) const;
 
   public:// Utility functions
 
     /// returns axial segments.
-/*     static const std::vector<const TRGCDCSegment *> */
-/* 	axial(const std::vector<const TRGCDCSegment *> & list); */
+    /*     static const std::vector<const TRGCDCSegment *> */
+    /*  axial(const std::vector<const TRGCDCSegment *> & list); */
 
     /// returns \# of stereo segments.
     static unsigned
-	nStereo(const std::vector<const TRGCDCSegment *> & list);
+    nStereo(const std::vector<const TRGCDCSegment*>& list);
 
     /// returns true this has member named a.
-    virtual bool hasMember(const std::string & a) const;
+    virtual bool hasMember(const std::string& a) const;
 
   public:// Modifiers
 
@@ -136,119 +136,129 @@ int priorityPosition(void)const;
     void simulate(bool clockSimulation, bool logicLUTFlag);
 
     /// sets a pointer to a TRGCDCSegmentHit.
-    const TRGCDCSegmentHit * hit(const TRGCDCSegmentHit *);
+    const TRGCDCSegmentHit* hit(const TRGCDCSegmentHit*);
 
     /// sets a pointer to a CDCTriggerSegmentHit.
     const CDCTriggerSegmentHit* storeHit(const CDCTriggerSegmentHit*);
 
   public:
 
-    /// simulates time-indegrated TF hit 
+    /// simulates time-indegrated TF hit
     void simulateWithoutClock(bool logicLUTFlag);
 
     /// simulates TF hit time-dependently
-  //  void simulateWithClock(bool logicLUTFlag);
+    //  void simulateWithClock(bool logicLUTFlag);
 
   private:
 
     /// LookUp Table. 0: no hit, 1: right, 2: left, 3: not determined.
-    TRGCDCLUT * m_TSLUT;
+    TRGCDCLUT* m_TSLUT;
 
     /// LookUp Table.
 //    const TRGCDCLUT * const _lut;  //Will be Removed.
 
     /// Wires.
-    std::vector<const TRGCDCWire *> _wires;
+    std::vector<const TRGCDCWire*> _wires;
 
     /// Center wire.
-    const TRGCDCWire * _center;
+    const TRGCDCWire* _center;
 
     /// Trigger signal.
     TRGSignal _signal;
 
     /// Wire hits.
-    std::vector<const TRGCDCWireHit *> _hits;
+    std::vector<const TRGCDCWireHit*> _hits;
 
     /// DataStore hit.
     const CDCTriggerSegmentHit* _storeHit;
 
     /// EventTime class.
-    const TRGCDCEventTime * const _eventTime;
+    const TRGCDCEventTime* const _eventTime;
 
     /// TS LUT file name.
     std::string m_TSLUTFileName;
 
-  // Friends
+    // Friends
     friend class TRGCDC;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-const std::vector<const TRGCDCWire *> &
-TRGCDCSegment::wires(void) const {
+  inline
+  const std::vector<const TRGCDCWire*>&
+  TRGCDCSegment::wires(void) const
+  {
     return _wires;
-}
+  }
 
-inline
-const TRGCDCWire *
-TRGCDCSegment::operator[](unsigned id) const {
+  inline
+  const TRGCDCWire*
+  TRGCDCSegment::operator[](unsigned id) const
+  {
     if (id < _wires.size())
-	return _wires[id];
+      return _wires[id];
     return 0;
-}
+  }
 
-inline
-const TRGSignal &
-TRGCDCSegment::signal(void) const {
+  inline
+  const TRGSignal&
+  TRGCDCSegment::signal(void) const
+  {
     return _signal;
-}
+  }
 
-inline
-const TRGCDCSegmentHit *
-TRGCDCSegment::hit(const TRGCDCSegmentHit * h) {
-    return (const TRGCDCSegmentHit *)
-	TRGCDCCell::hit((const TRGCDCCellHit *) h);
-}
+  inline
+  const TRGCDCSegmentHit*
+  TRGCDCSegment::hit(const TRGCDCSegmentHit* h)
+  {
+    return (const TRGCDCSegmentHit*)
+           TRGCDCCell::hit((const TRGCDCCellHit*) h);
+  }
 
-inline
-const TRGCDCSegmentHit *
-TRGCDCSegment::hit(void) const {
-    return  (const TRGCDCSegmentHit *) TRGCDCCell::hit();
-}
+  inline
+  const TRGCDCSegmentHit*
+  TRGCDCSegment::hit(void) const
+  {
+    return (const TRGCDCSegmentHit*) TRGCDCCell::hit();
+  }
 
-inline
-const CDCTriggerSegmentHit*
-TRGCDCSegment::storeHit(const CDCTriggerSegmentHit* h) {
+  inline
+  const CDCTriggerSegmentHit*
+  TRGCDCSegment::storeHit(const CDCTriggerSegmentHit* h)
+  {
     return _storeHit = h;
-}
+  }
 
-inline
-const CDCTriggerSegmentHit*
-TRGCDCSegment::storeHit(void) const {
+  inline
+  const CDCTriggerSegmentHit*
+  TRGCDCSegment::storeHit(void) const
+  {
     return _storeHit;
-}
+  }
 
-inline
-const TRGCDCLUT *
-TRGCDCSegment::LUT(void)  const{
+  inline
+  const TRGCDCLUT*
+  TRGCDCSegment::LUT(void)  const
+  {
     return m_TSLUT;
-}
+  }
 
-inline
-const TRGCDCWire &
-TRGCDCSegment::center(void) const {
+  inline
+  const TRGCDCWire&
+  TRGCDCSegment::center(void) const
+  {
     if (_wires.size() == 15)
-	return * _wires[0];
+      return * _wires[0];
     return * _wires[5];
-}
+  }
 
-inline
-const TRGCDCEventTime *
-TRGCDCSegment::EvtTime(void) const{
-   std::cout << "this function(EvtTime() in Segment class) will be removed. - ktkim" << std::endl;
+  inline
+  const TRGCDCEventTime*
+  TRGCDCSegment::EvtTime(void) const
+  {
+    std::cout << "this function(EvtTime() in Segment class) will be removed. - ktkim" << std::endl;
     return _eventTime;
-}
+  }
 
 } // namespace Belle2
 

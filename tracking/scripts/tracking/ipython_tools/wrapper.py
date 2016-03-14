@@ -1,7 +1,6 @@
 # Nice display features imports
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 from tracking.validation.harvesting import HarvestingModule
-from trackfindingcdc.quadtree.quadTreePlotter import StereoQuadTreePlotter
 import os
 import multiprocessing
 
@@ -51,47 +50,6 @@ class QueueDrawer(CDCSVGDisplayModule):
         output_file_name = CDCSVGDisplayModule.new_output_filename(self)
         self.file_list.append(output_file_name)
         return output_file_name
-
-
-class QueueStereoQuadTreePlotter(StereoQuadTreePlotter):
-
-    """
-    A wrapper around the svg drawer in the tracking package that
-    writes its output files as a list to the queue
-    """
-
-    def __init__(self, queue, label, *args, **kwargs):
-        """ The same as the base class, except:
-
-        Arguments
-        ---------
-
-        queue: The queue to write to
-        label: The key name in the queue
-        """
-        #: The queue to handle
-        self.queue = queue
-        #: The label for writing to the queue
-        self.label = label
-        StereoQuadTreePlotter.__init__(self, *args, **kwargs)
-
-        #: The list of created paths
-        self.file_list = []
-
-    def terminate(self):
-        """ Overwrite the terminate to put the list to the queue"""
-        StereoQuadTreePlotter.terminate(self)
-        self.queue.put(self.label, self.file_list)
-
-    def save_and_show_file(self):
-        """ Overwrite the function to listen for every new filename """
-
-        from datetime import datetime
-        from matplotlib import pyplot as plt
-
-        fileName = "/tmp/" + datetime.now().isoformat() + '.svg'
-        plt.savefig(fileName)
-        self.file_list.append(fileName)
 
 
 def show_image(filename, show=True):

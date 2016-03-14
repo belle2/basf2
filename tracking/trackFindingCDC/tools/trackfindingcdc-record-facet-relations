@@ -16,7 +16,7 @@ class CDCFacetRelationRecordingRun(RecordingRun):
     n_events = 50
     # bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
-    output_file_name = "CDCFacetRelationTruthRecords.root"
+    root_output_file_name = "CDCFacetRelationTruthRecords.root"
     varsets = ["basic", "filter(truth)", ]
 
     recording_filter_parameter_name = "FacetRelationFilterParameters"
@@ -26,7 +26,7 @@ class CDCFacetRelationRecordingRun(RecordingRun):
     recording_finder_module.param({
         "FacetRelationFilter": "unionrecording",
         recording_filter_parameter_name : {
-            "rootFileName": output_file_name,
+            "rootFileName": root_output_file_name,
             "varsets": varsets,
         },
     })

@@ -8,7 +8,7 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
     recording_finder_module = basf2.register_module("TrackFinderCDCAutomatonDev")
 
     recording_filter_parameter_name = "FillMeFilterParameters"
-    output_file_name = "Records.root"
+    root_output_file_name = "Records.root"
     varsets = ["truth", ]
 
     def create_argument_parser(self, **kwds):
@@ -25,10 +25,9 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
         )
 
         argument_parser.add_argument(
-            '-o',
-            '--output',
-            default=self.output_file_name,
-            dest='output_file_name',
+            '--root-output',
+            default=self.root_output_file_name,
+            dest='root_output_file_name',
             help='File to which the recorded varsets should be written',
         )
 
@@ -39,7 +38,7 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
 
         self.recording_finder_module.param({
             self.recording_filter_parameter_name: {
-                "rootFileName": self.output_file_name,
+                "rootFileName": self.root_output_file_name,
                 "varSets": self.varsets,
             },
         })

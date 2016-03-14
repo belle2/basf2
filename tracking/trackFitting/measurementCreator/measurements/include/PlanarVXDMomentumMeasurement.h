@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <tracking/measurementCreator/measurements/PlanarMomentumMeasurement.h>
+#include <tracking/trackFitting/measurementCreator/measurements/PlanarMomentumMeasurement.h>
 #include <tracking/vxdMomentumEstimation/VXDMomentumEstimation.h>
 #include <tracking/vxdMomentumEstimation/VXDMomentumEstimationTools.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -198,16 +198,10 @@ namespace Belle2 {
 
   /** Specialisation for PXD clusters. */
   template<>
-  int PlanarVXDMomentumMeasurement<PXDCluster>::getDetId() const
-  {
-    return Belle2::Const::PXD;
-  }
+  int PlanarVXDMomentumMeasurement<PXDCluster>::getDetId() const;
 
   /** Specialisation for SVD clusters. */
   template<>
-  int PlanarVXDMomentumMeasurement<SVDCluster>::getDetId() const
-  {
-    return Belle2::Const::SVD;
-  }
+  int PlanarVXDMomentumMeasurement<SVDCluster>::getDetId() const;
 
 }

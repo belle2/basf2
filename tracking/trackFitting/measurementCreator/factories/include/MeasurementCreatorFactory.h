@@ -32,9 +32,6 @@ namespace Belle2 {
     /** Typedef for convenience */
     typedef BaseMeasurementCreatorType CreatorType;
 
-    /** We need a virtual destr */
-    virtual ~MeasurementCreatorFactory() { }
-
     /** Use the parameters given to the module and create the measurement creators from them. */
     void initialize()
     {
@@ -46,9 +43,9 @@ namespace Belle2 {
 
         BaseMeasurementCreatorType* creatorPointer = createMeasurementCreatorFromName(creatorName);
         if (creatorPointer == nullptr) {
-          B2FATAL("Can not create a measurement creator with the name " << creatorName);
+          B2FATAL("Can not create a measurement creator with the name " << creatorName << ". Creator not known to the factory.");
         }
-        m_measurementCreators.push_back(std::move(std::unique_ptr<BaseMeasurementCreatorType>(creatorPointer)));
+        m_measurementCreators.push_back(std::move(std::shared_ptr<BaseMeasurementCreatorType>(creatorPointer)));
 
         for (const auto& parameterWithValue : parameterDictionary) {
           const std::string& parameterName = parameterWithValue.first;
@@ -59,10 +56,13 @@ namespace Belle2 {
     }
 
     /** Overload this method to create the measurement creators by their name. */
-    virtual BaseMeasurementCreatorType* createMeasurementCreatorFromName(const std::string& creatorName) const = 0;
+    virtual BaseMeasurementCreatorType* createMeasurementCreatorFromName(const std::string& /*creatorName*/) const
+    {
+      return nullptr;
+    }
 
     /** Return the creators to the module */
-    const std::vector<std::unique_ptr<BaseMeasurementCreatorType>>& getCreators() const
+    const std::vector<std::shared_ptr<BaseMeasurementCreatorType>>& getCreators() const
     {
       return m_measurementCreators;
     }
@@ -73,9 +73,15 @@ namespace Belle2 {
       return m_creatorsWithParametersDictionary;
     }
 
+    /** Set the parameters. */
+    void setParameters(const std::map<std::string, std::map<std::string, std::string>>& creatorsWithParametersDictionary)
+    {
+      m_creatorsWithParametersDictionary = std::move(creatorsWithParametersDictionary);
+    }
+
   private:
     /** A vector with the measurement creators. Is filled in initialize. */
-    std::vector<std::unique_ptr<BaseMeasurementCreatorType>> m_measurementCreators;
+    std::vector<std::shared_ptr<BaseMeasurementCreatorType>> m_measurementCreators;
 
     /** The map of dictionaries of the parameters. Fill it with the module parameters. */
     std::map<std::string, std::map<std::string, std::string>> m_creatorsWithParametersDictionary;

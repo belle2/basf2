@@ -61,10 +61,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
     path.add_module(mctrackmatcher)
 
     # track fitting
-    trackfitter = register_module('GenFitter')
+    trackfitter = path.add_module('GenFitter')
     trackfitter.param({"PDGCodes": [211]})
     trackfitter.set_name('combined GenFitter')
-    path.add_module(trackfitter)
 
     # create Belle2 Tracks from the genfit Tracks
     trackbuilder = register_module('TrackBuilder')
@@ -133,20 +132,20 @@ def add_track_finding(path, components=None):
     if use_vxd and use_cdc:
         vxd_tracklets = 'VXDGFTracks'
         cdc_tracklets = 'CDCGFTracks'
-    # track fitting
-        VXDtrackFitter = register_module('GenFitter')
+
+        # track fitting
+        VXDtrackFitter = path.add_module('GenFitter')
         VXDtrackFitter.param('GFTrackCandidatesColName', vxd_trackcands)
         VXDtrackFitter.param("PDGCodes", [211])
         VXDtrackFitter.param('GFTracksColName', vxd_tracklets)
         VXDtrackFitter.param('PruneFlags', 'FL')
         VXDtrackFitter.set_name('VXD-only GenFitter')
 
-        CDCtrackFitter = register_module('GenFitter')
-        CDCtrackFitter.param('GFTrackCandidatesColName', cdc_trackcands)
-        CDCtrackFitter.param("PDGCodes", [211])
-        CDCtrackFitter.param('GFTracksColName', cdc_tracklets)
-        CDCtrackFitter.param('PruneFlags', 'FL')
-        CDCtrackFitter.set_name('CDC-only GenFitter')
+        path.add_module("RecoTrackCreator", trackCandidatesStoreArrayName=cdc_trackcands,
+                        recoTracksStoreArrayName="CDCRecoTracks")
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCRecoTracks")
+        path.add_module("GenfitTrackCreator", genfitTracksStoreArrayName=cdc_tracklets,
+                        genfitTrackCandsStoreArrayName=cdc_trackcands, recoTracksStoreArrayName="CDCRecoTracks")
 
         vxd_cdcTracksMerger = register_module('VXDCDCTrackMerger')
         vxd_cdcTracksMerger_param = {
@@ -159,9 +158,6 @@ def add_track_finding(path, components=None):
             'recover': 1
         }
         vxd_cdcTracksMerger.param(vxd_cdcTracksMerger_param)
-
-        path.add_module(VXDtrackFitter)
-        path.add_module(CDCtrackFitter)
         path.add_module(vxd_cdcTracksMerger)
 
 

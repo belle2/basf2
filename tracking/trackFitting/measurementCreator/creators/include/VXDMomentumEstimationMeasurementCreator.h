@@ -9,9 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/measurementCreator/creators/BaseMeasurementCreatorFromCoordinateMeasurement.h>
+#include <tracking/trackFitting/measurementCreator/creators/BaseMeasurementCreatorFromCoordinateMeasurement.h>
 #include <tracking/vxdMomentumEstimation/VXDMomentumEstimation.h>
-#include <tracking/measurementCreator/measurements/PlanarVXDMomentumMeasurement.h>
+#include <tracking/trackFitting/measurementCreator/measurements/PlanarVXDMomentumMeasurement.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <genfit/PlanarMeasurement.h>
 
@@ -114,4 +114,9 @@ namespace Belle2 {
     /** Use the tracking seeds in the origin for calculating the path length rather than the current state. */
     bool m_useTrackingSeeds = false;
   };
+
+  /// Momentum measurement creator for the SVD.
+  using SVDMomentumMeasurementCreator = VXDMomentumEstimationMeasurementCreator<RecoHitInformation::UsedSVDHit, Const::SVD>;
+  /// Momentum measurement creator for the PXD.
+  using PXDMomentumMeasurementCreator = VXDMomentumEstimationMeasurementCreator<RecoHitInformation::UsedPXDHit, Const::PXD>;
 }

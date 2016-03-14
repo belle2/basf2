@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/measurementCreator/creators/BaseMeasurementCreatorFromHit.h>
+#include <tracking/trackFitting/measurementCreator/creators/BaseMeasurementCreatorFromHit.h>
 
 namespace Belle2 {
   /**
@@ -38,6 +38,7 @@ namespace Belle2 {
         this->createMeasurementFromCoordinateMeasurement(hit, recoTrack, recoHitInformation, coordinateMeasurement);
 
       // TODO: Do we want to create one track point for each or one track point for all?
+      // TODO: This is especially important in the question to which the track point should be related!
       std::vector<genfit::TrackPoint*> trackPoints;
       trackPoints.reserve(measurements.size());
       for (genfit::AbsMeasurement* measurement : measurements) {

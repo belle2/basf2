@@ -9,7 +9,7 @@ env['LIBS'] = [
     'pxd', 'pxd_dataobjects',
     'svd', 'svd_dataobjects',
     'vxd', 'vxd_dataobjects',
-    #'cdc', 'cdc_dataobjects',
+    'cdc', 'cdc_dataobjects',
    # 'testbeam_vxd_dataobjects',
     'simulation_dataobjects',
 #    'geometry',

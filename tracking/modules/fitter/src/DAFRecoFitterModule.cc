@@ -23,13 +23,8 @@ DAFRecoFitterModule::DAFRecoFitterModule() : BaseRecoFitterModule()
            "Probability cut for the DAF. Any value between 0 and 1 is possible. Common values are between 0.01 and 0.001",
            double(0.001));
 
-  addParam("minimumIterations", m_param_minimumIterations,
-           "Minimum number of iterations for the Kalman filter", static_cast<unsigned int>(2));
-  addParam("maximumIterations", m_param_maximumIterations,
-           "Maximum number of iterations for the Kalman filter", static_cast<unsigned int>(4));
-
   addParam("numberOfFailedHits", m_param_maxNumberOfFailedHits,
-           "Maximum number of failed hits before aborting the fit.", static_cast<int>(-1));
+           "Maximum number of failed hits before aborting the fit.", static_cast<int>(5));
 }
 
 /** Create a DAF fitter */
@@ -37,8 +32,6 @@ std::shared_ptr<genfit::AbsFitter> DAFRecoFitterModule::createFitter() const
 {
   std::shared_ptr<genfit::DAF> fitter = std::make_shared<genfit::DAF>();
   fitter->setMaxFailedHits(m_param_maxNumberOfFailedHits);
-  fitter->setMinIterations(m_param_minimumIterations);
-  fitter->setMaxIterations(m_param_maximumIterations);
 
   fitter->setProbCut(m_param_probabilityCut);
 

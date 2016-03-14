@@ -12,7 +12,7 @@
 
 #include <genfit/PlanarMeasurement.h>
 #include <genfit/RKTrackRep.h>
-#include <tracking/measurementCreator/measurements/HMatrixQP.h>
+#include <tracking/trackFitting/measurementCreator/measurements/HMatrixQP.h>
 #include <framework/logging/Logger.h>
 
 

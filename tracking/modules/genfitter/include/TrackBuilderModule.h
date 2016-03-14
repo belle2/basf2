@@ -19,7 +19,6 @@
 // TrackBuilderModule is used always and the code to build tracks is
 // removed from the GenFitterModule.
 #include <tracking/modules/genfitter/GenFitterModule.h>
-#include <tracking/modules/fitter/TrackBuilderFromRecoTracksModule.h>
 
 #include <vector>
 #include <string>
@@ -74,7 +73,6 @@ namespace Belle2 {
     // FIXME 2015-05-26 These two functions are to remain static as
     // long as they are also used by the GenFitterModule.
     friend void GenFitterModule::event();
-    friend class TrackBuilderFromRecoTracksModule;
     static HitPatternCDC getHitPatternCDC(const genfit::Track&); /**< returns HitPatternCDC of the Track */
     static HitPatternVXD getHitPatternVXD(const genfit::Track&); /**< returns the HitPatternVXD of the Track*/
   };

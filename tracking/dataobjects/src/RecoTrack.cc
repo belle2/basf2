@@ -1,13 +1,17 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <genfit/RKTrackRep.h>
+#include <tracking/trackFitting/measurementCreator/creators/CoordinateMeasurementCreator.h>
+
 #include <genfit/FitStatus.h>
+#include <genfit/KalmanFitStatus.h>
+#include <genfit/RKTrackRep.h>
 #include <genfit/TrackCand.h>
 #include <genfit/AbsFitter.h>
 
 #include <framework/gearbox/Const.h>
 
 #include <framework/dataobjects/Helix.h>
+#include <genfit/WireTrackCandHit.h>
 
 using namespace Belle2;
 
@@ -20,10 +24,9 @@ RecoTrack::RecoTrack(const TVector3& position, const TVector3& momentum, const s
   m_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
   m_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
   m_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits),
-  m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation),
-  m_lastFitSucessfull(false)
+  m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation)
 {
-  setStateSeed(position, momentum);
+  m_genfitTrack.setStateSeed(position, momentum);
 }
 
 RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand* trackCand,
@@ -49,16 +52,36 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand* trackCand,
                                                  storeArrayNameOfCDCHits, storeArrayNameOfSVDHits,
                                                  storeArrayNameOfPXDHits, storeArrayNameOfRecoHitInformation);
 
-  newRecoTrack->setCovSeed(trackCand->getCovSeed());
+  // TODO Set the covariance seed (that should be done by the tracking package)
+  TMatrixDSym covSeed(6);
+  covSeed(0, 0) = 1e-3;
+  covSeed(1, 1) = 1e-3;
+  covSeed(2, 2) = 4e-3;
+  covSeed(3, 3) = 0.01e-3;
+  covSeed(4, 4) = 0.01e-3;
+  covSeed(5, 5) = 0.04e-3;
+  newRecoTrack->m_genfitTrack.setCovSeed(covSeed);
 
   for (unsigned int hitIndex = 0; hitIndex < trackCand->getNHits(); hitIndex++) {
     genfit::TrackCandHit* trackCandHit = trackCand->getHit(hitIndex);
     const int detID = trackCandHit->getDetId();
     const int hitID = trackCandHit->getHitId();
-    const double sortingParameter = trackCandHit->getSortingParameter();
+    const unsigned int sortingParameter = static_cast<const unsigned int>(trackCandHit->getSortingParameter());
     if (detID == Const::CDC) {
       UsedCDCHit* cdcHit = cdcHits[hitID];
-      newRecoTrack->addCDCHit(cdcHit, sortingParameter);
+      // Special case for CDC hits, we add a right-left information
+      const genfit::WireTrackCandHit* wireHit = dynamic_cast<const genfit::WireTrackCandHit*>(trackCandHit);
+      if (not wireHit) {
+        B2FATAL("CDC hit is not a wire hit. The RecoTrack can not handle such a case.");
+      }
+      if (wireHit->getLeftRightResolution() > 0) {
+        newRecoTrack->addCDCHit(cdcHit, sortingParameter, RecoHitInformation::RightLeftInformation::right);
+      } else if (wireHit->getLeftRightResolution() < 0) {
+        newRecoTrack->addCDCHit(cdcHit, sortingParameter, RecoHitInformation::RightLeftInformation::left);
+      } else {
+        newRecoTrack->addCDCHit(cdcHit, sortingParameter, RecoHitInformation::RightLeftInformation::undefinedRightLeftInformation);
+      }
+
     } else if (detID == Const::SVD) {
       UsedSVDHit* svdHit = svdHits[hitID];
       newRecoTrack->addSVDHit(svdHit, sortingParameter);
@@ -96,81 +119,25 @@ genfit::TrackCand* RecoTrack::createGenfitTrackCand() const
   return createdTrackCand;
 }
 
-
-void RecoTrack::calculateTimeSeed(TParticlePDG* particleWithPDGCode)
+bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) const
 {
-  const TVector3& momentum = getMomentum();
+  checkDirtyFlag();
 
-  // Set the timing seed
-  // Particle velocity in cm / ns.
-  const double m = particleWithPDGCode->Mass();
-  const double p = momentum.Mag();
-  const double E = hypot(m, p);
-  const double beta = p / E;
-  const double v = beta * Const::speedOfLight;
-
-  // Arc length from IP to posSeed in cm.
-  // Calculate the arc-length.  Helix doesn't provide a way of
-  // obtaining this directly from the difference in z, as it
-  // only provide arc-lengths in the transverse plane, so we do
-  // it like this.
-  const TVector3& perigeePosition = getPosition();
-  const Helix h(perigeePosition, momentum, particleWithPDGCode->Charge() / 3, 1.5);
-  const double s2D = h.getArcLength2DAtCylindricalR(perigeePosition.Perp());
-  const double s = s2D * hypot(1, h.getTanLambda());
-
-  // Time (ns) from trigger (= 0 ns) to posSeed assuming constant velocity.
-  double timeSeed = s / v;
-
-  if (!(timeSeed > -1000)) {
-    // Guard against NaN or just something silly.
-    B2WARNING("Fixing calculated seed Time " << timeSeed << " to zero.");
-    timeSeed = 0;
-  }
-  setTimeSeed(timeSeed);
-}
-
-void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCodeForFit, bool resortHits)
-{
-  m_lastFitSucessfull = false;
-
-  // Create a track representation TODO: Do not ad one if there is already one!
-  // Set the pdg code accordingly if the user gave us the wrong charge sign
-  TParticlePDG* particleWithPDGCode = TDatabasePDG::Instance()->GetParticle(pdgCodeForFit);
-  // Note that for leptons positive PDG codes correspond to the
-  // negatively charged particles.
-  if (std::signbit(particleWithPDGCode->Charge()) != std::signbit(getCharge()))
-    pdgCodeForFit *= -1;
-  if (TDatabasePDG::Instance()->GetParticle(pdgCodeForFit)->Charge()
-      != getCharge() * 3)
-    B2FATAL("Charge of candidate and PDG particle don't match.  (Code assumes |q| = 1).");
-
-  genfit::RKTrackRep* trackRep = new genfit::RKTrackRep(pdgCodeForFit);
-  addTrackRep(trackRep);
-
-  // Set the covariance seed (that should be done by the tracking package)
-  TMatrixDSym covSeed(6);
-  covSeed(0, 0) = 1e-3;
-  covSeed(1, 1) = 1e-3;
-  covSeed(2, 2) = 4e-3;
-  covSeed(3, 3) = 0.01e-3;
-  covSeed(4, 4) = 0.01e-3;
-  covSeed(5, 5) = 0.04e-3;
-  setCovSeed(covSeed);
-
-  // Set the time seed correctly
-  calculateTimeSeed(particleWithPDGCode);
-
-  // Fit the track
-  fitter->processTrack(this, resortHits);
-
-  // Postprocessing of the fitted track: Set the fit status flag
-  bool fitSuccess = hasFitStatus(trackRep);
-  if (fitSuccess) {
-    genfit::FitStatus* fs = getFitStatus(trackRep);
-    fitSuccess = fitSuccess && fs->isFitted();
-    fitSuccess = fitSuccess && fs->isFitConverged();
+  if (not hasTrackFitStatus(representation)) {
+    return false;
   }
 
-  m_lastFitSucessfull = fitSuccess;
+  const genfit::FitStatus* fs = getTrackFitStatus(representation);
+  if (not fs) {
+    return false;
+  }
+  if (not fs->isFitConverged()) {
+    return false;
+  }
+  const genfit::KalmanFitStatus* kfs = dynamic_cast<const genfit::KalmanFitStatus*>(fs);
+  if (not kfs) {
+    return false;
+  }
+
+  return true;
 }

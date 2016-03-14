@@ -70,7 +70,8 @@ namespace Belle2 {
 
     /** Another flag to be used (currently unused) */
     enum RecoHitFlag {
-      undefinedRecoHitFlag
+      undefinedRecoHitFlag,
+      dismissedByFit,
     };
 
     /** The detector this hit comes from (which is of course also visible in the hit type) */
@@ -86,14 +87,7 @@ namespace Belle2 {
     /**
      * Empty constructor for root.
      */
-    RecoHitInformation() :
-      m_trackingDetector(TrackingDetector::undefinedTrackingDetector),
-      m_rightLeftInformation(RightLeftInformation::undefinedRightLeftInformation),
-      m_sortingParameter(0),
-      m_foundByTrackFinder(OriginTrackFinder::undefinedTrackFinder),
-      m_flag(RecoHitFlag::undefinedRecoHitFlag)
-    {
-    }
+    RecoHitInformation() {}
 
     /**
      * Create hit information for a CDC hit with the given information. Adds the relation to the hit automatically.
@@ -188,18 +182,48 @@ namespace Belle2 {
       return m_trackingDetector;
     }
 
+    /** Get the flag, whether this his should be used in a fit or not. */
+    bool useInFit() const
+    {
+      return m_useInFit;
+    }
+
+    /** Set the hit to be used (default) or not in the next fit. */
+    void setUseInFit(const bool useInFit = true)
+    {
+      m_useInFit = useInFit;
+    }
+
+    /** Get a pointer to the TrackPoint that was created from this hit. Can be a nullptr if no measurement was already created.
+     * Please be aware that refitting may or may not recreate the track points and older pointers can be invalid then.
+     * Also, pruning a RecoTrack will also delete most of the TrackPoints. */
+    const genfit::TrackPoint* getCreatedTrackPoint() const
+    {
+      return m_createdTrackPoint;
+    }
+
+    /** Set the pointer of the created track point related to this hit. */
+    void setCreatedTrackPoint(const genfit::TrackPoint* createdTrackPoint)
+    {
+      m_createdTrackPoint = createdTrackPoint;
+    }
+
   private:
     /// The tracking detector this hit comes from (can not be changed once created)
-    TrackingDetector m_trackingDetector;
+    TrackingDetector m_trackingDetector = TrackingDetector::undefinedTrackingDetector;
     /// The right-left-information of the hit. Can be invalid (for VXD hits) or unknown.
-    RightLeftInformation m_rightLeftInformation;
+    RightLeftInformation m_rightLeftInformation = RightLeftInformation::undefinedRightLeftInformation;
     /// The sorting parameter as an index.
-    unsigned int m_sortingParameter;
+    unsigned int m_sortingParameter = 0;
     /// Which track finder has found this hit and added it to the reco track.
     /// Can only be used if creating the RecoTrack in the track finder.
-    OriginTrackFinder m_foundByTrackFinder;
+    OriginTrackFinder m_foundByTrackFinder = OriginTrackFinder::undefinedTrackFinder;
     /// An additional flag to be used.
-    RecoHitFlag m_flag;
+    RecoHitFlag m_flag = RecoHitFlag::undefinedRecoHitFlag;
+    /// Set this flag to falso to not create a measurement out of this hit
+    bool m_useInFit = true;
+    /// A pointer to the TrackPoint for this hit.
+    const genfit::TrackPoint* m_createdTrackPoint = nullptr;
 
     /**
      * Create hit information for a generic hit with the given information. Adds the relation to the hit automatically.

@@ -34,7 +34,11 @@ namespace Belle2 {
     /** Destructor. **/
     virtual ~BaseMeasurementCreator() { }
 
-    /** Overload this method to create track points with measurements. **/
+    /** Overload this method to create track points with measurements.
+     * The ordering of the track points in this list has two meanings:
+     * 1. Genfit will process the first hit first.
+     * 2. Only the first hit will be related to the reco hit information. This means, if this track point is downvoted by genfit, the hit will also be marked.
+     * */
     virtual std::vector<genfit::TrackPoint*> createMeasurementPoints(RecoTrack& recoTrack) const = 0;
 
     /** Use this to set the parameters of the creator. Does nothing per default. */

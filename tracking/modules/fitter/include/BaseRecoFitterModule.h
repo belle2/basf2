@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFitting/fitter/base/TrackFitter.h>
+
 #include <framework/core/Module.h>
 #include <string>
 
@@ -52,6 +54,12 @@ namespace Belle2 {
   private:
     /** StoreArray name of the input and output reco tracks. */
     std::string m_param_recoTracksStoreArrayName = "RecoTracks";
+    /** StoreArray name of the CDC hits. */
+    std::string m_param_cdcHitsStoreArrayName = "CDCHits";
+    /** StoreArray name of the SVD hits. */
+    std::string m_param_svdHitsStoreArrayName = "SVDClusters";
+    /** StoreArray name of the PXD hits. */
+    std::string m_param_pxdHitsStoreArrayName = "PXDClusters";
     /** Use this particle hypothesis for fitting. Please use the positive pdg code only. */
     unsigned int m_param_pdgCodeToUseForFitting = 211;
     /** Resort the hits while fitting. */

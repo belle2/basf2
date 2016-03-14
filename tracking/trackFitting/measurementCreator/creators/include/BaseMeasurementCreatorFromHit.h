@@ -9,12 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/measurementCreator/creators/BaseMeasurementCreator.h>
+#include <tracking/trackFitting/measurementCreator/creators/BaseMeasurementCreator.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
-#include <tracking/dataobjects/RecoTrack.h>
+
 #include <genfit/MeasurementFactory.h>
+
 #include <framework/gearbox/Const.h>
-#include <genfit/TrackPoint.h>
 #include <vector>
 
 namespace genfit {
@@ -22,6 +22,7 @@ namespace genfit {
 }
 
 namespace Belle2 {
+  class RecoTrack;
 
   /**
    * Base Class to create measurements based on a given hit related to the RecoTrack.
@@ -35,8 +36,7 @@ namespace Belle2 {
   class BaseMeasurementCreatorFromHit : public BaseMeasurementCreator {
   public:
     /** Creates a MeasurementCreator which handles the creation of measurements of a given kind. **/
-    explicit BaseMeasurementCreatorFromHit(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
-      BaseMeasurementCreator(), m_measurementFactory(measurementFactory) {}
+    explicit BaseMeasurementCreatorFromHit(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory);
 
     /** Destructor **/
     virtual ~BaseMeasurementCreatorFromHit() { }
@@ -44,16 +44,6 @@ namespace Belle2 {
     /** Overload this method to create measurement track points from a given hit. **/
     virtual std::vector<genfit::TrackPoint*> createMeasurementPoints(HitType* hit, RecoTrack& recoTrack,
         const RecoHitInformation& recoHitInformation) const = 0;
-
-  private:
-    /** A reference to the prefilled measurement factory. */
-    const genfit::MeasurementFactory<genfit::AbsMeasurement>& m_measurementFactory;
-
-    /** We do not need this method in this overload. */
-    std::vector<genfit::TrackPoint*> createMeasurementPoints(RecoTrack&) const override final
-    {
-      return {};
-    }
 
   protected:
     /**
@@ -66,25 +56,35 @@ namespace Belle2 {
      * @param recoHitInformation
      * @return a coordinate AbsMeasurement as pointer.
      */
-    genfit::AbsMeasurement* createCoordinateMeasurement(HitType* hit, const RecoHitInformation& recoHitInformation) const
-    {
-      genfit::TrackCandHit* trackCandHit = new genfit::TrackCandHit(detector, hit->getArrayIndex(), -1,
-          recoHitInformation.getSortingParameter());
-
-      genfit::AbsMeasurement* coordinateMeasurement = m_measurementFactory.createOne(trackCandHit->getDetId(), trackCandHit->getHitId(),
-                                                      trackCandHit);
-
-      return coordinateMeasurement;
-    }
+    genfit::AbsMeasurement* createCoordinateMeasurement(HitType* hit, const RecoHitInformation& recoHitInformation) const;
 
     /** Helper: Create a TrackPoint from a measurement with a given RecoHitInformation. */
     genfit::TrackPoint* createTrackPointWithRecoHitInformation(genfit::AbsMeasurement* coordinateMeasurement,
-                                                               RecoTrack& recoTrack, const RecoHitInformation& recoHitInformation) const
-    {
-      genfit::TrackPoint* coordinateTrackPoint = new genfit::TrackPoint(coordinateMeasurement, &recoTrack);
-      coordinateTrackPoint->setSortingParameter(recoHitInformation.getSortingParameter());
+                                                               RecoTrack& recoTrack,
+                                                               const RecoHitInformation& recoHitInformation) const;
 
-      return coordinateTrackPoint;
+  private:
+    /** A reference to the prefilled measurement factory. */
+    const genfit::MeasurementFactory<genfit::AbsMeasurement>& m_measurementFactory;
+
+    /** We do not need this method in this overload. */
+    std::vector<genfit::TrackPoint*> createMeasurementPoints(RecoTrack&) const override final
+    {
+      return {};
     }
   };
+
+  /** Needed for templating. */
+  /// Standard base class for CDC measurement creators.
+  using CDCBaseMeasurementCreator = BaseMeasurementCreatorFromHit<RecoHitInformation::UsedCDCHit, Const::CDC>;
+  /// Standard base class for SVD measurement creators.
+  using SVDBaseMeasurementCreator = BaseMeasurementCreatorFromHit<RecoHitInformation::UsedSVDHit, Const::SVD>;
+  /// Standard base class for PXD measurement creators.
+  using PXDBaseMeasurementCreator = BaseMeasurementCreatorFromHit<RecoHitInformation::UsedPXDHit, Const::PXD>;
+
+  /** CDC hits are a special case, as they must be WireTrackCandHits, not TrackCandHits. **/
+  template<>
+  genfit::AbsMeasurement*
+  CDCBaseMeasurementCreator::createCoordinateMeasurement(RecoHitInformation::UsedCDCHit* cdcHit,
+                                                         const RecoHitInformation& recoHitInformation) const;
 }

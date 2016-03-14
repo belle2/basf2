@@ -18,6 +18,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <tracking/modules/fitter/BaseRecoFitterModule.h>
+#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 using namespace std;
 using namespace Belle2;
@@ -28,13 +29,21 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
   setDescription("Fit the given reco tracks with the given fitter parameters.");
 
   addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the input and output reco tracks.",
-           std::string("RecoTracks"));
+           m_param_recoTracksStoreArrayName);
+
+  addParam("cdcHitsStoreArrayName", m_param_cdcHitsStoreArrayName, "StoreArray name of the input CDC hits.",
+           m_param_cdcHitsStoreArrayName);
+  addParam("svdHitsStoreArrayName", m_param_svdHitsStoreArrayName, "StoreArray name of the input SVD hits.",
+           m_param_svdHitsStoreArrayName);
+  addParam("pxdHitsStoreArrayName", m_param_pxdHitsStoreArrayName, "StoreArray name of the input PXD hits.",
+           m_param_pxdHitsStoreArrayName);
 
   addParam("pdgCodeToUseForFitting", m_param_pdgCodeToUseForFitting,
-           "Use this particle hypothesis for fitting. Please use the positive pdg code only.", static_cast<unsigned int>(211));
+           "Use this particle hypothesis for fitting. Please use the positive pdg code only.",
+           m_param_pdgCodeToUseForFitting);
 
-  addParam("resortHits", m_param_resortHits,
-           "Resort the hits while fitting.", false);
+  addParam("resortHits", m_param_resortHits, "Resort the hits while fitting.",
+           m_param_resortHits);
 }
 
 void BaseRecoFitterModule::initialize()
@@ -56,15 +65,21 @@ void BaseRecoFitterModule::event()
 {
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
 
+  // The used fitting algorithm class.
+  TrackFitter fitter(m_param_cdcHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_pxdHitsStoreArrayName);
+
+  const std::shared_ptr<genfit::AbsFitter>& genfitFitter = createFitter();
+  fitter.resetFitter(genfitFitter);
+
   B2DEBUG(100, "Number of reco track candidates to process: " << recoTracks.getEntries());
   unsigned int recoTrackCounter = 0;
 
-  const std::shared_ptr<genfit::AbsFitter>& fitter = createFitter();
+  Const::ChargedStable particleUsedForFitting(m_param_pdgCodeToUseForFitting);
 
   for (RecoTrack& recoTrack : recoTracks) {
-
-    if (recoTrack.getNumPointsWithMeasurement() == 0) {
-      B2WARNING("No points with measurement.")
+    if (recoTrack.getNumberOfTotalHits() < 3) {
+      B2WARNING("Genfit2Module: only " << recoTrack.getNumberOfTotalHits() << " were assigned to the Track! " <<
+                "This Track will not be fitted!");
       continue;
     }
 
@@ -74,22 +89,21 @@ void BaseRecoFitterModule::event()
             recoTrack.getMomentum().Z());
     B2DEBUG(100, "Position: " << recoTrack.getPosition().X() << " " << recoTrack.getPosition().Y() << " " <<
             recoTrack.getPosition().Z());
+    B2DEBUG(100, "PDG: " << m_param_pdgCodeToUseForFitting);
     B2DEBUG(100, "Total number of hits assigned to the track: " << recoTrack.getNumberOfTotalHits());
 
-    recoTrack.fit(fitter, m_param_pdgCodeToUseForFitting, m_param_resortHits);
+    fitter.fit(recoTrack, particleUsedForFitting);
 
-    B2DEBUG(100, "-----> Fit results:");
-    B2DEBUG(100, "       Fitted and converged: " << recoTrack.wasLastFitSucessfull());
-
-    if (recoTrack.wasLastFitSucessfull()) {
-      genfit::FitStatus* fs = recoTrack.getFitStatus(recoTrack.getCardinalRep());
-      genfit::KalmanFitStatus* kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
-
-      B2DEBUG(100, "       Chi2 of the fit: " << kfs->getChi2());
-      B2DEBUG(100, "       NDF of the fit: " << kfs->getBackwardNdf());
-      B2DEBUG(100, "       pValue of the fit: " << kfs->getPVal());
+    if (recoTrack.wasFitSuccessful()) {
+      const genfit::FitStatus* fs = recoTrack.getTrackFitStatus();
+      const genfit::KalmanFitStatus* kfs = dynamic_cast<const genfit::KalmanFitStatus*>(fs);
+      B2DEBUG(99, "-----> Fit results:");
+      B2DEBUG(99, "       Chi2 of the fit: " << kfs->getChi2());
+      B2DEBUG(99, "       NDF of the fit: " << kfs->getBackwardNdf());
+      //Calculate probability
+      double pValue = recoTrack.getTrackFitStatus()->getPVal();
+      B2DEBUG(99, "       pValue of the fit: " << pValue);
     }
-
     recoTrackCounter += 1;
   }
 }

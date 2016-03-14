@@ -9,27 +9,27 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/measurementCreator/factories/MeasurementCreatorFactory.h>
-#include <tracking/measurementCreator/creators/CoordinateMeasurementCreator.h>
+#include <tracking/trackFitting/measurementCreator/factories/MeasurementCreatorFactory.h>
+#include <tracking/trackFitting/measurementCreator/creators/CoordinateMeasurementCreator.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
   /** Add all measurement creators related to CDC hits. */
   class CDCMeasurementCreatorFactory : public
-    MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedCDCHit, Const::CDC>> {
+    MeasurementCreatorFactory<CDCBaseMeasurementCreator> {
 
   public:
     /** Initialize with a measurement factory. */
     explicit CDCMeasurementCreatorFactory(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
-      MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedCDCHit, Const::CDC>>(),
-          m_measurementFactory(measurementFactory) {}
+      MeasurementCreatorFactory<CDCBaseMeasurementCreator>(),
+      m_measurementFactory(measurementFactory) {}
 
     /** Only a simple reco hit creator is implemented in the moment. */
-    BaseMeasurementCreatorFromHit<RecoTrack::UsedCDCHit, Const::CDC>* createMeasurementCreatorFromName(
-      const std::string& creatorName) const
+    CDCBaseMeasurementCreator* createMeasurementCreatorFromName(
+      const std::string& creatorName) const override
     {
       if (creatorName == "RecoHitCreator") {
-        return new CoordinateMeasurementCreator<RecoTrack::UsedCDCHit, Const::CDC>(m_measurementFactory);
+        return new CDCCoordinateMeasurementCreator(m_measurementFactory);
       }
 
       return nullptr;

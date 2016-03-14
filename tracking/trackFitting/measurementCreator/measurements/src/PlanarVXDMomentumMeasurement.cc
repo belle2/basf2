@@ -7,27 +7,20 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
 
-#include <tracking/modules/fitter/BaseRecoFitterModule.h>
-#include <genfit/DAF.h>
+#include <tracking/trackFitting/measurementCreator/measurements/PlanarVXDMomentumMeasurement.h>
 
-namespace Belle2 {
 
-  /** DAF fitter. */
-  class DAFRecoFitterModule : public BaseRecoFitterModule {
-  public:
-    /** Module for the DAF fitter. */
-    DAFRecoFitterModule();
+using namespace Belle2;
 
-  protected:
-    /** Create a DAF fitter. */
-    std::shared_ptr<genfit::AbsFitter> createFitter() const override;
+template<>
+int PlanarVXDMomentumMeasurement<PXDCluster>::getDetId() const
+{
+  return Belle2::Const::PXD;
+}
 
-  private:
-    /** Probability cut for the DAF. Any value between 0 and 1 possible. Common values are between 0.01 and 0.001. */
-    double m_param_probabilityCut;
-    /** Maximum number of failed hits before aborting the fit. */
-    int m_param_maxNumberOfFailedHits = -1;
-  };
+template<>
+int PlanarVXDMomentumMeasurement<SVDCluster>::getDetId() const
+{
+  return Belle2::Const::SVD;
 }

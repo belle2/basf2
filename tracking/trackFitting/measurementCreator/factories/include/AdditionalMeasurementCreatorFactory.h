@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/measurementCreator/factories/MeasurementCreatorFactory.h>
-#include <tracking/measurementCreator/creators/CoordinateMeasurementCreator.h>
+#include <tracking/trackFitting/measurementCreator/factories/MeasurementCreatorFactory.h>
+#include <tracking/trackFitting/measurementCreator/creators/CoordinateMeasurementCreator.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
@@ -25,7 +25,7 @@ namespace Belle2 {
     {}
 
     /** No creator is implemented in the moment. */
-    BaseMeasurementCreator* createMeasurementCreatorFromName(const std::string& /*creatorName*/) const
+    BaseMeasurementCreator* createMeasurementCreatorFromName(const std::string& /*creatorName*/) const override
     {
       return nullptr;
     }

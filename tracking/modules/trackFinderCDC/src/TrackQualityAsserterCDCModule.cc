@@ -29,10 +29,6 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
         return true;
       }
 
-      if (recoTrack->wasLastFitSucessfull()) {
-        return true;
-      }
-
       return false;
     }), tracks.end());
   }

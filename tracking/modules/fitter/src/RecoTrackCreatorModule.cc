@@ -12,6 +12,8 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <mdst/dataobjects/MCParticle.h>
 
+#include <framework/datastore/RelationArray.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -56,19 +58,19 @@ void RecoTrackCreatorModule::initialize()
   StoreArray<RecoHitInformation> recoHitInformations(m_param_recoHitInformationStoreArrayName);
   recoHitInformations.registerInDataStore();
 
-  StoreArray<RecoTrack::UsedCDCHit> cdcHits(m_param_cdcHitsStoreArrayName);
+  StoreArray<RecoHitInformation::UsedCDCHit> cdcHits(m_param_cdcHitsStoreArrayName);
   if (cdcHits.isOptional()) {
     cdcHits.registerRelationTo(recoTracks);
     recoHitInformations.registerRelationTo(cdcHits);
   }
 
-  StoreArray<RecoTrack::UsedSVDHit> svdHits(m_param_svdHitsStoreArrayName);
+  StoreArray<RecoHitInformation::UsedSVDHit> svdHits(m_param_svdHitsStoreArrayName);
   if (svdHits.isOptional()) {
     svdHits.registerRelationTo(recoTracks);
     recoHitInformations.registerRelationTo(svdHits);
   }
 
-  StoreArray<RecoTrack::UsedPXDHit> pxdHits(m_param_pxdHitsStoreArrayName);
+  StoreArray<RecoHitInformation::UsedPXDHit> pxdHits(m_param_pxdHitsStoreArrayName);
   if (pxdHits.isOptional()) {
     pxdHits.registerRelationTo(recoTracks);
     recoHitInformations.registerRelationTo(pxdHits);
@@ -82,12 +84,20 @@ void RecoTrackCreatorModule::event()
   StoreArray <genfit::TrackCand> trackCandidates(m_param_trackCandidatesStoreArrayName);
 
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
-  recoTracks.create();
+  if (not recoTracks.isValid()) {
+    recoTracks.create();
+  }
 
   StoreArray<RecoHitInformation> recoHitInformations(m_param_recoHitInformationStoreArrayName);
-  recoHitInformations.create();
+  if (not recoHitInformations.isValid()) {
+    recoHitInformations.create();
+  }
 
   StoreArray<MCParticle> mcParticles;
+
+  // ugly..
+  unsigned int trackCandidateCounter = 0;
+  RelationArray relationsFromRecoTracksToTrackCandidates(recoTracks, trackCandidates);
 
   for (const genfit::TrackCand& trackCandidate : trackCandidates) {
 
@@ -100,14 +110,20 @@ void RecoTrackCreatorModule::event()
                                                              m_param_cdcHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_pxdHitsStoreArrayName,
                                                              m_param_recoHitInformationStoreArrayName);
 
-    newRecoTrack->addRelationTo(&trackCandidate);
-    DataStore::Instance().addRelationFromTo(&trackCandidate, newRecoTrack);
+
+    relationsFromRecoTracksToTrackCandidates.add(newRecoTrack->getArrayIndex(), trackCandidateCounter);
 
     // Add also the MC information
     const int mcParticleID = trackCandidate.getMcTrackId();
     if (mcParticleID > 0 and mcParticles.isOptional()) {
       MCParticle* relatedMCParticle = mcParticles[mcParticleID];
-      newRecoTrack->addRelationTo(relatedMCParticle);
+      if (relatedMCParticle) {
+        newRecoTrack->addRelationTo(relatedMCParticle);
+      } else {
+        B2WARNING("Related MCParticle is invalid. Can not make a relations.");
+      }
     }
+
+    trackCandidateCounter++;
   }
 }

@@ -131,6 +131,9 @@ def additional_options(path):
         if m.type() == 'GenFitter':
             m.param('PDGCodes', [get_generated_pdg_code()])
 
+        if m.type() == 'DAFRecoFitter':
+            m.param('pdgCodeToUseForFitting', get_generated_pdg_code())
+
 
 def run_simulation(path, pt_value, output_filename=''):
     """Add needed modules to the path and set parameters and start it"""

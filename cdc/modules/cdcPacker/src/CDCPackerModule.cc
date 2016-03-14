@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
- * CDC unpacker module                                                    *
+ * CDC packer module                                                    *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Satoru Yamada and Makoto Uchida                          *
  *                                                                        *
@@ -285,10 +285,10 @@ void CDCPackerModule::loadMap()
 {
 
   if (! FileSystem::fileExists(m_xmlMapFileName)) {
-    B2ERROR("CDC unpacker can't fine a filename: " << m_xmlMapFileName);
+    B2ERROR("CDC packer can't fine a filename: " << m_xmlMapFileName);
     exit(1);
   } else {
-    B2INFO("CDC unpacker found a filename: " << m_xmlMapFileName);
+    B2INFO("CDC packer found a filename: " << m_xmlMapFileName);
   }
 
 

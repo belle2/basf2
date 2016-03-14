@@ -95,7 +95,7 @@ def add_track_finding(path, components=None):
     use_vxd = components is None or 'SVD' in components
     use_cdc = components is None or 'CDC' in components
 
-    # CDC track finder: trasan
+    # CDC track finder
     if use_cdc:
         cdc_trackcands = ''
         if use_vxd:

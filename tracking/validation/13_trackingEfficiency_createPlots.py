@@ -426,7 +426,7 @@ def get_scaled_rms_90(values, scale_factor=0.79):
 
     number_entries = len(values)
 
-    (vMin, vMax) = (np.percentile(values, 5), np.percentile(values, 95))
+    (vMin, vMax) = (np.nanpercentile(values, 5), np.nanpercentile(values, 95))
     final_list = np.array(values)[np.logical_and(values > vMin, values < vMax)]
 
     rms_90 = np.sqrt(np.mean(np.square(final_list))) / scale_factor

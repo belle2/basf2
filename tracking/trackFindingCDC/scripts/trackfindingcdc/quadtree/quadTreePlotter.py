@@ -20,7 +20,7 @@ from trackfindingcdc.cdcdisplay.svgdrawing import attributemaps
 class QuadTreePlotter(basf2.Module):
     #: This Module is able to draw the content coming from a QuadTreeImplementation with debugOutput = True.
 
-    def __init__(self):
+    def __init__(self, queue):
         """
         Do not forget to set the ranges! Otherwise you will end up with an empty plot..
         """
@@ -31,6 +31,9 @@ class QuadTreePlotter(basf2.Module):
         self.range_x_max = 0
         self.range_y_min = 0
         self.range_y_max = 0
+
+        self.queue = queue
+        self.file_names = []
 
     def plot_quad_tree_content(self):
         """
@@ -81,10 +84,7 @@ class QuadTreePlotter(basf2.Module):
         """
         fileName = "/tmp/" + datetime.now().isoformat() + '.svg'
         plt.savefig(fileName)
-        procDisplay = subprocess.Popen(['eog', fileName])
-        input("Press Enter to continue..")
-        # procDisplay = subprocess.Popen(['eog', fileName])
-        # raw_input("Press Enter to continue..")
+        self.file_names.append(fileName)
 
     def init_plotting(self):
         """
@@ -102,6 +102,9 @@ class QuadTreePlotter(basf2.Module):
         self.init_plotting()
         self.plot_quad_tree_content()
         self.save_and_show_file()
+
+    def terminate(self):
+        self.queue.put("quadTree", self.file_names)
 
 
 class SegmentQuadTreePlotter(QuadTreePlotter):
@@ -155,7 +158,7 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
         """
         position = position.conformalTransformed()
 
-        theta = np.linspace(-self.maximum_theta / 2, self.maximum_theta / 2, 100)
+        theta = np.linspace(self.range_x_min, self.range_x_max, 100)
         r = position.x() * np.cos(theta) + position.y() * np.sin(theta)
 
         return theta, r
@@ -220,11 +223,11 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
             self.range_x_min = 0
             self.range_x_max = self.maximum_theta
 
-        self.range_y_min = -0.05
-        self.range_y_max = 0.05
+        self.range_y_min = -0.08
+        self.range_y_max = 0.08
 
         self.init_plotting()
-        self.plotQuadTreeContent()
+        # self.plotQuadTreeContent()
 
         if self.draw_segment_intersection:
             map = attributemaps.SegmentMCTrackIdColorMap()
@@ -268,6 +271,22 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
                 plt.plot(theta, r, color=list(map(0, segment)), marker="o")
 
             self.forAllAxialSegments(f)
+
+        if self.draw_hits:
+            cdcHits = Belle2.PyStoreArray("CDCHits")
+            wireHitTopology = Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
+
+            array = Belle2.PyStoreArray("MCTrackCands")
+            cdc_hits = [cdcHits[i] for track in array for i in track.getHitIDs()]
+
+            for cdcHit in cdcHits:
+                if cdcHit in cdc_hits:
+                    continue
+                wireHit = wireHitTopology.getWireHit(cdcHit)
+
+                theta, r = self.calculatePositionInQuadTreePicture(wireHit.getRefPos2D())
+
+                plt.plot(theta, r, marker="", color="black", ls="-", alpha=0.8)
 
         if self.draw_mc_hits:
             wireHitTopology = Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()

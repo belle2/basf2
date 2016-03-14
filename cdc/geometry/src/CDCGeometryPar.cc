@@ -839,6 +839,7 @@ void CDCGeometryPar::readChMap(const GearDir gbxParams)
     ifs >> iSL >> iL >> iW >> iB >> iC;
     if (ifs.eof()) break;
 
+    if (iSL >= nSuperLayers) continue;
     ++nRead;
     WireID wID(iSL, iL, iW);
     m_wireToBoard.insert(pair<WireID, unsigned short>(wID, iB));

@@ -319,6 +319,7 @@ void CDCPackerModule::loadMap()
     //    ifs >>  isl >> icl >> iw >> lay >> cpr >> finess >> ch;
     ifs >>  isl >> icl >> iw >> iBoard >> iCh;
     //     B2INFO("CDC ch " << iCh);
+    if (isl >= 9) continue;
     const WireID  wireId(isl, icl, iw);
     m_map[iBoard][iCh] = wireId;
     m_fee_board[isl][icl][iw] = iBoard;

@@ -150,6 +150,9 @@ def parse_cmd_line_arguments():
                         "running the validation. Two possible values: 'local' "
                         "or 'cluster'. Default is 'local'",
                         type=str, nargs='?', default='local')
+    parser.add_argument("-i", "--intervals", help="Comma seperated list of intervals "
+                        "for which to execute the validation scripts. Default is 'nightly'",
+                        type=str, nargs='?', default='nightly')
     parser.add_argument("-o", "--options", help="A string which will be given"
                         "to basf2 as arguments. Example: '-n 100'. "
                         "Quotes are necessary!",

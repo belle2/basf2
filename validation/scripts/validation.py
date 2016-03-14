@@ -315,6 +315,33 @@ def draw_progress_bar(delete_lines, list_of_scripts, barlength=50):
     return len(running) + 2
 
 
+class IntervalSelector:
+
+    def __init__(self, intervals):
+        """
+        Initialzes the IntervalSelector class with a list of intervals which
+        should be selected
+        """
+
+        #: stores the intervals which have been selected
+        self.intervals = [x.strip() for x in intervals]
+
+    def in_interval(self, script_object):
+        """
+        checks whether the interval listed in a script object's header is
+        within the selected
+        """
+
+        # for scripts, which have no interval set, the default is nightly
+        script_interval = "nightly"
+
+        if script_object.header is not None:
+            if "interval" in script_object.header:
+                script_interval = script_object.header["interval"]
+
+        return script_interval in self.intervals
+
+
 ###############################################################################
 #                              Class Definition                               #
 ###############################################################################
@@ -525,7 +552,7 @@ class Validation:
         # Add the file handler to self.log
         self.log.addHandler(file_handler)
 
-    def collect_steering_files(self):
+    def collect_steering_files(self, intervalSelector):
         """!
         This function will collect all steering files from the local and
         central release directory and will store the corresponding paths in
@@ -565,7 +592,12 @@ class Validation:
             c_files = scripts_in_dir(folder, self.log, '.C')
             py_files = scripts_in_dir(folder, self.log, '.py')
             for steering_file in c_files + py_files:
-                self.list_of_scripts.append(Script(steering_file, package, self.log))
+                script = Script(steering_file, package, self.log)
+
+                script.load_header()
+                # only select this script, if this interval has been selected
+                if intervalSelector.in_interval(script):
+                    self.list_of_scripts.append(script)
 
         # Thats it, now there is a complete list of all steering files on
         # which we are going to perform the validation in self.list_of_scripts
@@ -971,7 +1003,8 @@ def execute():
         # Now collect the steering files which will be used in this validation.
         # This will fill validation.list_of_sf_paths with values.
         validation.log.note('Collecting steering files...')
-        validation.collect_steering_files()
+        intervals = cmd_arguments.intervals.split(",")
+        validation.collect_steering_files(IntervalSelector(intervals))
 
         # Build headers for every script object we have created
         validation.log.note('Building headers for Script objects...')

@@ -110,7 +110,7 @@ namespace Belle2{
       }
       // Process reformatted file.
       // vector<string> keywords = {"memory_initialization_radix", "memory_initialization_vector"};
-      int t_radix;
+      int t_radix = 0;
       vector<string> t_rawData;
       while(getline(reformatCoeFile,t_line)){
         //cout<<t_line<<endl;

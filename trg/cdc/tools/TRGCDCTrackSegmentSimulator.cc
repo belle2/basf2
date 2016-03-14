@@ -60,6 +60,10 @@ main(int argc, char * argv[]) {
     // const string tab = "    ";
 
     //...Arguments...
+    if (argc < 3) {
+        cout << PROGRAM_NAME << " needs 3 arguments" << endl;
+        return -1;
+    }
     const unsigned dl = stoi(string(argv[1]));
     const unsigned sl = stoi(string(argv[2]));
     const string fn = string(argv[3]);

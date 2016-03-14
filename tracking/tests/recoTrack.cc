@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <framework/gearbox/Const.h>
 #include <vector>
+#include <genfit/WireTrackCandHit.h>
 
 
 using namespace std;
@@ -151,14 +152,13 @@ namespace Belle2 {
     // with not added hits
     cdcHit = cdcHits[4];
 
-    EXPECT_THROW(m_recoTrack->getTrackingDetector(cdcHit), std::invalid_argument);
-    EXPECT_THROW(m_recoTrack->getRightLeftInformation(cdcHit), std::invalid_argument);
-    EXPECT_THROW(m_recoTrack->getFoundByTrackFinder(cdcHit), std::invalid_argument);
-    EXPECT_THROW(m_recoTrack->getSortingParameter(cdcHit), std::invalid_argument);
+    EXPECT_B2FATAL(m_recoTrack->getTrackingDetector(cdcHit));
+    EXPECT_B2FATAL(m_recoTrack->getRightLeftInformation(cdcHit));
+    EXPECT_B2FATAL(m_recoTrack->getFoundByTrackFinder(cdcHit));
+    EXPECT_B2FATAL(m_recoTrack->getSortingParameter(cdcHit));
 
-    EXPECT_THROW(m_recoTrack->setFoundByTrackFinder(cdcHit, RecoHitInformation::OriginTrackFinder::SegmentTrackCombiner),
-                 std::invalid_argument);
-    EXPECT_THROW(m_recoTrack->setRightLeftInformation(cdcHit, RecoHitInformation::RightLeftInformation::left), std::invalid_argument);
+    EXPECT_B2FATAL(m_recoTrack->setFoundByTrackFinder(cdcHit, RecoHitInformation::OriginTrackFinder::SegmentTrackCombiner));
+    EXPECT_B2FATAL(m_recoTrack->setRightLeftInformation(cdcHit, RecoHitInformation::RightLeftInformation::left));
   }
 
   TEST_F(RecoTrackTest, testGenfitConversionOne)
@@ -170,9 +170,9 @@ namespace Belle2 {
     short int charge = 1;
     // We can not add these parameters immediately - we hve to convert them to the perigee parameters
     newCreatedTrackCand->setPosMomSeed(position, momentum, charge);
-    newCreatedTrackCand->addHit(Const::CDC, 0, -1, 0);
-    newCreatedTrackCand->addHit(Const::CDC, 1, -1, 1);
-    newCreatedTrackCand->addHit(Const::CDC, 2, -1, 2);
+    newCreatedTrackCand->addHit(new genfit::WireTrackCandHit(Const::CDC, 0, -1, 0, 0));
+    newCreatedTrackCand->addHit(new genfit::WireTrackCandHit(Const::CDC, 1, -1, 1, 0));
+    newCreatedTrackCand->addHit(new genfit::WireTrackCandHit(Const::CDC, 2, -1, 2, 0));
 
     // convert it to a RecoTrack
     RecoTrack* recoTrackFromGenfit = RecoTrack::createFromTrackCand(newCreatedTrackCand, m_storeArrayNameOfRecoTracks,

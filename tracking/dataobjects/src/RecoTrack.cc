@@ -104,7 +104,16 @@ genfit::TrackCand* RecoTrack::createGenfitTrackCand() const
   // Add the hits
   mapOnHits<UsedCDCHit>(m_storeArrayNameOfCDCHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
   const UsedCDCHit * const hit) {
-    createdTrackCand->addHit(Const::CDC, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
+    if (hitInformation.getRightLeftInformation() == RecoHitInformation::left) {
+      createdTrackCand->addHit(new genfit::WireTrackCandHit(Const::CDC, hit->getArrayIndex(), -1,
+                                                            hitInformation.getSortingParameter(), -1));
+    } else if (hitInformation.getRightLeftInformation() == RecoHitInformation::right) {
+      createdTrackCand->addHit(new genfit::WireTrackCandHit(Const::CDC, hit->getArrayIndex(), -1,
+                                                            hitInformation.getSortingParameter(), 1));
+    } else {
+      createdTrackCand->addHit(new genfit::WireTrackCandHit(Const::CDC, hit->getArrayIndex(), -1,
+                                                            hitInformation.getSortingParameter(), 0));
+    }
   });
   mapOnHits<UsedSVDHit>(m_storeArrayNameOfSVDHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
   const UsedSVDHit * const hit) {

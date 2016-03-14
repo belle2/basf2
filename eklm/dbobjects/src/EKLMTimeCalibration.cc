@@ -18,6 +18,7 @@ ClassImp(Belle2::EKLMTimeCalibration);
 
 EKLMTimeCalibration::EKLMTimeCalibration()
 {
+  m_EffectiveLightSpeed = 0;
 }
 
 EKLMTimeCalibration::~EKLMTimeCalibration()

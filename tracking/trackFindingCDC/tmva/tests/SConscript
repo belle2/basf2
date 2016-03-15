@@ -10,7 +10,7 @@ env['LIBS'] = [
     'genfit2',
     'framework',
     'geometry',
-    'boost_python3',
+    'boost_python',
     '$ROOT_LIBS',
     '$PYTHON_LIBS',
     ]

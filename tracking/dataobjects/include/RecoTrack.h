@@ -115,17 +115,17 @@ namespace Belle2 {
     RecoTrack() {}
 
     /**
-       * Construct a RecoTrack with the given helix parameters and the given names for the hits.
+       * Construct a RecoTrack with the given seed helix parameters and the given names for the hits.
        * If you do not provide information for the hit store array names, the standard parameters are used.
-       * @param position A position on the helix. Only the perigee of the helix will be saved.
-       * @param momentum The momentum of the helix on the given position.
-       * @param charge The charge of the helix
+       * @param seedPosition A position on the helix of the track seed. Only the perigee of the helix will be saved.
+       * @param seedMomentum The seed momentum of the helix on the given position.
+       * @param seedCharge The seed charge of the helix
        * @param storeArrayNameOfCDCHits The name of the store array where the related cdc hits are stored.
        * @param storeArrayNameOfSVDHits The name of the store array where the related svd hits are stored.
        * @param storeArrayNameOfPXDHits The name of the store array where the related pxd hits are stored.
        * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
        */
-    RecoTrack(const TVector3& position, const TVector3& momentum, const short int charge,
+    RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum, const short int seedCharge,
               const std::string& storeArrayNameOfCDCHits = "CDCHits",
               const std::string& storeArrayNameOfSVDHits = "SVDClusters",
               const std::string& storeArrayNameOfPXDHits = "PXDClusters",

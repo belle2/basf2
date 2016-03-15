@@ -15,18 +15,18 @@
 
 using namespace Belle2;
 
-RecoTrack::RecoTrack(const TVector3& position, const TVector3& momentum, const short int charge,
+RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum, const short int seedCharge,
                      const std::string& storeArrayNameOfCDCHits,
                      const std::string& storeArrayNameOfSVDHits,
                      const std::string& storeArrayNameOfPXDHits,
                      const std::string& storeArrayNameOfRecoHitInformation) :
-  m_charge(charge),
+  m_charge(seedCharge),
   m_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
   m_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
   m_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits),
   m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation)
 {
-  m_genfitTrack.setStateSeed(position, momentum);
+  m_genfitTrack.setStateSeed(seedPosition, seedMomentum);
 }
 
 RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand* trackCand,

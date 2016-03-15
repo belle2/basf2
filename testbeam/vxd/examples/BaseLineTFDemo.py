@@ -35,13 +35,15 @@ eventinfoprinter = register_module('EventInfoPrinter')
 
 gearbox = register_module('Gearbox')
 # use simple testbeam geometry
-gearbox.param('fileName',
-              'testbeam/vxd/FullTelescopeVXDTB_v2_NOTAlignedAtAll.xml')
+# gearbox.param('fileName',
+# 'testbeam/vxd/FullTelescopeVXDTB_v2_NOTAlignedAtAll.xml')
+gearbox.param('fileName', 'testbeam/vxd/FullVXDTB2016.xml')
 
 geometry = register_module('Geometry')
 # only the tracking detectors will be simulated. Makes the example much faster
 if fieldOn:
-    geometry.param('components', ['MagneticField', 'TB'])
+    geometry.param('excludedComponents', ['MagneticField'])
+    # geometry.param('components', ['MagneticField', 'TB'])
     # secSetup = \
     # 'TB3GeVFullMagnetNoAlignedSource2014May22SVD-moreThan1500MeV_SVD'
     secSetup = 'testBeamMini6GeVJune08MagnetOnSVD-moreThan1500MeV_SVD'
@@ -137,9 +139,6 @@ param_tf = {  # normally we don't know the particleID, but in the case of the te
 }
 tf.param(param_tf)
 
-# VXDTF DQM module
-vxdtf_dqm = register_module('VXDTFDQM')
-vxdtf_dqm.param('GFTrackCandidatesColName', 'caTracks')
 
 analyzer = register_module('TFAnalizer')
 analyzer.logging.log_level = LogLevel.INFO
@@ -161,16 +160,6 @@ param_mctrackfinder = {
 }
 mctrackfinder.param(param_mctrackfinder)
 
-trackfitter = register_module('GenFitter')
-trackfitter.logging.log_level = LogLevel.FATAL
-trackfitter.param('GFTrackCandidatesColName', 'caTracks')
-trackfitter.param('FilterId', 'Kalman')
-trackfitter.param('StoreFailedTracks', True)
-# trackfitter.param('FilterId', 'simpleKalman')
-trackfitter.param('UseClusters', True)
-
-trackfit_dqm = register_module('TrackfitDQM')
-trackfit_dqm.param('GFTrackCandidatesColName', 'caTracks')
 
 eventCounter = register_module('EventCounter')
 eventCounter.logging.log_level = LogLevel.INFO
@@ -178,14 +167,13 @@ eventCounter.param('stepSize', 25)
 
 # Create paths
 main = create_path()
-histo = register_module('HistoManager')
-histo.param('histoFileName', 'vxdtfTBdemoHist.root')  # File to save histograms
-main.add_module(histo)
+
 # Add modules to paths
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
+main.add_module(register_module('SetupGenfitExtrapolation'))
 main.add_module(particlegun)
 main.add_module(g4sim)
 main.add_module(PXDDIGI)
@@ -195,10 +183,7 @@ main.add_module(SVDCLUST)
 main.add_module(tf)
 main.add_module(mctrackfinder)
 main.add_module(analyzer)
-main.add_module(trackfitter)
 main.add_module(eventCounter)
-main.add_module(vxdtf_dqm)
-main.add_module(trackfit_dqm)
 # Process events
 process(main)
 

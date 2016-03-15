@@ -26,7 +26,7 @@ void TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particle
   int currentPdgCode = particleType.getPDGCode();
 
   const auto& pdgParticleCharge = particleType.getParticlePDG()->Charge();
-  const auto& recoTrackCharge = recoTrack.getCharge();
+  const auto& recoTrackCharge = recoTrack.getChargeSeed();
 
   // Copy from GenfitterModule
   B2ASSERT("Charge of candidate and PDG particle don't match.  (Code assumes |q| = 1).",
@@ -63,7 +63,7 @@ void TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particle
 
 void TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRep& trackRepresentation) const
 {
-  recoTrack.m_genfitTrack.setTimeSeed(calculateTimeSeed(recoTrack, trackRepresentation));
+  recoTrack.setTimeSeed(calculateTimeSeed(recoTrack, trackRepresentation));
   // Fit the track
   m_fitter->processTrack(&recoTrack.m_genfitTrack, false);
   recoTrack.setDirtyFlag(false);
@@ -77,13 +77,12 @@ void TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRe
     if (trackPoint) {
       genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo(&trackRepresentation);
       if (not kalmanFitterInfo) {
-        recoHitInformation.setFlag(RecoHitInformation::RecoHitFlag::dismissedByFit);
+        recoHitInformation.setFlag(RecoHitInformation::RecoHitFlag::c_dismissedByFit);
       } else {
         std::vector<double> weights = kalmanFitterInfo->getWeights();
         for (const double weight : weights) {
           if (weight == 0) {
-            recoHitInformation.setFlag(RecoHitInformation::RecoHitFlag::dismissedByFit);
-            B2WARNING("Throwing away a hit!");
+            recoHitInformation.setFlag(RecoHitInformation::RecoHitFlag::c_dismissedByFit);
           }
         }
       }
@@ -121,7 +120,7 @@ double TrackFitter::calculateTimeSeed(const RecoTrack& recoTrack,
 {
   const int pdgCodeForFit = trackRepresentation.getPDG();
   TParticlePDG* particleWithPDGCode = TDatabasePDG::Instance()->GetParticle(pdgCodeForFit);
-  const TVector3& momentum = recoTrack.getMomentum();
+  const TVector3& momentum = recoTrack.getMomentumSeed();
 
   // Particle velocity in cm / ns.
   const double m = particleWithPDGCode->Mass();
@@ -135,7 +134,7 @@ double TrackFitter::calculateTimeSeed(const RecoTrack& recoTrack,
   // obtaining this directly from the difference in z, as it
   // only provide arc-lengths in the transverse plane, so we do
   // it like this.
-  const TVector3& perigeePosition = recoTrack.getPosition();
+  const TVector3& perigeePosition = recoTrack.getPositionSeed();
   const Belle2::Helix h(perigeePosition, momentum, particleWithPDGCode->Charge() / 3, 1.5);
   const double s2D = h.getArcLength2DAtCylindricalR(perigeePosition.Perp());
   const double s = s2D * hypot(1, h.getTanLambda());

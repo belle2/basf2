@@ -85,10 +85,10 @@ void BaseRecoFitterModule::event()
 
     B2DEBUG(100, "Fitting reco track candidate number " << recoTrackCounter);
     B2DEBUG(100, "Reco track candidate has start values: ");
-    B2DEBUG(100, "Momentum: " << recoTrack.getMomentum().X() << " " << recoTrack.getMomentum().Y() << " " <<
-            recoTrack.getMomentum().Z());
-    B2DEBUG(100, "Position: " << recoTrack.getPosition().X() << " " << recoTrack.getPosition().Y() << " " <<
-            recoTrack.getPosition().Z());
+    B2DEBUG(100, "Momentum: " << recoTrack.getMomentumSeed().X() << " " << recoTrack.getMomentumSeed().Y() << " " <<
+            recoTrack.getMomentumSeed().Z());
+    B2DEBUG(100, "Position: " << recoTrack.getPositionSeed().X() << " " << recoTrack.getPositionSeed().Y() << " " <<
+            recoTrack.getPositionSeed().Z());
     B2DEBUG(100, "PDG: " << m_param_pdgCodeToUseForFitting);
     B2DEBUG(100, "Total number of hits assigned to the track: " << recoTrack.getNumberOfTotalHits());
 

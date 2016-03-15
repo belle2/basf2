@@ -25,17 +25,21 @@ RecoTrackCreatorModule::RecoTrackCreatorModule() :
   setDescription("Converts the given genfit::TrackCands in the StoreArray to RecoTracks for further use in the fitter.");
 
   addParam("trackCandidatesStoreArrayName", m_param_trackCandidatesStoreArrayName, "StoreArray name of the input track candidates.",
-           std::string("TrackCands"));
+           m_param_trackCandidatesStoreArrayName);
   addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the output reco tracks.",
-           std::string("RecoTracks"));
+           m_param_recoTracksStoreArrayName);
   addParam("recoHitInformationStoreArrayName", m_param_recoHitInformationStoreArrayName,
-           "StoreArray name of the output reco hit information.", std::string("RecoHitInformations"));
+           "StoreArray name of the output reco hit information.", m_param_recoHitInformationStoreArrayName);
 
-  addParam("cdcHitsStoreArrayName", m_param_cdcHitsStoreArrayName, "StoreArray name of the input cdc hits.", std::string("CDCHits"));
+  addParam("recreateSortingParameters", m_param_recreateSortingParameters,
+           "Flag to recreate the sorting parameters of the hit out of the stored order.", m_param_recreateSortingParameters);
+
+  addParam("cdcHitsStoreArrayName", m_param_cdcHitsStoreArrayName, "StoreArray name of the input cdc hits.",
+           m_param_cdcHitsStoreArrayName);
   addParam("pxdHitsStoreArrayName", m_param_pxdHitsStoreArrayName, "StoreArray name of the input pxd hits.",
-           std::string("PXDClusters"));
+           m_param_pxdHitsStoreArrayName);
   addParam("svdHitsStoreArrayName", m_param_svdHitsStoreArrayName, "StoreArray name of the input svd hits.",
-           std::string("SVDClusters"));
+           m_param_svdHitsStoreArrayName);
 }
 
 void RecoTrackCreatorModule::initialize()
@@ -106,9 +110,9 @@ void RecoTrackCreatorModule::event()
       continue;
     }
 
-    RecoTrack* newRecoTrack = RecoTrack::createFromTrackCand(&trackCandidate, m_param_recoTracksStoreArrayName,
+    RecoTrack* newRecoTrack = RecoTrack::createFromTrackCand(trackCandidate, m_param_recoTracksStoreArrayName,
                                                              m_param_cdcHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_pxdHitsStoreArrayName,
-                                                             m_param_recoHitInformationStoreArrayName);
+                                                             m_param_recoHitInformationStoreArrayName, m_param_recreateSortingParameters);
 
 
     relationsFromRecoTracksToTrackCandidates.add(newRecoTrack->getArrayIndex(), trackCandidateCounter);

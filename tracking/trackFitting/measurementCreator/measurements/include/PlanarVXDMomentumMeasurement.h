@@ -135,9 +135,9 @@ namespace Belle2 {
 
 
     // Copy the information from the reco track.
-    const TVector3& trackPosition(m_recoTrack->getPosition());
-    const TVector3& trackMomentum(m_recoTrack->getMomentum());
-    short trackCharge = m_recoTrack->getCharge();
+    const TVector3& trackPosition(m_recoTrack->getPositionSeed());
+    const TVector3& trackMomentum(m_recoTrack->getMomentumSeed());
+    short trackCharge = m_recoTrack->getChargeSeed();
 
     // Copy the information from the mc particle (if there is one)
     MCParticle* relatedMCParticle = m_hit->template getRelated<MCParticle>("MCParticles");

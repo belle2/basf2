@@ -18,6 +18,8 @@
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <framework/datastore/StoreArray.h>
+
 #include <TMath.h>
 #include <cmath>
 
@@ -27,6 +29,7 @@ namespace genfit {
 
 namespace Belle2 {
   class MCParticle;
+  class RecoTrack;
 
 
   namespace TrackFindingCDC {
@@ -100,11 +103,17 @@ namespace Belle2 {
       { return not isInvalid(); }
 
     public:
+      /// Copies the trajectory information to the Genfit track candidate.
+      bool fillInto(genfit::TrackCand& trackCand) const;
+
       /// Copies the trajectory information to the Genfit track candidate
       bool fillInto(genfit::TrackCand& trackCand, const double bZ) const;
 
-      /// Copies the trajectory information to the Genfit track candidate
-      bool fillInto(genfit::TrackCand& trackCand) const;
+      /// Copies the trajectory information to the RecoTrack
+      RecoTrack* storeInto(StoreArray<RecoTrack>& recoTracks) const;
+
+      /// Copies the trajectory information to the RecoTrack
+      RecoTrack* storeInto(StoreArray<RecoTrack>& recoTracks, const double bZ) const;
 
 
     public:

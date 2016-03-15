@@ -9,19 +9,15 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
-#include <genfit/TrackCand.h>
-#include <framework/datastore/StoreArray.h>
-
 #include <vector>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+
+    class CDCTrack;
 
     /**
      *  Exports tracks has genfit track candidates
@@ -37,72 +33,19 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      virtual std::string getDescription() override
-      {
-        return "Creates reconstruction track candidates from each individual tracks.";
-      }
+      virtual std::string getDescription() override;
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
-      {
-        moduleParamList->addParameter(prefixed(prefix, "GFTrackCandsStoreArrayName"),
-                                      m_param_exportTracksInto,
-                                      "Alias for exportTracksInto",
-                                      std::string(m_param_exportTracksInto));
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final;
 
-        moduleParamList->addParameter(prefixed(prefix, "WriteGFTrackCands"),
-                                      m_param_exportTracks,
-                                      "Alias for exportTracks",
-                                      bool(m_param_exportTracks));
-
-        moduleParamList->addParameter(prefixed(prefix, "exportTracks"),
-                                      m_param_exportTracks,
-                                      "Switch for the creation of genfit track candidates for each cdc track.",
-                                      bool(m_param_exportTracks));
-
-        moduleParamList->addParameter(prefixed(prefix, "exportTracksInto"),
-                                      m_param_exportTracksInto,
-                                      "Name of the output StoreArray of genfit track candidates.",
-                                      std::string(m_param_exportTracksInto));
-      }
-
-    public:
       /// Signal initialisation phase to register store array for export
-      virtual void initialize() override
-      {
-        // Output StoreArray
-        if (m_param_exportTracks) {
-          StoreArray <genfit::TrackCand> storedGFTrackCands(m_param_exportTracksInto);
-          storedGFTrackCands.registerInDataStore();
-        }
-        Super::initialize();
-      }
+      virtual void initialize() override;
 
       /// Signal new event recreate the store array
-      virtual void beginEvent() override
-      {
-        if (m_param_exportTracks) {
-          StoreArray<genfit::TrackCand> storedGFTrackCands(m_param_exportTracksInto);
-          storedGFTrackCands.create();
-        }
-        Super::beginEvent();
-      }
+      virtual void beginEvent() override;
 
       /// Write give tracks into track store array
-      virtual void apply(std::vector<CDCTrack>& tracks) override final
-      {
-        // Put code to generate gf track cands here if requested.
-        if (m_param_exportTracks) {
-          StoreArray<genfit::TrackCand> storedGFTrackCands(m_param_exportTracksInto);
-          for (CDCTrack& track : tracks) {
-            genfit::TrackCand gfTrackCand;
-            if (track.fillInto(gfTrackCand)) {
-              genfit::TrackCand* storedGenfitTrackCand = storedGFTrackCands.appendNew(gfTrackCand);
-              track.setRelatedGenfitTrackCandidate(storedGenfitTrackCand);
-            }
-          }
-        }
-      }
+      virtual void apply(std::vector<CDCTrack>& tracks) override final;
 
     private:
       /// Parameter: Switch if genfit::TrackCandidates shall be generated for each track.

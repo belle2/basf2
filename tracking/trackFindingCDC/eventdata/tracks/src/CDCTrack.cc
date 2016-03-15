@@ -16,6 +16,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/GenfitUtil.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackCand.h>
 
 using namespace std;
@@ -310,6 +311,15 @@ bool CDCTrack::fillInto(genfit::TrackCand& trackCand) const
 {
   GenfitUtil::fill(trackCand, *this);
   return getStartTrajectory3D().fillInto(trackCand);
+}
+
+bool CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
+{
+  RecoTrack* newRecoTrack = getStartTrajectory3D().storeInto(recoTracks);
+  if (newRecoTrack) {
+    GenfitUtil::fill(*newRecoTrack, *this);
+  }
+  return true;
 }
 
 

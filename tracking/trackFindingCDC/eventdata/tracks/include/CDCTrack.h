@@ -21,6 +21,8 @@ namespace genfit {
 }
 
 namespace Belle2 {
+  class RecoTrack;
+
   namespace TrackFindingCDC {
     class CDCRecoSegment2D;
     class CDCRecoSegment3D;
@@ -51,6 +53,9 @@ namespace Belle2 {
 
       /// Copies the hit and trajectory content of this track to the Genfit track candidate
       bool fillInto(genfit::TrackCand& trackCand) const;
+
+      /// Copies the hit and trajectory content of this track to a new RecoTrack and store it into the store array.
+      bool storeInto(StoreArray<RecoTrack>& recoTracks) const;
 
       /** Splits the track into segments.
        *  Note : No trajectory information is copied*/

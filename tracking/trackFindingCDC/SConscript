@@ -7,9 +7,7 @@ env.Dictionary()['SUBLIB'] = True
 
 # Additional libraries
 env['LIBS'] = [
-    # This should be removed once the CDCLegendreNiceDrawing is gone,
-    # since it is the only thing the links currently links to tracking.
-
+    'tracking_dataobjects',
     'geometry',
     #'pxd', 'pxd_dataobjects',
     #'svd', 'svd_dataobjects',

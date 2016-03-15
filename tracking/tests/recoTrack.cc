@@ -91,7 +91,7 @@ namespace Belle2 {
 
     // Add three cdc hits to the track
     m_recoTrack->addCDCHit(cdcHits[0], 1);
-    m_recoTrack->addCDCHit(cdcHits[1], 0, RecoHitInformation::RightLeftInformation::right);
+    m_recoTrack->addCDCHit(cdcHits[1], 0, RecoHitInformation::RightLeftInformation::c_right);
     m_recoTrack->addCDCHit(cdcHits[2], 2);
 
     EXPECT_TRUE(m_recoTrack->hasCDCHits());
@@ -120,15 +120,15 @@ namespace Belle2 {
 
     RecoHitInformation* recoHitInformation = m_recoTrack->getRecoHitInformation(cdcHit);
     EXPECT_NE(recoHitInformation, nullptr);
-    EXPECT_EQ(recoHitInformation->getTrackingDetector(), RecoHitInformation::TrackingDetector::CDC);
-    EXPECT_EQ(recoHitInformation->getRightLeftInformation(), RecoHitInformation::RightLeftInformation::undefinedRightLeftInformation);
-    EXPECT_EQ(recoHitInformation->getFoundByTrackFinder(), RecoHitInformation::OriginTrackFinder::undefinedTrackFinder);
+    EXPECT_EQ(recoHitInformation->getTrackingDetector(), RecoHitInformation::TrackingDetector::c_CDC);
+    EXPECT_EQ(recoHitInformation->getRightLeftInformation(), RecoHitInformation::RightLeftInformation::c_undefinedRightLeftInformation);
+    EXPECT_EQ(recoHitInformation->getFoundByTrackFinder(), RecoHitInformation::OriginTrackFinder::c_undefinedTrackFinder);
     EXPECT_EQ(recoHitInformation->getSortingParameter(), 1);
 
     cdcHit = cdcHits[1];
     recoHitInformation = m_recoTrack->getRecoHitInformation(cdcHit);
     EXPECT_NE(recoHitInformation, nullptr);
-    EXPECT_EQ(recoHitInformation->getRightLeftInformation(), RecoHitInformation::RightLeftInformation::right);
+    EXPECT_EQ(recoHitInformation->getRightLeftInformation(), RecoHitInformation::RightLeftInformation::c_right);
 
 
 
@@ -136,17 +136,17 @@ namespace Belle2 {
     // with added hits
     cdcHit = cdcHits[0];
 
-    EXPECT_EQ(m_recoTrack->getTrackingDetector(cdcHit), RecoHitInformation::TrackingDetector::CDC);
-    EXPECT_EQ(m_recoTrack->getRightLeftInformation(cdcHit), RecoHitInformation::RightLeftInformation::undefinedRightLeftInformation);
-    EXPECT_EQ(m_recoTrack->getFoundByTrackFinder(cdcHit), RecoHitInformation::OriginTrackFinder::undefinedTrackFinder);
+    EXPECT_EQ(m_recoTrack->getTrackingDetector(cdcHit), RecoHitInformation::TrackingDetector::c_CDC);
+    EXPECT_EQ(m_recoTrack->getRightLeftInformation(cdcHit), RecoHitInformation::RightLeftInformation::c_undefinedRightLeftInformation);
+    EXPECT_EQ(m_recoTrack->getFoundByTrackFinder(cdcHit), RecoHitInformation::OriginTrackFinder::c_undefinedTrackFinder);
     EXPECT_EQ(m_recoTrack->getSortingParameter(cdcHit), 1);
 
-    EXPECT_NO_THROW(m_recoTrack->setFoundByTrackFinder(cdcHit, RecoHitInformation::OriginTrackFinder::SegmentTrackCombiner));
-    EXPECT_NO_THROW(m_recoTrack->setRightLeftInformation(cdcHit, RecoHitInformation::RightLeftInformation::left));
+    EXPECT_NO_THROW(m_recoTrack->setFoundByTrackFinder(cdcHit, RecoHitInformation::OriginTrackFinder::c_SegmentTrackCombiner));
+    EXPECT_NO_THROW(m_recoTrack->setRightLeftInformation(cdcHit, RecoHitInformation::RightLeftInformation::c_left));
     EXPECT_NO_THROW(m_recoTrack->setSortingParameter(cdcHit, 3));
 
-    EXPECT_EQ(m_recoTrack->getFoundByTrackFinder(cdcHit), RecoHitInformation::OriginTrackFinder::SegmentTrackCombiner);
-    EXPECT_EQ(m_recoTrack->getRightLeftInformation(cdcHit), RecoHitInformation::RightLeftInformation::left);
+    EXPECT_EQ(m_recoTrack->getFoundByTrackFinder(cdcHit), RecoHitInformation::OriginTrackFinder::c_SegmentTrackCombiner);
+    EXPECT_EQ(m_recoTrack->getRightLeftInformation(cdcHit), RecoHitInformation::RightLeftInformation::c_left);
     EXPECT_EQ(m_recoTrack->getSortingParameter(cdcHit), 3);
 
     // with not added hits
@@ -157,22 +157,22 @@ namespace Belle2 {
     EXPECT_B2FATAL(m_recoTrack->getFoundByTrackFinder(cdcHit));
     EXPECT_B2FATAL(m_recoTrack->getSortingParameter(cdcHit));
 
-    EXPECT_B2FATAL(m_recoTrack->setFoundByTrackFinder(cdcHit, RecoHitInformation::OriginTrackFinder::SegmentTrackCombiner));
-    EXPECT_B2FATAL(m_recoTrack->setRightLeftInformation(cdcHit, RecoHitInformation::RightLeftInformation::left));
+    EXPECT_B2FATAL(m_recoTrack->setFoundByTrackFinder(cdcHit, RecoHitInformation::OriginTrackFinder::c_SegmentTrackCombiner));
+    EXPECT_B2FATAL(m_recoTrack->setRightLeftInformation(cdcHit, RecoHitInformation::RightLeftInformation::c_left));
   }
 
   TEST_F(RecoTrackTest, testGenfitConversionOne)
   {
     // Create a genfit track cand
-    genfit::TrackCand* newCreatedTrackCand = new genfit::TrackCand();
+    genfit::TrackCand newCreatedTrackCand;
     TVector3 position(4, 23, 5.6);
     TVector3 momentum(4, 23, 5.6);
     short int charge = 1;
     // We can not add these parameters immediately - we hve to convert them to the perigee parameters
-    newCreatedTrackCand->setPosMomSeed(position, momentum, charge);
-    newCreatedTrackCand->addHit(new genfit::WireTrackCandHit(Const::CDC, 0, -1, 0, 0));
-    newCreatedTrackCand->addHit(new genfit::WireTrackCandHit(Const::CDC, 1, -1, 1, 0));
-    newCreatedTrackCand->addHit(new genfit::WireTrackCandHit(Const::CDC, 2, -1, 2, 0));
+    newCreatedTrackCand.setPosMomSeed(position, momentum, charge);
+    newCreatedTrackCand.addHit(new genfit::WireTrackCandHit(Const::CDC, 0, -1, 0, 0));
+    newCreatedTrackCand.addHit(new genfit::WireTrackCandHit(Const::CDC, 1, -1, 1, 0));
+    newCreatedTrackCand.addHit(new genfit::WireTrackCandHit(Const::CDC, 2, -1, 2, 0));
 
     // convert it to a RecoTrack
     RecoTrack* recoTrackFromGenfit = RecoTrack::createFromTrackCand(newCreatedTrackCand, m_storeArrayNameOfRecoTracks,
@@ -181,20 +181,20 @@ namespace Belle2 {
 
     // convert it back
 
-    genfit::TrackCand* exportedTrackCand = recoTrackFromGenfit->createGenfitTrackCand();
+    const genfit::TrackCand& exportedTrackCand = recoTrackFromGenfit->createGenfitTrackCand();
 
     // Expect equal
-    ASSERT_EQ(exportedTrackCand->getNHits(), newCreatedTrackCand->getNHits());
-    EXPECT_NEAR(exportedTrackCand->getPosSeed().X(), newCreatedTrackCand->getPosSeed().X(), 1E-10);
-    EXPECT_NEAR(exportedTrackCand->getPosSeed().Y(), newCreatedTrackCand->getPosSeed().Y(), 1E-10);
-    EXPECT_NEAR(exportedTrackCand->getPosSeed().Z(), newCreatedTrackCand->getPosSeed().Z(), 1E-10);
-    EXPECT_NEAR(exportedTrackCand->getMomSeed().X(), newCreatedTrackCand->getMomSeed().X(), 1E-10);
-    EXPECT_NEAR(exportedTrackCand->getMomSeed().Y(), newCreatedTrackCand->getMomSeed().Y(), 1E-10);
-    EXPECT_NEAR(exportedTrackCand->getMomSeed().Z(), newCreatedTrackCand->getMomSeed().Z(), 1E-10);
-    EXPECT_EQ(exportedTrackCand->getChargeSeed(), newCreatedTrackCand->getChargeSeed());
-    EXPECT_EQ(exportedTrackCand->getHit(0)->getHitId(), newCreatedTrackCand->getHit(0)->getHitId());
-    EXPECT_EQ(exportedTrackCand->getHit(1)->getSortingParameter(), newCreatedTrackCand->getHit(1)->getSortingParameter());
-    EXPECT_EQ(exportedTrackCand->getHit(2)->getHitId(), newCreatedTrackCand->getHit(2)->getHitId());
+    ASSERT_EQ(exportedTrackCand.getNHits(), newCreatedTrackCand.getNHits());
+    EXPECT_NEAR(exportedTrackCand.getPosSeed().X(), newCreatedTrackCand.getPosSeed().X(), 1E-10);
+    EXPECT_NEAR(exportedTrackCand.getPosSeed().Y(), newCreatedTrackCand.getPosSeed().Y(), 1E-10);
+    EXPECT_NEAR(exportedTrackCand.getPosSeed().Z(), newCreatedTrackCand.getPosSeed().Z(), 1E-10);
+    EXPECT_NEAR(exportedTrackCand.getMomSeed().X(), newCreatedTrackCand.getMomSeed().X(), 1E-10);
+    EXPECT_NEAR(exportedTrackCand.getMomSeed().Y(), newCreatedTrackCand.getMomSeed().Y(), 1E-10);
+    EXPECT_NEAR(exportedTrackCand.getMomSeed().Z(), newCreatedTrackCand.getMomSeed().Z(), 1E-10);
+    EXPECT_EQ(exportedTrackCand.getChargeSeed(), newCreatedTrackCand.getChargeSeed());
+    EXPECT_EQ(exportedTrackCand.getHit(0)->getHitId(), newCreatedTrackCand.getHit(0)->getHitId());
+    EXPECT_EQ(exportedTrackCand.getHit(1)->getSortingParameter(), newCreatedTrackCand.getHit(1)->getSortingParameter());
+    EXPECT_EQ(exportedTrackCand.getHit(2)->getHitId(), newCreatedTrackCand.getHit(2)->getHitId());
   }
 
   TEST_F(RecoTrackTest, testGenfitConversionTwo)
@@ -204,14 +204,14 @@ namespace Belle2 {
 
     // Add three cdc hits to the track
     m_recoTrack->addCDCHit(cdcHits[0], 1);
-    m_recoTrack->addCDCHit(cdcHits[1], 0, RecoHitInformation::RightLeftInformation::right);
+    m_recoTrack->addCDCHit(cdcHits[1], 0, RecoHitInformation::RightLeftInformation::c_right);
     m_recoTrack->addCDCHit(cdcHits[2], 2);
 
     EXPECT_TRUE(m_recoTrack->hasCDCHits());
 
-    genfit::TrackCand* exportedTrackCand = m_recoTrack->createGenfitTrackCand();
+    const genfit::TrackCand& exportedTrackCand = m_recoTrack->createGenfitTrackCand();
 
-    ASSERT_EQ(exportedTrackCand->getNHits(), m_recoTrack->getNumberOfTotalHits());
+    ASSERT_EQ(exportedTrackCand.getNHits(), m_recoTrack->getNumberOfTotalHits());
     ASSERT_EQ(m_recoTrack->getNumberOfTotalHits(), 3);
 
     RecoTrack* recoTrackFromGenfit = RecoTrack::createFromTrackCand(exportedTrackCand, m_storeArrayNameOfRecoTracks,

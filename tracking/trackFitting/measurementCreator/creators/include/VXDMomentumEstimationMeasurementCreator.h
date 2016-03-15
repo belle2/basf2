@@ -81,7 +81,7 @@ namespace Belle2 {
         return {};
       }
 
-      const TVector3& momentum = recoTrack.getMomentum();
+      const TVector3& momentum = recoTrack.getMomentumSeed();
 
       if (momentum.Mag() > m_minimumMomentum) {
         return {};

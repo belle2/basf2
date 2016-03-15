@@ -9,14 +9,16 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
 
 
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
+
 #include <genfit/TrackCand.h>
 
+#include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <cmath>
@@ -26,6 +28,90 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+namespace {
+  // Anonymous helper function
+  TMatrixDSym calculateCovarianceMatrix(const UncertainHelix& localHelix, const Vector3D& position, const Vector3D& momentum,
+                                        const ESign charge, const double bZ)
+  {
+    const double impactXY = localHelix.impactXY();
+    const Vector2D& tangentialXY = localHelix.tangentialXY();
+
+    const double cosPhi0 = tangentialXY.x();
+    const double sinPhi0 = tangentialXY.y();
+
+    const double curvatureXY = localHelix.curvatureXY();
+    const double tanLambda = localHelix.tanLambda();
+
+    // 0. Define indices
+    // Maybe push these out of this function:
+    // Indices of the cartesian coordinates
+    const int iX = 0;
+    const int iY = 1;
+    const int iZ = 2;
+    const int iPx = 3;
+    const int iPy = 4;
+    const int iPz = 5;
+
+    TMatrixDSym cov5 = localHelix.helixCovariance();
+
+    // 1. Inflat the perigee covariance to a cartesian covariance where phi0 = 0 is assumed
+    // Jacobian matrix for the translation
+    TMatrixD jacobianInflate(6, 5);
+    jacobianInflate.Zero();
+
+    const double alpha = getAlphaFromBField(bZ);
+    const double chargeAlphaCurv = charge * alpha * curvatureXY;
+    const double chargeAlphaCurv2 = charge * alpha * std::pow(curvatureXY, 2);
+
+    const double invChargeAlphaCurv = 1.0 / chargeAlphaCurv;
+    const double invChargeAlphaCurv2 = 1.0 / chargeAlphaCurv2;
+
+
+    using namespace NHelixParameter;
+    // Position
+    jacobianInflate(iX, c_Phi0) = -impactXY;
+    jacobianInflate(iY, c_I) = 1.0;
+    jacobianInflate(iZ, c_Z0) = 1.0;
+
+    // Momentum
+    if (bZ == 0) {
+      jacobianInflate(iPx, c_Curv) = 0;
+      jacobianInflate(iPy, c_Phi0) = momentum.cylindricalR();
+      jacobianInflate(iPz, c_Curv) = 0;
+      jacobianInflate(iPz, c_TanL) = momentum.cylindricalR();
+    } else {
+      jacobianInflate(iPx, c_Curv) = invChargeAlphaCurv2;
+      jacobianInflate(iPy, c_Phi0) = - invChargeAlphaCurv;
+      jacobianInflate(iPz, c_Curv) = tanLambda * invChargeAlphaCurv2;
+      jacobianInflate(iPz, c_TanL) = - invChargeAlphaCurv;
+    }
+    // Transform
+    TMatrixDSym cov6 = cov5; //copy
+    cov6.Similarity(jacobianInflate);
+
+    /// 2. Rotate to the right phi0
+    TMatrixD jacobianRot(6, 6);
+    jacobianRot.Zero();
+
+    // Active rotation matrix by phi0:
+    jacobianRot(iX, iX) = cosPhi0;
+    jacobianRot(iX, iY) = -sinPhi0;
+    jacobianRot(iY, iX) = sinPhi0;
+    jacobianRot(iY, iY) = cosPhi0;
+    jacobianRot(iZ, iZ) = 1.0;
+
+    jacobianRot(iPx, iPx) = cosPhi0;
+    jacobianRot(iPx, iPy) = -sinPhi0;
+    jacobianRot(iPy, iPx) = sinPhi0;
+    jacobianRot(iPy, iPy) = cosPhi0;
+    jacobianRot(iPz, iPz) = 1.0;
+
+    cov6.Similarity(jacobianRot);
+
+    // 3. Forward the covariance matrix.
+    return cov6;
+  }
+}
 
 
 CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
@@ -171,14 +257,10 @@ void CDCTrajectory3D::setPosMom3D(const Vector3D& pos3D,
                                 0.0);
 }
 
-
-
-
-
-bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand) const
+bool CDCTrajectory3D::fillInto(genfit::TrackCand& trackCand) const
 {
   Vector3D position = getSupport();
-  return fillInto(gfTrackCand, getBFieldZ(position));
+  return fillInto(trackCand, getBFieldZ(position));
 }
 
 bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) const
@@ -190,99 +272,50 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) 
 
   // Do not propagate invalid fits, signal that the fit is invalid to the caller.
   if (not ESignUtil::isValid(charge) or momentum.hasNAN() or position.hasNAN()) {
-    // B2INFO("Charge " <<  charge);
-    // B2INFO("Position " <<  position);
-    // B2INFO("Local origin " <<  getLocalOrigin());
-    // B2INFO("Momentum " <<  momentum);
     return false;
   }
 
   gfTrackCand.setPosMomSeed(position, momentum, charge);
 
-  // Now translate and set the covariance matrix.
-  const UncertainHelix& localHelix = getLocalHelix();
-
-  const double impactXY = localHelix.impactXY();
-  const Vector2D& tangentialXY = localHelix.tangentialXY();
-
-  const double cosPhi0 = tangentialXY.x();
-  const double sinPhi0 = tangentialXY.y();
-
-  const double curvatureXY = localHelix.curvatureXY();
-  const double tanLambda = localHelix.tanLambda();
-
-  // 0. Define indices
-  // Maybe push these out of this function:
-  // Indices of the cartesian coordinates
-  const int iX = 0;
-  const int iY = 1;
-  const int iZ = 2;
-  const int iPx = 3;
-  const int iPy = 4;
-  const int iPz = 5;
-
-  TMatrixDSym cov5 = localHelix.helixCovariance();
-
-  // 1. Inflat the perigee covariance to a cartesian covariance where phi0 = 0 is assumed
-  // Jacobian matrix for the translation
-  TMatrixD jacobianInflate(6, 5);
-  jacobianInflate.Zero();
-
-  const double alpha = getAlphaFromBField(bZ);
-  const double chargeAlphaCurv = charge * alpha * curvatureXY;
-  const double chargeAlphaCurv2 = charge * alpha * std::pow(curvatureXY, 2);
-
-  const double invChargeAlphaCurv = 1.0 / chargeAlphaCurv;
-  const double invChargeAlphaCurv2 = 1.0 / chargeAlphaCurv2;
-
-
-  using namespace NHelixParameter;
-  // Position
-  jacobianInflate(iX, c_Phi0) = -impactXY;
-  jacobianInflate(iY, c_I) = 1.0;
-  jacobianInflate(iZ, c_Z0) = 1.0;
-
-  // Momentum
-  if (bZ == 0) {
-    jacobianInflate(iPx, c_Curv) = 0;
-    jacobianInflate(iPy, c_Phi0) = momentum.cylindricalR();
-    jacobianInflate(iPz, c_Curv) = 0;
-    jacobianInflate(iPz, c_TanL) = momentum.cylindricalR();
-  } else {
-    jacobianInflate(iPx, c_Curv) = invChargeAlphaCurv2;
-    jacobianInflate(iPy, c_Phi0) = - invChargeAlphaCurv;
-    jacobianInflate(iPz, c_Curv) = tanLambda * invChargeAlphaCurv2;
-    jacobianInflate(iPz, c_TanL) = - invChargeAlphaCurv;
-  }
-  // Transform
-  TMatrixDSym cov6 = cov5; //copy
-  cov6.Similarity(jacobianInflate);
-
-  /// 2. Rotate to the right phi0
-  TMatrixD jacobianRot(6, 6);
-  jacobianRot.Zero();
-
-  // Active rotation matrix by phi0:
-  jacobianRot(iX, iX) = cosPhi0;
-  jacobianRot(iX, iY) = -sinPhi0;
-  jacobianRot(iY, iX) = sinPhi0;
-  jacobianRot(iY, iY) = cosPhi0;
-  jacobianRot(iZ, iZ) = 1.0;
-
-  jacobianRot(iPx, iPx) = cosPhi0;
-  jacobianRot(iPx, iPy) = -sinPhi0;
-  jacobianRot(iPy, iPx) = sinPhi0;
-  jacobianRot(iPy, iPy) = cosPhi0;
-  jacobianRot(iPz, iPz) = 1.0;
-
-  cov6.Similarity(jacobianRot);
-
-  // 3. Forward the covariance matrix.
+  const TMatrixDSym& cov6 = calculateCovarianceMatrix(getLocalHelix(), position, momentum, charge, bZ);
   gfTrackCand.setCovSeed(cov6);
 
   return true;
 }
 
+RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks) const
+{
+  Vector3D position = getSupport();
+  return storeInto(recoTracks, getBFieldZ(position));
+}
+
+RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks, const double bZ) const
+{
+  // Set the start parameters
+  Vector3D position = getSupport();
+  Vector3D momentum = bZ == 0 ? getUnitMom3DAtSupport() : getMom3DAtSupport(bZ);
+  ESign charge = getChargeSign();
+
+  // Do not propagate invalid fits, signal that the fit is invalid to the caller.
+  if (not ESignUtil::isValid(charge) or momentum.hasNAN() or position.hasNAN()) {
+    return nullptr;
+  }
+
+  RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge);
+
+  // TODO: This does not work properly!
+  //const TMatrixDSym& cov6 = calculateCovarianceMatrix(getLocalHelix(), position, momentum, charge, bZ);
+  TMatrixDSym covSeed(6);
+  covSeed(0, 0) = 1e-3;
+  covSeed(1, 1) = 1e-3;
+  covSeed(2, 2) = 4e-3;
+  covSeed(3, 3) = 0.01e-3;
+  covSeed(4, 4) = 0.01e-3;
+  covSeed(5, 5) = 0.04e-3;
+  newRecoTrack->setSeedCovariance(covSeed);
+
+  return newRecoTrack;
+}
 
 
 

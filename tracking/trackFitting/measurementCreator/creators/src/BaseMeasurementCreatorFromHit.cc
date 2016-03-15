@@ -55,9 +55,9 @@ genfit::AbsMeasurement* CDCBaseMeasurementCreator::createCoordinateMeasurement(R
   // From the genfit code: < 0 means left, > 0 means right, = 0 is undefined
   signed char rightLeftGenfitInformation = 0;
   RecoHitInformation::RightLeftInformation rightLeftHitInformation = recoHitInformation.getRightLeftInformation();
-  if (rightLeftHitInformation == RecoHitInformation::RightLeftInformation::left) {
+  if (rightLeftHitInformation == RecoHitInformation::RightLeftInformation::c_left) {
     rightLeftGenfitInformation = -1;
-  } else if (rightLeftHitInformation == RecoHitInformation::RightLeftInformation::right) {
+  } else if (rightLeftHitInformation == RecoHitInformation::RightLeftInformation::c_right) {
     rightLeftGenfitInformation = 1;
   }
 

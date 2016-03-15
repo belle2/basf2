@@ -95,70 +95,61 @@ def add_track_finding(path, components=None):
     use_vxd = components is None or 'SVD' in components
     use_cdc = components is None or 'CDC' in components
 
+    cdc_reco_tracks = "RecoTracks"
+    vxd_reco_tracks = "RecoTracks"
+
     # CDC track finder
     if use_cdc:
-        cdc_trackcands = ''
         if use_vxd:
-            cdc_trackcands = 'CDCGFTrackCands'
-        trackcands = cdc_trackcands
-        add_cdc_track_finding(path, trackcands)
+            cdc_reco_tracks = "CDCRecoTracks"
+
+        add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks)
 
     # VXD track finder
     if use_vxd:
-        vxd_trackcands = ''
         if use_cdc:
-            vxd_trackcands = 'VXDGFTrackCands'
-        vxd_trackfinder = register_module('VXDTF')
-        vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
-        # WARNING: workaround for possible clashes between fitting and VXDTF - stays until the redesign of the VXDTF is finished.
-        vxd_trackfinder.param('TESTERexpandedTestingRoutines', False)
-        if components is not None and 'PXD' not in components:
-            vxd_trackfinder.param('sectorSetup',
-                                  ['shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
-                                   'shiftedL3IssueTestSVDStd-100to400MeV_SVD',
-                                   'shiftedL3IssueTestSVDStd-25to100MeV_SVD'
-                                   ])
-            vxd_trackfinder.param('tuneCutoffs', 0.06)
-        else:
-            vxd_trackfinder.param('sectorSetup',
-                                  ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',
-                                   'shiftedL3IssueTestVXDStd-100to400MeV_PXDSVD',
-                                   'shiftedL3IssueTestVXDStd-25to100MeV_PXDSVD'
-                                   ])
-            vxd_trackfinder.param('tuneCutoffs', 0.22)
-        path.add_module(vxd_trackfinder)
+            vxd_reco_tracks = "VXDRecoTracks"
+
+        add_vxd_track_finding(path, components=components, reco_tracks=vxd_reco_tracks)
 
     # track merging
     if use_vxd and use_cdc:
-        vxd_tracklets = 'VXDGFTracks'
-        cdc_tracklets = 'CDCGFTracks'
+        vxd_tracks = 'VXDGFTracks'
+        cdc_tracks = 'CDCGFTracks'
 
-        # track fitting
-        VXDtrackFitter = path.add_module('GenFitter')
-        VXDtrackFitter.param('GFTrackCandidatesColName', vxd_trackcands)
-        VXDtrackFitter.param("PDGCodes", [211])
-        VXDtrackFitter.param('GFTracksColName', vxd_tracklets)
-        VXDtrackFitter.param('PruneFlags', 'FL')
-        VXDtrackFitter.set_name('VXD-only GenFitter')
+        vxd_trackcands = 'VXDGFTrackCands'
+        cdc_trackcands = 'CDCGFTrackCands'
 
-        path.add_module("RecoTrackCreator", trackCandidatesStoreArrayName=cdc_trackcands,
-                        recoTracksStoreArrayName="CDCRecoTracks")
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCRecoTracks")
-        path.add_module("GenfitTrackCreator", genfitTracksStoreArrayName=cdc_tracklets,
-                        genfitTrackCandsStoreArrayName=cdc_trackcands, recoTracksStoreArrayName="CDCRecoTracks")
+        # Fit all reco tracks This will be unneeded once the merger is rewritten.
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
+        path.add_module("GenfitTrackCandidatesCreator", recoTracksStoreArrayName=cdc_reco_tracks,
+                        genfitTrackCandsStoreArrayName=cdc_trackcands)
+        path.add_module("GenfitTrackCreator", recoTracksStoreArrayName=cdc_reco_tracks,
+                        genfitTracksStoreArrayName=cdc_tracks,
+                        genfitTrackCandsStoreArrayName=cdc_trackcands)
 
-        vxd_cdcTracksMerger = register_module('VXDCDCTrackMerger')
-        vxd_cdcTracksMerger_param = {
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=vxd_reco_tracks)
+        path.add_module("GenfitTrackCandidatesCreator", recoTracksStoreArrayName=vxd_reco_tracks,
+                        genfitTrackCandsStoreArrayName=vxd_trackcands)
+        path.add_module("GenfitTrackCreator", recoTracksStoreArrayName=vxd_reco_tracks,
+                        genfitTracksStoreArrayName=vxd_tracks,
+                        genfitTrackCandsStoreArrayName=vxd_trackcands)
+
+        # Merge CDC and CXD tracks
+        vxd_cdcTracksMerger = path.add_module('VXDCDCTrackMerger')
+        vxd_cdcTracksMerger.param({
             'VXDGFTrackCandsColName': vxd_trackcands,
-            'VXDGFTracksColName': vxd_tracklets,
+            'VXDGFTracksColName': vxd_tracks,
             'CDCGFTrackCandsColName': cdc_trackcands,
-            'CDCGFTracksColName': cdc_tracklets,
+            'CDCGFTracksColName': cdc_tracks,
             'relMatchedTracks': 'MatchedTracksIdx',
             'chi2_max': 100,
             'recover': 1
-        }
-        vxd_cdcTracksMerger.param(vxd_cdcTracksMerger_param)
-        path.add_module(vxd_cdcTracksMerger)
+        })
+
+    elif use_vxd or use_cdc:
+        # The following modules still expect a list of genfit::TrackCand.
+        path.add_module("GenfitTrackCandidatesCreator")
 
 
 def add_mc_track_finding(path, components=None):
@@ -186,7 +177,7 @@ def add_mc_track_finding(path, components=None):
     path.add_module(mc_trackfinder)
 
 
-def add_cdc_track_finding(path, cdc_trackcands="TrackCands"):
+def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
     """
     Convenience function for adding all cdc track finder modules
     to the path
@@ -194,7 +185,7 @@ def add_cdc_track_finding(path, cdc_trackcands="TrackCands"):
     Arguments
     ---------
     path: basf2 path
-    cdc_trackcands: Name of the output genfit TrackCands. Defaults to TrackCands.
+    reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
     """
 
     # Init the geometry for cdc tracking and the hits
@@ -235,7 +226,48 @@ def add_cdc_track_finding(path, cdc_trackcands="TrackCands"):
 
     # Improve the quality of all tracks and output
     path.add_module("TrackQualityAsserterCDC",
-                    GFTrackCandsStoreArrayName=cdc_trackcands,
                     WriteGFTrackCands=True,
                     TracksStoreObjNameIsInput=True,
+                    RecoTracksStoreArrayName=reco_tracks,
                     corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"])
+
+
+def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None):
+    """
+    Convenience function for adding all vxd track finder modules
+    to the path
+
+    Arguments
+    ---------
+    path: basf2 path
+    reco_tracks: Name of the output RecoTracks, Defaults to RecoTracks.
+    components: List of the detector components to be used in the reconstruction. Defaults to None which means all
+                components.
+    """
+
+    # Temporary array
+    vxd_trackcands = '__VXDGFTrackCands'
+
+    vxd_trackfinder = path.add_module('VXDTF')
+    vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
+    # WARNING: workaround for possible clashes between fitting and VXDTF
+    # stays until the redesign of the VXDTF is finished.
+    vxd_trackfinder.param('TESTERexpandedTestingRoutines', False)
+    if components is not None and 'PXD' not in components:
+        vxd_trackfinder.param('sectorSetup',
+                              ['shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
+                               'shiftedL3IssueTestSVDStd-100to400MeV_SVD',
+                               'shiftedL3IssueTestSVDStd-25to100MeV_SVD'
+                               ])
+        vxd_trackfinder.param('tuneCutoffs', 0.06)
+    else:
+        vxd_trackfinder.param('sectorSetup',
+                              ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',
+                               'shiftedL3IssueTestVXDStd-100to400MeV_PXDSVD',
+                               'shiftedL3IssueTestVXDStd-25to100MeV_PXDSVD'
+                               ])
+        vxd_trackfinder.param('tuneCutoffs', 0.22)
+
+    # Convert VXD trackcands to reco tracks
+    path.add_module("RecoTrackCreator", trackCandidatesStoreArrayName=vxd_trackcands,
+                    recoTracksStoreArrayName=reco_tracks, recreateSortingParameters=True)

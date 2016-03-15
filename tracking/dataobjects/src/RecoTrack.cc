@@ -29,28 +29,30 @@ RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum,
   m_genfitTrack.setStateSeed(seedPosition, seedMomentum);
 }
 
-RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand* trackCand,
+RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
                                           const std::string& storeArrayNameOfRecoTracks,
                                           const std::string& storeArrayNameOfCDCHits,
                                           const std::string& storeArrayNameOfSVDHits,
                                           const std::string& storeArrayNameOfPXDHits,
-                                          const std::string& storeArrayNameOfRecoHitInformation
+                                          const std::string& storeArrayNameOfRecoHitInformation,
+                                          const bool recreateSortingParameters
                                          )
 {
 
   StoreArray<RecoTrack> recoTracks(storeArrayNameOfRecoTracks);
+  StoreArray<RecoHitInformation> recoHitInformations(storeArrayNameOfRecoHitInformation);
   StoreArray<UsedCDCHit> cdcHits(storeArrayNameOfCDCHits);
   StoreArray<UsedSVDHit> svdHits(storeArrayNameOfSVDHits);
   StoreArray<UsedPXDHit> pxdHits(storeArrayNameOfPXDHits);
 
   // Set the tracking parameters
-  const TVector3& position = trackCand->getPosSeed();
-  const TVector3& momentum = trackCand->getMomSeed();
-  const short int charge = trackCand->getChargeSeed();
+  const TVector3& position = trackCand.getPosSeed();
+  const TVector3& momentum = trackCand.getMomSeed();
+  const short int charge = trackCand.getChargeSeed();
 
   RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge,
-                                                 storeArrayNameOfCDCHits, storeArrayNameOfSVDHits,
-                                                 storeArrayNameOfPXDHits, storeArrayNameOfRecoHitInformation);
+                                                 cdcHits.getName(), svdHits.getName(),
+                                                 pxdHits.getName(), recoHitInformations.getName());
 
   // TODO Set the covariance seed (that should be done by the tracking package)
   TMatrixDSym covSeed(6);
@@ -62,11 +64,12 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand* trackCand,
   covSeed(5, 5) = 0.04e-3;
   newRecoTrack->m_genfitTrack.setCovSeed(covSeed);
 
-  for (unsigned int hitIndex = 0; hitIndex < trackCand->getNHits(); hitIndex++) {
-    genfit::TrackCandHit* trackCandHit = trackCand->getHit(hitIndex);
+  for (unsigned int hitIndex = 0; hitIndex < trackCand.getNHits(); hitIndex++) {
+    genfit::TrackCandHit* trackCandHit = trackCand.getHit(hitIndex);
     const int detID = trackCandHit->getDetId();
     const int hitID = trackCandHit->getHitId();
-    const unsigned int sortingParameter = static_cast<const unsigned int>(trackCandHit->getSortingParameter());
+    const unsigned int sortingParameter = recreateSortingParameters ? hitIndex : static_cast<const unsigned int>
+                                          (trackCandHit->getSortingParameter());
     if (detID == Const::CDC) {
       UsedCDCHit* cdcHit = cdcHits[hitID];
       // Special case for CDC hits, we add a right-left information
@@ -75,11 +78,11 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand* trackCand,
         B2FATAL("CDC hit is not a wire hit. The RecoTrack can not handle such a case.");
       }
       if (wireHit->getLeftRightResolution() > 0) {
-        newRecoTrack->addCDCHit(cdcHit, sortingParameter, RecoHitInformation::RightLeftInformation::right);
+        newRecoTrack->addCDCHit(cdcHit, sortingParameter, RecoHitInformation::RightLeftInformation::c_right);
       } else if (wireHit->getLeftRightResolution() < 0) {
-        newRecoTrack->addCDCHit(cdcHit, sortingParameter, RecoHitInformation::RightLeftInformation::left);
+        newRecoTrack->addCDCHit(cdcHit, sortingParameter, RecoHitInformation::RightLeftInformation::c_left);
       } else {
-        newRecoTrack->addCDCHit(cdcHit, sortingParameter, RecoHitInformation::RightLeftInformation::undefinedRightLeftInformation);
+        newRecoTrack->addCDCHit(cdcHit, sortingParameter, RecoHitInformation::RightLeftInformation::c_undefinedRightLeftInformation);
       }
 
     } else if (detID == Const::SVD) {
@@ -94,35 +97,38 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand* trackCand,
   return newRecoTrack;
 }
 
-genfit::TrackCand* RecoTrack::createGenfitTrackCand() const
+genfit::TrackCand RecoTrack::createGenfitTrackCand() const
 {
-  genfit::TrackCand* createdTrackCand = new genfit::TrackCand();
+  genfit::TrackCand createdTrackCand;
 
   // Set the trajectory parameters
-  createdTrackCand->setPosMomSeed(getPosition(), getMomentum(), getCharge());
+  createdTrackCand.setPosMomSeed(getPositionSeed(), getMomentumSeed(), getChargeSeed());
+  createdTrackCand.setCovSeed(getSeedCovariance());
 
   // Add the hits
   mapOnHits<UsedCDCHit>(m_storeArrayNameOfCDCHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
   const UsedCDCHit * const hit) {
-    if (hitInformation.getRightLeftInformation() == RecoHitInformation::left) {
-      createdTrackCand->addHit(new genfit::WireTrackCandHit(Const::CDC, hit->getArrayIndex(), -1,
-                                                            hitInformation.getSortingParameter(), -1));
-    } else if (hitInformation.getRightLeftInformation() == RecoHitInformation::right) {
-      createdTrackCand->addHit(new genfit::WireTrackCandHit(Const::CDC, hit->getArrayIndex(), -1,
-                                                            hitInformation.getSortingParameter(), 1));
+    if (hitInformation.getRightLeftInformation() == RecoHitInformation::c_left) {
+      createdTrackCand.addHit(new genfit::WireTrackCandHit(Const::CDC, hit->getArrayIndex(), -1,
+                                                           hitInformation.getSortingParameter(), -1));
+    } else if (hitInformation.getRightLeftInformation() == RecoHitInformation::c_right) {
+      createdTrackCand.addHit(new genfit::WireTrackCandHit(Const::CDC, hit->getArrayIndex(), -1,
+                                                           hitInformation.getSortingParameter(), 1));
     } else {
-      createdTrackCand->addHit(new genfit::WireTrackCandHit(Const::CDC, hit->getArrayIndex(), -1,
-                                                            hitInformation.getSortingParameter(), 0));
+      createdTrackCand.addHit(new genfit::WireTrackCandHit(Const::CDC, hit->getArrayIndex(), -1,
+                                                           hitInformation.getSortingParameter(), 0));
     }
   });
   mapOnHits<UsedSVDHit>(m_storeArrayNameOfSVDHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
   const UsedSVDHit * const hit) {
-    createdTrackCand->addHit(Const::SVD, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
+    createdTrackCand.addHit(Const::SVD, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
   });
   mapOnHits<UsedPXDHit>(m_storeArrayNameOfPXDHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
   const UsedPXDHit * const hit) {
-    createdTrackCand->addHit(Const::PXD, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
+    createdTrackCand.addHit(Const::PXD, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
   });
+
+  createdTrackCand.sortHits();
 
   // Add the hits
   return createdTrackCand;

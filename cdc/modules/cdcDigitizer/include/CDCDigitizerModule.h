@@ -150,9 +150,9 @@ namespace Belle2 {
     /** Structure for saving the signal information. */
     struct SignalInfo {
       /** Constructor that initializes all members. */
-      SignalInfo(unsigned short simHitIndex = 0, float driftTime = 0, float charge = 0) :
+      SignalInfo(int simHitIndex = 0, float driftTime = 0, float charge = 0) :
         m_simHitIndex(simHitIndex), m_driftTime(driftTime), m_charge(charge) {}
-      unsigned short m_simHitIndex;   /**< SimHit Index number. */
+      int            m_simHitIndex;   /**< SimHit Index number. */
       float          m_driftTime;     /**< Shortest drift time of any SimHit in the cell. */
       float          m_charge;        /**< Sum of charge for all SimHits in the cell. */
     };

@@ -10,10 +10,7 @@ from beamparameters import add_beamparameters
 # This is tracking/vxdCaTracking/extendedExamples/scripts/setup_modules.py
 from VXDTF.setup_modules import (setup_sim,
                                  setup_pGun,
-                                 setup_gfTCtoSPTCConverters,
                                  setup_realClusters,
-                                 setup_spCreatorPXD,
-                                 setup_spCreatorSVD,
                                  setup_mcTF,
                                  setup_bg)
 
@@ -34,8 +31,8 @@ bgFolder = "~/FW/bkgFiles/campaign12th/"
 
 
 # Important parameters:
-numEvents = 1000  # can be overridden by the parameters given via terminal
-initialValue = 10  # want random events, if set to 0
+numEvents = 100000  # can be overridden by the parameters given via terminal
+initialValue = 14  # want random events, if set to 0
 
 
 # flags for the pGun
@@ -48,7 +45,7 @@ thetaMin = 60.0  # degrees
 thetaMax = 85.  # degrees
 # phi: starting angle of particle direction in x-y-plane (r-phi-plane)
 phiMin = 0.  # degrees
-phiMax = 360.  # degrees
+phiMax = 90.  # degrees
 # 13: muons, 211: charged pions
 pdgCODES = [13]
 

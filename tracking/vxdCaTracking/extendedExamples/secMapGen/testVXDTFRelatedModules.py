@@ -5,6 +5,7 @@ import os
 from basf2 import *
 from subprocess import call
 from sys import argv
+import time
 
 from VXDTF.setup_modules import (setup_gfTCtoSPTCConverters,
                                  setup_spCreatorPXD,
@@ -17,28 +18,42 @@ from VXDTF.setup_modules_ml import *
 
 # ################
 # rootInputFileName = "seed4nEv100000pGun1_1T.root"
+# rootInputFileName = "seed14nEv100000pGun1_1T.root" # phi 0-90, theta 60-85, pT 100-145 MeV/c, PDG 13
+# rootInputFileName = "seed13nEv100000pGun1_2T.root" # phi 0-90, theta 60-85, pT 100-145 MeV/c, PDG 13
 # rootInputFileName = "evtGenseed6nEv100000.root" #evtGenSinglePassTest-TrainSample. skipCluster = False
 # rootInputFileName = "evtGenseed5nEv10000.root" #testSample. skipCluster = False
-rootInputFileName = "evtGenseed7nEv10000.root"  # testSample. skipCluster = True
+# rootInputFileName = "evtGenseed7nEv10000.root"  # testSample. skipCluster = True
 # rootInputFileName = "evtGenseed8nEv200000.root" # trainSample. skipCluster = True
 # rootInputFileName = "evtGenseed8nEv100000.root" #evtGenSinglePassTest-TrainSample. skipCluster = True (TODO)
+
+# rootInputFileName = "seed11nEv100pGun1_1T.root"  # test- and TrainSample
+rootInputFileName = "seed12nEv200pGun1_2T.root"  # test- and TrainSample 0-90° phi, 60-85° Theta
 
 # file name into which the segNetAnalize stores its stuff
 segNetAnaRFN = 'SegNetAnalyzer_SM_train.root'
 fbdtSamplesFN = 'FBDTClassifier_samples_train_10k.dat'
 fbdtFN = 'FBDTClassifier_1000_3.dat'
-
+fitType = 'circleFit'  # currently supported: 'random' and 'circleFit'
+setFilterType = 'hopfield'  # currently supported: 'greedy' and 'hopfield'
 
 usePXD = False
 useDisplay = False
 newTrain = False  # if true, rawSecMap-Data is collected. IF false, new TF will be executed
 printNetworks = False  # creates graphs for each network for each event if true
 useOldTFinstead = False  # if true, the old vxdtf is used instead of the new one.
+oldTFNoSubsetSelection = True  # if true, the old vxdtf does not its hopfield-part, which allows using new modules for that
 ignoreDeadTCs = True  # if true, the TrackFinderVXDAnalizer will not add dead TCs to the efficiencies
+bypassCA = False  # if true, no CA will be used but the BasicPathFinder instead...
 
 trainFBDT = False  # with the current settings: collects samples but does not train a FastBDT!
 useFBDT = False  # use the ML Filter for creating the SegmentNetwork instead of the SectorMap filters
 activateSegNetAnalizer = False  # only needed when studying FastBDT-behavior
+
+doStrictSeeds = False  # if true, a smaller amount of TCs are created from the same segment-tree
+doNewSubsetSelection = False  # if true, then no noNewSubsetSelection will be executed
+doVirtualIPRemovalb4Fit = True  # if false, the vIP willbe removed after the fit
+doEventSummary = True  # if true TFVXDAnalizer will produce event-wise results
+switchFiltersOff = False  # if true, SegNetProducer does not apply any filters of the sectorMap.
 
 if useFBDT:
     cNetworks = int(2)
@@ -50,9 +65,9 @@ else:
 tempStringList = rootInputFileName.split('nEv', 1)
 stringInitialValue = tempStringList[0].split("seed", 1)
 print("found seed: " + stringInitialValue[1])
-numEvents = 10000  # WARNING has to be identical with the value named in rootInputFileName!
-# initialValue = int(stringInitialValue[1])
-initialValue = 7
+numEvents = 200  # WARNING has to be identical with the value named in rootInputFileName!
+initialValue = int(stringInitialValue[1])
+# initialValue = 4
 
 set_log_level(LogLevel.ERROR)
 set_random_seed(initialValue)
@@ -83,33 +98,41 @@ elif (initialValue == 4):
     # print("chosen initialvalue 5! (with background)" + rootInputFileName)
     # acceptedRawSecMapFiles = ['lowTestRedesign_753986291.root']  # 25
 elif (initialValue == 5):
-    print("chosen initialvalue 5 (skipCluster-setting=False)! " + rootInputFileName)
-    acceptedRawSecMapFiles = ['lowTestRedesign_1120112796.root']
+    print("chosen initialvalue 5! " + rootInputFileName)
+    acceptedRawSecMapFiles = ['lowTestRedesign_1120112796.root']  # lowTestRedesign_1120112796.root
 elif (initialValue == 6):
-    print("chosen initialvalue 6 (skipCluster-setting=False)! " + rootInputFileName)
+    print("chosen initialvalue 6! " + rootInputFileName)
     acceptedRawSecMapFiles = ['lowTestRedesign_1120112796.root']
     # acceptedRawSecMapFiles = ['lowTestRedesign_1667035383.root'] # 26 - single track, single event  raw data
 elif (initialValue == 7):
-    print("chosen initialvalue 7!  (skipCluster-setting=True)")
+    print("chosen initialvalue 7!  (skipCluster-setting=True) " + rootInputFileName)
     acceptedRawSecMapFiles = ['lowTestRedesign_1332084337.root']  # 27 - single track, single event raw data
 elif (initialValue == 8):
-    print("chosen initialvalue 8! (skipCluster-setting=True): 200k evtGen events")
+    print("chosen initialvalue 8! (skipCluster-setting=True): 200k evtGen events " + rootInputFileName)
     acceptedRawSecMapFiles = ['lowTestRedesign_1332084337.root']  # 28 - single track, single event raw data
+elif (initialValue == 11):
+    print("chosen initialvalue 11! (skipCluster-setting=True): 100 pGun events " + rootInputFileName)
+    acceptedRawSecMapFiles = ['lowTestRedesign_1017144726.root']  # 28 - single track, single event raw data
+elif (initialValue == 12):
+    print("chosen initialvalue 12! (skipCluster-setting=True): 200 pGun events " + rootInputFileName)
+    acceptedRawSecMapFiles = ['lowTestRedesign_1196763558.root']  # 28 - single track, single event raw data
+elif (initialValue == 13):
+    print("chosen initialvalue 13! (skipCluster-setting=True): 100k pGun events " + rootInputFileName)
+    acceptedRawSecMapFiles = ['lowTestRedesign_1874442389.root']  # 28 - single track, single event raw data
+elif (initialValue == 14):
+    print("chosen initialvalue 14! (skipCluster-setting=True): 100k pGun events " + rootInputFileName)
+    acceptedRawSecMapFiles = ['lowTestRedesign_1054912153.root']  # 28 - single track, single event raw data
 elif (initialValue == 57):
     print("chosen initialvalue 57! setup remark: train: 10k events, 10 tracks per event, theta 60-85°, phi 0-360°, pT 100-145MeV.")
-    thetaMin = 60.0  # degrees
-    thetaMax = 85.  # degrees
-    # phi: starting angle of particle direction in x-y-plane (r-phi-plane)
-    phiMin = 0.  # degrees
-    phiMax = 360.  # degrees
     acceptedRawSecMapFiles = ['lowTestRedesign_779994078.root']  # 55 - single track, single event raw data
 else:
     print("ERROR! no valid initialvalue chosen!")
     acceptedRawSecMapFiles = [""]
+    time.sleep(60)
 
 print('')
+time.sleep(5)  # sleep for 5 seconds
 print('')
-
 
 rootInputM = register_module('RootInput')
 rootInputM.param('inputFileName', rootInputFileName)
@@ -155,7 +178,6 @@ eventCounter = register_module('EventCounter')
 eventCounter.logging.log_level = LogLevel.INFO
 eventCounter.param('stepSize', evtStepSize)
 
-
 if useOldTFinstead:
     tuneValue = 0.06
     secSetup = [
@@ -172,12 +194,13 @@ if useOldTFinstead:
     vxdtf = register_module('VXDTF')  # VXDTF TFRedesign
     vxdtf.logging.log_level = LogLevel.DEBUG
     vxdtf.logging.debug_level = 1
-    param_vxdtf = {'sectorSetup': secSetup,
-                   'GFTrackCandidatesColName': 'caTracks',
-                   'tuneCutoffs': tuneValue,
-                   'displayCollector': 2
-                   }
-    vxdtf.param(param_vxdtf)
+    vxdtf.param('sectorSetup', secSetup)
+    vxdtf.param('GFTrackCandidatesColName', 'caTracks')
+    vxdtf.param('tuneCutoffs', tuneValue)
+    vxdtf.param('displayCollector', 2)
+    if oldTFNoSubsetSelection:
+        vxdtf.param('filterOverlappingTCs', 'none')  # shall provide overlapping TCs
+        # vxdtf.param('useTimeSeedAsQI', True)  # hack for storing QIs in TimeSeed-Variable for genfit::TrackCand
 
     oldAnalyzer = register_module('TFAnalizer')
     oldAnalyzer.logging.log_level = LogLevel.INFO
@@ -202,6 +225,7 @@ else:
     segNetProducer.param('CreateNeworks', cNetworks)
     segNetProducer.param('NetworkOutputName', 'test2Hits')
     segNetProducer.param('printNetworks', printNetworks)
+    segNetProducer.param('allFiltersOff', switchFiltersOff)
     # segNetProducer.param('SpacePointsArrayNames', ['pxdOnly', 'nosingleSP'])
     segNetProducer.param('SpacePointsArrayNames', ['nosingleSP_relTH'])
     segNetProducer.logging.log_level = TFlogLevel
@@ -214,23 +238,31 @@ else:
         segNetAnalyzer.logging.log_level = LogLevel.INFO
         segNetAnalyzer.logging.debug_level = 100
 
-    cellOmat = register_module('TrackFinderVXDCellOMat')
+    if bypassCA:
+        cellOmat = register_module('TrackFinderVXDBasicPathFinder')
+    else:
+        cellOmat = register_module('TrackFinderVXDCellOMat')
     cellOmat.param('printNetworks', printNetworks)
     cellOmat.param('SpacePointTrackCandArrayName', 'caSPTCs')
     cellOmat.param('NetworkName', 'test2Hits')
+    cellOmat.param('removeVirtualIP', False)
+    cellOmat.param('strictSeeding', doStrictSeeds)
     cellOmat.logging.log_level = CAlogLevel
     cellOmat.logging.debug_level = CADebugLevel
 
+
+print("spot 10")
 
 vxdAnal = register_module('TrackFinderVXDAnalizer')
 vxdAnal.param('referenceTCname', 'SPTracks')
 vxdAnal.param('testTCname', 'caSPTCs')
 vxdAnal.param('purityThreshold', 0.7)
 vxdAnal.param('ignoreDeadTCs', ignoreDeadTCs)
+vxdAnal.param('doEventSummary', doEventSummary)
 vxdAnal.logging.log_level = AnalizerlogLevel
 vxdAnal.logging.debug_level = AnalizerDebugLevel
 
-
+print("spot 11")
 if newTrain:
     log_to_file('testRedesign' + str(initialValue) + '_' + str(numEvents) + '.log', append=False)
 else:
@@ -257,6 +289,10 @@ setup_gfTCtoSPTCConverters(
     usePXD=usePXD,
     logLevel=LogLevel.WARNING)
 
+vIPRemover = register_module('SPTCvirtualIPRemover')
+vIPRemover.param('maxTCLengthForVIPKeeping', 0)  # want to remove virtualIP for any track length
+vIPRemover.param('tcArrayName', 'caSPTCs')
+
 # connect all SpacePoints to all possible TrueHits and store them in a new
 # StoreArray (to not interfere with the SpacePoints of the reference
 # TrackCands)
@@ -280,20 +316,31 @@ else:
         if activateSegNetAnalizer:
             main.add_module(segNetAnalyzer)
         main.add_module(cellOmat)
-        setup_qualityEstimators(main, 'circleFit', 'caSPTCs', LogLevel.DEBUG, 1)
+
+    if doVirtualIPRemovalb4Fit:
+        main.add_module(vIPRemover)
+
+    setup_qualityEstimators(main, fitType, 'caSPTCs', LogLevel.INFO, 1)
+    # setup_qualityEstimators(main, fitType, 'SPTracks', LogLevel.DEBUG, 1)
+
+    if doVirtualIPRemovalb4Fit is False:
+        main.add_module(vIPRemover)
+
+    if doNewSubsetSelection:
 
         tcNetworkProducer = register_module('SPTCNetworkProducer')
         tcNetworkProducer.param('tcArrayName', 'caSPTCs')
         tcNetworkProducer.param('tcNetworkName', 'tcNetwork')
         main.add_module(tcNetworkProducer)
 
-        setup_trackSetEvaluators(main, 'hopfield', 'caSPTCs', 'tcNetwork')
+        setup_trackSetEvaluators(main, setFilterType, 'caSPTCs', 'tcNetwork')
     main.add_module(vxdAnal)
 
 if useDisplay:
     display = register_module('Display')
     display.param('showAllPrimaries', True)
     main.add_module(display)
+
 # Process events
 process(main)
 

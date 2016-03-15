@@ -139,6 +139,9 @@ namespace Belle2 {
       }
     }
 
+    /// Empty constructor for ROOT. Do not use!
+    RecoTrack() { }
+
     /**
        * Construct a RecoTrack with the given seed helix parameters and the given names for the hits.
        * If you do not provide information for the hit store array names, the standard parameters are used.

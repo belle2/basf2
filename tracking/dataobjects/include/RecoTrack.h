@@ -538,7 +538,7 @@ namespace Belle2 {
      * Add a generic hit with the given parameters for the reco hit information.
      * @param hit a generic hit.
      * @param params for the constructor of the reco hit information.
-     * @return true of the hit was new.
+     * @return true if the hit was new.
      */
     template<class HitType, class ...Args>
     bool addHit(HitType* hit, Args&& ... params) const

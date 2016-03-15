@@ -68,6 +68,47 @@ namespace Belle2 {
     typedef RecoHitInformation::UsedSVDHit UsedSVDHit;
 
   public:
+
+    /**
+     * Convenience method which registers all relations required to fully use
+     * a RecoTrack. If you create a new RecoTrack StoreArray, call this method
+     * in the initialize() method of your module.
+     * @param recoTracks: Reference to the store array where the new RecoTrack list is located
+     * @param recoHitInformationStoreArrayName: name of the StoreArrary holding RecoHitInformation lists
+     * @param pxdHitsStoreArrayName: name of the StoreArrary holding the PXDClusters lists
+     * @param svdHitsStoreArrayName: name of the StoreArrary holding the SVDClusters lists
+     * @param cdcHitsStoreArrayName: name of the StoreArrary holding the CDCHits lists
+     */
+    static void registerRequiredRelations(
+      StoreArray<RecoTrack>& recoTracks,
+      std::string recoHitInformationStoreArrayName = "RecoHitInformations",
+      std::string pxdHitsStoreArrayName = "PXDClusters",
+      std::string svdHitsStoreArrayName = "SVDClusters",
+      std::string cdcHitsStoreArrayName = "CDCHits")
+    {
+      StoreArray<RecoHitInformation> recoHitInformations(recoHitInformationStoreArrayName);
+      recoHitInformations.registerInDataStore();
+      recoTracks.registerRelationTo(recoHitInformations);
+
+      StoreArray<RecoHitInformation::UsedCDCHit> cdcHits(cdcHitsStoreArrayName);
+      if (cdcHits.isOptional()) {
+        cdcHits.registerRelationTo(recoTracks);
+        recoHitInformations.registerRelationTo(cdcHits);
+      }
+
+      StoreArray<RecoHitInformation::UsedSVDHit> svdHits(svdHitsStoreArrayName);
+      if (svdHits.isOptional()) {
+        svdHits.registerRelationTo(recoTracks);
+        recoHitInformations.registerRelationTo(svdHits);
+      }
+
+      StoreArray<RecoHitInformation::UsedPXDHit> pxdHits(pxdHitsStoreArrayName);
+      if (pxdHits.isOptional()) {
+        pxdHits.registerRelationTo(recoTracks);
+        recoHitInformations.registerRelationTo(pxdHits);
+      }
+    }
+
     /**
      * Empty constructor for ROOT.
      */

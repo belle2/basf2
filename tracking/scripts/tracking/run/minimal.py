@@ -66,7 +66,7 @@ class MinimalRun(object):
             '--random-seed',
             dest='random_seed',
             default=self.random_seed,
-            type=int,
+            type=str,
             help='The random number generator seed to be set before the processing starts.',
         )
 

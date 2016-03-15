@@ -74,7 +74,7 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   TH1F* h, *h2;
   TF1* fcn;
   TTree* t;
-  TCanvas* c1;
+  TCanvas* c1 = NULL;
   if (m_Debug)
     c1 = new TCanvas();
   fcn = new TF1("fcn", CrystalBall, 0, 10, 6);

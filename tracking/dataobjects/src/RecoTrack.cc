@@ -128,6 +128,34 @@ genfit::TrackCand* RecoTrack::createGenfitTrackCand() const
   return createdTrackCand;
 }
 
+size_t RecoTrack::addHitsFromRecoTrack(RecoTrack* recoTrack, const unsigned int sortingParameterOffset)
+{
+  size_t hitsCopied = 0;
+
+  for (auto* pxdHit : recoTrack->getPXDHitList()) {
+    auto recoHitInfo = recoTrack->getRecoHitInformation(pxdHit);
+    assert(recoHitInfo);
+    hitsCopied += addPXDHit(pxdHit, recoHitInfo->getSortingParameter() + sortingParameterOffset, recoHitInfo->getFoundByTrackFinder());
+  }
+
+  for (auto* svdHit : recoTrack->getSVDHitList()) {
+    auto recoHitInfo = recoTrack->getRecoHitInformation(svdHit);
+    assert(recoHitInfo);
+    hitsCopied += addSVDHit(svdHit, recoHitInfo->getSortingParameter() + sortingParameterOffset, recoHitInfo->getFoundByTrackFinder());
+  }
+
+  for (auto* cdcHit : recoTrack->getCDCHitList()) {
+    auto recoHitInfo = recoTrack->getRecoHitInformation(cdcHit);
+    assert(recoHitInfo);
+    hitsCopied += addCDCHit(cdcHit, recoHitInfo->getSortingParameter() + sortingParameterOffset,
+                            recoHitInfo->getRightLeftInformation(),
+                            recoHitInfo->getFoundByTrackFinder());
+  }
+
+  return hitsCopied;
+}
+
+
 bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) const
 {
   checkDirtyFlag();

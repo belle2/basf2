@@ -177,6 +177,16 @@ namespace Belle2 {
     }
 
     /**
+     * Add all hits from another RecoTrack to this RecoTrack.
+     * @param recoTrack Pointer to the RecoTrack where the hits are copied from
+     * @param sortingParameterOffset This number will be added to the sortingParameter of all hits copied
+     *        from recoTrack. Set this to (largest sorting parameter) + 1 in order to add hits at the end of
+     *        this reco track.
+     * @return The number of hits copied.
+     */
+    size_t addHitsFromRecoTrack(RecoTrack* recoTrack, const unsigned int sortingParameterOffset = 0);
+
+    /**
      * Adds a pxd hit with the given information to the reco track.
      * You only have to provide the hit and the sorting parameter, all other parameters have default value.
      * @param pxdHit The pointer to a stored PXDHit/Cluster in the store array you provided earlier, which you want to add.

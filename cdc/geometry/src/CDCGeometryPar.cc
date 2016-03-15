@@ -845,7 +845,8 @@ void CDCGeometryPar::readChMap(const GearDir gbxParams)
     m_wireToBoard.insert(pair<WireID, unsigned short>(wID, iB));
   }
 
-  if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readTW: #lines read-in (=" << nRead << ") is inconsistent with #sense-wires (="
+  if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readChMap: #lines read-in (=" << nRead <<
+                                      ") is inconsistent with #sense-wires (="
                                       << nSenseWires << ") !");
 
   ifs.close();

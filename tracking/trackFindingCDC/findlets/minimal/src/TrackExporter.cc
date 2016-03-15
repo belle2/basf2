@@ -49,6 +49,11 @@ void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 m_param_exportTracksInto,
                                 "Name of the output StoreArray of RecoTracks.",
                                 std::string(m_param_exportTracksInto));
+
+  moduleParamList->addParameter(prefixed(prefix, "useRecoTracks"),
+                                m_param_useRecoTracks,
+                                "Flag to use reco tracks instead of genfit tracks.",
+                                m_param_useRecoTracks);
 }
 
 /// Signal initialisation phase to register store array for export
@@ -56,16 +61,15 @@ void TrackExporter::initialize()
 {
   // Output StoreArray
   if (m_param_exportTracks) {
-    StoreArray <RecoTrack> storedRecoTracks(m_param_exportTracksInto);
-    storedRecoTracks.registerInDataStore();
+    if (m_param_useRecoTracks) {
+      StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
+      storedRecoTracks.registerInDataStore();
 
-    StoreArray <RecoHitInformation> storedRecoHitInformation;
-    storedRecoHitInformation.registerInDataStore();
-    storedRecoTracks.registerRelationTo(storedRecoHitInformation);
-
-    StoreArray <CDCHit> storedCDCHits;
-    storedRecoHitInformation.registerRelationTo(storedCDCHits);
-    storedCDCHits.registerRelationTo(storedRecoTracks);
+      RecoTrack::registerRequiredRelations(storedRecoTracks);
+    } else {
+      StoreArray <genfit::TrackCand> storedGFTrackCands(m_param_exportTracksInto);
+      storedGFTrackCands.registerInDataStore();
+    }
   }
   Super::initialize();
 }
@@ -74,14 +78,19 @@ void TrackExporter::initialize()
 void TrackExporter::beginEvent()
 {
   if (m_param_exportTracks) {
-    StoreArray <RecoTrack> storedRecoTracks(m_param_exportTracksInto);
-    if (not storedRecoTracks.isValid()) {
-      storedRecoTracks.create();
-    }
+    if (m_param_useRecoTracks) {
+      StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
+      if (not storedRecoTracks.isValid()) {
+        storedRecoTracks.create();
+      }
 
-    StoreArray <RecoHitInformation> storedRecoHitInformation;
-    if (not storedRecoHitInformation.isValid()) {
-      storedRecoHitInformation.create();
+      StoreArray<RecoHitInformation> storedRecoHitInformation;
+      if (not storedRecoHitInformation.isValid()) {
+        storedRecoHitInformation.create();
+      }
+    } else {
+      StoreArray<genfit::TrackCand> storedGFTrackCands(m_param_exportTracksInto);
+      storedGFTrackCands.create();
     }
   }
   Super::beginEvent();
@@ -92,9 +101,20 @@ void TrackExporter::apply(std::vector<CDCTrack>& tracks)
 {
   // Put code to generate gf track cands here if requested.
   if (m_param_exportTracks) {
-    StoreArray <RecoTrack> storedRecoTracks(m_param_exportTracksInto);
-    for (CDCTrack& track : tracks) {
-      track.storeInto(storedRecoTracks);
+    if (m_param_useRecoTracks) {
+      StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
+      for (CDCTrack& track : tracks) {
+        track.storeInto(storedRecoTracks);
+      }
+    } else {
+      StoreArray<genfit::TrackCand> storedGFTrackCands(m_param_exportTracksInto);
+      for (CDCTrack& track : tracks) {
+        genfit::TrackCand gfTrackCand;
+        if (track.fillInto(gfTrackCand)) {
+          genfit::TrackCand* storedGenfitTrackCand = storedGFTrackCands.appendNew(gfTrackCand);
+          track.setRelatedGenfitTrackCandidate(storedGenfitTrackCand);
+        }
+      }
     }
   }
 }

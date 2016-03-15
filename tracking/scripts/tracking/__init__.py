@@ -228,6 +228,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
     path.add_module("TrackQualityAsserterCDC",
                     WriteGFTrackCands=True,
                     TracksStoreObjNameIsInput=True,
+                    useRecoTracks=True,
                     RecoTracksStoreArrayName=reco_tracks,
                     corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"])
 

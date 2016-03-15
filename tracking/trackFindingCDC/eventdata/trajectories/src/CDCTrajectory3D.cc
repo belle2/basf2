@@ -30,7 +30,7 @@ using namespace TrackFindingCDC;
 
 namespace {
   // Anonymous helper function
-  TMatrixDSym calculateCovarianceMatrix(const UncertainHelix& localHelix, const Vector3D& position, const Vector3D& momentum,
+  TMatrixDSym calculateCovarianceMatrix(const UncertainHelix& localHelix, const Vector3D& momentum,
                                         const ESign charge, const double bZ)
   {
     const double impactXY = localHelix.impactXY();
@@ -277,7 +277,7 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) 
 
   gfTrackCand.setPosMomSeed(position, momentum, charge);
 
-  const TMatrixDSym& cov6 = calculateCovarianceMatrix(getLocalHelix(), position, momentum, charge, bZ);
+  const TMatrixDSym& cov6 = calculateCovarianceMatrix(getLocalHelix(), momentum, charge, bZ);
   gfTrackCand.setCovSeed(cov6);
 
   return true;
@@ -304,7 +304,7 @@ RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks, const d
   RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge);
 
   // TODO: This does not work properly!
-  //const TMatrixDSym& cov6 = calculateCovarianceMatrix(getLocalHelix(), position, momentum, charge, bZ);
+  //const TMatrixDSym& cov6 = calculateCovarianceMatrix(getLocalHelix(), momentum, charge, bZ);
   TMatrixDSym covSeed(6);
   covSeed(0, 0) = 1e-3;
   covSeed(1, 1) = 1e-3;

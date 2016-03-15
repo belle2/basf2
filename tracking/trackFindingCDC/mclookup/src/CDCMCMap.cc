@@ -19,6 +19,17 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+namespace {
+  template< class MapType >
+  void print_map(const MapType& m)
+  {
+    typedef typename MapType::const_iterator const_iterator;
+    for (const_iterator iter = m.begin(), iend = m.end(); iter != iend; ++iter) {
+      std::cout << iter->first << "-->" << iter->second << std::endl;
+    }
+  }
+}
+
 CDCMCMap::CDCMCMap()
 {
 }
@@ -75,27 +86,23 @@ void CDCMCMap::fill()
 
 void CDCMCMap::fillSimHitByHitMap()
 {
-
   StoreArray<CDCSimHit> simHits;
   StoreArray<CDCHit> hits;
 
-  RelationArray simhitToHitsRelations(simHits, hits);
-
-  //Pickup an iterator for hinted insertion
+  // Pickup an iterator for hinted insertion
   CDCSimHitByCDCHitMap::iterator itInsertHint = m_simHitByHit.end();
 
-  for (const RelationElement& simHitToHitsRelation : simhitToHitsRelations) {
+  for (CDCSimHit& simHit : simHits) {
+    CDCSimHit* ptrSimHit = &simHit;
+    RelationVector<CDCHit> relatedHits = simHit.getRelationsTo<CDCHit>();
 
-    RelationElement::index_type iSimHit = simHitToHitsRelation.getFromIndex();
-    const CDCSimHit* ptrSimHit = simHits[iSimHit];
+    if (relatedHits.size() > 1) {
+      B2WARNING("CDCSimHit as more than one related CDCHit - reorganize the mapping");
+    }
 
-    size_t nRelatedHits = simHitToHitsRelation.getSize();
-    for (size_t iRelation = 0; iRelation < nRelatedHits; ++iRelation) {
+    for (CDCHit& hit : relatedHits) {
+      CDCHit* ptrHit = &hit;
 
-      RelationElement::index_type iHit = simHitToHitsRelation.getToIndex(iRelation);
-      //RelationElement::weight_type weight = simHitToHitsRelation.getWeight(iRelation);
-
-      const CDCHit* ptrHit = hits[iHit];
       if (m_simHitByHit.by<CDCHit>().count(ptrHit) != 0) {
         B2WARNING("CDCHit as more than one related CDCSimHit - reorganize the mapping");
       }
@@ -105,12 +112,10 @@ void CDCMCMap::fillSimHitByHitMap()
       }
 
       itInsertHint = m_simHitByHit.insert(itInsertHint, CDCSimHitByCDCHitMap::value_type(ptrHit, ptrSimHit));
-
     }
-
   }
 
-  //Check if every hit has a corresponding simhit
+  // Check if every hit has a corresponding simhit
   for (const CDCHit& hit : hits) {
     const CDCHit* ptrHit = &hit;
 
@@ -121,10 +126,6 @@ void CDCMCMap::fillSimHitByHitMap()
   }
 
 }
-
-
-
-
 
 
 void CDCMCMap::fillMCParticleByHitMap()

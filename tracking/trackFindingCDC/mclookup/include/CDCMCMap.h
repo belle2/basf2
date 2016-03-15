@@ -20,16 +20,25 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    ///Class to organize and present the monte carlo hit information
+    /// Class to organize and present the monte carlo hit information
     class CDCMCMap {
 
     public:
-
-      /// Type for a one to one relation form CDCHits to CDCSimHits
+      /**
+       *  Type for a 0..n to 1 relation form CDCHits to CDCSimHits
+       *
+       *  Caution: This is less intuitive than you think.
+       *           From the CDCDigitizer we expect that only the CDCSimHit that is closest to
+       *           the wire is related to the CDCHit, hence making up a 0..1 to 1 relation
+       *           between CDCHits and CDCSimHits. However during background studies we found
+       *           that one CDCSimHit can be responcible for more than one CDCHit.
+       *           A possible explanation would be that a CDCSimHit from background simulations hits
+       *           the border of a drift cell and produces two signals on digitization.
+       *           Until the situation is clarified this is considered a workaround.
+       */
       typedef
-      boost::bimaps::bimap <
-      boost::bimaps::set_of< boost::bimaps::tagged<const CDCHit*, CDCHit> >,
-            boost::bimaps::set_of< boost::bimaps::tagged<const CDCSimHit*, CDCSimHit> >
+      boost::bimaps::bimap <boost::bimaps::set_of< boost::bimaps::tagged<const CDCHit*, CDCHit> >,
+            boost::bimaps::multiset_of< boost::bimaps::tagged<const CDCSimHit*, CDCSimHit> >
             > CDCSimHitByCDCHitMap;
 
     public:
@@ -40,8 +49,7 @@ namespace Belle2 {
     public:
       /// Type for a one to n relation form CDCHits to MCParticles
       typedef
-      boost::bimaps::bimap <
-      boost::bimaps::set_of< boost::bimaps::tagged<const CDCHit*, CDCHit> >,
+      boost::bimaps::bimap <boost::bimaps::set_of< boost::bimaps::tagged<const CDCHit*, CDCHit> >,
             boost::bimaps::multiset_of< boost::bimaps::tagged<const MCParticle*, MCParticle> >
             > MCParticleByCDCHitMap;
 

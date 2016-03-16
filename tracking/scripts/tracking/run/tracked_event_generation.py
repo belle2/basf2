@@ -8,7 +8,7 @@ from tracking.modules import (
     StandardTrackingReconstructionModule
 )
 
-from tracking.metamodules import IfMCParticlesPresentModule
+from tracking.metamodules import IfMCParticlesPresentModule, IfStoreArrayPresentModule
 
 import tracking.utilities as utilities
 
@@ -171,8 +171,13 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 main_path.add_module(track_finder_module)
 
             # TODO: The following modules do still need a list of genfit::TrackCands. We make the transition here
-            main_path.add_module("GenfitTrackCandidatesCreator",
-                                 genfitTrackCandsStoreArrayName=self.trackCandidatesColumnName)
+
+            main_path.add_module(
+                IfStoreArrayPresentModule(
+                    basf2.register_module(
+                        "GenfitTrackCandidatesCreator",
+                        genfitTrackCandsStoreArrayName=self.trackCandidatesColumnName),
+                    "RecoTracks"))
 
             # check for detector geometry, necessary for track extrapolation in genfit
             if 'MCTrackMatcher' not in main_path and 'MCMatcherTracks' not in main_path:

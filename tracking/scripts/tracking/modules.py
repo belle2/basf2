@@ -74,46 +74,8 @@ class StandardTrackingReconstructionModule(metamodules.PathModule):
         super(StandardTrackingReconstructionModule, self).__init__(path)
 
 
-class CDCValidation(metamodules.PathModule):
-
-    """Add a validation and a mc track matcher to the path
-
-    Attributes
-    ----------
-    With track_candidates_store_array_name you can choose the name of the genfit::TrackCands this validation should be created for
-    With output_file_name you can choose the file name for the results
-
-    TODO: Do only create the mc_track_matching relations if not already present
-    """
-
-    def __init__(
-            self,
-            output_file_name,
-            track_candidates_store_array_name="TrackCands",
-            use_pxd=False,
-            use_cdc=True,
-            use_svd=False,
-            queue=None):
-
-        if queue is not None:
-            queue.put(self.__class__.__name__ + "_output_file_name", output_file_name)
-
-        from tracking.validation.module import SeparatedTrackingValidationModule
-
-        mc_track_matcher_module = CDCMCMatcher(track_cands_store_array_name=track_candidates_store_array_name,
-                                               use_cdc=use_cdc, use_pxd=use_pxd, use_svd=use_svd)
-
-        validation_module = SeparatedTrackingValidationModule(
-            name="",
-            contact="",
-            output_file_name=output_file_name,
-            trackCandidatesColumnName=track_candidates_store_array_name,
-            expert_level=2)
-
-        super(CDCValidation, self).__init__(modules=[mc_track_matcher_module, validation_module])
-
-
 class CDCMCFinder(metamodules.WrapperModule):
+    """Convenience module to add the MC track finder to the path."""
 
     def __init__(
             self,
@@ -137,30 +99,3 @@ class CDCMCFinder(metamodules.WrapperModule):
             mc_track_finder_module.param("WhichParticles", [])
 
         metamodules.WrapperModule.__init__(self, mc_track_finder_module)
-
-
-class CDCMCFiller(basf2.Module):
-
-    """ Fill the later needed mc information """
-
-    def event(self):
-        Belle2.TrackFindingCDC.CDCMCManager.getInstance().fill()
-
-
-class CDCMCMatcher(metamodules.WrapperModule):
-
-    """ Add the mc mathcer module for convenience """
-
-    def __init__(self, mc_track_cands_store_array_name="MCTrackCands",
-                 track_cands_store_array_name="TrackCands",
-                 use_cdc=True, use_svd=False, use_pxd=False):
-
-        mc_track_matcher_module = StandardEventGenerationRun.get_basf2_module('MCTrackMatcher',
-                                                                              UseCDCHits=use_cdc,
-                                                                              UseSVDHits=use_svd,
-                                                                              UsePXDHits=use_pxd,
-                                                                              RelateClonesToMCParticles=True,
-                                                                              MCGFTrackCandsColName=mc_track_cands_store_array_name,
-                                                                              PRGFTrackCandsColName=track_cands_store_array_name)
-
-        metamodules.WrapperModule.__init__(self, module=mc_track_matcher_module)

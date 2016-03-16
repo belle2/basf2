@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'belle_legacy', 'CLHEP']
+env['LIBS'] = ['CLHEP', 'framework', 'belle_legacy', 'mdst_dataobjects', 'b2bii', 'analysis_dataobjects', 'analysis_KFit']
 
 Return('env')

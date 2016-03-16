@@ -8,7 +8,7 @@
 // Contributors: Anze Zupanc, Matic Lubej,
 //-
 
-#include <b2bii/modules/B2BIIConvertMdst/B2BIIConvertMdstModule.h>
+#include <b2bii/modules/B2BIIMdstInput/B2BIIConvertMdstModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>

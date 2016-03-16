@@ -150,7 +150,7 @@
 //
 //
 
-#include <b2bii/modules/B2BIIFixMdst/B2BIIFixMdstModule.h>
+#include <b2bii/modules/B2BIIMdstInput/B2BIIFixMdstModule.h>
 
 #include <cstdio>
 #include <cmath>

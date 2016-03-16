@@ -1,5 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework', 'belle_legacy', 'analysis_KFit']
-
-Return('env')

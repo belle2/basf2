@@ -446,6 +446,31 @@ namespace Belle2 {
       return m_genfitTrack.getTrackReps();
     }
 
+    /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
+    * useful for extrapolation of measurements other locations
+    */
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr)
+    {
+      return getMeasuredStateOnPlaneFromHit(0, representation);
+    }
+
+    /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
+    * useful for extrapolation of measurements other locations
+    */
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr)
+    {
+      return getMeasuredStateOnPlaneFromHit(-1, representation);
+    }
+
+    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
+    * useful for extrapolation of measurements other locations
+    */
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr)
+    {
+      checkDirtyFlag();
+      return m_genfitTrack.getFittedState(id, representation);
+    }
+
     /// Prune the genfit track. Only to be used in the prune module.
     void prune(const std::string& optionsString)
     {

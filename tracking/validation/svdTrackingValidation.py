@@ -21,6 +21,7 @@ basf2.set_random_seed(1337)
 import logging
 
 from tracking.validation.run import TrackingValidationRun
+import tracking
 
 
 class SVD4Layer(TrackingValidationRun):
@@ -28,13 +29,8 @@ class SVD4Layer(TrackingValidationRun):
     generator_module = 'EvtGenInput'
     components = ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'PXD', 'SVD'
                   ]
-    secSetup = \
-        ['shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
-         'shiftedL3IssueTestSVDStd-100to400MeV_SVD',
-         'shiftedL3IssueTestSVDStd-25to100MeV_SVD']
-    finder_module = basf2.register_module('VXDTF')
-    param_vxdtf = {'sectorSetup': secSetup, 'tuneCutoffs': 0.06}
-    finder_module.param(param_vxdtf)
+
+    finder_module = staticmethod(lambda path: tracking.add_vxd_track_finding(path, components=["SVD"]))
 
     tracking_coverage = {
         'UsePXDHits': False,

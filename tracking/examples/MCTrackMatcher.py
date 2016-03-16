@@ -10,6 +10,7 @@ from basf2 import *
 from ROOT import Belle2
 
 import simulation
+import tracking
 
 
 class PrintMCMatchingRelation(Module):
@@ -102,9 +103,8 @@ particleGunModule.param({
     'thetaGeneration': 'uniform',
     'thetaParams': [17., 150.],
 })
-
-# Put your track finder here
-trackFinderModule = register_module('TrackFinderCDCLegendreTracking')
+# A module to recreate genfit TrackCands.
+trackCandidateConverter = register_module('GenfitTrackCandidatesCreator')
 
 # Reference Monte Carlo tracks
 trackFinderMCTruthModule = register_module('TrackFinderMCTruth')
@@ -136,7 +136,8 @@ components = ['MagneticFieldConstant4LimitedRCDC', 'BeamPipe', 'PXD', 'SVD',
               'CDC']
 simulation.add_simulation(main, components=components)
 
-main.add_module(trackFinderModule)
+tracking.add_cdc_track_finding(main)
+main.add_module(trackCandidateConverter)
 
 main.add_module(trackFinderMCTruthModule)
 main.add_module(mcTrackMatcherModule)

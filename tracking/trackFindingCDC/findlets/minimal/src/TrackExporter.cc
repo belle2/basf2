@@ -35,7 +35,7 @@ void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 "Alias for exportTracksInto",
                                 std::string(m_param_exportTracksInto));
 
-  moduleParamList->addParameter(prefixed(prefix, "WriteGFTrackCands"),
+  moduleParamList->addParameter(prefixed(prefix, "WriteRecoTracks"),
                                 m_param_exportTracks,
                                 "Alias for exportTracks",
                                 bool(m_param_exportTracks));

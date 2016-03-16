@@ -46,6 +46,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
     else:
         add_track_finding(path, components)
 
+        # The rest of the modules still needs TrackCands. We make the transition here. This will be unneeded later.
+        path.add_module("GenfitTrackCandidatesCreator")
+
     # Match the tracks to the MC truth.  The matching works based on
     # the output of the TrackFinderMCTruth.
     mctrackfinder = register_module('TrackFinderMCTruth')
@@ -88,6 +91,8 @@ def add_prune_tracks(path):
 def add_track_finding(path, components=None):
     """
     Adds the realistic track finding to the path.
+    The result is a StoreArray 'RecoTracks' full of RecoTracks (not TrackCands any more!).
+    Use the GenfitTrackCandidatesCreator Module to convert back.
     """
     if components and not ('SVD' in components or 'CDC' in components):
         return
@@ -143,13 +148,13 @@ def add_track_finding(path, components=None):
             'CDCGFTrackCandsColName': cdc_trackcands,
             'CDCGFTracksColName': cdc_tracks,
             'relMatchedTracks': 'MatchedTracksIdx',
+            'MergedGFTrackCandsColName': '__MergedTrackCands',
             'chi2_max': 100,
             'recover': 1
         })
 
-    elif use_vxd or use_cdc:
-        # The following modules still expect a list of genfit::TrackCand.
-        path.add_module("GenfitTrackCandidatesCreator")
+        # Make sure everyone can use RecoTracks if needed
+        path.add_module("RecoTrackCreator", trackCandidatesStoreArrayName='__MergedTrackCands')
 
 
 def add_mc_track_finding(path, components=None):
@@ -180,7 +185,10 @@ def add_mc_track_finding(path, components=None):
 def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
     """
     Convenience function for adding all cdc track finder modules
-    to the path
+    to the path.
+
+    The result is a StoreArray with name @param reco_tracks full of RecoTracks (not TrackCands any more!).
+    Use the GenfitTrackCandidatesCreator Module to convert back.
 
     Arguments
     ---------
@@ -198,11 +206,11 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
 
     # Find axial tracks
     path.add_module("TrackFinderCDCLegendreTracking",
-                    WriteGFTrackCands=False)
+                    WriteRecoTracks=False)
 
     # Improve the quality of the axial tracks
     path.add_module("TrackQualityAsserterCDC",
-                    WriteGFTrackCands=False,
+                    WriteRecoTracks=False,
                     TracksStoreObjNameIsInput=True,
                     corrections=["B2B"])
 
@@ -210,7 +218,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
     path.add_module('StereoHitFinderCDCLegendreHistogramming',
                     useSingleMatchAlgorithm=True,
                     TracksStoreObjNameIsInput=True,
-                    WriteGFTrackCands=False)
+                    WriteRecoTracks=False)
 
     # Delete segments which where fully used in the last events
     path.add_module("UsedSegmentsDeleter")
@@ -218,7 +226,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombinerDev',
                     TracksStoreObjNameIsInput=True,
-                    WriteGFTrackCands=False,
+                    WriteRecoTracks=False,
                     SegmentTrackFilterFirstStepFilter="tmva",
                     SegmentTrackFilterFirstStepFilterParameters={"cut": 0.75},
                     TrackFilter="tmva",
@@ -226,9 +234,8 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
 
     # Improve the quality of all tracks and output
     path.add_module("TrackQualityAsserterCDC",
-                    WriteGFTrackCands=True,
+                    WriteRecoTracks=True,
                     TracksStoreObjNameIsInput=True,
-                    useRecoTracks=True,
                     RecoTracksStoreArrayName=reco_tracks,
                     corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"])
 
@@ -236,7 +243,10 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
 def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None):
     """
     Convenience function for adding all vxd track finder modules
-    to the path
+    to the path.
+
+    The result is a StoreArray with name @param reco_tracks full of RecoTracks (not TrackCands any more!).
+    Use the GenfitTrackCandidatesCreator Module to convert back.
 
     Arguments
     ---------

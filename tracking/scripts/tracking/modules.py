@@ -5,7 +5,7 @@
 """
 
 import basf2
-import reconstruction
+import tracking
 
 import ROOT
 
@@ -70,7 +70,7 @@ class StandardTrackingReconstructionModule(metamodules.PathModule):
        """
 
         path = basf2.create_path()
-        reconstruction.add_tracking_reconstruction(path, *args, **kwds)
+        tracking.add_tracking_reconstruction(path, *args, **kwds)
         super(StandardTrackingReconstructionModule, self).__init__(path)
 
 

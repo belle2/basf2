@@ -108,6 +108,7 @@ wirehittopologypreparer = register_module('WireHitTopologyPreparer')
 
 # TrackFinderCDCLegendre
 cdctracking = register_module('TrackFinderCDCLegendreTracking')
+trackCandidateConverter = register_module('GenfitTrackCandidatesCreator')
 
 # Display module
 display_module = CDCSVGDisplayModule()
@@ -145,6 +146,7 @@ else:
 main.add_module(wirehittopologypreparer)
 
 main.add_module(cdctracking)
+main.add_module(trackCandidateConverter)
 
 main.add_module(display_module)
 

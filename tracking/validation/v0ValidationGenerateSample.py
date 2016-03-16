@@ -56,6 +56,8 @@ def run():
 
     add_track_finding(path, components)
 
+    path.add_module("GenfitTrackCandidatesCreator")
+
     # Match the tracks to the MC truth.  The matching works based on
     # the output of the TrackFinderMCTruth.
     path.add_module('TrackFinderMCTruth', GFTrackCandidatesColName='MCTrackCands', WhichParticles=[])

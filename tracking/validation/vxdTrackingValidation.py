@@ -19,6 +19,7 @@ basf2.set_random_seed(1337)
 import logging
 
 from tracking.validation.run import TrackingValidationRun
+import tracking
 
 
 class VXD(TrackingValidationRun):
@@ -26,13 +27,9 @@ class VXD(TrackingValidationRun):
     generator_module = 'EvtGenInput'
     components = ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'PXD', 'SVD'
                   ]
-    secSetup = \
-        ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',
-         'shiftedL3IssueTestVXDStd-100to400MeV_PXDSVD',
-         'shiftedL3IssueTestVXDStd-25to100MeV_PXDSVD']
-    finder_module = basf2.register_module('VXDTF')
-    param_vxdtf = {'sectorSetup': secSetup, 'tuneCutoffs': 0.22}
-    finder_module.param(param_vxdtf)
+
+    finder_module = staticmethod(lambda path: tracking.add_vxd_track_finding(path, components=["PXD", "SVD"]))
+
     fit_geometry = "default"
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE

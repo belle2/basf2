@@ -55,7 +55,7 @@ namespace Belle2 {
       std::string m_param_exportTracksInto = "";
 
       /// Flag to use reco tracks instead of genfit tracks
-      bool m_param_useRecoTracks = false;
+      bool m_param_useRecoTracks = true;
 
     }; // end class
   } // end namespace TrackFindingCDC

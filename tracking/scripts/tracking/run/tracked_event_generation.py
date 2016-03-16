@@ -104,7 +104,6 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                     'UseOnlyAxialCDCHits': False}
 
         elif finder_module_name in ("add_tracking_reconstruction", 'StandardReco', 'StandardTrackingReconstruction'):
-            input("all")
             return {'UsePXDHits': 'PXD' in self.components,
                     'UseSVDHits': 'SVD' in self.components,
                     'UseCDCHits': 'CDC' in self.components,
@@ -159,6 +158,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 main_path.add_module("WireHitTopologyPreparer")
 
             if self.finder_module == 'StandardReco':
+                basf2.B2FATAL("Because of the transition to RecoTracks, this is not implemented in the moment!")
                 track_finder_module = StandardTrackingReconstructionModule(components=self.components)
                 main_path.add_module(track_finder_module)
 
@@ -170,7 +170,10 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 track_finder_module = self.get_basf2_module(self.finder_module)
                 main_path.add_module(track_finder_module)
 
-            has_matcher = False
+            # TODO: The following modules do still need a list of genfit::TrackCands. We make the transition here
+            main_path.add_module("GenfitTrackCandidatesCreator",
+                                 genfitTrackCandsStoreArrayName=self.trackCandidatesColumnName)
+
             # check for detector geometry, necessary for track extrapolation in genfit
             if 'MCTrackMatcher' not in main_path and 'MCMatcherTracks' not in main_path:
                 # Reference Monte Carlo tracks

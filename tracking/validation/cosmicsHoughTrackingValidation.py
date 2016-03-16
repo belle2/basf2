@@ -34,12 +34,12 @@ class CosmicsHough(TrackingValidationRun):
     segment_finder_module.param("SegmentOrientation", "downwards")
 
     axial_hough_module = basf2.register_module('TrackFinderCDCAxialSegmentHough')
-    axial_hough_module.param(dict(WriteGFTrackCands=False,
+    axial_hough_module.param(dict(WriteRecoTracks=False,
                                   TracksStoreObjName="AxialCDCTracks"))
 
     cdc_stereo_combiner_module = basf2.register_module('StereoHitFinderCDCLegendreHistogramming')
     cdc_stereo_combiner_module.param(dict(TracksStoreObjNameIsInput=True,
-                                          WriteGFTrackCands=True,
+                                          WriteRecoTracks=True,
                                           TracksStoreObjName="AxialCDCTracks"))
 
     finder_module = [wire_hit_topology_preparer, segment_finder_module, axial_hough_module, cdc_stereo_combiner_module]

@@ -74,7 +74,6 @@ namespace Belle2 {
     virtual void defineHisto();
 
   private:
-
     /** Utility functions to convert indices to plane numbers and v.v.,
      * and to protect against range errors.
      */
@@ -87,19 +86,12 @@ namespace Belle2 {
       return iPlane - c_firstPXDPlane;
     }
 
-    /** This is a shortcut to getting SVD::SensorInfo from the GeoCache.
-     * @param index Index of the sensor (0,1,2,3), _not_ layer number!
-     * @return SensorInfo object for the desired plane.
-     */
-    const VXD::SensorInfoBase& getInfo(int index) const;
 
     std::string m_storeTrackName;           /**< genfit::Track StoreArray name */
     std::string m_storeTrackCandName;      /**< genfit::TrackCand StoreArray name */
     std::string m_relTrackCandTrackName;    /**< Relation between the two */
 
     std::string m_histogramDirectoryName;   /**< subdir where to place the histograms */
-
-    std::vector<TH1*> m_allHistos;          /**< All histograms for easy deletion */
 
     // Allocate all histos through these, and the destructor will take
     // care of deleting them, they will be reset on a new run, maybe
@@ -151,35 +143,43 @@ namespace Belle2 {
     TH2* m_hNDFPval;
 
     /** Residuals in cm.  */
-    TH1* m_hResidualU[c_nPlanes];
-    TH1* m_hResidualV[c_nPlanes];
-    TH2* m_hNDFResidualU[c_nPlanes];
-    TH2* m_hNDFResidualV[c_nPlanes];
+    /** rewritten to have a histogram for each sensor (before each plane)*/
+    std::map<VxdID, TH1*> m_hResidualU;
+    std::map<VxdID, TH1*> m_hResidualV;
+    std::map<VxdID, TH2*> m_hNDFResidualU;
+    std::map<VxdID, TH2*> m_hNDFResidualV;
 
-    TH2* m_hResidualUvsV[c_nPlanes];
-    TH2* m_hResidualVvsU[c_nPlanes];
-    TH2* m_hResidualUvsU[c_nPlanes];
-    TH2* m_hResidualVvsV[c_nPlanes];
+    std::map<VxdID, TH2*> m_hResidualUvsV;
+    std::map<VxdID, TH2*> m_hResidualVvsU;
+    std::map<VxdID, TH2*> m_hResidualUvsU;
+    std::map<VxdID, TH2*> m_hResidualVvsV;
 
     /** Residuals normalized with tracking error.  */
-    TH1* m_hNormalizedResidualU[c_nPlanes];
-    TH1* m_hNormalizedResidualV[c_nPlanes];
-    TH2* m_hNDFNormalizedResidualU[c_nPlanes];
-    TH2* m_hNDFNormalizedResidualV[c_nPlanes];
+    std::map<VxdID, TH1*> m_hNormalizedResidualU;
+    std::map<VxdID, TH1*> m_hNormalizedResidualV;
+    std::map<VxdID, TH2*> m_hNDFNormalizedResidualU;
+    std::map<VxdID, TH2*> m_hNDFNormalizedResidualV;
 
     /** The pseudo efficiencies := number of total reco tracks hitting the
-    plane (y = 0), number of reco tracks with associated hits in this
-    plane (y = 2, because denominator double-counts).  */
+      plane (y = 0), number of reco tracks with associated hits in this
+      plane (y = 2, because denominator double-counts).  */
     TH1* m_hPseudoEfficienciesU;
     TH1* m_hPseudoEfficienciesV;
 
     TH1* m_hMomentum;
 
+    std::vector<TH1*> m_allHistos;
+
     /** Correlation between seed and fitted track for five parameters in the first plane.  */
     TH2* m_hSeedQuality[6];
 
+    //fill the m_vPlanes
     void findPlanes();
-    std::vector<ROIDetPlane> m_vPlanes;
+    std::map<VxdID, ROIDetPlane> m_vPlanes;
+
+    //list of all sensors in the geometry
+    std::vector<VxdID> m_sensorList;
+
 
     void plotResiduals(const genfit::Track* track);
     void plotPseudoEfficiencies(const genfit::Track* track);

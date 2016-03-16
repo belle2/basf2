@@ -4,6 +4,8 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Tobias Schlüter                                          *
+ *    - several changes to make it work with the 2016 test beam           *
+ *      (Thomas Lueck,  committed March 2016)                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -35,6 +37,7 @@
 #include <boost/format.hpp>
 
 #include "TDirectory.h"
+#include "TString.h"
 
 using namespace Belle2;
 
@@ -66,7 +69,6 @@ TrackfitDQMModule::TrackfitDQMModule() : HistoModule()
 
 TrackfitDQMModule::~TrackfitDQMModule()
 {
-  m_allHistos.clear();
 }
 
 //------------------------------------------------------------------
@@ -90,58 +92,58 @@ void TrackfitDQMModule::defineHisto()
     m_hNDFChi2 = getHist("hNDFChi2", "#chi^{2} of tracks;NDF;#chi^{2};Tracks", 8, 0, 8, 1000, 0, 20);
     m_hNDFPval = getHist("hNDFPval", "p-values of tracks;NDF;pVal;Tracks", 8, 0, 8, 1000, 0, 1);
   }
-  for (int i = 0; i < c_nPlanes; ++i) {
-    int iLayer = indexToPlane(i);
-    std::string title, name;
+
+
+  for (VxdID& avxdid : m_sensorList) {
+    TString title, name;
 
     const double residualRange = 0.1;
-
-    name = (boost::format("hResidualsU%1%") % iLayer).str();
-    title = (boost::format("unnormalized, unbiased residuals along U in layer %1%;cm;Tracks") % iLayer).str();
-    m_hResidualU[i] = getHist(name, title, 1000, -residualRange, residualRange);
-    name = (boost::format("hResidualsV%1%") % iLayer).str();
-    title = (boost::format("unnormalized, unbiased residuals along V in layer %1%;cm;Tracks") % iLayer).str();
-    m_hResidualV[i] = getHist(name, title, 1000, -residualRange, residualRange);
-    name = (boost::format("hResidualVvsU%1%") % iLayer).str();
-    title = (boost::format("unnormalized, unbiased residuals along V vs U in layer %1%;res V [cm];U [cm];Tracks") % iLayer).str();
-    m_hResidualVvsU[i] = getHist(name, title, 100, -residualRange, residualRange, 100, -5, 5);
-    name = (boost::format("hResidualUvsV%1%") % iLayer).str();
-    title = (boost::format("unnormalized, unbiased residuals along U vs V in layer %1%;res U [cm];V [cm];Tracks") % iLayer).str();
-    m_hResidualUvsV[i] = getHist(name, title, 100, -residualRange, residualRange, 100, -5, 5);
-    name = (boost::format("hResidualUvsU%1%") % iLayer).str();
-    title = (boost::format("unnormalized, unbiased residuals along U vs U in layer %1%;res U [cm];U [cm];Tracks") % iLayer).str();
-    m_hResidualUvsU[i] = getHist(name, title, 100, -residualRange, residualRange, 100, -5, 5);
-    name = (boost::format("hResidualVvsV%1%") % iLayer).str();
-    title = (boost::format("unnormalized, unbiased residuals along V vs V in layer %1%;res V [cm];V [cm];Tracks") % iLayer).str();
-    m_hResidualVvsV[i] = getHist(name, title, 100, -residualRange, residualRange, 100, -5, 5);
-    name = (boost::format("hNormalizedResidualsU%1%") % iLayer).str();
-    title = (boost::format("normalized, unbiased residuals in layer %1%;#sigma;Tracks") % iLayer).str();
+    name = "hResidualsU" + ((std::string)avxdid);
+    title = "unnormalized, unbiased residuals along U in Sesnor " + ((std::string)avxdid);
+    m_hResidualU[avxdid] = getHist(name, title, 1000, -residualRange, residualRange);
+    name = "hResidualsV" + ((std::string)avxdid);
+    title = "unnormalized, unbiased residuals along V in Sensor " + ((std::string)avxdid) + " ;cm;Tracks";
+    m_hResidualV[avxdid] = getHist(name, title, 1000, -residualRange, residualRange);
+    name = "hResidualVvsU" + ((std::string)avxdid);
+    title = "unnormalized, unbiased residuals along V vs U in Sensori " + ((std::string)avxdid) + " ;res V [cm];U [cm];Tracks";
+    m_hResidualVvsU[avxdid] = getHist(name, title, 100, -residualRange, residualRange, 100, -5, 5);
+    name = "hResidualUvsV" + ((std::string)avxdid);
+    title = "unnormalized, unbiased residuals along U vs V in Sensor " + ((std::string)avxdid) + ";res U [cm];V [cm];Tracks";
+    m_hResidualUvsV[avxdid] = getHist(name, title, 100, -residualRange, residualRange, 100, -5, 5);
+    name = "hResidualUvsU" + ((std::string)avxdid);
+    title = "unnormalized, unbiased residuals along U vs U in Sensor " + ((std::string)avxdid) + ";res U [cm];U [cm];Tracks";
+    m_hResidualUvsU[avxdid] = getHist(name, title, 100, -residualRange, residualRange, 100, -5, 5);
+    name = "hResidualVvsV" + ((std::string)avxdid);
+    title = "unnormalized, unbiased residuals along V vs V in Sensor " + ((std::string)avxdid) + ";res V [cm];V [cm];Tracks";
+    m_hResidualVvsV[avxdid] = getHist(name, title, 100, -residualRange, residualRange, 100, -5, 5);
+    name = "hNormalizedResidualsU" + ((std::string)avxdid);
+    title = "normalized, unbiased residuals in Sensor " + ((std::string)avxdid) + ";#sigma;Tracks";
 
     double normResRange = 5;
-    m_hNormalizedResidualU[i] = getHist(name, title, 1000, -normResRange, normResRange);
-    name = (boost::format("hNormalizedResidualsV%1%") % iLayer).str();
-    title = (boost::format("normalized, unbiased residuals in layer %1%;NDF;#sigma;Tracks") % iLayer).str();
-    m_hNormalizedResidualV[i] = getHist(name, title, 1000, -normResRange, normResRange);
+    m_hNormalizedResidualU[avxdid] = getHist(name, title, 1000, -normResRange, normResRange);
+    name = "hNormalizedResidualsV" + ((std::string)avxdid);
+    title = "normalized, unbiased residuals in Sensor " + ((std::string)avxdid) + ";NDF;#sigma;Tracks";
+    m_hNormalizedResidualV[avxdid] = getHist(name, title, 1000, -normResRange, normResRange);
     if (m_fillExpertHistos) {
-      name = (boost::format("hNDFResidualsU%1%") % iLayer).str();
-      title = (boost::format("unnormalized, unbiased residuals along U in layer %1%;NDF;cm;Tracks") % iLayer).str();
-      m_hNDFResidualU[i] = getHist(name, title, 8, 0, 8, 1000, -residualRange, residualRange);
-      name = (boost::format("hNDFResidualsV%1%") % iLayer).str();
-      title = (boost::format("unnormalized, unbiased residuals along V in layer %1%;NDF;cm;Tracks") % iLayer).str();
-      m_hNDFResidualV[i] = getHist(name, title, 8, 0, 8, 1000, -residualRange, residualRange);
-      name = (boost::format("hNDFNormalizedResidualsU%1%") % iLayer).str();
-      title = (boost::format("normalized, unbiased residuals in layer %1%;NDF;#sigma;Tracks") % iLayer).str();
-      m_hNDFNormalizedResidualU[i] = getHist(name, title, 8, 0, 8, 1000, -normResRange, normResRange);
-      name = (boost::format("hNDFNormalizedResidualsV%1%") % iLayer).str();
-      title = (boost::format("normalized, unbiased residuals in layer %1%;NDF;#sigma;Tracks") % iLayer).str();
-      m_hNDFNormalizedResidualV[i] = getHist(name, title, 8, 0, 8, 1000, -normResRange, normResRange);
+      name = "hNDFResidualsU" + ((std::string)avxdid);
+      title = "unnormalized, unbiased residuals along U in Sensor " + ((std::string)avxdid) + ";NDF;cm;Tracks";
+      m_hNDFResidualU[avxdid] = getHist(name, title, 8, 0, 8, 1000, -residualRange, residualRange);
+      name = "hNDFResidualsV" + ((std::string)avxdid);
+      title = "unnormalized, unbiased residuals along V in Sensor " + ((std::string)avxdid) + ";NDF;cm;Tracks";
+      m_hNDFResidualV[avxdid] = getHist(name, title, 8, 0, 8, 1000, -residualRange, residualRange);
+      name = "hNDFNormalizedResidualsU" + ((std::string)avxdid);
+      title = "normalized, unbiased residuals in Sensor " + ((std::string)avxdid) + ";NDF;#sigma;Tracks";
+      m_hNDFNormalizedResidualU[avxdid] = getHist(name, title, 8, 0, 8, 1000, -normResRange, normResRange);
+      name = "hNDFNormalizedResidualsV" + ((std::string)avxdid);
+      title = "normalized, unbiased residuals in Sensor " + ((std::string)avxdid) + ";NDF;#sigma;Tracks";
+      m_hNDFNormalizedResidualV[avxdid] = getHist(name, title, 8, 0, 8, 1000, -normResRange, normResRange);
     }
   }
 
   m_hPseudoEfficienciesU = getHistProfile("hPseudoEfficienciesU", "pseudo efficiencies U;layer;pseudo efficiency", 6, 1, 7);
   m_hPseudoEfficienciesV = getHistProfile("hPseudoEfficienciesV", "pseudo efficiencies V;layer;pseudo efficiency", 6, 1, 7);
 
-  m_hMomentum = getHist("hMomentum", "reconstructed momentum at first TrackPoint", 1000, 0, 6);
+  m_hMomentum = getHist("hMomentum", "reconstructed momentum at first TrackPoint", 1000, 0, 8);
 
   for (int i = 0; i < 6; ++i) {
     const char* varName[6] = { "x", "y", "z", "px", "py", "pz", };
@@ -160,6 +162,10 @@ void TrackfitDQMModule::defineHisto()
 
 void TrackfitDQMModule::initialize()
 {
+  //get the list of sensors here or earlier as other methods need a it filled
+  m_sensorList = VXD::GeoCache::getInstance().getListOfSensors();
+
+
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
@@ -180,10 +186,6 @@ void TrackfitDQMModule::initialize()
 
 void TrackfitDQMModule::beginRun()
 {
-  for (size_t i = 0; i < m_allHistos.size(); ++i) {
-    m_allHistos[i]->Reset();
-  }
-
   findPlanes();
 }
 
@@ -247,6 +249,7 @@ void TrackfitDQMModule::event()
     } catch (...) {
       // Skip.
     }
+
   }
 }
 
@@ -258,21 +261,30 @@ void TrackfitDQMModule::endRun()
 
 void TrackfitDQMModule::terminate()
 {
+  //just a bit cosmetics
+  for (int i = 0; i < (int)m_allHistos.size(); i++) {
+    if (m_allHistos[i]->GetEntries() <= 0) {
+      B2DEBUG(1, "Deleting histogram " << m_allHistos[i]->GetName());
+      if (m_allHistos[i]) delete  m_allHistos[i];
+    }
+  }
 }
 
 void TrackfitDQMModule::findPlanes()
 {
   m_vPlanes.clear();
 
-  for (int i = 0; i < c_nPlanes; ++i) {
-    ROIDetPlane plane(getInfo(i).getID());
-    const VXD::SensorPlane& finitePlane(getInfo(i).getID());
+  for (int i = 0; i < (int)m_sensorList.size(); ++i) {
+    ROIDetPlane plane(m_sensorList[i]);
+    const VXD::SensorPlane& finitePlane(m_sensorList[i]);
     plane.setFinitePlane(finitePlane.clone());
-    m_vPlanes.push_back(plane);
+    m_vPlanes[m_sensorList[i]] = plane;
   }
 
   B2DEBUG(2, "found " << m_vPlanes.size() << " layers.");
 }
+
+
 
 
 void TrackfitDQMModule::plotResiduals(const genfit::Track* track)
@@ -280,8 +292,11 @@ void TrackfitDQMModule::plotResiduals(const genfit::Track* track)
   double NDF = track->getKalmanFitStatus()->getNdf();
   for (unsigned int i = 0; i < track->getNumPoints(); ++i) {
     const genfit::TrackPoint* tp = track->getPoint(i);
-    if (!tp->hasRawMeasurements())
+
+    if (!tp->hasRawMeasurements()) {
+      B2DEBUG(1, "no raw measurements");
       continue;
+    }
 
     // Identify Layer.
     const genfit::AbsMeasurement* raw = tp->getRawMeasurement(0);
@@ -289,12 +304,13 @@ void TrackfitDQMModule::plotResiduals(const genfit::Track* track)
     const PXDRecoHit* rawPXD = dynamic_cast<const PXDRecoHit*>(raw);
 
     if (rawSVD) {
-      int layer = rawSVD->getSensorID().getLayerNumber();
-      int index = planeToIndex(layer);
+      VxdID avxdid = rawSVD->getSensorID();
 
       const genfit::KalmanFitterInfo* kfi = tp->getKalmanFitterInfo();
-      if (!kfi)
+      if (!kfi) {
+        B2DEBUG(1, "No kalmanfitterinfo")
         continue;
+      }
 
       double u = 0;
       double v = 0;
@@ -304,6 +320,7 @@ void TrackfitDQMModule::plotResiduals(const genfit::Track* track)
       bool haveV = false;
 
       unsigned int nMeasurements = kfi->getNumMeasurements();
+      B2DEBUG(1, "n Measurements " << nMeasurements);
       for (unsigned int iMeas = 0; iMeas < nMeasurements; ++iMeas) {
         const genfit::MeasurementOnPlane& res = kfi->getResidual(iMeas, false);
         const genfit::AbsHMatrix* h = kfi->getMeasurementOnPlane(iMeas)->getHMatrix();
@@ -314,48 +331,48 @@ void TrackfitDQMModule::plotResiduals(const genfit::Track* track)
             haveU = haveU || isU;
             u = kfi->getFittedState().getState()(3);
             resU = res.getState()(0);
-            m_hResidualU[index]->Fill(resU,
-                                      res.getWeight());
-            m_hNormalizedResidualU[index]->Fill(resU / sqrt(res.getCov()(0, 0)),
-                                                res.getWeight());
+            m_hResidualU[avxdid]->Fill(resU,
+                                       res.getWeight());
+            m_hNormalizedResidualU[avxdid]->Fill(resU / sqrt(res.getCov()(0, 0)),
+                                                 res.getWeight());
           }
           if (m_fillExpertHistos) {
-            m_hNDFResidualU[index]->Fill(NDF,
-                                         res.getState()(0),
-                                         res.getWeight());
-            m_hNDFNormalizedResidualU[index]->Fill(NDF,
-                                                   res.getState()(0) / sqrt(res.getCov()(0, 0)),
-                                                   res.getWeight());
+            m_hNDFResidualU[avxdid]->Fill(NDF,
+                                          res.getState()(0),
+                                          res.getWeight());
+            m_hNDFNormalizedResidualU[avxdid]->Fill(NDF,
+                                                    res.getState()(0) / sqrt(res.getCov()(0, 0)),
+                                                    res.getWeight());
           }
         } else if (isV) {
           if (NDF > 2) {
             haveV = haveV || isV;
             v = kfi->getFittedState().getState()(4);
             resV = res.getState()(0);
-            m_hResidualV[index]->Fill(resV,
-                                      res.getWeight());
-            m_hNormalizedResidualV[index]->Fill(resV / sqrt(res.getCov()(0, 0)),
-                                                res.getWeight());
+            m_hResidualV[avxdid]->Fill(resV,
+                                       res.getWeight());
+            m_hNormalizedResidualV[avxdid]->Fill(resV / sqrt(res.getCov()(0, 0)),
+                                                 res.getWeight());
           }
           if (m_fillExpertHistos) {
-            m_hNDFResidualV[index]->Fill(NDF,
-                                         res.getState()(0),
-                                         res.getWeight());
-            m_hNDFNormalizedResidualV[index]->Fill(NDF,
-                                                   res.getState()(0) / sqrt(res.getCov()(0, 0)),
-                                                   res.getWeight());
+            m_hNDFResidualV[avxdid]->Fill(NDF,
+                                          res.getState()(0),
+                                          res.getWeight());
+            m_hNDFNormalizedResidualV[avxdid]->Fill(NDF,
+                                                    res.getState()(0) / sqrt(res.getCov()(0, 0)),
+                                                    res.getWeight());
           }
         }
       }
       if (NDF > 2) {
         if (haveU && haveV) {
-          m_hResidualUvsV[index]->Fill(resU, v);
-          m_hResidualVvsU[index]->Fill(resV, u);
+          m_hResidualUvsV[avxdid]->Fill(resU, v);
+          m_hResidualVvsU[avxdid]->Fill(resV, u);
         }
         if (haveU)
-          m_hResidualUvsU[index]->Fill(resU, u);
+          m_hResidualUvsU[avxdid]->Fill(resU, u);
         if (haveV)
-          m_hResidualVvsV[index]->Fill(resV, v);
+          m_hResidualVvsV[avxdid]->Fill(resV, v);
       }
     }
 
@@ -366,8 +383,7 @@ void TrackfitDQMModule::plotResiduals(const genfit::Track* track)
         continue;
       }
 
-      int layer = rawPXD->getSensorID().getLayerNumber();
-      int index = planeToIndex(layer);
+      VxdID avxdid = rawPXD->getSensorID();
 
       const genfit::KalmanFitterInfo* kfi = tp->getKalmanFitterInfo();
       if (!kfi)
@@ -391,30 +407,31 @@ void TrackfitDQMModule::plotResiduals(const genfit::Track* track)
         double errV = sqrt(res.getCov()(1, 1));
 
         if (NDF > 3) {
-          m_hResidualU[index]->Fill(resU, res.getWeight());
-          m_hNormalizedResidualU[index]->Fill(resU / errU, res.getWeight());
+          m_hResidualU[avxdid]->Fill(resU, res.getWeight());
+          m_hNormalizedResidualU[avxdid]->Fill(resU / errU, res.getWeight());
 
-          m_hResidualV[index]->Fill(resV, res.getWeight());
-          m_hNormalizedResidualV[index]->Fill(resV / errV, res.getWeight());
+          m_hResidualV[avxdid]->Fill(resV, res.getWeight());
+          m_hNormalizedResidualV[avxdid]->Fill(resV / errV, res.getWeight());
 
-          m_hResidualUvsV[index]->Fill(resU, v);
-          m_hResidualVvsU[index]->Fill(resV, u);
-          m_hResidualUvsU[index]->Fill(resU, u);
-          m_hResidualVvsV[index]->Fill(resV, v);
+          m_hResidualUvsV[avxdid]->Fill(resU, v);
+          m_hResidualVvsU[avxdid]->Fill(resV, u);
+          m_hResidualUvsU[avxdid]->Fill(resU, u);
+          m_hResidualVvsV[avxdid]->Fill(resV, v);
 
         }
 
         if (m_fillExpertHistos) {
-          m_hNDFResidualU[index]->Fill(NDF, resU, res.getWeight());
-          m_hNDFNormalizedResidualU[index]->Fill(NDF, resU / errU, res.getWeight());
+          m_hNDFResidualU[avxdid]->Fill(NDF, resU, res.getWeight());
+          m_hNDFNormalizedResidualU[avxdid]->Fill(NDF, resU / errU, res.getWeight());
 
-          m_hNDFResidualV[index]->Fill(NDF, resV, res.getWeight());
-          m_hNDFNormalizedResidualV[index]->Fill(NDF, resV / errV, res.getWeight());
+          m_hNDFResidualV[avxdid]->Fill(NDF, resV, res.getWeight());
+          m_hNDFNormalizedResidualV[avxdid]->Fill(NDF, resV / errV, res.getWeight());
         }
       }
     }
   }
 }
+
 
 void TrackfitDQMModule::plotPseudoEfficiencies(const genfit::Track* track)
 {
@@ -425,16 +442,16 @@ void TrackfitDQMModule::plotPseudoEfficiencies(const genfit::Track* track)
   // Extrapolate to all planes, see if there should be a hit.
   genfit::MeasuredStateOnPlane mop;
   try { mop = track->getFittedState(); } catch (...) { return; }
-  for (int i = 0; i < c_nPlanes; ++i) {
-    //const SVD::SensorInfo& info = getInfo(i);
-    //const VXD::SensorPlane& plane(info.getID());
+
+
+  for (VxdID& avxdid : m_sensorList) {
 
     try {
-      mop.extrapolateToPlane(genfit::SharedPlanePtr(new ROIDetPlane(m_vPlanes[i])));
-      if (m_vPlanes[i].isInActive(mop.getPos(), mop.getMom())) {
-
-        m_hPseudoEfficienciesU->Fill(indexToPlane(i), 0);
-        m_hPseudoEfficienciesV->Fill(indexToPlane(i), 0);
+      mop.extrapolateToPlane(genfit::SharedPlanePtr(new ROIDetPlane(m_vPlanes[avxdid])));
+      if (m_vPlanes[avxdid].isInActive(mop.getPos(), mop.getMom())) {
+        int layer = avxdid.getLayerNumber();
+        m_hPseudoEfficienciesU->Fill(layer, 0);
+        m_hPseudoEfficienciesV->Fill(layer, 0);
       }
     } catch (...) {}
   }
@@ -454,6 +471,7 @@ void TrackfitDQMModule::plotPseudoEfficiencies(const genfit::Track* track)
     if (!kfi)
       continue;
 
+    //not sure if that makes sense !?!?! But as it was in the old code I will keep it.
     unsigned int nMeasurements = kfi->getNumMeasurements();
     for (unsigned int iMeas = 0; iMeas < nMeasurements; ++iMeas) {
       const genfit::AbsHMatrix* h = kfi->getMeasurementOnPlane(iMeas)->getHMatrix();
@@ -469,6 +487,7 @@ void TrackfitDQMModule::plotPseudoEfficiencies(const genfit::Track* track)
 
   }
 }
+
 
 void TrackfitDQMModule::plotSeedQuality(const genfit::Track* track)
 {
@@ -488,12 +507,4 @@ void TrackfitDQMModule::plotSeedQuality(const genfit::Track* track)
       m_hSeedQuality[i + 3]->Fill(seedMom(i), mom(i));
     }
   } catch (...) { return; }
-}
-
-
-const VXD::SensorInfoBase& TrackfitDQMModule::getInfo(int index) const
-{
-  int iPlane = indexToPlane(index);
-  VxdID sensorID(iPlane, 1, iPlane);
-  return dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(sensorID));
 }

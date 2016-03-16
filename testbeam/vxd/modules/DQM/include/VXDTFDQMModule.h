@@ -64,77 +64,7 @@ namespace Belle2 {
     */
     virtual void defineHisto();
 
-
-    /** returns sensorInfo for current index */
-    inline const SVD::SensorInfo& getInfo(int index) const   // VXDTFDQMModule::getInfo
-    {
-      int iPlane = indexToPlane(index);
-      VxdID sensorID(iPlane, 1, iPlane);
-      return dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    }
-
   protected:
-    // Allocate all histos through these, and the destructor will take
-    // care of deleting them, they will be reset on a new run, maybe
-    // other stuff. REMARK: devilishly stolen from Tobias Schlüter
-    /** returns 1D histogram */
-    TH1* getHist(const char* name, const char* title,
-                 int nBins, double x0, double x1)
-    {
-      TH1* h = new TH1D(name, title, nBins, x0, x1);
-//       m_allHistos.push_back(h);
-      return h;
-    }
-
-    /** returns TProfile */
-    TProfile* getHistProfile(const char* name, const char* title,
-                             int nBins, double x0, double x1)
-    {
-      TProfile* h = new TProfile(name, title, nBins, x0, x1);
-//       m_allHistos.push_back(h);
-      return h;
-    }
-
-    /** returns 2D histogram */
-    TH2* getHist(const char* name, const char* title,
-                 int nBinsX, double x0, double x1,
-                 int nBinsY, double y0, double y1)
-    {
-      TH2* h = new TH2D(name, title, nBinsX, x0, x1, nBinsY, y0, y1);
-//       m_allHistos.push_back(h);
-      return h;
-    }
-
-    /** returns 1D histogram */
-    TH1* getHist(const std::string& name, const std::string& title,
-                 int nBins, double x0, double x1)
-    {
-      return getHist(name.c_str(), title.c_str(), nBins, x0, x1);
-    }
-
-    /** returns TProfile */
-    TProfile* getHistProfile(const std::string& name, const std::string& title,
-                             int nBins, double x0, double x1)
-    {
-      return getHistProfile(name.c_str(), title.c_str(), nBins, x0, x1);
-    }
-
-    /** returns 2D histogram */
-    TH2* getHist(const std::string& name, const std::string& title,
-                 int nBinsX, double x0, double x1,
-                 int nBinsY, double y0, double y1)
-    {
-      return getHist(name.c_str(), title.c_str(), nBinsX, x0, x1, nBinsY, y0, y1);
-    }
-
-
-
-    /** returns plane for current index */
-    inline int indexToPlane(int index) const
-    {
-      return c_firstSVDPlane + index;
-    }
-
     /** resetting counters */
     inline void resetCounters()
     {

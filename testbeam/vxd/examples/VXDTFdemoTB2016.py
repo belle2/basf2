@@ -115,7 +115,7 @@ else:
     PXDCLUST.param('TanLorentz', 0.)  # value scaled from 0.25 for 1.5T to 0.975T
 
 vxdtf = register_module('VXDTF')
-vxdtf.logging.log_level = LogLevel.DEBUG
+vxdtf.logging.log_level = LogLevel.ERROR
 vxdtf.logging.debug_level = 2
 # calcQIType:
 # Supports 'kalman', 'circleFit' or 'trackLength.
@@ -187,7 +187,7 @@ vxdtf.param(param_vxdtf)
 # VXDTF DQM module
 vxdtf_dqm = register_module('VXDTFDQM')
 vxdtf_dqm.param('GFTrackCandidatesColName', 'caTracks')
-vxdtf_dqm.logging.log_level = LogLevel.DEBUG
+vxdtf_dqm.logging.log_level = LogLevel.ERROR
 vxdtf_dqm.logging.debug_level = 1
 
 
@@ -221,6 +221,8 @@ trackfitter.param('UseClusters', True)
 
 trackfit_dqm = register_module('TrackfitDQM')
 trackfit_dqm.param('GFTrackCandidatesColName', 'caTracks')
+trackfit_dqm.logging.log_level = LogLevel.ERROR
+trackfit_dqm.logging.debug_level = 1
 
 setupGenfit = register_module('SetupGenfitExtrapolation')
 
@@ -251,8 +253,8 @@ main.add_module(analyzer)
 main.add_module(trackfitter)
 main.add_module(eventCounter)
 # the following two Modules are currentl broken
-# main.add_module(vxdtf_dqm)
-# main.add_module(trackfit_dqm)
+main.add_module(vxdtf_dqm)
+main.add_module(trackfit_dqm)
 # Process events
 process(main)
 

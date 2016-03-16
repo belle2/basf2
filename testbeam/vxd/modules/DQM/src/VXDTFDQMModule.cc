@@ -15,6 +15,8 @@
 
 #include "TDirectory.h"
 
+
+
 using namespace std;
 using boost::format;
 using namespace Belle2;
@@ -31,6 +33,7 @@ REG_MODULE(VXDTFDQM)
 
 VXDTFDQMModule::VXDTFDQMModule() : HistoModule()
 {
+  B2DEBUG(1, "start constructor");
   //Set module properties
   setDescription("VXDTF DQM module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
@@ -61,6 +64,7 @@ VXDTFDQMModule::~VXDTFDQMModule()
 
 void VXDTFDQMModule::defineHisto()
 {
+  B2DEBUG(1, "start defineHisto");
   TDirectory* oldDir = gDirectory;
   TDirectory* histDir = oldDir->mkdir(m_histogramDirectoryName.c_str());
   histDir->cd();
@@ -144,9 +148,19 @@ void VXDTFDQMModule::defineHisto()
   m_histoNHitsAtLayer7->GetYaxis()->SetTitle("count");
 
 
-  vector<uint> sensorIDs = {VxdID(1, 1, 1), VxdID(2, 1, 2), VxdID(3, 1, 3), VxdID(4, 1, 4), VxdID(5, 1, 5), VxdID(6, 1, 6), VxdID(7, 2, 1), VxdID(7, 2, 2), VxdID(7, 2, 3), VxdID(7, 3, 4), VxdID(7, 3, 5), VxdID(7, 3, 6)};
+  vector<VxdID> buff = VXD::GeoCache::getInstance().getListOfSensors();
+  vector<uint> sensorIDs;
+  vector<uint> SVDsensorIDs;
+  //cast the vxdid to uint
+  for (int ibuff = 0; ibuff < (int)buff.size(); ibuff++) {
+    B2DEBUG(1, "vxdid " << buff[ibuff] << std::endl);
+    sensorIDs.push_back((uint)(buff[ibuff]));
+    if (buff[ibuff].getLayerNumber() <= c_lastSVDPlane && buff[ibuff].getLayerNumber() >= c_firstSVDPlane)
+      SVDsensorIDs.push_back((uint)(buff[ibuff]));
+  }
   m_sensorIDs = sensorIDs;
-  vector<uint> SVDsensorIDs = {VxdID(3, 1, 3), VxdID(4, 1, 4), VxdID(5, 1, 5), VxdID(6, 1, 6)};
+
+
 
   string headLine = "VXDTF: nHits found by TF divided by total nHits ";
   string title = "VXDTFnTCHitsDivnTotHitsatSensor";
@@ -228,45 +242,16 @@ void VXDTFDQMModule::defineHisto()
   Prepare1DHistMap(headLine, title, m_hitMapReferenceTCsSVDOnlyV, false);
 
 
-  for (int i = 0; i < c_nSVDPlanes; i++) {
-
-    // correlation between total number of hit positions and hit positions of used hits
-    int iPlane = indexToPlane(i);
-    string nameU = str(format("hSVDHitmapU%1%") % iPlane);
-    string nameV = str(format("hSVDHitmapV%1%") % iPlane);
-    string titleU = str(format("SVD total HitPos vs accepted by TF HitPos in U, plane %1%") % iPlane);
-    string titleV = str(format("SVD total HitPos vs accepted by TF HitPos in V, plane %1%") % iPlane);
-    float width = getInfo(i).getWidth();
-    float length = getInfo(i).getLength();
-    int nUStrips = getInfo(i).getUCells();
-    int nVStrips = getInfo(i).getVCells();
-    m_correlationHitPositionU[i] = new TH2F(nameU.c_str(), titleU.c_str(), nUStrips, -0.5 * width, 0.5 * width, nUStrips, -0.5 * width,
-                                            0.5 * width);
-    m_correlationHitPositionU[i]->GetXaxis()->SetTitle("total u position [cm]");
-    m_correlationHitPositionU[i]->GetYaxis()->SetTitle("accepted u position [cm]");
-    m_correlationHitPositionU[i]->SetOption("colz"); // lego2
-
-    m_correlationHitPositionV[i] = new TH2F(nameV.c_str(), titleV.c_str(), nVStrips, -0.5 * length, 0.5 * length, nVStrips,
-                                            -0.5 * length, 0.5 * length);
-    m_correlationHitPositionV[i]->GetXaxis()->SetTitle("total v position [cm]");
-    m_correlationHitPositionV[i]->GetYaxis()->SetTitle("accepted v position [cm]");
-//    m_correlationHitPositionV[i]->SetOption("colz"); // lego2 // test what happens if I don't set this value
-
-//    m_correlationHitSignalStrength[c_nSVDPlanes];
-
-
-    string namenHits = str(format("hSVDHitmapV%1%") % iPlane);
-    string titlenHits = str(format("SVD total HitPos vs accepted by TF HitPos in U, plane %1%") % iPlane);
-  }
-
   oldDir->cd();
 }
 
 
 void VXDTFDQMModule::initialize()
 {
+  B2DEBUG(1, "start initialize");
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
+  B2DEBUG(1, "end REG_HISTOGRAM");
 
   //Register collections
   StoreArray<SVDCluster>::required();
@@ -274,6 +259,7 @@ void VXDTFDQMModule::initialize()
   StoreArray<genfit::TrackCand>::required(m_storeTrackCandsName);
   StoreArray<genfit::TrackCand>::optional(m_storeReferenceTCsColName);
 //   StoreArray<genfit::TrackCand> caTrackCandidates(m_storeTrackCandsName);
+  B2DEBUG(1, "end get StoreArrays");
 
   //Store names to speed up creation later
 //   m_storeClustersName = svdClusters.getName();
@@ -282,10 +268,12 @@ void VXDTFDQMModule::initialize()
   m_countNoSensorFound = 0;
   m_countAllHits = 0;
   m_badSensorIDs.clear();
+  B2DEBUG(1, "end clear");
 }
 
 void VXDTFDQMModule::beginRun()
 {
+  B2DEBUG(1, "start beginRun");
   // Just to make sure, reset all the histograms.
   m_histoMomentum->Reset();
   m_histoPT->Reset();
@@ -329,8 +317,8 @@ void VXDTFDQMModule::beginRun()
 
 void VXDTFDQMModule::event()
 {
+  B2DEBUG(1, "<<<<<<<<<<<<<<<<<<<<< VXDTFDQMModule::event()...")
   resetCounters();
-  B2DEBUG(5, "<<<<<<<<<<<<<<<<<<<<< VXDTFDQMModule::event()...")
   const StoreArray<genfit::TrackCand> caTrackCandidates(m_storeTrackCandsName);
   const StoreArray<PXDCluster> pxdClusters(m_storeSvdClustersName);
   const StoreArray<SVDCluster> svdClusters(m_storePxdClustersName);
@@ -338,7 +326,7 @@ void VXDTFDQMModule::event()
   const StoreArray<genfit::TrackCand> refTrackCandidates(m_storeReferenceTCsColName);
 
 
-//  B2INFO("2")
+  B2INFO("2")
   // collecting info from TCs (estimated momentum, nHits, ..)
   int nCaTCs = caTrackCandidates.getEntries();
 //   int nRefTCs = refTrackCandidates.getEntries();
@@ -350,7 +338,7 @@ void VXDTFDQMModule::event()
   TVector3 momentum;
   uint nPXDhits = 0, nSVDhits = 0, nTELhits = 0; // count hits of detectorType used for TCs
   for (const auto aTrackCand : caTrackCandidates) {
-//    B2INFO("3")
+    B2INFO("3")
     int nHits = aTrackCand.getNHits();
     tempIndices = aTrackCand.getHitIDs();
     allHitIndicesUsed.insert(allHitIndicesUsed.end(), tempIndices.begin(), tempIndices.end());
@@ -374,16 +362,17 @@ void VXDTFDQMModule::event()
     detectorIDs = aTrackCand.getDetIDs(); // detectorIDs of all Hits
     VxdID aVxdID;
     for (auto detectorID : detectorIDs) {
-//      B2INFO("4")
+      B2INFO("4")
       hitIDsOfCurrentDetector = aTrackCand.getHitIDs(detectorID); //Get hit ids of from a specific detector.
 
       for (auto hitID : hitIDsOfCurrentDetector) {
-//        B2INFO("5")
+        B2INFO("5")
         if (detectorID == Const::PXD) {
           ++nPXDhits;
           aVxdID = pxdClusters[hitID]->getSensorID();
           countedHitsInLayers.at(aVxdID.getLayerNumber()) += 1;
 
+          B2DEBUG(1, "getSensorinfo 1");
           const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(aVxdID);
           m_hitMapTCsOnly.find(uint(aVxdID))->second->Fill(aSensorInfo->getUCellID(pxdClusters[hitID]->getU()),
                                                            aSensorInfo->getVCellID(pxdClusters[hitID]->getV()));
@@ -392,7 +381,10 @@ void VXDTFDQMModule::event()
           aVxdID = svdClusters[hitID]->getSensorID();
           countedHitsInLayers.at(aVxdID.getLayerNumber()) += 1;
 
+          B2DEBUG(1, "getSensorinfo 2");
           const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(aVxdID);
+          B2DEBUG(1, "end getSensorinfo 2");
+
           bool isU = svdClusters[hitID]->isUCluster();
           if (isU) {
             m_hitMapTCsOnlySVDOnlyU.find(uint(aVxdID))->second->Fill(aSensorInfo->getUCellID(svdClusters[hitID]->getPosition()));
@@ -404,6 +396,7 @@ void VXDTFDQMModule::event()
           aVxdID = telClusters[hitID]->getSensorID();
           countedHitsInLayers.at(aVxdID.getLayerNumber()) += 1;
 
+          B2DEBUG(1, "getSensorinfo 3");
           const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(aVxdID);
           m_hitMapTCsOnly.find(uint(aVxdID))->second->Fill(aSensorInfo->getUCellID(telClusters[hitID]->getU()),
                                                            aSensorInfo->getVCellID(telClusters[hitID]->getV()));
@@ -415,7 +408,7 @@ void VXDTFDQMModule::event()
       }
     }
   }
-//   B2INFO("6")
+  B2INFO("6")
   m_histoNHitsAtPXD->Fill(nPXDhits);
   m_histoNHitsAtSVD->Fill(nSVDhits);
   m_histoNHitsAtTEL->Fill(nTELhits);
@@ -450,13 +443,17 @@ void VXDTFDQMModule::event()
         if (detectorID == Const::PXD) {
           aVxdID = pxdClusters[hitID]->getSensorID();
 
+          B2DEBUG(1, "getSensorinfo 4");
           const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(aVxdID);
           m_hitMapReferenceTCs.find(uint(aVxdID))->second->Fill(aSensorInfo->getUCellID(pxdClusters[hitID]->getU()),
                                                                 aSensorInfo->getVCellID(pxdClusters[hitID]->getV()));
         } else if (detectorID == Const::SVD) {
           aVxdID = svdClusters[hitID]->getSensorID();
 
+          B2DEBUG(1, "getSensorinfo 5");
           const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(aVxdID);
+          B2DEBUG(1, "end getSensorinfo 5");
+
           bool isU = svdClusters[hitID]->isUCluster();
           if (isU) {
             m_hitMapReferenceTCsSVDOnlyU.find(uint(aVxdID))->second->Fill(aSensorInfo->getUCellID(svdClusters[hitID]->getPosition()));
@@ -466,6 +463,7 @@ void VXDTFDQMModule::event()
         } else { // hopefully telescope clusters
           aVxdID = telClusters[hitID]->getSensorID();
 
+          B2DEBUG(1, "getSensorinfo 6");
           const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(aVxdID);
           m_hitMapReferenceTCs.find(uint(aVxdID))->second->Fill(aSensorInfo->getUCellID(telClusters[hitID]->getU()),
                                                                 aSensorInfo->getVCellID(telClusters[hitID]->getV()));
@@ -473,7 +471,7 @@ void VXDTFDQMModule::event()
       }
     }
   }
-//  B2INFO("7")
+  B2INFO("7")
   // collecting Info from Clusters
   for (const SVDCluster& aCluster : svdClusters) {
     VxdID aVxdID = aCluster.getSensorID();
@@ -496,7 +494,7 @@ void VXDTFDQMModule::event()
       B2DEBUG(10, "svdClusters: vxdID " << VxdID(aVxdID) << " with layerNumber " << VxdID(aVxdID).getLayerNumber() << " not found...")
       m_badSensorIDs.push_back(aVxdID);
     }
-//    B2INFO("ClusterCharge: " << aCluster.getCharge());
+    B2INFO("ClusterCharge: " << aCluster.getCharge());
     ++m_countAllHits;
   }
 
@@ -599,7 +597,10 @@ void VXDTFDQMModule::Prepare2DHistMap(std::string headLine, std::string title, s
     string currentTitle = titleStream.str();
     string currentHeadLine = headStream.str();
 
+    B2DEBUG(1, "getSensorinfo 9");
     const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(thisID);
+    B2DEBUG(1, "end getSensorinfo 9");
+
     int nPixelsU = aSensorInfo->getUCells();
     int nPixelsV = aSensorInfo->getVCells();
 
@@ -622,7 +623,9 @@ void VXDTFDQMModule::Prepare1DHistMap(std::string headLine, std::string title, s
     string currentTitle = titleStream.str();
     string currentHeadLine = headStream.str();
 
+    B2DEBUG(1, "getSensorinfo 10");
     const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(thisID);
+    B2DEBUG(1, "end getSensorinfo 10");
     int nPixels = aSensorInfo->getVCells();
     string axisLabel = "v position [pitch units]";
     if (isU) {

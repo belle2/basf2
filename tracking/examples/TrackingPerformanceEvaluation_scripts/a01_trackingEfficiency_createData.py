@@ -47,7 +47,7 @@ path = create_path()
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('expList', [1])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('evtNumList', [2000])
+eventinfosetter.param('evtNumList', [2500])
 
 progress = register_module('Progress')
 

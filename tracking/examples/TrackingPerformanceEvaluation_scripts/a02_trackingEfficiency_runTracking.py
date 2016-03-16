@@ -40,16 +40,24 @@ geometry = register_module('Geometry')
 path.add_module(geometry)
 
 add_reconstruction(path)
+modList = path.modules()
+for modItem in modList:
+    if modItem.name() == 'V0Finder':
+        modItem.param('Validation', True)
 
 path.add_module(mctf)
 matcher = register_module('MCTrackMatcher')
 path.add_module(matcher)
 
+v0matcher = register_module('MCV0Matcher')
+v0matcher.param('V0ColName', 'V0ValidationVertexs')
+v0matcher.logging.log_level = LogLevel.DEBUG
+path.add_module(v0matcher)
+
 root_output = register_module('RootOutput')
 root_output.param('outputFileName', output_file_name)
 path.add_module(root_output)
 
-modList = path.modules()
 for modItem in modList:
     if modItem.name() == 'PruneGenfitTracks':
         modItem.m_flags = ''

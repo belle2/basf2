@@ -53,7 +53,6 @@ void HitLevelInfoWriterModule::initialize()
   m_tree->Branch("pdg", &m_PDG, "pdg/D");
   m_tree->Branch("track", &m_trackID, "track/I");
   m_tree->Branch("nhits", &m_nhits, "nhits/I");
-  m_tree->Branch("layerHits", &m_layerhits, "layerHits/I");
   m_tree->Branch("vx0", &m_vx0, "vx0/D");
   m_tree->Branch("vy0", &m_vy0, "vy0/D");
   m_tree->Branch("vz0", &m_vz0, "vz0/D");
@@ -63,7 +62,8 @@ void HitLevelInfoWriterModule::initialize()
   m_tree->Branch("dz", &m_z0, "dz/D");
   m_tree->Branch("chi2", &m_chi2, "chi2/D");
   m_tree->Branch("pF", &m_p, "pF/D");
-  m_tree->Branch("numGoodHits", &m_nhitsused, "numGoodHits/I");
+  m_tree->Branch("numLayerHits", &m_nlhits, "numLayerHits/I");
+  m_tree->Branch("numGoodLayerHits", &m_nlhitsused, "numGoodLayerHits/I");
   m_tree->Branch("eopst", &m_eopst, "eopst/D"); // placeholder for Gadget
 
   // track level dE/dx measurement
@@ -82,11 +82,6 @@ void HitLevelInfoWriterModule::initialize()
   m_tree->Branch("doca", m_doca, "doca[nhits]/D");
   m_tree->Branch("enta", m_enta, "enta[nhits]/D");
   m_tree->Branch("driftT", m_driftT, "driftT[nhits]/D");
-
-  // layer hit level information
-  m_tree->Branch("layer", m_dedxLayer, "layer[layerHits]/I");
-  m_tree->Branch("layerDist", m_dedxLayerDist, "layerDist[layerHits]/I");
-  m_tree->Branch("layerDedx", m_dedxLayerDedx, "layerDedx[layerHits]/I");
 }
 
 void HitLevelInfoWriterModule::event()
@@ -137,13 +132,6 @@ void
 HitLevelInfoWriterModule::fillTrack(const TrackFitResult* fitResult)
 {
 
-  /*
-  const genfit::Track* gftrack = fitResult->getRelatedFrom<genfit::Track>();
-  if (!gftrack) {
-    B2WARNING("No related track for this fit...");
-  }
-  */
-
   TVector3 trackMom = fitResult->getMomentum();
   TVector3 trackPos = fitResult->getPosition();
 
@@ -172,9 +160,9 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxMeas)
 
   m_PDG = dedxMeas->getPDG();
 
-  //  m_layerhits = dedxMeas->getLayerHits();
   m_nhits = dedxMeas->size();
-  m_nhitsused = dedxMeas->getNHitsUsed();
+  m_nlhits = dedxMeas->getNLayerHits();
+  m_nlhitsused = dedxMeas->getNLayerHitsUsed();
   m_p = dedxMeas->getMomentum();
   if (m_PDG < 0) m_p *= -1;
 
@@ -182,18 +170,11 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxMeas)
   m_trunc = dedxMeas->getTruncatedMean();
   m_error = dedxMeas->getError();
 
-  // Get the vector of dE/dx values for combined layers
-  for (int ihit = 0; ihit < m_layerhits; ++ihit) {
-    m_dedxLayer[ihit] = dedxMeas->getLayer(ihit);
-    //    m_dedxLayerDist[ihit] = dedxMeas->getLayerDist(ihit);
-    //    m_dedxLayerDedx[ihit] = dedxMeas->getLayerDedx(ihit);
-  }
-
   // Get the vector of dE/dx values for all hits
   for (int ihit = 0; ihit < m_nhits; ++ihit) {
-    //    m_layer[ihit] = dedxMeas->getHitLayer(ihit);
+    m_layer[ihit] = dedxMeas->getLayer(ihit);
     m_wire[ihit] = dedxMeas->getWire(ihit);
-    m_adcraw[ihit] = dedxMeas->getDE(ihit);
+    m_adcraw[ihit] = dedxMeas->getADCCount(ihit);
     m_path[ihit] = dedxMeas->getDx(ihit);
     m_dedx[ihit] = dedxMeas->getDedx(ihit);
     m_doca[ihit] = dedxMeas->getDoca(ihit);

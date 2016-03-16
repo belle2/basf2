@@ -37,7 +37,7 @@ namespace Belle2 {
       RelationsObject(),
       m_eventID(0), m_trackID(0),
       m_p(0), m_p_cdc(0), m_cosTheta(0), m_charge(0),
-      m_length(0.0), m_nHits(0), m_nHitsUsed(0),
+      m_length(0.0), m_nHits(0), m_nLayerHits(0), m_nLayerHitsUsed(0),
       m_pdg(0), m_mother_pdg(0), m_p_true(0)
     {
       m_dedx_avg = m_dedx_avg_truncated = m_dedx_avg_truncated_err = 0.0;
@@ -66,6 +66,7 @@ namespace Belle2 {
       m_driftT.push_back(driftT);
       m_driftD.push_back(driftD);
       m_driftDRes.push_back(driftDRes);
+      m_nHits++;
     }
 
     /** add dE/dx information for a CDC layer */
@@ -99,8 +100,10 @@ namespace Belle2 {
     double getMomentum() const { return m_p_cdc; }
     /** Return the number of hits for this track */
     int size() const { return m_nHits; }
+    /** Return the number of layer hits for this track */
+    int getNLayerHits() const { return m_nLayerHits; }
     /** Return the number of hits used to determine the truncated mean */
-    double getNHitsUsed() const { return m_nHitsUsed; }
+    double getNLayerHitsUsed() const { return m_nLayerHitsUsed; }
     /** Return cos(theta) for this track */
     double getCosTheta() const { return m_cosTheta; }
 
@@ -179,7 +182,8 @@ namespace Belle2 {
 
     double m_length;   /**< total distance travelled by the track */
     short m_nHits;     /**< number of hits on this track */
-    short m_nHitsUsed; /**< number of hits on this track used for truncated mean */
+    short m_nLayerHits;     /**< number of layerhits on this track */
+    short m_nLayerHitsUsed; /**< number of hits on this track used for truncated mean */
 
     double m_pdg;        /**< MC PID */
     double m_mother_pdg; /**< MC PID of mother particle */
@@ -195,7 +199,7 @@ namespace Belle2 {
     double m_cdcChi[Const::ChargedStable::c_SetSize];  /**< chi values for each particle type */
     double m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(CDCDedxTrack, 2); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 3); /**< Debug output for CDCDedxPID module. */
   };
 }
 #endif

@@ -332,10 +332,11 @@ void CDCDedxPIDModule::event()
       const bool lastHit = (tp + 1 == gftrackPoints.end());
       bool lastHitInCurrentLayer = lastHit;
       if (!lastHit) {
-        //peek at next hit
+        // peek at next hit
         genfit::AbsMeasurement* aAbsMeasurementPtr = (*(tp + 1))->getRawMeasurement(0);
         const CDCRecoHit* nextcdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtr);
-        if (!nextcdcRecoHit) {
+        // if next hit fails, assume this is the last hit in the layer
+        if (!nextcdcRecoHit || !(cdcRecoHit->getCDCHit()) || !((*(tp + 1))->getFitterInfo(trackrep))) {
           lastHitInCurrentLayer = true;
           break;
         }
@@ -420,16 +421,17 @@ void CDCDedxPIDModule::event()
 
         // now calculate the path length for this hit
         double celldx = c.dx(doca, entAng);
-        if (!c.isValid()) continue;
+        if (c.isValid()) {
 
-        layerdE += adcCount;
-        layerdx += celldx;
+          layerdE += adcCount;
+          layerdx += celldx;
 
-        // save individual hits
-        double cellDedx = (adcCount / celldx) * sin(trackMom.Theta());
-        if (m_enableDebugOutput)
-          dedxTrack->addHit(wire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
-                            driftDRealistic, driftDRealisticRes);
+          // save individual hits
+          double cellDedx = (adcCount / celldx) * sin(trackMom.Theta());
+          if (m_enableDebugOutput)
+            dedxTrack->addHit(wire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
+                              driftDRealistic, driftDRealisticRes);
+        }
       } catch (genfit::Exception) {
         B2WARNING("Event " << m_eventID << ", Track: " << m_trackID << ": genfit::MeasuredStateOnPlane exception...");
         continue;
@@ -455,7 +457,6 @@ void CDCDedxPIDModule::event()
       }
     } // end of loop over CDC hits for this track
 
-
     if (dedxTrack->dedx.empty()) {
       B2DEBUG(50, "Found track with no hits, ignoring.");
       continue;
@@ -468,13 +469,13 @@ void CDCDedxPIDModule::event()
                      &(dedxTrack->m_dedx_avg_truncated_err),
                      dedxTrack->dedx);
       const int numDedx = dedxTrack->dedx.size();
-      dedxTrack->m_nHits = numDedx;
+      dedxTrack->m_nLayerHits = numDedx;
       // add a factor of 0.5 here to make sure we are rounding appropriately...
       const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
       const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
-      dedxTrack->m_nHitsUsed = highEdgeTrunc - lowEdgeTrunc;
+      dedxTrack->m_nLayerHitsUsed = highEdgeTrunc - lowEdgeTrunc;
       saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated,
-                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->m_nHitsUsed);
+                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->m_nLayerHitsUsed);
     }
 
     // save the PID information if not using individual hits

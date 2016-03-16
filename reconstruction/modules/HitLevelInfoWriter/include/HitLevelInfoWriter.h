@@ -82,8 +82,8 @@ namespace Belle2 {
 
     // track level information
     int m_trackID; /**< ID number of the Track */
-    int m_layerhits; /**< the total number of layers hit by this Track */
-    int m_nhitsused; /**< the total number of hits for this Track */
+    int m_nlhits; /**< the total number of layer hits for this Track */
+    int m_nlhitsused; /**< the total number of layer hits used for this Track */
     int m_nhits; /**< the number of good hits for this Track */
 
     //    double m_trackDist; /**< the total distance traveled by the track */
@@ -113,10 +113,6 @@ namespace Belle2 {
 
     // hit level information (references on nhits)
     static const int kMaxHits = 100; /**< default hit level index */
-
-    double m_dedxLayer[kMaxHits]; /**< the layer number for combined hits */
-    double m_dedxLayerDist[kMaxHits]; /**< the distance for combined hits */
-    double m_dedxLayerDedx[kMaxHits]; /**< the dE/dx for combined hits */
 
     int m_layer[kMaxHits]; /**< layer number */
     int m_wire[kMaxHits];  /**< sense wire ID */

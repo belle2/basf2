@@ -598,7 +598,8 @@ void ECLReconstructorModule::TmpClusterCorrection::init(const string& filename)
     ostringstream ostr;
     for (size_t j = 0; j < ncoeffE; j++)
       ostr << m_tmpCorrection[ j + i * (ncoeffE) ] << " ";
-    const char* out = ostr.str().c_str();
+
+    std::string out = ostr.str();
     B2INFO("ECLReconstructor: corrections: " << out);
   }
 }

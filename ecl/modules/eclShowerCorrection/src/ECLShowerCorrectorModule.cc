@@ -246,7 +246,8 @@ void ECLShowerCorrectorModule::TmpClusterCorrection::init(const std::string& fil
     std::ostringstream ostr;
     for (size_t j = 0; j < ncoeffE; j++)
       ostr << m_tmpCorrection[ j + i * (ncoeffE) ] << " ";
-    const char* out = ostr.str().c_str();
+
+    std::string out = ostr.str();
     B2INFO("ECLShowerCorrectorModule: corrections: " << out);
   }
 }

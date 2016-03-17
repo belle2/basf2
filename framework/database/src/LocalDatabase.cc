@@ -161,3 +161,37 @@ bool LocalDatabase::storeData(const std::string& package, const std::string& mod
 
   return true;
 }
+
+bool LocalDatabase::addPayload(const std::string& package, const std::string& module, const std::string& fileName,
+                               IntervalOfValidity& iov)
+{
+  if (m_readOnly) {
+    B2ERROR("Database file " << m_fileName << " is opened in read-only mode.");
+    return false;
+  }
+
+  if (!fs::exists(m_payloadDir)) {
+    fs::create_directories(m_payloadDir);
+  }
+  // get lock for write access to database file
+  FileSystem::Lock lock(m_fileName);
+  if (!lock.lock()) {
+    B2ERROR("Locking of database file " << m_fileName << " failed.");
+    return false;
+  }
+
+  // get revision number
+  int revision = 1;
+  while (FileSystem::fileExists(payloadFileName(m_payloadDir, package, module, revision))) revision++;
+
+  // copy payload file to payload directory and rename it to follow the file name convention
+  boost::filesystem::copy(fileName, payloadFileName(m_payloadDir, package, module, revision));
+
+  // add to database and update database file
+  m_database[package][module].push_back(make_pair(revision, iov));
+  std::ofstream file(m_fileName.c_str(), std::ios::app);
+  if (!file.is_open()) return false;
+  file << package << "/" << module << " " << revision << " " << iov << endl;
+
+  return true;
+}

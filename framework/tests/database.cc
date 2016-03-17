@@ -6,6 +6,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/EventDependency.h>
+#include <framework/database/PayloadFile.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/utilities/TestHelpers.h>
@@ -72,6 +73,11 @@ namespace {
           new(array[experiment - 1]) TObject;
           array[experiment - 1]->SetUniqueID(experiment);
           Database::Instance().storeData("dbstore", "TObjects", &array, iov);
+
+          FILE* f = fopen("file.xml", "w");
+          fprintf(f, "Experiment %d\n", experiment);
+          fclose(f);
+          Database::Instance().addPayload("dbstore", "file.xml", "file.xml", iov);
         }
         if (m_dbType != c_chain) {
           Database::Instance().storeData(query);
@@ -330,4 +336,20 @@ namespace {
     EXPECT_TRUE(intraRun.hasChanged());
   }
 
+  /** Test database access to payload files */
+  TEST_F(DataBaseTest, PayloadFile)
+  {
+    StoreObjPtr<EventMetaData> evtPtr;
+    DBObjPtr<PayloadFile> payload("file.xml");
+
+    evtPtr->setExperiment(1);
+    DBStore::Instance().update();
+    EXPECT_TRUE(payload->getContent() == "Experiment 1\n");
+    evtPtr->setExperiment(4);
+    DBStore::Instance().update();
+    EXPECT_TRUE(payload->getContent() == "Experiment 4\n");
+    evtPtr->setExperiment(7);
+    DBStore::Instance().update();
+    EXPECT_FALSE(payload);
+  }
 }  // namespace

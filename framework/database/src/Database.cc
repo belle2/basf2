@@ -21,6 +21,7 @@
 #include <framework/database/ConditionsDatabase.h>
 #include <framework/database/DatabaseChain.h>
 #include <framework/database/DBStore.h>
+#include <framework/database/PayloadFile.h>
 
 #include <TFile.h>
 
@@ -113,6 +114,10 @@ std::string Database::payloadFileName(const std::string& path, const std::string
 TObject* Database::readPayload(const std::string& fileName, const std::string& module) const
 {
   TObject* result = 0;
+
+  if (module.find(".") != std::string::npos) {
+    return new PayloadFile(fileName);
+  }
 
   TDirectory* saveDir = gDirectory;
   TFile* file = TFile::Open(fileName.c_str());

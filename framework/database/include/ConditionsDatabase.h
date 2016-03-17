@@ -63,6 +63,18 @@ namespace Belle2 {
      */
     virtual bool storeData(const std::string& package, const std::string& module, TObject* object, IntervalOfValidity& iov);
 
+    /**
+     * Add a payload file to the database.
+     *
+     * @param package    Name of the package that identifies the object in the database.
+     * @param module     Name of the module that identifies the object in the database.
+     * @param fileName   The name of the payload file.
+     * @param iov        The interval of validity of the the object.
+     * @return           True if the storage of the object succeeded.
+     */
+    virtual bool addPayload(const std::string& package, const std::string& module, const std::string& fileName,
+                            IntervalOfValidity& iov);
+
     /** set a mapping from experiment name to experiment number.
      * The experiment numbers and names need to be unique as we have to
      * transform the mapping in both directions. So a experiment number cannot

@@ -96,21 +96,8 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
     return result;
   }
 
-  TDirectory* saveDir = gDirectory;
-  TFile* file = TFile::Open(filename.c_str());
-  saveDir->cd();
-  if (!file || !file->IsOpen()) {
-    B2ERROR("Could not open payload file " << file << ".");
-    delete file;
-    return result;
-  }
-
-  result.first = file->Get(module.c_str());
-  delete file;
-  if (!result.first) {
-    B2ERROR("Failed to get " << package << "/" << module  << " from database. Object not found in payload file.");
-    return result;
-  }
+  result.first = readPayload(filename, module);
+  if (!result.first) return result;
 
   conditionsPayload payloadInfo = ConditionsService::getInstance()->getPayloadInfo(package, module);
   // we possibly need to convert the experiment names back to numbers so we
@@ -168,8 +155,15 @@ bool ConditionsDatabase::storeData(const std::string& package, const std::string
     ConditionsService::getInstance()->writePayloadFile(fileName, package, module);
   }
 
-  remove("payload.root");
+  remove(fileName.c_str());
 
+  return true;
+}
+
+bool ConditionsDatabase::addPayload(const std::string& package, const std::string& module, const std::string& fileName,
+                                    IntervalOfValidity&)
+{
+  ConditionsService::getInstance()->writePayloadFile(fileName, package, module);
   return true;
 }
 

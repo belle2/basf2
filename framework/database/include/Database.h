@@ -138,6 +138,28 @@ namespace Belle2 {
     virtual bool storeData(std::list<DBQuery>& query);
 
     /**
+     * Add a payload file to the database.
+     *
+     * @param package    Name of the package that identifies the object in the database.
+     * @param module     Name of the module that identifies the object in the database.
+     * @param fileName   The name of the payload file.
+     * @param iov        The interval of validity of the the object.
+     * @return           True if the storage of the object succeeded.
+     */
+    virtual bool addPayload(const std::string& package, const std::string& module, const std::string& fileName,
+                            IntervalOfValidity& iov) = 0;
+
+    /**
+     * Add a payload file to the database.
+     *
+     * @param module     Name of the module that identifies the object in the database.
+     * @param fileName   The name of the payload file.
+     * @param iov        The interval of validity of the the object.
+     * @return           True if the storage of the object succeeded.
+     */
+    bool addPayload(const std::string& module, const std::string& fileName, IntervalOfValidity& iov) {return addPayload("dbstore", module, fileName, iov);};
+
+    /**
      * Exposes setGlobalTag function of the Database class to Python.
      */
     static void exposePythonAPI();

@@ -78,3 +78,14 @@ bool DatabaseChain::storeData(const std::string& package, const std::string& mod
 
   return m_databases[0]->storeData(package, module, object, iov);
 }
+
+bool DatabaseChain::addPayload(const std::string& package, const std::string& module, const std::string& fileName,
+                               IntervalOfValidity& iov)
+{
+  if (m_databases.empty()) {
+    B2ERROR("No database backend available.");
+    return false;
+  }
+
+  return m_databases[0]->addPayload(package, module, fileName, iov);
+}

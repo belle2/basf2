@@ -38,7 +38,6 @@ namespace Belle2 {
       std::vector<short  int> getNeighbours(short int cid);
 
     private:
-      bool m_isInitialized; // true if the neighbourmap is set up
       std::vector < std::vector < short int > > m_neighbourMap; // list of list of neighbour cids
       std::vector < std::vector < short int > > m_neighbourMapTemp; // temp list of list of neighbour cids
 

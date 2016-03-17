@@ -37,7 +37,7 @@ ECLNeighbours::ECLNeighbours(const std::string neighbourDef, const float par)
 
   // fixed number of neighbours:
   if (neighbourDef == "N") {
-    B2INFO("ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n: " << parToInt << " x " << parToInt);
+    B2INFO("ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n: " << parToInt * 2 + 1 << " x " << parToInt * 2 + 1);
     if ((parToInt >= 0) && (parToInt < 6)) initializeN(parToInt);
     else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 5)!");
   }

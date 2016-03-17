@@ -22,6 +22,7 @@ GenfitTrackCreatorModule::GenfitTrackCreatorModule() :
   Module()
 {
   setDescription("Module turning reco tracks to genfit tracks (will be unneeded once we use reco tracks everywhere).");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("genfitTracksStoreArrayName", m_param_genfitTrackStoreArrayName, "StoreArray name of the output tracks.",
            m_param_genfitTrackStoreArrayName);

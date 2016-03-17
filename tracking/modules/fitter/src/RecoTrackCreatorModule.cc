@@ -23,6 +23,7 @@ RecoTrackCreatorModule::RecoTrackCreatorModule() :
   Module()
 {
   setDescription("Converts the given genfit::TrackCands in the StoreArray to RecoTracks for further use in the fitter.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("trackCandidatesStoreArrayName", m_param_trackCandidatesStoreArrayName, "StoreArray name of the input track candidates.",
            m_param_trackCandidatesStoreArrayName);

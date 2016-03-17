@@ -27,6 +27,7 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
   Module()
 {
   setDescription("Fit the given reco tracks with the given fitter parameters.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the input and output reco tracks.",
            m_param_recoTracksStoreArrayName);

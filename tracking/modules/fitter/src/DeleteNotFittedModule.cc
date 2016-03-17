@@ -22,6 +22,7 @@ BaseFilterFittedTracksModule::BaseFilterFittedTracksModule() : Module()
 {
   // Set module properties
   setDescription("Copy all TrackCands with a TrackFitResult to the StoreArray");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("inputStoreArrayNameForTrackCands", m_param_inputStoreArrayNameForTrackCands, "Input StoreArray name for the TrackCands.",

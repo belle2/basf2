@@ -307,6 +307,6 @@ namespace Belle2 {
     /** Template object used for later object creation */
     T* m_object{nullptr}; // Internal original object for making copies
 
-    ClassDef(CalibRootObj, 1) /**< Run dependent mergeable wrapper */
+    ClassDefOverride(CalibRootObj, 1) /**< Run dependent mergeable wrapper */
   };
 }

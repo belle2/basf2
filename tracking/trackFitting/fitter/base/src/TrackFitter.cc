@@ -21,7 +21,7 @@
 
 using namespace Belle2;
 
-void TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const
+bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const
 {
   int currentPdgCode = particleType.getPDGCode();
 
@@ -54,14 +54,14 @@ void TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particle
 
   if (alreadyPresentTrackRepresentation) {
     B2DEBUG(100, "Reusing the already present track representation with the same PDG code.");
-    fit(recoTrack, alreadyPresentTrackRepresentation);
+    return fit(recoTrack, alreadyPresentTrackRepresentation);
   } else {
     genfit::AbsTrackRep* newTrackRep = new genfit::RKTrackRep(currentPdgCode);
-    fit(recoTrack, newTrackRep);
+    return fit(recoTrack, newTrackRep);
   }
 }
 
-void TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRep& trackRepresentation) const
+bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRep& trackRepresentation) const
 {
   recoTrack.setTimeSeed(calculateTimeSeed(recoTrack, trackRepresentation));
   // Fit the track
@@ -88,9 +88,11 @@ void TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRe
       }
     }
   }
+
+  return recoTrack.wasFitSuccessful(&trackRepresentation);
 }
 
-void TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresentation) const
+bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresentation) const
 {
   B2ASSERT("No fitter was loaded! Have you reset the fitter to an invalid one?", m_fitter);
 
@@ -98,7 +100,7 @@ void TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
 
   if (recoTrack.m_genfitTrack.getNumPoints() == 0) {
     B2WARNING("No track points (measurements) were added to this reco track. Have you used an invalid measurement adder?");
-    return;
+    return false;
   }
 
   const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.m_genfitTrack.getTrackReps();
@@ -108,11 +110,11 @@ void TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
     if (not recoTrack.getDirtyFlag() and not m_skipDirtyCheck and not measurementAdderNeedsTrackRefit) {
       B2WARNING("Hit content did not change, track representation is already present and you used only default parameters." <<
                 "I will not fit the track again. If you still want to do so, set the dirty flag of the track.");
-      return;
+      return recoTrack.wasFitSuccessful(trackRepresentation);
     }
   }
 
-  fitWithoutCheck(recoTrack, *trackRepresentation);
+  return fitWithoutCheck(recoTrack, *trackRepresentation);
 }
 
 double TrackFitter::calculateTimeSeed(const RecoTrack& recoTrack,

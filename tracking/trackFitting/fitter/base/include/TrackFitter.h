@@ -149,8 +149,10 @@ namespace Belle2 {
      *
      * This fit function is only to be used for non-standard expert use.
      * For the typical use case, please use the other fit function.
+     *
+     * Return bool if the track was successful.
      */
-    void fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresentation) const;
+    bool fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresentation) const;
 
     /**
      * Fit a reco track with the given particle hypothesis, or with pion as default.
@@ -165,8 +167,10 @@ namespace Belle2 {
      * Internally, a new track representation with the given particle hypothesis is created
      * and added to the reco track, if not already present. For this, a RKTrackRep is used as a
      * base class. The PDG-code-sign is deduced from the reco track charge.
+     *
+     * Return bool if the track was successful.
      */
-    void fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType = Const::pion) const;
+    bool fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType = Const::pion) const;
 
     /**
      * Reset the internal measurement creator storage to the default settings.
@@ -244,10 +248,8 @@ namespace Belle2 {
      * In every fit step, all track representations are fitted with genfit. The given track representation is only used
      * for calculating the time seed for the fit. For this, the track representation needs to have the correct PDG code set
      * (indicating the correct particle AND the correct charge).
-     *
-     * TODO: Synchronisation!
      */
-    void fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRep& trackRepresentation) const;
+    bool fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRep& trackRepresentation) const;
   };
 }
 

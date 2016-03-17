@@ -125,7 +125,7 @@ findIntersection(const Circle2D& circle,
   if (d == 0) {
     t[0] = -b / (2.0 * a);
     intersections[0].setX(m_Point.x() + m_Vector.x() * t[0]);
-    intersections[0].setY(m_Point.y() + m_Vector.y() * t[1]);
+    intersections[0].setY(m_Point.y() + m_Vector.y() * t[0]);
     intersections[0].setZ(0);
     angles[0] = atan2(intersections[0].y() - circleCenter.y(),
                       intersections[0].x() - circleCenter.x());

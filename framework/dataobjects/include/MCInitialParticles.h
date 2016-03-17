@@ -56,8 +56,21 @@ namespace Belle2 {
     /** Equality operator */
     bool operator==(const MCInitialParticles& b)
     {
-      return m_her == b.m_her && m_ler == b.m_ler && m_vertex == b.m_vertex &&
+      // FIXME: Ah, bloody hell. sin(x) returns slightly different values on
+      // different platforms in some cases so we cannot just do an equality
+      // comparison. We need to do this more elegantly, this is just for
+      // testing if it solves all problems
+#if defined(MCP_DBL_CMP) || defined(MCP_VEC3_CMP) || defined(MCP_VEC4_CMP)
+#error Macro already defined, cannot continue
+#endif
+#define MCP_DBL_CMP(a,b,x) ((a.x()==b.x())||(std::abs(a.x()-b.x())<1e-10))
+#define MCP_VEC3_CMP(a,b) (MCP_DBL_CMP(a,b,X) && MCP_DBL_CMP(a,b,Y) && MCP_DBL_CMP(a,b,Z))
+#define MCP_VEC4_CMP(a,b) (MCP_VEC3_CMP(a,b) && MCP_DBL_CMP(a,b,E))
+      return MCP_VEC4_CMP(m_her, b.m_her) && MCP_VEC4_CMP(m_ler, b.m_ler) && MCP_VEC3_CMP(m_vertex, b.m_vertex) &&
              m_generationFlags == b.m_generationFlags;
+#undef MCP_DBL_CMP
+#undef MCP_VEC3_CMP
+#undef MCP_VEC4_CMP
     }
 
     /** Free memory of the LorentzRotation if it was created */

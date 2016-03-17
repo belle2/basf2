@@ -46,9 +46,6 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
     else:
         add_track_finding(path, components)
 
-        # The rest of the modules still needs TrackCands. We make the transition here. This will be unneeded later.
-        path.add_module("GenfitTrackCandidatesCreator")
-
     # Match the tracks to the MC truth.  The matching works based on
     # the output of the TrackFinderMCTruth.
     mctrackfinder = register_module('TrackFinderMCTruth')
@@ -148,13 +145,13 @@ def add_track_finding(path, components=None):
             'CDCGFTrackCandsColName': cdc_trackcands,
             'CDCGFTracksColName': cdc_tracks,
             'relMatchedTracks': 'MatchedTracksIdx',
-            'MergedGFTrackCandsColName': '__MergedTrackCands',
             'chi2_max': 100,
             'recover': 1
         })
 
-        # Make sure everyone can use RecoTracks if needed
-        path.add_module("RecoTrackCreator", trackCandidatesStoreArrayName='__MergedTrackCands')
+    elif use_vxd or use_cdc:
+        # The following modules still expect a list of genfit::TrackCand.
+        path.add_module("GenfitTrackCandidatesCreator")
 
 
 def add_mc_track_finding(path, components=None):

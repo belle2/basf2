@@ -191,7 +191,7 @@ void DBStore::addConstantOverride(const std::string& package, const std::string&
   DBEntry& dbEntry = m_dbEntries[package][module];
   dbEntry.package = package;
   dbEntry.module = module;
-  dbEntry.objClass = obj->Class();
+  dbEntry.objClass = obj->IsA();
   if (!dbEntry.intraRunDependency) delete dbEntry.object;
   dbEntry.object = obj;
   dbEntry.isArray = dynamic_cast<TClonesArray*>(obj) != nullptr;

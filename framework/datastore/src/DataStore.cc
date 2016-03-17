@@ -370,6 +370,15 @@ void DataStore::updateRelationsObjectCache(StoreEntry& entry)
 
 bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& entry, int& index)
 {
+  if (!entry or index < 0) {
+    //usually entry/index should be passed for RelationsObject,
+    //but there are exceptions -> let's check again
+    const RelationsObject* relObj = dynamic_cast<const RelationsObject*>(object);
+    if (relObj) {
+      entry = relObj->m_cacheDataStoreEntry;
+      index = relObj->m_cacheArrayIndex;
+    }
+  }
   // check whether the cached information is (still) valid
   if (entry && entry->ptr && (index >= 0)) {
     const TClonesArray* array = static_cast<TClonesArray*>(entry->ptr);
@@ -404,7 +413,13 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
           updateRelationsObjectCache(mapEntry.second);
 
           //if found, m_cacheArrayIndex is now correct, otherwise still -1
+          StoreEntry* objEntry = static_cast<const RelationsObject*>(object)->m_cacheDataStoreEntry;
           index = static_cast<const RelationsObject*>(object)->m_cacheArrayIndex;
+          if (index >= 0 and objEntry) {
+            //if the cache of 'object' is  filled, make sure to also set entry!
+            entry = objEntry;
+            return true;
+          }
         } else {
           //not a RelationsObject, so no caching
           index = array->IndexOf(object);

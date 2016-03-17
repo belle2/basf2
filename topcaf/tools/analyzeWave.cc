@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Belle2;
 
-bool analyzeWave(const char* filename, int firstEvent = 0, int nEvents = 1)
+bool analyzeWave(const char* filename, int firstEvent = 0, int nEvents = 1, const char* outfilename = "plot.root")
 {
   TFile fileIn(filename);
   TTreeReader theReader("tree", &fileIn);
@@ -21,7 +21,8 @@ bool analyzeWave(const char* filename, int firstEvent = 0, int nEvents = 1)
 
   int iEvent = -1;
 
-  TFile plotFile("plot.root", "RECREATE");
+  //TFile plotFile("plot.root", "RECREATE");
+  TFile plotFile(outfilename, "RECREATE");
   map<topcaf_channel_id_t, TH1F*> channelNoise; // stores the histogram of vector differences for each channel
   map<topcaf_channel_id_t, int> channelEventMap; // stores the first occurence of a channel
 
@@ -115,6 +116,8 @@ int main(int argc, char* argv[])
     analyzeWave(argv[1], atoi(argv[2]));
   } else if (argc == 4) {
     analyzeWave(argv[1], atoi(argv[2]), atoi(argv[3]));
+  } else if (argc == 5) {
+    analyzeWave(argv[1], atoi(argv[2]), atoi(argv[3]), argv[4]);
   }
   return 0;
 }

@@ -215,7 +215,6 @@ void KLMClusterEfficiencyModule::event()
       if (angle > m_MaxDecayVertexHitAngle)
         m_MaxDecayVertexHitAngle = angle;
     }
-    n2 = mcEKLMHit2ds.size();
     RelationVector<KLMCluster> kl0Clusters =
       mcParticles[i1]->getRelationsFrom<KLMCluster>();
     n2 = kl0Clusters.size();

@@ -53,9 +53,10 @@ namespace Belle2 {
     /** Method is called at the end of the event processing. */
     virtual void terminate();
 
+
   protected:
 
-    MCParticleGraph mpg;        /**< An instance of the MCParticle graph. */
+    MCParticleGraph mpg; /**< An instance of the MCParticle graph. */
     KKGenInterface m_Ikkgen;  /**< An instance of the KK2f MC Interface. */
     std::string m_KKdefaultFileName; /**<  KKMC default setting file.  */
     std::string m_tauinputFileName; /**<  KKMC setting file for generating fermions.  */
@@ -64,6 +65,12 @@ namespace Belle2 {
     std::string m_KKMCOutputFileName; /**<  KKMC output file previously as set "fort.16".  */
 
   private:
+    /** Method is called to initialize the generator. */
+    void initializeGenerator();
+
+    bool m_initialized{false}; /**< True if generator has been initialized. */
+    DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter. */
+
     InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
 
   };

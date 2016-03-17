@@ -2,6 +2,7 @@
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/RelationsObject.h>
 #include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>
@@ -592,5 +593,85 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     evtDataB.registerInDataStore();
     DataStore::Instance().copyContentsTo("foo");
+  }
+
+  TEST_F(DataStoreTest, FindStoreEntry)
+  {
+    DataStore::StoreEntry* entry = nullptr;
+    int index = -1;
+
+    //test TObject-derived arrays
+    StoreArray<EventMetaData> evtData;
+    StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
+
+    EXPECT_TRUE(DataStore::Instance().findStoreEntry(evtData[5], entry, index));
+    EXPECT_EQ(index, 5);
+    EXPECT_EQ(entry->name, evtData.getName());
+
+    //entry and index are already correct, should return quickly
+    EXPECT_TRUE(DataStore::Instance().findStoreEntry(evtData[5], entry, index));
+    EXPECT_EQ(index, 5);
+    EXPECT_EQ(entry->name, evtData.getName());
+
+    //not resetting entry, index here. this should not usually happen, but ought to be harmless
+    EXPECT_TRUE(DataStore::Instance().findStoreEntry(evtDataDifferentName[7], entry, index));
+    EXPECT_EQ(index, 7);
+    EXPECT_EQ(entry->name, evtDataDifferentName.getName());
+
+    entry = nullptr; index = -1;
+    EXPECT_TRUE(DataStore::Instance().findStoreEntry(evtDataDifferentName[7], entry, index));
+    EXPECT_EQ(index, 7);
+    EXPECT_EQ(entry->name, evtDataDifferentName.getName());
+
+    entry = nullptr; index = -1;
+    EventMetaData localObj;
+    EXPECT_FALSE(DataStore::Instance().findStoreEntry(&localObj, entry, index));
+    EXPECT_EQ(index, -1);
+    EXPECT_EQ(entry, nullptr);
+
+
+    //test RelationsObjects (caches used)
+    StoreArray<RelationsObject> relObjs;
+    StoreArray<RelationsObject> relObjs2("relobs2");
+    DataStore::Instance().setInitializeActive(true);
+    relObjs.registerInDataStore();
+    relObjs2.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+    for (int i = 0; i < 6; i++) {
+      relObjs.appendNew();
+      relObjs2.appendNew();
+    }
+
+    entry = nullptr; index = -1;
+    EXPECT_TRUE(DataStore::Instance().findStoreEntry(relObjs[5], entry, index));
+    EXPECT_EQ(index, 5);
+    EXPECT_EQ(entry->name, relObjs.getName());
+
+    //should use cache now
+    entry = nullptr; index = -1;
+    EXPECT_TRUE(DataStore::Instance().findStoreEntry(relObjs[5], entry, index));
+    EXPECT_EQ(index, 5);
+    EXPECT_EQ(entry->name, relObjs.getName());
+
+    entry = nullptr; index = -1;
+    EXPECT_TRUE(DataStore::Instance().findStoreEntry(relObjs2[2], entry, index));
+    EXPECT_EQ(index, 2);
+    EXPECT_EQ(entry->name, relObjs2.getName());
+
+    //and caches again
+    entry = nullptr; index = -1;
+    EXPECT_TRUE(DataStore::Instance().findStoreEntry(relObjs2[2], entry, index));
+    EXPECT_EQ(index, 2);
+    EXPECT_EQ(entry->name, relObjs2.getName());
+
+    //test storeobjptr (not implemented)
+    StoreObjPtr<EventMetaData> evtPtr;
+    entry = nullptr; index = -1;
+    EXPECT_FALSE(DataStore::Instance().findStoreEntry(&(*evtPtr), entry, index));
+    EXPECT_EQ(index, -1);
+    EXPECT_EQ(entry, nullptr);
+
+    //searching for nullptr is allowed
+    EXPECT_FALSE(DataStore::Instance().findStoreEntry(nullptr, entry, index));
   }
 }  // namespace

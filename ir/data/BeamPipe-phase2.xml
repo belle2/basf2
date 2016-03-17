@@ -47,8 +47,8 @@
     </Lv2OutBe>
 
     <Lv2InBe>
-        <L1 unit="cm">3.70</L1>
-        <L2 unit="cm">5.90</L2>
+        <L1 unit="cm">4.00</L1>
+        <L2 unit="cm">6.20</L2>
         <R1 unit="cm">1.00</R1>
         <R2 unit="cm">1.06</R2>
         <Material>Be</Material>
@@ -151,7 +151,7 @@
     </Lv1TaBwd>
 
     <Lv2VacBwd>
-        <D1 unit="cm">9.25</D1>
+        <D1 unit="cm">9.15</D1>
         <D2 unit="cm">24.5</D2>
         <D3 unit="cm">44.2</D3>
         <L1 unit="cm">50.0</L1>

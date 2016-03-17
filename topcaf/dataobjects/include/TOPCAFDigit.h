@@ -33,6 +33,7 @@ namespace Belle2 {
     size_t GetNumSamples() const {return m_nsamples;}
     double GetTDCBin() const {return m_tdc_bin;}
     double GetWidth() const {return m_width;}
+    double GetADCHeight() const {return m_adc_height;}
 
     // Extra stuff not in the raw packet //
     double GetTime() const {return m_time;}
@@ -81,6 +82,7 @@ namespace Belle2 {
     double m_corr_time;
     double m_boardstack;
     int m_flag;
+    double m_q;
 
     ClassDef(TOPCAFDigit, 1);
   };

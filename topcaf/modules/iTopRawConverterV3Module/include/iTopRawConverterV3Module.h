@@ -90,6 +90,7 @@ namespace Belle2 {
 
     std::string m_input_filename;
     std::string m_input_directory;
+    bool m_forceTrigger0xF;
     std::string m_input_fileandpath;
     std::ifstream m_input_file;
     std::string m_tmp;

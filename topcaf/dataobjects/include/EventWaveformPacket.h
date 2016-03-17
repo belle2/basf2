@@ -20,6 +20,7 @@ public:
   double adc_height; // hit height in adc counts
   double width; // bin width (1 sigma)
   double chi2; // chi2 of gaus fit to hit
+  double q; //integral over waveform ROI
   ClassDef(topcaf_hit_t, 1)
 } ;
 
@@ -86,7 +87,6 @@ namespace Belle2 {
     double m_rate;
     double m_quality;
     int m_time_bin;
-
     ClassDef(EventWaveformPacket, 1);
   };
 }

@@ -15,6 +15,7 @@ iTopRawConverterV3Module::iTopRawConverterV3Module() : Module()
   setDescription("This module is used to upack the raw data from the testbeam and crt data");
   addParam("inputFileName", m_input_filename, "Raw input filename");
   addParam("inputDirectory", m_input_directory, "Raw input file directory");
+  addParam("forceTrigger0xF", m_forceTrigger0xF, "Forcing all trigger bits to 0xF", true);
 
   m_WfPacket = nullptr;
   m_EvtPacket = nullptr;
@@ -177,6 +178,10 @@ void iTopRawConverterV3Module::event()
             << "\ttimestamp: 0x" << timeStamp << std::dec);
 
     bool repeatedCheck = false;
+
+    if (m_forceTrigger0xF) {
+      trigPattern = 0xF;
+    }
 
     // Check to see if this looks like selective readout or not...
     if (trigPattern == 0x0) {

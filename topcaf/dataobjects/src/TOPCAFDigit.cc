@@ -80,6 +80,7 @@ void TOPCAFDigit::SetHitValues(topcaf_hit_t& mydigit)
   m_adc_height = mydigit.adc_height;
   m_width = mydigit.width;
   m_chi2 = mydigit.chi2;
+  m_q = mydigit.q;
 
   return;
 

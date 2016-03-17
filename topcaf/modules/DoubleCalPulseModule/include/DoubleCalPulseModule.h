@@ -25,6 +25,8 @@ namespace Belle2 {
     int m_cal_ch;
     double m_tmin, m_tmax;
     double m_wmin, m_wmax;
+    double m_adcmin, m_adcmax;
+
   };
 
 }

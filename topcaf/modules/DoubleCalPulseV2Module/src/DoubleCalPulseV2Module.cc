@@ -70,7 +70,9 @@ void DoubleCalPulseV2Module::event()
     int asic = digit_ptr[w]->GetASIC();
     asicKey += asic * 10000;
 
-    if ((digit_ptr[w]->GetTDCBin() > 150) && (digit_ptr[w]->GetTDCBin() < 400)
+    //if ((digit_ptr[w]->GetTDCBin() > 150) && (digit_ptr[w]->GetTDCBin() < 400)
+    //modify for double pulse
+    if ((digit_ptr[w]->GetTDCBin() > 1300) && (digit_ptr[w]->GetTDCBin() < 2000)
         && ((digit_ptr[w]->GetTDCBin() < asic_ref_time[asicKey]) || (asic_ref_time[asicKey] == 0))) {
       asic_ref_time[asicKey] = digit_ptr[w]->GetTDCBin();
       digit_ptr[w]->SetFlag(10);

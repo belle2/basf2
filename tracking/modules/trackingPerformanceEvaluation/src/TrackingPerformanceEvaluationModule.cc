@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/modules/trackingPerformanceEvaluation/TrackingPerformanceEvaluationModule.h>
+#include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -57,7 +58,6 @@ REG_MODULE(TrackingPerformanceEvaluation)
 
 TrackingPerformanceEvaluationModule::TrackingPerformanceEvaluationModule() :
   Module()
-  , m_rootFilePtr(NULL)
 {
 
   setDescription("This module evaluates the tracking package performance");
@@ -640,11 +640,12 @@ void TrackingPerformanceEvaluationModule::terminate()
 {
 
 
-  addEfficiencyPlots(m_histoList);
+  //  addMoreEfficiencyPlots(m_histoList, m_h3_TracksPerMCParticle, m_h3_MCParticle);
+  //  addMoreInefficiencyPlots(m_histoList, m_h3_TracksPerMCParticle, m_h3_MCParticle);
+  addMoreEfficiencyPlots(m_histoList);
+  addMoreInefficiencyPlots(m_histoList);
 
-  addInefficiencyPlots(m_histoList);
-
-  addPurityPlots(m_histoList);
+  addPurityPlots(m_histoList, m_h3_MCParticlesPerTrack, m_h3_Tracks);
 
   if (m_rootFilePtr != NULL) {
     m_rootFilePtr->cd();
@@ -660,226 +661,6 @@ void TrackingPerformanceEvaluationModule::terminate()
 
 }
 
-TH1F* TrackingPerformanceEvaluationModule::createHistogram1D(const char* name, const char* title,
-    Int_t nbins, Double_t min, Double_t max,
-    const char* xtitle, TList* histoList)
-{
-
-  TH1F* h = new TH1F(name, title, nbins, min, max);
-
-  h->GetXaxis()->SetTitle(xtitle);
-
-  if (histoList)
-    histoList->Add(h);
-
-  return h;
-}
-
-
-TH2F* TrackingPerformanceEvaluationModule::createHistogram2D(const char* name, const char* title,
-    Int_t nbinsX, Double_t minX, Double_t maxX,
-    const char* titleX,
-    Int_t nbinsY, Double_t minY, Double_t maxY,
-    const char* titleY, TList* histoList)
-{
-
-  TH2F* h = new TH2F(name, title, nbinsX, minX, maxX, nbinsY, minY, maxY);
-
-  h->GetXaxis()->SetTitle(titleX);
-  h->GetYaxis()->SetTitle(titleY);
-
-  if (histoList)
-    histoList->Add(h);
-
-  return h;
-}
-
-TH3F* TrackingPerformanceEvaluationModule::createHistogram3D(const char* name, const char* title,
-    Int_t nbinsX, Double_t minX, Double_t maxX,
-    const char* titleX,
-    Int_t nbinsY, Double_t minY, Double_t maxY,
-    const char* titleY,
-    Int_t nbinsZ, Double_t minZ, Double_t maxZ,
-    const char* titleZ,
-    TList* histoList)
-{
-
-  TH3F* h = new TH3F(name, title, nbinsX, minX, maxX, nbinsY, minY, maxY, nbinsZ, minZ, maxZ);
-
-  h->GetXaxis()->SetTitle(titleX);
-  h->GetYaxis()->SetTitle(titleY);
-  h->GetZaxis()->SetTitle(titleZ);
-
-  if (histoList)
-    histoList->Add(h);
-
-  return h;
-}
-
-TH3F* TrackingPerformanceEvaluationModule::createHistogram3D(const char* name, const char* title,
-    Int_t nbinsX, Double_t* binsX,
-    const char* titleX,
-    Int_t nbinsY, Double_t* binsY,
-    const char* titleY,
-    Int_t nbinsZ, Double_t* binsZ,
-    const char* titleZ,
-    TList* histoList)
-{
-
-  TH3F* h = new TH3F(name, title, nbinsX, binsX, nbinsY, binsY, nbinsZ, binsZ);
-
-  h->GetXaxis()->SetTitle(titleX);
-  h->GetYaxis()->SetTitle(titleY);
-  h->GetZaxis()->SetTitle(titleZ);
-
-  if (histoList)
-    histoList->Add(h);
-
-  return h;
-}
-
-TH1* TrackingPerformanceEvaluationModule::duplicateHistogram(const char* newname, const char* newtitle,
-    TH1* h, TList* histoList)
-{
-
-  TH1F* h1 =  dynamic_cast<TH1F*>(h);
-  TH2F* h2 =  dynamic_cast<TH2F*>(h);
-  TH3F* h3 =  dynamic_cast<TH3F*>(h);
-
-  TH1* newh = 0;
-
-  if (h1)
-    newh = new TH1F(*h1);
-  if (h2)
-    newh = new TH2F(*h2);
-  if (h3)
-    newh = new TH3F(*h3);
-
-  newh->SetName(newname);
-  newh->SetTitle(newtitle);
-
-  if (histoList)
-    histoList->Add(newh);
-
-
-  return newh;
-}
-
-TH1F* TrackingPerformanceEvaluationModule::createHistogramsRatio(const char* name, const char* title,
-    TH1* hNum, TH1* hDen, bool isEffPlot,
-    int axisRef)
-{
-
-  TH1F* h1den =  dynamic_cast<TH1F*>(hDen);
-  TH1F* h1num =  dynamic_cast<TH1F*>(hNum);
-  TH2F* h2den =  dynamic_cast<TH2F*>(hDen);
-  TH2F* h2num =  dynamic_cast<TH2F*>(hNum);
-  TH3F* h3den =  dynamic_cast<TH3F*>(hDen);
-  TH3F* h3num =  dynamic_cast<TH3F*>(hNum);
-
-  TH1* hden = 0;
-  TH1* hnum = 0;
-
-  if (h1den) {
-    hden = new TH1F(*h1den);
-    hnum = new TH1F(*h1num);
-  }
-  if (h2den) {
-    hden = new TH2F(*h2den);
-    hnum = new TH2F(*h2num);
-  }
-  if (h3den) {
-    hden = new TH3F(*h3den);
-    hnum = new TH3F(*h3num);
-  }
-
-  TAxis* the_axis;
-  TAxis* the_other1;
-  TAxis* the_other2;
-
-  if (axisRef == 0) {
-    the_axis = hden->GetXaxis();
-    the_other1 = hden->GetYaxis();
-    the_other2 = hden->GetZaxis();
-  } else if (axisRef == 1) {
-    the_axis = hden->GetYaxis();
-    the_other1 = hden->GetXaxis();
-    the_other2 = hden->GetZaxis();
-  } else if (axisRef == 2) {
-    the_axis = hden->GetZaxis();
-    the_other1 = hden->GetXaxis();
-    the_other2 = hden->GetYaxis();
-  } else
-    return NULL;
-
-
-  TH1F* h;
-  if (the_axis->GetXbins()->GetSize())
-    h = new TH1F(name, title, the_axis->GetNbins(), (the_axis->GetXbins())->GetArray());
-  else
-    h = new TH1F(name, title, the_axis->GetNbins(), the_axis->GetXmin(), the_axis->GetXmax());
-  h->GetXaxis()->SetTitle(the_axis->GetTitle());
-
-  h->GetYaxis()->SetRangeUser(0.00001, 1);
-
-  double num = 0;
-  double den = 0;
-  Int_t bin = 0;
-  Int_t nBins = 0;
-
-  //  m_nFittedTracks =0 ;
-  //  m_nMCParticles =0;
-
-  for (int the_bin = 1; the_bin < the_axis->GetNbins() + 1; the_bin++) {
-
-    num = 0;
-    den = 0 ;
-
-    for (int other1_bin = 1; other1_bin < the_other1->GetNbins() + 1; other1_bin++)
-      for (int other2_bin = 1; other2_bin < the_other2->GetNbins() + 1; other2_bin++) {
-
-        if (axisRef == 0) bin = hden->GetBin(the_bin, other1_bin, other2_bin);
-        else if (axisRef == 1) bin = hden->GetBin(other1_bin, the_bin, other2_bin);
-        else if (axisRef == 2) bin = hden->GetBin(other1_bin, other2_bin, the_bin);
-
-        if (hden->IsBinUnderflow(bin))
-          B2INFO("  bin = " << bin << "(" << the_bin << "," << other1_bin << "," << other2_bin << "), UNDERFLOW");
-        if (hden->IsBinOverflow(bin))
-          B2INFO("  bin = " << bin << "(" << the_bin << "," << other1_bin << "," << other2_bin << "), OVERFLOW");
-
-        num += hnum->GetBinContent(bin);
-        den += hden->GetBinContent(bin);
-
-        nBins++;
-
-      }
-    double eff = 0;
-    double err = 0;
-
-    if (den > 0) {
-      eff = (double)num / den;
-      err = sqrt(eff * (1 - eff)) / sqrt(den);
-    }
-
-    //    m_nFittedTracks += num;
-    //    m_nMCParticles  += den;
-
-    if (isEffPlot) {
-      h->SetBinContent(the_bin, eff);
-      h->SetBinError(the_bin, err);
-    } else {
-      h->SetBinContent(the_bin, 1 - eff);
-      h->SetBinError(the_bin, err);
-    }
-
-    //    B2INFO(" the_bin = "<<the_bin<<" lowEdge: "<<h->GetXaxis()->GetBinLowEdge(the_bin)<<", den = "<<den<<", eff = "<<eff);
-  }
-
-  //  B2INFO("  total number of bins summed = "<<nBins);
-
-  return h;
-
-}
 
 void  TrackingPerformanceEvaluationModule::fillTrackParams1DHistograms(const TrackFitResult* fitResult,
     MCParticleInfo mcParticleInfo)
@@ -1104,7 +885,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
 }
 
-void TrackingPerformanceEvaluationModule::addInefficiencyPlots(TList* histoList)
+void TrackingPerformanceEvaluationModule::addMoreInefficiencyPlots(TList* histoList)
 {
 
   //normalized to MCParticles
@@ -1135,13 +916,13 @@ void TrackingPerformanceEvaluationModule::addInefficiencyPlots(TList* histoList)
 
 }
 
-void TrackingPerformanceEvaluationModule::addEfficiencyPlots(TList* histoList)
+void TrackingPerformanceEvaluationModule::addMoreEfficiencyPlots(TList* histoList)
 {
 
 
 
   //normalized to MCParticles
-  TH1F* h_eff_pt = createHistogramsRatio("heffpt", "efficiency VS pt, normalized to MCParticles", m_h3_TracksPerMCParticle,
+  TH1F* h_eff_pt = createHistogramsRatio("heffpt", "efficiency VS pt, normalized to MCParticles",  m_h3_TracksPerMCParticle,
                                          m_h3_MCParticle, true, 0);
   histoList->Add(h_eff_pt);
   //  B2INFO(" efficiency in pt, NUM =  "<<m_nFittedTracks<<", DEN = "<<m_nMCParticles<<", eff integrata = "<<(double)m_nFittedTracks/m_nMCParticles);
@@ -1243,21 +1024,6 @@ void TrackingPerformanceEvaluationModule::addEfficiencyPlots(TList* histoList)
 
 
 
-void TrackingPerformanceEvaluationModule::addPurityPlots(TList* histoList)
-{
-
-//purity histograms
-  TH1F* h_pur_pt = createHistogramsRatio("hpurpt", "purity VS pt", m_h3_MCParticlesPerTrack, m_h3_Tracks, true, 0);
-  histoList->Add(h_pur_pt);
-  //  B2INFO(" purity in pt, NUM =  "<<m_nFittedTracks<<", DEN = "<<m_nMCParticles<<", eff integrata = "<<(double)m_nFittedTracks/m_nMCParticles);
-
-  TH1F* h_pur_theta = createHistogramsRatio("hpurtheta", "purity VS #theta", m_h3_MCParticlesPerTrack, m_h3_Tracks, true, 1);
-  histoList->Add(h_pur_theta);
-
-  TH1F* h_pur_phi = createHistogramsRatio("hpurphi", "purity VS #phi", m_h3_MCParticlesPerTrack, m_h3_Tracks, true, 2);
-  histoList->Add(h_pur_phi);
-
-}
 
 bool TrackingPerformanceEvaluationModule::isTraceable(const MCParticle& the_mcParticle)
 {

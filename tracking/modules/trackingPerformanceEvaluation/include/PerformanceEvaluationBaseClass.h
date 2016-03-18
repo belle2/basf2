@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef V0FINDINGPERFORMANCEEVALUATIONMODULE_H_
-#define V0FINDINGPERFORMANCEEVALUATIONMODULE_H_
+#ifndef PERFORMANCEEVALUATIONBASECLASS_H_
+#define PERFORMANCEEVALUATIONBASECLASS_H_
 
 #include <framework/core/Module.h>
 #include <TTree.h>
@@ -18,19 +18,11 @@
 #include <TH2F.h>
 #include <TH3F.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <tracking/dataobjects/MCParticleInfo.h>
-#include <tracking/dataobjects/V0ValidationVertex.h>
-
 // forward declarations
 class TTree;
 class TFile;
-namespace genfit { class Track; }
 
 namespace Belle2 {
-  class MCParticle;
-  class V0;
 
   template< class T >
   class StoreArray;
@@ -39,15 +31,15 @@ namespace Belle2 {
    *  and the MCTrackCands input and produce a root file containing various histograms
    *  showing the performance of the tracking package: fitter, pattern recongnition algorithms.
    */
-  class V0findingPerformanceEvaluationModule : public Module {
+  class PerformanceEvaluationBaseClass  {
 
   public:
 
-    V0findingPerformanceEvaluationModule();
+    PerformanceEvaluationBaseClass();
 
-    virtual ~V0findingPerformanceEvaluationModule();
+    virtual ~PerformanceEvaluationBaseClass();
 
-    virtual void initialize();
+    /*    virtual void initialize();
 
     virtual void beginRun();
 
@@ -56,9 +48,7 @@ namespace Belle2 {
     virtual void endRun();
 
     virtual void terminate();
-
-  private:
-
+    */
     TList* m_histoList;
 
     //list of functions to create histograms:
@@ -92,67 +82,20 @@ namespace Belle2 {
                                 int axisRef);
 
 
-    //list of functions to fill histograms
-    void fillTrackParams1DHistograms(const TrackFitResult* fitResult,
-                                     MCParticleInfo mcParticleInfo); /**< fills err, resid and pull TH1F for each of the 5 track parameters*/
 
-    void addEfficiencyPlots(TList* graphList = NULL);
+    void addEfficiencyPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);
+    void addInefficiencyPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);
+    void addPurityPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);
 
-    void addInefficiencyPlots(TList* graphList = NULL);
-
-    void addPurityPlots(TList* graphList = NULL);
-
-
-    bool isV0(const MCParticle& the_mcParticle);
 
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */
-    std::string m_MCParticlesName; /**< MCParticle StoreArray name */
-    std::string m_V0sName; /**< MCTrackCand StoreArray name */
 
     /* ROOT file related parameters */
     TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
-
-    /* list of histograms filled per MCParticle found in the event */
-
-    TH1F* m_multiplicityV0s; /**< number of V0s per MCParticles*/
-    TH1F* m_multiplicityMCParticles;  /**< number of MCParticles per fitted Track*/
-
-    //error on track parameters
-    TH1F* m_h1_vtxX_err; /**< vtx error*/
-    TH1F* m_h1_vtxY_err; /**< vtx error*/
-    TH1F* m_h1_vtxZ_err; /**< vtx error*/
-    TH1F* m_h1_momX_err; /**< mom error*/
-    TH1F* m_h1_momY_err; /**< mom error*/
-    TH1F* m_h1_momZ_err; /**< mom error*/
-    //residuals on track parameters
-    TH1F* m_h1_vtxX_res; /**< vtx resid*/
-    TH1F* m_h1_vtxY_res; /**< vtx resid*/
-    TH1F* m_h1_vtxZ_res; /**< vtx resid*/
-    TH1F* m_h1_momX_res; /**< mom resid*/
-    TH1F* m_h1_momY_res; /**< mom resid*/
-    TH1F* m_h1_momZ_res; /**< mom resid*/
-    //pulls on track parameters
-    TH1F* m_h1_vtxX_pll; /**< vtx pull*/
-    TH1F* m_h1_vtxY_pll; /**< vtx pull*/
-    TH1F* m_h1_vtxZ_pll; /**< vtx pull*/
-    TH1F* m_h1_momX_pll; /**< mom pull*/
-    TH1F* m_h1_momY_pll; /**< mom pull*/
-    TH1F* m_h1_momZ_pll; /**< mom pull*/
-
-    TH1F* m_h1_pValue;
-
-    //histograms used for efficiency plots
-
-    TH3F* m_h3_MCParticle;
-    TH3F* m_h3_V0sPerMCParticle;
-
-    //histograms used for purity plots
-    TH3F* m_h3_V0s;
-    TH3F* m_h3_MCParticlesPerV0;
 
   };
 } // end of namespace
 
 
-#endif /* V0DFINDINGPERFORMANCEEVALUAITONMODULE_H_ */
+#endif /* PERFORMANCEEVALUAITONBASECLASS_H_ */

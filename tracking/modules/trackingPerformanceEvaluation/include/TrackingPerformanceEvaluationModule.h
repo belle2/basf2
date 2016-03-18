@@ -11,6 +11,8 @@
 #define TRACKINGPERFORMANCEEVALUATIONMODULE_H_
 
 #include <framework/core/Module.h>
+#include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
+
 #include <TTree.h>
 #include <TFile.h>
 #include <TList.h>
@@ -19,12 +21,9 @@
 #include <TH3F.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-//#include <tracking/modules/trackingPerformanceEvaluation/MCParticleInfo.h>
 #include <tracking/dataobjects/MCParticleInfo.h>
 
 // forward declarations
-class TTree;
-class TFile;
 namespace genfit { class Track; }
 
 namespace Belle2 {
@@ -40,7 +39,7 @@ namespace Belle2 {
    *  and the MCTrackCands input and produce a root file containing various histograms
    *  showing the performance of the tracking package: fitter, pattern recongnition algorithms.
    */
-  class TrackingPerformanceEvaluationModule : public Module {
+  class TrackingPerformanceEvaluationModule : public Module, PerformanceEvaluationBaseClass {
 
   public:
 
@@ -60,39 +59,6 @@ namespace Belle2 {
 
   private:
 
-    TList* m_histoList;
-
-    //list of functions to create histograms:
-    TH1F* createHistogram1D(const char* name, const char* title,
-                            Int_t nbins, Double_t min, Double_t max,
-                            const char* xtitle, TList* histoList = NULL);
-
-    TH2F* createHistogram2D(const char* name, const char* title,
-                            Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
-                            Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
-                            TList* histoList = NULL);
-
-    TH3F* createHistogram3D(const char* name, const char* title,
-                            Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
-                            Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
-                            Int_t nbinsZ, Double_t minZ, Double_t maxZ, const char* titleZ,
-                            TList* histoList = NULL);
-
-    TH3F* createHistogram3D(const char* name, const char* title,
-                            Int_t nbinsX, Double_t* binsX, const char* titleX,
-                            Int_t nbinsY, Double_t* binsY, const char* titleY,
-                            Int_t nbinsZ, Double_t* binsZ, const char* titleZ,
-                            TList* histoList = NULL);
-
-    TH1* duplicateHistogram(const char* newname, const char* newtitle,
-                            TH1* h, TList* histoList = NULL);
-
-
-    TH1F* createHistogramsRatio(const char* name, const char* title,
-                                TH1* hNum, TH1* hDen, bool isEffPlot,
-                                int axisRef);
-
-
     //list of functions to fill histograms
     void fillTrackParams1DHistograms(const TrackFitResult* fitResult,
                                      MCParticleInfo mcParticleInfo); /**< fills err, resid and pull TH1F for each of the 5 track parameters*/
@@ -101,25 +67,17 @@ namespace Belle2 {
 
     void fillHitsUsedInTrackFitHistograms(const genfit::Track& track);
 
-    void addEfficiencyPlots(TList* graphList = NULL);
-
-    void addInefficiencyPlots(TList* graphList = NULL);
-
-    void addPurityPlots(TList* graphList = NULL);
-
-
-
     bool isTraceable(const MCParticle& the_mcParticle);
 
+    void addMoreEfficiencyPlots(TList* histoList);
+    void addMoreInefficiencyPlots(TList* histoList);
+
     /* user-defined parameters */
-    std::string m_rootFileName;   /**< root file name */
     std::string m_MCParticlesName; /**< MCParticle StoreArray name */
     std::string m_MCTrackCandsName; /**< MCTrackCand StoreArray name */
     std::string m_TrackCandsName; /**< TrackCand StoreArray name */
     std::string m_TracksName; /**< Track StoreArray name */
 
-    /* ROOT file related parameters */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
 
     /* list of histograms filled per MCParticle found in the event */
 
@@ -201,10 +159,6 @@ namespace Belle2 {
     //histograms used for purity plots
     TH3F* m_h3_MCParticlesPerTrack;
     TH3F* m_h3_Tracks;
-
-    //debugging variables
-    //    Int_t m_nFittedTracks;
-    //    Int_t m_nMCParticles;
 
   };
 } // end of namespace

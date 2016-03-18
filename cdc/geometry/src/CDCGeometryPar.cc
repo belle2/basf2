@@ -561,12 +561,14 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
   //set xt(L/R,alpha=-90deg) = xt(R/L,alpha=90deg)
   for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
     for (int lr = 0; lr < 2; ++lr) {
-      int lrp = lr;
-      //      int lrp = 0;
-      //      if (lr == 0) lrp = 1;
+      //      int lrp = lr;
+      int lrp = 0;
+      if (lr == 0) lrp = 1;
       for (unsigned itheta = 0; itheta < nThetaPoints; ++itheta) {
         for (int i = 0; i < np; ++i) {
-          m_XT[iL][lr][0][itheta][i] = m_XT[iL][lrp][18][itheta][i];
+          double sgn = -1.;
+          if (i == 6) sgn = 1;
+          m_XT[iL][lr][0][itheta][i] = sgn * m_XT[iL][lrp][18][itheta][i];
         }
       }
     }

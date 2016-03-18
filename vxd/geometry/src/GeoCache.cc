@@ -107,6 +107,7 @@ namespace Belle2 {
           transform.SetDy(g4transform[13]*Unit::mm);
           transform.SetDz(g4transform[14]*Unit::mm);
           info->setTransformation(transform);
+          info->setTransformation(transform, true);
 
           addSensor(info);
         }

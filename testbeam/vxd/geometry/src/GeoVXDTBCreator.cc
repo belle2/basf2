@@ -275,7 +275,8 @@ namespace Belle2 {
         m_sensitiveSVD.push_back(sensitive);
 
         volume->SetSensitiveDetector(sensitive);
-
+        // Supress false positive from cppcheck
+// cppcheck-suppress memleak
       } else if (detectorType == "TEL") {
         VxdID xID(layer, ladder, sensorID);
         TEL::SensorInfo sensorInfo(xID,

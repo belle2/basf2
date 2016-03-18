@@ -154,6 +154,6 @@ namespace Belle2 {
     /** Wrapped root object. */
     T* m_wrapped;
 
-    ClassDef(RootMergeable, 2); /**< Wrap a root histogram or ntuple to make them mergeable. */
+    ClassDefOverride(RootMergeable, 2); /**< Wrap a root histogram or ntuple to make them mergeable. */
   };
 }

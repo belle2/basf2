@@ -35,9 +35,9 @@ namespace Belle2 {
   template< class T >
   class StoreArray;
 
-  /** This module takes the MCParticles, the genfit Tracks, the genfit TrackCand,
-   *  and the MCTrackCands input and produce a root file containing various histograms
-   *  showing the performance of the tracking package: fitter, pattern recongnition algorithms.
+  /** This module takes the MCParticles, the V0 candidates input and produce a root file
+   *  containing various histograms showing the performance of the
+   *  V0 finding module.
    */
   class V0findingPerformanceEvaluationModule : public Module, PerformanceEvaluationBaseClass {
 
@@ -61,6 +61,8 @@ namespace Belle2 {
 
     bool isV0(const MCParticle& the_mcParticle);
 
+    int nMatchedDaughters(const MCParticle& the_mcParticle);
+
     /* user-defined parameters */
     std::string m_MCParticlesName; /**< MCParticle StoreArray name */
     std::string m_V0sName; /**< MCTrackCand StoreArray name */
@@ -81,8 +83,8 @@ namespace Belle2 {
     TH1F* m_h1_vtxX_res; /**< vtx resid*/
     TH1F* m_h1_vtxY_res; /**< vtx resid*/
     TH1F* m_h1_vtxZ_res; /**< vtx resid*/
-    TH2F* m_h2_vtxTvsR_res; /**< vtx error on transverse plane VS transverse flight length*/
     TH1F* m_h1_mom_res; /**< mom resid*/
+    TH2F* m_h2_mom; /**< mom reco VS true*/
     TH1F* m_h1_mass_res; /**< mom resid*/
     //pulls on track parameters
     TH1F* m_h1_vtxX_pll; /**< vtx pull*/
@@ -93,6 +95,7 @@ namespace Belle2 {
 
     TH1F* m_h1_ChiSquare;
 
+    TH1F* m_h1_nMatchedDau;
     //histograms used for efficiency plots
 
     TH3F* m_h3_MCParticle;

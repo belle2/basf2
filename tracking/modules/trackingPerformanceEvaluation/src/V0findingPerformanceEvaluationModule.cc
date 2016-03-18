@@ -16,17 +16,22 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
+#include <framework/datastore/RelationsObject.h>
 
 #include <geometry/bfieldmap/BFieldMap.h>
 
 #include <vxd/geometry/GeoCache.h>
 
+#include <genfit/Track.h>
+#include <genfit/TrackCand.h>
 
 #include <root/TTree.h>
 #include <root/TAxis.h>
 #include <root/TObject.h>
 
 #include <boost/foreach.hpp>
+#include <vector>
+#include <utility>
 
 #include <typeinfo>
 #include <cxxabi.h>
@@ -85,12 +90,11 @@ void V0findingPerformanceEvaluationModule::initialize()
   //  m_h1_mom_err = createHistogram1D("h1momerr", "mom error", 100, 0, 0.1, "#sigma_{p} (GeV/c)", m_histoList);
   //  m_h1_mass_err = createHistogram1D("h1masserr", "mass error", 100, 0, 1, "#sigma_{m} (GeV/c2)", m_histoList);
   //vertex and momentum parameters residuals
-  m_h1_vtxX_res = createHistogram1D("h1vtxXres", "vtxX resol", 100, -0.2, 0.2, "vtxX resid (cm)", m_histoList);
-  m_h1_vtxY_res = createHistogram1D("h1vtxYres", "vtxY resol", 100, -0.2, 0.2, "vtxY resid (cm)", m_histoList);
-  m_h1_vtxZ_res = createHistogram1D("h1vtxZres", "vtxZ resol", 100, -0.5, 0.5, "vtxZ resid (cm)", m_histoList);
-  m_h2_vtxTvsR_res = createHistogram2D("h2vtxTresVsR", "vtxT resol vs R", 100, 0, 100, "R (cm)", 100, -0.2, 0.2, "vtx T resol (cm)",
-                                       m_histoList);  m_h1_mom_res = createHistogram1D("h1momres", "mom resol", 100, -1.5, 1.5, "mom resid (GeV/c)", m_histoList);
-  m_h1_mass_res = createHistogram1D("h1massres", "mass resol", 100, -1, 1, "mass resid (GeV/c)", m_histoList);
+  m_h1_vtxX_res = createHistogram1D("h1vtxXres", "vtxX resid", 100, -0.2, 0.2, "vtxX resid (cm)", m_histoList);
+  m_h1_vtxY_res = createHistogram1D("h1vtxYres", "vtxY resid", 100, -0.2, 0.2, "vtxY resid (cm)", m_histoList);
+  m_h1_vtxZ_res = createHistogram1D("h1vtxZres", "vtxZ resid", 100, -0.5, 0.5, "vtxZ resid (cm)", m_histoList);
+  m_h1_mom_res = createHistogram1D("h1momres", "mom resid", 100, -1.5, 1.5, "mom resid (GeV/c)", m_histoList);
+  m_h1_mass_res = createHistogram1D("h1massres", "mass resid", 100, -1, 1, "mass resid (GeV/c)", m_histoList);
 
   //vertex and momentum parameters pulls
   m_h1_vtxX_pll = createHistogram1D("h1vtxXpll", "vtxX pull", 100, -5, 5, "vtxX pull", m_histoList);
@@ -102,6 +106,12 @@ void V0findingPerformanceEvaluationModule::initialize()
 
   m_h1_ChiSquare = createHistogram1D("h1Chi2", "Chi2 of the fit", 100, 0, 20, "Chi2", m_histoList);
 
+  m_h1_nMatchedDau = createHistogram1D("h1nMatchedDau", "Number of Matched MCParticle Daughters", 3, -0.5, 2.5, "# matched dau",
+                                       m_histoList);
+
+
+  m_h2_mom = createHistogram2D("h2mom", "reco VS true momentum", 100, 0, 3, "V0 mom (GeV/c)", 100, 0, 3, "MC mom (GeV/c)",
+                               m_histoList);
 
   //histograms to produce efficiency plots
   Double_t bins_pt[9 + 1] = {0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 1, 2, 3.5}; //GeV/c
@@ -111,7 +121,7 @@ void V0findingPerformanceEvaluationModule::initialize()
   for (int bin = 0; bin < 14 + 1; bin++)
     bins_phi[bin] = - TMath::Pi() + bin * width_phi;
 
-  m_h1_MCParticle_R = createHistogram1D("h1nMCParticleVSr", "entry per MCParticles", 1000, 0, 100, "transverse L", m_histoList);
+  m_h1_MCParticle_R = createHistogram1D("h1nMCParticleVSr", "entry per MCParticles", 50, 0, 20, "transverse L", m_histoList);
 
   m_h1_V0sPerMCParticle_R = (TH1F*)duplicateHistogram("h1nV0perMCvsR", "entry per V0 related to a MCParticle",   m_h1_MCParticle_R,
                                                       m_histoList);
@@ -152,6 +162,13 @@ void V0findingPerformanceEvaluationModule::event()
   BOOST_FOREACH(MCParticle & mcParticle, mcParticles) {
 
     if (! isV0(mcParticle))
+      continue;
+
+    int nMatchedDau =  nMatchedDaughters(mcParticle);
+    m_h1_nMatchedDau->Fill(nMatchedDau);
+
+    //proceed only in case the MCParticle daughters have one associated reconstructed track:
+    if (nMatchedDau != 2)
       continue;
 
     int pdgCode = mcParticle.getPDG();
@@ -200,9 +217,9 @@ void V0findingPerformanceEvaluationModule::event()
       m_h1_vtxX_res->Fill(V0_vtx.X() -  MC_vtx.X());
       m_h1_vtxY_res->Fill(V0_vtx.Y() -  MC_vtx.Y());
       m_h1_vtxZ_res->Fill(V0_vtx.Z() -  MC_vtx.Z());
-      m_h2_vtxTvsR_res->Fill(flightR, sqrt((V0_vtx.X() - MC_vtx.X()) * (V0_vtx.X() - MC_vtx.X()) + (V0_vtx.Y() - MC_vtx.Y()) *
-                                           (V0_vtx.Y() - MC_vtx.Y())));
+
       m_h1_mom_res->Fill(V0_mom -  MC_mom);
+      m_h2_mom->Fill(V0_mom, MC_mom);
       m_h1_mass_res->Fill(V0_mass -  MC_mass);
 
       m_h1_vtxX_pll->Fill((V0_vtx.X() -  MC_vtx.X()) / sqrt(V0_cov[0][0]));
@@ -275,11 +292,22 @@ void V0findingPerformanceEvaluationModule::endRun()
 void V0findingPerformanceEvaluationModule::terminate()
 {
 
-  TH1F* h_eff_R = (TH1F*)duplicateHistogram("h_eff_R", "efficiency vs R", m_h1_MCParticle_R, m_histoList);
+  TH1F* h_eff_R   = (TH1F*)duplicateHistogram("h_eff_R", "efficiency vs R", m_h1_MCParticle_R, m_histoList);
 
-  for (int bin = 0; bin < 10000; bin++)
-    h_eff_R->SetBinContent(bin + 1, (float) m_h1_V0sPerMCParticle_R->GetBinContent(bin + 1) / m_h1_MCParticle_R->GetBinContent(
-                             bin + 1));
+  for (int bin = 0; bin < h_eff_R->GetXaxis()->GetNbins(); bin++) {
+    float num = m_h1_V0sPerMCParticle_R->GetBinContent(bin + 1);
+    float den = m_h1_MCParticle_R->GetBinContent(bin + 1);
+    double eff = 0;
+    double err = 0;
+
+    if (den > 0) {
+      eff = (double)num / den;
+      err = sqrt(eff * (1 - eff)) / sqrt(den);
+    }
+
+    h_eff_R->SetBinContent(bin + 1, eff);
+    h_eff_R->SetBinError(bin + 1, err);
+  }
 
   addEfficiencyPlots(m_histoList, m_h3_V0sPerMCParticle, m_h3_MCParticle);
 
@@ -309,7 +337,7 @@ bool V0findingPerformanceEvaluationModule::isV0(const MCParticle& the_mcParticle
   if (abs(the_mcParticle.getPDG()) == 310)
     isK_S0 = true;
 
-  bool isK_0 = false; //?
+  bool isK_0 = false;
   if (abs(the_mcParticle.getPDG()) == 311)
     isK_0 = true;
 
@@ -326,7 +354,46 @@ bool V0findingPerformanceEvaluationModule::isV0(const MCParticle& the_mcParticle
     if (the_mcParticle.getDaughters()[0]->getCharge() == 0)
       twoChargedProngs = false;
 
-  return ((isK_S0 || isLambda) && twoChargedProngs);
-  //  return ( isK_S0 && twoChargedProngs);
+  return ((isK_S0 || isK_0 || isLambda) && twoChargedProngs);
+
+}
+
+int V0findingPerformanceEvaluationModule::nMatchedDaughters(const MCParticle& the_mcParticle)
+{
+
+  int nMatchedDau = 0;
+
+  std::vector< MCParticle* > MCPart_dau = the_mcParticle.getDaughters();
+
+  bool first = false;
+  bool second = false;
+
+  //    RelationVector<MCParticle> RV_TCtoMCPart = getRelationsTo("TrackCands");
+  //    if(std::get<1>(TrackCands_fromMCParticle) > 0.66){
+
+  RelationVector<genfit::TrackCand> TrackCands_fromMCParticle_0 = DataStore::getRelationsToObj<genfit::TrackCand>(MCPart_dau[0]);
+
+  for (int tc = 0; tc < (int)TrackCands_fromMCParticle_0.size(); tc++) {
+    RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle_0[tc]);
+    if (Tracks_fromTrackCand.size() > 0)
+      first = true;
+  }
+
+  RelationVector<genfit::TrackCand> TrackCands_fromMCParticle_1 = DataStore::getRelationsToObj<genfit::TrackCand>(MCPart_dau[1]);
+
+  for (int tc = 0; tc < (int)TrackCands_fromMCParticle_1.size(); tc++) {
+    RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle_1[tc]);
+    if (Tracks_fromTrackCand.size() > 0)
+      second = true;
+  }
+
+  if (first)
+    nMatchedDau++;
+
+  if (second)
+    nMatchedDau++;
+
+
+  return nMatchedDau;
 
 }

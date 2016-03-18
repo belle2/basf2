@@ -264,6 +264,22 @@ namespace Belle2 {
        */
       int m_tdcOffset;
 
+      /**
+       * Board ID for the trigger.
+       */
+      int m_boardIDTrig;
+
+      /**
+       * Channel for the trigger.
+       */
+      int m_channelTrig;
+
+      /**
+       * Enable/Disable to sutract the trigger timing
+       * from TDCs.
+       */
+      bool m_subtractTrigTiming;
+
     };//end class declaration
 
 

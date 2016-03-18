@@ -51,11 +51,15 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("cdcRawHitName", m_cdcRawHitName, "Name of the CDCRawHit (Suppressed mode).", string(""));
   addParam("cdcHitName", m_cdcHitName, "Name of the CDCHit List name..", string(""));
   addParam("fadcThreshold", m_fadcThreshold, "Threshold voltage (mV).", 10);
-  addParam("tdcOffset", m_tdcOffset, "TDC offset (in TDC count).", 0);
+
   addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string("/cdc/data/ch_map.dat"));
   addParam("enableStoreCDCRawHit", m_enableStoreCDCRawHit, "Enable to store to the CDCRawHit object", false);
   addParam("enablePrintOut", m_enablePrintOut, "Enable to print out the data to the terminal", true);
   addParam("setRelationRaw2Hit", m_setRelationRaw2Hit, "Set/unset relation between CDCHit and RawCDC.", false);
+  addParam("boardIDTrig", m_boardIDTrig, "Board ID for the trigger.", 7);
+  addParam("channelTrig", m_channelTrig, "Channel for the trigger.", 1);
+  addParam("subtractTrigTiming", m_subtractTrigTiming, "Enable to subtract the trigger timing from TDCs.", false);
+  addParam("tdcOffset", m_tdcOffset, "TDC offset (in TDC count).", 0);
 
 }
 
@@ -107,6 +111,9 @@ void CDCUnpackerModule::beginRun()
 void CDCUnpackerModule::event()
 {
   B2INFO("CDCUnpacker: event() started.");
+
+  // TDC count for the trigger scinti.
+  int tdcCountTrig = 0;
 
   // Create Data objects.
 
@@ -278,7 +285,7 @@ void CDCUnpackerModule::event()
               } else {
                 tdc1 = trgTime - tdc1;
               }
-              const CDCHit* hit = cdcHits.appendNew(tdc1 + m_tdcOffset, fadcSum, wireId, tdc2 + m_tdcOffset);
+              const CDCHit* hit = cdcHits.appendNew(tdc1, fadcSum, wireId, tdc2);
 
               if (m_enableStoreCDCRawHit == true && m_setRelationRaw2Hit == true) {
                 int nRaws = cdcRawHitWFs.getEntries();
@@ -366,14 +373,25 @@ void CDCUnpackerModule::event()
               const unsigned short status = 0;
               // Store to the CDCHit.
               const WireID  wireId = getWireID(board, ch);
-              CDCHit* hit = cdcHits.appendNew(tdc1, fadcSum, wireId, tdc2);
+
+              if (board == m_boardIDTrig && ch == m_channelTrig) {
+                tdcCountTrig = tdc1;
+              } else {
+                cdcHits.appendNew(tdc1, fadcSum, wireId, tdc2);
+
+              }
 
               if (m_enableStoreCDCRawHit == true) {
                 // Store to the CDCRawHit object.
-                const CDCRawHit* raw = cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch, trgTime, fadcSum, tdc1, tdc2, tot);
-                if (m_setRelationRaw2Hit == true) {
-                  hit->addRelationTo(raw);
-                }
+                cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch, trgTime, fadcSum, tdc1, tdc2, tot);
+              }
+
+              if (m_setRelationRaw2Hit == true &&
+                  !(board == m_boardIDTrig && ch == m_channelTrig)) {
+                // Set relation.
+                CDCHit* hit = cdcHits[cdcHits.getEntries() - 1];
+                const CDCRawHit* raw = cdcRawHits[cdcRawHits.getEntries() - 1];
+                hit->addRelationTo(raw);
               }
             }
             it += static_cast<int>(length);
@@ -383,6 +401,19 @@ void CDCUnpackerModule::event()
           B2WARNING("CDCUnpacker :  Undefined CDC Data Block : Block #  " << i);
         }
       }
+    }
+  }
+  //
+  // t0 correction from the trigger scinti.
+  //
+  if (m_subtractTrigTiming == true) {
+    for (auto& hit : cdcHits) {
+      unsigned short tdc1 = hit.getTDCCount();
+      unsigned short tdc2 = hit.getTDCCount2ndHit();
+      tdc1  = tdc1 - tdcCountTrig + m_tdcOffset;
+      tdc2  = tdc2 - tdcCountTrig + m_tdcOffset;
+      hit.setTDCCount(tdc1);
+      hit.setTDCCount2ndHit(tdc2);
     }
   }
 }

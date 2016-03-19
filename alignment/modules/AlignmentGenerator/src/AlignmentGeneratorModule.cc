@@ -37,7 +37,7 @@ AlignmentGeneratorModule::AlignmentGeneratorModule() : Module()
 
   setPropertyFlags(c_ParallelProcessingCertified);
   // Set module properties
-  setDescription("Generate VXD misalignment and store in database");
+  setDescription("Generate VXD alignment and store in database");
 
   // Parameter definitions
   addParam("experimentLow", m_experimentLow, "Min experiment number to generate this alignment for", 0);

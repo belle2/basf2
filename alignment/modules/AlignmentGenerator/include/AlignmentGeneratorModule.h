@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MISALIGNMENTGENERATORMODULE_H
-#define MISALIGNMENTGENERATORMODULE_H
+#ifndef ALIGNMENTGENERATORMODULE_H
+#define ALIGNMENTGENERATORMODULE_H
 
 #include <framework/core/Module.h>
 
@@ -21,14 +21,14 @@ namespace Belle2 {
    * Generate VXD misalignment and store in database
    *
    */
-  class MisalignmentGeneratorModule : public Module {
+  class AlignmentGeneratorModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    MisalignmentGeneratorModule();
+    AlignmentGeneratorModule();
 
     /** Generate misalignment and store in database */
     virtual void initialize();
@@ -45,4 +45,4 @@ namespace Belle2 {
   };
 }
 
-#endif /* MISALIGNMENTGENERATORMODULE_H */
+#endif /* ALIGNMENTGENERATORMODULE_H */

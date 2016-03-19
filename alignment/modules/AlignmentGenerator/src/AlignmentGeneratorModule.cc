@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <alignment/modules/MisalignmentGenerator/MisalignmentGeneratorModule.h>
+#include <alignment/modules/AlignmentGenerator/AlignmentGeneratorModule.h>
 
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -25,13 +25,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(MisalignmentGenerator)
+REG_MODULE(AlignmentGenerator)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-MisalignmentGeneratorModule::MisalignmentGeneratorModule() : Module()
+AlignmentGeneratorModule::AlignmentGeneratorModule() : Module()
 {
   std::vector<std::string> emptyData;
 
@@ -40,17 +40,18 @@ MisalignmentGeneratorModule::MisalignmentGeneratorModule() : Module()
   setDescription("Generate VXD misalignment and store in database");
 
   // Parameter definitions
-  addParam("experimentLow", m_experimentLow, "Min experiment number to generate this misalignment for", 0);
-  addParam("runLow", m_runLow, "Min run number to generate this misalignment for", 0);
-  addParam("experimentHigh", m_experimentHigh, "Max experiment number to generate this misalignment for", -1);
-  addParam("runHigh", m_runHigh, "Max run number to generate this misalignment for", -1);
-  addParam("data", m_data, "Data for misalignment generation in format ['layer.ladder.sensor,parameter_no,distribution,value', ...]",
+  addParam("experimentLow", m_experimentLow, "Min experiment number to generate this alignment for", 0);
+  addParam("runLow", m_runLow, "Min run number to generate this alignment for", 0);
+  addParam("experimentHigh", m_experimentHigh, "Max experiment number to generate this alignment for", -1);
+  addParam("runHigh", m_runHigh, "Max run number to generate this alignment for", -1);
+  addParam("data", m_data,
+           "Data for alignment in format ['layer.ladder.sensor, parameter_no, distribution=fix|gaus|uniform, value', ...]",
            emptyData);
-  addParam("name", m_name, "Name of generated misalignment in database", std::string("VXDMisalignment"));
+  addParam("name", m_name, "Name of generated alignment in database", std::string(""));
 
 }
 
-void MisalignmentGeneratorModule::initialize()
+void AlignmentGeneratorModule::initialize()
 {
   IntervalOfValidity iov(m_experimentLow, m_runLow, m_experimentHigh, m_runHigh);
   auto data = new VXDAlignment();
@@ -60,7 +61,7 @@ void MisalignmentGeneratorModule::initialize()
       std::vector<std::string> paramDataParts;
       boost::algorithm::split(paramDataParts, paramData, boost::is_any_of(","));
       if (paramDataParts.size() != 4)
-        B2FATAL("Error parsing misalignment data.");
+        B2FATAL("Error parsing alignment data.");
 
       boost::trim(paramDataParts[0]);
       boost::trim(paramDataParts[1]);
@@ -72,19 +73,25 @@ void MisalignmentGeneratorModule::initialize()
       std::string distro = paramDataParts[2];
       double value = std::stod(paramDataParts[3]);
 
+      double generatedValue = 0.;
+      if (distro == "fix") generatedValue = value;
+      else if (distro == "gaus") generatedValue = gRandom->Gaus(0., value);
+      else if (distro == "uniform") generatedValue = gRandom->Uniform(-value, value);
+      else B2FATAL("Unknown distribution for parameter generation: " << distro << " Valid options are fix|gaus|uniform");
+
       if (idMask.getLayerNumber() && id.getLayerNumber() != idMask.getLayerNumber()) continue;
       if (idMask.getLadderNumber() && id.getLadderNumber() != idMask.getLadderNumber()) continue;
       if (idMask.getSensorNumber() && id.getSensorNumber() != idMask.getSensorNumber()) continue;
 
-      if (distro == "gaus") value = gRandom->Gaus(0., value);
-
-      data->set(id, paramID, value);
+      data->set(id, paramID, generatedValue);
     }
   }
 
-  data->dump();
+  if (m_name == "")
+    Database::Instance().storeData(data, iov);
+  else
+    Database::Instance().storeData(m_name, data, iov);
 
-  Database::Instance().storeData(m_name, data, iov);
 }
 
 

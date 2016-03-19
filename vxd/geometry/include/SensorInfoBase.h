@@ -362,7 +362,7 @@ namespace Belle2 {
       double cmaster[3];
       global.GetXYZ(cmaster);
       if (reco) m_recoTransform.MasterToLocalVect(cmaster, clocal);
-      m_transform.MasterToLocalVect(cmaster, clocal);
+      else m_transform.MasterToLocalVect(cmaster, clocal);
       return TVector3(clocal);
     }
   }

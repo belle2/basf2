@@ -34,7 +34,7 @@ parser.add_argument('--output', metavar='Output File (path/filename)',
 parser.add_argument(
     '--timeCalibFile',
     metavar='Time Calibration File (i.e. file name = /path/to/xxx_SampleCalibration.root)',
-    required=True,
+    required=False,
     help='the path/name for the input sample calibration file. This parameter is REQUIRED.')
 
 parser.add_argument('--Conditions', action='store_true',

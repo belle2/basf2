@@ -98,9 +98,9 @@ void SVDRecoHit::setDetectorPlane()
   // Construct vectors o, u, v
   TVector3 uLocal(1, 0, 0);
   TVector3 vLocal(0, 1, 0);
-  TVector3 origin  = geometry.pointToGlobal(TVector3(0, 0, 0));
-  TVector3 uGlobal = geometry.vectorToGlobal(uLocal);
-  TVector3 vGlobal = geometry.vectorToGlobal(vLocal);
+  TVector3 origin  = geometry.pointToGlobal(TVector3(0, 0, 0), true);
+  TVector3 uGlobal = geometry.vectorToGlobal(uLocal, true);
+  TVector3 vGlobal = geometry.vectorToGlobal(vLocal, true);
 
   //Construct the detector plane
   VXD::SensorPlane* finitePlane = new VXD::SensorPlane(m_sensorID, 20.0, 20.0);

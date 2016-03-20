@@ -9,6 +9,7 @@ env['LIBS'] = [
     'vxd_dataobjects',
     'cdc', 'cdc_dataobjects',
     'genfit2',
+    'alignment'
    # 'tracking', 'tracking_dataobjects',
     ]
 

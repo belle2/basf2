@@ -3,13 +3,15 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck & Oksana Brovchenko & Moritz Nadler           *
+ * Contributors: Tobias Schlüter, Tadeas Bilka                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <alignment/dbobjects/VXDAlignment.h>
 
 #include <string>
 
@@ -52,6 +54,10 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
+    /** Re-initialize alignment corrections in VXD from database
+     */
+    void updateVXDAlignment();
+
     std::string m_geometry;       /**< choice of geometry representation: 'TGeo' or 'Geant4'.  */
 
     bool m_noEffects;             /**< switch on/off ALL material effects in Genfit. "true" overwrites "true" flags for the individual effects.*/
@@ -61,5 +67,7 @@ namespace Belle2 {
     bool m_energyLossBrems;       /**< Determines if calculation of bremsstrahlung energy loss is on/off in Genfit */
     bool m_noiseBrems;            /**< Determines if calculation of bremsstrahlung energy loss variance is on/off in Genfit */
     std::string m_mscModel;       /**< Multiple scattering model */
+    bool m_useVXDAlignment;       /**< Use VXD alignment from database? */
+    DBObjPtr<VXDAlignment> m_vxdAlignment; /**< DB object with VXD alignment */
   };
 }

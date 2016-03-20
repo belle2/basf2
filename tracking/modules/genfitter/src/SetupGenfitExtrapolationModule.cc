@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Tobias Schlüter                                          *
+ * Contributors: Tobias Schlüter, Tadeas Bilka                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -28,6 +28,8 @@
 #include <boost/iostreams/concepts.hpp>
 
 #include <TGeoManager.h>
+
+#include <vxd/geometry/GeoCache.h>
 
 using namespace Belle2;
 
@@ -70,11 +72,11 @@ namespace {
 }
 
 SetupGenfitExtrapolationModule::SetupGenfitExtrapolationModule() :
-  Module()
+  Module(), m_vxdAlignment()
 {
 
   setDescription("Sets up material handling for genfit extrapolation.  Also setups up I/O streams for"
-                 " genfit in order to integrate it into basf2 logging system.");
+                 " genfit in order to integrate it into basf2 logging system. Also sets up update of VXDAlignment from DB (temporary).");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //input
@@ -97,6 +99,8 @@ SetupGenfitExtrapolationModule::SetupGenfitExtrapolationModule() :
            "individual material effects switches", false);
   addParam("MSCModel", m_mscModel,
            "Multiple scattering model", std::string("Highland"));
+  addParam("useVXDAlignment", m_useVXDAlignment,
+           "Use VXD alignment from database?", bool(true));
 }
 
 SetupGenfitExtrapolationModule::~SetupGenfitExtrapolationModule()
@@ -152,10 +156,21 @@ void SetupGenfitExtrapolationModule::initialize()
 
 void SetupGenfitExtrapolationModule::beginRun()
 {
+  // Ideally, we perform the update already at beginRun
+  if (m_useVXDAlignment) {
+    if (m_vxdAlignment.hasChanged())
+      updateVXDAlignment();
+
+    if (!m_vxdAlignment.isValid())
+      B2ERROR("No VXD alignment available in DB. Using nominal VXD sensor positions for reconstruction.");
+  }
 }
 
 void SetupGenfitExtrapolationModule::event()
 {
+  // In case of IntraRunDependency, we need to observe also event-by-event changes
+  if (m_useVXDAlignment && m_vxdAlignment.hasChanged())
+    updateVXDAlignment();
 }
 
 void SetupGenfitExtrapolationModule::endRun()
@@ -164,5 +179,76 @@ void SetupGenfitExtrapolationModule::endRun()
 
 void SetupGenfitExtrapolationModule::terminate()
 {
+}
+
+void SetupGenfitExtrapolationModule::updateVXDAlignment()
+{
+  // If no alignment is available, use nominal positions again
+  //NOTE: If the alignment was not available from start, nominal positions are already loaded
+  // during geometry construction
+  if (!m_vxdAlignment.isValid()) {
+    B2INFO("Re-loading nominal sensor positions for reconstruction...");
+
+    for (auto sensor : VXD::GeoCache::getInstance().getListOfSensors()) {
+      VXD::SensorInfoBase& geometry = const_cast<VXD::SensorInfoBase&>(VXD::GeoCache::getInstance().getSensorInfo(sensor));
+      // Copy nominal transformation to reco-transformation
+      geometry.setTransformation(geometry.getTransformation(false), true);
+    }
+    return;
+  }
+
+  B2INFO("Updating VXD alignment from DB object...");
+
+  // For the time being, let's check that we use non-zero alignment
+  bool nonZero(false);
+
+  for (auto sensor : VXD::GeoCache::getInstance().getListOfSensors()) {
+    double du = m_vxdAlignment->get(sensor, VXDAlignment::dU);
+    double dv = m_vxdAlignment->get(sensor, VXDAlignment::dV);
+    double dw = m_vxdAlignment->get(sensor, VXDAlignment::dW);
+    double dalpha = m_vxdAlignment->get(sensor, VXDAlignment::dAlpha);
+    double dbeta = m_vxdAlignment->get(sensor, VXDAlignment::dBeta);
+    double dgamma = m_vxdAlignment->get(sensor, VXDAlignment::dGamma);
+
+    if (du != 0. || dv != 0. || dw != 0. || dalpha != 0. || dbeta != 0. || dgamma != 0.) nonZero = true;
+
+    VXD::SensorInfoBase& geometry = const_cast<VXD::SensorInfoBase&>(VXD::GeoCache::getInstance().getSensorInfo(sensor));
+
+    // Take nominal trafo from geometry
+    TGeoHMatrix trafo(geometry.getTransformation(false));
+    TGeoTranslation translation;
+    TGeoRotation rotation;
+
+    translation.SetTranslation(du, dv, dw);
+
+    // Unfortunatelly we want to use different angle definition than TGeoRotation
+    // for alignment. TGeo is using Euler angles in zx'z'' convention, where we want
+    // xy'z'' (Note, order of matrix multiplication is R(Z)R(Y)R(X))
+    Double_t m[9];
+    double alfa = dalpha;
+    double beta = dbeta;
+    double gama = dgamma;
+    m[0] = cos(beta) * cos(gama);
+    m[1] = cos(alfa) * sin(gama) + sin(alfa) * sin(beta) * cos(gama);
+    m[2] = sin(alfa) * sin(gama) - cos(alfa) * sin(beta) * cos(gama);
+    m[3] = - cos(beta) * sin(gama);
+    m[4] = cos(alfa) * cos(gama) - sin(alfa) * sin(beta) * sin(gama);
+    m[5] = sin(alfa) * cos(gama) + cos(alfa) * sin(beta) * cos(gama);
+    m[6] = sin(beta);
+    m[7] = - sin(alfa) * cos(beta);
+    m[8] = cos(alfa) * cos(beta);
+    rotation.SetMatrix(m);
+
+    // Correct nominal position with alignment
+    TGeoCombiTrans correction(translation, rotation);
+    trafo = trafo * correction;
+
+    // Store new reco-transformation
+    geometry.setTransformation(trafo, true);
+  }
+
+  // Let's warn people they are not using nominal geometry for reconstruction
+  if (nonZero)
+    B2WARNING("Using non-zero alignment in reconstruction.");
 }
 

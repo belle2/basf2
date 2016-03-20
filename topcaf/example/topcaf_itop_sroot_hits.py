@@ -64,6 +64,7 @@ itopconfig = register_module('TopConfiguration')
 itopconfig.param('filename', args.topConfiguration)
 
 itopeventconverter = register_module('iTopRawConverterSRoot')
+itopeventconverter.param('forceTrigger0xF', True)
 
 histomanager = register_module("HistoManager")
 

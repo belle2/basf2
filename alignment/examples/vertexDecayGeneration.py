@@ -11,13 +11,23 @@ import simulation as sim
 import reconstruction as reco
 import modularAnalysis as ana
 
+if len(sys.argv) < 4:
+    print('Usage: basf2 1_generate.py experiment_number run_number num_events')
+    sys.exit(1)
+
+experiment = int(sys.argv[1])
+run = int(sys.argv[2])
+nevents = int(sys.argv[3])
+
 main = create_path()
 
-main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
-beam.add_beamparameters(main, "Y4S")
+main.add_module("EventInfoSetter", expList=[experiment], runList=[run], evtNumList=[nevents])
+# beam.add_beamparameters(main, "Y4S")
 
 ana.loadGearbox(main)
 main.add_module('Geometry')
+
+# main.add_module('BeamParameters', createPayload=True)
 
 kkgeninput = register_module('KKGenInput')
 kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat'))
@@ -39,7 +49,7 @@ ana.vertexRaveDaughtersUpdate('Z0:mumu', 0.0, path=main, constraint='ipprofile')
 # ana.matchMCTruth('Z0:mumu', main)
 # ana.matchMCTruth('mu+:good', main)
 
-ana.printVariableValues('Z0:mumu', ['E', 'deltaE', 'M', 'mcPDG'], path=main)
+# ana.printVariableValues('Z0:mumu', ['E', 'deltaE', 'M', 'mcPDG'], path=main)
 
 main.add_module("RootOutput")
 

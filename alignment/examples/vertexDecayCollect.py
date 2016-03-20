@@ -5,9 +5,6 @@ from basf2 import *
 
 set_log_level(LogLevel.INFO)
 
-reset_database()
-use_local_database()
-
 main = create_path()
 
 main.add_module("RootInput", excludeBranchNames=['GF2Tracks', 'TrackCandsToGF2Tracks', 'GF2TracksToMCParticles'])
@@ -18,7 +15,7 @@ main.add_module('Geometry')
 primary_vertices = ['Z0:mumu']
 
 main.add_module('UpdateParticleTrackCand', motherListNames=primary_vertices, removeBKLM=True, removeCDC=True)
-
+main.add_module('SetupGenfitExtrapolation', whichGeometry='TGeo', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
 main.add_module('GBLfit', UseClusters=True, addDummyVertexPoint=True, externalIterations=0, StoreFailedTracks=True)
 main.add_module('MillepedeCollector', tracks=[], primaryVertices=primary_vertices)
 # main.add_module('GBLdiagnostics')

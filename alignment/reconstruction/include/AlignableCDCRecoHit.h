@@ -30,11 +30,8 @@ namespace Belle2 {
   class AlignableCDCRecoHit : public CDCRecoHit, public genfit::ICalibrationParametersDerivatives  {
 
   public:
-    /// Default Constructor for ROOT IO.
-    AlignableCDCRecoHit() : CDCRecoHit() {}
-
-    /// Constructor
-    AlignableCDCRecoHit(const CDCHit* cdcHit, const genfit::TrackCandHit* trackCandHit) : CDCRecoHit(cdcHit, trackCandHit) {}
+    /** Inherit constructors */
+    using CDCRecoHit::CDCRecoHit;
 
     /// Destructor
     ~AlignableCDCRecoHit() {}

@@ -36,12 +36,10 @@ namespace Belle2 {
 
   private:
 
-    int m_experimentLow;  /**< Min experiment number to generate this misalignment for */
-    int m_runLow;  /**< Min run number to generate this misalignment for */
-    int m_experimentHigh;  /**< Max experiment number to generate this misalignment for */
-    int m_runHigh;  /**< Max run number to generate this misalignment for */
+    std::vector<int> m_payloadIov;  /**< IoV for the payload */
+    bool m_createPayload; /**< Whether to create and store the payload in database */
     std::vector<std::string> m_data;  /**< Data for misalignment generation */
-    std::string m_name;  /**< Name of generated misalignment in database */
+    std::string m_payloadName;  /**< Name of generated misalignment in database */
   };
 }
 

@@ -10,9 +10,6 @@ import numpy as np
 
 set_debug_level(1000)
 
-reset_database()
-use_local_database()
-
 # Only initialize RootInput, as we do not loop over events,
 # only load persistent objects stored during data collection
 input = register_module('RootInput')
@@ -28,21 +25,27 @@ geom.initialize()
 algo = Belle2.MillepedeAlgorithm()
 algo.steering().command('method diagonalization 1 0.1')
 algo.steering().command('entries 100')
+algo.steering().command('hugecut 1000')
 algo.steering().command('chiscut 30. 6.')
 algo.steering().command('outlierdownweighting 3')
 algo.steering().command('dwfractioncut 0.1')
 
 algo.steering().command('Parameters')
-
 for vxdid in Belle2.VXD.GeoCache.getInstance().getListOfSensors():
-    if vxdid.getLayerNumber() == 6 or (vxdid.getLayerNumber() > 3 and vxdid.getSensorNumber() == 1):
+    if vxdid.getLayerNumber() == 1 and vxdid.getLadderNumber() == 1 and vxdid.getSensorNumber() == 1:
         label = Belle2.GlobalLabel(vxdid, 0)
         for ipar in range(1, 7):
-            par_label = label.label() + ipar
-            cmd = str(par_label) + ' 0. -1.'
+            par_label = label.label() + 1
+            cmd = str(par_label) + ' 0.0 -1.'
             algo.steering().command(cmd)
 
+"""
+algo.steering().command('fortranfiles')
+algo.steering().command('constraints.txt')
+"""
+
 # algo.invertSign()
+
 algo.execute()
 
 # Done in algo
@@ -78,6 +81,7 @@ sensor = np.zeros(1, dtype=int)
 x = np.zeros(1, dtype=float)
 y = np.zeros(1, dtype=float)
 z = np.zeros(1, dtype=float)
+eigenweight = np.zeros(1, dtype=float)
 
 # Tree with VXD data
 vxdtree = ROOT.TTree('vxd', 'VXD data')
@@ -91,10 +95,14 @@ vxdtree.Branch('error', error, 'error/D')
 vxdtree.Branch('x', x, 'x/D')
 vxdtree.Branch('y', y, 'y/D')
 vxdtree.Branch('z', z, 'z/D')
+vxdtree.Branch('eigenweight', eigenweight, 'eigenweight/D')
+
+corrections = Belle2.VXDAlignment()
+errors = Belle2.VXDAlignment()
+eigenweights = Belle2.VXDAlignment()
 
 # Index of determined param
 ibin = 0
-
 for ipar in range(0, algo.result().getNoParameters()):
     if not algo.result().isParameterDetermined(ipar):
         continue
@@ -107,19 +115,37 @@ for ipar in range(0, algo.result().getNoParameters()):
     error[0] = algo.result().getParameterError(ipar)
 
     if (label.isVXD()):
-        value[0] = vxd.get(label.getVxdID().getID(), label.getParameterId())
-
+        sid = label.getVxdID().getID()
+        pid = label.getParameterId()
+        ew = algo.result().getEigenVectorElement(0, ipar)  # + algo.result().getEigenVectorElement(1, ipar)
         pos = Belle2.VXD.GeoCache.getInstance().get(label.getVxdID()).pointToGlobal(ROOT.TVector3(0, 0, 0))
+
+        value[0] = vxd.get(sid, pid)
+        corrections.set(sid, pid, correction[0])
+        errors.set(sid, pid, error[0])
+        eigenweights.set(sid, pid, ew)
+
         layer[0] = label.getVxdID().getLayerNumber()
         ladder[0] = label.getVxdID().getLadderNumber()
         sensor[0] = label.getVxdID().getSensorNumber()
         x[0] = pos[0]
         y[0] = pos[1]
         z[0] = pos[2]
+        eigenweight[0] = ew
         vxdtree.Fill()
 
     profile.SetBinContent(ibin, value[0])
     profile.SetBinError(ibin, error[0])
+
+condition = 0
+
+if algo.result().getNoEigenPairs():
+    maxEigenValue = algo.result().getEigenNumber(algo.result().getNoEigenPairs() - 1)
+    minEigenValue = algo.result().getEigenNumber(0)
+    condition = maxEigenValue / minEigenValue
+
+if condition:
+    print("Condition number of the matrix: ", condition)
 
 # Example how to access collected data (but you need exp and run number)
 chi2ndf = Belle2.PyStoreObj('MillepedeCollector_chi2/ndf', 1).obj().getObject('1.1')
@@ -143,3 +169,12 @@ print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import interactive
 interactive.embed()
+
+diagfile = ROOT.TFile('MillepedeJobDiagnostics.root', 'recreate')
+diagfile.cd()
+vxd.Write('values')
+corrections.Write('corrections')
+errors.Write('errors')
+eigenweights.Write('eigenweights')
+vxdtree.Write('vxdtree')
+diagfile.Close()

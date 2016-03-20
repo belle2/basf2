@@ -31,49 +31,8 @@ namespace Belle2 {
   class AlignableSVDRecoHit2D : public SVDRecoHit2D, public genfit::ICalibrationParametersDerivatives  {
     friend class SVDRecoHit2D;
   public:
-    /** Default constructor for ROOT IO. */
-    AlignableSVDRecoHit2D() : SVDRecoHit2D() {}
-
-    /** Construct SVDRecoHit from a SVDTrueHit for Monte Carlo based tracking.
-     * This requires a valid random number generator to be initialized at
-     * gRandom. The Hit position will be smeared using a gaussian smearing with
-     * sigmaU and sigmaV along u and v respectively
-     *
-     * If one of the errors is set <0, a default resolution will be
-     * assumed for both values by dividing the pixel size by sqrt(12).
-     *
-     * @param hit    SVDTrueHit to use as base
-     * @param sigmaU Error of the Hit along u
-     * @param sigmaV Error of the Hit along v
-     */
-    AlignableSVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit* trackCandHit = NULL, float sigmaU = -1,
-                          float sigmaV = -1) : SVDRecoHit2D(hit, trackCandHit, sigmaU, sigmaV) {setDetectorPlane();}
-
-
-    /** Construct SVDRecoHit directly from vxdid and coordinates without using a hit object from the storearray
-     * in the constructor
-     *
-     * @param vxdid  the vxd id so the reco hit knows on which sensor the measurment took place
-     * @param u coordinate of the Hit along u
-     * @param v coordinate of the Hit along v
-     * @param sigmaU Error of the Hit along u
-     * @param sigmaV Error of the Hit along v
-     */
-    AlignableSVDRecoHit2D(VxdID::baseType vxdid, const double u, const double v, double sigmaU = -1,
-                          double sigmaV = -1) : SVDRecoHit2D(vxdid, u, v, sigmaU, sigmaV) {setDetectorPlane();}
-
-    /** Construct SVDRecoHit from a u- and v- SVDCluster.
-     * @param uHit the u-type SVDCluster
-     * @param vHit the v-type SVDCluster
-     */
-    AlignableSVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit) : SVDRecoHit2D(uHit, vHit) {setDetectorPlane();}
-
-    /** Construct SVDRecoHit from a u- and v- (1D) SVDRecoHit.
-     * @param uRecoHit the u-type SVDRecoHit
-     * @param vRecoHit the v-type SVDRecoHit
-     */
-    AlignableSVDRecoHit2D(const SVDRecoHit& uRecoHit, const SVDRecoHit& vRecoHit) : SVDRecoHit2D(uRecoHit, vRecoHit) {setDetectorPlane();}
-
+    /** Inherit constructors */
+    using SVDRecoHit2D::SVDRecoHit2D;
 
     /** Destructor. */
     virtual ~AlignableSVDRecoHit2D() {}
@@ -97,12 +56,6 @@ namespace Belle2 {
      */
     virtual TMatrixD derivatives(const genfit::StateOnPlane* sop);
 
-    /**
-     * @brief Set the aligned detector plane
-     *
-     * @return void
-     */
-    void setDetectorPlane();
 
   private:
 

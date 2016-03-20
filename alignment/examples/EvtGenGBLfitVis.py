@@ -49,19 +49,8 @@ cdcDigitizer = register_module('CDCDigitizer')
 # find MCTracks
 track_finder_mc_truth = register_module('TrackFinderMCTruth')
 
-# select which detectors you would like to use
-param_track_finder_mc_truth = {  # select which particles to use: primary particles
-    'UseCDCHits': 1,
-    'UseSVDHits': 1,
-    'UsePXDHits': 1,
-    'UseClusters': False,
-    'WhichParticles': ['primary'],
-}
-track_finder_mc_truth.param(param_track_finder_mc_truth)
-
 # fitting
 fitting = register_module('GBLfit')
-fitting.param('UseClusters', False)
 fitting.param('BuildBelle2Tracks', True)
 # output
 output = register_module('RootOutput')
@@ -75,10 +64,15 @@ main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
-main.add_module('BeamParameters')
-main.add_module(evtgeninput)
+# main.add_module(evtgeninput)
+main.add_module('ParticleGun')
 main.add_module(g4sim)
+main.add_module('PXDDigitizer')
+main.add_module('SVDDigitizer')
+main.add_module('PXDClusterizer')
+main.add_module('SVDClusterizer')
 main.add_module(cdcDigitizer)
+main.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
 main.add_module(track_finder_mc_truth)
 main.add_module(fitting)
 main.add_module('Display')

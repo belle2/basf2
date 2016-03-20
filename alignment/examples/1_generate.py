@@ -77,9 +77,6 @@ class TrackFitCheck(Module):
 main = create_path()
 main.add_module('EventInfoSetter', expList=[experiment], runList=[run], evtNumList=[nevents])
 
-import beamparameters as beam
-beam.add_beamparameters(main, "Y4S")
-
 if cosmics_run:
     main.add_module('Cosmics')
 else:
@@ -92,19 +89,18 @@ if cosmics_run:
 else:
     main.add_module('Geometry', components=['BeamPipe', 'MagneticFieldConstant4LimitedRCDC', 'PXD', 'SVD'])
 
-main.add_module('MagnetConfiguration')
-
 main.add_module('FullSim')
+
 main.add_module('PXDDigitizer')
 main.add_module('SVDDigitizer')
 main.add_module('PXDClusterizer')
 main.add_module('SVDClusterizer')
+
 # main.add_module('CDCDigitizer')
-main.add_module('TrackFinderMCTruth', UseClusters=True, WhichParticles='SVD')
 
-
-main.add_module('MagnetSwitcher')
-main.add_module('GBLfit', UseClusters=True)
+main.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
+main.add_module('TrackFinderMCTruth', WhichParticles='SVD')
+main.add_module('GBLfit')
 
 store = create_path()
 store.add_module('RootOutput', outputFileName='DST_exp{:d}_run{:d}.root'.format(experiment, run))

@@ -6,9 +6,6 @@ import sys
 from basf2 import *
 from ROOT import Belle2
 
-reset_database()
-use_local_database()
-
 
 class VXDMisalignment:
     """ Class to generate VXDAlignment object in Database
@@ -101,21 +98,13 @@ main.add_module('Geometry', components=['MagneticFieldConstant4LimitedRCDC', 'PX
 
 misalignment = VXDMisalignment('VXDAlignment')
 # misalign everything
+
 misalignment.genSensorU('0.0.0', 0.01)
 misalignment.genSensorV('0.0.0', 0.01)
 misalignment.genSensorW('0.0.0', 0.01)
-misalignment.genSensorAlpha('0.0.0', 0.001)
-misalignment.genSensorBeta('0.0.0', 0.001)
-misalignment.genSensorGamma('0.0.0', 0.001)
-
-# Reset misalignment to zero for sensor we fix
-# in PedeSteering (see below)
-misalignment.setSensorAll('4.0.1', 0.0)
-misalignment.setSensorAll('5.0.1', 0.0)
-misalignment.setSensorAll('6.0.0', 0.0)
 
 main.add_module(
-    'MisalignmentGenerator',
+    'AlignmentGenerator',
     experimentLow=0,
     runLow=0,
     experimentHigh=-1,

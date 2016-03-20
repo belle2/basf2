@@ -64,8 +64,7 @@
 #include <genfit/Exception.h>
 #include <genfit/MeasurementFactory.h>
 
-//#include <tracking/gfbfield/GFGeant4Field.h>
-#include <alignment/gfbfield/GFGeant4RecoField.h>
+#include <tracking/gfbfield/GFGeant4Field.h>
 #include <alignment/GblMultipleScatteringController.h>
 
 #include <genfit/FieldManager.h>
@@ -252,31 +251,8 @@ void GBLfitModule::initialize()
 
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
-    if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
-      geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-      geoManager.createTGeoRepresentation();
-    }
-    //pass the magnetic field to genfit
-    genfit::FieldManager::getInstance()->init(new GFGeant4RecoField());
-    genfit::FieldManager::getInstance()->useCache();
-
-    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
-
-    // activate / deactivate material effects in genfit
-    genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(true);
-    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(false); // Noise matrix not used by GBL
-    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(false); // Noise matrix not used by GBL
-    genfit::MaterialEffects::getInstance()->setEnergyLossBrems(true);
-    genfit::MaterialEffects::getInstance()->setNoiseBrems(false); // Noise matrix not used by GBL
-
-    genfit::MaterialEffects::getInstance()->setMscModel("Highland");
-  } else {
-    B2WARNING("Material effects already set up! GBL uses own magnetic field interface and noise settings (no noise calculation)."
-              << std::endl <<
-              "By using your default field interface, you loose the possibility to process magnet ON/OFF data together. For noise, you are just wasting CPU time."
-             );
+    B2FATAL("Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
   }
-
 
   //read the pdgCode options and set attributes accordingly
   int nPdgCodes = m_pdgCodes.size();

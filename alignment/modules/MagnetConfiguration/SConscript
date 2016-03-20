@@ -1,7 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework', 'geometry']
-
-
-Return('env')
-

@@ -34,26 +34,30 @@ REG_MODULE(AlignmentGenerator)
 AlignmentGeneratorModule::AlignmentGeneratorModule() : Module()
 {
   std::vector<std::string> emptyData;
+  std::vector<int> infiniteIov{0, 0, -1, -1};
 
   setPropertyFlags(c_ParallelProcessingCertified);
   // Set module properties
-  setDescription("Generate VXD alignment and store in database");
+  setDescription("Generates VXD alignment."
+                 "Generated alignment overrides any existing one in reconstruction if done with this module. "
+                 "The generated object can also be stored as payload in the (local) DB, to keep track of it."
+                );
 
   // Parameter definitions
-  addParam("experimentLow", m_experimentLow, "Min experiment number to generate this alignment for", 0);
-  addParam("runLow", m_runLow, "Min run number to generate this alignment for", 0);
-  addParam("experimentHigh", m_experimentHigh, "Max experiment number to generate this alignment for", -1);
-  addParam("runHigh", m_runHigh, "Max run number to generate this alignment for", -1);
+  addParam("payloadIov", m_payloadIov, "IoV of the payload to be created. List "
+           "of four numbers: first experiment, first run, last experiment, "
+           "last run", infiniteIov);
+  addParam("createPayload", m_createPayload, "Store the generated alignment as payload in DB?", bool(false));
   addParam("data", m_data,
            "Data for alignment in format ['layer.ladder.sensor, parameter_no, distribution=fix|gaus|uniform, value', ...]",
            emptyData);
-  addParam("name", m_name, "Name of generated alignment in database", std::string(""));
+  addParam("payloadName", m_payloadName, "Name of generated alignment payload in database. If empty, default is used",
+           std::string(""));
 
 }
 
 void AlignmentGeneratorModule::initialize()
 {
-  IntervalOfValidity iov(m_experimentLow, m_runLow, m_experimentHigh, m_runHigh);
   auto data = new VXDAlignment();
 
   for (auto& id : VXD::GeoCache::getInstance().getListOfSensors()) {
@@ -87,10 +91,19 @@ void AlignmentGeneratorModule::initialize()
     }
   }
 
-  if (m_name == "")
-    Database::Instance().storeData(data, iov);
-  else
-    Database::Instance().storeData(m_name, data, iov);
+  std::string name = (m_payloadName == "") ? DBStore::objectName<VXDAlignment>("") : m_payloadName;
+
+  B2WARNING("Overriding VXDAlignment in DBStore with new object. This will affect reconstruction if done in this job.");
+  DBStore::Instance().addConstantOverride("dbstore", name, new VXDAlignment(*data));
+
+  if (m_createPayload) {
+    if (m_payloadIov.size() != 4)
+      B2FATAL("Payload IoV incorrect. Should be list of four numbers.");
+
+    B2INFO("Storing VXDAlignment payload in DB.");
+    IntervalOfValidity iov(m_payloadIov[0], m_payloadIov[1], m_payloadIov[2], m_payloadIov[3]);
+    Database::Instance().storeData(name, data, iov);
+  }
 
 }
 

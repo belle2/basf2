@@ -7,9 +7,6 @@ import ROOT
 from ROOT import Belle2
 import numpy as np
 
-reset_database()
-use_local_database()
-
 main = create_path()
 
 input = register_module('RootInput')

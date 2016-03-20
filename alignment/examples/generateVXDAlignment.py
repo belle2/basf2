@@ -111,11 +111,6 @@ class AlignmentGenerator:
         self.set_beta(vxdid, value)
         self.set_gamma(vxdid, value)
 
-main = create_path()
-
-main.add_module('EventInfoSetter')
-main.add_module('Gearbox')
-main.add_module('Geometry', components=['PXD', 'SVD'])
 
 alignment = AlignmentGenerator()
 
@@ -130,15 +125,11 @@ for u-shift of sensor 1 in all ladders of layer 1, do:
  alignment.gen_u_uniform('1.0.1', 0.01)
 """
 
-main.add_module(
-    'AlignmentGenerator',
-    experimentLow=0,
-    runLow=0,
-    experimentHigh=-1,
-    runHigh=-1,
-    name="",
-    data=alignment.get_alignment())
-
+main = create_path()
+main.add_module('EventInfoSetter')
+main.add_module('Gearbox')
+main.add_module('Geometry', components=['PXD', 'SVD'])
+main.add_module('AlignmentGenerator', payloadIov=[0, 0, -1, -1], payloadName="", data=alignment.get_alignment(), createPayload=True)
 main.add_module('Progress')
 
 process(main)

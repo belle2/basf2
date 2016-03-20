@@ -16,6 +16,9 @@
    <!-- Magnetic field inside PCMag @ DESY -->
    <xi:include href="VXD-MagneticField.xml" />
    <!-- Subdedectors -->
+   <DetectorComponent name="CDC" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
+     <xi:include href="../../cdc/CDC.xml" xpointer="xpointer(//DetectorComponent[@name='CDC']/*)" />
+   </DetectorComponent>   
    <DetectorComponent name="TB">
       <Creator library="testbeam">VXDTBCreator</Creator>
       <Content>

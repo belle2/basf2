@@ -16,6 +16,11 @@
    <!-- Magnetic field inside PCMag @ DESY -->
    <xi:include href="VXD-MagneticField.xml" />
    <!-- Subdedectors -->
+   <!-- TODO: This makes genfitter working, because it tries to initialize CDC translators which read params from GearBox -->
+   <DetectorComponent name="CDC" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
+     <xi:include href="../../cdc/CDC.xml" xpointer="xpointer(//DetectorComponent[@name='CDC']/*)" />
+   </DetectorComponent>
+  
    <DetectorComponent name="TB">
       <Creator library="testbeam">VXDTBCreator</Creator>
       <Content>

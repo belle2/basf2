@@ -17,12 +17,15 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <functional>
 
 
 namespace Belle2 {
 
   /**
-   * Singleton class to cache database objects
+   * Singleton class to cache database objects.
+   *
+   * The DBStore is the owner of the objects retrieved from the database.
    */
   class DBStore {
   public:
@@ -106,6 +109,18 @@ namespace Belle2 {
      */
     void addConstantOverride(const std::string& package, const std::string& module, TObject* obj, bool oneRun = false);
 
+    typedef std::function<void()> Callback;  /**< Type for callback functions **/
+
+    /**
+     * Add a callback function.
+     * The given function will be called whenever there is a new database entry for the given package/module.
+     *
+     * @param package    Package name under which the object is stored in the database (and in the DBStore).
+     * @param module     Module name under which the object is stored in the database (and in the DBStore).
+     * @param callback   The callback function.
+     */
+    void addCallback(const std::string& package, const std::string& module, Callback callback);
+
   private:
     /** Hidden constructor, as it is a singleton.*/
     explicit DBStore() {};
@@ -132,6 +147,12 @@ namespace Belle2 {
      */
     bool checkType(const DBEntry& dbEntry, const TObject* object) const;
 
+    /**
+     * Assign a new object and IoV to a given DBEntry and delete the old object.
+     *
+     * @param dbEntry    The existing DBStore entry.
+     * @param objectIov  A pair of the new object and new IoV.
+     */
     void updateEntry(DBEntry& dbEntry, const std::pair<TObject*, IntervalOfValidity>& objectIov);
 
     /** Map of package and module names to DBEntry objects. */

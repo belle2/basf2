@@ -95,6 +95,29 @@ namespace Belle2 {
       return result;
     }
 
+    /**
+     * Add a callback function.
+     * The given function will be called whenever there is a new database entry for this DBAccessor.
+     *
+     * @param callback   The callback function.
+     */
+    void addCallback(DBStore::Callback callback)
+    {
+      DBStore::Instance().addCallback(m_entry->package, m_entry->module, callback);
+    }
+
+    /**
+     * Add a callback method of an object.
+     * The given method will be called whenever there is a new database entry for this DBAccessor.
+     *
+     * @param object     The object with the callback method.
+     * @param callback   The callback method.
+     */
+    template<class T> void addCallback(T* object, void(T::*callback)(void))
+    {
+      DBStore::Instance().addCallback(m_entry->package, m_entry->module, std::bind(std::mem_fn(callback), object));
+    }
+
   protected:
     /** Pointer to the entry in the DBStore. */
     DBEntry* m_entry;

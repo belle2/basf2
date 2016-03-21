@@ -352,4 +352,71 @@ namespace {
     DBStore::Instance().update();
     EXPECT_FALSE(payload);
   }
+
+  /** Test callbacks */
+  int callbackCounter = 0;
+
+  void callback()
+  {
+    callbackCounter++;
+  }
+
+  class Callback {
+  public:
+    void callback(void)
+    {
+      callbackCounter++;
+    }
+  };
+  Callback callbackObject;
+
+  TEST_F(DataBaseTest, Callbacks)
+  {
+    StoreObjPtr<EventMetaData> evtPtr;
+    evtPtr->setRun(1);
+    evtPtr->setEvent(1);
+    callbackCounter = 0;
+
+    DBObjPtr<TNamed> named;
+    named.addCallback(&callback);
+    EXPECT_EQ(callbackCounter, 0);
+
+    evtPtr->setExperiment(2);
+    DBStore::Instance().update();
+    EXPECT_EQ(callbackCounter, 1);
+
+    evtPtr->setExperiment(4);
+    DBStore::Instance().update();
+    EXPECT_EQ(callbackCounter, 2);
+    DBStore::Instance().update();
+    EXPECT_EQ(callbackCounter, 2);
+
+    evtPtr->setExperiment(6);
+    DBStore::Instance().update();
+    EXPECT_EQ(callbackCounter, 3);
+
+    evtPtr->setExperiment(7);
+    DBStore::Instance().update();
+    EXPECT_EQ(callbackCounter, 3);
+
+    evtPtr->setExperiment(1);
+    DBStore::Instance().update();
+    EXPECT_EQ(callbackCounter, 4);
+
+    evtPtr->setRun(1);
+    DBObjPtr<TNamed> intraRun("IntraRun");
+    intraRun.addCallback(&callbackObject, &Callback::callback);
+
+    evtPtr->setEvent(1);
+    DBStore::Instance().updateEvent();
+    EXPECT_EQ(callbackCounter, 5);
+
+    evtPtr->setEvent(2);
+    DBStore::Instance().updateEvent();
+    EXPECT_EQ(callbackCounter, 5);
+
+    evtPtr->setEvent(10);
+    DBStore::Instance().updateEvent();
+    EXPECT_EQ(callbackCounter, 6);
+  }
 }  // namespace

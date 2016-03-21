@@ -13,6 +13,8 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/IntraRunDependency.h>
 #include <string>
+#include <vector>
+#include <functional>
 
 class TClass;
 
@@ -32,5 +34,6 @@ namespace Belle2 {
     TObject* object;   /**< pointer to the currently valid object that was returned from the database. **/
     IntervalOfValidity iov;   /**< the interval of validity of the object. **/
     IntraRunDependency* intraRunDependency;   /**< conditions data for cases where it changes during a run. **/
+    std::vector<std::function<void()>> callbackFunctions;   /**< vector of callback functions. **/
   };
 }

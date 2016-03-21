@@ -77,13 +77,18 @@ bool DBStore::checkType(const DBEntry& dbEntry, const TObject* object) const
 
 void DBStore::updateEntry(DBEntry& dbEntry, const std::pair<TObject*, IntervalOfValidity>& objectIov)
 {
+  if (dbEntry.intraRunDependency) {
+    delete dbEntry.intraRunDependency;
+    dbEntry.intraRunDependency = 0;
+  } else {
+    delete dbEntry.object;
+  }
+  dbEntry.object = 0;
   if (objectIov.first && objectIov.first->InheritsFrom(IntraRunDependency::Class())) {
-    dbEntry.object = 0;
     dbEntry.intraRunDependency = static_cast<IntraRunDependency*>(objectIov.first);
     m_intraRunDependencies.push_back(&dbEntry);
   } else {
     dbEntry.object = objectIov.first;
-    dbEntry.intraRunDependency = 0;
   }
   dbEntry.iov = objectIov.second;
 }
@@ -146,24 +151,42 @@ void DBStore::update()
   Database::Instance().getData(*m_event, invalidEntries);
 
   // Update DBStore entries
+  list<Callback> callbacks;
   for (auto& query : invalidEntries) {
     auto& dbEntry = m_dbEntries[query.package][query.module];
     if (!dbEntry.object && query.object) {
       if (!checkType(dbEntry, query.object)) continue;
     }
+    TObject* old = dbEntry.object;
     updateEntry(dbEntry, make_pair(query.object, query.iov));
-    // callbacks for updated objects could go here
+    if ((old != 0) || (dbEntry.object != 0)) {
+      for (auto& callback : dbEntry.callbackFunctions) {
+        callbacks.push_back(callback);
+      }
+    }
   }
+
+  // Callbacks
+  for (auto& callback : callbacks) callback();
 }
 
 
 void DBStore::updateEvent()
 {
   // loop over intra-run dependent conditions and update the objects if needed
+  list<Callback> callbacks;
   for (auto& dbEntry : m_intraRunDependencies) {
+    TObject* old = dbEntry->object;
     dbEntry->object = dbEntry->intraRunDependency->getObject(*m_event);
-    // callbacks for updated objects could go here
+    if (dbEntry->object != old) {
+      for (auto& callback : dbEntry->callbackFunctions) {
+        callbacks.push_back(callback);
+      }
+    }
   }
+
+  // Callbacks
+  for (auto& callback : callbacks) callback();
 }
 
 
@@ -212,4 +235,18 @@ void DBStore::addConstantOverride(const std::string& package, const std::string&
     }
   }
   B2WARNING("An override for DBEntry " << package << "/" << module << " was created.");
+}
+
+void DBStore::addCallback(const std::string& package, const std::string& module, Callback callback)
+{
+  const auto& packageEntry = m_dbEntries.find(package);
+  if (packageEntry != m_dbEntries.end()) {
+    const auto& moduleEntry = packageEntry->second.find(module);
+    if (moduleEntry != packageEntry->second.end()) {
+      DBEntry& dbEntry = moduleEntry->second;
+      dbEntry.callbackFunctions.push_back(callback);
+      return;
+    }
+  }
+  B2ERROR("Cannot add callback to unkown DB entry " << package << "/" << module << ".");
 }

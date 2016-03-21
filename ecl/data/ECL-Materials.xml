@@ -7,18 +7,6 @@
        <Element fraction="0.5115">I</Element>
     </Components>
   </Material>
-  <Material name="Si">
-     <density unit="g/cm3">2.3290</density>
-     <Components>
-        <Element fraction="1.0">Si</Element>
-     </Components>
-  </Material>
-  <Material name="Al">
-     <density unit="g/cm3">2.700</density>
-     <Components>
-        <Element fraction="1.0">Al</Element>
-     </Components>
-  </Material>
   <Material name="AlTeflon">
     <density unit="g/cm3">2.256</density>
     <Components>

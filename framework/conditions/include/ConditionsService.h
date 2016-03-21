@@ -13,9 +13,9 @@
 
 #include <string>
 #include <map>
-#include <framework/core/Module.h>
 
 namespace Belle2 {
+  class Module;
 
   /** The conditionsPayload structure holds the information related to payloads. */
   struct conditionsPayload {
@@ -140,8 +140,7 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
-    void writePayloadFile(std::string payloadFileName,
-                          Module* module) {writePayloadFile(payloadFileName, module->getPackage(), module->getName());};
+    void writePayloadFile(std::string payloadFileName, const Module* module);
 
     /** Adds a string to the buffer (for REST returns.)
      *  @param buffer The string to be added to the buffer.
@@ -165,7 +164,7 @@ namespace Belle2 {
      *
      *  @return Returns a string with the payload URL.
      */
-    std::string getPayloadFileURL(Module* module) {return getPayloadFileURL(module->getPackage(), module->getName());};
+    std::string getPayloadFileURL(const Module* module);
 
     /** Gets payload URL from run generated map and downloads conditions file if needed.
      *  @param packageName A string identifier for the payload type.  Does not necessarily need to be the BASF2 package.

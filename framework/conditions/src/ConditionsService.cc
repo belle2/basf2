@@ -1,6 +1,7 @@
 #include <framework/conditions/ConditionsService.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/core/Module.h>
 #include <framework/logging/Logger.h>
 #include <TFile.h>
 #include <TXMLEngine.h>
@@ -293,6 +294,10 @@ conditionsPayload ConditionsService::getPayloadInfo(std::string PackageModuleNam
   }
   return payload;
 }
+void ConditionsService::writePayloadFile(std::string payloadFileName, const Module* module)
+{
+  writePayloadFile(payloadFileName, module->getPackage(), module->getName());
+}
 
 void ConditionsService::writePayloadFile(std::string payloadFileName,
                                          std::string packageName,
@@ -379,6 +384,10 @@ size_t ConditionsService:: write_data(void* ptr, size_t size, size_t nmemb, FILE
   return written;
 }
 
+std::string ConditionsService::getPayloadFileURL(const Module* module)
+{
+  return getPayloadFileURL(module->getPackage(), module->getName());
+}
 
 std::string ConditionsService::getPayloadFileURL(std::string packageName, std::string moduleName)
 {

@@ -123,7 +123,7 @@ TObject* Database::readPayload(const std::string& fileName, const std::string& m
   TFile* file = TFile::Open(fileName.c_str());
   saveDir->cd();
   if (!file || !file->IsOpen()) {
-    B2ERROR("Could not open payload file " << fileName << ".");
+    B2ERROR("Could not open payload file " << fileName << " for reading.");
     delete file;
     return result;
   }
@@ -143,7 +143,7 @@ bool Database::writePayload(const std::string& fileName, const std::string& modu
   TDirectory* saveDir = gDirectory;
   TFile* file = TFile::Open(fileName.c_str(), "RECREATE");
   if (!file || !file->IsOpen()) {
-    B2ERROR("Could not open payload file " << fileName << ".");
+    B2ERROR("Could not open payload file " << fileName << " for writing.");
     delete file;
     saveDir->cd();
     return false;

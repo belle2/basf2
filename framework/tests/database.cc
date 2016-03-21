@@ -35,6 +35,8 @@ namespace {
     /** Type of database to be tested */
     EDatabaseType m_dbType = c_local;
 
+    TestHelpers::TempDirCreator m_tempDir; /**< ensure all tests are run inside a temporary directory. */
+
     /** Create a database with a TNamed object and an array of TObjects for experiment 1 to 5 each. */
     virtual void SetUp()
     {

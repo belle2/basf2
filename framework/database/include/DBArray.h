@@ -54,6 +54,17 @@ namespace Belle2 {
       return static_cast<T*>(obj); //type was checked by DataStore, so the cast is safe.
     }
 
+    template<class KEY> T* getByKey(KEY(T::*method)(void) const, KEY key) const
+    {
+      for (int i = 0; i < getEntries(); i++) {
+        T* obj = static_cast<T*>((*m_array)->At(i));
+        if ((*obj.*method)() == key) {
+          return obj;
+        }
+      }
+      return nullptr;
+    }
+
     /** Return iterator to first entry. */
     iterator begin() { return iterator(this, 0); }
     /** Return iterator to last entry +1. */

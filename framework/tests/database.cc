@@ -419,4 +419,24 @@ namespace {
     DBStore::Instance().updateEvent();
     EXPECT_EQ(callbackCounter, 6);
   }
+
+  /** Test the access to arrays by key */
+  TEST_F(DataBaseTest, KeyAccess)
+  {
+    StoreObjPtr<EventMetaData> evtPtr;
+    evtPtr->setExperiment(1);
+    DBStore::Instance().update();
+
+    DBArray<TObject> objects;
+    EXPECT_TRUE(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 1)->GetUniqueID() == 1);
+    EXPECT_TRUE(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 2) == 0);
+    EXPECT_TRUE(objects.getByKey(&TObject::IsFolder, false)->GetUniqueID() == 1);
+    EXPECT_TRUE(objects.getByKey(&TObject::IsFolder, true) == 0);
+
+    evtPtr->setExperiment(2);
+    DBStore::Instance().update();
+
+    EXPECT_TRUE(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 1)->GetUniqueID() == 1);
+    EXPECT_TRUE(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 2)->GetUniqueID() == 2);
+  }
 }  // namespace

@@ -30,6 +30,7 @@ namespace Belle2 {
 
     /**
      * Add an object to the intra run dependency.
+     * Note that the EventDependency object takes ownership of the added object.
      * @param event    the event number from which on the given conditions object is valid.
      * @param object   the object which is valid starting from the given event number.
      */

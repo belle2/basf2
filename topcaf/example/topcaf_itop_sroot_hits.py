@@ -70,7 +70,7 @@ histomanager = register_module("HistoManager")
 
 output = register_module('RootOutput')
 outputDict = {'outputFileName': outputFile,
-              'excludeBranchNames': ["EventWaveformPackets"]}
+              'excludeBranchNames': ["EventWaveformPackets", "RawDataBlocks"]}
 output.param(outputDict)
 
 pedmodule = register_module('Pedestal')

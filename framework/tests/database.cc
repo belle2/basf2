@@ -7,6 +7,7 @@
 #include <framework/database/DBArray.h>
 #include <framework/database/EventDependency.h>
 #include <framework/database/PayloadFile.h>
+#include <framework/database/DBPointer.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/utilities/TestHelpers.h>
@@ -430,15 +431,32 @@ namespace {
     DBStore::Instance().update();
 
     DBArray<TObject> objects;
-    EXPECT_TRUE(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 1)->GetUniqueID() == 1);
-    EXPECT_TRUE(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 2) == 0);
-    EXPECT_TRUE(objects.getByKey(&TObject::IsFolder, false)->GetUniqueID() == 1);
-    EXPECT_TRUE(objects.getByKey(&TObject::IsFolder, true) == 0);
+    EXPECT_EQ(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 1)->GetUniqueID(), 1);
+    EXPECT_EQ(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 2), nullptr);
+    EXPECT_EQ(objects.getByKey(&TObject::IsFolder, false)->GetUniqueID(), 1);
+    EXPECT_EQ(objects.getByKey(&TObject::IsFolder, true), nullptr);
 
     evtPtr->setExperiment(2);
     DBStore::Instance().update();
 
-    EXPECT_TRUE(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 1)->GetUniqueID() == 1);
-    EXPECT_TRUE(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 2)->GetUniqueID() == 2);
+    EXPECT_EQ(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 1)->GetUniqueID(), 1);
+    EXPECT_EQ(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 2)->GetUniqueID(), 2);
+  }
+
+  /** Test the access to arrays by key */
+  TEST_F(DataBaseTest, DBPointer)
+  {
+    StoreObjPtr<EventMetaData> evtPtr;
+    evtPtr->setExperiment(2);
+    DBStore::Instance().update();
+
+    DBPointer<TObject, unsigned int, &TObject::GetUniqueID> ptr(1);
+    EXPECT_EQ(ptr.key(), 1);
+    EXPECT_TRUE(ptr.isValid());
+    EXPECT_EQ(ptr->GetUniqueID(), 1);
+    ptr = 2;
+    EXPECT_EQ(ptr->GetUniqueID(), 2);
+    ptr = 3;
+    EXPECT_FALSE(ptr.isValid());
   }
 }  // namespace

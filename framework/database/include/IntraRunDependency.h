@@ -18,6 +18,8 @@ namespace Belle2 {
 
   /**
    * Base class for handling changing conditions during a run.
+   *
+   * Note that the IntraRunDependency object takes ownership of the individual payload objects.
    */
   class IntraRunDependency: public TObject {
   public:
@@ -26,7 +28,7 @@ namespace Belle2 {
      * Constructor for intra run depenent conditions.
      * @param object   the first valid object in the run.
      */
-    explicit IntraRunDependency(TObject* object = 0) {if (object) m_objects.Add(object);};
+    explicit IntraRunDependency(TObject* object = 0) {m_objects.SetOwner(true); if (object) m_objects.Add(object);};
 
     /**
      * Destructor.

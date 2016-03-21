@@ -110,9 +110,12 @@ if __name__ == "__main__":
     parser.add_argument("--retries", type=int, default=3,
                         help="Number of retries on connection problems (default: "
                         "%(default)s)")
-    parser.add_argument("--max-exp", default=None, type=int,
-                        help="Maximum experiment number to be set for iovs which "
-                        "don't have an end experiment")
+    parser.add_argument("--first-exp", default=None, type=int,
+                        help="Experiment number to be set for iovs which don't "
+                        "have a first experiment")
+    parser.add_argument("--final-exp", default=None, type=int,
+                        help="Experiment number to be set for iovs which don't "
+                        "have a final experiment")
     parser.add_argument("--base-url", default=ConditionsDB.BASE_URL,
                         help="URI for the base of the REST API (default: %(default)s)")
     parser.add_argument("--ignore-existing", action="store_true", default=False,
@@ -151,6 +154,7 @@ if __name__ == "__main__":
     entries = []
     experiments = set()
     missing = 0
+    unbound = {'first': False, 'final': False}
     with open(args.dbfile) as dbfile:
         for line in dbfile:
             entry = LocalDatabaseEntry(line, args.dbdir)
@@ -158,8 +162,14 @@ if __name__ == "__main__":
                 B2ERROR("Cannot find payload file %s" % entry.filename)
                 missing += 1
             entries.append(entry)
-            experiments.add(entry.firstRun["exp"])
-            experiments.add(entry.finalRun["exp"])
+            if(entry.firstRun["exp"] == -1):
+                unbound["first"] = True
+            else:
+                experiments.add(entry.firstRun["exp"])
+            if(entry.finalRun["exp"] == -1):
+                unbound["final"] = True
+            else:
+                experiments.add(entry.finalRun["exp"])
 
     # ok, we couldn't find all payload files, no need to continue
     if missing > 0:
@@ -171,18 +181,19 @@ if __name__ == "__main__":
     entries = sorted(set(reversed(entries)))
 
     # check if we have unbound experiments
-    if -1 in experiments:
-        # if so the --max-exp argument is needed to find out what we should use
-        # for -1
-        if args.max_exp is None:
-            B2ERROR("database file contains unbound final experiment which isn't "
-                    "supported by ConditionsDB. Please specify --max-exp to indicate "
-                    "which experiment should be used in its stead. Exiting.")
-            B2INFO("Existing experiments are: " + ", ".join(str(e) for e in sorted(db.get_experiments().keys(), key=natural_sortkey)))
-            sys.exit(1)
-        # so replace the -1 in the set
-        experiments.remove(-1)
-        experiments.add(args.max_exp)
+    for exp in "first", "final":
+        if unbound[exp]:
+            # if so the --max-exp argument is needed to find out what we should use
+            # for -1
+            if getattr(args, exp + "_exp") is None:
+                B2ERROR("database file contains unbound {0} experiment which isn't "
+                        "supported by ConditionsDB. Please specify --{0}-exp to indicate "
+                        "which experiment should be used in its stead. Exiting.".format(exp))
+                B2INFO("Existing experiments are: " +
+                       ", ".join(str(e) for e in sorted(db.get_experiments().keys(), key=natural_sortkey)))
+                sys.exit(1)
+            # so replace the -1 in the set
+            experiments.add(getattr(args, exp + "_exp"))
 
     # and just for fun, sort the experiments
     experiments = sorted(experiments)
@@ -229,15 +240,24 @@ if __name__ == "__main__":
     # or do nothing for each entry. First we have to convert exp/run numbers to
     # runId, removing unlimited experiments/runs in the process.
 
-    def update_run(run):
+    def update_run(run, name, unbound_exp, unbound_run):
         """Small helper function to update a given run with the runId
-        corresponding to the exp/run numbers"""
+        corresponding to the exp/run numbers
+
+        Args:
+            name (str): name when printing unbound replacement, one if "first" or "final"
+            unbound_exp (int): the experiment number to use for unbound experiments.
+            unbound_run (function): in case of an unbound run this function gets
+                called with a list of all possible run numbers and needs to
+                return the correct one.
+        """
         try:
             if run["exp"] == -1:
-                run["exp"] = args.max_exp
+                run["exp"] = unbound_exp
+                B2INFO("Replacing unbound {0} experiment with {exp}".format(name, **run))
             if run["run"] == -1:
-                run["run"] = max(existing_runs[run["exp"]])
-                B2INFO("Replacing unbound run for experiment {exp} with {run}".format(**run))
+                run["run"] = unbound_run(existing_runs[run["exp"]])
+                B2INFO("Replacing unbound {0} run for experiment {exp} with {run}".format(name, **run))
             run["id"] = existing_runs[run["exp"]][run["run"]]
             return 0
         except KeyError:
@@ -247,15 +267,15 @@ if __name__ == "__main__":
     errors = 0
     for entry in entries:
         # update entry to add run id to first and final run, count the errors
-        errors += update_run(entry.firstRun)
-        errors += update_run(entry.finalRun)
+        errors += update_run(entry.firstRun, "first", args.first_exp, min)
+        errors += update_run(entry.finalRun, "final", args.final_exp, max)
         # check if the final run is at least equal to the first run
         if entry.firstRun["exp"] > entry.finalRun["exp"] or \
                 (entry.firstRun["exp"] == entry.finalRun["exp"] and
                  entry.firstRun["run"] > entry.finalRun["run"]):
             B2ERROR("Invalid iov: final run ({final[exp]},{final[run]}) is before "
-                    "first run ({first[exp]},{first[run]}). Make sure --max-exp "
-                    "is correct if given".format(first=entry.firstRun, final=entry.finalRun))
+                    "first run ({first[exp]},{first[run]}). Make sure --fist_exp "
+                    "and --final-exp are correct if given".format(first=entry.firstRun, final=entry.finalRun))
             errors += 1
 
         # check for existing payload using package,module,checksum as key

@@ -100,7 +100,7 @@ namespace Belle2 {
      *
      *  @return true if payload exists, false if not.
      */
-    bool payloadExists(std::string PackageModuleName) {return (m_payloads.find(PackageModuleName) != m_payloads.end());}
+    bool payloadExists(std::string PackageModuleName) const {return (m_payloads.find(PackageModuleName) != m_payloads.end());}
 
     /** Adds a payload to the payload map.
      *  @param PackageModuleName The concatenation of the package.name and module.name.
@@ -147,7 +147,7 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
-    void addReturn(std::string buffer) {m_buffer = m_buffer + buffer;};
+    void addReturn(std::string buffer) {m_buffer += buffer;};
 
     /** Adds a payload file to the conditions database.
      *  @param payloadFileName The file name of the payload.
@@ -182,10 +182,10 @@ namespace Belle2 {
     ConditionsService();
 
     /** Singleton, so control use of constructors */
-    ConditionsService(ConditionsService const&);
+    ConditionsService(ConditionsService const&) = delete;
 
     /** Singleton, so control use of copy operator */
-    void operator=(ConditionsService const&);
+    void operator=(ConditionsService const&) = delete;
 
     /** Singleton, so control use of destructor */
     ~ConditionsService();
@@ -195,10 +195,10 @@ namespace Belle2 {
     static size_t capture_return(void* buffer, size_t size, size_t nmemb, void* userp);
 
     /** Function to parse payloads */
-    void parse_payloads(std::string temp);
+    static void parse_payloads(std::string temp);
 
     /** Function to parse generic xml return and display */
-    void parse_return(std::string temp);
+    static void parse_return(std::string temp);
 
     /** Function to facilitate downloading files */
     static size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream);

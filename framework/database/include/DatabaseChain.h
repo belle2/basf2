@@ -72,7 +72,7 @@ namespace Belle2 {
                             IntervalOfValidity& iov);
 
     /** Return the list of registered databases. */
-    std::vector<Database*> getDatabases() { return m_databases; }
+    const std::vector<Database*>& getDatabases() const { return m_databases; }
 
   private:
     /** Hidden constructor, as it is a singleton. */

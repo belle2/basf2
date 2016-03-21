@@ -310,7 +310,7 @@ void ConditionsService::writePayloadFile(std::string payloadFileName,
                                          std::string moduleName)
 {
 
-  TMD5* checksum = TMD5::FileChecksum(payloadFileName.c_str());
+  std::unique_ptr<TMD5> checksum(TMD5::FileChecksum(payloadFileName.c_str()));
 
   if (!checksum) {
     B2ERROR("Error calculating checksum for file " << payloadFileName << ".  Are you sure it exists?");

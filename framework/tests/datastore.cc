@@ -54,6 +54,7 @@ namespace {
         //fancy constructors
         // cppcheck-suppress memleak
         newobj = evtDataDifferentDurability.appendNew(30 + i);
+        ASSERT_TRUE(newobj != nullptr);
 
         //copy-construct ProfileInfo objects
         profileInfo.appendNew(profileInfoObject);

@@ -61,7 +61,9 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
   offset += 6;
 
 
+
   for (int k = 0; k < ncpr; k++) {
+    int top_pos = offset;
     //
     // RawHeader
     //
@@ -101,6 +103,8 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
 
 #ifdef REDUCED_DATA
 #else
+    int top_pos_cpr = offset;
+
     // COPPER header
     buf[ offset +  0 ] = 0x7fff0008;
     buf[ offset +  2 ] = 0;
@@ -150,12 +154,17 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
 #else
     // COPPER trailer/Raw Trailer
     buf[ offset ] = 0xfffff5f5;
-    buf[ offset + 1 ] = 0;
+    buf[ offset + 1 ] = buf[ top_pos_cpr ];
+    for (int j = top_pos_cpr + 1; j < offset + 1; j++) {
+      buf[ offset + 1 ] ^= buf[ j ];
+    }
     buf[ offset + 2 ] = 0x7fff0009;
     offset += 3;
 #endif
-
-    buf[ offset  ] = 0;
+    buf[ offset  ] = buf[ top_pos ];
+    for (int j = top_pos + 1; j < offset; j++) {
+      buf[ offset  ] ^= buf[ j ];
+    }
     buf[ offset + 1 ] = 0x7fff0006;
     offset += 2;
   }
@@ -164,6 +173,9 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
   buf[ offset ] = 0;
   buf[ offset + 1 ] = 0x7fff0000;
   offset += 2;
+
+
+
   return offset;
 }
 
@@ -173,26 +185,41 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
 //inline void addEvent(int* buf, int nwords, unsigned int event)
 {
   int offset = 0;
+  int prev_offset;
   buf[ offset + 4 ] = event;
   offset += NW_SEND_HEADER;
 
   for (int k = 0; k < ncpr; k++) {
+    int nwords = buf[ offset ];
+    int posback_xorchksum = 2;
+    int pos_xorchksum = offset + nwords - posback_xorchksum;
+    prev_offset = offset;
     if (buf[ offset + 4 ] != 0x12345601) {
       printf("ERROR 2 0x%.x", buf[ offset + 4 ]);
       fflush(stdout);
       exit(1);
     }
     // RawHeader
+    buf[ pos_xorchksum ] ^= buf[ offset + 3];
     buf[ offset + 3] = event;
+    buf[ pos_xorchksum ] ^= buf[ offset + 3];
 
 #ifdef REDUCED_DATA
     offset += NW_RAW_HEADER + NW_COPPER_HEADER +
               nhslb * (NW_B2L_HEADER + nwords_per_fee + NW_B2L_TRAILER)
               + NW_COPPER_TRAILER + NW_RAW_TRAILER;
 #else
+    int pos_xorchksum_cpr = offset + nwords - 4;
+    buf[ pos_xorchksum ] ^= buf[ pos_xorchksum_cpr ];
+
     // COPPER header
     offset += NW_RAW_HEADER;
+
+    buf[ pos_xorchksum ] ^= buf[ offset + 1];
+    buf[ pos_xorchksum_cpr ] ^= buf[ offset + 1];
     buf[ offset +  1 ] = event;
+    buf[ pos_xorchksum ] ^= buf[ offset + 1];
+    buf[ pos_xorchksum_cpr ] ^= buf[ offset + 1];
     offset += NW_COPPER_HEADER;
 
     for (int i = 0; i < nhslb ; i++) {
@@ -201,12 +228,37 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
         fflush(stdout);
         exit(1);
       }
+
+      buf[ pos_xorchksum ] ^= buf[ offset + 0];
+      buf[ pos_xorchksum_cpr ] ^= buf[ offset + 0];
       buf[ offset +  0 ] = 0xffaa0000 + (event & 0xffff);
+      buf[ pos_xorchksum ] ^= buf[ offset + 0];
+      buf[ pos_xorchksum_cpr ] ^= buf[ offset + 0];
+
+      buf[ pos_xorchksum ] ^= buf[ offset + 2];
+      buf[ pos_xorchksum_cpr ] ^= buf[ offset + 2];
       buf[ offset +  2 ] = event;
+      buf[ pos_xorchksum ] ^= buf[ offset + 2];
+      buf[ pos_xorchksum_cpr ] ^= buf[ offset + 2];
       offset += NW_B2L_HEADER + nwords_per_fee + NW_B2L_TRAILER;
     }
     offset += NW_COPPER_TRAILER + NW_RAW_TRAILER;
+    unsigned int xor_chksum = 0;
+    unsigned int xor_chksum2 = 0;
+
+    buf[ pos_xorchksum ] ^= buf[ pos_xorchksum_cpr ];
+
 #endif
+
+    // for(int i=prev_offset + NW_RAW_HEADER; i< offset - 4;i++){
+    //   xor_chksum2 ^= buf[ i ];
+    // }
+    // buf[ offset -4 ]  = xor_chksum2;
+
+    // for(int i=prev_offset;i< offset -2;i++){
+    //   xor_chksum ^= buf[ i ];
+    // }
+    // buf[ offset -2 ]  = xor_chksum;
 
   }
 
@@ -261,6 +313,7 @@ int main(int argc, char** argv)
   //
   // Prepare header
   //
+
   int temp_ret = fillDataContents(buff, nwords_per_fee, node_id, ncpr, nhslb, run_no);
   if (temp_ret != total_words) {
     printf("ERROR1 %d %d\n", total_words, temp_ret);

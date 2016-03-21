@@ -10,9 +10,11 @@
 
 #include <curl/curl.h>
 
-#include <iostream>
-#include <string>
 #include <boost/filesystem.hpp>
+
+#include <iostream>
+#include <memory>
+#include <string>
 
 using namespace Belle2;
 
@@ -402,7 +404,7 @@ std::string ConditionsService::getPayloadFileURL(std::string packageName, std::s
 
   if (m_FILEbase.substr(0, 7) == "http://") { // May need to transfer files locally.
     local_file = m_FILElocal + boost::filesystem::path(remote_file).filename().string();
-    TMD5* checksum = TMD5::FileChecksum(local_file.c_str()); // check if the file exists
+    std::unique_ptr<TMD5> checksum(TMD5::FileChecksum(local_file.c_str())); // check if the file exists
 
     remote_file = m_FILEbase + remote_file;
     if (!checksum) { // file isn't there.  Start downloading.
@@ -433,21 +435,20 @@ std::string ConditionsService::getPayloadFileURL(std::string packageName, std::s
           B2ERROR("libcurl error code " << res << " trying to download file.");
         }
       }
-      checksum = TMD5::FileChecksum(local_file.c_str()); // check checksum
+      checksum.reset(TMD5::FileChecksum(local_file.c_str())); // check checksum
     } else if (checksum->AsString() == m_payloads[packageName + moduleName].md5Checksum) {
       B2INFO("Found file: " << local_file << " with correct MD5 checksum: " << checksum->AsString());
       return local_file;
     }
 
 
-    TMD5* checksum_new;
     while (checksum->AsString() != m_payloads[packageName + moduleName].md5Checksum) { // then there was a checksum mis-match
       gSystem->Sleep(1000);
-      checksum_new = TMD5::FileChecksum(local_file.c_str()); // check checksum again
+      std::unique_ptr<TMD5> checksum_new(TMD5::FileChecksum(local_file.c_str())); // check checksum again
       if (std::string(checksum->AsString()) != std::string(checksum_new->AsString())) {   // Then we are downloading the file already.
         B2INFO("File with incorrect checksum found, download appears to be occuring... waiting for file to complete ");
         B2INFO("checksum: " << checksum->AsString() << "\tchecksum_new: " << checksum_new->AsString());
-        checksum = checksum_new;
+        checksum = std::move(checksum_new);
       } else { // File isn't downloading, but checksums don't match.  Throw an error.
         B2FATAL("Error with file " << local_file.c_str() << " checksum expected: " << m_payloads[packageName + moduleName].md5Checksum <<
                 " found: " << checksum->AsString());
@@ -457,7 +458,7 @@ std::string ConditionsService::getPayloadFileURL(std::string packageName, std::s
     }
   }
 
-  TMD5* checksum = TMD5::FileChecksum(local_file.c_str()); // check if the file exists
+  std::unique_ptr<TMD5> checksum(TMD5::FileChecksum(local_file.c_str())); // check if the file exists
   if (!checksum) { // file isn't there.  Toss an error.
     B2ERROR("Did not find file " << local_file << " check inputs.");
   } else if (std::string(checksum->AsString()) != m_payloads[packageName +

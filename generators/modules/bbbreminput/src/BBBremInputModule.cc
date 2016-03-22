@@ -61,17 +61,21 @@ void BBBremInputModule::initialize()
 
   //Beam Parameters, initial particle - BBBREM cannot handle beam energy spread
   m_initial.initialize();
-  const BeamParameters& nominal = m_initial.getBeamParameters();
-  double centerOfMassEnergy = nominal.getMass();
-
-  m_generator.init(centerOfMassEnergy, m_photonEFrac, m_unweighted, m_maxWeight, m_densityCorrectionMode,
-                   m_DensityCorrectionParameter);
 
 }
 
 
 void BBBremInputModule::event()
 {
+  // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)
+  if (m_beamParams.hasChanged()) {
+    if (!m_initialized) {
+      initializeGenerator();
+    } else {
+      B2FATAL("BBBremInputModule::event(): BeamParameters have changed within a job, this is not supported for BBBREM!");
+    }
+  }
+
   StoreObjPtr<EventMetaData> evtMetaData("EventMetaData", DataStore::c_Event);
 
   // initial particle from beam parameters
@@ -102,4 +106,17 @@ void BBBremInputModule::terminate()
   B2RESULT("Maximum weight delivered:                   " << m_generator.getMaxWeightDelivered())
   B2RESULT("Overweight bias cross-section (unweighted): " << m_generator.getCrossSectionOver() << " +/- " <<
            m_generator.getCrossSectionErrorOver() << " [mb]")
+}
+
+void BBBremInputModule::initializeGenerator()
+{
+
+  const BeamParameters& nominal = m_initial.getBeamParameters();
+  double centerOfMassEnergy = nominal.getMass();
+
+  m_generator.init(centerOfMassEnergy, m_photonEFrac, m_unweighted, m_maxWeight, m_densityCorrectionMode,
+                   m_DensityCorrectionParameter);
+
+  m_initialized = true;
+
 }

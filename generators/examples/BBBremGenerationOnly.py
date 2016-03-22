@@ -9,7 +9,6 @@
 ########################################################
 
 from basf2 import *
-from beamparameters import add_beamparameters
 
 # Set the global log level
 set_log_level(LogLevel.INFO)
@@ -17,12 +16,6 @@ set_log_level(LogLevel.INFO)
 main = create_path()
 
 main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=10000)
-
-# beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
-beamparameters.param("smearVertex", True)
-beamparameters.param("generateCMS", False)
-# print_params(beamparameters)
 
 # Register the BBBremInput module
 bbbrem = register_module('BBBremInput')

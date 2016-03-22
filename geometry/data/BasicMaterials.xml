@@ -12,30 +12,12 @@
     </Components>
   </Material>
 
-  <Material name="Ethane">
-    <state>Gas</state>
-    <density unit="g/cm3">1.356e-3</density>
-    <Components>
-      <Element fraction="0.7989">C</Element>
-      <Element fraction="0.2011">H</Element>
-    </Components>
-  </Material>
-
   <Material name="CDCGas">
     <state>Gas</state>
     <density unit="g/cm3">7.67e-4</density>
     <Components>
       <Element fraction="0.500">He</Element>
       <Material fraction="0.500">Ethane</Material>
-    </Components>
-  </Material>
-
-  <Material name="Paraffin">
-    <state>Liquid</state>
-    <density unit="g/cm3">0.93</density>
-    <Components>
-      <Element fraction="0.15">H</Element>
-      <Element fraction="0.85">O</Element>
     </Components>
   </Material>
 </Materials>

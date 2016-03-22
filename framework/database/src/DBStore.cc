@@ -151,7 +151,7 @@ void DBStore::update()
   Database::Instance().getData(*m_event, invalidEntries);
 
   // Update DBStore entries
-  list<Callback> callbacks;
+  DBCallbackMap callbacks;
   for (auto& query : invalidEntries) {
     auto& dbEntry = m_dbEntries[query.package][query.module];
     if (!dbEntry.object && query.object) {
@@ -161,32 +161,32 @@ void DBStore::update()
     updateEntry(dbEntry, make_pair(query.object, query.iov));
     if ((old != 0) || (dbEntry.object != 0)) {
       for (auto& callback : dbEntry.callbackFunctions) {
-        callbacks.push_back(callback);
+        callbacks[callback.first] = callback.second;
       }
     }
   }
 
   // Callbacks
-  for (auto& callback : callbacks) callback();
+  for (auto& callback : callbacks) callback.second();
 }
 
 
 void DBStore::updateEvent()
 {
   // loop over intra-run dependent conditions and update the objects if needed
-  list<Callback> callbacks;
+  DBCallbackMap callbacks;
   for (auto& dbEntry : m_intraRunDependencies) {
     TObject* old = dbEntry->object;
     dbEntry->object = dbEntry->intraRunDependency->getObject(*m_event);
     if (dbEntry->object != old) {
       for (auto& callback : dbEntry->callbackFunctions) {
-        callbacks.push_back(callback);
+        callbacks[callback.first] = callback.second;
       }
     }
   }
 
   // Callbacks
-  for (auto& callback : callbacks) callback();
+  for (auto& callback : callbacks) callback.second();
 }
 
 
@@ -237,14 +237,14 @@ void DBStore::addConstantOverride(const std::string& package, const std::string&
   B2WARNING("An override for DBEntry " << package << "/" << module << " was created.");
 }
 
-void DBStore::addCallback(const std::string& package, const std::string& module, Callback callback)
+void DBStore::addCallback(const std::string& package, const std::string& module, DBCallback callback, DBCallbackId id)
 {
   const auto& packageEntry = m_dbEntries.find(package);
   if (packageEntry != m_dbEntries.end()) {
     const auto& moduleEntry = packageEntry->second.find(module);
     if (moduleEntry != packageEntry->second.end()) {
       DBEntry& dbEntry = moduleEntry->second;
-      dbEntry.callbackFunctions.push_back(callback);
+      dbEntry.callbackFunctions[id] = callback;
       return;
     }
   }

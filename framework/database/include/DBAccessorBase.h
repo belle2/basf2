@@ -101,9 +101,10 @@ namespace Belle2 {
      *
      * @param callback   The callback function.
      */
-    void addCallback(DBStore::Callback callback)
+    void addCallback(void(*callback)())
     {
-      DBStore::Instance().addCallback(m_entry->package, m_entry->module, callback);
+      DBStore::Instance().addCallback(m_entry->package, m_entry->module, callback, std::make_pair(reinterpret_cast<void*>(callback),
+                                      nullptr));
     }
 
     /**
@@ -113,9 +114,10 @@ namespace Belle2 {
      * @param object     The object with the callback method.
      * @param callback   The callback method.
      */
-    template<class T> void addCallback(T* object, void(T::*callback)(void))
+    template<class T> void addCallback(T* object, void(T::*callback)())
     {
-      DBStore::Instance().addCallback(m_entry->package, m_entry->module, std::bind(std::mem_fn(callback), object));
+      DBStore::Instance().addCallback(m_entry->package, m_entry->module, std::bind(std::mem_fn(callback), object),
+                                      std::make_pair(reinterpret_cast<void*>(callback), object));
     }
 
   protected:

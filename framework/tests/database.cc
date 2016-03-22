@@ -402,6 +402,9 @@ namespace {
     DBStore::Instance().update();
     EXPECT_EQ(callbackCounter, 3);
 
+    DBArray<TObject> objects;
+    objects.addCallback(&callback);
+
     evtPtr->setExperiment(1);
     DBStore::Instance().update();
     EXPECT_EQ(callbackCounter, 4);

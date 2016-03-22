@@ -109,8 +109,6 @@ namespace Belle2 {
      */
     void addConstantOverride(const std::string& package, const std::string& module, TObject* obj, bool oneRun = false);
 
-    typedef std::function<void()> Callback;  /**< Type for callback functions **/
-
     /**
      * Add a callback function.
      * The given function will be called whenever there is a new database entry for the given package/module.
@@ -119,7 +117,7 @@ namespace Belle2 {
      * @param module     Module name under which the object is stored in the database (and in the DBStore).
      * @param callback   The callback function.
      */
-    void addCallback(const std::string& package, const std::string& module, Callback callback);
+    void addCallback(const std::string& package, const std::string& module, DBCallback callback, DBCallbackId id);
 
   private:
     /** Hidden constructor, as it is a singleton.*/

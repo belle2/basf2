@@ -9,7 +9,6 @@
 ########################################################
 
 from basf2 import *
-from beamparameters import add_beamparameters
 import os
 import sys
 
@@ -20,12 +19,6 @@ main = create_path()
 
 # event info setter
 main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
-
-# beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
-beamparameters.param("smearVertex", False)
-beamparameters.param("generateCMS", False)
-# print_params(beamparameters)
 
 # generator
 aafh = register_module('AafhInput')

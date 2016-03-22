@@ -93,41 +93,35 @@ void AafhInputModule::initialize()
 
   //Beam Parameters, initial particle - AAFH cannot handle beam energy spread
   m_initial.initialize();
-  const BeamParameters& nominal = m_initial.getBeamParameters();
-  const double beamEnergy = nominal.getMass() / 2.;
-
-  //Set Generator options
-  if (m_mode < 1 || m_mode > 5) {
-    B2ERROR("AAFH: mode must be a value between 1 and 5");
-  }
-  if (m_rejection < 1 || m_rejection > 2) {
-    B2ERROR("AAFH: rejection must be a value between 1 and 2");
-  }
-  m_generator.setMaxTries(m_maxTries);
-  m_generator.setParticle(m_particle);
-  m_generator.setMinimumMass(m_minMass);
-  m_generator.setGeneratorWeights(m_subgeneratorWeights);
-  m_generator.setSupressionLimits(m_suppressionLimits);
-  m_generator.setMaxWeights(m_maxSubgeneratorWeight, m_maxFinalWeight);
-  m_generator.initialize(beamEnergy, (AAFHInterface::EMode) m_mode,
-                         (AAFHInterface::ERejection)m_rejection);
 }
 
 void AafhInputModule::event()
 {
-  // initial particle from beam parameters
+
+  // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)
+  if (m_beamParams.hasChanged()) {
+    if (!m_initialized) {
+      initializeGenerator();
+    } else {
+      B2FATAL("AafhInputModule::event(): BeamParameters have changed within a job, this is not supported for AAFH!");
+    }
+  }
+
+  // Initial particle from beam parameters (for random vertex)
   MCInitialParticles& initial = m_initial.generate();
-  // true boost
+
+  // True boost.
   TLorentzRotation boost = initial.getCMSToLab();
-  // vertex
+
+  // vertex.
   TVector3 vertex = initial.getVertex();
 
   MCParticleGraph mpg;
 
-  //Generate event
+  //Generate event.
   m_generator.generateEvent(mpg);
 
-  //Boost to lab and set vertex
+  //Boost to lab and set vertex.
   for (size_t i = 0; i < mpg.size(); ++i) {
     mpg[i].set4Vector(boost * mpg[i].get4Vector());
 
@@ -144,6 +138,31 @@ void AafhInputModule::event()
 void AafhInputModule::terminate()
 {
   m_generator.finish();
+}
+
+void AafhInputModule::initializeGenerator()
+{
+  const BeamParameters& nominal = m_initial.getBeamParameters();
+  const double beamEnergy = nominal.getMass() / 2.;
+
+  //Set Generator options
+  if (m_mode < 1 || m_mode > 5) {
+    B2ERROR("AafhInputModule::initializeGenerator: 'mode' must be a value between 1 and 5");
+  }
+  if (m_rejection < 1 || m_rejection > 2) {
+    B2ERROR("AafhInputModule::initializeGenerator: 'rejection' must be a value between 1 and 2");
+  }
+  m_generator.setMaxTries(m_maxTries);
+  m_generator.setParticle(m_particle);
+  m_generator.setMinimumMass(m_minMass);
+  m_generator.setGeneratorWeights(m_subgeneratorWeights);
+  m_generator.setSupressionLimits(m_suppressionLimits);
+  m_generator.setMaxWeights(m_maxSubgeneratorWeight, m_maxFinalWeight);
+  m_generator.initialize(beamEnergy, (AAFHInterface::EMode) m_mode,
+                         (AAFHInterface::ERejection)m_rejection);
+
+  m_initialized = true;
+
 }
 
 

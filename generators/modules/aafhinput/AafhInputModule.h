@@ -3,7 +3,7 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
+ * Contributors: Martin Ritter, Torben Ferber                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -47,26 +47,43 @@ namespace Belle2 {
   private:
     /** Generator mode */
     int m_mode;
+
     /** Rejection mode */
     int m_rejection;
+
     /** maximum number of tries for generating an event */
     int m_maxTries;
+
     /** maximum expected final weight for rejection scheme */
     double m_maxFinalWeight;
+
     /** maximum expected subgenerator weight for rejection scheme */
     double m_maxSubgeneratorWeight;
+
     /** minimum invariant mass of generated fermion pair */
     double m_minMass;
+
     /** name of the generated particle for modes c_MuonParticle and c_ElectronParticle */
     std::string m_particle;
+
     /** relative subgenerator weights */
     std::vector<double> m_subgeneratorWeights;
+
     /** suppression limits for the matrix element calculations */
     std::vector<double> m_suppressionLimits;
+
     /** MCParticle collection */
     StoreArray<MCParticle> m_mcparticles;
+
     /** interface to the generator */
     AAFHInterface m_generator;
+
+    /** Method is called to initialize the generator. */
+    void initializeGenerator();
+
+    bool m_initialized{false}; /**< True if generator has been initialized. */
+    DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter. */
+
     /** initial particle used by BeamParameter class */
     InitialParticleGeneration m_initial;
   };

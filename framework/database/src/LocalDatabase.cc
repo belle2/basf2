@@ -129,7 +129,8 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& e
 }
 
 
-bool LocalDatabase::storeData(const std::string& package, const std::string& module, TObject* object, IntervalOfValidity& iov)
+bool LocalDatabase::storeData(const std::string& package, const std::string& module, TObject* object,
+                              const IntervalOfValidity& iov)
 {
   if (m_readOnly) {
     B2ERROR("Database file " << m_fileName << " is opened in read-only mode.");
@@ -163,7 +164,7 @@ bool LocalDatabase::storeData(const std::string& package, const std::string& mod
 }
 
 bool LocalDatabase::addPayload(const std::string& package, const std::string& module, const std::string& fileName,
-                               IntervalOfValidity& iov)
+                               const IntervalOfValidity& iov)
 {
   if (m_readOnly) {
     B2ERROR("Database file " << m_fileName << " is opened in read-only mode.");

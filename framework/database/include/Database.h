@@ -99,7 +99,7 @@ namespace Belle2 {
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    virtual bool storeData(const std::string& package, const std::string& module, TObject* object, IntervalOfValidity& iov) = 0;
+    virtual bool storeData(const std::string& package, const std::string& module, TObject* object, const IntervalOfValidity& iov) = 0;
 
     /**
      * Store an object in the database with the default package name "dbstore".
@@ -109,7 +109,7 @@ namespace Belle2 {
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    bool storeData(const std::string& module, TObject* object, IntervalOfValidity& iov) {return storeData("dbstore", module, object, iov);};
+    bool storeData(const std::string& module, TObject* object, const IntervalOfValidity& iov) {return storeData("dbstore", module, object, iov);};
 
     /**
      * Store an ClonesArray in the database with the default package name "dbstore" and default module name.
@@ -118,7 +118,7 @@ namespace Belle2 {
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    bool storeData(TClonesArray* array, IntervalOfValidity& iov) {return storeData("dbstore", DataStore::defaultArrayName(array->ClassName()), array, iov);};
+    bool storeData(TClonesArray* array, const IntervalOfValidity& iov) {return storeData("dbstore", DataStore::defaultArrayName(array->ClassName()), array, iov);};
 
     /**
      * Store an object in the database with the default package name "dbstore" and default module name.
@@ -127,7 +127,7 @@ namespace Belle2 {
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    template<class T> bool storeData(T* object, IntervalOfValidity& iov) {return storeData("dbstore", DBStore::objectName<T>(""), object, iov);};
+    template<class T> bool storeData(T* object, const IntervalOfValidity& iov) {return storeData("dbstore", DBStore::objectName<T>(""), object, iov);};
 
     /**
      * Store multiple objects in the database.
@@ -147,7 +147,7 @@ namespace Belle2 {
      * @return           True if the storage of the object succeeded.
      */
     virtual bool addPayload(const std::string& package, const std::string& module, const std::string& fileName,
-                            IntervalOfValidity& iov) = 0;
+                            const IntervalOfValidity& iov) = 0;
 
     /**
      * Add a payload file to the database.
@@ -157,7 +157,7 @@ namespace Belle2 {
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    bool addPayload(const std::string& module, const std::string& fileName, IntervalOfValidity& iov) {return addPayload("dbstore", module, fileName, iov);};
+    bool addPayload(const std::string& module, const std::string& fileName, const IntervalOfValidity& iov) {return addPayload("dbstore", module, fileName, iov);};
 
     /**
      * Exposes setGlobalTag function of the Database class to Python.

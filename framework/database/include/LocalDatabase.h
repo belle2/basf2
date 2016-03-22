@@ -46,7 +46,7 @@ namespace Belle2 {
      * @return           A pair of a pointer to the object and the interval for which it is valid
      */
     virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& package,
-                                                            const std::string& module);
+                                                            const std::string& module) override;
 
     /**
      * Store an object in the database.
@@ -57,7 +57,8 @@ namespace Belle2 {
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    virtual bool storeData(const std::string& package, const std::string& module, TObject* object, IntervalOfValidity& iov);
+    virtual bool storeData(const std::string& package, const std::string& module, TObject* object,
+                           const IntervalOfValidity& iov) override;
 
     /**
      * Add a payload file to the database.
@@ -69,7 +70,7 @@ namespace Belle2 {
      * @return           True if the storage of the object succeeded.
      */
     virtual bool addPayload(const std::string& package, const std::string& module, const std::string& fileName,
-                            IntervalOfValidity& iov);
+                            const IntervalOfValidity& iov) override;
 
   private:
     /**

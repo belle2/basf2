@@ -34,7 +34,7 @@ void DBImportBase::addIntraRunDependency(unsigned long long int tag,
 }
 
 
-bool DBImportBase::import(IntervalOfValidity& iov)
+bool DBImportBase::import(const IntervalOfValidity& iov)
 {
 
   switch (m_dependency) {

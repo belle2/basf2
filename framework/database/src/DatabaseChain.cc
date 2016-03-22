@@ -69,7 +69,8 @@ pair<TObject*, IntervalOfValidity> DatabaseChain::getData(const EventMetaData& e
   return result;
 }
 
-bool DatabaseChain::storeData(const std::string& package, const std::string& module, TObject* object, IntervalOfValidity& iov)
+bool DatabaseChain::storeData(const std::string& package, const std::string& module, TObject* object,
+                              const IntervalOfValidity& iov)
 {
   if (m_databases.empty()) {
     B2ERROR("No database backend available.");
@@ -80,7 +81,7 @@ bool DatabaseChain::storeData(const std::string& package, const std::string& mod
 }
 
 bool DatabaseChain::addPayload(const std::string& package, const std::string& module, const std::string& fileName,
-                               IntervalOfValidity& iov)
+                               const IntervalOfValidity& iov)
 {
   if (m_databases.empty()) {
     B2ERROR("No database backend available.");

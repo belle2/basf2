@@ -148,7 +148,8 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
   return result;
 }
 
-bool ConditionsDatabase::storeData(const std::string& package, const std::string& module, TObject* object, IntervalOfValidity& iov)
+bool ConditionsDatabase::storeData(const std::string& package, const std::string& module, TObject* object,
+                                   const IntervalOfValidity& iov)
 {
   std::string fileName = fs::unique_path().string();
   if (writePayload(fileName, module, object, &iov)) {
@@ -161,7 +162,7 @@ bool ConditionsDatabase::storeData(const std::string& package, const std::string
 }
 
 bool ConditionsDatabase::addPayload(const std::string& package, const std::string& module, const std::string& fileName,
-                                    IntervalOfValidity&)
+                                    const IntervalOfValidity&)
 {
   ConditionsService::getInstance()->writePayloadFile(fileName, package, module);
   return true;

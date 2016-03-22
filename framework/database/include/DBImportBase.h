@@ -82,7 +82,7 @@ namespace Belle2 {
      * Import the object to database
      * @param iov interval of validity
      */
-    bool import(IntervalOfValidity& iov);
+    bool import(const IntervalOfValidity& iov);
 
     /**
      * Clear the content, e.g. destroy allocated objects and prepare for the new DB import.
@@ -123,7 +123,7 @@ namespace Belle2 {
      * Import intra run dependent object to database
      * @param iov interval of validity
      */
-    template<class IntraRun> bool import(IntervalOfValidity& iov)
+    template<class IntraRun> bool import(const IntervalOfValidity& iov)
     {
       if (m_objects.empty()) return false;
       IntraRun intraRun(m_objects[0]);

@@ -32,7 +32,7 @@ try:
 except ImportError:
     # Minimal workaround that only relies on numpy and python 2.7
     # prob as a vectorized function
-    prop = np.frompyfunc(ROOT.TMath.Prob, 2, 1)
+    prob = np.frompyfunc(ROOT.TMath.Prob, 2, 1)
 
 
 def is_primary(mc_particle):

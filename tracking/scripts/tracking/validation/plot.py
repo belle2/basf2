@@ -168,11 +168,13 @@ class ValidationPlot(object):
         #: A list of the histograms that make up the plot
         self.histograms = []
 
-        # per default all plots are expert and must be set to non-expert explicitly
+        #: per default all plots are expert and must be set to non-expert explicitly
         self._is_expert = True
 
-        # custom levels for pvalue warnings and errors
+        #: custom levels for pvalue warnings
         self.pvalue_warn = None
+
+        #: custom levels for pvalue errors
         self.pvalue_error = None
 
     def hist(self,
@@ -217,6 +219,7 @@ class ValidationPlot(object):
                 bins=None,
                 lower_bound=None,
                 upper_bound=None,
+                y_binary=None,
                 outlier_z_score=None,
                 include_exceptionals=True,
                 allow_discrete=False,
@@ -240,8 +243,16 @@ class ValidationPlot(object):
                        allow_discrete=allow_discrete,
                        cumulation_direction=cumulation_direction)
 
-        if not self.ylabel and self.is_binary(ys):
-            self.ylabel = 'probability'
+        if y_binary or self.is_binary(ys):
+            if not self.ylabel:
+                self.ylabel = 'probability'
+
+            for histogram in self.histograms:
+                histogram.SetMinimum(0)
+                histogram.SetMaximum(1)
+
+            self.plot.SetMinimum(0)
+            self.plot.SetMaximum(1)
 
         return self
 
@@ -353,7 +364,7 @@ class ValidationPlot(object):
             x_taxis = histogram.GetXaxis()
             for i_x_bin, x_bin_label in enumerate(x_bin_labels):
                 x_taxis.SetBinLabel(i_x_bin + 1, x_bin_label)
-            self.add_stats_entry(histogram, "dx", 0)
+            self.add_stats_entry(histogram, "dx", 1)
 
         else:
             x_bin_width = x_bin_edges[1] - x_bin_edges[0]
@@ -364,7 +375,7 @@ class ValidationPlot(object):
             y_taxis = histogram.GetYaxis()
             for i_y_bin, y_bin_label in enumerate(y_bin_labels):
                 y_taxis.SetBinLabel(i_y_bin + 1, y_bin_label)
-            self.add_stats_entry(histogram, "dy", 0)
+            self.add_stats_entry(histogram, "dy", 1)
 
         else:
             y_bin_width = y_bin_edges[1] - y_bin_edges[0]
@@ -776,7 +787,7 @@ class ValidationPlot(object):
             x_taxis = histogram.GetXaxis()
             for i_bin, bin_label in enumerate(bin_labels):
                 x_taxis.SetBinLabel(i_bin + 1, bin_label)
-            self.add_stats_entry(histogram, "dx", 0)
+            self.add_stats_entry(histogram, "dx", 1)
 
         else:
             bin_width = bin_edges[1] - bin_edges[0]
@@ -922,8 +933,6 @@ class ValidationPlot(object):
         cls.add_stats_entry(tgrapherrors,
                             'cov',
                             tgrapherrors.GetCovariance())
-
-        print(" Corr ", tgrapherrors.GetCorrelationFactor())
 
         cls.add_stats_entry(tgrapherrors,
                             'corr',

@@ -63,6 +63,13 @@ namespace Belle2 {
     MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */
 
   private:
+
+    /** Method is called to initialize the generator. */
+    void initializeGenerator();
+
+    bool m_initialized{false}; /**< True if generator has been initialized. */
+    DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter. */
+
     InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
 
   };

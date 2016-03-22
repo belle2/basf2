@@ -59,17 +59,21 @@ void KoralWInputModule::initialize()
 
   //Beam Parameters, initial particle - KORALW cannot handle beam energy spread
   m_initial.initialize();
-  const BeamParameters& nominal = m_initial.getBeamParameters();
-  double ecm = nominal.getMass();
-  m_generator.setCMSEnergy(ecm);
-
-  m_generator.init(m_dataPath, m_userDataFile, m_seed);
 
 }
 
 
 void KoralWInputModule::event()
 {
+  // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)
+  if (m_beamParams.hasChanged()) {
+    if (!m_initialized) {
+      initializeGenerator();
+    } else {
+      B2FATAL("KoralWInputModule::event(): BeamParameters have changed within a job, this is not supported for KORALW!");
+    }
+  }
+
   // initial particle from beam parameters
   MCInitialParticles& initial = m_initial.generate();
 
@@ -92,5 +96,15 @@ void KoralWInputModule::terminate()
   B2INFO(">>> Total cross section: " << m_generator.getCrossSection() << " pb +- " << m_generator.getCrossSectionError() << " pb")
 }
 
+void KoralWInputModule::initializeGenerator()
+{
 
+  const BeamParameters& nominal = m_initial.getBeamParameters();
+  double ecm = nominal.getMass();
+  m_generator.setCMSEnergy(ecm);
 
+  m_generator.init(m_dataPath, m_userDataFile, m_seed);
+
+  m_initialized = true;
+
+}

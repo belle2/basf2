@@ -94,6 +94,9 @@ namespace Belle2 {
     for (unsigned i = 0; i < sigFsp.size(); i++) {
       PCmsLabTransform T;
       TLorentzVector p_cms = T.rotateLabToCms() * sigFsp[i]->get4Vector();
+
+      if (p_cms.P() < 0.8) continue;
+
       p3_cms_all.push_back(p_cms.Vect());
       p3_cms_sigB.push_back(p_cms.Vect());
 
@@ -127,6 +130,10 @@ namespace Belle2 {
           PCmsLabTransform T;
           TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
           if (p_cms.Rho() > P_MAX) continue;
+
+//    std::cout << p_cms.P() << std::endl;
+//    if (p_cms.P() > 0.5) continue;
+
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
 
@@ -167,33 +174,6 @@ namespace Belle2 {
           et[0] += p_cms.Perp();
           et[1] += p_cms.Perp();
         }
-      }
-
-      // KLMCluster -> K0_L
-      //
-      std::vector<const KLMCluster*> roeKLMClusters = roe->getKLMClusters();
-
-      for (int i = 0; i < roe->getNKLMClusters(); i++) {
-
-        const KLMCluster* cluster = roeKLMClusters[i];
-
-        // Create particle from KLMCluster with K0_L hypothesis
-        Particle particle(cluster);
-
-        TLorentzVector p_lab = particle.get4Vector();
-        if (p_lab.Rho() < 0.05) continue;
-        PCmsLabTransform T;
-        TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
-        if (p_cms.Rho() > P_MAX) continue;
-        p3_cms_all.push_back(p_cms.Vect());
-        p3_cms_roe.push_back(p_cms.Vect());
-
-        p3_cms_q_roe.push_back({p_cms.Vect(), particle.getCharge()});
-
-        p_cms_missA -= p_cms;
-        p_cms_missB -= p_cms;
-        et[0] += p_cms.Perp();
-        et[1] += p_cms.Perp();
       }
 
       // Thrust variables

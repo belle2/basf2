@@ -245,6 +245,7 @@ class Plot2DRefiner(Refiner):
                  description=None,
                  check=None,
                  y_unit=None,
+                 y_binary=None,
                  lower_bound=None,
                  upper_bound=None,
                  bins=None,
@@ -269,6 +270,7 @@ class Plot2DRefiner(Refiner):
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
         self.bins = bins
+        self.y_binary = y_binary
 
         self.outlier_z_score = outlier_z_score
         self.allow_discrete = allow_discrete
@@ -349,6 +351,7 @@ class Plot2DRefiner(Refiner):
                                          lower_bound=self.lower_bound,
                                          upper_bound=self.upper_bound,
                                          bins=self.bins,
+                                         y_binary=self.y_binary,
                                          outlier_z_score=self.outlier_z_score,
                                          allow_discrete=self.allow_discrete)
 

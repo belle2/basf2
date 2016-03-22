@@ -5,7 +5,7 @@ from basf2 import *
 
 # CRT tests 2016
 
-# module position: z = 0 at bar/prism boundary, y = 0 bar central plane.
+# module position: z = 0 at bar-prism boundary, y = 0 bar central plane.
 
 # specify here the position and sizes of rectangular surfaces cosmic ray has to cross,
 # time when the upper surface is crossed and time resolutions
@@ -13,10 +13,10 @@ from basf2 import *
 # ----------------------------------------------------------------------------------
 # upperPad = [14.7, 0, 25, 30, 37]  # upper trig. paddle: z, x, size_z, size_x, y [cm]
 # lowerPad = [14.7, 0, 25, 25, -63]  # lower trig. paddle: z, x, size_z, size_x, y [cm]
-# upperPad = [130, 0, 25, 30, 37]  # upper trig. paddle: z, x, size_z, size_x, y [cm]
-# lowerPad = [130, 0, 25, 25, -63]  # lower trig. paddle: z, x, size_z, size_x, y [cm]
-upperPad = [242.5, 0, 25, 30, 37]  # upper trig. paddle: z, x, size_z, size_x, y [cm]
-lowerPad = [242.5, 0, 25, 25, -63]  # lower trig. paddle: z, x, size_z, size_x, y [cm]
+upperPad = [69.5, 0, 25, 30, 37]  # upper trig. paddle: z, x, size_z, size_x, y [cm]
+lowerPad = [69.5, 0, 25, 25, -63]  # lower trig. paddle: z, x, size_z, size_x, y [cm]
+# upperPad = [242.5, 0, 25, 30, 37]  # upper trig. paddle: z, x, size_z, size_x, y [cm]
+# lowerPad = [242.5, 0, 25, 25, -63]  # lower trig. paddle: z, x, size_z, size_x, y [cm]
 startTime = 0  # time at crossing the upperPad [ns]
 sigmaAsic = 1.5  # electronic time resolution [ns]
 sigmaTrig = 2.5  # trigger paddles time resolution [ns]

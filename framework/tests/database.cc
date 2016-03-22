@@ -366,12 +366,12 @@ namespace {
 
   class Callback {
   public:
-    void callback(void)
+    void callback()
     {
       callbackCounter++;
     }
   };
-//  Callback callbackObject;
+  Callback callbackObject;
 
   TEST_F(DataBaseTest, Callbacks)
   {
@@ -411,8 +411,7 @@ namespace {
 
     evtPtr->setRun(1);
     DBObjPtr<TNamed> intraRun("IntraRun");
-//    intraRun.addCallback(&callbackObject, &Callback::callback);  intel compiler doesn't like this
-    intraRun.addCallback(&callback);
+    intraRun.addCallback(&callbackObject, &Callback::callback);
 
     evtPtr->setEvent(1);
     DBStore::Instance().updateEvent();

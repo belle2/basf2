@@ -116,8 +116,10 @@ namespace Belle2 {
      */
     template<class T> void addCallback(T* object, void(T::*callback)())
     {
+      union {void(T::*callback)(); void* pointer;} tmp;
+      tmp.callback = callback;
       DBStore::Instance().addCallback(m_entry->package, m_entry->module, std::bind(std::mem_fn(callback), object),
-                                      std::make_pair(reinterpret_cast<void*>(callback), object));
+                                      std::make_pair(tmp.pointer, object));
     }
 
   protected:

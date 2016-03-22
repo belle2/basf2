@@ -93,6 +93,52 @@ void PhokharaInputModule::initialize()
 
   //Beam Parameters, initial particle - PHOKHARA cannot handle beam energy spread
   m_initial.initialize();
+
+}
+
+//-----------------------------------------------------------------
+//                 Event
+//-----------------------------------------------------------------
+void PhokharaInputModule::event()
+{
+
+  // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)
+  if (m_beamParams.hasChanged()) {
+    if (!m_initialized) {
+      initializeGenerator();
+    } else {
+      B2FATAL("PhokharaInputModule::event(): BeamParameters have changed within a job, this is not supported for PHOKHARA!");
+    }
+  }
+
+  // initial particle from beam parameters
+  MCInitialParticles& initial = m_initial.generate();
+
+  // true boost
+  TLorentzRotation boost = initial.getCMSToLab();
+
+  // vertex
+  TVector3 vertex = initial.getVertex();
+
+  m_mcGraph.clear();
+  m_generator.generateEvent(m_mcGraph, vertex, boost);
+  m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
+
+}
+
+
+//-----------------------------------------------------------------
+//                 Terminate
+//-----------------------------------------------------------------
+void PhokharaInputModule::terminate()
+{
+
+  m_generator.term();
+}
+
+void PhokharaInputModule::initializeGenerator()
+{
+
   const BeamParameters& nominal = m_initial.getBeamParameters();
   m_cmsEnergy = nominal.getMass();
 
@@ -122,32 +168,6 @@ void PhokharaInputModule::initialize()
 
   m_generator.init(m_ParameterFile);
 
-}
+  m_initialized = true;
 
-//-----------------------------------------------------------------
-//                 Event
-//-----------------------------------------------------------------
-void PhokharaInputModule::event()
-{
-  // initial particle from beam parameters
-  MCInitialParticles& initial = m_initial.generate();
-  // true boost
-  TLorentzRotation boost = initial.getCMSToLab();
-  // vertex
-  TVector3 vertex = initial.getVertex();
-
-  m_mcGraph.clear();
-  m_generator.generateEvent(m_mcGraph, vertex, boost);
-  m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
-
-}
-
-
-//-----------------------------------------------------------------
-//                 Terminate
-//-----------------------------------------------------------------
-void PhokharaInputModule::terminate()
-{
-
-  m_generator.term();
 }

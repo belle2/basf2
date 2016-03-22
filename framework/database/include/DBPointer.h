@@ -41,22 +41,23 @@ namespace Belle2 {
      * Check whether we point to a valid object.
      * @return          True if the object exists.
      **/
-    inline bool isValid() const {getPointer(); return m_object;}
+    inline bool isValid() const {return getPointer();}
 
     /** Is this pointer's data safe to access? */
     inline operator bool() const {return isValid();}
 
-    inline T& operator *()  const {getPointer(); return *m_object;}  /**< Imitate pointer functionality. */
-    inline T* operator ->() const {getPointer(); return m_object;}   /**< Imitate pointer functionality. */
+    inline T& operator *()  const {return *getPointer();}  /**< Imitate pointer functionality. */
+    inline T* operator ->() const {return getPointer();}   /**< Imitate pointer functionality. */
 
   private:
     /** Find the referred object and set m_object to it */
-    inline void getPointer() const
+    inline T* getPointer() const
     {
       if (!m_object) {
         DBArray<T> array(NAME);
         m_object = array.getByKey(METHOD, m_key);
       }
+      return m_object;
     }
 
     /** Key value of the referred array element. */

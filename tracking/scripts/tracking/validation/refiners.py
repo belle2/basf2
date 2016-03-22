@@ -512,6 +512,7 @@ class SavePullAnalysisRefiner(Refiner):
                  contact=None,
                  title_postfix=None,
                  part_name=None,
+                 part_names=None,
                  truth_name=None,
                  estimate_name=None,
                  variance_name=None,
@@ -524,13 +525,18 @@ class SavePullAnalysisRefiner(Refiner):
         self.contact = contact
         self.title_postfix = title_postfix
 
-        self.part_name = part_name
+        self.part_names = []
+        if part_names is not None:
+            self.part_names = part_names
+
+        if part_name is not None:
+            self.part_names.append(part_name)
 
         self.truth_name = truth_name
         self.estimate_name = estimate_name
         self.variance_name = variance_name
 
-        self.quantity_name = quantity_name or part_name
+        self.quantity_name = quantity_name
         self.unit = unit
 
         self.outlier_z_score = outlier_z_score
@@ -555,52 +561,59 @@ class SavePullAnalysisRefiner(Refiner):
         contact = formatter.format(contact, **replacement_dict)
 
         name = self.name or self.default_name
-        name = formatter.format(name, part_name=self.part_name, **replacement_dict)
-        plot_name = name + "_{subplot_name}"
 
-        title_postfix = self.title_postfix
-        if title_postfix is None:
-            title_postfix = self.default_title_postfix
+        for part_name in self.part_names:
+            name = formatter.format(name, part_name=part_name, **replacement_dict)
+            plot_name = name + "_{subplot_name}"
 
-        title_postfix = formatter.format(title_postfix, part_name=self.part_name, **replacement_dict)
-        plot_title = "{subplot_title} of {quantity_name}" + title_postfix
+            title_postfix = self.title_postfix
+            if title_postfix is None:
+                title_postfix = self.default_title_postfix
 
-        if self.truth_name is not None:
-            truth_name = self.truth_name
-        else:
-            truth_name = self.default_truth_name
+            title_postfix = formatter.format(title_postfix, part_name=part_name, **replacement_dict)
+            plot_title = "{subplot_title} of {quantity_name}" + title_postfix
 
-        if self.estimate_name is not None:
-            estimate_name = self.estimate_name
-        else:
-            estimate_name = self.default_estimate_name
+            if self.truth_name is not None:
+                truth_name = self.truth_name
+            else:
+                truth_name = self.default_truth_name
 
-        if self.variance_name is not None:
-            variance_name = self.variance_name
-        else:
-            variance_name = self.default_variance_name
+            if self.estimate_name is not None:
+                estimate_name = self.estimate_name
+            else:
+                estimate_name = self.default_estimate_name
 
-        truth_name = formatter.format(truth_name, part_name=self.part_name)
-        estimate_name = formatter.format(estimate_name, part_name=self.part_name)
-        variance_name = formatter.format(variance_name, part_name=self.part_name)
+            if self.variance_name is not None:
+                variance_name = self.variance_name
+            else:
+                variance_name = self.default_variance_name
 
-        truths = crops[truth_name]
-        estimates = crops[estimate_name]
-        variances = crops[variance_name]
+            truth_name = formatter.format(truth_name, part_name=part_name)
+            estimate_name = formatter.format(estimate_name, part_name=part_name)
+            variance_name = formatter.format(variance_name, part_name=part_name)
 
-        pull_analysis = PullAnalysis(self.quantity_name,
-                                     unit=self.unit,
-                                     absolute=self.absolute,
-                                     outlier_z_score=self.outlier_z_score,
-                                     plot_name=plot_name,
-                                     plot_title=plot_title)
+            truths = crops[truth_name]
+            estimates = crops[estimate_name]
+            try:
+                variances = crops[variance_name]
+            except KeyError:
+                variances = None
 
-        pull_analysis.analyse(truths, estimates, variances)
+            quantity_name = self.quantity_name or part_name
 
-        pull_analysis.contact = contact
+            pull_analysis = PullAnalysis(quantity_name,
+                                         unit=self.unit,
+                                         absolute=self.absolute,
+                                         outlier_z_score=self.outlier_z_score,
+                                         plot_name=plot_name,
+                                         plot_title=plot_title)
 
-        if tdirectory:
-            pull_analysis.write(tdirectory)
+            pull_analysis.analyse(truths, estimates, variances)
+
+            pull_analysis.contact = contact
+
+            if tdirectory:
+                pull_analysis.write(tdirectory)
 
 
 class SaveTreeRefiner(Refiner):

@@ -25,6 +25,8 @@ class G4VPhysicalVolume;
 namespace Belle2 {
 
   class GearDir;
+  class GeoConfiguration;
+  class IntervalOfValidity;
 
   namespace geometry {
     class CreatorBase;
@@ -58,13 +60,33 @@ namespace Belle2 {
        * Create Geometry.
        *
        * This function will create the geometry representation. First the
-       * Materials will be created, than the top voluume will be defined and
+       * Materials will be created, than the top volume will be defined and
        * all components of the detector will be built by calling the
        * corresponding creator
        * @param params GearDir pointing to the top element of the geometry parameters
        * @param type Type of the geometry to be built
        */
       void createGeometry(const GearDir& params, GeometryTypes type = FullGeometry);
+
+      /**
+       * Create Geometry.
+       *
+       * This function will create the geometry representation from an existing
+       * configuration object. First the Materials will be created, than the
+       * top volume will be defined and all components of the detector will be
+       * built by calling the corresponding creator
+       * @param params geometry configuration object
+       * @param type Type of the geometry to be built
+       * @param useDB whether the creators should be using the Database or Gearbox
+       */
+      void createGeometry(const GeoConfiguration& params, GeometryTypes type = FullGeometry, bool useDB = true);
+
+      /** Create Geometry configuration object.
+       * This function will convert a Gearbox representation of the geometry to
+       * an object containing all necessary parameters
+       * @param detectorDir GearDir pointing to the top element of the geometry parameters
+       */
+      GeoConfiguration createGeometryConfig(const GearDir& detectorDir, const IntervalOfValidity& iov);
 
       /**
        * Set the names of the components to create.
@@ -148,7 +170,7 @@ namespace Belle2 {
       /** Assignment operator declared private since class is a Singleton. */
       GeometryManager& operator=(const GeometryManager&) = delete;
       /** Destructor: make sure we clean up memory at the end */
-      ~GeometryManager() { clear(); }
+      ~GeometryManager() {}
 
       /** Pointer to the top volume of the native geometry description */
       G4VPhysicalVolume* m_topVolume;

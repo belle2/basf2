@@ -12,6 +12,8 @@
 #define GEOMETRYMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <geometry/dbobjects/GeoConfiguration.h>
 
 namespace Belle2 {
   /** Module to faciliate Geometry creation. */
@@ -23,6 +25,8 @@ namespace Belle2 {
     ~GeometryModule() {};
     /** Create geometry */
     void initialize();
+    /** Clean up the geometry */
+    void terminate();
   protected:
     /** Path for the geometry in the parameter space */
     std::string m_geometryPath;
@@ -40,6 +44,14 @@ namespace Belle2 {
      * already present. This can be used to add the geometry multiple times if
      * it's not clear if it's already present in another path */
     bool m_ignoreIfPresent{false};
+    /** Whether or not to build the geometry from the database */
+    bool m_useDB{false};
+    /** Payload iov when creating a geometry configuration */
+    std::vector<int> m_payloadIov{0, 0, -1, -1};
+    /** If true we need to create a payload */
+    bool m_createGeometryPayload{false};
+
+    DBObjPtr<GeoConfiguration>* m_geometryConfig{nullptr};
   };
 } //Belle2 namespace
 #endif

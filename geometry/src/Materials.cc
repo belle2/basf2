@@ -12,6 +12,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
+#include <geometry/dbobjects/GeoMaterial.h>
+#include <geometry/dbobjects/GeoOpticalSurface.h>
 
 #include <memory>
 #include <limits>
@@ -21,6 +23,7 @@
 #include <G4Element.hh>
 #include <G4NistManager.hh>
 #include <G4OpticalSurface.hh>
+#include <G4MaterialPropertiesTable.hh>
 
 #include "CLHEP/Units/PhysicalConstants.h"
 
@@ -28,6 +31,54 @@ using namespace std;
 
 namespace Belle2 {
   namespace geometry {
+    namespace {
+      /** add GeoMaterialProperties defined in XML to a payload object
+       * @param object instance of GeoMaterial or GeoOpticalSurface to add the properties to
+       * @param parameters gearbox parameters containing the <Property> definitions
+       */
+      template<class T> void addProperties(T& object, const gearbox::Interface& parameters)
+      {
+        // check if we have properties defined for this material
+        if (parameters.getNumberNodes("Property") > 0) {
+          //Apparantly we have properties, so lets add them to the Material
+          for (const GearDir& property : parameters.getNodes("Property")) {
+            string name;
+            try {
+              name = property.getString("@name");
+            } catch (gearbox::PathEmptyError) {
+              B2ERROR("Property at " << property.getPath() << " does not have a name attribute, ignoring");
+              continue;
+            }
+            const double conversionFactor = Unit::convertValue(1, property.getString("@unit", "GeV"));
+            unsigned int nValues = property.getNumberNodes("value");
+            std::vector<double> energies(nValues, 0);
+            std::vector<double> values(nValues, 0);
+            for (unsigned int i = 0; i < nValues; ++i) {
+              GearDir value(property, "value", i + 1);
+              energies[i] = value.getDouble("@energy") * conversionFactor;
+              values[i] = value.getDouble();
+            }
+            object.addProperty({name, energies, values});
+          }
+        }
+      }
+    }
+
+    G4MaterialPropertiesTable* Materials::createProperties(const std::vector<GeoMaterialProperty>& props)
+    {
+      if (!props.size()) return 0;
+      G4MaterialPropertiesTable* table = new G4MaterialPropertiesTable();
+      m_PropTables.push_back(table);
+      for (const GeoMaterialProperty& prop : props) {
+        std::vector<double> energies = prop.getEnergies();
+        std::vector<double> values = prop.getValues();
+        const size_t n = values.size();
+        // convert energies to Geant4 Units
+        for (double& energy : energies) energy *= CLHEP::GeV / Unit::GeV;
+        table->AddProperty(prop.getName().c_str(), energies.data(), values.data(), n);
+      }
+      return table;
+    }
 
     Materials& Materials::getInstance()
     {
@@ -37,10 +88,7 @@ namespace Belle2 {
 
     Materials::~Materials()
     {
-      for (G4MaterialPropertiesTable* propTable : m_PropTables) delete propTable;
-      m_PropTables.clear();
-      for (G4OpticalSurface* optSurf : m_OptSurfaces) delete optSurf;
-      m_OptSurfaces.clear();
+      clear();
     }
 
     G4Material* Materials::getMaterial(const string& name, bool showErrors) const
@@ -79,70 +127,112 @@ namespace Belle2 {
 
     G4Material* Materials::createMaterial(const gearbox::Interface& parameters)
     {
-      //Get straightforward parameters from gearbox
-      string name = parameters.getString("@name");
-      G4Material* oldmat = getMaterial(name, false);
+      GeoMaterial material = createMaterialConfig(parameters);
+      return createMaterial(material);
+    }
+
+    G4Material* Materials::createMaterial(const GeoMaterial& parameters)
+    {
+      G4Material* oldmat = getMaterial(parameters.getName(), false);
       if (oldmat) {
         //We cannot modify or delete materials, so we just use existing ones
-        B2DEBUG(100, "Material with name " << name << " already existing, using existing material");
+        B2ERROR("Material with name " << parameters.getName() << " already existing");
         return oldmat;
       }
-      B2INFO("Creating Material " << name);
-      string stateStr = parameters.getString("state", "undefined");
-      double density = parameters.getDensity("density", 0) * CLHEP::g / CLHEP::cm3;
-      double temperature = parameters.getDouble("temperature", CLHEP::STP_Temperature);
-      double pressure = parameters.getDouble("pressure", CLHEP::STP_Pressure / CLHEP::pascal);
+      B2INFO("Creating Material " << parameters.getName());
       //If density is negative or smaller than epsilon we should calculate the
       //density from the used materials
-      bool deductDensity = density < 1e-25;
-
-      //Check if we can calculate density, only works if we just add materials,
-      //elements do not have density
-      if (deductDensity && parameters.getNumberNodes("Components/Element")) {
-        B2ERROR("createMaterial " << name
-                << ": Cannot calculate density when adding elements, please provde a density");
-        return 0;
+      double density = parameters.getDensity() * CLHEP::g / CLHEP::cm3;
+      if (density < 1e-25) {
+        density = 0;
+        for (const GeoMaterialComponent& component : parameters.getComponents()) {
+          //Check if we can calculate density, only works if we just add materials,
+          //elements do not have density
+          if (component.getIselement()) {
+            B2ERROR("createMaterial " << parameters.getName()
+                    << ": Cannot calculate density when adding elements, please provde a density");
+            return 0;
+          }
+          G4Material* mat = getMaterial(component.getName());
+          if (!mat) {
+            B2ERROR("createMaterial " << parameters.getName() << ": Material '" << component.getName() << "' not found");
+            return 0;
+          }
+          density += mat->GetDensity() * component.getFraction();
+        }
       }
+
+      //Finally, create Material and add all components
+      G4Material* mat = new G4Material(parameters.getName(), density, parameters.getComponents().size(),
+                                       (G4State)parameters.getState(), parameters.getTemperature(), parameters.getPressure() * CLHEP::pascal);
+
+      for (const GeoMaterialComponent& component : parameters.getComponents()) {
+        if (component.getIselement()) {
+          G4Element* cmp = getElement(component.getName());
+          if (!cmp) {
+            B2ERROR("Cannot create material " << parameters.getName() << ": element " << component.getName() << " not found");
+            return 0;
+          }
+          mat->AddElement(cmp, component.getFraction());
+        } else {
+          G4Material* cmp = getMaterial(component.getName());
+          if (!cmp) {
+            B2ERROR("Cannot create material " << parameters.getName() << ": material " << component.getName() << " not found");
+            return 0;
+          }
+          mat->AddMaterial(cmp, component.getFraction());
+        }
+      }
+
+      //add properties
+      mat->SetMaterialPropertiesTable(createProperties(parameters.getProperties()));
+
+      //Insert into cache and return
+      m_materialCache.insert(parameters.getName(), mat);
+      return mat;
+    }
+
+    GeoMaterial Materials::createMaterialConfig(const gearbox::Interface& parameters)
+    {
+      //Get straightforward parameters from gearbox
+      string name = parameters.getString("@name");
+      B2INFO("Creating Material Config " << name);
+      string stateStr = parameters.getString("state", "undefined");
+      double density = parameters.getDensity("density", 0); // * CLHEP::g / CLHEP::cm3;
+      double temperature = parameters.getDouble("temperature", CLHEP::STP_Temperature);
+      double pressure = parameters.getDouble("pressure", CLHEP::STP_Pressure / CLHEP::pascal);
+
+      // set the simple ones like they are
+      GeoMaterial material;
+      material.setName(name);
+      material.setPressure(pressure);
+      material.setTemperature(temperature);
+      material.setDensity(density);
 
       //Sum up fractions to see if they are normalized
       double sumFractions(0);
 
-      //Prepare vector with all component materials
-      vector<G4Material*> componentMaterials;
-      vector<double> fractionMaterials;
-      for (const GearDir& material : parameters.getNodes("Components/Material")) {
-        G4Material* mat = getMaterial(material.getString());
-        double fraction = material.getDouble("@fraction", 1.0);
-        if (!mat) {
-          B2ERROR("createMaterial " << name << ": Material '" << material.getString() << "' not found");
-          return 0;
-        }
-        componentMaterials.push_back(mat);
-        fractionMaterials.push_back(fraction);
-        if (deductDensity) density += mat->GetDensity() * fraction;
+      // Add all component materials
+      for (const GearDir& component : parameters.getNodes("Components/Material")) {
+        const string componentName = component.getString();
+        double fraction = component.getDouble("@fraction", 1.0);
+        material.addComponent({componentName, false, fraction});
         sumFractions += fraction;
       }
-      //Normalize density if we calculate it
-      if (deductDensity) density /= sumFractions;
-
-      //Prepare vector with all component elements
-      vector<G4Element*> componentElements;
-      vector<double> fractionElements;
+      // Add all component elements
       for (const GearDir& element : parameters.getNodes("Components/Element")) {
-        G4Element* elm = getElement(element.getString());
+        const std::string elementName = element.getString();
         double fraction = element.getDouble("@fraction", 1.0);
-        if (!elm) {
-          B2ERROR("createMaterial " << name << ": Element '" << element.getString() << "' not found");
-          return 0;
-        }
-        componentElements.push_back(elm);
-        fractionElements.push_back(fraction);
+        material.addComponent({elementName, true, fraction});
         sumFractions += fraction;
       }
 
       //Warn if the fractions are not normalized
       if (abs(sumFractions - 1) > numeric_limits<double>::epsilon()) {
         B2WARNING("createMaterial " << name << ": Fractions not normalized, scaling by 1/" << sumFractions);
+        for (GeoMaterialComponent& cmp : material.getComponents()) {
+          cmp.setFraction(cmp.getFraction() / sumFractions);
+        }
       }
 
       //Determine material state
@@ -157,60 +247,32 @@ namespace Belle2 {
       } else if (stateStr != "undefined") {
         B2WARNING("createMaterial " << name << ": Unknown state '" << stateStr << "', using undefined");
       }
+      material.setState(state);
 
-      //Finally, create Material and add all components
-      G4Material* mat = new G4Material(name, density, componentElements.size() + componentMaterials.size(),
-                                       state, temperature, pressure * CLHEP::pascal);
-
-      for (size_t i = 0; i < componentMaterials.size(); ++i) {
-        mat->AddMaterial(componentMaterials[i], fractionMaterials[i] / sumFractions);
-      }
-      for (size_t i = 0; i < componentElements.size(); ++i) {
-        mat->AddElement(componentElements[i], fractionElements[i] / sumFractions);
-      }
-
-      //check if we have properties defined for this material
-      G4MaterialPropertiesTable* g4PropTable = createProperties(parameters);
-      if (g4PropTable) mat->SetMaterialPropertiesTable(g4PropTable);
-
-      //Insert into cache and return
-      m_materialCache.insert(name, mat);
-      return mat;
-    }
-
-    G4MaterialPropertiesTable* Materials::createProperties(const gearbox::Interface& parameters)
-    {
-      if (parameters.getNumberNodes("Property") > 0) {
-        //Apparantly we have properties, so lets add them to the Material
-        G4MaterialPropertiesTable* g4PropTable = new G4MaterialPropertiesTable();
-        m_PropTables.push_back(g4PropTable);
-        for (const GearDir& property : parameters.getNodes("Property")) {
-          string name;
-          try {
-            name = property.getString("@name");
-          } catch (gearbox::PathEmptyError) {
-            B2ERROR("Property at " << property.getPath() << " does not have a name attribute, ignoring");
-            continue;
-          }
-          double conversionFactor = Unit::convertValue(1, property.getString("@unit", "GeV"));
-          //Geant4 uses MeV as default energy
-          conversionFactor /= Unit::MeV;
-          unsigned int nValues = property.getNumberNodes("value");
-          std::vector<double> energies(nValues, 0);
-          std::vector<double> values(nValues, 0);
-          for (unsigned int i = 0; i < nValues; ++i) {
-            GearDir value(property, "value", i + 1);
-            energies[i] = value.getDouble("@energy") * conversionFactor;
-            values[i] = value.getDouble();
-          }
-          g4PropTable->AddProperty(name.c_str(), energies.data(), values.data(), nValues);
-        }
-        return g4PropTable;
-      }
-      return 0;
+      addProperties(material, parameters);
+      // all done, return material description
+      return material;
     }
 
     G4OpticalSurface* Materials::createOpticalSurface(const gearbox::Interface& parameters)
+    {
+      GeoOpticalSurface surface = createOpticalSurfaceConfig(parameters);
+      return createOpticalSurface(surface);
+    }
+
+    G4OpticalSurface* Materials::createOpticalSurface(const GeoOpticalSurface& surface)
+    {
+      G4OpticalSurface* optSurf = new G4OpticalSurface(surface.getName(),
+                                                       (G4OpticalSurfaceModel) surface.getModel(),
+                                                       (G4OpticalSurfaceFinish) surface.getFinish(),
+                                                       (G4SurfaceType) surface.getType(),
+                                                       surface.getValue());
+      optSurf->SetMaterialPropertiesTable(createProperties(surface.getProperties()));
+      //m_OptSurfaces.push_back(optSurf);
+      return optSurf;
+    }
+
+    GeoOpticalSurface Materials::createOpticalSurfaceConfig(const gearbox::Interface& parameters)
     {
       string name         = parameters.getString("@name", "OpticalSurface");
       string modelString  = parameters.getString("Model", "glisur");
@@ -225,8 +287,7 @@ namespace Belle2 {
       else CHECK_ENUM_VALUE(model, unified)
         else CHECK_ENUM_VALUE(model, LUT)
           else {
-            B2ERROR("Unknown Optical Surface Model: " << modelString);
-            return 0;
+            B2FATAL("Unknown Optical Surface Model: " << modelString);
           }
 
       G4OpticalSurfaceFinish finish;
@@ -262,8 +323,7 @@ namespace Belle2 {
                                                             else CHECK_ENUM_VALUE(finish, groundvm2000air)
                                                               else CHECK_ENUM_VALUE(finish, groundvm2000glue)
                                                                 else {
-                                                                  B2ERROR("Unknown Optical Surface Finish: " << finishString);
-                                                                  return 0;
+                                                                  B2FATAL("Unknown Optical Surface Finish: " << finishString);
                                                                 }
 
       G4SurfaceType type;
@@ -274,20 +334,30 @@ namespace Belle2 {
           else CHECK_ENUM_VALUE(type, firsov)
             else CHECK_ENUM_VALUE(type, x_ray)
               else {
-                B2ERROR("Unknown Optical Surface Type: " << typeString);
-                return 0;
+                B2FATAL("Unknown Optical Surface Type: " << typeString);
               }
 #undef CHECK_ENUM_VALUE
 
-      G4OpticalSurface* optSurf = new G4OpticalSurface(name, model, finish, type, value);
-      m_OptSurfaces.push_back(optSurf);
-
-      G4MaterialPropertiesTable* g4PropTable = createProperties(GearDir(parameters, "Properties"));
-      if (g4PropTable) optSurf->SetMaterialPropertiesTable(g4PropTable);
-
-      return optSurf;
+      GeoOpticalSurface surface(name, model, finish, type, value);
+      addProperties(surface, GearDir(parameters, "Properties"));
+      return surface;
     }
 
+    void Materials::clear()
+    {
+      // delete all property tables we have
+      B2DEBUG(50, "Cleaning G4MaterialPropertiesTable");
+      for (G4MaterialPropertiesTable* prop : m_PropTables) delete prop;
+      m_PropTables.clear();
+      // and last but not least: get rid of all materials
+      B2DEBUG(50, "Cleaning G4Materials");
+      G4MaterialTable& materials = *G4Material::GetMaterialTable();
+      for (G4Material* mat : materials) delete mat;
+      materials.clear();
+      // finally, get rid of the cache, it's invalid now anyway
+      B2DEBUG(50, "Clean up material cache");
+      m_materialCache.clear();
+    }
 
   } //geometry namespace
 } //Belle2 namespace

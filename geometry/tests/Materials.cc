@@ -5,6 +5,7 @@
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/utilities/TestHelpers.h>
 
 #include <G4Element.hh>
 #include <G4Material.hh>
@@ -177,12 +178,9 @@ namespace Belle2 {
       EXPECT_EQ(x_ray, surf2->GetType());
       EXPECT_EQ(2.0, surf2->GetSigmaAlpha());
 
-      G4OpticalSurface* surf3 = m.createOpticalSurface(GearDir("/test/Surface[3]"));
-      EXPECT_FALSE(surf3);
-      G4OpticalSurface* surf4 = m.createOpticalSurface(GearDir("/test/Surface[4]"));
-      EXPECT_FALSE(surf4);
-      G4OpticalSurface* surf5 = m.createOpticalSurface(GearDir("/test/Surface[5]"));
-      EXPECT_FALSE(surf5);
+      EXPECT_B2FATAL(m.createOpticalSurface(GearDir("/test/Surface[3]")));
+      EXPECT_B2FATAL(m.createOpticalSurface(GearDir("/test/Surface[4]")));
+      EXPECT_B2FATAL(m.createOpticalSurface(GearDir("/test/Surface[5]")));
     }
 
     /** Check the material properties (need to be checked)

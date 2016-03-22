@@ -11,6 +11,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/utilities/Utils.h>
+#include <framework/database/IntervalOfValidity.h>
 #include <geometry/GeometryManager.h>
 #include <geometry/Materials.h>
 #include <geometry/CreatorManager.h>
@@ -19,12 +20,14 @@
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <framework/geometry/BFieldManager.h>
 #include <geometry/bfieldmap/BFieldFrameworkInterface.h>
+#include <geometry/dbobjects/GeoConfiguration.h>
 
 #include "G4Box.hh"
 #include "G4ThreeVector.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 
+#include "G4RunManager.hh"
 #include "G4GeometryManager.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4LogicalVolumeStore.hh"
@@ -57,14 +60,14 @@ namespace Belle2 {
 
     void GeometryManager::clear()
     {
+      B2DEBUG(50, "Cleaning up Geometry");
       for (G4VisAttributes* visAttr : m_VisAttributes) delete visAttr;
       m_VisAttributes.clear();
       for (CreatorBase* creator : m_creators) delete creator;
       m_creators.clear();
       m_topVolume = 0;
+      // empty magnetic field
       BFieldManager::getInstance().clearComponents();
-      //FIXME: Geometry is now run independent, don't delete anything, let Geant4 care about freeing stuff
-      return;
       //Clean up existing Geometry
       G4GeometryManager::GetInstance()->OpenGeometry();
       G4PhysicalVolumeStore::Clean();
@@ -72,51 +75,38 @@ namespace Belle2 {
       G4SolidStore::Clean();
       G4LogicalBorderSurface::CleanSurfaceTable();
       G4LogicalSkinSurface::CleanSurfaceTable();
-      //FIXME: The MaterialPropertyTables associated with the surfaces won't get deleted.
       G4SurfaceProperty::CleanSurfacePropertyTable();
-      for (CreatorBase* creator : m_creators) delete creator;
-      m_creators.clear();
-      m_topVolume = 0;
+      //And finally clean up materials
+      Materials::getInstance().clear();
     }
 
-    void GeometryManager::createGeometry(const GearDir& detectorDir, GeometryTypes type)
+    GeoConfiguration GeometryManager::createGeometryConfig(const GearDir& detectorDir, const IntervalOfValidity& iov)
     {
-      clear();
-      B2INFO("Creating Geometry");
-
+      std::string detectorName;
       try {
-        string detectorName = detectorDir.getString("Name");
+        detectorName = detectorDir.getString("Name");
         B2INFO("Creating geometry for detector: " << detectorName);
       } catch (gearbox::PathEmptyError& e) {
         B2FATAL("Could not read detector name, make sure gearbox is connected and "
                 << detectorDir.getPath() << " points to the geometry description");
       }
 
+      const double width  = detectorDir.getLength("Global/width",  8 * Unit::m);
+      const double height = detectorDir.getLength("Global/height", 8 * Unit::m);
+      const double length = detectorDir.getLength("Global/length", 8 * Unit::m);
+      const std::string material = detectorDir.getString("Global/material", "Air");
+
+      GeoConfiguration config(detectorName, width, height, length, material);
+
+      // Add materials
       Materials& materials = Materials::getInstance();
-      //Set up Materials first since we possibly need them for the top volume
       for (const GearDir& matlist : detectorDir.getNodes("Materials")) {
         for (const GearDir& mat : matlist.getNodes("Material")) {
-          materials.createMaterial(mat);
+          GeoMaterial material = materials.createMaterialConfig(mat);
+          config.addMaterial(material);
         }
       }
 
-      //Interface the magnetic field
-      BFieldManager::getInstance().addComponent(new BFieldFrameworkInterface());
-
-      //Now set Top volume
-      double width  = detectorDir.getLength("Global/width",  8 * Unit::m) / Unit::mm;
-      double height = detectorDir.getLength("Global/height", 8 * Unit::m) / Unit::mm;
-      double length = detectorDir.getLength("Global/length", 8 * Unit::m) / Unit::mm;
-      string material = detectorDir.getString("Global/material", "Air");
-      G4Material*      top_mat = Materials::get(material);
-      G4Box*           top_box = new G4Box("Top", width, height, length);
-      G4LogicalVolume* top_log = new G4LogicalVolume(top_box, top_mat, "Top", 0, 0, 0);
-      setVisibility(*top_log, false);
-      m_topVolume = new G4PVPlacement(0, G4ThreeVector(), top_log, "Top", 0, false, 0);
-      B2INFO("Created top volume with x= +-" << width * Unit::mm << " cm, y= +-"
-             << height * Unit::mm << " cm, z= +-" << length * Unit::mm << " cm");
-      //Make a copy of the names for all selected or excluded components to
-      //check if all of those names are actually known components
       std::set<std::string> componentNames = m_components;
       std::set<std::string> excludedNames = m_excluded;
       std::set<std::string> additionalNames = m_additional;
@@ -159,41 +149,15 @@ namespace Belle2 {
         }
 
         string libraryName = component.getString("Creator/@library", "");
-
-        CreatorBase* creator = CreatorManager::getCreator(creatorName, libraryName);
-        if (creator) {
-          int oldSolids = G4SolidStore::GetInstance()->size();
-          int oldLogical = G4LogicalVolumeStore::GetInstance()->size();
-          int oldPhysical = G4PhysicalVolumeStore::GetInstance()->size();
-          B2INFO_MEASURE_TIME(
-            "Calling creator " << creatorName << " to create component " << name << " took ",
-            creator->create(GearDir(component, "Content"), *top_log, type)
-          );
-          int newSolids = G4SolidStore::GetInstance()->size() - oldSolids;
-          int newLogical = G4LogicalVolumeStore::GetInstance()->size() - oldLogical;
-          int newPhysical = G4PhysicalVolumeStore::GetInstance()->size() - oldPhysical;
-          B2INFO("DetectorComponent " << name << " created " << newSolids
-                 << " solids, " << newLogical << " logical volumes and "
-                 << newPhysical << " physical volumes");
-          m_creators.push_back(creator);
-          if (m_assignRegions) {
-            //Automatically assign a region with the creator name to all volumes
-            G4Region* region {nullptr};
-            //We loop over all children of the top volume and check whether they
-            //have the correct region assigned
-            for (int i = 0; i < top_log->GetNoDaughters(); ++i) {
-              G4LogicalVolume* vol = top_log->GetDaughter(i)->GetLogicalVolume();
-              //We only assign a region if there is not already one
-              if (!vol->GetRegion()) {
-                //Ok, new region, create or get one if not already done and assign it
-                if (!region) region = G4RegionStore::GetInstance()->FindOrCreateRegion(name);
-                vol->SetRegion(region);
-                //And propagate the region to all child volumes
-                region->AddRootLogicalVolume(vol);
-              }
-            }
+        if (!iov.empty()) {
+          CreatorBase* creator = CreatorManager::getCreator(creatorName, libraryName);
+          if (creator) {
+            creator->createPayloads(GearDir(component, "Content"), iov);
+          } else {
+            B2ERROR("Could not load creator");
           }
         }
+        config.addComponent({name, creatorName, libraryName});
       }
 
       //If there are still names left in the componentNames, excludedNames or
@@ -209,6 +173,90 @@ namespace Belle2 {
       checkRemaining("components", componentNames);
       checkRemaining("excluded components", excludedNames);
       checkRemaining("additional components", additionalNames);
+
+      return config;
+    }
+
+    void GeometryManager::createGeometry(const GearDir& detectorDir, GeometryTypes type)
+    {
+      GeoConfiguration config = createGeometryConfig(detectorDir, IntervalOfValidity());
+      createGeometry(config, type, false);
+    }
+
+    void GeometryManager::createGeometry(const GeoConfiguration& config, GeometryTypes type, bool useDB)
+    {
+      // remove the old geometry
+      clear();
+
+      //Let Geant4 know that we "modified" the geometry
+      G4RunManager* runManager = G4RunManager::GetRunManager();
+      if (runManager) runManager->ReinitializeGeometry(true, true);
+
+      // create new geometry
+      B2INFO("Creating geometry for detector: " << config.getName());
+
+      // create Materials
+      Materials& materials = Materials::getInstance();
+      for (const GeoMaterial& mat : config.getMaterials()) {
+        materials.createMaterial(mat);
+      }
+
+      //Interface the magnetic field
+      BFieldManager::getInstance().addComponent(new BFieldFrameworkInterface());
+
+      //Now set Top volume
+      G4Material*      top_mat = Materials::get(config.getGlobalMaterial());
+      G4Box*           top_box = new G4Box("Top", config.getGlobalWidth() / Unit::cm * CLHEP::cm,
+                                           config.getGlobalHeight() / Unit::cm * CLHEP::cm,
+                                           config.getGlobalWidth() / Unit::cm * CLHEP::cm);
+      G4LogicalVolume* top_log = new G4LogicalVolume(top_box, top_mat, "Top", 0, 0, 0);
+      setVisibility(*top_log, false);
+      m_topVolume = new G4PVPlacement(0, G4ThreeVector(), top_log, "Top", 0, false, 0);
+      B2INFO("Created top volume with x= +-" << config.getGlobalWidth() << " cm, y= +-"
+             << config.getGlobalHeight() << " cm, z= +-" << config.getGlobalLength() << " cm");
+
+      for (const GeoComponent& component : config.getComponents()) {
+        CreatorBase* creator = CreatorManager::getCreator(component.getCreator(), component.getLibrary());
+        if (creator) {
+          int oldSolids = G4SolidStore::GetInstance()->size();
+          int oldLogical = G4LogicalVolumeStore::GetInstance()->size();
+          int oldPhysical = G4PhysicalVolumeStore::GetInstance()->size();
+          try {
+            if (!useDB) throw CreatorBase::DBNotImplemented();
+            creator->createFromDB(component.getName(), *top_log, type);
+            B2INFO("called creator " << component.getCreator() << " to create component " << component.getName() << " from DB");
+
+          } catch (CreatorBase::DBNotImplemented& e) {
+            GearDir parameters = Gearbox::getInstance().getDetectorComponent(component.getName());
+            creator->create(parameters, *top_log, type);
+            B2INFO("called creator " << component.getCreator() << " to create component " << component.getName() << " from Gearbox");
+          }
+          int newSolids = G4SolidStore::GetInstance()->size() - oldSolids;
+          int newLogical = G4LogicalVolumeStore::GetInstance()->size() - oldLogical;
+          int newPhysical = G4PhysicalVolumeStore::GetInstance()->size() - oldPhysical;
+          B2INFO("DetectorComponent " << component.getName() << " created " << newSolids
+                 << " solids, " << newLogical << " logical volumes and "
+                 << newPhysical << " physical volumes");
+          m_creators.push_back(creator);
+          if (m_assignRegions) {
+            //Automatically assign a region with the creator name to all volumes
+            G4Region* region {nullptr};
+            //We loop over all children of the top volume and check whether they
+            //have the correct region assigned
+            for (int i = 0; i < top_log->GetNoDaughters(); ++i) {
+              G4LogicalVolume* vol = top_log->GetDaughter(i)->GetLogicalVolume();
+              //We only assign a region if there is not already one
+              if (!vol->GetRegion()) {
+                //Ok, new region, create or get one if not already done and assign it
+                if (!region) region = G4RegionStore::GetInstance()->FindOrCreateRegion(component.getName());
+                vol->SetRegion(region);
+                //And propagate the region to all child volumes
+                region->AddRootLogicalVolume(vol);
+              }
+            }
+          }
+        }
+      }
 
       int newSolids = G4SolidStore::GetInstance()->size();
       int newLogical = G4LogicalVolumeStore::GetInstance()->size();

@@ -20,9 +20,12 @@ class G4Element;
 class G4MaterialPropertiesTable;
 class G4OpticalSurface;
 
-
 namespace Belle2 {
   namespace gearbox { class Interface; }
+
+  class GeoMaterial;
+  class GeoOpticalSurface;
+  class GeoMaterialProperty;
 
   namespace geometry {
     /**
@@ -84,20 +87,44 @@ namespace Belle2 {
        */
       G4Material* createMaterial(const gearbox::Interface& parameters);
 
-      /**
-       * Create a list of Material properties from a set of parameters
-       * @param  parameters Material properties definition
-       * @return pointer to the newly created properties table, 0 if no
-       *         properties were found
+      /** Create Geant4 Material from Material definition in DB
+       * @param parameters Material properties
+       * @return pointer to the newly created material, 0 if there was an
+       *         error creating it
        */
-      G4MaterialPropertiesTable* createProperties(const gearbox::Interface& parameter);
+      G4Material* createMaterial(const GeoMaterial& parameters);
 
       /**
-       * Create an optical surface from parameters
+       * Create an optical surface from parameters, will abort on error
        * @param parameters Optical surface definition
-       * @return new optical surface, 0 on error
+       * @return new optical surface
        */
       G4OpticalSurface* createOpticalSurface(const gearbox::Interface& parameters);
+
+      /**
+       * Create an optical surface from Surface definition in DB
+       * @param parameters Optical surface definition
+       * @return new optical surface
+       */
+      G4OpticalSurface* createOpticalSurface(const GeoOpticalSurface& surface);
+
+      /**
+       * Create Material from XML description
+       * @param parameters GearDir pointing to the Material description
+       * @return GeoMaterial instance describing the material and suitable for
+       * serialization
+       */
+      GeoMaterial createMaterialConfig(const gearbox::Interface& parameters);
+
+      /** Create Optical Surface Configuration from XML description
+       * @param parameters GearDir pointing to the Optical Surface description
+       * @return GeoOpticalSurface instance describing the material and
+       * suitable for serialization
+       */
+      GeoOpticalSurface createOpticalSurfaceConfig(const gearbox::Interface& parameters);
+
+      /** Clear all existing materials */
+      void clear();
 
     protected:
       /** Singleton: hide constructor */
@@ -113,9 +140,8 @@ namespace Belle2 {
       /** Vector of created G4MaterialProperties objects */
       std::vector<G4MaterialPropertiesTable*> m_PropTables;
 
-      /** Vector of created G4OpticalSurfaces objects */
-      std::vector<G4OpticalSurface*> m_OptSurfaces;
-
+      /** Create a properties table from a vector of properties. Return 0 if the vector is empty */
+      G4MaterialPropertiesTable* createProperties(const std::vector<GeoMaterialProperty>& props);
     };
 
   } //geometry namespace

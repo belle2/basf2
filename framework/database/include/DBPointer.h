@@ -13,12 +13,12 @@
 
 namespace Belle2 {
 
-  std::string emptyString = "";
+  std::string DBPointer_defaultName = "";
 
   /**
    * Class for pointing to an element in an array stored in the database.
    */
-  template<class T, typename KEY, KEY(T::*METHOD)() const, std::string& NAME = emptyString> class DBPointer {
+  template<class T, typename KEY, KEY(T::*METHOD)() const, const std::string& NAME = DBPointer_defaultName> class DBPointer {
   public:
 
     /**

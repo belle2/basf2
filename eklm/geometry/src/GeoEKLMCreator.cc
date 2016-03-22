@@ -2059,14 +2059,16 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
     createScintillator(i);
   }
   /* Create other volumes. */
-  for (m_CurVol.endcap = 1; m_CurVol.endcap <= 2; m_CurVol.endcap++) {
+  for (m_CurVol.endcap = 1; m_CurVol.endcap <= m_GeoDat->getNEndcaps();
+       m_CurVol.endcap++) {
     endcap = createEndcap(&topVolume);
     for (m_CurVol.layer = 1; m_CurVol.layer <= m_GeoDat->getNLayers();
          m_CurVol.layer++) {
       if (detectorLayer(m_CurVol.endcap, m_CurVol.layer)) {
         /* Detector layer. */
         layer = createLayer(endcap, NULL);
-        for (m_CurVol.sector = 1; m_CurVol.sector <= 4; m_CurVol.sector++) {
+        for (m_CurVol.sector = 1; m_CurVol.sector <= m_GeoDat->getNSectors();
+             m_CurVol.sector++) {
           sector = createSector(layer, NULL);
           createSectorSupport(sector);
           createSectorSupportCorner1(sector);
@@ -2111,7 +2113,8 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
       } else {
         /* Shield layer. */
         layer = createLayer(endcap, m_LogVol.shieldLayer);
-        for (m_CurVol.sector = 1; m_CurVol.sector <= 4; m_CurVol.sector++)
+        for (m_CurVol.sector = 1; m_CurVol.sector <= m_GeoDat->getNSectors();
+             m_CurVol.sector++)
           sector = createSector(layer, m_LogVol.shieldLayerSector);
         createSectorSupport(m_LogVol.shieldLayerSector);
         createSectorSupportCorner1(m_LogVol.shieldLayerSector);

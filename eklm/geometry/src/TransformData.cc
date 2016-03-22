@@ -25,22 +25,54 @@ using namespace Belle2;
 EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
 {
   int iEndcap, iLayer, iSector, iPlane, iSegment, iStrip, segment;
+  int nEndcaps, nLayers, nSectors, nPlanes, nStrips, nSegments, nStripsSegment;
   EKLMAlignment* alignment;
   EKLMAlignmentData* alignmentData;
   AlignmentChecker alignmentChecker;
-  const GeometryData& geoDat = GeometryData::Instance();
+  m_GeoDat = &(GeometryData::Instance());
   TFile* f;
-  for (iEndcap = 0; iEndcap < 2; iEndcap++) {
-    geoDat.getEndcapTransform(&m_Endcap[iEndcap], iEndcap);
-    for (iLayer = 0; iLayer < 14; iLayer++) {
-      geoDat.getLayerTransform(&m_Layer[iEndcap][iLayer], iLayer);
-      for (iSector = 0; iSector < 4; iSector++) {
-        geoDat.getSectorTransform(&m_Sector[iEndcap][iLayer][iSector], iSector);
-        for (iPlane = 0; iPlane < 2; iPlane++) {
-          geoDat.getPlaneTransform(&m_Plane[iEndcap][iLayer][iSector][iPlane],
-                                   iPlane);
-          for (iStrip = 0; iStrip < 75; iStrip++) {
-            geoDat.getStripTransform(
+  nEndcaps = m_GeoDat->getNEndcaps();
+  m_Endcap = new HepGeom::Transform3D[nEndcaps];
+  m_Layer = new HepGeom::Transform3D*[nEndcaps];
+  m_Sector = new HepGeom::Transform3D** [nEndcaps];
+  m_Plane = new HepGeom::Transform3D** *[nEndcaps];
+  m_Strip = new HepGeom::Transform3D**** [nEndcaps];
+  m_StripInverse = new HepGeom::Transform3D**** [nEndcaps];
+  nSectors = m_GeoDat->getNSectors();
+  nPlanes = m_GeoDat->getNPlanes();
+  nStrips = m_GeoDat->getNStrips();
+  nSegments = m_GeoDat->getNSegments();
+  nStripsSegment = m_GeoDat->getNStripsSegment();
+  for (iEndcap = 0; iEndcap < nEndcaps; iEndcap++) {
+    m_GeoDat->getEndcapTransform(&m_Endcap[iEndcap], iEndcap);
+    nLayers = m_GeoDat->getNDetectorLayers(iEndcap);
+    m_Layer[iEndcap] = new HepGeom::Transform3D[nLayers];
+    m_Sector[iEndcap] = new HepGeom::Transform3D*[nLayers];
+    m_Plane[iEndcap] = new HepGeom::Transform3D** [nLayers];
+    m_Strip[iEndcap] = new HepGeom::Transform3D** *[nLayers];
+    m_StripInverse[iEndcap] = new HepGeom::Transform3D** *[nLayers];
+    for (iLayer = 0; iLayer < nLayers; iLayer++) {
+      m_GeoDat->getLayerTransform(&m_Layer[iEndcap][iLayer], iLayer);
+      m_Sector[iEndcap][iLayer] = new HepGeom::Transform3D[nSectors];
+      m_Plane[iEndcap][iLayer] = new HepGeom::Transform3D*[nSectors];
+      m_Strip[iEndcap][iLayer] = new HepGeom::Transform3D** [nSectors];
+      m_StripInverse[iEndcap][iLayer] = new HepGeom::Transform3D** [nSectors];
+      for (iSector = 0; iSector < nSectors; iSector++) {
+        m_GeoDat->getSectorTransform(&m_Sector[iEndcap][iLayer][iSector],
+                                     iSector);
+        m_Plane[iEndcap][iLayer][iSector] = new HepGeom::Transform3D[nPlanes];
+        m_Strip[iEndcap][iLayer][iSector] = new HepGeom::Transform3D*[nPlanes];
+        m_StripInverse[iEndcap][iLayer][iSector] =
+          new HepGeom::Transform3D*[nPlanes];
+        for (iPlane = 0; iPlane < nPlanes; iPlane++) {
+          m_GeoDat->getPlaneTransform(
+            &m_Plane[iEndcap][iLayer][iSector][iPlane], iPlane);
+          m_Strip[iEndcap][iLayer][iSector][iPlane] =
+            new HepGeom::Transform3D[nStrips];
+          m_StripInverse[iEndcap][iLayer][iSector][iPlane] =
+            new HepGeom::Transform3D[nStrips];
+          for (iStrip = 0; iStrip < nStrips; iStrip++) {
+            m_GeoDat->getStripTransform(
               &m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip], iStrip);
           }
         }
@@ -55,27 +87,28 @@ EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
       B2FATAL("Alignment data does not exist in the input file.");
     if (!alignmentChecker.checkAlignment(&(*alignment)))
       B2FATAL("EKLM alignment data is incorrect, overlaps exist.");
-    for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
-      for (iLayer = 1; iLayer <= EKLM::GeometryData::Instance().
-           getNDetectorLayers(iEndcap); iLayer++) {
-        for (iSector = 1; iSector <= 4; iSector++) {
-          for (iPlane = 1; iPlane <= 2; iPlane++) {
-            for (iSegment = 1; iSegment <= 5; iSegment++) {
-              segment = geoDat.segmentNumber(iEndcap, iLayer, iSector, iPlane,
-                                             iSegment);
+    for (iEndcap = 1; iEndcap <= nEndcaps; iEndcap++) {
+      nLayers = m_GeoDat->getNDetectorLayers(iEndcap);
+      for (iLayer = 1; iLayer <= nLayers; iLayer++) {
+        for (iSector = 1; iSector <= nSectors; iSector++) {
+          for (iPlane = 1; iPlane <= nPlanes; iPlane++) {
+            for (iSegment = 1; iSegment <= nSegments; iSegment++) {
+              segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector,
+                                                iPlane, iSegment);
               alignmentData = alignment->getAlignmentData(segment);
               if (alignmentData == NULL)
                 B2FATAL("Incomplete alignment data.");
-              for (iStrip = 1; iStrip <= 15; iStrip++) {
-                m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip] =
+              for (iStrip = 1; iStrip <= nStripsSegment; iStrip++) {
+                m_Strip[iEndcap - 1][iLayer - 1][iSector - 1][iPlane - 1]
+                [nStripsSegment * (iSegment - 1) + iStrip - 1] =
                   HepGeom::Translate3D(
                     alignmentData->getDx() * CLHEP::cm / Unit::cm,
                     alignmentData->getDy() * CLHEP::cm / Unit::cm, 0) *
-                  m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip] *
+                  m_Strip[iEndcap - 1][iLayer - 1][iSector - 1][iPlane - 1]
+                  [nStripsSegment * (iSegment - 1) + iStrip - 1] *
                   HepGeom::RotateZ3D(alignmentData->getDalpha() * CLHEP::rad /
                                      Unit::rad);
               }
-
             }
           }
         }
@@ -89,22 +122,62 @@ EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
 
 EKLM::TransformData::~TransformData()
 {
+  int iEndcap, iLayer, iSector, iPlane;
+  int nEndcaps, nLayers, nSectors, nPlanes;
+  nEndcaps = m_GeoDat->getNEndcaps();
+  nSectors = m_GeoDat->getNSectors();
+  nPlanes = m_GeoDat->getNPlanes();
+  for (iEndcap = 0; iEndcap < nEndcaps; iEndcap++) {
+    nLayers = m_GeoDat->getNDetectorLayers(iEndcap);
+    for (iLayer = 0; iLayer < nLayers; iLayer++) {
+      for (iSector = 0; iSector < nSectors; iSector++) {
+        for (iPlane = 0; iPlane < nPlanes; iPlane++) {
+          delete[] m_Strip[iEndcap][iLayer][iSector][iPlane];
+          delete[] m_StripInverse[iEndcap][iLayer][iSector][iPlane];
+        }
+        delete[] m_Plane[iEndcap][iLayer][iSector];
+        delete[] m_Strip[iEndcap][iLayer][iSector];
+        delete[] m_StripInverse[iEndcap][iLayer][iSector];
+      }
+      delete[] m_Sector[iEndcap][iLayer];
+      delete[] m_Plane[iEndcap][iLayer];
+      delete[] m_Strip[iEndcap][iLayer];
+      delete[] m_StripInverse[iEndcap][iLayer];
+    }
+    delete[] m_Layer[iEndcap];
+    delete[] m_Sector[iEndcap];
+    delete[] m_Plane[iEndcap];
+    delete[] m_Strip[iEndcap];
+    delete[] m_StripInverse[iEndcap];
+  }
+  delete[] m_Endcap;
+  delete[] m_Layer;
+  delete[] m_Sector;
+  delete[] m_Plane;
+  delete[] m_Strip;
+  delete[] m_StripInverse;
 }
 
 void EKLM::TransformData::transformsToGlobal()
 {
   int iEndcap, iLayer, iSector, iPlane, iStrip;
-  for (iEndcap = 0; iEndcap < 2; iEndcap++) {
-    for (iLayer = 0; iLayer < 14; iLayer++) {
+  int nEndcaps, nLayers, nSectors, nPlanes, nStrips;
+  nEndcaps = m_GeoDat->getNEndcaps();
+  nSectors = m_GeoDat->getNSectors();
+  nPlanes = m_GeoDat->getNPlanes();
+  nStrips = m_GeoDat->getNStrips();
+  for (iEndcap = 0; iEndcap < nEndcaps; iEndcap++) {
+    nLayers = m_GeoDat->getNDetectorLayers(iEndcap);
+    for (iLayer = 0; iLayer < nLayers; iLayer++) {
       m_Layer[iEndcap][iLayer] = m_Endcap[iEndcap] * m_Layer[iEndcap][iLayer];
-      for (iSector = 0; iSector < 4; iSector++) {
+      for (iSector = 0; iSector < nSectors; iSector++) {
         m_Sector[iEndcap][iLayer][iSector] =
           m_Layer[iEndcap][iLayer] * m_Sector[iEndcap][iLayer][iSector];
-        for (iPlane = 0; iPlane < 2; iPlane++) {
+        for (iPlane = 0; iPlane < nPlanes; iPlane++) {
           m_Plane[iEndcap][iLayer][iSector][iPlane] =
             m_Sector[iEndcap][iLayer][iSector] *
             m_Plane[iEndcap][iLayer][iSector][iPlane];
-          for (iStrip = 0; iStrip < 75; iStrip++) {
+          for (iStrip = 0; iStrip < nStrips; iStrip++) {
             m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip] =
               m_Plane[iEndcap][iLayer][iSector][iPlane] *
               m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip];
@@ -176,15 +249,14 @@ bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
   if (hit1->getPlane() == hit2->getPlane())
     return false;
   /* Coordinates of strip 1 ends. */
-  const GeometryData& geoDat = GeometryData::Instance();
-  double l1 = geoDat.getStripLength(hit1->getStrip());
+  double l1 = m_GeoDat->getStripLength(hit1->getStrip());
   HepGeom::Point3D<double> s1_1(-0.5 * l1, 0.0, 0.0);
   HepGeom::Point3D<double> s1_2(0.5 * l1, 0.0, 0.0);
   const HepGeom::Transform3D* tr1 = getStripLocalToGlobal(hit1);
   HepGeom::Point3D<double> s1_1g = (*tr1) * s1_1;
   HepGeom::Point3D<double> s1_2g = (*tr1) * s1_2;
   /* Coordinates of strip 2 ends. */
-  double l2 = geoDat.getStripLength(hit2->getStrip());
+  double l2 = m_GeoDat->getStripLength(hit2->getStrip());
   HepGeom::Point3D<double> s2_1(-0.5 * l2, 0.0, 0.0);
   HepGeom::Point3D<double> s2_2(0.5 * l2, 0.0, 0.0);
   const HepGeom::Transform3D* tr2 = getStripLocalToGlobal(hit2);

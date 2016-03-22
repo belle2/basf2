@@ -332,6 +332,11 @@ namespace Belle2 {
       std::string getDisplacementDataFile() const;
 
       /**
+       * Get number of endcaps.
+       */
+      int getNEndcaps() const;
+
+      /**
        * Get number of layers.
        */
       int getNLayers() const;
@@ -341,6 +346,11 @@ namespace Belle2 {
        * @param[in] endcap Endcap number (1 - backward, 2 - forward).
        */
       int getNDetectorLayers(int endcap) const;
+
+      /**
+       * Get number of sectors.
+       */
+      int getNSectors() const;
 
       /**
        * Get number of planes.
@@ -366,6 +376,11 @@ namespace Belle2 {
        * Get number of segments.
        */
       int getNSegments() const;
+
+      /**
+       * Get number of strips in a segment.
+       */
+      int getNStripsSegment() const;
 
       /**
        * Get layer number.
@@ -661,17 +676,96 @@ namespace Belle2 {
        */
       void calculateShieldGeometry();
 
+      /**
+       * Check if endcap number is correct (fatal error if not).
+       * @param[in] endcap Endcap number.
+       */
+      void checkEndcap(int endcap) const;
+
+      /**
+       * Check if layer number is correct (fatal error if not).
+       * @param[in] layer Layer number.
+       */
+      void checkLayer(int layer) const;
+
+      /**
+       * Check if number of detector layers is correct (fatal error if not).
+       * Endcap number must be checked separately.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       */
+      void checkDetectorLayerNumber(int endcap, int layer) const;
+
+      /**
+       * Check if detector layer number is correct (fatal error if not).
+       * Endcap number must be checked separately.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       */
+      void checkDetectorLayer(int endcap, int layer) const;
+
+      /**
+       * Check if sector number is correct (fatal error if not).
+       * @param[in] sector Sector number.
+       */
+      void checkSector(int sector) const;
+
+      /**
+       * Check if plane number is correct (fatal error if not).
+       * @param[in] plane Plane number.
+       */
+      void checkPlane(int plane) const;
+
+      /**
+       * Check if segment number is correct (fatal error if not).
+       * @param[in] segment Segment number.
+       */
+      void checkSegment(int segment) const;
+
+      /**
+       * Check if segment support number is correct (fatal error if not).
+       * @param[in] support Segment support element number.
+       */
+      void checkSegmentSupport(int support) const;
+
+      /**
+       * Check if strip number is correct (fatal error if not).
+       * @param[in] strip Strip number.
+       */
+      void checkStrip(int strip) const;
+
       /** Displacement data file. */
       std::string m_DisplacementDataFile;
+
+      /** Maximal endcap number. */
+      const int m_MaximalEndcapNumber;
+
+      /** Maximal layer number. */
+      const int m_MaximalLayerNumber;
+
+      /** Maximal sector number. */
+      const int m_MaximalSectorNumber;
+
+      /** Maximal plane number. */
+      const int m_MaximalPlaneNumber;
+
+      /** Maximal segment number. */
+      const int m_MaximalSegmentNumber;
+
+      /** Maximal strip number. */
+      const int m_MaximalStripNumber;
+
+      /** Number of endcaps. */
+      int m_NEndcaps;
 
       /** Number of layers. */
       int m_nLayer;
 
-      /** Number of detector layers in the forward endcap. */
-      int m_nLayerForward;
+      /** Number of detector layers. */
+      int* m_NDetectorLayers;
 
-      /** Number of detector layers in the backward endcap. */
-      int m_nLayerBackward;
+      /** Number of sectors. */
+      int m_NSectors;
 
       /** Number of planes in one sector. */
       int m_nPlane;

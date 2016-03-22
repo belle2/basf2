@@ -16,6 +16,7 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/geometry/GeometryData.h>
 
 /**
  * @file
@@ -131,23 +132,26 @@ namespace Belle2 {
        */
       void transformsToGlobal();
 
+      /** Geometry data. */
+      const GeometryData* m_GeoDat;
+
       /** Endcap transformations. */
-      HepGeom::Transform3D m_Endcap[2];
+      HepGeom::Transform3D* m_Endcap;
 
       /** Layer transformations. */
-      HepGeom::Transform3D m_Layer[2][14];
+      HepGeom::Transform3D** m_Layer;
 
       /** Sector transformations. */
-      HepGeom::Transform3D m_Sector[2][14][4];
+      HepGeom::Transform3D*** m_Sector;
 
       /** Plane transformations. */
-      HepGeom::Transform3D m_Plane[2][14][4][2];
+      HepGeom::Transform3D**** m_Plane;
 
       /** Strip transformations. */
-      HepGeom::Transform3D m_Strip[2][14][4][2][75];
+      HepGeom::Transform3D***** m_Strip;
 
       /** Inverse strip transformations. */
-      HepGeom::Transform3D m_StripInverse[2][14][4][2][75];
+      HepGeom::Transform3D***** m_StripInverse;
 
     };
 

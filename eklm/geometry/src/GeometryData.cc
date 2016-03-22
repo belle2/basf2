@@ -24,14 +24,6 @@ using namespace Belle2;
 static const char c_MemErr[] = "Memory allocation error.";
 static const char c_ModeErr[] =
   "Requested data are defined only for c_DetectorBackground mode.";
-static const char c_EndcapErr[] =
-  "Number of endcap must be 1 (backward) or 2 (forward).";
-static const char c_PlaneErr[] = "Number of plane must be from 1 to 2.";
-static const char c_SegmentErr[] = "Number of segment must be from 1 to 5.";
-static const char c_SupportErr[] =
-  "Number of segment support element must be from 1 to 6.";
-static const char c_BoardErr[] = "Number of board must be from 1 to 15.";
-static const char c_StripErr[] = "Number of strip must be from 1 to 75.";
 
 const EKLM::GeometryData& EKLM::GeometryData::Instance()
 {
@@ -265,6 +257,7 @@ void EKLM::GeometryData::readXMLDataStrips()
   GearDir Strips("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap/"
                  "Layer/Sector/Plane/Strips");
   m_nStrip = Strips.getNumberNodes("Strip");
+  checkStrip(m_nStrip);
   m_StripGeometry.Width  = Strips.getLength("Width") * CLHEP::cm;
   m_StripGeometry.Thickness = Strips.getLength("Thickness") * CLHEP::cm;
   m_StripGeometry.GrooveDepth = Strips.getLength("GrooveDepth") * CLHEP::cm;
@@ -459,9 +452,12 @@ void EKLM::GeometryData::calculateShieldGeometry()
   m_ShieldGeometry.DetailCCenter.setZ(0);
 }
 
-EKLM::GeometryData::GeometryData()
+EKLM::GeometryData::GeometryData() : m_MaximalEndcapNumber(2),
+  m_MaximalLayerNumber(14), m_MaximalSectorNumber(4), m_MaximalPlaneNumber(2),
+  m_MaximalSegmentNumber(5), m_MaximalStripNumber(75)
 {
   int i, j, mode;
+  m_NDetectorLayers = new int[m_MaximalEndcapNumber];
   GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
   mode = gd.getInt("Mode");
   if (mode < 0 || mode > 1)
@@ -469,6 +465,7 @@ EKLM::GeometryData::GeometryData()
   m_mode = (enum DetectorMode)mode;
   m_DisplacementDataFile = gd.getString("Displacements");
   m_solenoidZ = gd.getLength("SolenoidZ") * CLHEP::cm;
+  m_NEndcaps = m_MaximalEndcapNumber;
   GearDir EndCap(gd);
   EndCap.append("/Endcap");
   readPositionData(&m_EndcapPosition, &EndCap);
@@ -478,36 +475,24 @@ EKLM::GeometryData::GeometryData()
   m_MaxZBackward = m_solenoidZ - m_EndcapPosition.Z +
                    0.5 * m_EndcapPosition.Length;
   m_nLayer = EndCap.getInt("nLayer");
-  if (m_nLayer < 1 || m_nLayer > 14)
-    B2FATAL("Number of layers must be from 1 to 14.");
-  m_nLayerForward = EndCap.getInt("nLayerForward");
-  if (m_nLayerForward < 0)
-    B2FATAL("Number of detector layers in the forward endcap "
-            "must be nonnegative.");
-  if (m_nLayerForward > m_nLayer)
-    B2FATAL("Number of detector layers in the forward endcap "
-            "must be less than or equal to the number of layers.");
-  m_nLayerBackward = EndCap.getInt("nLayerBackward");
-  if (m_nLayerBackward < 0)
-    B2FATAL("Number of detector layers in the backward endcap "
-            "must be nonnegative.");
-  if (m_nLayerBackward > m_nLayer)
-    B2FATAL("Number of detector layers in the backward endcap "
-            "must be less than or equal to the number of layers.");
+  checkLayer(m_nLayer);
+  m_NDetectorLayers[0] = EndCap.getInt("nLayerBackward");
+  checkDetectorLayerNumber(1, m_NDetectorLayers[0]);
+  m_NDetectorLayers[1] = EndCap.getInt("nLayerForward");
+  checkDetectorLayerNumber(2, m_NDetectorLayers[1]);
   GearDir Layer(EndCap);
   Layer.append("/Layer");
   readSizeData(&m_LayerPosition, &Layer);
   m_LayerShiftZ = Layer.getLength("ShiftZ") * CLHEP::cm;
   GearDir Sector(Layer);
+  m_NSectors = m_MaximalSectorNumber;
   Sector.append("/Sector");
   readSizeData(&m_SectorPosition, &Sector);
   m_nPlane = Sector.getInt("nPlane");
-  if (m_nPlane < 1 || m_nPlane > 2)
-    B2FATAL("Number of strip planes must be from 1 to 2.");
+  checkPlane(m_nPlane);
   if (m_mode == c_DetectorBackground) {
     m_nBoard = Sector.getInt("nBoard");
-    if (m_nBoard < 1 || m_nBoard > 5)
-      B2FATAL("Number of readout boards must be from 1 to 5.");
+    checkSegment(m_nBoard);
     GearDir Boards(Sector);
     Boards.append("/Boards");
     m_BoardGeometry.Length = Boards.getLength("Length") * CLHEP::cm;
@@ -631,6 +616,7 @@ static void freeShieldDetail(struct EKLM::ShieldDetailGeometry* sdg)
 EKLM::GeometryData::~GeometryData()
 {
   int i;
+  delete[] m_NDetectorLayers;
   for (i = 0; i < m_nPlane; i++)
     free(m_SegmentSupportPosition[i]);
   if (m_mode == c_DetectorBackground) {
@@ -644,6 +630,72 @@ EKLM::GeometryData::~GeometryData()
   freeShieldDetail(&m_ShieldGeometry.DetailB);
   freeShieldDetail(&m_ShieldGeometry.DetailC);
   freeShieldDetail(&m_ShieldGeometry.DetailD);
+}
+
+void EKLM::GeometryData::checkEndcap(int endcap) const
+{
+  if (endcap <= 0 || endcap > m_MaximalEndcapNumber)
+    B2FATAL("Number of endcap must be 1 (backward) or 2 (forward).");
+}
+
+void EKLM::GeometryData::checkLayer(int layer) const
+{
+  if (layer <= 0 || layer > m_MaximalLayerNumber)
+    B2FATAL("Number of layer must be from 1 to " << m_MaximalLayerNumber <<
+            ".");
+}
+
+void EKLM::GeometryData::checkDetectorLayerNumber(int endcap, int layer) const
+{
+  const char* endcapName[2] = {"backward", "forward"};
+  if (layer < 0 || layer > m_nLayer)
+    B2FATAL("Number of detector layers in the " << endcapName[endcap - 1] <<
+            " endcap must be from 0 to the number of layers ( " <<
+            m_nLayer << ").");
+}
+
+void EKLM::GeometryData::checkDetectorLayer(int endcap, int layer) const
+{
+  const char* endcapName[2] = {"backward", "forward"};
+  if (layer < 0 || layer > m_NDetectorLayers[endcap - 1])
+    B2FATAL("Number of layer must be less from 1 to the number of "
+            "detector layers in the " << endcapName[endcap - 1] << " endcap ("
+            << m_NDetectorLayers[endcap - 1] << ").");
+}
+
+void EKLM::GeometryData::checkSector(int sector) const
+{
+  if (sector <= 0 || sector > m_MaximalSectorNumber)
+    B2FATAL("Number of sector must be from 1 to " << m_MaximalSectorNumber <<
+            ".");
+}
+
+void EKLM::GeometryData::checkPlane(int plane) const
+{
+  if (plane <= 0 || plane > m_MaximalPlaneNumber)
+    B2FATAL("Number of plane must be from 1 to " << m_MaximalPlaneNumber <<
+            ".");
+}
+
+void EKLM::GeometryData::checkSegment(int segment) const
+{
+  if (segment <= 0 || segment > m_MaximalSegmentNumber)
+    B2FATAL("Number of segment must be from 1 to " << m_MaximalSegmentNumber <<
+            ".");
+}
+
+void EKLM::GeometryData::checkSegmentSupport(int support) const
+{
+  if (support <= 0 || support > m_MaximalSegmentNumber + 1)
+    B2FATAL("Number of segment support element must be from 1 to " <<
+            m_MaximalSegmentNumber + 1 << ".");
+}
+
+void EKLM::GeometryData::checkStrip(int strip) const
+{
+  if (strip <= 0 || strip > m_MaximalStripNumber)
+    B2FATAL("Number of strip must be from 1 to " << m_MaximalStripNumber <<
+            ".");
 }
 
 EKLM::DetectorMode EKLM::GeometryData::getDetectorMode() const
@@ -661,6 +713,11 @@ std::string EKLM::GeometryData::getDisplacementDataFile() const
   return m_DisplacementDataFile;
 }
 
+int EKLM::GeometryData::getNEndcaps() const
+{
+  return m_NEndcaps;
+}
+
 int EKLM::GeometryData::getNLayers() const
 {
   return m_nLayer;
@@ -668,11 +725,13 @@ int EKLM::GeometryData::getNLayers() const
 
 int EKLM::GeometryData::getNDetectorLayers(int endcap) const
 {
-  if (endcap <= 0 || endcap > 2)
-    B2FATAL("Number of endcap must be 1 (backward) or 2 (forward).");
-  if (endcap == 1)
-    return m_nLayerBackward;
-  return m_nLayerForward;
+  checkEndcap(endcap);
+  return m_NDetectorLayers[endcap - 1];
+}
+
+int EKLM::GeometryData::getNSectors() const
+{
+  return m_NSectors;
 }
 
 int EKLM::GeometryData::getNPlanes() const
@@ -704,53 +763,49 @@ int EKLM::GeometryData::getNSegments() const
   return m_nSegment;
 }
 
+int EKLM::GeometryData::getNStripsSegment() const
+{
+  return 15;
+}
+
 int EKLM::GeometryData::detectorLayerNumber(int endcap, int layer) const
 {
-  if (endcap <= 0 || endcap > 2)
-    B2FATAL(c_EndcapErr);
-  if (layer <= 0)
-    B2FATAL("Number of layer must be positive.");
-  if (endcap == 1) {
-    if (layer > m_nLayerBackward)
-      B2FATAL("Number of layer must be less than or equal to the number of "
-              "detector layers in the backward endcap.");
+  checkEndcap(endcap);
+  checkDetectorLayer(endcap, layer);
+  if (endcap == 1)
     return layer;
-  }
-  if (layer > m_nLayerForward)
-    B2FATAL("Number of layer must be less than or equal to the number of "
-            "detector layers in the forward endcap.");
-  return m_nLayerBackward + layer;
+  return m_NDetectorLayers[0] + layer;
 }
 
 int EKLM::GeometryData::sectorNumber(int endcap, int layer, int sector) const
 {
-  if (sector <= 0 || sector > 4)
-    B2FATAL("Number of sector must be from 1 to 4.");
-  return 4 * (detectorLayerNumber(endcap, layer) - 1) + sector;
+  checkSector(sector);
+  return m_MaximalSectorNumber * (detectorLayerNumber(endcap, layer) - 1) +
+         sector;
 }
 
 int EKLM::GeometryData::planeNumber(int endcap, int layer, int sector,
                                     int plane) const
 {
-  if (plane <= 0 || plane > 2)
-    B2FATAL(c_PlaneErr);
-  return 2 * (sectorNumber(endcap, layer, sector) - 1) + plane;
+  checkPlane(plane);
+  return m_MaximalPlaneNumber * (sectorNumber(endcap, layer, sector) - 1) +
+         plane;
 }
 
 int EKLM::GeometryData::segmentNumber(int endcap, int layer, int sector,
                                       int plane, int segment) const
 {
-  if (segment <= 0 || segment > 5)
-    B2FATAL(c_SegmentErr);
-  return 5 * (planeNumber(endcap, layer, sector, plane) - 1) + segment;
+  checkSegment(segment);
+  return m_MaximalSegmentNumber * (planeNumber(endcap, layer, sector, plane) -
+                                   1) + segment;
 }
 
 int EKLM::GeometryData::stripNumber(int endcap, int layer, int sector,
                                     int plane, int strip) const
 {
-  if (strip <= 0 || strip > 75)
-    B2FATAL(c_StripErr);
-  return 75 * (planeNumber(endcap, layer, sector, plane) - 1) + strip;
+  checkStrip(strip);
+  return m_MaximalStripNumber * (planeNumber(endcap, layer, sector, plane) - 1)
+         + strip;
 }
 
 int EKLM::GeometryData::stripLocalNumber(int strip) const
@@ -758,12 +813,14 @@ int EKLM::GeometryData::stripLocalNumber(int strip) const
   static int maxStrip = getMaximalStripNumber();
   if (strip <= 0 || strip > maxStrip)
     B2FATAL("Number of strip must be from 1 to getMaximalStripNumber().");
-  return strip % 75 + 1;
+  return (strip - 1) % m_MaximalStripNumber + 1;
 }
 
 int EKLM::GeometryData::getMaximalStripNumber() const
 {
-  return stripNumber(2, m_nLayerForward, 4, 2, 75);
+  return stripNumber(m_MaximalEndcapNumber, m_NDetectorLayers[1],
+                     m_MaximalSectorNumber, m_MaximalPlaneNumber,
+                     m_MaximalStripNumber);
 }
 
 double EKLM::GeometryData::getSolenoidZ() const
@@ -815,10 +872,8 @@ EKLM::GeometryData::getBoardPosition(int plane, int segment) const
 {
   if (m_mode != c_DetectorBackground)
     B2FATAL(c_ModeErr);
-  if (plane <= 0 || plane > 2)
-    B2FATAL(c_PlaneErr);
-  if (segment <= 0 || segment > 5)
-    B2FATAL(c_SegmentErr);
+  checkPlane(plane);
+  checkSegment(segment);
   return &m_BoardPosition[plane - 1][segment - 1];
 }
 
@@ -827,8 +882,7 @@ EKLM::GeometryData::getStripBoardPosition(int board) const
 {
   if (m_mode != c_DetectorBackground)
     B2FATAL(c_ModeErr);
-  if (board <= 0 || board > 15)
-    B2FATAL(c_BoardErr);
+  checkSegment(board);
   return &m_StripBoardPosition[board - 1];
 }
 
@@ -840,10 +894,8 @@ const EKLM::ElementPosition* EKLM::GeometryData::getPlanePosition() const
 const EKLM::SegmentSupportPosition*
 EKLM::GeometryData::getSegmentSupportPosition(int plane, int support) const
 {
-  if (plane <= 0 || plane > 2)
-    B2FATAL(c_PlaneErr);
-  if (support <= 0 || support > 6)
-    B2FATAL(c_SupportErr);
+  checkPlane(plane);
+  checkSegmentSupport(support);
   return &m_SegmentSupportPosition[plane - 1][support - 1];
 }
 
@@ -862,8 +914,7 @@ EKLM::GeometryData::getPlasticSheetGeometry() const
 const EKLM::ElementPosition*
 EKLM::GeometryData::getStripPosition(int strip) const
 {
-  if (strip <= 0 || strip > 75)
-    B2FATAL(c_StripErr);
+  checkStrip(strip);
   return &m_StripPosition[strip - 1];
 }
 

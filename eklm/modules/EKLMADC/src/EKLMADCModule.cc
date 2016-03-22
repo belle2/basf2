@@ -66,6 +66,7 @@ void EKLMADCModule::initialize()
   int i;
   double l;
   EKLM::setDefDigitizationParams(&m_digPar);
+  const EKLM::GeometryData* geoDat = &EKLM::GeometryData::Instance();
   m_digPar.debug = false;
   try {
     m_fout = new TFile(m_out.c_str(), "recreate");
@@ -75,9 +76,8 @@ void EKLMADCModule::initialize()
     B2FATAL(MemErr);
   }
   if (m_mode.compare("Strips") == 0) {
-    for (i = 1; i <= 75; i++) {
-      l = EKLM::GeometryData::Instance().getStripLength(i) / CLHEP::mm *
-          Unit::mm;
+    for (i = 1; i <= geoDat->getNStrips(); i++) {
+      l = geoDat->getStripLength(i) / CLHEP::mm * Unit::mm;
       snprintf(str, 32, "h%d_near", i);
       generateHistogram(str, l, 0, 10000);
       snprintf(str, 32, "h%d_far", i);

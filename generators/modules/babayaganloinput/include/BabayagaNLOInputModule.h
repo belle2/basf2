@@ -109,6 +109,12 @@ namespace Belle2 {
     std::pair<T, T> vectorToPair(std::vector<T>& vec, const std::string& name = "");
 
   private:
+    /** Method is called to initialize the generator. */
+    void initializeGenerator();
+
+    bool m_initialized{false}; /**< True if generator has been initialized. */
+    DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter. */
+
     static InitialParticleGeneration
     s_initial;   /**< Initial particle for beam parameters, static because we need to call it from FORTRAN here. */
   };

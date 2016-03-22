@@ -99,6 +99,7 @@ BabayagaNLOInputModule::~BabayagaNLOInputModule()
 
 void BabayagaNLOInputModule::initialize()
 {
+  //Initialize MCParticle collection
   StoreArray<MCParticle>::registerPersistent();
 
   //open extrafile
@@ -108,8 +109,54 @@ void BabayagaNLOInputModule::initialize()
     m_th1dSDif = new TH1D("sdif", "sdif", 1000, 0., 100000.);
   }
 
-  // beam parameters
+  //Initialize initial particle for beam parameters.
   s_initial.initialize();
+
+  // Initialize ExtraInfo (hold prescale values)
+  m_generator.initExtraInfo();
+
+
+}
+
+void BabayagaNLOInputModule::event()
+{
+
+  // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)
+  if (m_beamParams.hasChanged()) {
+    if (!m_initialized) {
+      initializeGenerator();
+    } else {
+      B2FATAL("BabayagaNLOInputModule::event(): BeamParameters have changed within a job, this is not supported for BABAYAGA!");
+    }
+  }
+
+  // initial particle from beam parameters
+  MCInitialParticles& initial = s_initial.generate();
+
+  // CM energy
+  double ecm = initial.getMass();
+
+  // true boost (per event!)
+  TLorentzRotation boost = initial.getCMSToLab();
+
+  // vertex
+  TVector3 vertex = initial.getVertex();
+
+  m_mcGraph.clear();
+  m_generator.generateEvent(m_mcGraph, ecm, vertex, boost); // actual generator call
+
+  m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
+
+}
+
+void BabayagaNLOInputModule::terminate()
+{
+
+  m_generator.term();
+}
+
+void BabayagaNLOInputModule::initializeGenerator()
+{
 
   // generator parameters
   m_generator.setScatAngle(vectorToPair(m_ScatteringAngleRange, "ScatteringAngleRange"));
@@ -160,30 +207,7 @@ void BabayagaNLOInputModule::initialize()
   }
 
   m_generator.init();
-}
 
-void BabayagaNLOInputModule::event()
-{
-  // initial particle from beam parameters
-  MCInitialParticles& initial = s_initial.generate();
+  m_initialized = true;
 
-  // CM energy
-  double ecm = initial.getMass();
-
-  // true boost (per event!)
-  TLorentzRotation boost = initial.getCMSToLab();
-
-  // vertex
-  TVector3 vertex = initial.getVertex();
-
-  m_mcGraph.clear();
-  m_generator.generateEvent(m_mcGraph, ecm, vertex, boost);
-  m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
-
-}
-
-void BabayagaNLOInputModule::terminate()
-{
-
-  m_generator.term();
 }

@@ -9,7 +9,6 @@
 ########################################################
 
 from basf2 import *
-from beamparameters import add_beamparameters
 
 # Set the global log level
 set_log_level(LogLevel.INFO)
@@ -19,13 +18,6 @@ main = create_path()
 
 # event info setter
 main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
-
-# beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
-# beamparameters.param("smearEnergy", False)
-# beamparameters.param("generateCMS", False)
-# beamparameters.param("smearDirection", False)
-# beamparameters.param("smearVertex", False)
 
 # Register the BABAYAGA.NLO module
 babayaganlo = register_module('BabayagaNLOInput')

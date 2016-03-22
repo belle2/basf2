@@ -313,10 +313,13 @@ void BabayagaNLO::setDefaultSettings()
   m_maxprescale = 1.0;
 }
 
-void BabayagaNLO::init()
+void BabayagaNLO::initExtraInfo()
 {
   StoreObjPtr<EventExtraInfo>::registerPersistent("", DataStore::c_Event, false);
+}
 
+void BabayagaNLO::init()
+{
   applySettings();
 }
 

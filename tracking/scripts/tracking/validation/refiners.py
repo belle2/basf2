@@ -138,6 +138,8 @@ class SaveFiguresOfMeritRefiner(Refiner):
         if tdirectory:
             figures_of_merit.write(tdirectory)
 
+        print(figures_of_merit)
+
 
 class SaveHistogramsRefiner(Refiner):
     default_name = "{module.id}_{part_name}_histogram{stacked_by_indication}{stackby}"

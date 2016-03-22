@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include <TObject.h>
-
+#include <iosfwd>
+#include <Rtypes.h>
 
 namespace Belle2 {
   class EventMetaData;
@@ -20,7 +20,7 @@ namespace Belle2 {
    * A class that describes the interval of experiments/runs
    * for which an object in the database is valid.
    */
-  class IntervalOfValidity {
+  class IntervalOfValidity final {
   public:
 
     /**
@@ -35,7 +35,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~IntervalOfValidity() {};
+    ~IntervalOfValidity() = default;
 
     /**
      * Function that checks whether the event is inside the validity interval.
@@ -53,7 +53,7 @@ namespace Belle2 {
     /**
      * Check whether two intervals of validity are identical.
      */
-    virtual bool operator==(const IntervalOfValidity& other)
+    bool operator==(const IntervalOfValidity& other)
     {
       return (m_experimentLow == other.m_experimentLow) && (m_runLow == other.m_runLow) &&
              (m_experimentHigh == other.m_experimentHigh) && (m_runHigh == other.m_runHigh);
@@ -62,7 +62,7 @@ namespace Belle2 {
     /**
      * Check whether two intervals of validity are different.
      */
-    virtual bool operator!=(const IntervalOfValidity& other)
+    bool operator!=(const IntervalOfValidity& other)
     {
       return !(*this == other);
     }
@@ -149,6 +149,6 @@ namespace Belle2 {
      */
     void makeValid();
 
-    ClassDef(IntervalOfValidity, 2);  /**< describes the interval of experiments/runs for which an object in the database is valid. */
+    ClassDefNV(IntervalOfValidity, 2);  /**< describes the interval of experiments/runs for which an object in the database is valid. */
   };
 }

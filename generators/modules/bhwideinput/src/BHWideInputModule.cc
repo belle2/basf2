@@ -3,7 +3,7 @@
  * Copyright(C) 2011  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Torben Ferber                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -68,10 +68,52 @@ void BHWideInputModule::initialize()
 
   //Beam Parameters, initial particle - BHWIDE cannot handle beam energy spread
   m_initial.initialize();
+
+}
+
+
+void BHWideInputModule::event()
+{
+  // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)
+  if (m_beamParams.hasChanged()) {
+    if (!m_initialized) {
+      initializeGenerator();
+    } else {
+      B2FATAL("BHWideInputModule::event(): BeamParameters have changed within a job, this is not supported for BHWide!");
+    }
+  }
+
+  // initial particle from beam parameters
+  MCInitialParticles& initial = m_initial.generate();
+
+  // true boost
+  TLorentzRotation boost = initial.getCMSToLab();
+
+  // vertex
+  TVector3 vertex = initial.getVertex();
+
+  m_mcGraph.clear();
+  m_generator.generateEvent(m_mcGraph, vertex, boost);
+  m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
+}
+
+
+
+void BHWideInputModule::terminate()
+{
+  m_generator.term();
+
+  B2RESULT("BHWideInputModule: Total cross section: " << m_generator.getCrossSection() * 0.001 << " nb +- " <<
+           m_generator.getCrossSection() *
+           m_generator.getCrossSectionError() * 0.001 << " nb")
+}
+
+void BHWideInputModule::initializeGenerator()
+{
   const BeamParameters& nominal = m_initial.getBeamParameters();
   double ecm = nominal.getMass();
 
-//   m_generator.enableBoost(m_boostMode > 0);
+  //   m_generator.enableBoost(m_boostMode > 0);
   m_generator.setScatAnglePositron(vectorToPair(m_ScatteringAngleRangePositron, "ScatteringAngleRangePositron"));
   m_generator.setScatAngleElectron(vectorToPair(m_ScatteringAngleRangeElectron, "ScatteringAngleRangeElectron"));
 
@@ -103,32 +145,7 @@ void BHWideInputModule::initialize()
   m_generator.setCMSEnergy(ecm);
 
   m_generator.init();
-}
 
+  m_initialized = true;
 
-void BHWideInputModule::event()
-{
-  // initial particle from beam parameters
-  MCInitialParticles& initial = m_initial.generate();
-
-  // true boost
-  TLorentzRotation boost = initial.getCMSToLab();
-
-  // vertex
-  TVector3 vertex = initial.getVertex();
-
-  m_mcGraph.clear();
-  m_generator.generateEvent(m_mcGraph, vertex, boost);
-  m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
-}
-
-
-
-void BHWideInputModule::terminate()
-{
-  m_generator.term();
-
-  B2RESULT("BHWideInputModule: Total cross section: " << m_generator.getCrossSection() * 0.001 << " nb +- " <<
-           m_generator.getCrossSection() *
-           m_generator.getCrossSectionError() * 0.001 << " nb")
 }

@@ -13,7 +13,6 @@
 import sys
 import math
 from basf2 import *
-from beamparameters import add_beamparameters
 
 # reenable GUI thread for our canvas
 from ROOT import PyConfig
@@ -75,12 +74,6 @@ main = create_path()
 
 # event info setter
 main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
-
-# beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
-# beamparameters.param("smearVertex", False)
-# beamparameters.param("generateCMS", True)
-# print_params(beamparameters)
 
 # Register the BHWideInput module
 bhwide = register_module('BHWideInput')

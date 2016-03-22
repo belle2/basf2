@@ -139,10 +139,13 @@ void Teegg::setDefaultSettings()
   m_vp2 = 1.0;
 }
 
-void Teegg::init()
+void Teegg::initExtraInfo()
 {
   StoreObjPtr<EventExtraInfo>::registerPersistent("", DataStore::c_Event, false);
+}
 
+void Teegg::init()
+{
   applySettings();
 }
 

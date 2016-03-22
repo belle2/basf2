@@ -1,6 +1,6 @@
 /************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2014  Belle II Collaboration                              *
+* Copyright(C) 2015  Belle II Collaboration                              *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Torben Ferber                                            *
@@ -63,7 +63,6 @@ TeeggInputModule::TeeggInputModule() : Module(), m_initial(BeamParameters::c_sme
   addParam("UNWEIGHTED", m_UNWGHT, "If true then generate unweighted events", 1);
 }
 
-
 TeeggInputModule::~TeeggInputModule()
 {
 
@@ -72,9 +71,53 @@ TeeggInputModule::~TeeggInputModule()
 
 void TeeggInputModule::initialize()
 {
+  //Initialize MCParticle collection.
   StoreArray<MCParticle>::registerPersistent();
 
+  //Initialize initial particle for beam parameters.
   m_initial.initialize();
+
+  // Initialize ExtraInfo (holds vaccum polarization corrections)
+  m_generator.initExtraInfo();
+
+}
+
+
+void TeeggInputModule::event()
+{
+
+  // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)
+  if (m_beamParams.hasChanged()) {
+    if (!m_initialized) {
+      initializeGenerator();
+    } else {
+      B2FATAL("TeeggInputModule::event(): BeamParameters have changed within a job, this is not supported for TEEGG!");
+    }
+  }
+
+  m_mcGraph.clear();
+
+  // initial particle from beam parameters
+  MCInitialParticles& initial = m_initial.generate();
+
+  // true boost
+  TLorentzRotation boost = initial.getCMSToLab();
+
+  // vertex
+  TVector3 vertex = initial.getVertex();
+
+  m_generator.generateEvent(m_mcGraph, vertex, boost);
+  m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
+}
+
+
+void TeeggInputModule::terminate()
+{
+  m_generator.term();
+}
+
+void TeeggInputModule::initializeGenerator()
+{
   const BeamParameters& nominal = m_initial.getBeamParameters();
   m_cmsEnergy = nominal.getMass();
 
@@ -104,28 +147,7 @@ void TeeggInputModule::initialize()
 
   m_generator.init();
 
+  m_initialized = true;
+
 }
 
-
-void TeeggInputModule::event()
-{
-  m_mcGraph.clear();
-
-  // initial particle from beam parameters
-  MCInitialParticles& initial = m_initial.generate();
-
-  // true boost
-  TLorentzRotation boost = initial.getCMSToLab();
-
-  // vertex
-  TVector3 vertex = initial.getVertex();
-
-  m_generator.generateEvent(m_mcGraph, vertex, boost);
-  m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
-}
-
-
-void TeeggInputModule::terminate()
-{
-  m_generator.term();
-}

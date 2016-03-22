@@ -153,6 +153,11 @@ namespace Belle2 {
 
     void init(); /**< Initialize generator. */
 
+    /**
+     * Initializes the extra info.
+     */
+    void initExtraInfo();
+
     /** Generates one single event.
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
      */

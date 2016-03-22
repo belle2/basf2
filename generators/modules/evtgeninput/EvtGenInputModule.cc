@@ -60,32 +60,12 @@ EvtGenInputModule::EvtGenInputModule() : Module(), m_initial(BeamParameters::c_s
 
 void EvtGenInputModule::initialize()
 {
-  B2DEBUG(10, "starting initialisation of EvtGen Input Module. ");
-  if (getParam<std::string>("pdlFile").isSetInSteering()) {
-    B2ERROR("The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.")
-  }
-
-  //setup the DECAY files:
-  m_Ievtgen.setup(m_DECFileName, m_parentParticle, m_userDECFileName);
-
   //Initialize MCParticle collection
   StoreArray<MCParticle>::registerPersistent();
-
-  if (m_inclusiveType == 0) m_inclusiveParticle = "";
-  if (m_inclusiveType != 0 && EvtPDL::getId(m_inclusiveParticle).getId() == -1) {
-    B2ERROR("User Specified Inclusive Particle '" << m_inclusiveParticle
-            << "' does not exist");
-  }
-  m_parentId = EvtPDL::getId(m_parentParticle);
-  if (m_parentId.getId() == -1) {
-    B2ERROR("User specified parent particle '" << m_parentParticle
-            << "' does not exist");
-  }
 
   //initial particle for beam parameters
   m_initial.initialize();
 
-  B2DEBUG(10, "finished initialising the EvtGen Input Module.");
 }
 
 
@@ -121,6 +101,16 @@ TLorentzVector EvtGenInputModule::createBeamParticle(double minMass, double maxM
 void EvtGenInputModule::event()
 {
   B2DEBUG(10, "Starting event generation");
+
+  // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)
+  if (m_beamParams.hasChanged()) {
+    if (!m_initialized) {
+      initializeGenerator();
+    } else {
+      B2FATAL("EvtGenInputModule::event(): BeamParameters have changed within a job, this is not supported for EvtGen!");
+    }
+  }
+
   TLorentzVector pParentParticle;
 
   //Initialize the beam energy for each event separatly
@@ -143,4 +133,31 @@ void EvtGenInputModule::event()
 
   B2DEBUG(10, "EvtGen: generated event with " << nPart << " particles.");
 }
+
+void EvtGenInputModule::initializeGenerator()
+{
+
+  B2DEBUG(10, "starting initialisation of EvtGen Input Module. ");
+  if (getParam<std::string>("pdlFile").isSetInSteering()) {
+    B2ERROR("The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.")
+  }
+
+  //setup the DECAY files:
+  m_Ievtgen.setup(m_DECFileName, m_parentParticle, m_userDECFileName);
+
+  if (m_inclusiveType == 0) m_inclusiveParticle = "";
+  if (m_inclusiveType != 0 && EvtPDL::getId(m_inclusiveParticle).getId() == -1) {
+    B2ERROR("User Specified Inclusive Particle '" << m_inclusiveParticle
+            << "' does not exist");
+  }
+  m_parentId = EvtPDL::getId(m_parentParticle);
+  if (m_parentId.getId() == -1) {
+    B2ERROR("User specified parent particle '" << m_parentParticle
+            << "' does not exist");
+  }
+
+  m_initialized = true;
+
+}
+
 

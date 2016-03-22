@@ -8,7 +8,6 @@
 ########################################################
 
 from basf2 import *
-from beamparameters import add_beamparameters
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.INFO)
@@ -18,13 +17,6 @@ main = create_path()
 
 # event info setter
 main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
-
-# beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
-# beamparameters.param("generateCMS", True)
-# beamparameters.param("smearVertex", False)
-# beamparameters.param("smearEnergy", False)
-# print_params(beamparameters)
 
 # EvtGen
 evtgen = register_module('EvtGenInput')

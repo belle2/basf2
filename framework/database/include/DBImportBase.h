@@ -126,7 +126,7 @@ namespace Belle2 {
     template<class IntraRun> bool import(const IntervalOfValidity& iov)
     {
       if (m_objects.empty()) return false;
-      IntraRun intraRun(m_objects[0]);
+      IntraRun intraRun(m_objects[0], false); // IntraRun must not own the objects
 
       if (m_object) m_objects.push_back(m_object);
       for (unsigned i = 1; i < m_objects.size(); i++) {

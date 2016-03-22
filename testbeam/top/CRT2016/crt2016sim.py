@@ -11,8 +11,12 @@ from basf2 import *
 # time when the upper surface is crossed and time resolutions
 # (numbers below are arbitrary!)
 # ----------------------------------------------------------------------------------
-upperPad = [14.7, 0, 25, 30, 37]  # upper trig. paddle: z, x, size_z, size_x, y [cm]
-lowerPad = [14.7, 0, 25, 25, -63]  # lower trig. paddle: z, x, size_z, size_x, y [cm]
+# upperPad = [14.7, 0, 25, 30, 37]  # upper trig. paddle: z, x, size_z, size_x, y [cm]
+# lowerPad = [14.7, 0, 25, 25, -63]  # lower trig. paddle: z, x, size_z, size_x, y [cm]
+# upperPad = [130, 0, 25, 30, 37]  # upper trig. paddle: z, x, size_z, size_x, y [cm]
+# lowerPad = [130, 0, 25, 25, -63]  # lower trig. paddle: z, x, size_z, size_x, y [cm]
+upperPad = [242.5, 0, 25, 30, 37]  # upper trig. paddle: z, x, size_z, size_x, y [cm]
+lowerPad = [242.5, 0, 25, 25, -63]  # lower trig. paddle: z, x, size_z, size_x, y [cm]
 startTime = 0  # time at crossing the upperPad [ns]
 sigmaAsic = 1.5  # electronic time resolution [ns]
 sigmaTrig = 2.5  # trigger paddles time resolution [ns]
@@ -55,6 +59,7 @@ cosmicgun.param('lowerPad', lowerPad)
 cosmicgun.param('startTime', startTime)
 cosmicgun.param('momentumDistributionType', 'polyline')
 cosmicgun.param('momentumPolyline', polyline)
+# cosmicgun.param('momentumCutOff', 1.0)
 main.add_module(cosmicgun)
 
 # Gearbox

@@ -332,7 +332,7 @@ void ShaperDSP_t::init(const std::vector<double>& s)
 
 double ShaperDSP_t::operator()(double t) const
 {
-  shaperdspshift_t t0 = shaperdspshift_t(t * _itscale - _toff, *this);
+  shaperdspshift_t t0 = shaperdspshift_t(t  - _toff, *this);
   return ShaperDSP(t0);
 }
 
@@ -343,17 +343,17 @@ double ShaperDSP_t::operator()(double* x, double*)
 
 void ShaperDSP_t::settimestride(double dt)
 {
-  _tstride.init(dt * _itscale, *this);
+  _tstride.init(dt , *this);
 }
 
 void ShaperDSP_t::setseedoffset(double dt)
 {
-  _toffset.init(dt * _itscale, *this);
+  _toffset.init(dt , *this);
 }
 
 void ShaperDSP_t::settimeseed(double t0)
 {
-  _tzero.init(t0 * _itscale - _toff, *this);
+  _tzero.init(t0 - _toff, *this);
 }
 
 void ShaperDSP_t::nextseed()
@@ -376,13 +376,12 @@ void ShaperDSP_t::fillarray(int n, dd_t* s) const
 
   for (int i = 0; i < n; i++, t0 += _tstride) {
     s[i] = ddShaperDSP(t0);
-    s[i].second *= _itscale;
   }
 }
 
 void ShaperDSP_t::fillarray(double t, int n, double* s) const
 {
-  shaperdspshift_t t0 = shaperdspshift_t(t * _itscale - _toff, *this);
+  shaperdspshift_t t0 = shaperdspshift_t(t  - _toff, *this);
 
   for (int i = 0; i < n; i++, t0 += _tstride) {
     s[i] = ShaperDSP(t0);
@@ -391,11 +390,10 @@ void ShaperDSP_t::fillarray(double t, int n, double* s) const
 
 void ShaperDSP_t::fillarray(double t, int n, dd_t* s) const
 {
-  shaperdspshift_t t0 = shaperdspshift_t(t * _itscale - _toff, *this);
+  shaperdspshift_t t0 = shaperdspshift_t(t  - _toff, *this);
 
   for (int i = 0; i < n; i++, t0 += _tstride) {
     s[i] = ddShaperDSP(t0);
-    s[i].second *= _itscale;
   }
 }
 

@@ -72,7 +72,7 @@ void Belle2::ECL::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg
 
 
 
-  it0 = 48 + ((23 - ttrig) << 2);//Alex modify
+  it0 = 48 + ((143 - *ttrig2) << 2) / 6;
 
 
   if (ttrig > 23) {cout << "*Ttrig  Warning" << ttrig << endl; ttrig = 23;}
@@ -190,7 +190,7 @@ void Belle2::ECL::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg
 
         T = ((it) << 3) + ((it) << 2) + (((B3 >> 1) + (B3) + 2) >> 2) - 3072;
 
-        T = ((210 - *ttrig2) << 3) - T;
+        T = ((215 - *ttrig2) << 3) - 4 - T;
 
 
 
@@ -202,9 +202,9 @@ void Belle2::ECL::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg
         it = it < it_l ? it_l : it;
 
 
-        T = T > 2047 ?  T - 4096 * ((T + 2048) / 4096) : T;
+        T = T > 2046 ?  2047 : T;
 
-        T = T < -2047 ? T + 4096 * ((-T + 2048) / 4096) : T;
+        T = T < -2046 ? -2047 : T;
 
         C1 = (*(fg33 + it * 16) * z00);
 

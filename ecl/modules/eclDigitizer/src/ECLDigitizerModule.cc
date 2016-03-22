@@ -46,7 +46,7 @@ void ECLDigitizerModule::signalsample_t::InitSample(const double* MPd)
   const int N = m_ns * m_nl;
   vector<double> MP(MPd, MPd + 10);
   ShaperDSP_t dsp(MP);
-  dsp.settimestride(m_tick / m_ns);
+  dsp.settimestride(m_step / m_ns);
   dsp.fillarray(0.0, N, m_ft);
 
   double sum = 0;
@@ -73,7 +73,7 @@ double ECLDigitizerModule::signalsample_t::Accumulate(const double a, const doub
   // t -- signal offset
   // output parameter
   // s -- output array with added signal
-  const double itick = 1 / m_tick;          // reciprocal to avoid division in usec^-1 (has to be evaluated at compile time)
+  const double itick = m_rf / s_clock;          // reciprocal to avoid division in usec^-1 (has to be evaluated at compile time)
   const double  tlen = m_nl - 1.0 / m_ns;   // length of the sampled signal in ADC clocks units
   const double  tmax = m_tmin + m_nsmp - 1; // upper range of the fit region
 
@@ -176,10 +176,10 @@ void ECLDigitizerModule::event()
   StoreArray<ECLDsp> eclDsps;
   StoreArray<ECLTrig> eclTrigs;
 
-  const double trgtick = m_tick / m_ntrg;   // trigger tick
-  const double  DeltaT = gRandom->Uniform(0, double(m_ntrg)); // trigger decision can come in any time ???
-  const double timeInt = DeltaT * trgtick;
-  const int      ttrig = int(DeltaT);
+  const double trgtick = s_clock / m_rf / m_ntrg;   // trigger tick
+  const int  DeltaT = gRandom->Uniform(0, double(m_ntrg) / 2.); // trigger decision can come in any time ???
+  const double timeInt = 2.* (double) DeltaT * trgtick;
+  const int      ttrig = 2 * DeltaT;
 
   const auto eclTrig = eclTrigs.appendNew();
   eclTrig->setTimeTrig(timeInt); //t0 (us)= (1520 - m_ltr)*24.*
@@ -192,7 +192,7 @@ void ECLDigitizerModule::event()
     int j = eclHit.getCellId() - 1; //0~8735
     double hitE       = eclHit.getEnergyDep() / Unit::GeV;
     double hitTimeAve = eclHit.getTimeAve() / Unit::us;
-    m_adc[j].AddHit(hitE, hitTimeAve + timeInt - 0.32 , m_ss[m_tbl[j].iss]);
+    m_adc[j].AddHit(hitE, hitTimeAve + timeInt - s_clock / 2. / m_rf  , m_ss[m_tbl[j].iss]);
   }
 
   // loop over entire calorimeter
@@ -203,7 +203,7 @@ void ECLDigitizerModule::event()
       // This has been added by Alex Bobrov for calibration
       // of covariance matrix artificially generate 100 MeV in time for each crystal
       double hitE = 0.1, hitTimeAve = 0.0;
-      a.AddHit(hitE, hitTimeAve + timeInt - 0.32 , m_ss[m_tbl[j].iss]);
+      a.AddHit(hitE, hitTimeAve + timeInt - s_clock / 2. / m_rf , m_ss[m_tbl[j].iss]);
     } else if (a.total < 0.0001)
       continue;
 
@@ -430,9 +430,9 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
   int_array_24x16_t&  ref_fg43 = p.fg43;
 
   ShaperDSP_t dsp(MP);
-  dsp.settimestride(m_tick);
-  dsp.setseedoffset(m_tick / m_ndt);
-  dsp.settimeseed(-(m_tick - (m_tick / m_ndt)));
+  dsp.settimestride(m_step);
+  dsp.setseedoffset(m_step / m_ndt);
+  dsp.settimeseed(-(m_step - (m_step / m_ndt)));
   vector<dd_t> f(16);
   for (int k = 0; k < 2 * m_ndt; k++, dsp.nextseed()) { // calculate fit parameters around 0 +- 1 ADC tick
     dsp.fillvector(f);

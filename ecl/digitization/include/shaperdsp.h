@@ -33,7 +33,6 @@ namespace Belle2 {
 
     private:
       static const double _defs[]; // default parameters
-      static constexpr double _itscale = 127. / 144.; //internal time scale ???
       static constexpr double _filterdt = 0.2;
 
       double _cs0, _cc0, _cs1, _cc1, _ces, _ced;

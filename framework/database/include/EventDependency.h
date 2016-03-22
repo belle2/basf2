@@ -25,12 +25,13 @@ namespace Belle2 {
     /**
      * Constructor for event depenent conditions.
      * @param object   the first valid object in the run.
+     * @param owner    flag that indicates whether the EventDependency takes ownership of the payload objects or not.
      */
-    explicit EventDependency(TObject* object = 0): IntraRunDependency(object) {};
+    explicit EventDependency(TObject* object = 0, bool owner = true): IntraRunDependency(object, owner) {};
 
     /**
      * Add an object to the intra run dependency.
-     * Note that the EventDependency object takes ownership of the added object.
+     * Note that the EventDependency object takes ownership of the added object by default.
      * @param event    the event number from which on the given conditions object is valid.
      * @param object   the object which is valid starting from the given event number.
      */

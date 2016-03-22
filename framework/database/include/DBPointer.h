@@ -13,6 +13,7 @@
 
 namespace Belle2 {
 
+  /** Use default name for array in DBPointer. */
   std::string DBPointer_defaultName = "";
 
   /**

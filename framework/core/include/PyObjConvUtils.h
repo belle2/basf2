@@ -151,30 +151,30 @@ namespace Belle2 {
     /// Check if the python object is an integral number
     inline bool checkPythonObject(const boost::python::object& pyObject, int /*dispatch tag*/)
     {
-      return PyLong_Check(pyObject.ptr());
+      return PyLong_CheckExact(pyObject.ptr());
     }
     /// Check if the python object is an integral number
     inline bool checkPythonObject(const boost::python::object& pyObject, unsigned int /*dispatch tag*/)
     {
-      return PyLong_Check(pyObject.ptr());
+      return PyLong_CheckExact(pyObject.ptr());
     }
 
     /// Check if the python object is an integral number
     inline bool checkPythonObject(const boost::python::object& pyObject, unsigned long int /*dispatch tag*/)
     {
-      return PyLong_Check(pyObject.ptr());
+      return PyLong_CheckExact(pyObject.ptr());
     }
 
     /// Check if the python object is a float number
     inline bool checkPythonObject(const boost::python::object& pyObject, float /*dispatch tag*/)
     {
-      return PyNumber_Check(pyObject.ptr());
+      return PyFloat_CheckExact(pyObject.ptr());
     }
 
     /// Check if the python object is a float number
     inline bool checkPythonObject(const boost::python::object& pyObject, double /*dispatch tag*/)
     {
-      return PyFloat_Check(pyObject.ptr());
+      return PyFloat_CheckExact(pyObject.ptr());
     }
 
     /// Check if the python object is a string

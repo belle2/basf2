@@ -5,9 +5,17 @@ import ROOT
 import re
 import functools
 import numpy as np
+np.seterr(invalid='ignore')
 
 import collections
 from tracking.validation.plot import ValidationPlot
+
+import logging
+
+
+def get_logger():
+    """Getter for the logger instance of this file."""
+    return logging.getLogger(__name__)
 
 
 try:
@@ -179,6 +187,13 @@ def plot_tmultigraph(tmultigraph,
         tgraph_label = create_label(tgraph, label=label)
         plot_tgraph_data_into(ax, tgraph, label=tgraph_label)
 
+    y_lower_bound, y_upper_bound = common_bounds(
+        ax.get_ylim(),
+        (tmultigraph.GetMinimum(), tmultigraph.GetMaximum())
+    )
+
+    ax.set_ylim(y_lower_bound, y_upper_bound)
+
     put_legend(fig, ax, legend=legend)
     return fig
 
@@ -198,7 +213,7 @@ def plot_th1(th1,
 
     if th1.GetSumOfWeights() == 0:
         get_logger().info("Skipping empty histogram %s", th1.GetName())
-        return
+        return fig
 
     plot_th1_data_into(ax, th1, label=th1_label)
 
@@ -442,8 +457,12 @@ def get_stats_from_th(th):
         x_taxis = th.GetXaxis()
         n_bins = x_taxis.GetNbins()
 
-        underflow_content = th.GetBinContent(0)
-        overflow_content = th.GetBinContent(n_bins + 1)
+        if isinstance(th, ROOT.TProfile):
+            underflow_content = th.GetBinEntries(0)
+            overflow_content = th.GetBinEntries(n_bins + 1)
+        else:
+            underflow_content = th.GetBinContent(0)
+            overflow_content = th.GetBinContent(n_bins + 1)
 
         if underflow_content:
             stats["x underf."] = underflow_content
@@ -464,19 +483,19 @@ def get_stats_from_th(th):
 
     if np.isnan(sum_wy):
         # Only one dimensional
-        stats["x avg"] = sum_wx / sum_w
-        stats["x std"] = np.sqrt(sum_wx2 * sum_w - sum_wx * sum_wx) / sum_w
+        stats["x avg"] = np.divide(sum_wx, sum_w)
+        stats["x std"] = np.divide(np.sqrt(sum_wx2 * sum_w - sum_wx * sum_wx), sum_w)
 
     else:
         # Only two dimensional
-        stats["x avg"] = sum_wx / sum_w
-        stats["x std"] = np.sqrt(sum_wx2 * sum_w - sum_wx * sum_wx) / sum_w
-        stats["y avg"] = sum_wy / sum_w
-        stats["y std"] = np.sqrt(sum_wy2 * sum_w - sum_wy * sum_wy) / sum_w
+        stats["x avg"] = np.divide(sum_wx, sum_w)
+        stats["x std"] = np.divide(np.sqrt(sum_wx2 * sum_w - sum_wx * sum_wx), sum_w)
+        stats["y avg"] = np.divide(sum_wy, sum_w)
+        stats["y std"] = np.divide(np.sqrt(sum_wy2 * sum_w - sum_wy * sum_wy), sum_w)
 
         if not np.isnan(sum_wxy):
-            stats["cov"] = (sum_wxy * sum_w - sum_wx * sum_wy) / (sum_w * sum_w)
-            stats["corr"] = stats["cov"] / (stats["x std"] * stats["y std"])
+            stats["cov"] = np.divide((sum_wxy * sum_w - sum_wx * sum_wy), (sum_w * sum_w))
+            stats["corr"] = np.divide(stats["cov"], (stats["x std"] * stats["y std"]))
 
     return stats
 
@@ -660,6 +679,15 @@ def plot_th1_data_into(ax,
                     fmt="none",
                     ecolor=linecolor,
                     label=label)
+
+        y_lower_bound, y_upper_bound = common_bounds(
+            ax.get_ylim(),
+            (th1.GetMinimum(), th1.GetMaximum())
+        )
+
+        y_total_width = y_upper_bound - y_lower_bound
+        ax.set_ylim(y_lower_bound - 0.02 * y_total_width, y_upper_bound + 0.02 * y_total_width)
+
     else:
         if is_discrete_binning:
             ax.bar(bin_centers - 0.4,
@@ -887,3 +915,14 @@ def reformat_root_latex_to_matplotlib_latex(text):
 def is_root_latex_directive(text_part):
     """Test if a text part looks like a ROOT latex directive"""
     return text_part.startswith('#') or '_{' in text_part or '{}' in text_part
+
+
+def common_bounds(matplot_bounds, root_bounds):
+    lower_bound, upper_bound = matplot_bounds
+    root_lower_bound, root_upper_bound = root_bounds
+
+    if root_lower_bound != 0 or root_upper_bound != 0:
+        lower_bound = np.nanmin((lower_bound, root_lower_bound))
+        upper_bound = np.nanmax((upper_bound, root_upper_bound))
+
+    return lower_bound, upper_bound

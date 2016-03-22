@@ -6,6 +6,9 @@ from ROOT import Belle2
 import multiprocessing
 
 set_random_seed("something important")
+# make sure FATAL messages don't have the function signature as this makes
+# problems with clang printing namespaces differently
+logging.set_info(LogLevel.FATAL, logging.get_info(LogLevel.ERROR))
 
 
 class NoopModule(Module):

@@ -9,6 +9,9 @@ ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
 from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
+import math
+
+
 formatter = TolerateMissingKeyFormatter()
 
 
@@ -42,7 +45,7 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
         return dict(
             # At origin assuming perfect magnetic field
             d0_truth=helix.getD0(),
-            phi0_truth=helix.getPhi0(),
+            phi0_truth=helix.getPhi0() % (2.0 * math.pi),
             omega_truth=helix.getOmega(),
             z0_truth=helix.getZ0(),
             tan_lambda_truth=helix.getTanLambda(),
@@ -129,7 +132,7 @@ def peel_fit_result(fit_result, key="{part_name}"):
         fit_crops = dict(
             d0_estimate=fit_result.getD0(),
             d0_variance=fit_result.getCov()[0],
-            phi0_estimate=fit_result.getPhi(),
+            phi0_estimate=fit_result.getPhi() % (2.0 * math.pi),
             phi0_variance=fit_result.getCov()[5],
             omega_estimate=fit_result.getOmega(),
             omega_variance=fit_result.getCov()[9],

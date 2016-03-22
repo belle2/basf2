@@ -95,7 +95,7 @@ hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
 
     # Save a histogram of the hit efficiency
     save_hit_efficiency_histogram = refiners.save_histograms(
-        select="hit_efficiency",
+        select={"hit_efficiency": "hit efficiency"},
         description="Not a serious plot yet.",
     )
 
@@ -105,7 +105,6 @@ hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
         'is_matched': 'finding efficiency',
         'd0_truth': 'd_{0}',
         'pt_truth': 'p_{t}',
-        'tan_lambda_truth': 'tan #lambda',
         'multiplicity': 'multiplicity',
         'phi0_truth': '#phi',
     }
@@ -113,8 +112,21 @@ hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
     save_finding_efficiency_profiles = refiners.save_profiles(
         select=renaming_select_for_finding_efficiency_profiles,
         y='finding efficiency',
+        y_binary=True,
         outlier_z_score=5.0,
         allow_discrete=True,
+    )
+
+    save_finding_efficiency_by_tan_lamba_profiles = refiners.save_profiles(
+        select={
+            'is_matched': 'finding efficiency',
+            'tan_lambda_truth': 'tan #lambda'
+        },
+        y='finding efficiency',
+        y_binary=True,
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
     )
 
     # Make profiles of the hit efficiencies versus various fit parameters
@@ -123,7 +135,6 @@ hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
         'hit_efficiency': 'hit efficiency',
         'd0_truth': 'd_{0}',
         'pt_truth': 'p_{t}',
-        'tan_lambda_truth': 'tan #lambda',
         'multiplicity': 'multiplicity',
         'phi0_truth': '#phi',
     }
@@ -131,8 +142,21 @@ hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
     save_hit_efficiency_profiles = refiners.save_profiles(
         select=renaming_select_for_hit_efficiency_profiles,
         y='hit efficiency',
+        y_binary=True,
         outlier_z_score=5.0,
         allow_discrete=True,
+    )
+
+    save_hit_efficiency_by_tan_lambda_profiles = refiners.save_profiles(
+        select={
+            'hit_efficiency': 'hit efficiency',
+            'tan_lambda_truth': 'tan #lambda',
+        },
+        y='hit efficiency',
+        y_binary=True,
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
     )
 
 

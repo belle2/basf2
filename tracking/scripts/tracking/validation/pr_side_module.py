@@ -148,17 +148,26 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
 
     # Make profiles of the finding efficiencies versus various fit parameters
     # Rename the quatities to names that display nicely by root latex translation
-    renaming_select_for_fake_rate_profiles = {
-        'is_fake': 'fake rate',
-        'seed_tan_lambda_estimate': 'seed tan #lambda',
-        'seed_phi0_estimate': 'seed #phi',
-    }
-
-    save_fake_rate_profile = refiners.save_profiles(
-        select=renaming_select_for_fake_rate_profiles,
+    save_fake_rate_by_seed_phi0_profile = refiners.save_profiles(
+        select={
+            'is_fake': 'fake rate',
+            'seed_phi0_estimate': 'seed #phi',
+        },
         y='fake rate',
+        y_binary=True,
         outlier_z_score=5.0,
-        allow_discrete=True,
+    )
+
+    save_fake_rate_by_seed_tan_lambda_profile = refiners.save_profiles(
+        select={
+            'is_fake': 'fake rate',
+            'seed_tan_lambda_estimate': 'seed tan #lambda',
+        },
+        y='fake rate',
+        y_binary=True,
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
     )
 
 

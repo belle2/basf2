@@ -26,26 +26,28 @@ EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
 {
   int iEndcap, iLayer, iSector, iPlane, iSegment, iStrip, segment;
   int nEndcaps, nLayers, nSectors, nPlanes, nStrips, nSegments, nStripsSegment;
+  int nDetectorLayers;
   EKLMAlignment* alignment;
   EKLMAlignmentData* alignmentData;
   AlignmentChecker alignmentChecker;
   m_GeoDat = &(GeometryData::Instance());
   TFile* f;
   nEndcaps = m_GeoDat->getNEndcaps();
+  nSectors = m_GeoDat->getNSectors();
+  nLayers = m_GeoDat->getNLayers();
+  nPlanes = m_GeoDat->getNPlanes();
+  nStrips = m_GeoDat->getNStrips();
+  nSegments = m_GeoDat->getNSegments();
+  nStripsSegment = m_GeoDat->getNStripsSegment();
   m_Endcap = new HepGeom::Transform3D[nEndcaps];
   m_Layer = new HepGeom::Transform3D*[nEndcaps];
   m_Sector = new HepGeom::Transform3D** [nEndcaps];
   m_Plane = new HepGeom::Transform3D** *[nEndcaps];
   m_Strip = new HepGeom::Transform3D**** [nEndcaps];
   m_StripInverse = new HepGeom::Transform3D**** [nEndcaps];
-  nSectors = m_GeoDat->getNSectors();
-  nPlanes = m_GeoDat->getNPlanes();
-  nStrips = m_GeoDat->getNStrips();
-  nSegments = m_GeoDat->getNSegments();
-  nStripsSegment = m_GeoDat->getNStripsSegment();
   for (iEndcap = 0; iEndcap < nEndcaps; iEndcap++) {
     m_GeoDat->getEndcapTransform(&m_Endcap[iEndcap], iEndcap);
-    nLayers = m_GeoDat->getNDetectorLayers(iEndcap);
+    nDetectorLayers = m_GeoDat->getNDetectorLayers(iEndcap + 1);
     m_Layer[iEndcap] = new HepGeom::Transform3D[nLayers];
     m_Sector[iEndcap] = new HepGeom::Transform3D*[nLayers];
     m_Plane[iEndcap] = new HepGeom::Transform3D** [nLayers];
@@ -54,6 +56,8 @@ EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
     for (iLayer = 0; iLayer < nLayers; iLayer++) {
       m_GeoDat->getLayerTransform(&m_Layer[iEndcap][iLayer], iLayer);
       m_Sector[iEndcap][iLayer] = new HepGeom::Transform3D[nSectors];
+      if (iLayer >= nDetectorLayers)
+        continue;
       m_Plane[iEndcap][iLayer] = new HepGeom::Transform3D*[nSectors];
       m_Strip[iEndcap][iLayer] = new HepGeom::Transform3D** [nSectors];
       m_StripInverse[iEndcap][iLayer] = new HepGeom::Transform3D** [nSectors];
@@ -88,8 +92,8 @@ EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
     if (!alignmentChecker.checkAlignment(&(*alignment)))
       B2FATAL("EKLM alignment data is incorrect, overlaps exist.");
     for (iEndcap = 1; iEndcap <= nEndcaps; iEndcap++) {
-      nLayers = m_GeoDat->getNDetectorLayers(iEndcap);
-      for (iLayer = 1; iLayer <= nLayers; iLayer++) {
+      nDetectorLayers = m_GeoDat->getNDetectorLayers(iEndcap + 1);
+      for (iLayer = 1; iLayer <= nDetectorLayers; iLayer++) {
         for (iSector = 1; iSector <= nSectors; iSector++) {
           for (iPlane = 1; iPlane <= nPlanes; iPlane++) {
             for (iSegment = 1; iSegment <= nSegments; iSegment++) {
@@ -123,13 +127,17 @@ EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
 EKLM::TransformData::~TransformData()
 {
   int iEndcap, iLayer, iSector, iPlane;
-  int nEndcaps, nLayers, nSectors, nPlanes;
+  int nEndcaps, nLayers, nDetectorLayers, nSectors, nPlanes;
   nEndcaps = m_GeoDat->getNEndcaps();
+  nLayers = m_GeoDat->getNLayers();
   nSectors = m_GeoDat->getNSectors();
   nPlanes = m_GeoDat->getNPlanes();
   for (iEndcap = 0; iEndcap < nEndcaps; iEndcap++) {
-    nLayers = m_GeoDat->getNDetectorLayers(iEndcap);
+    nDetectorLayers = m_GeoDat->getNDetectorLayers(iEndcap + 1);
     for (iLayer = 0; iLayer < nLayers; iLayer++) {
+      delete[] m_Sector[iEndcap][iLayer];
+      if (iLayer >= nDetectorLayers)
+        continue;
       for (iSector = 0; iSector < nSectors; iSector++) {
         for (iPlane = 0; iPlane < nPlanes; iPlane++) {
           delete[] m_Strip[iEndcap][iLayer][iSector][iPlane];
@@ -139,7 +147,6 @@ EKLM::TransformData::~TransformData()
         delete[] m_Strip[iEndcap][iLayer][iSector];
         delete[] m_StripInverse[iEndcap][iLayer][iSector];
       }
-      delete[] m_Sector[iEndcap][iLayer];
       delete[] m_Plane[iEndcap][iLayer];
       delete[] m_Strip[iEndcap][iLayer];
       delete[] m_StripInverse[iEndcap][iLayer];
@@ -161,18 +168,21 @@ EKLM::TransformData::~TransformData()
 void EKLM::TransformData::transformsToGlobal()
 {
   int iEndcap, iLayer, iSector, iPlane, iStrip;
-  int nEndcaps, nLayers, nSectors, nPlanes, nStrips;
+  int nEndcaps, nLayers, nDetectorLayers, nSectors, nPlanes, nStrips;
   nEndcaps = m_GeoDat->getNEndcaps();
+  nLayers = m_GeoDat->getNLayers();
   nSectors = m_GeoDat->getNSectors();
   nPlanes = m_GeoDat->getNPlanes();
   nStrips = m_GeoDat->getNStrips();
   for (iEndcap = 0; iEndcap < nEndcaps; iEndcap++) {
-    nLayers = m_GeoDat->getNDetectorLayers(iEndcap);
+    nDetectorLayers = m_GeoDat->getNDetectorLayers(iEndcap + 1);
     for (iLayer = 0; iLayer < nLayers; iLayer++) {
       m_Layer[iEndcap][iLayer] = m_Endcap[iEndcap] * m_Layer[iEndcap][iLayer];
       for (iSector = 0; iSector < nSectors; iSector++) {
         m_Sector[iEndcap][iLayer][iSector] =
           m_Layer[iEndcap][iLayer] * m_Sector[iEndcap][iLayer][iSector];
+        if (iLayer >= nDetectorLayers)
+          continue;
         for (iPlane = 0; iPlane < nPlanes; iPlane++) {
           m_Plane[iEndcap][iLayer][iSector][iPlane] =
             m_Sector[iEndcap][iLayer][iSector] *

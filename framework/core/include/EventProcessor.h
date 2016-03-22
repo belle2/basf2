@@ -79,8 +79,11 @@ namespace Belle2 {
      * Loops over all module instances specified in a list and calls their initialize() method.
      *
      * @param modulePathList A list of all modules which could be executed during the data processing.
+     * @param setEventInfo if true the first event call of the master module
+     * will be called immidiately to load the event info right away so that
+     * it's available for subsequent modules
      */
-    void processInitialize(const ModulePtrList& modulePathList);
+    void processInitialize(const ModulePtrList& modulePathList, bool setEventInfo = true);
 
     /**
      * Processes the full module chain consisting of an arbitrary number of connected paths, starting with the first module in the specified path.
@@ -88,14 +91,23 @@ namespace Belle2 {
      * @param startPath The processing starts with the first module of this path.
      * @param modulePathList A list of all modules which could be executed during the data processing (used for calling the beginRun() and endRun() method).
      * @param maxEvent The maximum number of events that will be processed. If the number is smaller or equal 0, all events are processed.
+     * @param isInputProcess true when this is either the only or the input process
      */
-    void processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent = 0);
+    void processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent = 0, bool isInputProcess = true);
 
     /** Calls event() functions on all modules for the current event. Used by processCore.
      *
+     * @param skipMasterModule skip the execution of the master module,
+     * presumably because this is the first event and it's already been done in
+     * initialize()
      * @return true if execution should stop.
      */
-    bool processEvent(PathIterator moduleIter);
+    bool processEvent(PathIterator moduleIter, bool skipMasterModule);
+
+    /** Calls event() on one single module, setting up logging and statistics as needed
+     * @param module Module to call the event() function
+     */
+    void callEvent(Module* module);
 
     /**
      * Terminates the modules.

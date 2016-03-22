@@ -289,7 +289,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       setupSignalHandler();
 
     try {
-      processCore(localPath, localModules, maxEvent);
+      processCore(localPath, localModules, maxEvent, m_procHandler->isInputProcess());
     } catch (StoppedBySignalException& e) {
       if (e.signal != SIGINT) {
         B2FATAL(e.what());

@@ -86,7 +86,7 @@ void SubEventModule::initialize()
   DataStore::Instance().registerEntry(m_objectName, DataStore::c_Event, arrayEntry.objClass, false, DataStore::c_DontWriteOut);
 
   m_moduleList = m_path->buildModulePathList();
-  processInitialize(m_moduleList);
+  processInitialize(m_moduleList, false);
 
   //don't screw up statistics for this module
   processStatistics->startModule();
@@ -172,7 +172,7 @@ void SubEventModule::event()
 
     //stuff usually done in processCore()
     PathIterator moduleIter(m_path);
-    processEvent(moduleIter);
+    processEvent(moduleIter, false);
 
     //restore datastore
     restoreContents(eventMapCopy, eventMap);

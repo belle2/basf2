@@ -155,7 +155,23 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
 //                            Protected methods
 //============================================================================
 
-void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
+void EventProcessor::callEvent(Module* module)
+{
+  LogSystem& logSystem = LogSystem::Instance();
+  const bool collectStats = !Environment::Instance().getNoStats();
+  // set up logging
+  logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
+  // set up statistics is requested
+  if (collectStats) m_processStatisticsPtr->startModule();
+  // call module
+  CALL_MODULE(module, event);
+  // stop timing
+  if (collectStats) m_processStatisticsPtr->stopModule(module, ModuleStatistics::c_Event);
+  // reset logging
+  logSystem.setModuleLogConfig(NULL);
+};
+
+void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool setEventInfo)
 {
   LogSystem& logSystem = LogSystem::Instance();
 
@@ -192,6 +208,11 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
     if (!m_master && DataStore::Instance().getEntry(m_eventMetaDataPtr) != NULL) {
       B2DEBUG(100, "Found module providing EventMetaData: " << module->getName());
       m_master = module;
+      if (setEventInfo) {
+        callEvent(module);
+        // update Database payloads: we now have valid event meta data
+        DBStore::Instance().update();
+      }
     }
 
     if (gSignalReceived != 0) {
@@ -214,26 +235,17 @@ void EventProcessor::setupSignalHandler()
   }
 }
 
-bool EventProcessor::processEvent(PathIterator moduleIter)
+bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule)
 {
-  LogSystem& logSystem = LogSystem::Instance();
   const bool collectStats = !Environment::Instance().getNoStats();
 
   while (!moduleIter.isDone()) {
     Module* module = moduleIter.get();
 
-    //Set the module dependent log level
-    logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
-
-    //Call the event method of the module
-    if (collectStats)
-      m_processStatisticsPtr->startModule();
-    CALL_MODULE(module, event);
-    if (collectStats)
-      m_processStatisticsPtr->stopModule(module, ModuleStatistics::c_Event);
-
-    //Set the global log level
-    logSystem.setModuleLogConfig(NULL);
+    // run the module ... unless we don't want to
+    if (!(skipMasterModule && module == m_master)) {
+      callEvent(module);
+    }
 
     //Check for end of data
     if ((m_eventMetaDataPtr && (m_eventMetaDataPtr->isEndOfData())) ||
@@ -273,8 +285,11 @@ bool EventProcessor::processEvent(PathIterator moduleIter)
       DBStore::Instance().updateEvent();
 
     } else {
-      //Check for a second master module
-      if (m_eventMetaDataPtr && (*m_eventMetaDataPtr != m_previousEventMetaData)) {
+      //Check for a second master module. Cannot do this if we skipped the
+      //master module as the EventMetaData is probably set before we call this
+      //function
+      if (!skipMasterModule && m_eventMetaDataPtr &&
+          (*m_eventMetaDataPtr != m_previousEventMetaData)) {
         B2FATAL("Two modules setting EventMetaData were discovered: " << m_master->getName() << " and " << module->getName());
       }
     }
@@ -299,7 +314,7 @@ bool EventProcessor::processEvent(PathIterator moduleIter)
   return false;
 }
 
-void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent)
+void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent, bool isInputProcess)
 {
   DataStore::Instance().setInitializeActive(false);
   m_moduleList = modulePathList;
@@ -316,7 +331,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
       m_processStatisticsPtr->startGlobal();
 
     PathIterator moduleIter(startPath);
-    endProcess = processEvent(moduleIter);
+    endProcess = processEvent(moduleIter, isInputProcess && currEvent == 0);
 
     //Delete event related data in DataStore
     DataStore::Instance().invalidateData(DataStore::c_Event);

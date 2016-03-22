@@ -3,6 +3,7 @@
 
 from basf2 import *
 from ROOT import Belle2
+import multiprocessing
 
 set_random_seed("something important")
 
@@ -42,10 +43,15 @@ main.add_module(printcollections)
 # Process events
 process(main)
 
-# Test starting directly with a given event
+# Test starting directly with a given event. There will be a fatal error if the
+# event is not found in the file so let's call process() in a child process to
+# not be aborted
+ctx = multiprocessing.get_context("fork")
 for evtNo in range(1, 6):
     main = create_path()
     main.add_module("RootInput", inputFileName=Belle2.FileSystem.findFile('framework/tests/root_input.root'),
                     branchNames=["EventMetaData"], skipTillEvent=[0, 1, evtNo], logLevel=LogLevel.WARNING)
     main.add_module("EventInfoPrinter")
-    process(main)
+    child = ctx.Process(target=process, args=(main,))
+    child.start()
+    child.join()

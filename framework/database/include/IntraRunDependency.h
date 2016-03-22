@@ -49,6 +49,12 @@ namespace Belle2 {
      */
     TObject* getAnyObject() const {return m_objects.At(0);};
 
+    /**
+     * Flag for ownership.
+     * @return        true if the IntraRunDependency owns the individual objects.
+     */
+    bool isOwner() const {return m_objects.IsOwner();}
+
   protected:
     TObjArray m_objects;   /**< Array of intra-run dependent objects **/
 

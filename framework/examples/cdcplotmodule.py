@@ -21,7 +21,7 @@ try:
     import matplotlib.cm as colormap
 except:
     B2FATAL('This example requires Matplotlib. Please install'
-            ' it and try again. (Package "python-matplotlib" on Debian/Ubuntu)')
+            ' it using "pip3 install matplotlib" and try again.')
 
 from ROOT import Belle2
 import os

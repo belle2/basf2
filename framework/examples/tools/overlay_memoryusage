@@ -25,7 +25,7 @@ try:
     from matplotlib.backends.backend_pdf import PdfPages
 except ImportError:
     print("Error: Could not find matplotlib which is required to create "
-          "the plots, please install it using\n    $ pip install matplotlib",
+          "the plots, please install it using\n    $ pip3 install matplotlib",
           file=sys.stderr)
     sys.exit(1)
 

@@ -160,7 +160,7 @@ if do_plotting:
     except ImportError:
         print("Error: Could not find matplotlib which is required to create "
               "the plots.\nPlease use --mode=record to just record the profile"
-              " or install matplotlib using\n    $ pip install matplotlib",
+              " or install matplotlib using\n    $ pip3 install matplotlib",
               file=sys.stderr)
         sys.exit(1)
 

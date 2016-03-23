@@ -15,7 +15,7 @@ except ImportError:
     print("""\
 Could not find matplotlib which is required to create the charts. Please
 install it using
-    pip install matplotlib""")
+    pip3 install matplotlib""")
     sys.exit(1)
 
 from matplotlib import pyplot as pl

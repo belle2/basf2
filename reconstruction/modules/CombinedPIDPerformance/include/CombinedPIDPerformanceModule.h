@@ -17,6 +17,7 @@
 #include <TList.h>
 #include <TH1F.h>
 #include <TEfficiency.h>
+#include <TH3F.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -70,9 +71,9 @@ namespace Belle2 {
 
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */
-    int m_nbins; /**< number of bins in momentum range */
-    double m_p_lower; /**< lower limit of momentum range */
-    double m_p_upper; /**< upper limit of momentum range */
+    std::string m_mdstType;       /**< flag for Belle/BelleII mdst files */
+    double m_pLow;                /**< lower bound of momentum range */
+    double m_pHigh;               /**< upper bound of momentum range */
 
     /* ROOT file related parameters */
     TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
@@ -96,10 +97,23 @@ namespace Belle2 {
     std::vector< TEfficiency* > m_epi_FakeRates;    /**< electron fake rates */
     std::vector< TEfficiency* > m_mpi_FakeRates;    /**< muon fake rates */
 
+    TH3F* h_ROC[5][10]; /**< ROC histograms */
+
+    /** returns the likelihood ratio for given log likelihoods */
+    double pidvalue(float pida, float pidb);
+
+    /** determine the availability of the given detector(s) */
+    bool pidavail(const PIDLikelihood* pid, Const::DetectorSet dets);
+
     // determine which detectors to use for each particle
     Const::DetectorSet chargedSet;  /**< pions, kaons, protons */
     Const::DetectorSet electronSet; /**< electrons */
     Const::DetectorSet muonSet;     /**< muons */
+
+    /** enumeration for detector numbering */
+    enum dettype {svd, cdc, top, arich, klm, ecl, dedx, dedxtop, all};
+    std::vector<int> detset;  /**< set of detectors used for hadrons */
+    std::vector<int> edetset; /**< set of detectors used electrons */
 
   };
 } // end of namespace

@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+############################################################
+# Demonstrates using (I)python inside a basf2 session,
+# creating a few example objects to look at.
+# Prints further instructions when started.
+############################################################
+
 from basf2 import *
 
 import interactive
@@ -13,7 +19,8 @@ class MinModule(Module):
     """
     Example module to drop into ipython and create some objects to look at.
     If you just want to start IPython and create PyStoreArray etc.
-    interactively, the Interactive module might be  of interest.
+    interactively in your own steering file, the 'Interactive' module
+    might be of interest.
     """
 
     def event(self):

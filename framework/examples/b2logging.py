@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 ######################################################
-# This steering file shows how to use the logging
-# object exposed by the framework
+# shows how to use the logging object exposed by the framework
 #
 # Example steering file - 2011 Belle II Collaboration
 ######################################################

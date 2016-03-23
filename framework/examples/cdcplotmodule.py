@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 ###############################################################################
-# Example showing a more complex python module using matlotlib to create
+# A more complex python module using matlotlib to create
 # advanced plots.
 # It gathers the x/y position off all CDCSimHits and draws them in different
 # colours depending on associated MCParticle.

@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# ******** Imports ********
+######################################################
+# Demonstrates using PyStoreArray and PyStoreObj to
+# create data store contents from Python modules.
+######################################################
+
 import os
 import math
 import random

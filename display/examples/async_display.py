@@ -35,10 +35,10 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module('ProgressBar')
 
+main.add_module(evtgeninput)
 main.add_module(gearbox)
 main.add_module(geometry)
 
-main.add_module(evtgeninput)
 
 # detecor simulation
 components = [

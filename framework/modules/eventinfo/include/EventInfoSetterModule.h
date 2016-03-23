@@ -72,6 +72,6 @@ namespace Belle2 {
     std::vector<int> m_expList{0};      /**< The list (column) of experiments. */
     std::vector<int> m_runList{0};      /**< The list (column) of runs. */
     std::vector<int> m_evtNumList{1};   /**< The list (column) of the number of events which should be processed. */
-    std::vector<int> m_skipTillEvent;   /**< The (expNo, runNo, evtNo) tuple to skip to, empty if not used */
+    std::vector<int> m_skipToEvent;   /**< The (expNo, runNo, evtNo) tuple to skip to, empty if not used */
   };
 }

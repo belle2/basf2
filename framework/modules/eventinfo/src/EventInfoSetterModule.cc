@@ -51,9 +51,9 @@ EventInfoSetterModule::EventInfoSetterModule() : Module()
   addParam("skipNEvents", m_eventsToSkip, "Skip this number of events before "
            "starting. Equivalent to running over this many events without performing "
            "any action, to allow starting at higher event numbers.", m_eventsToSkip);
-  addParam("skipTillEvent", m_skipTillEvent, "Skip events until the event with "
+  addParam("skipToEvent", m_skipToEvent, "Skip events until the event with "
            "the specified (experiment, run, event number) occurs. This parameter "
-           "is useful for debugging to start with a specific event.", m_skipTillEvent);
+           "is useful for debugging to start with a specific event.", m_skipToEvent);
 }
 
 
@@ -94,16 +94,16 @@ void EventInfoSetterModule::initialize()
     }
   }
 
-  if (!m_skipTillEvent.empty()) {
+  if (!m_skipToEvent.empty()) {
     // make sure the number of entries is exactly 3
-    if (m_skipTillEvent.size() != 3) {
-      B2ERROR("skipTillEvent must be a list of three values: experiment, run, event number");
+    if (m_skipToEvent.size() != 3) {
+      B2ERROR("skipToEvent must be a list of three values: experiment, run, event number");
       // ignore the value
-      m_skipTillEvent.clear();
+      m_skipToEvent.clear();
     }
     if (m_eventsToSkip > 0) {
       B2ERROR("You cannot supply a number of events to skip (skipNEvents) and an "
-              "event to skip to (skipTillEvent) at the same time, ignoring skipNEvents");
+              "event to skip to (skipToEvent) at the same time, ignoring skipNEvents");
       //force the number of skipped events to be zero
       m_eventsToSkip = 0;
     }
@@ -133,16 +133,16 @@ void EventInfoSetterModule::event()
     }
 
     // check if we want to skip to a specific event
-    if (!m_skipTillEvent.empty()) {
+    if (!m_skipToEvent.empty()) {
       // if current experiment and run number is different to what we're looking for
-      if (m_skipTillEvent[0] != m_expList[m_colIndex] || m_skipTillEvent[1] != m_runList[m_colIndex]) {
+      if (m_skipToEvent[0] != m_expList[m_colIndex] || m_skipToEvent[1] != m_runList[m_colIndex]) {
         // then we set the m_evtNumber to the max
         m_evtNumber = m_evtNumList[m_colIndex];
       } else {
         // otherwise we start at the event number we want to skip to
-        m_evtNumber = m_skipTillEvent[2];
+        m_evtNumber = m_skipToEvent[2];
         // and reset the variable as skipping is done
-        m_skipTillEvent.clear();
+        m_skipToEvent.clear();
       }
       // and check again if the event number is in the range we want to generate
       continue;

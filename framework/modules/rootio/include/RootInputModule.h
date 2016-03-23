@@ -160,7 +160,7 @@ namespace Belle2 {
     std::map<std::string, TTree*> m_parentTrees;
 
     /** experiment, run, event number of first event to load */
-    std::vector<int> m_skipTillEvent;
+    std::vector<int> m_skipToEvent;
   };
 } // end namespace Belle2
 

@@ -53,7 +53,7 @@ ctx = multiprocessing.get_context("fork")
 for evtNo in range(1, 6):
     main = create_path()
     main.add_module("RootInput", inputFileName=Belle2.FileSystem.findFile('framework/tests/root_input.root'),
-                    branchNames=["EventMetaData"], skipTillEvent=[0, 1, evtNo], logLevel=LogLevel.WARNING)
+                    branchNames=["EventMetaData"], skipToEvent=[0, 1, evtNo], logLevel=LogLevel.WARNING)
     main.add_module("EventInfoPrinter")
     child = ctx.Process(target=process, args=(main,))
     child.start()

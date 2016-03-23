@@ -598,6 +598,7 @@ namespace Belle2 {
     /// Store array of added RecoHitInformation.
     std::string m_storeArrayNameOfRecoHitInformation = "";
     /// Bool is hits were added to track after fitting and the measurements should be recalculated.
+    /// will be true after ROOT deserialization, which means the measurements will be recreated
     bool m_dirtyFlag = true;
 
 

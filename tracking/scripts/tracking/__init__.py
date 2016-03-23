@@ -6,6 +6,16 @@ from basf2 import *
 from ROOT import Belle2
 
 
+def is_vxd_used(components):
+    """Return true, if the VXD is present in the components list"""
+    return components is None or 'SVD' in components
+
+
+def is_cdc_used(components):
+    """Return true, if the CDC is present in the components list"""
+    return components is None or 'CDC' in components
+
+
 def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False):
     """
     This function adds the standard reconstruction modules for MC tracking
@@ -27,8 +37,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
     if components and not ('SVD' in components or 'CDC' in components):
         return
 
-    use_vxd = components is None or 'SVD' in components
-    use_cdc = components is None or 'CDC' in components
+    use_vxd = is_vxd_used(components)
 
     # check for detector geometry, necessary for track extrapolation in genfit
     if 'Geometry' not in path:
@@ -75,14 +84,36 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
 
     # prune genfit tracks
     if pruneTracks:
-        add_prune_tracks(path)
+        add_prune_tracks(path, components)
 
 
-def add_prune_tracks(path):
+def add_prune_tracks(path, components=None):
     """
     Adds removal of the intermediate states at each measurement from the fitted tracks.
     """
     path.add_module("PruneGenfitTracks")
+
+    use_vxd = is_vxd_used(components)
+    use_cdc = is_cdc_used(components)
+
+    # prune CDC tracks
+    if use_cdc:
+        if use_vxd:
+            cdc_pruner = register_module('PruneRecoTracks')
+            cdc_pruner.param('storeArrayName', "CDCRecoTracks")
+            path.add_module(cdc_pruner)
+
+    # prune VXD tracks
+    if use_vxd:
+        if use_cdc:
+            vxd_pruner = register_module('PruneRecoTracks')
+            vxd_pruner.param('storeArrayName', "VXDRecoTracks")
+            path.add_module(vxd_pruner)
+
+    # prune the final RecoTrack collection, if there is only one
+    # tracking component used
+    if use_vxd ^ use_vxd:
+        path.add_module('PruneRecoTracks')
 
 
 def add_track_finding(path, components=None):
@@ -94,9 +125,12 @@ def add_track_finding(path, components=None):
     if components and not ('SVD' in components or 'CDC' in components):
         return
 
-    use_vxd = components is None or 'SVD' in components
-    use_cdc = components is None or 'CDC' in components
+    use_vxd = is_vxd_used(components)
+    use_cdc = is_cdc_used(components)
 
+    # if only CDC or VXD are used, the track finding result
+    # will be directly written to the final RecoTracks array
+    # because no merging is required
     cdc_reco_tracks = "RecoTracks"
     vxd_reco_tracks = "RecoTracks"
 

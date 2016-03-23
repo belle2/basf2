@@ -30,7 +30,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True):
 
     # Prune tracks as soon as the intermediate states at each measurement are not needed anymore.
     if pruneTracks:
-        add_prune_tracks(path)
+        add_prune_tracks(path, components)
 
     # track extrapolation
     if components is None or 'CDC' in components:

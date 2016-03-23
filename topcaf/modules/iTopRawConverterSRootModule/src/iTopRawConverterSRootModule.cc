@@ -364,6 +364,7 @@ iTopRawConverterSRootModule::event()
     istringstream in(buffer);
     parseData(in, nWords);
   }
+  m_evt_no += 1;
 }
 
 

@@ -46,9 +46,12 @@ namespace Belle2 {
   /** Class containing all the parameters needed to create the geometry and
    * suitable to save into a ROOT file to be used from the Database */
   class MyDBPayloadClass: public TObject {
+    /** Database objects need a dictionary */
     ClassDef(MyDBPayloadClass, 1);
   };
 
+  /** Very simple Creator class which actually does not do anything but shows
+   * how creators should implement loading the geometry from database */
   class MyDBCreator: public geometry::CreatorBase {
   private:
     /** Create a parameter object from the Gearbox XML parameters. If more

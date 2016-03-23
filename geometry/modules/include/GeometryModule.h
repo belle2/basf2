@@ -50,7 +50,8 @@ namespace Belle2 {
     std::vector<int> m_payloadIov{0, 0, -1, -1};
     /** If true we need to create a payload */
     bool m_createGeometryPayload{false};
-
+    /** Database object pointing to the geometry configuration in case we load
+     * the geometry from database */
     DBObjPtr<GeoConfiguration>* m_geometryConfig{nullptr};
   };
 } //Belle2 namespace

@@ -70,7 +70,7 @@ namespace Belle2 {
     std::vector<std::string> m_overlaps;  /**< list of overlapping volumes */
     std::set<G4VPhysicalVolume*> m_seen; /**< set of logical volumes we already checked */
     G4NavigationHistory m_nav; /**< navigation history to remember coordinate transformations */
-    StoreObjPtr<DisplayData> m_displayData; /** Pointer to the DisplayData where we add the overlap points for rendering */
+    StoreObjPtr<DisplayData> m_displayData; /**< Pointer to the DisplayData where we add the overlap points for rendering */
   };
 } //Belle2 namespace
 #endif

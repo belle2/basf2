@@ -19,8 +19,8 @@ ToFileLoggerModule::ToFileLoggerModule():
   m_fileDeviceOfStdout(0),
   m_fileDeviceOfStderr(0)
 {
-  setDescription("For better handling of non BASF2-Logging (e.g. cout or printf()), you can insert this module."
-                 "It redirects all output to the console into the filename given as parameter."
+  setDescription("For better handling of non BASF2-Logging (e.g. cout or printf()), you can insert this module. "
+                 "It redirects all output to the console into the filename given as parameter. "
                  "Using the basf2-own logging framework (logging.add_file()) you can even write the basf2-related logging"
                  "into a separate file.");
 

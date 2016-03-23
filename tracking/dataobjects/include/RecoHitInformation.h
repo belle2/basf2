@@ -223,7 +223,8 @@ namespace Belle2 {
     /// Set this flag to falso to not create a measurement out of this hit
     bool m_useInFit = true;
     /// A pointer to the TrackPoint for this hit.
-    const genfit::TrackPoint* m_createdTrackPoint = nullptr;
+    /// do not store to ROOT file, otherwise the *RecoHits get created when reading in the file
+    const genfit::TrackPoint* m_createdTrackPoint = nullptr; //! -> this is the marker for ROOT I/O to ignore this pointer
 
     /**
      * Create hit information for a generic hit with the given information. Adds the relation to the hit automatically.

@@ -48,22 +48,30 @@ namespace Belle2 {
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/
+
+      /** Default name ECLShowers */
       virtual const char* eclShowerArrayName() const
       { return "ECLShowers" ; }
 
+      /** Default name ECLConnectedRegion */
       virtual const char* eclConnectedRegionArrayName() const
       { return "ECLConnectedRegions" ; }
+
     }; // end of ECLCRFinderAndSplitterModule
 
 
     /** The very same module but for PureCsI */
     class ECLShowerCalibratorPureCsIModule : public ECLShowerCalibratorModule {
     public:
+
+      /** PureCsI name ECLShowers */
       virtual const char* eclShowerArrayName() const override
       { return "ECLShowersPureCsI" ; }
 
+      /** PureCsI name ECLConnectedRegion */
       virtual const char* eclConnectedRegionArrayName() const override
       { return "ECLConnectedRegionsPureCsI" ; }
+
     }; // end of ECLCRFinderAndSplitterPureCsIModule
   } // end of ECL namespace
 } // end of Belle2 namespace

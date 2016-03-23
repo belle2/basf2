@@ -47,29 +47,39 @@ namespace Belle2 {
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/
+
+      /** Default name ECLShowers */
       virtual const char* eclShowerArrayName() const
       { return "ECLShowers" ; }
 
+      /** Default name ECLCalDigits */
       virtual const char* eclCalDigitArrayName() const
       { return "ECLCalDigits" ; }
 
+      /** Default name ECLConnectedRegions */
       virtual const char* eclConnectedRegionArrayName() const
       { return "ECLConnectedRegions" ; }
-    }; // end of ECLCRFinderAndSplitterModule
+
+    }; // end of ECLShowerShapeModule
 
 
     /** The very same module but for PureCsI */
     class ECLShowerShapePureCsIModule : public ECLShowerShapeModule {
     public:
+
+      /** PureCsI name ECLShowersPureCsI */
       virtual const char* eclShowerArrayName() const override
       { return "ECLShowersPureCsI" ; }
 
+      /** PureCsI name ECLCalDigitsPureCsI */
       virtual const char* eclCalDigitArrayName() const override
       { return "ECLCalDigitsPureCsI" ; }
 
+      /** PureCsI name ECLConnectedRegionsPureCsI */
       virtual const char* eclConnectedRegionArrayName() const override
       { return "ECLConnectedRegionsPureCsI" ; }
-    }; // end of ECLCRFinderAndSplitterPureCsIModule
+
+    }; // end of ECLShowerShapePureCsIModule
 
   } // end of ECL namespace
 } // end of Belle2 namespace

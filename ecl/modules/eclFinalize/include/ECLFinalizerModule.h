@@ -46,8 +46,12 @@ namespace Belle2 {
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/
+
+      /** Default name ECLShower */
       virtual const char* eclShowerArrayName() const
       { return "ECLShowers" ; }
+
+      /** Default name ECLCluster */
       virtual const char* eclClusterArrayName() const
       { return "ECLClusters"; }
 
@@ -57,8 +61,12 @@ namespace Belle2 {
     /** The very same module but for PureCsI */
     class ECLFinalizerPureCsIModule : public ECLFinalizerModule {
     public:
+
+      /** PureCsI name ECLShower */
       virtual const char* eclShowerArrayName() const override
       { return "ECLShowersPureCsI" ; }
+
+      /** PureCsI name ECLCluster */
       virtual const char* eclClusterArrayName() const override
       { return "ECLClustersPureCsI"; }
 

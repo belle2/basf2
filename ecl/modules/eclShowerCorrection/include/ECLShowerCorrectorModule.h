@@ -53,44 +53,45 @@ namespace Belle2 {
       /** Terminate. */
       virtual void terminate();
 
-
       // OLD METHOD (TF)
       /**calculate correction factor of energy depending on Energy and Theta  */
       double correctionFactor(double energy, double theta);
 
-      // read correction accounting shower leakage to get unbiased photon energy
+      /** read correction accounting shower leakage to get unbiased photon energy */
       void ReadCorrection();
 
-      // m_ranges -- theta ranges for the correction
-      // m_ecorr  -- correction polynomial coefficients storage
-      std::vector<double> m_ranges, m_ecorr;
+      /**  theta ranges for the correction */
+      std::vector<double> m_ranges;
 
-      //Temp fix to correct energy bias
-      //to be removed ASAP with a proper calibration
+      /** correction polynomial coefficients storage */
+      std::vector<double> m_ecorr;
 
+      /** Temp fix to correct energy bias (to be removed ASAP with a proper calibration) */
       class TmpClusterCorrection {
       public:
-        void init(const std::string& filename);
+        void init(const std::string& filename); /**< initialize*/
 //        void scale(Belle2::ECLCluster& c) const;
-        void scale(Belle2::ECLShower& c)
-        const; // we cannot correct clusters at this stage since they dont exist in the refactored here at this very moment (TF)
+        void scale(Belle2::ECLShower& c) const;  /**< scale the shower energies */
       private:
-        double m_deltaE;
-        std::size_t m_npointsE;
-        std::vector<double> m_maxTheta;
-        std::vector<double> m_tmpCorrection;
+        double m_deltaE;   /**< energ bin */
+        std::size_t m_npointsE;   /**< number of bins */
+        std::vector<double> m_maxTheta;   /**< theta bins */
+        std::vector<double> m_tmpCorrection;   /**< correction factor */
       };
 
-      TmpClusterCorrection m_tmpClusterCorrection;
+      TmpClusterCorrection m_tmpClusterCorrection; /**< correction class instance */
 
 
     private:
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/
+
+      /** Default name ECLShowers */
       virtual const char* eclShowerArrayName() const
       { return "ECLShowers" ; }
 
+      /** Default name ECLConnectedRegion */
       virtual const char* eclConnectedRegionArrayName() const
       { return "ECLConnectedRegions" ; }
     }; // end of ECLCRFinderAndSplitterModule
@@ -99,9 +100,12 @@ namespace Belle2 {
     /** The very same module but for PureCsI */
     class ECLShowerCorrectorPureCsIModule : public ECLShowerCorrectorModule {
     public:
+
+      /** PureCsI name ECLShowersPureCsI */
       virtual const char* eclShowerArrayName() const override
       { return "ECLShowersPureCsI" ; }
 
+      /** PureCsI name ECLConnectedRegionPureCsI */
       virtual const char* eclConnectedRegionArrayName() const override
       { return "ECLConnectedRegionsPureCsI" ; }
     }; // end of ECLCRFinderAndSplitterPureCsIModule

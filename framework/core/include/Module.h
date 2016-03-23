@@ -514,7 +514,7 @@ namespace Belle2 {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    template<class U> friend class ModuleProxy;
+    friend class ModuleProxyBase;
   };
 
 
@@ -582,7 +582,14 @@ namespace Belle2 {
      * Instances of modules can only be created by this method.
      * @return A shared pointer to the created module instance.
      */
-    virtual ModulePtr createModule() const = 0;
+    ModulePtr createModule() const
+    {
+      ModulePtr nm(createInstance());
+      nm->setType(m_moduleType);
+      nm->setName(m_moduleType);
+      nm->m_package = m_package;
+      return nm;
+    }
 
     /**
      * Returns the module name of the module associated to this proxy.
@@ -591,62 +598,21 @@ namespace Belle2 {
 
 
   protected:
+    /** create a new instance of the module in question */
+    virtual Module* createInstance() const = 0;
 
     std::string m_moduleType; /**< The type name of the module. (without trailing "Module") */
     std::string m_package; /**< Package this module is found in (may be empty). */
   };
 
-
-  /**
-   * The templated proxy class.
-   * Be defining a global variable of this class, any module can be registered to the ModuleManager.
-   * For a module definition of MyTestModule, you should add "REG_MODULE(MyTest)" to the .cc file to register
-   * the module.
-   */
-  template <class T>
-  class ModuleProxy : public ModuleProxyBase {
-
-  public:
-
-    /**
-     * The constructor of the ModuleProxy class.
-     * Calls the constructor of the base class.
-     * @param moduleType The type name of the module.
-     */
-    ModuleProxy(const std::string& moduleType, const std::string& package = "") : ModuleProxyBase(moduleType, package) {};
-
-    /**
-     * The destructor of the ModuleProxy class.
-     */
-    virtual ~ModuleProxy() {};
-
-    /**
-     * Creates a new module and returns a shared pointer to it.
-     * Instances of modules should only be created by this method.
-     */
-    ModulePtr createModule() const
-    {
-      ModulePtr nm(new T());
-      nm->setType(m_moduleType);
-      nm->setName(m_moduleType);
-      nm->m_package = m_package;
-      return nm;
-    }
-  };
-
-
   //------------------------------------------------------
-  //             Define convenient macros
+  //             Define convenient macro
   //------------------------------------------------------
-#ifdef _PACKAGE_
   /** Register the given module (without 'Module' suffix) with the framework. */
-#define REG_MODULE(moduleName) ModuleProxy<moduleName##Module> regProxy##moduleName(#moduleName, _PACKAGE_);
-#else
-  /** Register the given module (without 'Module' suffix) with the framework. */
-#define REG_MODULE(moduleName) ModuleProxy<moduleName##Module> regProxy##moduleName(#moduleName);
-#endif
-
-  //-------------------------------
+#define REG_MODULE(moduleName) namespace { struct ModuleProxy##moduleName: public ModuleProxyBase { \
+      ModuleProxy##moduleName(): ModuleProxyBase(#moduleName, "" _PACKAGE_) {} \
+      virtual ::Belle2::Module* createInstance() const override final { return new moduleName##Module(); } \
+    } proxy##moduleName##Module; }
 
 } // end namespace Belle2
 

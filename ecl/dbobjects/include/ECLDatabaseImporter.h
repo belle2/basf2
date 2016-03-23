@@ -21,8 +21,15 @@ namespace Belle2 {
   class ECLDatabaseImporter {
 
   public:
+
+    /**
+     * Constructor.
+     */
     ECLDatabaseImporter(std::vector<std::string> inputFileNames, std::string m_name);
 
+    /**
+     * Destructor.
+     */
     virtual ~ECLDatabaseImporter() {};
 
     /**
@@ -32,9 +39,12 @@ namespace Belle2 {
 
   private:
 
-    std::vector<std::string> m_inputFileNames;
-    std::string m_name;
+    std::vector<std::string> m_inputFileNames; /**< Input file name */
+    std::string m_name;  /**< Database object (output) file name */
 
+    /**
+     * 1: Initial version.
+     */
     ClassDef(ECLDatabaseImporter, 1);
   };
 

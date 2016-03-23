@@ -131,6 +131,7 @@ class String(LatexObject):
         Finish the generation of the string by replacing possible placehholders with the given dictionary
             @param kwargs dictionary used to replace placeholders
         """
+        #: output string
         self.output = self.output.format(**kwargs) + '\n'
         return self
 

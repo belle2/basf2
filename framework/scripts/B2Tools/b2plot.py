@@ -208,9 +208,6 @@ class Plotter(object):
         self.xmax *= 1.0 + math.copysign(self.xscale, self.xmax)
         return self
 
-# trying to get doxygen to shut up
-# \{
-
 
 class PurityOverEfficiency(Plotter):
     """
@@ -348,11 +345,16 @@ class Distribution(Plotter):
         super(Distribution, self).__init__(figure, axis)
         #: Normalize histograms before drawing them
         self.normed_to_all_entries = normed_to_all_entries
+        #: Normalize histograms before drawing them
         self.normed_to_bin_width = normed_to_bin_width
         # if self.normed_to_all_entries or self.normed_to_bin_width:
+        #: size in x/y
         self.ymin = float(0)
+        #: size in x/y
         self.ymax = float('-inf')
+        #: size in x/y
         self.xmin = float('inf')
+        #: size in x/y
         self.xmax = float('-inf')
         #: Keep first binning if user wants so
         self.keep_first_binning = keep_first_binning
@@ -856,5 +858,3 @@ if __name__ == '__main__':
     p.add(data, ['FastBDT', 'NeuroBayes', 'FastBDT2', 'NeuroBayes2', 'FastBDT3', 'NeuroBayes3'])
     p.finish()
     p.save('correlation_matrix.png')
-
-# \}

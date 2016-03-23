@@ -238,6 +238,9 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   m_procHandler->startInputProcess();
   if (m_procHandler->isInputProcess()) {   // In input process
     localPath = m_inpathlist[0];
+  } else {
+    // This is not the input path, clean up datastore to not contain the first event
+    DataStore::Instance().invalidateData(DataStore::c_Event);
   }
 
   if (localPath == nullptr) { //not forked yet

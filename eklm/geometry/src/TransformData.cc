@@ -56,14 +56,16 @@ EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
     for (iLayer = 0; iLayer < nLayers; iLayer++) {
       m_GeoDat->getLayerTransform(&m_Layer[iEndcap][iLayer], iLayer);
       m_Sector[iEndcap][iLayer] = new HepGeom::Transform3D[nSectors];
-      if (iLayer >= nDetectorLayers)
-        continue;
-      m_Plane[iEndcap][iLayer] = new HepGeom::Transform3D*[nSectors];
-      m_Strip[iEndcap][iLayer] = new HepGeom::Transform3D** [nSectors];
-      m_StripInverse[iEndcap][iLayer] = new HepGeom::Transform3D** [nSectors];
+      if (iLayer < nDetectorLayers) {
+        m_Plane[iEndcap][iLayer] = new HepGeom::Transform3D*[nSectors];
+        m_Strip[iEndcap][iLayer] = new HepGeom::Transform3D** [nSectors];
+        m_StripInverse[iEndcap][iLayer] = new HepGeom::Transform3D** [nSectors];
+      }
       for (iSector = 0; iSector < nSectors; iSector++) {
         m_GeoDat->getSectorTransform(&m_Sector[iEndcap][iLayer][iSector],
                                      iSector);
+        if (iLayer >= nDetectorLayers)
+          continue;
         m_Plane[iEndcap][iLayer][iSector] = new HepGeom::Transform3D[nPlanes];
         m_Strip[iEndcap][iLayer][iSector] = new HepGeom::Transform3D*[nPlanes];
         m_StripInverse[iEndcap][iLayer][iSector] =
@@ -92,7 +94,7 @@ EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
     if (!alignmentChecker.checkAlignment(&(*alignment)))
       B2FATAL("EKLM alignment data is incorrect, overlaps exist.");
     for (iEndcap = 1; iEndcap <= nEndcaps; iEndcap++) {
-      nDetectorLayers = m_GeoDat->getNDetectorLayers(iEndcap + 1);
+      nDetectorLayers = m_GeoDat->getNDetectorLayers(iEndcap);
       for (iLayer = 1; iLayer <= nDetectorLayers; iLayer++) {
         for (iSector = 1; iSector <= nSectors; iSector++) {
           for (iPlane = 1; iPlane <= nPlanes; iPlane++) {

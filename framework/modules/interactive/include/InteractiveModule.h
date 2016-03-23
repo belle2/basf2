@@ -33,7 +33,6 @@ namespace Belle2 {
 
     ~InteractiveModule();
 
-    virtual void initialize();
     virtual void event();
   };
 }

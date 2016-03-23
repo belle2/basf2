@@ -28,7 +28,7 @@ REG_MODULE(HistoManager)
 HistoManagerModule::HistoManagerModule() : Module(), m_initmain(false), m_tupleManagerInitialized(false)
 {
   // Module description
-  setDescription("Module to manage histograms/Ntuples/TTrees");
+  setDescription("Manage histograms/Ntuples/TTrees for modules inheriting from the HistoModule class. See https://belle2.cc.kek.jp/~twiki/bin/view/Software/HistogramManagement for details.");
   setPropertyFlags(Module::c_HistogramManager);
 
   // Parameters

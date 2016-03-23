@@ -32,7 +32,7 @@ REG_MODULE(PrintCollections)
 
 PrintCollectionsModule::PrintCollectionsModule()
 {
-  setDescription("Prints the contents of DataStore in each event, listing all objects and arrays (including size).");
+  setDescription("Prints the contents of the DataStore in each event, listing all objects and arrays (including size).");
 }
 
 

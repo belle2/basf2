@@ -27,16 +27,13 @@ REG_MODULE(Interactive)
 
 InteractiveModule::InteractiveModule() : Module()
 {
-  setDescription("Start an interactive python shell in each call of event().  Also imports the ROOT.Belle2 namespace for convenience, allowing you to use Belle2.PyStoreArray etc. directly.");
+  setDescription("Start an interactive (I)python shell in each call of event().  Also imports the ROOT.Belle2 namespace for convenience, allowing you to use Belle2.PyStoreArray etc. directly.");
 }
 
 InteractiveModule::~InteractiveModule()
 {
 }
 
-void InteractiveModule::initialize()
-{
-}
 void InteractiveModule::event()
 {
   //In case of exceptions in the embed() call, the imports may get lost (why?)

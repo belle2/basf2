@@ -34,7 +34,7 @@ REG_MODULE(SeqRootInput)
 SeqRootInputModule::SeqRootInputModule() : Module(), m_streamer(nullptr), m_size(0), m_size2(0)
 {
   //Set module properties
-  setDescription("SeqROOT input module");
+  setDescription("Read files produced by SeqRootOutput.");
   setPropertyFlags(c_Input);
 
   m_file = 0;

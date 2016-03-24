@@ -103,8 +103,7 @@ void VXDCDCTrackMergerModule::event()
     try {
       genfit::MeasuredStateOnPlane cdc_sop =
         cdcTrack.getMeasuredStateOnPlaneFromFirstHit();
-      double pathLength = cdc_sop.extrapolateToCylinder(m_CDC_wall_radius,
-                                                        position, momentum);
+      cdc_sop.extrapolateToCylinder(m_CDC_wall_radius, position, momentum);
       cdcpos = cdc_sop.getPos();
       cdcmom = cdc_sop.getMom();
     } catch (...) {
@@ -220,7 +219,7 @@ size_t VXDCDCTrackMergerModule::addUnmatchedTracks(StoreArray<RecoTrack>& single
       // this track has not been used by any matchet combinations, add it
       auto mergedRecoTrack = m_mergedRecoTracks.appendNew(singleTrack.getPositionSeed(), singleTrack.getMomentumSeed(),
                                                           singleTrack.getChargeSeed());
-      auto addedHits = mergedRecoTrack->addHitsFromRecoTrack(&singleTrack);
+      mergedRecoTrack->addHitsFromRecoTrack(&singleTrack);
       addCount++;
     }
 

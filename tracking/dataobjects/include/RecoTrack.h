@@ -766,7 +766,7 @@ namespace Belle2 {
     void checkDirtyFlag() const
     {
       if (m_dirtyFlag) {
-        B2WARNING("Dirty flag is set. The result may not be in sync with the latest changes. Refit the track to be sure.");
+        B2DEBUG(100, "Dirty flag is set. The result may not be in sync with the latest changes. Refit the track to be sure.");
       }
     }
 

@@ -95,8 +95,6 @@ namespace Belle2 {
       PCmsLabTransform T;
       TLorentzVector p_cms = T.rotateLabToCms() * sigFsp[i]->get4Vector();
 
-      if (p_cms.P() < 0.8) continue;
-
       p3_cms_all.push_back(p_cms.Vect());
       p3_cms_sigB.push_back(p_cms.Vect());
 
@@ -130,9 +128,6 @@ namespace Belle2 {
           PCmsLabTransform T;
           TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
           if (p_cms.Rho() > P_MAX) continue;
-
-//    std::cout << p_cms.P() << std::endl;
-//    if (p_cms.P() > 0.5) continue;
 
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());

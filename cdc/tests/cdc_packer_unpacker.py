@@ -6,7 +6,9 @@ from ROOT import Belle2
 
 import simulation
 
-cdc_mapping_file = "cdc/data/ch_map.dat"
+cdc_mapping_file = Belle2.FileSystem.findFile("data/cdc/ch_map.dat")
+if not cdc_mapping_file:
+    B2FATAL("Cannot find cdc mapping file")
 cdc_hits = "CDCHits"
 cdc_hits_pack_unpack_collection = "CDCHits_test_output"
 set_random_seed(42)

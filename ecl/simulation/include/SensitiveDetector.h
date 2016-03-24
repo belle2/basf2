@@ -57,6 +57,7 @@ namespace Belle2 {
       G4double m_thresholdKineticEnergy;// Kinetic Energy  threshold
 
       int m_oldEvnetNumber;        // Current event number, change of event number triggers clearing of array m_ECLHitIndex
+      int m_oldRunNumber;          // Current run number, change of run number triggers clearing of array m_ECLHitIndex
       int m_trackID;               // track id
       double m_WeightedTime;       // average track time weighted by energy deposition
       double m_energyDeposit;      // total energy deposited in a volume by a track

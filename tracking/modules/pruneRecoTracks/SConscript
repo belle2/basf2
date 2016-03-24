@@ -1,6 +1,7 @@
 Import('env')
 
 env['LIBS'] = [
+    'tracking',
     'tracking_dataobjects',
     'framework' ]
 

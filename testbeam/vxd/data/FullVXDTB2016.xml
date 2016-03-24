@@ -94,7 +94,20 @@
       
       <!-- Include the definition of all the components like ladders, sensors and
       chips -->
-      <xi:include href="../../pxd/PXD-Components.xml"/>
+      <!--xi:include href="../../pxd/PXD-Components.xml"/ -->
+      <Components>
+        <!-- Inlude everything from the ladder definitions except forward sensors -->
+        <Ladder layer="1">
+          <shift unit="mm">0</shift>
+          <xi:include href="../../pxd/PXD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=1]/*[not(self::Sensor[@id=1])])" />
+        </Ladder>
+        <Ladder layer="2">
+          <shift unit="mm">0</shift>
+          <xi:include href="../../pxd/PXD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=2]/*[not(self::Sensor[@id=1])])" />
+        </Ladder>
+        <!-- now we include all other components from PXD-Components which are not ladder definitions -->
+        <xi:include href="../../pxd/PXD-Components.xml" xpointer="xpointer(/Components/*[not(self::Ladder)])" />
+      </Components>
       <!-- include radiation sensor definition -->
       <xi:include href="../../pxd/PXD-RadiationSensors.xml"/>
       

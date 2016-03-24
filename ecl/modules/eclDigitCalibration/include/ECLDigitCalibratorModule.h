@@ -2,8 +2,16 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
+ * Digit Calibration.                                                     *
+ *                                                                        *
+ * This  module converts the fitted amplitude into calibrated energy,     *
+ * fitted time into calibrated time, and determines the time resolution   *
+ * per digit. It furthermore determines the background level by counting  *
+ * out of time digits above a certain energy threshold.                   *
+ *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
+ * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
+ *               Chris Hearty (hearty@physics.ubc.ca) (CH)                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,11 +22,11 @@
 // FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
 
 // ECL
 #include <framework/database/DBArray.h>
-#include <ecl/dbobjects/ECLCalibrationDigit.h>
+#include <ecl/dbobjects/ECLDigitEnergyConstants.h>
+#include <ecl/dbobjects/ECLDigitTimeConstants.h>
 
 // OTHER
 #include <vector>
@@ -57,13 +65,17 @@ namespace Belle2 {
       /** terminate.*/
       virtual void terminate();
 
-      /** get name of the ECLDigit (needed to differentiate between default and PureCsI).*/
+      /** Name of the ECLDigit.*/
       virtual const char* eclDigitArrayName() const
       { return "ECLDigits" ; }
 
-      /** get name of the ECLCalDigit (needed to differentiate between default and PureCsI).*/
+      /** Name of the ECLCalDigit.*/
       virtual const char* eclCalDigitArrayName() const
       { return "ECLCalDigits" ; }
+
+      /** Name of the ECLEventInformation.*/
+      virtual const char* eclEventInformationName() const
+      { return "ECLEventInformation" ; }
 
     protected:
 
@@ -71,36 +83,55 @@ namespace Belle2 {
 
       double m_backgroundEnergyCut;  /**< Energy cut for background level counting. */
       double m_backgroundTimingCut;  /**< Timing window for background level counting. */
-      StoreObjPtr<ECLEventInformation> m_eventInformationPtr; /**< Output object for event wide information. */
+//      StoreObjPtr<ECLEventInformation> m_eventInformationPtr; /**< Output object for event wide information. */
 
       const int c_nCrystals = 8736;  /**< Number of ECL crystals. */
-      std::vector < float > m_calibrationAmplitudesLowEnergy;  /**< vector with single crystal calibration amplitudes low energy */
-      std::vector < float > m_calibrationEnergiesLowEnergy;  /**< vector with single crystal calibration energy values low energy */
-      std::vector < float > m_calibrationAmplitudesHighEnergy;  /**< vector with single crystal calibration amplitudes high energy */
-      std::vector < float > m_calibrationEnergiesHighEnergy;  /**< vector with single crystal calibration energy values high energy */
-      std::vector < double > m_calibrationC0;  /**< vector with single crystal calibration energy values c0 */
-      std::vector < double > m_calibrationC1;  /**< vector with single crystal calibration  values c1 */
-      DBArray<ECLCalibrationDigit> m_calibrationLow;  /**< single crystal calibration constants low energy */
-      DBArray<ECLCalibrationDigit> m_calibrationHigh;  /**< single crystal calibration constants high energy */
+      std::vector < float > m_calibrationEnergyAmplitudeHigh;  /**< vector with single crystal calibration amplitudes high energy */
+      std::vector < float > m_calibrationEnergyEnergyHigh;  /**< vector with single crystal calibration energy values high energy */
+      std::vector < float > m_calibrationTimeOffset;  /**< vector with time calibration constant offsets */
 
-      double getCalibratedEnergy(int cellid, int energy); /**< log interpolated value from the calibration amplitudes and energies */
-      double getCalibratedTime(int cellid, int time); /**< timing correction */
-      void prepareCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
+      DBArray<ECLDigitEnergyConstants> m_calibrationEnergyHigh;  /**< single crystal calibration constants high energy */
+      DBArray<ECLDigitTimeConstants> m_calibrationTime;  /**< single crystal calibration constants time */
 
-      void determineBackgroundECL();/**< count out of time digits to determine baclground levels */
+      double getCalibratedEnergy(const int cellid, const int energy); /**< energy calibration */
+      double getCalibratedTime(const int cellid, const int time, const bool fitfailed); /**< timing correction. */
+      double getCalibratedTimeResolution(const int cellid, const double energy, const bool fitfailed); /**< timing resolution. */
+      double getInterpolatedTimeResolution(const double x, const int bin); /**< timing resolution interpolation. */
+
+      void prepareEnergyCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
+      void prepareTimeCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
+
+      void determineBackgroundECL(); /**< count out of time digits to determine baclground levels */
+
+      double m_timeInverseSlope; /**< Time calibration inverse slope "a". */
+      double m_timeResolutionPointResolution[4]; /**< Time resolution calibration interpolation parameter "Resolution". */
+      double m_timeResolutionPointX[4];  /**< Time resolution calibration interpolation parameter "x = 1/E (GeV)". */
+
+      const double c_timeResolutionForFitFailed  = 1.0e9; /**< Time resolution for failed fits". */
+      const double c_timeResolutionForZeroEnergy =
+        1.0e9; /**< Time resolution for (very close to) zero energy digits (should not happen)". */
+      const double c_timeForFitFailed            = 0.0; /**< Time for failed fits". */
+      const int c_MinimumAmplitude               = 1; /**< Minimum amplitude". */
+      const double c_energyForSmallAmplitude     = 0.0; /**< Energy for small amplitudes". */
 
     };
 
     /**< Class derived from ECLDigitCalibratorModule, only difference are the ECLDigit and ECLCalDigit names */
     class ECLDigitCalibratorPureCsIModule : public ECLDigitCalibratorModule {
     public:
-      /**< get name of the ECLDigit (needed to differentiate between default and PureCsI).*/
+      /**< PureCsI Name of the ECLDigitsPureCsI.*/
       virtual const char* eclDigitArrayName() const override
       { return "ECLDigitsPureCsI" ; }
 
-      /**< get name of the ECLCalDigit (needed to differentiate between default and PureCsI).*/
+      /**< PureCsI Name of the ECLCalDigitsPureCsI.*/
       virtual const char* eclCalDigitArrayName() const override
       { return "ECLCalDigitsPureCsI" ; }
+
+      /**< PureCsI Name of the ECLEventInformationPureCsI.*/
+      virtual const char* eclEventInformationName() const
+      { return "ECLEventInformationPureCsI" ; }
+
+
     };
 
   } // end ECL namespace

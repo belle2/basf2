@@ -474,6 +474,9 @@ namespace Belle2 {
     /// Prune the genfit track. Only to be used in the prune module.
     void prune(const std::string& optionsString)
     {
+      if (getHitPointsWithMeasurement().size() < 2)
+        return;
+
       checkDirtyFlag();
       m_genfitTrack.prune(optionsString.c_str());
     }

@@ -10,7 +10,8 @@
 
 // ECL
 #include <ecl/dbobjects/ECLDatabaseImporter.h>
-#include <ecl/dbobjects/ECLCalibrationDigit.h>
+#include <ecl/dbobjects/ECLDigitEnergyConstants.h>
+#include <ecl/dbobjects/ECLDigitTimeConstants.h>
 
 // FRAMEWORK
 #include <framework/gearbox/GearDir.h>
@@ -35,10 +36,10 @@ ECLDatabaseImporter::ECLDatabaseImporter(vector<string> inputFileNames, std::str
   m_name = name;
 }
 
-void ECLDatabaseImporter::importDigitCalibration()
+void ECLDatabaseImporter::importDigitEnergyCalibration()
 {
 
-  TClonesArray digitCalibrationConstants("Belle2::ECLCalibrationDigit");
+  TClonesArray digitCalibrationConstants("Belle2::ECLDigitEnergyConstants");
 
   TH1F* energy = 0;
   TH1F* amplitude = 0;
@@ -60,7 +61,7 @@ void ECLDatabaseImporter::importDigitCalibration()
         amplitude = (TH1F*)f->Get(histconstants.c_str());
       }
 
-      else { B2ERROR("Key name does not match any of the following: energy, amplitude!"); }
+      else { B2FATAL("Key name does not match any of the following: energy, amplitude!"); }
     }
 
     nFiles++;
@@ -73,7 +74,48 @@ void ECLDatabaseImporter::importDigitCalibration()
   for (int bin = 1; bin <= amplitude->GetNbinsX(); ++bin) {
     float amplitudeval = amplitude->GetBinContent(bin);
     float energyval = energy->GetBinContent(bin);
-    new(digitCalibrationConstants[cell]) ECLCalibrationDigit(bin, amplitudeval, energyval);
+    new(digitCalibrationConstants[cell]) ECLDigitEnergyConstants(bin, amplitudeval, energyval);
+    cell++;
+  }
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  Database::Instance().storeData(m_name, &digitCalibrationConstants, iov);
+}
+
+
+void ECLDatabaseImporter::importDigitTimeCalibration()
+{
+
+  TClonesArray digitCalibrationConstants("Belle2::ECLDigitTimeConstants");
+
+  TH1F* offset = 0;
+  int nFiles = 0;
+
+  for (const string& inputFile : m_inputFileNames) {
+
+    TFile* f = TFile::Open(inputFile.c_str(), "READ");
+
+    TIter next(f->GetListOfKeys());
+    TKey* key;
+    while ((key = (TKey*) next())) {
+
+      string histconstants = key->GetName();
+
+      if (histconstants.compare("constantB") == 0) {
+        offset = (TH1F*)f->Get(histconstants.c_str());
+      } else { B2FATAL("Key name does not match any of the following: constantC!"); }
+    }
+
+    nFiles++;
+  }
+
+  if (nFiles != 1) { B2FATAL("Sorry, you must only import one file at a time for now!"); }
+
+  // loop over the histogram to fill the TClonesArray
+  int cell = 0;
+  for (int bin = 1; bin <= offset->GetNbinsX(); ++bin) {
+    float offsetval = offset->GetBinContent(bin);
+    new(digitCalibrationConstants[cell]) ECLDigitTimeConstants(bin, offsetval);
     cell++;
   }
 

@@ -61,6 +61,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
     mctrackfinder.param('GFTrackCandidatesColName', 'MCTrackCands')
     mctrackfinder.param('WhichParticles', [])
     path.add_module(mctrackfinder)
+
     mctrackmatcher = register_module('MCMatcherTracks')
     mctrackmatcher.param('MCGFTrackCandsColName', 'MCTrackCands')
     # FIXME 2015/10/30: Stopgap for the release, ideally the module
@@ -110,10 +111,8 @@ def add_prune_tracks(path, components=None):
             vxd_pruner.param('storeArrayName', "VXDRecoTracks")
             path.add_module(vxd_pruner)
 
-    # prune the final RecoTrack collection, if there is only one
-    # tracking component used
-    if use_vxd ^ use_vxd:
-        path.add_module('PruneRecoTracks')
+    # prune the final RecoTrack collection
+    path.add_module('PruneRecoTracks')
 
 
 def add_track_finding(path, components=None):
@@ -153,35 +152,29 @@ def add_track_finding(path, components=None):
         vxd_tracks = 'VXDGFTracks'
         cdc_tracks = 'CDCGFTracks'
 
-        vxd_trackcands = 'VXDGFTrackCands'
-        cdc_trackcands = 'CDCGFTrackCands'
+        merged_recotracks = 'RecoTracks'
 
         # Fit all reco tracks This will be unneeded once the merger is rewritten.
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
-        path.add_module("GenfitTrackCandidatesCreator", recoTracksStoreArrayName=cdc_reco_tracks,
-                        genfitTrackCandsStoreArrayName=cdc_trackcands)
-        path.add_module("GenfitTrackCreator", recoTracksStoreArrayName=cdc_reco_tracks,
-                        genfitTracksStoreArrayName=cdc_tracks,
-                        genfitTrackCandsStoreArrayName=cdc_trackcands)
-
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName=vxd_reco_tracks)
-        path.add_module("GenfitTrackCandidatesCreator", recoTracksStoreArrayName=vxd_reco_tracks,
-                        genfitTrackCandsStoreArrayName=vxd_trackcands)
-        path.add_module("GenfitTrackCreator", recoTracksStoreArrayName=vxd_reco_tracks,
-                        genfitTracksStoreArrayName=vxd_tracks,
-                        genfitTrackCandsStoreArrayName=vxd_trackcands)
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
 
         # Merge CDC and CXD tracks
-        vxd_cdcTracksMerger = path.add_module('VXDCDCTrackMerger')
-        vxd_cdcTracksMerger.param({
-            'VXDGFTrackCandsColName': vxd_trackcands,
-            'VXDGFTracksColName': vxd_tracks,
-            'CDCGFTrackCandsColName': cdc_trackcands,
-            'CDCGFTracksColName': cdc_tracks,
-            'relMatchedTracks': 'MatchedTracksIdx',
-            'chi2_max': 100,
-            'recover': 1
-        })
+        vxd_cdcTracksMerger = register_module('VXDCDCTrackMerger')
+        vxd_cdcTracksMerger_param = {
+            'CDCRecoTrackColName': cdc_reco_tracks,
+            'VXDRecoTrackColName': vxd_reco_tracks,
+            'MergedRecoTrackColName': merged_recotracks,
+            'chi2_max': 100
+        }
+        vxd_cdcTracksMerger.param(vxd_cdcTracksMerger_param)
+        path.add_module(vxd_cdcTracksMerger)
+
+        # fit the merged track
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=merged_recotracks)
+
+        # just add the GenfitTrackCandidatesCreator here, the GenFitter module in
+        # will add_tracking_reconstruction create the genfit::Tracks
+        path.add_module("GenfitTrackCandidatesCreator", recoTracksStoreArrayName=merged_recotracks)
 
     elif use_vxd or use_cdc:
         # The following modules still expect a list of genfit::TrackCand.

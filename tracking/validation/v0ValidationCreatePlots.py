@@ -37,6 +37,8 @@ class V0ValidationPlots:
         self.hist_chi2_inside = ROOT.TH1F("", "", 50, 0, 50)
         self.hist_chi2_outside = ROOT.TH1F("", "", 50, 0, 50)
 
+        self.hist_mass_vs_mc_mass = ROOT.TH2F("", "", 80, 0, 0.8, 80, 0, 0.8)
+
     def collect_histograms(self):
         input_root_file = ROOT.TFile.Open(self.input_file, "READ")
 
@@ -62,6 +64,8 @@ class V0ValidationPlots:
                     assert event.R_MC <= 1.0
                     self.hist_chi2_inside.Fill(event.CHI2)
 
+                self.hist_mass_vs_mc_mass.Fill(event.M, event.M_MC)
+
         input_root_file.Close()
         return self
 
@@ -86,6 +90,19 @@ class V0ValidationPlots:
                                              hist.GetXaxis().GetXmin()) /
                                             hist.GetNbinsX(), x_unit) if x_unit is not None \
             else 'Entries / ({})'.format((hist.GetXaxis().GetXmax() - hist.GetXaxis().GetXmin()) / hist.GetNbinsX())
+        hist.SetTitle("{};{};{}".format(title, xlabel, ylabel))
+        hist.GetListOfFunctions().Add(ROOT.TNamed('Description', description))
+        hist.GetListOfFunctions().Add(ROOT.TNamed('Check', check))
+        hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', contact))
+        hist.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', meta_options))
+        return hist
+
+    @staticmethod
+    def histogram_2d_plot(hist, title, x_variable, y_variable, x_unit=None, y_unit=None,
+                          description='', check='', contact='', meta_options=''):
+        hist.SetName("".join(title.split()))
+        xlabel = '{} / ({})'.format(x_variable, x_unit) if x_unit is not None else '{}'.format(x_variable)
+        ylabel = '{} / ({})'.format(y_variable, y_unit) if y_unit is not None else '{}'.format(y_variable)
         hist.SetTitle("{};{};{}".format(title, xlabel, ylabel))
         hist.GetListOfFunctions().Add(ROOT.TNamed('Description', description))
         hist.GetListOfFunctions().Add(ROOT.TNamed('Check', check))
@@ -149,6 +166,13 @@ class V0ValidationPlots:
                                          check='Check if distribution looks like a Chi2 distribution with 1 dof',
                                          contact='markus.prim@kit.edu',
                                          meta_options='expert').Write()
+
+        V0ValidationPlots.histogram_2d_plot(self.hist_mass_vs_mc_mass, "Reconstructed vs MC Mass.",
+                                            "Reconstructed Mass", "GeV", "MC Mass", "GeV",
+                                            description="Reconstruted mass vs invariant Mass.",
+                                            check="Should be a diagonal.",
+                                            contact="markus.prim@kit.edu",
+                                            meta_options='expert').Write()
 
         output_root_file.Write()
         output_root_file.Close()

@@ -56,8 +56,6 @@ def run():
 
     add_track_finding(path, components)
 
-    path.add_module("GenfitTrackCandidatesCreator")
-
     # Match the tracks to the MC truth.  The matching works based on
     # the output of the TrackFinderMCTruth.
     path.add_module('TrackFinderMCTruth', GFTrackCandidatesColName='MCTrackCands', WhichParticles=[])
@@ -126,6 +124,7 @@ class V0Harvester(HarvestingModule):
                 "M_RES": V0Harvester.resolution(v0_m, mc_m),
                 "P_RES": V0Harvester.resolution(v0_p, mc_p),
                 "M": v0_m,
+                "M_MC": mc_m,
                 "CHI2": v0_chi2,
                 "FOUND": True
             }
@@ -142,6 +141,7 @@ class V0Harvester(HarvestingModule):
                 "M_RES": numpy.NaN,
                 "P_RES": numpy.NaN,
                 "M": numpy.NaN,
+                "M_MC": mc_m,
                 "CHI2": numpy.NaN,
                 "FOUND": False
             }

@@ -263,18 +263,19 @@ namespace Belle2 {
     double m_minTimePXD;  /**< minimal time shift of background event for PXD */
     double m_maxTimePXD;  /**< maximal time shift of background event for PXD */
     double m_maxEdepECL;  /**< maximal allowed deposited energy in ECL */
+    int m_cacheSize;  /**< file cache size in Mbytes */
 
     std::vector<BkgFiles> m_backgrounds;  /**< container for background samples */
 
-    bool m_PXD; /**< true if found in m_components */
-    bool m_SVD; /**< true if found in m_components */
-    bool m_CDC; /**< true if found in m_components */
-    bool m_TOP; /**< true if found in m_components */
-    bool m_ARICH; /**< true if found in m_components */
-    bool m_ECL; /**< true if found in m_components */
-    bool m_BKLM; /**< true if found in m_components */
-    bool m_EKLM; /**< true if found in m_components */
-    bool m_BeamBackHits; /**<  if true add also background hits */
+    bool m_PXD = false; /**< true if found in m_components */
+    bool m_SVD = false; /**< true if found in m_components */
+    bool m_CDC = false; /**< true if found in m_components */
+    bool m_TOP = false; /**< true if found in m_components */
+    bool m_ARICH = false; /**< true if found in m_components */
+    bool m_ECL = false; /**< true if found in m_components */
+    bool m_BKLM = false; /**< true if found in m_components */
+    bool m_EKLM = false; /**< true if found in m_components */
+    bool m_BeamBackHits = false; /**<  if true add also background hits */
 
     background::BeamBGTypes m_bgTypes;  /**< defined BG types */
 

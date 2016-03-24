@@ -59,9 +59,7 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  BeamBkgMixerModule::BeamBkgMixerModule() : Module(),
-    m_PXD(false), m_SVD(false), m_CDC(false), m_TOP(false),
-    m_ARICH(false), m_ECL(false), m_BKLM(false), m_EKLM(false)
+  BeamBkgMixerModule::BeamBkgMixerModule() : Module()
   {
     // set module description (e.g. insert text)
     setDescription("Beam background mixer at SimHit level that uses beam background"
@@ -105,6 +103,8 @@ namespace Belle2 {
              "maximal deposited energy of ECLHit to accept BG event for mixing"
              "(0 means accept all events)", 1.0);
 
+    addParam("cacheSize", m_cacheSize,
+             "file cache size in Mbytes. If negative, use root default", 5);
   }
 
   BeamBkgMixerModule::~BeamBkgMixerModule()
@@ -247,6 +247,8 @@ namespace Belle2 {
 
       bkg.numEvents = bkg.tree->GetEntries();
       bkg.rate =  bkg.numEvents / bkg.realTime * bkg.scaleFactor;
+
+      if (m_cacheSize >= 0) bkg.tree->SetCacheSize(m_cacheSize * 1024 * 1024);
 
       if (m_PXD and bkg.tree->GetBranch("PXDSimHits"))
         bkg.tree->SetBranchAddress("PXDSimHits", &bkg.simHits.PXD);

@@ -87,12 +87,12 @@ timemodule = register_module('WaveTimingV2')
 timeDict = {'time2TDC': 1.0}
 timemodule.param(timeDict)
 timemodule.param('threshold', 50.)  # always
-if((args.inputRun).find("cpr3015") != -1):
-    print('TSUKUBA')
-    timemodule.param('threshold_n', -80.)  # tsukuba
-else:
+if (args.inputRun).find("cpr31") != -1 or (args.inputRun).find("cpr32") != -1:
     print('FUJI')
     timemodule.param('threshold_n', 1.)  # fuji
+else:
+    print('TSUKUBA')
+    timemodule.param('threshold_n', -80.)  # tsukuba
 # it shouldn't be anything else
 
 timecalibmodule = register_module('DoubleCalPulse')

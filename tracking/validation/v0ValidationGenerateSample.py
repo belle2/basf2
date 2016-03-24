@@ -28,7 +28,7 @@ def run():
     # generateY4S(1000, path=path)
 
     path.add_module('EventInfoSetter',
-                    evtNumList=[1000],
+                    evtNumList=[50],
                     runList=[1],
                     expList=[1]
                     )
@@ -55,6 +55,7 @@ def run():
     path.add_module('SetupGenfitExtrapolation')
 
     add_track_finding(path, components)
+    path.add_module("GenfitTrackCandidatesCreator")
 
     # Match the tracks to the MC truth.  The matching works based on
     # the output of the TrackFinderMCTruth.

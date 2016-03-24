@@ -28,14 +28,14 @@ def run():
     # generateY4S(1000, path=path)
 
     path.add_module('EventInfoSetter',
-                    evtNumList=[500],
+                    evtNumList=[1000],
                     runList=[1],
                     expList=[1]
                     )
 
     path.add_module('ParticleGun',
                     pdgCodes=[310],
-                    nTracks=10,
+                    nTracks=5,
                     momentumGeneration='uniform',
                     momentumParams=[0.000, 1.000],
                     thetaGeneration='uniform',
@@ -87,10 +87,6 @@ class V0Harvester(HarvestingModule):
     def __init__(self):
         HarvestingModule.__init__(self, foreach="MCParticles", output_file_name="../V0ValidationHarvested.root")
 
-    @staticmethod
-    def resolution(measured, mc):
-        return (measured - mc) / mc
-
     def pick(self, mc_particle):
         return abs(mc_particle.getPDG()) == 310
 
@@ -114,15 +110,14 @@ class V0Harvester(HarvestingModule):
             v0_chi2 = v0.getVertexChi2()
 
             return {
+                "R": v0_perp,
                 "R_MC": mc_perp,
+                "THETA": v0_theta,
                 "THETA_MC": mc_theta,
+                "PHI": v0_phi,
                 "PHI_MC": mc_phi,
+                "P": v0_p,
                 "P_MC": mc_p,
-                "R_RES": V0Harvester.resolution(v0_perp, mc_perp),
-                "THETA_RES": V0Harvester.resolution(v0_theta, mc_theta),
-                "PHI_RES": V0Harvester.resolution(v0_phi, mc_phi),
-                "M_RES": V0Harvester.resolution(v0_m, mc_m),
-                "P_RES": V0Harvester.resolution(v0_p, mc_p),
                 "M": v0_m,
                 "M_MC": mc_m,
                 "CHI2": v0_chi2,
@@ -131,15 +126,14 @@ class V0Harvester(HarvestingModule):
 
         else:
             return {
+                "R": numpy.NaN,
                 "R_MC": mc_perp,
+                "THETA": numpy.NaN,
                 "THETA_MC": mc_theta,
+                "PHI": numpy.NaN,
                 "PHI_MC": mc_phi,
+                "P": numpy.NaN,
                 "P_MC": mc_p,
-                "R_RES": numpy.NaN,
-                "THETA_RES": numpy.NaN,
-                "PHI_RES": numpy.NaN,
-                "M_RES": numpy.NaN,
-                "P_RES": numpy.NaN,
                 "M": numpy.NaN,
                 "M_MC": mc_m,
                 "CHI2": numpy.NaN,

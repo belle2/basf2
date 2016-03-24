@@ -39,6 +39,13 @@ class V0ValidationPlots:
 
         self.hist_mass_vs_mc_mass = ROOT.TH2F("", "", 80, 0, 0.8, 80, 0, 0.8)
 
+        # Residuum histograms
+        self.hist_invariant_mass_residuum = ROOT.TH1F("", "", 60, -0.05, 0.05)
+        self.hist_r_residuum = ROOT.TH1F("", "", 60, -0.1, 0.1)
+        self.hist_theta_residuum = ROOT.TH1F("", "", 60, -0.1, 0.1)
+        self.hist_phi_residuum = ROOT.TH1F("", "", 60, -0.1, 0.1)
+        self.hist_p_residuum = ROOT.TH1F("", "", 60, -0.05, 0.05)
+
     def collect_histograms(self):
         input_root_file = ROOT.TFile.Open(self.input_file, "READ")
 
@@ -55,7 +62,13 @@ class V0ValidationPlots:
                 self.hist_p_found.Fill(event.P_MC)
 
                 self.hist_invariant_mass.Fill(event.M)
-                self.hist_invariant_mass_res.Fill(event.M_RES)
+
+                # Residuum histograms
+                self.hist_invariant_mass_residuum.Fill(event.M - event.M_MC)
+                self.hist_r_residuum.Fill(event.R - event.R_MC)
+                self.hist_theta_residuum.Fill(event.THETA - event.THETA_MC)
+                self.hist_phi_residuum.Fill(event.PHI - event.PHI_MC)
+                self.hist_p_residuum.Fill(event.P - event.P_MC)
 
                 self.hist_chi2.Fill(event.CHI2)
                 if event.R_MC > 1.0:
@@ -143,8 +156,8 @@ class V0ValidationPlots:
                                          contact='markus.prim@kit.edu',
                                          meta_options='').Write()
 
-        V0ValidationPlots.histogram_plot(self.hist_invariant_mass_res, "KShort Invariant Mass Resolution", "Rec/MC - 1", None,
-                                         description='Invariant mass resolution of KShorts with standard reconstruction',
+        V0ValidationPlots.histogram_plot(self.hist_invariant_mass_residuum, "KShort Invariant Mass Residuum", "Rec - MC", "GeV",
+                                         description='Invariant mass residuum of KShorts with standard reconstruction',
                                          check='',
                                          contact='markus.prim@kit.edu',
                                          meta_options='').Write()
@@ -169,10 +182,31 @@ class V0ValidationPlots:
 
         V0ValidationPlots.histogram_2d_plot(self.hist_mass_vs_mc_mass, "Reconstructed vs MC Mass.",
                                             "Reconstructed Mass", "GeV", "MC Mass", "GeV",
-                                            description="Reconstruted mass vs invariant Mass.",
-                                            check="Should be a diagonal.",
+                                            description="Reconstructed mass vs invariant Mass.",
+                                            check="",
                                             contact="markus.prim@kit.edu",
                                             meta_options='expert').Write()
+
+        V0ValidationPlots.histogram_plot(self.hist_r_residuum, "KShort R Residuum", "Rec - MC", "cm",
+                                         description='R residuum of KShorts with standard reconstruction',
+                                         check='',
+                                         contact='markus.prim@kit.edu',
+                                         meta_options='').Write()
+        V0ValidationPlots.histogram_plot(self.hist_theta_residuum, "KShort Theta Residuum", "Rec - MC", "rad",
+                                         description='Theta residuum of KShorts with standard reconstruction',
+                                         check='',
+                                         contact='markus.prim@kit.edu',
+                                         meta_options='').Write()
+        V0ValidationPlots.histogram_plot(self.hist_phi_residuum, "KShort Phi Residuum", "Rec - MC", "rad",
+                                         description='Phi residuum of KShorts with standard reconstruction',
+                                         check='',
+                                         contact='markus.prim@kit.edu',
+                                         meta_options='').Write()
+        V0ValidationPlots.histogram_plot(self.hist_p_residuum, "KShort Momentum Residuum", "Rec - MC", "GeV",
+                                         description='Momentum residuum of KShorts with standard reconstruction',
+                                         check='',
+                                         contact='markus.prim@kit.edu',
+                                         meta_options='').Write()
 
         output_root_file.Write()
         output_root_file.Close()

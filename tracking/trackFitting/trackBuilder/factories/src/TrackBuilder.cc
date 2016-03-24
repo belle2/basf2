@@ -92,6 +92,8 @@ bool TrackBuilder::storeTrackFromRecoTrack(const RecoTrack& recoTrack)
 
   B2DEBUG(100, "Number of fitted hypothesis = " << newTrack.getNumberOfFittedHypotheses());
   if (newTrack.getNumberOfFittedHypotheses() > 0) {
+    // false positive due to new with placement (cppcheck issue #7163)
+    // cppcheck-suppress memleak
     Track* addedTrack = tracks.appendNew(newTrack);
     addedTrack->addRelationTo(&recoTrack);
     const MCParticle* mcParticle = recoTrack.getRelated<MCParticle>(m_mcParticleColName);

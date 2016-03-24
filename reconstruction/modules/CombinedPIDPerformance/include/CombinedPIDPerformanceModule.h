@@ -72,6 +72,7 @@ namespace Belle2 {
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */
     std::string m_mdstType;       /**< flag for Belle/BelleII mdst files */
+    int m_nbins;                  /**< number of momentum bins */
     double m_pLow;                /**< lower bound of momentum range */
     double m_pHigh;               /**< upper bound of momentum range */
 
@@ -111,7 +112,7 @@ namespace Belle2 {
     Const::DetectorSet muonSet;     /**< muons */
 
     /** enumeration for detector numbering */
-    enum dettype {svd, cdc, top, arich, klm, ecl, dedx, dedxtop, all};
+    enum dettype {svd, cdc, top, arich, klm, ecl, dedx, dedxtop, dedxecl, all};
     std::vector<int> detset;  /**< set of detectors used for hadrons */
     std::vector<int> edetset; /**< set of detectors used electrons */
 

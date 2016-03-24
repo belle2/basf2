@@ -33,9 +33,14 @@ namespace Belle2 {
     virtual ~ECLDatabaseImporter() {};
 
     /**
-     * Import ECL single crystal calibration constants to the database
+     * Import ECL energy calibration constants to the database
      */
-    void importDigitCalibration();
+    void importDigitEnergyCalibration();
+
+    /**
+     * Import ECL time calibration constants to the database
+     */
+    void importDigitTimeCalibration();
 
   private:
 
@@ -43,9 +48,10 @@ namespace Belle2 {
     std::string m_name;  /**< Database object (output) file name */
 
     /**
+     * 2: Added time calibration.
      * 1: Initial version.
      */
-    ClassDef(ECLDatabaseImporter, 1);
+    ClassDef(ECLDatabaseImporter, 2);
   };
 
 } // Belle2 namespace

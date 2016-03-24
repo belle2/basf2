@@ -27,6 +27,15 @@ RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum,
   m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation)
 {
   m_genfitTrack.setStateSeed(seedPosition, seedMomentum);
+  // TODO Set the covariance seed (that should be done by the tracking package)
+  TMatrixDSym covSeed(6);
+  covSeed(0, 0) = 1e-3;
+  covSeed(1, 1) = 1e-3;
+  covSeed(2, 2) = 4e-3;
+  covSeed(3, 3) = 0.01e-3;
+  covSeed(4, 4) = 0.01e-3;
+  covSeed(5, 5) = 0.04e-3;
+  m_genfitTrack.setCovSeed(covSeed);
 }
 
 RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,

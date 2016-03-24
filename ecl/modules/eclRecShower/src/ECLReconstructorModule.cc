@@ -266,7 +266,8 @@ void ECLReconstructorModule::event()
       // Fill ECLCluster here
       if (!eclClusters) eclClusters.create();
       // Loose timing cut is applied. 20150529 K.Miyabayashi
-      if (-300.0 < v_TIME && v_TIME < 200.0) {
+      // replaced -300..200 clocktick cut by +/- 125ns cut (Torbenm 24-March-2016) - THIS WILL BE REPLACED BY AN ENERGY DEPENDENT CUT USING THE RESOLUTION SOON
+      if (-125.0 * Belle2::Unit::ns < v_TIME && v_TIME < 125.0 * Belle2::Unit::ns) {
         const auto eclCluster = eclClusters.appendNew();
 
         eclCluster->setError(Mdst_Error);

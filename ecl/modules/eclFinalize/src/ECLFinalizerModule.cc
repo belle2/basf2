@@ -92,7 +92,8 @@ void ECLFinalizerModule::event()
     const float ShowerTime = eclShower.getTime();
 
     // Loose timing cut is applied. 20150529 K.Miyabayashi (original comment)
-    if (-300.0 < ShowerTime && ShowerTime < 200.0) {
+    // replaced -300..200 clocktick cut by +/- 125ns cut (Torbenm 24-March-2016) - THIS WILL BE REPLACED BY AN ENERGY DEPENDENT CUT USING THE RESOLUTION SOON
+    if (-125.0 * Belle2::Unit::ns < ShowerTime && ShowerTime < 125.0 * Belle2::Unit::ns) {
       const auto eclCluster = eclClusters.appendNew();
 
       eclCluster->setTiming(eclShower.getTime());

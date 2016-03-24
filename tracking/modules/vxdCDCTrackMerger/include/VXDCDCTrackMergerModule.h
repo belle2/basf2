@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Benjamin Oberhof                                        *
+ * Contributors:  Benjamin Oberhof, Thomas Hauth                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,6 +19,8 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreArray.h>
+
+#include <tracking/dataobjects/RecoTrack.h>
 
 using namespace genfit;
 
@@ -43,63 +45,44 @@ namespace Belle2 {
      */
     virtual void initialize();
 
-    /** Called once before a new run begins.
-     *
-     * This method gives you the chance to change run dependent constants like alignment parameters, etc.
-     */
-    virtual void beginRun();
-
     /** Called once for each event.
      *
      * This is most likely where your module will actually do anything.
      */
     virtual void event();
 
-    /** Called once when a run ends.
-     *
-     *  Use this method to save run information, which you aggregated over the last run.
-     */
-    virtual void endRun();
-
-    /** Clean up anything you created in initialize(). */
-    virtual void terminate();
   private:
-    //    void insertTrackInGrid(double track_theta, double track_phi, genfit::Track* gftrack, std::vector<std::vector<std::vector<genfit::Track*>*>*>* tracks_grid);
-    //void insertTrackAndPositionInGrid(TVector3 position, genfit::Track* gftrack, std::vector<std::vector<std::vector<TVector3>*>*>* positions_grid,
-    //                                   std::vector<std::vector<std::vector<genfit::Track*>*>*>* tracks_grid);
-    double m_CDC_wall_radius;
+
+    // pair of matched Tracks, first enry is the index of the VXD Track, second of the CDC Track
+    typedef std::pair<int, int> MatchPairType;
+
+    // list of matched track pairs
+    typedef std::vector<MatchPairType> MatchPairList;
+
+    /**
+     * Takes the list of matches pairs and adds all items which do not
+     * occur in the matchedList to the list out of output tracks (a.k.a. m_mergedRecoTracks)
+     * This is useful to keep VXD and CDC tracks, which have not found any reasonbale merge.
+     * if useFirstIndex = true, the VXD index will be used for the check, otherwise the CDC track index
+     * will be used.
+     */
+    size_t addUnmatchedTracks(StoreArray<RecoTrack>& singleRecoTracks,
+                              MatchPairList const& matchedList, bool useFirstIndex = true);
+
+    double m_CDC_wall_radius = 16.25;
     double m_chi2_max;
     double m_merge_radius;
-    bool m_recover;
 
-    std::string m_VXDGFTracksColName;
-    std::string m_VXDGFTrackCandsColName;
-    std::string m_CDCGFTracksColName;
-    std::string m_CDCGFTrackCandsColName;
-    std::string m_mergedGFTrackCandsColName;
-
+    std::string m_VXDRecoTrackColName;
+    std::string m_CDCRecoTrackColName;
+    std::string m_mergedRecoTrackColName;
 
     std::string m_relMatchedTracks;
 
-    //for global trk merging efficiency
-    double m_total_pairs;
-    double m_total_matched_pairs;
-    //root tree variables
+    StoreArray<RecoTrack>  m_CDCRecoTracks;
+    StoreArray<RecoTrack>  m_VXDRecoTracks;
+    StoreArray<RecoTrack>  m_mergedRecoTracks;
 
-    // VXD TrackCands, Tracks
-    StoreArray<TrackCand>  m_VXDGFTrackCands;
-    StoreArray<Track>      m_VXDGFTracks;
-
-
-    // CDC TrackCands, Tracks
-    StoreArray<TrackCand>  m_CDCGFTrackCands;
-    StoreArray<Track>      m_CDCGFTracks;
-
-
-    // create the TrackCand ouput list
-    StoreArray<TrackCand>  m_TrackCands;
-
-    void collectMergedTrackCands(void);
   };
 }
 #endif

@@ -71,8 +71,8 @@ namespace Belle2 {
     //! Exp number, Run number
     unsigned int m_count;
     unsigned int m_count_0;
-    unsigned int m_expno;
-    unsigned int m_runno;
+    int m_expno;
+    int m_runno;
     unsigned long long m_nbyte;
     double m_ctime;
 

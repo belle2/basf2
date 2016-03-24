@@ -32,6 +32,11 @@ PruneRecoTracksModule::PruneRecoTracksModule() :
 
 }
 
+void PruneRecoTracksModule::initialize()
+{
+  StoreArray<RecoTrack>::required(m_storeArrayName);
+}
+
 void PruneRecoTracksModule::event()
 {
   auto tracks = Belle2::StoreArray<RecoTrack>(m_storeArrayName);

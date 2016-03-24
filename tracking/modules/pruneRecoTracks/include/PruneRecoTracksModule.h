@@ -27,6 +27,9 @@ namespace Belle2 {
     /// Constructor of the module. Setting up parameters and description.
     PruneRecoTracksModule();
 
+    // Declare required StoreArray
+    virtual void initialize() override;
+
     /// Event processing, prunes the RecoTracks contained in each event
     virtual void event() override;
 

@@ -108,7 +108,7 @@ void VXDCDCTrackMergerModule::event()
       cdcpos = cdc_sop.getPos();
       cdcmom = cdc_sop.getMom();
     } catch (...) {
-      B2INFO("CDCTrack extrapolation to cylinder failed!");
+      B2DEBUG(9, "CDCTrack extrapolation to cylinder failed!");
       continue;
     }
 
@@ -131,7 +131,7 @@ void VXDCDCTrackMergerModule::event()
         vxdmom = vxd_sop.getMom();
       } catch (genfit::Exception const&) {
         // extrapolation not possible, skip this track
-        B2INFO("VXDTrack extrapolation to cylinder failed!");
+        B2DEBUG(9, "VXDTrack extrapolation to cylinder failed!");
         continue;
       }
 
@@ -146,7 +146,7 @@ void VXDCDCTrackMergerModule::event()
           vxd_sop.extrapolateToPlane(cdc_sop.getPlane());
         } catch (genfit::Exception const&) {
           // extrapolation not possible, skip this track
-          B2INFO("VXDTrack extrapolation to plane failed!");
+          B2DEBUG(9, "VXDTrack extrapolation to plane failed!");
           continue;
         }
         genfit::MeasuredStateOnPlane vxd_sop =

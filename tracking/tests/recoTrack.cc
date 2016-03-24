@@ -224,4 +224,34 @@ namespace Belle2 {
     ASSERT_EQ(cdcHitListOne.size(), 3);
     ASSERT_EQ(cdcHitListTwo.size(), 3);
   }
+
+  /** Test simple Setters and Getters. */
+  TEST_F(RecoTrackTest, copyRecoTrack)
+  {
+    StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);
+
+    // Add three cdc hits to the track
+    m_recoTrack->addCDCHit(cdcHits[0], 1);
+    m_recoTrack->addCDCHit(cdcHits[1], 0, RecoHitInformation::RightLeftInformation::c_right);
+    m_recoTrack->addCDCHit(cdcHits[2], 2);
+
+    // create a second RecoTrack
+    StoreArray<RecoTrack> recoTracks(m_storeArrayNameOfRecoTracks);
+
+    auto recoTrack = recoTracks.appendNew(m_recoTrack->getPositionSeed(), m_recoTrack->getMomentumSeed(), m_recoTrack->getChargeSeed(),
+                                          m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits, m_storeArrayNameOfHitInformation);
+    EXPECT_FALSE(recoTrack->hasCDCHits());
+
+    // check if the offset computation of the hit order works as expected
+    size_t offset = 3;
+    recoTrack->addHitsFromRecoTrack(m_recoTrack, offset);
+    ASSERT_EQ(recoTrack->getNumberOfCDCHits(), 3);
+
+    size_t this_i = offset;
+    for (auto pHit : recoTrack->getSortedCDCHitList()) {
+      auto sortParam = recoTrack->getSortingParameter(pHit);
+      ASSERT_EQ(this_i, sortParam);
+      this_i++;
+    }
+  }
 }

@@ -8,31 +8,142 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
-
-#include <G4VPhysicalVolume.hh>
-#include <G4VTouchable.hh>
-
-#include <cmath>
-#include <boost/format.hpp>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <cmath>
-#include <boost/format.hpp>
-#include <iostream>
-#include <iomanip>
-#include <fstream>
+#include <framework/logging/Logger.h>
+
+#include <G4VTouchable.hh>
+#include <G4PhysicalVolumeStore.hh>
+#include <G4NavigationHistory.hh>
+
+#include "TVector3.h"
 
 using namespace std;
-using namespace boost;
-using namespace Belle2;
-using namespace ECL;
-
-#define PI 3.14159265358979323846
-
+using namespace Belle2::ECL;
 
 ECLGeometryPar* ECLGeometryPar::m_B4ECLGeometryParDB = 0;
+
+class Mapping_t {
+public:
+  static void Mapping(int id, int& ThetaId, int& PhiId)
+  {
+    ThetaId = m_Theta[((unsigned int)id) >> 4];
+    PhiId = id - m_dTheta[ThetaId] * 16 - ThetaId * 128;
+  }
+
+  static void Mapping(int id, int& ThetaId, int& PhiId, int& nrep, int& indx)
+  {
+    Mapping(id, ThetaId, PhiId);
+
+    int off = m_offsets[ThetaId];
+    int i = m_tbl[ThetaId];
+
+    int r = m_recip[i];
+    int d = m_denom[i];
+
+    nrep = (PhiId * r) >> m_RECIPROCAL_SHIFT;
+    indx = off + (PhiId - nrep * d);
+  }
+
+  static int CellID(int ThetaId, int PhiId)
+  {
+    return PhiId + m_dTheta[ThetaId] * 16 + ThetaId * 128;
+  }
+
+  static int Offset(int ThetaId)
+  {
+    return m_dTheta[ThetaId] + ThetaId * 8;
+  }
+
+  static int Indx2ThetaId(int indx)
+  {
+    return m_Theta[indx];
+  }
+
+  static int ThetaId2NCry(int ThetaId)  // Theta Id to the number of crystals @ this Id
+  {
+    return m_denom[m_tbl[ThetaId]];
+  }
+
+private:
+  static const char m_dTheta[69];
+  static const unsigned char m_Theta[546], m_tbl[69], m_offsets[69];
+
+  static const unsigned char m_RECIPROCAL_SHIFT = 16;
+  static const unsigned int m_recip[5], m_denom[5];
+};
+
+const unsigned char Mapping_t::m_Theta[546] = {
+  0, 0, 0,  1, 1, 1,
+  2, 2, 2, 2,  3, 3, 3, 3,  4, 4, 4, 4,
+  5, 5, 5, 5, 5, 5,  6, 6, 6, 6, 6, 6,  7, 7, 7, 7, 7, 7,
+  8, 8, 8, 8, 8, 8,  9, 9, 9, 9, 9, 9,  10, 10, 10, 10, 10, 10,
+  11, 11, 11, 11, 11, 11, 11, 11, 11,  12, 12, 12, 12, 12, 12, 12, 12, 12,
+
+  13, 13, 13, 13, 13, 13, 13, 13, 13,  14, 14, 14, 14, 14, 14, 14, 14, 14,  15, 15, 15, 15, 15, 15, 15, 15, 15,
+  16, 16, 16, 16, 16, 16, 16, 16, 16,  17, 17, 17, 17, 17, 17, 17, 17, 17,  18, 18, 18, 18, 18, 18, 18, 18, 18,
+  19, 19, 19, 19, 19, 19, 19, 19, 19,  20, 20, 20, 20, 20, 20, 20, 20, 20,  21, 21, 21, 21, 21, 21, 21, 21, 21,
+  22, 22, 22, 22, 22, 22, 22, 22, 22,  23, 23, 23, 23, 23, 23, 23, 23, 23,  24, 24, 24, 24, 24, 24, 24, 24, 24,
+  25, 25, 25, 25, 25, 25, 25, 25, 25,  26, 26, 26, 26, 26, 26, 26, 26, 26,  27, 27, 27, 27, 27, 27, 27, 27, 27,
+  28, 28, 28, 28, 28, 28, 28, 28, 28,  29, 29, 29, 29, 29, 29, 29, 29, 29,  30, 30, 30, 30, 30, 30, 30, 30, 30,
+  31, 31, 31, 31, 31, 31, 31, 31, 31,  32, 32, 32, 32, 32, 32, 32, 32, 32,  33, 33, 33, 33, 33, 33, 33, 33, 33,
+  34, 34, 34, 34, 34, 34, 34, 34, 34,  35, 35, 35, 35, 35, 35, 35, 35, 35,  36, 36, 36, 36, 36, 36, 36, 36, 36,
+  37, 37, 37, 37, 37, 37, 37, 37, 37,  38, 38, 38, 38, 38, 38, 38, 38, 38,  39, 39, 39, 39, 39, 39, 39, 39, 39,
+  40, 40, 40, 40, 40, 40, 40, 40, 40,  41, 41, 41, 41, 41, 41, 41, 41, 41,  42, 42, 42, 42, 42, 42, 42, 42, 42,
+  43, 43, 43, 43, 43, 43, 43, 43, 43,  44, 44, 44, 44, 44, 44, 44, 44, 44,  45, 45, 45, 45, 45, 45, 45, 45, 45,
+  46, 46, 46, 46, 46, 46, 46, 46, 46,  47, 47, 47, 47, 47, 47, 47, 47, 47,  48, 48, 48, 48, 48, 48, 48, 48, 48,
+  49, 49, 49, 49, 49, 49, 49, 49, 49,  50, 50, 50, 50, 50, 50, 50, 50, 50,  51, 51, 51, 51, 51, 51, 51, 51, 51,
+  52, 52, 52, 52, 52, 52, 52, 52, 52,  53, 53, 53, 53, 53, 53, 53, 53, 53,  54, 54, 54, 54, 54, 54, 54, 54, 54,
+  55, 55, 55, 55, 55, 55, 55, 55, 55,  56, 56, 56, 56, 56, 56, 56, 56, 56,  57, 57, 57, 57, 57, 57, 57, 57, 57,
+  58, 58, 58, 58, 58, 58, 58, 58, 58,
+
+  59, 59, 59, 59, 59, 59, 59, 59, 59,  60, 60, 60, 60, 60, 60, 60, 60, 60,
+  61, 61, 61, 61, 61, 61,  62, 62, 62, 62, 62, 62,
+  63, 63, 63, 63, 63, 63,  64, 64, 64, 64, 64, 64,
+  65, 65, 65, 65, 65, 65,
+  66, 66, 66, 66,  67, 67, 67, 67,  68, 68, 68, 68
+};
+
+const char Mapping_t::m_dTheta[69] = {
+  0, -5, -10, -14, -18, -22, -24, -26, -28, -30, -32, -34, -33, // forward
+
+  -32, -31, -30, -29, -28, -27, -26, -25, -24,
+  -23, -22, -21, -20, -19, -18, -17, -16, -15,
+  -14, -13, -12, -11, -10,  -9,  -8,  -7,  -6,
+  -5,  -4,  -3,  -2,  -1,   0,   1,   2,   3,
+  4,   5,   6,   7,   8,   9,  10,  11,  12, 13,
+
+  14, 15, 16, 14, 12, 10, 8, 6, 2, -2 // backward
+};
+
+const unsigned char Mapping_t::m_tbl[69] = { // pointer to the denominator/reciprocal arrays or how many crystals in a phi sector
+  1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, // forward
+
+  0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+
+  4, 4, 3, 3, 3, 3, 3, 2, 2, 2           // backward
+};
+
+const unsigned char Mapping_t::m_offsets[69] = {
+  0,  3,  6, 10, 14, 18, 24, 30, 36, 42, 48, 54, 63, // forward
+
+  132, 134, 136, 138, 140, 142, 144, 146, 148,
+  150, 152, 154, 156, 158, 160, 162, 164, 166,
+  168, 170, 172, 174, 176, 178, 180, 182, 184,
+  186, 188, 190, 192, 194, 196, 198, 200, 202,
+  204, 206, 208, 210, 212, 214, 216, 218, 220, 222,
+
+  72, 81, 90, 96, 102, 108, 114, 120, 124, 128       // backward
+};
+
+#define pack(x) ((1<<Mapping_t::m_RECIPROCAL_SHIFT)/x+1)
+const unsigned int Mapping_t::m_recip[] = {pack(2), pack(3), pack(4), pack(6), pack(9)};
+const unsigned int Mapping_t::m_denom[] = {    (2), (3), (4), (6), (9)};
+#undef pack
+
 
 ECLGeometryPar* ECLGeometryPar::Instance()
 {
@@ -56,451 +167,215 @@ ECLGeometryPar::~ECLGeometryPar()
 
 void ECLGeometryPar::clear()
 {
+  m_ini_cid = -1;
   mPar_cellID = 0;
   mPar_thetaID = 0;
   mPar_phiID = 0;
-  mPar_thetaIndex = 0;
-  mPar_phiIndex = 0;
+}
 
+const double sectorPhi[2] = {M_PI / 36, M_PI / 8};
+
+// There is no way to get world coordinates of a local point of a physical volume in Geant.
+// The only way to check geometry is to trace particle and check volumes it crosses.
+// Here particle gun parameters are produced to check crystal positions with the center @ r0 and direction n
+void ParticleGunParameters(const G4String& comment, const G4ThreeVector& n, const G4ThreeVector& r0, double dphi)
+{
+  cout << comment << endl;
+  cout << "Center position = " << r0 << ", Direction = " << n << endl;
+  // closest point to z-axis
+  double t = -(n.z() * r0.z() - n * r0) / (n.z() * n.z() - n * n);
+  G4ThreeVector r = n * t + r0;
+  cout << "Closest point to z-axis = " << r << endl; // at the moment I do not see tilt in phi
+  const double r2d = 180 / M_PI;
+  double th = r2d * n.theta();
+  double phi = r2d * n.phi();
+  double z = r.z();
+  dphi *= r2d;
+  cout << "    'thetaParams': [" << th << ", " << th << "]," << endl;
+  cout << "    'phiParams': [" << phi << "+0*" << dphi << ", " << phi << "+0*" << dphi << "]," << endl;
+  cout << "    'zVertexParams': [" << z << ", " << z << "]" << endl;
 }
 
 void ECLGeometryPar::read()
 {
+  m_crystals.clear();
+  m_crystals.reserve(46 * 2 + 132); // 10752 bytes
 
-  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"ECL\"]/Content/");
-  for (int iBrCry = 1 ; iBrCry <= 46 ; ++iBrCry) {//46=29+17
+  G4PhysicalVolumeStore* store = G4PhysicalVolumeStore::GetInstance();
+  G4ThreeVector a0(0, 0, 0), a1(0, 0, 1);
 
-    GearDir layerContent(content);
-    layerContent.append((format("/BarrelCrystals/BarrelCrystal[%1%]/") % (iBrCry)).str());
+  // Endcap sectors are rotated since behaviour of G4Replica class. It
+  // requires a physical volume during phi replication to be symmetric
+  // around phi=0. So we need to rotate it by -((2*pi)/16)/2 angle at the
+  // geometry description are return back here.
+  G4RotationMatrix H = CLHEP::HepRotationZ(sectorPhi[1] * 0.5);
 
-    m_BLThetaCrystal[iBrCry - 1] = layerContent.getAngle("K_z_TILTED") * 180 / PI;
-    m_BLPhiCrystal[iBrCry - 1] = layerContent.getAngle("K_phi_TILTED") * 180 / PI;
-    m_BLPreppos[iBrCry - 1] = layerContent.getLength("K_perpC") ;
-    m_BLPhipos[iBrCry - 1] = layerContent.getAngle("K_phiC")  * 180 / PI;
-    m_BLZpos[iBrCry - 1] = layerContent.getLength("K_zC") ;
+  G4String tnamef("eclFwdFoilPhysical_");
+  for (int i = 1; i <= 72; i++) {
+    G4String vname(tnamef); vname += to_string(i);
+    G4VPhysicalVolume* v0 = store->GetVolume(vname);
+    G4RotationMatrix m0 = v0->GetObjectRotationValue();
+    G4ThreeVector d0 = v0->GetObjectTranslation();
+    CrystalGeom_t c0 = {(1 / CLHEP::cm)* (H * d0), H* (m0 * a1)};
+    m_crystals.push_back(c0);
+    // const CrystalGeom_t &t = m_crystals.back();
+    // ParticleGunParameters(string("Forward ")+to_string(i),t.dir,t.pos,sectorPhi[1]);
   }
 
-
-
-  for (int iCry = 1 ; iCry <= 132 ; ++iCry) {
-
-    GearDir counter(content);
-    counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
-
-    m_ECThetaCrystal[iCry - 1]  = counter.getAngle("K_Ptheta") * 180 / PI;
-    m_ECPhiCrystal[iCry - 1] = counter.getAngle("K_Rphi2")  * 180 / PI;
-    m_ECRpos[iCry - 1]  = counter.getLength("K_Pr") ;
-    m_ECThetapos[iCry - 1]  = counter.getAngle("K_Ptheta") * 180 / PI;
-    m_ECPhipos[iCry - 1]  = counter.getAngle("K_Pphi") * 180 / PI;
+  G4String tnameb("eclBwdFoilPhysical_");
+  for (int i = 73; i <= 132; i++) {
+    G4String vname(tnameb); vname += to_string(i);
+    G4VPhysicalVolume* v0 = store->GetVolume(vname);
+    G4RotationMatrix m0 = v0->GetObjectRotationValue();
+    G4ThreeVector d0 = v0->GetObjectTranslation();
+    CrystalGeom_t c0 = {(1 / CLHEP::cm)* (H * d0), H* (m0 * a1)};
+    m_crystals.push_back(c0);
+    // const CrystalGeom_t &t = m_crystals.back();
+    // ParticleGunParameters(string("Backward ")+to_string(i),t.dir,t.pos,sectorPhi[1]);
   }
 
+  // since barrel sector is symmetric around phi=0 we need to
+  // translate crystal with negative phi back to positive rotating
+  // crystal position by (2*M_PI/72) angle
+  G4RotationMatrix S = CLHEP::HepRotationZ(sectorPhi[0]);
 
+  // get barrel sector (between two septums) transformation
+  G4VPhysicalVolume* bs = store->GetVolume("eclBarrelCrystalSectorPhysical");
+  G4RotationMatrix mbs = bs->GetObjectRotationValue();
+  G4ThreeVector dbs = bs->GetObjectTranslation();
+
+  G4String tnameb0("eclBarrelFoilPhysical_0_"), tnameb1("eclBarrelFoilPhysical_1_");
+  for (int i = 1; i <= 46; i++) {
+    G4String istr(to_string(i));
+
+    G4String vname0(tnameb0); vname0 += istr;
+    G4VPhysicalVolume* v0 = store->GetVolume(vname0);
+    G4RotationMatrix m0 = v0->GetObjectRotationValue();
+    G4ThreeVector d0 = v0->GetObjectTranslation();
+    CrystalGeom_t c0 = {(1 / CLHEP::cm)* (mbs * d0 + dbs), mbs* (m0 * a1)};
+    m_crystals.push_back(c0);
+    // const CrystalGeom_t &t0 = m_crystals.back();
+    // ParticleGunParameters(string("Barrel0 ")+to_string(i),t0.dir,t0.pos,sectorPhi[1]);
+
+    G4String vname1(tnameb1); vname1 += istr;
+    G4VPhysicalVolume* v1 = store->GetVolume(vname1);
+    G4RotationMatrix m1 = v1->GetObjectRotationValue();
+    G4ThreeVector d1 = v1->GetObjectTranslation();
+    CrystalGeom_t c1 = {(1 / CLHEP::cm)* (S * (mbs * d1 + dbs)), S* (mbs * (m1 * a1))};
+    m_crystals.push_back(c1);
+    // const CrystalGeom_t &t1 = m_crystals.back();
+    // ParticleGunParameters(string("Barrel1 ")+to_string(i),t1.dir,t1.pos,sectorPhi[1]);
+  }
+  B2INFO("ECLGeometryPar::read() initialized with " << m_crystals.size() << " crystals.");
 }
 
+TVector3 geom_pos, geom_vec;
 
-TVector3 ECLGeometryPar::GetCrystalPos(int cid)
+void ECLGeometryPar::InitCrystal(int cid)
 {
+  int thetaid, phiid, nreplica, indx;
+  Mapping_t::Mapping(cid, thetaid, phiid, nreplica, indx);
+  int isect = indx > 131 ? 0 : 1;
+  const CrystalGeom_t& t = m_crystals[indx];
+  double phi = nreplica * sectorPhi[isect], s, c;
+  sincos(phi, &s, &c);
+  // cout<<cid<<" "<<thetaid<<" "<<phiid<<" "<<nreplica<<" "<<indx<<" "<<isect<<" "<<sectorPhi[isect]<<" "<<phi<<" "<<s<<" "<<c<<endl;
 
-  Mapping(cid);
-  TVector3 Pos;
+  double xp = c * t.pos.x() - s * t.pos.y();
+  double yp = s * t.pos.x() + c * t.pos.y();
+  geom_pos.SetXYZ(xp, yp, t.pos.z());
 
-  if (mPar_cellID < 7776 && mPar_cellID > 1151) {
-    int iSector = mPar_phiID / 2;
-    double phi_ang = iSector * 360 / 72  + m_BLPhipos[mPar_thetaIndex] + (mPar_phiIndex % 2) * (5 - 2.494688) ;
-    TVector3 Pos_tmp(m_BLPreppos[mPar_thetaIndex] * cos(phi_ang * PI / 180) ,
-                     m_BLPreppos[mPar_thetaIndex] * sin(phi_ang * PI / 180) , m_BLZpos[mPar_thetaIndex]);
-    Pos = Pos_tmp;
-  } else {
+  double xv = c * t.dir.x() - s * t.dir.y();
+  double yv = s * t.dir.x() + c * t.dir.y();
+  geom_vec.SetXYZ(xv, yv, t.dir.z());
 
-    double phi_ang = m_ECPhipos[mPar_phiIndex] + 360. / 16 * mPar_thetaIndex;
-    double theta_ang = m_ECThetapos[mPar_phiIndex];
-    TVector3 Pos_tmp(
-      m_ECRpos[mPar_phiIndex] * sin(theta_ang * PI / 180) * cos(phi_ang * PI / 180),
-      m_ECRpos[mPar_phiIndex] * sin(theta_ang * PI / 180) * sin(phi_ang * PI / 180),
-      m_ECRpos[mPar_phiIndex] * cos(theta_ang * PI / 180));
-
-    mPar_thetaID = 4;
-    mPar_phiID = cid - 14 * 16 ;
-    mPar_phiIndex = mPar_phiID % 4 + 14;
-    mPar_thetaIndex = mPar_phiID / 4;
-    Pos = Pos_tmp;
-  }
-
-  return Pos;
+  m_ini_cid = cid;
 }
 
-TVector3 ECLGeometryPar::GetCrystalVec(int cid)
+const TVector3& ECLGeometryPar::GetCrystalPos(int cid)
 {
-
-  Mapping(cid);
-  TVector3 Pos;
-
-  if (mPar_cellID < 7776 && mPar_cellID > 1151) {
-    int iSector = mPar_phiID / 2;
-    double phi_ang = double(iSector) * 360. / 72.  + m_BLPhipos[mPar_thetaIndex] + double(mPar_phiIndex % 2) *
-                     (5. - 2.494688) + m_BLPhiCrystal[mPar_thetaIndex];
-    double theta_ang = m_BLThetaCrystal[mPar_thetaIndex];
-    TVector3 Pos_tmp(
-      sin(theta_ang * PI / 180) * cos(phi_ang * PI / 180),
-      sin(theta_ang * PI / 180) * sin(phi_ang * PI / 180),
-      cos(theta_ang * PI / 180));
-    Pos = Pos_tmp;
-
-  } else {
-    double phi_ang =   360. / 16. * mPar_thetaIndex +  m_ECPhiCrystal[mPar_phiIndex];
-    double theta_ang =  m_ECThetaCrystal[mPar_phiIndex];
-    TVector3 Pos_tmp(
-      sin(theta_ang * PI / 180) * cos(phi_ang * PI / 180),
-      sin(theta_ang * PI / 180) * sin(phi_ang * PI / 180),
-      cos(theta_ang * PI / 180));
-    Pos = Pos_tmp;
-  }
-
-  return Pos;
-
+  if (cid != m_ini_cid) InitCrystal(cid);
+  return geom_pos;
 }
 
-
+const TVector3& ECLGeometryPar::GetCrystalVec(int cid)
+{
+  if (cid != m_ini_cid) InitCrystal(cid);
+  return geom_vec;
+}
 
 int ECLGeometryPar::GetCellID(int ThetaId, int PhiId)
 {
-  int forwRing[13] = {0, 3, 6, 10, 14, 18, 24, 30, 36, 42, 48, 54, 63 };
-  int backRing[10] = {0, 9, 18, 24, 30, 36, 42, 48, 52, 56} ;
-
-/// 0-12  forward
-/// 13-58 barrel
-/// 59-68 backward
-  if (ThetaId < 13) {
-    mPar_cellID = forwRing[ThetaId] * 16 + PhiId;
-  } else if (ThetaId > 58) {
-    mPar_cellID = 7776 + backRing[ThetaId - 59] * 16 + PhiId;
-  } else if (ThetaId > 12 && ThetaId < 59) {
-    mPar_cellID = 1152 + 144 * (ThetaId - 13)  + PhiId;
-  } else     B2WARNING("ECL ECLGeometryPar::CellID int ThetaId " << ThetaId << " int PhiId " << PhiId << ". Out of range.");
-
-  mPar_thetaID = ThetaId;
-  mPar_phiID =  PhiId ;
-  return mPar_cellID;
+  return Mapping_t::CellID(ThetaId, PhiId);
 }
-
 
 void ECLGeometryPar::Mapping(int cid)
 {
-
-
   mPar_cellID = cid;
-  if (cid < 0) {
-    B2WARNING("ECL ECLGeometryPar Mapping  " << cid << ". Out of range.");
-  } else if (cid < 3 * 16) { //Forkward start
-    mPar_thetaID = 0;
-    mPar_phiID = cid;
-    mPar_phiIndex = mPar_phiID % 3;
-    mPar_thetaIndex = mPar_phiID / 3;
-  } else if (cid < 6 * 16) {
-    mPar_thetaID = 1;
-    mPar_phiID = cid - 3 * 16;
-    mPar_phiIndex = mPar_phiID % 3 + 3;
-    mPar_thetaIndex = mPar_phiID / 3;
-  } else if (cid < 10 * 16) {
-    mPar_thetaID = 2;
-    mPar_phiID = cid - 6 * 16 ;
-    mPar_phiIndex = mPar_phiID % 4 + 6;
-    mPar_thetaIndex = mPar_phiID / 4;
-  } else if (cid < 14 * 16) {
-    mPar_thetaID = 3;
-    mPar_phiID = cid - 10 * 16 ;
-    mPar_phiIndex = mPar_phiID % 4 + 10;
-    mPar_thetaIndex = mPar_phiID / 4;
-  } else if (cid < 18 * 16) {
-    mPar_thetaID = 4;
-    mPar_phiID = cid - 14 * 16 ;
-    mPar_phiIndex = mPar_phiID % 4 + 14;
-    mPar_thetaIndex = mPar_phiID / 4;
-  } else if (cid < 24 * 16) {
-    mPar_thetaID = 5;
-    mPar_phiID = cid - 18 * 16 ;
-    mPar_phiIndex = mPar_phiID % 6 + 18;
-    mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 30 * 16) {
-    mPar_thetaID = 6;
-    mPar_phiID = cid - 24 * 16 ;
-    mPar_phiIndex = mPar_phiID % 6 + 24;
-    mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 36 * 16) {
-    mPar_thetaID = 7;
-    mPar_phiID = cid - 30 * 16 ;
-    mPar_phiIndex = mPar_phiID % 6 + 30;
-    mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 42 * 16) {
-    mPar_thetaID = 8;
-    mPar_phiID = cid - 36 * 16 ;
-    mPar_phiIndex = mPar_phiID % 6 + 36;
-    mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 48 * 16) {
-    mPar_thetaID = 9;
-    mPar_phiID = cid - 42 * 16 ;
-    mPar_phiIndex = mPar_phiID % 6 + 42;
-    mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 54 * 16) {
-    mPar_thetaID = 10;
-    mPar_phiID = cid - 48 * 16 ;
-    mPar_phiIndex = mPar_phiID % 6 + 48;
-    mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 63 * 16) {
-    mPar_thetaID = 11;
-    mPar_phiID = cid - 54 * 16 ;
-    mPar_phiIndex = mPar_phiID % 9 + 54;
-    mPar_thetaIndex = mPar_phiID / 9;
-  } else if (cid < 72 * 16) {
-    mPar_thetaID = 12;
-    mPar_phiID = cid - 63 * 16 ;
-    mPar_phiIndex = mPar_phiID % 9 + 63;
-    mPar_thetaIndex = mPar_phiID / 9;
-  } else if (cid < 7776) {//Barrel start
-    mPar_phiID = (cid - 1152) % 144;
-    mPar_thetaID = (cid - 1152) / 144 + 13;
-    mPar_thetaIndex = (cid - 1152) / 144;
-    mPar_phiIndex = mPar_phiID;
-  } else if (cid < 7776 + 9 * 16) { //Backward start
-    mPar_thetaID = 59;
-    mPar_phiID =  cid - 7776 ;
-    mPar_phiIndex = mPar_phiID % 9 + 72;
-    mPar_thetaIndex = mPar_phiID / 9;
-  } else if (cid < 7776 + 18 * 16) {
-    mPar_thetaID = 60;
-    mPar_phiID =   cid - 7776 - 9 * 16 ;
-    mPar_phiIndex = mPar_phiID % 9 + 81;
-    mPar_thetaIndex = mPar_phiID / 9;
-  } else if (cid < 7776 + 24 * 16) {
-    mPar_thetaID = 61;
-    mPar_phiID =   cid - 7776 - 18 * 16 ;
-    mPar_phiIndex = mPar_phiID % 6 + 90;
-    mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 7776 + 30 * 16) {
-    mPar_thetaID = 62;
-    mPar_phiID =   cid - 7776 - 24 * 16 ;
-    mPar_phiIndex = mPar_phiID % 6 + 96;
-    mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 7776 + 36 * 16) {
-    mPar_thetaID = 63;
-    mPar_phiID =   cid - 7776 - 30 * 16 ;
-    mPar_phiIndex = mPar_phiID % 6 + 102;
-    mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 7776 + 42 * 16) {
-    mPar_thetaID = 64;
-    mPar_phiID =   cid - 7776 - 36 * 16 ;
-    mPar_phiIndex = mPar_phiID % 6 + 108;
-    mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 7776 + 48 * 16) {
-    mPar_thetaID = 65;
-    mPar_phiID =   cid - 7776 - 42 * 16 ;
-    mPar_phiIndex = mPar_phiID % 6 + 114;
-    mPar_thetaIndex = mPar_phiID / 6;
-  } else if (cid < 7776 + 52 * 16) {
-    mPar_thetaID = 66;
-    mPar_phiID =   cid - 7776 - 48 * 16 ;
-    mPar_phiIndex = mPar_phiID % 4 + 120;
-    mPar_thetaIndex = mPar_phiID / 4;
-  } else if (cid < 7776 + 56 * 16) {
-    mPar_thetaID = 67;
-    mPar_phiID =   cid - 7776 - 52 * 16 ;
-    mPar_phiIndex = mPar_phiID % 4 + 124;
-    mPar_thetaIndex = mPar_phiID / 4;
-  } else if (cid < 7776 + 60 * 16) {
-    mPar_thetaID = 68;
-    mPar_phiID =   cid - 7776 - 56 * 16 ;
-    mPar_phiIndex = mPar_phiID % 4 + 128;
-    mPar_thetaIndex = mPar_phiID / 4;
-  } else {
-    B2WARNING("ECL ECLGeometryPar Mapping  " << cid << ". Out of range.");
-  }
-//      cout<<"cid "<<cid<<" mPar_thetaID "<<mPar_thetaID<<" mPar_phiID "<<mPar_phiID<<" mPar_phiIndex "<<mPar_phiIndex<<" mPar_thetaIndex "<<mPar_thetaIndex<<endl;
-
+  Mapping_t::Mapping(mPar_cellID, mPar_thetaID, mPar_phiID);
 }
 
-
-// LEP: old way
-int ECLGeometryPar::ECLVolNameToCellID(const G4String& VolumeName)
+int ECLGeometryPar::TouchableToCellID(const G4VTouchable* touch)
 {
-  char temp1[100], temp2[100], temp3[100], temp4[100], temp5[100], temp6[100], temp7[100];
-  int cellID = 0;
-  sscanf(VolumeName.c_str(), "%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%5s",
-         temp1, temp2, temp3, temp4, temp5, temp6, temp7);
+  //  touch->GetCopyNumber() is a virtual call, avoid it by using
+  //  directly G4NavigationHistory so we will have only one virtual
+  //  call instead of three here
+  const G4NavigationHistory* h = touch->GetHistory();
+  int hd = h->GetDepth();
+  int indx     = h->GetReplicaNo(hd - 0); // index of each volume is set at physical volume creation
+  int NReplica = h->GetReplicaNo(hd - 2); // go up in volume hierarchy
+  //  int indx     = touch->GetCopyNumber(0); // index of each volume is set at physical volume creation
+  //  int NReplica = touch->GetCopyNumber(2); // go up in volume hierarchy
 
-  int GSector = atoi(temp4) - 1;
-  int iCry = atoi(temp6) - 1;
+  int ThetaId  = Mapping_t::Indx2ThetaId(indx);
+  int NCryst   = Mapping_t::ThetaId2NCry(ThetaId); // the number of crystals in a sector at given ThetaId
+  int Offset   = Mapping_t::Offset(ThetaId);
+  int PhiId    = NReplica * NCryst + (indx - Offset);
+  if (NCryst == 2) { // barrel
+    PhiId -= h->GetReplicaNo(hd - 1);
+    //    PhiId -= touch->GetCopyNumber(1);
+    if (PhiId == -1) PhiId = 143; // this can occure only @ NReplica==0
+  }
+  int cellID = Offset * 16 + PhiId;
+  //  cout<<"ECLGeometryPar::TouchableToCellID "<<indx<<" "<<NReplica<<" "<<ThetaId<<" "<<NCryst<<" "<<Offset<<" "<<PhiId<<endl;
 
-  if (VolumeName.c_str() == 0) {
-    B2WARNING("ECL simulation cellId; Sector  " << GSector << ". Out of range.");
-    return -1;
-  } else if (string(VolumeName.c_str()).find("Fw") != string::npos) {
+  // test of the position and direction of crystal
+  if (0) {
+    G4AffineTransform t = h->GetTopTransform();
+    G4ThreeVector o(0, 0, 0), n(0, 0, 1);
+    G4ThreeVector ro = t.Inverse().TransformPoint(o);
+    G4ThreeVector rn = t.Inverse().TransformAxis(n);
 
-    if (iCry < 3) {
-      cellID = GSector * 3 + iCry - 0;
-    } else if (iCry < 6) {
-      cellID = GSector * 3 + (iCry - 3) + 16 * 3;
-    } else if (iCry < 10) {
-      cellID = GSector * 4 + (iCry - 6) + 16 * 6;
-    } else if (iCry < 14) {
-      cellID = GSector * 4 + (iCry - 10) + 16 * 10;
-    } else if (iCry < 18) {
-      cellID = GSector * 4 + (iCry - 14) + 16 * 14;
-    } else if (iCry < 24) {
-      cellID = GSector * 6 + (iCry - 18) + 16 * 18;
-    } else if (iCry < 30) {
-      cellID = GSector * 6 + (iCry - 24) + 16 * 24;
-    } else if (iCry < 36) {
-      cellID = GSector * 6 + (iCry - 30) + 16 * 30;
-    } else if (iCry < 42) {
-      cellID = GSector * 6 + (iCry - 36) + 16 * 36;
-    } else if (iCry < 48) {
-      cellID = GSector * 6 + (iCry - 42) + 16 * 42;
-    } else if (iCry < 54) {
-      cellID = GSector * 6 + (iCry - 48) + 16 * 48;
-    } else if (iCry < 63) {
-      cellID = GSector * 9 + (iCry - 54) + 16 * 54;
-    } else if (iCry < 72) {
-      cellID = GSector * 9 + (iCry - 63) + 16 * 63;
+    InitCrystal(cellID);
+    ro *= 1 / CLHEP::cm;
+    double drx = geom_pos.X() - ro.x(), dry = geom_pos.Y() - ro.y(), drz = geom_pos.Z() - ro.z();
+    double dnx = geom_vec.X() - rn.x(), dny = geom_vec.Y() - rn.y(), dnz = geom_vec.Z() - rn.z();
 
-    }
-  } else if (string(VolumeName.c_str()).find("Br") != string::npos) {
-
-    GSector = atoi(temp4) - 2 ; //atoi(temp4) = 1-144
-    if (GSector == -1) GSector = 143;
-    cellID = 1152 + (iCry) * 144 + GSector;
-
-  } else {
-
-    iCry = iCry - 72;
-    if (iCry < 9) {
-      cellID = (GSector) * 9 + iCry - 0 + 7776;
-    } else if (iCry < 18) {
-      cellID = (GSector) * 9 + (iCry - 9) + 16 * 9 + 7776;
-    } else if (iCry < 24) {
-      cellID = (GSector) * 6 + (iCry - 18) + 16 * 18 + 7776;
-    } else if (iCry < 30) {
-      cellID = (GSector) * 6 + (iCry - 24) + 16 * 24 + 7776;
-    } else if (iCry < 36) {
-      cellID = (GSector) * 6 + (iCry - 30) + 16 * 30 + 7776;
-    } else if (iCry < 42) {
-      cellID = (GSector) * 6 + (iCry - 36) + 16 * 36 + 7776;
-    } else if (iCry < 48) {
-      cellID = (GSector) * 6 + (iCry - 42) + 16 * 42 + 7776;
-    } else if (iCry < 52) {
-      cellID = (GSector) * 4 + (iCry - 48) + 16 * 48 + 7776;
-    } else if (iCry < 56) {
-      cellID = (GSector) * 4 + (iCry - 52) + 16 * 52 + 7776;
-    } else if (iCry < 60) {
-      cellID = (GSector) * 4 + (iCry - 56) + 16 * 56 + 7776;
+    G4ThreeVector dr(drx, dry, drz), dn(dnx, dny, dnz);
+    if (dr.mag() > 1e-10 || dn.mag() > 1e-10) {
+      cout << NReplica << " " << indx << " " << PhiId << " " << ro << " " << rn << " " << dr << " " << dn << endl;
     }
   }
+
   return cellID;
 }
 
-// LEP: new way
 int ECLGeometryPar::ECLVolumeToCellID(const G4VTouchable* touch)
 {
-
   int depth = touch->GetHistoryDepth();
   if ((depth != 5) && (depth != 6)) {
-    B2WARNING("ECL simulation cellId; History depth = " << depth << " is out of range: should be 5 or 6.");
+    B2WARNING("ECLGeometryPar::ECLVolumeToCellID: History depth = " << depth << " is out of range: should be 5 or 6.");
     return -1;
   }
-
-  // iCry range is 0..71 for Fwd, 72..131 for Bwd, 0..45 for Barrel
-  int iCry = touch->GetCopyNumber(0) - 1;
-  // GSector range is 0..15 for Fwd, 0..15 for Bwd, 0..71 for Barrel
-  int GSector = touch->GetCopyNumber(2);
-
-  // Return an illegal value by default
-  int cellID = -1;
-
-  if (touch->GetVolume()->GetName().compare(0, 21, "eclFwdCrystalPhysical") == 0) {
-
-    if (iCry < 3) {
-      cellID = GSector * 3 + iCry - 0;
-    } else if (iCry < 6) {
-      cellID = GSector * 3 + (iCry - 3) + 16 * 3;
-    } else if (iCry < 10) {
-      cellID = GSector * 4 + (iCry - 6) + 16 * 6;
-    } else if (iCry < 14) {
-      cellID = GSector * 4 + (iCry - 10) + 16 * 10;
-    } else if (iCry < 18) {
-      cellID = GSector * 4 + (iCry - 14) + 16 * 14;
-    } else if (iCry < 24) {
-      cellID = GSector * 6 + (iCry - 18) + 16 * 18;
-    } else if (iCry < 30) {
-      cellID = GSector * 6 + (iCry - 24) + 16 * 24;
-    } else if (iCry < 36) {
-      cellID = GSector * 6 + (iCry - 30) + 16 * 30;
-    } else if (iCry < 42) {
-      cellID = GSector * 6 + (iCry - 36) + 16 * 36;
-    } else if (iCry < 48) {
-      cellID = GSector * 6 + (iCry - 42) + 16 * 42;
-    } else if (iCry < 54) {
-      cellID = GSector * 6 + (iCry - 48) + 16 * 48;
-    } else if (iCry < 63) {
-      cellID = GSector * 9 + (iCry - 54) + 16 * 54;
-    } else if (iCry < 72) {
-      cellID = GSector * 9 + (iCry - 63) + 16 * 63;
-
-    }
-
-  } else if (touch->GetVolume()->GetName().compare(0, 24, "eclBarrelCrystalPhysical") == 0) {
-
-    // Barrel GSector range is -1..142 --> 0..143 (by relabelling the -1 value)
-    GSector = GSector * 2 - touch->GetCopyNumber(1);
-    if (GSector == -1) GSector = 143;
-    cellID = 1152 + (iCry) * 144 + GSector;
-
-  } else if (touch->GetVolume()->GetName().compare(0, 21, "eclBwdCrystalPhysical") == 0) {
-
-    iCry = iCry - 72;
-    if (iCry < 9) {
-      cellID = (GSector) * 9 + iCry - 0 + 7776;
-    } else if (iCry < 18) {
-      cellID = (GSector) * 9 + (iCry - 9) + 16 * 9 + 7776;
-    } else if (iCry < 24) {
-      cellID = (GSector) * 6 + (iCry - 18) + 16 * 18 + 7776;
-    } else if (iCry < 30) {
-      cellID = (GSector) * 6 + (iCry - 24) + 16 * 24 + 7776;
-    } else if (iCry < 36) {
-      cellID = (GSector) * 6 + (iCry - 30) + 16 * 30 + 7776;
-    } else if (iCry < 42) {
-      cellID = (GSector) * 6 + (iCry - 36) + 16 * 36 + 7776;
-    } else if (iCry < 48) {
-      cellID = (GSector) * 6 + (iCry - 42) + 16 * 42 + 7776;
-    } else if (iCry < 52) {
-      cellID = (GSector) * 4 + (iCry - 48) + 16 * 48 + 7776;
-    } else if (iCry < 56) {
-      cellID = (GSector) * 4 + (iCry - 52) + 16 * 52 + 7776;
-    } else if (iCry < 60) {
-      cellID = (GSector) * 4 + (iCry - 56) + 16 * 56 + 7776;
-    }
-
-  } else {
-
-    B2WARNING("ECL simulation cellId; Bad volume name = " << touch->GetVolume()->GetName());
-
+  const G4String& vname = touch->GetVolume()->GetName();
+  std::size_t pos = vname.find("CrystalPhysical_");
+  if (pos == string::npos) {
+    B2WARNING("ECLGeometryPar::ECLVolumeToCellID: Volume name does not match pattern. NAME=" << vname);
+    return -1;
   }
-  return cellID;
+  return TouchableToCellID(touch);
 }
 
-
-
-
-
-
-//
-// constants, enums and typedefs
-//
-
-//
-// static data member definitions
-//
-
-// constructors and destructor
-//
 EclNbr::EclNbr() :
   m_nbrs(*new std::vector< Identifier >)
 {
@@ -567,8 +442,6 @@ EclNbr& EclNbr::operator=(const EclNbr& aNbr)
 {
   if (this != &aNbr) {
     m_nbrs     = aNbr.m_nbrs     ;
-//     delete &m_nbrs;
-//     m_nbrs     = *new vector< Identifier > ( aNbr.m_nbrs );
     m_nearSize = aNbr.m_nearSize ;
   }
   return *this ;
@@ -627,20 +500,7 @@ EclNbr::nextSize()  const
 
 int EclNbr::GetCellID(int ThetaId, int PhiId)
 {
-
-/// 0-12  forward
-/// 13-58 barrel
-/// 59-68 backward
-  if (ThetaId < 13) {
-    int forwRing[13] = {0, 3, 6, 10, 14, 18, 24, 30, 36, 42, 48, 54, 63 };
-    mNbr_cellID = forwRing[ThetaId] * 16 + PhiId;
-  } else if (ThetaId > 58) {
-    int backRing[10] = {0, 9, 18, 24, 30, 36, 42, 48, 52, 56} ;
-    mNbr_cellID = 7776 + backRing[ThetaId - 59] * 16 + PhiId;
-  } else if (ThetaId > 12 && ThetaId < 59) {
-    mNbr_cellID = 1152 + 144 * (ThetaId - 13)  + PhiId;
-  } else     B2WARNING("ECL ECLGeometryNbr::CellID int ThetaId " << ThetaId << " int PhiId " << PhiId << ". Out of range.");
-
+  mNbr_cellID = Mapping_t::CellID(ThetaId, PhiId);
   mNbr_thetaID = ThetaId;
   mNbr_phiID =  PhiId ;
   return mNbr_cellID;
@@ -648,98 +508,14 @@ int EclNbr::GetCellID(int ThetaId, int PhiId)
 
 void EclNbr::Mapping(int cid)
 {
-
-
   mNbr_cellID = cid;
-  if (cid < 0) {
-    B2WARNING("ECL ECLGeometryNbr Mapping  " << cid << ". Out of range.");
-  } else if (cid < 3 * 16) { //Forkward start
-    mNbr_thetaID = 0;
-    mNbr_phiID = cid;
-  } else if (cid < 6 * 16) {
-    mNbr_thetaID = 1;
-    mNbr_phiID = cid - 3 * 16;
-  } else if (cid < 10 * 16) {
-    mNbr_thetaID = 2;
-    mNbr_phiID = cid - 6 * 16 ;
-  } else if (cid < 14 * 16) {
-    mNbr_thetaID = 3;
-    mNbr_phiID = cid - 10 * 16 ;
-  } else if (cid < 18 * 16) {
-    mNbr_thetaID = 4;
-    mNbr_phiID = cid - 14 * 16 ;
-  } else if (cid < 24 * 16) {
-    mNbr_thetaID = 5;
-    mNbr_phiID = cid - 18 * 16 ;
-  } else if (cid < 30 * 16) {
-    mNbr_thetaID = 6;
-    mNbr_phiID = cid - 24 * 16 ;
-  } else if (cid < 36 * 16) {
-    mNbr_thetaID = 7;
-    mNbr_phiID = cid - 30 * 16 ;
-  } else if (cid < 42 * 16) {
-    mNbr_thetaID = 8;
-    mNbr_phiID = cid - 36 * 16 ;
-  } else if (cid < 48 * 16) {
-    mNbr_thetaID = 9;
-    mNbr_phiID = cid - 42 * 16 ;
-  } else if (cid < 54 * 16) {
-    mNbr_thetaID = 10;
-    mNbr_phiID = cid - 48 * 16 ;
-  } else if (cid < 63 * 16) {
-    mNbr_thetaID = 11;
-    mNbr_phiID = cid - 54 * 16 ;
-  } else if (cid < 72 * 16) {
-    mNbr_thetaID = 12;
-    mNbr_phiID = cid - 63 * 16 ;
-  } else if (cid < 7776) {//Barrel start
-    mNbr_phiID = (cid - 1152) % 144;
-    mNbr_thetaID = (cid - 1152) / 144 + 13;
-  } else if (cid < 7776 + 9 * 16) { //Backward start
-    mNbr_thetaID = 59;
-    mNbr_phiID =  cid - 7776 ;
-  } else if (cid < 7776 + 18 * 16) {
-    mNbr_thetaID = 60;
-    mNbr_phiID =   cid - 7776 - 9 * 16 ;
-  } else if (cid < 7776 + 24 * 16) {
-    mNbr_thetaID = 61;
-    mNbr_phiID =   cid - 7776 - 18 * 16 ;
-  } else if (cid < 7776 + 30 * 16) {
-    mNbr_thetaID = 62;
-    mNbr_phiID =   cid - 7776 - 24 * 16 ;
-  } else if (cid < 7776 + 36 * 16) {
-    mNbr_thetaID = 63;
-    mNbr_phiID =   cid - 7776 - 30 * 16 ;
-  } else if (cid < 7776 + 42 * 16) {
-    mNbr_thetaID = 64;
-    mNbr_phiID =   cid - 7776 - 36 * 16 ;
-  } else if (cid < 7776 + 48 * 16) {
-    mNbr_thetaID = 65;
-    mNbr_phiID =   cid - 7776 - 42 * 16 ;
-  } else if (cid < 7776 + 52 * 16) {
-    mNbr_thetaID = 66;
-    mNbr_phiID =   cid - 7776 - 48 * 16 ;
-  } else if (cid < 7776 + 56 * 16) {
-    mNbr_thetaID = 67;
-    mNbr_phiID =   cid - 7776 - 52 * 16 ;
-  } else if (cid < 7776 + 60 * 16) {
-    mNbr_thetaID = 68;
-    mNbr_phiID =   cid - 7776 - 56 * 16 ;
-  } else {
-    B2WARNING("ECL ECLGeometryNbr Mapping  " << cid << ". Out of range.");
-  }
+  Mapping_t::Mapping(mNbr_cellID, mNbr_thetaID, mNbr_phiID);
 }
 
 EclNbr
 EclNbr::getNbr(const Identifier aCellId)
 {
   // generate nbr lists. always easier here to work with theta-phi
-
-  //const EclThetaPhiId thetaPhiId ( ids()[ aCellId -1 ].thetaPhiId() );
-  //const EclThetaPhiId::Identifier thetaId ( thetaPhiId.thetaId() );
-  //const EclThetaPhiId::Identifier phiId   ( thetaPhiId.phiId()   );
-
-
 
   const int cellID = aCellId;
   Mapping(cellID);
@@ -778,15 +554,7 @@ EclNbr::getNbr(const Identifier aCellId)
     vNbr.push_back(GetCellID(tm1 , fp1));
     vNbr.push_back(GetCellID(tm1 , f00));
     vNbr.push_back(GetCellID(tm1 , fm1));
-    /*
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tp1 , fm1 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tp1 , f00 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tp1 , fp1 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( t00 , fp1 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tm1 , fp1 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tm1 , f00 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tm1 , fm1 )));
-    */
+
     nearSize = vNbr.size();
 
     vNbr.push_back(GetCellID(tm1 , fm2));
@@ -805,24 +573,6 @@ EclNbr::getNbr(const Identifier aCellId)
     vNbr.push_back(GetCellID(tm2 , f00));
     vNbr.push_back(GetCellID(tm2 , fm1));
     vNbr.push_back(GetCellID(tm2 , fm2));
-    /*
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tm1 , fm2 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( t00 , fm2 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tp1 , fm2 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tp2 , fm2 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tp2 , fm1 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tp2 , f00 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tp2 , fp1 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tp2 , fp2 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tp1 , fp2 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( t00 , fp2 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tm1 , fp2 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tm2 , fp2 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tm2 , fp1 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tm2 , f00 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tm2 , fm1 )));
-         vNbr.push_back( mappings().cellId( EclThetaPhiId( tm2 , fm2 )));
-    */
   }//if( aCellId > 1152 && aCellId < 7777 )
   else {
     // endcap -- not always 24!
@@ -1005,26 +755,6 @@ EclNbr::getNbr(const Identifier aCellId)
         vNbr.push_back(GetCellID(tp1 , fp1p1));
     }
     nearSize = vNbr.size() ;
-    /*
-         // insert near-nbrs
-         vNbr.push_back(mappings().cellId(EclThetaPhiId(t00, f00m1)));
-         vNbr.push_back(mappings().cellId(EclThetaPhiId(t00, f00p1)));
-         if(nm1 < 999) {
-            vNbr.push_back(mappings().cellId(EclThetaPhiId(tm1 ,fm100)));
-            if (fm1m1 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tm1 ,fm1m1)));
-            if (fm1p1 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tm1 ,fm1p1)));
-         }
-         if(np1 < 999) {
-            vNbr.push_back(mappings().cellId(EclThetaPhiId(tp1 ,fp100)));
-            if (fp1m1 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tp1 ,fp1m1)));
-            if (fp1p1 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tp1 , fp1p1)));
-         }
-         nearSize = vNbr.size() ;
-    */
 
     // now on to next-near neighbors
     if (nm2 < 999) {
@@ -1063,130 +793,7 @@ EclNbr::getNbr(const Identifier aCellId)
       if (fp2p2 < 999)
         vNbr.push_back(GetCellID(tp2, fp2p2));
     }
-
-    /*
-         // now on to next-near neighbors
-         if(nm2 < 999) {
-            vNbr.push_back(mappings().cellId(EclThetaPhiId(tm2 ,fm200)));
-            if (fm2m1 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tm2 ,fm2m1)));
-            if (fm2p1 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tm2 ,fm2p1)));
-            if (fm2m2 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tm2 ,fm2m2)));
-            if (fm2p2 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tm2 ,fm2p2)));
-         }
-         if(nm1 < 999) {
-            if (fm1m2 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tm1 ,fm1m2)));
-            if (fm1p2 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tm1 ,fm1p2)));
-         }
-         vNbr.push_back(mappings().cellId(EclThetaPhiId(t00 ,f00m2)));
-         vNbr.push_back(mappings().cellId(EclThetaPhiId(t00 ,f00p2)));
-         if(np1 < 999) {
-            if (fp1m2 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tp1, fp1m2)));
-            if (fp1p2 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tp1, fp1p2)));
-         }
-         if(np2 < 999) {
-            vNbr.push_back(mappings().cellId(EclThetaPhiId(tp2, fp200)));
-            if (fp2m1 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tp2, fp2m1)));
-            if (fp2p1 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tp2, fp2p1)));
-            if (fp2m2 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tp2, fp2m2)));
-            if (fp2p2 < 999)
-               vNbr.push_back(mappings().cellId(EclThetaPhiId(tp2, fp2p2)));
-         }
-
-    */
   }//else( aCellId > 1152 && aCellId < 7777 )
   return
     EclNbr(vNbr, nearSize);
 }
-
-namespace Belle2 {
-  int ECLG4VolNameToCellID(const G4String& VolumeName)
-  {
-    char temp1[100], temp2[100], temp3[100], temp4[100], temp5[100], temp6[100], temp7[100];
-    int cellID = 0;
-
-    sscanf(VolumeName.c_str(), "%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%5s", temp1, temp2, temp3, temp4,
-           temp5, temp6, temp7);
-
-    int GSector = (atoi(temp4) - 1) ;
-    int iCry = atoi(temp6) - 1;
-
-    if (VolumeName.c_str() == 0) {
-      B2WARNING("ECL simulation cellId; Sector  " << GSector << ". Out of range.");
-      return -1;
-    } else if (string(VolumeName.c_str()).find("Fw") != string::npos) {
-
-      if (iCry < 3) {
-        cellID = GSector * 3 + iCry - 0;
-      } else if (iCry < 6) {
-        cellID = GSector * 3 + (iCry - 3) + 16 * 3;
-      } else if (iCry < 10) {
-        cellID = GSector * 4 + (iCry - 6) + 16 * 6;
-      } else if (iCry < 14) {
-        cellID = GSector * 4 + (iCry - 10) + 16 * 10;
-      } else if (iCry < 18) {
-        cellID = GSector * 4 + (iCry - 14) + 16 * 14;
-      } else if (iCry < 24) {
-        cellID = GSector * 6 + (iCry - 18) + 16 * 18;
-      } else if (iCry < 30) {
-        cellID = GSector * 6 + (iCry - 24) + 16 * 24;
-      } else if (iCry < 36) {
-        cellID = GSector * 6 + (iCry - 30) + 16 * 30;
-      } else if (iCry < 42) {
-        cellID = GSector * 6 + (iCry - 36) + 16 * 36;
-      } else if (iCry < 48) {
-        cellID = GSector * 6 + (iCry - 42) + 16 * 42;
-      } else if (iCry < 54) {
-        cellID = GSector * 6 + (iCry - 48) + 16 * 48;
-      } else if (iCry < 63) {
-        cellID = GSector * 9 + (iCry - 54) + 16 * 54;
-      } else if (iCry < 72) {
-        cellID = GSector * 9 + (iCry - 63) + 16 * 63;
-
-      }
-    } else if (string(VolumeName.c_str()).find("Br") != string::npos) {
-      GSector = GSector - 1;
-      if (GSector == -1) GSector = 143;
-      cellID = 1152 + (iCry) * 144 + GSector;
-
-    } else {
-
-      iCry = iCry - 72;
-      if (iCry < 9) {
-        cellID = (GSector) * 9 + iCry - 0 + 7776;
-      } else if (iCry < 18) {
-        cellID = (GSector) * 9 + (iCry - 9) + 16 * 9 + 7776;
-      } else if (iCry < 24) {
-        cellID = (GSector) * 6 + (iCry - 18) + 16 * 18 + 7776;
-      } else if (iCry < 30) {
-        cellID = (GSector) * 6 + (iCry - 24) + 16 * 24 + 7776;
-      } else if (iCry < 36) {
-        cellID = (GSector) * 6 + (iCry - 30) + 16 * 30 + 7776;
-      } else if (iCry < 42) {
-        cellID = (GSector) * 6 + (iCry - 36) + 16 * 36 + 7776;
-      } else if (iCry < 48) {
-        cellID = (GSector) * 6 + (iCry - 42) + 16 * 42 + 7776;
-      } else if (iCry < 52) {
-        cellID = (GSector) * 4 + (iCry - 48) + 16 * 48 + 7776;
-      } else if (iCry < 56) {
-        cellID = (GSector) * 4 + (iCry - 52) + 16 * 52 + 7776;
-      } else if (iCry < 60) {
-        cellID = (GSector) * 4 + (iCry - 56) + 16 * 56 + 7776;
-      }
-    }
-    return cellID;
-  }
-}//Belle2
-
-
-

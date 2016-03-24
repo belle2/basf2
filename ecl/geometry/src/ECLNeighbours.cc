@@ -26,7 +26,7 @@ using namespace Belle2;
 using namespace ECL;
 
 // Constructor.
-ECLNeighbours::ECLNeighbours(const std::string neighbourDef, const float par)
+ECLNeighbours::ECLNeighbours(const std::string neighbourDef, const double par)
 {
   // resize the vector
   std::vector<short int> fakeneighbours;
@@ -60,7 +60,7 @@ ECLNeighbours::~ECLNeighbours()
   ;
 }
 
-void ECLNeighbours::initializeR(float radius)
+void ECLNeighbours::initializeR(double radius)
 {
   // resize the vector
   std::vector<short int> fakeneighbours;
@@ -75,8 +75,8 @@ void ECLNeighbours::initializeR(float radius)
 
   for (int i = 0; i < 8736; i++) {
     // get the central one
-    TVector3 direction = geom->GetCrystalVec(i);
-    TVector3 position  = geom->GetCrystalPos(i);
+    const TVector3& direction = geom->GetCrystalVec(i);
+    const TVector3& position  = geom->GetCrystalPos(i);
 
     // get all nearby crystals
     std::vector<short int> neighbours = getNeighbours(i + 1);
@@ -84,10 +84,10 @@ void ECLNeighbours::initializeR(float radius)
 
     // ... and calculate the shortest distance between the central one and all possible neighbours (of the reduced set)
     for (auto const& id : neighbours) {
-      TVector3 directionNeighbour = geom->GetCrystalVec(id - 1);
-      const float alpha = direction.Angle(directionNeighbour);
-      const float R = position.Mag();
-      const float distance = getDistance(alpha, R);
+      const TVector3& directionNeighbour = geom->GetCrystalVec(id - 1);
+      const double alpha = direction.Angle(directionNeighbour);
+      const double R = position.Mag();
+      const double distance = getDistance(alpha, R);
 
 //      B2INFO(i << " " << id << " " << distance << " (radius = " << radius << ")");
 
@@ -111,36 +111,28 @@ void ECLNeighbours::initializeN(int n)
   // in the endcaps we project the neighbours to the outer and inner rings.
   for (int i = 0; i < 8736; i++) {
 
-//    B2INFO(i);
-
     // this vector will hold all neighbours for the i-th crystal
     std::vector<short int> neighbours;
 
     // phi and theta coordinates of the central crystal
     geom->Mapping(i);
-    //const short cid = i;
     const short tid = geom->GetThetaID();
     const short pid = geom->GetPhiID();
 
     // 'left' and 'right' extremal neighbours in the same theta ring
     const short int phiInc = increasePhiId(pid, tid, n);
     const short int phiDec = decreasePhiId(pid, tid, n);
-    const float fractionalPhiInc = static_cast < float >(phiInc) / m_crystalsPerRing [ tid ];
-    const float fractionalPhiDec = static_cast < float >(phiDec) / m_crystalsPerRing [ tid ];
-//    B2INFO("   phiInc = " << phiInc << " phiDec = " << phiDec);
-//    B2INFO("   fractionalPhiInc = " << fractionalPhiInc << " fractionalPhiDec = " << fractionalPhiDec);
+    const double fractionalPhiInc = static_cast < double >(phiInc) / m_crystalsPerRing [ tid ];
+    const double fractionalPhiDec = static_cast < double >(phiDec) / m_crystalsPerRing [ tid ];
 
     // loop over all possible theta rings and add neighbours
     for (int theta = tid - n; theta <= tid + n; theta++) {
       if ((theta > 68) || (theta < 0)) continue;     // valid theta ids are 0..68 (69 in total)
-//      B2INFO("   " << theta);
 
       short int thisPhiInc = TMath::Nint(fractionalPhiInc * m_crystalsPerRing [ theta ]);
 
       short int thisPhiDec = TMath::Nint(fractionalPhiDec * m_crystalsPerRing [ theta ]);
       if (thisPhiDec == m_crystalsPerRing [ theta ]) thisPhiDec = 0;
-
-//      B2INFO("          thisPhiInc = " << thisPhiInc << " thisPhiDec = " << thisPhiDec);
 
       const std::vector<short int> phiList = getPhiIdsInBetween(thisPhiInc, thisPhiDec, theta);
 
@@ -190,7 +182,7 @@ std::vector<short int> ECLNeighbours::getPhiIdsInBetween(const short int phi0, c
   return phiList;
 }
 
-float ECLNeighbours::getDistance(float alpha, float R)
+double ECLNeighbours::getDistance(const double alpha, const double R)
 {
   return 2.0 * R * TMath::Sin(alpha / 2.0);
 }

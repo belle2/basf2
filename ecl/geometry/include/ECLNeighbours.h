@@ -29,7 +29,7 @@ namespace Belle2 {
 //      ECLNeighbours();
 
       /**  Constructor: Fix number of neighbours ("N") in the seed theta ring or radius ("R") with par = n or par = radius [cm]. */
-      ECLNeighbours(const std::string neighbourDef, const float par);
+      ECLNeighbours(const std::string neighbourDef, const double par);
 
       /**  Destructor. */
       ~ECLNeighbours();
@@ -56,7 +56,7 @@ namespace Belle2 {
       void initializeN(const int nneighbours);
 
       /**  initialize the radius neighbout list. */
-      void initializeR(const float radius);
+      void initializeR(const double radius);
 
       /**  return the previous phi id. */
       short int decreasePhiId(const short int phiid, const short int thetaid, const short int n);
@@ -68,7 +68,7 @@ namespace Belle2 {
       std::vector<short int> getPhiIdsInBetween(const short int phiInc, const short int phiDec, const short int theta);
 
       /** return the chord length between crystals */
-      float getDistance(float alpha, float R);
+      double getDistance(const double alpha, const double R);
 
     };
 

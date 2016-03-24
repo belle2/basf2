@@ -12,6 +12,8 @@
 #pragma link C++ class Belle2::RestOfEvent+;
 #pragma link C++ class Belle2::Vertex+;
 #pragma link C++ class Belle2::ContinuumSuppression+;
+#pragma link C++ class Belle2::FANNMLP+;
+#pragma link C++ class Belle2::FANNMLPData+;
 #pragma link C++ class Belle2::FlavorTaggerInfo+;
 #pragma link C++ class Belle2::FlavorTaggerInfoMap+;
 //these two are needed when using these types (returned by Particle) in PyROOT

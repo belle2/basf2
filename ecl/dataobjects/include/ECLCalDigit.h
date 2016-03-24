@@ -2,8 +2,10 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
+ * ECL dataobject ECLCalDigit.                                            *
+ *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
+ * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,6 +27,7 @@ namespace Belle2 {
       c_IsEnergyCalibrated = 1 << 0,
       c_IsTimeCalibrated = 1 << 1,
       c_IsTimeResolutionCalibrated = 1 << 2,
+      c_IsFailedFit = 1 << 3,
       c_IsCalibrated = c_IsEnergyCalibrated | c_IsTimeCalibrated | c_IsTimeResolutionCalibrated,
     };
 
@@ -111,40 +114,54 @@ namespace Belle2 {
      */
     bool isTimeResolutionCalibrated() const;
 
+    /*! Get Boolean Fit Failed Status
+     * @return Fit Failed Status
+     */
+    bool isFailedFit() const;
+
   private:
 
     int m_CellId;   /**< Cell ID */
     double m_Time;   /**< Calibrated Time */
     double m_TimeResolution;   /**< Calibrated Time resolution*/
     double m_Energy; /**< Calibrated Energy */
-    unsigned short int m_Status;   /**< Calibration Status */
+    unsigned short int m_Status;   /**< Calibration and Fit Status */
 
-    ClassDef(ECLCalDigit, 2); /**< ClassDef */
+    // 1: first version (TF)
+    // 2: added m_TimeResolution (TF)
+    // 3: added status bits for failed fits (TF)
+    ClassDef(ECLCalDigit, 3); /**< ClassDef */
 
   };
 
-  // inline
+  // inline isCalibrated
   inline bool ECLCalDigit::isCalibrated() const
   {
     return hasStatus(c_IsCalibrated);
   }
 
-  // inline
+  // inline isEnergyCalibrated
   inline bool ECLCalDigit::isEnergyCalibrated() const
   {
     return hasStatus(c_IsEnergyCalibrated);
   }
 
-  // inline
+  // inline isTimeCalibrated
   inline bool ECLCalDigit::isTimeCalibrated() const
   {
     return hasStatus(c_IsTimeCalibrated);
   }
 
-  // inline
+  // inline isTimeResolutionCalibrated
   inline bool ECLCalDigit::isTimeResolutionCalibrated() const
   {
     return hasStatus(c_IsTimeResolutionCalibrated);
+  }
+
+  // inline isFailedFit
+  inline bool ECLCalDigit::isFailedFit() const
+  {
+    return hasStatus(c_IsFailedFit);
   }
 
 } // end namespace Belle2

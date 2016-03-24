@@ -120,7 +120,6 @@ void VXDCDCTrackMergerModule::event()
 
       // skip VXD Tracks which were not properly fitted
       if (!vxdTrack.wasFitSuccessful()) {
-        //std::cout << "fit of vxd track " << currentVxdTrack << "not sucessful, continue" << std::endl;
         continue;
       }
 
@@ -157,7 +156,6 @@ void VXDCDCTrackMergerModule::event()
         cdc_sop.extrapolateToCylinder(m_CDC_wall_radius, position, momentum);
         vxd_sop.extrapolateToPlane(cdc_sop.getPlane());
 
-        //TMatrixDSym inv_covmtrx;
         try {
           TMatrixDSym inv_covmtrx = (vxd_sop.getCov() + cdc_sop.getCov()).Invert();
           TVectorD state_diff = cdc_sop.getState() - vxd_sop.getState();
@@ -169,7 +167,6 @@ void VXDCDCTrackMergerModule::event()
         }
 
         if ((this_chi_2 < chi_2_max_this_cdc_track) && (this_chi_2 > 0)) {
-          //std::cout << " -> new best macth" << std::endl;
           matched_track = true;
           chi_2_max_this_cdc_track = this_chi_2;
           bestMatchedVxdTrack = currentVxdTrack;

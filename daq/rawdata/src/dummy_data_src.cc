@@ -194,9 +194,28 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
     buf[ offset +  7 ] = 0xfffffafa;
     buf[ offset +  8 ] = cpr_nwords - (NW_RAW_HEADER + 7 + 2 + NW_RAW_TRAILER);
     buf[ offset +  9 ] = finesse_nwords;
-    buf[ offset +  10 ] = finesse_nwords;
-    buf[ offset +  11 ] = finesse_nwords;
-    buf[ offset +  12 ] = finesse_nwords;
+
+    if (nhslb > 1) {
+      buf[ offset +  10 ] = finesse_nwords;
+      if (nhslb > 2) {
+        buf[ offset +  11 ] = finesse_nwords;
+        if (nhslb > 3) {
+          buf[ offset +  12 ] = finesse_nwords;
+        } else {
+          buf[ offset +  12 ] = 0;
+        }
+      } else {
+        buf[ offset +  11 ] = 0;
+        buf[ offset +  12 ] = 0;
+      }
+    } else {
+      buf[ offset +  10 ] = 0;
+      buf[ offset +  11 ] = 0;
+      buf[ offset +  12 ] = 0;
+    }
+
+
+
     offset += 13;
 #endif
 

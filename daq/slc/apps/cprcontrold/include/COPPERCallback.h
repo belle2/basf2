@@ -54,7 +54,6 @@ namespace Belle2 {
     COPPER m_copper;
     FlowMonitor m_flow;
     bool m_dummymode;
-    bool m_dummymode_org;
     bool m_force_boothslb;
     std::string m_hslb_firm;
     bool m_iserr;

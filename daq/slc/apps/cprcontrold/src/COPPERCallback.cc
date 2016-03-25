@@ -45,7 +45,6 @@ std::string popen(const std::string& cmd)
 COPPERCallback::COPPERCallback(FEE* fee[4], bool dummymode)
 {
   m_dummymode = dummymode;
-  m_dummymode_org = dummymode;
   setTimeout(5);
   m_con.setCallback(this);
   for (int i = 0; i < 4; i++) {
@@ -84,7 +83,6 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
   try {
     LogFile::info(obj.getName());
-    m_dummymode = m_dummymode_org || (obj.hasValue("dummymode") && obj.getBool("dummymode"));
     add(new NSMVHandlerOutputPort(*this, "basf2.output.port"));
     add(new NSMVHandlerFifoEmpty(*this, "copper.err.fifoempty"));
     add(new NSMVHandlerFifoFull(*this, "copper.err.fifofull"));
@@ -213,7 +211,6 @@ void COPPERCallback::boot(const DBObject& obj) throw(RCHandlerException)
 
 void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
-  //m_dummymode = obj.hasValue("dummymode") && obj.getBool("dummymode");
   if (!m_dummymode) {
     m_ttrx.open();
     m_ttrx.monitor();
@@ -229,7 +226,7 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
           hslb.open(i);
           if (!obj.hasObject("fee")) continue;
           try {
-            //hslb.test();
+            hslb.test();
           } catch (const HSLBHandlerException& e) {
             throw (RCHandlerException("tesths failed : %s", e.what()));
           }
@@ -321,7 +318,6 @@ void COPPERCallback::logging(bool err, LogFile::Priority pri,
     va_start(ap, str);
     vsprintf(ss, str, ap);
     va_end(ap);
-    //LogFile::put(pri, ss);
     log(pri, ss);
     if (pri >= LogFile::ERROR)
       setState(RCState::NOTREADY_S);
@@ -414,35 +410,53 @@ void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)
   std::string script;
   try {
     int flag = 0;
+    int nhslb = 0;
     for (size_t i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj.getObject("hslb", i));
-      if (m_fee[i] != NULL && o_hslb.getBool("used")) flag += 1 << i;
+      if (m_fee[i] != NULL && o_hslb.getBool("used")) {
+        flag += 1 << i;
+        nhslb++;
+      }
     }
     m_con.clearArguments();
-    //m_con.setExecutable("basf2");
-    //script = obj.getObject("basf2").getText("script");
-    //m_con.addArgument("%s/%s", getenv("BELLE2_LOCAL_DIR"), script.c_str());
-    m_con.setExecutable(StringUtil::form("%s/daq/ropc/des_ser_COPPER_main", getenv("BELLE2_LOCAL_DIR")));
-    m_con.addArgument(obj.getText("hostname"));
-    std::string copperid_s = obj.getText("copperid");
-    int id = atoi(copperid_s.substr(3).c_str());
-    int copperid = id % 1000;
-    int detectorid = id / 1000;
-    char str[64];
-    sprintf(str, "0x%d000000", detectorid);
-    copperid += strtol(str, NULL, 0);
-    m_con.addArgument(StringUtil::form("%d", copperid));
-    m_con.addArgument(StringUtil::form("%d", flag));
-    m_con.addArgument("1");
-    const std::string nodename = StringUtil::tolower(getNode().getName());
-    m_con.addArgument(nodename + "_" + "basf2");
+    if (!m_dummymode) {
+      m_con.setExecutable(StringUtil::form("%s/daq/ropc/des_ser_COPPER_main", getenv("BELLE2_LOCAL_DIR")));
+      m_con.addArgument(obj.getText("hostname"));
+      std::string copperid_s = obj.getText("copperid");
+      int id = atoi(copperid_s.substr(3).c_str());
+      int copperid = id % 1000;
+      int detectorid = id / 1000;
+      char str[64];
+      sprintf(str, "0x%d000000", detectorid);
+      copperid += strtol(str, NULL, 0);
+      m_con.addArgument(StringUtil::form("%d", copperid));
+      m_con.addArgument("%d", nhslb);
+      m_con.addArgument("1");
+      const std::string nodename = StringUtil::tolower(getNode().getName());
+      m_con.addArgument(nodename + "_" + "basf2");
+      try {
+        m_con.load(30);
+      } catch (const std::exception& e) {
+        LogFile::warning("load timeout");
+      }
+    } else {
+      m_con.setExecutable(StringUtil::form("%s/daq/rawdata/dummy_data_src", getenv("BELLE2_LOCAL_DIR")));
+      std::string copperid_s = obj.getText("copperid");
+      int id = atoi(copperid_s.substr(3).c_str());
+      int copperid = id % 1000;
+      int detectorid = id / 1000;
+      char str[64];
+      sprintf(str, "0x%d000000", detectorid);
+      copperid += strtol(str, NULL, 0);
+      m_con.addArgument(StringUtil::form("%d", copperid));
+      m_con.addArgument("0");
+      m_con.addArgument("%d", (obj.hasValue("nwords") ? obj.getInt("nwords") : 10));
+      m_con.addArgument("1");
+      m_con.addArgument("%d", flag);
+      m_con.load(0);
+    }
   } catch (const std::out_of_range& e) {
     throw (RCHandlerException(e.what()));
-  }
-  try {
-    m_con.load(30);
-  } catch (const std::exception& e) {
-    LogFile::warning("load timeout");
   }
   LogFile::debug("load succeded");
 }

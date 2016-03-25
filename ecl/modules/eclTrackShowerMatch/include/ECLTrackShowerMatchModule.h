@@ -12,6 +12,9 @@
 #define ECLTRACKSHOWERMATCH_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/Track.h>
+#include <ecl/dataobjects/ECLShower.h>
 
 namespace Belle2 {
 
@@ -57,6 +60,8 @@ namespace Belle2 {
     /** Clean up anything you created in initialize(). */
     virtual void terminate();
   private:
+
+    double computeTrkMinDistance(const ECLShower&, StoreArray<Track>&) const;
   };
 
 } //Belle2

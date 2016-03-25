@@ -14,6 +14,7 @@
 #define ECLSHOWERSHAPEMODULE_H_
 
 #include <framework/core/Module.h>
+#include <ecl/dataobjects/ECLShower.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -44,6 +45,8 @@ namespace Belle2 {
       virtual void terminate();
 
     private:
+
+      double computeLateralEnergy(const ECLShower&) const;
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/

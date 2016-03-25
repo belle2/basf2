@@ -48,6 +48,9 @@ namespace Belle2 {
 
       m_UniqueShowerId = 0; /**< Unique Shower ID (TF) */
       m_HighestEnergy = 0.0; /**< Highest energy in Shower (TF) */
+      m_lateralEnergy = 0.0; /**< Lateral Energy  */
+      m_minTrkDistance = 0.0; /**< Distance between shower and closest track  */
+      m_isTrk = false; /**< Match with track  */
     }
 
 
@@ -102,6 +105,15 @@ namespace Belle2 {
     /*! Set Highest Energy (TF)
      */
     void setHighestEnergy(float HighestEnergy) { m_HighestEnergy = HighestEnergy; }
+    /*! Set Lateral Energy
+     */
+    void setLateralEnergy(float lateralEnergy) { m_lateralEnergy = lateralEnergy; }
+    /*! Set Distance to closest track
+     */
+    void setMinTrkDistance(float dist) { m_minTrkDistance = dist; }
+    /*! Set Match with Track
+     */
+    void setIsTrack(bool val) { m_isTrk = val; }
 
 
     /*! Get Shower Id
@@ -187,6 +199,20 @@ namespace Belle2 {
      */
     float getHighestEnergy() const { return m_HighestEnergy; }
 
+    /*! Get Lateral Energy in Shower
+     * @return Lateral Energy
+     */
+    float getLateralEnergy() const { return m_lateralEnergy; }
+
+    /*! Get distance to closest Track
+     * @return distance to closest Track
+     */
+    float getMinTrkDistance() const { return m_minTrkDistance; }
+    /*! Get if matched with a Track
+     * @return flag for track Matching
+     */
+    bool getIsTrack() const { return m_isTrk; }
+
     //! The method to get return  TVector3 Momentum
     TVector3 getMomentum() const
     {
@@ -217,11 +243,14 @@ namespace Belle2 {
     float m_UncEnergy;     /**< UncEnergy, inherit from Belle */
     float m_Time;          /**< Time, new parameter for Belle2, wait for more stude */
 
-    int m_UniqueShowerId;  /**< Unique Shower ID (TF) */
-    float m_HighestEnergy; /**< Highest Energy in Shower (GeV) (TF) */
-
+    int m_UniqueShowerId;   /**< Unique Shower ID (TF) */
+    float m_HighestEnergy;  /**< Highest Energy in Shower (GeV) (TF) */
+    float m_lateralEnergy; /**< Lateral Energy in Shower  (GDN) */
+    float m_minTrkDistance;/**< Distance to closest Track  (GDN) */
+    bool m_isTrk;          /**< Match with track (GDN) */
     // 2: added uniqueID and highestE (TF)
-    ClassDef(ECLShower, 2);/**< ClassDef */
+    // 3: added LAT and distance to closest track and trk match flag (GDN)
+    ClassDef(ECLShower, 3);/**< ClassDef */
 
   };
 } // end namespace Belle2

@@ -95,26 +95,6 @@ def add_prune_tracks(path, components=None):
     """
     path.add_module("PruneGenfitTracks")
 
-    use_vxd = is_vxd_used(components)
-    use_cdc = is_cdc_used(components)
-
-    # prune CDC tracks
-    if use_cdc:
-        if use_vxd:
-            cdc_pruner = register_module('PruneRecoTracks')
-            cdc_pruner.param('storeArrayName', "CDCRecoTracks")
-            path.add_module(cdc_pruner)
-
-    # prune VXD tracks
-    if use_vxd:
-        if use_cdc:
-            vxd_pruner = register_module('PruneRecoTracks')
-            vxd_pruner.param('storeArrayName', "VXDRecoTracks")
-            path.add_module(vxd_pruner)
-
-    # prune the final RecoTrack collection
-    path.add_module('PruneRecoTracks')
-
 
 def add_track_finding(path, components=None):
     """
@@ -166,6 +146,10 @@ def add_track_finding(path, components=None):
         }
         vxd_cdcTracksMerger.param(vxd_cdcTracksMerger_param)
         path.add_module(vxd_cdcTracksMerger)
+
+        # We have to prune the two RecoTracks before merging
+        path.add_module('PruneRecoTracks', storeArrayName=cdc_reco_tracks)
+        path.add_module('PruneRecoTracks', storeArrayName=vxd_reco_tracks)
 
 
 def add_mc_track_finding(path, components=None):

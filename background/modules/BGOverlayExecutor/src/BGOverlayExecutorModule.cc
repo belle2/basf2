@@ -89,7 +89,7 @@ namespace Belle2 {
     //    addBGDigits<SVDCluster>();
     //    addBGDigits<CDCHit>();
     addBGDigits<TOPDigit>();
-    //    addBGDigits<ARICHDigit>();
+    addBGDigits<ARICHDigit>();
     //    addBGDigits<ECLDigit>(); // not yet clear which one
     //    addBGDigits<BKLMDigit>();
     //    addBGDigits<EKLMDigit>();

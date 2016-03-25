@@ -37,12 +37,14 @@ namespace Belle2 {
     virtual void abort() throw(RCHandlerException);
     virtual void term() throw();
     virtual void monitor() throw(RCHandlerException);
+
   public:
     HSLB& getHSLB(int i) { return m_hslb[i]; }
     FEE* getFEE(int i) { return m_fee[i]; }
     TTRX& getTTRX() { return m_ttrx; }
     COPPER& getCopper() { return m_copper; }
     ProcessController& getProcess() { return m_con; }
+    virtual bool feeload();
 
   private:
     ProcessController m_con;

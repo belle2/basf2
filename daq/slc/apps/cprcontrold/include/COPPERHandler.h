@@ -97,6 +97,7 @@ namespace Belle2 {
   CPRHANDLER_TEXT(NSMVHandlerFEEStream);
   CPRHANDLER_INT_SET(NSMVHandlerFEEBoot);
   CPRHANDLER_INT_SET(NSMVHandlerFEELoad);
+  CPRHANDLER_INT_SET(NSMVHandlerFEELoadAll);
 
 }
 

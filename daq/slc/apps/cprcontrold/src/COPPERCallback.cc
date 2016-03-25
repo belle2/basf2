@@ -94,6 +94,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
     const DBObject& o_ttrx(obj("ttrx"));
     add(new NSMVHandlerTTRXFirmware(*this, "ttrx.firm", 0,
                                     o_ttrx.hasText("firm") ? o_ttrx.getText("firm") : ""));
+    add(new NSMVHandlerFEELoadAll(*this, "loadfee"));
     //bool bootedttrx = false;
     for (int i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj("hslb", i));
@@ -151,6 +152,37 @@ void COPPERCallback::term() throw()
   m_ttrx.close();
 }
 
+bool COPPERCallback::feeload()
+{
+  try {
+    DBObject& obj(getDBObject());
+    get(obj);
+    for (int i = 0; i < 4; i++) {
+      const DBObject& o_hslb(obj("hslb", i));
+      if (o_hslb.getBool("used") && m_fee[i] != NULL) {
+        HSLB& hslb(m_hslb[i]);
+        hslb.open(i);
+        if (!obj.hasObject("fee")) continue;
+        try {
+          hslb.test();
+        } catch (const HSLBHandlerException& e) {
+          throw (RCHandlerException("tesths failed : %s", e.what()));
+        }
+        FEE& fee(*m_fee[i]);
+        try {
+          fee.load(hslb, (obj("fee", i)));
+        } catch (const IOException& e) {
+          throw (RCHandlerException(e.what()));
+        }
+      }
+    }
+    return true;
+  } catch (const std::out_of_range& e) {
+    throw (RCHandlerException(e.what()));
+  }
+  return false;
+}
+
 void COPPERCallback::boot(const DBObject& obj) throw(RCHandlerException)
 {
   abort();
@@ -197,7 +229,7 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
           hslb.open(i);
           if (!obj.hasObject("fee")) continue;
           try {
-            hslb.test();
+            //hslb.test();
           } catch (const HSLBHandlerException& e) {
             throw (RCHandlerException("tesths failed : %s", e.what()));
           }

@@ -199,6 +199,14 @@ bool NSMVHandlerFEELoad::handleSetInt(int val)
   return false;
 }
 
+bool NSMVHandlerFEELoadAll::handleSetInt(int val)
+{
+  if (val > 0) {
+    return m_callback.feeload();
+  }
+  return false;
+}
+
 bool NSMVHandlerHSLBRegValue::handleSetInt(int val)
 {
   try {

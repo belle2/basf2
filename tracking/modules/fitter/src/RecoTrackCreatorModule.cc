@@ -101,8 +101,6 @@ void RecoTrackCreatorModule::event()
   StoreArray<MCParticle> mcParticles;
 
   // ugly..
-  unsigned int trackCandidateCounter = 0;
-  RelationArray relationsFromRecoTracksToTrackCandidates(recoTracks, trackCandidates);
 
   for (const genfit::TrackCand& trackCandidate : trackCandidates) {
 
@@ -116,7 +114,7 @@ void RecoTrackCreatorModule::event()
                                                              m_param_recoHitInformationStoreArrayName, m_param_recreateSortingParameters);
 
 
-    relationsFromRecoTracksToTrackCandidates.add(newRecoTrack->getArrayIndex(), trackCandidateCounter);
+    newRecoTrack->addRelationTo(&trackCandidate);
 
     // Add also the MC information
     const int mcParticleID = trackCandidate.getMcTrackId();
@@ -128,7 +126,5 @@ void RecoTrackCreatorModule::event()
         B2WARNING("Related MCParticle is invalid. Can not make a relations.");
       }
     }
-
-    trackCandidateCounter++;
   }
 }

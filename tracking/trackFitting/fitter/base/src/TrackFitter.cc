@@ -70,7 +70,7 @@ bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRe
 
   // Do the hits synchronisation
   auto relatedRecoHitInformation =
-    recoTrack.getRelationsWith<RecoHitInformation>(recoTrack.getStoreArrayNameOfRecoHitInformation());
+    recoTrack.getRelationsTo<RecoHitInformation>(recoTrack.getStoreArrayNameOfRecoHitInformation());
 
   for (RecoHitInformation& recoHitInformation : relatedRecoHitInformation) {
     const genfit::TrackPoint* trackPoint = recoHitInformation.getCreatedTrackPoint();

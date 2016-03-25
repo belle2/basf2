@@ -440,7 +440,7 @@ void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)
         LogFile::warning("load timeout");
       }
     } else {
-      m_con.setExecutable(StringUtil::form("%s/daq/rawdata/dummy_data_src", getenv("BELLE2_LOCAL_DIR")));
+      m_con.setExecutable(StringUtil::form("%s/daq/rawdata/src/dummy_data_src", getenv("BELLE2_LOCAL_DIR")));
       std::string copperid_s = obj.getText("copperid");
       int id = atoi(copperid_s.substr(3).c_str());
       int copperid = id % 1000;

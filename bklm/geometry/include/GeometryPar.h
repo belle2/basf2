@@ -12,19 +12,21 @@
 #define BKLMGEOMETRYPAR_H
 
 #include "bklm/geometry/Module.h"
+#include "bklm/dbobjects/BKLMGeometryPar.h"
 
 #include <vector>
 #include <map>
 
 #include "CLHEP/Vector/ThreeVector.h"
 
-#define NLAYER 15
-#define NSECTOR 8
-#define NSCINT 100
-#define BKLM_INNER 1
-#define BKLM_OUTER 2
-#define BKLM_FORWARD 1
-#define BKLM_BACKWARD 2
+//! already defined in BKLMGeometryPar.h
+//#define NLAYER 15
+//#define NSECTOR 8
+//#define NSCINT 100
+//#define BKLM_INNER 1
+//#define BKLM_OUTER 2
+//#define BKLM_FORWARD 1
+//#define BKLM_BACKWARD 2
 
 namespace Belle2 {
 
@@ -32,7 +34,7 @@ namespace Belle2 {
 
   namespace bklm {
 
-    //! Provides BKLM geometry parameters for simulation, reconstruction etc (from Gearbox)
+    //! Provides BKLM geometry parameters for simulation, reconstruction etc (from Gearbox or DataBase)
     /*! Length is measured along the z axis.
         Height is measured in the r-phi plane along a radial axis at the centre of a polygon side.
         Width is measured in the r-phi plane along the tangent to a polygon side.
@@ -46,6 +48,9 @@ namespace Belle2 {
 
       //! Static method to initialize and then get a reference to the singleton GeometryPar instance
       static GeometryPar* instance(const GearDir&);
+
+      //! Static method to initialize and then get a reference to the singleton GeometryPar instance from database
+      static GeometryPar* instance(const BKLMGeometryPar&);
 
       //! Get the overlap-check flag for the geometry builder
       bool doOverlapCheck(void) const { return m_DoOverlapCheck; }
@@ -301,6 +306,9 @@ namespace Belle2 {
       //! Hidden constructor
       explicit GeometryPar(const GearDir&);
 
+      //! Hidden constructor from database
+      explicit GeometryPar(const Belle2::BKLMGeometryPar&);
+
       //! Hidden copy constructor
       GeometryPar(GeometryPar&);
 
@@ -315,6 +323,9 @@ namespace Belle2 {
 
       //! Get geometry parameters from Gearbox
       void read(const GearDir&);
+
+      //! Get geometry parameters from DataBase
+      void readFromDB(const BKLMGeometryPar&);
 
       //! Flag for enabling overlap-check during geometry construction
       bool m_DoOverlapCheck;

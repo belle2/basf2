@@ -10,6 +10,7 @@
 
 #include <bklm/geometry/GeoBKLMCreator.h>
 #include <bklm/simulation/SensitiveDetector.h>
+#include "bklm/dbobjects/BKLMGeometryPar.h"
 #include <simulation/background/BkgSensitiveDetector.h>
 
 #include <geometry/Materials.h>
@@ -97,14 +98,21 @@ namespace Belle2 {
     //                 Build and place the BKLM
     //-----------------------------------------------------------------
 
-    void GeoBKLMCreator::create(const GearDir& content, G4LogicalVolume& motherLogical, GeometryTypes)
+    //void GeoBKLMCreator::create(const GearDir& content, G4LogicalVolume& motherLogical, GeometryTypes)
+    void GeoBKLMCreator::createGeometry(const BKLMGeometryPar& parameters, G4LogicalVolume& motherLogical, GeometryTypes)
     {
 
-      if (content.getInt("BeamBackgroundStudy") != 0) {
+      /*if (content.getInt("BeamBackgroundStudy") != 0) {
         m_Sensitive = dynamic_cast<G4VSensitiveDetector*>(new BkgSensitiveDetector("BKLM"));
       }
 
       m_GeoPar = GeometryPar::instance(content);
+      */
+
+      if (parameters.doBeamBackgroundStudy())
+      { m_Sensitive = dynamic_cast<G4VSensitiveDetector*>(new BkgSensitiveDetector("BKLM")); }
+
+      m_GeoPar = GeometryPar::instance(parameters);
       m_SectorDphi = 2.0 * M_PI / m_GeoPar->getNSector();
       m_SectorDz = 0.5 * m_GeoPar->getHalfLength() * cm;
       m_RibShift = 0.5 * m_GeoPar->getRibThickness() * cm / sin(0.5 * m_SectorDphi);

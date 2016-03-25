@@ -13,6 +13,11 @@
 
 #include <geometry/CreatorBase.h>
 #include <bklm/geometry/GeometryPar.h>
+#include <bklm/dbobjects/BKLMGeometryPar.h>
+#include <framework/logging/Logger.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/IntervalOfValidity.h>
 
 class G4VSolid;
 class G4Box;
@@ -46,11 +51,47 @@ namespace Belle2 {
       virtual ~GeoBKLMCreator();
 
       //! Creates the objects for the BKLM geometry
-      virtual void create(const GearDir&, G4LogicalVolume&, geometry::GeometryTypes type);
+      //! virtual void create(const GearDir&, G4LogicalVolume&, geometry::GeometryTypes type);
+      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
+      {
+        BKLMGeometryPar config = createConfiguration(content);
+        createGeometry(config, topVolume, type);
+      }
+
+      //! Create the configuration objects and save them in the Database.
+      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override
+      {
+        DBImportObjPtr<BKLMGeometryPar> importObj;
+        importObj.construct(createConfiguration(content));
+        importObj.import(iov);
+      }
+
+      //! Create the geometry from the Database
+      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
+      {
+        DBObjPtr<BKLMGeometryPar> dbObj;
+        if (!dbObj) {
+          //! Check that we found the object and if not report the problem
+          B2FATAL("No configuration for " << name << " found.");
+        }
+        createGeometry(*dbObj, topVolume, type);
+      }
 
     protected:
 
     private:
+
+      //! Create a parameter object from the Gearbox XML parameters.
+      BKLMGeometryPar createConfiguration(const GearDir& param)
+      {
+        BKLMGeometryPar bklmGeometryPar;
+        //bklmGeometryPar.setVersion(0);
+        bklmGeometryPar.read(param);
+        return bklmGeometryPar;
+      };
+
+      //! Create the geometry from a parameter object.
+      void createGeometry(const BKLMGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
       //! Put the forward and backward ends into the BKLM envelope
       void putEndsInEnvelope(G4LogicalVolume*);

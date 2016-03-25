@@ -37,10 +37,22 @@ namespace Belle2 {
       return m_Instance;
     }
 
+    GeometryPar* GeometryPar::instance(const BKLMGeometryPar& element)
+    {
+      if (!m_Instance) m_Instance = new GeometryPar(element);
+      return m_Instance;
+    }
+
     GeometryPar::GeometryPar(const GearDir& content)
     {
       clear();
       read(content);
+    }
+
+    GeometryPar::GeometryPar(const BKLMGeometryPar& element)
+    {
+      clear();
+      readFromDB(element);
     }
 
     GeometryPar::~GeometryPar()
@@ -229,6 +241,173 @@ namespace Belle2 {
           }
         }
       }
+
+    }
+
+    void GeometryPar::readFromDB(const BKLMGeometryPar& element)
+    {
+      // Get geometry parameters form dbobject
+
+      m_DoOverlapCheck = element.doOverlapCheck();
+      m_Rotation = element.getRotation();
+      m_OffsetZ = element.getOffsetZ();
+      m_Phi = element.getPhi();
+      m_NSector = element.getNSector();
+      m_SolenoidOuterRadius = element.getSolenoidOuterRadius();
+      m_OuterRadius = element.getOuterRadius();
+      m_HalfLength = element.getHalfLength();
+      m_NLayer = element.getNLayer();
+      if (m_NLayer > NLAYER) { // for array m_HasRPCs[]
+        B2FATAL("BKLM GeometryPar::readFromDB(): # of layers (" << m_NLayer << ") exceeds array size NLAYER (" << NLAYER << ")")
+      }
+
+      m_IronNominalHeight = element.getIronNominalHeight();
+      m_IronActualHeight = element.getIronActualHeight();
+
+      m_Gap1NominalHeight = element.getGap1NominalHeight();
+      m_Gap1ActualHeight = element.getGap1ActualHeight();
+
+      m_GapNominalHeight = element.getGapNominalHeight();
+      m_GapActualHeight = element.getGapActualHeight();
+      //m_GapActualHeight = m_GapNominalHeight + (m_IronNominalHeight - m_IronActualHeight);//should be same with the above one
+
+      m_Layer1Height = element.getLayer1Height();
+      m_LayerHeight = element.getLayerHeight();
+
+      m_Gap1InnerRadius = element.getGap1InnerRadius();
+      m_GapInnerRadius = element.getGapInnerRadius();
+      //m_GapInnerRadius = m_Gap1InnerRadius + m_Layer1Height - m_LayerHeight; //should be same with the above line
+
+      m_Gap1IronWidth = element.getGap1IronWidth();
+      m_GapIronWidth = element.getGapIronWidth();
+
+      m_GapLength = element.getGapLength();
+
+      m_NZStrips = element.getNZStrips(false);
+      m_NZStripsChimney = element.getNZStrips(true);
+      m_NZScints = element.getNZScints(false);
+      m_NZScintsChimney = element.getNZScints(true);
+
+      m_ModuleLength = element.getModuleLength();
+      m_ModuleLengthChimney = element.getModuleLengthChimney();
+      m_ModuleCoverHeight = element.getModuleCoverHeight();
+      m_ModuleCopperHeight = element.getModuleCopperHeight();
+      m_ModuleFoamHeight = element.getModuleFoamHeight();
+      m_ModuleMylarHeight = element.getModuleMylarHeight();
+      m_ModuleGlassHeight = element.getModuleGlassHeight();
+      m_ModuleGasHeight = element.getModuleGasHeight();
+      m_ModuleReadoutHeight = element.getModuleReadoutHeight();
+      //m_ModuleReadoutHeight = m_ModuleFoamHeight + (m_ModuleCopperHeight + m_ModuleMylarHeight) * 2.0;
+      m_ModuleHeight = element.getModuleHeight();
+      //m_ModuleHeight = (m_ModuleCoverHeight + m_ModuleReadoutHeight + m_ModuleGasHeight + m_ModuleGlassHeight * 2.0) * 2.0;
+      m_ModuleFrameWidth = element.getModuleFrameWidth();
+      m_ModuleFrameThickness = element.getModuleFrameThickness();
+      m_ModuleGasSpacerWidth = element.getModuleGasSpacerWidth();
+      m_ModulePolystyreneInnerHeight = element.getModulePolystyreneInnerHeight();
+      m_ModulePolystyreneOuterHeight = element.getModulePolystyreneOuterHeight();
+      m_ScintWidth = element.getScintWidth();
+      m_ScintHeight = element.getScintHeight();
+      m_ScintBoreRadius = element.getScintBoreRadius();
+      m_ScintFiberRadius = element.getScintFiberRadius();
+      m_ScintTiO2ThicknessTop = element.getScintTiO2ThicknessTop();
+      m_ScintTiO2ThicknessSide = element.getScintTiO2ThicknessSide();
+
+      m_ChimneyLength = element.getChimneyLength();
+      m_ChimneyWidth = element.getChimneyWidth();
+      m_ChimneyCoverThickness = element.getChimneyCoverThickness();
+      m_ChimneyHousingInnerRadius = element.getChimneyHousingInnerRadius();
+      m_ChimneyHousingOuterRadius = element.getChimneyHousingOuterRadius();
+      m_ChimneyShieldInnerRadius = element.getChimneyShieldInnerRadius();
+      m_ChimneyShieldOuterRadius = element.getChimneyShieldOuterRadius();
+      m_ChimneyPipeInnerRadius = element.getChimneyPipeInnerRadius();
+      m_ChimneyPipeOuterRadius = element.getChimneyPipeOuterRadius();
+
+      m_RibThickness = element.getRibThickness();
+      m_CablesWidth = element.getCablesWidth();
+      m_BraceWidth = element.getBraceWidth();
+      m_BraceWidthChimney = element.getBraceWidthChimney();
+
+      m_SupportPlateWidth = element.getSupportPlateWidth();
+      m_SupportPlateHeight = element.getSupportPlateHeight();
+      m_SupportPlateLength = element.getSupportPlateLength();
+      m_SupportPlateLengthChimney = element.getSupportPlateLengthChimney();
+
+      m_BracketWidth = element.getBracketWidth();
+      m_BracketThickness = element.getBracketThickness();
+      m_BracketLength = element.getBracketLength();
+      m_BracketRibWidth = element.getBracketRibWidth();
+      m_BracketRibThickness = element.getBracketRibThickness();
+      m_BracketInnerRadius = element.getBracketInnerRadius();
+      m_BracketInset = element.getBracketInset();
+      m_BracketCutoutDphi = element.getBracketCutoutDphi();
+
+      for (int fb = 1; fb <= 2; ++fb) {
+        bool isForward = (fb == 1);
+        for (int sector = 1; sector <= m_NSector; ++sector) {
+          bool hasChimney = (!isForward) && (sector == 3);
+          int nZStrips = (hasChimney ? m_NZStripsChimney : m_NZStrips);
+          int nZScints = (hasChimney ? m_NZScintsChimney : m_NZScints);
+          HepRotation rotation;
+          if (!isForward) rotation.rotateX(M_PI);
+          rotation.rotateZ(element.getSectorRotation(sector));
+          for (int layer = 1; layer <= m_NLayer; ++layer) {
+            Hep3Vector localReconstructionShift(element.getLocalReconstructionShiftX(sector, layer),
+                                                element.getLocalReconstructionShiftY(sector, layer),
+                                                element.getLocalReconstructionShiftZ(sector, layer));
+            m_HasRPCs[layer] = element.hasRPCs(layer);
+            m_NPhiScints[layer] = element.getNPhiScints(layer);
+            Hep3Vector localOrigin(getActiveMiddleRadius(layer), 0.0, m_ModuleFrameThickness);
+            int moduleID = (isForward ? BKLM_END_MASK : 0)
+                           | ((sector - 1) << BKLM_SECTOR_BIT)
+                           | ((layer - 1) << BKLM_LAYER_BIT);
+            if (m_HasRPCs[layer]) {
+              int phiStripNumber = element.getPhiStripNumber(layer);
+              localOrigin.setZ(localOrigin.z() + m_ModuleGasSpacerWidth);
+              Module* pModule = new Module(element.getPhiStripWidth(layer),
+                                           (layer == 1 ? 2 : 1),
+                                           (layer == 1 ? phiStripNumber - 1 : phiStripNumber),
+                                           element.getZStripWidth(layer),
+                                           nZStrips,
+                                           Hep3Vector(0.0, 0.0, m_OffsetZ) + rotation(localOrigin),
+                                           localReconstructionShift,
+                                           rotation
+                                          );
+              m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
+            } else {
+              m_PhiScintsOffsetSign[layer] = element.getPhiScintsOffsetSign(layer);
+              localOrigin.setY(localOrigin.y() + getScintEnvelopeOffset(layer, hasChimney).y());
+              Module* pModule = new Module(m_ScintWidth,
+                                           m_NPhiScints[layer],
+                                           m_PhiScintsOffsetSign[layer],
+                                           nZScints,
+                                           Hep3Vector(0.0, 0.0, m_OffsetZ) + rotation(localOrigin),
+                                           localReconstructionShift,
+                                           rotation
+                                          );
+              m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
+              double base = -0.5 * (m_NPhiScints[layer] + 1) * m_ScintWidth;
+              for (int scint = 1; scint <= m_NPhiScints[layer]; ++scint) {
+                double dLength = element.getPhiScintsDlength(layer, scint);
+                pModule->addPhiScint(scint,
+                                     nZScints * m_ScintWidth + dLength,
+                                     -0.5 * dLength,
+                                     base + scint * m_ScintWidth
+                                    );
+              }
+              base = -0.5 * (nZScints + 1) * m_ScintWidth;
+              for (int scint = 1; scint <= nZScints; ++scint) {
+                double dLength = element.getZScintsDlength(layer, scint);
+                pModule->addZScint(scint,
+                                   m_NPhiScints[layer] * m_ScintWidth + dLength,
+                                   -0.5 * dLength,
+                                   base + scint * m_ScintWidth
+                                  );
+              }
+            }
+          }
+        }
+      }
+
 
     }
 

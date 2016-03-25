@@ -19,6 +19,7 @@ ropc:
 	@ make -C apps/cprcontrold
 	@ make -C apps/rocontrold
 	@ make -C apps/logcollectord
+	@ make -C ${BELLE2_LOCAL_DIR}/daq/ropc
 
 runcontrold:
 	@ make -C apps/runcontrold

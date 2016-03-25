@@ -15,6 +15,8 @@
 #include <eklm/dataobjects/EKLMHitBase.h>
 #include <eklm/dataobjects/EKLMHitMCTime.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
+#include <framework/dataobjects/DigitBase.h>
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
@@ -23,7 +25,7 @@ namespace Belle2 {
    * Main reconstruction hit class. Contains information about the
    * hitted strips.
    */
-  class EKLMDigit : public RelationsObject, public EKLMHitBase,
+  class EKLMDigit : public DigitBase, public EKLMHitBase,
     public EKLMHitGlobalCoord, public EKLMHitMCTime {
 
   public:
@@ -45,6 +47,16 @@ namespace Belle2 {
     ~EKLMDigit() {};
 
     /**
+     * Get unique channel identifier.
+     */
+    unsigned int getUniqueChannelID() const;
+
+    /**
+     * The pile-up method.
+     */
+    EAppendStatus addBGDigit(const DigitBase* bg);
+
+    /**
      * Get number of photoelectrons (fit result).
      * @return Number of photoelectrons.
      */
@@ -60,7 +72,7 @@ namespace Belle2 {
      * Get generated number of photoelectrons.
      * @return Number of photoelectrons.
      */
-    int getGeneratedNPE();
+    int getGeneratedNPE() const;
 
     /**
      * Set generated number of photoelectrons.
@@ -132,6 +144,9 @@ namespace Belle2 {
 
   private:
 
+    /** Element numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbers; //! ROOT streamer
+
     /** Number of plane. */
     int m_Plane;
 
@@ -154,7 +169,7 @@ namespace Belle2 {
     float m_sMCTime;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigit, 4);
+    ClassDef(Belle2::EKLMDigit, 5);
 
   };
 

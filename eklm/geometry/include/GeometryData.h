@@ -8,13 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_GEOMETRYDATA2_H
-#define EKLM_GEOMETRYDATA2_H
+#ifndef EKLM_GEOMETRYDATA_H
+#define EKLM_GEOMETRYDATA_H
 
 /* External headers. */
 #include <CLHEP/Geometry/Transform3D.h>
 
 /* Belle2 headers. */
+#include <eklm/dataobjects/ElementNumbers.h>
 #include <eklm/geometry/GeoEKLMTypes.h>
 
 /**
@@ -307,7 +308,7 @@ namespace Belle2 {
      * EKLM geometry data.
      * All data and function results are in CLHEP units unless noted otherwise.
      */
-    class GeometryData {
+    class GeometryData : public ElementNumbers {
 
     public:
 
@@ -381,88 +382,6 @@ namespace Belle2 {
        * Get number of strips in a segment.
        */
       int getNStripsSegment() const;
-
-      /**
-       * Get layer number.
-       * @param[in] endcap Endcap number.
-       * @param[in] layer  Layer number.
-       * @return Number of layer.
-       * @details
-       * Number is from 1 to 14*2 = 28.
-       */
-      int layerNumber(int endcap, int layer) const;
-
-      /**
-       * Get detector layer number.
-       * @param[in] endcap Endcap number.
-       * @param[in] layer  Layer number.
-       * @return Number of layer.
-       * @details
-       * Number is from 1 to 12 + 14 = 26.
-       */
-      int detectorLayerNumber(int endcap, int layer) const;
-
-      /**
-       * Get sector number.
-       * @param[in] endcap Endcap number.
-       * @param[in] layer  Layer number.
-       * @param[in] sector Sector number.
-       * @return Number of sector.
-       * @details
-       * Number is from 1 to 4*14*2 = 112.
-       */
-      int sectorNumber(int endcap, int layer, int sector) const;
-
-      /**
-       * Get plane number.
-       * @param[in] endcap Endcap number.
-       * @param[in] layer  Layer number.
-       * @param[in] sector Sector number.
-       * @param[in] plane  Plane number.
-       * @return Number of plane.
-       * @details
-       * Number is from 1 to 2*4*26 = 208.
-       */
-      int planeNumber(int endcap, int layer, int sector, int plane) const;
-
-      /**
-       * Get segment number.
-       * @param[in] endcap  Endcap number.
-       * @param[in] layer   Layer number.
-       * @param[in] sector  Sector number.
-       * @param[in] plane   Plane number.
-       * @param[in] segment Segment number.
-       * @return Number of strip.
-       * @details
-       * Number is from 1 to 5*2*4*26 = 1040.
-       */
-      int segmentNumber(int endcap, int layer, int sector, int plane,
-                        int strip) const;
-
-      /**
-       * Get strip number.
-       * @param[in] endcap Endcap number.
-       * @param[in] layer  Layer number.
-       * @param[in] sector Sector number.
-       * @param[in] plane  Plane number.
-       * @param[in] strip  Strip number.
-       * @return Number of strip.
-       * @details
-       * Number is from 1 to 75*2*4*26 = 15600.
-       */
-      int stripNumber(int endcap, int layer, int sector, int plane,
-                      int strip) const;
-
-      /**
-       * Strip local number (in a plane).
-       * @param[in] strip Global strip number.
-       */
-      int stripLocalNumber(int strip) const;
-
-      /**
-       * Get maximal strip number.
-       */
-      int getMaximalStripNumber() const;
 
       /**
        * Get solenoid center Z coordinate.
@@ -677,18 +596,6 @@ namespace Belle2 {
       void calculateShieldGeometry();
 
       /**
-       * Check if endcap number is correct (fatal error if not).
-       * @param[in] endcap Endcap number.
-       */
-      void checkEndcap(int endcap) const;
-
-      /**
-       * Check if layer number is correct (fatal error if not).
-       * @param[in] layer Layer number.
-       */
-      void checkLayer(int layer) const;
-
-      /**
        * Check if number of detector layers is correct (fatal error if not).
        * Endcap number must be checked separately.
        * @param[in] endcap Endcap number.
@@ -705,55 +612,13 @@ namespace Belle2 {
       void checkDetectorLayer(int endcap, int layer) const;
 
       /**
-       * Check if sector number is correct (fatal error if not).
-       * @param[in] sector Sector number.
-       */
-      void checkSector(int sector) const;
-
-      /**
-       * Check if plane number is correct (fatal error if not).
-       * @param[in] plane Plane number.
-       */
-      void checkPlane(int plane) const;
-
-      /**
-       * Check if segment number is correct (fatal error if not).
-       * @param[in] segment Segment number.
-       */
-      void checkSegment(int segment) const;
-
-      /**
        * Check if segment support number is correct (fatal error if not).
        * @param[in] support Segment support element number.
        */
       void checkSegmentSupport(int support) const;
 
-      /**
-       * Check if strip number is correct (fatal error if not).
-       * @param[in] strip Strip number.
-       */
-      void checkStrip(int strip) const;
-
       /** Displacement data file. */
       std::string m_DisplacementDataFile;
-
-      /** Maximal endcap number. */
-      const int m_MaximalEndcapNumber;
-
-      /** Maximal layer number. */
-      const int m_MaximalLayerNumber;
-
-      /** Maximal sector number. */
-      const int m_MaximalSectorNumber;
-
-      /** Maximal plane number. */
-      const int m_MaximalPlaneNumber;
-
-      /** Maximal segment number. */
-      const int m_MaximalSegmentNumber;
-
-      /** Maximal strip number. */
-      const int m_MaximalStripNumber;
 
       /** Number of endcaps. */
       int m_NEndcaps;

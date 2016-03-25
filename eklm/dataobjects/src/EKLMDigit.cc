@@ -19,6 +19,7 @@ ClassImp(Belle2::EKLMDigit);
 
 EKLMDigit::EKLMDigit()
 {
+  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   m_Plane = -1;
   m_Strip = -1;
   m_good = false;
@@ -33,11 +34,38 @@ EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
     m_Plane(hit->getPlane()),
     m_Strip(hit->getStrip())
 {
+  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   m_good = false;
   m_NPE = -1;
   m_generatedNPE = -1;
   m_fitStatus = -1;
   m_sMCTime = -1;
+}
+
+unsigned int EKLMDigit::getUniqueChannelID() const
+{
+  return m_ElementNumbers->stripNumber(m_Endcap, m_Layer, m_Sector, m_Plane,
+                                       m_Strip);
+}
+
+DigitBase::EAppendStatus EKLMDigit::addBGDigit(const DigitBase* bg)
+{
+  const EKLMDigit* bgDigit = (EKLMDigit*)bg;
+  if (!bgDigit->isGood())
+    return DigitBase::c_DontAppend;
+  if (!this->isGood())
+    return DigitBase::c_Append;
+  /* MC data from digit with larger energy. */
+  if (this->getEDep() < bgDigit->getEDep()) {
+    this->setPDG(bgDigit->getPDG());
+    this->setMCTime(bgDigit->getMCTime());
+  }
+  this->setEDep(this->getEDep() + bgDigit->getEDep());
+  if (this->getTime() > bgDigit->getTime())
+    this->setTime(bgDigit->getTime());
+  this->setNPE(this->getNPE() + bgDigit->getNPE());
+  this->setGeneratedNPE(this->getGeneratedNPE() + bgDigit->getGeneratedNPE());
+  return DigitBase::c_DontAppend;
 }
 
 float EKLMDigit::getNPE() const
@@ -50,7 +78,7 @@ void EKLMDigit::setNPE(float npe)
   m_NPE = npe;
 }
 
-int EKLMDigit::getGeneratedNPE()
+int EKLMDigit::getGeneratedNPE() const
 {
   return m_generatedNPE;
 }

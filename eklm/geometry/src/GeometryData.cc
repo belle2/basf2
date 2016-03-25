@@ -452,9 +452,7 @@ void EKLM::GeometryData::calculateShieldGeometry()
   m_ShieldGeometry.DetailCCenter.setZ(0);
 }
 
-EKLM::GeometryData::GeometryData() : m_MaximalEndcapNumber(2),
-  m_MaximalLayerNumber(14), m_MaximalSectorNumber(4), m_MaximalPlaneNumber(2),
-  m_MaximalSegmentNumber(5), m_MaximalStripNumber(75)
+EKLM::GeometryData::GeometryData() : ElementNumbers()
 {
   int i, j, mode;
   m_NDetectorLayers = new int[m_MaximalEndcapNumber];
@@ -632,23 +630,11 @@ EKLM::GeometryData::~GeometryData()
   freeShieldDetail(&m_ShieldGeometry.DetailD);
 }
 
-void EKLM::GeometryData::checkEndcap(int endcap) const
-{
-  if (endcap <= 0 || endcap > m_MaximalEndcapNumber)
-    B2FATAL("Number of endcap must be 1 (backward) or 2 (forward).");
-}
-
-void EKLM::GeometryData::checkLayer(int layer) const
-{
-  if (layer <= 0 || layer > m_MaximalLayerNumber)
-    B2FATAL("Number of layer must be from 1 to " << m_MaximalLayerNumber <<
-            ".");
-}
-
 void EKLM::GeometryData::checkDetectorLayerNumber(int endcap, int layer) const
 {
   const char* endcapName[2] = {"backward", "forward"};
-  if (layer < 0 || layer > m_nLayer)
+  if (layer < 0 || layer > m_nLayer ||
+      layer > m_MaximalDetectorLayerNumber[endcap - 1])
     B2FATAL("Number of detector layers in the " << endcapName[endcap - 1] <<
             " endcap must be from 0 to the number of layers ( " <<
             m_nLayer << ").");
@@ -663,39 +649,11 @@ void EKLM::GeometryData::checkDetectorLayer(int endcap, int layer) const
             << m_NDetectorLayers[endcap - 1] << ").");
 }
 
-void EKLM::GeometryData::checkSector(int sector) const
-{
-  if (sector <= 0 || sector > m_MaximalSectorNumber)
-    B2FATAL("Number of sector must be from 1 to " << m_MaximalSectorNumber <<
-            ".");
-}
-
-void EKLM::GeometryData::checkPlane(int plane) const
-{
-  if (plane <= 0 || plane > m_MaximalPlaneNumber)
-    B2FATAL("Number of plane must be from 1 to " << m_MaximalPlaneNumber <<
-            ".");
-}
-
-void EKLM::GeometryData::checkSegment(int segment) const
-{
-  if (segment <= 0 || segment > m_MaximalSegmentNumber)
-    B2FATAL("Number of segment must be from 1 to " << m_MaximalSegmentNumber <<
-            ".");
-}
-
 void EKLM::GeometryData::checkSegmentSupport(int support) const
 {
   if (support <= 0 || support > m_MaximalSegmentNumber + 1)
     B2FATAL("Number of segment support element must be from 1 to " <<
             m_MaximalSegmentNumber + 1 << ".");
-}
-
-void EKLM::GeometryData::checkStrip(int strip) const
-{
-  if (strip <= 0 || strip > m_MaximalStripNumber)
-    B2FATAL("Number of strip must be from 1 to " << m_MaximalStripNumber <<
-            ".");
 }
 
 EKLM::DetectorMode EKLM::GeometryData::getDetectorMode() const
@@ -766,61 +724,6 @@ int EKLM::GeometryData::getNSegments() const
 int EKLM::GeometryData::getNStripsSegment() const
 {
   return 15;
-}
-
-int EKLM::GeometryData::detectorLayerNumber(int endcap, int layer) const
-{
-  checkEndcap(endcap);
-  checkDetectorLayer(endcap, layer);
-  if (endcap == 1)
-    return layer;
-  return m_NDetectorLayers[0] + layer;
-}
-
-int EKLM::GeometryData::sectorNumber(int endcap, int layer, int sector) const
-{
-  checkSector(sector);
-  return m_MaximalSectorNumber * (detectorLayerNumber(endcap, layer) - 1) +
-         sector;
-}
-
-int EKLM::GeometryData::planeNumber(int endcap, int layer, int sector,
-                                    int plane) const
-{
-  checkPlane(plane);
-  return m_MaximalPlaneNumber * (sectorNumber(endcap, layer, sector) - 1) +
-         plane;
-}
-
-int EKLM::GeometryData::segmentNumber(int endcap, int layer, int sector,
-                                      int plane, int segment) const
-{
-  checkSegment(segment);
-  return m_MaximalSegmentNumber * (planeNumber(endcap, layer, sector, plane) -
-                                   1) + segment;
-}
-
-int EKLM::GeometryData::stripNumber(int endcap, int layer, int sector,
-                                    int plane, int strip) const
-{
-  checkStrip(strip);
-  return m_MaximalStripNumber * (planeNumber(endcap, layer, sector, plane) - 1)
-         + strip;
-}
-
-int EKLM::GeometryData::stripLocalNumber(int strip) const
-{
-  static int maxStrip = getMaximalStripNumber();
-  if (strip <= 0 || strip > maxStrip)
-    B2FATAL("Number of strip must be from 1 to getMaximalStripNumber().");
-  return (strip - 1) % m_MaximalStripNumber + 1;
-}
-
-int EKLM::GeometryData::getMaximalStripNumber() const
-{
-  return stripNumber(m_MaximalEndcapNumber, m_NDetectorLayers[1],
-                     m_MaximalSectorNumber, m_MaximalPlaneNumber,
-                     m_MaximalStripNumber);
 }
 
 double EKLM::GeometryData::getSolenoidZ() const

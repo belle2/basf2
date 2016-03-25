@@ -149,16 +149,17 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(
   double stripLen, double distSiPM, int nPE, double timeShift,
   bool isReflected, float* hist, int* gnpe)
 {
-  int i;
-  int j;
+  int i, j, hitTimeBin;
   double hitTime;
   double digTime;
   double deExcitationTime;
   double cosTheta;
   double hitDist;
   double sig, dt, exp1, exp2;
+  double attenuationTime;
   *gnpe = 0;
   dt = 0.5 * m_DigPar->ADCSamplingTime;
+  attenuationTime = 1.0 / m_DigPar->PEAttenuationFreq;
   for (i = 0; i < nPE; i++) {
     cosTheta = gRandom->Uniform(m_DigPar->minCosTheta, 1);
     if (!isReflected)
@@ -177,18 +178,15 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(
                        gRandom->Exp(m_DigPar->fiberDeExcitationTime);
     hitTime = hitDist / m_DigPar->fiberLightSpeed + deExcitationTime +
               timeShift;
+    hitTimeBin = floor(hitTime / m_DigPar->ADCSamplingTime);
     exp1 = exp(-m_DigPar->PEAttenuationFreq * (-hitTime - dt));
     exp2 = exp(-m_DigPar->PEAttenuationFreq * (-hitTime + dt));
-    for (j = 0; j < m_DigPar->nDigitizations; j++) {
-      digTime = j * m_DigPar->ADCSamplingTime + 0.5;
-      if (digTime > hitTime + dt)
-        sig = (m_SignalTimeDependence[j] * (exp1 - exp2)) /
-              m_DigPar->PEAttenuationFreq;
-      else if (digTime > hitTime - dt)
-        sig = (1.0 - m_SignalTimeDependence[j] * exp2) /
-              m_DigPar->PEAttenuationFreq;
-      else
-        sig = 0;
+    if (hitTimeBin > m_DigPar->nDigitizations)
+      continue;
+    sig = (1.0 - m_SignalTimeDependence[hitTimeBin] * exp2) * attenuationTime;
+    hist[hitTimeBin] = hist[hitTimeBin] + sig;
+    for (j = hitTimeBin + 1; j < m_DigPar->nDigitizations; j++) {
+      sig = m_SignalTimeDependence[j] * (exp1 - exp2) * attenuationTime;
       hist[j] = hist[j] + sig;
     }
   }

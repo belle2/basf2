@@ -61,7 +61,10 @@ namespace Belle2 {
     void setVersion(int version) { m_version = version; }
 
     //! Get the overlap-check flag for the geometry builder
-    //bool doOverlapCheck(void) const { return m_DoOverlapCheck; }
+    bool doOverlapCheck(void) const { return m_DoOverlapCheck == 1 ? true : false; }
+
+    //! Get the flag for doing beamBackgroundStudy
+    bool doBeamBackgroundStudy(void) const { return (m_beamBackgroundStudy == 1 ? true : false); }
 
     //! Clear all geometry parameters
     //void clear();
@@ -136,14 +139,20 @@ namespace Belle2 {
     //! Set width of the chimney hole
     void setChimneyWidth(double chimneyWidth) {m_ChimneyWidth = chimneyWidth;}
 
-    //! Get the height of the entire volume of a scintillator strip (including TiO2 coating)
+    //! Get half of the height of the entire volume of a scintillator strip (including TiO2 coating)
     double getScintHalfHeight(void) const { return 0.5 * m_ScintHeight; }
+
+    //! Get the height of the entire volume of a scintillator strip (including TiO2 coating)
+    double getScintHeight(void) const { return  m_ScintHeight; }
 
     //! Set the height of the entire volume of a scintillator strip (including TiO2 coating)
     void setScintHeight(double scintHeight) {  m_ScintHeight = scintHeight; }
 
-    //! Get the height of the entire volume of a scintillator strip (including TiO2 coating)
+    //! Get half of the height of the entire volume of a scintillator strip (including TiO2 coating)
     double getScintHalfWidth(void) const { return 0.5 * m_ScintWidth; }
+
+    //! Get the height of the entire volume of a scintillator strip (including TiO2 coating)
+    double getScintWidth(void) const { return m_ScintWidth; }
 
     //! Set the height of the entire volume of a scintillator strip (including TiO2 coating)
     void setScintWidth(double scintWidth) { m_ScintWidth = scintWidth; }
@@ -173,9 +182,9 @@ namespace Belle2 {
     double getRotation(void) const { return m_Rotation; }
 
     //! Get the rotation angle for a sector
-    double getSectorRotation(int sector) {return m_SectorRotation[sector];}
+    double getSectorRotation(int sector) const {return m_SectorRotation[sector];}
 
-    //! Set the rotation anble for a sector
+    //! Set the rotation angle for a sector
     void setSectorRotation(int sector, double sectorRotation) {m_SectorRotation[sector] = sectorRotation; }
 
     //! Set the global rotation angle about z of the entire BKLM
@@ -332,6 +341,9 @@ namespace Belle2 {
     //! set the number of phi-measuring scintillators in an scintillator module
     void setNPhiScints(int layer, int nPhiScints) {m_NPhiScints[layer] = nPhiScints;}
 
+    //! get the number of phi-measuring scintillators in an scintillator module
+    double getPhiScintsOffsetSign(int layer) const {return m_PhiScintsOffsetSign[layer]; }
+
     //! set the number of phi-measuring scintillators in an scintillator module
     void setPhiScintsOffsetSign(int layer, int phiScintsOffsetSign) {m_PhiScintsOffsetSign[layer] = phiScintsOffsetSign;}
 
@@ -372,7 +384,7 @@ namespace Belle2 {
     void setModuleMylarHeight(double moduleMylarHeight) { m_ModuleMylarHeight = moduleMylarHeight; }
 
     //! Get the height of a detector module's readout
-    double getModuleReadoutHeight(void) {return m_ModuleReadoutHeight;}
+    double getModuleReadoutHeight(void) const {return m_ModuleReadoutHeight;}
 
     //! Set the height of a detector module's readout
     void setModuleReadoutHeight(double ModuleReadoutHeight) { m_ModuleReadoutHeight = ModuleReadoutHeight;}
@@ -504,25 +516,25 @@ namespace Belle2 {
     void setBraceWidthChimney(double braceWidthChimney) { m_BraceWidthChimney = braceWidthChimney; }
 
     //! Get width of the innermost-module support plate
-    double getSupportPlateWidth(void) { return m_SupportPlateWidth; }
+    double getSupportPlateWidth(void) const { return m_SupportPlateWidth; }
 
     //! Set width of the innermost-module support plate
     void setSupportPlateWidth(double supportPlateWidth) { m_SupportPlateWidth = supportPlateWidth; }
 
     //! Get height of the innermost-module support plate
-    double getSupportPlateHeight(void) { return m_SupportPlateHeight; }
+    double getSupportPlateHeight(void) const { return m_SupportPlateHeight; }
 
     //! Set height of the innermost-module support plate
     void setSupportPlateHeight(double supportPlateHeight) { m_SupportPlateHeight = supportPlateHeight; }
 
     //! Get length of the innermost-module support plate
-    double getSupportPlateLength(void) { return m_SupportPlateLength; }
+    double getSupportPlateLength(void) const { return m_SupportPlateLength; }
 
     //! Set length of the innermost-module support plate
     void setSupportPlateLength(double supportPlateLength) { m_SupportPlateLength = supportPlateLength; }
 
     //! Get length of the innermost-module support plate in the chimney sector
-    double getSupportPlateLengthChimney(void) { return m_SupportPlateLengthChimney; }
+    double getSupportPlateLengthChimney(void) const { return m_SupportPlateLengthChimney; }
 
     //! Set length of the innermost-module support plate in the chimney sector
     void setSupportPlateLengthChimney(double supportPlateLengthChimney) { m_SupportPlateLengthChimney = supportPlateLengthChimney; }
@@ -599,6 +611,9 @@ namespace Belle2 {
     //! Set reconstructionShift of each layer along z  in local system. displacement, not alignment here
     void setLocalReconstructionShiftZ(int sector, int layer, double localReconstructionShift) {m_LocalReconstructionShift_Z[sector][layer] = localReconstructionShift;}
 
+    //!get the number of the phi strips on each layer.
+    int getPhiStripNumber(int layer) const {return m_PhiStripNumber[layer]; }
+
     //!get width of the phi strips on each layer.
     double getPhiStripWidth(int layer) const {return m_PhiStripWidth[layer]; }
 
@@ -641,7 +656,10 @@ namespace Belle2 {
     int m_version;
 
     //! Flag for enabling overlap-check during geometry construction
-    //bool m_DoOverlapCheck;
+    int m_DoOverlapCheck;
+
+    //! Flag for beam Background Study
+    int m_beamBackgroundStudy;
 
     //! global rotation about z of the BKLM
     double m_Rotation;
@@ -884,7 +902,7 @@ namespace Belle2 {
     double m_LocalReconstructionShift_Z[NSECTOR + 1][NLAYER + 1];
 
     //!number of the phi strips on each layer.
-    double m_PhiStripNumber[NLAYER + 1];
+    int m_PhiStripNumber[NLAYER + 1];
 
     //!width of the phi strips on each layer.
     double m_PhiStripWidth[NLAYER + 1];
@@ -907,7 +925,7 @@ namespace Belle2 {
     //! optional comment
     std::string m_comment;
 
-    ClassDef(BKLMGeometryPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(BKLMGeometryPar, 2);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 } // end of namespace Belle2

@@ -58,7 +58,8 @@ void BKLMGeometryPar::read(const GearDir& content)
 {
   // Get Gearbox parameters for BKLM
 
-  //m_DoOverlapCheck = content.getInt("DoOverlapCheck");
+  m_DoOverlapCheck = content.getInt("DoOverlapCheck");
+  m_beamBackgroundStudy = content.getInt("BeamBackgroundStudy");
   m_Rotation = content.getAngle("Rotation");
   m_OffsetZ = content.getLength("OffsetZ");
   m_Phi = content.getLength("Phi");
@@ -186,7 +187,7 @@ void BKLMGeometryPar::read(const GearDir& content)
           m_PhiStripNumber[layer] = layerContent.getInt("PhiStrips/NStrips");
           //localOrigin.setZ(localOrigin.z() + m_ModuleGasSpacerWidth);
           m_PhiStripWidth[layer] = layerContent.getLength("PhiStrips/Width");
-          m_ZStripWidth[layer] = layerContent.getLength("PhiStrips/Width");
+          m_ZStripWidth[layer] = layerContent.getLength("ZStrips/Width");
           /*Module pModule(m_PhiStripWidth[layer],
                                        (layer == 1 ? 2 : 1),
                                        (layer == 1 ? phiStripNumber - 1 : phiStripNumber),

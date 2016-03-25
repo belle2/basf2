@@ -14,6 +14,12 @@ all: copyinc $(SUBPACKAGES) tool
 
 full: all
 
+ropc:
+	@ make -C apps/runcontrold
+	@ make -C apps/cprcontrold
+	@ make -C apps/rocontrold
+	@ make -C apps/logcollectord
+
 runcontrold:
 	@ make -C apps/runcontrold
 

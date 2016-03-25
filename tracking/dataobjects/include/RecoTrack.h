@@ -159,6 +159,11 @@ namespace Belle2 {
               const std::string& storeArrayNameOfPXDHits = "PXDClusters",
               const std::string& storeArrayNameOfRecoHitInformation = "RecoHitInformations");
 
+    /** Delete the copy construtr. */
+    RecoTrack(const RecoTrack&) = delete;
+    /** Delete the copy construtr. */
+    RecoTrack& operator=(RecoTrack const&) = delete;
+
     /**
      * Create a reco track from a genfit::TrackCand and save it to the given store array.
      * @param trackCand The genfit::TrackCand from which to create the new object.

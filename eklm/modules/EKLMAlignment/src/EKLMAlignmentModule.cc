@@ -49,12 +49,12 @@ void EKLMAlignmentModule::generateZeroDisplacement()
   EKLMAlignment alignment;
   EKLMAlignmentData alignmentData(0., 0., 0.);
   int iEndcap, iLayer, iSector, iPlane, iSegment, segment;
-  for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
-    for (iLayer = 1; iLayer <= EKLM::GeometryData::Instance().
-         getNDetectorLayers(iEndcap); iLayer++) {
-      for (iSector = 1; iSector <= 4; iSector++) {
-        for (iPlane = 1; iPlane <= 2; iPlane++) {
-          for (iSegment = 1; iSegment <= 5; iSegment++) {
+  for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
+    for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
+         iLayer++) {
+      for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
+        for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
+          for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
             segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
                                               iSegment);
             alignment.setAlignmentData(segment, &alignmentData);
@@ -80,12 +80,12 @@ void EKLMAlignmentModule::generateRandomDisplacement()
   EKLMAlignmentData alignmentData;
   EKLM::AlignmentChecker alignmentChecker;
   int iEndcap, iLayer, iSector, iPlane, iSegment, segment;
-  for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
-    for (iLayer = 1; iLayer <= EKLM::GeometryData::Instance().
-         getNDetectorLayers(iEndcap); iLayer++) {
-      for (iSector = 1; iSector <= 4; iSector++) {
-        for (iPlane = 1; iPlane <= 2; iPlane++) {
-          for (iSegment = 1; iSegment <= 5; iSegment++) {
+  for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
+    for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
+         iLayer++) {
+      for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
+        for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
+          for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
             do {
               alignmentData.setDx(gRandom->Uniform(minDx, maxDx));
               alignmentData.setDy(gRandom->Uniform(minDy, maxDy));
@@ -130,9 +130,9 @@ void EKLMAlignmentModule::studyAlignmentLimits()
   t->Branch("dy", &dy, "dy/F");
   t->Branch("dalpha", &dalpha, "dalpha/F");
   t->Branch("status", &alignmentStatus, "status/I");
-  for (jPlane = 1; jPlane <= 2; jPlane++) {
+  for (jPlane = 1; jPlane <= m_GeoDat->getNPlanes(); jPlane++) {
     printf("Plane %d\n", jPlane);
-    for (jSegment = 1; jSegment <= 5; jSegment++) {
+    for (jSegment = 1; jSegment <= m_GeoDat->getNSegments(); jSegment++) {
       printf("Segment %d\n", jSegment);
       for (i = 0; i < nPoints; i++) {
         dx = gRandom->Uniform(minDx, maxDx);
@@ -141,12 +141,13 @@ void EKLMAlignmentModule::studyAlignmentLimits()
         alignmentDataRandom.setDx(dx);
         alignmentDataRandom.setDy(dy);
         alignmentDataRandom.setDalpha(dalpha);
-        for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
-          for (iLayer = 1; iLayer <= EKLM::GeometryData::Instance().
-               getNDetectorLayers(iEndcap); iLayer++) {
-            for (iSector = 1; iSector <= 4; iSector++) {
-              for (iPlane = 1; iPlane <= 2; iPlane++) {
-                for (iSegment = 1; iSegment <= 5; iSegment++) {
+        for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
+          for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
+               iLayer++) {
+            for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
+              for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
+                for (iSegment = 1; iSegment <= m_GeoDat->getNSegments();
+                     iSegment++) {
                   segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector,
                                                     iPlane, iSegment);
                   if (iPlane == jPlane && iSegment == jSegment)

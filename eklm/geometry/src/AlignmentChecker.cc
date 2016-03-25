@@ -116,8 +116,8 @@ checkSegmentAlignment(int iPlane, int iSegment,
   const struct ElementPosition* stripPosition;
   const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
   ly = 0.5 * stripGeometry->Width;
-  for (i = 1; i <= 15; i++) {
-    iStrip = 15 * (iSegment - 1) + i;
+  for (i = 1; i <= m_GeoDat->getNStripsSegment(); i++) {
+    iStrip = m_GeoDat->getNStripsSegment() * (iSegment - 1) + i;
     stripPosition = m_GeoDat->getStripPosition(iStrip);
     lx = 0.5 * stripPosition->Length;
     stripRectangle[0].setX(lx);
@@ -164,12 +164,12 @@ bool EKLM::AlignmentChecker::checkAlignment(EKLMAlignment* alignment) const
 {
   int iEndcap, iLayer, iSector, iPlane, iSegment, segment;
   EKLMAlignmentData* alignmentData;
-  for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
-    for (iLayer = 1; iLayer <= EKLM::GeometryData::Instance().
-         getNDetectorLayers(iEndcap); iLayer++) {
-      for (iSector = 1; iSector <= 4; iSector++) {
-        for (iPlane = 1; iPlane <= 2; iPlane++) {
-          for (iSegment = 1; iSegment <= 5; iSegment++) {
+  for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
+    for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
+         iLayer++) {
+      for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
+        for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
+          for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
             segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
                                               iSegment);
             alignmentData = alignment->getAlignmentData(segment);

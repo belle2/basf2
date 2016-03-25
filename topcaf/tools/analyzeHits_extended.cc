@@ -60,7 +60,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     roi[ii]->Rebin(2);
   }
 
-  const int flag_lab = strstr(filename, "cpr3015") != NULL;
+  const int flag_lab = (strstr(filename, "cpr3015") != NULL) + (strstr(filename, "cpr3003") != NULL);
   //0=fuji, 1=tsukuba
   if (flag_lab == 0) {
     if (trigstring == "mirror") {
@@ -250,7 +250,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
   //4: wideband
   //5: sideband
 
-  //const int flag_lab = strstr(filename, "cpr3015") != NULL;
+  //  const int flag_lab = (strstr(filename, "cpr3015") != NULL) + (strstr(filename, "cpr3003") != NULL);
   //0=fuji, 1=tsukuba
   //cout<<flag_lab<<endl;
   const int flag_m0809 = (strstr(filename, "module08") != NULL) || (strstr(filename, "module09") != NULL);

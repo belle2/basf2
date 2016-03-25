@@ -87,7 +87,7 @@ namespace Belle2 {
     private:
 
       /** Parameters. */
-      struct EKLM::DigitizationParams* m_digPar;
+      struct EKLM::DigitizationParams* m_DigPar;
 
       /** Fitter. */
       FPGAFitter* m_fitter;
@@ -106,6 +106,9 @@ namespace Belle2 {
 
       /** Digital amplitude. */
       int* m_ADCAmplitude;
+
+      /** Buffer for signal time dependence calculation. */
+      double* m_SignalTimeDependence;
 
       /** FPGA fit status. */
       enum FPGAFitStatus m_FPGAStat;
@@ -129,6 +132,20 @@ namespace Belle2 {
        * Add random noise to the signal (amplitude-dependend).
        */
       void addRandomSiPMNoise();
+
+      /**
+       * Fill SiPM output.
+       * @param[in]     stripLen    Strip length.
+       * @param[in]     distSiPM    Distance from hit to SiPM.
+       * @param[in]     nPE         Number of photons to be simulated.
+       * @param[in]     timeShift   Time of hit.
+       * @param[in]     isReflected Whether photon is reflected or not.
+       * @param[in,out] hist        Output histogram (signal is added to it).
+       * @param[out]    gnpe        Number of generated photoelectrons.
+       */
+      void fillSiPMOutput(double stripLen, double distSiPM, int nPE,
+                          double timeShift, bool isReflected, float* hist,
+                          int* gnpe);
 
       /**
        * Simulate ADC (create digital signal from analog),

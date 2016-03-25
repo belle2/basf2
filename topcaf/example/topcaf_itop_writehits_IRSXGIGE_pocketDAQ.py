@@ -124,7 +124,14 @@ if args.s2s:
     sampletimemodule.param(sampletimeDict)
 
 timecalibmodule = register_module('DoubleCalPulse')
-if (args.inputRun).find("cpr3015") != -1:
+if (args.inputRun).find("cpr31") != -1 or (args.inputRun).find("cpr32") != -1:
+    # fuji
+    timecalibmodule.param('calibrationTimeMin', 1300)
+    timecalibmodule.param('calibrationWidthMax', 30)
+    timecalibmodule.param('calibrationWidthMin', 6)
+    timecalibmodule.param('calibrationADCThreshold', 500)
+    timecalibmodule.param('calibrationADCThreshold_max', 3000)
+else:
     # tsukuba
     timecalibmodule.param('calibrationTimeMin', 200)   # laser
     if (args.inputRun).find("cosmic") != -1:
@@ -134,13 +141,6 @@ if (args.inputRun).find("cpr3015") != -1:
     timecalibmodule.param('calibrationWidthMin', 2)
     timecalibmodule.param('calibrationADCThreshold', -80)
     timecalibmodule.param('calibrationADCThreshold_max', -600)
-else:
-    # fuji
-    timecalibmodule.param('calibrationTimeMin', 1300)
-    timecalibmodule.param('calibrationWidthMax', 30)
-    timecalibmodule.param('calibrationWidthMin', 6)
-    timecalibmodule.param('calibrationADCThreshold', 500)
-    timecalibmodule.param('calibrationADCThreshold_max', 3000)
 # it shouldn't be anything else
 # timeCorrection = register_module("TimeBasedCorrection")
 # timeCorrection.param('correctionFileName', path.join(os.environ['BELLE2_LOCAL_DIR'], 'topcaf/data/M03_M04_dT.dat'))

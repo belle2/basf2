@@ -22,28 +22,22 @@ namespace Belle2 {
   namespace EKLM {
 
     /**
-     * Calculate StripHit times (at the end of the strip),
-     * @param[in]  stripLen    Length of strip.
-     * @param[in]  distSipm    Distance to SiPM.
-     * @param[in]  nPE         Number of photoelectrons.
-     * @param[in]  timeShift   Time of the SimHit.
-     * @param[in]  isReflected If the hit is direct or reflected.
-     * @param[in]  digPar      Digitization parameters.
-     * @param[out] hist        Histogram.
-     * @param[out] gnpe        Number of generated photoelectrons.
-     * @return Vector of hit times.
-     */
-    void fillSiPMOutput(double stripLen, double distSiPM, int nPE,
-                        double timeShift, bool isReflected,
-                        struct DigitizationParams* digPar, float* hist,
-                        int* gnpe);
-
-    /**
      * Digitize EKLMSim2Hits to get EKLM StripHits.
      */
     class FiberAndElectronics : public EKLMHitMCTime {
 
     public:
+
+      /** Photoelectron data. */
+      struct Photoelectron {
+        int bin;        /**< Hit time bin in ADC output histogram */
+        double expTime; /**< exp(-m_DigPar->PEAttenuationFreq * (-time)) */
+      };
+
+      /**
+       * Constructor (only to fill external ADC histograms).
+       */
+      FiberAndElectronics(struct EKLM::DigitizationParams* digPar);
 
       /**
        * Constructor.
@@ -84,6 +78,20 @@ namespace Belle2 {
        */
       int getGeneratedNPE();
 
+      /**
+       * Fill SiPM output.
+       * @param[in]     stripLen    Strip length.
+       * @param[in]     distSiPM    Distance from hit to SiPM.
+       * @param[in]     nPE         Number of photons to be simulated.
+       * @param[in]     timeShift   Time of hit.
+       * @param[in]     isReflected Whether the hits are reflected or not.
+       * @param[in,out] hist        Output histogram (signal is added to it).
+       * @param[out]    gnpe        Number of generated photoelectrons.
+       */
+      void fillSiPMOutput(double stripLen, double distSiPM, int nPhotons,
+                          double timeShift, bool isReflected, float* hist,
+                          int* gnpe);
+
     private:
 
       /** Parameters. */
@@ -110,6 +118,9 @@ namespace Belle2 {
       /** Buffer for signal time dependence calculation. */
       double* m_SignalTimeDependence;
 
+      /** Buffer for signal time dependence calculation. */
+      double* m_SignalTimeDependenceDiff;
+
       /** FPGA fit status. */
       enum FPGAFitStatus m_FPGAStat;
 
@@ -132,20 +143,6 @@ namespace Belle2 {
        * Add random noise to the signal (amplitude-dependend).
        */
       void addRandomSiPMNoise();
-
-      /**
-       * Fill SiPM output.
-       * @param[in]     stripLen    Strip length.
-       * @param[in]     distSiPM    Distance from hit to SiPM.
-       * @param[in]     nPE         Number of photons to be simulated.
-       * @param[in]     timeShift   Time of hit.
-       * @param[in]     isReflected Whether photon is reflected or not.
-       * @param[in,out] hist        Output histogram (signal is added to it).
-       * @param[out]    gnpe        Number of generated photoelectrons.
-       */
-      void fillSiPMOutput(double stripLen, double distSiPM, int nPE,
-                          double timeShift, bool isReflected, float* hist,
-                          int* gnpe);
 
       /**
        * Simulate ADC (create digital signal from analog),

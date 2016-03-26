@@ -32,7 +32,7 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   FPGAFitter* fitter)
 {
   int i;
-  double time;
+  double time, attenuationTime;
   m_DigPar = digPar;
   m_fitter = fitter;
   m_hit = it;
@@ -56,13 +56,24 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   if (m_ADCAmplitude == NULL)
     B2FATAL(MemErr);
   try {
-    m_SignalTimeDependence = new double[m_DigPar->nDigitizations];
+    m_SignalTimeDependence = new double[m_DigPar->nDigitizations + 1];
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  for (i = 0; i < m_DigPar->nDigitizations; i++) {
-    time  = digPar->ADCSamplingTime * i + 0.5;
-    m_SignalTimeDependence[i] = exp(-digPar->PEAttenuationFreq * time);
+  try {
+    m_SignalTimeDependenceDiff = new double[m_DigPar->nDigitizations];
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  attenuationTime = 1.0 / m_DigPar->PEAttenuationFreq;
+  for (i = 0; i <= m_DigPar->nDigitizations; i++) {
+    time = digPar->ADCSamplingTime * i;
+    m_SignalTimeDependence[i] = exp(-digPar->PEAttenuationFreq * time) *
+                                attenuationTime;
+    if (i > 0) {
+      m_SignalTimeDependenceDiff[i - 1] = m_SignalTimeDependence[i - 1] -
+                                          m_SignalTimeDependence[i];
+    }
   }
 }
 
@@ -73,14 +84,15 @@ EKLM::FiberAndElectronics::~FiberAndElectronics()
   free(m_amplitudeReflected);
   free(m_amplitude);
   free(m_ADCAmplitude);
-  delete m_SignalTimeDependence;
+  delete[] m_SignalTimeDependence;
+  delete[] m_SignalTimeDependenceDiff;
 }
 
 void EKLM::FiberAndElectronics::processEntry()
 {
   int i, gnpe;
   double l, d, t;
-  double npe;
+  double nPhotons;
   std::multimap<int, EKLMSimHit*>::iterator it;
   EKLMSimHit* hit;
   m_MCTime = -1;
@@ -91,8 +103,8 @@ void EKLM::FiberAndElectronics::processEntry()
   }
   for (it = m_hit; it != m_hitEnd; ++it) {
     hit = it->second;
-    /* Poisson mean for number of photoelectrons. */
-    npe = hit->getEDep() * m_DigPar->nPEperMeV;
+    /* Poisson mean for number of photons. */
+    nPhotons = hit->getEDep() * m_DigPar->nPEperMeV;
     /* Fill histograms. */
     l = GeometryData::Instance().getStripLength(hit->getStrip()) / CLHEP::mm *
         Unit::mm;
@@ -102,11 +114,11 @@ void EKLM::FiberAndElectronics::processEntry()
       m_MCTime = t;
     else
       m_MCTime = t < m_MCTime ? t : m_MCTime;
-    fillSiPMOutput(l, d, gRandom->Poisson(npe), hit->getTime(), false,
+    fillSiPMOutput(l, d, gRandom->Poisson(nPhotons), hit->getTime(), false,
                    m_amplitudeDirect, &gnpe);
     m_npe = m_npe + gnpe;
     if (m_DigPar->mirrorReflectiveIndex > 0) {
-      fillSiPMOutput(l, d, gRandom->Poisson(npe), hit->getTime(), true,
+      fillSiPMOutput(l, d, gRandom->Poisson(nPhotons), hit->getTime(), true,
                      m_amplitudeReflected, &gnpe);
       m_npe = m_npe + gnpe;
     }
@@ -145,50 +157,148 @@ void EKLM::FiberAndElectronics::addRandomSiPMNoise()
     m_amplitude[i] = m_amplitude[i] + gRandom->Poisson(m_DigPar->meanSiPMNoise);
 }
 
+/**
+ * Comparison function for photoelectrons.
+ */
+static bool comparePhotoelectrons(
+  struct EKLM::FiberAndElectronics::Photoelectron& pe1,
+  struct EKLM::FiberAndElectronics::Photoelectron& pe2)
+{
+  return pe1.bin < pe2.bin;
+}
+
+/*
+ * ADC signal corresponding to a photoelectron is
+ *
+ * exp(-(t - tau) / t0),
+ *
+ * where tau is the hit time and t0 = 1.0 / m_DigPar->PEAttenuationFreq. Its
+ * integral from t1 to t2 is
+ *
+ * t0 * exp(-(t1 - tau) / t0) - t0 * exp(-(t2 - tau) / t0).
+ *
+ * The integration is performed over digitization bins from (t_dig * i) to
+ * (t_dig * (i + 1)), where t_dig = m_DigPar->ADCSamplingTime and i is the bin
+ * number. The integrals are
+ *
+ * I1 = t0 - t0 * exp(-(t_dig * (i + 1) - tau) / t0)
+ *
+ * for the first signal bin (t_dig * i <= tau < t_dig * (i + 1)) and
+ *
+ * I2 = t0 * exp(-(t_dig * i - tau) / t0) -
+ *      t0 * exp(-(t_dig * (i + 1) - tau) / t0)
+ *
+ * for the following bins. The integrals contain expressions that do not depend
+ * on the hit time and may be calculated preliminary:
+ *
+ * B1 = t0 * exp(-(t_dig * (i + 1) / t0)
+ *
+ * and
+ *
+ * B2 = t0 * exp(-(t_dig * i) / t0) - t0 * exp(-(t_dig * (i + 1)) / t0).
+ *
+ * In terms of B1 and B2 the integrals are equal to
+ *
+ * I1 = t0 - B1 * exp(tau / t0)
+ *
+ * and
+ *
+ * I2 = B2 * exp(tau / t0).
+ *
+ * The sum of integrals for all photoelectrons is
+ *
+ * I = \sum_{hits before this bin} B2 * exp(tau_j / t0) +
+ *     \sum_{hits in this bin} t0 - B1 * exp(tau_j / t0),
+ *
+ * where tau_j is the time of j-th hit. The bindependent expresions B1 and B2
+ * are the same for all hits:
+ *
+ * I = B2 * \sum_{hits before this bin} exp(tau_j / t0) +
+ *     N_i * t0 - B1 * \sum_{hits in this bin} exp(tau_j / t0).
+ *
+ * where N_i is the number of hits in this (i-th) bin.
+ */
 void EKLM::FiberAndElectronics::fillSiPMOutput(
-  double stripLen, double distSiPM, int nPE, double timeShift,
+  double stripLen, double distSiPM, int nPhotons, double timeShift,
   bool isReflected, float* hist, int* gnpe)
 {
-  int i, j, hitTimeBin;
-  double hitTime;
-  double digTime;
-  double deExcitationTime;
-  double cosTheta;
-  double hitDist;
-  double sig, dt, exp1, exp2;
-  double attenuationTime;
+  const double maxHitTime = m_DigPar->nDigitizations *
+                            m_DigPar->ADCSamplingTime;
+  int i, maxBin;
+  double hitTime, deExcitationTime, cosTheta, hitDist;
+  double attenuationTime, sig, expSum;
+  double inverseLightSpeed, inverseAttenuationLength;
+  std::vector<struct Photoelectron> photoelectrons;
+  std::vector<struct Photoelectron>::iterator it, it2, it3;
+  struct Photoelectron pe;
+  photoelectrons.reserve(nPhotons);
   *gnpe = 0;
-  dt = 0.5 * m_DigPar->ADCSamplingTime;
   attenuationTime = 1.0 / m_DigPar->PEAttenuationFreq;
-  for (i = 0; i < nPE; i++) {
+  inverseLightSpeed = 1.0 / m_DigPar->fiberLightSpeed;
+  inverseAttenuationLength = 1.0 / m_DigPar->attenuationLength;
+  /* Generation of photoelectrons. */
+  for (i = 0; i < nPhotons; i++) {
     cosTheta = gRandom->Uniform(m_DigPar->minCosTheta, 1);
     if (!isReflected)
       hitDist = distSiPM / cosTheta;
     else
       hitDist = (2.0 * stripLen - distSiPM) / cosTheta;
-    /* Drop lightflashes which were captured by fiber. */
-    if (gRandom->Uniform() > exp(-hitDist / m_DigPar->attenuationLength))
+    /* Fiber absorption. */
+    if (gRandom->Uniform() > exp(-hitDist * inverseAttenuationLength))
       continue;
     /* Account for mirror reflective index. */
     if (isReflected)
       if (gRandom->Uniform() > m_DigPar->mirrorReflectiveIndex)
         continue;
-    *gnpe = *gnpe + 1;
     deExcitationTime = gRandom->Exp(m_DigPar->scintillatorDeExcitationTime) +
                        gRandom->Exp(m_DigPar->fiberDeExcitationTime);
-    hitTime = hitDist / m_DigPar->fiberLightSpeed + deExcitationTime +
+    hitTime = hitDist * inverseLightSpeed + deExcitationTime +
               timeShift;
-    hitTimeBin = floor(hitTime / m_DigPar->ADCSamplingTime);
-    exp1 = exp(-m_DigPar->PEAttenuationFreq * (-hitTime - dt));
-    exp2 = exp(-m_DigPar->PEAttenuationFreq * (-hitTime + dt));
-    if (hitTimeBin > m_DigPar->nDigitizations)
+    if (hitTime >= maxHitTime)
       continue;
-    sig = (1.0 - m_SignalTimeDependence[hitTimeBin] * exp2) * attenuationTime;
-    hist[hitTimeBin] = hist[hitTimeBin] + sig;
-    for (j = hitTimeBin + 1; j < m_DigPar->nDigitizations; j++) {
-      sig = m_SignalTimeDependence[j] * (exp1 - exp2) * attenuationTime;
-      hist[j] = hist[j] + sig;
+    if (hitTime >= 0)
+      pe.bin = floor(hitTime / m_DigPar->ADCSamplingTime);
+    else
+      pe.bin = -1;
+    pe.expTime = exp(m_DigPar->PEAttenuationFreq * hitTime);
+    photoelectrons.push_back(pe);
+    *gnpe = *gnpe + 1;
+  }
+  if (photoelectrons.size() == 0)
+    return;
+  /* Generation of ADC output. */
+  sort(photoelectrons.begin(), photoelectrons.end(), comparePhotoelectrons);
+  it = photoelectrons.begin();
+  expSum = 0;
+  while (1) {
+    it2 = it;
+    while (1) {
+      ++it2;
+      if (it2 == photoelectrons.end())
+        break;
+      if (it2->bin != it->bin)
+        break;
     }
+    /* Now it .. it2 - photoelectrons in current bin. */
+    for (it3 = it; it3 != it2; ++it3) {
+      if (it->bin >= 0) {
+        sig = attenuationTime - it3->expTime *
+              m_SignalTimeDependence[it->bin + 1];
+        hist[it->bin] = hist[it->bin] + sig;
+      }
+      expSum = expSum + it3->expTime;
+    }
+    if (it2 == photoelectrons.end())
+      maxBin = m_DigPar->nDigitizations - 1;
+    else
+      maxBin = it2->bin;
+    for (i = it->bin + 1; i <= maxBin; i++) {
+      sig = m_SignalTimeDependenceDiff[i] * expSum;
+      hist[i] = hist[i] + sig;
+    }
+    if (it2 == photoelectrons.end())
+      break;
+    it = it2;
   }
 }
 

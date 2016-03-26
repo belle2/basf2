@@ -25,6 +25,23 @@ using namespace Belle2;
 
 static const char MemErr[] = "Memory allocation error.";
 
+void EKLM::FiberAndElectronics::reallocPhotoElectronBuffers(int size)
+{
+  m_PhotoelectronBufferSize = size;
+  m_Photoelectrons =
+    (struct Photoelectron*)realloc(m_Photoelectrons,
+                                   size * sizeof(struct Photoelectron));
+  m_PhotoelectronIndex = (int*)realloc(m_PhotoelectronIndex,
+                                       size * sizeof(int));
+  m_PhotoelectronIndex2 = (int*)realloc(m_PhotoelectronIndex2,
+                                        size * sizeof(int));
+  if (size != 0) {
+    if (m_Photoelectrons == NULL || m_PhotoelectronIndex == NULL ||
+        m_PhotoelectronIndex2 == NULL)
+      B2FATAL(MemErr);
+  }
+}
+
 EKLM::FiberAndElectronics::FiberAndElectronics(
   std::multimap<int, EKLMSimHit*>::iterator& it,
   std::multimap<int, EKLMSimHit*>::iterator& end,
@@ -75,6 +92,10 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
                                           m_SignalTimeDependence[i];
     }
   }
+  m_Photoelectrons = NULL;
+  m_PhotoelectronIndex = NULL;
+  m_PhotoelectronIndex2 = NULL;
+  reallocPhotoElectronBuffers(100);
 }
 
 
@@ -86,6 +107,7 @@ EKLM::FiberAndElectronics::~FiberAndElectronics()
   free(m_ADCAmplitude);
   delete[] m_SignalTimeDependence;
   delete[] m_SignalTimeDependenceDiff;
+  reallocPhotoElectronBuffers(0);
 }
 
 void EKLM::FiberAndElectronics::processEntry()
@@ -157,14 +179,52 @@ void EKLM::FiberAndElectronics::addRandomSiPMNoise()
     m_amplitude[i] = m_amplitude[i] + gRandom->Poisson(m_DigPar->meanSiPMNoise);
 }
 
-/**
- * Comparison function for photoelectrons.
- */
-static bool comparePhotoelectrons(
-  struct EKLM::FiberAndElectronics::Photoelectron& pe1,
-  struct EKLM::FiberAndElectronics::Photoelectron& pe2)
+int* EKLM::FiberAndElectronics::sortPhotoelectrons(int nPhotoelectrons)
 {
-  return pe1.bin < pe2.bin;
+  int* currentIndexArray, *newIndexArray, *tmpIndexArray;
+  int i, i1, i2, i1Max, i2Max, j, mergeSize;
+  currentIndexArray = m_PhotoelectronIndex;
+  newIndexArray = m_PhotoelectronIndex2;
+  mergeSize = 1;
+  while (mergeSize < nPhotoelectrons) {
+    for (i = 0; i < nPhotoelectrons; i = i + 2 * mergeSize) {
+      i1 = i;
+      j = i;
+      i2 = i + mergeSize;
+      if (i2 > nPhotoelectrons)
+        i2 = nPhotoelectrons;
+      i1Max = i2;
+      i2Max = i2 + mergeSize;
+      if (i2Max > nPhotoelectrons)
+        i2Max = nPhotoelectrons;
+      while (i1 < i1Max || i2 < i2Max) {
+        if (i1 < i1Max) {
+          if (i2 < i2Max) {
+            if (m_Photoelectrons[currentIndexArray[i1]].bin <
+                m_Photoelectrons[currentIndexArray[i2]].bin) {
+              newIndexArray[j] = currentIndexArray[i1];
+              i1++;
+            } else {
+              newIndexArray[j] = currentIndexArray[i2];
+              i2++;
+            }
+          } else {
+            newIndexArray[j] = currentIndexArray[i1];
+            i1++;
+          }
+        } else {
+          newIndexArray[j] = currentIndexArray[i2];
+          i2++;
+        }
+        j++;
+      }
+    }
+    tmpIndexArray = currentIndexArray;
+    currentIndexArray = newIndexArray;
+    newIndexArray = tmpIndexArray;
+    mergeSize = mergeSize * 2;
+  }
+  return currentIndexArray;
 }
 
 /*
@@ -224,20 +284,20 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(
 {
   const double maxHitTime = m_DigPar->nDigitizations *
                             m_DigPar->ADCSamplingTime;
-  int i, maxBin;
+  int i, bin, nPhotoelectrons, maxBin;
   double hitTime, deExcitationTime, cosTheta, hitDist;
   double attenuationTime, sig, expSum;
   double inverseLightSpeed, inverseAttenuationLength;
-  std::vector<struct Photoelectron> photoelectrons;
-  std::vector<struct Photoelectron>::iterator it, it2, it3;
-  struct Photoelectron pe;
-  photoelectrons.reserve(nPhotons);
-  *gnpe = 0;
+  int ind1, ind2, ind3;
+  int* indexArray;
+  nPhotoelectrons = 0;
   attenuationTime = 1.0 / m_DigPar->PEAttenuationFreq;
   inverseLightSpeed = 1.0 / m_DigPar->fiberLightSpeed;
   inverseAttenuationLength = 1.0 / m_DigPar->attenuationLength;
   /* Generation of photoelectrons. */
   for (i = 0; i < nPhotons; i++) {
+    if (nPhotoelectrons >= m_PhotoelectronBufferSize)
+      reallocPhotoElectronBuffers(m_PhotoelectronBufferSize + 100);
     cosTheta = gRandom->Uniform(m_DigPar->minCosTheta, 1);
     if (!isReflected)
       hitDist = distSiPM / cosTheta;
@@ -257,48 +317,52 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(
     if (hitTime >= maxHitTime)
       continue;
     if (hitTime >= 0)
-      pe.bin = floor(hitTime / m_DigPar->ADCSamplingTime);
+      m_Photoelectrons[nPhotoelectrons].bin =
+        floor(hitTime / m_DigPar->ADCSamplingTime);
     else
-      pe.bin = -1;
-    pe.expTime = exp(m_DigPar->PEAttenuationFreq * hitTime);
-    photoelectrons.push_back(pe);
-    *gnpe = *gnpe + 1;
+      m_Photoelectrons[nPhotoelectrons].bin = -1;
+    m_Photoelectrons[nPhotoelectrons].expTime =
+      exp(m_DigPar->PEAttenuationFreq * hitTime);
+    m_PhotoelectronIndex[nPhotoelectrons] = nPhotoelectrons;
+    nPhotoelectrons++;
   }
-  if (photoelectrons.size() == 0)
+  *gnpe = nPhotoelectrons;
+  if (nPhotoelectrons == 0)
     return;
   /* Generation of ADC output. */
-  sort(photoelectrons.begin(), photoelectrons.end(), comparePhotoelectrons);
-  it = photoelectrons.begin();
+  indexArray = sortPhotoelectrons(nPhotoelectrons);
+  ind1 = 0;
   expSum = 0;
   while (1) {
-    it2 = it;
+    ind2 = ind1;
+    bin = m_Photoelectrons[indexArray[ind1]].bin;
     while (1) {
-      ++it2;
-      if (it2 == photoelectrons.end())
+      ind2++;
+      if (ind2 == nPhotoelectrons)
         break;
-      if (it2->bin != it->bin)
+      if (bin != m_Photoelectrons[indexArray[ind2]].bin)
         break;
     }
-    /* Now it .. it2 - photoelectrons in current bin. */
-    for (it3 = it; it3 != it2; ++it3) {
-      if (it->bin >= 0) {
-        sig = attenuationTime - it3->expTime *
-              m_SignalTimeDependence[it->bin + 1];
-        hist[it->bin] = hist[it->bin] + sig;
+    /* Now ind1 .. ind2 - photoelectrons in current bin. */
+    for (ind3 = ind1; ind3 != ind2; ind3++) {
+      if (bin >= 0) {
+        sig = attenuationTime - m_Photoelectrons[indexArray[ind3]].expTime *
+              m_SignalTimeDependence[bin + 1];
+        hist[bin] = hist[bin] + sig;
       }
-      expSum = expSum + it3->expTime;
+      expSum = expSum + m_Photoelectrons[indexArray[ind3]].expTime;
     }
-    if (it2 == photoelectrons.end())
+    if (ind2 == nPhotoelectrons)
       maxBin = m_DigPar->nDigitizations - 1;
     else
-      maxBin = it2->bin;
-    for (i = it->bin + 1; i <= maxBin; i++) {
+      maxBin = m_Photoelectrons[indexArray[ind2]].bin;
+    for (i = bin + 1; i <= maxBin; i++) {
       sig = m_SignalTimeDependenceDiff[i] * expSum;
       hist[i] = hist[i] + sig;
     }
-    if (it2 == photoelectrons.end())
+    if (ind2 == nPhotoelectrons)
       break;
-    it = it2;
+    ind1 = ind2;
   }
 }
 

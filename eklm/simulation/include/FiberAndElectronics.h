@@ -121,6 +121,18 @@ namespace Belle2 {
       /** Buffer for signal time dependence calculation. */
       double* m_SignalTimeDependenceDiff;
 
+      /** Buffer for photoelectron data. */
+      struct Photoelectron* m_Photoelectrons;
+
+      /** Buffer for photoelectron indices. */
+      int* m_PhotoelectronIndex;
+
+      /** Buffer for photoelectron indices. */
+      int* m_PhotoelectronIndex2;
+
+      /** Size of photoelectron data buffer. */
+      int m_PhotoelectronBufferSize;
+
       /** FPGA fit status. */
       enum FPGAFitStatus m_FPGAStat;
 
@@ -138,6 +150,19 @@ namespace Belle2 {
 
       /** Name of the strip. */
       std::string m_stripName;
+
+      /**
+       * Reallocate photoelectron buffers.
+       * @param[in] size New size of buffers.
+       */
+      void reallocPhotoElectronBuffers(int size);
+
+      /**
+       * Sort photoelectrons.
+       * @param[in] nPhotoelectrons Number of photoelectrons.
+       * @return Pointer to index array.
+       */
+      int* sortPhotoelectrons(int nPhotoelectrons);
 
       /**
        * Add random noise to the signal (amplitude-dependend).

@@ -46,6 +46,7 @@ namespace Belle2 {
 
     private:
 
+      /** Shower shape variable: Lateral energy. */
       double computeLateralEnergy(const ECLShower&) const;
 
     public:

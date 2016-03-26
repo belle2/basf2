@@ -379,12 +379,18 @@ int ECLGeometryPar::ECLVolumeToCellID(const G4VTouchable* touch)
 EclNbr::EclNbr() :
   m_nbrs(*new std::vector< Identifier >)
 {
+  mNbr_cellID = 0;
+  mNbr_thetaID = 0;
+  mNbr_phiID = 0;
 }
 
 EclNbr::EclNbr(const EclNbr& aNbr) :
   m_nbrs(*new std::vector< Identifier > (aNbr.m_nbrs)) ,
   m_nearSize(aNbr.m_nearSize)
 {
+  mNbr_cellID = 0;
+  mNbr_thetaID = 0;
+  mNbr_phiID = 0;
 }
 
 EclNbr::EclNbr(
@@ -441,6 +447,10 @@ void EclNbr::printNbr()
 EclNbr& EclNbr::operator=(const EclNbr& aNbr)
 {
   if (this != &aNbr) {
+    mNbr_cellID  = aNbr.mNbr_cellID;
+    mNbr_thetaID = aNbr.mNbr_thetaID;
+    mNbr_phiID   = aNbr.mNbr_phiID;
+
     m_nbrs     = aNbr.m_nbrs     ;
     m_nearSize = aNbr.m_nearSize ;
   }

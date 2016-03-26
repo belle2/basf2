@@ -22,6 +22,11 @@ SensitiveDetector::SensitiveDetector(G4String name, G4double thresholdEnergyDepo
 {
   m_oldEvnetNumber = -1;
   m_oldRunNumber = -1;
+  for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
+    for (int  TimeIndex = 0; TimeIndex < 80; TimeIndex++) {
+      m_ECLHitIndex[iECLCell][TimeIndex] = -1;
+    }
+  }
   m_trackID = 0;
   m_WeightedTime = 0;
   m_energyDeposit = 0;

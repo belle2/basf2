@@ -93,20 +93,17 @@ namespace Belle2 {
       DBArray<ECLDigitEnergyConstants> m_calibrationEnergyHigh;  /**< single crystal calibration constants high energy */
       DBArray<ECLDigitTimeConstants> m_calibrationTime;  /**< single crystal calibration constants time */
 
-      double getCalibratedEnergy(const int cellid, const int energy); /**< energy calibration */
-      double getCalibratedTime(const int cellid, const int time, const bool fitfailed); /**< timing correction. */
-      double getCalibratedTimeResolution(const int cellid, const double energy, const bool fitfailed); /**< timing resolution. */
-      double getInterpolatedTimeResolution(const double x, const int bin); /**< timing resolution interpolation. */
-
+      double getCalibratedEnergy(const int cellid, const int energy) const; /**< energy calibration */
+      double getCalibratedTime(const int cellid, const int time, const bool fitfailed) const; /**< timing correction. */
+      double getCalibratedTimeResolution(const int cellid, const double energy, const bool fitfailed) const; /**< timing resolution. */
+      double getInterpolatedTimeResolution(const double x, const int bin) const; /**< timing resolution interpolation. */
       void prepareEnergyCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
       void prepareTimeCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
-
       void determineBackgroundECL(); /**< count out of time digits to determine baclground levels */
 
       double m_timeInverseSlope; /**< Time calibration inverse slope "a". */
       double m_timeResolutionPointResolution[4]; /**< Time resolution calibration interpolation parameter "Resolution". */
       double m_timeResolutionPointX[4];  /**< Time resolution calibration interpolation parameter "x = 1/E (GeV)". */
-
       const double c_timeResolutionForFitFailed  = 1.0e9; /**< Time resolution for failed fits". */
       const double c_timeResolutionForZeroEnergy =
         1.0e9; /**< Time resolution for (very close to) zero energy digits (should not happen)". */
@@ -116,19 +113,19 @@ namespace Belle2 {
 
     };
 
-    /**< Class derived from ECLDigitCalibratorModule, only difference are the ECLDigit and ECLCalDigit names */
+    /** Class derived from ECLDigitCalibratorModule, only difference are the names */
     class ECLDigitCalibratorPureCsIModule : public ECLDigitCalibratorModule {
     public:
-      /**< PureCsI Name of the ECLDigitsPureCsI.*/
+      /** PureCsI Name of the ECLDigitsPureCsI.*/
       virtual const char* eclDigitArrayName() const override
       { return "ECLDigitsPureCsI" ; }
 
-      /**< PureCsI Name of the ECLCalDigitsPureCsI.*/
+      /** PureCsI Name of the ECLCalDigitsPureCsI.*/
       virtual const char* eclCalDigitArrayName() const override
       { return "ECLCalDigitsPureCsI" ; }
 
-      /**< PureCsI Name of the ECLEventInformationPureCsI.*/
-      virtual const char* eclEventInformationName() const
+      /** PureCsI Name of the ECLEventInformationPureCsI.*/
+      virtual const char* eclEventInformationName() const override
       { return "ECLEventInformationPureCsI" ; }
 
 

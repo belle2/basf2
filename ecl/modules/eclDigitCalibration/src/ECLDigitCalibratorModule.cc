@@ -148,7 +148,6 @@ void ECLDigitCalibratorModule::event()
     const auto aECLCalDigit = eclCalDigits.appendNew();
 
     // get the cell id from the ECLDigit as identifier
-    // FIXME: could be removed, cellid can be obtained via relation
     const int cellid = aECLDigit.getCellId();
 
     // check that the cell id is valid
@@ -208,7 +207,7 @@ void ECLDigitCalibratorModule::terminate()
 }
 
 // Energy calibration
-double ECLDigitCalibratorModule::getCalibratedEnergy(int cellid, int amplitude)
+double ECLDigitCalibratorModule::getCalibratedEnergy(int cellid, int amplitude) const
 {
   //get sign of amplitude (could be negative as result of the fit if we would have implemented that in hardware )
   int sign = 1;
@@ -235,7 +234,7 @@ double ECLDigitCalibratorModule::getCalibratedEnergy(int cellid, int amplitude)
 
 // Time calibration
 // this will eventually depend on the cell id for data - as of release-00-07 it is the same for all crystals.
-double ECLDigitCalibratorModule::getCalibratedTime(const int cellid, const int fittedtime, const bool fitfailed)
+double ECLDigitCalibratorModule::getCalibratedTime(const int cellid, const int fittedtime, const bool fitfailed) const
 {
 
   double caltime = c_timeForFitFailed; // Set the time to zero ("trigger time") in case the waveform fit failed
@@ -250,7 +249,7 @@ double ECLDigitCalibratorModule::getCalibratedTime(const int cellid, const int f
 }
 
 // Time resolution calibration
-double ECLDigitCalibratorModule::getCalibratedTimeResolution(const int cellid, const double energy, const bool fitfailed)
+double ECLDigitCalibratorModule::getCalibratedTimeResolution(const int cellid, const double energy, const bool fitfailed) const
 {
 
   // if this digit is calibrated to the trigger time, we set the resolution to 'very bad'
@@ -267,11 +266,14 @@ double ECLDigitCalibratorModule::getCalibratedTimeResolution(const int cellid, c
 
   double timeresolution = getInterpolatedTimeResolution(x, bin);
 
+  B2DEBUG(175, "ECLDigitCalibratorModule::getCalibratedTimeResolution: cellid = " << cellid << ", timeresolution = " <<
+          timeresolution);
+
   return timeresolution;
 }
 
 // time resolution interpolation
-double ECLDigitCalibratorModule::getInterpolatedTimeResolution(const double x, const int bin)
+double ECLDigitCalibratorModule::getInterpolatedTimeResolution(const double x, const int bin) const
 {
   double interpolation = m_timeResolutionPointResolution[bin] +
                          (m_timeResolutionPointResolution[bin + 1] - m_timeResolutionPointResolution[bin]) *

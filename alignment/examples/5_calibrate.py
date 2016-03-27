@@ -24,20 +24,22 @@ geom.initialize()
 
 algo = Belle2.MillepedeAlgorithm()
 algo.steering().command('method diagonalization 1 0.1')
-algo.steering().command('entries 100')
-algo.steering().command('hugecut 1000')
-algo.steering().command('chiscut 30. 6.')
+# algo.steering().command('entries 100')
+algo.steering().command('hugecut 100000')
+algo.steering().command('chiscut 3000. 600.')
 algo.steering().command('outlierdownweighting 3')
 algo.steering().command('dwfractioncut 0.1')
 
 algo.steering().command('Parameters')
 for vxdid in Belle2.VXD.GeoCache.getInstance().getListOfSensors():
-    if vxdid.getLayerNumber() == 1 and vxdid.getLadderNumber() == 1 and vxdid.getSensorNumber() == 1:
-        label = Belle2.GlobalLabel(vxdid, 0)
-        for ipar in range(1, 7):
-            par_label = label.label() + 1
-            cmd = str(par_label) + ' 0.0 -1.'
-            algo.steering().command(cmd)
+    # Fix 6th SVD layer
+    if vxdid.getLayerNumber() != 6:
+        continue
+    label = Belle2.GlobalLabel(vxdid, 0)
+    for ipar in range(1, 7):
+        par_label = label.label() + ipar
+        cmd = str(par_label) + ' 0.0 -1.'
+        algo.steering().command(cmd)
 
 """
 algo.steering().command('fortranfiles')
@@ -172,7 +174,8 @@ interactive.embed()
 
 diagfile = ROOT.TFile('MillepedeJobDiagnostics.root', 'recreate')
 diagfile.cd()
-vxd.Write('values')
+if vxd:
+    vxd.Write('values')
 corrections.Write('corrections')
 errors.Write('errors')
 eigenweights.Write('eigenweights')

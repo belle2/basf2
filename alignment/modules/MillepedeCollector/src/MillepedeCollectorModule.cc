@@ -27,6 +27,8 @@
 #include <mdst/dataobjects/Track.h>
 #include <genfit/Track.h>
 
+#include <alignment/GlobalLabel.h>
+
 #include <TMath.h>
 
 using namespace Belle2;
@@ -53,6 +55,8 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
            "Name of particle list of (mother) particles with daughters for calibration using vertex + IP profile constraint",
            vector<string>());
   addParam("doublePrecision", m_doublePrecision, "Use double (=true) or single/float (=false) precision for writing binary files",
+           bool(false));
+  addParam("calibrateVertex", m_calibrateVertex, "For primary vertices, beam spot calibration derivatives are added",
            bool(false));
 }
 
@@ -189,38 +193,48 @@ void MillepedeCollectorModule::collect()
       auto mother = list->getParticle(iParticle);
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
-      for (auto track : getParticlesTracks(mother->getDaughters()))
+      TMatrixD extProjection(3, 5);
+
+      bool first(true);
+      for (auto track : getParticlesTracks(mother->getDaughters())) {
+        if (first) {
+          // For first trajectory only
+          extProjection = getLocalToGlobalTransform(track->getFittedState()).GetSub(0, 2, 0, 4);
+          first = false;
+        }
         daughters.push_back({
-        gbl->collectGblPoints(track, track->getCardinalRep()),
-        getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2)
-      });
+          gbl->collectGblPoints(track, track->getCardinalRep()),
+          getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2)
+        });
+      }
 
       if (daughters.size() > 1) {
-        TMatrixD extDerivatives(3, 3);
-        TVectorD extMeasurements(3);
-        TVectorD extPrecisions(3);
-
-        extDerivatives.UnitMatrix();
-
         DBObjPtr<BeamParameters> beam;
+
+        TMatrixDSym vertexPrec(beam->getCovVertex().Invert());
         TVector3 vertexResidual = mother->getVertex() - beam->getVertex();
 
-
-        TMatrixDSym vertexCov(beam->getCovVertex());
-        TMatrixDSymEigen vertexPrec(vertexCov.Invert());
-        extPrecisions = vertexPrec.GetEigenValues();
-
-        TMatrixD transformation = vertexPrec.GetEigenVectors();
-        transformation.T();
-
-        extDerivatives = transformation * extDerivatives;
-        vertexResidual = transformation * vertexResidual;
-
+        TVectorD extMeasurements(3);
         extMeasurements[0] = vertexResidual[0];
         extMeasurements[1] = vertexResidual[1];
         extMeasurements[2] = vertexResidual[2];
 
-        gbl::GblTrajectory combined(daughters, extDerivatives, extMeasurements, extPrecisions);
+        // Attach the external measurement to first point of first trajectory
+        daughters[0].first[0].addMeasurement(extProjection, extMeasurements, vertexPrec);
+
+        if (m_calibrateVertex) {
+          TMatrixD globals(3, 3);
+          globals.UnitMatrix();
+          std::vector<int> labels;
+          labels.push_back(GlobalLabel(BeamID(), BeamID::vertexX).label());
+          labels.push_back(GlobalLabel(BeamID(), BeamID::vertexY).label());
+          labels.push_back(GlobalLabel(BeamID(), BeamID::vertexZ).label());
+
+          // Add derivatives for vertex calibration to first point of first trajectory
+          daughters[0].first[0].addGlobals(labels, globals);
+        }
+
+        gbl::GblTrajectory combined(daughters);
 
         double chi2 = -1.;
         double lostWeight = -1.;
@@ -385,4 +399,64 @@ TMatrixD MillepedeCollectorModule::getGlobalToLocalTransform(genfit::MeasuredSta
   return J_Mp_6x5;
 }
 
+TMatrixD MillepedeCollectorModule::getLocalToGlobalTransform(genfit::MeasuredStateOnPlane msop)
+{
+  auto state = msop;
+  // get vectors and aux variables
+  const TVector3& U(state.getPlane()->getU());
+  const TVector3& V(state.getPlane()->getV());
+  const TVector3& W(state.getPlane()->getNormal());
 
+  const TVectorD& state5(state.getState());
+  double spu = 1.;
+
+  const TVectorD& auxInfo = state.getAuxInfo();
+  if (auxInfo.GetNrows() == 2
+      || auxInfo.GetNrows() == 1) // backwards compatibility with old RKTrackRep
+    spu = state.getAuxInfo()(0);
+
+  TVectorD pTilde(3);
+  pTilde[0] = spu * (W.X() + state5(1) * U.X() + state5(2) * V.X()); // a_x
+  pTilde[1] = spu * (W.Y() + state5(1) * U.Y() + state5(2) * V.Y()); // a_y
+  pTilde[2] = spu * (W.Z() + state5(1) * U.Z() + state5(2) * V.Z()); // a_z
+
+  const double pTildeMag = sqrt(pTilde[0] * pTilde[0] + pTilde[1] * pTilde[1] + pTilde[2] * pTilde[2]);
+  const double pTildeMag2 = pTildeMag * pTildeMag;
+
+  const double utpTildeOverpTildeMag2 = (U.X() * pTilde[0] + U.Y() * pTilde[1] + U.Z() * pTilde[2]) / pTildeMag2;
+  const double vtpTildeOverpTildeMag2 = (V.X() * pTilde[0] + V.Y() * pTilde[1] + V.Z() * pTilde[2]) / pTildeMag2;
+
+  //J_pM matrix is d(x,y,z,px,py,pz) / d(q/p,u',v',u,v)       (out is 6x6)
+
+  const double qop = state5(0);
+  const double p = state.getCharge() / qop; // momentum
+
+  TMatrixD J_pM_5x6(5, 6);
+  J_pM_5x6.Zero();
+
+  // d(px,py,pz)/d(q/p)
+  double fact = -1. * p / (pTildeMag * qop);
+  J_pM_5x6(0, 3) = fact * pTilde[0]; // [0][3]
+  J_pM_5x6(0, 4) = fact * pTilde[1]; // [0][4]
+  J_pM_5x6(0, 5) = fact * pTilde[2]; // [0][5]
+  // d(px,py,pz)/d(u')
+  fact = p * spu / pTildeMag;
+  J_pM_5x6(1, 3)  = fact * (U.X() - pTilde[0] * utpTildeOverpTildeMag2); // [1][3]
+  J_pM_5x6(1, 4) = fact * (U.Y() - pTilde[1] * utpTildeOverpTildeMag2); // [1][4]
+  J_pM_5x6(1, 5) = fact * (U.Z() - pTilde[2] * utpTildeOverpTildeMag2); // [1][5]
+  // d(px,py,pz)/d(v')
+  J_pM_5x6(2, 3) = fact * (V.X() - pTilde[0] * vtpTildeOverpTildeMag2); // [2][3]
+  J_pM_5x6(2, 4) = fact * (V.Y() - pTilde[1] * vtpTildeOverpTildeMag2); // [2][4]
+  J_pM_5x6(2, 5) = fact * (V.Z() - pTilde[2] * vtpTildeOverpTildeMag2); // [2][5]
+  // d(x,y,z)/d(u)
+  J_pM_5x6(3, 0) = U.X(); // [3][0]
+  J_pM_5x6(3, 1) = U.Y(); // [3][1]
+  J_pM_5x6(3, 2) = U.Z(); // [3][2]
+  // d(x,y,z)/d(v)
+  J_pM_5x6(4, 0) = V.X(); // [4][0]
+  J_pM_5x6(4, 1) = V.Y(); // [4][1]
+  J_pM_5x6(4, 2) = V.Z(); // [4][2]
+
+  return J_pM_5x6;
+
+}

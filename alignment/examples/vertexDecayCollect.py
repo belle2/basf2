@@ -11,13 +11,15 @@ main.add_module("RootInput", excludeBranchNames=['GF2Tracks', 'TrackCandsToGF2Tr
 main.add_module('Gearbox')
 main.add_module('Geometry')
 
+from beamparameters import add_beamparameters
+# add_beamparameters(main, "Y4S", None, vertex=[0.01, 0.001, 0.01])
+
 # vertices = ['J/psi:real', 'K_S0:real', 'Lambda0:real']
 primary_vertices = ['Z0:mumu']
-
 main.add_module('UpdateParticleTrackCand', motherListNames=primary_vertices, removeBKLM=True, removeCDC=True)
 main.add_module('SetupGenfitExtrapolation', whichGeometry='TGeo', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
-main.add_module('GBLfit', UseClusters=True, addDummyVertexPoint=True, externalIterations=0, StoreFailedTracks=True)
-main.add_module('MillepedeCollector', tracks=[], primaryVertices=primary_vertices)
+main.add_module('GBLfit', UseClusters=True, addDummyVertexPoint=True, externalIterations=0, StoreFailedTracks=True, PDGCodes=[13])
+main.add_module('MillepedeCollector', tracks=[], primaryVertices=primary_vertices, calibrateVertex=True)
 # main.add_module('GBLdiagnostics')
 main.add_module("RootOutput", branchNames=['EventMetaData'])
 

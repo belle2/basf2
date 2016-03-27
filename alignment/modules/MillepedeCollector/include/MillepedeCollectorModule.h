@@ -51,6 +51,9 @@ namespace Belle2 {
     /** Compute the transformation matrix d(q/p,u',v',u,v)/d(x,y,z,px,py,pz) from state at first track point (vertex) */
     TMatrixD getGlobalToLocalTransform(genfit::MeasuredStateOnPlane msop);
 
+    /** Compute the transformation matrix d(x,y,z,px,py,pz)/d(q/p,u',v',u,v) from state at first track point (vertex) */
+    TMatrixD getLocalToGlobalTransform(genfit::MeasuredStateOnPlane msop);
+
   private:
     /** Names of arrays with single genfit::Tracks fitted by GBL */
     std::vector<std::string> m_tracks;
@@ -62,6 +65,8 @@ namespace Belle2 {
     std::vector<std::string> m_primaryVertices;
     /** Use double (instead of single/float) precision for binary files */
     bool m_doublePrecision;
+    /** Add derivatives for beam spot calibration for primary vertices */
+    bool m_calibrateVertex;
   };
 }
 

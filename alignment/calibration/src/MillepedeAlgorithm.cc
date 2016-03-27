@@ -8,6 +8,8 @@
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <alignment/GlobalLabel.h>
 
+#include <framework/dbobjects/BeamParameters.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace alignment;
@@ -42,6 +44,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     return c_Failure;
   }
 
+  int nBeamParams = 0;
   int nVXDparams = 0;
   int nCDCparams = 0;
   int nBKLMparams = 0;
@@ -49,10 +52,13 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     if (!m_result.isParameterDetermined(ipar)) continue;
 
     GlobalLabel param(m_result.getParameterLabel(ipar));
+    if (param.isBeam()) ++nBeamParams;
     if (param.isVXD()) ++nVXDparams;
     if (param.isCDC()) ++nCDCparams;
     if (param.isKLM()) ++nBKLMparams;
   }
+  if (!nBeamParams)
+    B2WARNING("No Beam parameters determined");
   if (!nVXDparams)
     B2WARNING("No VXD parameters determined");
   if (!nCDCparams)
@@ -69,6 +75,8 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   auto& runSet = getObject<RunRange>(CalibrationAlgorithm::RUN_RANGE_OBJ_NAME);
   // Objects in DB we are interested in
   std::list<Database::DBQuery> belle2Constants;
+  if (nBeamParams)
+    belle2Constants.push_back(Database::DBQuery("dbstore", "BeamParameters"));
   if (nVXDparams)
     belle2Constants.push_back(Database::DBQuery("dbstore", "VXDAlignment"));
   if (nCDCparams)
@@ -76,6 +84,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   if (nBKLMparams)
     belle2Constants.push_back(Database::DBQuery("dbstore", "BKLMAlignment"));
   // Maps (key is IOV of object in DB)
+  std::map<string, BeamParameters*> previousBeam;
   std::map<string, VXDAlignment*> previousVXD;
   std::map<string, CDCCalibration*> previousCDC;
   std::map<string, BKLMAlignment*> previousBKLM;
@@ -85,6 +94,9 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     auto event1 = EventMetaData(1, exprun.second, exprun.first);
     Database::Instance().getData(event1, belle2Constants);
     for (auto& payload : belle2Constants) {
+      if (auto beam = dynamic_cast<BeamParameters*>(payload.object)) {
+        previousBeam[to_string(payload.iov)] = beam;
+      }
       if (auto vxd = dynamic_cast<VXDAlignment*>(payload.object)) {
         previousVXD[to_string(payload.iov)] = vxd;
       }
@@ -97,9 +109,14 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     }
   }
   // All objects have to be re-created, with new constant values...
+  std::map<string, BeamParameters*> newBeam;
   std::map<string, VXDAlignment*> newVXD;
   std::map<string, CDCCalibration*> newCDC;
   std::map<string, BKLMAlignment*> newBKLM;
+
+  if (nBeamParams)
+    for (auto& beam : previousBeam)
+      newBeam[beam.first] = new BeamParameters(*beam.second);
 
   if (nVXDparams)
     for (auto& vxd : previousVXD)
@@ -112,6 +129,11 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   if (nBKLMparams)
     for (auto& bklm : previousBKLM)
       newBKLM[bklm.first] = new BKLMAlignment(*bklm.second);
+
+  if (newBeam.empty() && nBeamParams) {
+    B2ERROR("No previous BeamParameters found. First update from nominal. Only vertex position is filled!");
+    newBeam.insert({to_string(getIovFromData()), new BeamParameters()});
+  }
 
   if (newVXD.empty() && nVXDparams) {
     B2INFO("No previous VXDAlignment found. First update from nominal.");
@@ -150,6 +172,19 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
       maxCorrectionPullLabel = param.label();
     }
 
+    if (param.isBeam()) {
+      // Add correction to all objects
+      for (auto& beam : newBeam) {
+        auto vertex = beam.second->getVertex();
+
+        if (param.getParameterId() == BeamID::vertexX)(m_invertSign) ? vertex[0] -= correction : vertex[0] += correction;
+        if (param.getParameterId() == BeamID::vertexY)(m_invertSign) ? vertex[1] -= correction : vertex[1] += correction;
+        if (param.getParameterId() == BeamID::vertexZ)(m_invertSign) ? vertex[2] -= correction : vertex[2] += correction;
+
+        beam.second->setVertex(vertex);
+      }
+    }
+
     if (param.isVXD()) {
       // Add correction to all objects
       for (auto& vxd : newVXD) {
@@ -173,6 +208,8 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   }
 
   // Save (possibly updated) objects
+  for (auto& beam : newBeam)
+    saveCalibration(beam.second, "BeamParameters", to_IOV(beam.first).overlap(getIovFromData()));
   for (auto& vxd : newVXD)
     saveCalibration(vxd.second, "VXDAlignment", to_IOV(vxd.first).overlap(getIovFromData()));
   for (auto& cdc : newCDC)

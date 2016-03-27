@@ -50,13 +50,33 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True):
     # ECL calibration and reconstruction
     if components is None or 'ECL' in components:
 
-        # digit calibration
+        # ECL digit calibration
         ecl_digit_calibration = register_module('ECLDigitCalibrator')
         path.add_module(ecl_digit_calibration)
 
-        # shower reconstruction
-        ecl_shower_rec = register_module('ECLReconstructor')
-        path.add_module(ecl_shower_rec)
+        # ECL CR finder and splitter (refactored old version - two steps at once)
+        ecl_finderandsplitter = register_module('ECLCRFinderAndSplitter')
+        path.add_module(ecl_finderandsplitter)
+
+        # ECL Shower Correction
+        ecl_showercorrection = register_module('ECLShowerCorrector')
+        path.add_module(ecl_showercorrection)
+
+        # ECL Shower Calibration
+        ecl_showercalibration = register_module('ECLShowerCalibrator')
+        path.add_module(ecl_showercalibration)
+
+        # ECL Shower Shape
+        ecl_showershape = register_module('ECLShowerShape')
+        path.add_module(ecl_showershape)
+
+        # ECL covariance matrix
+        ecl_covariance = register_module('ECLCovarianceMatrix')
+        path.add_module(ecl_covariance)
+
+        # ECL finalize
+        ecl_finalize = register_module('ECLFinalizer')
+        path.add_module(ecl_finalize)
 
         # track shower matching
         ecl_track_match = register_module('ECLTrackShowerMatch')

@@ -42,13 +42,17 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
   int j;
   int gnpe;
   double t, s;
-  EKLM::FiberAndElectronics fe(&m_digPar);
+  EKLM::FiberAndElectronics fe(&m_digPar, NULL);
   TH1F* h = NULL;
   t = m_digPar.nDigitizations * m_digPar.ADCSamplingTime;
   try {
     h = new TH1F(name, "", m_digPar.nDigitizations, 0, t);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
+  }
+  for (j = 0; j < m_digPar.nDigitizations; j++) {
+    m_hDir[j] = 0;
+    m_hRef[j] = 0;
   }
   fe.fillSiPMOutput(l, d, npe, 0, false, m_hDir, &gnpe);
   fe.fillSiPMOutput(l, d, npe, 0, true, m_hRef, &gnpe);
@@ -71,11 +75,15 @@ void EKLMADCModule::initialize()
   m_digPar.debug = false;
   try {
     m_fout = new TFile(m_out.c_str(), "recreate");
-    m_hDir = new float[m_digPar.nDigitizations];
-    m_hRef = new float[m_digPar.nDigitizations];
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
+  m_hDir = (float*)malloc(m_digPar.nDigitizations * sizeof(float));
+  if (m_hDir == NULL)
+    B2FATAL(MemErr);
+  m_hRef = (float*)malloc(m_digPar.nDigitizations * sizeof(float));
+  if (m_hRef == NULL)
+    B2FATAL(MemErr);
   if (m_mode.compare("Strips") == 0) {
     for (i = 1; i <= geoDat->getNStrips(); i++) {
       l = geoDat->getStripLength(i) / CLHEP::mm * Unit::mm;
@@ -89,8 +97,8 @@ void EKLMADCModule::initialize()
     generateHistogram("FitShape", 0, 0, 1000000);
   } else
     B2FATAL("Unknown operation mode.");
-  delete m_hDir;
-  delete m_hRef;
+  free(m_hDir);
+  free(m_hRef);
   m_fout->Close();
   delete m_fout;
 }

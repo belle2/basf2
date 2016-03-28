@@ -35,11 +35,6 @@ namespace Belle2 {
       };
 
       /**
-       * Constructor (only to fill external ADC histograms).
-       */
-      FiberAndElectronics(struct EKLM::DigitizationParams* digPar);
-
-      /**
        * Constructor.
        */
       FiberAndElectronics(struct EKLM::DigitizationParams* digPar,

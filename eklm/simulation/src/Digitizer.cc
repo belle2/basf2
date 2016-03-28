@@ -207,37 +207,32 @@ void EKLM::Digitizer::makeSim2Hits()
  */
 void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
 {
-  EKLM::FiberAndElectronics* fes = NULL;
+  EKLM::FiberAndElectronics fes(m_digPar, &m_fitter);
   std::multimap<int, EKLMSimHit*>::iterator it, ub;
   for (it = m_simHitVolumeMap.begin(); it != m_simHitVolumeMap.end();
        it = m_simHitVolumeMap.upper_bound(it->first)) {
     ub = m_simHitVolumeMap.upper_bound(it->first);
-    try {
-      fes = new FiberAndElectronics(it, ub, m_digPar, &m_fitter);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-    fes->processEntry();
+    fes.setHitRange(it, ub);
+    fes.processEntry();
     EKLMSimHit* simHit = it->second;
     EKLMDigit* stripHit = m_stripHitsArray.appendNew(simHit);
     stripHit->setMCTime(simHit->getTime());
-    stripHit->setSiPMMCTime(fes->getMCTime());
+    stripHit->setSiPMMCTime(fes.getMCTime());
     stripHit->setPosition(simHit->getPosition());
-    stripHit->setGeneratedNPE(fes->getGeneratedNPE());
+    stripHit->setGeneratedNPE(fes.getGeneratedNPE());
     stripHit->addRelationTo(simHit);
-    if (!fes->getFitStatus()) {
-      stripHit->setTime(fes->getFitResults()->startTime);
-      stripHit->setNPE(fes->getNPE());
+    if (!fes.getFitStatus()) {
+      stripHit->setTime(fes.getFitResults()->startTime);
+      stripHit->setNPE(fes.getNPE());
     } else {
       stripHit->setTime(0.);
       stripHit->setNPE(0);
     }
-    stripHit->setFitStatus(fes->getFitStatus());
+    stripHit->setFitStatus(fes.getFitStatus());
     if (stripHit->getNPE() > threshold)
       stripHit->isGood(true);
     else
       stripHit->isGood(false);
-    delete fes;
     /* cppcheck-suppress memleak */
   }
 }

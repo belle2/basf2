@@ -43,8 +43,6 @@ void EKLM::FiberAndElectronics::reallocPhotoElectronBuffers(int size)
 }
 
 EKLM::FiberAndElectronics::FiberAndElectronics(
-  std::multimap<int, EKLMSimHit*>::iterator& it,
-  std::multimap<int, EKLMSimHit*>::iterator& end,
   struct EKLM::DigitizationParams* digPar,
   FPGAFitter* fitter)
 {
@@ -52,36 +50,31 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   double time, attenuationTime;
   m_DigPar = digPar;
   m_fitter = fitter;
-  m_hit = it;
-  m_hitEnd = end;
   m_npe = 0;
-  m_stripName = "Strip" + boost::lexical_cast<std::string>(it->first);
   m_histRange = m_DigPar->nDigitizations * m_DigPar->ADCSamplingTime;
   m_FPGAParams = {0, 0, 0};
   /* Amplitude arrays. */
-  m_amplitudeDirect = (float*)calloc(m_DigPar->nDigitizations, sizeof(float));
+  m_amplitudeDirect = (float*)malloc(m_DigPar->nDigitizations * sizeof(float));
   if (m_amplitudeDirect == NULL)
     B2FATAL(MemErr);
-  m_amplitudeReflected = (float*)calloc(m_DigPar->nDigitizations,
+  m_amplitudeReflected = (float*)malloc(m_DigPar->nDigitizations *
                                         sizeof(float));
   if (m_amplitudeReflected == NULL)
     B2FATAL(MemErr);
-  m_amplitude = (float*)calloc(m_DigPar->nDigitizations, sizeof(float));
+  m_amplitude = (float*)malloc(m_DigPar->nDigitizations * sizeof(float));
   if (m_amplitude == NULL)
     B2FATAL(MemErr);
-  m_ADCAmplitude = (int*)calloc(m_DigPar->nDigitizations, sizeof(int));
+  m_ADCAmplitude = (int*)malloc(m_DigPar->nDigitizations * sizeof(int));
   if (m_ADCAmplitude == NULL)
     B2FATAL(MemErr);
-  try {
-    m_SignalTimeDependence = new double[m_DigPar->nDigitizations + 1];
-  } catch (std::bad_alloc& ba) {
+  m_SignalTimeDependence = (double*)malloc((m_DigPar->nDigitizations + 1) *
+                                           sizeof(double));
+  if (m_SignalTimeDependence == NULL)
     B2FATAL(MemErr);
-  }
-  try {
-    m_SignalTimeDependenceDiff = new double[m_DigPar->nDigitizations];
-  } catch (std::bad_alloc& ba) {
+  m_SignalTimeDependenceDiff = (double*)malloc(m_DigPar->nDigitizations *
+                                               sizeof(double));
+  if (m_SignalTimeDependenceDiff == NULL)
     B2FATAL(MemErr);
-  }
   attenuationTime = 1.0 / m_DigPar->PEAttenuationFreq;
   for (i = 0; i <= m_DigPar->nDigitizations; i++) {
     time = digPar->ADCSamplingTime * i;
@@ -105,9 +98,18 @@ EKLM::FiberAndElectronics::~FiberAndElectronics()
   free(m_amplitudeReflected);
   free(m_amplitude);
   free(m_ADCAmplitude);
-  delete[] m_SignalTimeDependence;
-  delete[] m_SignalTimeDependenceDiff;
+  free(m_SignalTimeDependence);
+  free(m_SignalTimeDependenceDiff);
   reallocPhotoElectronBuffers(0);
+}
+
+void EKLM::FiberAndElectronics::setHitRange(
+  std::multimap<int, EKLMSimHit*>::iterator& it,
+  std::multimap<int, EKLMSimHit*>::iterator& end)
+{
+  m_hit = it;
+  m_hitEnd = end;
+  m_stripName = "Strip" + boost::lexical_cast<std::string>(it->first);
 }
 
 void EKLM::FiberAndElectronics::processEntry()

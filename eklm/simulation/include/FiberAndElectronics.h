@@ -42,9 +42,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      FiberAndElectronics(std::multimap<int, EKLMSimHit*>::iterator& it,
-                          std::multimap<int, EKLMSimHit*>::iterator& end,
-                          struct EKLM::DigitizationParams* digPar,
+      FiberAndElectronics(struct EKLM::DigitizationParams* digPar,
                           FPGAFitter* fitter);
 
       /**
@@ -77,6 +75,14 @@ namespace Belle2 {
        * Get generated number of photoelectrons.
        */
       int getGeneratedNPE();
+
+      /**
+       * Set hit range.
+       * @param[in] it  First hit in this strip.
+       * @param[in] end End of hit range.
+       */
+      void setHitRange(std::multimap<int, EKLMSimHit*>::iterator& it,
+                       std::multimap<int, EKLMSimHit*>::iterator& end);
 
       /**
        * Fill SiPM output.

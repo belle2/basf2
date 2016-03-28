@@ -397,7 +397,8 @@ void GBLfitModule::event()
       m_pdgCodes.push_back(aTrackCandPointer->getPdgCode());
       B2DEBUG(100, "PDG code from track candidate will be used and it is: " << aTrackCandPointer->getPdgCode());
       if (m_pdgCodes[0] == 0) {
-        B2FATAL("The current genfit::TrackCand has no valid PDG code (it is 0) AND you did not set any valid PDG Code in Genfit2Module module to use instead");
+        B2WARNING("The current genfit::TrackCand has no valid PDG code (it is 0) AND you did not set any valid PDG Code in Genfit2Module module to use instead. Skipping TrackCand.");
+        continue;
       }
     }
 

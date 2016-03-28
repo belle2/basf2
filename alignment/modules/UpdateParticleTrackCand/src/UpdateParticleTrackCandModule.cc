@@ -79,6 +79,7 @@ void UpdateParticleTrackCandModule::event()
         TVector3 vertexPos = particle->getVertex();
         TVector3 vertexMom = particle->getMomentum();
         trackCand->setPosMomSeed(vertexPos, vertexMom, particle->getCharge());
+        trackCand->setPdgCode(particle->getPDGCode());
       }
     }
   }

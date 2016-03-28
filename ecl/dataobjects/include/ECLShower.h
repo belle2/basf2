@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Poyuan Chen                                              *
+ *               Guglielmo De Nardo (denardo@na.infn.it)                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -50,6 +51,8 @@ namespace Belle2 {
       m_HighestEnergy = 0.0; /**< Highest energy in Shower (TF) */
       m_lateralEnergy = 0.0; /**< Lateral Energy  */
       m_minTrkDistance = 0.0; /**< Distance between shower and closest track  */
+      m_trkDepth = 0.0; /**< path on track extrapolation to POCA to average cluster direction   */
+      m_showerDepth = 0.0; /**< same as above, but on the cluster average direction*/
       m_isTrk = false; /**< Match with track  */
     }
 
@@ -114,7 +117,10 @@ namespace Belle2 {
     /*! Set Match with Track
      */
     void setIsTrack(bool val) { m_isTrk = val; }
-
+    /*! set path on track extrapolation line to POCA to average cluster direction */
+    void setTrkDepth(float trkDepth) { m_trkDepth = trkDepth; }
+    /*! set path on the average cluster direction */
+    void setShowerDepth(float showerDepth) { m_showerDepth = showerDepth; }
 
     /*! Get Shower Id
      * @return Shower Id
@@ -212,6 +218,14 @@ namespace Belle2 {
      * @return flag for track Matching
      */
     bool getIsTrack() const { return m_isTrk; }
+    /*! path on track extrapolation to POCA to average cluster direction
+     * @return path lenght in cm
+     */
+    float getTrkDepth() const { return m_trkDepth; }
+    /*! path on track extrapolation to POCA to average cluster direction
+     * @return path lenght in cm starting from cluster center
+     */
+    float getShowerDepth() const { return m_showerDepth; }
 
     //! The method to get return  TVector3 Momentum
     TVector3 getMomentum() const
@@ -222,9 +236,6 @@ namespace Belle2 {
                m_Energy * cos(m_Theta)
              );
     }
-
-
-
 
   private:
     int m_ShowerId;        /**< Shower ID */
@@ -247,7 +258,9 @@ namespace Belle2 {
     float m_HighestEnergy;  /**< Highest Energy in Shower (GeV) (TF) */
     float m_lateralEnergy; /**< Lateral Energy in Shower  (GDN) */
     float m_minTrkDistance;/**< Distance to closest Track  (GDN) */
-    bool m_isTrk;          /**< Match with track (GDN) */
+    bool m_isTrk; /**< Match with track (GDN) */
+    float m_trkDepth;
+    float m_showerDepth;
     // 2: added uniqueID and highestE (TF)
     // 3: added LAT and distance to closest track and trk match flag (GDN)
     ClassDef(ECLShower, 3);/**< ClassDef */

@@ -1,30 +1,27 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- * Contributors: Guglielmo De Nardo                                       *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Contributors: Guglielmo De Nardo (denardo@na.infn.it)                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <ecl/modules/eclTrackShowerMatch/ECLTrackShowerMatchModule.h>
 #include <ecl/dataobjects/ECLHitAssignment.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <framework/gearbox/Const.h>
-
 #include <framework/logging/Logger.h>
-
 #include <set>
 
 using namespace std;
 using namespace Belle2;
 using namespace ECL;
 
-//this line registers the module with the framework and actually makes it available
-//in steering files or the the module list (basf2 -m).
-//Note that the 'Module' part of the class name is missing, this is also the way it
-//will be called in the module list.
 REG_MODULE(ECLTrackShowerMatch)
 
 ECLTrackShowerMatchModule::ECLTrackShowerMatchModule() : Module()
@@ -61,9 +58,14 @@ void ECLTrackShowerMatchModule::event()
   const int pdgCodePiPlus = Const::pion.getPDGCode();
   const int pdgCodePiMinus = -1 * Const::pion.getPDGCode();
   ECLGeometryPar* geometry = ECLGeometryPar::Instance();
+
   for (const Track& track : tracks) {
     set<int> clid;
-    B2DEBUG(150, "*** TRACK ****");
+
+    // Find extrapolated track hits in the ECL, considering
+    // only hit points where the track enters the crystal
+    // note that more than on crystal belonging to more than one shower
+    // can be found
     for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
       if (extHit.getPdgCode() != pdgCodePiPlus && extHit.getPdgCode() != pdgCodePiMinus) continue;
       if ((extHit.getDetectorID() != myDetID) || (extHit.getCopyID() == 0)) continue;
@@ -79,20 +81,10 @@ void ECLTrackShowerMatchModule::event()
       if (iHA != eclHitAssignments.end()) {
         showerid = iHA->getShowerId();
         clid.insert(showerid);
-
-        B2DEBUG(150, "******** EXT HIT ********");
-        B2DEBUG(150, "Status: " << extHit.getStatus());
-        B2DEBUG(150, "cellid: " << cell);
-        B2DEBUG(150, "ctheta  :" << cpos.Theta());
-        B2DEBUG(150, "trktheta:" << trkpos.Theta());
-        B2DEBUG(150, "cphi  :" << cpos.Phi());
-        B2DEBUG(150, "trkphi:" << trkpos.Phi());
-        B2DEBUG(150, "showid: " << showerid);
-        B2DEBUG(150, "tof   : " << extHit.getTOF());
       }
     } // end loop on ExtHit
 
-
+    // Make a track --> shower relation for every shower that has a digit been hit.
     for (const auto& id : clid) {
       const auto ish = find_if(eclRecShowers.begin(), eclRecShowers.end(),
       [&](const ECLShower & element) { return element.getShowerId() == id; }
@@ -101,7 +93,6 @@ void ECLTrackShowerMatchModule::event()
         ish->setIsTrack(true);
         const ECLShower* shower = &(*ish);
         track.addRelationTo(shower);
-
         ECLCluster* cluster = shower->getRelatedFrom<ECLCluster>();
         if (cluster != nullptr) {
           cluster->setisTrack(true);
@@ -109,15 +100,25 @@ void ECLTrackShowerMatchModule::event()
         }
       }
     } // end loop on shower id
-
-    B2DEBUG(150, "************************");
   } // end loop on Tracks
 
   for (auto& shower : eclRecShowers) {
+    // compute the distance from shower COG and the closest extrapolated track
     double dist = computeTrkMinDistance(shower, tracks);
     shower.setMinTrkDistance(float(dist));
-  }
 
+    // compute path lenghts on the energy weighted average crystals direction
+    // and on the extrapolated track direction corresponding to the minimum
+    // distance among the two lines.
+    // if more than one track is related to a shower the one with highest momentum is used
+    double lTrk, lShower;
+    if (shower.getIsTrack()) {
+      computeDepth(shower, lTrk, lShower);
+      B2DEBUG(150, "shower depth: ltrk = " << lTrk << " lShower = " << lShower);
+      shower.setTrkDepth(lTrk);
+      shower.setShowerDepth(lShower);
+    }
+  }
 }
 
 void ECLTrackShowerMatchModule::endRun()
@@ -131,8 +132,9 @@ void ECLTrackShowerMatchModule::terminate()
 double ECLTrackShowerMatchModule::computeTrkMinDistance(const ECLShower& shower, StoreArray<Track>& tracks) const
 {
   double minDist(10000);
-  TVector3 cryFaceCenter;
-  cryFaceCenter.SetMagThetaPhi(shower.getR(), shower.getTheta(), shower.getPhi());
+  TVector3 cryCenter;
+  cryCenter.SetMagThetaPhi(shower.getR(), shower.getTheta(), shower.getPhi());
+
   for (const auto& track : tracks) {
     TVector3 trkpos(0, 0, 0);
     bool found(false);
@@ -145,9 +147,57 @@ double ECLTrackShowerMatchModule::computeTrkMinDistance(const ECLShower& shower,
       break;
     }
     if (! found) continue;
-    double distance = (cryFaceCenter - trkpos).Mag();
+    double distance = (cryCenter - trkpos).Mag();
     if (distance < minDist) minDist = distance;
   }
   if (minDist > 9999) minDist = -1;
   return minDist;
 }
+
+void ECLTrackShowerMatchModule::computeDepth(const ECLShower& shower, double& lTrk, double& lShower) const
+{
+  ECLGeometryPar* geometry = ECLGeometryPar::Instance();
+  TVector3 avgDir(0, 0, 0), showerCenter, trkpos, trkdir;
+  showerCenter.SetMagThetaPhi(shower.getR(), shower.getTheta(), shower.getPhi());
+
+  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
+  for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
+    const auto aECLCalDigit = relatedDigitsPairs.object(iRel);
+    const auto weight = relatedDigitsPairs.weight(iRel);
+    double energy = weight * aECLCalDigit->getEnergy();
+    int cellid = aECLCalDigit->getCellId();
+    TVector3 cvec   = geometry->GetCrystalVec(cellid);
+    avgDir += weight * energy * cvec;
+  }
+  double p = 0;
+  const Track* selectedTrk = nullptr;
+  for (const auto& track : shower.getRelationsFrom<Track>()) {
+    const TrackFitResult* fit = track.getTrackFitResult(Const::pion);
+    double cp = 0;
+    if (fit != 0) cp = fit->getMomentum().Mag();
+    if (cp > p) selectedTrk = & track;
+  }
+  lTrk = 0;
+  lShower = 0;
+  if (selectedTrk == nullptr) return;
+  bool found(false);
+  for (const auto& extHit : selectedTrk->getRelationsTo<ExtHit>()) {
+    if (extHit.getPdgCode() != Const::pion.getPDGCode() && extHit.getPdgCode() != -Const::pion.getPDGCode()) continue;
+    if ((extHit.getDetectorID() !=  Const::EDetector::ECL) || (extHit.getCopyID() == 0)) continue;
+    if (extHit.getStatus() != EXT_ENTER) continue;
+    trkpos = extHit.getPosition();
+    trkdir = extHit.getMomentum().Unit();
+    found = true;
+    break;
+  }
+  if (!found) return;
+  TVector3 w0 = showerCenter - trkpos;
+  double costh = avgDir * trkdir;
+  double sin2th = 1 - costh * costh;
+  lShower = costh * (w0 * trkdir) - w0 * avgDir;
+  lShower /= sin2th;
+
+  lTrk = w0 * trkdir - costh * (w0 * avgDir);
+  lTrk /= sin2th;
+}
+

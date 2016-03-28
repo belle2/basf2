@@ -6,6 +6,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ *               Guglielmo De Nardo (denardo@na.infn.it)                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -121,6 +122,9 @@ void ECLFinalizerModule::event()
 
       // ECLCluster has no "ID"-like structure, abuse the unused "CrystHealth"
       eclCluster->setCrystHealth(eclShower.getUniqueShowerId());
+
+      // set shower shapes variables
+      eclCluster->setLAT(eclShower.getLateralEnergy());
 
       // set relation to ECLShower
       eclCluster->addRelationTo(&eclShower);

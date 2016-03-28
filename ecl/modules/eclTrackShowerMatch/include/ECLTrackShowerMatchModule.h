@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guglielmo De Nardo                                       *
+ * Contributors: Guglielmo De Nardo (denardo@na.infn.it                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -63,6 +63,7 @@ namespace Belle2 {
 
     /** Minimal distance between track and shower. */
     double computeTrkMinDistance(const ECLShower&, StoreArray<Track>&) const;
+    void computeDepth(const ECLShower& shower, double& lTrk, double& lShower) const;
   };
 
 } //Belle2

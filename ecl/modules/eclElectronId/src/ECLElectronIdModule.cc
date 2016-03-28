@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guglielmo De Nardo                                       *
+ * Contributors: Guglielmo De Nardo (denardo@na.infn.it)                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,21 +12,17 @@
 #include <ecl/modules/eclElectronId/ECLElectronIdModule.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
+#include <ecl/electronId/ECLMuonPdf.h>
+#include <ecl/electronId/ECLElectronPdf.h>
+#include <ecl/electronId/ECLPionPdf.h>
 #include <mdst/dataobjects/Track.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
-#include <ecl/electronId/ECLMuonPdf.h>
-#include <ecl/electronId/ECLElectronPdf.h>
-#include <ecl/electronId/ECLPionPdf.h>
+
 using namespace std;
 using namespace Belle2;
 
-
-//this line registers the module with the framework and actually makes it available
-//in steering files or the the module list (basf2 -m).
-//Note that the 'Module' part of the class name is missing, this is also the way it
-//will be called in the module list.
 REG_MODULE(ECLElectronId)
 
 ECLElectronIdModule::ECLElectronIdModule() : Module()
@@ -36,11 +32,9 @@ ECLElectronIdModule::ECLElectronIdModule() : Module()
   for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) m_pdf[i] = 0;
 }
 
-
 ECLElectronIdModule::~ECLElectronIdModule()
 {
 }
-
 
 void ECLElectronIdModule::initialize()
 {
@@ -80,9 +74,8 @@ void ECLElectronIdModule::event()
 
     const double p = fitRes->getMomentum().Mag();
     const double costheta = fitRes->getMomentum().CosTheta();
-    double energy = 0;
-    double maxEnergy = 0;
-    double e9e25 = 0;
+    double energy(0), maxEnergy(0), e9e25(0);
+    double lat(0), dist(0), trkdepth(0), shdepth(0);
     int nCrystals = 0;
     int nClusters = relShowers.size();
 
@@ -92,6 +85,10 @@ void ECLElectronIdModule::event()
       if (shEnergy > maxEnergy) {
         maxEnergy = shEnergy;
         e9e25 = eclShower.getE9oE25();
+        lat = eclShower.getLateralEnergy();
+        dist = eclShower.getMinTrkDistance();
+        trkdepth = eclShower.getTrkDepth();
+        shdepth = eclShower.getShowerDepth();
       }
       nCrystals += int(eclShower.getNHits());
     }
@@ -109,7 +106,8 @@ void ECLElectronIdModule::event()
       else likelihoods[hypo.getIndex()] = m_minLogLike;
     } // end loop on hypo
 
-    const auto eclPidLikelihood = eclPidLikelihoods.appendNew(likelihoods, energy, eop, e9e25, nCrystals, nClusters);
+    const auto eclPidLikelihood = eclPidLikelihoods.appendNew(likelihoods, energy, eop, e9e25, lat, dist, trkdepth, shdepth, nCrystals,
+                                                              nClusters);
     track.addRelationTo(eclPidLikelihood);
 
   } // end loop on tracks

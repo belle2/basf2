@@ -6,6 +6,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ *               Guglielmo De Nardo (denardo@na.infn.it)                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -48,7 +49,6 @@ namespace Belle2 {
 
       /** Shower shape variable: Lateral energy. */
       double computeLateralEnergy(const ECLShower&) const;
-
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/
 

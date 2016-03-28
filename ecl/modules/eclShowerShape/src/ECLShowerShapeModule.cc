@@ -6,6 +6,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ *               Guglielmo De Nardo (denardo@na.infn.it)                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,6 +26,7 @@
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/geometry/ECLGeometryPar.h>
+
 
 using namespace Belle2;
 using namespace ECL;
@@ -53,16 +55,6 @@ ECLShowerShapeModule::~ECLShowerShapeModule()
 
 void ECLShowerShapeModule::initialize()
 {
-  // Register in datastore
-  /*
-  StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
-  StoreArray<ECLShower> eclShowers(eclShowerArrayName());
-  StoreArray<ECLConnectedRegion> eclCRs(eclConnectedRegionArrayName());
-
-  eclCalDigits.registerInDataStore();
-  eclShowers.registerInDataStore();
-  eclCRs.registerInDataStore();
-  */
 }
 
 void ECLShowerShapeModule::beginRun()
@@ -73,17 +65,9 @@ void ECLShowerShapeModule::beginRun()
 
 void ECLShowerShapeModule::event()
 {
-  // input array
   StoreArray<ECLShower> eclShowers(eclShowerArrayName());
-
-  // loop over all ECLShowers
-  for (auto& eclShower : eclShowers) {
-    B2DEBUG(150, "Shower Id: " << eclShower.getShowerId());
-    double lat = computeLateralEnergy(eclShower);
-    eclShower.setLateralEnergy(float(lat));
-    B2DEBUG(150, "lat: " << lat);
-
-  }
+  for (auto& eclShower : eclShowers)
+    eclShower.setLateralEnergy(float(computeLateralEnergy(eclShower)));
 }
 
 void ECLShowerShapeModule::endRun()
@@ -98,12 +82,9 @@ double ECLShowerShapeModule::computeLateralEnergy(const ECLShower& shower) const
 {
 
   auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
-
-  // loop over all <digit, weight> pairs that are related to this shower
-  // EclNbr ecl;
   if (shower.getNHits() < 3) return 0;
 
-  // Find the digis with two digits with the maximum energy
+  // Find the two digits with the maximum energy
   double maxEnergy(0), secondMaxEnergy(0);
   unsigned int iMax(0), iSecondMax(0);
   for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
@@ -113,20 +94,16 @@ double ECLShowerShapeModule::computeLateralEnergy(const ECLShower& shower) const
     if (energy > maxEnergy) {
       maxEnergy = energy;
       iMax = iRel;
-    }
-  }
-  for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
-    const auto aECLCalDigit = relatedDigitsPairs.object(iRel);
-    const auto weight = relatedDigitsPairs.weight(iRel);
-    double energy = weight * aECLCalDigit->getEnergy();
-    if (energy > secondMaxEnergy && iRel != iMax) {
+      secondMaxEnergy = maxEnergy;
+      iSecondMax = iMax;
+    } else if (energy > secondMaxEnergy) {
       secondMaxEnergy = energy;
       iSecondMax = iRel;
     }
   }
   double sumE = 0;
-  TVector3 cryFaceCenter;
-  cryFaceCenter.SetMagThetaPhi(shower.getR(), shower.getTheta(), shower.getPhi());
+  TVector3 cryCenter;
+  cryCenter.SetMagThetaPhi(shower.getR(), shower.getTheta(), shower.getPhi());
 
   for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
     if (iRel != iMax && iRel != iSecondMax) {
@@ -135,7 +112,7 @@ double ECLShowerShapeModule::computeLateralEnergy(const ECLShower& shower) const
       int cId = aECLCalDigit->getCellId();
       ECLGeometryPar* geometry = ECLGeometryPar::Instance();
       TVector3 pos = geometry->GetCrystalPos(cId);
-      TVector3 deltaPos = pos - cryFaceCenter;
+      TVector3 deltaPos = pos - cryCenter;
       double r = deltaPos.Mag();
       double r2 = r * r;
       sumE += weight * aECLCalDigit->getEnergy() * r2;
@@ -144,3 +121,4 @@ double ECLShowerShapeModule::computeLateralEnergy(const ECLShower& shower) const
   const double r0sq = 5.*5. ; // average crystal dimension
   return sumE / (sumE + r0sq * (maxEnergy + secondMaxEnergy));
 }
+

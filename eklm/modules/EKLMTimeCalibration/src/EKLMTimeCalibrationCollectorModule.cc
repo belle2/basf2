@@ -60,7 +60,7 @@ void EKLMTimeCalibrationCollectorModule::prepare()
   StoreArray<EKLMDigit>::required();
   StoreArray<Track>::required();
   StoreArray<ExtHit>::required();
-  m_TransformData = new EKLM::TransformData(true, NULL);
+  m_TransformData = new EKLM::TransformData(true, false);
   t = new TTree("calibration_data", "");
   t->Branch("time", &m_ev.time, "time/F");
   t->Branch("dist", &m_ev.dist, "dist/F");

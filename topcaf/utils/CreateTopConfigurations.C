@@ -92,9 +92,17 @@ void CreateTopConfigurations(void){
     if ( (*i) == ModuleC02Construction ) {
 	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 32;
       	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 29;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 96;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 31;
+    }
+    /*
+    if ( (*i) == ModuleC02Construction ) {
+	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 32;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 29;
       	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 31;
       	ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 28;
     }
+    */
     if ( (*i) == ModuleC03Construction ) {
 	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 42;
       	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 26;
@@ -134,10 +142,12 @@ void CreateTopConfigurations(void){
     if ( (*i) == ModuleC09Construction ) {
 	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 51;
       	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 53;
+//      ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 56;
       	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 99;
       	ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 59;
     }
     if ( (*i) == ModuleC13Construction ) {
+//	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 87;
 	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 83;
       	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 98;
       	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 84;
@@ -146,7 +156,8 @@ void CreateTopConfigurations(void){
     if ( (*i) == ModuleC14Construction ) {
 	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 37;
       	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 55;
-      	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 57;
+//      ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 57;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 21;
       	ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 71;
     }
 

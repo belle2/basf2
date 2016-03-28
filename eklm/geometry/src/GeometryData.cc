@@ -460,8 +460,6 @@ EKLM::GeometryData::GeometryData()
   if (mode < 0 || mode > 1)
     B2FATAL("EKLM started with unknown geometry mode " << mode << ".");
   m_Mode = (enum DetectorMode)mode;
-  /* TODO: read from database but not from EKLMGeometry. */
-  m_DisplacementDataFile = gd.getString("Displacements");
   m_SolenoidZ = gd.getLength("SolenoidZ") * CLHEP::cm;
   m_NEndcaps = gd.getInt("NEndcaps");
   checkEndcap(m_NEndcaps);
@@ -632,16 +630,6 @@ EKLM::GeometryData::~GeometryData()
   freeShieldDetail(&m_ShieldGeometry.DetailB);
   freeShieldDetail(&m_ShieldGeometry.DetailC);
   freeShieldDetail(&m_ShieldGeometry.DetailD);
-}
-
-bool EKLM::GeometryData::displacedGeometry() const
-{
-  return (m_DisplacementDataFile != "");
-}
-
-std::string EKLM::GeometryData::getDisplacementDataFile() const
-{
-  return m_DisplacementDataFile;
 }
 
 double EKLM::GeometryData::getStripLength(int strip) const

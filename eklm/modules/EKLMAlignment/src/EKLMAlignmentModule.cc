@@ -33,7 +33,7 @@ EKLMAlignmentModule::EKLMAlignmentModule() : Module()
   setDescription("Module for generation of EKLM displacement data.");
   addParam("Mode", m_Mode, "Mode ('Zero', 'Random' or 'Limits').",
            std::string("Zero"));
-  addParam("OutputFile", m_OutputFile, "Output file.",
+  addParam("OutputFile", m_OutputFile, "Output file (for mode 'Limits').",
            std::string("EKLMDisplacement.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
   m_GeoDat = NULL;
@@ -45,7 +45,7 @@ EKLMAlignmentModule::~EKLMAlignmentModule()
 
 void EKLMAlignmentModule::generateZeroDisplacement()
 {
-  TFile* f = new TFile(m_OutputFile.c_str(), "recreate");
+  IntervalOfValidity iov(0, 0, -1, -1);
   EKLMAlignment alignment;
   EKLMAlignmentData alignmentData(0., 0., 0.);
   int iEndcap, iLayer, iSector, iPlane, iSegment, segment;
@@ -63,13 +63,12 @@ void EKLMAlignmentModule::generateZeroDisplacement()
       }
     }
   }
-  alignment.Write("EKLMDisplacement");
-  delete f;
+  Database::Instance().storeData("EKLMDisplacement", (TObject*)&alignment, iov);
 }
 
 void EKLMAlignmentModule::generateRandomDisplacement()
 {
-  TFile* f = new TFile(m_OutputFile.c_str(), "recreate");
+  IntervalOfValidity iov(0, 0, -1, -1);
   const double maxDx = 1. * Unit::cm;
   const double minDx = -1. * Unit::cm;
   const double maxDy = 0.2 * Unit::cm;
@@ -100,8 +99,7 @@ void EKLMAlignmentModule::generateRandomDisplacement()
       }
     }
   }
-  alignment.Write("EKLMDisplacement");
-  delete f;
+  Database::Instance().storeData("EKLMDisplacement", (TObject*)&alignment, iov);
 }
 
 void EKLMAlignmentModule::studyAlignmentLimits()

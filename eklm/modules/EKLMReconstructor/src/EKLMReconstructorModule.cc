@@ -67,7 +67,7 @@ void EKLMReconstructorModule::initialize()
   hit2ds.registerInDataStore();
   digits.isRequired();
   hit2ds.registerRelationTo(digits);
-  m_TransformData = new EKLM::TransformData(true, NULL);
+  m_TransformData = new EKLM::TransformData(true, false);
   m_GeoDat = &(EKLM::GeometryData::Instance());
   if (m_GeoDat->getNPlanes() != 2)
     B2FATAL("It is not possible to run EKLM reconstruction with 1 plane.");

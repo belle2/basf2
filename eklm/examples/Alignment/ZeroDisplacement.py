@@ -7,6 +7,10 @@ import os
 import random
 from basf2 import *
 
+# Uncomment to upload the result to central database
+# reset_database()
+# use_central_database("eklm_test", LogLevel.INFO)
+
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.INFO)
 

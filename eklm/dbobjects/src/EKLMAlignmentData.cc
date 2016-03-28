@@ -17,16 +17,16 @@ ClassImp(Belle2::EKLMAlignmentData);
 
 EKLMAlignmentData::EKLMAlignmentData()
 {
-  m_dx = 0;
-  m_dy = 0;
-  m_dalpha = 0;
+  m_Dx = 0;
+  m_Dy = 0;
+  m_Dalpha = 0;
 }
 
 EKLMAlignmentData::EKLMAlignmentData(double dx, double dy, double dalpha)
 {
-  m_dx = dx;
-  m_dy = dy;
-  m_dalpha = dalpha;
+  m_Dx = dx;
+  m_Dy = dy;
+  m_Dalpha = dalpha;
 }
 
 EKLMAlignmentData::~EKLMAlignmentData()
@@ -35,31 +35,31 @@ EKLMAlignmentData::~EKLMAlignmentData()
 
 void EKLMAlignmentData::setDx(double dx)
 {
-  m_dx = dx;
+  m_Dx = dx;
 }
 
 double EKLMAlignmentData::getDx()
 {
-  return m_dx;
+  return m_Dx;
 }
 
 void EKLMAlignmentData::setDy(double dy)
 {
-  m_dy = dy;
+  m_Dy = dy;
 }
 
 double EKLMAlignmentData::getDy()
 {
-  return m_dy;
+  return m_Dy;
 }
 
 void EKLMAlignmentData::setDalpha(double dalpha)
 {
-  m_dalpha = dalpha;
+  m_Dalpha = dalpha;
 }
 
 double EKLMAlignmentData::getDalpha()
 {
-  return m_dalpha;
+  return m_Dalpha;
 }
 

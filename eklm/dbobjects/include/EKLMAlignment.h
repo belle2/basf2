@@ -63,7 +63,7 @@ namespace Belle2 {
   private:
 
     /** Alignment data. */
-    std::map<uint16_t, EKLMAlignmentData> m_data;
+    std::map<uint16_t, EKLMAlignmentData> m_Data;
 
     /** Makes objects storable. */
     ClassDef(Belle2::EKLMAlignment, 1);

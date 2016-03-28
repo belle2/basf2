@@ -42,16 +42,6 @@ namespace Belle2 {
       static const GeometryData& Instance();
 
       /**
-       * Check if displacements are used.
-       */
-      bool displacedGeometry() const;
-
-      /**
-       * Get name of displacement data file.
-       */
-      std::string getDisplacementDataFile() const;
-
-      /**
        * Get strip length.
        * @param[in] strip Strip number.
        */
@@ -169,9 +159,6 @@ namespace Belle2 {
        * Calculate shield geometry data.
        */
       void calculateShieldGeometry();
-
-      /** Displacement data file. */
-      std::string m_DisplacementDataFile;
 
       /** Number of strips with different lengths in one plane. */
       int m_nStripDifferent;

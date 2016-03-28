@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TFile.h>
-
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/AlignmentChecker.h>
@@ -22,16 +19,14 @@
 
 using namespace Belle2;
 
-EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
+EKLM::TransformData::TransformData(bool global, bool useDisplacement)
 {
   int iEndcap, iLayer, iSector, iPlane, iSegment, iStrip, segment;
   int nEndcaps, nLayers, nSectors, nPlanes, nStrips, nSegments, nStripsSegment;
   int nDetectorLayers;
-  EKLMAlignment* alignment;
   EKLMAlignmentData* alignmentData;
   AlignmentChecker alignmentChecker;
   m_GeoDat = &(GeometryData::Instance());
-  TFile* f;
   nEndcaps = m_GeoDat->getNEndcaps();
   nSectors = m_GeoDat->getNSectors();
   nLayers = m_GeoDat->getNLayers();
@@ -86,13 +81,12 @@ EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
     }
   }
   /* Read alignment data from the database and modify transformations. */
-  if (alignmentDataFile != NULL) {
-    f = new TFile(alignmentDataFile);
-    alignment = (EKLMAlignment*)f->Get("EKLMDisplacement");
-    if (alignment == NULL)
-      B2FATAL("Alignment data does not exist in the input file.");
+  if (useDisplacement) {
+    DBObjPtr<EKLMAlignment> alignment("EKLMDisplacement");
+    if (!alignment.isValid())
+      B2FATAL("No EKLM displacement data.");
     if (!alignmentChecker.checkAlignment(&(*alignment)))
-      B2FATAL("EKLM alignment data is incorrect, overlaps exist.");
+      B2FATAL("EKLM displacement data are incorrect, overlaps exist.");
     for (iEndcap = 1; iEndcap <= nEndcaps; iEndcap++) {
       nDetectorLayers = m_GeoDat->getNDetectorLayers(iEndcap);
       for (iLayer = 1; iLayer <= nDetectorLayers; iLayer++) {
@@ -103,7 +97,7 @@ EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
                                                 iPlane, iSegment);
               alignmentData = alignment->getAlignmentData(segment);
               if (alignmentData == NULL)
-                B2FATAL("Incomplete alignment data.");
+                B2FATAL("Incomplete EKLM displacement data.");
               for (iStrip = 1; iStrip <= nStripsSegment; iStrip++) {
                 m_Strip[iEndcap - 1][iLayer - 1][iSector - 1][iPlane - 1]
                 [nStripsSegment * (iSegment - 1) + iStrip - 1] =
@@ -120,7 +114,6 @@ EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
         }
       }
     }
-    delete f;
   }
   if (global)
     transformsToGlobal();

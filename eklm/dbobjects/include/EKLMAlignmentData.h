@@ -74,13 +74,13 @@ namespace Belle2 {
   private:
 
     /** Change of the segment x coordinate (along the strips). */
-    double m_dx;
+    double m_Dx;
 
     /** Change of the segment y coordinate (perpendicular to the strips). */
-    double m_dy;
+    double m_Dy;
 
     /** Additional rotation of the segment. */
-    double m_dalpha;
+    double m_Dalpha;
 
     /** Makes objects storable. */
     ClassDef(Belle2::EKLMAlignmentData, 1);

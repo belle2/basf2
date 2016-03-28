@@ -65,9 +65,9 @@ namespace Belle2 {
                                       maxTIF; /**< max internal id = 1.999.999.999 */
     static const gidTYPE maxLabel   =
       maxGID;  /**< Label and internal id ("gid") are the same numbers (label is signed but 0 and <0 values are invalid to give to Pede)*/
-    static const gidTYPE beamOffset = 0;
-    static const gidTYPE vxdOffset  = 100000;       /**< No offset for VXD (VxdID(0) is dummy) */
-    static const gidTYPE cdcOffset  = 200000;  /**< Offset of 100000 in element ids for CDC. WireID(0) is a real wire */
+    static const gidTYPE beamOffset = 0;       /**< Offset of 0 for BeamParameters */
+    static const gidTYPE vxdOffset  = 100000;  /**< Offset of 100000 for VXD (VxdID(0) is dummy) */
+    static const gidTYPE cdcOffset  = 200000;  /**< Offset of 200000 in element ids for CDC. WireID(0) is a real wire */
     static const gidTYPE klmOffset  = 300000;  /**< Offset of 300000 in element ids for KLM */
     /**
      * @brief Constructor from Pede label

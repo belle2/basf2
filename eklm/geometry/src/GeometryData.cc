@@ -22,8 +22,6 @@
 using namespace Belle2;
 
 static const char c_MemErr[] = "Memory allocation error.";
-static const char c_ModeErr[] =
-  "Requested data are defined only for c_DetectorBackground mode.";
 
 const EKLM::GeometryData& EKLM::GeometryData::Instance()
 {
@@ -36,7 +34,7 @@ const EKLM::GeometryData& EKLM::GeometryData::Instance()
  * @param epos Position data.
  * @param gd   XML data directory.
  */
-static void readPositionData(struct EKLM::ElementPosition* epos, GearDir* gd)
+static void readPositionData(struct EKLMGeometry::ElementPosition* epos, GearDir* gd)
 {
   epos->X = gd->getLength("PositionX") * CLHEP::cm;
   epos->Y = gd->getLength("PositionY") * CLHEP::cm;
@@ -48,7 +46,7 @@ static void readPositionData(struct EKLM::ElementPosition* epos, GearDir* gd)
  * @param epos Position data.
  * @param gd   XML data directory.
  */
-static void readSizeData(struct EKLM::ElementPosition* epos, GearDir* gd)
+static void readSizeData(struct EKLMGeometry::ElementPosition* epos, GearDir* gd)
 {
   epos->InnerR = gd->getLength("InnerR") * CLHEP::cm;
   epos->OuterR = gd->getLength("OuterR") * CLHEP::cm;
@@ -60,8 +58,8 @@ static void readSizeData(struct EKLM::ElementPosition* epos, GearDir* gd)
  * @param ssg Sector support geometry data.
  * @param gd  XML data directory.
  */
-static void readSectorSupportGeometry(struct EKLM::SectorSupportGeometry* ssg,
-                                      GearDir* gd)
+static void readSectorSupportGeometry(
+  struct EKLMGeometry::SectorSupportGeometry* ssg, GearDir* gd)
 {
   ssg->Thickness = gd->getLength("Thickness") * CLHEP::cm;
   ssg->DeltaLY = gd->getLength("DeltaLY") * CLHEP::cm;
@@ -89,8 +87,8 @@ static void readSectorSupportGeometry(struct EKLM::SectorSupportGeometry* ssg,
  * @param sdg Shield layer detail geometry data.
  * @param gd  XML data directory.
  */
-static void readShieldDetailGeometry(struct EKLM::ShieldDetailGeometry* sdg,
-                                     GearDir* gd)
+static void readShieldDetailGeometry(
+  struct EKLMGeometry::ShieldDetailGeometry* sdg, GearDir* gd)
 {
   int i, n;
   sdg->LengthX = gd->getLength("LengthX") * CLHEP::cm;
@@ -206,7 +204,7 @@ void EKLM::GeometryData::fillStripIndexArrays()
   std::map<double, int> mapLengthStrip;
   std::map<double, int> mapLengthStrip2;
   std::map<double, int>::iterator itm;
-  for (i = 0; i < m_nStrip; i++) {
+  for (i = 0; i < m_NStrips; i++) {
     strips.push_back(m_StripPosition[i].Length);
     mapLengthStrip.insert(std::pair<double, int>(m_StripPosition[i].Length, i));
   }
@@ -240,10 +238,10 @@ void EKLM::GeometryData::fillStripIndexArrays()
       mapLengthStrip2.insert(std::pair<double, int>(l, i));
     }
   }
-  m_StripAllToLen = (int*)malloc(m_nStrip * sizeof(int));
+  m_StripAllToLen = (int*)malloc(m_NStrips * sizeof(int));
   if (m_StripAllToLen == NULL)
     B2FATAL(c_MemErr);
-  for (i = 0; i < m_nStrip; i++) {
+  for (i = 0; i < m_NStrips; i++) {
     itm = mapLengthStrip2.find(m_StripPosition[i].Length);
     if (itm == mapLengthStrip2.end())
       B2FATAL(err);
@@ -256,8 +254,8 @@ void EKLM::GeometryData::readXMLDataStrips()
   int i;
   GearDir Strips("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap/"
                  "Layer/Sector/Plane/Strips");
-  m_nStrip = Strips.getNumberNodes("Strip");
-  checkStrip(m_nStrip);
+  m_NStrips = Strips.getNumberNodes("Strip");
+  checkStrip(m_NStrips);
   m_StripGeometry.Width  = Strips.getLength("Width") * CLHEP::cm;
   m_StripGeometry.Thickness = Strips.getLength("Thickness") * CLHEP::cm;
   m_StripGeometry.GrooveDepth = Strips.getLength("GrooveDepth") * CLHEP::cm;
@@ -265,11 +263,12 @@ void EKLM::GeometryData::readXMLDataStrips()
   m_StripGeometry.NoScintillationThickness =
     Strips.getLength("NoScintillationThickness") * CLHEP::cm;
   m_StripGeometry.RSSSize = Strips.getLength("RSSSize") * CLHEP::cm;
-  m_StripPosition = (struct EKLM::ElementPosition*)
-                    malloc(m_nStrip * sizeof(struct EKLM::ElementPosition));
+  m_StripPosition = (struct EKLMGeometry::ElementPosition*)
+                    malloc(m_NStrips *
+                           sizeof(struct EKLMGeometry::ElementPosition));
   if (m_StripPosition == NULL)
     B2FATAL(c_MemErr);
-  for (i = 0; i < m_nStrip; i++) {
+  for (i = 0; i < m_NStrips; i++) {
     GearDir StripContent(Strips);
     StripContent.append((boost::format("/Strip[%1%]") % (i + 1)).str());
     m_StripPosition[i].Length = StripContent.getLength("Length") * CLHEP::cm;
@@ -452,7 +451,7 @@ void EKLM::GeometryData::calculateShieldGeometry()
   m_ShieldGeometry.DetailCCenter.setZ(0);
 }
 
-EKLM::GeometryData::GeometryData() : ElementNumbers()
+EKLM::GeometryData::GeometryData()
 {
   int i, j, mode;
   m_NDetectorLayers = new int[m_MaximalEndcapNumber];
@@ -460,74 +459,37 @@ EKLM::GeometryData::GeometryData() : ElementNumbers()
   mode = gd.getInt("Mode");
   if (mode < 0 || mode > 1)
     B2FATAL("EKLM started with unknown geometry mode " << mode << ".");
-  m_mode = (enum DetectorMode)mode;
+  m_Mode = (enum DetectorMode)mode;
+  /* TODO: read from database but not from EKLMGeometry. */
   m_DisplacementDataFile = gd.getString("Displacements");
-  m_solenoidZ = gd.getLength("SolenoidZ") * CLHEP::cm;
-  m_NEndcaps = m_MaximalEndcapNumber;
+  m_SolenoidZ = gd.getLength("SolenoidZ") * CLHEP::cm;
+  m_NEndcaps = gd.getInt("NEndcaps");
+  checkEndcap(m_NEndcaps);
   GearDir EndCap(gd);
   EndCap.append("/Endcap");
   readPositionData(&m_EndcapPosition, &EndCap);
   readSizeData(&m_EndcapPosition, &EndCap);
-  m_MinZForward = m_solenoidZ + m_EndcapPosition.Z -
+  m_MinZForward = m_SolenoidZ + m_EndcapPosition.Z -
                   0.5 * m_EndcapPosition.Length;
-  m_MaxZBackward = m_solenoidZ - m_EndcapPosition.Z +
+  m_MaxZBackward = m_SolenoidZ - m_EndcapPosition.Z +
                    0.5 * m_EndcapPosition.Length;
-  m_nLayer = EndCap.getInt("nLayer");
-  checkLayer(m_nLayer);
-  m_NDetectorLayers[0] = EndCap.getInt("nLayerBackward");
+  m_NLayers = EndCap.getInt("NLayers");
+  checkLayer(m_NLayers);
+  m_NDetectorLayers[0] = EndCap.getInt("NDetectorLayersBackward");
   checkDetectorLayerNumber(1, m_NDetectorLayers[0]);
-  m_NDetectorLayers[1] = EndCap.getInt("nLayerForward");
+  m_NDetectorLayers[1] = EndCap.getInt("NDetectorLayersForward");
   checkDetectorLayerNumber(2, m_NDetectorLayers[1]);
   GearDir Layer(EndCap);
   Layer.append("/Layer");
   readSizeData(&m_LayerPosition, &Layer);
   m_LayerShiftZ = Layer.getLength("ShiftZ") * CLHEP::cm;
+  m_NSectors = Layer.getInt("NSectors");
+  checkSector(m_NSectors);
   GearDir Sector(Layer);
-  m_NSectors = m_MaximalSectorNumber;
   Sector.append("/Sector");
   readSizeData(&m_SectorPosition, &Sector);
-  m_nPlane = Sector.getInt("nPlane");
-  checkPlane(m_nPlane);
-  if (m_mode == c_DetectorBackground) {
-    m_nBoard = Sector.getInt("nBoard");
-    checkSegment(m_nBoard);
-    GearDir Boards(Sector);
-    Boards.append("/Boards");
-    m_BoardGeometry.Length = Boards.getLength("Length") * CLHEP::cm;
-    m_BoardGeometry.Width = Boards.getLength("Width") * CLHEP::cm;
-    m_BoardGeometry.Height = Boards.getLength("Height") * CLHEP::cm;
-    m_BoardGeometry.BaseWidth = Boards.getLength("BaseWidth") * CLHEP::cm;
-    m_BoardGeometry.BaseHeight = Boards.getLength("BaseHeight") * CLHEP::cm;
-    m_BoardGeometry.StripLength = Boards.getLength("StripLength") * CLHEP::cm;
-    m_BoardGeometry.StripWidth = Boards.getLength("StripWidth") * CLHEP::cm;
-    m_BoardGeometry.StripHeight = Boards.getLength("StripHeight") * CLHEP::cm;
-    m_nStripBoard = Boards.getInt("nStripBoard");
-    for (j = 0; j < m_nPlane; j++) {
-      m_BoardPosition[j] = (struct BoardPosition*)
-                           malloc(m_nBoard * sizeof(struct BoardPosition));
-      if (m_BoardPosition[j] == NULL)
-        B2FATAL(c_MemErr);
-      for (i = 0; i < m_nBoard; i++) {
-        GearDir BoardContent(Boards);
-        BoardContent.append((boost::format("/BoardData[%1%]") % (j + 1)).str());
-        BoardContent.append((boost::format("/Board[%1%]") % (i + 1)).str());
-        m_BoardPosition[j][i].Phi = BoardContent.getLength("Phi") * CLHEP::rad;
-        m_BoardPosition[j][i].R = BoardContent.getLength("Radius") * CLHEP::cm;
-      }
-    }
-    m_StripBoardPosition = (struct StripBoardPosition*)
-                           malloc(m_nStripBoard *
-                                  sizeof(struct StripBoardPosition));
-    if (m_StripBoardPosition == NULL)
-      B2FATAL(c_MemErr);
-    for (i = 0; i < m_nStripBoard; i++) {
-      GearDir StripBoardContent(Boards);
-      StripBoardContent.append((boost::format("/StripBoardData/Board[%1%]") %
-                                (i + 1)).str());
-      m_StripBoardPosition[i].X = StripBoardContent.getLength("PositionX") *
-                                  CLHEP::cm;
-    }
-  }
+  m_NPlanes = Sector.getInt("NPlanes");
+  checkPlane(m_NPlanes);
   GearDir SectorSupport(Sector);
   SectorSupport.append("/SectorSupport");
   readPositionData(&m_SectorSupportPosition, &SectorSupport);
@@ -538,10 +500,8 @@ EKLM::GeometryData::GeometryData() : ElementNumbers()
   Plane.append("/Plane");
   readPositionData(&m_PlanePosition, &Plane);
   readSizeData(&m_PlanePosition, &Plane);
-  readXMLDataStrips();
-  fillStripIndexArrays();
-  m_nSegment = Plane.getInt("nSegment");
-  if (m_nSegment <= 0)
+  m_NSegments = Plane.getInt("NSegments");
+  if (m_NSegments <= 0)
     B2FATAL("Number of segments must be positive.");
   m_PlasticSheetGeometry.Width = Plane.getLength("PlasticSheetWidth") *
                                  CLHEP::cm;
@@ -557,13 +517,14 @@ EKLM::GeometryData::GeometryData() : ElementNumbers()
     Segments.getLength("MiddleWidth") * CLHEP::cm;
   m_SegmentSupportGeometry.MiddleThickness =
     Segments.getLength("MiddleThickness") * CLHEP::cm;
-  for (j = 0; j < m_nPlane; j++) {
+  for (j = 0; j < m_NPlanes; j++) {
     m_SegmentSupportPosition[j] =
-      (struct EKLM::SegmentSupportPosition*)
-      malloc((m_nSegment + 1) * sizeof(struct EKLM::SegmentSupportPosition));
+      (struct EKLMGeometry::SegmentSupportPosition*)
+      malloc((m_NSegments + 1) *
+             sizeof(struct EKLMGeometry::SegmentSupportPosition));
     if (m_SegmentSupportPosition[j] == NULL)
       B2FATAL(c_MemErr);
-    for (i = 0; i <= m_nSegment; i++) {
+    for (i = 0; i <= m_NSegments; i++) {
       GearDir SegmentSupportContent(Segments);
       SegmentSupportContent.append(
         (boost::format("/SegmentSupportData[%1%]") % (j + 1)).str());
@@ -583,6 +544,9 @@ EKLM::GeometryData::GeometryData() : ElementNumbers()
         SegmentSupportContent.getLength("DeltaLLeft") * CLHEP::cm;
     }
   }
+  m_NStripsSegment = Plane.getInt("NStripsSegment");
+  readXMLDataStrips();
+  fillStripIndexArrays();
   GearDir shield(Sector);
   shield.append("/Shield");
   m_ShieldGeometry.Thickness = shield.getLength("Thickness") * CLHEP::cm;
@@ -599,13 +563,53 @@ EKLM::GeometryData::GeometryData() : ElementNumbers()
   shieldDetailD.append("/Detail[@id=\"D\"]");
   readShieldDetailGeometry(&m_ShieldGeometry.DetailD, &shieldDetailD);
   calculateShieldGeometry();
+  if (m_Mode == c_DetectorBackground) {
+    m_NBoards = Sector.getInt("NBoards");
+    checkSegment(m_NBoards);
+    GearDir Boards(Sector);
+    Boards.append("/Boards");
+    m_BoardGeometry.Length = Boards.getLength("Length") * CLHEP::cm;
+    m_BoardGeometry.Width = Boards.getLength("Width") * CLHEP::cm;
+    m_BoardGeometry.Height = Boards.getLength("Height") * CLHEP::cm;
+    m_BoardGeometry.BaseWidth = Boards.getLength("BaseWidth") * CLHEP::cm;
+    m_BoardGeometry.BaseHeight = Boards.getLength("BaseHeight") * CLHEP::cm;
+    m_BoardGeometry.StripLength = Boards.getLength("StripLength") * CLHEP::cm;
+    m_BoardGeometry.StripWidth = Boards.getLength("StripWidth") * CLHEP::cm;
+    m_BoardGeometry.StripHeight = Boards.getLength("StripHeight") * CLHEP::cm;
+    m_NStripBoards = Boards.getInt("NStripBoards");
+    for (j = 0; j < m_NPlanes; j++) {
+      m_BoardPosition[j] = (struct BoardPosition*)
+                           malloc(m_NBoards * sizeof(struct BoardPosition));
+      if (m_BoardPosition[j] == NULL)
+        B2FATAL(c_MemErr);
+      for (i = 0; i < m_NBoards; i++) {
+        GearDir BoardContent(Boards);
+        BoardContent.append((boost::format("/BoardData[%1%]") % (j + 1)).str());
+        BoardContent.append((boost::format("/Board[%1%]") % (i + 1)).str());
+        m_BoardPosition[j][i].Phi = BoardContent.getLength("Phi") * CLHEP::rad;
+        m_BoardPosition[j][i].R = BoardContent.getLength("Radius") * CLHEP::cm;
+      }
+    }
+    m_StripBoardPosition = (struct StripBoardPosition*)
+                           malloc(m_NStripBoards *
+                                  sizeof(struct StripBoardPosition));
+    if (m_StripBoardPosition == NULL)
+      B2FATAL(c_MemErr);
+    for (i = 0; i < m_NStripBoards; i++) {
+      GearDir StripBoardContent(Boards);
+      StripBoardContent.append((boost::format("/StripBoardData/Board[%1%]") %
+                                (i + 1)).str());
+      m_StripBoardPosition[i].X = StripBoardContent.getLength("PositionX") *
+                                  CLHEP::cm;
+    }
+  }
 }
 
 /**
  * Free shield layer detail geometry data.
  * @param sdg Shield layer detail geometry data.
  */
-static void freeShieldDetail(struct EKLM::ShieldDetailGeometry* sdg)
+static void freeShieldDetail(struct EKLMGeometry::ShieldDetailGeometry* sdg)
 {
   if (sdg->Points != NULL)
     delete[] sdg->Points;
@@ -615,10 +619,10 @@ EKLM::GeometryData::~GeometryData()
 {
   int i;
   delete[] m_NDetectorLayers;
-  for (i = 0; i < m_nPlane; i++)
+  for (i = 0; i < m_NPlanes; i++)
     free(m_SegmentSupportPosition[i]);
-  if (m_mode == c_DetectorBackground) {
-    for (i = 0; i < m_nPlane; i++)
+  if (m_Mode == c_DetectorBackground) {
+    for (i = 0; i < m_NPlanes; i++)
       free(m_BoardPosition[i]);
     free(m_StripBoardPosition);
   }
@@ -628,37 +632,6 @@ EKLM::GeometryData::~GeometryData()
   freeShieldDetail(&m_ShieldGeometry.DetailB);
   freeShieldDetail(&m_ShieldGeometry.DetailC);
   freeShieldDetail(&m_ShieldGeometry.DetailD);
-}
-
-void EKLM::GeometryData::checkDetectorLayerNumber(int endcap, int layer) const
-{
-  const char* endcapName[2] = {"backward", "forward"};
-  if (layer < 0 || layer > m_nLayer ||
-      layer > m_MaximalDetectorLayerNumber[endcap - 1])
-    B2FATAL("Number of detector layers in the " << endcapName[endcap - 1] <<
-            " endcap must be from 0 to the number of layers ( " <<
-            m_nLayer << ").");
-}
-
-void EKLM::GeometryData::checkDetectorLayer(int endcap, int layer) const
-{
-  const char* endcapName[2] = {"backward", "forward"};
-  if (layer < 0 || layer > m_NDetectorLayers[endcap - 1])
-    B2FATAL("Number of layer must be less from 1 to the number of "
-            "detector layers in the " << endcapName[endcap - 1] << " endcap ("
-            << m_NDetectorLayers[endcap - 1] << ").");
-}
-
-void EKLM::GeometryData::checkSegmentSupport(int support) const
-{
-  if (support <= 0 || support > m_MaximalSegmentNumber + 1)
-    B2FATAL("Number of segment support element must be from 1 to " <<
-            m_MaximalSegmentNumber + 1 << ".");
-}
-
-EKLM::DetectorMode EKLM::GeometryData::getDetectorMode() const
-{
-  return m_mode;
 }
 
 bool EKLM::GeometryData::displacedGeometry() const
@@ -671,169 +644,9 @@ std::string EKLM::GeometryData::getDisplacementDataFile() const
   return m_DisplacementDataFile;
 }
 
-int EKLM::GeometryData::getNEndcaps() const
-{
-  return m_NEndcaps;
-}
-
-int EKLM::GeometryData::getNLayers() const
-{
-  return m_nLayer;
-}
-
-int EKLM::GeometryData::getNDetectorLayers(int endcap) const
-{
-  checkEndcap(endcap);
-  return m_NDetectorLayers[endcap - 1];
-}
-
-int EKLM::GeometryData::getNSectors() const
-{
-  return m_NSectors;
-}
-
-int EKLM::GeometryData::getNPlanes() const
-{
-  return m_nPlane;
-}
-
-int EKLM::GeometryData::getNBoards() const
-{
-  if (m_mode != c_DetectorBackground)
-    B2FATAL(c_ModeErr);
-  return m_nBoard;
-}
-
-int EKLM::GeometryData::getNStripBoards() const
-{
-  if (m_mode != c_DetectorBackground)
-    B2FATAL(c_ModeErr);
-  return m_nStripBoard;
-}
-
-int EKLM::GeometryData::getNStrips() const
-{
-  return m_nStrip;
-}
-
-int EKLM::GeometryData::getNSegments() const
-{
-  return m_nSegment;
-}
-
-int EKLM::GeometryData::getNStripsSegment() const
-{
-  return 15;
-}
-
-double EKLM::GeometryData::getSolenoidZ() const
-{
-  return m_solenoidZ;
-}
-
-const EKLM::ElementPosition* EKLM::GeometryData::getEndcapPosition() const
-{
-  return &m_EndcapPosition;
-}
-
-const EKLM::ElementPosition* EKLM::GeometryData::getLayerPosition() const
-{
-  return &m_LayerPosition;
-}
-
-double EKLM::GeometryData::getLayerShiftZ() const
-{
-  return m_LayerShiftZ;
-}
-
-const EKLM::ElementPosition* EKLM::GeometryData::getSectorPosition() const
-{
-  return &m_SectorPosition;
-}
-
-const EKLM::ElementPosition*
-EKLM::GeometryData::getSectorSupportPosition() const
-{
-  return &m_SectorSupportPosition;
-}
-
-const EKLM::SectorSupportGeometry*
-EKLM::GeometryData::getSectorSupportGeometry() const
-{
-  return &m_SectorSupportGeometry;
-}
-
-const EKLM::BoardGeometry* EKLM::GeometryData::getBoardGeometry() const
-{
-  if (m_mode != c_DetectorBackground)
-    B2FATAL(c_ModeErr);
-  return &m_BoardGeometry;
-}
-
-const EKLM::BoardPosition*
-EKLM::GeometryData::getBoardPosition(int plane, int segment) const
-{
-  if (m_mode != c_DetectorBackground)
-    B2FATAL(c_ModeErr);
-  checkPlane(plane);
-  checkSegment(segment);
-  return &m_BoardPosition[plane - 1][segment - 1];
-}
-
-const EKLM::StripBoardPosition*
-EKLM::GeometryData::getStripBoardPosition(int board) const
-{
-  if (m_mode != c_DetectorBackground)
-    B2FATAL(c_ModeErr);
-  checkSegment(board);
-  return &m_StripBoardPosition[board - 1];
-}
-
-const EKLM::ElementPosition* EKLM::GeometryData::getPlanePosition() const
-{
-  return &m_PlanePosition;
-}
-
-const EKLM::SegmentSupportPosition*
-EKLM::GeometryData::getSegmentSupportPosition(int plane, int support) const
-{
-  checkPlane(plane);
-  checkSegmentSupport(support);
-  return &m_SegmentSupportPosition[plane - 1][support - 1];
-}
-
-const EKLM::SegmentSupportGeometry*
-EKLM::GeometryData::getSegmentSupportGeometry() const
-{
-  return &m_SegmentSupportGeometry;
-}
-
-const EKLM::PlasticSheetGeometry*
-EKLM::GeometryData::getPlasticSheetGeometry() const
-{
-  return &m_PlasticSheetGeometry;
-}
-
-const EKLM::ElementPosition*
-EKLM::GeometryData::getStripPosition(int strip) const
-{
-  checkStrip(strip);
-  return &m_StripPosition[strip - 1];
-}
-
 double EKLM::GeometryData::getStripLength(int strip) const
 {
   return m_StripPosition[strip - 1].Length;
-}
-
-const EKLM::StripGeometry* EKLM::GeometryData::getStripGeometry() const
-{
-  return &m_StripGeometry;
-}
-
-const EKLM::ShieldGeometry* EKLM::GeometryData::getShieldGeometry() const
-{
-  return &m_ShieldGeometry;
 }
 
 int EKLM::GeometryData::getStripLengthIndex(int positionIndex) const
@@ -866,10 +679,10 @@ EKLM::GeometryData::getEndcapTransform(HepGeom::Transform3D* t, int n) const
 {
   if (n == 0)
     *t = HepGeom::Translate3D(m_EndcapPosition.X, m_EndcapPosition.Y,
-                              -m_EndcapPosition.Z + m_solenoidZ);
+                              -m_EndcapPosition.Z + m_SolenoidZ);
   else
     *t = HepGeom::Translate3D(m_EndcapPosition.X, m_EndcapPosition.Y,
-                              m_EndcapPosition.Z + m_solenoidZ) *
+                              m_EndcapPosition.Z + m_SolenoidZ) *
          HepGeom::RotateY3D(180.*CLHEP::deg);
 }
 

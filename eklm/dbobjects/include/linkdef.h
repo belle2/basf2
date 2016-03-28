@@ -7,6 +7,7 @@
 
 #pragma link C++ class Belle2::EKLMAlignment+;
 #pragma link C++ class Belle2::EKLMAlignmentData+;
+#pragma link C++ class Belle2::EKLMGeometry+;
 #pragma link C++ class Belle2::EKLMTimeCalibration+;
 #pragma link C++ class Belle2::EKLMTimeCalibrationData+;
 

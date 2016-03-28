@@ -24,12 +24,12 @@ EKLM::AlignmentChecker::AlignmentChecker()
   HepGeom::Point3D<double> supportRectangle[4];
   HepGeom::Transform3D t;
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  const SectorSupportGeometry* sectorSupportGeometry =
+  const struct EKLMGeometry::SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
-  const ElementPosition* sectorSupportPosition =
+  const EKLMGeometry::ElementPosition* sectorSupportPosition =
     m_GeoDat->getSectorSupportPosition();
-  const struct SegmentSupportPosition* segmentSupportPos;
-  const struct SegmentSupportGeometry* segmentSupportGeometry =
+  const struct EKLMGeometry::SegmentSupportPosition* segmentSupportPos;
+  const struct EKLMGeometry::SegmentSupportGeometry* segmentSupportGeometry =
     m_GeoDat->getSegmentSupportGeometry();
   m_LineCorner1 = new LineSegment2D(
     sectorSupportGeometry->Corner1AInner, sectorSupportGeometry->Corner1BInner);
@@ -113,8 +113,9 @@ checkSegmentAlignment(int iPlane, int iSegment,
   double lx, ly;
   HepGeom::Point3D<double> stripRectangle[4];
   HepGeom::Transform3D t;
-  const struct ElementPosition* stripPosition;
-  const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
+  const struct EKLMGeometry::ElementPosition* stripPosition;
+  const struct EKLMGeometry::StripGeometry* stripGeometry =
+    m_GeoDat->getStripGeometry();
   ly = 0.5 * stripGeometry->Width;
   for (i = 1; i <= m_GeoDat->getNStripsSegment(); i++) {
     iStrip = m_GeoDat->getNStripsSegment() * (iSegment - 1) + i;

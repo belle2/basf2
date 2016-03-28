@@ -29,7 +29,6 @@ EKLMSensitiveDetector(G4String name, enum SensitiveType type)
   m_GeoDat = &(EKLM::GeometryData::Instance());
   m_type = type;
   GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
-  m_mode = (enum DetectorMode)gd.getInt("Mode");
   gd.append("/SensitiveDetector");
   m_ThresholdEnergyDeposit =
     Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "MeV");
@@ -65,7 +64,8 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
    * use "<=" instead of "<" to drop hits from neutrinos etc unless eDepositionThreshold is non-negative
    * Background studies m_mode=1 accepts all tracks
    */
-  if (eDep <= m_ThresholdEnergyDeposit && m_mode == c_DetectorNormal)
+  if (eDep <= m_ThresholdEnergyDeposit &&
+      m_GeoDat->getDetectorMode() == EKLMGeometry::c_DetectorNormal)
     return false;
 
   /**
@@ -88,7 +88,8 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
     return false;
   }
   // No time cut for background studeis
-  if (hitTime > m_ThresholdHitTime && m_mode == 0) {
+  if (hitTime > m_ThresholdHitTime &&
+      m_GeoDat->getDetectorMode() == EKLMGeometry::c_DetectorNormal) {
     B2INFO("EKLMSensitiveDetector: "
            " ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!");
     return false;
@@ -115,7 +116,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   hit->setEDep(eDep);
   hit->setPDG(track.GetDefinition()->GetPDGEncoding());
   hit->setTime(hitTime);
-  if (m_GeoDat->getDetectorMode() == c_DetectorBackground)
+  if (m_GeoDat->getDetectorMode() == EKLMGeometry::c_DetectorBackground)
     stripLevel = 2;
   /** Get information on mother volumes and store them to the hit. */
   switch (m_type) {

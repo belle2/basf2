@@ -14,6 +14,7 @@
 /* Belle2 headers. */
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
+#include <eklm/dbobjects/EKLMGeometry.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/GeoEKLMTypes.h>
 
@@ -67,9 +68,6 @@ namespace Belle2 {
 
       /** Sensitive detector type. */
       enum SensitiveType m_type;
-
-      /** Sensitive detector operation mode. */
-      enum EKLM::DetectorMode m_mode;
 
     };
 

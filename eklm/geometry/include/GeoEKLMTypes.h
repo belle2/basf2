@@ -30,14 +30,6 @@ namespace Belle2 {
       c_SensitiveBoard = 2,
     };
 
-    /** Mode of detector operation. */
-    enum DetectorMode {
-      /** Normal mode. */
-      c_DetectorNormal = 0,
-      /** Background study. */
-      c_DetectorBackground = 1,
-    };
-
   }
 
 }

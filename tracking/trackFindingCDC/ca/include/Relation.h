@@ -27,10 +27,6 @@ namespace Belle2 {
       /// Make the constructor of the base type available
       using Super::Super;
 
-      /// Allow decay of the reference object types from non-const to const.
-      operator Relation<const T>() const
-      { return Relation<const T>(this->first, this->second); }
-
       /// Operator to compare key type item to the relations for assoziative lookups.
       friend bool operator<(T* ptr,
                             const Relation<T>& relation)
@@ -40,10 +36,6 @@ namespace Belle2 {
       friend bool operator<(const Relation<T>& relation,
                             T* ptr)
       { return relation.getFrom() < ptr; }
-
-      /// Operator for easy unpacking of the relation destination
-      operator T* () const
-      { return this->second; }
 
       /// Getter for the pointer to the from side object
       T* getFrom() const

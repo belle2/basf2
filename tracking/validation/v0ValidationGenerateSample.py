@@ -13,7 +13,7 @@ import basf2
 from simulation import add_simulation
 from reconstruction import add_mdst_output
 from modularAnalysis import generateY4S
-from tracking import add_track_finding, add_prune_tracks
+from tracking import add_tracking_reconstruction
 from tracking.validation.harvesting import HarvestingModule
 from tracking.validation import refiners, tracking_efficiency_helpers
 import numpy
@@ -28,7 +28,7 @@ def run():
     # generateY4S(1000, path=path)
 
     path.add_module('EventInfoSetter',
-                    evtNumList=[50],
+                    evtNumList=[500],
                     runList=[1],
                     expList=[1]
                     )
@@ -50,31 +50,14 @@ def run():
 
     path.add_module('Gearbox')
     add_simulation(path, components=components)
+    add_tracking_reconstruction(path, components=components)
 
-    # Material effects for all track extrapolations
-    path.add_module('SetupGenfitExtrapolation')
-
-    add_track_finding(path, components)
-    path.add_module("GenfitTrackCandidatesCreator")
-
-    # Match the tracks to the MC truth.  The matching works based on
-    # the output of the TrackFinderMCTruth.
-    path.add_module('TrackFinderMCTruth', GFTrackCandidatesColName='MCTrackCands', WhichParticles=[])
-    path.add_module('MCMatcherTracks', MCGFTrackCandsColName='MCTrackCands')
-
-    # track fitting
-    path.add_module('GenFitter', PDGCodes=[211]).set_name('combined GenFitter')
-
-    # create Belle2 Tracks from the genfit Tracks
-    path.add_module('TrackBuilder')
-
-    # V0 finding
-    path.add_module('V0Finder', Validation=True)
+    # Set options for V0 Validation
+    for module in path.modules():
+        if module.name() == "V0Finder":
+            module.param("Validation", True)
     path.add_module('MCV0Matcher', V0ColName='V0ValidationVertexs')
     path.add_module(V0Harvester())
-
-    # prune genfit tracks
-    add_prune_tracks(path)
 
     # Store mdst output plus v0validation
     add_mdst_output(path, filename='../V0ValidationSample.root', additionalBranches=['V0Validations'])

@@ -19,6 +19,8 @@ class G4Material;
 class G4Element;
 class G4MaterialPropertiesTable;
 class G4OpticalSurface;
+class G4NistElementBuilder;
+class G4NistMaterialBuilder;
 
 namespace Belle2 {
   namespace gearbox { class Interface; }
@@ -71,13 +73,13 @@ namespace Belle2 {
        *
        * @param name Name of the material to be found
        */
-      G4Material* getMaterial(const std::string& name, bool showErrors = true) const;
+      G4Material* getMaterial(const std::string& name, bool showErrors = true);
 
       /**
        * Find given chemical element
        * @param name Name of the Element, e.g. Si, Al, He
        */
-      G4Element* getElement(const std::string& name) const;
+      G4Element* getElement(const std::string& name);
 
       /**
        * Create a material from the parameters specified by parameters
@@ -140,8 +142,17 @@ namespace Belle2 {
       /** Vector of created G4MaterialProperties objects */
       std::vector<G4MaterialPropertiesTable*> m_PropTables;
 
+      /** G4NistElementBuilder instance to create chemical elements with
+       * correct natural abundances from NIST database */
+      G4NistElementBuilder* m_nistElementBuilder{nullptr};
+      /** G4NistMaterialBuilder to create predefined materials from NIST database */
+      G4NistMaterialBuilder* m_nistMaterialBuilder{nullptr};
+
       /** Create a properties table from a vector of properties. Return 0 if the vector is empty */
       G4MaterialPropertiesTable* createProperties(const std::vector<GeoMaterialProperty>& props);
+
+      /** Initialize Nist Builder instances */
+      void initBuilders();
     };
 
   } //geometry namespace

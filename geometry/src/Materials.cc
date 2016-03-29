@@ -91,13 +91,23 @@ namespace Belle2 {
       clear();
     }
 
-    G4Material* Materials::getMaterial(const string& name, bool showErrors) const
+    void Materials::initBuilders()
+    {
+      if (!m_nistMaterialBuilder) {
+        B2DEBUG(50, "Creating new Nist Builder instances");
+        m_nistElementBuilder = new G4NistElementBuilder(0);
+        m_nistMaterialBuilder = new G4NistMaterialBuilder(m_nistElementBuilder, 0);
+      }
+    }
+
+    G4Material* Materials::getMaterial(const string& name, bool showErrors)
     {
       G4Material* mat;
       if (m_materialCache.retrieve(name, mat)) {
         return mat;
       }
-      mat = G4NistManager::Instance()->FindOrBuildMaterial(name);
+      initBuilders();
+      mat = m_nistMaterialBuilder->FindOrBuildMaterial(name);
 
       //Try different combinations of the Material name to fallback to predefined G4 Elements
       if (!mat && name.substr(0, 3) != "G4_") {
@@ -106,9 +116,9 @@ namespace Belle2 {
                   << name << " and G4_" << boost::to_upper_copy(name));
         }
         //Mainly for materials from single elements, e.g. G4_Al, G4_Si
-        mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_" + name);
+        mat = m_nistMaterialBuilder->FindOrBuildMaterial("G4_" + name);
         //For predefined materials, e.g. G4_AIR, G4_TEFLON
-        if (!mat) mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_" + boost::to_upper_copy(name));
+        if (!mat) mat = m_nistMaterialBuilder->FindOrBuildMaterial("G4_" + boost::to_upper_copy(name));
       }
 
       //Insert into cache
@@ -118,9 +128,10 @@ namespace Belle2 {
       return mat;
     }
 
-    G4Element* Materials::getElement(const string& name) const
+    G4Element* Materials::getElement(const string& name)
     {
-      G4Element* elm = G4NistManager::Instance()->FindOrBuildElement(name);
+      initBuilders();
+      G4Element* elm = m_nistElementBuilder->FindOrBuildElement(name);
       if (!elm) B2ERROR("Element '" << name << "' could not be found");
       return elm;
     }
@@ -354,6 +365,19 @@ namespace Belle2 {
       G4MaterialTable& materials = *G4Material::GetMaterialTable();
       for (G4Material* mat : materials) delete mat;
       materials.clear();
+      B2DEBUG(50, "Cleaning G4Elements");
+      G4ElementTable& elements = *G4Element::GetElementTable();
+      for (G4Element* elm : elements) delete elm;
+      elements.clear();
+      B2DEBUG(50, "Cleaning G4Isotopes");
+      G4IsotopeTable& isotopes = const_cast<G4IsotopeTable&>(*G4Isotope::GetIsotopeTable());
+      for (G4Isotope* iso : isotopes) delete iso;
+      isotopes.clear();
+      // delete material and element builder as they keep indices to materials they created :/
+      delete m_nistMaterialBuilder;
+      delete m_nistElementBuilder;
+      m_nistMaterialBuilder = nullptr;
+      m_nistElementBuilder = nullptr;
       // finally, get rid of the cache, it's invalid now anyway
       B2DEBUG(50, "Clean up material cache");
       m_materialCache.clear();

@@ -143,8 +143,7 @@ def add_track_finding(path, components=None):
         vxd_cdcTracksMerger_param = {
             'CDCRecoTrackColName': cdc_reco_tracks,
             'VXDRecoTrackColName': vxd_reco_tracks,
-            'MergedRecoTrackColName': merged_recotracks,
-            'chi2_max': 100
+            'MergedRecoTrackColName': merged_recotracks
         }
         vxd_cdcTracksMerger.param(vxd_cdcTracksMerger_param)
         path.add_module(vxd_cdcTracksMerger)

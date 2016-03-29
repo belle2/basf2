@@ -70,7 +70,6 @@ namespace Belle2 {
                               MatchPairList const& matchedList, bool useFirstIndex = true);
 
     double m_CDC_wall_radius = 16.25;
-    double m_chi2_max;
     double m_merge_radius;
 
     std::string m_VXDRecoTrackColName;

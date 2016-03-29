@@ -40,7 +40,6 @@ VXDCDCTrackMergerModule::VXDCDCTrackMergerModule() :
   addParam("MergedRecoTrackColName", m_mergedRecoTrackColName, "Merged Reco Tracks");
 
   //merging parameters
-  addParam("chi2_max", m_chi2_max, "Chi^2 cut for matching", double(100.0));
   addParam("merge_radius", m_merge_radius,
            "Maximum distance between extrapolated tracks on the CDC wall",
            double(2.0));

@@ -15,7 +15,7 @@
 #include <CLHEP/Geometry/Transform3D.h>
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/ElementNumbers.h>
+#include <eklm/dataobjects/EKLMElementNumbers.h>
 #include <eklm/dbobjects/EKLMGeometry.h>
 #include <eklm/geometry/GeoEKLMTypes.h>
 #include <framework/database/IntervalOfValidity.h>

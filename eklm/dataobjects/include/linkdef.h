@@ -22,4 +22,6 @@
 /* Reconstuction stage. */
 #pragma link C++ class Belle2::EKLMHit2d+;
 
+#pragma link C++ class Belle2::EKLMElementNumbers;
+
 #endif

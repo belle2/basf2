@@ -16,14 +16,14 @@
 #include <CLHEP/Geometry/Point3D.h>
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/ElementNumbers.h>
+#include <eklm/dataobjects/EKLMElementNumbers.h>
 
 namespace Belle2 {
 
   /**
    * Class to store EKLM geometry data in the database.
    */
-  class EKLMGeometry : public EKLM::ElementNumbers, public TObject {
+  class EKLMGeometry : public EKLMElementNumbers {
 
   public:
 

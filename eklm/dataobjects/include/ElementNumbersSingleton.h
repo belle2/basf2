@@ -12,7 +12,7 @@
 #define EKLM_ELEMENTNUMBERSSINGLETON_H
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/ElementNumbers.h>
+#include <eklm/dataobjects/EKLMElementNumbers.h>
 
 namespace Belle2 {
 
@@ -20,8 +20,9 @@ namespace Belle2 {
 
     /**
      * EKLM element numbers (singleton version).
+     * This class is not a dataobject but is used by other EKLM dataobjects.
      */
-    class ElementNumbersSingleton : public ElementNumbers {
+    class ElementNumbersSingleton : public EKLMElementNumbers {
 
     public:
 

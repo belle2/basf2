@@ -36,6 +36,53 @@ namespace Belle2 {
     };
 
     /**
+     * @struct EndcapStructureGeometry
+     * @brief EndcapStructure geometry parameters.
+     *
+     * @var EndcapStructureGeometry::phi
+     * The starting angle of the octagonal Endcap KLM shape.
+     *
+     * @var EndcapStructureGeometry::dphi
+     * The opening angle (shape is extended from phi to phi+dphi).
+     *
+     * @var EndcapStructureGeometry::nsides
+     * The number of sides (=8 : octagonal).
+     *
+     * @var EndcapStructureGeometry::nboundary
+     * The number of boundaries perpendicular to the z-axis.
+     *
+     * @var EndcapStructureGeometry::z
+     * The z coordinate of the section specified by input id (=boundary id).
+     *
+     * @var EndcapStructureGeometry::rmin
+     * The radius of the circle tangent to the sides of the inner polygon.
+     *
+     * @var EndcapStructureGeometry::rmax
+     * The radius of the circle tangent to the sides of the outer polygon.
+     *
+     * @var EndcapStructureGeometry::zsub
+     * The length of the tube.
+     *
+     * @var EndcapStructureGeometry::rminsub
+     * The inner radius of the tube.
+     *
+     * @var EndcapStructureGeometry::rmaxsub
+     * The outer radius of the tube.
+     */
+    struct EndcapStructureGeometry {
+      double phi;
+      double dphi;
+      int nsides;
+      int nboundary;
+      double* z;
+      double* rmin;
+      double* rmax;
+      double zsub;
+      double rminsub;
+      double rmaxsub;
+    };
+
+    /**
      * @struct ElementPosition
      * Position information for the elements of detector.
      *
@@ -408,6 +455,11 @@ namespace Belle2 {
     double getSolenoidZ() const;
 
     /**
+     * Get endcap structure geometry data.
+     */
+    const struct EndcapStructureGeometry* getEndcapStructureGeometry() const;
+
+    /**
      * Get position data for endcaps.
      */
     const struct ElementPosition* getEndcapPosition() const;
@@ -531,6 +583,9 @@ namespace Belle2 {
 
     /** Solenoid center Z coordinate. */
     double m_SolenoidZ;
+
+    /** Endcap structure geometry data. */
+    struct EndcapStructureGeometry m_EndcapStructureGeometry;
 
     /** Position data for endcaps. */
     struct ElementPosition m_EndcapPosition;

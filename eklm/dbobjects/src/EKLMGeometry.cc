@@ -125,6 +125,12 @@ double EKLMGeometry::getSolenoidZ() const
   return m_SolenoidZ;
 }
 
+const EKLMGeometry::EndcapStructureGeometry*
+EKLMGeometry::getEndcapStructureGeometry() const
+{
+  return &m_EndcapStructureGeometry;
+}
+
 const EKLMGeometry::ElementPosition* EKLMGeometry::getEndcapPosition() const
 {
   return &m_EndcapPosition;

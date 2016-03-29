@@ -160,6 +160,11 @@ namespace Belle2 {
        */
       void calculateShieldGeometry();
 
+      /**
+       * Read endcap structure geometry data.
+       */
+      void readEndcapStructureGeometry();
+
       /** Number of strips with different lengths in one plane. */
       int m_nStripDifferent;
 

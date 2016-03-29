@@ -32,7 +32,6 @@
 #include <eklm/simulation/EKLMSensitiveDetector.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/G4TriangularPrism.h>
-#include <eklm/geometry/GeoESTRCreator.h>
 #include <eklm/geometry/GeoEKLMTypes.h>
 #include <eklm/geometry/TransformData.h>
 
@@ -689,9 +688,6 @@ namespace Belle2 {
 
       /** Geometry data. */
       const GeometryData* m_GeoDat;
-
-      /** ESTR Geometry data. */
-      struct ESTRGeometryParams m_ESTRPar;
 
       /** Transformations of boards from sector reference frame. */
       G4Transform3D* m_BoardTransform[2];

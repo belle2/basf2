@@ -451,6 +451,42 @@ void EKLM::GeometryData::calculateShieldGeometry()
   m_ShieldGeometry.DetailCCenter.setZ(0);
 }
 
+void EKLM::GeometryData::readEndcapStructureGeometry()
+{
+  int i;
+  GearDir d("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/ESTR");
+  GearDir d1(d);
+  GearDir d2(d);
+  d1.append("/EndcapKLM");
+  d2.append("/EndcapKLMsub");
+  m_EndcapStructureGeometry.phi = d1.getAngle("Phi") * CLHEP::rad;
+  m_EndcapStructureGeometry.dphi = d1.getAngle("Dphi") * CLHEP::rad;
+  m_EndcapStructureGeometry.nsides = d1.getInt("Nsides");
+  m_EndcapStructureGeometry.nboundary = d1.getNumberNodes("ZBoundary");
+  m_EndcapStructureGeometry.z =
+    (double*)malloc(m_EndcapStructureGeometry.nboundary * sizeof(double));
+  if (m_EndcapStructureGeometry.z == NULL)
+    B2FATAL(c_MemErr);
+  m_EndcapStructureGeometry.rmin =
+    (double*)malloc(m_EndcapStructureGeometry.nboundary * sizeof(double));
+  if (m_EndcapStructureGeometry.rmin == NULL)
+    B2FATAL(c_MemErr);
+  m_EndcapStructureGeometry.rmax =
+    (double*)malloc(m_EndcapStructureGeometry.nboundary * sizeof(double));
+  if (m_EndcapStructureGeometry.rmax == NULL)
+    B2FATAL(c_MemErr);
+  for (i = 0; i < m_EndcapStructureGeometry.nboundary; i++) {
+    GearDir d4(d1);
+    d4.append((boost::format("/ZBoundary[%1%]") % (i + 1)).str());
+    m_EndcapStructureGeometry.z[i] = d4.getLength("Zposition") * CLHEP::cm;
+    m_EndcapStructureGeometry.rmin[i] = d4.getLength("InnerRadius") * CLHEP::cm;
+    m_EndcapStructureGeometry.rmax[i] = d4.getLength("OuterRadius") * CLHEP::cm;
+  }
+  m_EndcapStructureGeometry.zsub = d2.getLength("Length") * CLHEP::cm;
+  m_EndcapStructureGeometry.rminsub = d2.getLength("InnerRadius") * CLHEP::cm;
+  m_EndcapStructureGeometry.rmaxsub = d2.getLength("OuterRadius") * CLHEP::cm;
+}
+
 EKLM::GeometryData::GeometryData()
 {
   int i, j, mode;
@@ -460,6 +496,7 @@ EKLM::GeometryData::GeometryData()
   if (mode < 0 || mode > 1)
     B2FATAL("EKLM started with unknown geometry mode " << mode << ".");
   m_Mode = (enum DetectorMode)mode;
+  readEndcapStructureGeometry();
   m_SolenoidZ = gd.getLength("SolenoidZ") * CLHEP::cm;
   m_NEndcaps = gd.getInt("NEndcaps");
   checkEndcap(m_NEndcaps);
@@ -617,6 +654,9 @@ EKLM::GeometryData::~GeometryData()
 {
   int i;
   delete[] m_NDetectorLayers;
+  free(m_EndcapStructureGeometry.z);
+  free(m_EndcapStructureGeometry.rmin);
+  free(m_EndcapStructureGeometry.rmax);
   for (i = 0; i < m_NPlanes; i++)
     free(m_SegmentSupportPosition[i]);
   if (m_Mode == c_DetectorBackground) {

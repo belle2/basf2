@@ -48,8 +48,6 @@ EKLM::GeoEKLMCreator::GeoEKLMCreator()
   m_Materials.air = NULL;
   m_CurVol.endcap = 1;
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  if (readESTRData(&m_ESTRPar) == ENOMEM)
-    B2FATAL(MemErr);
   try {
     m_TransformData = new EKLM::TransformData(false, true);
   } catch (std::bad_alloc& ba) {
@@ -63,9 +61,6 @@ EKLM::GeoEKLMCreator::GeoEKLMCreator()
 EKLM::GeoEKLMCreator::~GeoEKLMCreator()
 {
   delete m_TransformData;
-  free(m_ESTRPar.z);
-  free(m_ESTRPar.rmin);
-  free(m_ESTRPar.rmax);
   deleteVolumes();
   deleteTransforms();
   deleteSensitive();
@@ -214,18 +209,26 @@ void EKLM::GeoEKLMCreator::createMaterials()
 
 void EKLM::GeoEKLMCreator::createEndcapSolid()
 {
+  const struct EKLMGeometry::EndcapStructureGeometry* endcapStructureGeometry =
+    m_GeoDat->getEndcapStructureGeometry();
   G4Polyhedra* op = NULL;
   G4Tubs* tb = NULL;
   try {
-    op = new G4Polyhedra("Endcap_Octagonal_Prism", m_ESTRPar.phi,
-                         m_ESTRPar.dphi, m_ESTRPar.nsides, m_ESTRPar.nboundary,
-                         m_ESTRPar.z, m_ESTRPar.rmin, m_ESTRPar.rmax);
+    op = new G4Polyhedra("Endcap_Octagonal_Prism",
+                         endcapStructureGeometry->phi,
+                         endcapStructureGeometry->dphi,
+                         endcapStructureGeometry->nsides,
+                         endcapStructureGeometry->nboundary,
+                         endcapStructureGeometry->z,
+                         endcapStructureGeometry->rmin,
+                         endcapStructureGeometry->rmax);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   try {
-    tb = new G4Tubs("Endcap_Tube",  m_ESTRPar.rminsub, m_ESTRPar.rmaxsub,
-                    m_ESTRPar.zsub, 0.0, 360.0 * CLHEP::deg);
+    tb = new G4Tubs("Endcap_Tube", endcapStructureGeometry->rminsub,
+                    endcapStructureGeometry->rmaxsub,
+                    endcapStructureGeometry->zsub, 0.0, 360.0 * CLHEP::deg);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }

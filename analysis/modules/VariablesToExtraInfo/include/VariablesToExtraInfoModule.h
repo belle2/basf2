@@ -19,6 +19,8 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
 
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+
 #include <string>
 #include <map>
 #include <vector>
@@ -29,6 +31,11 @@ namespace Belle2 {
   /**
    *  For each particle in the input list the selected variables are saved in an extra-info field with the given name,
    *  Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.");
+   *
+   * The module can also write any variable as an extra-info filed to any of the daughter particles specified via the DecayString.
+   * This is usefull for example when calculating various vetos (pi0, J/psi, ...). Note that in general it is not advised
+   * to write anything to daughter particle, since the daughter particle is not unique, it can be daughter of some other particle
+   * in an event as well.
    */
   class VariablesToExtraInfoModule : public Module {
   public:
@@ -43,23 +50,28 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
-    std::string m_inputListName; /**< name of input particle list. */
-    StoreObjPtr<ParticleList> m_inputList; /**< input particle list */
-
-    /**
-     * Map of variables and extraInfo names to save in the extra-info field.
-     * Variables are taken from Variable::Manager, and are identical to those
-     * available to e.g. ParticleSelector.
-     */
+    /**< name of input particle list. */
+    std::string m_inputListName;
+    /**< input particle list */
+    StoreObjPtr<ParticleList> m_inputList;
+    /** Map of variables and extraInfo names to save in the extra-info field. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
     std::map<std::string, std::string> m_variables;
+    /**< Vector of function pointers corresponding to given variables. */
+    std::vector<Variable::Manager::FunctionPtr> m_functions;
+    /**< Vector of extra info names */
+    std::vector<std::string> m_extraInfoNames;
 
-    std::vector<Variable::Manager::FunctionPtr> m_functions; /**< Vector of function pointers corresponding to given variables. */
-    std::vector<std::string> m_extraInfoNames; /**< Vector of extra info names */
+    std::string m_decayString;  /**< DecayString specifying the daughter Particle to which the extra-info field will be added */
+    DecayDescriptor m_pDDescriptor;         /**< Decay descriptor of the particle being selected */
+    bool m_writeToDaughter = false;
+    int m_overwrite =
+      0; /**< -1/0/1: Overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given name already exists */
 
     /**
-     * Adds extra info to the particle.
+     * Adds extra info to the particle. The value is estimated for the source
+     * and added as an extra-info to the destination.
      */
-    void addExtraInfo(Particle* part);
+    void addExtraInfo(const Particle* source, Particle* destination);
 
   };
 

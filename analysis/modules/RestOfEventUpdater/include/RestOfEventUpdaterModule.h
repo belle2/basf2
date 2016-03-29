@@ -59,7 +59,6 @@ namespace Belle2 {
 
     std::vector<double>
     m_fractions; /**< A priori fractions used for newly added masks. Fractions of existing masks will not be changed (default: pion always) */
-
   };
 }
 

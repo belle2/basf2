@@ -920,6 +920,38 @@ def variablesToExtraInfo(
     path.add_module(mod)
 
 
+def variablesToDaughterExtraInfo(
+    particleList,
+    decayString,
+    variables,
+    option=0,
+    path=analysis_main,
+):
+    """
+    For each daughter particle specified via decay string the selected variables (estimated for the mother particle)
+    are saved in an extra-info field with the given name. In other words, the property of mother is saved as extra-info
+    to specified daughter particle.
+    Should only be used in ROE path, that is path executed for each ROE object in an event.
+
+    It is possible to overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given name
+    already exists (-1/0/1)
+
+    @param particleList  The input ParticleList
+    @param decayString   Decay string that specifiec to which daughter the extra infor should be appended
+    @param variables     Dictionary of Variables and extraInfo names.
+    @param option        Various options for overwriting
+    @param path          modules are added to this path
+    """
+
+    mod = register_module('VariablesToExtraInfo')
+    mod.set_name('VariablesToDaughterExtraInfo_' + particleList)
+    mod.param('particleList', particleList)
+    mod.param('decayString', decayString)
+    mod.param('variables', variables)
+    mod.param('overwrite', option)
+    path.add_module(mod)
+
+
 def variableToSignalSideExtraInfo(
     particleList,
     varToExtraInfo,

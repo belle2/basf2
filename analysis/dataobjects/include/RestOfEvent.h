@@ -149,6 +149,11 @@ namespace Belle2 {
      */
     void updateECLClusterMask(std::string maskName, std::map<unsigned int, bool> eclClusterMask);
 
+    /**
+     * Append the vector of V0 array indices from ROE to the map
+     */
+    void appendV0IDList(std::string maskName, std::vector<unsigned int>);
+
     // getters
     /**
      * Get vector of all (no mask) or a subset (use mask) of all Tracks in ROE.
@@ -240,6 +245,14 @@ namespace Belle2 {
     std::map<unsigned int, bool> getECLClusterMask(std::string maskName) const;
 
     /**
+     * Get list of V0 array indices used to replace tracks in ROE with a specific mask name
+     *
+     * @param name of mask
+     * @return list ov V0 array indices
+     */
+    std::vector<unsigned int> getV0IDList(std::string maskName) const;
+
+    /**
      * Fill input parameter with a priori ChargedStable fractions with a specific mask name
      *
      * @param a priori fractions container
@@ -272,6 +285,9 @@ namespace Belle2 {
                                                      m_trackMasks; /**< Map of Track masks, where each mask is another map that contains track indices and boolean values based on selection criteria for each track */
     std::map<std::string, std::map<unsigned int, bool>>
                                                      m_eclClusterMasks; /**< Map of ECLCluster masks, where each mask is another map that contains cluster indices and boolean values based on selection criteria for each cluster */    // TODO: add support for vee
+
+    std::map<std::string, std::vector<unsigned int>>
+                                                  m_v0IDMap; /**< map of V0 array indices from ROE for each ROE mask to be used to update the ROE 4 momentum */
 
     /**
      * Prints indices in the given set in a single line

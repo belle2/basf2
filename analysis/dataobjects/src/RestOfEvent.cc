@@ -12,6 +12,7 @@
 
 #include <framework/datastore/StoreArray.h>
 
+#include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -81,6 +82,11 @@ void RestOfEvent::appendECLClusterMasks(std::map<std::string, std::map<unsigned 
 void RestOfEvent::updateECLClusterMask(std::string maskName, std::map<unsigned int, bool> eclClusterMask)
 {
   m_eclClusterMasks[maskName] = eclClusterMask;
+}
+
+void RestOfEvent::appendV0IDList(std::string maskName, std::vector<unsigned int> v0IDList)
+{
+  m_v0IDMap.insert(std::pair<std::string, std::vector<unsigned int>>(maskName, v0IDList));
 }
 
 std::vector<const Track*> RestOfEvent::getTracks(std::string maskName) const
@@ -164,8 +170,14 @@ TLorentzVector RestOfEvent::get4Vector(std::string maskName) const
 
 TLorentzVector RestOfEvent::get4VectorTracks(std::string maskName) const
 {
+  StoreArray<Particle> particles;
   std::vector<const Track*> roeTracks = RestOfEvent::getTracks(maskName);
+
+  // if v0 momentum mask has a value, take it, otherwise take 0.
   TLorentzVector roe4VectorTracks;
+  std::vector<unsigned int> v0List = RestOfEvent::getV0IDList(maskName);
+  for (unsigned int iV0 = 0; iV0 < v0List.size(); iV0++)
+    roe4VectorTracks += particles[v0List[iV0]]->get4Vector();
 
   const unsigned int n = Const::ChargedStable::c_SetSize;
   double fractions[n];
@@ -249,6 +261,19 @@ std::map<unsigned int, bool> RestOfEvent::getECLClusterMask(std::string maskName
     B2FATAL("Cannot find ROE mask with name \'" << maskName << "\', are you sure you spelled it correctly?");
 
   return m_eclClusterMasks.at(maskName);
+}
+
+std::vector<unsigned int> RestOfEvent::getV0IDList(std::string maskName) const
+{
+  std::vector<unsigned int> emptyVector;
+
+  if (maskName == "")
+    return emptyVector;
+
+  if (m_v0IDMap.find(maskName) == m_v0IDMap.end())
+    return emptyVector;
+
+  return m_v0IDMap.at(maskName);
 }
 
 void RestOfEvent::fillFractions(double fractions[], std::string maskName) const

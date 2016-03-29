@@ -21,6 +21,8 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h> //
+#include <framework/dataobjects/EventMetaData.h> //
 
 #include <framework/logging/Logger.h>
 
@@ -90,16 +92,15 @@ namespace Belle2 {
 
       std::vector<std::string> allMaskNames = roe->getMaskNames();
 
-      for (auto& roeMask : m_maskNamesForUpdating) {
+      std::vector<const Track*> roeAllTracks = roe->getTracks();
+      std::vector<const ECLCluster*> roeAllECLClusters = roe->getECLClusters();
 
+      for (auto& roeMask : m_maskNamesForUpdating) {
         // Check if mask exists. If not, create a default mask.
         if (std::find(allMaskNames.begin(), allMaskNames.end(), roeMask) == allMaskNames.end()) {
 
           intAndBoolMap newTrackMask;
           intAndBoolMap newECLClusterMask;
-
-          std::vector<const Track*> roeAllTracks = roe->getTracks();
-          std::vector<const ECLCluster*> roeAllECLClusters = roe->getECLClusters();
 
           // Fill track mask
           for (unsigned i = 0; i < roeAllTracks.size(); i++) {
@@ -131,8 +132,10 @@ namespace Belle2 {
         std::vector<const Track*> roeTracks = roe->getTracks(roeMask);
         std::vector<const ECLCluster*> roeECLClusters = roe->getECLClusters(roeMask);
 
-        // Update existing eclCluster or track mask
-        if (abs(m_inputList->getPDGCode()) == Const::pion.getPDGCode()) {
+        double pdgList = abs(m_inputList->getPDGCode());
+
+        // Update existing track mask
+        if (pdgList == Const::pion.getPDGCode()) {
           intAndIntMap trackIDAndParticlePositionMap;
           for (unsigned j = 0; j < m_inputList->getListSize(); j++) {
             const Particle* partWithInfo = m_inputList->getParticle(j);
@@ -152,7 +155,10 @@ namespace Belle2 {
               trackMask[trackID] = false;
           }
           roe->updateTrackMask(roeMask, trackMask);
-        } else if (abs(m_inputList->getPDGCode()) == Const::photon.getPDGCode()) {
+
+        }
+        // Update existing eclCluster mask
+        else if (pdgList == Const::photon.getPDGCode()) {
           intAndIntMap eclClusterIDAndParticlePositionMap;
           for (unsigned j = 0; j < m_inputList->getListSize(); j++) {
             const Particle* partWithInfo = m_inputList->getParticle(j);
@@ -172,10 +178,49 @@ namespace Belle2 {
               eclClusterMask[eclID] = false;
           }
           roe->updateECLClusterMask(roeMask, eclClusterMask);
+        }
+        // Update track mask with info from V0 list, V0 list should be sorted
+        // TODO: add support for lambda and converted photons
+        else if (pdgList == Const::Kshort.getPDGCode()) {
+
+          TLorentzVector track4momentum;
+
+          std::vector<unsigned int> v0ID;
+          std::vector<unsigned int> tracksFromV0;
+          for (unsigned j = 0; j < m_inputList->getListSize(); j++) {
+            const Particle* v0part = m_inputList->getParticle(j);
+            const Particle* d0 = v0part->getDaughter(0);
+            const Particle* d1 = v0part->getDaughter(1);
+
+            bool passNewCut = m_cut->check(v0part);
+            if (!passNewCut)
+              continue;
+
+            bool track0InList = std::find(tracksFromV0.begin(), tracksFromV0.end(), d0->getTrack()->getArrayIndex()) != tracksFromV0.end();
+            bool track1InList = std::find(tracksFromV0.begin(), tracksFromV0.end(), d1->getTrack()->getArrayIndex()) != tracksFromV0.end();
+
+            if (!track0InList and !track1InList) {
+              v0ID.push_back(v0part->getArrayIndex());
+              track4momentum += d0->get4Vector() + d1->get4Vector();
+              tracksFromV0.push_back(d0->getTrack()->getArrayIndex());
+              tracksFromV0.push_back(d1->getTrack()->getArrayIndex());
+            }
+          }
+
+          for (unsigned j = 0; j < roeTracks.size(); j++) {
+            unsigned int trackID = roeTracks[j]->getArrayIndex();
+
+            // Is this ROE track used in V0? If yes, discard the track from the mask
+            if (std::find(tracksFromV0.begin(), tracksFromV0.end(), trackID) != tracksFromV0.end())
+              trackMask[trackID] = false;
+          }
+
+          roe->appendV0IDList(roeMask, v0ID);
+          roe->updateTrackMask(roeMask, trackMask);
+
         } else
           B2FATAL("ParticleList with PDG: " << m_inputList->getPDGCode() <<
                   " was inserted. Only pion/photon infoList for tracks/eclClusters possible!");
-
       }
     }
   }

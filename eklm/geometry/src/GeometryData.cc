@@ -265,11 +265,11 @@ void EKLM::GeometryData::readXMLDataStrips()
   m_StripGeometry.NoScintillationThickness =
     Strips.getLength("NoScintillationThickness") * CLHEP::cm;
   m_StripGeometry.RSSSize = Strips.getLength("RSSSize") * CLHEP::cm;
-  m_StripPosition = (struct EKLMGeometry::ElementPosition*)
-                    malloc(m_NStrips *
-                           sizeof(struct EKLMGeometry::ElementPosition));
-  if (m_StripPosition == NULL)
+  try {
+    m_StripPosition = new struct EKLMGeometry::ElementPosition[m_NStrips];
+  } catch (std::bad_alloc& ba) {
     B2FATAL(c_MemErr);
+  }
   for (i = 0; i < m_NStrips; i++) {
     GearDir StripContent(Strips);
     StripContent.append((boost::format("/Strip[%1%]") % (i + 1)).str());
@@ -461,32 +461,32 @@ void EKLM::GeometryData::readEndcapStructureGeometry()
   GearDir d2(d);
   d1.append("/EndcapKLM");
   d2.append("/EndcapKLMsub");
-  m_EndcapStructureGeometry.phi = d1.getAngle("Phi") * CLHEP::rad;
-  m_EndcapStructureGeometry.dphi = d1.getAngle("Dphi") * CLHEP::rad;
-  m_EndcapStructureGeometry.nsides = d1.getInt("Nsides");
-  m_EndcapStructureGeometry.nboundary = d1.getNumberNodes("ZBoundary");
-  m_EndcapStructureGeometry.z =
-    (double*)malloc(m_EndcapStructureGeometry.nboundary * sizeof(double));
-  if (m_EndcapStructureGeometry.z == NULL)
+  m_EndcapStructureGeometry.Phi = d1.getAngle("Phi") * CLHEP::rad;
+  m_EndcapStructureGeometry.Dphi = d1.getAngle("Dphi") * CLHEP::rad;
+  m_EndcapStructureGeometry.Nsides = d1.getInt("Nsides");
+  m_EndcapStructureGeometry.Nboundary = d1.getNumberNodes("ZBoundary");
+  m_EndcapStructureGeometry.Z =
+    (double*)malloc(m_EndcapStructureGeometry.Nboundary * sizeof(double));
+  if (m_EndcapStructureGeometry.Z == NULL)
     B2FATAL(c_MemErr);
-  m_EndcapStructureGeometry.rmin =
-    (double*)malloc(m_EndcapStructureGeometry.nboundary * sizeof(double));
-  if (m_EndcapStructureGeometry.rmin == NULL)
+  m_EndcapStructureGeometry.Rmin =
+    (double*)malloc(m_EndcapStructureGeometry.Nboundary * sizeof(double));
+  if (m_EndcapStructureGeometry.Rmin == NULL)
     B2FATAL(c_MemErr);
-  m_EndcapStructureGeometry.rmax =
-    (double*)malloc(m_EndcapStructureGeometry.nboundary * sizeof(double));
-  if (m_EndcapStructureGeometry.rmax == NULL)
+  m_EndcapStructureGeometry.Rmax =
+    (double*)malloc(m_EndcapStructureGeometry.Nboundary * sizeof(double));
+  if (m_EndcapStructureGeometry.Rmax == NULL)
     B2FATAL(c_MemErr);
-  for (i = 0; i < m_EndcapStructureGeometry.nboundary; i++) {
+  for (i = 0; i < m_EndcapStructureGeometry.Nboundary; i++) {
     GearDir d4(d1);
     d4.append((boost::format("/ZBoundary[%1%]") % (i + 1)).str());
-    m_EndcapStructureGeometry.z[i] = d4.getLength("Zposition") * CLHEP::cm;
-    m_EndcapStructureGeometry.rmin[i] = d4.getLength("InnerRadius") * CLHEP::cm;
-    m_EndcapStructureGeometry.rmax[i] = d4.getLength("OuterRadius") * CLHEP::cm;
+    m_EndcapStructureGeometry.Z[i] = d4.getLength("Zposition") * CLHEP::cm;
+    m_EndcapStructureGeometry.Rmin[i] = d4.getLength("InnerRadius") * CLHEP::cm;
+    m_EndcapStructureGeometry.Rmax[i] = d4.getLength("OuterRadius") * CLHEP::cm;
   }
-  m_EndcapStructureGeometry.zsub = d2.getLength("Length") * CLHEP::cm;
-  m_EndcapStructureGeometry.rminsub = d2.getLength("InnerRadius") * CLHEP::cm;
-  m_EndcapStructureGeometry.rmaxsub = d2.getLength("OuterRadius") * CLHEP::cm;
+  m_EndcapStructureGeometry.Zsub = d2.getLength("Length") * CLHEP::cm;
+  m_EndcapStructureGeometry.Rminsub = d2.getLength("InnerRadius") * CLHEP::cm;
+  m_EndcapStructureGeometry.Rmaxsub = d2.getLength("OuterRadius") * CLHEP::cm;
 }
 
 void EKLM::GeometryData::initializeFromGearbox()
@@ -555,12 +555,12 @@ void EKLM::GeometryData::initializeFromGearbox()
   m_SegmentSupportGeometry.MiddleThickness =
     Segments.getLength("MiddleThickness") * CLHEP::cm;
   for (j = 0; j < m_NPlanes; j++) {
-    m_SegmentSupportPosition[j] =
-      (struct EKLMGeometry::SegmentSupportPosition*)
-      malloc((m_NSegments + 1) *
-             sizeof(struct EKLMGeometry::SegmentSupportPosition));
-    if (m_SegmentSupportPosition[j] == NULL)
+    try {
+      m_SegmentSupportPosition[j] =
+        new struct EKLMGeometry::SegmentSupportPosition[m_NSegments + 1];
+    } catch (std::bad_alloc& ba) {
       B2FATAL(c_MemErr);
+    }
     for (i = 0; i <= m_NSegments; i++) {
       GearDir SegmentSupportContent(Segments);
       SegmentSupportContent.append(
@@ -615,10 +615,11 @@ void EKLM::GeometryData::initializeFromGearbox()
     m_BoardGeometry.StripHeight = Boards.getLength("StripHeight") * CLHEP::cm;
     m_NStripBoards = Boards.getInt("NStripBoards");
     for (j = 0; j < m_NPlanes; j++) {
-      m_BoardPosition[j] = (struct BoardPosition*)
-                           malloc(m_NBoards * sizeof(struct BoardPosition));
-      if (m_BoardPosition[j] == NULL)
+      try {
+        m_BoardPosition[j] = new struct BoardPosition[m_NBoards];
+      } catch (std::bad_alloc& ba) {
         B2FATAL(c_MemErr);
+      }
       for (i = 0; i < m_NBoards; i++) {
         GearDir BoardContent(Boards);
         BoardContent.append((boost::format("/BoardData[%1%]") % (j + 1)).str());
@@ -627,11 +628,11 @@ void EKLM::GeometryData::initializeFromGearbox()
         m_BoardPosition[j][i].R = BoardContent.getLength("Radius") * CLHEP::cm;
       }
     }
-    m_StripBoardPosition = (struct StripBoardPosition*)
-                           malloc(m_NStripBoards *
-                                  sizeof(struct StripBoardPosition));
-    if (m_StripBoardPosition == NULL)
+    try {
+      m_StripBoardPosition = new struct StripBoardPosition[m_NStripBoards];
+    } catch (std::bad_alloc& ba) {
       B2FATAL(c_MemErr);
+    }
     for (i = 0; i < m_NStripBoards; i++) {
       GearDir StripBoardContent(Boards);
       StripBoardContent.append((boost::format("/StripBoardData/Board[%1%]") %
@@ -672,15 +673,15 @@ EKLM::GeometryData::~GeometryData()
 {
   int i;
   delete[] m_NDetectorLayers;
-  free(m_EndcapStructureGeometry.z);
-  free(m_EndcapStructureGeometry.rmin);
-  free(m_EndcapStructureGeometry.rmax);
+  free(m_EndcapStructureGeometry.Z);
+  free(m_EndcapStructureGeometry.Rmin);
+  free(m_EndcapStructureGeometry.Rmax);
   for (i = 0; i < m_NPlanes; i++)
-    free(m_SegmentSupportPosition[i]);
+    delete[] m_SegmentSupportPosition[i];
   if (m_Mode == c_DetectorBackground) {
     for (i = 0; i < m_NPlanes; i++)
-      free(m_BoardPosition[i]);
-    free(m_StripBoardPosition);
+      delete[] m_BoardPosition[i];
+    delete[] m_StripBoardPosition;
   }
   free(m_StripLenToAll);
   free(m_StripAllToLen);

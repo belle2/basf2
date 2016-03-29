@@ -39,47 +39,54 @@ namespace Belle2 {
      * @struct EndcapStructureGeometry
      * @brief EndcapStructure geometry parameters.
      *
-     * @var EndcapStructureGeometry::phi
+     * @var EndcapStructureGeometry::Phi
      * The starting angle of the octagonal Endcap KLM shape.
      *
-     * @var EndcapStructureGeometry::dphi
+     * @var EndcapStructureGeometry::Dphi
      * The opening angle (shape is extended from phi to phi+dphi).
      *
-     * @var EndcapStructureGeometry::nsides
+     * @var EndcapStructureGeometry::Nsides
      * The number of sides (=8 : octagonal).
      *
-     * @var EndcapStructureGeometry::nboundary
+     * @var EndcapStructureGeometry::Nboundary
      * The number of boundaries perpendicular to the z-axis.
      *
-     * @var EndcapStructureGeometry::z
+     * @var EndcapStructureGeometry::Z
      * The z coordinate of the section specified by input id (=boundary id).
      *
-     * @var EndcapStructureGeometry::rmin
+     * @var EndcapStructureGeometry::Rmin
      * The radius of the circle tangent to the sides of the inner polygon.
      *
-     * @var EndcapStructureGeometry::rmax
+     * @var EndcapStructureGeometry::Rmax
      * The radius of the circle tangent to the sides of the outer polygon.
      *
-     * @var EndcapStructureGeometry::zsub
+     * @var EndcapStructureGeometry::Zsub
      * The length of the tube.
      *
-     * @var EndcapStructureGeometry::rminsub
+     * @var EndcapStructureGeometry::Rminsub
      * The inner radius of the tube.
      *
-     * @var EndcapStructureGeometry::rmaxsub
+     * @var EndcapStructureGeometry::Rmaxsub
      * The outer radius of the tube.
      */
-    struct EndcapStructureGeometry {
-      double phi;
-      double dphi;
-      int nsides;
-      int nboundary;
-      double* z;
-      double* rmin;
-      double* rmax;
-      double zsub;
-      double rminsub;
-      double rmaxsub;
+    struct EndcapStructureGeometry : public TObject {
+
+      double Phi;
+      double Dphi;
+      int Nsides;
+      int Nboundary;
+      double* Z;    //[Nboundary]
+      double* Rmin; //[Nboundary]
+      double* Rmax; //[Nboundary]
+      double Zsub;
+      double Rminsub;
+      double Rmaxsub;
+
+    private:
+
+      /* Makes objects storable. */
+      ClassDef(EndcapStructureGeometry, 1);
+
     };
 
     /**
@@ -105,13 +112,20 @@ namespace Belle2 {
      * Z coordinate.
      *
      */
-    struct ElementPosition {
+    struct ElementPosition : public TObject {
+
       double InnerR;
       double OuterR;
       double Length;
       double X;
       double Y;
       double Z;
+
+    private:
+
+      /* Makes objects storable. */
+      ClassDef(ElementPosition, 1);
+
     };
 
     /**
@@ -211,7 +225,8 @@ namespace Belle2 {
      * @var SectorSupportGeometry::Corner4Prism
      * Coordinates of the corner of corner 4 prism.
      */
-    struct SectorSupportGeometry {
+    struct SectorSupportGeometry : public TObject {
+
       double Thickness;
       double DeltaLY;
       double CornerX;
@@ -231,19 +246,25 @@ namespace Belle2 {
       double Corner4LY;
       double Corner4Thickness;
       double Corner4Z;
-      /* FIXME: following parameters should not be stored in database. */
-      double CornerAngle;
-      HepGeom::Point3D<double> Corner1A;
-      HepGeom::Point3D<double> Corner1AInner;
-      HepGeom::Point3D<double> Corner1B;
-      HepGeom::Point3D<double> Corner1BInner;
-      HepGeom::Point3D<double> Corner2Inner;
-      HepGeom::Point3D<double> Corner3;
-      HepGeom::Point3D<double> Corner3Inner;
-      HepGeom::Point3D<double> Corner3Prism;
-      HepGeom::Point3D<double> Corner4;
-      HepGeom::Point3D<double> Corner4Inner;
-      HepGeom::Point3D<double> Corner4Prism;
+      /* The following parameters are not stored in the database. */
+      double CornerAngle;                     //!
+      HepGeom::Point3D<double> Corner1A;      //!
+      HepGeom::Point3D<double> Corner1AInner; //!
+      HepGeom::Point3D<double> Corner1B;      //!
+      HepGeom::Point3D<double> Corner1BInner; //!
+      HepGeom::Point3D<double> Corner2Inner;  //!
+      HepGeom::Point3D<double> Corner3;       //!
+      HepGeom::Point3D<double> Corner3Inner;  //!
+      HepGeom::Point3D<double> Corner3Prism;  //!
+      HepGeom::Point3D<double> Corner4;       //!
+      HepGeom::Point3D<double> Corner4Inner;  //!
+      HepGeom::Point3D<double> Corner4Prism;  //!
+
+    private:
+
+      /* Makes objects storable. */
+      ClassDef(SectorSupportGeometry, 1);
+
     };
 
     /**
@@ -256,9 +277,16 @@ namespace Belle2 {
      * @var PlasticSheetGeometry::DeltaL
      * Distance from edge of last strip to edge of plastic list.
      */
-    struct PlasticSheetGeometry {
+    struct PlasticSheetGeometry : public TObject {
+
       double Width;
       double DeltaL;
+
+    private:
+
+      /* Makes objects storable. */
+      ClassDef(PlasticSheetGeometry, 1);
+
     };
 
     /**
@@ -277,65 +305,126 @@ namespace Belle2 {
      * @var SegmentSupportGeometry::MiddleThickness
      * Middle box thickness.
      */
-    struct SegmentSupportGeometry {
+    struct SegmentSupportGeometry : public TObject {
+
       double TopWidth;
       double TopThickness;
       double MiddleWidth;
       double MiddleThickness;
+
+    private:
+
+      /* Makes objects storable. */
+      ClassDef(SegmentSupportGeometry, 1);
+
     };
 
     /**
      * Segment support position.
      */
-    struct SegmentSupportPosition {
+    struct SegmentSupportPosition : public TObject {
+
       double DeltaLRight; /**< Right (X-plane) delta L. */
       double DeltaLLeft;  /**< Left (X-plane) delta L. */
       double Length;      /**< Length */
       double X;           /**< X coordinate. */
       double Y;           /**< Y coordinate. */
       double Z;           /**< Z coordinate. */
+
+    private:
+
+      /* Makes objects storable. */
+      ClassDef(SegmentSupportPosition, 1);
+
     };
 
     /**
      * Strip geometry data.
      */
-    struct StripGeometry {
+    struct StripGeometry : public TObject {
+
       double Width;                    /**< Width. */
       double Thickness;                /**< Thickness. */
       double GrooveDepth;              /**< Groove depth. */
       double GrooveWidth;              /**< Groove width. */
       double NoScintillationThickness; /**< Non-scintillating layer. */
       double RSSSize;                  /**< Radiation study SiPM size. */
+
+    private:
+
+      /* Makes objects storable. */
+      ClassDef(StripGeometry, 1);
+
     };
 
     /**
      * Shield layer detail geometry data.
      */
-    struct ShieldDetailGeometry {
+    struct ShieldDetailGeometry : public TObject {
+
       double LengthX;                   /**< X length. */
       double LengthY;                   /**< Y length. */
       HepGeom::Point3D<double>* Points; /**< Points. */
+
+    private:
+
+      /* Makes objects storable. */
+      ClassDef(ShieldDetailGeometry, 1);
+
     };
 
     /**
+     * @struct ShieldGeometry
      * Shield layer geometry data.
+     *
+     * @var ShieldGeometry::Thickness
+     * Thickness.
+     *
+     * @var ShieldGeometry::DetailA
+     * Detail A.
+     *
+     * @var ShieldGeometry::DetailB
+     * Detail B.
+     *
+     * @var ShieldGeometry::DetailC
+     * Detail C.
+     *
+     * @var ShieldGeometry::DetailD
+     * Detail D.
+     *
+     * @var ShieldGeometry::DetailACenter
+     * Detail A center.
+     *
+     * @var ShieldGeometry::DetailBCenter
+     * Detail B center.
+     *
+     * @var ShieldGeometry::DetailCCenter
+     * Detail C center.
      */
-    struct ShieldGeometry {
-      double Thickness;                       /**< Thickness. */
-      struct ShieldDetailGeometry DetailA;    /**< Detail A. */
-      struct ShieldDetailGeometry DetailB;    /**< Detail B. */
-      struct ShieldDetailGeometry DetailC;    /**< Detail C. */
-      struct ShieldDetailGeometry DetailD;    /**< Detail D. */
-      /* FIXME: following parameters should not be stored in database. */
-      HepGeom::Point3D<double> DetailACenter; /**< Detail A center. */
-      HepGeom::Point3D<double> DetailBCenter; /**< Detail B center. */
-      HepGeom::Point3D<double> DetailCCenter; /**< Detail C center. */
+    struct ShieldGeometry : public TObject {
+
+      double Thickness;
+      struct ShieldDetailGeometry DetailA;
+      struct ShieldDetailGeometry DetailB;
+      struct ShieldDetailGeometry DetailC;
+      struct ShieldDetailGeometry DetailD;
+      /* The following parameters are not stored in the database. */
+      HepGeom::Point3D<double> DetailACenter; //!
+      HepGeom::Point3D<double> DetailBCenter; //!
+      HepGeom::Point3D<double> DetailCCenter; //!
+
+    private:
+
+      /* Makes objects storable. */
+      ClassDef(ShieldGeometry, 1);
+
     };
 
     /**
      * Readout board geometry data.
      */
-    struct BoardGeometry {
+    struct BoardGeometry : public TObject {
+
       double Length;      /**< Length. */
       double Width;       /**< Width. */
       double Height;      /**< Height. */
@@ -344,21 +433,41 @@ namespace Belle2 {
       double StripLength; /**< Length of strip readout board. */
       double StripWidth;  /**< Width of strip readout board. */
       double StripHeight; /**< Height of strip readout board. */
+
+    private:
+
+      /* Makes objects storable. */
+      ClassDef(BoardGeometry, 1);
+
     };
 
     /**
      * Readout board position data.
      */
-    struct BoardPosition {
+    struct BoardPosition : public TObject {
+
       double R;      /**< Radius of far edge of the board. */
       double Phi;    /**< Angle. */
+
+    private:
+
+      /* Makes objects storable. */
+      ClassDef(BoardPosition, 1);
+
     };
 
     /**
      * Strip readout board position data.
      */
-    struct StripBoardPosition {
+    struct StripBoardPosition : public TObject {
+
       double X;         /**< X coordinate. */
+
+    private:
+
+      /* Makes objects storable. */
+      ClassDef(StripBoardPosition, 1);
+
     };
 
     /**
@@ -558,7 +667,7 @@ namespace Belle2 {
     int m_NLayers;
 
     /** Number of detector layers. */
-    int* m_NDetectorLayers;
+    int* m_NDetectorLayers; //[m_NEndcaps]
 
     /** Number of sectors in one layer. */
     int m_NSectors;

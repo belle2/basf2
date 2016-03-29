@@ -153,7 +153,6 @@ PXDDataRedAnalysisModule::PXDDataRedAnalysisModule()
     m_thetamc(0.), /**< true theta*/
 //    double m_theta;
     m_costhetamc(0.), /**< true cos theta */
-    m_costhetaMCPart(0.), /**< cos theta of MC particle */
     m_phimc(0.),  /**< true phi */
     m_lambdamc(0.),  /**< true lambda = pi/2 - theta*/
 

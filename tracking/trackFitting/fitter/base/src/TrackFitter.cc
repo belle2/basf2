@@ -108,8 +108,8 @@ bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
     recoTrack.m_genfitTrack.addTrackRep(trackRepresentation);
   } else {
     if (not recoTrack.getDirtyFlag() and not m_skipDirtyCheck and not measurementAdderNeedsTrackRefit) {
-      B2WARNING("Hit content did not change, track representation is already present and you used only default parameters." <<
-                "I will not fit the track again. If you still want to do so, set the dirty flag of the track.");
+      B2DEBUG(100, "Hit content did not change, track representation is already present and you used only default parameters." <<
+              "I will not fit the track again. If you still want to do so, set the dirty flag of the track.");
       return recoTrack.wasFitSuccessful(trackRepresentation);
     }
   }

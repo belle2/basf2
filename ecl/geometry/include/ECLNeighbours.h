@@ -29,7 +29,7 @@ namespace Belle2 {
 //      ECLNeighbours();
 
       /**  Constructor: Fix number of neighbours ("N") in the seed theta ring or radius ("R") with par = n or par = radius [cm]. */
-      ECLNeighbours(const std::string neighbourDef, const double par);
+      ECLNeighbours(const std::string& neighbourDef, const double par);
 
       /**  Destructor. */
       ~ECLNeighbours();

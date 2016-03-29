@@ -26,7 +26,7 @@ using namespace Belle2;
 using namespace ECL;
 
 // Constructor.
-ECLNeighbours::ECLNeighbours(const std::string neighbourDef, const double par)
+ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par)
 {
   // resize the vector
   std::vector<short int> fakeneighbours;

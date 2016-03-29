@@ -22,6 +22,10 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <framework/dataobjects/Helix.h>
+
 #include <TLorentzVector.h>
 #include <TVectorF.h>
 #include <TVector3.h>
@@ -193,6 +197,58 @@ namespace Belle2 {
       return cos(a.Angle(b));
     }
 
+    double v0DaughterD0(const Particle* particle, const std::vector<double>& daughterID)
+    {
+      if (!particle)
+        return -999;
+
+      TVector3 v0Vertex = particle->getVertex();
+
+      const Particle* daug = particle->getDaughter(daughterID[0]);
+
+      const Track* track = daug->getTrack();
+      if (!track) return 999.9;
+
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(daug->getPDGCode())));
+      if (!trackFit) return 999.9;
+
+      UncertainHelix helix = trackFit->getUncertainHelix();
+      helix.passiveMoveBy(v0Vertex);
+
+      return helix.getD0();
+    }
+
+    double v0DaughterD0Diff(const Particle* particle)
+    {
+      return v0DaughterD0(particle, {0}) - v0DaughterD0(particle, {1});
+    }
+
+    double v0DaughterZ0(const Particle* particle, const std::vector<double>& daughterID)
+    {
+      if (!particle)
+        return -999;
+
+      TVector3 v0Vertex = particle->getVertex();
+
+      const Particle* daug = particle->getDaughter(daughterID[0]);
+
+      const Track* track = daug->getTrack();
+      if (!track) return 999.9;
+
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(daug->getPDGCode())));
+      if (!trackFit) return 999.9;
+
+      UncertainHelix helix = trackFit->getUncertainHelix();
+      helix.passiveMoveBy(v0Vertex);
+
+      return helix.getZ0();
+    }
+
+    double v0DaughterZ0Diff(const Particle* particle)
+    {
+      return v0DaughterZ0(particle, {0}) - v0DaughterZ0(particle, {1});
+    }
+
     double Constant(const Particle*, const std::vector<double>& constant)
     {
       return constant[0];
@@ -220,6 +276,15 @@ namespace Belle2 {
                       "Estimated uncertainty on difference in invariant masses of this particle and its i-th daughter");
     REGISTER_VARIABLE("massDifferenceSignificance(i)", massDifferenceSignificance,
                       "Signed significance of the deviation from the nominal mass difference of this particle and its i-th daughter [(massDiff - NOMINAL_MASS_DIFF)/ErrMassDiff]");
+
+    REGISTER_VARIABLE("V0d0(id)", v0DaughterD0,
+                      "Return the d0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.");
+    REGISTER_VARIABLE("V0Deltad0", v0DaughterD0Diff,
+                      "Return the difference between d0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track.");
+    REGISTER_VARIABLE("V0z0(id)", v0DaughterZ0,
+                      "Return the z0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.");
+    REGISTER_VARIABLE("V0Deltaz0", v0DaughterZ0Diff,
+                      "Return the difference between z0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track.");
 
     REGISTER_VARIABLE("constant(float i)", Constant,
                       "Returns i.\n"

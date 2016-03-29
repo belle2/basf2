@@ -33,10 +33,17 @@ namespace Belle2 {
      * returns the number of SVD hits associated to this track
      */
     double trackNSVDHits(const Particle* part);
+
     /**
      * returns the number of PXD hits associated to this track
      */
     double trackNPXDHits(const Particle* part);
+
+    /**
+     * returns the number of PXD and SVD hits associated to this track
+     */
+    double trackNVXDHits(const Particle* part);
+
     /**
      * returns the track's D0 impact parameter
      */

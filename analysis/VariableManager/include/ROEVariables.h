@@ -38,6 +38,36 @@ namespace Belle2 {
     double nROEKLMClusters(const Particle* particle);
 
     /**
+     * Returns true energy of unused tracks and clusters in ROE.
+     */
+    double mcROEEnergy(const Particle* particle);
+
+    /**
+     * Returns true invariant mass of unused tracks and clusters in ROE
+     */
+    double mcROEInvariantMass(const Particle* particle);
+
+    /**
+     * Returns true momentum of unused tracks and clusters in ROE
+     */
+    double mcROEMomentum(const Particle* particle);
+
+    /**
+     * Returns x component of true momentum of unused tracks and clusters in ROE
+     */
+    double mcROEMomentumX(const Particle* particle);
+
+    /**
+     * Returns y component of true momentum of unused tracks and clusters in ROE
+     */
+    double mcROEMomentumY(const Particle* particle);
+
+    /**
+     * Returns z component of true momentum of unused tracks and clusters in ROE
+     */
+    double mcROEMomentumZ(const Particle* particle);
+
+    /**
      * Returns flags corresponding to missing particles on ROE side.
      */
     Manager::FunctionPtr ROEMCMissingFlags(const std::vector<std::string>& arguments);
@@ -71,6 +101,11 @@ namespace Belle2 {
      * Returns extra energy in the calorimeter that is not associated to the given Particle
      */
     Manager::FunctionPtr ROEExtraEnergy(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle
+     */
+    Manager::FunctionPtr ROENeutralExtraEnergy(const std::vector<std::string>& arguments);
 
     /**
      * Returns energy of unused tracks and clusters in ROE.

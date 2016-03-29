@@ -73,6 +73,11 @@ namespace Belle2 {
       return trackNHits(part, Const::EDetector::PXD);
     }
 
+    double trackNVXDHits(const Particle* part)
+    {
+      return trackNPXDHits(part) + trackNSVDHits(part);
+    }
+
     double trackD0(const Particle* part)
     {
       const Track* track = part->getTrack();
@@ -111,6 +116,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("nCDCHits", trackNCDCHits,     "Number of CDC hits associated to the track");
     REGISTER_VARIABLE("nSVDHits", trackNSVDHits,     "Number of SVD hits associated to the track");
     REGISTER_VARIABLE("nPXDHits", trackNPXDHits,     "Number of PXD hits associated to the track");
+    REGISTER_VARIABLE("nVXDHits", trackNVXDHits,     "Number of PXD and SVD hits associated to the track");
 
     REGISTER_VARIABLE("d0",     trackD0,     "Signed distance to the POCA in the r-phi plane");
     REGISTER_VARIABLE("z0",     trackZ0,     "z coordinate of the POCA");

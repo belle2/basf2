@@ -18,8 +18,141 @@ static const char c_ModeErr[] =
   "It is forbidden to read the requested data if mode is not "
   "c_DetectorBackground.";
 
-EKLMGeometry::EKLMGeometry()
+EKLMGeometry::EndcapStructureGeometry::EndcapStructureGeometry()
 {
+  Phi = 0;
+  Dphi = 0;
+  Nsides = 0;
+  Nboundary = 0;
+  Z = NULL;
+  Rmin = NULL;
+  Rmax = NULL;
+  Zsub = 0;
+  Rminsub = 0;
+  Rmaxsub = 0;
+}
+
+EKLMGeometry::ElementPosition::ElementPosition()
+{
+  InnerR = 0;
+  OuterR = 0;
+  Length = 0;
+  X = 0;
+  Y = 0;
+  Z = 0;
+}
+
+EKLMGeometry::SectorSupportGeometry::SectorSupportGeometry()
+{
+  Thickness = 0;
+  DeltaLY = 0;
+  CornerX = 0;
+  Corner1LX = 0;
+  Corner1Width = 0;
+  Corner1Thickness = 0;
+  Corner1Z = 0;
+  Corner2LX = 0;
+  Corner2LY = 0;
+  Corner2Thickness = 0;
+  Corner2Z = 0;
+  Corner3LX = 0;
+  Corner3LY = 0;
+  Corner3Thickness = 0;
+  Corner3Z = 0;
+  Corner4LX = 0;
+  Corner4LY = 0;
+  Corner4Thickness = 0;
+  Corner4Z = 0;
+  CornerAngle = 0;
+}
+
+EKLMGeometry::PlasticSheetGeometry::PlasticSheetGeometry()
+{
+  Width = 0;
+  DeltaL = 0;
+}
+
+EKLMGeometry::SegmentSupportGeometry::SegmentSupportGeometry()
+{
+  TopWidth = 0;
+  TopThickness = 0;
+  MiddleWidth = 0;
+  MiddleThickness = 0;
+}
+
+EKLMGeometry::SegmentSupportPosition::SegmentSupportPosition()
+{
+  DeltaLRight = 0;
+  DeltaLLeft = 0;
+  Length = 0;
+  X = 0;
+  Y = 0;
+  Z = 0;
+}
+
+EKLMGeometry::StripGeometry::StripGeometry()
+{
+  Width = 0;
+  Thickness = 0;
+  GrooveDepth = 0;
+  GrooveWidth = 0;
+  NoScintillationThickness = 0;
+  RSSSize = 0;
+}
+
+EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry()
+{
+  LengthX = 0;
+  LengthY = 0;
+  Points = NULL;
+}
+
+EKLMGeometry::ShieldGeometry::ShieldGeometry()
+{
+  Thickness = 0;
+}
+
+EKLMGeometry::BoardGeometry::BoardGeometry()
+{
+  Length = 0;
+  Width = 0;
+  Height = 0;
+  BaseWidth = 0;
+  BaseHeight = 0;
+  StripLength = 0;
+  StripWidth = 0;
+  StripHeight = 0;
+}
+
+EKLMGeometry::BoardPosition::BoardPosition()
+{
+  R = 0;
+  Phi = 0;
+}
+
+EKLMGeometry::StripBoardPosition::StripBoardPosition()
+{
+  X = 0;
+}
+
+EKLMGeometry::EKLMGeometry() : m_SegmentSupportPosition {NULL, NULL},
+  m_BoardPosition {NULL, NULL}
+{
+  m_Mode = c_DetectorNormal,
+  m_NEndcaps = 0;
+  m_NLayers = 0;
+  m_NDetectorLayers = NULL;
+  m_NSectors = 0;
+  m_NPlanes = 0;
+  m_NSegments = 0;
+  m_NStripsSegment = 0;
+  m_NStrips = 0;
+  m_NBoards = 0;
+  m_NStripBoards = 0;
+  m_SolenoidZ = 0;
+  m_LayerShiftZ = 0;
+  m_StripPosition = NULL;
+  m_StripBoardPosition = NULL;
 }
 
 EKLMGeometry::~EKLMGeometry()

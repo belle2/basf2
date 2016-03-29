@@ -71,6 +71,11 @@ namespace Belle2 {
      */
     struct EndcapStructureGeometry : public TObject {
 
+      /**
+       * Constructor.
+       */
+      EndcapStructureGeometry();
+
       double Phi;
       double Dphi;
       int Nsides;
@@ -113,6 +118,11 @@ namespace Belle2 {
      *
      */
     struct ElementPosition : public TObject {
+
+      /**
+       * Constructor.
+       */
+      ElementPosition();
 
       double InnerR;
       double OuterR;
@@ -227,6 +237,11 @@ namespace Belle2 {
      */
     struct SectorSupportGeometry : public TObject {
 
+      /**
+       * Constructor.
+       */
+      SectorSupportGeometry();
+
       double Thickness;
       double DeltaLY;
       double CornerX;
@@ -279,6 +294,11 @@ namespace Belle2 {
      */
     struct PlasticSheetGeometry : public TObject {
 
+      /**
+       * Constructor.
+       */
+      PlasticSheetGeometry();
+
       double Width;
       double DeltaL;
 
@@ -307,6 +327,11 @@ namespace Belle2 {
      */
     struct SegmentSupportGeometry : public TObject {
 
+      /**
+       * Constructor.
+       */
+      SegmentSupportGeometry();
+
       double TopWidth;
       double TopThickness;
       double MiddleWidth;
@@ -323,6 +348,11 @@ namespace Belle2 {
      * Segment support position.
      */
     struct SegmentSupportPosition : public TObject {
+
+      /**
+       * Constructor.
+       */
+      SegmentSupportPosition();
 
       double DeltaLRight; /**< Right (X-plane) delta L. */
       double DeltaLLeft;  /**< Left (X-plane) delta L. */
@@ -343,6 +373,11 @@ namespace Belle2 {
      */
     struct StripGeometry : public TObject {
 
+      /**
+       * Constructor.
+       */
+      StripGeometry();
+
       double Width;                    /**< Width. */
       double Thickness;                /**< Thickness. */
       double GrooveDepth;              /**< Groove depth. */
@@ -361,6 +396,11 @@ namespace Belle2 {
      * Shield layer detail geometry data.
      */
     struct ShieldDetailGeometry : public TObject {
+
+      /**
+       * Constructor.
+       */
+      ShieldDetailGeometry();
 
       double LengthX;                   /**< X length. */
       double LengthY;                   /**< Y length. */
@@ -403,6 +443,11 @@ namespace Belle2 {
      */
     struct ShieldGeometry : public TObject {
 
+      /**
+       * Constructor.
+       */
+      ShieldGeometry();
+
       double Thickness;
       struct ShieldDetailGeometry DetailA;
       struct ShieldDetailGeometry DetailB;
@@ -425,6 +470,11 @@ namespace Belle2 {
      */
     struct BoardGeometry : public TObject {
 
+      /**
+       * Constructor.
+       */
+      BoardGeometry();
+
       double Length;      /**< Length. */
       double Width;       /**< Width. */
       double Height;      /**< Height. */
@@ -446,6 +496,11 @@ namespace Belle2 {
      */
     struct BoardPosition : public TObject {
 
+      /**
+       * Constructor.
+       */
+      BoardPosition();
+
       double R;      /**< Radius of far edge of the board. */
       double Phi;    /**< Angle. */
 
@@ -460,6 +515,11 @@ namespace Belle2 {
      * Strip readout board position data.
      */
     struct StripBoardPosition : public TObject {
+
+      /**
+       * Constructor.
+       */
+      StripBoardPosition();
 
       double X;         /**< X coordinate. */
 

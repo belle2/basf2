@@ -103,6 +103,8 @@ bool TrackBuilder::storeTrackFromRecoTrack(const RecoTrack& recoTrack)
     } else {
       B2DEBUG(200, "Relation to MCParticle not set. No related MCParticle to RecoTrack.")
     }
+    // false positive due to new with placement (cppcheck issue #7163)
+    // cppcheck-suppress memleak
     return true;
   } else {
     return false;

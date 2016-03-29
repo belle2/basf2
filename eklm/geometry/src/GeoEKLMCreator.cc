@@ -47,23 +47,30 @@ EKLM::GeoEKLMCreator::GeoEKLMCreator()
 {
   m_Materials.air = NULL;
   m_CurVol.endcap = 1;
-  m_GeoDat = &(EKLM::GeometryData::Instance());
-  try {
-    m_TransformData = new EKLM::TransformData(false, true);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  newVolumes();
-  newTransforms();
-  newSensitive();
+  m_GeoDat = NULL;
+  m_TransformData = NULL;
+  m_Solids.plane = NULL;
+  m_Solids.psheet = NULL;
+  m_LogVol.psheet = NULL;
+  m_LogVol.stripvol = NULL;
+  m_LogVol.strip = NULL;
+  m_Solids.groove = NULL;
+  m_LogVol.groove = NULL;
+  m_LogVol.scint = NULL;
+  m_LogVol.segmentsup = NULL;
+  m_BoardTransform[0] = NULL;
+  m_Sensitive[0] = NULL;
 }
 
 EKLM::GeoEKLMCreator::~GeoEKLMCreator()
 {
   delete m_TransformData;
-  deleteVolumes();
-  deleteTransforms();
-  deleteSensitive();
+  if (m_Solids.plane != NULL)
+    deleteVolumes();
+  if (m_BoardTransform[0] != NULL)
+    deleteTransforms();
+  if (m_Sensitive[0] != NULL)
+    deleteSensitive();
 }
 
 /***************************** MEMORY ALLOCATION *****************************/
@@ -2041,12 +2048,8 @@ bool EKLM::GeoEKLMCreator::detectorLayer(int endcap, int layer) const
           (endcap == 2 && layer <= m_GeoDat->getNDetectorLayers(2)));
 }
 
-void EKLM::GeoEKLMCreator::create(const GearDir& content,
-                                  G4LogicalVolume& topVolume,
-                                  geometry::GeometryTypes type)
+void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
 {
-  (void)content;
-  (void)type;
   int i, j;
   G4LogicalVolume* endcap, *layer, *sector, *plane, *segmentReadoutBoard;
   createMaterials();
@@ -2129,5 +2132,56 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
       }
     }
   }
+}
+
+void EKLM::GeoEKLMCreator::create(const GearDir& content,
+                                  G4LogicalVolume& topVolume,
+                                  geometry::GeometryTypes type)
+{
+  (void)content;
+  (void)type;
+  m_GeoDat = &(EKLM::GeometryData::Instance(GeometryData::c_Gearbox));
+  try {
+    m_TransformData = new EKLM::TransformData(false, true);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  newVolumes();
+  newTransforms();
+  newSensitive();
+  create(topVolume);
+}
+
+void EKLM::GeoEKLMCreator::createFromDB(const std::string& name,
+                                        G4LogicalVolume& topVolume,
+                                        geometry::GeometryTypes type)
+{
+  (void)name;
+  (void)type;
+  B2WARNING("EKLM geometry creation from database is not implemented. Gearbox "
+            "will be used.");
+  m_GeoDat = &(EKLM::GeometryData::Instance(GeometryData::c_Gearbox));
+  try {
+    m_TransformData = new EKLM::TransformData(false, true);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  newVolumes();
+  newTransforms();
+  newSensitive();
+  create(topVolume);
+}
+
+void EKLM::GeoEKLMCreator::createPayloads(const GearDir& content,
+                                          const IntervalOfValidity& iov)
+{
+  (void)content;
+  m_GeoDat = &(EKLM::GeometryData::Instance(GeometryData::c_Database));
+  try {
+    m_TransformData = new EKLM::TransformData(false, true);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  m_GeoDat->saveToDatabase(iov);
 }
 

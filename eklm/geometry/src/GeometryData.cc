@@ -16,6 +16,7 @@
 #include <eklm/geometry/Circle2D.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/Line2D.h>
+#include <framework/database/Database.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
@@ -23,9 +24,10 @@ using namespace Belle2;
 
 static const char c_MemErr[] = "Memory allocation error.";
 
-const EKLM::GeometryData& EKLM::GeometryData::Instance()
+const EKLM::GeometryData&
+EKLM::GeometryData::Instance(enum DataSource dataSource)
 {
-  static EKLM::GeometryData gd;
+  static EKLM::GeometryData gd(dataSource);
   return gd;
 }
 
@@ -487,7 +489,7 @@ void EKLM::GeometryData::readEndcapStructureGeometry()
   m_EndcapStructureGeometry.rmaxsub = d2.getLength("OuterRadius") * CLHEP::cm;
 }
 
-EKLM::GeometryData::GeometryData()
+void EKLM::GeometryData::initializeFromGearbox()
 {
   int i, j, mode;
   m_NDetectorLayers = new int[m_MaximalEndcapNumber];
@@ -640,6 +642,22 @@ EKLM::GeometryData::GeometryData()
   }
 }
 
+void EKLM::GeometryData::initializeFromDatabase()
+{
+}
+
+EKLM::GeometryData::GeometryData(enum DataSource dataSource)
+{
+  switch (dataSource) {
+    case c_Gearbox:
+      initializeFromGearbox();
+      break;
+    case c_Database:
+      initializeFromDatabase();
+      break;
+  }
+}
+
 /**
  * Free shield layer detail geometry data.
  * @param sdg Shield layer detail geometry data.
@@ -670,6 +688,11 @@ EKLM::GeometryData::~GeometryData()
   freeShieldDetail(&m_ShieldGeometry.DetailB);
   freeShieldDetail(&m_ShieldGeometry.DetailC);
   freeShieldDetail(&m_ShieldGeometry.DetailD);
+}
+
+void EKLM::GeometryData::saveToDatabase(const IntervalOfValidity& iov) const
+{
+  Database::Instance().storeData("EKLMGeometry", (TObject*)this, iov);
 }
 
 double EKLM::GeometryData::getStripLength(int strip) const

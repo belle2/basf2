@@ -228,13 +228,30 @@ namespace Belle2 {
       ~GeoEKLMCreator();
 
       /**
-       * Creation of the detector geometry.
-       * @param content   XML data directory.
-       * @param topVolume Geant world volume.
-       * @param type      Geometry type.
+       * Creation of the detector geometry from Gearbox (XML).
+       * @param[in] content   XML data directory.
+       * @param[in] topVolume Geant world volume.
+       * @param[in] type      Geometry type.
        */
       void create(const GearDir& content, G4LogicalVolume& topVolume,
                   geometry::GeometryTypes type);
+
+      /**
+       * Creation of the detector geometry from database.
+       * @param[in] name      Name of the component in the database.
+       * @param[in] topVolume Geant world volume.
+       * @param[in] type      Geometry type.
+       */
+      void createFromDB(const std::string& name, G4LogicalVolume& topVolume,
+                        geometry::GeometryTypes type);
+
+      /**
+       * Creation of payloads.
+       * @param content XML data directory.
+       * @param iov     Interval of validity.
+       */
+      void createPayloads(const GearDir& content,
+                          const IntervalOfValidity& iov);
 
     private:
 
@@ -670,6 +687,12 @@ namespace Belle2 {
        * Calculate board transformations.
        */
       void calcBoardTransform();
+
+      /**
+       * Creation of the detector geometry.
+       * @param[in] topVolume Geant world volume.
+       */
+      void create(G4LogicalVolume& topVolume);
 
       /** Solids. */
       struct Solids m_Solids;

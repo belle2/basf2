@@ -18,6 +18,7 @@
 #include <eklm/dataobjects/ElementNumbers.h>
 #include <eklm/dbobjects/EKLMGeometry.h>
 #include <eklm/geometry/GeoEKLMTypes.h>
+#include <framework/database/IntervalOfValidity.h>
 
 /**
  * @file
@@ -36,10 +37,28 @@ namespace Belle2 {
 
     public:
 
+      /** Geometry data source. */
+      enum DataSource {
+
+        /** Gearbox (XML). */
+        c_Gearbox,
+
+        /** Database. */
+        c_Database,
+
+      };
+
       /**
        * Instantiation.
+       * @param[in] dataSource Data source.
        */
-      static const GeometryData& Instance();
+      static const GeometryData& Instance(enum DataSource dataSource =
+                                            c_Gearbox);
+
+      /**
+       * Save geometry data to database.
+       */
+      void saveToDatabase(const IntervalOfValidity& iov) const;
 
       /**
        * Get strip length.
@@ -132,13 +151,24 @@ namespace Belle2 {
 
       /**
        * Constructor.
+       * @param[in] dataSource Data source.
        */
-      GeometryData();
+      GeometryData(enum DataSource dataSource);
 
       /**
        * Destructor.
        */
       ~GeometryData();
+
+      /**
+       * Initialize from Gearbox (XML).
+       */
+      void initializeFromGearbox();
+
+      /**
+       * Initialize from database.
+       */
+      void initializeFromDatabase();
 
       /**
        * Calculate sector support geometry data.

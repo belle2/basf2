@@ -86,6 +86,7 @@ void DBStore::updateEntry(DBEntry& dbEntry, const std::pair<TObject*, IntervalOf
   dbEntry.object = 0;
   if (objectIov.first && objectIov.first->InheritsFrom(IntraRunDependency::Class())) {
     dbEntry.intraRunDependency = static_cast<IntraRunDependency*>(objectIov.first);
+    dbEntry.object = dbEntry.intraRunDependency->getObject(*m_event);
     m_intraRunDependencies.push_back(&dbEntry);
   } else {
     dbEntry.object = objectIov.first;

@@ -100,10 +100,6 @@ void ECLDigitCalibratorModule::initialize()
   // resize vector that holds the time (and time resolution) calibration constants
   m_calibrationTimeOffset.resize(c_nCrystals + 1);
 
-  // background information (cuts can be reset via module parameters)
-  m_backgroundEnergyCut = 7.0 * Belle2::Unit::MeV;  /**< Energy cut for background level counting. */
-  m_backgroundTimingCut = 150.0 * Belle2::Unit::ns;  /**< Timing window for background level counting. */
-
   // HARDCODED VALUES WILL DISAPPEAR FOR RELEASE-00-08
   // time calibration for MC: t = a * (m_timeFit + b)
   m_timeInverseSlope = 1.0 / 2.0366; // "b", (CH for svn revision 25745)

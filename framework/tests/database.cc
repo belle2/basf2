@@ -414,19 +414,23 @@ namespace {
     DBStore::Instance().update();
     EXPECT_EQ(callbackCounter, 4);
 
-    evtPtr->setRun(1);
     DBObjPtr<TNamed> intraRun("IntraRun");
     intraRun.addCallback(&callbackObject, &Callback::callback);
 
+    //There won't be any callback here because the correct object is already set on creation
     evtPtr->setEvent(1);
     DBStore::Instance().updateEvent();
-    EXPECT_EQ(callbackCounter, 5);
+    EXPECT_EQ(callbackCounter, 4);
 
     evtPtr->setEvent(2);
     DBStore::Instance().updateEvent();
-    EXPECT_EQ(callbackCounter, 5);
+    EXPECT_EQ(callbackCounter, 4);
 
     evtPtr->setEvent(10);
+    DBStore::Instance().updateEvent();
+    EXPECT_EQ(callbackCounter, 5);
+
+    evtPtr->setEvent(1);
     DBStore::Instance().updateEvent();
     EXPECT_EQ(callbackCounter, 6);
   }

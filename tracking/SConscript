@@ -11,7 +11,6 @@ env['LIBS'] = [
     'vxd', 'vxd_dataobjects',
     'cdc', 'cdc_dataobjects',
    # 'testbeam_vxd_dataobjects',
-    'simulation_dataobjects',
 #    'geometry',
     'mdst_dataobjects',
     'framework',

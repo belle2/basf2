@@ -2,7 +2,6 @@ Import('env')
 
 env['LIBS'] = [
 	'cdc_dataobjects',
-	'cdc',
 	'framework',
 	'genfit2',
 	'tracking_dataobjects',
@@ -10,9 +9,7 @@ env['LIBS'] = [
 	'pxd_dataobjects',
 	'svd_dataobjects',
 	'vxd_dataobjects',
-	'pxd',
 	'vxd',
-	'svd',
 	'tracking'
     ]
 

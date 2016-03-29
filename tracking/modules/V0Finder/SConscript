@@ -1,4 +1,4 @@
 Import('env')
-env['LIBS'] = ['framework', 'genfit2', 'geometry', 'mdst_dataobjects']
+env['LIBS'] = ['framework', 'genfit2', 'geometry', 'tracking_dataobjects', 'mdst_dataobjects']
 
 Return('env')

@@ -4,7 +4,6 @@ env['LIBS'] = [
     'tracking_trackFindingCDC',
     'cdc',
     'cdc_dataobjects',
-    'mdst_dataobjects',
     'framework',
     '$ROOT_LIBS',
     '$PYTHON_LIBS',

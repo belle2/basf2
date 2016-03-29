@@ -6,12 +6,11 @@ env['LIBS'] = [
     'cdc',
     'cdc_dataobjects',
     'simulation_dataobjects',
-    'mdst_dataobjects',
     'genfit2',
     'framework',
     'geometry',
     '$ROOT_LIBS',
-    '$PYTHON_LIBS',
+    '$PYTHON_LIBS'
     ]
 
 

@@ -10,6 +10,8 @@ env['LIBS'] = [
     'cdc_dataobjects',
     'mdst_dataobjects',
     'genfit2',
+    '$ROOT_LIBS',
+    'EG',
     ]
 Return('env')
 

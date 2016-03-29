@@ -5,9 +5,7 @@ env['LIBS'] = [
     'framework',
     '$ROOT_LIBS',
     '$PYTHON_LIBS',
-    'genfit2',
-    'cdc_dataobjects',
-    'cdc',
+    'cdc_dataobjects'
     ]
 
 Return('env')

@@ -42,7 +42,15 @@ namespace Belle2 {
 
       /** Terminate. */
       virtual void terminate();
+
+      template <typename T> std::vector<T> make_vector(T const& t1, T const& t2);  /**< make_vector. */
+      template <typename T> std::pair<T, T> vectorToPair(std::vector<T>& vec, const std::string& name = "");   /**< vectorToPair. */
+
     private:
+
+      std::vector<double> m_clusterEnergyCuts; /**< Min [0] and Max [1] value for the cluster energy cut. */
+      std::vector<double> m_highestEnergyCuts; /**< Min [0] and Max [1] value for the highest energy cut. */
+      std::vector<double> m_clusterTimeCuts; /**< Min [0] and Max [1] value for the cluster time cut. */
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/
@@ -71,6 +79,29 @@ namespace Belle2 {
       { return "ECLClustersPureCsI"; }
 
     }; // end of ECLFinalizerPureCsIModule
+
+    template <typename T>
+    inline std::vector<T> ECLFinalizerModule::make_vector(T const& t1, T const& t2)
+    {
+      std::vector<T> v;
+      v.push_back(t1);
+      v.push_back(t2);
+      return v; /**< make_vector */
+    }
+
+    template <typename T>
+    inline std::pair<T, T> ECLFinalizerModule::vectorToPair(std::vector<T>& vec, const std::string& name)
+    {
+      std::pair<T, T> p;
+      if (vec.size() != 2) {
+        B2ERROR("The parameter " + name + " has to have exactly 2 elements!")
+      } else {
+        p.first  = vec[0];
+        p.second = vec[1];
+      }
+      return p;  /**< vectorToPair. */
+    }
+
 
   } // end of ECL namespace
 } // end of Belle2 namespace

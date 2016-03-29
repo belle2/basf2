@@ -49,6 +49,14 @@ ECLFinalizerModule::ECLFinalizerModule() : Module()
 {
   // Set description
   setDescription("ECLFinalizerModule: Converts ecl dataobjects to mdst dataobjects");
+
+  addParam("clusterEnergyCuts", m_clusterEnergyCuts, "Min [0] and Max [1] value for the cluster energy cut.",
+           make_vector(0.0 * Belle2::Unit::GeV, 999.0 * Belle2::Unit::GeV));
+  addParam("highestEnergyCuts", m_highestEnergyCuts, "Min [0] and Max [1] value for the highest energy cut.",
+           make_vector(0.0 * Belle2::Unit::GeV, 999.0 * Belle2::Unit::GeV));
+  addParam("clusterTimeCuts", m_clusterTimeCuts, "Min [0] and Max [1] value for the cluster time cut.",
+           make_vector(-125.0 * Belle2::Unit::ns, 125.0 * Belle2::Unit::ns));
+
   setPropertyFlags(c_ParallelProcessingCertified);
 
 }
@@ -59,19 +67,20 @@ ECLFinalizerModule::~ECLFinalizerModule()
 
 void ECLFinalizerModule::initialize()
 {
-  // Register in datastore
+  // Register in datastore.
   StoreArray<ECLShower> eclShowers(eclShowerArrayName());
   eclShowers.registerInDataStore();
-
   StoreArray<ECLCluster> eclClusters(eclClusterArrayName());
   eclClusters.registerInDataStore();
+
+  // Register relations.
   eclClusters.registerRelationTo(eclShowers);
 
 }
 
 void ECLFinalizerModule::beginRun()
 {
-  // Do not use this for Database updates, they will not follow the concept of a "run"
+  // Do not use this blindly for database updates, they will probably not follow the concept of a "run"
   ;
 }
 
@@ -89,12 +98,17 @@ void ECLFinalizerModule::event()
     // create an mdst cluster for each ecl shower
     if (!eclClusters) eclClusters.create();
 
-    // get shower time
-    const float ShowerTime = eclShower.getTime();
+    // get shower time, energy and highest energy for cuts
+    const double showerTime = eclShower.getTime();
+    const double showerEnergy = eclShower.getEnergy();
+    const double highestEnergy = eclShower.getHighestEnergy();
 
     // Loose timing cut is applied. 20150529 K.Miyabayashi (original comment)
     // replaced -300..200 clocktick cut by +/- 125ns cut (Torbenm 24-March-2016) - THIS WILL BE REPLACED BY AN ENERGY DEPENDENT CUT USING THE RESOLUTION SOON
-    if (-125.0 * Belle2::Unit::ns < ShowerTime && ShowerTime < 125.0 * Belle2::Unit::ns) {
+    if ((vectorToPair(m_clusterTimeCuts).first < showerTime and showerTime < vectorToPair(m_clusterTimeCuts).second)
+        and (vectorToPair(m_clusterEnergyCuts).first < showerEnergy and showerEnergy < vectorToPair(m_clusterEnergyCuts).second)
+        and (vectorToPair(m_highestEnergyCuts).first < highestEnergy and highestEnergy < vectorToPair(m_highestEnergyCuts).second)) {
+
       const auto eclCluster = eclClusters.appendNew();
 
       eclCluster->setTiming(eclShower.getTime());
@@ -102,8 +116,6 @@ void ECLFinalizerModule::event()
       eclCluster->setTheta(eclShower.getTheta());
       eclCluster->setPhi(eclShower.getPhi());
       eclCluster->setR(eclShower.getR());
-
-      eclCluster->setE9oE25(eclShower.getE9oE25());
 
       eclCluster->setEnedepSum(eclShower.getUncEnergy()); // abuses UncEnergy from the Belle CF in the old code (TF)
       eclCluster->setNofCrystals(eclShower.getNHits());
@@ -120,17 +132,17 @@ void ECLFinalizerModule::event()
       };
       eclCluster->setError(Mdst_Error);
 
-      // ECLCluster has no "ID"-like structure, abuse the unused "CrystHealth"
+      // ECLCluster has no "ID"-like structure, abuse the unused "CrystHealth" (TF)
       eclCluster->setCrystHealth(eclShower.getUniqueShowerId());
 
       // set shower shapes variables
       eclCluster->setLAT(eclShower.getLateralEnergy());
+      eclCluster->setE9oE25(eclShower.getE9oE25());
 
       // set relation to ECLShower
       eclCluster->addRelationTo(&eclShower);
 
     }
-
 
   }
 

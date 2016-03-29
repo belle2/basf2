@@ -46,10 +46,6 @@ VXDCDCTrackMergerModule::VXDCDCTrackMergerModule() :
            double(2.0));
 }
 
-VXDCDCTrackMergerModule::~VXDCDCTrackMergerModule()
-{
-}
-
 void VXDCDCTrackMergerModule::initialize()
 {
   m_CDCRecoTracks.isRequired(m_CDCRecoTrackColName);

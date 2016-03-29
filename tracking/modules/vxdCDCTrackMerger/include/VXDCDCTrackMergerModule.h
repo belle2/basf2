@@ -36,7 +36,7 @@ namespace Belle2 {
     VXDCDCTrackMergerModule();
 
     /** Use to clean up anything you created in the constructor. */
-    virtual ~VXDCDCTrackMergerModule();
+    virtual ~VXDCDCTrackMergerModule() = default;
 
     /** Use this to initialize resources or memory your module needs.
      *

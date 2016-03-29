@@ -111,13 +111,14 @@ namespace Belle2 {
       unsigned eventCount;     /**< current event (tree entry) */
       double rate;             /**< background rate of the sample */
       BkgHits simHits;         /**< input event buffer */
+      unsigned index;          /**< index of this element in the std::vector */
 
       /**
        * default constructor
        */
       BkgFiles(): tag(SimHitBase::bg_none), realTime(0.0), scaleFactor(1.0),
         fileType(BackgroundMetaData::c_Usual),
-        tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0)
+        tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0), index(0)
       {}
       /**
        * usefull constructor
@@ -127,16 +128,18 @@ namespace Belle2 {
        * @param time real time that corresponds to background sample
        * @param scaleFac scale factor for the rate
        * @param fileTyp file type
+       * @param indx index of this element in the std::vector
        */
       BkgFiles(SimHitBase::BG_TAG bkgTag,
                const std::string& bkgType,
                const std::string& fileName,
                double time,
                double scaleFac,
-               BackgroundMetaData::EFileType fileTyp = BackgroundMetaData::c_Usual):
+               BackgroundMetaData::EFileType fileTyp = BackgroundMetaData::c_Usual,
+               unsigned indx = 0):
         tag(bkgTag), type(bkgType), realTime(time), scaleFactor(scaleFac),
         fileType(fileTyp),
-        tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0)
+        tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0), index(indx)
       {
         fileNames.push_back(fileName);
       }

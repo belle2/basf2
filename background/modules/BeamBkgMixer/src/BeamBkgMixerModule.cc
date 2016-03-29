@@ -38,6 +38,7 @@
 // MetaData
 #include <framework/dataobjects/EventMetaData.h>
 #include <background/dataobjects/BackgroundMetaData.h>
+#include <background/dataobjects/BackgroundInfo.h>
 
 // Root
 #include <TRandom3.h>
@@ -315,6 +316,38 @@ namespace Belle2 {
     StoreArray<BeamBackHit> beamBackHits;
     if (m_BeamBackHits) beamBackHits.registerInDataStore();
 
+    // add BackgroundInfo to persistent tree
+    StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
+    bkgInfo.registerInDataStore();
+    if (!bkgInfo.isValid()) {
+      bkgInfo.create();
+    } else {
+      B2WARNING("BackgroundInfo already created on DataStore -> will be overriden");
+    }
+    bkgInfo->setMethod(BackgroundInfo::c_Mixing);
+    bkgInfo->setComponents(m_components);
+    bkgInfo->setMinTime(m_minTime);
+    bkgInfo->setMaxTime(m_maxTime);
+    bkgInfo->setMinTimeECL(m_minTimeECL);
+    bkgInfo->setMaxTimeECL(m_maxTimeECL);
+    bkgInfo->setMinTimePXD(m_minTimePXD);
+    bkgInfo->setMaxTimePXD(m_maxTimePXD);
+    bkgInfo->setWrapAround(m_wrapAround);
+    bkgInfo->setMaxEdepECL(m_maxEdepECL);
+    for (auto& bkg : m_backgrounds) {
+      BackgroundInfo::BackgroundDescr descr;
+      descr.tag = bkg.tag;
+      descr.type = bkg.type;
+      descr.fileType = bkg.fileType;
+      descr.fileNames = bkg.fileNames;
+      descr.realTime = bkg.realTime;
+      descr.numEvents = bkg.numEvents;
+      descr.scaleFactor = bkg.scaleFactor;
+      descr.rate = bkg.rate;
+      descr.reused = 0;
+      bkgInfo->appendBackgroundDescr(descr);
+    }
+
   }
 
   void BeamBkgMixerModule::beginRun()
@@ -342,7 +375,6 @@ namespace Belle2 {
     if (m_BKLM && !bklmSimHits.isValid()) bklmSimHits.create();
     if (m_EKLM && !eklmSimHits.isValid()) eklmSimHits.create();
     if (m_BeamBackHits && !beamBackHits.isValid()) beamBackHits.create();
-
 
     for (auto& bkg : m_backgrounds) {
 
@@ -376,6 +408,8 @@ namespace Belle2 {
         if (bkg.eventCount >= bkg.numEvents) {
           bkg.eventCount = 0;
           B2INFO("BeamBkgMixer: events of " << bkg.type << " will be re-used");
+          StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
+          if (bkgInfo) bkgInfo->incrementReusedCounter(bkg.index);
         }
       }
     }
@@ -412,6 +446,8 @@ namespace Belle2 {
         if (bkg.eventCount >= bkg.numEvents) {
           bkg.eventCount = 0;
           B2INFO("BeamBkgMixer: events of " << bkg.type << " will be re-used");
+          StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
+          if (bkgInfo) bkgInfo->incrementReusedCounter(bkg.index);
         }
       }
 
@@ -443,6 +479,8 @@ namespace Belle2 {
         if (bkg.eventCount >= bkg.numEvents) {
           bkg.eventCount = 0;
           B2INFO("BeamBkgMixer: events of " << bkg.type << " will be re-used");
+          StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
+          if (bkgInfo) bkgInfo->incrementReusedCounter(bkg.index);
         }
       }
 
@@ -494,8 +532,9 @@ namespace Belle2 {
     std::string ftype = type;
     if (fileType == BackgroundMetaData::c_ECL) ftype += "(ECL)";
     if (fileType == BackgroundMetaData::c_PXD) ftype += "(PXD)";
+    unsigned index = m_backgrounds.size();
     m_backgrounds.push_back(BkgFiles(tag, ftype, fileName, realTime,
-                                     m_overallScaleFactor, fileType));
+                                     m_overallScaleFactor, fileType, index));
   }
 
 

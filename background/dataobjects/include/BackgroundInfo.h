@@ -1,64 +1,242 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2011  Belle II Collaboration                              *
+ * Copyright(C) 2016  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Marko Staric                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BACKGROUNDINFO_H
-#define BACKGROUNDINFO_H
+#pragma once
 
 #include <TObject.h>
+#include <simulation/dataobjects/SimHitBase.h>
+#include <background/dataobjects/BackgroundMetaData.h>
 #include <string>
+#include <vector>
 
 namespace Belle2 {
 
   /**
-   * This class stores information about the background origin of a MCParticle.
+   * This class stores the information about what background was mixed or overlayed.
    */
   class BackgroundInfo: public TObject {
 
   public:
-
-    /** Default constructor. */
-    BackgroundInfo() : m_component(""), m_generator("") {}
-
-    /** Constructor.
-     * @param component The background component (e.g. Touschek).
-     * @param generator The background generator (e.g. SAD_LER)
+    /**
+     * enum for methods used to add BG
      */
-    BackgroundInfo(const std::string& component, const std::string& generator) :
-      m_component(component), m_generator(generator) {}
-
-
-    /** Destructor. */
-    virtual ~BackgroundInfo() {}
+    enum EMethod {c_Unknown = 0, /**< unknown */
+                  c_Mixing  = 1, /**< BG mixing */
+                  c_Overlay = 2  /**< BG overlay */
+                 };
 
     /**
-     * Returns the background component.
-     * @return The background component.
+     * Structure for background description
      */
-    const std::string& getComponent() const { return m_component; }
+    struct BackgroundDescr {
+      SimHitBase::BG_TAG tag = SimHitBase::bg_none;  /**< background tag denoting type */
+      std::string type; /**< background type */
+      BackgroundMetaData::EFileType fileType = BackgroundMetaData::c_Usual; /**< file type */
+      std::vector<std::string> fileNames;     /**< file names */
+      double realTime = 0;         /**< real time of BG samlpe */
+      unsigned numEvents = 0;      /**< number of events (tree entries) in the sample */
+      double scaleFactor = 1;      /**< scale factor for the rate */
+      double rate = 0;             /**< background rate of the sample */
+      unsigned reused = 0;         /**< number of times the sample is reused */
+    };
 
     /**
-     * Returns the background generator.
-     * @return The background generator.
+     * Default constructor.
      */
-    const std::string& getGenerator() const { return m_generator; }
+    BackgroundInfo()
+    {}
+
+    /**
+     * Destructor.
+     */
+    ~BackgroundInfo() {}
+
+    /**
+     * Set method that is used to add BG
+     * @param method enum for method
+     */
+    void setMethod(EMethod method) {m_method = method;}
+
+    /**
+     * Append background description of a sample
+     * @param bgDescr description
+     */
+    void appendBackgroundDescr(const BackgroundDescr& bgDescr)
+    {
+      m_backgrounds.push_back(bgDescr);
+    }
+
+    /**
+     * Set components included
+     * @param components vector of component names
+     */
+    void setComponents(const std::vector<std::string>& components)
+    {
+      m_components = components;
+    }
+
+    /**
+     * Set lower edge of the narrow time window
+     * @param minTime lower edge
+     */
+    void setMinTime(double minTime) {m_minTime = minTime;}
+
+    /**
+     * Set upper edge of the narrow time window
+     * @param maxTime upper edge
+     */
+    void setMaxTime(double maxTime) {m_maxTime = maxTime;}
+
+    /**
+     * Set lower edge of ECL time window
+     * @param minTimeECL lower edge
+     */
+    void setMinTimeECL(double minTimeECL) {m_minTimeECL = minTimeECL;}
+
+    /**
+     * Set upper edge of ECL time window
+     * @param maxTimeECL upper edge
+     */
+    void setMaxTimeECL(double maxTimeECL) {m_maxTimeECL = maxTimeECL;}
+
+    /**
+     * Set lower edge of PXD time window
+     * @param minTimePXD lower edge
+     */
+    void setMinTimePXD(double minTimePXD) {m_minTimePXD = minTimePXD;}
+
+    /**
+     * Set upper edge of PXD time window
+     * @param maxTimePXD upper edge
+     */
+    void setMaxTimePXD(double maxTimePXD) {m_maxTimePXD = maxTimePXD;}
+
+    /**
+     * Set wrap-around flag
+     * @param wrapAround flag
+     */
+    void setWrapAround(bool wrapAround) {m_wrapAround = wrapAround;}
+
+    /**
+     * Set maximal alowed energy deposited in ECL to use BG events
+     * @param maxEdepECL energy cut [GeV]
+     */
+    void setMaxEdepECL(double maxEdepECL) {m_maxEdepECL = maxEdepECL;}
+
+    /**
+     * Increments sample reused counter
+     * @param index element index in std::vector
+     */
+    void incrementReusedCounter(unsigned index)
+    {
+      if (index < m_backgrounds.size()) m_backgrounds[index].reused++;
+    }
+
+    /**
+     * Returns method enum used to add BG
+     * @return method
+     */
+    EMethod getMethod() const {return m_method;}
+
+    /**
+     * Returns background descriptions
+     * @return descriptions
+     */
+    const std::vector<BackgroundDescr>& getBackgroundDescr() const {return m_backgrounds;}
+
+    /**
+     * Returns included components
+     * @return vector of component names
+     */
+    const std::vector<std::string>& getComponents() const {return m_components;}
+
+    /**
+     * Returns lower edge of the narrow time window
+     * @return lower edge
+     */
+    double getMinTime() const {return m_minTime;}
+
+    /**
+     * Returns upper edge of the narrow time window
+     * @return upper edge
+     */
+    double getMaxTime() const {return m_maxTime;}
+
+    /**
+     * Returns lower edge of ECL time window
+     * @return lower edge
+     */
+    double getMinTimeECL() const {return m_minTimeECL;}
+
+    /**
+     * Returns upper edge of ECL time window
+     * @return upper edge
+     */
+    double getMaxTimeECL() const {return m_maxTimeECL;}
+
+    /**
+     * Returns lower edge of PXD time window
+     * @return lower edge
+     */
+    double getMinTimePXD() const {return m_minTimePXD;}
+
+    /**
+     * Returns upper edge of PXD time window
+     * @return upper edge
+     */
+    double getMaxTimePXD() const {return m_maxTimePXD;}
+
+    /**
+     * Returns wrap-around flag
+     * @return flag
+     */
+    bool getWrapAround() const {return m_wrapAround;}
+
+    /**
+     * Returns maximal alowed energy deposited in ECL to use BG events
+     * @return energy cut [GeV]
+     */
+    double getMaxEdepECL() const {return m_maxEdepECL;}
+
+    /**
+     * Print the info
+     */
+    void print() const;
 
 
-  protected:
+  private:
 
-    std::string m_component; /**< The background component (e.g. Touschek). */
-    std::string m_generator; /**< The background generator (e.g. SAD_LER). */
+    /**
+     * Print info when BG mixing is used
+     */
+    void printForMixing() const;
 
-    /** Class definition required for the creation of the ROOT dictionary. */
-    ClassDef(BackgroundInfo, 1);
+    /**
+     * Print info when BG overlay is used
+     */
+    void printForOverlay() const;
+
+    EMethod m_method = c_Unknown; /**< method */
+    std::vector<BackgroundDescr> m_backgrounds; /**< background descriptions */
+    std::vector<std::string> m_components; /**< detector components included */
+    double m_minTime = 0;  /**< minimal time shift of background event */
+    double m_maxTime = 0;  /**< maximal time shift of background event */
+    double m_minTimeECL = 0;  /**< minimal time shift of background event for ECL */
+    double m_maxTimeECL = 0;  /**< maximal time shift of background event for ECL */
+    double m_minTimePXD = 0;  /**< minimal time shift of background event for PXD */
+    double m_maxTimePXD = 0;  /**< maximal time shift of background event for PXD */
+    bool m_wrapAround = false; /**< wrap around events in the tail after maxTime */
+    double m_maxEdepECL = 0;  /**< maximal allowed deposited energy in ECL */
+
+    ClassDef(BackgroundInfo, 2); /**< Class definition */
   };
 }
 
 
-#endif /* BACKGROUNDINFO_H */

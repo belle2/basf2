@@ -22,8 +22,6 @@
 
 using namespace Belle2;
 
-static const char MemErr[] = "Memory allocation error.";
-
 void EKLM::setDefDigitizationParams(struct DigitizationParams* digPar)
 {
   GearDir dig("/Detector/DetectorComponent[@name=\"EKLM\"]/"

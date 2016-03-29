@@ -92,25 +92,24 @@ static void readSectorSupportGeometry(
 static void readShieldDetailGeometry(
   struct EKLMGeometry::ShieldDetailGeometry* sdg, GearDir* gd)
 {
-  int i, n;
+  int i;
   sdg->LengthX = gd->getLength("LengthX") * CLHEP::cm;
   sdg->LengthY = gd->getLength("LengthY") * CLHEP::cm;
-  n = gd->getNumberNodes("Point");
-  if (n == 0) {
+  sdg->NPoints = gd->getNumberNodes("Point");
+  if (sdg->NPoints == 0) {
     sdg->Points = NULL;
     return;
   }
   try {
-    sdg->Points = new HepGeom::Point3D<double>[n];
+    sdg->Points = new EKLMGeometry::Point[sdg->NPoints];
   } catch (std::bad_alloc& ba) {
     B2FATAL(c_MemErr);
   }
-  for (i = 0; i < n; i++) {
+  for (i = 0; i < sdg->NPoints; i++) {
     GearDir point(*gd);
     point.append((boost::format("/Point[%1%]") % (i + 1)).str());
-    sdg->Points[i].setX(point.getLength("X") * CLHEP::cm);
-    sdg->Points[i].setY(point.getLength("Y") * CLHEP::cm);
-    sdg->Points[i].setZ(0);
+    sdg->Points[i].X = point.getLength("X") * CLHEP::cm;
+    sdg->Points[i].Y = point.getLength("Y") * CLHEP::cm;
   }
 }
 
@@ -363,6 +362,19 @@ static void getDetailDxDy(HepGeom::Point3D<double>* points, int nPoints,
   dy = ky * maxt;
 }
 
+/**
+ * Convert EKLMGeometry::Point to CLHEP point.
+ * @param[in]  pointEKLM  EKLM point.
+ * @param[out] pointCLHEP CLHEP point.
+ */
+static void EKLMPointToCLHEP(const EKLMGeometry::Point& pointEKLM,
+                             HepGeom::Point3D<double>& pointCLHEP)
+{
+  pointCLHEP.setX(pointEKLM.X);
+  pointCLHEP.setY(pointEKLM.Y);
+  pointCLHEP.setZ(0);
+}
+
 void EKLM::GeometryData::calculateShieldGeometry()
 {
   int i;
@@ -371,16 +383,16 @@ void EKLM::GeometryData::calculateShieldGeometry()
   HepGeom::Point3D<double> points[8];
   r = m_SectorSupportPosition.InnerR + m_SectorSupportGeometry.Thickness;
   /* Detail A. */
-  points[0] = m_ShieldGeometry.DetailA.Points[0];
-  points[1] = m_ShieldGeometry.DetailA.Points[1];
-  points[2] = m_ShieldGeometry.DetailA.Points[2];
-  points[3] = m_ShieldGeometry.DetailA.Points[3];
-  points[4] = m_ShieldGeometry.DetailA.Points[4];
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailA.Points[0], points[0]);
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailA.Points[1], points[1]);
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailA.Points[2], points[2]);
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailA.Points[3], points[3]);
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailA.Points[4], points[4]);
   points[5].setX(m_ShieldGeometry.DetailA.LengthX);
   points[5].setY(m_ShieldGeometry.DetailA.LengthY);
   points[5].setZ(0);
-  points[6] = m_ShieldGeometry.DetailA.Points[5];
-  points[7] = m_ShieldGeometry.DetailA.Points[6];
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailA.Points[5], points[6]);
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailA.Points[6], points[7]);
   l = 0.5 * (m_ShieldGeometry.DetailA.LengthX +
              m_ShieldGeometry.DetailB.LengthX);
   m_ShieldGeometry.DetailACenter.setX(-asqrt2 * l);
@@ -410,10 +422,10 @@ void EKLM::GeometryData::calculateShieldGeometry()
   points[3].setX(m_ShieldGeometry.DetailB.LengthX);
   points[3].setY(-m_ShieldGeometry.DetailD.LengthY);
   points[3].setZ(0);
-  points[4] = m_ShieldGeometry.DetailB.Points[0];
-  points[5] = m_ShieldGeometry.DetailB.Points[1];
-  points[6] = m_ShieldGeometry.DetailB.Points[2];
-  points[7] = m_ShieldGeometry.DetailB.Points[3];
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailB.Points[0], points[4]);
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailB.Points[1], points[5]);
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailB.Points[2], points[6]);
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailB.Points[3], points[7]);
   /* Detail B center coordinates are (0, 0), not necessary to set them here. */
   for (i = 0; i < 8; i++)
     points[i] = HepGeom::RotateZ3D(-45.0 * CLHEP::deg) *
@@ -425,16 +437,16 @@ void EKLM::GeometryData::calculateShieldGeometry()
   m_ShieldGeometry.DetailBCenter.setY(m_ShieldGeometry.DetailBCenter.y() + dy);
   m_ShieldGeometry.DetailBCenter.setZ(0);
   /* Detail C. */
-  points[0] = m_ShieldGeometry.DetailC.Points[0];
-  points[1] = m_ShieldGeometry.DetailC.Points[1];
-  points[2] = m_ShieldGeometry.DetailC.Points[2];
-  points[3] = m_ShieldGeometry.DetailC.Points[3];
-  points[4] = m_ShieldGeometry.DetailC.Points[4];
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailC.Points[0], points[0]);
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailC.Points[1], points[1]);
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailC.Points[2], points[2]);
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailC.Points[3], points[3]);
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailC.Points[4], points[4]);
   points[5].setX(m_ShieldGeometry.DetailC.LengthX);
   points[5].setY(m_ShieldGeometry.DetailC.LengthY);
   points[5].setZ(0);
-  points[6] = m_ShieldGeometry.DetailC.Points[5];
-  points[7] = m_ShieldGeometry.DetailC.Points[6];
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailC.Points[5], points[6]);
+  EKLMPointToCLHEP(m_ShieldGeometry.DetailC.Points[6], points[7]);
   l = 0.5 * (m_ShieldGeometry.DetailB.LengthX +
              m_ShieldGeometry.DetailC.LengthX);
   m_ShieldGeometry.DetailCCenter.setX(asqrt2 * l);

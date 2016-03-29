@@ -15,6 +15,7 @@
 #pragma link C++ class Belle2::EKLMGeometry::SegmentSupportGeometry+;
 #pragma link C++ class Belle2::EKLMGeometry::SegmentSupportPosition+;
 #pragma link C++ class Belle2::EKLMGeometry::StripGeometry+;
+#pragma link C++ class Belle2::EKLMGeometry::Point+;
 #pragma link C++ class Belle2::EKLMGeometry::ShieldDetailGeometry+;
 #pragma link C++ class Belle2::EKLMGeometry::ShieldGeometry+;
 #pragma link C++ class Belle2::EKLMGeometry::BoardGeometry+;

@@ -1274,28 +1274,28 @@ void EKLM::GeoEKLMCreator::createShieldDetailALogicalVolume()
   }
   ss1 = cutSolidCorner("ShieldDetailA_Subtraction_1", box,
                        m_Solids.subtractionBox, t, false,
-                       shieldGeometry->DetailA.Points[0].x() - lx,
-                       shieldGeometry->DetailA.Points[0].y() - ly,
-                       shieldGeometry->DetailA.Points[1].x() - lx,
-                       shieldGeometry->DetailA.Points[1].y() - ly);
+                       shieldGeometry->DetailA.Points[0].X - lx,
+                       shieldGeometry->DetailA.Points[0].Y - ly,
+                       shieldGeometry->DetailA.Points[1].X - lx,
+                       shieldGeometry->DetailA.Points[1].Y - ly);
   ss2 = cutSolidCorner("ShieldDetailA_Subtraction_2", ss1,
                        m_Solids.subtractionBox, t, true,
-                       shieldGeometry->DetailA.Points[3].x() - lx,
-                       shieldGeometry->DetailA.Points[3].y() - ly,
-                       shieldGeometry->DetailA.Points[2].x() - lx,
-                       shieldGeometry->DetailA.Points[2].y() - ly);
+                       shieldGeometry->DetailA.Points[3].X - lx,
+                       shieldGeometry->DetailA.Points[3].Y - ly,
+                       shieldGeometry->DetailA.Points[2].X - lx,
+                       shieldGeometry->DetailA.Points[2].Y - ly);
   ss3 = cutSolidCorner("ShieldDetailA_Subtraction_3", ss2,
                        m_Solids.subtractionBox, t, false,
-                       shieldGeometry->DetailA.Points[3].x() - lx,
-                       shieldGeometry->DetailA.Points[3].y() - ly,
-                       shieldGeometry->DetailA.Points[4].x() - lx,
-                       shieldGeometry->DetailA.Points[4].y() - ly);
+                       shieldGeometry->DetailA.Points[3].X - lx,
+                       shieldGeometry->DetailA.Points[3].Y - ly,
+                       shieldGeometry->DetailA.Points[4].X - lx,
+                       shieldGeometry->DetailA.Points[4].Y - ly);
   solidDetailA = cutSolidCorner("ShieldDetailA", ss3,
                                 m_Solids.subtractionBox, t, false,
-                                shieldGeometry->DetailA.Points[5].x() - lx,
-                                shieldGeometry->DetailA.Points[5].y() - ly,
-                                shieldGeometry->DetailA.Points[6].x() - lx,
-                                shieldGeometry->DetailA.Points[6].y() - ly);
+                                shieldGeometry->DetailA.Points[5].X - lx,
+                                shieldGeometry->DetailA.Points[5].Y - ly,
+                                shieldGeometry->DetailA.Points[6].X - lx,
+                                shieldGeometry->DetailA.Points[6].Y - ly);
   try {
     m_LogVol.shield.detailA =
       new G4LogicalVolume(solidDetailA, m_Materials.polyethylene,
@@ -1323,16 +1323,16 @@ void EKLM::GeoEKLMCreator::createShieldDetailBLogicalVolume()
   }
   ss1 = cutSolidCorner("ShieldDetailB_Subtraction_1", box,
                        m_Solids.subtractionBox, t, false,
-                       shieldGeometry->DetailB.Points[0].x() - lx,
-                       shieldGeometry->DetailB.Points[0].y() - ly,
-                       shieldGeometry->DetailB.Points[1].x() - lx,
-                       shieldGeometry->DetailB.Points[1].y() - ly);
+                       shieldGeometry->DetailB.Points[0].X - lx,
+                       shieldGeometry->DetailB.Points[0].Y - ly,
+                       shieldGeometry->DetailB.Points[1].X - lx,
+                       shieldGeometry->DetailB.Points[1].Y - ly);
   solidDetailB = cutSolidCorner("ShieldDetailB", ss1,
                                 m_Solids.subtractionBox, t, false,
-                                shieldGeometry->DetailB.Points[2].x() - lx,
-                                shieldGeometry->DetailB.Points[2].y() - ly,
-                                shieldGeometry->DetailB.Points[3].x() - lx,
-                                shieldGeometry->DetailB.Points[3].y() - ly);
+                                shieldGeometry->DetailB.Points[2].X - lx,
+                                shieldGeometry->DetailB.Points[2].Y - ly,
+                                shieldGeometry->DetailB.Points[3].X - lx,
+                                shieldGeometry->DetailB.Points[3].Y - ly);
   try {
     m_LogVol.shield.detailB =
       new G4LogicalVolume(solidDetailB, m_Materials.polyethylene,
@@ -1360,28 +1360,28 @@ void EKLM::GeoEKLMCreator::createShieldDetailCLogicalVolume()
   }
   ss1 = cutSolidCorner("ShieldDetailC_Subtraction_1", box,
                        m_Solids.subtractionBox, t, false,
-                       shieldGeometry->DetailC.Points[0].x() - lx,
-                       shieldGeometry->DetailC.Points[0].y() - ly,
-                       shieldGeometry->DetailC.Points[1].x() - lx,
-                       shieldGeometry->DetailC.Points[1].y() - ly);
+                       shieldGeometry->DetailC.Points[0].X - lx,
+                       shieldGeometry->DetailC.Points[0].Y - ly,
+                       shieldGeometry->DetailC.Points[1].X - lx,
+                       shieldGeometry->DetailC.Points[1].Y - ly);
   ss2 = cutSolidCorner("ShieldDetailC_Subtraction_2", ss1,
                        m_Solids.subtractionBox, t, true,
-                       shieldGeometry->DetailC.Points[3].x() - lx,
-                       shieldGeometry->DetailC.Points[3].y() - ly,
-                       shieldGeometry->DetailC.Points[2].x() - lx,
-                       shieldGeometry->DetailC.Points[2].y() - ly);
+                       shieldGeometry->DetailC.Points[3].X - lx,
+                       shieldGeometry->DetailC.Points[3].Y - ly,
+                       shieldGeometry->DetailC.Points[2].X - lx,
+                       shieldGeometry->DetailC.Points[2].Y - ly);
   ss3 = cutSolidCorner("ShieldDetailC_Subtraction_3", ss2,
                        m_Solids.subtractionBox, t, false,
-                       shieldGeometry->DetailC.Points[3].x() - lx,
-                       shieldGeometry->DetailC.Points[3].y() - ly,
-                       shieldGeometry->DetailC.Points[4].x() - lx,
-                       shieldGeometry->DetailC.Points[4].y() - ly);
+                       shieldGeometry->DetailC.Points[3].X - lx,
+                       shieldGeometry->DetailC.Points[3].Y - ly,
+                       shieldGeometry->DetailC.Points[4].X - lx,
+                       shieldGeometry->DetailC.Points[4].Y - ly);
   solidDetailC = cutSolidCorner("ShieldDetailC", ss3,
                                 m_Solids.subtractionBox, t, false,
-                                shieldGeometry->DetailC.Points[5].x() - lx,
-                                shieldGeometry->DetailC.Points[5].y() - ly,
-                                shieldGeometry->DetailC.Points[6].x() - lx,
-                                shieldGeometry->DetailC.Points[6].y() - ly);
+                                shieldGeometry->DetailC.Points[5].X - lx,
+                                shieldGeometry->DetailC.Points[5].Y - ly,
+                                shieldGeometry->DetailC.Points[6].X - lx,
+                                shieldGeometry->DetailC.Points[6].Y - ly);
   try {
     m_LogVol.shield.detailC =
       new G4LogicalVolume(solidDetailC, m_Materials.polyethylene,

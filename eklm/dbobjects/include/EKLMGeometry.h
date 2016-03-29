@@ -393,6 +393,26 @@ namespace Belle2 {
     };
 
     /**
+     * 2D point.
+     */
+    struct Point : public TObject {
+
+      /**
+       * Constructor.
+       */
+      Point();
+
+      double X; /**< X coordinate. */
+      double Y; /**< Y coordinate. */
+
+    private:
+
+      /* Makes objects storable. */
+      ClassDef(Point, 1);
+
+    };
+
+    /**
      * Shield layer detail geometry data.
      */
     struct ShieldDetailGeometry : public TObject {
@@ -402,9 +422,17 @@ namespace Belle2 {
        */
       ShieldDetailGeometry();
 
-      double LengthX;                   /**< X length. */
-      double LengthY;                   /**< Y length. */
-      HepGeom::Point3D<double>* Points; /**< Points. */
+      /** X length. */
+      double LengthX;
+
+      /** Y length. */
+      double LengthY;
+
+      /** Number of points. */
+      int NPoints;
+
+      /** Points. */
+      Point* Points; //[NPoints]
 
     private:
 

@@ -100,10 +100,17 @@ EKLMGeometry::StripGeometry::StripGeometry()
   RSSSize = 0;
 }
 
+EKLMGeometry::Point::Point()
+{
+  X = 0;
+  Y = 0;
+}
+
 EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry()
 {
   LengthX = 0;
   LengthY = 0;
+  NPoints = 0;
   Points = NULL;
 }
 

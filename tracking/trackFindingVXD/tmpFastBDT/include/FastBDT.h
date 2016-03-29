@@ -412,7 +412,6 @@ namespace tmpFastBDT {
     void UpdateEvents(const EventSample& sample, unsigned int iLayer);
 
   private:
-    unsigned int nLayers; /**< Number of layers in this tree */
     std::vector<Cut> cuts; /**< The best cut for every node in the tree excluding the leave nodes */
     std::vector<Node> nodes; /**< Information about every node in the tree including the leave nodes */
 

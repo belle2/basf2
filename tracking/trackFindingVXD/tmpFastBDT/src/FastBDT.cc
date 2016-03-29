@@ -236,7 +236,7 @@ namespace tmpFastBDT {
   }
 
 
-  TreeBuilder::TreeBuilder(unsigned int nLayers, EventSample& sample) : nLayers(nLayers)
+  TreeBuilder::TreeBuilder(unsigned int nLayers, EventSample& sample)
   {
 
     const unsigned int nNodes = 1 << nLayers;

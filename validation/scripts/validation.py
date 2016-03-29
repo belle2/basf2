@@ -316,6 +316,11 @@ def draw_progress_bar(delete_lines, list_of_scripts, barlength=50):
 
 
 class IntervalSelector:
+    """
+    This can be used to parse the execution intervals of validation scripts
+    and can check whether a script object is in the list of intervals
+    configured in this class.
+    """
 
     def __init__(self, intervals):
         """

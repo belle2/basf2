@@ -53,6 +53,8 @@ namespace Belle2 {
   private:
 
     std::string m_filenameROOT; /**< The filename of the ROOT file into which the geometry is saved. */
+    bool m_exportAsGDML{false}; /**< Export the geometry as GDML format */
+    bool m_gdmlAdresses{true}; /**< If true make the xml names unique by prepending the pointer address */
 
   };
 }

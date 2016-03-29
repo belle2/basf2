@@ -476,15 +476,10 @@ namespace Belle2 {
       return m_genfitTrack.getFittedState(id, representation);
     }
 
-    /// Prune the genfit track. Only to be used in the prune module.
-    void prune(const std::string& optionsString)
-    {
-      if (getHitPointsWithMeasurement().size() < 2)
-        return;
-
-      checkDirtyFlag();
-      m_genfitTrack.prune(optionsString.c_str());
-    }
+    /** Prune the genfit track, e.g. remove all track points with measurements, but the first and the last one.
+      * Also, set the flags of the corresponding RecoHitInformation to pruned. Only to be used in the prune module.
+      */
+    void prune();
 
     /// Return a list of measurements and track points, which can be used e.g. to extrapolate. You are not allowed to modify or delete them!
     const std::vector<genfit::TrackPoint*>& getHitPointsWithMeasurement() const

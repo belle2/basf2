@@ -19,16 +19,12 @@ REG_MODULE(PruneRecoTracks);
 PruneRecoTracksModule::PruneRecoTracksModule() :
   Module()
 {
-  setDescription("Prunes RecoTracks");
+  setDescription("Prunes RecoTracks.");
   setPropertyFlags(c_ParallelProcessingCertified);
-
-  addParam("pruneFlags", m_pruneFlags,
-           "Pruning options passed on to genfit. See genfit::Track class for a detailed description",
-           std::string("FL"));
 
   addParam("storeArrayName", m_storeArrayName,
            "Name of the StoreArray which is pruned",
-           std::string("RecoTracks"));
+           m_storeArrayName);
 
 }
 
@@ -41,7 +37,7 @@ void PruneRecoTracksModule::event()
 {
   auto tracks = Belle2::StoreArray<RecoTrack>(m_storeArrayName);
   for (auto& t : tracks) {
-    t.prune(m_pruneFlags.c_str());
+    t.prune();
   }
 }
 

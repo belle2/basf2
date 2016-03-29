@@ -72,6 +72,7 @@ namespace Belle2 {
     enum RecoHitFlag {
       c_undefinedRecoHitFlag,
       c_dismissedByFit,
+      c_pruned,
     };
 
     /** The detector this hit comes from (which is of course also visible in the hit type) */

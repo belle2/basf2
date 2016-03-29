@@ -193,3 +193,27 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
 
   return true;
 }
+
+void RecoTrack::prune()
+{
+  if (getHitPointsWithMeasurement().size() < 2)
+    return;
+
+  // Copy is intended!
+  std::vector<RelationEntry> relatedRecoHitInformations = getRelationsWith<RecoHitInformation>
+                                                          (m_storeArrayNameOfRecoHitInformation).relations();
+  std::sort(relatedRecoHitInformations.begin(), relatedRecoHitInformations.end() , [](const RelationEntry & lhs,
+  const RelationEntry & rhs) {
+    return dynamic_cast<RecoHitInformation*>(lhs.object)->getSortingParameter() > dynamic_cast<RecoHitInformation*>
+           (rhs.object)->getSortingParameter();
+  });
+
+  // "Prune" all RecoHitInformation but the first and the last.
+  for (unsigned int i = 1; i < relatedRecoHitInformations.size() - 1; ++i) {
+    dynamic_cast<RecoHitInformation*>(relatedRecoHitInformations[i].object)->setFlag(RecoHitInformation::RecoHitFlag::c_pruned);
+    dynamic_cast<RecoHitInformation*>(relatedRecoHitInformations[i].object)->setCreatedTrackPoint(nullptr);
+  }
+
+  checkDirtyFlag();
+  m_genfitTrack.prune("FL");
+}

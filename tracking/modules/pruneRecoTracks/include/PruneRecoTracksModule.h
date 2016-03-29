@@ -19,8 +19,7 @@
  */
 
 namespace Belle2 {
-
-  /// Depricated alias for TrackFinderCDCAutomatonModule
+  /// Module to prune RecoTracks.
   class PruneRecoTracksModule : public Module {
 
   public:
@@ -34,12 +33,8 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
-
-    // flags used for pruning, See genfit::Track class for possible settings
-    std::string m_pruneFlags;
-
-    // name of the StoreArray to prune
-    std::string m_storeArrayName;
+    /// Name of the StoreArray to prune.
+    std::string m_storeArrayName = "RecoTracks";
 
   }; // end class
 } // end namespace Belle2

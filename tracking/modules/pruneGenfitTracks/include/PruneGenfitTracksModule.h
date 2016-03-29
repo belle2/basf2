@@ -20,7 +20,7 @@
 
 namespace Belle2 {
 
-  /// Depricated alias for TrackFinderCDCAutomatonModule
+  /// Module to prune genfit::Tracks
   class PruneGenfitTracksModule : public Module {
 
   public:

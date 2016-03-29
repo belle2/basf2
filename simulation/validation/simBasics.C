@@ -1,6 +1,6 @@
 /*
 <header>
-  <input>EvtGenSimRec.root</input>
+  <input>EvtGenSimNoBkg.root</input>
   <output>simBasics.root</output>
   <contact>dorisykim@ssu.ac.kr</contact>
   <description> A collection of basic MC information to validate the simulation library. </header>
@@ -25,7 +25,7 @@ void vertexDistribution(TTree* tree);
 void simBasics()
 {
   // open the file with simulated and reconstructed EvtGen particles
-  TFile* input = TFile::Open("../EvtGenSimRec.root");
+  TFile* input = TFile::Open("../EvtGenSimNoBkg.root");
   TTree* tree = (TTree*) input->Get("tree");
 
   // open the output file for the validation histograms

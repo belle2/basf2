@@ -10,6 +10,8 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/SelectSubset.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
 
 /**
  * This module calls RecoTrack::prune to remove hits before
@@ -35,6 +37,9 @@ namespace Belle2 {
   private:
     /// Name of the StoreArray to prune.
     std::string m_storeArrayName = "RecoTracks";
+
+    /// We use SelectSubset here to delete all pruned RecoHitInformation.
+    SelectSubset<RecoHitInformation> m_subsetOfUnprunedRecoHitInformation;
 
   }; // end class
 } // end namespace Belle2

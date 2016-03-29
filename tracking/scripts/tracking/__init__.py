@@ -93,6 +93,8 @@ def add_prune_tracks(path, components=None):
     """
     Adds removal of the intermediate states at each measurement from the fitted tracks.
     """
+
+    path.add_module('PruneRecoTracks')
     path.add_module("PruneGenfitTracks")
 
 

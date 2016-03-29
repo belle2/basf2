@@ -196,9 +196,7 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
 
 void RecoTrack::prune()
 {
-  if (getHitPointsWithMeasurement().size() < 2)
-    return;
-
+  // "Delete" all RecoHitInfromation but the first and the last.
   // Copy is intended!
   std::vector<RelationEntry> relatedRecoHitInformations = getRelationsWith<RecoHitInformation>
                                                           (m_storeArrayNameOfRecoHitInformation).relations();
@@ -214,6 +212,9 @@ void RecoTrack::prune()
     dynamic_cast<RecoHitInformation*>(relatedRecoHitInformations[i].object)->setCreatedTrackPoint(nullptr);
   }
 
-  checkDirtyFlag();
-  m_genfitTrack.prune("FL");
+
+  // Genfits prune method fails, if the number of hits is too small.
+  if (getHitPointsWithMeasurement().size() >= 2) {
+    m_genfitTrack.prune("FL");
+  }
 }

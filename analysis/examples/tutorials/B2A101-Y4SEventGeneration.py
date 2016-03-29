@@ -25,12 +25,7 @@ from modularAnalysis import generateY4S
 from modularAnalysis import loadGearbox
 from reconstruction import add_mdst_output
 from modularAnalysis import analysis_main
-from beamparameters import add_beamparameters
 from ROOT import Belle2
-
-# set the BeamParameters for running at Y(4S)
-beamparameters = add_beamparameters(analysis_main, "Y4S")
-print_params(beamparameters)
 
 # generation of 100 events according to the specified DECAY table
 # Y(4S) -> Btag- Bsig+

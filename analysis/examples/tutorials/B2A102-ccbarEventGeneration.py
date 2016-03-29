@@ -25,12 +25,6 @@ from modularAnalysis import generateContinuum
 from modularAnalysis import loadGearbox
 from modularAnalysis import analysis_main
 from reconstruction import add_mdst_output
-from beamparameters import add_beamparameters
-
-# set the BeamParameters for running at Y(4S)-off resonance
-beamparameters = add_beamparameters(analysis_main, "Y4S-off")
-print_params(beamparameters)
-
 
 # generation of 100 events according to the specified DECAY table
 # e+e- -> ccbar -> D*+ anthing
@@ -46,3 +40,6 @@ add_mdst_output(analysis_main, True, 'B2A102-ccbarEventGeneration-evtgen.root')
 
 # Process the events
 process(analysis_main)
+
+# print out the summary
+print(statistics)

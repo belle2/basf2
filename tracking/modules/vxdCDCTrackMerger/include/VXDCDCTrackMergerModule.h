@@ -53,10 +53,14 @@ namespace Belle2 {
 
   private:
 
-    // pair of matched Tracks, first enry is the index of the VXD Track, second of the CDC Track
+    /**
+     * pair of matched Tracks, first enry is the index of the VXD Track, second of the CDC Track
+     */
     typedef std::pair<int, int> MatchPairType;
 
-    // list of matched track pairs
+    /**
+     * list of matched track pairs
+     */
     typedef std::vector<MatchPairType> MatchPairList;
 
     /**
@@ -69,17 +73,23 @@ namespace Belle2 {
     size_t addUnmatchedTracks(StoreArray<RecoTrack>& singleRecoTracks,
                               MatchPairList const& matchedList, bool useFirstIndex = true);
 
+    /** Radius of the inner CDC wall in centimeters */
     double m_CDC_wall_radius = 16.25;
+    /** Maximum distance between extrapolated tracks on the CDC wall */
     double m_merge_radius;
 
+    /** StoreArray name of the VXD Track collection */
     std::string m_VXDRecoTrackColName;
+    /** StoreArray name of the CDC Track collection */
     std::string m_CDCRecoTrackColName;
+    /** StoreArray name of the merged Track collection */
     std::string m_mergedRecoTrackColName;
 
-    std::string m_relMatchedTracks;
-
-    StoreArray<RecoTrack>  m_CDCRecoTracks;
+    /** StoreArray of the VXD Track collection */
     StoreArray<RecoTrack>  m_VXDRecoTracks;
+    /** StoreArray of the CDC Track collection */
+    StoreArray<RecoTrack>  m_CDCRecoTracks;
+    /** StoreArray of the merged Track collection */
     StoreArray<RecoTrack>  m_mergedRecoTracks;
 
   };

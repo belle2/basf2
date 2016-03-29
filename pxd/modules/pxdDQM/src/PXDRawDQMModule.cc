@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDRawDQMModule.h>
+#include <vxd/geometry/GeoCache.h>
 
 #include "TDirectory.h"
 #include <string>
@@ -16,6 +17,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
+using namespace Belle2::VXD;
 
 using boost::format;
 
@@ -62,28 +64,37 @@ void PXDRawDQMModule::defineHisto()
     NULL;// new TH2F("hrawPxdPedestalMapAll",                                    "Pxd Raw Pedestal Map Overview;column+(ladder-1)*300+100;row+850*((layer-1)*2+(sensor-1))", 370/*0*/, 0, 3700, 350/*0*/, 0, 3500);
 
   hrawPxdHitsCount = new TH1F("hrawPxdCount", "Pxd Raw Count ;Nr per Event", 8192, 0, 8192);
-  int limit_dhhid = 4; // workaround for testbeam online DQM to prevent memory overflow for too many histograms
   for (auto i = 0; i < 64; i++) {
     auto num1 = (((i >> 5) & 0x1) + 1);
     auto num2 = ((i >> 1) & 0xF);
     auto num3 = ((i & 0x1) + 1);
-    //cppcheck-suppress zerodiv
-    string s = str(format("Sensor %d:%d:%d (DHH ID %02Xh)") % num1 % num2 % num3 % i);
-    //cppcheck-suppress zerodiv
-    string s2 = str(format("_%d.%d.%d") % num1 % num2 % num3);
 
-    hrawPxdHitMap[i] = (i > limit_dhhid) ? NULL : new TH2F(("hrawPxdHitMap" + s2).c_str(),
-                                                           ("Pxd Raw Hit Map, " + s + ";column;row").c_str(), 256,
-                                                           0, 256, 786, 0, 786);
-    hrawPxdChargeMap[i] = (i > limit_dhhid) ? NULL : new TH2F(("hrawPxdChargeMap" + s2).c_str(),
-                                                              ("Pxd Raw Charge Map, " + s + ";column;row").c_str(), 256, 0, 256, 786, 0, 786);
-    hrawPxdHitsCharge[i] = (i > limit_dhhid) ? NULL : new TH1F(("hrawPxdHitsCharge" + s2).c_str(),
-                                                               ("Pxd Raw Hit Charge, " + s + ";Charge").c_str(), 256, 0, 256);
-    hrawPxdHitsCommonMode[i] = (i > limit_dhhid) ? NULL : new TH1F(("hrawPxdHitsCommonMode" + s2).c_str(),
-                               ("Pxd Raw Hit Common Mode, " + s + ";Value").c_str(),
-                               256, 0, 256);
-    hrawPxdHitsTimeWindow[i] = (i > limit_dhhid) ? NULL : new TH1F(("hrawPxdHitsTimeWindow" + s2).c_str(),
-                               ("Pxd Raw Hit Time Window (framenr*1024-startrow), " + s + ";Time [a.u.]").c_str(), 8192, -1024, 8192 - 1024);
+    // Check if sensor exist
+    if (Belle2::VXD::GeoCache::getInstance().validSensorID(Belle2::VxdID(num1, num2, num3))) {
+      //cppcheck-suppress zerodiv
+      string s = str(format("Sensor %d:%d:%d (DHH ID %02Xh)") % num1 % num2 % num3 % i);
+      //cppcheck-suppress zerodiv
+      string s2 = str(format("_%d.%d.%d") % num1 % num2 % num3);
+
+      hrawPxdHitMap[i] = new TH2F(("hrawPxdHitMap" + s2).c_str(),
+                                  ("Pxd Raw Hit Map, " + s + ";column;row").c_str(), 256,
+                                  0, 256, 786, 0, 786);
+      hrawPxdChargeMap[i] = new TH2F(("hrawPxdChargeMap" + s2).c_str(),
+                                     ("Pxd Raw Charge Map, " + s + ";column;row").c_str(), 256, 0, 256, 786, 0, 786);
+      hrawPxdHitsCharge[i] = new TH1F(("hrawPxdHitsCharge" + s2).c_str(),
+                                      ("Pxd Raw Hit Charge, " + s + ";Charge").c_str(), 256, 0, 256);
+      hrawPxdHitsCommonMode[i] = new TH1F(("hrawPxdHitsCommonMode" + s2).c_str(),
+                                          ("Pxd Raw Hit Common Mode, " + s + ";Value").c_str(),
+                                          256, 0, 256);
+      hrawPxdHitsTimeWindow[i] = new TH1F(("hrawPxdHitsTimeWindow" + s2).c_str(),
+                                          ("Pxd Raw Hit Time Window (framenr*1024-startrow), " + s + ";Time [a.u.]").c_str(), 8192, -1024, 8192 - 1024);
+    } else {
+      hrawPxdHitMap[i] = NULL;
+      hrawPxdChargeMap[i] = NULL;
+      hrawPxdHitsCharge[i] =  NULL;
+      hrawPxdHitsCommonMode[i] = NULL;
+      hrawPxdHitsTimeWindow[i] = NULL;
+    }
   }
 
   // cd back to root directory

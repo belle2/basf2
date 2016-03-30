@@ -28,7 +28,7 @@ def run():
     # generateY4S(1000, path=path)
 
     path.add_module('EventInfoSetter',
-                    evtNumList=[500],
+                    evtNumList=[100],
                     runList=[1],
                     expList=[1]
                     )

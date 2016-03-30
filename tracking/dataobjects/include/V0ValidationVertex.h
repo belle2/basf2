@@ -21,8 +21,8 @@ namespace Belle2 {
       m_chi2(0)
     {}
 
-    V0ValidationVertex(const std::pair<Belle2::Track*, Belle2::TrackFitResult*>& trackPairPositive,
-                       const std::pair<Belle2::Track*, Belle2::TrackFitResult*>& trackPairNegative) :
+    V0ValidationVertex(const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairPositive,
+                       const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairNegative) :
       V0(trackPairPositive, trackPairNegative),
       m_fittedVertexPosition(TVector3(0, 0, 0)),
       m_fittedMomentum(0),
@@ -30,8 +30,8 @@ namespace Belle2 {
       m_chi2(0)
     {}
 
-    V0ValidationVertex(const std::pair<Belle2::Track*, Belle2::TrackFitResult*>& trackPairPositive,
-                       const std::pair<Belle2::Track*, Belle2::TrackFitResult*>& trackPairNegative,
+    V0ValidationVertex(const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairPositive,
+                       const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairNegative,
                        const TVector3& fittedVertexPosition,
                        const TMatrixDSym& fittedVertexPositionCovariance,
                        const double& momentum,

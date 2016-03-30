@@ -1,0 +1,260 @@
+#include <tracking/v0Finding/fitter/V0Fitter.h>
+
+#include <framework/logging/Logger.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <tracking/v0Finding/dataobjects/VertexVector.h>
+
+#include <genfit/MeasuredStateOnPlane.h>
+#include <genfit/GFRaveVertexFactory.h>
+#include <genfit/GFRaveVertex.h>
+#include <genfit/Track.h>
+#include <genfit/FieldManager.h>
+
+#include <TVector3.h>
+
+using namespace Belle2;
+
+V0Fitter::V0Fitter(const std::string& trackFitResultColName, const std::string& v0ColName,
+                   const std::string& v0ValidationVertexColName, const std::string& gfTrackColName)
+  : m_validation(false), m_GFTrackColName(gfTrackColName)
+{
+  m_trackFitResults = StoreArray<TrackFitResult>(trackFitResultColName);
+  m_v0s = StoreArray<V0>(v0ColName);
+  m_validationV0s = StoreArray<V0ValidationVertex>(v0ValidationVertexColName);
+}
+
+void V0Fitter::initializeCuts(double beamPipeRadius,
+                              double vertexChi2CutInside,
+                              double massWindowKshortInside,
+                              double vertexChi2CutOutside)
+{
+  m_beamPipeRadius = beamPipeRadius;
+  m_vertexChi2CutInside = vertexChi2CutInside;
+  m_massWindowKshortInside = massWindowKshortInside;
+  m_vertexChi2CutOutside = vertexChi2CutOutside;
+}
+
+
+bool V0Fitter::rejectCandidate(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus)
+{
+  const TVector3& posPlus = stPlus.getPos();
+  const TVector3& posMinus = stMinus.getPos();
+
+  // Starting point: point closest to axis where either track is defined
+  //
+  // This is intended to reject tracks that curl away before
+  // meeting, there are corner cases where this could throw away
+  // legitimate candidates, namely where one track makes a full
+  // circle through the detector without hitting any detectors
+  // then making it past Rstart without hitting the detector there
+  // -- while still being part of the V0.  Unlikely, I didn't find
+  // a single example in MC.  On the other hand it rejects
+  // impossible candidates.
+  const double Rstart = std::min(posPlus.Perp(), posMinus.Perp());
+  try {
+    stPlus.extrapolateToCylinder(Rstart);
+    stMinus.extrapolateToCylinder(Rstart);
+  } catch (...) {
+    B2DEBUG(200, "Extrapolation to cylinder failed.");
+    return true;
+  }
+
+  return false;
+}
+
+
+bool V0Fitter::fitVertex(genfit::Track* trackPlus, genfit::Track* trackMinus, genfit::GFRaveVertex& vertex)
+{
+  VertexVector vertexVector;
+  std::vector<genfit::Track*> trackPair {trackPlus, trackMinus};
+
+  try {
+    genfit::GFRaveVertexFactory vertexFactory;
+    vertexFactory.findVertices(&vertexVector.v, trackPair);
+  } catch (...) {
+    B2ERROR("Exception during vertex fit.");
+    return false;
+  }
+
+  if (vertexVector.size() != 1) {
+    B2DEBUG(150, "Vertex fit failed. Size of vertexVector not 1, but: " << vertexVector.size());
+    return false;
+  }
+
+  if ((*vertexVector[0]).getNTracks() != 2) {
+    B2ERROR("Wrong number of tracks in vertex.");
+    return false;
+  }
+
+  vertex = *vertexVector[0];
+  return true;
+}
+
+
+bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
+                                   const TVector3& vertexPosition)
+{
+  try {
+    stPlus.extrapolateToPoint(vertexPosition);
+    stMinus.extrapolateToPoint(vertexPosition);
+  } catch (...) {
+    // This shouldn't ever happen, but I can see the extrapolation
+    // code trying several windings before giving up, so this
+    // happens occasionally.  Something more stable would perhaps
+    // be desirable.
+    B2ERROR("Could not extrapolate track to vertex.");
+    return false;
+  }
+  return true;
+}
+
+
+double V0Fitter::getBzAtVertex(const TVector3& vertexPosition)
+{
+  double Bx, By, Bz;
+  genfit::FieldManager::getInstance()->getFieldVal(vertexPosition.X(), vertexPosition.Y(), vertexPosition.Z(),
+                                                   Bx, By, Bz);
+  Bz = Bz / 10;
+  return Bz;
+}
+
+
+TrackFitResult* V0Fitter::buildTrackFitResult(genfit::Track* track, genfit::MeasuredStateOnPlane& msop, double Bz,
+                                              const Const::ParticleType& trackHypothesis)
+{
+  TrackFitResult* v0TrackFitResult
+    = m_trackFitResults.appendNew(msop.getPos(), msop.getMom(),
+                                  msop.get6DCov(), msop.getCharge(),
+                                  trackHypothesis,
+                                  track->getFitStatus()->getPVal(),
+                                  Bz, 0, 0);
+
+  DataStore::addRelationFromTo(track, v0TrackFitResult);
+  return v0TrackFitResult;
+}
+
+std::pair<Const::ParticleType, Const::ParticleType> V0Fitter::getTrackHypotheses(const Const::ParticleType& v0Hypothesis)
+{
+  if (v0Hypothesis == Const::Kshort) {
+    return std::make_pair(Const::pion, Const::pion);
+  } else if (v0Hypothesis == Const::photon) {
+    return std::make_pair(Const::electron, Const::electron);
+  } else if (v0Hypothesis == Const::Lambda) {
+    return std::make_pair(Const::proton, Const::pion);
+  } else if (v0Hypothesis == Const::antiLambda) {
+    return std::make_pair(Const::pion, Const::proton);
+  } else {
+    B2FATAL("Given V0Hypothesis not available.")
+    return std::make_pair(Const::invalidParticle, Const::invalidParticle);
+  }
+
+}
+
+bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
+                           const Const::ParticleType& v0Hypothesis)  // TODO: Give Particle Types
+{
+  const auto trackHypotheses = getTrackHypotheses(v0Hypothesis);
+  genfit::Track* gfTrackPlus = trackPlus->getTrackFitResult(trackHypotheses.first)->getRelatedFrom<genfit::Track>(m_GFTrackColName);
+
+  if (!gfTrackPlus) {
+    B2ERROR("No genfit::Track for TrackFitResult");
+    return false;
+  }
+
+  genfit::Track* gfTrackMinus = trackMinus->getTrackFitResult(trackHypotheses.second)->getRelatedFrom<genfit::Track>
+                                (m_GFTrackColName);
+
+  if (!gfTrackMinus) {
+    B2ERROR("No genfit::Track for TrackFitResult");
+    return false;
+  }
+
+  genfit::MeasuredStateOnPlane stPlus = gfTrackPlus->getFittedState();
+  genfit::MeasuredStateOnPlane stMinus = gfTrackMinus->getFittedState();
+
+  if (rejectCandidate(stPlus, stMinus)) {
+    return false;
+  }
+
+  genfit::GFRaveVertex vert;
+  if (not fitVertex(gfTrackPlus, gfTrackMinus, vert)) {
+    return false;
+  }
+
+  // FIXME we assume that only the pion hypothesis is employed.
+  // Non-pion tracks are ignored at this point.
+  const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
+  const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
+
+  // FIXME: This could will be obsolete in the future.
+  if (fabs(tr0->getPdg()) != trackHypotheses.first.getPDGCode()
+      || fabs(tr1->getPdg()) != trackHypotheses.second.getPDGCode()) {
+    B2ERROR("Unsupported particle hypothesis in V0.");
+    return false;
+  }
+
+  // TODO: Call specific cuts with particle types
+
+  const TVector3& posVert(vert.getPos());
+  TLorentzVector lv0, lv1;
+
+  // Apply cuts.  We have one set of cuts inside the beam pipe,
+  // the other outside.
+  if (posVert.Perp() < m_beamPipeRadius) {
+    if (v0Hypothesis == Const::photon) {
+      return false;  // No converions inside beampipe
+    }
+
+    if (vert.getChi2() > m_vertexChi2CutInside) {
+      B2DEBUG(200, "Vertex inside beam pipe, chi^2 too large.");
+      return false;
+    }
+
+    // Reconstruct invariant mass.
+    lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
+    lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
+
+    const double mReco = (lv0 + lv1).M();
+    if (v0Hypothesis == Const::Kshort and fabs(mReco - Const::K0Mass) > m_massWindowKshortInside * Unit::MeV) {
+      B2DEBUG(200, "Vertex inside beam pipe, outside Kshort mass window.");
+      return false;
+    }
+  } else {
+    if (vert.getChi2() > m_vertexChi2CutOutside) {
+      B2DEBUG(200, "Vertex outside beam pipe, chi^2 too large.");
+      return false;
+    }
+  }
+
+  B2DEBUG(200, "Vertex accepted.");
+
+  // Assemble V0s.
+  if (not extrapolateToVertex(stPlus, stMinus, posVert)) {
+    return false;
+  }
+
+  const double Bz = getBzAtVertex(posVert);
+
+  TrackFitResult* tfrPlusVtx = buildTrackFitResult(gfTrackPlus, stPlus, Bz, trackHypotheses.first);
+  TrackFitResult* tfrMinusVtx = buildTrackFitResult(gfTrackMinus, stMinus, Bz, trackHypotheses.second);
+
+  B2DEBUG(100, "Creating new V0.");
+  m_v0s.appendNew(std::make_pair(trackPlus, tfrPlusVtx),
+                  std::make_pair(trackMinus, tfrMinusVtx));
+
+  if (m_validation) {
+    B2DEBUG(300, "Create StoreArray and Output for validation.");
+    m_validationV0s.appendNew(
+      std::make_pair(trackPlus, tfrPlusVtx),
+      std::make_pair(trackMinus, tfrMinusVtx),
+      vert.getPos(),
+      vert.getCov(),
+      (lv0 + lv1).P(),
+      (lv0 + lv1).M(),
+      vert.getChi2()
+    );
+
+  }
+  return true;
+}

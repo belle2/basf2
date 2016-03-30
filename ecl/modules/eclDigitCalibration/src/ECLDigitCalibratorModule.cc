@@ -272,8 +272,7 @@ void ECLDigitCalibratorModule::prepareEnergyCalibrationConstants()
       B2FATAL("ECLDigitCalibratorModule::prepareEnergyCalibrationConstants(): high energy: Wrong cell id [0.." << c_nCrystals << "]: " <<
               cellid);
       continue;
-    } else if (m_calibrationEnergyHighRatio[cellid] > 1e
-               - 5) { //FIXME magic number //check if the field is already filled (should not be)
+    } else if (m_calibrationEnergyHighRatio[cellid] > 1.e-5) {
       B2ERROR("ECLDigitCalibratorModule::prepareEnergyCalibrationConstants(): high energy: Constants for cell id " << cellid <<
               " already filled");
     } else { // basic checks passed, fill the vector entry

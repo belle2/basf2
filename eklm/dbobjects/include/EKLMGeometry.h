@@ -94,7 +94,7 @@ namespace Belle2 {
 
     private:
 
-      /* Makes objects storable. */
+      /** Makes objects storable. */
       ClassDef(EndcapStructureGeometry, 1);
 
     };
@@ -138,7 +138,7 @@ namespace Belle2 {
 
     private:
 
-      /* Makes objects storable. */
+      /** Makes objects storable. */
       ClassDef(ElementPosition, 1);
 
     };
@@ -282,7 +282,7 @@ namespace Belle2 {
 
     private:
 
-      /* Makes objects storable. */
+      /** Makes objects storable. */
       ClassDef(SectorSupportGeometry, 1);
 
     };
@@ -309,7 +309,7 @@ namespace Belle2 {
 
     private:
 
-      /* Makes objects storable. */
+      /** Makes objects storable. */
       ClassDef(PlasticSheetGeometry, 1);
 
     };
@@ -344,7 +344,7 @@ namespace Belle2 {
 
     private:
 
-      /* Makes objects storable. */
+      /** Makes objects storable. */
       ClassDef(SegmentSupportGeometry, 1);
 
     };
@@ -368,7 +368,7 @@ namespace Belle2 {
 
     private:
 
-      /* Makes objects storable. */
+      /** Makes objects storable. */
       ClassDef(SegmentSupportPosition, 1);
 
     };
@@ -392,7 +392,7 @@ namespace Belle2 {
 
     private:
 
-      /* Makes objects storable. */
+      /** Makes objects storable. */
       ClassDef(StripGeometry, 1);
 
     };
@@ -412,7 +412,7 @@ namespace Belle2 {
 
     private:
 
-      /* Makes objects storable. */
+      /** Makes objects storable. */
       ClassDef(Point, 1);
 
     };
@@ -446,7 +446,7 @@ namespace Belle2 {
 
     private:
 
-      /* Makes objects storable. */
+      /** Makes objects storable. */
       ClassDef(ShieldDetailGeometry, 1);
 
     };
@@ -498,7 +498,7 @@ namespace Belle2 {
 
     private:
 
-      /* Makes objects storable. */
+      /** Makes objects storable. */
       ClassDef(ShieldGeometry, 1);
 
     };
@@ -524,7 +524,7 @@ namespace Belle2 {
 
     private:
 
-      /* Makes objects storable. */
+      /** Makes objects storable. */
       ClassDef(BoardGeometry, 1);
 
     };
@@ -544,7 +544,7 @@ namespace Belle2 {
 
     private:
 
-      /* Makes objects storable. */
+      /** Makes objects storable. */
       ClassDef(BoardPosition, 1);
 
     };
@@ -563,7 +563,7 @@ namespace Belle2 {
 
     private:
 
-      /* Makes objects storable. */
+      /** Makes objects storable. */
       ClassDef(StripBoardPosition, 1);
 
     };

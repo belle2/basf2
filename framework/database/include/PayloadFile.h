@@ -24,7 +24,7 @@ namespace Belle2 {
      * Constructor.
      * @param fileName       Name of the payload file obtained from the database.
      */
-    PayloadFile(const std::string& fileName): m_fileName(fileName) {};
+    explicit PayloadFile(const std::string& fileName): m_fileName(fileName) {};
 
     /**
      * Get the name of the downloaded payload file.

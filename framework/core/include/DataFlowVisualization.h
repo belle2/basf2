@@ -22,7 +22,7 @@ namespace Belle2 {
   class DataFlowVisualization {
   public:
     /** Constructor. */
-    DataFlowVisualization(const DependencyMap* dependencyMap);
+    explicit DataFlowVisualization(const DependencyMap* dependencyMap);
 
     /** Create graphs with datastore inputs/outputs of each module in path
      *

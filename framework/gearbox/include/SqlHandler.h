@@ -28,7 +28,7 @@ namespace Belle2 {
       /**
        * Create a new context from an (already executed) mysql statement
        * Statement is owned by SqlHandler and will only be used*/
-      SqlContext(TSQLStatement* statement);
+      explicit SqlContext(TSQLStatement* statement);
       /** Reset the statement to be ready for execution again */
       virtual ~SqlContext();
       /** Read a block of data */
@@ -54,7 +54,7 @@ namespace Belle2 {
        * Create a new SqlHandler opening a given database file
        * @param uri name of the database file
        */
-      SqlHandler(const std::string& uri);
+      explicit SqlHandler(const std::string& uri);
       /** Close database connection */
       ~SqlHandler();
       /**

@@ -43,7 +43,7 @@ namespace Belle2 {
     typedef double value_type;
 
     /** Construct with a given name */
-    ModuleStatistics(const std::string& name = ""): m_index(0), m_name(name) {}
+    explicit ModuleStatistics(const std::string& name = ""): m_index(0), m_name(name) {}
 
     /** Add a time and memory measurment to the counter of a given type.
      * @param type Type of counter to add the value to

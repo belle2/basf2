@@ -68,7 +68,7 @@ namespace {
     public:
 
       // constructor
-      Relations(const KeyElementType& from):
+      explicit Relations(const KeyElementType& from):
         m_fromElement(from)
       {
       }
@@ -189,7 +189,7 @@ namespace {
       }
 
       // constructor
-      NamedSet(const string name = "") :
+      explicit NamedSet(const string& name = "") :
         m_name(name), m_storeArray(name),
         to(NULL), from(NULL), self(NULL)
       {

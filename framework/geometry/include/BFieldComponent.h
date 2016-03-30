@@ -32,7 +32,7 @@ namespace Belle2 {
      * @param exclusive if set to true this component will be exclusive and the
      * field of other components will not be added
      */
-    BFieldComponent(bool exclusive): m_exclusive(exclusive) {}
+    explicit BFieldComponent(bool exclusive): m_exclusive(exclusive) {}
     /** returns whether the field is set to exclusive mode */
     bool exclusive() const { return m_exclusive; }
     /** check whether the point pos is inside the volume covered by the component */

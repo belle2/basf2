@@ -52,22 +52,24 @@ namespace Belle2 {
     /** Constructor expecting 3 coordinates */
     B2Vector3(const DataType xVal, const DataType yVal, const DataType zVal): m_coordinates {xVal, yVal, zVal} {};
     /** Constructor using a reference */
-    B2Vector3(const DataType(& coords)[3]): m_coordinates {coords[0], coords[1], coords[2]} {};
+    explicit B2Vector3(const DataType(& coords)[3]): m_coordinates {coords[0], coords[1], coords[2]} {};
     /** Constructor using a pointer */
-    B2Vector3(const DataType(* coords)[3]): m_coordinates {(*coords)[0], (*coords)[1], (*coords)[2]} {};
+    explicit B2Vector3(const DataType(* coords)[3]): m_coordinates {(*coords)[0], (*coords)[1], (*coords)[2]} {};
     /** Constructor expecting a TVector3 */
+    // cppcheck-suppress noExplicitConstructor
     B2Vector3(const TVector3& tVec3): m_coordinates {static_cast<DataType>(tVec3.X()), static_cast<DataType>(tVec3.Y()), static_cast<DataType>(tVec3.Z())} {};
     /** Constructor expecting a pointer to a TVector3 */
+    // cppcheck-suppress noExplicitConstructor
     B2Vector3(const TVector3* tVec3): m_coordinates {static_cast<DataType>(tVec3->X()), static_cast<DataType>(tVec3->Y()), static_cast<DataType>(tVec3->Z())} {};
     /** Constructor expecting a B2Vector3 of same type */
-    B2Vector3(const B2Vector3<DataType>& b2Vec3): m_coordinates {b2Vec3.X(), b2Vec3.Y(), b2Vec3.Z()} {};
+    explicit B2Vector3(const B2Vector3<DataType>& b2Vec3): m_coordinates {b2Vec3.X(), b2Vec3.Y(), b2Vec3.Z()} {};
     /** Constructor expecting a pointer to a B2Vector3 */
-    B2Vector3(const B2Vector3<DataType>* b2Vec3): m_coordinates {b2Vec3->X(), b2Vec3->Y(), b2Vec3->Z()} {};
+    explicit B2Vector3(const B2Vector3<DataType>* b2Vec3): m_coordinates {b2Vec3->X(), b2Vec3->Y(), b2Vec3->Z()} {};
     /** Constructor expecting a B2Vector3 of different type*/
     template <typename OtherType> B2Vector3(const B2Vector3<OtherType>& b2Vec3):
       m_coordinates {static_cast<DataType>(b2Vec3.X()), static_cast<DataType>(b2Vec3.Y()), static_cast<DataType>(b2Vec3.Z())} {};
     /** Constructor expecting a pointer to a B2Vector3 of different type */
-    template <typename OtherType> B2Vector3(const B2Vector3<OtherType>* b2Vec3):
+    template <typename OtherType> explicit B2Vector3(const B2Vector3<OtherType>* b2Vec3):
       m_coordinates {static_cast<DataType>(b2Vec3->X()), static_cast<DataType>(b2Vec3->Y()), static_cast<DataType>(b2Vec3->Z())} {};
 
 

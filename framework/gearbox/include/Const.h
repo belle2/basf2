@@ -59,6 +59,7 @@ namespace Belle2 {
        * Constructor for a set containig one detector ID.
        * @param det  The ID of the detector.
        */
+      // cppcheck-suppress noExplicitConstructor
       DetectorSet(EDetector det): m_bits(getBit(det)) {}
 
       /**
@@ -121,7 +122,7 @@ namespace Belle2 {
        * Constructor.
        * @param bits  The internal representation of the set as bit pattern.
        */
-      DetectorSet(unsigned short bits): m_bits(bits) {};
+      explicit DetectorSet(unsigned short bits): m_bits(bits) {};
 
       /**
        * Conversion of detector ID to bit pattern.
@@ -162,12 +163,14 @@ namespace Belle2 {
        * (Copy) constructor.
        * @param set  The copied set of detector IDs.
        */
+      // cppcheck-suppress noExplicitConstructor
       RestrictedDetectorSet(const DetectorSet& set): DetectorSet(set) {checkSet();}
 
       /**
        * Constructor for a set containg one detector ID.
        * @param det  The detector ID.
        */
+      // cppcheck-suppress noExplicitConstructor
       RestrictedDetectorSet(EDetector det): DetectorSet(det) {checkSet();}
 
       /**
@@ -419,6 +422,7 @@ namespace Belle2 {
        *
        * Throws a runtime_error if p is not in chargedStableSet.
        */
+      // cppcheck-suppress noExplicitConstructor
       ChargedStable(const ParticleType& p)
         : ParticleType(chargedStableSet.find(p.getPDGCode()))
       {

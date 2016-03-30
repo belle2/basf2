@@ -31,8 +31,8 @@ namespace Belle2 {
     V0();
 
     /** Constructor taking two pairs of tracks and trackFitResults. */
-    V0(const std::pair<Belle2::Track*, Belle2::TrackFitResult*>& trackPairPositive,
-       const std::pair<Belle2::Track*, Belle2::TrackFitResult*>& trackPairNegative);
+    V0(const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairPositive,
+       const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairNegative);
 
     /** Get pair of  yhe Tracks, that are part of the V0 particle.*/
     std::pair<Track*, Track*> getTracks() const

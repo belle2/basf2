@@ -20,8 +20,8 @@ V0::V0():
   m_trackFitResultIndexNegative(-1)
 {}
 
-V0::V0(const std::pair<Belle2::Track*, Belle2::TrackFitResult*>& trackPairPositive,
-       const std::pair<Belle2::Track*, Belle2::TrackFitResult*>& trackPairNegative) :
+V0::V0(const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairPositive,
+       const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairNegative) :
   m_trackIndexPositive(trackPairPositive.first->getArrayIndex()),
   m_trackIndexNegative(trackPairNegative.first->getArrayIndex()),
   m_trackFitResultIndexPositive(trackPairPositive.second->getArrayIndex()),

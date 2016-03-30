@@ -13,6 +13,7 @@
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
 #include <framework/pcore/DataStoreStreamer.h>
+#include <framework/pcore/RbTuple.h>
 
 #include <framework/core/Environment.h>
 #include <framework/logging/LogSystem.h>
@@ -322,6 +323,11 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   cleanup();
   B2INFO("Global process: completed");
+
+  if (m_histoman) {
+    B2INFO("HistoManager:: adding histogram files");
+    RbTupleManager::Instance().hadd();
+  }
 
   //did anything bad happen?
   if (s_PIDofKilledChild != 0) {

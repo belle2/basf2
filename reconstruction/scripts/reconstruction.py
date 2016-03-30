@@ -181,10 +181,12 @@ def add_mdst_output(
         'KLMClustersToTracks',
         'TRGSummary',
     ]
+    persistentBranches = ['FileMetaData']
     if mc:
         branches += ['MCParticles', 'TracksToMCParticles',
                      'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
+        persistentBranches += ['BackgroundInfos']
     branches += additionalBranches
     output.param('branchNames', branches)
-    output.param('branchNamesPersistent', ['FileMetaData'])
+    output.param('branchNamesPersistent', persistentBranches)
     path.add_module(output)

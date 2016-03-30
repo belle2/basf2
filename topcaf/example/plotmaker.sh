@@ -53,7 +53,7 @@ perl perl_analyzeHits_extended.pl $rlname $subname $cutname
 echo "Cleaning up"
 if [ "$#" -eq 4 ]; then
     rm -rf $rlname
-end
+fi
 rm -rf sub_${subname}analyzeHits_extended.sh
 rm -rf hadd_${subname}_plothits_${cutname}.sh
 rm -rf ${subname}_sh_scripts_batch

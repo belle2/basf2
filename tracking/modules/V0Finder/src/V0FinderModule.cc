@@ -180,11 +180,9 @@ void V0FinderModule::event()
 
   // Pair up each positive track with each negative track.
   for (auto& trackPlus : tracksPlus) {
-
     for (auto& trackMinus : tracksMinus) {
-
       v0Fitter.fitAndStore(trackPlus, trackMinus, Const::Kshort);
-
+      v0Fitter.fitAndStore(trackPlus, trackMinus, Const::photon);
     }
   }
 }

@@ -28,7 +28,7 @@ def run():
     # generateY4S(1000, path=path)
 
     path.add_module('EventInfoSetter',
-                    evtNumList=[100],
+                    evtNumList=[500],
                     runList=[1],
                     expList=[1]
                     )
@@ -60,7 +60,7 @@ def run():
     path.add_module(V0Harvester())
 
     # Store mdst output plus v0validation
-    add_mdst_output(path, filename='../V0ValidationSample.root', additionalBranches=['V0Validations'])
+    add_mdst_output(path, filename='../V0ValidationSample.root', additionalBranches=['V0ValidationVertexs'])
 
     basf2.process(path)
     print(basf2.statistics)

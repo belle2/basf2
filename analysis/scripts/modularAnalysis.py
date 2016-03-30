@@ -767,6 +767,82 @@ def isTMVAMethodAvailable(prefix='TMVA'):
     return os.path.isfile(prefix + '_1.config')
 
 
+def trainFANNMethod(
+        decayString,
+        variables,
+        limits=[],
+        methods=[
+            ('MLP',
+             'FANN',
+             'NCycles=10000:HiddenLayers=3*N:NeuronType=FANN_SIGMOID_SYMMETRIC:'
+             'ValidationFraction=0.5:RandomSeeds=1:TrainingMethod=FANN_TRAIN_RPROP:'
+             'TestRate=500:NThreads=1:EpochMonitoring=True')],
+        target='isSignal',
+        prefix='FANN',
+        workingDirectory='.',
+        path=analysis_main,
+):
+    """
+    Trains a FANN Multi-Layer-Perceptron Method
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
+    @param variables list of variables which are registered in the VariableManager
+    @param limits optional list of manually set limits of the variables used for training
+    @param methods list of tuples (name, type, config) of the FANN MLPs
+    @param target variable registered in VariableManager which is used as target
+    @param prefix prefix which is used to identify the weight files created by FANN
+    @param workingDirectory in which the config file and the weight file directory are created
+    @param path         modules are added to this path
+    """
+
+    teacher = register_module('FANNTeacher')
+    teacher.param('prefix', prefix)
+    teacher.param('methods', methods)
+    teacher.param('variables', variables)
+    teacher.param('target', target)
+    teacher.param('workingDirectory', workingDirectory)
+    teacher.param('listNames', decayString)
+    path.add_module(teacher)
+
+
+def applyFANNMethod(
+    decayString,
+    method='MLP',
+    expertOutputName='isSignal',
+    signalClass=1,
+    prefix='FANN',
+    workingDirectory='.',
+    path=analysis_main,
+):
+    """
+    Applies a trained FANN Multi-Layer-Perceptron method to a particle list
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
+    @param method name of the FANN MLP method
+    @param expertOutputName extra-info name which is used to store the classifier output in the particle
+    @param signalClass is the cluster to calculate the probability of beeing signal
+    @param prefix prefix which is used to identify the weight files created by FANN
+    @param workingDirectory in which the expert finds the config file and the weight file directory
+    @param path         modules are added to this path
+    """
+
+    expert = register_module('FANNExpert')
+    expert.param('prefix', prefix)
+    expert.param('method', method)
+    expert.param('workingDirectory', workingDirectory)
+    expert.param('listNames', decayString)
+    expert.param('expertOutputName', expertOutputName)
+    expert.param('signalClass', signalClass)
+    path.add_module(expert)
+
+
+def isFANNMethodAvailable(prefix='FANN'):
+    """
+    True if a FANN MLP with the given prefix was trained
+    @param prefix which is used to identify the weight file created by FANN
+    """
+
+    return os.path.isfile(prefix + '_WeightFile.root')
+
+
 def printDataStore(path=analysis_main):
     """
     Prints the contents of DataStore in each event,

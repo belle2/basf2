@@ -23,6 +23,12 @@
 #include <fstream>
 #include <cmath>
 
+#ifdef HAS_OPENMP
+#include <parallel_fann.hpp>
+#else
+#include <fann.h>
+#endif
+
 #include <TFile.h>
 #include <TTree.h>
 #include <TH1D.h>
@@ -34,7 +40,7 @@ namespace Belle2 {
 
   REG_MODULE(FANNTeacher)
 
-  FANNTeacherModule::FANNTeacherModule() : Module(), m_sample_var(nullptr), m_maxSamples(0), m_nSamples(0)
+  FANNTeacherModule::FANNTeacherModule() : Module()
   {
     setDescription("Trains FANN method with given particle lists as training samples. "
                    "The target variable has to be an integer valued variable which defines the clusters in the sample. "
@@ -45,24 +51,21 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
     std::vector<std::string> empty;
+    std::vector<std::vector<float>> emptyLimits;
     addParam("listNames", m_listNames,
              "Particles from these ParticleLists are used as input. If no name is given the teacher is applied to every event once, and one can only use variables which accept nullptr as Particle*",
              empty);
     addParam("variables", m_variableNames, "Input variables used by the FANN method");
 
+    addParam("limits", m_variableLimits, "Set limits of the variables used by the FANN method manually", emptyLimits);
+
     addParam("prefix", m_prefix,
              "Prefix which is used by the FANNTeacherModule to store its MLP parameters file, the file where the training samples will be saved and the log file",
-             std::string("MLP"));
+             std::string("FANN"));
     addParam("treeName", m_treeName, "Tree name used in output file, default is prefix + '_tree'", std::string(""));
 
     addParam("workingDirectory", m_workingDirectory,
              "Working directory in which the config file and the weight file directory is created", std::string("."));
-
-    addParam("sample", m_sample,
-             "Variable used for inverse sampling rates. Usually this is the same as the target", std::string(""));
-    std::map<int, unsigned int> defaultInverseSamplingRates;
-    addParam("inverseSamplingRates", m_inverseSamplingRates, "Map of class id and inverse sampling rate for this class.",
-             defaultInverseSamplingRates);
 
     addParam("methods", m_methods,
              "Vector of Tuples with (Name, Type, Config) of the methods. Valid types are: BDT, KNN, Fisher, Plugin. For type 'Plugin', the plugin matching the Name attribute will be loaded (e.g. NeuroBayes). The Config is passed to the FANN Method and is documented in the FANN UserGuide.");
@@ -133,10 +136,10 @@ namespace Belle2 {
     if (m_workingDirectory.back() != '/') {
       m_workingDirectory += '/';
     }
-    m_logFilename = m_prefix + std::string("FANNlogFile");
-    m_trainFilename = m_prefix + std::string("FANNdataFile.root");
-    m_filename = m_prefix + std::string("FANNweightFile.root");
-    m_trainArrayname = std::string("FANNtrainSamples");
+    m_logFilename = m_prefix + std::string("_LogFile");
+    m_trainFilename = m_prefix + std::string("_DataFile.root");
+    m_filename = m_prefix + std::string("_WeightFile.root");
+    m_trainArrayname = m_prefix + std::string("_TrainSamples");
 
     m_MLPs.clear();
 
@@ -245,42 +248,65 @@ namespace Belle2 {
   void FANNTeacherModule::terminate()
   {
     // do training for all sectors with sufficient training samples
-    for (unsigned isector = 0; isector < m_MLPs.size(); ++isector) {
-      float nTestAndValid = m_trainSet.nSamples() * m_MLPs[isector].getValidationFraction();
+    for (unsigned iMethod = 0; iMethod < m_MLPs.size(); ++iMethod) {
+      float nTestAndValid = m_trainSet.nSamples() * m_MLPs[iMethod].getValidationFraction();
       int nTest = int(nTestAndValid * 0.5); // Number of events in the test sample.
       int nValid = int(nTestAndValid * 0.5);
-      float nTrainMin = 10 * m_MLPs[isector].nWeights();
+      float nTrainMin = 10 * m_MLPs[iMethod].nWeights();
       if (m_trainSet.nSamples() < (nTrainMin + nValid + nTest)) {
-        B2WARNING("Not enough training samples for sector " << isector << " (" << (nTrainMin + nValid + nTest)
+        B2WARNING("Not enough training samples for sector " << iMethod << " (" << (nTrainMin + nValid + nTest)
                   << ") found, requested " << m_trainSet.nSamples() << " events.");
         continue;
       }
+      // set scaling limits
+      if (m_variableLimits.size() != 0) {
+        if (m_variables.size() != m_variableLimits.size()) {
+          B2ERROR("The limit of one or more feature variables could not be set manually as specified. Check the limits!");
+        }
+        std::vector<std::vector<float>> minAndMaxInputSample;
+        std::vector<float> minInputSample;
+        std::vector<float> maxInputSample;
 
-      m_MLPs[isector].setMinAndMaxInputSample(m_trainSet.getMinAndMaxInputSample());
-      m_MLPs[isector].setMinAndMaxTargetSample(m_trainSet.getMinAndMaxTargetSample());
+        for (unsigned var = 0; var < m_variables.size(); ++var) {
+          if (m_variableLimits[var].size() == 2) {
+            minInputSample.push_back(m_variableLimits[var][0]);
+            maxInputSample.push_back(m_variableLimits[var][1]);
+          } else {
+            B2ERROR("The limits of the variable " << m_variableNames[var] << " are not set correctly. Try something like [min, max] ");
+          }
+        }
+        minAndMaxInputSample.push_back(minInputSample);
+        minAndMaxInputSample.push_back(maxInputSample);
+        m_MLPs[iMethod].setMinAndMaxInputSample(minAndMaxInputSample);
+
+      } else {
+        m_MLPs[iMethod].setMinAndMaxInputSample(m_trainSet.getMinAndMaxInputSample());
+      }
+
+      m_MLPs[iMethod].setMinAndMaxTargetSample(m_trainSet.getMinAndMaxTargetSample());
 
       for (unsigned var = 0; var < m_variables.size(); ++var) {
-        if (m_MLPs[isector].getMinAndMaxInputSample()[0][var] == m_MLPs[isector].getMinAndMaxInputSample()[1][var]) {
-          B2WARNING("The variable " << m_variableNames[var] << " is always equal to " << m_MLPs[isector].getMinAndMaxInputSample()[1][var] <<
+        if (m_MLPs[iMethod].getMinAndMaxInputSample()[0][var] == m_MLPs[iMethod].getMinAndMaxInputSample()[1][var]) {
+          B2WARNING("The variable " << m_variableNames[var] << " is always equal to " << m_MLPs[iMethod].getMinAndMaxInputSample()[1][var] <<
                     ". It will be scaled to -1 but should be better removed.");
         }
       }
 
-      if (m_MLPs[isector].getMinAndMaxTargetSample()[0][0] == m_MLPs[isector].getMinAndMaxTargetSample()[1][0]) {
-        B2ERROR("The target variable " << m_targetName << " is always equals to " << m_MLPs[isector].getMinAndMaxTargetSample()[1][0] <<
+      if (m_MLPs[iMethod].getMinAndMaxTargetSample()[0][0] == m_MLPs[iMethod].getMinAndMaxTargetSample()[1][0]) {
+        B2ERROR("The target variable " << m_targetName << " is always equals to " << m_MLPs[iMethod].getMinAndMaxTargetSample()[1][0] <<
                 ". Nothing to be trained.");
       }
 
-      train(isector);
+      train(iMethod);
       // save everything to file
-      save(m_filename, m_MLPs[isector].getArrayName());
+      save(m_filename, m_MLPs[iMethod].getArrayName());
     }
 
     saveTraindata(m_trainFilename);
   }
 
 
-  void FANNTeacherModule::train(unsigned isector)
+  void FANNTeacherModule::train(unsigned iMethod)
   {
 #ifdef HAS_OPENMP
     B2INFO("Training a Multi-Layer Perceptron for Particle List with OpenMP");
@@ -293,10 +319,10 @@ namespace Belle2 {
     unsigned num_input = m_variables.size(); //Number of variables.
     unsigned nEvents = m_trainSet.nSamples(); //Number of events.
 
-    unsigned nLayers = m_MLPs[isector].nLayers(); //The total number of layers including the input and the output layer.
+    unsigned nLayers = m_MLPs[iMethod].nLayers(); //The total number of layers including the input and the output layer.
     unsigned num_output = 1; //Number of outputs per MLP.
 
-    float nTestAndValid = m_trainSet.nSamples() * m_MLPs[isector].getValidationFraction();
+    float nTestAndValid = m_trainSet.nSamples() * m_MLPs[iMethod].getValidationFraction();
     int nTest = int(nTestAndValid * 0.5); // Number of events in the test sample.
     int nValid = int(nTestAndValid * 0.5);
 
@@ -305,10 +331,10 @@ namespace Belle2 {
     unsigned* nNodes = new unsigned[nLayers];
 
     for (unsigned il = 0; il < nLayers; ++il) {
-      nNodes[il] = m_MLPs[isector].nNodesLayer(il);
+      nNodes[il] = m_MLPs[iMethod].nNodesLayer(il);
     }
 
-    unsigned nWeights = m_MLPs[isector].nWeights();
+    unsigned nWeights = m_MLPs[iMethod].nWeights();
 
     struct fann* ann = fann_create_standard_array(nLayers, nNodes);
     // initialize training and validation data
@@ -318,11 +344,11 @@ namespace Belle2 {
     struct fann_train_data* train_data =
       fann_create_train(nTrain, num_input, num_output);
     for (unsigned i = 0; i < nTrain; ++i) {
-      std::vector<float> input = m_MLPs[isector].scaleInput(currentData.getInput(i)); //here
+      std::vector<float> input = m_MLPs[iMethod].scaleInput(currentData.getInput(i)); //here
       for (unsigned j = 0; j < input.size(); ++j) {
         train_data->input[i][j] = input[j];
       }
-      std::vector<float> target = m_MLPs[isector].scaleTarget(currentData.getTarget(i)); //here
+      std::vector<float> target = m_MLPs[iMethod].scaleTarget(currentData.getTarget(i)); //here
       for (unsigned j = 0; j < target.size(); ++j) {
         train_data->output[i][j] = target[j];
       }
@@ -331,49 +357,49 @@ namespace Belle2 {
     struct fann_train_data* valid_data =
       fann_create_train(nValid, num_input, num_output);
     for (unsigned i = nTrain; i < nTrain + nValid; ++i) {
-      std::vector<float> input = m_MLPs[isector].scaleInput(currentData.getInput(i)); //here
+      std::vector<float> input = m_MLPs[iMethod].scaleInput(currentData.getInput(i)); //here
       for (unsigned j = 0; j < input.size(); ++j) {
         valid_data->input[i - nTrain][j] = input[j];
       }
-      std::vector<float> target = m_MLPs[isector].scaleTarget(currentData.getTarget(i)); //here
+      std::vector<float> target = m_MLPs[iMethod].scaleTarget(currentData.getTarget(i)); //here
       for (unsigned j = 0; j < target.size(); ++j) {
         valid_data->output[i - nTrain][j] = target[j];
       }
     }
     // set network parameters
-    fann_set_activation_function_hidden(ann, m_neuronTypes[m_MLPs[isector].getNeuronType()]);
-    fann_set_activation_function_output(ann, m_neuronTypes[m_MLPs[isector].getNeuronType()]);
+    fann_set_activation_function_hidden(ann, m_neuronTypes[m_MLPs[iMethod].getNeuronType()]);
+    fann_set_activation_function_output(ann, m_neuronTypes[m_MLPs[iMethod].getNeuronType()]);
     double bestRMS = 999.;
     std::vector<double> bestTrainLog = {};
     std::vector<double> bestValidLog = {};
     // repeat training several times with different random start weights
-    for (int irun = 0; irun < m_MLPs[isector].getRandomSeeds(); ++irun) {
+    for (int irun = 0; irun < m_MLPs[iMethod].getRandomSeeds(); ++irun) {
       double bestValid = 999.;
       std::vector<double> trainLog = {};
       std::vector<double> validLog = {};
-      trainLog.assign(m_MLPs[isector].getNCycles(), 0.);
-      validLog.assign(m_MLPs[isector].getNCycles(), 0.);
+      trainLog.assign(m_MLPs[iMethod].getNCycles(), 0.);
+      validLog.assign(m_MLPs[iMethod].getNCycles(), 0.);
       int breakEpoch = 0;
       std::vector<fann_type> bestWeights = {};
       bestWeights.assign(nWeights, 0.); //here
       fann_randomize_weights(ann, -0.1, 0.1);
 
       // train and save the network
-      for (int epoch = 1; epoch <= m_MLPs[isector].getNCycles(); ++epoch) {
+      for (int epoch = 1; epoch <= m_MLPs[iMethod].getNCycles(); ++epoch) {
         double mse;
 #ifdef HAS_OPENMP
-        if (m_MLPs[isector].getTrainingMethod() != "FANN_TRAIN_INCREMENTAL") {
-          mse = m_trainingMethodsOPENMP[m_MLPs[isector].getTrainingMethod()](ann, train_data, m_MLPs[isector].getNThreads());
+        if (m_MLPs[iMethod].getTrainingMethod() != "FANN_TRAIN_INCREMENTAL") {
+          mse = m_trainingMethodsOPENMP[m_MLPs[iMethod].getTrainingMethod()](ann, train_data, m_MLPs[iMethod].getNThreads());
         } else {mse = parallel_fann::train_epoch_incremental_mod(ann, train_data);}
 #else
-        fann_set_training_algorithm(ann, m_trainingMethods[m_MLPs[isector].getTrainingMethod()]);
+        fann_set_training_algorithm(ann, m_trainingMethods[m_MLPs[iMethod].getTrainingMethod()]);
         mse = fann_train_epoch(ann, train_data);
 #endif
         trainLog[epoch - 1] = mse;
         // evaluate validation set
         fann_reset_MSE(ann);
 #ifdef HAS_OPENMP
-        double valid_mse = parallel_fann::test_data_parallel(ann, valid_data, m_MLPs[isector].getNThreads());
+        double valid_mse = parallel_fann::test_data_parallel(ann, valid_data, m_MLPs[iMethod].getNThreads());
 #else
         double valid_mse = fann_test_data(ann, valid_data);
 #endif
@@ -386,7 +412,7 @@ namespace Belle2 {
           }
         }
         // break when validation error increases
-        if (epoch > m_MLPs[isector].getTestRate() && valid_mse > validLog[epoch - m_MLPs[isector].getTestRate()]) {
+        if (epoch > m_MLPs[iMethod].getTestRate() && valid_mse > validLog[epoch - m_MLPs[iMethod].getTestRate()]) {
           B2INFO("Training stopped in epoch " << epoch);
           B2INFO("Train error: " << mse << ", valid error: " << valid_mse <<
                  ", best valid: " << bestValid);
@@ -400,12 +426,12 @@ namespace Belle2 {
         }
       }
       // test trained network
-      std::vector<float> oldWeights = m_MLPs[isector].getWeights();
-      m_MLPs[isector].setWeights(bestWeights);
+      std::vector<float> oldWeights = m_MLPs[iMethod].getWeights();
+      m_MLPs[iMethod].setWeights(bestWeights);
       std::vector<double> sumSqr;
       sumSqr.assign(num_output, 0.);
       for (unsigned i = nTrain + nValid; i < m_trainSet.nSamples(); ++i) {
-        std::vector<float> output = m_MLPs[isector].runMLP(m_trainSet.getInput(i));
+        std::vector<float> output = m_MLPs[iMethod].runMLP(m_trainSet.getInput(i));
         std::vector<float> target = m_trainSet.getTarget(i);
         for (unsigned iout = 0; iout < output.size(); ++iout) {
           float diff = output[iout] - target[iout];
@@ -414,7 +440,7 @@ namespace Belle2 {
       }
       double sumSqrTotal = 0;
 
-      sumSqrTotal += sumSqr[0]; //here
+      sumSqrTotal += sumSqr[0];
       B2INFO("RMS Output: " << sqrt(sumSqr[0] / nTest));
       double RMS = sqrt(sumSqrTotal / nTest / sumSqr.size());
       B2INFO("RMS on test samples: " << RMS << " (best: " << bestRMS << ")");
@@ -423,11 +449,11 @@ namespace Belle2 {
         bestTrainLog.assign(trainLog.begin(), trainLog.begin() + breakEpoch);
         bestValidLog.assign(validLog.begin(), validLog.begin() + breakEpoch);
       } else {
-        m_MLPs[isector].setWeights(oldWeights); //here
+        m_MLPs[iMethod].setWeights(oldWeights);
       }
     }
     // save training log
-    std::ofstream logstream(m_logFilename + ".log");//+ "_" + to_string(isector) + ".log");
+    std::ofstream logstream(m_logFilename + ".log");//+ "_" + to_string(iMethod) + ".log");
     for (unsigned i = 0; i < bestTrainLog.size(); ++i) {
       logstream << bestTrainLog[i] << " " << bestValidLog[i] << std::endl;
     }
@@ -445,8 +471,8 @@ namespace Belle2 {
     B2INFO("Saving networks to file " << filename << ", array " << arrayname);
     TFile datafile(filename.c_str(), "UPDATE");
     TObjArray* MLPs = new TObjArray(m_MLPs.size());
-    for (unsigned isector = 0; isector < m_MLPs.size(); ++isector) {
-      MLPs->Add(&m_MLPs[isector]);
+    for (unsigned iMethod = 0; iMethod < m_MLPs.size(); ++iMethod) {
+      MLPs->Add(&m_MLPs[iMethod]);
     }
     MLPs->Write(arrayname.c_str(), TObject::kSingleKey | TObject::kOverwrite);
     datafile.Close();
@@ -458,7 +484,7 @@ namespace Belle2 {
   {
     TFile datafile(filename.c_str(), "READ");
     if (!datafile.IsOpen()) {
-      B2WARNING("Could not open file " << filename);
+      B2WARNING("Could not open file " << filename << ". New MLP will be trained.");
       return false;
     }
     TObjArray* MLPs = (TObjArray*)datafile.Get(arrayname.c_str());
@@ -468,10 +494,10 @@ namespace Belle2 {
       return false;
     }
     m_MLPs.clear();
-    for (int isector = 0; isector < MLPs->GetEntriesFast(); ++isector) {
-      FANNMLP* expert = dynamic_cast<FANNMLP*>(MLPs->At(isector));
+    for (int iMethod = 0; iMethod < MLPs->GetEntriesFast(); ++iMethod) {
+      FANNMLP* expert = dynamic_cast<FANNMLP*>(MLPs->At(iMethod));
       if (expert) m_MLPs.push_back(*expert);
-      else B2WARNING("Wrong type " << MLPs->At(isector)->ClassName() << ", ignoring this entry.");
+      else B2WARNING("Wrong type " << MLPs->At(iMethod)->ClassName() << ", ignoring this entry.");
     }
     MLPs->Clear();
     delete MLPs;
@@ -609,7 +635,7 @@ namespace Belle2 {
 
     bool addToSet = true;
     if (!std::isfinite(targetraw[0])) {
-      B2ERROR("Output of variable " << m_target->name << " is " << targetraw[0] << ", please fix it. Candidate will be skipped.");
+      B2WARNING("Output of variable " << m_target->name << " is " << targetraw[0] << ", please fix it. Candidate will be skipped.");
       addToSet = false;
       return;
     }
@@ -617,7 +643,7 @@ namespace Belle2 {
       if (m_variables[i] != nullptr)
         input[i] = m_variables[i]->function(particle);
       if (!std::isfinite(input[i])) {
-        B2ERROR("Output of variable " << m_variables[i]->name << " is " << input[i] << ", please fix it. Candidate will be skipped.");
+        B2WARNING("Output of variable " << m_variables[i]->name << " is " << input[i] << ", please fix it. Candidate will be skipped.");
         addToSet = false;
         return;
       }

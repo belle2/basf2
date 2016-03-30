@@ -55,7 +55,9 @@ FANNMLP::scaleInput(std::vector<float> input) const
   scaled.assign(input.size(), 0.);
   for (unsigned i = 0; i < input.size(); ++i) {
     if (scalingfactors[1][i] != scalingfactors[0][i]) {
-      scaled[i] = 2. * (input[i] - scalingfactors[0][i]) / (scalingfactors[1][i] - scalingfactors[0][i]) - 1.;
+      if (input[i] < scalingfactors[0][i]) scaled[i] = 1;
+      else if (input[i] > scalingfactors[1][i]) scaled[i] = -1;
+      else scaled[i] = -1 * (2. * (input[i] - scalingfactors[0][i]) / (scalingfactors[1][i] - scalingfactors[0][i]) - 1.);
     } else {
       scaled[i] = -1;
     }
@@ -71,7 +73,7 @@ FANNMLP::unscaleInput(std::vector<float> input) const
   unscaled.assign(input.size(), 0.);
   for (unsigned i = 0; i < input.size(); ++i) {
     if (descalingfactors[1][i] != descalingfactors[0][i]) {
-      unscaled[i] = (input[i] + 1.) * (descalingfactors[1][i] - descalingfactors[0][i]) / 2. + descalingfactors[0][i];
+      unscaled[i] = (-1 * input[i] + 1.) * (descalingfactors[1][i] - descalingfactors[0][i]) / 2. + descalingfactors[0][i];
     } else {
       unscaled[i] = descalingfactors[0][i];
     }

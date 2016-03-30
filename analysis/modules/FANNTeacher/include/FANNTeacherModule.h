@@ -16,8 +16,6 @@
 #include <analysis/dataobjects/FANNMLPData.h>
 #include <analysis/VariableManager/Utility.h>
 
-#include <parallel_fann.hpp>
-
 #include <memory>
 #include <fstream>
 #include <cmath>
@@ -86,23 +84,22 @@ namespace Belle2 {
      * @param filename name of the TFile to write to
      * @param arrayname name of the TObjArray holding the MLPs in the file
      */
-    void save(const std::string& filename, const std::string& arrayname = "MLPs");
+    void save(const std::string& filename, const std::string& arrayname);
 
     /** Load MLPs from file.
      * @param filename name of the TFile to read from
      * @param arrayname name of the TObjArray holding the MLPs in the file
      * @return true if the MLPs were loaded correctly
      */
-    bool load(const std::string& filename, const std::string& arrayname = "MLPs");
+    bool load(const std::string& filename, const std::string& arrayname);
 
   protected:
 
     std::vector<std::string> m_listNames; /**< Input particle list names */
-    std::vector<const Variable::Manager::Var*> m_variables; /**< Input variables for the TMVA method */
-    std::vector<std::string> m_variableNames; /**< Input variables for the TMVA method */
-    std::vector<std::string>
-    m_spectators; /**< Input spectators for the TMVA method (e.g. possible target, weight or mcStatus variables) */
-    std::string m_prefix; /**< Filename of the created root file and common prefix for the trained TMVA method weight-files */
+    std::vector<const Variable::Manager::Var*> m_variables; /**< Input variables for the FANN MLP */
+    std::vector<std::string> m_variableNames; /**< Input variables for the FANN MLP */
+    std::vector<std::vector<float>> m_variableLimits; /**< Input variables for the FANN MLP */
+    std::string m_prefix; /**< Filename of the created root file and common prefix for the trained FANN MLP weight-files */
     std::string m_logFilename; /**< Log Filename */
     std::string m_trainFilename;/**< Filename to save the training Sample.*/
     std::string m_filename; /**< Filename to save the weights of the trained MLPs.*/
@@ -110,12 +107,6 @@ namespace Belle2 {
 
     std::string m_treeName; /**< Treename of the created root file with the training Sample.*/
     std::string m_workingDirectory; /**< Working directory in which the config file and the weight file directory is created */
-
-    std::string m_sample; /**< Sample variables used for inverse sampling rates, usually this is the same as the target */
-    std::map<int, unsigned int> m_inverseSamplingRates; /**< Inverse sampling rates for class id */
-    const Variable::Manager::Var* m_sample_var; /**< Variable Pointer to target variable */
-    std::map<int, unsigned int> m_iSamples; /**< count for classes used by inverse sampling rates */
-
 
     float m_nTestAndValid;/**< Number of events in validation and training samples*/
 

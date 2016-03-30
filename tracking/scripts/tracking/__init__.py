@@ -94,6 +94,10 @@ def add_prune_tracks(path, components=None):
     Adds removal of the intermediate states at each measurement from the fitted tracks.
     """
 
+    # do not add any pruning, if no tracking detectors are in the components
+    if components and not ('SVD' in components or 'CDC' in components):
+        return
+
     path.add_module('PruneRecoTracks')
     path.add_module("PruneGenfitTracks")
 

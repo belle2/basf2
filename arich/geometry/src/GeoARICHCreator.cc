@@ -38,7 +38,6 @@
 #include <G4Polyhedra.hh>
 #include <G4SubtractionSolid.hh>
 #include <G4Material.hh>
-#include <G4NistManager.hh>
 
 using namespace std;
 using namespace boost;
@@ -116,9 +115,9 @@ namespace Belle2 {
         G4Transform3D transform = G4Translate3D(envOrigin);
         new G4PVPlacement(transform, envelope, "ARICH.Envelope", &topVolume, false, 1);
 
-        G4NistManager* man = G4NistManager::Instance();
-        G4Material* medPoly = man->FindOrBuildMaterial("G4_POLYETHYLENE");
-        G4Material* boron   = man->FindOrBuildMaterial("G4_B");
+        G4Material* medPoly = geometry::Materials::get("G4_POLYETHYLENE");
+        G4Material* boron   = geometry::Materials::get("G4_B");
+
         // 10% borated polyethylene = SWX210 // 13.7.2015 switched from 30% to 10% boron
         G4Material* boratedpoly10 = new G4Material("BoratedPoly10", 1.19 * CLHEP::g / CLHEP::cm3, 2);
         boratedpoly10->AddMaterial(boron, 0.10);

@@ -77,5 +77,23 @@ void BackgroundInfo::printForMixing() const
 
 void BackgroundInfo::printForOverlay() const
 {
+  cout << "Components: ";
+  if (m_components.empty()) {
+    cout << "all ";
+  } else {
+    for (const auto& component : m_components) cout << component << " ";
+  }
+  cout << endl;
+
+  cout << "Samples: " << endl;
+  for (const auto& bkg : m_backgrounds) {
+    cout << " " << bkg.type << endl;
+    cout << " events: " << bkg.numEvents;
+    cout << ", re-used: " << bkg.reused << " times";
+    cout << endl;
+
+    for (const auto& fileName : bkg.fileNames) cout << " " << fileName << endl;
+    cout << endl;
+  }
 }
 

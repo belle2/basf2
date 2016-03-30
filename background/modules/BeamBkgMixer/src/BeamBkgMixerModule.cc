@@ -316,14 +316,12 @@ namespace Belle2 {
     StoreArray<BeamBackHit> beamBackHits;
     if (m_BeamBackHits) beamBackHits.registerInDataStore();
 
+
     // add BackgroundInfo to persistent tree
-    StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
-    bkgInfo.registerInDataStore();
-    if (!bkgInfo.isValid()) {
-      bkgInfo.create();
-    } else {
-      B2WARNING("BackgroundInfo already created on DataStore -> will be overriden");
-    }
+
+    StoreArray<BackgroundInfo> bkgInfos("", DataStore::c_Persistent);
+    bkgInfos.registerInDataStore();
+    auto* bkgInfo = bkgInfos.appendNew();
     bkgInfo->setMethod(BackgroundInfo::c_Mixing);
     bkgInfo->setComponents(m_components);
     bkgInfo->setMinTime(m_minTime);
@@ -347,6 +345,7 @@ namespace Belle2 {
       descr.reused = 0;
       bkgInfo->appendBackgroundDescr(descr);
     }
+    m_BGInfoIndex = bkgInfos.getEntries() - 1;
 
   }
 
@@ -408,8 +407,9 @@ namespace Belle2 {
         if (bkg.eventCount >= bkg.numEvents) {
           bkg.eventCount = 0;
           B2INFO("BeamBkgMixer: events of " << bkg.type << " will be re-used");
-          StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
-          if (bkgInfo) bkgInfo->incrementReusedCounter(bkg.index);
+          StoreArray<BackgroundInfo> bkgInfos("", DataStore::c_Persistent);
+          if (m_BGInfoIndex >= 0 and m_BGInfoIndex < bkgInfos.getEntries())
+            bkgInfos[m_BGInfoIndex]->incrementReusedCounter(bkg.index);
         }
       }
     }
@@ -446,8 +446,9 @@ namespace Belle2 {
         if (bkg.eventCount >= bkg.numEvents) {
           bkg.eventCount = 0;
           B2INFO("BeamBkgMixer: events of " << bkg.type << " will be re-used");
-          StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
-          if (bkgInfo) bkgInfo->incrementReusedCounter(bkg.index);
+          StoreArray<BackgroundInfo> bkgInfos("", DataStore::c_Persistent);
+          if (m_BGInfoIndex >= 0 and m_BGInfoIndex < bkgInfos.getEntries())
+            bkgInfos[m_BGInfoIndex]->incrementReusedCounter(bkg.index);
         }
       }
 
@@ -479,8 +480,9 @@ namespace Belle2 {
         if (bkg.eventCount >= bkg.numEvents) {
           bkg.eventCount = 0;
           B2INFO("BeamBkgMixer: events of " << bkg.type << " will be re-used");
-          StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
-          if (bkgInfo) bkgInfo->incrementReusedCounter(bkg.index);
+          StoreArray<BackgroundInfo> bkgInfos("", DataStore::c_Persistent);
+          if (m_BGInfoIndex >= 0 and m_BGInfoIndex < bkgInfos.getEntries())
+            bkgInfos[m_BGInfoIndex]->incrementReusedCounter(bkg.index);
         }
       }
 

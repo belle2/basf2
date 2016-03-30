@@ -67,10 +67,12 @@ namespace Belle2 {
     /**
      * Append background description of a sample
      * @param bgDescr description
+     * @return index of appended element in std::vector
      */
-    void appendBackgroundDescr(const BackgroundDescr& bgDescr)
+    unsigned appendBackgroundDescr(const BackgroundDescr& bgDescr)
     {
       m_backgrounds.push_back(bgDescr);
+      return m_backgrounds.size() - 1;
     }
 
     /**

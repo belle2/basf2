@@ -19,13 +19,16 @@ class printBGInfo(Module):
     def event(self):
         ''' event function '''
 
-        bgInfo = Belle2.PyStoreObj('BackgroundInfo', 1)
-        if bgInfo.isValid():
-            print("             ==================")
-            print("             * Backgroud info *")
-            print("             ==================")
-            print()
-            bgInfo.obj().print()
+        bgInfos = Belle2.PyStoreArray('BackgroundInfos', 1)
+        if bgInfos.isValid():
+            if bgInfos.getEntries() == 0:
+                print("Background info is empty")
+            i = 0
+            for bgInfo in bgInfos:
+                print("===========================")
+                print("* Backgroud info: entry", str(i))
+                print("===========================")
+                bgInfo.print()
         else:
             print("No background info available")
 

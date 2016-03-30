@@ -23,6 +23,9 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+// MetaData
+#include <background/dataobjects/BackgroundInfo.h>
+
 // root
 #include <framework/io/RootIOUtilities.h>
 #include <TClonesArray.h>
@@ -100,6 +103,19 @@ namespace Belle2 {
       B2ERROR("No branches found to be connected");
     }
 
+    // add BackgroundInfo to persistent tree
+    StoreArray<BackgroundInfo> bkgInfos("", DataStore::c_Persistent);
+    bkgInfos.registerInDataStore();
+    auto* bkgInfo = bkgInfos.appendNew();
+    bkgInfo->setMethod(BackgroundInfo::c_Overlay);
+    BackgroundInfo::BackgroundDescr descr;
+    descr.tag = SimHitBase::bg_other;
+    descr.type = string("RandomTrigger");
+    descr.fileNames = m_inputFileNames;
+    descr.numEvents = m_numEvents;
+    m_index = bkgInfo->appendBackgroundDescr(descr);
+    m_BGInfoIndex = bkgInfos.getEntries() - 1;
+
   }
 
 
@@ -120,6 +136,9 @@ namespace Belle2 {
     if (m_eventCount >= m_numEvents) {
       m_eventCount = 0;
       B2INFO("BGOverlayInput: events for BG overlay will be re-used");
+      StoreArray<BackgroundInfo> bkgInfos("", DataStore::c_Persistent);
+      if (m_BGInfoIndex >= 0 and m_BGInfoIndex < bkgInfos.getEntries())
+        bkgInfos[m_BGInfoIndex]->incrementReusedCounter(m_index);
     }
 
     for (auto entry : m_storeEntries) {

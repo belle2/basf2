@@ -1,16 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
 from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
 
 
-def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, convertedFromBelle=False):
+def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, chargedB=True, neutralB=True, convertedFromBelle=False):
     """
     returns list of Particle objects with all default channels for running
     FEI on Upsilon(4S). For a training with analysis-specific signal selection,
     adding a cut on nRemainingTracksInRestOfEvent is recommended.
-    @param semileptonicB wether to include semileptonic B decays
+    @param B_extra_cut Additional user cut on rekombination of tag-B-mesons
+    @param semileptonic whether to include semileptonic B decays (default is True)
+    @param KLong whether to include K_long decays into the training (default is True)
+    @param chargedB whether to recombine charged B mesons (default is True)
+    @param neutralB whether to recombine neutral B mesons (default is True)
+    @param convertedFromBelle whether to use Belle variables which is necessary for b2bii converted data (default is False)
     """
+
+    if chargedB is False and neutralB is False:
+        print('FATAL: No B-Mesons will be recombined, since chargedB==False and neutralB==False was selected!')
+        print('       Please reconfigure the arguments of get_default_channels() accordingly')
+        sys.exit('Invalid get_default_channels configuration provided!')
 
     if convertedFromBelle:
         # Using Belle specific Variables for e-ID, mu-ID and K-ID
@@ -35,8 +46,8 @@ def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, conver
                     MVAConfiguration(variables=chargedVariables,
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
-                                        bestCandidateMode='highest',
-                                        bestCandidateVariable='piid',
+                                        bestCandidateMode='lowest',
+                                        bestCandidateVariable='piid' if not convertedFromBelle else 'atcPIDBelle(3,2)',
                                         bestCandidateCut=20),
                     PostCutConfiguration(bestCandidateCut=10, value=0.01))
     pion.addChannel(['pi+:FSP'])
@@ -46,7 +57,7 @@ def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, conver
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='Kid',
+                                        bestCandidateVariable='Kid' if not convertedFromBelle else 'atcPIDBelle(3,2)',
                                         bestCandidateCut=20),
                     PostCutConfiguration(bestCandidateCut=10, value=0.01))
     kaon.addChannel(['K+:FSP'])
@@ -56,7 +67,7 @@ def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, conver
                                          target='isPrimarySignal'),
                         PreCutConfiguration(userCut=charged_user_cut,
                                             bestCandidateMode='highest',
-                                            bestCandidateVariable='eid',
+                                            bestCandidateVariable='eid' if not convertedFromBelle else 'eIDBelle',
                                             bestCandidateCut=10),
                         PostCutConfiguration(bestCandidateCut=5, value=0.01))
     electron.addChannel(['e+:FSP'])
@@ -66,7 +77,7 @@ def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, conver
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='muid',
+                                        bestCandidateVariable='muid' if not convertedFromBelle else 'muIDBelle',
                                         bestCandidateCut=10),
                     PostCutConfiguration(bestCandidateCut=5, value=0.01))
     muon.addChannel(['mu+:FSP'])
@@ -689,8 +700,10 @@ def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, conver
     particles.append(DSP)
     particles.append(DSS)
 
-    particles.append(B0)
-    particles.append(BP)
+    if neutralB:
+        particles.append(B0)
+    if chargedB:
+        particles.append(BP)
 
     if KLong:
         particles.append(KL0)
@@ -700,16 +713,20 @@ def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, conver
         particles.append(DS0_KL)
         particles.append(DSP_KL)
         particles.append(DSS_KL)
-        particles.append(B0_KL)
-        particles.append(BP_KL)
+        if neutralB:
+            particles.append(B0_KL)
+        if chargedB:
+            particles.append(BP_KL)
 
     if semileptonic:
         particles.append(D0_SL)
         particles.append(DP_SL)
         particles.append(DS0_SL)
         particles.append(DSP_SL)
-        particles.append(B0_SL)
-        particles.append(BP_SL)
+        if neutralB:
+            particles.append(B0_SL)
+        if chargedB:
+            particles.append(BP_SL)
 
     return particles
 

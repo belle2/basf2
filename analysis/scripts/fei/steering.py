@@ -54,6 +54,8 @@ def getCommandLineOptions():
                         help='Prune particles which are not in lists.')
     parser.add_argument('-rerunCached', '--rerunCached', dest='rerunCachedProviders', action='store_true',
                         help='Runs cached providers again')
+    parser.add_argument('-noSelection', '--noSelection', dest='noSelection', action='store_true',
+                        help='Set whether the selection path should be removed from the to be dumped pickle-file')
     args = parser.parse_args()
     return args
 
@@ -67,7 +69,7 @@ def charge_conjugated_identifier(particle):
     return pdg.conjugate(particle.name) + ':' + particle.label
 
 
-def fullEventInterpretation(signalParticleList, selection_path, particles):
+def fullEventInterpretation(signalParticleList, selection_path, particles, BtoBII=False):
     """
     The Full Event Interpretation algorithm has to be executed multiple times, because of the dependencies between
     the MVCs among each other and PreCuts on Histograms.
@@ -78,6 +80,7 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
                The path should load the data and perform skimming and belle-I conversion if needed
                In addition it should select a signal-side B and create a 'RestOfEvents' list if signalParticleList is not None
         @param particles list of particle objects which shall be reconstructed by this algorithm
+        @param BtoBII Boolian to set geometry and gearbox for B2BII converted Belle Data/MC. Default is False.
         @return FeiState object containing basf2 path to execute, plus status information
     """
     args = getCommandLineOptions()
@@ -86,7 +89,7 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
     dag = fei.dag.DAG()
 
     # Set environment variables
-    dag.env['ROE'] = str(signalParticleList) if signalParticleList is not None and not args.dumpPath else False
+    dag.env['ROE'] = str(signalParticleList) if signalParticleList is not None else False
     dag.env['monitor'] = args.monitor
     dag.env['verbose'] = args.verbose
     dag.env['nThreads'] = args.nThreads
@@ -274,7 +277,8 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
     path = create_path()
 
     if finished_training:
-        path.add_path(selection_path)
+        if not args.noSelection:
+            path.add_path(selection_path)
         path.add_path(fei_path)
         return FeiState(path, fei_path, selection_path, is_trained=True)
 
@@ -296,10 +300,19 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
             path.add_path(fei_path)
     else:
         path.add_module('RootInput', excludeBranchNamesPersistent=[])
-        path.add_module('Gearbox')
-        path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
+
+        if BtoBII:
+            gearbox = register_module('Gearbox')
+            gearbox.param('fileName', 'b2bii/Belle.xml')
+            path.add_module(gearbox)
+            path.add_module('Geometry', ignoreIfPresent=False, components=['MagneticField'])
+        else:
+            path.add_module('Gearbox')
+            path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
         path.add_path(fei_path)
 
     # with RestOfEvent path, this will be the first module inside for_each
     path.add_module('ProgressBar')
+    if args.noSelection:
+        path = fei_path
     return FeiState(path, fei_path, selection_path, is_trained=False)

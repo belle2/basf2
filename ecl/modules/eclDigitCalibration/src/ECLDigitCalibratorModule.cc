@@ -27,24 +27,12 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
 // DATABASE
 #include <framework/conditions/ConditionsService.h>
-
-// SYSTEM
-#include <ctime>
-#include <iomanip>
-
-// ROOT
-#include <TVector3.h>
-#include <TMatrixFSym.h>
-#include <TMath.h>
-#include <TFile.h>
-#include <TTree.h>
 
 using namespace std;
 using namespace Belle2;
@@ -104,7 +92,7 @@ void ECLDigitCalibratorModule::initialize()
   // time calibration for MC: t = a * (m_timeFit + b)
   m_timeInverseSlope = 1.0 / 2.0366; // "b", (CH for svn revision 25745)
 
-  // time resolution calibration for MC (for full background. for no background, this will be a pessimistic approximation)
+  // time resolution calibration for MC (for full background. for no background, this will be a pessimistic approximation.)
   m_timeResolutionPointResolution[0] =   0.134 * Belle2::Unit::ns; // (CH for svn revision 26660)
   m_timeResolutionPointResolution[1] =  12.23 * Belle2::Unit::ns; // (CH for svn revision 26660)
   m_timeResolutionPointResolution[2] =  85.74 * Belle2::Unit::ns; // (CH for svn revision 26660)
@@ -120,6 +108,7 @@ void ECLDigitCalibratorModule::initialize()
 void ECLDigitCalibratorModule::beginRun()
 {
   // get the calibration objects and put them into vectors (to be accessed via cell id later)
+  // TF: THIS MUST BE MOVED TO event() and use the new callback method to check for intra-run dependencies
   prepareEnergyCalibrationConstants();
   prepareTimeCalibrationConstants();
 
@@ -229,7 +218,6 @@ double ECLDigitCalibratorModule::getCalibratedEnergy(int cellid, int amplitude) 
 }
 
 // Time calibration
-// this will eventually depend on the cell id for data - as of release-00-07 it is the same for all crystals.
 double ECLDigitCalibratorModule::getCalibratedTime(const int cellid, const int fittedtime, const bool fitfailed) const
 {
 
@@ -313,7 +301,6 @@ void ECLDigitCalibratorModule::prepareEnergyCalibrationConstants()
 
 }
 
-
 // prepare time calibration constants
 void ECLDigitCalibratorModule::prepareTimeCalibrationConstants()
 {
@@ -366,10 +353,13 @@ void ECLDigitCalibratorModule::determineBackgroundECL()
 
   // if an event misses the ECL we will have zero digits in total or we have another problem,
   // set background level to -1 to indicate true zero ECL hits (even below cuts)
-  if (totalcount < 0) backgroundcount = -1;
+  if (totalcount == 0) backgroundcount = -1;
 
   // put into EventInformation dataobject
   if (!eclEventInformationPtr) eclEventInformationPtr.create();
   eclEventInformationPtr->setBackgroundECL(backgroundcount);
+
+
+  B2DEBUG(175, "ECLDigitCalibratorModule::determineBackgroundECL(): backgroundcount = " << backgroundcount);
 
 }

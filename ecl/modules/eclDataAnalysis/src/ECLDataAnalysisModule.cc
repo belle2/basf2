@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <list>
+#include <iostream>
 #include <ecl/modules/eclDataAnalysis/ECLDataAnalysisModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -29,8 +31,6 @@
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 
 //#include <ecl/dataobjects/ECLTrig.h>
-#include <list>
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -39,6 +39,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
+
 REG_MODULE(ECLDataAnalysis)
 
 //-----------------------------------------------------------------
@@ -77,20 +78,13 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclHitMultip(0),
     m_eclHitIdx(0),
     m_eclHitToMc(0),
+    m_eclHitToDigit(0),
+    m_eclHitToDigitAmp(0),
+    m_eclHitToPureDigit(0),
+    m_eclHitToPureDigitAmp(0),
     m_eclHitCellId(0),
     m_eclHitEnergyDep(0),
     m_eclHitTimeAve(0),
-    /*    m_eclShowerMultip(0),
-        m_eclShowerIdx(0),
-        m_eclShowerToMc(0),
-        m_eclShowerToGamma(0),
-        m_eclShowerEnergy(0),
-        m_eclShowerTheta(0),
-        m_eclShowerPhi(0),
-        m_eclShowerR(0),
-        m_eclShowerNHits(0),
-        m_eclShowerE9oE25(0),
-        m_eclShowerUncEnergy(0),*/
     m_eclClusterMultip(0),
     m_eclClusterIdx(0),
     m_eclClusterToMc1(0),
@@ -105,8 +99,6 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclClusterToMcWeight5(0),
     m_eclClusterToBkgWeight(0),
     m_eclClusterSimHitSum(0),
-//    m_eclClusterToShower(0),
-//m_eclClusterToTrack(0),
     m_eclClusterEnergy(0),
     m_eclClusterEnergyError(0),
     m_eclClusterTheta(0),
@@ -130,30 +122,41 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclClusterPi0Likel(0),
     m_eclClusterEtaLikel(0),
     m_eclClusterDeltaL(0),
-    m_eclClusterBeta(0),/*
-    m_eclGammaMultip(0),
-    m_eclGammaIdx(0),
-    m_eclGammaEnergy(0),
-    m_eclGammaTheta(0),
-    m_eclGammaPhi(0),
-    m_eclGammaPx(0),
-    m_eclGammaPy(0),
-    m_eclGammaPz(0),
-    m_eclGammaR(0),
-    m_eclGammaToPi0(0),
-    m_eclPi0Multip(0),
-    m_eclPi0Idx(0),
-    //m_eclPi0ToGamma(0),
-    m_eclPi0ShowerId1(0),
-    m_eclPi0ShowerId2(0),
-    m_eclPi0Energy(0),
-    m_eclPi0Px(0),
-    m_eclPi0Py(0),
-    m_eclPi0Pz(0),
-    m_eclPi0Mass(0),
-    m_eclPi0MassFit(0),
-    m_eclPi0Chi2(0),
-    m_eclPi0PValue(0),*/
+    m_eclClusterBeta(0),
+    m_eclPureDigitMultip(0),
+//m_eclPureDigitToHit(0),
+    m_eclPureDigitIdx(0),
+    m_eclPureDigitToMc(0),
+    m_eclPureDigitCellId(0),
+    m_eclPureDigitAmp(0),
+    m_eclPureDigitTimeFit(0),
+    m_eclPureDigitFitQuality(0),
+    m_eclPureClusterMultip(0),
+    m_eclPureClusterIdx(0),
+    m_eclPureClusterEnergy(0),
+    m_eclPureClusterEnergyError(0),
+    m_eclPureClusterTheta(0),
+    m_eclPureClusterThetaError(0),
+    m_eclPureClusterPhi(0),
+    m_eclPureClusterPhiError(0),
+    m_eclPureClusterR(0),
+    m_eclPureClusterEnergyDepSum(0),
+    m_eclPureClusterTiming(0),
+    m_eclPureClusterTimingError(0),
+    m_eclPureClusterE9oE25(0),
+    m_eclPureClusterHighestE(0),
+    m_eclPureClusterLat(0),
+    m_eclPureClusterNofCrystals(0),
+    m_eclPureClusterCrystalHealth(0),
+    m_eclPureClusterMergedPi0(0),
+    m_eclPureClusterPx(0),
+    m_eclPureClusterPy(0),
+    m_eclPureClusterPz(0),
+    m_eclPureClusterIsTrack(0),
+    m_eclPureClusterPi0Likel(0),
+    m_eclPureClusterEtaLikel(0),
+    m_eclPureClusterDeltaL(0),
+    m_eclPureClusterBeta(0),
     m_mcMultip(0),
     m_mcIdx(0),
     m_mcPdg(0),
@@ -184,10 +187,20 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_trkX(0),
     m_trkY(0),
     m_trkZ(0),
-    m_eclpidtrkIdx(0), m_eclpidEnergy(0), m_eclpidEop(0), m_eclpidE9E25(0), m_eclpidNCrystals(0), m_eclpidNClusters(0),
-    m_eclLogLikeEl(0), m_eclLogLikeMu(0), m_eclLogLikePi(0)
+    m_eclpidtrkIdx(0),
+    m_eclpidEnergy(0),
+    m_eclpidEop(0),
+    m_eclpidE9E25(0),
+    m_eclpidNCrystals(0),
+    m_eclpidNClusters(0),
+    m_eclLogLikeEl(0),
+    m_eclLogLikeMu(0),
+    m_eclLogLikePi(0)
+
 {
+
   //Set module properties
+
   setDescription("This module produces an ntuple with ECL-related quantities starting from mdst");
 
   addParam("writeToRoot", m_writeToRoot,
@@ -195,114 +208,14 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
   addParam("rootFileName", m_rootFileName,
            "fileName used for root file where info are saved. Will be ignored if parameter 'writeToRoot' is false (standard)",
            string("eclDataAnalysis"));
+
   addParam("doTracking", m_doTracking,
            "set true if you want to save the informations from TrackFitResults'rootFileName'", bool(true));
 
-
-  /*
-
-  m_eclHitMultip=0;
-  m_eclHitIdx(0),
-  m_eclHitToMc(0),
-  m_eclHitCellId(0),
-  m_eclHitEnergyDep(0),
-  m_eclHitTimeAve->clear();
-
-  m_eclShowerMultip=0;
-  m_eclShowerIdx->clear();
-  m_eclShowerToMc->clear();
-  m_eclShowerToGamma->clear();
-  m_eclShowerEnergy->clear();
-  m_eclShowerTheta->clear();
-  m_eclShowerPhi->clear();
-  m_eclShowerR->clear();
-  m_eclShowerNHits->clear();
-  m_eclShowerE9oE25->clear();
-  m_eclShowerUncEnergy->clear();
-
-  m_eclClusterMultip=0;
-  m_eclClusterIdx->clear();
-  m_eclClusterToMc->clear();
-  m_eclClusterToShower->clear();
-  m_eclClusterToTrack->clear();
-  m_eclClusterEnergy->clear();
-  m_eclClusterEnergyError->clear();
-  m_eclClusterTheta->clear();
-  m_eclClusterThetaError->clear();
-  m_eclClusterPhi->clear();
-  m_eclClusterPhiError->clear();
-  m_eclClusterR->clear();
-  m_eclClusterEnergyDepSum->clear();
-  m_eclClusterTiming->clear();
-  m_eclClusterTimingError->clear();
-  m_eclClusterE9oE25->clear();
-  m_eclClusterHighestE->clear();
-  m_eclClusterLat->clear();
-  m_eclClusterNofCrystals->clear();
-  m_eclClusterCrystalHealth->clear();
-  m_eclClusterMergedPi0->clear();
-  m_eclClusterPx->clear();
-  m_eclClusterPy->clear();
-  m_eclClusterPz->clear();
-  m_eclClusterIsTrack->clear();
-  m_eclClusterPi0Likel->clear();
-  m_eclClusterEtaLikel->clear();
-  m_eclClusterDeltaL->clear();
-  m_eclClusterBeta->clear();
-
-  m_eclGammaMultip=0;
-  m_eclGammaIdx->clear();
-  m_eclGammaEnergy->clear();
-  m_eclGammaTheta->clear();
-  m_eclGammaPhi->clear();
-  m_eclGammaR->clear();
-  m_eclGammaPx->clear();
-  m_eclGammaPy->clear();
-  m_eclGammaPz->clear();
-
-  m_eclPi0Multip=0;
-  m_eclPi0Idx->clear();
-  //m_eclPi0ToGamma->clear();
-  m_eclPi0ShowerId1->clear();
-  m_eclPi0ShowerId2->clear();
-  m_eclPi0Energy->clear();
-  m_eclPi0Px->clear();
-  m_eclPi0Py->clear();
-  m_eclPi0Pz->clear();
-  m_eclPi0Mass->clear();
-  m_eclPi0MassFit->clear();
-  m_eclPi0Chi2->clear();
-  m_eclPi0PValue->clear();
-
-  m_mcMultip=0;
-  m_mcIdx->clear();
-  m_mcPdg->clear();
-  m_mcMothPdg->clear();
-  m_mcGMothPdg->clear();
-  m_mcGGMothPdg->clear();
-  m_mcEnergy->clear();
-  m_mcPx->clear();
-  m_mcPy->clear();
-  m_mcPz->clear();
-  m_mcDecayVtxX->clear();
-  m_mcDecayVtxY->clear();
-  m_mcDecayVtxZ->clear();
-  m_mcProdVtxX->clear();
-  m_mcProdVtxY->clear();
-  m_mcProdVtxZ->clear();
-  m_mcSecondaryPhysProc->clear();
-
-  m_trkMultip=0;
-  m_trkIdx->clear();
-  m_trkPdg->clear();
-  m_trkCharge->clear();
-  m_trkPx->clear();
-  m_trkPy->clear();
-  m_trkPz->clear();
-  m_trkX->clear();
-  m_trkY->clear();
-  m_trkZ->clear();
-  */
+  addParam("doPureCsIStudy", m_doPureCsIStudy,
+           "set true if you want to save the informations for upgrade option'", bool(false));
+  addParam("pure_clusters", m_pure_clusters, "name of input Pure CsI Clusters", string("ECLClustersPureCsI"));
+  addParam("pure_digits", m_pure_digits, "name of input Pure CsI Digits", string("ECLDigitsPureCsI"));
 }
 
 ECLDataAnalysisModule::~ECLDataAnalysisModule()
@@ -319,10 +232,7 @@ void ECLDataAnalysisModule::initialize()
   StoreArray<ECLDigit>::required();
   StoreArray<ECLSimHit>::required();
   StoreArray<ECLHit>::required();
-  //StoreArray<ECLShower>::required();
   StoreArray<ECLCluster>::required();
-  // StoreArray<ECLGamma>::required();
-  // StoreArray<ECLPi0>::required();
   StoreArray<MCParticle>::required();
 
   if (m_doTracking == true) {
@@ -335,6 +245,7 @@ void ECLDataAnalysisModule::initialize()
     m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
   } else
     m_rootFilePtr = NULL;
+
 
   // initialize tree
   m_tree     = new TTree("m_tree", "ECL Analysis tree");
@@ -352,7 +263,7 @@ void ECLDataAnalysisModule::initialize()
   m_eclDigitAmp = new std::vector<int>();
   m_eclDigitTimeFit = new std::vector<int>();
   m_eclDigitFitQuality = new std::vector<int>();
-  /*
+
   m_eclSimHitMultip = 0;
   m_eclSimHitIdx = new std::vector<int>();
   m_eclSimHitToMc = new std::vector<int>();
@@ -370,27 +281,18 @@ void ECLDataAnalysisModule::initialize()
   m_eclHitMultip = 0;
   m_eclHitIdx = new std::vector<int>();
   m_eclHitToMc = new std::vector<int>();
+  m_eclHitToDigit = new std::vector<int>();
+  m_eclHitToDigitAmp = new std::vector<int>();
+  m_eclHitToPureDigit = new std::vector<int>();
+  m_eclHitToPureDigitAmp = new std::vector<int>();
   m_eclHitCellId = new std::vector<int>();
   m_eclHitEnergyDep = new std::vector<double>();
   m_eclHitTimeAve = new std::vector<double>();
 
-  m_eclShowerMultip = 0;
-  m_eclShowerIdx = new std::vector<int>();
-  m_eclShowerToMc = new std::vector<int>();
-  m_eclShowerToGamma = new std::vector<int>();
-  m_eclShowerEnergy = new std::vector<double>();
-  m_eclShowerTheta = new std::vector<double>();
-  m_eclShowerPhi = new std::vector<double>();
-  m_eclShowerR = new std::vector<double>();
-  m_eclShowerNHits = new std::vector<int>();
-  m_eclShowerE9oE25 = new std::vector<double>();
-  m_eclShowerUncEnergy = new std::vector<double>();
-
   m_eclClusterMultip = 0;
   m_eclClusterIdx = new std::vector<int>();
-  m_eclClusterToMc = new std::vector<int>();
-  m_eclClusterToShower = new std::vector<int>();
-  m_eclClusterToTrack = new std::vector<int>();
+  //m_eclClusterToMc = new std::vector<int>();
+  //m_eclClusterToTrack = new std::vector<int>();
   m_eclClusterEnergy = new std::vector<double>();
   m_eclClusterEnergyError = new std::vector<double>();
   m_eclClusterTheta = new std::vector<double>();
@@ -416,31 +318,6 @@ void ECLDataAnalysisModule::initialize()
   m_eclClusterDeltaL = new std::vector<double>();
   m_eclClusterBeta = new std::vector<double>();
 
-
-  m_eclGammaMultip = 0;
-  m_eclGammaIdx = new std::vector<int>();
-  m_eclGammaEnergy = new std::vector<double>();
-  m_eclGammaTheta = new std::vector<double>();
-  m_eclGammaPhi = new std::vector<double>();
-  m_eclGammaR = new std::vector<double>();
-  m_eclGammaPx = new std::vector<double>();
-  m_eclGammaPy = new std::vector<double>();
-  m_eclGammaPz = new std::vector<double>();
-
-  m_eclPi0Multip = 0;
-  m_eclPi0Idx = new std::vector<int>();
-  m_eclPi0ToGamma = new std::vector<int>();
-  m_eclPi0ShowerId1 = new std::vector<int>();
-  m_eclPi0ShowerId2 = new std::vector<int>();
-  m_eclPi0Energy = new std::vector<double>();
-  m_eclPi0Px = new std::vector<double>();
-  m_eclPi0Py = new std::vector<double>();
-  m_eclPi0Pz = new std::vector<double>();
-  m_eclPi0Mass = new std::vector<double>();
-  m_eclPi0MassFit = new std::vector<double>();
-  m_eclPi0Chi2 = new std::vector<double>();
-  m_eclPi0PValue = new std::vector<double>();
-
   m_mcMultip = 0;
   m_mcIdx = new std::vector<int>();
   m_mcPdg = new std::vector<int>();
@@ -458,7 +335,7 @@ void ECLDataAnalysisModule::initialize()
   m_mcProdVtxY = new std::vector<double>();
   m_mcProdVtxZ = new std::vector<double>();
   m_mcSecondaryPhysProc = new std::vector<int>();
-  */
+
   m_trkMultip = 0;
   m_trkIdx = new std::vector<int>();
   m_trkPdg = new std::vector<int>();
@@ -482,6 +359,7 @@ void ECLDataAnalysisModule::initialize()
   m_eclLogLikeEl = new std::vector<double>();
   m_eclLogLikeMu = new std::vector<double>();
   m_eclLogLikePi = new std::vector<double>();
+
 
   m_tree->Branch("expNo", &m_iExperiment, "expNo/I");
   m_tree->Branch("runNo", &m_iRun, "runNo/I");
@@ -517,22 +395,12 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclHitMultip",     &m_eclHitMultip,      "eclHitMultip/I");
   m_tree->Branch("eclHitIdx",     "std::vector<int>",       &m_eclHitIdx);
   m_tree->Branch("eclHitToMC",      "std::vector<int>",       &m_eclHitToMc);
+  m_tree->Branch("eclHitToDigit",      "std::vector<int>",       &m_eclHitToDigit);
+  m_tree->Branch("eclHitToDigitAmp",      "std::vector<int>",       &m_eclHitToDigitAmp);
   m_tree->Branch("eclHitCellId",     "std::vector<int>",    &m_eclHitCellId);
   m_tree->Branch("eclHitEnergyDep",      "std::vector<double>", &m_eclHitEnergyDep);
   m_tree->Branch("eclHitTimeAve",       "std::vector<double>", &m_eclHitTimeAve);
-  /*
-  m_tree->Branch("eclShowerMultip",     &m_eclShowerMultip,      "eclShowerMultip/I");
-  m_tree->Branch("eclShowerIdx",     "std::vector<int>",       &m_eclShowerIdx);
-  m_tree->Branch("eclShowerToMc",      "std::vector<int>",       &m_eclShowerToMc);
-  m_tree->Branch("eclShowerToGamma",      "std::vector<int>",       &m_eclShowerToGamma);
-  m_tree->Branch("eclShowerEnergy",     "std::vector<double>",    &m_eclShowerEnergy);
-  m_tree->Branch("eclShowerTheta",      "std::vector<double>",    &m_eclShowerTheta);
-  m_tree->Branch("eclShowerPhi",        "std::vector<double>",    &m_eclShowerPhi);
-  m_tree->Branch("eclShowerR",          "std::vector<double>",    &m_eclShowerR);
-  m_tree->Branch("eclShowerNhits",      "std::vector<int>",       &m_eclShowerNHits);
-  m_tree->Branch("eclShowerE9oE25",     "std::vector<double>",    &m_eclShowerE9oE25);
-  m_tree->Branch("eclShowerUncEnergy",  "std::vector<double>",    &m_eclShowerUncEnergy);
-  */
+
   m_tree->Branch("eclClusterMultip",     &m_eclClusterMultip,     "eclClusterMultip/I");
   m_tree->Branch("eclClusterIdx",     "std::vector<int>",       &m_eclClusterIdx);
   m_tree->Branch("eclClusterToMc1",      "std::vector<int>",       &m_eclClusterToMc1);
@@ -573,32 +441,49 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclClusterEtaLikel",   "std::vector<double>",    &m_eclClusterEtaLikel);
   m_tree->Branch("eclClusterDeltaL",     "std::vector<double>",    &m_eclClusterDeltaL);
   m_tree->Branch("eclClusterBeta",       "std::vector<double>",    &m_eclClusterBeta);
-  /*
-  m_tree->Branch("eclGammaMultip",     &m_eclGammaMultip,      "eclGammaMultip/I");
-  m_tree->Branch("eclGammaIdx",     "std::vector<int>",       &m_eclGammaIdx);
-  m_tree->Branch("eclGammaEnergy",     "std::vector<double>",    &m_eclGammaEnergy);
-  m_tree->Branch("eclGammaTheta",      "std::vector<double>",    &m_eclGammaTheta);
-  m_tree->Branch("eclGammaPhi",        "std::vector<double>",    &m_eclGammaPhi);
-  m_tree->Branch("eclGammar",          "std::vector<double>",    &m_eclGammaR);
-  m_tree->Branch("eclGammaPx",         "std::vector<double>",    &m_eclGammaPx);
-  m_tree->Branch("eclGammaPy",         "std::vector<double>",    &m_eclGammaPy);
-  m_tree->Branch("eclGammaPz",         "std::vector<double>",    &m_eclGammaPz);
-  m_tree->Branch("eclGammaToPi0",      "std::vector<int>",       &m_eclGammaToPi0);
 
-  m_tree->Branch("eclPi0Multip",     &m_eclPi0Multip,      "eclPi0Multip/I");
-  m_tree->Branch("eclPi0Idx",     "std::vector<int>",       &m_eclPi0Idx);
-  //m_tree->Branch("eclPi0ToGamma",      "std::vector<int>",       &m_eclPi0ToGamma);
-  m_tree->Branch("eclPi0ShowerId1",  "std::vector<int>",    &m_eclPi0ShowerId1);
-  m_tree->Branch("eclPi0ShowerId2",  "std::vector<int>",    &m_eclPi0ShowerId2);
-  m_tree->Branch("eclPi0Energy",     "std::vector<double>", &m_eclPi0Energy);
-  m_tree->Branch("eclPi0Px",         "std::vector<double>", &m_eclPi0Px);
-  m_tree->Branch("eclPi0Py",         "std::vector<double>", &m_eclPi0Py);
-  m_tree->Branch("eclPi0Pz",         "std::vector<double>", &m_eclPi0Pz);
-  m_tree->Branch("eclPi0Mass",       "std::vector<double>", &m_eclPi0Mass);
-  m_tree->Branch("eclPi0MassFit",    "std::vector<double>", &m_eclPi0MassFit);
-  m_tree->Branch("eclPi0Chi2",       "std::vector<double>", &m_eclPi0Chi2);
-  m_tree->Branch("eclPi0Pvalue",       "std::vector<double>", &m_eclPi0PValue);
-  */
+  if (m_doPureCsIStudy == true) {
+
+    m_tree->Branch("eclHitToPureDigit",      "std::vector<int>",       &m_eclHitToPureDigit);
+    m_tree->Branch("eclHitToPureDigitAmp",      "std::vector<int>",       &m_eclHitToPureDigitAmp);
+
+    m_tree->Branch("eclPureDigitMultip",     &m_eclPureDigitMultip,         "ecdigit_Multip/I");
+    m_tree->Branch("eclPureDigitIdx",        "std::vector<int>",         &m_eclPureDigitIdx);
+    m_tree->Branch("eclPureDigitToMC",      "std::vector<int>",          &m_eclPureDigitToMc);
+    //m_tree->Branch("eclPureDigitToHit",      "std::vector<int>",          &m_eclPureDigitToHit);
+    m_tree->Branch("eclPureDigitCellId",     "std::vector<int>",         &m_eclPureDigitCellId);
+    m_tree->Branch("eclPureDigitAmp",        "std::vector<int>",         &m_eclPureDigitAmp);
+    m_tree->Branch("eclPureDigitTimeFit",    "std::vector<int>",         &m_eclPureDigitTimeFit);
+    m_tree->Branch("eclPureDigitFitQuality",    "std::vector<int>",         &m_eclPureDigitFitQuality);
+
+    m_tree->Branch("eclPureClusterMultip",     &m_eclPureClusterMultip,     "eclPureClusterMultip/I");
+    m_tree->Branch("eclPureClusterIdx",     "std::vector<int>",       &m_eclPureClusterIdx);
+    m_tree->Branch("eclPureClusterEnergy",     "std::vector<double>",    &m_eclPureClusterEnergy);
+    m_tree->Branch("eclPureClusterEnergyError",  "std::vector<double>",    &m_eclPureClusterEnergyError);
+    m_tree->Branch("eclPureClusterTheta",      "std::vector<double>",    &m_eclPureClusterTheta);
+    m_tree->Branch("eclPureClusterThetaError",   "std::vector<double>",    &m_eclPureClusterThetaError);
+    m_tree->Branch("eclPureClusterPhi",        "std::vector<double>",    &m_eclPureClusterPhi);
+    m_tree->Branch("eclPureClusterPhiError",     "std::vector<double>",    &m_eclPureClusterPhiError);
+    m_tree->Branch("eclPureClusterR",          "std::vector<double>",    &m_eclPureClusterR);
+    m_tree->Branch("eclPureClusterEnergyDepSum",   "std::vector<double>",    &m_eclPureClusterEnergyDepSum);
+    m_tree->Branch("eclPureClusterTiming",     "std::vector<double>",    &m_eclPureClusterTiming);
+    m_tree->Branch("eclPureClusterTimingError",  "std::vector<double>",    &m_eclPureClusterTimingError);
+    m_tree->Branch("eclPureClusterE9oE25",     "std::vector<double>",    &m_eclPureClusterE9oE25);
+    m_tree->Branch("eclPureClusterHighestE",   "std::vector<double>",    &m_eclPureClusterHighestE);
+    m_tree->Branch("eclPureClusterLat",        "std::vector<double>",    &m_eclPureClusterLat);
+    m_tree->Branch("eclPureClusterNofCrystals",   "std::vector<int>",       &m_eclPureClusterNofCrystals);
+    m_tree->Branch("eclPureClusterCrystalHealth", "std::vector<int>",       &m_eclPureClusterCrystalHealth);
+    m_tree->Branch("eclPureClusterMergedPi0",  "std::vector<double>",    &m_eclPureClusterMergedPi0);
+    m_tree->Branch("eclPureClusterPx",         "std::vector<double>",    &m_eclPureClusterPx);
+    m_tree->Branch("eclPureClusterPy",         "std::vector<double>",    &m_eclPureClusterPy);
+    m_tree->Branch("eclPureClusterPz",         "std::vector<double>",    &m_eclPureClusterPz);
+    m_tree->Branch("eclPureClusterIsTrack",    "std::vector<bool>",       &m_eclPureClusterIsTrack);
+    m_tree->Branch("eclPureClusterPi0Likel",   "std::vector<double>",    &m_eclPureClusterPi0Likel);
+    m_tree->Branch("eclPureClusterEtaLikel",   "std::vector<double>",    &m_eclPureClusterEtaLikel);
+    m_tree->Branch("eclPureClusterDeltaL",     "std::vector<double>",    &m_eclPureClusterDeltaL);
+    m_tree->Branch("eclPureClusterBeta",       "std::vector<double>",    &m_eclPureClusterBeta);
+  }
+
   m_tree->Branch("mcMultip",     &m_mcMultip,           "mcMultip/I");
   m_tree->Branch("mcIdx",        "std::vector<int>",    &m_mcIdx);
   m_tree->Branch("mcPdg",        "std::vector<int>",    &m_mcPdg);
@@ -659,15 +544,19 @@ void ECLDataAnalysisModule::event()
   B2DEBUG(1, "  ++++++++++++++ ECLDataAnalysisModule");
 
   // re-initialize vars
-  /*m_eclTriggerMultip=0;*/  m_eclDigitMultip = 0;  m_eclSimHitMultip = 0;  m_eclHitMultip = 0;
-  //m_eclShowerMultip = 0;
+  /*m_eclTriggerMultip=0;*/
+  m_eclDigitMultip = 0;  m_eclSimHitMultip = 0;  m_eclHitMultip = 0;
+
+  if (m_doPureCsIStudy == true) {
+    m_eclPureClusterMultip = 0;
+  }
   m_eclClusterMultip = 0;  //m_eclGammaMultip = 0;  m_eclPi0Multip = 0;
   m_mcMultip = 0;  m_trkMultip = 0;
 
   //m_eclTriggerCellId->clear();  m_eclTriggerTime->clear();   m_eclTriggerIdx->clear();
 
   m_eclDigitCellId->clear();  m_eclDigitAmp->clear();  m_eclDigitTimeFit->clear();  m_eclDigitFitQuality->clear();
-  m_eclDigitIdx->clear();   m_eclDigitToMc->clear();
+  m_eclDigitIdx->clear();   m_eclDigitToMc->clear(); //m_eclDigitToHit->clear();
 
   m_eclSimHitCellId->clear(); m_eclSimHitPdg->clear(); m_eclSimHitEnergyDep->clear(); m_eclSimHitFlightTime->clear();
   m_eclSimHitIdx->clear();   m_eclSimHitToMc->clear();
@@ -675,19 +564,8 @@ void ECLDataAnalysisModule::event()
   m_eclSimHitPx->clear(); m_eclSimHitPy->clear(); m_eclSimHitPz->clear();
 
   m_eclHitCellId->clear(); m_eclHitEnergyDep->clear(); m_eclHitTimeAve->clear(); m_eclHitIdx->clear();   m_eclHitToMc->clear();
-  /*
-  m_eclShowerToMc->clear();   m_eclShowerToGamma->clear();
-  m_eclShowerEnergy->clear(); m_eclShowerTheta->clear();  m_eclShowerPhi->clear(); m_eclShowerIdx->clear();
-  m_eclShowerR->clear();  m_eclShowerNHits->clear();  m_eclShowerE9oE25->clear();  m_eclShowerUncEnergy->clear();
+  m_eclHitToDigit->clear();  m_eclHitToDigitAmp->clear();
 
-  m_eclGammaEnergy->clear();  m_eclGammaTheta->clear();  m_eclGammaPhi->clear();  m_eclGammaR->clear();
-  m_eclGammaPx->clear();  m_eclGammaPy->clear();  m_eclGammaPz->clear(); m_eclGammaIdx->clear();  m_eclGammaToPi0->clear();
-
-  //  m_eclPi0ToGamma->clear();
-  m_eclPi0ShowerId1->clear(); m_eclPi0ShowerId2->clear(); m_eclPi0Idx->clear();
-  m_eclPi0Energy->clear(); m_eclPi0Px->clear(); m_eclPi0Py->clear(); m_eclPi0Pz->clear();
-  m_eclPi0Mass->clear(); m_eclPi0MassFit->clear(); m_eclPi0Chi2->clear(); m_eclPi0PValue->clear();
-  */
   m_eclClusterEnergy->clear();  m_eclClusterEnergyError->clear();  m_eclClusterTheta->clear();  m_eclClusterThetaError->clear();
   m_eclClusterPhi->clear();  m_eclClusterPhiError->clear();  m_eclClusterR->clear();
   m_eclClusterIdx->clear();  m_eclClusterToMc1->clear(); m_eclClusterToMcWeight1->clear(); m_eclClusterToMc2->clear();
@@ -695,13 +573,31 @@ void ECLDataAnalysisModule::event()
   m_eclClusterToMcWeight3->clear(); m_eclClusterToMc4->clear();
   m_eclClusterToMcWeight4->clear(); m_eclClusterToMc5->clear();
   m_eclClusterToMcWeight5->clear(); m_eclClusterToBkgWeight->clear(); m_eclClusterSimHitSum->clear();
-  //m_eclClusterToShower->clear(); //m_eclClusterToTrack->clear();
+  //m_eclClusterToTrack->clear();
   m_eclClusterEnergyDepSum->clear();  m_eclClusterTiming->clear();  m_eclClusterTimingError->clear();
   m_eclClusterE9oE25->clear();  m_eclClusterHighestE->clear();  m_eclClusterLat->clear();
   m_eclClusterNofCrystals->clear();  m_eclClusterCrystalHealth->clear();  m_eclClusterMergedPi0->clear();
   m_eclClusterPx->clear();  m_eclClusterPy->clear();  m_eclClusterPz->clear();  m_eclClusterIsTrack->clear();
   m_eclClusterPi0Likel->clear();  m_eclClusterEtaLikel->clear();  m_eclClusterDeltaL->clear();  m_eclClusterBeta->clear();
 
+  if (m_doPureCsIStudy == true) {
+
+    m_eclHitToPureDigit->clear();  m_eclHitToPureDigitAmp->clear();
+
+    m_eclPureDigitMultip = 0;
+    m_eclPureDigitCellId->clear();  m_eclPureDigitAmp->clear();  m_eclPureDigitTimeFit->clear();  m_eclPureDigitFitQuality->clear();
+    m_eclPureDigitIdx->clear();   m_eclPureDigitToMc->clear(); //m_eclPureDigitToHit->clear();
+
+    m_eclPureClusterEnergy->clear();  m_eclPureClusterEnergyError->clear();  m_eclPureClusterTheta->clear();
+    m_eclPureClusterThetaError->clear();
+    m_eclPureClusterPhi->clear();  m_eclPureClusterPhiError->clear();  m_eclPureClusterR->clear();
+    m_eclPureClusterIdx->clear();  m_eclPureClusterTiming->clear();  m_eclPureClusterTimingError->clear();
+    m_eclPureClusterE9oE25->clear();  m_eclPureClusterHighestE->clear();  m_eclPureClusterLat->clear();
+    m_eclPureClusterNofCrystals->clear();  m_eclPureClusterCrystalHealth->clear();  m_eclPureClusterMergedPi0->clear();
+    m_eclPureClusterPx->clear();  m_eclPureClusterPy->clear();  m_eclPureClusterPz->clear();  m_eclPureClusterIsTrack->clear();
+    m_eclPureClusterPi0Likel->clear();  m_eclPureClusterEtaLikel->clear();  m_eclPureClusterDeltaL->clear();
+    m_eclPureClusterBeta->clear();
+  }
   m_mcIdx->clear();  m_mcPdg->clear();  m_mcMothPdg->clear();  m_mcGMothPdg->clear();  m_mcGGMothPdg->clear();
   m_mcEnergy->clear();  m_mcPx->clear();  m_mcPy->clear();  m_mcPz->clear();
   m_mcDecayVtxX->clear();  m_mcDecayVtxY->clear();  m_mcDecayVtxZ->clear();  m_mcProdVtxX->clear();  m_mcProdVtxY->clear();
@@ -735,8 +631,16 @@ void ECLDataAnalysisModule::event()
   StoreArray<ECLHit> hits;
   //StoreArray<ECLShower> showers;
   StoreArray<ECLCluster> clusters;
+
   StoreArray<MCParticle> mcParticles;
   RelationArray ECLClusterToMC(clusters, mcParticles);
+  RelationArray ECLHitsToDigit(hits, digits);
+  RelationArray ECLHitsToMC(hits, mcParticles);
+
+  //  if (m_doPureCsIStudy == true) {
+  //    StoreArray<ECLDigit> pure_digits(m_pure_digits);
+  //    RelationArray ECLHitsToDigit(hits, pure_digits);
+  //  }
   /*
   m_eclTriggerMultip=trgs.getEntries();
   for (int itrgs = 0; itrgs < trgs.getEntries() ; itrgs++){
@@ -797,12 +701,48 @@ void ECLDataAnalysisModule::event()
     m_eclHitEnergyDep->push_back(aECLHits->getEnergyDep());
     m_eclHitTimeAve->push_back(aECLHits->getTimeAve());
 
+    if (aECLHits->getRelated<ECLDigit>() != (nullptr)) {
+      const ECLDigit* hit_digit = aECLHits->getRelated<ECLDigit>();
+      m_eclHitToDigit->push_back(hit_digit->getArrayIndex());
+      m_eclHitToDigitAmp->push_back(hit_digit->getAmp());
+    } else {
+      m_eclHitToDigit->push_back(-1);
+      m_eclHitToDigitAmp->push_back(-1);
+    }
+
+    if (m_doPureCsIStudy == true) {
+      StoreArray<ECLDigit> pure_digits(m_pure_digits);
+      RelationArray ECLHitsToPureDigit(hits, pure_digits);
+
+      //for (int idigits = 0; idigits < pure_digits.getEntries() ; idigits++) {
+      //ECLDigit* aECLPureDigits = pure_digits[idigits];
+      if (aECLHits->getRelated<ECLDigit>(m_pure_digits) != (nullptr)) {
+        const ECLDigit* hit_digit = aECLHits->getRelated<ECLDigit>(m_pure_digits);
+        m_eclHitToPureDigit->push_back(hit_digit->getArrayIndex());
+        m_eclHitToPureDigitAmp->push_back(hit_digit->getAmp());
+      } else {
+        m_eclHitToPureDigit->push_back(-1);
+        m_eclHitToPureDigitAmp->push_back(-1);
+      }
+      //}
+    }
+
+    if (aECLHits->getRelated<MCParticle>() != (nullptr)) {
+      for (int rel = 0; rel < (int)ECLHitsToMC.getEntries(); rel++) {
+        //if (ECLHitsToMC[rel].getFromIndex() == ihits) {
+        //if ((ECLHitsToMC[rel].getWeight() > 0) && (rel < 10)) {
+        m_eclHitToMc->push_back(ECLHitsToMC[rel].getToIndex());
+        //}
+        //}
+      }
+    }
+    /*
     if (aECLHits->getRelated<MCParticle>() != (nullptr)) {
       const MCParticle* mc_hit = aECLHits->getRelated<MCParticle>();
-      m_eclHitToMc->push_back(mc_hit->getArrayIndex());
+      m_eclHitToMc->push_back(mc_hit->getFromIndex());
     } else
       m_eclHitToMc->push_back(-1);
-
+    */
   }
 
   m_eclClusterMultip = clusters.getEntries();
@@ -841,16 +781,9 @@ void ECLDataAnalysisModule::event()
       idx[i] = -1;
 
     if (aECLClusters->getRelated<MCParticle>() != (nullptr)) {
-      //int rel=0;
-      //std::cout << "Entries: " << (int)ECLClusterToMC.getEntries() << std::endl;
-      //std::cout << "Entries: " << (int)aECLClusters->getRelationsFrom<ECLCluster> << std::endl;
-      //for (auto MCpart : aECLClusters->getRelationsTo<MCParticle>()) {
-      //m_eclClusterToMc->push_back(MCpart.getArrayIndex());
       int ii = 0;
       for (int rel = 0; rel < (int)ECLClusterToMC.getEntries(); rel++) {
         if (ECLClusterToMC[rel].getFromIndex() == iclusters) {
-          //m_eclClusterToMc->push_back(ECLClusterToMC[rel].getToIndex());
-          //m_eclClusterToMcWeight->push_back(ECLClusterToMC[rel].getWeight());
           if ((ECLClusterToMC[rel].getWeight() > 0) && (rel < 10)) {
             idx[ii] = rel;
             ii++;
@@ -867,7 +800,6 @@ void ECLDataAnalysisModule::event()
       int y = 0;
       while (y < max) {
         for (int i = 0; i < max; i++) {
-          //cout << "Idx1: " << idx[i] << " Idx2: " << idx[i+1] << endl;
           if (((idx[i]) > -1) && ((idx[i + 1]) > -1)) {
             if (ECLClusterToMC[idx[i]].getWeight() < ECLClusterToMC[idx[i + 1]].getWeight()) {
               int temp = idx[i];
@@ -881,18 +813,15 @@ void ECLDataAnalysisModule::event()
       m_eclClusterToBkgWeight->push_back(aECLClusters->getEnergy() - sumHit);
       m_eclClusterSimHitSum->push_back(sumHit);
       m_eclClusterToMc1->push_back(idx[0]);
-      //cout << idx[0] << endl;
       if (idx[0] > -1)
         m_eclClusterToMcWeight1->push_back(ECLClusterToMC[idx[0]].getWeight());
       else
         m_eclClusterToMcWeight1->push_back(-1);
       m_eclClusterToMc2->push_back(idx[1]);
-      //cout << idx[1] << endl;
       if (idx[1] > -1)
         m_eclClusterToMcWeight2->push_back(ECLClusterToMC[idx[1]].getWeight());
       else
         m_eclClusterToMcWeight2->push_back(-1);
-      //cout << idx[2] << endl;
       m_eclClusterToMc3->push_back(idx[2]);
       if (idx[2] > -1)
         m_eclClusterToMcWeight3->push_back(ECLClusterToMC[idx[2]].getWeight());
@@ -922,19 +851,67 @@ void ECLDataAnalysisModule::event()
       m_eclClusterToBkgWeight->push_back(aECLClusters->getEnergy() - sumHit);
       m_eclClusterSimHitSum->push_back(-1);
     }
+  }
 
-    //if (aECLClusters->getRelated<MCParticle>() != (nullptr)) {
-    //  const MCParticle* mc_cluster = aECLClusters->getRelated<MCParticle>();
-    //  m_eclClusterToMc->push_back(mc_cluster->getArrayIndex());
-    //} else
-    //  m_eclClusterToMc->push_back(-1);
-    /*
-    if (aECLClusters->getRelated<ECLShower>() != (nullptr)) {
-      const ECLShower* shower_cluster = aECLClusters->getRelated<ECLShower>();
-      m_eclClusterToShower->push_back(shower_cluster->getArrayIndex());
-    } else
-      m_eclClusterToShower->push_back(-1);
-    */
+
+  if (m_doPureCsIStudy == true) {
+
+    //StoreArray<ECLDigit> pure_digits(m_pure_digits);
+    //RelationArray ECLPureDigitToHit(m_pure_digits, hits);
+    StoreArray<ECLDigit> pure_digits(m_pure_digits);
+    //RelationArray ECLHitsToDigit(hits, pure_digits);
+    m_eclPureDigitMultip = pure_digits.getEntries();
+    for (int idigits = 0; idigits < pure_digits.getEntries() ; idigits++) {
+      ECLDigit* aECLPureDigits = pure_digits[idigits];
+
+      m_eclPureDigitIdx->push_back(idigits);
+      m_eclPureDigitCellId->push_back(aECLPureDigits->getCellId());
+      m_eclPureDigitAmp->push_back(aECLPureDigits->getAmp());
+      m_eclPureDigitTimeFit->push_back(aECLPureDigits->getTimeFit());
+      m_eclPureDigitFitQuality->push_back(aECLPureDigits->getQuality());
+
+      /*
+      if (aECLPureDigits->getRelated<MCParticle>() != (nullptr)) {
+      const MCParticle* mc_digit = aECLPureDigits->getRelated<MCParticle>();
+      m_eclPureDigitToMc->push_back(mc_digit->getArrayIndex());
+      } else
+      m_eclPureDigitToMc->push_back(-1);
+      */
+    }
+
+    StoreArray<ECLCluster> pure_clusters(m_pure_clusters);
+
+    m_eclPureClusterMultip = pure_clusters.getEntries();
+
+    for (unsigned int iclusters = 0; iclusters < (unsigned int)pure_clusters.getEntries() ; iclusters++) {
+      ECLCluster* aECLClusters = pure_clusters[iclusters];
+
+      m_eclPureClusterIdx->push_back(iclusters);
+      m_eclPureClusterEnergy->push_back(aECLClusters->getEnergy());
+      m_eclPureClusterEnergyError->push_back(aECLClusters->getErrorEnergy());
+      m_eclPureClusterTheta->push_back(aECLClusters->getTheta());
+      m_eclPureClusterThetaError->push_back(aECLClusters->getErrorTheta());
+      m_eclPureClusterPhi->push_back(aECLClusters->getPhi());
+      m_eclPureClusterPhiError->push_back(aECLClusters->getErrorPhi());
+      m_eclPureClusterR->push_back(aECLClusters->getR());
+      m_eclPureClusterEnergyDepSum->push_back(aECLClusters->getEnedepSum());
+      m_eclPureClusterTiming->push_back(aECLClusters->getTiming());
+      m_eclPureClusterTimingError->push_back(aECLClusters->getErrorTiming());
+      m_eclPureClusterE9oE25->push_back(aECLClusters->getE9oE25());
+      m_eclPureClusterHighestE->push_back(aECLClusters->getHighestE());
+      m_eclPureClusterLat->push_back(aECLClusters->getLAT());
+      m_eclPureClusterNofCrystals->push_back(aECLClusters->getNofCrystals());
+      m_eclPureClusterCrystalHealth->push_back(aECLClusters->getCrystHealth());
+      m_eclPureClusterMergedPi0->push_back(aECLClusters->getMergedPi0());
+      m_eclPureClusterPx->push_back(aECLClusters->getPx());
+      m_eclPureClusterPy->push_back(aECLClusters->getPy());
+      m_eclPureClusterPz->push_back(aECLClusters->getPz());
+      m_eclPureClusterIsTrack->push_back(aECLClusters->getisTrack());
+      m_eclPureClusterPi0Likel->push_back(aECLClusters->getpi0Likelihood());
+      m_eclPureClusterEtaLikel->push_back(aECLClusters->getetaLikelihood());
+      m_eclPureClusterDeltaL->push_back(aECLClusters->getdeltaL());
+      m_eclPureClusterBeta->push_back(aECLClusters->getbeta());
+    }
   }
 
   /*

@@ -66,6 +66,9 @@ namespace Belle2 {
     std::string m_rootFileName; /**< name of the root file */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
     bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
+    bool m_doPureCsIStudy; /**< if true, info on pureCsI upgrade is stored*/
+    std::string m_pure_clusters;
+    std::string m_pure_digits;
 
     TTree* m_tree; /**< Root tree and file for saving the output */
     //TFile* m_rootFile;
@@ -83,6 +86,7 @@ namespace Belle2 {
     int m_eclDigitMultip; /**< Number of ECLDigits per event */
     std::vector<int>* m_eclDigitIdx; /**< ECLDigit index */
     std::vector<int>* m_eclDigitToMc; /**< Index of MCParticle related to that ECLDigit */
+    //std::vector<int>* m_eclDigitToHit; /**< Index of ECLHit related to that ECLDigit */
     std::vector<int>* m_eclDigitCellId; /**< Number of ECLDigit CellId */
     std::vector<int>* m_eclDigitAmp;  /**< ECLDigit amplitude */
     std::vector<int>* m_eclDigitTimeFit;  /**< ECLDigit timing */
@@ -105,21 +109,13 @@ namespace Belle2 {
     int m_eclHitMultip; /**< Number of ECLHits per event */
     std::vector<int>* m_eclHitIdx; /**< Index of ECLHits */
     std::vector<int>* m_eclHitToMc; /**< Index of MCParticle related to ECLHit */
+    std::vector<int>* m_eclHitToDigit; /**< Index of ECLDigit related to ECLHit */
+    std::vector<int>* m_eclHitToDigitAmp; /**< Amplitude of ECLDigit related to ECLHit */
+    std::vector<int>* m_eclHitToPureDigit; /**< Index of ECLDigit related to ECLHit */
+    std::vector<int>* m_eclHitToPureDigitAmp; /**< Amplitude of ECLDigit related to ECLHit */
     std::vector<int>* m_eclHitCellId; /**< ECLHit CellID */
     std::vector<double>* m_eclHitEnergyDep; /**< ECLHit energy */
     std::vector<double>* m_eclHitTimeAve; /**< ECLHit time */
-
-    //int m_eclShowerMultip; /**< Number of ECLShowers per event */
-    //std::vector<int>* m_eclShowerIdx; /**< ECLShower index */
-    //std::vector<int>* m_eclShowerToMc; /**< Index of MCParticle related to ECLShower */
-    //std::vector<int>* m_eclShowerToGamma; /**< Index of ECLGamma related to ECLShower */
-    //std::vector<double>* m_eclShowerEnergy; /**< ECLShower energy */
-    //std::vector<double>* m_eclShowerTheta; /**< Polar direction of ECLShower */
-    //std::vector<double>* m_eclShowerPhi; /**< Azimuthal direction of ECLShower */
-    //std::vector<double>* m_eclShowerR; /**< Distance from IP of ECLShower */
-    //std::vector<int>* m_eclShowerNHits; /**< Number of ECLHits related to ECLShower */
-    //std::vector<double>* m_eclShowerE9oE25; /**< Ratio of 3x3 over 5x5 crystal matrices energies for ECLShower*/
-    //std::vector<double>* m_eclShowerUncEnergy; /**< Uncorrected ECLShower energy */
 
     int m_eclClusterMultip;  /**< Number of ECLClusterss per event */
     std::vector<int>* m_eclClusterIdx;  /**< ECLCluster index */
@@ -162,6 +158,42 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterEtaLikel; /**< Flag for eta */
     std::vector<double>* m_eclClusterDeltaL; /**< ??? */
     std::vector<double>* m_eclClusterBeta; /**< ??? */
+
+    int m_eclPureDigitMultip; /**< Number of ECLPureDigits per event */
+    std::vector<int>* m_eclPureDigitIdx; /**< ECLPureDigit index */
+    std::vector<int>* m_eclPureDigitToMc; /**< Index of MCParticle related to that ECLPureDigit */
+    //std::vector<int>* m_eclPureDigitToHit; /**< Index of Hit related to that ECLPureDigit */
+    std::vector<int>* m_eclPureDigitCellId; /**< Number of ECLPureDigit CellId */
+    std::vector<int>* m_eclPureDigitAmp;  /**< ECLPureDigit amplitude */
+    std::vector<int>* m_eclPureDigitTimeFit;  /**< ECLPureDigit timing */
+    std::vector<int>* m_eclPureDigitFitQuality;  /**< ECLPureDigit fit quality */
+
+    int m_eclPureClusterMultip;  /**< Number of ECLClusterss per event */
+    std::vector<int>* m_eclPureClusterIdx;  /**< ECLCluster index */
+    std::vector<double>* m_eclPureClusterEnergy; /**< ECLPureCluster energy */
+    std::vector<double>* m_eclPureClusterEnergyError; /**< ECLPureCluster energy error*/
+    std::vector<double>* m_eclPureClusterTheta;  /**< ECLPureCluster polar direction */
+    std::vector<double>* m_eclPureClusterThetaError;  /**< ECLPureCluster error on polar direction */
+    std::vector<double>* m_eclPureClusterPhi;  /**< ECLPureCluster azimuthal direction */
+    std::vector<double>* m_eclPureClusterPhiError;  /**< ECLPureCluster error on azimuthal direction */
+    std::vector<double>* m_eclPureClusterR;  /**< ECLPureCluster distance from IP */
+    std::vector<double>* m_eclPureClusterEnergyDepSum;  /**< ECLPureCluster simulated energy */
+    std::vector<double>* m_eclPureClusterTiming;  /**< ECLPureCluster time */
+    std::vector<double>* m_eclPureClusterTimingError;  /**< ECLPureCluster time error */
+    std::vector<double>* m_eclPureClusterE9oE25;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for ECLPureCluster*/
+    std::vector<double>* m_eclPureClusterHighestE; /**< Highest energy deposit (per crystal) in ECLPureCluster */
+    std::vector<double>* m_eclPureClusterLat; /**< ECLPureCluster shape parameter */
+    std::vector<int>* m_eclPureClusterNofCrystals;  /**< Number of crystals in ECLPureCluster */
+    std::vector<int>* m_eclPureClusterCrystalHealth;  /**< Crystal healt flag */
+    std::vector<double>* m_eclPureClusterMergedPi0;  /**< Flag for merged pi0 */
+    std::vector<double>* m_eclPureClusterPx;  /**< Reconstructed momentum along X */
+    std::vector<double>* m_eclPureClusterPy;  /**< Reconstructed momentum along Y */
+    std::vector<double>* m_eclPureClusterPz;  /**< Reconstructed momentum along Z */
+    std::vector<bool>* m_eclPureClusterIsTrack; /**< Flag for charged clusters */
+    std::vector<double>* m_eclPureClusterPi0Likel; /**< Flag for pi0 */
+    std::vector<double>* m_eclPureClusterEtaLikel; /**< Flag for eta */
+    std::vector<double>* m_eclPureClusterDeltaL; /**< ??? */
+    std::vector<double>* m_eclPureClusterBeta; /**< ??? */
     /*
     int m_eclGammaMultip;
     std::vector<int>* m_eclGammaIdx;

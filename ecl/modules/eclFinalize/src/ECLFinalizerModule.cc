@@ -50,12 +50,18 @@ ECLFinalizerModule::ECLFinalizerModule() : Module()
   // Set description
   setDescription("ECLFinalizerModule: Converts ecl dataobjects to mdst dataobjects");
 
-  addParam("clusterEnergyCuts", m_clusterEnergyCuts, "Min [0] and Max [1] value for the cluster energy cut.",
-           make_vector(0.0 * Belle2::Unit::GeV, 999.0 * Belle2::Unit::GeV));
-  addParam("highestEnergyCuts", m_highestEnergyCuts, "Min [0] and Max [1] value for the highest energy cut.",
-           make_vector(0.0 * Belle2::Unit::GeV, 999.0 * Belle2::Unit::GeV));
-  addParam("clusterTimeCuts", m_clusterTimeCuts, "Min [0] and Max [1] value for the cluster time cut.",
-           make_vector(-125.0 * Belle2::Unit::ns, 125.0 * Belle2::Unit::ns));
+  addParam("clusterEnergyCutMin", m_clusterEnergyCutMin, "Min value for the cluster energy cut.",
+           0.0 * Belle2::Unit::GeV);
+  addParam("clusterEnergyCutMax", m_clusterEnergyCutMax, "Max value for the cluster energy cut.",
+           999.9 * Belle2::Unit::GeV);
+  addParam("highestEnergyCutMin", m_highestEnergyCutMin, "Min value for the highest energy cut.",
+           0.0 * Belle2::Unit::GeV);
+  addParam("highestEnergyCutMax", m_highestEnergyCutMax, "Max value for the highest energy cut.",
+           999.9 * Belle2::Unit::GeV);
+  addParam("clusterTimeCutMin", m_clusterTimeCutMin, "Min value for the cluster time cut.",
+           -125.0 * Belle2::Unit::ns);
+  addParam("clusterTimeCutMax", m_clusterTimeCutMax, "Max value for the cluster time cut.",
+           125.0 * Belle2::Unit::ns);
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -105,9 +111,9 @@ void ECLFinalizerModule::event()
 
     // Loose timing cut is applied. 20150529 K.Miyabayashi (original comment)
     // replaced -300..200 clocktick cut by +/- 125ns cut (Torbenm 24-March-2016) - THIS WILL BE REPLACED BY AN ENERGY DEPENDENT CUT USING THE RESOLUTION SOON
-    if ((vectorToPair(m_clusterTimeCuts).first < showerTime and showerTime < vectorToPair(m_clusterTimeCuts).second)
-        and (vectorToPair(m_clusterEnergyCuts).first < showerEnergy and showerEnergy < vectorToPair(m_clusterEnergyCuts).second)
-        and (vectorToPair(m_highestEnergyCuts).first < highestEnergy and highestEnergy < vectorToPair(m_highestEnergyCuts).second)) {
+    if ((m_clusterTimeCutMin < showerTime and showerTime < m_clusterTimeCutMax)
+        and (m_clusterEnergyCutMin < showerEnergy and showerEnergy < m_clusterEnergyCutMax)
+        and (m_highestEnergyCutMin < highestEnergy and highestEnergy < m_highestEnergyCutMax)) {
 
       const auto eclCluster = eclClusters.appendNew();
 

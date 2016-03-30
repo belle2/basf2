@@ -162,6 +162,7 @@ void FullSimModule::initialize()
   //- if (m_optics) physicsList->registerOpticalPhysicsList();
   //- runManager.SetUserInitialization(physicsList);
   G4PhysListFactory physListFactory;
+  physListFactory.SetVerbose(m_runEventVerbosity);
   G4VModularPhysicsList* physicsList = NULL;
   if (physListFactory.IsReferencePhysList(m_physicsList)) physicsList = physListFactory.GetReferencePhysList(m_physicsList);
   if (physicsList == NULL) B2FATAL("Could not load the physics list " << m_physicsList);

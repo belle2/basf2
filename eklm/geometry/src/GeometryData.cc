@@ -504,7 +504,6 @@ void EKLM::GeometryData::readEndcapStructureGeometry()
 void EKLM::GeometryData::initializeFromGearbox()
 {
   int i, j, mode;
-  m_NDetectorLayers = new int[m_MaximalEndcapNumber];
   GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
   mode = gd.getInt("Mode");
   if (mode < 0 || mode > 1)
@@ -524,10 +523,13 @@ void EKLM::GeometryData::initializeFromGearbox()
                    0.5 * m_EndcapPosition.Length;
   m_NLayers = EndCap.getInt("NLayers");
   checkLayer(m_NLayers);
+  m_NDetectorLayers = new int[m_NEndcaps];
   m_NDetectorLayers[0] = EndCap.getInt("NDetectorLayersBackward");
   checkDetectorLayerNumber(1, m_NDetectorLayers[0]);
-  m_NDetectorLayers[1] = EndCap.getInt("NDetectorLayersForward");
-  checkDetectorLayerNumber(2, m_NDetectorLayers[1]);
+  if (m_NEndcaps == 2) {
+    m_NDetectorLayers[1] = EndCap.getInt("NDetectorLayersForward");
+    checkDetectorLayerNumber(2, m_NDetectorLayers[1]);
+  }
   GearDir Layer(EndCap);
   Layer.append("/Layer");
   readSizeData(&m_LayerPosition, &Layer);

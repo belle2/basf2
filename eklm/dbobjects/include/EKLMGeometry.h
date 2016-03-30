@@ -76,6 +76,11 @@ namespace Belle2 {
        */
       EndcapStructureGeometry();
 
+      /**
+       * Copy constructor.
+       */
+      EndcapStructureGeometry(const EndcapStructureGeometry& geometry);
+
       double Phi;
       double Dphi;
       int Nsides;
@@ -422,6 +427,11 @@ namespace Belle2 {
        */
       ShieldDetailGeometry();
 
+      /**
+       * Copy constructor.
+       */
+      ShieldDetailGeometry(const ShieldDetailGeometry& geometry);
+
       /** X length. */
       double LengthX;
 
@@ -562,6 +572,11 @@ namespace Belle2 {
      * Constructor.
      */
     EKLMGeometry();
+
+    /**
+     * Copy constructor.
+     */
+    EKLMGeometry(const EKLMGeometry& geometry);
 
     /**
      * Destructor.
@@ -818,7 +833,7 @@ namespace Belle2 {
     struct StripGeometry m_StripGeometry;
 
     /** Position data for strips. */
-    struct ElementPosition* m_StripPosition;
+    struct ElementPosition* m_StripPosition; //[m_NStrips]
 
     /** Shield layer details geometry data. */
     struct ShieldGeometry m_ShieldGeometry;
@@ -830,7 +845,7 @@ namespace Belle2 {
     struct BoardPosition* m_BoardPosition[2];
 
     /** Positions of strip readout boards. */
-    struct StripBoardPosition* m_StripBoardPosition;
+    struct StripBoardPosition* m_StripBoardPosition; //[m_NStripBoards]
 
     /** Makes objects storable. */
     ClassDef(Belle2::EKLMGeometry, 1);

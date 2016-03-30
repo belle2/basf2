@@ -32,6 +32,24 @@ EKLMGeometry::EndcapStructureGeometry::EndcapStructureGeometry()
   Rmaxsub = 0;
 }
 
+EKLMGeometry::EndcapStructureGeometry::EndcapStructureGeometry(
+  const EndcapStructureGeometry& geometry) : TObject(geometry)
+{
+  Phi = geometry.Phi;
+  Dphi = geometry.Dphi;
+  Nsides = geometry.Nsides;
+  Nboundary = geometry.Nboundary;
+  Z = new double[Nboundary];
+  memcpy(Z, geometry.Z, Nboundary * sizeof(double));
+  Rmin = new double[Nboundary];
+  memcpy(Rmin, geometry.Rmin, Nboundary * sizeof(double));
+  Rmax = new double[Nboundary];
+  memcpy(Rmax, geometry.Rmax, Nboundary * sizeof(double));
+  Zsub = geometry.Zsub;
+  Rminsub = geometry.Rminsub;
+  Rmaxsub = geometry.Rmaxsub;
+}
+
 EKLMGeometry::ElementPosition::ElementPosition()
 {
   InnerR = 0;
@@ -114,6 +132,18 @@ EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry()
   Points = NULL;
 }
 
+EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry(
+  const ShieldDetailGeometry& geometry) : TObject(geometry)
+{
+  int i;
+  LengthX = geometry.LengthX;
+  LengthY = geometry.LengthY;
+  NPoints = geometry.NPoints;
+  Points = new Point[NPoints];
+  for (i = 0; i < NPoints; i++)
+    Points[i] = geometry.Points[i];
+}
+
 EKLMGeometry::ShieldGeometry::ShieldGeometry()
 {
   Thickness = 0;
@@ -160,6 +190,48 @@ EKLMGeometry::EKLMGeometry() : m_SegmentSupportPosition {NULL, NULL},
   m_LayerShiftZ = 0;
   m_StripPosition = NULL;
   m_StripBoardPosition = NULL;
+}
+
+EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
+  EKLMElementNumbers(geometry),
+  m_EndcapStructureGeometry(*geometry.getEndcapStructureGeometry()),
+  m_EndcapPosition(*geometry.getEndcapPosition()),
+  m_LayerPosition(*geometry.getLayerPosition()),
+  m_SectorPosition(*geometry.getSectorPosition()),
+  m_SectorSupportPosition(*geometry.getSectorSupportPosition()),
+  m_SectorSupportGeometry(*geometry.getSectorSupportGeometry()),
+  m_PlanePosition(*geometry.getPlanePosition()),
+  m_PlasticSheetGeometry(*geometry.getPlasticSheetGeometry()),
+  m_SegmentSupportGeometry(*geometry.getSegmentSupportGeometry()),
+  m_StripGeometry(*geometry.getStripGeometry()),
+  m_ShieldGeometry(*geometry.getShieldGeometry()),
+  m_BoardGeometry(*geometry.getBoardGeometry())
+{
+  int i;
+  m_Mode = geometry.getDetectorMode();
+  m_NEndcaps = geometry.getNEndcaps();
+  m_NLayers = geometry.getNLayers();
+  m_NDetectorLayers = new int[m_NEndcaps];
+  m_NDetectorLayers[0] = geometry.getNDetectorLayers(1);
+  if (m_NEndcaps == 2)
+    m_NDetectorLayers[1] = geometry.getNDetectorLayers(2);
+  m_NSectors = geometry.getNSectors();
+  m_NPlanes = geometry.getNPlanes();
+  m_NSegments = geometry.getNSegments();
+  m_NStripsSegment = geometry.getNStripsSegment();
+  m_NStrips = geometry.getNStrips();
+  m_NBoards = geometry.getNBoards();
+  m_NStripBoards = geometry.getNStripBoards();
+  m_SolenoidZ = geometry.getSolenoidZ();
+  m_LayerShiftZ = geometry.getLayerShiftZ();
+  /* FIXME: Add copying of m_SegmentSupportPosition. */
+  m_StripPosition = new struct ElementPosition[m_NStrips];
+  for (i = 0; i < m_NStrips; i++)
+    m_StripPosition[i] = *geometry.getStripPosition(i + 1);
+  /* FIXME: Add copying of m_BoardPosition. */
+  m_StripBoardPosition = new struct StripBoardPosition[m_NStripBoards];
+  for (i = 0; i < m_NStripBoards; i++)
+    m_StripBoardPosition[i] = *geometry.getStripBoardPosition(i + 1);
 }
 
 EKLMGeometry::~EKLMGeometry()

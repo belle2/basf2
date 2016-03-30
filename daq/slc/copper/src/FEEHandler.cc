@@ -5,6 +5,9 @@
 #include <daq/slc/copper/FEE.h>
 #include <daq/slc/copper/HSLB.h>
 
+#include <daq/slc/system/File.h>
+#include <daq/slc/system/LogFile.h>
+
 #include "mgt/hsreg.h"
 
 #include <unistd.h>
@@ -74,4 +77,17 @@ unsigned int FEEHandler::bitmask(unsigned int max, unsigned int min)
     bit |= 0x1 << i;
   }
   return bit;
+}
+
+bool FEEStreamHandler::handleSetText(const std::string& val)
+{
+  NSMVHandlerText::handleSetText(val);
+  const std::string stream = val;
+  if (File::exist(stream)) {
+    m_hslb.writestream(stream.c_str());
+  } else {
+    LogFile::warning("file %s not exsits", stream.c_str());
+    return false;
+  }
+  return true;
 }

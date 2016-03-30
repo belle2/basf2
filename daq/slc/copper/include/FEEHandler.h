@@ -51,6 +51,22 @@
     FEE_HANDLER_INT(FEE8Handler);
     FEE_HANDLER_INT(FEE32Handler);
 
+    class FEEStreamHandler : public NSMVHandlerText {
+    public:
+      FEEStreamHandler(const std::string& name, RCCallback& callback,
+                       HSLB& hslb, const std::string& streamfile)
+        : NSMVHandlerText(name, true, true, streamfile),
+          m_callback(callback), m_hslb(hslb) {}
+      virtual ~FEEStreamHandler() throw() {}
+    public:
+      virtual bool handleSetText(const std::string& val);
+
+    protected:
+      RCCallback& m_callback;
+      HSLB& m_hslb;
+
+    };
+
   };
 
 #endif

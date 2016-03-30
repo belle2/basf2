@@ -20,6 +20,12 @@
 #include <fstream>
 #include <cmath>
 
+#ifdef HAS_OPENMP
+#include <parallel_fann.hpp>
+#else
+#include <fann.h>
+#endif
+
 namespace Belle2 {
 
   class FANNTeacher;
@@ -124,14 +130,20 @@ namespace Belle2 {
     unsigned long int m_maxSamples; /**< Maximum number of samples. */
     unsigned long int m_nSamples; /**< Current number of samples. */
 
-    std::map<std::string, enum fann_activationfunc_enum>
-    m_neuronTypes; /**< Map containing all possible neuron types, i.e. activation functions supported by the FANN library.*/
-    std::map<std::string, enum  fann_train_enum>
-    m_trainingMethods; /**< Map containing all possible training algorithms supported by the FANN library.*/
-
+#ifdef HAS_OPENMP
     typedef float (*FnPtr)(struct fann* ann, struct fann_train_data* data, const unsigned int threadnumb);
     std::map<std::string, FnPtr>
     m_trainingMethodsOPENMP; /**< Map containing all possible training algorithms supported by the FANN library which need OPENMP to be run in parallel.*/
+#endif
+
+    std::map<std::string, enum  fann_train_enum>
+    m_trainingMethods; /**< Map containing all possible training algorithms supported by the FANN library.*/
+
+    std::map<std::string, enum fann_activationfunc_enum>
+    m_neuronTypes; /**< Map containing all possible neuron types, i.e. activation functions supported by the FANN library.*/
+
+
+
 
 
 

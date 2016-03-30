@@ -23,12 +23,6 @@
 #include <fstream>
 #include <cmath>
 
-#ifdef HAS_OPENMP
-#include <parallel_fann.hpp>
-#else
-#include <fann.h>
-#endif
-
 #include <TFile.h>
 #include <TTree.h>
 #include <TH1D.h>
@@ -90,15 +84,20 @@ namespace Belle2 {
     m_neuronTypes["FANN_COS_SYMMETRIC"] =  FANN_COS_SYMMETRIC;
     m_neuronTypes["FANN_SIN"] =  FANN_SIN;
     m_neuronTypes["FANN_COS"] =  FANN_COS;
+
+#ifdef HAS_OPENMP
+    m_trainingMethodsOPENMP["FANN_TRAIN_RPROP"] = parallel_fann::train_epoch_irpropm_parallel;
+    m_trainingMethodsOPENMP["FANN_TRAIN_BATCH"]      = parallel_fann::train_epoch_batch_parallel;
+    m_trainingMethodsOPENMP["FANN_TRAIN_QUICKPROP"] = parallel_fann::train_epoch_quickprop_parallel;
+    m_trainingMethodsOPENMP["FANN_TRAIN_SARPROP"]  = parallel_fann::train_epoch_sarprop_parallel;
+#endif
     m_trainingMethods["FANN_TRAIN_INCREMENTAL"] = FANN_TRAIN_INCREMENTAL;
     m_trainingMethods["FANN_TRAIN_BATCH"]      = FANN_TRAIN_BATCH;
     m_trainingMethods["FANN_TRAIN_RPROP"]      = FANN_TRAIN_RPROP;
     m_trainingMethods["FANN_TRAIN_QUICKPROP"]  = FANN_TRAIN_QUICKPROP;
     m_trainingMethods["FANN_TRAIN_SARPROP"]    = FANN_TRAIN_SARPROP;
-    m_trainingMethodsOPENMP["FANN_TRAIN_RPROP"] = parallel_fann::train_epoch_irpropm_parallel;
-    m_trainingMethodsOPENMP["FANN_TRAIN_BATCH"]      = parallel_fann::train_epoch_batch_parallel;
-    m_trainingMethodsOPENMP["FANN_TRAIN_QUICKPROP"] = parallel_fann::train_epoch_quickprop_parallel;
-    m_trainingMethodsOPENMP["FANN_TRAIN_SARPROP"]  = parallel_fann::train_epoch_sarprop_parallel;
+
+
 
   }
 

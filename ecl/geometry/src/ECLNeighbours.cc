@@ -50,7 +50,7 @@ ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par)
   // or wrong type:
   else {
     B2FATAL("ECLNeighbours::ECLNeighbours (constructor via std::string): Invalid option: " << neighbourDef <<
-            " (valid: N1, N2, N3, N4, N5 or R");
+            " (valid: N1, N2, N3, N4, N5 or R ( with R<30 cm)");
   }
 
 }
@@ -67,7 +67,7 @@ void ECLNeighbours::initializeR(double radius)
   fakeneighbours.push_back(0); // insert one fake to avoid the "0" entry
   m_neighbourMapTemp.push_back(fakeneighbours);
 
-  // distance calculations take a long time, so reduce the number of candidates first:
+  // distance calculations take a "long" time, so reduce the number of candidates first:
   initializeN(6);
 
   // ECL geometry
@@ -75,8 +75,8 @@ void ECLNeighbours::initializeR(double radius)
 
   for (int i = 0; i < 8736; i++) {
     // get the central one
-    const TVector3& direction = geom->GetCrystalVec(i);
-    const TVector3& position  = geom->GetCrystalPos(i);
+    TVector3 direction = geom->GetCrystalVec(i);
+    TVector3 position  = geom->GetCrystalPos(i);
 
     // get all nearby crystals
     std::vector<short int> neighbours = getNeighbours(i + 1);
@@ -85,11 +85,9 @@ void ECLNeighbours::initializeR(double radius)
     // ... and calculate the shortest distance between the central one and all possible neighbours (of the reduced set)
     for (auto const& id : neighbours) {
       const TVector3& directionNeighbour = geom->GetCrystalVec(id - 1);
-      const double alpha = direction.Angle(directionNeighbour);
-      const double R = position.Mag();
+      const double alpha    = direction.Angle(directionNeighbour);
+      const double R        = position.Mag();
       const double distance = getDistance(alpha, R);
-
-//      B2INFO(i << " " << id << " " << distance << " (radius = " << radius << ")");
 
       if (distance <= radius) neighboursTemp.push_back(id);
     }
@@ -139,7 +137,6 @@ void ECLNeighbours::initializeN(int n)
       for (unsigned int k = 0; k < phiList.size(); ++k) {
         neighbours.push_back(geom->GetCellID(theta , phiList.at(k)) + 1);
       }
-
     }
 
     // push back the final vector of IDs

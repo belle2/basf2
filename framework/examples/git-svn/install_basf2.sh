@@ -164,6 +164,33 @@ if [ ! -d basf2 ]; then
   ln -s svnexternals.sh post-rewrite
   ln -s svnexternals.sh post-checkout
   popd > /dev/null
+
+  # add initial gitignore
+  cat > .gitignore <<EOT
+# files we don't want to commit
+*.py[cod]
+*.orig
+*.rej
+*.bak
+*.patch
+*.root
+
+# usual Belle2 stuff
+/.gitignore
+/.externals
+/.release
+/.scon*
+/config.log
+/setup.sh
+/SConstruct
+/bin/
+/build/
+/data/
+/include/
+/lib/
+/modules/
+EOT
+
   popd > /dev/null
 
   echo "git svn clone finished."

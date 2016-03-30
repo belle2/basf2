@@ -10,6 +10,8 @@ import datetime
 
 # ## setup of the most important parts for the VXDTF ###
 fieldOn = True  # Turn field on or off (changes geometry components and digi/clust params)
+usePXD = True  # the pxd is used in track finding (in addition to the SVD)
+
 filterOverlaps = 'hopfield'
 seed = 1  # 1, 5, 6
 numEvents = 250
@@ -44,17 +46,21 @@ geometry = register_module('Geometry')
 # only the tracking detectors will be simulated. Makes the example much faster
 if fieldOn:
     # SVD and PXD sec map
-    # secSetup = ['TB2016Test8Feb2016MagnetOnPXDSVD-moreThan1500MeV_PXDSVD']
+    if usePXD:
+        secSetup = ['TB2016Test8Feb2016MagnetOnPXDSVD-moreThan1500MeV_PXDSVD']
     # only SVD:
-    secSetup = ['TB2016Test8Feb2016MagnetOnSVD-moreThan1500MeV_SVD']
+    else:
+        secSetup = ['TB2016Test8Feb2016MagnetOnSVD-moreThan1500MeV_SVD']
     qiType = 'circleFit'  # circleFit
 else:
     # To turn off magnetic field:
     geometry.param('excludedComponents', ['MagneticField'])
     # SVD and PXD sec map:
-    # secSetup = ['TB2016Test8Feb2016MagnetOffPXDSVD-moreThan1500MeV_PXDSVD']
+    if usePXD:
+        secSetup = ['TB2016Test8Feb2016MagnetOffPXDSVD-moreThan1500MeV_PXDSVD']
     # only SVD
-    secSetup = ['TB2016Test8Feb2016MagnetOffSVD-moreThan1500MeV_SVD']
+    else:
+        secSetup = ['TB2016Test8Feb2016MagnetOffSVD-moreThan1500MeV_SVD']
     qiType = 'straightLine'  # straightLine
 
 particlegun = register_module('ParticleGun')
@@ -252,7 +258,6 @@ main.add_module(mctrackfinder)
 main.add_module(analyzer)
 main.add_module(trackfitter)
 main.add_module(eventCounter)
-# the following two Modules are currentl broken
 main.add_module(vxdtf_dqm)
 main.add_module(trackfit_dqm)
 # Process events

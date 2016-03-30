@@ -83,12 +83,10 @@ namespace Belle2 {
 
       double m_backgroundEnergyCut;  /**< Energy cut for background level counting. */
       double m_backgroundTimingCut;  /**< Timing window for background level counting. */
-//      StoreObjPtr<ECLEventInformation> m_eventInformationPtr; /**< Output object for event wide information. */
 
       const int c_nCrystals = 8736;  /**< Number of ECL crystals. */
-      std::vector < float > m_calibrationEnergyAmplitudeHigh;  /**< vector with single crystal calibration amplitudes high energy */
-      std::vector < float > m_calibrationEnergyEnergyHigh;  /**< vector with single crystal calibration energy values high energy */
-      std::vector < float > m_calibrationTimeOffset;  /**< vector with time calibration constant offsets */
+      std::vector < double > m_calibrationEnergyHighRatio;  /**< vector with single crystal calibration ratios (high energy) */
+      std::vector < double > m_calibrationTimeOffset;  /**< vector with time calibration constant offsets */
 
       DBArray<ECLDigitEnergyConstants> m_calibrationEnergyHigh;  /**< single crystal calibration constants high energy */
       DBArray<ECLDigitTimeConstants> m_calibrationTime;  /**< single crystal calibration constants time */

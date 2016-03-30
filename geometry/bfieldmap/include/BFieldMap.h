@@ -83,17 +83,8 @@ namespace Belle2 {
     /** The destructor of the BFieldMap class. */
     virtual ~BFieldMap();
 
-    static BFieldMap* m_instance; /**< Pointer that saves the instance of this class. */
-
-    /** Destroyer class to delete the instance of the BFieldMap class when the program terminates. */
-    class SingletonDestroyer {
-    public: ~SingletonDestroyer()
-      {
-        if (BFieldMap::m_instance != NULL) delete BFieldMap::m_instance;
-      }
-    };
-    friend class SingletonDestroyer;
-
+    /** allow destruction of instance */
+    friend struct std::default_delete<BFieldMap>;
   };
 
 

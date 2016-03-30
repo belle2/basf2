@@ -230,8 +230,6 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 
   //double p0_HER = her.getDouble("energy") / Unit::eV; // 7.0e+9 [eV]
   //double p0_LER = ler.getDouble("energy") / Unit::eV; // 4.0e+9 [eV]
-  double p0_HER = 7.0e+9;
-  double p0_LER = 4.0e+9;
   double c = Const::speedOfLight / (Unit::m / Unit::s);  // 3.0e+8 [m/s]
 
   TVector3 pHER(point.X(), point.Y(), point.Z()); pHER.RotateY(-angle_HER); pHER.RotateX(M_PI);
@@ -276,6 +274,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
     Y = pHER.Y() / Unit::m; // in [m]
     s = pHER.Z() / Unit::m; // in [m]
 
+    double p0_HER = 7.0e+9;
     bool foundflag = false;
     //H.Nakayama: this loop could be modified to binary-search
     for (int i = 0; i < m_mapSizeHER; i++) {
@@ -393,6 +392,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 
     TVector3 B(0, 0, 0);
     if (foundflag) {
+      double p0_LER = 4.0e+9;
       TVector3 p_tmp(X - DX, Y - DY, s);
       p_tmp.RotateZ(-ROTATE / 180.*M_PI);
       X = p_tmp.X();

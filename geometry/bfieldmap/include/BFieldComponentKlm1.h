@@ -33,8 +33,11 @@ namespace Belle2 {
 
   public:
 
+    /** Trivial struct representing rz coordinate */
     struct BFieldPoint {
+      /** r coordinate of the point */
       double r;
+      /** z coordinate of the point */
       double z;
     };
 
@@ -69,12 +72,31 @@ namespace Belle2 {
      */
     void setMapFilename(const std::string& filename) { m_mapFilename = filename; };
 
+    /** Sets the number of barrel and endcap layers
+     * @param b barrel layers
+     * @param e endcap layers
+     */
     void setNLayers(int b, int e) {m_nBarrelLayers = b; m_nEndcapLayers = e;}
 
+    /** Sets the dimensions of the barrel region
+     * @param minR minimal radius
+     * @param maxZ max extension in z in both directions
+     * @param offset map offset in z
+     */
     void setBarrelRegion(double minR, double maxZ, double offset) { m_barrelRMin = minR; m_barrelZMax = maxZ; m_mapOffset = offset; }
 
+    /** Set the dimensions of the endcap region
+     * @param minR minimal radius
+     * @param minZ starting z coordinate in both directions
+     */
     void setEndcapRegion(double minR, double minZ) { m_endcapRMin = minR; m_endcapZMin = minZ;}
 
+    /** Set the layer parameters
+     * @bgapl0 barrel gap height for layer 0
+     * @bironth barrel iron thickness
+     * @egap endcap gap height
+     * @dl distance between two layers
+     */
     void setLayerParam(double bgapl0, double bironth, double egap, double dl)
     {
       m_barrelGapHeightLayer0 = bgapl0;  m_barrelIronThickness = bironth;
@@ -117,27 +139,68 @@ namespace Belle2 {
     /** Thickness of Barrel iron plate */
     double m_barrelIronThickness{0};
 
-    // parameters for field map, field map represent linear function
+    /** z position of breakpoints between the two linear approximations of Bz in the barrel.
+     * Index indicates the current layer */
     double m_barrelZBreakpoint[15] {0};
+    /** z position of breakpoints between the two linear approximations of Br in the barrel.
+     * Index indicates the current layer */
     double m_barrelRBreakpoint[15] {0};
-
+    /** Slope of Bz before the breakpoint in the barrel.
+     * Index indicates the current layer */
     double m_barrelFieldZSlope1[15] {0};
+    /** Intercept of Bz before the beackpoint in the barrel.
+     * Index indicates the current layer */
     double m_barrelFieldZIntercept1[15] {0};
+    /** Slope of Bz after the breakpoint in the barrel.
+     * Index indicates the current layer */
     double m_barrelFieldZSlope2[15] {0};
+    /** Intercept of Bz after the beackpoint in the barrel.
+     * Index indicates the current layer */
     double m_barrelFieldZIntercept2[15] {0};
+    /** Slope of Br before the breakpoint in the barrel.
+     * Index indicates the current layer */
     double m_barrelFieldRSlope1[15] {0};
+    /** Intercept of Br before the beackpoint in the barrel.
+     * Index indicates the current layer */
     double m_barrelFieldRIntercept1[15] {0};
+    /** Slope of Br after the breakpoint in the barrel.
+     * Index indicates the current layer */
     double m_barrelFieldRSlope2[15] {0};
+    /** Intercept of Br after the beackpoint in the barrel.
+     * Index indicates the current layer */
     double m_barrelFieldRIntercept2[15] {0};
 
+    /** z position of breakpoints between linear functions in the endcap.
+     * First index indicates whether or not where in a gap (0) or in iron (1),
+     * second index is the layer and third index is the number of breaks we
+     * have in the linear approximation and their positions */
     double m_endcapZBreakpoint[2][15][5] {{{0}}};
+    /** r position of breakpoints between linear functions in the endcap
+     * First index indicates whether or not where in a gap (0) or in iron (1),
+     * second index is the layer and third index is the number of breaks we
+     * have in the linear approximation and their positions */
     double m_endcapRBreakpoint[2][15][5] {{{0}}};
 
+    /** Slopes of the linear approximation of Bz in the endcap.
+     * First index indicates whether or not where in a gap (0) or in iron (1),
+     * second index is the layer and third index is the number of breaks we
+     * have in the linear approximation and their positions */
     double m_endcapFieldZSlope[2][15][5] {{{0}}};
+    /** Intercepts of the linear approximation of Bz in the endcap.
+     * First index indicates whether or not where in a gap (0) or in iron (1),
+     * second index is the layer and third index is the number of breaks we
+     * have in the linear approximation and their positions */
     double m_endcapFieldZIntercept[2][15][5] {{{0}}};
+    /** Slopes of the linear approximation of Br in the endcap.
+     * First index indicates whether or not where in a gap (0) or in iron (1),
+     * second index is the layer and third index is the number of breaks we
+     * have in the linear approximation and their positions */
     double m_endcapFieldRSlope[2][15][5] {{{0}}};
+    /** Intercepts of the linear approximation of Br in the endcap.
+     * First index indicates whether or not where in a gap (0) or in iron (1),
+     * second index is the layer and third index is the number of breaks we
+     * have in the linear approximation and their positions */
     double m_endcapFieldRIntercept[2][15][5] {{{0}}};
-    // > for KLM field
   };
 
 } //end of namespace Belle2

@@ -16,18 +16,11 @@
 using namespace std;
 using namespace Belle2;
 
-BFieldMap* BFieldMap::m_instance = NULL;
-
-
 BFieldMap& BFieldMap::Instance()
 {
-  static SingletonDestroyer siDestroyer;
-  if (!m_instance) {
-    m_instance = new BFieldMap();
-  }
-  return *m_instance;
+  static std::unique_ptr<BFieldMap> instance(new BFieldMap());
+  return *instance;
 }
-
 
 const TVector3 BFieldMap::getBField(const TVector3& point)
 {

@@ -102,12 +102,11 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
 
   // special treatment into the EKLM region
   // iron gap
-  double dLayer(m_gapHeight + m_ironPlateThickness);
-
   double dz_eklm = fabs(z - m_mapOffset) - (m_endyokeZMin - m_gapHeight);
 
-  int flag(0);
   if (r > m_slotRMin && dz_eklm > 0 && dz != 0. && dz != m_gridPitchZ) {
+    double dLayer(m_gapHeight + m_ironPlateThickness);
+    int flag(0);
     int layer = static_cast<int>(floor(dz_eklm / dLayer));
     if (layer <= 14) {
       double ddz = dz_eklm - dLayer * layer;

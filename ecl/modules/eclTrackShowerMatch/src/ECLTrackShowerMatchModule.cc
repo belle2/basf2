@@ -106,6 +106,9 @@ void ECLTrackShowerMatchModule::event()
     // compute the distance from shower COG and the closest extrapolated track
     double dist = computeTrkMinDistance(shower, tracks);
     shower.setMinTrkDistance(float(dist));
+    ECLCluster* cluster = shower.getRelatedFrom<ECLCluster>();
+    if (cluster != nullptr)
+      cluster->setMinTrkDistance(float(dist));
 
     // compute path lenghts on the energy weighted average crystals direction
     // and on the extrapolated track direction corresponding to the minimum
@@ -117,6 +120,8 @@ void ECLTrackShowerMatchModule::event()
       B2DEBUG(150, "shower depth: ltrk = " << lTrk << " lShower = " << lShower);
       shower.setTrkDepth(lTrk);
       shower.setShowerDepth(lShower);
+      if (cluster != nullptr)
+        cluster->setdeltaL(lTrk);
     }
   }
 }

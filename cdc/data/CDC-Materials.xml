@@ -26,20 +26,23 @@
      </Components>
   </Material>
 
-  <Material name="Aluminum">
-     <density unit="g/cm3">2.699</density>
-     <Components>
-        <Element fraction="1.0">Al</Element>
-     </Components>
-   </Material>
+  <Material name="CDCHeGas">
+    <density unit="g/cm3">0.000164637157859193</density>
+    <state>Gas</state>
+    <temperature unit="K">296.15</temperature>
+    <Components>
+      <Material fraction="1.0">He</Material>
+    </Components>
+  </Material>
 
-   <Material name="Tungsten">
-     <density unit="g/cm3">19.3</density>
-     <Components>
-        <Element fraction="1.0">W</Element>
-     </Components>
-   </Material>
-
+  <Material name="CDCEthaneGas">
+    <state>Gas</state>
+    <density unit="g/cm3">0.00124054467668411</density>
+    <temperature unit="K">296.15</temperature>
+    <Components>
+      <Material fraction="1.0">Ethane</Material>
+    </Components>
+  </Material>
 
    <Material name="CDCGlue">
       <state>Solid</state>

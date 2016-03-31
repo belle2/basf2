@@ -31,7 +31,6 @@
 #include <G4PVPlacement.hh>
 #include <G4Transform3D.hh>
 #include <G4VisAttributes.hh>
-#include <G4NistManager.hh>
 #include <G4RotationMatrix.hh>
 #include <G4UserLimits.hh>
 #include <iostream>
@@ -90,8 +89,8 @@ namespace Belle2 {
       //------------------------
       //      double globalRotAngle = (180.0 / M_PI) * content.getAngle("Rotation");
       double globalOffsetZ  = content.getLength("OffsetZ");
-      //      string Helium  = content.getString("Helium");
-      //      string Ethane  = content.getString("Ethane");
+      string Helium  = content.getString("Helium");
+      string Ethane  = content.getString("Ethane");
       string Aluminum  = content.getString("Aluminum");
       string Tungsten  = content.getString("Tungsten");
       string CFRP  = content.getString("CFRP");
@@ -178,31 +177,14 @@ namespace Belle2 {
       // Get Material
       //----------------
 
-      //N.B. In the following two lines, the He density is taken from cdc/data/CDC-Materials.xml; the Ethane density is from G4_ETHANE (not from geometry/data/BasicMaterials.xml (the material 'Ethane' in BasicMaterials.xml is actually not defined since its name is found in the G4 internal material table).
-      /*
-      G4Material* medHelium = G4Material::GetMaterial(Helium.c_str());
-      G4Material* medEthane = geometry::Materials::get(Ethane.c_str());
-      */
-      /*
-      std::cout << (geometry::Materials::get("G4_He"))->GetDensity()/(CLHEP::g/CLHEP::cm3) << std::endl;
-      std::cout << (geometry::Materials::get(Helium.c_str()))->GetDensity()/(CLHEP::g/CLHEP::cm3) << std::endl;
-      std::cout << (geometry::Materials::get(Ethane.c_str()))->GetDensity()/(CLHEP::g/CLHEP::cm3) << std::endl;
-      std::cout << (geometry::Materials::get(Aluminum.c_str()))->GetDensity()/(CLHEP::g/CLHEP::cm3) << std::endl;
-      std::cout << (geometry::Materials::get(Tungsten.c_str()))->GetDensity()/(CLHEP::g/CLHEP::cm3) << std::endl;
-      //      exit(-1);
-      */
-      //N.B. There is no need to deinfe Helium, Aluminum and Tungsten in CDC-Materials.xml. Instead, they should be taken from the G4 internal table, i.e. G4_He, G4_Al and G4_W. => Modify the following code and CDC-Materials.xml eventually.
-      G4NistManager* man = G4NistManager::Instance();
       const G4double realTemperture = (273.15 + 23.) * CLHEP::kelvin;
-      G4Material* medHelium = man->ConstructNewGasMaterial("CDCHeGas",
-                                                           "G4_He", realTemperture, 1. * CLHEP::atmosphere);
-      G4Material* medEthane = man->ConstructNewGasMaterial("CDCEthaneGas", "G4_ETHANE", realTemperture, 1. * CLHEP::atmosphere);
-
-      G4Material* medAluminum = G4Material::GetMaterial(Aluminum.c_str());
-      G4Material* medTungsten = G4Material::GetMaterial(Tungsten.c_str());
-      G4Material* medCFRP = geometry::Materials::get(CFRP.c_str());
-      G4Material* medNEMA_G10_Plate = geometry::Materials::get(NEMA_G10_Plate.c_str());
-      G4Material* medGlue = geometry::Materials::get(CDCGlue.c_str());
+      G4Material* medHelium = geometry::Materials::get(Helium);
+      G4Material* medEthane = geometry::Materials::get(Ethane);
+      G4Material* medAluminum = geometry::Materials::get(Aluminum);
+      G4Material* medTungsten = geometry::Materials::get(Tungsten);
+      G4Material* medCFRP = geometry::Materials::get(CFRP);
+      G4Material* medNEMA_G10_Plate = geometry::Materials::get(NEMA_G10_Plate);
+      G4Material* medGlue = geometry::Materials::get(CDCGlue);
       G4Material* medAir = geometry::Materials::get("Air");
 
       //
@@ -1165,9 +1147,8 @@ namespace Belle2 {
         // double AA = 10.811*g/mole
         // Atomic mass for B (natural abanduns)
 
-        G4NistManager* man = G4NistManager::Instance();
-        G4Material* C2H4 = man->FindOrBuildMaterial("G4_POLYETHYLENE");
-        G4Material* elB   = man->FindOrBuildMaterial("G4_B");
+        G4Material* C2H4 = geometry::Materials::get("G4_POLYETHYLENE");
+        G4Material* elB   = geometry::Materials::get("G4_B");
         // G4Material* B4C = man->FindOrBuildMaterial("G4_BORON_CARBIDE");
 
         // 5% borated polyethylene = SWX201

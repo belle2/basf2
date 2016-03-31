@@ -49,10 +49,10 @@
     <tw4ReconFileName desc="file which contains time-walk for reconstruction">tw_off.dat</tw4ReconFileName>
 
     <OffsetZ desc="The offset of the whole cdc in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>
-    <Helium>Helium</Helium>
-    <Ethane>Ethane</Ethane>
-    <Aluminum>Aluminum</Aluminum>
-    <Tungsten>Tungsten</Tungsten>
+    <Helium>CDCHeGas</Helium>
+    <Ethane>CDCEthaneGas</Ethane>
+    <Aluminum>Al</Aluminum>
+    <Tungsten>W</Tungsten>
     <CFRP>CFRP</CFRP>
     <NEMA_G10_Plate>NEMA_G10_Plate</NEMA_G10_Plate>
     <CDCGlue>CDCGlue</CDCGlue>

@@ -600,7 +600,6 @@ void EKLM::GeometryData::initializeFromGearbox()
   }
   m_NStripsSegment = Plane.getInt("NStripsSegment");
   readXMLDataStrips();
-  fillStripIndexArrays();
   GearDir shield(Sector);
   shield.append("/Shield");
   m_ShieldGeometry.Thickness = shield.getLength("Thickness") * CLHEP::cm;
@@ -616,7 +615,6 @@ void EKLM::GeometryData::initializeFromGearbox()
   GearDir shieldDetailD(shield);
   shieldDetailD.append("/Detail[@id=\"D\"]");
   readShieldDetailGeometry(&m_ShieldGeometry.DetailD, &shieldDetailD);
-  calculateShieldGeometry();
   m_NBoards = Sector.getInt("NBoards");
   checkSegment(m_NBoards);
   m_NBoardsSector = m_NBoards * m_NPlanes;
@@ -676,6 +674,8 @@ EKLM::GeometryData::GeometryData(enum DataSource dataSource)
       initializeFromDatabase();
       break;
   }
+  fillStripIndexArrays();
+  calculateShieldGeometry();
 }
 
 /**

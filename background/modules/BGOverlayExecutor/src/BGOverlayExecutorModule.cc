@@ -92,7 +92,7 @@ namespace Belle2 {
     addBGDigits<ARICHDigit>();
     //    addBGDigits<ECLDigit>(); // not yet clear which one
     //    addBGDigits<BKLMDigit>();
-    //    addBGDigits<EKLMDigit>();
+    addBGDigits<EKLMDigit>();
 
   }
 

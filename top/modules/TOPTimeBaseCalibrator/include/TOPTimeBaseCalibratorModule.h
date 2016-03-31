@@ -19,21 +19,21 @@
 namespace Belle2 {
 
   /**
-   * Sample time calibrator (under development)
+   * Time base calibrator (under development)
    */
-  class TOPSampleTimeCalibratorModule : public Module {
+  class TOPTimeBaseCalibratorModule : public Module {
 
   public:
 
     /**
      * Constructor
      */
-    TOPSampleTimeCalibratorModule();
+    TOPTimeBaseCalibratorModule();
 
     /**
      * Destructor
      */
-    virtual ~TOPSampleTimeCalibratorModule();
+    virtual ~TOPTimeBaseCalibratorModule();
 
     /**
      * Initialize the Module.
@@ -63,11 +63,6 @@ namespace Belle2 {
      * Clean-up, close files, summarize statistics, etc.
      */
     virtual void terminate();
-
-    /**
-     * Prints module parameters.
-     */
-    void printModuleParams() const;
 
   private:
 

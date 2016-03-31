@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <top/modules/TOPSampleTimeCalibrator/TOPSampleTimeCalibratorModule.h>
+#include <top/modules/TOPTimeBaseCalibrator/TOPTimeBaseCalibratorModule.h>
 
 #include <framework/core/ModuleManager.h>
 
@@ -43,13 +43,13 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPSampleTimeCalibrator)
+  REG_MODULE(TOPTimeBaseCalibrator)
 
   //-----------------------------------------------------------------
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPSampleTimeCalibratorModule::TOPSampleTimeCalibratorModule() : Module()
+  TOPTimeBaseCalibratorModule::TOPTimeBaseCalibratorModule() : Module()
 
   {
     // set module description (e.g. insert text)
@@ -74,11 +74,11 @@ namespace Belle2 {
 
   }
 
-  TOPSampleTimeCalibratorModule::~TOPSampleTimeCalibratorModule()
+  TOPTimeBaseCalibratorModule::~TOPTimeBaseCalibratorModule()
   {
   }
 
-  void TOPSampleTimeCalibratorModule::initialize()
+  void TOPTimeBaseCalibratorModule::initialize()
   {
 
     StoreArray<TOPDigit>::required();
@@ -92,11 +92,11 @@ namespace Belle2 {
 
   }
 
-  void TOPSampleTimeCalibratorModule::beginRun()
+  void TOPTimeBaseCalibratorModule::beginRun()
   {
   }
 
-  void TOPSampleTimeCalibratorModule::event()
+  void TOPTimeBaseCalibratorModule::event()
   {
 
     StoreArray<TOPDigit> digits;
@@ -140,11 +140,11 @@ namespace Belle2 {
   }
 
 
-  void TOPSampleTimeCalibratorModule::endRun()
+  void TOPTimeBaseCalibratorModule::endRun()
   {
   }
 
-  void TOPSampleTimeCalibratorModule::terminate()
+  void TOPTimeBaseCalibratorModule::terminate()
   {
 
     // write histograms to file
@@ -167,10 +167,6 @@ namespace Belle2 {
     // find sample times
 
 
-  }
-
-  void TOPSampleTimeCalibratorModule::printModuleParams() const
-  {
   }
 
 

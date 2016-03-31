@@ -58,7 +58,7 @@ void ECLPi0(TTree* pi0_tree)
   hPi0s->GetXaxis()->SetTitle("Pi0 Energy (GeV)");
   hPi0s->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed energy for 1 GeV Pi0s")); 
   hPi0s->GetListOfFunctions()->Add(new TNamed("Check","Should not be biased"));
-  hPi0s->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
+  hPi0s->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
   gPad->RedrawAxis();
   pi0_tree->Draw("eclPi0Energy>>hPi0s");
   hPi0s->Write();
@@ -70,7 +70,7 @@ void ECLPi0(TTree* pi0_tree)
     "Reconstructed mass for 1 GeV Pi0s")); 
   hPi0mass->GetListOfFunctions()->Add(new TNamed("Check", 
     "Should not be biased"));
-  hPi0mass->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
+  hPi0mass->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
   gPad->RedrawAxis();
   pi0_tree->Draw("eclPi0Mass>>hPi0mass");
   hPi0mass->Write();
@@ -88,7 +88,7 @@ void ECLPion(TTree* pion_tree){
   hPionE->GetXaxis()->SetTitle("Cluster energy (GeV)");
   hPionE->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster energy for single 1GeV charged pion")); 
   hPionE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be 0.2 GeV"));
-  hPionE->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
+  hPionE->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   hPionE->Write();
 
 
@@ -98,7 +98,7 @@ void ECLPion(TTree* pion_tree){
   hPionMultip->GetXaxis()->SetTitle("ECL cluster multiplicity");
   hPionMultip->GetListOfFunctions()->Add(new TNamed("Description","ECL cluster multiplicity for 1 GeV charged pion")); 
   hPionMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be low"));
-  hPionMultip->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
+  hPionMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   hPionMultip->Write();
   
   output->Close();
@@ -115,7 +115,7 @@ void ECLMuon(TTree* muon_tree)
   hMuonsE->GetXaxis()->SetTitle("Cluster Energy (GeV)");
   hMuonsE->GetListOfFunctions()->Add(new TNamed("Description","Energy release in the ECL for 1 GeV muons")); 
   hMuonsE->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 200 MeV"));
-  hMuonsE->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
+  hMuonsE->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   hMuonsE->Write();
 
   TH1F* hMuonsFake = new TH1F("hMuonsFake","Fake reconstructed gamma for 1000 muons should be less than 5%", 10,0,10);
@@ -125,7 +125,7 @@ void ECLMuon(TTree* muon_tree)
   hMuonsFake->GetXaxis()->SetTitle("Gamma Idx");
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Description", "Fake reconstructed gamma every 1000 muons")); 
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Check", "Should be low"));
-  hMuonsFake->GetListOfFunctions()->Add(new TNamed("Contact", "ecl2ml@bpost.kek.jp")); 
+  hMuonsFake->GetListOfFunctions()->Add(new TNamed("Contact", "elisa.manoni@pg.infn.it")); 
   hMuonsFake->Write();
 
   //delete output;
@@ -141,7 +141,7 @@ void ECLCluster(TTree* cluster_tree)
   hMultip->GetListOfFunctions()->Add(new TNamed("Description", "Multiplicity of reconstructed clusters for 500 MeV/c single photons"));
   hMultip->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
   hMultip->GetXaxis()->SetTitle("Cluster Multiplicity");
-  hMultip->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
+  hMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
 
   TH1F* hEnergy = new TH1F("hEnergy","Corrected Cluster Energy", 120, 0., 0.6);
@@ -149,7 +149,7 @@ void ECLCluster(TTree* cluster_tree)
   hEnergy->GetListOfFunctions()->Add(new TNamed("Description", "Corrected deposited energy for 500 MeV/c single photons"));
   hEnergy->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 0.5 GeV and left-side tail.")); 
   hEnergy->GetXaxis()->SetTitle("Cluster Energy (GeV)");
-  hEnergy->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
+  hEnergy->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
 
   TH1F* hEnDepSum = new TH1F("hEnDepSum","Reconstructed Cluster Energy", 120, 0., 0.6);
@@ -157,7 +157,7 @@ void ECLCluster(TTree* cluster_tree)
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Description", "Uncorrected deposited energy for 500 MeV/c single photons"));
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 0.5 GeV and left-side tail.")); 
   hEnDepSum->GetXaxis()->SetTitle("Cluster Energy (GeV)");
-  hEnDepSum->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
+  hEnDepSum->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
 
   TH1F* hHighestE = new TH1F("hHighestE","Highest Energy Deposit", 100, 0., 0.50);
@@ -165,7 +165,7 @@ void ECLCluster(TTree* cluster_tree)
   hHighestE->GetListOfFunctions()->Add(new TNamed("Description", "Highest energy deposited in a crystal for 500 MeV/c single photons"));
   hHighestE->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape."));
   hHighestE->GetXaxis()->SetTitle("Deposited Energy(GeV)");
-  hHighestE->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
+  hHighestE->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
 
   TH1F* hE9oE25 = new TH1F("hE9oE25","E9/E25", 120, 0., 1.2);
@@ -173,7 +173,7 @@ void ECLCluster(TTree* cluster_tree)
   hE9oE25->GetListOfFunctions()->Add(new TNamed("Description", "Energy deposited in 3x3 matrix around most energetic deposit over energy deposited in 5x5 matrix around most energetic deposit 500 MeV/c single photons"));
   hE9oE25->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape."));
   hE9oE25->GetXaxis()->SetTitle("E9oE25");
-  hE9oE25->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
+  hE9oE25->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
 
   TH1F* hphi = new TH1F("hphi", "Reconstructed #phi Angle", 128, -3.2, 3.2);
@@ -182,7 +182,7 @@ void ECLCluster(TTree* cluster_tree)
   hphi->GetListOfFunctions()->Add(new TNamed("Check","Consistent shape, flat distribution"));
   hphi->GetXaxis()->SetTitle("#phi (rad)");
   hphi->SetMinimum(.0);
-  hphi->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
+  hphi->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
 
   TFile* output = TFile::Open("ECLCluster.root", "recreate");
@@ -208,7 +208,7 @@ void ECLBkg(TTree* bkg_tree)
   bkgClusterE->GetXaxis()->SetTitle("Cluster Energy (GeV)");
   bkgClusterE->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster energy for bkg clusters")); 
   bkgClusterE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be peaked at 0"));
-  bkgClusterE->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
+  bkgClusterE->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
   bkgClusterE->Write();
 
@@ -217,7 +217,7 @@ void ECLBkg(TTree* bkg_tree)
   bkgClusterMultip->GetXaxis()->SetTitle("ECL cluster multiplicity Bkg");
   bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Description","ECL cluster multiplicity for bkg")); 
   bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be around 50 (Jun 2014)"));
-  bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
+  bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
   bkgClusterMultip->Write();
  
   output->Close();
@@ -258,7 +258,7 @@ void ECL2D(TTree* bkg_tree)
   BDyz->GetListOfFunctions()->Add(new TNamed("MetaOptions","colz")); 
   BDyz->GetListOfFunctions()->Add(new TNamed("Description","Cluster position in the ecl (upper part is phi<0, lower part phi>0)")); 
   BDyz->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
-  BDyz->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
+  BDyz->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
   BDyz->Write();
 
@@ -273,7 +273,7 @@ void ECL2D(TTree* bkg_tree)
   BDyz7->GetListOfFunctions()->Add(new TNamed("MetaOptions","colz")); 
   BDyz7->GetListOfFunctions()->Add(new TNamed("Description","Cluster position in the FWD ecl")); 
   BDyz7->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
-  BDyz7->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
+  BDyz7->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
   BDyz7->Write();
 
@@ -285,7 +285,7 @@ void ECL2D(TTree* bkg_tree)
   BDyz8->GetListOfFunctions()->Add(new TNamed("MetaOptions","colz")); 
   BDyz8->GetListOfFunctions()->Add(new TNamed("Description","Cluster position in the BWD ecl")); 
   BDyz8->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
-  BDyz8->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
+  BDyz8->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
   BDyz8->Write();
 
@@ -297,7 +297,7 @@ void ECL2D(TTree* bkg_tree)
   BDyz9->GetListOfFunctions()->Add(new TNamed("MetaOptions","colz")); 
   BDyz9->GetListOfFunctions()->Add(new TNamed("Description","Cluster position in barrel ecl")); 
   BDyz9->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
-  BDyz9->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
+  BDyz9->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
   BDyz9->Write();
   

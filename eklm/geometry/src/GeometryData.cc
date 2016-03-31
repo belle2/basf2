@@ -503,7 +503,7 @@ void EKLM::GeometryData::readEndcapStructureGeometry()
 
 void EKLM::GeometryData::initializeFromGearbox()
 {
-  int i, j, mode;
+  int i, j, k, mode;
   GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
   mode = gd.getInt("Mode");
   if (mode < 0 || mode > 1)
@@ -554,6 +554,7 @@ void EKLM::GeometryData::initializeFromGearbox()
   m_NSegments = Plane.getInt("NSegments");
   if (m_NSegments <= 0)
     B2FATAL("Number of segments must be positive.");
+  m_NSegmentSupportElementsSector = (m_NSegments + 1) * m_NPlanes;
   m_PlasticSheetGeometry.Width = Plane.getLength("PlasticSheetWidth") *
                                  CLHEP::cm;
   m_PlasticSheetGeometry.DeltaL = Plane.getLength("PlasticSheetDeltaL") *
@@ -568,30 +569,32 @@ void EKLM::GeometryData::initializeFromGearbox()
     Segments.getLength("MiddleWidth") * CLHEP::cm;
   m_SegmentSupportGeometry.MiddleThickness =
     Segments.getLength("MiddleThickness") * CLHEP::cm;
+  try {
+    m_SegmentSupportPosition =
+      new struct EKLMGeometry::SegmentSupportPosition[
+        m_NSegmentSupportElementsSector];
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(c_MemErr);
+  }
   for (j = 0; j < m_NPlanes; j++) {
-    try {
-      m_SegmentSupportPosition[j] =
-        new struct EKLMGeometry::SegmentSupportPosition[m_NSegments + 1];
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(c_MemErr);
-    }
     for (i = 0; i <= m_NSegments; i++) {
+      k = j * (m_NSegments + 1) + i;
       GearDir SegmentSupportContent(Segments);
       SegmentSupportContent.append(
         (boost::format("/SegmentSupportData[%1%]") % (j + 1)).str());
       SegmentSupportContent.append(
         (boost::format("/SegmentSupport[%1%]") % (i + 1)).str());
-      m_SegmentSupportPosition[j][i].Length =
+      m_SegmentSupportPosition[k].Length =
         SegmentSupportContent.getLength("Length") * CLHEP::cm;
-      m_SegmentSupportPosition[j][i].X =
+      m_SegmentSupportPosition[k].X =
         SegmentSupportContent.getLength("PositionX") * CLHEP::cm;
-      m_SegmentSupportPosition[j][i].Y =
+      m_SegmentSupportPosition[k].Y =
         SegmentSupportContent.getLength("PositionY") * CLHEP::cm;
-      m_SegmentSupportPosition[j][i].Z =
+      m_SegmentSupportPosition[k].Z =
         SegmentSupportContent.getLength("PositionZ") * CLHEP::cm;
-      m_SegmentSupportPosition[j][i].DeltaLRight =
+      m_SegmentSupportPosition[k].DeltaLRight =
         SegmentSupportContent.getLength("DeltaLRight") * CLHEP::cm;
-      m_SegmentSupportPosition[j][i].DeltaLLeft =
+      m_SegmentSupportPosition[k].DeltaLLeft =
         SegmentSupportContent.getLength("DeltaLLeft") * CLHEP::cm;
     }
   }
@@ -617,6 +620,7 @@ void EKLM::GeometryData::initializeFromGearbox()
   if (m_Mode == c_DetectorBackground) {
     m_NBoards = Sector.getInt("NBoards");
     checkSegment(m_NBoards);
+    m_NBoardsSector = m_NBoards * m_NPlanes;
     GearDir Boards(Sector);
     Boards.append("/Boards");
     m_BoardGeometry.Length = Boards.getLength("Length") * CLHEP::cm;
@@ -628,18 +632,19 @@ void EKLM::GeometryData::initializeFromGearbox()
     m_BoardGeometry.StripWidth = Boards.getLength("StripWidth") * CLHEP::cm;
     m_BoardGeometry.StripHeight = Boards.getLength("StripHeight") * CLHEP::cm;
     m_NStripBoards = Boards.getInt("NStripBoards");
+    try {
+      m_BoardPosition = new struct BoardPosition[m_NBoardsSector];
+    } catch (std::bad_alloc& ba) {
+      B2FATAL(c_MemErr);
+    }
     for (j = 0; j < m_NPlanes; j++) {
-      try {
-        m_BoardPosition[j] = new struct BoardPosition[m_NBoards];
-      } catch (std::bad_alloc& ba) {
-        B2FATAL(c_MemErr);
-      }
       for (i = 0; i < m_NBoards; i++) {
+        k = j * m_NBoards + i;
         GearDir BoardContent(Boards);
         BoardContent.append((boost::format("/BoardData[%1%]") % (j + 1)).str());
         BoardContent.append((boost::format("/Board[%1%]") % (i + 1)).str());
-        m_BoardPosition[j][i].Phi = BoardContent.getLength("Phi") * CLHEP::rad;
-        m_BoardPosition[j][i].R = BoardContent.getLength("Radius") * CLHEP::cm;
+        m_BoardPosition[k].Phi = BoardContent.getLength("Phi") * CLHEP::rad;
+        m_BoardPosition[k].R = BoardContent.getLength("Radius") * CLHEP::cm;
       }
     }
     try {
@@ -685,16 +690,13 @@ static void freeShieldDetail(struct EKLMGeometry::ShieldDetailGeometry* sdg)
 
 EKLM::GeometryData::~GeometryData()
 {
-  int i;
   delete[] m_NDetectorLayers;
   free(m_EndcapStructureGeometry.Z);
   free(m_EndcapStructureGeometry.Rmin);
   free(m_EndcapStructureGeometry.Rmax);
-  for (i = 0; i < m_NPlanes; i++)
-    delete[] m_SegmentSupportPosition[i];
+  delete[] m_SegmentSupportPosition;
   if (m_Mode == c_DetectorBackground) {
-    for (i = 0; i < m_NPlanes; i++)
-      delete[] m_BoardPosition[i];
+    delete[] m_BoardPosition;
     delete[] m_StripBoardPosition;
   }
   free(m_StripLenToAll);

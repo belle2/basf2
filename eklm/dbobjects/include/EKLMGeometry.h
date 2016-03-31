@@ -620,6 +620,11 @@ namespace Belle2 {
     int getNSegments() const;
 
     /**
+     * Get number of segment support elements *in one sector).
+     */
+    int getNSegmentSupportElementsSector() const;
+
+    /**
      * Get number of strips in a segment.
      */
     int getNStripsSegment() const;
@@ -633,6 +638,11 @@ namespace Belle2 {
      * Get number of readout boards.
      */
     int getNBoards() const;
+
+    /**
+     * Get number of redout boards in one sector.
+     */
+    int getNBoardsSector() const;
 
     /**
      * Get number of strip readout boards.
@@ -781,14 +791,20 @@ namespace Belle2 {
     /** Number of segments in one plane. */
     int m_NSegments;
 
+    /** Number of segment support elements in one sector. */
+    int m_NSegmentSupportElementsSector;
+
     /** Number of strips in one segment. */
     int m_NStripsSegment;
 
     /** Number of strips in one plane. */
     int m_NStrips;
 
-    /** Number of readout boards in one sector. */
+    /** Number of readout boards corresponding to one plane. */
     int m_NBoards;
+
+    /** Number of readout boards in one sector. */
+    int m_NBoardsSector;
 
     /** Number of strip readout boards on one segment readout board. */
     int m_NStripBoards;
@@ -827,7 +843,7 @@ namespace Belle2 {
     struct SegmentSupportGeometry m_SegmentSupportGeometry;
 
     /** Position data for segment support structure. */
-    struct SegmentSupportPosition* m_SegmentSupportPosition[2];
+    struct SegmentSupportPosition* m_SegmentSupportPosition; //[m_NSegmentSupportElementsSector]
 
     /** Strip geometry data. */
     struct StripGeometry m_StripGeometry;
@@ -842,7 +858,7 @@ namespace Belle2 {
     struct BoardGeometry m_BoardGeometry;
 
     /** Positions of readout boards. */
-    struct BoardPosition* m_BoardPosition[2];
+    struct BoardPosition* m_BoardPosition; //[m_NBoardsSector]
 
     /** Positions of strip readout boards. */
     struct StripBoardPosition* m_StripBoardPosition; //[m_NStripBoards]

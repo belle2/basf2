@@ -172,8 +172,7 @@ EKLMGeometry::StripBoardPosition::StripBoardPosition()
   X = 0;
 }
 
-EKLMGeometry::EKLMGeometry() : m_SegmentSupportPosition {NULL, NULL},
-  m_BoardPosition {NULL, NULL}
+EKLMGeometry::EKLMGeometry()
 {
   m_Mode = c_DetectorNormal,
   m_NEndcaps = 0;
@@ -188,7 +187,9 @@ EKLMGeometry::EKLMGeometry() : m_SegmentSupportPosition {NULL, NULL},
   m_NStripBoards = 0;
   m_SolenoidZ = 0;
   m_LayerShiftZ = 0;
+  m_SegmentSupportPosition = NULL;
   m_StripPosition = NULL;
+  m_BoardPosition = NULL;
   m_StripBoardPosition = NULL;
 }
 
@@ -207,7 +208,7 @@ EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
   m_ShieldGeometry(*geometry.getShieldGeometry()),
   m_BoardGeometry(*geometry.getBoardGeometry())
 {
-  int i;
+  int i, j;
   m_Mode = geometry.getDetectorMode();
   m_NEndcaps = geometry.getNEndcaps();
   m_NLayers = geometry.getNLayers();
@@ -218,17 +219,32 @@ EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
   m_NSectors = geometry.getNSectors();
   m_NPlanes = geometry.getNPlanes();
   m_NSegments = geometry.getNSegments();
+  m_NSegmentSupportElementsSector = geometry.getNSegmentSupportElementsSector();
   m_NStripsSegment = geometry.getNStripsSegment();
   m_NStrips = geometry.getNStrips();
   m_NBoards = geometry.getNBoards();
+  m_NBoardsSector = geometry.getNBoardsSector();
   m_NStripBoards = geometry.getNStripBoards();
   m_SolenoidZ = geometry.getSolenoidZ();
   m_LayerShiftZ = geometry.getLayerShiftZ();
-  /* FIXME: Add copying of m_SegmentSupportPosition. */
+  m_SegmentSupportPosition =
+    new struct SegmentSupportPosition[m_NSegmentSupportElementsSector];
+  for (i = 0; i < m_NPlanes; i++) {
+    for (j = 0; j <= m_NSegments; j++) {
+      m_SegmentSupportPosition[i * (m_NSegments + 1) + j] =
+        *geometry.getSegmentSupportPosition(i + 1, j + 1);
+    }
+  }
   m_StripPosition = new struct ElementPosition[m_NStrips];
   for (i = 0; i < m_NStrips; i++)
     m_StripPosition[i] = *geometry.getStripPosition(i + 1);
-  /* FIXME: Add copying of m_BoardPosition. */
+  m_BoardPosition = new struct BoardPosition[m_NBoardsSector];
+  for (i = 0; i < m_NPlanes; i++) {
+    for (j = 0; j < m_NBoards; j++) {
+      m_BoardPosition[i * m_NBoards + i] =
+        *geometry.getBoardPosition(i + 1, j + 1);
+    }
+  }
   m_StripBoardPosition = new struct StripBoardPosition[m_NStripBoards];
   for (i = 0; i < m_NStripBoards; i++)
     m_StripBoardPosition[i] = *geometry.getStripBoardPosition(i + 1);
@@ -278,6 +294,11 @@ int EKLMGeometry::getNSegments() const
   return m_NSegments;
 }
 
+int EKLMGeometry::getNSegmentSupportElementsSector() const
+{
+  return m_NSegmentSupportElementsSector;
+}
+
 int EKLMGeometry::getNStripsSegment() const
 {
   return m_NStripsSegment;
@@ -293,6 +314,13 @@ int EKLMGeometry::getNBoards() const
   if (m_Mode != c_DetectorBackground)
     B2FATAL(c_ModeErr);
   return m_NBoards;
+}
+
+int EKLMGeometry::getNBoardsSector() const
+{
+  if (m_Mode != c_DetectorBackground)
+    B2FATAL(c_ModeErr);
+  return m_NBoardsSector;
 }
 
 int EKLMGeometry::getNStripBoards() const
@@ -397,7 +425,8 @@ EKLMGeometry::getSegmentSupportPosition(int plane, int support) const
 {
   checkPlane(plane);
   checkSegmentSupport(support);
-  return &m_SegmentSupportPosition[plane - 1][support - 1];
+  return &m_SegmentSupportPosition[(plane - 1) * (m_NSegments + 1) +
+                                   support - 1];
 }
 
 const EKLMGeometry::StripGeometry* EKLMGeometry::getStripGeometry() const
@@ -431,7 +460,7 @@ EKLMGeometry::getBoardPosition(int plane, int segment) const
     B2FATAL(c_ModeErr);
   checkPlane(plane);
   checkSegment(segment);
-  return &m_BoardPosition[plane - 1][segment - 1];
+  return &m_BoardPosition[(plane - 1) * m_NBoards + segment - 1];
 }
 
 const EKLMGeometry::StripBoardPosition*

@@ -28,24 +28,24 @@
     </Boardstack>
   </TOPModule>
 
-  <TOPModule moduleID="2"> <!-- dummy SCRODid's-->
+  <TOPModule moduleID="2">
     <Boardstack col="0">
-      <SCRODid>201</SCRODid>
+      <SCRODid>32</SCRODid>
       <COPPERid>1002</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
-      <SCRODid>202</SCRODid>
+      <SCRODid>29</SCRODid>
       <COPPERid>1002</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
-      <SCRODid>203</SCRODid>
+      <SCRODid>96</SCRODid>
       <COPPERid>1002</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
-      <SCRODid>204</SCRODid>
+      <SCRODid>31</SCRODid>
       <COPPERid>1002</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
@@ -258,24 +258,24 @@
     </Boardstack>
   </TOPModule>
 
-  <TOPModule moduleID="12"> <!-- dummy SCRODid's-->
+  <TOPModule moduleID="12">
     <Boardstack col="0">
-      <SCRODid>1201</SCRODid>
+      <SCRODid>75</SCRODid>
       <COPPERid>1012</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
-      <SCRODid>1202</SCRODid>
+      <SCRODid>76</SCRODid>
       <COPPERid>1012</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
-      <SCRODid>1203</SCRODid>
+      <SCRODid>77</SCRODid>
       <COPPERid>1012</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
-      <SCRODid>1204</SCRODid>
+      <SCRODid>81</SCRODid>
       <COPPERid>1012</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
@@ -316,7 +316,7 @@
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
-      <SCRODid>57</SCRODid>
+      <SCRODid>21</SCRODid> <!-- up to run ?: 57 -->
       <COPPERid>1014</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
@@ -327,24 +327,24 @@
     </Boardstack>
   </TOPModule>
 
-  <TOPModule moduleID="15"> <!-- dummy SCRODid's-->
+  <TOPModule moduleID="15">
     <Boardstack col="0">
-      <SCRODid>1501</SCRODid>
+      <SCRODid>85</SCRODid>
       <COPPERid>1015</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
-      <SCRODid>1502</SCRODid>
+      <SCRODid>90</SCRODid>
       <COPPERid>1015</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
-      <SCRODid>1503</SCRODid>
+      <SCRODid>91</SCRODid>
       <COPPERid>1015</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
-      <SCRODid>1504</SCRODid>
+      <SCRODid>92</SCRODid>
       <COPPERid>1015</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>

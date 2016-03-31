@@ -14,10 +14,6 @@
 
 using namespace Belle2;
 
-static const char c_ModeErr[] =
-  "It is forbidden to read the requested data if mode is not "
-  "c_DetectorBackground.";
-
 EKLMGeometry::EndcapStructureGeometry::EndcapStructureGeometry()
 {
   Phi = 0;
@@ -311,22 +307,16 @@ int EKLMGeometry::getNStrips() const
 
 int EKLMGeometry::getNBoards() const
 {
-  if (m_Mode != c_DetectorBackground)
-    B2FATAL(c_ModeErr);
   return m_NBoards;
 }
 
 int EKLMGeometry::getNBoardsSector() const
 {
-  if (m_Mode != c_DetectorBackground)
-    B2FATAL(c_ModeErr);
   return m_NBoardsSector;
 }
 
 int EKLMGeometry::getNStripBoards() const
 {
-  if (m_Mode != c_DetectorBackground)
-    B2FATAL(c_ModeErr);
   return m_NStripBoards;
 }
 
@@ -356,6 +346,13 @@ void EKLMGeometry::checkSegmentSupport(int support) const
   if (support <= 0 || support > m_MaximalSegmentNumber + 1)
     B2FATAL("Number of segment support element must be from 1 to " <<
             m_MaximalSegmentNumber + 1 << ".");
+}
+
+void EKLMGeometry::checkStripSegment(int strip) const
+{
+  if (strip <= 0 || strip > m_NStripsSegment)
+    B2FATAL("Number of strip in a segment must be from 1 to " <<
+            m_NStripsSegment << ".");
 }
 
 /* Positions, coordinates, sizes. */
@@ -448,16 +445,12 @@ const EKLMGeometry::ShieldGeometry* EKLMGeometry::getShieldGeometry() const
 
 const EKLMGeometry::BoardGeometry* EKLMGeometry::getBoardGeometry() const
 {
-  if (m_Mode != c_DetectorBackground)
-    B2FATAL(c_ModeErr);
   return &m_BoardGeometry;
 }
 
 const EKLMGeometry::BoardPosition*
 EKLMGeometry::getBoardPosition(int plane, int segment) const
 {
-  if (m_Mode != c_DetectorBackground)
-    B2FATAL(c_ModeErr);
   checkPlane(plane);
   checkSegment(segment);
   return &m_BoardPosition[(plane - 1) * m_NBoards + segment - 1];
@@ -466,9 +459,7 @@ EKLMGeometry::getBoardPosition(int plane, int segment) const
 const EKLMGeometry::StripBoardPosition*
 EKLMGeometry::getStripBoardPosition(int board) const
 {
-  if (m_Mode != c_DetectorBackground)
-    B2FATAL(c_ModeErr);
-  checkSegment(board);
+  checkStripSegment(board);
   return &m_StripBoardPosition[board - 1];
 }
 

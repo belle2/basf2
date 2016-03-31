@@ -586,7 +586,7 @@ namespace Belle2 {
     /**
      * Get EKLM detector mode.
      */
-    DetectorMode getDetectorMode() const;
+    enum DetectorMode getDetectorMode() const;
 
     /**
      * Get number of endcaps.
@@ -670,6 +670,12 @@ namespace Belle2 {
      * @param[in] support Segment support element number.
      */
     void checkSegmentSupport(int support) const;
+
+    /**
+     * Check if number of strip in a segment is correct (fatal error if not).
+     * @param[in] strip Strip number.
+     */
+    void checkStripSegment(int strip) const;
 
     /**
      * Get solenoid center Z coordinate.

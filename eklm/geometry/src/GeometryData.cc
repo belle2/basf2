@@ -617,49 +617,48 @@ void EKLM::GeometryData::initializeFromGearbox()
   shieldDetailD.append("/Detail[@id=\"D\"]");
   readShieldDetailGeometry(&m_ShieldGeometry.DetailD, &shieldDetailD);
   calculateShieldGeometry();
-  if (m_Mode == c_DetectorBackground) {
-    m_NBoards = Sector.getInt("NBoards");
-    checkSegment(m_NBoards);
-    m_NBoardsSector = m_NBoards * m_NPlanes;
-    GearDir Boards(Sector);
-    Boards.append("/Boards");
-    m_BoardGeometry.Length = Boards.getLength("Length") * CLHEP::cm;
-    m_BoardGeometry.Width = Boards.getLength("Width") * CLHEP::cm;
-    m_BoardGeometry.Height = Boards.getLength("Height") * CLHEP::cm;
-    m_BoardGeometry.BaseWidth = Boards.getLength("BaseWidth") * CLHEP::cm;
-    m_BoardGeometry.BaseHeight = Boards.getLength("BaseHeight") * CLHEP::cm;
-    m_BoardGeometry.StripLength = Boards.getLength("StripLength") * CLHEP::cm;
-    m_BoardGeometry.StripWidth = Boards.getLength("StripWidth") * CLHEP::cm;
-    m_BoardGeometry.StripHeight = Boards.getLength("StripHeight") * CLHEP::cm;
-    m_NStripBoards = Boards.getInt("NStripBoards");
-    try {
-      m_BoardPosition = new struct BoardPosition[m_NBoardsSector];
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(c_MemErr);
-    }
-    for (j = 0; j < m_NPlanes; j++) {
-      for (i = 0; i < m_NBoards; i++) {
-        k = j * m_NBoards + i;
-        GearDir BoardContent(Boards);
-        BoardContent.append((boost::format("/BoardData[%1%]") % (j + 1)).str());
-        BoardContent.append((boost::format("/Board[%1%]") % (i + 1)).str());
-        m_BoardPosition[k].Phi = BoardContent.getLength("Phi") * CLHEP::rad;
-        m_BoardPosition[k].R = BoardContent.getLength("Radius") * CLHEP::cm;
-      }
-    }
-    try {
-      m_StripBoardPosition = new struct StripBoardPosition[m_NStripBoards];
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(c_MemErr);
-    }
-    for (i = 0; i < m_NStripBoards; i++) {
-      GearDir StripBoardContent(Boards);
-      StripBoardContent.append((boost::format("/StripBoardData/Board[%1%]") %
-                                (i + 1)).str());
-      m_StripBoardPosition[i].X = StripBoardContent.getLength("PositionX") *
-                                  CLHEP::cm;
+  m_NBoards = Sector.getInt("NBoards");
+  checkSegment(m_NBoards);
+  m_NBoardsSector = m_NBoards * m_NPlanes;
+  GearDir Boards(Sector);
+  Boards.append("/Boards");
+  m_BoardGeometry.Length = Boards.getLength("Length") * CLHEP::cm;
+  m_BoardGeometry.Width = Boards.getLength("Width") * CLHEP::cm;
+  m_BoardGeometry.Height = Boards.getLength("Height") * CLHEP::cm;
+  m_BoardGeometry.BaseWidth = Boards.getLength("BaseWidth") * CLHEP::cm;
+  m_BoardGeometry.BaseHeight = Boards.getLength("BaseHeight") * CLHEP::cm;
+  m_BoardGeometry.StripLength = Boards.getLength("StripLength") * CLHEP::cm;
+  m_BoardGeometry.StripWidth = Boards.getLength("StripWidth") * CLHEP::cm;
+  m_BoardGeometry.StripHeight = Boards.getLength("StripHeight") * CLHEP::cm;
+  m_NStripBoards = Boards.getInt("NStripBoards");
+  try {
+    m_BoardPosition = new struct BoardPosition[m_NBoardsSector];
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(c_MemErr);
+  }
+  for (j = 0; j < m_NPlanes; j++) {
+    for (i = 0; i < m_NBoards; i++) {
+      k = j * m_NBoards + i;
+      GearDir BoardContent(Boards);
+      BoardContent.append((boost::format("/BoardData[%1%]") % (j + 1)).str());
+      BoardContent.append((boost::format("/Board[%1%]") % (i + 1)).str());
+      m_BoardPosition[k].Phi = BoardContent.getLength("Phi") * CLHEP::rad;
+      m_BoardPosition[k].R = BoardContent.getLength("Radius") * CLHEP::cm;
     }
   }
+  try {
+    m_StripBoardPosition = new struct StripBoardPosition[m_NStripBoards];
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(c_MemErr);
+  }
+  for (i = 0; i < m_NStripBoards; i++) {
+    GearDir StripBoardContent(Boards);
+    StripBoardContent.append((boost::format("/StripBoardData/Board[%1%]") %
+                              (i + 1)).str());
+    m_StripBoardPosition[i].X = StripBoardContent.getLength("PositionX") *
+                                CLHEP::cm;
+  }
+  m_Geometry = new EKLMGeometry(*this);
 }
 
 void EKLM::GeometryData::initializeFromDatabase()
@@ -668,6 +667,7 @@ void EKLM::GeometryData::initializeFromDatabase()
 
 EKLM::GeometryData::GeometryData(enum DataSource dataSource)
 {
+  m_Geometry = NULL;
   switch (dataSource) {
     case c_Gearbox:
       initializeFromGearbox();
@@ -690,15 +690,15 @@ static void freeShieldDetail(struct EKLMGeometry::ShieldDetailGeometry* sdg)
 
 EKLM::GeometryData::~GeometryData()
 {
+  if (m_Geometry != NULL)
+    delete m_Geometry;
   delete[] m_NDetectorLayers;
   free(m_EndcapStructureGeometry.Z);
   free(m_EndcapStructureGeometry.Rmin);
   free(m_EndcapStructureGeometry.Rmax);
   delete[] m_SegmentSupportPosition;
-  if (m_Mode == c_DetectorBackground) {
-    delete[] m_BoardPosition;
-    delete[] m_StripBoardPosition;
-  }
+  delete[] m_BoardPosition;
+  delete[] m_StripBoardPosition;
   free(m_StripLenToAll);
   free(m_StripAllToLen);
   freeShieldDetail(&m_ShieldGeometry.DetailA);
@@ -709,7 +709,7 @@ EKLM::GeometryData::~GeometryData()
 
 void EKLM::GeometryData::saveToDatabase(const IntervalOfValidity& iov) const
 {
-  Database::Instance().storeData("EKLMGeometry", (TObject*)this, iov);
+  Database::Instance().storeData("EKLMGeometry", (TObject*)m_Geometry, iov);
 }
 
 double EKLM::GeometryData::getStripLength(int strip) const

@@ -195,6 +195,9 @@ namespace Belle2 {
        */
       void readEndcapStructureGeometry();
 
+      /** Copy of data in this class used to write it to database. */
+      EKLMGeometry* m_Geometry;
+
       /** Number of strips with different lengths in one plane. */
       int m_nStripDifferent;
 

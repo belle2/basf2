@@ -155,10 +155,10 @@ namespace Belle2 {
     /*! Return LAT (shower variable) */
     double getLAT() const {return m_LAT;}
 
-    /*! Get distance between cluster COG and track extrapolation to ECL */
+    /*! Get distance between cluster COG and track extrapolation to ECL. Note that this variable may be removed in later versions. */
     double getTemporaryMinTrkDistance() { return m_minTrkDistance; }
 
-    /*! Return deltaL for shower shape */
+    /*! Return deltaL for shower shape. Note that this variable may be removed in later versions. */
     double getTemporaryDeltaL() const { return m_deltaL; }
 
     /*! Return Number of a Crystals in a shower */
@@ -314,8 +314,8 @@ namespace Belle2 {
           20 : Broken
           30 : Dead  */
     float m_MergedPi0; /**< Likelihood of being Merged Pi0 (Not available now) */
-    float  m_minTrkDistance; /**<  Distance between cluster COG and track extrapolation to ECL */
-    float  m_deltaL; /**<  Delta L as defined in arXiv:0711.1593 */
+    float  m_minTrkDistance; /**<  Distance between cluster COG and track extrapolation to ECL. Note that this variable may be removed in later versions. */
+    float  m_deltaL; /**<  Delta L as defined in arXiv:0711.1593. Note that this variable may be removed in later versions. */
 
     /**< Class definition */
     ClassDef(ECLCluster, 3); /**< Needed to make objects storable */

@@ -137,19 +137,20 @@ void MCMatcherECLClustersModule::event()
     const int mcParticleIndex = mcParticleToECLHitRelationArray[index].getFromIndex();
     const map<int, int>::iterator iter = eclPrimaryMap.find(mcParticleIndex);
 
-    if (iter != eclPrimaryMap.end()) {
-      PrimaryIndex = iter->first; //it's the daughter
-    } else continue;
+    //if (iter != eclPrimaryMap.end()) {
+    //  PrimaryIndex = iter->first; //it's the daughter
+    //} else continue;
+
+    PrimaryIndex = mcParticleIndex;
 
     for (int hit = 0; hit < (int)mcParticleToECLHitRelationArray[index].getToIndices().size(); hit++) {
       const int eclHitIndex = mcParticleToECLHitRelationArray[index].getToIndex(hit);
       const ECLHit* aECLHit = eclHits[eclHitIndex];
       int hitCellId         = aECLHit->getCellId() - 1;
       if (aECLHit->getBackgroundTag() != 0) continue;
-
-      if (DigiIndex[hitCellId] != -1 && DigiOldTrack[hitCellId] != PrimaryIndex) {
+      if (DigiIndex[hitCellId] != -1 && PrimaryIndex > -1) { // && DigiOldTrack[hitCellId] != PrimaryIndex) {
         eclCalDigitToMCParticleRelationArray.add(DigiIndex[hitCellId], PrimaryIndex);
-        DigiOldTrack[hitCellId] = PrimaryIndex;
+        //DigiOldTrack[hitCellId] = PrimaryIndex;
       }
     }//for (int hit = 0
   }//for index

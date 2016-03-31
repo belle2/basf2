@@ -84,14 +84,12 @@ int main(int argc, char* argv[])
   pbins[0] = 0.0; pbins[1] = 0.05;
   for (int bin = 2; bin <= num_p_bins; bin++) {
     if (bin <= 19)
-      pbins[bin] = 0.025 + 0.025 * bin;
-    else if (bin <= 29)
+      pbins[bin] = 0.025 * bin;
+    else if (bin <= 59)
       pbins[bin] = pbins[19] + 0.05 * (bin - 19);
-    else if (bin <= 49)
-      pbins[bin] = pbins[29] + 0.1 * (bin - 29);
     else
-      pbins[bin] = pbins[49] + 0.25 * (bin - 49);
-    std::cout << ": " << pbins[bin] << "\n";
+      pbins[bin] = pbins[59] + 0.3 * (bin - 59);
+    //std::cout << ": " << pbins[bin] << "\n";
   }
 
   for (int i = 0; i < 2; i++) { //normal/truncated

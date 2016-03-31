@@ -92,6 +92,15 @@ namespace Belle2 {
     std::vector<int>* m_eclDigitTimeFit;  /**< ECLDigit timing */
     std::vector<int>* m_eclDigitFitQuality;  /**< ECLDigit fit quality */
 
+    int m_eclCalDigitMultip; /**< Number of ECLCalDigits per event */
+    std::vector<int>* m_eclCalDigitIdx; /**< ECLCalDigit index */
+    std::vector<int>* m_eclCalDigitToMc; /**< Index of MCParticle related to that ECLCalDigit */
+    //std::vector<int>* m_eclCalDigitToHit; /**< Index of ECLHit related to that ECLCalDigit */
+    std::vector<int>* m_eclCalDigitCellId; /**< Number of ECLCalDigit CellId */
+    std::vector<int>* m_eclCalDigitAmp;  /**< ECLCalDigit amplitude */
+    std::vector<int>* m_eclCalDigitTimeFit;  /**< ECLCalDigit timing */
+    std::vector<int>* m_eclCalDigitFitQuality;  /**< ECLCalDigit fit quality */
+
     int m_eclSimHitMultip;  /**< Number of ECLSimHits per event */
     std::vector<int>* m_eclSimHitIdx;  /**< Index of ECLSimHit*/
     std::vector<int>* m_eclSimHitToMc; /**< Index of MCParticle related to that ECLSimHit */
@@ -99,12 +108,12 @@ namespace Belle2 {
     std::vector<int>* m_eclSimHitPdg; /**< PDG code of MCParticle associted to that ECLDigit */
     std::vector<double>* m_eclSimHitEnergyDep; /**< Energy deposition of ECLSimHit */
     std::vector<double>* m_eclSimHitFlightTime; /**< ??? */
-    std::vector<double>* m_eclSimHitX; /**< ECLDigit X position */
-    std::vector<double>* m_eclSimHitY; /**< ECLDigit Y position */
-    std::vector<double>* m_eclSimHitZ; /**< ECLDigit Z position */
-    std::vector<double>* m_eclSimHitPx; /**< ECLDigit PX */
-    std::vector<double>* m_eclSimHitPy; /**< ECLDigit PY */
-    std::vector<double>* m_eclSimHitPz; /**< ECLDigit PZ */
+    std::vector<double>* m_eclSimHitX; /**< ECLSimHit X position */
+    std::vector<double>* m_eclSimHitY; /**< ECLSimHit Y position */
+    std::vector<double>* m_eclSimHitZ; /**< ECLSimHit Z position */
+    std::vector<double>* m_eclSimHitPx; /**< ECLSimHit PX */
+    std::vector<double>* m_eclSimHitPy; /**< ECLSimHit PY */
+    std::vector<double>* m_eclSimHitPz; /**< ECLSimHit PZ */
 
     int m_eclHitMultip; /**< Number of ECLHits per event */
     std::vector<int>* m_eclHitIdx; /**< Index of ECLHits */

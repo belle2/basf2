@@ -46,6 +46,32 @@ EKLMGeometry::EndcapStructureGeometry::EndcapStructureGeometry(
   Rmaxsub = geometry.Rmaxsub;
 }
 
+EKLMGeometry::EndcapStructureGeometry&
+EKLMGeometry::EndcapStructureGeometry::operator=(
+  const EndcapStructureGeometry& geometry)
+{
+  Phi = geometry.Phi;
+  Dphi = geometry.Dphi;
+  Nsides = geometry.Nsides;
+  Nboundary = geometry.Nboundary;
+  if (Z != NULL)
+    delete[] Z;
+  Z = new double[Nboundary];
+  memcpy(Z, geometry.Z, Nboundary * sizeof(double));
+  if (Rmin != NULL)
+    delete[] Rmin;
+  Rmin = new double[Nboundary];
+  memcpy(Rmin, geometry.Rmin, Nboundary * sizeof(double));
+  if (Rmax != NULL)
+    delete[] Rmax;
+  Rmax = new double[Nboundary];
+  memcpy(Rmax, geometry.Rmax, Nboundary * sizeof(double));
+  Zsub = geometry.Zsub;
+  Rminsub = geometry.Rminsub;
+  Rmaxsub = geometry.Rmaxsub;
+  return *this;
+}
+
 EKLMGeometry::ElementPosition::ElementPosition()
 {
   InnerR = 0;
@@ -138,6 +164,22 @@ EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry(
   Points = new Point[NPoints];
   for (i = 0; i < NPoints; i++)
     Points[i] = geometry.Points[i];
+}
+
+EKLMGeometry::ShieldDetailGeometry&
+EKLMGeometry::ShieldDetailGeometry::operator=(
+  const ShieldDetailGeometry& geometry)
+{
+  int i;
+  LengthX = geometry.LengthX;
+  LengthY = geometry.LengthY;
+  NPoints = geometry.NPoints;
+  if (Points != NULL)
+    delete[] Points;
+  Points = new Point[NPoints];
+  for (i = 0; i < NPoints; i++)
+    Points[i] = geometry.Points[i];
+  return *this;
 }
 
 EKLMGeometry::ShieldGeometry::ShieldGeometry()
@@ -248,6 +290,61 @@ EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
 
 EKLMGeometry::~EKLMGeometry()
 {
+}
+
+EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
+{
+  int i, j;
+  m_Mode = geometry.getDetectorMode();
+  m_NEndcaps = geometry.getNEndcaps();
+  m_NLayers = geometry.getNLayers();
+  if (m_NDetectorLayers != NULL)
+    delete[] m_NDetectorLayers;
+  m_NDetectorLayers = new int[m_NEndcaps];
+  m_NDetectorLayers[0] = geometry.getNDetectorLayers(1);
+  if (m_NEndcaps == 2)
+    m_NDetectorLayers[1] = geometry.getNDetectorLayers(2);
+  m_NSectors = geometry.getNSectors();
+  m_NPlanes = geometry.getNPlanes();
+  m_NSegments = geometry.getNSegments();
+  m_NSegmentSupportElementsSector = geometry.getNSegmentSupportElementsSector();
+  m_NStripsSegment = geometry.getNStripsSegment();
+  m_NStrips = geometry.getNStrips();
+  m_NBoards = geometry.getNBoards();
+  m_NBoardsSector = geometry.getNBoardsSector();
+  m_NStripBoards = geometry.getNStripBoards();
+  m_SolenoidZ = geometry.getSolenoidZ();
+  m_LayerShiftZ = geometry.getLayerShiftZ();
+  if (m_SegmentSupportPosition != NULL)
+    delete[] m_SegmentSupportPosition;
+  m_SegmentSupportPosition =
+    new struct SegmentSupportPosition[m_NSegmentSupportElementsSector];
+  for (i = 0; i < m_NPlanes; i++) {
+    for (j = 0; j <= m_NSegments; j++) {
+      m_SegmentSupportPosition[i * (m_NSegments + 1) + j] =
+        *geometry.getSegmentSupportPosition(i + 1, j + 1);
+    }
+  }
+  if (m_StripPosition != NULL)
+    delete[] m_StripPosition;
+  m_StripPosition = new struct ElementPosition[m_NStrips];
+  for (i = 0; i < m_NStrips; i++)
+    m_StripPosition[i] = *geometry.getStripPosition(i + 1);
+  if (m_BoardPosition != NULL)
+    delete[] m_BoardPosition;
+  m_BoardPosition = new struct BoardPosition[m_NBoardsSector];
+  for (i = 0; i < m_NPlanes; i++) {
+    for (j = 0; j < m_NBoards; j++) {
+      m_BoardPosition[i * m_NBoards + i] =
+        *geometry.getBoardPosition(i + 1, j + 1);
+    }
+  }
+  if (m_StripBoardPosition != NULL)
+    delete[] m_StripBoardPosition;
+  m_StripBoardPosition = new struct StripBoardPosition[m_NStripBoards];
+  for (i = 0; i < m_NStripBoards; i++)
+    m_StripBoardPosition[i] = *geometry.getStripBoardPosition(i + 1);
+  return *this;
 }
 
 /* Global settings. */

@@ -16,6 +16,7 @@
 #include <eklm/geometry/Circle2D.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/Line2D.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/database/Database.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -661,6 +662,11 @@ void EKLM::GeometryData::initializeFromGearbox()
 
 void EKLM::GeometryData::initializeFromDatabase()
 {
+  DBObjPtr<EKLMGeometry> eklmGeometry;
+  if (!eklmGeometry.isValid())
+    B2FATAL("No EKLM geometry data in the database.");
+  EKLMGeometry::operator=(*eklmGeometry);
+  m_Geometry = new EKLMGeometry(*this);
 }
 
 EKLM::GeometryData::GeometryData(enum DataSource dataSource)

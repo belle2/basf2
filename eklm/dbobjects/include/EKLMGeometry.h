@@ -81,6 +81,12 @@ namespace Belle2 {
        */
       EndcapStructureGeometry(const EndcapStructureGeometry& geometry);
 
+      /**
+       * Operator =.
+       */
+      EndcapStructureGeometry& operator=(
+        const EndcapStructureGeometry& geometry);
+
       double Phi;
       double Dphi;
       int Nsides;
@@ -432,6 +438,11 @@ namespace Belle2 {
        */
       ShieldDetailGeometry(const ShieldDetailGeometry& geometry);
 
+      /**
+       * Operator =.
+       */
+      ShieldDetailGeometry& operator=(const ShieldDetailGeometry& geometry);
+
       /** X length. */
       double LengthX;
 
@@ -582,6 +593,11 @@ namespace Belle2 {
      * Destructor.
      */
     ~EKLMGeometry();
+
+    /**
+     * Operator =.
+     */
+    EKLMGeometry& operator=(const EKLMGeometry& geometry);
 
     /**
      * Get EKLM detector mode.

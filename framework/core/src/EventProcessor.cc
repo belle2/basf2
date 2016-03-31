@@ -210,8 +210,9 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
       m_master = module;
       if (setEventInfo) {
         callEvent(module);
-        // update Database payloads: we now have valid event meta data
-        DBStore::Instance().update();
+        // update Database payloads: we now have valid event meta data unless
+        // we don't process any events
+        if (m_eventMetaDataPtr) DBStore::Instance().update();
       }
     }
 

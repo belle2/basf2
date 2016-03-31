@@ -152,12 +152,6 @@ void V0FinderModule::event()
       continue;
     }
 
-    // FIXME: This could will be obsolete in the future.
-    if (tfr->getParticleType() != Const::pion) {
-      B2DEBUG(99, "Requested TrackFitResult for pion, got something else");
-      continue;
-    }
-
     const double charge = tfr->getChargeSign();
     if (charge == +1) {
       tracksPlus.push_back(&track);

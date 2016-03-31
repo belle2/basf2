@@ -182,19 +182,8 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     return false;
   }
 
-  // FIXME we assume that only the pion hypothesis is employed.
-  // Non-pion tracks are ignored at this point.
   const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
   const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
-
-  // FIXME: This could will be obsolete in the future.
-  if (fabs(tr0->getPdg()) != trackHypotheses.first.getPDGCode()
-      || fabs(tr1->getPdg()) != trackHypotheses.second.getPDGCode()) {
-    B2ERROR("Unsupported particle hypothesis in V0.");
-    return false;
-  }
-
-  // TODO: Call specific cuts with particle types
 
   const TVector3& posVert(vert.getPos());
   TLorentzVector lv0, lv1;

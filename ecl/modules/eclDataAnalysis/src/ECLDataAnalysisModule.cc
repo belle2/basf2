@@ -704,9 +704,9 @@ void ECLDataAnalysisModule::event()
 
     m_eclCalDigitIdx->push_back(icaldigits);
     m_eclCalDigitCellId->push_back(aECLCalDigits->getCellId());
-    //m_eclCalDigitAmp->push_back(aECLCalDigits->getAmp());
-    //m_eclCalDigitTimeFit->push_back(aECLCalDigits->getTimeFit());
-    //m_eclCalDigitFitQuality->push_back(aECLCalDigits->getQuality());
+    m_eclCalDigitAmp->push_back(aECLCalDigits->getEnergy());
+    m_eclCalDigitTimeFit->push_back(aECLCalDigits->getTime());
+    m_eclCalDigitFitQuality->push_back(aECLCalDigits->isFailedFit());
 
     if (aECLCalDigits->getRelated<MCParticle>() != (nullptr)) {
       const MCParticle* mc_digit = aECLCalDigits->getRelated<MCParticle>();
@@ -837,8 +837,7 @@ void ECLDataAnalysisModule::event()
       for (int rel = 0; rel < (int)ECLClusterToMC.getEntries(); rel++) {
         if (ECLClusterToMC[rel].getFromIndex() == iclusters) {
           if ((ECLClusterToMC[rel].getWeight() > 0) && (rel < 10)) {
-            cout << "Contribution from Mc particle: " << ECLClusterToMC[rel].getToIndex() << " with weight " << ECLClusterToMC[rel].getWeight()
-                 << endl;
+            //cout << "Contribution from Mc particle: " << ECLClusterToMC[rel].getToIndex() << " with weight " << ECLClusterToMC[rel].getWeight() << endl;
             idx[ii] = rel;
             ii++;
           }
@@ -868,8 +867,7 @@ void ECLDataAnalysisModule::event()
       m_eclClusterToBkgWeight->push_back(aECLClusters->getEnergy() - sumHit);
       m_eclClusterSimHitSum->push_back(sumHit);
       if (idx[0] > -1) {
-        cout << "Dumped -> MC particle: " << ECLClusterToMC[idx[0]].getToIndex() << " with weight " << ECLClusterToMC[idx[0]].getWeight() <<
-             endl;
+        //cout << "Dumped -> MC particle: " << ECLClusterToMC[idx[0]].getToIndex() << " with weight " << ECLClusterToMC[idx[0]].getWeight() << endl;
         m_eclClusterToMcWeight1->push_back(ECLClusterToMC[idx[0]].getWeight());
         m_eclClusterToMc1->push_back(ECLClusterToMC[idx[0]].getToIndex());
       } else {

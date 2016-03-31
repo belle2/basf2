@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Vishal     (ECL Software Group)                          *
- *                                                                        *
+ *               Guglielmo De Nardo (denardo@na.infn.it)                  *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -22,10 +22,8 @@
 
 namespace Belle2 {
 
-  /*! Class to store ECLCluster reconstructed from ECLDigit as Belle method
-   * relation to ECLShower
-   * filled in ecl/modules/eclRecShower/src/ECLReconstructorModule.cc
-   */
+  /*! Class to store reconstructed cluster in ECL */
+
 
   class ECLCluster : public RelationsObject {
   public:
@@ -46,7 +44,9 @@ namespace Belle2 {
       m_LAT(0),
       m_NofCrystals(0),
       m_CrystHealth(0),
-      m_MergedPi0(0)
+      m_MergedPi0(0),
+      m_minTrkDistance(-1),
+      m_deltaL(-1)
     {
       m_Error[0] = 0;
       m_Error[1] = 0;
@@ -85,6 +85,12 @@ namespace Belle2 {
 
     /*! Set Lateral distribution parameter */
     void setLAT(double LAT) { m_LAT = LAT; }
+
+    /*! Set distance between cluster COG and track extrapolation to ECL */ \
+    void setMinTrkDistance(double distance) { m_minTrkDistance = distance; }
+
+    /*! Set deltaL for shower shape */
+    void setdeltaL(double deltaL) { m_deltaL = deltaL; }
 
     /*! Set Number of Crystals in a shower */
     void setNofCrystals(int NofCrystals) { m_NofCrystals = NofCrystals; }
@@ -148,6 +154,12 @@ namespace Belle2 {
 
     /*! Return LAT (shower variable) */
     double getLAT() const {return m_LAT;}
+
+    /*! Get distance between cluster COG and track extrapolation to ECL */
+    double getTemporaryMinTrkDistance() { return m_minTrkDistance; }
+
+    /*! Return deltaL for shower shape */
+    double getTemporaryDeltaL() const { return m_deltaL; }
 
     /*! Return Number of a Crystals in a shower */
     int getNofCrystals() const {return m_NofCrystals;}
@@ -267,7 +279,6 @@ namespace Belle2 {
      */
     bool isNeutral() const { return !m_isTrack; }
 
-
     //..... For FUTURE (to DO)
 
     /*! Return pi0Likelihood for a shower (for future, Not available now) */
@@ -276,8 +287,8 @@ namespace Belle2 {
     /*! Return etaLikelihood for a shower (for future, Not available now) */
     double getetaLikelihood() const { return 0.5; }
 
-    /*! Return deltaL for shower shape (for future, Not available now) */
-    double getdeltaL() const { return 0; }
+    /* Return deltaL for shower shape (for future, Not available now) */
+    double getdeltaL() const { return 0;}
 
     /*! Return beta for shower shape (for future, Not available now) */
     double getbeta() const { return 0; }
@@ -289,30 +300,25 @@ namespace Belle2 {
     float  m_Energy;     /**< Corrected energy (GeV) */
     float  m_Theta;         /**< Theta of Shower (radian) */
     float  m_Phi;         /**< Phi of Shower (radian)  */
-
-
     float  m_R;         /**< R (cm) */
     float  m_EnedepSum;  /**< Uncorrected  Energy Deposited (GeV) */
     float  m_Timing;     /**< Timing information (study going on) */
     float  m_ErrorTiming;    /**< Timing Error (NA) */
     float  m_E9oE25;     /**< E9/E25: photon-like & isolation cut */
     float  m_HighestE;  /**< Highest energy stored in a crystal in Shower */
-    //TODO
-    float m_LAT;  /**< Lateral distribution parameter (Not available now) */
-    int   m_NofCrystals; /**< Number of Crystals in a shower (Not available now) */
-    int   m_CrystHealth;/**< Crystal Health (Not available now)
+    float  m_LAT;  /**< Lateral distribution parameter */
+    int    m_NofCrystals; /**< Number of Crystals in a shower (Not available now) */
+    int    m_CrystHealth;/**< Crystal Health (Not available now)
           -100 : healthy
           10 : Bad
           20 : Broken
           30 : Dead  */
     float m_MergedPi0; /**< Likelihood of being Merged Pi0 (Not available now) */
-
-
+    float  m_minTrkDistance; /**<  Distance between cluster COG and track extrapolation to ECL */
+    float  m_deltaL; /**<  Delta L as defined in arXiv:0711.1593 */
 
     /**< Class definition */
-    ClassDef(ECLCluster, 2); /**< Needed to make objects storable */
-
-
+    ClassDef(ECLCluster, 3); /**< Needed to make objects storable */
   };
 
 }// end namespace Belle2

@@ -56,11 +56,18 @@ void CreateTopConfigurations(void){
   TopElectronicConstructionName ModuleC09Construction("ModuleC09");
   TopModuleElectronicConstructions.push_back(ModuleC09Construction);
 
+  TopElectronicConstructionName ModuleC12Construction("ModuleC12");
+  TopModuleElectronicConstructions.push_back(ModuleC12Construction);
+
   TopElectronicConstructionName ModuleC13Construction("ModuleC13");
   TopModuleElectronicConstructions.push_back(ModuleC13Construction);
 
   TopElectronicConstructionName ModuleC14Construction("ModuleC14");
   TopModuleElectronicConstructions.push_back(ModuleC14Construction);
+
+  TopElectronicConstructionName ModuleC15Construction("ModuleC15");
+  TopModuleElectronicConstructions.push_back(ModuleC15Construction);
+
 
   TopElectronicRefMap ElectronicModuletoScrod;
   TopElectronicRetMap ScrodtoElectronicModule;
@@ -146,6 +153,12 @@ void CreateTopConfigurations(void){
       	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 99;
       	ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 59;
     }
+    if ( (*i) == ModuleC12Construction ) {
+	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 75;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 76;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 77;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 81;
+    }
     if ( (*i) == ModuleC13Construction ) {
 //	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 87;
 	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 83;
@@ -159,6 +172,12 @@ void CreateTopConfigurations(void){
 //      ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 57;
       	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 21;
       	ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 71;
+    }
+    if ( (*i) == ModuleC15Construction ) {
+	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 85;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 90;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 91;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 92;
     }
 
     

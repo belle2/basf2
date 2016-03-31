@@ -72,7 +72,8 @@ namespace Belle2 {
       if (applyQE) {
         double energy = photon.GetKineticEnergy() * Unit::MeV / Unit::eV;
         double qeffi = m_topgp->QE(energy) * m_topgp->getColEffi();
-        double fraction = info->getFraction();
+        double fraction = 1;
+        if (info) fraction = info->getFraction();
         if (gRandom->Uniform() * fraction > qeffi) {
           photon.SetTrackStatus(fStopAndKill);
           return false;

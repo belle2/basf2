@@ -30,23 +30,27 @@ PruneRecoTracksModule::PruneRecoTracksModule() :
 
 void PruneRecoTracksModule::initialize()
 {
-  StoreArray<RecoTrack>::required(m_storeArrayName);
+  StoreArray<RecoTrack> recoTracks(m_storeArrayName);
 
-  StoreArray<RecoHitInformation> recoHitInformation;
-  recoHitInformation.isRequired();
+  if (recoTracks.isOptional()) {
+    StoreArray<RecoHitInformation> recoHitInformation;
+    recoHitInformation.isRequired();
 
-  m_subsetOfUnprunedRecoHitInformation.registerSubset(recoHitInformation, DataStore::c_DontWriteOut);
+    m_subsetOfUnprunedRecoHitInformation.registerSubset(recoHitInformation, DataStore::c_DontWriteOut);
+  }
 }
 
 void PruneRecoTracksModule::event()
 {
-  auto tracks = Belle2::StoreArray<RecoTrack>(m_storeArrayName);
-  for (auto& t : tracks) {
-    t.prune();
-  }
+  Belle2::StoreArray<RecoTrack> tracks(m_storeArrayName);
+  if (tracks.isValid()) {
+    for (auto& t : tracks) {
+      t.prune();
+    }
 
-  m_subsetOfUnprunedRecoHitInformation.select([](const RecoHitInformation * recoHitInformation) {
-    return recoHitInformation->getFlag() != RecoHitInformation::RecoHitFlag::c_pruned;
-  });
+    m_subsetOfUnprunedRecoHitInformation.select([](const RecoHitInformation * recoHitInformation) {
+      return recoHitInformation->getFlag() != RecoHitInformation::RecoHitFlag::c_pruned;
+    });
+  }
 }
 

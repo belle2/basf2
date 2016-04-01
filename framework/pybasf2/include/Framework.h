@@ -127,9 +127,9 @@ namespace Belle2 {
     /**
      * Function to set streaming objects for Tx module
      *
-     * @param objs objects to be streamed
+     * @param streamingObjects objects to be streamed
     */
-    void setStreamingObjects(boost::python::object strobjs);
+    void setStreamingObjects(std::vector<std::string> streamingObjects);
 
 
     //--------------------------------------------------

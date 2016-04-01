@@ -15,8 +15,6 @@
 #include <framework/logging/LogConfig.h>
 #include <framework/core/InputController.h>
 
-#include <framework/core/PyObjConvUtils.h>
-
 #include <boost/filesystem/path.hpp>
 #include <boost/shared_ptr.hpp>
 

@@ -159,9 +159,9 @@ std::string Framework::getPicklePath() const
   return Environment::Instance().getPicklePath();
 }
 
-void Framework::setStreamingObjects(boost::python::object strobjs)
+void Framework::setStreamingObjects(std::vector<std::string> streamingObjects)
 {
-  Environment::Instance().setStreamingObjects(strobjs);
+  Environment::Instance().setStreamingObjects(streamingObjects);
 }
 
 //=====================================================================

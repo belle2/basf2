@@ -48,9 +48,9 @@ void TxModule::initialize()
   //  vector<string> streamobjs = { "EventMetaData", "RawSVDs", "ROIpayload", "ROIs", "SVClusters", "SVDDigits",
   //        "ProcessStatistics" };
   //  m_streamer->registerStreamObjs ( streamobjs );
-  if ((Environment::Instance().getStreamObjs()).size() > 0) {
-    m_streamer->registerStreamObjs(Environment::Instance().getStreamObjs());
-    B2INFO("Tx: Streaming objects limited : " << (Environment::Instance().getStreamObjs()).size() << " objects");
+  if ((Environment::Instance().getStreamingObjects()).size() > 0) {
+    m_streamer->registerStreamObjs(Environment::Instance().getStreamingObjects());
+    B2INFO("Tx: Streaming objects limited : " << (Environment::Instance().getStreamingObjects()).size() << " objects");
   }
 
   B2INFO(getName() << " initialized.");

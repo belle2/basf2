@@ -67,8 +67,8 @@ namespace Belle2 {
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
     bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
     bool m_doPureCsIStudy; /**< if true, info on pureCsI upgrade is stored*/
-    std::string m_pure_clusters;
-    std::string m_pure_digits;
+    std::string m_pure_clusters; /**< Pure CsI clusters StoreArray name*/
+    std::string m_pure_digits; /**< Pure CsI digits StoreArray name*/
 
     TTree* m_tree; /**< Root tree and file for saving the output */
     //TFile* m_rootFile;
@@ -95,6 +95,7 @@ namespace Belle2 {
     int m_eclCalDigitMultip; /**< Number of ECLCalDigits per event */
     std::vector<int>* m_eclCalDigitIdx; /**< ECLCalDigit index */
     std::vector<int>* m_eclCalDigitToMc; /**< Index of MCParticle related to that ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToShower; /**< Index of ECLShower related to that ECLCalDigit */
     //std::vector<int>* m_eclCalDigitToHit; /**< Index of ECLHit related to that ECLCalDigit */
     std::vector<int>* m_eclCalDigitCellId; /**< Number of ECLCalDigit CellId */
     std::vector<int>* m_eclCalDigitAmp;  /**< ECLCalDigit amplitude */
@@ -141,7 +142,7 @@ namespace Belle2 {
     std::vector<double>*
     m_eclClusterToBkgWeight; /**< Remaining energy contribution not associated to first five MCParticles related to ECLCluster */
     std::vector<double>* m_eclClusterSimHitSum; /**< Energy contribution of first MCParticle related to ECLCluster */
-    //std::vector<int>* m_eclClusterToShower; /**< Index of ECLShower related to ECLCluster */
+    std::vector<int>* m_eclClusterToShower; /**< Index of ECLShower related to ECLCluster */
     //std::vector<int>* m_eclClusterToTrack;
     std::vector<double>* m_eclClusterEnergy; /**< ECLCluster energy */
     std::vector<double>* m_eclClusterEnergyError; /**< ECLCluster energy error*/
@@ -229,6 +230,18 @@ namespace Belle2 {
     std::vector<double>* m_eclPi0Chi2;
     std::vector<double>* m_eclPi0PValue;
     */
+
+    int m_eclShowerMultip; /**< Number of ECLShowers per event */
+    std::vector<int>* m_eclShowerIdx; /**< Shower Index */
+    std::vector<int>* m_eclShowerToMc; /**< MC Index to Shower */
+    std::vector<double>* m_eclShowerUncEnergy; /**< Shower bare energy */
+    std::vector<double>* m_eclShowerEnergy; /**< Shower Energy */
+    std::vector<double>* m_eclShowerTheta; /**< Shower Theta */
+    std::vector<double>* m_eclShowerPhi; /**< Shower Phi */
+    std::vector<double>* m_eclShowerR; /**< Shower R */
+    std::vector<double>* m_eclShowerNHits; /**< Shower NHits */
+    std::vector<double>* m_eclShowerE9oE25; /**< Shower E9oE25 */
+
     int m_mcMultip; /**< Multiplicity of MCParticles */
     std::vector<int>* m_mcIdx; /**< MCParticle index */
     std::vector<int>* m_mcPdg; /**< MCParticle PDG code */

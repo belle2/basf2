@@ -12,6 +12,8 @@
 #ifndef FRAMEWORK_H_
 #define FRAMEWORK_H_
 
+#include <boost/python/object.hpp>
+
 #include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
 
@@ -121,6 +123,13 @@ namespace Belle2 {
      * @return path to file where the pickled path is stored
     */
     std::string getPicklePath() const;
+
+    /**
+     * Function to set streaming objects for Tx module
+     *
+     * @param objs objects to be streamed
+    */
+    void setStreamingObjects(boost::python::object strobjs);
 
 
     //--------------------------------------------------

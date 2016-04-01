@@ -159,6 +159,10 @@ std::string Framework::getPicklePath() const
   return Environment::Instance().getPicklePath();
 }
 
+void Framework::setStreamingObjects(boost::python::object strobjs)
+{
+  Environment::Instance().setStreamingObjects(strobjs);
+}
 
 //=====================================================================
 //                          Python API
@@ -232,5 +236,6 @@ void Framework::exposePythonAPI()
   .def("set_pickle_path", &Framework::setPicklePath)
   .def("set_nprocesses", &Framework::setNumberProcesses)
   .def("get_nprocesses", &Framework::getNumberProcesses)
+  .def("set_streamobjs", &Framework::setStreamingObjects)
   ;
 }

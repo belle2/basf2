@@ -17,8 +17,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(BKLMSimulationPar);
-
 // BKLMSimulationPar* BKLMSimulationPar::m_Instance = NULL;
 
 /*BKLMSimulationPar* BKLMSimulationPar::instance()

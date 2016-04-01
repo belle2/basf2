@@ -14,8 +14,6 @@
 using namespace Belle2;
 using namespace std;
 
-ClassImp(BKLMBadChannels);
-
 void BKLMBadChannels::appendDeadChannel(int channel)
 {
   /*bool isexist=false;

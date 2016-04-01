@@ -19,9 +19,6 @@ using namespace Belle2;
 using namespace std;
 using namespace CLHEP;
 
-ClassImp(BKLMGeometryPar);
-
-
 /*BKLMGeometryPar* BKLMGeometryPar::instance(void)
 {
   if (m_Instance) return m_Instance;

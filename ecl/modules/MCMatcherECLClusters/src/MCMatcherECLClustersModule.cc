@@ -135,7 +135,7 @@ void MCMatcherECLClustersModule::event()
   for (int index = 0; index < mcParticleToECLHitRelationArray.getEntries(); index++) {
     int PrimaryIndex = -1;
     const int mcParticleIndex = mcParticleToECLHitRelationArray[index].getFromIndex();
-    const map<int, int>::iterator iter = eclPrimaryMap.find(mcParticleIndex);
+    //const map<int, int>::iterator iter = eclPrimaryMap.find(mcParticleIndex);
 
     //if (iter != eclPrimaryMap.end()) {
     //  PrimaryIndex = iter->first; //it's the daughter

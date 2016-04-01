@@ -287,7 +287,7 @@ namespace Belle2 {
     /*! Return etaLikelihood for a shower (for future, Not available now) */
     double getetaLikelihood() const { return 0.5; }
 
-    /* Return deltaL for shower shape (for future, Not available now) */
+    /*! Return deltaL for shower shape (for future, Not available now) */
     double getdeltaL() const { return 0;}
 
     /*! Return beta for shower shape (for future, Not available now) */

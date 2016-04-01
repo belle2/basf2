@@ -66,8 +66,8 @@ std::pair<const unsigned short, const unsigned short> HitPatternVXD::getSVDLayer
   std::bitset<32> uHitsPattern(m_pattern & (getLayerMask(layerId) & s_SVDuvMasks[0]));
   std::bitset<32> vHitsPattern(m_pattern & (getLayerMask(layerId) & s_SVDuvMasks[1]));
   const unsigned short arrayId = layerId - 3;
-  const unsigned short uHits = (uHitsPattern >>= (s_svdUshift + 4 * arrayId)).to_ulong();
-  const unsigned short vHits = (vHitsPattern >>= (s_svdVshift + 4 * arrayId)).to_ulong();
+  const unsigned short uHits = (uHitsPattern >> (s_svdUshift + 4 * arrayId)).to_ulong();
+  const unsigned short vHits = (vHitsPattern >> (s_svdVshift + 4 * arrayId)).to_ulong();
   return std::make_pair(uHits, vHits);
 }
 
@@ -133,7 +133,7 @@ unsigned short HitPatternVXD::getPXDLayer(const unsigned short layerId, const PX
   B2ASSERT("PXD layer is out of range.", layerId == 1 or layerId == 2);
   const unsigned short arrayId = layerId - 1;
   std::bitset<32> hits(m_pattern & (getLayerMask(layerId) & s_PXDModeMasks[static_cast<unsigned short>(mode)]));
-  return (hits >>= (4 * arrayId + 2 * static_cast<unsigned short>(mode))).to_ulong();
+  return (hits >> (4 * arrayId + 2 * static_cast<unsigned short>(mode))).to_ulong();
 }
 
 void HitPatternVXD::resetPXDLayer(const unsigned short layerId, const PXDMode& mode)

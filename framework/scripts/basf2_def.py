@@ -545,3 +545,11 @@ def is_mod_function(mod, func):
 
 def list_functions(mod):
     return [func.__name__ for func in mod.__dict__.values() if is_mod_function(mod, func)]
+
+
+def set_streamobjs(objs):
+    """
+    Sets objects to be streamed. To be ised to limit objects for the improvement of
+    parallel processing performance
+    """
+    fw.set_streamobjs(objs)

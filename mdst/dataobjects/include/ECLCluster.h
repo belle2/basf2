@@ -156,7 +156,7 @@ namespace Belle2 {
     double getLAT() const {return m_LAT;}
 
     /*! Get distance between cluster COG and track extrapolation to ECL. Note that this variable may be removed in later versions. */
-    double getTemporaryMinTrkDistance() { return m_minTrkDistance; }
+    double getTemporaryMinTrkDistance() const { return m_minTrkDistance; }
 
     /*! Return deltaL for shower shape. Note that this variable may be removed in later versions. */
     double getTemporaryDeltaL() const { return m_deltaL; }

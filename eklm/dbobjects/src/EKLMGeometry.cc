@@ -50,6 +50,8 @@ EKLMGeometry::EndcapStructureGeometry&
 EKLMGeometry::EndcapStructureGeometry::operator=(
   const EndcapStructureGeometry& geometry)
 {
+  if (&geometry == this)
+    return *this;
   Phi = geometry.Phi;
   Dphi = geometry.Dphi;
   Nsides = geometry.Nsides;
@@ -171,6 +173,8 @@ EKLMGeometry::ShieldDetailGeometry::operator=(
   const ShieldDetailGeometry& geometry)
 {
   int i;
+  if (&geometry == this)
+    return *this;
   LengthX = geometry.LengthX;
   LengthY = geometry.LengthY;
   NPoints = geometry.NPoints;
@@ -295,6 +299,8 @@ EKLMGeometry::~EKLMGeometry()
 EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
 {
   int i, j;
+  if (&geometry == this)
+    return *this;
   m_Mode = geometry.getDetectorMode();
   m_NEndcaps = geometry.getNEndcaps();
   m_NLayers = geometry.getNLayers();

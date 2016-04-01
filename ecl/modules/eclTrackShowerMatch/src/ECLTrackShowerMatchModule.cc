@@ -58,7 +58,6 @@ void ECLTrackShowerMatchModule::event()
   const int pdgCodePiPlus = Const::pion.getPDGCode();
   const int pdgCodePiMinus = -1 * Const::pion.getPDGCode();
   ECLGeometryPar* geometry = ECLGeometryPar::Instance();
-
   for (const Track& track : tracks) {
     set<int> clid;
 
@@ -68,10 +67,12 @@ void ECLTrackShowerMatchModule::event()
     // can be found
     for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
       if (extHit.getPdgCode() != pdgCodePiPlus && extHit.getPdgCode() != pdgCodePiMinus) continue;
-      if ((extHit.getDetectorID() != myDetID) || (extHit.getCopyID() == 0)) continue;
+      if ((extHit.getDetectorID() != myDetID)) continue;
       if (extHit.getStatus() != EXT_ENTER) continue;
-      const int cell = extHit.getCopyID() + 1;
-      TVector3 cpos   = geometry->GetCrystalPos(cell);
+      int copyid =  extHit.getCopyID();
+      if (copyid == -1) continue;
+      const int cell = copyid + 1;
+      TVector3 cpos   = geometry->GetCrystalPos(copyid);
       TVector3 trkpos = extHit.getPosition();
       int showerid = -1;
       const auto iHA =
@@ -145,8 +146,9 @@ double ECLTrackShowerMatchModule::computeTrkMinDistance(const ECLShower& shower,
     bool found(false);
     for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
       if (extHit.getPdgCode() != Const::pion.getPDGCode() && extHit.getPdgCode() != -Const::pion.getPDGCode()) continue;
-      if ((extHit.getDetectorID() !=  Const::EDetector::ECL) || (extHit.getCopyID() == 0)) continue;
+      if ((extHit.getDetectorID() !=  Const::EDetector::ECL)) continue;
       if (extHit.getStatus() != EXT_ENTER) continue;
+      if (extHit.getCopyID() == -1) continue;
       trkpos = extHit.getPosition();
       found = true;
       break;
@@ -171,7 +173,7 @@ void ECLTrackShowerMatchModule::computeDepth(const ECLShower& shower, double& lT
     const auto weight = relatedDigitsPairs.weight(iRel);
     double energy = weight * aECLCalDigit->getEnergy();
     int cellid = aECLCalDigit->getCellId();
-    TVector3 cvec   = geometry->GetCrystalVec(cellid);
+    TVector3 cvec   = geometry->GetCrystalVec(cellid - 1);
     avgDir += weight * energy * cvec;
   }
   double p = 0;
@@ -188,8 +190,9 @@ void ECLTrackShowerMatchModule::computeDepth(const ECLShower& shower, double& lT
   bool found(false);
   for (const auto& extHit : selectedTrk->getRelationsTo<ExtHit>()) {
     if (extHit.getPdgCode() != Const::pion.getPDGCode() && extHit.getPdgCode() != -Const::pion.getPDGCode()) continue;
-    if ((extHit.getDetectorID() !=  Const::EDetector::ECL) || (extHit.getCopyID() == 0)) continue;
+    if ((extHit.getDetectorID() !=  Const::EDetector::ECL)) continue;
     if (extHit.getStatus() != EXT_ENTER) continue;
+    if (extHit.getCopyID() == -1) continue;
     trkpos = extHit.getPosition();
     trkdir = extHit.getMomentum().Unit();
     found = true;

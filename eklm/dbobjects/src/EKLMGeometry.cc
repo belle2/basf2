@@ -223,9 +223,11 @@ EKLMGeometry::EKLMGeometry()
   m_NSectors = 0;
   m_NPlanes = 0;
   m_NSegments = 0;
+  m_NSegmentSupportElementsSector = 0;
   m_NStripsSegment = 0;
   m_NStrips = 0;
   m_NBoards = 0;
+  m_NBoardsSector = 0;
   m_NStripBoards = 0;
   m_SolenoidZ = 0;
   m_LayerShiftZ = 0;

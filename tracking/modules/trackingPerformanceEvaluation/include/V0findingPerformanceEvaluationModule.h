@@ -86,6 +86,7 @@ namespace Belle2 {
     TH1F* m_h1_mom_res; /**< mom resid*/
     TH2F* m_h2_mom; /**< mom reco VS true*/
     TH1F* m_h1_mass_res; /**< mom resid*/
+    TH2F* m_h2_mass; /**< mass reco VS true*/
     //pulls on track parameters
     TH1F* m_h1_vtxX_pll; /**< vtx pull*/
     TH1F* m_h1_vtxY_pll; /**< vtx pull*/

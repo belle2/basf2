@@ -112,6 +112,8 @@ void V0findingPerformanceEvaluationModule::initialize()
 
   m_h2_mom = createHistogram2D("h2mom", "reco VS true momentum", 100, 0, 3, "V0 mom (GeV/c)", 100, 0, 3, "MC mom (GeV/c)",
                                m_histoList);
+  m_h2_mass = createHistogram2D("h2mass", "reco VS true mass", 100, 0, 1.5, "V0 mass (GeV/c2)", 100, 0, 1.5, "MC mass (GeV/c)",
+                                m_histoList);
 
   //histograms to produce efficiency plots
   Double_t bins_pt[9 + 1] = {0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 1, 2, 3.5}; //GeV/c
@@ -221,6 +223,7 @@ void V0findingPerformanceEvaluationModule::event()
       m_h1_mom_res->Fill(V0_mom -  MC_mom);
       m_h2_mom->Fill(V0_mom, MC_mom);
       m_h1_mass_res->Fill(V0_mass -  MC_mass);
+      m_h2_mass->Fill(V0_mass, MC_mass);
 
       m_h1_vtxX_pll->Fill((V0_vtx.X() -  MC_vtx.X()) / sqrt(V0_cov[0][0]));
       m_h1_vtxY_pll->Fill((V0_vtx.Y() -  MC_vtx.Y()) / sqrt(V0_cov[1][1]));
@@ -254,6 +257,7 @@ void V0findingPerformanceEvaluationModule::event()
     if (nMCParticles == 0)
       continue;
 
+    m_h3_MCParticlesPerV0->Fill
     m_multiplicityMCParticles->Fill(nMCParticles);
 
   }
@@ -342,7 +346,7 @@ bool V0findingPerformanceEvaluationModule::isV0(const MCParticle& the_mcParticle
     isK_0 = true;
 
   bool isLambda = false;
-  if (abs(the_mcParticle.getPDG()) == 31122)
+  if (abs(the_mcParticle.getPDG()) == 3122)
     isLambda = true;
 
   bool twoChargedProngs = false;
@@ -368,24 +372,23 @@ int V0findingPerformanceEvaluationModule::nMatchedDaughters(const MCParticle& th
   bool first = false;
   bool second = false;
 
-  //    RelationVector<MCParticle> RV_TCtoMCPart = getRelationsTo("TrackCands");
-  //    if(std::get<1>(TrackCands_fromMCParticle) > 0.66){
-
   RelationVector<genfit::TrackCand> TrackCands_fromMCParticle_0 = DataStore::getRelationsToObj<genfit::TrackCand>(MCPart_dau[0]);
 
-  for (int tc = 0; tc < (int)TrackCands_fromMCParticle_0.size(); tc++) {
-    RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle_0[tc]);
-    if (Tracks_fromTrackCand.size() > 0)
-      first = true;
-  }
+  for (int tc = 0; tc < (int)TrackCands_fromMCParticle_0.size(); tc++)
+    if (TrackCands_fromMCParticle_0.weight(tc) > 0.66) {
+      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle_0[tc]);
+      if (Tracks_fromTrackCand.size() > 0)
+        first = true;
+    }
 
   RelationVector<genfit::TrackCand> TrackCands_fromMCParticle_1 = DataStore::getRelationsToObj<genfit::TrackCand>(MCPart_dau[1]);
 
-  for (int tc = 0; tc < (int)TrackCands_fromMCParticle_1.size(); tc++) {
-    RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle_1[tc]);
-    if (Tracks_fromTrackCand.size() > 0)
-      second = true;
-  }
+  for (int tc = 0; tc < (int)TrackCands_fromMCParticle_1.size(); tc++)
+    if (TrackCands_fromMCParticle_1.weight(tc) > 0.66) {
+      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle_1[tc]);
+      if (Tracks_fromTrackCand.size() > 0)
+        second = true;
+    }
 
   if (first)
     nMatchedDau++;

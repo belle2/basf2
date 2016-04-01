@@ -377,6 +377,7 @@ void ExtModule::getVolumeID(const G4TouchableHandle& touch, Const::EDetector& de
   // ECL
   if (name == "eclPhysical") {
     detID = Const::EDetector::ECL;
+    copyID = -1; // to avoid ambiguity of "0" with crystal #0
   }
   // ECL crystal (=sensitive) is named "ecl{Barrel,Forward,Backward}CrystalPhysical_*"
   if (name.find("CrystalPhysical_") != string::npos) {

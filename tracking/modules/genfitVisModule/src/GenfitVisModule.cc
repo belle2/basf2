@@ -40,8 +40,6 @@ GenfitVisModule::GenfitVisModule() : Module()
   // Parameter definitions
   addParam("onlyBadTracks", m_onlyBadTracks, "show only unfitted and unconverged tracks", false);
 
-  // Make cppcheck happy
-  m_display = 0;
 }
 
 void GenfitVisModule::initialize()

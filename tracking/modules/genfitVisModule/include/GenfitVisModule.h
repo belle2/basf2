@@ -47,7 +47,9 @@ namespace Belle2 {
 
   private:
 
-    genfit::EventDisplay* m_display;
+    /** pointer to the genfit::EventDisplay which gets created in initialize() */
+    genfit::EventDisplay* m_display = nullptr;
+    /** if true, tracks which have been fitted and the fit converged will no be shown */
     bool m_onlyBadTracks;
 
   };

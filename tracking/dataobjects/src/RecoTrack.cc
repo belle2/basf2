@@ -1,16 +1,12 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <tracking/trackFitting/measurementCreator/creators/CoordinateMeasurementCreator.h>
+#include <framework/dataobjects/Helix.h>
 
 #include <genfit/FitStatus.h>
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/RKTrackRep.h>
 #include <genfit/TrackCand.h>
 #include <genfit/AbsFitter.h>
-
-#include <framework/gearbox/Const.h>
-
-#include <framework/dataobjects/Helix.h>
 #include <genfit/WireTrackCandHit.h>
 
 using namespace Belle2;

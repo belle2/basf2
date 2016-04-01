@@ -146,21 +146,35 @@ bool MeasurementAdder::addMeasurements(RecoTrack& recoTrack) const
   // Add the measurements created by the CDC, SVD and PXD measurement creators.
   recoTrack.mapOnHits<RecoHitInformation::UsedCDCHit>(m_param_storeArrayNameOfCDCHits, [&](RecoHitInformation & recoHitInformation,
   RecoHitInformation::UsedCDCHit * cdcHit) {
-    recoTrack.addMeasurementsFromHit<RecoHitInformation::UsedCDCHit, Const::CDC>(recoHitInformation, cdcHit, m_cdcMeasurementCreators);
+    addMeasurementsFromHitToRecoTrack<RecoHitInformation::UsedCDCHit, Const::CDC>(recoTrack, recoHitInformation, cdcHit,
+        m_cdcMeasurementCreators);
   });
   recoTrack.mapOnHits<RecoHitInformation::UsedSVDHit>(m_param_storeArrayNameOfSVDHits, [&](RecoHitInformation & recoHitInformation,
   RecoHitInformation::UsedSVDHit * svdHit) {
-    recoTrack.addMeasurementsFromHit<RecoHitInformation::UsedSVDHit, Const::SVD>(recoHitInformation, svdHit, m_svdMeasurementCreators);
+    addMeasurementsFromHitToRecoTrack<RecoHitInformation::UsedSVDHit, Const::SVD>(recoTrack, recoHitInformation, svdHit,
+        m_svdMeasurementCreators);
   });
   recoTrack.mapOnHits<RecoHitInformation::UsedPXDHit>(m_param_storeArrayNameOfPXDHits, [&](RecoHitInformation & recoHitInformation,
   RecoHitInformation::UsedPXDHit * pxdHit) {
-    recoTrack.addMeasurementsFromHit<RecoHitInformation::UsedPXDHit, Const::PXD>(recoHitInformation, pxdHit, m_pxdMeasurementCreators);
+    addMeasurementsFromHitToRecoTrack<RecoHitInformation::UsedPXDHit, Const::PXD>(recoTrack, recoHitInformation, pxdHit,
+        m_pxdMeasurementCreators);
   });
 
   // Special case is with the additional measurement creator factories. They do not need any hits:
-  recoTrack.addMeasurements(m_additionalMeasurementCreators);
+  addMeasurementsToRecoTrack(recoTrack, m_additionalMeasurementCreators);
 
   recoTrack.m_genfitTrack.sort();
 
   return true;
+}
+
+void MeasurementAdder::addMeasurementsToRecoTrack(RecoTrack& recoTrack,
+                                                  const std::vector<std::shared_ptr<BaseMeasurementCreator>>& measurementCreators) const
+{
+  for (const auto& measurementCreator : measurementCreators) {
+    const std::vector<genfit::TrackPoint*>& trackPoints = measurementCreator->createMeasurementPoints(recoTrack);
+    for (genfit::TrackPoint* trackPoint : trackPoints) {
+      recoTrack.m_genfitTrack.insertPoint(trackPoint);
+    }
+  }
 }

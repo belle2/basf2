@@ -10,18 +10,16 @@
 
 #pragma once
 
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <mdst/dataobjects/HitPatternVXD.h>
-
-#include <tracking/trackFitting/measurementCreator/creators/BaseMeasurementCreatorFromHit.h>
-#include <tracking/trackFitting/measurementCreator/creators/BaseMeasurementCreator.h>
-#include <tracking/dataobjects/RecoHitInformation.h>
-
 #include <framework/datastore/RelationsObject.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 
 #include <genfit/Track.h>
 
-#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
+
+#include <tracking/dataobjects/RecoHitInformation.h>
 
 #include <algorithm>
 #include <functional>
@@ -730,39 +728,6 @@ namespace Belle2 {
       }
 
       return hitList;
-    }
-
-    /// Helper: Go through all measurement creators in the given list and create the measurement with a given hit.
-    template <class HitType, Const::EDetector detector>
-    void addMeasurementsFromHit(RecoHitInformation& recoHitInformation, HitType* hit,
-                                const std::vector<std::shared_ptr<BaseMeasurementCreatorFromHit<HitType, detector>>>& measurementCreators)
-    {
-      if (not recoHitInformation.useInFit()) {
-        return;
-      }
-
-      for (const auto& measurementCreator : measurementCreators) {
-        const std::vector<genfit::TrackPoint*>& trackPoints = measurementCreator->createMeasurementPoints(hit, *this, recoHitInformation);
-
-        if (trackPoints.size() >= 1) {
-          recoHitInformation.setCreatedTrackPoint(trackPoints.front());
-        }
-
-        for (genfit::TrackPoint* trackPoint : trackPoints) {
-          m_genfitTrack.insertPoint(trackPoint);
-        }
-      }
-    }
-
-    /// Helper: Go through all measurement creators in the given list and create the measurement without a given hit.
-    void addMeasurements(const std::vector<std::shared_ptr<BaseMeasurementCreator>>& measurementCreators)
-    {
-      for (const auto& measurementCreator : measurementCreators) {
-        const std::vector<genfit::TrackPoint*>& trackPoints = measurementCreator->createMeasurementPoints(*this);
-        for (genfit::TrackPoint* trackPoint : trackPoints) {
-          m_genfitTrack.insertPoint(trackPoint);
-        }
-      }
     }
 
     /// Helper: Check the dirty flag and produce a warning, whenever a fit result is accessed.

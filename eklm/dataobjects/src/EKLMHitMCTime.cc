@@ -13,8 +13,6 @@
 
 using namespace Belle2;
 
-ClassImp(EKLMHitMCTime);
-
 EKLMHitMCTime::EKLMHitMCTime()
 {
   m_MCTime = -1;

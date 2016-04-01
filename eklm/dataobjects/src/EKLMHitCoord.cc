@@ -13,8 +13,6 @@
 
 using namespace Belle2;
 
-ClassImp(EKLMHitCoord);
-
 EKLMHitCoord::EKLMHitCoord()
 {
   m_localX = -1;

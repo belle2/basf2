@@ -14,8 +14,6 @@
 
 using namespace Belle2;
 
-ClassImp(EKLMSimHit);
-
 EKLMSimHit::EKLMSimHit()
 {
   m_trackID = -1;

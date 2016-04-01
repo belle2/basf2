@@ -13,8 +13,6 @@
 
 using namespace Belle2;
 
-ClassImp(Belle2::EKLMAlignmentData);
-
 EKLMAlignmentData::EKLMAlignmentData()
 {
   m_Dx = 0;

@@ -14,8 +14,6 @@
 
 using namespace Belle2;
 
-ClassImp(Belle2::EKLMTimeCalibration);
-
 EKLMTimeCalibration::EKLMTimeCalibration()
 {
   m_EffectiveLightSpeed = 0;

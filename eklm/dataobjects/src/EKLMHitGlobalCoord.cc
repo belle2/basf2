@@ -13,8 +13,6 @@
 
 using namespace Belle2;
 
-ClassImp(EKLMHitGlobalCoord);
-
 EKLMHitGlobalCoord::EKLMHitGlobalCoord()
 {
   m_globalX = -1;

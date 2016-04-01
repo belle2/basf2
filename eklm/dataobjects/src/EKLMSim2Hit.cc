@@ -18,8 +18,6 @@
 
 using namespace Belle2;
 
-ClassImp(Belle2::EKLMSim2Hit)
-
 EKLMSim2Hit::EKLMSim2Hit()
 {
   m_volid = -1;

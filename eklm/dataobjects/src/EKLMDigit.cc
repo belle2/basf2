@@ -15,8 +15,6 @@
 
 using namespace Belle2;
 
-ClassImp(Belle2::EKLMDigit);
-
 EKLMDigit::EKLMDigit()
 {
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());

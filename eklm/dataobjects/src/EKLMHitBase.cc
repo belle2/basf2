@@ -13,8 +13,6 @@
 
 using namespace Belle2;
 
-ClassImp(EKLMHitBase);
-
 EKLMHitBase::EKLMHitBase()
 {
   m_PDG = -1;

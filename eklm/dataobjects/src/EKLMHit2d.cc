@@ -16,8 +16,6 @@
 
 using namespace Belle2;
 
-ClassImp(Belle2::EKLMHit2d);
-
 EKLMHit2d::EKLMHit2d()
 {
   m_ChiSq = -1;

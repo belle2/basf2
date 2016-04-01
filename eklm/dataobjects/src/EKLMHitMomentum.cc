@@ -13,8 +13,6 @@
 
 using namespace Belle2;
 
-ClassImp(EKLMHitMomentum);
-
 EKLMHitMomentum::EKLMHitMomentum()
 {
   m_e = -1;

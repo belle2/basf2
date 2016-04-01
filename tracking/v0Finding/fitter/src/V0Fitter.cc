@@ -188,6 +188,10 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   const TVector3& posVert(vert.getPos());
   TLorentzVector lv0, lv1;
 
+  // Reconstruct invariant mass.
+  lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
+  lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
+
   // Apply cuts.  We have one set of cuts inside the beam pipe,
   // the other outside.
   if (posVert.Perp() < m_beamPipeRadius) {
@@ -199,10 +203,6 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
       B2DEBUG(200, "Vertex inside beam pipe, chi^2 too large.");
       return false;
     }
-
-    // Reconstruct invariant mass.
-    lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
-    lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
 
     const double mReco = (lv0 + lv1).M();
     if (v0Hypothesis == Const::Kshort and fabs(mReco - Const::K0Mass) > m_massWindowKshortInside * Unit::MeV) {

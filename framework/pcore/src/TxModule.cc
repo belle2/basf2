@@ -11,6 +11,7 @@
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/DataStoreStreamer.h>
 #include <framework/core/RandomNumbers.h>
+#include <framework/core/Environment.h>
 
 #include <stdlib.h>
 
@@ -42,6 +43,15 @@ void TxModule::initialize()
 
   m_rbuf->txAttached();
   m_streamer = new DataStoreStreamer(m_compressionLevel);
+
+  // Limit streaming objs for performance test
+  //  vector<string> streamobjs = { "EventMetaData", "RawSVDs", "ROIpayload", "ROIs", "SVClusters", "SVDDigits",
+  //        "ProcessStatistics" };
+  //  m_streamer->registerStreamObjs ( streamobjs );
+  if ((Environment::Instance().getStreamObjs()).size() > 0) {
+    m_streamer->registerStreamObjs(Environment::Instance().getStreamObjs());
+    B2INFO("Tx: Streaming objects limited : " << (Environment::Instance().getStreamObjs()).size() << " objects");
+  }
 
   B2INFO(getName() << " initialized.");
 }

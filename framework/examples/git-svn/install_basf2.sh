@@ -173,7 +173,6 @@ if [ ! -d basf2 ]; then
 *.rej
 *.bak
 *.patch
-*.root
 
 # usual Belle2 stuff
 /.gitignore

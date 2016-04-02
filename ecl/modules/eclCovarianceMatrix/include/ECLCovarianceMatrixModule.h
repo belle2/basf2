@@ -16,7 +16,8 @@
 #define ECLCOVARIANCEMATRIXMODULE_H_
 
 #include <framework/core/Module.h>
-#include <TMatrixFSym.h>
+#include <framework/datastore/StoreArray.h>
+#include <ecl/dataobjects/ECLShower.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -46,36 +47,7 @@ namespace Belle2 {
       /** Terminate. */
       virtual void terminate();
 
-      /** function of square */
-      double squ(double x) { return x * x; }
-
-      /**calculate error of Energy with Energy  */
-      double errorEnergy(double energy);
-
-      /**calculate error of Theta with Energy and Theta  */
-      double errorTheta(double energy, double theta);
-
-      /**calculate error of Phi with Energy and Theta  */
-      double errorPhi(double energy, double theta);
-
-      /** Fill error matrix for Px, Py Pz and E */
-      void readErrorMatrix(double energy, double theta,
-                           double phi, TMatrixFSym& errorMatrix);
-
-      /** Fill error matrix for Px, Py Pz and E */
-      void readErrorMatrix7x7(double energy, double theta,
-                              double phi, TMatrixFSym& errorMatrix);
-
-      /**calculate Px using Energy, Theta and Phi */
-      double Px(double energy, double theta, double phi);
-
-      /** Calculate Py using Energy, Theta and Phi */
-      double Py(double energy, double theta, double phi);
-
-      /** Calculate Pz using Energy, Theta  */
-      double Pz(double energy, double theta);
-
-
+      StoreArray<ECLShower> m_eclShowers;
     private:
 
     public:

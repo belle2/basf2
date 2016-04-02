@@ -177,7 +177,7 @@ namespace Belle2 {
     double m_thetamc; /**< true theta*/
     //    double m_theta;
     double m_costhetamc; /**< true cos theta */
-    double m_costhetaMCPart; /**< cos theta of MC particle */
+    //    double m_costhetaMCPart; /**< cos theta of MC particle */
     double m_phimc;  /**< true phi */
     double m_lambdamc;  /**< true lambda = pi/2 - theta*/
 

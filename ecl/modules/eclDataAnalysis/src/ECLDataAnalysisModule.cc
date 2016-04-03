@@ -166,6 +166,16 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclPureClusterEtaLikel(0),
     m_eclPureClusterDeltaL(0),
     m_eclPureClusterBeta(0),
+    m_eclShowerMultip(0),
+    m_eclShowerIdx(0),
+    m_eclShowerToMc(0),
+    m_eclShowerUncEnergy(0),
+    m_eclShowerEnergy(0),
+    m_eclShowerTheta(0),
+    m_eclShowerPhi(0),
+    m_eclShowerR(0),
+    m_eclShowerNHits(0),
+    m_eclShowerE9oE25(0),
     m_mcMultip(0),
     m_mcIdx(0),
     m_mcPdg(0),
@@ -483,6 +493,8 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclClusterDeltaL",     "std::vector<double>",    &m_eclClusterDeltaL);
   m_tree->Branch("eclClusterBeta",       "std::vector<double>",    &m_eclClusterBeta);
 
+
+
   if (m_doPureCsIStudy == true) {
 
     m_tree->Branch("eclHitToPureDigit",      "std::vector<int>",       &m_eclHitToPureDigit);
@@ -491,7 +503,6 @@ void ECLDataAnalysisModule::initialize()
     m_tree->Branch("eclPureDigitMultip",     &m_eclPureDigitMultip,         "ecdigit_Multip/I");
     m_tree->Branch("eclPureDigitIdx",        "std::vector<int>",         &m_eclPureDigitIdx);
     m_tree->Branch("eclPureDigitToMC",      "std::vector<int>",          &m_eclPureDigitToMc);
-    //m_tree->Branch("eclPureDigitToHit",      "std::vector<int>",          &m_eclPureDigitToHit);
     m_tree->Branch("eclPureDigitCellId",     "std::vector<int>",         &m_eclPureDigitCellId);
     m_tree->Branch("eclPureDigitAmp",        "std::vector<int>",         &m_eclPureDigitAmp);
     m_tree->Branch("eclPureDigitTimeFit",    "std::vector<int>",         &m_eclPureDigitTimeFit);
@@ -524,6 +535,19 @@ void ECLDataAnalysisModule::initialize()
     m_tree->Branch("eclPureClusterDeltaL",     "std::vector<double>",    &m_eclPureClusterDeltaL);
     m_tree->Branch("eclPureClusterBeta",       "std::vector<double>",    &m_eclPureClusterBeta);
   }
+
+  ///SHOWERS
+
+  m_tree->Branch("eclShowerMultip",     &m_eclShowerMultip,     "eclShowerMultip/I");
+  m_tree->Branch("eclShowerIdx",     "std::vector<int>",       &m_eclShowerIdx);
+  m_tree->Branch("eclShowerToMc",      "std::vector<int>",       &m_eclShowerToMc);
+  m_tree->Branch("eclShowerEnergy",     "std::vector<double>",    &m_eclShowerEnergy);
+  m_tree->Branch("eclShowerUncEnergy",  "std::vector<double>",    &m_eclShowerUncEnergy);
+  m_tree->Branch("eclShowerTheta",      "std::vector<double>",    &m_eclShowerTheta);
+  m_tree->Branch("eclShowerPhi",        "std::vector<double>",    &m_eclShowerPhi);
+  m_tree->Branch("eclShowerR",          "std::vector<double>",    &m_eclShowerR);
+  m_tree->Branch("eclShowerNHits",   "std::vector<double>",       &m_eclShowerNHits);
+  m_tree->Branch("eclShowerE9oE25",     "std::vector<double>",    &m_eclShowerE9oE25);
 
   m_tree->Branch("mcMultip",     &m_mcMultip,           "mcMultip/I");
   m_tree->Branch("mcIdx",        "std::vector<int>",    &m_mcIdx);

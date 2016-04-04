@@ -8,16 +8,22 @@
 
 // basic particle ID selection requirements
 
+using std::string;
+
 // electrons and posistrons
-TCut electron = "abs(MCParticles.m_pdg) == 11";
+TCut electrons = "abs(MCParticles.m_pdg) == 11";
 // photons
-TCut photon = "abs(MCParticles.m_pdg) == 22";
+TCut photons = "abs(MCParticles.m_pdg) == 22";
 // 3 leptons and 3 neutrinos
 TCut leptons = "abs(MCParticles.m_pdg) > 10 && abs(MCParticles.m_pdg) < 20";
 // pi+, KL, K+
 TCut stableMesons = "abs(MCParticles.m_pdg) == 211 || abs(MCParticles.m_pdg) == 130 || abs(MCParticles.m_pdg) == 321";
 // p, n
 TCut stableBaryons = "abs(MCParticles.m_pdg) == 2212 || abs(MCParticles.m_pdg) == 2112";
+// Atoms or their fragments
+TCut nuclei = "abs(MCParticles.m_pdg) >= 1000000000"; 
+
+void createVertexHistograms(TTree* tree, const char* particle, const char* info, TCut& cut);  
 
 void numberOfParticles(TTree* tree);
 void vertexDistribution(TTree* tree);
@@ -123,81 +129,79 @@ void numberOfParticles(TTree* tree)
   delete h;
 }
 
+
+void createVertexHistograms(TTree* tree, const char* particle, const char* info, TCut& cut)
+{
+  // Distribution of vertex: x component
+  string name = string("hVX") + particle;
+  string title = string("MC Vertex [x] of ") + info; 
+  h = new TH1F(name.data(), title.data(), 100, -400, 400);
+
+  h->GetXaxis()->SetTitle("x [cm]");
+  h->GetYaxis()->SetTitle("Entries/bin");
+
+  string varexp = string("MCParticles.m_productionVertex_x >> hVX") + particle; 
+  tree->Draw(varexp.data(), cut);
+
+  title = string("Vertex distribution of ") + info +  " in the x-axis";
+  h->GetListOfFunctions()->Add(new TNamed("Description", title.data()));
+  h->GetListOfFunctions()->Add(new TNamed("Check",
+    "The entry in each bin should be similar to that of the reference"));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "dorisykim@ssu.ac.kr"));
+  h->Write();
+  delete h;
+
+  // y component
+  name = string("hVY") + particle;
+  title = string("MC Vertex [y] of ") + info;
+  h = new TH1F(name.data(), title.data(), 100, -400, 400);
+
+  h->GetXaxis()->SetTitle("y [cm]");
+  h->GetYaxis()->SetTitle("Entries/bin");
+
+  varexp = string("MCParticles.m_productionVertex_y >> hVY") + particle;
+  tree->Draw(varexp.data(), cut);
+
+  title = string("Vertex distribution of ") + info +  " in the y-axis";
+  h->GetListOfFunctions()->Add(new TNamed("Description", title.data()));
+  h->GetListOfFunctions()->Add(new TNamed("Check",
+    "The entry in each bin should be similar to that of the reference"));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "dorisykim@ssu.ac.kr"));
+  h->Write();
+  delete h;
+
+  // z component
+  name = string("hVZ") + particle;
+  title = string("MC Vertex [z] of ") + info;
+  h = new TH1F(name.data(), title.data(), 100, -800, 800);
+
+  h->GetXaxis()->SetTitle("z [cm]");
+  h->GetYaxis()->SetTitle("Entries/bin");
+
+  varexp = string("MCParticles.m_productionVertex_z >> hVZ") + particle;
+  tree->Draw(varexp.data(), cut);
+
+  title = string("Vertex distribution of ") + info +  " in the z-axis";
+  h->GetListOfFunctions()->Add(new TNamed("Description", title.data()));
+  h->GetListOfFunctions()->Add(new TNamed("Check",
+    "The entry in each bin should be similar to that of the reference"));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "dorisykim@ssu.ac.kr"));
+  h->Write();
+  delete h;
+
+}
+
 void vertexDistribution(TTree* tree)
 {
   // Vertex distribution
 
   // electrons/positrons
-  h = new TH1F("hVXElectron", "MC Vertex [x] of electrons/positrons", 100, -400, 400);
-  h->GetXaxis()->SetTitle("x [cm]");
-  h->GetYaxis()->SetTitle("Entries/bin");
-  tree->Draw("MCParticles.m_productionVertex_x >> hVXElectron", electron);
-  h->GetListOfFunctions()->Add(new TNamed("Description",
-    "Vertex distribution of electrons/positrons in the x-axis"));
-  h->GetListOfFunctions()->Add(new TNamed("Check",
-    "The entry in each bin should be similar to that of the reference"));
-  h->GetListOfFunctions()->Add(new TNamed("Contact", "dorisykim@ssu.ac.kr"));
-  h->Write();
-  delete h;
-
-  h = new TH1F("hVYElectron", "MC Vertex [y] of electrons/positrons", 100, -400, 400);
-  h->GetXaxis()->SetTitle("y [cm]");
-  h->GetYaxis()->SetTitle("Entries/bin");
-  tree->Draw("MCParticles.m_productionVertex_y >> hVYElectron", electron);
-  h->GetListOfFunctions()->Add(new TNamed("Description",
-    "Vertex distribution of electrons/positrons in the y-axis"));
-  h->GetListOfFunctions()->Add(new TNamed("Check",
-    "The entry in each bin should be similar to that of the reference"));
-  h->GetListOfFunctions()->Add(new TNamed("Contact", "dorisykim@ssu.ac.kr"));
-  h->Write();
-  delete h;
-
-  h = new TH1F("hVZElectron", "MC Vertex [z] of electrons/positrons", 100, -800, 800);
-  h->GetXaxis()->SetTitle("z [cm]");
-  h->GetYaxis()->SetTitle("Entries/bin");
-  tree->Draw("MCParticles.m_productionVertex_z >> hVZElectron", electron);
-  h->GetListOfFunctions()->Add(new TNamed("Description",
-    "Vertex distribution of electrons/positrons in the z-axis"));
-  h->GetListOfFunctions()->Add(new TNamed("Check",
-    "The entry in each bin should be similar to that of the reference"));
-  h->GetListOfFunctions()->Add(new TNamed("Contact", "dorisykim@ssu.ac.kr"));
-  h->Write();
-  delete h;
+  createVertexHistograms(tree, "Electron", "electrons/positrons", electrons);
 
   // photons 
-  h = new TH1F("hVXPhoton", "MC Vertex [x] of photons", 100, -400, 400);
-  h->GetXaxis()->SetTitle("x [cm]");
-  h->GetYaxis()->SetTitle("Entries/bin");
-  tree->Draw("MCParticles.m_productionVertex_x >> hVXPhoton", photon);
-  h->GetListOfFunctions()->Add(new TNamed("Description",
-    "Vertex distribution of photon in the x-axis"));
-  h->GetListOfFunctions()->Add(new TNamed("Check",
-    "The entry in each bin should be similar to that of the reference"));
-  h->GetListOfFunctions()->Add(new TNamed("Contact", "dorisykim@ssu.ac.kr"));
-  h->Write();
-  delete h;
+  createVertexHistograms(tree, "Photon", "photons", photons);
 
-  h = new TH1F("hVYPhoton", "MC Vertex [y] of photons", 100, -400, 400);
-  h->GetXaxis()->SetTitle("y [cm]");
-  h->GetYaxis()->SetTitle("Entries/bin");
-  tree->Draw("MCParticles.m_productionVertex_y >> hVYPhoton", photon);
-  h->GetListOfFunctions()->Add(new TNamed("Description",
-    "Vertex distribution of photon in the y-axis"));
-  h->GetListOfFunctions()->Add(new TNamed("Check",
-    "The entry in each bin should be similar to that of the reference"));
-  h->GetListOfFunctions()->Add(new TNamed("Contact", "dorisykim@ssu.ac.kr"));
-  h->Write();
-  delete h;
+  // nuclei
+  createVertexHistograms(tree, "Nucleus", "atoms or their fragments", nuclei);
 
-  h = new TH1F("hVZPhoton", "MC Vertex [z] of photons", 100, -800, 800);
-  h->GetXaxis()->SetTitle("z [cm]");
-  h->GetYaxis()->SetTitle("Entries/bin");
-  tree->Draw("MCParticles.m_productionVertex_z >> hVZPhoton", photon);
-  h->GetListOfFunctions()->Add(new TNamed("Description",
-    "Vertex distribution of photon in the z-axis"));
-  h->GetListOfFunctions()->Add(new TNamed("Check",
-    "The entry in each bin should be similar to that of the reference"));
-  h->GetListOfFunctions()->Add(new TNamed("Contact", "dorisykim@ssu.ac.kr"));
-  h->Write();
-  delete h;
 }

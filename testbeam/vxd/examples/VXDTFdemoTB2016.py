@@ -221,7 +221,7 @@ trackfitter = register_module('GenFitter')
 trackfitter.logging.log_level = LogLevel.FATAL
 trackfitter.param('GFTrackCandidatesColName', 'caTracks')
 trackfitter.param('FilterId', 'Kalman')
-trackfitter.param('StoreFailedTracks', True)
+# trackfitter.param('StoreFailedTracks', True)
 # trackfitter.param('FilterId', 'simpleKalman')
 trackfitter.param('UseClusters', True)
 

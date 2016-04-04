@@ -53,4 +53,3 @@ float TOPSampleTime::getTime(unsigned window, float sample) const
 }
 
 
-// ClassImp(TOPSampleTime)

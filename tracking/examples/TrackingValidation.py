@@ -35,15 +35,20 @@ import ROOT
 
 
 class Standalone(TrackingValidationRun):
+    """Run-Class to run the validation on top of a simulated root file. Most parameters can be chosen from command line."""
 
+    #: The number of events
     n_events = N_EVENTS
-    # load all components
+    #: load all components
     components = ['PXD', 'SVD', 'CDC', 'BeamPipe',
                   'MagneticFieldConstant4LimitedRCDC']
-    # will be selected by command line
+    #: will be selected by command line
     finder_module = None
+    #: will be selected by command line
     fit_geometry = None
+    #: Calculate also pull variables
     pulls = True
+    #: The contact person (Thomas Hauth)
     contact = CONTACT
 
 

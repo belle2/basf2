@@ -11,8 +11,6 @@
 #pragma link C++ class Belle2::MuidHit+;
 #pragma link C++ class Belle2::VXDTFInfoBoard+;
 #pragma link C++ class Belle2::VXDTFSecMap+;
-#pragma link C++ class Belle2::SVDHoughTrack;
-#pragma link C++ class Belle2::SVDHoughCluster;
 #pragma link C++ class Belle2::V0ValidationVertex+;
 
 #pragma link C++ class pair <bool, double>+;

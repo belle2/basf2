@@ -41,16 +41,6 @@ bool V0Fitter::rejectCandidate(genfit::MeasuredStateOnPlane& stPlus, genfit::Mea
   const TVector3& posPlus = stPlus.getPos();
   const TVector3& posMinus = stMinus.getPos();
 
-  // Starting point: point closest to axis where either track is defined
-  //
-  // This is intended to reject tracks that curl away before
-  // meeting, there are corner cases where this could throw away
-  // legitimate candidates, namely where one track makes a full
-  // circle through the detector without hitting any detectors
-  // then making it past Rstart without hitting the detector there
-  // -- while still being part of the V0.  Unlikely, I didn't find
-  // a single example in MC.  On the other hand it rejects
-  // impossible candidates.
   const double Rstart = std::min(posPlus.Perp(), posMinus.Perp());
   try {
     stPlus.extrapolateToCylinder(Rstart);

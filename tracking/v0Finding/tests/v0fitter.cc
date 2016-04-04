@@ -14,7 +14,7 @@ namespace Belle2 {
   class V0FitterTest : public ::testing::Test {
   };
 
-
+  /// Test getter for track hypotheses.
   TEST_F(V0FitterTest, GetTrackHypotheses)
   {
     V0Fitter v0Fitter;
@@ -36,6 +36,7 @@ namespace Belle2 {
     EXPECT_EQ(Const::proton, antiLambdaTracks.second);
   }
 
+  /// Test enable validation.
   TEST_F(V0FitterTest, EnableValidation)
   {
     V0Fitter v0Fitter;
@@ -45,6 +46,7 @@ namespace Belle2 {
     EXPECT_EQ(true, v0Fitter.m_validation);
   }
 
+  /// Test initialization of cuts.
   TEST_F(V0FitterTest, InitializeCuts)
   {
     V0Fitter v0Fitter;

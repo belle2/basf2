@@ -53,8 +53,6 @@ namespace Belle2 {
                             double sMax,
                             bool varField = true);
 
-    double findNextBoundaryAndStepStraight(double sMax);
-
   private:
 
     std::unique_ptr<class G4SafeNavigator> nav_;

@@ -16,7 +16,6 @@
 
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeCandidateFinder.h>
 
-#include <tracking/trackFindingCDC/processing/TrackQuality.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>

@@ -10,6 +10,8 @@ env['LIBS'] = [
 	'tracking',
 	'framework',
 	'$ROOT_LIBS',
+	'mdst_dataobjects',
+	'tracking_dataobjects'
     ]
 
 Return('env')

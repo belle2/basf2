@@ -1067,6 +1067,28 @@ namespace Belle2 {
       return result;
     }
 
+    double eclClusterIsolation(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower)
+        result = shower->getTemporaryMinTrkDistance();
+
+      return result;
+    }
+
+    double eclClusterDeltaL(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower)
+        result = shower->getTemporaryDeltaL();
+
+      return result;
+    }
+
     double minCluster2HelixDistance(const Particle* particle)
     {
       // Needed StoreArrays
@@ -1469,6 +1491,19 @@ namespace Belle2 {
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
                       "detection region in the ECL [1 - forward, 2 - barrel, 3 - backward]");
+    REGISTER_VARIABLE("clusterDeltaLTemp", eclClusterDeltaL,
+                      "Returns DeltaL for the shower shape.\n"
+                      "NOTE: this distance is calculated on the reconstructed level and is temporarily\n"
+                      "included to the ECLCLuster MDST data format for studying purposes. If it is found\n"
+                      "that it is not crucial for physics analysis then this variable will be removed in future releases.\n"
+                      "Therefore, keep in mind that this variable might be removed in the future!");
+    REGISTER_VARIABLE("minC2TDistTemp", eclClusterIsolation,
+                      "Return distance from eclCluster to nearest track hitting the ECL.\n"
+                      "NOTE: this distance is calculated on the reconstructed level and is temporarily\n"
+                      "included to the ECLCLuster MDST data format for studying purposes. If it is found\n"
+                      "to be effectively replaced by the \'minC2HDist\', which can be calculated\n"
+                      "on the analysis level then this variable will be removed in future releases.\n"
+                      "Therefore, keep in mind that this variable might be removed in the future!");
     REGISTER_VARIABLE("minC2HDist", minCluster2HelixDistance,
                       "Return distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius.");
     REGISTER_VARIABLE("goodGamma", goodGamma,

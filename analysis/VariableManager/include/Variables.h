@@ -420,6 +420,25 @@ namespace Belle2 {
     double eclClusterDetectionRegion(const Particle* particle);
 
     /**
+     * return distance from eclCluster to nearest track hitting the ECLCluster
+     * Note: This distance is calculated on the reconstructed level and is temporarily
+     * included to the ECLCLuster MDST data format for studying purposes. If it is found
+     * to be effectively replaced by the 'minCluster2HelixDistance', which can be caluclated
+     * on the analysis level then this variable will be removed in future releases.
+     * Therefore, keep in mind that this variable might be removed in the future!
+     */
+    double eclClusterIsolation(const Particle* particle);
+
+    /**
+     * return DeltaL for the shower shape
+     * Note: This distance is calculated on the reconstructed level and is temporarily
+     * included to the ECLCLuster MDST data format for studying purposes. If it is found
+     * to be not crutial for physics analysis then this variable will be removed in future releases.
+     * Therefore, keep in mind that this variable might be removed in the future!
+     */
+    double eclClusterDeltaL(const Particle* particle);
+
+    /**
      * return distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
      */
     double minCluster2HelixDistance(const Particle* particle);

@@ -24,12 +24,18 @@ namespace Belle2 {
   /** Test class for the RecoTrack object. */
   class RecoTrackTest : public ::testing::Test {
   protected:
+    /// Setup a "working environment" with store arrays for the hits and the correct relations.
     void SetUp() override
     {
+      /// Name of the RecoTrack store array.
       m_storeArrayNameOfRecoTracks = "ILoveRecoTracks";
+      /// Name of the CDC hits store array.
       m_storeArrayNameOfCDCHits = "CDCHitsAreCool";
+      /// Name of the SVD hits store array.
       m_storeArrayNameOfSVDHits = "WhatAboutSVD";
+      /// Name of the PXD hits store array.
       m_storeArrayNameOfPXDHits = "PXDsILike";
+      /// Name of the reco hit information store array.
       m_storeArrayNameOfHitInformation = "ConnectingAll";
 
       //--- Setup -----------------------------------------------------------------------
@@ -161,6 +167,7 @@ namespace Belle2 {
     EXPECT_B2FATAL(m_recoTrack->setRightLeftInformation(cdcHit, RecoHitInformation::RightLeftInformation::c_left));
   }
 
+  /** Test conversion to genfit track cands. */
   TEST_F(RecoTrackTest, testGenfitConversionOne)
   {
     // Create a genfit track cand
@@ -197,6 +204,7 @@ namespace Belle2 {
     EXPECT_EQ(exportedTrackCand.getHit(2)->getHitId(), newCreatedTrackCand.getHit(2)->getHitId());
   }
 
+  /** Test conversion from genfit track cands. */
   TEST_F(RecoTrackTest, testGenfitConversionTwo)
   {
     EXPECT_FALSE(m_recoTrack->hasCDCHits());
@@ -225,7 +233,7 @@ namespace Belle2 {
     ASSERT_EQ(cdcHitListTwo.size(), 3);
   }
 
-  /** Test simple Setters and Getters. */
+  /** Test copying a RecoTrack. */
   TEST_F(RecoTrackTest, copyRecoTrack)
   {
     StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);

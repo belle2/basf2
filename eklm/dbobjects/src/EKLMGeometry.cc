@@ -296,6 +296,16 @@ EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
 
 EKLMGeometry::~EKLMGeometry()
 {
+  if (m_NDetectorLayers != NULL)
+    delete[] m_NDetectorLayers;
+  if (m_SegmentSupportPosition != NULL)
+    delete[] m_SegmentSupportPosition;
+  if (m_StripPosition != NULL)
+    delete[] m_StripPosition;
+  if (m_BoardPosition != NULL)
+    delete[] m_BoardPosition;
+  if (m_StripBoardPosition != NULL)
+    delete[] m_StripBoardPosition;
 }
 
 EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)

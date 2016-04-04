@@ -22,44 +22,72 @@ static const bool debug = false;
 using namespace Belle2;
 
 namespace Belle2 {
+  /**
+   * Guards against leaving the physical volume.
+   *
+   * Not inheriting from G4Navigator because CheckNextStep is not
+   * virtual.
+   */
   class G4SafeNavigator {
-    // Guards against leaving the physical volume.
-    //
-    // Not inheriting from G4Navigator because CheckNextStep is not
-    // virtual.
   public:
     G4SafeNavigator() = default;
     ~G4SafeNavigator() = default;
 
+    /**
+     * Returns the Geant4 world volume
+     */
     G4VPhysicalVolume* GetWorldVolume() const { return nav_.GetWorldVolume(); }
+
+    /**
+     * Sets the Geant4 world volume
+     */
     void SetWorldVolume(G4VPhysicalVolume* pWorld)
     {
       nav_.SetWorldVolume(pWorld);
       worldsolid_ = pWorld->GetLogicalVolume()->GetSolid();
     }
 
+    /**
+     * Use Geant4's LocateGlobalPointAndSetup to get a G4VPhysicalVolume
+     * or use cached values from previous calls
+     */
     G4VPhysicalVolume* LocateGlobalPointAndSetup(const G4ThreeVector& point,
                                                  const G4ThreeVector* direction = 0,
                                                  const G4bool pRelativeSearch = true,
                                                  const G4bool ignoreDirection = true);
 
+    /**
+     * Check if within world volume and call Geant4's CheckNextStep
+     */
     G4double CheckNextStep(const G4ThreeVector& pGlobalPoint,
                            const G4ThreeVector& pDirection,
                            const G4double pCurrentProposedStepLength,
                            G4double& pNewSafety);
 
+    /**
+     * Call Geant4's ResetHierarchyAndLocate to get a G4VPhysicalVolume
+     * or use cached values from previous calls
+     */
     G4VPhysicalVolume* ResetHierarchyAndLocate(const G4ThreeVector& point,
                                                const G4ThreeVector& direction,
                                                const G4TouchableHistory& h);
+
+    /**
+     * Call Geant4's CreateTouchableHistory
+     */
     G4TouchableHistory* CreateTouchableHistory() const
     {
       return nav_.CreateTouchableHistory();
     }
   private:
+    /** the last point which has been queried with G4 */
     G4ThreeVector lastpoint_;
+    /** the last volume which has been queried */
     G4VPhysicalVolume* lastvolume_{0};
+    /** Geant4's navigator which calls are forwarded to */
     G4Navigator nav_;
-    const G4VSolid* worldsolid_{0};
+    /** The topmost solid of the G4 world */
+    const G4VSolid* worldsolid_ {0};
   };
 }
 

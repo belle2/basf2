@@ -72,6 +72,7 @@ namespace Belle2 {
 
     // FIXME 2015-05-26 These two functions are to remain static as
     // long as they are also used by the GenFitterModule.
+    /** friend method in GenFitterModule */
     friend void GenFitterModule::event();
     static HitPatternCDC getHitPatternCDC(const genfit::Track&); /**< returns HitPatternCDC of the Track */
     static HitPatternVXD getHitPatternVXD(const genfit::Track&); /**< returns the HitPatternVXD of the Track*/

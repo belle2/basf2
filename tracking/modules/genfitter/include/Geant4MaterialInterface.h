@@ -40,6 +40,9 @@ namespace Belle2 {
                                double& radiationLength,
                                double& mEE);
 
+    /** get the material parameters as the method above, but fill directly
+     * into a genfit::MaterialProperties class
+     */
     void getMaterialParameters(genfit::MaterialProperties& parameters);
 
     /** @brief Make a step (following the curvature) until step length
@@ -55,7 +58,10 @@ namespace Belle2 {
 
   private:
 
+    /** holds a object of G4SafeNavigator, which is located in Geant4MaterialInterface.cc */
     std::unique_ptr<class G4SafeNavigator> nav_;
+
+    /** the volume the extraoplation is currenly located in*/
     const class G4VPhysicalVolume* currentVolume_;
   };
 

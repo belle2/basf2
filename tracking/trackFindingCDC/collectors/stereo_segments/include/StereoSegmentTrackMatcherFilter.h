@@ -24,9 +24,12 @@ namespace Belle2 {
     class CDCTrack;
     class CDCRecoSegment2D;
 
+    /// A Matcher Algorithm for adding stereo segments to tracks using a configurable filter (e.g. TMVA).
     class StereoSegmentTrackMatcherFilter : public FilterBasedMatcher<StereoSegmentFilterFactory> {
     public:
+      /// Use tracks as collector items.
       typedef CDCTrack CollectorItem;
+      /// Use segments as collection items.
       typedef CDCRecoSegment2D CollectionItem;
 
       /// Empty desctructor. Everything is handled via terminate.

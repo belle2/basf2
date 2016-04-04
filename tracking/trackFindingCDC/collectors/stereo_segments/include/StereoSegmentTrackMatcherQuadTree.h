@@ -30,9 +30,16 @@ namespace Belle2 {
     class CDCTrack;
     class CDCRecoSegment2D;
 
+    /**
+     * A matcher algorithm for using a stereo quad tree for matching stereo segments
+     * to tracks. After the quad tree has given a yes to a match, the configured filter is used to
+     * give a weight to the relation.
+     */
     class StereoSegmentTrackMatcherQuadTree : public QuadTreeBasedMatcher<SegmentZ0TanLambdaLegendre> {
     public:
+      /// Use tracks as collector items.
       typedef CDCTrack CollectorItem;
+      /// Use (stereo) segments as collection items.
       typedef CDCRecoSegment2D CollectionItem;
 
       /// Empty desctructor. Everything is handled via terminate.
@@ -52,6 +59,15 @@ namespace Belle2 {
       /// Set to false to skip the B2B check (good for curlers).
       bool m_param_checkForB2BTracks = true;
 
+      /**
+       * Before filling the quad tree, check each reconstructed segment to be applicable to this track.
+       * @param recoSegment3D the reconstructed segment that should be matched to the trac
+       * @param isCurler a flag if the track is a curler
+       * @param shiftValue 2 * TMath::Pi() * radius of the track
+       * @param lastSuperLayer the last superlayer of the track
+       * @param lastArcLength2D the last arc length 2d of the track
+       * @return True, if the match can be m ade (the quad tree has still to give his yes too).
+       */
       bool checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D, const bool isCurler, const double shiftValue,
                               const ISuperLayer lastSuperLayer, const double lastArcLength2D) const;
     };

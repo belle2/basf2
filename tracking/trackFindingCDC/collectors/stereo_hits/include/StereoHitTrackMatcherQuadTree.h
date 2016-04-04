@@ -86,7 +86,7 @@ namespace Belle2 {
       /// Set to false to skip the in-wire-bound check (good for second stage).
       double m_param_checkForInWireBoundsFactor = 1.0;
 
-
+      /// The filter factory we use to create a filter which should later decide which connections to take if there is more than one possibility.
       StereoHitFilterFactory m_filterFactory;
       /// The used filter.
       std::unique_ptr<BaseStereoHitFilter> m_stereoHitFilter;

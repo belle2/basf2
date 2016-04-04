@@ -22,6 +22,13 @@ namespace Belle2 {
      */
     class StereoHitLessOperator {
     public:
+      /**
+       * Main method of the comparator class which does the operation (according to std::less).
+       * @param lhs: First CDCRLTaggedWireHit to compare.
+       * @param rhs: Second CDCRLTaggedWireHit to compare.
+       *
+       * @return True, if the wire hit of the lhs is less than the wire hit of the rhs.
+       */
       bool operator()(const CDCRLTaggedWireHit* lhs, const CDCRLTaggedWireHit* rhs) const
       {
         return lhs->getWireHit() < rhs->getWireHit();

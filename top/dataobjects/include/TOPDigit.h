@@ -95,13 +95,6 @@ namespace Belle2 {
     void setChannel(unsigned int channel) {m_channel = channel;}
 
     /**
-     * Sets hardware channel number (0-based)
-     * @param channel hardware channel number
-     */
-    void setHardwareChannelID(unsigned int channel)  __attribute__((deprecated("Please use setChannel()")))
-    {m_channel = channel;}
-
-    /**
      * Sets first ASIC window number of the merged waveform this hit is taken from
      * @param window ASIC window number
      */
@@ -138,13 +131,6 @@ namespace Belle2 {
      * @return module ID
      */
     int getModuleID() const { return m_moduleID; }
-
-    /**
-     * Returns module ID
-     * @return module ID
-     */
-    int getBarID() const __attribute__((deprecated("Please use getModuleID()")))
-    { return m_moduleID; }
 
     /**
      * Returns pixel ID
@@ -201,13 +187,6 @@ namespace Belle2 {
     int getPMTPixel() const {return getPMTPixelCol() + (getPMTPixelRow() - 1) * 4;}
 
     /**
-     * Returns pixel ID
-     * @return software channel ID
-     */
-    int getChannelID() const  __attribute__((deprecated("Please use getPixelID()")))
-    { return m_pixelID; }
-
-    /**
      * Returns t0-subtracted and calibrated time in [ns] (converted back from TDC counts)
      * @return time
      */
@@ -236,13 +215,6 @@ namespace Belle2 {
      * @return hardware channel number
      */
     unsigned int getChannel() const { return m_channel; }
-
-    /**
-     * Returns hardware channel number
-     * @return hardware channel number
-     */
-    unsigned int getHardwareChannelID() const __attribute__((deprecated("Please use getChannel()")))
-    { return m_channel; }
 
     /**
      * Returns ASIC channel number

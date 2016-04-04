@@ -13,6 +13,8 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
 #include <cdc/dataobjects/CDCRawHitWaveForm.h>
+// DB objects
+#include <cdc/dbobjects/CDCChannelMap.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -20,6 +22,12 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+// framework - Database
+#include <framework/database/Database.h>
+#include <framework/database/DBArray.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/database/DBImportArray.h>
+
 
 #include <sstream>
 #include <iostream>
@@ -60,6 +68,7 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("channelTrig", m_channelTrig, "Channel for the trigger.", 1);
   addParam("subtractTrigTiming", m_subtractTrigTiming, "Enable to subtract the trigger timing from TDCs.", false);
   addParam("tdcOffset", m_tdcOffset, "TDC offset (in TDC count).", 0);
+  addParam("enableDatabase", m_enableDatabase, "Enable database to read the channel map.", false);
 
 }
 
@@ -437,27 +446,40 @@ const WireID CDCUnpackerModule::getWireID(int iBoard, int iCh)
 void CDCUnpackerModule::loadMap()
 {
 
-  if (! FileSystem::fileExists(m_xmlMapFileName)) {
-    B2ERROR("CDC unpacker can't fine a filename: " << m_xmlMapFileName);
-    exit(1);
+  if (m_enableDatabase == false) {
+    // Real the channel map from the local text.
+    if (! FileSystem::fileExists(m_xmlMapFileName)) {
+      B2ERROR("CDC unpacker can't find a filename: " << m_xmlMapFileName);
+      exit(1);
+    }
+
+
+    ifstream ifs;
+    ifs.open(m_xmlMapFileName.c_str());
+    int isl;
+    int icl;
+    int iw;
+    int iBoard;
+    int iCh;
+
+    while (!ifs.eof()) {
+      ifs >>  isl >> icl >> iw >> iBoard >> iCh;
+      const WireID  wireId(isl, icl, iw);
+      m_map[iBoard][iCh] = wireId;
+    }
+  } else {
+    // Real the channel map from the database.
+    DBArray<CDCChannelMap> channelMaps;
+    for (const auto& cm : channelMaps) {
+      const int isl = cm.getISuperLayer();
+      const int il = cm.getILayer();
+      const int iw = cm.getIWire();
+      const int iBoard = cm.getBoardID();
+      const int iCh = cm.getBoardChannel();
+      const WireID  wireId(isl, il, iw);
+      m_map[iBoard][iCh] = wireId;
+    }
   }
-
-
-  ifstream ifs;
-  ifs.open(m_xmlMapFileName.c_str());
-  int isl;
-  int icl;
-  int iw;
-  int iBoard;
-  int iCh;
-
-  while (!ifs.eof()) {
-    ifs >>  isl >> icl >> iw >> iBoard >> iCh;
-    const WireID  wireId(isl, icl, iw);
-    m_map[iBoard][iCh] = wireId;
-  }
-
-
 }
 
 

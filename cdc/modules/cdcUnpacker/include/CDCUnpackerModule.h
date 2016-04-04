@@ -280,6 +280,12 @@ namespace Belle2 {
        */
       bool m_subtractTrigTiming;
 
+      /**
+       * Enable/Disable to read the channel map
+       * from the database.
+       */
+      bool m_enableDatabase;
+
     };//end class declaration
 
 

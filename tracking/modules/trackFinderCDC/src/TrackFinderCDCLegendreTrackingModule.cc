@@ -133,7 +133,8 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
   // if holes exsist then track is splitted
   m_cdcTrackList.doForAllTracks([&](CDCTrack & track) {
     if (track.size() > 3) {
-      TrackQuality trackQuality(track);
+      TrackQuality::maskHitsWithPoorQuality(track);
+      HitProcessor::deleteAllMarkedHits(track);
       HitProcessor::splitBack2BackTrack(track);
 
       TrackQualityTools::normalizeTrack(track);

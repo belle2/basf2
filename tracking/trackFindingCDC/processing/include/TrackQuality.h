@@ -24,16 +24,19 @@ namespace Belle2 {
 
     public:
 
-      TrackQuality(CDCTrack& track) : m_track(track)
+      static void maskHitsWithPoorQuality(CDCTrack& track)
       {
-        double apogeeArcLenght = fabs(m_track.getStartTrajectory3D().getGlobalCircle().perimeter()) / 4.;
+        double apogeeArcLenght = fabs(track.getStartTrajectory3D().getGlobalCircle().perimeter()) / 4.;
+
         std::vector<int> nHitsStartingArm;
         std::vector<int> nHitsEndingArm;
 
+        std::vector<double> startingArmSLayers;
+        std::vector<double> endingArmSLayers;
 
         for (int ii = 0; ii <= 8; ii++) {
-          m_startingArmSLayers.push_back(0);
-          m_endingArmSLayers.push_back(0);
+          startingArmSLayers.push_back(0);
+          endingArmSLayers.push_back(0);
           if (ii == 0) {
             nHitsStartingArm.push_back(10);
             nHitsEndingArm.push_back(10);
@@ -43,46 +46,37 @@ namespace Belle2 {
           }
         }
 
-        for (const CDCRecoHit3D& hit : m_track) {
-//          B2INFO("arc: " << hit.getArcLength2D() << "; apogee: " << apogeeArcLenght);
+        for (const CDCRecoHit3D& hit : track) {
           if ((hit.getArcLength2D() <= apogeeArcLenght) && (hit.getArcLength2D() > 0)) {
-            m_startingArmSLayers[hit->getISuperLayer()]++;
+            startingArmSLayers[hit->getISuperLayer()]++;
           } else {
-            m_endingArmSLayers[hit->getISuperLayer()]++;
+            endingArmSLayers[hit->getISuperLayer()]++;
           }
         }
 
         for (int ii = 0; ii <= 8; ii++) {
-          m_startingArmSLayers[ii] = (double)m_startingArmSLayers[ii] / nHitsStartingArm[ii];
-          m_endingArmSLayers[ii] = (double)m_endingArmSLayers[ii] / nHitsEndingArm[ii];
+          startingArmSLayers[ii] = (double)startingArmSLayers[ii] / nHitsStartingArm[ii];
+          endingArmSLayers[ii] = (double)endingArmSLayers[ii] / nHitsEndingArm[ii];
         }
 
 
-        m_startingSlayer = startingSLayer();
-        m_endingSlayer = endingSLayer();
+        int startingSlayer = startingSLayer(startingArmSLayers);
+        int endingSlayer = endingSLayer(startingArmSLayers);
 
-        if (hasHoles()) {
-//          B2WARNING("Track has holes!");
+        std::vector<int> emptyStartingSLayers;
+        std::vector<int> emptyEndingSLayers;
 
-          sort(m_emptyStartingSLayers.begin(), m_emptyStartingSLayers.end());
+        if (hasHoles(startingArmSLayers, startingSlayer, endingArmSLayers, endingSlayer, emptyStartingSLayers, emptyEndingSLayers)) {
+          sort(emptyStartingSLayers.begin(), emptyStartingSLayers.end());
 
-          for (int breakSLayer : m_emptyStartingSLayers) {
-//          int breakSLayer = m_emptyStartingSLayers.front();
-
-//            B2INFO("Break layer: " << breakSLayer);
-            /*
-                        m_track.erase(
-                        std::remove_if(m_track.begin(), m_track.end(), [&breakSLayer, &apogeeArcLenght](const CDCRecoHit3D & hit) {
-                          if(hit.getArcLength2D() >= apogeeArcLenght || hit.getArcLength2D() < 0) return true;
-                          if(hit.getISuperLayer() >= breakSLayer) return true;
-                          return false;
-                        }),
-                        m_track.end());
-                      }
-            */
-            for (CDCRecoHit3D& hit : m_track) {
-              if (hit.getArcLength2D() >= apogeeArcLenght || hit.getArcLength2D() < 0) hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
-              if (hit.getISuperLayer() >= breakSLayer) hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
+          for (int breakSLayer : emptyStartingSLayers) {
+            for (CDCRecoHit3D& hit : track) {
+              if (hit.getArcLength2D() >= apogeeArcLenght || hit.getArcLength2D() < 0) {
+                hit.getWireHit().getAutomatonCell().setMaskedFlag();
+              }
+              if (hit.getISuperLayer() >= breakSLayer) {
+                hit.getWireHit().getAutomatonCell().setMaskedFlag();
+              }
             }
 
           }
@@ -90,72 +84,61 @@ namespace Belle2 {
 
       };
 
-      int startingSLayer()
+    private:
+      static int startingSLayer(const std::vector<double>& startingArmSLayers)
       {
-        std::vector<double>::iterator startSlIt;
-        startSlIt = std::find_if(m_startingArmSLayers.begin(), m_startingArmSLayers.end(), [](double val) {return val > 0;});
+        std::vector<double>::const_iterator startSlIt;
+        startSlIt = std::find_if(startingArmSLayers.begin(), startingArmSLayers.end(), [](double val) {return val > 0;});
 
-        if (startSlIt != m_startingArmSLayers.end())
-          return startSlIt - m_startingArmSLayers.begin();
+        if (startSlIt != startingArmSLayers.end())
+          return startSlIt - startingArmSLayers.begin();
         else
           return 8;
       }
 
 
-      int endingSLayer()
+      static int endingSLayer(const std::vector<double>& startingArmSLayers)
       {
-        std::vector<double>::reverse_iterator endSlIt;
-        endSlIt = std::find_if(m_startingArmSLayers.rbegin(), m_startingArmSLayers.rend(), [](double val) {return val > 0;});
+        std::vector<double>::const_reverse_iterator endSlIt;
+        endSlIt = std::find_if(startingArmSLayers.rbegin(), startingArmSLayers.rend(), [](double val) {return val > 0;});
 
-        if (endSlIt != m_startingArmSLayers.rend())
-          return 8 - (endSlIt - m_startingArmSLayers.rbegin());
+        if (endSlIt != startingArmSLayers.rend())
+          return 8 - (endSlIt - startingArmSLayers.rbegin());
         else
           return 0;
       }
 
-      bool isTwoSided()
+      static bool isTwoSided(const std::vector<double>& startingArmSLayers, const std::vector<double>& endingArmSLayers)
       {
-        if ((std::accumulate(m_startingArmSLayers.begin(), m_startingArmSLayers.end(), 0) > 0) &&
-            (std::accumulate(m_endingArmSLayers.begin(), m_endingArmSLayers.end(), 0) > 0)) return true;
+        if ((std::accumulate(startingArmSLayers.begin(), startingArmSLayers.end(), 0) > 0) &&
+            (std::accumulate(endingArmSLayers.begin(), endingArmSLayers.end(), 0) > 0)) return true;
         else return false;
       }
 
-      bool hasHoles()
+      static bool hasHoles(const std::vector<double>& startingArmSLayers, int startingSlayer,
+                           const std::vector<double>& endingArmSLayers, int endingSlayer,
+                           std::vector<int>& emptyStartingSLayers, std::vector<int>& emptyEndingSLayers)
       {
-        std::vector<double>::iterator first = m_startingArmSLayers.begin() + m_startingSlayer;
-        std::vector<double>::iterator last = m_startingArmSLayers.begin() + m_endingSlayer;
+        std::vector<double>::const_iterator first = startingArmSLayers.begin() + startingSlayer;
+        std::vector<double>::const_iterator last = startingArmSLayers.begin() + endingSlayer;
 
         for (; first <= last;) {
-          if (*first == 0)m_emptyStartingSLayers.push_back(first - m_startingArmSLayers.begin());
+          if (*first == 0)emptyStartingSLayers.push_back(first - startingArmSLayers.begin());
           first = first + 2;
         }
 
-        if (isTwoSided()) {
-          std::vector<double>::iterator rfirst = m_endingArmSLayers.begin() + m_startingSlayer;
-          std::vector<double>::iterator rlast = m_endingArmSLayers.begin() + m_endingSlayer;
+        if (isTwoSided(startingArmSLayers, endingArmSLayers)) {
+          std::vector<double>::const_iterator rfirst = endingArmSLayers.begin() + startingSlayer;
+          std::vector<double>::const_iterator rlast = endingArmSLayers.begin() + endingSlayer;
 
           for (; rfirst <= rlast; rfirst = rfirst + 2) {
-            if (*rfirst == 0)m_emptyEndingSLayers.push_back(rfirst - m_endingArmSLayers.begin());
+            if (*rfirst == 0)emptyEndingSLayers.push_back(rfirst - endingArmSLayers.begin());
           }
         }
 
-        if (m_emptyStartingSLayers.size() > 0) return true;
+        if (emptyStartingSLayers.size() > 0) return true;
         else return false;
       }
-
-    private:
-
-      std::vector<double> m_startingArmSLayers;
-      std::vector<double> m_endingArmSLayers;
-
-      int m_startingSlayer;
-      int m_endingSlayer;
-
-      std::vector<int> m_emptyStartingSLayers;
-      std::vector<int> m_emptyEndingSLayers;
-
-
-      CDCTrack& m_track;
 
     };
 

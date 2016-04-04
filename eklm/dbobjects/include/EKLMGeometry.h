@@ -87,6 +87,11 @@ namespace Belle2 {
       EndcapStructureGeometry& operator=(
         const EndcapStructureGeometry& geometry);
 
+      /**
+       * Destructor.
+       */
+      ~EndcapStructureGeometry();
+
       double Phi;
       double Dphi;
       int Nsides;

@@ -74,6 +74,16 @@ EKLMGeometry::EndcapStructureGeometry::operator=(
   return *this;
 }
 
+EKLMGeometry::EndcapStructureGeometry::~EndcapStructureGeometry()
+{
+  if (Z != NULL)
+    delete[] Z;
+  if (Rmin != NULL)
+    delete[] Rmin;
+  if (Rmax != NULL)
+    delete[] Rmax;
+}
+
 EKLMGeometry::ElementPosition::ElementPosition()
 {
   InnerR = 0;

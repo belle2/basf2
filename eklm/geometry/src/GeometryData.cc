@@ -698,9 +698,6 @@ EKLM::GeometryData::~GeometryData()
 {
   if (m_Geometry != NULL)
     delete m_Geometry;
-  free(m_EndcapStructureGeometry.Z);
-  free(m_EndcapStructureGeometry.Rmin);
-  free(m_EndcapStructureGeometry.Rmax);
   free(m_StripLenToAll);
   free(m_StripAllToLen);
   freeShieldDetail(&m_ShieldGeometry.DetailA);

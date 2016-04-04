@@ -322,19 +322,12 @@ void HitProcessor::maskHitsWithPoorQuality(CDCTrack& track)
 {
   double apogeeArcLenght = fabs(track.getStartTrajectory3D().getGlobalCircle().perimeter()) / 4.;
 
-  std::vector<int> typicalNumberOfHitsPerSuperlayer;
-
   std::vector<double> startingArmSLayers;
   std::vector<double> endingArmSLayers;
 
   for (int ii = 0; ii <= 8; ii++) {
     startingArmSLayers.push_back(0);
     endingArmSLayers.push_back(0);
-    if (ii == 0) {
-      typicalNumberOfHitsPerSuperlayer.push_back(10);
-    } else {
-      typicalNumberOfHitsPerSuperlayer.push_back(6);
-    }
   }
 
   // Count the number of hits in the outgoing and ingoing arm per superlayer.
@@ -346,23 +339,14 @@ void HitProcessor::maskHitsWithPoorQuality(CDCTrack& track)
     }
   }
 
-  // Normalize the number of hits to a percentage.
-  for (int ii = 0; ii <= 8; ii++) {
-    startingArmSLayers[ii] /= static_cast<double>(typicalNumberOfHitsPerSuperlayer[ii]);
-    endingArmSLayers[ii] /= static_cast<double>(typicalNumberOfHitsPerSuperlayer[ii]);
-  }
-
-  // Find the start end end point.
-  int startingSlayer = startingSLayer(startingArmSLayers);
-  int endingSlayer = endingSLayer(startingArmSLayers);
-
   std::vector<int> emptyStartingSLayers;
   std::vector<int> emptyEndingSLayers;
 
-  if (hasHoles(startingArmSLayers, startingSlayer, endingSlayer, endingArmSLayers, emptyStartingSLayers, emptyEndingSLayers)) {
+  if (hasHoles(startingArmSLayers, endingArmSLayers, emptyStartingSLayers, emptyEndingSLayers)) {
     sort(emptyStartingSLayers.begin(), emptyStartingSLayers.end());
 
-    for (int breakSLayer : emptyStartingSLayers) {
+    if (emptyStartingSLayers.size() > 0) {
+      const int breakSLayer = emptyStartingSLayers.front();
       for (CDCRecoHit3D& hit : track) {
         if (hit.getArcLength2D() >= apogeeArcLenght || hit.getArcLength2D() < 0) {
           hit.getWireHit().getAutomatonCell().setMaskedFlag();
@@ -371,8 +355,17 @@ void HitProcessor::maskHitsWithPoorQuality(CDCTrack& track)
           hit.getWireHit().getAutomatonCell().setMaskedFlag();
         }
       }
-
     }
+
+    if (emptyEndingSLayers.size() > 0) {
+      const int breakSLayer = emptyEndingSLayers.back();
+      for (CDCRecoHit3D& hit : track) {
+        if (hit.getISuperLayer() >= breakSLayer) {
+          hit.getWireHit().getAutomatonCell().setMaskedFlag();
+        }
+      }
+    }
+
   }
 
   deleteAllMarkedHits(track);
@@ -409,10 +402,16 @@ bool HitProcessor::isTwoSided(const std::vector<double>& startingArmSLayers, con
   else return false;
 }
 
-bool HitProcessor::hasHoles(const std::vector<double>& startingArmSLayers, int startingSlayer, int endingSlayer,
+bool HitProcessor::hasHoles(const std::vector<double>& startingArmSLayers,
                             const std::vector<double>& endingArmSLayers,
                             std::vector<int>& emptyStartingSLayers, std::vector<int>& emptyEndingSLayers)
 {
+
+  // Find the start end end point.
+  int startingSlayer = startingSLayer(startingArmSLayers);
+  int endingSlayer = endingSLayer(startingArmSLayers);
+
+
   std::vector<double>::const_iterator first = startingArmSLayers.begin() + startingSlayer;
   std::vector<double>::const_iterator last = startingArmSLayers.begin() + endingSlayer;
 
@@ -423,6 +422,11 @@ bool HitProcessor::hasHoles(const std::vector<double>& startingArmSLayers, int s
   }
 
   if (isTwoSided(startingArmSLayers, endingArmSLayers)) {
+
+    // Find the start end end point.
+    startingSlayer = startingSLayer(endingArmSLayers);
+    endingSlayer = endingSLayer(endingArmSLayers);
+
     std::vector<double>::const_iterator rfirst = endingArmSLayers.begin() + startingSlayer;
     std::vector<double>::const_iterator rlast = endingArmSLayers.begin() + endingSlayer;
 
@@ -433,5 +437,5 @@ bool HitProcessor::hasHoles(const std::vector<double>& startingArmSLayers, int s
     }
   }
 
-  return emptyStartingSLayers.size() > 0;
+  return emptyStartingSLayers.size() > 0 or emptyEndingSLayers.size() > 0;
 }

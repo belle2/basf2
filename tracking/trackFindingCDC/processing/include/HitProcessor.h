@@ -104,7 +104,7 @@ namespace Belle2 {
 
       /** Fill the two arrays emptyStartingSLayers (for the outgoing arm) and emptyEndingSLayers (for the ingoing arm) with the superlayers between start end end of the track that are empty.
        * Return true if we have found such a case. */
-      static bool hasHoles(const std::vector<double>& startingArmSLayers, int startingSlayer, int endingSlayer,
+      static bool hasHoles(const std::vector<double>& startingArmSLayers,
                            const std::vector<double>& endingArmSLayers,
                            std::vector<int>& emptyStartingSLayers, std::vector<int>& emptyEndingSLayers);
     };

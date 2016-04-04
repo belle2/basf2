@@ -156,9 +156,6 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
   track.sortByArcLength2D();
 }
 
-
-// Remove all hits which can not belong to the track, as the particle can not exit and enter the CDC again.
-// Works not very good
 void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track, double m_outerCylindricalRFactor)
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
@@ -239,9 +236,6 @@ void TrackQualityTools::removeHitsAfterLayerBreak2(CDCTrack& track)
   }
 }
 
-
-// Search for consecutive hits with 2D-distance below 50 and layer-delta below 4. If the number of consecutive hits is below 7, remove them.
-// Works quite well for finding large "breaks" in the track.
 void TrackQualityTools::removeHitsAfterLayerBreak(CDCTrack& track, double m_maximumArcLength2DDistance)
 {
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
@@ -300,9 +294,9 @@ void TrackQualityTools::removeHitsAfterLayerBreak(CDCTrack& track, double m_maxi
   }
 }
 
-void TrackQualityTools::removeHitsIfSmall(CDCTrack& track, unsigned int m_minimalHits)
+void TrackQualityTools::removeHitsIfSmall(CDCTrack& track, unsigned int minimalHits)
 {
-  const bool deleteTrack = track.size() < m_minimalHits;
+  const bool deleteTrack = track.size() < minimalHits;
 
   if (deleteTrack) {
     for (const CDCRecoHit3D& recoHit : track) {
@@ -311,7 +305,7 @@ void TrackQualityTools::removeHitsIfSmall(CDCTrack& track, unsigned int m_minima
   }
 }
 
-void TrackQualityTools::removeHitsInTheBeginningIfAngleLarge(CDCTrack& track, double m_maximalAngle)
+void TrackQualityTools::removeHitsInTheBeginningIfAngleLarge(CDCTrack& track, double maximalAngle)
 {
   double lastAngle = NAN;
   bool removeAfterThis = false;
@@ -326,7 +320,7 @@ void TrackQualityTools::removeHitsInTheBeginningIfAngleLarge(CDCTrack& track, do
     if (not std::isnan(lastAngle)) {
       const double delta = currentAngle - lastAngle;
       const double normalizedDelta = std::min(TVector2::Phi_0_2pi(delta), TVector2::Phi_0_2pi(-delta));
-      if (fabs(normalizedDelta) > m_maximalAngle) {
+      if (fabs(normalizedDelta) > maximalAngle) {
         removeAfterThis = true;
         recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
       }

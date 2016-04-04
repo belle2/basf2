@@ -65,18 +65,18 @@ namespace Belle2 {
      */
     virtual void terminate();
   private:
-    std::string m_GFTrackColName;
-    std::string m_TFRColName;
-    std::string m_TrackColName;
-    std::string m_V0ColName;
+    std::string m_GFTrackColName; ///< InputcolName of the genfit Tracks.
+    std::string m_TFRColName; ///< OutputColName of the TrackFitResults matching to the created V0s.
+    std::string m_TrackColName; ///< InputColName of the Tracks.
+    std::string m_V0ColName; ///< OutputColName of the V0
 
-    double m_beamPipeRadius;
-    double m_vertexChi2CutInside;
-    double m_massWindowKshortInside;
-    double m_vertexChi2CutOutside;
+    double m_beamPipeRadius; ///< Radius where inside/outside beampipe is defined.
+    double m_vertexChi2CutInside; ///< Chi2 cut for V0s inside of the beampipe. Applies to all.
+    double m_massWindowKshortInside; ///< Invariant mass cut for reconstructed Kshort inside the beampipe.
+    double m_vertexChi2CutOutside; ///< Chi2 cut for V0s outside of the beampipe. Applies to all.
 
-    bool m_validation;
-    std::string m_V0ValidationVertexColName;
+    bool m_validation; ///< Flag if use validation.
+    std::string m_V0ValidationVertexColName; ///< OutputColName of the V0ValidationVertex
   };
 }
 #endif

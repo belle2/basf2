@@ -23,10 +23,10 @@ namespace Belle2 {
       /// The type of the underlaying HoughBox (copied from the udnerlaying hit algorithm)
       typedef typename AHitInBoxAlgorithm::HoughBox HoughBox;
 
-      /*  When called, it goes through all items in the range object (e.g. a CDCRecoSegment) and checks the
-      *  HitInBox algorithm passed as a template argument. If there is a certain amount of items of the range
-      *  in the box, it returns the number of items as a weight, otherwise it returns NAN;
-      */
+      /**  When called, it goes through all items in the range object (e.g. a CDCRecoSegment) and checks the
+       *  HitInBox algorithm passed as a template argument. If there is a certain amount of items of the range
+       *  in the box, it returns the number of items as a weight, otherwise it returns NAN;
+       */
       template<class ARangeObject>
       inline Weight operator()(const ARangeObject& rangeObject,
                                const HoughBox* box)
@@ -49,6 +49,7 @@ namespace Belle2 {
         }
       }
 
+      /// The minimal percentage of items of a given range that must belong to the box the be called a hit.
       const double minimalRatio = 0.6;
     };
   }

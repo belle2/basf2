@@ -22,7 +22,7 @@ namespace Belle2 {
     class OffOrigin : public T {
 
     public:
-      // Type of the base class
+      /// Type of the base class
       using Super = T;
 
       /// Using the constructor of the base class.

@@ -74,6 +74,7 @@ namespace Belle2 {
         }
       }
 
+      /// Find all children node at maximum level and add them to the result list. Skip nodes if their weight is below minWeight.
       template<class AItemInDomainMeasure>
       std::vector<std::pair<ADomain, std::vector<T> > >
       findHeavyLeavesDisjoint(AItemInDomainMeasure& weightItemInDomain,
@@ -86,6 +87,7 @@ namespace Belle2 {
         return findLeavesDisjoint(weightItemInDomain, maxLevel, skipLowWeightNode);
       }
 
+      /// Find all children node at maximum level and add them to the result list. Skip nodes if skipNode returns true.
       template<class AItemInDomainMeasure, class ASkipNodePredicate>
       std::vector<std::pair<ADomain,  std::vector<T> > >
       findLeavesDisjoint(AItemInDomainMeasure& weightItemInDomain,
@@ -120,7 +122,13 @@ namespace Belle2 {
         return found;
       }
 
-
+      /**
+       * Go through all children until maxLevel is reached and find the heaviest leaves.
+       *
+       * For this, the single heaviest leaf is found and added to an internal list.
+       * The process is repeated until no leaf can be found anymore.
+       * A node is skipped if the weight is below minWeight.
+       */
       template<class AItemInDomainMeasure>
       std::vector<std::pair<ADomain,  std::vector<T> > >
       findHeaviestLeafRepeated(AItemInDomainMeasure& weightItemInDomain,
@@ -133,6 +141,13 @@ namespace Belle2 {
         return findHeaviestLeafRepeated(weightItemInDomain, maxLevel, skipLowWeightNode);
       }
 
+      /**
+       * Go through all children until maxLevel is reached and find the heaviest leaves.
+       *
+       * For this, the single heaviest leaf is found and added to an internal list.
+       * The process is repeated until no leaf can be found anymore.
+       * A node is skipped if skipNode is returns true for this node.
+       */
       template<class AItemInDomainMeasure, class ASkipNodePredicate>
       std::vector<std::pair<ADomain,  std::vector<T> > >
       findHeaviestLeafRepeated(AItemInDomainMeasure& weightItemInDomain,
@@ -152,6 +167,11 @@ namespace Belle2 {
         return found;
       }
 
+      /**
+       * Go through all children until the maxLevel is reached and find the leaf with the highest weight.
+       * If no node could be found, return an empty list, otherwise return a list with just on element.
+       * A node is skipped if skipNode is returns true for this node.
+       */
       template<class AItemInDomainMeasure, class ASkipNodePredicate>
       std::unique_ptr<std::pair<ADomain,  std::vector<T> > >
       findHeaviestLeafSingle(AItemInDomainMeasure& weightItemInDomain,
@@ -171,7 +191,11 @@ namespace Belle2 {
         return found;
       }
 
-
+      /**
+       * Go through all children until the maxLevel is reached and find the leaf with the highest weight.
+       * If no node could be found, return a nullptr.
+       * A node is skipped if skipNode is returns true for this node.
+       */
       template<class AItemInDomainMeasure, class ASkipNodePredicate>
       Node* findHeaviestLeaf(AItemInDomainMeasure& weightItemInDomain,
                              const size_t maxLevel,
@@ -206,6 +230,10 @@ namespace Belle2 {
       }
 
     public:
+      /**
+       * Walk through the children and fill them if necessary until isLeaf returns true.
+       * Uses the weightItemInDomain to create weights for the items (or decide if an item belongs to a mode or not).
+       */
       template<class AItemInDomainMeasure, class AIsLeafPredicate>
       void fillWalk(AItemInDomainMeasure& weightItemInDomain,
                     AIsLeafPredicate& isLeaf)

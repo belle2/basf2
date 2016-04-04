@@ -18,6 +18,7 @@ namespace Belle2 {
     template<class T, class ATag = T>
     class ContinuousValue {
     public:
+      /// Shortcut for the class itself.
       using This = ContinuousValue<T, ATag>;
 
       /// Allow default construction

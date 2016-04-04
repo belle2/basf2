@@ -23,10 +23,20 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /**
+     * The base class for all boxes. This "box" (which can be a very generic box) can be used to
+     * build a hough tree from it. Decision algorithms can be sued to decide if a certain item (e.g. a hit)
+     * belongs to a box (e.g. a rectangle in the legendre space) or not. This is used to fill the whole hough tree
+     * and find the point of largest interceptions of all hits.
+     */
     template<class... ATypes>
     class Box;
     template<>
 
+    /**
+     * Box Base class specification without any template arguments. Is the "zero-th" element in the list of
+     * stacked boxes (see below).
+     */
     class Box<> {
     public:
       /// Nothing to do on set bounds.
@@ -37,6 +47,13 @@ namespace Belle2 {
       { return output; }
     };
 
+    /**
+     * Box Base class specification without a first and subordinary types which can be used to "stack"
+     * various template until the full box is described correctly. E.g.:
+     * Box<A, B, C> = Box< A, (B, C) > = Box< A, ( B, (C) ) )>
+     * With this principle it is possible to describe all sorts and numbers of lists of template
+     * arguments with only one single class. The zero-th box (the "beginning") is defined above.
+     */
     template<class AFirstType, class... ASubordinaryTypes>
     class Box<AFirstType, ASubordinaryTypes...> {
     public:

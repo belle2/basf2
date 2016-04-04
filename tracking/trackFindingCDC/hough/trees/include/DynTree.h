@@ -20,6 +20,11 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /**
+     * This is the base class for all hough trees. It stores its children trees (each tree has children trees itself to reuse this class)
+     * as nodes, and has basic functionality to fill and go through ( = walk) all its children and the chdilren of its children etc.
+     */
+
     template<class AProperties, class ASubPropertiesFactory>
     class DynTree {
 

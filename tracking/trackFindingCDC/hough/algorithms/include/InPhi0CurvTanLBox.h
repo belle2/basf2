@@ -28,20 +28,12 @@ namespace Belle2 {
     class InPhi0CurvTanLBox {
 
     public:
+      /// Create a new box with the given curler curvature.
       InPhi0CurvTanLBox(const float& curlCurv) : m_curlCurv(curlCurv) {}
 
     public:
       /// The box to which this object correspondes.
       typedef Box<DiscretePhi0, DiscreteCurvWithArcLength2DCache, ContinuousTanL> HoughBox;
-
-      template<size_t N>
-      static bool all_nan(const std::array<float, N>& values)
-      {
-        return std::all_of(values.begin(), values.end(), [](float value) { return std::isnan(value); });
-      }
-
-      static float nvl(const float& value, const float& subs)
-      { return std::isnan(value) ? subs : value; }
 
     public:
       /// Function that gives the sign of the distance from an observed drift circle to the sweeped object.

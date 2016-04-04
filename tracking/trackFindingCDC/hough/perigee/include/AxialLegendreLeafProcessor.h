@@ -34,6 +34,7 @@ namespace Belle2 {
       using Candidate = std::pair<CDCTrajectory2D, std::vector<CDCRLTaggedWireHit> >;
 
     public:
+      /// Initialize a new processor with the maximum level.
       AxialLegendreLeafProcessor(const size_t maxLevel) : m_maxLevel(maxLevel)
       {}
 

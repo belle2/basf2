@@ -16,8 +16,12 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     *
-     */
+      * Predicate class to check for the containment of hits in a z0 tan lambda hough space part using a different algorithm than normal.
+      * Instead of calculating of the hit belongs to the box, it constructs a trajectory out if the box parameters (using its taln lambda and z0)
+      * and checks the distance from the hit to the trajectory. It returns e^{-distance}.
+      * Note this part this code defines the performance of
+      * the search in the hough plain quite significantly and there is probably room for improvement.
+      */
     class HitInZ0TanLambdaBoxUsingZ {
     public:
 
@@ -25,7 +29,9 @@ namespace Belle2 {
       typedef Z0TanLambdaBox HoughBox;
 
       /**
-       *
+       * Return exp{-distance} with distance = distance between the trajectory constructed from the box parameters
+       * and the hit in the xy-plane.
+       * Note that this is not a binary decision and must be used with some sort of cutoff (because otherwise all hits belong in all boxes).
        */
       inline Weight operator()(const CDCRecoHit3D& recoHit,
                                const HoughBox* z0TanLambdaBox)
@@ -50,26 +56,7 @@ namespace Belle2 {
 
         const Vector3D& pos3D = wireLine.pos3DAtZ(hitZ);
 
-        /*if(not wire.isInCellZBounds(lowerPos3D) and not wire.isInCellZBounds(upperPos3D)) {
-          return NAN;
-        }*/
-
         const float& distanceToRecoPosition = (pos3D.xy() - recoPosition).norm();
-
-        /*const float& distLowerZ0LowerTanLambda = perpS * lowerTanLambda - reconstructedZ + lowerZ0;
-        const float& distUpperZ0LowerTanLambda = perpS * lowerTanLambda - reconstructedZ + upperZ0;
-        const float& distLowerZ0UpperTanLambda = perpS * upperTanLambda - reconstructedZ + lowerZ0;
-        const float& distUpperZ0UpperTanLambda = perpS * upperTanLambda - reconstructedZ + upperZ0;
-
-        const bool sameSign = SameSignChecker::sameSign(distLowerZ0LowerTanLambda, distUpperZ0LowerTanLambda,
-                                                        distLowerZ0UpperTanLambda, distUpperZ0UpperTanLambda);
-        if (not sameSign) {
-          return 1.0;
-        } else {
-          return NAN;
-        }*/
-
-        //if(distanceToRecoPosition > 10) return NAN;
 
         return exp(-distanceToRecoPosition);
       }

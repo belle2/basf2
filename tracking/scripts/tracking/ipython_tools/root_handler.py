@@ -6,12 +6,11 @@ import pandas as pd
 
 
 class TrackingValidationResult:
-    # Plotting imports
-
-    #: This class represents a loaded validation root file.
-    #: It has methods for plotting the mostly needed graphs
+    """This class represents a loaded validation root file. It has methods for plotting the typically needed graphs."""
 
     def __init__(self, filename, label=None, color_index=0, additional_information=None):
+        """Create a new validation result from the given filename.
+           Additional options for plotting (e.g. color or label) can be given."""
         #: The root filename
         self.filename = filename
         #: The pr data
@@ -52,6 +51,7 @@ class TrackingValidationResult:
 
     @staticmethod
     def from_calculations(calculations, key="output_file_name", parameter_part=None):
+        """Create validation results from an ipython calculation."""
         if parameter_part:
             return [
                 TrackingValidationResult(
@@ -68,6 +68,7 @@ class TrackingValidationResult:
                 c in enumerate(calculations)]
 
     def get_figure_of_merits(self):
+        """Return the figures of merit from the file. Mosty used for internal seeting of the properties."""
         if self.finding_efficiency is None:
             overview = read_root(self.filename, tree_key="ExpertMCSideTrackingValidationModule_overview_figures_of_merit")
             self.finding_efficiency = overview.finding_efficiency[0]
@@ -83,6 +84,7 @@ class TrackingValidationResult:
                     fake_rate=self.fake_rate)
 
     def get_figures_of_merit_latex(self):
+        """Print out the figures of merit as a LaTeX-ready table."""
         results = self.get_figure_of_merits()
 
         latex_string = r'\begin{table}' + "\n"
@@ -98,12 +100,14 @@ class TrackingValidationResult:
         return latex_string
 
     def plot_efficiency_point(self):
+        """Plot a oint in the finding-efficiency/hit-efficiency plane."""
         import matplotlib.pyplot as plt
         self.plot(100 * self.finding_efficiency, 100 * self.hit_efficiency, loc=3)
         plt.xlabel("finding efficiency")
         plt.ylabel("hit efficiency")
 
     def grouped_by_pt_data(self, mc_data=None):
+        """Convenience function to return the input data (or the internal mc_data) grouped by pt."""
         if mc_data is None:
             mc_data = self.mc_data
 
@@ -113,6 +117,7 @@ class TrackingValidationResult:
         return grouped
 
     def plot(self, data_x, data_y, loc=4, yerr=None):
+        """Plot data_y over data_x with the correct settings for this result. Mostly used internally."""
         import matplotlib.pyplot as plt
         if yerr is not None:
             plt.errorbar(data_x, data_y, ls="-", marker="o",
@@ -125,6 +130,7 @@ class TrackingValidationResult:
             plt.legend(loc=loc, frameon=True)
 
     def plot_finding_efficiency(self, data=None):
+        """Plot the finding efficiency over pt."""
         import matplotlib.pyplot as plt
         grouped = self.grouped_by_pt_data(data)
 
@@ -133,6 +139,7 @@ class TrackingValidationResult:
         plt.ylabel("Finding Efficiency")
 
     def plot_hit_efficiency(self, data=None):
+        """Plot the hit efficiency over pt."""
         import matplotlib.pyplot as plt
         grouped = self.grouped_by_pt_data(data)
 
@@ -141,6 +148,7 @@ class TrackingValidationResult:
         plt.ylabel("Hit Efficiency")
 
     def print_useful_information(self):
+        """Print mostfully useful information about this result."""
         pr_data = self.pr_data
         mc_data = self.mc_data
         primaries = pr_data[self.pr_data.is_prompt == 1]
@@ -158,6 +166,7 @@ class TrackingValidationResult:
         print("Wrong Hits", primaries.number_of_wrong_hits.mean(), pr_data.number_of_wrong_hits.mean())
 
     def append_to_dataframe(self, df):
+        """Append the main results to a already consisting dataframe."""
         result = {"finding_efficiency": self.finding_efficiency,
                   "hit_efficiency": self.hit_efficiency,
                   "clone_rate": self.clone_rate,
@@ -166,37 +175,3 @@ class TrackingValidationResult:
         if self.additional_information:
             result.update(self.additional_information)
         return df.append(result, ignore_index=True)
-
-
-class TMVAPlotter():
-
-    def __init__(self):
-        pass
-
-    def grouper(self, data, truth_value, non_truth_value, truth_column):
-        if data.size == 0:
-            return None
-        if (data[truth_column] == 1).all():
-            return truth_value
-        else:
-            return non_truth_value
-
-    def hatcher(self, X, truth_column):
-        return self.grouper(X, "//", "", truth_column)
-
-    def filler(self, X, truth_column):
-        return self.grouper(X, False, True, truth_column)
-
-    def labeler(self, X, truth_column):
-        return self.grouper(X, "signal", "background", truth_column)
-
-    def plot_splitted(self, data, column_name, title=None, truth_column="truth"):
-        grouped = data.groupby(data[truth_column])
-        for name, X in grouped:
-            X[column_name].hist(normed=True, histtype="bar", hatch=self.hatcher(X, truth_column),
-                                fill=self.filler(X, truth_column), label=self.labeler(X, truth_column))
-
-        plt.title(title)
-        plt.legend()
-
-tmvaPlotter = TMVAPlotter()

@@ -159,9 +159,19 @@ std::string Framework::getPicklePath() const
   return Environment::Instance().getPicklePath();
 }
 
-void Framework::setStreamingObjects(std::vector<std::string> streamingObjects)
+void Framework::setStreamingObjects(boost::python::list streamingObjects)
 {
-  Environment::Instance().setStreamingObjects(streamingObjects);
+  std::vector<std::string> stringVector;
+  int nList = boost::python::len(streamingObjects);
+  for (int i = 0; i < nList; ++i) {
+    extract<std::string> checkValue(streamingObjects[i]);
+    if (checkValue.check()) {
+      stringVector.push_back(checkValue);
+    } else {
+      B2ERROR("set_streamobjs() expects a list of strings, ignoring argument " << i);
+    }
+  }
+  Environment::Instance().setStreamingObjects(stringVector);
 }
 
 //=====================================================================

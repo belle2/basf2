@@ -129,7 +129,7 @@ namespace Belle2 {
      *
      * @param streamingObjects objects to be streamed
     */
-    void setStreamingObjects(std::vector<std::string> streamingObjects);
+    void setStreamingObjects(boost::python::list streamingObjects);
 
 
     //--------------------------------------------------

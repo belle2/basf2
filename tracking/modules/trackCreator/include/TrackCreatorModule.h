@@ -53,16 +53,17 @@ namespace Belle2 {
   private:
 
     // Input
-    std::string m_recoTrackColName;
-    std::string m_mcParticleColName;
+    std::string m_recoTrackColName;  ///< Name of collection holding the RecoTracks (input).
+    std::string m_mcParticleColName;  ///< Name of collection holding the MCParticles (input, optional).
 
     // Output
-    std::string m_trackColName;
-    std::string m_trackFitResultColName;
+    std::string m_trackColName;  ///< Name of collection holding the Tracks (output).
+    std::string m_trackFitResultColName;   ///< Name of collection holding the TrackFitResult (output).
 
-    std::vector<double> m_beamSpot;
-    std::vector<double> m_beamAxis;
-    std::vector<int> m_pdgCodes;
+    std::vector<double> m_beamSpot;  ///< BeamSpot define the coordinate system in which the tracks will be extrapolated to the perigee.
+    std::vector<double>
+    m_beamAxis;   ///< BeamAxis define the coordinate system in which the tracks will be extrapolated to the perigee.
+    std::vector<int> m_pdgCodes;  ///< PDG codes for which TrackFitResults will be created.
   };
 }
 

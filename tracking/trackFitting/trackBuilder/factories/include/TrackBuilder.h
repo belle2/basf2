@@ -20,8 +20,33 @@ namespace Belle2 {
   class HitPatternVXD;
   class HitPatternCDC;
 
+  /*** TrackBuilder class to create the Track/TrackFitResult mdst output from the RecoTrack.
+   *
+   * To use this class, iterate over all Reco tracks and call trackBuilder.storeTrackFromRecoTrack. All fitted hypotheses will be stored into one Track with the TrackFitResult array indices stored in the Track.
+   * for (auto& recoTrack : recoTracks) {
+   *   trackBuilder.storeTrackFromRecoTrack(recoTrack);
+   * }
+   *
+   * If you want to make sure that all hypotheses are fitted and stored, call the fitter again. If the tracks are fitted already, this produces no overhead.
+   * TrackFitter trackFitter;
+   * TrackBuilder trackBuilder;
+   * for (auto& recoTrack : recoTracks) {
+   *   for (const auto& pdg : m_pdgCodes) {
+   *      trackFitter.fit(recoTrack, Const::ParticleType(abs(pdg)));
+   *   }
+   *   trackBuilder.storeTrackFromRecoTrack(recoTrack);
+   * }
+   */
   class TrackBuilder {
   public:
+    /** Constructor of the class. Requires the Store Arrayse and the extrapolation target (at Belle2 defined as the perigee in xy) for the TrackFitResults.
+     *
+     * @param trackColName TrackColName (output).
+     * @param trackFitResultColName TrackFitResultColName (output).
+     * @param mcParticleColName MCParticleColName (input, optional). If given, the tracks are matched to MCParticles.
+     * @param beamSpot Origin.
+     * @param beamAxis Positive z-direction.
+     */
     TrackBuilder(
       const std::string& trackColName,
       const std::string& trackFitResultColName,
@@ -36,17 +61,25 @@ namespace Belle2 {
       m_beamAxis(beamAxis)
     {};
 
+    /** Stores a Belle2 Track from a Reco Track.
+     *
+     * Every fitted hypothesis will be extrapolated to the perigee and stored as a TrackFitResult.
+     * The StoreArrayIndex is stored in the Belle2 Track, no relation is set.
+     *
+     * @param recoTrack
+     * @return
+     */
     bool storeTrackFromRecoTrack(const RecoTrack& recoTrack);
 
   private:
-    std::string m_trackColName;
-    std::string m_trackFitResultColName;
-    std::string m_mcParticleColName;
-    TVector3 m_beamSpot;
-    TVector3 m_beamAxis;
+    std::string m_trackColName;  ///< TrackColName (output).
+    std::string m_trackFitResultColName;  ///< TrackFitResultColName (output).
+    std::string m_mcParticleColName;  ///< MCParticleColName (input, optional).
+    TVector3 m_beamSpot;  ///<  Extrapolation target, origin.
+    TVector3 m_beamAxis;  ///<  Extrapolation target, positive z direction.
 
-    uint32_t getHitPatternVXDInitializer(const RecoTrack& recoTrack) const;
-    uint64_t getHitPatternCDCInitializer(const RecoTrack& recoTrack) const;
+    uint32_t getHitPatternVXDInitializer(const RecoTrack& recoTrack) const;  ///< Get the HitPattern in the VXD.
+    uint64_t getHitPatternCDCInitializer(const RecoTrack& recoTrack) const;  ///< Get the HitPattern in the CDC.
   };
 
 }

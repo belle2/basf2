@@ -17,7 +17,7 @@ using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
 
-void ConformalCDCWireHit::initializeFromWireHit(const CDCWireHit* wireHit)
+ConformalCDCWireHit::ConformalCDCWireHit(const CDCWireHit* wireHit)
 {
   assert(wireHit);
   m_cdcWireHit = wireHit;

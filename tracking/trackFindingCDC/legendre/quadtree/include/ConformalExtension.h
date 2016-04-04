@@ -176,7 +176,7 @@ namespace Belle2 {
                    static_cast<float>(curv + precision_r)));
 
         std::vector<ConformalCDCWireHit*> hitsVector = ConformalCDCWireHitCreator::createConformalCDCWireHitListForQT(
-                                                         conformalCDCWireHitList, false);
+                                                         conformalCDCWireHitList);
 
         for (ConformalCDCWireHit* hit : hitsVector) {
           hit->setUsedFlag(false);

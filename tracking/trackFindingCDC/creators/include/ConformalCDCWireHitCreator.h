@@ -39,8 +39,7 @@ namespace Belle2 {
        * @return the hit set with axial hits to use in the QuadTree-Finding.
        */
       static std::vector<ConformalCDCWireHit*> createConformalCDCWireHitListForQT(
-        std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
-        bool useSegmentsOnly = false);
+        std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
     private:
       /// Static only.

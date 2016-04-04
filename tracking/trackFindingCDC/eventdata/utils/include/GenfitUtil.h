@@ -21,6 +21,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /// Structure to summarize utility function to output a list of hits into a genfit::TrackCand (deprecated) or a RecoTrack.
     struct GenfitUtil {
 
       /**

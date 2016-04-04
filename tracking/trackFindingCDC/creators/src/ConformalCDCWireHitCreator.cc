@@ -40,11 +40,11 @@ void ConformalCDCWireHitCreator::copyHitsFromTopology(std::vector<ConformalCDCWi
 
 
 std::vector<ConformalCDCWireHit*> ConformalCDCWireHitCreator::createConformalCDCWireHitListForQT(
-  std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, bool useSegmentsOnly)
+  std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
 {
   std::vector<ConformalCDCWireHit*> QuadTreeHitWrappers;
   for (ConformalCDCWireHit& trackHit : conformalCDCWireHitList) {
-    if (trackHit.getUsedFlag() or trackHit.getMaskedFlag() or (useSegmentsOnly and not trackHit.getSegment().isAxial())) {
+    if (trackHit.getUsedFlag() or trackHit.getMaskedFlag()) {
       continue;
     }
     QuadTreeHitWrappers.push_back(&trackHit);

@@ -162,11 +162,16 @@ namespace Belle2 {
         m_relatedGenfitTrackCandidate = relatedTrackCand;
       }
 
+      /// Set the flag which indicates that the track has a matching segment (probably only used in the SegmentTrackCombiner).
       void setHasMatchingSegment(bool hasMatchingSegment = true)
       {
         m_hasMatchingSegment = hasMatchingSegment;
       }
 
+      /**
+       * Get a flag which indicates that the track has a matching segment (probably set in the SegmentTrackCombiner).
+       * This flag can be used for filter decisions (e.g. if the track is fake).
+       */
       bool getHasMatchingSegment() const
       {
         return m_hasMatchingSegment;

@@ -100,6 +100,11 @@ namespace Belle2 {
       static CDCRecoHit3D reconstructNearest(const CDCWireHit* wireHit,
                                              const CDCTrajectory2D& trackTrajectory2D);
 
+      /// Convenience function to call the other reconstruct method with the sz- and 2d-trajectory contained in the 3d one.
+      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
+                                      const CDCTrajectory3D& trajectory3D);
+
+
       /// Reconstructs the three dimensional hit from the two dimensional,
       /// the two dimensional trajectory and sz trajectory.
       /** For two dimensional reconstructed hits on axial wires this reconstructs
@@ -111,10 +116,6 @@ namespace Belle2 {
        *  as in the reconstuct() method before. However the z coordinate is set to the value of the sz trajectory
        *  at just calculated the transvers travel distance, since the trajectory should be more exact than the shifting
        *  along the wire.*/
-      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
-                                      const CDCTrajectory3D& trajectory3D);
-
-
       static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
                                       const CDCTrajectory2D& trajectory2D,
                                       const CDCTrajectorySZ& trajectorySZ);

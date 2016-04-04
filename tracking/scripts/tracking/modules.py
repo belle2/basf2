@@ -42,7 +42,10 @@ class BrowseTFileOnTerminateModule(basf2.Module):
     """
 
     def __init__(self, root_file):
+        """Create a new BrowsTFileOnTerminate module and set the root file."""
         super(BrowseTFileOnTerminateModule, self).__init__()
+
+        #: The root file that should be shown with a TBrowser on terminate.
         self.root_file = root_file
 
     def terminate(self):
@@ -92,6 +95,8 @@ class CDCMCFinder(metamodules.WrapperModule):
             UsePXDHits=use_pxd,
             UseOnlyAxialCDCHits=only_axials,
             GFTrackCandidatesColName=track_candidates_store_array_name)
+        """Create a new CDCMCFinder module with the given parameters, which can be used to steer
+           the store array names and the detector components."""
 
         if only_primaries:
             mc_track_finder_module.param("WhichParticles", ["primary"])

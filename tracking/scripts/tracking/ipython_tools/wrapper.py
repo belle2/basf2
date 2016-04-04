@@ -32,6 +32,7 @@ class QueueDrawer(CDCSVGDisplayModule):
         #: We want to use cpp for sure
         self.use_cpp = True
 
+        #: We store the files in a list and this list must be accessible also in multiprocessing, so we us a manager here.
         self.manager = multiprocessing.Manager()
 
         #: The list of created paths

@@ -40,6 +40,8 @@ class WrapperModule(basf2.Module):
     """
 
     def __init__(self, module):
+        """Create a new wrapper module around the given module. This base implementation does not change anything,
+           so there is no reason to use this base implementation alone."""
         super(WrapperModule, self).__init__()
 
         name = self.compose_wrapped_module_name(module)
@@ -58,6 +60,7 @@ class WrapperModule(basf2.Module):
 
     @property
     def wrapper_name(self):
+        """Name of the wrapper class."""
         return self.__class__.__name__
 
     @property
@@ -117,18 +120,23 @@ class PyProfilingModule(WrapperModule):
       profiler (cProfile.Profile): Profiler instance to manage and extract the profiling statistics.
     """
 
+    #: The default name for output if none is given.
     default_output_file_name = "profile.txt"
 
     def __init__(self, module, output_file_name=None):
+        """Create a new PyProfilingModule wrapped around the given module
+           which outputs its results to the output_file_name of given (if not, to profile.txt)."""
         super(PyProfilingModule, self).__init__(module)
 
-        if output_file_name is None:
-            self.output_file_name = self.default_output_file_name
-        else:
+        #: The output file name the results will be written into.
+        self.output_file_name = self.default_output_file_name
+
+        if output_file_name is not None:
             self.output_file_name = output_file_name
 
     def initialize(self):
         """Initialize method of the module"""
+        #: The used profiler instance.
         self.profiler = cProfile.Profile()
         super(PyProfilingModule, self).initialize()
 
@@ -252,6 +260,7 @@ class IfStoreArrayPresentModule(IfModule):
         self.storearray_is_present = None
 
     def initialize(self):
+        """Initialize the contianed module (only of the condition is true)."""
         if self.condition():
             super().initialize()
 
@@ -322,6 +331,7 @@ class PathModule(basf2.Module):
         if path is None:
             path = basf2.create_path()
 
+        #: The contained path.
         self._path = path
 
         if modules:
@@ -337,10 +347,6 @@ class PathModule(basf2.Module):
             itemCount = len(modules)
         self.set_name("{path_module} ({items} modules):".format(path_module=self.__class__.__name__,
                                                                 items=itemCount))
-
-    @classmethod
-    def from_modules(cls, *modules):
-        return cls(modules=modules)
 
     def event(self):
         """Event method of the module

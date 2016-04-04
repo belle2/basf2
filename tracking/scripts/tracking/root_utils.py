@@ -179,6 +179,7 @@ def root_ls(obj):
 
 @root_ls.register(str)
 def __(filename):
+    """Overloaded function for root_ls for filenames (e.g. opens the file and ls its content)."""
     rootFile = ROOT.TFile(filename)
     result = ls(rootInputFile)
 
@@ -189,6 +190,7 @@ def __(filename):
 
 @root_ls.register(ROOT.TDirectory)
 def __(tDirectory):
+    """Overloaded function for root_ls for ROOT directories (e.g. list the keys in the directory)."""
     tKeys = list(tDirectory.GetListOfKeys())
     result = sorted([tKey.GetName() for tKey in tKeys])
     return result
@@ -197,6 +199,7 @@ def __(tDirectory):
 @root_ls.register(ROOT.TTree)
 @root_ls.register(ROOT.TNtuple)
 def __(tTree):
+    """Overloaded function for root_ls for trees and ntuples (e.g. list the keys in the tuple/tree)."""
     tBranches = list(tTree.GetListOfBranches())
     result = sorted([tBranch.GetName() for tBranch in tBranches])
     return result

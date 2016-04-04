@@ -40,15 +40,15 @@ itopconfig = register_module('TopConfiguration')
 itopconfig.param('filename', args.topConfiguration)
 
 itopeventconverter = register_module('iTopRawConverterSRoot')
+itopeventconverter.param('forceTrigger0xF', True)
 
 histomanager = register_module("HistoManager")
 
-WriteFile = 1
 if args.output:
     outputFile = args.output
 else:
     outputFile = args.inputRun.replace('.sroot', '_writehits.root')
-print('Writing output root file to ' + outputFile)
+# print('Writing output root file to ' + outputFile)
 output = register_module('RootOutput')
 outputDict = {'outputFileName': outputFile,
               'excludeBranchNames': ["EventWaveformPackets"]}
@@ -73,5 +73,5 @@ main.add_module(itopeventconverter)
 main.add_module(pedmodule)
 main.add_module(mergemodule)
 main.add_module(plotsmodule)
-main.add_module(output)
+# main.add_module(output)
 process(main)

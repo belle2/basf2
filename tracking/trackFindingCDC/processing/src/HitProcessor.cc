@@ -378,7 +378,7 @@ void HitProcessor::maskHitsWithPoorQuality(CDCTrack& track)
   deleteAllMarkedHits(track);
 }
 
-static int HitProcessor::startingSLayer(const std::vector<double>& startingArmSLayers)
+int HitProcessor::startingSLayer(const std::vector<double>& startingArmSLayers)
 {
   std::vector<double>::const_iterator startSlIt = std::find_if(startingArmSLayers.begin(), startingArmSLayers.end(), [](double val) {
     return val > 0;

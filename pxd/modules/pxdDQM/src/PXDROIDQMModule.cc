@@ -47,18 +47,18 @@ void PXDROIDQMModule::defineHisto()
   hrawROIHLTmap  = new TH2F("hrawROIHLTmap", "HLT ROI Middle Map ;column;row", 256 / 4, 0, 256, 786 / 4, 0, 786);
   hrawROIHLTsize  = new TH2F("hrawROIHLTsize", "HLT ROI Size Map ;column;row", 256 / 4, 0, 256, 786 / 4, 0, 786);
   hrawROIHLT_DHHID = new TH1F("hrawROIHLT_DHHID", "HLT ROI DHHID;Nr per Event", 64, 0, 64);
-  hrawROIHLTrow1 = new TH1F("hrawROIHLTrow1", "HLT ROI row1;Nr per Event", 786, 0, 786);
-  hrawROIHLTrow2 = new TH1F("hrawROIHLTrow2", "HLT ROI row2;Nr per Event", 786, 0, 786);
-  hrawROIHLTcol1 = new TH1F("hrawROIHLTcol1", "HLT ROI col1;Nr per Event", 256, 0, 256);
-  hrawROIHLTcol2 = new TH1F("hrawROIHLTcol2", "HLT ROI col2;Nr per Event", 256, 0, 256);
+  hrawROIHLTrow1 = new TH1F("hrawROIHLTrow1", "HLT ROI row1;row", 786, 0, 786);
+  hrawROIHLTrow2 = new TH1F("hrawROIHLTrow2", "HLT ROI row2;row", 786, 0, 786);
+  hrawROIHLTcol1 = new TH1F("hrawROIHLTcol1", "HLT ROI col1;column", 256, 0, 256);
+  hrawROIHLTcol2 = new TH1F("hrawROIHLTcol2", "HLT ROI col2;column", 256, 0, 256);
 
   hrawROIDCmap  = new TH2F("hrawROIDCmap", "DATCON ROI Middle Map ;column;row", 256 / 4, 0, 256, 786 / 4, 0, 786);
   hrawROIDCsize  = new TH2F("hrawROIDCsize", "DATCON ROI Size Map ;column;row", 256 / 4, 0, 256, 786 / 4, 0, 786);
   hrawROIDC_DHHID = new TH1F("hrawROIDC_DHHID", "DATCON ROI DHHID;Nr per Event", 64, 0, 64);
-  hrawROIDCrow1 = new TH1F("hrawROIDCrow1", "DATCON ROI row1;Nr per Event", 786, 0, 786);
-  hrawROIDCrow2 = new TH1F("hrawROIDCrow2", "DATCON ROI row2;Nr per Event", 786, 0, 786);
-  hrawROIDCcol1 = new TH1F("hrawROIDCcol1", "DATCON ROI col1;Nr per Event", 256, 0, 256);
-  hrawROIDCcol2 = new TH1F("hrawROIDCcol2", "DATCON ROI col2;Nr per Event", 256, 0, 256);
+  hrawROIDCrow1 = new TH1F("hrawROIDCrow1", "DATCON ROI row1;row", 786, 0, 786);
+  hrawROIDCrow2 = new TH1F("hrawROIDCrow2", "DATCON ROI row2;row", 786, 0, 786);
+  hrawROIDCcol1 = new TH1F("hrawROIDCcol1", "DATCON ROI col1;column", 256, 0, 256);
+  hrawROIDCcol2 = new TH1F("hrawROIDCcol2", "DATCON ROI col2;column", 256, 0, 256);
 
   // cd back to root directory
   oldDir->cd();

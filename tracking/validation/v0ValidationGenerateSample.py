@@ -67,14 +67,38 @@ def run():
 
 
 class V0Harvester(HarvestingModule):
+    """Collects variables of interest for the V0Validation and the v0ValidationCreatePlots script."""
 
     def __init__(self):
+        """Initialize the harvester.
+        Defines over which StoreArray is iterated and the output file.
+        """
         HarvestingModule.__init__(self, foreach="MCParticles", output_file_name="../V0ValidationHarvested.root")
 
     def pick(self, mc_particle):
+        """Selects all MCParticles which are KShort.
+
+        :param mc_particle: Belle2::MCParticle.
+        :return: True if the MCParticle is a KShort.
+        """
         return abs(mc_particle.getPDG()) == 310
 
     def peel(self, mc):
+        """Selects MCTrue variables of interest for all KShort in the sample. If the KShort has a related reconstructed
+        V0, these values are written out too. Variables of interest are:
+        R: Radial (in xy) distance to origin.
+        Theta: Theta Angle of decay vertex.
+        Phi: Phi Angle of decay vertex.
+        P: Momentum of the KShort.
+        M: Invariant mass of the KShort.
+        Chi2: Chi2 of vertex fit.
+        isFound: True if MCParticle has a related V0.
+
+        If the MCParticle has no related V0, the variables are filled with NaN's.
+
+        :param mc: Belle2::MCParticle
+        :return: dict with the variables of interest.
+        """
         mc_vertex = mc.getDecayVertex()
         mc_perp = mc_vertex.Perp()
         mc_theta = mc_vertex.Theta()
@@ -124,6 +148,7 @@ class V0Harvester(HarvestingModule):
                 "FOUND": False
             }
 
+    #: Store the output of the module in a root file.
     save_tree = refiners.SaveTreeRefiner()
 
 

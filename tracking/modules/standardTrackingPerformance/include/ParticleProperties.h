@@ -17,7 +17,7 @@ namespace Belle2 {
    */
   struct ParticleProperties {
 
-    static const int maxNweights = 160;
+    static const int maxNweights = 160; /**< the maximum number of stored weights */
 
     double mass; /**< measured mass */
     double px; /**< measured momentum in x direction */
@@ -48,6 +48,10 @@ namespace Belle2 {
     double y_gen; /**< y value of generated position */
     double z_gen; /**< z value of generated position */
 
+    /**
+     * Set all the values of the data structure to one value
+     * for initialization
+     */
     void setAllTo(double value)
     {
       mass = value;
@@ -82,6 +86,9 @@ namespace Belle2 {
       z_gen = value;
     }
 
+    /**
+     * Same as setAllTo but usable as C++ assignment operator
+     */
     void operator=(double value)
     {
       setAllTo(value);

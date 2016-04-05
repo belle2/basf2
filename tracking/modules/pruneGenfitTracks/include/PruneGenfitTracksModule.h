@@ -32,10 +32,10 @@ namespace Belle2 {
 
   private:
 
-    // flags used for pruning, See genfit::Track class for possible settings
+    /// flags used for pruning, See genfit::Track class for possible settings
     std::string m_pruneFlags;
 
-    // name of the StoreArray to prune
+    /// name of the StoreArray to prune
     std::string m_storeArrayName;
 
   }; // end class

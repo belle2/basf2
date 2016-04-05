@@ -23,10 +23,12 @@ TCut stableBaryons = "abs(MCParticles.m_pdg) == 2212 || abs(MCParticles.m_pdg) =
 // Atoms or their fragments
 TCut nuclei = "abs(MCParticles.m_pdg) >= 1000000000"; 
 
-void createVertexHistograms(TTree* tree, const char* particle, const char* info, TCut& cut);  
+void createVertexHistograms(TTree* tree, const char* particle, const char* info, const TCut& cut);  
+void createEnergyHistogram(TTree* tree, const char* particle, const char* info, const TCut& cut, const double& xup);
 
 void numberOfParticles(TTree* tree);
 void vertexDistribution(TTree* tree);
+void energyDistribution(TTree* tree);
 
 void simBasics()
 {
@@ -39,6 +41,7 @@ void simBasics()
 
   numberOfParticles(tree);
   vertexDistribution(tree);
+  energyDistribution(tree);
 
   // close ROOT files
   output->Close();
@@ -130,59 +133,73 @@ void numberOfParticles(TTree* tree)
 }
 
 
-void createVertexHistograms(TTree* tree, const char* particle, const char* info, TCut& cut)
+void createVertexHistograms(TTree* tree, const char* particle, const char* info, const TCut& cut)
 {
-  // Distribution of vertex: x component
-  string name = string("hVX") + particle;
-  string title = string("MC Vertex [x] of ") + info; 
-  h = new TH1F(name.data(), title.data(), 100, -400, 400);
+  // Distribution
 
-  h->GetXaxis()->SetTitle("x [cm]");
+  // x component 
+  string name = string("hV") + "X" + particle;
+  string particleDetails = string(particle) + " " + info;
+
+  string title = string("MC Vertex [") + "x" + "] of " + particleDetails;
+
+  h = new TH1F(name.c_str(), title.c_str(), 100, -400., 400.);
+
+  title = string("x") + " [cm]";
+  h->GetXaxis()->SetTitle(title.c_str());
   h->GetYaxis()->SetTitle("Entries/bin");
 
-  string varexp = string("MCParticles.m_productionVertex_x >> hVX") + particle; 
-  tree->Draw(varexp.data(), cut);
+  string varexp = string("MCParticles.m_productionVertex_") + "x" + " >> " + name; 
+  tree->Draw(varexp.c_str(), cut);
 
-  title = string("Vertex distribution of ") + info +  " in the x-axis";
-  h->GetListOfFunctions()->Add(new TNamed("Description", title.data()));
+  title = string("Vertex distribution of ") + particleDetails +  " in the " + "x" + "-axis";
+  h->GetListOfFunctions()->Add(new TNamed("Description", title.c_str()));
   h->GetListOfFunctions()->Add(new TNamed("Check",
     "The entry in each bin should be similar to that of the reference"));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "dorisykim@ssu.ac.kr"));
   h->Write();
   delete h;
 
-  // y component
-  name = string("hVY") + particle;
-  title = string("MC Vertex [y] of ") + info;
-  h = new TH1F(name.data(), title.data(), 100, -400, 400);
+  // y component 
+  name = string("hV") + "Y" + particle;
+  particleDetails = string(particle) + " " + info;
 
-  h->GetXaxis()->SetTitle("y [cm]");
+  title = string("MC Vertex [") + "y" + "] of " + particleDetails;
+
+  h = new TH1F(name.c_str(), title.c_str(), 100, -400., 400.);
+
+  title = string("y") + " [cm]";
+  h->GetXaxis()->SetTitle(title.c_str());
   h->GetYaxis()->SetTitle("Entries/bin");
 
-  varexp = string("MCParticles.m_productionVertex_y >> hVY") + particle;
-  tree->Draw(varexp.data(), cut);
+  varexp = string("MCParticles.m_productionVertex_") + "y" + " >> " + name; 
+  tree->Draw(varexp.c_str(), cut);
 
-  title = string("Vertex distribution of ") + info +  " in the y-axis";
-  h->GetListOfFunctions()->Add(new TNamed("Description", title.data()));
+  title = string("Vertex distribution of ") + particleDetails +  " in the " + "y" + "-axis";
+  h->GetListOfFunctions()->Add(new TNamed("Description", title.c_str()));
   h->GetListOfFunctions()->Add(new TNamed("Check",
     "The entry in each bin should be similar to that of the reference"));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "dorisykim@ssu.ac.kr"));
   h->Write();
   delete h;
 
-  // z component
-  name = string("hVZ") + particle;
-  title = string("MC Vertex [z] of ") + info;
-  h = new TH1F(name.data(), title.data(), 100, -800, 800);
+  // z component 
+  name = string("hV") + "Z" + particle;
+  particleDetails = string(particle) + " " + info;
 
-  h->GetXaxis()->SetTitle("z [cm]");
+  title = string("MC Vertex [") + "z" + "] of " + particleDetails;
+
+  h = new TH1F(name.c_str(), title.c_str(), 100, -800., 800.);
+
+  title = string("z") + " [cm]";
+  h->GetXaxis()->SetTitle(title.c_str());
   h->GetYaxis()->SetTitle("Entries/bin");
 
-  varexp = string("MCParticles.m_productionVertex_z >> hVZ") + particle;
-  tree->Draw(varexp.data(), cut);
+  varexp = string("MCParticles.m_productionVertex_") + "z" + " >> " + name; 
+  tree->Draw(varexp.c_str(), cut);
 
-  title = string("Vertex distribution of ") + info +  " in the z-axis";
-  h->GetListOfFunctions()->Add(new TNamed("Description", title.data()));
+  title = string("Vertex distribution of ") + particleDetails +  " in the " + "z" + "-axis";
+  h->GetListOfFunctions()->Add(new TNamed("Description", title.c_str()));
   h->GetListOfFunctions()->Add(new TNamed("Check",
     "The entry in each bin should be similar to that of the reference"));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "dorisykim@ssu.ac.kr"));
@@ -196,12 +213,55 @@ void vertexDistribution(TTree* tree)
   // Vertex distribution
 
   // electrons/positrons
-  createVertexHistograms(tree, "Electron", "electrons/positrons", electrons);
+  createVertexHistograms(tree, "Electron", "(positrons included)", electrons);
 
   // photons 
-  createVertexHistograms(tree, "Photon", "photons", photons);
+  createVertexHistograms(tree, "Photon", "", photons);
 
   // nuclei
-  createVertexHistograms(tree, "Nucleus", "atoms or their fragments", nuclei);
+  createVertexHistograms(tree, "Nucleus", "(atoms or their fragments)", nuclei);
 
 }
+
+void createEnergyHistogram(TTree* tree, const char* particle, const char* info, const TCut& cut, const double& xup)
+{
+
+  string name = string("hE") + particle;
+  string particleDetails = string(particle) + " " + info;
+
+  string title = string("MC Energy of ") + particleDetails;
+
+  h = new TH1F(name.c_str(), title.c_str(), 100, 0., xup);
+
+  title = string("[GeV]");
+  h->GetXaxis()->SetTitle(title.c_str());
+  h->GetYaxis()->SetTitle("Entries/bin");
+
+  string varexp = string("MCParticles.m_energy") + " >> " + name; 
+  tree->Draw(varexp.c_str(), cut);
+
+  title = string("Energy distribution of ") + particleDetails;
+  h->GetListOfFunctions()->Add(new TNamed("Description", title.c_str()));
+  h->GetListOfFunctions()->Add(new TNamed("Check",
+    "The entry in each bin should be similar to that of the reference"));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "dorisykim@ssu.ac.kr"));
+  h->Write();
+  delete h;
+
+}
+
+void energyDistribution(TTree* tree)
+{
+  // Vertex distribution
+
+  // electrons/positrons
+  createEnergyHistogram(tree, "Electron", "(positrons included)", electrons, 1.0);
+
+  // photons
+  createEnergyHistogram(tree, "Photon", "", photons, 2.5);
+
+  // nuclei
+  createEnergyHistogram(tree, "Nucleus", "(atoms or their fragments)", nuclei, 5.0);
+
+}
+

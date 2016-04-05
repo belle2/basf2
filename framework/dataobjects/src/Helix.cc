@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <framework/dataobjects/Helix.h>
 
+#include <framework/gearbox/Const.h>
+
 #include <boost/math/special_functions/sign.hpp>
 #include <boost/math/special_functions/sinc.hpp>
 #include <boost/math/tools/precision.hpp>
@@ -103,7 +105,7 @@ double Helix::getKappa(const double bZ) const
 
 double Helix::getAlpha(const double bZ)
 {
-  return 1.0 / (bZ * TMath::C()) * 1E11;
+  return 1.0 / (bZ * Const::speedOfLight) * 1E4;
 }
 
 short Helix::getChargeSign() const
@@ -347,7 +349,7 @@ void Helix::calcPassiveMoveByJacobian(const double& byX,
   jacobian(iZ0, iD0) = tanLambda * dArcLength2D_dD0;
   jacobian(iZ0, iPhi0) = tanLambda * dArcLength2D_dPhi0;
   jacobian(iZ0, iOmega) = tanLambda * dArcLength2D_dOmega;
-  //jacobian(iZ0, iZ0) = 1.0; // From UnitMatrix above.
+  jacobian(iZ0, iZ0) = 1.0; // From UnitMatrix above.
   jacobian(iZ0, iTanLambda) = arcLength2D;
 
   if (jacobian.GetNrows() == 6) {
@@ -355,7 +357,7 @@ void Helix::calcPassiveMoveByJacobian(const double& byX,
     jacobian(iArcLength2D, iD0) = dArcLength2D_dD0;
     jacobian(iArcLength2D, iPhi0) = dArcLength2D_dPhi0;
     jacobian(iArcLength2D, iOmega) = dArcLength2D_dOmega;
-    jacobian(iArcLength2D, iArcLength2D) = 0.0;
+    jacobian(iArcLength2D, iZ0) = 0.0;
     jacobian(iArcLength2D, iTanLambda) = 0;
     jacobian(iArcLength2D, iArcLength2D) = 1.0;
   }

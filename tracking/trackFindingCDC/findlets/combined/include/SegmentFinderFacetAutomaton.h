@@ -81,7 +81,7 @@ namespace Belle2 {
         m_facetCreator.exposeParameters(moduleParamList, prefixed(prefix, "Facet"));
         m_facetRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "FacetRelation"));
         m_segmentCreatorFacetAutomaton.exposeParameters(moduleParamList, prefix);
-        m_segmentMerger.exposeParameters(moduleParamList, prefixed(prefix, "Segment"));
+        m_segmentMerger.exposeParameters(moduleParamList, prefixed(prefix, "SegmentRelation"));
         // FIXME : make parameter names small
 
         m_segmentFitter.exposeParameters(moduleParamList, prefix);

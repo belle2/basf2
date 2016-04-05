@@ -5,18 +5,16 @@ Import('env')
 
 env['LIBS'] = [
     'tracking_dataobjects',
-    #'tracking_trackFindingCDC',
     'pxd', 'pxd_dataobjects',
     'svd', 'svd_dataobjects',
     'vxd', 'vxd_dataobjects',
     'cdc', 'cdc_dataobjects',
-   # 'testbeam_vxd_dataobjects',
-#    'geometry',
     'mdst_dataobjects',
     'framework',
     'genfit2',
     'EG',
     '$ROOT_LIBS',
+    'tracking_v0Finding_dataobjects'
     ]
 
 Return('env')

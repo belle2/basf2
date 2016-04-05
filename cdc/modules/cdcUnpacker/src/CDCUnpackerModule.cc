@@ -447,7 +447,7 @@ void CDCUnpackerModule::loadMap()
 {
 
   if (m_enableDatabase == false) {
-    // Real the channel map from the local text.
+    // Read the channel map from the local text.
     if (! FileSystem::fileExists(m_xmlMapFileName)) {
       B2ERROR("CDC unpacker can't find a filename: " << m_xmlMapFileName);
       exit(1);
@@ -468,7 +468,7 @@ void CDCUnpackerModule::loadMap()
       m_map[iBoard][iCh] = wireId;
     }
   } else {
-    // Real the channel map from the database.
+    // Read the channel map from the database.
     DBArray<CDCChannelMap> channelMaps;
     for (const auto& cm : channelMaps) {
       const int isl = cm.getISuperLayer();

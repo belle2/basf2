@@ -4,7 +4,6 @@ env['LIBS'] = [
     'tracking_trackFindingCDC',
     'framework',
     'genfit2',
-    'mdst_dataobjects',
     'simulation_dataobjects',
     '$ROOT_LIBS',
     'cdc_dataobjects',

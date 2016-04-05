@@ -45,10 +45,10 @@ namespace Belle2 {
      */
     virtual void terminate();
   private:
-    std::string m_TrackColName;
-    std::string m_TFRColName;
-    std::string m_V0ColName;
-    std::string m_MCParticleColName;
+    std::string m_TrackColName;  ///< Belle2::Track collection name (input).
+    std::string m_TFRColName;   ///< Belle2::TrackFitResult collection name (input).
+    std::string m_V0ColName;   ///< V0 collection name (input).
+    std::string m_MCParticleColName;   ///< MCParticle collection name (input).
 
   };
 }

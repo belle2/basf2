@@ -25,3 +25,6 @@ REG_MODULE(SegmentFitter);
 REG_MODULE(SegmentOrienter);
 REG_MODULE(SegmentExporter);
 REG_MODULE(SegmentCreatorMCTruth);
+
+REG_MODULE(SegmentFinderFacetAutomaton);
+REG_MODULE(TrackFinderSegmentPairAutomaton);

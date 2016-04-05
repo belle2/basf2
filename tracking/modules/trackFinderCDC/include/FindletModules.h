@@ -9,12 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/wireHitRelation/PrimaryWireHitRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/cluster/ChooseableClusterFilter.h>
-#include <tracking/trackFindingCDC/filters/facet/ChooseableFacetFilter.h>
-#include <tracking/trackFindingCDC/filters/facetRelation/ChooseableFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentRelation/ChooseableSegmentRelationFilter.h>
-
+#include <tracking/trackFindingCDC/findlets/combined/SegmentFinderFacetAutomaton.h>
+#include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitTopologyFiller.h>
@@ -30,7 +26,18 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentExporter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorMCTruth.h>
 
+#include <tracking/trackFindingCDC/filters/wireHitRelation/PrimaryWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/cluster/ChooseableClusterFilter.h>
+#include <tracking/trackFindingCDC/filters/facet/ChooseableFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/ChooseableFacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/ChooseableSegmentRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/ChooseableSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPairRelation/ChooseableSegmentPairRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/ChooseableTrackRelationFilter.h>
+
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+
+/******* Minimal Findlets **********/
 
 namespace Belle2 {
   class WireHitCreatorModule:
@@ -124,5 +131,46 @@ namespace Belle2 {
     /// Type of the base class
     using Super =  TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentCreatorMCTruth>;
     SegmentCreatorMCTruthModule() : Super{{{"CDCWireHitVector", "CDCRecoSegment2DVector"}}} {}
+  };
+}
+
+
+
+/******* Combined Findlets **********/
+namespace Belle2 {
+
+#include <tracking/trackFindingCDC/findlets/combined/SegmentFinderFacetAutomaton.h>
+#include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
+
+  class SegmentFinderFacetAutomatonModule:
+    public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentFinderFacetAutomaton<
+    TrackFindingCDC::ChooseableClusterFilter,
+    TrackFindingCDC::ChooseableFacetFilter,
+    TrackFindingCDC::ChooseableFacetRelationFilter,
+    TrackFindingCDC::ChooseableSegmentRelationFilter> > {
+
+    /// Type of the base class
+    using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentFinderFacetAutomaton<
+                  TrackFindingCDC::ChooseableClusterFilter,
+                  TrackFindingCDC::ChooseableFacetFilter,
+                  TrackFindingCDC::ChooseableFacetRelationFilter,
+                  TrackFindingCDC::ChooseableSegmentRelationFilter> >;
+  public:
+    SegmentFinderFacetAutomatonModule() : Super{{{"CDCWireHitVector", "CDCRecoSegment2DVector"}}} {}
+  };
+
+  class TrackFinderSegmentPairAutomatonModule:
+    public TrackFindingCDC::FindletModule<TrackFindingCDC::TrackFinderSegmentPairAutomaton<
+    TrackFindingCDC::ChooseableSegmentPairFilter,
+    TrackFindingCDC::ChooseableSegmentPairRelationFilter,
+    TrackFindingCDC::ChooseableTrackRelationFilter> > {
+
+    /// Type of the base class
+    using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::TrackFinderSegmentPairAutomaton<
+                  TrackFindingCDC::ChooseableSegmentPairFilter,
+                  TrackFindingCDC::ChooseableSegmentPairRelationFilter,
+                  TrackFindingCDC::ChooseableTrackRelationFilter> >;
+  public:
+    TrackFinderSegmentPairAutomatonModule() : Super{{{"CDCRecoSegment2DVector", "CDCTrackVector"}}} {}
   };
 }

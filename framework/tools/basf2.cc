@@ -381,7 +381,11 @@ int main(int argc, char* argv[])
         Environment::Instance().printJobInformation();
       }
     } catch (error_already_set) {
+      //Apparently an exception occured which wasn't handled. So print the traceback
       PyErr_Print();
+      //And in rare cases, i.e. when redirecting output, the buffers are not
+      //flushed unless we finalize python. So do it now
+      Py_Finalize();
       return 1;
     }
 

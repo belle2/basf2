@@ -18,6 +18,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <memory>
 #include <fstream>
@@ -110,7 +111,7 @@ namespace Belle2 {
 
     } else {
       m_target =  manager.getVariable(m_targetName);
-      B2INFO("FANN Teacher is going to train a Multi-Layer Percetron at the termination.");
+      B2INFO("FANN Teacher is going to train a Multi-Layer Percetron " << m_prefix << "at the termination.");
     }
 
     for (auto& name : m_listNames) {
@@ -253,8 +254,8 @@ namespace Belle2 {
       int nValid = int(nTestAndValid * 0.5);
       float nTrainMin = 10 * m_MLPs[iMethod].nWeights();
       if (m_trainSet.nSamples() < (nTrainMin + nValid + nTest)) {
-        B2WARNING("Not enough training samples for sector " << iMethod << " (" << (nTrainMin + nValid + nTest)
-                  << ") found, requested " << m_trainSet.nSamples() << " events.");
+        B2WARNING("Not enough training samples for sector " << iMethod << " (" << m_trainSet.nSamples()
+                  << ") found, requested " << (nTrainMin + nValid + nTest) << " events.");
         continue;
       }
       // set scaling limits
@@ -302,15 +303,16 @@ namespace Belle2 {
     }
 
     saveTraindata(m_trainFilename);
+    B2INFO("Training finished for " << m_prefix << ".");
   }
 
 
   void FANNTeacherModule::train(unsigned iMethod)
   {
 #ifdef HAS_OPENMP
-    B2INFO("Training a Multi-Layer Perceptron for Particle List with OpenMP");
+    B2INFO("Training a Multi-Layer Perceptron " << m_prefix << " for Particle List with OpenMP");
 #else
-    B2INFO("Training a Multi-Layer Perceptron for Particle List without OpenMP");
+    B2INFO("Training a Multi-Layer Perceptron " << m_prefix << " for Particle List without OpenMP");
 #endif
 
     // initialize network
@@ -368,6 +370,7 @@ namespace Belle2 {
     // set network parameters
     fann_set_activation_function_hidden(ann, m_neuronTypes[m_MLPs[iMethod].getNeuronType()]);
     fann_set_activation_function_output(ann, m_neuronTypes[m_MLPs[iMethod].getNeuronType()]);
+    fann_set_train_error_function(ann, FANN_ERRORFUNC_LINEAR);
     double bestRMS = 999.;
     std::vector<double> bestTrainLog = {};
     std::vector<double> bestValidLog = {};
@@ -481,6 +484,13 @@ namespace Belle2 {
 
   bool FANNTeacherModule::load(const std::string& filename, const std::string& arrayname)
   {
+    WorkingDirectoryManager dummy(m_workingDirectory);
+
+    if (!FileSystem::isFile(filename)) {
+      B2INFO("File " << filename << " has not been found. New MLP will be trained.");
+      return false;
+    }
+
     TFile datafile(filename.c_str(), "READ");
     if (!datafile.IsOpen()) {
       B2WARNING("Could not open file " << filename << ". New MLP will be trained.");
@@ -527,27 +537,32 @@ namespace Belle2 {
     for (unsigned int i = 0; i < m_variableNames.size(); ++i)
       tree -> SetBranchAddress(Variable::makeROOTCompatible(m_variableNames[i]).c_str(), &input[i]);
     tree -> SetBranchAddress(Variable::makeROOTCompatible(m_targetName).c_str(), &input[m_variableNames.size() + 1]);
-
+    B2INFO("here0");
     for (unsigned event = 0; event < m_trainSet.nSamples(); ++event) {
       // Fill the tree with the input variables
       for (unsigned int i = 0; i < m_variableNames.size(); ++i) {
         input[i] = m_trainSet.getInput(event)[i];
       }
-      input[m_variableNames.size() + 1] = m_trainSet.getTarget(event)[0];
+      input[m_variableNames.size()] = m_trainSet.getTarget(event)[0];
       tree->Fill();
     }
+
+    m_trainSet.clear();
+    B2INFO("here1");
     tree->Write("", TObject::kOverwrite);
 
     const bool writeError = datafile->TestBit(TFile::kWriteError);
-
+    B2INFO("here2");
     if (writeError) {
       //m_file deleted first so we have a chance of closing it (though that will probably fail)
       delete datafile;
       B2FATAL("A write error occured while saving '" << filename << "', please check if enough disk space is available.");
     }
 
+    tree -> SetDirectory(nullptr);
+    B2INFO("here3");
     datafile->Close();
-
+    B2INFO("here4");
   }
 
   bool FANNTeacherModule::loadTraindata(const std::string& filename)

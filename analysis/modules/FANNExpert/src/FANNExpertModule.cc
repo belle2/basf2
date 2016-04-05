@@ -15,6 +15,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
+#include <analysis/utility/WorkingDirectoryManager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -115,6 +116,7 @@ namespace Belle2 {
 
   bool FANNExpertModule::load(const std::string& filename, const std::string& arrayname)
   {
+    WorkingDirectoryManager dummy(m_workingDirectory);
     TFile datafile(filename.c_str(), "READ");
     if (!datafile.IsOpen()) {
       B2WARNING("Could not open file " << filename);

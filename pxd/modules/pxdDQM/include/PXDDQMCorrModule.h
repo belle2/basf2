@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Bjoern Spruck                                            *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef PXDDQMCORRMODULE_H_
 #define PXDDQMCORRMODULE_H_
 
@@ -75,6 +85,8 @@ namespace Belle2 {
     // +1 in dimensions to protect against noisy VXDID values.
     TH2F* m_CorrelationU;          /**< Correlation Sensor 1 vs 2 */
     TH2F* m_CorrelationV;          /**< Correlation Sensor 1 vs 2 */
+    TH1F* m_DeltaU;          /**< Correlation Sensor 1 vs 2 */
+    TH1F* m_DeltaV;          /**< Correlation Sensor 1 vs 2 */
   };
 
   inline const PXD::SensorInfo& PXDDQMCorrModule::getInfo(int index) const

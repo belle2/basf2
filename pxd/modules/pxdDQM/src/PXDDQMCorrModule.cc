@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Bjoern Spruck                                            *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include "pxd/modules/pxdDQM/PXDDQMCorrModule.h"
 
 #include <framework/core/HistoModule.h>
@@ -58,12 +68,14 @@ void PXDDQMCorrModule::defineHisto()
   oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
   //----------------------------------------------------------------
 
-  int nPixelsU1 = 1;//getInfo(0).getUCells();
+  int nPixelsU1 = 1;//getInfo(0).getUCells();// we need an actual sensor ID to use that
   int nPixelsV1 = 3;//getInfo(0).getVCells();
   int nPixelsU2 = 1;//getInfo(1).getUCells();
   int nPixelsV2 = 3;//getInfo(1).getVCells();
-  m_CorrelationU = new TH2F("CorrelationU", "Correlation of U;U1/pitch unit;U2/pitch unit", 50, 0, nPixelsU1, 50, 0, nPixelsU2);
-  m_CorrelationV = new TH2F("CorrelationV", "Correlation of V;V1/pitch unit;V2/pitch unit", 50, 0, nPixelsV1, 50, 0, nPixelsV2);
+  m_CorrelationU = new TH2F("CorrelationU", "Correlation of U;U1/cm;U2/cm", 50, 0, nPixelsU1, 50, 0, nPixelsU2);
+  m_CorrelationV = new TH2F("CorrelationV", "Correlation of V;V1/cm;V2/cm", 100, 0, nPixelsV1, 100, 0, nPixelsV2);
+  m_DeltaU = new TH1F("DeltaU", "Correlation of U2-U1;Udiff/cm", 100, -nPixelsU1, nPixelsU2);
+  m_DeltaV = new TH1F("DeltaV", "Correlation of V2-V1;Vdiff/cm", 200, -nPixelsV1, nPixelsV2);
 
   // cd back to root directory
   oldDir->cd();
@@ -87,6 +99,8 @@ void PXDDQMCorrModule::beginRun()
   // Just to make sure, reset all the histograms.
   m_CorrelationU->Reset();
   m_CorrelationV->Reset();
+  m_DeltaU->Reset();
+  m_DeltaV->Reset();
 }
 
 
@@ -109,6 +123,8 @@ void PXDDQMCorrModule::event()
         if (index2 == 1) {
           m_CorrelationU->Fill(cluster1.getU(), cluster2.getU());
           m_CorrelationV->Fill(cluster1.getV(), cluster2.getV());
+          m_DeltaU->Fill(cluster2.getU() - cluster1.getU());
+          m_DeltaV->Fill(cluster2.getV() - cluster1.getV());
         }
       }
     }

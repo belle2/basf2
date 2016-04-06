@@ -42,16 +42,31 @@ class FlavorTaggerInfoFiller(Module):
         roe = Belle2.PyStoreObj('RestOfEvent')
         FlavorTaggerInfo = roe.obj().getRelated('FlavorTaggerInfos')
 
-        qrCombined = 2 * (info.obj().getExtraInfo('qrCombined') - 0.5)
-        B0Probability = info.obj().getExtraInfo('qrCombined')
-        B0barProbability = 1 - info.obj().getExtraInfo('qrCombined')
-
         FlavorTaggerInfo.setUseModeFlavorTagger("Expert")
-        FlavorTaggerInfo.addMethodMap("TMVA")
-        FlavorTaggerInfoMap = FlavorTaggerInfo.getMethodMap("TMVA")
-        FlavorTaggerInfoMap.setQrCombined(qrCombined)
-        FlavorTaggerInfoMap.setB0Probability(B0Probability)
-        FlavorTaggerInfoMap.setB0barProbability(B0barProbability)
+
+        infoMaps = dict()
+
+        if TMVAfbdt:
+            FlavorTaggerInfo.addMethodMap("TMVA")
+            infoMaps["TMVA"] = FlavorTaggerInfo.getMethodMap("TMVA")
+
+            qrCombined = 2 * (info.obj().getExtraInfo('qrCombinedTMVA') - 0.5)
+            B0Probability = info.obj().getExtraInfo('qrCombinedTMVA')
+            B0barProbability = 1 - info.obj().getExtraInfo('qrCombinedTMVA')
+            infoMaps["TMVA"].setQrCombined(qrCombined)
+            infoMaps["TMVA"].setB0Probability(B0Probability)
+            infoMaps["TMVA"].setB0barProbability(B0barProbability)
+
+        if FANNmlp:
+            FlavorTaggerInfo.addMethodMap("FANN")
+            infoMaps["FANN"] = FlavorTaggerInfo.getMethodMap("FANN")
+
+            qrCombined = 2 * (info.obj().getExtraInfo('qrCombinedFANN') - 0.5)
+            B0Probability = info.obj().getExtraInfo('qrCombinedFANN')
+            B0barProbability = 1 - info.obj().getExtraInfo('qrCombinedFANN')
+            infoMaps["FANN"].setQrCombined(qrCombined)
+            infoMaps["FANN"].setB0Probability(B0Probability)
+            infoMaps["FANN"].setB0barProbability(B0barProbability)
 
         if not FlavorTaggerInfo:
             B2ERROR('FlavorTaggerInfoFiller: FlavorTaggerInfo does not exist')
@@ -63,8 +78,8 @@ class FlavorTaggerInfoFiller(Module):
 
             # From the likelihood it is possible to have Kaon category with no actual kaons
             if plist.obj().getListSize() == 0:
-                FlavorTaggerInfoMap.setTargetTrackLevel(category, None)
-                FlavorTaggerInfoMap.setProbTrackLevel(category, 0)
+                infoMaps["TMVA"].setTargetTrackLevel(category, None)
+                infoMaps["TMVA"].setProbTrackLevel(category, 0)
 
             for i in range(0, plist.obj().getListSize()):
                 particle = plist.obj().getParticle(i)  # Pointer to the particle with highest prob
@@ -74,8 +89,8 @@ class FlavorTaggerInfoFiller(Module):
                     # Prob of being the right target track
                     targetProb = particle.getExtraInfo('isRightTrack(' + category + ')')
                     track = particle.getTrack()  # Track of the particle
-                    FlavorTaggerInfoMap.setTargetTrackLevel(category, track)
-                    FlavorTaggerInfoMap.setProbTrackLevel(category, targetProb)
+                    infoMaps["TMVA"].setTargetTrackLevel(category, track)
+                    infoMaps["TMVA"].setProbTrackLevel(category, targetProb)
                     break
 
         for (particleList, category) in EventLevelParticleLists:
@@ -84,9 +99,9 @@ class FlavorTaggerInfoFiller(Module):
 
             # From the likelihood it is possible to have Kaon category with no actual kaons
             if plist.obj().getListSize() == 0:
-                FlavorTaggerInfoMap.setTargetEventLevel(category, None)
-                FlavorTaggerInfoMap.setProbEventLevel(category, 0)
-                FlavorTaggerInfoMap.setQrCategory(category, 0)
+                infoMaps["TMVA"].setTargetEventLevel(category, None)
+                infoMaps["TMVA"].setProbEventLevel(category, 0)
+                infoMaps["TMVA"].setQrCategory(category, 0)
 
             for i in range(0, plist.obj().getListSize()):
                 particle = plist.obj().getParticle(i)  # Pointer to the particle with highest prob
@@ -99,9 +114,9 @@ class FlavorTaggerInfoFiller(Module):
                     qrCategory = mc_variables.variables.evaluate(AvailableCategories[category][3], particle)
 
                     # Save information in the FlavorTaggerInfo DataObject
-                    FlavorTaggerInfoMap.setTargetEventLevel(category, track)
-                    FlavorTaggerInfoMap.setProbEventLevel(category, categoryProb)
-                    FlavorTaggerInfoMap.setQrCategory(category, qrCategory)
+                    infoMaps["TMVA"].setTargetEventLevel(category, track)
+                    infoMaps["TMVA"].setProbEventLevel(category, categoryProb)
+                    infoMaps["TMVA"].setQrCategory(category, qrCategory)
                     break
 
 
@@ -186,9 +201,12 @@ methods = [
 ]
 
 # Methods for Combiner Level
-methodsCombiner = [
+methodsCombinerTMVA = [
     ('FastBDT', 'Plugin', 'CreateMVAPdfs:NbinsMVAPdf=300:!H:!V:NTrees=300:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')
 ]
+methodsCombinerFANN = [('MLP', 'FANN', 'NCycles=10000:HiddenLayers=3*N:NeuronType=FANN_SIGMOID_SYMMETRIC:'
+                        'ValidationFraction=0.5:RandomSeeds=10:TrainingMethod=FANN_TRAIN_RPROP:TestRate=500:'
+                        'NThreads=8:EpochMonitoring=True')]
 
 # SignalFraction: TMVA feature
 # For smooth output set to -1, this will break the calibration.
@@ -656,49 +674,106 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./
         B2FATAL('FlavorTagger: THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
 
     methodPrefixCombinerLevel = weightFiles + 'CombinerLevel' \
-        + categoriesCombinationCode + 'TMVA'
-    if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefixCombinerLevel):
-        if mode == 'Expert':
-            B2FATAL('FlavorTagger: Combinerlevel was not trained with this combination of categories. Weight file ' +
-                    methodPrefixCombinerLevel + '_1.config not found. Stopped')
-        else:
-            B2INFO('Train TMVAMethod on combiner level')
-            trainTMVAMethod(
-                [],
-                variables=variablesCombinerLevel,
-                target='qrCombined',
-                prefix=methodPrefixCombinerLevel,
-                methods=methodsCombiner,
-                workingDirectory=workingDirectory,
-                path=path,
-            )
-    else:
-        B2INFO('FlavorTagger: Ready to be used with weightFiles' +
-               weightFiles + '. The training process has been finished.')
-        if mode == 'Expert':
-            B2INFO('Apply TMVAMethod on combiner level')
-            applyTMVAMethod(
-                [],
-                expertOutputName='qrCombined',
-                prefix=methodPrefixCombinerLevel,
-                signalClass=1,
-                method=methodsCombiner[0][0],
-                signalFraction=-1,
-                transformToProbability=False,
-                workingDirectory=workingDirectory,
-                path=path,
-            )
-        else:
-            B2FATAL('FlavorTagger: Combinerlevel was already trained with this combination of categories. Weight file ' +
-                    methodPrefixCombinerLevel + '_1.config has been found. Please use the "Expert" mode')
+        + categoriesCombinationCode
 
-        return True
+    ReadyTMVAfbdt = False
+    ReadyFANNmlp = False
+
+    if TMVAfbdt:
+        if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefixCombinerLevel + 'TMVA'):
+            if mode == 'Expert':
+                B2FATAL('FlavorTagger: Combinerlevel was not trained with this combination of categories. Weight file ' +
+                        methodPrefixCombinerLevel + 'TMVA' + '_1.config not found. Stopped')
+            else:
+                B2INFO('Train TMVAMethod on combiner level')
+                trainTMVAMethod(
+                    [],
+                    variables=variablesCombinerLevel,
+                    target='qrCombined',
+                    prefix=methodPrefixCombinerLevel + 'TMVA',
+                    methods=methodsCombinerTMVA,
+                    workingDirectory=workingDirectory,
+                    path=path,
+                )
+        else:
+            B2INFO('FlavorTagger: Ready to be used with weightFiles ' +
+                   weightFiles + '. The training process has been finished.')
+            if mode == 'Expert' or (mode == 'Teacher' and FANNmlp):
+                B2INFO('Apply TMVAMethod on combiner level')
+                applyTMVAMethod(
+                    [],
+                    expertOutputName='qrCombined' + 'TMVA',
+                    prefix=methodPrefixCombinerLevel + 'TMVA',
+                    signalClass=1,
+                    method=methodsCombinerTMVA[0][0],
+                    signalFraction=-1,
+                    transformToProbability=False,
+                    workingDirectory=workingDirectory,
+                    path=path,
+                )
+                ReadyTMVAfbdt = True
+
+            else:
+                B2FATAL('FlavorTagger: Combinerlevel was already trained with this combination of categories. Weight file ' +
+                        methodPrefixCombinerLevel + 'TMVA' + '_1.config has been found. Please use the "Expert" mode')
+
+    if FANNmlp:
+        if not isFANNMethodAvailable(workingDirectory + '/' + methodPrefixCombinerLevel + 'FANN'):
+            if mode == 'Expert':
+                B2FATAL('FlavorTagger: Combinerlevel was not trained with this combination of categories. Weight file ' +
+                        methodPrefixCombinerLevel + 'FANN' + '_WeightFile.root not found. Stopped')
+            else:
+                B2INFO('Train FANNMethod on combiner level')
+                trainFANNMethod(
+                    [],
+                    variables=variablesCombinerLevel,
+                    target='qrCombined',
+                    prefix=methodPrefixCombinerLevel + 'FANN',
+                    methods=methodsCombinerFANN,
+                    workingDirectory=workingDirectory,
+                    path=path,
+                )
+
+        else:
+            B2INFO('FlavorTagger: Ready to be used with weightFiles ' +
+                   weightFiles + '. The training process has been finished.')
+            if mode == 'Expert' or (mode == 'Teacher' and TMVAfbdt):
+                B2INFO('Apply FANNMethod on combiner level')
+                applyFANNMethod(
+                    [],
+                    expertOutputName='qrCombined' + 'FANN',
+                    prefix=methodPrefixCombinerLevel + 'FANN',
+                    method=methodsCombinerFANN[0][0],
+                    workingDirectory=workingDirectory,
+                    path=path,
+                )
+                ReadyFANNmlp = True
+
+            else:
+                B2FATAL(
+                    'FlavorTagger: Combinerlevel was already trained with this combination of categories. Weight file ' +
+                    methodPrefixCombinerLevel +
+                    'TMVA' +
+                    '_1.config or ' +
+                    methodPrefixCombinerLevel +
+                    '_WeightFile.root has been found. Please use the "Expert" mode')
+
+        if TMVAfbdt and not FANNmlp:
+            if ReadyTMVAfbdt:
+                return True
+        if FANNmlp and not TMVAfbdt:
+            if ReadyFANNmlp:
+                return True
+        if FANNmlp and TMVAfbdt:
+            if ReadyFANNmlp and ReadyTMVAfbdt:
+                return True
 
 
 def FlavorTagger(
     mode='Expert',
     weightFiles='B2JpsiKs_mu',
     workingDirectory='.',
+    combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
     method='TMVA',
     categories=[
         'Electron',
@@ -741,6 +816,23 @@ def FlavorTagger(
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
 
     workingDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
+
+    if len(combinerMethods) < 1 or len(combinerMethods) > 2:
+        B2FATAL('FlavorTagger: Invalid list of combinerMethods. The available methods are "TMVA-FBDT" and "FANN-MLP"')
+
+    global FANNmlp
+    global TMVAfbdt
+
+    FANNmlp = False
+    TMVAfbdt = False
+
+    for method in combinerMethods:
+        if method == 'TMVA-FBDT':
+            TMVAfbdt = True
+        elif method == 'FANN-MLP':
+            FANNmlp = True
+        else:
+            B2FATAL('FlavorTagger: Invalid list of combinerMethods. The available methods are "TMVA-FBDT" and "FANN-MLP"')
 
     B2INFO('*** FLAVOR TAGGING ***')
     B2INFO(' ')

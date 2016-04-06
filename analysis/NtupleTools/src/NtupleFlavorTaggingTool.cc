@@ -27,38 +27,72 @@ void NtupleFlavorTaggingTool::setupTree()
   if (strNames.empty()) return;
   int nDecayProducts = strNames.size();
 
-  B0Probability = new float[nDecayProducts];
-  B0barProbability = new float[nDecayProducts];
-  qrCombined = new float[nDecayProducts];
+  qrCombinedTMVA = new float[nDecayProducts];
+  qrCombinedFANN = new float[nDecayProducts];
   qrMC = new float[nDecayProducts];
   string method("");
 
+  const char* categories[] = { "Muon",  "IntermediateMuon", "Electron", "IntermediateElectron", "KinLepton",
+                               "IntermediateKinLepton", "Kaon", "SlowPion", "FastPion", "Lambda", "FSC", "MaximumPstar", "KaonPion"
+                             };
+
+  for (auto& category : categories) {
+    m_qrCategories.insert(std::pair<std::string, float*>(category, new float[nDecayProducts]));
+  }
+
   if (m_strOption.empty()) {
-    method = "TMVA";
+    m_useTMVA = true;
     B2INFO("Flavor Tagger Output saved for default Multivariate Method: No arguments given.");
   } else {
-    if (m_strOption == "TMVA") {
-      B2INFO("Flavor Tagger Output saved for TMVA Multivariate Method");
-      method = "TMVA";
-    } if (m_strOption == "FANN") {
-      B2INFO("Flavor Tagger Output saved for FANN Multivariate Method");
-      method = "FANN";
-      m_useFANN = true;
-    } else {
-      B2FATAL("Invalid option used for Flavor Tagger ntuple tool: " << m_strOption <<
-              ". Set to 'TMVA' or 'FANN' to save the Flavor Tagger Output related to these methods or leave the option empty to use the default multivariate Method.");
+
+
+    std::stringstream options(m_strOption);
+    std::string option;
+    std::vector<std::string> optionsVector;
+    while (std::getline(options, option, ',')) {
+      option.erase(std::remove(option.begin(), option.end(), ' '), option.end());
+      optionsVector.push_back(option);
+    }
+
+    for (auto& optioni : optionsVector) {
+
+      if (optioni == "TMVA") {
+        B2INFO("Flavor Tagger Output saved for TMVA Multivariate Method");
+        m_useTMVA = true;
+      } else if (optioni == "FANN") {
+        B2INFO("Flavor Tagger Output saved for FANN Multivariate Method");
+        m_useFANN = true;
+      } else if (optioni == "qrCategories") {
+        B2INFO("Flavor Tagger Output for each category saved");
+        m_saveCategories = true;
+      } else {
+        B2FATAL("Invalid option used for Flavor Tagger ntuple tool: " << m_strOption <<
+                ". Write 'TMVA' and/or 'FANN' to save the Flavor Tagger Output related to these combiner methods or leave the option empty to use the default TMVA Method"
+                <<
+                ". Write 'qrCategories' to save the qr output of all used categories");
+      }
     }
   }
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_tree->Branch((strNames[iProduct] + "_" + method + "_B0Probability").c_str(), &B0Probability[iProduct],
-                   (strNames[iProduct] + "_" + method + "_B0Probability/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_" + method + "_B0barProbability").c_str(), &B0barProbability[iProduct],
-                   (strNames[iProduct] + "_" + method + "_B0barProbability/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_" + method + "_qrCombined").c_str(), &qrCombined[iProduct],
-                   (strNames[iProduct] + "_" + method + "_qrCombined/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_" + method + "_qrMC").c_str(), &qrMC[iProduct],
-                   (strNames[iProduct] + "_" + method + "_qrMC/F").c_str());
+
+
+    if (m_useTMVA == true) m_tree->Branch((strNames[iProduct] + "_TMVA_qrCombined").c_str(), &qrCombinedTMVA[iProduct],
+                                            (strNames[iProduct] + "_TMVA_qrCombined/F").c_str());
+
+    if (m_useFANN == true) m_tree->Branch((strNames[iProduct] + "_FANN_qrCombined").c_str(), &qrCombinedFANN[iProduct],
+                                            (strNames[iProduct] + "_FANN_qrCombined/F").c_str());
+
+    m_tree->Branch((strNames[iProduct] + "_qrMC").c_str(), &qrMC[iProduct],
+                   (strNames[iProduct] + "_qrMC/F").c_str());
+
+    if (m_saveCategories == true) {
+      for (auto& categoryEntry : m_qrCategories) {
+        m_tree->Branch((strNames[iProduct] + "_qr" + categoryEntry.first).c_str(), &categoryEntry.second[iProduct],
+                       (strNames[iProduct] + "_qr" + categoryEntry.first + "/F").c_str());
+      }
+    }
+
   }
 }
 
@@ -75,10 +109,9 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
 
-    B0Probability[iProduct]     = -2;
-    B0barProbability[iProduct] = -2;
-    qrCombined[iProduct] = -2;
-    qrMC[iProduct] = -2;
+    qrCombinedTMVA[iProduct] = -2;
+    qrCombinedFANN[iProduct] = -2;
+    qrMC[iProduct] = 0;
 
     FlavorTaggerInfo* flavorTaggerInfo = selparticles[iProduct]->getRelatedTo<FlavorTaggerInfo>();
 
@@ -86,13 +119,21 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
       if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") continue;
 //       method[iProduct] = flavTag->getMethod();
       if (Variable::isRestOfEventEmpty(selparticles[iProduct]) != -2) {
-        FlavorTaggerInfoMap* flavorTaggerInfoMap;
-        if (m_useFANN == true) flavorTaggerInfoMap = flavorTaggerInfo->getMethodMap("FANN");
-        else flavorTaggerInfoMap = flavorTaggerInfo->getMethodMap("TMVA");
 
-        B0Probability[iProduct] = flavorTaggerInfoMap->getB0Probability();
-        B0barProbability[iProduct] = flavorTaggerInfoMap->getB0barProbability();
-        qrCombined[iProduct] = flavorTaggerInfoMap->getQrCombined();
+        if (m_useTMVA == true) qrCombinedTMVA[iProduct] = flavorTaggerInfo->getMethodMap("TMVA")->getQrCombined();
+        if (m_useFANN == true) qrCombinedFANN[iProduct] = flavorTaggerInfo->getMethodMap("FANN")->getQrCombined();
+
+        if (m_saveCategories == true) {
+          for (auto& categoryEntry : m_qrCategories) {
+            categoryEntry.second[iProduct] = 0;
+          }
+          std::map<std::string, float> iQrCategories = flavorTaggerInfo -> getMethodMap("TMVA")-> getQrCategory();
+
+          for (auto& categoryEntry : iQrCategories) {
+            m_qrCategories.at(categoryEntry.first)[iProduct] = categoryEntry.second;
+          }
+
+        }
 
         //  MC Flavor is saved only if mcparticles is not empty
         StoreArray<MCParticle> mcparticles;

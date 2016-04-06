@@ -31,20 +31,27 @@ namespace Belle2 {
 
   private:
 
-    /** Flag to save the Flavor Tagger Output using the TMVA Output. Default is to use the TMVA Output. */
+
+    /** Flag to save the Flavor Tagger Output using the FANN Output. This is the Default */
+    bool m_useTMVA;
+
+    /**< qr Output of the Combiner. Output of the FlavorTagger using the FANN MLP method as combiner after the complete process*/
+    float* qrCombinedTMVA;
+
+    /** Flag to save the Flavor Tagger Output using the FANN Output.  */
     bool m_useFANN;
 
-    /**< Direct Output of the Combiner: Probability of being a B0.*/
-    float* B0Probability;
-
-    /**< Direct Output of the Combiner: Probability of being a B0bar).*/
-    float* B0barProbability;
-
-    /**< qr Output of the Combiner. Output of the FlavorTagger after the complete process*/
-    float* qrCombined;
+    /**< qr Output of the Combiner. Output of the FlavorTagger using the FANN MLP method as combiner after the complete process*/
+    float* qrCombinedFANN;
 
     /**< q Flavor of the B0-Meson related to the RestOfEvent. Only saved if there is MC Info.*/
     float* qrMC;
+
+    /** Flag to save the individual output of each category.  */
+    bool m_saveCategories;
+
+    /**< map containing the category name and the corresponding qr Output, i.e. the Combiner input value. They could be used for independent tags.*/
+    std::map<std::string, float*> m_qrCategories;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
@@ -55,6 +62,8 @@ namespace Belle2 {
           decaydescriptor, strOptions)
     {
       m_useFANN = false;
+      m_useTMVA = false;
+      m_saveCategories = false;
       setupTree();
     }
 

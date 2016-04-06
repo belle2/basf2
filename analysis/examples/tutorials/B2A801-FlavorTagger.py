@@ -87,6 +87,7 @@ buildRestOfEvent('B0:jspiks')
 FlavorTagger(
     mode='Expert',
     weightFiles='B2JpsiKs_mu',
+    combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
     workingDirectory=os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data',
     categories=[
         'Electron',
@@ -138,8 +139,12 @@ FlavorTagger(
 # FlavorTagger(mode = 'Expert', weightFiles='B2JpsiKs_mu', categories=['Electron', 'Muon', 'Kaon', ... etc.])
 #
 # Another possibility is to train a combiner for a specific category combination using the default weight files
-
-# create and fill flat Ntuple with MCTruth, kinematic information and Flavor Tagger Output
+#
+# By default the FlavorTagger trains and applies two methods, 'TMVA-FBDT' and 'FANN-MLP', for the combiner.
+# If you want to train or test the Flavor Tagger only for one of them you have to specify it like:
+#
+# combinerMethods=['TMVA-FBDT']
+#
 
 # Fit Vertex of the B0 on the tag side
 TagV('B0:jspiks', 'breco', 0.001, 'standard_PXD')
@@ -153,8 +158,11 @@ toolsDST += ['PID', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
 toolsDST += ['Track', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
 toolsDST += ['MCTruth', '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]']
 toolsDST += ['ROEMultiplicities', '^B0']
-toolsDST += ['FlavorTagging', '^B0']
-toolsDST += ['FlavorTagging', '^B0']
+# create and fill flat Ntuple with MCTruth, kinematic information and Flavor Tagger Output
+# Without any arguments only TMVA is saved. If you want to save the FANN Output please specify it.
+# If you set qrCategories, the output of each category is saved.
+toolsDST += ['FlavorTagging[TMVA, FANN, qrCategories]', '^B0']
+
 toolsDST += ['TagVertex', '^B0']
 toolsDST += ['DeltaT', '^B0']
 toolsDST += ['MCTagVertex', '^B0']

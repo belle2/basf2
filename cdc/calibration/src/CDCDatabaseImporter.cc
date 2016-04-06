@@ -45,7 +45,7 @@ void CDCDatabaseImporter::importTimeZero()
       int l = cl > 7 ? static_cast<int>((cl - 8) % 6) : cl;
       const WireID wire = WireID(sl, l, w);
       const float t0 = m_cdcgp.getT0(wire);
-      tz.appendNew(cl, w, t0);
+      tz.appendNew(wire, t0);
     }
   }
 

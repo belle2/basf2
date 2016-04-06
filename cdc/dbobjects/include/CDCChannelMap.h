@@ -33,9 +33,10 @@ namespace Belle2 {
     CDCChannelMap(unsigned short slayer, unsigned short layer,
                   unsigned short wire,
                   unsigned short board, unsigned short channel):
+      m_wireID(WireID(slayer, layer, wire)),
       m_board(board), m_channel(channel)
     {
-      m_wireID = WireID(slayer, layer, wire);
+
     }
 
     /**
@@ -75,7 +76,7 @@ namespace Belle2 {
   private:
     WireID m_wireID; /**< Wire ID. */
     unsigned short m_board; /**< Board ID. */
-    unsigned short m_channel; /** Channel ID */
+    unsigned short m_channel; /**< Channel ID */
 
     ClassDef(CDCChannelMap, 1); /**< ClassDef */
 

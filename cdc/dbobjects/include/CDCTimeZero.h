@@ -30,12 +30,9 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCTimeZero(unsigned short layer, unsigned short wire, float t0):
-      m_t0(t0)
+    CDCTimeZero(WireID wid, float t0):
+      m_wireID(wid), m_t0(t0)
     {
-      int sl = layer > 7 ? static_cast<int>((layer - 8) / 6) + 1 : 0;
-      int l = layer > 7 ? static_cast<int>((layer - 8) % 6) : layer;
-      m_wireID = WireID(sl, l, wire);
     }
 
     /**

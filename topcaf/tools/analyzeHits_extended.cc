@@ -85,7 +85,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
   }
 
   TSpectrum* s0 = new TSpectrum(npeaks);
-  int nfound0 = s0->Search(roi[0], 1, "", 0.01);
+  s0->Search(roi[0], 1, "", 0.01);
   Double_t* xpeaks0 = s0->GetPositionX();
 
   if (trigstring == "mirror") {
@@ -102,10 +102,10 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
   }
 
   TSpectrum* s1 = new TSpectrum(npeaks);
-  int nfound1 = s1->Search(roi[1], 1, "", 0.01);
+  s1->Search(roi[1], 1, "", 0.01);
   Double_t* xpeaks1 = s1->GetPositionX();
   TSpectrum* s2 = new TSpectrum(npeaks);
-  int nfound2 = s2->Search(roi[2], 1, "", 0.01);
+  s2->Search(roi[2], 1, "", 0.01);
   Double_t* xpeaks2 = s2->GetPositionX();
 
 
@@ -311,7 +311,6 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
   /*
     if(trigstring=="midbar"){
       cout<<"midbar"<<endl;
-      /*
       cosmic_cut[0]=("TOPCAFDigits.m_time>-1237&&TOPCAFDigits.m_time<-1219"); //-1228 m06
       cosmic_cut[1]=("TOPCAFDigits.m_time>-1170&&TOPCAFDigits.m_time<-1144"); //-1156 m06
       cosmic_cut[2]=("TOPCAFDigits.m_time>-1085&&TOPCAFDigits.m_time<-1061"); //-1073 m06

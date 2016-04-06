@@ -55,7 +55,7 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() : m_calibrationEnergyHigh("
   // Set module properties
   setDescription("Applies digit energy, time and time-resolution calibration to each ECL digit. Counts number of out-of-time background digits to determine the event-by-event background level.");
   addParam("backgroundEnergyCut", m_backgroundEnergyCut, "Energy cut used to count background digits", 7.0 * Belle2::Unit::MeV);
-  addParam("backgroundTimingCut", m_backgroundTimingCut, "Timing cut used to count background digits", 150.0 * Belle2::Unit::ns);
+  addParam("backgroundTimingCut", m_backgroundTimingCut, "Timing cut used to count background digits", 110.0 * Belle2::Unit::ns);
 
   // Parallel processing certification
   setPropertyFlags(c_ParallelProcessingCertified);

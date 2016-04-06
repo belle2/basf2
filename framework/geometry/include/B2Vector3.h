@@ -45,6 +45,7 @@ namespace Belle2 {
     /** contains the coordinates in given data type */
     DataType m_coordinates[3];
   public:
+    /** storage type of the vector */
     typedef DataType value_type;
 
     /** empty Constructor sets everything to 0 */

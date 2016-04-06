@@ -54,6 +54,12 @@ namespace Belle2 {
       return static_cast<T*>(obj); //type was checked by DataStore, so the cast is safe.
     }
 
+    /** Access object by key instead of by index.
+     * @param method pointer to a member function of the objects in the array
+     * which will return the key for a given element
+     * @param key key to look for. If none of the elements return this key then
+     * NULL is returned
+     */
     template<class KEY> T* getByKey(KEY(T::*method)(void) const, KEY key) const
     {
       for (int i = 0; i < getEntries(); i++) {

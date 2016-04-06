@@ -40,19 +40,29 @@ namespace Belle2 {
      * We need forward declarations here, because otherwise the compiler ends up calling
      * the wrong function!
      */
+    /** check if the python object can be converted to the given a floating bool */
     bool checkPythonObject(const boost::python::object& pyObject, bool);
+    /** check if the python object can be converted to the given a floating point */
     bool checkPythonObject(const boost::python::object& pyObject, float);
+    /** check if the python object can be converted to the given a floating point */
     bool checkPythonObject(const boost::python::object& pyObject, double);
+    /** check if the python object can be converted to the given an integral number */
     bool checkPythonObject(const boost::python::object& pyObject, int);
+    /** check if the python object can be converted to the given an integral number */
     bool checkPythonObject(const boost::python::object& pyObject, unsigned int);
+    /** check if the python object can be converted to the given an integral number */
     bool checkPythonObject(const boost::python::object& pyObject, unsigned long int);
+    /** check if the python object can be converted to the given a string */
     bool checkPythonObject(const boost::python::object& pyObject, const std::string&);
     template<typename Key, typename Value>
     bool checkPythonObject(const boost::python::object& pyObject, const std::map<Key, Value>&);
+    /** check if the python object can be converted to the given std::vector type */
     template<typename Value>
     bool checkPythonObject(const boost::python::object& pyObject, const std::vector<Value>&);
+    /** check if the python object can be converted to the given std::tuple type */
     template<typename... Types>
     bool checkPythonObject(const boost::python::object& pyObject, const std::tuple<Types...>&);
+    /** check if the python object can be converted to the given boost::variant type */
     template<typename... Types>
     bool checkPythonObject(const boost::python::object& pyObject, const boost::variant<Types...>&);
 

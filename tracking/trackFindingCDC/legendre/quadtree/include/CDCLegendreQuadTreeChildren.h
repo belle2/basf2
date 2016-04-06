@@ -53,6 +53,7 @@ namespace Belle2 {
 
 //      typedef std::map<std::pair<size_t, size_t>, quadChild> ChildrenHolder;
 
+      /// Constructor
       QuadChildrenTemplate()
       {
         // initialize to null
@@ -63,9 +64,9 @@ namespace Belle2 {
         }
       };
 
-      /*
-        This method will apply a lambda function to every child of the quad tree
-      */
+      /**
+       * This method will apply a lambda function to every child of the quad tree
+       */
       void apply(std::function<void(quadChild*)> lmd)
       {
         for (size_t t_index = 0; t_index < m_sizeX; ++t_index) {
@@ -82,11 +83,17 @@ namespace Belle2 {
         this->apply([](quadChild * qt) { delete qt;});
       };
 
+      /**
+       * Set child with indexes x, y
+       * @param qt pointer to QuadTree child to set
+       */
+
       inline void set(const size_t x, const size_t y, quadChild* qt)
       {
         m_children[x][y] = qt;
       }
 
+      /// Get pointer to the child with indexes x, y
       inline quadChild* get(const size_t x, const size_t y)
       {
         return m_children[x][y];
@@ -97,6 +104,7 @@ namespace Belle2 {
 
     private:
 
+      /// Array of children
       quadChild* m_children[m_sizeX][m_sizeY];
     };
 

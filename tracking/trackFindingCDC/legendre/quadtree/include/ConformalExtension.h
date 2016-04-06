@@ -32,11 +32,12 @@ namespace Belle2 {
 
     public:
 
+      /// Constructor
       ConformalExtension(double levelPrecision = 9) : m_levelPrecision(levelPrecision)
       {
       };
 
-      /// perform transformation for set of given hits; reference position taken as POCA of the fitted trajectory
+      /// Perform transformation for set of given hits; reference position taken as POCA of the fitted trajectory
       std::vector<const CDCWireHit*> newRefPoint(std::vector<const CDCWireHit*>& cdcWireHits,
                                                  std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, bool doMaskInitialHits = false)
       {

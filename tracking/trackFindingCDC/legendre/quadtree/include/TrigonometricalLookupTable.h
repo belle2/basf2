@@ -36,6 +36,7 @@ namespace Belle2 {
 
     public:
 
+      /// Constructor
       TrigonometricalLookupTable() :
         m_lookup_created(false), m_nbinsTheta(pow(2, maxLvl))
       {

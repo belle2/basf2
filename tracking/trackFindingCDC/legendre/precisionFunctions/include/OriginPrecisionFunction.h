@@ -23,6 +23,7 @@ namespace Belle2 {
 
     public:
 
+      /// Constructor
       OriginPrecisionFunction()
       {
         // function which estimates desired rho (curvature) resolution of quadtree node in the given pt (1/rho) region
@@ -49,8 +50,6 @@ namespace Belle2 {
           return res;
         };
       };
-
-
 
     };
   }

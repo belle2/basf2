@@ -23,6 +23,7 @@ namespace Belle2 {
 
     public:
 
+      /// Constructor
       NonOriginPrecisionFunction()
       {
 
@@ -49,8 +50,6 @@ namespace Belle2 {
           return res;
         };
       };
-
-      virtual ~NonOriginPrecisionFunction() {};
 
 
     };

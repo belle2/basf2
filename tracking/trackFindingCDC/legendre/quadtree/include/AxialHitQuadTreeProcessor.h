@@ -19,6 +19,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
 
 
 #include <TF1.h>
@@ -39,19 +40,32 @@ namespace Belle2 {
 
     public:
 
-      AxialHitQuadTreeProcessor(unsigned char lastLevel, const ChildRanges& ranges, std::function< double(double) >& lmdFunctLevel,
+      /// Constructor
+      AxialHitQuadTreeProcessor(unsigned char lastLevel, const ChildRanges& ranges,
+                                BasePrecisionFunction::PrecisionFunction& lmdFunctLevel,
                                 bool standartBinning = false) :
         QuadTreeProcessorTemplate(lastLevel, ranges), m_standartBinning(standartBinning), m_lmdFunctLevel(lmdFunctLevel) { }
 
     private:
 
+      /**
+       *  Sets whether standard splitting of bins will be used
+       *   - in case of standard binning each bin will be splitted into 4 equal bins
+       *   - in case of non-standard binning boundaries of each child will be extended (see AxialHitQuadTreeProcessor::createChildWithParent())
+       */
       bool m_standartBinning;
 
-      std::function< double(double) >& m_lmdFunctLevel;
+      /// Lambda which holds resolution function for the quadtree
+      BasePrecisionFunction::PrecisionFunction& m_lmdFunctLevel;
 
+      /// Function to check whether sinogram is crossing the node (see AxialHitQuadTreeProcessor::insertItemInNode())
       inline bool sameSign(double n1, double n2, double n3, double n4) const
       {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
 
+      /**
+       * Vector of QuadTrees
+       * QuadTree instances (which are filled in the vector) cover the whole Legendre phase-space; each instance is processes independently.
+       */
       std::vector<QuadTree> m_seededTree;
 
     public:
@@ -152,6 +166,10 @@ namespace Belle2 {
 
       /**
        * Return the new ranges. We do not use the standard ranges for the lower levels.
+       * @param node quadtree node
+       * @param i theta index of the child
+       * @param j rho index of the child
+       * @return returns ranges of the (i;j) child
        */
       ChildRanges createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const override final
       {
@@ -194,7 +212,10 @@ namespace Belle2 {
         }
       }
 
-
+      /**
+       * Fill m_quadTree vector with QuadTree instances (number of instances is 4^lvl).
+       * @param lvl level to which QuadTree instances should be equal in sense of the rho-theta boundaries.
+       */
       void seedQuadTree(int lvl)
       {
         bool twoSidedPhasespace(false);
@@ -251,12 +272,18 @@ namespace Belle2 {
 
       }
 
-
+      /// Sort vector of seeded QuadTree instances by number of hits.
       void sortSeededTree()
       {
         std::sort(m_seededTree.begin(), m_seededTree.end(), [](QuadTree & quadTree1, QuadTree & quadTree2) { return quadTree1.getNItems() > quadTree2.getNItems();});
       }
 
+      /**
+       * Fill vector of QuadTree instances with hits.
+       * @param lmdProcessor the lambda function to call after a node was selected
+       * @param nHitsThreshold the threshold on the number of items
+       * @param rThreshold the threshold in the rho (curvature) variable
+       */
       void fillSeededTree(CandidateProcessorLambda& lmdProcessor,
                           unsigned int nHitsThreshold, float rThreshold)
       {
@@ -272,12 +299,18 @@ namespace Belle2 {
 
       }
 
-
+      /// Clear vector of QuadTree instances
       void clearSeededTree()
       {
         m_seededTree.clear();
         m_seededTree.resize(0);
       }
+
+      /**
+       * Create single QuadTree node and fill it with unused hits.
+       * @param ranges ranges of the node
+       * @return returns pointer to QuadTree instance
+       */
 
       QuadTree* createSingleNode(const ChildRanges& ranges)
       {
@@ -298,7 +331,7 @@ namespace Belle2 {
         return quadTree;
       }
 
-
+      /// Draw QuadTree nodes
       void drawNode()
       {
         static int nevent(0);
@@ -336,6 +369,16 @@ namespace Belle2 {
         nevent++;
       }
 
+      /**
+       * Check derivative of the sinogram.
+       * @param node QuadTree node
+       * @param hit pointer to the hit to check
+       * @return returns true in cases:
+       * @return    - positive derivative and no extremum in the node's ranges or
+       * @return    - extremum located in the node's ranges
+       * @return returns false in other cases (namely negative derivative
+       *
+       */
       bool checkDerivative(QuadTree* node, ConformalCDCWireHit* hit) const
       {
         TrigonometricalLookupTable<>& trigonometricalLookupTable = TrigonometricalLookupTable<>::Instance();
@@ -356,6 +399,12 @@ namespace Belle2 {
 
       }
 
+      /**
+       * Checks whether extremum point is located whithin QuadTree node's ranges
+       * @param node QuadTree node
+       * @param hit hit to check
+       * @return true or false
+       */
       bool checkExtremum(QuadTree* node, ConformalCDCWireHit* hit) const
       {
 

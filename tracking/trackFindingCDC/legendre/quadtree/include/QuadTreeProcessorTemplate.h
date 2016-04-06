@@ -43,6 +43,8 @@ namespace Belle2 {
       /**
        * Constructor is very simple. The QuadTree has to be constructed elsewhere.
        * @param lastLevel describing the last search level for the quad tree creation.
+       * @param ranges ranges of the QuadTree at the top level
+       * @param setUsedFlag Set the used flag after every lambda function call
        */
       QuadTreeProcessorTemplate(unsigned char lastLevel, const ChildRanges& ranges, bool debugOutput = false, bool setUsedFlag = true) :
         m_lastLevel(lastLevel), m_debugOutput(debugOutput), m_debugOutputMap(), m_param_setUsedFlag(setUsedFlag)

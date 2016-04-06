@@ -27,19 +27,26 @@ namespace Belle2 {
 
     public:
 
+      /**
+       * Constructor.
+       * @param ranges ranges of the initial QuadTree (only one instance without children created)
+       * @referencePoint reference position. Conformal transformation will be performed with respect to this point rather than to (0;0)
+       */
       AxialHitQuadTreeProcessorWithNewReferencePoint(const ChildRanges& ranges, std::pair<double, double> referencePoint) :
         QuadTreeProcessorTemplate(0, ranges), m_referencePoint(referencePoint) { }
 
     private:
 
+      /// Function to check whether sinogram is crossing the node (see AxialHitQuadTreeProcessorWithNewReferencePoint::insertItemInNode())
       inline bool sameSign(double n1, double n2, double n3, double n4) const
       {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
 
-
+      /// Reference point
       std::pair<double, double> m_referencePoint;
 
     public:
 
+      /// Provide ConformalCDCWireHit to process.
       void provideItemsSet(std::vector<ConformalCDCWireHit*>& itemsVector) override final
       {
         clear();
@@ -53,6 +60,9 @@ namespace Belle2 {
         }
       }
 
+      /**
+       * @return Hits which belong to the QuadTree
+       */
       std::vector<ConformalCDCWireHit*> getAssignedHits()
       {
         std::vector<ConformalCDCWireHit*> itemsToReturn;

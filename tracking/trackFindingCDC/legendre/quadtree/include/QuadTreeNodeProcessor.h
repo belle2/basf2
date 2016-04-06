@@ -172,11 +172,12 @@ namespace Belle2 {
       }
 
     private:
-      AxialHitQuadTreeProcessor& m_qtProcessor; /**< Reference to the quadtree processor */
+      AxialHitQuadTreeProcessor& m_qtProcessor; /**< Reference to the quadtree processor. */
 
-      BasePrecisionFunction::PrecisionFunction m_precisionFunct; /**< Quadtree precision function*/
+      BasePrecisionFunction::PrecisionFunction m_precisionFunct; /**< Quadtree precision function. */
 
-      const unsigned long m_nbinsTheta = pow(2, TrackFindingCDC::BasePrecisionFunction::getLookupGridLevel());
+      const unsigned long m_nbinsTheta = pow(2,
+                                             TrackFindingCDC::BasePrecisionFunction::getLookupGridLevel()); /**< Number of theta bins.*/
     };
 
   }

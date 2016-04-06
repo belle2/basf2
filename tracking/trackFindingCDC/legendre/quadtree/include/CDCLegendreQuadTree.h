@@ -55,18 +55,21 @@ namespace Belle2 {
     public:
       typedef QuadTreeTemplate<typeX, typeY, typeData, binCountX, binCountY> ThisType;
 
-      // a lambda expression with this signature is used to process each of the
-      // found candidates during the startFillingTree call
+      /**
+       * a lambda expression with this signature is used to process each of the
+       * found candidates during the startFillingTree call
+       */
       typedef std::function< void(ThisType*) > CandidateProcessorLambda;
 
-      // store the minimum, center and maximum of this bin (in this order in the tuple)
+      /// store the minimum, center and maximum of this bin (in this order in the tuple)
       typedef std::array<typeX, 3> XBinTuple;
       typedef std::array<typeY, 3> YBinTuple;
       typedef std::vector<ThisType*> NodeList;
 
-      // type of the child nodes hold by this node
+      /// type of the child nodes hold by this node
       typedef QuadChildrenTemplate<ThisType> Children;
 
+      /// Constructor
       QuadTreeTemplate() : m_parent(nullptr), m_level(0), m_filled(false)
       {
         // initialize all bin settings to zero
@@ -76,6 +79,7 @@ namespace Belle2 {
         }
       }
 
+      /// Constructor
       QuadTreeTemplate(typeX xMin, typeX xMax, typeY yMin, typeY yMax, unsigned char level, ThisType* parent) :
         m_level(level)
       {
@@ -93,6 +97,7 @@ namespace Belle2 {
         computeBins(xMin, xMax, yMin, yMax);
       }
 
+      /// Set parameters of the QuadTree
       void setParameters(typeX xMin, typeX xMax, typeY yMin, typeY yMax, int level, ThisType* parent)
       {
         m_level = level;
@@ -237,7 +242,7 @@ namespace Belle2 {
 
     private:
 
-      // sets the x and y bin values and computes the bin centers
+      /// sets the x and y bin values and computes the bin centers
       void computeBins(typeX xMin, typeX xMax, typeY yMin, typeY yMax)
       {
         m_xBins[0] = xMin;

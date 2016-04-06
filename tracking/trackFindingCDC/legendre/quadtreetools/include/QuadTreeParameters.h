@@ -93,7 +93,7 @@ namespace Belle2 {
       }
 
     private:
-      int m_maxLevel;
+      int m_maxLevel; /**< Maximal deepness (level) of the QuadTree */
       LegendreFindingPass& m_legendreFindingPass; /**< Reference to the current pass */
 
 

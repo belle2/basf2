@@ -29,8 +29,10 @@ namespace Belle2 {
 
     public:
 
+      /// Number of generated tracks
       const unsigned int numberOfPossibleTrackCandidate = 2;
 
+      /// Setup test
       void SetUp() override
       {
         prepareWireHits();
@@ -45,6 +47,7 @@ namespace Belle2 {
 
       }
 
+      /// Delete objects
       void TearDown() override
       {
         // clean-up hits. Here the assumption is use that
@@ -56,11 +59,13 @@ namespace Belle2 {
         m_trackHitWrapperList.clear();
       }
 
+      /// Get vector of the generated hits
       std::vector<ConformalCDCWireHit*>& getHitVector()
       {
         return m_trackHitWrapperList;
       }
 
+      /// Mark hits as unused (for further QuadTree look-up)
       void markAllHitsAsUnused()
       {
         for (ConformalCDCWireHit* hit : m_trackHitWrapperList) {
@@ -68,6 +73,11 @@ namespace Belle2 {
         }
       }
 
+      /**
+       * Get track candidate
+       * @param index index of the track
+       * @return the reference to the track candidate
+       */
       CDCTrack& getTrackCandidate(unsigned int index)
       {
         return m_trackList[index % numberOfPossibleTrackCandidate];
@@ -75,10 +85,15 @@ namespace Belle2 {
 
     private:
 
-      std::vector<CDCWireHit> m_hitList;
-      std::vector<CDCTrack> m_trackList;
-      std::vector<ConformalCDCWireHit*> m_trackHitWrapperList;
+      std::vector<CDCWireHit> m_hitList; /**< List of the generated CDCWireHits */
+      std::vector<CDCTrack> m_trackList; /**< List of the generated CDCTracks */
+      std::vector<ConformalCDCWireHit*> m_trackHitWrapperList; /**< List of the generated ConformalCDCWireHit */
 
+      /**
+       * Generate track candidate
+       * @param number index of the track
+       * @return reference to the generated track
+       */
       CDCTrack& createTrack(unsigned int number)
       {
         B2ASSERT("Create CDCTrack: Only 2 tracks can be created whithin the test!", m_trackList.size() < 2);
@@ -111,6 +126,9 @@ namespace Belle2 {
         return resultTrackCandidate;
       }
 
+      /**
+       * Fill vectors of hits
+       */
       void prepareWireHits(/*unsigned int number, CDCTrack& resultTrackCandidate*/)
       {
 //          trackHitList.reserve(76);

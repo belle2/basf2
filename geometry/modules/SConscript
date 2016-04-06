@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'geometry']
+env['LIBS'] = ['geometry_dbobjects', 'geometry', 'framework']
 
 # check if we have GDML support
 conf = Configure(env)

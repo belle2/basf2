@@ -66,7 +66,11 @@ class ConditionsDB:
 
         All other arguments will be forwarded to requests.request.
         """
-        req = self._session.request(method, self._base_url + url.lstrip("/"), *args, **argk)
+        try:
+            req = self._session.request(method, self._base_url + url.lstrip("/"), *args, **argk)
+        except requests.exceptions.ConnectionError as e:
+            B2FATAL("Could not access '" + self._base_url + url.lstrip("/") + "': " + str(e))
+
         if not req.status_code == requests.codes.ok:
             # Apparently something is not good. Let's try to decode the json
             # reply containing reason and message

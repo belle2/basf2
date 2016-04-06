@@ -73,7 +73,10 @@ namespace Belle2 {
       }
 
       /**
-       * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node
+       * Check whether hit belongs to the quadtree node:
+       * @param node quadtree node
+       * @param hit hit being checked
+       * @return returns true if sinogram of the hit crosses (geometrically) borders of the node
        */
       inline bool insertItemInNode(QuadTree* node, ConformalCDCWireHit* hit, unsigned int /*t_index*/,
                                    unsigned int /*r_index*/) const override final
@@ -84,10 +87,14 @@ namespace Belle2 {
 
         TrigonometricalLookupTable<>& trigonometricalLookupTable = TrigonometricalLookupTable<>::Instance();
 
+        // get left and right borders of the node
         unsigned long thetaMin = node->getXMin();
         unsigned long thetaMax = node->getXMax();
+
+        // get top and bottom borders of the node
         float rMin = node->getYMin();
         float rMax = node->getYMax();
+
         float cosThetaMin = trigonometricalLookupTable.cosTheta(thetaMin);
         float sinThetaMin = trigonometricalLookupTable.sinTheta(thetaMin);
         float cosThetaMax = trigonometricalLookupTable.cosTheta(thetaMax);
@@ -96,10 +103,13 @@ namespace Belle2 {
         float rHitMin = hit->getConformalX() * cosThetaMin + hit->getConformalY() * sinThetaMin;
         float rHitMax = hit->getConformalX() * cosThetaMax + hit->getConformalY() * sinThetaMax;
 
+        // compute sinograms at the left and right borders of the node
         float rHitMin1 = rHitMin - hit->getConformalDriftLength();
         float rHitMin2 = rHitMin + hit->getConformalDriftLength();
         float rHitMax1 = rHitMax - hit->getConformalDriftLength();
         float rHitMax2 = rHitMax + hit->getConformalDriftLength();
+
+        //compute distance from the sinograms to bottom and top borders of the node
 
         // this has some explicit cppcheck suppressions to silence false-positives about
         // array bounds
@@ -121,6 +131,7 @@ namespace Belle2 {
 
         bool valueToReturn(false);
 
+        // compare distances from sinograms to the node -- basing on this information we check for the affiliation of the hit to the node
         // cppcheck-suppress arrayIndexOutOfBounds
         if (! sameSign(dist_1[0][0], dist_1[0][1], dist_1[1][0], dist_1[1][1])) {
           valueToReturn = true;

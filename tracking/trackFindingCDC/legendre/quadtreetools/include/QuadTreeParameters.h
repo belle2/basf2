@@ -26,7 +26,6 @@ namespace Belle2 {
         m_maxLevel(maxLevel), m_legendreFindingPass(legendreFindingPass),
         m_rangesFine(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, BasePrecisionFunction::getLookupGridLevel())),
                                     AxialHitQuadTreeProcessor::rangeY(-0.02, 0.14))),
-//        m_rangesFine(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, BasePrecisionFunction::getLookupGridLevel())), AxialHitQuadTreeProcessor::rangeY(0., 0.15))),
         m_rangesRough(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, BasePrecisionFunction::getLookupGridLevel())),
                                      AxialHitQuadTreeProcessor::rangeY(0., 0.30))),
         m_originPrecisionFunction(),

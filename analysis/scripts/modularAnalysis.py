@@ -808,7 +808,6 @@ def applyFANNMethod(
     decayString,
     method='MLP',
     expertOutputName='isSignal',
-    signalClass=1,
     prefix='FANN',
     workingDirectory='.',
     path=analysis_main,
@@ -830,7 +829,6 @@ def applyFANNMethod(
     expert.param('workingDirectory', workingDirectory)
     expert.param('listNames', decayString)
     expert.param('expertOutputName', expertOutputName)
-    expert.param('signalClass', signalClass)
     path.add_module(expert)
 
 

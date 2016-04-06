@@ -51,9 +51,6 @@ namespace Belle2 {
              "Working directory in which the expert finds the config file and the weight file directory", std::string("."));
     addParam("expertOutputName", m_expertOutputName,
              "Name under which the output of the expert is stored in the ExtraInfo of the Particle object.");
-    addParam("signalClass", m_signalClass,
-             "Class which is considered as signal. e.g. the pdg of the Particle which is considered signal if "
-             "you trained the method with pdg as target variable. Or 1 if you trained with isSignal as target.", 1);
 
   }
 

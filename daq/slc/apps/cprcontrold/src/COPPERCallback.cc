@@ -226,7 +226,7 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
           hslb.open(i);
           if (!obj.hasObject("fee")) continue;
           try {
-            hslb.test();
+            //hslb.test();
           } catch (const HSLBHandlerException& e) {
             throw (RCHandlerException("tesths failed : %s", e.what()));
           }

@@ -4,6 +4,7 @@
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Christian Pulvermacher                                   *
+*               Thomas Keck                                              *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -45,6 +46,11 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
   addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToNtuple.root"));
   addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
 
+  std::tuple<std::string, std::map<int, unsigned int>> default_sampling{"", {}};
+  addParam("sampling", m_sampling,
+           "Tuple of variable name and a map of integer values and inverse sampling rate. E.g. (signal, {1: 0, 0:10}) selects all signal candidates and every 10th background candidate.",
+           default_sampling);
+
   m_file = nullptr;
 }
 
@@ -69,13 +75,10 @@ void VariablesToNtupleModule::initialize()
   }
 
   // root wants var1:var2:...
-  string varlist;
-  bool first = true;
+  string varlist = "__weight__";
   for (const string& varStr : m_variables) {
-    if (!first)
-      varlist += ":";
+    varlist += ":";
     varlist += Variable::makeROOTCompatible(varStr);
-    first = false;
 
     //also collection function pointers
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);
@@ -86,8 +89,45 @@ void VariablesToNtupleModule::initialize()
     }
   }
 
+  m_sampling_name = std::get<0>(m_sampling);
+  m_sampling_rates = std::get<1>(m_sampling);
+
+  if (m_sampling_name != "") {
+    m_sampling_variable = Variable::Manager::Instance().getVariable(m_sampling_name);
+    if (m_sampling_variable == nullptr) {
+      B2FATAL("Couldn't find sample variable " << m_sampling_name << " via the Variable::Manager. Check the name!");
+    }
+    for (const auto& pair : m_sampling_rates)
+      m_sampling_counts[pair.first] = 0;
+  } else {
+    m_sampling_variable = nullptr;
+  }
+
   m_tree.registerInDataStore(m_fileName + m_treeName, DataStore::c_DontWriteOut);
   m_tree.construct(m_treeName.c_str(), "", varlist.c_str());
+  m_tree->get().SetBasketSize("*", 1600);
+  m_tree->get().SetCacheSize(100000);
+}
+
+
+float VariablesToNtupleModule::getInverseSamplingRateWeight(const Particle* particle)
+{
+
+  if (m_sampling_variable == nullptr)
+    return 1.0;
+
+  long target = std::lround(m_sampling_variable->function(particle));
+  if (m_sampling_rates.find(target) != m_sampling_rates.end() and m_sampling_rates[target] > 0) {
+    m_sampling_counts[target]++;
+    if (m_sampling_counts[target] % m_sampling_rates[target] != 0)
+      return 0;
+    else {
+      m_sampling_counts[target] = 0;
+      return m_sampling_rates[target];
+    }
+  }
+
+  return 1.0;
 }
 
 void VariablesToNtupleModule::event()
@@ -96,21 +136,26 @@ void VariablesToNtupleModule::event()
   std::vector<float> vars(nVars);
 
   if (m_particleList.empty()) {
-    for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-      vars[iVar] = m_functions[iVar](nullptr);
+    vars[0] = getInverseSamplingRateWeight(nullptr);
+    if (vars[0] > 0) {
+      for (unsigned int iVar = 0; iVar < nVars; iVar++) {
+        vars[iVar + 1] = m_functions[iVar](nullptr);
+      }
+      m_tree->get().Fill(vars.data());
     }
-    m_tree->get().Fill(vars.data());
 
   } else {
     StoreObjPtr<ParticleList> particlelist(m_particleList);
     unsigned int nPart = particlelist->getListSize();
     for (unsigned int iPart = 0; iPart < nPart; iPart++) {
       const Particle* particle = particlelist->getParticle(iPart);
-      for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-        vars[iVar] = m_functions[iVar](particle);
+      vars[0] = getInverseSamplingRateWeight(particle);
+      if (vars[0] > 0) {
+        for (unsigned int iVar = 0; iVar < nVars; iVar++) {
+          vars[iVar + 1] = m_functions[iVar](particle);
+        }
+        m_tree->get().Fill(vars.data());
       }
-
-      m_tree->get().Fill(vars.data());
     }
   }
 }

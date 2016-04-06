@@ -40,6 +40,11 @@ namespace Belle2 {
     virtual void terminate() override;
 
   private:
+    /**
+     * Calculate inverse sampling rate weight. Event is skipped if returned weight is 0.
+     */
+    float getInverseSamplingRateWeight(const Particle* particle);
+
     /** Name of particle list with reconstructed particles. */
     std::string m_particleList;
     /** List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
@@ -55,6 +60,16 @@ namespace Belle2 {
     StoreObjPtr<RootMergeable<TNtuple>> m_tree;
     /** List of function pointers corresponding to given variables. */
     std::vector<Variable::Manager::FunctionPtr> m_functions;
+
+    /** Tuple of variable name and a map of integer values and inverse sampling rate. E.g. (signal, {1: 0, 0:10}) selects all signal candidates and every 10th background candidate. */
+    std::tuple<std::string, std::map<int, unsigned int>> m_sampling;
+    /** Variable name of sampling variable */
+    std::string m_sampling_name;
+    /** Inverse sampling rates */
+    std::map<int, unsigned int> m_sampling_rates;
+
+    const Variable::Manager::Var* m_sampling_variable; /**< Variable Pointer to target variable */
+    std::map<int, unsigned long int> m_sampling_counts; /**< Current number of samples with this value */
 
   };
 } // end namespace Belle2

@@ -72,8 +72,8 @@ void PXDDQMCorrModule::defineHisto()
   int nPixelsV1 = 3;//getInfo(0).getVCells();
   int nPixelsU2 = 1;//getInfo(1).getUCells();
   int nPixelsV2 = 3;//getInfo(1).getVCells();
-  m_CorrelationU = new TH2F("CorrelationU", "Correlation of U;U1/cm;U2/cm", 50, 0, nPixelsU1, 50, 0, nPixelsU2);
-  m_CorrelationV = new TH2F("CorrelationV", "Correlation of V;V1/cm;V2/cm", 100, 0, nPixelsV1, 100, 0, nPixelsV2);
+  m_CorrelationU = new TH2F("CorrelationU", "Correlation of U;U1/cm;U2/cm", 25, -nPixelsU1, nPixelsU1, 25, nPixelsU2, nPixelsU2);
+  m_CorrelationV = new TH2F("CorrelationV", "Correlation of V;V1/cm;V2/cm", 50, -nPixelsV1, nPixelsV1, 50, nPixelsV2, nPixelsV2);
   m_DeltaU = new TH1F("DeltaU", "Correlation of U2-U1;Udiff/cm", 100, -nPixelsU1, nPixelsU2);
   m_DeltaV = new TH1F("DeltaV", "Correlation of V2-V1;Vdiff/cm", 200, -nPixelsV1, nPixelsV2);
 

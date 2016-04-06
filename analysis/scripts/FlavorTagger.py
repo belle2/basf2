@@ -774,7 +774,6 @@ def FlavorTagger(
     weightFiles='B2JpsiKs_mu',
     workingDirectory='.',
     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
-    method='TMVA',
     categories=[
         'Electron',
         'IntermediateElectron',

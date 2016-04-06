@@ -13,11 +13,11 @@
  * the quad tree.
  */
 
-
 #pragma once
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Utils.h>
+#include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
 
 #include <boost/math/constants/constants.hpp>
 #include <cmath>
@@ -26,22 +26,46 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /**
+     * Class which holds lookup table for sin and cos functions.
+     * Deepness (grid level) of the table could be modified via template parameter. Number of bins in the table is 2^level.
+     * Since default value for quadtree search is 12 as default deepness of 16 has been chosen to keep ability to perform bins overlapping.
+     */
+    template<unsigned int maxLvl = BasePrecisionFunction::getLookupGridLevel()>
     class TrigonometricalLookupTable {
 
     public:
 
-      TrigonometricalLookupTable();
+      TrigonometricalLookupTable() :
+        m_lookup_created(false), m_nbinsTheta(pow(2, maxLvl))
+      {
+
+      };
 
       /**
        * Initialize lookup table
        */
-      void initialize();
+      void initialize()
+      {
+        if (not m_lookup_created) {
+          m_lookup_theta.resize(m_nbinsTheta + 1);
+          for (unsigned long i = 0; i <= m_nbinsTheta; ++i) {
+            m_lookup_theta[i] = std::make_pair(computeSin(i), computeCos(i));
+          }
+          m_lookup_created = true;
+        }
+      };
 
       /**
        * Get instance of class
        */
-      static TrigonometricalLookupTable& Instance();
+      static TrigonometricalLookupTable& Instance()
+      {
+        static TrigonometricalLookupTable trigonometricalLookupTable;
+        return trigonometricalLookupTable;
+      } ;
 
+      /// Get sin() corresponding to the given bin
       inline float sinTheta(unsigned long bin)
       {
         if (branch_unlikely(not m_lookup_created)) {
@@ -54,6 +78,7 @@ namespace Belle2 {
         }
       }
 
+      /// Get cos() corresponding to the given bin
       inline float cosTheta(unsigned long bin)
       {
         if (branch_unlikely(not m_lookup_created)) initialize();
@@ -64,16 +89,19 @@ namespace Belle2 {
         }
       }
 
+      /// Get number of bins in the lookup table
       inline unsigned long getNBinsTheta() const {return m_nbinsTheta;};
 
     private:
 
+      /// Compute cos for the given bin value
       inline float computeSin(unsigned long bin) const
       {
         const float bin_width = 2.* boost::math::constants::pi<float>()  / m_nbinsTheta;
         return sin(bin * bin_width - boost::math::constants::pi<float>() + bin_width / 2.);
       }
 
+      /// Compute cos for the given bin value
       inline float computeCos(unsigned long bin) const
       {
         const float bin_width = 2.* boost::math::constants::pi<float>()  / m_nbinsTheta;

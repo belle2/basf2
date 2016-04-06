@@ -58,6 +58,9 @@ TrackFinderCDCLegendreTrackingModule::TrackFinderCDCLegendreTrackingModule() :
 
 void TrackFinderCDCLegendreTrackingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
+  B2ASSERT("Maximal level of QuadTree search is setted to be greater than lookuptable grid level! ",
+           m_param_maxLevel <= BasePrecisionFunction::getLookupGridLevel());
+
   startNewEvent();
   findTracks();
   outputObjects(tracks);

@@ -32,13 +32,15 @@ using namespace TrackFindingCDC;
 TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
 {
   //high-pt candidate
-  AxialHitQuadTreeProcessor::ChildRanges ranges1(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)),
+  AxialHitQuadTreeProcessor::ChildRanges ranges1(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2,
+                                                 BasePrecisionFunction::getLookupGridLevel())),
                                                  AxialHitQuadTreeProcessor::rangeY(0., 0.15));
   OriginPrecisionFunction originPrecisionFunction;
   BasePrecisionFunction::PrecisionFunction highPtPrecisionFunction = originPrecisionFunction.getFunction();
 
   //low-pt candidate
-  AxialHitQuadTreeProcessor::ChildRanges ranges2(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)),
+  AxialHitQuadTreeProcessor::ChildRanges ranges2(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2,
+                                                 BasePrecisionFunction::getLookupGridLevel())),
                                                  AxialHitQuadTreeProcessor::rangeY(0., 0.30));
   NonOriginPrecisionFunction nonOriginPrecisionFunction;
   BasePrecisionFunction::PrecisionFunction lowPtPrecisionFunction = nonOriginPrecisionFunction.getFunction();

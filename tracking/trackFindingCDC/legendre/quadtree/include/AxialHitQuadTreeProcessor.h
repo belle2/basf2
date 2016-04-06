@@ -82,14 +82,16 @@ namespace Belle2 {
         Quadlet dist_1;
         Quadlet dist_2;
 
+        TrigonometricalLookupTable<>& trigonometricalLookupTable = TrigonometricalLookupTable<>::Instance();
+
         unsigned long thetaMin = node->getXMin();
         unsigned long thetaMax = node->getXMax();
         float rMin = node->getYMin();
         float rMax = node->getYMax();
-        float cosThetaMin = TrigonometricalLookupTable::Instance().cosTheta(thetaMin);
-        float sinThetaMin = TrigonometricalLookupTable::Instance().sinTheta(thetaMin);
-        float cosThetaMax = TrigonometricalLookupTable::Instance().cosTheta(thetaMax);
-        float sinThetaMax = TrigonometricalLookupTable::Instance().sinTheta(thetaMax);
+        float cosThetaMin = trigonometricalLookupTable.cosTheta(thetaMin);
+        float sinThetaMin = trigonometricalLookupTable.sinTheta(thetaMin);
+        float cosThetaMax = trigonometricalLookupTable.cosTheta(thetaMax);
+        float sinThetaMax = trigonometricalLookupTable.sinTheta(thetaMax);
 
         float rHitMin = hit->getConformalX() * cosThetaMin + hit->getConformalY() * sinThetaMin;
         float rHitMax = hit->getConformalX() * cosThetaMax + hit->getConformalY() * sinThetaMax;
@@ -154,7 +156,7 @@ namespace Belle2 {
               else theta1 -= extension;
 
               unsigned long theta2 = node->getXBin(i + 1) + extension;
-              if (theta2 >= TrigonometricalLookupTable::Instance().getNBinsTheta())
+              if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta())
                 theta2 = node->getXBin(i + 1);
 
               return ChildRanges(rangeX(theta1, theta2), rangeY(r1, r2));
@@ -168,7 +170,7 @@ namespace Belle2 {
               else theta1 -= extension;
 
               unsigned long theta2 = node->getXBin(i + 1) + extension;
-              if (theta2 >= TrigonometricalLookupTable::Instance().getNBinsTheta())
+              if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta())
                 theta2 = node->getXBin(i + 1);
 
               return ChildRanges(rangeX(theta1, theta2), rangeY(r1, r2));
@@ -325,11 +327,13 @@ namespace Belle2 {
 
       bool checkDerivative(QuadTree* node, ConformalCDCWireHit* hit) const
       {
-        float rMinD = -1.*hit->getConformalX() * TrigonometricalLookupTable::Instance().sinTheta(node->getXMin())
-                      + hit->getConformalY() * TrigonometricalLookupTable::Instance().cosTheta(node->getXMin());
+        TrigonometricalLookupTable<>& trigonometricalLookupTable = TrigonometricalLookupTable<>::Instance();
 
-        float rMaxD = -1.*hit->getConformalX() * TrigonometricalLookupTable::Instance().sinTheta(node->getXMax())
-                      + hit->getConformalY() * TrigonometricalLookupTable::Instance().cosTheta(node->getXMax());
+        float rMinD = -1.*hit->getConformalX() * trigonometricalLookupTable.sinTheta(node->getXMin())
+                      + hit->getConformalY() * trigonometricalLookupTable.cosTheta(node->getXMin());
+
+        float rMaxD = -1.*hit->getConformalX() * trigonometricalLookupTable.sinTheta(node->getXMax())
+                      + hit->getConformalY() * trigonometricalLookupTable.cosTheta(node->getXMax());
 
 
 //        float rMean = node->getYMean();
@@ -351,12 +355,14 @@ namespace Belle2 {
         //        if (thetaExtremum > pi) thetaExtremum -= pi;
         //        if (thetaExtremum < 0.) thetaExtremum += pi;
 
-        unsigned long thetaExtremumLookup = (thetaExtremum + pi) * TrigonometricalLookupTable::Instance().getNBinsTheta() / (2.*pi) ;
+        TrigonometricalLookupTable<>& trigonometricalLookupTable = TrigonometricalLookupTable<>::Instance();
+
+        unsigned long thetaExtremumLookup = (thetaExtremum + pi) * trigonometricalLookupTable.getNBinsTheta() / (2.*pi) ;
 
         if ((thetaExtremumLookup > node->getXMax()) || (thetaExtremumLookup < node->getXMin())) return false;
 
-        double rD = hit->getConformalX() * TrigonometricalLookupTable::Instance().cosTheta(thetaExtremumLookup)
-                    + hit->getConformalY() * TrigonometricalLookupTable::Instance().sinTheta(thetaExtremumLookup);
+        double rD = hit->getConformalX() * trigonometricalLookupTable.cosTheta(thetaExtremumLookup)
+                    + hit->getConformalY() * trigonometricalLookupTable.sinTheta(thetaExtremumLookup);
 
         if ((rD > node->getYMin()) && (rD < node->getYMax())) return true;
 

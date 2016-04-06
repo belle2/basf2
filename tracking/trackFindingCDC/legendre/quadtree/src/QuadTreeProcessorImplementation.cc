@@ -20,7 +20,7 @@ bool QuadTreeProcessorSegments::insertItemInNode(QuadTree* node, CDCRecoSegment2
 {
   float dist[2][2];
 
-  TrigonometricalLookupTable& lookupTable = TrigonometricalLookupTable::Instance();
+  TrigonometricalLookupTable<>& lookupTable = TrigonometricalLookupTable<>::Instance();
 
   float bin_width = TMath::Pi() / lookupTable.getNBinsTheta();
 

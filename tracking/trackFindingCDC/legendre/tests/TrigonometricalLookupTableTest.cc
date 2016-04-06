@@ -18,7 +18,7 @@ using namespace TrackFindingCDC;
 
 TEST(TrigonometricalLookupTableTest, compute_sin_cos)
 {
-  TrigonometricalLookupTable& inst = TrigonometricalLookupTable::Instance();
+  TrigonometricalLookupTable<>& inst = TrigonometricalLookupTable<>::Instance();
 
   auto binCount = inst.getNBinsTheta();
   double binWidth = 2.0f * boost::math::constants::pi<double>() / binCount;

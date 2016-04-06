@@ -82,6 +82,7 @@ namespace Belle2 {
         postprocessSingleNode(candidateHits, conformalCDCWireHitList, cdcTrackList);
       };
 
+
       /// Trying to assing new hits from neighbouring regions of the given node.
       /// THIS METHOD IS DISABLED BECACUSE IT CREATES INVALID TREE ITEMS
       /// WHICH ARE IN THETA AREAS ( < 0 or > m_nbinsTheta )
@@ -147,7 +148,6 @@ namespace Belle2 {
         }
       };
 
-
       /// Perform conformal extension for given set of hits and create CDCTrack object of them
       void postprocessSingleNode(std::vector<ConformalCDCWireHit*>& candidateHits,
                                  std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
@@ -176,7 +176,7 @@ namespace Belle2 {
 
       BasePrecisionFunction::PrecisionFunction m_precisionFunct; /**< Quadtree precision function*/
 
-      const unsigned long m_nbinsTheta = pow(2, 16);
+      const unsigned long m_nbinsTheta = pow(2, TrackFindingCDC::BasePrecisionFunction::getLookupGridLevel());
     };
 
   }

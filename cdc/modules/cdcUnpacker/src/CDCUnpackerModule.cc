@@ -79,7 +79,9 @@ CDCUnpackerModule::~CDCUnpackerModule()
 void CDCUnpackerModule::initialize()
 {
 
-  B2INFO("CDCUnpacker: initialize() Called.");
+  if (m_enablePrintOut == true) {
+    B2INFO("CDCUnpacker: initialize() Called.");
+  }
 
   StoreArray<RawCDC>::required(m_rawCDCName);
 
@@ -106,20 +108,24 @@ void CDCUnpackerModule::initialize()
                                    DataStore::arrayName<CDCHit>(m_cdcHitName));
 
   loadMap();
-
-  B2INFO("CDCUnpacker: FADC threshold: " << m_fadcThreshold);
+  if (m_enablePrintOut == true) {
+    B2INFO("CDCUnpacker: FADC threshold: " << m_fadcThreshold);
+  }
 }
 
 void CDCUnpackerModule::beginRun()
 {
-
-  B2INFO("CDCUnpacker: beginRun() called.");
+  if (m_enablePrintOut == true) {
+    B2INFO("CDCUnpacker: beginRun() called.");
+  }
 
 }
 
 void CDCUnpackerModule::event()
 {
-  B2INFO("CDCUnpacker: event() started.");
+  if (m_enablePrintOut == true) {
+    B2INFO("CDCUnpacker: event() started.");
+  }
 
   // TDC count for the trigger scinti.
   int tdcCountTrig = 0;
@@ -199,12 +205,16 @@ void CDCUnpackerModule::event()
         const int c_headearWords = 3;
 
         if (nWord < c_headearWords) {
-          B2WARNING("CDCUnpacker : No CDC block header.");
+          if (m_enablePrintOut == true) {
+            B2WARNING("CDCUnpacker : No CDC block header.");
+          }
           continue;
         }
 
-        B2INFO("CDCUnpacker : RawDataBlock(CDC) : Block #  " << i);
-        B2INFO("CDCUnpacker : Node ID " << iNode << ", Finness ID " << iFiness);
+        if (m_enablePrintOut == true) {
+          B2INFO("CDCUnpacker : RawDataBlock(CDC) : Block #  " << i);
+          B2INFO("CDCUnpacker : Node ID " << iNode << ", Finness ID " << iFiness);
+        }
 
         setCDCPacketHeader(ibuf);
 
@@ -218,20 +228,26 @@ void CDCUnpackerModule::event()
           B2ERROR("data length " << dataLength << " nWord " << nWord);
           continue;
         }
-        B2INFO("CDCUnpacker : Data size " << dataLength <<  " words.");
+        if (m_enablePrintOut == true) {
+          B2INFO("CDCUnpacker : Data size " << dataLength <<  " words.");
+        }
 
         const int board = getBoardId();
         const int trgNumber = getTriggerNumber();
         const int trgTime = getTriggerTime();
 
-        B2INFO("CDCUnpacker : Board ID " << board <<  ", Trigger number " << trgNumber << ", Trigger time " << trgTime);
+        if (m_enablePrintOut == true) {
+          B2INFO("CDCUnpacker : Board ID " << board <<  ", Trigger number " << trgNumber << ", Trigger time " << trgTime);
+        }
 
         //
         // Check the data type (raw or supressed mode?).
         //
 
         if (dataType == 1) { //  Raw data mode.
-          B2INFO("CDCUnpacker : Raw data mode.");
+          if (m_enablePrintOut == true) {
+            B2INFO("CDCUnpacker : Raw data mode.");
+          }
 
           m_buffer.clear();
 
@@ -329,8 +345,9 @@ void CDCUnpackerModule::event()
           }
 
         } else if (dataType == 2) { // Suppressed mode.
-
-          B2INFO("CDCUnpacker : Suppressed mode.");
+          if (m_enablePrintOut == true) {
+            B2INFO("CDCUnpacker : Suppressed mode.");
+          }
 
           // convert int array -> short array.
           m_buffer.clear();
@@ -429,12 +446,16 @@ void CDCUnpackerModule::event()
 
 void CDCUnpackerModule::endRun()
 {
-  B2INFO("CDCUnpacker : End run.");
+  if (m_enablePrintOut == true) {
+    B2INFO("CDCUnpacker : End run.");
+  }
 }
 
 void CDCUnpackerModule::terminate()
 {
-  B2INFO("CDCUnpacker : Terminated.");
+  if (m_enablePrintOut == true) {
+    B2INFO("CDCUnpacker : Terminated.");
+  }
 }
 
 

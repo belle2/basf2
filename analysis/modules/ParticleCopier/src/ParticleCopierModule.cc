@@ -69,8 +69,8 @@ namespace Belle2 {
     const StoreArray<Particle> particles;
 
     // copy all particles from input lists that pass selection criteria into plist
-    for (unsigned i = 0; i < m_inputListNames.size(); i++) {
-      const StoreObjPtr<ParticleList> plist(m_inputListNames[i]);
+    for (unsigned iList = 0; iList < m_inputListNames.size(); iList++) {
+      const StoreObjPtr<ParticleList> plist(m_inputListNames[iList]);
 
       const unsigned int origSize = plist->getListSize();
       std::vector<Particle*> copies(origSize);
@@ -91,7 +91,7 @@ namespace Belle2 {
       unsigned int copySize = plist->getListSize();
 
       if (copySize != origSize)
-        B2FATAL("Size of the ParticleList " << m_inputListNames[i]
+        B2FATAL("Size of the ParticleList " << m_inputListNames[iList]
                 << " has changed while copying the Particles! original size = "
                 << origSize << " vs. new size = " << copySize);
 

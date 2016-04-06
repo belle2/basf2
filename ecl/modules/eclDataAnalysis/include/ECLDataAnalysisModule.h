@@ -62,7 +62,7 @@ namespace Belle2 {
 
     /** members of ECLReconstructor Module */
 
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing info */
+    TFile* m_rootFilePtr; /**< root file used for storing info */
     std::string m_rootFileName; /**< name of the root file */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
     bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
@@ -91,6 +91,8 @@ namespace Belle2 {
     std::vector<int>* m_eclDigitAmp;  /**< ECLDigit amplitude */
     std::vector<int>* m_eclDigitTimeFit;  /**< ECLDigit timing */
     std::vector<int>* m_eclDigitFitQuality;  /**< ECLDigit fit quality */
+    std::vector<int>* m_eclDigitToShower; /**< Index of Shower related to that ECLDigit */
+    std::vector<int>* m_eclDigitToCalDigit; /**< Index of CalDigit related to that ECLDigit */
 
     int m_eclCalDigitMultip; /**< Number of ECLCalDigits per event */
     std::vector<int>* m_eclCalDigitIdx; /**< ECLCalDigit index */
@@ -98,8 +100,8 @@ namespace Belle2 {
     std::vector<int>* m_eclCalDigitToShower; /**< Index of ECLShower related to that ECLCalDigit */
     //std::vector<int>* m_eclCalDigitToHit; /**< Index of ECLHit related to that ECLCalDigit */
     std::vector<int>* m_eclCalDigitCellId; /**< Number of ECLCalDigit CellId */
-    std::vector<int>* m_eclCalDigitAmp;  /**< ECLCalDigit amplitude */
-    std::vector<int>* m_eclCalDigitTimeFit;  /**< ECLCalDigit timing */
+    std::vector<double>* m_eclCalDigitAmp;  /**< ECLCalDigit amplitude */
+    std::vector<double>* m_eclCalDigitTimeFit;  /**< ECLCalDigit timing */
     std::vector<int>* m_eclCalDigitFitQuality;  /**< ECLCalDigit fit quality */
 
     int m_eclSimHitMultip;  /**< Number of ECLSimHits per event */
@@ -177,6 +179,7 @@ namespace Belle2 {
     std::vector<int>* m_eclPureDigitAmp;  /**< ECLPureDigit amplitude */
     std::vector<int>* m_eclPureDigitTimeFit;  /**< ECLPureDigit timing */
     std::vector<int>* m_eclPureDigitFitQuality;  /**< ECLPureDigit fit quality */
+    std::vector<int>* m_eclPureDigitToCluster;  /**< ECLPureDigit To Cluster */
 
     int m_eclPureClusterMultip;  /**< Number of ECLClusterss per event */
     std::vector<int>* m_eclPureClusterIdx;  /**< ECLCluster index */

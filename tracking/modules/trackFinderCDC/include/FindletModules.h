@@ -40,6 +40,9 @@
 /******* Minimal Findlets **********/
 
 namespace Belle2 {
+  /**
+   * Module implementation using the WireHitCreator
+   */
   class WireHitCreatorModule:
     public TrackFindingCDC::FindletModule<TrackFindingCDC::WireHitCreator> {
 
@@ -49,7 +52,9 @@ namespace Belle2 {
     WireHitCreatorModule() : Super{{{"CDCWireHitVector"}}} {}
   };
 
-
+  /**
+   * Module implementation using the WireHitTopologyFiller
+   */
   class WireHitTopologyFillerModule:
     public TrackFindingCDC::FindletModule<TrackFindingCDC::WireHitTopologyFiller> {
 
@@ -59,6 +64,9 @@ namespace Belle2 {
     WireHitTopologyFillerModule() : Super{{{"CDCWireHitVector"}}} {}
   };
 
+  /**
+   * Module implementation using the SuperClusterCreator
+   */
   class SuperClusterCreatorModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::SuperClusterCreator> {
 
@@ -68,6 +76,9 @@ namespace Belle2 {
     SuperClusterCreatorModule() : Super{{{"CDCWireHitVector", "CDCWireHitSuperClusterVector"}}} {}
   };
 
+  /**
+   * Module implementation using the ClusterRefiner
+   */
   class ClusterRefinerModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::ClusterRefiner<> > {
 
@@ -77,6 +88,9 @@ namespace Belle2 {
     ClusterRefinerModule() : Super{{{"CDCWireHitSuperClusterVector", "CDCWireHitClusterVector"}}} {}
   };
 
+  /**
+   * Module implementation using the ClusterBackgroundDetector
+   */
   class ClusterBackgroundDetectorModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::ClusterBackgroundDetector<
     TrackFindingCDC::ChooseableClusterFilter> > {
@@ -87,6 +101,9 @@ namespace Belle2 {
     ClusterBackgroundDetectorModule() : Super{{{"CDCWireHitClusterVector"}}} {}
   };
 
+  /**
+   * Module implementation using the ChooseableFacetFilter
+   */
   class FacetCreatorModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::FacetCreator<
     TrackFindingCDC::ChooseableFacetFilter> > {
@@ -99,6 +116,9 @@ namespace Belle2 {
     FacetCreatorModule() : Super{{{"CDCWireHitClusterVector", "CDCFacetVector"}}} {}
   };
 
+  /**
+   * Module implementation using the SegmentCreatorFacetAutomaton
+   */
   class SegmentCreatorFacetAutomatonModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentCreatorFacetAutomaton> {
   public:
@@ -108,23 +128,38 @@ namespace Belle2 {
     SegmentCreatorFacetAutomatonModule() : Super{{{"CDCFacetVector", "" /*to be set externally*/}}} {}
   };
 
+  /**
+   * Module implementation using the SegmentMerger
+   */
   class SegmentMergerModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentMerger<
     TrackFindingCDC::ChooseableSegmentRelationFilter> > {
   };
 
+  /**
+   * Module implementation using the SegmentOrienter
+   */
   class SegmentOrienterModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentOrienter> {
   };
 
+  /**
+   * Module implementation using the SegmentFitter
+   */
   class SegmentFitterModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentFitter> {
   };
 
+  /**
+   * Module implementation using the SegmentExporter
+   */
   class SegmentExporterModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentExporter> {
   };
 
+  /**
+   * Module implementation using the SegmentCreatorMCTruth
+   */
   class SegmentCreatorMCTruthModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentCreatorMCTruth> {
   public:
@@ -142,6 +177,9 @@ namespace Belle2 {
 #include <tracking/trackFindingCDC/findlets/combined/SegmentFinderFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
 
+  /*
+   * Combined Module using a combination of filters for segments
+   */
   class SegmentFinderFacetAutomatonModule:
     public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentFinderFacetAutomaton<
     TrackFindingCDC::ChooseableClusterFilter,
@@ -159,6 +197,9 @@ namespace Belle2 {
     SegmentFinderFacetAutomatonModule() : Super{{{"CDCWireHitVector", "CDCRecoSegment2DVector"}}} {}
   };
 
+  /*
+   * Combined Module using a combination of filters on segment pairs
+   */
   class TrackFinderSegmentPairAutomatonModule:
     public TrackFindingCDC::FindletModule<TrackFindingCDC::TrackFinderSegmentPairAutomaton<
     TrackFindingCDC::ChooseableSegmentPairFilter,

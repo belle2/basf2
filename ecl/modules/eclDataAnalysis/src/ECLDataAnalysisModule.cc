@@ -840,7 +840,6 @@ void ECLDataAnalysisModule::event()
       m_eclHitToMc->push_back(-1);
   }
 
-  cout << "Clusters" << endl;
   //CLUSTERS
   m_eclClusterMultip = clusters.getEntries();
   for (unsigned int iclusters = 0; iclusters < (unsigned int)clusters.getEntries() ; iclusters++) {
@@ -871,8 +870,6 @@ void ECLDataAnalysisModule::event()
     m_eclClusterDeltaL->push_back(aECLClusters->getdeltaL());
     m_eclClusterBeta->push_back(aECLClusters->getbeta());
 
-    cout << "Standard stuff" << endl;
-
     if (aECLClusters->getRelated<ECLShower>() != (nullptr)) {
       const ECLShower* shower_cluster = aECLClusters->getRelated<ECLShower>();
       m_eclClusterToShower->push_back(shower_cluster->getArrayIndex());
@@ -891,14 +888,12 @@ void ECLDataAnalysisModule::event()
     //} else
     //  m_eclHitToMc->push_back(-1);
 
-    cout << "ClusterMC" << endl;
     if (aECLClusters->getRelated<MCParticle>() != (nullptr)) {
       int ii = 0;
       for (int rel = 0; rel < (int)ECLClusterToMC.getEntries(); rel++) {
         if (ECLClusterToMC[rel].getFromIndex() == iclusters) {
           if ((ECLClusterToMC[rel].getWeight() > 0) && (rel < 10)) {
-            cout << "Contribution from Mc particle: " << ECLClusterToMC[rel].getToIndex() << " with weight " << ECLClusterToMC[rel].getWeight()
-                 << endl;
+            //cout << "Contribution from Mc particle: " << ECLClusterToMC[rel].getToIndex() << " with weight " << ECLClusterToMC[rel].getWeight() << endl;
             idx[ii] = rel;
             ii++;
           }
@@ -980,8 +975,6 @@ void ECLDataAnalysisModule::event()
     }
   }
 
-  cout << "Pure Digit" << endl;
-
   if (m_doPureCsIStudy == true) {
 
     //StoreArray<ECLDigit> pure_digits(m_pure_digits);
@@ -1015,8 +1008,6 @@ void ECLDataAnalysisModule::event()
         m_eclPureDigitToMc->push_back(-1);
     }
 
-    cout << "Pure Clusters" << endl;
-
     m_eclPureClusterMultip = pure_clusters.getEntries();
     for (unsigned int iclusters = 0; iclusters < (unsigned int)pure_clusters.getEntries() ; iclusters++) {
       ECLCluster* aECLClusters = pure_clusters[iclusters];
@@ -1048,8 +1039,6 @@ void ECLDataAnalysisModule::event()
     }
   }
 
-  cout << "Showers" << endl;
-
   m_eclShowerMultip = showers.getEntries();
   for (int ishowers = 0; ishowers < showers.getEntries() ; ishowers++) {
     ECLShower* aECLshowers = showers[ishowers];
@@ -1068,8 +1057,6 @@ void ECLDataAnalysisModule::event()
     } else
       m_eclShowerToMc->push_back(-1);
   }
-
-  cout << "MC" << endl;
 
   m_mcMultip = mcParticles.getEntries();
   for (int imcpart = 0; imcpart < mcParticles.getEntries(); imcpart++) {

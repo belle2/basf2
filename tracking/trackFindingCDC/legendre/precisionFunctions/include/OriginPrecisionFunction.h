@@ -16,8 +16,8 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /*
-     * Basic function for checking quadtree's node "r" boundaries:
-     * when used in quadtree processor marks nodes at lvl==13 as leafs
+     * Function for checking quadtree's node "r" boundaries;
+     * used upon making decision whether quadtree node is a leaf or not
      */
     class OriginPrecisionFunction : public BasePrecisionFunction {
 
@@ -25,6 +25,13 @@ namespace Belle2 {
 
       OriginPrecisionFunction()
       {
+        // function which estimates desired rho (curvature) resolution of quadtree node in the given pt (1/rho) region
+        // parameters of the function are taken from the fit:
+        //     10000 of pion tracks were generated with particle gun produced at (0,0,0) (IP) with pt=[0.05;2.0]GeV, phi=[-2pi;2pi]
+        //     by resolution we imply size of the quadtree node which can cover 80% of the hits in legendre phase-space
+        //     resolution was estimated in bins of pt with step of 200MeV
+        //     distribution of resolutions was fitted with function exp(a+b*pt)+c+d*pt (this function has been choosen as it can describe the shape of the distribution)
+        // this function takes into account smearing of the track in legendre space due to energy losses
         m_function = [&](double r_qt) -> double {
           double res;
           //TODO: bug is here!

@@ -96,7 +96,7 @@ void eventCallback(struct event_handler_args eha)
     const char* pvname_c = ca_name(eha.chid);
     if (pvname_c != NULL) {
       std::string pvname = StringUtil::replace(pvname_c, ":", ".");
-      //LogFile::debug("Event Callback: %s = %s", pvname.c_str(), pvdata);
+      LogFile::debug("Event Callback: %s = %s", pvname.c_str(), pvdata);
       g_callback->set(pvname, pvdata);
       g_callback->notify();
     } else {

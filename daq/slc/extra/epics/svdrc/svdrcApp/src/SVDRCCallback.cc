@@ -32,21 +32,23 @@ SVDRCCallback::SVDRCCallback(const NSMNode& node)
 
 void SVDRCCallback::init(NSMCommunicator&) throw()
 {
-  int status = ca_create_channel("GPSC:SVD:State:Rqs", NULL, NULL, 0, &m_PSRqs);
+  int status = ca_create_channel("B2:PSC:SVD:State:req:S", NULL, NULL, 0, &m_PSRqs);
   SEVCHK(status, "Create channel failed");
   status = ca_pend_io(1.0);
   SEVCHK(status, "Channel connection failed");
-  status = ca_create_channel("GRC:SVD:State:Rqs", NULL, NULL, 0, &m_RCRqs);
+  status = ca_create_channel("B2:RC:SVD:State:req:S", NULL, NULL, 0, &m_RCRqs);
   SEVCHK(status, "Create channel failed");
   status = ca_pend_io(1.0);
   SEVCHK(status, "Channel connection failed");
   NSMNode& node(getNode());
   node.setState(RCState::NOTREADY_S);
   add(new NSMVHandlerText("rcstate", true, false, node.getState().getLabel()));
-  addPV("GPSC:SVD:State:Act");
-  addPV("GPSC:SVD:State:Rqs");
-  addPV("GRC:SVD:State:Act");
-  addPV("GRC:SVD:State:Rqs");
+  add(new NSMVHandlerText("rcconfig", true, false, "default"));
+  add(new NSMVHandlerText("dbtable", true, false, "none"));
+  addPV("B2:PSC:SVD:State:cur:S");
+  addPV("B2:PSC:SVD:State:req:S");
+  addPV("B2:RC:SVD:State:cur:S");
+  addPV("B2:RC:SVD:State:req:S");
 }
 
 int SVDRCCallback::putPV(chid cid, const char* val)
@@ -59,22 +61,22 @@ int SVDRCCallback::putPV(chid cid, const char* val)
 
 void SVDRCCallback::load(const DBObject&) throw(RCHandlerException)
 {
-  putPV(m_RCRqs, "Ready");
+  putPV(m_RCRqs, "ready");
 }
 
 void SVDRCCallback::abort() throw(RCHandlerException)
 {
-  putPV(m_RCRqs, "NotReady");
+  putPV(m_RCRqs, "notReady");
 }
 
 void SVDRCCallback::start(int expno, int runno) throw(RCHandlerException)
 {
-  putPV(m_RCRqs, "Running");
+  putPV(m_RCRqs, "running");
 }
 
 void SVDRCCallback::stop() throw(RCHandlerException)
 {
-  putPV(m_RCRqs, "Ready");
+  putPV(m_RCRqs, "ready");
 }
 
 bool SVDRCCallback::addPV(const std::string& pvname) throw()

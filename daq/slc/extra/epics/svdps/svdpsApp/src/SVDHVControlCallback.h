@@ -2,6 +2,7 @@
 #define _Belle2_SVDHVControlCallback_h
 
 #include <daq/slc/hvcontrol/HVControlCallback.h>
+#include <daq/slc/runcontrol/RCNode.h>
 
 struct MYNODE {
   char value[20];
@@ -29,7 +30,7 @@ namespace Belle2 {
     };
 
   public:
-    SVDHVControlCallback(const NSMNode& node);
+    SVDHVControlCallback(const NSMNode& node, const std::string& rcname);
     virtual ~SVDHVControlCallback() throw() {}
 
   public:
@@ -45,9 +46,16 @@ namespace Belle2 {
   public:
     int putPV(chid cid, const char* val);
     bool addPV(const std::string& pvname) throw();
-    HVState& getStateTarget() throw() { return m_state_target; }
+    const HVState& getStateTarget() const throw() { return m_state_target; }
+    const RCState getRCState() const throw() { return m_rcnode.getState(); }
+    void setRCState(const RCState& state) throw() { m_rcnode.setState(state); }
+    void sendToRC(const RCCommand& cmd);
+    void setStoppedByTrip(bool stopped) { m_stopped_by_trip = stopped; }
+    bool isStoppedByTrip() const { return m_stopped_by_trip; }
 
   private:
+    RCNode m_rcnode;
+    bool m_stopped_by_trip;
     chid m_RCRqs;
     chid m_PSRqs;
     HVState m_state_target;

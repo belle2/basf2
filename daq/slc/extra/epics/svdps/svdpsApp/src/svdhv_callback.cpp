@@ -39,8 +39,9 @@ void init_svdhv(const char* confname)
   const std::string hostname = config.get("nsm.host");
   const int port = config.getInt("nsm.port");
   const std::string nodename = config.get("nsm.nodename");
+  const std::string rcname = config.get("nsm.rcname");
   SEVCHK(ca_context_create(ca_enable_preemptive_callback),"ca_context_create");
-  g_callback = new SVDHVControlCallback(NSMNode(nodename));
+  g_callback = new SVDHVControlCallback(NSMNode(nodename), rcname);
   PThread(new NSMNodeDaemon(g_callback, hostname, port));
 }
 
@@ -80,29 +81,56 @@ void eventCallback(struct event_handler_args eha)
       HVState state_target = g_callback->getStateTarget();
       g_callback->set(pvname, pvdata);
       std::string val = pvdata;
-      if (pvname == "GPSC.SVD.State.Act") {
-	if (val == "Off") {
+      if (pvname == "B2.PSC.SVD.State.cur.S") {
+	if (val == "off") {
 	  g_callback->setHVState(HVState::OFF_S);
-	} else if (val == "Standby") {
+	  g_callback->setStoppedByTrip(false);
+	} else if (val == "standby") {
 	  g_callback->setHVState(HVState::STANDBY_S);
-	} else if (val == "Peak") {
+	} else if (val == "peak") {
 	  g_callback->setHVState(HVState::PEAK_S);
-	} else if (val == "Preparing") {
+	  if (g_callback->isStoppedByTrip()) {
+            g_callback->reply(NSMMessage(RCCommand::START));
+          }
+	  g_callback->setStoppedByTrip(false);
+	} else if (val == "preparing") {
 	  g_callback->setHVState(HVState::TURNINGON_TS);
-	} else if (val == "TurningOff") {
+	} else if (val == "turningOff") {
 	  g_callback->setHVState(HVState::TURNINGOFF_TS);
-	} else if (val == "RampingUp") {
+	} else if (val == "tampingUp") {
 	  g_callback->setHVState(HVState::RAMPINGUP_TS);
-	} else if (val == "RampingDown") {
+	} else if (val == "rampingDown") {
 	  g_callback->setHVState(HVState::RAMPINGDOWN_TS);
-	} else if (val == "Trip") {
+	} else if (val == "trip") {
 	  g_callback->setHVState(HVState::TRIP_ES);
-	} else if (val == "Error") {
+	  if (g_callback->getRCState() == RCState::RUNNING_S) {
+            g_callback->reply(NSMMessage(RCCommand::STOP));
+            g_callback->setStoppedByTrip(true);
+            g_callback->sendToRC(RCCommand::STOP);
+	  }
+	} else if (val == "error") {
 	  g_callback->setHVState(HVState::ERROR_ES);
+	  if (g_callback->getRCState() == RCState::RUNNING_S) {
+            g_callback->reply(NSMMessage(RCCommand::STOP));
+          }
+          g_callback->sendToRC(RCCommand::ABORT);
+          g_callback->setStoppedByTrip(false);
 	}
-      } else if (pvname == "GPSC.SVD.State.Rqs") {
-	if (state_target == HVState::STANDBY_S && val == "Standby") {
-	  
+      } else if (pvname == "B2.RC.SVD.State.cur.S") {
+	if (val == "notReady") {
+	  g_callback->setRCState(RCState::NOTREADY_S);
+	} else if (val == "ready") {
+	  g_callback->setRCState(RCState::READY_S);
+	} else if (val == "running") {
+	  g_callback->setRCState(RCState::RUNNING_S);
+	} else if (val == "loading") {
+	  g_callback->setRCState(RCState::LOADING_TS);
+	} else if (val == "unloading") {
+	  g_callback->setRCState(RCState::ABORTING_RS);
+	} else if (val == "unknown") {
+	  g_callback->setRCState(RCState::UNKNOWN);
+	} else if (val == "error") {
+	  g_callback->setRCState(RCState::ERROR_ES);
 	}
       } 
     } else {

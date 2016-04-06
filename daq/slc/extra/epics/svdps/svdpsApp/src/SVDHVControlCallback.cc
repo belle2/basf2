@@ -11,6 +11,7 @@
 #include "SVDHVControlCallback.h"
 
 #include <daq/slc/nsm/NSMCallback.h>
+#include <daq/slc/nsm/NSMCommunicator.h>
 
 #include <daq/slc/system/LogFile.h>
 
@@ -23,27 +24,27 @@ void connectionCallback(struct connection_handler_args args);
 void accessRightsCallback(struct access_rights_handler_args args);
 void eventCallback(struct event_handler_args eha);
 
-SVDHVControlCallback::SVDHVControlCallback(const NSMNode& node)
-  : HVControlCallback(node)
+SVDHVControlCallback::SVDHVControlCallback(const NSMNode& node, const std::string& rcname)
+  : HVControlCallback(node), m_rcnode(rcname), m_stopped_by_trip(false)
 {
   getNode().setState(HVState::OFF_S);
 }
 
 void SVDHVControlCallback::init(NSMCommunicator&) throw()
 {
-  int status = ca_create_channel("GPSC:SVD:State:Rqs", NULL, NULL, 0, &m_PSRqs);
+  int status = ca_create_channel("B2:PSC:SVD:State:req:S", NULL, NULL, 0, &m_PSRqs);
   SEVCHK(status, "Create channel failed");
   status = ca_pend_io(1.0);
   SEVCHK(status, "Channel connection failed");
-  status = ca_create_channel("GRC:SVD:State:Rqs", NULL, NULL, 0, &m_RCRqs);
+  status = ca_create_channel("B2:RC:SVD:State:req:S", NULL, NULL, 0, &m_RCRqs);
   SEVCHK(status, "Create channel failed");
   status = ca_pend_io(1.0);
   SEVCHK(status, "Channel connection failed");
   add(new NSMVHandlerText("hvstate", true, false, getNode().getState().getLabel()));
-  addPV("GPSC:SVD:State:Act");
-  addPV("GPSC:SVD:State:Rqs");
-  addPV("GRC:SVD:State:Act");
-  addPV("GRC:SVD:State:Rqs");
+  addPV("B2:PSC:SVD:State:cur:S");
+  addPV("B2:PSC:SVD:State:req:S");
+  addPV("B2:RC:SVD:State:cur:S");
+  addPV("B2:RC:SVD:State:req:S");
 }
 
 int SVDHVControlCallback::putPV(chid cid, const char* val)
@@ -57,32 +58,32 @@ int SVDHVControlCallback::putPV(chid cid, const char* val)
 void SVDHVControlCallback::turnon() throw(HVHandlerException)
 {
   LogFile::info("turnon");
-  putPV(m_RCRqs, "Ready");
-  putPV(m_PSRqs, "Standby");
+  putPV(m_RCRqs, "ready");
+  putPV(m_PSRqs, "standby");
 }
 
 void SVDHVControlCallback::turnoff() throw(HVHandlerException)
 {
-  putPV(m_PSRqs, "Off");
-  putPV(m_RCRqs, "NotReady");
+  putPV(m_PSRqs, "off");
+  putPV(m_RCRqs, "notReady");
 }
 
 void SVDHVControlCallback::standby() throw(HVHandlerException)
 {
-  putPV(m_RCRqs, "Ready");
-  putPV(m_PSRqs, "Standby");
+  putPV(m_RCRqs, "ready");
+  putPV(m_PSRqs, "standby");
 }
 
 void SVDHVControlCallback::peak() throw(HVHandlerException)
 {
   LogFile::info("peak");
-  putPV(m_PSRqs, "Peak");
+  putPV(m_PSRqs, "peak");
 }
 
 void SVDHVControlCallback::recover() throw(HVHandlerException)
 {
-  putPV(m_RCRqs, "NotReady");
-  putPV(m_PSRqs, "Standby");
+  putPV(m_RCRqs, "notReady");
+  putPV(m_PSRqs, "standby");
 }
 
 bool SVDHVControlCallback::addPV(const std::string& pvname) throw()
@@ -103,6 +104,11 @@ bool SVDHVControlCallback::addPV(const std::string& pvname) throw()
                          DBE_VALUE, eventCallback, pvnode, &pvnode->myevid);
   add(new SVDPSVHandler(vname, NSMVar("")));
   return true;
+}
+
+void SVDHVControlCallback::sendToRC(const RCCommand& cmd)
+{
+  NSMCommunicator::send(NSMMessage(m_rcnode, cmd));
 }
 
 SVDHVControlCallback::SVDPSVHandler::SVDPSVHandler(const std::string& name, const NSMVar& var)

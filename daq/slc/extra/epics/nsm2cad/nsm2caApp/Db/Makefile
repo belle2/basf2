@@ -11,9 +11,8 @@ include $(TOP)/configure/CONFIG
 # Create and install (or just install) into <top>/db
 # databases, templates, substitutions like this
 #DB += xxx.db
-DB += nsmnode.db
-DB += store_ecl_status.db
-DB += ropc.db
+DB += rcnode.db
+DB += hvnode.db
 #DB += hv.db
 #DB += konno_hv.db
 

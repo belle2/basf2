@@ -95,7 +95,7 @@ void PXDClusterGetNNDataModule::event()
     // if PXCluster is valid save training variables to file
     if (isValid) {
       // load trainings variables from PXDCluster
-      m_PXDClusterRescueNN.getPXDClusterTrainingVariables(&pxdCluster, pxdClusterVariables.data());
+      m_PXDClusterRescueNN.getPXDClusterTrainingVariables(&pxdCluster, pxdClusterVariables);
 
       // write training variables to file
       for (int p = 0; p < NumTrainingVariables; p++) {

@@ -52,7 +52,7 @@ namespace Belle2 {
      * variable 10: global cluster coordinate in r
      * variable 11: global cluster coordinate in phi
      */
-    virtual void getPXDClusterTrainingVariables(const PXDCluster* pxdCluster, float* trainingVariables);
+    virtual void getPXDClusterTrainingVariables(const PXDCluster* pxdCluster, std::vector<float>& trainingVariables);
 
     /**
      * return number of training variables of neural network

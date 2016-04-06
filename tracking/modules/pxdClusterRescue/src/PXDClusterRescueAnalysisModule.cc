@@ -296,7 +296,7 @@ void PXDClusterRescueAnalysisModule::event()
       // store training variables to file
       int NumTrainingVariables = m_PXDClusterRescueNN.getNumTrainingVariables();
       std::vector<float> pxdClusterVariables(NumTrainingVariables);
-      m_PXDClusterRescueNN.getPXDClusterTrainingVariables(pxdClusters[k], pxdClusterVariables.data());
+      m_PXDClusterRescueNN.getPXDClusterTrainingVariables(pxdClusters[k], pxdClusterVariables);
 
       for (int p = 0; p < NumTrainingVariables; p++) {
         m_fileLostByROI << pxdClusterVariables[p];

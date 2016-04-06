@@ -72,14 +72,14 @@ void PXDClusterRescueNNModule::event()
 {
   // create lambda function for classification of PXDClusters
   auto selectPXDClustersNeuroBayes = [this](const PXDCluster * pxdCluster) -> bool {
-    float pxdClusterVariables[m_NumTrainingVariables];
+    std::vector<float> pxdClusterVariables(m_NumTrainingVariables);
     float NBOutput;
 
     // load trainings variables from PXDCluster
     getPXDClusterTrainingVariables(pxdCluster, pxdClusterVariables);
 
     // do classifcation with NeuroBayes neural network
-    NBOutput = m_NBExpert->nb_expert(pxdClusterVariables);
+    NBOutput = m_NBExpert->nb_expert(pxdClusterVariables.data());
     if (NBOutput > m_classThreshold) return true;
     else return false;
   };
@@ -98,7 +98,7 @@ void PXDClusterRescueNNModule::terminate()
   delete m_NBExpert;
 }
 
-void PXDClusterRescueNNModule::getPXDClusterTrainingVariables(const PXDCluster* pxdCluster, float* trainingVariables)
+void PXDClusterRescueNNModule::getPXDClusterTrainingVariables(const PXDCluster* pxdCluster, std::vector<float>& trainingVariables)
 {
   // get pixels from cluster
   RelationVector<PXDDigit> pixels = pxdCluster->getRelationsTo<PXDDigit>();

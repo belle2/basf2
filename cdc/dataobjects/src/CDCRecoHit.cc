@@ -24,8 +24,6 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-ClassImp(CDCRecoHit);
-
 std::unique_ptr<ADCCountTranslatorBase>    CDCRecoHit::s_adcCountTranslator    = 0;
 std::unique_ptr<CDCGeometryTranslatorBase> CDCRecoHit::s_cdcGeometryTranslator = 0;
 std::unique_ptr<TDCCountTranslatorBase>    CDCRecoHit::s_tdcCountTranslator    = 0;

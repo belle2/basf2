@@ -13,8 +13,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(CDCRawHitWaveForm);
-
 CDCRawHitWaveForm::CDCRawHitWaveForm() :
   m_status(0), m_triggerNumber(0), m_node(0), m_finess(0), m_board(0),
   m_channel(0), m_triggerTime(0), m_sample(0), m_adc(), m_tdc()

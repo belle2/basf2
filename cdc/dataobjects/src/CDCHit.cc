@@ -13,8 +13,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(CDCHit)
-
 CDCHit::CDCHit(unsigned short tdcCount, unsigned short charge,
                unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short tdcCount2ndHit, unsigned short status)
 {

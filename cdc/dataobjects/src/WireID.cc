@@ -13,8 +13,6 @@
 using namespace Belle2;
 using namespace std;
 
-ClassImp(WireID)
-
 void WireID::setWireID(const unsigned short iCLayer, const unsigned short iWire)
 {
   B2DEBUG(250, "setWireID called with " << iCLayer << ", " << iWire);

@@ -2,6 +2,7 @@ Import('env')
 env['TOOLS_LIBS']['analyzeWave'] = ['framework', 'topcaf_dataobjects', '$ROOT_LIBS', 'TreePlayer'];
 env['TOOLS_LIBS']['analyzeHits'] = ['framework', 'topcaf_dataobjects', '$ROOT_LIBS', 'TreePlayer', 'Spectrum'];
 env['TOOLS_LIBS']['analyzeHits_extended'] = ['framework', 'topcaf_dataobjects', '$ROOT_LIBS', 'TreePlayer', 'Spectrum'];
+env['TOOLS_LIBS']['analyzeHits_AsicByAsic'] = ['framework', 'topcaf_dataobjects', '$ROOT_LIBS', 'TreePlayer', 'Spectrum'];
 env['TOOLS_LIBS']['pedestalStability'] = ['framework', 'topcaf_dataobjects', '$ROOT_LIBS', 'TreePlayer'];
 env['TOOLS_LIBS']['analyzeHits'] = ['$ROOT_LIBS', 'TreePlayer', 'topcaf_dataobjects', 'Spectrum'];
 env['TOOLS_LIBS']['analyzeTopDigits'] = ['$ROOT_LIBS', 'TreePlayer', 'topcaf_dataobjects'];

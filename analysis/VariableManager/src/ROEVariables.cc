@@ -1258,6 +1258,53 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr passesROEMask(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+
+      if (arguments.size() == 0)
+        maskName = "";
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("Wrong number of arguments (1 required) for meta function trackPassesMask");
+
+      auto func = [maskName](const Particle * particle) -> double {
+
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (not roe.isValid())
+          return -1;
+
+        double result = -1;
+
+        if (particle->getParticleType() == Particle::c_Track)
+        {
+
+          const Track* track = particle->getTrack();
+
+          std::map<unsigned int, bool> trackMask = roe->getTrackMask(maskName);
+
+          result = trackMask.at(track->getArrayIndex());
+        } else if (particle->getParticleType() == Particle::c_ECLCluster)
+        {
+
+          const ECLCluster* ecl = particle->getECLCluster();
+
+          std::map<unsigned int, bool> eclClusterMask = roe->getECLClusterMask(maskName);
+
+          result = eclClusterMask.at(ecl->getArrayIndex());
+        } else {
+          B2ERROR("Particle used is not an ECLCluster or Track type particle!");
+        }
+
+        return result;
+
+      };
+      return func;
+    }
+
+
+
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------
@@ -1540,5 +1587,8 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("missM2OverMissE(maskName)", missM2OverMissE,
                       "Returns custom variable missing mass squared over missing energy");
+
+    REGISTER_VARIABLE("passesROEMask(maskName)", passesROEMask,
+                      "Returns boolean value if track or eclCluster type particle passes a certain mask or not. Only to be used in for_each path");
   }
 }

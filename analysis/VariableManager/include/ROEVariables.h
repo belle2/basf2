@@ -210,6 +210,11 @@ namespace Belle2 {
     Manager::FunctionPtr cosThetaEll(const std::vector<std::string>& arguments);
 
     /**
+     * Returns boolean value if track or eclCluster type particle passes a certain mask or not. Only to be used in for_each path!
+     */
+    Manager::FunctionPtr passesROEMask(const std::vector<std::string>& arguments);
+
+    /**
      * Returns custom variable missing mass squared over missing energy
      */
     Manager::FunctionPtr missM2OverMissE(const std::vector<std::string>& arguments);

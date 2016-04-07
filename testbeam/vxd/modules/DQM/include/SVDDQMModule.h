@@ -122,14 +122,16 @@ namespace Belle2 {
   inline const SVD::SensorInfo& SVDDQMModule::getInfo(int index) const
   {
     int iPlane = indexToPlane(index);
-    VxdID sensorID(iPlane, 1, iPlane);
+//    VxdID sensorID(iPlane, 1, iPlane);
+    VxdID sensorID(iPlane, 1, 2);
     return dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
   }
 
   inline const PXD::SensorInfo& SVDDQMModule::getInfoPXD(int index) const
   {
     int iPlane = indexToPlanePXD(index);
-    VxdID sensorID(iPlane, 1, iPlane);
+//    VxdID sensorID(iPlane, 1, iPlane);
+    VxdID sensorID(iPlane, 1, 2);
     return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
   }
 

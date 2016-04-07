@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Common PXD&SVD TestBeam Jan 2014 @ DESY Simulation
+# Common PXD&SVD TestBeam Jan 2016 @ DESY Simulation
 # This is the default simulation scenario for VXD beam test WITHOUT telescopes
 #
 # This steering file prepares simulation data for the SVD DQM module.
@@ -9,13 +9,14 @@
 
 # Important parameters of the simulation:
 events = 1000  # Number of events to simulate
-momentum = 5.0  # GeV/c
+fieldOn = True  # Turn field on or off (changes geometry components and digi/clust params)
+momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
 theta_spread = 0.005  # # degrees (sigma of gaussian)
-phi = 180.0  # degrees
+phi = 0.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
-gun_x_position = 100.  # cm / 100cm, outside magnet, shielding, Al scatterer
+gun_x_position = -100.  # cm / 100cm, outside magnet, shielding, Al scatterer
 beamspot_size_y = 0.3  # cm (sigma of gaussian)
 beamspot_size_z = 0.3  # cm (sigma of gaussian)
 
@@ -45,7 +46,7 @@ particlegun.param('phiParams', [phi, phi_spread])
 # Al target at 750mm to simulate 15m air between collimator and TB setup
 particlegun.param('vertexGeneration', 'normal')
 particlegun.param('xVertexParams', [gun_x_position, 0.])
-particlegun.param('yVertexParams', [0. + 0.4, beamspot_size_y])
+particlegun.param('yVertexParams', [0., beamspot_size_y])
 particlegun.param('zVertexParams', [0., beamspot_size_z])
 particlegun.param('independentVertices', True)
 
@@ -59,12 +60,17 @@ progress = register_module('Progress')
 # Load parameters from xml
 gearbox = register_module('Gearbox')
 # VXD (no Telescopes) plus the real PCMAG magnetic field
-gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB.xml')
+# gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB.xml')
+gearbox.param('fileName', 'testbeam/vxd/FullVXDTB2016.xml')
 
 # Create geometry
 geometry = register_module('Geometry')
+# geometry = register_module('Geometry')
 # No magnetic field
-geometry.param('components', ['TB'])
+# geometry.param('components', ['TB'])
+if not fieldOn:
+    # To turn off magnetic field:
+    geometry.param('excludedComponents', ['MagneticField'])
 
 # Full simulation module
 simulation = register_module('FullSim')
@@ -72,13 +78,13 @@ simulation.param('StoreAllSecondaries', True)
 
 # PXD/SVD/Tel digitizer
 PXDDigi = register_module('PXDDigitizer')
-PXDDigi.param('SimpleDriftModel', False)
+# PXDDigi.param('SimpleDriftModel', False)
 
 SVDDigi = register_module('SVDDigitizer')
 
 TelDigi = register_module('TelDigitizer')
-TelDigi.param('ElectronicNoise', 200)
-TelDigi.param("NoiseSN", 5.0)
+# TelDigi.param('ElectronicNoise', 200)
+# TelDigi.param("NoiseSN", 5.0)
 
 # PXD DAQ produces PXDRawHits, not PXDDigits.
 PXDConv = register_module("PXDRawHitProducer")

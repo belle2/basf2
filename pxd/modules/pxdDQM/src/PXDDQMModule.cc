@@ -38,7 +38,8 @@ PXDDQMModule::PXDDQMModule() : HistoModule()
   //Set module properties
   setDescription("PXD DQM module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed", std::string("pxd"));
+  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+           std::string("pxd"));
   m_PXDCutSeedL = 0;
   m_PXDCutSeedH = 100000;
   addParam("PXDCutSeedL", m_PXDCutSeedL, "PXD: seed cut lower border", m_PXDCutSeedL);
@@ -310,7 +311,7 @@ void PXDDQMModule::event()
   // Fired pixels
   vector<int> pixel_count(c_nPXDPlanes);
   for (int i = 0; i < c_nPXDPlanes; i++) pixel_count[i] = 0;
-  for (const PXDDigit & digit : storeDigits) {
+  for (const PXDDigit& digit : storeDigits) {
     int iPlane = digit.getSensorID().getLayerNumber();
     if ((iPlane < c_firstPXDPlane) || (iPlane > c_lastPXDPlane)) continue;
     int index = planeToIndex(iPlane);
@@ -321,7 +322,7 @@ void PXDDQMModule::event()
   // Cluster counts - same as Pixels
   vector<int> cluster_count(c_nPXDPlanes);
   for (int i = 0; i < c_nPXDPlanes; i++) cluster_count[i] = 0;
-  for (const PXDCluster & cluster : storeClusters) {
+  for (const PXDCluster& cluster : storeClusters) {
     int iPlane = cluster.getSensorID().getLayerNumber();
     if ((iPlane < c_firstPXDPlane) || (iPlane > c_lastPXDPlane)) continue;
     int index = planeToIndex(iPlane);
@@ -332,7 +333,7 @@ void PXDDQMModule::event()
   }
 
   // Digit charge
-  for (const PXDDigit & digit : storeDigits) {
+  for (const PXDDigit& digit : storeDigits) {
     int iPlane = digit.getSensorID().getLayerNumber();
     if ((iPlane < c_firstPXDPlane) || (iPlane > c_lastPXDPlane)) continue;
     int index = planeToIndex(iPlane);
@@ -341,7 +342,7 @@ void PXDDQMModule::event()
 
 
   // Hitmaps, Charge, Seed, Size, Time
-  for (const PXDCluster & cluster : storeClusters) {
+  for (const PXDCluster& cluster : storeClusters) {
     int iPlane = cluster.getSensorID().getLayerNumber();
     if ((iPlane < c_firstPXDPlane) || (iPlane > c_lastPXDPlane)) continue;
     int index = planeToIndex(iPlane);
@@ -361,7 +362,7 @@ void PXDDQMModule::event()
   }
   if (storeFrames && storeFrames.getEntries()) {
     // Start rows
-    for (const PXDFrame & frame : storeFrames) {
+    for (const PXDFrame& frame : storeFrames) {
       int iPlane = frame.getSensorID().getLayerNumber();
       if ((iPlane < c_firstPXDPlane) || (iPlane > c_lastPXDPlane)) continue;
       int index = planeToIndex(iPlane);

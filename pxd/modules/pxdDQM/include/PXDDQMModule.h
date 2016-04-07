@@ -52,13 +52,15 @@ namespace Belle2 {
     /** Utility function to convert index to plane number
      * and to protect against range errors.
      */
-    inline int indexToPlane(int index) const {
+    inline int indexToPlane(int index) const
+    {
       return c_firstPXDPlane + index;
     }
     /** Utility function to convert plane number to index
      * and to protect against range errors.
      */
-    inline int planeToIndex(int iPlane) const {
+    inline int planeToIndex(int iPlane) const
+    {
       return iPlane - c_firstPXDPlane;
     }
     /** This is a shortcut to getting PXD::SensorInfo from the GeoCache.
@@ -99,7 +101,7 @@ namespace Belle2 {
   inline const PXD::SensorInfo& PXDDQMModule::getInfo(int index) const
   {
     int iPlane = indexToPlane(index);
-    VxdID sensorID(iPlane, 1, iPlane);
+    VxdID sensorID(iPlane, 1, 2);
     return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
   }
 

@@ -62,7 +62,7 @@ void TOPCAF_DataQualityModule::basicDebuggingPlots(EventWaveformPacket* ewp)
   m_scrod_id->Fill(ewp->GetScrodID());
   m_asic_ch->Fill(ewp->GetASICChannel());
   m_asic_row->Fill(ewp->GetASICRow());
-  m_asic_col->Fill(ewp->GetASICColumn());
+  m_asic_col->Fill(ewp->GetASIC());
   m_asic_win->Fill(ewp->GetASICWindow());
   m_entries->Fill(ewp->GetSamples().size());
 }
@@ -82,7 +82,7 @@ TOPCAF_DataQualityModule::drawWaveforms(EventWaveformPacket* ewp)
     return;
   }
   string gname = string("scrod_") + to_string(scrodid) + string("_carrier") + to_string(v.GetASICRow()) + string("_asic") + to_string(
-                   v.GetASICColumn());
+                   v.GetASIC());
   if (m_channelLabels[scrodid].find(gname) == m_channelLabels[scrodid].end()) {
     m_channels[scrodid].insert(make_pair(gname, new TMultiGraph(gname.c_str(), gname.c_str())));
   }

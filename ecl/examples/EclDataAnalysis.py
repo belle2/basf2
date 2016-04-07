@@ -6,9 +6,6 @@
 # module to dump ECL related quantities in an ntuple
 # starting from dst root file.
 #
-# The user should provide input and output root filnames
-# as first and second argument respectively.
-#
 # Author: The Belle II Collaboration
 # Contributors: Benjamin Oberhof
 #
@@ -17,6 +14,7 @@
 # import os
 # import random
 from basf2 import *
+import glob
 from ROOT import Belle2
 from modularAnalysis import *
 from simulation import add_simulation
@@ -33,17 +31,17 @@ main.add_module(eventinfosetter)
 
 # random number for generation
 import random
-intseed = random.randint(1, 10000000)
+intseed = random.randint(1, 1)
 
 # generator settings
 pGun = register_module('ParticleGun')
 param_pGun = {
-    'pdgCodes': [111],
+    'pdgCodes': [13],
     'nTracks': 1,
     'momentumGeneration': 'fixed',
-    'momentumParams': [1.0],
+    'momentumParams': [0.5],
     'thetaGeneration': 'uniform',
-    'thetaParams': [30., 40.],
+    'thetaParams': [0., 30.],
     'phiGeneration': 'uniform',
     'phiParams': [0., 360.],
     'vertexGeneration': 'uniform',
@@ -54,11 +52,7 @@ param_pGun = {
 pGun.param(param_pGun)
 main.add_module(pGun)
 
-# evtgen = register_module('EvtGenInput')
-# main.add_module(evtgen)
-
-bkgdir = 'bkg/'
-# bkg = glob.glob(bkgdir+'*.root')
+# bkg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR']+'*.root')
 
 add_simulation(main)
 add_reconstruction(main)
@@ -68,8 +62,9 @@ add_reconstruction(main)
 
 # eclDataAnalysis module
 ecldataanalysis = register_module('ECLDataAnalysis')
-ecldataanalysis.param('rootFileName', 'EclDataAnalysis_Example.root')
+ecldataanalysis.param('rootFileName', 'EclDataAnalysis_Test.root')
 ecldataanalysis.param('doTracking', 1)
+ecldataanalysis.param('doPureCsIStudy', 0)
 main.add_module(ecldataanalysis)
 
 process(main)

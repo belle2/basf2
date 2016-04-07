@@ -448,6 +448,11 @@ namespace Belle2 {
        */
       ShieldDetailGeometry& operator=(const ShieldDetailGeometry& geometry);
 
+      /**
+       * Destructor.
+       */
+      ~ShieldDetailGeometry();
+
       /** X length. */
       double LengthX;
 

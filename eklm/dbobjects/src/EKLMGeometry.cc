@@ -173,9 +173,12 @@ EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry(
   LengthX = geometry.LengthX;
   LengthY = geometry.LengthY;
   NPoints = geometry.NPoints;
-  Points = new Point[NPoints];
-  for (i = 0; i < NPoints; i++)
-    Points[i] = geometry.Points[i];
+  if (NPoints > 0) {
+    Points = new Point[NPoints];
+    for (i = 0; i < NPoints; i++)
+      Points[i] = geometry.Points[i];
+  } else
+    Points = NULL;
 }
 
 EKLMGeometry::ShieldDetailGeometry&
@@ -190,10 +193,19 @@ EKLMGeometry::ShieldDetailGeometry::operator=(
   NPoints = geometry.NPoints;
   if (Points != NULL)
     delete[] Points;
-  Points = new Point[NPoints];
-  for (i = 0; i < NPoints; i++)
-    Points[i] = geometry.Points[i];
+  if (NPoints > 0) {
+    Points = new Point[NPoints];
+    for (i = 0; i < NPoints; i++)
+      Points[i] = geometry.Points[i];
+  } else
+    Points = NULL;
   return *this;
+}
+
+EKLMGeometry::ShieldDetailGeometry::~ShieldDetailGeometry()
+{
+  if (Points != NULL)
+    delete[] Points;
 }
 
 EKLMGeometry::ShieldGeometry::ShieldGeometry()

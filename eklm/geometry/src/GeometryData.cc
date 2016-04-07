@@ -684,26 +684,12 @@ EKLM::GeometryData::GeometryData(enum DataSource dataSource)
   calculateShieldGeometry();
 }
 
-/**
- * Free shield layer detail geometry data.
- * @param sdg Shield layer detail geometry data.
- */
-static void freeShieldDetail(struct EKLMGeometry::ShieldDetailGeometry* sdg)
-{
-  if (sdg->Points != NULL)
-    delete[] sdg->Points;
-}
-
 EKLM::GeometryData::~GeometryData()
 {
   if (m_Geometry != NULL)
     delete m_Geometry;
   free(m_StripLenToAll);
   free(m_StripAllToLen);
-  freeShieldDetail(&m_ShieldGeometry.DetailA);
-  freeShieldDetail(&m_ShieldGeometry.DetailB);
-  freeShieldDetail(&m_ShieldGeometry.DetailC);
-  freeShieldDetail(&m_ShieldGeometry.DetailD);
 }
 
 void EKLM::GeometryData::saveToDatabase(const IntervalOfValidity& iov) const

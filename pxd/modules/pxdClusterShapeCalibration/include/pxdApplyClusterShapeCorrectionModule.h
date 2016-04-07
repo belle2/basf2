@@ -68,17 +68,23 @@ namespace Belle2 {
       /** Exist file with corrections for PK=3, default=0 */
       int m_ExistCorrectionPK3 = 0;
 
-      /** Map of corrections for Bias for 5 cases: 0: realistic data, 1..4: simulation for ful angle range for all pixel types */
-      map_typeCorrs TCorrection_BiasMap[5];
-      /** Map of corrections for Error Estimation for 5 cases: 0: realistic data, 1..4: simulation for ful angle range for all pixel types */
-      map_typeCorrs TCorrection_ErrorEstimationMap[5];
-      /** Map of corrections for Bias errors for 5 cases: 0: realistic data, 1..4: simulation for ful angle range for all pixel types */
-      map_typeCorrs TCorrection_BiasMapErr[5];
-      /** Map of corrections for In-Pixel positions for 5 cases: 0: realistic data, 1..4: simulation for ful angle range for all pixel types */
-      map_typeInPics TInPixelPositionMap[5];
+      /** Map of corrections for Bias for 6 cases: 0: realistic data, 1..4: simulation for ful angle range for all pixel types, 5: combine 1..4 */
+      map_typeCorrs TCorrection_BiasMap[6];
+      /** Map of corrections for Error Estimation for 6 cases: 0: realistic data, 1..4: simulation for ful angle range for all pixel types, 5: combine 1..4 */
+      map_typeCorrs TCorrection_ErrorEstimationMap[6];
+      /** Map of corrections for Bias errors for 6 cases: 0: realistic data, 1..4: simulation for ful angle range for all pixel types, 5: combine 1..4 */
+      map_typeCorrs TCorrection_BiasMapErr[6];
+      /** Map of corrections for In-Pixel positions for 6 cases: 0: realistic data, 1..4: simulation for ful angle range for all pixel types, 5: combine 1..4 */
+      map_typeInPics TInPixelPositionMap[6];
 
       /** Expert setting, production of monitoring histograms, default=False */
       Bool_t m_DoExpertHistograms = kFALSE;
+
+      /** Expert setting, production of monitoring histograms, default=False */
+      Bool_t m_ShowDetailStatistics = kFALSE;
+
+      /** Mark of loop to save monitored data to different file, default=0 */
+      int m_MarkOfLoopForHistogramsFile = 0;
 
       /** Expert setting, production of monitoring histograms */
       TFile* fExpertHistograms = NULL;
@@ -94,11 +100,20 @@ namespace Belle2 {
       /** Processed Number od clusters */
       int NClusters = 0;
 
-      /** To use track information (default) or simulations, default=True */
-      Bool_t m_UseTracks = kTRUE;
+      /** Processed Number od clusters used bias corrections from real data or realistic tracking simulation */
+      int NClustersBasicCorBias[2] = {0, 0};
 
-      /** To use real data without simulations or simulations, default=False */
-      Bool_t m_UseRealData = kFALSE;
+      /** Processed Number od clusters used bias corrections from simulation */
+      int NClustersSimulationCorBias[2] = {0, 0};
+
+      /** Processed Number od clusters used Err Estim corrections from real data or realistic tracking simulation */
+      int NClustersBasicCorErEst[2] = {0, 0};
+
+      /** Processed Number od clusters used Err Estim corrections from simulation */
+      int NClustersSimulationCorErEst[2] = {0, 0};
+
+      /** To use simulations rather than real data calculated corrections, default=False */
+      Bool_t m_PrefereSimulation = kFALSE;
 
       /** Name of the collection to use for the PXDClusters */
       std::string m_storeClustersName;
@@ -114,13 +129,13 @@ namespace Belle2 {
       /** Name of file contain basic calibration, default="pxdCalibrationBasic */
       std::string m_CalFileBasicName = "pxdCalibrationBasic";
       /** Name of file contain calibration for pixel kind 0 (PitchV=55um), default="pxdCalibrationPixelKind0 */
-      std::string m_CalFilePK0Name;
+      std::string m_CalFilePK0Name = "pxdCalibrationPixelKind0";
       /** Name of file contain calibration for pixel kind 1 (PitchV=60um), default="pxdCalibrationPixelKind1 */
-      std::string m_CalFilePK1Name;
+      std::string m_CalFilePK1Name = "pxdCalibrationPixelKind1";
       /** Name of file contain calibration for pixel kind 2 (PitchV=70um), default="pxdCalibrationPixelKind2 */
-      std::string m_CalFilePK2Name;
+      std::string m_CalFilePK2Name = "pxdCalibrationPixelKind2";
       /** Name of file contain calibration for pixel kind 3 (PitchV=85um), default="pxdCalibrationPixelKind3 */
-      std::string m_CalFilePK3Name;
+      std::string m_CalFilePK3Name = "pxdCalibrationPixelKind3";
 
       /** Presets for usinf of pxd cluster shape calibration - shapes */
       int m_shapes = 0;     // 1 .. 15, shapeID = 0: not setting shape

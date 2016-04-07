@@ -8,6 +8,7 @@
 #   pxd/examples/PXDClasterShape_PrepareSources.py
 #   pxd/examples/PXDClasterShape_CalculateCorrections.py
 #   pxd/examples/PXDClasterShape_ApplyCorrections.py
+#   pxd/examples/PXDClasterShape_ApplyCorrections2.py
 # It use data stored in a root file from step PrepareSources.
 #
 # "UseTracks" to use track information (default) or simulations
@@ -33,7 +34,7 @@
 # There is possibility to call this macro with presets in parameters:
 #    basf2 PXDClasterShape_CalculateCorrections.py UseTracks UseRealData CalibrationKind PixelKind
 #    Example for defaults:
-#    basf2 PXDClasterShape_CalculateCorrections.py 1 0 1 0
+#    basf2 pxd/examples/PXDClasterShape_CalculateCorrections.py 1 0 1 0
 #
 ##############################################################################
 import os

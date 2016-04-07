@@ -8,6 +8,7 @@
 #   pxd/examples/PXDClasterShape_PrepareSources.py
 #   pxd/examples/PXDClasterShape_CalculateCorrections.py
 #   pxd/examples/PXDClasterShape_ApplyCorrections.py
+#   pxd/examples/PXDClasterShape_ApplyCorrections2.py
 # It uses ParicleGun module to generate tracks,
 # (see "generators/example/ParticleGunFull.py" for detailed usage)
 # builds PXD geometry, performs geant4 and PXD simulation,
@@ -36,7 +37,7 @@
 # There is possibility to call this macro with presets in parameters:
 #    basf2 PXDClasterShape_PrepareSources.py UseTracks UseRealData CalibrationKind PixelKindCal
 #    Example for defaults:
-#    basf2 PXDClasterShape_PrepareSources.py 1 0 1 0
+#    basf2 pxd/examples/PXDClasterShape_PrepareSources.py 1 0 1 0
 #
 ##############################################################################
 from basf2 import *

@@ -8,22 +8,19 @@
 #   pxd/examples/PXDClasterShape_PrepareSources.py
 #   pxd/examples/PXDClasterShape_CalculateCorrections.py
 #   pxd/examples/PXDClasterShape_ApplyCorrections.py
+#   pxd/examples/PXDClasterShape_ApplyCorrections2.py
 # It uses ParicleGun module to generate tracks,
 # (see "generators/example/ParticleGunFull.py" for detailed usage)
 # builds PXD geometry, performs geant4 and PXD simulation,
 # and stores output in a root file.
 #
-# "UseTracks" to use track information (default) or simulations
-# "UseRealData" to use real data without simulations or simulations (default)
-#
-# Parameters are not independent, there are some priorities:
-#   Priorities: UseRealData, UseTracks, rest is independent
-#   if you set UseRealData=True, UseTracks is set automatically to True (noe TrueHit data).
+# "PrefereSimulation" To use simulations rather than real data calculated corrections, default=False
 #
 # There is possibility to call this macro with presets in parameters:
-#    basf2 PXDClasterShape_ApplyCorrections.py UseTracks UseRealData
+#    basf2 PXDClasterShape_ApplyCorrections.py PrefereSimulation
 #    Example for defaults:
-#    basf2 PXDClasterShape_ApplyCorrections.py 1 0 1 0
+#    basf2 pxd/examples/PXDClasterShape_ApplyCorrections.py 0
+#    basf2 pxd/examples/PXDClasterShape_ApplyCorrections2.py 0
 #
 ##############################################################################
 from basf2 import *
@@ -32,8 +29,7 @@ from basf2 import *
 set_log_level(LogLevel.WARNING)
 
 # Presets (defaults, no need to set if no change):
-UseTracks = True
-UseRealData = False
+PrefereSimulation = False
 
 # If exist load from arguments:
 argvs = sys.argv
@@ -41,41 +37,26 @@ argc = len(argvs)
 print("Number of arguments: ", argc - 1)
 if argc >= 2:
     if (argvs[1] == '0'):
-        UseTracks = False
+        PrefereSimulation = False
     if (argvs[1] == '1'):
-        UseTracks = True
-    print("first argument UseTracks: ", UseTracks)
-if argc >= 3:
-    if (argvs[2] == '0'):
-        UseRealData = False
-    if (argvs[2] == '1'):
-        UseRealData = True
-    print("second argument UseRealData: ", UseRealData)
+        PrefereSimulation = True
+    print("first argument PrefereSimulation: ", PrefereSimulation)
 
-# Crosscheck of presets:
-if (UseRealData is True):
-    UseTracks = True
+print("Setting of arguments: ")
+print("         PrefereSimulation: ", PrefereSimulation)
 
-print("Final setting of arguments: ")
-print("                 UseTracks: ", UseTracks)
-print("               UseRealData: ", UseRealData)
+outputFileName = 'pxdClShCalApply_Step1.root'
 
-# outputFileName = 'pxdClShapeCalibrationSource_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
-# outputFileName = outputFileName + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKindCal) + '.root'
+# Name of file contain basic calibration, default="pxdCalibrationBasic.root" - creating from excluded residuals
+inputCalFileName = "pxd/data/pxdClShCal_RealData0_Track1_Calib1_Pixel0.root"
+# Name of file contain basic calibration, default="pxdCalibrationBasic.root" - creating from included residuals - not good!
+# inputCalFileName = "pxd/data/pxdClShCal_RealData0_Track0_Calib1_Pixel0.root"
 
-CalibrationKind = 1
-PixelKindCal = 0
-
-outputFileName = 'pxdClShCalApply_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
-outputFileName = outputFileName + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKindCal) + '.root'
-
-# inputCalFileName = "pxdClShCal_RealData0_Track1_Calib1_Pixel0.root"
-inputCalFileName = "pxdClShCal_RealData0_Track0_Calib1_Pixel0.root"
-
-inputCalFileNamePK0 = "pxdClShCal_RealData0_Track0_Calib2_Pixel0.root"
-inputCalFileNamePK1 = "pxdClShCal_RealData0_Track0_Calib2_Pixel1.root"
-inputCalFileNamePK2 = "pxdClShCal_RealData0_Track0_Calib2_Pixel2.root"
-inputCalFileNamePK3 = "pxdClShCal_RealData0_Track0_Calib2_Pixel3.root"
+# Name of files contain calibration for pixel kind 0..3 (PitchV=55um, 60um, 70um, 85um), default="pxdCalibrationPixelKind0..3.root"
+inputCalFileNamePK0 = "pxd/data/pxdClShCal_RealData0_Track0_Calib2_Pixel0.root"
+inputCalFileNamePK1 = "pxd/data/pxdClShCal_RealData0_Track0_Calib2_Pixel1.root"
+inputCalFileNamePK2 = "pxd/data/pxdClShCal_RealData0_Track0_Calib2_Pixel2.root"
+inputCalFileNamePK3 = "pxd/data/pxdClShCal_RealData0_Track0_Calib2_Pixel3.root"
 
 # Register modules
 
@@ -99,11 +80,10 @@ PXDCLUST = register_module('PXDClusterizer')
 SVDDIGI = register_module('SVDDigitizer')
 # SVD clusterizer
 SVDCLUST = register_module('SVDClusterizer')
-# PXD shape calibration module
+# PXD shape calibration check module
+PXDCheckClShCorrection = register_module('pxdCheckClusterShapeCorrection')
+# PXD shape calibration apply module
 PXDApplyClShCorrection = register_module('pxdApplyClusterShapeCorrection')
-# Save output of simulation
-output = register_module('RootOutput')
-# output.param('branchNames', ['EventMetaData'])  # cannot be removed, but of only small effect on file size
 
 # ============================================================================
 # Set a fixed random seed for particle generation:
@@ -122,8 +102,10 @@ particlegun.param('nTracks', 1)
 print_params(particlegun)
 
 # Set the number of events to be processed (10 events)
-eventinfosetter.param({'evtNumList': [200], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [50000], 'runList': [1]})
 
+# Save output of simulation step 1
+output = register_module('RootOutput')
 # Set output filename
 output.param('outputFileName', outputFileName)
 
@@ -140,29 +122,41 @@ geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
 PXDCLUST.param('useClusterShape', True)
 
-# To use track information (default) or simulations, default=True
-PXDApplyClShCorrection.param('UseTracks', UseTracks)
+# To use simulations rather than real data calculated corrections, default=False
+PXDApplyClShCorrection.param('PrefereSimulation', PrefereSimulation)
+PXDCheckClShCorrection.param('PrefereSimulation', PrefereSimulation)
 
-# To use real data without simulations or simulations, default=False
-PXDApplyClShCorrection.param('UseRealData', UseRealData)
-
-# Name of file contain basic calibration, default="pxdCalibrationBasic"
+# Name of file contain basic calibration, default="pxdCalibrationBasic.root"
 PXDApplyClShCorrection.param('CalFileBasic', inputCalFileName)
-# Name of file contain calibration for pixel kind 0 (PitchV=55um), default="pxdCalibrationPixelKind0"
+PXDCheckClShCorrection.param('CalFileBasic', inputCalFileName)
+# Name of file contain calibration for pixel kind 0 (PitchV=55um), default="pxdCalibrationPixelKind0.root"
 PXDApplyClShCorrection.param('CalFilePK0', inputCalFileNamePK0)
-# Name of file contain calibration for pixel kind 1 (PitchV=60um), default="pxdCalibrationPixelKind1"
+PXDCheckClShCorrection.param('CalFilePK0', inputCalFileNamePK0)
+# Name of file contain calibration for pixel kind 1 (PitchV=60um), default="pxdCalibrationPixelKind1.root"
 PXDApplyClShCorrection.param('CalFilePK1', inputCalFileNamePK1)
-# Name of file contain calibration for pixel kind 2 (PitchV=70um), default="pxdCalibrationPixelKind2"
+PXDCheckClShCorrection.param('CalFilePK1', inputCalFileNamePK1)
+# Name of file contain calibration for pixel kind 2 (PitchV=70um), default="pxdCalibrationPixelKind2.root"
 PXDApplyClShCorrection.param('CalFilePK2', inputCalFileNamePK2)
-# Name of file contain calibration for pixel kind 3 (PitchV=85um), default="pxdCalibrationPixelKind3"
+PXDCheckClShCorrection.param('CalFilePK2', inputCalFileNamePK2)
+# Name of file contain calibration for pixel kind 3 (PitchV=85um), default="pxdCalibrationPixelKind3.root"
 PXDApplyClShCorrection.param('CalFilePK3', inputCalFileNamePK3)
+PXDCheckClShCorrection.param('CalFilePK3', inputCalFileNamePK3)
 
-# Do expert histograms"
+# Mark of loop to save monitored data to different file, default=0
+PXDApplyClShCorrection.param('MarkOfLoopForHistogramsFile', 0)
+
+# Do expert histograms
 PXDApplyClShCorrection.param('DoExpertHistograms', True)
+# Show Detail Statistics
+PXDApplyClShCorrection.param('ShowDetailStatistics', False)
+
 
 PXDApplyClShCorrection.set_log_level(LogLevel.INFO)
 PXDApplyClShCorrection.set_log_level(LogLevel.DEBUG)
 PXDApplyClShCorrection.set_debug_level(100)
+PXDCheckClShCorrection.set_log_level(LogLevel.INFO)
+PXDCheckClShCorrection.set_log_level(LogLevel.DEBUG)
+PXDCheckClShCorrection.set_debug_level(100)
 
 secSetup = \
     ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',
@@ -212,7 +206,7 @@ eventCounter.param('stepSize', 25)
 
 
 # ============================================================================
-# Do the simulation
+# Do the simulation step 1 - apply corrections
 
 main = create_path()
 main.add_module(eventinfosetter)
@@ -224,17 +218,20 @@ main.add_module(particlegun)
 main.add_module(simulation)
 main.add_module(PXDDIGI)
 main.add_module(PXDCLUST)
-if (UseTracks is True):
-    main.add_module(SVDDIGI)
-    main.add_module(SVDCLUST)
-    main.add_module(eventCounter)
-    main.add_module(vxdtf)
-    main.add_module(TrackFinderMCTruth)
-    main.add_module(GenFitter)
+
+main.add_module(SVDDIGI)
+main.add_module(SVDCLUST)
+main.add_module(eventCounter)
+main.add_module(vxdtf)
+main.add_module(TrackFinderMCTruth)
+main.add_module(GenFitter)
+
+# main.add_module(PXDCheckClShCorrection)
 main.add_module(PXDApplyClShCorrection)
 
 main.add_module("PrintCollections")
 main.add_module(output)
+
 # Process events
 process(main)
 

@@ -173,6 +173,14 @@ toolsDST += ['MCDeltaT', '^B0']
 ntupleFile('B2A801-FlavorTagger.root')
 ntupleTree('B0tree', 'B0:jspiks', toolsDST)
 
+# If you want to calculate the efficiency of the FlavorTagger on your own
+# File use the script analysis/examples/FlavorTaggerEfficiency.py giving
+# your file as argument:
+
+# basf2 FlavorTaggerEfficiency.py YourFile.root
+
+# Note: This script needs MCParticles. If the name of your tree is not 'B0tree' please change line 65.
+
 # Summary of created Lists
 summaryOfLists(['J/psi:mumu', 'K_S0:pipi', 'B0:jspiks'])
 

@@ -489,6 +489,12 @@ if Belle2.FileSystem.findFile(workingFile):
 
         # ****** produce the input plots from combiner level ******
 
+        maxSignal = hist_signal.GetBinContent(hist_signal.GetMaximumBin())
+        maxBackground = hist_background.GetBinContent(hist_background.GetMaximumBin())
+
+        Ymax = max(maxSignal, maxBackground)
+        Ymax = Ymax + Ymax / 12
+
         ROOT.gStyle.SetOptStat(0)
         Canvas = ROOT.TCanvas('Bla', 'TITEL BLA', 1200, 800)
         Canvas.cd()  # activate
@@ -501,19 +507,23 @@ if Belle2.FileSystem.findFile(workingFile):
         hist_signal.GetYaxis().SetTitleSize(0.05)
         hist_signal.GetXaxis().SetTitleOffset(0.95)
         hist_signal.GetYaxis().SetTitleOffset(1.1)
+        hist_signal.GetYaxis().SetLimits(0, Ymax)
         hist_signal.SetLineColor(ROOT.kBlue)
         hist_background.SetFillColorAlpha(ROOT.kRed, 1.0)
         hist_background.SetFillStyle(3005)
+        hist_background.GetYaxis().SetLimits(0, Ymax)
         hist_background.SetLineColor(ROOT.kRed)
 
-        hist_signal.SetTitle(category + ' category input; Network output ; Events')
-        # hist_signal.SetMinimum(0)
-        # hist_signal.SetMaximum(10000)
+        hist_signal.SetTitle(category + ' category; $qr$-Output ; Events')
+        hist_signal.SetMinimum(0)
+        hist_signal.SetMaximum(Ymax)
+        hist_background.SetMinimum(0)
+        hist_background.SetMaximum(Ymax)
 
         hist_signal.Draw('hist')
         hist_background.Draw('hist same')
 
-        if category == 'MaximumP':
+        if category == 'MaximumPstar':
             l = ROOT.TLegend(0.4, 0.75, 0.6, 0.9)
         else:
             l = ROOT.TLegend(0.6, 0.75, 0.8, 0.9)

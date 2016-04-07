@@ -174,6 +174,9 @@ if [ ! -d basf2 ]; then
 *.bak
 *.patch
 
+# .root files in packages might be ours. global? not so much.
+/*.root
+
 # usual Belle2 stuff
 /.gitignore
 /.externals

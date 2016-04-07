@@ -60,27 +60,8 @@ param_pgun = {
 pgun.param(param_pgun)
 path.add_module(pgun)
 
-# Need to define this to replace default (non-physical) magnetic field with 2D map
-components = [
-    'MagneticField2d',
-    'COIL',
-    'STR',
-    'BeamPipe',
-    'Cryostat',
-    'HeavyMetalShield',
-    'VXDService',
-    'PXD',
-    'SVD',
-    'CDC',
-    'TOP',
-    'ARICH',
-    'ECL',
-    'BKLM',
-    'EKLM',
-]
-
-add_simulation(path, components)
-add_reconstruction(path, components)
+add_simulation(path)
+add_reconstruction(path)
 
 output = register_module('RootOutput')
 output.param('outputFileName', output_filename)

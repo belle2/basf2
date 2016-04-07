@@ -101,10 +101,8 @@ class ReadOrGenerateEventsRun(MinimalRun):
     # Declarative section which can be redefined in a subclass
     generator_module = None
     bkg_files = []
-    components = []
+    components = None
     simulate_only = False
-    components = ['PXD', 'SVD', 'CDC', 'BeamPipe',
-                  'MagneticFieldConstant4LimitedRCDC']
     disable_deltas = False
 
     def create_argument_parser(self, **kwds):
@@ -172,7 +170,8 @@ class ReadOrGenerateEventsRun(MinimalRun):
 
         components = self.components
         geometry_module = basf2.register_module('Geometry')
-        geometry_module.param('components', components)
+        if components is not None:
+            geometry_module.param('components', components)
         main_path.add_module(geometry_module)
 
         if self.root_input_file is None:

@@ -27,8 +27,7 @@ import tracking
 class SVD4Layer(TrackingValidationRun):
     n_events = N_EVENTS
     generator_module = 'EvtGenInput'
-    components = ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'PXD', 'SVD'
-                  ]
+    components = None
 
     finder_module = staticmethod(lambda path: tracking.add_vxd_track_finding(path, components=["SVD"]))
 

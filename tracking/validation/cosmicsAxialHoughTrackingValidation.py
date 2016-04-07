@@ -26,7 +26,7 @@ from tracking.validation.run import TrackingValidationRun
 class CosmicsAxialHough(TrackingValidationRun):
     n_events = N_EVENTS
     generator_module = 'Cosmics'
-    components = ['CDC', 'MagneticFieldConstant4LimitedRCDC']
+    components = None
 
     wire_hit_topology_preparer = basf2.register_module('WireHitTopologyPreparer')
 

@@ -25,7 +25,7 @@ from tracking.validation.run import TrackingValidationRun
 class Cosmics(TrackingValidationRun):
     n_events = N_EVENTS
     generator_module = 'Cosmics'
-    components = ['CDC', 'MagneticFieldConstant4LimitedRCDC']
+    components = None
     finder_module = 'TrackFinderCDCCosmics'
     fit_geometry = None
     pulls = True

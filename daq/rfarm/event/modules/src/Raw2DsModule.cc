@@ -132,7 +132,8 @@ void Raw2DsModule::registerRawCOPPERs()
   tempdblk.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
 
   // Store data contents in Corresponding RawXXXX
-  for (int cprid = 0; cprid < ncprs; cprid++) {
+  //  for (int cprid = 0; cprid < ncprs; cprid++) {
+  for (int cprid = 0; cprid < ncprs * npackedevts; cprid++) {
     // Pick up one COPPER and copy data in a temporary buffer
     int nwds_buf = tempdblk.GetBlockNwords(cprid);
     int* cprbuf = new int[nwds_buf];
@@ -152,10 +153,14 @@ void Raw2DsModule::registerRawCOPPERs()
     }
 #endif
     RawCOPPER tempcpr;
-    tempcpr.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
+    //    tempcpr.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);  -> bug. If RawFTSW is stored in bufbody, tempcpr's version becomes 0 and getNodeID fails.
+    tempcpr.SetBuffer(cprbuf, nwds_buf, false, 1, 1);
+
     //    int subsysid = ((RawCOPPER&)tempdblk).GetNodeID(cprid);
-    int subsysid = tempcpr.GetNodeID(cprid);
-    if (tempcpr.GetErrorBitFlag(cprid)) error_flag = 1;
+    //    int subsysid = tempcpr.GetNodeID(cprid);
+    int subsysid = tempcpr.GetNodeID(0);
+    if (tempcpr.GetErrorBitFlag(0)) error_flag = 1;
+    //    if (tempcpr.GetErrorBitFlag(cprid)) error_flag = 1;
 
     // Switch to each detector and register RawXXX
     if ((subsysid & DETECTOR_MASK) == CDC_ID) {

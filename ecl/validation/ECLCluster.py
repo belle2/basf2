@@ -6,7 +6,6 @@
 # and reconstructed. ECL-related infos are dumped on
 # a TTree saved in an output file named
 # ECLClusterOutput_500mev.root .
-#
 ########################################################
 
 """
@@ -39,12 +38,12 @@ set_random_seed(123456)
 # single particle generator settings
 pGun = register_module('ParticleGun')
 param_pGun = {
-    'pdgCodes': [11],
+    'pdgCodes': [22],
     'nTracks': 0,
     'momentumGeneration': 'fixed',
     'momentumParams': [0.5],
     'thetaGeneration': 'uniform',
-    'thetaParams': [40., 120.],
+    'thetaParams': [13., 160.],
     'phiGeneration': 'uniform',
     'phiParams': [0, 360],
     'vertexGeneration': 'uniform',

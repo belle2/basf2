@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+#######################################################
+# 1000 500 MeV-pions are generated with ParticleGun
+# and reconstructed. ECL-related infos are dumped on
+# a TTree saved in an output file named
+# ECLPionOutput_500mev.root .
+########################################################
+
 """
 <header>
 <output>ECLPionOutput.root</output>
@@ -13,50 +20,49 @@ from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
-set_log_level(LogLevel.ERROR)
+# Create paths
+main = create_path()
 
-# Register necessary modules
+# Event setting and info
 eventinfosetter = register_module('EventInfoSetter')
-# Set the number of events to be processed (1000 events)
 eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
+main.add_module(eventinfosetter)
 
-eventinfoprinter = register_module('EventInfoPrinter')
+# random number for generation
+# import random
+# intseed = random.randint(1, 10000000)
 
 # Fixed random seed
 set_random_seed(123456)
 
+# single particle generator settings
 pGun = register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [211],
-    'nTracks': 1,
+    'nTracks': 0,
     'momentumGeneration': 'fixed',
-    'momentumParams': [1],
+    'momentumParams': [0.5],
     'thetaGeneration': 'uniform',
-    'thetaParams': [0., 180.],
+    'thetaParams': [13., 160.],
     'phiGeneration': 'uniform',
     'phiParams': [0, 360],
     'vertexGeneration': 'uniform',
-    'xVertexParams': [0., 0.],
-    'yVertexParams': [0., 0.],
-    'zVertexParams': [0., 0.],
+    'xVertexParams': [0.0, 0.0],
+    'yVertexParams': [0.0, 0.0],
+    'zVertexParams': [0.0, 0.0],
     }
+
 pGun.param(param_pGun)
-
-# simpleoutput = register_module('RootOutput')
-# simpleoutput.param('outputFileName', '../ECLPionOutput.root')
-eclanalysis = register_module('ECLDataAnalysis')
-eclanalysis.param('rootFileName', '../ECLPionOutput.root')
-eclanalysis.param('doTracking', 1)
-
-# Create paths
-main = create_path()
-main.add_module(eventinfosetter)
-# main.add_module(eventinfoprinter)
 main.add_module(pGun)
+
 add_simulation(main)
 add_reconstruction(main)
-main.add_module(eclanalysis)
-# main.add_module(simpleoutput)
+
+# eclDataAnalysis module
+ecldataanalysis = register_module('ECLDataAnalysis')
+ecldataanalysis.param('rootFileName', '../ECLPionOutput.root')
+ecldataanalysis.param('doTracking', 1)
+main.add_module(ecldataanalysis)
 
 process(main)
 # print(statistics)

@@ -1,15 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-########################################################
-# BASF2 (Belle Analysis Framework 2)                                     *
-# Copyright(C) 2011 - Belle II Collaboration                             *
-#
-# Author: The Belle II Collaboration                                     *
-# Contributors: Benjamin Oberhof
-# This steering file generates an ntuple for validation
-# purposes
 #######################################################
+# 100 pure bkg events are produced
+########################################################
 
 """
 <header>
@@ -19,26 +13,25 @@
 """
 
 import os
-import glob
 from basf2 import *
+import glob
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
-set_log_level(LogLevel.ERROR)
+# Create paths
+main = create_path()
 
-# Register necessary modules
+# Event setting and info
 eventinfosetter = register_module('EventInfoSetter')
-# Set the number of events to be processed (1000 events)
 eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
+main.add_module(eventinfosetter)
 
-# eventinfoprinter = register_module('EventInfoPrinter')
+# random number for generation
+# import random
+# intseed = random.randint(1, 10000000)
 
 # Fixed random seed
 set_random_seed(123456)
-
-eclanalysis = register_module('ECLDataAnalysis')
-eclanalysis.param('rootFileName', '../ECLBkgOutput.root')
-eclanalysis.param('doTracking', 1)
 
 # bg = None
 if 'BELLE2_BACKGROUND_DIR' in os.environ:
@@ -46,13 +39,14 @@ if 'BELLE2_BACKGROUND_DIR' in os.environ:
 else:
     print('Warning: variable BELLE2_BACKGROUND_DIR is not set')
 
-# Create paths
-main = create_path()
-main.add_module(eventinfosetter)
-# main.add_module(eventinfoprinter)
 add_simulation(main, bkgfiles=bg)
 add_reconstruction(main)
-main.add_module(eclanalysis)
+
+# eclDataAnalysis module
+ecldataanalysis = register_module('ECLDataAnalysis')
+ecldataanalysis.param('rootFileName', '../ECLBkgOutput.root')
+ecldataanalysis.param('doTracking', 1)
+main.add_module(ecldataanalysis)
 
 process(main)
 # print(statistics)

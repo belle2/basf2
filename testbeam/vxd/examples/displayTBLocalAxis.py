@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Common PXD&SVD TestBeam Jan 2014 @ DESY Simulation
+# Common PXD&SVD TestBeam Jan 2016 @ DESY Simulation
 # This is the default simulation scenario for VXD beam test without telescopes
 
 import os
@@ -51,11 +51,11 @@ print("*****************************************************************")
 events = 1  # Number of events to simulate
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
-theta = 90.0  # degrees
+theta = -90.0  # degrees
 theta_spread = 0.005  # # degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
-gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding
+gun_x_position = -100.  # cm ... 100cm ... outside magnet + plastic shielding
 # + Al scatterer (air equiv.)
 # gun_x_position = 40. # cm ... 40cm ... inside magnet
 beamspot_size_y = 0.3  # cm (sigma of gaussian)
@@ -85,9 +85,9 @@ class DisplayAxis(Module):
 
         posBeam = TVector3(30, -5, -5)
         displayData.obj().addArrow(
-            "Beam direction, -x=20cm",
+            "Beam direction, x=20cm",
             posBeam,
-            posBeam + TVector3(-20, 0, 0))
+            posBeam + TVector3(20, 0, 0))
 
         posBField = TVector3(30, 5, -5)
         displayData.obj().addArrow(
@@ -323,6 +323,7 @@ main.add_module(PXDClust)
 main.add_module(SVDClust)
 main.add_module(mctrackfinder)
 main.add_module(geosaver)
+main.add_module("SetupGenfitExtrapolation")
 main.add_module(trackfitter)
 
 main.add_module(DisplayAxis())

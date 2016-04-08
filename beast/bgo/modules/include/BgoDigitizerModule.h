@@ -79,7 +79,9 @@ namespace Belle2 {
       double m_Range[8];
       /** Fano Factor */
       double m_Resolution[8];
+      /** Energy resolution factor */
       double m_EnergyResolutionFactor;
+      /** Energy resolution constant */
       double m_EnergyResolutionConst;
 
     };

@@ -3,7 +3,12 @@
   <Creator library="beast">CSICreator</Creator>
   <Content>
     <BeamBackgroundStudy desc="select 1 if you want to record neutron and gamma hits">0</BeamBackgroundStudy>  
- 
+    
+    <Threshold>0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5</Threshold>
+    <Range>1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5</Range>
+    <EnergyResolutionConst>0.03,0.04,0.05</EnergyResolutionConst>
+    <EnergyResolutionFactor>2,6,3</EnergyResolutionFactor>
+
     <Wrapping description="Wrapping around each crystals">
       <Thickness unit="cm">0.01</Thickness>
       <Material>AlTeflon</Material>

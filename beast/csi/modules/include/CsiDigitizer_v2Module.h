@@ -1,0 +1,92 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Igal Jaegle                                              *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#ifndef CSIDIGITIZER_V2MODULE_H
+#define CSIDIGITIZER_V2MODULE_H
+
+#include <framework/core/Module.h>
+#include <string>
+#include <vector>
+
+//ROOT
+#include <TRandom3.h>
+#include <TMath.h>
+#include <TF1.h>
+#include <TVector3.h>
+
+
+namespace Belle2 {
+  namespace csi {
+    /**
+     * Csi tube digitizer_v2
+     *
+     * Creates CsiHits from CsiSimHits
+     *
+     */
+    class CsiDigitizer_v2Module : public Module {
+
+    public:
+
+      /**
+       * Constructor: Sets the description, the properties and the parameters of the module.
+       */
+      CsiDigitizer_v2Module();
+
+      /**  */
+      virtual ~CsiDigitizer_v2Module();
+
+      /**  */
+      virtual void initialize();
+
+      /**  */
+      virtual void beginRun();
+
+      /**  */
+      virtual void event();
+
+      /**  */
+      virtual void endRun();
+      /**  */
+      virtual void terminate();
+
+
+    private:
+
+      /** reads data from CSI.xml: threshold in MeV, range in MeV, and resolution in % */
+      virtual void getXMLData();
+      /*
+      Double_t GetEnergyResolutionGeV(Double_t pEnergy) const
+      {
+      // Returns energy resolution in GeV when supplied Energy in GeV
+      return (m_EnergyResolutionFactor * TMath::Sqrt(pEnergy) + m_EnergyResolutionConst * pEnergy);
+
+      }
+      */
+      Double_t GetEnergyResolutionGeV(Double_t, int);
+
+      /** number of detectors. Read from CSI.xml*/
+      int nCSI = 18;
+      /** Cremat gain */
+      double m_Threshold[18];
+      /** Work function */
+      double m_Range[18];
+      /** Fano Factor */
+      double m_Resolution[18];
+      /** Energy resolution factor */
+      double m_EnergyResolutionFactor[3];
+      /** Energy resolution constant */
+      double m_EnergyResolutionConst[3];
+
+    };
+
+  }
+}
+
+#endif /* CSIDIGITIZER_V2MODULE_H */

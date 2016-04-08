@@ -613,6 +613,7 @@ class CDCSVGDisplayModule(Module):
                 plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segments_mctrackid:
+            Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
             if self.use_cpp:
                 cppplotter.drawCDCRecoSegments(self.cdc_reco_segment_vector_store_obj_name, "SegmentMCTrackIdColorMap", "")
             if self.use_python:

@@ -547,7 +547,7 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
         const TCRelation& trackRelation = aTrack.relation();
         const MCParticle& trackMCParticle = trackRelation.mcParticle(0);
         //double mcPt = trackMCParticle.getMomentum().Pt();
-        double mcPhi0;
+        double mcPhi0 = 0;
         if (trackMCParticle.getCharge() > 0) mcPhi0 = trackMCParticle.getMomentum().Phi() - M_PI / 2;
         if (trackMCParticle.getCharge() < 0) mcPhi0 = trackMCParticle.getMomentum().Phi() + M_PI / 2;
         //Change range to [0,2pi]

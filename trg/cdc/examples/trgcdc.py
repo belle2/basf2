@@ -10,6 +10,7 @@
 # 2015/05/18 : Fixed background file issue. //JB
 # 2015/06/09 : Updated for release-00-05-00 //JB
 # 2015/07/12 : Updated for 2D trgcdc update //JB
+# 2016/04/08 : Added NeuroTrigger. Updated for head //JB
 
 from basf2 import *
 import glob
@@ -37,21 +38,22 @@ cdcdigitizer = register_module('CDCDigitizer')
 cdctrg = register_module("TRGCDC")
 rootOut = register_module('RootOutput')
 rootIn = register_module('RootInput')
+neuro = register_module('NeuroTrigger')
 
 
 ##########################################################
 # Module settings
 
 # ...Global settings...
-# simulatedComponents = ['MagneticField', 'CDC'
-# ,'PXD', 'SVD', 'BeamPipe'
-# ]
 simulatedComponents = ['MagneticField', 'CDC'
-                       ]
+,'PXD', 'SVD', 'BeamPipe'
+]
+# simulatedComponents = ['MagneticField', 'CDC'
+#                        ]
 
 # ...EventInfoSetter...
 # Set number of events and runs
-evtmetagen.param({'evtNumList': [10], 'runList': [1]})
+evtmetagen.param({'evtNumList': [1000], 'runList': [1]})
 
 # ...Geometry...
 # Set what dectectors to simulate.
@@ -60,16 +62,16 @@ geobuilder.param('components', simulatedComponents)
 # geobuilder.log_level = LogLevel.INFO
 
 # ...ParticleGun...
-# particlegun.param('randomSeed', 3452346)
-particlegun.param('pdgCodes', [13])
-particlegun.param('nTracks', 1)
-particlegun.param('momentumGeneration', 'uniformPt')
+particlegun.param('pdgCodes', [13, -13])
+particlegun.param('nTracks', 5)
+particlegun.param('momentumGeneration', 'inversePt')
+# particlegun.param('momentumGeneration', 'uniformPt')
 # particlegun.param('momentumGeneration', 'uniform')
-# particlegun.param('momentumParams', [0.2,0.4])
-particlegun.param('momentumParams', [0.9, 0.9])
+particlegun.param('momentumParams', [0.2, 8.0])
+# particlegun.param('momentumParams', [0.9, 0.9])
 # particlegun.param('thetaGeneration', 'uniform')
 # particlegun.param('thetaParams', [35, 127])
-particlegun.param('thetaParams', [90, 90])
+# particlegun.param('thetaParams', [90, 90])
 particlegun.param('phiGeneration', 'uniform')
 particlegun.param('phiParams', [0, 360])
 # particlegun.param('vertexGeneration', 'fixed')
@@ -77,16 +79,16 @@ particlegun.param('phiParams', [0, 360])
 particlegun.param('vertexGeneration', 'uniform')
 particlegun.param('xVertexParams', [0, 0])
 particlegun.param('yVertexParams', [0, 0])
-particlegun.param('zVertexParams', [0, 0])
+particlegun.param('zVertexParams', [-20.0, 20.0])
+# particlegun.param('zVertexParams', [0, 0])
 
 # ...EvtGenInput...
 # evtgeninput.param('userDECFile', 'USER.DEC')
-evtgeninput.param('boost2LAB', True)
 
 # ...KKGenInput...
 # You need to copy mu.input.dat to the current directory, that is
 # found in "data/generators/kkmc".
-kkdir = '/sw/belle2/releases/build-2014-10-22/generators/'
+kkdir = os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None), 'generators')
 kkgeninput.param('tauinputFile', kkdir + 'kkmc/data/mu.input.dat')
 kkgeninput.param('KKdefaultFile', kkdir + 'kkmc/data/KK2f_defaults.dat')
 kkgeninput.param('taudecaytableFile', '')
@@ -99,8 +101,8 @@ mcparticleprinter.param('maxLevel', -1)
 # "physics.mac" is located at "trg/examples/".
 # g4sim.param('UICommands',['/control/execute physics.mac'])
 # or below line can be used when trgcdc.py is not in trg/examples directory //JB
-g4sim.param('UICommands', ['/control/execute ' +
-                           os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None), "trg/cdc/examples/physics.mac")])
+# g4sim.param('UICommands', ['/control/execute ' +
+#                            os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None), "trg/cdc/examples/physics.mac")])
 
 # ...BeamBkgMixer...
 # Mix background (From beamBkgMixer.py)
@@ -128,14 +130,14 @@ bkgmixer.param('scaleFactors', [
 
 # ...CDCDigitizer...
 # set digitizer to no smearing
-param_cdcdigi = {'Fraction': 1,
-                 'Resolution1': 0.,
-                 'Resolution2': 0.,
-                 'Threshold': -10.0}
-cdcdigitizer.param(param_cdcdigi)
-cdcdigitizer.param('AddInWirePropagationDelay', True)
-cdcdigitizer.param('AddTimeOfFlight', True)
-cdcdigitizer.param('UseSimpleDigitization', True)
+# param_cdcdigi = {'Fraction': 1,
+#                  'Resolution1': 0.,
+#                  'Resolution2': 0.,
+#                  'Threshold': -10.0}
+# cdcdigitizer.param(param_cdcdigi)
+# cdcdigitizer.param('AddInWirePropagationDelay', True)
+# cdcdigitizer.param('AddTimeOfFlight', True)
+# cdcdigitizer.param('UseSimpleDigitization', True)
 
 # ...CDC Trigger...
 # ---General settings---
@@ -151,16 +153,15 @@ cdctrg.param('FastSimulationMode', 0)
 # TSLUT (latest version @ 2014.07)
 cdctrg.param('InnerTSLUTFile', os.path.join(basf2datadir, "trg/cdc/innerLUT_v2.2.coe"))
 cdctrg.param('OuterTSLUTFile', os.path.join(basf2datadir, "trg/cdc/outerLUT_v2.2.coe"))
-# 0: (Default) Logic TSF, 1: LUT TSF
-# cdctrg.param('TSFLogicLUT', 1)
+# 0: Logic TSF, 1: (Default) LUT TSF
+# cdctrg.param('TSFLogicLUT', 0)
 # cdctrg.param('TSFRootFile',1)
 # ---2D finder settings---
 cdctrg.param('HoughFinderMappingFileMinus', os.path.join(basf2datadir, "trg/cdc/HoughMappingMinus20160223.dat"))
 cdctrg.param('HoughFinderMappingFilePlus', os.path.join(basf2datadir, "trg/cdc/HoughMappingPlus20160223.dat"))
-cdctrg.param('2DFinderPerfect', 1)
-# cdctrg.param('HoughFinderMeshX',160)
-# cdctrg.param('HoughFinderMeshY',26)
+# cdctrg.param('2DFinderPerfect', 1)
 # cdctrg.param('HoughFinderPeakMin',4)
+# cdctrg.param('HoughFinderDoit', 2)
 # ---3D finder settings---
 # cdctrg.param('Hough3DRootFile',1)
 # 0: perfect finder, 1: Hough3DFinder, 2: (Default) GeoFinder, 3: VHDL GeoFinder
@@ -169,6 +170,14 @@ cdctrg.param('2DFinderPerfect', 1)
 # cdctrg.param('Fitter3DRootFile',1)
 # cdctrg.param('RootFitter3DFile', 'Fitter3D.root')
 # cdctrg.param('Fitter3DLRLUT', 0)
+
+# ...NeuroTrigger...
+# define parameters
+neuro.param('filename', os.path.join(basf2datadir, "trg/cdc/Neuro20160118Nonlin.root"))
+# output warnings, info and some debug output for neurotrigger module
+# neuro.logging.log_level = basf2.LogLevel.DEBUG
+# neuro.logging.debug_level = 80
+# basf2.logging.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
 
 # ...RootOutput...
 rootOut.param('outputFileName', 'basf2.root')
@@ -195,6 +204,7 @@ fullMain.add_module(g4sim)
 fullMain.add_module(bkgmixer)
 fullMain.add_module(cdcdigitizer)
 fullMain.add_module(cdctrg)
+fullMain.add_module(neuro)
 
 # For only generator+G4Sim and save file. (To save time)
 g4SimMain = create_path()
@@ -203,12 +213,12 @@ g4SimMain.add_module(evtmetagen)
 g4SimMain.add_module(evtmetainfo)
 g4SimMain.add_module(paramloader)
 g4SimMain.add_module(geobuilder)
-# g4SimMain.add_module(particlegun)
-g4SimMain.add_module(evtgeninput)
+g4SimMain.add_module(particlegun)
+# g4SimMain.add_module(evtgeninput)
 # g4SimMain.add_module(kkgeninput)
 g4SimMain.add_module(mcparticleprinter)
 g4SimMain.add_module(g4sim)
-# g4SimMain.add_module(bkgmixer)
+g4SimMain.add_module(bkgmixer)
 g4SimMain.add_module(cdcdigitizer)
 g4SimMain.add_module(rootOut)
 
@@ -242,7 +252,7 @@ savedGeneratorMain.add_module(rootIn)
 savedGeneratorMain.add_module(evtmetainfo)
 savedGeneratorMain.add_module(paramloader)
 savedGeneratorMain.add_module(geobuilder)
-# savedGeneratorMain.add_module(bkgmixer)
+savedGeneratorMain.add_module(bkgmixer)
 savedGeneratorMain.add_module(cdcdigitizer)
 savedGeneratorMain.add_module(cdctrg)
 

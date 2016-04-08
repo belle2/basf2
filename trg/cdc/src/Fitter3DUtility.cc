@@ -176,12 +176,11 @@ void Fitter3DUtility::rPhiFit2(double *rr, double *phi2, double *phierror, doubl
   //pchi3/=3;
 }
 
-double Fitter3DUtility::calPhi(double wirePhi, double driftLength, double eventTime, double rr, int lr){
+double Fitter3DUtility::calPhi(double wirePhi, double driftTime, double eventTime, double rr, int lr){
+
   double result = wirePhi;
-  // JB: EventTime definition was changed. 2015.01.03
-  //double t_dPhi=driftLength*10 - eventTime;
-  // driftLength is cm scale. eventTime is ns scale.
-  double t_dPhi=driftLength*10 - eventTime*40/1000;
+  // time is in 2ns rms clock.
+  double t_dPhi = (driftTime - eventTime)*2*40/1000;
   // Change to radian
   // rr is cm scale.
   t_dPhi=atan(t_dPhi/rr/10);
@@ -191,9 +190,9 @@ double Fitter3DUtility::calPhi(double wirePhi, double driftLength, double eventT
   return result;
 }
 
-double Fitter3DUtility::calPhi(int localId, int nWires, double driftLength, double eventTime, double rr, int lr){
+double Fitter3DUtility::calPhi(int localId, int nWires, double driftTime, double eventTime, double rr, int lr){
   double wirePhi = (double)localId/nWires*4*M_PI;
-  return Fitter3DUtility::calPhi(wirePhi, driftLength, eventTime, rr, lr);
+  return Fitter3DUtility::calPhi(wirePhi, driftTime, eventTime, rr, lr);
 }
 
 double Fitter3DUtility::rotatePhi(double value, double refPhi) {

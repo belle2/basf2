@@ -411,9 +411,9 @@ namespace Belle2 {
     unsigned layerId = segmentHit->segment().center().layerId();
     int nWires = cdcp.nWiresInLayer(layerId) * 2;
     double rr = cdcp.senseWireR(layerId);
-    double driftLength = segmentHit->drift();
+    double driftTime = segmentHit->segment().priorityTime();
     int lr = segmentHit->segment().LUT()->getValue(segmentHit->segment().lutPattern());
-    return Fitter3DUtility::calPhi(localId, nWires, driftLength, eventTime, rr, lr);
+    return Fitter3DUtility::calPhi(localId, nWires, driftTime, eventTime, rr, lr);
   }
 
   void TRGCDCHoughFinder::calCosPhi(std::map<std::string, Belle2::TRGCDCJSignal>& mSignalStorage,

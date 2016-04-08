@@ -629,9 +629,9 @@ namespace Belle2{
     double t_minActual=targetMin.m_minActual;
     double t_maxActual=targetMax.m_maxActual;
     for(unsigned iCondition=0; iCondition<data.size(); iCondition++){
-      TRGCDCJSignal * from;
-      TRGCDCJSignal * to;
-      TRGCDCJSignal * assign;
+      TRGCDCJSignal * from = 0;
+      TRGCDCJSignal * to = 0;
+      TRGCDCJSignal * assign = 0;
       assign = &(data[iCondition][0]);
 
       // To keep properties.
@@ -798,7 +798,7 @@ namespace Belle2{
         if(t_maxClock < t_clock) t_maxClock = t_clock;
       }
     }
-    int t_finishClock;
+    int t_finishClock = 0;
     if(targetClock==-3) {
       if(t_maxClock < 0) cout<<"[Error] TRGCDCJSignal::ifElse() => t_maxClock is negative. Did not consider this case."<<endl;
       t_finishClock = t_maxClock+1;

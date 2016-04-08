@@ -423,7 +423,7 @@ namespace Belle2 {
     _eventTime.push_back(new TCEventTime(*this));
     _eventTime.back()->initialize();
 
-    TRGCDCSegment* tstmp;
+    TRGCDCSegment* tstmp = 0;
 
     //...Make TSF's...
     const unsigned nWiresInTS[2] = {15, 11};
@@ -1989,7 +1989,12 @@ namespace Belle2 {
       _hFinder->FindAndFit(_trackList2D, _trackList2DFitted);
 
     //...Stereo finder...
-    _h3DFinder->doit(_trackList2DFitted, _trackList3D, m_eventNum);
+    {
+      bool t_use2DFitted = 0;
+      if(_perfect2DFinder) t_use2DFitted = 1;
+      if (t_use2DFitted == 0) _h3DFinder->doit(_trackList2D, _trackList3D, m_eventNum);
+      else _h3DFinder->doit(_trackList2DFitted, _trackList3D, m_eventNum);
+    }
 
     //...Check tracks...
     if (TRGDebug::level()) {

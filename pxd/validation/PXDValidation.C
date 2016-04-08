@@ -72,7 +72,7 @@
 void PXDValidation()
 {
 // Options:
-  int SensorMirroring = 0;   // sensor u&v counting, default = 0
+//  int SensorMirroring = 0;   // sensor u&v counting, default = 0
 //               1: sensor u&v count with respect of readout chips
 //               0: sensor u&v count with respect to detector axis
   float CloseSurf = 0.98;    // how cloase surface is acceptance of particle entry/exit
@@ -97,8 +97,8 @@ void PXDValidation()
 // Load constants:
   float DetThicknes = h_consts->GetBinContent(1);
   float DigitNoise = h_consts->GetBinContent(12);
-  int PixNoU = h_consts->GetBinContent(7);
-  float PixSizeU = h_consts->GetBinContent(2);
+//  int PixNoU = h_consts->GetBinContent(7);
+//  float PixSizeU = h_consts->GetBinContent(2);
   int *PixNoV = new int[nPixelTypes];
   PixNoV[0] = h_consts->GetBinContent(8);
   PixNoV[1] = h_consts->GetBinContent(9);
@@ -388,13 +388,13 @@ void PXDValidation()
     TString cond2(Form("pixel_type==%i&&sensor==1",ipixtype));
     TString cond3(Form("pixel_type==%i&&sensor==2",ipixtype));
     cValidEtaDist->cd(ipixtype*2+0+1);
-    if (SensorMirroring == 1) {
-      tree->Draw(exprU1,cond2);
-      tree->Draw(exprU2,cond3);
-    }
-    else {
-      tree->Draw(exprU1,cond);
-    }
+//    if (SensorMirroring == 1) {
+//      tree->Draw(exprU1,cond2);
+//      tree->Draw(exprU2,cond3);
+//    }
+//    else {
+    tree->Draw(exprU1,cond);
+//    }
     hValidEtaDistU[ipixtype]->SetLineColor(kRed);
     hValidEtaDistU[ipixtype]->GetListOfFunctions()->Add(new TNamed("Description", title.Data()));
     hValidEtaDistU[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should be peak in middle and rest of bins flat."));
@@ -414,13 +414,13 @@ void PXDValidation()
 //    TString expr2(Form("(cluster_v+%i/2*%f)/%f-TMath::Floor((cluster_v+%i/2*%f)/%f)>>%s",
 //        PixNoV[ipixtype],PixSizeV[ipixtype],PixSizeV[ipixtype],PixNoV[ipixtype],PixSizeV[ipixtype],PixSizeV[ipixtype],name2.Data()));
     cValidEtaDist->cd(ipixtype*2+1+1);
-    if (SensorMirroring == 1) {
-      tree->Draw(exprV1,cond2);
-      tree->Draw(exprV2,cond3);
-    }
-    else {
-      tree->Draw(exprV1,cond);
-    }
+//    if (SensorMirroring == 1) {
+//      tree->Draw(exprV1,cond2);
+//      tree->Draw(exprV2,cond3);
+//    }
+//    else {
+    tree->Draw(exprV1,cond);
+//    }
     hValidEtaDistV[ipixtype]->GetListOfFunctions()->Add(new TNamed("Description", title2.Data()));
     hValidEtaDistV[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should be peak in middle and rest of bins flat."));
     hValidEtaDistV[ipixtype]->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));

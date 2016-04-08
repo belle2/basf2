@@ -6,6 +6,10 @@
 namespace Belle2 {
   /** Class to keep all parameters of an expert MLP for the neuro trigger. */
   class CDCTriggerMLP : public TObject {
+
+    // weights etc. are set only by the trainer
+    friend class NeuroTriggerTrainerModule;
+
   public:
     /** default constructor. */
     CDCTriggerMLP();
@@ -22,17 +26,6 @@ namespace Belle2 {
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerMLP() { }
-
-    /** set the relevant Id range */
-    void setRelevantID(std::vector<float>& relId) { relevantID = relId; }
-    /** set the weights */
-    void setWeights(std::vector<float>& w) { weights = w; }
-    /** set phi range for which this expert is trained */
-    void setPhiRange(std::vector<float>& phi) { phiRange = phi; }
-    /** set charge / Pt range for which this expert is trained */
-    void setInvptRange(std::vector<float>& invpt) { invptRange = invpt; }
-    /** set theta range for which this expert is trained */
-    void setThetaRange(std::vector<float>& theta) { thetaRange = theta; }
 
     /** get number of layers */
     unsigned nLayers() const { return nNodes.size(); }

@@ -361,9 +361,9 @@ void NeuroTriggerTrainerModule::terminate()
     phiRange[1] *= Unit::deg;
     thetaRange[0] *= Unit::deg;
     thetaRange[1] *= Unit::deg;
-    m_NeuroTrigger[isector].setPhiRange(phiRange);
-    m_NeuroTrigger[isector].setInvptRange(invptRange);
-    m_NeuroTrigger[isector].setThetaRange(thetaRange);
+    m_NeuroTrigger[isector].phiRange = phiRange;
+    m_NeuroTrigger[isector].invptRange = invptRange;
+    m_NeuroTrigger[isector].thetaRange = thetaRange;
   }
   // save everything to file
   m_NeuroTrigger.save(m_filename, m_arrayname);
@@ -439,7 +439,7 @@ NeuroTriggerTrainerModule::updateRelevantID(unsigned isector)
     B2DEBUG(50, "SL " << iSL << ": "
             << relevantID[2 * iSL] << " " << relevantID[2 * iSL + 1]);
   }
-  m_NeuroTrigger[isector].setRelevantID(relevantID);
+  m_NeuroTrigger[isector].relevantID = relevantID;
 }
 
 void NeuroTriggerTrainerModule::train(unsigned isector)
@@ -542,7 +542,7 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
     }
     // test trained network
     vector<float> oldWeights = m_NeuroTrigger[isector].getWeights();
-    m_NeuroTrigger[isector].setWeights(bestWeights);
+    m_NeuroTrigger[isector].weights = bestWeights;
     vector<double> sumSqr;
     sumSqr.assign(nNodes[nLayers - 1], 0.);
     for (unsigned i = nTrain + m_nValid; i < m_trainSets[isector].nSamples(); ++i) {
@@ -570,7 +570,7 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
       bestTrainLog.assign(trainLog.begin(), trainLog.begin() + breakEpoch);
       bestValidLog.assign(validLog.begin(), validLog.begin() + breakEpoch);
     } else {
-      m_NeuroTrigger[isector].setWeights(oldWeights);
+      m_NeuroTrigger[isector].weights = oldWeights;
     }
   }
   // save training log

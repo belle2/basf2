@@ -85,8 +85,9 @@ namespace Belle2 {
                              bool fLogicLUTTSF = 0,
                              bool fLRLUT = 1,
                              bool fevtTime = 1,
-                             bool fzierror = 1,
-                             bool fmclr = 0,
+                             bool fFitter3Dsmclr = 0,
+                             bool fFitter3Ds2DFit = 1,
+                             bool fFitter3Ds2DFitDrift = 0,
                              double inefficiency = 0,
                              bool fileTSF = 0,
                              bool fileHough3D = 0,
@@ -119,8 +120,9 @@ namespace Belle2 {
            bool fLogicLUTTSF,
            bool fLRLUT,
            bool fevtTime,
-           bool fzierror,
-           bool fmclr,
+           bool fFitter3Dsmclr,
+           bool fFitter3Ds2DFit,
+           bool fFitter3Ds2DFitDrift,
            double inefficiecny,
            bool fileTSF,
            bool fileHough3D,
@@ -488,11 +490,14 @@ namespace Belle2 {
     /// Switch for the event tiem in Segment.
     bool _fevtTime;
 
-    /// Switch for the zi error.
-    bool _fzierror;
+    /// Switch for MC L/R information in Fitter3D.
+    bool _fFitter3Dsmclr;
 
-    /// Switch for MC L/R information.
-    bool _fmclr;
+    /// Switch to us 2D fit or Hough finder results.
+    bool _fFitter3Ds2DFit;
+
+    /// Switch to us wire 2D fit or drift 2D fit.
+    bool _fFitter3Ds2DFitDrift;
 
     /// Hit inefficiency parameter.
     double _inefficiency;

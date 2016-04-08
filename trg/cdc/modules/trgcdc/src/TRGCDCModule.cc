@@ -60,6 +60,9 @@ namespace Belle2 {
       _fLogicLUTTSF(1),
       _fLRLUT(1),
       _fevtTime(1),
+      _fFitter3Dsmclr(0),
+      _fFitter3Ds2DFit(1),
+      _fFitter3Ds2DFitDrift(0),
       _wireHitInefficiency(0.),
       _fileTSF(0),
       _fileHough3D(0),
@@ -143,7 +146,7 @@ namespace Belle2 {
              _hFinderDoit,
              "Hough finder doit() version",
              _hFinderDoit);
-    addParam("Fitter3DLRLUT",
+    addParam("Fitter3DsLRLUT",
              _fLRLUT,
              "Using L/R LUT in fitter3D",
              _fLRLUT);
@@ -151,14 +154,18 @@ namespace Belle2 {
              _fevtTime,
              "Using event time in Segment",
              _fevtTime);
-    addParam("Zierror",
-             _fzierror,
-             "Using new Zi error",
-             _fzierror);
-    addParam("MCLR",
-             _fmclr,
-             "Using MC L/R information",
-             _fmclr);
+    addParam("Fitter3DsMcLR",
+             _fFitter3Dsmclr,
+             "Using MC L/R information for Fitter3D",
+             _fFitter3Dsmclr);
+    addParam("Fitter3Ds2DFit",
+             _fFitter3Ds2DFit,
+             "Using 1: 2D fit or 0: Hough Finder results for Fitter3D",
+             _fFitter3Ds2DFit);
+    addParam("Fitter3Ds2DFitDrift",
+             _fFitter3Ds2DFitDrift,
+             "Using 1: drift 2D fit or 0: wire 2D fit for Fitter3D",
+             _fFitter3Ds2DFitDrift);
     addParam("wireHitInefficiency",
              _wireHitInefficiency,
              "wire hit inefficiency",
@@ -284,8 +291,9 @@ namespace Belle2 {
                                _fLogicLUTTSF,
                                _fLRLUT,
                                _fevtTime,
-                               _fzierror,
-                               _fmclr,
+                               _fFitter3Dsmclr,
+                               _fFitter3Ds2DFit,
+                               _fFitter3Ds2DFitDrift,
                                _wireHitInefficiency,
                                _fileTSF,
                                _fileHough3D,

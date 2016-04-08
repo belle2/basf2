@@ -169,7 +169,10 @@ cdctrg.param('HoughFinderMappingFilePlus', os.path.join(basf2datadir, "trg/cdc/H
 # ---3D fitter settings---
 # cdctrg.param('Fitter3DRootFile',1)
 # cdctrg.param('RootFitter3DFile', 'Fitter3D.root')
-# cdctrg.param('Fitter3DLRLUT', 0)
+# cdctrg.param('Fitter3DsMcLR', 0)
+# cdctrg.param('Fitter3Ds2DFit', 1)
+# cdctrg.param('Fitter3Ds2DFitDrift', 0)
+# cdctrg.param('Fitter3DsLRLUT', 0)
 
 # ...NeuroTrigger...
 # define parameters

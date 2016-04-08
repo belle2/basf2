@@ -73,16 +73,11 @@ namespace Belle2 {
   }
 
   void TRGCDCFitter3D::initialize(){
-    // [TODO] move to TRGCDC steering file
     // If we are using Monte Carlo information.
     m_mBool["fMc"] = 1;
     m_mBool["fVerbose"] = 0;
     m_mBool["fIsPrintError"] = 0;
     m_mBool["fIsIntegerEffect"] = 1;
-    // LR is from MC.
-    m_mBool["fmcLR"] = 0;
-    m_mBool["f2DFit"] = 1;
-    m_mBool["f2DFitDrift"] = 0;
     // Init values
     m_mConstD["Trg_PI"] = 3.141592653589793;
 
@@ -158,7 +153,6 @@ namespace Belle2 {
     if(m_mBool["fVerbose"]) {
       cout<<"fLRLUT:       "<<m_mBool["fLRLUT"]<<endl;
       cout<<"fEvtTime:     "<<m_mBool["fEvtTime"]<<endl;
-      cout<<"fzierror:     "<<m_mBool["fzierror"]<<endl;
       cout<<"fMc:          "<<m_mBool["fMc"]<<endl;
       cout<<"fVerbose:     "<<m_mBool["fVerbose"]<<endl;
       cout<<"fmcLR:        "<<m_mBool["fmcLR"]<<endl;

@@ -151,11 +151,14 @@ namespace Belle2 {
     /// Switch for the event time in Segment.
     bool _fevtTime;
 
-    /// Switch for the zi error.
-    bool _fzierror;
+    /// Switch for Fitter3D's MC L/R information.
+    bool _fFitter3Dsmclr;
 
-    /// Switch for MC L/R information.
-    bool _fmclr;
+    /// Switch to us 2D fit or Hough finder results.
+    bool _fFitter3Ds2DFit;
+
+    /// Switch to us wire 2D fit or drift 2D fit.
+    bool _fFitter3Ds2DFitDrift;
 
     /// Parameter for Hit inefficiency.
     double _wireHitInefficiency;

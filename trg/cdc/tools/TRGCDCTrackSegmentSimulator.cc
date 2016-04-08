@@ -101,7 +101,6 @@ main(int argc, char* argv[])
   const unsigned fLogicLUTTSF = 0;
   const unsigned fLRLUT = 1;
   const unsigned fevtTime = 1;
-  const unsigned fzierror = 0;
   const unsigned fmclr = 0;
   const double inefficiency = 0;
   const unsigned fileTSF = 0;
@@ -129,7 +128,6 @@ main(int argc, char* argv[])
                                   fLogicLUTTSF,
                                   fLRLUT,
                                   fevtTime,
-                                  fzierror,
                                   fmclr,
                                   inefficiency,
                                   fileTSF,

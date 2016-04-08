@@ -6,5 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::BgoSimHit+;
+#pragma link C++ class Belle2::BgoHit+;
 
 #endif

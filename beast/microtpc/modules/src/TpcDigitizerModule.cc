@@ -166,7 +166,7 @@ void TpcDigitizerModule::event()
       // check if enough energy to ionize if not break
       // keV -> eV
 
-      if ((ionEn * 1e3) <  m_Workfct) break; // TODO: Use Unit constants instead of self made magic numbers
+      if ((ionEn * 1e3) <  m_Workfct) continue; // TODO: Use Unit constants instead of self made magic numbers
       ////////////////////////////////
       // check if enough energy to ionize
       else if ((ionEn * 1e3) >  m_Workfct) { // TODO: Use Unit constants instead of self made magic numbers

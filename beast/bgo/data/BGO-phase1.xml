@@ -16,6 +16,10 @@
     <bar unit="mm">1 2 3 4 5 6 7 8 
     </bar>
     <Ethres>0.05</Ethres>
+    <Threshold>0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5</Threshold>
+    <Range>1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5</Range>
+    <EnergyResolutionConst>0.03</EnergyResolutionConst>
+    <EnergyResolutionFactor>2</EnergyResolutionFactor>
     <Active>
       <Material>BGO-Material</Material>
       <cDx1 unit="mm">17.974</cDx1>

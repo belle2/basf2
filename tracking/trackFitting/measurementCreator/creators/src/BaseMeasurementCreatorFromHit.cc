@@ -21,7 +21,7 @@ BaseMeasurementCreatorFromHit<HitType, detector>::BaseMeasurementCreatorFromHit(
 
 template <class HitType, Const::EDetector detector>
 genfit::AbsMeasurement* BaseMeasurementCreatorFromHit<HitType, detector>::createCoordinateMeasurement(HitType* hit,
-    const RecoHitInformation& recoHitInformation) const
+    const RecoHitInformation& /*recoHitInformation*/) const
 {
   // No one is using the trackCandHit (neither in SVDRecoHit nor in PXDRecoHit). So we do not provide any here!
   genfit::AbsMeasurement* coordinateMeasurement = m_measurementFactory.createOne(detector, hit->getArrayIndex(),

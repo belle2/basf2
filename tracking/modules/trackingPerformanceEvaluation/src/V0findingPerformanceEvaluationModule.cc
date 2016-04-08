@@ -337,6 +337,10 @@ void V0findingPerformanceEvaluationModule::terminate()
 bool V0findingPerformanceEvaluationModule::isV0(const MCParticle& the_mcParticle)
 {
 
+  bool isGamma = false;
+  if (abs(the_mcParticle.getPDG()) == 22)
+    isGamma = true;
+
   bool isK_S0 = false;
   if (abs(the_mcParticle.getPDG()) == 310)
     isK_S0 = true;
@@ -358,7 +362,10 @@ bool V0findingPerformanceEvaluationModule::isV0(const MCParticle& the_mcParticle
     if (the_mcParticle.getDaughters()[0]->getCharge() == 0)
       twoChargedProngs = false;
 
-  return ((isK_S0 || isK_0 || isLambda) && twoChargedProngs);
+  return ((isGamma || isK_S0 || isK_0 || isLambda) && twoChargedProngs);
+  //  return (isGamma && twoChargedProngs);
+  //  return (isLambda && twoChargedProngs);
+  //  return ( (isK_S0 || isK_0) && twoChargedProngs);
 
 }
 

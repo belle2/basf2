@@ -12,6 +12,8 @@ using std::string;
 
 // electrons and posistrons
 TCut electrons = "abs(MCParticles.m_pdg) == 11";
+// muons 
+TCut muons = "abs(MCParticles.m_pdg) == 13";
 // photons
 TCut photons = "abs(MCParticles.m_pdg) == 22";
 // 3 leptons and 3 neutrinos
@@ -262,6 +264,15 @@ void energyDistribution(TTree* tree)
 
   // nuclei
   createEnergyHistogram(tree, "Nucleus", "(atoms or their fragments)", nuclei, 5.0);
+
+  // muons 
+  createEnergyHistogram(tree, "Muon", "(anti-muons included)", muons, 1.0);
+
+  // photons
+  createEnergyHistogram(tree, "StableMeson", "(charged pions, K Longs, and charged kaons)", stableMesons, 2.5);
+
+  // nuclei
+  createEnergyHistogram(tree, "StableBaryon", "(protons and neutrons)", stableBaryons, 2.5);
 
 }
 

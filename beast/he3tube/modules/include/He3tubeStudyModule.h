@@ -88,6 +88,8 @@ namespace Belle2 {
       TH1F* h_PulseHeights_Neutron;
       /** Pulse height of waveforms from non-neutrons */
       TH1F* h_PulseHeights_NotNeutron;
+      /** Pulse heught of all waveforms */
+      TH1F* h_PulseHeights_All;
 
       /** Number of neutrons */
       int nNeutronHits = 0;

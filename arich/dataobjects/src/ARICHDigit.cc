@@ -13,8 +13,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(ARICHDigit)
-
 DigitBase::EAppendStatus ARICHDigit::addBGDigit(const DigitBase* bg)
 {
 

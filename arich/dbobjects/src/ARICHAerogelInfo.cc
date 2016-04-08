@@ -14,9 +14,6 @@
 using namespace Belle2;
 using namespace std;
 
-ClassImp(ARICHAerogelInfo);
-
-
 float ARICHAerogelInfo::getAerogelTransmittanceElement(int lambda) const
 {
   if (lambda < c_lambdaMin || lambda > c_lambdaMax) {

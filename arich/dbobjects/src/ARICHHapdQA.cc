@@ -13,9 +13,6 @@
 using namespace Belle2;
 using namespace std;
 
-ClassImp(ARICHHapdQA);
-
-
 TGraph* ARICHHapdQA::getHapdLeakCurrent(unsigned int i) const
 {
   if (i < m_leakCurrent.size()) return m_leakCurrent[i];

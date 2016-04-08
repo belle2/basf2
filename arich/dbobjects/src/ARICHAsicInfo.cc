@@ -13,9 +13,6 @@
 using namespace Belle2;
 using namespace std;
 
-ClassImp(ARICHAsicInfo);
-
-
 int ARICHAsicInfo::getDeadChannel(unsigned int i) const
 {
   if (i < m_deadChannel.size()) return m_deadChannel[i];

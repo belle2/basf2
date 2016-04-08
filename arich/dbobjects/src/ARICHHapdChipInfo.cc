@@ -13,9 +13,6 @@
 using namespace Belle2;
 using namespace std;
 
-ClassImp(ARICHHapdChipInfo);
-
-
 TGraph* ARICHHapdChipInfo::getBombardmentCurrent(unsigned int i) const
 {
   if (i < m_bombardmentCurrent.size()) return m_bombardmentCurrent[i];

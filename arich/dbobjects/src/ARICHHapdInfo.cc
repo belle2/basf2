@@ -14,8 +14,6 @@
 using namespace Belle2;
 using namespace std;
 
-ClassImp(ARICHHapdInfo);
-
 ARICHHapdChipInfo ARICHHapdInfo::getHapdChipInfo(unsigned int i) const
 {
   if (i < c_NumberOfChips) return m_HAPDChipInfo[i];

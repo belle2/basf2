@@ -13,9 +13,6 @@
 using namespace Belle2;
 using namespace std;
 
-ClassImp(ARICHBadChannels);
-
-
 int ARICHBadChannels::getHapdCutChannel(unsigned int i) const
 {
   if (i < m_hapdCutChannels.size()) return m_hapdCutChannels[i];

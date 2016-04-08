@@ -14,8 +14,6 @@
 using namespace Belle2;
 using namespace std;
 
-ClassImp(ARICHFEBoardInfo);
-
 ARICHAsicInfo ARICHFEBoardInfo::getAsicInfo(unsigned int i) const
 {
   if (i < 4) return m_asicInfo[i];

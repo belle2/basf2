@@ -13,8 +13,6 @@
 using namespace Belle2;
 using namespace std;
 
-ClassImp(ARICHFebTest);
-
 int ARICHFebTest::getDeadChannel(unsigned int i) const
 {
   if (i < m_deadChannel.size()) return m_deadChannel[i];

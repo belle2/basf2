@@ -22,10 +22,6 @@ NeuroTrigger::initialize(const Parameters& p)
   // check parameters
   bool okay = true;
   // ensure that length of lists matches number of sectors
-  if (p.nInput.size() != 1 && p.nInput.size() != p.nMLP) {
-    B2ERROR("Number of nInput values should be 1 or " << p.nMLP);
-    okay = false;
-  }
   if (p.nHidden.size() != 1 && p.nHidden.size() != p.nMLP) {
     B2ERROR("Number of nHidden lists should be 1 or " << p.nMLP);
     okay = false;
@@ -53,14 +49,16 @@ NeuroTrigger::initialize(const Parameters& p)
       okay = false;
     }
   }
-  // ensure that number of input and target nodes are valid
-  for (unsigned i = 0; i < p.nInput.size(); ++i) {
-    if (p.nInput[i] % 3 != 0 || p.nInput[i] > 27) {
-      B2ERROR("nInput should be a multiple of 3 <= 27");
-      okay = false;
-      continue;
-    }
+  // ensure that length of maxHitsPerSL and SLpatternMask lists matches SLpattern
+  if (p.maxHitsPerSL.size() != 1 && p.maxHitsPerSL.size() != p.SLpattern.size()) {
+    B2ERROR("Number of maxHitsPerSL lists should be 1 or " << p.SLpattern.size());
+    okay = false;
   }
+  if (p.SLpatternMask.size() != 1 && p.SLpatternMask.size() != p.SLpattern.size()) {
+    B2ERROR("Number of SLpatternMask lists should be 1 or " << p.SLpattern.size());
+    okay = false;
+  }
+  // ensure that number of target nodes is valid
   unsigned short nTarget = int(p.targetZ) + int(p.targetTheta);
   if (nTarget < 1) {
     B2ERROR("No outputs! Turn on either targetZ or targetTheta.");
@@ -166,8 +164,13 @@ NeuroTrigger::initialize(const Parameters& p)
   // initialize MLPs
   m_MLPs.clear();
   for (unsigned iMLP = 0; iMLP < p.nMLP; ++iMLP) {
+    //get indices for sector parameters
+    vector<unsigned> indices = getRangeIndices(p, iMLP);
     //get number of nodes for each layer
-    unsigned short nInput = (p.nInput.size() == 1) ? p.nInput[0] : p.nInput[iMLP];
+    unsigned short maxHits = (p.maxHitsPerSL.size() == 1) ? p.maxHitsPerSL[0] : p.maxHitsPerSL[indices[3]];
+    unsigned long SLpattern = p.SLpattern[indices[3]];
+    unsigned long SLpatternMask = (p.SLpatternMask.size() == 1) ? p.SLpatternMask[0] : p.SLpatternMask[indices[3]];
+    unsigned short nInput = 27 * maxHits;
     vector<float> nHidden = (p.nHidden.size() == 1) ? p.nHidden[0] : p.nHidden[iMLP];
     vector<unsigned short> nNodes = {nInput};
     for (unsigned iHid = 0; iHid < nHidden.size(); ++iHid) {
@@ -180,11 +183,9 @@ NeuroTrigger::initialize(const Parameters& p)
     nNodes.push_back(nTarget);
     unsigned short targetVars = int(p.targetZ) + (int(p.targetTheta) << 1);
     //get sector ranges (initially train ranges)
-    vector<unsigned> indices = getRangeIndices(p, iMLP);
     vector<float> phiRange = p.phiRangeTrain[indices[0]];
     vector<float> invptRange = p.invptRangeTrain[indices[1]];
     vector<float> thetaRange = p.thetaRangeTrain[indices[2]];
-    unsigned short SLpattern = p.SLpattern[indices[3]];
     B2DEBUG(50, "Ranges for sector " << iMLP
             << ": phiRange [" << phiRange[0] << ", " << phiRange[1]
             << "], invptRange [" << invptRange[0] << ", " << invptRange[1]
@@ -203,7 +204,8 @@ NeuroTrigger::initialize(const Parameters& p)
     }
     //create new MLP
     m_MLPs.push_back(CDCTriggerMLP(nNodes, targetVars, outputScale,
-                                   phiRange, invptRange, thetaRange, SLpattern, p.tMax));
+                                   phiRange, invptRange, thetaRange,
+                                   maxHits, SLpattern, SLpatternMask, p.tMax));
   }
   // load some values from the geometry that will be needed for the input
   CDCGeometryPar& cdc = CDCGeometryPar::Instance();
@@ -257,8 +259,8 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
   for (unsigned isector = 0; isector < m_MLPs.size(); ++isector) {
     if (m_MLPs[isector].inPhiRange(phi0) && m_MLPs[isector].inPtRange(pt)
         && m_MLPs[isector].inThetaRange(theta)) {
-      unsigned short hitPattern = getInputPattern(isector);
-      unsigned short sectorPattern = m_MLPs[isector].getSLpattern();
+      unsigned long hitPattern = getInputPattern(isector);
+      unsigned long sectorPattern = m_MLPs[isector].getSLpattern();
       B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
       // no hit pattern restriction -> keep looking for exact match
       if (sectorPattern == 0) {
@@ -347,12 +349,14 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
   return relId;
 }
 
-unsigned short
+unsigned long
 NeuroTrigger::getInputPattern(unsigned isector)
 {
   StoreArray<CDCTriggerSegmentHit> hits("CDCTriggerSegmentHits");
   CDCTriggerMLP& expert = m_MLPs[isector];
-  unsigned short hitPattern = 0;
+  unsigned long hitPattern = 0;
+  vector<unsigned> nHits;
+  nHits.assign(9, 0);
   // loop over hits
   for (int ihit = 0; ihit < hits.getEntries(); ++ ihit) {
     unsigned short iSL = hits[ihit]->getISuperLayer();
@@ -361,12 +365,15 @@ NeuroTrigger::getInputPattern(unsigned isector)
     if (t < 0 || t > expert.getTMax()) continue;
     double relId = getRelId(*hits[ihit]);
     if (expert.isRelevant(relId, iSL)) {
-      hitPattern |= 1 << iSL;
+      if (nHits[iSL] < expert.getMaxHitsPerSL()) {
+        hitPattern |= 1 << (iSL + 9 * nHits[iSL]);
+        ++nHits[iSL];
+      }
       B2DEBUG(250, "hit in SL " << iSL);
     }
   }
   B2DEBUG(250, "hitPattern " << hitPattern);
-  return hitPattern;
+  return hitPattern & expert.getSLpatternMask();
 }
 
 vector<float>
@@ -378,16 +385,19 @@ NeuroTrigger::getInputVector(unsigned isector)
   vector<float> inputVector;
   inputVector.assign(expert.nNodesLayer(0), 0.);
   vector<int> tMin;
-  tMin.assign(9, expert.getTMax());
+  tMin.assign(expert.nNodesLayer(0), expert.getTMax());
   vector<bool> LRknown;
-  LRknown.assign(9, false);
+  LRknown.assign(expert.nNodesLayer(0), false);
   vector<int> hitIds;
-  hitIds.assign(9, -1);
+  hitIds.assign(expert.nNodesLayer(0), -1);
+  vector<unsigned> nHits;
+  nHits.assign(9, 0);
   // loop over hits, choosing only 1 per superlayer
+  B2DEBUG(250, "start hit loop");
   for (int ihit = 0; ihit < hits.getEntries(); ++ ihit) {
     unsigned short iSL = hits[ihit]->getISuperLayer();
-    if (inputVector.size() <= 3 * iSL) continue;
-    if (expert.getSLpattern() > 0 && !((expert.getSLpattern() >> iSL) & 1)) {
+    if ((expert.getSLpatternMask() >> iSL) & 1 &&
+        !((expert.getSLpattern() >> iSL) & 1)) {
       B2DEBUG(250, "skipping hit in SL " << iSL);
       continue;
     }
@@ -398,30 +408,47 @@ NeuroTrigger::getInputVector(unsigned isector)
     int LR = hits[ihit]->getLeftRight();
     double relId = getRelId(*hits[ihit]);
     if (expert.isRelevant(relId, iSL) && t <= expert.getTMax()) {
+      // get reference hit
+      unsigned short iRef = iSL;
+      if (expert.getMaxHitsPerSL() > 1) {
+        if (nHits[iSL] < expert.getMaxHitsPerSL() &&
+            (expert.getSLpatternUnmasked() >> (iSL + 9 * nHits[iSL])) & 1) {
+          iRef += 9 * nHits[iSL];
+          ++nHits[iSL];
+        } else {
+          for (unsigned compare = iSL; compare < iSL + 9 * nHits[iSL]; compare += 9) {
+            if ((LRknown[iRef] && !LRknown[compare]) ||
+                (LRknown[iRef] == LRknown[compare] && tMin[iRef] < tMin[compare]))
+              iRef = compare;
+          }
+        }
+      }
       // choose best hit (LR known before LR unknown, then shortest drift time)
       bool useHit = false;
-      if (LRknown[iSL]) {
-        useHit = (hits[ihit]->LRknown() && t <= tMin[iSL]);
+      if (LRknown[iRef]) {
+        useHit = (hits[ihit]->LRknown() && t <= tMin[iRef]);
       } else {
-        useHit = (hits[ihit]->LRknown() || t <= tMin[iSL]);
+        useHit = (hits[ihit]->LRknown() || t <= tMin[iRef]);
       }
+      B2DEBUG(250, "relevant wire SL " << iSL << " LR " << LR << " t " << t
+              << " iRef " << iRef << " useHit " << useHit);
       if (useHit) {
         // keep drift time and LR
-        LRknown[iSL] = hits[ihit]->LRknown();
-        tMin[iSL] = t;
-        hitIds[iSL] = ihit;
+        LRknown[iRef] = hits[ihit]->LRknown();
+        tMin[iRef] = t;
+        hitIds[iRef] = ihit;
         // get scaled input values: (relId, t, 2D arclength)
-        inputVector[3 * iSL] = expert.scaleId(relId, iSL);
-        inputVector[3 * iSL + 1] = (((LR >> 1) & 1) - (LR & 1)) * t / float(expert.getTMax());
-        inputVector[3 * iSL + 2] = 2. * (m_arclength[iSL][int(priority < 3)] - m_radius[iSL][0])
-                                   / (M_PI_2 * m_radius[iSL][1] - m_radius[iSL][0]) - 1.;
+        inputVector[3 * iRef] = expert.scaleId(relId, iSL);
+        inputVector[3 * iRef + 1] = (((LR >> 1) & 1) - (LR & 1)) * t / float(expert.getTMax());
+        inputVector[3 * iRef + 2] = 2. * (m_arclength[iSL][int(priority < 3)] - m_radius[iSL][0])
+                                    / (M_PI_2 * m_radius[iSL][1] - m_radius[iSL][0]) - 1.;
       }
     }
   }
   // save selected hit Ids (for making relations to track)
   m_selectedHitIds.clear();
-  for (unsigned iSL = 0; iSL < 9; ++iSL) {
-    if (hitIds[iSL] >= 0) m_selectedHitIds.push_back(hitIds[iSL]);
+  for (unsigned iHit = 0; iHit < hitIds.size(); ++iHit) {
+    if (hitIds[iHit] >= 0) m_selectedHitIds.push_back(hitIds[iHit]);
   }
   return inputVector;
 }

@@ -21,7 +21,9 @@ namespace Belle2 {
                   std::vector<float> phiRange,
                   std::vector<float> invptRange,
                   std::vector<float> thetaRange,
-                  unsigned short SLpattern,
+                  unsigned short maxHits,
+                  unsigned long SLpattern,
+                  unsigned long SLpatternMask,
                   unsigned short tMax);
 
     /** destructor, empty because we don't allocate memory anywhere. */
@@ -37,14 +39,14 @@ namespace Belle2 {
     unsigned nWeightsCal() const;
     /** get weights vector */
     std::vector<float> getWeights() const { return weights; }
-    /** get phi range for which this expert is trained */
-    std::vector<float> getPhiRange() const { return phiRange; }
-    /** get charge / Pt range for which this expert is trained */
-    std::vector<float> getInvptRange() const { return invptRange; }
-    /** get theta range for which this expert is trained */
-    std::vector<float> getThetaRange() const { return thetaRange; }
+    /** get maximum hit number for a single super layer */
+    unsigned short getMaxHitsPerSL() const { return maxHitsPerSL; }
     /** get super layer pattern */
-    unsigned short getSLpattern() const { return SLpattern; }
+    unsigned long getSLpattern() const { return SLpattern & SLpatternMask; }
+    /** get bitmask for super layer pattern */
+    unsigned long getSLpatternMask() const { return SLpatternMask; }
+    /** get raw super layer pattern */
+    unsigned long getSLpatternUnmasked() const { return SLpattern; }
     /** get maximal drift time */
     unsigned short getTMax() const { return tMax; }
 
@@ -91,10 +93,16 @@ namespace Belle2 {
     /** Theta region in radian for which this expert is trained. */
     std::vector<float> thetaRange;
 
+    /** Maximum number of inputs for a single super layer. */
+    unsigned short maxHitsPerSL;
     /** Super layer pattern for which this expert is trained.
-      * Binary pattern of 9 bits (on/off for each SL).
+      * Binary pattern of 9 * maxHitsPerSL bits (on/off for each hit).
       * 0 means no restriction rather than no inputs. */
-    unsigned short SLpattern;
+    unsigned long SLpattern;
+    /** Bitmask for comparing the super layer pattern.
+      * A track matches a sector, if
+      * SLpattern & SLpatternMask == hitPattern(track) & SLpatternMask. */
+    unsigned long SLpatternMask;
 
     /** Maximal drift time (for scaling), hits with larger values are ignored. */
     unsigned short tMax;
@@ -104,7 +112,7 @@ namespace Belle2 {
     std::vector<float> relevantID;
 
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerMLP, 3);
+    ClassDef(CDCTriggerMLP, 4);
   };
 }
 #endif

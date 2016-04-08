@@ -74,8 +74,6 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
   // NeuroTrigger parameters
   addParam("nMLP", m_parameters.nMLP,
            "Number of expert MLPs.", m_parameters.nMLP);
-  addParam("nInput", m_parameters.nInput,
-           "Number of input nodes (1 value or nMLP values).", m_parameters.nInput);
   addParam("nHidden", m_parameters.nHidden,
            "Number of nodes in each hidden layer for all networks "
            "or factor to multiply with number of inputs (1 list or nMLP lists). "
@@ -113,10 +111,16 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
   addParam("thetaRangeTrain", m_parameters.thetaRangeTrain,
            "Theta region in degree from which training events are taken. "
            "Can be larger than phiRange to avoid edge effect.", m_parameters.thetaRangeTrain);
+  addParam("maxHitsPerSL", m_parameters.maxHitsPerSL,
+           "Maximum number of hits in a single SL. "
+           "1 value or same as SLpattern.", m_parameters.maxHitsPerSL);
   addParam("SLpattern", m_parameters.SLpattern,
            "Super layer pattern for which experts are trained. "
            "1 value, nMLP values or nPattern values "
            "with nPhi * nPt * nTheta * nPattern = nMLP.", m_parameters.SLpattern);
+  addParam("SLpatternMask", m_parameters.SLpatternMask,
+           "Super layer pattern mask for which experts are trained. "
+           "1 value or same as SLpattern.", m_parameters.SLpatternMask);
   addParam("tMax", m_parameters.tMax,
            "Maximal drift time (for scaling).", m_parameters.tMax);
   addParam("selectSectorByMC", m_selectSectorByMC,
@@ -302,8 +306,8 @@ void NeuroTriggerTrainerModule::event()
           continue;
         }
         // check hit pattern
-        unsigned short hitPattern = m_NeuroTrigger.getInputPattern(isector);
-        unsigned short sectorPattern = m_NeuroTrigger[isector].getSLpattern();
+        unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector);
+        unsigned long sectorPattern = m_NeuroTrigger[isector].getSLpattern();
         B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
         if (sectorPattern > 0 && (sectorPattern & hitPattern) != sectorPattern) {
           B2DEBUG(250, "hitPattern not matching " << (sectorPattern & hitPattern));

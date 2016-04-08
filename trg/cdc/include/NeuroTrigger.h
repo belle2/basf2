@@ -33,8 +33,6 @@ namespace Belle2 {
        * The ranges are also valid if nPhi * nPt * nTheta = nMLPs.
        */
       unsigned nMLP = 1;
-      /** Number of input nodes. */
-      std::vector<int> nInput = {27};
       /** Number of nodes in each hidden layer for all networks
        * or factor to multiply with number of inputs.
        * The number of layers is derived from the shape.
@@ -63,10 +61,14 @@ namespace Belle2 {
       /** Theta region for which MLP is trained in degree for all networks.
        *  Can be larger than use range to avoid edge effects. */
       std::vector<std::vector<float>> thetaRangeTrain = {{17., 150.}};
+      /** Maximum number of hits in a single super layer for all networks. */
+      std::vector<unsigned short> maxHitsPerSL = {1};
       /** Super layer pattern for which MLP is trained for all networks. */
-      std::vector<unsigned int> SLpattern = {0};
+      std::vector<unsigned long> SLpattern = {0};
+      /** Super layer pattern mask for which MLP is trained for all networks. */
+      std::vector<unsigned long> SLpatternMask = {0};
       /** Maximal drift time, identical for all networks. */
-      unsigned tMax = 512;
+      unsigned tMax = 256;
     };
 
     /** Default constructor. */
@@ -131,7 +133,7 @@ namespace Belle2 {
      * @param isector index of the MLP that will use the input
      * @return super layer pattern of hits in the current track
      */
-    unsigned short getInputPattern(unsigned isector);
+    unsigned long getInputPattern(unsigned isector);
 
     /** Calculate input values for MLP.
      * @param isector index of the MLP that will use the input

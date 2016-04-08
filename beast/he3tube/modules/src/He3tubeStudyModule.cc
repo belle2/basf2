@@ -68,18 +68,19 @@ void He3tubeStudyModule::defineHisto()
 {
 
 
-  h_NeutronHits = new TH1F("NeutronHits", "Neutron Hits;Tube ", 8, -0.5, 7.5);
-  h_NeutronRate = new TH1F("NeutronRate", "Neutron Hits per second;Tube; Rate (Hz)", 8, -0.5, 7.5);
+  h_NeutronHits = new TH1F("NeutronHits", "Neutron Hits;Tube ", 4, -0.5, 3.5);
+  h_NeutronRate = new TH1F("NeutronRate", "Neutron Hits per second;Tube; Rate (Hz)", 4, -0.5, 3.5);
 
   h_Edep1H3H =       new TH1F("Edep1H3H"     , "Energy deposited by Proton and Tritium; MeV", 100, 0.7, 0.8);
-  h_Edep1H3H_detNB = new TH1F("Edep1H3H_tube", "Energy deposited by Proton and Tritium in each tube;Tube Num; MeV", 8, -0.5, 7.5);
+  h_Edep1H3H_detNB = new TH1F("Edep1H3H_tube", "Energy deposited by Proton and Tritium in each tube;Tube Num; MeV", 4, -0.5, 3.5);
   h_Edep1H =         new TH1F("Edep1H"       , "Energy deposited by Protons;MeV", 100, 0, 0.7);
   h_Edep3H =         new TH1F("Edep3H"       , "Energy deposited by Tritiums;MeV", 100, 0, 0.4);
   h_TotEdep =        new TH1F("TotEdep"      , "Total energy deposited;MeV", 100, 0, 1.5);
-  h_DetN_Edep =      new TH1F("DetN_Edep"    , "Energy deposited vs detector number;Tube Num;MeV", 8, -0.5, 7.5);
+  h_DetN_Edep =      new TH1F("DetN_Edep"    , "Energy deposited vs detector number;Tube Num;MeV", 4, -0.5, 3.5);
 
-  h_PulseHeights_NotNeutron = new TH1F("PulseHeights_NotNeutron", "Pulse height of waveforms from non-neutron events", 100, 0, 1);
-  h_PulseHeights_Neutron =    new TH1F("PulseHeights_Neutron"   , "Pulse height of waveforms from neutron events", 100, 0, 1);
+  h_PulseHeights_NotNeutron = new TH1F("PulseHeights_NotNeutron", "Pulse height of waveforms from non-neutron events", 100, 0, 18000);
+  h_PulseHeights_Neutron =    new TH1F("PulseHeights_Neutron"   , "Pulse height of waveforms from neutron events", 100, 0, 18000);
+  h_PulseHeights_All =        new TH1F("PulseHeights_All"   , "Pulse height of waveforms from all events", 100, 0, 18000);
 
 }
 
@@ -110,9 +111,12 @@ void He3tubeStudyModule::event()
   double edepSum_1H = 0;
   double edepSum_3H = 0;
   double totedepSum = 0;
+  double totedepDet[4] = {0};
 
   //int detectorNumber = -1;
-  bool NeutronProcess[8] = {false};
+  //bool NeutronProcess[8] = {false};
+  bool ContainsP[4] = {false};
+  bool Contains3H[4] = {false};
 
   for (int i = 0; i < simHits.getEntries(); i++) {
     He3tubeSimHit* aHit = simHits[i];
@@ -120,26 +124,43 @@ void He3tubeStudyModule::event()
     int detNB = aHit->getdetNb();
     int PID = aHit->gettkPDG();
 
-    h_DetN_Edep->Fill(detNB, edep);
+    if (detNB > 3) {
+      B2WARNING("Hit registered in undefined tube, ignoring");
+      continue;
+
+    }
+
+
+    h_DetN_Edep->AddBinContent(detNB + 1, edep);
     totedepSum = totedepSum + edep;
+    totedepDet[detNB] = totedepDet[detNB] + edep;
 
     //was the process that created the particle a neutron process?
+    /*
     if (aHit->getNeuProcess()) {
       NeutronProcess[detNB] = true;
       h_Edep1H3H_detNB->Fill(detNB, edep);
       edepSum = edepSum + edep;
 
-    }
+      }*/
+
 
     //energy deposited by protons
     if (PID == 2212) {
-      nPhits++;
+      ContainsP[detNB] = true;
+      //nPhits++;
+      h_Edep1H3H_detNB->AddBinContent(detNB + 1, edep);
       edepSum_1H = edepSum_1H + edep;
+      edepSum = edepSum + edep;
+
     }
     //energy deposited by tritiums
     if (PID == 1000010030) {
-      n3Hhits++;
+      Contains3H[detNB] = true;
+      //n3Hhits++;
+      h_Edep1H3H_detNB->AddBinContent(detNB + 1, edep);
       edepSum_3H = edepSum_3H + edep;
+      edepSum = edepSum + edep;
     }
 
 
@@ -150,23 +171,39 @@ void He3tubeStudyModule::event()
   if (edepSum_1H != 0)  h_Edep1H->Fill(edepSum_1H);
   if (edepSum_3H != 0)  h_Edep3H->Fill(edepSum_3H);
 
+
+
   //pulse heights of digitized waveforms
   for (int i = 0; i < Hits.getEntries(); i++) {
     He3tubeHit* aHit = Hits[i];
-    if (NeutronProcess[aHit->getdetNb()]) {
+    if (ContainsP[aHit->getdetNb()] && Contains3H[aHit->getdetNb()]) {
+      B2DEBUG(80, "He3tubeStudyModule: Possible Neutron in tube #" << aHit->getdetNb());
       h_PulseHeights_Neutron->Fill(aHit->getPeakV());
-    } else h_PulseHeights_NotNeutron->Fill(aHit->getPeakV());
+      h_NeutronHits->Fill(aHit->getdetNb());
+      h_NeutronRate->AddBinContent(aHit->getdetNb() + 1, 1 / rateCorrection);
+      nNeutronHits++;
+    } else {
+      h_PulseHeights_NotNeutron->Fill(aHit->getPeakV());
+    }
+    h_PulseHeights_All->Fill(aHit->getPeakV());
+
   }
 
+
+  for (int i = 0; i < 4; i++) {
+    if (ContainsP[i]) nPhits++;
+    if (Contains3H[i]) n3Hhits++;
+  }
+  /*
   for (int detNB = 0; detNB < 8; detNB++) {
     if (NeutronProcess[detNB]) {
       B2DEBUG(80, "He3tubeStudyModule: Neutron in tube #" << detNB);
       nNeutronHits++;
-      h_NeutronHits->Fill(detNB);                      //number of neutrons in each tube
-      h_NeutronRate->Fill(detNB, 1 / rateCorrection);  //rate in Hz for each tube
+      //h_NeutronHits->Fill(detNB);                      //number of neutrons in each tube
+      //h_NeutronRate->Fill(detNB, 1 / rateCorrection);  //rate in Hz for each tube
     }
   }
-
+  */
   eventNum++;
 
 

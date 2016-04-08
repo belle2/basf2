@@ -23,11 +23,9 @@ template <class HitType, Const::EDetector detector>
 genfit::AbsMeasurement* BaseMeasurementCreatorFromHit<HitType, detector>::createCoordinateMeasurement(HitType* hit,
     const RecoHitInformation& recoHitInformation) const
 {
-  genfit::TrackCandHit* trackCandHit = new genfit::TrackCandHit(detector, hit->getArrayIndex(), -1,
-      recoHitInformation.getSortingParameter());
-
-  genfit::AbsMeasurement* coordinateMeasurement = m_measurementFactory.createOne(trackCandHit->getDetId(), trackCandHit->getHitId(),
-                                                  trackCandHit);
+  // No one is using the trackCandHit (neither in SVDRecoHit nor in PXDRecoHit). So we do not provide any here!
+  genfit::AbsMeasurement* coordinateMeasurement = m_measurementFactory.createOne(detector, hit->getArrayIndex(),
+                                                  nullptr);
 
   return coordinateMeasurement;
 }
@@ -61,12 +59,15 @@ genfit::AbsMeasurement* CDCBaseMeasurementCreator::createCoordinateMeasurement(R
     rightLeftGenfitInformation = 1;
   }
 
-  genfit::TrackCandHit* trackCandHit = new genfit::WireTrackCandHit(Const::CDC, cdcHit->getArrayIndex(), -1,
-      recoHitInformation.getSortingParameter(),
-      rightLeftGenfitInformation);
+  // No one is using the WireTrackCandHit after this stage, as the CDCRecoHit does not store it (it is just needed or getting the rl info).
+  auto trackCandHit = std::unique_ptr<genfit::WireTrackCandHit>(new genfit::WireTrackCandHit(Const::CDC, cdcHit->getArrayIndex(), -1,
+                      recoHitInformation.getSortingParameter(),
+                      rightLeftGenfitInformation));
 
   genfit::AbsMeasurement* coordinateMeasurement = m_measurementFactory.createOne(trackCandHit->getDetId(), trackCandHit->getHitId(),
-                                                  trackCandHit);
+                                                  trackCandHit.get());
+
+
 
   return coordinateMeasurement;
 }

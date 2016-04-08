@@ -31,6 +31,8 @@ namespace Belle2 {
    * If you do not relate to a specific hit from the track finders (for example for ECL energy
    * measurements as a TrackPoint) you should not use this class as a base class but rather use
    * BaseMeasurementCreator directly.
+   *
+   * TODO: It would be better to skip the genfit::MeasurementFactory completely and just implement the conversion here directly!
    */
   template <class HitType, Const::EDetector detector>
   class BaseMeasurementCreatorFromHit : public BaseMeasurementCreator {

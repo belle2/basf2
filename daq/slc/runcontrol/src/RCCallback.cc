@@ -177,6 +177,8 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
         stop();
         if (m_expno > 0 && m_runno > 0) {
           dbrecord(m_obj, m_expno, m_runno, false);
+          m_expno = 0;
+          m_runno = 0;
         }
       } else if (cmd == RCCommand::RESUME) {
         if (!resume(msg.getParam(0))) {
@@ -194,6 +196,8 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
           abort();
           if (m_expno > 0 && m_runno > 0) {
             dbrecord(m_obj, m_expno, m_runno, false);
+            m_expno = 0;
+            m_runno = 0;
           }
         } else if (cmd == RCCommand::RECOVER) {
           recover(m_obj);

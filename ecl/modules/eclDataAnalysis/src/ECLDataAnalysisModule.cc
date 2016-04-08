@@ -685,6 +685,7 @@ void ECLDataAnalysisModule::event()
   ///Tracks
   if (m_doTracking == true) {
     m_trkMultip = 0; m_trkIdx->clear(); m_trkPdg->clear(); m_trkCharge->clear(); m_trkPx->clear(); m_trkPy->clear(); m_trkPz->clear();
+    m_trkP->clear();
     m_trkPhi->clear(); m_trkTheta->clear(); m_trkPhi->clear(); m_trkX->clear(); m_trkY->clear();  m_trkZ->clear();
 
     ///PID

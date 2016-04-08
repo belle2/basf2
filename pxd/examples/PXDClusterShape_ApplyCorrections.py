@@ -102,7 +102,7 @@ particlegun.param('nTracks', 1)
 print_params(particlegun)
 
 # Set the number of events to be processed (10 events)
-eventinfosetter.param({'evtNumList': [50000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10000], 'runList': [1]})
 
 # Save output of simulation step 1
 output = register_module('RootOutput')

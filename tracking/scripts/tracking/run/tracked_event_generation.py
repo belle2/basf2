@@ -12,29 +12,35 @@ from tracking.metamodules import IfMCParticlesPresentModule, IfStoreArrayPresent
 
 import tracking.utilities as utilities
 
-import logging
-
-
-def get_logger():
-    return logging.getLogger(__name__)
-
 
 class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
+    """
+    Helper class to read in or generate events and do tracking on them.
+    Most of the options are in the two base classes ReadOrGenerateEventsRun or MinimalRun.
+    This class gives parameters to set the tracking module to be used (finder_module),
+    its geometrical coverage (tracking_coverage), whether to fit the tracks (fit_track) and which
+    geometry to use for this (fit_geometry) and the name for the track candidates (trackCandidatesColumnName).
+    """
+    #: Which tracking module to use. Can be a string, a module or a module-adding function.
     finder_module = None
     #: States which detectors the finder module covers like as a dictionary like
     #: {'UsePXDHits': True, 'UseSVDHits': True,'UseCDCHits': True, 'UseOnlyAxialCDCHits': False}
     tracking_coverage = {}
-    fit_geometry = None  # Determines which fit geometry should be used.
-    fit_tracks = False  # If true, tracks will be fitted after they have been found
-    # This flag is ignored when running the full reco chain
+    #: Determines which fit geometry should be used.
+    fit_geometry = None
+    #: If true, tracks will be fitted after they have been found
+    fit_tracks = False
+    #: This flag is ignored when running the full reco chain
     trackCandidatesColumnName = 'TrackCands'
 
     def create_argument_parser(self, **kwds):
+        """
+        Add the arguments of the finder (--finder or -f), the fitting geometry (--fit-geometry) and a flag to
+        only run the simulation (-so or --simulate-only).
+        """
+
         argument_parser = super(ReadOrGenerateTrackedEventsRun, self).create_argument_parser(**kwds)
 
-        # Indication if tracks should be fitted with which geomety
-        # Currently tracks are not fitted because of a segmentation fault related TGeo / an assertation error in Geant4 geometry.
-        # Geometry name to be used in the Genfit extrapolation.
         argument_parser.add_argument(
             '-f',
             '--finder',
@@ -66,16 +72,14 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
         return argument_parser
 
-    @staticmethod
-    def get_module_param(module, name):
-        parameters = module.available_params()
-        for parameter in parameters:
-            if name == parameter.name:
-                return parameter.values
-            else:
-                raise AttributeError('%s module does not have a parameter named %s' % (module, name))
-
     def determine_tracking_coverage(self, finder_module_or_name):
+        """
+        In cases a string or another known module is given as the finder_module,
+        we can get the tracking coverage from a lookup table. In all other cases, we do not have a chance and
+        the user has to give his own tracking coverage. The tracking coverage is then uses to setup the MC TrackFinder
+        and MC Matching correctly.
+        """
+
         # Use value overwritten in the concrete subclass
         if self.tracking_coverage:
             return self.tracking_coverage
@@ -121,12 +125,16 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                         'UseCDCHits': 'CDC' in self.components,
                         'UseOnlyAxialCDCHits': False}
         else:
-            get_logger().info('Could not determine tracking coverage for module name %s. '
-                              'Using the default of the MCMatcherTracks',
-                              finder_module_name)
+            basf2.B2INFO('Could not determine tracking coverage for module name %s. ' +
+                         'Using the default of the MCMatcherTracks' % finder_module_name)
             return {}
 
     def create_path(self):
+        """
+        Add the finder module and the MC trackfinder + matcher to the path.
+        If needed, add also the modules used for fitting.
+        """
+
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
         main_path = super(ReadOrGenerateTrackedEventsRun, self).create_path()
@@ -211,13 +219,11 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         return main_path
 
 
-class StandardReconstructionEventsRun(ReadOrGenerateTrackedEventsRun):
-    generator_module = 'EvtGenInput'
-    finder_module = 'StandardReco'
-
-
 def main():
-    generateTrackedEventsRun = StandardReconstructionEventsRun()
+    """Main function for quick tests of this particular file."""
+    generateTrackedEventsRun = ReadOrGenerateTrackedEventsRun()
+    generateTrackedEventsRun.generator_module = 'EvtGenInput'
+    generateTrackedEventsRun.finder_module = 'StandardReco'
 
     # Allow presimulated events to be tracked in a second step
     allow_input = True
@@ -244,5 +250,4 @@ def main():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
     main()

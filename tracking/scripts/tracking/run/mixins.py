@@ -5,22 +5,22 @@ from tracking.modules import BrowseTFileOnTerminateModule
 from tracking.run.minimal import MinimalRun
 
 
+import logging
+
+
+def get_logger():
+    return logging.getLogger(__name__)
+
+
 class RunMixin(MinimalRun):
-    """Base class for mixins during run. Does nothing for the moment."""
     pass
 
 
 class BrowseTFileOnTerminateRunMixin(RunMixin):
-    """Class to mix in a BrowseTFileOnTerminateModule and a parameter show_results,
-       which shows the output fule name after the calculations or not."""
-
-    #: Name of the output file name to show
     output_file_name = None
-    #: Flag to show results or not
     show_results = False
 
     def create_argument_parser(self, **kwds):
-        """Add the show_results argument as -s and --show flag."""
         argument_parser = super(BrowseTFileOnTerminateRunMixin, self).create_argument_parser(**kwds)
 
         argument_parser.add_argument(
@@ -34,8 +34,8 @@ class BrowseTFileOnTerminateRunMixin(RunMixin):
         return argument_parser
 
     def create_path(self):
-        """Add the BrowseTFileOnTerminateModule module to the path if show_results is True and the
-           output_file_name is set."""
+        # Sets up a path that plays back pregenerated events or generates events
+        # based on the properties in the base class.
         main_path = super(BrowseTFileOnTerminateRunMixin, self).create_path()
 
         if self.show_results and self.output_file_name:

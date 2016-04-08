@@ -17,6 +17,7 @@
 
 #include <TFile.h>
 #include <TTree.h>
+#include <TRandom.h>
 
 namespace Belle2 {
   namespace he3tube {
@@ -49,47 +50,20 @@ namespace Belle2 {
 
     private:
 
-      /** creates waveform, returns peak */
-      double WaveformMaker(std::vector<double> edepVec, std::vector<double> timeVec, std::vector<double> RVec, double lowTime,
-                           double highTime);
-      /** loads the simulated signals from a root file */
-      void loadGarfieldData();
-      /** Produces the impulse response function */
-      virtual void impulseResponse();
       /** reads data from HE3TUBE.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();
       /** filename of Garfield datafile */
-      std::string m_GarfDataFile;
-      /** size of impulse response */
-      static const int iResponseLength = 5500;
-      /** number of different radius values in the simulated signal file */
-      static const int numRadii = 1000;
-      /** size of the garfield simulated signals */
-      static const int garfSignalSize = 5000;
-      /** garfied simulated signal variable */
-      double garfSignal[garfSignalSize] = {0};
       /** number of detectors. Read from the gearbox*/
       int numOfTubes = 0;
-      /** X coordinate of tube center */
-      std::vector<double> TubeCenterX;
-      /** Y coordinate of tube center */
-      std::vector<double> TubeCenterY;
-      /** inner radius of the tube, read from the gearbox*/
-      double rTube;
-      /** radius of the sense wire */
-      double rWire = 0.030;
-      /** Impulse response function */
-      double iResponse[iResponseLength];
+
       /** Event counter */
       int Event = 0;
       /** Conversion to ADC counts, set in steering file*/
       double m_ConversionFactor;
       /** ionization energy of He3 */
-      double IonizationE = 1;
-      /** TFile containing garfield signals */
-      TFile* f_sim;
-      /** TTree containing garfield signals */
-      TTree* t_sim;
+      double m_Workfct = 35.075;
+      /** fano factor */
+      double m_Fanofac = 220;
 
     };
 

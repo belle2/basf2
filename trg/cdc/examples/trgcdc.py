@@ -173,7 +173,7 @@ cdctrg.param('HoughFinderMappingFilePlus', os.path.join(basf2datadir, "trg/cdc/H
 
 # ...NeuroTrigger...
 # define parameters
-neuro.param('filename', os.path.join(basf2datadir, "trg/cdc/Neuro20160118Nonlin.root"))
+neuro.param('filename', os.path.join(basf2datadir, "trg/cdc/Neuro20160309Nonlin.root"))
 # output warnings, info and some debug output for neurotrigger module
 # neuro.logging.log_level = basf2.LogLevel.DEBUG
 # neuro.logging.debug_level = 80

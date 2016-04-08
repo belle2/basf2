@@ -17,6 +17,7 @@ namespace Belle2 {
     class QuadTreeItem {
     public:
 
+      /// typedef
       typedef typeData TypeData;
 
       /// Constructor
@@ -83,19 +84,27 @@ namespace Belle2 {
       typeData* m_pointer;    /**< A pointer to the underlying event */
     };
 
-    /** As special case: the QuadTreeHitWrapper has a used flag itself */
+    /**
+     *  As special case: the QuadTreeHitWrapper has a used flag itself
+     */
     template<>
     bool QuadTreeItem<ConformalCDCWireHit>::isUsed() const;
 
-    /** As special case: the QuadTreeHitWrapper has a used flag itself */
+    /**
+     *  As special case: the QuadTreeHitWrapper has a used flag itself
+     */
     template<>
     void QuadTreeItem<ConformalCDCWireHit>::setUsedFlag(bool usedFlag);
 
-    /** As special case: the CDCRecoSegment2D has a used flag itself */
+    /**
+     *  As special case: the CDCRecoSegment2D has a used flag itself
+     */
     template<>
     bool QuadTreeItem<CDCRecoSegment2D>::isUsed() const;
 
-    /** As special case: the CDCRecoSegment2D has a used flag itself */
+    /**
+     *  As special case: the CDCRecoSegment2D has a used flag itself
+     */
     template<>
     void QuadTreeItem<CDCRecoSegment2D>::setUsedFlag(bool usedFlag);
 

@@ -47,6 +47,10 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /**
+     * Class which holds pointer to the children nodes of QuadTree
+     * @tparam quadChild type of the QuadTree
+     */
     template<typename quadChild>
     class QuadChildrenTemplate {
     public:
@@ -99,8 +103,8 @@ namespace Belle2 {
         return m_children[x][y];
       }
 
-      static constexpr size_t m_sizeX = 2;
-      static constexpr size_t m_sizeY = 2;
+      static constexpr size_t m_sizeX = 2; /**< Number of children in X dirextion */
+      static constexpr size_t m_sizeY = 2; /**< Number of children in Y dirextion */
 
     private:
 

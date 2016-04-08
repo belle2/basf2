@@ -15,7 +15,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /*
+    /**
      * Basic function for checking quadtree's node "r" boundaries:
      * when used in quadtree processor marks nodes at lvl==13 as leafs
      */

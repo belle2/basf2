@@ -37,6 +37,7 @@ namespace Belle2 {
       typedef std::pair<typeY, typeY> rangeY;   /**< This pair describes the range in Y for a node */
       typedef std::pair<rangeX, rangeY> ChildRanges; /**< This pair of ranges describes the range of a node */
 
+      /// QuadTree can access private members
       friend QuadTree;
 
     public:

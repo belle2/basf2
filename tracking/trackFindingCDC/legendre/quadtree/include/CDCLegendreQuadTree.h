@@ -49,10 +49,20 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /**
+     * Class which holds quadtree structure.
+     * @tparam typeX type of the X-axis variable
+     * @tparam typeY type of the Y-axis variable
+     * @tparam typeData type of the objects which are filled into QuadTree
+     * @tparam binCountX number of divisions of the node along X axis (default is 2)
+     * @tparam binCountY number of divisions of the node along Y axis (default is 2)
+     */
     template<typename typeX, typename typeY, class typeData, int binCountX = 2, int binCountY = 2>
     class QuadTreeTemplate {
 
     public:
+
+      /// typedef
       typedef QuadTreeTemplate<typeX, typeY, typeData, binCountX, binCountY> ThisType;
 
       /**
@@ -61,9 +71,13 @@ namespace Belle2 {
        */
       typedef std::function< void(ThisType*) > CandidateProcessorLambda;
 
-      /// store the minimum, center and maximum of this bin (in this order in the tuple)
+      /// store the minimum, center and maximum of this bin in X direction (in this order in the tuple)
       typedef std::array<typeX, 3> XBinTuple;
+
+      /// store the minimum, center and maximum of this bin in Y direction (in this order in the tuple)
       typedef std::array<typeY, 3> YBinTuple;
+
+      /// typedef for vector of QuadTree pointers
       typedef std::vector<ThisType*> NodeList;
 
       /// type of the child nodes hold by this node

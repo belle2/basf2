@@ -25,6 +25,9 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /**
+     * Test fixture for QuadTree tests
+     */
     class CDCLegendreTestFixture : public TrackFindingCDCTestWithTopology {
 
     public:

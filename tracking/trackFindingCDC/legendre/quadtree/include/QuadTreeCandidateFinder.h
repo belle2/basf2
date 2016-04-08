@@ -27,6 +27,9 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /**
+     * Class which operates with AxialHitQuadTreeProcessor instance and performs tracks finding with different conditions
+     */
     class QuadTreeCandidateFinder {
 
     public:
@@ -38,6 +41,9 @@ namespace Belle2 {
 
       /**
        * Performs quadtree search
+       * @param lmdInterface lambda interface to operate with QuadTree which contains possible track
+       * @param parameters pass-dependent parameters of the QuadTree search
+       * @param qtProcessor reference to the AxialHitQuadTreeProcessor instance
        */
       void doTreeTrackFinding(AxialHitQuadTreeProcessor::CandidateProcessorLambda& lmdInterface, QuadTreeParameters& parameters,
                               AxialHitQuadTreeProcessor& qtProcessor)

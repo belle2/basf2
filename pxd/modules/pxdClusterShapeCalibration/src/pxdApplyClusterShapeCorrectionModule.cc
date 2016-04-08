@@ -328,7 +328,7 @@ void pxdApplyClusterShapeCorrectionModule::initialize()
     for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++)
       for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++)
         for (int i_pk = 0; i_pk < 4; i_pk++) {  // only first 4 pixel kinds for Sensor = 1
-          int i_axis = 1;
+          //int i_axis = 1;
           //TCorrection_BiasMap[5][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] = -TCorrection_BiasMap[5][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)];
         }
 
@@ -611,8 +611,10 @@ void pxdApplyClusterShapeCorrectionModule::event()
         double f_thetaTrack = state[2];
         f_phiTrack = TMath::ATan2(f_phiTrack, 1.0);
         f_thetaTrack = TMath::ATan2(f_thetaTrack, 1.0);
-        double f_TrackUIncluded = state[3];
-        double f_TrackVIncluded = state[4];
+        double f_TrackUIncluded;
+        f_TrackUIncluded = state[3];
+        double f_TrackVIncluded;
+        f_TrackVIncluded = state[4];
         bool biased = false; // excluded residuals
         //biased = true;       // included residuals
         //TVectorD residual = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getState();

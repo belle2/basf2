@@ -119,7 +119,7 @@ namespace Belle2 {
     TH2F* m_correlationsHitMapsSP[c_nVXDPlanes * c_nVXDPlanes]; /**< Correlations and hit maps from space points */
   };
 
-  inline const SVD::SensorInfo& SVDDQMModule::getInfo(int index) const
+  inline const SVD::SensorInfo& SVDDQMModule::getInfo(int index) const  // TODO for TB 2016 this macro must be revrite correct
   {
     int iPlane = indexToPlane(index);
 //    VxdID sensorID(iPlane, 1, iPlane);
@@ -127,7 +127,7 @@ namespace Belle2 {
     return dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
   }
 
-  inline const PXD::SensorInfo& SVDDQMModule::getInfoPXD(int index) const
+  inline const PXD::SensorInfo& SVDDQMModule::getInfoPXD(int index) const  // TODO for TB 2016 this macro must be revrite correct
   {
     int iPlane = indexToPlanePXD(index);
 //    VxdID sensorID(iPlane, 1, iPlane);

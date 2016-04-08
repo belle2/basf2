@@ -62,8 +62,8 @@ public class DQMViewCommunicator extends Thread {
 		if (g_store == null) {
 			g_store = new DQMViewCommunicator();
 			final IPreferencesService prefs = Platform.getPreferencesService();
-			final String host = "localhost";//prefs.getString(DQMViewDataSource.PLUGIN_ID, PreferenceConstants.HOST, "localhost", null);
-			final Integer port = 50100;//prefs.getInt(DQMViewDataSource.PLUGIN_ID, PreferenceConstants.PORT, 9090, null);
+			final String host = prefs.getString(DQMViewDataSource.PLUGIN_ID, PreferenceConstants.HOST, "localhost", null);
+			final Integer port = prefs.getInt(DQMViewDataSource.PLUGIN_ID, PreferenceConstants.PORT, 9090, null);
 			g_store.init(host, port, "");
 			g_store.start();
 		}

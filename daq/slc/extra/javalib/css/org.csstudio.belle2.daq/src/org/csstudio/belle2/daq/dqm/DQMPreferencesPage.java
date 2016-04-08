@@ -1,6 +1,5 @@
 package org.csstudio.belle2.daq.dqm;
 
-import org.csstudio.belle2.daq.nsm.PreferenceConstants;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -37,7 +36,7 @@ public class DQMPreferencesPage extends FieldEditorPreferencePage implements
 
 	@Override
 	public boolean performOk() {
-		return true;
+		return super.performOk();
 	}
 
 	@Override

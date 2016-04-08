@@ -125,6 +125,7 @@ int PXDReadRawDHHModule::readOneEvent()
       len -= 8;
       if (len > 0) {
         B2INFO("Read Event len " << len << "+16");
+        m_nread = evt2->Triggernumber;
         // now comes the best part ... we found a valid packet and end loop
         break;
       }
@@ -170,7 +171,7 @@ void PXDReadRawDHHModule::event()
   m_eventMetaDataPtr->setRun(1);
   m_eventMetaDataPtr->setEvent(m_nread);
 
-  m_nread++;
+//   m_nread++;
 
   return;
 }

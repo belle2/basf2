@@ -8,57 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#if 0
-
-/*
-  // Now, loop over data and find frames
-  unsigned int *ptr=(unsigned int *)(data+(4*MAX_PXD_FRAMES+8));
-  unsigned int *hdr=(unsigned int *)data;
-  hdr[0]=0xBLAHBLAHu;
-  hdr[1]=0;
-  while(len>16){
-      if (ptr[0] != 0xCAFEBABEu) {
-        printf("subheader wrong : Magic %X\n", (unsigned int) ptr[0]);
-        exit(0);
-      }
-      ptr+=ptr[1]/4+4;
-      len-=(16+ptr[1]);
-      hdr[1]++;
-  }
-*/
-/*
-const int headerlen = 8;
-ubig32_t* pxdheader = (ubig32_t*) data;
-ubig32_t* pxdheadertable = (ubig32_t*) &data[headerlen];
-int framenr = 0, tablelen = 0, datalen = 0;
-int br = read_data(data, headerlen);
-if (br <= 0) return br;
-if (pxdheader[0] != 0xCAFEBABEu) {
-printf("pxdheader wrong : Magic %X , Frames %X \n", (unsigned int) pxdheader[0], (unsigned int) pxdheader[1]);
-exit(0);
-}
-framenr = pxdheader[1];
-if (framenr > MAX_PXD_FRAMES) {
-printf("MAX_PXD_FRAMES too small : %d(%d) \n", framenr, MAX_PXD_FRAMES);
-exit(0);
-}
-tablelen = 4 * framenr;
-br = read_data((char*)&data[headerlen], tablelen);
-if (br <= 0) return br;
-for (int i = 0; i < framenr; i++) {
-datalen += (pxdheadertable[i] + 3) & 0xFFFFFFFC;
-}
-
-if (datalen + headerlen + tablelen > len) {
-printf("buffer too small : %d %d %d(%d) \n", headerlen, tablelen, datalen, len);
-exit(0);
-}
-int bcount = read_data(data + headerlen + tablelen, datalen);
-if (br <= 0) return br;
-*/
-
-#endif
-
 #include <pxd/modules/pxdUnpacking/PXDUnpackerDHHModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
@@ -149,9 +98,9 @@ typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhe_crc_32_type;
 ///*********************************************************************************
 
 struct dhc_frame_header_word0 {
-  const ubig16_t data;
+  const ubig16_t data; // ENDIAN
   /// fixed length
-  inline ubig16_t getData(void) const
+  inline ubig16_t getData(void) const // ENDIAN
   {
     return data;
   };
@@ -787,6 +736,16 @@ void PXDUnpackerDHHModule::event()
   }
 }
 
+void endian_swapper(void* a, unsigned int len)
+{
+  ubig16_t* p;
+  ulittle16_t* q;
+  p = (ubig16_t*)a;
+  q = (ulittle16_t*)a;
+  len /= 2;
+  for (unsigned int i = 0; i < len; i++, q++, p++) { *q = *p;}
+}
+
 #pragma GCC diagnostic ignored "-Wstack-usage="
 void PXDUnpackerDHHModule::unpack_event(RawDHH& px)
 {
@@ -810,23 +769,6 @@ void PXDUnpackerDHHModule::unpack_event(RawDHH& px)
     return;
   }
 
-//   if (data[5] != 0xCAFEBABE) {
-//     B2ERROR("Magic invalid: Will not unpack anything. Header corrupted! " << hex << data[0]);
-//     m_errorMask |= ONSEN_ERR_FLAG_MAGIC;
-//     return;
-//   }
-
-//   if (m_headerEndianSwap) Frames_in_event = ((ubig32_t*)data)[1];
-//   else Frames_in_event = ((ulittle32_t*)data)[1];
-//   if (Frames_in_event < 0 || Frames_in_event > 256) {
-//     B2ERROR("Number of Frames invalid: Will not unpack anything. Header corrupted! Frames in event: " << Frames_in_event);
-//     m_errorMask |= ONSEN_ERR_FLAG_FRAME_NR;
-//     return;
-//   }
-
-  B2INFO("Data $" << hex << data[0] << " $" << hex << data[1] << " $" << hex << data[2] << " $" << hex << data[3] << " $" << hex <<
-         data[4] << " $" << hex << data[5] << " $" << hex << data[6]);
-
   unsigned int* dataptr;
   dataptr = &data[5];
   datafullsize = fullsize - 5 * 4; // minus header
@@ -834,23 +776,23 @@ void PXDUnpackerDHHModule::unpack_event(RawDHH& px)
   int ll = 0; // Offset in dataptr in bytes
   int j = 0;
   while (datafullsize - ll >= 16) {
-    int lo;/// len of frame in bytes
     if (dataptr[0] != 0xCAFEBABE) {
-      B2ERROR("Magic invalid in frame " << j << "(" << datafullsize << "," << ll << "): Will not unpack anything. Header corrupted! $" <<
-              hex << dataptr[0] << " $" << hex << dataptr[1] << " $" << hex << dataptr[2] << " $" << hex << dataptr[1]);
+      B2ERROR("Magic invalid in frame " << j << " (" << datafullsize << "," << ll << "): Will not unpack anything. Header corrupted! $" <<
+              hex << dataptr[0] << " $" << hex << dataptr[1] << " $" << hex << dataptr[2] << " $" << hex << dataptr[3]);
       m_errorMask |= ONSEN_ERR_FLAG_MAGIC;
       break;
     }
-    B2INFO("Magic " << hex << dataptr[0]);
 
+    int lo;// len of frame in bytes
     lo = dataptr[1];
+    dataptr += 4; // Cafebabe header
+    ll += 16;
+
     if (lo <= 0) {
-      B2ERROR("size of frame invalid: " << j << "size " << lo << " at byte offset " << ll);
+      B2ERROR("size of frame invalid: " << j << " size $" << std::hex << lo << " at byte offset " << std::hex << ll);
       m_errorMask |= ONSEN_ERR_FLAG_FRAME_SIZE;
       return;
     }
-    B2INFO("size of frame: " << j << "size " << lo << " at byte offset " << ll);
-    ll += 16; // Cafebabe header
 
     if (ll + lo > datafullsize) {
       B2ERROR("frames exceed packet size: " << j  << " size " << lo << " at byte offset " << ll << " of datafullsize " <<
@@ -860,13 +802,14 @@ void PXDUnpackerDHHModule::unpack_event(RawDHH& px)
     }
     if (lo & 0x3) {
       B2ERROR("SKIP Frame with Data with not MOD 4 length " << " ( $" << hex << lo << " ) ");
-      ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
+      lo = (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
     } else {
-      B2INFO("unpack DHE(C) frame: " << j << " with size " << lo << " at byte offset " << ll);
-      unpack_dhc_frame(16 + (char*)dataptr, lo, j, 256);
-      ll += lo; /// no rounding needed
+      B2INFO("unpack DHE(C) frame: " << j << " with size $" << std::hex << lo << " at byte offset " << std::hex << ll);
+      endian_swapper((char*)dataptr, lo);
+      unpack_dhc_frame((char*)dataptr, lo, j, 256);
     }
-    dataptr += ll / 4;
+    ll += lo;
+    dataptr += lo / 4;
     j++;// framecounter
   }
 
@@ -1417,69 +1360,69 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       break;
   }
 
-  if (eventNrOfThisFrame != eventNrOfOnsenTrgFrame) {
-    B2ERROR("Frame TrigNr != ONSEN Trig Nr $" << hex << eventNrOfThisFrame << " != $" << eventNrOfOnsenTrgFrame);
-    m_errorMask |= ONSEN_ERR_FLAG_DHC_DHE_MM;
-//     evtnr_error++;
-//     error_flag = true;
-  }
+//   if (eventNrOfThisFrame != eventNrOfOnsenTrgFrame) {
+//     B2ERROR("Frame TrigNr != ONSEN Trig Nr $" << hex << eventNrOfThisFrame << " != $" << eventNrOfOnsenTrgFrame);
+//     m_errorMask |= ONSEN_ERR_FLAG_DHC_DHE_MM;
+// //     evtnr_error++;
+// //     error_flag = true;
+//   }
 
-  if (Frame_Number == 0) {
-    /// Check that DHC Start is first Frame
-    if (type != DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG) {
-      B2ERROR("First frame is not a ONSEN Trigger frame in Event Nr " << eventNrOfThisFrame);
-      m_errorMask |= ONSEN_ERR_FLAG_ONSEN_TRG_FIRST;
-    }
-  } else { // (Frame_Number != 0 &&
-    /// Check that there is no other DHC Start
-    if (type == DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG) {
-      B2ERROR("More than one ONSEN Trigger frame in Event Nr " << eventNrOfThisFrame);
-      m_errorMask |= ONSEN_ERR_FLAG_ONSEN_TRG_FIRST;
-    }
-  }
+//   if (Frame_Number == 0) {
+//     /// Check that DHC Start is first Frame
+//     if (type != DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG) {
+//       B2ERROR("First frame is not a ONSEN Trigger frame in Event Nr " << eventNrOfThisFrame);
+//       m_errorMask |= ONSEN_ERR_FLAG_ONSEN_TRG_FIRST;
+//     }
+//   } else { // (Frame_Number != 0 &&
+//     /// Check that there is no other DHC Start
+//     if (type == DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG) {
+//       B2ERROR("More than one ONSEN Trigger frame in Event Nr " << eventNrOfThisFrame);
+//       m_errorMask |= ONSEN_ERR_FLAG_ONSEN_TRG_FIRST;
+//     }
+//   }
 
-  if (Frame_Number == 1) {
-    /// Check that DHC Start is first Frame
-    if (type != DHC_FRAME_HEADER_DATA_TYPE_DHC_START) {
-      B2ERROR("Second frame is not a DHC start of subevent frame in Event Nr " << eventNrOfThisFrame);
-      m_errorMask |= ONSEN_ERR_FLAG_DHC_START_SECOND;
-    }
-  } else { // (Frame_Number != 0 &&
-    /// Check that there is no other DHC Start
-    if (type == DHC_FRAME_HEADER_DATA_TYPE_DHC_START) {
-      B2ERROR("More than one DHC start of subevent frame in Event Nr " << eventNrOfThisFrame);
-      m_errorMask |= ONSEN_ERR_FLAG_DHC_START_SECOND;
-    }
-  }
-
-  if (Frame_Number == Frames_in_event - 1) {
-    /// Check that DHC End is last Frame
-    if (type != DHC_FRAME_HEADER_DATA_TYPE_DHC_END) {
-      B2ERROR("Last frame is not a DHC end of subevent frame in Event Nr " << eventNrOfThisFrame);
-      m_errorMask |= ONSEN_ERR_FLAG_DHC_END;
-    }
-
-    /// As we now have processed the whole event, we can do some more consistency checks!
-    if (countedDHEStartFrames != countedDHEEndFrames || countedDHEStartFrames != nr_active_dhe) {
-      B2ERROR("The number of DHE Start/End does not match the number of active DHE in DHC Header! Header: " << nr_active_dhe <<
-              " Start: " << countedDHEStartFrames << " End: " << countedDHEEndFrames << " Mask: $" << hex << mask_active_dhe << " in Event Nr " <<
-              eventNrOfThisFrame);
-      m_errorMask |= ONSEN_ERR_FLAG_DHE_ACTIVE;
-    }
-
-  } else { //  (Frame_Number != Frames_in_event - 1 &&
-    /// Check that there is no other DHC End
-    if (type == DHC_FRAME_HEADER_DATA_TYPE_DHC_END) {
-      B2ERROR("More than one DHC end of subevent frame in frame in Event Nr " << eventNrOfThisFrame);
-      m_errorMask |= ONSEN_ERR_FLAG_DHC_END;
-    }
-  }
-
-  /// Check that (if there is at least one active DHE) the second Frame is DHE Start, actually this is redundant if the other checks work
-  if (Frame_Number == 2 && nr_active_dhe != 0 && type != DHC_FRAME_HEADER_DATA_TYPE_DHE_START) {
-    B2ERROR("Third frame is not a DHE start frame in Event Nr " << eventNrOfThisFrame);
-    m_errorMask |= ONSEN_ERR_FLAG_DHE_START;
-  }
+//   if (Frame_Number == 0) { // was 0 for ONSEN
+//     /// Check that DHC Start is first Frame
+//     if (type != DHC_FRAME_HEADER_DATA_TYPE_DHC_START) {
+//       B2ERROR("Second frame is not a DHC start of subevent frame in Event Nr " << eventNrOfThisFrame);
+//       m_errorMask |= ONSEN_ERR_FLAG_DHC_START_SECOND;
+//     }
+//   } else { // (Frame_Number != 0 &&
+//     /// Check that there is no other DHC Start
+//     if (type == DHC_FRAME_HEADER_DATA_TYPE_DHC_START) {
+//       B2ERROR("More than one DHC start of subevent frame in Event Nr " << eventNrOfThisFrame);
+//       m_errorMask |= ONSEN_ERR_FLAG_DHC_START_SECOND;
+//     }
+//   }
+//
+//   if (Frame_Number == Frames_in_event - 1) {
+//     /// Check that DHC End is last Frame
+//     if (type != DHC_FRAME_HEADER_DATA_TYPE_DHC_END) {
+//       B2ERROR("Last frame is not a DHC end of subevent frame in Event Nr " << eventNrOfThisFrame);
+//       m_errorMask |= ONSEN_ERR_FLAG_DHC_END;
+//     }
+//
+//     /// As we now have processed the whole event, we can do some more consistency checks!
+//     if (countedDHEStartFrames != countedDHEEndFrames || countedDHEStartFrames != nr_active_dhe) {
+//       B2ERROR("The number of DHE Start/End does not match the number of active DHE in DHC Header! Header: " << nr_active_dhe <<
+//               " Start: " << countedDHEStartFrames << " End: " << countedDHEEndFrames << " Mask: $" << hex << mask_active_dhe << " in Event Nr " <<
+//               eventNrOfThisFrame);
+//       m_errorMask |= ONSEN_ERR_FLAG_DHE_ACTIVE;
+//     }
+//
+//   } else { //  (Frame_Number != Frames_in_event - 1 &&
+//     /// Check that there is no other DHC End
+//     if (type == DHC_FRAME_HEADER_DATA_TYPE_DHC_END) {
+//       B2ERROR("More than one DHC end of subevent frame in frame in Event Nr " << eventNrOfThisFrame);
+//       m_errorMask |= ONSEN_ERR_FLAG_DHC_END;
+//     }
+//   }
+//
+//   /// Check that (if there is at least one active DHE) the second Frame is DHE Start, actually this is redundant if the other checks work
+//   if (Frame_Number == 2 && nr_active_dhe != 0 && type != DHC_FRAME_HEADER_DATA_TYPE_DHE_START) {
+//     B2ERROR("Third frame is not a DHE start frame in Event Nr " << eventNrOfThisFrame);
+//     m_errorMask |= ONSEN_ERR_FLAG_DHE_START;
+//   }
 
   countedWordsInEvent += len;
 

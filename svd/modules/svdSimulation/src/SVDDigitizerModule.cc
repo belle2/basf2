@@ -626,11 +626,12 @@ void SVDDigitizerModule::saveDigits()
           t += m_samplingTime;
         }
       }
-      // Check that at least one sample is over threshold
-      bool isOverThreshold = false;
-      for (double value : samples)
-        isOverThreshold = isOverThreshold || (value > charge_thresholdU);
-      if (!isOverThreshold) continue;
+      // Check that at least three consecutive samples are over threshold
+      auto it = search_n(
+                  samples.begin(), samples.end(), 3, charge_thresholdU,
+      [](double x, double y) { return x > y; }
+                );
+      if (it == samples.end()) continue;
       // Save samples and relations
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
@@ -702,11 +703,12 @@ void SVDDigitizerModule::saveDigits()
           t += m_samplingTime;
         }
       }
-      // Check that at least one sample is over threshold
-      bool isOverThreshold = false;
-      for (double value : samples)
-        isOverThreshold = isOverThreshold || (value > charge_thresholdV);
-      if (!isOverThreshold) continue;
+      // Check that at least three samples are over threshold
+      auto it = search_n(
+                  samples.begin(), samples.end(), 3, charge_thresholdV,
+      [](double x, double y) { return x > y; }
+                );
+      if (it == samples.end()) continue;
       // Save samples and relations
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();

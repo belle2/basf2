@@ -22,11 +22,11 @@ while (my $line = <$fh>){
     my $sh_filename = $subname . '_sh_scripts_batch/' . $line . 'analyzeHits_extended.sh';
     open(my $shf, '>', $sh_filename);
     print $shf "#!/bin/sh\n";
-    print $shf "analyzeHits_extended /group/belle2/testbeam/TOP/CRT_analysis/hits/${line}_writehits.root /group/belle2/testbeam/TOP/CRT_analysis/hits/${line}_plothits_$cutnum.root $cutnum\n";
+    print $shf "analyzeHits_extended /group/belle2/testbeam/TOP/CRT_analysis/hits/${line}_writehits.root /group/belle2/testbeam/TOP/CRT_analysis/hits/${line}_plothits_$cutnum.root $cutnum /group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_${cutnum}_info.txt \n";
     close $shf;
     chmod 0777, $sh_filename;
     
-    print $subf "bsub -K -q s -o /group/belle2/testbeam/TOP/CRT_analysis/logs/${line}_analyzeHits_extended_$cutnum.txt $sh_filename &\n";
+    print $subf "bsub -K -q s -o /group/belle2/testbeam/TOP/CRT_analysis/logs/${line}_analyzeHits_extended_$cutnum%J.txt $sh_filename &\n";
     print $subf "sleep 0.2\n";
 }
 print $subf "wait\n";

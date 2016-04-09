@@ -1,6 +1,7 @@
 package org.csstudio.belle2.daq.nsm;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -157,12 +158,12 @@ public class NSMDataSource extends DataSource {
 						com.add(g_source.m_sethandler);
 						String nsmnode = "";
 						if (nsmnode.isEmpty()) {
-							IProduct product = Platform.getProduct();
-							if (null != product)
-								nsmnode = product.getName() + "_";
+							nsmnode = InetAddress.getLocalHost().getHostName();
 							Subject user = SecuritySupport.getSubject();
+							String [] sss = nsmnode.split(".");
+							if (sss.length > 1) nsmnode = sss[0];
 							if (null != user)
-								nsmnode += SecuritySupport.getSubjectName(user);
+								nsmnode += "_" + SecuritySupport.getSubjectName(user);
 						}
 						nsmnode = nsmnode.replaceAll("-", "_").replaceAll("\\.", "_") + "_" + i;
 						com.reconnect(host, port, nsmnode, nsmhost, nsmport);

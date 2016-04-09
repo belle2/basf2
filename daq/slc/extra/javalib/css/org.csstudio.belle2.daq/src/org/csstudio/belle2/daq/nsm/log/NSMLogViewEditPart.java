@@ -1,6 +1,8 @@
 package org.csstudio.belle2.daq.nsm.log;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -43,10 +45,16 @@ public class NSMLogViewEditPart extends AbstractPVWidgetEditPart {
 			com = new NSMCommunicator();
 			String nsmnode = "";
 			if (nsmnode.isEmpty()) {
-				IProduct product = Platform.getProduct();
-				if (null != product) nsmnode = product.getName() + "_";
+				try {
+					nsmnode = InetAddress.getLocalHost().getHostName();
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+				}
 				Subject user = SecuritySupport.getSubject();
-				if (null != user) nsmnode += SecuritySupport.getSubjectName(user);
+				String [] sss = nsmnode.split(".");
+				if (sss.length > 1) nsmnode = sss[0];
+				if (null != user)
+					nsmnode += "_"+SecuritySupport.getSubjectName(user);
 			}
 			nsmnode = nsmnode.replaceAll("-", "_").replaceAll("\\.", "_") + "_LOG";
 			String host = getWidgetModel().getHost();

@@ -79,17 +79,19 @@ int main(int argc, char* argv[])
   }
 
   //create momentum binning (larger bins for high momentum)
-  const int num_p_bins = 59;
+  const int num_p_bins = 69;
   double pbins[num_p_bins + 1];
   pbins[0] = 0.0; pbins[1] = 0.05;
+  std::cout << ": " << pbins[0] << "\n";
+  std::cout << ": " << pbins[1] << "\n";
   for (int bin = 2; bin <= num_p_bins; bin++) {
     if (bin <= 19)
-      pbins[bin] = 0.025 * bin;
+      pbins[bin] = 0.025 + 0.025 * bin;
     else if (bin <= 59)
       pbins[bin] = pbins[19] + 0.05 * (bin - 19);
     else
       pbins[bin] = pbins[59] + 0.3 * (bin - 59);
-    //std::cout << ": " << pbins[bin] << "\n";
+    std::cout << ": " << pbins[bin] << "\n";
   }
 
   for (int i = 0; i < 2; i++) { //normal/truncated
@@ -161,11 +163,13 @@ int main(int argc, char* argv[])
       if (use_truncated_mean)
         tree->Project(histname.Data(),
                       TString::Format("%s[][%i]:CDCDedxTracks.m_p_cdc", varname, detector),
-                      TString::Format("%s < %g && abs(CDCDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
+                      TString::Format("CDCDedxTracks.m_nLayerHitsUsed > 15 && %s < %g && abs(CDCDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff,
+                                      pdg_code, flayer_selection.Data()));
       else
         tree->Project(histname.Data(),
                       TString::Format("%s:CDCDedxTracks.m_p_cdc", varname),
-                      TString::Format("%s < %g && abs(CDCDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
+                      TString::Format("CDCDedxTracks.m_nLayerHitsUsed > 15 && %s < %g && abs(CDCDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff,
+                                      pdg_code, flayer_selection.Data()));
 
       //TString::Format("%s < %g && abs(log(CDCDedxTracks.m_chi2)) < 5 && abs(CDCDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
 

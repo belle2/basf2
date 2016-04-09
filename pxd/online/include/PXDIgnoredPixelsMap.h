@@ -50,7 +50,7 @@ namespace Belle2 {
     /** Constructor
      * @param xml_filename is the name of the xml file containing the map.
      */
-    PXDIgnoredPixelsMap(const std::string& xml_filename);
+    explicit PXDIgnoredPixelsMap(const std::string& xml_filename);
 
     /** No default constructor */
     PXDIgnoredPixelsMap() = delete;

@@ -39,7 +39,7 @@ namespace Belle2 {
        * to construct an empty sample, eg. for a seed in ClusterCandidate.
        */
       Sample():
-        m_arrayIndex(0), m_cellID(0), m_iTime(0), m_charge(0) {}
+        m_arrayIndex(0), m_cellID(0), m_iTime(0), m_charge(0), m_prev_charge(0), m_next_charge(0) {}
       /** Less-than operator */
       bool operator<(const Sample& b)  const
       {

@@ -57,7 +57,7 @@ namespace Belle2 {
        * @times array of points in time at which data are taken
        */
       WaveFitter(wave_function_type wave, std::array<double, 6> times):
-        m_hasFit(false), m_times(times), m_wave(wave), m_ndf(0)
+        m_hasFit(false), m_times(times), m_wave(wave), m_fittedTime(0), m_fittedTimeError(), m_fittedLik(1.0e10), m_ndf(0)
       {
         m_dt = m_times[1] - m_times[0];
       }

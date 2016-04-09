@@ -252,6 +252,19 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
       err_flag = 1;
 #endif
     }
+
+    //
+    // Check if the first event of a run is zero. (For the moment, I will comment it out to avoid trigger reset when invoking DAQ program)
+    //
+    // }else{
+    //   if( GetRunNo( n ) !=  ( prev_exprunsubrun_no & RawHeader_latest::RUNNO_MASK ) >> RawHeader_latest::RUNNO_SHIFT ){
+    //     if( *cur_evenum_rawcprhdr != 0 ){
+    //     sprintf(err_buf, "Invalid Event # at the beginning of the run (It should be zero.): i %d preveve 0x%x cureve 0x%x : prevrun %.8x currun %.8x: Exiting...\n%s %s %d\n",
+    //             n, prev_evenum, *cur_evenum_rawcprhdr, prev_exprunsubrun_no, *cur_exprunsubrun_no,
+    //             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    //     err_flag = 1;
+    //     }
+    //   }
   }
 
 
@@ -710,6 +723,11 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
 
 
   *cur_exprunsubrun_no = GetExpRunSubrun(datablock_id);
+
+  if ((unsigned int)cur_ftsw_eve32 < 50) {
+    printf("EVENT OUTPUT ########## %d\n", cur_ftsw_eve32);
+    PrintData(GetBuffer(datablock_id), TotalBufNwords());
+  }
   if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if (prev_eve32 + 1 != cur_ftsw_eve32) {
 

@@ -44,12 +44,30 @@ namespace Belle2 {
      * 2. Only process one background component at a time.
      * 3. Add occupancy estimates and a separate ntuple to hold the data.
      */
+    /* Modifications Feb 2016:
+     * Add more information on fired strips rate and related occupancy estmates:
+     * 1. Two strip firing rates:
+     * - one with threshold equal to threshold cut, to provide check for occupancy estimates
+     * - another with threshold equal to elNoise
+     * 2. Two occupancies:
+     * - one for time of 1 APV cycle, no SNR adjustment
+     * - one for trigger jitter of 5 ns + testbeam-based hit time error
+     *
+     * Make module functionality switchable:
+     * - Add module parameters to turn on/off dose, neutron flux, and occupancy data collection.
+     */
+
     class SVDBackgroundModule: public Module {
 
     public:
       /** Number of VXD layers */
 
       static const int c_nVXDLayers = 6;
+
+      // Reporting levels
+      static const unsigned short c_reportNone = 0; /**< No reporting */
+      static const unsigned short c_reportSummary = 1; /**< Summary only */
+      static const unsigned short c_reportNTuple = 2; /**< Summary and NTuple */
 
       /** Struct to hold data of an SVD sensor */
       struct SensorData {
@@ -59,14 +77,22 @@ namespace Belle2 {
         double m_dose;
         /** Neutron flux */
         double m_neutronFlux;
-        /** Fired pixels in U, per cm2 and second */
+        /** Fired pixels in U, per cm2 and second, zero-suppression threshold */
         double m_firedU;
-        /** Fired pixels in V, per cm2 and second */
+        /** Fired pixels in V, per cm2 and second, zero-suppression threshold */
         double m_firedV;
+        /** Fired pixels in U, occupied time per cm2 and second */
+        double m_firedU_t;
+        /** Fired pixels in V, occupied time per cm2 and second */
+        double m_firedV_t;
         /** Occupancy in U */
         double m_occupancyU;
         /** Occupancy in V */
         double m_occupancyV;
+        /** Occupancy in U, for 1 APV cycle */
+        double m_occupancyU_APV;
+        /** Occupancy in V, for 1 APV cycle */
+        double m_occupancyV_APV;
       };
 
       /** Constructor */
@@ -90,6 +116,7 @@ namespace Belle2 {
       // General
       const double c_densitySi = 2.3290 * Unit::g_cm3; /**< Density of crystalline Silicon */
       const double c_smy = 1.0e7 * Unit::s;             /**< Seconds in snowmass year */
+      const double c_APVCycleTime = 31.44 * Unit::ns;   /**< APV cycle time */
       // NIEL file names - placed in svd/data, so needn't be module parameters.
       /** NIEL-correction file for neutrons */
       const std::string c_niel_neutronFile = "/svd/data/neutrons.csv";
@@ -142,6 +169,10 @@ namespace Belle2 {
       std::string m_storeEnergyDepositsName; /**< SVDEnergyDepositEvents StoreArray name */
       std::string m_storeNeutronFluxesName; /**< SVDNeutronFluxEvents StoreArray name */
       std::string m_storeOccupancyEventsName; /**< SVDOccupancyEvents StoreArray name */
+
+      unsigned short m_doseReportingLevel; /**< 0 - no data, 1 - summary only, 2 - ntuple */
+      unsigned short m_nfluxReportingLevel; /**< 0 - no data, 1 - summary only, 2 - ntuple */
+      unsigned short m_occupancyReportingLevel; /**< 0 - no data, 1 - summary only, 2 - ntuple */
 
       std::string m_componentName; /**< Name of the current component. */
       double m_componentTime; /**< Time of current component. */

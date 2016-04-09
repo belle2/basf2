@@ -16,7 +16,8 @@
 #include <algorithm>
 
 namespace Belle2 {
-  /** Class SVDOccupancyEvent: SVDCluster data container for background studies.
+  /** Class SVDOccupancyEvent:
+   * SVDCluster data container for background studies.
    *
    * This class holds cluster data from background reconstruction, and adds several
    * quantities for easy analysis of background studies. In particular, the class
@@ -30,7 +31,7 @@ namespace Belle2 {
     /** default constructor for ROOT */
     SVDOccupancyEvent(): m_layer(0), m_ladder(0), m_sensor(0),
       m_time(0.0), m_isU(true), m_pos(0.0), m_size(0), m_charge(0.0),
-      m_snr(0), m_wAcceptance(0.0), m_occupancy(0.0)
+      m_snr(0), m_wAcceptance(0.0), m_occupancy(0.0), m_occupancy_APVcycle(0.0)
     {}
 
     /** Standard constructor
@@ -45,13 +46,14 @@ namespace Belle2 {
      * @param snr Cluster signal-to-noise ratio
      * @param wAcceptance Probability of hit acceptance as being signal
      * @param occupancy Contribution to occupancy by the current hit
+     * @param occupancy_APVcycle Contribution to occupancy for APV cycle time (31.44 ns)
      */
     SVDOccupancyEvent(unsigned short layer, unsigned short ladder, unsigned short sensor,
                       float time, bool isU, float pos, unsigned short size, float charge, float snr,
-                      float wAcceptance, float occupancy):
+                      float wAcceptance, float occupancy, float occupancy_APVcycle):
       m_layer(layer), m_ladder(ladder), m_sensor(sensor), m_time(time), m_isU(isU), m_pos(pos),
       m_size(size), m_charge(charge), m_snr(snr),  m_wAcceptance(wAcceptance),
-      m_occupancy(occupancy)
+      m_occupancy(occupancy), m_occupancy_APVcycle(occupancy_APVcycle)
     {}
 
     unsigned short m_layer; /**< layer number */
@@ -63,10 +65,11 @@ namespace Belle2 {
     unsigned short m_size;   /**< Cluster size */
     float m_charge;  /**< cluster charge */
     float m_snr;    /**< cluster S/N ratio */
-    float m_wAcceptance;   /**< contribution to dose (in Gy) */
-    float m_occupancy;   /**< contribution to exposition (J/s) */
+    float m_wAcceptance;   /**< acceptance rate */
+    float m_occupancy;   /**< contribution to occupancy */
+    float m_occupancy_APVcycle; /**< contribution to cycle occupancy */
 
-    ClassDef(SVDOccupancyEvent, 1)
+    ClassDef(SVDOccupancyEvent, 2)
   };
 } // end namespace Belle2
 

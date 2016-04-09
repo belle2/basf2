@@ -2,8 +2,6 @@
 
 using namespace Belle2;
 
-ClassImp(TelEventInfo)
-
 TelEventInfo::TelEventInfo(ULong64_t event /* = 0 */,
                            ULong64_t triggerID /* = 0 */,
                            ULong64_t timeStamp /* = 0 */)

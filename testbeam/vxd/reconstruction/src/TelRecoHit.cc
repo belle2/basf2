@@ -24,8 +24,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(TelRecoHit)
-
 TelRecoHit::TelRecoHit():
   genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(0),
   m_energyDep(0)//, m_energyDepError(0)

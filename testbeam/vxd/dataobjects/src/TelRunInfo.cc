@@ -2,8 +2,6 @@
 
 using namespace Belle2;
 
-ClassImp(TelRunInfo)
-
 TelRunInfo::TelRunInfo(ULong64_t run /* = 0 */,
                        ULong64_t numEvents /* = 0 */,
                        const std::string& fileName /* = "" */,

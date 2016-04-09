@@ -17,8 +17,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(TBSpacePoint)
-
 TBSpacePoint::TBSpacePoint(const TelCluster* telCluster,
                            const VXD::SensorInfoBase* aSensorInfo)
 {

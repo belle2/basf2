@@ -593,7 +593,6 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
   freopen("/dev/null", "w", stderr);
 
-  //int n_Events = getObject<TTree>(name_SourceTree).GetEntries();
   int nSelRowsTemp = 0;
   for (int i_shape = 0; i_shape < m_shapes; i_shape++) {
     TString cCat;
@@ -706,8 +705,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
             B2DEBUG(30, "--> Selected raws " << nSelRows);
             double* Col1 = getObject<TTree>(name_SourceTree.Data()).GetV1();
             double* Col2 = getObject<TTree>(name_SourceTree.Data()).GetV2();
-            double* Col3 = getObject<TTree>(name_SourceTree.Data()).GetV3();
-            double* Col4 = getObject<TTree>(name_SourceTree.Data()).GetV4();
+            //double* Col3 = getObject<TTree>(name_SourceTree.Data()).GetV3();
+            //double* Col4 = getObject<TTree>(name_SourceTree.Data()).GetV4();
 
             double RetVal;
             double RetValError;
@@ -742,6 +741,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
                     m_histBiasCorrectionV[m_pixelkinds * m_shapes]->GetBinContent(i_angleU + 1, i_angleV + 1) + 1);
               }
             }
+            /*
             if (CalculateCorrection(2, nSelRows, Col3, &RetVal, &RetValError, &RetRMS)) {
               TCorrection_ErrorEstimationMap[make_tuple(i_shape, i_pk, 0, i_angleU, i_angleV)] = RetRMS;
               SummariesInfo[6]++;
@@ -762,6 +762,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
                     m_histErrorEstimationV[m_pixelkinds * m_shapes]->GetBinContent(i_angleU + 1, i_angleV + 1) + 1);
               }
             }
+            */
 
             if (m_DoExpertHistograms) {
               m_histnClusters[i_pk * m_shapes + i_shape]->SetBinContent(i_angleU + 1, i_angleV + 1, nSelRows);
@@ -836,7 +837,112 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
     }
   }
 
-  B2DEBUG(30, "--> Presets2b done. ");
+  B2DEBUG(30, "--> bias correction calculation done. ");
+
+  int n_Events = getObject<TTree>(name_SourceTree.Data()).GetEntries();
+  /*
+    double *fResidU = new double[n_Events];
+    double *fResidV = new double[n_Events];
+    for (int i_Ev = 0; i_Ev < n_Events; i_Ev++) {
+      getObject<TTree>(name_SourceTree.Data()).GetEntry(i_Ev);
+      int iIndexPhi = (m_phiTrue+ (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesU);
+      int iIndexTheta = (m_thetaTrue + (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesV);
+      fResidU[i_Ev] = m_ResidUTrue;
+      fResidV[i_Ev] = m_ResidVTrue;
+      if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {
+        iIndexPhi = (m_phiTrack+ (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesU);
+        iIndexTheta = (m_thetaTrack + (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesV);
+        fResidU[i_Ev] = m_ResidUTrack;
+        fResidV[i_Ev] = m_ResidVTrack;
+      }
+      int iShape = m_shape;
+      int iPK = m_pixelKind;
+      fResidU[i_Ev] -= TCorrection_BiasMap[make_tuple(iShape, iPK, 0, iIndexPhi, iIndexTheta)];
+      fResidV[i_Ev] -= TCorrection_BiasMap[make_tuple(iShape, iPK, 1, iIndexPhi, iIndexTheta)];
+    }
+  */
+  B2DEBUG(30, "--> bias correction aplication done. ");
+
+  double* fEEU = new double[n_Events];
+  double* fEEV = new double[n_Events];
+  int nSelRows = 0;
+  for (int i_shape = 0; i_shape < m_shapes; i_shape++) {
+    B2INFO("Error estimation---> cluster shape: " << i_shape + 1 <<
+           ", description: " << Belle2::PXD::PXDClusterShape::pxdClusterShapeDescription[(Belle2::PXD::pxdClusterShapeType)(
+                 i_shape + 1)].c_str()
+          );
+    for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++) {
+      B2INFO("Error estimation   ---> pixel kind: " << i_pk <<
+             ", Layer: " << (int)((i_pk % 4) / 2) + 1 <<
+             ", Sensor: " << (int)(i_pk / 4) + 1 <<
+             ", Size: " << i_pk % 2
+            );
+      for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++) {
+        for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {
+          nSelRows = 0;
+          for (int i_Ev = 0; i_Ev < n_Events; i_Ev++) {
+            if ((i_Ev == (int)(n_Events / 2)) && (nSelRows < m_MinClustersCorrections / 4)) {  // acceleration
+              continue;
+            }
+            getObject<TTree>(name_SourceTree.Data()).GetEntry(i_Ev);
+            int iIndexPhi = (m_phiTrue + (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesU);
+            int iIndexTheta = (m_thetaTrue + (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesV);
+            if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {
+              iIndexPhi = (m_phiTrack + (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesU);
+              iIndexTheta = (m_thetaTrack + (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesV);
+            }
+            int iShape = m_shape;
+            int iPK = m_pixelKind;
+            if ((i_shape == iShape) && (i_pk == iPK) && (i_angleU == iIndexPhi) && (i_angleV == iIndexTheta)) {
+              double fResidU = m_ResidUTrue;
+              double fResidV = m_ResidVTrue;
+              if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {
+                fResidU = m_ResidUTrack;
+                fResidV = m_ResidVTrack;
+              }
+              fResidU -= TCorrection_BiasMap[make_tuple(iShape, iPK, 0, iIndexPhi, iIndexTheta)];
+              fResidV -= TCorrection_BiasMap[make_tuple(iShape, iPK, 1, iIndexPhi, iIndexTheta)];
+              fEEU[nSelRows] = fResidU / m_SigmaU;
+              fEEV[nSelRows] = fResidV / m_SigmaV;
+              nSelRows++;
+            }
+          }
+
+          if (nSelRows >= m_MinClustersCorrections) {
+            double RetVal;
+            double RetValError;
+            double RetRMS;
+            RetVal = 0;
+            RetValError = 0;
+            RetRMS = 0;
+            if (CalculateCorrection(2, nSelRows, fEEU, &RetVal, &RetValError, &RetRMS)) {
+              TCorrection_ErrorEstimationMap[make_tuple(i_shape, i_pk, 0, i_angleU, i_angleV)] = RetRMS;
+              SummariesInfo[6]++;
+              SummariesInfo[8] += nSelRows;
+              if (m_DoExpertHistograms) {
+                m_histErrorEstimationU[i_pk * m_shapes + i_shape]->SetBinContent(i_angleU + 1, i_angleV + 1, RetRMS);
+                m_histErrorEstimationU[m_pixelkinds * m_shapes]->SetBinContent(i_angleU + 1, i_angleV + 1,
+                    m_histErrorEstimationU[m_pixelkinds * m_shapes]->GetBinContent(i_angleU + 1, i_angleV + 1) + 1);
+              }
+            }
+            if (CalculateCorrection(2, nSelRows, fEEV, &RetVal, &RetValError, &RetRMS)) {
+              TCorrection_ErrorEstimationMap[make_tuple(i_shape, i_pk, 1, i_angleU, i_angleV)] = RetRMS;
+              SummariesInfo[7]++;
+              SummariesInfo[9] += nSelRows;
+              if (m_DoExpertHistograms) {
+                m_histErrorEstimationV[i_pk * m_shapes + i_shape]->SetBinContent(i_angleU + 1, i_angleV + 1, RetRMS);
+                m_histErrorEstimationV[m_pixelkinds * m_shapes]->SetBinContent(i_angleU + 1, i_angleV + 1,
+                    m_histErrorEstimationV[m_pixelkinds * m_shapes]->GetBinContent(i_angleU + 1, i_angleV + 1) + 1);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+  B2DEBUG(30, "--> error estimation correction calculation done. ");
 
 //  auto key = make_tuple(1, 1, 0, 1, 0);
 //  double& data = TCorrection_BiasMap[key];
@@ -1037,6 +1143,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
   delete[] ValueCors;
   delete[] ValueInPix;
+  delete[] fEEU;
+  delete[] fEEV;
   return c_OK;
 }
 

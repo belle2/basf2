@@ -7,7 +7,11 @@ class Backend():
     Classes derived from this will implement their own submission of basf2 jobs
     to whatever backend they describe. Common methods/properties go here.
     """
-    pass
+    def __init__(self):
+        """
+        Initialise method
+        """
+        pass
 
 
 class Local(Backend):

@@ -18,6 +18,7 @@ import collections
 import pickle
 
 from .utils import topological_sort
+from .utils import CalibrationAlgorithmRunner
 import caf.backends
 
 import ROOT
@@ -65,10 +66,15 @@ class Calibration():
         until those are done.
         """
 
+        #: Name of calibration object
         self.name = name
+        #: Internal calibration collector/algorithms stored for this calibration
         self._collector, self._algorithms = None, None
+        #: Publicly accessible collector
         self.collector = collector
+        #: Publicly accessible algorithms
         self.algorithms = algorithms
+        #: Maximum iterations fo rthis calibration (Will probably move to CAF)
         self.max_iterations = max_iterations
 
     def is_valid(self):
@@ -99,6 +105,7 @@ class Calibration():
         Setter for the name property. Checks that a string was passed in.
         """
         if isinstance(name, str):
+            #: Internal storage of calibration object name
             self._name = name
         else:
             B2FATAL("Tried to set Calibration name to a non-string type")
@@ -172,14 +179,22 @@ class CAF():
     collection to a batch system/grid based on user's choice.
     - It should be able to sort the required collection/algorithm steps into a
     valid order based on dependencies.
-    - At the most basic level, it should take a set of files to process and
-    output/upload calibration constants for the defined calibrations.
+    - Much of the checking for consistency should be done here and in the calibration
+    class. Leaving functions that it calls to assume everything is correctly set up.
     """
     def __init__(self):
+        """
+        Initialise method
+        """
+        #: Dictionary of calibrations for this CAF instance
         self.calibrations = {}
+        #: Dictionary of dependenciesof calibration objects
         self.dependencies = {}
+        #: The backend to use for this CAF run (Public)
         self.backend = caf.backends.Local()
+        #: List of input files for this set of calibrations (Move to Calibration()?)
         self.input_files = []
+        #: Output path to store results of calibration and bookkeeping information
         self.output_path = 'calibration_results'
 
     def add_calibration(self, calibration):
@@ -251,6 +266,7 @@ class CAF():
         Setter for the backend property. Checks that a Backend instance was passed in.
         """
         if isinstance(backend, caf.backends.Backend):
+            #: Private backend attribute
             self._backend = backend
         else:
             B2ERROR('backend property must inherit from Backend class')
@@ -282,47 +298,20 @@ class CAF():
             with open(os.path.join(path_output_dir, path_file_name), 'bw') as serialized_path_file:
                 pickle.dump(serialize_path(path), serialized_path_file)
 
-
-# class CalibrationAlgorithmRunner(Module):
-#     """
-#     Algorithm runner.
-#
-#     This module is responsible of calling the CalibrationAlgorithm with the
-#     correct run iovs and record all calibration results.
-#     (Shamelessly stolen from calibration_framework.py)
-#     """
-#
-#     def __init__(self, algorithm):
-#         """Constructor"""
-#         super().__init__()
-#         self.algorithm = algorithm
-#         # list of currently collected iovs
-#         self.runs = set()
-#
-#     def beginRun(self):
-#         """Collect all runs we have seen"""
-#         event = PyStoreObj("EventMetaData").obj()
-#         self.runs.add((event.getExperiment(), event.getRun()))
-#
-#     def execute(self, runs):
-#         """Execute the algorithm over list of runs"""
-#         # create std::vector<ExpRun> for the argument
-#         iov_vec = ROOT.vector("std::pair<int,int>")()
-#         pair = ROOT.pair("int", "int")()
-#         for run in runs:
-#             pair.first, pair.second = run
-#             iov_vec.push_back(pair)
-#         # run the algorithm
-#         result = self.algorithm.execute(iov_vec, 1) # Use 1 iteration as default for now
-#         return result
-#
-#     def terminate(self):
-#         """Run the calibration algorithm"""
-#         runs = []
-#         for run in sorted(self.runs):
-#             runs.append(run)
-#             result = self.execute(runs)
-#             # if anything else then NotEnoughData is returned then we
-#             # empty the list of runs for the next call
-#             if result != CalibrationAlgorithm.c_NotEnoughData:
-#                 runs = []
+    def _make_calibration_paths(self):
+        """
+        Creates separate basf2 paths for overall calibraiton objects and serializes them in the self.output_path/paths
+        directory
+        """
+        path_output_dir = os.path.join(self.output_path, 'paths')
+        os.mkdir(path_output_dir)
+        for calibration_name in self.order:
+            path = create_path()
+            calibration = self.calibrations[calibration_name]
+            path.add_module(calibration.collector)
+            for algorithm in calibration.algorithms:
+                algorithm_runner = CalibrationAlgorithmRunner(algorithm)
+                path.add_module(algorithm_runner)
+            path_file_name = calibration.name+'.pickle'
+            with open(os.path.join(path_output_dir, path_file_name), 'bw') as serialized_path_file:
+                pickle.dump(serialize_path(path), serialized_path_file)

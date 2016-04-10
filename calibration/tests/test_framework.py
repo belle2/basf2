@@ -21,9 +21,13 @@ class TestCalibrationClass_Configure(TestCase):
         """
         Create useful objects for each test
         """
+        #: Calibration attribute for use in unittests
         self.cal = Calibration('TestCalibration')
+        #: Calibration algorithm for use in unittests
         self.alg1 = TestAlgo()
+        #: Calibration algorithm attribute for use in unittests
         self.alg2 = TestAlgo()
+        #: Collector module attribute for use in unittests
         self.col1 = register_module('CaTest')
 
     def test_1(self):
@@ -48,9 +52,13 @@ class TestCalibrationClass_Args(TestCase):
         """
         Create useful objects for each test
         """
+        #: Calibration algorithm for use in unittests
         self.alg1 = TestAlgo()
+        #: Calibration algorithm for use in unittests
         self.alg2 = TestAlgo()
+        #: Collector module attribute for use in unittests
         self.col1 = register_module('CaTest')
+        #: Calibration name for use in unittests
         self.name = 'TestCalibration'
 
     def test_1(self):
@@ -67,8 +75,11 @@ class TestCalibrationClass_Mismatch(TestCase):
         """
         Create useful objects for each test
         """
+        #: Calibration algorithm for use in unittests
         self.alg1 = TestAlgo()
+        #: Calibration algorithm for use in unittests
         self.alg2 = PXDAlgo()
+        #: Collector module attribute for use in unittests
         self.col1 = register_module('CaTest')
 
     def test_1(self):
@@ -87,13 +98,19 @@ class TestCAF(TestCase):
         """
         Create useful objects for each test
         """
+        #: Calibration name for use in unittests
         self.name1 = 'TestCalibration1'
+        #: Calibration name for use in unittests
         self.name2 = 'TestCalibration2'
+        #: Calibration name for use in unittests
         self.name3 = 'TestCalibration3'
         alg = TestAlgo()
         col = register_module('CaTest')
+        #: Calibration attribute for use in unittests
         self.cal1 = Calibration(self.name1, col, alg)
+        #: Calibration attribute for use in unittests
         self.cal2 = Calibration(self.name2, col, alg)
+        #: Calibration attribute for use in unittests
         self.cal3 = Calibration(self.name3, col, alg)
 
     def test_add_calibration(self):

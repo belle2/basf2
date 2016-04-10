@@ -716,18 +716,13 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   // check incrementation of event #
   //
 
-  if ((unsigned int)(prev_eve32 + 1) < 50) {
-//     printf("#################EVE cur %.8x prev %.8x\n", cur_ftsw_eve32, prev_eve32);
-//     fflush(stdout);
-  }
-
 
   *cur_exprunsubrun_no = GetExpRunSubrun(datablock_id);
 
-  if ((unsigned int)cur_ftsw_eve32 < 50) {
-    printf("EVENT OUTPUT ########## %d\n", cur_ftsw_eve32);
-    PrintData(GetBuffer(datablock_id), TotalBufNwords());
-  }
+//   if ((unsigned int)cur_ftsw_eve32 < 50) {
+//     printf("EVENT OUTPUT ########## %u\n", cur_ftsw_eve32);
+//     PrintData(GetBuffer(datablock_id), TotalBufNwords());
+//   }
   if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if (prev_eve32 + 1 != cur_ftsw_eve32) {
 

@@ -27,7 +27,8 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
 {
 
   vector<float> infovect;
-  if (infofile != '\0') {
+  //if (infofile != '\0') {
+  if (infofile != NULL) {
     ifstream in(infofile);
     string line;
     while (getline(in, line)) {
@@ -151,7 +152,8 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
   cout << nfound0 << nfound1 << nfound2 << endl;
 
   //Previously done run-by-run, now for ensemble of runs
-  if (infofile != '\0') {
+  //if (infofile != '\0') {
+  if (infofile != NULL) {
     if (infovect.at(0) != 0) {
       xpeaks0[0] = infovect.at(0);
       xpeaks1[0] = infovect.at(1);

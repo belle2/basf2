@@ -69,13 +69,13 @@ void SVDDQM3Module::defineHisto()
 {
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
-  TDirectory* BasicDir = oldDir->mkdir(m_histogramDirectoryName.c_str());
-  // oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
+  //TDirectory* BasicDir = oldDir->mkdir(m_histogramDirectoryName.c_str());
   //----------------------------------------------------------------
   // Number of fired strips per frame : hFired[U/V][PlaneNo]
   //----------------------------------------------------------------
   // Fired strip counts U
-  BasicDir->mkdir("JoinHistos_Basic")->cd();
+  oldDir->mkdir("SVD_JoinHistos_Basic")->cd();
+  //BasicDir->mkdir("JoinHistos_Basic")->cd();
   for (int i = 0; i < c_nSVDPlanes; i++) {
     int iPlane = indexToPlane(i);
     string name = str(format("hSVDFiredU%1%") % iPlane);
@@ -222,7 +222,8 @@ void SVDDQM3Module::defineHisto()
     m_timeV[i]->GetYaxis()->SetTitle("count");
   }
 
-  BasicDir->mkdir("JoinHistos_Correlations")->cd();
+  oldDir->mkdir("SVD_JoinHistos_Correlations")->cd();
+  //BasicDir->mkdir("SVD_JoinHistos_Correlations")->cd();
   //----------------------------------------------------------------
   // Correlations in U + V, 2D Hitmaps for VXD in local uv coordinates : m_correlationsHitMaps[U/V][PlaneNo]
   //----------------------------------------------------------------
@@ -319,7 +320,8 @@ void SVDDQM3Module::defineHisto()
 
 
 
-  BasicDir->mkdir("DetailHistos_Basic")->cd();
+  oldDir->mkdir("SVD_DetailHistos_Basic")->cd();
+  //BasicDir->mkdir("DetailHistos_Basic")->cd();
 
   for (int iS = 0; iS < c_MaxSensorsInSVDPlane; iS++) {
     //----------------------------------------------------------------
@@ -473,7 +475,8 @@ void SVDDQM3Module::defineHisto()
     }
   }
 
-  BasicDir->mkdir("GlobalCorrelations")->cd();
+  oldDir->mkdir("SVD_GlobalCorrelations")->cd();
+  //BasicDir->mkdir("GlobalCorrelations")->cd();
   //----------------------------------------------------------------
   // Correlations in U + V, 2D Hitmaps for VXD in local uv coordinates : m_correlationsHitMaps[U/V][PlaneNo]
   //----------------------------------------------------------------

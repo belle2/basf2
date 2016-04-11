@@ -531,7 +531,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     cosmic_cut[5] = ("TOPCAFDigits.m_time>-10&&TOPCAFDigits.m_time<10");
     if (trigstring == "laser") {
       cout << "laser" << endl;
-      cosmic_cut[0] = ("TOPCAFDigits.m_time>30&&TOPCAFDigits.m_time<50");
+      cosmic_cut[0] = ("TOPCAFDigits.m_time>355&&TOPCAFDigits.m_time<375");
       cosmic_cut[1] = ("TOPCAFDigits.m_time>115&&TOPCAFDigits.m_time<130");
       cosmic_cut[2] = ("TOPCAFDigits.m_time>60&&TOPCAFDigits.m_time<80");
       cosmic_cut[3] = ("TOPCAFDigits.m_time>30&&TOPCAFDigits.m_time<50");
@@ -697,7 +697,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
            Form("TOPCAFDigits.m_boardstack==%d", c));
   }
   t.Draw("(TOPCAFDigits.m_boardstack*16+TOPCAFDigits.m_asic_row*4+TOPCAFDigits.m_asic)>>asic_occupancy_all", width_cut && qual_cut
-         && (cosmic_cut[0] || cosmic_cut[1]) && height_cut && "TOPCAFDigits.m_asic_ch!=7");
+         && (cosmic_cut[0]) && height_cut && "TOPCAFDigits.m_asic_ch!=7");
 
   Float_t a_cut = (asic_occupancy_all->GetEntries()) / 64;
   for (int i = 1; i < 65; i++) {
@@ -712,7 +712,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
            && Form("TOPCAFDigits.m_boardstack==%d", c));
   }
   t.Draw("(TOPCAFDigits.m_boardstack*16+TOPCAFDigits.m_asic_row*4+TOPCAFDigits.m_asic)>>asic_occupancy_all_tight", cut_tight
-         && (cosmic_cut[0] || cosmic_cut[1]) && "TOPCAFDigits.m_asic_ch!=7");
+         && (cosmic_cut[0]) && "TOPCAFDigits.m_asic_ch!=7");
 
   a_cut = (asic_occupancy_all_tight->GetEntries()) / 64;
   for (int i = 1; i < 65; i++) {
@@ -727,7 +727,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
            && Form("TOPCAFDigits.m_boardstack==%d", c));
   }
   t.Draw("(TOPCAFDigits.m_boardstack*16+TOPCAFDigits.m_asic_row*4+TOPCAFDigits.m_asic)>>asic_occupancy_all_optics", cut_optics
-         && (cosmic_cut[0] || cosmic_cut[1]) && "TOPCAFDigits.m_asic_ch!=7");
+         && (cosmic_cut[0]) && "TOPCAFDigits.m_asic_ch!=7");
 
   a_cut = (asic_occupancy_all_optics->GetEntries()) / 64;
   for (int i = 1; i < 65; i++) {

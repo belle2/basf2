@@ -274,7 +274,11 @@ void TrackQualityTools::removeHitsAfterLayerBreak(CDCTrack& track, double m_maxi
 
   if (trackletList.size() > 1) {
     // Throw away the ends if they are too small
-    while (trackletList.back().size() < 5 and trackletList.size() > 0) {
+    while (trackletList.size() > 0) {
+      if (trackletList.back().size() > 4) {
+        break;
+      }
+
       for (const CDCRecoHit3D* recoHit : trackletList.back()) {
         recoHit->getWireHit().getAutomatonCell().setAssignedFlag();
       }
@@ -284,7 +288,11 @@ void TrackQualityTools::removeHitsAfterLayerBreak(CDCTrack& track, double m_maxi
 
     std::reverse(trackletList.begin(), trackletList.end());
 
-    while (trackletList.back().size() < 5 and trackletList.size() > 0) {
+    while (trackletList.size() > 0) {
+      if (trackletList.back().size() > 4) {
+        break;
+      }
+
       for (const CDCRecoHit3D* recoHit : trackletList.back()) {
         recoHit->getWireHit().getAutomatonCell().setAssignedFlag();
       }

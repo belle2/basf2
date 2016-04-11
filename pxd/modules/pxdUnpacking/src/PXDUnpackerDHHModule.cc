@@ -747,10 +747,8 @@ void endian_swapper(void* a, unsigned int len)
   for (unsigned int i = 0; i < len; i++, q++, p++) { *q = *p;}
 }
 
-#pragma GCC diagnostic ignored "-Wstack-usage="
 void PXDUnpackerDHHModule::unpack_event(RawDHH& px)
 {
-#pragma GCC diagnostic pop
   int Frames_in_event;
   int fullsize;
   int datafullsize;
@@ -760,9 +758,9 @@ void PXDUnpackerDHHModule::unpack_event(RawDHH& px)
     m_errorMask |= ONSEN_ERR_FLAG_PACKET_SIZE;
     return;
   }
-  unsigned int data[px.size()];// size cannot be unlimited, because we check it before
+  std::vector<unsigned int> data(px.size());
   fullsize = px.size() * 4; /// in bytes ... rounded up to next 32bit boundary
-  memcpy(data, (unsigned int*)px.data(), fullsize);
+  std::copy_n(px.data(), px.size(), data.begin());
 
   if (fullsize < 16) {
     B2ERROR("Data is to small to hold a valid Header! Will not unpack anything. Size:" << fullsize);
@@ -1339,6 +1337,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       if (!m_doNotStore) dhc.data_onsen_roi_frame->save(m_storeROIs, len, (unsigned int*) data);
       break;
     case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG:
+      /// we do not expect to see this frame in BonnDAQ DHH data
       countedDHCFrames += 0; /// DO NOT COUNT!!!!
       eventNrOfOnsenTrgFrame = eventNrOfThisFrame;
 //   m_meta_event_nr=evtPtr->getEvent();

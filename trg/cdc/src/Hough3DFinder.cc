@@ -47,6 +47,11 @@ namespace Belle2 {
 
 TRGCDCHough3DFinder::TRGCDCHough3DFinder(const TRGCDC & TRGCDC, bool makeRootFile, int finderMode)
     : _cdc(TRGCDC), m_makeRootFile(makeRootFile) , m_finderMode(finderMode) {
+
+
+    // Initialize variables.
+    m_eventNum = 0;
+
     m_Trg_PI = 3.141592653589793;
     // Initialize rr, ztostraw, anglest, nWiresInStereoLayer.
     CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();

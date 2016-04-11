@@ -42,7 +42,11 @@ namespace Belle2 {
   }
 
   TRGCDCJLUT::TRGCDCJLUT(const string& name)
-    : m_name(name)
+    : m_name(name),
+    m_outputFlag(0), m_inputBitsize(0), m_outputBitsize(0), 
+    m_inputOffset(0), m_outputOffset(0), m_outputIntMax(0), 
+    m_inputToReal(0), m_toReal(0), m_inputShiftBits(0),
+    m_outputType(0), m_outputNBitsWithOffset(0)
   {
     m_write = 0;
   }
@@ -62,6 +66,7 @@ namespace Belle2 {
     m_outputNBitsWithOffset = in.m_outputNBitsWithOffset;
     m_outputType = in.m_outputType;
     m_toReal = in.m_toReal;
+    m_inputShiftBits = in.m_inputShiftBits;
     m_outputIntMax = in.m_outputIntMax;
     m_const = in.m_const;
     m_inputMin = in.m_inputMin;

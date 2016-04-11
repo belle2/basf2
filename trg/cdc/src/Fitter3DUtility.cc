@@ -346,7 +346,7 @@ void Fitter3DUtility::calZ(std::map<std::string, double> const & mConstD, std::m
     string t_maxName = "dPhiMax_" + to_string(iSt);
     string t_minName = "dPhiMin_" + to_string(iSt);
     string t_valueName = "dPhi_" + to_string(iSt);
-    double t_value = 2*mConstD.at("Trg_PI")*abs(mConstV.at("nShift")[iSt])/(mConstV.at("nWires")[2*iSt+1]);
+    double t_value = 2*mConstD.at("Trg_PI")*fabs(mConstV.at("nShift")[iSt])/(mConstV.at("nWires")[2*iSt+1]);
     mSignalStorage[t_maxName] = Belle2::TRGCDCJSignal(t_value, mSignalStorage[t_valueName].getToReal(), commonData);
     mSignalStorage[t_minName] = Belle2::TRGCDCJSignal(0, mSignalStorage[t_valueName].getToReal(), commonData);
   }

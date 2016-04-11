@@ -55,10 +55,14 @@ rm -f /group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_${cutname}_inf
 root -b -q "find_py_peaks.C(\"/group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_plothits_${cutname}.root\",\"/group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_${cutname}_info.txt\",\"${cutname}\")"
 
 #redo with refined cuts
-echo "Refining the analysis"
-rm -rf /group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_plothits_${cutname}.root
-./sub_${subname}analyzeHits_extended.sh
-./hadd_${subname}_plothits_${cutname}.sh
+#Don't do this for laser events because non-uniform hitmap may be misinterpreted
+if test "$cutname" != "laser"
+then
+    echo "Refining the analysis"
+    rm -rf /group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_plothits_${cutname}.root
+    ./sub_${subname}analyzeHits_extended.sh
+    ./hadd_${subname}_plothits_${cutname}.sh
+fi
 
 #execute plotting script
 root -b -q "plot_package.C(\"/group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_plothits_${cutname}.root\",\"/group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_plothits_${cutname}.ps\",\"${cutname}\")"

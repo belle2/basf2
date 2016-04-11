@@ -43,6 +43,9 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
     if(trigstring=="prism"){
       roi[0]->GetXaxis()->SetRangeUser(-500,-100);
     }
+    if(trigstring=="laser"){
+      roi[0]->GetXaxis()->SetRangeUser(300,500);
+    }
   }
   
   TSpectrum *s0 = new TSpectrum(npeaks);
@@ -67,6 +70,13 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   if(trigstring=="prism"){
     roi[1]->GetXaxis()->SetRangeUser(xpeaks0[0]+77.5-32.5,xpeaks0[0]+77.5+32.5);
     roi[2]->GetXaxis()->SetRangeUser(xpeaks0[0]-37.5-22.5,xpeaks0[0]-37.5+22.5);
+  }
+  if(trigstring=="laser"){
+    //currently incorrect values; do not matter
+    roi[1]->GetXaxis()->SetRangeUser(xpeaks0[0]+90-25,xpeaks0[0]+90+25);
+    roi[2]->GetXaxis()->SetRangeUser(xpeaks0[0]-42.5-22.5,xpeaks0[0]-42.5+22.5);
+    sigma1=3;
+    sigma2=3;
   }
   
   TSpectrum *s1 = new TSpectrum(npeaks);
@@ -115,16 +125,25 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   }
   else{
     py2->GetXaxis()->SetRangeUser(-500,-250);
+    if(trigstring=="laser"){
+      py2->GetXaxis()->SetRangeUser(300,500);      
+    }
   }
   TF1 *fn0=new TF1("fn0","gaus",xpeaks0[0]-sigma1,xpeaks0[0]+sigma1);
   fn0->SetParLimits(0,10,py2->GetMaximum()*1.2);
   fn0->SetParLimits(1,xpeaks0[0]-sigma1,xpeaks0[0]+sigma1);
   fn0->SetParLimits(2,4,20);
+  if(trigstring=="laser"){
+    fn0->SetParLimits(2,0.5,5);
+  }
   py2->Fit(fn0,"RB");
   TF1 *fn1=new TF1("fn1","gaus(0)+pol2(3)",xpeaks1[0]-sigma2*2,xpeaks1[0]+sigma2*2);
   fn1->SetParLimits(0,10,py2->GetMaximum()*1.2);
   fn1->SetParLimits(1,xpeaks1[0]-sigma1,xpeaks1[0]+sigma1);
   fn1->SetParLimits(2,4,30);
+  if(trigstring=="laser"){
+    fn1->SetParLimits(2,0.5,5);
+  }
   py2->Fit(fn1,"RB");
   TPaveText *py1t=new TPaveText(0.6,0.5,1.0,0.9,"NDC");
   char ct1[25];
@@ -187,6 +206,9 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
       }
       else{
 	asict[ii*16+iii]->GetXaxis()->SetRangeUser(-500,-250);
+	if(trigstring=="laser"){
+	  asict[ii*16+iii]->GetXaxis()->SetRangeUser(300,500);
+	}
       }
       asict[ii*16+iii]->Draw();
     }
@@ -205,6 +227,10 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   else{
     ctt->GetXaxis()->SetRangeUser(0,400);
     ctt->GetYaxis()->SetRangeUser(-500,-420);
+    if(trigstring=="laser"){
+      ctt->GetXaxis()->SetRangeUser(500,1000);
+      ctt->GetYaxis()->SetRangeUser(300,500);
+    }
   }
   ctt->Draw("COLZ");
   cctt->Print(Form("%s.ps",outfile)); 
@@ -213,6 +239,15 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   TCanvas *ccht= new TCanvas("ccht","ccht",800,800);
   gStyle->SetOptStat(0);
   ccht->SetLogz();
+  if(flag_lab==1){
+    cht->GetYaxis()->SetRangeUser(-1350,-1050);
+  }
+  else{
+    cht->GetYaxis()->SetRangeUser(-550,-250);
+    if(trigstring=="laser"){
+      cht->GetYaxis()->SetRangeUser(250,550);
+    }
+  }
   ccht->cd(1);
   cht->Draw("COLZ");
   ccht->Print(Form("%s.ps)",outfile));

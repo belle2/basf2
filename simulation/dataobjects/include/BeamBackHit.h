@@ -28,21 +28,10 @@ namespace Belle2 {
   public:
 
     //! Default constructor
-    BeamBackHit():
-      m_subDet(0),
-      m_identifier(0),
-      m_PDG(0),
-      m_trackID(0),
-      m_position(0., 0., 0.),
-      m_momentum(0., 0., 0.),
-      m_t(0.),
-      m_E_start(0.),
-      m_E_end(0.),
-      m_energyDeposit(0),
-      m_trackLength(0.),
-      m_neutronWeight(0.)
-    {
-    }
+    BeamBackHit(): m_subDet(0), m_identifier(0), m_PDG(0), m_trackID(0),
+      m_position(0., 0., 0.), m_momentum(0., 0., 0.), m_t(0.), m_E_start(0.),
+      m_E_end(0.), m_energyDeposit(0), m_trackLength(0.), m_neutronWeight(0.)
+    {}
 
     /*!  Full constructor
      * @param subDet the ID of the individual subdetector
@@ -58,35 +47,14 @@ namespace Belle2 {
      * @param trackLength the length of the track in the volume
      * @param nutronWeight the effective neutron weigth
      */
-
-    BeamBackHit(
-      int subDet,
-      int iden,
-      int PDG,
-      int trackID,
-      TVector3 position,
-      TVector3 momentum,
-      double t,
-      double E_start,
-      double E_end,
-      double eDep,
-      double trackLength,
-      double nWeight
-    )
-    {
-      m_subDet = subDet;
-      m_identifier = iden;
-      m_PDG = PDG;
-      m_trackID = trackID;
-      m_position = position;
-      m_momentum = momentum;
-      m_t = t;
-      m_E_start = E_start;
-      m_E_end = E_end;
-      m_energyDeposit = eDep;
-      m_trackLength = trackLength;
-      m_neutronWeight = nWeight;
-    }
+    BeamBackHit(int subDet, int iden, int PDG, int trackID, TVector3 position,
+                TVector3 momentum, double t, double E_start, double E_end,
+                double eDep, double trackLength, double nWeight):
+      m_subDet(subDet), m_identifier(iden), m_PDG(PDG), m_trackID(trackID),
+      m_position(position), m_momentum(momentum), m_t(t), m_E_start(E_start),
+      m_E_end(E_end), m_energyDeposit(eDep), m_trackLength(trackLength),
+      m_neutronWeight(nWeight)
+    {}
 
     //! Get the subdetector name in which the hit occured
     TString getSubDetName() const

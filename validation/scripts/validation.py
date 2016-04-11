@@ -679,13 +679,10 @@ class Validation:
             return None
 
     def apply_package_selection(self, selected_packages, ignore_dependencies=False):
-        # If we are not performing a complete validation, we need to remove
-        # all packages that were not given via the '--packages' option
-        # if self.packages is not None:
-        #    unwanted_keys = [_ for _ in validation_folders if _ not
-        #                     in self.packages]
-        #    for unwanted_key in unwanted_keys:
-        #        del validation_folders[unwanted_key]
+        """
+        Only select packages from a specfic set of packages, but still honor the
+        dependencies to outside scripts which may exist
+        """
 
         to_keep_dependencies = set()
 
@@ -749,7 +746,6 @@ class Validation:
         output_dir_datafiles = os.path.abspath('./results/{0}/'.
                                                format(self.tag))
 
-        print(cacheable_scripts)
         for s in cacheable_scripts:
             # for for all output files
             outfiles = s.get_output_files()
@@ -760,8 +756,6 @@ class Validation:
 
             if files_exist:
                 s.status = ScriptStatus.cached
-
-            print("cached {}".format(files_exist))
 
         # Remove all cached scripts from the dependencies
         # of dependent script objects, they will not be
@@ -796,6 +790,15 @@ class Validation:
         """
 
         self.list_of_scripts.append(script)
+
+    def sort_scripts(self, script_list):
+        """
+        Sort the list of scripts that have to be processed by runtime,
+        execute slow scripts first
+        If no runtime information is available from the last execution, run the scripts in the
+        validation package first because they are log running and used as input for other scripts
+        """
+        script_list.sort(key=lambda x: x.runtime or x.package == "validation", reverse=True)
 
     def run_validation(self):
         """!
@@ -842,7 +845,7 @@ class Validation:
 
         # Sort the list of scripts that have to be processed by runtime,
         # execute slow scripts first
-        remaining_scripts.sort(key=lambda x: x.runtime or 0, reverse=True)
+        self.sort_scripts(remaining_scripts)
 
         # While there are scripts that have not yet been executed...
         while remaining_scripts:
@@ -948,7 +951,7 @@ class Validation:
                                  script.status in [ScriptStatus.waiting, ScriptStatus.running]]
 
             # Sort them again, Justin Case
-            remaining_scripts.sort(key=lambda x: x.runtime or 0, reverse=True)
+            self.sort_scripts(remaining_scripts)
 
             # Wait for one second before starting again
             time.sleep(1)

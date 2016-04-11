@@ -208,7 +208,7 @@ namespace Belle2 {
       G4Material*      top_mat = Materials::get(config.getGlobalMaterial());
       G4Box*           top_box = new G4Box("Top", config.getGlobalWidth() / Unit::cm * CLHEP::cm,
                                            config.getGlobalHeight() / Unit::cm * CLHEP::cm,
-                                           config.getGlobalWidth() / Unit::cm * CLHEP::cm);
+                                           config.getGlobalLength() / Unit::cm * CLHEP::cm);
       G4LogicalVolume* top_log = new G4LogicalVolume(top_box, top_mat, "Top", 0, 0, 0);
       setVisibility(*top_log, false);
       m_topVolume = new G4PVPlacement(0, G4ThreeVector(), top_log, "Top", 0, false, 0);

@@ -4,6 +4,7 @@
 """
 <header>
   <contact>oliver.frost@desy.de</contact>
+  <input>CosmicsSimNoBkg.root</input>
   <output>CosmicsTrackingValidation.root</output>
   <description>This module validates that track finding is capable of reconstructing tracks in cosmics run.</description>
 </header>
@@ -24,7 +25,7 @@ from tracking.validation.run import TrackingValidationRun
 
 class Cosmics(TrackingValidationRun):
     n_events = N_EVENTS
-    generator_module = 'Cosmics'
+    root_input_file = '../CosmicsSimNoBkg.root'
     components = None
     finder_module = 'TrackFinderCDCCosmics'
     fit_geometry = None

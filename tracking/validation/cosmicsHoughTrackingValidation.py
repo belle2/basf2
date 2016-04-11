@@ -4,6 +4,7 @@
 """
 <header>
   <contact>tracking@belle2.kek.jp</contact>
+  <input>CosmicsSimNoBkg.root</input>
   <description>Validates the hough finder working on segments in cosmics events.</description>
 </header>
 """
@@ -25,7 +26,7 @@ from tracking.validation.run import TrackingValidationRun
 
 class CosmicsHough(TrackingValidationRun):
     n_events = N_EVENTS
-    generator_module = 'Cosmics'
+    root_input_file = '../CosmicsSimNoBkg.root'
     components = None
 
     wire_hit_topology_preparer = basf2.register_module('WireHitTopologyPreparer')

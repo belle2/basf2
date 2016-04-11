@@ -573,14 +573,6 @@ class Validation:
             if package not in validation_folders:
                 validation_folders[package] = folder
 
-        # If we are not performing a complete validation, we need to remove
-        # all packages that were not given via the '--packages' option
-        if self.packages is not None:
-            unwanted_keys = [_ for _ in validation_folders if _ not
-                             in self.packages]
-            for unwanted_key in unwanted_keys:
-                del validation_folders[unwanted_key]
-
         # remove packages which have been explicitly ignored
         for ignored in self.ignored_packages:
             if ignored in validation_folders:
@@ -686,6 +678,31 @@ class Validation:
         else:
             return None
 
+    def apply_package_selection(self, selected_packages, ignore_dependencies=False):
+        # If we are not performing a complete validation, we need to remove
+        # all packages that were not given via the '--packages' option
+        # if self.packages is not None:
+        #    unwanted_keys = [_ for _ in validation_folders if _ not
+        #                     in self.packages]
+        #    for unwanted_key in unwanted_keys:
+        #        del validation_folders[unwanted_key]
+
+        to_keep_dependencies = set()
+
+        # compile the dependencies of selected scripts
+        if not ignore_dependencies:
+            for script_obj in self.list_of_scripts:
+                if script_obj.package in selected_packages:
+                    for dep in script_obj.dependencies:
+                        to_keep_dependencies.add(dep.unique_name())
+
+        # now, remove all scripts from the script list, which are either
+        # not in the selected packages or have a dependency to them
+        self.list_of_scripts = [
+            s for s in self.list_of_scripts if (
+                s.package in selected_packages) or (
+                s.unique_name() in to_keep_dependencies)]
+
     def apply_script_selection(self, script_selection, ignore_dependencies=False):
         """!
         This method will take the validation file name ( e.g. "FullTrackingValidation.py" ), determine
@@ -726,6 +743,36 @@ class Validation:
                                  .format(script_obj.name))
                 script_obj.status = ScriptStatus.skipped
 
+    def apply_script_caching(self):
+        cacheable_scripts = [s for s in self.list_of_scripts if s.is_cacheable()]
+
+        output_dir_datafiles = os.path.abspath('./results/{0}/'.
+                                               format(self.tag))
+
+        print(cacheable_scripts)
+        for s in cacheable_scripts:
+            # for for all output files
+            outfiles = s.get_output_files()
+            files_exist = True
+            for of in outfiles:
+                full_path = os.path.join(output_dir_datafiles, of)
+                files_exist = files_exist and os.path.isfile(full_path)
+
+            if files_exist:
+                s.status = ScriptStatus.cached
+
+            print("cached {}".format(files_exist))
+
+        # Remove all cached scripts from the dependencies
+        # of dependent script objects, they will not be
+        # executed and no one needs to wait for them
+        for script in self.list_of_scripts:
+            for dep_script in script.dependencies:
+                # check if the script this one is depending on is
+                # in cached execution
+                if dep_script.status == ScriptStatus.cached:
+                    script.dependencies.remove(dep_script)
+
     def store_run_results_json(self):
 
         json_package = []
@@ -741,6 +788,14 @@ class Validation:
         rev = json_objects.Revision(self.tag, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), packages=json_package)
         results_file = "./results/{}/revision.json".format(self.tag)
         json_objects.dump(results_file, rev)
+
+    def add_script(self, script):
+        """!
+        Explictly add a script object. In normal operation, scripts are auto-discovered
+        but this method is useful for testing
+        """
+
+        self.list_of_scripts.append(script)
 
     def run_validation(self):
         """!
@@ -1021,6 +1076,9 @@ def execute():
             validation.log.note('Building dependencies for Script objects...')
             validation.build_dependencies()
 
+        if cmd_arguments.packages:
+            validation.apply_package_selection(cmd_arguments.packages)
+
         # select only specific scripts, if this option has been set
         if cmd_arguments.select:
             validation.log.note("Applying selection for validation scripts")
@@ -1033,6 +1091,12 @@ def execute():
                                 "ignoring their dependencies")
             validation.apply_script_selection(cmd_arguments.select_ignore_dependencies,
                                               ignore_dependencies=True)
+
+        # check if the scripts which are cacheable can be skipped, because their output
+        # is already available
+        if cmd_arguments.use_cache:
+            validation.log.note("Checking for cached script output")
+            validation.apply_script_caching()
 
         # Start the actual validation
         validation.log.note('Starting the validation...')

@@ -45,6 +45,10 @@ class ScriptStatus:
     class skipped:
         pass
 
+    # script output is already cached, do not execute script
+    class cached:
+        pass
+
 
 class Script:
 
@@ -139,6 +143,8 @@ class Script:
             string_status = "skipped"
         elif self.status == ScriptStatus.waiting:
             string_status = "waiting"
+        elif self.status == ScriptStatus.cached:
+            string_status = "cached"
 
         return json_objects.Script(self.name_not_sanitized, self.path, string_status,
                                    log_url=os.path.join(self.package, self.name_not_sanitized) + ".log",
@@ -177,6 +183,13 @@ class Script:
                 all_deps.add(rc)
 
         return all_deps
+
+    def unique_name(self):
+        """
+        Generates a unique name from the package and name of the script
+        which only occurs once in th whole validation suite
+        """
+        return "script_unique_name_{}_{}".format(self.package, self.name)
 
     def compute_dependencies(self, list_of_scripts):
         """!
@@ -234,6 +247,37 @@ class Script:
             if in_same_pkg.index(self) - 1 >= 0:
                 predecessor = in_same_pkg[in_same_pkg.index(self) - 1]
                 self.dependencies.append(predecessor)
+
+    def get_input_files(self):
+        """
+        return a list of input files which this script will read.
+        This information is only available, if load_header has been called
+        """
+        if self.header is None:
+            return []
+
+        return self.header.get('input', [])
+
+    def get_output_files(self):
+        """
+        return a list of output files this script will create.
+        This information is only available, if load_header has been called
+        """
+        if self.header is None:
+            return []
+
+        return self.header.get('output', [])
+
+    def is_cacheable(self):
+        """
+        Returns true, if the script must not be executed if its output
+        files are already present.
+        This information is only available, if load_header has been called
+        """
+        if self.header is None:
+            return False
+
+        return 'cacheable' in self.header
 
     def load_header(self):
         """!

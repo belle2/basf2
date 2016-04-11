@@ -139,7 +139,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
       double e_Beam = T.getCMSEnergy() / 2;
-      double m_B = 5.2794; //Only true for B^+ or B^0
+      double m_B = part->getPDGMass();
       double p_B = std::sqrt(e_Beam * e_Beam - m_B * m_B);
 
       TLorentzVector p = T.rotateLabToCms() * part->get4Vector();

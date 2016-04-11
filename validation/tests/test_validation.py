@@ -91,6 +91,73 @@ class ValidationTest(unittest.TestCase):
             intervalSel = validation.IntervalSelector(["release", " nightly"])
             self.assertTrue(intervalSel.in_interval(script))
 
+    def test_apply_package_selection(self):
+        """
+        Test if the package selection works and if the required dependecies are
+        properly honored
+        """
+
+        val = validation.Validation()
+
+        script1 = validation.Script("val1.py", "tracking", None)
+        script2 = validation.Script("val2.py", "tracking", None)
+        script3 = validation.Script("valOther.py", "other_package", None)
+        script4 = validation.Script("valOtherNotDepending.py", "other_package", None)
+        script2.dependencies = [script3]
+
+        val.add_script(script1)
+        val.add_script(script2)
+        val.add_script(script3)
+        val.add_script(script4)
+
+        # test with honoring dependencies
+        val.apply_package_selection(["tracking"], False)
+
+        self.assertEqual(3, len(val.list_of_scripts))
+        self.assertTrue(len([s for s in val.list_of_scripts if s.unique_name() == script3.unique_name()]) == 1)
+        self.assertTrue(len([s for s in val.list_of_scripts if s.unique_name() == script4.unique_name()]) == 0)
+
+        valNoDeps = validation.Validation()
+
+        valNoDeps.add_script(script1)
+        valNoDeps.add_script(script2)
+        valNoDeps.add_script(script3)
+        valNoDeps.add_script(script4)
+
+        # test with honoring dependencies
+        valNoDeps.apply_package_selection(["tracking"], True)
+
+        self.assertEqual(2, len(valNoDeps.list_of_scripts))
+        self.assertTrue(len([s for s in valNoDeps.list_of_scripts if s.unique_name() == script3.unique_name()]) == 0)
+
+    def test_parse_header(self):
+        """
+        Test if the interval selection works if there is no
+        interval setting in the validation header
+        """
+        with tempfile.NamedTemporaryFile() as tf:
+            tf.write(b'#!/usr/bin/env python3\n'
+                     b'# -*- coding: utf-8 -*-\n'
+                     b'"""\n'
+                     b'<header>\n'
+                     b'<input>SomeIn.root</input>\n'
+                     b'<output>EvtGenSim.root</output>\n'
+                     b'<cacheable/>\n'
+                     b'<contact>tkuhr</contact>\n'
+                     b'<description>description_text</description>\n'
+                     b'</header>\n'
+                     b'"""\n')
+
+            # flush file content, so it can be read by the Script class used
+            # below
+            tf.flush()
+
+            script = validationscript.Script(tf.name, "package", None)
+            script.load_header()
+            self.assertTrue(script.is_cacheable())
+            self.assertTrue('EvtGenSim.root' in script.get_output_files())
+            self.assertTrue('SomeIn.root' in script.get_input_files())
+
     def test_meta_option_parser(self):
         """
         Test if the meta options parsers behaves nice

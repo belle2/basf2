@@ -687,6 +687,7 @@ class Validation:
         to_keep_dependencies = set()
 
         # compile the dependencies of selected scripts
+        # todo: won't work for nested dependencies
         if not ignore_dependencies:
             for script_obj in self.list_of_scripts:
                 if script_obj.package in selected_packages:
@@ -1023,8 +1024,7 @@ def execute():
 
         # Now we check whether we are running a complete validation or only
         # validating a certain set of packages:
-        if cmd_arguments.packages:
-            validation.packages = cmd_arguments.packages
+        if validation.packages:
             validation.log.note('Only validating package(s): {0}'
                                 .format(', '.join(validation.packages)))
         else:
@@ -1080,7 +1080,10 @@ def execute():
             validation.build_dependencies()
 
         if cmd_arguments.packages:
-            validation.apply_package_selection(cmd_arguments.packages)
+            validation.packages = cmd_arguments.packages
+
+        if validation.packages:
+            validation.apply_package_selection(validation.packages)
 
         # select only specific scripts, if this option has been set
         if cmd_arguments.select:

@@ -479,7 +479,7 @@ const ECLCluster* Particle::getECLCluster() const
     return eclClusters[m_mdstIndex];
   } else if (m_particleType == c_Track) {
     StoreArray<Track> tracks;
-    return tracks[m_mdstIndex]->getRelatedFrom<ECLCluster>();
+    return tracks[m_mdstIndex]->getRelated<ECLCluster>();
   } else {
     return nullptr;
   }

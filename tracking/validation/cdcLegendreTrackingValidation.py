@@ -4,6 +4,7 @@
 """
 <header>
   <contact>Thomas.Hauth@kit.edu</contact>
+  <input>EvtGenSimNoBkg.root</input>
   <output>CDCLegendreTrackingValidation.root</output>
   <description>This module validates that legendre track finding is capable of reconstructing tracks in Y(4S) runs.</description>
 </header>
@@ -23,7 +24,7 @@ from tracking.validation.run import TrackingValidationRun
 
 class CDCLegendre(TrackingValidationRun):
     n_events = N_EVENTS
-    generator_module = 'EvtGenInput'
+    root_input_file = '../EvtGenSimNoBkg.root'
     finder_module = 'TrackFinderCDCLegendreTracking'
     fit_geometry = None
     pulls = True

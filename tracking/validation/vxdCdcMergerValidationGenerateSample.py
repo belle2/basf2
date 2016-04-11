@@ -5,6 +5,7 @@
 <header>
   <contact>tracking@belle2.kek.jp</contact>
   <output>VxdCdcValidationHarvested.root</output>
+  <input>EvtGenSimNoBkg.root</input>
   <description>This module generates events for the V0 validation.</description>
 </header>
 """
@@ -30,19 +31,12 @@ def run():
     basf2.set_random_seed(1337)
     path = basf2.create_path()
 
-    # generateY4S(1000, path=path)
-
-    path.add_module('EventInfoSetter',
-                    evtNumList=[1000],
-                    runList=[1],
-                    expList=[1]
-                    )
-
-    path.add_module('EvtGenInput')
-
+    rootinput = basf2.register_module('RootInput')
+    rootinput.param('inputFileName', "../EvtGenSimNoBkg.root")
+    path.add_module(rootinput)
     path.add_module('Gearbox')
-    add_simulation(path, components=components)
-    add_reconstruction(path, components=components)
+
+    add_reconstruction(path, components=components, pruneTracks=False)
 
     # convert to TrackCands so tracks can be matched
     path.add_module("GenfitTrackCandidatesCreator", recoTracksStoreArrayName='VXDRecoTracks',

@@ -4,6 +4,7 @@
 """
 <header>
   <contact>oliver.frost@desy.de</contact>
+  <input>EvtGenSimNoBkg.root</input>
   <output>CDCLocalTrackingValidation.root</output>
   <description>This module validates that local track finding is capable of reconstructing tracks in Y(4S) runs.</description>
 </header>
@@ -24,7 +25,7 @@ from tracking.validation.run import TrackingValidationRun
 
 class CDCLocal(TrackingValidationRun):
     n_events = N_EVENTS
-    generator_module = 'EvtGenInput'
+    root_input_file = '../EvtGenSimNoBkg.root'
     finder_module = 'TrackFinderCDCAutomaton'
     fit_geometry = None
     pulls = True

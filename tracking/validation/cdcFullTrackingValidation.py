@@ -4,6 +4,7 @@
 """
 <header>
   <contact>Thomas.Hauth@kit.edu</contact>
+  <input>EvtGenSimNoBkg.root</input>
   <output>CDCFullTrackingValidation.root</output>
   <description>This script validates the full CDC tracking chain with a legendre step first
   and a cellular automaton step second in Y(4S) runs.</description>
@@ -25,7 +26,7 @@ from tracking.validation.run import TrackingValidationRun
 
 class CDCFull(TrackingValidationRun):
     n_events = N_EVENTS
-    generator_module = 'EvtGenInput'
+    root_input_file = '../EvtGenSimNoBkg.root'
     finder_module = staticmethod(tracking.add_cdc_track_finding)
     tracking_coverage = {
         'UsePXDHits': False,

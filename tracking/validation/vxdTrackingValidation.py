@@ -4,6 +4,7 @@
 """
 <header>
   <contact>tracking@belle2.kek.jp</contact>
+  <input>EvtGenSimNoBkg.root</input>
   <output>VXDTrackingValidation.root</output>
   <description>This module validates that the vxd track finding is capable of reconstructing tracks in Y(4S) runs.</description>
 </header>
@@ -24,7 +25,7 @@ import tracking
 
 class VXD(TrackingValidationRun):
     n_events = N_EVENTS
-    generator_module = 'EvtGenInput'
+    root_input_file = '../EvtGenSimNoBkg.root'
     components = None
 
     finder_module = staticmethod(lambda path: tracking.add_vxd_track_finding(path, components=["PXD", "SVD"]))

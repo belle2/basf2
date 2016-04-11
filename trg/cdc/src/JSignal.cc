@@ -668,8 +668,12 @@ namespace Belle2{
         }
       }
 
-      if(from->m_argumentSignals.size()==0) from->initArgumentSignals();
-      if(to->m_argumentSignals.size()==0) to->initArgumentSignals();
+      if(from) {
+        if(from->m_argumentSignals.size()==0) from->initArgumentSignals();
+      }
+      if(to) {
+        if(to->m_argumentSignals.size()==0) to->initArgumentSignals();
+      }
     }
     // For integer case.
     for(unsigned iCondition=0; iCondition<data.size(); iCondition++){

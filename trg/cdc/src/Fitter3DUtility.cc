@@ -180,7 +180,7 @@ double Fitter3DUtility::calPhi(double wirePhi, double driftTime, double eventTim
 
   double result = wirePhi;
   // time is in 2ns rms clock.
-  double t_dPhi = (driftTime - eventTime)*2*40/1000;
+  double t_dPhi = (driftTime - eventTime)*1000/1017.774*2*40/1000;
   // Change to radian
   // rr is cm scale.
   t_dPhi=atan(t_dPhi/rr/10);

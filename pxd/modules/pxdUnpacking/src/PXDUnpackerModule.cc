@@ -292,12 +292,12 @@ struct dhc_direct_readout_frame_zsd : public dhc_direct_readout_frame {
 struct dhc_onsen_trigger_frame {
   const dhc_frame_header_word0 word0;
   const ubig16_t trignr0;
-  const ubig32_t magic1;/// redundant
-  const ubig32_t trignr1;
-  const ubig32_t trigtag1;
-  const ubig32_t magic2;/// redundant
-  const ubig32_t trignr2;/// redundant, DATCON check
-  const ubig32_t trigtag2;/// redundant, DATCON check
+  const ubig32_t magic1;//! CAFExxxx , redundant
+  const ubig32_t trignr1;//! HLT Trigger/Tag part 1
+  const ubig32_t trigtag1;//! HLT Trigger/Tag part 2
+  const ubig32_t magic2;/// CAFExxxx, redundant
+  const ubig32_t trignr2;/// redundant, DATCON Trigger/Tag part 1
+  const ubig32_t trigtag2;/// redundant, DATCON Trigger/Tag part 2
   const unsigned int crc32;
 
   inline unsigned int getFixedSize(void) const

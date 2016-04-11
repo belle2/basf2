@@ -5,6 +5,7 @@
 <header>
   <output>EvtGenSimNoBkg.root</output>
   <contact>tkuhr</contact>
+  <cacheable/>
   <description>This steering file produces 1000 generic BBbar events with EvtGen
   and runs the detector simulation without mixing in background.</description>
 </header>

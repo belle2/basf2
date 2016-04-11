@@ -174,7 +174,6 @@ namespace Belle2 {
     int m_eclPureDigitMultip; /**< Number of ECLPureDigits per event */
     std::vector<int>* m_eclPureDigitIdx; /**< ECLPureDigit index */
     std::vector<int>* m_eclPureDigitToMc; /**< Index of MCParticle related to that ECLPureDigit */
-    //std::vector<int>* m_eclPureDigitToHit; /**< Index of Hit related to that ECLPureDigit */
     std::vector<int>* m_eclPureDigitCellId; /**< Number of ECLPureDigit CellId */
     std::vector<int>* m_eclPureDigitAmp;  /**< ECLPureDigit amplitude */
     std::vector<int>* m_eclPureDigitTimeFit;  /**< ECLPureDigit timing */

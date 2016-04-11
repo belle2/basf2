@@ -33,6 +33,16 @@ class Plotter(object):
     Base class for all Plotters.
     """
 
+    # stupid workaround for doxygen refusing to document things
+
+    #: @fn set_errorbar_options(errorbar_kwargs)
+    #: Overrides default errorbar options for datapoint errorbars
+
+    #: @var xscale
+    #: limit scale
+    #: @var yscale
+    #: limit scale
+
     #: Plots added to the axis so far
     plots = None
     #: Labels of the plots added so far
@@ -45,9 +55,7 @@ class Plotter(object):
     ymin = None
     #: Maximum y value
     ymax = None
-    #: y limit scale
     yscale = 0.0
-    #: x limit scale
     xscale = 0.0
     #: figure which is used to draw
     figure = None
@@ -76,7 +84,9 @@ class Plotter(object):
         self.labels = []
         self.xmin, self.xmax = float(0), float(1)
         self.ymin, self.ymax = float(0), float(1)
+        #: y limit scale
         self.yscale = 0.1
+        #: x limit scale
         self.xscale = 0.0
 
         #: Default keyword arguments for plot function
@@ -213,6 +223,10 @@ class PurityOverEfficiency(Plotter):
     """
     Plots the purity over the efficiency also known as ROC curve
     """
+    #: @var xmax
+    #: Maximum x value
+    #: @var ymax
+    #: Maximum y value
 
     def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None):
         """
@@ -252,6 +266,10 @@ class RejectionOverEfficiency(Plotter):
     """
     Plots the rejection over the efficiency also known as ROC curve
     """
+    #: @var xmax
+    #: Maximum x value
+    #: @var ymax
+    #: Maximum y value
 
     def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None):
         """
@@ -292,6 +310,10 @@ class Diagonal(Plotter):
     """
     Plots the purity in each bin over the classifier output.
     """
+    #: @var xmax
+    #: Maximum x value
+    #: @var ymax
+    #: Maximum y value
 
     def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None):
         """
@@ -475,6 +497,12 @@ class Difference(Plotter):
     """
     Plots the difference between two histograms
     """
+    #: @var xmax
+    #: Maximum x value
+    #: @var ymax
+    #: Maximum y value
+    #: @var ymin
+    #: min y value
 
     def add(self, data, column, minuend_mask, subtrahend_mask, weight_column=None):
         """

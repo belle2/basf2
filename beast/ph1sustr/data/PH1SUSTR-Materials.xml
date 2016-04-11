@@ -20,7 +20,6 @@
     </Components>
   </Material>
 
-
   <Material name="PH1SUSTR"> <!-- Bi4Ge3O12 -->
     <density unit="g/cm3">7.130</density>
     <Components>
@@ -29,126 +28,6 @@
        <Element fraction="0.1541">O</Element>
     </Components>
   </Material>
-
-  <Material name="StainlessSteel304">
-    <density unit="g/cm3">0.03</density>
-    <Components>
-       <Element fraction="0.76">Fe</Element>
-       <Element fraction="0.13">Cr</Element>
-       <Element fraction="0.11">Ni</Element>
-    </Components>
-  </Material>
-
-  <Material name="G10">
-    <density unit="g/cm3">1.7</density>
-    <Components>
-       <Element fraction="0.2802">Si</Element>
-       <Element fraction="0.3874">O</Element>
-       <Element fraction="0.304">C</Element>
-       <Element fraction="0.0284">H</Element>
-    </Components>
-  </Material>
-
-  <Material name="MetalCopper">
-    <density unit="g/cm3">8.967</density>
-    <Components>
-       <Element fraction="1.0">Cu</Element>
-    </Components>
-  </Material>
-
-  <Material name="ststeel">
-    <density unit="g/cm3">7.7</density>
-    <Components>
-       <Element fraction="0.04">C</Element>
-       <Element fraction="0.88">Fe</Element>
-       <Element fraction="0.08">Co</Element>
-    </Components>
-  </Material>
-
-  <Material name="AusteniticStainlessSteel">
-    <density unit="g/cm3">8.02</density>
-    <Components>
-       <Element fraction="0.68">Fe</Element>
-       <Element fraction="0.19">Cr</Element>
-       <Element fraction="0.10">Ni</Element>
-       <Element fraction="0.02">Mn</Element>
-       <Element fraction="0.01">Si</Element>
-    </Components>
-  </Material>
-
-  <Material name="MaterialVessel">
-    <density unit="g/cm3">7.7</density>
-    <Components>
-       <Element fraction="0.0003">C</Element>
-       <Element fraction="0.02">Mn</Element>
-       <Element fraction="0.00045">P</Element>
-       <Element fraction="0.0003">S</Element>
-       <Element fraction="0.0075">Si</Element>
-       <Element fraction="0.19">Cr</Element>
-       <Element fraction="0.10">Ni</Element>
-       <Element fraction="0.001">N</Element>
-       <Element fraction="0.68045">Fe</Element>
-    </Components>
-  </Material>
-  
-  <Material name="ststeel304L">
-    <density unit="g/cm3">7.7</density>
-    <Components>
-       <Element fraction="0.0003">C</Element>
-       <Element fraction="0.02">Mn</Element>
-       <Element fraction="0.00045">P</Element>
-       <Element fraction="0.0003">S</Element>
-       <Element fraction="0.0075">Si</Element>
-       <Element fraction="0.19">Cr</Element>
-       <Element fraction="0.10">Ni</Element>
-       <Element fraction="0.001">N</Element>
-       <Element fraction="0.68045">Fe</Element>
-    </Components>
-  </Material>
-
-  <Material name="meatCuScreen">
-    <density unit="g/cm3">8.95</density>
-    <Components>
-       <Element fraction="0.9">Cu</Element>
-       <Element fraction="0.1">Zn</Element>
-    </Components>
-  </Material>
-
-  <Material name="Kovar">
-    <density unit="g/cm3">8.36</density>
-    <Components>
-       <Element fraction="0.536">Fe</Element>
-       <Element fraction="0.29">Ni</Element>
-       <Element fraction="0.17">Co</Element>
-       <Element fraction="0.003">Mn</Element>
-       <Element fraction="0.001">Si</Element>
-    </Components>
-  </Material>
-
-  <Material name="Quartz">
-    <density unit="g/cm3">2.64</density>
-    <Components>
-       <Element fraction="0.536">Si</Element>
-       <Element fraction="0.29">Ni</Element>
-       <Element fraction="0.17">Co</Element>
-       <Element fraction="0.003">Mn</Element>
-       <Element fraction="0.001">Si</Element>
-    </Components>
-  </Material>
-
-  <Material name="Aluminum">
-     <density unit="g/cm3">2.70</density>
-     <Components>
-        <Element fraction="1.0">Al</Element>
-     </Components>
-   </Material>
-
-   <Material name="Tungsten">
-     <density unit="g/cm3">19.3</density>
-     <Components>
-        <Element fraction="1.0">W</Element>
-     </Components>
-   </Material>
 
    <Material name="SiO2">
      <state>Solid</state>
@@ -237,15 +116,6 @@
       <Material fraction="0.75">O</Material>     
     </Components>  
    </Material>
-   
-   <Material name="ZnO">
-     <state>Solid</state>
-     <Components>   
-      <Material fraction="0.5">Zn</Material> 
-      <Material fraction="0.5">O</Material>     
-    </Components>  
-   </Material>
-
 
    <Material name="FGA">
      <state>Solid</state>
@@ -268,7 +138,7 @@
       <Material fraction="0.106060">O</Material>    
     </Components>  
    </Material>
-   
+
    <Material name="FG_Epoxy">
      <state>Solid</state>
      <Components>   
@@ -276,7 +146,4 @@
       <Material fraction="0.6">Epoxy_C15H44O7</Material>     
     </Components>  
    </Material>
-
-
 </Materials>
-  

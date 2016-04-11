@@ -354,7 +354,7 @@ namespace Belle2 {
         }
         G4double dy_layer2 = 0.001 / 2.*InchtoCm;
         G4VSolid* s_layer2 = new G4Box("s_layer1", dx_layer, dy_layer2, dz_layer);
-        G4LogicalVolume* l_layer2 = new G4LogicalVolume(s_layer2, geometry::Materials::get("Aluminum"), "l_layer2");
+        G4LogicalVolume* l_layer2 = new G4LogicalVolume(s_layer2, geometry::Materials::get("Al"), "l_layer2");
         l_layer2->SetVisAttributes(green);
         for (int i = 0; i < dimz; i++) {
           G4Transform3D transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *

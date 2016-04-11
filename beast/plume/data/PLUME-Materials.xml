@@ -20,17 +20,6 @@
     </Components>
   </Material>
 
-
-  <Material name="Kapton">
-    <density unit="g/cm3">1.42</density>
-    <Components>
-      <Element fraction="0.0273">H</Element>
-      <Element fraction="0.7213">C</Element>
-      <Element fraction="0.0765">N</Element>
-      <Element fraction="0.1749">O</Element>
-    </Components>
-  </Material>
-
   <Material name="Glue">
     <density unit="g/cm3">1.3</density>
     <Components>
@@ -55,25 +44,7 @@
       <Element fraction="1.0">Si</Element>
     </Components>
   </Material>
-
-  <Material name="Quartz">
-    <density unit="g/cm3">2.64</density>
-    <Components>
-      <Element fraction="0.536">Si</Element>
-      <Element fraction="0.29">Ni</Element>
-      <Element fraction="0.17">Co</Element>
-      <Element fraction="0.003">Mn</Element>
-      <Element fraction="0.001">Si</Element>
-    </Components>
-  </Material>
-
-  <Material name="Aluminium">
-    <density unit="g/cm3">2.70</density>
-    <Components>
-      <Element fraction="1.0">Al</Element>
-    </Components>
-  </Material>  
-
+  
   <Material name="SiO2">
     <state>Solid</state>
     <Components>   
@@ -81,18 +52,12 @@
       <Material fraction="0.666667">O</Material> 
     </Components>  
   </Material>
-  
 
   <Material name="SiO2Al">
     <density unit="g/cm3">2.3</density>
     <Components>
       <Material fraction="0.89">SiO2</Material>     
-      <Material fraction="0.11">Aluminium</Material> 
+      <Material fraction="0.11">Al</Material> 
     </Components>
   </Material>
-
-
-
-
 </Materials>
-  

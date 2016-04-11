@@ -130,7 +130,7 @@ namespace Belle2 {
         G4VSolid* s_plate = new G4Box("s_plate", dx_plate, dy_plate, dz_plate);
 
         //place plate volume
-        G4LogicalVolume* l_plate = new G4LogicalVolume(s_plate,  geometry::Materials::get("Aluminum") , "l_plate", 0, 0);
+        G4LogicalVolume* l_plate = new G4LogicalVolume(s_plate,  geometry::Materials::get("Al") , "l_plate", 0, 0);
         G4VisAttributes* white = new G4VisAttributes(G4Colour(1, 1, 1));
         white->SetForceAuxEdgeVisible(true);
         l_plate->SetVisAttributes(white);

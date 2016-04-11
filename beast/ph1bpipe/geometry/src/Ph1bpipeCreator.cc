@@ -69,7 +69,7 @@ namespace Belle2 {
       double pillar_length = 3. * CLHEP::cm;
       double pillar_width = pillar_length;
       G4VSolid* s_bppillar = new G4Box("s_bppillar", pillar_length, pillar_height, pillar_width);
-      G4LogicalVolume* l_bppillar = new G4LogicalVolume(s_bppillar,  geometry::Materials::get("Aluminum") , "l_bppillar", 0, 0);
+      G4LogicalVolume* l_bppillar = new G4LogicalVolume(s_bppillar,  geometry::Materials::get("Al") , "l_bppillar", 0, 0);
       G4VisAttributes* white = new G4VisAttributes(G4Colour(1, 1, 1));
       white->SetForceAuxEdgeVisible(true);
       l_bppillar->SetVisAttributes(white);
@@ -92,7 +92,7 @@ namespace Belle2 {
       double y_reih = 2.3 * CLHEP::cm / 2.;
       double z_reih = 48. * CLHEP::cm / 2.;
       G4VSolid* s_reih = new G4Box("s_reih", x_reih, y_reih, z_reih);
-      G4LogicalVolume* l_reih = new G4LogicalVolume(s_reih,  geometry::Materials::get("Aluminum") , "l_reih", 0, 0);
+      G4LogicalVolume* l_reih = new G4LogicalVolume(s_reih,  geometry::Materials::get("Al") , "l_reih", 0, 0);
       l_reih->SetVisAttributes(white);
       G4ThreeVector Reihpos = G4ThreeVector(72.8780869619 * CLHEP::mm, 0, 1.35841468498 * CLHEP::mm);
       new G4PVPlacement(0, Reihpos, l_reih, "p_Reih1", &topVolume, false, 1);
@@ -103,7 +103,7 @@ namespace Belle2 {
       double y_reiv = 5.2 * CLHEP::cm / 2.;
       double z_reiv = 140. * CLHEP::cm / 2.;
       G4VSolid* s_reiv = new G4Box("s_reiv", x_reiv, y_reiv, z_reiv);
-      G4LogicalVolume* l_reiv = new G4LogicalVolume(s_reiv,  geometry::Materials::get("Aluminum") , "l_reiv", 0, 0);
+      G4LogicalVolume* l_reiv = new G4LogicalVolume(s_reiv,  geometry::Materials::get("Al") , "l_reiv", 0, 0);
       l_reiv->SetVisAttributes(white);
       //G4ThreeVector Reivpos = G4ThreeVector(0, -77.5018052955 * CLHEP::mm, 0);
       G4ThreeVector Reivpos = G4ThreeVector(0, -83.0 * CLHEP::mm, 0);

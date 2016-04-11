@@ -182,7 +182,7 @@ namespace Belle2 {
 
         //create copper layer on each side of the G10 board
         G4Box* s_Culayer = new G4Box("s_Culayer", dx_board, dy_board, dz_Culayer);
-        G4LogicalVolume* l_Culayer = new G4LogicalVolume(s_Culayer, geometry::Materials::get("MetalCopper"), "l_Culayer");
+        G4LogicalVolume* l_Culayer = new G4LogicalVolume(s_Culayer, geometry::Materials::get("Cu"), "l_Culayer");
         l_Culayer->SetVisAttributes(coppercolor);
 
         G4double r_Culayer_bot = r_board - dz_board - dz_Culayer;
@@ -193,7 +193,7 @@ namespace Belle2 {
         G4VSolid* s_scint = new G4Box("s_scint", dx_scint, dy_scint, dz_scint);
         G4VSolid* s_Al = new G4Box("s_Al", dx_Al, dy_Al, dz_Al);
         s_Al = new G4SubtractionSolid("s_Al", s_Al, s_scint, 0, G4ThreeVector(0, 0, 0));
-        G4LogicalVolume* l_Al = new G4LogicalVolume(s_Al, geometry::Materials::get("Aluminum"), "l_Al");
+        G4LogicalVolume* l_Al = new G4LogicalVolume(s_Al, geometry::Materials::get("Al"), "l_Al");
         l_Al->SetVisAttributes(gray);
 
         G4LogicalVolume* l_scint = new G4LogicalVolume(s_scint, geometry::Materials::get("G4_POLYSTYRENE"), "l_scint", 0, m_sensitive);

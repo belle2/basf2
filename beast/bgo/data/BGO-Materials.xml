@@ -20,15 +20,6 @@
     </Components>
   </Material>
 
-  <Material name="BGO"> <!-- Bi4Ge3O12 -->
-    <density unit="g/cm3">7.130</density>
-    <Components>
-       <Element fraction="0.6710">Bi</Element>
-       <Element fraction="0.1749">Ge</Element>
-       <Element fraction="0.1541">O</Element>
-    </Components>
-  </Material>
-
   <Material name="StainlessSteel304">
     <density unit="g/cm3">0.03</density>
     <Components>
@@ -45,13 +36,6 @@
        <Element fraction="0.3874">O</Element>
        <Element fraction="0.304">C</Element>
        <Element fraction="0.0284">H</Element>
-    </Components>
-  </Material>
-
-  <Material name="MetalCopper">
-    <density unit="g/cm3">8.967</density>
-    <Components>
-       <Element fraction="1.0">Cu</Element>
     </Components>
   </Material>
 
@@ -89,7 +73,7 @@
        <Element fraction="0.68045">Fe</Element>
     </Components>
   </Material>
-  
+
   <Material name="ststeel304L">
     <density unit="g/cm3">7.7</density>
     <Components>
@@ -134,50 +118,4 @@
        <Element fraction="0.001">Si</Element>
     </Components>
   </Material>
-
-
-  <Material name="Helium">
-     <density unit="g/cm3">1.786e-4</density>
-     <state>Gas</state>
-     <Components>
-        <Element fraction="1.0">He</Element>
-     </Components>
-  </Material>
-
-  
-  <Material name="MaterialGas">
-     <density unit="g/cm3">6.6908e-4</density>
-     <state>Gas</state>
-     <Components>
-        <Element fraction="0.1751">He</Element>
-        <Element fraction="0.2251">C</Element>
-        <Element fraction="0.5998">O</Element>
-     </Components>
-  </Material>
-
-   <Material name="MaterialEnCap">
-     <density unit="g/cm3">2.70</density>
-     <Components>
-        <Element fraction="1.0">Al</Element>
-     </Components>
-   </Material>
-
-
-  <Material name="Aluminum">
-     <density unit="g/cm3">2.70</density>
-     <Components>
-        <Element fraction="1.0">Al</Element>
-     </Components>
-   </Material>
-
-   <Material name="Tungsten">
-     <density unit="g/cm3">19.3</density>
-     <Components>
-        <Element fraction="1.0">W</Element>
-     </Components>
-   </Material>
-
-
-
 </Materials>
-  

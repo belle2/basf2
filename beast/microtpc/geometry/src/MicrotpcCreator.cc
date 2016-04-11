@@ -231,7 +231,7 @@ namespace Belle2 {
           s_Ring = new G4SubtractionSolid(Name, s_Ring, s_RingHoles, 0, G4ThreeVector(x_Rod[i], y_Rod[i], 0));
         }
 
-        G4LogicalVolume* l_Ring = new G4LogicalVolume(s_Ring, geometry::Materials::get("MetalCopper"), "l_Ring");
+        G4LogicalVolume* l_Ring = new G4LogicalVolume(s_Ring, geometry::Materials::get("Cu"), "l_Ring");
         G4int RingNb = 10;
         G4double hspacer = 1.*CLHEP::cm;
         G4double offset = dz_iGasTPC - 5.*CLHEP::cm;
@@ -254,7 +254,7 @@ namespace Belle2 {
           sprintf(Name, "s_Anode_%d", i);
           s_Anode = new G4SubtractionSolid(Name, s_Anode, s_RingHoles, 0, G4ThreeVector(x_Rod[i], y_Rod[i], 0));
         }
-        G4LogicalVolume* l_Anode = new G4LogicalVolume(s_Anode, geometry::Materials::get("MetalCopper"), "l_Anode");
+        G4LogicalVolume* l_Anode = new G4LogicalVolume(s_Anode, geometry::Materials::get("Cu"), "l_Anode");
         x_Ring[10] = 0;
         y_Ring[10] = 0;
         z_Ring[10] = -dz_iGasTPC + offset + (hspacer + 2.*dz_Ring) * RingNb;
@@ -372,7 +372,7 @@ namespace Belle2 {
         s_CuPlate = new G4SubtractionSolid("s_CuPlate", s_CuPlate, s_PixelChip, 0, G4ThreeVector(0, 0, 0));
 
 
-        G4LogicalVolume* l_CuPlate = new G4LogicalVolume(s_CuPlate, geometry::Materials::get("MetalCopper"), "l_CuPlate");
+        G4LogicalVolume* l_CuPlate = new G4LogicalVolume(s_CuPlate, geometry::Materials::get("Cu"), "l_CuPlate");
         new G4PVPlacement(0, G4ThreeVector(x_PixelChip, y_PixelChip, z_PixelChip), l_CuPlate, "p_CuPlate", l_iGasTPC, false, 1);
 
         //create pixel board

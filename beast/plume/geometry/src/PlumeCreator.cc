@@ -145,7 +145,7 @@ namespace Belle2 {
 
         //create metal layers
         G4Box* s_metal = new G4Box("s_metal", dx_foam, dy_foam, AluminiumThickness / 2.);
-        G4LogicalVolume* l_metal = new G4LogicalVolume(s_metal, geometry::Materials::get("Aluminium"), "l_metal");
+        G4LogicalVolume* l_metal = new G4LogicalVolume(s_metal, geometry::Materials::get("Al"), "l_metal");
         G4double r_metal = r_Kapton + AirGap + (KaptonThickness + AluminiumThickness) / 2.;
         new G4PVPlacement(0, G4ThreeVector(0, 0, -r_metal), l_metal, "p_metal_0", l_env, false, 1);
         new G4PVPlacement(0, G4ThreeVector(0, 0, r_metal), l_metal, "p_metal_1", l_env, false, 1);

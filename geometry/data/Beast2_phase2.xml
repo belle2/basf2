@@ -22,6 +22,7 @@
   <xi:include href="../ecl/ECL-Materials.xml"/>
   <xi:include href="../bklm/BKLM-Materials.xml"/>
   <xi:include href="../eklm/EKLMMaterials.xml"/>
+  <xi:include href="../beast/bgo/BGO-Materials.xml" />
   <xi:include href="../beast/microtpc/MICROTPC-Materials.xml"/>
   <xi:include href="../beast/pindiode/PINDIODE-Materials.xml"/>
   <xi:include href="../beast/beamabort/BEAMABORT-Materials.xml"/>
@@ -38,6 +39,7 @@
   <xi:include href="../geometry/MagneticFieldConstant4LimitedRCDC.xml"/>
   <xi:include href="../geometry/MagneticField2d.xml"/>
   <xi:include href="../geometry/MagneticField3d.xml"/>
+  <xi:include href="../geometry/MagneticField3dTotalVolume.xml"/>
 
   <!-- Accelerator -->
   <xi:include href="SuperKEKB.xml"/>
@@ -68,11 +70,9 @@
   <xi:include href="../beast/plume/PLUME_pos2.xml"/>
   <xi:include href="../beast/qcsmonitor/QCSMONITOR-phase2.xml"/>
 
-
   <!-- VXD Tracking and MUID muon identification -->
   <Tracking>
     <xi:include href="../tracking/VXDTFindex.xml"/>
     <xi:include href="../tracking/MuidParameters.xml"/>
   </Tracking>
-
 </Detector>

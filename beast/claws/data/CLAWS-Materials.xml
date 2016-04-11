@@ -7,17 +7,6 @@
       <Material fraction="0.98">Mylar</Material>
     </Components>
   </Material>
-
-  <Material name="G10">
-    <density unit="g/cm3">1.7</density>
-    <Components>
-      <Element fraction="0.2802">Si</Element>
-      <Element fraction="0.3874">O</Element>
-      <Element fraction="0.304">C</Element>
-    <Element fraction="0.0284">H</Element>
-    </Components>
-  </Material>
-
 </Materials>
 
 

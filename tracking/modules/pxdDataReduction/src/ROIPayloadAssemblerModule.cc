@@ -214,11 +214,11 @@ void ROIPayloadAssemblerModule::DESYremap(unsigned int& row1, unsigned int& row2
   {
     if (col1 <= 63) {
       col1 = 0;
-    } else if (col1 <= 63) {
-      col1 = 62;
     } else if (col1 <= 127) {
-      col1 = 125;
+      col1 = 62;
     } else if (col1 <= 191) {
+      col1 = 125;
+    } else { // col1<=255
       col1 = 187;
     }
     if (col2 >= 192) {
@@ -227,7 +227,7 @@ void ROIPayloadAssemblerModule::DESYremap(unsigned int& row1, unsigned int& row2
       col2 = 187;
     } else if (col2 >= 64) {
       col2 = 124;
-    } else {
+    } else { // col1>=0
       col2 = 62;
     }
   }

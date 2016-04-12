@@ -11,6 +11,7 @@
 #include <beast/microtpc/modules/MicrotpcStudyModule.h>
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcHit.h>
+#include <beast/microtpc/dataobjects/MicrotpcDataHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcRecoTrack.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -213,6 +214,17 @@ void MicrotpcStudyModule::event()
   StoreArray<MicrotpcHit> Hits;
   StoreArray<MicrotpcRecoTrack> Tracks;
 
+  StoreArray<MicrotpcDataHit> DataHits;
+  int dentries = DataHits.getEntries();
+  for (int j = 0; j < dentries; j++) {
+    MicrotpcDataHit* aHit = DataHits[j];
+    int detNb = aHit->getdetNb();
+    //int trkID = aHit->gettrkID();
+    int col = aHit->getcolumn();
+    int row = aHit->getrow();
+    int tot = aHit->getTOT();
+    cout << " col " << col << " row " << row << " tot " << tot << " detNb " << detNb << endl;
+  }
   Bool_t EdgeCut[8];
   double esum[8];
   //Initialize recoil and hit type counters

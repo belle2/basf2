@@ -12,6 +12,7 @@
 #include <beast/microtpc/modules/TrackFitterModule.h>
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcHit.h>
+#include <beast/microtpc/dataobjects/MicrotpcDataHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcRecoTrack.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -139,13 +140,16 @@ void TrackFitterModule::event()
   StoreArray<MCParticle> particles;
   StoreArray<MicrotpcSimHit> TpcSimHits;
   StoreArray<MicrotpcHit> TpcHits;
-
+  StoreArray<MicrotpcDataHit> TpcDataHits;
+  /*
   //Skip events with no TpcSimHits, but continue the event counter
   if (TpcHits.getEntries() == 0) {
     Event++;
     return;
   }
+  */
   int nentries = TpcHits.getEntries();
+  int nEntries = TpcDataHits.getEntries();
   //auto columnArray = new vector<int>[nTPC](); //column
   //auto rowArray = new vector<int>[nTPC](); //row
   //auto bcidArray = new vector<int>[nTPC](); //BCID
@@ -153,8 +157,9 @@ void TrackFitterModule::event()
   //int i_tpc[8];
   //int i_tpc1[8];
   //int i_tpc2[8];
-  if (nentries > 0) {
+  if (nentries > 0 || nEntries > 0) {
     //cout << " nTPC " << nTPC << endl;
+    if (nEntries > 0) nTPC = 1;
     for (int i = 0; i < nTPC; i++) {
 
       //i_tpc[i] = 0;
@@ -179,38 +184,95 @@ void TrackFitterModule::event()
         ynpts[j] = 0;
       }
 
-      //Determine T0 for each TPC
-      m_dchip_map.clear();
-      m_dchip.clear();
+      int fpxhits = 0;
+      int m_time_range = 0;
+      int m_totsum = 0;
+      float m_esum = 0;
 
-      for (int j = 0; j < nentries; j++) {
-        MicrotpcHit* aHit = TpcHits[j];
-        int detNb = aHit->getdetNb();
-        //int trkID = aHit->gettrkID();
-        int col = aHit->getcolumn();
-        int row = aHit->getrow();
-        int tot = aHit->getTOT();
-        int bcid = aHit->getBCID();
-        if (detNb == i) {
-          m_dchip_map[std::tuple<int, int>(col, row)] = 1;
-          m_dchip[std::tuple<int, int, int>(col, row, bcid)] = tot;
+      if (nentries > 0) {
+
+        //Determine T0 for each TPC
+        m_dchip_map.clear();
+        m_dchip.clear();
+
+        for (int j = 0; j < nentries; j++) {
+          MicrotpcHit* aHit = TpcHits[j];
+          int detNb = aHit->getdetNb();
+          //int trkID = aHit->gettrkID();
+          int col = aHit->getcolumn();
+          int row = aHit->getrow();
+          int tot = aHit->getTOT();
+          int bcid = aHit->getBCID();
+          if (detNb == i) {
+            m_dchip_map[std::tuple<int, int>(col, row)] = 1;
+            m_dchip[std::tuple<int, int, int>(col, row, bcid)] = tot;
+          }
         }
-      }
 
-      if (m_dchip_map.size() > 0) {
-        int fpxhits = m_dchip_map.size();
-        //cout << "fpxhits from size " << fpxhits << "  other " << m_dchip.size() << endl;
-        int time[fpxhits];
-        int itime[fpxhits];
+        if (m_dchip_map.size() > 0) {
+          fpxhits = m_dchip_map.size();
+          //cout << "fpxhits from size " << fpxhits << "  other " << m_dchip.size() << endl;
+          int time[fpxhits];
+          int itime[fpxhits];
 
-        fpxhits = 0;
-        if (m_dchip_map.size() != m_dchip.size()) {
+          fpxhits = 0;
+          if (m_dchip_map.size() != m_dchip.size()) {
+            for (auto& keyValuePair1 : m_dchip_map) {
+              const auto& key1 = keyValuePair1.first;
+              //column
+              int col = std::get<0>(key1);
+              //row
+              int row = std::get<1>(key1);
+              if (m_dchip_map[std::tuple<int, int>(col, row)] == 1) {
+                for (auto& keyValuePair2 : m_dchip) {
+                  const auto& key2 = keyValuePair2.first;
+                  //column
+                  int col2 = std::get<0>(key2);
+                  //row
+                  int row2 = std::get<1>(key2);
+                  //bcid
+                  int bcid = std::get<2>(key2);
+                  //tot
+                  int tot = m_dchip[std::tuple<int, int, int>(col2, row2, bcid)];
+                  if (tot >= 0 && col2 == col && row2 == row) {
+                    time[fpxhits] = bcid;
+                  }
+                }
+                fpxhits++;
+              }
+            }
+          } else {
+            for (auto& keyValuePair2 : m_dchip) {
+              const auto& key2 = keyValuePair2.first;
+              //column
+              int col2 = std::get<0>(key2);
+              //row
+              int row2 = std::get<1>(key2);
+              //bcid
+              int bcid = std::get<2>(key2);
+              //tot
+              int tot = m_dchip[std::tuple<int, int, int>(col2, row2, bcid)];
+              if (tot >= 0)time[fpxhits] = bcid;
+              fpxhits++;
+            }
+          }
+          //cout << " fpxhits " << fpxhits << endl;
+          if (fpxhits == 0 || fpxhits > MAXSIZE)continue;
+
+          TMath::Sort(fpxhits, time, itime, false);
+          m_time_range = fabs(time[itime[0]] - time[itime[fpxhits - 1]]);
+          //cout << " m_time_range " << m_time_range << endl;
+          fpxhits = 0;
+          m_totsum = 0;
+          m_esum = 0;
           for (auto& keyValuePair1 : m_dchip_map) {
             const auto& key1 = keyValuePair1.first;
             //column
             int col = std::get<0>(key1);
             //row
             int row = std::get<1>(key1);
+            x[fpxhits] = col * (2. * m_ChipColumnX / (float)m_ChipColumnNb) - m_ChipColumnX + TPCCenter[i].X();
+            y[fpxhits] = row * (2. * m_ChipRowY / (float)m_ChipRowNb) - m_ChipRowY + TPCCenter[i].Y();
             if (m_dchip_map[std::tuple<int, int>(col, row)] == 1) {
               for (auto& keyValuePair2 : m_dchip) {
                 const auto& key2 = keyValuePair2.first;
@@ -223,204 +285,234 @@ void TrackFitterModule::event()
                 //tot
                 int tot = m_dchip[std::tuple<int, int, int>(col2, row2, bcid)];
                 if (tot >= 0 && col2 == col && row2 == row) {
-                  time[fpxhits] = bcid;
+                  z[fpxhits] = (m_PixelTimeBin / 2. + m_PixelTimeBin * (bcid - time[itime[0]])) * m_v_DG;
+                  m_totsum += tot;
+                  if (tot < 3) e[fpxhits] = fctQ_Calib1->Eval(tot) / (m_GEMGain1 * m_GEMGain2) * m_Workfct * 1e-3;
+                  else e[fpxhits] = fctQ_Calib2->Eval(tot) / (m_GEMGain1 * m_GEMGain2) * m_Workfct * 1e-3;
+                  m_esum += e[fpxhits];
                 }
               }
+
+              Track->SetPoint(fpxhits, x[fpxhits], y[fpxhits], z[fpxhits]);
+              //Track->SetPointError(fpxhits,0,0,e[fpxhits]);
+              Track->SetPointError(fpxhits, 0, 0, 1.);
+
+              for (int k = 0; k < 4; k++) {
+                if (0 <= col && col <= k)m_side[4 * k + 0] = k + 1;
+                if (80 - k <= col && col <= 80)m_side[4 * k + 1] = k + 1;
+                if (0 <= row && row <= 5 * k)m_side[4 * k + 2] = k + 1;
+                if (336 - 5 * k <= row && row <= 336)m_side[4 * k + 3] = k + 1;
+              }
+              if (col == 0) {
+                m_impact_y[0] += y[fpxhits];
+                ynpts[0]++;
+              }
+              if (col == 1) {
+                m_impact_y[1] += y[fpxhits];
+                ynpts[1]++;
+              }
+              if (col == 80) {
+                m_impact_y[2] += y[fpxhits];
+                ynpts[2]++;
+              }
+              if (col == 79) {
+                m_impact_y[3] += y[fpxhits];
+                ynpts[3]++;
+              }
+              if (row == 0) {
+                m_impact_x[0] += x[fpxhits];
+                xnpts[0]++;
+              }
+              if (row == 1) {
+                m_impact_x[1] += x[fpxhits];
+                xnpts[1]++;
+              }
+              if (row == 2) {
+                m_impact_x[2] += x[fpxhits];
+                xnpts[2]++;
+              }
+              if (row == 3) {
+                m_impact_x[3] += x[fpxhits];
+                xnpts[3]++;
+              }
+
               fpxhits++;
             }
           }
-        } else {
-          for (auto& keyValuePair2 : m_dchip) {
-            const auto& key2 = keyValuePair2.first;
-            //column
-            int col2 = std::get<0>(key2);
-            //row
-            int row2 = std::get<1>(key2);
-            //bcid
-            int bcid = std::get<2>(key2);
-            //tot
-            int tot = m_dchip[std::tuple<int, int, int>(col2, row2, bcid)];
-            if (tot >= 0)time[fpxhits] = bcid;
-            fpxhits++;
-          }
         }
-        //cout << " fpxhits " << fpxhits << endl;
-        if (fpxhits == 0 || fpxhits > MAXSIZE)continue;
+      }
+
+      if (nEntries > 0) {
+        fpxhits = TpcDataHits.getEntries();
+        int time[fpxhits];
+        int itime[fpxhits];
+        m_totsum = 0;
+        m_time_range = 0;
+        m_esum = 0;
+
+        for (int j = 0; j < nEntries; j++) {
+          MicrotpcDataHit* aHit = TpcDataHits[j];
+          int bcid = aHit->getBCID();
+          time[j] = bcid;
+        }
 
         TMath::Sort(fpxhits, time, itime, false);
         m_time_range = fabs(time[itime[0]] - time[itime[fpxhits - 1]]);
-        //cout << " m_time_range " << m_time_range << endl;
-        fpxhits = 0;
-        int m_totsum = 0;
-        float m_esum = 0;
-        for (auto& keyValuePair1 : m_dchip_map) {
-          const auto& key1 = keyValuePair1.first;
-          //column
-          int col = std::get<0>(key1);
-          //row
-          int row = std::get<1>(key1);
-          x[fpxhits] = col * (2. * m_ChipColumnX / (float)m_ChipColumnNb) - m_ChipColumnX + TPCCenter[i].X();
-          y[fpxhits] = row * (2. * m_ChipRowY / (float)m_ChipRowNb) - m_ChipRowY + TPCCenter[i].Y();
-          if (m_dchip_map[std::tuple<int, int>(col, row)] == 1) {
-            for (auto& keyValuePair2 : m_dchip) {
-              const auto& key2 = keyValuePair2.first;
-              //column
-              int col2 = std::get<0>(key2);
-              //row
-              int row2 = std::get<1>(key2);
-              //bcid
-              int bcid = std::get<2>(key2);
-              //tot
-              int tot = m_dchip[std::tuple<int, int, int>(col2, row2, bcid)];
-              if (tot >= 0 && col2 == col && row2 == row) {
-                z[fpxhits] = (m_PixelTimeBin / 2. + m_PixelTimeBin * (bcid - time[itime[0]])) * m_v_DG;
-                m_totsum += tot;
-                if (tot < 3) e[fpxhits] = fctQ_Calib1->Eval(tot) / (m_GEMGain1 * m_GEMGain2) * m_Workfct * 1e-3;
-                else e[fpxhits] = fctQ_Calib2->Eval(tot) / (m_GEMGain1 * m_GEMGain2) * m_Workfct * 1e-3;
-                m_esum += e[fpxhits];
-              }
-            }
-            Track->SetPoint(fpxhits, x[fpxhits], y[fpxhits], z[fpxhits]);
-            //Track->SetPointError(fpxhits,0,0,e[fpxhits]);
-            Track->SetPointError(fpxhits, 0, 0, 1.);
 
-            for (int k = 0; k < 4; k++) {
-              if (0 <= col && col <= k)m_side[4 * k + 0] = k + 1;
-              if (80 - k <= col && col <= 80)m_side[4 * k + 1] = k + 1;
-              if (0 <= row && row <= 5 * k)m_side[4 * k + 2] = k + 1;
-              if (336 - 5 * k <= row && row <= 336)m_side[4 * k + 3] = k + 1;
-            }
-            if (col == 0) {
-              m_impact_y[0] += y[fpxhits];
-              ynpts[0]++;
-            }
-            if (col == 1) {
-              m_impact_y[1] += y[fpxhits];
-              ynpts[1]++;
-            }
-            if (col == 80) {
-              m_impact_y[2] += y[fpxhits];
-              ynpts[2]++;
-            }
-            if (col == 79) {
-              m_impact_y[3] += y[fpxhits];
-              ynpts[3]++;
-            }
-            if (row == 0) {
-              m_impact_x[0] += x[fpxhits];
-              xnpts[0]++;
-            }
-            if (row == 1) {
-              m_impact_x[1] += x[fpxhits];
-              xnpts[1]++;
-            }
-            if (row == 2) {
-              m_impact_x[2] += x[fpxhits];
-              xnpts[2]++;
-            }
-            if (row == 3) {
-              m_impact_x[3] += x[fpxhits];
-              xnpts[3]++;
-            }
+        for (int j = 0; j < nEntries; j++) {
 
-            fpxhits++;
+          MicrotpcDataHit* aHit = TpcDataHits[j];
+          int bcid = aHit->getBCID();
+          int col = aHit->getcolumn();
+          int row = aHit->getrow();
+          int tot = aHit->getTOT();
+          x[j] = col * (2. * m_ChipColumnX / (float)m_ChipColumnNb) - m_ChipColumnX + TPCCenter[2].X();
+          y[j] = row * (2. * m_ChipRowY / (float)m_ChipRowNb) - m_ChipRowY + TPCCenter[2].Y();
+          z[j] = (m_PixelTimeBin / 2. + m_PixelTimeBin * (bcid - time[itime[0]])) * m_v_DG;
+          if (tot < 3) e[j] = fctQ_Calib1->Eval(tot) / (m_GEMGain1 * m_GEMGain2) * m_Workfct * 1e-3;
+          else e[j] = fctQ_Calib2->Eval(tot) / (m_GEMGain1 * m_GEMGain2) * m_Workfct * 1e-3;
+          m_esum += e[j];
+          m_totsum += tot;
+
+          Track->SetPoint(j, x[j], y[j], z[j]);
+          //Track->SetPointError(fpxhits,0,0,e[fpxhits]);
+          Track->SetPointError(j, 0, 0, 1.);
+
+          for (int k = 0; k < 4; k++) {
+            if (0 <= col && col <= k)m_side[4 * k + 0] = k + 1;
+            if (80 - k <= col && col <= 80)m_side[4 * k + 1] = k + 1;
+            if (0 <= row && row <= 5 * k)m_side[4 * k + 2] = k + 1;
+            if (336 - 5 * k <= row && row <= 336)m_side[4 * k + 3] = k + 1;
+          }
+          if (col == 0) {
+            m_impact_y[0] += y[j];
+            ynpts[0]++;
+          }
+          if (col == 1) {
+            m_impact_y[1] += y[j];
+            ynpts[1]++;
+          }
+          if (col == 80) {
+            m_impact_y[2] += y[j];
+            ynpts[2]++;
+          }
+          if (col == 79) {
+            m_impact_y[3] += y[j];
+            ynpts[3]++;
+          }
+          if (row == 0) {
+            m_impact_x[0] += x[j];
+            xnpts[0]++;
+          }
+          if (row == 1) {
+            m_impact_x[1] += x[j];
+            xnpts[1]++;
+          }
+          if (row == 2) {
+            m_impact_x[2] += x[j];
+            xnpts[2]++;
+          }
+          if (row == 3) {
+            m_impact_x[3] += x[j];
+            xnpts[3]++;
           }
         }
-
-        for (int j = 0; j < 4; j++) {
-          if (xnpts[j] > 0)m_impact_x[j] = m_impact_x[j] / ((double)xnpts[j]);
-          if (ynpts[j] > 0)m_impact_y[j] = m_impact_y[j] / ((double)ynpts[j]);
-        }
-
-        L = new float[fpxhits];
-        ix = new int[fpxhits];
-        iy = new int[fpxhits];
-        iz = new int[fpxhits];
-        TMath::Sort(fpxhits, x, ix, false);
-        TMath::Sort(fpxhits, y, iy, false);
-        TMath::Sort(fpxhits, z, iz, false);
-
-        TVirtualFitter::SetDefaultFitter("Minuit");
-        TVirtualFitter* min = TVirtualFitter::Fitter(0, 5);
-        min->SetDefaultFitter("Minuit");
-        min->SetObjectFit(Track);
-        min->SetFCN(SumDistance2_angles);
-
-        Double_t arglist[6] = { -1, 0, 0, 0, 0, 0};
-        min->ExecuteCommand("SET PRINT", arglist, 1);
-        min->ExecuteCommand("SET NOWARNINGS", arglist, 0);
-
-        XYZVector temp_vector3(0, 0, 0);
-        float pStart[5] = {0, 0, 0, 0, 0};
-        temp_vector3  = XYZVector(x[ix[fpxhits - 1]] - x[ix[0]] , y[iy[fpxhits - 1]] - y[iy[0]], z[iz[fpxhits - 1]] - z[iz[0]]);
-        float init_theta = TPCCenter[i].Theta();//temp_vector3.Theta();
-        float init_phi = TPCCenter[i].Phi();//temp_vector3.Phi();
-        pStart[0] = x[ix[0]];
-        pStart[1] = y[iy[0]];
-        pStart[2] = z[iz[0]];
-        pStart[3] = init_theta;
-        pStart[4] = init_phi;
-
-        min->SetParameter(0, "x0",    pStart[0], 0.01, 0, 0);
-        min->SetParameter(1, "y0",    pStart[1], 0.01, 0, 0);
-        min->SetParameter(2, "z0",    pStart[2], 0.01, 0, 0);
-        min->SetParameter(3, "theta", pStart[3], 0.0001, 0, TMath::Pi());
-        min->SetParameter(4, "phi",   pStart[4], 0.0001, -TMath::Pi(), TMath::Pi());
-
-        arglist[0] = 10000; // number of fucntion calls
-        arglist[1] = 0.001; // tolerance
-        min->ExecuteCommand("MIGRAD", arglist, 2);
-
-        int nvpar, nparx;
-        double amin, edm, errdef;
-        min->GetStats(amin, edm, errdef, nvpar, nparx);
-        m_chi2 = amin;
-
-        for (int j = 0; j < 5; j++) {
-          m_parFit[j] = 0;
-          m_parFit_err[j] = 0;
-          m_parFit[j] = min->GetParameter(j);
-          m_parFit_err[i] = min->GetParError(j);
-          for (int k = 0; k < 5; k++) {
-            //m_cov[j][k] = 0;
-            //m_cov[j][k] = min->GetCovarianceMatrixElement(j, k);
-            m_cov[j * 5 + k] = 0;
-            m_cov[j * 5 + k] = min->GetCovarianceMatrixElement(j, k);
-          }
-        }
-
-        TVector3 TrackDir(1, 0, 0);
-        TrackDir.SetTheta(m_parFit[3]);
-        TrackDir.SetPhi(m_parFit[4]);
-
-        m_theta = m_parFit[3] * TMath::RadToDeg();
-        m_phi   = m_parFit[4] * TMath::RadToDeg();
-
-        for (int j = 0; j < fpxhits; j++) {
-          TVector3 Point(x[j], y[j], z[j]);
-          L[j] = Point * TrackDir.Unit();
-        }
-
-        iL = new int [fpxhits];
-        TMath::Sort(fpxhits, L, iL, false);
-        m_trl = fabs(L[iL[fpxhits - 1]] - L[iL[0]]);
-
-        StoreArray<MicrotpcRecoTrack> RecoTracks;
-        RecoTracks.appendNew(i, fpxhits, m_chi2, m_theta, m_phi, m_esum, m_totsum, m_trl, m_time_range, m_parFit, m_parFit_err, m_cov,
-                             m_impact_x, m_impact_y, m_side);
-
-        delete [] iL;
-        delete min;
-        delete [] L;
-        delete [] ix;
-        delete [] iy;
-        delete [] iz;
       }
+
+      for (int j = 0; j < 4; j++) {
+        if (xnpts[j] > 0)m_impact_x[j] = m_impact_x[j] / ((double)xnpts[j]);
+        if (ynpts[j] > 0)m_impact_y[j] = m_impact_y[j] / ((double)ynpts[j]);
+      }
+
+      L = new float[fpxhits];
+      ix = new int[fpxhits];
+      iy = new int[fpxhits];
+      iz = new int[fpxhits];
+      TMath::Sort(fpxhits, x, ix, false);
+      TMath::Sort(fpxhits, y, iy, false);
+      TMath::Sort(fpxhits, z, iz, false);
+
+      TVirtualFitter::SetDefaultFitter("Minuit");
+      TVirtualFitter* min = TVirtualFitter::Fitter(0, 5);
+      min->SetDefaultFitter("Minuit");
+      min->SetObjectFit(Track);
+      min->SetFCN(SumDistance2_angles);
+
+      Double_t arglist[6] = { -1, 0, 0, 0, 0, 0};
+      min->ExecuteCommand("SET PRINT", arglist, 1);
+      min->ExecuteCommand("SET NOWARNINGS", arglist, 0);
+
+      XYZVector temp_vector3(0, 0, 0);
+      float pStart[5] = {0, 0, 0, 0, 0};
+      temp_vector3  = XYZVector(x[ix[fpxhits - 1]] - x[ix[0]] , y[iy[fpxhits - 1]] - y[iy[0]], z[iz[fpxhits - 1]] - z[iz[0]]);
+      float init_theta = TPCCenter[i].Theta();//temp_vector3.Theta();
+      float init_phi = TPCCenter[i].Phi();//temp_vector3.Phi();
+      pStart[0] = x[ix[0]];
+      pStart[1] = y[iy[0]];
+      pStart[2] = z[iz[0]];
+      pStart[3] = init_theta;
+      pStart[4] = init_phi;
+
+      min->SetParameter(0, "x0",    pStart[0], 0.01, 0, 0);
+      min->SetParameter(1, "y0",    pStart[1], 0.01, 0, 0);
+      min->SetParameter(2, "z0",    pStart[2], 0.01, 0, 0);
+      min->SetParameter(3, "theta", pStart[3], 0.0001, 0, TMath::Pi());
+      min->SetParameter(4, "phi",   pStart[4], 0.0001, -TMath::Pi(), TMath::Pi());
+
+      arglist[0] = 10000; // number of fucntion calls
+      arglist[1] = 0.001; // tolerance
+      min->ExecuteCommand("MIGRAD", arglist, 2);
+
+      int nvpar, nparx;
+      double amin, edm, errdef;
+      min->GetStats(amin, edm, errdef, nvpar, nparx);
+      m_chi2 = amin;
+
+      for (int j = 0; j < 5; j++) {
+        m_parFit[j] = 0;
+        m_parFit_err[j] = 0;
+        m_parFit[j] = min->GetParameter(j);
+        m_parFit_err[i] = min->GetParError(j);
+        for (int k = 0; k < 5; k++) {
+          //m_cov[j][k] = 0;
+          //m_cov[j][k] = min->GetCovarianceMatrixElement(j, k);
+          m_cov[j * 5 + k] = 0;
+          m_cov[j * 5 + k] = min->GetCovarianceMatrixElement(j, k);
+        }
+      }
+
+      TVector3 TrackDir(1, 0, 0);
+      TrackDir.SetTheta(m_parFit[3]);
+      TrackDir.SetPhi(m_parFit[4]);
+
+      m_theta = m_parFit[3] * TMath::RadToDeg();
+      m_phi   = m_parFit[4] * TMath::RadToDeg();
+
+      for (int j = 0; j < fpxhits; j++) {
+        TVector3 Point(x[j], y[j], z[j]);
+        L[j] = Point * TrackDir.Unit();
+      }
+
+      iL = new int [fpxhits];
+      TMath::Sort(fpxhits, L, iL, false);
+      m_trl = fabs(L[iL[fpxhits - 1]] - L[iL[0]]);
+
+      StoreArray<MicrotpcRecoTrack> RecoTracks;
+      RecoTracks.appendNew(i, fpxhits, m_chi2, m_theta, m_phi, m_esum, m_totsum, m_trl, m_time_range, m_parFit, m_parFit_err, m_cov,
+                           m_impact_x, m_impact_y, m_side);
+
+      delete [] iL;
+      delete min;
+      delete [] L;
+      delete [] ix;
+      delete [] iy;
+      delete [] iz;
+
+      Track->Delete();
     }
-    Track->Delete();
   }
 
-  Event++;
+  //Event++;
 
 }
 

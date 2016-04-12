@@ -43,6 +43,8 @@ ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
   addParam("ROIListName", m_ROIListName, "name of the list of ROIs", std::string(""));
   addParam("ROIpayloadName", m_ROIpayloadName, "name of the payload of ROIs", std::string(""));
   addParam("TrigDivider", m_divider, "Generates one ROI every TrigDivider events", 2);
+  addParam("Desy2016Remapping", m_DESYremap,
+           "Does a ROI coordinate remapping for Desy TB 2016, WORKAROUND for missing DHH functionality", false);
 }
 
 ROIPayloadAssemblerModule::~ROIPayloadAssemblerModule()
@@ -130,6 +132,8 @@ void ROIPayloadAssemblerModule::event()
     unsigned int column1 = std::min(tmpColMin, tmpColMax);
     unsigned int column2 = std::max(tmpColMin, tmpColMax);
 
+    if (m_DESYremap) DESYremap(row1, row2, column1, column2);
+
     m_roiraw.setRowMin(row1);
     m_roiraw.setRowMax(row2);
     m_roiraw.setColMin(column1);
@@ -200,3 +204,32 @@ void ROIPayloadAssemblerModule::terminate()
 {
 }
 
+
+void ROIPayloadAssemblerModule::DESYremap(unsigned int& row1, unsigned int& row2, unsigned int& col1, unsigned int& col2)
+{
+  row1 &= ~3; /// Decrease row min to readout boundary
+  row2 = (row2 & ~3) + 3;/// Increase row max to readout boundary
+
+  // IB OF and OB IF are same (luckly) at least with this coarse mapping
+  {
+    if (col1 <= 63) {
+      col1 = 0;
+    } else if (col1 <= 63) {
+      col1 = 62;
+    } else if (col1 <= 127) {
+      col1 = 125;
+    } else if (col1 <= 191) {
+      col1 = 187;
+    }
+    if (col2 >= 192) {
+      col2 = 249;
+    } else if (col2 >= 128) {
+      col2 = 187;
+    } else if (col2 >= 64) {
+      col2 = 124;
+    } else {
+      col2 = 62;
+    }
+  }
+
+}

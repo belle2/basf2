@@ -60,6 +60,10 @@ namespace Belle2 {
     std::string m_ROIListName; /**< name of the ROI list */
     std::string m_ROIpayloadName; /**< name of the payload to be sent to ONSEN */
     int m_divider; /**< append all ROIs of the event if trigger number is a multiple of divider*/
+    bool m_DESYremap; /**< Remap ROI coordinates for DESY TB 2016, WORKAROUND for missing DHH functionality!!!  */
+
+    void DESYremap(unsigned int& tmpRowMin, unsigned int& tmpRowMax, unsigned int& tmpColMin, unsigned int& tmpColMax);
+
   };
 }
 #endif

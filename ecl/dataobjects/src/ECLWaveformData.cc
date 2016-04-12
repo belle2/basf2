@@ -13,8 +13,3 @@ void Belle2::ECLWaveformData::print() const
   }
   B2INFO(line);
 }
-
-ClassImp(Belle2::ECLWaveformData)
-ClassImp(Belle2::ECLWFAlgoParams)
-ClassImp(Belle2::ECLNoiseData)
-ClassImp(Belle2::ECLLookupTable)

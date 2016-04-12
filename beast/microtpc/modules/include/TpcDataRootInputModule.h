@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Igal Jaegle                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,7 +14,6 @@
 #include <framework/core/Module.h>
 #include <string>
 #include <top/geometry/TOPGeometryPar.h>
-//#include <testbeam/top/modules/TpcDataRootOutput/TopTree.h>
 #include <beast/microtpc/modules/TpcTree.h>
 #include "TFile.h"
 #include "TChain.h"

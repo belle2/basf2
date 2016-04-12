@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kenji Inami, Marko Staric                                *
+ * Contributors: Igal Jaegle                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

@@ -280,7 +280,7 @@ void ECLDataAnalysisModule::initialize()
   m_tree     = new TTree("m_tree", "ECL Analysis tree");
 
   /* m_eclTriggerMultip=0;
-    m_eclTriggerIdx = new std::vector<int>();
+  m_eclTriggerIdx = new std::vector<int>();
   m_eclTriggerCellId = new std::vector<int>();
   m_eclTriggerTime = new std::vector<double>();
   */
@@ -663,8 +663,7 @@ void ECLDataAnalysisModule::event()
 
     m_eclPureDigitIdx->clear();  m_eclPureDigitToMc->clear(); m_eclPureDigitCellId->clear(); m_eclPureDigitAmp->clear();
     m_eclPureDigitTimeFit->clear();  m_eclPureDigitFitQuality->clear(); m_eclPureDigitToCluster->clear();
-
-    //m_eclHitToPureDigit->clear();  m_eclHitToPureDigitAmp->clear();
+    m_eclHitToPureDigit->clear();  m_eclHitToPureDigitAmp->clear();
 
     ///Pure Clusters
     m_eclPureClusterMultip = 0; m_eclPureClusterEnergy->clear(); m_eclPureClusterEnergyError->clear();  m_eclPureClusterTheta->clear();

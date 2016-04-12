@@ -49,8 +49,7 @@ bool plotChannels(const char* filename, const char* outputname)
       //if (scrodid!=37 && scrodid!=38 && scrodid!=52 && scrodid!=66) {
       //continue;
       //}
-      int asicid = v.GetASICRow() + 4 * v.GetASICColumn();
-      //   cerr << v.GetASIC() << "\t" << v.GetASICRow() << "\t" << v.GetASICColumn() << endl;
+      int asicid = v.GetASICRow() + 4 * v.GetASIC();
       if (channelLabels[scrodid].find(asicid) == channelLabels[scrodid].end()) {
         // channelLabels[scrodid].insert(make_pair(asicid, vector<string>()));
         string gname = string("channels") + to_string(scrodid) + string("_") + to_string(asicid);

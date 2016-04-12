@@ -15,6 +15,8 @@
 #include <framework/database/Database.h>
 #include <framework/pcore/ProcHandler.h>
 
+#include <mdst/dataobjects/HitPatternVXD.h>
+
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
@@ -1388,7 +1390,22 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
 
     double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
 
-    TrackFitResult helixFromHelix(helixParam, helixError, pType, pValue, -1, -1);
+    // conversion of SVD hit pattern
+    HitPatternVXD vxdPattern;
+
+    // taken from: http://belle.kek.jp/group/indirectcp/cpfit/cpfit-festa/2004/talks/Apr.14/CPfesta-2005-Higuchi(3).pdf
+    unsigned int svdHitBitMap = trk_fit.hit_svd();
+    for (unsigned svdLayer = 0; svdLayer < 4; svdLayer++) {
+
+      unsigned uShift = svdLayer * 2;
+      unsigned vShift = svdLayer * 2 + 8;
+      unsigned uHit = (svdHitBitMap & 3 << uShift) != 0;
+      unsigned vHit = (svdHitBitMap & 3 << vShift) != 0;
+
+      vxdPattern.setSVDLayer(svdLayer + 3, uHit, vHit);
+    }
+
+    TrackFitResult helixFromHelix(helixParam, helixError, pType, pValue, -1, vxdPattern.getInteger());
 
     if (m_use6x6CovarianceMatrix4Tracks) {
       TMatrixDSym cartesianCovariance(6);
@@ -1413,7 +1430,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
           helixError[counter++] = helixCovariance(i, j);
     }
 
-    auto trackFit = trackFitResults.appendNew(helixParam, helixError, pType, pValue, -1, -1);
+    auto trackFit = trackFitResults.appendNew(helixParam, helixError, pType, pValue, -1, vxdPattern.getInteger());
 
     track->setTrackFitResultIndex(pType, trackFit->getArrayIndex());
 

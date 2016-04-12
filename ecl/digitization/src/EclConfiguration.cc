@@ -12,7 +12,7 @@ void EclConfiguration::signalsample_t::InitSample(const double* MPd)
   const int N = m_ns * m_nl;
   vector<double> MP(MPd, MPd + 10);
   ShaperDSP_t dsp(MP);
-  dsp.settimestride(m_tick / m_ns);
+  dsp.settimestride(m_step / m_ns);
   dsp.fillarray(0.0, N, m_ft);
 
   double sum = 0;
@@ -40,7 +40,7 @@ double EclConfiguration::signalsample_t::Accumulate(const double a, const double
   // t -- signal offset
   // output parameter
   // s -- output array with added signal
-  const double itick = 1 / m_tick;          // reciprocal to avoid division in usec^-1 (has to be evaluated at compile time)
+  const double itick = m_rf / s_clock;  // reciprocal to avoid division in usec^-1 (has to be evaluated at compile time)
   const double  tlen = m_nl - 1.0 / m_ns;   // length of the sampled signal in ADC clocks units
   const double  tmax = m_tmin + m_nsmp - 1; // upper range of the fit region
 

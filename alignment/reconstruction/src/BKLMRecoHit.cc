@@ -24,8 +24,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(BKLMRecoHit)
-
 BKLMRecoHit::BKLMRecoHit():
   genfit::PlanarMeasurement(HIT_DIMENSIONS), m_bklmHit2d(0)
 {}

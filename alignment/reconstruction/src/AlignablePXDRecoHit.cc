@@ -23,8 +23,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(AlignablePXDRecoHit);
-
 TMatrixD AlignablePXDRecoHit::derivatives(const genfit::StateOnPlane* sop)
 {
 

@@ -24,8 +24,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(AlignableSVDRecoHit2D);
-
 TMatrixD AlignableSVDRecoHit2D::derivatives(const genfit::StateOnPlane* sop)
 {
 

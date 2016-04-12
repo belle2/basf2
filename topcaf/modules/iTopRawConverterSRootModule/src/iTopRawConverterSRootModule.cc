@@ -282,12 +282,12 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
       // must read a short at a time to get back on track...
       unsigned short x1, x2;
 
-      while (in && word != PACKET_LAST && l < 30) {
+      while (in && ((word != PACKET_LAST) && (word != PACKET_LAST2) && (word != PACKET_LAST3)) && l < 30) {
         x2 = x1;
         in.read(reinterpret_cast<char*>(&x1), sizeof(unsigned short));
         word = ((x1 << 16) & 0xFFFF0000) + x2;
         B2DEBUG(1, "evt no: " << m_evt_no << "\tl: " << l << "\tx1: 0x" << hex << x1 << dec);
-        if (x1 == 0x616c) {
+        if (x1 == 0x616c || x1 == 0x636c) {
           word = PACKET_LAST;
         }
         l++;
@@ -295,12 +295,12 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
       m_evtheader_ptr->SetFlag(1005);
     }
     // read ahead
-    while (word != PACKET_LAST && in) {
+    while ((word != PACKET_LAST && word != PACKET_LAST2 && word != PACKET_LAST3) && in) {
       in.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
       word = swap_endianess(word);
       B2DEBUG(1, "footer: 0x" << hex << word << dec);
 
-      if (word != PACKET_LAST) {
+      if (word != PACKET_LAST && word != PACKET_LAST2 && word != PACKET_LAST3) {
         B2WARNING("Bad window footer (" << hex << word << "!=" << PACKET_LAST << dec << ")... marking event " << m_evt_no << ".");
         m_evtheader_ptr->SetFlag(1002);
         if (l > 30)  break;

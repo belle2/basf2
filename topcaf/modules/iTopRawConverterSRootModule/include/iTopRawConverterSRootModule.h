@@ -18,6 +18,8 @@ namespace Belle2 {
 #define PACKET_TYPE_EVENT (0x65766e74) //ascii: "evnt"
 #define PACKET_TYPE_WAVEFORM (0x77617665) //ascii: "wave"
 #define PACKET_LAST (0x6c617374) //ascii: "last"
+#define PACKET_LAST2 (0x6c637374) //ascii: "last"
+#define PACKET_LAST3 (0x6c637774) //ascii: "last"
 #define NPOINTS 64
 #define WORDS_PER_WINDOW 256
 #define COPPER_HEADER 0x7F7F

@@ -7,13 +7,13 @@
  **************************************************************************/
 
 #include <ecl/modules/eclTrackShowerMatch/ECLTrackShowerMatchModule.h>
-#include <ecl/dataobjects/ECLHitAssignment.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
+#include <framework/datastore/RelationVector.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <set>
@@ -50,9 +50,9 @@ void ECLTrackShowerMatchModule::beginRun()
 void ECLTrackShowerMatchModule::event()
 {
   StoreArray<Track> tracks;
-  StoreArray<ECLHitAssignment> eclHitAssignments;
   StoreArray<ECLShower> eclRecShowers;
   StoreArray<ECLCluster> eclClusters;
+  StoreArray<ECLCalDigit> eclDigits;
 
   Const::EDetector myDetID = Const::EDetector::ECL;
   const int pdgCodePiPlus = Const::pion.getPDGCode();
@@ -74,14 +74,12 @@ void ECLTrackShowerMatchModule::event()
       const int cell = copyid + 1;
       TVector3 cpos   = geometry->GetCrystalPos(copyid);
       TVector3 trkpos = extHit.getPosition();
-      int showerid = -1;
-      const auto iHA =
-        find_if(eclHitAssignments.begin(), eclHitAssignments.end(),
-      [&](const ECLHitAssignment & ha) { return ha.getCellId() == cell; }
-               );
-      if (iHA != eclHitAssignments.end()) {
-        showerid = iHA->getShowerId();
-        clid.insert(showerid);
+      const auto idigit = find_if(eclDigits.begin(), eclDigits.end(),
+      [&](const ECLCalDigit & d) { return d.getCellId() == cell; }
+                                 );
+      if (idigit != eclDigits.end()) {
+        RelationVector<ECLShower> eclShower = idigit->getRelationsFrom<ECLShower>();
+        for (const auto& sh : eclShower) clid.insert(sh.getShowerId());
       }
     } // end loop on ExtHit
 

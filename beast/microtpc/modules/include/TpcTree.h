@@ -17,7 +17,7 @@ namespace Belle2 {
   namespace TPC {
 
     /**
-     * Structure for the output of test beam simulation to a root file (TTree "tpc")
+     * Structure for the input of the data TPC (TTree "Data_TPC")
      * https://belle2.cc.kek.jp/~twiki/bin/view/Detector/TPC/ROOTDataFormats
      */
     struct TpcTree {

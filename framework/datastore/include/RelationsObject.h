@@ -30,9 +30,7 @@ namespace Belle2 {
 
   /** Defines interface for accessing relations of objects in StoreArray.
    *
-   *  A class that wants to support the relations interface and is a subclass
-   *  of BASE should be derived from RelationsInterface<BASE> instead.
-   *  In most cases, BASE will be TObject and you can simply derive from RelationsObject.
+   *  \note Please use the RelationsObject typedef instead of this class.
    *
    *  Your class then provides methods like addRelationTo or getRelationsTo for
    *  an easy handling of relations to and from objects of this class.
@@ -94,6 +92,8 @@ namespace Belle2 {
       \endcode
    */
   template <class BASE> class RelationsInterface: public BASE {
+    static_assert(std::is_same<TObject, BASE>::value,
+                  "Using RelationsInterface<BASE> is no longer allowed. Please use RelationsObject as a base class.");
   public:
     /** Default constructor.
      */

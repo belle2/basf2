@@ -16,6 +16,7 @@
 #include <framework/pcore/ProcHandler.h>
 
 #include <mdst/dataobjects/HitPatternVXD.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
 
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
@@ -61,6 +62,7 @@
 
 #include <cmath>
 #include <cfloat>
+#include <bitset>
 using namespace Belle2;
 
 const Const::ChargedStable B2BIIConvertMdstModule::c_belleHyp_to_chargedStable[c_nHyp] = { Const::electron, Const::muon, Const::pion, Const::kaon, Const::proton };
@@ -1390,22 +1392,55 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
 
     double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
 
-    // conversion of SVD hit pattern
-    HitPatternVXD vxdPattern;
+    // Create an empty cdc hitpattern and set the number of total hits
+    // use hits from 0: axial-wire, 1:stereo-wire, 2:cathode
+    // the actual cdc hitpattern is not converted
 
-    // taken from: http://belle.kek.jp/group/indirectcp/cpfit/cpfit-festa/2004/talks/Apr.14/CPfesta-2005-Higuchi(3).pdf
-    unsigned int svdHitBitMap = trk_fit.hit_svd();
-    for (unsigned svdLayer = 0; svdLayer < 4; svdLayer++) {
+    int cdcNHits = 0;
+    for (unsigned int i = 0; i < 3; i++)
+      cdcNHits += trk_fit.nhits(i);
 
-      unsigned uShift = svdLayer * 2;
-      unsigned vShift = svdLayer * 2 + 8;
-      unsigned uHit = (svdHitBitMap & 3 << uShift) != 0;
-      unsigned vHit = (svdHitBitMap & 3 << vShift) != 0;
+    HitPatternCDC patternCdc;
+    patternCdc.setNHits(cdcNHits);
 
-      vxdPattern.setSVDLayer(svdLayer + 3, uHit, vHit);
+    // conversion of the SVD hit pattern
+    int svdHitPattern = trk_fit.hit_svd();
+    // use hits from 3: SVD-rphi, 4: SVD-z
+    // int svdNHits = trk_fit.nhits(3) + trk_fit.nhits(4);
+
+    std::bitset<32> svdBitSet(svdHitPattern);
+
+    HitPatternVXD patternVxd;
+    unsigned short uHits;
+    unsigned short vHits;
+    unsigned short svdLayers;
+// taken from: http://belle.kek.jp/group/indirectcp/cpfit/cpfit-festa/2004/talks/Apr.14/CPfesta-2005-Higuchi(3).pdf
+    StoreObjPtr<EventMetaData> event;
+    // mask for the rphi hits, first 6 (8) bits/ 2 bits per layer
+    std::bitset<32> svdUMask(static_cast<std::string>("00000000000000000000000000000011"));
+    // mask for the z hits, second 6 (8) bits/ 2 bits per layer
+    std::bitset<32> svdVMask;
+
+    // find out if the SVD has 3 (4) layers; if exp <= (>) exp 27
+    if (event->getExperiment() <= 27) {
+      svdVMask = svdUMask << 6;
+      svdLayers = 3;
+    } else {
+      svdVMask = svdUMask << 8;
+      svdLayers = 4;
     }
 
-    TrackFitResult helixFromHelix(helixParam, helixError, pType, pValue, -1, vxdPattern.getInteger());
+    // loop over all svd layers (layer index is shifted + 3 for basf2)
+    for (unsigned short layerId = 0; layerId < svdLayers; layerId++) {
+      uHits = (svdBitSet & svdUMask).count();
+      vHits = (svdBitSet & svdVMask).count();
+      patternVxd.setSVDLayer(layerId + 3, uHits, vHits);
+      // shift masks to the left
+      svdUMask <<= 2;
+      svdVMask <<= 2;
+    }
+
+    TrackFitResult helixFromHelix(helixParam, helixError, pType, pValue, -1, patternVxd.getInteger());
 
     if (m_use6x6CovarianceMatrix4Tracks) {
       TMatrixDSym cartesianCovariance(6);
@@ -1430,10 +1465,8 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
           helixError[counter++] = helixCovariance(i, j);
     }
 
-    auto trackFit = trackFitResults.appendNew(helixParam, helixError, pType, pValue, -1, vxdPattern.getInteger());
-
+    auto trackFit = trackFitResults.appendNew(helixParam, helixError, pType, pValue, patternCdc.getInteger(), patternVxd.getInteger());
     track->setTrackFitResultIndex(pType, trackFit->getArrayIndex());
-
     /*
       B2INFO("--- B1 Track: ");
       std::cout << "Momentum = " << momentum << std::endl;

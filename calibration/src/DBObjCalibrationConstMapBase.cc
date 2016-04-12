@@ -2,8 +2,6 @@
 
 using namespace Belle2;
 
-ClassImp(DBObjCalibrationConstMapBase);
-
 void DBObjCalibrationConstMapBase::dump()
 {
   for (auto& elementParam : m_constants) {

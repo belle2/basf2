@@ -110,8 +110,24 @@ TrackFitterModule::~TrackFitterModule()
 
 void TrackFitterModule::initialize()
 {
+  //trackCandidates;
+  //trackCandidates.isRequired();
+
   B2INFO("TrackFitter: Initializing");
+
   StoreArray<MicrotpcRecoTrack>::registerPersistent();
+
+  StoreArray<MicrotpcRecoTrack> RecoTracks;
+  RecoTracks.isRequired();
+
+  StoreArray<MicrotpcHit> TpcHits;
+  TpcHits.isOptional();
+
+  StoreArray<MicrotpcDataHit> TpcDataHits;
+  TpcDataHits.isOptional();
+
+  RecoTracks.registerRelationTo(TpcDataHits);
+  RecoTracks.registerRelationTo(TpcHits);
 
   //get the garfield drift data, gas, and TPC paramters
   getXMLData();
@@ -141,6 +157,7 @@ void TrackFitterModule::event()
   StoreArray<MicrotpcSimHit> TpcSimHits;
   StoreArray<MicrotpcHit> TpcHits;
   StoreArray<MicrotpcDataHit> TpcDataHits;
+
   /*
   //Skip events with no TpcSimHits, but continue the event counter
   if (TpcHits.getEntries() == 0) {

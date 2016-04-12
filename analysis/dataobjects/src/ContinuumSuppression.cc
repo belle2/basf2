@@ -60,5 +60,3 @@ void ContinuumSuppression::addCleoCones(std::vector<float> CleoCones)
 {
   m_cleoCones = CleoCones;
 }
-
-ClassImp(ContinuumSuppression)

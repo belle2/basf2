@@ -3,9 +3,6 @@
 
 using namespace Belle2;
 
-ClassImp(FANNMLPData);
-
-
 std::vector<std::vector<float>> FANNMLPData::getMinAndMaxInputSample()
 {
 

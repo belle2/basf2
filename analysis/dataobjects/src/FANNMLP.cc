@@ -3,8 +3,6 @@
 
 using namespace Belle2;
 
-ClassImp(FANNMLP);
-
 FANNMLP::FANNMLP():
   arrayName(), variableNames(), targetName(), nNodes(), neuronType(),
   trainingMethod(),

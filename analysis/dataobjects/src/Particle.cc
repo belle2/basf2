@@ -801,6 +801,3 @@ void Particle::addExtraInfo(const std::string& name, float value)
     m_extraInfo.push_back(value); //add value
   }
 }
-
-
-ClassImp(Particle);

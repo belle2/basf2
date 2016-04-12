@@ -3,8 +3,6 @@
 
 using namespace Belle2;
 
-ClassImp(ParticleExtraInfoMap);
-
 unsigned int ParticleExtraInfoMap::getIndex(unsigned int mapID, const std::string& name) const
 {
   const IndexMap& map = m_maps[mapID];
@@ -65,7 +63,7 @@ unsigned int ParticleExtraInfoMap::getMapForNewVar(const std::string& name, unsi
 
   //nothing found, add new map (copy all entries prior to insertIndex from oldMap)
   IndexMap map;
-  for (const auto & pair : oldMap) {
+  for (const auto& pair : oldMap) {
     if (pair.second < insertIndex)
       map[pair.first] = pair.second;
   }
@@ -78,7 +76,7 @@ unsigned int ParticleExtraInfoMap::getMapForNewVar(const std::string& name, unsi
 
 bool ParticleExtraInfoMap::isCompatible(const IndexMap& oldMap, const IndexMap& map, unsigned int insertIndex)
 {
-  for (const auto & pair : oldMap) {
+  for (const auto& pair : oldMap) {
     if (pair.second < insertIndex) {
       const auto it = map.find(pair.first);
       if (it == map.end() or it->second != pair.second) {

@@ -371,5 +371,3 @@ void RestOfEvent::printIndices(std::set<int> indices) const
   }
   std::cout << std::endl;
 }
-
-ClassImp(RestOfEvent)

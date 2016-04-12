@@ -4,8 +4,6 @@
 
 using namespace Belle2;
 
-ClassImp(DecayHashMap)
-
 DecayHashMap::DecayHashMap() : m_LookupIsUpdated(false)
 {
   //Performance optimization

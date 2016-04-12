@@ -96,5 +96,3 @@ void  Vertex::resetTagVertexErrorMatrix()
   m_tagVertexErrMatrix.ResizeTo(temp);
   m_tagVertexErrMatrix = temp;
 }
-
-ClassImp(Vertex)

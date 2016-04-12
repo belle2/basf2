@@ -19,8 +19,6 @@
 #include "TMVA/Results.h"
 #include "TMVA/ResultsMulticlass.h"
 
-ClassImp(TMVA::MethodMockPlugin)
-
 TMVA::MethodMockPlugin::MethodMockPlugin(const TString& jobName,
                                          const TString& methodTitle,
                                          DataSetInfo& theData,

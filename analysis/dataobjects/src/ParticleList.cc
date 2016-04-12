@@ -248,5 +248,3 @@ ParticleList& ParticleList::getAntiParticleList() const
   return **m_antiList;
 }
 
-ClassImp(ParticleList)
-

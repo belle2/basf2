@@ -195,63 +195,11 @@ namespace Belle2 {
 
       ///////////////////////////////////////
       // Check if all superlayers have one TS for the track.
-      bool trackFull=1;
-      //// Check for axial super layers
-      //for (unsigned iAx = 0; iAx < 5; iAx++) {
-      //  // Check if all superlayers have one TS
-      //  const vector<TCLink *> & links = aTrack.links(iAx*2);
-      //  const unsigned nSegments = links.size();
-      //  // Find if there is a TS with a priority hit.
-      //  // Loop over all TS in same superlayer.
-      //  bool priorityHitTS = 0;
-      //  for (unsigned iTS = 0; iTS < nSegments; iTS++) {
-      //    const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
-      //    if (t_segment->center().hit() != 0)  priorityHitTS = 1;
-      //  }
-      //  if(nSegments != 1) {
-      //    if (nSegments == 0){
-      //      trackFull = 0;
-      //      //cout<<"Fitter3D::doit() => Not enough TS."<<endl;
-      //    } else {
-      //      if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::doit() => multiple TS are assigned."<<endl;
-      //    }
-      //  } else {
-      //    if (priorityHitTS == 0) {
-      //      trackFull = 0;
-      //      if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::doit() => There are no priority hit TS"<<endl;
-      //    }
-      //  }
-      //} // End superlayer loop
-      //// Check for stereo super layers
-      //for (unsigned iSt = 0; iSt < 4; iSt++) {
-      //  // Check if all superlayers have one TS
-      //  const vector<TCLink *> & links = aTrack.links(iSt*2+1);
-      //  const unsigned nSegments = links.size();
-      //  // Find if there is a TS with a priority hit.
-      //  // Loop over all TS in same superlayer.
-      //  bool priorityHitTS = 0;
-      //  for (unsigned iTS = 0; iTS < nSegments; iTS++) {
-      //    const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
-      //    if (t_segment->center().hit() != 0)  priorityHitTS = 1;
-      //  }
-      //  if(nSegments != 1) {
-      //    if (nSegments == 0){
-      //      trackFull = 0;
-      //      //cout<<"Fitter3D::doit() => Not enough TS."<<endl;
-      //    } else {
-      //      if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::doit() => multiple TS are assigned."<<endl;
-      //    }
-      //  } else {
-      //    if (priorityHitTS == 0) {
-      //      trackFull = 0;
-      //      if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::doit() => There are no priority hit TS"<<endl;
-      //    }
-      //  }
-      //} // End superlayer loop
-      if(trackFull == 0){
-         aTrack.setFitted(0);
-         continue;
-      }
+      //bool trackFull= isAxialTrackFull(aTrack) && isStereoTrackFull(aTrack);
+      //if(trackFull == 0){
+      //   aTrack.setFitted(0);
+      //   continue;
+      //}
 
       // Get MC values for fitter
       if(m_mBool["fMc"]) getMCValues(&aTrack);
@@ -262,37 +210,13 @@ namespace Belle2 {
       /////////////////////////////////
       // 2D Fitter
       // Check which axial super layers should be used.
-      bool useAxSl[5] = {1,1,1,1,1};
-      for (unsigned iAx = 0; iAx < 5; iAx++) {
-        // Check if all superlayers have one TS
-        const vector<TCLink *> & links = aTrack.links(iAx*2);
-        const unsigned nSegments = links.size();
-        // Find if there is a TS with a priority hit.
-        // Loop over all TS in same superlayer.
-        bool priorityHitTS = 0;
-        for (unsigned iTS = 0; iTS < nSegments; iTS++) {
-          const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
-          if (t_segment->center().hit() != 0)  priorityHitTS = 1;
-        }
-        if(nSegments != 1) {
-          if (nSegments == 0){
-            useAxSl[iAx] = 0;
-          }
-        } else {
-          if (priorityHitTS == 0) {
-            useAxSl[iAx] = 0;
-            //cout<<" priority is 0 for Ax"<<iAx<<endl;
-          }
-        }
-      } // End superlayer loop
+      bool useAxSl[5];
+      findHitAxialSuperlayers(aTrack, useAxSl);
       // Check if number of axial super layer hits is smaller or equal to 1.
       int nHitAx = (int)useAxSl[0]+(int)useAxSl[1]+(int)useAxSl[2]+(int)useAxSl[3]+(int)useAxSl[4];
       if(nHitAx <= 1) {
-        trackFull = 0;
-      }
-      if(trackFull == 0){
-         aTrack.setFitted(0);
-         continue;
+        aTrack.setFitted(0);
+        continue;
       }
 
       // Fill information for axial layers
@@ -388,43 +312,14 @@ namespace Belle2 {
       /////////////////////////////////
       // 3D Fitter
       // Check which stereo super layers should be used.
-      bool useStSl[4] = {1,1,1,1};
-      for (unsigned iSt = 0; iSt < 4; iSt++) {
-        // Check if all superlayers have one TS
-        const vector<TCLink *> & links = aTrack.links(iSt*2+1);
-        const unsigned nSegments = links.size();
-        // Find if there is a TS with a priority hit.
-        // Loop over all TS in same superlayer.
-        bool priorityHitTS = 0;
-        for (unsigned iTS = 0; iTS < nSegments; iTS++) {
-          const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
-          if (t_segment->center().hit() != 0)  priorityHitTS = 1;
-        }
-        if(nSegments != 1) {
-          if (nSegments == 0){
-            useStSl[iSt] = 0;
-            //cout<<" Number of TS is 0 for stSL:"<<iSt<<endl;
-          }
-        } else {
-          if (priorityHitTS == 0) {
-            useStSl[iSt] = 0;
-            //cout<<" No priority for stSL:"<<iSt<<endl;
-          }
-        }
-        // Check if rho is large enough for stereo super layer.
-        if(2*m_mDouble["rho"] < m_mConstV["rr3D"][iSt] ) {
-          useStSl[iSt] = 0;
-          //cout<<"rho is too low for stSL:"<<iSt<<endl;
-        }
-      } // End superlayer loop
+      bool useStSl[4];
+      findHitStereoSuperlayers(aTrack, useStSl);
+      removeImpossibleStereoSuperlayers(useStSl);
       // Check if number of stereo super layer hits is smaller or equal to 1.
       int nHitSl = (int)useStSl[0]+(int)useStSl[1]+(int)useStSl[2]+(int)useStSl[3];
       if(nHitSl <= 1) {
-        trackFull = 0;
-      }
-      if(trackFull == 0){
-         aTrack.setFitted(0);
-         continue;
+        aTrack.setFitted(0);
+        continue;
       }
 
       // Fill information for stereo layers
@@ -620,32 +515,7 @@ namespace Belle2 {
 
       ///////////////////////////////////////
       // Check if all superlayers have one TS for the track.
-      bool trackFull=1;
-      for (unsigned iSL = 0; iSL < m_cdc.nSuperLayers(); iSL++) {
-        // Check if all superlayers have one TS
-        const vector<TCLink *> & links = aTrack.links(iSL);
-        const unsigned nSegments = links.size();
-        // Find if there is a TS with a priority hit.
-        // Loop over all TS in same superlayer.
-        bool priorityHitTS = 0;
-        for (unsigned iTS = 0; iTS < nSegments; iTS++) {
-          const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
-          if (t_segment->center().hit() != 0)  priorityHitTS = 1;
-        }
-        if(nSegments != 1) {
-          if (nSegments == 0){
-            trackFull = 0;
-            //cout<<"Fitter3D::doit() => Not enough TS."<<endl;
-          } else {
-            if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::doit() => multiple TS are assigned."<<endl;
-          }
-        } else {
-          if (priorityHitTS == 0) {
-            trackFull = 0;
-            if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::doit() => There are no priority hit TS"<<endl;
-          }
-        }
-      } // End superlayer loop
+      bool trackFull= isAxialTrackFull(aTrack) && isStereoTrackFull(aTrack);
       if(trackFull == 0){
          aTrack.setFitted(0);
          continue;
@@ -1115,6 +985,132 @@ namespace Belle2 {
         //cout<<"Px: "<<t_momentumAtR.X()<<" Py: "<<t_momentumAtR.Y()<<" Pz: "<<t_momentumAtR.Z()<<endl;
       }
     }
+  }
+
+  bool TRGCDCFitter3D::isAxialTrackFull( TRGCDCTrack & aTrack ){
+    bool trackFull = 1;
+    for (unsigned iAx = 0; iAx < 5; iAx++) {
+      // Check if all superlayers have one TS
+      const vector<TCLink *> & links = aTrack.links(iAx*2);
+      const unsigned nSegments = links.size();
+      // Find if there is a TS with a priority hit.
+      // Loop over all TS in same superlayer.
+      bool priorityHitTS = 0;
+      for (unsigned iTS = 0; iTS < nSegments; iTS++) {
+        const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
+        if (t_segment->center().hit() != 0)  priorityHitTS = 1;
+      }
+      if(nSegments != 1) {
+        if (nSegments == 0){
+          trackFull = 0;
+          if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::isAxialTrackFull() => There are no TS."<<endl;
+        } else {
+          if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::isAxialTrackFull() => multiple TS are assigned."<<endl;
+        }
+      } else {
+        if (priorityHitTS == 0) {
+          trackFull = 0;
+          if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::isAxialTrackFull() => There are no priority hit TS"<<endl;
+        }
+      }
+    } // End superlayer loop
+    return trackFull;
+  }
+
+  bool TRGCDCFitter3D::isStereoTrackFull( TRGCDCTrack & aTrack ){
+    bool trackFull = 1;
+    for (unsigned iSt = 0; iSt < 4; iSt++) {
+      // Check if all superlayers have one TS
+      const vector<TCLink *> & links = aTrack.links(iSt*2+1);
+      const unsigned nSegments = links.size();
+      // Find if there is a TS with a priority hit.
+      // Loop over all TS in same superlayer.
+      bool priorityHitTS = 0;
+      for (unsigned iTS = 0; iTS < nSegments; iTS++) {
+        const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
+        if (t_segment->center().hit() != 0)  priorityHitTS = 1;
+      }
+      if(nSegments != 1) {
+        if (nSegments == 0){
+          trackFull = 0;
+          if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::isStereoTrackFull() => There are no TS."<<endl;
+        } else {
+          if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::isStereoTrackFull() => multiple TS are assigned."<<endl;
+        }
+      } else {
+        if (priorityHitTS == 0) {
+          trackFull = 0;
+          if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::isStereoTrackFull() => There are no priority hit TS"<<endl;
+        }
+      }
+    } // End superlayer loop
+    return trackFull;
+  }
+
+  void TRGCDCFitter3D::findHitAxialSuperlayers( TRGCDCTrack & aTrack,  bool (&useAxSl)[5] ){
+    std::fill_n( useAxSl, 5, 1 );
+    for (unsigned iAx = 0; iAx < 5; iAx++) {
+      // Check if all superlayers have one TS
+      const vector<TCLink *> & links = aTrack.links(iAx*2);
+      const unsigned nSegments = links.size();
+      // Find if there is a TS with a priority hit.
+      // Loop over all TS in same superlayer.
+      bool priorityHitTS = 0;
+      for (unsigned iTS = 0; iTS < nSegments; iTS++) {
+        const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
+        if (t_segment->center().hit() != 0)  priorityHitTS = 1;
+      }
+      if(nSegments != 1) {
+        if (nSegments == 0){
+          useAxSl[iAx] = 0;
+        } else {
+          if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::findHitAxialSuperlayers() => multiple TS are assigned."<<endl;
+        }
+      } else {
+        if (priorityHitTS == 0) {
+          useAxSl[iAx] = 0;
+          if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::findHitAxialSuperlayers() => There are no priority hit TS"<<endl;
+        }
+      }
+    } // End superlayer loop
+  }
+
+  void TRGCDCFitter3D::findHitStereoSuperlayers( TRGCDCTrack & aTrack,  bool (&useStSl)[4] ){
+    std::fill_n( useStSl, 4, 1 );
+    for (unsigned iSt = 0; iSt < 4; iSt++) {
+      // Check if all superlayers have one TS
+      const vector<TCLink *> & links = aTrack.links(iSt*2+1);
+      const unsigned nSegments = links.size();
+      // Find if there is a TS with a priority hit.
+      // Loop over all TS in same superlayer.
+      bool priorityHitTS = 0;
+      for (unsigned iTS = 0; iTS < nSegments; iTS++) {
+        const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
+        if (t_segment->center().hit() != 0)  priorityHitTS = 1;
+      }
+      if(nSegments != 1) {
+        if (nSegments == 0){
+          useStSl[iSt] = 0;
+        } else {
+          if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::findHitStereoSuperlayers() => multiple TS are assigned."<<endl;
+        }
+      } else {
+        if (priorityHitTS == 0) {
+          useStSl[iSt] = 0;
+          if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::findHitStereoSuperlayers() => There are no priority hit TS"<<endl;
+        }
+      }
+    } // End superlayer loop
+  }
+
+  void TRGCDCFitter3D::removeImpossibleStereoSuperlayers( bool (&useStSl)[4] ){
+    for (unsigned iSt = 0; iSt < 4; iSt++) {
+      // Check if rho is large enough for stereo super layer.
+      if(2*m_mDouble["rho"] < m_mConstV["rr3D"][iSt] ) {
+        useStSl[iSt] = 0;
+        if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::removeImpossibleStereoSuperlayers() => pt is too low for SL."<<endl;
+      }
+    } // End superlayer loop
   }
 
 

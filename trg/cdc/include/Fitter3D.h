@@ -65,6 +65,21 @@ namespace Belle2 {
     /// Function for mc debugging.
     void getMCValues( TRGCDCTrack* aTrack );
 
+    /// Checks if axial track has 5 TSs. One per each superlayer.
+    bool isAxialTrackFull( TRGCDCTrack & aTrack );
+
+    /// Checks if stereo track has 4 TSs. One per each superlayer.
+    bool isStereoTrackFull( TRGCDCTrack & aTrack );
+
+    /// Finds which axial superlayers has TSs. useAxSL array indicating hit superlayers.
+    void findHitAxialSuperlayers( TRGCDCTrack & aTrack, bool (&useAxSL)[5] );
+
+    /// Finds which stereo superlayers has TSs. useStSL array indicating hit superlayers.
+    void findHitStereoSuperlayers( TRGCDCTrack & aTrack, bool (&useStSL)[4] );
+
+    /// Removes TSs that are not possible with track Pt.
+    void removeImpossibleStereoSuperlayers( bool (&useStSL)[4] );
+
     /// Functions for saving.
     /// Save VHDL and code files.
     void saveVhdlAndCoe();

@@ -18,7 +18,7 @@ namespace Belle2 {
 
     /**
      * Structure for the output of test beam simulation to a root file (TTree "tpc")
-     * https://belle2.cc.kek.jp/~twiki/bin/view/Detector/TPC/BeamTestJune2013ROOTDataFormats
+     * https://belle2.cc.kek.jp/~twiki/bin/view/Detector/TPC/ROOTDataFormats
      */
     struct TpcTree {
       enum {MaxRoi = 30000}; /**< max number of hits */

@@ -46,36 +46,44 @@ void ConditionsService::getPayloads(std::string GlobalTag, std::string Experimen
 
   m_payloads.clear(); // not sure we should do this here.
 
-  CURL* curl;
-  CURLcode res;
+  if (!m_enabled) {
+    B2DEBUG(50, "Central database access is disabled: getPayloads does nothing");
+    return;
+  }
 
-  curl = curl_easy_init();
-
-  int count = 0;
+  CURLcode res{CURLE_FAILED_INIT};
+  CURL* curl = curl_easy_init();
+  char errbuf[CURL_ERROR_SIZE];
 
   if (curl) {
     std::string REST_payloads = m_RESTbase + "iovPayloads/?gtName=" + GlobalTag + "&expName=" + ExperimentName + "&runName=" + RunName;
-    B2INFO("rest payload call: " << REST_payloads);
+    B2DEBUG(50, "rest payload call: " << REST_payloads);
     m_buffer.clear();
     curl_easy_setopt(curl, CURLOPT_URL, REST_payloads.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, capture_return);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&count);
+    curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);
+    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
     //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L); // For debug.
-
     res = curl_easy_perform(curl);
-
-    if (res != CURLE_OK) {
-      B2ERROR("curl_easy_perform() failed: " << curl_easy_strerror(res));
-    }
-
     curl_easy_cleanup(curl);
   }
+
+  if (res != CURLE_OK) {
+    size_t len = strlen(errbuf);
+    if (len) {
+      B2WARNING("Could not get list of payloads from database: " << errbuf);
+    } else {
+      B2WARNING("Could not get list of payloads from database: " << curl_easy_strerror(res));
+    }
+    B2WARNING("Access to central database is disabled");
+    m_enabled = false;
+    return;
+  }
+
   if (!m_buffer.empty()) parse_payloads(m_buffer);
 
-  B2INFO("Conditions service retrieved " << m_payloads.size() << " payloads for experiment " << ExperimentName << " and run " <<
-         RunName << " listed under global tag " << GlobalTag);
-
-  return ;
+  B2INFO("Conditions service retrieved " << m_payloads.size() << " payloads for experiment "
+         << ExperimentName << " and run " << RunName << " listed under global tag " << GlobalTag);
 }
 
 namespace {
@@ -119,6 +127,9 @@ void ConditionsService::parse_return(std::string temp)
   XMLDocPointer_t xmldoc = xml->ParseString(temp.c_str());
   if (xmldoc == 0) {
     B2WARNING("corrupt return from REST call: " << temp.c_str());
+    B2WARNING("Access to central database is disabled");
+    m_enabled = false;
+    return;
   }
 
 
@@ -134,26 +145,24 @@ void ConditionsService::parse_return(std::string temp)
 
 }
 
-size_t ConditionsService::capture_return(void* buffer, size_t size, size_t nmemb, void* userp)
+size_t ConditionsService::capture_return(void* buffer, size_t size, size_t nmemb, void*)
 {
-
   std::string temp(static_cast<const char*>(buffer), size * nmemb);
-  int count = *((int*)userp);
-  count = 1;
   ConditionsService::getInstance()->addReturn(temp);
-  return size * nmemb * count;
-
+  return size * nmemb;
 }
 
 
 void ConditionsService::parse_payloads(std::string temp)
 {
-
-  TXMLEngine* xml = new TXMLEngine;
+  std::unique_ptr<TXMLEngine> xml(new TXMLEngine);
 
   XMLDocPointer_t xmldoc = xml->ParseString(temp.c_str());
   if (xmldoc == 0) {
     B2WARNING("corrupt return from REST call: " << temp.c_str());
+    B2WARNING("Access to central database is disabled");
+    m_enabled = false;
+    return;
   }
 
   // take access to main node
@@ -177,7 +186,7 @@ void ConditionsService::parse_payloads(std::string temp)
     conditionsPayload payload;
     nodeName = xml->GetNodeName(payload_node);
     attr = xml->GetFirstAttr(payload_node);
-    B2INFO("Parsing payload... " << nodeName << " with id " << xml->GetAttrValue(attr));
+    B2DEBUG(100, "Parsing payload... " << nodeName << " with id " << xml->GetAttrValue(attr));
     if (nodeName == "payload") { /// Found a payload, now parse the needed information.
 
       child_node = xml->GetChild(payload_node);
@@ -264,17 +273,17 @@ void ConditionsService::parse_payloads(std::string temp)
     }
 
     if (payload.package.size() == 0 || payload.module.size() == 0 || payload.logicalFileName.size() == 0) {
-      B2ERROR("ConditionsService::parse_payload Payload not parsed correctly.");
+      B2WARNING("ConditionsService::parse_payload Payload not parsed correctly: empty package, module or filename");
     } else {
       std::string payloadKey = payload.package + payload.module;
       if (ConditionsService::getInstance()->payloadExists(payloadKey)) {
-        B2ERROR("Found duplicate payload key " << payloadKey <<
-                " while parsing conditions payloads. Using refusing to add payload with identical key.");
+        B2WARNING("Found duplicate payload key " << payloadKey <<
+                  " while parsing conditions payloads. Using refusing to add payload with identical key.");
       } else {
-        B2INFO("Found payload for module " << payload.module << " in package " << payload.package
-               << " at URL " << payload.logicalFileName << ".  Storing with key: "
-               << payloadKey << " and checksum: " << payload.md5Checksum << ".  IOV (exp/run) from "
-               << payload.expInitial << "/" << payload.runInitial << " to " << payload.expFinal << "/" << payload.runFinal);
+        B2DEBUG(100, "Found payload for module " << payload.module << " in package " << payload.package
+                << " at URL " << payload.logicalFileName << ".  Storing with key: "
+                << payloadKey << " and checksum: " << payload.md5Checksum << ".  IOV (exp/run) from "
+                << payload.expInitial << "/" << payload.runInitial << " to " << payload.expFinal << "/" << payload.runFinal);
         ConditionsService::getInstance()->addPayloadInfo(payloadKey, payload);
       }
     }
@@ -285,9 +294,6 @@ void ConditionsService::parse_payloads(std::string temp)
 
   // Release memory before exit
   xml->FreeDoc(xmldoc);
-  delete xml;
-
-
 }
 
 conditionsPayload ConditionsService::getPayloadInfo(std::string PackageModuleName)
@@ -309,6 +315,11 @@ void ConditionsService::writePayloadFile(std::string payloadFileName,
                                          std::string packageName,
                                          std::string moduleName)
 {
+
+  if (!m_enabled) {
+    B2ERROR("Central database access is disabled: writePayloadFile does nothing");
+    return;
+  }
 
   std::unique_ptr<TMD5> checksum(TMD5::FileChecksum(payloadFileName.c_str()));
 
@@ -375,7 +386,7 @@ void ConditionsService::writePayloadFile(std::string payloadFileName,
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-      B2ERROR("curl_easy_perform() failed: " << curl_easy_strerror(res));
+      B2ERROR("Sending payload to database failed: " << curl_easy_strerror(res));
     }
 
     curl_easy_cleanup(curl);
@@ -397,14 +408,17 @@ std::string ConditionsService::getPayloadFileURL(const Module* module)
 
 std::string ConditionsService::getPayloadFileURL(std::string packageName, std::string moduleName)
 {
+  if (!m_enabled) {
+    B2DEBUG(50, "Central database access is disabled: getPayloadFileURL does nothing");
+    return "";
+  }
 
   if (!payloadExists(packageName + moduleName)) {
-    B2ERROR("Unable to find conditions payload for requested package " << packageName << "\t and module " << moduleName);
+    B2WARNING("Unable to find conditions payload for requested package " << packageName << "\t and module " << moduleName);
+    return "";
   }
   std::string remote_file = m_payloads[packageName + moduleName].logicalFileName;
   std::string local_file = m_FILEbase + remote_file; // This will work for local files and CVMFS.
-
-
 
   if (m_FILEbase.substr(0, 7) == "http://") { // May need to transfer files locally.
     local_file = m_FILElocal + boost::filesystem::path(remote_file).filename().string();
@@ -412,8 +426,7 @@ std::string ConditionsService::getPayloadFileURL(std::string packageName, std::s
 
     remote_file = m_FILEbase + remote_file;
     if (!checksum) { // file isn't there.  Start downloading.
-
-      B2INFO("Did not find file " << local_file << " starting download from " << remote_file);
+      B2DEBUG(100, "Did not find file " << local_file << " starting download from " << remote_file);
 
       CURL* curl;
       FILE* fp;
@@ -425,18 +438,16 @@ std::string ConditionsService::getPayloadFileURL(std::string packageName, std::s
         curl_easy_setopt(curl, CURLOPT_URL, remote_file.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, false);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, true);
         curl_easy_setopt(curl, CURLOPT_AUTOREFERER, true);
         //  curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, progress_func);
-
         res = curl_easy_perform(curl);
-
         curl_easy_cleanup(curl);
-
         fclose(fp);
 
         if (res != CURLE_OK) {
-          B2ERROR("libcurl error code " << res << " trying to download file.");
+          B2WARNING("Could not download payload for requested " << packageName << " and " << moduleName << ": " << curl_easy_strerror(res));
+          return "";
         }
       }
       checksum.reset(TMD5::FileChecksum(local_file.c_str())); // check checksum
@@ -464,12 +475,13 @@ std::string ConditionsService::getPayloadFileURL(std::string packageName, std::s
 
   std::unique_ptr<TMD5> checksum(TMD5::FileChecksum(local_file.c_str())); // check if the file exists
   if (!checksum) { // file isn't there.  Toss an error.
-    B2ERROR("Did not find file " << local_file << " check inputs.");
+    B2WARNING("Did not find file " << local_file << " check inputs.");
+    return "";
   } else if (std::string(checksum->AsString()) != m_payloads[packageName +
                                                              moduleName].md5Checksum) { // MD5 checksum doesn't match the database entry.
     B2FATAL("Conditions file " << local_file << " error! Expected MD5 checksum " << m_payloads[packageName + moduleName].md5Checksum <<
             " and calculated checksum " << checksum->AsString());
-    return NULL;
+    return "";
   }
 
   return local_file;

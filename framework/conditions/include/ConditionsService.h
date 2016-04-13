@@ -47,15 +47,17 @@ namespace Belle2 {
   };
 
 
-  /** The conditions service will store and retrieve conditions payloads.  This service is under construction and currently needs
-   *  particular file directories and database permissions which will eventually be generalized for distributed use.  Currently
-   *  must be used at hep.pnnl.gov.
+  /** The conditions service will store and retrieve conditions payloads.  This
+   * service is under construction and currently needs particular file
+   * directories and database permissions which will eventually be generalized
+   * for distributed use.  Currently must be used at hep.pnnl.gov.
    *
-   * Details   Any TObject can be stored by the conditions service for later retrieval.  Storage is based on associating
-   *           a payload with a Subsystem Tag, Algorithm Name, and Algorithm Version.  An example is the 'itop' subsystem,
-   *           'pedestal' algorithm, and '1_0_0_1' is an example algorithm version.  This service is currently implemented as
-   *           a singleton.
-   *
+   * Details  Any TObject can be stored by the conditions service for later
+   *          retrieval.  Storage is based on associating a payload with a
+   *          Subsystem Tag, Algorithm Name, and Algorithm Version.  An example
+   *          is the 'itop' subsystem, 'pedestal' algorithm, and '1_0_0_1' is
+   *          an example algorithm version.  This service is currently
+   *          implemented as a singleton.
    */
   class ConditionsService {
 
@@ -195,10 +197,10 @@ namespace Belle2 {
     static size_t capture_return(void* buffer, size_t size, size_t nmemb, void* userp);
 
     /** Function to parse payloads */
-    static void parse_payloads(std::string temp);
+    void parse_payloads(std::string temp);
 
     /** Function to parse generic xml return and display */
-    static void parse_return(std::string temp);
+    void parse_return(std::string temp);
 
     /** Function to facilitate downloading files */
     static size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream);
@@ -225,6 +227,8 @@ namespace Belle2 {
     /** Map of payloads for current experiment and run. */
     std::map<std::string, conditionsPayload> m_payloads;
 
+    /** If False no calls to the central database will be performed */
+    bool m_enabled{true};
   };
 }
 #endif

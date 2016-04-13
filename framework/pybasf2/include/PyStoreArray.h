@@ -43,8 +43,8 @@ namespace Belle2 {
      # Alternative: simhits = Belle2.PyStoreArray(Belle2.PXDSimHits.Class())
      for hit in simhits:
          part = hit.getRelatedFrom('MCParticles')
-         print "Edep: ", str(hit.getEnergyDep())
-         print "Particle: ", str(part.getPDG())
+         print("Edep: ", str(hit.getEnergyDep()))
+         print("Particle: ", str(part.getPDG()))
     \endcode
   *
   * You can check the runtime type information of the returned objects by

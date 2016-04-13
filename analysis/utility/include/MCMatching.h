@@ -41,11 +41,10 @@ namespace Belle2 {
      *
      * Can also be used from Python:
      * \code{.py}
-        from basf2 import *
-        from ROOT import gSystem
-        gSystem.Load('libanalysis')
-        from ROOT import Belle2
-        print Belle2.MCMatching.explainFlags(402)
+        import basf2
+        from ROOT import Belle2, gInterpreter
+        gInterpreter.ProcessLine('#include "analysis/utility/MCMatching.h"')
+        print(Belle2.MCMatching.explainFlags(123))
        \endcode
      */
     std::string explainFlags(unsigned int flags);

@@ -78,7 +78,7 @@ namespace Belle2 {
 
         from ROOT import TLorentzVector
         someParticle = Belle2.Particle(TLorentzVector(1.0, 0, 0, 0), 321)
-        print variables.evaluate('E', someParticle)
+        print(variables.evaluate('E', someParticle))
         \endcode
      *
      *

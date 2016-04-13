@@ -86,7 +86,7 @@ int* DesSer::getNewBuffer(int nwords, int* delete_flag)
 
 }
 
-void DesSer::initialize()
+void DesSer::initialize(bool close_listen)
 {
   printf("[INFO] DesSer: initialize() started.\n"); fflush(stdout);
   //  B2INFO("DesSer: initialize() started.");
@@ -137,7 +137,7 @@ void DesSer::initialize()
   m_buffer = new int[ BUF_SIZE_WORD ];
 #endif
 
-  Accept();
+  Accept(close_listen);
 
 #ifdef NONSTOP
   openRunPauseNshm();

@@ -57,7 +57,7 @@ namespace Belle2 {
     //    DesSer();
     virtual ~DesSer();
 
-    void initialize();
+    void initialize(bool close_listen = true);
 
     //! Module functions to be called from event process
     virtual void DataAcquisition() = 0;

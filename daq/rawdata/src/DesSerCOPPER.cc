@@ -57,7 +57,7 @@ void DesSerCOPPER::DataAcquisition()
   unsigned int eve_copper_0 = 0;
   //  B2INFO("initializing...");
   printf("[INFO] initializing...\n"); fflush(stdout);
-  initialize();
+  initialize(false);
 
 
   //  B2INFO("Done.");
@@ -288,7 +288,7 @@ void DesSerCOPPER::waitResume()
 
   if (CheckConnection(m_socket_send) < 0) {
     printf("Trying Accept1\n"); fflush(stdout);
-    Accept();
+    Accept(false);
     printf("Trying Accept2\n"); fflush(stdout);
   }
 

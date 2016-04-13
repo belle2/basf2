@@ -45,6 +45,9 @@ ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
   addParam("TrigDivider", m_divider, "Generates one ROI every TrigDivider events", 2);
   addParam("Desy2016Remapping", m_DESYremap,
            "Does a ROI coordinate remapping for Desy TB 2016, WORKAROUND for missing DHH functionality", false);
+  addParam("SendAllDownscaler", mSendAllDS, "Send all Data (no selection) downscaler; Workaround for missing ONSEN functionality",
+           9u);
+  addParam("SendROIsDownscaler", mSendROIsDS, "Send ROIs downscaler; Workaround for missing ONSEN functionality", 3u);
 }
 
 ROIPayloadAssemblerModule::~ROIPayloadAssemblerModule()
@@ -80,6 +83,7 @@ void ROIPayloadAssemblerModule::event()
   int trgNum = eventMetaDataPtr->getEvent(); // trigger number
 
   if (trgNum % m_divider != 0)
+    /// TODO Why the hell is it necessary to flip the coordinated here????? This should be correct within the geometry file!!!
     for (int iROI = 0; iROI < ROIListSize; iROI++) {
 
       const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(ROIList[iROI]->getSensorID());
@@ -90,9 +94,9 @@ void ROIPayloadAssemblerModule::event()
 
       tmpROIid.setSensorID(ROIList[iROI]->getSensorID());
       unsigned int tmpRowMin = nPixelsU - ROIList[iROI]->getMinUid();
-      unsigned int tmpRowMax =  nPixelsU - ROIList[iROI]->getMaxUid();
-      unsigned int tmpColMin =  nPixelsV - ROIList[iROI]->getMinVid();
-      unsigned int tmpColMax = nPixelsV -  ROIList[iROI]->getMaxVid();
+      unsigned int tmpRowMax = nPixelsU - ROIList[iROI]->getMaxUid();
+      unsigned int tmpColMin = nPixelsV - ROIList[iROI]->getMinVid();
+      unsigned int tmpColMax = nPixelsV - ROIList[iROI]->getMaxVid();
 
       tmpROIid.setMinUid(std::min(tmpRowMin, tmpRowMax));
       tmpROIid.setMaxUid(std::max(tmpRowMin, tmpRowMax));
@@ -154,7 +158,9 @@ void ROIPayloadAssemblerModule::event()
 
   payloadPtr.assign(payload);
 
-  payload->setHeader();
+  unsigned int evtNr = eventMetaDataPtr->getEvent();
+  bool accepted = true; // thats the default until HLT has reject mechanism
+  payload->setHeader(accepted, (evtNr % mSendAllDS) == 0, (evtNr % mSendROIsDS) == 0);
 
   //  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   payload->setTriggerNumber(eventMetaDataPtr->getEvent());

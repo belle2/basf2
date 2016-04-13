@@ -61,6 +61,8 @@ namespace Belle2 {
     std::string m_ROIpayloadName; /**< name of the payload to be sent to ONSEN */
     int m_divider; /**< append all ROIs of the event if trigger number is a multiple of divider*/
     bool m_DESYremap; /**< Remap ROI coordinates for DESY TB 2016, WORKAROUND for missing DHH functionality!!!  */
+    unsigned int mSendAllDS; /**< Send all Data (no selection) downscaler; Workaround for missing ONSEN functionality */
+    unsigned int mSendROIsDS; /**<  Send ROIs downscaler; Workaround for missing ONSEN functionality */
 
     void DESYremap(unsigned int& tmpRowMin, unsigned int& tmpRowMax, unsigned int& tmpColMin, unsigned int& tmpColMax);
 

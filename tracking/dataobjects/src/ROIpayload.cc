@@ -59,9 +59,15 @@ void ROIpayload::setPayloadLength()
   m_packetLengthByte = lengthInBytes + sizeof(uint32_t);  // The space for payload lenght
 }
 
-void ROIpayload::setHeader()
+void ROIpayload::setHeader(bool Accepted, bool SendAll, bool SendROIs)
 {
-  m_data32[OFFSET_HEADER] = htonl(0xCAFE8000 | (1 << 13));
+  unsigned int h = 0xCAFE0000; // Magic
+  if (Accepted) h |= 0x8000;
+  if (SendAll) h |=
+      0x4000; /// For Testbeam/Debugging purpose, we do not do any selection -> move to a downscaler on ONSEN Merger / SlowControl
+  if (SendROIs) h |=
+      0x2000; /// for debugging purpose, we want to see the ROIs which were send in (esp from DATCON) -> move to a downscaler on ONSEN Merger / SlowControl
+  m_data32[OFFSET_HEADER] = htonl(h);
 };
 
 void ROIpayload::setTriggerNumber(unsigned long int triggerNumber)

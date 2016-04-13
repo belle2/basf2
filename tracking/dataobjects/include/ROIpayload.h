@@ -43,7 +43,7 @@ namespace Belle2 {
 
     void setPayloadLength(int length); /**< set payload length*/
     void setPayloadLength(); /**< set payload length*/
-    void setHeader(); /**< set header*/
+    void setHeader(bool Accepted, bool SendAll, bool SendROIs);  /**< set header*/
     void setTriggerNumber(unsigned long int triggerNumber); /**< set trigger number*/
 
     //! set run/ subrun/exp number

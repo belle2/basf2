@@ -213,7 +213,7 @@ namespace Belle2 {
     //    int sendByWriteV(RawDataBlock* rawdblk);
     int sendByWriteV(RawDataBlockFormat* rawdblk);
     //    void Connect(const char* hostname, const int port);
-    void Accept();
+    void Accept(bool close_listen = true);
 
     //    void fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawDataBlock* rawdblk);
     void fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawDataBlockFormat* rawdblk);

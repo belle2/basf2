@@ -350,7 +350,7 @@ int DesSer::Send(int socket, char* buf, int size_bytes)
   return sent_bytes;
 }
 
-void DesSer::Accept()
+void DesSer::Accept(bool close_listen)
 {
   //
   // Connect to cprtb01
@@ -430,7 +430,10 @@ void DesSer::Accept()
       exit(-1);
     }
   }
-  close(fd_listen);
+
+  if (close_listen) {
+    close(fd_listen);
+  }
 
   //   int flag = 1;
   //   ret = setsockopt(fd_accept, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(flag) );

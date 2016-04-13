@@ -84,7 +84,8 @@ namespace Belle2 {
     int m_nClusters;
     float m_lat, m_dist, m_trkDepth, m_shDepth;
 
-    ClassDef(ECLPidLikelihood, 2); /**< Build ROOT dictionary */
+    // 3: Added DeltaL track match variable (GDN, increment by TF)
+    ClassDef(ECLPidLikelihood, 3); /**< Build ROOT dictionary */
   };
 }
 #endif

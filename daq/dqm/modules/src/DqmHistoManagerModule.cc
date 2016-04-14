@@ -8,6 +8,8 @@
 
 #include <daq/dqm/modules/DqmHistoManagerModule.h>
 
+#include <framework/pcore/ProcHandler.h>
+
 #include "TText.h"
 
 using namespace Belle2;
@@ -42,11 +44,13 @@ DqmHistoManagerModule::~DqmHistoManagerModule()
   //  if (ProcHandler::EvtProcID() == -1) {   // should be called from main proc.
   //    cout << "DqmHistoManager:: destructor called from pid=" << ProcHandler::EvtProcID() << endl;
   //    if (Environment::Instance().getNumberProcesses() > 0 && ProcHandler::EvtProcID() == -1) {
+  /*
   if (Environment::Instance().getNumberProcesses() > 0) {
     cout << "DqmHistoManager:: adding histogram files" << endl;
     RbTupleManager::Instance().hadd();
     cout << "DqmHistoManager:: adding histogram files done" << endl;
   }
+  */
   //  }
 }
 
@@ -58,8 +62,8 @@ void DqmHistoManagerModule::initialize()
   //  cout << "DqmHistoManager::initialization done" << endl;
 
   // Connect to Histogram Server
-  m_sock = new EvtSocketSend(m_hostname, m_port);
-  printf("EvtSocketSend : fd = %d\n", (m_sock->sock())->sock());
+  //  m_sock = new EvtSocketSend(m_hostname, m_port);
+  //  printf("EvtSocketSend : fd = %d\n", (m_sock->sock())->sock());
 
   // Message Handler
   m_msg = new MsgHandler(0);    // Compression level = 0
@@ -75,6 +79,10 @@ void DqmHistoManagerModule::beginRun()
     //    cout << "DqmHistoManager:: first pass in beginRun() : proc="
     //   << ProcHandler::EvtProcID() << endl;
     RbTupleManager::Instance().begin(ProcHandler::EvtProcID());
+    // Connect to Histogram Server
+    m_sock = new EvtSocketSend(m_hostname, m_port);
+    printf("EvtSocketSend (Proc %d) : fd = %d\n", ProcHandler::EvtProcID(),
+           (m_sock->sock())->sock());
     m_initialized = true;
   }
 }
@@ -91,6 +99,10 @@ void DqmHistoManagerModule::endRun()
 
 void DqmHistoManagerModule::event()
 {
+  //  if ( ProcHandler::EvtProcID() >= 10000 ) {
+  //    m_nevent++;
+  //    return;
+  //  }
   if (!m_initialized) {
     //    cout << "DqmHistoManager:: first pass in event() : proc="
     //   << ProcHandler::EvtProcID() << endl;
@@ -114,8 +126,8 @@ void DqmHistoManagerModule::event()
     (msg->header())->reserved[2] = 0;
 
     if (m_nobjs > 0) {
-      printf("DqmHistoManger: dumping histos.....%d histos\n",
-             m_nobjs);
+      printf("DqmHistoManger(proc:%d): dumping histos.....%d histos\n",
+             ProcHandler::EvtProcID(), m_nobjs);
       m_sock->send(msg);
     }
 
@@ -128,6 +140,9 @@ void DqmHistoManagerModule::event()
 
 void DqmHistoManagerModule::terminate()
 {
+  //  if ( ProcHandler::EvtProcID() >= 10000 ) {
+  //    return;
+  //  }
   if (m_initialized) {
     //    cout << "DqmHistoManager::terminating event process : PID=" << ProcHandler::EvtProcID() << endl;
     m_msg->clear();

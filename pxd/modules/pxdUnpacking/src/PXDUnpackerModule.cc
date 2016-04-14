@@ -1047,14 +1047,14 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
             if ((dhe_reformat == 0) && (IFOB_flag == 1)) {
               B2INFO("Remap inner forward or outer backward ...");
               dhp_row = PXDUnpackerModule::remap_row_IF_OB(dhp_row, dhp_col, dhp_dhp_id, dhe_ID);
-              dhp_col = PXDUnpackerModule::remap_col_IF_OB(dhp_col, dhp_col, dhp_dhp_id, dhe_ID);
+              dhp_col = PXDUnpackerModule::remap_col_IF_OB(dhp_col, dhp_col, dhp_dhp_id);
               //      B2INFO("Remapped :: ROW_GEO " << dhp_row << " COL_GEO " << dhp_col);
             }
 
             if ((dhe_reformat == 0) && (IBOF_flag == 1)) {
               B2INFO("Remap inner backward or outer forward ...");
               dhp_row = PXDUnpackerModule::remap_row_IB_OF(dhp_row, dhp_col, dhp_dhp_id, dhe_ID);
-              dhp_col = PXDUnpackerModule::remap_col_IB_OF(dhp_col, dhp_col, dhp_dhp_id, dhe_ID);
+              dhp_col = PXDUnpackerModule::remap_col_IB_OF(dhp_col, dhp_col, dhp_dhp_id);
               //        B2INFO("Remapped :: ROW_GEO " << dhp_row << " COL_GEO " << dhp_col);
             }
           }
@@ -1511,24 +1511,24 @@ unsigned int PXDUnpackerModule::remap_row_IF_OB(unsigned int DHP_row, unsigned i
   row = (DHP_row / 4) * 4  + Drain % 4;
 //   B2INFO("row false " << DHP_row << " col false " << DHP_col << " DCD line " << DCD_channel << " Gate " << Gate << " Drain " << Drain << " row geo " << row);
   B2INFO("Remapped :: ROW $" << DHP_row << " to $" << row);
-//     if((dhe_ID >> 5) & 0x1) == 0 ){v_cellID = 1;} //if inner module
-  return row;
+  if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 786 - 1 - row ;} //if inner module
+  if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = row ;} //if outer module
+  return v_cellID;
 }
 
 //Remaps cols of inner forward (IF) and outer backward (OB) modules of the PXD
-unsigned int PXDUnpackerModule::remap_col_IF_OB(unsigned int DHP_col, unsigned int DHP_row, unsigned int dhp_id,
-                                                unsigned int dhe_ID)
+unsigned int PXDUnpackerModule::remap_col_IF_OB(unsigned int DHP_col, unsigned int DHP_row, unsigned int dhp_id)
 {
   unsigned int DCD_channel = 0;
   unsigned int Drain = 0;
-  unsigned int col_geo = 0;
+  unsigned int u_cellID = 0;
 
   DCD_channel = 4 * DHP_col + DHP_row % 4 + 256 * dhp_id;
   Drain = LUT_IF_OB[DCD_channel];
-  col_geo = Drain / 4;
+  u_cellID = Drain / 4;
 //   B2INFO(" col false " << DHP_col << " DCD line " << DCD_channel << " col geo " << col_geo);
-  B2INFO("Remapped :: COL $" << DHP_col << " to $" << col_geo);
-  return col_geo;
+  B2INFO("Remapped :: COL $" << DHP_col << " to $" << u_cellID);
+  return u_cellID;
 }
 
 //Remaps rows of inner backward (IB) and outer forward (OF) modules of the PXD
@@ -1538,27 +1538,31 @@ unsigned int PXDUnpackerModule::remap_row_IB_OF(unsigned int DHP_row, unsigned i
   unsigned int DCD_channel = 0;
   unsigned int Drain = 0;
   unsigned int row = 0;
+  unsigned int v_cellID = 0;
 
   DCD_channel = 4 * DHP_col + DHP_row % 4 + 256 * dhp_id;
   Drain = LUT_IB_OF[DCD_channel];
-//   row = 4 * Gate + Drain % 4;
+  row = (DHP_row / 4) * 4  + Drain % 4;
 //   B2INFO("row false " << DHP_row << " col false " << DHP_col << " DCD line " << DCD_channel << " Gate " << Gate << " Drain " << Drain << " row geo " << row);
-  B2INFO("Remapped :: ROW $" << DHP_row << " to $" << row);
-  return row;
+  if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 786 - 1 - row ;} //if inner module
+  if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = row ;} //if outer module
+  B2INFO("Remapped :: ROW $" << DHP_row << " to $" << v_cellID);
+  return v_cellID;
 }
 
 //Remaps cols of inner backward (IB) and outer forward (OF) modules of the PXD
-unsigned int PXDUnpackerModule::remap_col_IB_OF(unsigned int DHP_col, unsigned int DHP_row, unsigned int dhp_id,
-                                                unsigned int dhe_ID)
+unsigned int PXDUnpackerModule::remap_col_IB_OF(unsigned int DHP_col, unsigned int DHP_row, unsigned int dhp_id)
 {
   unsigned int DCD_channel = 0;
   unsigned int Drain = 0;
-  unsigned int col_geo = 0;
+  unsigned int col = 0;
+  unsigned int u_cellID = 0;
 
   DCD_channel = 4 * DHP_col + DHP_row % 4 + 256 * dhp_id;
   Drain = LUT_IB_OF[DCD_channel];
-  col_geo = Drain / 4;
+  col = Drain / 4;
 //   B2INFO(" col false " << DHP_col << " DCD line " << DCD_channel << " col geo " << col_geo);
-  B2INFO("Remapped :: COL $" << DHP_col << " to $" << col_geo);
-  return col_geo;
+  u_cellID = 250 - 1 - col;
+  B2INFO("Remapped :: COL $" << DHP_col << " to $" << u_cellID);
+  return u_cellID;
 }

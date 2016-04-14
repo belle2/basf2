@@ -43,6 +43,8 @@ ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
   addParam("ROIListName", m_ROIListName, "name of the list of ROIs", std::string(""));
   addParam("ROIpayloadName", m_ROIpayloadName, "name of the payload of ROIs", std::string(""));
   addParam("TrigDivider", m_divider, "Generates one ROI every TrigDivider events", 2);
+  addParam("Desy2016ROIExtension", m_DESYROIExtension,
+           "Does a ROI coordinate extension for Desy TB 2016, WORKAROUND for missing DHH functionality", false);
   addParam("Desy2016Remapping", m_DESYremap,
            "Does a ROI coordinate remapping for Desy TB 2016, WORKAROUND for missing DHH functionality", false);
   addParam("SendAllDownscaler", mSendAllDS, "Send all Data (no selection) downscaler; Workaround for missing ONSEN functionality",
@@ -80,32 +82,45 @@ void ROIPayloadAssemblerModule::event()
   int ROIListSize = ROIList.getEntries();
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  int trgNum = eventMetaDataPtr->getEvent(); // trigger number
 
-  if (trgNum % m_divider != 0)
-    /// TODO Why the hell is it necessary to flip the coordinated here????? This should be correct within the geometry file!!!
-    for (int iROI = 0; iROI < ROIListSize; iROI++) {
+  /// This is necessary as long as DHH is NOT delivering the DHP coordinates in local sensor coordinates (Ucell/Vcell)
+  for (int iROI = 0; iROI < ROIListSize; iROI++) {
+    const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(ROIList[iROI]->getSensorID());
+    const int nPixelsU = aSensorInfo.getUCells() - 1;
+    const int nPixelsV = aSensorInfo.getVCells() - 1;
 
-      const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(ROIList[iROI]->getSensorID());
-      const int nPixelsU = aSensorInfo.getUCells() - 1;
-      const int nPixelsV = aSensorInfo.getVCells() - 1;
-
-      ROIid tmpROIid;
-
-      tmpROIid.setSensorID(ROIList[iROI]->getSensorID());
-      unsigned int tmpRowMin = nPixelsU - ROIList[iROI]->getMinUid();
-      unsigned int tmpRowMax = nPixelsU - ROIList[iROI]->getMaxUid();
-      unsigned int tmpColMin = nPixelsV - ROIList[iROI]->getMinVid();
-      unsigned int tmpColMax = nPixelsV - ROIList[iROI]->getMaxVid();
-
-      tmpROIid.setMinUid(std::min(tmpRowMin, tmpRowMax));
-      tmpROIid.setMaxUid(std::max(tmpRowMin, tmpRowMax));
-      tmpROIid.setMinVid(std::min(tmpColMin, tmpColMax));
-      tmpROIid.setMaxVid(std::max(tmpColMin, tmpColMax));
-
-      ROIList.appendNew(tmpROIid);
+    unsigned int tmpRowMin;
+    unsigned int tmpRowMax;
+    if (m_DESYremap and (ROIList[iROI]->getSensorID()).getLayerNumber() == 1) {
+      // Inner (because of NO -1 above
+      tmpRowMin = nPixelsV - ROIList[iROI]->getMinVid();
+      tmpRowMax = nPixelsV - ROIList[iROI]->getMaxVid();
+    } else {
+      // Outer
+      tmpRowMin = ROIList[iROI]->getMinVid();
+      tmpRowMax = ROIList[iROI]->getMaxVid();
     }
 
+    unsigned int tmpColMin;
+    unsigned int tmpColMax;
+    if (m_DESYremap and (ROIList[iROI]->getSensorID()).getLayerNumber() != (ROIList[iROI]->getSensorID()).getSensorNumber()) {
+      // Outer Forward, Inner Backward
+      tmpColMin = nPixelsU - ROIList[iROI]->getMinUid();
+      tmpColMax = nPixelsU - ROIList[iROI]->getMaxUid();
+    } else { // (layer!=sensor)
+      // Inner Forward, Outer Backward
+      tmpColMin = ROIList[iROI]->getMinUid();
+      tmpColMax = ROIList[iROI]->getMaxUid();
+    }
+
+    ROIid tmpROIid;
+    tmpROIid.setSensorID(ROIList[iROI]->getSensorID());
+    tmpROIid.setMinVid(std::min(tmpRowMin, tmpRowMax));
+    tmpROIid.setMaxVid(std::max(tmpRowMin, tmpRowMax));
+    tmpROIid.setMinUid(std::min(tmpColMin, tmpColMax));
+    tmpROIid.setMaxUid(std::max(tmpColMin, tmpColMax));
+    ROIList.appendNew(tmpROIid);
+  }
 
   ROIListSize = ROIList.getEntries();
 
@@ -136,7 +151,7 @@ void ROIPayloadAssemblerModule::event()
     unsigned int column1 = std::min(tmpColMin, tmpColMax);
     unsigned int column2 = std::max(tmpColMin, tmpColMax);
 
-    if (m_DESYremap) DESYremap(row1, row2, column1, column2);
+    if (m_DESYROIExtension) DESYremap(row1, row2, column1, column2);
 
     m_roiraw.setRowMin(row1);
     m_roiraw.setRowMax(row2);
@@ -149,9 +164,9 @@ void ROIPayloadAssemblerModule::event()
 
   B2DEBUG(1, " number of ROIs in the set = " << orderedROIraw.size());
 
-  // The payload is created with a buffer long enough to contains all
-  // the ROIs but the actual payload will contains max 32 ROIs per pxd
-  // sensor per event as required by the Onsens specifications
+// The payload is created with a buffer long enough to contains all
+// the ROIs but the actual payload will contains max 32 ROIs per pxd
+// sensor per event as required by the Onsens specifications
   ROIpayload* payload = new ROIpayload(ROIListSize);// let the ROIpayload compute the size itself
 
   StoreObjPtr<ROIpayload> payloadPtr(m_ROIpayloadName);
@@ -162,10 +177,10 @@ void ROIPayloadAssemblerModule::event()
   bool accepted = true; // thats the default until HLT has reject mechanism
   payload->setHeader(accepted, (evtNr % mSendAllDS) == 0, (evtNr % mSendROIsDS) == 0);
 
-  //  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+//  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   payload->setTriggerNumber(eventMetaDataPtr->getEvent());
 
-  // Set run subrun exp number
+// Set run subrun exp number
   payload->setRunSubrunExpNumber(eventMetaDataPtr->getRun(), eventMetaDataPtr->getSubrun(), eventMetaDataPtr->getExperiment());
 
   int tmpDHHID = -1;

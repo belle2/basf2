@@ -8,17 +8,20 @@ from basf2 import *
 from basf2 import Module
 
 rawinput = register_module('PXDReadRawONSEN')
-rawinput.param('FileName', 'dump.dat')
+rawinput.param('FileName', 'dhh_data_nonref.dat')
 
 unpacker = register_module('PXDUnpacker')
+# uncoment the next two lines in order to remap DHP data
+# unpacker.param('RemapLUT_IF_OB','LUT_IF_OB.csv');
+# unpacker.param('RemapLUT_IB_OF','LUT_IB_OF.csv');
 # unpacker.param('DoNotStore',True);
 # unpacker.param('HeaderEndianSwap',False);
 
 histoman = register_module('HistoManager')
-histoman.param('histoFileName', 'your_histo_file.root')
+histoman.param('histoFileName', 'dhh_data_nonref_HISTO.root')
 
 simpleoutput = register_module('RootOutput')
-simpleoutput.param('outputFileName', 'PXDRawHit.root')
+simpleoutput.param('outputFileName', 'dhh_data_nonref_RAW.root')
 simpleoutput.param('compressionLevel', 0)
 
 main = create_path()

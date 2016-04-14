@@ -20,6 +20,8 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <framework/datastore/StoreArray.h>
+#include <iostream>
+#include <fstream>
 
 namespace Belle2 {
 
@@ -53,6 +55,8 @@ namespace Belle2 {
       std::string m_PXDRawPedestalsName;  /**< The name of the StoreArray of PXDRawPedestals to be generated */
       std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
       std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
+      std::string m_RemapLUTifob;  /**< Name of the LUT which remaps DHP data for inner forward and outer backward modules */
+      std::string m_RemapLUTibof;  /**< Name of the LUT which remaps DHP data for inner backward and outer forward modules */
 
       /**  Swap the endianess of the ONSEN header yes/no */
       bool m_headerEndianSwap;
@@ -83,6 +87,7 @@ namespace Belle2 {
       StoreArray<PXDRawPedestal> m_storeRawPedestal;
       /** Output array for Clusters. */
       StoreArray<PXDRawCluster> m_storeRawCluster;
+
 
       /** Unpack one event (several frames) stored in RawPXD object./ Unpack one cluster stored in Cluster object.
        * @param px RawPXD data object
@@ -142,6 +147,21 @@ namespace Belle2 {
 
       int nr5bits(int i) const;/// helper function to "count" nr of set bits within lower 5 bits
 
+      //Remaps rows of inner forward (IF) and outer backward (OB) modules of the PXD
+      unsigned int remap_row_IF_OB(unsigned int row_false, unsigned int col_false, unsigned int dhp_id);
+
+      //Remaps cols of inner forward (IF) and outer backward (OB) modules of the PXD
+      unsigned int remap_col_IF_OB(unsigned int col_false, unsigned int row_false, unsigned int dhp_id);
+
+      //Remaps rows of inner backward (IB) and outer forward (OF) modules of the PXD
+      unsigned int remap_row_IB_OF(unsigned int row_false, unsigned int col_false, unsigned int dhp_id);
+
+      //Remaps cols of inner backward (IB) and outer forward (OF) modules of the PXD
+      unsigned int remap_col_IB_OF(unsigned int col_false, unsigned int row_false, unsigned int dhp_id);
+
+      //Lookup tables for DHP remapping
+      int LUT_IF_OB[1030];
+      int LUT_IB_OF[1030];
 
       /** Error Mask set per packet / event*/
       unsigned int m_errorMask;

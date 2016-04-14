@@ -644,6 +644,10 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing DATCON ROIs", false);
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
   addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of PXD Clusters to be processed", std::string(""));
+  addParam("RemapLUT_IF_OB", m_RemapLUTifob, "Name of the LUT which remaps the inner forward and outer backward layer",
+           std::string(""));
+  addParam("RemapLUT_IB_OF", m_RemapLUTibof, "Name of the LUT which remaps the inner backward and outer forward layer",
+           std::string(""));
 }
 
 void PXDUnpackerModule::initialize()
@@ -666,6 +670,36 @@ void PXDUnpackerModule::initialize()
 
   m_unpackedEventsCount = 0;
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) m_errorCounter[i] = 0;
+
+  printf("open LUT  \n");
+  int i = 0;
+  ifstream LUT_IF_OB_read(m_RemapLUTifob.c_str());
+  if (LUT_IF_OB_read) {
+    B2INFO("Read Raw ONSEN Data from " << m_RemapLUTifob);
+  } else {
+    B2ERROR("Could not open Raw ONSEN Data: " << m_RemapLUTifob);
+  }
+  while (!LUT_IF_OB_read.eof()) {
+    i++;
+    LUT_IF_OB_read >> LUT_IF_OB[i];
+//      cout << "LUT_IF_OB :: " << i << " :: " << LUT_IF_OB[i] << endl;
+  }
+  printf("LUT_IF_OB written \n");
+  LUT_IF_OB_read.close();
+  int j = 0;
+  ifstream LUT_IB_OF_read(m_RemapLUTibof.c_str());
+  if (LUT_IB_OF_read) {
+    B2INFO("Read Raw ONSEN Data from " << m_RemapLUTibof);
+  } else {
+    B2ERROR("Could not open Raw ONSEN Data: " << m_RemapLUTibof);
+  }
+  while (!LUT_IB_OF_read.eof()) {
+    j++;
+    LUT_IB_OF_read >> LUT_IB_OF[j];
+//    cout << "LUT_IB_OF :: " << j << " :: " << LUT_IB_OF[j] << endl;
+  }
+  LUT_IB_OF_read.close();
+  printf("LUT_IB_OF written\n");
 }
 
 void PXDUnpackerModule::terminate()
@@ -921,7 +955,21 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
   unsigned int dhp_offset = 0;
   bool rowflag = false;
+  //is frame from (inner forward & outer backward) or (inner backward & outer forward) sensor
+  bool IFOB_flag = false;
+  bool IBOF_flag = false;
 
+  //checks if frame is from inner forward or outer backward sensor
+  if ((((dhe_ID >> 5) & 0x1) == 1 && (dhe_ID & 0x1) == 1) || (((dhe_ID >> 5) & 0x1) == 0 && (dhe_ID & 0x1) == 0)) {
+    IFOB_flag = true;
+  }
+
+  //checks if frame is from inner backward or outer forward sensor
+  if ((((dhe_ID >> 5) & 0x1) == 1 && (dhe_ID & 0x1) == 0) || (((dhe_ID >> 5) & 0x1) == 0 && (dhe_ID & 0x1) == 1)) {
+    IBOF_flag = true;
+  }
+  B2INFO("dhe_reformat :: " << dhe_reformat << " IFOB_flag :: " << IFOB_flag);
+  B2INFO("dhe_reformat :: " << dhe_reformat << " IBOF_flag :: " << IBOF_flag);
   if (nr_words < 4) {
     B2ERROR("DHP frame size error (too small) " << nr_words);
     m_errorMask |= ONSEN_ERR_FLAG_DHP_SIZE;
@@ -961,6 +1009,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     return;
   }
 
+  //offsets might be 0, 61, 125, 189
   static int offtab[4] = {0, 64, 128, 192};
   dhp_offset = offtab[dhp_dhp_id];
 
@@ -989,7 +1038,21 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
           dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] & 0x4000) >> 14);
           dhp_col = ((dhp_pix[i]  & 0x3F00) >> 8);
           ///  remapping flag
-          if (dhe_reformat == 0) dhp_col ^= 0x3C ; /// 0->60 61 62 63 4->56 57 58 59 ...
+//           if (dhe_reformat == 0) dhp_col ^= 0x3C ; /// 0->60 61 62 63 4->56 57 58 59 ..
+
+          if ((dhe_reformat == 0) && (IFOB_flag == 1)) {
+            B2INFO("Remap inner forward or outer backward ...");
+            dhp_row = PXDUnpackerModule::remap_row_IF_OB(dhp_row, dhp_col, dhp_dhp_id);
+            dhp_col = PXDUnpackerModule::remap_col_IF_OB(dhp_col, dhp_col, dhp_dhp_id);
+//      B2INFO("Remapped :: ROW_GEO " << dhp_row << " COL_GEO " << dhp_col);
+          }
+
+          if ((dhe_reformat == 0) && (IBOF_flag == 1)) {
+            B2INFO("Remap inner backward or outer forward ...");
+            dhp_row = PXDUnpackerModule::remap_row_IB_OF(dhp_row, dhp_col, dhp_dhp_id);
+            dhp_col = PXDUnpackerModule::remap_col_IB_OF(dhp_col, dhp_col, dhp_dhp_id);
+//        B2INFO("Remapped :: ROW_GEO " << dhp_row << " COL_GEO " << dhp_col);
+          }
           dhp_col += dhp_offset;
           dhp_adc = dhp_pix[i] & 0xFF;
           if (printflag)
@@ -1057,8 +1120,6 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   static unsigned int currentDHEID = 0xFFFFFFFF;
   static unsigned int currentVxdId = 0;
   static bool isFakedData_event = false;
-
-
 
   dhc_frame_header_word0* hw = (dhc_frame_header_word0*)data;
 //   error_flag = false;
@@ -1148,7 +1209,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       m_errorMask |= dhc.check_crc();
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 //       stat_zsd++;
-
+      B2INFO("Unpack DHP ZSD with reformat flag $" << dhc.data_direct_readout_frame->getDataReformattedFlag());
       unpack_dhp(data, len - 4,
                  dhe_first_readout_frame_id_lo,
                  dhc.data_direct_readout_frame->getDHEId(),
@@ -1218,6 +1279,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       break;
     };
     case DHC_FRAME_HEADER_DATA_TYPE_DHE_START: {
+//       bool ref_flag;
       countedDHCFrames++;
       if (verbose)dhc.data_dhe_start_frame->print();
       dhe_first_readout_frame_id_lo = dhc.data_dhe_start_frame->getStartFrameNr();
@@ -1430,5 +1492,66 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
 }
 
+//Remaps rows of inner forward (IF) and outer backward (OB) modules of the PXD
+unsigned int PXDUnpackerModule::remap_row_IF_OB(unsigned int row_false, unsigned int col_false, unsigned int dhp_id)
+{
+  unsigned int DCD_line = 0;
+  unsigned int MDrain = 0;
+  unsigned int Gate = 0;
+  unsigned int row_geo = 0;
 
+  DCD_line = 4 * col_false + row_false % 4 + 256 * dhp_id;
+  Gate = row_false / 4;
+  MDrain = LUT_IF_OB[DCD_line];
+  row_geo = 4 * Gate + MDrain % 4;
+//   B2INFO("row false " << row_false << " col false " << col_false << " DCD line " << DCD_line << " Gate " << Gate << " MDrain " << MDrain << " row geo " << row_geo);
+  B2INFO("Remapped :: ROW $" << row_false << " to $" << row_geo);
+  return row_geo;
+}
 
+//Remaps cols of inner forward (IF) and outer backward (OB) modules of the PXD
+unsigned int PXDUnpackerModule::remap_col_IF_OB(unsigned int col_false, unsigned int row_false, unsigned int dhp_id)
+{
+  unsigned int DCD_line = 0;
+  unsigned int MDrain = 0;
+  unsigned int col_geo = 0;
+
+  DCD_line = 4 * col_false + row_false % 4 + 256 * dhp_id;
+  MDrain = LUT_IF_OB[DCD_line];
+  col_geo = MDrain / 4;
+//   B2INFO(" col false " << col_false << " DCD line " << DCD_line << " col geo " << col_geo);
+  B2INFO("Remapped :: COL $" << col_false << " to $" << col_geo);
+  return col_geo;
+}
+
+//Remaps rows of inner backward (IB) and outer forward (OF) modules of the PXD
+unsigned int PXDUnpackerModule::remap_row_IB_OF(unsigned int row_false, unsigned int col_false, unsigned int dhp_id)
+{
+  unsigned int DCD_line = 0;
+  unsigned int MDrain = 0;
+  unsigned int Gate = 0;
+  unsigned int row_geo = 0;
+
+  DCD_line = 4 * col_false + row_false % 4 + 256 * dhp_id;
+  Gate = row_false / 4;
+  MDrain = LUT_IB_OF[DCD_line];
+  row_geo = 4 * Gate + MDrain % 4;
+//   B2INFO("row false " << row_false << " col false " << col_false << " DCD line " << DCD_line << " Gate " << Gate << " MDrain " << MDrain << " row geo " << row_geo);
+  B2INFO("Remapped :: ROW $" << row_false << " to $" << row_geo);
+  return row_geo;
+}
+
+//Remaps cols of inner backward (IB) and outer forward (OF) modules of the PXD
+unsigned int PXDUnpackerModule::remap_col_IB_OF(unsigned int col_false, unsigned int row_false, unsigned int dhp_id)
+{
+  unsigned int DCD_line = 0;
+  unsigned int MDrain = 0;
+  unsigned int col_geo = 0;
+
+  DCD_line = 4 * col_false + row_false % 4 + 256 * dhp_id;
+  MDrain = LUT_IB_OF[DCD_line];
+  col_geo = MDrain / 4;
+//   B2INFO(" col false " << col_false << " DCD line " << DCD_line << " col geo " << col_geo);
+  B2INFO("Remapped :: COL $" << col_false << " to $" << col_geo);
+  return col_geo;
+}

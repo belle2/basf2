@@ -64,6 +64,8 @@ namespace Belle2 {
       bool m_ignoreDATCON;
       /** Only unpack, but Do Not Store anything to file */
       bool m_doNotStore;
+      /**< Set to one if data should be remapped according to Belle II node 10 */
+      bool m_RemapFlag;
       /** Event Number from MetaInfo */
       unsigned long m_meta_event_nr;
       /** Run Number from MetaInfo */
@@ -148,16 +150,16 @@ namespace Belle2 {
       int nr5bits(int i) const;/// helper function to "count" nr of set bits within lower 5 bits
 
       //Remaps rows of inner forward (IF) and outer backward (OB) modules of the PXD
-      unsigned int remap_row_IF_OB(unsigned int row_false, unsigned int col_false, unsigned int dhp_id);
+      unsigned int remap_row_IF_OB(unsigned int row_false, unsigned int col_false, unsigned int dhp_id, unsigned int dhe_ID);
 
       //Remaps cols of inner forward (IF) and outer backward (OB) modules of the PXD
-      unsigned int remap_col_IF_OB(unsigned int col_false, unsigned int row_false, unsigned int dhp_id);
+      unsigned int remap_col_IF_OB(unsigned int col_false, unsigned int row_false, unsigned int dhp_id, unsigned int dhe_ID);
 
       //Remaps rows of inner backward (IB) and outer forward (OF) modules of the PXD
-      unsigned int remap_row_IB_OF(unsigned int row_false, unsigned int col_false, unsigned int dhp_id);
+      unsigned int remap_row_IB_OF(unsigned int row_false, unsigned int col_false, unsigned int dhp_id, unsigned int dhe_ID);
 
       //Remaps cols of inner backward (IB) and outer forward (OF) modules of the PXD
-      unsigned int remap_col_IB_OF(unsigned int col_false, unsigned int row_false, unsigned int dhp_id);
+      unsigned int remap_col_IB_OF(unsigned int col_false, unsigned int row_false, unsigned int dhp_id, unsigned int dhe_ID);
 
       //Lookup tables for DHP remapping
       int LUT_IF_OB[1030];

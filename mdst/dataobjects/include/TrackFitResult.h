@@ -216,7 +216,8 @@ namespace Belle2 {
     /** Getter for the hit pattern in the VXD; @sa HitPatternVXD */
     HitPatternVXD getHitPatternVXD() const;
 
-    virtual std::string getInfoHTML() const;
+    /** Return a short summary of this object's contents in HTML format. */
+    virtual std::string getInfoHTML() const override;
 
     ///--------------------------------------------------------------------------------------------------------------------------
   private:
@@ -267,7 +268,7 @@ namespace Belle2 {
      */
     const uint32_t m_hitPatternVXDInitializer;
 
-    ClassDef(TrackFitResult, 7); /**< Values of the result of a track fit with a given particle hypothesis. */
+    ClassDefOverride(TrackFitResult, 7); /**< Values of the result of a track fit with a given particle hypothesis. */
     /* Version history:
        ver 7: fixed sign errors in the translation of position and momentum covariances.
        ver 6: use fixed size arrays instead of vectors (add schema evolution rule), use Double32_t.

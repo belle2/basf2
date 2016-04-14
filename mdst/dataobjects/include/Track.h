@@ -13,8 +13,6 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <algorithm>
 
-namespace genfit { class Track; }
-
 namespace Belle2 {
   class TrackFitResult;
   /** Class that bundles various TrackFitResults.

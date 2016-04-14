@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #include <mdst/dataobjects/HitPatternVXD.h>
+#include <framework/logging/Logger.h>
+
 
 using namespace Belle2;
 

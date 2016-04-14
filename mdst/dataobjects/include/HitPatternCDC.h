@@ -9,13 +9,9 @@
 **************************************************************************/
 #pragma once
 
-#include <framework/logging/Logger.h>
-
 #include <Rtypes.h>
 
 #include <bitset>
-#include <algorithm>
-#include <vector>
 #include <map>
 #include <utility>
 

@@ -10,10 +10,8 @@
 
 #pragma once
 
-#include <framework/logging/Logger.h>
-
 #include <bitset>
-#include <algorithm>
+#include <utility>
 #include <list>
 
 namespace Belle2 {

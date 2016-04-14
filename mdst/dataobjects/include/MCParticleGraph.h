@@ -16,9 +16,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <set>
-#include <vector>
 #include <string>
-#include <stdexcept>
 
 
 namespace Belle2 {
@@ -48,7 +46,8 @@ namespace Belle2 {
     /** The exception is thrown if a non-physical decay was detected in the graph. */
     BELLE2_DEFINE_EXCEPTION(NonContinousDaughtersError, "Can not represent decay graph, non continuous indices for daughters")
     /** The exception is thrown if a daughter already has a mother assigned to it. */
-    BELLE2_DEFINE_EXCEPTION(DaughterHasMotherError, "A daughter particle was already assigned to a mother. A particle can't have two mothers!")
+    BELLE2_DEFINE_EXCEPTION(DaughterHasMotherError,
+                            "A daughter particle was already assigned to a mother. A particle can't have two mothers!")
     /** The exception is thrown if the specified index is out of range. */
     BELLE2_DEFINE_EXCEPTION(OutOfRangeError, "Index out of range")
 
@@ -82,7 +81,8 @@ namespace Belle2 {
        * assign all values/flags from the MCParticle.
        * @param particle Particle which values (momentum, energy, mass, vertex, etc.) shall be assigned
        */
-      GraphParticle& operator=(const MCParticle& particle) {
+      GraphParticle& operator=(const MCParticle& particle)
+      {
         MCParticle::operator=(particle);
         //The pointer to the TClonesArray the MCParticle is stored in makes no
         //sense inside the Graph so we set it to some invalid value to avoid
@@ -178,7 +178,8 @@ namespace Belle2 {
        * @param index The vertex id of the particle in the graph.
        */
       GraphParticle(MCParticleGraph* graph, unsigned int vertexId): MCParticle(),
-        m_graph(graph), m_vertexId(vertexId), m_ignore(false), m_primary(true), m_trackID(0) {
+        m_graph(graph), m_vertexId(vertexId), m_ignore(false), m_primary(true), m_trackID(0)
+      {
         //The pointer to the TClonesArray the MCParticle is stored in makes no
         //sense inside the Graph so we set it to some invalid value to avoid
         //the MCParticle::fixParticleList() to complain

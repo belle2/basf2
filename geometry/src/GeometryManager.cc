@@ -269,6 +269,11 @@ namespace Belle2 {
         "Initialization of magnetic field took ",
         BFieldMap::Instance().getBField(TVector3(0, 0, 0));
       );
+      B2INFO("Optimizing geometry and creating lookup tables ...")
+      B2INFO_MEASURE_TIME(
+        "Optimizing geometry took ",
+        G4GeometryManager::GetInstance()->CloseGeometry(true, LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME()));
+      );
     }
 
     void GeometryManager::createTGeoRepresentation()

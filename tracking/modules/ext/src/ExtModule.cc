@@ -67,7 +67,7 @@ ExtModule::ExtModule() :
   m_Enter(NULL), // initialized later
   m_Exit(NULL), // initialized later
   m_TOF(0.0), // initialized later
-  m_MinRadiusSq(0.0), // initialized later
+  m_MinRadiusSq(10.0 * 10.0), // mm^2 - this is the (beam pipe radius)^2
   m_Target(NULL) // initialized later
 {
   m_PDGCode.clear();
@@ -139,7 +139,6 @@ void ExtModule::initialize()
   double halfLength = strContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
   m_Target = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_Target);
-  m_MinRadiusSq = (rMaxCoil * 0.25) * (rMaxCoil * 0.25); // roughly 40 cm
 
   // Hypotheses for extrapolation
   const Const::ParticleSet set = Const::chargedStableSet;

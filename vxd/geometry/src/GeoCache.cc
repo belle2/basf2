@@ -54,7 +54,10 @@ namespace Belle2 {
     {
       id.setSegmentNumber(0);
       SensorInfoMap::const_iterator info = m_sensorInfo.find(id);
-      if (info == m_sensorInfo.end()) B2FATAL("VXD Sensor " << id << " does not exist.");
+      if (info == m_sensorInfo.end()) {
+        B2WARNING("VXD Sensor " << id << " does not exist.");
+        return *(m_sensorInfo.begin()->second);
+      }
       return *(info->second);
     }
 

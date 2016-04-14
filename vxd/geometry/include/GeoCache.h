@@ -86,6 +86,7 @@ namespace Belle2 {
       const std::vector<VxdID> getListOfSensors() const;
 
       /** Return a referecne to the SensorInfo of a given SensorID */
+      /* If sensor not found, it returns a warning and the first sensor!*/
       const SensorInfoBase& getSensorInfo(Belle2::VxdID id) const;
 
       /** Return a reference to the SensorInfo of a given SensorID.

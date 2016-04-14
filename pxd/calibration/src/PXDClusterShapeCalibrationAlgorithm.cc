@@ -107,11 +107,14 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   name_OutFileCalibrations = Form("pxdClShCal%s.root", name_Case.Data());
   int SummariesInfo[20];
   for (int i = 0; i < 20; i++) SummariesInfo[i] = 0;
-  int SummariesInfoPK[m_pixelkinds];
+  //int SummariesInfoPK[m_pixelkinds];
+  std::vector<int> SummariesInfoPK(m_pixelkinds);
   for (int i = 0; i < m_pixelkinds; i++) SummariesInfoPK[i] = 0;
-  int SummariesInfoSh[m_shapes];
+  //int SummariesInfoSh[m_shapes];
+  std::vector<int> SummariesInfoSh(m_shapes);
   for (int i = 0; i < m_shapes; i++) SummariesInfoSh[i] = 0;
-  int SummariesInfoAng[m_anglesU * m_anglesV];
+  //int SummariesInfoAng[m_anglesU * m_anglesV];
+  std::vector<int> SummariesInfoAng(m_anglesU * m_anglesV);
   for (int i = 0; i < m_anglesU * m_anglesV; i++) SummariesInfoAng[i] = 0;
 
   // START - section for variables for DQM and expert histograms

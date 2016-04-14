@@ -62,7 +62,7 @@ public:
   {
     // Is this an exception for low-momentum track that would over-curl in B field?
     if (strstr(description, "Error returned: 3") != NULL) {
-      B2INFO("In " << origin << ", " << code << ": " << description)
+      B2DEBUG(1, "In " << origin << ", " << code << ": " << description)
     } else {
       B2ERROR("In " << origin << ", " << code << ": " << description)
     }

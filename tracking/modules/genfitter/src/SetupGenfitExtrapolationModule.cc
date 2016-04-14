@@ -31,6 +31,8 @@
 
 #include <vxd/geometry/GeoCache.h>
 
+#include <TMath.h>
+
 using namespace Belle2;
 
 REG_MODULE(SetupGenfitExtrapolation)
@@ -220,24 +222,13 @@ void SetupGenfitExtrapolationModule::updateVXDAlignment()
     TGeoRotation rotation;
 
     translation.SetTranslation(du, dv, dw);
-
     // Unfortunatelly we want to use different angle definition than TGeoRotation
     // for alignment. TGeo is using Euler angles in zx'z'' convention, where we want
-    // xy'z'' (Note, order of matrix multiplication is R(Z)R(Y)R(X))
-    Double_t m[9];
-    double alfa = dalpha;
-    double beta = dbeta;
-    double gama = dgamma;
-    m[0] = cos(beta) * cos(gama);
-    m[1] = cos(alfa) * sin(gama) + sin(alfa) * sin(beta) * cos(gama);
-    m[2] = sin(alfa) * sin(gama) - cos(alfa) * sin(beta) * cos(gama);
-    m[3] = - cos(beta) * sin(gama);
-    m[4] = cos(alfa) * cos(gama) - sin(alfa) * sin(beta) * sin(gama);
-    m[5] = sin(alfa) * cos(gama) + cos(alfa) * sin(beta) * cos(gama);
-    m[6] = sin(beta);
-    m[7] = - sin(alfa) * cos(beta);
-    m[8] = cos(alfa) * cos(beta);
-    rotation.SetMatrix(m);
+    // xy'z''
+    // Note the order of matrix multiplication is R(Z, gamma)R(Y, beta)R(X, alpha)
+    rotation.RotateX(- dalpha * TMath::RadToDeg());
+    rotation.RotateY(- dbeta  * TMath::RadToDeg());
+    rotation.RotateZ(- dgamma * TMath::RadToDeg());
 
     // Correct nominal position with alignment
     TGeoCombiTrans correction(translation, rotation);

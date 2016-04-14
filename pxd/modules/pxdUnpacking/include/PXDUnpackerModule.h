@@ -32,7 +32,7 @@ namespace Belle2 {
 
     /** The PXDUnpacker module.
      *
-     * This module is responsible for unpacking the Raw PXD data to Pixels
+     * This module is responsible for unpacking the Raw PXD data to Pixels in v_cellID and u_cellID (global tracking coordinates system)
      */
     class PXDUnpackerModule : public Module {
 

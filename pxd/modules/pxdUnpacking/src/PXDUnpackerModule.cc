@@ -648,7 +648,7 @@ PXDUnpackerModule::PXDUnpackerModule() :
            std::string(""));
   addParam("RemapLUT_IB_OF", m_RemapLUTibof, "Name of the LUT which remaps the inner backward and outer forward layer",
            std::string(""));
-  addParam("RemapCoordinates", m_RemapFlag, "Set to one if DHP data should be remapped according to Belle II node 10", false);
+  addParam("RemapFlag", m_RemapFlag, "Set to one if DHP data should be remapped according to Belle II node 10", false);
 }
 
 void PXDUnpackerModule::initialize()

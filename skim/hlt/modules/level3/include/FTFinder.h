@@ -62,7 +62,7 @@ namespace Belle2 {
     int getWireId(FTWire*) const;
 
     //! convert t to x
-    double t2x(const double t) const;
+    double t2x(const FTLayer& l, const double t) const;
 
     //! convert x to t
     double x2t(const double x) const;
@@ -114,8 +114,14 @@ namespace Belle2 {
     //! coefficient of the x-t relation
     double m_xtCoEff;
 
+    //! additional coefficient of the x-t relation
+    double m_xtCoEff2;
+
     //! time window of a hit
     double m_tWindow;
+
+    //! nominal T0 value
+    double m_tZero;
 
     //! pointer to the array of wires
     FTWire* m_wire;
@@ -185,14 +191,15 @@ namespace Belle2 {
   double
   FTFinder::x2t(const double x) const
   {
-    return x / m_xtCoEff;
+    return pow(x / m_xtCoEff, 1. / m_xtCoEff2);
   }
 
   inline
   double
-  FTFinder::t2x(const double t) const
+  FTFinder::t2x(const FTLayer& l, const double t) const
   {
-    return t * m_xtCoEff;
+    double x = t > 0. ? m_xtCoEff * pow(t, m_xtCoEff2) : 0.;
+    return x > 0.5 * l.csize() ? 0.5 * l.csize() : x;
   }
 
 }

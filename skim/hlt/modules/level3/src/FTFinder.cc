@@ -34,7 +34,9 @@ FTFinder::instance(void)
 FTFinder::FTFinder()
   : m_tOffSet(FLT_MAX),
     m_xtCoEff(FLT_MAX),
+    m_xtCoEff2(FLT_MAX),
     m_tWindow(400.),
+    m_tZero(0.),
     m_wire(NULL),
     m_layer(NULL),
     m_superLayer(NULL),
@@ -55,7 +57,9 @@ FTFinder::FTFinder()
 FTFinder::FTFinder(const FTFinder& o)
   : m_tOffSet(o.m_tOffSet),
     m_xtCoEff(o.m_xtCoEff),
-    m_tWindow(400.),
+    m_xtCoEff2(o.m_xtCoEff2),
+    m_tWindow(o.m_tWindow),
+    m_tZero(o.m_tZero),
     m_wire(o.m_wire),
     m_layer(o.m_layer),
     m_superLayer(o.m_superLayer),
@@ -206,12 +210,14 @@ FTFinder::beginRun()
 
   // set default x-t parameters
   m_tOffSet = -15.;
-  m_xtCoEff = 40. / 10000.;
+  m_xtCoEff = 0.025;
+  m_xtCoEff2 = 0.6;
   m_tWindowLow = -m_tWindow;
   m_tWindowHigh = m_tWindow + 300.;
   FTTrack::s_additionalTdcCuts = true;
 
   // read bad wires, T0 and pedestal
+  m_tZero = 8340.;
 
 }
 
@@ -311,7 +317,7 @@ FTFinder::updateCdc3(void)
 
     const CDCHit& h = * CDCHits[i];
 
-    double time = (double)h.getTDCCount();
+    double time = m_tZero - (double)h.getTDCCount();
     //double adc = (double)h.getADCCount();
 
     FTSuperLayer& sup = m_superLayer[h.getISuperLayer()];
@@ -322,12 +328,12 @@ FTFinder::updateCdc3(void)
     //... Remove bad wire
     if (wire.stateAND(FTWire::Dead)) continue;
 
-    if (time < -m_tWindow || time > m_tWindow + 300) continue;
+    if (time < m_tWindowLow || time > m_tWindowHigh) continue;
 
     //... execute adc cuts
     //if (!adc_cut_(&m_ExpNo,&m_RunNo,&adc,&layer,&local)) continue;
 
-    wire.distance(t2x(time));
+    wire.distance(t2x(layer, time));
     wire.state(FTWire::Hit);
     sup.appendHit(&wire);
 

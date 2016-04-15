@@ -144,7 +144,7 @@ FTTrack::rPhiReFit(double vx, double vy, int vtx_flag)
         if (s_additionalTdcCuts) {
           if (time < -100. || time > FTFinder::instance().x2t(0.6 * cellsize)) continue;
         }
-        h.distance(FTFinder::instance().t2x(time));
+        h.distance(FTFinder::instance().t2x(h.layer(), time));
       }
       double delta = h.distance() / h.layer().r();
       if (fabs(d0) - delta > 0.5 * cellsize) continue; // remove bad hits
@@ -227,7 +227,7 @@ FTTrack::szFit(void)
         if (s_additionalTdcCuts) {
           if (time < -100. || time > FTFinder::instance().x2t(0.6 * cellsize)) continue;
         }
-        h.distance(FTFinder::instance().t2x(time));
+        h.distance(FTFinder::instance().t2x(h.layer(), time));
       }
       double par = h.distance() / (0.25 * cellsize);
       m_za->add(s, z, exp(-par * par));

@@ -16,7 +16,7 @@
 #include <iostream>
 
 
-void pid(){
+void combinedPID_performance(){
 
   TFile* infile = new TFile("CombinedPIDPerformance.root","READ");
   if(!infile) {

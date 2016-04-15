@@ -122,7 +122,7 @@ void Framework::process(PathPtr startPath, long maxEvent)
       pEventProcessor processor;
       processor.process(startPath, maxEvent);
     }
-    errors_from_previous_run += LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
+    errors_from_previous_run = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
   } catch (std::exception& e) {
     B2ERROR("Uncaught exception encountered: " << e.what()); //should show module name
     DataStore::Instance().reset(); // ensure we are executed before ROOT's exit handlers

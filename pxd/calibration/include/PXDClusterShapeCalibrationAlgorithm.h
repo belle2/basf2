@@ -155,7 +155,7 @@ namespace Belle2 {
     int getThetaIndex(float theta);
 
     /** Calculate mean value and its error from array of values */
-    int CalculateCorrection(int CorCase, int n, double* array, double* val, double* valError, double* rms);
+    int CalculateCorrection(int CorCase, int n, std::vector<double> array, double* val, double* valError, double* rms);
 
   protected:
 

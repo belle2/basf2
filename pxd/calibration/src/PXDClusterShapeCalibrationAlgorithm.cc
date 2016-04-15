@@ -599,7 +599,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   freopen("/dev/null", "w", stderr);
 
   int nSelRowsTemp = 0;
-  for (int i_shape = 10; i_shape < m_shapes; i_shape++) {  // TODO nastavit na 0
+  for (int i_shape = 0; i_shape < m_shapes; i_shape++) {  // TODO nastavit na 0
     TString cCat;
     TCut c1;
     TCut c2;
@@ -620,7 +620,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
       nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
       if (nSelRowsTemp < m_MinClustersCorrections) continue;
     }
-    for (int i_pk = 4; i_pk < m_pixelkinds; i_pk++) {  // TODO nastavit na 0
+    for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++) {  // TODO nastavit na 0
       cCat = Form("pixelKind == %i", i_pk);
       c2.SetTitle(cCat.Data());
       if (!m_DoExpertHistograms) {  // acceleration of calibration process
@@ -633,7 +633,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
              ", Sensor: " << (int)(i_pk / 4) + 1 <<
              ", Size: " << i_pk % 2
             );
-      for (int i_angleU = 9; i_angleU < m_anglesU; i_angleU++) {  // TODO nastavit na 0
+      for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++) {  // TODO nastavit na 0
         double PhiMi = ((TMath::Pi() * i_angleU) / m_anglesU) - (TMath::Pi() / 2.0);
         double PhiMa = ((TMath::Pi() * (i_angleU + 1)) / m_anglesU) - (TMath::Pi() / 2.0);
         if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {
@@ -654,7 +654,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
           nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
           if (nSelRowsTemp < m_MinClustersCorrections) continue;
         }
-        for (int i_angleV = 9; i_angleV < m_anglesV; i_angleV++) {  // TODO nastavit na 0
+        for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {  // TODO nastavit na 0
           SummariesInfo[1]++;
           B2DEBUG(130, "  --> AngleCalibration for: " << i_angleU << ", " << i_angleV);
 

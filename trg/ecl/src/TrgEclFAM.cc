@@ -166,10 +166,10 @@ TrgEclFAM::getTCHit(int TableFlag)
 
   }
   */
-  float E_cell[8736][80]  = {{0}};
-  float T_ave[8736][80]   = {{0}};
-  float Tof_ave[8736][80] = {{0}};
-  float beambkg_tag[8736][80] = {{0}};
+  std::vector< std::vector<float> > E_cell( 8736, std::vector<float>(80, 0.0) ); 
+  std::vector< std::vector<float> > T_ave( 8736, std::vector<float>(80, 0.0) );
+  std::vector< std::vector<float> > Tof_ave(8736, std::vector<float>(80, 0.0) );
+  std::vector< std::vector<float> > beambkg_tag(8736, std::vector<float>(80, 0.0) );
 
   int nBinTime = 80;
   TimeRange = 4000; // -4us ~ 4us
@@ -364,11 +364,11 @@ TrgEclFAM::digitization01(void)
   float* X_pr = new float [64];
   float* X_sr = new float [64];
   */
-  float noise_pileup[576][64] = {{0}};  // [GeV]
-  float noise_parallel[576][64] = {{0}};  // [GeV]
-  float noise_serial[576][64] = {{0}};  // [GeV]
-  float X_pr[64] = {0};
-  float X_sr[64] = {0};
+  std::vector< std::vector<float> > noise_pileup( 576, std::vector<float>(64, 0.0));  // [GeV]
+  std::vector< std::vector<float> > noise_parallel( 576, std::vector<float>(64, 0.0));  // [GeV]
+  std::vector< std::vector<float> > noise_serial( 576, std::vector<float>(64, 0.0));  // [GeV]
+  std::vector<float> X_pr(64, 0.0);
+  std::vector<float> X_sr(64, 0.0);
 
 
   /*
@@ -583,11 +583,11 @@ TrgEclFAM::digitization02(void)
   double fam_sampling_interval = 125; //@ [ns]
   int NSampling = 64;
 
-  double noise_pileup[576][64] = {{0}};  // [GeV]
-  double noise_parallel[576][64] = {{0}};  // [GeV]
-  double noise_serial[576][64] = {{0}};  // [GeV]
-  double X_pr[64] = {0};
-  double X_sr[64] = {0};
+  std::vector< std::vector<double> > noise_pileup( 576, std::vector<double>(64, 0.0) );  // [GeV]
+  std::vector< std::vector<double> > noise_parallel( 576, std::vector<double>(64, 0.0) );  // [GeV]
+  std::vector< std::vector<double> > noise_serial( 576, std::vector<double>(64, 0.0) );  // [GeV]
+  std::vector<double> X_pr(64, 0.0);
+  std::vector<double> X_sr(64, 0.0);
   /*
   double (*noise_pileup)[64] = new double [576][64];  // [GeV]
   double (*noise_parallel)[64] = new double [576][64];  // [GeV]
@@ -840,8 +840,8 @@ TrgEclFAM::digitization03(void)
   int nbin_pedestal = 100;
   float fam_sampling_interval = 12; // [ns]
 
-  float TCDigiEnergy[576][666] = {{0}};  // [GeV]
-  float TCDigiTiming[576][666] = {{0}};  // [ns]
+  std::vector< std::vector<float> > TCDigiEnergy( 576, std::vector<float>(666, 0.0) );  // [GeV]
+  std::vector< std::vector<float> > TCDigiTiming( 576, std::vector<float>(666, 0.0) );  // [ns]
   /*
   float (*TCDigiEnergy)[666] = new  float [576][666];  // [GeV]
   float (*TCDigiTiming)[666] = new float [576][666];  // [ns]

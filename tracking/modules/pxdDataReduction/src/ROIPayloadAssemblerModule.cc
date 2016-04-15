@@ -78,72 +78,49 @@ void ROIPayloadAssemblerModule::event()
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   StoreArray<ROIid> ROIList(m_ROIListName);
-
-  int ROIListSize = ROIList.getEntries();
-
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
+  set<ROIrawID, ROIrawID> orderedROIraw;
+  set<ROIrawID, ROIrawID>::iterator itOrderedROIraw;
+
+  B2DEBUG(1, " number of ROIs in the list = " << ROIList.getEntries());
+
   /// This is necessary as long as DHH is NOT delivering the DHP coordinates in local sensor coordinates (Ucell/Vcell)
-  for (int iROI = 0; iROI < ROIListSize; iROI++) {
-    const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(ROIList[iROI]->getSensorID());
+  for (auto& iROI : ROIList) {
+    const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(iROI.getSensorID());
     const int nPixelsU = aSensorInfo.getUCells() - 1;
     const int nPixelsV = aSensorInfo.getVCells() - 1;
 
     unsigned int tmpRowMin;
     unsigned int tmpRowMax;
-    if (m_DESYremap and (ROIList[iROI]->getSensorID()).getLayerNumber() == 1) {
+    if (m_DESYremap and (iROI.getSensorID()).getLayerNumber() == 1) {
       // Inner (because of NO -1 above
-      tmpRowMin = nPixelsV - ROIList[iROI]->getMinVid();
-      tmpRowMax = nPixelsV - ROIList[iROI]->getMaxVid();
+      tmpRowMin = nPixelsV - iROI.getMinVid();
+      tmpRowMax = nPixelsV - iROI.getMaxVid();
     } else {
       // Outer
-      tmpRowMin = ROIList[iROI]->getMinVid();
-      tmpRowMax = ROIList[iROI]->getMaxVid();
+      tmpRowMin = iROI.getMinVid();
+      tmpRowMax = iROI.getMaxVid();
     }
 
     unsigned int tmpColMin;
     unsigned int tmpColMax;
-    if (m_DESYremap and (ROIList[iROI]->getSensorID()).getLayerNumber() != (ROIList[iROI]->getSensorID()).getSensorNumber()) {
+    if (m_DESYremap and (iROI.getSensorID()).getLayerNumber() != (iROI.getSensorID()).getSensorNumber()) {
       // Outer Forward, Inner Backward
-      tmpColMin = nPixelsU - ROIList[iROI]->getMinUid();
-      tmpColMax = nPixelsU - ROIList[iROI]->getMaxUid();
+      tmpColMin = nPixelsU - iROI.getMinUid();
+      tmpColMax = nPixelsU - iROI.getMaxUid();
     } else { // (layer!=sensor)
       // Inner Forward, Outer Backward
-      tmpColMin = ROIList[iROI]->getMinUid();
-      tmpColMax = ROIList[iROI]->getMaxUid();
+      tmpColMin = iROI.getMinUid();
+      tmpColMax = iROI.getMaxUid();
     }
 
-    ROIid tmpROIid;
-    tmpROIid.setSensorID(ROIList[iROI]->getSensorID());
-    tmpROIid.setMinVid(std::min(tmpRowMin, tmpRowMax));
-    tmpROIid.setMaxVid(std::max(tmpRowMin, tmpRowMax));
-    tmpROIid.setMinUid(std::min(tmpColMin, tmpColMax));
-    tmpROIid.setMaxUid(std::max(tmpColMin, tmpColMax));
-    ROIList.appendNew(tmpROIid);
-  }
-
-  ROIListSize = ROIList.getEntries();
-
-  set<ROIrawID, ROIrawID> orderedROIraw;
-  set<ROIrawID, ROIrawID>::iterator itOrderedROIraw;
-
-  B2DEBUG(1, " number of ROIs in the list = " << ROIListSize);
-
-  for (int iROI = 0; iROI < ROIListSize; iROI++) {
-
-    int layer = (ROIList[iROI]->getSensorID()).getLayerNumber() - 1;
-    int ladder = (ROIList[iROI]->getSensorID()).getLadderNumber();
-    int sensor = (ROIList[iROI]->getSensorID()).getSensorNumber() - 1;
+    int layer = (iROI.getSensorID()).getLayerNumber() - 1;
+    int ladder = (iROI.getSensorID()).getLadderNumber();
+    int sensor = (iROI.getSensorID()).getSensorNumber() - 1;
 
     m_roiraw.setSystemFlag(0);
     m_roiraw.setDHHID(((layer) << 5) | ((ladder) << 1) | (sensor));
-
-    // ToDo!!! Code elsewhere the translation for u v row and column
-    unsigned int tmpRowMin = ROIList[iROI]->getMinUid();
-    unsigned int tmpRowMax = ROIList[iROI]->getMaxUid();
-
-    unsigned int tmpColMin = ROIList[iROI]->getMinVid();
-    unsigned int tmpColMax = ROIList[iROI]->getMaxVid();
 
     unsigned int row1 = std::min(tmpRowMin, tmpRowMax);
     unsigned int row2 = std::max(tmpRowMin, tmpRowMax);
@@ -159,7 +136,6 @@ void ROIPayloadAssemblerModule::event()
     m_roiraw.setColMax(column2);
 
     orderedROIraw.insert(m_roiraw);
-
   }
 
   B2DEBUG(1, " number of ROIs in the set = " << orderedROIraw.size());
@@ -167,7 +143,7 @@ void ROIPayloadAssemblerModule::event()
 // The payload is created with a buffer long enough to contains all
 // the ROIs but the actual payload will contains max 32 ROIs per pxd
 // sensor per event as required by the Onsens specifications
-  ROIpayload* payload = new ROIpayload(ROIListSize);// let the ROIpayload compute the size itself
+  ROIpayload* payload = new ROIpayload(orderedROIraw.size());// let the ROIpayload compute the size itself
 
   StoreObjPtr<ROIpayload> payloadPtr(m_ROIpayloadName);
 

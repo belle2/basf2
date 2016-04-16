@@ -66,14 +66,14 @@ void LogFile::open()
   if (!g_opened) return;
   struct stat st;
   if (stat(g_filepath.c_str(), &st) == 0) {
-    g_filesize = st.st_blksize;
+    g_filesize = st.st_size;
     g_stream.open(g_filepath.c_str(), std::ios::out | std::ios::app);
   } else {
     g_filesize = 0;
     g_stream.open(g_filepath.c_str(), std::ios::out);
   }
   debug("/* ---------- log file opened ---------- */");
-  debug("log file : %s", g_filepath.c_str());
+  debug("log file : %s (%d) ", g_filepath.c_str(), g_filesize);
 }
 
 void LogFile::close()
@@ -153,7 +153,7 @@ int LogFile::put_impl(const std::string& msg, Priority priority, va_list ap)
     g_stream.close();
     ConfigFile config("slowcontrol");
     rename(g_filepath.c_str(),
-           (config.get("logfile.dir") + "/" + g_filename + "/" +
+           (config.get("log.dir") + "/" + g_filename + "/" +
             g_date.toString("%Y.%m.%d.%H.%M.log")).c_str());
     g_mutex.unlock();
     open();

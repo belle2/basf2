@@ -599,7 +599,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   freopen("/dev/null", "w", stderr);
 
   int nSelRowsTemp = 0;
-  for (int i_shape = 0; i_shape < m_shapes; i_shape++) {  // TODO nastavit na 0
+  for (int i_shape = 10; i_shape < m_shapes; i_shape++) {  // TODO nastavit na 0
     TString cCat;
     TCut c1;
     TCut c2;
@@ -620,7 +620,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
       nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
       if (nSelRowsTemp < m_MinClustersCorrections) continue;
     }
-    for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++) {  // TODO nastavit na 0
+    for (int i_pk = 4; i_pk < m_pixelkinds; i_pk++) {  // TODO nastavit na 0
       cCat = Form("pixelKind == %i", i_pk);
       c2.SetTitle(cCat.Data());
       if (!m_DoExpertHistograms) {  // acceleration of calibration process
@@ -633,7 +633,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
              ", Sensor: " << (int)(i_pk / 4) + 1 <<
              ", Size: " << i_pk % 2
             );
-      for (int i_angleU = 0; i_angleU < m_anglesU; i_angleU++) {  // TODO nastavit na 0
+      for (int i_angleU = 9; i_angleU < m_anglesU; i_angleU++) {  // TODO nastavit na 0
         double PhiMi = ((TMath::Pi() * i_angleU) / m_anglesU) - (TMath::Pi() / 2.0);
         double PhiMa = ((TMath::Pi() * (i_angleU + 1)) / m_anglesU) - (TMath::Pi() / 2.0);
         if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {
@@ -654,7 +654,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
           nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
           if (nSelRowsTemp < m_MinClustersCorrections) continue;
         }
-        for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {  // TODO nastavit na 0
+        for (int i_angleV = 9; i_angleV < m_anglesV; i_angleV++) {  // TODO nastavit na 0
           SummariesInfo[1]++;
           B2DEBUG(130, "  --> AngleCalibration for: " << i_angleU << ", " << i_angleV);
 
@@ -686,7 +686,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
           getObject<TTree>(name_SourceTree.Data()).Draw(">>selection", cFin);
           TEventList* selectionn = (TEventList*)gDirectory->Get("selection");
           //getObject<TTree>(name_SourceTree.Data()).SetEventList(selectionn);
-//          printf("---> GetSelRaws : %i\n",(int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows() );
+          //printf("---> GetSelRaws : %i\n",(int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows() );
           int nSelRows = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
           SummariesInfoSh[i_shape] += nSelRows;
           SummariesInfoAng[i_angleU * m_anglesV + i_angleV] += nSelRows;
@@ -696,6 +696,10 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
             std::vector<double> Colm2(nSelRows);
             std::vector<double> Colm3(nSelRows);
             std::vector<double> Colm4(nSelRows);
+            std::vector<double> Colm5(nSelRows);
+            std::vector<double> Colm6(nSelRows);
+            std::vector<double> Colm7(nSelRows);
+            std::vector<double> Colm8(nSelRows);
             for (int i = 0; i < nSelRows; i++) {
               getObject<TTree>(name_SourceTree.Data()).GetEntry(selectionn->GetEntry(i));
               if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {
@@ -707,6 +711,13 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
               }
               Colm3[i] = m_SigmaU;
               Colm4[i] = m_SigmaV;
+              Colm5[i] = m_ResidUTrue;
+              Colm6[i] = m_ResidVTrue;
+              Colm7[i] = m_SigmaUTrack;
+              Colm8[i] = m_SigmaVTrack;
+              //Colm1[i] = Colm5[i];     // TODO true - test
+              //Colm2[i] = Colm6[i];
+
             }
 
             //          int imax = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
@@ -777,10 +788,18 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
             }
 //            printf("--> %f EE%f\n", Colm1[1] * 10000.0, Colm1[1] / Colm3[1]);
             for (int i = 0; i < nSelRows; i++) {
+              //double co1 = TMath::Sqrt(Colm1[i] * Colm1[i] - Colm7[i] * Colm7[i]);
+              //double co2 = TMath::Sqrt(Colm2[i] * Colm2[i] - Colm8[i] * Colm8[i]);
+              //Colm3[i] = co1 / Colm3[i];
+              //Colm4[i] = co2 / Colm4[i];
               Colm1[i] -= TCorrection_BiasMap[make_tuple(i_shape, i_pk, 0, i_angleU, i_angleV)];
               Colm2[i] -= TCorrection_BiasMap[make_tuple(i_shape, i_pk, 1, i_angleU, i_angleV)];
+              Colm3[i] = TMath::Sqrt(Colm3[i] * Colm3[i] + Colm7[i] * Colm7[i]);
+              Colm4[i] = TMath::Sqrt(Colm4[i] * Colm4[i] + Colm8[i] * Colm8[i]);
               Colm3[i] = Colm1[i] / Colm3[i];
               Colm4[i] = Colm2[i] / Colm4[i];
+              //Colm3[i] /= 2.5;
+              //Colm4[i] /= 2.5;
             }
 //            printf("  --> %f %f EE%f\n",TCorrection_BiasMap[make_tuple(i_shape, i_pk, 0, i_angleU, i_angleV)] * 10000.0, Colm1[1] * 10000.0, Colm3[1]);
 
@@ -804,7 +823,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
                     m_histErrorEstimationV[m_pixelkinds * m_shapes]->GetBinContent(i_angleU + 1, i_angleV + 1) + 1);
               }
             }
-//            printf("  --> EEcor%f\n",TCorrection_ErrorEstimationMap[make_tuple(i_shape, i_pk, 1, i_angleU, i_angleV)]);
+            //printf("  --> BCor%6.1f, EECor%6.3f\n",TCorrection_BiasMap[make_tuple(i_shape, i_pk, 0, i_angleU, i_angleV)] * 10000.0, TCorrection_ErrorEstimationMap[make_tuple(i_shape, i_pk, 1, i_angleU, i_angleV)]);
 
             if (m_DoExpertHistograms) {
               m_histnClusters[i_pk * m_shapes + i_shape]->SetBinContent(i_angleU + 1, i_angleV + 1, nSelRows);

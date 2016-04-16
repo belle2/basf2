@@ -711,8 +711,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
               }
               Colm3[i] = m_SigmaU;
               Colm4[i] = m_SigmaV;
-              Colm5[i] = m_ResidUTrue;
-              Colm6[i] = m_ResidVTrue;
+              //Colm5[i] = m_ResidUTrue;
+              //Colm6[i] = m_ResidVTrue;
               Colm7[i] = m_SigmaUTrack;
               Colm8[i] = m_SigmaVTrack;
               //Colm1[i] = Colm5[i];     // TODO true - test
@@ -794,8 +794,10 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
               //Colm4[i] = co2 / Colm4[i];
               Colm1[i] -= TCorrection_BiasMap[make_tuple(i_shape, i_pk, 0, i_angleU, i_angleV)];
               Colm2[i] -= TCorrection_BiasMap[make_tuple(i_shape, i_pk, 1, i_angleU, i_angleV)];
-              Colm3[i] = TMath::Sqrt(Colm3[i] * Colm3[i] + Colm7[i] * Colm7[i]);
-              Colm4[i] = TMath::Sqrt(Colm4[i] * Colm4[i] + Colm8[i] * Colm8[i]);
+              if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {
+                Colm3[i] = TMath::Sqrt(Colm3[i] * Colm3[i] + Colm7[i] * Colm7[i]);
+                Colm4[i] = TMath::Sqrt(Colm4[i] * Colm4[i] + Colm8[i] * Colm8[i]);
+              }
               Colm3[i] = Colm1[i] / Colm3[i];
               Colm4[i] = Colm2[i] / Colm4[i];
               //Colm3[i] /= 2.5;

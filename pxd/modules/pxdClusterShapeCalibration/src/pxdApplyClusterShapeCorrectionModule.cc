@@ -622,13 +622,26 @@ void pxdApplyClusterShapeCorrectionModule::event()
         double f_TrackU = state2[3];
         double f_TrackV = state2[4];
 
-        //TVectorD residual = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, true).getState();
+        TMatrixDSym covarianceTR = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getCov();
+        double SigmaUTrack = sqrt(covarianceTR(0, 0) - cluster->getUSigma() * cluster->getUSigma());
+        double SigmaVTrack = sqrt(covarianceTR(1, 1) - cluster->getVSigma() * cluster->getVSigma());
+        TMatrixDSym covarianceTRIncluded = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, true).getCov();
+        double SigmaUTrackIncl = sqrt(covarianceTRIncluded(0, 0) - cluster->getUSigma() * cluster->getUSigma());
+        double SigmaVTrackIncl = sqrt(covarianceTRIncluded(1, 1) - cluster->getVSigma() * cluster->getVSigma());
+        TVectorD residual = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, true).getState();
         // m_ResidUTrack = cluster.getU() - state[3];
         // m_ResidVTrack = cluster.getV() - state[4];
         //ResUIncl = f_TrackUIncluded - cluster->getU();
         //m_ResidUTrack = residual.GetMatrixArray()[0];
         //m_ResidVTrack = residual.GetMatrixArray()[1];
-        //printf("---> %f %f --- %f %f  \n",cluster->getU() - state[3], cluster->getV() - state[4], residual.GetMatrixArray()[0], residual.GetMatrixArray()[1]);
+        printf("---> %f %f --- %f %f  (Tr: excl:%f incl: %f)\n",
+               cluster->getU() - state[3], cluster->getV() - state[4], residual.GetMatrixArray()[0], residual.GetMatrixArray()[1],
+//               SigmaUTrack, TMath::Sqrt(f_TrackU*f_TrackU - f_TrackUIncluded*f_TrackUIncluded)
+//               f_TrackU, TMath::Sqrt(SigmaUTrack*SigmaUTrack + f_TrackUIncluded*f_TrackUIncluded)
+//               f_TrackU, SigmaUTrack + f_TrackUIncluded
+//               f_TrackU - cluster->getU(), TMath::Sqrt(SigmaUTrack*SigmaUTrack + (f_TrackUIncluded - cluster->getU())*(f_TrackUIncluded - cluster->getU()))
+               SigmaUTrack, SigmaUTrackIncl
+              );
 
 //        TVectorD track = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getState();
 

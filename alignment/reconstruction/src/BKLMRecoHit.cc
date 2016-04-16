@@ -24,9 +24,6 @@
 using namespace std;
 using namespace Belle2;
 
-BKLMRecoHit::BKLMRecoHit():
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_bklmHit2d(0)
-{}
 
 BKLMRecoHit::BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
   genfit::PlanarMeasurement(HIT_DIMENSIONS), m_moduleID(0), m_bklmHit2d(hit)

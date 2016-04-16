@@ -31,12 +31,9 @@ namespace Belle2 {
   public:
 
     /** Default constructor for ROOT IO. */
-    BKLMRecoHit();
+    BKLMRecoHit() {};
 
-    /** Construct BKLMRecoHit from a PXD cluster
-     *
-     * @param hit    PXDCluster to use as base
-     */
+    /** Construct BKLMRecoHit from a BKLMHit2d */
     BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit* trackCandHit = NULL);
 
     /** Destructor. */
@@ -62,6 +59,7 @@ namespace Belle2 {
     enum { HIT_DIMENSIONS = 2 /**< sensitive Dimensions of the Hit */ };
 
     unsigned short m_moduleID; /**< Unique module identifier.*/
+
     const BKLMHit2d* m_bklmHit2d; /**< Pointer to the BKLMHit2d used when creating this object */
 
     /** layer number */

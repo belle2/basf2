@@ -606,42 +606,42 @@ void pxdApplyClusterShapeCorrectionModule::event()
         //}
         int DoCorrection = 1;
         if (cluster->getShape() < 0) DoCorrection = 0; // do only monitoring histograms
-        TVectorD state = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getFittedState(true).getState();
-        double f_phiTrack = state[1];
-        double f_thetaTrack = state[2];
-        f_phiTrack = TMath::ATan2(f_phiTrack, 1.0);
-        f_thetaTrack = TMath::ATan2(f_thetaTrack, 1.0);
-        double f_TrackUIncluded;
-        f_TrackUIncluded = state[3];
-        double f_TrackVIncluded;
-        f_TrackVIncluded = state[4];
+        //TVectorD state = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getFittedState(true).getState();
+        //double f_TrackUIncluded;
+        //f_TrackUIncluded = state[3];
+        //double f_TrackVIncluded;
+        //f_TrackVIncluded = state[4];
         bool biased = false; // excluded residuals
         //biased = true;       // included residuals
         //TVectorD residual = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getState();
         TVectorD state2 = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getFittedState(biased).getState();
+        double f_phiTrack = state2[1];
+        double f_thetaTrack = state2[2];
+        f_phiTrack = TMath::ATan2(f_phiTrack, 1.0);
+        f_thetaTrack = TMath::ATan2(f_thetaTrack, 1.0);
         double f_TrackU = state2[3];
         double f_TrackV = state2[4];
 
         TMatrixDSym covarianceTR = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getCov();
         double SigmaUTrack = sqrt(covarianceTR(0, 0) - cluster->getUSigma() * cluster->getUSigma());
         double SigmaVTrack = sqrt(covarianceTR(1, 1) - cluster->getVSigma() * cluster->getVSigma());
-        TMatrixDSym covarianceTRIncluded = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, true).getCov();
-        double SigmaUTrackIncl = sqrt(covarianceTRIncluded(0, 0) - cluster->getUSigma() * cluster->getUSigma());
-        double SigmaVTrackIncl = sqrt(covarianceTRIncluded(1, 1) - cluster->getVSigma() * cluster->getVSigma());
-        TVectorD residual = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, true).getState();
+        //TMatrixDSym covarianceTRIncluded = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, true).getCov();
+        //double SigmaUTrackIncl = sqrt(covarianceTRIncluded(0, 0) - cluster->getUSigma() * cluster->getUSigma());
+        //double SigmaVTrackIncl = sqrt(covarianceTRIncluded(1, 1) - cluster->getVSigma() * cluster->getVSigma());
+        //TVectorD residual = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, true).getState();
         // m_ResidUTrack = cluster.getU() - state[3];
         // m_ResidVTrack = cluster.getV() - state[4];
         //ResUIncl = f_TrackUIncluded - cluster->getU();
         //m_ResidUTrack = residual.GetMatrixArray()[0];
         //m_ResidVTrack = residual.GetMatrixArray()[1];
-        printf("---> %f %f --- %f %f  (Tr: excl:%f incl: %f)\n",
-               cluster->getU() - state[3], cluster->getV() - state[4], residual.GetMatrixArray()[0], residual.GetMatrixArray()[1],
+        //printf("---> %f %f --- %f %f  (Tr: excl:%f incl: %f)\n",
+        //       cluster->getU() - state[3], cluster->getV() - state[4], residual.GetMatrixArray()[0], residual.GetMatrixArray()[1],
 //               SigmaUTrack, TMath::Sqrt(f_TrackU*f_TrackU - f_TrackUIncluded*f_TrackUIncluded)
 //               f_TrackU, TMath::Sqrt(SigmaUTrack*SigmaUTrack + f_TrackUIncluded*f_TrackUIncluded)
 //               f_TrackU, SigmaUTrack + f_TrackUIncluded
 //               f_TrackU - cluster->getU(), TMath::Sqrt(SigmaUTrack*SigmaUTrack + (f_TrackUIncluded - cluster->getU())*(f_TrackUIncluded - cluster->getU()))
-               SigmaUTrack, SigmaUTrackIncl
-              );
+        //       SigmaUTrack, SigmaUTrackIncl
+        //      );
 
 //        TVectorD track = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getState();
 
@@ -663,8 +663,6 @@ void pxdApplyClusterShapeCorrectionModule::event()
                                         sensorID));
         int i_layer = Info.getID().getLayerNumber();
         int i_sensor = Info.getID().getSensorNumber();
-        float f_SigmaU = cluster->getUSigma();
-        float f_SigmaV = cluster->getVSigma();
         int InspectDets = 0;
         if ((cluster->getShape() >= 11) && (cluster->getShape() <= 14)) InspectDets = 1;
         if (!InspectDets) continue;
@@ -702,38 +700,40 @@ void pxdApplyClusterShapeCorrectionModule::event()
         //continue;
         //if (i_sensor == 1) continue;  // special condition to check..... TODO remove later
 
-        float ResU;
-        float ResV;
-        float ResUIncl = 0;
-        float ResVIncl = 0;
+        float ResU = 0;
+        float ResV = 0;
+        float EEU = 0;
+        float EEV = 0;
+        float f_SigmaU = cluster->getUSigma();
+        float f_SigmaV = cluster->getVSigma();
+        float Clsu = cluster->getU();
+        float Clsv = cluster->getV();
         if (m_closeEdge  == 0) {
           NClusters++;
           //if (InspectDets) printf("------->Not close edge\n");
           if (m_DoExpertHistograms) {
-            ResU = f_TrackU - cluster->getU();
-            ResV = f_TrackV - cluster->getV();
-            ResUIncl = f_TrackUIncluded - cluster->getU();
-            ResVIncl = f_TrackVIncluded - cluster->getV();
+            ResU = f_TrackU - Clsu;
+            ResV = f_TrackV - Clsv;
+            EEU = ResU / TMath::Sqrt(f_SigmaU * f_SigmaU + SigmaUTrack * SigmaUTrack);
+            EEV = ResV / TMath::Sqrt(f_SigmaV * f_SigmaV + SigmaVTrack * SigmaVTrack);
             //if (InspectDets) printf("------->ResU %f , ResV %f\n", 10000.0 * ResU, 10000.0 * ResV );
-            B2DEBUG(130, "--------------------------------> before: " << cluster->getU() << ", ResU " << ResU << ", ResV " << ResV << ", ind1 "
+            B2DEBUG(130, "--------------------------------> before: " << Clsu << ", ResU " << ResU << ", ResV " << ResV << ", ind1 "
                     <<
                     0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape <<
                     ", ind2 " << 0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes);
             m_histResidualU[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um);
             m_histResidualV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResV / Unit::um);
             m_histResidualUV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um, ResV / Unit::um);
-            m_histNormErrorU[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResUIncl / cluster->getUSigma());
-            m_histNormErrorV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResVIncl / cluster->getVSigma());
-            m_histNormErrorUV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResUIncl / cluster->getUSigma(),
-                ResVIncl / cluster->getVSigma());
+            m_histNormErrorU[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEU);
+            m_histNormErrorV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEV);
+            m_histNormErrorUV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEU, EEV);
 
             m_histResidualU[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResU / Unit::um);
             m_histResidualV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResV / Unit::um);
             m_histResidualUV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResU / Unit::um, ResV / Unit::um);
-            m_histNormErrorU[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResUIncl / cluster->getUSigma());
-            m_histNormErrorV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResVIncl / cluster->getVSigma());
-            m_histNormErrorUV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResUIncl / cluster->getUSigma(),
-                ResVIncl / cluster->getVSigma());
+            m_histNormErrorU[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEU);
+            m_histNormErrorV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEV);
+            m_histNormErrorUV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEU, EEV);
           }
           for (int i_axis = 0; i_axis < m_dimensions; i_axis++) {
             if (TCorrection_BiasMap[0][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)] != 0.0) {  // use basic corrections:
@@ -742,16 +742,16 @@ void pxdApplyClusterShapeCorrectionModule::event()
               NClustersSimulationCorBias[i_axis]++;
             }
             if (i_axis == 0) {
-              float u = cluster->getU() - TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
+              Clsu -= TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
               //if (InspectDets) printf("------->i_shape%i, i_pixelKind%i, i_axis%i, iIndexPhi%i, iIndexTheta%i Val %f CorVal %f, newVal %f\n", i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta,
               //    cluster->getU(), 10000.0 * TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)], u);
-              if (DoCorrection) cluster->setU(u);
+              if (DoCorrection) cluster->setU(Clsu);
             }
             if (i_axis == 1) {
-              float v = cluster->getV() - TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
+              Clsv -= TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
               //if (InspectDets) printf("------->i_shape%i, i_pixelKind%i, i_axis%i, iIndexPhi%i, iIndexTheta%i Val %f CorVal %f um, newVal %f\n", i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta,
               //    cluster->getV(), 10000.0 * TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)], v);
-              if (DoCorrection) cluster->setV(v);
+              if (DoCorrection) cluster->setV(Clsv);
             }
             if (TCorrection_ErrorEstimationMap[0][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)] != 1.0) {
               NClustersBasicCorErEst[i_axis]++;
@@ -772,30 +772,30 @@ void pxdApplyClusterShapeCorrectionModule::event()
             }
           }
           if (m_DoExpertHistograms) {
-            ResU = f_TrackU - cluster->getU();
-            ResV = f_TrackV - cluster->getV();
+            ResU = f_TrackU - Clsu;
+            ResV = f_TrackV - Clsv;
+            EEU = ResU / TMath::Sqrt(f_SigmaU * f_SigmaU + SigmaUTrack * SigmaUTrack);
+            EEV = ResV / TMath::Sqrt(f_SigmaV * f_SigmaV + SigmaVTrack * SigmaVTrack);
             //ResUIncl = f_TrackUIncluded - cluster->getU();
             //ResVIncl = f_TrackVIncluded - cluster->getV();
             //if (InspectDets) printf("------->ResU %f , ResV %f\n", 10000.0 * ResU, 10000.0 * ResV );
-            B2DEBUG(130, "--------------------------------> After: " << cluster->getU() << ", ResU " << ResU << ", ResV " << ResV << ", ind1 "
+            B2DEBUG(130, "--------------------------------> After: " << Clsu << ", ResU " << ResU << ", ResV " << ResV << ", ind1 "
                     <<
                     1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape <<
                     ", ind2 " << 1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes);
             m_histResidualU[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um);
             m_histResidualV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResV / Unit::um);
             m_histResidualUV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um, ResV / Unit::um);
-            m_histNormErrorU[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResUIncl / cluster->getUSigma());
-            m_histNormErrorV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResVIncl / cluster->getVSigma());
-            m_histNormErrorUV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResUIncl / cluster->getUSigma(),
-                ResVIncl / cluster->getVSigma());
+            m_histNormErrorU[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEU);
+            m_histNormErrorV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEV);
+            m_histNormErrorUV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEU, EEV);
 
             m_histResidualU[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResU / Unit::um);
             m_histResidualV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResV / Unit::um);
             m_histResidualUV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResU / Unit::um, ResV / Unit::um);
-            m_histNormErrorU[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResUIncl / cluster->getUSigma());
-            m_histNormErrorV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResVIncl / cluster->getVSigma());
-            m_histNormErrorUV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResUIncl / cluster->getUSigma(),
-                ResVIncl / cluster->getVSigma());
+            m_histNormErrorU[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEU);
+            m_histNormErrorV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEV);
+            m_histNormErrorUV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEU, EEV);
           }
         }
         if (DoCorrection) cluster->setShape(-100 + i_shape);

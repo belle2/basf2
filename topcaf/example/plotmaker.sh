@@ -13,7 +13,7 @@
 #
 #BF 2016-03-29
 
-if [ "$#" -eq 4 ]; then
+if [ "$#" -eq 4 ] || [ "$#" -eq 5 ]; then
     
 #Create bsubs for many jobs
 #perl script to do sub scripts and hadd
@@ -56,12 +56,13 @@ root -b -q "find_py_peaks.C(\"/group/belle2/testbeam/TOP/CRT_analysis/combined/$
 
 #redo with refined cuts
 #Don't do this for laser events because non-uniform hitmap may be misinterpreted
-if test "$cutname" != "laser"
-then
-    echo "Refining the analysis"
-    rm -rf /group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_plothits_${cutname}.root
-    ./sub_${subname}analyzeHits_extended.sh
-    ./hadd_${subname}_plothits_${cutname}.sh
+if [ "$cutname" != "laser" ] && [ "$#" -eq 5 ]; then
+    if [ "${5}" == "opt" }; then
+	echo "Refining the analysis"
+	rm -rf /group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_plothits_${cutname}.root
+	./sub_${subname}analyzeHits_extended.sh
+	./hadd_${subname}_plothits_${cutname}.sh
+    fi
 fi
 
 #execute plotting script
@@ -69,7 +70,7 @@ root -b -q "plot_package.C(\"/group/belle2/testbeam/TOP/CRT_analysis/combined/${
 
 #clean up crap
 echo "Cleaning up"
-if [ "$#" -eq 4 ]; then
+if [ "$#" -eq 4 ] || [ "$#" -eq 5 ]; then
     rm -rf $rlname
 fi
 rm -rf /group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_${cutname}_info.txt

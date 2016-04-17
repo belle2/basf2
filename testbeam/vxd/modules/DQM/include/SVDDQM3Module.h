@@ -99,14 +99,31 @@ namespace Belle2 {
     }
     /** This is a shortcut to getting SVD::SensorInfo from the GeoCache.
      * @param index Index of the sensor (0,1,2,3), _not_ layer number!
+     * @param sensor Number of the sensor (1,.. - depend of layer)!
      * @return SensorInfo object for the desired plane.
      */
-    inline const SVD::SensorInfo& getInfo(int index) const;
+    inline const SVD::SensorInfo& getInfo(int index, int sensor) const;
     /** This is a shortcut to getting PXD::SensorInfo from the GeoCache.
      * @param index Index of the sensor (0,1), _not_ layer number!
+     * @param sensor Number of the sensor (1,2)!
      * @return SensorInfo object for the desired plane.
      */
-    inline const PXD::SensorInfo& getInfoPXD(int index) const;
+    inline const PXD::SensorInfo& getInfoPXD(int index, int sensor) const;
+    /** This is a shortcut to getting number of sensors for PXD and SVD layers.
+    * @param layer Index of sensor layer (1,6)
+    * @return Number of sensors in layer.
+    */
+    inline int getSensorsInLayer(int layer) const
+    {
+      int nSensors = 0;
+      if ((layer >= 1) && (layer <= 3)) nSensors = 2;
+      if (layer == 4) nSensors = 3;
+      if (layer == 5) nSensors = 4;
+      if (layer == 6) nSensors = 5;
+      if (layer == 1) nSensors = 1;  // TODO very special case for TB2016
+      if (layer == 2) nSensors = 1;  // TODO very special case for TB2016
+      return nSensors;
+    }
 
     std::string m_storeDigitsName;        /**< SVDDigits StoreArray name */
     std::string m_storePXDClustersName;   /**< PXDClusters StoreArray name */
@@ -154,19 +171,20 @@ namespace Belle2 {
 
   };
 
-  inline const SVD::SensorInfo& SVDDQM3Module::getInfo(int index) const  // TODO for TB 2016 this macro must be revrite correct
+  inline const SVD::SensorInfo& SVDDQM3Module::getInfo(int index,
+                                                       int sensor) const  // TODO for TB 2016 this macro must be revrite correct
   {
     int iPlane = indexToPlane(index);
 //    VxdID sensorID(iPlane, 1, iPlane);
-    VxdID sensorID(iPlane, 1, 2);
+    VxdID sensorID(iPlane, 1, sensor);
     return dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
   }
 
-  inline const PXD::SensorInfo& SVDDQM3Module::getInfoPXD(int index) const  // TODO for TB 2016 this macro must be revrite correct
+  inline const PXD::SensorInfo& SVDDQM3Module::getInfoPXD(int index, int sensor) const
   {
     int iPlane = indexToPlanePXD(index);
 //    VxdID sensorID(iPlane, 1, iPlane);
-    VxdID sensorID(iPlane, 1, 2);
+    VxdID sensorID(iPlane, 1, sensor);
     return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
   }
 

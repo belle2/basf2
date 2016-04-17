@@ -127,7 +127,7 @@ namespace Belle2 {
 
     std::string m_storeDigitsName;        /**< SVDDigits StoreArray name */
     std::string m_storePXDClustersName;   /**< PXDClusters StoreArray name */
-    std::string m_storeClustersName;      /**< SVDClusters StoreArray name */
+    std::string m_storeSVDClustersName;   /**< SVDClusters StoreArray name */
     std::string m_relClusterDigitName;    /**< SVDClustersToSVDDigits RelationArray name */
     std::string m_histogramDirectoryName; /**< Name of the ROOT file directory for these histograms */
 

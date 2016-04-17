@@ -561,17 +561,17 @@ void SVDDQM3Module::defineHisto()
       //uSize1 = getInfo(i - c_nPXDPlanes).getUSize();
       //nStripsV1 = getInfo(i - c_nPXDPlanes).getVCells();
       vSize1 = 32.0;  // cm
-      uSize1 = 6.0;   // cm
+      uSize1 = 12.0;   // cm
     } else { // PXD
       //vSize1 = getInfoPXD(i).getVSize();
       //nStripsU1 = getInfoPXD(i).getUCells();
       //uSize1 = getInfoPXD(i).getUSize();
       //nStripsV1 = getInfoPXD(i).getVCells();
-      vSize1 = 8.0;  // cm
-      uSize1 = 2.0;   // cm
+      vSize1 = 16.0;  // cm
+      uSize1 = 8.0;   // cm
     }
-    nStripsV1 = vSize1 * 20;  // step 0.5 mm
-    nStripsU1 = uSize1 * 20;  // step 0.5 mm
+    nStripsV1 = vSize1 * 10;  // step 1 mm
+    nStripsU1 = uSize1 * 10;  // step 1 mm
     for (int j = 0; j < c_nVXDPlanes; j++) {
       int iPlane2 = indexToPlaneVXD(j);
       float vSize2, uSize2;
@@ -582,17 +582,17 @@ void SVDDQM3Module::defineHisto()
         //uSize2 = getInfo(j - c_nPXDPlanes).getUSize();
         //nStripsU2 = getInfo(j - c_nPXDPlanes).getUCells();
         vSize2 = 32.0;  // cm
-        uSize2 = 6.0;   // cm
+        uSize2 = 12.0;   // cm
       } else { // PXD
         //uSize2 = getInfoPXD(j).getUSize();
         //nStripsU2 = getInfoPXD(j).getUCells();
         //vSize2 = getInfoPXD(j).getVSize();
         //nStripsV2 = getInfoPXD(j).getVCells();
-        vSize2 = 8.0;  // cm
-        uSize2 = 2.0;   // cm
+        vSize2 = 16.0;  // cm
+        uSize2 = 8.0;   // cm
       }
-      nStripsU2 = uSize2 * 20;  // step 0.5 mm
-      nStripsV2 = vSize2 * 20;  // step 0.5 mm
+      nStripsU2 = uSize2 * 10;  // step 1 mm
+      nStripsV2 = vSize2 * 10;  // step 1 mm
       if (i == j) {  // hit maps
         DirVXDLocalHitmaps->cd();
         string name = str(format("h2GlobVXD_L%1%_HitmapUV") % iPlane2);
@@ -679,16 +679,16 @@ void SVDDQM3Module::initialize()
 
   //Register collections
   StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
-  StoreArray<SVDCluster> storeClusters(m_storeClustersName);
+  StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
   StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
 
-  //storeClusters.required();
+  //storeSVDClusters.required();
   //storeDigits.required();
 
-  RelationArray relClusterDigits(storeClusters, storeDigits);
+  RelationArray relClusterDigits(storeSVDClusters, storeDigits);
 
   //Store names to speed up creation later
-  m_storeClustersName = storeClusters.getName();
+  m_storeSVDClustersName = storeSVDClusters.getName();
   m_storeDigitsName = storeDigits.getName();
   m_relClusterDigitName = relClusterDigits.getName();
 }
@@ -748,10 +748,10 @@ void SVDDQM3Module::event()
 {
 
   const StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
-  const StoreArray<SVDCluster> storeClusters(m_storeClustersName);
+  const StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
 
-  const RelationArray relClusterDigits(storeClusters, storeDigits, m_relClusterDigitName);
+  const RelationArray relClusterDigits(storeSVDClusters, storeDigits, m_relClusterDigitName);
 
   // Fired strips
   vector< set<int> > uStrips(c_nSVDPlanes); // sets to eliminate multiple samples per strip
@@ -794,7 +794,7 @@ void SVDDQM3Module::event()
       countsUSen[iS * c_nSVDPlanes + i] = 0; countsVSen[iS * c_nSVDPlanes + i] = 0;
     }
   }
-  for (const SVDCluster& cluster : storeClusters) {
+  for (const SVDCluster& cluster : storeSVDClusters) {
     int iPlane = cluster.getSensorID().getLayerNumber();
     if ((iPlane < c_firstSVDPlane) || (iPlane > c_lastSVDPlane)) continue;
     int index = planeToIndex(iPlane);
@@ -818,7 +818,7 @@ void SVDDQM3Module::event()
   }
 
   // Hitmaps, Charge, Seed, Size, Time
-  for (const SVDCluster& cluster : storeClusters) {
+  for (const SVDCluster& cluster : storeSVDClusters) {
     int iPlane = cluster.getSensorID().getLayerNumber();
     if ((iPlane < c_firstSVDPlane) || (iPlane > c_lastSVDPlane)) continue;
     int index = planeToIndex(iPlane);
@@ -879,7 +879,7 @@ void SVDDQM3Module::event()
   }
   CutDQMCorrelTime = 70;  // ns
 
-  for (int i1 = 0; i1 < storeClusters.getEntries() + storePXDClusters.getEntries(); i1++) {
+  for (int i1 = 0; i1 < storeSVDClusters.getEntries() + storePXDClusters.getEntries(); i1++) {
     // preparing of first value for correlation plots with postfix "1":
     float fTime1 = 0.0;
     float fPosU1 = 0.0;
@@ -902,7 +902,7 @@ void SVDDQM3Module::event()
       fPosU1 = getInfoPXD(index1, clusterPXD1.getSensorID().getSensorNumber()).getUCellID(clusterPXD1.getU());
       fPosV1 = getInfoPXD(index1, clusterPXD1.getSensorID().getSensorNumber()).getVCellID(clusterPXD1.getV());
     } else {                                  // SVD clusters:
-      const SVDCluster& cluster1 = *storeClusters[i1 - storePXDClusters.getEntries()];
+      const SVDCluster& cluster1 = *storeSVDClusters[i1 - storePXDClusters.getEntries()];
       iPlane1 = cluster1.getSensorID().getLayerNumber();
       if ((iPlane1 < c_firstSVDPlane) || (iPlane1 > c_lastSVDPlane)) continue;
       index1 = planeToIndexVXD(iPlane1);
@@ -921,7 +921,7 @@ void SVDDQM3Module::event()
     // hit maps for PXD:
     if ((iIsU1 == 1) && (iIsV1 == 1))
       m_correlationsHitMaps[c_nVXDPlanes * index1 + index1]->Fill(fPosU1, fPosV1);
-    for (int i2 = 0; i2 < storeClusters.getEntries() + storePXDClusters.getEntries(); i2++) {
+    for (int i2 = 0; i2 < storeSVDClusters.getEntries() + storePXDClusters.getEntries(); i2++) {
       // preparing of second value for correlation plots with postfix "2":
       float fTime2 = 0.0;
       float fPosU2 = 0.0;
@@ -944,7 +944,7 @@ void SVDDQM3Module::event()
         fPosU2 = getInfoPXD(index2, clusterPXD2.getSensorID().getSensorNumber()).getUCellID(clusterPXD2.getU());
         fPosV2 = getInfoPXD(index2, clusterPXD2.getSensorID().getSensorNumber()).getVCellID(clusterPXD2.getV());
       } else {                                  // SVD clusters:
-        const SVDCluster& cluster2 = *storeClusters[i2 - storePXDClusters.getEntries()];
+        const SVDCluster& cluster2 = *storeSVDClusters[i2 - storePXDClusters.getEntries()];
         iPlane2 = cluster2.getSensorID().getLayerNumber();
         if ((iPlane2 < c_firstSVDPlane) || (iPlane2 > c_lastSVDPlane)) continue;
         index2 = planeToIndexVXD(iPlane2);
@@ -977,7 +977,7 @@ void SVDDQM3Module::event()
   }
 
   // Correlations for space point coordinates
-  for (int i1 = 0; i1 < storeClusters.getEntries() + storePXDClusters.getEntries(); i1++) {
+  for (int i1 = 0; i1 < storeSVDClusters.getEntries() + storePXDClusters.getEntries(); i1++) {
     // preparing of first value for correlation plots with postfix "1":
     float fTime1 = 0.0;
     float fPosSPU1 = 0.0;
@@ -1006,7 +1006,7 @@ void SVDDQM3Module::event()
       fPosSPU1 = rGlobal1.Y();
       fPosSPV1 = rGlobal1.Z();
     } else {                                  // SVD clusters:
-      const SVDCluster& cluster1 = *storeClusters[i1 - storePXDClusters.getEntries()];
+      const SVDCluster& cluster1 = *storeSVDClusters[i1 - storePXDClusters.getEntries()];
       iPlane1 = cluster1.getSensorID().getLayerNumber();
       if ((iPlane1 < c_firstSVDPlane) || (iPlane1 > c_lastSVDPlane)) continue;
       index1 = planeToIndexVXD(iPlane1);
@@ -1033,7 +1033,7 @@ void SVDDQM3Module::event()
       m_correlationsHitMapsSP[c_nVXDPlanes * index1 + index1]->Fill(fPosSPU1, fPosSPV1);
       m_correlationsHitMapsSPGlob[c_nVXDPlanes * index1 + index1]->Fill(fPosSPU1, fPosSPV1);
     }
-    for (int i2 = 0; i2 < storeClusters.getEntries() + storePXDClusters.getEntries(); i2++) {
+    for (int i2 = 0; i2 < storeSVDClusters.getEntries() + storePXDClusters.getEntries(); i2++) {
       // preparing of second value for correlation plots with postfix "2":
       float fTime2 = 0.0;
       float fPosSPU2 = 0.0;
@@ -1062,7 +1062,7 @@ void SVDDQM3Module::event()
         fPosSPU2 = rGlobal2.Y();
         fPosSPV2 = rGlobal2.Z();
       } else {                                  // SVD clusters:
-        const SVDCluster& cluster2 = *storeClusters[i2 - storePXDClusters.getEntries()];
+        const SVDCluster& cluster2 = *storeSVDClusters[i2 - storePXDClusters.getEntries()];
         iPlane2 = cluster2.getSensorID().getLayerNumber();
         if ((iPlane2 < c_firstSVDPlane) || (iPlane2 > c_lastSVDPlane)) continue;
         index2 = planeToIndexVXD(iPlane2);
@@ -1093,12 +1093,23 @@ void SVDDQM3Module::event()
         m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1, fPosSPV2);
       } else if ((index1 < index2) && (iIsU1 == iIsU2) && (iIsU1 == 1)) {
         // correlations for u
-        m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1, fPosSPU2);
-        m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1, fPosSPU2);
+        //if ((index2 == 2) && (index1 == 1)) { // PXD/SVD TODO something artifical, should remove
+        if ((index2 >= 2) && (index1 <= 1)) { // PXD/SVD TODO something artifical, should remove
+          m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV1, fPosSPU2);
+          m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV1, fPosSPU2);
+        } else {
+          m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1, fPosSPU2);
+          m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1, fPosSPU2);
+        }
       } else if ((index1 > index2) && (iIsV1 == iIsV2) && (iIsV1 == 1)) {
         // correlations for v
-        m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV2, fPosSPV1);
-        m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV2, fPosSPV1);
+        if ((index2 <= 1) && (index1 >= 2)) { // PXD/SVD TODO something artifical, should remove
+          m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU2, fPosSPV1);
+          m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU2, fPosSPV1);
+        } else {
+          m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV2, fPosSPV1);
+          m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV2, fPosSPV1);
+        }
       }
     }
   }

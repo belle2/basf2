@@ -30,7 +30,7 @@
 #include <assert.h>
 #include <ctime>
 #include <TMinuit.h>
-
+#include <TCutG.h>
 
 using namespace ROOT::Math;
 static void SumDistance2_angles(int&, double*, double&, double*, int);
@@ -239,7 +239,18 @@ namespace Belle2 {
       int* iz; //!
       /** index L */
       int* iL; //!
-
+      /** Top source TPC #2#3 */
+      TCutG* m_CutTPC1e4_PO210top;
+      /** Top source TPC #2#3 */
+      TCutG* m_CutTPC2e3_PO210top;
+      /** Bottom source TPC #1#4 */
+      TCutG* m_CutTPC1e4_PO210bot;
+      /** Bottom source TPC #1#4 */
+      TCutG* m_CutTPC2e3_PO210bot;
+      /** Cut extra PO210*/
+      TCutG* m_CutExtraPO210;
+      /** Raw particle ID */
+      int m_partID[6];
     };
 
   }

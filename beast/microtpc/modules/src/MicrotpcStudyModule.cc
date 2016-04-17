@@ -213,7 +213,7 @@ void MicrotpcStudyModule::event()
   StoreArray<MicrotpcSimHit>  SimHits;
   StoreArray<MicrotpcHit> Hits;
   StoreArray<MicrotpcRecoTrack> Tracks;
-
+  /*
   StoreArray<MicrotpcDataHit> DataHits;
   int dentries = DataHits.getEntries();
   for (int j = 0; j < dentries; j++) {
@@ -225,6 +225,7 @@ void MicrotpcStudyModule::event()
     int tot = aHit->getTOT();
     cout << " col " << col << " row " << row << " tot " << tot << " detNb " << detNb << endl;
   }
+  */
   Bool_t EdgeCut[8];
   double esum[8];
   //Initialize recoil and hit type counters

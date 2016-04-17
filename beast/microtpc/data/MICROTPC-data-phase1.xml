@@ -13,7 +13,7 @@ insensitive), everything else will be interpreted as true -->
 <!-- we can also have arrays as parameters which makes it easy to get a
 number of values as vector<double>.  The numbers can be divided by
 whitespace, comma or semi-colon -->
-<bar unit="mm">1 2 3 4
+<bar unit="mm">1 
 </bar>
 <!-- Lets define 3 sensitive Boxes at different z positions and with different sizes -->
 <LookAtRec>0</LookAtRec>
@@ -75,54 +75,9 @@ whitespace, comma or semi-colon -->
 <dz_Vessel unit="cm">31.0</dz_Vessel>
 <AngleX unit="deg">0.0</AngleX>
 <AngleZ unit="deg">90.0</AngleZ>
-<TPCpos_x unit="cm">45.64700</TPCpos_x>
-<TPCpos_y unit="cm">7.03894</TPCpos_y>
-<TPCpos_z unit="cm">40.00000</TPCpos_z>
-</Active>
-<Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<ScaleGas>MICROTPC-Material</ScaleGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
-<Material>MICROTPC-Material</Material>
-<dx_Vessel unit="cm">15.0</dx_Vessel>
-<dy_Vessel unit="cm">10.4</dy_Vessel>
-<dz_Vessel unit="cm">31.0</dz_Vessel>
-<AngleX unit="deg">0.0</AngleX>
-<AngleZ unit="deg">90.0</AngleZ>
 <TPCpos_x unit="cm">-47.04700</TPCpos_x>
 <TPCpos_y unit="cm">5.93894</TPCpos_y>
 <TPCpos_z unit="cm">37.70000</TPCpos_z>
-</Active>
-<Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<ScaleGas>MICROTPC-Material</ScaleGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
-<Material>MICROTPC-Material</Material>
-<dx_Vessel unit="cm">15.0</dx_Vessel>
-<dy_Vessel unit="cm">10.4</dy_Vessel>
-<dz_Vessel unit="cm">31.0</dz_Vessel>
-<AngleX unit="deg">0.0</AngleX>
-<AngleZ unit="deg">0.0</AngleZ>
-<TPCpos_x unit="cm">6.33894</TPCpos_x>
-<TPCpos_y unit="cm">45.94700</TPCpos_y>
-<TPCpos_z unit="cm">37.90000</TPCpos_z>
-</Active>
-<Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<ScaleGas>MICROTPC-Material</ScaleGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
-<Material>MICROTPC-Material</Material>
-<dx_Vessel unit="cm">15.0</dx_Vessel>
-<dy_Vessel unit="cm">10.4</dy_Vessel>
-<dz_Vessel unit="cm">31.0</dz_Vessel>
-<AngleX unit="deg">0.0</AngleX>
-<AngleZ unit="deg">0.0</AngleZ>
-<TPCpos_x unit="cm">8.33894</TPCpos_x>
-<TPCpos_y unit="cm">-44.34700</TPCpos_y>
-<TPCpos_z unit="cm">42.30000</TPCpos_z>
 </Active>
 </Content>
 </DetectorComponent>

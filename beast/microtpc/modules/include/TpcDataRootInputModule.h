@@ -13,7 +13,6 @@
 
 #include <framework/core/Module.h>
 #include <string>
-#include <top/geometry/TOPGeometryPar.h>
 #include <beast/microtpc/modules/TpcTree.h>
 #include "TFile.h"
 #include "TChain.h"
@@ -76,18 +75,18 @@ namespace Belle2 {
     std::vector<std::string> m_inputFileNames; /**< list of file names */
     TChain* m_tree = 0;            /**< tree pointer */
     std::string m_inputFileName;  /**< input file name */
+    int m_inputTPCNumber;         /**<input TPC number readout */
 
     TFile* m_file;        /**< TFile */
     TTree* m_treeTpc;     /**< TTree data tpc */
     TTree* m_treeTpcPar;  /**< TTree tpc parameters */
     TPC::TpcTree m_tpc;   /**< TPC tree structure */
 
-    //TOP::TOPGeometryPar* m_tpcgp; /**< geometry parameters */
-
     int m_numEntries;     /**< number of ntuple entries */
     int m_entryCounter;   /**< entry counter */
     unsigned m_numEvents = 0;      /**< number of events (tree entries) in the sample */
     unsigned m_eventCount = 0;     /**< current event (tree entry) */
+    unsigned m_exp = 0;            /**< Date of the day */
   };
 
 } // Belle2 namespace

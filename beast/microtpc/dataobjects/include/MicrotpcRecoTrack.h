@@ -29,16 +29,15 @@ namespace Belle2 {
 
     /** default constructor for ROOT */
     MicrotpcRecoTrack(): m_detNb(0), m_pixnb(0), m_chi2(0), m_theta(0), m_phi(0), m_esum(0), m_totsum(0), m_trl(0), m_time_range(0),
-      m_parFit(),
-      m_parFit_err(), m_cov(), m_impact_x() , m_impact_y(), m_side() {}
+      m_parFit(), m_parFit_err(), m_cov(), m_impact_x() , m_impact_y(), m_side(), m_partID() {}
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
      */
     MicrotpcRecoTrack(int detNb, int pixnb, float chi2, float theta, float phi, float esum, int totsum, float trl, int time_range,
                       const float parFit[5], const float parFit_err[5], const float cov[25], const float impact_x[4], const float impact_y[4],
-                      const int side[16]): m_detNb(detNb), m_pixnb(pixnb), m_chi2(chi2), m_theta(theta), m_phi(phi), m_esum(esum), m_totsum(totsum),
-      m_trl(trl),
+                      const int side[16], const int partID[6]):
+      m_detNb(detNb), m_pixnb(pixnb), m_chi2(chi2), m_theta(theta), m_phi(phi), m_esum(esum), m_totsum(totsum), m_trl(trl),
       m_time_range(time_range)
     {
       std::copy(parFit, parFit + 5, m_parFit);
@@ -49,6 +48,7 @@ namespace Belle2 {
       std::copy(impact_y, impact_y + 4, m_impact_y);
       //std::copy(&side[0][0], &side[0][0] + 4 * 4, &m_side[0][0]);
       std::copy(side, side + 16, m_side);
+      std::copy(partID, partID + 6, m_partID);
     }
     /** Return detector number */
     int getdetNb() const { return m_detNb; }
@@ -85,6 +85,8 @@ namespace Belle2 {
     //void getside(int ** side) const { m_side = side; return m_side; }
     //const int* getside() const { return m_side[4]; }
     const int* getside() const { return m_side; }
+    /** Return raw part ID */
+    const int* getpartID() const { return m_partID; }
 
   private:
     /** detector number */
@@ -118,6 +120,8 @@ namespace Belle2 {
     /** Which side was/were hit */
     //int m_side[4][4];
     int m_side[16];
+    /** Raw particle ID */
+    int m_partID[6];
 
     ClassDef(MicrotpcRecoTrack, 1)
   };

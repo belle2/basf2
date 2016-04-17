@@ -13,6 +13,8 @@
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcDataHit.h>
+#include <beast/microtpc/dataobjects/MicrotpcMetaHit.h>
+#include <beast/microtpc/dataobjects/MicrotpcMetaEDataHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcRecoTrack.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -126,6 +128,9 @@ void TrackFitterModule::initialize()
   StoreArray<MicrotpcDataHit> TpcDataHits;
   TpcDataHits.isOptional();
 
+  //StoreArray<MicrotpcMetaEDataHit> TpcDataHits;
+  //TpcDataHits.isOptional();
+
   RecoTracks.registerRelationTo(TpcDataHits);
   RecoTracks.registerRelationTo(TpcHits);
 
@@ -144,6 +149,130 @@ void TrackFitterModule::initialize()
   fctQ_Calib2 = new TF1("fctQ_Calib2", "[0]*([1]*x-[2])/([3]-x)", 0., 15.);
   fctQ_Calib2->SetParameters(m_TOTQ2, m_TOTC2, m_TOTA2 * m_TOTB2, m_TOTA2);
 
+  m_CutTPC1e4_PO210bot = new TCutG("m_CutTPC1e4_PO210bot", 25);
+  m_CutTPC1e4_PO210bot->SetPoint(0, -0.8436139, 1.216809);
+  m_CutTPC1e4_PO210bot->SetPoint(1, -0.7202467, 1.468415);
+  m_CutTPC1e4_PO210bot->SetPoint(2, -0.5424528, 4.990899);
+  m_CutTPC1e4_PO210bot->SetPoint(3, -0.1614659, 12.28747);
+  m_CutTPC1e4_PO210bot->SetPoint(4, 0.1106676, 17.5712);
+  m_CutTPC1e4_PO210bot->SetPoint(5, 0.4662554, 26.37741);
+  m_CutTPC1e4_PO210bot->SetPoint(6, 0.6222787, 32.91916);
+  m_CutTPC1e4_PO210bot->SetPoint(7, 0.7093614, 38.20289);
+  m_CutTPC1e4_PO210bot->SetPoint(8, 0.7529028, 44.74465);
+  m_CutTPC1e4_PO210bot->SetPoint(9, 0.7819303, 48.01552);
+  m_CutTPC1e4_PO210bot->SetPoint(10, 0.8363571, 48.26713);
+  m_CutTPC1e4_PO210bot->SetPoint(11, 0.8436139, 31.66113);
+  m_CutTPC1e4_PO210bot->SetPoint(12, 0.8472424, 21.34529);
+  m_CutTPC1e4_PO210bot->SetPoint(13, 0.8436139, 15.55835);
+  m_CutTPC1e4_PO210bot->SetPoint(14, 0.7855588, 18.57762);
+  m_CutTPC1e4_PO210bot->SetPoint(15, 0.738389, 24.11296);
+  m_CutTPC1e4_PO210bot->SetPoint(16, 0.5787373, 20.33887);
+  m_CutTPC1e4_PO210bot->SetPoint(17, 0.2703193, 10.52623);
+  m_CutTPC1e4_PO210bot->SetPoint(18, -0.1433237, 1.720021);
+  m_CutTPC1e4_PO210bot->SetPoint(19, -0.527939, -5.073341);
+  m_CutTPC1e4_PO210bot->SetPoint(20, -0.6476778, -6.079765);
+  m_CutTPC1e4_PO210bot->SetPoint(21, -0.7746735, -6.582977);
+  m_CutTPC1e4_PO210bot->SetPoint(22, -0.8617562, -5.576553);
+  m_CutTPC1e4_PO210bot->SetPoint(23, -0.8472424, 1.216809);
+  m_CutTPC1e4_PO210bot->SetPoint(24, -0.8436139, 1.216809);
+
+  m_CutTPC1e4_PO210top = new TCutG("m_CutTPC1e4_PO210top", 25);
+  m_CutTPC1e4_PO210top->SetPoint(0, -0.8169236, -10.40452);
+  m_CutTPC1e4_PO210top->SetPoint(1, -0.760302, -13.52468);
+  m_CutTPC1e4_PO210top->SetPoint(2, -0.645486, -14.82474);
+  m_CutTPC1e4_PO210top->SetPoint(3, -0.4724756, -13.13466);
+  m_CutTPC1e4_PO210top->SetPoint(4, -0.266436, -10.0145);
+  m_CutTPC1e4_PO210top->SetPoint(5, -0.04466814, -5.724287);
+  m_CutTPC1e4_PO210top->SetPoint(6, 0.2164203, -1.564079);
+  m_CutTPC1e4_PO210top->SetPoint(7, 0.4366153, 2.856143);
+  m_CutTPC1e4_PO210top->SetPoint(8, 0.5844605, 5.456273);
+  m_CutTPC1e4_PO210top->SetPoint(9, 0.694558, 7.79639);
+  m_CutTPC1e4_PO210top->SetPoint(10, 0.7857817, 7.926396);
+  m_CutTPC1e4_PO210top->SetPoint(11, 0.8785782, 6.366318);
+  m_CutTPC1e4_PO210top->SetPoint(12, 0.8644228, -4.294215);
+  m_CutTPC1e4_PO210top->SetPoint(13, 0.7842089, -4.294215);
+  m_CutTPC1e4_PO210top->SetPoint(14, 0.5860333, -8.454423);
+  m_CutTPC1e4_PO210top->SetPoint(15, 0.2132746, -13.26466);
+  m_CutTPC1e4_PO210top->SetPoint(16, 0.002516512, -17.29487);
+  m_CutTPC1e4_PO210top->SetPoint(17, -0.2680088, -22.10511);
+  m_CutTPC1e4_PO210top->SetPoint(18, -0.5479711, -24.96525);
+  m_CutTPC1e4_PO210top->SetPoint(19, -0.6816609, -25.74529);
+  m_CutTPC1e4_PO210top->SetPoint(20, -0.7964769, -25.48528);
+  m_CutTPC1e4_PO210top->SetPoint(21, -0.8342246, -24.70524);
+  m_CutTPC1e4_PO210top->SetPoint(22, -0.84838, -14.69474);
+  m_CutTPC1e4_PO210top->SetPoint(23, -0.8169236, -10.53453);
+  m_CutTPC1e4_PO210top->SetPoint(24, -0.8169236, -10.40452);
+
+  m_CutTPC2e3_PO210bot = new TCutG("m_CutTPC2e3_PO210bot", 31);
+  m_CutTPC2e3_PO210bot->SetPoint(0, -0.8122051, 14.55068);
+  m_CutTPC2e3_PO210bot->SetPoint(1, -0.78704, 18.53199);
+  m_CutTPC2e3_PO210bot->SetPoint(2, -0.7115445, 18.53199);
+  m_CutTPC2e3_PO210bot->SetPoint(3, -0.6093111, 17.84948);
+  m_CutTPC2e3_PO210bot->SetPoint(4, -0.4709028, 16.37071);
+  m_CutTPC2e3_PO210bot->SetPoint(5, -0.3089022, 13.75442);
+  m_CutTPC2e3_PO210bot->SetPoint(6, -0.0855615, 9.318106);
+  m_CutTPC2e3_PO210bot->SetPoint(7, 0.05756527, 5.791806);
+  m_CutTPC2e3_PO210bot->SetPoint(8, 0.2478767, 1.810499);
+  m_CutTPC2e3_PO210bot->SetPoint(9, 0.4020132, -1.488298);
+  m_CutTPC2e3_PO210bot->SetPoint(10, 0.6096257, -5.469605);
+  m_CutTPC2e3_PO210bot->SetPoint(11, 0.6788298, -7.17588);
+  m_CutTPC2e3_PO210bot->SetPoint(12, 0.7621894, -7.972141);
+  m_CutTPC2e3_PO210bot->SetPoint(13, 0.8109468, -7.403383);
+  m_CutTPC2e3_PO210bot->SetPoint(14, 0.853413, -4.900847);
+  m_CutTPC2e3_PO210bot->SetPoint(15, 0.86285, -1.147043);
+  m_CutTPC2e3_PO210bot->SetPoint(16, 0.853413, 1.696747);
+  m_CutTPC2e3_PO210bot->SetPoint(17, 0.7763448, 2.834263);
+  m_CutTPC2e3_PO210bot->SetPoint(18, 0.5073923, 8.635596);
+  m_CutTPC2e3_PO210bot->SetPoint(19, 0.22743, 14.32318);
+  m_CutTPC2e3_PO210bot->SetPoint(20, 0.007234977, 18.41824);
+  m_CutTPC2e3_PO210bot->SetPoint(21, -0.2271154, 22.7408);
+  m_CutTPC2e3_PO210bot->SetPoint(22, -0.4174269, 26.0396);
+  m_CutTPC2e3_PO210bot->SetPoint(23, -0.5275244, 27.74587);
+  m_CutTPC2e3_PO210bot->SetPoint(24, -0.7288456, 28.31463);
+  m_CutTPC2e3_PO210bot->SetPoint(25, -0.8373703, 26.94961);
+  m_CutTPC2e3_PO210bot->SetPoint(26, -0.8609626, 19.55575);
+  m_CutTPC2e3_PO210bot->SetPoint(27, -0.8562441, 13.98192);
+  m_CutTPC2e3_PO210bot->SetPoint(28, -0.8420887, 13.07191);
+  m_CutTPC2e3_PO210bot->SetPoint(29, -0.8137779, 13.98192);
+  m_CutTPC2e3_PO210bot->SetPoint(30, -0.8122051, 14.55068);
+
+  m_CutTPC2e3_PO210top = new TCutG("m_CutTPC2e3_PO210top", 21);
+  m_CutTPC2e3_PO210top->SetPoint(0, -0.858477, 7.478814);
+  m_CutTPC2e3_PO210top->SetPoint(1, -0.7327586, 7.669492);
+  m_CutTPC2e3_PO210top->SetPoint(2, -0.5639368, 5.572034);
+  m_CutTPC2e3_PO210top->SetPoint(3, -0.2298851, -0.5296611);
+  m_CutTPC2e3_PO210top->SetPoint(4, 0.01795977, -4.533898);
+  m_CutTPC2e3_PO210top->SetPoint(5, 0.2658046, -8.728814);
+  m_CutTPC2e3_PO210top->SetPoint(6, 0.4454023, -10.82627);
+  m_CutTPC2e3_PO210top->SetPoint(7, 0.5962644, -10.25424);
+  m_CutTPC2e3_PO210top->SetPoint(8, 0.7507184, -7.966102);
+  m_CutTPC2e3_PO210top->SetPoint(9, 0.8081897, -6.631356);
+  m_CutTPC2e3_PO210top->SetPoint(10, 0.8405173, -8.347458);
+  m_CutTPC2e3_PO210top->SetPoint(11, 0.8405173, -23.98305);
+  m_CutTPC2e3_PO210top->SetPoint(12, 0.7471264, -23.79237);
+  m_CutTPC2e3_PO210top->SetPoint(13, 0.5100575, -24.55509);
+  m_CutTPC2e3_PO210top->SetPoint(14, 0.2658046, -21.31356);
+  m_CutTPC2e3_PO210top->SetPoint(15, -0.1616379, -13.49576);
+  m_CutTPC2e3_PO210top->SetPoint(16, -0.5711207, -6.25);
+  m_CutTPC2e3_PO210top->SetPoint(17, -0.8081897, -3.008475);
+  m_CutTPC2e3_PO210top->SetPoint(18, -0.8800287, -2.245763);
+  m_CutTPC2e3_PO210top->SetPoint(19, -0.8477012, 7.288136);
+  m_CutTPC2e3_PO210top->SetPoint(20, -0.858477, 7.478814);
+
+  m_CutExtraPO210 = new TCutG("m_CutExtraPO210", 13);
+  m_CutExtraPO210->SetPoint(0, -3.916762, 0.1491452);
+  m_CutExtraPO210->SetPoint(1, 72.35678, 0.1491452);
+  m_CutExtraPO210->SetPoint(2, 148.6303, 0.2675731);
+  m_CutExtraPO210->SetPoint(3, 332.0991, 0.6450622);
+  m_CutExtraPO210->SetPoint(4, 472.2775, 1.037355);
+  m_CutExtraPO210->SetPoint(5, 604.2101, 1.35563);
+  m_CutExtraPO210->SetPoint(6, 744.3885, 1.573981);
+  m_CutExtraPO210->SetPoint(7, 866.0139, 1.770128);
+  m_CutExtraPO210->SetPoint(8, 989.7007, 1.955171);
+  m_CutExtraPO210->SetPoint(9, 1039.175, 2.036591);
+  m_CutExtraPO210->SetPoint(10, 2.267579, 2.03289);
+  m_CutExtraPO210->SetPoint(11, -1.855315, 0.1454443);
+  m_CutExtraPO210->SetPoint(12, -3.916762, 0.1491452);
 }
 
 void TrackFitterModule::beginRun()
@@ -157,6 +286,8 @@ void TrackFitterModule::event()
   StoreArray<MicrotpcSimHit> TpcSimHits;
   StoreArray<MicrotpcHit> TpcHits;
   StoreArray<MicrotpcDataHit> TpcDataHits;
+  StoreArray<MicrotpcMetaHit> TpcMetaHits;
+  //StoreArray<MicrotpcMetaEDataHit> TpcDataHits;
 
   /*
   //Skip events with no TpcSimHits, but continue the event counter
@@ -171,15 +302,14 @@ void TrackFitterModule::event()
   //auto rowArray = new vector<int>[nTPC](); //row
   //auto bcidArray = new vector<int>[nTPC](); //BCID
   //auto totArray = new vector<int>[nTPC](); //TOT
-  //int i_tpc[8];
-  //int i_tpc1[8];
-  //int i_tpc2[8];
+  int detNB = -1;
   if (nentries > 0 || nEntries > 0) {
     //cout << " nTPC " << nTPC << endl;
-    if (nEntries > 0) nTPC = 1;
+    if (nEntries > 0) {
+      nTPC = TpcMetaHits.getEntries();
+    }
     for (int i = 0; i < nTPC; i++) {
-
-      //i_tpc[i] = 0;
+      if (nentries) detNB = i;
 
       for (int j = 0; j < MAXSIZE; j++) {
         x[j] = 0;
@@ -215,7 +345,6 @@ void TrackFitterModule::event()
         for (int j = 0; j < nentries; j++) {
           MicrotpcHit* aHit = TpcHits[j];
           int detNb = aHit->getdetNb();
-          //int trkID = aHit->gettrkID();
           int col = aHit->getcolumn();
           int row = aHit->getrow();
           int tot = aHit->getTOT();
@@ -320,35 +449,35 @@ void TrackFitterModule::event()
                 if (0 <= row && row <= 5 * k)m_side[4 * k + 2] = k + 1;
                 if (336 - 5 * k <= row && row <= 336)m_side[4 * k + 3] = k + 1;
               }
-              if (col == 0) {
+              if (col == 1) {
                 m_impact_y[0] += y[fpxhits];
                 ynpts[0]++;
               }
-              if (col == 1) {
+              if (col == 2) {
                 m_impact_y[1] += y[fpxhits];
                 ynpts[1]++;
               }
-              if (col == 80) {
+              if (col == 79) {
                 m_impact_y[2] += y[fpxhits];
                 ynpts[2]++;
               }
-              if (col == 79) {
+              if (col == 80) {
                 m_impact_y[3] += y[fpxhits];
                 ynpts[3]++;
               }
-              if (row == 0) {
+              if (row == 1) {
                 m_impact_x[0] += x[fpxhits];
                 xnpts[0]++;
               }
-              if (row == 1) {
+              if (row == 2) {
                 m_impact_x[1] += x[fpxhits];
                 xnpts[1]++;
               }
-              if (row == 2) {
+              if (row == 335) {
                 m_impact_x[2] += x[fpxhits];
                 xnpts[2]++;
               }
-              if (row == 3) {
+              if (row == 336) {
                 m_impact_x[3] += x[fpxhits];
                 xnpts[3]++;
               }
@@ -360,7 +489,13 @@ void TrackFitterModule::event()
       }
 
       if (nEntries > 0) {
+        MicrotpcMetaHit* aMetaHit = TpcMetaHits[0];
+        detNB = aMetaHit->getdetNb();
+
         fpxhits = TpcDataHits.getEntries();
+        //MicrotpcMetaEDataHit * aHit = TpcDataHits[0];
+        //fpxhits = (aHit->getcolumn()).size();
+        //cout <<"fpxhits " << fpxhits << endl;
         int time[fpxhits];
         int itime[fpxhits];
         m_totsum = 0;
@@ -368,23 +503,32 @@ void TrackFitterModule::event()
         m_esum = 0;
 
         for (int j = 0; j < nEntries; j++) {
+          //for (int j = 0; j < fpxhits; j++) {
           MicrotpcDataHit* aHit = TpcDataHits[j];
           int bcid = aHit->getBCID();
           time[j] = bcid;
+          //time[j] = aHit->getBCID()[j];
         }
 
         TMath::Sort(fpxhits, time, itime, false);
         m_time_range = fabs(time[itime[0]] - time[itime[fpxhits - 1]]);
 
         for (int j = 0; j < nEntries; j++) {
+          //for (int j = 0; j < fpxhits; j++) {
 
           MicrotpcDataHit* aHit = TpcDataHits[j];
           int bcid = aHit->getBCID();
           int col = aHit->getcolumn();
           int row = aHit->getrow();
           int tot = aHit->getTOT();
-          x[j] = col * (2. * m_ChipColumnX / (float)m_ChipColumnNb) - m_ChipColumnX + TPCCenter[2].X();
-          y[j] = row * (2. * m_ChipRowY / (float)m_ChipRowNb) - m_ChipRowY + TPCCenter[2].Y();
+          //int bcid = aHit->getBCID()[j];
+          //int col = aHit->getcolumn()[j];
+          //int row = aHit->getrow()[j];
+          //int tot = aHit->getTOT()[j];
+          //x[j] = col * (2. * m_ChipColumnX / (float)m_ChipColumnNb) - m_ChipColumnX + TPCCenter[2].X();
+          //y[j] = row * (2. * m_ChipRowY / (float)m_ChipRowNb) - m_ChipRowY + TPCCenter[2].Y();
+          x[j] = col * (2. * m_ChipColumnX / (float)m_ChipColumnNb) - m_ChipColumnX;
+          y[j] = row * (2. * m_ChipRowY / (float)m_ChipRowNb) - m_ChipRowY;
           z[j] = (m_PixelTimeBin / 2. + m_PixelTimeBin * (bcid - time[itime[0]])) * m_v_DG;
           if (tot < 3) e[j] = fctQ_Calib1->Eval(tot) / (m_GEMGain1 * m_GEMGain2) * m_Workfct * 1e-3;
           else e[j] = fctQ_Calib2->Eval(tot) / (m_GEMGain1 * m_GEMGain2) * m_Workfct * 1e-3;
@@ -401,39 +545,40 @@ void TrackFitterModule::event()
             if (0 <= row && row <= 5 * k)m_side[4 * k + 2] = k + 1;
             if (336 - 5 * k <= row && row <= 336)m_side[4 * k + 3] = k + 1;
           }
-          if (col == 0) {
+          if (col == 1) {
             m_impact_y[0] += y[j];
             ynpts[0]++;
           }
-          if (col == 1) {
+          if (col == 2) {
             m_impact_y[1] += y[j];
             ynpts[1]++;
           }
-          if (col == 80) {
+          if (col == 79) {
             m_impact_y[2] += y[j];
             ynpts[2]++;
           }
-          if (col == 79) {
+          if (col == 80) {
             m_impact_y[3] += y[j];
             ynpts[3]++;
           }
-          if (row == 0) {
+          if (row == 1) {
             m_impact_x[0] += x[j];
             xnpts[0]++;
           }
-          if (row == 1) {
+          if (row == 2) {
             m_impact_x[1] += x[j];
             xnpts[1]++;
           }
-          if (row == 2) {
+          if (row == 335) {
             m_impact_x[2] += x[j];
             xnpts[2]++;
           }
-          if (row == 3) {
+          if (row == 336) {
             m_impact_x[3] += x[j];
             xnpts[3]++;
           }
         }
+
       }
 
       for (int j = 0; j < 4; j++) {
@@ -462,8 +607,10 @@ void TrackFitterModule::event()
       XYZVector temp_vector3(0, 0, 0);
       float pStart[5] = {0, 0, 0, 0, 0};
       temp_vector3  = XYZVector(x[ix[fpxhits - 1]] - x[ix[0]] , y[iy[fpxhits - 1]] - y[iy[0]], z[iz[fpxhits - 1]] - z[iz[0]]);
-      float init_theta = TPCCenter[i].Theta();//temp_vector3.Theta();
-      float init_phi = TPCCenter[i].Phi();//temp_vector3.Phi();
+      //float init_theta = TPCCenter[i].Theta();//temp_vector3.Theta();
+      //float init_phi = TPCCenter[i].Phi();//temp_vector3.Phi();
+      float init_theta = temp_vector3.Theta();
+      float init_phi = temp_vector3.Phi();
       pStart[0] = x[ix[0]];
       pStart[1] = y[iy[0]];
       pStart[2] = z[iz[0]];
@@ -514,9 +661,45 @@ void TrackFitterModule::event()
       TMath::Sort(fpxhits, L, iL, false);
       m_trl = fabs(L[iL[fpxhits - 1]] - L[iL[0]]);
 
+      for (int j = 0; j < 6; j++)m_partID[j] = 0;
+      Bool_t GoodRawXray = false;
+      if (fpxhits < 10) {
+        GoodRawXray = true;
+        m_partID[0] = 1;
+      }
+      Bool_t EdgeCuts = false;
+      if (m_side[0] == 0 && m_side[1] == 0 && m_side[2] == 0 && m_side[3] == 0) EdgeCuts = true;
+      //Bool_t GoodXray = false;
+      if (EdgeCuts && GoodRawXray) {
+        //GoodXray = true;
+        m_partID[1] = 1;
+      }
+      Bool_t StillAlpha = false;
+      StillAlpha = m_CutExtraPO210->IsInside(m_esum, m_trl);
+      Bool_t IsTopSource = false;
+      Bool_t IsBotSource = false;
+      if (detNB == 0 || detNB == 3) {
+        IsBotSource = m_CutTPC1e4_PO210bot->IsInside(m_impact_y[0], m_phi);
+        IsTopSource = m_CutTPC1e4_PO210top->IsInside(m_impact_y[0], m_phi);
+      } else if (detNB == 1 || detNB == 2) {
+        IsBotSource = m_CutTPC2e3_PO210bot->IsInside(m_impact_y[3], m_phi);
+        IsTopSource = m_CutTPC2e3_PO210top->IsInside(m_impact_y[3], m_phi);
+      }
+      if (StillAlpha) m_partID[2] = 1;
+      if (IsBotSource) m_partID[3] = 1;
+      if (IsTopSource) m_partID[4] = 1;
+
+      //Bool_t GoodNeutron = false;
+      if (EdgeCuts && fpxhits > 100  && m_esum < 10000. && m_trl < 1.9 && !StillAlpha) {
+        //GoodNeutron = true;
+        m_partID[5] = 1;
+      }
       StoreArray<MicrotpcRecoTrack> RecoTracks;
       RecoTracks.appendNew(i, fpxhits, m_chi2, m_theta, m_phi, m_esum, m_totsum, m_trl, m_time_range, m_parFit, m_parFit_err, m_cov,
-                           m_impact_x, m_impact_y, m_side);
+                           m_impact_x, m_impact_y, m_side, m_partID);
+
+
+
 
       delete [] iL;
       delete min;

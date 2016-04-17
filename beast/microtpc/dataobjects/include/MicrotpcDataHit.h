@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2011  Belle II Collaboration                         *
+ * Copyright(C) 2010-2016  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Igal Jaegle                                              *
@@ -29,65 +29,84 @@ namespace Belle2 {
   */
   class MicrotpcDataHit : public SimHitBase {
   public:
-    //typedef std::vector<unsigned int>::iterator iterator;
-    //typedef std::vector<unsigned int>::const_iterator const_iterator;
-
     /** default constructor for ROOT */
-    //MicrotpcDataHit(): m_column(0), m_row(0), m_BCID(0), m_TOT(0), m_detNb(0), m_pdg(0) {}
-    //MicrotpcDataHit(): m_column(0), m_row(0), m_BCID(0), m_TOT(0), m_detNb(0) {}
-    MicrotpcDataHit(): m_column(0), m_row(0), m_BCID(0), m_TOT(0), m_detNb(0), m_pdg(0), m_trkID(0) {}
+    MicrotpcDataHit(): m_column(0), m_row(0), m_BCID(0), m_TOT(0), m_detNb(0) {}
+    //MicrotpcDataHit(): m_detNb(0) {}
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
      */
-    /*
-    MicrotpcDataHit(int column, int row, int BCID, int TOT, int detNb, int pdg):
-      m_column(column), m_row(row), m_BCID(BCID), m_TOT(TOT), m_detNb(detNb), m_pdg(pdg)
-    {
-    }
-    */
-    /*
+
+
     MicrotpcDataHit(int column, int row, int BCID, int TOT, int detNb):
       m_column(column), m_row(row), m_BCID(BCID), m_TOT(TOT), m_detNb(detNb)
     {
     }
-    */
-    MicrotpcDataHit(int column, int row, int BCID, int TOT, int detNb, int pdg, int trkID):
-      m_column(column), m_row(row), m_BCID(BCID), m_TOT(TOT), m_detNb(detNb), m_pdg(pdg), m_trkID(trkID)
+    /*
+    MicrotpcDataHit(int detNb):
+    m_detNb(detNb)
     {
     }
-
-    /** Return the column */
+    */
+    /** Set energy deposition profile
+     * To avoid copying of the entries this will take over the contents of the
+     * argument and after the call the argument will be empty.
+     *
+     * TODO: Normally this would be done with an lvalue reference but we need a
+     * dictionary so we have to compile it with cint, might change for ROOT6.
+     *
+     * @param electronProfile list of energy depositions along the simhit,
+     * encoded using ElectronDeposit class. Will be empty after call
+     */
+    /*
+    void setcolumn(std::vector<int>& column) {
+    m_column.clear();
+    std::swap(m_column, column);
+    }
+    void setrow(std::vector<int>& row) {
+    m_row.clear();
+    std::swap(m_row, row);
+    }
+    void setBCID(std::vector<int>& BCID) {
+    m_BCID.clear();
+    std::swap(m_BCID, BCID);
+    }
+    void setTOT(std::vector<int>& TOT) {
+    m_TOT.clear();
+    std::swap(m_TOT, TOT);
+    }
+    */
+    /** Return column vector */
     int getcolumn() const { return m_column; }
-    /** Return the row */
+    //std::vector<int > getcolumn() const;
+    /** Return row vector */
     int getrow() const { return m_row; }
-    /** Return the BCID */
+    //std::vector<int > getrow() const;
+    /** Return BCID vector */
     int getBCID() const { return m_BCID; }
-    /** Return the TOT */
+    //std::vector<int > getBCID() const;
+    /** Return TOT vector */
     int getTOT() const { return m_TOT; }
+    //std::vector<int > getTOT() const;
     /** Return the TPC number */
     int getdetNb()  const { return m_detNb; }
-    /** Return the PDG of particles */
-    int getPDG()  const { return m_pdg; }
-    /** Return the track ID */
-    int gettrkID()  const { return m_trkID; }
 
   private:
 
     /** Column */
     int m_column;
+    //std::vector<int> m_column;
     /** Row */
     int m_row;
+    //std::vector<int> m_row;
     /** BCID */
     int m_BCID;
+    //std::vector<int> m_BCID;
     /** TOT */
     int m_TOT;
+    //std::vector<int> m_TOT;
     /** Detector Number */
     int m_detNb;
-    /** Particle PDG */
-    int m_pdg;
-    /** Particle PDG */
-    int m_trkID;
 
     ClassDef(MicrotpcDataHit, 1)
   };

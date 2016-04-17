@@ -22,6 +22,18 @@ from os import listdir
 from os.path import isfile, join
 
 
+def from_num_to_label(i, j):
+    Labels = [
+        ['fw', 'bw'],
+        ['fw', '-z', 'bw'],
+        ['fw', '+z', '-z', 'bw'],
+        ['fw', '+z', 'ce', '-z', 'bw']
+    ]
+
+    Layer_labels = Labels[i - 3]
+    return Layer_labels[j - 1]
+
+
 def update_z_filenames(path):
 
     for i in range(3, 7):  # loop on layer
@@ -90,14 +102,12 @@ def get_filename(i, j, k, path_layer):
 
     # strings to be searched in filenames
     layer = 'L' + str(i)
-    type = ['_bw_', '_fw_']
-    # type=['_bw_','_fw_','_z_','_ce_',''] # +z,-z --> _z
     np_side = ['Nside', 'Pside']  # mapping this to side=['v', 'u']
 
     filename = 'nofile'
 
     # look up file based on layer, sensor type and side
-    strings = [layer, np_side[k], type[j - 1]]
+    strings = [layer, np_side[k], from_num_to_label(i, j)]
 
     for name in files_list:
         if all(x in name for x in strings):
@@ -137,7 +147,7 @@ def main():
     path = './input_files'
 
     # rename z files with appropriate '+z' or '-z' labels
-    # update_z_filenames(path)
+    update_z_filenames(path)
 
     for i in range(3, 7):  # loop on layers
 
@@ -153,11 +163,11 @@ def main():
         f.write('\t<layer n=\"' + str(i) + '\">\n')
         f.write('\t\t<ladder n=\"' + str(1) + '\">\n')
 
-        for j in range(1, 3):  # loop on sensors, only doing bw and fw now
-
+        for j in range(1, i):  # loop on sensors
             # if needed file is not found, continue
             if not if_file_exists(i, j, path_layer):
-                print('Files for layer ' + str(i) + ', sensor ' + str(j) + ', not found. Moving on ..')
+                print('Files for layer ' + str(i) + ', sensor ' + str(j) +
+                      ' (' + from_num_to_label(i, j) + '), not found. Moving on ..')
                 continue
 
             # write sensor details
@@ -168,7 +178,8 @@ def main():
                 filename = get_filename(i, j, k, path_layer)
 
                 if 'nofile' in filename:  # file hasn't been found
-                    print('File for layer ' + str(i) + ', sensor ' + str(j) + ', ' +
+                    print('File for layer ' + str(i) + ', sensor ' + str(j) +
+                          ' (' + from_num_to_label(i, j) + '), ' +
                           np_side[k] + ', not found. Moving on ..')
                     continue
                 else:  # file has been found

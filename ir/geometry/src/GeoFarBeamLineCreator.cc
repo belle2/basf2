@@ -100,9 +100,9 @@ namespace Belle2 {
 
       int TubeR_N = cTubeR.getInt("N");
 
-      double TubeR_Z[TubeR_N];
-      double TubeR_R[TubeR_N];
-      double TubeR_r[TubeR_N];
+      std::vector<double> TubeR_Z(TubeR_N);
+      std::vector<double> TubeR_R(TubeR_N);
+      std::vector<double> TubeR_r(TubeR_N);
 
       for (int i = 0; i < TubeR_N; ++i) {
         ostringstream ossZID;
@@ -122,7 +122,7 @@ namespace Belle2 {
       tubeR.transform = G4Translate3D(0.0, 0.0, 0.0);
 
       //define geometry
-      tubeR.geo = new G4Polycone("geo_TubeR_name", 0.0, 2 * M_PI, TubeR_N, TubeR_Z, TubeR_r, TubeR_R);
+      tubeR.geo = new G4Polycone("geo_TubeR_name", 0.0, 2 * M_PI, TubeR_N, &(TubeR_Z[0]), &(TubeR_r[0]), &(TubeR_R[0]));
 
       elements["TubeR"] = tubeR;
 
@@ -136,9 +136,9 @@ namespace Belle2 {
 
       int TubeL_N = cTubeL.getInt("N");
 
-      double TubeL_Z[TubeL_N];
-      double TubeL_R[TubeL_N];
-      double TubeL_r[TubeL_N];
+      std::vector<double> TubeL_Z(TubeL_N);
+      std::vector<double> TubeL_R(TubeL_N);
+      std::vector<double> TubeL_r(TubeL_N);
 
       for (int i = 0; i < TubeL_N; ++i) {
         ostringstream ossZID;
@@ -158,11 +158,11 @@ namespace Belle2 {
       tubeL.transform = G4Translate3D(0.0, 0.0, 0.0);
 
       //define geometry
-      tubeL.geo = new G4Polycone("geo_TubeL_name", 0.0, 2 * M_PI, TubeL_N, TubeL_Z, TubeL_r, TubeL_R);
+      tubeL.geo = new G4Polycone("geo_TubeL_name", 0.0, 2 * M_PI, TubeL_N, &(TubeL_Z[0]), &(TubeL_r[0]), &(TubeL_R[0]));
 
       elements["TubeL"] = tubeL;
 
-      double zero_r[N] = {0, 0};
+      std::vector<double> zero_r(N, 0.);
       BOOST_FOREACH(const GearDir & cPolycone, content.getNodes("Straight")) {
 
         //--------------
@@ -173,9 +173,9 @@ namespace Belle2 {
 
         FarBeamLineElement polycone;
 
-        double Polycone_Z[N];
-        double Polycone_R[N];
-        double Polycone_r[N];
+        std::vector<double> Polycone_Z(N);
+        std::vector<double> Polycone_R(N);
+        std::vector<double> Polycone_r(N);
         Polycone_Z[0] = 0;
         Polycone_Z[1] = cPolycone.getLength("L") * unitFactor;
         Polycone_R[0] = cPolycone.getLength("R") * unitFactor;
@@ -202,13 +202,13 @@ namespace Belle2 {
 
         if (subtract != "" || intersect != "")
           if (type == "pipe") // for pipes inner space will be created as vacuum
-            geo_polyconexx = new G4Polycone(geo_polyconexx_name, 0.0, 2 * M_PI, N, Polycone_Z, zero_r, Polycone_R);
+            geo_polyconexx = new G4Polycone(geo_polyconexx_name, 0.0, 2 * M_PI, N, &(Polycone_Z[0]), &(zero_r[0]), &(Polycone_R[0]));
           else
-            geo_polyconexx = new G4Polycone(geo_polyconexx_name, 0.0, 2 * M_PI, N, Polycone_Z, Polycone_r, Polycone_R);
+            geo_polyconexx = new G4Polycone(geo_polyconexx_name, 0.0, 2 * M_PI, N, &(Polycone_Z[0]), &(Polycone_r[0]), &(Polycone_R[0]));
         else if (type == "pipe") // for pipes inner space will be created as vacuum
-          geo_polycone = new G4Polycone(geo_polycone_name, 0.0, 2 * M_PI, N, Polycone_Z, zero_r, Polycone_R);
+          geo_polycone = new G4Polycone(geo_polycone_name, 0.0, 2 * M_PI, N, &(Polycone_Z[0]), &(zero_r[0]), &(Polycone_R[0]));
         else
-          geo_polycone = new G4Polycone(geo_polycone_name, 0.0, 2 * M_PI, N, Polycone_Z, Polycone_r, Polycone_R);
+          geo_polycone = new G4Polycone(geo_polycone_name, 0.0, 2 * M_PI, N, &(Polycone_Z[0]), &(Polycone_r[0]), &(Polycone_R[0]));
 
 
         if (subtract != "" && intersect != "") {
@@ -254,7 +254,7 @@ namespace Belle2 {
 
           G4VSolid* geo_vacuumxx, *geo_vacuum;
 
-          geo_vacuumxx = new G4Polycone(geo_vacuumxx_name, 0.0, 2 * M_PI, N, Polycone_Z, zero_r, Polycone_r);
+          geo_vacuumxx = new G4Polycone(geo_vacuumxx_name, 0.0, 2 * M_PI, N, &(Polycone_Z[0]), &(zero_r[0]), &(Polycone_r[0]));
           geo_vacuum = new G4IntersectionSolid(geo_vacuumxx_name, geo_vacuumxx, geo_polycone);
 
           vacuum.geo = geo_vacuum;

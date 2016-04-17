@@ -175,9 +175,9 @@ namespace Belle2 {
       GearDir cTubeR(content, "TubeR/");
       const int TubeR_N = cTubeR.getInt("N");
 
-      double TubeR_Z[TubeR_N];
-      double TubeR_R[TubeR_N];
-      double TubeR_r[TubeR_N];
+      std::vector<double> TubeR_Z(TubeR_N);
+      std::vector<double> TubeR_R(TubeR_N);
+      std::vector<double> TubeR_r(TubeR_N);
 
       for (int i = 0; i < TubeR_N; ++i) {
         ostringstream ossZID;
@@ -195,7 +195,7 @@ namespace Belle2 {
       }
 
       tubeR.transform = G4Translate3D(0., 0., 0.);
-      tubeR.geo = new G4Polycone("geo_TubeR_name", 0, 2 * M_PI, TubeR_N, TubeR_Z, TubeR_r, TubeR_R);
+      tubeR.geo = new G4Polycone("geo_TubeR_name", 0, 2 * M_PI, TubeR_N, &(TubeR_Z[0]), &(TubeR_r[0]), &(TubeR_R[0]));
       tubeR.logi = NULL;
       elements["TubeR"] = tubeR;
 
@@ -204,9 +204,9 @@ namespace Belle2 {
       GearDir cTubeR2(content, "TubeR2/");
       const int TubeR2_N = cTubeR2.getInt("N");
 
-      double TubeR2_Z[TubeR2_N];
-      double TubeR2_R[TubeR2_N];
-      double TubeR2_r[TubeR2_N];
+      std::vector<double> TubeR2_Z(TubeR2_N);
+      std::vector<double> TubeR2_R(TubeR2_N);
+      std::vector<double> TubeR2_r(TubeR2_N);
 
       for (int i = 0; i < TubeR2_N; ++i) {
         ostringstream ossZID;
@@ -224,7 +224,7 @@ namespace Belle2 {
       }
 
       tubeR2.transform = G4Translate3D(0., 0., 0.);
-      tubeR2.geo = new G4Polycone("geo_TubeR2_name", 0, 2 * M_PI, TubeR2_N, TubeR2_Z, TubeR2_r, TubeR2_R);
+      tubeR2.geo = new G4Polycone("geo_TubeR2_name", 0, 2 * M_PI, TubeR2_N, &(TubeR2_Z[0]), &(TubeR2_r[0]), &(TubeR2_R[0]));
       tubeR2.logi = NULL;
       elements["TubeR2"] = tubeR2;
 
@@ -233,9 +233,9 @@ namespace Belle2 {
       GearDir cTubeL(content, "TubeL/");
       const int TubeL_N = cTubeL.getInt("N");
 
-      double TubeL_Z[TubeL_N];
-      double TubeL_R[TubeL_N];
-      double TubeL_r[TubeL_N];
+      std::vector<double> TubeL_Z(TubeL_N);
+      std::vector<double> TubeL_R(TubeL_N);
+      std::vector<double> TubeL_r(TubeL_N);
 
       for (int i = 0; i < TubeL_N; ++i) {
         ostringstream ossZID;
@@ -253,7 +253,7 @@ namespace Belle2 {
       }
 
       tubeL.transform = G4Translate3D(0., 0., 0.);
-      tubeL.geo = new G4Polycone("geo_TubeL_name", 0, 2 * M_PI, TubeL_N, TubeL_Z, TubeL_r, TubeL_R);
+      tubeL.geo = new G4Polycone("geo_TubeL_name", 0, 2 * M_PI, TubeL_N, &(TubeL_Z[0]), &(TubeL_r[0]), &(TubeL_R[0]));
       tubeL.logi = NULL;
       elements["TubeL"] = tubeL;
 
@@ -268,9 +268,9 @@ namespace Belle2 {
       GearDir cA1spc1(content, "A1spc1/");
       const int A1spc1_N = cA1spc1.getInt("N");
 
-      double A1spc1_Z[A1spc1_N];
-      double A1spc1_r[A1spc1_N];
-      double A1spc1_R[A1spc1_N];
+      std::vector<double> A1spc1_Z(A1spc1_N);
+      std::vector<double> A1spc1_r(A1spc1_N);
+      std::vector<double> A1spc1_R(A1spc1_N);
 
       for (int i = 0; i < A1spc1_N; ++i) {
         ostringstream ossZID;
@@ -288,16 +288,17 @@ namespace Belle2 {
       }
 
       A1spc1.transform = transform_HER;
-      G4Polycone* geo_A1spc1xx = new G4Polycone("geo_A1spc1xx_name", 0, 2 * M_PI, A1spc1_N, A1spc1_Z, A1spc1_r, A1spc1_R);
+      G4Polycone* geo_A1spc1xx = new G4Polycone("geo_A1spc1xx_name", 0, 2 * M_PI, A1spc1_N, &(A1spc1_Z[0]), &(A1spc1_r[0]),
+                                                &(A1spc1_R[0]));
 
       // space containing all structures around right HER beam pipe, part 2
       CryostatElement A1spc2;
       GearDir cA1spc2(content, "A1spc2/");
       const int A1spc2_N = cA1spc2.getInt("N");
 
-      double A1spc2_Z[A1spc2_N];
-      double A1spc2_R[A1spc2_N];
-      double A1spc2_r[A1spc2_N];
+      std::vector<double> A1spc2_Z(A1spc2_N);
+      std::vector<double> A1spc2_R(A1spc2_N);
+      std::vector<double> A1spc2_r(A1spc2_N);
 
       for (int i = 0; i < A1spc2_N; ++i) {
         ostringstream ossZID;
@@ -315,16 +316,17 @@ namespace Belle2 {
       }
 
       A1spc2.transform = transform_HER;
-      G4Polycone* geo_A1spc2xx = new G4Polycone("geo_A1spc2xx_name", 0, 2 * M_PI, A1spc2_N, A1spc2_Z, A1spc2_r, A1spc2_R);
+      G4Polycone* geo_A1spc2xx = new G4Polycone("geo_A1spc2xx_name", 0, 2 * M_PI, A1spc2_N, &(A1spc2_Z[0]), &(A1spc2_r[0]),
+                                                &(A1spc2_R[0]));
 
       // space containing all structures around right LER beam pipe, part 1
       CryostatElement B1spc1;
       GearDir cB1spc1(content, "B1spc1/");
       const int B1spc1_N = cB1spc1.getInt("N");
 
-      double B1spc1_Z[B1spc1_N];
-      double B1spc1_R[B1spc1_N];
-      double B1spc1_r[B1spc1_N];
+      std::vector<double> B1spc1_Z(B1spc1_N);
+      std::vector<double> B1spc1_R(B1spc1_N);
+      std::vector<double> B1spc1_r(B1spc1_N);
 
       for (int i = 0; i < B1spc1_N; ++i) {
         ostringstream ossZID;
@@ -342,16 +344,17 @@ namespace Belle2 {
       }
 
       B1spc1.transform = transform_LER;
-      G4Polycone* geo_B1spc1xx = new G4Polycone("geo_B1spc1xx_name", 0, 2 * M_PI, B1spc1_N, B1spc1_Z, B1spc1_r, B1spc1_R);
+      G4Polycone* geo_B1spc1xx = new G4Polycone("geo_B1spc1xx_name", 0, 2 * M_PI, B1spc1_N, &(B1spc1_Z[0]), &(B1spc1_r[0]),
+                                                &(B1spc1_R[0]));
 
       // space containing all structures around right LER beam pipe, part 2
       CryostatElement B1spc2;
       GearDir cB1spc2(content, "B1spc2/");
       const int B1spc2_N = cB1spc2.getInt("N");
 
-      double B1spc2_Z[B1spc2_N];
-      double B1spc2_R[B1spc2_N];
-      double B1spc2_r[B1spc2_N];
+      std::vector<double> B1spc2_Z(B1spc2_N);
+      std::vector<double> B1spc2_R(B1spc2_N);
+      std::vector<double> B1spc2_r(B1spc2_N);
 
       for (int i = 0; i < B1spc2_N; ++i) {
         ostringstream ossZID;
@@ -369,7 +372,8 @@ namespace Belle2 {
       }
 
       B1spc2.transform = transform_LER;
-      G4Polycone* geo_B1spc2xx = new G4Polycone("geo_B1spc2xx_name", 0, 2 * M_PI, B1spc2_N, B1spc2_Z, B1spc2_r, B1spc2_R);
+      G4Polycone* geo_B1spc2xx = new G4Polycone("geo_B1spc2xx_name", 0, 2 * M_PI, B1spc2_N, &(B1spc2_Z[0]), &(B1spc2_r[0]),
+                                                &(B1spc2_R[0]));
 
       // final cut
       B1spc2.geo = new G4IntersectionSolid("geo_B1spc2_name", geo_B1spc2xx, elements["TubeR2"].geo, B1spc2.transform.inverse());
@@ -422,9 +426,9 @@ namespace Belle2 {
       GearDir cC1wal1(content, "C1wal1/");
       const int C1wal1_N = cC1wal1.getInt("N");
 
-      double C1wal1_Z[C1wal1_N];
-      double C1wal1_R[C1wal1_N];
-      double C1wal1_r[C1wal1_N];
+      std::vector<double> C1wal1_Z(C1wal1_N);
+      std::vector<double> C1wal1_R(C1wal1_N);
+      std::vector<double> C1wal1_r(C1wal1_N);
 
       for (int i = 0; i < C1wal1_N; ++i) {
         ostringstream ossZID;
@@ -444,7 +448,8 @@ namespace Belle2 {
       C1wal1.transform = G4Translate3D(0., 0., 0.);
 
       //define geometry
-      G4Polycone* geo_C1wal1xxx = new G4Polycone("geo_C1wal1xxx_name", 0, 2 * M_PI, C1wal1_N, C1wal1_Z, C1wal1_r, C1wal1_R);
+      G4Polycone* geo_C1wal1xxx = new G4Polycone("geo_C1wal1xxx_name", 0, 2 * M_PI, C1wal1_N, &(C1wal1_Z[0]), &(C1wal1_r[0]),
+                                                 &(C1wal1_R[0]));
       G4IntersectionSolid* geo_C1wal1xx = new G4IntersectionSolid("geo_C1wal1xx_name", geo_C1wal1xxx, elements["TubeR"].geo,
                                                                   elements["TubeR"].transform);
       G4SubtractionSolid* geo_C1wal1x = new G4SubtractionSolid("geo_C1wal1x_name", geo_C1wal1xx, elements["A1spc1"].geo,
@@ -470,9 +475,9 @@ namespace Belle2 {
       GearDir cD1spc1(content, "D1spc1/");
       const int D1spc1_N = cD1spc1.getInt("N");
 
-      double D1spc1_Z[D1spc1_N];
-      double D1spc1_r[D1spc1_N];
-      double D1spc1_R[D1spc1_N];
+      std::vector<double> D1spc1_Z(D1spc1_N);
+      std::vector<double> D1spc1_r(D1spc1_N);
+      std::vector<double> D1spc1_R(D1spc1_N);
 
       for (int i = 0; i < D1spc1_N; ++i) {
         ostringstream ossZID;
@@ -490,16 +495,17 @@ namespace Belle2 {
       }
 
       D1spc1.transform = transform_HER;
-      G4Polycone* geo_D1spc1xx = new G4Polycone("geo_D1spc1xx_name", 0, 2 * M_PI, D1spc1_N, D1spc1_Z, D1spc1_r, D1spc1_R);
+      G4Polycone* geo_D1spc1xx = new G4Polycone("geo_D1spc1xx_name", 0, 2 * M_PI, D1spc1_N, &(D1spc1_Z[0]), &(D1spc1_r[0]),
+                                                &(D1spc1_R[0]));
 
       // space containing all structures around left LER beam pipe
       CryostatElement E1spc1;
       GearDir cE1spc1(content, "E1spc1/");
       const int E1spc1_N = cE1spc1.getInt("N");
 
-      double E1spc1_Z[E1spc1_N];
-      double E1spc1_R[E1spc1_N];
-      double E1spc1_r[E1spc1_N];
+      std::vector<double> E1spc1_Z(E1spc1_N);
+      std::vector<double> E1spc1_R(E1spc1_N);
+      std::vector<double> E1spc1_r(E1spc1_N);
 
       for (int i = 0; i < E1spc1_N; ++i) {
         ostringstream ossZID;
@@ -517,7 +523,8 @@ namespace Belle2 {
       }
 
       E1spc1.transform = transform_LER;
-      G4Polycone* geo_E1spc1xx = new G4Polycone("geo_E1spc1xx_name", 0, 2 * M_PI, E1spc1_N, E1spc1_Z, E1spc1_r, E1spc1_R);
+      G4Polycone* geo_E1spc1xx = new G4Polycone("geo_E1spc1xx_name", 0, 2 * M_PI, E1spc1_N, &(E1spc1_Z[0]), &(E1spc1_r[0]),
+                                                &(E1spc1_R[0]));
 
       // final cut
       G4IntersectionSolid* geo_D1spc1x = new G4IntersectionSolid("geo_D1spc1x_name", geo_D1spc1xx, elements["TubeL"].geo,
@@ -559,9 +566,9 @@ namespace Belle2 {
       GearDir cF1wal1(content, "F1wal1/");
       const int F1wal1_N = cF1wal1.getInt("N");
 
-      double F1wal1_Z[F1wal1_N];
-      double F1wal1_R[F1wal1_N];
-      double F1wal1_r[F1wal1_N];
+      std::vector<double> F1wal1_Z(F1wal1_N);
+      std::vector<double> F1wal1_R(F1wal1_N);
+      std::vector<double> F1wal1_r(F1wal1_N);
 
       for (int i = 0; i < F1wal1_N; ++i) {
         ostringstream ossZID;
@@ -581,7 +588,8 @@ namespace Belle2 {
       F1wal1.transform = G4Translate3D(0., 0., 0.);
 
       //define geometry
-      G4Polycone* geo_F1wal1xxx = new G4Polycone("geo_F1wal1xxx_name", 0, 2 * M_PI, F1wal1_N, F1wal1_Z, F1wal1_r, F1wal1_R);
+      G4Polycone* geo_F1wal1xxx = new G4Polycone("geo_F1wal1xxx_name", 0, 2 * M_PI, F1wal1_N, &(F1wal1_Z[0]), &(F1wal1_r[0]),
+                                                 &(F1wal1_R[0]));
       G4IntersectionSolid* geo_F1wal1xx = new G4IntersectionSolid("geo_F1wal1xx_name", geo_F1wal1xxx, elements["TubeL"].geo,
                                                                   elements["TubeL"].transform);
       G4SubtractionSolid* geo_F1wal1x = new G4SubtractionSolid("geo_F1wal1x_name", geo_F1wal1xx, elements["D1spc1"].geo,
@@ -611,9 +619,9 @@ namespace Belle2 {
 
         int N = cPolycone.getInt("N");
 
-        double Z[N];
-        double R[N];
-        double r[N];
+        std::vector<double> Z(N);
+        std::vector<double> R(N);
+        std::vector<double> r(N);
 
         for (int i = 0; i < N; ++i) {
           ostringstream ossZID;
@@ -644,21 +652,21 @@ namespace Belle2 {
         G4VSolid* geo_polyconexx, *geo_polyconex, *geo_polycone;
 
         if (subtract != "" && intersect != "") {
-          geo_polyconexx = new G4Polycone(geo_polyconexx_name, 0.0, 2 * M_PI, N, Z, r, R);
+          geo_polyconexx = new G4Polycone(geo_polyconexx_name, 0.0, 2 * M_PI, N, &(Z[0]), &(r[0]), &(R[0]));
           geo_polyconex = new G4SubtractionSolid(geo_polyconex_name, geo_polyconexx, elements[subtract].geo,
                                                  elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[subtract].transform);
           geo_polycone = new G4IntersectionSolid(geo_polycone_name, geo_polyconex, elements[intersect].geo,
                                                  elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[intersect].transform);
         } else if (subtract != "") {
-          geo_polyconexx = new G4Polycone(geo_polyconexx_name, 0.0, 2 * M_PI, N, Z, r, R);
+          geo_polyconexx = new G4Polycone(geo_polyconexx_name, 0.0, 2 * M_PI, N, &(Z[0]), &(r[0]), &(R[0]));
           geo_polycone = new G4SubtractionSolid(geo_polycone_name, geo_polyconexx, elements[subtract].geo,
                                                 elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[subtract].transform);
         } else if (intersect != "") {
-          geo_polyconexx = new G4Polycone(geo_polyconexx_name, 0.0, 2 * M_PI, N, Z, r, R);
+          geo_polyconexx = new G4Polycone(geo_polyconexx_name, 0.0, 2 * M_PI, N, &(Z[0]), &(r[0]), &(R[0]));
           geo_polycone = new G4IntersectionSolid(geo_polycone_name, geo_polyconexx, elements[intersect].geo,
                                                  elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[intersect].transform);
         } else
-          geo_polycone = new G4Polycone(geo_polycone_name, 0.0, 2 * M_PI, N, Z, r, R);
+          geo_polycone = new G4Polycone(geo_polycone_name, 0.0, 2 * M_PI, N, &(Z[0]), &(r[0]), &(R[0]));
 
         polycone.geo = geo_polycone;
 

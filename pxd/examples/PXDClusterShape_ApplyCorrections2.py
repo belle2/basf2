@@ -45,7 +45,8 @@ if argc >= 2:
 print("Setting of arguments: ")
 print("         PrefereSimulation: ", PrefereSimulation)
 
-outputFileName = 'pxdClShCalApply_Step1.root'
+inputFileName = 'pxdClShCalApply_Step1.root'
+outputFileName = 'pxdClShCalApply_Step2.root'
 
 # Name of file contain basic calibration, default="pxdCalibrationBasic.root" - creating from excluded residuals
 inputCalFileName = "pxd/data/pxdClShCal_RealData0_Track1_Calib1_Pixel0.root"
@@ -109,54 +110,42 @@ output = register_module('RootOutput')
 # Set output filename
 output.param('outputFileName', outputFileName)
 
+input2 = register_module('RootInput')
+input2.param('inputFileName', inputFileName)
+input2.param('excludeBranchNames', [
+    'VXDTFInfoBoards',
+    'GF2Tracks',
+    'mcTracks',
+    'caTracks'
+])
+
 # Select subdetectors to be built
 # geometry.param('Components', ['PXD','SVD'])
 geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
-# PXDDIGI.param('SimpleDriftModel', False)
-# PXDDIGI.param('statisticsFilename', 'PXDDiags.root')
-# PXDDIGI.param('PoissonSmearing', True)
-# PXDDIGI.param('ElectronicEffects', False)
-# PXDDIGI.param('NoiseSN', 1.0)
-# PXDCLUST.param('NoiseSN', 1.0)
-
-PXDCLUST.param('useClusterShape', True)
-
 # To use simulations rather than real data calculated corrections, default=False
 PXDApplyClShCorrection.param('PrefereSimulation', PrefereSimulation)
-PXDCheckClShCorrection.param('PrefereSimulation', PrefereSimulation)
 
 # Name of file contain basic calibration, default="pxdCalibrationBasic.root"
 PXDApplyClShCorrection.param('CalFileBasic', inputCalFileName)
-PXDCheckClShCorrection.param('CalFileBasic', inputCalFileName)
 # Name of file contain calibration for pixel kind 0 (PitchV=55um), default="pxdCalibrationPixelKind0.root"
 PXDApplyClShCorrection.param('CalFilePK0', inputCalFileNamePK0)
-PXDCheckClShCorrection.param('CalFilePK0', inputCalFileNamePK0)
 # Name of file contain calibration for pixel kind 1 (PitchV=60um), default="pxdCalibrationPixelKind1.root"
 PXDApplyClShCorrection.param('CalFilePK1', inputCalFileNamePK1)
-PXDCheckClShCorrection.param('CalFilePK1', inputCalFileNamePK1)
 # Name of file contain calibration for pixel kind 2 (PitchV=70um), default="pxdCalibrationPixelKind2.root"
 PXDApplyClShCorrection.param('CalFilePK2', inputCalFileNamePK2)
-PXDCheckClShCorrection.param('CalFilePK2', inputCalFileNamePK2)
 # Name of file contain calibration for pixel kind 3 (PitchV=85um), default="pxdCalibrationPixelKind3.root"
 PXDApplyClShCorrection.param('CalFilePK3', inputCalFileNamePK3)
-PXDCheckClShCorrection.param('CalFilePK3', inputCalFileNamePK3)
 
 # Mark of loop to save monitored data to different file, default=0
-PXDApplyClShCorrection.param('MarkOfLoopForHistogramsFile', 0)
+PXDApplyClShCorrection.param('MarkOfLoopForHistogramsFile', 1)
 
-# Do expert histograms
+# Do expert histograms"
 PXDApplyClShCorrection.param('DoExpertHistograms', True)
-# Show Detail Statistics
-PXDApplyClShCorrection.param('ShowDetailStatistics', False)
-
 
 PXDApplyClShCorrection.set_log_level(LogLevel.INFO)
 PXDApplyClShCorrection.set_log_level(LogLevel.DEBUG)
 PXDApplyClShCorrection.set_debug_level(100)
-PXDCheckClShCorrection.set_log_level(LogLevel.INFO)
-PXDCheckClShCorrection.set_log_level(LogLevel.DEBUG)
-PXDCheckClShCorrection.set_debug_level(100)
 
 secSetup = \
     ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',
@@ -192,6 +181,7 @@ param_TrackFinderMCTruth = {
     'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
 }
+# 'GFTrackCandidatesColName': 'mcTracks2',
 TrackFinderMCTruth.param(param_TrackFinderMCTruth)
 
 setupGenfit = register_module('SetupGenfitExtrapolation')
@@ -206,32 +196,25 @@ eventCounter.param('stepSize', 25)
 
 
 # ============================================================================
-# Do the simulation step 1 - apply corrections
+# Do the simulation step 2 - use corrected clusters
 
 main = create_path()
 main.add_module(eventinfosetter)
-main.add_module(progress)
+# main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)
-main.add_module(setupGenfit)
-main.add_module(particlegun)
-main.add_module(simulation)
-main.add_module(PXDDIGI)
-main.add_module(PXDCLUST)
-
-main.add_module(SVDDIGI)
-main.add_module(SVDCLUST)
+main.add_module(input2)
 main.add_module(eventCounter)
+# main2.add_module('SetupGenfitExtrapolation')
+main.add_module(setupGenfit)
 main.add_module(vxdtf)
 main.add_module(TrackFinderMCTruth)
 main.add_module(GenFitter)
 
-# main.add_module(PXDCheckClShCorrection)
 main.add_module(PXDApplyClShCorrection)
 
 main.add_module("PrintCollections")
 main.add_module(output)
-
 # Process events
 process(main)
 

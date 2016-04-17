@@ -294,7 +294,8 @@ void pxdApplyClusterShapeCorrectionModule::initialize()
           for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++)
             for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++) {
               if (fabs(TCorrection_BiasMap[0][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)]) > fDifference) {
-                //TCorrection_BiasMap[5][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] = TCorrection_BiasMap[0][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)];
+                TCorrection_BiasMap[5][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] = TCorrection_BiasMap[0][make_tuple(i_shape, i_pk,
+                    i_axis, i_angleU, i_angleV)];
                 //TCorrection_BiasMapErr[5][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)] = TCorrection_BiasMapErr[0][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)];
               }
               if ((fabs(TCorrection_BiasMap[0][make_tuple(i_shape, i_pk, i_axis, i_angleU, i_angleV)]) > fDifference) &&
@@ -623,8 +624,8 @@ void pxdApplyClusterShapeCorrectionModule::event()
         double f_TrackV = state2[4];
 
         TMatrixDSym covarianceTR = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getCov();
-        double SigmaUTrack = sqrt(covarianceTR(0, 0) - cluster->getUSigma() * cluster->getUSigma());
-        double SigmaVTrack = sqrt(covarianceTR(1, 1) - cluster->getVSigma() * cluster->getVSigma());
+        double SigmaUTrack = sqrt(covarianceTR(0, 0) - (cluster->getUSigma() * cluster->getUSigma()));
+        double SigmaVTrack = sqrt(covarianceTR(1, 1) - (cluster->getVSigma() * cluster->getVSigma()));
         //TMatrixDSym covarianceTRIncluded = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, true).getCov();
         //double SigmaUTrackIncl = sqrt(covarianceTRIncluded(0, 0) - cluster->getUSigma() * cluster->getUSigma());
         //double SigmaVTrackIncl = sqrt(covarianceTRIncluded(1, 1) - cluster->getVSigma() * cluster->getVSigma());
@@ -663,9 +664,9 @@ void pxdApplyClusterShapeCorrectionModule::event()
                                         sensorID));
         int i_layer = Info.getID().getLayerNumber();
         int i_sensor = Info.getID().getSensorNumber();
-        int InspectDets = 0;
-        if ((cluster->getShape() >= 11) && (cluster->getShape() <= 14)) InspectDets = 1;
-        if (!InspectDets) continue;
+        //int InspectDets = 0;
+        //if ((cluster->getShape() >= 11) && (cluster->getShape() <= 14)) InspectDets = 1;
+        //if (!InspectDets) continue;
         //if (InspectDets) printf("------->Shape %i (%s)\n",cluster->getShape(), Belle2::PXD::PXDClusterShape::pxdClusterShapeDescription[(Belle2::PXD::pxdClusterShapeType)cluster->getShape()].c_str());
         int i_shape = cluster->getShape() - 1;
         if (i_shape < 0) i_shape = i_shape + 100;
@@ -735,40 +736,34 @@ void pxdApplyClusterShapeCorrectionModule::event()
             m_histNormErrorV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEV);
             m_histNormErrorUV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEU, EEV);
           }
-          for (int i_axis = 0; i_axis < m_dimensions; i_axis++) {
-            if (TCorrection_BiasMap[0][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)] != 0.0) {  // use basic corrections:
-              NClustersBasicCorBias[i_axis]++;
-            } else {  // use simulation corrections:
-              NClustersSimulationCorBias[i_axis]++;
-            }
-            if (i_axis == 0) {
-              Clsu -= TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
-              //if (InspectDets) printf("------->i_shape%i, i_pixelKind%i, i_axis%i, iIndexPhi%i, iIndexTheta%i Val %f CorVal %f, newVal %f\n", i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta,
-              //    cluster->getU(), 10000.0 * TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)], u);
-              if (DoCorrection) cluster->setU(Clsu);
-            }
-            if (i_axis == 1) {
-              Clsv -= TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
-              //if (InspectDets) printf("------->i_shape%i, i_pixelKind%i, i_axis%i, iIndexPhi%i, iIndexTheta%i Val %f CorVal %f um, newVal %f\n", i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta,
-              //    cluster->getV(), 10000.0 * TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)], v);
-              if (DoCorrection) cluster->setV(Clsv);
-            }
-            if (TCorrection_ErrorEstimationMap[0][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)] != 1.0) {
-              NClustersBasicCorErEst[i_axis]++;
-            } else {  // use simulation corrections:
-              NClustersSimulationCorErEst[i_axis]++;
-            }
-            if (i_axis == 0) {
-              //printf("--->U %f %f %f \n", f_SigmaU * 10000.0, TCorrection_ErrorEstimationMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)],
-              //       f_SigmaU * TCorrection_ErrorEstimationMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)] * 10000.0);
-              f_SigmaU *= TCorrection_ErrorEstimationMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
-              if (DoCorrection) cluster->setUSigma(f_SigmaU);
-            }
-            if (i_axis == 1) {
-              //printf("--->V %f %f %f \n", f_SigmaV * 10000.0, TCorrection_ErrorEstimationMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)],
-              //       f_SigmaV * TCorrection_ErrorEstimationMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)] * 10000.0);
-              f_SigmaV *= TCorrection_ErrorEstimationMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
-              if (DoCorrection) cluster->setVSigma(f_SigmaV);
+          if (DoCorrection) {
+            for (int i_axis = 0; i_axis < m_dimensions; i_axis++) {
+              if (TCorrection_BiasMap[0][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)] != 0.0) {  // use basic corrections:
+                NClustersBasicCorBias[i_axis]++;
+              } else {  // use simulation corrections:
+                NClustersSimulationCorBias[i_axis]++;
+              }
+              if (i_axis == 0) {
+                Clsu -= TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
+                cluster->setU(Clsu);
+              }
+              if (i_axis == 1) {
+                Clsv -= TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
+                cluster->setV(Clsv);
+              }
+              if (TCorrection_ErrorEstimationMap[0][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)] != 1.0) {
+                NClustersBasicCorErEst[i_axis]++;
+              } else {  // use simulation corrections:
+                NClustersSimulationCorErEst[i_axis]++;
+              }
+              if (i_axis == 0) {
+                f_SigmaU *= TCorrection_ErrorEstimationMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
+                cluster->setUSigma(f_SigmaU);
+              }
+              if (i_axis == 1) {
+                f_SigmaV *= TCorrection_ErrorEstimationMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
+                cluster->setVSigma(f_SigmaV);
+              }
             }
           }
           if (m_DoExpertHistograms) {
@@ -798,7 +793,7 @@ void pxdApplyClusterShapeCorrectionModule::event()
             m_histNormErrorUV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEU, EEV);
           }
         }
-        if (DoCorrection) cluster->setShape(-100 + i_shape);
+        if (DoCorrection) cluster->setShape(-100 + i_shape + 1); // 1 -> -99,...
       }
     }
   }

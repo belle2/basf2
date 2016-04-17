@@ -58,6 +58,8 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
            bool(false));
   addParam("calibrateVertex", m_calibrateVertex, "For primary vertices, beam spot calibration derivatives are added",
            bool(false));
+  addParam("minPValue", m_minPValue, "Minimum p-value to write out a trejectory, <0 to write out all",
+           double(-1.));
 }
 
 void MillepedeCollectorModule::prepare()
@@ -133,7 +135,7 @@ void MillepedeCollectorModule::collect()
 
       using namespace gbl;
       GblTrajectory trajectory(gbl->collectGblPoints(&track, track.getCardinalRep()), fs->hasCurvature());
-      mille.fill(trajectory);
+      if (fs->getPVal() > m_minPValue) mille.fill(trajectory);
 
     }
 
@@ -149,7 +151,7 @@ void MillepedeCollectorModule::collect()
         getObject<TH1F>("pval").Fill(gblfs->getPVal());
 
         gbl::GblTrajectory trajectory(gbl->collectGblPoints(track, track->getCardinalRep()), gblfs->hasCurvature());
-        mille.fill(trajectory);
+        if (gblfs->getPVal() > m_minPValue) mille.fill(trajectory);
 
       }
     }
@@ -178,7 +180,7 @@ void MillepedeCollectorModule::collect()
         combined.fit(chi2, ndf, lostWeight);
         B2INFO("Combined GBL fit with vertex constraint: NDF = " << ndf << " Chi2/NDF = " << chi2 / ndf);
 
-        mille.fill(combined);
+        if (TMath::Prob(chi2, ndf) > m_minPValue) mille.fill(combined);
         getObject<TH1F>("chi2/ndf").Fill(chi2 / ndf);
         getObject<TH1F>("pval").Fill(TMath::Prob(chi2, ndf));
       }
@@ -243,7 +245,7 @@ void MillepedeCollectorModule::collect()
         combined.fit(chi2, ndf, lostWeight);
         B2INFO("Combined GBL fit with vertex + ip profile constraint: NDF = " << ndf << " Chi2/NDF = " << chi2 / ndf);
 
-        mille.fill(combined);
+        if (TMath::Prob(chi2, ndf) > m_minPValue) mille.fill(combined);
         getObject<TH1F>("chi2/ndf").Fill(chi2 / ndf);
         getObject<TH1F>("pval").Fill(TMath::Prob(chi2, ndf));
       }

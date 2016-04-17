@@ -67,6 +67,8 @@ namespace Belle2 {
     bool m_doublePrecision;
     /** Add derivatives for beam spot calibration for primary vertices */
     bool m_calibrateVertex;
+    /** Minimum p.value for output */
+    double m_minPValue;
   };
 }
 

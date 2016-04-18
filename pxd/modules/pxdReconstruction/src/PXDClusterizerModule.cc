@@ -37,7 +37,7 @@ REG_MODULE(PXDClusterizer);
 //-----------------------------------------------------------------
 
 PXDClusterizerModule::PXDClusterizerModule() :
-  Module(), m_elNoise(300.0), m_eToADU(200), m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(
+  Module(), m_elNoise(150.0), m_gq(0.7), m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(
     8.0), m_sizeHeadTail(3), m_clusterCacheSize(0)
 {
   //Set module properties
@@ -51,7 +51,8 @@ PXDClusterizerModule::PXDClusterizerModule() :
   addParam("SeedSN", m_cutSeed, "SN for digits to be considered as seed",
            m_cutSeed);
   addParam("ClusterSN", m_cutCluster, "Minimum SN for clusters", m_cutCluster);
-  addParam("eToADU", m_eToADU, "ENC equvalent of 1 ADU", m_eToADU);
+  addParam("Gq", m_gq, "Gq for pixels, nA/e-", m_gq);
+  addParam("ADCFineMode", m_ADCFineMode, "The slope of ADC cureve is 70 nA/ADU in fine mode and 130 in coarse mode", true);
   addParam("ClusterCacheSize", m_clusterCacheSize,
            "Maximum desired number of sensor rows", 0);
   addParam("HeadTailSize", m_sizeHeadTail,
@@ -66,9 +67,6 @@ PXDClusterizerModule::PXDClusterizerModule() :
            string(""));
   addParam("MCParticles", m_storeMCParticlesName, "MCParticles collection name",
            string(""));
-
-  addParam("TanLorentz", m_tanLorentzAngle, "Tangent of the Lorentz angle",
-           double(-1.0));
 
   addParam("useClusterShape", m_useClusterShape,
            "Apply recognition of cluster shape and set it as ID", false);
@@ -115,13 +113,10 @@ void PXDClusterizerModule::initialize()
   m_relDigitTrueHitName = relDigitTrueHits.getName();
   m_relDigitMCParticleName = relDigitMCParticles.getName();
 
-  //Warn if tanLorentz set
-  if (m_tanLorentzAngle > 0.0)
-    B2WARNING("The TanLorentz parameter is obsolete and has no effect!")
-
-    B2INFO(
-      "PXDClusterizer Parameters (in default system units, *=cannot be set directly):");
+  B2INFO(
+    "PXDClusterizer Parameters (in default system units, *=cannot be set directly):");
   B2INFO(" -->  ElectronicNoise:    " << m_elNoise);
+  B2INFO(" -->  e / ADU             " << m_gq << " e-/ADU");
   B2INFO(" -->  NoiseSN:            " << m_cutAdjacent);
   B2INFO(" -->  SeedSN:             " << m_cutSeed);
   B2INFO(" -->  ClusterSN:          " << m_cutCluster);
@@ -138,10 +133,10 @@ void PXDClusterizerModule::initialize()
   B2INFO(" -->  ClusterDigitRel:    " << m_relClusterDigitName);
   B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
   B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
-  B2INFO(" -->  TanLorentz:         " << m_tanLorentzAngle);
   B2INFO(" -->  useClusterShape:    " << m_useClusterShape);
 
-  //This is still static noise for all pixels, should be done more sophisticated in the future
+  /* Electron equivalent of 1 ADU is set using gq and slope of the ADC curve.*/
+  m_eToADU = m_ADCFineMode ? (70.0 / m_gq) : (130.0 / m_gq);
   if (m_useADC) m_elNoise = m_elNoise / m_eToADU;
   m_noiseMap.setNoiseLevel(m_elNoise);
   m_cutElectrons = m_elNoise * m_cutAdjacent;

@@ -91,9 +91,13 @@ namespace Belle2 {
 
       /** Noise in number of electrons */
       double m_elNoise;
-      /** ENC equivalent of 1 ADU */
+      /** Gq for pixels */
+      double m_gq;
+      /** Is ADC in fine mode? */
+      bool m_ADCFineMode;
+      /** Electron equivalent of 1 ADU */
       double m_eToADU;
-      /** Charge expressed in ADU? */
+      /** Digit charge is expressed in ADU (default) */
       bool m_useADC;
       /** Seed cut in sigma */
       double m_cutSeed;
@@ -124,8 +128,6 @@ namespace Belle2 {
 
       /** Size of the cluster at which we switch from Center of Gravity to Analog Head Tail */
       int m_sizeHeadTail;
-      /** LorentzAngle , FIXME: should be determined directly from B-Field */
-      double m_tanLorentzAngle;
 
       /** Apply recognition of cluster shape and set its ID */
       bool m_useClusterShape;

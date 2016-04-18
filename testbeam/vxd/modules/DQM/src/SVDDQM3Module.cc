@@ -83,6 +83,8 @@ void SVDDQM3Module::defineHisto()
   //TDirectory* DirSVDGlobCorrelsNeigh = oldDir->mkdir("SVD_Global_CorrelationsNeighboar");
   //TDirectory* DirSVDGlobCorrels = oldDir->mkdir("SVD_Global_CorrelationsOthers");
 
+  TDirectory* DirSVDDetailBasic = oldDir->mkdir("SVD_Detail_Basic");
+
   // 2D histograms in local coordinates:
   TDirectory* DirVXDJoinCorrels = oldDir->mkdir("VXD_Join_CorrelationsOldStyle_Remove");
   //TDirectory* DirVXDLocalCorrels = oldDir->mkdir("VXD_Local_Correlations");
@@ -92,7 +94,6 @@ void SVDDQM3Module::defineHisto()
 //  TDirectory* DirPXDJoinBasic = oldDir->mkdir("PXD_Join_Basic");
 //  TDirectory* DirPXDDetailBasic = oldDir->mkdir("PXD_Detail_Basic");
   TDirectory* DirSVDJoinBasic = oldDir->mkdir("SVD_Join_Basic");
-  TDirectory* DirSVDDetailBasic = oldDir->mkdir("SVD_Detail_Basic");
   //oldDir->mkdir("SVD_JoinHistos_Correlations")->cd();
   //oldDir->mkdir("SVD_DetailHistos_Basic")->cd();
   //oldDir->mkdir("SVD_GlobalCorrelations")->cd();

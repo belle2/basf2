@@ -1548,7 +1548,7 @@ unsigned int PXDUnpackerModule::remap_row_IB_OF(unsigned int DHP_row, unsigned i
   unsigned int v_cellID = 0;
 
   DCD_channel = 4 * DHP_col + DHP_row % 4 + 256 * dhp_id;
-  Drain = LUT_IB_OF[DCD_channel]; //since LUT starts with one and array with zero
+  Drain = LUT_IB_OF[DCD_channel + 1]; //since LUT starts with one and array with zero
   B2INFO("in remap ROW ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   row = (DHP_row / 4) * 4  + Drain % 4;
 //   B2INFO("row false " << DHP_row << " col false " << DHP_col << " DCD line " << DCD_channel << " Gate " << Gate << " Drain " << Drain << " row geo " << row);
@@ -1567,7 +1567,7 @@ unsigned int PXDUnpackerModule::remap_col_IB_OF(unsigned int DHP_row, unsigned i
   unsigned int u_cellID = 0;
 
   DCD_channel = 4 * DHP_col + DHP_row % 4 + 256 * dhp_id;
-  Drain = LUT_IB_OF[DCD_channel]; //since LUT starts with one and array with zero
+  Drain = LUT_IB_OF[DCD_channel + 1]; //since LUT starts with one and array with zero
   B2INFO("in remap COL ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   col = Drain / 4;
 //   B2INFO(" col false " << DHP_col << " DCD line " << DCD_channel << " col geo " << col_geo);

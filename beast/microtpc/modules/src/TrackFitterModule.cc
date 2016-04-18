@@ -444,10 +444,10 @@ void TrackFitterModule::event()
               Track->SetPointError(fpxhits, 0, 0, 1.);
 
               for (int k = 0; k < 4; k++) {
-                if (0 <= col && col <= k)m_side[4 * k + 0] = k + 1;
-                if (80 - k <= col && col <= 80)m_side[4 * k + 1] = k + 1;
-                if (0 <= row && row <= 5 * k)m_side[4 * k + 2] = k + 1;
-                if (336 - 5 * k <= row && row <= 336)m_side[4 * k + 3] = k + 1;
+                if (1 <= col && col <= k + 1)m_side[4 * k + 0] = k + 1;
+                if (80 - (k + 1) <= col && col <= 80)m_side[4 * k + 1] = k + 1;
+                if (1 <= row && row <= 5 * (k + 1))m_side[4 * k + 2] = k + 1;
+                if (336 - 5 * (k + 1) <= row && row <= 336)m_side[4 * k + 3] = k + 1;
               }
               if (col == 1) {
                 m_impact_y[0] += y[fpxhits];
@@ -540,11 +540,12 @@ void TrackFitterModule::event()
           Track->SetPointError(j, 0, 0, 1.);
 
           for (int k = 0; k < 4; k++) {
-            if (0 <= col && col <= k)m_side[4 * k + 0] = k + 1;
-            if (80 - k <= col && col <= 80)m_side[4 * k + 1] = k + 1;
-            if (0 <= row && row <= 5 * k)m_side[4 * k + 2] = k + 1;
-            if (336 - 5 * k <= row && row <= 336)m_side[4 * k + 3] = k + 1;
+            if (1 <= col && col <= k + 1)m_side[4 * k + 0] = k + 1;
+            if (80 - (k + 1) <= col && col <= 80)m_side[4 * k + 1] = k + 1;
+            if (1 <= row && row <= 5 * (k + 1))m_side[4 * k + 2] = k + 1;
+            if (336 - 5 * (k + 1) <= row && row <= 336)m_side[4 * k + 3] = k + 1;
           }
+
           if (col == 1) {
             m_impact_y[0] += y[j];
             ynpts[0]++;

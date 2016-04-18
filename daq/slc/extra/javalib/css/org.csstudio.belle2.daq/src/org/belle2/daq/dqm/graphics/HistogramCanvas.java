@@ -239,7 +239,8 @@ public class HistogramCanvas extends GRect {
 			histo.getDrawer().setCanvas(this);
 			histo.getDrawer().update();
 		}
-		if (legend != null && legend.getHistograms().size() == 0) {
+		if (legend != null) {
+			legend.getHistograms().clear();
 			for (Histo histo : histograms) {
 				legend.add(histo);
 			}

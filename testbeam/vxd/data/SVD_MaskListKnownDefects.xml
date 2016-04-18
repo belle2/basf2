@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Meta>
+	<Date>18/04/2016<\Date>
+	<Description short="Ignore strips list for SVD planes in 2016 VXD TB">
+		List of known strip defects from layers groups
+	</Description>
+	<Author>Giacomo Caria</Author>
+</Meta>
+<SVD>
+	<layer n="3">
+		<ladder n="1">
+			<sensor n="1">
+			</sensor>
+			<sensor n="2">
+				<side side="v">
+					<strip stripNo = "767"></strip>
+				</side>
+				<side side="u">
+				</side>
+			</sensor>
+		</ladder>
+	</layer>
+	<layer n="4">
+		<ladder n="1">
+			<sensor n="1">
+				<side side="v">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "203"></strip>
+					<strip stripNo = "308"></strip>
+					<strip stripNo = "511"></strip>
+				</side>
+				<side side="u">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "1"></strip>
+					<strip stripNo = "2"></strip>
+					<strip stripNo = "3"></strip>
+					<strip stripNo = "4"></strip>
+					<strip stripNo = "5"></strip>
+					<strip stripNo = "6"></strip>
+					<strip stripNo = "7"></strip>
+					<strip stripNo = "8"></strip>
+					<strip stripNo = "113"></strip>
+					<strip stripNo = "142"></strip>
+					<strip stripNo = "149"></strip>
+					<strip stripNo = "193"></strip>
+					<strip stripNo = "194"></strip>
+					<strip stripNo = "195"></strip>
+					<strip stripNo = "245"></strip>
+					<strip stripNo = "262"></strip>
+					<strip stripNo = "263"></strip>
+					<strip stripNo = "290"></strip>
+					<strip stripNo = "291"></strip>
+					<strip stripNo = "314"></strip>
+					<strip stripNo = "315"></strip>
+					<strip stripNo = "414"></strip>
+					<strip stripNo = "466"></strip>
+					<strip stripNo = "575"></strip>
+					<strip stripNo = "618"></strip>
+					<strip stripNo = "767"></strip>
+				</side>
+			</sensor>
+			<sensor n="2">
+				<side side="v">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "9"></strip>
+					<strip stripNo = "73"></strip>
+					<strip stripNo = "74"></strip>
+					<strip stripNo = "75"></strip>
+					<strip stripNo = "118"></strip>
+					<strip stripNo = "125"></strip>
+					<strip stripNo = "126"></strip>
+					<strip stripNo = "127"></strip>
+					<strip stripNo = "511"></strip>
+				</side>
+				<side side="u">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "1"></strip>
+					<strip stripNo = "2"></strip>
+					<strip stripNo = "13"></strip>
+					<strip stripNo = "127"></strip>
+					<strip stripNo = "383"></strip>
+					<strip stripNo = "384"></strip>
+					<strip stripNo = "401"></strip>
+					<strip stripNo = "404"></strip>
+					<strip stripNo = "410"></strip>
+					<strip stripNo = "411"></strip>
+					<strip stripNo = "415"></strip>
+					<strip stripNo = "416"></strip>
+					<strip stripNo = "417"></strip>
+					<strip stripNo = "419"></strip>
+					<strip stripNo = "420"></strip>
+					<strip stripNo = "421"></strip>
+					<strip stripNo = "423"></strip>
+					<strip stripNo = "424"></strip>
+					<strip stripNo = "427"></strip>
+					<strip stripNo = "428"></strip>
+					<strip stripNo = "431"></strip>
+					<strip stripNo = "433"></strip>
+					<strip stripNo = "434"></strip>
+					<strip stripNo = "435"></strip>
+					<strip stripNo = "436"></strip>
+					<strip stripNo = "437"></strip>
+					<strip stripNo = "438"></strip>
+					<strip stripNo = "440"></strip>
+					<strip stripNo = "443"></strip>
+					<strip stripNo = "451"></strip>
+					<strip stripNo = "458"></strip>
+					<strip stripNo = "459"></strip>
+					<strip stripNo = "487"></strip>
+					<strip stripNo = "524"></strip>
+					<strip stripNo = "564"></strip>
+					<strip stripNo = "622"></strip>
+					<strip stripNo = "669"></strip>
+					<strip stripNo = "670"></strip>
+					<strip stripNo = "687"></strip>
+					<strip stripNo = "765"></strip>
+					<strip stripNo = "766"></strip>
+					<strip stripNo = "767"></strip>
+				</side>
+			</sensor>
+			<sensor n="3">
+				<side side="v">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "461"></strip>
+					<strip stripNo = "493"></strip>
+					<strip stripNo = "511"></strip>
+				</side>
+				<side side="u">
+					<strip stripNo = "10"></strip>
+					<strip stripNo = "104"></strip>
+					<strip stripNo = "112"></strip>
+					<strip stripNo = "138"></strip>
+					<strip stripNo = "163"></strip>
+					<strip stripNo = "283"></strip>
+					<strip stripNo = "309"></strip>
+					<strip stripNo = "313"></strip>
+					<strip stripNo = "318"></strip>
+					<strip stripNo = "348"></strip>
+					<strip stripNo = "460"></strip>
+					<strip stripNo = "483"></strip>
+					<strip stripNo = "491"></strip>
+					<strip stripNo = "495"></strip>
+					<strip stripNo = "505"></strip>
+					<strip stripNo = "513"></strip>
+					<strip stripNo = "533"></strip>
+					<strip stripNo = "540"></strip>
+					<strip stripNo = "541"></strip>
+					<strip stripNo = "542"></strip>
+					<strip stripNo = "544"></strip>
+					<strip stripNo = "545"></strip>
+					<strip stripNo = "550"></strip>
+					<strip stripNo = "555"></strip>
+					<strip stripNo = "564"></strip>
+					<strip stripNo = "571"></strip>
+					<strip stripNo = "573"></strip>
+					<strip stripNo = "590"></strip>
+					<strip stripNo = "605"></strip>
+					<strip stripNo = "612"></strip>
+					<strip stripNo = "618"></strip>
+					<strip stripNo = "653"></strip>
+					<strip stripNo = "654"></strip>
+				</side>
+			</sensor>
+		</ladder>
+	</layer>
+	<layer n="5">
+		<ladder n="1">
+			<sensor n="1">
+			</sensor>
+			<sensor n="2">
+				<side side="v">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "1"></strip>
+					<strip stripNo = "2"></strip>
+					<strip stripNo = "3"></strip>
+					<strip stripNo = "7"></strip>
+					<strip stripNo = "15"></strip>
+					<strip stripNo = "16"></strip>
+					<strip stripNo = "17"></strip>
+					<strip stripNo = "33"></strip>
+					<strip stripNo = "276"></strip>
+					<strip stripNo = "277"></strip>
+					<strip stripNo = "278"></strip>
+					<strip stripNo = "284"></strip>
+					<strip stripNo = "397"></strip>
+					<strip stripNo = "398"></strip>
+					<strip stripNo = "399"></strip>
+					<strip stripNo = "413"></strip>
+					<strip stripNo = "415"></strip>
+					<strip stripNo = "425"></strip>
+					<strip stripNo = "426"></strip>
+					<strip stripNo = "427"></strip>
+					<strip stripNo = "441"></strip>
+					<strip stripNo = "442"></strip>
+					<strip stripNo = "443"></strip>
+					<strip stripNo = "469"></strip>
+					<strip stripNo = "470"></strip>
+					<strip stripNo = "471"></strip>
+					<strip stripNo = "511"></strip>
+				</side>
+				<side side="u">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "1"></strip>
+					<strip stripNo = "6"></strip>
+					<strip stripNo = "14"></strip>
+					<strip stripNo = "24"></strip>
+					<strip stripNo = "25"></strip>
+					<strip stripNo = "49"></strip>
+					<strip stripNo = "50"></strip>
+					<strip stripNo = "65"></strip>
+					<strip stripNo = "66"></strip>
+					<strip stripNo = "67"></strip>
+					<strip stripNo = "68"></strip>
+					<strip stripNo = "69"></strip>
+					<strip stripNo = "162"></strip>
+					<strip stripNo = "163"></strip>
+					<strip stripNo = "164"></strip>
+					<strip stripNo = "178"></strip>
+					<strip stripNo = "179"></strip>
+					<strip stripNo = "243"></strip>
+					<strip stripNo = "244"></strip>
+					<strip stripNo = "245"></strip>
+					<strip stripNo = "246"></strip>
+					<strip stripNo = "247"></strip>
+					<strip stripNo = "279"></strip>
+					<strip stripNo = "383"></strip>
+					<strip stripNo = "384"></strip>
+					<strip stripNo = "385"></strip>
+					<strip stripNo = "398"></strip>
+					<strip stripNo = "440"></strip>
+					<strip stripNo = "712"></strip>
+					<strip stripNo = "713"></strip>
+					<strip stripNo = "714"></strip>
+					<strip stripNo = "715"></strip>
+					<strip stripNo = "716"></strip>
+					<strip stripNo = "722"></strip>
+					<strip stripNo = "735"></strip>
+					<strip stripNo = "736"></strip>
+					<strip stripNo = "750"></strip>
+					<strip stripNo = "766"></strip>
+					<strip stripNo = "767"></strip>
+				</side>
+			</sensor>
+			<sensor n="3">
+				<side side="v">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "128"></strip>
+					<strip stripNo = "382"></strip>
+					<strip stripNo = "421"></strip>
+					<strip stripNo = "423"></strip>
+					<strip stripNo = "510"></strip>
+					<strip stripNo = "511"></strip>
+				</side>
+				<side side="u">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "1"></strip>
+					<strip stripNo = "19"></strip>
+					<strip stripNo = "41"></strip>
+					<strip stripNo = "44"></strip>
+					<strip stripNo = "47"></strip>
+					<strip stripNo = "50"></strip>
+					<strip stripNo = "304"></strip>
+					<strip stripNo = "383"></strip>
+					<strip stripNo = "384"></strip>
+					<strip stripNo = "401"></strip>
+					<strip stripNo = "462"></strip>
+					<strip stripNo = "463"></strip>
+					<strip stripNo = "464"></strip>
+					<strip stripNo = "465"></strip>
+					<strip stripNo = "511"></strip>
+					<strip stripNo = "512"></strip>
+					<strip stripNo = "630"></strip>
+					<strip stripNo = "631"></strip>
+					<strip stripNo = "718"></strip>
+					<strip stripNo = "719"></strip>
+					<strip stripNo = "720"></strip>
+					<strip stripNo = "721"></strip>
+					<strip stripNo = "733"></strip>
+					<strip stripNo = "765"></strip>
+					<strip stripNo = "766"></strip>
+					<strip stripNo = "767"></strip>
+				</side>
+			</sensor>
+			<sensor n="4">
+				<side side="v">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "277"></strip>
+					<strip stripNo = "278"></strip>
+					<strip stripNo = "279"></strip>
+					<strip stripNo = "497"></strip>
+					<strip stripNo = "498"></strip>
+					<strip stripNo = "511"></strip>
+				</side>
+				<side side="u">
+					<strip stripNo = "35"></strip>
+					<strip stripNo = "36"></strip>
+					<strip stripNo = "56"></strip>
+					<strip stripNo = "88"></strip>
+					<strip stripNo = "154"></strip>
+					<strip stripNo = "230"></strip>
+					<strip stripNo = "298"></strip>
+					<strip stripNo = "313"></strip>
+					<strip stripNo = "314"></strip>
+					<strip stripNo = "315"></strip>
+					<strip stripNo = "316"></strip>
+					<strip stripNo = "317"></strip>
+					<strip stripNo = "318"></strip>
+					<strip stripNo = "319"></strip>
+					<strip stripNo = "320"></strip>
+					<strip stripNo = "321"></strip>
+					<strip stripNo = "682"></strip>
+					<strip stripNo = "687"></strip>
+					<strip stripNo = "702"></strip>
+					<strip stripNo = "705"></strip>
+					<strip stripNo = "707"></strip>
+					<strip stripNo = "710"></strip>
+					<strip stripNo = "712"></strip>
+					<strip stripNo = "715"></strip>
+					<strip stripNo = "743"></strip>
+				</side>
+			</sensor>
+		</ladder>
+	</layer>
+	<layer n="6">
+		<ladder n="1">
+			<sensor n="1">
+				<side side="v">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "511"></strip>
+				</side>
+				<side side="u">
+					<strip stripNo = "750"></strip>
+					<strip stripNo = "751"></strip>
+					<strip stripNo = "752"></strip>
+				</side>
+			</sensor>
+			<sensor n="2">
+				<side side="v">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "511"></strip>
+				</side>
+				<side side="u">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "1"></strip>
+					<strip stripNo = "2"></strip>
+					<strip stripNo = "3"></strip>
+					<strip stripNo = "13"></strip>
+					<strip stripNo = "19"></strip>
+					<strip stripNo = "64"></strip>
+					<strip stripNo = "83"></strip>
+					<strip stripNo = "85"></strip>
+					<strip stripNo = "133"></strip>
+					<strip stripNo = "176"></strip>
+					<strip stripNo = "181"></strip>
+					<strip stripNo = "258"></strip>
+					<strip stripNo = "261"></strip>
+					<strip stripNo = "268"></strip>
+					<strip stripNo = "293"></strip>
+					<strip stripNo = "308"></strip>
+					<strip stripNo = "319"></strip>
+					<strip stripNo = "330"></strip>
+					<strip stripNo = "332"></strip>
+					<strip stripNo = "341"></strip>
+					<strip stripNo = "383"></strip>
+					<strip stripNo = "400"></strip>
+					<strip stripNo = "401"></strip>
+					<strip stripNo = "427"></strip>
+					<strip stripNo = "540"></strip>
+					<strip stripNo = "624"></strip>
+					<strip stripNo = "631"></strip>
+					<strip stripNo = "633"></strip>
+					<strip stripNo = "634"></strip>
+					<strip stripNo = "635"></strip>
+					<strip stripNo = "636"></strip>
+					<strip stripNo = "639"></strip>
+					<strip stripNo = "640"></strip>
+					<strip stripNo = "641"></strip>
+					<strip stripNo = "642"></strip>
+					<strip stripNo = "645"></strip>
+					<strip stripNo = "659"></strip>
+					<strip stripNo = "752"></strip>
+					<strip stripNo = "765"></strip>
+					<strip stripNo = "766"></strip>
+					<strip stripNo = "767"></strip>
+				</side>
+			</sensor>
+			<sensor n="3">
+				<side side="v">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "511"></strip>
+				</side>
+				<side side="u">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "1"></strip>
+					<strip stripNo = "2"></strip>
+					<strip stripNo = "22"></strip>
+					<strip stripNo = "27"></strip>
+					<strip stripNo = "59"></strip>
+					<strip stripNo = "70"></strip>
+					<strip stripNo = "183"></strip>
+					<strip stripNo = "208"></strip>
+					<strip stripNo = "361"></strip>
+					<strip stripNo = "387"></strip>
+					<strip stripNo = "419"></strip>
+					<strip stripNo = "420"></strip>
+					<strip stripNo = "466"></strip>
+					<strip stripNo = "542"></strip>
+					<strip stripNo = "624"></strip>
+					<strip stripNo = "650"></strip>
+					<strip stripNo = "651"></strip>
+					<strip stripNo = "666"></strip>
+					<strip stripNo = "667"></strip>
+					<strip stripNo = "668"></strip>
+					<strip stripNo = "669"></strip>
+					<strip stripNo = "670"></strip>
+					<strip stripNo = "671"></strip>
+					<strip stripNo = "672"></strip>
+					<strip stripNo = "673"></strip>
+					<strip stripNo = "717"></strip>
+					<strip stripNo = "747"></strip>
+					<strip stripNo = "748"></strip>
+					<strip stripNo = "765"></strip>
+					<strip stripNo = "766"></strip>
+					<strip stripNo = "767"></strip>
+				</side>
+			</sensor>
+			<sensor n="4">
+				<side side="v">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "15"></strip>
+					<strip stripNo = "189"></strip>
+					<strip stripNo = "511"></strip>
+				</side>
+				<side side="u">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "1"></strip>
+					<strip stripNo = "2"></strip>
+					<strip stripNo = "30"></strip>
+					<strip stripNo = "198"></strip>
+					<strip stripNo = "266"></strip>
+					<strip stripNo = "317"></strip>
+					<strip stripNo = "324"></strip>
+					<strip stripNo = "325"></strip>
+					<strip stripNo = "326"></strip>
+					<strip stripNo = "352"></strip>
+					<strip stripNo = "354"></strip>
+					<strip stripNo = "357"></strip>
+					<strip stripNo = "358"></strip>
+					<strip stripNo = "360"></strip>
+					<strip stripNo = "362"></strip>
+					<strip stripNo = "365"></strip>
+					<strip stripNo = "366"></strip>
+					<strip stripNo = "368"></strip>
+					<strip stripNo = "370"></strip>
+					<strip stripNo = "373"></strip>
+					<strip stripNo = "374"></strip>
+					<strip stripNo = "376"></strip>
+					<strip stripNo = "378"></strip>
+					<strip stripNo = "381"></strip>
+					<strip stripNo = "382"></strip>
+					<strip stripNo = "734"></strip>
+					<strip stripNo = "738"></strip>
+					<strip stripNo = "750"></strip>
+					<strip stripNo = "756"></strip>
+					<strip stripNo = "765"></strip>
+					<strip stripNo = "766"></strip>
+					<strip stripNo = "767"></strip>
+				</side>
+			</sensor>
+			<sensor n="5">
+				<side side="v">
+					<strip stripNo = "0"></strip>
+					<strip stripNo = "511"></strip>
+				</side>
+				<side side="u">
+					<strip stripNo = "1"></strip>
+					<strip stripNo = "8"></strip>
+					<strip stripNo = "71"></strip>
+					<strip stripNo = "126"></strip>
+					<strip stripNo = "134"></strip>
+					<strip stripNo = "182"></strip>
+					<strip stripNo = "189"></strip>
+					<strip stripNo = "208"></strip>
+					<strip stripNo = "244"></strip>
+					<strip stripNo = "288"></strip>
+					<strip stripNo = "290"></strip>
+					<strip stripNo = "291"></strip>
+					<strip stripNo = "292"></strip>
+					<strip stripNo = "293"></strip>
+					<strip stripNo = "328"></strip>
+					<strip stripNo = "368"></strip>
+					<strip stripNo = "369"></strip>
+					<strip stripNo = "370"></strip>
+					<strip stripNo = "387"></strip>
+					<strip stripNo = "388"></strip>
+					<strip stripNo = "415"></strip>
+					<strip stripNo = "420"></strip>
+					<strip stripNo = "421"></strip>
+					<strip stripNo = "422"></strip>
+					<strip stripNo = "439"></strip>
+					<strip stripNo = "500"></strip>
+					<strip stripNo = "506"></strip>
+					<strip stripNo = "514"></strip>
+					<strip stripNo = "556"></strip>
+					<strip stripNo = "557"></strip>
+					<strip stripNo = "596"></strip>
+					<strip stripNo = "626"></strip>
+					<strip stripNo = "627"></strip>
+					<strip stripNo = "723"></strip>
+				</side>
+			</sensor>
+		</ladder>
+	</layer>
+</SVD>

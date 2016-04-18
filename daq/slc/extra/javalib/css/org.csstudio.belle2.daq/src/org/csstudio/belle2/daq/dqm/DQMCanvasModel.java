@@ -3,6 +3,7 @@ package org.csstudio.belle2.daq.dqm;
 import org.csstudio.opibuilder.model.AbstractContainerModel;
 import org.csstudio.opibuilder.properties.BooleanProperty;
 import org.csstudio.opibuilder.properties.ColorProperty;
+import org.csstudio.opibuilder.properties.DoubleProperty;
 import org.csstudio.opibuilder.properties.IntegerProperty;
 import org.csstudio.opibuilder.properties.StringProperty;
 import org.csstudio.opibuilder.properties.WidgetPropertyCategory;
@@ -30,6 +31,7 @@ public class DQMCanvasModel extends AbstractContainerModel {
 	public static final String histFillColor = "histFillColor";
 	public static final String histUseLineColor = "histUseLineColor";
 	public static final String histLineColor = "histLineColor";
+	public static final String histLineWidth = "histLineWidth";
 	public static final String histName = "histName";
 	public static final String histTitle = "histTitle";
 	public static final String histNdim = "histNdim";
@@ -87,6 +89,7 @@ public class DQMCanvasModel extends AbstractContainerModel {
 			addProperty(new ColorProperty(histFillColor + n, "Fill Color", category, new RGB(255, 255, 255)));
 			addProperty(new BooleanProperty(histUseLineColor + n, "Use Line Color", category, false));
 			addProperty(new ColorProperty(histLineColor + n, "Line Color", category, new RGB(255, 0, 0)));
+			addProperty(new DoubleProperty(histLineWidth + n, "Line Width", category, 1));
 			addProperty(new StringProperty(histName + n, "Name", category, "histo_" + n));
 			addProperty(new StringProperty(histTitle + n, "Tile", category, ""));
 		}
@@ -158,6 +161,10 @@ public class DQMCanvasModel extends AbstractContainerModel {
 		return getCastedPropertyValue(histUseLineColor + n);
 	}
 
+	public double getHistLineWidth(int n) {
+		return getCastedPropertyValue(histLineWidth + n);
+	}
+
 	public String getHistName(int n) {
 		return getCastedPropertyValue(histName + n);
 	}
@@ -181,6 +188,7 @@ public class DQMCanvasModel extends AbstractContainerModel {
 			setPropertyVisible(histFillColor + n, visible);
 			setPropertyVisible(histUseLineColor + n, visible);
 			setPropertyVisible(histLineColor + n, visible);
+			setPropertyVisible(histLineWidth + n, visible);
 			setPropertyVisible(histName + n, visible);
 			setPropertyVisible(histTitle + n, visible);
 		}

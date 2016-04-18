@@ -50,16 +50,6 @@ public class DQMCanvasEditPart extends AbstractWidgetEditPart {
 		String ytitle = getWidgetModel().getCanvasYTitle();
 		try {
 			HistogramCanvas hcanvas = figure.getHistoCanvas();
-			if (getWidgetModel().useLegend()) {
-				Legend legend = new Legend();
-				RGB rgb = getWidgetModel().getLegendFillColor().getRGBValue();
-				legend.setFillColor(new HtmlColor(rgb.red, rgb.green, rgb.blue));
-				rgb = getWidgetModel().getLegendLineColor().getRGBValue();
-				legend.setLineColor(new HtmlColor(rgb.red, rgb.green, rgb.blue));
-				hcanvas.setLegend(legend);
-			} else {
-				hcanvas.setLegend(null);
-			}
 			hcanvas.getHistograms().clear();
 			for (int n = 0; n < getWidgetModel().getNHists(); n++) {
 				String name = getWidgetModel().getHistName(n);
@@ -87,7 +77,18 @@ public class DQMCanvasEditPart extends AbstractWidgetEditPart {
 				h.setFillColor(getWidgetModel().getHistUseFillColor(n) ? new HtmlColor(rgb.red, rgb.green, rgb.blue) : null);
 				rgb = (getWidgetModel().getHistLineColor(n)).getRGBValue();
 				h.setLineColor(getWidgetModel().getHistUseLineColor(n) ? new HtmlColor(rgb.red, rgb.green, rgb.blue) : null);
+				h.setLineWidth((float)getWidgetModel().getHistLineWidth(n));
 				hcanvas.addHisto(h);
+			}
+			if (getWidgetModel().useLegend()) {
+				Legend legend = new Legend();
+				RGB rgb = getWidgetModel().getLegendFillColor().getRGBValue();
+				legend.setFillColor(new HtmlColor(rgb.red, rgb.green, rgb.blue));
+				rgb = getWidgetModel().getLegendLineColor().getRGBValue();
+				legend.setLineColor(new HtmlColor(rgb.red, rgb.green, rgb.blue));
+				hcanvas.setLegend(legend);
+			} else {
+				hcanvas.setLegend(null);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -178,6 +179,7 @@ public class DQMCanvasEditPart extends AbstractWidgetEditPart {
 		for (int n = 0; n < DQMCanvasModel.maxhists; n++) {
 			setPropertyChangeHandler(DQMCanvasModel.histFillColor + n, new HistoFillColorPropertyChangeHandler(n));
 			setPropertyChangeHandler(DQMCanvasModel.histLineColor + n, new HistoLineColorPropertyChangeHandler(n));
+			setPropertyChangeHandler(DQMCanvasModel.histLineWidth + n, new HistoLineWidthPropertyChangeHandler(n));
 			setPropertyChangeHandler(DQMCanvasModel.histUseFillColor + n, new HistoUseFillColorPropertyChangeHandler(n));
 			setPropertyChangeHandler(DQMCanvasModel.histUseLineColor + n, new HistoUseLineColorPropertyChangeHandler(n));
 			setPropertyChangeHandler(DQMCanvasModel.histName + n, new HistoNamePropertyChangeHandler(n));
@@ -300,6 +302,28 @@ public class DQMCanvasEditPart extends AbstractWidgetEditPart {
 				RGB rgb = (getWidgetModel().getHistLineColor(m_id)).getRGBValue();
 				use = getWidgetModel().getHistUseLineColor(m_id);
 				dqm.getHistoCanvas().getHisto(m_id).setLineColor(use ? new HtmlColor(rgb.red, rgb.green, rgb.blue) : null);
+				dqm.update();
+			} catch (Exception e) {
+				// e.printStackTrace();
+			}
+			return false;
+		}
+	}
+
+	private class HistoLineWidthPropertyChangeHandler implements IWidgetPropertyChangeHandler {
+		private int m_id;
+
+		public HistoLineWidthPropertyChangeHandler(int id) {
+			m_id = id;
+		}
+
+		public boolean handleChange(final Object oldValue, final Object newValue, final IFigure figure) {
+			if (newValue == null)
+				return false;
+			try {
+				DQMCanvasFigure dqm = ((DQMCanvasFigure) figure);
+				double width = (double) newValue;
+				dqm.getHistoCanvas().getHisto(m_id).setLineWidth((float)width);
 				dqm.update();
 			} catch (Exception e) {
 				// e.printStackTrace();

@@ -80,6 +80,7 @@ public class DQMCanvasFigure extends Figure {
 			}
 			replaceHisto(h, packname, hname);
 		}
+		hcanvas.update();
 		drawer.update();
 		repaint();
 	}

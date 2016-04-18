@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.belle2.daq.dqm.Histo;
 import org.belle2.daq.dqm.Histo1F;
 import org.belle2.daq.dqm.Histo2F;
 import org.belle2.daq.io.SocketDataReader;
+import org.belle2.daq.nsm.NSMCommunicator;
+import org.csstudio.opibuilder.preferences.StringTableFieldEditor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.swt.widgets.Display;
@@ -36,21 +39,24 @@ public class DQMViewCommunicator extends Thread {
 	private DQMViewCommunicator() {
 	}
 
-	private static DQMViewCommunicator g_store;
+	private static ArrayList<DQMViewCommunicator> g_store = new ArrayList<>();
+	public static ArrayList<DQMViewCommunicator> get() {
+		return g_store;
+	}
 
-	public static HashMap<String, ArrayList<Histo>> getHists() {
-		if (g_store != null)
-			return g_store.pack_v;
-		return null;
+	public HashMap<String, ArrayList<Histo>> getHists() {
+		return pack_v;
 	}
 
 	public static Histo getHisto(String dirname, String histname) {
-		if (g_store != null && g_store.pack_v != null) {
-			for (String dname : g_store.pack_v.keySet()) {
-				if (dname.equals(dirname)) {
-					for (Histo h : g_store.pack_v.get(dname)) {
-						if (h.getName().equals(histname))
-							return (Histo) h;
+		for (DQMViewCommunicator store : g_store) {
+			if (store.pack_v != null) {
+				for (String dname : store.pack_v.keySet()) {
+					if (dname.equals(dirname)) {
+						for (Histo h : store.pack_v.get(dname)) {
+							if (h.getName().equals(histname))
+								return (Histo) h;
+						}
 					}
 				}
 			}
@@ -59,8 +65,7 @@ public class DQMViewCommunicator extends Thread {
 	}
 
 	public static void startDQM() {
-		if (g_store == null) {
-			g_store = new DQMViewCommunicator();
+		if (g_store.isEmpty()) {
 			final IPreferencesService prefs = Platform.getPreferencesService();
 			final String host = prefs.getString(DQMViewDataSource.PLUGIN_ID, PreferenceConstants.HOST, "localhost", null);
 			final Integer port = prefs.getInt(DQMViewDataSource.PLUGIN_ID, PreferenceConstants.PORT, 9090, null);

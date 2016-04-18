@@ -39,30 +39,32 @@ public class DQMViewChannelHandler extends MultiplexedChannelHandler<Object, Obj
 	}
 
 	public void update() {
-		for (String dname : DQMViewCommunicator.getHists().keySet()) {
-			if (dname.equals(dirname)) {
-				for (Histo h : DQMViewCommunicator.getHists().get(dname)) {
-					if (h.getName().equals(histname)) {
-						switch (parname) {
-						case "entries":
-							updateValue(h.getEntries());
-							break;
-						case "mean":
-							updateValue(h.getMean());
-							break;
-						case "rms":
-							updateValue(h.getRMS());
-							break;
-						case "title":
-							updateValue(ValueFactory.newVString(h.getTitle(),
-									ValueFactory.alarmNone(),
-									ValueFactory.timeNow()));
-							break;
-						default:
-							if (parname.startsWith("bincontent")) {
-								updateValueWithBinContent(h);
+		for (DQMViewCommunicator store : DQMViewCommunicator.get()) {
+			for (String dname : store.getHists().keySet()) {
+				if (dname.equals(dirname)) {
+					for (Histo h : store.getHists().get(dname)) {
+						if (h.getName().equals(histname)) {
+							switch (parname) {
+							case "entries":
+								updateValue(h.getEntries());
+								break;
+							case "mean":
+								updateValue(h.getMean());
+								break;
+							case "rms":
+								updateValue(h.getRMS());
+								break;
+							case "title":
+								updateValue(ValueFactory.newVString(
+										h.getTitle(), ValueFactory.alarmNone(),
+										ValueFactory.timeNow()));
+								break;
+							default:
+								if (parname.startsWith("bincontent")) {
+									updateValueWithBinContent(h);
+								}
+								break;
 							}
-							break;
 						}
 					}
 				}

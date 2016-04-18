@@ -168,6 +168,10 @@ namespace Belle2 {
     // DQM for correlations for all sensors in rough granulation:
     TH2F* m_correlationsHitMapsGlob[c_nVXDPlanes * c_nVXDPlanes];     /**< Correlations and hit maps from local uv coordinates*/
     TH2F* m_correlationsHitMapsSPGlob[c_nVXDPlanes * c_nVXDPlanes];   /**< Correlations and hit maps from space points */
+    TH1F* m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes *
+                                         c_nVXDPlanes];/**< Correlations and hit maps from space points - differencies in u*/
+    TH1F* m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes *
+                                         c_nVXDPlanes];/**< Correlations and hit maps from space points - differencies in v*/
 
   };
 

@@ -71,9 +71,9 @@ void SVDDQM3Module::defineHisto()
   TDirectory* oldDir = gDirectory;
 
   // 1D histograms:
-  //TDirectory* DirVXDGlobCorrels1DNeigh = oldDir->mkdir("VXD_Global_1DCorrelationsNeighboar");
-  //TDirectory* DirVXDGlobCorrels1D = oldDir->mkdir("VXD_Global_1DCorrelationsOthers");
-  //TDirectory* DirVXDGlobHitmaps1D = oldDir->mkdir("VXD_Global_1DHitmaps");
+  TDirectory* DirVXDGlobCorrels1DNeigh = oldDir->mkdir("VXD_Global_1DCorrelationsNeighboar");
+  TDirectory* DirVXDGlobCorrels1D = oldDir->mkdir("VXD_Global_1DCorrelationsOthers");
+  TDirectory* DirVXDGlobHitmaps1D = oldDir->mkdir("VXD_Global_1DHitmaps");
 
   // 2D histograms in global coordinates:
   TDirectory* DirVXDGlobCorrelsNeigh = oldDir->mkdir("VXD_Global_CorrelationsNeighboar");
@@ -550,6 +550,14 @@ void SVDDQM3Module::defineHisto()
 //  getObject<TFile>("TB2016-DQM-VXD-histo.root").mkdir("NoSorting");
 
 //  TB2016-DQM-VXD-histo.root
+  for (int i = 0; i < c_nVXDPlanes; i++) {
+    for (int j = 0; j < c_nVXDPlanes; j++) {
+      m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i] = NULL;
+      m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i] = NULL;
+      m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i] = NULL;
+      m_correlationsHitMapsGlob[c_nVXDPlanes * j + i] = NULL;
+    }
+  }
 
   for (int i = 0; i < c_nVXDPlanes; i++) {
     int iPlane1 = indexToPlaneVXD(i);
@@ -611,6 +619,21 @@ void SVDDQM3Module::defineHisto()
         m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle("vertical y position [cm]");
         m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("horizontal z position [cm]");
         m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
+
+        DirVXDGlobHitmaps1D->cd();
+        nameSP = str(format("h1GlobVXD_L%1%_y_HitmapSP") % iPlane2);
+        titleSP = str(format("TB2016 Glob Hitmap in y VXD in space points, plane %1%") % iPlane2);
+        m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i] = new TH1F(nameSP.c_str(), titleSP.c_str(), nStripsU2 * 2, -1.0 * uSize2,
+            1.0 * uSize2);
+        m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle("vertical y position [cm]");
+        m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("hits");
+        nameSP = str(format("h1GlobVXD_L%1%_z_HitmapSP") % iPlane2);
+        titleSP = str(format("TB2016 Glob Hitmap in z VXD in space points, plane %1%") % iPlane2);
+        m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i] = new TH1F(nameSP.c_str(), titleSP.c_str(), nStripsV2 * 2, -1.0 * vSize2,
+            1.0 * vSize2);
+        m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle("horizontal z position [cm]");
+        m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("hits");
+
       } else if (i < j) { // correlations for u
         DirVXDJoinCorrels->cd();
         string name = str(format("h2GlobVXD_L%1%_L%2%_CorrelationmapU") % iPlane1 % iPlane2);
@@ -637,6 +660,25 @@ void SVDDQM3Module::defineHisto()
         m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
         m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle(axisytitle.c_str());
         m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
+        if (abs(i - j) == 1) {
+          DirVXDGlobCorrels1DNeigh->cd();
+        } else {
+          DirVXDGlobCorrels1D->cd();
+        }
+        nameSP = str(format("h1GlobVXD_L%1%_L%2%_y_CorrelationmapSP") % iPlane1 % iPlane2);
+        titleSP = str(format("TB2016 Glob Correlation map VXD space points, difference in Y, plane %1%, plane %2%") % iPlane1 % iPlane2);
+        m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i] = new TH1F(nameSP.c_str(), titleSP.c_str(), nStripsU1 * 2, -1.0 * uSize1,
+            1.0 * uSize1);
+        axisxtitle = str(format("vertical y position, planes %1% - %2% [cm]") % iPlane1 % iPlane2);
+        m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
+        m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("hits");
+        nameSP = str(format("h1GlobVXD_L%1%_L%2%_z_CorrelationmapSP") % iPlane1 % iPlane2);
+        titleSP = str(format("TB2016 Glob Correlation map VXD space points, difference in Z, plane %1%, plane %2%") % iPlane1 % iPlane2);
+        m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i] = new TH1F(nameSP.c_str(), titleSP.c_str(), nStripsV1 * 2, -1.0 * vSize1,
+            1.0 * vSize1);
+        axisxtitle = str(format("vertical z difference, planes %1% - %2% [cm]") % iPlane1 % iPlane2);
+        m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
+        m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("hits");
       } else {       // correlations for v
         DirVXDJoinCorrels->cd();
         string name = str(format("h2GlobVXD_L%1%_L%2%_CorrelationmapV") % iPlane2 % iPlane1);
@@ -733,6 +775,12 @@ void SVDDQM3Module::beginRun()
       m_sizeVSen[i]->Reset();
       m_timeUSen[i]->Reset();
       m_timeVSen[i]->Reset();
+    }
+  }
+  for (int i = 0; i < c_nVXDPlanes; i++) {
+    for (int j = 0; j < c_nVXDPlanes; j++) {
+      if (i <= j) m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i]->Reset();
+      if (i <= j) m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i]->Reset();
     }
   }
   for (int i = 0; i < c_nVXDPlanes * c_nVXDPlanes; i++) {
@@ -1037,6 +1085,8 @@ void SVDDQM3Module::event()
     if ((iIsU1 == 1) && (iIsV1 == 1)) {
       m_correlationsHitMapsSP[c_nVXDPlanes * index1 + index1]->Fill(fPosSPU1, fPosSPV1);
       m_correlationsHitMapsSPGlob[c_nVXDPlanes * index1 + index1]->Fill(fPosSPU1, fPosSPV1);
+      m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * index1 + index1]->Fill(fPosSPU1);
+      m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * index1 + index1]->Fill(fPosSPV1);
     }
     for (int i2 = 0; i2 < storeSVDClusters.getEntries() + storePXDClusters.getEntries(); i2++) {
       // preparing of second value for correlation plots with postfix "2":
@@ -1100,6 +1150,8 @@ void SVDDQM3Module::event()
         // hit maps for SVD:
         m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1, fPosSPV2);
         m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1, fPosSPV2);
+        m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1);
+        m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV2);
       } else if ((index1 < index2) && (iIsU1 == iIsU2) && (iIsU1 == 1)) {
         // correlations for u
         //if ((index2 == 2) && (index1 == 1)) { // PXD/SVD TODO something artifical, should remove
@@ -1109,6 +1161,7 @@ void SVDDQM3Module::event()
 //        } else {
         m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1, fPosSPU2);
         m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1, fPosSPU2);
+        m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU2 - fPosSPU1);
 //        }
       } else if ((index1 > index2) && (iIsV1 == iIsV2) && (iIsV1 == 1)) {
         // correlations for v
@@ -1118,6 +1171,7 @@ void SVDDQM3Module::event()
 //        } else {
         m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV2, fPosSPV1);
         m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV2, fPosSPV1);
+        m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * index1 + index2]->Fill(fPosSPV2 - fPosSPV1);
 //        }
       }
     }

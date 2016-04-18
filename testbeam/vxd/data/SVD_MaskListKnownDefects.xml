@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Meta>
-	<Date>18/04/2016<\Date>
+    <Date>18/04/2016</Date>
 	<Description short="Ignore strips list for SVD planes in 2016 VXD TB">
 		List of known strip defects from layers groups
 	</Description>

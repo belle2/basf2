@@ -147,7 +147,7 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
   int flag = 0;
   unsigned int eve[4];
   for (int i = 0; i < 4 ; i++) {
-    eve[ i ] = 12345678;
+    eve[ i ] = 0xbaadf00d;
     if (GetFINESSENwords(n, i) > 0) {
       int pos_nwords = GetOffsetFINESSE(n, i) + SIZE_B2LHSLB_HEADER + POS_TT_TAG;
       eve[ i ] = m_buffer[ pos_nwords ];
@@ -169,7 +169,7 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
   if (err_flag == 1) {
     PrintData(m_buffer, m_nwords);
     char err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n%s %s %d\n",
+    sprintf(err_buf, "CORRUPTED DATA: Different event number over HSLBs : slot A 0x%.8x : B 0x%.8x :C 0x%.8x : D 0x%.8x\n%s %s %d\n",
             eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[DEBUG] [ERROR] %s\n", err_buf);

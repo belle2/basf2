@@ -49,7 +49,7 @@ namespace Belle2 {
       std::copy(ts_start, ts_start + 10, m_ts_start);
       std::copy(ts_stop, ts_stop + 10, m_ts_stop);
       std::copy(Temperature, Temperature + 4, m_Temperature);
-      std::copy(Pressure, Pressure + 4, m_Pressure);
+      std::copy(Pressure, Pressure + 2, m_Pressure);
       std::copy(Flow, Flow + 2, m_Flow);
     }
 

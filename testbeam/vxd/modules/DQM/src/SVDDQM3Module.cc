@@ -976,6 +976,7 @@ void SVDDQM3Module::event()
     }
   }
 
+  int SwapPXD = 1;
   // Correlations for space point coordinates
   for (int i1 = 0; i1 < storeSVDClusters.getEntries() + storePXDClusters.getEntries(); i1++) {
     // preparing of first value for correlation plots with postfix "1":
@@ -1005,6 +1006,10 @@ void SVDDQM3Module::event()
       iIsV1 = 1;
       fPosSPU1 = rGlobal1.Y();
       fPosSPV1 = rGlobal1.Z();
+      if (SwapPXD) {
+        fPosSPV1 = rGlobal1.Y();
+        fPosSPU1 = rGlobal1.Z();
+      }
     } else {                                  // SVD clusters:
       const SVDCluster& cluster1 = *storeSVDClusters[i1 - storePXDClusters.getEntries()];
       iPlane1 = cluster1.getSensorID().getLayerNumber();
@@ -1061,6 +1066,10 @@ void SVDDQM3Module::event()
         iIsV2 = 1;
         fPosSPU2 = rGlobal2.Y();
         fPosSPV2 = rGlobal2.Z();
+        if (SwapPXD) {
+          fPosSPV2 = rGlobal2.Y();
+          fPosSPU2 = rGlobal2.Z();
+        }
       } else {                                  // SVD clusters:
         const SVDCluster& cluster2 = *storeSVDClusters[i2 - storePXDClusters.getEntries()];
         iPlane2 = cluster2.getSensorID().getLayerNumber();
@@ -1094,22 +1103,22 @@ void SVDDQM3Module::event()
       } else if ((index1 < index2) && (iIsU1 == iIsU2) && (iIsU1 == 1)) {
         // correlations for u
         //if ((index2 == 2) && (index1 == 1)) { // PXD/SVD TODO something artifical, should remove
-        if ((index2 >= 2) && (index1 <= 1)) { // PXD/SVD TODO something artifical, should remove
-          m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV1, fPosSPU2);
-          m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV1, fPosSPU2);
-        } else {
-          m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1, fPosSPU2);
-          m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1, fPosSPU2);
-        }
+//        if ((index2 >= 2) && (index1 <= 1)) { // PXD/SVD TODO something artifical, should remove
+//          m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV1, fPosSPU2);
+//          m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV1, fPosSPU2);
+//        } else {
+        m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1, fPosSPU2);
+        m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU1, fPosSPU2);
+//        }
       } else if ((index1 > index2) && (iIsV1 == iIsV2) && (iIsV1 == 1)) {
         // correlations for v
-        if ((index2 <= 1) && (index1 >= 2)) { // PXD/SVD TODO something artifical, should remove
-          m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU2, fPosSPV1);
-          m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU2, fPosSPV1);
-        } else {
-          m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV2, fPosSPV1);
-          m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV2, fPosSPV1);
-        }
+//        if ((index2 <= 1) && (index1 >= 2)) { // PXD/SVD TODO something artifical, should remove
+//          m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU2, fPosSPV1);
+//          m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPU2, fPosSPV1);
+//        } else {
+        m_correlationsHitMapsSP[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV2, fPosSPV1);
+        m_correlationsHitMapsSPGlob[c_nVXDPlanes * index2 + index1]->Fill(fPosSPV2, fPosSPV1);
+//        }
       }
     }
   }

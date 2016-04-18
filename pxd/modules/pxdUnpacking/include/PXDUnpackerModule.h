@@ -153,13 +153,13 @@ namespace Belle2 {
       unsigned int remap_row_IF_OB(unsigned int row_false, unsigned int col_false, unsigned int dhp_id, unsigned int dhe_ID);
 
       //Remaps cols of inner forward (IF) and outer backward (OB) modules of the PXD
-      unsigned int remap_col_IF_OB(unsigned int col_false, unsigned int row_false, unsigned int dhp_id);
+      unsigned int remap_col_IF_OB(unsigned int row_false, unsigned int col_false, unsigned int dhp_id);
 
       //Remaps rows of inner backward (IB) and outer forward (OF) modules of the PXD
       unsigned int remap_row_IB_OF(unsigned int row_false, unsigned int col_false, unsigned int dhp_id, unsigned int dhe_ID);
 
       //Remaps cols of inner backward (IB) and outer forward (OF) modules of the PXD
-      unsigned int remap_col_IB_OF(unsigned int col_false, unsigned int row_false, unsigned int dhp_id);
+      unsigned int remap_col_IB_OF(unsigned int row_false, unsigned int col_false, unsigned int dhp_id);
 
       //Lookup tables for DHP remapping
       int LUT_IF_OB[1030];

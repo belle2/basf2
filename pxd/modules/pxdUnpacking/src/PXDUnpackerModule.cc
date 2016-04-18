@@ -956,6 +956,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   unsigned int dhp_dhp_id       = 0;
 
   unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
+  unsigned int v_cellID = 0, u_cellID = 0;
   unsigned int dhp_offset = 0;
   bool rowflag = false;
   //is frame from (inner forward & outer backward) or (inner backward & outer forward) sensor
@@ -1032,6 +1033,8 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
         if (printflag)
           B2INFO("SetRow: " << hex << dhp_row << " CM " << hex << dhp_cm);
       } else {
+        v_cellID = dhp_row;
+        u_cellID = dhp_col;
         if (!rowflag) {
           B2ERROR("DHP Unpacking: Pix without Row!!! skip dhp data ");
           m_errorMask |= ONSEN_ERR_FLAG_DHP_PIX_WO_ROW;
@@ -1045,16 +1048,18 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 
           if (m_RemapFlag) {
             if ((dhe_reformat == 0) && (IFOB_flag == 1)) {
-              B2INFO("Remap inner forward or outer backward ...");
-              dhp_row = PXDUnpackerModule::remap_row_IF_OB(dhp_row, dhp_col, dhp_dhp_id, dhe_ID);
-              dhp_col = PXDUnpackerModule::remap_col_IF_OB(dhp_col, dhp_col, dhp_dhp_id);
+              B2INFO("Remap inner forward or outer backward ... with DHP_row :: " << dhp_row << " and DHP_col :: " << dhp_col << " DHE_ID $" <<
+                     dhe_ID << " DHP_ID $" << dhp_dhp_id);
+              v_cellID = PXDUnpackerModule::remap_row_IF_OB(dhp_row, dhp_col, dhp_dhp_id, dhe_ID);
+              u_cellID = PXDUnpackerModule::remap_col_IF_OB(dhp_row, dhp_col, dhp_dhp_id);
               //      B2INFO("Remapped :: ROW_GEO " << dhp_row << " COL_GEO " << dhp_col);
             }
 
             if ((dhe_reformat == 0) && (IBOF_flag == 1)) {
-              B2INFO("Remap inner backward or outer forward ...");
-              dhp_row = PXDUnpackerModule::remap_row_IB_OF(dhp_row, dhp_col, dhp_dhp_id, dhe_ID);
-              dhp_col = PXDUnpackerModule::remap_col_IB_OF(dhp_col, dhp_col, dhp_dhp_id);
+              B2INFO("Remap inner backward or outer forward ... with DHP_row :: " << dhp_row << " and DHP_col :: " << dhp_col << " DHE_ID $" <<
+                     dhe_ID << " DHP_ID $" << dhp_dhp_id);
+              v_cellID = PXDUnpackerModule::remap_row_IB_OF(dhp_row, dhp_col, dhp_dhp_id, dhe_ID);
+              u_cellID = PXDUnpackerModule::remap_col_IB_OF(dhp_row, dhp_col, dhp_dhp_id);
               //        B2INFO("Remapped :: ROW_GEO " << dhp_row << " COL_GEO " << dhp_col);
             }
           }
@@ -1072,8 +1077,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
             B2INFO("start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
             B2INFO("toffset " << toffset);
           };*/
-
-          if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, dhp_row, dhp_col, dhp_adc,
+          if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
                                                         toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F, dhp_cm
                                                        );
         }
@@ -1507,27 +1511,30 @@ unsigned int PXDUnpackerModule::remap_row_IF_OB(unsigned int DHP_row, unsigned i
   unsigned int v_cellID = 0;
 
   DCD_channel = 4 * DHP_col + DHP_row % 4 + 256 * dhp_id;
-  Drain = LUT_IF_OB[DCD_channel];
+  Drain = LUT_IF_OB[DCD_channel + 1]; //since LUT starts with one and array with zero
+  B2INFO("in remap ROW ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   row = (DHP_row / 4) * 4  + Drain % 4;
-//   B2INFO("row false " << DHP_row << " col false " << DHP_col << " DCD line " << DCD_channel << " Gate " << Gate << " Drain " << Drain << " row geo " << row);
-  B2INFO("Remapped :: ROW $" << DHP_row << " to $" << row);
-  if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 786 - 1 - row ;} //if inner module
+//   row = DHP_row + Drain % 4;
+  //   B2INFO("row false " << DHP_row << " col false " << DHP_col << " DCD line " << DCD_channel << " Gate " << Gate << " Drain " << Drain << " row geo " << row);
+  if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - 1 - row ;} //if inner module
   if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = row ;} //if outer module
+  B2INFO("Remapped :: ROW $" << DHP_row << " to v_cellID $" << v_cellID);
   return v_cellID;
 }
 
 //Remaps cols of inner forward (IF) and outer backward (OB) modules of the PXD
-unsigned int PXDUnpackerModule::remap_col_IF_OB(unsigned int DHP_col, unsigned int DHP_row, unsigned int dhp_id)
+unsigned int PXDUnpackerModule::remap_col_IF_OB(unsigned int DHP_row, unsigned int DHP_col, unsigned int dhp_id)
 {
   unsigned int DCD_channel = 0;
   unsigned int Drain = 0;
   unsigned int u_cellID = 0;
 
   DCD_channel = 4 * DHP_col + DHP_row % 4 + 256 * dhp_id;
-  Drain = LUT_IF_OB[DCD_channel];
+  Drain = LUT_IF_OB[DCD_channel + 1]; //since LUT starts with one and array with zero
+  B2INFO("in remap COL ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   u_cellID = Drain / 4;
 //   B2INFO(" col false " << DHP_col << " DCD line " << DCD_channel << " col geo " << col_geo);
-  B2INFO("Remapped :: COL $" << DHP_col << " to $" << u_cellID);
+  B2INFO("Remapped :: COL $" << DHP_col << " to u_cellID $" << u_cellID);
   return u_cellID;
 }
 
@@ -1541,17 +1548,18 @@ unsigned int PXDUnpackerModule::remap_row_IB_OF(unsigned int DHP_row, unsigned i
   unsigned int v_cellID = 0;
 
   DCD_channel = 4 * DHP_col + DHP_row % 4 + 256 * dhp_id;
-  Drain = LUT_IB_OF[DCD_channel];
+  Drain = LUT_IB_OF[DCD_channel]; //since LUT starts with one and array with zero
+  B2INFO("in remap ROW ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   row = (DHP_row / 4) * 4  + Drain % 4;
 //   B2INFO("row false " << DHP_row << " col false " << DHP_col << " DCD line " << DCD_channel << " Gate " << Gate << " Drain " << Drain << " row geo " << row);
   if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 786 - 1 - row ;} //if inner module
   if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = row ;} //if outer module
-  B2INFO("Remapped :: ROW $" << DHP_row << " to $" << v_cellID);
+  B2INFO("Remapped :: ROW $" << DHP_row << " to v_cellID $" << v_cellID);
   return v_cellID;
 }
 
 //Remaps cols of inner backward (IB) and outer forward (OF) modules of the PXD
-unsigned int PXDUnpackerModule::remap_col_IB_OF(unsigned int DHP_col, unsigned int DHP_row, unsigned int dhp_id)
+unsigned int PXDUnpackerModule::remap_col_IB_OF(unsigned int DHP_row, unsigned int DHP_col, unsigned int dhp_id)
 {
   unsigned int DCD_channel = 0;
   unsigned int Drain = 0;
@@ -1559,10 +1567,11 @@ unsigned int PXDUnpackerModule::remap_col_IB_OF(unsigned int DHP_col, unsigned i
   unsigned int u_cellID = 0;
 
   DCD_channel = 4 * DHP_col + DHP_row % 4 + 256 * dhp_id;
-  Drain = LUT_IB_OF[DCD_channel];
+  Drain = LUT_IB_OF[DCD_channel]; //since LUT starts with one and array with zero
+  B2INFO("in remap COL ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   col = Drain / 4;
 //   B2INFO(" col false " << DHP_col << " DCD line " << DCD_channel << " col geo " << col_geo);
   u_cellID = 250 - 1 - col;
-  B2INFO("Remapped :: COL $" << DHP_col << " to $" << u_cellID);
+  B2INFO("Remapped :: COL $" << DHP_col << " to u_cellID $" << u_cellID);
   return u_cellID;
 }

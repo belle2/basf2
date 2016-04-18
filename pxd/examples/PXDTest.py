@@ -54,26 +54,18 @@ particlegun.param('pdgCodes', [-11, 11])
 particlegun.param('nTracks', 1)
 
 # ============================================================================
-# Print the parameters of the particle gun
-print_params(particlegun)
-
 # Set the number of events to be processed (10 events)
-eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 
 # Set output filename
 output.param('outputFileName', 'PXDTestOutput.root')
 
 # Select subdetectors to be built
 # geometry.param('Components', ['PXD','SVD'])
-geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
+geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
-PXDDIGI.param('SimpleDriftModel', False)
 PXDDIGI.param('statisticsFilename', 'PXDDiags.root')
-PXDDIGI.param('PoissonSmearing', True)
-PXDDIGI.param('ElectronicEffects', False)
-PXDDIGI.param('NoiseSN', 1.0)
-PXDCLUST.param('NoiseSN', 1.0)
-
+PXDDIGI.param('ADCFineMode', True)
 # ============================================================================
 # Do the simulation
 

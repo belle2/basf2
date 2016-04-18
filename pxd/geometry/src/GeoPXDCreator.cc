@@ -46,7 +46,7 @@ namespace Belle2 {
 
     GeoPXDCreator::~GeoPXDCreator()
     {
-      for (SensorInfo * sensorInfo : m_SensorInfo) delete sensorInfo;
+      for (SensorInfo* sensorInfo : m_SensorInfo) delete sensorInfo;
       m_SensorInfo.clear();
     }
 
@@ -66,11 +66,16 @@ namespace Belle2 {
         sensor.getDouble("BulkDoping") / (Unit::um * Unit::um * Unit::um),
         sensor.getWithUnit("BackVoltage"),
         sensor.getWithUnit("TopVoltage"),
-        sensor.getLength("SourceBorder"),
-        sensor.getLength("ClearBorder"),
-        sensor.getLength("DrainBorder"),
+        sensor.getLength("SourceBorderSmallPixel"),
+        sensor.getLength("ClearBorderSmallPixel"),
+        sensor.getLength("DrainBorderSmallPixel"),
+        sensor.getLength("SourceBorderLargePixel"),
+        sensor.getLength("ClearBorderLargePixel"),
+        sensor.getLength("DrainBorderLargePixel"),
         sensor.getLength("GateDepth"),
-        sensor.getBool("DoublePixel")
+        sensor.getBool("DoublePixel"),
+        sensor.getDouble("ChargeThreshold"),
+        sensor.getDouble("NoiseFraction")
       );
       info->setIntegrationWindow(
         sensor.getTime("IntegrationStart"),
@@ -80,7 +85,8 @@ namespace Belle2 {
       return info;
     }
 
-    VXD::SensitiveDetectorBase* GeoPXDCreator::createSensitiveDetector(VxdID sensorID, const VXD::GeoVXDSensor& sensor, const VXD::GeoVXDSensorPlacement& placement)
+    VXD::SensitiveDetectorBase* GeoPXDCreator::createSensitiveDetector(VxdID sensorID, const VXD::GeoVXDSensor& sensor,
+        const VXD::GeoVXDSensorPlacement& placement)
     {
       SensorInfo* sensorInfo = new SensorInfo(dynamic_cast<SensorInfo&>(*sensor.info));
       sensorInfo->setID(sensorID);

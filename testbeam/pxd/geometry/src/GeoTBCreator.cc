@@ -123,24 +123,32 @@ namespace Belle2 {
       double aHeight = 2.0 * parentContent.getLength("HalfZ") ;// Unit::mm/10.0;
 
       unsigned short sensorID = content.getInt("SensorID");
-      if (sensorID == 0) B2ERROR("Do not use sensorID=0 in your XML, it is incompatible with PXD geometry cache and with the TB Analysis Module.");
+      if (sensorID == 0)
+        B2ERROR("Do not use sensorID=0 in your XML, it is incompatible with PXD geometry cache and with the TB Analysis Module.");
       double stepSize = content.getLength("stepSize") ;// Unit::mm;
       string detectorType = content.getString("DetectorType", "");
 
       if (detectorType == "") B2FATAL("TB: Geometry XML Problem: No DetectorType provided in 'Active' node.");
       if (detectorType == "PXD") {
-        if (sensorID == 0) B2FATAL("TB Geometry Creator: sensorID=0 in your XML is incompatible with PXD geometry cache. Use 1-based numbering of sensorID's.");
+        if (sensorID == 0)
+          B2FATAL("TB Geometry Creator: sensorID=0 in your XML is incompatible with PXD geometry cache. Use 1-based numbering of sensorID's.");
         VxdID xID(1, 1, sensorID);
-        PXD::SensorInfo sensorInfo(xID, aWidth, aLength, aHeight, content.getInt("pixelsR"), content.getInt("pixelsZ[1]"), content.getLength("splitLength", 0), content.getInt("pixelsZ[2]", 0));
+        PXD::SensorInfo sensorInfo(xID, aWidth, aLength, aHeight, content.getInt("pixelsR"), content.getInt("pixelsZ[1]"),
+                                   content.getLength("splitLength", 0), content.getInt("pixelsZ[2]", 0));
         sensorInfo.setDEPFETParams(
           content.getDouble("BulkDoping") / (Unit::um * Unit::um * Unit::um),
-          content.getWithUnit("BackVoltage"), // Unit::V,
-          content.getWithUnit("TopVoltage"), // Unit::V,
-          content.getLength("SourceBorder"),
-          content.getLength("ClearBorder"),
-          content.getLength("DrainBorder"),
+          content.getWithUnit("BackVoltage"),
+          content.getWithUnit("TopVoltage"),
+          content.getLength("SourceBorderSmallPixel"),
+          content.getLength("ClearBorderSmallPixel"),
+          content.getLength("DrainBorderSmallPixel"),
+          content.getLength("SourceBorderLargePixel"),
+          content.getLength("ClearBorderLargePixel"),
+          content.getLength("DrainBorderLargePixel"),
           content.getLength("GateDepth"),
-          content.getBool("DoublePixel")
+          content.getBool("DoublePixel"),
+          content.getDouble("ChargeThreshold"),
+          content.getDouble("NoiseFraction")
         );
         sensorInfo.setIntegrationWindow(
           content.getTime("IntegrationStart"),
@@ -155,7 +163,8 @@ namespace Belle2 {
         volume->SetSensitiveDetector(sensitive);
       }
       if (detectorType == "TEL") {
-        TEL::SensorInfo sensorInfo(sensorID, aWidth, aLength, aHeight, content.getInt("pixelsR"), content.getInt("pixelsZ[1]"), content.getLength("splitLength", 0), content.getInt("pixelsZ[2]", 0));
+        TEL::SensorInfo sensorInfo(sensorID, aWidth, aLength, aHeight, content.getInt("pixelsR"), content.getInt("pixelsZ[1]"),
+                                   content.getLength("splitLength", 0), content.getInt("pixelsZ[2]", 0));
 
         TEL::SensorInfo* newInfo = new TEL::SensorInfo(sensorInfo);
         TEL::SensitiveDetector* sensitive = new TEL::SensitiveDetector(newInfo);

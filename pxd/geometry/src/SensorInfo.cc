@@ -30,6 +30,7 @@ double SensorInfo::getElectronMobility(double E) const
 
 const TVector3 SensorInfo::getEField(const TVector3& point) const
 {
+  // FIXME: Get rid of the gateDepth
   double depletionVoltage = 0.5 * Unit::e * m_bulkDoping
                             / Const::permSi * m_thickness * m_thickness;
   double gateZ = 0.5 * m_thickness - m_gateDepth;

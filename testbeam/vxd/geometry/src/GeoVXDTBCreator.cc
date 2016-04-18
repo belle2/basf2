@@ -231,11 +231,16 @@ namespace Belle2 {
           content.getDouble("BulkDoping") / (Unit::um * Unit::um * Unit::um),
           content.getWithUnit("BackVoltage"),
           content.getWithUnit("TopVoltage"),
-          content.getLength("SourceBorder"),
-          content.getLength("ClearBorder"),
-          content.getLength("DrainBorder"),
+          content.getLength("SourceBorderSmallPixel"),
+          content.getLength("ClearBorderSmallPixel"),
+          content.getLength("DrainBorderSmallPixel"),
+          content.getLength("SourceBorderLargePixel"),
+          content.getLength("ClearBorderLargePixel"),
+          content.getLength("DrainBorderLargePixel"),
           content.getLength("GateDepth"),
-          content.getBool("DoublePixel")
+          content.getBool("DoublePixel"),
+          content.getDouble("ChargeThreshold"),
+          content.getDouble("NoiseFraction")
         );
         sensorInfo.setIntegrationWindow(
           content.getTime("IntegrationStart"),

@@ -50,9 +50,7 @@ PXDDigitizerModule::PXDDigitizerModule() :
   addParam("ElectronicEffects", m_applyNoise, "Apply electronic effects?",
            true);
   addParam("ElectronicNoise", m_elNoise,
-           "Noise added by the electronics, set in ENC", 300.0);
-  addParam("NoiseSN", m_SNAdjacent,
-           "SN for digits to be considered for clustering", 4.0);
+           "Noise added by the electronics, set in ENC", 150.0);
 
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticle collection name", string(""));
@@ -78,15 +76,8 @@ PXDDigitizerModule::PXDDigitizerModule() :
            "Maximum number of steps when propagating electrons", 200);
 
   addParam("ADC", m_applyADC, "Simulate ADC?", true);
-  addParam("eToADU", m_eToADU, "ENC equivalent of 1 ADU", 200.0);
-  addParam("SimpleDriftModel", m_useSimpleDrift,
-           "Use deprecated drift model?", false);
-  addParam("Diffusion", m_diffusionCoefficient,
-           "Diffusion coefficient (in mm)", double(0.00008617));
-  addParam("widthOfDiffusCloud", m_widthOfDiffusCloud,
-           "Integration range of the e- cloud in sigmas", double(5.0));
-  addParam("tanLorentz", m_tanLorentz, "Tangent of the Lorentz angle",
-           double(0.25));
+  addParam("Gq", m_gq, "Gq of a pixel in nA/electron", 0.7);
+  addParam("ADCFineMode", m_ADCFineMode, "Fine mode has slope of ADC curve of 70 nA/ADU, coarse mode has 130", true);
 
   addParam("statisticsFilename", m_rootFilename,
            "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced",
@@ -119,10 +110,9 @@ void PXDDigitizerModule::initialize()
 
   //Convert parameters to correct units
   m_elNoise *= Unit::e;
+  m_eToADU = (m_ADCFineMode) ? 70.0 / m_gq : 130.0 / m_gq;
   m_elStepTime *= Unit::ns;
   m_segmentLength *= Unit::mm;
-  m_diffusionCoefficient *= Unit::mm;
-  m_noiseFraction = TMath::Freq(m_SNAdjacent);
 
   B2INFO(
     "PXDDigitizer Parameters (in default system units, *=cannot be set directly):");
@@ -150,10 +140,6 @@ void PXDDigitizerModule::initialize()
   B2INFO(" -->  ElectronMaxSteps:   " << m_elMaxSteps);
   B2INFO(" -->  ADC:                " << (m_applyADC ? "true" : "false"));
   B2INFO(" -->  ADU unit:           " << m_eToADU);
-  B2INFO(
-    " -->  SimpleDriftModel:   " << (m_useSimpleDrift ? "true" : "false"));
-  B2INFO(" -->  Diffusion:          " << m_diffusionCoefficient);
-  B2INFO(" -->  widthOfDiffusCloud: " << m_widthOfDiffusCloud);
   B2INFO(" -->  statisticsFilename: " << m_rootFilename);
 
   if (!m_rootFilename.empty()) {
@@ -286,15 +272,18 @@ void PXDDigitizerModule::event()
               << " --> Width:        " << m_currentSensorInfo->getWidth() << endl
               << " --> Length:       " << m_currentSensorInfo->getLength() << endl
               << " --> uPitch:       " << m_currentSensorInfo->getUPitch() << endl
-              << " --> vPitch:       " << m_currentSensorInfo->getVPitch(-m_currentSensorInfo->getLength() / 2.0)
+              << " --> vPitch        " << m_currentSensorInfo->getVPitch(-m_currentSensorInfo->getLength() / 2.0)
               << ", " << m_currentSensorInfo->getVPitch(m_currentSensorInfo->getLength() / 2.0) << endl
               << " --> Thickness:    " << m_currentSensorInfo->getThickness() << endl
               << " --> BulkDoping:   " << m_currentSensorInfo->getBulkDoping() << endl
               << " --> BackVoltage:  " << m_currentSensorInfo->getBackVoltage() << endl
               << " --> TopVoltage:   " << m_currentSensorInfo->getTopVoltage() << endl
-              << " --> SourceBorder: " << m_currentSensorInfo->getSourceBorder() << endl
-              << " --> ClearBorder:  " << m_currentSensorInfo->getClearBorder() << endl
-              << " --> DrainBorder:  " << m_currentSensorInfo->getDrainBorder() << endl
+              << " --> SourceBorder: " << m_currentSensorInfo->getSourceBorder(-0.4 * m_currentSensorInfo->getLength())
+              << ", "                  << m_currentSensorInfo->getSourceBorder(+0.4 * m_currentSensorInfo->getLength()) << endl
+              << " --> ClearBorder: " << m_currentSensorInfo->getClearBorder(-0.4 * m_currentSensorInfo->getLength())
+              << ", "                  << m_currentSensorInfo->getClearBorder(+0.4 * m_currentSensorInfo->getLength()) << endl
+              << " --> DrainBorder: " << m_currentSensorInfo->getDrainBorder(-0.4 * m_currentSensorInfo->getLength())
+              << ", "                  << m_currentSensorInfo->getDrainBorder(+0.4 * m_currentSensorInfo->getLength()) << endl
               << " --> GateDepth:    " << m_currentSensorInfo->getGateDepth() << endl
               << " --> DoublePixel:  " << m_currentSensorInfo->getDoublePixel() << endl);
 
@@ -371,13 +360,8 @@ void PXDDigitizerModule::driftCharge(const TVector3& position,
   static double weightGL[5] = { walpha, wbeta, 128.0 / 225.0, wbeta, walpha };
 
   B2DEBUG(30,
-          "Drifting " << electrons << " electrons at position (" << position.x() << ", " << position.y() << ", " << position.z() << ") with "
-          << (m_useSimpleDrift ? "old" : "new") << " drift model");
+          "Drifting " << electrons << " electrons at position (" << position.x() << ", " << position.y() << ", " << position.z() << ")");
 
-  if (m_useSimpleDrift) {
-    driftChargeSimple(position, electrons);
-    return;
-  }
   //Get references to current sensor/info for ease of use
   const SensorInfo& info = *m_currentSensorInfo;
   Sensor& sensor = *m_currentSensor;
@@ -390,7 +374,7 @@ void PXDDigitizerModule::driftCharge(const TVector3& position,
   TVector3 currentEField = info.getEField(position);
   TVector3 v = info.getDriftVelocity(currentEField, m_currentBField);
   TVector3 positionInPlane(position);
-  double sigmaDrift2 = 0;
+  double sigmaDriftSqr = 0;
   // If we are close to the target plane, don't integrate
   if (fabs(distanceToPlane) > 1.0 * Unit::um) {
     // set integration region and integration points
@@ -412,17 +396,17 @@ void PXDDigitizerModule::driftCharge(const TVector3& position,
       v = info.getDriftVelocity(currentEField, m_currentBField);
       double weightByT = h * weightGL[iz] / v.Z();
       positionInPlane += weightByT * v;
-      sigmaDrift2 += fabs(weightByT) * 2 * Const::uTherm
-                     * info.getElectronMobility(currentEField.Mag());
+      sigmaDriftSqr += fabs(weightByT) * 2 * Const::uTherm
+                       * info.getElectronMobility(currentEField.Mag());
     } // for knots
   } // Integration
   // Adjust sigmaDrift to _current_ Lorentz angle
   double currentTanLA_u = v.X() / v.Z();
   double currentTanLA_v = v.Y() / v.Z();
   double sigmaDrift_u = sqrt(
-                          sigmaDrift2 * (1 + currentTanLA_u * currentTanLA_u));
+                          sigmaDriftSqr * (1 + currentTanLA_u * currentTanLA_u));
   double sigmaDrift_v = sqrt(
-                          sigmaDrift2 * (1 + currentTanLA_v * currentTanLA_v));
+                          sigmaDriftSqr * (1 + currentTanLA_v * currentTanLA_v));
   if (fabs(distanceToPlane) > 1.0 * Unit::um) {
     double tanLorentz_u = (positionInPlane.X() - position.X())
                           / distanceToPlane;
@@ -444,7 +428,7 @@ void PXDDigitizerModule::driftCharge(const TVector3& position,
   double groupCharge = electrons / nGroups;
 
   B2DEBUG(30,
-          "Sigma of drift diffusion is " << sigmaDrift2 << ", i.p. " << sigmaDrift_u << " in u, and " << sigmaDrift_v << " in v");
+          "Sigma of drift diffusion is " << sigmaDriftSqr << ", i.p. " << sigmaDrift_u << " in u, and " << sigmaDrift_v << " in v");
   B2DEBUG(30, "Sigma of lateral diffusion is " << sigmaDiffus << " per step");
   B2DEBUG(40,
           "Splitting charge in " << nGroups << " groups of " << groupCharge << " electrons");
@@ -467,9 +451,9 @@ void PXDDigitizerModule::driftCharge(const TVector3& position,
       //Check if electrons are close enough to internal gate
       const double uPitch = info.getUPitch();
       const double vPitch = info.getVPitch(vPixel);
-      double lowerBorder = 0.5 * vPitch - info.getDrainBorder();
-      double upperBorder = 0.5 * vPitch - info.getSourceBorder();
-      const double uBorder = 0.5 * uPitch - info.getClearBorder();
+      double lowerBorder = 0.5 * vPitch - info.getDrainBorder(vPixel);
+      double upperBorder = 0.5 * vPitch - info.getSourceBorder(vPixel);
+      const double uBorder = 0.5 * uPitch - info.getClearBorder(vPixel);
 
       if (info.getDoublePixel() && vID % 2 == 0) {
         swap(lowerBorder, upperBorder);
@@ -517,87 +501,12 @@ void PXDDigitizerModule::driftCharge(const TVector3& position,
   }
 }
 
-void PXDDigitizerModule::driftChargeSimple(const TVector3& position,
-                                           double electrons)
-{
-  //Get references to current sensor/info for ease of use
-  const SensorInfo& info = *m_currentSensorInfo;
-  Sensor& sensor = *m_currentSensor;
-
-  double sensorThickness = info.getThickness();
-  //Drift to module surface
-  double distanceToPlane = 0.5 * sensorThickness - position.Z();
-  TVector3 final = position
-                   + TVector3(m_tanLorentz * distanceToPlane, 0, distanceToPlane);
-  double driftLength = (final - position).Mag();
-
-  //Calculate diffusion of electron cloud
-  double invCosLorentzAngle = sqrt(1.0 + m_tanLorentz * m_tanLorentz);
-  double sigmaDiffus = sqrt(driftLength * m_diffusionCoefficient);
-
-  //Calculate the the size of the diffusion cloud and all pixel IDs this will hit
-  double uCenter = final.X();
-  double vCenter = final.Y();
-  double uSigma = sigmaDiffus * invCosLorentzAngle;
-  double vSigma = sigmaDiffus;
-  double uLow = uCenter - m_widthOfDiffusCloud * uSigma;
-  double uHigh = uCenter + m_widthOfDiffusCloud * uSigma;
-  double vLow = vCenter - m_widthOfDiffusCloud * vSigma;
-  double vHigh = vCenter + m_widthOfDiffusCloud * vSigma;
-  int uIDLow = info.getUCellID(uLow, 0, true);
-  int uIDHigh = info.getUCellID(uHigh, 0, true);
-  int vIDLow = info.getVCellID(vLow, true);
-  int vIDHigh = info.getVCellID(vHigh, true);
-  B2DEBUG(30, "Size of diffusion cloud: " << uSigma << ", " << vSigma);
-  B2DEBUG(30,
-          "uID from " << uIDLow << " to " << uIDHigh << ", vID from " << vIDLow << " to " << vIDHigh);
-
-#define NORMAL_CDF(mean,sigma,x) TMath::Freq(((x)-(mean))/(sigma))
-
-  //Now loop over all pixels and calculate the integral of the 2D gaussian charge distribution
-  //Deposit the charge corresponding to the per pixel integral in each pixel
-  double fraction(0);
-  double vLowerTail =
-    NORMAL_CDF(vCenter, vSigma, info.getVCellPosition(vIDLow) - 0.5 * info.getVPitch(vLow));
-  for (int vID = vIDLow; vID <= vIDHigh; ++vID) {
-    double vPos = info.getVCellPosition(vID);
-    double vUpperTail =
-      NORMAL_CDF(vCenter, vSigma, vPos + 0.5 * info.getVPitch(vPos));
-    double vIntegral = vUpperTail - vLowerTail;
-    vLowerTail = vUpperTail;
-
-    double uLowerTail =
-      NORMAL_CDF(uCenter, uSigma, info.getUCellPosition(uIDLow) - 0.5 * info.getUPitch());
-    for (int uID = uIDLow; uID <= uIDHigh; ++uID) {
-      double uPos = info.getUCellPosition(uID);
-      double uUpperTail =
-        NORMAL_CDF(uCenter, uSigma, uPos + 0.5 * info.getUPitch());
-      double uIntegral = uUpperTail - uLowerTail;
-      uLowerTail = uUpperTail;
-
-      double charge = electrons * uIntegral * vIntegral;
-      sensor[Digit(uID, vID)].add(charge, m_currentParticle,
-                                  m_currentTrueHit);
-      B2DEBUG(80,
-              "Relative charge for pixel (" << uID << ", " << vID << "): " << uIntegral * vIntegral);
-      fraction += uIntegral * vIntegral;
-      if (m_histDiffusion && charge >= 1.0)
-        m_histDiffusion->Fill((uPos - uCenter) / Unit::um,
-                              (vPos - vCenter) / Unit::um, charge);
-    }
-    B2DEBUG(30, "Fraction of charge: " << fraction);
-  }
-
-#undef NORMAL_CDF
-
-}
 
 double PXDDigitizerModule::addNoise(double charge)
 {
   if (charge <= 0) {
-    //Noise Pixel, add noise to exceed Noise Threshold;
-    double p = gRandom->Uniform(m_noiseFraction, 1.0);
-    charge = TMath::NormQuantile(p) * m_elNoise;
+    //Noise Pixel, add chargeThreshold electrons;
+    charge = 1.1 * m_chargeThresholdElectrons;
   } else {
     if (m_applyPoisson) {
       // For big charge assume Gaussian distr.
@@ -619,26 +528,22 @@ void PXDDigitizerModule::addNoiseDigits()
   if (!m_applyNoise)
     return;
 
-  double fraction = 1 - m_noiseFraction;
   for (Sensors::value_type& sensor : m_sensors) {
     Sensor& s = sensor.second;
-    //FIXME: Backwards compatible
-    //if (s.size() == 0) continue;
 
     //Calculate the number of pixels on an empty sensor which will exceed the noise cut
     const SensorInfo& info =
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensor.first));
     int nU = info.getUCells();
     int nV = info.getVCells();
-    int nPixels = gRandom->Poisson(fraction * nU * nV);
+    int nPixels = gRandom->Poisson(info.getNoiseFraction() * nU * nV);
 
-    //With an empty Sensor, nPixels would exceed the noise cut. If pixels are lit, these will have their own
-    //noise fluctuation in addNoise. So if we find that a pixel we chose randomly to be lit already carry charge,
-    //we ignore it.
+    // Existing digits will get noise in PXDDIgitizer::AddNoise.
+    // Here we add zero charge to nPixels digits.
+    // In part, this will create some new zero-charge digits.
+    // If we happen to select an existing (fired) digit, it remains unchanged.
     for (int i = 0; i < nPixels; ++i) {
       Digit d(gRandom->Integer(nU), gRandom->Integer(nV));
-      //Add 0 electrons, will not modify existing digits but will add empty ones which
-      //will be filled with noise in PXDDigitizer::addNoise
       s[d].add(0.0);
     }
   }
@@ -654,13 +559,13 @@ void PXDDigitizerModule::saveDigits()
   RelationArray relDigitTrueHit(storeDigits, storeTrueHits,
                                 m_relDigitTrueHitName);
 
-  //Zero supression cut in electrons
-  double charge_threshold = m_SNAdjacent * m_elNoise;
 
   for (Sensors::value_type& sensor : m_sensors) {
     int sensorID = sensor.first;
     const SensorInfo& info =
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+    m_chargeThreshold = info.getChargeThreshold();
+    m_chargeThresholdElectrons = m_chargeThreshold * m_eToADU;
     for (Sensor::value_type& digit : sensor.second) {
       const Digit& d = digit.first;
       const DigitValue& v = digit.second;
@@ -669,7 +574,7 @@ void PXDDigitizerModule::saveDigits()
       double charge = addNoise(v.charge());
 
       //Zero suppresion cut
-      if (charge < charge_threshold)
+      if (charge < m_chargeThresholdElectrons)
         continue;
 
       //Limit electrons to ADC steps

@@ -78,13 +78,18 @@
            for digitization. The voltages might be time dependent and than
            should be placed somewhere else -->
       <BulkDoping unit="1/um^3">10.0</BulkDoping>
-      <BackVoltage unit="V">-60.0</BackVoltage>
-      <TopVoltage unit="V">0.0</TopVoltage>
-      <SourceBorder unit="um">3.0</SourceBorder>
-      <ClearBorder unit="um">8.0</ClearBorder>
-      <DrainBorder unit="um">8.0</DrainBorder>
+      <BackVoltage unit="V">-30.0</BackVoltage>
+      <TopVoltage unit="V">-5.0</TopVoltage>
+      <SourceBorderSmallPixel unit="um">6.0</SourceBorderSmallPixel>
+      <ClearBorderSmallPixel unit="um">4.0</ClearBorderSmallPixel>
+      <DrainBorderSmallPixel unit="um">6.0</DrainBorderSmallPixel>
+      <SourceBorderLargePixel unit="um">6.0</SourceBorderLargePixel>
+      <ClearBorderLargePixel unit="um">4.0</ClearBorderLargePixel>
+      <DrainBorderLargePixel unit="um">6.0</DrainBorderLargePixel>
       <GateDepth unit="um">22</GateDepth>
       <DoublePixel>true</DoublePixel>
+      <ChargeThreshold unit = "ADU">4</ChargeThreshold>
+      <NoiseFraction>0.00001</NoiseFraction>
       <!-- Define the integration window to be 20µs. This probably should go
            somewhere else -->
       <IntegrationStart unit="us">-10.0</IntegrationStart>
@@ -153,13 +158,18 @@
       <splitLength unit="mm">43.520</splitLength>
 
       <BulkDoping unit="1/um^3">10.0</BulkDoping>
-      <BackVoltage unit="V">-60.0</BackVoltage>
-      <TopVoltage unit="V">0.0</TopVoltage>
-      <SourceBorder unit="um">3.0</SourceBorder>
-      <ClearBorder unit="um">8.0</ClearBorder>
-      <DrainBorder unit="um">15.0</DrainBorder>
+      <BackVoltage unit="V">-30.0</BackVoltage>
+      <TopVoltage unit="V">-5.0</TopVoltage>
+      <SourceBorderSmallPixel unit="um">6.0</SourceBorderSmallPixel>
+      <ClearBorderSmallPixel unit="um">4.0</ClearBorderSmallPixel>
+      <DrainBorderSmallPixel unit="um">6.0</DrainBorderSmallPixel>
+      <SourceBorderLargePixel unit="um">6.0</SourceBorderLargePixel>
+      <ClearBorderLargePixel unit="um">4.0</ClearBorderLargePixel>
+      <DrainBorderLargePixel unit="um">7.0</DrainBorderLargePixel>
       <GateDepth unit="um">22</GateDepth>
       <DoublePixel>true</DoublePixel>
+      <ChargeThreshold unit = "ADU">4</ChargeThreshold>
+      <NoiseFraction>0.00001</NoiseFraction>
       <IntegrationStart unit="us">-10.0</IntegrationStart>
       <IntegrationEnd   unit="us"> 10.0</IntegrationEnd>
     </Active>

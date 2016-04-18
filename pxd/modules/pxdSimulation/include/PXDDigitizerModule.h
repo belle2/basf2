@@ -59,7 +59,8 @@ namespace Belle2 {
        * @param charge charge in electrons to be added
        * @param particle Index of the particle contributing the charge, -1 for no particle/noise
        */
-      void add(double charge, int particle = -1, int truehit = -1) {
+      void add(double charge, int particle = -1, int truehit = -1)
+      {
         if (particle >= 0) m_particles[particle] += charge;
         if (truehit >= 0) m_truehits[truehit] += charge;
         m_charge += charge;
@@ -177,16 +178,14 @@ namespace Belle2 {
       bool   m_applyADC;
       /** ENC equivalent of 1 ADU */
       double m_eToADU;
-
-      /** Whether of not to use simple drift model */
-      bool   m_useSimpleDrift;
-      /** Width of diffusion cloud for simple drift model */
-      double m_widthOfDiffusCloud;
-      /** Diffusion coefficient for simple drift model */
-      double m_diffusionCoefficient;
-      /** Tangent of the Lorentz angle for simple drift model */
-      double m_tanLorentz;
-
+      /** g_q of a pixel in nA/electrons.*/
+      double m_gq;
+      /** Is ADC working in fine (hi-res) mode? */
+      bool m_ADCFineMode;
+      /** Zero-suppression threshold in ADU, steerable */
+      double m_chargeThreshold;
+      /** ... and its equivalent in electrons */
+      double m_chargeThresholdElectrons;
       /** Structure containing all existing sensors */
       Sensors m_sensors;
 

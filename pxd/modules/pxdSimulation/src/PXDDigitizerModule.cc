@@ -115,11 +115,11 @@ void PXDDigitizerModule::initialize()
   m_segmentLength *= Unit::mm;
 
   B2INFO(
-    "PXDDigitizer Parameters (in default system units, *=cannot be set directly):");
+    "PXDDigitizer Parameters (in system units, *=calculated +=set in xml):");
   B2INFO(" -->  ElectronicEffects:  " << (m_applyNoise ? "true" : "false"));
-  B2INFO(" -->  ElectronicNoise:    " << m_elNoise);
-  B2INFO(" -->  NoiseSN:            " << m_SNAdjacent);
-  B2INFO(" --> *NoiseFraction:      " << m_noiseFraction);
+  B2INFO(" -->  ElectronicNoise:    " << m_elNoise << " e-");
+  B2INFO(" --> +ChargeThreshold:    " << "set in xml by sensor, nominal 4 ADU");
+  B2INFO(" --> *NoiseFraction:      " << "set in xml by sensor, nominal 1.0e-5");
   B2INFO(
     " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
   B2INFO(
@@ -133,13 +133,13 @@ void PXDDigitizerModule::initialize()
   B2INFO(" -->  TrueSimRel:         " << m_relTrueHitSimHitName);
   B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
   B2INFO(" -->  PoissonSmearing:    " << (m_applyPoisson ? "true" : "false"));
-  B2INFO(" -->  IntegrationWindow:  " << (m_applyWindow ? "true" : "false"));
-  B2INFO(" -->  SegmentLength:      " << m_segmentLength);
-  B2INFO(" -->  ElectronGroupSize:  " << m_elGroupSize);
-  B2INFO(" -->  ElectronStepTime:   " << m_elStepTime);
+  B2INFO(" --> +IntegrationWindow:  " << (m_applyWindow ? "true" : "false") << ", size defined in xml");
+  B2INFO(" -->  SegmentLength:      " << m_segmentLength << " cm");
+  B2INFO(" -->  ElectronGroupSize:  " << m_elGroupSize << " e-");
+  B2INFO(" -->  ElectronStepTime:   " << m_elStepTime << " ns");
   B2INFO(" -->  ElectronMaxSteps:   " << m_elMaxSteps);
   B2INFO(" -->  ADC:                " << (m_applyADC ? "true" : "false"));
-  B2INFO(" -->  ADU unit:           " << m_eToADU);
+  B2INFO(" -->  ADU unit:           " << m_eToADU << " e-/ADU");
   B2INFO(" -->  statisticsFilename: " << m_rootFilename);
 
   if (!m_rootFilename.empty()) {

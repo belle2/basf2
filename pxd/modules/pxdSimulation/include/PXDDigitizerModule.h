@@ -137,8 +137,6 @@ namespace Belle2 {
       bool   m_applyNoise;
       /** Amount of noise to apply */
       double m_elNoise;
-      /** Signal to Noise ratio for zero suppression cut */
-      double m_SNAdjacent;
       /** Fraction of noisy pixels per sensor */
       double m_noiseFraction;
 

@@ -32,7 +32,66 @@ def check_simulation(path):
                 % (", ".join(required), ", ".join(found)))
 
 
-def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None, bkgscale=1.0):
+def add_PXDDataReduction(path, components=None):
+
+    pxd_unfiltered_digits = 'pxd_unfiltered_digits'
+    pxd_digitizer = register_module('PXDDigitizer')
+    pxd_digitizer.param('Digits', pxd_unfiltered_digits)
+    path.add_module(pxd_digitizer)
+
+    # track fitting
+    setupGenfit = register_module('SetupGenfitExtrapolation')
+    setupGenfit.set_name('SetupGenfitExtrapolationForDataReduction')
+    path.add_module(setupGenfit)
+
+    svd_trackcands = '__ROIsvdGFTrackCands'
+    svd_tracks = '__ROIsvdGFTracks'
+
+    svd_trackfinder = register_module('VXDTF')
+    svd_trackfinder.set_name('SVD-only VXDTF')
+    svd_trackfinder.param('GFTrackCandidatesColName', svd_trackcands)
+    # WARNING: workaround for possible clashes between fitting and VXDTF
+    # stays until the redesign of the VXDTF is finished.
+    svd_trackfinder.param('TESTERexpandedTestingRoutines', False)
+    svd_trackfinder.param('sectorSetup',
+                          ['shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
+                           'shiftedL3IssueTestSVDStd-100to400MeV_SVD',
+                           'shiftedL3IssueTestSVDStd-25to100MeV_SVD'
+                           ])
+    svd_trackfinder.param('tuneCutoffs', 0.06)
+    path.add_module(svd_trackfinder)
+
+    trackfitter = register_module('GenFitter')
+    trackfitter.param({"GFTracksColName": svd_tracks,
+                       "PDGCodes": [211],
+                       'GFTrackCandidatesColName': svd_trackcands})
+    trackfitter.set_name('SVD-only GenFitter')
+    path.add_module(trackfitter)
+
+    pxdDataRed = register_module('PXDDataReduction')
+    param_pxdDataRed = {
+        'gfTrackListName': svd_tracks,
+        'PXDInterceptListName': 'PXDIntercepts',
+        'ROIListName': 'ROIs',
+        'sigmaSystU': 0.02,
+        'sigmaSystV': 0.02,
+        'numSigmaTotU': 10,
+        'numSigmaTotV': 10,
+        'maxWidthU': 0.5,
+        'maxWidthV': 0.5,
+    }
+    pxdDataRed.param(param_pxdDataRed)
+    path.add_module(pxdDataRed)
+
+    # Filtering of PXDDigits
+    pxd_digifilter = register_module('PXDdigiFilter')
+    pxd_digifilter.param('ROIidsName', 'ROIs')
+    pxd_digifilter.param('PXDDigitsName', pxd_unfiltered_digits)
+    pxd_digifilter.param('PXDDigitsInsideROIName', 'PXDDigits')
+    path.add_module(pxd_digifilter)
+
+
+def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None, bkgscale=1.0, usePXDDataReduction=False):
     """
     This function adds the standard simulation modules to a path.
     """
@@ -72,13 +131,6 @@ def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None, bkg
     # not necessary for running simulation jobs and it should be possible to
     # have them in the path more than once
 
-    # PXD digitization
-    if components is None or 'PXD' in components:
-        pxd_digitizer = register_module('PXDDigitizer')
-        path.add_module(pxd_digitizer)
-        pxd_clusterizer = register_module('PXDClusterizer')
-        path.add_module(pxd_clusterizer)
-
     # SVD digitization
     if components is None or 'SVD' in components:
         svd_digitizer = register_module('SVDDigitizer')
@@ -90,6 +142,17 @@ def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None, bkg
     if components is None or 'CDC' in components:
         cdc_digitizer = register_module('CDCDigitizer')
         path.add_module(cdc_digitizer)
+
+    # PXD digitization
+    if components is None or 'PXD' in components:
+        if usePXDDataReduction:
+            # if 'SVD' in components:
+            add_PXDDataReduction(path, components)
+        else:
+            pxd_digitizer = register_module('PXDDigitizer')
+            path.add_module(pxd_digitizer)
+        pxd_clusterizer = register_module('PXDClusterizer')
+        path.add_module(pxd_clusterizer)
 
     # TOP digitization
     if components is None or 'TOP' in components:

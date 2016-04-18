@@ -127,6 +127,11 @@ namespace Belle2 {
     TTimeStamp timedate2(std::string time);
 
     /**
+     * Returns lists of slopes (fine & rough)
+     */
+    std::pair<std::vector<float>, std::vector<float>> getSlopes(std::string dna);
+
+    /**
      * Export ARICH FEB test data from the database.
      */
     void exportFebTest();

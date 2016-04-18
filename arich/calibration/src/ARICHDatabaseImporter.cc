@@ -646,8 +646,13 @@ void ARICHDatabaseImporter::importFebTest()
       febConst->setCurrentV38p(std::get<3>(LVtest));
     }
 
-//    febConst->setSlopesFine(slopesFine); // std::vector<float>
-//    febConst->setSlopesRough(slopesRough); // std::vector<float>
+    // slopes (from offset settings measurements)
+    std::pair<std::vector<float>, std::vector<float>> slopes = ARICHDatabaseImporter::getSlopes(dna);
+
+    febConst->setSlopesFine(std::get<0>(slopes)); // std::vector<float>
+    febConst->setSlopesRough(std::get<1>(slopes)); // std::vector<float>
+
+
 //    febConst->setOffsetFine3D(offsetFine); // TH3F*
 //    febConst->setOffsetRough3D(offsetRough); // TH3F*
 //    febConst->setTestPulse2D(testPulse); // TH2F*
@@ -729,7 +734,6 @@ std::vector<int> ARICHDatabaseImporter::getDeadChFEB(std::string dna)
   return listCHs;
 }
 
-
 TTimeStamp ARICHDatabaseImporter::timedate2(std::string time)
 {
   // convert string into TTimeStamp
@@ -754,6 +758,33 @@ TTimeStamp ARICHDatabaseImporter::timedate2(std::string time)
   return datum;
 }
 
+std::pair<std::vector<float>, std::vector<float>> ARICHDatabaseImporter::getSlopes(std::string dna)
+{
+  vector<float> slopesF, slopesR;
+  std::pair<std::vector<float>, std::vector<float>> slopes;
+  string line;
+  ifstream fileSlopes("febTest/SlopesFEBpravi.txt");
+  if (fileSlopes.is_open()) {
+    while (getline(fileSlopes, line)) {
+      string dna2 = line.substr(0, line.find(",") - 1);
+      string line2 = line.substr(line.find(",") + 1);
+      string slopeR = line2.substr(0, line2.find(",") - 1);
+      string slopeF = line2.substr(line2.find(",") + 1);
+      if (dna2 == dna) {
+        float slopeRfloat = (-1) * 2500.0 / 1024 * stof(slopeR.c_str());
+        slopesR.push_back(slopeRfloat);
+        float slopeFfloat = (-1) * 2500.0 / 1024 * stof(slopeF.c_str());
+        slopesF.push_back(slopeFfloat);
+      }
+    }
+  } else { B2INFO("No file SlopesFEBpravi.txt"); }
+  fileSlopes.close();
+  slopes = std::make_pair(slopesF, slopesR);
+
+  return slopes;
+}
+
+
 void ARICHDatabaseImporter::exportFebTest()
 {
   DBArray<ARICHFebTest> elements("ARICHFebTest");
@@ -762,7 +793,8 @@ void ARICHDatabaseImporter::exportFebTest()
   // Print serial numbers of FEBs
   unsigned int el = 0;
   for (const auto& element : elements) {
-    B2INFO("Element Number: " << el << "; serial = " << element.getFebSerial());
+    B2INFO("Element Number: " << el << "; serial = " << element.getFebSerial() << "; dna = " << element.getFebDna() <<
+           "; slope fine ch. 143 = " << element.getSlopeFine(143));
     el++;
   }
 }
@@ -792,7 +824,7 @@ void ARICHDatabaseImporter::importHapdInfo()
     int guardbias = atoi(gb.c_str());
 
     // prepare TGraph of quantum efficiency as function of lambda
-    int n1 = 70;
+    const int n1 = 70;
     float lambda[n1], qepoint[n1];
     int i1 = 0;
     for (const auto& QE : hapdInfo.getNodes("qe/qepoint")) {
@@ -807,7 +839,7 @@ void ARICHDatabaseImporter::importHapdInfo()
     qe->GetYaxis()->SetTitle("qe");
 
     // prepare TGraph of pulse height distribution
-    int n2 = 4100;
+    const int n2 = 4100;
     int channel_adc[n2], pulse_adc[n2];
     int i2 = 0;
     for (const auto& ADC : hapdInfo.getNodes("adc/value")) {
@@ -858,7 +890,8 @@ void ARICHDatabaseImporter::importHapdInfo()
     }
 
     // prepare TGraphs for bombardment gain and current
-    int n3 = 30, i3 = 0;
+    const int n3 = 30;
+    int i3 = 0;
     //int channel_label_bomb;
     float hv_bomb[n3], gain_bomb[n3], current1_bomb[n3], current2_bomb[n3], current3_bomb[n3];
     chip_ABCD = 0;
@@ -892,7 +925,8 @@ void ARICHDatabaseImporter::importHapdInfo()
     }
 
     // prepare TGraphs for avalanche gain and current
-    int n4 = 30, i4 = 0;
+    const int n4 = 30;
+    int i4 = 0;
     float hv_aval[n4], gain_aval[n4], current1_aval[n4], current2_aval[n4], current3_aval[n4];
     chip_ABCD = 0;
     for (const auto& BG : hapdInfo.getNodes("avalanchegain/ch")) {
@@ -928,10 +962,11 @@ void ARICHDatabaseImporter::importHapdInfo()
 
     chip_ABCD = 0;
     // prepare 2D histograms for bias voltage and current
-    int n5 = 150, i5 = 0, chipnum[n5];
+    const int n5 = 150;
+    int i5 = 0, chipnum[n5];
     float biasv[n5], biasi[n5];
     for (const auto& HI : hapdInfo.getNodes("bias2d/biasvalue")) {
-      std::string chip_2d = HI.getString("@chip");
+      string chip_2d = HI.getString("@chip");
       chipnum[i5] = HI.getInt("@ch");
       biasv[i5] = (float) HI.getDouble("biasv");
       biasi[i5] = (float) HI.getDouble("biasi");

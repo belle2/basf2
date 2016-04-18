@@ -63,7 +63,7 @@ namespace Belle2 {
     /// Utility functions.
     static double calPhi(TRGCDCSegmentHit const * segmentHit, double eventTime);
     /// Function for mc debugging.
-    void getMCValues( TRGCDCTrack* aTrack );
+    static void getMCValues(const TRGCDC & m_cdc, TRGCDCTrack* aTrack, std::map<std::string, double> & m_mConstD, std::map<std::string, double> & m_mDouble, std::map<std::string, std::vector<double> > & m_mVector);
 
     /// Checks if axial track has 5 TSs. One per each superlayer.
     bool isAxialTrackFull( TRGCDCTrack & aTrack );
@@ -72,13 +72,16 @@ namespace Belle2 {
     bool isStereoTrackFull( TRGCDCTrack & aTrack );
 
     /// Finds which axial superlayers has TSs. useAxSL array indicating hit superlayers.
-    void findHitAxialSuperlayers( TRGCDCTrack & aTrack, bool (&useAxSL)[5] );
+    static void findHitAxialSuperlayers( TRGCDCTrack & aTrack, bool (&useAxSL)[5] , bool printError);
 
     /// Finds which stereo superlayers has TSs. useStSL array indicating hit superlayers.
-    void findHitStereoSuperlayers( TRGCDCTrack & aTrack, bool (&useStSL)[4] );
+    static void findHitStereoSuperlayers( TRGCDCTrack & aTrack, bool (&useStSL)[4] , bool printError);
 
     /// Removes TSs that are not possible with track Pt.
     void removeImpossibleStereoSuperlayers( bool (&useStSL)[4] );
+
+    /// Does 2D fit. Returns 0 if fit is done successfully. m_mBool should have fIsPrintError, fmcLR, fLRLUT, fmcLR, f2DFit, f2DFitDrift. m_mConstD should have Trg_PI. m_mConstV should have nWires, driftPhi2DError, wirePhi2DError, rr, rr2D.
+    static int do2DFit( TRGCDCTrack & aTrack, std::map<std::string, bool> & m_mBool, std::map<std::string, double> & m_mConstD, std::map<std::string, std::vector<double> > & m_mConstV, std::map<std::string, double> & m_mDouble, std::map<std::string, std::vector<double> > & m_mVector);
 
     /// Functions for saving.
     /// Save VHDL and code files.

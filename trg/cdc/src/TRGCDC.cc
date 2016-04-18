@@ -625,46 +625,48 @@ namespace Belle2 {
     m_eventNum = 1;
 
     //...Initialize root file...
-    if (_makeRootFile) m_file = new TFile((char*)_rootTRGCDCFilename.c_str(), "RECREATE");
-    //m_file = new TFile("TRGCDC.root", "RECREATE");
-    m_tree = new TTree("m_tree", "tree");
-    m_treeAllTracks = new TTree("m_treeAllTracks", "treeAllTracks");
+    if (_makeRootFile) { 
+      m_file = new TFile((char*)_rootTRGCDCFilename.c_str(), "RECREATE");
+      //m_file = new TFile("TRGCDC.root", "RECREATE");
+      m_tree = new TTree("m_tree", "tree");
+      m_treeAllTracks = new TTree("m_treeAllTracks", "treeAllTracks");
 
-    m_fitParameters = new TClonesArray("TVectorD");
-    m_mcParameters = new TClonesArray("TVectorD");
-    m_mcTrack4Vector = new TClonesArray("TLorentzVector");
-    m_mcTrackVertexVector = new TClonesArray("TVector3");
-    m_mcTrackStatus = new TClonesArray("TVectorD");
-    // m_parameters2D = new TClonesArray("TVectorD");
+      m_fitParameters = new TClonesArray("TVectorD");
+      m_mcParameters = new TClonesArray("TVectorD");
+      m_mcTrack4Vector = new TClonesArray("TLorentzVector");
+      m_mcTrackVertexVector = new TClonesArray("TVector3");
+      m_mcTrackStatus = new TClonesArray("TVectorD");
+      // m_parameters2D = new TClonesArray("TVectorD");
 
-    m_tree->Branch("fitParameters", &m_fitParameters, 32000, 0);
-    m_tree->Branch("mcParameters", &m_mcParameters, 32000, 0);
-    m_treeAllTracks->Branch("mcTrack4Vector", &m_mcTrack4Vector, 32000, 0);
-    m_treeAllTracks->Branch("mcTrackVertexVector", &m_mcTrackVertexVector, 32000, 0);
-    m_treeAllTracks->Branch("mcTrackStatus", &m_mcTrackStatus, 32000, 0);
+      m_tree->Branch("fitParameters", &m_fitParameters, 32000, 0);
+      m_tree->Branch("mcParameters", &m_mcParameters, 32000, 0);
+      m_treeAllTracks->Branch("mcTrack4Vector", &m_mcTrack4Vector, 32000, 0);
+      m_treeAllTracks->Branch("mcTrackVertexVector", &m_mcTrackVertexVector, 32000, 0);
+      m_treeAllTracks->Branch("mcTrackStatus", &m_mcTrackStatus, 32000, 0);
 
-    m_evtTime = new TClonesArray("TVectorD");
-    m_treeAllTracks->Branch("evtTime", &m_evtTime, 32000, 0);
+      m_evtTime = new TClonesArray("TVectorD");
+      m_treeAllTracks->Branch("evtTime", &m_evtTime, 32000, 0);
 
-    _tree2D = new TTree("tree2D", "2D Tracks");
-    _tracks2D = new TClonesArray("TVectorD");
-    _tree2D->Branch("track parameters", & _tracks2D, 32000, 0);
+      _tree2D = new TTree("tree2D", "2D Tracks");
+      _tracks2D = new TClonesArray("TVectorD");
+      _tree2D->Branch("track parameters", & _tracks2D, 32000, 0);
 
-    //...Initialize firmware ROOT input
-    //m_minCDCTdc = 9999;
-    //m_maxCDCTdc = 0;
-    //m_minTRGTdc = 9999;
-    //m_maxTRGTdc = 0;
+      //...Initialize firmware ROOT input
+      //m_minCDCTdc = 9999;
+      //m_maxCDCTdc = 0;
+      //m_minTRGTdc = 9999;
+      //m_maxTRGTdc = 0;
 
-    m_treeROOTInput = new TTree("m_treeROOTInput", "treeRootInput");
-    //m_CDCTRGTimeMatch = new TClonesArray("TVectorD");
-    m_rootCDCHitInformation = new TClonesArray("TVectorD");
-    m_rootTRGHitInformation = new TClonesArray("TVectorD");
-    m_rootTRGRawInformation = new TClonesArray("TObjString");
-    //m_treeROOTInput->Branch("CDCTRGTimeMatch", &m_CDCTRGTimeMatch,32000,0);
-    m_treeROOTInput->Branch("rootCDCHitInformation", &m_rootCDCHitInformation, 32000, 0);
-    m_treeROOTInput->Branch("rootTRGHitInformation", &m_rootTRGHitInformation, 32000, 0);
-    m_treeROOTInput->Branch("rootTRGRawInformation", &m_rootTRGRawInformation, 32000, 0);
+      m_treeROOTInput = new TTree("m_treeROOTInput", "treeRootInput");
+      //m_CDCTRGTimeMatch = new TClonesArray("TVectorD");
+      m_rootCDCHitInformation = new TClonesArray("TVectorD");
+      m_rootTRGHitInformation = new TClonesArray("TVectorD");
+      m_rootTRGRawInformation = new TClonesArray("TObjString");
+      //m_treeROOTInput->Branch("CDCTRGTimeMatch", &m_CDCTRGTimeMatch,32000,0);
+      m_treeROOTInput->Branch("rootCDCHitInformation", &m_rootCDCHitInformation, 32000, 0);
+      m_treeROOTInput->Branch("rootTRGHitInformation", &m_rootTRGHitInformation, 32000, 0);
+      m_treeROOTInput->Branch("rootTRGRawInformation", &m_rootTRGRawInformation, 32000, 0);
+    }
 
     TRGDebug::leaveStage("TRGCDC initialize");
   }
@@ -1443,12 +1445,14 @@ namespace Belle2 {
 
 
     // Save CDC hit data and TRG hit data to ROOT file.
-    saveTRGRawInformation(trgInformations);
-    saveCDCHitInformation(hitCdcData);
-    if (trgOutput == 2) {
-      saveTRGHitInformation(hitTrgData);
+    if (_makeRootFile) { 
+      saveTRGRawInformation(trgInformations);
+      saveCDCHitInformation(hitCdcData);
+      if (trgOutput == 2) {
+        saveTRGHitInformation(hitTrgData);
+      }
+      m_treeROOTInput->Fill();
     }
-    m_treeROOTInput->Fill();
 
     // Update CDC wires using data. Start from layer 50.
     for (unsigned iHit = 0; iHit < hitCdcData.size(); iHit++) {

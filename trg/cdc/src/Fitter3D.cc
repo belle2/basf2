@@ -202,118 +202,22 @@ namespace Belle2 {
       //}
 
       // Get MC values for fitter
-      if(m_mBool["fMc"]) getMCValues(&aTrack);
+      if(m_mBool["fMc"]) getMCValues(m_cdc, &aTrack, m_mConstD, m_mDouble, m_mVector);
       // Get event and track ID
       m_mDouble["eventNumber"] = m_cdc.getEventNumber();
       m_mDouble["trackId"] = aTrack.getTrackID();
 
-      /////////////////////////////////
-      // 2D Fitter
-      // Check which axial super layers should be used.
-      bool useAxSl[5];
-      findHitAxialSuperlayers(aTrack, useAxSl);
-      // Check if number of axial super layer hits is smaller or equal to 1.
-      int nHitAx = (int)useAxSl[0]+(int)useAxSl[1]+(int)useAxSl[2]+(int)useAxSl[3]+(int)useAxSl[4];
-      if(nHitAx <= 1) {
-        aTrack.setFitted(0);
-        continue;
-      }
 
-      // Fill information for axial layers
-      m_mVector["wirePhi"] = vector<double> (9);
-      m_mVector["lutLR"] = vector<double> (9);
-      m_mVector["LR"] = vector<double> (9);
-      m_mVector["driftLength"] = vector<double> (9);
-      m_mVector["tdc"] = vector<double> (9);
-      for (unsigned iAx = 0; iAx < 5; iAx++) {
-        if(useAxSl[iAx] == 1) {
-          const vector<TCLink *> & links = aTrack.links(iAx*2);
-          const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
-          m_mVector["wirePhi"][iAx*2] = (double) t_segment->localId()/m_mConstV["nWires"][iAx*2]*4*m_mConstD["Trg_PI"];
-          m_mVector["lutLR"][iAx*2] = t_segment->LUT()->getValue(t_segment->lutPattern());
-          // mcLR should be removed.
-          m_mVector["mcLR"][iAx*2] = t_segment->hit()->mcLR();
-          m_mVector["driftLength"][iAx*2] = t_segment->hit()->drift();
-          m_mVector["tdc"][iAx*2] = t_segment->priorityTime();
-          if(m_mBool["fmcLR"]==1) m_mVector["LR"][iAx*2] = m_mVector["mcLR"][iAx*2];
-          else if(m_mBool["fLRLUT"]==1) m_mVector["LR"][iAx*2] = m_mVector["lutLR"][iAx*2];
-          else m_mVector["LR"][iAx*2] = 3;
-        } else {
-          m_mVector["wirePhi"][iAx*2] = 9999;
-          m_mVector["lutLR"][iAx*2] = 9999;
-          // mcLR should be removed.
-          m_mVector["mcLR"][iAx*2] = 9999;
-          m_mVector["driftLength"][iAx*2] = 9999;
-          m_mVector["tdc"][iAx*2] = 9999;
-          if(m_mBool["fmcLR"]==1) m_mVector["LR"][iAx*2] = 9999;
-          else if(m_mBool["fLRLUT"]==1) m_mVector["LR"][iAx*2] = 9999;
-          else m_mVector["LR"][iAx*2] = 9999;
-        }
-      } // End superlayer loop
-      ////////////////////
-      // Get 2D fit values
-      // Get 2D fit values from IW 2D fitter
-      m_mDouble["phi02D"] = aTrack.helix().phi0();
-      m_mDouble["pt2D"] = aTrack.pt();
-      if(aTrack.charge()<0) {
-        m_mDouble["phi02D"] -= m_mConstD["Trg_PI"];
-        if (m_mDouble["phi02D"] < 0) m_mDouble["phi02D"] += 2 * m_mConstD["Trg_PI"];
-      }
-      m_mDouble["dr2D"] = aTrack.helix().dr()*0.01;
-      // Get 2D fit values from JB 2D fitter
-      // Currently using JB fitter for 3D fitting
-      m_mDouble["charge"] = double(aTrack.charge());
-      // Set phi2DError for 2D fit
-      m_mVector["phi2DError"] = vector<double> (5);
-      for (unsigned iAx = 0; iAx < 5; iAx++) {
-        if(useAxSl[iAx] == 1) {
-          if(m_mVector["LR"][2*iAx] != 3) m_mVector["phi2DError"][iAx] = m_mConstV["driftPhi2DError"][iAx];
-          else m_mVector["phi2DError"][iAx] = m_mConstV["wirePhi2DError"][iAx];
-        } else {
-          m_mVector["phi2DError"][iAx] = 9999;
-        }
-      }
-      // Set invPhi2DError for 2D fit
-      m_mVector["phi2DInvError"] = vector<double> (5);
-      for (unsigned iAx = 0; iAx < 5; iAx++) {
-        if(useAxSl[iAx] == 1) {
-          m_mVector["phi2DInvError"][iAx] = 1/m_mVector["phi2DError"][iAx];
-        } else {
-          m_mVector["phi2DInvError"][iAx] = 0;
-        }
-      }
-      // Calculate phi2D.
-      m_mVector["phi2D"] = vector<double> (5);
-      if (m_mBool["f2DFitDrift"] == 0) {
-        for (unsigned iAx = 0; iAx < 5; iAx++) m_mVector["phi2D"][iAx] = m_mVector["wirePhi"][iAx*2];
-      } else {
-        for (unsigned iAx = 0; iAx < 5; iAx++) {
-          if(useAxSl[iAx] == 1) {
-            m_mVector["phi2D"][iAx] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iAx*2], m_mVector["tdc"][iAx*2], m_mDouble["eventTime"], m_mConstV["rr"][iAx*2], m_mVector["LR"][iAx*2]);
-          } else {
-            m_mVector["phi2D"][iAx] = 9999;
-          }
-        }
-      }
-      // Fit2D
-      if (m_mBool["f2DFit"] == 0) {
-        m_mDouble["rho"] = m_mDouble["pt2D"]/0.01/1.5/0.299792458;
-        m_mDouble["pt"] = 0.299792458*1.5*m_mDouble["rho"]/100;
-        m_mDouble["phi0"] = m_mDouble["phi02D"];
-        m_mDouble["fit2DChi2"] = 9999;
-      } else {
-        m_mDouble["rho"] = 0;
-        m_mDouble["phi0"] = 0;
-        m_mDouble["fit2DChi2"] = 0;
-        Fitter3DUtility::rPhiFitter(&m_mConstV["rr2D"][0],&m_mVector["phi2D"][0],&m_mVector["phi2DInvError"][0],m_mDouble["rho"], m_mDouble["phi0"],m_mDouble["fit2DChi2"]); 
-        m_mDouble["pt"] = 0.3*1.5*m_mDouble["rho"]/100;
-      }
+      ///////////////////////////////////
+      //// 2D Fitter
+      int fit2DResult = do2DFit(aTrack, m_mBool, m_mConstD, m_mConstV, m_mDouble, m_mVector);
+      if (fit2DResult != 0) continue;
 
       /////////////////////////////////
       // 3D Fitter
       // Check which stereo super layers should be used.
       bool useStSl[4];
-      findHitStereoSuperlayers(aTrack, useStSl);
+      findHitStereoSuperlayers(aTrack, useStSl, m_mBool["fIsPrintError"]);
       removeImpossibleStereoSuperlayers(useStSl);
       // Check if number of stereo super layer hits is smaller or equal to 1.
       int nHitSl = (int)useStSl[0]+(int)useStSl[1]+(int)useStSl[2]+(int)useStSl[3];
@@ -523,11 +427,14 @@ namespace Belle2 {
 
       /////////////////////////////////
       // Get MC values for 3D fitter
-      if(m_mBool["fMc"]) getMCValues(&aTrack);
+      if(m_mBool["fMc"]) getMCValues(m_cdc, &aTrack, m_mConstD,  m_mDouble, m_mVector);
       // Get input values for 3D fitter
       // Get event and track ID
       m_mDouble["eventNumber"] = m_cdc.getEventNumber();
       m_mDouble["trackId"] = aTrack.getTrackID();
+
+      ////////////////
+      // Do 2D Fit
       // Get wirePhi, LR, mcLR, Drift information
       m_mVector["wirePhi"] = vector<double> (9);
       m_mVector["lutLR"] = vector<double> (9);
@@ -591,7 +498,6 @@ namespace Belle2 {
         Fitter3DUtility::rPhiFitter(&m_mConstV["rr2D"][0],&m_mVector["phi2D"][0],&m_mVector["phi2DInvError"][0],m_mDouble["rho"], m_mDouble["phi0"],m_mDouble["fit2DChi2"]); 
         m_mDouble["pt"] = 0.3*1.5*m_mDouble["rho"]/100;
       }
-
 
       //////////////////////
       // Start of 3D fitter
@@ -882,7 +788,7 @@ namespace Belle2 {
   }
 
 
-  void TRGCDCFitter3D::getMCValues( TRGCDCTrack* aTrack ){
+  void TRGCDCFitter3D::getMCValues(const TRGCDC & m_cdc, TRGCDCTrack* aTrack, std::map<std::string, double> & m_mConstD, std::map<std::string, double> & m_mDouble, std::map<std::string, std::vector<double> > & m_mVector){
     // Access to track's MC particle.
     const TCRelation & trackRelation = aTrack->relation();
     // Biggest contibutor is 0. Next is 1 and so on.
@@ -1047,7 +953,7 @@ namespace Belle2 {
     return trackFull;
   }
 
-  void TRGCDCFitter3D::findHitAxialSuperlayers( TRGCDCTrack & aTrack,  bool (&useAxSl)[5] ){
+  void TRGCDCFitter3D::findHitAxialSuperlayers( TRGCDCTrack & aTrack,  bool (&useAxSl)[5], bool printError ){
     std::fill_n( useAxSl, 5, 1 );
     for (unsigned iAx = 0; iAx < 5; iAx++) {
       // Check if all superlayers have one TS
@@ -1064,18 +970,18 @@ namespace Belle2 {
         if (nSegments == 0){
           useAxSl[iAx] = 0;
         } else {
-          if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::findHitAxialSuperlayers() => multiple TS are assigned."<<endl;
+          if (printError) cout<<"Fitter3D::findHitAxialSuperlayers() => multiple TS are assigned."<<endl;
         }
       } else {
         if (priorityHitTS == 0) {
           useAxSl[iAx] = 0;
-          if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::findHitAxialSuperlayers() => There are no priority hit TS"<<endl;
+          if (printError) cout<<"Fitter3D::findHitAxialSuperlayers() => There are no priority hit TS"<<endl;
         }
       }
     } // End superlayer loop
   }
 
-  void TRGCDCFitter3D::findHitStereoSuperlayers( TRGCDCTrack & aTrack,  bool (&useStSl)[4] ){
+  void TRGCDCFitter3D::findHitStereoSuperlayers( TRGCDCTrack & aTrack,  bool (&useStSl)[4] , bool printError){
     std::fill_n( useStSl, 4, 1 );
     for (unsigned iSt = 0; iSt < 4; iSt++) {
       // Check if all superlayers have one TS
@@ -1092,12 +998,12 @@ namespace Belle2 {
         if (nSegments == 0){
           useStSl[iSt] = 0;
         } else {
-          if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::findHitStereoSuperlayers() => multiple TS are assigned."<<endl;
+          if (printError) cout<<"Fitter3D::findHitStereoSuperlayers() => multiple TS are assigned."<<endl;
         }
       } else {
         if (priorityHitTS == 0) {
           useStSl[iSt] = 0;
-          if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::findHitStereoSuperlayers() => There are no priority hit TS"<<endl;
+          if (printError) cout<<"Fitter3D::findHitStereoSuperlayers() => There are no priority hit TS"<<endl;
         }
       }
     } // End superlayer loop
@@ -1111,6 +1017,108 @@ namespace Belle2 {
         if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::removeImpossibleStereoSuperlayers() => pt is too low for SL."<<endl;
       }
     } // End superlayer loop
+  }
+
+  int TRGCDCFitter3D::do2DFit( TRGCDCTrack & aTrack, std::map<std::string, bool> & m_mBool, std::map<std::string, double> & m_mConstD, std::map<std::string, std::vector<double> > & m_mConstV, std::map<std::string, double> & m_mDouble, std::map<std::string, std::vector<double> > & m_mVector) {
+    bool useAxSl[5];
+    findHitAxialSuperlayers(aTrack, useAxSl, m_mBool["fIsPrintError"]);
+    // Check if number of axial super layer hits is smaller or equal to 1.
+    int nHitAx = (int)useAxSl[0]+(int)useAxSl[1]+(int)useAxSl[2]+(int)useAxSl[3]+(int)useAxSl[4];
+    if(nHitAx <= 1) {
+      aTrack.setFitted(0);
+      return 1;
+    }
+
+    // Fill information for axial layers
+    m_mVector["wirePhi"] = vector<double> (9);
+    m_mVector["lutLR"] = vector<double> (9);
+    m_mVector["LR"] = vector<double> (9);
+    m_mVector["driftLength"] = vector<double> (9);
+    m_mVector["tdc"] = vector<double> (9);
+    for (unsigned iAx = 0; iAx < 5; iAx++) {
+      if(useAxSl[iAx] == 1) {
+        const vector<TCLink *> & links = aTrack.links(iAx*2);
+        const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
+        m_mVector["wirePhi"][iAx*2] = (double) t_segment->localId()/m_mConstV["nWires"][iAx*2]*4*m_mConstD["Trg_PI"];
+        m_mVector["lutLR"][iAx*2] = t_segment->LUT()->getValue(t_segment->lutPattern());
+        // mcLR should be removed.
+        m_mVector["mcLR"][iAx*2] = t_segment->hit()->mcLR();
+        m_mVector["driftLength"][iAx*2] = t_segment->hit()->drift();
+        m_mVector["tdc"][iAx*2] = t_segment->priorityTime();
+        if(m_mBool["fmcLR"]==1) m_mVector["LR"][iAx*2] = m_mVector["mcLR"][iAx*2];
+        else if(m_mBool["fLRLUT"]==1) m_mVector["LR"][iAx*2] = m_mVector["lutLR"][iAx*2];
+        else m_mVector["LR"][iAx*2] = 3;
+      } else {
+        m_mVector["wirePhi"][iAx*2] = 9999;
+        m_mVector["lutLR"][iAx*2] = 9999;
+        // mcLR should be removed.
+        m_mVector["mcLR"][iAx*2] = 9999;
+        m_mVector["driftLength"][iAx*2] = 9999;
+        m_mVector["tdc"][iAx*2] = 9999;
+        if(m_mBool["fmcLR"]==1) m_mVector["LR"][iAx*2] = 9999;
+        else if(m_mBool["fLRLUT"]==1) m_mVector["LR"][iAx*2] = 9999;
+        else m_mVector["LR"][iAx*2] = 9999;
+      }
+    } // End superlayer loop
+    ////////////////////
+    // Get 2D fit values
+    // Get 2D fit values from IW 2D fitter
+    m_mDouble["phi02D"] = aTrack.helix().phi0();
+    m_mDouble["pt2D"] = aTrack.pt();
+    if(aTrack.charge()<0) {
+      m_mDouble["phi02D"] -= m_mConstD["Trg_PI"];
+      if (m_mDouble["phi02D"] < 0) m_mDouble["phi02D"] += 2 * m_mConstD["Trg_PI"];
+    }
+    m_mDouble["dr2D"] = aTrack.helix().dr()*0.01;
+    // Get 2D fit values from JB 2D fitter
+    // Currently using JB fitter for 3D fitting
+    m_mDouble["charge"] = double(aTrack.charge());
+    // Set phi2DError for 2D fit
+    m_mVector["phi2DError"] = vector<double> (5);
+    for (unsigned iAx = 0; iAx < 5; iAx++) {
+      if(useAxSl[iAx] == 1) {
+        if(m_mVector["LR"][2*iAx] != 3) m_mVector["phi2DError"][iAx] = m_mConstV["driftPhi2DError"][iAx];
+        else m_mVector["phi2DError"][iAx] = m_mConstV["wirePhi2DError"][iAx];
+      } else {
+        m_mVector["phi2DError"][iAx] = 9999;
+      }
+    }
+    // Set invPhi2DError for 2D fit
+    m_mVector["phi2DInvError"] = vector<double> (5);
+    for (unsigned iAx = 0; iAx < 5; iAx++) {
+      if(useAxSl[iAx] == 1) {
+        m_mVector["phi2DInvError"][iAx] = 1/m_mVector["phi2DError"][iAx];
+      } else {
+        m_mVector["phi2DInvError"][iAx] = 0;
+      }
+    }
+    // Calculate phi2D.
+    m_mVector["phi2D"] = vector<double> (5);
+    if (m_mBool["f2DFitDrift"] == 0) {
+      for (unsigned iAx = 0; iAx < 5; iAx++) m_mVector["phi2D"][iAx] = m_mVector["wirePhi"][iAx*2];
+    } else {
+      for (unsigned iAx = 0; iAx < 5; iAx++) {
+        if(useAxSl[iAx] == 1) {
+          m_mVector["phi2D"][iAx] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iAx*2], m_mVector["tdc"][iAx*2], m_mDouble["eventTime"], m_mConstV["rr"][iAx*2], m_mVector["LR"][iAx*2]);
+        } else {
+          m_mVector["phi2D"][iAx] = 9999;
+        }
+      }
+    }
+    // Fit2D
+    if (m_mBool["f2DFit"] == 0) {
+      m_mDouble["rho"] = m_mDouble["pt2D"]/0.01/1.5/0.299792458;
+      m_mDouble["pt"] = 0.299792458*1.5*m_mDouble["rho"]/100;
+      m_mDouble["phi0"] = m_mDouble["phi02D"];
+      m_mDouble["fit2DChi2"] = 9999;
+    } else {
+      m_mDouble["rho"] = 0;
+      m_mDouble["phi0"] = 0;
+      m_mDouble["fit2DChi2"] = 0;
+      Fitter3DUtility::rPhiFitter(&m_mConstV["rr2D"][0],&m_mVector["phi2D"][0],&m_mVector["phi2DInvError"][0],m_mDouble["rho"], m_mDouble["phi0"],m_mDouble["fit2DChi2"]); 
+      m_mDouble["pt"] = 0.3*1.5*m_mDouble["rho"]/100;
+    }
+    return 0;
   }
 
 
@@ -1138,5 +1146,6 @@ namespace Belle2 {
   std::string TRGCDCFitter3D::name(void) const {
     return m_name;
   }
+
 
 } // namespace Belle2

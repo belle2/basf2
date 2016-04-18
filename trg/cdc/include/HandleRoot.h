@@ -32,6 +32,7 @@ namespace HandleRoot{
          std::map<std::string, double> & constMapD, std::map<std::string, std::vector<double> > & constMapV,
          std::map<std::string, double> & trackMapD, std::map<std::string, std::vector<double> > & trackMapV
   );
+  // Requries trackMapD to have key "iSave".
   void saveTrackValues(std::string prefix,
          std::map<std::string, TClonesArray*> & trackMapTVectorD, 
          std::map<std::string, double> & trackMapD, std::map<std::string, std::vector<double> > & trackMapV

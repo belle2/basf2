@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - 2016 Belle II Collaboration                             *
+ * Copyright(C) 2010 - 2016 Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Igal Jaegle                                              *
@@ -233,9 +233,11 @@ namespace Belle2 {
     float Flow[2] = {m_tpc.m_Flow1, 0};
     double ts_start[10];
     double ts_stop[10];
-    for (int i = 0; i < (int)m_tpc.m_timestamp_nb; i++) {
+    for (int i = 0; i < 10; i++) {
       ts_start[i] = 0;
       ts_stop[i] = 0;
+    }
+    for (int i = 0; i < (int)m_tpc.m_timestamp_nb; i++) {
       ts_start[i] = m_tpc.m_timestamp_start[i] - m_inputTimeStampOffset;
       ts_stop[i] = m_tpc.m_timestamp_stop[i] - m_inputTimeStampOffset;
     }
@@ -259,7 +261,7 @@ namespace Belle2 {
     m_eventCount++;
 
     if (m_tpc.m_timestamp_nb > 0)
-      m_exp = TTimeStamp(m_tpc.m_timestamp_start[0]).GetDate();
+      m_exp = TTimeStamp(ts_start[0]).GetDate();
     //cout << m_exp << endl;
     // set event metadata
     evtMetaData->setEvent(m_tpc.m_evtnb);

@@ -50,7 +50,7 @@ namespace Belle2 {
       std::copy(ts_stop, ts_stop + 10, m_ts_stop);
       std::copy(Temperature, Temperature + 4, m_Temperature);
       std::copy(Pressure, Pressure + 4, m_Pressure);
-      std::copy(Flow, Flow + 4, m_Flow);
+      std::copy(Flow, Flow + 2, m_Flow);
     }
 
     /** Return the TPC number */

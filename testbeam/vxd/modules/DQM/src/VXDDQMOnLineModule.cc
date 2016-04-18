@@ -101,166 +101,114 @@ void VXDDQMOnLineModule::defineHisto()
     m_timeVSen[i] = NULL;
   }
 
-  for (int iS = 0; iS < c_MaxSensorsInSVDPlane; iS++) {
-    //----------------------------------------------------------------
-    // Number of fired strips per frame : hFired[U/V][PlaneNo]
-    //----------------------------------------------------------------
-    // Fired strip counts U
-    for (int i = 0; i < c_nSVDPlanes; i++) {
+  for (int i = 0; i < c_nSVDPlanes; i++) {
+    int iPlane = indexToPlane(i);
+    for (int iS = 0; iS < c_MaxSensorsInSVDPlane; iS++) {
+      //----------------------------------------------------------------
+      // Number of fired strips per frame : hFired[U/V][PlaneNo]
+      //----------------------------------------------------------------
+      // Fired strip counts U
       if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      int iPlane = indexToPlane(i);
       string name = str(format("hSVD_L%1%_S%2%_FiredU") % iPlane % (iS + 1));
       string title = str(format("TB2016 SVD Sensor %1% Fired pixels in U, plane %2%") % (iS + 1) % iPlane);
       m_firedUSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
       m_firedUSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("# of fired u strips");
       m_firedUSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("count");
-    }
-    // Fired strip counts V
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      int iPlane = indexToPlane(i);
-      string name = str(format("hSVD_L%2%_S%1%_FiredV") % (iS + 1) % iPlane);
-      string title = str(format("TB2016 SVD Sensor %1% Fired pixels in V, plane %2%") % (iS + 1) % iPlane);
+      // Fired strip counts V
+      name = str(format("hSVD_L%2%_S%1%_FiredV") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% Fired pixels in V, plane %2%") % (iS + 1) % iPlane);
       m_firedVSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
       m_firedVSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("# of fired v strips");
       m_firedVSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("count");
-    }
-    //----------------------------------------------------------------
-    // Number of clusters per frame : hClusters[U/V][PlaneNo]
-    //----------------------------------------------------------------
-    // Number of clusters U
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      int iPlane = indexToPlane(i);
-      string name = str(format("hSVD_L%2%_S%1%_ClustersU") % (iS + 1) % iPlane);
-      string title = str(format("TB2016 SVD Sensor %1% Number of clusters in U, plane %2%") % (iS + 1) % iPlane);
+      //----------------------------------------------------------------
+      // Number of clusters per frame : hClusters[U/V][PlaneNo]
+      //----------------------------------------------------------------
+      // Number of clusters U
+      name = str(format("hSVD_L%2%_S%1%_ClustersU") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% Number of clusters in U, plane %2%") % (iS + 1) % iPlane);
       m_clustersUSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
       m_clustersUSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("# of u clusters");
       m_clustersUSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("count");
-    }
-    // Number of clusters V
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      int iPlane = indexToPlane(i);
-      string name = str(format("hSVD_L%2%_S%1%_ClustersV") % (iS + 1) % iPlane);
-      string title = str(format("TB2016 SVD Sensor %1% Number of clusters in V, plane %2%") % (iS + 1) % iPlane);
+      // Number of clusters V
+      name = str(format("hSVD_L%2%_S%1%_ClustersV") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% Number of clusters in V, plane %2%") % (iS + 1) % iPlane);
       m_clustersVSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
       m_clustersVSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("# of v clusters");
       m_clustersVSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("count");
-    }
-    //----------------------------------------------------------------
-    // Hitmaps: Number of clusters by coordinate : hHitmap[U/V][PlaneNo]
-    //----------------------------------------------------------------
-    // Hitmaps in U
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      int iPlane = indexToPlane(i);
-      string name = str(format("hSVD_L%2%_S%1%_HitmapU") % (iS + 1) % iPlane);
-      string title = str(format("TB2016 SVD Sensor %1% Hitmap in U, plane %2%") % (iS + 1) % iPlane);
+      //----------------------------------------------------------------
+      // Hitmaps: Number of clusters by coordinate : hHitmap[U/V][PlaneNo]
+      //----------------------------------------------------------------
+      // Hitmaps in U
+      name = str(format("hSVD_L%2%_S%1%_HitmapU") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% Hitmap in U, plane %2%") % (iS + 1) % iPlane);
       int nStrips = getInfo(i, iS + 1).getUCells();
       m_hitMapUSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), nStrips, 0, nStrips);
       m_hitMapUSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("u position [pitch units]");
       m_hitMapUSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("hits");
-    }
-    // Hitmaps in V
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      int iPlane = indexToPlane(i);
-      string name = str(format("hSVD_L%2%_S%1%_HitmapV") % (iS + 1) % iPlane);
-      string title = str(format("TB2016 SVD Sensor %1% Hitmap in V, plane %2%") % (iS + 1) % iPlane);
-      int nStrips = getInfo(i, iS + 1).getVCells();
+      // Hitmaps in V
+      name = str(format("hSVD_L%2%_S%1%_HitmapV") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% Hitmap in V, plane %2%") % (iS + 1) % iPlane);
+      nStrips = getInfo(i, iS + 1).getVCells();
       m_hitMapVSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), nStrips, 0, nStrips);
       m_hitMapVSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("v position [pitch units]");
       m_hitMapVSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("hits");
-    }
-    //----------------------------------------------------------------
-    // Charge of clusters : hClusterCharge[U/V][PlaneNo]
-    //----------------------------------------------------------------
-    // u charge by plane
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      int iPlane = indexToPlane(i);
-      string name = str(format("hSVD_L%2%_S%1%_ClusterChargeU") % (iS + 1) % iPlane);
-      string title = str(format("TB2016 SVD Sensor %1% cluster charge in U, plane %2%") % (iS + 1) % iPlane);
+      //----------------------------------------------------------------
+      // Charge of clusters : hClusterCharge[U/V][PlaneNo]
+      //----------------------------------------------------------------
+      // u charge by plane
+      name = str(format("hSVD_L%2%_S%1%_ClusterChargeU") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% cluster charge in U, plane %2%") % (iS + 1) % iPlane);
       m_chargeUSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
       m_chargeUSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("charge of u clusters [ADU]");
       m_chargeUSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("count");
-    }
-    // v charge by plane
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      int iPlane = indexToPlane(i);
-      string name = str(format("hSVD_L%2%_S%1%_ClusterChargeV") % (iS + 1) % iPlane);
-      string title = str(format("TB2016 SVD Sensor %1% cluster charge in V, plane %2%") % (iS + 1) % iPlane);
+      // v charge by plane
+      name = str(format("hSVD_L%2%_S%1%_ClusterChargeV") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% cluster charge in V, plane %2%") % (iS + 1) % iPlane);
       m_chargeVSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
       m_chargeVSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("charge of v clusters [ADU]");
       m_chargeVSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("count");
-    }
-    //----------------------------------------------------------------
-    // Cluster seed charge distribution : hSeedCharge[U/V][PlaneNo]
-    //----------------------------------------------------------------
-    // u seed by plane
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      int iPlane = indexToPlane(i);
-      string name = str(format("hSVD_L%2%_S%1%_SeedU") % (iS + 1) % iPlane);
-      string title = str(format("TB2016 SVD Sensor %1% seed charge in U, plane %2%") % (iS + 1) % iPlane);
+      //----------------------------------------------------------------
+      // Cluster seed charge distribution : hSeedCharge[U/V][PlaneNo]
+      //----------------------------------------------------------------
+      // u seed by plane
+      name = str(format("hSVD_L%2%_S%1%_SeedU") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% seed charge in U, plane %2%") % (iS + 1) % iPlane);
       m_seedUSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
       m_seedUSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("seed charge of u clusters [ADU]");
       m_seedUSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("count");
-    }
-    // v seed by plane
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      int iPlane = indexToPlane(i);
-      string name = str(format("hSVD_L%2%_S%1%_SeedV") % (iS + 1) % iPlane);
-      string title = str(format("TB2016 SVD Sensor %1% seed charge in V, plane %2%") % (iS + 1) % iPlane);
+      // v seed by plane
+      name = str(format("hSVD_L%2%_S%1%_SeedV") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% seed charge in V, plane %2%") % (iS + 1) % iPlane);
       m_seedVSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
       m_seedVSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("seed charge of v clusters [ADU]");
       m_seedVSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("count");
-    }
-    //----------------------------------------------------------------
-    // Cluster size distribution : hClusterSize[U/V][PlaneNo]
-    //----------------------------------------------------------------
-    // u size by plane
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      int iPlane = indexToPlane(i);
-      string name = str(format("hSVD_L%2%_S%1%_ClusterSizeU") % (iS + 1) % iPlane);
-      string title = str(format("TB2016 SVD Sensor %1% cluster size in U, plane %2%") % (iS + 1) % iPlane);
+      //----------------------------------------------------------------
+      // Cluster size distribution : hClusterSize[U/V][PlaneNo]
+      //----------------------------------------------------------------
+      // u size by plane
+      name = str(format("hSVD_L%2%_S%1%_ClusterSizeU") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% cluster size in U, plane %2%") % (iS + 1) % iPlane);
       m_sizeUSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
       m_sizeUSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("size of u clusters");
       m_sizeUSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("count");
-    }
-    // v size by plane
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      int iPlane = indexToPlane(i);
-      string name = str(format("hSVD_L%2%_S%1%_ClusterSizeV") % (iS + 1) % iPlane);
-      string title = str(format("TB2016 SVD Sensor %1% cluster size in V, plane %2%") % (iS + 1) % iPlane);
+      // v size by plane
+      name = str(format("hSVD_L%2%_S%1%_ClusterSizeV") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% cluster size in V, plane %2%") % (iS + 1) % iPlane);
       m_sizeVSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
       m_sizeVSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("size of v clusters");
       m_sizeVSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("count");
-    }
-    //----------------------------------------------------------------
-    // Cluster time distribution : hClusterTime[U/V][PlaneNo]
-    //----------------------------------------------------------------
-    // u time by plane
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      int iPlane = indexToPlane(i);
-      string name = str(format("hSVD_L%2%_S%1%_ClusterTimeU") % (iS + 1) % iPlane);
-      string title = str(format("TB2016 SVD Sensor %1% cluster time in U, plane %2%") % (iS + 1) % iPlane);
+      //----------------------------------------------------------------
+      // Cluster time distribution : hClusterTime[U/V][PlaneNo]
+      //----------------------------------------------------------------
+      // u time by plane
+      name = str(format("hSVD_L%2%_S%1%_ClusterTimeU") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% cluster time in U, plane %2%") % (iS + 1) % iPlane);
       m_timeUSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 50, -50, 150);
       m_timeUSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("time of u clusters [ns]");
       m_timeUSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("count");
-    }
-    // v time by plane
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      int iPlane = indexToPlane(i);
-      string name = str(format("hSVD_L%2%_S%1%_ClusterTimeV") % (iS + 1) % iPlane);
-      string title = str(format("TB2016 SVD Sensor %1% cluster time in V, plane %2%") % (iS + 1) % iPlane);
+      // v time by plane
+      name = str(format("hSVD_L%2%_S%1%_ClusterTimeV") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% cluster time in V, plane %2%") % (iS + 1) % iPlane);
       m_timeVSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 50, -50, 150);
       m_timeVSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("time of v clusters [ns]");
       m_timeVSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("count");

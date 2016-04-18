@@ -65,6 +65,8 @@ namespace Belle2 {
              "List of files with measured beam background ");
     addParam("inputTPCNumber", m_inputTPCNumber,
              "TPC number tree readout");
+    addParam("inputTimeStampOffset", m_inputTimeStampOffset,
+             "Time stamp offset if any");
 
     // initialize other private data members
     m_file = NULL;
@@ -231,7 +233,7 @@ namespace Belle2 {
     float Flow[2] = {m_tpc.m_Flow1, 0};
 
     microtpcMetaHits.appendNew(MicrotpcMetaHit(detNb, m_tpc.m_pxhits,
-                                               m_tpc.m_timestamp_nb, m_tpc.m_timestamp_start, m_tpc.m_timestamp_stop,
+                                               m_tpc.m_timestamp_nb, m_tpc.m_timestamp_start - m_inputTimeStampOffset, m_tpc.m_timestamp_stop - m_inputTimeStampOffset,
                                                m_tpc.m_Temperature, Pressure, Flow, m_tpc.m_SetFlow, m_tpc.m_GetFlow,
                                                m_tpc.m_IHER, m_tpc.m_PHER, m_tpc.m_tauHER, m_tpc.m_flagHER,
                                                m_tpc.m_ILER, m_tpc.m_PLER, m_tpc.m_tauLER, m_tpc.m_flagLER));
@@ -253,7 +255,7 @@ namespace Belle2 {
       m_exp = TTimeStamp(m_tpc.m_timestamp_start[0]).GetDate();
     //cout << m_exp << endl;
     // set event metadata
-    evtMetaData->setEvent(m_tpc.m_pxhits);
+    evtMetaData->setEvent(m_tpc.m_evtnb);
     evtMetaData->setRun(Fname.Atof());
     evtMetaData->setExperiment(m_exp);
 

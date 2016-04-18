@@ -76,7 +76,7 @@ namespace Belle2 {
     TChain* m_tree = 0;            /**< tree pointer */
     std::string m_inputFileName;  /**< input file name */
     int m_inputTPCNumber;         /**<input TPC number readout */
-
+    double m_inputTimeStampOffset; /**<input time stamp offset */
     TFile* m_file;        /**< TFile */
     TTree* m_treeTpc;     /**< TTree data tpc */
     TTree* m_treeTpcPar;  /**< TTree tpc parameters */

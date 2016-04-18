@@ -231,9 +231,16 @@ namespace Belle2 {
     }
     float Pressure[2] = {m_tpc.m_Pressure1, m_tpc.m_Pressure2};
     float Flow[2] = {m_tpc.m_Flow1, 0};
-
+    double ts_start[10];
+    double ts_stop[10];
+    for (int i = 0; i < (int)m_tpc.m_timestamp_nb; i++) {
+      ts_start[i] = 0;
+      ts_stop[i] = 0;
+      ts_start[i] = m_tpc.m_timestamp_start[i] - m_inputTimeStampOffset;
+      ts_stop[i] = m_tpc.m_timestamp_stop[i] - m_inputTimeStampOffset;
+    }
     microtpcMetaHits.appendNew(MicrotpcMetaHit(detNb, m_tpc.m_pxhits,
-                                               m_tpc.m_timestamp_nb, m_tpc.m_timestamp_start - m_inputTimeStampOffset, m_tpc.m_timestamp_stop - m_inputTimeStampOffset,
+                                               m_tpc.m_timestamp_nb, ts_start, ts_stop,
                                                m_tpc.m_Temperature, Pressure, Flow, m_tpc.m_SetFlow, m_tpc.m_GetFlow,
                                                m_tpc.m_IHER, m_tpc.m_PHER, m_tpc.m_tauHER, m_tpc.m_flagHER,
                                                m_tpc.m_ILER, m_tpc.m_PLER, m_tpc.m_tauLER, m_tpc.m_flagLER));

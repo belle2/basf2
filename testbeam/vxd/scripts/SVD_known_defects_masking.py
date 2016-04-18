@@ -105,7 +105,7 @@ def hasNumbers(inputString):
 def print_header(output):
     output.write('<?xml version="1.0" encoding="UTF-8"?>\n')
     output.write('<Meta>\n')
-    output.write('\t<Date>' + time.strftime("%d/%m/%Y") + '<\Date>\n')
+    output.write('\t<Date>' + time.strftime("%d/%m/%Y") + '</Date>\n')
     output.write('\t<Description short=\"Ignore strips list for SVD planes in 2016 VXD TB\">\n')
     output.write('\t\tList of known strip defects from layers groups\n')
     output.write('\t</Description>\n')

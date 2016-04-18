@@ -265,6 +265,9 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
     //     err_flag = 1;
     //     }
     //   }
+  } else {
+    printf("[INFO] New run started. cur run %.8x prev. run %.8x cur eve %.8x prev eve %8.x\n",
+           *cur_exprunsubrun_no, prev_exprunsubrun_no , *cur_evenum_rawcprhdr, prev_evenum);
   }
 
 

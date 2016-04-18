@@ -36,18 +36,37 @@
 using namespace std;
 using namespace Belle2;
 
-void CDCDatabaseImporter::importTimeZero()
+void CDCDatabaseImporter::importTimeZero(std::string fileName)
 {
-  DBImportArray<CDCTimeZero> tz;
-  for (int cl = 0; cl < 56; ++cl) {
-    for (int w = 0; w < 384; ++w) {
-      int sl = cl > 7 ? static_cast<int>((cl - 8) / 6) + 1 : 0;
-      int l = cl > 7 ? static_cast<int>((cl - 8) % 6) : cl;
-      const WireID wire = WireID(sl, l, w);
-      const float t0 = m_cdcgp.getT0(wire);
-      tz.appendNew(wire, t0);
-    }
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2ERROR("openFile: " << fileName << " *** failed to open");
+    return;
   }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportArray<CDCTimeZero> tz;
+
+  int iL(0);
+  int iC(0);
+  float t0(0.);
+  int nRead(0);
+
+  while (true) {
+    stream >> iL >> iC >> t0;
+    if (stream.eof()) break;
+    ++nRead;
+    WireID wire(iL, iC);
+    tz.appendNew(wire, t0);
+    //      if (m_debug) {
+    //  std::cout << iL << " " << iC << " " << t0 << std::endl;
+    //      }
+  }
+  stream.close();
+
+  if (nRead != nSenseWires) B2FATAL("#lines read-in (=" << nRead << ") is inconsistent with total #sense wires (=" << nSenseWires <<
+                                      ") !");
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
@@ -56,6 +75,7 @@ void CDCDatabaseImporter::importTimeZero()
   B2RESULT("Time zero table imported to database.");
 
 }
+
 void CDCDatabaseImporter::importChannelMap(std::string fileName)
 {
   std::ifstream stream;

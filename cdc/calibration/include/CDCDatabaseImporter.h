@@ -59,7 +59,7 @@ namespace Belle2 {
     /**
      * Import t0 table to the data base.
      */
-    void importTimeZero();
+    void importTimeZero(std::string fileName);
     /**
      * Get the t0 table from the database and
      * print it.

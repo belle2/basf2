@@ -2,8 +2,6 @@
 
 using namespace Belle2;
 
-ClassImp(CDCTriggerMLPData);
-
 void
 CDCTriggerMLPData::addHit(unsigned iSL, int iTS)
 {

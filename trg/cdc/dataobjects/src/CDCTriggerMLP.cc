@@ -3,21 +3,19 @@
 
 using namespace Belle2;
 
-ClassImp(CDCTriggerMLP);
-
 CDCTriggerMLP::CDCTriggerMLP():
-  nNodes({27, 27, 2}), targetVars(3), outputScale({ -1., 1., -1., 1.}),
-  phiRange({0., 2. * M_PI}), invptRange({ -5., 5.}), thetaRange({0., M_PI}),
+  nNodes{27, 27, 2}, targetVars(3), outputScale{ -1., 1., -1., 1.},
+  phiRange{0., 2. * M_PI}, invptRange{ -5., 5.}, thetaRange{0., M_PI},
   maxHitsPerSL(1), SLpattern(0), SLpatternMask(0), tMax(256),
-  relevantID({ -1., 1.,
-               -10., 1.,
-               -1., 1.,
-               -1., 10.,
-               -1., 1.,
-               -10.5, 1.,
-               -1., 1.,
-               -1., 11.,
-               -1., 1.})
+  relevantID{ -1., 1.,
+              -10., 1.,
+              -1., 1.,
+              -1., 10.,
+              -1., 1.,
+              -10.5, 1.,
+              -1., 1.,
+              -1., 11.,
+              -1., 1.}
 {
   weights.assign(nWeightsCal(), 0.);
 }
@@ -36,15 +34,15 @@ CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short> nNodes,
   phiRange(phiRange), invptRange(invptRange), thetaRange(thetaRange),
   maxHitsPerSL(maxHits), SLpattern(SLpattern), SLpatternMask(SLpatternMask),
   tMax(tMax),
-  relevantID({ -1., 1.,
-               -10., 1.,
-               -1., 1.,
-               -1., 10.,
-               -1., 1.,
-               -10.5, 1.,
-               -1., 1.,
-               -1., 11.,
-               -1., 1.})
+  relevantID{ -1., 1.,
+              -10., 1.,
+              -1., 1.,
+              -1., 10.,
+              -1., 1.,
+              -10.5, 1.,
+              -1., 1.,
+              -1., 11.,
+              -1., 1.}
 {
   weights.assign(nWeightsCal(), 0.);
 }

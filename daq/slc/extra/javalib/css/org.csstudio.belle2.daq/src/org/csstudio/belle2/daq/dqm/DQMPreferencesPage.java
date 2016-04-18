@@ -1,5 +1,6 @@
 package org.csstudio.belle2.daq.dqm;
 
+import org.csstudio.opibuilder.preferences.StringTableFieldEditor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;

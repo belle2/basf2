@@ -17,7 +17,6 @@ import org.belle2.daq.nsm.NSMRequestHandler;
 import org.belle2.daq.nsm.NSMVar;
 import org.csstudio.opibuilder.preferences.StringTableFieldEditor;
 import org.csstudio.security.SecuritySupport;
-import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.epics.pvmanager.ChannelHandler;

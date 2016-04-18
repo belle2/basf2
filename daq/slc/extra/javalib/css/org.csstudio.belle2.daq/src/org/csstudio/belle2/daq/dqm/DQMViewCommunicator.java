@@ -10,7 +10,6 @@ import org.belle2.daq.dqm.Histo;
 import org.belle2.daq.dqm.Histo1F;
 import org.belle2.daq.dqm.Histo2F;
 import org.belle2.daq.io.SocketDataReader;
-import org.belle2.daq.nsm.NSMCommunicator;
 import org.csstudio.opibuilder.preferences.StringTableFieldEditor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
@@ -64,13 +63,25 @@ public class DQMViewCommunicator extends Thread {
 		return null;
 	}
 
-	public static void startDQM() {
+	public static void startDQM() throws Exception {
 		if (g_store.isEmpty()) {
 			final IPreferencesService prefs = Platform.getPreferencesService();
-			final String host = prefs.getString(DQMViewDataSource.PLUGIN_ID, PreferenceConstants.HOST, "localhost", null);
-			final Integer port = prefs.getInt(DQMViewDataSource.PLUGIN_ID, PreferenceConstants.PORT, 9090, null);
-			g_store.init(host, port, "");
-			g_store.start();
+			final String s = prefs.getString(DQMViewDataSource.PLUGIN_ID, PreferenceConstants.DQM, "belle-dqm.desy.de,50100", null);
+			synchronized (g_store) {
+				List<String[]> ss = StringTableFieldEditor.decodeStringTable(s);
+				for (String[] cs : ss) {
+					try {
+						String host = cs[0];
+						int port = Integer.parseInt(cs[1]);
+						DQMViewCommunicator com = new DQMViewCommunicator();
+						com.init(host, port, "");
+						com.start();
+						g_store.add(com);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 	}
 

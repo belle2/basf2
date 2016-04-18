@@ -26,7 +26,12 @@ public class DQMCanvasEditPart extends AbstractWidgetEditPart {
 
 	@Override
 	protected IFigure doCreateFigure() {
-		DQMViewCommunicator.startDQM();
+		try {
+			DQMViewCommunicator.startDQM();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		DQMCanvasFigure figure = new DQMCanvasFigure();
 		figure.setCanvasFillColor(getWidgetModel().getCanvasFillColor());
 		figure.setCanvasLineColor(getWidgetModel().getCanvasLineColor());

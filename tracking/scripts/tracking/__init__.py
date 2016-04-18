@@ -47,8 +47,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
         path.add_module(geometry)
 
     # Material effects for all track extrapolations
-    material_effects = register_module('SetupGenfitExtrapolation')
-    path.add_module(material_effects)
+    if 'SetupGenfitExtrapolation' not in path:
+        material_effects = register_module('SetupGenfitExtrapolation')
+        path.add_module(material_effects)
 
     if mcTrackFinding:
         add_mc_track_finding(path, components)

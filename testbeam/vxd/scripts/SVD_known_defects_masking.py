@@ -22,11 +22,43 @@ from os import listdir
 from os.path import isfile, join
 
 
+def get_list_of_defects(filename):
+
+    with open(filename, 'rt') as q:
+        reader3 = csv.reader(q, delimiter=',')
+
+        # look for row with defects types
+        for row in reader3:
+            if row and 'strip number' in row[0]:
+                defects_list_raw = row
+                break
+
+    list_of_defects = []
+    for cell in defects_list_raw:
+        head = cell[1:3]
+        # if head == 'p_' or head == 'n_': # then it's a defect type string
+        list_of_defects.append(cell[3:])  # remove 'n_' from string
+    return list_of_defects
+
+
+def get_defect_type(row, list_of_defects):
+
+    for i, cell in enumerate(row):
+
+        if i > 1 and '1' in cell:
+            index = i
+            break
+
+    type = list_of_defects[index]
+
+    return type
+
+
 def from_num_to_label(i, j):
     Labels = [
         ['fw', 'bw'],
         ['fw', '-z', 'bw'],
-        ['fw', '+z', '-z', 'bw'],
+        ['fw', 'ce', '-z', 'bw'],
         ['fw', '+z', 'ce', '-z', 'bw']
     ]
 
@@ -49,10 +81,9 @@ def update_z_filenames(path):
                     b = 0
                     # look for row just before sensor type specification
                     for i, row in enumerate(reader2):
-                        if row:
-                            if 'tags' in row[0]:
-                                b = i
-                                break
+                        if row and 'tags' in row[0]:
+                            b = i
+                            break
                     # then get z type
                     for i, row in enumerate(reader2):
                         if row:
@@ -71,16 +102,15 @@ def hasNumbers(inputString):
     return any(char.isdigit() for char in inputString)
 
 
-def print_header(f, i):
-    f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-    f.write('<Meta>\n')
-    f.write('\t<Date>' + time.strftime("%d/%m/%Y") + '<\Date>\n')
-    f.write('\t<Description short=\"Ignore strips list for SVD plane #' +
-            str(i) + ' in 2016 VXD TB\">\n')
-    f.write('\t\tList of known strip defects from layer' + str(i) + ' group\n')
-    f.write('\t</Description>\n')
-    f.write('\t<Author>Giacomo Caria</Author>\n')
-    f.write('</Meta>\n')
+def print_header(output):
+    output.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+    output.write('<Meta>\n')
+    output.write('\t<Date>' + time.strftime("%d/%m/%Y") + '<\Date>\n')
+    output.write('\t<Description short=\"Ignore strips list for SVD planes in 2016 VXD TB\">\n')
+    output.write('\t\tList of known strip defects from layers groups\n')
+    output.write('\t</Description>\n')
+    output.write('\t<Author>Giacomo Caria</Author>\n')
+    output.write('</Meta>\n')
     return
 
 
@@ -118,11 +148,13 @@ def get_filename(i, j, k, path_layer):
 
 def print_file_content(filename, f):
 
+    list_of_defects = get_list_of_defects(filename)
+
     with open(filename, 'rt') as x:
         reader = csv.reader(x, delimiter=',')
         a = 0
 
-        # look for row just before strip numbers
+        # look for row jusskDirectoryPatht before strip numbers
         for i, row in enumerate(reader):
             if row:
                 if 'strip number' in row[0]:
@@ -132,8 +164,18 @@ def print_file_content(filename, f):
         # get strip numbers, enumerate now starts from 'strip number' row
         for j, rows in enumerate(reader):
             if rows and hasNumbers(rows[0]):
+
+                # don't include strips with Particle_Resp defect, they are
+                # false defects
+                if 'Particle_Resp' in get_defect_type(rows, list_of_defects):
+                    continue
+
                 f.write('\t\t\t\t\t<strip stripNo = \"' +
-                        re.findall(r'\d+', rows[0])[0] + '\"><strip>\n')  # strip number cell might contain spaces
+                        re.findall(r'\d+', rows[0])[0] + '\"></strip>\n')  # strip number cell might contain spaces
+                # if also want to include defect type do something like
+                # f.write('\t\t\t\t\t<strip stripNo = \"' +
+                #        re.findall(r'\d+', rows[0])[0] + ', ' +
+                #        get_defect_type(rows,list_of_defects) + '\"><strip>\n')  # strip number cell might contain spaces
             else:
                 if rows and 'parameter' in rows[0]:
                     break  # stop when we hit the 'parameters' row, strip numbers have finished
@@ -149,19 +191,21 @@ def main():
     # rename z files with appropriate '+z' or '-z' labels
     update_z_filenames(path)
 
+    # open file
+    output = 'SVD_MaskListKnownDefects.xml'
+    f = open(output, 'w')
+
+    print_header(f)
+
+    f.write('<SVD>\n')
+
     for i in range(3, 7):  # loop on layers
+
+        f.write('\t<layer n=\"' + str(i) + '\">\n')
+        f.write('\t\t<ladder n=\"' + str(1) + '\">\n')
 
         # specify path to look for xml files
         path_layer = path + '/L' + str(i) + '/'
-        # open file
-        output = 'SVD' + str(i) + '_MaskListKnownDefects.xml'
-        f = open(output, 'w')
-
-        print_header(f, i)
-
-        f.write('<SVD>\n')
-        f.write('\t<layer n=\"' + str(i) + '\">\n')
-        f.write('\t\t<ladder n=\"' + str(1) + '\">\n')
 
         for j in range(1, i):  # loop on sensors
             # if needed file is not found, continue
@@ -183,6 +227,7 @@ def main():
                           np_side[k] + ', not found. Moving on ..')
                     continue
                 else:  # file has been found
+
                     print('Found file: ' + filename)
                     f.write('\t\t\t\t<side side=\"' + uv_side[k] + '\">\n')
                     print_file_content(filename, f)
@@ -192,7 +237,7 @@ def main():
 
         f.write('\t\t</ladder>\n')
         f.write('\t</layer>\n')
-        f.write('</SVD>\n')
+    f.write('</SVD>\n')
     return
 
 if __name__ == '__main__':

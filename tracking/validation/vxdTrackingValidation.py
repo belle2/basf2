@@ -31,6 +31,13 @@ class VXD(TrackingValidationRun):
     finder_module = staticmethod(lambda path: tracking.add_vxd_track_finding(path, components=["PXD", "SVD"]))
 
     fit_geometry = "default"
+
+    tracking_coverage = {
+        'UsePXDHits': True,
+        'UseSVDHits': True,
+        'UseCDCHits': False,
+    }
+
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE
 

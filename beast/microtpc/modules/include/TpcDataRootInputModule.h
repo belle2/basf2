@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010 - 2016 Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Igal Jaegle                                              *
@@ -20,7 +20,7 @@
 namespace Belle2 {
 
   /**
-   * Intput of LEPS 2013 test beam data from a specific root ntuple ("top tree")
+   * Intput of TPC data from a specific root ntuple ("Data_TPC tree")
    */
   class TpcDataRootInputModule : public Module {
 

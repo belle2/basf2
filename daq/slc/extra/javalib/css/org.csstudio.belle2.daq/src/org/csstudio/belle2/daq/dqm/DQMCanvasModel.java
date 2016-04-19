@@ -27,6 +27,12 @@ public class DQMCanvasModel extends AbstractContainerModel {
 	public static final String legendLineColor = "legendLineColor";
 	public static final String padFillColor = "padFillColor";
 	public static final String padLineColor = "padLineColor";
+	public static final String padLogX = "padLogX";
+	public static final String padLogY = "padLogY";
+	public static final String padMinY = "padMinY";
+	public static final String padMaxY = "padMaxY";
+	public static final String padMinZ = "padMinZ";
+	public static final String padMaxZ = "padMaxZ";
 	public static final String histUseFillColor = "histUseFillColor";
 	public static final String histFillColor = "histFillColor";
 	public static final String histUseLineColor = "histUseLineColor";
@@ -83,6 +89,12 @@ public class DQMCanvasModel extends AbstractContainerModel {
 		addProperty(new ColorProperty(canvasLineColor, "Line Color", Canvas, new RGB(0, 0, 0)));
 		addProperty(new ColorProperty(padFillColor, "Fill Color", Pad, new RGB(255, 255, 255)));
 		addProperty(new ColorProperty(padLineColor, "Line Color", Pad, new RGB(0, 0, 0)));
+		addProperty(new BooleanProperty(padLogX, "X Log scale", Pad, false));
+		addProperty(new BooleanProperty(padLogY, "Y Log scale", Pad, false));
+		addProperty(new DoubleProperty(padMinY, "Y Minimum", Pad, -1));
+		addProperty(new DoubleProperty(padMaxY, "Y Maximum", Pad, -1));
+		addProperty(new DoubleProperty(padMinZ, "Z Minimum", Pad, -1));
+		addProperty(new DoubleProperty(padMaxZ, "Z Maximum", Pad, -1));
 		for (int n = 0; n < maxhists; n++) {
 			WidgetPropertyCategory category = createHistoPropertyCategory(n);
 			addProperty(new BooleanProperty(histUseFillColor + n, "Use Fill Color", category, false));
@@ -143,6 +155,30 @@ public class DQMCanvasModel extends AbstractContainerModel {
 
 	public OPIColor getPadLineColor() {
 		return getCastedPropertyValue(padLineColor);
+	}
+
+	public boolean getPadLogX() {
+		return getCastedPropertyValue(padLogX);
+	}
+
+	public boolean getPadLogY() {
+		return getCastedPropertyValue(padLogY);
+	}
+
+	public double getPadMinY() {
+		return getCastedPropertyValue(padMinY);
+	}
+
+	public double getPadMaxY() {
+		return getCastedPropertyValue(padMaxY);
+	}
+
+	public double getPadMinZ() {
+		return getCastedPropertyValue(padMinZ);
+	}
+
+	public double getPadMaxZ() {
+		return getCastedPropertyValue(padMaxZ);
 	}
 
 	public OPIColor getHistFillColor(int n) {

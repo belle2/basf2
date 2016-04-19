@@ -124,6 +124,57 @@ public class DQMCanvasFigure extends Figure {
 		hcanvas.getPad().setLineColor(new HtmlColor(rgb.red, rgb.green, rgb.blue));
 	}
 
+	public void setPadLogX(boolean logx) {
+		hcanvas.getAxisX().setLogScale(logx);
+	}
+
+	public void setPadLogY(boolean logy) {
+		hcanvas.getAxisY().setLogScale(logy);
+	}
+
+	public void setPadMinY(double min) {
+		if (min > 0 && min < hcanvas.getAxisY().getMax()) {
+			hcanvas.getAxisY().setFixedMin(false);
+			hcanvas.getAxisY().setMin(min);
+			hcanvas.getAxisY().setFixedMin(true);
+		} else {
+			hcanvas.getAxisY().setFixedMin(false);
+		}
+	}
+
+	public void setPadMaxY(double max) {
+		if (max > 0 && max > hcanvas.getAxisY().getMin()) {
+			hcanvas.getAxisY().setFixedMax(false);
+			hcanvas.getAxisY().setMax(max);
+			hcanvas.getAxisY().setFixedMax(true);
+		} else {
+			hcanvas.getAxisY().setFixedMax(false);
+		}
+	}
+
+	public void setPadMinZ(double min) {
+		if (hcanvas.getColorAxis() == null) return;
+		if (min > 0 && min < hcanvas.getColorAxis().getMax()) {
+			hcanvas.getColorAxis().setFixedMin(false);
+			hcanvas.getColorAxis().setMin(min);
+			hcanvas.getColorAxis().setFixedMin(true);
+		} else {
+			hcanvas.getColorAxis().setFixedMin(false);
+		}
+	}
+	
+	public void setPadMaxZ(double max) {
+		if (hcanvas.getColorAxis() == null) return;
+		if (max > 0 && max > hcanvas.getColorAxis().getMin()) {
+			hcanvas.getColorAxis().setFixedMax(false);
+			hcanvas.getColorAxis().setMax(max);
+			hcanvas.getColorAxis().setFixedMax(true);
+		} else {
+			hcanvas.getColorAxis().setFixedMax(false);
+		}
+	}
+
+
 	public void setLegendFillColor(OPIColor color) {
 		if (hcanvas.getLegend() != null) {
 			RGB rgb = color.getRGBValue();

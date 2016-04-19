@@ -85,15 +85,15 @@ public class Axis {
     }
 
     public void setMax(double max) {
-        //if (!fixedMax) {
+        if (!fixedMax) {
             this.max = max;
-        //}
+        }
     }
 
     public void setMin(double min) {
-        //if (!fixedMin) {
+        if (!fixedMin) {
             this.min = min;
-        //}
+        }
     }
 
     public void setTitle(String label) {

@@ -45,6 +45,12 @@ public class DQMCanvasEditPart extends AbstractWidgetEditPart {
 		figure.addMouseListener(listener);
 		figure.addMouseMotionListener(listener);
 		figure.setToolTip(handler);
+		figure.setPadLogX(getWidgetModel().getPadLogX());
+		figure.setPadLogY(getWidgetModel().getPadLogY());
+		figure.setPadMinY(getWidgetModel().getPadMinY());
+		figure.setPadMaxY(getWidgetModel().getPadMaxY());
+		figure.setPadMinZ(getWidgetModel().getPadMinZ());
+		figure.setPadMaxZ(getWidgetModel().getPadMaxZ());
 
 		return figure;
 	}
@@ -177,6 +183,66 @@ public class DQMCanvasEditPart extends AbstractWidgetEditPart {
 					return false;
 				DQMCanvasFigure dqm = ((DQMCanvasFigure) figure);
 				dqm.setPadFillColor((OPIColor) newValue);
+				dqm.update();
+				return false;
+			}
+		});
+		setPropertyChangeHandler(DQMCanvasModel.padLogX, new IWidgetPropertyChangeHandler() {
+			public boolean handleChange(final Object oldValue, final Object newValue, final IFigure figure) {
+				if (newValue == null)
+					return false;
+				DQMCanvasFigure dqm = ((DQMCanvasFigure) figure);
+				dqm.getHistoCanvas().getAxisX().setLogScale((Boolean)newValue);
+				dqm.update();
+				return false;
+			}
+		});
+		setPropertyChangeHandler(DQMCanvasModel.padLogY, new IWidgetPropertyChangeHandler() {
+			public boolean handleChange(final Object oldValue, final Object newValue, final IFigure figure) {
+				if (newValue == null)
+					return false;
+				DQMCanvasFigure dqm = ((DQMCanvasFigure) figure);
+				dqm.getHistoCanvas().getAxisY().setLogScale((Boolean)newValue);
+				dqm.update();
+				return false;
+			}
+		});
+		setPropertyChangeHandler(DQMCanvasModel.padMinY, new IWidgetPropertyChangeHandler() {
+			public boolean handleChange(final Object oldValue, final Object newValue, final IFigure figure) {
+				if (newValue == null)
+					return false;
+				DQMCanvasFigure dqm = ((DQMCanvasFigure) figure);
+				dqm.setPadMinY((Double)newValue);
+				dqm.update();
+				return false;
+			}
+		});
+		setPropertyChangeHandler(DQMCanvasModel.padMaxY, new IWidgetPropertyChangeHandler() {
+			public boolean handleChange(final Object oldValue, final Object newValue, final IFigure figure) {
+				if (newValue == null)
+					return false;
+				DQMCanvasFigure dqm = ((DQMCanvasFigure) figure);
+				dqm.setPadMaxY((Double)newValue);
+				dqm.update();
+				return false;
+			}
+		});
+		setPropertyChangeHandler(DQMCanvasModel.padMinZ, new IWidgetPropertyChangeHandler() {
+			public boolean handleChange(final Object oldValue, final Object newValue, final IFigure figure) {
+				if (newValue == null)
+					return false;
+				DQMCanvasFigure dqm = ((DQMCanvasFigure) figure);
+				dqm.setPadMinZ((Double)newValue);
+				dqm.update();
+				return false;
+			}
+		});
+		setPropertyChangeHandler(DQMCanvasModel.padMaxZ, new IWidgetPropertyChangeHandler() {
+			public boolean handleChange(final Object oldValue, final Object newValue, final IFigure figure) {
+				if (newValue == null)
+					return false;
+				DQMCanvasFigure dqm = ((DQMCanvasFigure) figure);
+				dqm.setPadMaxZ((Double)newValue);
 				dqm.update();
 				return false;
 			}

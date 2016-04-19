@@ -559,6 +559,12 @@ namespace Belle2 {
       for(unsigned iSt=0; iSt<4; iSt++) m_mVector["relPhi3D"][iSt] = Fitter3DUtility::rotatePhi(m_mVector["phi3D"][iSt], m_mDouble["relRefPhi"]);
       //Reject low pt.
       if(m_mDouble["rho"] > 67){
+        
+        // Constrain rho to 1600.
+        if(m_mDouble["rho"] > rhoMax) {
+          m_mDouble["rho"] = rhoMax;
+          m_mDouble["pt"] = rhoMax * 0.3 * 1.5 * 0.01;
+        }
 
         // Change to Signals.
         {

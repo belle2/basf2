@@ -81,8 +81,6 @@ namespace Belle2{
     m_int = FpgaUtility::roundInt(value / m_toReal);
     m_minInt = FpgaUtility::roundInt(minValue/m_toReal);
     m_maxInt = FpgaUtility::roundInt(maxValue/m_toReal);
-    // Check if there is overflow or underflow. 
-    checkInt("TRGCDCJSignal(int, int, double, double)");
     m_actual = value;
     m_minActual = minValue;
     m_maxActual = maxValue;
@@ -91,6 +89,8 @@ namespace Belle2{
     m_vhdlCode = "";
     m_finishClock = clock;
     m_commonData = commonData;
+    // Check if there is overflow or underflow. 
+    checkInt("TRGCDCJSignal(int, int, double, double)");
   }
 
   TRGCDCJSignal::TRGCDCJSignal(int const & bitwidth, double const & value, double const & minValue, double const & maxValue, TRGCDCJSignalData * commonData){
@@ -109,12 +109,12 @@ namespace Belle2{
     else m_type = 2;
     m_bitsize = calBitwidth();
     m_finishClock = finishClock;
-    // Check if there is overflow or underflow. 
-    checkInt("TRGCDCJSignal(int, double, signed long long, signed long long, double, double, double)");
     m_debug = 0;
     m_name = "";
     m_vhdlCode = "";
     m_commonData = commonData;
+    // Check if there is overflow or underflow. 
+    checkInt("TRGCDCJSignal(int, double, signed long long, signed long long, double, double, double)");
   }
 
   TRGCDCJSignal::TRGCDCJSignal(double const & value, double const & toReal, TRGCDCJSignalData * commonData){
@@ -127,13 +127,13 @@ namespace Belle2{
     m_minActual = value;
     m_maxActual = value;
     m_bitsize = calBitwidth();
-    // Check if there is overflow or underflow. 
-    checkInt("TRGCDCJSignal(double, double)");
     m_debug = 0;
     m_name = "";
     m_vhdlCode = "";
     m_finishClock = -1;
     m_commonData = commonData;
+    // Check if there is overflow or underflow. 
+    checkInt("TRGCDCJSignal(double, double)");
   }
 
   TRGCDCJSignal::TRGCDCJSignal(std::vector<bool> const & slvValue, int const& finishClock, TRGCDCJSignalData* commonData){

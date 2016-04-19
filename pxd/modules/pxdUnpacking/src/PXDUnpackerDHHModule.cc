@@ -1243,7 +1243,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
         ///   dhe_id = ((layer-1)<<5) | ((ladder)<<1) | (sensor-1);
         unsigned short sensor, ladder, layer;
         sensor = (currentDHEID & 0x1) + 1;
-        ladder = ((currentDHEID & 0x1E) >> 1) + 1 ;
+        ladder = ((currentDHEID & 0x1E) >> 1);
         layer = ((currentDHEID & 0x20) >> 5) + 1;
         currentVxdId = VxdID(layer, ladder, sensor);
 

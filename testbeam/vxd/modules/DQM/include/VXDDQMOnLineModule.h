@@ -123,18 +123,31 @@ namespace Belle2 {
       if (layer == 4) nSensors = 3;
       if (layer == 5) nSensors = 4;
       if (layer == 6) nSensors = 5;
-      if (layer == 1) nSensors = 1;  // TODO very special case for TB2016
-      if (layer == 2) nSensors = 1;  // TODO very special case for TB2016
+      //if (layer == 1) nSensors = 1;  // TODO very special case for TB2016
+      //if (layer == 2) nSensors = 1;  // TODO very special case for TB2016
       return nSensors;
     }
 
     int m_Reduce1DCorrelHistos = 0;       /**< flag <0,1> for removing of 1D correlation plots from output */
+    int m_SaveOtherHistos = 0;       /**< flag <0,1> for removing of 1D correlation plots from output */
 
+    std::string m_storePXDDigitsName;     /**< PXDDigits StoreArray name */
     std::string m_storeDigitsName;        /**< SVDDigits StoreArray name */
     std::string m_storePXDClustersName;   /**< PXDClusters StoreArray name */
     std::string m_storeSVDClustersName;   /**< SVDClusters StoreArray name */
+    std::string m_relPXDClusterDigitName; /**< PXDClustersToPXDDigits RelationArray name */
     std::string m_relClusterDigitName;    /**< SVDClustersToSVDDigits RelationArray name */
     std::string m_histogramDirectoryName; /**< Name of the ROOT file directory for these histograms */
+
+    // DQM for every PXD sensor:
+    TH1F* m_firedPxdSen[c_nPXDPlanes * c_MaxSensorsInPXDPlane];      /**< Fired pixels per event by plane */
+    TH1F* m_clustersPxdSen[c_nPXDPlanes * c_MaxSensorsInPXDPlane];   /**< Pixels per event by plane */
+    TH2F* m_hitMapPxdSen[c_nPXDPlanes * c_MaxSensorsInPXDPlane];     /**< Hitmaps for pixels by plane */
+    TH1F* m_chargePxdSen[c_nPXDPlanes * c_MaxSensorsInPXDPlane];     /**< Charge by plane */
+    TH1F* m_seedPxdSen[c_nPXDPlanes * c_MaxSensorsInPXDPlane];       /**< Seed by plane */
+    TH1F* m_sizePxdSen[c_nPXDPlanes * c_MaxSensorsInPXDPlane];       /**< Cluster size by plane */
+    TH1F* m_sizeUPxdSen[c_nPXDPlanes * c_MaxSensorsInPXDPlane];      /**< u cluster size by plane */
+    TH1F* m_sizeVPxdSen[c_nPXDPlanes * c_MaxSensorsInPXDPlane];      /**< v cluster size by plane */
 
     // DQM for every SVD sensor:
     TH1F* m_firedUSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];         /**< Fired u strips per event by plane */
@@ -172,6 +185,7 @@ namespace Belle2 {
   {
     int iPlane = indexToPlanePXD(index);
     VxdID sensorID(iPlane, 1, sensor);
+    //VxdID sensorID(iPlane, 1, 2);  // TODO very special case for TB2016
     return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
   }
 

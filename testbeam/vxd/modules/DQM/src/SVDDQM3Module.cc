@@ -814,6 +814,7 @@ void SVDDQM3Module::event()
     int index = planeToIndex(iPlane);
     int indexSen = (digit.getSensorID().getSensorNumber() - 1) * c_nSVDPlanes + planeToIndex(iPlane);
     if (digit.isUStrip()) {
+      printf("-->u strip %i time %i signal %f\n", digit.getCellID(), digit.getIndex(), digit.getCharge());
       uStrips.at(index).insert(digit.getCellID());
       uStripsSen.at(indexSen).insert(digit.getCellID());
     } else {

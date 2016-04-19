@@ -22,7 +22,7 @@
 #include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 
-//#include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
 #include <set>
@@ -73,18 +73,117 @@ void VXDDQMOnLineModule::defineHisto()
   // 1D histograms:
   TDirectory* DirVXDGlobCorrels1DNeigh = NULL;
   TDirectory* DirVXDGlobHitmaps1D = NULL;
+  TDirectory* DirVXDGlobCorrels1D = NULL;
   if (!m_Reduce1DCorrelHistos) {
     DirVXDGlobCorrels1DNeigh = oldDir->mkdir("VXD_Global_1DCorrelationsNeighboar");
     DirVXDGlobHitmaps1D = oldDir->mkdir("VXD_Global_1DHitmaps");
+    if (m_SaveOtherHistos) {
+      DirVXDGlobCorrels1D = oldDir->mkdir("VXD_Global_1DCorrelationsOthers");
+    }
   }
 
   // 2D histograms in global coordinates:
   TDirectory* DirVXDGlobCorrelsNeigh = oldDir->mkdir("VXD_Global_CorrelationsNeighboar");
   TDirectory* DirVXDGlobHitmaps = oldDir->mkdir("VXD_Global_Hitmaps");
+  TDirectory* DirVXDGlobCorrels = NULL;
+  if (m_SaveOtherHistos) {
+    DirVXDGlobCorrels = oldDir->mkdir("VXD_Global_CorrelationsOthers");
+  }
+
+  // PXD sensor status 1D+2D histograms
+  TDirectory* DirPXDDetailBasic = oldDir->mkdir("PXD_Detail_Basic");
 
   // SVD sensor status 1D histograms
   TDirectory* DirSVDDetailBasic = oldDir->mkdir("SVD_Detail_Basic");
 
+  DirPXDDetailBasic->cd();
+
+  for (int i = 0; i < c_nPXDPlanes * c_MaxSensorsInPXDPlane; i++) {
+    m_firedPxdSen[i] = NULL;
+    m_clustersPxdSen[i] = NULL;
+    m_hitMapPxdSen[i] = NULL;
+    m_chargePxdSen[i] = NULL;
+    m_seedPxdSen[i] = NULL;
+    m_sizePxdSen[i] = NULL;
+    m_sizeUPxdSen[i] = NULL;
+    m_sizeVPxdSen[i] = NULL;
+  }
+
+  for (int i = 0; i < c_nPXDPlanes; i++) {
+    int iPlane = indexToPlanePXD(i);
+    for (int iS = 0; iS < c_MaxSensorsInPXDPlane; iS++) {
+      //----------------------------------------------------------------
+      // Number of fired pixels per frame : hFired[U/V][PlaneNo]
+      //----------------------------------------------------------------
+      // Fired pixel counts
+      if (iS >= getSensorsInLayer(c_firstPXDPlane + i)) continue;
+      string name = str(format("hPXD_L%1%_S%2%_Fired") % iPlane % (iS + 1));
+      string title = str(format("TB2016 PXD Sensor %1% Fired pixels, plane %2%") % (iS + 1) % iPlane);
+      m_firedPxdSen[iS * c_nPXDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
+      m_firedPxdSen[iS * c_nPXDPlanes + i]->GetXaxis()->SetTitle("# of fired pixels");
+      m_firedPxdSen[iS * c_nPXDPlanes + i]->GetYaxis()->SetTitle("count");
+      //----------------------------------------------------------------
+      // Number of clusters per frame : hClusters[U/V][PlaneNo]
+      //----------------------------------------------------------------
+      // Number of clusters
+      name = str(format("hPXD_L%2%_S%1%_Clusters") % (iS + 1) % iPlane);
+      title = str(format("TB2016 PXD Sensor %1% Number of clusters, plane %2%") % (iS + 1) % iPlane);
+      m_clustersPxdSen[iS * c_nPXDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
+      m_clustersPxdSen[iS * c_nPXDPlanes + i]->GetXaxis()->SetTitle("# of clusters");
+      m_clustersPxdSen[iS * c_nPXDPlanes + i]->GetYaxis()->SetTitle("count");
+      //----------------------------------------------------------------
+      // Hitmaps: Number of clusters by coordinate : hHitmap[U/V][PlaneNo]
+      //----------------------------------------------------------------
+      // Hitmaps
+      name = str(format("hPXD_L%2%_S%1%_Hitmap") % (iS + 1) % iPlane);
+      title = str(format("TB2016 PXD Sensor %1% Hitmap, plane %2%") % (iS + 1) % iPlane);
+      int nStripsU = getInfoPXD(i, 1 + 1).getUCells();  // TODO - very special for TB2016
+      int nStripsV = getInfoPXD(i, 1 + 1).getVCells();  // TODO - very special for TB2016
+      m_hitMapPxdSen[iS * c_nPXDPlanes + i] = new TH2F(name.c_str(), title.c_str(), nStripsU, 0, nStripsU, nStripsV, 0, nStripsV);
+      m_hitMapPxdSen[iS * c_nPXDPlanes + i]->GetXaxis()->SetTitle("u position [pitch units]");
+      m_hitMapPxdSen[iS * c_nPXDPlanes + i]->GetYaxis()->SetTitle("v position [pitch units]");
+      m_hitMapPxdSen[iS * c_nPXDPlanes + i]->GetZaxis()->SetTitle("hits");
+      //----------------------------------------------------------------
+      // Charge of clusters : hClusterCharge[U/V][PlaneNo]
+      //----------------------------------------------------------------
+      // charge by plane
+      name = str(format("hPXD_L%2%_S%1%_ClusterCharge") % (iS + 1) % iPlane);
+      title = str(format("TB2016 PXD Sensor %1% cluster charge, plane %2%") % (iS + 1) % iPlane);
+      m_chargePxdSen[iS * c_nPXDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
+      m_chargePxdSen[iS * c_nPXDPlanes + i]->GetXaxis()->SetTitle("charge of clusters [ADU]");
+      m_chargePxdSen[iS * c_nPXDPlanes + i]->GetYaxis()->SetTitle("count");
+      //----------------------------------------------------------------
+      // Cluster seed charge distribution : hSeedCharge[U/V][PlaneNo]
+      //----------------------------------------------------------------
+      // seed by plane
+      name = str(format("hPXD_L%2%_S%1%_Seed") % (iS + 1) % iPlane);
+      title = str(format("TB2016 PXD Sensor %1% seed charge, plane %2%") % (iS + 1) % iPlane);
+      m_seedPxdSen[iS * c_nPXDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
+      m_seedPxdSen[iS * c_nPXDPlanes + i]->GetXaxis()->SetTitle("seed charge of clusters [ADU]");
+      m_seedPxdSen[iS * c_nPXDPlanes + i]->GetYaxis()->SetTitle("count");
+      //----------------------------------------------------------------
+      // Cluster size distribution : hClusterSize[U/V][PlaneNo]
+      //----------------------------------------------------------------
+      // cluster size by plane
+      name = str(format("hPXD_L%2%_S%1%_ClusterSize") % (iS + 1) % iPlane);
+      title = str(format("TB2016 PXD Sensor %1% cluster size, plane %2%") % (iS + 1) % iPlane);
+      m_sizePxdSen[iS * c_nPXDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
+      m_sizePxdSen[iS * c_nPXDPlanes + i]->GetXaxis()->SetTitle("size of u clusters");
+      m_sizePxdSen[iS * c_nPXDPlanes + i]->GetYaxis()->SetTitle("count");
+      // u size by plane
+      name = str(format("hPXD_L%2%_S%1%_ClusterSizeU") % (iS + 1) % iPlane);
+      title = str(format("TB2016 PXD Sensor %1% cluster size in U, plane %2%") % (iS + 1) % iPlane);
+      m_sizeUPxdSen[iS * c_nPXDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
+      m_sizeUPxdSen[iS * c_nPXDPlanes + i]->GetXaxis()->SetTitle("size of u clusters");
+      m_sizeUPxdSen[iS * c_nPXDPlanes + i]->GetYaxis()->SetTitle("count");
+      // v size by plane
+      name = str(format("hPXD_L%2%_S%1%_ClusterSizeV") % (iS + 1) % iPlane);
+      title = str(format("TB2016 PXD Sensor %1% cluster size in V, plane %2%") % (iS + 1) % iPlane);
+      m_sizeVPxdSen[iS * c_nPXDPlanes + i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
+      m_sizeVPxdSen[iS * c_nPXDPlanes + i]->GetXaxis()->SetTitle("size of v clusters");
+      m_sizeVPxdSen[iS * c_nPXDPlanes + i]->GetYaxis()->SetTitle("count");
+    }
+  }
 
   DirSVDDetailBasic->cd();
 
@@ -279,59 +378,67 @@ void VXDDQMOnLineModule::defineHisto()
           m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle("horizontal z position [cm]");
           m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("hits");
         }
-
       } else if (i < j) { // correlations for u
-        if (abs(i - j) == 1) {
+        if ((!m_SaveOtherHistos) && (abs(i - j) > 1)) continue;
+        if (abs(i - j) > 1) {
+          DirVXDGlobCorrels->cd();
+        } else {
           DirVXDGlobCorrelsNeigh->cd();
-          string nameSP = str(format("h2GlobVXD_L%1%_L%2%_CorrelationmapSPU") % iPlane1 % iPlane2);
-          string titleSP = str(format("TB2016 Glob Correlation map VXD space points in U, plane %1%, plane %2%") % iPlane1 % iPlane2);
-          m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsU1, -0.5 * uSize1,
-              0.5 * uSize1,
-              nStripsU2, -0.5 * uSize2, 0.5 * uSize2);
-          string axisxtitle = str(format("vertical y position, plane %1% [cm]") % iPlane1);
-          string axisytitle = str(format("vertical y position, plane %1% [cm]") % iPlane2);
-          m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
-          m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle(axisytitle.c_str());
-          m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
         }
-        if (abs(i - j) == 1) {
-          if (!m_Reduce1DCorrelHistos) {
+        string nameSP = str(format("h2GlobVXD_L%1%_L%2%_CorrelationmapSPU") % iPlane1 % iPlane2);
+        string titleSP = str(format("TB2016 Glob Correlation map VXD space points in U, plane %1%, plane %2%") % iPlane1 % iPlane2);
+        m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsU1, -0.5 * uSize1,
+            0.5 * uSize1,
+            nStripsU2, -0.5 * uSize2, 0.5 * uSize2);
+        string axisxtitle = str(format("vertical y position, plane %1% [cm]") % iPlane1);
+        string axisytitle = str(format("vertical y position, plane %1% [cm]") % iPlane2);
+        m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
+        m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle(axisytitle.c_str());
+        m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
+
+        if (!m_Reduce1DCorrelHistos) {
+          if (abs(i - j) > 1) {
+            DirVXDGlobCorrels1D->cd();
+          } else {
             DirVXDGlobCorrels1DNeigh->cd();
-            string nameSP = str(format("h1GlobVXD_L%1%_L%2%_y_CorrelationmapSP") % iPlane1 % iPlane2);
-            string titleSP = str(format("TB2016 Glob Correlation map VXD space points, difference in Y, plane %1%, plane %2%") % iPlane1 %
-                                 iPlane2);
-            m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i] = new TH1F(nameSP.c_str(), titleSP.c_str(), nStripsU1 * 2, -1.0 * uSize1,
-                1.0 * uSize1);
-            string axisxtitle = str(format("vertical y position, planes %1% - %2% [cm]") % iPlane1 % iPlane2);
-            m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
-            m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("hits");
-            nameSP = str(format("h1GlobVXD_L%1%_L%2%_z_CorrelationmapSP") % iPlane1 % iPlane2);
-            titleSP = str(format("TB2016 Glob Correlation map VXD space points, difference in Z, plane %1%, plane %2%") % iPlane1 % iPlane2);
-            m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i] = new TH1F(nameSP.c_str(), titleSP.c_str(), nStripsV1 * 2, -1.0 * vSize1,
-                1.0 * vSize1);
-            axisxtitle = str(format("vertical z difference, planes %1% - %2% [cm]") % iPlane1 % iPlane2);
-            m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
-            m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("hits");
           }
+          string nameSP = str(format("h1GlobVXD_L%1%_L%2%_y_CorrelationmapSP") % iPlane1 % iPlane2);
+          string titleSP = str(format("TB2016 Glob Correlation map VXD space points, difference in Y, plane %1%, plane %2%") % iPlane1 %
+                               iPlane2);
+          m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i] = new TH1F(nameSP.c_str(), titleSP.c_str(), nStripsU1 * 2, -1.0 * uSize1,
+              1.0 * uSize1);
+          string axisxtitle = str(format("vertical y position, planes %1% - %2% [cm]") % iPlane1 % iPlane2);
+          m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
+          m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("hits");
+          nameSP = str(format("h1GlobVXD_L%1%_L%2%_z_CorrelationmapSP") % iPlane1 % iPlane2);
+          titleSP = str(format("TB2016 Glob Correlation map VXD space points, difference in Z, plane %1%, plane %2%") % iPlane1 % iPlane2);
+          m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i] = new TH1F(nameSP.c_str(), titleSP.c_str(), nStripsV1 * 2, -1.0 * vSize1,
+              1.0 * vSize1);
+          axisxtitle = str(format("vertical z difference, planes %1% - %2% [cm]") % iPlane1 % iPlane2);
+          m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
+          m_correlationsHitMapsSPGlob1Dv[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("hits");
         }
       } else {       // correlations for v
-        if (abs(i - j) == 1) {
+        if ((!m_SaveOtherHistos) && (abs(i - j) > 1)) continue;
+        if (abs(i - j) > 1) {
+          DirVXDGlobCorrels->cd();
+        } else {
           DirVXDGlobCorrelsNeigh->cd();
-          string nameSP = str(format("h2GlobVXD_L%1%_L%2%_CorrelationmapSPV") % iPlane2 % iPlane1);
-          string titleSP = str(format("TB2016 Glob Correlation map VXD space points in V, plane %1%, plane %2%") % iPlane2 % iPlane1);
-          m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsV2, -0.5 * vSize2,
-              0.5 * vSize2,
-              nStripsV1, -0.5 * vSize1, 0.5 * vSize1);
-          string axisxtitle = str(format("horizontal z position, plane %1% [cm]") % iPlane1);
-          string axisytitle = str(format("horizontal z position, plane %1% [cm]") % iPlane2);
-          m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
-          m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle(axisytitle.c_str());
-          m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
         }
+        DirVXDGlobCorrelsNeigh->cd();
+        string nameSP = str(format("h2GlobVXD_L%1%_L%2%_CorrelationmapSPV") % iPlane2 % iPlane1);
+        string titleSP = str(format("TB2016 Glob Correlation map VXD space points in V, plane %1%, plane %2%") % iPlane2 % iPlane1);
+        m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsV2, -0.5 * vSize2,
+            0.5 * vSize2,
+            nStripsV1, -0.5 * vSize1, 0.5 * vSize1);
+        string axisxtitle = str(format("horizontal z position, plane %1% [cm]") % iPlane1);
+        string axisytitle = str(format("horizontal z position, plane %1% [cm]") % iPlane2);
+        m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
+        m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle(axisytitle.c_str());
+        m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i]->GetZaxis()->SetTitle("hits");
       }
     }
   }
-
 
   oldDir->cd();
 }
@@ -344,12 +451,17 @@ void VXDDQMOnLineModule::initialize()
 
   //Register collections
   StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
+  StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
   StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
   StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
 
+  RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits);
   RelationArray relClusterDigits(storeSVDClusters, storeDigits);
 
   //Store names to speed up creation later
+  m_storePXDClustersName = storePXDClusters.getName();
+  m_storePXDDigitsName = storePXDDigits.getName();
+  m_relPXDClusterDigitName = relPXDClusterDigits.getName();
   m_storeSVDClustersName = storeSVDClusters.getName();
   m_storeDigitsName = storeDigits.getName();
   m_relClusterDigitName = relClusterDigits.getName();
@@ -392,27 +504,79 @@ void VXDDQMOnLineModule::beginRun()
 void VXDDQMOnLineModule::event()
 {
 
+  const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
   const StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
   const StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
 
+  const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
   const RelationArray relClusterDigits(storeSVDClusters, storeDigits, m_relClusterDigitName);
 
+  // PXD basic histograms:
   // Fired strips
-  vector< set<int> > uStrips(c_nSVDPlanes); // sets to eliminate multiple samples per strip
-  vector< set<int> > vStrips(c_nSVDPlanes);
+  vector< set<int> > uStripsSenp(c_nPXDPlanes * c_MaxSensorsInPXDPlane); // sets to eliminate multiple samples per strip
+  //vector< set<int> > vStripsSenp(c_nPXDPlanes * c_MaxSensorsInPXDPlane);
+  for (const PXDDigit& digit : storePXDDigits) {
+    int iPlane = digit.getSensorID().getLayerNumber();
+    if ((iPlane < c_firstPXDPlane) || (iPlane > c_lastPXDPlane)) continue;
+    int indexSen = (digit.getSensorID().getSensorNumber() - 1) * c_nPXDPlanes + planeToIndexPXD(iPlane);
+    uStripsSenp.at(indexSen).insert(digit.getUCellID());
+    //vStripsSen.at(indexSen).insert(digit.getVCellID());
+  }
+  for (int i = 0; i < c_nPXDPlanes; i++) {
+    for (int iS = 0; iS < c_MaxSensorsInPXDPlane; iS++) {
+      if (iS >= getSensorsInLayer(c_firstPXDPlane + i)) continue;
+      m_firedPxdSen[iS * c_nPXDPlanes + i]->Fill(0.1667 * uStripsSenp[i].size());
+      //m_firedVSen[iS * c_nPXDPlanes + i]->Fill(0.1667 * vStripsSen[i].size());
+    }
+  }
+
+  int countsSen[c_nPXDPlanes * c_MaxSensorsInPXDPlane];
+  for (int i = 0; i < c_nPXDPlanes; i++) {
+    for (int iS = 0; iS < c_MaxSensorsInPXDPlane; iS++) {
+      countsSen[iS * c_nPXDPlanes + i] = 0;
+    }
+  }
+  for (const PXDCluster& cluster : storePXDClusters) {
+    int iPlane = cluster.getSensorID().getLayerNumber();
+    if ((iPlane < c_firstPXDPlane) || (iPlane > c_lastPXDPlane)) continue;
+    int indexSen = (cluster.getSensorID().getSensorNumber() - 1) * c_nPXDPlanes + planeToIndex(iPlane);
+    countsSen[indexSen]++;
+  }
+  for (int i = 0; i < c_nPXDPlanes; i++) {
+    for (int iS = 0; iS < c_MaxSensorsInPXDPlane; iS++) {
+      if (iS >= getSensorsInLayer(c_firstPXDPlane + i)) continue;
+      m_clustersPxdSen[iS * c_nPXDPlanes + i]->Fill(countsSen[iS * c_nPXDPlanes + i]);
+    }
+  }
+
+  // Hitmaps, Charge, Seed, Size
+  for (const PXDCluster& cluster : storePXDClusters) {
+    int iPlane = cluster.getSensorID().getLayerNumber();
+    if ((iPlane < c_firstPXDPlane) || (iPlane > c_lastPXDPlane)) continue;
+    int indexSen = (cluster.getSensorID().getSensorNumber() - 1) * c_nPXDPlanes + planeToIndexPXD(iPlane);
+    m_hitMapPxdSen[indexSen]->Fill(getInfoPXD(planeToIndexPXD(iPlane),
+                                              cluster.getSensorID().getSensorNumber()).getUCellID(cluster.getU()),
+                                   getInfoPXD(planeToIndexPXD(iPlane), cluster.getSensorID().getSensorNumber()).getVCellID(cluster.getV())
+                                  );
+    m_chargePxdSen[indexSen]->Fill(cluster.getCharge());
+    m_seedPxdSen[indexSen]->Fill(cluster.getSeedCharge());
+    m_sizePxdSen[indexSen]->Fill(cluster.getSize());
+    m_sizeUPxdSen[indexSen]->Fill(cluster.getUSize());
+    m_sizeVPxdSen[indexSen]->Fill(cluster.getVSize());
+  }
+
+  // SVD basic histograms:
+  // Fired strips
   vector< set<int> > uStripsSen(c_nSVDPlanes * c_MaxSensorsInSVDPlane); // sets to eliminate multiple samples per strip
   vector< set<int> > vStripsSen(c_nSVDPlanes * c_MaxSensorsInSVDPlane);
   for (const SVDDigit& digit : storeDigits) {
     int iPlane = digit.getSensorID().getLayerNumber();
     if ((iPlane < c_firstSVDPlane) || (iPlane > c_lastSVDPlane)) continue;
-    int index = planeToIndex(iPlane);
     int indexSen = (digit.getSensorID().getSensorNumber() - 1) * c_nSVDPlanes + planeToIndex(iPlane);
     if (digit.isUStrip()) {
-      uStrips.at(index).insert(digit.getCellID());
       uStripsSen.at(indexSen).insert(digit.getCellID());
     } else {
-      vStrips.at(index).insert(digit.getCellID());
       vStripsSen.at(indexSen).insert(digit.getCellID());
     }
   }
@@ -424,12 +588,9 @@ void VXDDQMOnLineModule::event()
     }
   }
 
-  int countsU[c_nSVDPlanes];
-  int countsV[c_nSVDPlanes];
   int countsUSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];
   int countsVSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];
   for (int i = 0; i < c_nSVDPlanes; i++) {
-    countsU[i] = 0; countsV[i] = 0;
     for (int iS = 0; iS < c_MaxSensorsInSVDPlane; iS++) {
       countsUSen[iS * c_nSVDPlanes + i] = 0; countsVSen[iS * c_nSVDPlanes + i] = 0;
     }
@@ -437,13 +598,10 @@ void VXDDQMOnLineModule::event()
   for (const SVDCluster& cluster : storeSVDClusters) {
     int iPlane = cluster.getSensorID().getLayerNumber();
     if ((iPlane < c_firstSVDPlane) || (iPlane > c_lastSVDPlane)) continue;
-    int index = planeToIndex(iPlane);
     int indexSen = (cluster.getSensorID().getSensorNumber() - 1) * c_nSVDPlanes + planeToIndex(iPlane);
     if (cluster.isUCluster()) {
-      countsU[index]++;
       countsUSen[indexSen]++;
     } else {
-      countsV[index]++;
       countsVSen[indexSen]++;
     }
   }
@@ -459,16 +617,17 @@ void VXDDQMOnLineModule::event()
   for (const SVDCluster& cluster : storeSVDClusters) {
     int iPlane = cluster.getSensorID().getLayerNumber();
     if ((iPlane < c_firstSVDPlane) || (iPlane > c_lastSVDPlane)) continue;
-    int index = planeToIndex(iPlane);
     int indexSen = (cluster.getSensorID().getSensorNumber() - 1) * c_nSVDPlanes + planeToIndex(iPlane);
     if (cluster.isUCluster()) {
-      m_hitMapUSen[indexSen]->Fill(getInfo(index, cluster.getSensorID().getSensorNumber()).getUCellID(cluster.getPosition()));
+      m_hitMapUSen[indexSen]->Fill(getInfo(planeToIndex(iPlane),
+                                           cluster.getSensorID().getSensorNumber()).getUCellID(cluster.getPosition()));
       m_chargeUSen[indexSen]->Fill(cluster.getCharge());
       m_seedUSen[indexSen]->Fill(cluster.getSeedCharge());
       m_sizeUSen[indexSen]->Fill(cluster.getSize());
       m_timeUSen[indexSen]->Fill(cluster.getClsTime());
     } else {
-      m_hitMapVSen[indexSen]->Fill(getInfo(index, cluster.getSensorID().getSensorNumber()).getVCellID(cluster.getPosition()));
+      m_hitMapVSen[indexSen]->Fill(getInfo(planeToIndex(iPlane),
+                                           cluster.getSensorID().getSensorNumber()).getVCellID(cluster.getPosition()));
       m_chargeVSen[indexSen]->Fill(cluster.getCharge());
       m_seedVSen[indexSen]->Fill(cluster.getSeedCharge());
       m_sizeVSen[indexSen]->Fill(cluster.getSize());
@@ -476,6 +635,7 @@ void VXDDQMOnLineModule::event()
     }
   }
 
+  // Correlations for space point coordinates
 
   float CutDQMCorrelSigU[c_nVXDPlanes];
   float CutDQMCorrelSigV[c_nVXDPlanes];
@@ -488,10 +648,9 @@ void VXDDQMOnLineModule::event()
     CutDQMCorrelSigU[i] = 0;
     CutDQMCorrelSigV[i] = 0;
   }
-  CutDQMCorrelTime = 70;  // ns
 
+  CutDQMCorrelTime = 70;  // ns
   int SwapPXD = 0;    // TODO Very special case, in simulations we see swap u-v! check with data. April 18,2016
-  // Correlations for space point coordinates
   for (int i1 = 0; i1 < storeSVDClusters.getEntries() + storePXDClusters.getEntries(); i1++) {
     // preparing of first value for correlation plots with postfix "1":
     float fTime1 = 0.0;

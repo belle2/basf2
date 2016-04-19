@@ -65,7 +65,11 @@ def add_simulation(path, momentum=6., positrons=False):
 
 def add_unpackers(path, svd_only=False):
     if not svd_only:
-        path.add_module('PXDUnpacker')
+        path.add_module('PXDUnpacker',
+                        RemapFlag=True,
+                        RemapLUT_IF_OB=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'),
+                        RemapLUT_IB_OF=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'))
+
     path.add_module('SVDUnpacker', xmlMapFileName='testbeam/vxd/data/TB_svd_mapping.xml')
 
 
@@ -192,7 +196,7 @@ args = parser.parse_args()
 
 
 # suppress messages and warnings during processing:
-set_log_level(LogLevel.INFO)
+set_log_level(LogLevel.ERROR)
 
 # Set up DB chain
 reset_database()
@@ -206,7 +210,7 @@ main = create_path()
 if args.raw_input:
     main.add_module('SeqRootInput')
 else:
-    main.add_module('RootInput', branchNames=['EventMetaData', 'RawFTSWs', 'RawSVDs', 'RawPXDs', 'RawFTSWs'])
+    main.add_module('RootInput', branchNames=['EventMetaData', 'RawFTSWs', 'RawSVDs', 'RawPXDs'])
 
 
 if args.dqm:

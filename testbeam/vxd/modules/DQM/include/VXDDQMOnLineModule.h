@@ -97,18 +97,21 @@ namespace Belle2 {
     {
       return iPlaneVXD - c_firstVXDPlane;
     }
+
     /** This is a shortcut to getting SVD::SensorInfo from the GeoCache.
      * @param index Index of the sensor (0,1,2,3), _not_ layer number!
      * @param sensor Number of the sensor (1,.. - depend of layer)!
      * @return SensorInfo object for the desired plane.
      */
     inline const SVD::SensorInfo& getInfo(int index, int sensor) const;
+
     /** This is a shortcut to getting PXD::SensorInfo from the GeoCache.
      * @param index Index of the sensor (0,1), _not_ layer number!
      * @param sensor Number of the sensor (1,2)!
      * @return SensorInfo object for the desired plane.
      */
     inline const PXD::SensorInfo& getInfoPXD(int index, int sensor) const;
+
     /** This is a shortcut to getting number of sensors for PXD and SVD layers.
     * @param layer Index of sensor layer (1,6)
     * @return Number of sensors in layer.
@@ -124,6 +127,8 @@ namespace Belle2 {
       if (layer == 2) nSensors = 1;  // TODO very special case for TB2016
       return nSensors;
     }
+
+    int m_Reduce1DCorrelHistos = 0;       /**< flag <0,1> for removing of 1D correlation plots from output */
 
     std::string m_storeDigitsName;        /**< SVDDigits StoreArray name */
     std::string m_storePXDClustersName;   /**< PXDClusters StoreArray name */
@@ -156,11 +161,9 @@ namespace Belle2 {
 
   };
 
-  inline const SVD::SensorInfo& VXDDQMOnLineModule::getInfo(int index,
-                                                            int sensor) const  // TODO for TB 2016 this macro must be revrite correct
+  inline const SVD::SensorInfo& VXDDQMOnLineModule::getInfo(int index, int sensor) const
   {
     int iPlane = indexToPlane(index);
-//    VxdID sensorID(iPlane, 1, iPlane);
     VxdID sensorID(iPlane, 1, sensor);
     return dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
   }
@@ -168,7 +171,6 @@ namespace Belle2 {
   inline const PXD::SensorInfo& VXDDQMOnLineModule::getInfoPXD(int index, int sensor) const
   {
     int iPlane = indexToPlanePXD(index);
-//    VxdID sensorID(iPlane, 1, iPlane);
     VxdID sensorID(iPlane, 1, sensor);
     return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
   }

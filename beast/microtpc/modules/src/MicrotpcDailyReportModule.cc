@@ -130,7 +130,7 @@ void MicrotpcDailyReportModule::event()
       if (T0 > MetaHit.getts_start()[0] && old_run < run) {
         T0 = MetaHit.getts_start()[0];
         old_run = run;
-        if (T0 > T1) {
+        if (T1 > T0) {
           DT += (T1 - T0);
         }
       }

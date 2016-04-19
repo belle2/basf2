@@ -16,11 +16,14 @@
 #include <beast/microtpc/dataobjects/MicrotpcRecoTrack.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/dataobjects/EventMetaData.h>
+
 #include <cmath>
 #include <boost/foreach.hpp>
 
@@ -45,6 +48,10 @@ using namespace std;
 using namespace Belle2;
 using namespace microtpc;
 
+int old_run = 0;
+double T0 = 15000000000.;
+double T1 = 0;
+double DT = 0;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -74,7 +81,7 @@ MicrotpcDailyReportModule::~MicrotpcDailyReportModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void MicrotpcDailyReportModule::defineHisto()
 {
-  for (int i = 0; i < 2; i ++) {
+  for (int i = 0; i < 3; i ++) {
     h_tpc_uptime[i] = new TH1F(TString::Format("h_tpc_uptime_%d", i), "", 3, 0., 3.);
   }
   for (int i = 0; i < 9; i ++) {
@@ -112,11 +119,23 @@ void MicrotpcDailyReportModule::event()
 
   StoreArray<MicrotpcMetaHit> MetaHits;
   StoreArray<MicrotpcRecoTrack> Tracks;
+  StoreObjPtr<EventMetaData> evtMetaData;
 
+  int run = evtMetaData->getRun();
 
   double TimeStamp = 0;
   for (const auto& MetaHit : MetaHits) {
     TimeStamp = MetaHit.getts_start()[0];
+    if (MetaHit.getts_nb() > 0) {
+      if (T0 > MetaHit.getts_start()[0] && old_run < run) {
+        T0 = MetaHit.getts_start()[0];
+        old_run = run;
+        if (T0 > T1) {
+          DT += (T1 - T0);
+        }
+      }
+      T1 = MetaHit.getts_start()[0];
+    }
   }
   if (TimeStamp > 1) {
     TimeStamp -= TDatime(m_inputReportDate, 0).Convert();
@@ -138,6 +157,7 @@ void MicrotpcDailyReportModule::event()
     h_tpc_uptime[0]->Fill(1);
     if (TimeStamp > 0.) {
       h_tpc_uptime[1]->Fill(1);
+      h_tpc_uptime[2]->Fill(2, DT);
       for (int j = 0; j < 7; j++) {
         if (partID[j] == 1) {
           h_tpc_rate[j]->Fill(TimeStamp);
@@ -165,7 +185,7 @@ void MicrotpcDailyReportModule::endRun()
 void MicrotpcDailyReportModule::terminate()
 {
   cout << "terminate section" << endl;
-  double LifeTime = h_tpc_uptime[1]->GetMaximum();
+  double LifeTime = h_tpc_uptime[2]->GetMaximum();
   for (int i = 0; i < 7; i++) {
     int Nbin = h_tpc_rate[i]->GetNbinsX();
     double von = h_tpc_rate[i]->GetXaxis()->GetXmin();

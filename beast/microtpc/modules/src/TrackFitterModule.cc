@@ -490,7 +490,7 @@ void TrackFitterModule::event()
 
       if (nEntries > 0) {
         MicrotpcMetaHit* aMetaHit = TpcMetaHits[0];
-        detNB = aMetaHit->getdetNb();
+        detNB = aMetaHit->getdetNb() - 1;
 
         fpxhits = TpcDataHits.getEntries();
         //MicrotpcMetaEDataHit * aHit = TpcDataHits[0];

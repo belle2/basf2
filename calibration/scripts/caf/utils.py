@@ -1,5 +1,7 @@
 from basf2 import *
-from collections import deque, defaultdict
+from collections import deque
+import json
+from functools import singledispatch, update_wrapper
 
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
@@ -55,6 +57,32 @@ def topological_sort(dependencies):
     else:
         B2WARNING('Cyclic dependency detected, check CAF.add_dependency() calls')
         return []
+
+
+def decode_json_string(object_string):
+    """
+    Simple function to call json.loads() on a string to return the
+    Python object constructed (Saves importing json everywhere).
+    """
+    return json.loads(object_string)
+
+
+def method_dispatch(func):
+    """
+    Decorator that behaves exactly like functools.singledispatch
+    but which takes the second argument to be the important one
+    that we want to check the type of and dispatch to the correct function.
+
+    This is needed when trying to dispatch a method in a class, since the
+    first argument of the method is always 'self'.
+    """
+    dispatcher = singledispatch(func)
+
+    def wrapper(*args, **kw):
+        return dispatcher.dispatch(args[1].__class__)(*args, **kw)
+    wrapper.register = dispatcher.register
+    update_wrapper(wrapper, func)
+    return wrapper
 
 
 class CalibrationAlgorithmRunner(Module):

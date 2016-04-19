@@ -19,10 +19,14 @@ import pickle
 
 from .utils import topological_sort
 from .utils import CalibrationAlgorithmRunner
+from .utils import decode_json_string
 import caf.backends
 
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
+
+collector_steering_file_path = os.environ.get('BELLE2_LOCAL_DIR')
+collector_steering_file_path = os.path.join(collector_steering_file_path, 'calibration/scripts/caf/run_collector_path.py')
 
 
 class Calibration():
@@ -31,13 +35,14 @@ class Calibration():
     You have the option to add in your collector/algorithm by argument here, or
     later by changing the properties.
 
-    Calibration(name, collector, algorithms, max_iterations)
+    Calibration(name, collector, algorithms, input_files)
     - 'name' must be set when you create the class instance. It should be unique
     if you plan to add multiple ones to a CAF().
     - 'collector' should be a CalibrationCollectorModule or a string with the module name.
     - 'algorithms' should be a CalibrationAlgorithm or a list of them.
-    - 'max iterations' is set to 5 by default but can be set to any >0
-      integer. The overall calibration will fail if max iterations is reached.
+    - 'input_files' is set to None by default but can be set to a string/list of strings.
+      The input files have to be understood by the backend used e.g. LFNs for DIRAC,
+      accessible local paths for Batch/Local.
 
     # Example
     >>> cal = Calibration('TestCalibration1')
@@ -55,14 +60,17 @@ class Calibration():
     OR
     cal.algorithms = [alg1, alg2]  # Multiple algorithms for one collector
 
-    ## Or can use optional arguments to pass in some/all during initialisation ##
-    >>> cal = Calibration( 'TestCalibration1', 'CaTest', [alg1,alg2], 2)
+    # Or can use optional arguments to pass in some/all during initialisation #
+    >>> cal = Calibration( 'TestCalibration1', 'CaTest', [alg1,alg2], ['/path/to/file.root'])
+
+    # Change the input file list later on before running with CAF()
+    >>> cal.input_files = ['path/to/file.root', 'other/path/to/file2.root']
     """
 
-    def __init__(self, name, collector=None, algorithms=None, max_iterations=5):
+    def __init__(self, name, collector=None, algorithms=None, input_files=None):
         """
         You have to specify a unique name for the calibration when creating it.
-        You can specify the collector and algorithms later on or here but it won't run
+        You can specify the collector/algorithms/input files later on or here but it won't run
         until those are done.
         """
 
@@ -74,13 +82,13 @@ class Calibration():
         self.collector = collector
         #: Publicly accessible algorithms
         self.algorithms = algorithms
-        #: Maximum iterations fo rthis calibration (Will probably move to CAF)
-        self.max_iterations = max_iterations
+        #: Files used for collection procedure
+        self.input_files = input_files
 
     def is_valid(self):
-        """A full calibration consists of a collector AND an associated algorithm
-        This returns False if either are missing or if the collector and algorithm are mismatched."""
-        if (not self.collector or not self.algorithms):
+        """A full calibration consists of a collector AND an associated algorithm AND input_files.
+        This returns False if any are missing or if the collector and algorithm are mismatched."""
+        if (not self.collector or not self.algorithms or not self.input_files):
             return False
         else:
             for alg in self.algorithms:
@@ -130,6 +138,7 @@ class Calibration():
             if not isinstance(collector, Module):
                 print(collector)
                 B2FATAL("Collector needs to be either a Module or the name of such a module")
+        #: Internal storage of collector attribute
         self._collector = collector
 
     @property
@@ -165,13 +174,47 @@ class Calibration():
         else:
             self._algorithms = []
 
+    @property
+    def input_files(self):
+        """
+        Getter for the input_files attribute.
+        """
+        return self._input_files
+
+    @input_files.setter
+    def input_files(self, input_files):
+        """
+        Setter for the input_files attribute. Checks that a string/list of strings was passed in.
+        And then builds a list from that.
+        """
+        if input_files:
+            # Need to check if a string or a list of them was passed in.
+            if isinstance(input_files, collections.Iterable):
+                #: Internal storage of input_files attribute
+                self._input_files = []
+                for file_path in input_files:
+                    if isinstance(file_path, str):
+                        self._input_files.append(file_path)
+                    else:
+                        B2FATAL("Something other than string passed in as an input file.")
+            else:
+                if isinstance(input_files, str):
+                    self._input_files = [input_files]
+                else:
+                    B2FATAL(("Something other than string passed in as an input file"))
+        else:
+            self._input_files = []
+
     def __repr__(self):
+        """
+        Representation of Calibration class (what happens when you print a Calibration() instance)
+        """
         return self.name
 
 
 class CAF():
     """
-    The top level class to hold calibration objects and process them:
+    Class to hold calibration objects and process them:
     - It will define the configuration/flow of logic for the calibrations,
     but most of the heavy lifting should be done through outside functions
     or smaller classes to prevent this getting too big.
@@ -181,21 +224,39 @@ class CAF():
     valid order based on dependencies.
     - Much of the checking for consistency should be done here and in the calibration
     class. Leaving functions that it calls to assume everything is correctly set up.
+    - Choosing which files to use as input should be done from outside during the
+    setup of the CAF and Calibration instances. Allowing the CAF to assume that this
+    is your most logical set of data to calibrate at the moment and that you want
+    constants for ALL runs passed in (whether they are the best constants or not).
     """
     def __init__(self):
         """
-        Initialise method
+        Initialise CAF instance. Sets up some empty containers for attributes.
+        Sets the default backend to Local, and some other defaults to  what is
+        in the config file.
+
+        Note that the config file is in the calibration/data directory and we assume
+        that $BELLE2_LOCAL_DIR is set and that it is the correct release directory to
+        access the config file.
         """
+        config_file_path = os.environ.get('BELLE2_LOCAL_DIR')
+        if config_file_path:
+            config_file_path = os.path.join(config_file_path, 'calibration/data/caf.cfg')
+            import configparser
+            #: Configuration object for CAF, can change the defaults through a single config file
+            self.config = configparser.ConfigParser()
+            self.config.read(config_file_path)
+        else:
+            B2FATAL("Tried to use $BELLE2_LOCAL_DIR but it wasn't there. Is basf2 set up?")
+
         #: Dictionary of calibrations for this CAF instance
         self.calibrations = {}
         #: Dictionary of dependenciesof calibration objects
         self.dependencies = {}
         #: The backend to use for this CAF run (Public)
         self.backend = caf.backends.Local()
-        #: List of input files for this set of calibrations (Move to Calibration()?)
-        self.input_files = []
         #: Output path to store results of calibration and bookkeeping information
-        self.output_path = 'calibration_results'
+        self.output_dir = self.config['CAF_DEFAULTS']['ResultsDir']
 
     def add_calibration(self, calibration):
         """
@@ -225,10 +286,10 @@ class CAF():
         if calibration_name != depends_on:
             # Tests if we have the calibrations added
             if set([calibration_name, depends_on]).issubset([cal for cal in self.calibrations.keys()]):
-                    # Note that we add the depends_on as the key and the calibration
-                    # name as the value. This is to make the sorting algorithm
-                    # simpler and more efficient later.
-                    self.dependencies[depends_on].append(calibration_name)
+                # Note that we add the depends_on as the key and the calibration
+                # name as the value. This is to make the sorting algorithm
+                # simpler and more efficient later.
+                self.dependencies[depends_on].append(calibration_name)
             else:
                 B2WARNING(("Tried to add dependency for calibrations not in the framework."
                            "Dependency was not added."))
@@ -238,20 +299,50 @@ class CAF():
 
     def order_calibrations(self):
         """
-        Takes everything put into the dependencies dictionary and passes it to
-        a sorting algorithm. Returns True if sort was succesful, False if it
-        failed (most likely a cyclic dependency)
+        - Takes everything put into the dependencies dictionary and passes it to a sorting
+        algorithm.
+        - Returns True if sort was succesful, False if it failed (most likely a cyclic dependency)
         """
+        #: List to store calibration order after sorting.
         self.order = topological_sort(self.dependencies)
         return bool(self.order)  # Returns False if sort had problems
 
+    def configure_jobs(self, calibrations):
+        """
+        Creates a Job object for each collector to pass to the Backend.
+        """
+        #: Dictionary of named job objects to send to the backend
+        self.jobs = {}
+        for calibration_name in calibrations:
+            job = Job(calibration_name)
+            self._make_calibration_dir(calibration_name)
+            collector_path_file = self._make_collector_path(calibration_name)
+            job.output_dir = os.path.join(self.output_dir, calibration_name, 'output')
+            job.working_dir = os.path.join(self.output_dir, calibration_name, 'input')
+            job.cmd = ['basf2', 'run_collector_path.py']
+            job.input_sandbox_files.append(collector_steering_file_path)
+            job.input_sandbox_files.append(collector_path_file)
+            job.output_files = ['*.mille']
+            self.jobs[calibration_name] = job
+
     def run(self):
         """
-        Runs the overall calibration job and saves the output to the output_path.
+        - Runs the overall calibration job, saves the outputs to the output_dir directory,
+        and creates database payloads.
+        - Upload may be moved to another method or function entirely to give the option of
+        monitoring output before committing to database.
         """
         self.order_calibrations()
-        self._make_output_dir()
-        self._make_collector_paths()
+        # Creates the overall output directory and reset the attribute to use an absolute path to it.
+        self.output_dir = self._make_output_dir()
+
+        self.configure_jobs(self.order)
+
+        # Run the collection stage
+        for calibration_name in self.order:
+            job = self.jobs[calibration_name]
+            print("Submitting {0} to Backend".format(calibration_name))
+            self.backend.submit(job)
 
     @property
     def backend(self):
@@ -273,45 +364,74 @@ class CAF():
 
     def _make_output_dir(self):
         """
-        Creates the output directory. If it already exists it will copy the directory tree to
-        a new one based on the current time.
+        Creates the output directory. If it already exists we quit the program to prevent horrible
+        problems by either overwriting the files in this directory or moving it to a new name.
+        It returns the absolute path of the new output_dir
         """
-        if os.path.isdir(self.output_path):
-            B2WARNING('%s output directory already exists. The directory and its contents will be moved'
-                      % self.output_path)
-            shutil.move(self.output_path, ''.join(datetime.now().isoformat()+'_'+self.output_path))
+        if os.path.isdir(self.output_dir):
+            B2FATAL('{0} output directory already exists.'.format(self.output_dir))
+        else:
+            os.mkdir(self.output_dir)
+            abs_output_dir = os.path.join(os.getcwd(), self.output_dir)
+            if os.path.exists(abs_output_dir):
+                return abs_output_dir
+            else:
+                B2FATAL("Attempted to create output_dir {0}, but it didn't work.".format(abs_output_dir))
 
-        # make a new output directory, it shouldn't already exist as we took care of that above
-        os.mkdir(self.output_path)
+    def _make_calibration_dir(self, calibration_name):
+        """
+        Creates a directory for a calibration object contained in this CAF.
+        """
+        # This should always work as we will be running _make_output_dir() first and the calibration names
+        # should be unique => no need for superfluous checks
+        os.mkdir(os.path.join(self.output_dir, calibration_name))
 
-    def _make_collector_paths(self):
+    def _make_collector_path(self, calibration_name):
         """
-        Creates separate basf2 paths for collectors and serializes them in the self.output_path/paths directory
+        Creates a basf2 path for the correct collector and serializes it in the self.output_dir/<calibration_name>/paths directory
         """
-        path_output_dir = os.path.join(self.output_path, 'paths')
+        path_output_dir = os.path.join(self.output_dir, calibration_name, 'paths')
+        # Should work fine as we previously make the other directories
         os.mkdir(path_output_dir)
-        for calibration_name in self.order:
-            path = create_path()
-            calibration = self.calibrations[calibration_name]
-            path.add_module(calibration.collector)
-            path_file_name = calibration.collector.name()+'.pickle'
-            with open(os.path.join(path_output_dir, path_file_name), 'bw') as serialized_path_file:
-                pickle.dump(serialize_path(path), serialized_path_file)
+        # Create empty path and add collector to it
+        path = create_path()
+        calibration = self.calibrations[calibration_name]
+        path.add_module(calibration.collector)
+        # Dump the basf2 path to file and repeat
+        path_file_name = calibration.collector.name()+'.pickle'
+        path_file_name = os.path.join(path_output_dir, path_file_name)
+        with open(path_file_name, 'bw') as serialized_path_file:
+            pickle.dump(serialize_path(path), serialized_path_file)
+        # Return the pickle file path for addition to the input sandbox
+        return path_file_name
 
-    def _make_calibration_paths(self):
+
+class Job:
+    """
+    Generic Job object used to tell a Backend what to do.
+    - This is a way to store necessary information about a process for
+    submission and pass it in one object to a backend, rather than having
+    the framework set each parameter directly.
+    - Hopefully means that ANY use case can be more easily supported,
+    not just the CAF. You just have to fill a job object and pass it to a
+    Backend for the job submission to work.
+    - Use absolute paths for all directories, otherwise you'll likely get into trouble
+    """
+
+    def __init__(self, name):
         """
-        Creates separate basf2 paths for overall calibraiton objects and serializes them in the self.output_path/paths
-        directory
+        Init method of Job object.
+        - Here you just set the job name, everything else comes later.
         """
-        path_output_dir = os.path.join(self.output_path, 'paths')
-        os.mkdir(path_output_dir)
-        for calibration_name in self.order:
-            path = create_path()
-            calibration = self.calibrations[calibration_name]
-            path.add_module(calibration.collector)
-            for algorithm in calibration.algorithms:
-                algorithm_runner = CalibrationAlgorithmRunner(algorithm)
-                path.add_module(algorithm_runner)
-            path_file_name = calibration.name+'.pickle'
-            with open(os.path.join(path_output_dir, path_file_name), 'bw') as serialized_path_file:
-                pickle.dump(serialize_path(path), serialized_path_file)
+        #: Job object's name. Only descriptive, not necessarily unique.
+        self.name = name
+        #: Files to be tarballed and sent along with the job (NOT the input root files)
+        self.input_sandbox_files = []
+        #: Working directory of the job (str). Default is '.', mostly used in Local() backend
+        self.working_dir = '.'
+        #: Output directory (str), where we will download our output_files to. Default is '.'
+        self.output_dir = '.'
+        #: Files that we produce during the job and want to be returned. Can use wildcard (*)
+        self.output_files = []
+        #: Command and arguments as a list that wil be run by the job on the backend
+        self.cmd = []

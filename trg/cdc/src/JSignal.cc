@@ -934,8 +934,8 @@ namespace Belle2{
     t_result.m_maxActual = maxActual;
     t_result.m_type = t_result.calType();
     t_result.m_bitsize = t_result.calBitwidth();
-    // Check if there is overflow or underflow.
-    t_result.checkInt("TRGCDCJSignal::limit()");
+    //// Check if there is overflow or underflow.
+    //t_result.checkInt("TRGCDCJSignal::limit()");
     
 
     if(getPrintVhdl()==1) vhdlCode("none", *this, t_result, t_result.m_vhdlCode);

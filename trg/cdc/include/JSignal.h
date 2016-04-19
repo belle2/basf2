@@ -87,9 +87,9 @@ class TRGCDCJSignal {
   static void ifElse(std::vector<std::pair<TRGCDCJSignal, std::vector<std::pair<TRGCDCJSignal *, TRGCDCJSignal> > > > & data, int targetClock);
   /// If else implementation.
   static void ifElse(std::vector<std::pair<TRGCDCJSignal, std::vector<std::pair<TRGCDCJSignal *, TRGCDCJSignal> > > > & data);
-  /// Limits min and max values using specific integers.
+  /// Limits min and max values using specific integers. Use only for ifElse. Doesn't check overflow, underflow to be used in ifElse. 
   TRGCDCJSignal const limit(signed long long minInt, signed long long maxInt, double minActual, double maxActual) const;
-  /// Limits min and max values using JSignal.
+  /// Limits min and max values using JSignal. Use only for ifElse. Doesn't check overflow, underflow to be used in ifElse.
   TRGCDCJSignal const limit(TRGCDCJSignal const & min, TRGCDCJSignal const & max) const;
   /// Resizes signal.
   TRGCDCJSignal const resize(int bitwidth) const;

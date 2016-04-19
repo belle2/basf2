@@ -254,9 +254,6 @@ namespace Belle2 {
         }
       } // End superlayer loop
 
-
-      //////////////////////
-      // Start of 3D fitter
       // Calculate phi3D using driftTime.
       m_mVector["phi3D"] = vector<double> (4);
       for (unsigned iSt = 0; iSt < 4; iSt++) {
@@ -417,13 +414,14 @@ namespace Belle2 {
 
       TCTrack & aTrack = * trackList[iTrack];
 
-      ///////////////////////////////////////
-      // Check if all superlayers have one TS for the track.
-      bool trackFull= isAxialTrackFull(aTrack) && isStereoTrackFull(aTrack);
-      if(trackFull == 0){
-         aTrack.setFitted(0);
-         continue;
-      }
+      /////////////////////////////////////////
+      //// Check if all superlayers have one TS for the track.
+      //bool trackFull= isAxialTrackFull(aTrack) && isStereoTrackFull(aTrack);
+      //if(trackFull == 0){
+      //   cout<<"track is not Full."<<endl;
+      //   aTrack.setFitted(0);
+      //   continue;
+      //}
 
       /////////////////////////////////
       // Get MC values for 3D fitter
@@ -433,74 +431,51 @@ namespace Belle2 {
       m_mDouble["eventNumber"] = m_cdc.getEventNumber();
       m_mDouble["trackId"] = aTrack.getTrackID();
 
-      ////////////////
-      // Do 2D Fit
-      // Get wirePhi, LR, mcLR, Drift information
-      m_mVector["wirePhi"] = vector<double> (9);
-      m_mVector["lutLR"] = vector<double> (9);
-      m_mVector["LR"] = vector<double> (9);
-      m_mVector["driftLength"] = vector<double> (9);
-      m_mVector["tdc"] = vector<double> (9);
-      for (unsigned iSL = 0; iSL < 9; iSL++) {
-        const vector<TCLink *> & links = aTrack.links(iSL);
-        const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
-        m_mVector["wirePhi"][iSL] = (double) t_segment->localId()/m_mConstV["nWires"][iSL]*4*m_mConstD["Trg_PI"];
-        m_mVector["lutLR"][iSL] = t_segment->LUT()->getValue(t_segment->lutPattern());
-        // mcLR should be removed.
-        m_mVector["mcLR"][iSL] = t_segment->hit()->mcLR();
-        m_mVector["driftLength"][iSL] = t_segment->hit()->drift();
-        m_mVector["tdc"][iSL] = t_segment->priorityTime();
-        if(m_mBool["fmcLR"]==1) m_mVector["LR"][iSL] = m_mVector["mcLR"][iSL];
-        else if(m_mBool["fLRLUT"]==1) m_mVector["LR"][iSL] = m_mVector["lutLR"][iSL];
-        else m_mVector["LR"][iSL] = 3;
-      } // End superlayer loop
-
-      ////////////////////
-      // Get 2D fit values
-      // Get 2D fit values from IW 2D fitter
-      m_mDouble["phi02D"] = aTrack.helix().phi0();
-      m_mDouble["pt2D"] = aTrack.pt();
-      if(aTrack.charge()<0) {
-        m_mDouble["phi02D"] -= m_mConstD["Trg_PI"];
-        if (m_mDouble["phi02D"] < 0) m_mDouble["phi02D"] += 2 * m_mConstD["Trg_PI"];
-      }
-      m_mDouble["dr2D"] = aTrack.helix().dr()*0.01;
-      // Get 2D fit values from JB 2D fitter
-      // Currently using JB fitter for 3D fitting
-      m_mDouble["charge"] = double(aTrack.charge());
-      // Set phi2DError for 2D fit
-      m_mVector["phi2DError"] = vector<double> (5);
-      m_mVector["phi2DInvError"] = vector<double> (5);
-      for (unsigned iAx = 0; iAx < 5; iAx++) {
-        if(m_mVector["LR"][2*iAx] != 3) m_mVector["phi2DError"][iAx] = m_mConstV["driftPhi2DError"][iAx];
-        else m_mVector["phi2DError"][iAx] = m_mConstV["wirePhi2DError"][iAx];
-        m_mVector["phi2DInvError"][iAx] = 1/m_mVector["phi2DError"][iAx];
-      }
-      // Calculate phi2D.
-      m_mVector["phi2D"] = vector<double> (5);
-      if (m_mBool["f2DFitDrift"] == 0) {
-        for (unsigned iAx = 0; iAx < 5; iAx++) m_mVector["phi2D"][iAx] = m_mVector["wirePhi"][iAx*2];
-      } else {
-        for (unsigned iAx = 0; iAx < 5; iAx++) {
-          m_mVector["phi2D"][iAx] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iAx*2], m_mVector["tdc"][iAx*2], m_mDouble["eventTime"], m_mConstV["rr"][iAx*2], m_mVector["LR"][iAx*2]);
-        }
-      }
-      // Fit2D
-      if (m_mBool["f2DFit"] == 0) {
-        m_mDouble["rho"] = m_mDouble["pt2D"]/0.01/1.5/0.299792458;
-        m_mDouble["pt"] = 0.299792458*1.5*m_mDouble["rho"]/100;
-        m_mDouble["phi0"] = m_mDouble["phi02D"];
-        m_mDouble["fit2DChi2"] = 9999;
-      } else {
-        m_mDouble["rho"] = 0;
-        m_mDouble["phi0"] = 0;
-        m_mDouble["fit2DChi2"] = 0;
-        Fitter3DUtility::rPhiFitter(&m_mConstV["rr2D"][0],&m_mVector["phi2D"][0],&m_mVector["phi2DInvError"][0],m_mDouble["rho"], m_mDouble["phi0"],m_mDouble["fit2DChi2"]); 
-        m_mDouble["pt"] = 0.3*1.5*m_mDouble["rho"]/100;
-      }
+      ///////////////////////////////////
+      //// 2D Fitter
+      int fit2DResult = do2DFit(aTrack, m_mBool, m_mConstD, m_mConstV, m_mDouble, m_mVector);
+      if (fit2DResult != 0) continue;
 
       //////////////////////
       // Start of 3D fitter
+      bool useStSl[4];
+      findHitStereoSuperlayers(aTrack, useStSl, m_mBool["fIsPrintError"]);
+      removeImpossibleStereoSuperlayers(useStSl);
+      // Check if number of stereo super layer hits is smaller or equal to 1.
+      int nHitSl = (int)useStSl[0]+(int)useStSl[1]+(int)useStSl[2]+(int)useStSl[3];
+      if(nHitSl <= 1) {
+        aTrack.setFitted(0);
+        continue;
+      }
+
+      // Fill information for stereo layers
+      for (unsigned iSt = 0; iSt < 4; iSt++) {
+        if(useStSl[iSt] == 1) {
+          const vector<TCLink *> & links = aTrack.links(iSt*2+1);
+          const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
+          m_mVector["wirePhi"][iSt*2+1] = (double) t_segment->localId()/m_mConstV["nWires"][iSt*2+1]*4*m_mConstD["Trg_PI"];
+          //m_mVector["lutLR"][iSL] = t_segment->LUT()->getLRLUT(t_segment->hitPattern(),iSL);
+          m_mVector["lutLR"][iSt*2+1] = t_segment->LUT()->getValue(t_segment->lutPattern());
+          // mcLR should be removed.
+          m_mVector["mcLR"][iSt*2+1] = t_segment->hit()->mcLR();
+          m_mVector["driftLength"][iSt*2+1] = t_segment->hit()->drift();
+          m_mVector["tdc"][iSt*2+1] = t_segment->priorityTime();
+          if(m_mBool["fmcLR"]==1) m_mVector["LR"][iSt*2+1] = m_mVector["mcLR"][iSt*2+1];
+          else if(m_mBool["fLRLUT"]==1) m_mVector["LR"][iSt*2+1] = m_mVector["lutLR"][iSt*2+1];
+          else m_mVector["LR"][iSt*2+1] = 3;
+        } else {
+          m_mVector["wirePhi"][iSt*2+1] = 9999;
+          m_mVector["lutLR"][iSt*2+1] = 9999;
+          // mcLR should be removed.
+          m_mVector["mcLR"][iSt*2+1] = 9999;
+          m_mVector["driftLength"][iSt*2+1] = 9999;
+          m_mVector["tdc"][iSt*2+1] = 9999;
+          if(m_mBool["fmcLR"]==1) m_mVector["LR"][iSt*2+1] = 9999;
+          else if(m_mBool["fLRLUT"]==1) m_mVector["LR"][iSt*2+1] = 9999;
+          else m_mVector["LR"][iSt*2+1] = 9999;
+        }
+      } // End superlayer loop
+
       // Calculate phi3D using driftTime.
       m_mVector["phi3D"] = vector<double> (4);
       for (unsigned iSt = 0; iSt < 4; iSt++) m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], m_mVector["tdc"][iSt*2+1], m_mDouble["eventTime"], m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
@@ -512,7 +487,13 @@ namespace Belle2 {
       }
       // Get inverse zerror ^ 2
       m_mVector["iZError2"] = vector<double> (4);
-      for (unsigned iSt = 0; iSt < 4; iSt++) m_mVector["iZError2"][iSt] = 1/pow(m_mVector["zError"][iSt],2);
+      for (unsigned iSt = 0; iSt < 4; iSt++) {
+        if(useStSl[iSt] == 1) {
+          m_mVector["iZError2"][iSt] = 1/pow(m_mVector["zError"][iSt],2);
+        } else {
+          m_mVector["iZError2"][iSt] = 0;
+        }
+      }
 
       // Simple version of Fitter3D
       //// Calculate zz

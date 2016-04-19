@@ -13,6 +13,7 @@
 
 #include <limits>
 #include <iostream>
+#include <cmath>
 #include "trg/trg/Clock.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/Signal.h"
@@ -111,15 +112,7 @@ TRGClock::position(double t) const {
 //    cout << "t,offset,unit=" << t << "," << _offset << "," << int((t
 //    - _offset) / _cycle) << endl;
 #endif
-
-    // Here ignoring offset effect (assuming same offset to a source).
-
-    if (_source && _multi != 1) {
-	const int tt = _source->position(t);
-	const double rem = _source->overShoot(t);
-	return tt * int(_multi) + int(rem / _cycle);
-    }
-    return int((t - _offset) / _cycle) + 1;
+    return floor((t - _offset) / _cycle);
 }
 
 double
@@ -129,10 +122,6 @@ TRGClock::absoluteTime(int t) const {
 
 double
 TRGClock::overShoot(double t) const {
-    if (_source && _multi != 1) {
-	const double rem = _source->overShoot(t);
-	return rem - _cycle * double(_source->position(t));
-    }
     return (t - _offset) - _cycle * double(position(t));
 }
 

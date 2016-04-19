@@ -17,6 +17,7 @@ import subprocess
 from fnmatch import fnmatch
 
 mapfile = FileSystem.findFile('data/cdc/ch_map.dat')
+t0file = FileSystem.findFile('data/cdc/t0.dat')
 use_local_database("cdc_crt/database.txt", "cdc_crt")
 
 main = create_path()
@@ -35,6 +36,6 @@ process(main)
 
 dbImporter = CDCDatabaseImporter()
 dbImporter.importChannelMap(mapfile)
-dbImporter.importTimeZero()
+dbImporter.importTimeZero(t0file)
 # dbImporter.printChannelMap()
 # dbImporter.printTimeZero()

@@ -206,7 +206,7 @@ main = create_path()
 if args.raw_input:
     main.add_module('SeqRootInput')
 else:
-    main.add_module('RootInput', branchNames=['EventMetaData', 'RawFTSWs', 'RawSVDs'])
+    main.add_module('RootInput', branchNames=['EventMetaData', 'RawFTSWs', 'RawSVDs', 'RawPXDs', 'RawFTSWs'])
 
 
 if args.dqm:
@@ -219,7 +219,9 @@ add_geometry(main, not args.magnet_off)
 if args.unpacking:
     add_unpackers(main, args.svd_only)
 
+
 if not args.svd_only:
+    main.add_module("PXDRawHitSorter")
     main.add_module('PXDClusterizer')
 
 main.add_module('SVDDigitSorter')  # , ignoredStripsListName='data/testbeam/vxd/SVD_Masking.xml')
@@ -240,7 +242,9 @@ else:
     main.add_module('GenFitter', FilterId='Kalman')
 
 if args.dqm:
-    main.add_module('PXDDQM')
+    main.add_module("PXDRawDQM")
+    main.add_module("PXDDQMCorr")
+    # main.add_module('PXDDQM')
     main.add_module('SVDDQM3')
 
     if not args.gbl_collect:

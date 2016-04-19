@@ -1025,7 +1025,7 @@ void SVDDQM3Module::event()
     }
   }
 
-  int SwapPXD = 1;
+  int SwapPXD = 0;
   // Correlations for space point coordinates
   for (int i1 = 0; i1 < storeSVDClusters.getEntries() + storePXDClusters.getEntries(); i1++) {
     // preparing of first value for correlation plots with postfix "1":

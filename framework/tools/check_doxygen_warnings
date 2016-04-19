@@ -1,5 +1,11 @@
 #!/bin/bash
 
+which doxygen &> /dev/null
+if [ $? -ne 0 ]; then
+    echo "doxygen executable not found. Doxygen must be installed for this script to work"
+    exit 1;
+fi
+
 # check for help argument
 echo $@ | grep -E -- "(^|\\s)(--help|-h)($|\\s)" &>/dev/null
 if [ $? -eq 0 ]; then

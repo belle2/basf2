@@ -366,21 +366,12 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
 
     } // End of loop over all the tracks.
 
-    if(m_makeRootFile) {
-      if(m_fileFinder3D==0) {
-        m_fileFinder3D = new TFile("Finder3D.root","RECREATE");
-        HandleRoot::initializeRoot("hough3D", &m_treeConstantsFinder3D, &m_treeTrackFinder3D,
-          m_mRunTVectorD, m_mEventTVectorD, m_mTClonesArray,
-          m_mConstD, m_mConstV,
-          m_mEventD, m_mEventV,
-          m_mDouble, m_mVector
+    // Will ignore events until event has a track.
+    if(m_makeRootFile && m_fileFinder3D) {
+        HandleRoot::saveEventValues("hough3D", 
+          m_mEventTVectorD, m_mEventD, m_mEventV
         );
-      }
-      HandleRoot::saveEventValues("hough3D", 
-        m_mEventTVectorD, m_mEventD, m_mEventV
-      );
-
-      m_treeTrackFinder3D->Fill();
+        m_treeTrackFinder3D->Fill();
     }
 
 

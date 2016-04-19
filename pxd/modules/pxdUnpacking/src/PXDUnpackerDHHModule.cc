@@ -1446,6 +1446,22 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
 //Remaps of inner forward (IF) and outer backward (OB) modules of the PXD
 void PXDUnpackerDHHModule::remap_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int dhp_id, unsigned int dhe_ID)
 {
+  unsigned int ch = 4 * u_cellID + v_cellID % 4;
+  unsigned int DCD_col = ch / 16;
+  unsigned int DCD_col_sw = 15 - DCD_col;
+  unsigned int  drain = ch % 16 + DCD_col_sw * 16 + 250 * dhp_id;
+
+  if (ch >= 10 and ch <= 15) drain = 1023;
+
+  u_cellID = drain / 4;
+  unsigned int row = (v_cellID / 4) * 4  + drain % 4;
+  if (((dhe_ID >> 5) & 0x1) == 0) {//if inner module
+    v_cellID = 768 - 1 - row ;
+  } else {//if outer module
+    v_cellID = row ;
+  }
+
+#if 0
   unsigned int DCD_channel = 0;
   unsigned int Drain = 0;
   unsigned int row = 0;
@@ -1490,14 +1506,44 @@ void PXDUnpackerDHHModule::remap_IF_OB(unsigned int& v_cellID, unsigned int& u_c
   B2INFO("in remap ROW ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   u_cellID = Drain / 4;
   row = (v_cellID / 4) * 4  + Drain % 4;
-  if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - 1 - row ;} //if inner module
-  if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = row ;} //if outer module
+  if (((dhe_ID >> 5) & 0x1) == 0) {//if inner module
+    v_cellID = 768 - 1 - row ;
+
+  } else {//if outer module
+    v_cellID = row ;
+  }
+#endif
   B2INFO("Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }
 
 //Remaps of inner backward (IB) and outer forward (OF) modules of the PXD
 void PXDUnpackerDHHModule::remap_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int dhp_id, unsigned int dhe_ID)
 {
+  unsigned int ch = 4 * u_cellID + v_cellID % 4;
+  unsigned int DCD_col = ch / 16;
+  unsigned int DCD_col_sw = 15 - DCD_col;
+  unsigned int ch_map = 4 * u_cellID + (3 - v_cellID) % 4;
+  unsigned int drain = ch_map % 16 + DCD_col_sw * 16 + 250 * dhp_id;
+
+  if (dhp_id == 1 or dhp_id == 3) {
+    if (v_cellID / 2 == 0) {
+      drain -= 4;
+    } else {
+      drain += 4;
+    }
+  }
+
+  if (ch >= 10 and ch <= 15) drain = 1023;
+
+  u_cellID = 250 - 1 - drain / 4;
+  unsigned int row = (v_cellID / 4) * 4  + drain % 4;
+  if (((dhe_ID >> 5) & 0x1) == 0) { //if inner module
+    v_cellID = 768 - 1 - row ;
+  } else { //if outer module
+    v_cellID = row ;
+  }
+
+#if 0
   unsigned int DCD_channel = 0;
   unsigned int Drain = 0;
   unsigned int row = 0;
@@ -1542,7 +1588,11 @@ void PXDUnpackerDHHModule::remap_IB_OF(unsigned int& v_cellID, unsigned int& u_c
   B2INFO("in remap ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   u_cellID = 250 - 1 - Drain / 4;
   row = (v_cellID / 4) * 4  + Drain % 4;
-  if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 786 - 1 - row ;} //if inner module
-  if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = row ;} //if outer module
+  if (((dhe_ID >> 5) & 0x1) == 0) { //if inner module
+    v_cellID = 768 - 1 - row ;
+  } else { //if outer module
+    v_cellID = row ;
+  }
+#endif
   B2INFO("Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }

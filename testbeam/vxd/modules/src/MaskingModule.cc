@@ -443,7 +443,7 @@ void MaskingModule::event()
 
   StoreObjPtr<EventMetaData> storeEventMetaData;
 
-  if (storeEventMetaData->getEvent() > m_nEventsProcess) {
+  if (storeEventMetaData->getEvent() > (unsigned int)m_nEventsProcess) {
     storeEventMetaData->setEndOfData();
   }
   m_StatAllEvents++;

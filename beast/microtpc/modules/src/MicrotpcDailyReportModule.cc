@@ -77,7 +77,7 @@ void MicrotpcDailyReportModule::defineHisto()
   for (int i = 0; i < 2; i ++) {
     h_tpc_uptime[i] = new TH1F(TString::Format("h_tpc_uptime_%d", i), "", 3, 0., 3.);
   }
-  for (int i = 0; i < 8; i ++) {
+  for (int i = 0; i < 9; i ++) {
     h_tpc_rate[i] = new TH1F(TString::Format("h_tpc_rate_%d", i), "", 24 * 60 * 60, 0., 24.);
     h_tpc_gain[i] = new TH2F(TString::Format("h_tpc_gain_%d", i), "", 24 * 60 * 60, 0., 24., 200, 0., 2000.);
     h_tpc_triglength[i] = new TH1F(TString::Format("h_tpc_triglength_%d", i), "", 24 * 60 * 60, 0., 24.);
@@ -160,6 +160,11 @@ void MicrotpcDailyReportModule::event()
 }
 void MicrotpcDailyReportModule::endRun()
 {
+}
+
+void MicrotpcDailyReportModule::terminate()
+{
+  cout << "terminate section" << endl;
   double LifeTime = h_tpc_uptime[1]->GetMaximum();
   for (int i = 0; i < 7; i++) {
     int Nbin = h_tpc_rate[i]->GetNbinsX();
@@ -183,11 +188,6 @@ void MicrotpcDailyReportModule::endRun()
        " % of the time " << endl;
   cout << "TPC #" << m_inputTPCNumber << " daily report: detector was up " << LifeTime / 60. / 60. / 24. / 24. * 100. <<
        " % of the time" << endl;
-
-}
-
-void MicrotpcDailyReportModule::terminate()
-{
 }
 
 

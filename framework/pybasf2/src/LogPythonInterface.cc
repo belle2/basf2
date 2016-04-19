@@ -100,6 +100,10 @@ void LogPythonInterface::zeroCounters()
   LogSystem::Instance().resetMessageCounter();
 }
 
+void LogPythonInterface::enableErrorSummary(bool on)
+{
+  LogSystem::Instance().enableErrorSummary(on);
+}
 
 /** Return dict containing message counters */
 dict LogPythonInterface::getLogStatistics()
@@ -191,6 +195,9 @@ void LogPythonInterface::exposePythonAPI()
   .def("reset", &LogPythonInterface::reset)
   .def("zero_counters", &LogPythonInterface::zeroCounters)
   .def_readonly("log_stats", &LogPythonInterface::getLogStatistics)
+  .def("enable_summary", &LogPythonInterface::enableErrorSummary, args("on"),
+       "Enable or disable the error summary printed at the end of processing. "
+       "Expects one argument wether or not the summary should be shown")
   ;
 
   docstring_options doc_options(true, true, false);

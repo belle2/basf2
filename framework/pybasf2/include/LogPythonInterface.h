@@ -143,6 +143,8 @@ namespace Belle2 {
      */
     void zeroCounters();
 
+    /** Enable/Disable error summary */
+    void enableErrorSummary(bool on);
 
     /**
      * Produce debug message

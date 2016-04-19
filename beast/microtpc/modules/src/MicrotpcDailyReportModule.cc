@@ -90,7 +90,7 @@ void MicrotpcDailyReportModule::defineHisto()
     h_tpc_triglength[i] = new TH1F(TString::Format("h_tpc_triglength_%d", i), "", 256, 0., 256.);
     h_tpc_phivtheta[i] = new TH2F(TString::Format("h_tpc_phivtheta_%d", i), "", 360, -180., 180., 180, 0., 180.);
     h_tpc_phivtheta_w[i] = new TH2F(TString::Format("h_tpc_phivtheta_w_%d", i), "",  360, -180., 180., 180, 0., 180.);
-    h_tpc_edepvtrl[i] = new TH2F(TString::Format(" h_tpc_edepvtrl_%d", i), "", 2000, 0., 4000., 1000, 0., 3.);
+    h_tpc_edepvtrl[i] = new TH2F(TString::Format("h_tpc_edepvtrl_%d", i), "", 2000, 0., 4000., 1000, 0., 3.);
     h_tpc_rate[i]->Sumw2();
     h_tpc_gain[i]->Sumw2();
     h_tpc_triglength[i]->Sumw2();

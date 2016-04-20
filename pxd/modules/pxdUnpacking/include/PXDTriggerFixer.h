@@ -15,10 +15,9 @@ namespace Belle2 {
 
   namespace PXD {
 
-#define MAX_EVENTSHIFT int(100)
-
     class PXDTriggerFixerModule: public Module {
     private:
+      enum {MAX_EVENTSHIFT = 100};
       MRUCache<int, TClonesArray> m_previous_events{MAX_EVENTSHIFT};
       StoreArray<RawPXD> m_storeRaw;
 

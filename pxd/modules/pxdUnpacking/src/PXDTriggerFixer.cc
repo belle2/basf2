@@ -38,9 +38,11 @@ void PXDTriggerFixerModule::event(void)
 
   m_previous_events.insert(pxdTriggerNr, *rawdata);
 
+  setReturnValue(true);
   if (triggerNr != pxdTriggerNr) {
     if (!m_previous_events.retrieve(triggerNr, *rawdata)) {
-      B2ERROR("Could not trigger offset for HLT $" << hex << triggerNr << " and DHH $" << hex << pxdTriggerNr);
+      B2WARNING("Could not trigger offset for HLT $" << hex << triggerNr << " and DHH $" << hex << pxdTriggerNr);
+      setReturnValue(false);
     } else {
       B2INFO("Fixed trigger offset for #$" << hex << triggerNr << " and " << hex << pxdTriggerNr);
     }

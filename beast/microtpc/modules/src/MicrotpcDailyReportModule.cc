@@ -84,7 +84,7 @@ void MicrotpcDailyReportModule::defineHisto()
   for (int i = 0; i < 2; i ++) {
     h_tpc_uptime[i] = new TH1F(TString::Format("h_tpc_uptime_%d", i), "", 3, 0., 3.);
   }
-  for (int i = 0; i < 11; i ++) {
+  for (int i = 0; i < 12; i ++) {
     if (i < 7) {
       h_tpc_rate[i] = new TH1F(TString::Format("h_tpc_rate_%d", i), "", 5000, 0., 24.);
       h_tpc_gain[i] = new TH2F(TString::Format("h_tpc_gain_%d", i), "", 1000, 0., 24., 200, 0., 2000.);
@@ -99,7 +99,7 @@ void MicrotpcDailyReportModule::defineHisto()
     h_tpc_phivtheta[i]->Sumw2();
     h_tpc_phivtheta_w[i]->Sumw2();
     h_tpc_edepvtrl[i]->Sumw2();
-    if (i < 5) {
+    if (i < 6) {
       h_tpc_yvphi[i] = new TH2F(TString::Format("h_tpc_yvphi_%d", i), "", 336, -1., 1., 360, -180., 180.);
       h_tpc_yvphi[i]->Sumw2();
     }
@@ -246,6 +246,14 @@ void MicrotpcDailyReportModule::event()
       h_tpc_edepvtrl[10]->Fill(esum, trl);
       h_tpc_yvphi[4]->Fill(impact_y, phi);
     }
+    //neutron candidate
+    if (partID[6] == 1) {
+      h_tpc_triglength[11]->Fill(time_range);
+      h_tpc_phivtheta[11]->Fill(phi, theta);
+      h_tpc_phivtheta_w[11]->Fill(phi, theta, esum);
+      h_tpc_edepvtrl[11]->Fill(esum, trl);
+      h_tpc_yvphi[5]->Fill(impact_y, phi);
+    }
 
   }// end loop over all Tracks
 
@@ -281,14 +289,14 @@ void MicrotpcDailyReportModule::terminate()
     h_tpc_gain[i]->Scale(1. / rate / 60. / 60.);
   }
 
-  for (int i = 0; i < 11; i++) {
+  for (int i = 0; i < 12; i++) {
     h_tpc_triglength[i]->Scale(1. / LifeTime);
     h_tpc_phivtheta[i]->Scale(1. / LifeTime);
     h_tpc_phivtheta_w[i]->Scale(1. / LifeTime);
     h_tpc_edepvtrl[i]->Scale(1. / LifeTime);
   }
 
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 6; i++) {
     h_tpc_yvphi[i]->Scale(1. / LifeTime);
   }
 

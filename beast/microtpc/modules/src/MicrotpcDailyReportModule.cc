@@ -100,7 +100,7 @@ void MicrotpcDailyReportModule::defineHisto()
     h_tpc_phivtheta_w[i]->Sumw2();
     h_tpc_edepvtrl[i]->Sumw2();
     if (i < 5) {
-      h_tpc_yvphi[i] = new TH2F(TString::Format("h_tpv_yvphi_%d", i), "", 336, -1., 1., 360, -180., 180.);
+      h_tpc_yvphi[i] = new TH2F(TString::Format("h_tpc_yvphi_%d", i), "", 336, -1., 1., 360, -180., 180.);
       h_tpc_yvphi[i]->Sumw2();
     }
   }
@@ -180,11 +180,11 @@ void MicrotpcDailyReportModule::event()
   }
 
   for (const auto& aTrack : Tracks) { // start loop over all Tracks
-    const int detNb = aTrack.getdetNb() - 1;
-    const double phi = aTrack.getphi();
-    const double theta = aTrack.gettheta();
-    const double trl = aTrack.gettrl();
-    const double esum = aTrack.getesum();
+    int detNb = m_inputTPCNumber - 1;//aTrack.getdetNb() - 1;
+    const float phi = aTrack.getphi();
+    const float theta = aTrack.gettheta();
+    const float trl = aTrack.gettrl();
+    const float esum = aTrack.getesum();
     const int time_range = aTrack.gettime_range();
     int side[16];
     for (int j = 0; j < 16; j++) {
@@ -222,7 +222,7 @@ void MicrotpcDailyReportModule::event()
     h_tpc_phivtheta_w[8]->Fill(phi, theta, esum);
     h_tpc_edepvtrl[8]->Fill(esum, trl);
 
-    double impact_y = -1000.;
+    float impact_y = -1000.;
     if (detNb == 0 || detNb == 3) impact_y = aTrack.getimpact_y()[0];
     else if (detNb == 1 || detNb == 2) impact_y = aTrack.getimpact_y()[3];
     h_tpc_yvphi[0]->Fill(impact_y, phi);

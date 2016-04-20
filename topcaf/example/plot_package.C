@@ -107,7 +107,7 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   TH2F *h_hitmap3=(TH2F*) fr.Get("pmt_xy_tight2");
   TCanvas *c_hitmap = new TCanvas("chitmap","chitmap",800,800);  
   c_hitmap->Divide(1,4);
-  c_hitmap->SetLogy();
+  //c_hitmap->SetLogy();
   c_hitmap->SetLogz();
   c_hitmap->cd(1);
   h_hitmap0->Draw();
@@ -133,6 +133,8 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
       py2->GetXaxis()->SetRangeUser(300,500);      
       if(strstr(filename, "slot") != NULL){
 	py2->GetXaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
+	TPad* c_py2_1=(TPad*)(c_py2->GetPrimitive("c_py2_1"));
+	c_py2_1->SetLogy();
       }
     }
   }
@@ -152,7 +154,13 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
     fn1->SetParLimits(2,0.5,5);
   }
   py2->Fit(fn1,"RB");
-  TPaveText *py1t=new TPaveText(0.6,0.5,1.0,0.9,"NDC");
+  TPaveText *py1t;
+  if(strstr(filename, "slot") != NULL){
+    py1t=new TPaveText(0.8,0.7,1.0,0.9,"NDC");
+  }
+  else{
+    py1t=new TPaveText(0.6,0.5,1.0,0.9,"NDC");
+  }
   char ct1[25];
   sprintf(ct1,"1: x=%f +/- %f",fn0->GetParameter(1),fn0->GetParError(1));
   py1t->AddText(ct1);
@@ -202,6 +210,7 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
     asict[i]=(TH1F*) fr.Get(Form("asic_time_optics%i",i));
   }
   TCanvas *cbs[4];
+  TPad *cbs_i[64];
   for(int ii=0;ii<4;ii++){
     cbs[ii]=new TCanvas(Form("cbs%i",ii),Form("cbs%i",ii),800,800);
     cbs[ii]->Divide(4,4);
@@ -217,6 +226,8 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
 	  asict[ii*16+iii]->GetXaxis()->SetRangeUser(300,500);
 	  if(strstr(filename, "slot") != NULL){
 	    asict[ii*16+iii]->GetXaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
+	    cbs_i[ii*16+iii]=(TPad*)(cbs[ii]->GetPrimitive(Form("cbs%i_%i",ii,iii+1)));
+	    cbs_i[ii*16+iii]->SetLogy();
 	  }
 	}
       }

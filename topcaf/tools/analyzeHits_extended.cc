@@ -188,8 +188,11 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     cosmic_cut[2] = (Form("TOPCAFDigits.m_time>%f && TOPCAFDigits.m_time<%f", xpeaks2[0] - 12, xpeaks2[0] + 12));
   }
   if (trigstring == "laser") {
-    cosmic_cut[0] = (Form("TOPCAFDigits.m_time>%f && TOPCAFDigits.m_time<%f", xpeaks0[0] - 9, xpeaks0[0] + 9));
-    cosmic_cut[1] = (Form("TOPCAFDigits.m_time>%f && TOPCAFDigits.m_time<%f", xpeaks1[0] - 14, xpeaks1[0] + 14));
+    //cosmic_cut[0] = (Form("TOPCAFDigits.m_time>%f && TOPCAFDigits.m_time<%f", xpeaks0[0] - 9, xpeaks0[0] + 9));
+    //cosmic_cut[1] = (Form("TOPCAFDigits.m_time>%f && TOPCAFDigits.m_time<%f", xpeaks1[0] - 14, xpeaks1[0] + 14));
+    //Redone for installed modules
+    cosmic_cut[0] = (Form("TOPCAFDigits.m_time>%f && TOPCAFDigits.m_time<%f", xpeaks0[0] - 3, xpeaks0[0] + 3));
+    cosmic_cut[1] = (Form("TOPCAFDigits.m_time>%f && TOPCAFDigits.m_time<%f", xpeaks0[0] + 80 - 7, xpeaks0[0] + 80 + 7));
     cosmic_cut[2] = (Form("TOPCAFDigits.m_time>%f && TOPCAFDigits.m_time<%f", xpeaks2[0] - 12, xpeaks2[0] + 12));
   }
 

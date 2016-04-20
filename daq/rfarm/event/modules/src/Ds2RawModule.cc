@@ -93,7 +93,7 @@ void Ds2RawModule::event()
   hdr.SetNumNodesinPacket(1);
   hdr.SetEventNumber(evtmeta->getEvent());
   //  hdr.SetExpRunWord(evtmeta->getRun());
-  hdr.SetSubRunNum(0);     // temporary
+  hdr.SetSubRunNum(evtmeta->getSubrun());     // modified on Apr. 20, 2016 by SY
   hdr.SetRunNum(evtmeta->getRun());
   hdr.SetExpNum(evtmeta->getExperiment());
   hdr.SetNodeID(HLT_SUBSYS_ID);

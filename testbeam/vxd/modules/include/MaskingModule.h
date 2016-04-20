@@ -1,6 +1,7 @@
 #ifndef MaskingMODULE_H_
 #define MaskingMODULE_H_
 
+
 #undef DQM
 #ifndef DQM
 #include <framework/core/HistoModule.h>
@@ -36,7 +37,6 @@
 #include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <testbeam/vxd/dataobjects/TelDigit.h>
-#include <pxd/dataobjects/PXDCluster.h>
 
 #include <framework/core/HistoModule.h>
 
@@ -45,7 +45,6 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-
 
 
 // Include BASF2 Base stuff
@@ -78,14 +77,18 @@ namespace Belle2 {
       c_nPXDPlanes = 2,
       c_firstPXDPlane = 1,
       c_lastPXDPlane = 2,
+      c_MaxSensorsInPXDPlane = 2,
       c_nSVDPlanes = 4,
       c_firstSVDPlane = 3,
       c_lastSVDPlane = 6,
+      c_MaxSensorsInSVDPlane = 5,
       c_nTelPlanes = 6,
       c_firstTelPlane = 1,
       c_lastTelPlane = 6,
       c_nTelPlanesFrontGrup = 3,
-      c_MissingPlaneIndex = 3,
+      c_nVXDPlanes = 6,
+      c_firstVXDPlane = 1,
+      c_lastVXDPlane = 6,
     };
 
     /** Constructor */
@@ -101,20 +104,6 @@ namespace Belle2 {
     virtual void terminate();
 
     int CallSVDFilter(const SVDCluster* cluster);
-    int CallFullTrackFilter(const StoreArray<PXDCluster>* storePXDClusters,
-                            const StoreArray<SVDCluster>* storeSVDClusters,
-                            const StoreArray<PXDCluster>* storeTelClusters);
-    int CallCorrelation(const StoreArray<PXDCluster>* storePXDClusters,
-                        const StoreArray<SVDCluster>* storeSVDClusters,
-                        const StoreArray<PXDCluster>* storeTelClusters,
-                        const PXDCluster* clusterPXD);
-    int CallCorrelation(const StoreArray<PXDCluster>* storePXDClusters,
-                        const StoreArray<SVDCluster>* storeSVDClusters,
-                        const StoreArray<PXDCluster>* storeTelClusters,
-                        const SVDCluster* clusterSVD);
-    int CallCorrelationPXDPXD(const PXDCluster* clusterPXD1, const PXDCluster* clusterPXD2, int iPlane1, int iPlane2);
-    int CallCorrelationPXDSVD(const PXDCluster* clusterPXD, const SVDCluster* clusterSVD, int iPlane1, int iPlane2);
-    int CallCorrelationSVDSVD(const SVDCluster* clusterSVD1, const SVDCluster* clusterSVD2, int iPlane1, int iPlane2);
 
 
     /**
@@ -137,11 +126,15 @@ namespace Belle2 {
     }
     inline int indexToPlaneSVD(int index) const
     {
-      return c_firstPXDPlane + index;
+      return c_firstSVDPlane + index;
     }
     inline int planeToIndexSVD(int iPlane) const
     {
-      return iPlane - c_firstPXDPlane;
+      return iPlane - c_firstSVDPlane;
+    }
+    inline int indexToPlaneVXD(int index) const
+    {
+      return c_firstVXDPlane + index;
     }
     inline int indexToPlaneTel(int index) const
     {
@@ -182,23 +175,41 @@ namespace Belle2 {
              iPlane - c_firstTelPlane;
     }
 
+    /** This is a shortcut to getting SVD::SensorInfo from the GeoCache.
+     * @param index Index of the sensor (0,1,2,3), _not_ layer number!
+     * @param sensor Number of the sensor (1,.. - depend of layer)!
+     * @return SensorInfo object for the desired plane.
+     */
+    inline const SVD::SensorInfo& getInfoSVD(int index, int sensor) const;
+
     /** This is a shortcut to getting PXD::SensorInfo from the GeoCache.
      * @param index Index of the sensor (0,1), _not_ layer number!
+     * @param sensor Number of the sensor (1,2)!
      * @return SensorInfo object for the desired plane.
      */
-    inline const PXD::SensorInfo& getInfoPXD(int index) const;
-
-    /** This is a shortcut to getting SVD::SensorInfo from the GeoCache.
-     * @param index Index of the sensor (2,3,4,5), _not_ layer number!
-     * @return SensorInfo object for the desired plane.
-     */
-    inline const SVD::SensorInfo& getInfoSVD(int index) const;
+    inline const PXD::SensorInfo& getInfoPXD(int index, int sensor) const;
 
     /** This is a shortcut to getting TEL::SensorInfo from the GeoCache.
      * @param index Index of the sensor (0,1,2,9,10,11), _not_ layer number!
      * @return SensorInfo object for the desired plane.
      */
     inline const TEL::SensorInfo& getInfoTel(int index) const;
+
+    /** This is a shortcut to getting number of sensors for PXD and SVD layers.
+    * @param layer Index of sensor layer (1,6)
+    * @return Number of sensors in layer.
+    */
+    inline int getSensorsInLayer(int layer) const
+    {
+      int nSensors = 0;
+      if ((layer >= 1) && (layer <= 3)) nSensors = 2;
+      if (layer == 4) nSensors = 3;
+      if (layer == 5) nSensors = 4;
+      if (layer == 6) nSensors = 5;
+      //if (layer == 1) nSensors = 1;  // TODO very special case for TB2016
+      //if (layer == 2) nSensors = 1;  // TODO very special case for TB2016
+      return nSensors;
+    }
 
     std::string m_storePXDDigitsName;        /**< PXDDigits StoreArray name */
     std::string m_storePXDClustersName;      /**< PXDClusters StoreArray name */
@@ -219,47 +230,38 @@ namespace Belle2 {
     int m_AppendMaskFile;                    /**< Set option for append of existing file or recreate new list */
     float m_PXDCutSeedL;                     /**< PXD - lower seed cut for acceptans of cluster */
     float m_PXDCutSeedH;                     /**< PXD - higher seed cut for acceptans of cluster */
-    int m_SVDStrongMasking;                  /**< 1: strong SVD masking with time shape; 2: correlation masking */
     int m_StatAllEvents;                     /**< Statistics: all events */
     int m_StatSelEvents;                     /**< Statistics: selected events */
     float m_StatEverageOccupancy[c_nTBPlanes * 2]; /**< Statistics: average occupancy for every plane and direction */
 
-    int m_MaskingStep;                       /**< Set masking step: 0: prepare SVD time shape; 1: apply SVD time shape and create masking */
+    float m_CutSVDCharge = 10;               /**< Cut to show on plot signal over this border  TODO set it more sofisticaly */
 
-    // +1 in dimensions to protect against noisy VXDID values.
-    TH2F* m_SVDHitMapU[c_nSVDPlanes];        /**< SVD hitmaps for u strips and timestamp by plane */
-    TH2F* m_SVDHitMapV[c_nSVDPlanes];        /**< SVD hitmaps for v strips and timestamp by plane */
-    TH2F* m_SVDAvrChargeU[c_nSVDPlanes];     /**< SVD average charge for u strips and timestamp by plane */
-    TH2F* m_SVDAvrChargeV[c_nSVDPlanes];     /**< SVD average charge for v strips and timestamp by plane */
-    TH2F* m_SVDClusterTimeU[c_nSVDPlanes];   /**< SVD cluster time every strip for u by plane */
-    TH2F* m_SVDClusterTimeV[c_nSVDPlanes];   /**< SVD cluster time every strip for v by plane */
-    TH1F* m_SVDClusterTimeMapU[c_nSVDPlanes];/**< SVD cluster time for u by plane */
-    TH1F* m_SVDClusterTimeMapV[c_nSVDPlanes];/**< SVD cluster time for v by plane */
-
-    TH2F* m_CorrNeighboreYu[c_nTBPlanes - 1]; /**< Correlations in Y of space points between neighbore planes */
-    TH2F* m_CorrNeighboreZv[c_nTBPlanes - 1]; /**< Correlations in Z of space points between neighbore planes */
-    TH2F* m_hitMapUV[c_nTBPlanes];           /**< Hitmaps for pixels by plane */
-    TH2F* m_digitMapUV[c_nTBPlanes];         /**< Digitmaps for pixels by plane */
-    TH1F* m_digitCharge[c_nTBPlanes];        /**< Digit charge by plane */
-    TH1F* m_clusterCharge[c_nTBPlanes];      /**< Cluster charge by plane */
-    TH1F* m_seed[c_nTBPlanes];               /**< seed by plane */
+    TH2F* m_PXDHitMapUV[c_nPXDPlanes * c_MaxSensorsInPXDPlane];       /**< Hitmaps for pixels by PXD plane */
+    TH2F* m_SVDHitMapU[c_nSVDPlanes * c_MaxSensorsInSVDPlane];        /**< SVD hitmaps for u strips and timestamp by plane */
+    TH2F* m_SVDHitMapV[c_nSVDPlanes * c_MaxSensorsInSVDPlane];        /**< SVD hitmaps for v strips and timestamp by plane */
+    TH2F* m_TelHitMapUV[c_nTelPlanes];                                /**< Hitmaps for pixels by Tel plane */
+    TH2F* m_PXDMaskUV[c_nPXDPlanes * c_MaxSensorsInPXDPlane];         /**< mask for pixels by PXD plane */
+    TH1F* m_SVDMaskU[c_nSVDPlanes * c_MaxSensorsInSVDPlane];          /**< SVD mask for u strips by plane */
+    TH1F* m_SVDMaskV[c_nSVDPlanes * c_MaxSensorsInSVDPlane];          /**< SVD mask for v strips by plane */
+    TH2F* m_TelMaskUV[c_nTelPlanes];                                  /**< mask for pixels by Tel plane */
+    TH1F* m_SVDSignalU[c_nSVDPlanes * c_MaxSensorsInSVDPlane];        /**< SVD signal for u strips by plane */
+    TH1F* m_SVDSignalV[c_nSVDPlanes * c_MaxSensorsInSVDPlane];        /**< SVD signal for v strips by plane */
+    TH1F* m_PXDSignal[c_nPXDPlanes * c_MaxSensorsInPXDPlane];         /**< PXD signal for pixels by plane */
   };
 
-  inline const PXD::SensorInfo& MaskingModule::getInfoPXD(int index) const  // TODO for TB 2016 this macro must be revrite correct
+
+  inline const PXD::SensorInfo& MaskingModule::getInfoPXD(int index, int sensor) const
   {
-    // for only index: 0,1.
     int iPlane = indexToPlanePXD(index);
-    // VxdID sensorID(iPlane, 1, iPlane);
-    VxdID sensorID(iPlane, 1, 2);
+    if (sensor != 2) sensor = 2;  // TODO seems very unusual condition ...
+    VxdID sensorID(iPlane, 1, sensor);
     return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
   }
 
-  inline const SVD::SensorInfo& MaskingModule::getInfoSVD(int index) const  // TODO for TB 2016 this macro must be revrite correct
+  inline const SVD::SensorInfo& MaskingModule::getInfoSVD(int index, int sensor) const
   {
-    // for only index: 2,3,4,5.
     int iPlane = indexToPlaneSVD(index);
-    // VxdID sensorID(iPlane, 1, iPlane);
-    VxdID sensorID(iPlane, 1, 2);
+    VxdID sensorID(iPlane, 1, sensor);
     return dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
   }
 
@@ -272,6 +274,7 @@ namespace Belle2 {
       sensorID = VxdID(7 , 2, iPlane);
     else if (iPlane >= 4)
       sensorID = VxdID(7 , 3, iPlane);
+//    sensorID = VxdID(iPlane , 1, iPlane);
     return dynamic_cast<const TEL::SensorInfo&>(VXD::GeoCache::get(sensorID));
   }
 

@@ -43,6 +43,8 @@ void find_py_peaks(TString filename, const char* outfile="", const char* trigpos
     if(trigstring=="prism"){
       roi[0]->GetXaxis()->SetRangeUser(-500,-100);
     }
+    //Now in all cases search the whole range
+    roi[0]->GetXaxis()->SetRangeUser(-500,-10);
   }
   
   TSpectrum *s0 = new TSpectrum(npeaks);

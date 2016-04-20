@@ -27,7 +27,7 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
       roi[0]->GetXaxis()->SetRangeUser(-1220,-1180);
     }
     if(trigstring=="midbar"){
-      roi[0]->GetXaxis()->SetRangeUser(-1250,-1220);
+      roi[0]->GetXaxis()->SetRangeUser(-1250,-1210);
     }
     if(trigstring=="prism"){
       roi[0]->GetXaxis()->SetRangeUser(-1240,-1170);
@@ -45,6 +45,10 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
     }
     if(trigstring=="laser"){
       roi[0]->GetXaxis()->SetRangeUser(300,500);
+    }
+    //For installed modules, use full negative range
+    if(strstr(filename, "slot") != NULL){
+      roi[0]->GetXaxis()->SetRangeUser(-500,-5);
     }
   }
   
@@ -73,7 +77,7 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   }
   if(trigstring=="laser"){
     //currently incorrect values; do not matter
-    roi[1]->GetXaxis()->SetRangeUser(xpeaks0[0]+90-25,xpeaks0[0]+90+25);
+    roi[1]->GetXaxis()->SetRangeUser(xpeaks0[0]+100-20,xpeaks0[0]+100+20);
     roi[2]->GetXaxis()->SetRangeUser(xpeaks0[0]-42.5-22.5,xpeaks0[0]-42.5+22.5);
     sigma1=3;
     sigma2=3;
@@ -127,6 +131,9 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
     py2->GetXaxis()->SetRangeUser(-500,-250);
     if(trigstring=="laser"){
       py2->GetXaxis()->SetRangeUser(300,500);      
+      if(strstr(filename, "slot") != NULL){
+	py2->GetXaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
+      }
     }
   }
   TF1 *fn0=new TF1("fn0","gaus",xpeaks0[0]-sigma1,xpeaks0[0]+sigma1);
@@ -208,6 +215,9 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
 	asict[ii*16+iii]->GetXaxis()->SetRangeUser(-500,-250);
 	if(trigstring=="laser"){
 	  asict[ii*16+iii]->GetXaxis()->SetRangeUser(300,500);
+	  if(strstr(filename, "slot") != NULL){
+	    asict[ii*16+iii]->GetXaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
+	  }
 	}
       }
       asict[ii*16+iii]->Draw();
@@ -230,6 +240,10 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
     if(trigstring=="laser"){
       ctt->GetXaxis()->SetRangeUser(500,1000);
       ctt->GetYaxis()->SetRangeUser(300,500);
+      if(strstr(filename, "slot") != NULL){
+	ctt->GetXaxis()->SetRangeUser(0,500);
+        ctt->GetYaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
+      }
     }
   }
   ctt->Draw("COLZ");
@@ -246,6 +260,9 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
     cht->GetYaxis()->SetRangeUser(-550,-250);
     if(trigstring=="laser"){
       cht->GetYaxis()->SetRangeUser(250,550);
+      if(strstr(filename, "slot") != NULL){
+        cht->GetYaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
+      }
     }
   }
   ccht->cd(1);

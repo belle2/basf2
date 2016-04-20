@@ -11,6 +11,7 @@ if (not defined $runlist){
 my $sub_filename = 'sub_' . $subname . 'analyzeHits_extended.sh';
 open(my $subf, '>', $sub_filename);
 print $subf "#!/bin/sh\n";
+print $subf "mp=\$((\$(ulimit -u) - 20))\n";
 
 open(my $fh, '<', $runlist)
     or die "Could not open file";
@@ -25,9 +26,18 @@ while (my $line = <$fh>){
     print $shf "analyzeHits_extended /group/belle2/testbeam/TOP/CRT_analysis/hits/${line}_writehits.root /group/belle2/testbeam/TOP/CRT_analysis/hits/${line}_plothits_$cutnum.root $cutnum /group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_${cutnum}_info.txt \n";
     close $shf;
     chmod 0777, $sh_filename;
-    
+
+    print $subf "rp=\$(ps -ef | grep -c \"\$USER\")\n";
+    print $subf "while [ \$rp -ge \$mp ]\n";
+    print $subf "do\n";
+    print $subf "sleep 2\n";
+    print $subf "rp=\$(ps -ef | grep -c \"\$USER\")\n";
+#    print $subf "mp=\$((\$(ulimit -u) - 20))\n";
+#    print $subf "echo \$rp\n";
+    print $subf "done\n";
     print $subf "bsub -K -q s -o /group/belle2/testbeam/TOP/CRT_analysis/logs/${line}_analyzeHits_extended_$cutnum%J.txt $sh_filename &\n";
     print $subf "sleep 0.2\n";
+#    print $subf "echo \$rp\n";
 }
 print $subf "wait\n";
 chmod 0777, $sub_filename;

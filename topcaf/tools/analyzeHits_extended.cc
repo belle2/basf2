@@ -105,15 +105,19 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
   //0=tsukuba, 1=fuji
   if (flag_lab == 1) {
     if (trigstring == "mirror") {
-      roi[0]->GetXaxis()->SetRangeUser(-1220, -1180);
-    }
-    if (trigstring == "midbar") {
-      roi[0]->GetXaxis()->SetRangeUser(-1250, -1220);
-    }
-    if (trigstring == "prism") {
+      //roi[0]->GetXaxis()->SetRangeUser(-1220, -1180);
       roi[0]->GetXaxis()->SetRangeUser(-1240, -1170);
     }
+    if (trigstring == "midbar") {
+      //roi[0]->GetXaxis()->SetRangeUser(-1250, -1220);
+      roi[0]->GetXaxis()->SetRangeUser(-1270, -1200);
+    }
+    if (trigstring == "prism") {
+      //roi[0]->GetXaxis()->SetRangeUser(-1240, -1170);
+      roi[0]->GetXaxis()->SetRangeUser(-1260, -1160);
+    }
   } else {
+    //This section does not matter if using Umberto's suggested simplification below for Tsukuba
     if (trigstring == "mirror") {
       roi[0]->GetXaxis()->SetRangeUser(-500, -100);
     }
@@ -129,6 +133,13 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
   int nfound0 = s0->Search(roi[0], 1, "", 0.01);
   Double_t* xpeaks0 = s0->GetPositionX();
 
+  //Use Umberto's suggestion for simplification
+  //At Tsukuba, find the maximum bin as the central peak, no matter what type of run it is
+  if (flag_lab != 1) {
+    roi[0]->GetXaxis()->SetRangeUser(-500, -10);
+    xpeaks0[0] = roi[0]->GetBinCenter(roi[0]->GetMaximumBin());
+  }
+
   if (trigstring == "mirror") {
     roi[1]->GetXaxis()->SetRangeUser(xpeaks0[0] + 90 - 25, xpeaks0[0] + 90 + 25);
     roi[2]->GetXaxis()->SetRangeUser(xpeaks0[0] - 42.5 - 22.5, xpeaks0[0] - 42.5 + 22.5);
@@ -141,6 +152,11 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     roi[1]->GetXaxis()->SetRangeUser(xpeaks0[0] + 77.5 - 32.5, xpeaks0[0] + 77.5 + 32.5);
     roi[2]->GetXaxis()->SetRangeUser(xpeaks0[0] - 37.5 - 22.5, xpeaks0[0] - 37.5 + 22.5);
   }
+  if (trigstring == "laser") {
+    roi[1]->GetXaxis()->SetRangeUser(xpeaks0[0] + 103.5 - 14, xpeaks0[0] + 103.5 + 14);
+    roi[2]->GetXaxis()->SetRangeUser(xpeaks0[0] - 37.5 - 22.5, xpeaks0[0] - 37.5 + 22.5);
+  }
+
 
   TSpectrum* s1 = new TSpectrum(npeaks);
   int nfound1 = s1->Search(roi[1], 1, "", 0.01);
@@ -171,12 +187,17 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     cosmic_cut[1] = (Form("TOPCAFDigits.m_time>%f && TOPCAFDigits.m_time<%f", xpeaks1[0] - 13, xpeaks1[0] + 13));
     cosmic_cut[2] = (Form("TOPCAFDigits.m_time>%f && TOPCAFDigits.m_time<%f", xpeaks2[0] - 12, xpeaks2[0] + 12));
   }
+  if (trigstring == "laser") {
+    cosmic_cut[0] = (Form("TOPCAFDigits.m_time>%f && TOPCAFDigits.m_time<%f", xpeaks0[0] - 9, xpeaks0[0] + 9));
+    cosmic_cut[1] = (Form("TOPCAFDigits.m_time>%f && TOPCAFDigits.m_time<%f", xpeaks1[0] - 14, xpeaks1[0] + 14));
+    cosmic_cut[2] = (Form("TOPCAFDigits.m_time>%f && TOPCAFDigits.m_time<%f", xpeaks2[0] - 12, xpeaks2[0] + 12));
+  }
 
 
   TFile fout(outfilename, "RECREATE");
 
   //Define the histograms
-  TH1F* scrods = new TH1F("scrods", "scrod id numbers (no cuts)", 100, 0., 100.);
+  TH1F* scrods = new TH1F("scrods", "scrod id numbers (no cuts)", 120, 0., 120.);
   scrods->GetXaxis()->SetTitle("scrod id");
 
   TH2F* ch_widths = new TH2F("ch_widths", "hit width vs pixel (quality cuts)", 512, 0., 512., 1000, 0., 100.);
@@ -529,9 +550,9 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     cosmic_cut[5] = ("TOPCAFDigits.m_time>-10&&TOPCAFDigits.m_time<10");
     if (trigstring == "laser") {
       cout << "laser" << endl;
-      cosmic_cut[0] = ("TOPCAFDigits.m_time>355&&TOPCAFDigits.m_time<375");
-      cosmic_cut[1] = ("TOPCAFDigits.m_time>115&&TOPCAFDigits.m_time<130");
-      cosmic_cut[2] = ("TOPCAFDigits.m_time>60&&TOPCAFDigits.m_time<80");
+      //cosmic_cut[0] = ("TOPCAFDigits.m_time>355&&TOPCAFDigits.m_time<375");
+      //cosmic_cut[1] = ("TOPCAFDigits.m_time>115&&TOPCAFDigits.m_time<130");
+      //cosmic_cut[2] = ("TOPCAFDigits.m_time>60&&TOPCAFDigits.m_time<80");
       cosmic_cut[3] = ("TOPCAFDigits.m_time>30&&TOPCAFDigits.m_time<50");
       cosmic_cut[4] = ("TOPCAFDigits.m_time>0&&TOPCAFDigits.m_time<10");
       cosmic_cut[5] = ("TOPCAFDigits.m_time>85&&TOPCAFDigits.m_time<110");

@@ -72,6 +72,16 @@ Format: layerID (0-55), wireID(0-), t0 [ns]
 
 
 
+badwire
+=======
+The file contains a list of bad wires.
+
+Format: layerID (0-55), wireID(0-)
+
+* badwire.dat: Just a sample file.
+
+
+
 time-walk
 =========
 The file contains coefficients for time-walk (p.h.-dependent timing shift).

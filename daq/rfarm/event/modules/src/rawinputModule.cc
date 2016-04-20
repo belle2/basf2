@@ -172,9 +172,9 @@ void RawInputModule::registerRawCOPPERs()
 
   StoreObjPtr<EventMetaData> evtmetadata;
   evtmetadata.create();
-  evtmetadata->setExperiment(1);
-  evtmetadata->setRun(1);
-  evtmetadata->setEvent(m_nevt);
+  evtmetadata->setExperiment(sndhdr.GetExpNum());
+  evtmetadata->setRun(sndhdr.GetRunNum());
+  evtmetadata->setEvent(sndhdr.GetEventNumber());
   if (error_flag) evtmetadata->addErrorFlag(EventMetaData::c_B2LinkCRCError);
 
   delete[] evtbuf;
@@ -193,6 +193,8 @@ void RawInputModule::beginRun()
 
 void RawInputModule::event()
 {
+  printf("This program is obsolete. Do not use this program.\n");
+  exit(1);
   m_nevt++;
   // First event is already loaded
   if (m_nevt == 0) return;

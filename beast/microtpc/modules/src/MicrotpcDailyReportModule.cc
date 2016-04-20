@@ -279,12 +279,19 @@ void MicrotpcDailyReportModule::terminate()
     bis = h_tpc_gain[i]->GetXaxis()->GetXmax();
     rate = (bis - von) / (double)Nbin;
     h_tpc_gain[i]->Scale(1. / rate / 60. / 60.);
+  }
 
+  for (int i = 0; i < 11; i++) {
     h_tpc_triglength[i]->Scale(1. / LifeTime);
     h_tpc_phivtheta[i]->Scale(1. / LifeTime);
     h_tpc_phivtheta_w[i]->Scale(1. / LifeTime);
     h_tpc_edepvtrl[i]->Scale(1. / LifeTime);
   }
+
+  for (int i = 0; i < 5; i++) {
+    h_tpc_yvphi[i]->Scale(1. / LifeTime);
+  }
+
   cout << "TPC #" << m_inputTPCNumber << " daily report: event with time stamp " << h_tpc_uptime[1]->GetMaximum() /
        h_tpc_uptime[0]->GetMaximum() * 100 <<
        " % of the time " << endl;

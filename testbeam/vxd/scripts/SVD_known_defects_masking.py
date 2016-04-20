@@ -20,6 +20,7 @@ import csv
 import re
 from os import listdir
 from os.path import isfile, join
+import codecs
 
 
 def get_list_of_defects(filename):
@@ -35,7 +36,7 @@ def get_list_of_defects(filename):
 
     list_of_defects = []
     for cell in defects_list_raw:
-        head = cell[1:3]
+        header = cell[1:3]
         # if head == 'p_' or head == 'n_': # then it's a defect type string
         list_of_defects.append(cell[3:])  # remove 'n_' from string
     return list_of_defects
@@ -43,15 +44,13 @@ def get_list_of_defects(filename):
 
 def get_defect_type(row, list_of_defects):
 
+    types = []
     for i, cell in enumerate(row):
-
         if i > 1 and '1' in cell:
-            index = i
-            break
+            defect = list_of_defects[i]
+            types.append(defect)
 
-    type = list_of_defects[index]
-
-    return type
+    return types
 
 
 def from_num_to_label(i, j):
@@ -102,19 +101,26 @@ def hasNumbers(inputString):
     return any(char.isdigit() for char in inputString)
 
 
-def print_header(output):
+def print_header(output, list_of_good_defects):
     output.write('<?xml version="1.0" encoding="UTF-8"?>\n')
     output.write('<Meta>\n')
     output.write('\t<Date>' + time.strftime("%d/%m/%Y") + '</Date>\n')
-    output.write('\t<Description short=\"Ignore strips list for SVD planes in 2016 VXD TB\">\n')
+    output.write('\t<Description short=\"Ignore strips list for SVD planes in 2016 TB\">\n')
     output.write('\t\tList of known strip defects from layers groups\n')
     output.write('\t</Description>\n')
     output.write('\t<Author>Giacomo Caria</Author>\n')
     output.write('</Meta>\n')
+    output.write('<!-- List of input files used to produce this mask is appended at end of file.\n')
+    output.write('     List of defects included in this mask: \n')
+    # print list of defects to be considered, the 'good' ones
+    for name in list_of_good_defects[:-1]:
+        output.write('\t' + name + ' \n')
+    output.write('\t' + list_of_good_defects[-1] + ' -->\n')
+
     return
 
 
-def if_file_exists(i, j, path_layer):
+def is_file_in_path(i, j, path_layer):
     files_list = [l for l in listdir(path_layer) if isfile(join(path_layer, l))]
     header = 'L' + str(i)
     bool = False
@@ -127,7 +133,6 @@ def if_file_exists(i, j, path_layer):
 
 def get_filename(i, j, k, path_layer):
 
-    # get all filenames in directory
     files_list = [l for l in listdir(path_layer) if isfile(join(path_layer, l))]
 
     # strings to be searched in filenames
@@ -146,7 +151,7 @@ def get_filename(i, j, k, path_layer):
     return path_layer + filename
 
 
-def print_file_content(filename, f):
+def print_file_content(filename, f, list_of_good_defects):
 
     list_of_defects = get_list_of_defects(filename)
 
@@ -154,50 +159,69 @@ def print_file_content(filename, f):
         reader = csv.reader(x, delimiter=',')
         a = 0
 
-        # look for row jusskDirectoryPatht before strip numbers
+        # look for row just before strip numbers
         for i, row in enumerate(reader):
             if row:
                 if 'strip number' in row[0]:
                     a = i
                     break
 
-        # get strip numbers, enumerate now starts from 'strip number' row
+        # get strip numbers, enumerate now starts from the 'strip number' row
         for j, rows in enumerate(reader):
-            if rows and hasNumbers(rows[0]):
+            if rows and hasNumbers(rows[0]):  # ok it's a strip defect line
 
-                # don't include strips with Particle_Resp defect, they are
-                # false defects
-                if 'Particle_Resp' in get_defect_type(rows, list_of_defects):
-                    continue
-
-                f.write('\t\t\t\t\t<strip stripNo = \"' +
-                        re.findall(r'\d+', rows[0])[0] + '\"></strip>\n')  # strip number cell might contain spaces
-                # if also want to include defect type do something like
-                # f.write('\t\t\t\t\t<strip stripNo = \"' +
-                #        re.findall(r'\d+', rows[0])[0] + ', ' +
-                #        get_defect_type(rows,list_of_defects) + '\"><strip>\n')  # strip number cell might contain spaces
+                # only include strips with meaningful defect
+                # i.e. with its defect in the list of considered defects
+                matches = [defect for defect in get_defect_type(rows,
+                                                                list_of_defects) if defect.lower() in list_of_good_defects]
+                if matches:
+                    f.write('\t\t\t\t\t<strip stripNo = \"' +
+                            re.findall(r'\d+', rows[0])[0] + '\"></strip>\n')  # strip number cell might contain spaces
+                    f.write('\t\t\t\t\t\t<!-- ' +
+                            str(matches) + '--> \n')
+                # if also want to include correctly parsed defect type do something like
+                # f.write('\t\t\t\t\t<strip defectType = \"' +
+                #        get_defect_type(rows,list_of_defects) + '\">' +
+                #        re.findall(r'\d+', rows[0])[0]  +
+                #        '</strip>\n')
             else:
                 if rows and 'parameter' in rows[0]:
                     break  # stop when we hit the 'parameters' row, strip numbers have finished
     return
 
 
-def main():
+def append_filenames(list_of_used_files, file):
+    file.write('<!-- List of input files used to create this xml file: \n')
+    for name in list_of_used_files[:-1]:
+        file.write('\t' + name + '\n')
+    file.write('\t' + list_of_used_files[-1] + ' -->')
 
+
+def create_file():
+    # list of defects to be included in this mask
+    list_of_good_defects = ['pinhole_dssd',
+                            'metal_open_dssd',
+                            'metal_short_dssd',
+                            'pinhole_et',
+                            'open_et',
+                            'short_et']
     uv_side = ['v', 'u']
     np_side = ['Nside', 'Pside']
+
+    # path with input files
     path = './input_files'
 
     # rename z files with appropriate '+z' or '-z' labels
     update_z_filenames(path)
 
-    # open file
+    # open output file
     output = 'SVD_MaskListKnownDefects.xml'
     f = open(output, 'w')
 
-    print_header(f)
-
+    print_header(f, list_of_good_defects)
     f.write('<SVD>\n')
+
+    list_of_used_files = []
 
     for i in range(3, 7):  # loop on layers
 
@@ -209,7 +233,7 @@ def main():
 
         for j in range(1, i):  # loop on sensors
             # if needed file is not found, continue
-            if not if_file_exists(i, j, path_layer):
+            if not is_file_in_path(i, j, path_layer):
                 print('Files for layer ' + str(i) + ', sensor ' + str(j) +
                       ' (' + from_num_to_label(i, j) + '), not found. Moving on ..')
                 continue
@@ -218,19 +242,24 @@ def main():
             f.write('\t\t\t<sensor n=\"' + str(j) + '\">\n')
 
             for k in range(0, 2):  # loop on sides
-
+                # look up filename for this combination of layer,sensor and strip type
                 filename = get_filename(i, j, k, path_layer)
-
                 if 'nofile' in filename:  # file hasn't been found
-                    print('File for layer ' + str(i) + ', sensor ' + str(j) +
-                          ' (' + from_num_to_label(i, j) + '), ' +
-                          np_side[k] + ', not found. Moving on ..')
+                    nofile_str = 'File for layer ' + str(i) + ', sensor ' + str(j) +\
+                        ' (' + from_num_to_label(i, j) + '), ' +\
+                        np_side[k] + ', not found.'
+                    print(nofile_str)
+                    list_of_used_files.append(nofile_str)
                     continue
-                else:  # file has been found
+                else:  # file has been found !!
 
                     print('Found file: ' + filename)
+                    list_of_used_files.append(filename)
+
                     f.write('\t\t\t\t<side side=\"' + uv_side[k] + '\">\n')
-                    print_file_content(filename, f)
+                    # print list of strips with their defects
+                    print_file_content(filename, f, list_of_good_defects)
+
                     # write closing lines
                     f.write('\t\t\t\t</side>\n')
             f.write('\t\t\t</sensor>\n')
@@ -238,7 +267,23 @@ def main():
         f.write('\t\t</ladder>\n')
         f.write('\t</layer>\n')
     f.write('</SVD>\n')
+
+    append_filenames(list_of_used_files, f)
+
     return
+
+
+def get_line_with_string(string, file):
+
+    with open(file) as f:
+        for i, line in enumerate(f):
+            if string in line:
+                a = i
+                break
+
+
+def main():
+    create_file()
 
 if __name__ == '__main__':
     main()

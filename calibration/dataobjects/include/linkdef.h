@@ -16,4 +16,6 @@
 #pragma link C++ class Belle2::RunRange+;
 #pragma link C++ class Belle2::CalibRootObj<Belle2::RunRange>+;
 
+#pragma link C++ class Belle2::XmlFile+;
+
 #endif

@@ -70,7 +70,7 @@ open(my $fh3, '<', $runlist)
 while (my $line3 = <$fh3>){
     chomp $line3;
     $line3 =~ s{\.[^.]+$}{};
-    print $subf3 "/group/belle2/testbeam/TOP/CRT_analysis/expert/hits/${line3}_plothits_$cutnum.root ";
+    print $subf3 "/group/belle2/testbeam/TOP/CRT_analysis/expert/hits/${line3}_AsicByAsic_plothits_$cutnum.root ";
 
 }
 chmod 0777, $sub_filename3;

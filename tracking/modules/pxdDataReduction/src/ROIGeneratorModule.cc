@@ -43,11 +43,11 @@ ROIGeneratorModule::ROIGeneratorModule() : Module()
   addParam("Sensor"     , m_sensor , " sensor " , 1);
 
   addParam("MinU"       , m_minU   , " min U (pixel column hopefully) ", 0);
-  addParam("MaxU"       , m_maxU   , " max U (pixel column hopefully) ", 768 - 1);
+  addParam("MaxU"       , m_maxU   , " max U (pixel column hopefully) ", 250 - 1);
 
 
   addParam("MinV"       , m_minV   , " min V (pixel column hopefully) ", 0);
-  addParam("MaxV"       , m_maxV   , " max v (pixel column hopefully) ", 250 - 1);
+  addParam("MaxV"       , m_maxV   , " max v (pixel column hopefully) ", 768 - 1);
 
 
 }

@@ -206,7 +206,7 @@ void MicrotpcDailyReportModule::event()
       //h_tpc_uptime[2]->Fill(2, DT);
       for (int j = 0; j < 7; j++) {
         if (partID[j] == 1) {
-          if ((j == 4 || j == 5) && !ASource) partID[j] = 0;
+          if ((j == 4 || j == 5) && !Asource) partID[j] = 0;
           h_tpc_rate[j]->Fill(TimeStamp);
           h_tpc_gain[j]->Fill(TimeStamp, esum);
           h_tpc_triglength[j]->Fill(time_range);

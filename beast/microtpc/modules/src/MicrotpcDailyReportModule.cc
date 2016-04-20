@@ -81,22 +81,28 @@ MicrotpcDailyReportModule::~MicrotpcDailyReportModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void MicrotpcDailyReportModule::defineHisto()
 {
-  for (int i = 0; i < 3; i ++) {
+  for (int i = 0; i < 2; i ++) {
     h_tpc_uptime[i] = new TH1F(TString::Format("h_tpc_uptime_%d", i), "", 3, 0., 3.);
   }
-  for (int i = 0; i < 9; i ++) {
-    h_tpc_rate[i] = new TH1F(TString::Format("h_tpc_rate_%d", i), "", 5000, 0., 24.);
-    h_tpc_gain[i] = new TH2F(TString::Format("h_tpc_gain_%d", i), "", 1000, 0., 24., 200, 0., 2000.);
+  for (int i = 0; i < 11; i ++) {
+    if (i < 7) {
+      h_tpc_rate[i] = new TH1F(TString::Format("h_tpc_rate_%d", i), "", 5000, 0., 24.);
+      h_tpc_gain[i] = new TH2F(TString::Format("h_tpc_gain_%d", i), "", 1000, 0., 24., 200, 0., 2000.);
+      h_tpc_rate[i]->Sumw2();
+      h_tpc_gain[i]->Sumw2();
+    }
     h_tpc_triglength[i] = new TH1F(TString::Format("h_tpc_triglength_%d", i), "", 256, 0., 256.);
     h_tpc_phivtheta[i] = new TH2F(TString::Format("h_tpc_phivtheta_%d", i), "", 360, -180., 180., 180, 0., 180.);
     h_tpc_phivtheta_w[i] = new TH2F(TString::Format("h_tpc_phivtheta_w_%d", i), "",  360, -180., 180., 180, 0., 180.);
     h_tpc_edepvtrl[i] = new TH2F(TString::Format("h_tpc_edepvtrl_%d", i), "", 2000, 0., 4000., 1000, 0., 3.);
-    h_tpc_rate[i]->Sumw2();
-    h_tpc_gain[i]->Sumw2();
     h_tpc_triglength[i]->Sumw2();
     h_tpc_phivtheta[i]->Sumw2();
     h_tpc_phivtheta_w[i]->Sumw2();
     h_tpc_edepvtrl[i]->Sumw2();
+    if (i < 5) {
+      h_tpc_yvphi[i] = new TH2F(TString::Format("h_tpv_yvphi_%d", i), "", 336, -1., 1., 360, -180., 180.);
+      h_tpc_yvphi[i]->Sumw2();
+    }
   }
   for (int i = 0; i < 3; i ++) {
     h_iher[i] = new TH1F(TString::Format("h_iher_%d", i), "", 5000, 0., 24.);
@@ -174,12 +180,23 @@ void MicrotpcDailyReportModule::event()
   }
 
   for (const auto& aTrack : Tracks) { // start loop over all Tracks
-    //int detNb = aTrack->getdetNb();
+    const int detNb = aTrack.getdetNb() - 1;
     const double phi = aTrack.getphi();
     const double theta = aTrack.gettheta();
     const double trl = aTrack.gettrl();
     const double esum = aTrack.getesum();
     const int time_range = aTrack.gettime_range();
+    int side[16];
+    for (int j = 0; j < 16; j++) {
+      side[j] = 0;
+      side[j] = aTrack.getside()[j];
+    }
+    Bool_t Asource = false;
+    if (side[4] == 2 && side[5] == 2) Asource = true;
+    Bool_t Goodtrk = false;
+    if (2.015 < trl && trl < 2.03) Goodtrk = true;
+    Bool_t GoodAngle = false;
+    if (88.5 < theta && theta < 91.5) GoodAngle = true;
     int partID[7];
     partID[0] = 1; //[0] for all events
     for (int j = 0; j < 6; j++) partID[j + 1] = aTrack.getpartID()[j];
@@ -204,6 +221,31 @@ void MicrotpcDailyReportModule::event()
     h_tpc_phivtheta[8]->Fill(phi, theta);
     h_tpc_phivtheta_w[8]->Fill(phi, theta, esum);
     h_tpc_edepvtrl[8]->Fill(esum, trl);
+
+    double impact_y = -1000.;
+    if (detNb == 0 || detNb == 3) impact_y = aTrack.getimpact_y()[0];
+    else if (detNb == 1 || detNb == 2) impact_y = aTrack.getimpact_y()[3];
+    h_tpc_yvphi[0]->Fill(impact_y, phi);
+
+    if (partID[4] == 1)h_tpc_yvphi[1]->Fill(impact_y, phi);
+    if (partID[5] == 1)h_tpc_yvphi[2]->Fill(impact_y, phi);
+    //bottom source
+    if (partID[4] == 1 && Asource && Goodtrk && GoodAngle)  {
+      h_tpc_triglength[9]->Fill(time_range);
+      h_tpc_phivtheta[9]->Fill(phi, theta);
+      h_tpc_phivtheta_w[9]->Fill(phi, theta, esum);
+      h_tpc_edepvtrl[9]->Fill(esum, trl);
+      h_tpc_yvphi[3]->Fill(impact_y, phi);
+    }
+    //top source
+    if (partID[5] == 1 && Asource && Goodtrk && GoodAngle)  {
+      h_tpc_triglength[10]->Fill(time_range);
+      h_tpc_phivtheta[10]->Fill(phi, theta);
+      h_tpc_phivtheta_w[10]->Fill(phi, theta, esum);
+      h_tpc_edepvtrl[10]->Fill(esum, trl);
+      h_tpc_yvphi[4]->Fill(impact_y, phi);
+    }
+
   }// end loop over all Tracks
 
 }

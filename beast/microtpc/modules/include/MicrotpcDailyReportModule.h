@@ -81,13 +81,13 @@ namespace Belle2 {
       /** Gain stability */
       TH2F* h_tpc_gain[10];
       /** Trigger length */
-      TH1F* h_tpc_triglength[10];
+      TH1F* h_tpc_triglength[20];
       /** Scatter plot theta v phi */
-      TH2F* h_tpc_phivtheta[10];
+      TH2F* h_tpc_phivtheta[20];
       /** Scatter plot theta v phi weighted by the energy */
-      TH2F* h_tpc_phivtheta_w[10];
+      TH2F* h_tpc_phivtheta_w[20];
       /** Tracl length v energy deposited */
-      TH2F* h_tpc_edepvtrl[10];
+      TH2F* h_tpc_edepvtrl[20];
       /** HER current */
       TH1F* h_iher[10];
       /** HER average pressure */
@@ -96,6 +96,8 @@ namespace Belle2 {
       TH1F* h_iler[10];
       /** HER average pressure */
       TH1F* h_pler[10];
+      /** Impact parameter v. phi */
+      TH2F* h_tpc_yvphi[10];
     };
 
   }

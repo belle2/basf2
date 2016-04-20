@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Meta>
-	<Date>19/04/2016</Date>
+	<Date>20/04/2016</Date>
 	<Description short="Ignore strips list for SVD planes in 2016 TB">
 		List of known strip defects from layers groups
 	</Description>
@@ -8,15 +8,40 @@
 </Meta>
 <!-- List of input files used to produce this mask is appended at end of file.
      List of defects included in this mask: 
-	pinhole_DSSD
-	metal_open_DSSD
-	metal_short_DSSDPinhole_ET
-	Open_ET
-	Short_ET -->
+	pinhole_dssd 
+	metal_open_dssd 
+	metal_short_dssd 
+	pinhole_et 
+	open_et 
+	short_et -->
 <SVD>
 	<layer n="3">
 		<ladder n="1">
 			<sensor n="1">
+				<side side="v">
+					<strip stripNo = "3"></strip>
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
+					<strip stripNo = "4"></strip>
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
+					<strip stripNo = "7"></strip>
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
+				</side>
+				<side side="u">
+					<strip stripNo = "350"></strip>
+						<!-- ['Short_ET']--> 
+					<strip stripNo = "351"></strip>
+						<!-- ['Metal_Short_DSSD', 'Short_ET']--> 
+					<strip stripNo = "352"></strip>
+						<!-- ['Metal_Short_DSSD']--> 
+					<strip stripNo = "356"></strip>
+						<!-- ['Metal_Short_DSSD', 'Short_ET']--> 
+					<strip stripNo = "357"></strip>
+						<!-- ['Metal_Short_DSSD', 'Short_ET']--> 
+					<strip stripNo = "358"></strip>
+						<!-- ['Metal_Short_DSSD', 'Short_ET']--> 
+					<strip stripNo = "489"></strip>
+						<!-- ['Pinhole_ET']--> 
+				</side>
 			</sensor>
 			<sensor n="2">
 				<side side="v">
@@ -31,91 +56,101 @@
 			<sensor n="1">
 				<side side="v">
 					<strip stripNo = "0"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "203"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD']--> 
+					<strip stripNo = "308"></strip>
+						<!-- ['Pinhole_ET']--> 
 					<strip stripNo = "511"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
+					<strip stripNo = "0"></strip>
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "1"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "113"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 					<strip stripNo = "149"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 					<strip stripNo = "193"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "194"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "195"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "262"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "263"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "290"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "291"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "314"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "315"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "414"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 					<strip stripNo = "466"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 				</side>
 			</sensor>
 			<sensor n="2">
 				<side side="v">
 					<strip stripNo = "0"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "73"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "74"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "75"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "125"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "126"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "127"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "511"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
 					<strip stripNo = "0"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "1"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
+					<strip stripNo = "13"></strip>
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "384"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "411"></strip>
-						<!-- Defect type: metal_open_DSSD--> 
+						<!-- ['metal_open_DSSD']--> 
 					<strip stripNo = "458"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "459"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "766"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "767"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 				</side>
 			</sensor>
 			<sensor n="3">
 				<side side="v">
 					<strip stripNo = "0"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
+					<strip stripNo = "461"></strip>
+						<!-- ['Pinhole_ET']--> 
+					<strip stripNo = "493"></strip>
+						<!-- ['Pinhole_ET']--> 
 					<strip stripNo = "511"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
 					<strip stripNo = "10"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 				</side>
 			</sensor>
 		</ladder>
@@ -127,63 +162,79 @@
 			<sensor n="2">
 				<side side="v">
 					<strip stripNo = "0"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "3"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
+					<strip stripNo = "7"></strip>
+						<!-- ['Pinhole_ET']--> 
+					<strip stripNo = "15"></strip>
+						<!-- ['Pinhole_ET']--> 
+					<strip stripNo = "17"></strip>
+						<!-- ['Pinhole_ET']--> 
+					<strip stripNo = "277"></strip>
+						<!-- ['Pinhole_ET']--> 
+					<strip stripNo = "284"></strip>
+						<!-- ['Pinhole_ET']--> 
 					<strip stripNo = "398"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
+					<strip stripNo = "426"></strip>
+						<!-- ['Pinhole_ET']--> 
 					<strip stripNo = "442"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "470"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
 					<strip stripNo = "67"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 					<strip stripNo = "68"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 					<strip stripNo = "69"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 					<strip stripNo = "279"></strip>
-						<!-- Defect type: metal_open_DSSD--> 
+						<!-- ['metal_open_DSSD']--> 
 					<strip stripNo = "398"></strip>
-						<!-- Defect type: metal_open_DSSD--> 
+						<!-- ['metal_open_DSSD']--> 
 					<strip stripNo = "722"></strip>
-						<!-- Defect type: metal_open_DSSD--> 
+						<!-- ['metal_open_DSSD']--> 
 					<strip stripNo = "750"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 				</side>
 			</sensor>
 			<sensor n="3">
 				<side side="v">
 					<strip stripNo = "0"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "421"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "423"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "511"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
 					<strip stripNo = "19"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
+					<strip stripNo = "464"></strip>
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "630"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "631"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "718"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
+					<strip stripNo = "719"></strip>
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "765"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 					<strip stripNo = "766"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 				</side>
 			</sensor>
 			<sensor n="4">
 				<side side="v">
 					<strip stripNo = "278"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
 				</side>
@@ -195,97 +246,99 @@
 			<sensor n="1">
 				<side side="v">
 					<strip stripNo = "0"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
 					<strip stripNo = "751"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 				</side>
 			</sensor>
 			<sensor n="2">
 				<side side="v">
 					<strip stripNo = "0"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 					<strip stripNo = "511"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
 					<strip stripNo = "0"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "13"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 				</side>
 			</sensor>
 			<sensor n="3">
 				<side side="v">
 					<strip stripNo = "511"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
 					<strip stripNo = "0"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "22"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
+					<strip stripNo = "766"></strip>
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "767"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 				</side>
 			</sensor>
 			<sensor n="4">
 				<side side="v">
 					<strip stripNo = "15"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "189"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "511"></strip>
-						<!-- Defect type: Open_ET--> 
+						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
 					<strip stripNo = "0"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "1"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "30"></strip>
-						<!-- Defect type: pinhole_DSSD--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 					<strip stripNo = "324"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "325"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "326"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "352"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "354"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "357"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "358"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "360"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "362"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "365"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "366"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "368"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "370"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "373"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "374"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "376"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "378"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "381"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "382"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 					<strip stripNo = "767"></strip>
-						<!-- Defect type: Short_ET--> 
+						<!-- ['Short_ET']--> 
 				</side>
 			</sensor>
 			<sensor n="5">
@@ -293,27 +346,33 @@
 				</side>
 				<side side="u">
 					<strip stripNo = "8"></strip>
-						<!-- Defect type: metal_open_DSSD--> 
+						<!-- ['metal_open_DSSD', 'Open_ET']--> 
+					<strip stripNo = "244"></strip>
+						<!-- ['Pinhole_ET']--> 
 					<strip stripNo = "328"></strip>
-						<!-- Defect type: metal_open_DSSD--> 
+						<!-- ['metal_open_DSSD', 'Open_ET']--> 
 					<strip stripNo = "500"></strip>
-						<!-- Defect type: metal_open_DSSD--> 
+						<!-- ['metal_open_DSSD', 'Open_ET']--> 
 					<strip stripNo = "514"></strip>
-						<!-- Defect type: metal_open_DSSD--> 
+						<!-- ['metal_open_DSSD', 'Open_ET']--> 
 				</side>
 			</sensor>
 		</ladder>
 	</layer>
 </SVD>
 <!-- List of input files used to create this xml file: 
-	./input_files/L3/L3.002_bw_ETdefects_Nside.csv
-	./input_files/L3/L3.002_bw_ETdefects_Pside.csv
+	./input_files/L3/L3.002_HPK_L3-15_fw_defects_Nside_20160419_1106.csv
+	./input_files/L3/L3.002_HPK_L3-15_fw_defects_Pside_20160419_1106.csv
+	./input_files/L3/L3.002_HPK_L3-08_bw_defects_Nside_20160419_1103.csv
+	./input_files/L3/L3.002_HPK_L3-08_bw_defects_Pside_20160419_1103.csv
 	./input_files/L4/L4.001_2965_12_Wedge_fw_defects_Nside.csv
 	./input_files/L4/L4.001_2965_12_Wedge_fw_defects_Pside.csv
 	./input_files/L4/L4.001_202012000042_-z_defects_Nside.csv
 	./input_files/L4/L4.001_202012000042_-z_defects_Pside.csv
 	./input_files/L4/L4.001_202012008170_bw_defects_Nside.csv
 	./input_files/L4/L4.001_202012008170_bw_defects_Pside.csv
+	File for layer 5, sensor 1 (fw), Nside, not found.
+	File for layer 5, sensor 1 (fw), Pside, not found.
 	./input_files/L5/L5.903_202012000060_ce_defects_Nside_20160417_2044_corrected_1.csv
 	./input_files/L5/L5.903_202012000060_ce_defects_Pside_20160417_2044_corrected_3.csv
 	./input_files/L5/L5.903_202012000054_-z_defects_Nside_20160417_2031_edited_3.csv

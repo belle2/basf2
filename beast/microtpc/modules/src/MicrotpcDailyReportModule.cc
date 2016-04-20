@@ -117,6 +117,8 @@ void MicrotpcDailyReportModule::initialize()
 
 void MicrotpcDailyReportModule::beginRun()
 {
+  //StoreObjPtr<EventMetaData> evtMetaData;
+  //int run = evtMetaData->getRun();
 }
 
 void MicrotpcDailyReportModule::event()
@@ -125,37 +127,40 @@ void MicrotpcDailyReportModule::event()
 
   StoreArray<MicrotpcMetaHit> MetaHits;
   StoreArray<MicrotpcRecoTrack> Tracks;
-  StoreObjPtr<EventMetaData> evtMetaData;
 
-  int run = evtMetaData->getRun();
+  //StoreObjPtr<EventMetaData> evtMetaData;
+  //int run = evtMetaData->getRun();
 
   double TimeStamp = 0;
   for (const auto& MetaHit : MetaHits) {
-    TimeStamp = MetaHit.getts_start()[0];
+
     if (MetaHit.getts_nb() > 0) {
 
-      h_iher[0]->Fill(MetaHit.getts_start()[0], MetaHit.getIHER());
+      TimeStamp = MetaHit.getts_start()[0];
+      TimeStamp -= TDatime(m_inputReportDate, 0).Convert();
+      TimeStamp /= (60. * 60.);
+      h_iher[0]->Fill(TimeStamp, MetaHit.getIHER());
       if (MetaHit.getflagHER() == 0)
-        h_iher[1]->Fill(MetaHit.getts_start()[0], MetaHit.getIHER());
+        h_iher[1]->Fill(TimeStamp, MetaHit.getIHER());
       if (MetaHit.getflagHER() == 1)
-        h_iher[2]->Fill(MetaHit.getts_start()[0], MetaHit.getIHER());
-      h_pher[0]->Fill(MetaHit.getts_start()[0], MetaHit.getPHER());
+        h_iher[2]->Fill(TimeStamp, MetaHit.getIHER());
+      h_pher[0]->Fill(TimeStamp, MetaHit.getPHER());
       if (MetaHit.getflagHER() == 0)
-        h_pher[1]->Fill(MetaHit.getts_start()[0], MetaHit.getPHER());
+        h_pher[1]->Fill(TimeStamp, MetaHit.getPHER());
       if (MetaHit.getflagHER() == 1)
-        h_pher[2]->Fill(MetaHit.getts_start()[0], MetaHit.getPHER());
+        h_pher[2]->Fill(TimeStamp, MetaHit.getPHER());
 
-      h_iler[0]->Fill(MetaHit.getts_start()[0], MetaHit.getILER());
+      h_iler[0]->Fill(TimeStamp, MetaHit.getILER());
       if (MetaHit.getflagLER() == 0)
-        h_iler[1]->Fill(MetaHit.getts_start()[0], MetaHit.getILER());
+        h_iler[1]->Fill(TimeStamp, MetaHit.getILER());
       if (MetaHit.getflagLER() == 1)
-        h_iler[2]->Fill(MetaHit.getts_start()[0], MetaHit.getILER());
-      h_pler[0]->Fill(MetaHit.getts_start()[0], MetaHit.getPLER());
+        h_iler[2]->Fill(TimeStamp, MetaHit.getILER());
+      h_pler[0]->Fill(TimeStamp, MetaHit.getPLER());
       if (MetaHit.getflagLER() == 0)
-        h_pler[1]->Fill(MetaHit.getts_start()[0], MetaHit.getPLER());
+        h_pler[1]->Fill(TimeStamp, MetaHit.getPLER());
       if (MetaHit.getflagLER() == 1)
-        h_pler[2]->Fill(MetaHit.getts_start()[0], MetaHit.getPLER());
-
+        h_pler[2]->Fill(TimeStamp, MetaHit.getPLER());
+      /*
       if (T0 > MetaHit.getts_start()[0] && old_run < run) {
         T0 = MetaHit.getts_start()[0];
         old_run = run;
@@ -164,13 +169,8 @@ void MicrotpcDailyReportModule::event()
         }
       }
       T1 = MetaHit.getts_start()[0];
+      */
     }
-  }
-  if (TimeStamp > 1) {
-    TimeStamp -= TDatime(m_inputReportDate, 0).Convert();
-    TimeStamp /= (60. * 60.);
-  } else {
-    TimeStamp = 0;
   }
 
   for (const auto& aTrack : Tracks) { // start loop over all Tracks
@@ -186,7 +186,7 @@ void MicrotpcDailyReportModule::event()
     h_tpc_uptime[0]->Fill(1);
     if (TimeStamp > 0.) {
       h_tpc_uptime[1]->Fill(1);
-      h_tpc_uptime[2]->Fill(2, DT);
+      //h_tpc_uptime[2]->Fill(2, DT);
       for (int j = 0; j < 7; j++) {
         if (partID[j] == 1) {
           h_tpc_rate[j]->Fill(TimeStamp);
@@ -220,7 +220,11 @@ void MicrotpcDailyReportModule::terminate()
     h_iler[i]->Divide(h_tpc_rate[0]);
     h_pler[i]->Divide(h_tpc_rate[0]);
   }
-  double LifeTime = h_tpc_uptime[2]->GetMaximum();
+  double LifeTime = 0;
+  for (int i = 0; i < (int)h_tpc_rate[0]->GetNbinsX(); i++) {
+    if (h_tpc_rate[0]->GetBinContent(i + 1) > 0) LifeTime ++;
+  }
+  LifeTime *= (24. * 60. * 60. / (double)h_tpc_rate[0]->GetNbinsX());
   for (int i = 0; i < 7; i++) {
     int Nbin = h_tpc_rate[i]->GetNbinsX();
     double von = h_tpc_rate[i]->GetXaxis()->GetXmin();

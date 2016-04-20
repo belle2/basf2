@@ -42,14 +42,15 @@ ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
 
   addParam("ROIListName", m_ROIListName, "name of the list of ROIs", std::string(""));
   addParam("ROIpayloadName", m_ROIpayloadName, "name of the payload of ROIs", std::string(""));
-  addParam("TrigDivider", m_divider, "Generates one ROI every TrigDivider events", 2);
   addParam("Desy2016ROIExtension", m_DESYROIExtension,
            "Does a ROI coordinate extension for Desy TB 2016, WORKAROUND for missing DHH functionality", false);
   addParam("Desy2016Remapping", m_DESYremap,
            "Does a ROI coordinate remapping for Desy TB 2016, WORKAROUND for missing DHH functionality", false);
-  addParam("SendAllDownscaler", mSendAllDS, "Send all Data (no selection) downscaler; Workaround for missing ONSEN functionality",
+  addParam("SendAllDownscaler", mSendAllDS,
+           "Send all Data (no selection) downscaler; Workaround for missing ONSEN functionality, 0 never set, 1 alway set, 2 set in every second...",
            9u);
-  addParam("SendROIsDownscaler", mSendROIsDS, "Send ROIs downscaler; Workaround for missing ONSEN functionality", 3u);
+  addParam("SendROIsDownscaler", mSendROIsDS,
+           "Send ROIs downscaler; Workaround for missing ONSEN functionality, 0 never set, 1 alway set, 2 set in every second...", 3u);
 }
 
 ROIPayloadAssemblerModule::~ROIPayloadAssemblerModule()
@@ -151,7 +152,7 @@ void ROIPayloadAssemblerModule::event()
 
   unsigned int evtNr = eventMetaDataPtr->getEvent();
   bool accepted = true; // thats the default until HLT has reject mechanism
-  payload->setHeader(accepted, (evtNr % mSendAllDS) == 0, (evtNr % mSendROIsDS) == 0);
+  payload->setHeader(accepted, mSendAllDS  ? (evtNr % mSendAllDS) == 0 : 0, mSendROIsDS ? (evtNr % mSendROIsDS) == 0 : 0);
 
 //  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   payload->setTriggerNumber(eventMetaDataPtr->getEvent());

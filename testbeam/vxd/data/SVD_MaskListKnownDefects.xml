@@ -55,29 +55,17 @@
 		<ladder n="1">
 			<sensor n="1">
 				<side side="v">
-					<strip stripNo = "0"></strip>
-						<!-- ['Open_ET']--> 
 					<strip stripNo = "203"></strip>
-						<!-- ['pinhole_DSSD']--> 
-					<strip stripNo = "308"></strip>
-						<!-- ['Pinhole_ET']--> 
-					<strip stripNo = "511"></strip>
-						<!-- ['Open_ET']--> 
+						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 				</side>
 				<side side="u">
 					<strip stripNo = "0"></strip>
-						<!-- ['Open_ET']--> 
-					<strip stripNo = "1"></strip>
 						<!-- ['Open_ET']--> 
 					<strip stripNo = "113"></strip>
 						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 					<strip stripNo = "149"></strip>
 						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
-					<strip stripNo = "193"></strip>
-						<!-- ['Open_ET']--> 
 					<strip stripNo = "194"></strip>
-						<!-- ['Open_ET']--> 
-					<strip stripNo = "195"></strip>
 						<!-- ['Open_ET']--> 
 					<strip stripNo = "262"></strip>
 						<!-- ['Short_ET']--> 
@@ -99,54 +87,26 @@
 			</sensor>
 			<sensor n="2">
 				<side side="v">
-					<strip stripNo = "0"></strip>
-						<!-- ['Open_ET']--> 
-					<strip stripNo = "73"></strip>
-						<!-- ['Open_ET']--> 
 					<strip stripNo = "74"></strip>
-						<!-- ['Open_ET']--> 
-					<strip stripNo = "75"></strip>
-						<!-- ['Open_ET']--> 
-					<strip stripNo = "125"></strip>
 						<!-- ['Open_ET']--> 
 					<strip stripNo = "126"></strip>
 						<!-- ['Open_ET']--> 
-					<strip stripNo = "127"></strip>
-						<!-- ['Open_ET']--> 
-					<strip stripNo = "511"></strip>
-						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
-					<strip stripNo = "0"></strip>
-						<!-- ['Open_ET']--> 
-					<strip stripNo = "1"></strip>
-						<!-- ['Open_ET']--> 
 					<strip stripNo = "13"></strip>
-						<!-- ['Short_ET']--> 
-					<strip stripNo = "384"></strip>
-						<!-- ['Short_ET']--> 
+						<!-- ['Pinhole_ET']--> 
 					<strip stripNo = "411"></strip>
 						<!-- ['metal_open_DSSD']--> 
 					<strip stripNo = "458"></strip>
 						<!-- ['Short_ET']--> 
 					<strip stripNo = "459"></strip>
 						<!-- ['Short_ET']--> 
-					<strip stripNo = "766"></strip>
-						<!-- ['Short_ET']--> 
-					<strip stripNo = "767"></strip>
-						<!-- ['Short_ET']--> 
 				</side>
 			</sensor>
 			<sensor n="3">
 				<side side="v">
-					<strip stripNo = "0"></strip>
-						<!-- ['Open_ET']--> 
-					<strip stripNo = "461"></strip>
-						<!-- ['Pinhole_ET']--> 
 					<strip stripNo = "493"></strip>
 						<!-- ['Pinhole_ET']--> 
-					<strip stripNo = "511"></strip>
-						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
 					<strip stripNo = "10"></strip>
@@ -245,8 +205,6 @@
 		<ladder n="1">
 			<sensor n="1">
 				<side side="v">
-					<strip stripNo = "0"></strip>
-						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
 					<strip stripNo = "751"></strip>
@@ -255,22 +213,14 @@
 			</sensor>
 			<sensor n="2">
 				<side side="v">
-					<strip stripNo = "0"></strip>
-						<!-- ['Open_ET']--> 
-					<strip stripNo = "511"></strip>
-						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
-					<strip stripNo = "0"></strip>
-						<!-- ['Short_ET']--> 
 					<strip stripNo = "13"></strip>
 						<!-- ['pinhole_DSSD', 'Pinhole_ET']--> 
 				</side>
 			</sensor>
 			<sensor n="3">
 				<side side="v">
-					<strip stripNo = "511"></strip>
-						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
 					<strip stripNo = "0"></strip>
@@ -289,8 +239,6 @@
 						<!-- ['Short_ET']--> 
 					<strip stripNo = "189"></strip>
 						<!-- ['Short_ET']--> 
-					<strip stripNo = "511"></strip>
-						<!-- ['Open_ET']--> 
 				</side>
 				<side side="u">
 					<strip stripNo = "0"></strip>
@@ -365,12 +313,12 @@
 	./input_files/L3/L3.002_HPK_L3-15_fw_defects_Pside_20160419_1106.csv
 	./input_files/L3/L3.002_HPK_L3-08_bw_defects_Nside_20160419_1103.csv
 	./input_files/L3/L3.002_HPK_L3-08_bw_defects_Pside_20160419_1103.csv
-	./input_files/L4/L4.001_2965_12_Wedge_fw_defects_Nside.csv
-	./input_files/L4/L4.001_2965_12_Wedge_fw_defects_Pside.csv
-	./input_files/L4/L4.001_202012000042_-z_defects_Nside.csv
-	./input_files/L4/L4.001_202012000042_-z_defects_Pside.csv
-	./input_files/L4/L4.001_202012008170_bw_defects_Nside.csv
-	./input_files/L4/L4.001_202012008170_bw_defects_Pside.csv
+	./input_files/L4/L4.001_2965-12_Wedge_fw_defects_Nside_20160420_1228.csv
+	./input_files/L4/L4.001_2965-12_Wedge_fw_defects_Pside_20160420_1228.csv
+	./input_files/L4/L4.001_202012000042_-z_defects_Nside_20160419_1208.csv
+	./input_files/L4/L4.001_202012000042_-z_defects_Pside_20160419_1208.csv
+	./input_files/L4/L4.001_202012008170_bw_defects_Nside_20160419_1206.csv
+	./input_files/L4/L4.001_202012008170_bw_defects_Pside_20160419_1206.csv
 	File for layer 5, sensor 1 (fw), Nside, not found.
 	File for layer 5, sensor 1 (fw), Pside, not found.
 	./input_files/L5/L5.903_202012000060_ce_defects_Nside_20160417_2044_corrected_1.csv
@@ -379,13 +327,13 @@
 	./input_files/L5/L5.903_202012000054_-z_defects_Pside_20160417_2031_edited_3.csv
 	./input_files/L5/L5.903_202012000084_bw_defects_Nside_20160417_2048.csv
 	./input_files/L5/L5.903_202012000084_bw_defects_Pside_20160417_2048.csv
-	./input_files/L6/L6.001_3084_15_Wedge_fw_defects_Nside.csv
+	./input_files/L6/L6.001_3084_15_Wedge_fw_defects_Nside_false_open_corrected.csv
 	./input_files/L6/L6.001_3084_15_Wedge_fw_defects_Pside.csv
-	./input_files/L6/L6.001_202012100065_+z_defects_Nside.csv
-	./input_files/L6/L6.001_202012100065_+z_defects_Pside.csv
-	./input_files/L6/L6.001_202012100072_ce_defects_Nside.csv
+	./input_files/L6/L6.001_202012100065_+z_defects_Nside_false_open_corrected.csv
+	./input_files/L6/L6.001_202012100065_+z_defects_Pside_false_short_corrected.csv
+	./input_files/L6/L6.001_202012100072_ce_defects_Nside_false_open_corrected.csv
 	./input_files/L6/L6.001_202012100072_ce_defects_Pside.csv
-	./input_files/L6/L6.001_202012000083_-z_defects_Nside.csv
+	./input_files/L6/L6.001_202012000083_-z_defects_Nside_false_open_corrected.csv
 	./input_files/L6/L6.001_202012000083_-z_defects_Pside.csv
 	./input_files/L6/L6.001_202012005097_bw_defects_Nside.csv
 	./input_files/L6/L6.001_202012005097_bw_defects_Pside.csv -->

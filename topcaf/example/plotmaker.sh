@@ -49,6 +49,7 @@ echo "0" >> /group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_${cutnam
 
 #hadd the result
 ./hadd_${subname}_plothits_${cutname}.sh
+./hadd_${subname}_AsicByAsic_plothits_${cutname}.sh
 
 #find the peaks and bad ASICs
 rm -f /group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_${cutname}_info.txt
@@ -76,4 +77,5 @@ fi
 rm -rf /group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_${cutname}_info.txt
 rm -rf sub_${subname}analyzeHits_extended.sh
 rm -rf hadd_${subname}_plothits_${cutname}.sh
+rm -rf hadd_${subname}_AsicByAsic_plothits_${cutname}.sh
 rm -rf ${subname}_sh_scripts_batch

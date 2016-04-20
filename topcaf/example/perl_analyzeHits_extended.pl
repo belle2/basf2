@@ -24,6 +24,7 @@ while (my $line = <$fh>){
     open(my $shf, '>', $sh_filename);
     print $shf "#!/bin/sh\n";
     print $shf "analyzeHits_extended /group/belle2/testbeam/TOP/CRT_analysis/hits/${line}_writehits.root /group/belle2/testbeam/TOP/CRT_analysis/hits/${line}_plothits_$cutnum.root $cutnum /group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_${cutnum}_info.txt \n";
+    print $shf "analyzeHits_extended /group/belle2/testbeam/TOP/CRT_analysis/hits/${line}_writehits.root /group/belle2/testbeam/TOP/CRT_analysis/expert/hits/${line}_AsicByAsic_plothits_$cutnum.root $cutnum \n";
     close $shf;
     chmod 0777, $sh_filename;
 
@@ -58,3 +59,18 @@ while (my $line2 = <$fh2>){
 
 }
 chmod 0777, $sub_filename2;
+
+my $sub_filename3 = 'hadd_' . $subname . '_AsicByAsic_plothits_' . $cutnum . '.sh';
+open(my $subf3, '>', $sub_filename3);
+print $subf3 "#!/bin/sh\n";
+print $subf3 "hadd -f /group/belle2/testbeam/TOP/CRT_analysis/expert/combined/${subname}_AsicByAsic_plothits_$cutnum.root ";
+
+open(my $fh3, '<', $runlist)
+    or die "Could not open file";
+while (my $line3 = <$fh3>){
+    chomp $line3;
+    $line3 =~ s{\.[^.]+$}{};
+    print $subf3 "/group/belle2/testbeam/TOP/CRT_analysis/expert/hits/${line3}_plothits_$cutnum.root ";
+
+}
+chmod 0777, $sub_filename3;

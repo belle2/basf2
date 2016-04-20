@@ -214,6 +214,12 @@ void MicrotpcDailyReportModule::endRun()
 void MicrotpcDailyReportModule::terminate()
 {
   cout << "terminate section" << endl;
+  for (int i = 0; i < 3; i++) {
+    h_iher[i]->Divide(h_tpc_rate[0]);
+    h_pher[i]->Divide(h_tpc_rate[0]);
+    h_iler[i]->Divide(h_tpc_rate[0]);
+    h_pler[i]->Divide(h_tpc_rate[0]);
+  }
   double LifeTime = h_tpc_uptime[2]->GetMaximum();
   for (int i = 0; i < 7; i++) {
     int Nbin = h_tpc_rate[i]->GetNbinsX();

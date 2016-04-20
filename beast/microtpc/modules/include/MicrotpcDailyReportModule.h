@@ -88,7 +88,14 @@ namespace Belle2 {
       TH2F* h_tpc_phivtheta_w[10];
       /** Tracl length v energy deposited */
       TH2F* h_tpc_edepvtrl[10];
-
+      /** HER current */
+      TH1F* h_iher[10];
+      /** HER average pressure */
+      TH1F* h_pher[10];
+      /** HER current */
+      TH1F* h_iler[10];
+      /** HER average pressure */
+      TH1F* h_pler[10];
     };
 
   }

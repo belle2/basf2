@@ -98,6 +98,12 @@ void MicrotpcDailyReportModule::defineHisto()
     h_tpc_phivtheta_w[i]->Sumw2();
     h_tpc_edepvtrl[i]->Sumw2();
   }
+  for (int i = 0; i < 3; i ++) {
+    h_iher[i] = new TH1F(TString::Format("h_iher_%d", i), "", 5000, 0., 24.);
+    h_iler[i] = new TH1F(TString::Format("h_iler_%d", i), "", 5000, 0., 24.);
+    h_pher[i] = new TH1F(TString::Format("h_pher_%d", i), "", 5000, 0., 24.);
+    h_pler[i] = new TH1F(TString::Format("h_pler_%d", i), "", 5000, 0., 24.);
+  }
 }
 
 
@@ -127,6 +133,29 @@ void MicrotpcDailyReportModule::event()
   for (const auto& MetaHit : MetaHits) {
     TimeStamp = MetaHit.getts_start()[0];
     if (MetaHit.getts_nb() > 0) {
+
+      h_iher[0]->Fill(MetaHit.getts_start()[0], MetaHit.getIHER());
+      if (MetaHit.getflagHER() == 0)
+        h_iher[1]->Fill(MetaHit.getts_start()[0], MetaHit.getIHER());
+      if (MetaHit.getflagHER() == 1)
+        h_iher[2]->Fill(MetaHit.getts_start()[0], MetaHit.getIHER());
+      h_pher[0]->Fill(MetaHit.getts_start()[0], MetaHit.getPHER());
+      if (MetaHit.getflagHER() == 0)
+        h_pher[1]->Fill(MetaHit.getts_start()[0], MetaHit.getPHER());
+      if (MetaHit.getflagHER() == 1)
+        h_pher[2]->Fill(MetaHit.getts_start()[0], MetaHit.getPHER());
+
+      h_iler[0]->Fill(MetaHit.getts_start()[0], MetaHit.getILER());
+      if (MetaHit.getflagLER() == 0)
+        h_iler[1]->Fill(MetaHit.getts_start()[0], MetaHit.getILER());
+      if (MetaHit.getflagLER() == 1)
+        h_iler[2]->Fill(MetaHit.getts_start()[0], MetaHit.getILER());
+      h_pler[0]->Fill(MetaHit.getts_start()[0], MetaHit.getPLER());
+      if (MetaHit.getflagLER() == 0)
+        h_pler[1]->Fill(MetaHit.getts_start()[0], MetaHit.getPLER());
+      if (MetaHit.getflagLER() == 1)
+        h_pler[2]->Fill(MetaHit.getts_start()[0], MetaHit.getPLER());
+
       if (T0 > MetaHit.getts_start()[0] && old_run < run) {
         T0 = MetaHit.getts_start()[0];
         old_run = run;

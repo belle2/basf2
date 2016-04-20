@@ -20,8 +20,7 @@ MaskingModule::MaskingModule() : HistoModule()
   //Set module properties
   setDescription("Masking of pixels and strips in PXD, VXD and Tels");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-//  addParam("Clusters", m_storeTelClustersName, "Name of the telescopes cluster collection",
-//           std::string("TelClusters")); // always be explicit about this, can cause trouble
+
   addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("mask"));
   m_MaskDirectoryPath = std::string("");
@@ -36,6 +35,10 @@ MaskingModule::MaskingModule() : HistoModule()
   addParam("PXDCutSeedH", m_PXDCutSeedH, "PXD: seed cut higher border", m_PXDCutSeedH);
   addParam("CutSVDCharge", m_CutSVDCharge, "Cut to show on plot signal over this border", m_CutSVDCharge);
 
+  addParam("PXDCut", m_PXDCut, "Cut for masking of PXD pixel - prreset for 10 kEvents", m_PXDCut);
+  addParam("SVDuCut", m_SVDuCut, "Cut for masking of SVD U strip - prreset for 10 kEvents", m_SVDuCut);
+  addParam("SVDvCut", m_SVDvCut, "Cut for masking of SVD V strip - prreset for 10 kEvents", m_SVDvCut);
+  addParam("TelCut", m_TelCut, "Cut for masking of PXD pixel - prreset for 10 kEvents", m_TelCut);
 
 }
 
@@ -327,27 +330,30 @@ void MaskingModule::endRun()
   m_nEventsProcessFraction = (double)m_nRealEventsProcess / m_nEventsProcess;
 
   // Maskin border for all sensors at 10 000 events!:
-  float PXDCut = 22.0;
-  float TelCut = 12.0;
+  float PXDCut = m_PXDCut;
+  float TelCut = m_TelCut;
 
-  float SVDCutU[] = {60.0, 60.0, 60.0, 60.0};
-  float SVDCutV[] = {360.0, 360.0, 360.0, 360.0};
-  float SVDCutUOut[] = {20.0, 20.0, 20.0, 20.0};
-  float SVDCutVOut[] = {20.0, 20.0, 20.0, 20.0};
+  float SVDCutU[] = {500.0, 500.0, 500.0, 500.0};
+  float SVDCutV[] = {1000.0, 1000.0, 1000.0, 1000.0};
+  float SVDCutUOut[] = {500.0, 500.0, 500.0, 500.0};
+  float SVDCutVOut[] = {1000.0, 1000.0, 1000.0, 1000.0};
   float SVDMaskRegUMi[] = {0, 0, 0, 0};
   float SVDMaskRegUMa[] = {1000, 1000, 1000, 1000};
   float SVDMaskRegVMi[] = {0, 0, 0, 0};
   float SVDMaskRegVMa[] = {1000, 1000, 1000, 1000};
+
+  for (int i = 0; i < 4; i++) {
+    SVDCutU[i] = m_SVDuCut;
+    SVDCutV[i] = m_SVDvCut;
+    SVDCutUOut[i] = SVDCutU[i];
+    SVDCutVOut[i] = SVDCutV[i];
+  }
 
   // correction for unmerged events and different No. of proces events:
   PXDCut *= m_nEventsProcessFraction * m_nEventsProcess / 10000.0;
   for (int i = 0; i < c_nSVDPlanes; ++i) {
     SVDCutU[i] *= m_nEventsProcessFraction * m_nEventsProcess / 10000.0;
     SVDCutV[i] *= m_nEventsProcessFraction * m_nEventsProcess / 10000.0;
-//    SVDCutU[i] *= 3.0;
-//    SVDCutV[i] *= 1.5;
-//    SVDCutUOut[i] *= 3.0;
-//    SVDCutVOut[i] *= 3.0;
   }
   TelCut *= m_nEventsProcessFraction * m_nEventsProcess / 10000.0;
 
@@ -360,39 +366,25 @@ void MaskingModule::endRun()
   std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
       m_ignoredPixelsListName));
   MaskList = fopen(FileName.data(), "w");
+  fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+  fprintf(MaskList, "<Meta>\n");
+  fprintf(MaskList, "    <Date>20.04.2016</Date>\n");
+  fprintf(MaskList, "    <Description short=\"Ignore strip list for PXD planes in 2016 VXD beam test\">\n");
+  fprintf(MaskList, "        Crude initial list of bad pixels\n");
+  fprintf(MaskList, "    </Description>\n");
+  fprintf(MaskList, "    <Author>Peter Kodys</Author>\n");
+  fprintf(MaskList, "</Meta>\n");
+  fprintf(MaskList, "<PXD>\n");
   for (int i = 0; i < c_nPXDPlanes; i++) {
-    for (int j = 1; j < c_MaxSensorsInPXDPlane; j++) {
-      if (j >= getSensorsInLayer(indexToPlanePXD(i))) continue;
-      if (m_nEventsPlane[i]) {
+    int iLayer = getInfoPXD(i, 2).getID().getLayerNumber();
+    int iLadder = getInfoPXD(i, 2).getID().getLadderNumber();
+    if (m_nEventsPlane[i]) {
+      fprintf(MaskList, "  <layer n=\"%i\">\n", iLayer);
+      fprintf(MaskList, "    <ladder n=\"%i\">\n", iLadder);
+      for (int j = 1; j < c_MaxSensorsInPXDPlane; j++) {
+        if (j >= getSensorsInLayer(indexToPlanePXD(i))) continue;
         int nMasked = 0;
-        //int iPlane = indexToPlanePXD(i);
-        int iLayer = getInfoPXD(i, j + 1).getID().getLayerNumber();
-        int iLadder = getInfoPXD(i, j + 1).getID().getLadderNumber();
         int iSensor = getInfoPXD(i, j + 1).getID().getSensorNumber();
-        //string FileName = str(format("%3%PXDL%1%S%4%_MaskListRun%2%.xml") % iPlane % runNo % m_MaskDirectoryPath % iSensor);
-        //std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
-        ////      ifstream ifile(m_ignoredPixelsListName.data());
-        ////      if (ifile) {
-        ////        std::string m_ignoredPixelsListName = str(format("%1%") % FileName);
-        //std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
-        //    m_ignoredPixelsListName));
-        ////      }
-        ////      for (auto pixel : m_ignoredPixelsList->getIgnoredPixels(VxdID(iLayer, iLadder, iSensor))) {
-        ////        unsigned int u = (unsigned int)(pixel.first);
-        ////        unsigned int v = (unsigned int)(pixel.second);
-        ////      }
-        //MaskList = fopen(FileName.data(), "w");
-        fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        fprintf(MaskList, "<Meta>\n");
-        fprintf(MaskList, "    <Date>20.04.2016</Date>\n");
-        fprintf(MaskList, "    <Description short=\"Ignore strip list for PXD planes in 2016 VXD beam test\">\n");
-        fprintf(MaskList, "        Crude initial list of bad pixels\n");
-        fprintf(MaskList, "    </Description>\n");
-        fprintf(MaskList, "    <Author>Peter Kodys</Author>\n");
-        fprintf(MaskList, "</Meta>\n");
-        fprintf(MaskList, "<PXD>\n");
-        fprintf(MaskList, "  <layer n=\"%i\">\n", iLayer);
-        fprintf(MaskList, "    <ladder n=\"%i\">\n", iLadder);
         fprintf(MaskList, "      <sensor n=\"%i\">\n", iSensor);
         fprintf(MaskList, "        <!-- Masking rectangular parts of the sensor -->\n");
         fprintf(MaskList, "        <!--pixels uStart = \"070\" uEnd = \"110\" vStart = \"0\" vEnd = \"500\"></pixels-->\n");
@@ -427,15 +419,15 @@ void MaskingModule::endRun()
         }
         fprintf(MaskList, "\n");
         fprintf(MaskList, "      </sensor>\n");
-        fprintf(MaskList, "    </ladder>\n");
-        fprintf(MaskList, "  </layer>\n");
-        fprintf(MaskList, "</PXD>\n");
         B2INFO("PXD(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMasked << " pixels in: " <<
                m_ignoredPixelsListName.data());
         printf("PXD(%i,%i,%i) masked %i pixels in: %s\n", iLayer, iLadder, iSensor, nMasked, m_ignoredPixelsListName.data());
       }
+      fprintf(MaskList, "    </ladder>\n");
+      fprintf(MaskList, "  </layer>\n");
     }
   }
+  fprintf(MaskList, "</PXD>\n");
   fclose(MaskList);
 
   FileName = str(format("%2%SVD_MaskFired_Run%1%.xml") % runNo % m_MaskDirectoryPath);
@@ -443,33 +435,26 @@ void MaskingModule::endRun()
   std::unique_ptr<SVDIgnoredStripsMap> m_ignoredStripsList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
       m_ignoredPixelsListName));
   MaskList = fopen(FileName.data(), "w");
+  fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+  fprintf(MaskList, "<Meta>\n");
+  fprintf(MaskList, "    <Date>20.04.2016</Date>\n");
+  fprintf(MaskList, "    <Description short=\"Ignore strip list for SVD planes in 2016 VXD beam test\">\n");
+  fprintf(MaskList, "        Crude initial list of bad strips\n");
+  fprintf(MaskList, "    </Description>\n");
+  fprintf(MaskList, "    <Author>Peter Kodys</Author>\n");
+  fprintf(MaskList, "</Meta>\n");
+  fprintf(MaskList, "<SVD>\n");
   for (int i = 0; i < c_nSVDPlanes; i++) {
-    for (int j = 0; j < c_MaxSensorsInSVDPlane; j++) {
-      if (j >= getSensorsInLayer(indexToPlaneSVD(i))) continue;
-      if (m_nEventsPlane[i + 2]) {
+    int iLayer = getInfoSVD(i, 2).getID().getLayerNumber();
+    if (m_nEventsPlane[i + 2]) {
+      int iLadder = getInfoSVD(i, 2).getID().getLadderNumber();
+      fprintf(MaskList, "    <layer n=\"%i\">\n", iLayer);
+      fprintf(MaskList, "        <ladder n=\"%i\">\n", iLadder);
+      for (int j = 0; j < c_MaxSensorsInSVDPlane; j++) {
+        if (j >= getSensorsInLayer(indexToPlaneSVD(i))) continue;
         int nMaskedU = 0;
         int nMaskedV = 0;
-        int iLayer = getInfoSVD(i, j + 1).getID().getLayerNumber();
-        int iLadder = getInfoSVD(i, j + 1).getID().getLadderNumber();
         int iSensor = getInfoSVD(i, j + 1).getID().getSensorNumber();
-        //int iPlane = indexToPlaneSVD(i + 2);
-        //string FileName = str(format("%3%SVDL%1%S%4%_MaskListRun%2%.xml") % iPlane % runNo % m_MaskDirectoryPath % iSensor);
-        //std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
-        ////      std::string m_ignoredPixelsListName = str(format("%1%") % FileName);
-        //std::unique_ptr<SVDIgnoredStripsMap> m_ignoredPixelsList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
-        //    m_ignoredPixelsListName));
-        //MaskList = fopen(FileName.data(), "w");
-        fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        fprintf(MaskList, "<Meta>\n");
-        fprintf(MaskList, "    <Date>20.04.2016</Date>\n");
-        fprintf(MaskList, "    <Description short=\"Ignore strip list for SVD planes in 2016 VXD beam test\">\n");
-        fprintf(MaskList, "        Crude initial list of bad strips\n");
-        fprintf(MaskList, "    </Description>\n");
-        fprintf(MaskList, "    <Author>Peter Kodys</Author>\n");
-        fprintf(MaskList, "</Meta>\n");
-        fprintf(MaskList, "<SVD>\n");
-        fprintf(MaskList, "    <layer n=\"%i\">\n", iLayer);
-        fprintf(MaskList, "        <ladder n=\"%i\">\n", iLadder);
         fprintf(MaskList, "            <sensor n=\"%i\">\n", iSensor);
         fprintf(MaskList, "                <side side=\"v\">\n");
         fprintf(MaskList, "                    <stripsFromTo fromStrip = \"620\" toStrip = \"767\"></stripsFromTo>\n");
@@ -522,9 +507,6 @@ void MaskingModule::endRun()
         }
         fprintf(MaskList, "                </side>\n");
         fprintf(MaskList, "            </sensor>\n");
-        fprintf(MaskList, "        </ladder>\n");
-        fprintf(MaskList, "    </layer>\n");
-        fprintf(MaskList, "</SVD>\n");
         B2INFO("SVD(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMaskedU << " U strips in: " <<
                m_ignoredPixelsListName.data());
         B2INFO("SVD(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMaskedV << " V strips in: " <<
@@ -532,8 +514,11 @@ void MaskingModule::endRun()
         printf("SVD(%i,%i,%i) masked %i U strips in: %s\n", iLayer, iLadder, iSensor, nMaskedU, m_ignoredPixelsListName.data());
         printf("SVD(%i,%i,%i) masked %i V strips in: %s\n", iLayer, iLadder, iSensor, nMaskedV, m_ignoredPixelsListName.data());
       }
+      fprintf(MaskList, "        </ladder>\n");
+      fprintf(MaskList, "    </layer>\n");
     }
   }
+  fprintf(MaskList, "</SVD>\n");
   fclose(MaskList);
 
   FileName = str(format("%2%Tel_MaskFired_Run%1%.xml") % runNo % m_MaskDirectoryPath);
@@ -541,6 +526,15 @@ void MaskingModule::endRun()
   std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredTelPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
         m_ignoredPixelsListName));
   MaskList = fopen(FileName.data(), "w");
+  fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+  fprintf(MaskList, "<Meta>\n");
+  fprintf(MaskList, "    <Date>20.04.2016</Date>\n");
+  fprintf(MaskList, "    <Description short=\"Ignore strip list for Tel planes in 2016 VXD beam test\">\n");
+  fprintf(MaskList, "        Crude initial list of bad pixels\n");
+  fprintf(MaskList, "    </Description>\n");
+  fprintf(MaskList, "    <Author>Peter Kodys</Author>\n");
+  fprintf(MaskList, "</Meta>\n");
+  fprintf(MaskList, "<PXD>\n");
   for (int i = 0; i < c_nTelPlanes; i++) {
     if (m_nEventsPlane[i + 6]) {
       int nMasked = 0;
@@ -548,21 +542,6 @@ void MaskingModule::endRun()
       int iLayer = getInfoTel(i).getID().getLayerNumber();
       int iLadder = getInfoTel(i).getID().getLadderNumber();
       int iSensor = getInfoTel(i).getID().getSensorNumber();
-//      string FileName = str(format("%3%Tel%1%_MaskListRun%2%.xml") % iPlane % runNo % m_MaskDirectoryPath);
-//      std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
-////      std::string m_ignoredPixelsListName = str(format("%1%") % FileName);
-//      std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
-//          m_ignoredPixelsListName));
-//      MaskList = fopen(FileName.data(), "w");
-      fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-      fprintf(MaskList, "<Meta>\n");
-      fprintf(MaskList, "    <Date>20.04.2016</Date>\n");
-      fprintf(MaskList, "    <Description short=\"Ignore strip list for Tel planes in 2016 VXD beam test\">\n");
-      fprintf(MaskList, "        Crude initial list of bad pixels\n");
-      fprintf(MaskList, "    </Description>\n");
-      fprintf(MaskList, "    <Author>Peter Kodys</Author>\n");
-      fprintf(MaskList, "</Meta>\n");
-      fprintf(MaskList, "<PXD>\n");
       fprintf(MaskList, "  <layer n=\"%i\">\n", iLayer);
       fprintf(MaskList, "    <ladder n=\"%i\">\n", iLadder);
       fprintf(MaskList, "      <sensor n=\"%i\">\n", iSensor);
@@ -601,12 +580,12 @@ void MaskingModule::endRun()
       fprintf(MaskList, "      </sensor>\n");
       fprintf(MaskList, "    </ladder>\n");
       fprintf(MaskList, "  </layer>\n");
-      fprintf(MaskList, "</PXD>\n");
       B2INFO("Tel(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMasked << " pixels in: " <<
              m_ignoredPixelsListName.data());
       printf("Tel(%i,%i,%i) masked %i pixels in: %s\n", iLayer, iLadder, iSensor, nMasked, m_ignoredPixelsListName.data());
     }
   }
+  fprintf(MaskList, "</PXD>\n");
   fclose(MaskList);
 
   printf("Statistics: all events: %i, use: %i (%4.2f)\n", m_StatAllEvents, m_StatSelEvents, (float)m_StatSelEvents / m_StatAllEvents);

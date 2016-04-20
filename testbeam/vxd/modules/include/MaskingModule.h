@@ -46,18 +46,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-
-// Include BASF2 Base stuff
-//#include <framework/core/Module.h>
-//#include <framework/core/Environment.h>
-
-//#include <framework/datastore/DataStore.h>
-//#include <framework/datastore/StoreObjPtr.h>
-//#include <framework/dataobjects/EventMetaData.h>
-
-//#include <vxd/dataobjects/VxdID.h>
-//#include <rawdata/dataobjects/RawFTSW.h>
-
 namespace Belle2 {
 
   /** PXD DQM Module */
@@ -235,6 +223,11 @@ namespace Belle2 {
     float m_StatEverageOccupancy[c_nTBPlanes * 2]; /**< Statistics: average occupancy for every plane and direction */
 
     float m_CutSVDCharge = 10;               /**< Cut to show on plot signal over this border  TODO set it more sofisticaly */
+
+    float m_PXDCut = 22.0;                   /**< Cut for masking of PXD pixel - prreset for 10 kEvents */
+    float m_TelCut = 12.0;                   /**< Cut for masking of Tel pixel - prreset for 10 kEvents */
+    float m_SVDuCut = 500.0;                 /**< Cut for masking of SVD u strip - prreset for 10 kEvents */
+    float m_SVDvCut = 1000.0;                /**< Cut for masking of SVD v strip - prreset for 10 kEvents */
 
     TH2F* m_PXDHitMapUV[c_nPXDPlanes * c_MaxSensorsInPXDPlane];       /**< Hitmaps for pixels by PXD plane */
     TH2F* m_SVDHitMapU[c_nSVDPlanes * c_MaxSensorsInSVDPlane];        /**< SVD hitmaps for u strips and timestamp by plane */

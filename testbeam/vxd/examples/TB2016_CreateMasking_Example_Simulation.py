@@ -5,7 +5,7 @@
 # This is the default simulation scenario for VXD beam test WITHOUT telescopes
 
 # Important parameters of the simulation:
-events = 100  # Number of events to simulate
+events = 10000  # Number of events to simulate
 fieldOn = True  # Turn field on or off (changes geometry components and digi/clust params)
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
@@ -158,8 +158,8 @@ histo.param('histoFileName', 'TB2016-Masking-VXD-histo.root')  # File to save hi
 outputMaskFilePath = 'testbeam/vxd/data/'
 
 Mask = register_module('Masking')
-# Mask.param('nEventsProcess', 1000)
-Mask.param('nEventsProcess', 100)
+# Mask.param('nEventsProcess', 10000)
+Mask.param('nEventsProcess', 10000)
 Mask.param('MaskDirectoryPath', outputMaskFilePath)
 # Mask.param('AppendMaskFile', 0)
 # Mask.param('PXDCutSeedL', 18)

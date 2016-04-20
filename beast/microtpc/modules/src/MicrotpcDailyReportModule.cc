@@ -245,7 +245,7 @@ void MicrotpcDailyReportModule::terminate()
   cout << "TPC #" << m_inputTPCNumber << " daily report: event with time stamp " << h_tpc_uptime[1]->GetMaximum() /
        h_tpc_uptime[0]->GetMaximum() * 100 <<
        " % of the time " << endl;
-  cout << "TPC #" << m_inputTPCNumber << " daily report: detector was up " << LifeTime / 60. / 60. / 24. / 24. * 100. <<
+  cout << "TPC #" << m_inputTPCNumber << " daily report: detector was up " << LifeTime / 60. / 60. / 24. * 100. <<
        " % of the time" << endl;
 }
 

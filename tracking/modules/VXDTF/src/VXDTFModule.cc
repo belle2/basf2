@@ -975,6 +975,9 @@ void VXDTFModule::the_real_event()
       int nTotalIndices = 0, nTotalHitsInTCs = 0;
 
       for (VXDTFTrackCandidate* aTC : m_baselinePass.tcVector) {
+        // added: 20.04.16
+        if (!aTC->getCondition()) { continue; }
+
         nTotalIndices += aTC->getPXDHitIndices().size() + aTC->getSVDHitIndices().size();
         nTotalHitsInTCs += aTC->size();
         genfit::TrackCand gfTC = generateGFTrackCand(aTC);                                          /// generateGFTrackCand
@@ -5613,6 +5616,11 @@ void VXDTFModule::calcQIbyStraightLine(TCsOfEvent& tcVector)
     } catch (FilterExceptions::Straight_Up& anException) {
       B2ERROR("VXDTFModule::calcQIbyStraightLine:lineFit failed , reason: " << anException.what() << ", killing TC...")
       currentTC->setFitSucceeded(false);
+      //added 20.4.16
+      currentTC->setCondition(false);
+      currentTC->setTrackQuality(0.0);
+      currentTC->setInitialValue((*currentHits)[0]->hitPosition, TVector3(0., 0., 0.), m_PARAMpdGCode); // position, momentum, pdgCode
+      //end added 20.4.16
       continue;
     }
 

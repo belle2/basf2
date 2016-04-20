@@ -54,6 +54,12 @@ VXDDQMOnLineModule::VXDDQMOnLineModule() : HistoModule()
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("vxd"));
+  addParam("Reduce1DCorrelHistos", m_Reduce1DCorrelHistos,
+           "flag <0,1> for removing of 1D correlation plots from output, default = 0 ", m_Reduce1DCorrelHistos);
+  addParam("SaveOtherHistos", m_SaveOtherHistos,
+           "flag <0,1> for creation of correlation plots for non-neighboar layers, default = 0 ", m_SaveOtherHistos);
+  addParam("SwapPXD", m_SwapPXD, "flag <0,1> very special case for swap of u-v coordinates, default = 0 ", m_SwapPXD);
+
 }
 
 
@@ -650,7 +656,6 @@ void VXDDQMOnLineModule::event()
   }
 
   CutDQMCorrelTime = 70;  // ns
-  int SwapPXD = 0;    // TODO Very special case, in simulations we see swap u-v! check with data. April 18,2016
   for (int i1 = 0; i1 < storeSVDClusters.getEntries() + storePXDClusters.getEntries(); i1++) {
     // preparing of first value for correlation plots with postfix "1":
     float fTime1 = 0.0;
@@ -677,7 +682,7 @@ void VXDDQMOnLineModule::event()
       iIsV1 = 1;
       fPosSPU1 = rGlobal1.Y();
       fPosSPV1 = rGlobal1.Z();
-      if (SwapPXD) {
+      if (m_SwapPXD) {
         fPosSPV1 = rGlobal1.Y();
         fPosSPU1 = rGlobal1.Z();
       }
@@ -736,7 +741,7 @@ void VXDDQMOnLineModule::event()
         iIsV2 = 1;
         fPosSPU2 = rGlobal2.Y();
         fPosSPV2 = rGlobal2.Z();
-        if (SwapPXD) {
+        if (m_SwapPXD) {
           fPosSPV2 = rGlobal2.Y();
           fPosSPU2 = rGlobal2.Z();
         }

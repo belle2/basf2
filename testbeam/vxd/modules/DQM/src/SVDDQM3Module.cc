@@ -446,6 +446,15 @@ void SVDDQM3Module::defineHisto()
 
 void SVDDQM3Module::initialize()
 {
+
+  B2INFO("***********************************************************");
+  B2INFO("*                                                         *");
+  B2INFO("* THIS MODULE WILL BE NO MORE SUPPORTED BY AUTHOR!        *");
+  B2INFO("* PLEASE CHANGE MODULE TO: 'VXDDQMOnLine'                 *");
+  B2INFO("*                          SaveOtherHistos=1              *");
+  B2INFO("*                                                         *");
+  B2INFO("***********************************************************");
+
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 

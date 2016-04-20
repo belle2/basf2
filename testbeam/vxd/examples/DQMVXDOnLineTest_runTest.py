@@ -70,6 +70,7 @@ TelClust = register_module('TelClusterizer')
 
 # VXD on line DQM module
 vxd_dqm = register_module('VXDDQMOnLine')
+vxd_dqm.param('SaveOtherHistos', 1)
 
 trackfitterTel = register_module('GenFitterVXDTB')
 trackfitter = register_module('GenFitter')

@@ -151,13 +151,15 @@ TelSort6.param('ignoredPixelsListName', tel_mask6)
 
 TelClust = register_module('TelClusterizer')
 
+# Histogram manager immediately after master module
+histo = register_module('HistoManager')
+histo.param('histoFileName', 'TB2016-Masking-VXD-histo.root')  # File to save histograms
+
 outputMaskFilePath = 'testbeam/vxd/data/'
 
 Mask = register_module('Masking')
 # Mask.param('nEventsProcess', 1000)
-Mask.param('MaskingStep', 0)
 Mask.param('nEventsProcess', 100)
-Mask.param('SVDStrongMasking', 2)
 Mask.param('MaskDirectoryPath', outputMaskFilePath)
 # Mask.param('AppendMaskFile', 0)
 # Mask.param('PXDCutSeedL', 18)
@@ -166,6 +168,7 @@ Mask.param('MaskDirectoryPath', outputMaskFilePath)
 # Path construction
 main = create_path()
 main.add_module(eventinfosetter)
+main.add_module(histo)  # immediately after master module
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)

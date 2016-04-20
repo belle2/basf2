@@ -129,7 +129,8 @@ namespace Belle2 {
     }
 
     int m_Reduce1DCorrelHistos = 0;       /**< flag <0,1> for removing of 1D correlation plots from output */
-    int m_SaveOtherHistos = 0;       /**< flag <0,1> for removing of 1D correlation plots from output */
+    int m_SaveOtherHistos = 0;            /**< flag <0,1> for creation of correlation plots for non-neighboar layers */
+    int m_SwapPXD = 0;                    /**< flag <0,1> very special case for swap of u-v coordinates */
 
     std::string m_storePXDDigitsName;     /**< PXDDigits StoreArray name */
     std::string m_storeDigitsName;        /**< SVDDigits StoreArray name */

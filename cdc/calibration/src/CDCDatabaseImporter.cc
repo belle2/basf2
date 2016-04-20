@@ -14,8 +14,10 @@
 // framework - Database
 #include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportArray.h>
+#include <framework/database/DBImportObjPtr.h>
 
 // framework - xml
 #include <framework/gearbox/GearDir.h>
@@ -28,6 +30,7 @@
 // DB objects
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <cdc/dbobjects/CDCTimeZero.h>
+#include <cdc/dbobjects/CDCBadWires.h>
 #include <cdc/dataobjects/WireID.h>
 
 #include <iostream>
@@ -109,6 +112,42 @@ void CDCDatabaseImporter::importChannelMap(std::string fileName)
 
 }
 
+void CDCDatabaseImporter::importBadWire(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2ERROR("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCBadWires> bw;
+  bw.construct();
+
+  int iL(0), iC(0), nRead(0);
+
+  while (true) {
+    stream >> iL >> iC;
+    if (stream.eof()) break;
+    ++nRead;
+    bw->setWire(WireID(iL, iC));
+    //      if (m_debug) {
+    //  std::cout << iL << " " << iC << std::endl;
+    //      }
+  }
+  stream.close();
+
+  if (nRead > static_cast<int>(nSenseWires)) B2FATAL("#lines read-in (=" << nRead << ") is larger than #sense wires (=" << nSenseWires
+                                                       << ") !");
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  bw.import(iov);
+  B2RESULT("BadWire table imported to database.");
+}
+
+
 void CDCDatabaseImporter::printChannelMap()
 {
 
@@ -134,3 +173,8 @@ void CDCDatabaseImporter::printTimeZero()
 
 }
 
+void CDCDatabaseImporter::printBadWire()
+{
+  DBObjPtr<CDCBadWires> bw;
+  bw->dump();
+}

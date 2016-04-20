@@ -66,6 +66,16 @@ namespace Belle2 {
      */
     void printTimeZero();
 
+    /**
+     * Import badwire table to the data base.
+     */
+    void importBadWire(std::string fileName);
+    /**
+     * Get the badwire table from the database and
+     * print it.
+     */
+    void printBadWire();
+
   private:
 
     /**

@@ -25,6 +25,10 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
     output_file_name = 'TrackingValidation.root'  # Specification for BrowseTFileOnTerminateRunMixin
     root_output_file = None  # If events file should be written
     pulls = True
+
+    #: not fit by default
+    #: can be overridden by derived validation class
+    fit_geometry = None
     exclude_profile_mc_parameter = []
     exclude_profile_pr_parameter = []
 

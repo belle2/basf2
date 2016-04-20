@@ -38,13 +38,17 @@ int main(int argc, char **argv)
     exit(1);
   }
 
+  bool getRunNumberFromFileName(false);
+
   Int_t runNum, eventNum, nCh, nWindow;
   Short_t ftsw;
   Short_t id[512], module[512], carrier[512], irsx[512], channel[512],
           window0[512];
   TFile *fin = TFile::Open(argv[1]);
   TTree *t_in = (TTree*)fin->Get("rawdata");
-//  t_in->SetBranchAddress("runNum",&runNum);
+  if (!getRunNumberFromFileName) {
+    t_in->SetBranchAddress("runNum",&runNum);
+  }
   t_in->SetBranchAddress("eventNum",&eventNum);
   t_in->SetBranchAddress("ftsw",&ftsw);
   t_in->SetBranchAddress("nCh",&nCh);
@@ -60,23 +64,37 @@ int main(int argc, char **argv)
   Short_t wave[512][nsample];
   t_in->SetBranchAddress("PSsamples",wave);
 
-#if 1
-  char *filename = argv[1];
-  runNum = 0;
-  if (strstr(filename,"run")) {
-    strtok(filename,"/");
-    while (1) {
-      sprintf(filename,"%s",strtok(NULL,"/"));
-      if (strstr(filename,".root")) break;
+  if (getRunNumberFromFileName) {
+    runNum = 0;
+    TString fileName(argv[1]);
+
+    TObjArray* tokens;
+    TObjString* objstring;   
+    TString string;    
+    tokens = fileName.Tokenize("/");
+    objstring = (TObjString*) tokens->At(tokens->GetLast());
+    if (objstring) {string = objstring->GetString();}
+    tokens->Delete(); 
+    
+    tokens = string.Tokenize("run");      
+    if (tokens->At(1)) {objstring = (TObjString*) tokens->At(1);}   
+    if (objstring) {string = objstring->GetString();}
+    tokens->Delete();
+
+    tokens = string.Tokenize(".");    
+    if (tokens->At(0)) {objstring = (TObjString*) tokens->At(0);}    
+    if (objstring) {string = objstring->GetString();}
+    tokens->Delete();
+      
+    if (string.IsDec()) {
+      runNum = string.Atoi();
+    } else {
+      std::cerr << "Unable to determine run number from file name." << std::endl;
     }
-    strtok(filename,"_");
-    strtok(filename,".");
-    char runChar[6];
-    strncpy(runChar,filename+3,6);
-    strtok(runChar,".");
-    runNum = atoi(runChar);
+    delete tokens;
   }
-#endif
+
+
 
   Int_t nhit;
   Short_t scrodId[512], eModule[512], asicRow[512], asicCol[512], asicCh[512],

@@ -7,5 +7,5 @@
 
 #pragma link C++ class Belle2::SendHeader+;
 #pragma link C++ class Belle2::SendTrailer+;
-pragma link C++ class Belle2::SndHdrTemp +;
+#pragma link C++ class Belle2::SndHdrTemp+;
 #endif

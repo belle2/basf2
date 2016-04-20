@@ -201,16 +201,19 @@ set_log_level(LogLevel.ERROR)
 # Set up DB chain
 reset_database()
 use_database_chain()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True)
 if args.local_db is not None:
-    use_local_database(Belle2.FileSystem.findFile(args.local_db))
+    use_local_database(Belle2.FileSystem.findFile(args.local_db), "", True)
 
 main = create_path()
 
 if args.raw_input:
     main.add_module('SeqRootInput')
 else:
-    main.add_module('RootInput', branchNames=['EventMetaData', 'RawFTSWs', 'RawSVDs', 'RawPXDs'])
+    branches = ['EventMetaData', 'RawFTSWs', 'RawSVDs', 'RawPXDs']
+    if not args.unpacking:
+        branches = branches + ['EventMetaData', 'PXDDigits', 'SVDDigits']
+    main.add_module('RootInput', branchNames=branches)
 
 
 if args.dqm:
@@ -225,7 +228,8 @@ if args.unpacking:
 
 
 if not args.svd_only:
-    main.add_module("PXDRawHitSorter")
+    if args.unpacking:
+        main.add_module("PXDRawHitSorter")
     main.add_module('PXDClusterizer')
 
 main.add_module('SVDDigitSorter')  # , ignoredStripsListName='data/testbeam/vxd/SVD_Masking.xml')
@@ -246,14 +250,17 @@ else:
     main.add_module('GenFitter', FilterId='Kalman')
 
 if args.dqm:
-    main.add_module("PXDRawDQM")
+    if args.unpacking:
+        main.add_module("PXDRawDQM")
     main.add_module("PXDDQMCorr")
-    # main.add_module('PXDDQM')
-    main.add_module('SVDDQM3')
+    # main.add_module('PXDDQM') does not work
+    # main.add_module('SVDDQM3') will be removed, replaced by VXDDQMOnLine
+    main.add_module('VXDDQMOnLine', SaveOtherHistos=1)
 
     if not args.gbl_collect:
         main.add_module('TrackfitDQM')
 
+# main.add_module('TrackBuilder')
 main.add_module('RootOutput')
 
 if args.display:

@@ -96,6 +96,7 @@ void SVDDigitSorterModule::event()
   StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
   // If not digits, nothing to do
   if (!storeDigits || !storeDigits.getEntries()) return;
+  B2DEBUG(89, "Initial size of StoreDigits array: " << storeDigits.getEntries());
 
   RelationArray relDigitMCParticle(m_relDigitMCParticleName);
   RelationArray relDigitTrueHit(m_relDigitTrueHitName);
@@ -123,7 +124,7 @@ void SVDDigitSorterModule::event()
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   if (m_minSamples > 1)
-    for (auto vxd_samples : sensors) {
+    for (auto& vxd_samples : sensors) {
       // vxd_samples.second is a multiset, remove all samples whose strip number occurs less than m_minSamples times
       // Fist geometry data for the sensor
       VxdID sensorID = vxd_samples.first;
@@ -143,14 +144,14 @@ void SVDDigitSorterModule::event()
       auto currentStart = samples.begin();
       auto firstSample = samples.cbegin();
       bool pass = false;
-      B2DEBUG(99, "Initial size: " << samples.size());
+      B2DEBUG(99, "Initial size: " << vxd_samples.second.size());
       for (auto sensor_it = firstSample; sensor_it != samples.end(); sensor_it++) {
         if (sensor_it->getCellID() != currentStrip) {
           // Count samples and erase if small, reset counters.
           if (!pass) {
             samples.erase(currentStart, sensor_it);
-            B2DEBUG(99, "Erased.")
-          }
+            if (sensor_it != firstSample) B2DEBUG(89, "ERASED.")
+            }
           currentStart = sensor_it;;
           currentCount = 0;
           currentStrip = sensor_it->getCellID();
@@ -180,9 +181,9 @@ void SVDDigitSorterModule::event()
       // Finish the last strip
       if (!pass) {
         samples.erase(currentStart, samples.end());
-        B2DEBUG(99, "ERASED.");
+        B2DEBUG(89, "ERASED.");
       }
-      B2DEBUG(99, "Final size: " << samples.size());
+      B2DEBUG(99, "Final size: " << vxd_samples.second.size());
     } // for vxd_samples
 
   // Now we loop over sensors and reorder the digits list
@@ -193,7 +194,7 @@ void SVDDigitSorterModule::event()
   unsigned int index(0);
   // And just loop over the sensors and assign the digits at the correct position
   for (const auto& sensor : sensors) {
-    B2INFO("Sample size: " << sensor.second.size())
+    B2DEBUG(99, "Sample size: " << sensor.second.size())
     const SVD::Sample* lastsample(0);
     for (const SVD::Sample& sample : sensor.second) {
       //Normal case: strip has different address
@@ -237,4 +238,6 @@ void SVDDigitSorterModule::event()
   RelationArray::Identity to;
   if (relDigitMCParticle) relDigitMCParticle.consolidate(from, to, RelationArray::c_deleteElement);
   if (relDigitTrueHit) relDigitTrueHit.consolidate(from, to, RelationArray::c_deleteElement);
+  B2DEBUG(89, "Final size of StoreDigits store array: " << storeDigits.getEntries());
+
 }

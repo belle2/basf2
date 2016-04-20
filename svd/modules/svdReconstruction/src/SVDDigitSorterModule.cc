@@ -18,6 +18,10 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/reconstruction/Sample.h>
+#include <vxd/geometry/GeoCache.h>
+#include <svd/geometry/SensorInfo.h>
+#include <set>
+#include <algorithm>
 
 using namespace std;
 using namespace Belle2;
@@ -41,7 +45,16 @@ SVDDigitSorterModule::SVDDigitSorterModule() : Module()
                  "The module is generally not required for simulation, as SVDDigitzer outputs"
                  "a properly sorted digit collection.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("mergeDuplicates", m_mergeDuplicates, "If true, merge Sample information if more than one digit exists for the same address", true);
+  addParam("mergeDuplicates", m_mergeDuplicates,
+           "If true, merge Sample information if more than one digit exists for the same address", true);
+  addParam("minSamples", m_minSamples,
+           "Minimum number of consecutive samples to accept a strip signal. 1-6, default 3, 1 means filtering disabled.", 3);
+  addParam("ADCLow", m_minADC, "Low end of ADC range", double(-96000.0));
+  addParam("ADCHigh", m_maxADC, "High end of ADC range", double(288000.0));
+  addParam("ADCbits", m_bitsADC, "Number of ADC bits", 10);
+  addParam("RejectionThreshold", m_rejectionThreshold,
+           "Threshold that at least minSamples consecutive samples must exceed for a strip to pass", 3.0);
+
   addParam("ignoredStripsListName", m_ignoredStripsListName, "Name of the xml with ignored strips list", string(""));
   addParam("digits", m_storeDigitsName, "SVDDigit collection name", string(""));
   addParam("truehits", m_storeTrueHitsName, "SVDTrueHit collection name", string(""));
@@ -75,6 +88,7 @@ void SVDDigitSorterModule::initialize()
   m_relDigitMCParticleName = relDigitMCParticles.getName();
 
   m_ignoredStripsList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(m_ignoredStripsListName));
+  m_e2ADC = (m_maxADC - m_minADC) / pow(2, m_bitsADC);
 }
 
 void SVDDigitSorterModule::event()
@@ -106,6 +120,71 @@ void SVDDigitSorterModule::event()
     }
   }
 
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
+  if (m_minSamples > 1)
+    for (auto vxd_samples : sensors) {
+      // vxd_samples.second is a multiset, remove all samples whose strip number occurs less than m_minSamples times
+      // Fist geometry data for the sensor
+      VxdID sensorID = vxd_samples.first;
+      // If malformed object, drop it. Only here, for sorted digits the check will be done in sorter module.
+      if (!geo.validSensorID(sensorID)) {
+        B2WARNING("Sensor with malformed VxdID " << sensorID.getID() << ", dropping.")
+        continue;
+      }
+      const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+      double elNoise = (sensorID.getSegmentNumber() == 0) ? info.getElectronicNoiseU() : info.getElectronicNoiseV();
+      double threshold = m_rejectionThreshold * elNoise / m_e2ADC;
+
+      decltype(vxd_samples.second)& samples = vxd_samples.second;
+      unsigned int currentStrip = 5000;
+      int currentSampleIndex = 0;
+      int currentCount = 0;
+      auto currentStart = samples.begin();
+      auto firstSample = samples.cbegin();
+      bool pass = false;
+      B2DEBUG(99, "Initial size: " << samples.size());
+      for (auto sensor_it = firstSample; sensor_it != samples.end(); sensor_it++) {
+        if (sensor_it->getCellID() != currentStrip) {
+          // Count samples and erase if small, reset counters.
+          if (!pass) {
+            samples.erase(currentStart, sensor_it);
+            B2DEBUG(99, "Erased.")
+          }
+          currentStart = sensor_it;;
+          currentCount = 0;
+          currentStrip = sensor_it->getCellID();
+          currentSampleIndex = 0;
+          pass = false;
+        }
+        // We need consecutive samples, so reset index if a sample is missing or a sample is small
+        if (
+          (sensor_it->getSampleIndex() == currentSampleIndex)
+          &&
+          (sensor_it->getCharge() > threshold)
+        ) currentCount++;
+        else
+          currentCount = 0;
+        currentSampleIndex = sensor_it->getSampleIndex() + 1;
+        if (currentCount >= m_minSamples) pass = true;
+        B2DEBUG(99,
+                "VXD ID: " << vxd_samples.first <<
+                " cut: " << threshold <<
+                " strip: " << currentStrip <<
+                " sample: " << currentSampleIndex <<
+                " count: " << currentCount <<
+                " charge: " << sensor_it->getCharge() <<
+                " pass: " << pass << endl;
+               );
+      }
+      // Finish the last strip
+      if (!pass) {
+        samples.erase(currentStart, samples.end());
+        B2DEBUG(99, "ERASED.");
+      }
+      B2DEBUG(99, "Final size: " << samples.size());
+    } // for vxd_samples
+
   // Now we loop over sensors and reorder the digits list
   // To do this, we create a copy of the existing digits
   m_digitcopy.clear();
@@ -113,9 +192,10 @@ void SVDDigitSorterModule::event()
   // and a vector to remember which index changed into what
   unsigned int index(0);
   // And just loop over the sensors and assign the digits at the correct position
-  for (const auto & sensor : sensors) {
+  for (const auto& sensor : sensors) {
+    B2INFO("Sample size: " << sensor.second.size())
     const SVD::Sample* lastsample(0);
-    for (const SVD::Sample & sample : sensor.second) {
+    for (const SVD::Sample& sample : sensor.second) {
       //Normal case: strip has different address
       if (!lastsample || sample > *lastsample) {
         //Overwrite the digit
@@ -146,6 +226,7 @@ void SVDDigitSorterModule::event()
       lastsample = &sample;
     }
   }
+
   //Resize if we omitted/merged one or more elements
   storeDigits.getPtr()->ExpandCreate(index);
 

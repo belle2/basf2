@@ -54,6 +54,17 @@ namespace Belle2 {
       std::vector<SVDDigit> m_digitcopy;
       /** Mode: if true, merge duplicate pixels, otherwise delete all but the first occurence */
       bool m_mergeDuplicates;
+      int m_minSamples;
+      /** Low limit of ADC range in electrons. */
+      double m_minADC;
+      /** High limit of ADC range in electrons. */
+      double m_maxADC;
+      /** Number of ADC bits. */
+      int m_bitsADC;
+      /** Electron equivalent of 1 ADU. */
+      double m_e2ADC;
+      /** Suppression threshold */
+      double m_rejectionThreshold;
       /** Name of the ignored strips list xml */
       std::string m_ignoredStripsListName;
       /** Ignored strips list manager class */

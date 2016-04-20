@@ -10,7 +10,6 @@
 #include <tracking/modules/genfitter/TrackBuilderModule.h>
 
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
@@ -104,13 +103,11 @@ void TrackBuilderModule::event()
   StoreArray < genfit::Track > gfTracks(m_gfTracksColName);
 
   //Relations for Tracks
-  RelationArray tracksToMcParticles(tracks, mcParticles);
   RelationArray gfTracksToTrackFitResults(gfTracks, trackFitResults);
   RelationArray gfTrackCandidatesToTrackFitResults(trackCandidates, trackFitResults);
 
   // Utility used to match everything up
   RelationArray gfTrackCandidatesTogfTracks(trackCandidates, gfTracks);
-  RelationIndex<genfit::Track, MCParticle> gfTracksToMCPart(gfTracks, mcParticles);
 
   for (int iGFTrack = 0; iGFTrack < gfTracks.getEntries(); ++iGFTrack) {
     assert(gfTracks[iGFTrack]);
@@ -228,13 +225,13 @@ void TrackBuilderModule::event()
       B2DEBUG(50, "Built Belle2::Track");
       // Do MC association.
       if (mcParticles.getEntries() > 0) {
-        auto relationToMCPart = gfTracksToMCPart.getFirstElementFrom(gfTrack);
+        MCParticle* mcparticle = DataStore::Instance().getRelated<MCParticle>(gfTrack);
         // relationToMCPart can be a nullptr (as of 2015-05-08 this
         // happens in framework/tests/streamer_test.py), so we have to
         // guard against this.  Otherwise we check if the relation
         // points to an MC particle and if so, we build the relation.
-        if (relationToMCPart && relationToMCPart->to) {
-          tr->addRelationTo(relationToMCPart->to);
+        if (mcparticle) {
+          tr->addRelationTo(mcparticle);
           B2DEBUG(100, "Associated new Belle2::Track with Belle2::MCParticle");
         }
       }

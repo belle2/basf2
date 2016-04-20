@@ -479,6 +479,11 @@ namespace Belle2 {
     double goodBelleGamma(const Particle* particle);
 
     /**
+     * return ECL cluster's Error on Energy
+     */
+    double eclClusterErrorE(const Particle* particle);
+
+    /**
      * return ECL cluster's uncorrected energy
      */
     double eclClusterUncorrectedE(const Particle* particle);
@@ -504,6 +509,11 @@ namespace Belle2 {
     double eclClusterTiming(const Particle* particle);
 
     /**
+     * return ECL cluster's Error on timing information
+     */
+    double eclClusterErrorTiming(const Particle* particle);
+
+    /**
      * return the energy of the crystall with highest  energy
      */
     double eclClusterHighestE(const Particle* particle);
@@ -512,6 +522,16 @@ namespace Belle2 {
      * return ratio of energies in inner 3x3 and 5x5 cells
      */
     double eclClusterE9E25(const Particle* particle);
+
+    /**
+     * return LAT (shower variable)
+     */
+    double eclClusterLAT(const Particle* particle);
+
+    /**
+     * return high momentum pi0 likelihood.
+     */
+    double eclClusterMergedPi0(const Particle* particle);
 
     /**
      *

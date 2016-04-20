@@ -1187,6 +1187,17 @@ namespace Belle2 {
       return (double) isGoodBelleGamma(region, energy);
     }
 
+    double eclClusterErrorE(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getErrorEnergy();
+      }
+      return result;
+    }
+
     double eclClusterUncorrectedE(const Particle* particle)
     {
       double result = 0.0;
@@ -1216,6 +1227,17 @@ namespace Belle2 {
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
         result = shower->getTiming();
+      }
+      return result;
+    }
+
+    double eclClusterErrorTiming(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getErrorTiming();
       }
       return result;
     }
@@ -1260,6 +1282,28 @@ namespace Belle2 {
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
         result = shower->getE9oE25();
+      }
+      return result;
+    }
+
+    double eclClusterLAT(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getLAT();
+      }
+      return result;
+    }
+
+    double eclClusterMergedPi0(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getMergedPi0();
       }
       return result;
     }
@@ -1512,6 +1556,8 @@ namespace Belle2 {
                       "1.0 if photon candidate passes good photon selection criteria (to be used if photon's energy is not calibrated)");
     REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma,
                       "1.0 if photon candidate passes good photon selection criteria (For Belle data and MC, hence 50, 100, 150 MeV cuts)");
+    REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE,
+                      "ECL cluster's Error on Energy");
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,
                       "ECL cluster's uncorrected energy");
     REGISTER_VARIABLE("clusterR", eclClusterR,
@@ -1522,10 +1568,16 @@ namespace Belle2 {
                       "ECL cluster's polar angle");
     REGISTER_VARIABLE("clusterTiming", eclClusterTiming,
                       "ECL cluster's timing");
+    REGISTER_VARIABLE("clusterErrorTiming", eclClusterErrorTiming,
+                      "ECL cluster's timing");
     REGISTER_VARIABLE("clusterHighestE", eclClusterHighestE,
                       "energy of the crystall with highest  energy");
     REGISTER_VARIABLE("clusterE9E25", eclClusterE9E25,
                       "ratio of energies in inner 3x3 and 5x5 cells");
+    REGISTER_VARIABLE("clusterLAT", eclClusterLAT,
+                      "LAT (shower variable)");
+    REGISTER_VARIABLE("clusterMergedPi0", eclClusterMergedPi0,
+                      "High momentum pi0 likelihood. ");
     REGISTER_VARIABLE("clusterNHits", eclClusterNHits,
                       "number of hits associated to this cluster");
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,

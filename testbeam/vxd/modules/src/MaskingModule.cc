@@ -354,29 +354,34 @@ void MaskingModule::endRun()
   FILE* MaskList;
   B2INFO("Start to create masking");
   printf("Start to create masking from %i events (fraction: %6.3f)\n", (int)m_nRealEventsProcess, m_nEventsProcessFraction);
+
+  std::string FileName = str(format("%2%PXD_MaskFired_Run%1%.xml") % runNo % m_MaskDirectoryPath);
+  std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+  std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
+      m_ignoredPixelsListName));
+  MaskList = fopen(FileName.data(), "w");
   for (int i = 0; i < c_nPXDPlanes; i++) {
     for (int j = 1; j < c_MaxSensorsInPXDPlane; j++) {
       if (j >= getSensorsInLayer(indexToPlanePXD(i))) continue;
       if (m_nEventsPlane[i]) {
         int nMasked = 0;
-        int iPlane = indexToPlanePXD(i);
+        //int iPlane = indexToPlanePXD(i);
         int iLayer = getInfoPXD(i, j + 1).getID().getLayerNumber();
         int iLadder = getInfoPXD(i, j + 1).getID().getLadderNumber();
         int iSensor = getInfoPXD(i, j + 1).getID().getSensorNumber();
-        string FileName = str(format("%3%PXDL%1%S%4%_MaskListRun%2%.xml") % iPlane % runNo % m_MaskDirectoryPath % iSensor);
-        std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
-        //      ifstream ifile(m_ignoredPixelsListName.data());
-        //      if (ifile) {
-        //        std::string m_ignoredPixelsListName = str(format("%1%") % FileName);
-        std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
-            m_ignoredPixelsListName));
-        //      }
-        //      for (auto pixel : m_ignoredPixelsList->getIgnoredPixels(VxdID(iLayer, iLadder, iSensor))) {
-        //        unsigned int u = (unsigned int)(pixel.first);
-        //        unsigned int v = (unsigned int)(pixel.second);
-        //      }
-
-        MaskList = fopen(FileName.data(), "w");
+        //string FileName = str(format("%3%PXDL%1%S%4%_MaskListRun%2%.xml") % iPlane % runNo % m_MaskDirectoryPath % iSensor);
+        //std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+        ////      ifstream ifile(m_ignoredPixelsListName.data());
+        ////      if (ifile) {
+        ////        std::string m_ignoredPixelsListName = str(format("%1%") % FileName);
+        //std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
+        //    m_ignoredPixelsListName));
+        ////      }
+        ////      for (auto pixel : m_ignoredPixelsList->getIgnoredPixels(VxdID(iLayer, iLadder, iSensor))) {
+        ////        unsigned int u = (unsigned int)(pixel.first);
+        ////        unsigned int v = (unsigned int)(pixel.second);
+        ////      }
+        //MaskList = fopen(FileName.data(), "w");
         fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         fprintf(MaskList, "<Meta>\n");
         fprintf(MaskList, "    <Date>20.04.2016</Date>\n");
@@ -425,14 +430,19 @@ void MaskingModule::endRun()
         fprintf(MaskList, "    </ladder>\n");
         fprintf(MaskList, "  </layer>\n");
         fprintf(MaskList, "</PXD>\n");
-        fclose(MaskList);
         B2INFO("PXD(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMasked << " pixels in: " <<
                m_ignoredPixelsListName.data());
         printf("PXD(%i,%i,%i) masked %i pixels in: %s\n", iLayer, iLadder, iSensor, nMasked, m_ignoredPixelsListName.data());
       }
     }
   }
+  fclose(MaskList);
 
+  FileName = str(format("%2%SVD_MaskFired_Run%1%.xml") % runNo % m_MaskDirectoryPath);
+  m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+  std::unique_ptr<SVDIgnoredStripsMap> m_ignoredStripsList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
+      m_ignoredPixelsListName));
+  MaskList = fopen(FileName.data(), "w");
   for (int i = 0; i < c_nSVDPlanes; i++) {
     for (int j = 0; j < c_MaxSensorsInSVDPlane; j++) {
       if (j >= getSensorsInLayer(indexToPlaneSVD(i))) continue;
@@ -442,13 +452,13 @@ void MaskingModule::endRun()
         int iLayer = getInfoSVD(i, j + 1).getID().getLayerNumber();
         int iLadder = getInfoSVD(i, j + 1).getID().getLadderNumber();
         int iSensor = getInfoSVD(i, j + 1).getID().getSensorNumber();
-        int iPlane = indexToPlaneSVD(i + 2);
-        string FileName = str(format("%3%SVDL%1%S%4%_MaskListRun%2%.xml") % iPlane % runNo % m_MaskDirectoryPath % iSensor);
-        std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
-        //      std::string m_ignoredPixelsListName = str(format("%1%") % FileName);
-        std::unique_ptr<SVDIgnoredStripsMap> m_ignoredPixelsList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
-            m_ignoredPixelsListName));
-        MaskList = fopen(FileName.data(), "w");
+        //int iPlane = indexToPlaneSVD(i + 2);
+        //string FileName = str(format("%3%SVDL%1%S%4%_MaskListRun%2%.xml") % iPlane % runNo % m_MaskDirectoryPath % iSensor);
+        //std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+        ////      std::string m_ignoredPixelsListName = str(format("%1%") % FileName);
+        //std::unique_ptr<SVDIgnoredStripsMap> m_ignoredPixelsList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
+        //    m_ignoredPixelsListName));
+        //MaskList = fopen(FileName.data(), "w");
         fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         fprintf(MaskList, "<Meta>\n");
         fprintf(MaskList, "    <Date>20.04.2016</Date>\n");
@@ -468,7 +478,7 @@ void MaskingModule::endRun()
         for (int i1 = 0; i1 < m_SVDMaskU[j * c_nSVDPlanes + i]->GetNbinsX(); ++i1) {
           int ExistMask = 0;
           if (m_AppendMaskFile) {
-            if (!m_ignoredPixelsList->stripOK(VxdID(iLayer, iLadder, iSensor, 1), (unsigned short) i1)) {
+            if (!m_ignoredStripsList->stripOK(VxdID(iLayer, iLadder, iSensor, 1), (unsigned short) i1)) {
               ExistMask = 1;
             }
           }
@@ -492,7 +502,7 @@ void MaskingModule::endRun()
         for (int i2 = 0; i2 < m_SVDMaskV[j * c_nSVDPlanes + i]->GetNbinsX(); ++i2) {
           int ExistMask = 0;
           if (m_AppendMaskFile) {
-            if (!m_ignoredPixelsList->stripOK(VxdID(iLayer, iLadder, iSensor, 0), (unsigned short) i2)) {
+            if (!m_ignoredStripsList->stripOK(VxdID(iLayer, iLadder, iSensor, 0), (unsigned short) i2)) {
               ExistMask = 1;
             }
           }
@@ -515,7 +525,6 @@ void MaskingModule::endRun()
         fprintf(MaskList, "        </ladder>\n");
         fprintf(MaskList, "    </layer>\n");
         fprintf(MaskList, "</SVD>\n");
-        fclose(MaskList);
         B2INFO("SVD(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMaskedU << " U strips in: " <<
                m_ignoredPixelsListName.data());
         B2INFO("SVD(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMaskedV << " V strips in: " <<
@@ -525,20 +534,26 @@ void MaskingModule::endRun()
       }
     }
   }
+  fclose(MaskList);
 
+  FileName = str(format("%2%Tel_MaskFired_Run%1%.xml") % runNo % m_MaskDirectoryPath);
+  m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+  std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredTelPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
+        m_ignoredPixelsListName));
+  MaskList = fopen(FileName.data(), "w");
   for (int i = 0; i < c_nTelPlanes; i++) {
     if (m_nEventsPlane[i + 6]) {
       int nMasked = 0;
-      int iPlane = i + 1;
+      //int iPlane = i + 1;
       int iLayer = getInfoTel(i).getID().getLayerNumber();
       int iLadder = getInfoTel(i).getID().getLadderNumber();
       int iSensor = getInfoTel(i).getID().getSensorNumber();
-      string FileName = str(format("%3%Tel%1%_MaskListRun%2%.xml") % iPlane % runNo % m_MaskDirectoryPath);
-      std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
-//      std::string m_ignoredPixelsListName = str(format("%1%") % FileName);
-      std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
-          m_ignoredPixelsListName));
-      MaskList = fopen(FileName.data(), "w");
+//      string FileName = str(format("%3%Tel%1%_MaskListRun%2%.xml") % iPlane % runNo % m_MaskDirectoryPath);
+//      std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+////      std::string m_ignoredPixelsListName = str(format("%1%") % FileName);
+//      std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
+//          m_ignoredPixelsListName));
+//      MaskList = fopen(FileName.data(), "w");
       fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
       fprintf(MaskList, "<Meta>\n");
       fprintf(MaskList, "    <Date>20.04.2016</Date>\n");
@@ -572,7 +587,7 @@ void MaskingModule::endRun()
         for (int i2 = 0; i2 < m_TelMaskUV[i]->GetNbinsY(); ++i2) {
           int ExistMask = 0;
           if (m_AppendMaskFile) {
-            if (!m_ignoredPixelsList->pixelOK(VxdID(iLayer, iLadder, iSensor), PXDIgnoredPixelsMap::map_pixel(i1, i2))) {
+            if (!m_ignoredTelPixelsList->pixelOK(VxdID(iLayer, iLadder, iSensor), PXDIgnoredPixelsMap::map_pixel(i1, i2))) {
               ExistMask = 1;
             }
           }
@@ -587,12 +602,13 @@ void MaskingModule::endRun()
       fprintf(MaskList, "    </ladder>\n");
       fprintf(MaskList, "  </layer>\n");
       fprintf(MaskList, "</PXD>\n");
-      fclose(MaskList);
       B2INFO("Tel(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMasked << " pixels in: " <<
              m_ignoredPixelsListName.data());
       printf("Tel(%i,%i,%i) masked %i pixels in: %s\n", iLayer, iLadder, iSensor, nMasked, m_ignoredPixelsListName.data());
     }
   }
+  fclose(MaskList);
+
   printf("Statistics: all events: %i, use: %i (%4.2f)\n", m_StatAllEvents, m_StatSelEvents, (float)m_StatSelEvents / m_StatAllEvents);
   for (int i = 0; i < c_nTBPlanes; i++) {
     if (m_StatSelEvents) {

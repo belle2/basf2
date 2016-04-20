@@ -431,7 +431,6 @@ void VXDDQMOnLineModule::defineHisto()
         } else {
           DirVXDGlobCorrelsNeigh->cd();
         }
-        DirVXDGlobCorrelsNeigh->cd();
         string nameSP = str(format("h2GlobVXD_L%1%_L%2%_CorrelationmapSPV") % iPlane2 % iPlane1);
         string titleSP = str(format("TB2016 Glob Correlation map VXD space points in V, plane %1%, plane %2%") % iPlane2 % iPlane1);
         m_correlationsHitMapsSPGlob[c_nVXDPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsV2, -0.5 * vSize2,
@@ -770,7 +769,8 @@ void VXDDQMOnLineModule::event()
       }
       if ((iIsPXD1 == 0) && (iIsPXD2 == 0))
         if ((fabs(fTime1 - fTime2)) > CutDQMCorrelTime) continue;
-      if (abs(index1 - index2) > 1) continue;  // only neighboars
+      if (!m_SaveOtherHistos)
+        if (abs(index1 - index2) > 1) continue;  // only neighboars
       // ready to fill correlation histograms and hit maps:
       if ((index1 == index2) && (iIsU1 == 1) && (iIsV2 == 1) && (iIsPXD1 == 0) && (iIsPXD2 == 0)) {
         // hit maps for SVD:

@@ -43,7 +43,7 @@ ROIGeneratorModule::ROIGeneratorModule() : Module()
   addParam("Sensor"     , m_sensor , " sensor " , 1);
 
   addParam("MinU"       , m_minU   , " min U (pixel column hopefully) ", 0);
-  addParam("MaxU"       , m_maxU   , " max U (pixel column hopefully) ", 786 - 1);
+  addParam("MaxU"       , m_maxU   , " max U (pixel column hopefully) ", 768 - 1);
 
 
   addParam("MinV"       , m_minV   , " min V (pixel column hopefully) ", 0);
@@ -79,7 +79,7 @@ void ROIGeneratorModule::event()
   int tNr = eventMetaDataPtr->getEvent(); // trigger number
 
   // Only if divider tells us to...
-  if (tNr % m_divider != 0)
+  if (m_divider != 0 && (tNr % m_divider) != 0)
     return ;
 
   //  ROIList.create(true);

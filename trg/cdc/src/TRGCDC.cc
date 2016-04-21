@@ -429,8 +429,6 @@ namespace Belle2 {
     _eventTime.push_back(new TCEventTime(*this));
     _eventTime.back()->initialize();
 
-    TRGCDCSegment* tstmp = 0;
-
     //...Make TSF's...
     const unsigned nWiresInTS[2] = {15, 11};
     const int shape[2][30] = {
@@ -547,7 +545,6 @@ namespace Belle2 {
                                  cells);
         }
         ts->initialize();
-        tstmp = ts;
 
         //...Store it...
         _tss.push_back(ts);
@@ -555,8 +552,6 @@ namespace Belle2 {
         layer->push_back(ts);
       }
     }
-
-    tstmp->initialize(_fevtTime);
 
     //...Fill caches...
     if (_width) delete [] _width;

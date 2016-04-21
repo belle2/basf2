@@ -108,9 +108,6 @@ namespace Belle2 {
     void initialize(void);
     void initialize(bool fevtTime);
 
-    /// returns phi position.
-    double phiPosition(void) const;
-
     /// returns event time.
     const TRGCDCEventTime* EvtTime(void) const;
 

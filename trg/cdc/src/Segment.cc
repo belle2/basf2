@@ -30,11 +30,6 @@
 #include "trg/cdc/EventTime.h"
 #include <bitset>
 
-//... Global varibles...
-double wireR[9];
-int nWires[9];
-bool flagevtTime;
-
 using namespace std;
 
 #define P3D HepGeom::Point3D<double>
@@ -66,22 +61,6 @@ namespace Belle2 {
   TRGCDCSegment::~TRGCDCSegment()
   {
   }
-
-  void
-  TRGCDCSegment::initialize(bool fevtTime)
-  {
-    flagevtTime = fevtTime;
-    CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
-    wireR[0] = cdcp.senseWireR(2) * 0.01;
-    nWires[0] = cdcp.nWiresInLayer(2) * 2;
-    for (int i = 0; i < 4; i++) {
-      wireR[2 * i + 1] = cdcp.senseWireR(12 * i + 10) * 0.01;
-      wireR[2 * (i + 1)] = cdcp.senseWireR(12 * (i + 1) + 4) * 0.01;
-      nWires[2 * i + 1] = cdcp.nWiresInLayer(12 * i + 10) * 2;
-      nWires[2 * (i + 1)] = cdcp.nWiresInLayer(12 * (i + 1) + 4) * 2;
-    }
-  }
-
 
   void
   TRGCDCSegment::initialize()
@@ -651,24 +630,6 @@ namespace Belle2 {
     return outValue;
   }
 
-  double
-  TRGCDCSegment::phiPosition(void) const
-  {
-//  cout << "this function(phiPosition in Segment class) will be removed. for 2D & 3D fitting, calculate this information by your own class" <<endl;
-    float evtTime = EvtTime()->getT0();
-    evtTime = evtTime * 40 / 1000;
-    double phi = (double)localId() / nWires[superLayerId()] * 4 * M_PI;
-    int lutcomp = LUT()->getValue(lutPattern());
-    float dphi = hit()->drift() * 10;
-    if (flagevtTime) {
-      dphi -= evtTime;
-    }
-    dphi = atan(dphi / wireR[superLayerId()] / 1000);
-    if (lutcomp == 2) {phi -= dphi;}
-    else if (lutcomp == 1) {phi += dphi;}
-
-    return phi;
-  }
 
   bool
   TRGCDCSegment::hasMember(const std::string& a) const

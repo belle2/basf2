@@ -25,19 +25,22 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHSensorModuleInfo(): m_id(0), m_FEB(ARICHFEBoardInfo()), m_HAPD(ARICHHapdInfo()), m_timeStamp(), m_comment("") {};
+    ARICHSensorModuleInfo(): m_id(0), m_FEBserial(0), m_FEB(ARICHFEBoardInfo()), m_HAPDserial(""), m_HAPD(ARICHHapdInfo()),
+      m_timeStamp(), m_comment("") {};
 
     /**
      * Constructor
      */
-    ARICHSensorModuleInfo(int id, ARICHFEBoardInfo FEB, ARICHHapdInfo HAPD, TTimeStamp timeStamp): m_id(id), m_FEB(FEB), m_HAPD(HAPD),
+    ARICHSensorModuleInfo(int id, ARICHFEBoardInfo FEB, ARICHHapdInfo HAPD, TTimeStamp timeStamp): m_id(id),  m_FEBserial(0),
+      m_FEB(FEB),  m_HAPDserial(""), m_HAPD(HAPD),
       m_timeStamp(timeStamp), m_comment("") {};
 
     /**
      * Constructor
      */
     ARICHSensorModuleInfo(int id, ARICHFEBoardInfo FEB, ARICHHapdInfo HAPD, TTimeStamp timeStamp, std::string comment): m_id(id),
-      m_FEB(FEB), m_HAPD(HAPD), m_timeStamp(timeStamp), m_comment(comment) {};
+      m_FEBserial(0),
+      m_FEB(FEB),  m_HAPDserial(""), m_HAPD(HAPD), m_timeStamp(timeStamp), m_comment(comment) {};
 
     /**
      * Destructor
@@ -54,6 +57,16 @@ namespace Belle2 {
      */
     void setSensorModuleID(int id) {m_id = id; }
 
+    /** Get FEB serial number
+     * @return FEB serial number
+     */
+    int getFEBserial() const {return m_FEBserial; }
+
+    /** Set FEB serial number
+     * @param FEB serial number
+     */
+    void setFEBserial(int FEBserial) {m_FEBserial = FEBserial; }
+
     /** Get FEBoard Identifier
      * @return FEBoard Identifier
      */
@@ -63,6 +76,16 @@ namespace Belle2 {
      * @param FEBoard Identifier
      */
     void setFEBoardID(ARICHFEBoardInfo FEB) {m_FEB = FEB; }
+
+    /** Get HAPD serial number
+     * @return HAPD serial number
+     */
+    std::string getHAPDserial() const {return m_HAPDserial; }
+
+    /** Set HAPD serial number
+     * @param HAPD serial number
+     */
+    void setHAPDserial(std::string HAPDserial) {m_HAPDserial = HAPDserial; }
 
     /** Get HAPD Identifier
      * @return HAPD Identifier
@@ -96,8 +119,10 @@ namespace Belle2 {
 
   private:
     int m_id;                    /**< Sensor Module identifier: m_id = n_ring * nModulesInRing + n_column */
-    ARICHFEBoardInfo m_FEB;      /**< HapdInfo Sensor identifier */
-    ARICHHapdInfo m_HAPD;        /**< FEBoardInfo Front End Board identifier */
+    int m_FEBserial;             /**< FEB serial number */
+    ARICHFEBoardInfo m_FEB;      /**< FEBoardInfo Front End Board identifier */
+    std::string m_HAPDserial;    /**< HAPD serial number */
+    ARICHHapdInfo m_HAPD;        /**< HapdInfo Sensor identifier */
     TTimeStamp m_timeStamp;      /**< Production Date */
     std::string m_comment;       /**< optional comment */
 

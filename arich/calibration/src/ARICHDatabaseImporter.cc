@@ -17,6 +17,8 @@
 #include <arich/dbobjects/ARICHHapdInfo.h>
 #include <arich/dbobjects/ARICHHapdQE.h>
 #include <arich/dbobjects/ARICHBadChannels.h>
+#include <arich/dbobjects/ARICHSensorModuleInfo.h>
+#include <arich/dbobjects/ARICHSensorModuleMap.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -1451,4 +1453,82 @@ std::map<std::string, float> ARICHDatabaseImporter::getAerogelParams(std::string
 }
 
 
+
+void ARICHDatabaseImporter::importSensorModule()
+{
+  GearDir content = GearDir("/ArichData/AllData/hapdfebmapping");
+
+  // define data array
+//  TClonesArray moduleInfoConstants("Belle2::ARICHSensorModuleInfo");
+  TClonesArray moduleMapConstants("Belle2::ARICHSensorModuleMap");
+
+  int module = 0;
+
+  // loop over xml files and extract the data
+  for (const auto& sensor : content.getNodes("hapdfeb")) {
+    int febSerial = sensor.getInt("febserial");
+    string hapdSerial = sensor.getString("hapdserial");
+    int sextant = sensor.getInt("sextant");
+    int ring = sensor.getInt("ring");
+    int column = sensor.getInt("column");
+    int id = sensor.getInt("moduleID");
+
+    // save data as an element of the array
+    new(moduleMapConstants[module]) ARICHSensorModuleMap();
+    auto* moduleMapConst = static_cast<ARICHSensorModuleMap*>(moduleMapConstants[module]);
+    moduleMapConst->setSensorModuleSextantID(sextant);
+    moduleMapConst->setSensorModuleRingID(ring);
+    moduleMapConst->setSensorModuleColumnID(column);
+
+    ARICHSensorModuleInfo* moduleInfoConstants = new ARICHSensorModuleInfo();
+    auto* moduleInfoConst = static_cast<ARICHSensorModuleInfo*>(moduleInfoConstants);
+    moduleInfoConst->setSensorModuleID(id);
+    moduleInfoConst->setFEBserial(febSerial);
+    moduleInfoConst->setHAPDserial(hapdSerial);
+
+    DBArray<ARICHHapdInfo> elementsHapd("ARICHHapdInfo");
+    elementsHapd.getEntries();
+    for (const auto& element : elementsHapd) {
+      if (element.getSerialNumber() == hapdSerial) {  moduleInfoConst->setHapdID(element); }
+    }
+
+    /*    DBArray<ARICHFEBoardInfo> elementsFeb("ARICHFEBoardInfo");
+        elementsFeb.getEntries();
+        for (const auto& element : elementsFeb) {
+          if (element.getFEBoardSerial() == febSerial) {  moduleInfoConst->setFEBoardID(element); }
+        }*/
+
+    moduleMapConst->setSensorModuleId(*moduleInfoConst);
+
+
+    module++;
+  }
+
+  // define interval of validity
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+
+  // store under default name:
+//  Database::Instance().storeData("ARICHSensorModuleInfo", &moduleInfoConstants, iov);
+  Database::Instance().storeData("ARICHSensorModuleMap", &moduleMapConstants, iov);
+}
+
+
+
+void ARICHDatabaseImporter::exportSensorModule()
+{
+  DBArray<ARICHSensorModuleMap> elements("ARICHSensorModuleMap");
+  elements.getEntries();
+
+  for (const auto& element : elements) {
+    B2INFO("Sextant = " << element.getSensorModuleSextantID() << ", ring = " << element.getSensorModuleRingID() << ", column = " <<
+           element.getSensorModuleColumnID());
+    ARICHSensorModuleInfo newelement = element.getSensorModuleId();
+    B2INFO("module ID = " << newelement.getSensorModuleID() << ", feb = " << newelement.getFEBserial() << ", hapd = " <<
+           newelement.getHAPDserial());
+    ARICHHapdInfo newerelement = newelement.getHapdID();
+    B2INFO("Hapd Serial = " << newerelement.getSerialNumber() << "; HV = " << newerelement.getHighVoltage() << "; qe400 = " <<
+           newerelement.getQuantumEfficiency400());
+
+  }
+}
 

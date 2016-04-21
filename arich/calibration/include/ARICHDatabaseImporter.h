@@ -217,6 +217,16 @@ namespace Belle2 {
      */
     std::map<std::string, float> getAerogelParams(std::string aeroSerialNumber);
 
+    /**
+     * Import module sensor map and info classes
+     */
+    void importSensorModule();
+
+    /**
+     * Export module sensor map and info classes from database
+     */
+    void exportSensorModule();
+
   private:
 
     std::vector<std::string> m_inputFilesHapdQA;        /**< Input root files for HAPD QA */

@@ -70,7 +70,7 @@ namespace Belle2 {
      * Set SensorModule Sextant Identifier
      * @param Sextant Identifier
      */
-    void setSensorModuleSextantID(int sextant) {m_ring = sextant;}
+    void setSensorModuleSextantID(int sextant) {m_sextant = sextant;}
 
     /**
       * Return SensorModule Ring Identifier

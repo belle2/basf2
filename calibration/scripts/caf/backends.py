@@ -7,6 +7,11 @@ from itertools import repeat
 import glob
 from .utils import method_dispatch
 
+# For weird reasons, a multiprocessing pool doesn't work properly as a class attribute
+# So we make it a module variable. Should be fine as starting up multiple pools
+# is not recommended anyway.
+pool = None
+
 
 class Backend():
     """
@@ -31,22 +36,62 @@ class Local(Backend):
         It's the maximium simultaneous subjobs. Try not to specify a large number or a number
         larger than the number of cores (-1?). Won't crash the program but it will slow down
         and negatively impact performance. Default = 1
+
+    Note that you should call the self.join() method to close the pool and wait for any
+    running processes to finish. Once you've called join you will have to set up a new
+    instance of this backend (or set max_processes again) to create a new pool.
+    If you don't call self.join() and don't create a join yourself somewhere then the main
+    python process might end before your pool is done.
     """
 
-    def __init__(self):
+    def __init__(self, max_processes=1):
         """
-        Init method for Local Backend.
+        Init method for Local Backend. Spawns a multiprocessing pool based on
+        max_processes argument (default=1)
         """
         #: The size of the multiprocessing process pool.
-        self.max_processes = 1
+        self.max_processes = max_processes
+
+    def join(self):
+        """
+        Closes and joins the Pool, letting you wait for all results currently
+        still processing.
+        """
+        print('Joining Process Pool, waiting for results to finish')
+        global pool
+        pool.close()
+        pool.join()
+        print('Process Pool joined.')
+
+    @property
+    def max_processes(self):
+        """
+        Getter for max_processes
+        """
+        return self._max_processes
+
+    @max_processes.setter
+    def max_processes(self, value):
+        """
+        Setter for max_processes, we also check for a previous Pool(), wait for it to join
+        and then create a new one with the new value of max_processes
+        """
+        #: Internal attribute of max_processes
+        self._max_processes = value
+        global pool
+        if pool:
+            self.join()
+        print('Starting up new Pool with {0} processes'.format(self.max_processes))
+        pool = mp.Pool(self.max_processes)
 
     @method_dispatch
     def submit(self, job):
         """
-        Submit method of Local() backend. Submits collection jobs in subprocesses using the
-        pickled basf2 paths. Captures the stdout and stderr of the jobs and places output
-        files in the right calibration directories.
+        Submit method of Local() backend. Mostly setup here creating the right directories.
         """
+        global pool
+        # Submit the jobs to owned Pool
+        print('Job Submitting:', job.name)
         # Make sure the output directory of the job is created
         if not os.path.exists(job.output_dir):
             os.mkdir(job.output_dir)
@@ -61,7 +106,9 @@ class Local(Backend):
             for file in input_files:
                 shutil.copy(file, job.working_dir)
 
-        self.run_job(job)
+        result = pool.apply_async(Local.run_job, (self, job))
+        print('Job {0} submitted'.format(job.name))
+        return result
 
     @submit.register(list)
     def _(self, jobs):
@@ -69,10 +116,12 @@ class Local(Backend):
         Submit method of Local() that takes a list of jobs instead of just one and creates a process pool
         to run them.
         """
-        # Create a Process Pool and submit the jobs to it
-        with mp.Pool(self.max_processes) as pool:
-            print('Starting up Pool with {0} processes'.format(self.max_processes))
-            pool.map(self.submit, jobs)
+        results = []
+        # Submit the jobs to owned Pool
+        for job in jobs:
+            results.append(self.submit(job))
+        print('Jobs submitted')
+        return results
 
     def run_job(self, job):
         """
@@ -85,8 +134,10 @@ class Local(Backend):
         with open(stdout_file_path, 'w') as f_out, open(stderr_file_path, 'w') as f_err:
             print('Starting Sub Process: {0}'.format(job.name))
             subprocess.run(job.cmd, shell=False, stdout=f_out, stderr=f_err, cwd=job.working_dir)
+            print('Sub Process {0} Finished.'.format(job.name))
 
         # Once the subprocess is done, move the requested output to the output directory
+        print('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
         for pattern in job.output_files:
             output_files = glob.glob(os.path.join(job.working_dir, pattern))
             for file in output_files:

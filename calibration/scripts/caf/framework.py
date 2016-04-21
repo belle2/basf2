@@ -13,13 +13,18 @@ and will be extended soon.
 from basf2 import *
 import os
 import shutil
+from pprint import PrettyPrinter
 from datetime import datetime
-import collections
+from collections import OrderedDict
+from collections import deque
 import pickle
+from time import sleep
 
 from .utils import topological_sort
-from .utils import CalibrationAlgorithmRunner
+from .utils import all_dependencies
 from .utils import decode_json_string
+from .utils import method_dispatch
+from .utils import find_sources
 import caf.backends
 
 import ROOT
@@ -27,6 +32,8 @@ from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
 
 collector_steering_file_path = os.environ.get('BELLE2_LOCAL_DIR')
 collector_steering_file_path = os.path.join(collector_steering_file_path, 'calibration/scripts/caf/run_collector_path.py')
+
+pp = PrettyPrinter()
 
 
 class Calibration():
@@ -76,14 +83,17 @@ class Calibration():
 
         #: Name of calibration object
         self.name = name
-        #: Internal calibration collector/algorithms stored for this calibration
-        self._collector, self._algorithms = None, None
-        #: Publicly accessible collector
-        self.collector = collector
-        #: Publicly accessible algorithms
-        self.algorithms = algorithms
-        #: Files used for collection procedure
-        self.input_files = input_files
+        #: Internal calibration collector/algorithms/input_files stored for this calibration
+        self._collector, self._algorithms, self._input_files = None, [], []
+        if collector:
+            #: Publicly accessible collector
+            self.collector = collector
+        if algorithms:
+            #: Publicly accessible algorithms
+            self.algorithms = algorithms
+        if input_files:
+            #: Files used for collection procedure
+            self.input_files = input_files
 
     def is_valid(self):
         """A full calibration consists of a collector AND an associated algorithm AND input_files.
@@ -136,7 +146,6 @@ class Calibration():
             if isinstance(collector, str):
                 collector = register_module(collector)
             if not isinstance(collector, Module):
-                print(collector)
                 B2FATAL("Collector needs to be either a Module or the name of such a module")
         #: Internal storage of collector attribute
         self._collector = collector
@@ -149,30 +158,31 @@ class Calibration():
         return self._algorithms
 
     @algorithms.setter
-    def algorithms(self, algorithms):
+    @method_dispatch
+    def algorithms(self, value):
         """
         Setter for the algorithms property, checks if single or list of algorithms passed in.
         """
-        if algorithms:
-            # Need to check if an algorithm or a list of them was passed in.
-            if isinstance(algorithms, collections.Iterable):
-                self._algorithms = []
-                for alg in algorithms:
-                    if isinstance(alg, CalibrationAlgorithm):
-                        self._algorithms.append(alg)
-                    else:
-                        # print(alg)
-                        B2FATAL(("Something other than CalibrationAlgorithm instance passed in."
-                                 "Algorithm needs to inherit from Belle2::CalibrationAlgorithm"))
-            else:
-                if isinstance(algorithms, CalibrationAlgorithm):
-                    self._algorithms = [algorithms]
-                else:
-                    # print(algorithms)
-                    B2FATAL(("Something other than CalibrationAlgorithm instance passed in."
-                             "Algorithm needs to inherit from Belle2::CalibrationAlgorithm"))
+        if isinstance(value, CalibrationAlgorithm):
+            self._algorithms = [value]
         else:
+            B2FATAL(("Something other than CalibrationAlgorithm instance passed in ({0})."
+                     "Algorithm needs to inherit from Belle2::CalibrationAlgorithm".format(type(value))))
+
+    @algorithms.fset.register(tuple)
+    @algorithms.fset.register(list)
+    def _(self, value):
+        """
+        Alternate algorithms setter for lists and tuples of CalibrationAlgorithms
+        """
+        if value:
             self._algorithms = []
+            for alg in value:
+                if isinstance(alg, CalibrationAlgorithm):
+                    self._algorithms.append(alg)
+                else:
+                    B2FATAL(("Something other than CalibrationAlgorithm instance passed in {0}."
+                             "Algorithm needs to inherit from Belle2::CalibrationAlgorithm".format(type(value))))
 
     @property
     def input_files(self):
@@ -182,28 +192,30 @@ class Calibration():
         return self._input_files
 
     @input_files.setter
-    def input_files(self, input_files):
+    @method_dispatch
+    def input_files(self, file):
         """
         Setter for the input_files attribute. Checks that a string/list of strings was passed in.
         And then builds a list from that.
         """
-        if input_files:
-            # Need to check if a string or a list of them was passed in.
-            if isinstance(input_files, collections.Iterable):
-                #: Internal storage of input_files attribute
-                self._input_files = []
-                for file_path in input_files:
-                    if isinstance(file_path, str):
-                        self._input_files.append(file_path)
-                    else:
-                        B2FATAL("Something other than string passed in as an input file.")
-            else:
-                if isinstance(input_files, str):
-                    self._input_files = [input_files]
-                else:
-                    B2FATAL(("Something other than string passed in as an input file"))
+        if isinstance(file, str):
+            self._input_files = [file]
         else:
+            B2FATAL("Something other than string passed in as an input file.")
+
+    @input_files.fset.register(tuple)
+    @input_files.fset.register(list)
+    def _(self, value):
+        """
+        Alternate input_files setter for lists and tuples of strings
+        """
+        if value:
             self._input_files = []
+            for file in value:
+                if isinstance(file, str):
+                    self._input_files.append(file)
+                else:
+                    B2FATAL("Something other than string passed in as an input file.")
 
     def __repr__(self):
         """
@@ -232,8 +244,9 @@ class CAF():
     def __init__(self):
         """
         Initialise CAF instance. Sets up some empty containers for attributes.
-        Sets the default backend to Local, and some other defaults to  what is
-        in the config file.
+        No default backend is set! This is to prevent unnecessary process pools
+        being allocated. You should set it directly beofre calling caf.run()
+        e.g. caf.backend = Local()
 
         Note that the config file is in the calibration/data directory and we assume
         that $BELLE2_LOCAL_DIR is set and that it is the correct release directory to
@@ -251,12 +264,12 @@ class CAF():
 
         #: Dictionary of calibrations for this CAF instance
         self.calibrations = {}
-        #: Dictionary of dependenciesof calibration objects
-        self.dependencies = {}
-        #: The backend to use for this CAF run (Public)
-        self.backend = caf.backends.Local()
+        #: OrderedDictionary of dependenciesof calibration objects
+        self.dependencies = OrderedDict()
         #: Output path to store results of calibration and bookkeeping information
         self.output_dir = self.config['CAF_DEFAULTS']['ResultsDir']
+        #: Polling frequencywhile waiting for jobs to finish
+        self.heartbeat = decode_json_string(self.config['CAF_DEFAULTS']['HeartBeat'])
 
     def add_calibration(self, calibration):
         """
@@ -303,16 +316,24 @@ class CAF():
         algorithm.
         - Returns True if sort was succesful, False if it failed (most likely a cyclic dependency)
         """
-        #: List to store calibration order after sorting.
-        self.order = topological_sort(self.dependencies)
-        return bool(self.order)  # Returns False if sort had problems
+        # Gives us a list of A (not THE) valid ordering and checks for cyclic dependencies
+        order = topological_sort(self.dependencies)
+        if order:
+            # We want to put the most critical (most overall dependencies) near the start
+            # First get an ordered dictionary of the sort order but including the dependencies.
+            # This time the dependencies will be in the key=calibration, value=[all dependent calibrations]
+            # format.
+            ordered_full_dependencies = all_dependencies(self.dependencies, order)
+            # Need to implement an ordering algorithm here, based on number of future dependents?
+            order = ordered_full_dependencies
+
+        return ordered_full_dependencies
 
     def configure_jobs(self, calibrations):
         """
         Creates a Job object for each collector to pass to the Backend.
         """
-        #: Dictionary of named job objects to send to the backend
-        self.jobs = {}
+        jobs = {}
         for calibration_name in calibrations:
             job = Job(calibration_name)
             self._make_calibration_dir(calibration_name)
@@ -323,7 +344,9 @@ class CAF():
             job.input_sandbox_files.append(collector_steering_file_path)
             job.input_sandbox_files.append(collector_path_file)
             job.output_files = ['*.mille']
-            self.jobs[calibration_name] = job
+            jobs[calibration_name] = job
+
+        return jobs
 
     def run(self):
         """
@@ -332,17 +355,49 @@ class CAF():
         - Upload may be moved to another method or function entirely to give the option of
         monitoring output before committing to database.
         """
-        self.order_calibrations()
+        # Creates the ordering of calibrations, including any dependencies that we must wait for
+        # before continuing.
+        order = self.order_calibrations()
+        if not order:
+            B2FATAL("Couldn't order the calibraitons properly. Probably a cyclic dependency.")
+
+        # Creates deque of first set of calibrations to submit
+        to_submit = find_sources(order)
+        # remove the submitting calibraitons from the order
+        for calibration_name in to_submit:
+            order.pop(calibration_name)
+
         # Creates the overall output directory and reset the attribute to use an absolute path to it.
         self.output_dir = self._make_output_dir()
 
-        self.configure_jobs(self.order)
+        # Main running loop, continues until we're completely finished
+        while to_submit:
+            jobs = self.configure_jobs(to_submit)
+            # Submit collection jobs that have no dependencies
+            results = self.backend.submit(list(jobs.values()))
+            # Event loop waiting for results
+            while True:
+                # We sleep initially since we only just submitted the jobs
+                sleep(self.heartbeat)
+                # loop to check which results are finished and remove from to_submit
+                for calibration_name, result in zip(list(to_submit), results):
+                    ready = result.ready()
+                    B2DEBUG(100, '{0} is ready: {1}'.format(calibration_name, ready))
+                    if ready:
+                        to_submit.remove(calibration_name)
+                # Once everything is finished find any remaining collectors to submit
+                if not to_submit:
+                    # Find new sources if they exist
+                    to_submit = find_sources(order)
+                    # Remove new sources from order
+                    for calibration_name in to_submit:
+                        order.pop(calibration_name)
+                    # Go round and submit again
+                    break
 
-        # Run the collection stage
-        for calibration_name in self.order:
-            job = self.jobs[calibration_name]
-            print("Submitting {0} to Backend".format(calibration_name))
-            self.backend.submit(job)
+        # Close down our processing pool nicely
+        if isinstance(self.backend, caf.backends.Local):
+            self.backend.join()
 
     @property
     def backend(self):
@@ -435,3 +490,9 @@ class Job:
         self.output_files = []
         #: Command and arguments as a list that wil be run by the job on the backend
         self.cmd = []
+
+    def __repr__(self):
+        """
+        Representation of Job class (what happens when you print a Job() instance)
+        """
+        return self.name

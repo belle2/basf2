@@ -1,5 +1,6 @@
 from basf2 import *
 from collections import deque
+from collections import OrderedDict
 import json
 from functools import singledispatch, update_wrapper
 
@@ -14,6 +15,26 @@ algorithm_result_names = {
     CalibrationAlgorithm.c_Iterate: "Iterate",
     CalibrationAlgorithm.c_Failure: "Failure",
 }
+
+
+def find_sources(dependencies):
+    """
+    Returns a deque of node names that have no input dependencies
+    """
+    # Create an OrderedDict to make sure that our sources are
+    # in the same order that we started with
+    in_degrees = OrderedDict((k, 0) for k in dependencies)
+    for node, adjacency_list in dependencies.items():
+        for future_node in adjacency_list:
+            in_degrees[future_node] += 1
+
+    # We build a deque of nodes with no dependencies
+    sources = deque([])
+    for name, in_degree in in_degrees.items():
+        if in_degree == 0:
+            sources.appendleft(name)
+
+    return sources
 
 
 def topological_sort(dependencies):
@@ -59,6 +80,46 @@ def topological_sort(dependencies):
         return []
 
 
+def all_dependencies(dependencies, order=None):
+    """
+    Here we pass in a dictionary of the form that is used in topological sort
+    where the keys are nodes, and the values are a list of the nodes that depend
+    on it.
+
+    However, the value (list) does not necessarily contain all of the future nodes
+    that depend on each one, only those that are directly adjacent in the graph.
+    So there are implicit dependencies not shown in the list.
+
+    This function calculates the implicit future nodes and returns an OrderedDict
+    with a full list for each node. This may be expensive in memory for
+    complex graphs so be careful.
+
+    If you care about the ordering of the final OrderedDict you can pass in a list
+    of the nodes. The final OrderedDict then has the same order as the order parameter.
+    """
+    full_dependencies = OrderedDict()
+
+    def add_out_nodes(node, node_set):
+        """
+        This is a recursive function that follows the tree of adjacent future nodes
+        and adds all of them to a set (so that we have unique items)
+        """
+        for out_node in dependencies[node]:
+            node_set.add(out_node)
+            add_out_nodes(out_node, node_set)
+
+    if not order:
+        order = dependencies.keys()
+    # Loop over the nodes in the order and recursively head upwards through explicit
+    # adjacent nodes.
+    for node in order:
+        node_dependencies = set()
+        add_out_nodes(node, node_dependencies)
+        full_dependencies[node] = list(node_dependencies)
+
+    return full_dependencies
+
+
 def decode_json_string(object_string):
     """
     Simple function to call json.loads() on a string to return the
@@ -75,6 +136,33 @@ def method_dispatch(func):
 
     This is needed when trying to dispatch a method in a class, since the
     first argument of the method is always 'self'.
+    Just decorate around class methods and their alternate functions:
+
+    @method_dispatch             # Default method
+    def my_method(self, default_type, ...):
+        ...
+
+    @my_method.register(list)    # Registers list method for dispatch
+
+    def _(self, list_type, ...):
+        ...
+
+    Doesn't work the same for property decorated class methods, as these
+    return a property builtin not a function and change the method naming.
+    Do this type of decoration to get them to work:
+
+    @property
+    def my_property(self):
+        return self._my_property
+
+    @my_property.setter
+    @method_dispatch
+    def my_property(self, input_property):
+        ...
+
+    @my_property.fset.register(list)
+    def _(self, input_list_properties):
+        ...
     """
     dispatcher = singledispatch(func)
 

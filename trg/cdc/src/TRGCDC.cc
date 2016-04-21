@@ -122,6 +122,7 @@ namespace Belle2 {
                     bool fileHough3D,
                     int finder3DMode,
                     bool fileFitter3D,
+                    double TdcBinWidth,
                     int trgCDCDataInputMode)
   {
     if (_cdc) {
@@ -156,6 +157,7 @@ namespace Belle2 {
                         fileHough3D,
                         finder3DMode,
                         fileFitter3D,
+                        TdcBinWidth,
                         trgCDCDataInputMode);
     } else {
       cout << "TRGCDC::getTRGCDC ... good-bye" << endl;
@@ -218,6 +220,7 @@ namespace Belle2 {
                  bool fileHough3D,
                  int finder3DMode,
                  bool fileFitter3D,
+                 double TdcBinWidth,
                  int trgCDCDataInputMode):
     _debugLevel(0),
     _configFilename(configFile),
@@ -246,17 +249,14 @@ namespace Belle2 {
     _width(0),
     _r(0),
     _r2(0),
-    _clock("CDCTrigger system clock", Belle2_GDL::GDLSystemClock, 1),
-    _clockFE("CDCFE TDC clock", Belle2_GDL::GDLSystemClock, 8),
-    _clockD("CDCTrigger data clock", Belle2_GDL::GDLSystemClock, 1, 4),
+    _clock("CDCTrigger system clock", 0, 125. / TdcBinWidth),
+    _clockFE("CDCFE TDC clock", _clock, 8),
+    _clockTDC("CDCTrigger TDC clock (after mergers)", _clock, 4),
+    _clockD("CDCTrigger data clock", _clock, 1, 4),
     _clockUser3125("CDCTrigger Aurora user clock (3.125Gbps)",
-                   Belle2_GDL::GDLSystemClock,
-                   25,
-                   20),
+                   _clock, 25, 20),
     _clockUser6250("CDCTrigger Aurora user clock (6.250Gbps)",
-                   Belle2_GDL::GDLSystemClock,
-                   50,
-                   20),
+                   _clock, 50, 20),
     _offset(5.3),
     _pFinder(0),
     _hFinder(0),
@@ -418,6 +418,8 @@ namespace Belle2 {
                            m_cdcp->wireBackwardPosition(i, j).y(),
                            m_cdcp->wireBackwardPosition(i, j).z());
         TCWire* tw = new TCWire(nWires++, j, *layer, fp, bp, _clockFE);
+        if (_simulationMode & 1)
+          tw->_signal.clock(_clockTDC);
         _wires.push_back(tw);
         layer->push_back(tw);
       }
@@ -1017,15 +1019,17 @@ namespace Belle2 {
         TCWire& w = *(TCWire*) wire(layerId, wireId);
 
         //...TDC count...
-        const int tdcCount = floor((m_cdcp->getT0(WireID(h.getID())) / m_cdcp->getTdcBinWidth()
-                                    + 0.5 - h.getTDCCount()) / 2);
+        const int tdcCount = floor(m_cdcp->getT0(WireID(h.getID())) / m_cdcp->getTdcBinWidth()
+                                   - h.getTDCCount() + 0.5);
 
         //...Drift length from TDC...
-        const float driftLength = tdcCount * 2 * m_cdcp->getTdcBinWidth() * m_cdcp->getNominalDriftV();
+        const float driftLength = tdcCount * m_cdcp->getTdcBinWidth() * m_cdcp->getNominalDriftV();
         const float driftLengthError = 0.013;
 
         //...Trigger timing...
         TRGTime rise = TRGTime(tdcCount, true, _clockFE, w.name());
+        if (_simulationMode & 1)
+          rise.clock(_clockTDC);
         TRGTime fall = rise;
         fall.shift(1).reverse();
         w._signal = TRGSignal(rise & fall);

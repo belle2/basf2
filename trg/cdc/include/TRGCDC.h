@@ -93,6 +93,7 @@ namespace Belle2 {
                              bool fileHough3D = 0,
                              int finder3DMode = 0,
                              bool fileFitter3D = 0,
+                             double TdcBinWidth = 1.,
                              int trgCDCDataInputMode = 0);
 
     /// returns TRGCDC object. TRGCDC should be created with specific
@@ -128,6 +129,7 @@ namespace Belle2 {
            bool fileHough3D,
            int finder3DMode,
            bool fileFitter3D,
+           double TdcBinWidth,
            int trgCDCDataInputMode);
 
     /// Destructor
@@ -392,6 +394,10 @@ namespace Belle2 {
     /// returns the system clock of the front-end
     const TRGClock& systemClockFE(void) const;
 
+    /// returns the system clock of the trigger TDC after mergers
+    /// (2 * front-end binwidth)
+    const TRGClock& TDCClock(void) const;
+
     /// returns the data clock.
     const TRGClock& dataClock(void) const;
 
@@ -583,8 +589,12 @@ namespace Belle2 {
     /// CDC trigger system clock.
     const TRGClock _clock;
 
-    /// CDC FE trigger system clock.
+    /// CDC front end clock. Resolution is CDC TdcBinWidth.
     const TRGClock _clockFE;
+
+    /// CDC trigger TDC clock. After mergers 1 bit of TDC count is dropped,
+    /// so binwidth is 2 * CDC TdcBinWidth.
+    const TRGClock _clockTDC;
 
     /// CDC trigger data clock.
     const TRGClock _clockD;
@@ -869,6 +879,13 @@ namespace Belle2 {
   TRGCDC::systemClockFE(void) const
   {
     return _clockFE;
+  }
+
+  inline
+  const TRGClock&
+  TRGCDC::TDCClock(void) const
+  {
+    return _clockTDC;
   }
 
   inline

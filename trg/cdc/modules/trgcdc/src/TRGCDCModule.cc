@@ -26,6 +26,8 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 
+#include <cdc/geometry/CDCGeometryPar.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -272,7 +274,8 @@ namespace Belle2 {
     static string cfn = _configFilename;
 
     //...CDC trigger...
-    if ((cfn != _configFilename) || (_cdc == 0))
+    if ((cfn != _configFilename) || (_cdc == 0)) {
+      Belle2::CDC::CDCGeometryPar& cdc = Belle2::CDC::CDCGeometryPar::Instance();
       _cdc = TRGCDC::getTRGCDC(_configFilename,
                                _simulationMode,
                                _fastSimulationMode,
@@ -299,7 +302,9 @@ namespace Belle2 {
                                _fileHough3D,
                                _finder3DMode,
                                _fileFitter3D,
+                               cdc.getTdcBinWidth(),
                                _trgCDCDataInputMode);
+    }
 
     if (TRGDebug::level())
       cout << "TRGCDCModule ... beginRun called " << endl;

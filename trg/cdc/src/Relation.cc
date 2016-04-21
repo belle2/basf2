@@ -134,7 +134,7 @@ TRGCDCRelation::efficiency3D(unsigned trkID, std::map<unsigned, unsigned> & numT
   map<unsigned, unsigned>::iterator itTSF = numTSsParticle.find(trkID);
   if ( itTSF != numTSsParticle.end() ) nTrueTS = itTSF->second;
   else {
-    cout<<"[Error] TRGCDCRelation::efficiency3D. No mc stereo TSs for track."<<endl;
+    //cout<<"[Error] TRGCDCRelation::efficiency3D. No mc stereo TSs for track."<<endl;
     return -1;
   }
 

@@ -210,20 +210,25 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
       vector<const TCSHit *> hits = _cdc.stereoSegmentHits(iSL);
       // Initialize vectors.
       string slName = "st" + to_string(iSL);
-      m_mEventV[slName+"_hit"] = vector<double> (hits.size());
-      m_mEventV[slName+"_driftHit"] = vector<double> (hits.size());
-      stTSs[iSL] = vector<double> (hits.size());
-      p_stTSs[iSL] = vector<const TCSHit *> (hits.size());
+      m_mEventV[slName+"_hit"] = vector<double> ();
+      m_mEventV[slName+"_driftHit"] = vector<double> ();
+      stTSs[iSL] = vector<double> ();
+      p_stTSs[iSL] = vector<const TCSHit *> ();
       // Fill vectors
       for(unsigned iHit= 0; iHit < hits.size(); iHit++) {
         if(hits[iHit] == 0) continue;
-        m_mEventV[slName+"_hit"][iHit] = (double)hits[iHit]->cell().localId()/m_mConstV["nWires"][2*iSL+1]*4*m_mConstD["Trg_PI"];
-        m_mEventV[slName+"_driftHit"][iHit] = TRGCDCFitter3D::calPhi(hits[iHit],_cdc.getEventTime());
-        stTSs[iSL][iHit] = m_mEventV[slName+"_hit"][iHit];
-        p_stTSs[iSL][iHit] = hits[iHit];
+        // Select only TSs that contain 1st priority.
+        if(hits[iHit]->segment().priorityPosition() != 3) {
+          continue;
+        }
+        double t_wirePhi = ((double)hits[iHit]->cell().localId())/m_mConstV["nWires"][2*iSL+1]*4*m_mConstD["Trg_PI"];
+        m_mEventV[slName+"_hit"].push_back(t_wirePhi);
+        m_mEventV[slName+"_driftHit"].push_back(TRGCDCFitter3D::calPhi(hits[iHit],_cdc.getEventTime()));
+        stTSs[iSL].push_back(t_wirePhi);
+        p_stTSs[iSL].push_back(hits[iHit]);
       }
-    }
 
+    }
 
     // Get MC values related with finding
     // numberTSsForParticle[mcId] = # superlayer hits.

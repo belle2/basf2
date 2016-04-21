@@ -603,7 +603,6 @@ void Hough3DFinder::runFinderVersion2(vector<double> &trackVariables, vector<vec
       if(tsDiffSt > m_Trg_PI) tsDiffSt -= 2*m_Trg_PI;
       if(tsDiffSt < -m_Trg_PI) tsDiffSt += 2*m_Trg_PI;
       tsDiffSt = tsDiffSt/2/m_Trg_PI*m_nWires[iLayer]/2;
-      
       //cout<<"JB ["<<iLayer<<"]["<<iTS<<"] tsDiffSt: "<<tsDiffSt<<" stTSs:"<<stTSs[iLayer][iTS]<<"rho: "<<rho<<" phi0: "<<fitPhi0<<endl;
       // Save index if condition is in 10 wires
       if(iLayer%2==0){

@@ -283,58 +283,53 @@ namespace Belle2 {
         }
       }
 
-      //Reject low pt. (Should not happen because 2D is requiring all TS hits.)
-      //if(m_mDouble["rho"] > 67){
-
-        // Calculate zz
-        m_mVector["zz"] = vector<double> (4);
-        for (unsigned iSt = 0; iSt < 4; iSt++) {
-          if(useStSl[iSt] == 1) {
-            m_mVector["zz"][iSt] = Fitter3DUtility::calZ(m_mDouble["charge"], m_mConstV["angleSt"][iSt], m_mConstV["zToStraw"][iSt], m_mConstV["rr3D"][iSt], m_mVector["phi3D"][iSt], m_mDouble["rho"], m_mDouble["phi0"]);
-          } else {
-            m_mVector["zz"][iSt] = 0;
-          }
-        }
-        // Calculate arcS
-        m_mVector["arcS"] = vector<double> (4);
-        for (unsigned iSt = 0; iSt < 4; iSt++) {
-          if(useStSl[iSt] == 1) {
-            m_mVector["arcS"][iSt] = Fitter3DUtility::calS(m_mDouble["rho"], m_mConstV["rr3D"][iSt]);
-          } else {
-            m_mVector["arcS"][iSt] = 0; 
-          }
-        }
-        // Fit3D
-        m_mDouble["z0"] = 0;
-        m_mDouble["cot"] = 0;
-        m_mDouble["zChi2"] = 0;
-        Fitter3DUtility::rSFit(&m_mVector["iZError2"][0], &m_mVector["arcS"][0], &m_mVector["zz"][0], m_mDouble["z0"], m_mDouble["cot"], m_mDouble["zChi2"]);
-        // Change to deg
-        m_mDouble["theta"] = m_mConstD["Trg_PI"]/2 - atan(m_mDouble["cot"]);
-        m_mDouble["theta"] = 180 / m_mConstD["Trg_PI"];
-
-      //} //Reject low pt.
-
-        // Set track in trackList
-        // Set Helix parameters 
-        TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0)); 
-        CLHEP::HepVector a(5); 
-        a = aTrack.helix().a(); 
-        aTrack.setFitted(1); 
-        if(m_mDouble["charge"]<0){
-          a[1] = fmod(m_mDouble["phi0"] + m_mConstD["Trg_PI"],2*m_mConstD["Trg_PI"]);
+      // Calculate zz
+      m_mVector["zz"] = vector<double> (4);
+      for (unsigned iSt = 0; iSt < 4; iSt++) {
+        if(useStSl[iSt] == 1) {
+          m_mVector["zz"][iSt] = Fitter3DUtility::calZ(m_mDouble["charge"], m_mConstV["angleSt"][iSt], m_mConstV["zToStraw"][iSt], m_mConstV["rr3D"][iSt], m_mVector["phi3D"][iSt], m_mDouble["rho"], m_mDouble["phi0"]);
         } else {
-          a[1] = m_mDouble["phi0"];
+          m_mVector["zz"][iSt] = 0;
         }
-        a[2] = 1/m_mDouble["pt"]*m_mDouble["charge"];
-        a[3] = m_mDouble["z0"];  
-        a[4] = m_mDouble["cot"]; 
-        helix.a(a); 
-        aTrack.set2DFitChi2(m_mDouble["fit2DChi2"]);
-        aTrack.set3DFitChi2(m_mDouble["zChi2"]);
-        aTrack.setHelix(helix); 
+      }
+      // Calculate arcS
+      m_mVector["arcS"] = vector<double> (4);
+      for (unsigned iSt = 0; iSt < 4; iSt++) {
+        if(useStSl[iSt] == 1) {
+          m_mVector["arcS"][iSt] = Fitter3DUtility::calS(m_mDouble["rho"], m_mConstV["rr3D"][iSt]);
+        } else {
+          m_mVector["arcS"][iSt] = 0; 
+        }
+      }
+      // Fit3D
+      m_mDouble["z0"] = 0;
+      m_mDouble["cot"] = 0;
+      m_mDouble["zChi2"] = 0;
+      Fitter3DUtility::rSFit(&m_mVector["iZError2"][0], &m_mVector["arcS"][0], &m_mVector["zz"][0], m_mDouble["z0"], m_mDouble["cot"], m_mDouble["zChi2"]);
+      // Change to deg
+      m_mDouble["theta"] = m_mConstD["Trg_PI"]/2 - atan(m_mDouble["cot"]);
+      m_mDouble["theta"] = 180 / m_mConstD["Trg_PI"];
 
-        //cout<<"charge="<<m_mDouble["charge"]<<" pt="<<m_mDouble["pt"]<<" phi_c="<<m_mDouble["phi0"]<<" z0="<<m_mDouble["z0"]<<" cot="<<m_mDouble["cot"]<<endl;
+      // Set track in trackList
+      // Set Helix parameters 
+      TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0)); 
+      CLHEP::HepVector a(5); 
+      a = aTrack.helix().a(); 
+      aTrack.setFitted(1); 
+      if(m_mDouble["charge"]<0){
+        a[1] = fmod(m_mDouble["phi0"] + m_mConstD["Trg_PI"],2*m_mConstD["Trg_PI"]);
+      } else {
+        a[1] = m_mDouble["phi0"];
+      }
+      a[2] = 1/m_mDouble["pt"]*m_mDouble["charge"];
+      a[3] = m_mDouble["z0"];  
+      a[4] = m_mDouble["cot"]; 
+      helix.a(a); 
+      aTrack.set2DFitChi2(m_mDouble["fit2DChi2"]);
+      aTrack.set3DFitChi2(m_mDouble["zChi2"]);
+      aTrack.setHelix(helix); 
+
+      //cout<<"charge="<<m_mDouble["charge"]<<" pt="<<m_mDouble["pt"]<<" phi_c="<<m_mDouble["phi0"]<<" z0="<<m_mDouble["z0"]<<" cot="<<m_mDouble["cot"]<<endl;
 
       ///////////////
       // Save values

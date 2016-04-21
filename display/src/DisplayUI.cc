@@ -132,8 +132,16 @@ void DisplayUI::updateUI()
   if (!eventMetaData) {
     m_eventLabel->SetText("No EventMetaData object available.");
   } else {
-    m_eventLabel->SetText(TString::Format("Event: \t\t%u\nRun: \t\t%d\nExperiment: \t%d", eventMetaData->getEvent(),
-                                          eventMetaData->getRun(), eventMetaData->getExperiment()));
+    time_t secondsSinceEpoch = eventMetaData->getTime() / 1e9;
+    //double subSecondPart = double(eventMetaData->getTime()) / 1e9 - secondsSinceEpoch;
+    char date[30] = "<invalid time>";
+    auto gmt = gmtime(&secondsSinceEpoch);
+    if (gmt)
+      strftime(date, 30, "<%Y-%m-%d %H:%M:%S>", gmt);
+    m_eventLabel->SetText(TString::Format("Event: \t\t%u\nRun: \t\t%d\nExperiment: \t%d\n\n%s",
+                                          eventMetaData->getEvent(),
+                                          eventMetaData->getRun(), eventMetaData->getExperiment(),
+                                          date));
   }
   m_eventLabel->Resize();
 

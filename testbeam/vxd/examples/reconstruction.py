@@ -260,7 +260,7 @@ if args.dqm:
     if not args.gbl_collect:
         main.add_module('TrackfitDQM')
 
-# main.add_module('TrackBuilder')
+main.add_module('TrackBuilder')
 main.add_module('RootOutput')
 
 if args.display:

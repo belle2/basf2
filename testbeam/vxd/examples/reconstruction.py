@@ -63,16 +63,6 @@ def add_simulation(path, momentum=6., positrons=False):
     path.add_module('TelDigitizer')
 
 
-def add_unpackers(path, svd_only=False):
-    if not svd_only:
-        path.add_module('PXDUnpacker',
-                        RemapFlag=True,
-                        RemapLUT_IF_OB=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'),
-                        RemapLUT_IB_OF=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'))
-
-    path.add_module('SVDUnpacker', xmlMapFileName='testbeam/vxd/data/TB_svd_mapping.xml')
-
-
 def add_vxdtf(path, magnet=True, svd_only=False, momentum=6., filterOverlaps='hopfield'):
     if magnet:
         if not svd_only:
@@ -212,8 +202,8 @@ if args.raw_input:
 else:
     branches = ['EventMetaData', 'RawFTSWs', 'RawSVDs', 'RawPXDs']
     if not args.unpacking:
-        branches = branches + ['EventMetaData', 'PXDDigits', 'SVDDigits']
-    main.add_module('RootInput', branchNames=branches)
+        branches = branches + ['PXDDigits', 'SVDDigits']
+    main.add_module('RootInput')  # , branchNames=branches)
 
 
 if args.dqm:
@@ -224,7 +214,16 @@ main.add_module('Progress')
 add_geometry(main, not args.magnet_off)
 
 if args.unpacking:
-    add_unpackers(main, args.svd_only)
+    if not args.svd_only:
+        triggerfix = register_module(register_module('PXDTriggerFixer'))
+        triggerfix.if_false(create_path())
+        path.add_module(triggerfix)
+        path.add_module('PXDUnpacker',
+                        RemapFlag=True,
+                        RemapLUT_IF_OB=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'),
+                        RemapLUT_IB_OF=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'))
+
+    path.add_module('SVDUnpacker', xmlMapFileName='testbeam/vxd/data/TB_svd_mapping.xml')
 
 
 if not args.svd_only:
@@ -250,12 +249,13 @@ else:
     main.add_module('GenFitter', FilterId='Kalman')
 
 if args.dqm:
-    if args.unpacking:
-        main.add_module("PXDRawDQM")
-    main.add_module("PXDDQMCorr")
+    if not args.svd_only:
+        if args.unpacking:
+            main.add_module("PXDRawDQM")
+        main.add_module("PXDDQMCorr")
     # main.add_module('PXDDQM') does not work
     # main.add_module('SVDDQM3') will be removed, replaced by VXDDQMOnLine
-    main.add_module('VXDDQMOnLine', SaveOtherHistos=1)
+    main.add_module('VXDDQMOnLine', SaveOtherHistos=1, SwapPXD=0)
 
     if not args.gbl_collect:
         main.add_module('TrackfitDQM')

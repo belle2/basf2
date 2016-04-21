@@ -1156,7 +1156,7 @@ def appendROEMask(
        - appendROEMask('B+:sig', 'goodROEGamma', '', 'goodGamma == 1')
 
     o) append a ROE mask with track from IP, use equal a-priori probabilities
-       - appendROEMask('B+:sig', 'IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', [1,1,1,1,1,1])
+       - appendROEMask('B+:sig', 'IPAndGoodGamma', 'abs(d0) < 0.05 and abs(z0) < 0.1', 'goodGamma == 1', [1,1,1,1,1,1])
 
     @param list_name             name of the input ParticleList
     @param mask_name             name of the appended ROEMask
@@ -1185,7 +1185,7 @@ def appendROEMasks(list_name, mask_tuples, path=analysis_main):
 
     o) Example for two tuples, one with and one without fractions
        ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
-       goodROEGamma = ('goodROEGamma', '', 'goodGamma == 1', [1,1,1,1,1,1])
+       goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', 'goodGamma == 1', [1,1,1,1,1,1])
        appendROEMasks('B+:sig', [ipTracks, goodROEGamma])
 
     @param list_name             name of the input ParticleList
@@ -1311,10 +1311,22 @@ def keepInROEMasks(
     The input particle list should be a V0 particle list: K_S0 ('K_S0:someLabel', ''),
     Lambda ('Lambda:someLabel', '') or converted photons ('gamma:someLabel')
 
-    It is possible to update a-priori fractions by providing them (see appendROEMask). Empty array will result in no change.
+    It is possible to update a-priori fractions by providing them (see appendROEMask and appendROEFractions).
+    Empty array will result in no change.
 
     Updating a non-existing mask will create a new one. If a-priori fractions for ChargedStable particles are not provided,
     pion-mass hypothesis will be used as default.
+
+    o) keep only those tracks that were used in provided particle list
+       - keepInROEMasks('pi+:goodTracks', 'mask', '')
+
+    o) keep only those clusters that were used in provided particle list and pass a cut, apply to several masks
+       - keepInROEMasks('gamma:goodClusters', ['mask1', 'mask2'], 'E > 0.1')
+
+    o) create a ROE mask on-the-fly with some fractions and with tracks used in provided particle list
+       - keepInROEMasks('pi+:trueTracks', 'newMask', 'mcPrimary == 1', [1,1,1,1,1,1])
+       - or use [-1] fractions to use true MC mass hypothesis
+
 
     @param list_name    name of the input ParticleList
     @param mask_names   array of ROEMasks to be updated
@@ -1352,10 +1364,21 @@ def discardFromROEMasks(
     The input particle list should be a V0 particle list: K_S0 ('K_S0:someLabel', ''),
     Lambda ('Lambda:someLabel', '') or converted photons ('gamma:someLabel')
 
-    It is possible to update a-priori fractions by providing them (see appendROEMask). Empty array will result in no change.
+    It is possible to update a-priori fractions by providing them (see appendROEMask or appendROEFractions).
+    Empty array will result in no change.
 
     Updating a non-existing mask will create a new one. If a-priori fractions for ChargedStable particles are not provided,
     pion-mass hypothesis will be used as default.
+
+    o) discart tracks that were used in provided particle list
+       - discardFromROEMasks('pi+:badTracks', 'mask', '')
+
+    o) discart clusters that were used in provided particle list and pass a cut, apply to several masks
+       - discardFromROEMasks('gamma:badClusters', ['mask1', 'mask2'], 'E < 0.1')
+
+    o) create a ROE mask on-the-fly with some fractions and with tracks NOT used in provided particle list
+       - discardFromROEMasks('pi+:badTracks', 'newMask', 'mcPrimary != 1', [1,1,1,1,1,1])
+       - or use [-1] fractions to use true MC mass hypothesis
 
     @param list_name    name of the input ParticleList
     @param mask_names   array of ROEMasks to be updated

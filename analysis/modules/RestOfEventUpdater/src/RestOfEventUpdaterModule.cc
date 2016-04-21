@@ -53,13 +53,6 @@ namespace Belle2 {
     std::string emptyCutString;
     std::vector<double> defaultFractionsVector = {0, 0, 1, 0, 0, 0};
 
-    /* for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {
-       if (i == 2)
-         defaultFractionsVector.push_back(1);
-       else
-         defaultFractionsVector.push_back(0);
-     }*/
-
     addParam("particleList", m_inputListName, "Name of the ParticleList which contains information that will be used for updating");
     addParam("updateMasks", m_maskNamesForUpdating, "List of all mask names which will be updated", emptyMaskVector);
     addParam("cutString", m_selection, "Cut string which will be used for updating masks", emptyCutString);
@@ -263,16 +256,12 @@ namespace Belle2 {
             if (!track0MaskTrue or !track1MaskTrue)
               continue;
 
-            // Check if V0 daughter tracks already taken into account
+            // Check if V0 daughter tracks already taken into account, skip candidate if yes
             bool track0InList = std::find(tracksFromV0.begin(), tracksFromV0.end(), d0->getTrack()->getArrayIndex()) != tracksFromV0.end();
             bool track1InList = std::find(tracksFromV0.begin(), tracksFromV0.end(), d1->getTrack()->getArrayIndex()) != tracksFromV0.end();
 
-            if (track0InList and track1InList)
+            if (track0InList or track1InList)
               continue;
-
-            // Sanity check
-            if ((track0InList and !track1InList) or (!track0InList and track1InList))
-              B2ERROR("Something is very wrong! Only one V0 daughter taken into account!");
 
             v0ID.push_back(v0part->getArrayIndex());
             tracksFromV0.push_back(d0->getTrack()->getArrayIndex());

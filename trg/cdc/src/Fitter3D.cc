@@ -148,7 +148,22 @@ namespace Belle2 {
     m_mConstV["driftZError"][1] = 2.8765; 
     m_mConstV["driftZError"][2] = 2.90057;
     m_mConstV["driftZError"][3] = 3.96206;
-    
+
+    // Make driftLength table for each superlayer. Up to 500 clock ticks.
+    // driftLengthTableSLX[ tdcCount (~2ns unit) ] = drift length (cm)
+    for (unsigned iSl = 0; iSl < 9; iSl++) {
+      string tableName = "driftLengthTableSL" + to_string(iSl);
+      unsigned tableSize = 500;
+      m_mConstV[tableName] = vector<double> (tableSize);
+      unsigned t_layer = m_cdc.segment(iSl,0).center().layerId();
+      for (unsigned iTick = 0; iTick <= tableSize; iTick++) {
+        double t_driftTime = iTick * 2 * cdcp.getTdcBinWidth();
+        double driftLength_0 = cdcp.getDriftLength(t_driftTime, t_layer, 0);
+        double driftLength_1 = cdcp.getDriftLength(t_driftTime, t_layer, 1);
+        double avgDriftLength = (driftLength_0 + driftLength_1)/2;
+        m_mConstV[tableName][iTick] = avgDriftLength;
+      }
+    }
 
     if(m_mBool["fVerbose"]) {
       cout<<"fLRLUT:       "<<m_mBool["fLRLUT"]<<endl;
@@ -258,7 +273,14 @@ namespace Belle2 {
       m_mVector["phi3D"] = vector<double> (4);
       for (unsigned iSt = 0; iSt < 4; iSt++) {
         if(useStSl[iSt] == 1) {
-          m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], m_mVector["tdc"][iSt*2+1], m_mDouble["eventTime"], m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
+          // Get drift length from table.
+          string tableName = "driftLengthTableSL" + to_string(iSt*2+1);
+          double t_driftTime = m_mVector["tdc"][iSt*2+1] - m_mDouble["eventTime"];
+          if (t_driftTime < 0) t_driftTime = 0;
+          double t_driftLength = m_mConstV[tableName][(unsigned)t_driftTime];
+
+          m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], t_driftLength, m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
+          //m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], m_mVector["tdc"][iSt*2+1], m_mDouble["eventTime"], m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
         } else {
           m_mVector["phi3D"][iSt] = 9999;
         }

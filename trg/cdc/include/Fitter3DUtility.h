@@ -35,11 +35,14 @@ class Fitter3DUtility{
     /// A circle fitter
     static void rPhiFit2(double *rr, double *phi2, double *phierror, double &rho, double &myphi0, int nTS);
 
-    /// Pre 3D fitter functions
-    static double calPhi(double wirePhi, double driftLength, double eventTime, double rr, int lr);
+    /// Pre 3D fitter functions. rr is in cm scale. driftLength is in cm scale.
+    static double calPhi(double wirePhi, double driftLength, double rr, int lr);
+
+    /// Pre 3D fitter functions. 
+    static double calPhi(double wirePhi, double driftTime, double eventTime, double rr, int lr);
 
     /// Pre 3D fitter functions
-    static double calPhi(int localId, int nWires, double driftLength, double eventTime, double rr, int lr);
+    static double calPhi(int localId, int nWires, double driftTime, double eventTime, double rr, int lr);
 
     /// Rotates to range [-pi, pi]
     static double rotatePhi(double value, double refPhi);

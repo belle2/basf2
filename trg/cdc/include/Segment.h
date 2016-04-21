@@ -81,11 +81,17 @@ namespace Belle2 {
 
     /// returns hit pattern.
     unsigned hitPattern(void) const;
-
+    /// returns hit pattern for hits in given time window.
+    unsigned hitPattern(int clk0, int clk1) const;
+    /// hit pattern containing bit for priority position
     unsigned lutPattern(void) const;
+    /// hit pattern containing bit for priority position for hits in given time window.
+    unsigned lutPattern(int clk0, int clk1) const;
 
-/// return fastest time in TSHit.
+    /// return fastest time in TSHit.
     float fastestTime(void) const;
+    /// fastest time in TSHit that is larger of equal to clk0.
+    float fastestTime(int clk0) const;
 
 /// return found time in TSHit.
     float foundTime(void)const;
@@ -93,8 +99,10 @@ namespace Belle2 {
 /// return priority time in TSHit.
     float priorityTime(void) const;
 
-/// return priority cell position in TSHit. 0: no hit, 3: 1st priority, 1: 2nd right, 2: 2nd left
+    /// return priority cell position in TSHit. 0: no hit, 3: 1st priority, 1: 2nd right, 2: 2nd left
     int priorityPosition(void)const;
+    /// return priority cell position in TSHit for given time window.
+    int priorityPosition(int clk0, int clk1)const;
 
     /// returns LUT
     const TRGCDCLUT* LUT(void) const;
@@ -144,7 +152,7 @@ namespace Belle2 {
     void simulateWithoutClock(bool logicLUTFlag);
 
     /// simulates TF hit time-dependently
-    //  void simulateWithClock(bool logicLUTFlag);
+    void simulateWithClock();
 
   private:
 

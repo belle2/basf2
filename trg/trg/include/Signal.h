@@ -331,9 +331,7 @@ TRGSignal::active(int c0, int c1) const {
             const int t0 = _history[i - 1].time();
             const int t1 = _history[i].time();
 
-            if ((c0 > t0) && (c0 < t1))
-                return true;
-            if ((c1 > t0) && (c1 < t1))
+            if ((c1 > t0) && (c0 < t1))
                 return true;
             if ((c1 < t0) && (c1 < t1))
                 return false;

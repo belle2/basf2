@@ -2132,34 +2132,36 @@ namespace Belle2 {
     TRGDebug::enterStage("TRGCDC storeSimulationResults");
 
     // hits
-    StoreArray<CDCTriggerSegmentHit> storeSegmentHits;
-    StoreArray<CDCHit> cdcHits(_cdchitCollectionName);
-    for (unsigned its = 0; its < _segmentHits.size(); ++its) {
-      const TCSHit* segmentHit = _segmentHits[its];
-      const CDCHit* priorityHit = cdcHits[segmentHit->iCDCHit()];
-      const TCSegment* segment = static_cast<const TCSegment*>(&segmentHit->cell());
-      const CDCTriggerSegmentHit* storeHit =
-        storeSegmentHits.appendNew(*priorityHit,
-                                   segment->id(),
-                                   segment->priorityPosition(),
-                                   segment->LUT()->getValue(segment->lutPattern()),
-                                   segment->priorityTime(),
-                                   segment->fastestTime(),
-                                   segment->foundTime());
-      _tss[segment->id()]->storeHit(storeHit);
-      // relation to all CDCHits in segment
-      for (unsigned iw = 0; iw < segment->wires().size(); ++iw) {
-        const TRGCDCWire* wire = (TRGCDCWire*)(*segment)[iw];
-        if (wire->signal().active()) {
-          // priority wire has relation weight 2
-          double weight = (wire == &(segment->priority())) ? 2. : 1.;
-          storeHit->addRelationTo(cdcHits[wire->hit()->iCDCHit()], weight);
+    if (!(_fastSimulationMode & 2)) {
+      StoreArray<CDCTriggerSegmentHit> storeSegmentHits;
+      StoreArray<CDCHit> cdcHits(_cdchitCollectionName);
+      for (unsigned its = 0; its < _segmentHits.size(); ++its) {
+        const TCSHit* segmentHit = _segmentHits[its];
+        const CDCHit* priorityHit = cdcHits[segmentHit->iCDCHit()];
+        const TCSegment* segment = static_cast<const TCSegment*>(&segmentHit->cell());
+        const CDCTriggerSegmentHit* storeHit =
+          storeSegmentHits.appendNew(*priorityHit,
+                                     segment->id(),
+                                     segment->priorityPosition(),
+                                     segment->LUT()->getValue(segment->lutPattern()),
+                                     segment->priorityTime(),
+                                     segment->fastestTime(),
+                                     segment->foundTime());
+        _tss[segment->id()]->storeHit(storeHit);
+        // relation to all CDCHits in segment
+        for (unsigned iw = 0; iw < segment->wires().size(); ++iw) {
+          const TRGCDCWire* wire = (TRGCDCWire*)(*segment)[iw];
+          if (wire->signal().active()) {
+            // priority wire has relation weight 2
+            double weight = (wire == &(segment->priority())) ? 2. : 1.;
+            storeHit->addRelationTo(cdcHits[wire->hit()->iCDCHit()], weight);
+          }
         }
-      }
-      // relation to MCParticles (same as priority hit)
-      RelationVector<MCParticle> mcrel = priorityHit->getRelationsFrom<MCParticle>();
-      for (unsigned imc = 0; imc < mcrel.size(); ++imc) {
-        mcrel[imc]->addRelationTo(storeHit, mcrel.weight(imc));
+        // relation to MCParticles (same as priority hit)
+        RelationVector<MCParticle> mcrel = priorityHit->getRelationsFrom<MCParticle>();
+        for (unsigned imc = 0; imc < mcrel.size(); ++imc) {
+          mcrel[imc]->addRelationTo(storeHit, mcrel.weight(imc));
+        }
       }
     }
     // 2D finder tracks

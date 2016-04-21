@@ -27,6 +27,10 @@
 #include "trg/cdc/LUT.h"
 #include "cdc/geometry/CDCGeometryPar.h"
 
+#include <framework/datastore/StoreArray.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+
 #include "trg/cdc/EventTime.h"
 #include <bitset>
 
@@ -158,16 +162,10 @@ namespace Belle2 {
   void
   TCSegment::simulate(bool clockSimulation, bool logicLUTFlag)
   {
-
     //...Get wire informtion for speed-up...
-    const unsigned n = _wires.size();
     unsigned nHits = 0;
-    // vector<TRGSignal> signals;
-    for (unsigned i = 0; i < n; i++) {
-
-      //...Copy signal from a wire...
-      const TRGSignal& s = _wires[i]->signal();
-      if (s.active())
+    for (unsigned i = 0, n = _wires.size(); i < n; i++) {
+      if (_wires[i]->signal().active())
         ++nHits;
     }
 
@@ -175,17 +173,16 @@ namespace Belle2 {
     if (nHits == 0)
       return;
 
-    if (clockSimulation)
-      cout << "this part is replaced with simulateBoard TrackSegmentFinder class" << endl;
-//  simulateWithClock(logicLUTFlag);
-    else
+    if (clockSimulation) {
+      simulateWithClock();
+    } else {
       simulateWithoutClock(logicLUTFlag);
+    }
   }
 
   void
   TCSegment::simulateWithoutClock(bool logicLUTFlag)
   {
-
     TRGDebug::enterStage("TS sim");
 
     //...System clocks... Freq: 125 MHz
@@ -217,7 +214,6 @@ namespace Belle2 {
       if (s.active())
         ++nHits;
     }
-
 
     if (logicLUTFlag == 0) {
       ///// TS Logic Finder
@@ -295,41 +291,94 @@ namespace Belle2 {
         }
       }
 
-
-      //bitset<15> strHitPattern(this->hitPattern());
-      //cout<<"SuperLayerID: "<<this->superLayerId()<<" hitPattern: "<<this->hitPattern()<<" "<<strHitPattern<<endl;
-      //cout<<"LUT result: "<<this->LUT()->getHitLRLUT(this->hitPattern(),this->superLayerId())<<endl;
-      //cout<<"Is center hit fired? " << (this->center().hit() != 0)<<endl;
-//      int lutHit = atoi(&(this->LUT()->getHitLRLUT(this->hitPattern(),this->superLayerId()).at(4)));
-      //
-      // Only when center wire is hit
-//     if(lutHit == 1 && (this->center().hit() != 0) ) {
-
-//work here
-      //int lutValue = this->nLUT()->getValue(this->hitPattern());
       int lutValue = this->LUT()->getValue(this->lutPattern());
-//      if((lutValue != 0) && (this->center().hit() != 0) ) {
       if ((lutValue != 0) && (this->priority().hit() != 0)) {
-        //if((lutValue != 0) ){
         allSignals.name(name());
         _signal = allSignals;
       }
       ///// End of TS LUT finder
     }
 
-//     if (iwd) {
-//  l0.dump("", "     l0-> ");
-//  l1.dump("", "     l1-> ");
-//  l2.dump("", "     l2-> ");
-//  l3.dump("", "     l3-> ");
-//  l4.dump("", "     l4-> ");
-//  if (all.nEdges())
-//      cout << "===========" << endl;
-//  all.dump("", "    ----> ");
-//     }
-
     TRGDebug::leaveStage("TS sim");
+  }
 
+  void
+  TCSegment::simulateWithClock()
+  {
+    // check LUT pattern without clock -> if there is no hit, skip clock simulation
+    if (m_TSLUT->getValue(lutPattern()) == 0) return;
+
+    TRGDebug::enterStage("TS sim with clock");
+
+    StoreArray<CDCHit> cdcHits(TRGCDC::getTRGCDC()->getCDCHitCollectionName());
+    StoreArray<CDCTriggerSegmentHit> segmentHits;
+
+    // get data clock of first and last hit
+    const TRGClock& wireClock = _wires[0]->signal().clock();
+    int clkMin = 1000;
+    int clkMax = -1000;
+    for (unsigned i = 0, n = _wires.size(); i < n; ++i) {
+      const TRGSignal& s = _wires[i]->signal();
+      if (s.active()) {
+        int clk0 = s[0]->time();
+        int clk1 = s[s.nEdges() - 2]->time();
+        if (clk0 < clkMin) clkMin = clk0;
+        if (clk1 > clkMax) clkMax = clk1;
+      }
+    }
+    // loop over data clock cycles
+    const int step = wireClock.frequency() / TRGCDC::getTRGCDC()->dataClock().frequency();
+    const int width = 16 * step;
+    clkMin -= clkMin % step;
+    clkMax -= clkMax % step;
+    int lastLutValue = 0;
+    int lastPriority = 0;
+    int lastFastest = 0;
+    for (int iclk = clkMin; iclk <= clkMax; iclk += step) {
+      // check pattern in the last width clock cycles
+      unsigned pattern = lutPattern(iclk - width, iclk + step);
+      int lutValue = m_TSLUT->getValue(pattern);
+      if (lutValue) {
+        int priorityPos = priorityPosition(iclk - width, iclk + step);
+        int fastest = fastestTime(iclk - width);
+        // make a new hit if L/R changes to known, if priority changes to first
+        // or if the fastest hit changes
+        if ((lastLutValue == 3 && lutValue != 3) ||
+            (lastPriority != 3 && priorityPos == 3) ||
+            fastest != lastFastest) {
+          // add new edge to signal
+          TRGTime rise = TRGTime(wireClock.absoluteTime(iclk), true, _signal.clock());
+          TRGTime fall = rise;
+          fall.shift(1).reverse();
+          _signal |= TRGSignal(rise & fall);
+          // get priority wire from position flag
+          int ipr = (priorityPos == 3) ? 0 : priorityPos;
+          const TRGCDCWire* priorityWire = (_wires.size() == 15) ? _wires[ipr] : _wires[ipr + 5];
+          // get priority time (first hit on priority wire in time window)
+          int tdc = priorityWire->signal()[0]->time();
+          if (tdc < iclk - width) {
+            for (unsigned itdc = 2, edges = priorityWire->signal().nEdges(); itdc < edges; itdc += 2) {
+              tdc = priorityWire->signal()[itdc]->time();
+              if (tdc >= iclk - width) break;
+            }
+          }
+          // create hit
+          const CDCHit* priorityHit = cdcHits[priorityWire->hit()->iCDCHit()];
+          segmentHits.appendNew(*priorityHit,
+                                id(),
+                                priorityPos,
+                                lutValue,
+                                tdc,
+                                fastest,
+                                iclk + step);
+          lastLutValue = lutValue;
+          lastPriority = priorityPos;
+          lastFastest = fastest;
+        }
+      }
+    }
+
+    TRGDebug::leaveStage("TS sim with clock");
   }
 
   float
@@ -349,6 +398,24 @@ namespace Belle2 {
       return tmpFastTime;
     } else
       return -1;
+  }
+
+  float
+  TCSegment::fastestTime(int clk0) const
+  {
+    int fastest = 9999;
+    for (unsigned iw = 0; iw < _wires.size(); ++iw) {
+      if (_wires[iw]->hit()) {
+        for (unsigned itdc = 0, edges = _wires[iw]->signal().nEdges(); itdc < edges; itdc += 2) {
+          float dt = _wires[iw]->signal()[itdc]->time();
+          if (dt >= clk0) {
+            if (dt < fastest) fastest = dt;
+            break;
+          }
+        }
+      }
+    }
+    return fastest;
   }
 
   float
@@ -436,6 +503,32 @@ namespace Belle2 {
     } else return 0;
   }
 
+  int
+  TCSegment::priorityPosition(int clk0, int clk1) const
+  {
+    if (center().signal().active(clk0, clk1)) {
+      return 3;
+    } else {
+      const TRGCDCWire* priorityL;
+      const TRGCDCWire* priorityR;
+      if (_wires.size() == 15) {
+        priorityL = _wires[2];
+        priorityR = _wires[1];
+      } else {
+        priorityL = _wires[7];
+        priorityR = _wires[6];
+      }
+      if (priorityL->signal().active(clk0, clk1)) {
+        if (priorityR->signal().active(clk0, clk1)) {
+          if ((priorityL->hit()->drift()) > (priorityR->hit()->drift())) return 1;
+          else return 2;
+        } else return 2;
+      } else if (priorityR->signal().active(clk0, clk1)) {
+        return 1;
+      } else return 0;
+    }
+  }
+
   const TRGCDCWire&
   TCSegment::priority(void) const
   {
@@ -465,148 +558,6 @@ namespace Belle2 {
     } else return *w2;
   }
 
-  /*void
-  TCSegment::simulateWithClock(bool logicLUTFlag) {
-
-      //cout<<"Start TSF with clock"<<endl;
-
-      const string stage = "TS sim w/clock" + name();
-      TRGDebug::enterStage(stage);
-
-      //...System clocks...
-      const TRGClock & dataClock = TRGCDC::getTRGCDC()->dataClock();
-
-      //...Get wire informtion...
-      const unsigned n = _wires.size();
-      unsigned nHits = 0;
-      TRGSignalVector signals(name(), dataClock);
-      for (unsigned i = 0; i < n; i++) {
-
-    //...Copy signal from a wire...
-    TRGSignal s = _wires[i]->signal();
-
-  //  if (TRGDebug::level() > 2) {
-  //      s.dump("detail", TRGDebug::tab() + "wire TDC ");
-  //  }
-
-    //...Change clock... (from FE clock to data clock)
-    s.clock(dataClock);
-
-    //...Widen it...
-    static const unsigned width = dataClock.unit(400);
-    s.widen(width);
-
-  //  if (TRGDebug::level() > 2) {
-  //      s.dump("detail", TRGDebug::tab() + "data CLK ");
-  //  }
-
-          signals += s;
-
-          if (s.active())
-              ++nHits;
-      }
-
-  //  signals.dump("detail", TRGDebug::tab() + "TS wire dump:");
-
-      //...Check state changes...
-      vector<int> clocks = signals.stateChanges();
-      const unsigned nStates = clocks.size();
-      int tsSize = signals.size();
-      // TS timing
-      int tsRise, tsFall = 0;
-      bool tsPrevious = 0;
-      TRGSignal tsSignal(dataClock);
-      for (unsigned i = 0; i < nStates; i++) {
-        const TRGState state = signals.state(clocks[i]);
-        //  state.dump("dump of state:", TRGDebug::tab());
-        //cout << TRGDebug::tab() << i << ":c=" << clocks[i] << ":" << state
-        //<< endl;
-
-        bool tsAll = 0;
-
-        if ( logicLUTFlag == 0 ) {
-          ////// TS logic Finder
-          bool tsL0,tsL1,tsL2,tsL3,tsL4=0;
-          if(tsSize == 11) {
-            //cout<<"Outer TS"<<endl;
-            //...Simple simulation assuming 3:2:1:2:3 shape...
-            tsL0 = state[0] | state[1] | state[2];
-            tsL1 = state[3] | state[4];
-            tsL2 = state[5];
-            tsL3 = state[6] | state[7];
-            tsL4 = state[8] | state[9] | state[10];
-          } else if (tsSize == 15) {
-            //cout<<"Inner TS"<<endl;
-            //...Simple simulation assuming 1:2:3:4:5 shape...
-            tsL0 = state[0];
-            tsL1 = state[1] | state[2];
-            tsL2 = state[3] | state[4] | state[5];
-            tsL3 = state[6] | state[7] | state[8] | state[9];
-            tsL4 = state[10] |state[11] | state[12] | state[13] |state[14];
-          }
-
-          tsAll = tsL0 & tsL1 & tsL2 & tsL3 & tsL4;
-          //cout<<"L0,L1,L2,L3,L4: "<<tsL0<<tsL1<<tsL2<<tsL3<<tsL4<<endl;
-          //cout<<"tsAll: "<<tsAll<<endl;
-          //// TS logic Finder
-        }
-
-        if (logicLUTFlag == 1) {
-          ////// TS LUT Finder
-          bool centerState;
-          if(tsSize==15) {
-            centerState = state[0];
-          } else if (tsSize==11) {
-            centerState = state[5];
-          }
-          //cout<<"State: "<<unsigned(state)<<endl;
-          //unsigned iHitPattern = unsigned(state);
-          //bitset<15> strHitPattern(iHitPattern);
-          //cout<<"SuperLayerID: "<<this->superLayerId()<<" hitPattern: "<<unsigned(state)<<" "<<strHitPattern<<endl;
-          //cout<<"LUT result: "<<this->LUT()->getHitLRLUT(unsigned(state),this->superLayerId())<<" TS logic result: "<<tsAll<<endl;
-          //cout<<"Is center hit fired? " <<centerState<<endl;
-          int lutHit = atoi(&(this->LUT()->getHitLRLUT(unsigned(state),this->superLayerId()).at(4)));
-          if(lutHit == 1 && (centerState != 0) ) {
-            tsAll = 1;
-          }
-          ////// TS LUT Finder
-        }
-
-        // Makes signal for TS
-        if(tsPrevious != tsAll) {
-          if(tsAll == 1) {
-            //cout<<"Start of new signal"<<endl;
-            tsRise = clocks[i];
-            tsPrevious = tsAll;
-          }
-          if(tsAll == 0) {
-            tsFall = clocks[i];
-            tsSignal |= TRGSignal(dataClock, tsRise, tsFall);
-            tsPrevious = tsAll;
-            //cout<<"End of new signal"<<endl;
-            //tsSignal.dump();
-          }
-        }
-
-      } // Loop over all state changes
-
-      //cout<<"End of all signals for TS"<<endl;
-      //tsSignal.dump();
-
-
-      if(tsSignal.nEdges()) {
-        tsSignal.name(name());
-        _signal = tsSignal;
-        //cout<<tsSignal.name()<<":#signals="<<tsSignal.nSignals()<<endl;
-        //tsSignal.dump();
-      }
-
-
-      //cout<<"End TSF with clock"<<endl;
-
-      TRGDebug::leaveStage(stage);
-  }*/
-
   unsigned
   TRGCDCSegment::hitPattern(void) const
   {
@@ -619,6 +570,17 @@ namespace Belle2 {
     return ptn;
   }
 
+  unsigned
+  TRGCDCSegment::hitPattern(int clk0, int clk1) const
+  {
+    unsigned ptn = 0;
+    for (unsigned i = 0; i < _wires.size(); i++) {
+      const TRGSignal& s = _wires[i]->signal();
+      if (s.active(clk0, clk1))
+        ptn |= (1 << i);
+    }
+    return ptn;
+  }
 
   unsigned
   TRGCDCSegment::lutPattern(void) const
@@ -630,6 +592,15 @@ namespace Belle2 {
     return outValue;
   }
 
+  unsigned
+  TRGCDCSegment::lutPattern(int clk0, int clk1) const
+  {
+    unsigned outValue = (this->hitPattern(clk0, clk1)) * 2;
+    if (priorityPosition(clk0, clk1) == 2) {
+      outValue += 1;
+    }
+    return outValue;
+  }
 
   bool
   TRGCDCSegment::hasMember(const std::string& a) const

@@ -217,13 +217,13 @@ if args.unpacking:
     if not args.svd_only:
         triggerfix = register_module(register_module('PXDTriggerFixer'))
         triggerfix.if_false(create_path())
-        path.add_module(triggerfix)
-        path.add_module('PXDUnpacker',
+        main.add_module(triggerfix)
+        main.add_module('PXDUnpacker',
                         RemapFlag=True,
                         RemapLUT_IF_OB=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'),
                         RemapLUT_IB_OF=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'))
 
-    path.add_module('SVDUnpacker', xmlMapFileName='testbeam/vxd/data/TB_svd_mapping.xml')
+    main.add_module('SVDUnpacker', xmlMapFileName='testbeam/vxd/data/TB_svd_mapping.xml')
 
 
 if not args.svd_only:

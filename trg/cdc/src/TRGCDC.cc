@@ -2147,7 +2147,7 @@ namespace Belle2 {
                                      segment->priorityTime(),
                                      segment->fastestTime(),
                                      segment->foundTime());
-        _tss[segment->id()]->storeHit(storeHit);
+        _tss[segment->id()]->addStoreHit(storeHit);
         // relation to all CDCHits in segment
         for (unsigned iw = 0; iw < segment->wires().size(); ++iw) {
           const TRGCDCWire* wire = (TRGCDCWire*)(*segment)[iw];
@@ -2176,7 +2176,10 @@ namespace Belle2 {
       vector<TRGCDCLink*> links = track2D->links();
       for (unsigned its = 0; its < links.size(); ++its) {
         TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
-        track->addRelationTo(segment->storeHit());
+        const vector<const CDCTriggerSegmentHit*> storeHits = segment->storeHits();
+        for (unsigned ihit = 0; ihit < storeHits.size(); ++ihit) {
+          track->addRelationTo(storeHits[ihit]);
+        }
       }
     }
     // 2D fitter tracks
@@ -2193,7 +2196,10 @@ namespace Belle2 {
       vector<TRGCDCLink*> links = track2D->links();
       for (unsigned its = 0; its < links.size(); ++its) {
         TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
-        track->addRelationTo(segment->storeHit());
+        const vector<const CDCTriggerSegmentHit*> storeHits = segment->storeHits();
+        for (unsigned ihit = 0; ihit < storeHits.size(); ++ihit) {
+          track->addRelationTo(storeHits[ihit]);
+        }
       }
       // relation to 2D finder, assuming same order in tracklist
       if (storeTracks2Dfinder.getEntries() > 0)
@@ -2216,7 +2222,10 @@ namespace Belle2 {
       vector<TRGCDCLink*> links = track3D->links();
       for (unsigned its = 0; its < links.size(); ++its) {
         TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
-        track->addRelationTo(segment->storeHit());
+        const vector<const CDCTriggerSegmentHit*> storeHits = segment->storeHits();
+        for (unsigned ihit = 0; ihit < storeHits.size(); ++ihit) {
+          track->addRelationTo(storeHits[ihit]);
+        }
       }
       // relation to 2D finder, assuming same order in tracklist
       if (storeTracks2Dfinder.getEntries() > 0)

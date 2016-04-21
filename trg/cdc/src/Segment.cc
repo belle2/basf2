@@ -30,6 +30,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include "trg/cdc/EventTime.h"
 #include <bitset>
@@ -54,7 +55,7 @@ namespace Belle2 {
              w.backwardPosition()),
       _wires(cells),
       _signal(std::string("TS_") + TRGUtil::itostring(id), clock),
-      _storeHit(0),
+      _storeHits{},
       _eventTime(eventTime),
       m_TSLUTFileName(TSLUTFile)
   {
@@ -143,7 +144,7 @@ namespace Belle2 {
     TCCell::clear();
     _signal.clear();
     _hits.clear();
-    _storeHit = 0;
+    _storeHits.clear();
   }
 
   string
@@ -364,13 +365,29 @@ namespace Belle2 {
           }
           // create hit
           const CDCHit* priorityHit = cdcHits[priorityWire->hit()->iCDCHit()];
-          segmentHits.appendNew(*priorityHit,
-                                id(),
-                                priorityPos,
-                                lutValue,
-                                tdc,
-                                fastest,
-                                iclk + step);
+          const CDCTriggerSegmentHit* storeHit =
+            segmentHits.appendNew(*priorityHit,
+                                  id(),
+                                  priorityPos,
+                                  lutValue,
+                                  tdc,
+                                  fastest,
+                                  iclk + step);
+          addStoreHit(storeHit);
+          // relation to all CDCHits in segment
+          for (unsigned iw = 0; iw < _wires.size(); ++iw) {
+            if (_wires[iw]->signal().active(iclk - width, iclk + step)) {
+              // priority wire has relation weight 2
+              double weight = (_wires[iw] == priorityWire) ? 2. : 1.;
+              storeHit->addRelationTo(cdcHits[_wires[iw]->hit()->iCDCHit()], weight);
+            }
+          }
+          // relation to MCParticles (same as priority hit)
+          RelationVector<MCParticle> mcrel = priorityHit->getRelationsFrom<MCParticle>();
+          for (unsigned imc = 0; imc < mcrel.size(); ++imc) {
+            mcrel[imc]->addRelationTo(storeHit, mcrel.weight(imc));
+          }
+          // store values of this hit to compare with the next hit
           lastLutValue = lutValue;
           lastPriority = priorityPos;
           lastFastest = fastest;

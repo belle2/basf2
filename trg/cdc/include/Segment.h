@@ -77,7 +77,7 @@ namespace Belle2 {
     const TRGCDCSegmentHit* hit(void) const;
 
     /// returns a pointer to a CDCTriggerSegmentHit.
-    const CDCTriggerSegmentHit* storeHit(void) const;
+    const std::vector<const CDCTriggerSegmentHit*> storeHits(void) const;
 
     /// returns hit pattern.
     unsigned hitPattern(void) const;
@@ -144,7 +144,7 @@ namespace Belle2 {
     const TRGCDCSegmentHit* hit(const TRGCDCSegmentHit*);
 
     /// sets a pointer to a CDCTriggerSegmentHit.
-    const CDCTriggerSegmentHit* storeHit(const CDCTriggerSegmentHit*);
+    void addStoreHit(const CDCTriggerSegmentHit*);
 
   public:
 
@@ -174,8 +174,8 @@ namespace Belle2 {
     /// Wire hits.
     std::vector<const TRGCDCWireHit*> _hits;
 
-    /// DataStore hit.
-    const CDCTriggerSegmentHit* _storeHit;
+    /// list of DataStore hits.
+    std::vector<const CDCTriggerSegmentHit*> _storeHits;
 
     /// EventTime class.
     const TRGCDCEventTime* const _eventTime;
@@ -228,17 +228,17 @@ namespace Belle2 {
   }
 
   inline
-  const CDCTriggerSegmentHit*
-  TRGCDCSegment::storeHit(const CDCTriggerSegmentHit* h)
+  void
+  TRGCDCSegment::addStoreHit(const CDCTriggerSegmentHit* h)
   {
-    return _storeHit = h;
+    _storeHits.push_back(h);
   }
 
   inline
-  const CDCTriggerSegmentHit*
-  TRGCDCSegment::storeHit(void) const
+  const std::vector<const CDCTriggerSegmentHit*>
+  TRGCDCSegment::storeHits(void) const
   {
-    return _storeHit;
+    return _storeHits;
   }
 
   inline

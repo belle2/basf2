@@ -244,7 +244,7 @@ namespace Belle2 {
         if (mcDaughters.size() != 2)
           return -999;
 
-        // Get the other B meson
+        // Get the companion B meson
         MCParticle* mcROE = nullptr;
         if (mcDaughters[0]->getArrayIndex() == mcParticle->getArrayIndex())
           mcROE = mcDaughters[1];
@@ -254,10 +254,10 @@ namespace Belle2 {
         // Get related ROE object
         const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
-        // Load unused ROE Tracks
+        // Load ROE Tracks
         std::vector<const Track*> roeTracks = roe->getTracks(maskName);
 
-        // Add tracks in ROE V0 list
+        // Add tracks in ROE V0 list, if they exist
         std::vector<unsigned int> v0List = roe->getV0IDList(maskName);
         for (unsigned int iV0 = 0; iV0 < v0List.size(); iV0++)
         {
@@ -265,11 +265,8 @@ namespace Belle2 {
           roeTracks.push_back(particles[v0List[iV0]]->getDaughter(1)->getTrack());
         }
 
-        // Load unused ROE ECLClusters
+        // Load ROE ECLClusters
         std::vector<const ECLCluster*> roeECL = roe->getECLClusters(maskName);
-
-        // TODO: in the future to load KLMClusters
-        //std::vector<const KLMCluster*> roeKLM = roe->getNKLMClusters();
 
         StoreArray<MCParticle> mcParticles;
         std::set<const MCParticle*> mcROEObjects;

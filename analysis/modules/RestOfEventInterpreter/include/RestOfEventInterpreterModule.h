@@ -52,7 +52,7 @@ namespace Belle2 {
 
     std::string m_particleList;  /**< Name of the ParticleList */
 
-    std::vector<std::string> m_allMaskNames; /**< Container for all mask names of ROE interpretations */
+    std::vector<std::string> m_maskNames; /**< Container for added mask names of ROE interpretations */
 
     std::vector<std::tuple<std::string, std::string, std::string>> m_ROEMasks; /**< Container for tuples */
     std::vector<std::tuple<std::string, std::string, std::string, std::vector<double>>>
@@ -63,6 +63,8 @@ namespace Belle2 {
     m_eclClusterCuts; /**< Cut object which performs the cuts on the remaining ECL clusters for a single ROE interpretation */
     stringAndVectorMap
     m_setOfFractions; /**< A set of probabilities of the ChargedStable particles to be used in a single ROE interpretation. Default is pion always.*/
+
+    bool m_update; /**< Set true for updating a-priori charged stable fractions. */
 
   };
 }

@@ -173,7 +173,7 @@ TLorentzVector RestOfEvent::get4VectorTracks(std::string maskName) const
   StoreArray<Particle> particles;
   std::vector<const Track*> roeTracks = RestOfEvent::getTracks(maskName);
 
-  // if v0 momentum mask has a value, take it, otherwise take 0.
+  // Collect V0 momenta
   TLorentzVector roe4VectorTracks;
   std::vector<unsigned int> v0List = RestOfEvent::getV0IDList(maskName);
   for (unsigned int iV0 = 0; iV0 < v0List.size(); iV0++)
@@ -183,7 +183,7 @@ TLorentzVector RestOfEvent::get4VectorTracks(std::string maskName) const
   double fractions[n];
   fillFractions(fractions, maskName);
 
-  // Add all momenta from tracks
+  // Add momenta from other tracks
   for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
 
     const Track* track = roeTracks[iTrack];
@@ -261,6 +261,19 @@ std::map<unsigned int, bool> RestOfEvent::getECLClusterMask(std::string maskName
     B2FATAL("Cannot find ROE mask with name \'" << maskName << "\', are you sure you spelled it correctly?");
 
   return m_eclClusterMasks.at(maskName);
+}
+
+std::vector<double> RestOfEvent::getChargedStableFractions(std::string maskName) const
+{
+  std::vector<double> defaultVector = {0, 0, 1, 0, 0, 0};
+
+  if (maskName == "")
+    return defaultVector;
+
+  if (m_fractionsSet.find(maskName) == m_fractionsSet.end())
+    B2FATAL("Cannot find ROE mask with name \'" << maskName << "\', are you sure you spelled it correctly?");
+
+  return m_fractionsSet.at(maskName);
 }
 
 std::vector<unsigned int> RestOfEvent::getV0IDList(std::string maskName) const

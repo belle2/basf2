@@ -245,6 +245,14 @@ namespace Belle2 {
     std::map<unsigned int, bool> getECLClusterMask(std::string maskName) const;
 
     /**
+     * Get charged stable fractions with a specific mask name
+     *
+     * @param name of mask
+     * @return fractions
+     */
+    std::vector<double> getChargedStableFractions(std::string maskName) const;
+
+    /**
      * Get list of V0 array indices used to replace tracks in ROE with a specific mask name
      *
      * @param name of mask

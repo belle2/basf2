@@ -1103,7 +1103,14 @@ namespace Belle2 {
     } else {
       for (unsigned iAx = 0; iAx < 5; iAx++) {
         if(useAxSl[iAx] == 1) {
-          m_mVector["phi2D"][iAx] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iAx*2], m_mVector["tdc"][iAx*2], m_mDouble["eventTime"], m_mConstV["rr"][iAx*2], m_mVector["LR"][iAx*2]);
+          // Get drift length from table.
+          string tableName = "driftLengthTableSL" + to_string(iAx*2);
+          double t_driftTime = m_mVector["tdc"][iAx*2] - m_mDouble["eventTime"];
+          if (t_driftTime < 0) t_driftTime = 0;
+          double t_driftLength = m_mConstV[tableName][(unsigned)t_driftTime];
+
+          m_mVector["phi2D"][iAx] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iAx*2], t_driftLength, m_mConstV["rr"][iAx*2], m_mVector["LR"][iAx*2]);
+          //m_mVector["phi2D"][iAx] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iAx*2], m_mVector["tdc"][iAx*2], m_mDouble["eventTime"], m_mConstV["rr"][iAx*2], m_mVector["LR"][iAx*2]);
         } else {
           m_mVector["phi2D"][iAx] = 9999;
         }

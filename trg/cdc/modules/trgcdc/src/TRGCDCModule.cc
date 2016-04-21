@@ -314,7 +314,7 @@ namespace Belle2 {
   TRGCDCModule::event()
   {
     //...CDC trigger simulation...
-    _cdc->update(true);
+    _cdc->update();
     _cdc->simulate();
 
     // save the results to DataStore

@@ -911,7 +911,7 @@ namespace Belle2 {
   TRGCDC::fastClear(void) {}
 
   void
-  TRGCDC::update(bool)
+  TRGCDC::update()
   {
     _trackList2D.clear();
     _trackList2DFitted.clear();

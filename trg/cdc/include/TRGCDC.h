@@ -299,7 +299,7 @@ namespace Belle2 {
     void fastClear(void);
 
     /// updates TRGCDC wire information. clear() is called in this function.
-    void update(bool mcAnalysis = true);
+    void update();
 
     /// updates TRGCDC wire information by Hardware data
     /// 0: From CDC FE ASCII file (Implementing)

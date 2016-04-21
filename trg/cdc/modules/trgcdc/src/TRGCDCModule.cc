@@ -192,6 +192,9 @@ namespace Belle2 {
              _trgCDCDataInputMode,
              "Flag for TRG CDC input mode",
              _trgCDCDataInputMode);
+    addParam("inputCollection", m_inputCollectionName,
+             "Name of the CDCHit StoreArray to be used as input.",
+             string(""));
     addParam("2DfinderCollection", m_2DfinderCollectionName,
              "Name of the StoreArray holding the tracks made by the 2D finder.",
              string("Trg2DFinderTracks"));
@@ -247,7 +250,8 @@ namespace Belle2 {
     // register DataStore elements
     StoreArray<CDCTriggerSegmentHit>::registerPersistent();
     StoreArray<CDCTriggerSegmentHit> segmentHits;
-    StoreArray<CDCHit> cdcHits;
+    StoreArray<CDCHit> cdcHits(m_inputCollectionName);
+    cdcHits.isRequired();
     StoreArray<MCParticle> mcparticles;
     segmentHits.registerRelationTo(cdcHits);
     mcparticles.registerRelationTo(segmentHits);
@@ -303,7 +307,8 @@ namespace Belle2 {
                                _finder3DMode,
                                _fileFitter3D,
                                cdc.getTdcBinWidth(),
-                               _trgCDCDataInputMode);
+                               _trgCDCDataInputMode,
+                               m_inputCollectionName);
     }
 
     if (TRGDebug::level())

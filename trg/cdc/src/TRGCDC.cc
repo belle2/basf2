@@ -123,7 +123,8 @@ namespace Belle2 {
                     int finder3DMode,
                     bool fileFitter3D,
                     double TdcBinWidth,
-                    int trgCDCDataInputMode)
+                    int trgCDCDataInputMode,
+                    const string& cdchitCollectionName)
   {
     if (_cdc) {
       //delete _cdc;
@@ -158,7 +159,8 @@ namespace Belle2 {
                         finder3DMode,
                         fileFitter3D,
                         TdcBinWidth,
-                        trgCDCDataInputMode);
+                        trgCDCDataInputMode,
+                        cdchitCollectionName);
     } else {
       cout << "TRGCDC::getTRGCDC ... good-bye" << endl;
       // delete _cdc;
@@ -221,7 +223,8 @@ namespace Belle2 {
                  int finder3DMode,
                  bool fileFitter3D,
                  double TdcBinWidth,
-                 int trgCDCDataInputMode):
+                 int trgCDCDataInputMode,
+                 const string& cdchitCollectionName):
     _debugLevel(0),
     _configFilename(configFile),
     _simulationMode(simulationMode),
@@ -263,7 +266,8 @@ namespace Belle2 {
     _h3DFinder(0),
     _fitter3D(0),
     _eventTime(0),
-    _trgCDCDataInputMode(trgCDCDataInputMode)
+    _trgCDCDataInputMode(trgCDCDataInputMode),
+    _cdchitCollectionName(cdchitCollectionName)
   {
 
     TRGDebug::enterStage("TRGCDC constructor");
@@ -938,7 +942,7 @@ namespace Belle2 {
       const unsigned n = SimHits.getEntries();
 
       //...CDCHit...
-      StoreArray<CDCHit> CDCHits("CDCHits");
+      StoreArray<CDCHit> CDCHits(_cdchitCollectionName);
       if (! CDCHits) {
         if (TRGDebug::level())
           cout << "TRGCDC !!! can not access to CDCHits" << endl;
@@ -2129,7 +2133,7 @@ namespace Belle2 {
 
     // hits
     StoreArray<CDCTriggerSegmentHit> storeSegmentHits;
-    StoreArray<CDCHit> cdcHits;
+    StoreArray<CDCHit> cdcHits(_cdchitCollectionName);
     for (unsigned its = 0; its < _segmentHits.size(); ++its) {
       const TCSHit* segmentHit = _segmentHits[its];
       const CDCHit* priorityHit = cdcHits[segmentHit->iCDCHit()];

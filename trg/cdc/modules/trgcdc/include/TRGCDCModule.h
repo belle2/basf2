@@ -178,6 +178,8 @@ namespace Belle2 {
     /// Switch for TRG CDC input mode
     int _trgCDCDataInputMode;
 
+    /** Name of the CDCHit StoreArray used as input. */
+    std::string m_inputCollectionName;
     /** Name of the StoreArray holding the tracks made by the 2D finder. */
     std::string m_2DfinderCollectionName;
     /** Name of the StoreArray holding the tracks made by the 2D fitter. */

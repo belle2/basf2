@@ -94,7 +94,8 @@ namespace Belle2 {
                              int finder3DMode = 0,
                              bool fileFitter3D = 0,
                              double TdcBinWidth = 1.,
-                             int trgCDCDataInputMode = 0);
+                             int trgCDCDataInputMode = 0,
+                             const std::string& cdchitCollectionName = "");
 
     /// returns TRGCDC object. TRGCDC should be created with specific
     /// configuration before calling this function.
@@ -130,7 +131,8 @@ namespace Belle2 {
            int finder3DMode,
            bool fileFitter3D,
            double TdcBinWidth,
-           int trgCDCDataInputMode);
+           int trgCDCDataInputMode,
+           const std::string& cdchitCollectionName);
 
     /// Destructor
     virtual ~TRGCDC();
@@ -204,6 +206,9 @@ namespace Belle2 {
 
     /// returns 3D track list (fitted).
     std::vector<TRGCDCTrack*> getTrackList3D(void);
+
+    /// get name of the CDCHit DataStore array used as input
+    std::string getCDCHitCollectionName() const { return _cdchitCollectionName; }
 
   public:// Geometry
 
@@ -682,6 +687,9 @@ namespace Belle2 {
 
     // Switch for TRG CDC input mode
     int _trgCDCDataInputMode;
+
+    /** name of the CDCHit DataStore array used as input */
+    std::string _cdchitCollectionName;
 
     // Debugging members for firmware ROOT input.
     //int m_minCDCTdc;

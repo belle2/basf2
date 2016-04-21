@@ -203,7 +203,7 @@ else:
     branches = ['EventMetaData', 'RawFTSWs', 'RawSVDs', 'RawPXDs']
     if not args.unpacking:
         branches = branches + ['PXDDigits', 'SVDDigits']
-    main.add_module('RootInput')  # , branchNames=branches)
+    main.add_module('RootInput', branchNames=branches)
 
 
 if args.dqm:

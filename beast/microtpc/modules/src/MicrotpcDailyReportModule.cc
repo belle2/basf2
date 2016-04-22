@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Igal Jaegle                                              *
@@ -104,11 +104,18 @@ void MicrotpcDailyReportModule::defineHisto()
       h_tpc_yvphi[i]->Sumw2();
     }
   }
-  for (int i = 0; i < 3; i ++) {
+  for (int i = 0; i < 4; i ++) {
     h_iher[i] = new TH1F(TString::Format("h_iher_%d", i), "", 5000, 0., 24.);
     h_iler[i] = new TH1F(TString::Format("h_iler_%d", i), "", 5000, 0., 24.);
     h_pher[i] = new TH1F(TString::Format("h_pher_%d", i), "", 5000, 0., 24.);
     h_pler[i] = new TH1F(TString::Format("h_pler_%d", i), "", 5000, 0., 24.);
+
+    for (int j = 0; j < 7; j ++) {
+      h_tpc_rate_ler[i][j] = new TH1F(TString::Format("h_tpc_rate_ler_%d_%d", i, j), "", 5000, 0., 24.);
+      h_tpc_rate_ler[i][j]->Sumw2();
+      h_tpc_rate_her[i][j] = new TH1F(TString::Format("h_tpc_rate_her_%d_%d", i, j), "", 5000, 0., 24.);
+      h_tpc_rate_her[i][j]->Sumw2();
+    }
   }
 }
 
@@ -136,7 +143,7 @@ void MicrotpcDailyReportModule::event()
 
   //StoreObjPtr<EventMetaData> evtMetaData;
   //int run = evtMetaData->getRun();
-
+  double IHER = 0, ILER = 0, flagHER = -1, flagLER = -1;
   double TimeStamp = 0;
   for (const auto& MetaHit : MetaHits) {
 
@@ -145,27 +152,43 @@ void MicrotpcDailyReportModule::event()
       TimeStamp = MetaHit.getts_start()[0];
       TimeStamp -= TDatime(m_inputReportDate, 0).Convert();
       TimeStamp /= (60. * 60.);
+      IHER = MetaHit.getIHER();
+      ILER = MetaHit.getILER();
+      //PHER = MetaHit.getPHER();
+      //PLER = MetaHit.getPLER();
+      flagHER = MetaHit.getflagHER();
+      flagLER = MetaHit.getflagLER();
+
       h_iher[0]->Fill(TimeStamp, MetaHit.getIHER());
       if (MetaHit.getflagHER() == 0)
         h_iher[1]->Fill(TimeStamp, MetaHit.getIHER());
       if (MetaHit.getflagHER() == 1)
         h_iher[2]->Fill(TimeStamp, MetaHit.getIHER());
+      if (MetaHit.getflagHER() == 0 && MetaHit.getILER() <= 0)
+        h_iher[3]->Fill(TimeStamp, MetaHit.getIHER());
       h_pher[0]->Fill(TimeStamp, MetaHit.getPHER());
       if (MetaHit.getflagHER() == 0)
         h_pher[1]->Fill(TimeStamp, MetaHit.getPHER());
       if (MetaHit.getflagHER() == 1)
         h_pher[2]->Fill(TimeStamp, MetaHit.getPHER());
+      if (MetaHit.getflagHER() == 0 && MetaHit.getILER() <= 0)
+        h_pher[3]->Fill(TimeStamp, MetaHit.getPHER());
 
       h_iler[0]->Fill(TimeStamp, MetaHit.getILER());
       if (MetaHit.getflagLER() == 0)
         h_iler[1]->Fill(TimeStamp, MetaHit.getILER());
       if (MetaHit.getflagLER() == 1)
         h_iler[2]->Fill(TimeStamp, MetaHit.getILER());
+      if (MetaHit.getflagLER() == 0 && MetaHit.getIHER() <= 0)
+        h_iler[3]->Fill(TimeStamp, MetaHit.getILER());
       h_pler[0]->Fill(TimeStamp, MetaHit.getPLER());
       if (MetaHit.getflagLER() == 0)
         h_pler[1]->Fill(TimeStamp, MetaHit.getPLER());
       if (MetaHit.getflagLER() == 1)
         h_pler[2]->Fill(TimeStamp, MetaHit.getPLER());
+      if (MetaHit.getflagLER() == 0 && MetaHit.getIHER() <= 0)
+        h_pler[3]->Fill(TimeStamp, MetaHit.getPLER());
+
       /*
       if (T0 > MetaHit.getts_start()[0] && old_run < run) {
         T0 = MetaHit.getts_start()[0];
@@ -213,6 +236,18 @@ void MicrotpcDailyReportModule::event()
           h_tpc_phivtheta[j]->Fill(phi, theta);
           h_tpc_phivtheta_w[j]->Fill(phi, theta, esum);
           h_tpc_edepvtrl[j]->Fill(esum, trl);
+          if (IHER > 0) {
+            h_tpc_rate_her[0][j]->Fill(TimeStamp);
+            if (flagHER == 0) h_tpc_rate_her[1][j]->Fill(TimeStamp);
+            if (flagHER == 1) h_tpc_rate_her[2][j]->Fill(TimeStamp);
+            if (flagHER == 0 && ILER <= 0) h_tpc_rate_her[3][j]->Fill(TimeStamp);
+          }
+          if (ILER > 0) {
+            h_tpc_rate_ler[0][j]->Fill(TimeStamp);
+            if (flagLER == 0) h_tpc_rate_ler[1][j]->Fill(TimeStamp);
+            if (flagLER == 1) h_tpc_rate_ler[2][j]->Fill(TimeStamp);
+            if (flagLER == 0 && IHER <= 0) h_tpc_rate_ler[3][j]->Fill(TimeStamp);
+          }
         }
       }
     }

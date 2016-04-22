@@ -98,6 +98,10 @@ namespace Belle2 {
       TH1F* h_pler[10];
       /** Impact parameter v. phi */
       TH2F* h_tpc_yvphi[10];
+      /** Rates of different particle ID correlated to LER beams */
+      TH1F* h_tpc_rate_ler[4][10];
+      /** Rates of different particle ID correlated to HER beams */
+      TH1F* h_tpc_rate_her[4][10];
     };
 
   }

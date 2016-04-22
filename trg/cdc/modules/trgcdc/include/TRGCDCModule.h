@@ -175,6 +175,9 @@ namespace Belle2 {
     /// Switch for Fitter3D.root file.
     bool _fileFitter3D;
 
+    /// Switch for using simple x-t curve or non-linear x-t curve. 0: non-linear 1: simple.
+    bool _fXtSimpleFitter3D;
+
     /// Switch for TRG CDC input mode
     int _trgCDCDataInputMode;
 

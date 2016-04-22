@@ -122,6 +122,7 @@ namespace Belle2 {
                     bool fileHough3D,
                     int finder3DMode,
                     bool fileFitter3D,
+                    bool fXtSimpleFitter3D,
                     double TdcBinWidth,
                     int trgCDCDataInputMode,
                     const string& cdchitCollectionName)
@@ -158,6 +159,7 @@ namespace Belle2 {
                         fileHough3D,
                         finder3DMode,
                         fileFitter3D,
+                        fXtSimpleFitter3D,
                         TdcBinWidth,
                         trgCDCDataInputMode,
                         cdchitCollectionName);
@@ -222,6 +224,7 @@ namespace Belle2 {
                  bool fileHough3D,
                  int finder3DMode,
                  bool fileFitter3D,
+                 bool fXtSimpleFitter3D,
                  double TdcBinWidth,
                  int trgCDCDataInputMode,
                  const string& cdchitCollectionName):
@@ -248,6 +251,7 @@ namespace Belle2 {
     _fileHough3D(fileHough3D),
     _finder3DMode(finder3DMode),
     _fileFitter3D(fileFitter3D),
+    _fXtSimpleFitter3D(fXtSimpleFitter3D),
     _fudgeFactor(1.),
     _width(0),
     _r(0),
@@ -611,7 +615,8 @@ namespace Belle2 {
       {"fmcLR", _fFitter3Dsmclr},
       {"f2DFit", _fFitter3Ds2DFit},
       {"f2DFitDrift", _fFitter3Ds2DFitDrift},
-      {"fRootFile", _fileFitter3D}
+      {"fRootFile", _fileFitter3D},
+      {"fXtSimple", _fXtSimpleFitter3D}
     };
     _fitter3D = new TCFitter3D("Fitter3D",
                                _rootFitter3DFilename,

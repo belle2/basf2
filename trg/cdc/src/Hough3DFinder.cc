@@ -53,6 +53,8 @@ TRGCDCHough3DFinder::TRGCDCHough3DFinder(const TRGCDC & TRGCDC, bool makeRootFil
     m_eventNum = 0;
 
     m_fileFinder3D = 0;
+    m_treeTrackFinder3D = 0;
+    m_treeConstantsFinder3D = 0;
 
     m_mBool["fMc"] = 1;
     m_mBool["fVerbose"] = 0;

@@ -78,6 +78,7 @@ namespace Belle2 {
     m_mBool["fVerbose"] = 0;
     m_mBool["fIsPrintError"] = 0;
     m_mBool["fIsIntegerEffect"] = 1;
+
     // Init values
     m_mConstD["Trg_PI"] = 3.141592653589793;
 
@@ -155,12 +156,18 @@ namespace Belle2 {
       string tableName = "driftLengthTableSL" + to_string(iSl);
       unsigned tableSize = 500;
       m_mConstV[tableName] = vector<double> (tableSize);
+
       unsigned t_layer = m_cdc.segment(iSl,0).center().layerId();
       for (unsigned iTick = 0; iTick <= tableSize; iTick++) {
         double t_driftTime = iTick * 2 * cdcp.getTdcBinWidth();
-        double driftLength_0 = cdcp.getDriftLength(t_driftTime, t_layer, 0);
-        double driftLength_1 = cdcp.getDriftLength(t_driftTime, t_layer, 1);
-        double avgDriftLength = (driftLength_0 + driftLength_1)/2;
+        double avgDriftLength = 0;
+        if (m_mBool["fXtSimple"] == 1) {
+          avgDriftLength = cdcp.getNominalDriftV() * t_driftTime;
+        } else {
+          double driftLength_0 = cdcp.getDriftLength(t_driftTime, t_layer, 0);
+          double driftLength_1 = cdcp.getDriftLength(t_driftTime, t_layer, 1);
+          avgDriftLength = (driftLength_0 + driftLength_1)/2;
+        }
         m_mConstV[tableName][iTick] = avgDriftLength;
       }
     }

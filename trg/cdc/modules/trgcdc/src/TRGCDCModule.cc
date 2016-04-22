@@ -70,6 +70,7 @@ namespace Belle2 {
       _fileHough3D(0),
       _finder3DMode(2),
       _fileFitter3D(0),
+      _fXtSimpleFitter3D(0),
       _trgCDCDataInputMode(0),
       _cdc(0),
       _sa(0)
@@ -188,6 +189,10 @@ namespace Belle2 {
              _fileFitter3D,
              "Flag for making Fitter3D.root",
              _fileFitter3D);
+    addParam("Fitter3DsXtSimple",
+             _fXtSimpleFitter3D,
+             "0: Use simple xt curve table. 1: use non-linear xt curve table.",
+             _fXtSimpleFitter3D);
     addParam("TRGCDCDataInputMode",
              _trgCDCDataInputMode,
              "Flag for TRG CDC input mode",
@@ -306,6 +311,7 @@ namespace Belle2 {
                                _fileHough3D,
                                _finder3DMode,
                                _fileFitter3D,
+                               _fXtSimpleFitter3D,
                                cdc.getTdcBinWidth(),
                                _trgCDCDataInputMode,
                                m_inputCollectionName);

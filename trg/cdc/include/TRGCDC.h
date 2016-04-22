@@ -93,6 +93,7 @@ namespace Belle2 {
                              bool fileHough3D = 0,
                              int finder3DMode = 0,
                              bool fileFitter3D = 0,
+                             bool fXtSimpleFitter3D = 0,
                              double TdcBinWidth = 1.,
                              int trgCDCDataInputMode = 0,
                              const std::string& cdchitCollectionName = "");
@@ -130,6 +131,7 @@ namespace Belle2 {
            bool fileHough3D,
            int finder3DMode,
            bool fileFitter3D,
+           bool fXtSimpleFitter3D,
            double TdcBinWidth,
            int trgCDCDataInputMode,
            const std::string& cdchitCollectionName);
@@ -524,6 +526,9 @@ namespace Belle2 {
 
     /// Switch for Fitter3D.root file.
     bool _fileFitter3D;
+
+    /// Switch for using simple x-t curve or non-linear x-t curve. 0: non-linear 1: simple.
+    bool _fXtSimpleFitter3D;
 
     /// Super layers.
     std::vector<std::vector<TRGCDCLayer*> *> _superLayers;

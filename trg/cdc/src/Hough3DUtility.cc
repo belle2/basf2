@@ -11,7 +11,7 @@
 
 using namespace std;
 
-Hough3DFinder::Hough3DFinder(void): 
+Hough3DFinder::Hough3DFinder(int mode) :
     m_mode(0), m_nWires(), m_rr(), m_ztostraw(), m_anglest(),
     m_cotStart(0), m_cotEnd(0), m_z0Start(0), m_z0End(0), 
     m_nCotSteps(0), m_nZ0Steps(0), m_cotStepSize(0), m_z0StepSize(0), 
@@ -26,18 +26,18 @@ Hough3DFinder::Hough3DFinder(void):
     m_rhoMax(0), m_rhoMin(0), m_rhoBit(0), m_phi0Max(0), m_phi0Min(0), m_phi0Bit(0), 
     m_stAxWireFactor(0), m_LUT(0), 
     m_arcCosLUT(0), m_wireConvertLUT(0) {
-  m_mode = 2;
+  m_mode = mode;
   m_Trg_PI = 3.141592653589793;
   m_inputFileName = "GeoFinder.input";
 
-  // Initialize values that will be initialized again later. (buildbot fix).
+  // Initialize values that will be initialized again later.
   m_LUT = 0;
-
 }
 
-Hough3DFinder::Hough3DFinder(int mode){
-  m_mode = mode;
+Hough3DFinder::Hough3DFinder(void) {
+  Hough3DFinder(2);
 }
+
 
 Hough3DFinder::~Hough3DFinder(void){
   destruct();

@@ -76,12 +76,11 @@ void DumpClustersModule::event()
   m_productionnumber = -999;
 
   m_tlunumber = -999;
-  /*
   //currently not working as there is no rawFTSW in the MC!!
   StoreArray<RawFTSW> storeFTSW("");
   //CIRC::tag_type
   int currentTLUTagFromFTSW = static_cast<unsigned short>(storeFTSW[0]->Get15bitTLUTag(0)); //should be an int
-  */
+  m_tlunumber = currentTLUTagFromFTSW; // this is the tlu tag
 
   //Print event meta data information
   StoreObjPtr<EventMetaData> eventMetaDataPtr;

@@ -41,24 +41,24 @@ void PXDROIDQMModule::defineHisto()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
 
-  hrawROIcount = new TH1F("hrawROIcount", "ROI count;Nr per Event", 256, 0, 256);
+  hrawROIcount = new TH1F("hrawROIcount", "ROI count;Nr per Event", 250, 0, 250);
   hrawROItype = new TH1F("hrawROItype", "ROI type;Nr per Event", 2, 0, 2);
 
-  hrawROIHLTmap  = new TH2F("hrawROIHLTmap", "HLT ROI Middle Map ;column;row", 256 / 4, 0, 256, 786 / 4, 0, 786);
-  hrawROIHLTsize  = new TH2F("hrawROIHLTsize", "HLT ROI Size Map ;column;row", 256 / 4, 0, 256, 786 / 4, 0, 786);
+  hrawROIHLTmap  = new TH2F("hrawROIHLTmap", "HLT ROI Middle Map ;column;row", 250 / 4, 0, 250, 768 / 4, 0, 768);
+  hrawROIHLTsize  = new TH2F("hrawROIHLTsize", "HLT ROI Size Map ;column;row", 250 / 4, 0, 250, 768 / 4, 0, 768);
   hrawROIHLT_DHHID = new TH1F("hrawROIHLT_DHHID", "HLT ROI DHHID;Nr per Event", 64, 0, 64);
-  hrawROIHLTrow1 = new TH1F("hrawROIHLTrow1", "HLT ROI row1;row", 786, 0, 786);
-  hrawROIHLTrow2 = new TH1F("hrawROIHLTrow2", "HLT ROI row2;row", 786, 0, 786);
-  hrawROIHLTcol1 = new TH1F("hrawROIHLTcol1", "HLT ROI col1;column", 256, 0, 256);
-  hrawROIHLTcol2 = new TH1F("hrawROIHLTcol2", "HLT ROI col2;column", 256, 0, 256);
+  hrawROIHLTrow1 = new TH1F("hrawROIHLTrow1", "HLT ROI row1;row", 768, 0, 768);
+  hrawROIHLTrow2 = new TH1F("hrawROIHLTrow2", "HLT ROI row2;row", 768, 0, 768);
+  hrawROIHLTcol1 = new TH1F("hrawROIHLTcol1", "HLT ROI col1;column", 250, 0, 250);
+  hrawROIHLTcol2 = new TH1F("hrawROIHLTcol2", "HLT ROI col2;column", 250, 0, 250);
 
-  hrawROIDCmap  = new TH2F("hrawROIDCmap", "DATCON ROI Middle Map ;column;row", 256 / 4, 0, 256, 786 / 4, 0, 786);
-  hrawROIDCsize  = new TH2F("hrawROIDCsize", "DATCON ROI Size Map ;column;row", 256 / 4, 0, 256, 786 / 4, 0, 786);
+  hrawROIDCmap  = new TH2F("hrawROIDCmap", "DATCON ROI Middle Map ;column;row", 250 / 4, 0, 250, 768 / 4, 0, 768);
+  hrawROIDCsize  = new TH2F("hrawROIDCsize", "DATCON ROI Size Map ;column;row", 250 / 4, 0, 250, 768 / 4, 0, 768);
   hrawROIDC_DHHID = new TH1F("hrawROIDC_DHHID", "DATCON ROI DHHID;Nr per Event", 64, 0, 64);
-  hrawROIDCrow1 = new TH1F("hrawROIDCrow1", "DATCON ROI row1;row", 786, 0, 786);
-  hrawROIDCrow2 = new TH1F("hrawROIDCrow2", "DATCON ROI row2;row", 786, 0, 786);
-  hrawROIDCcol1 = new TH1F("hrawROIDCcol1", "DATCON ROI col1;column", 256, 0, 256);
-  hrawROIDCcol2 = new TH1F("hrawROIDCcol2", "DATCON ROI col2;column", 256, 0, 256);
+  hrawROIDCrow1 = new TH1F("hrawROIDCrow1", "DATCON ROI row1;row", 768, 0, 768);
+  hrawROIDCrow2 = new TH1F("hrawROIDCrow2", "DATCON ROI row2;row", 768, 0, 768);
+  hrawROIDCcol1 = new TH1F("hrawROIDCcol1", "DATCON ROI col1;column", 250, 0, 250);
+  hrawROIDCcol2 = new TH1F("hrawROIDCcol2", "DATCON ROI col2;column", 250, 0, 250);
 
   // cd back to root directory
   oldDir->cd();

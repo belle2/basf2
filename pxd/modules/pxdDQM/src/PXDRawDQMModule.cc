@@ -77,10 +77,10 @@ void PXDRawDQMModule::defineHisto()
       string s2 = str(format("_%d.%d.%d") % num1 % num2 % num3);
 
       hrawPxdHitMap[i] = new TH2F(("hrawPxdHitMap" + s2).c_str(),
-                                  ("Pxd Raw Hit Map, " + s + ";column;row").c_str(), 256,
-                                  0, 256, 786, 0, 786);
+                                  ("Pxd Raw Hit Map, " + s + ";column;row").c_str(), 250,
+                                  0, 250, 768, 0, 768);
       hrawPxdChargeMap[i] = new TH2F(("hrawPxdChargeMap" + s2).c_str(),
-                                     ("Pxd Raw Charge Map, " + s + ";column;row").c_str(), 256, 0, 256, 786, 0, 786);
+                                     ("Pxd Raw Charge Map, " + s + ";column;row").c_str(), 250, 0, 250, 768, 0, 768);
       hrawPxdHitsCharge[i] = new TH1F(("hrawPxdHitsCharge" + s2).c_str(),
                                       ("Pxd Raw Hit Charge, " + s + ";Charge").c_str(), 256, 0, 256);
       hrawPxdHitsCommonMode[i] = new TH1F(("hrawPxdHitsCommonMode" + s2).c_str(),
@@ -104,7 +104,7 @@ void PXDRawDQMModule::defineHisto()
 void PXDRawDQMModule::initialize()
 {
   REG_HISTOGRAM
-  m_storeRawPxdrarray.required(m_storeRawPxdrarrayName);
+  m_storeRawPxdrarray.optional(m_storeRawPxdrarrayName);
   m_storeRawHits.required(m_storeRawHitsName);
   m_storeRawPedestals.required(m_storeRawPedestalsName);
   m_storeRawAdcs.required(m_storeRawAdcsName);
@@ -182,7 +182,7 @@ void PXDRawDQMModule::event()
       unsigned int chip_offset;
       chip_offset = it.getChip() * 64;
       const unsigned char* data = it.getData();
-      for (int row = 0; row < 786; row++) {
+      for (int row = 0; row < 768; row++) {
         for (int col = 0; col < 64; col++) {
           hrawPxdAdcMapAll->Fill(col + chip_offset + ladder * 300 - 200, 100 + row + 850 * (layer + layer + sensor - 3), *(data++));
         }
@@ -209,7 +209,7 @@ void PXDRawDQMModule::event()
       const unsigned char* data = it.getData();
       unsigned int chip_offset;
       chip_offset = it.getChip() * 64;
-      for (int row = 0; row < 786; row++) {
+      for (int row = 0; row < 768; row++) {
         for (int col = 0; col < 64; col++) {
           hrawPxdPedestalMapAll->Fill(col + chip_offset + ladder * 300 - 200, 100 + row + 850 * (layer + layer + sensor - 3), *(data++));
         }

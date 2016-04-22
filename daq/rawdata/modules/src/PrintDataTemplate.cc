@@ -169,6 +169,51 @@ void PrintDataTemplateModule::printPXDEvent(RawPXD* raw_pxd)
          (int)raw_pxd->size(), raw_pxd->data()[0]);
   printf("******* Raw PXD data block (including Detector Buffer) **********\n");
   printBuffer(raw_pxd->data(), raw_pxd->size());
+
+  int* temp_buf = raw_pxd->data();
+  vector <int> nframesv;
+  int nframes = ((temp_buf[ 1 ] >> 24) & 0xff) | (((temp_buf[ 1 ] >> 16) & 0xff) << 8) |
+                (((temp_buf[ 1 ] >> 8) & 0xff) << 16) | (((temp_buf[ 1 ] >> 0) & 0xff) << 24);
+  ;
+  for (int i = 0; i < nframes; i++) {
+    int temp_nframes =
+      ((temp_buf[ i + 2 ] >> 24) & 0xff) | (((temp_buf[ i + 2 ] >> 16) & 0xff) << 8) |
+      (((temp_buf[ i + 2 ] >> 8) & 0xff) << 16) | (((temp_buf[ i + 2 ] >> 0) & 0xff) << 24);
+    nframesv.push_back(temp_nframes);
+  }
+
+  //   printf("FRAME %.8x %.8x %.8x\n", nframes, temp_buf[ nframes +  10 ], temp_buf[ nframes +  11 ]);
+  unsigned int onsen_trg = temp_buf[ nframes + 2 ];
+  onsen_trg = ((onsen_trg >> 24) & 0xff) | (((onsen_trg >> 16) & 0xff) << 8) |
+              (((onsen_trg >> 8) & 0xff) << 16) | (((onsen_trg >> 0) & 0xff) << 24);
+  unsigned int hlttrg = ((temp_buf[ nframes + 4 ] >> 24) & 0xff) | (((temp_buf[ nframes + 4 ] >> 16) & 0xff) << 8) |
+                        (((temp_buf[ nframes + 4 ] >> 8) & 0xff) << 16) | (((temp_buf[ nframes + 4 ] >> 0) & 0xff) << 24);
+  //     unsigned int hlttrg = temp_buf[ nframes + 4 ];
+
+  if (nframes != 0) {
+    int pos = nframesv[ 0 ] / 4;
+    //     printf("nf0 %d\n", nframesv[ 0 ]);
+    for (int i = 1; i < nframesv.size(); i++) {
+      if ((nframesv[ i ] % 4) != 0) break;
+      int dhh_trg1 = (temp_buf[ nframes + 2 + pos ] >> 24) & 0xff;
+      int dhh_trg2 = (temp_buf[ nframes + 2 + pos ] >> 16) & 0xff;
+      int dhh_trg3 = (temp_buf[ nframes + 3 + pos ] >> 8) & 0xff;
+      int dhh_trg4 = (temp_buf[ nframes + 3 + pos ] >> 0) & 0xff;
+      unsigned int dhh_trg = dhh_trg1 | (dhh_trg2 << 8) | (dhh_trg3 << 16) | (dhh_trg4 << 24);
+
+//         printf("Event mixing is occured. hlt %.8x dhh %.8x onsen %.8x %.8x %.8x nf %d\n", hlttrg, dhh_trg, onsen_trg,
+//          temp_buf[ nframes + 2 + pos ], temp_buf[ nframes + 3 + pos ], nframesv[ i ] );
+      printf("Event tag(16bits) in PXD data : frame %.2d hlt %.4x onsen %.4x dhh %.4x\n", i + 1, hlttrg & 0xffff, onsen_trg & 0xffff,
+             dhh_trg & 0xffff);
+      if (((dhh_trg & 0xffff) != (hlttrg & 0xffff)) || ((dhh_trg & 0xffff) != (onsen_trg & 0xffff))) {
+        printf("### ERROR !! Event mixing occured. :  frame %d hlt %.4x onsen %.4x dhh %.4x\n", i + 1, hlttrg & 0xffff, onsen_trg & 0xffff,
+               dhh_trg & 0xffff);
+      }
+      pos += nframesv[ i ] / 4;
+    }
+  }
+
+
 }
 
 void PrintDataTemplateModule::event()

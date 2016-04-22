@@ -6,5 +6,6 @@ env['LIBS'] = ['framework', 'geometry', 'simulation',
 	       'simulation_dataobjects','mdst_dataobjects']
 
 #env.Append(CPPDEFINES = {'CDC_DEBUG':None})
+#env.Append(CPPDEFINES = {'CDC_BADWIREFROMDB':None})
 
 Return('env')

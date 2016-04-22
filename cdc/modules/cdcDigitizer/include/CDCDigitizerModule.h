@@ -13,11 +13,13 @@
 
 //basf2 framework headers
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 
 //cdc package headers
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/dbobjects/CDCBadWires.h>
 
 //C++/C standard lib elements.
 #include <string>
@@ -156,6 +158,11 @@ namespace Belle2 {
       float          m_driftTime;     /**< Shortest drift time of any SimHit in the cell. */
       float          m_charge;        /**< Sum of charge for all SimHits in the cell. */
     };
+
+    /** Badwire list (from DB). */
+#if defined(CDC_BADWIREFROMDB)
+    DBObjPtr<CDCBadWires> m_badWires;
+#endif
   };
 
 } // end of Belle2 namespace

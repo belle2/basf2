@@ -323,8 +323,8 @@ void MicrotpcDailyReportModule::terminate()
     rate = (bis - von) / (double)Nbin;
     h_tpc_gain[i]->Scale(1. / rate / 60. / 60.);
     for (int j = 0; j < 4; j++) {
-      h_tpc_gain_ler[j][i]->Scale(1. / rate / 60. / 60.);
-      h_tpc_gain_her[j][i]->Scale(1. / rate / 60. / 60.);
+      h_tpc_rate_ler[j][i]->Scale(1. / rate / 60. / 60.);
+      h_tpc_rate_her[j][i]->Scale(1. / rate / 60. / 60.);
     }
   }
 

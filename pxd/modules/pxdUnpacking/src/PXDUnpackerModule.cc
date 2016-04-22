@@ -1552,7 +1552,7 @@ unsigned int PXDUnpackerModule::remap_row_IB_OF(unsigned int DHP_row, unsigned i
   B2INFO("in remap ROW ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   row = (DHP_row / 4) * 4  + Drain % 4;
 //   B2INFO("row false " << DHP_row << " col false " << DHP_col << " DCD line " << DCD_channel << " Gate " << Gate << " Drain " << Drain << " row geo " << row);
-  if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 786 - 1 - row ;} //if inner module
+  if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - 1 - row ;} //if inner module
   if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = row ;} //if outer module
   B2INFO("Remapped :: ROW $" << DHP_row << " to v_cellID $" << v_cellID);
   return v_cellID;

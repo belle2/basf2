@@ -56,6 +56,8 @@ void ConditionsService::getPayloads(std::string GlobalTag, std::string Experimen
   char errbuf[CURL_ERROR_SIZE];
 
   if (curl) {
+    curl_slist* headers = NULL;
+    headers = curl_slist_append(headers, "Accept: application/xml");
     std::string REST_payloads = m_RESTbase + "iovPayloads/?gtName=" + GlobalTag + "&expName=" + ExperimentName + "&runName=" + RunName;
     B2DEBUG(50, "rest payload call: " << REST_payloads);
     m_buffer.clear();
@@ -63,8 +65,10 @@ void ConditionsService::getPayloads(std::string GlobalTag, std::string Experimen
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, capture_return);
     curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L); // For debug.
     res = curl_easy_perform(curl);
+    curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
   }
 
@@ -371,6 +375,7 @@ void ConditionsService::writePayloadFile(std::string payloadFileName,
                CURLFORM_CONTENTTYPE, "application/x-root", CURLFORM_END);
 
   headerlist = curl_slist_append(headerlist, "Content-Type: multipart/mixed");
+  headerlist = curl_slist_append(headerlist, "Accept: application/xml");
 
   curl = curl_easy_init();
   if (curl) {
@@ -393,6 +398,7 @@ void ConditionsService::writePayloadFile(std::string payloadFileName,
     parse_return(m_buffer);
   }
 
+  curl_slist_free_all(headerlist);
 }
 
 size_t ConditionsService:: write_data(void* ptr, size_t size, size_t nmemb, FILE* stream)

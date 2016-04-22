@@ -215,9 +215,12 @@ add_geometry(main, not args.magnet_off)
 
 if args.unpacking:
     if not args.svd_only:
+        """
         triggerfix = register_module(register_module('PXDTriggerFixer'))
         triggerfix.if_false(create_path())
         main.add_module(triggerfix)
+        """
+        main.add_module('PXDTriggerShifter')
         main.add_module('PXDUnpacker',
                         RemapFlag=True,
                         RemapLUT_IF_OB=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'),
@@ -253,7 +256,7 @@ if args.dqm:
         if args.unpacking:
             main.add_module("PXDRawDQM")
         main.add_module("PXDDQMCorr")
-    # main.add_module('PXDDQM') does not work
+    main.add_module('PXDDQM')  # does not work
     # main.add_module('SVDDQM3') will be removed, replaced by VXDDQMOnLine
     main.add_module('VXDDQMOnLine', SaveOtherHistos=1, SwapPXD=0)
 

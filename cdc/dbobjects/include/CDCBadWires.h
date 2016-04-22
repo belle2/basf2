@@ -63,6 +63,9 @@ namespace Belle2 {
       return torf;
     }
 
+    /**
+     * Print out contents
+     */
     void dump() const
     {
       std::cout << " " << std::endl;

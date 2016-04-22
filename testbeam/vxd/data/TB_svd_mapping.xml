@@ -6,12 +6,12 @@
 		<ladder n="1">
 			<sensor n="1">
 				<side side="u">
-					<chip n="30" FADCn="2" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
-					<chip n="31" FADCn="2" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
-					<chip n="32" FADCn="2" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
-					<chip n="33" FADCn="2" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
-					<chip n="34" FADCn="2" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
-					<chip n="35" FADCn="2" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+					<chip n="30" FADCn="2" strip_number_of_ch0="767" strip_number_of_ch127="640"></chip>
+					<chip n="31" FADCn="2" strip_number_of_ch0="639" strip_number_of_ch127="512"></chip>
+					<chip n="32" FADCn="2" strip_number_of_ch0="511" strip_number_of_ch127="384"></chip>
+					<chip n="33" FADCn="2" strip_number_of_ch0="383" strip_number_of_ch127="256"></chip>
+					<chip n="34" FADCn="2" strip_number_of_ch0="255" strip_number_of_ch127="128"></chip>
+					<chip n="35" FADCn="2" strip_number_of_ch0="127" strip_number_of_ch127="000"></chip>
 				</side>
 
 				<side side="v">
@@ -71,12 +71,12 @@
 
 			<sensor n="2">
 				<side side="u">
-					<chip n="0" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
-					<chip n="1" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
-					<chip n="2" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
-					<chip n="3" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
-					<chip n="4" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
-					<chip n="5" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+					<chip n="0" FADCn="1" strip_number_of_ch0="767" strip_number_of_ch127="640"></chip>
+					<chip n="1" FADCn="1" strip_number_of_ch0="639" strip_number_of_ch127="512"></chip>
+					<chip n="2" FADCn="1" strip_number_of_ch0="511" strip_number_of_ch127="384"></chip>
+					<chip n="3" FADCn="1" strip_number_of_ch0="383" strip_number_of_ch127="256"></chip>
+					<chip n="4" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128"></chip>
+					<chip n="5" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="000"></chip>
 				</side>
 
 				<side side="v">
@@ -89,13 +89,13 @@
 			</sensor>
 
 			<sensor n="3">
-				<side side="u">
-					<chip n="6" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
-					<chip n="7" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
-					<chip n="8" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
-					<chip n="9" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
-					<chip n="10" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
-					<chip n="11" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+				<side side="u">                							     
+					<chip n="6" FADCn="1"  strip_number_of_ch0="767" strip_number_of_ch127="640"></chip>
+					<chip n="7" FADCn="1"  strip_number_of_ch0="639" strip_number_of_ch127="512"></chip>
+					<chip n="8" FADCn="1"  strip_number_of_ch0="511" strip_number_of_ch127="384"></chip>
+					<chip n="9" FADCn="1"  strip_number_of_ch0="383" strip_number_of_ch127="256"></chip>
+					<chip n="10" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128"></chip>
+					<chip n="11" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="000"></chip>
 				</side>
 
 				<side side="v">
@@ -133,12 +133,12 @@
 
 			<sensor n="2">
 				<side side="u">
-					<chip n="36" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
-					<chip n="37" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
-					<chip n="38" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
-					<chip n="39" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
-					<chip n="40" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
-					<chip n="41" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+					<chip n="36" FADCn="1" strip_number_of_ch0="767" strip_number_of_ch127="640"></chip>
+					<chip n="37" FADCn="1" strip_number_of_ch0="639" strip_number_of_ch127="512"></chip>
+					<chip n="38" FADCn="1" strip_number_of_ch0="511" strip_number_of_ch127="384"></chip>
+					<chip n="39" FADCn="1" strip_number_of_ch0="383" strip_number_of_ch127="256"></chip>
+					<chip n="40" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128"></chip>
+					<chip n="41" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="000"></chip>
 				</side>
 
 				<side side="v">
@@ -152,12 +152,12 @@
 
 			<sensor n="3">
 				<side side="u">
-					<chip n="42" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
-					<chip n="43" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
-					<chip n="44" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
-					<chip n="45" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
-					<chip n="46" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
-					<chip n="47" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+					<chip n="42" FADCn="1" strip_number_of_ch0="767" strip_number_of_ch127="640"></chip>
+					<chip n="43" FADCn="1" strip_number_of_ch0="639" strip_number_of_ch127="512"></chip>
+					<chip n="44" FADCn="1" strip_number_of_ch0="511" strip_number_of_ch127="384"></chip>
+					<chip n="45" FADCn="1" strip_number_of_ch0="383" strip_number_of_ch127="256"></chip>
+					<chip n="46" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128"></chip>
+					<chip n="47" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="000"></chip>
 				</side>
 
 				<side side="v">
@@ -171,12 +171,12 @@
 
 			<sensor n="4">
 				<side side="u">
-					<chip n="30" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
-					<chip n="31" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
-					<chip n="32" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
-					<chip n="33" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
-					<chip n="34" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
-					<chip n="35" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+					<chip n="30" FADCn="1" strip_number_of_ch0="767" strip_number_of_ch127="640"></chip>
+					<chip n="31" FADCn="1" strip_number_of_ch0="639" strip_number_of_ch127="512"></chip>
+					<chip n="32" FADCn="1" strip_number_of_ch0="511" strip_number_of_ch127="384"></chip>
+					<chip n="33" FADCn="1" strip_number_of_ch0="383" strip_number_of_ch127="256"></chip>
+					<chip n="34" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128"></chip>
+					<chip n="35" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="000"></chip>
 				</side>
 
 				<side side="v">
@@ -194,10 +194,10 @@
 		<ladder n="1">
 			<sensor n="1">
 				<side side="u">
-					<chip n="6" FADCn="2" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
-					<chip n="7" FADCn="2" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
-					<chip n="8" FADCn="2" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
-					<chip n="9" FADCn="2" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="6" FADCn="2"  strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="2"  strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="2"  strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="2"  strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
 					<chip n="10" FADCn="2" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
 					<chip n="11" FADCn="2" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
 				</side>
@@ -213,12 +213,12 @@
 	
 			<sensor n="2">
 				<side side="u">
-					<chip n="0" FADCn="2" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
-					<chip n="1" FADCn="2" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
-					<chip n="2" FADCn="2" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
-					<chip n="3" FADCn="2" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
-					<chip n="4" FADCn="2" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
-					<chip n="5" FADCn="2" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+					<chip n="0" FADCn="2" strip_number_of_ch0="767" strip_number_of_ch127="640"></chip>
+					<chip n="1" FADCn="2" strip_number_of_ch0="639" strip_number_of_ch127="512"></chip>
+					<chip n="2" FADCn="2" strip_number_of_ch0="511" strip_number_of_ch127="384"></chip>
+					<chip n="3" FADCn="2" strip_number_of_ch0="383" strip_number_of_ch127="256"></chip>
+					<chip n="4" FADCn="2" strip_number_of_ch0="255" strip_number_of_ch127="128"></chip>
+					<chip n="5" FADCn="2" strip_number_of_ch0="127" strip_number_of_ch127="000"></chip>
 				</side>
 
 				<side side="v">
@@ -233,12 +233,12 @@
 
 			<sensor n="3">
 				<side side="u">
-					<chip n="18" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
-					<chip n="19" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
-					<chip n="20" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
-					<chip n="21" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
-					<chip n="22" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
-					<chip n="23" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+					<chip n="18" FADCn="1" strip_number_of_ch0="767" strip_number_of_ch127="640"></chip>
+					<chip n="19" FADCn="1" strip_number_of_ch0="639" strip_number_of_ch127="512"></chip>
+					<chip n="20" FADCn="1" strip_number_of_ch0="511" strip_number_of_ch127="384"></chip>
+					<chip n="21" FADCn="1" strip_number_of_ch0="383" strip_number_of_ch127="256"></chip>
+					<chip n="22" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128"></chip>
+					<chip n="23" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="000"></chip>
 					 									
 				</side>
 				<side side="v">
@@ -251,12 +251,12 @@
 
 			<sensor n="4">
 				<side side="u">
-					<chip n="24" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
-					<chip n="25" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
-					<chip n="26" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
-					<chip n="27" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
-					<chip n="28" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
-					<chip n="29" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+					<chip n="24" FADCn="1" strip_number_of_ch0="767" strip_number_of_ch127="640"></chip>
+					<chip n="25" FADCn="1" strip_number_of_ch0="639" strip_number_of_ch127="512"></chip>
+					<chip n="26" FADCn="1" strip_number_of_ch0="511" strip_number_of_ch127="384"></chip>
+					<chip n="27" FADCn="1" strip_number_of_ch0="383" strip_number_of_ch127="256"></chip>
+					<chip n="28" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128"></chip>
+					<chip n="29" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="000"></chip>
 					 									
 				</side>
 
@@ -271,12 +271,12 @@
 
 			<sensor n="5">
 				<side side="u">
-					<chip n="12" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
-					<chip n="13" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
-					<chip n="14" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
-					<chip n="15" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
-					<chip n="16" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
-					<chip n="17" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+					<chip n="12" FADCn="1" strip_number_of_ch0="767" strip_number_of_ch127="640"></chip>
+					<chip n="13" FADCn="1" strip_number_of_ch0="639" strip_number_of_ch127="512"></chip>
+					<chip n="14" FADCn="1" strip_number_of_ch0="511" strip_number_of_ch127="384"></chip>
+					<chip n="15" FADCn="1" strip_number_of_ch0="383" strip_number_of_ch127="256"></chip>
+					<chip n="16" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128"></chip>
+					<chip n="17" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="000"></chip>
 					 									
 				</side>
 				<side side="v">

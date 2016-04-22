@@ -13,9 +13,12 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/Database.h>
+#include <framework/database/DBArray.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
 #include <cdc/dataobjects/CDCRawHitWaveForm.h>
+#include <cdc/dbobjects/CDCChannelMap.h>
 #include <rawdata/dataobjects/RawDataBlock.h>
 
 #include <rawdata/dataobjects/RawFTSW.h>
@@ -148,7 +151,7 @@ namespace Belle2 {
       /**
        * Getter of Wire ID.
        */
-      const WireID getWireID(int iBoard, int iCh);
+      WireID getWireID(int iBoard, int iCh) const;
 
       /**
        * Print out the CDC data block in hex.

@@ -107,7 +107,6 @@ void CDCUnpackerModule::initialize()
                                    DataStore::arrayName<CDCRawHitWaveForm>(m_cdcRawHitWaveFormName),
                                    DataStore::arrayName<CDCHit>(m_cdcHitName));
 
-  loadMap();
   if (m_enablePrintOut == true) {
     B2INFO("CDCUnpacker: FADC threshold: " << m_fadcThreshold);
   }
@@ -119,6 +118,7 @@ void CDCUnpackerModule::beginRun()
     B2INFO("CDCUnpacker: beginRun() called.");
   }
 
+  loadMap();
 }
 
 void CDCUnpackerModule::event()
@@ -135,27 +135,14 @@ void CDCUnpackerModule::event()
   StoreArray<CDCRawHitWaveForm> cdcRawHitWFs(m_cdcRawHitWaveFormName);
   StoreArray<CDCRawHit> cdcRawHits(m_cdcRawHitName);
   StoreArray<CDCHit> cdcHits(m_cdcHitName);
+  cdcHits.clear();
 
   RelationArray rawCDCsToCDCHits(cdcRawHits, cdcHits, m_relCDCRawHitToCDCHitName); // CDCRawHit <-> CDCHit
   RelationArray rawCDCWFsToCDCHits(cdcRawHitWFs, cdcHits, m_relCDCRawHitWFToCDCHitName); // CDCRawHitWaveForm <-> CDCHit
 
   if (m_enableStoreCDCRawHit == true) {
-    if (!cdcRawHitWFs.isValid()) {
-      cdcRawHits.create();
-    } else {
-      cdcRawHits.getPtr()->Clear();
-    }
-    if (!cdcRawHits.isValid()) {
-      cdcRawHits.create();
-    } else {
-      cdcRawHits.getPtr()->Clear();
-    }
-  }
-
-  if (!cdcHits.isValid()) {
-    cdcHits.create();
-  } else {
-    cdcHits.getPtr()->Clear();
+    cdcRawHits.clear();
+    cdcRawHits.clear();
   }
 
   //
@@ -459,7 +446,7 @@ void CDCUnpackerModule::terminate()
 }
 
 
-const WireID CDCUnpackerModule::getWireID(int iBoard, int iCh)
+WireID CDCUnpackerModule::getWireID(int iBoard, int iCh) const
 {
   return m_map[iBoard][iCh];
 }

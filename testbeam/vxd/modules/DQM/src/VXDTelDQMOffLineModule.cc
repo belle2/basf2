@@ -352,7 +352,9 @@ void VXDTelDQMOffLineModule::defineHisto()
     }
   }
 
-  for (int i = 0; i < c_nTBPlanes; i++) {
+  for (int iL = 0; iL < c_nTBPlanes; iL++) {
+    int i = iL;
+    if (iL >= c_nVXDPlanes) i = c_nTBPlanes + c_nVXDPlanes - iL - c_firstTBPlane;  // reorder of telescopes
     int iPlane1 = indexToPlaneTB(i);
     float vSize1, uSize1;
     int nStripsU1, nStripsV1;
@@ -368,10 +370,18 @@ void VXDTelDQMOffLineModule::defineHisto()
     }
     nStripsV1 = vSize1 * 10;  // step 1 mm
     nStripsU1 = uSize1 * 10;  // step 1 mm
-    for (int j = 0; j < c_nTBPlanes; j++) {
+    for (int jL = 0; jL < c_nTBPlanes; jL++) {
+      int j = jL;
+      if (jL >= c_nVXDPlanes) j = c_nTBPlanes + c_nVXDPlanes - jL - c_firstTBPlane;  // reorder of telescopes
       int iPlane2 = indexToPlaneTB(j);
       float vSize2, uSize2;
       int nStripsU2, nStripsV2;
+      int indexOrd1 = iPlane1;
+      if (indexOrd1 > c_nVXDPlanes) indexOrd1 = c_nTelPlanes - (indexOrd1 - c_nVXDPlanes) +
+                                                  c_firstTelPlane;  // reorder telescopes to more native order
+      int indexOrd2 = iPlane2;
+      if (indexOrd2 > c_nVXDPlanes) indexOrd2 = c_nTelPlanes - (indexOrd2 - c_nVXDPlanes) +
+                                                  c_firstTelPlane;  // reorder telescopes to more native order
       if (j >= c_nVXDPlanes) {  // Tel
         vSize2 = 32.0;  // cm
         uSize2 = 12.0;   // cm
@@ -386,17 +396,17 @@ void VXDTelDQMOffLineModule::defineHisto()
       nStripsV2 = vSize2 * 10;  // step 1 mm
       if (i == j) {  // hit maps
         DirVXDGlobHitmaps->cd();
-        string nameSP = str(format("VXD_L%1%_Hitmap") % iPlane2);
-        string titleSP = str(format("TB2016 Hitmap VXD in space points, plane %1%") % iPlane2);
+        string nameSP = str(format("VXD_L%1%_Hitmap") % indexOrd2);
+        string titleSP = str(format("TB2016 HitMap VXD plane %1% in space points") % indexOrd2);
         if (i >= c_nVXDPlanes) {
-          nameSP = str(format("Tel_L%1%_Hitmap") % iPlane2);
-          titleSP = str(format("TB2016 Hitmap Tel in space points, plane %1%") % iPlane2);
+          nameSP = str(format("Tel_L%1%_HitMap") % indexOrd2);
+          titleSP = str(format("TB2016 Hitmap Tel %1% in space points") % indexOrd2);
         }
         m_correlations[c_nTBPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsU2, -0.5 * uSize2,
                                                        0.5 * uSize2,
                                                        nStripsV2, -0.5 * vSize2, 0.5 * vSize2);
-        m_correlations[c_nTBPlanes * j + i]->GetXaxis()->SetTitle("vertical y position [cm]");
-        m_correlations[c_nTBPlanes * j + i]->GetYaxis()->SetTitle("horizontal z position [cm]");
+        m_correlations[c_nTBPlanes * j + i]->GetXaxis()->SetTitle("y position [cm]");
+        m_correlations[c_nTBPlanes * j + i]->GetYaxis()->SetTitle("z position [cm]");
         m_correlations[c_nTBPlanes * j + i]->GetZaxis()->SetTitle("hits");
 
       } else if (i < j) { // correlations for u
@@ -406,21 +416,28 @@ void VXDTelDQMOffLineModule::defineHisto()
         } else {
           DirVXDGlobCorrelsNeigh->cd();
         }
-        string nameSP = str(format("VXD_L%1%_L%2%_CorrelationMapU") % iPlane1 % iPlane2);
-        string titleSP = str(format("TB2016 Correlation map VXD space points in U, plane %1%, plane %2%") % iPlane1 % iPlane2);
-        if ((i >= c_nVXDPlanes) || (j >= c_nVXDPlanes)) {
-          nameSP = str(format("TelVXD_L%1%_L%2%_CorrelationMapU") % iPlane1 % iPlane2);
-          titleSP = str(format("TB2016 Correlation map TelVXD space points in U, plane %1%, plane %2%") % iPlane1 % iPlane2);
-        }
-        if ((i >= c_nVXDPlanes) && (j >= c_nVXDPlanes)) {
-          nameSP = str(format("Tel_L%1%_L%2%_CorrelationMapU") % iPlane1 % iPlane2);
-          titleSP = str(format("TB2016 Correlation map Tel space points in U, plane %1%, plane %2%") % iPlane1 % iPlane2);
+        if (((i == 5) && (j == 6)) || ((i == 6) && (j == 5))) DirVXDGlobCorrels->cd(); //they are not neighboar
+        if (((i == 8) && (j == 9)) || ((i == 9) && (j == 8))) DirVXDGlobCorrels->cd(); //they are not neighboar tels
+        if (((i == 5) && (j == 8)) || ((i == 8) && (j == 5))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
+        if (((i == 0) && (j == 9)) || ((i == 9) && (j == 0))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
+
+        string nameSP = str(format("VXD_L%1%_VXD_L%2%_CorrelationMapU") % indexOrd1 % indexOrd2);
+        string titleSP = str(format("TB2016 Correlation map VXD %1% VXD %2% space points in U") % indexOrd1 % indexOrd2);
+        if ((iPlane1 > c_nVXDPlanes) && (iPlane2 > c_nVXDPlanes)) {
+          nameSP = str(format("Tel_L%1%_Tel_L%2%_CorrelationMapU") % indexOrd1 % indexOrd2);
+          titleSP = str(format("TB2016 Correlation map Tel %1% Tel %2% space points in U") % indexOrd1 % indexOrd2);
+        } else if ((iPlane1 > c_nVXDPlanes) && (iPlane2 <= c_nVXDPlanes)) {
+          nameSP = str(format("Tel_L%1%_VXD_L%2%_CorrelationMapU") % indexOrd1 % indexOrd2);
+          titleSP = str(format("TB2016 Correlation map Tel %1% VXD %2% space points in U") % indexOrd1 % indexOrd2);
+        } else if ((iPlane1 <= c_nVXDPlanes) && (iPlane2 > c_nVXDPlanes)) {
+          nameSP = str(format("VXD_L%1%_Tel_L%2%_CorrelationMapU") % indexOrd1 % indexOrd2);
+          titleSP = str(format("TB2016 Correlation map VXD %1% Tel %2% space points in U") % indexOrd1 % indexOrd2);
         }
         m_correlations[c_nTBPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsU1, -0.5 * uSize1,
                                                        0.5 * uSize1,
                                                        nStripsU2, -0.5 * uSize2, 0.5 * uSize2);
-        string axisxtitle = str(format("vertical y position, plane %1% [cm]") % iPlane1);
-        string axisytitle = str(format("vertical y position, plane %1% [cm]") % iPlane2);
+        string axisxtitle = str(format("y position [cm]"));
+        string axisytitle = str(format("y position [cm]"));
         m_correlations[c_nTBPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
         m_correlations[c_nTBPlanes * j + i]->GetYaxis()->SetTitle(axisytitle.c_str());
         m_correlations[c_nTBPlanes * j + i]->GetZaxis()->SetTitle("hits");
@@ -432,21 +449,28 @@ void VXDTelDQMOffLineModule::defineHisto()
         } else {
           DirVXDGlobCorrelsNeigh->cd();
         }
-        string nameSP = str(format("VXD_L%1%_L%2%_CorrelationmapV") % iPlane2 % iPlane1);
-        string titleSP = str(format("TB2016 Correlation map VXD space points in V, plane %1%, plane %2%") % iPlane2 % iPlane1);
-        if ((i >= c_nVXDPlanes) || (j >= c_nVXDPlanes)) {
-          nameSP = str(format("TelVXD_L%1%_L%2%_CorrelationMapV") % iPlane1 % iPlane2);
-          titleSP = str(format("TB2016 Correlation map TelVXD space points in V, plane %1%, plane %2%") % iPlane1 % iPlane2);
-        }
-        if ((i >= c_nVXDPlanes) && (j >= c_nVXDPlanes)) {
-          nameSP = str(format("Tel_L%1%_L%2%_CorrelationMapV") % iPlane1 % iPlane2);
-          titleSP = str(format("TB2016 Correlation map Tel space points in V, plane %1%, plane %2%") % iPlane1 % iPlane2);
+        if (((i == 5) && (j == 6)) || ((i == 6) && (j == 5))) DirVXDGlobCorrels->cd(); //they are not neighboar
+        if (((i == 8) && (j == 9)) || ((i == 9) && (j == 8))) DirVXDGlobCorrels->cd(); //they are not neighboar tels
+        if (((i == 5) && (j == 8)) || ((i == 8) && (j == 5))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
+        if (((i == 0) && (j == 9)) || ((i == 9) && (j == 0))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
+
+        string nameSP = str(format("VXD_L%1%_VXD_L%2%_CorrelationMapV") % indexOrd1 % indexOrd2);
+        string titleSP = str(format("TB2016 Correlation map VXD %1% VXD %2% space points in V") % indexOrd1 % indexOrd2);
+        if ((iPlane1 > c_nVXDPlanes) && (iPlane2 > c_nVXDPlanes)) {
+          nameSP = str(format("Tel_L%1%_Tel_L%2%_CorrelationMapV") % indexOrd1 % indexOrd2);
+          titleSP = str(format("TB2016 Correlation map Tel %1% Tel %2% space points in V") % indexOrd1 % indexOrd2);
+        } else if ((iPlane1 > c_nVXDPlanes) && (iPlane2 <= c_nVXDPlanes)) {
+          nameSP = str(format("Tel_L%1%_VXD_L%2%_CorrelationMapV") % indexOrd1 % indexOrd2);
+          titleSP = str(format("TB2016 Correlation map Tel %1% VXD %2% space points in V") % indexOrd1 % indexOrd2);
+        } else if ((iPlane1 <= c_nVXDPlanes) && (iPlane2 > c_nVXDPlanes)) {
+          nameSP = str(format("VXD_L%1%_Tel_L%2%_CorrelationMapV") % indexOrd1 % indexOrd2);
+          titleSP = str(format("TB2016 Correlation map VXD %1% Tel %2% space points in V") % indexOrd1 % indexOrd2);
         }
         m_correlations[c_nTBPlanes * j + i] = new TH2F(nameSP.c_str(), titleSP.c_str(), nStripsV2, -0.5 * vSize2,
                                                        0.5 * vSize2,
                                                        nStripsV1, -0.5 * vSize1, 0.5 * vSize1);
-        string axisxtitle = str(format("horizontal z position, plane %1% [cm]") % iPlane1);
-        string axisytitle = str(format("horizontal z position, plane %1% [cm]") % iPlane2);
+        string axisxtitle = str(format("z position [cm]"));
+        string axisytitle = str(format("z position [cm]"));
         m_correlations[c_nTBPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
         m_correlations[c_nTBPlanes * j + i]->GetYaxis()->SetTitle(axisytitle.c_str());
         m_correlations[c_nTBPlanes * j + i]->GetZaxis()->SetTitle("hits");

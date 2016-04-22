@@ -256,7 +256,7 @@ if args.dqm:
         if args.unpacking:
             main.add_module("PXDRawDQM")
         main.add_module("PXDDQMCorr")
-    main.add_module('PXDDQM')  # does not work
+    main.add_module('PXDDQM', histgramDirectoryName='pxddqm')  # does not work
     # main.add_module('SVDDQM3') will be removed, replaced by VXDDQMOnLine
     main.add_module('VXDDQMOnLine', SaveOtherHistos=1, SwapPXD=0)
 

@@ -1344,7 +1344,10 @@ int PXDClusterShapeCalibrationAlgorithm::CalculateCorrection(int CorCase, int n,
   *rms = 1;
 //printf("----->n %i MinSamples %i\n",n,MinSamples);
 
-  if (n < MinSamples) return 0;
+  if (n < MinSamples) {
+    delete [] array2;
+    return 0;
+  }
 
   float QuantCut = 0.9; // TODO this parameter can be change...
   double quantiles[2];

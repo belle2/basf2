@@ -142,7 +142,7 @@ void CDCUnpackerModule::event()
 
   if (m_enableStoreCDCRawHit == true) {
     cdcRawHits.clear();
-    cdcRawHits.clear();
+    cdcRawHitWFs.clear();
   }
 
   //

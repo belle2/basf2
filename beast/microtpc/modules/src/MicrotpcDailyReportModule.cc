@@ -240,13 +240,13 @@ void MicrotpcDailyReportModule::event()
             h_tpc_rate_her[0][j]->Fill(TimeStamp);
             if (flagHER == 0) h_tpc_rate_her[1][j]->Fill(TimeStamp);
             if (flagHER == 1) h_tpc_rate_her[2][j]->Fill(TimeStamp);
-            if (flagHER == 0 && ILER <= 0) h_tpc_rate_her[3][j]->Fill(TimeStamp);
+            if (flagHER == 0 && ILER <= 10) h_tpc_rate_her[3][j]->Fill(TimeStamp);
           }
           if (ILER > 0) {
             h_tpc_rate_ler[0][j]->Fill(TimeStamp);
             if (flagLER == 0) h_tpc_rate_ler[1][j]->Fill(TimeStamp);
             if (flagLER == 1) h_tpc_rate_ler[2][j]->Fill(TimeStamp);
-            if (flagLER == 0 && IHER <= 0) h_tpc_rate_ler[3][j]->Fill(TimeStamp);
+            if (flagLER == 0 && IHER <= 10) h_tpc_rate_ler[3][j]->Fill(TimeStamp);
           }
         }
       }
@@ -322,6 +322,10 @@ void MicrotpcDailyReportModule::terminate()
     bis = h_tpc_gain[i]->GetXaxis()->GetXmax();
     rate = (bis - von) / (double)Nbin;
     h_tpc_gain[i]->Scale(1. / rate / 60. / 60.);
+    for (int j = 0; j < 4; j++) {
+      h_tpc_gain_ler[j][i]->Scale(1. / rate / 60. / 60.);
+      h_tpc_gain_her[j][i]->Scale(1. / rate / 60. / 60.);
+    }
   }
 
   for (int i = 0; i < 12; i++) {

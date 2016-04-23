@@ -317,7 +317,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     adcint[ii] = new TH1F(n_adcint, n_adcint, 1000, 0, 10000);
   }
 
-  TH1F* scrods_tight = new TH1F("scrods_tight", "scrod id numbers (tight cuts)", 100, 0., 100.);
+  TH1F* scrods_tight = new TH1F("scrods_tight", "scrod id numbers (tight cuts)", 120, 0., 120.);
   scrods_tight->GetXaxis()->SetTitle("scrod id");
 
   TH2F* ch_widths_tight = new TH2F("ch_widths_tight", "hit width vs pixel (tight cuts)", 512, 0., 512., 1000, 0., 100.);
@@ -421,7 +421,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     adcint_tight[ii] = new TH1F(n_adcint_tight, n_adcint_tight, 1000, 0, 10000);
   }
 
-  TH1F* scrods_optics = new TH1F("scrods_optics", "scrod id numbers (optics cuts)", 100, 0., 100.);
+  TH1F* scrods_optics = new TH1F("scrods_optics", "scrod id numbers (optics cuts)", 120, 0., 120.);
   scrods_optics->GetXaxis()->SetTitle("scrod id");
 
   TH2F* ch_widths_optics = new TH2F("ch_widths_optics", "hit width vs pixel (optics cuts)", 512, 0., 512., 1000, 0., 100.);

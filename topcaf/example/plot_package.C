@@ -1,5 +1,8 @@
 void plot_package(TString filename, const char* outfile="", const char* trigpos=""){
 
+  int flag_slot = ( (strstr(filename, "slot") != NULL) || (strstr(filename, "cpr2061") != NULL) );
+  cout<<flag_slot<<endl;
+
   //Opens ROOT "filename"
   //Makes plots based on trigpos and lab
   //Saves as PS file "outfile"
@@ -47,15 +50,17 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
       roi[0]->GetXaxis()->SetRangeUser(300,500);
     }
     //For installed modules, use full negative range
-    if(strstr(filename, "slot") != NULL){
+    //Similarly for M01 in special condition test at Tsukuba
+    //if( (strstr(filename, "slot") != NULL) || (strstr(filename, "cpr2061") != NULL)   ){
+    if( flag_slot==1 ){
       roi[0]->GetXaxis()->SetRangeUser(-500,-5);
-    }
+    }    
   }
   
   TSpectrum *s0 = new TSpectrum(npeaks);
   int nfound0 = s0->Search(roi[0],1,"",0.01);
   Double_t *xpeaks0=s0->GetPositionX();
-
+  cout<<"Main peak location: "<<xpeaks0[0]<<endl;
 
   Float_t sigma1,sigma2;
   sigma1=9;
@@ -129,12 +134,13 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   }
   else{
     py2->GetXaxis()->SetRangeUser(-500,-250);
-    if(trigstring=="laser"){
+    if(trigstring=="laser" || flag_slot==1){
       py2->GetXaxis()->SetRangeUser(300,500);      
-      if(strstr(filename, "slot") != NULL){
+      //if( (strstr(filename, "slot") != NULL) || (strstr(filename, "cpr2061") != NULL)   ){
+      if( flag_slot==1 ){
 	py2->GetXaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
 	TPad* c_py2_1=(TPad*)(c_py2->GetPrimitive("c_py2_1"));
-	c_py2_1->SetLogy();
+	if( strstr(filename, "slot") != NULL ) c_py2_1->SetLogy();
       }
     }
   }
@@ -155,7 +161,8 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   }
   py2->Fit(fn1,"RB");
   TPaveText *py1t;
-  if(strstr(filename, "slot") != NULL){
+  //if( (strstr(filename, "slot") != NULL) || (strstr(filename, "cpr2061") != NULL)   ){
+  if( flag_slot==1 ){
     py1t=new TPaveText(0.8,0.7,1.0,0.9,"NDC");
   }
   else{
@@ -222,12 +229,13 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
       }
       else{
 	asict[ii*16+iii]->GetXaxis()->SetRangeUser(-500,-250);
-	if(trigstring=="laser"){
+	if(trigstring=="laser" || flag_slot==1){
 	  asict[ii*16+iii]->GetXaxis()->SetRangeUser(300,500);
-	  if(strstr(filename, "slot") != NULL){
+	  //if( (strstr(filename, "slot") != NULL) || (strstr(filename, "cpr2061") != NULL)   ){
+	  if( flag_slot==1 ){
 	    asict[ii*16+iii]->GetXaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
 	    cbs_i[ii*16+iii]=(TPad*)(cbs[ii]->GetPrimitive(Form("cbs%i_%i",ii,iii+1)));
-	    cbs_i[ii*16+iii]->SetLogy();
+	    if( strstr(filename, "slot") != NULL )	    cbs_i[ii*16+iii]->SetLogy();
 	  }
 	}
       }
@@ -248,10 +256,11 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   else{
     ctt->GetXaxis()->SetRangeUser(0,400);
     ctt->GetYaxis()->SetRangeUser(-500,-420);
-    if(trigstring=="laser"){
+    if(trigstring=="laser" || flag_slot==1){
       ctt->GetXaxis()->SetRangeUser(500,1000);
       ctt->GetYaxis()->SetRangeUser(300,500);
-      if(strstr(filename, "slot") != NULL){
+      //if(strstr(filename, "slot") != NULL){
+      if( flag_slot==1 ){
 	ctt->GetXaxis()->SetRangeUser(0,500);
         ctt->GetYaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
       }
@@ -269,9 +278,10 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   }
   else{
     cht->GetYaxis()->SetRangeUser(-550,-250);
-    if(trigstring=="laser"){
+    if(trigstring=="laser" || flag_slot==1){
       cht->GetYaxis()->SetRangeUser(250,550);
-      if(strstr(filename, "slot") != NULL){
+      //if(strstr(filename, "slot") != NULL){
+      if( flag_slot==1 ){
         cht->GetYaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
       }
     }

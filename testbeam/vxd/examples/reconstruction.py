@@ -182,11 +182,28 @@ parser.add_argument('--dqm', dest='dqm', action='store_const', const=True, defau
 parser.add_argument('--display', dest='display', action='store_const', const=True, default=False, help='Show Event Display window')
 parser.add_argument('--gbl-collect', dest='gbl_collect', action='store_const', const=True,
                     default=False, help='Use GBLfit for track fitting and collect calibration data')
+parser.add_argument(
+    '--tel-input',
+    dest='tel_input',
+    action='store',
+    default=None,
+    type=str,
+    help='Location of telescope .raw file to merge')
+parser.add_argument(
+    '--debug',
+    dest='debug',
+    action='store_const',
+    const=True,
+    default=False,
+    help='Set log level to INFO to see all messages')
 args = parser.parse_args()
 
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
+if args.debug:
+    set_log_level(LogLevel.INFO)
+
 
 # Set up DB chain
 reset_database()
@@ -213,6 +230,19 @@ main.add_module('Progress')
 
 add_geometry(main, not args.magnet_off)
 
+if args.tel_input:
+    telmerger = register_module('TelDataMergerTB2016')
+    # telmerger.logging.log_level = LogLevel.INFO
+    param_telmerger = {
+        'MergeSwitch': 1,
+        'storeOutputPXDDigitsName': 'PXDDigits_2',
+        'storeTELDigitsName': 'TelDigits',
+        'bufferSize': 10000,
+        'inputFileName': args.tel_input,
+    }
+    telmerger.param(param_telmerger)
+    main.add_module(telmerger)
+
 if args.unpacking:
     if not args.svd_only:
         """
@@ -236,7 +266,10 @@ if not args.svd_only:
 
 main.add_module('SVDDigitSorter')  # , ignoredStripsListName='data/testbeam/vxd/SVD_Masking.xml')
 main.add_module('SVDClusterizer')
-# main.add_module('TelClusterizer')
+
+if args.tel_input:
+    main.add_module('TelDigitSorter')
+    main.add_module('TelClusterizer')
 
 if args.gbl_collect:
     main.add_module('SetupGenfitExtrapolation', whichGeometry='TGeo')
@@ -247,7 +280,7 @@ add_vxdtf(main, not args.magnet_off, args.svd_only, args.momentum)
 
 if args.gbl_collect:
     main.add_module('GBLfit', BuildBelle2Tracks=True, beamSpot=[-30, 0, 0])
-    main.add_module('MillepedeCollector', minPValue=0.001)
+    main.add_module('MillepedeCollector', minPValue=0.0)
 else:
     main.add_module('GenFitter', FilterId='Kalman')
 
@@ -259,6 +292,11 @@ if args.dqm:
     main.add_module('PXDDQM', histgramDirectoryName='pxddqm')  # does not work
     # main.add_module('SVDDQM3') will be removed, replaced by VXDDQMOnLine
     main.add_module('VXDDQMOnLine', SaveOtherHistos=1, SwapPXD=0)
+
+    if args.tel_input:
+        main.add_module("TelDQM")
+        # main.add_module("TelxVXD2016")
+        main.add_module("VXDTelDQMOffLine", SaveOtherHistos=1)
 
     if not args.gbl_collect:
         main.add_module('TrackfitDQM')

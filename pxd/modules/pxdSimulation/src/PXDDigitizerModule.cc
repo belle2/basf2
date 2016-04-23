@@ -208,10 +208,7 @@ void PXDDigitizerModule::event()
                                   m_relTrueHitSimHitName);
 
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
-  if (!storeDigits.isValid())
-    storeDigits.create();
-  else
-    storeDigits.getPtr()->Clear();
+  storeDigits.clear();
 
   RelationArray relDigitMCParticle(storeDigits, storeMCParticles,
                                    m_relDigitMCParticleName);

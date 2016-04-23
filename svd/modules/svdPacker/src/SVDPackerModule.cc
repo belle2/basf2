@@ -88,11 +88,7 @@ void SVDPackerModule::event()
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
   StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
 
-  if (!rawSVDList.isValid()) {
-    rawSVDList.create();
-
-  } else
-    rawSVDList.getPtr()->Clear();
+  rawSVDList.clear();
 
 
   if (! m_map) {
@@ -179,7 +175,9 @@ void SVDPackerModule::event()
     // here goes FTB header
     data32 = 0xffaa0000;
 
-    if (iFADC > 0 and iFADC % 12 == 0)   j_buf[iFADC / 12 - 1] = data_words.size(); // iFADC=12 -> j_buf[0]=size;   iFADC=24 -> j_buf[1]=size;  iFADC=36 -> j_buf[2]=size;
+    if (iFADC > 0
+        and iFADC % 12 == 0)   j_buf[iFADC / 12 - 1] =
+            data_words.size(); // iFADC=12 -> j_buf[0]=size;   iFADC=24 -> j_buf[1]=size;  iFADC=36 -> j_buf[2]=size;
 
 
     //adds data32 to data vector and to crc16Input for further crc16 calculation

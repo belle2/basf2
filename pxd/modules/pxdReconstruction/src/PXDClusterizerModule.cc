@@ -153,10 +153,7 @@ void PXDClusterizerModule::event()
   const StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
   StoreArray<PXDCluster> storeClusters(m_storeClustersName);
 
-  if (!storeClusters.isValid())
-    storeClusters.create();
-  else
-    storeClusters.getPtr()->Clear();
+  storeClusters.clear();
 
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles,
                                      m_relClusterMCParticleName);

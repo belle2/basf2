@@ -159,10 +159,7 @@ void TelDigitizerModule::event()
   const StoreArray<TelTrueHit> storeTrueHits(m_storeTrueHitsName);
 
   StoreArray<TelDigit> storeDigits(m_storeDigitsName);
-  if (!storeDigits.isValid())
-    storeDigits.create();
-  else
-    storeDigits.getPtr()->Clear();
+  storeDigits.clear();
 
   RelationArray relDigitMCParticle(storeDigits, storeMCParticles,
                                    m_relDigitMCParticleName);

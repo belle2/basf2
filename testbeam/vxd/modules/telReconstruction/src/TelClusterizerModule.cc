@@ -144,10 +144,7 @@ void TelClusterizerModule::event()
   StoreArray<PXDCluster> storeClusters(m_storeClustersName);
 #endif
 
-  if (!storeClusters.isValid())
-    storeClusters.create();
-  else
-    storeClusters.getPtr()->Clear();
+  storeClusters.clear();
 
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles,
                                      m_relClusterMCParticleName);

@@ -78,11 +78,7 @@ void SVDUnpackerModule::event()
   StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
 
 
-  if (!svdDigits.isValid()) {
-    svdDigits.create();
-
-  } else
-    svdDigits.getPtr()->Clear();
+  svdDigits.clear();
 
 
   if (! m_map) {

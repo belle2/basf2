@@ -241,10 +241,7 @@ void SVDClusterizerModule::event()
   const StoreArray<SVDDigit>   storeDigits(m_storeDigitsName);
   StoreArray<SVDCluster> storeClusters(m_storeClustersName);
 
-  if (!storeClusters.isValid())
-    storeClusters.create();
-  else
-    storeClusters.getPtr()->Clear();
+  storeClusters.clear();
 
   RelationArray relClusterMCParticle(storeClusters, storeMCParticles,
                                      m_relClusterMCParticleName);

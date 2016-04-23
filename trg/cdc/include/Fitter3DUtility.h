@@ -47,6 +47,12 @@ class Fitter3DUtility{
     /// Rotates to range [-pi, pi]
     static double rotatePhi(double value, double refPhi);
 
+    /// Rotates to range [-pi, pi]. Use tsId as reference.
+    static double rotatePhi(double value, int refId, int nTSs);
+
+    /// Rotates to range [0, nTSs-1].
+    static int rotateTsId(int value, int refId, int nTSs);
+
     /// Calculates the fitted axial phi for the stereo super layer.
     static double calStAxPhi(int charge, double anglest, double ztostraw, double rr, double rho, double phi0);
 

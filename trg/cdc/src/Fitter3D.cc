@@ -253,6 +253,7 @@ namespace Belle2 {
         if(useStSl[iSt] == 1) {
           const vector<TCLink *> & links = aTrack.links(iSt*2+1);
           const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
+          m_mVector["tsId"][iSt*2+1] = t_segment->localId();
           m_mVector["wirePhi"][iSt*2+1] = (double) t_segment->localId()/m_mConstV["nWires"][iSt*2+1]*4*m_mConstD["Trg_PI"];
           //m_mVector["lutLR"][iSL] = t_segment->LUT()->getLRLUT(t_segment->hitPattern(),iSL);
           m_mVector["lutLR"][iSt*2+1] = t_segment->LUT()->getValue(t_segment->lutPattern());
@@ -264,6 +265,7 @@ namespace Belle2 {
           else if(m_mBool["fLRLUT"]==1) m_mVector["LR"][iSt*2+1] = m_mVector["lutLR"][iSt*2+1];
           else m_mVector["LR"][iSt*2+1] = 3;
         } else {
+          m_mVector["tsId"][iSt*2+1] = 9999;
           m_mVector["wirePhi"][iSt*2+1] = 9999;
           m_mVector["lutLR"][iSt*2+1] = 9999;
           // mcLR should be removed.
@@ -287,7 +289,6 @@ namespace Belle2 {
           double t_driftLength = m_mConstV[tableName][(unsigned)t_driftTime];
 
           m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], t_driftLength, m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
-          //m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], m_mVector["tdc"][iSt*2+1], m_mDouble["eventTime"], m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
         } else {
           m_mVector["phi3D"][iSt] = 9999;
         }
@@ -477,6 +478,7 @@ namespace Belle2 {
         if(useStSl[iSt] == 1) {
           const vector<TCLink *> & links = aTrack.links(iSt*2+1);
           const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
+          m_mVector["tsId"][iSt*2+1] = t_segment->localId();
           m_mVector["wirePhi"][iSt*2+1] = (double) t_segment->localId()/m_mConstV["nWires"][iSt*2+1]*4*m_mConstD["Trg_PI"];
           //m_mVector["lutLR"][iSL] = t_segment->LUT()->getLRLUT(t_segment->hitPattern(),iSL);
           m_mVector["lutLR"][iSt*2+1] = t_segment->LUT()->getValue(t_segment->lutPattern());
@@ -488,6 +490,7 @@ namespace Belle2 {
           else if(m_mBool["fLRLUT"]==1) m_mVector["LR"][iSt*2+1] = m_mVector["lutLR"][iSt*2+1];
           else m_mVector["LR"][iSt*2+1] = 3;
         } else {
+          m_mVector["tsId"][iSt*2+1] = 0;
           m_mVector["wirePhi"][iSt*2+1] = 9999;
           m_mVector["lutLR"][iSt*2+1] = 9999;
           // mcLR should be removed.
@@ -502,7 +505,16 @@ namespace Belle2 {
 
       // Calculate phi3D using driftTime.
       m_mVector["phi3D"] = vector<double> (4);
-      for (unsigned iSt = 0; iSt < 4; iSt++) m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], m_mVector["tdc"][iSt*2+1], m_mDouble["eventTime"], m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
+      for (unsigned iSt = 0; iSt < 4; iSt++) {
+
+        // Get drift length from table.
+        string tableName = "driftLengthTableSL" + to_string(iSt*2+1);
+        double t_driftTime = m_mVector["tdc"][iSt*2+1] - m_mDouble["eventTime"];
+        if (t_driftTime < 0) t_driftTime = 0;
+        double t_driftLength = m_mConstV[tableName][(unsigned)t_driftTime];
+
+        m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], t_driftLength, m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
+      }
       // Get zerror for 3D fit
       m_mVector["zError"] = vector<double> (4);
       for (unsigned iSt = 0; iSt < 4; iSt++) {
@@ -558,129 +570,129 @@ namespace Belle2 {
       // Find reference value. Set phi0 to be 45 deg or -45 deg depending on charge.
       if(m_mDouble["charge"] == -1) m_mDouble["relRefPhi"] = m_mDouble["phi0"] - m_mConstD["Trg_PI"]/4;
       else m_mDouble["relRefPhi"] = m_mDouble["phi0"] + m_mConstD["Trg_PI"]/4;
+      //m_mDouble["relRefPhi"] = 0;
       // Rotate
       m_mDouble["relPhi0"] = Fitter3DUtility::rotatePhi(m_mDouble["phi0"], m_mDouble["relRefPhi"]);
       m_mVector["relPhi3D"] = vector<double> (4);
       for(unsigned iSt=0; iSt<4; iSt++) m_mVector["relPhi3D"][iSt] = Fitter3DUtility::rotatePhi(m_mVector["phi3D"][iSt], m_mDouble["relRefPhi"]);
-      //Reject low pt.
-      if(m_mDouble["rho"] > 67){
-        
-        // Constrain rho to 1600.
-        if(m_mDouble["rho"] > rhoMax) {
-          m_mDouble["rho"] = rhoMax;
-          m_mDouble["pt"] = rhoMax * 0.3 * 1.5 * 0.01;
-        }
 
-        // Change to Signals.
-        {
-          vector<tuple<string, double, int, double, double, int> > t_values = {
-            make_tuple("phi0", m_mDouble["relPhi0"], phiBitSize, phiMin, phiMax, 0),
-            make_tuple("phi_0", m_mVector["relPhi3D"][0], phiBitSize, phiMin, phiMax, 0),
-            make_tuple("phi_1", m_mVector["relPhi3D"][1], phiBitSize, phiMin, phiMax, 0),
-            make_tuple("phi_2", m_mVector["relPhi3D"][2], phiBitSize, phiMin, phiMax, 0),
-            make_tuple("phi_3", m_mVector["relPhi3D"][3], phiBitSize, phiMin, phiMax, 0),
-            make_tuple("rho", m_mDouble["rho"], rhoBitSize, rhoMin, rhoMax, 0),
-            make_tuple("iZError2_0", m_mVector["iZError2"][0], iError2BitSize, 0, iError2Max, 0),
-            make_tuple("iZError2_1", m_mVector["iZError2"][1], iError2BitSize, 0, iError2Max, 0),
-            make_tuple("iZError2_2", m_mVector["iZError2"][2], iError2BitSize, 0, iError2Max, 0),
-            make_tuple("iZError2_3", m_mVector["iZError2"][3], iError2BitSize, 0, iError2Max, 0),
-            make_tuple("charge",(int) (m_mDouble["charge"]==1 ? 1 : 0), 1, 0, 1, 0)
-          };
-          TRGCDCJSignal::valuesToMapSignals(t_values, m_commonData, m_mSignalStorage);
-        }
-        Fitter3DUtility::calZ(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
-        Fitter3DUtility::calS(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
-        Fitter3DUtility::rSFit(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
-        // Change to values.
-        vector<tuple<string, double, int, double, double, int> > resultValues;
-        {
-          vector<pair<string, int> > t_chooseSignals = {
-            make_pair("z0", 0), make_pair("cot",0), make_pair("chi2Sum",0)
-          };
-          TRGCDCJSignal::mapSignalsToValues(m_mSignalStorage, t_chooseSignals, resultValues);
-        }
-
-        // Post handling of signals.
-        // Name all signals.
-        if((*m_mSignalStorage.begin()).second.getName() == ""){
-          for(auto it = m_mSignalStorage.begin(); it != m_mSignalStorage.end(); ++it){
-            (*it).second.setName((*it).first);
-          }
-        }
-        ////// Dump all signals.
-        ////bool done = 0;
-        ////if((*m_mSignalStorage.begin()).second.getName() != "" && done==0){
-        ////  for(auto it = m_mSignalStorage.begin(); it != m_mSignalStorage.end(); ++it){
-        ////    (*it).second.dump();
-        ////  }
-        ////  done=1;
-        ////}
-
-
-        // Takes some time.
-        // Save values.
-        if(m_mBool["fRootFile"]) {
-          // Check if there is a name.
-          if((*m_mSignalStorage.begin()).second.getName() != ""){
-
-            // Save values to root file.
-            {
-              vector<pair<string, int> > chooseValues = {
-                make_pair("zz_0", m_mBool["fIsIntegerEffect"]),
-                make_pair("zz_1", m_mBool["fIsIntegerEffect"]),
-                make_pair("zz_2", m_mBool["fIsIntegerEffect"]),
-                make_pair("zz_3", m_mBool["fIsIntegerEffect"]),
-                make_pair("arcS_0", m_mBool["fIsIntegerEffect"]),
-                make_pair("arcS_1", m_mBool["fIsIntegerEffect"]),
-                make_pair("arcS_2", m_mBool["fIsIntegerEffect"]),
-                make_pair("arcS_3", m_mBool["fIsIntegerEffect"]),
-                make_pair("z0", m_mBool["fIsIntegerEffect"]),
-                make_pair("cot", m_mBool["fIsIntegerEffect"]),
-                make_pair("zChi2", m_mBool["fIsIntegerEffect"])
-              };
-              // outValues => [name, value, bitwidth, min, max, clock]
-              vector<tuple<string, double, int, double, double, int> > outValues;
-              TRGCDCJSignal::mapSignalsToValues(m_mSignalStorage, chooseValues, outValues);
-              HandleRoot::convertSignalValuesToMaps(outValues, m_mDouble, m_mVector);
-              // Save values to m_mDouble and m_mVector.
-            }
-          }
-        }
-
-        m_mBool["fVHDLFile"] = 0;
-        if(m_mBool["fVHDLFile"]) {
-          // Check if there is a name.
-          if((*m_mSignalStorage.begin()).second.getName() != ""){
-            // Saves to file only one time.
-            saveVhdlAndCoe();
-            // Saves values to memory. Wrote to file at terminate().
-            saveAllSignals();
-            saveIoSignals();
-          }
-        }
-
-        // Set track in trackListOut.
-        // Set Helix parameters 
-        TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0)); 
-        CLHEP::HepVector a(5); 
-        a = aTrack.helix().a(); 
-        aTrack.setFitted(1); 
-        if(m_mDouble["charge"]<0){
-          a[1] = fmod(m_mDouble["phi0"] + m_mConstD["Trg_PI"],2*m_mConstD["Trg_PI"]);
-        } else {
-          a[1] = m_mDouble["phi0"];
-        }
-        a[2] = 1/m_mDouble["pt"]*m_mDouble["charge"];
-        a[3] = m_mDouble["z0"];  
-        a[4] = m_mDouble["cot"]; 
-        helix.a(a); 
-        aTrack.setHelix(helix); 
-        aTrack.set2DFitChi2(m_mDouble["fit2DChi2"]);
-        aTrack.set3DFitChi2(m_mDouble["zChi2"]);
-
-      } else { //Reject low pt.
-        aTrack.setFitted(0);
+      // Constrain rho to rhoMin
+      if(m_mDouble["rho"] < rhoMin) {
+          m_mDouble["rho"] = rhoMin;
+          m_mDouble["pt"] = rhoMin * 0.3 * 1.5 * 0.01;
       }
+      // Constrain rho to rhoMax.
+      if(m_mDouble["rho"] > rhoMax) {
+        m_mDouble["rho"] = rhoMax;
+        m_mDouble["pt"] = rhoMax * 0.3 * 1.5 * 0.01;
+      }
+
+      // Change to Signals.
+      {
+        vector<tuple<string, double, int, double, double, int> > t_values = {
+          make_tuple("phi0", m_mDouble["relPhi0"], phiBitSize, phiMin, phiMax, 0),
+          make_tuple("phi_0", m_mVector["relPhi3D"][0], phiBitSize, phiMin, phiMax, 0),
+          make_tuple("phi_1", m_mVector["relPhi3D"][1], phiBitSize, phiMin, phiMax, 0),
+          make_tuple("phi_2", m_mVector["relPhi3D"][2], phiBitSize, phiMin, phiMax, 0),
+          make_tuple("phi_3", m_mVector["relPhi3D"][3], phiBitSize, phiMin, phiMax, 0),
+          make_tuple("rho", m_mDouble["rho"], rhoBitSize, rhoMin, rhoMax, 0),
+          make_tuple("iZError2_0", m_mVector["iZError2"][0], iError2BitSize, 0, iError2Max, 0),
+          make_tuple("iZError2_1", m_mVector["iZError2"][1], iError2BitSize, 0, iError2Max, 0),
+          make_tuple("iZError2_2", m_mVector["iZError2"][2], iError2BitSize, 0, iError2Max, 0),
+          make_tuple("iZError2_3", m_mVector["iZError2"][3], iError2BitSize, 0, iError2Max, 0),
+          make_tuple("charge",(int) (m_mDouble["charge"]==1 ? 1 : 0), 1, 0, 1, 0)
+        };
+        TRGCDCJSignal::valuesToMapSignals(t_values, m_commonData, m_mSignalStorage);
+      }
+      Fitter3DUtility::calZ(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
+      Fitter3DUtility::calS(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
+      Fitter3DUtility::rSFit(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
+      // Change to values.
+      vector<tuple<string, double, int, double, double, int> > resultValues;
+      {
+        vector<pair<string, int> > t_chooseSignals = {
+          make_pair("z0", 0), make_pair("cot",0), make_pair("chi2Sum",0)
+        };
+        TRGCDCJSignal::mapSignalsToValues(m_mSignalStorage, t_chooseSignals, resultValues);
+      }
+
+      // Post handling of signals.
+      // Name all signals.
+      if((*m_mSignalStorage.begin()).second.getName() == ""){
+        for(auto it = m_mSignalStorage.begin(); it != m_mSignalStorage.end(); ++it){
+          (*it).second.setName((*it).first);
+        }
+      }
+      ////// Dump all signals.
+      ////bool done = 0;
+      ////if((*m_mSignalStorage.begin()).second.getName() != "" && done==0){
+      ////  for(auto it = m_mSignalStorage.begin(); it != m_mSignalStorage.end(); ++it){
+      ////    (*it).second.dump();
+      ////  }
+      ////  done=1;
+      ////}
+
+
+      // Takes some time.
+      // Save values.
+      if(m_mBool["fRootFile"]) {
+        // Check if there is a name.
+        if((*m_mSignalStorage.begin()).second.getName() != ""){
+
+          // Save values to root file.
+          {
+            vector<pair<string, int> > chooseValues = {
+              make_pair("zz_0", m_mBool["fIsIntegerEffect"]),
+              make_pair("zz_1", m_mBool["fIsIntegerEffect"]),
+              make_pair("zz_2", m_mBool["fIsIntegerEffect"]),
+              make_pair("zz_3", m_mBool["fIsIntegerEffect"]),
+              make_pair("arcS_0", m_mBool["fIsIntegerEffect"]),
+              make_pair("arcS_1", m_mBool["fIsIntegerEffect"]),
+              make_pair("arcS_2", m_mBool["fIsIntegerEffect"]),
+              make_pair("arcS_3", m_mBool["fIsIntegerEffect"]),
+              make_pair("z0", m_mBool["fIsIntegerEffect"]),
+              make_pair("cot", m_mBool["fIsIntegerEffect"]),
+              make_pair("zChi2", m_mBool["fIsIntegerEffect"])
+            };
+            // outValues => [name, value, bitwidth, min, max, clock]
+            vector<tuple<string, double, int, double, double, int> > outValues;
+            TRGCDCJSignal::mapSignalsToValues(m_mSignalStorage, chooseValues, outValues);
+            HandleRoot::convertSignalValuesToMaps(outValues, m_mDouble, m_mVector);
+            // Save values to m_mDouble and m_mVector.
+          }
+        }
+      }
+
+      m_mBool["fVHDLFile"] = 0;
+      if(m_mBool["fVHDLFile"]) {
+        // Check if there is a name.
+        if((*m_mSignalStorage.begin()).second.getName() != ""){
+          // Saves to file only one time.
+          saveVhdlAndCoe();
+          // Saves values to memory. Wrote to file at terminate().
+          saveAllSignals();
+          saveIoSignals();
+        }
+      }
+
+      // Set track in trackListOut.
+      // Set Helix parameters 
+      TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0)); 
+      CLHEP::HepVector a(5); 
+      a = aTrack.helix().a(); 
+      aTrack.setFitted(1); 
+      if(m_mDouble["charge"]<0){
+        a[1] = fmod(m_mDouble["phi0"] + m_mConstD["Trg_PI"],2*m_mConstD["Trg_PI"]);
+      } else {
+        a[1] = m_mDouble["phi0"];
+      }
+      a[2] = 1/m_mDouble["pt"]*m_mDouble["charge"];
+      a[3] = m_mDouble["z0"];  
+      a[4] = m_mDouble["cot"]; 
+      helix.a(a); 
+      aTrack.setHelix(helix); 
+      aTrack.set2DFitChi2(m_mDouble["fit2DChi2"]);
+      aTrack.set3DFitChi2(m_mDouble["zChi2"]);
 
       ///////////////
       // Save values
@@ -1041,6 +1053,7 @@ namespace Belle2 {
     }
 
     // Fill information for axial layers
+    m_mVector["tsId"] = vector<double> (9);
     m_mVector["wirePhi"] = vector<double> (9);
     m_mVector["lutLR"] = vector<double> (9);
     m_mVector["LR"] = vector<double> (9);
@@ -1050,6 +1063,7 @@ namespace Belle2 {
       if(useAxSl[iAx] == 1) {
         const vector<TCLink *> & links = aTrack.links(iAx*2);
         const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
+        m_mVector["tsId"][iAx*2] = t_segment->localId();
         m_mVector["wirePhi"][iAx*2] = (double) t_segment->localId()/m_mConstV["nWires"][iAx*2]*4*m_mConstD["Trg_PI"];
         m_mVector["lutLR"][iAx*2] = t_segment->LUT()->getValue(t_segment->lutPattern());
         // mcLR should be removed.
@@ -1060,6 +1074,7 @@ namespace Belle2 {
         else if(m_mBool["fLRLUT"]==1) m_mVector["LR"][iAx*2] = m_mVector["lutLR"][iAx*2];
         else m_mVector["LR"][iAx*2] = 3;
       } else {
+        m_mVector["tsId"][iAx*2] = 9999;
         m_mVector["wirePhi"][iAx*2] = 9999;
         m_mVector["lutLR"][iAx*2] = 9999;
         // mcLR should be removed.

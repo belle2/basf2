@@ -9,8 +9,6 @@ class Hough3DFinder {
   public: 
     /// 3D finder constructor.
     Hough3DFinder(void);
-    /// 3D finder constructor that chooses which finder to use.
-    Hough3DFinder(int mode);
     /// 3D finder destructor.
     ~Hough3DFinder(void);
     /// Sets which 3D finder to use.

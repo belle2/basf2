@@ -214,6 +214,23 @@ double Fitter3DUtility::rotatePhi(double value, double refPhi) {
   return result;
 }
 
+double Fitter3DUtility::rotatePhi(double value, int refId, int nTSs) {
+  double refPhi = (double)refId/nTSs*2*M_PI;
+  return rotatePhi(value, refPhi);
+}
+
+// TODO rotatePhi range and rotateTSId range do not match.
+int Fitter3DUtility::rotateTsId(int value, int refId, int nTSs) {
+  int result = value - refId;
+  bool rangeOk = 0;
+  while(rangeOk==0){
+    if(result > nTSs) result -= nTSs;
+    else if(result < 0) result += nTSs;
+    else rangeOk = 1;
+  }
+  return result;
+}
+
 double Fitter3DUtility::calStAxPhi(int mysign, double anglest, double ztostraw, double rr, double rho, double myphi0){
   if(1==2) cout<<anglest<<ztostraw<<endl; // Removes warnings when compileing
 

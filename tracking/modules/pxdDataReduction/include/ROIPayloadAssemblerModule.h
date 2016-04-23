@@ -64,6 +64,7 @@ namespace Belle2 {
     unsigned int mSendAllDS; /**< Send all Data (no selection) downscaler; Workaround for missing ONSEN functionality */
     unsigned int mSendROIsDS; /**<  Send ROIs downscaler; Workaround for missing ONSEN functionality */
 
+    signed int m_triggerNumberShift; /**< ideally = 0. Workaround to find the pxd trigger number in the onsen for Testbeam 16*/
     void DESYremap(unsigned int& tmpRowMin, unsigned int& tmpRowMax, unsigned int& tmpColMin, unsigned int& tmpColMax);
 
   };

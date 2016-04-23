@@ -34,7 +34,8 @@ REG_MODULE(ROIPayloadAssembler)
 //                 Implementation
 //-----------------------------------------------------------------
 
-ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
+ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module(),
+  m_triggerNumberShift(0)
 {
   //Set module properties
   setDescription("This module assembles payload for the ROI in the correct format to be sent to the ONSEN");
@@ -51,6 +52,8 @@ ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
            9u);
   addParam("SendROIsDownscaler", mSendROIsDS,
            "Send ROIs downscaler; Workaround for missing ONSEN functionality, 0 never set, 1 alway set, 2 set in every second...", 3u);
+  addParam("triggerNumberShift", m_triggerNumberShift,
+           "Ideally = 0. Payload trigger number = event trigger number + triggerNumberShift", 0);
 }
 
 ROIPayloadAssemblerModule::~ROIPayloadAssemblerModule()
@@ -155,7 +158,7 @@ void ROIPayloadAssemblerModule::event()
   payload->setHeader(accepted, mSendAllDS  ? (evtNr % mSendAllDS) == 0 : 0, mSendROIsDS ? (evtNr % mSendROIsDS) == 0 : 0);
 
 //  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  payload->setTriggerNumber(eventMetaDataPtr->getEvent());
+  payload->setTriggerNumber(eventMetaDataPtr->getEvent() + m_triggerNumberShift);
 
 // Set run subrun exp number
   payload->setRunSubrunExpNumber(eventMetaDataPtr->getRun(), eventMetaDataPtr->getSubrun(), eventMetaDataPtr->getExperiment());

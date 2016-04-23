@@ -60,6 +60,27 @@
     </Content>
   </DetectorComponent>
   
+  <!-- Magnetic field inside PCMag @ DESY -->
+  <DetectorComponent name="MagneticFieldConstant" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="False">
+    <Description>The magnetic field description for PCMAG Superconducting magnet
+      for common PXD/SVD beam test at DESY April 2016</Description>
+    <Version>0</Version>
+    <Creator>GeoMagneticField</Creator>
+    <Content>
+      <Components>
+        <Component type="Constant">
+        <X>0</X>
+        <Y>0</Y>
+        <Z>0.975</Z>       
+        <MaxR unit="mm">599.9</MaxR>
+        <MinZ unit="mm">-799.9</MinZ>
+        <MaxZ unit="mm">799.9</MaxZ>
+        </Component>      
+      </Components>
+    </Content>
+  </DetectorComponent>
+
+  
   <!-- Subdedectors: PXD -->
   <!-- modified copy of pxd/data/PXD-phase2.xml -->
   <DetectorComponent name="PXD" xmlns:xi="http://www.w3.org/2001/XInclude">

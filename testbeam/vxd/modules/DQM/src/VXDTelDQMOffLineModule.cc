@@ -355,7 +355,7 @@ void VXDTelDQMOffLineModule::defineHisto()
 
   for (int iL = 0; iL < c_nTBPlanes; iL++) {
     int i = iL;
-    if (iL >= c_nVXDPlanes) i = c_nTBPlanes + c_nVXDPlanes - iL - c_firstTBPlane;  // reorder of telescopes
+//    if (iL >= c_nVXDPlanes) i = c_nTBPlanes + c_nVXDPlanes - iL - c_firstTBPlane;  // reorder of telescopes
     int iPlane1 = indexToPlaneTB(i);
     float vSize1, uSize1;
     int nStripsU1, nStripsV1;
@@ -373,16 +373,18 @@ void VXDTelDQMOffLineModule::defineHisto()
     nStripsU1 = uSize1 * 10;  // step 1 mm
     for (int jL = 0; jL < c_nTBPlanes; jL++) {
       int j = jL;
-      if (jL >= c_nVXDPlanes) j = c_nTBPlanes + c_nVXDPlanes - jL - c_firstTBPlane;  // reorder of telescopes
+//      if (jL >= c_nVXDPlanes) j = c_nTBPlanes + c_nVXDPlanes - jL - c_firstTBPlane;  // reorder of telescopes
       int iPlane2 = indexToPlaneTB(j);
       float vSize2, uSize2;
       int nStripsU2, nStripsV2;
       int indexOrd1 = iPlane1;
-      if (indexOrd1 > c_nVXDPlanes) indexOrd1 = c_nTelPlanes - (indexOrd1 - c_nVXDPlanes) +
-                                                  c_firstTelPlane;  // reorder telescopes to more native order
+//      if (indexOrd1 > c_nVXDPlanes) indexOrd1 = c_nTelPlanes - (indexOrd1 - c_nVXDPlanes) +
+//                                                  c_firstTelPlane;  // reorder telescopes to more native order
+      if (indexOrd1 > c_nVXDPlanes) indexOrd1 = indexOrd1 - c_nVXDPlanes;  // reorder telescopes to more native order
       int indexOrd2 = iPlane2;
-      if (indexOrd2 > c_nVXDPlanes) indexOrd2 = c_nTelPlanes - (indexOrd2 - c_nVXDPlanes) +
-                                                  c_firstTelPlane;  // reorder telescopes to more native order
+//      if (indexOrd2 > c_nVXDPlanes) indexOrd2 = c_nTelPlanes - (indexOrd2 - c_nVXDPlanes) +
+//                                                  c_firstTelPlane;  // reorder telescopes to more native order
+      if (indexOrd2 > c_nVXDPlanes) indexOrd2 = indexOrd2 - c_nVXDPlanes;  // reorder telescopes to more native order
       if (j >= c_nVXDPlanes) {  // Tel
         vSize2 = 32.0;  // cm
         uSize2 = 12.0;   // cm
@@ -419,8 +421,10 @@ void VXDTelDQMOffLineModule::defineHisto()
         }
         if (m_SaveOtherHistos) if (((i == 5) && (j == 6)) || ((i == 6) && (j == 5))) DirVXDGlobCorrels->cd(); //they are not neighboar
         if (m_SaveOtherHistos) if (((i == 8) && (j == 9)) || ((i == 9) && (j == 8))) DirVXDGlobCorrels->cd(); //they are not neighboar tels
-        if (((i == 5) && (j == 8)) || ((i == 8) && (j == 5))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
-        if (((i == 0) && (j == 9)) || ((i == 9) && (j == 0))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
+        if (((i == 5) && (j == 9)) || ((i == 9) && (j == 5))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
+        if (((i == 0) && (j == 8)) || ((i == 8) && (j == 0))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
+//        if (((i == 5) && (j == 8)) || ((i == 8) && (j == 5))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
+//        if (((i == 0) && (j == 9)) || ((i == 9) && (j == 0))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
 
         string nameSP = str(format("VXD_L%1%_VXD_L%2%_CorrelationMapU") % indexOrd1 % indexOrd2);
         string titleSP = str(format("TB2016 Correlation map VXD %1% VXD %2% space points in U") % indexOrd1 % indexOrd2);
@@ -452,8 +456,10 @@ void VXDTelDQMOffLineModule::defineHisto()
         }
         if (m_SaveOtherHistos) if (((i == 5) && (j == 6)) || ((i == 6) && (j == 5))) DirVXDGlobCorrels->cd(); //they are not neighboar
         if (m_SaveOtherHistos) if (((i == 8) && (j == 9)) || ((i == 9) && (j == 8))) DirVXDGlobCorrels->cd(); //they are not neighboar tels
-        if (((i == 5) && (j == 8)) || ((i == 8) && (j == 5))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
-        if (((i == 0) && (j == 9)) || ((i == 9) && (j == 0))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
+        if (((i == 5) && (j == 9)) || ((i == 9) && (j == 5))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
+        if (((i == 0) && (j == 8)) || ((i == 8) && (j == 0))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
+//        if (((i == 5) && (j == 8)) || ((i == 8) && (j == 5))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
+//        if (((i == 0) && (j == 9)) || ((i == 9) && (j == 0))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
 
         string nameSP = str(format("VXD_L%1%_VXD_L%2%_CorrelationMapV") % indexOrd1 % indexOrd2);
         string titleSP = str(format("TB2016 Correlation map VXD %1% VXD %2% space points in V") % indexOrd1 % indexOrd2);

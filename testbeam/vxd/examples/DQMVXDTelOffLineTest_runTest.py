@@ -72,7 +72,7 @@ TelClust = register_module('TelClusterizer')
 vxd_dqm = register_module('VXDDQMOnLine')
 vxd_dqm.param('SaveOtherHistos', 1)
 vxd_dqm.param('SwapPXD', 0)
-vxd_dqm.param('Reduce1DCorrelHistos', 1)
+vxd_dqm.param('Reduce1DCorrelHistos', 0)
 
 # VXD+Tel off line DQM module
 vxdTel_dqm = register_module('VXDTelDQMOffLine')

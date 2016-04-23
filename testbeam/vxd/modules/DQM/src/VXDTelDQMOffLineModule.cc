@@ -74,6 +74,7 @@ void VXDTelDQMOffLineModule::defineHisto()
 
   DirTelDetailBasic->cd();
 
+
   for (int i = 0; i < c_nTelPlanes; i++) {
     m_firedTelSen[i] = NULL;
     m_clustersTelSen[i] = NULL;
@@ -412,12 +413,12 @@ void VXDTelDQMOffLineModule::defineHisto()
       } else if (i < j) { // correlations for u
         if ((!m_SaveOtherHistos) && (abs(i - j) > 1)) continue;
         if (abs(i - j) > 1) {
-          DirVXDGlobCorrels->cd();
+          if (m_SaveOtherHistos) DirVXDGlobCorrels->cd();
         } else {
           DirVXDGlobCorrelsNeigh->cd();
         }
-        if (((i == 5) && (j == 6)) || ((i == 6) && (j == 5))) DirVXDGlobCorrels->cd(); //they are not neighboar
-        if (((i == 8) && (j == 9)) || ((i == 9) && (j == 8))) DirVXDGlobCorrels->cd(); //they are not neighboar tels
+        if (m_SaveOtherHistos) if (((i == 5) && (j == 6)) || ((i == 6) && (j == 5))) DirVXDGlobCorrels->cd(); //they are not neighboar
+        if (m_SaveOtherHistos) if (((i == 8) && (j == 9)) || ((i == 9) && (j == 8))) DirVXDGlobCorrels->cd(); //they are not neighboar tels
         if (((i == 5) && (j == 8)) || ((i == 8) && (j == 5))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
         if (((i == 0) && (j == 9)) || ((i == 9) && (j == 0))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
 
@@ -445,12 +446,12 @@ void VXDTelDQMOffLineModule::defineHisto()
       } else {       // correlations for v
         if ((!m_SaveOtherHistos) && (abs(i - j) > 1)) continue;
         if (abs(i - j) > 1) {
-          DirVXDGlobCorrels->cd();
+          if (m_SaveOtherHistos) DirVXDGlobCorrels->cd();
         } else {
           DirVXDGlobCorrelsNeigh->cd();
         }
-        if (((i == 5) && (j == 6)) || ((i == 6) && (j == 5))) DirVXDGlobCorrels->cd(); //they are not neighboar
-        if (((i == 8) && (j == 9)) || ((i == 9) && (j == 8))) DirVXDGlobCorrels->cd(); //they are not neighboar tels
+        if (m_SaveOtherHistos) if (((i == 5) && (j == 6)) || ((i == 6) && (j == 5))) DirVXDGlobCorrels->cd(); //they are not neighboar
+        if (m_SaveOtherHistos) if (((i == 8) && (j == 9)) || ((i == 9) && (j == 8))) DirVXDGlobCorrels->cd(); //they are not neighboar tels
         if (((i == 5) && (j == 8)) || ((i == 8) && (j == 5))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
         if (((i == 0) && (j == 9)) || ((i == 9) && (j == 0))) DirVXDGlobCorrelsNeigh->cd();  // VXD-Tel neighboar
 
@@ -514,31 +515,33 @@ void VXDTelDQMOffLineModule::initialize()
 void VXDTelDQMOffLineModule::beginRun()
 {
   // Just to make sure, reset all the histograms.
-  for (int iS = 0; iS < c_MaxSensorsInSVDPlane; iS++) {
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
-      m_firedUSen[i]->Reset();
-      m_firedVSen[i]->Reset();
-      m_clustersUSen[i]->Reset();
-      m_clustersVSen[i]->Reset();
-      m_hitMapUSen[i]->Reset();
-      m_hitMapVSen[i]->Reset();
-      m_chargeUSen[i]->Reset();
-      m_chargeVSen[i]->Reset();
-      m_seedUSen[i]->Reset();
-      m_seedVSen[i]->Reset();
-      m_sizeUSen[i]->Reset();
-      m_sizeVSen[i]->Reset();
-      m_timeUSen[i]->Reset();
-      m_timeVSen[i]->Reset();
+  /*
+    for (int iS = 0; iS < c_MaxSensorsInSVDPlane; iS++) {
+      for (int i = 0; i < c_nSVDPlanes; i++) {
+        if (iS >= getSensorsInLayer(c_firstSVDPlane + i)) continue;
+        m_firedUSen[i]->Reset();
+        m_firedVSen[i]->Reset();
+        m_clustersUSen[i]->Reset();
+        m_clustersVSen[i]->Reset();
+        m_hitMapUSen[i]->Reset();
+        m_hitMapVSen[i]->Reset();
+        m_chargeUSen[i]->Reset();
+        m_chargeVSen[i]->Reset();
+        m_seedUSen[i]->Reset();
+        m_seedVSen[i]->Reset();
+        m_sizeUSen[i]->Reset();
+        m_sizeVSen[i]->Reset();
+        m_timeUSen[i]->Reset();
+        m_timeVSen[i]->Reset();
+      }
     }
-  }
-  for (int i = 0; i < c_nTBPlanes; i++) {
-    for (int j = 0; j < c_nTBPlanes; j++) {
-      if (abs(i - j) > 1) continue;
-      m_correlations[c_nTBPlanes * j + i]->Reset();
+    for (int i = 0; i < c_nTBPlanes; i++) {
+      for (int j = 0; j < c_nTBPlanes; j++) {
+  //      if (abs(i - j) > 1) continue;
+        m_correlations[c_nTBPlanes * j + i]->Reset();
+      }
     }
-  }
+  */
 }
 
 

@@ -199,7 +199,7 @@ namespace Belle2 {
       return nSensors;
     }
 
-    int m_SaveOtherHistos = 0;            /**< flag <0,1> for creation of correlation plots for non-neighboar layers */
+    int m_SaveOtherHistos = 1;            /**< flag <0,1> for creation of correlation plots for non-neighboar layers */
     int m_SwapPXD = 0;                    /**< flag <0,1> very special case for swap of u-v coordinates */
     int m_SwapTel = 0;                    /**< flag <0,1> very special case for swap of u-v coordinates */
 

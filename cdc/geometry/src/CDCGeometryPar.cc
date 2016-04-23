@@ -34,8 +34,14 @@ CDCGeometryPar& CDCGeometryPar::Instance()
   return *m_B4CDCGeometryParDB;
 }
 
+#if defined(CDC_T0_FROM_DB)
+CDCGeometryPar::CDCGeometryPar() : m_t0fromDB()
+{
+  m_t0fromDB.addCallback(this, &CDCGeometryPar::setT0);
+#else
 CDCGeometryPar::CDCGeometryPar()
 {
+#endif
   clear();
   read();
 }
@@ -286,8 +292,13 @@ void CDCGeometryPar::read()
     //Read propagation speed
     readPropSpeed(gbxParams);
 
-    //Read t0
+#if defined(CDC_T0_FROM_DB)
+    //Set t0 (from DB)
+    setT0();
+#else
+    //Read t0 (from file)
     readT0(gbxParams);
+#endif
 
     //Read time-walk coefficient
     readChMap(gbxParams);
@@ -853,6 +864,20 @@ void CDCGeometryPar::readChMap(const GearDir gbxParams)
 
   ifs.close();
 }
+
+
+#if defined(CDC_T0_FROM_DB)
+// Set t0 (from DB)
+void CDCGeometryPar::setT0()
+{
+  for (auto ent : m_t0fromDB) {
+    unsigned short iCL  = ent.getILayer();
+    unsigned short iW  = ent.getIWire();
+    m_t0[iCL][iW] = ent.getT0();
+    //    std::cout <<"t0DB"<<  iCL <<" "<< iW <<" "<< ent.getT0() << std::endl;
+  }
+}
+#endif
 
 
 void CDCGeometryPar::Print() const

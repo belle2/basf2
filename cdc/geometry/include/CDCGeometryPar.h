@@ -13,7 +13,10 @@
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/database/DBArray.h>
+
 #include <cdc/dataobjects/WireID.h>
+#include <cdc/dbobjects/CDCTimeZero.h>
 
 #include <vector>
 #include <string>
@@ -99,12 +102,16 @@ namespace Belle2 {
       void readPropSpeed(const GearDir, int mode = 0);
 
       /**
-       * Read t0 parameter.
+       * Read t0 parameters (from a file).
        * @param GearDir Gear Dir.
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
-
       void readT0(const GearDir, int mode = 0);
+
+      /**
+       * Set t0 parameters (from DB)
+       */
+      void setT0();
 
       /**
        * Read channel map between wire-id and electronics-id.
@@ -816,6 +823,10 @@ namespace Belle2 {
       double m_nominalPropSpeed;   /*!< Nominal propagation speed of the sense wire (27.25 cm/nsec). */
       double m_nominalSpaceResol;  /*!< Nominal spacial resolution (0.0130 cm). */
       double m_maxSpaceResol;      /*!< 10 times Nominal spacial resolution. */
+
+#if defined(CDC_T0_FROM_DB)
+      DBArray<CDCTimeZero> m_t0fromDB; /*!< t0 taken from DB. */
+#endif
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 

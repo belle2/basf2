@@ -40,6 +40,7 @@ iTopRawConverterSRootModule::iTopRawConverterSRootModule() : Module()
 {
   setDescription("This module is used to upack the raw data from the testbeam and crt data");
   addParam("forceTrigger0xF", m_forceTrigger0xF, "Forcing all trigger bits to 0xF", false);
+  addParam("headerlessBlob", m_headerlessBlob, "write out data without belle2link headers", string(""));
 
   m_WfPacket = nullptr;
   m_EvtPacket = nullptr;
@@ -63,16 +64,25 @@ iTopRawConverterSRootModule::initialize()
   m_filedata_ptr.registerInDataStore();
 }
 
+
 void
 iTopRawConverterSRootModule::beginRun()
 {
   m_filedata_ptr.create();
   m_evt_no = 0;
+  if (not m_headerlessBlob.empty()) {
+    B2INFO("Opening headerless file " << m_headerlessBlob);
+    m_headerlessBlobFile.open(m_headerlessBlob, std::ofstream::out | std::ofstream::binary);
+  }
 }
 
 void
 iTopRawConverterSRootModule::terminate()
 {
+  if (m_headerlessBlobFile.is_open()) {
+    B2INFO("Closing file " << m_headerlessBlob);
+    m_headerlessBlobFile.close();
+  }
 }
 
 
@@ -99,7 +109,7 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
   packet_word_t wavePacket[WAVE_PACKET_SIZE];
 
   packet_word_t word;
-  int prev_pos = in.tellg();
+  // int prev_pos = in.tellg();
   // in.seekg(0, in.end);
   // int length = in.tellg();
   // in.seekg(prev_pos);
@@ -122,8 +132,9 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
         B2FATAL("Could not recover from data corruption... giving up.");
       }
     }
-    prev_pos = in.tellg();
-    in.seekg(prev_pos - 2 * sizeof(int));
+    // we found the header. Roll back to the beginning of the header and try again
+    in.seekg(- 2 * sizeof(int), ios_base::cur);
+
     in.read(reinterpret_cast<char*>(&cpr_hdr), sizeof(cpr_hdr));
     B2DEBUG(1, "cpr_hdr\n\tformat: 0x" << hex << (int)cpr_hdr.version
             << "\n\tblock words: 0x" << (int)cpr_hdr.block_words
@@ -142,6 +153,15 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
             << dec);
 
   }
+  if (m_headerlessBlobFile.is_open()) {
+    ifstream::pos_type prev_pos = in.tellg();
+    // we know we have read a good header.
+    // roll back to just befor the header and write file
+    in.seekg(- 2 * sizeof(int), ios_base::cur);
+    m_headerlessBlobFile << in.rdbuf();
+    B2DEBUG(1, "Headerless event written");
+    in.seekg(prev_pos);
+  }
 
   // // identify HSLB buffer sizes
   // // determine number of HSLBs in the data stream
@@ -159,8 +179,6 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
   else if (!bufsize[3])  {maxhslb = 3;}
   else          {maxhslb = 4;}
   B2DEBUG(1, "max hslb: " << maxhslb);
-  //
-  //
   eventPacket[0] = 1001;
   eventPacket[1] = m_scrod;
   eventPacket[2] = cpr_hdr.version;
@@ -203,7 +221,7 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
 
     // Check to see if this looks like selective readout or not...
     if (trigPattern == 0x0) {
-      prev_pos = in.tellg();
+      ifstream::pos_type prev_pos = in.tellg();
       packet_word_t word1 = readWordUnique(in, word);
       int scrod1 = (word1 >> 9) & 0x7F; // should be a scrod id...
       packet_word_t word2 = readWordUnique(in, word1);
@@ -338,7 +356,6 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
     B2WARNING("Bad copper footer found.  Marking event as corrupt.");
     m_evtheader_ptr->SetFlag(1003);
   }
-  // prev_pos = in.tellg();
   return 0;
 }
 

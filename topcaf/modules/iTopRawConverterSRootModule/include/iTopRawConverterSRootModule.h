@@ -2,7 +2,7 @@
 #define iTopRawConverterSRootModule_H
 
 #include <istream>
-
+#include <fstream>
 #include <framework/core/Module.h>
 #include <topcaf/dataobjects/EventHeaderPacket.h>
 #include <topcaf/dataobjects/EventWaveformPacket.h>
@@ -95,6 +95,8 @@ namespace Belle2 {
     StoreArray<EventWaveformPacket>  m_evtwaves_ptr;
     StoreObjPtr<topFileMetaData>     m_filedata_ptr;
     bool m_forceTrigger0xF;
+    std::string m_headerlessBlob;
+    std::ofstream m_headerlessBlobFile;
 
     CPR_hdr cpr_hdr;
     HSLB_hdr hslb_hdr;

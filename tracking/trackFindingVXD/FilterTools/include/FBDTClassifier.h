@@ -11,8 +11,7 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-// #include <inc/FBDT.h> // externals version (needs an update!)
-#include <tracking/trackFindingVXD/tmpFastBDT/FastBDT.h> // temporary copy with necessary changes
+#include <FastBDT.h>
 
 #include <tracking/trackFindingVXD/FilterTools/FBDTClassifierHelper.h>
 #include <tracking/trackFindingVXD/FilterTools/DecorrelationMatrix.h>
@@ -39,7 +38,7 @@ namespace Belle2 {
     FBDTClassifier() { ; }// = default; /**< default constructor */
 
     /** constructor from three main parts. (for testing purposes mainly) */
-    FBDTClassifier(tmpFastBDT::Forest forest, std::vector<tmpFastBDT::FeatureBinning<double> > fB, Belle2::DecorrelationMatrix<9> dM) :
+    FBDTClassifier(FastBDT::Forest forest, std::vector<FastBDT::FeatureBinning<double> > fB, Belle2::DecorrelationMatrix<9> dM) :
       m_forest(forest), m_featBins(fB), m_decorrMat(dM) { ; }
 
     ~FBDTClassifier() { ; } /**< TODO destructor */
@@ -65,19 +64,19 @@ namespace Belle2 {
     void writeToStream(std::ostream& os) const;
 
     /** get the forest */
-    tmpFastBDT::Forest getForest() const { return m_forest; }
+    FastBDT::Forest getForest() const { return m_forest; }
 
     /** get the feature binnings */
-    std::vector<tmpFastBDT::FeatureBinning<double> > getFeatureBinnings()  const { return m_featBins; }
+    std::vector<FastBDT::FeatureBinning<double> > getFeatureBinnings()  const { return m_featBins; }
 
     /** get the decorrelation matrix */
     Belle2::DecorrelationMatrix<9> getDecorrelationMatrix() const { return m_decorrMat; }
 
   private:
 
-    tmpFastBDT::Forest m_forest{}; /**< the forest used for classification */
+    FastBDT::Forest m_forest{}; /**< the forest used for classification */
 
-    std::vector<tmpFastBDT::FeatureBinning<double> > m_featBins{}; /**< the feature binnings corresponding to the BDT */
+    std::vector<FastBDT::FeatureBinning<double> > m_featBins{}; /**< the feature binnings corresponding to the BDT */
 
     Belle2::DecorrelationMatrix<Ndims> m_decorrMat{}; /**< the decorrelation matrix used in this classifier */
 

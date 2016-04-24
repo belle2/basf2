@@ -14,7 +14,8 @@ env['LIBS'] = [
     'genfit2',
     'EG',
     '$ROOT_LIBS',
-    'tracking_v0Finding_dataobjects'
+    'tracking_v0Finding_dataobjects',
+    'FastBDT_shared',
     ]
 
 Return('env')

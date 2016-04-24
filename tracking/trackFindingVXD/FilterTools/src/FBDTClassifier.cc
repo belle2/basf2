@@ -9,12 +9,9 @@
 **************************************************************************/
 
 #include <tracking/trackFindingVXD/FilterTools/FBDTClassifier.h>
-#include <algorithm> // std::move
-#include <tracking/spacePointCreation/SpacePoint.h> // needed for explicit instantiation
 #include <framework/logging/Logger.h>
 
-// for development! change this to externals version!
-#include <tracking/trackFindingVXD/tmpFastBDT/IO.h>
+#include <IO.h>
 
 using namespace Belle2;
 using namespace std;
@@ -23,8 +20,11 @@ template<size_t Ndims>
 void FBDTClassifier<Ndims>::readFromStream(std::istream& is)
 {
   m_featBins.clear(); // clear possibly present feature Binning
+  B2DEBUG(50, "Reading the FeatureBinnings");
   is >> m_featBins;
-  m_forest = tmpFastBDT::readForestFromStream(is);
+  B2DEBUG(50, "Reading the Forest");
+  m_forest = FastBDT::readForestFromStream(is);
+  B2DEBUG(50, "Reading the DecorrelationMatrix");
   if (!m_decorrMat.readFromStream(is)) { // for some reason this does not stop if there is no decor matrix
     B2ERROR("Reading in the decorrelation matrix did not work! The decorrelation matrix of this classifier will be set to identity!");
     m_decorrMat = DecorrelationMatrix<9>();
@@ -34,8 +34,11 @@ void FBDTClassifier<Ndims>::readFromStream(std::istream& is)
 template<size_t Ndims>
 void FBDTClassifier<Ndims>::writeToStream(std::ostream& os) const
 {
+  B2DEBUG(50, "Reading the FeatureBinnings");
   os << m_featBins << std::endl;
+  B2DEBUG(50, "Reading the Forest");
   os << m_forest << std::endl;
+  B2DEBUG(50, "Reading the DecorrelationMatrix");
   os << m_decorrMat.print() << std::endl;
 }
 
@@ -69,13 +72,13 @@ void FBDTClassifier<Ndims>::train(const std::vector<Belle2::FBDTTrainSample<Ndim
   std::vector<unsigned int> nBinningLevels;
   m_featBins.clear(); // clear the feature binnings (if present)
   for (auto featureVec : data) {
-    m_featBins.push_back(tmpFastBDT::FeatureBinning<double>(nBinCuts, featureVec.begin(), featureVec.end()));
+    m_featBins.push_back(FastBDT::FeatureBinning<double>(nBinCuts, featureVec.begin(), featureVec.end()));
     nBinningLevels.push_back(nBinCuts);
   }
 
   // have to use the decorrelated data for training!!!
   B2DEBUG(10, "FBDTClassifier::train(): Creating the EventSamples");
-  tmpFastBDT::EventSample eventSample(nSamples, Ndims, nBinningLevels);
+  FastBDT::EventSample eventSample(nSamples, Ndims, nBinningLevels);
   for (size_t iS = 0; iS < nSamples; ++iS) {
     std::vector<unsigned> bins(Ndims);
     for (size_t iF = 0; iF < Ndims; ++iF) {
@@ -85,10 +88,10 @@ void FBDTClassifier<Ndims>::train(const std::vector<Belle2::FBDTTrainSample<Ndim
   }
 
   B2DEBUG(1, "FBDTClassifier::train(): Training the FastBDT");
-  tmpFastBDT::ForestBuilder fbdt(eventSample, nTrees, shrinkage, ratio, depth); // train FastBDT
+  FastBDT::ForestBuilder fbdt(eventSample, nTrees, shrinkage, ratio, depth); // train FastBDT
 
   B2DEBUG(100, "FBDTClassifier::train(): getting FastBDT to internal member");
-  tmpFastBDT::Forest forest(fbdt.GetF0(), fbdt.GetShrinkage());
+  FastBDT::Forest forest(fbdt.GetF0(), fbdt.GetShrinkage());
   for (const auto& tree : fbdt.GetForest()) {
     forest.AddTree(tree);
   }

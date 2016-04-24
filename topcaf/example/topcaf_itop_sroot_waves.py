@@ -51,7 +51,7 @@ else:
 # print('Writing output root file to ' + outputFile)
 output = register_module('RootOutput')
 outputDict = {'outputFileName': outputFile,
-              'excludeBranchNames': ["EventWaveformPackets"]}
+              'excludeBranchNames': ["RawDataBlocks"]}
 output.param(outputDict)
 
 pedmodule = register_module('Pedestal')
@@ -73,5 +73,5 @@ main.add_module(itopeventconverter)
 main.add_module(pedmodule)
 main.add_module(mergemodule)
 main.add_module(plotsmodule)
-# main.add_module(output)
+main.add_module(output)
 process(main)

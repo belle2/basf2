@@ -29,9 +29,6 @@ namespace Belle2 {
     //FIXME temporarily need to keep track of events in a file until event builder works
     int m_iEvent; // keep track of iterations within run
     TH1F* m_samples;//Plot all ADC sample values.
-    TH1F* scrod;
-    TH1F* m_asics;
-    TH1F* m_channel;
     TH2F* m_hitmap;
     TH1F* m_scrod_id;
     TH1F* m_asic_row;

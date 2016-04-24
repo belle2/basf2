@@ -146,7 +146,7 @@ void SampleTimeCalibrationV3Module::event()
   digit_ptr.isRequired();
 
   if (digit_ptr) {
-    if ((m_mode == 0)) { // Calculate calibration
+    if (m_mode == 0) { // Calculate calibration
       std::vector<int> cal_pulses;
       for (int c = 0; c < digit_ptr.getEntries(); c++) { // First id the cal pulse for each asic.
         if (digit_ptr[c]->GetFlag() == 10) {
@@ -426,4 +426,3 @@ double SampleTimeCalibrationV3Module::CalibrateWaveform(TOPCAFDigit* in_digit)
   }
 
 }
-

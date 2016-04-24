@@ -34,6 +34,7 @@ TOPCAFDigit::TOPCAFDigit()
   , m_corr_time(0)
   , m_boardstack(-1)
   , m_flag(0)
+  , m_q(0)
 {
 }
 
@@ -58,6 +59,10 @@ TOPCAFDigit::TOPCAFDigit(const EventWaveformPacket* in_wp)
 
 // default values
   m_quality = -1;
+  m_amp = 0;
+  m_q = 0;
+  m_time = 0;
+  m_nsamples = -1;
   m_time_bin = -1;
   m_pixel_id = -1;
   m_pmt_id = -1;

@@ -53,8 +53,8 @@ SVDUNPACK.param('xmlMapFileName', 'testbeam/vxd/data/TB_svd_mapping.xml')
 
 PXDUNPACK = register_module('PXDUnpacker')
 PXDUNPACK.param('RemapFlag', True)
-PXDUNPACK.param('RemapLUT_IB_OF', '/home/gcasa/gcasa/rTB2016/testbeam/vxd/data/LUT_IB_OF.csv')
-PXDUNPACK.param('RemapLUT_IF_OB', '/home/gcasa/gcasa/rTB2016/testbeam/vxd/data/LUT_IF_OB.csv')
+PXDUNPACK.param('RemapLUT_IB_OF', os.environ.get('BELLE2_LOCAL_DIR') + '/testbeam/vxd/data/LUT_IB_OF.csv')
+PXDUNPACK.param('RemapLUT_IF_OB', os.environ.get('BELLE2_LOCAL_DIR') + '/testbeam/vxd/data/LUT_IF_OB.csv')
 
 # Digitizer
 SVDDIGISORTER = register_module('SVDDigitSorter')
@@ -71,6 +71,9 @@ else:
     SVDCLUST.param('TanLorentz_electrons', 0.)
 
 PXDCLUST = register_module('PXDClusterizer')
+# PXDCLUST.param('NoiseSN', 0.)
+# PXDCLUST.param('SeedSN', 0.)
+# PXDCLUST.param('ClusterSN', 0.)
 
 # VXDTF
 vxdtf = register_module('VXDTF')
@@ -198,8 +201,8 @@ roiprod.param(param_roiprod)
 # Input and Output
 
 # Input module
-# input = register_module ('SeqRootInput' )
-input = register_module('RootInput')
+input = register_module('SeqRootInput')
+# input = register_module ('RootInput' )
 
 # Output module
 output = register_module('RootOutput')

@@ -179,16 +179,16 @@ void Belle2::ECL::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg
         it = it > it_h ? it_h : it;
         it = it < it_l ? it_l : it;
       } else {
-        B2 = B1 >> (k_b - 13);
+        B2 = B1 >> (k_b - 11);
         B5 = B1 >> (k_b - 9);
 
 
         B1 = B2 >> 13;
-        B2 += (A1 << 13);
+        B2 += (A1 << 11);
         B3 = (B2 / A1);
 
 
-        T = ((it) << 3) + ((it) << 2) + (((B3 >> 1) + (B3) + 2) >> 2) - 3072;
+        T = ((it) << 3) + ((it) << 2) + ((B3 + 1) >> 1) + B3 - 3072;
 
         T = ((215 - *ttrig2) << 3) - 4 - T;
 

@@ -227,7 +227,7 @@ void bit(int num, char* inputPath)
   bitfg43 = 19;
 
 
-  const int mapsize = 252;
+  const int mapsize = 217;
 
   short int bfg31[mapsize];
 

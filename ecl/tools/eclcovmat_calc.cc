@@ -10,58 +10,16 @@
 #include <fstream>
 #include <iomanip>
 #include <vector>
-#include "TCL1.h"
 #include <cassert>
 #include <framework/utilities/FileSystem.h>
 #include <ecl/digitization/WrapArray2D.h>
+#include <Eigen/Dense>
 
 using namespace std;
 using namespace Belle2;
 using namespace ECL;
+using namespace Eigen;
 
-// function for inversion simmetric matrix
-void sim(double* ss, int* N, double* aa, double* sb)
-{
-  int i, k, j;
-  int n, n1, n2;
-
-  double dbs;
-
-  n = *N;
-  n1 = n * (n + 1) / 2;
-  n2 = n * n;
-
-  vector<double> svec(n1, 0), rvec(n1, 0);
-  double* s = & svec[0];
-  double* r = & rvec[0];
-
-  for (i = 0; i < n2; i++) {
-    *(aa + i) = *(ss + i);
-  }
-
-  TCL::trpck(aa, s, *N);
-  TCL::trsinv(s, r, *N);
-  TCL::trupck(r, aa, *N);
-
-  *sb = 0.;
-  for (j = 0; j < n; j++) {
-    for (i = 0; i < n; i++) {
-      dbs = 0.;
-      for (k = 0; k < n; k++) {
-        dbs = dbs + *(ss + i + k * n) * (*(aa + n * j + k));
-      }
-      if (!(i == j) && fabs(dbs) > *sb) {*sb = fabs(dbs);}
-      if (i == j && fabs(dbs - 1.) > *sb) {*sb = fabs(1. - dbs);}
-    }
-  }   // for j
-
-
-  for (j = 0; j < n2; j++) {
-
-    *(ss + j) = *(aa + j);
-
-  }
-}
 
 class DoubleArray3D {
 public:
@@ -120,25 +78,22 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
   fChain.SetBranchAddress("nhits", &nhits, &b_nhits);
   fChain.SetBranchAddress("hitA", hitA, &b_hitA);
 
-  double dec;
 
-  int N1;
-  N1 = 16;
   double delta;
   delta = 0.;
+
 
   // not used commented to silence warning
   // double SI[16][16];
   // double IS[16][16];
 
-  double MI[16][16];
   double IM[16][16];
   double UU[16][16];
   double FF[16][16];
 
 
 
-  const int mapmax = 252;
+  const int mapmax = 217;
 
   /*
   typedef boost::multi_array<double, 3> array3d;
@@ -152,6 +107,11 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
   WrapArray2D<double> Q(mapmax, 16);
   vector<double> Mean(8736, 0);
 
+
+  Eigen::MatrixXd m(16, 16);
+  Eigen::MatrixXd u(16, 16);
+  Eigen::MatrixXd y(16, 16);
+
   // not used commented to silence warning
   // double rms(8736,0);
 
@@ -159,6 +119,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
   vector<double> sl(8736, 0);
 
   vector<double> dt(mapmax, 0);
+  vector<double> dtn(mapmax, 0);
 
 
   vector<double> inmt(mapmax, 0);
@@ -181,12 +142,12 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
 
   int cid, group;
   bool readerr = false;
-//  vector<int> grmap[252]; // TF: Commented unused variable to silence compiler warning
+  vector<int> grmap[217];
   while (! ctoecldatafile.eof()) {
     ctoecldatafile >> cid >> group;
 
     if (ctoecldatafile.eof()) break;
-    if (group <= -1 || group >= 252 || cid <= -1 || cid >= 8736) {
+    if (group <= -1 || group >= 217 || cid <= -1 || cid >= 8736) {
       cout << "Error cid="  << cid << " group=" << group << endl;
       readerr = true;
       break;
@@ -227,6 +188,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
   for (icn = 0; icn < mapmax; icn++) {
     inmt[icn] = 0.;
     dt[icn] = 0.;
+    dtn[icn] = 0.;
     for (it = 0; it < 16; it++) {
       W[icn][it][0] = 0.;
       Q[icn][it] = 0.;
@@ -265,7 +227,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
       // selection not applied because seems to cut all events
       // to be checked
 
-      if (index == 1 || index == 0) {
+      if (index == 1) {
         inmt[DS[icn]] = inmt[DS[icn]] + 1.;
         A0 = 0.;
 
@@ -310,9 +272,6 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
 
   // MATRICES INVERTION
 
-  //             for(icn=0;icn<max;icn++){  //%%%%%%%%%%%%%%%%%%%%%%%%55555555555
-
-//                  for(icn=0;icn<mapmax;icn++){  //%%%%%%%%%%%%%%%%%%%%%%%%55555555555
 
   for (icn = 0; icn < mapmax; icn++) { //%%%%%%%%%%%%%%%%%%%%%%%%55555555555
 
@@ -332,8 +291,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
       for (ia = 0; ia < 16; ia++) {
         for (ib = 0; ib < 16; ib++) {
           if (ib < 16 && ia < 16) {
-            MI[ia][ib] = (WW[icn][ia][ib] - W[icn][ia][0] * W[icn][ib][0] / inmt[icn]) / inmt[icn];
-
+            m(ia, ib) = (WW[icn][ia][ib] - W[icn][ia][0] * W[icn][ib][0] / inmt[icn]) / inmt[icn];
             UU[ia][ib] = (WW[icn][ia][ib] - W[icn][ia][0] * W[icn][ib][0] / inmt[icn]) / inmt[icn];
             // not used commented to silence warning
             // SI[ia][ib] = (WW[icn][ia][ib] - W[icn][ia][0] * W[icn][ib][0] / inmt[icn]) / inmt[icn];
@@ -350,21 +308,22 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
 
 
       // INVERSION
-      N1 = 16;
-
-      sim(*MI, &N1, *IM, &dec);
 
 
+      u = m.inverse();
 
+
+//     u = y*y;
       int ic;
 
       // CALCULATION RESIDUAL
       dt[icn] = 0.;
       for (ia = 0; ia < 16; ia++) {
         for (ib = 0; ib < 16; ib++) {
+          IM[ia][ib] = u(ia, ib);
           FF[ia][ib] = 0.;
           for (ic = 0; ic < 16; ic++) {
-            FF[ia][ib] = FF[ia][ib] + UU[ia][ic] * IM[ic][ib];
+            FF[ia][ib] = FF[ia][ib] + UU[ia][ic] * u(ic, ib);
           }
           if (ia == ib && fabs(FF[ia][ib] - 1.) > delta) {delta = fabs(FF[ia][ib] - 1.);}
           if (ia != ib && fabs(FF[ia][ib]) > delta) {delta = fabs(FF[ia][ib]);}
@@ -393,9 +352,16 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
 
       }  //conventinal comment
 
+
+
+
+
     } // largest conventional comment, but what is this for???
 
+
+
     // WRITE INVERS MATRICES
+
 
     if (0 == 0) { // conventional comment
 
@@ -406,12 +372,12 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
 
       for (poq = 0; poq < 16; poq++) {
         mcorFile << setprecision(5)
-                 << UU[0][poq] << "\t" << UU[1][poq] << "\t" <<  UU[2][poq] << "\t"
-                 << UU[3][poq] << "\t" << UU[4][poq] << "\t" <<  UU[5][poq] << "\t"
-                 << UU[6][poq] << "\t" << UU[7][poq] << "\t" <<  UU[8][poq] << "\t"
-                 << UU[9][poq] << "\t" << UU[10][poq]
-                 << UU[11][poq]  << "\t" << UU[12][poq]  << "\t"
-                 << UU[13][poq]  << "\t" << UU[14][poq] << "\t" <<  UU[15][poq] << endl;
+                 << m(0, poq) << "\t" <<  m(1, poq) << "\t" <<   m(2, poq) << "\t"
+                 <<  m(3, poq) << "\t" <<  m(4, poq) << "\t" <<   m(5, poq) << "\t"
+                 <<  m(6, poq) << "\t" <<  m(7, poq) << "\t" <<   m(8, poq) << "\t"
+                 <<  m(9, poq) << "\t" <<  m(10, poq)
+                 <<  m(11, poq)  << "\t" <<  m(12, poq)  << "\t"
+                 <<  m(13, poq)  << "\t" <<  m(14, poq) << "\t" <<   m(15, poq) << endl;
         // fprintf(McoIN,
         // "%.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \n  ",
         //       UU[0][poq], UU[1][poq], UU[2][poq], UU[3][poq], UU[4][poq], UU[5][poq], UU[6][poq], UU[7][poq], UU[8][poq], UU[9][poq], UU[10][poq],
@@ -429,12 +395,12 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
       ofstream inmcorFile(inmcorFilename);
       for (poq = 0; poq < 16; poq++) {
         inmcorFile << setprecision(3)
-                   << IM[0][poq] << "\t" << IM[1][poq] << "\t" <<  IM[2][poq] << "\t"
-                   << IM[3][poq] << "\t" << IM[4][poq] << "\t" <<  IM[5][poq] << "\t"
-                   << IM[6][poq] << "\t" << IM[7][poq] << "\t" <<  IM[8][poq] << "\t"
-                   << IM[9][poq] << "\t" << IM[10][poq]
-                   << IM[11][poq]  << "\t" << IM[12][poq]  << "\t"
-                   << IM[13][poq]  << "\t" << IM[14][poq] << "\t" <<  IM[15][poq] << endl;
+                   << u(0, poq) << "\t" <<  u(1, poq) << "\t" <<   u(2, poq) << "\t"
+                   <<  u(3, poq) << "\t" <<  u(4, poq) << "\t" <<   u(5, poq) << "\t"
+                   <<  u(6, poq) << "\t" <<  u(7, poq) << "\t" <<   u(8, poq) << "\t"
+                   <<  u(9, poq) << "\t" <<  u(10, poq)
+                   <<  u(11, poq)  << "\t" <<  u(12, poq)  << "\t"
+                   <<  u(13, poq)  << "\t" <<  u(14, poq) << "\t" <<   u(15, poq) << endl;
 
         // fprintf(McoIN,
         //                "%.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \n  ",
@@ -455,7 +421,11 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
   }  // icn
 
   cout << endl;
-  cout << "delta= " <<  delta << endl;
+//  cout << "  delta= " <<  delta << endl;
+  cout <<  "  delta= " <<  delta << endl;
+
+
+
 
 }
 

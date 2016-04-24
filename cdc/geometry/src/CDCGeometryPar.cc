@@ -35,9 +35,10 @@ CDCGeometryPar& CDCGeometryPar::Instance()
 }
 
 #if defined(CDC_T0_FROM_DB)
-CDCGeometryPar::CDCGeometryPar() : m_t0fromDB()
+CDCGeometryPar::CDCGeometryPar() : m_t0FromDB(), m_propSpeedFromDB()
 {
-  m_t0fromDB.addCallback(this, &CDCGeometryPar::setT0);
+  m_t0FromDB.addCallback(this, &CDCGeometryPar::setT0);
+  m_propSpeedFromDB.addCallback(this, &CDCGeometryPar::setPropSpeed);
 #else
 CDCGeometryPar::CDCGeometryPar()
 {
@@ -289,8 +290,13 @@ void CDCGeometryPar::read()
     //Read sigma params.
     readSigma(gbxParams);
 
+#if defined(CDC_PROPSPEED_FROM_DB)
+    //Set prop-speed (from DB)
+    setPropSpeed();
+#else
     //Read propagation speed
     readPropSpeed(gbxParams);
+#endif
 
 #if defined(CDC_T0_FROM_DB)
     //Set t0 (from DB)
@@ -729,7 +735,7 @@ void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
 
     ++nRead;
 
-    m_PropSpeedInv[iL] = 1. / speed;
+    m_propSpeedInv[iL] = 1. / speed;
 
     if (m_debug) cout << iL << " " << speed << endl;
   }
@@ -870,11 +876,22 @@ void CDCGeometryPar::readChMap(const GearDir gbxParams)
 // Set t0 (from DB)
 void CDCGeometryPar::setT0()
 {
-  for (auto ent : m_t0fromDB) {
+  for (auto ent : m_t0FromDB) {
     unsigned short iCL  = ent.getILayer();
     unsigned short iW  = ent.getIWire();
     m_t0[iCL][iW] = ent.getT0();
     //    std::cout <<"t0DB"<<  iCL <<" "<< iW <<" "<< ent.getT0() << std::endl;
+  }
+}
+#endif
+
+
+#if defined(CDC_PROPSPEED_FROM_DB)
+// Set prop.-speed (from DB)
+void CDCGeometryPar::setPropSpeed()
+{
+  for (unsigned short iCL = 0; iCL < m_propSpeedFromDB->getEntries(); ++iCL) {
+    m_propSpeedInv[iCL] = 1. / m_propSpeedFromDB->getSpeed(iCL);
   }
 }
 #endif

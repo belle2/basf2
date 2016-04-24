@@ -14,9 +14,11 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCTimeZero.h>
+#include <cdc/dbobjects/CDCPropSpeeds.h>
 
 #include <vector>
 #include <string>
@@ -98,8 +100,12 @@ namespace Belle2 {
        * @param GearDir Gear Dir.
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
-
       void readPropSpeed(const GearDir, int mode = 0);
+
+      /**
+       * Set prop.-speeds (from DB).
+       */
+      void setPropSpeed();
 
       /**
        * Read t0 parameters (from a file).
@@ -556,7 +562,7 @@ namespace Belle2 {
 
       inline double getPropSpeedInv(const unsigned int layerID) const
       {
-        return m_PropSpeedInv[layerID];
+        return m_propSpeedInv[layerID];
       }
 
       /**
@@ -809,7 +815,7 @@ namespace Belle2 {
 
       float m_XT[MAX_N_SLAYERS][2][nAlphaPoints][nThetaPoints][9];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
       float m_Sigma[MAX_N_SLAYERS][7];      /*!< position resulution for each layer. */
-      float m_PropSpeedInv[MAX_N_SLAYERS];  /*!< Inverse of propagation speed of the sense wire. */
+      float m_propSpeedInv[MAX_N_SLAYERS];  /*!< Inverse of propagation speed of the sense wire. */
       float m_t0[MAX_N_SLAYERS][MAX_N_SCELLS];  /*!< t0 for each sense-wire (in nsec). */
       float m_timeWalkCoef[nBoards];  /*!< coefficient for time walk (in ns/sqrt(ADC count)). */
 
@@ -825,7 +831,10 @@ namespace Belle2 {
       double m_maxSpaceResol;      /*!< 10 times Nominal spacial resolution. */
 
 #if defined(CDC_T0_FROM_DB)
-      DBArray<CDCTimeZero> m_t0fromDB; /*!< t0 taken from DB. */
+      DBArray<CDCTimeZero> m_t0FromDB; /*!< t0 retrieved from DB. */
+#endif
+#if defined(CDC_PROPSPEED_FROM_DB)
+      DBObjPtr<CDCPropSpeeds> m_propSpeedFromDB; /*!< prop.-speed ririeved from DB. */
 #endif
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */

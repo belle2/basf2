@@ -76,6 +76,16 @@ namespace Belle2 {
      */
     void printBadWire();
 
+    /**
+     * Import propspeed table to the database.
+     */
+    void importPropSpeed(std::string fileName);
+    /**
+     * Get the propspeed table from the database and
+     * print it.
+     */
+    void printPropSpeed();
+
   private:
 
     /**

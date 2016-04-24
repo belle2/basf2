@@ -19,6 +19,7 @@ from fnmatch import fnmatch
 mapfile = FileSystem.findFile('data/cdc/ch_map.dat')
 t0file = FileSystem.findFile('data/cdc/t0.dat')
 bwfile = FileSystem.findFile('data/cdc/badwire.dat')
+psfile = FileSystem.findFile('data/cdc/propspeed_v0.dat')
 use_local_database("cdc_crt/database.txt", "cdc_crt")
 
 main = create_path()
@@ -39,7 +40,9 @@ dbImporter = CDCDatabaseImporter()
 dbImporter.importChannelMap(mapfile)
 dbImporter.importTimeZero(t0file)
 dbImporter.importBadWire(bwfile)
+dbImporter.importPropSpeed(psfile)
 
 # dbImporter.printChannelMap()
 # dbImporter.printTimeZero()
 # dbImporter.printBadWire()
+# dbImporter.printPropSpeed()

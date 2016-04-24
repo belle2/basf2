@@ -31,6 +31,7 @@
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <cdc/dbobjects/CDCTimeZero.h>
 #include <cdc/dbobjects/CDCBadWires.h>
+#include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dataobjects/WireID.h>
 
 #include <iostream>
@@ -148,6 +149,43 @@ void CDCDatabaseImporter::importBadWire(std::string fileName)
 }
 
 
+void CDCDatabaseImporter::importPropSpeed(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2ERROR("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCPropSpeeds> ps;
+  ps.construct();
+
+  int iCL(0), nRead(0);
+  float speed(0.);
+
+  while (true) {
+    stream >> iCL >> speed;
+    if (stream.eof()) break;
+    ++nRead;
+    ps->setSpeed(speed);
+    //    ps->setSpeed(iCL, speed);
+    //      if (m_debug) {
+    //  std::cout << iCL << " " << value << std::endl;
+    //      }
+  }
+  stream.close();
+
+  if (nRead != MAX_N_SLAYERS) B2FATAL("#lines read-in (=" << nRead << ") is no equal #sense layers (=" << MAX_N_SLAYERS << ") !");
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  ps.import(iov);
+  B2RESULT("PropSpeed table imported to database.");
+}
+
+
 void CDCDatabaseImporter::printChannelMap()
 {
 
@@ -177,4 +215,10 @@ void CDCDatabaseImporter::printBadWire()
 {
   DBObjPtr<CDCBadWires> bw;
   bw->dump();
+}
+
+void CDCDatabaseImporter::printPropSpeed()
+{
+  DBObjPtr<CDCPropSpeeds> ps;
+  ps->dump();
 }

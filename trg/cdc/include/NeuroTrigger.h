@@ -154,13 +154,13 @@ namespace Belle2 {
     /** List of networks */
     std::vector<CDCTriggerMLP> m_MLPs = {};
     /** Radius of the CDC layers with priority wires (2 per super layer) */
-    double m_radius[9][2];
+    double m_radius[9][2] = {};
     /** Number of track segments up to super layer */
-    unsigned m_TSoffset[10];
+    unsigned m_TSoffset[10] = {};
     /** 2D phi position of current track scaled to number of wires */
-    double m_idRef[9][2];
+    double m_idRef[9][2] = {};
     /** 2D arclength of current track */
-    double m_arclength[9][2];
+    double m_arclength[9][2] = {};
     /** List of indices for the hits that are selected as input for the MLP */
     std::vector<unsigned> m_selectedHitIds = {};
   };

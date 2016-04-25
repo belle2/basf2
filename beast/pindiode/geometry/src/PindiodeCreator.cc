@@ -134,40 +134,53 @@ namespace Belle2 {
         int dimz_offsetp = 0;
         int dimz = 0;
         int dimr_dia = 0;
-        for (double x_offset : activeParams.getArray("x_offset", {0})) {
-          x_offset *= CLHEP::cm;
-          x_off[dimx_offset] = x_offset;
-          dimx_offset++;
+        if (phase == 2) {
+          for (int i = 0; i < 100; i++) {
+            x_pos[i] = 0;
+            y_pos[i] = 0;
+            x_off[i] = 0;
+            y_off[i] = 0;
+          }
+          //for (int i = 0; i < dimz; i++) {
+          //cout << "pin z " << z_pos[i] / CLHEP::cm << " r " << r[i] / CLHEP::cm << endl;
+          //}
         }
-        for (double y_offset : activeParams.getArray("y_offset", {0})) {
-          y_offset *= CLHEP::cm;
-          y_off[dimy_offset] = y_offset;
-          dimy_offset++;
-        }
-        for (double x_offsetp : activeParams.getArray("x_offsetp", {0})) {
-          x_offsetp *= CLHEP::cm;
-          x_offp[dimx_offsetp] = x_offsetp;
-          dimx_offsetp++;
-        }
-        for (double y_offsetp : activeParams.getArray("y_offsetp", {0})) {
-          y_offsetp *= CLHEP::cm;
-          y_offp[dimy_offsetp] = y_offsetp;
-          dimy_offsetp++;
-        }
-        for (double z_offsetp : activeParams.getArray("z_offsetp", {0})) {
-          z_offsetp *= CLHEP::cm;
-          z_offp[dimz_offsetp] = z_offsetp;
-          dimz_offsetp++;
-        }
-        for (double x : activeParams.getArray("x", {0})) {
-          x *= CLHEP::cm;
-          x_pos[dimx] = x + x_off[dimx];
-          dimx++;
-        }
-        for (double y : activeParams.getArray("y", {0})) {
-          y *= CLHEP::cm;
-          y_pos[dimy] = y + y_off[dimy];
-          dimy++;
+        if (phase == 1) {
+          for (double x_offset : activeParams.getArray("x_offset", {0})) {
+            x_offset *= CLHEP::cm;
+            x_off[dimx_offset] = x_offset;
+            dimx_offset++;
+          }
+          for (double y_offset : activeParams.getArray("y_offset", {0})) {
+            y_offset *= CLHEP::cm;
+            y_off[dimy_offset] = y_offset;
+            dimy_offset++;
+          }
+          for (double x_offsetp : activeParams.getArray("x_offsetp", {0})) {
+            x_offsetp *= CLHEP::cm;
+            x_offp[dimx_offsetp] = x_offsetp;
+            dimx_offsetp++;
+          }
+          for (double y_offsetp : activeParams.getArray("y_offsetp", {0})) {
+            y_offsetp *= CLHEP::cm;
+            y_offp[dimy_offsetp] = y_offsetp;
+            dimy_offsetp++;
+          }
+          for (double z_offsetp : activeParams.getArray("z_offsetp", {0})) {
+            z_offsetp *= CLHEP::cm;
+            z_offp[dimz_offsetp] = z_offsetp;
+            dimz_offsetp++;
+          }
+          for (double x : activeParams.getArray("x", {0})) {
+            x *= CLHEP::cm;
+            x_pos[dimx] = x + x_off[dimx];
+            dimx++;
+          }
+          for (double y : activeParams.getArray("y", {0})) {
+            y *= CLHEP::cm;
+            y_pos[dimy] = y + y_off[dimy];
+            dimy++;
+          }
         }
         for (double z : activeParams.getArray("z", {0})) {
           z *= CLHEP::cm;
@@ -195,17 +208,7 @@ namespace Belle2 {
           if (phase == 2)r[dimr_dia] = r_pin;
           dimr_dia++;
         }
-        if (phase == 2) {
-          for (int i = 0; i < 100; i++) {
-            x_pos[i] = 0;
-            y_pos[i] = 0;
-            x_off[i] = 0;
-            y_off[i] = 0;
-          }
-          for (int i = 0; i < dimz; i++) {
-            cout << "pin z " << z_pos[i] / CLHEP::cm << " r " << r[i] / CLHEP::cm << endl;
-          }
-        }
+
         //double r = activeParams.getLength("r_pindiode") * CLHEP::cm;
         //double z = activeParams.getLength("z_pindiode") * CLHEP::cm;
         //double phi = activeParams.getAngle("Phi") - 90. * CLHEP::deg;

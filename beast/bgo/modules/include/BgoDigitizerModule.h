@@ -69,16 +69,15 @@ namespace Belle2 {
 
       }
       */
+      /** Fold energy resolution */
       Double_t GetEnergyResolutionGeV(Double_t);
 
       /** number of detectors. Read from BGO.xml*/
       int nBGO = 8;
-      /** Cremat gain */
+      /** Energy threshold */
       double m_Threshold[8];
-      /** Work function */
+      /** Energy range */
       double m_Range[8];
-      /** Fano Factor */
-      double m_Resolution[8];
       /** Energy resolution factor */
       double m_EnergyResolutionFactor;
       /** Energy resolution constant */

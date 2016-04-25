@@ -64,32 +64,26 @@ namespace Belle2 {
       std::copy(Flow, Flow + 2, m_Flow);
     }
 
-    /** Set energy deposition profile
-     * To avoid copying of the entries this will take over the contents of the
-     * argument and after the call the argument will be empty.
-     *
-     * TODO: Normally this would be done with an lvalue reference but we need a
-     * dictionary so we have to compile it with cint, might change for ROOT6.
-     *
-     * @param electronProfile list of energy depositions along the simhit,
-     * encoded using ElectronDeposit class. Will be empty after call
-     */
 
+    /** Set column into a vector array */
     void setcolumn(std::vector<int>& column)
     {
       m_column.clear();
       std::swap(m_column, column);
     }
+    /** Set row into a vector array */
     void setrow(std::vector<int>& row)
     {
       m_row.clear();
       std::swap(m_row, row);
     }
+    /** Set bc into a vector array */
     void setBCID(std::vector<int>& BCID)
     {
       m_BCID.clear();
       std::swap(m_BCID, BCID);
     }
+    /** Set tot into a vector array */
     void setTOT(std::vector<int>& TOT)
     {
       m_TOT.clear();

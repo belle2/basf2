@@ -101,25 +101,35 @@ namespace Belle2 {
         int dimy_offset = 0;
         int dimz = 0;
         int dimr_dia = 0;
-        for (double x_offset : activeParams.getArray("x_offset", {0})) {
-          x_offset *= CLHEP::cm;
-          x_off[dimx_offset] = x_offset;
-          dimx_offset++;
+        if (phase == 2) {
+          for (int i = 0; i < 100; i++) {
+            x_pos[i] = 0;
+            y_pos[i] = 0;
+            x_off[i] = 0;
+            y_off[i] = 0;
+          }
         }
-        for (double y_offset : activeParams.getArray("y_offset", {0})) {
-          y_offset *= CLHEP::cm;
-          y_off[dimy_offset] = y_offset;
-          dimy_offset++;
-        }
-        for (double x : activeParams.getArray("x", {0})) {
-          x *= CLHEP::cm;
-          x_pos[dimx] = x + x_off[dimx];
-          dimx++;
-        }
-        for (double y : activeParams.getArray("y", {0})) {
-          y *= CLHEP::cm;
-          y_pos[dimy] = y + y_off[dimy];
-          dimy++;
+        if (phase == 1) {
+          for (double x_offset : activeParams.getArray("x_offset", {0})) {
+            x_offset *= CLHEP::cm;
+            x_off[dimx_offset] = x_offset;
+            dimx_offset++;
+          }
+          for (double y_offset : activeParams.getArray("y_offset", {0})) {
+            y_offset *= CLHEP::cm;
+            y_off[dimy_offset] = y_offset;
+            dimy_offset++;
+          }
+          for (double x : activeParams.getArray("x", {0})) {
+            x *= CLHEP::cm;
+            x_pos[dimx] = x + x_off[dimx];
+            dimx++;
+          }
+          for (double y : activeParams.getArray("y", {0})) {
+            y *= CLHEP::cm;
+            y_pos[dimy] = y + y_off[dimy];
+            dimy++;
+          }
         }
         for (double z : activeParams.getArray("z", {0})) {
           z *= CLHEP::cm;
@@ -144,14 +154,7 @@ namespace Belle2 {
             r[dimr_dia] = r_dia;
           dimr_dia++;
         }
-        if (phase == 2) {
-          for (int i = 0; i < 100; i++) {
-            x_pos[i] = 0;
-            y_pos[i] = 0;
-            x_off[i] = 0;
-            y_off[i] = 0;
-          }
-        }
+
         //create beamabort package
         G4double dx_opa = 10. / 2.*CLHEP::mm;
         G4double dy_opa = 20. / 2.*CLHEP::mm;

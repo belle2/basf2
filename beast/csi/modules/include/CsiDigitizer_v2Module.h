@@ -69,16 +69,15 @@ namespace Belle2 {
 
       }
       */
+      /** Fold energy resolution */
       Double_t GetEnergyResolutionGeV(Double_t, int);
 
       /** number of detectors. Read from CSI.xml*/
       int nCSI = 18;
-      /** Cremat gain */
+      /** Energy threshold */
       double m_Threshold[18];
-      /** Work function */
+      /** Enegy range */
       double m_Range[18];
-      /** Fano Factor */
-      double m_Resolution[18];
       /** Energy resolution factor */
       double m_EnergyResolutionFactor[3];
       /** Energy resolution constant */

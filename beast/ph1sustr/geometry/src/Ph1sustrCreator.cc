@@ -76,7 +76,7 @@ namespace Belle2 {
       BOOST_FOREACH(double value, bar) {
         B2INFO("value: " << value);
       }
-      double x_tpcbeamR = 0;
+      /*double x_tpcbeamR = 0;
       double y_tpcbeamR = 0;
       double z_tpcbeamR = 0;
       double x_tpcbeamL = 0;
@@ -87,23 +87,23 @@ namespace Belle2 {
       double z_tpcbeamT = 0;
       double x_tpcbeamB = 0;
       double y_tpcbeamB = 0;
-      double z_tpcbeamB = 0;
+      double z_tpcbeamB = 0;*/
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
         //plate positions
-        x_tpcbeamR = activeParams.getLength("x_tpcbeamR") * CLHEP::cm;
-        y_tpcbeamR = activeParams.getLength("y_tpcbeamR") * CLHEP::cm;
-        z_tpcbeamR = activeParams.getLength("z_tpcbeamR") * CLHEP::cm;
-        x_tpcbeamL = activeParams.getLength("x_tpcbeamL") * CLHEP::cm;
-        y_tpcbeamL = activeParams.getLength("y_tpcbeamL") * CLHEP::cm;
-        z_tpcbeamL = activeParams.getLength("z_tpcbeamL") * CLHEP::cm;
-        x_tpcbeamT = activeParams.getLength("x_tpcbeamT") * CLHEP::cm;
-        y_tpcbeamT = activeParams.getLength("y_tpcbeamT") * CLHEP::cm;
-        z_tpcbeamT = activeParams.getLength("z_tpcbeamT") * CLHEP::cm;
-        x_tpcbeamB = activeParams.getLength("x_tpcbeamB") * CLHEP::cm;
-        y_tpcbeamB = activeParams.getLength("y_tpcbeamB") * CLHEP::cm;
-        z_tpcbeamB = activeParams.getLength("z_tpcbeamB") * CLHEP::cm;
+        double x_tpcbeamR = activeParams.getLength("x_tpcbeamR") * CLHEP::cm;
+        double y_tpcbeamR = activeParams.getLength("y_tpcbeamR") * CLHEP::cm;
+        double z_tpcbeamR = activeParams.getLength("z_tpcbeamR") * CLHEP::cm;
+        double x_tpcbeamL = activeParams.getLength("x_tpcbeamL") * CLHEP::cm;
+        double y_tpcbeamL = activeParams.getLength("y_tpcbeamL") * CLHEP::cm;
+        double z_tpcbeamL = activeParams.getLength("z_tpcbeamL") * CLHEP::cm;
+        double x_tpcbeamT = activeParams.getLength("x_tpcbeamT") * CLHEP::cm;
+        double y_tpcbeamT = activeParams.getLength("y_tpcbeamT") * CLHEP::cm;
+        double z_tpcbeamT = activeParams.getLength("z_tpcbeamT") * CLHEP::cm;
+        double x_tpcbeamB = activeParams.getLength("x_tpcbeamB") * CLHEP::cm;
+        double y_tpcbeamB = activeParams.getLength("y_tpcbeamB") * CLHEP::cm;
+        double z_tpcbeamB = activeParams.getLength("z_tpcbeamB") * CLHEP::cm;
 
         //TPC vertical: 4x @ 1614/ea
         //TPC horizontal + BGO base: 8x @ 1583/ea

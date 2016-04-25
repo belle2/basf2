@@ -70,7 +70,7 @@ namespace Belle2 {
       /** Input TPC number */
       int m_inputTPCNumber;
       /** number of detectors. Read from MICROTPC.xml*/
-      int nTPC = 0;
+      //int nTPC = 0;
       /** TPC coordinate */
       std::vector<TVector3> TPCCenter;
 

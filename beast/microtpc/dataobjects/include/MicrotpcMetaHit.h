@@ -36,7 +36,7 @@ namespace Belle2 {
       m_Temperature(), m_Pressure(), m_Flow(), m_SetFlow(0), m_GetFlow(0),
       m_IHER(0), m_PHER(0), m_tHER(0), m_flagHER(0),
       m_ILER(0), m_PLER(0), m_tLER(0), m_flagLER(0) {}
-
+    /** Meta hit store array */
     MicrotpcMetaHit(int detNb, int pixNb,
                     int ts_nb, const double ts_start[10], const double ts_stop[10],
                     const float Temperature[4], const float Pressure[2], const float Flow[2], float SetFlow, float GetFlow,

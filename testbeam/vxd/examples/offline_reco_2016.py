@@ -50,6 +50,8 @@ else:
 # Unpacker
 SVDUNPACK = register_module('SVDUnpacker')
 SVDUNPACK.param('xmlMapFileName', 'testbeam/vxd/data/TB_svd_mapping.xml')
+SVDUNPACK.param('FADCTriggerNumberOffset', 1)
+SVDUNPACK.param('shutUpFTBError', -1)
 
 PXDUNPACK = register_module('PXDUnpacker')
 PXDUNPACK.param('RemapFlag', True)

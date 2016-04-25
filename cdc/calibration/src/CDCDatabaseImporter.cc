@@ -28,11 +28,12 @@
 #include <framework/logging/Logger.h>
 
 // DB objects
+#include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <cdc/dbobjects/CDCTimeZero.h>
 #include <cdc/dbobjects/CDCBadWires.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
-#include <cdc/dataobjects/WireID.h>
+#include <cdc/dbobjects/CDCTimeWalks.h>
 
 #include <iostream>
 #include <fstream>
@@ -186,6 +187,43 @@ void CDCDatabaseImporter::importPropSpeed(std::string fileName)
 }
 
 
+void CDCDatabaseImporter::importTimeWalk(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2ERROR("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCTimeWalks> tw;
+  tw.construct();
+
+  unsigned short iBoard(0);
+  int nRead(0);
+  float coeff(0.);
+
+  while (true) {
+    stream >> iBoard >> coeff;
+    if (stream.eof()) break;
+    ++nRead;
+    tw->setTimeWalk(iBoard, coeff);
+    //      if (m_debug) {
+    //  std::cout << iBoard << " " << coeff << std::endl;
+    //      }
+  }
+  stream.close();
+
+  if (nRead != nBoards) B2FATAL("#lines read-in (=" << nRead << ") is not equal #boards (=" << nBoards << ") !");
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  tw.import(iov);
+  B2RESULT("Time-walk coeff. table imported to database.");
+}
+
+
 void CDCDatabaseImporter::printChannelMap()
 {
 
@@ -221,4 +259,10 @@ void CDCDatabaseImporter::printPropSpeed()
 {
   DBObjPtr<CDCPropSpeeds> ps;
   ps->dump();
+}
+
+void CDCDatabaseImporter::printTimeWalk()
+{
+  DBObjPtr<CDCTimeWalks> tw;
+  tw->dump();
 }

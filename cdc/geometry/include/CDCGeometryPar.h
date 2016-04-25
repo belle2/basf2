@@ -19,6 +19,7 @@
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCTimeZero.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
+#include <cdc/dbobjects/CDCTimeWalks.h>
 
 #include <vector>
 #include <string>
@@ -131,6 +132,11 @@ namespace Belle2 {
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
       void readTW(const GearDir, int mode = 0);
+
+      /**
+       * Set time-walk parameters.
+       */
+      void setTW();
 
       //! Generate an xml file used in gearbox
       /*!
@@ -831,10 +837,13 @@ namespace Belle2 {
       double m_maxSpaceResol;      /*!< 10 times Nominal spacial resolution. */
 
 #if defined(CDC_T0_FROM_DB)
-      DBArray<CDCTimeZero> m_t0FromDB; /*!< t0 retrieved from DB. */
+      DBArray<CDCTimeZero> m_t0FromDB; /*!< t0s retrieved from DB. */
 #endif
 #if defined(CDC_PROPSPEED_FROM_DB)
-      DBObjPtr<CDCPropSpeeds> m_propSpeedFromDB; /*!< prop.-speed ririeved from DB. */
+      DBObjPtr<CDCPropSpeeds> m_propSpeedFromDB; /*!< prop.-speeds retrieved from DB. */
+#endif
+#if defined(CDC_TIMEWALK_FROM_DB)
+      DBObjPtr<CDCTimeWalks> m_timeWalkFromDB; /*!< time-walk coeffs. retrieved from DB. */
 #endif
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */

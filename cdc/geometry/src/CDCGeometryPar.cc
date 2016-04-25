@@ -35,10 +35,11 @@ CDCGeometryPar& CDCGeometryPar::Instance()
 }
 
 #if defined(CDC_T0_FROM_DB)
-CDCGeometryPar::CDCGeometryPar() : m_t0FromDB(), m_propSpeedFromDB()
+CDCGeometryPar::CDCGeometryPar() : m_t0FromDB(), m_propSpeedFromDB(), m_timewalkFromDB()
 {
   m_t0FromDB.addCallback(this, &CDCGeometryPar::setT0);
   m_propSpeedFromDB.addCallback(this, &CDCGeometryPar::setPropSpeed);
+  m_timeWalkFromDB.addCallback(this, &CDCGeometryPar::setTimeWalk);
 #else
 CDCGeometryPar::CDCGeometryPar()
 {
@@ -308,7 +309,14 @@ void CDCGeometryPar::read()
 
     //Read time-walk coefficient
     readChMap(gbxParams);
+
+#if defined(CDC_TIMEWALK_FROM_DB)
+    //Set time-walk coeffs. (from DB)
+    setTW();
+#else
+    //Read time-walk coeffs. (from file)
     readTW(gbxParams);
+#endif
   }
 
   //Replace xt etc. with those for reconstriction
@@ -892,6 +900,17 @@ void CDCGeometryPar::setPropSpeed()
 {
   for (unsigned short iCL = 0; iCL < m_propSpeedFromDB->getEntries(); ++iCL) {
     m_propSpeedInv[iCL] = 1. / m_propSpeedFromDB->getSpeed(iCL);
+  }
+}
+#endif
+
+
+#if defined(CDC_TIMEWALK_FROM_DB)
+// Set time-walk coefficient (from DB)
+void CDCGeometryPar::setTW()
+{
+  for (unsigned short iBd = 0; iBd < m_timeWalkFromDB->getEntries(); ++iBd) {
+    m_timeWalkCoef[iBd] = m_timeWalkFromDB->getTimeWalk(iBd);
   }
 }
 #endif

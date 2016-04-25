@@ -9,5 +9,6 @@
 #pragma link C++ class Belle2::CDCTimeZero+;
 #pragma link C++ class Belle2::CDCBadWires+;
 #pragma link C++ class Belle2::CDCPropSpeeds+;
+#pragma link C++ class Belle2::CDCTimeWalks+;
 
 #endif

@@ -86,6 +86,16 @@ namespace Belle2 {
      */
     void printPropSpeed();
 
+    /**
+     * Import time-walk coeff. table to the database.
+     */
+    void importTimeWalk(std::string fileName);
+    /**
+     * Get the time-walk coeff. table from the database and
+     * print it.
+     */
+    void printTimeWalk();
+
   private:
 
     /**

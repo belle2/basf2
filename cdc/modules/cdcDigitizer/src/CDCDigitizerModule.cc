@@ -36,7 +36,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
   m_tdcBinWidth(1.0), m_tdcBinWidthInv(1.0),
   m_tdcResol(0.2887), m_driftV(4.0e-3),
-#if defined(CDC_BADWIREFROMDB)
+#if defined(CDC_BADWIRE_FROM_DB)
   m_driftVInv(250.0), m_propSpeedInv(27.25), m_misalign(true), m_badWires()
 #else
   m_driftVInv(250.0), m_propSpeedInv(27.25), m_misalign(true)
@@ -190,7 +190,7 @@ void CDCDigitizerModule::event()
     B2DEBUG(250, "Encoded wire number of current CDCSimHit: " << m_wireID);
 
     // Reject bad wire
-#if defined(CDC_BADWIREFROMDB)
+#if defined(CDC_BADWIRE_FROM_DB)
     //    m_badWires->dump();
     if (m_badWires->isBadWire(m_wireID)) continue;
 #endif

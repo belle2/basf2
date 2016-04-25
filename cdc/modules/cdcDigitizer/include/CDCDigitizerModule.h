@@ -160,7 +160,7 @@ namespace Belle2 {
     };
 
     /** Badwire list (from DB). */
-#if defined(CDC_BADWIREFROMDB)
+#if defined(CDC_BADWIRE_FROM_DB)
     DBObjPtr<CDCBadWires> m_badWires;
 #endif
   };

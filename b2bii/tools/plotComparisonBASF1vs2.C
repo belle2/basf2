@@ -577,7 +577,7 @@ void drawHist(string fileName, TFile* file1, TFile* file2, string name1, string 
       // Create legend
       TLegend *leg = new TLegend(0.6,0.7,0.8,0.9);
       leg->AddEntry(h1,"basf1","f");
-      leg->AddEntry(h2,"basgBASF","f");
+      leg->AddEntry(h2,"basf2","f");
 
       C->cd();
 

@@ -89,8 +89,8 @@ void LogcollectorCallback::logget(const std::string& nodename,
     }
   }
   try {
-    for (std::vector<DAQLogMessage>::reverse_iterator it = m_msgs.rbegin();
-         it != m_msgs.rend(); it++) {
+    for (std::vector<DAQLogMessage>::iterator it = m_msgs.begin();
+         it != m_msgs.end(); it++) {
       DAQLogMessage& msg(*it);
       if (msg.getPriority() > LogFile::DEBUG) {
         NSMCommunicator::send(NSMMessage(node, *it, NSMCommand::LOGSET));

@@ -1493,7 +1493,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcROE_Pz", mcROEMomentumZ,
                       "Returns z component of true momentum of unused tracks and clusters in ROE");
 
-    REGISTER_VARIABLE("ROE_mcMissFlags", ROEMCMissingFlags,
+    REGISTER_VARIABLE("ROE_mcMissFlags(maskName)", ROEMCMissingFlags,
                       "Returns flags corresponding to missing particles on ROE side.");
 
     REGISTER_VARIABLE("nROETracks(maskName)",  nROETracks,

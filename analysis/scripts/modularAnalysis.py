@@ -1397,6 +1397,36 @@ def discardFromROEMasks(
     path.add_module(updateMask)
 
 
+def printROEInfo(
+    mask_names=[],
+    which_mask='both',
+    full_print=False,
+    path=analysis_main
+):
+    """
+    This function prints out the information for the current ROE, so it should only be used in the for_each path.
+    It prints out basic ROE object info.
+
+    If mask names are provided, specific information for those masks will be printed out. By default, basic
+    ECLCluster and Track mask info will be printed out, but it is possible to do this only for one, if needed.
+
+    It is also possible to print out the specific mask values for each Track and ECLCluster by setting the 'full_print'
+    option to True.
+
+    @param mask_names   array of ROEMask names for printing out info
+    @param which_mask   print out info for Tracks ('track'), ECLClusters ('cluster') or ('both')
+    @param full_print   print out mask values for each Track/ECLCLuster in mask
+    @param path         modules are added to this path
+    """
+
+    printMask = register_module('RestOfEventPrinter')
+    printMask.set_name('RestOfEventPrinter')
+    printMask.param('maskNames', mask_names)
+    printMask.param('whichMask', which_mask)
+    printMask.param('fullPrint', full_print)
+    path.add_module(printMask)
+
+
 def buildContinuumSuppression(list_name, path=analysis_main):
     """
     Creates for each Particle in the given ParticleList a ContinuumSuppression

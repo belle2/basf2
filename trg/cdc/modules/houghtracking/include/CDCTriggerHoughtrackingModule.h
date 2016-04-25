@@ -141,7 +141,8 @@ namespace Belle2 {
     bool inList(const CDCTriggerHoughCand& a, const std::vector<CDCTriggerHoughCand>& list) const;
     /** Check if candidates are connected. */
     bool connected(const CDCTriggerHoughCand& a, const CDCTriggerHoughCand& b) const;
-    void mergeIdList(std::vector<unsigned>&, std::vector<unsigned>&, std::vector<unsigned>&);
+    /** Merge lists a and b and put the result in merged. */
+    void mergeIdList(std::vector<unsigned>& merged, std::vector<unsigned>& a, std::vector<unsigned>& b);
 
   protected:
 

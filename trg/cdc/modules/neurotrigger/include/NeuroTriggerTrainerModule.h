@@ -117,12 +117,12 @@ namespace Belle2 {
     std::vector<CDCTriggerMLPData> m_trainSets;
 
     //monitoring histograms
-    std::vector<TH1D*> phiHistsMC;
-    std::vector<TH1D*> ptHistsMC;
-    std::vector<TH1D*> thetaHistsMC;
-    std::vector<TH1D*> zHistsMC;
-    std::vector<TH1D*> phiHists2D;
-    std::vector<TH1D*> ptHists2D;
+    std::vector<TH1D*> phiHistsMC;   /**< phi of MCParticles */
+    std::vector<TH1D*> ptHistsMC;    /**< pt of MCParticles */
+    std::vector<TH1D*> thetaHistsMC; /**< theta of MCParticles */
+    std::vector<TH1D*> zHistsMC;     /**< z of MCParticles */
+    std::vector<TH1D*> phiHists2D;   /**< phi of 2D tracks */
+    std::vector<TH1D*> ptHists2D;    /**< pt of 2D tracks */
   };
 }
 

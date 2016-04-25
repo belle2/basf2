@@ -62,7 +62,7 @@ namespace Belle2 {
       std::cout << " " << std::endl;
       std::cout << "PropSpeed list" << std::endl;
       std::cout << "#entries= " << m_speedList.size() << std::endl;
-      std::cout << "in order of ICLayer and Speed^-1 (ns/cm)" << std::endl;
+      std::cout << "in order of clayer and speed (cm/ns)" << std::endl;
 
       for (unsigned short CL = 0; CL < m_speedList.size(); ++CL) {
         std::cout << CL << " " << m_speedList[CL] << std::endl;

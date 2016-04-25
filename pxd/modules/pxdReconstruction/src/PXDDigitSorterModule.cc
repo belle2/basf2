@@ -18,12 +18,13 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/reconstruction/Pixel.h>
-
+#include <functional>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
 using namespace boost::python;
+
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -42,6 +43,8 @@ PXDDigitSorterModule::PXDDigitSorterModule() : Module()
                  "needed for unsorted pixel data as the Clusterizer expects sorted input.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("merge", m_mergeDuplicates, "If true, merge Pixel information if more than one digit exists for the same address", true);
+  addParam("trimDigits", m_trimDigits, "If true, pixel data will be checked to detect malformed pixels. Such pixels will be scarded.",
+           true);
   addParam("digits", m_storeDigitsName, "PXDDigit collection name", string(""));
   addParam("ignoredPixelsListName", m_ignoredPixelsListName, "Name of the xml with ignored pixels list", string(""));
   addParam("truehits", m_storeTrueHitsName, "PXDTrueHit collection name", string(""));
@@ -82,6 +85,7 @@ void PXDDigitSorterModule::event()
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
   // If not digits, nothing to do
   if (!storeDigits || !storeDigits.getEntries()) return;
+  storeDigits.clear();
 
   RelationArray relDigitMCParticle(m_relDigitMCParticleName);
   RelationArray relDigitTrueHit(m_relDigitTrueHitName);
@@ -97,8 +101,18 @@ void PXDDigitSorterModule::event()
     const PXDDigit* const digit = storeDigits[i];
     Pixel px(digit, i);
     VxdID sensorID = digit->getSensorID();
-    if (m_ignoredPixelsListName == "" || m_ignoredPixelsList->pixelOK(digit->getSensorID(), PXDIgnoredPixelsMap::map_pixel(digit->getUCellID(), digit->getVCellID()))) {
-      sensors[sensorID].insert(px);
+    if (m_ignoredPixelsListName == ""
+        || m_ignoredPixelsList->pixelOK(digit->getSensorID(), PXDIgnoredPixelsMap::map_pixel(digit->getUCellID(), digit->getVCellID()))) {
+      // Trim digits
+      if (!m_trimDigits || goodDigit(digit)) {
+        sensors[sensorID].insert(px);
+      } else {
+        B2INFO("Encountered a malformed digit in PXDDigit sorter: " << endl
+               << "VxdID: " << sensorID.getLayerNumber() << "/"
+               << sensorID.getLadderNumber() << "/"
+               << sensorID.getSensorNumber() << " u = " << digit->getUCellID() << "v = " << digit->getVCellID()
+               << " DISCARDED.");
+      }
     }
   }
 
@@ -109,9 +123,9 @@ void PXDDigitSorterModule::event()
   // and a vector to remember which index changed into what
   unsigned int index(0);
   // And just loop over the sensors and assign the digits at the correct position
-  for (const auto & sensor : sensors) {
+  for (const auto& sensor : sensors) {
     const PXD::Pixel* lastpx(0);
-    for (const PXD::Pixel & px : sensor.second) {
+    for (const PXD::Pixel& px : sensor.second) {
       //Normal case: pixel has different address
       if (!lastpx || px > *lastpx) {
         //Overwrite the digit
@@ -125,7 +139,8 @@ void PXDDigitSorterModule::event()
         if (m_mergeDuplicates) {
           //Merge the two pixels. As the PXDDigit does not have setters we have to create a new object.
           const PXDDigit& old = *storeDigits[index - 1];
-          *storeDigits[index - 1] = PXDDigit(old.getSensorID(), old.getUCellID(), old.getVCellID(), old.getUCellPosition(), old.getVCellPosition(), old.getCharge() + m_digitcopy[px.getIndex()].getCharge());
+          *storeDigits[index - 1] = PXDDigit(old.getSensorID(), old.getUCellID(), old.getVCellID(), old.getUCellPosition(),
+                                             old.getVCellPosition(), old.getCharge() + m_digitcopy[px.getIndex()].getCharge());
           relationIndices[px.getIndex()] = std::make_pair(index - 1, false);
         } else {
           //Otherwise delete the second pixel by omitting it here and removing relation elements on consolidation

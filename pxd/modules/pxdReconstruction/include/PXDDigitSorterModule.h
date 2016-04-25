@@ -15,6 +15,7 @@
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/online/PXDIgnoredPixelsMap.h>
 #include <string>
+#include <algorithm>
 
 namespace Belle2 {
   namespace PXD {
@@ -39,6 +40,16 @@ namespace Belle2 {
       virtual void event();
 
     private:
+      /** Utility function to check pixel coordinates */
+      inline bool goodDigit(const PXDDigit* const digit) const
+      {
+        int u = digit->getUCellID();
+        bool goodU = (u == std::min(std::max(u, 0), 249));
+        int v = digit->getVCellID();
+        bool goodV = (v == std::min(std::max(v, 0), 767));
+        return (goodU && goodV);
+      }
+
       /** Name of the collection to use for the PXDDigits */
       std::string m_storeDigitsName;
       /** Name of the collection to use for the PXDTrueHits */
@@ -53,6 +64,8 @@ namespace Belle2 {
       std::vector<PXDDigit> m_digitcopy;
       /** Mode: if true, merge duplicate pixels, otherwise delete all but the first occurence */
       bool m_mergeDuplicates;
+      /** if true, check digit data and discard malformed digits.*/
+      bool m_trimDigits;
       /** Name of the ignored pixels list xml */
       std::string m_ignoredPixelsListName;
       /** Ignored pixels list manager class */

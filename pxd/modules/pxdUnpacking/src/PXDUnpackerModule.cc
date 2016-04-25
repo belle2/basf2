@@ -1571,7 +1571,7 @@ unsigned int PXDUnpackerModule::remap_col_IB_OF(unsigned int DHP_row, unsigned i
   B2INFO("in remap COL ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   col = Drain / 4;
 //   B2INFO(" col false " << DHP_col << " DCD line " << DCD_channel << " col geo " << col_geo);
-  if (ucell_ID < 250) u_cellID = 250 - 1 - col;
+  if (u_cellID < 250) u_cellID = 250 - 1 - col;
   B2INFO("Remapped :: COL $" << DHP_col << " to u_cellID $" << u_cellID);
   return u_cellID;
 }

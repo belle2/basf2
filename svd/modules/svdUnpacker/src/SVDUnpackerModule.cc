@@ -1,12 +1,14 @@
-/**************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: Jarek Wiechczynski, Giulia Casarosa, Eugenio Paoloni     *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
+/******************************************************************************
+* BASF2 (Belle Analysis Framework 2)                                          *
+* Copyright(C) 2010 - Belle II Collaboration                                  *
+*                                                                             *
+* Author: The Belle II Collaboration                                          *
+* Contributors: Jarek Wiechczynski, Peter Kvasnicka                           *
+*               Giulia Casarosa, Eugenio Paoloni                              *
+*                                                                             *
+* This software is provided "as is" without any warranty.                     *
+* Beware! Do not expose to open flames it can explode                         *
+******************************************************************************/
 
 #include <svd/modules/svdUnpacker/SVDUnpackerModule.h>
 
@@ -20,7 +22,7 @@
 #include <arpa/inet.h>
 #include <boost/crc.hpp>      // for boost::crc_basic, boost::augmented_crc
 #include <boost/cstdint.hpp>  // for boost::uint16_t
-#define CRC16POLYREV 0x8005         // CRC-16 polynomial, normal representation 
+#define CRC16POLYREV 0x8005   // CRC-16 polynomial, normal representation 
 
 #include <sstream>
 #include <iomanip>
@@ -39,7 +41,9 @@ REG_MODULE(SVDUnpacker)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDUnpackerModule::SVDUnpackerModule() : Module()
+SVDUnpackerModule::SVDUnpackerModule() : Module(),
+  m_shutUpFTBError(0),
+  m_FADCTriggerNumberOffset(0)
 {
   //Set module properties
   setDescription("Produce SVDDigits from RawSVD. NOTE: only zero-suppressed mode is currently supported!");
@@ -47,9 +51,11 @@ SVDUnpackerModule::SVDUnpackerModule() : Module()
 
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
   addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
-  //addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string(""));
   addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", FileSystem::findFile("data/svd/svd_mapping.xml"));
-
+  addParam("shutUpFTBError", m_shutUpFTBError,
+           "if >0 is the number of reported FTB header ERRORs before quiet operations. If <0 full log produced.", -1);
+  addParam("FADCTriggerNumberOffset", m_FADCTriggerNumberOffset,
+           "number to be added to the FADC trigger number to match the main trigger number", 0);
 }
 
 SVDUnpackerModule::~SVDUnpackerModule()
@@ -58,7 +64,7 @@ SVDUnpackerModule::~SVDUnpackerModule()
 
 void SVDUnpackerModule::initialize()
 {
-
+  m_eventMetaDataPtr.required();
   StoreArray<RawSVD>::required(m_rawSVDListName);
   StoreArray<SVDDigit>::registerPersistent(m_svdDigitListName);
 
@@ -73,16 +79,20 @@ void SVDUnpackerModule::beginRun()
 
 void SVDUnpackerModule::event()
 {
-
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
   StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
 
+  if (!m_eventMetaDataPtr.isValid()) {  // give up...
+    B2ERROR("Missing valid EventMetaData." << std::endl <<
+            "No SVDDigit produced for this event");
+    return;
+  }
 
   svdDigits.clear();
 
-
-  if (! m_map) {
-    B2ERROR("xml map not loaded, going to the next module");
+  if (! m_map) { //give up
+    B2ERROR("SVD xml map not loaded." << std::endl <<
+            "No SVDDigit produced for this event");
     return;
   }
 
@@ -116,27 +126,69 @@ void SVDUnpackerModule::event()
         vector<uint32_t> crc16vec;
 
         for (; data32_it != &data32tab[buf][nWords[buf]]; data32_it++) {
-          data32 = *data32_it; //pu current 32-bit frame to union
+          m_data32 = *data32_it; //put current 32-bit frame to union
 
-
-          if (data32 == 0xffaa0000) {   // first part of FTB header
+          if (m_data32 == 0xffaa0000) {   // first part of FTB header
             crc16vec.clear(); // clear the input container for crc16 calculation
-            crc16vec.push_back(data32);
+            crc16vec.push_back(m_data32);
             data32_it++; // go to 2nd part of FTB header
             crc16vec.push_back(*data32_it);
+
+            m_data32 = *data32_it; //put the second 32-bit frame to union
+            if (m_FTBHeader.eventNumber !=
+                (m_eventMetaDataPtr->getEvent() & 0xFFFFFF)) {
+              if (m_shutUpFTBError) { //
+                m_shutUpFTBError -= 1 ;
+                B2ERROR(
+                  "Trigger number mismatch." << std::endl <<
+                  "Expected trigger number & 0xFFFFFF   = 0x" <<
+                  std::hex  <<
+                  (m_eventMetaDataPtr->getEvent() & 0xFFFFFF) <<
+                  std::endl <<
+                  "Trigger number in the FTB            = 0x" <<
+                  std::hex <<
+                  m_FTBHeader.eventNumber);
+              }
+            }
+
+            if (m_FTBHeader.errorsField != 0) {
+              if (m_shutUpFTBError) {
+                m_shutUpFTBError -= 1 ;
+                B2ERROR(
+                  "Error on SVD FTB : 0x" << std::hex <<
+                  m_FTBHeader.errorsField
+                );
+              }
+            }
             continue;
           }
 
-          crc16vec.push_back(data32);
+
+          crc16vec.push_back(m_data32);
 
 
-          if (m_MainHeader.check == 6)  // FADC header
+          if (m_MainHeader.check == 6) { // FADC header
             fadc = m_MainHeader.FADCnum;
 
+            if ((char) m_MainHeader.trgNumber + m_FADCTriggerNumberOffset !=
+                (char)((m_eventMetaDataPtr->getEvent()) & 0xFF)) {
+              B2ERROR(" On event number: " << m_eventMetaDataPtr->getEvent() <<
+                      std::endl <<
+                      " Found a wrong FTB header of the SVD FADC " <<
+                      std::endl <<
+                      " FADC: " << fadc << std::endl <<
+                      " Trigger number LSByte reported by the FADC: " <<
+                      m_MainHeader.trgNumber << " + offset " <<
+                      m_FADCTriggerNumberOffset <<
+                      std::endl <<
+                      " expected: " << (m_eventMetaDataPtr->getEvent() & 0xFF)
+                     );
+            }
+          }
 
-          if (m_APVHeader.check == 2)  // APV header
+          if (m_APVHeader.check == 2) { // APV header
             apv = m_APVHeader.APVnum;
-
+          }
 
           if (m_data_A.check == 0) { // data
             strip = m_data_A.stripNum;
@@ -146,8 +198,8 @@ void SVDUnpackerModule::event()
             sample[2] = m_data_A.sample3;
 
             data32_it++;
-            data32 = *data32_it; // 2nd frame with data
-            crc16vec.push_back(data32);
+            m_data32 = *data32_it; // 2nd frame with data
+            crc16vec.push_back(m_data32);
 
             sample[3] = m_data_B.sample4;
             sample[4] = m_data_B.sample5;

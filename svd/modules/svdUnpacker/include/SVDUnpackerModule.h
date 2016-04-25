@@ -16,6 +16,7 @@
 #include <svd/geometry/SensorInfo.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <svd/dataobjects/SVDDigit.h>
@@ -23,6 +24,7 @@
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <svd/online/SVDStripNoiseMap.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 namespace Belle2 {
 
@@ -82,18 +84,18 @@ namespace Belle2 {
       struct MainHeader {
         unsigned int trgNumber : 8; //LSB
         unsigned int trgTiming : 8;
-        unsigned int FADCnum : 8;
-        unsigned int evtType : 3;
-        unsigned int runType : 2;
-        unsigned int check : 3; //MSB
+        unsigned int FADCnum   : 8;
+        unsigned int evtType   : 3;
+        unsigned int runType   : 2;
+        unsigned int check     : 3; //MSB
       };
 
       struct APVHeader {
-        unsigned int CMC1 : 8; //LSB
+        unsigned int CMC1      : 8; //LSB
 
-        unsigned int CMC2 : 4;
-        unsigned int reserved : 3;
-        unsigned int errorBit : 1;
+        unsigned int CMC2      : 4;
+        unsigned int errorMask : 3;
+        unsigned int errorBit  : 1;
 
         unsigned int pipelineAddr : 8;
 
@@ -137,8 +139,8 @@ namespace Belle2 {
 
 
 
-      union {
-        uint32_t data32; // input
+      union {  // The 4 byte words of the stream can be interpreted as:
+        uint32_t m_data32;
         FTBHeader m_FTBHeader;
         MainHeader m_MainHeader;
         APVHeader m_APVHeader;
@@ -148,8 +150,10 @@ namespace Belle2 {
         FTBTrailer m_FTBTrailer;
       };
 
+      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
-
+      int m_shutUpFTBError;
+      int m_FADCTriggerNumberOffset;
 
     };//end class declaration
 

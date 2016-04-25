@@ -131,6 +131,7 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
          sizeof(int) * (raw_copper->GetDetectorNwords(i, 2)),
          sizeof(int) * (raw_copper->GetDetectorNwords(i, 3))
         );
+  printf("SVD CTIME_TYPE %.8x EVE 0x %.8x\n", raw_copper->GetTTCtimeTRGType(i), raw_copper->GetEveNo(i));
   if (m_eventMetaDataPtr->getErrorFlag()) {
     printf("!!!!!!!!! ERROR event !!!!!!!!!! : eve %d errflag %.8x\n", raw_copper->GetEveNo(i), m_eventMetaDataPtr->getErrorFlag());
   }
@@ -190,16 +191,33 @@ void PrintDataTemplateModule::printPXDEvent(RawPXD* raw_pxd)
                         (((temp_buf[ nframes + 4 ] >> 8) & 0xff) << 16) | (((temp_buf[ nframes + 4 ] >> 0) & 0xff) << 24);
   //     unsigned int hlttrg = temp_buf[ nframes + 4 ];
 
+  int ctime_type = 0;
+  int dhe_time = 0;
   if (nframes != 0) {
-    int pos = nframesv[ 0 ] / 4;
+    int pos = nframesv[ 0 ] / 4 + nframes + 2 ;
     //     printf("nf0 %d\n", nframesv[ 0 ]);
     for (int i = 1; i < nframesv.size(); i++) {
       if ((nframesv[ i ] % 4) != 0) break;
-      int dhh_trg1 = (temp_buf[ nframes + 2 + pos ] >> 24) & 0xff;
-      int dhh_trg2 = (temp_buf[ nframes + 2 + pos ] >> 16) & 0xff;
-      int dhh_trg3 = (temp_buf[ nframes + 3 + pos ] >> 8) & 0xff;
-      int dhh_trg4 = (temp_buf[ nframes + 3 + pos ] >> 0) & 0xff;
+      int dhh_trg1 = (temp_buf[ pos ] >> 24) & 0xff;
+      int dhh_trg2 = (temp_buf[ pos ] >> 16) & 0xff;
+      int dhh_trg3 = (temp_buf[ pos + 1 ] >> 8) & 0xff;
+      int dhh_trg4 = (temp_buf[ pos + 1 ] >> 0) & 0xff;
       unsigned int dhh_trg = dhh_trg1 | (dhh_trg2 << 8) | (dhh_trg3 << 16) | (dhh_trg4 << 24);
+
+      //      if (i == 1) {
+      if (((temp_buf[ pos ] >> 4)  & 0x7) == 5) {
+        ctime_type = ((temp_buf[ pos + 2 ] & 0xff) << 24) |
+                     (((temp_buf[ pos + 2 ] >> 8) & 0xff) << 16) |
+                     (((temp_buf[ pos + 1 ] >> 16) & 0xff) << 8) |
+                     (((temp_buf[ pos + 1 ] >> 24) & 0xff));
+      }
+
+      if (((temp_buf[ pos ] >> 4)  & 0x7) == 1) {
+        dhe_time = ((temp_buf[ pos + 2 ] & 0xff) << 24) |
+                   (((temp_buf[ pos + 2 ] >> 8) & 0xff) << 16) |
+                   (((temp_buf[ pos + 1 ] >> 16) & 0xff) << 8) |
+                   (((temp_buf[ pos + 1 ] >> 24) & 0xff));
+      }
 
 //         printf("Event mixing is occured. hlt %.8x dhh %.8x onsen %.8x %.8x %.8x nf %d\n", hlttrg, dhh_trg, onsen_trg,
 //          temp_buf[ nframes + 2 + pos ], temp_buf[ nframes + 3 + pos ], nframesv[ i ] );
@@ -212,6 +230,7 @@ void PrintDataTemplateModule::printPXDEvent(RawPXD* raw_pxd)
       pos += nframesv[ i ] / 4;
     }
   }
+  printf("PXD FTSW %u TRG %u DHE %u\n", ctime_type, hlttrg, dhe_time);
 
 
 }

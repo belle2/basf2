@@ -73,7 +73,7 @@ namespace Belle2 {
     std::string m_expertOutputName; /**< Name under which the SignalProbability is stored in the ExtraInfo of the Particle object. */
     std::string m_filename;  /**< Filename where the weights of the trained MLPs are saved.*/
     std::vector<const Variable::Manager::Var*> m_variables; /**< Input variables for the FANN MLP */
-    double m_signalFraction; /**< signalFraction to calculate probability, -1 the training signal fraction is used */
+    // double m_signalFraction; /**< signalFraction to calculate probability, -1 the training signal fraction is used */
     FANNMLP m_MLP; /**< Trained neural Network */
 
   };

@@ -4542,12 +4542,12 @@ TTrack::helixHasNan(const THelix& h) {
 #endif
         const CLHEP::HepVector& a = h.a();
         for (unsigned i = 0; i < 5; i++)
-            if (isnan(a[i]))
+            if (std::isnan(a[i]))
                 return true;
         const CLHEP::HepSymMatrix& Ea = h.Ea();
         for (unsigned i = 0; i < 5; i++)
             for (unsigned j = 0; j <= i; j++)
-                if (isnan(Ea[i][j]))
+                if (std::isnan(Ea[i][j]))
                     return true;
         return false;
 #if defined(BELLE_DEBUG)

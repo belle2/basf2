@@ -189,8 +189,8 @@ def parse_cmd_line_arguments():
                         "validation package are executed. During regular"
                         "validation, these scripts are ignored.",
                         action='store_true')
-    parser.add_argument("--use-cache", help="If validation scripts are marked as"
-                        "cacheable and their output files already exist, don't execute"
+    parser.add_argument("--use-cache", help="If validation scripts are marked as "
+                        "cacheable and their output files already exist, don't execute "
                         "these scripts again",
                         action='store_true')
     parser.add_argument("--view", help="Once the validation is finished, start"

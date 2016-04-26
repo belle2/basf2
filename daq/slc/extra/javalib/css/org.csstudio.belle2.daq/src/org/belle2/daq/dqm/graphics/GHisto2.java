@@ -40,13 +40,15 @@ public class GHisto2 extends GHisto {
 		double max = axisY.get().getMax();
 		double min = axisY.get().getMin();
 		double X, Y, width, height;
+		HtmlColor cline = canvas.getLine().getColor();
+		HtmlColor cfill = canvas.getFill().getColor();
+		HtmlColor color = color_pattern.get(0);
 		for (int ny = 0; ny < histo.getAxisY().getNbins(); ny++) {
+			Y = y0 - this.canvas.getAxisY().eval(dbiny * ny + ymin);
+			height = Y - (y0 - this.canvas.getAxisY().eval(dbiny * (ny + 1) + ymin));
 			for (int nx = 0; nx < histo.getAxisX().getNbins(); nx++) {
 				X = x0 + this.canvas.getAxisX().eval(dbinx * nx + xmin);
-				Y = y0 - this.canvas.getAxisY().eval(dbiny * ny + ymin);
 				width = x0 + this.canvas.getAxisX().eval(dbinx * (nx + 1) + xmin) - X;
-				height = Y - (y0 - this.canvas.getAxisY().eval(dbiny * (ny + 1) + ymin));
-				HtmlColor color = color_pattern.get(0);
 				double data = histo.getBinContent(nx, ny);
 				if (data < max && data > min) {
 					color = color_pattern.get((int) (color_pattern.size() * ((data - min) / (max - min))));
@@ -58,13 +60,11 @@ public class GHisto2 extends GHisto {
 					color = HtmlColor.WHITE;
 				}
 				if (color != null) {
-					HtmlColor c = canvas.getLine().getColor();
-					HtmlColor cf = canvas.getFill().getColor();
 					canvas.getFill().setColor(color);
 					canvas.getLine().setColor(null);
 					canvas.drawRect(X, Y - height, width, height, 1);
-					canvas.getFill().setColor(cf);
-					canvas.getLine().setColor(c);
+					canvas.getFill().setColor(cfill);
+					canvas.getLine().setColor(cline);
 				}
 				//if (histo.getLineColor() != null) {
 				//	HtmlColor c = canvas.getFill().getColor();

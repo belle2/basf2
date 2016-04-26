@@ -19,14 +19,31 @@ public class JavaGraphicDrawer extends GraphicsDrawer {
 	private Graphics _graphics;
 	private Font _j_font;
 	private int _font_real_size = 16;
-	private int m_x, m_y;
 	private Image image;
+	private int m_x;
+	private int m_y;
 	private GC gc;
-
+	private static Color[][][] gcolor= null;
+	
 	public static Color convert(HtmlColor color) {
+		if (gcolor == null) {
+			gcolor = new Color[256][][];
+			for (int i = 0; i < 256; i++) {
+				gcolor[i] = new Color[256][];
+				for (int j = 0; j < 256; j++) {
+					gcolor[i][j] = new Color[256];
+				}
+			}
+		}
 		if (color == null || color.isNull())
 			return null;
-		return new Color(Display.getCurrent(), color.getRed(), color.getGreen(), color.getBlue());
+		int r = color.getRed();
+		int g = color.getGreen();
+		int b = color.getBlue();
+		if (gcolor[r][g][b] == null) {
+			gcolor[r][g][b] = new Color(Display.getCurrent(), color.getRed(), color.getGreen(), color.getBlue());
+		}
+		return gcolor[r][g][b];
 	}
 
 	public JavaGraphicDrawer(int width, int height) {
@@ -118,8 +135,8 @@ public class JavaGraphicDrawer extends GraphicsDrawer {
 		int nmax = (x.length > y.length) ? y.length : x.length;
 		int[] points = new int[nmax * 2];
 		for (int n = 0; n < nmax; n++) {
-			points[n * 2] = (int) (x[n] * getWidth());
-			points[n * 2 + 1] = (int) (y[n] * getHeight());
+			points[n * 2] = m_x+(int) (x[n] * getWidth());
+			points[n * 2 + 1] = m_y+(int) (y[n] * getHeight());
 		}
 		if (getFill().getColor() != null && !getFill().getColor().isNull()) {
 			gc.setBackground(convert(getFill().getColor()));
@@ -149,7 +166,7 @@ public class JavaGraphicDrawer extends GraphicsDrawer {
 			return;
 		int nmax = (x.length > y.length) ? y.length : x.length;
 		for (int n = 0; n < nmax; n++) {
-			drawMarker(x[n], y[n]);
+			drawMarker(m_x+x[n], m_y+y[n]);
 		}
 	}
 
@@ -210,12 +227,17 @@ public class JavaGraphicDrawer extends GraphicsDrawer {
 
 	public void update() {
 		super.update();
-		if (_graphics != null && image != null && !image.isDisposed() && gc != null && !gc.isDisposed()) {
+		if (_graphics != null && image != null && !image.isDisposed() && !gc.isDisposed() /* && gc != null*/) {
 			try {
 				_graphics.drawImage(image, m_x, m_y);
+				//gc.dispose();
 			} catch (Exception e) {
 
 			}
+		}
+		if (gc != null) {
+			gc.dispose();
+			gc = new GC(image);
 		}
 	}
 
@@ -223,14 +245,14 @@ public class JavaGraphicDrawer extends GraphicsDrawer {
 		if (_graphics == null)
 			return;
 		if (getFill().getColor() != null && !getFill().getColor().isNull()) {
-			_graphics.setBackgroundColor(convert(getLine().getColor()));
-			_graphics.fillOval((int) ((x - r_x) * getWidth()), (int) ((y - r_y) * getHeight()), (int) (r_x * getWidth() * 2),
+			gc.setBackground(convert(getLine().getColor()));
+			gc.fillOval((int) ((x - r_x) * getWidth()), (int) ((y - r_y) * getHeight()), (int) (r_x * getWidth() * 2),
 					(int) (r_y * getHeight() * 2));
 		}
 		if (getLine().getColor() != null && !getLine().getColor().isNull()) {
-			_graphics.setForegroundColor(convert(getLine().getColor()));
-			_graphics.setLineWidthFloat(getLine().getWidth());
-			_graphics.drawOval((int) ((x - r_x) * getWidth()), (int) ((y - r_y) * getHeight()), (int) (r_x * getWidth() * 2),
+			gc.setForeground(convert(getLine().getColor()));
+			gc.setLineWidth((int)getLine().getWidth());
+			gc.drawOval((int) ((x - r_x) * getWidth()), (int) ((y - r_y) * getHeight()), (int) (r_x * getWidth() * 2),
 					(int) (r_y * getHeight() * 2));
 		}
 	}
@@ -250,14 +272,14 @@ public class JavaGraphicDrawer extends GraphicsDrawer {
 		if (_graphics == null)
 			return;
 		if (getFill().getColor() != null && !getFill().getColor().isNull()) {
-			_graphics.setBackgroundColor(convert(getLine().getColor()));
-			_graphics.fillArc((int) ((x - r_x) * getWidth()), (int) ((y - r_y) * getHeight()), (int) (r_x * getWidth() * 2),
+			gc.setBackground(convert(getLine().getColor()));
+			gc.fillArc((int) ((x - r_x) * getWidth()), (int) ((y - r_y) * getHeight()), (int) (r_x * getWidth() * 2),
 					(int) (r_y * getHeight() * 2), (int) angle0, (int) angle1);
 		}
 		if (getLine().getColor() != null && !getLine().getColor().isNull()) {
-			_graphics.setForegroundColor(convert(getLine().getColor()));
-			_graphics.setLineWidthFloat(getLine().getWidth());
-			_graphics.drawArc((int) ((x - r_x) * getWidth()), (int) ((y - r_y) * getHeight()), (int) (r_x * getWidth() * 2),
+			gc.setForeground(convert(getLine().getColor()));
+			gc.setLineWidth((int)getLine().getWidth());
+			gc.drawArc((int) ((x - r_x) * getWidth()), (int) ((y - r_y) * getHeight()), (int) (r_x * getWidth() * 2),
 					(int) (r_y * getHeight() * 2), (int) angle0, (int) angle1);
 		}
 	}

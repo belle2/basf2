@@ -12,7 +12,8 @@ public class Axis {
     private boolean fixedMax = false;
     private String title = null;
     private ArrayList<String> m_labels = null;
-
+    private double avarageFactor = 0;
+    
     public Axis(int nbin, double min, double max, String label) {
         nbins = nbin;
         this.min = min;
@@ -148,5 +149,13 @@ public class Axis {
     public ArrayList<String> getLabels() {
         return m_labels;
     }
+
+    public double getAvarageFactor () {
+    	return avarageFactor;
+    }
+
+    public void setAvarageFactor(double factor) {
+    	avarageFactor = factor;
+	}
 
 }

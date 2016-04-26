@@ -193,4 +193,12 @@ public class DQMCanvasFigure extends Figure {
 		return hcanvas;
 	}
 
+	public void setPadAvarageFactor(double factor) {
+		if (hcanvas.getColorAxis() != null) {
+			hcanvas.getColorAxis().get().setAvarageFactor(factor);
+		} else {
+			hcanvas.getAxisY().get().setAvarageFactor(factor);
+		}
+	}
+
 }

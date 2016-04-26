@@ -29,6 +29,7 @@ public class DQMCanvasModel extends AbstractContainerModel {
 	public static final String padLineColor = "padLineColor";
 	public static final String padLogX = "padLogX";
 	public static final String padLogY = "padLogY";
+	public static final String padAvarageFactor = "padAvarageFactor";
 	public static final String padMinY = "padMinY";
 	public static final String padMaxY = "padMaxY";
 	public static final String padMinZ = "padMinZ";
@@ -91,6 +92,7 @@ public class DQMCanvasModel extends AbstractContainerModel {
 		addProperty(new ColorProperty(padLineColor, "Line Color", Pad, new RGB(0, 0, 0)));
 		addProperty(new BooleanProperty(padLogX, "X Log scale", Pad, false));
 		addProperty(new BooleanProperty(padLogY, "Y Log scale", Pad, false));
+		addProperty(new DoubleProperty(padAvarageFactor, "Avarage factor", Pad, -1));
 		addProperty(new DoubleProperty(padMinY, "Y Minimum", Pad, -1));
 		addProperty(new DoubleProperty(padMaxY, "Y Maximum", Pad, -1));
 		addProperty(new DoubleProperty(padMinZ, "Z Minimum", Pad, -1));
@@ -163,6 +165,10 @@ public class DQMCanvasModel extends AbstractContainerModel {
 
 	public boolean getPadLogY() {
 		return getCastedPropertyValue(padLogY);
+	}
+
+	public double getPadAvarageFactor() {
+		return getCastedPropertyValue(padAvarageFactor);
 	}
 
 	public double getPadMinY() {

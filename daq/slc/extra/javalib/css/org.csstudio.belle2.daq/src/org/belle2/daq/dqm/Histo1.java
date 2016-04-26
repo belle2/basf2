@@ -106,14 +106,27 @@ public abstract class Histo1 extends Histo {
 	@Override
 	public void setMaxAndMin() {
 		if (!axisY.isFixedMax() || !axisY.isFixedMin()) {
-			double data, data_max = getBinContent(0);
-			for (int nx = 0; nx < axisX.getNbins(); nx++) {
-				data = getBinContent(nx);
-				if (data > data_max) {
-					data_max = data;
+			if (axisY.getAvarageFactor() > 0) {
+				double data = 0;
+				int n = 0;
+				for (int nx = 0; nx < axisX.getNbins(); nx++) {
+					double bin = getBinContent(nx);
+					if (bin > axisY.getMin()) n++;
+					data += bin;
 				}
+				if (n > 0) {
+					setMaximum(data / n * axisY.getAvarageFactor());
+				}
+			} else {
+				double data, data_max = getBinContent(0);
+				for (int nx = 0; nx < axisX.getNbins(); nx++) {
+					data = getBinContent(nx);
+					if (data > data_max) {
+						data_max = data;
+					}
+				}
+				setMaximum(data_max * 1.1);
 			}
-			setMaximum(data_max * 1.1);
 		}
 	}
 

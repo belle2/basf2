@@ -260,6 +260,8 @@
   <DetectorComponent name="Telescopes" xmlns:xi="http://www.w3.org/2001/XInclude">
     <Creator library="testbeam">VXDTBCreator</Creator>
     <Content>
+      <!-- Displacement parameters -->
+      <xi:include href="VXDTB2016-Displacements.xml"/> 
       <Volumes>
         
         <Volume name="EUDET-Module1">

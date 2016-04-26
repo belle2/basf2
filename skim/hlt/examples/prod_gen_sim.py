@@ -3,7 +3,6 @@
 
 from basf2 import *
 from simulation import add_simulation
-from beamparameters import add_beamparameters
 import glob
 
 set_random_seed(12345)
@@ -16,9 +15,6 @@ eventinfosetter.param('evtNumList', [10])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)
-
-# beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
 
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')

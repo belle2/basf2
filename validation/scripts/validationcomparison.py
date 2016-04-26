@@ -68,10 +68,10 @@ class Chi2Test(ComparisonBase):
         """
         @return: True if the two objects can be compared, False otherwise
         """
-        if not self.has_compatible_bins():
+        if not self.correct_types():
             return False
 
-        return self.correct_types()
+        return self.has_compatible_bins()
 
     def correct_types(self):
         """
@@ -82,11 +82,16 @@ class Chi2Test(ComparisonBase):
         if self.objectA is None or self.objectA is None:
             return False
 
-        supported_types = ["TProfile", "TH1D", "TH1F"]
+        supported_types = ["TProfile", "TH1D", "TH1F", "TEfficiency"]
         # check if the supplied object inherit from one of the supported types
         # and if they are of the same type
         if len([type for type in supported_types if self.objectA.ClassName() == type and self.objectB.ClassName() == type]) == 0:
             return False
+
+        if self.objectA.ClassName() == "TEfficiency":
+            # can only handle TEfficiencies with dimension one atm
+            if self.objectA.GetDimension() > 1:
+                return False
 
         return True
 
@@ -148,7 +153,28 @@ class Chi2Test(ComparisonBase):
         Check if both ROOT obeject have the same amount of bins
         @return: True if the bins are equal, otherwise False
         """
+        if (self.objectA.ClassName() == "TEfficiency") and (self.objectB.ClassName() == "TEfficiency"):
+            return self.objectA.GetTotalHistogram().GetNbinsX() == self.objectB.GetTotalHistogram().GetNbinsX()
+
         return self.objectA.GetNbinsX() == self.objectB.GetNbinsX()
+
+    def __convert_teff_to_hist(self, teffA):
+        """
+        Convert the content of a TEfficiency plot to a histogram and set
+        the bin content and errors
+        """
+        conv_hist = teffA.GetTotalHistogram()
+        xbinCount = conv_hist.GetNbinsX()
+        xbin_low = conv_hist.GetXaxis().GetXmin()
+        xbin_max = conv_hist.GetXaxis().GetXmax()
+
+        th1 = ROOT.TH1D(teffA.GetName() + "root_conversion", teffA.GetName(), xbinCount, xbin_low, xbin_max)
+        # starting from the first to the last bin, ignoring the under/overflow bins
+        for i in range(1, xbinCount):
+            th1.SetBinContent(i, teffA.GetEfficiency(i))
+            th1.SetBinError(i, teffA.GetEfficiencyErrorLow(i))
+
+        return th1
 
     def __internal_compare(self):
         """
@@ -167,24 +193,32 @@ Please contact Thomas.Hauth@kit.edu if you need this supported.""".format(
             raise DifferingBinCount("The objects have differing x bin count: {} has {} vs. {} has {}".format(
                 self.objectA.GetName(), self.objectA.GetNbinsX(), self.objectB.GetName(), self.objectB.GetNbinsX()))
 
-        nbins = self.objectA.GetNbinsX()
+        local_objectA = self.objectA
+        local_objectB = self.objectB
+
+        # very special handling for TEfficiencies
+        if self.objectA.ClassName() == "TEfficiency":
+            local_objectA = self.__convert_teff_to_hist(self.objectA)
+            local_objectB = self.__convert_teff_to_hist(self.objectB)
+
+        nbins = local_objectA.GetNbinsX()
 
         if nbins < 2:
             raise TooFewBins("{} bin is to few to perform the Chi2 test.".format(nbins))
 
         compareWeightOne = (
-            self.objectA.ClassName() == "TProfile") or (
-            self.objectA.ClassName() == "TH1D") or (
-            self.objectA.ClassName() == "TH1F")
+            local_objectA.ClassName() == "TProfile") or (
+            local_objectA.ClassName() == "TH1D") or (
+            local_objectA.ClassName() == "TH1F")
         compareWeightTwo = (
-            self.objectA.ClassName() == "TProfile") or (
-            self.objectA.ClassName() == "TH1D") or (
-            self.objectA.ClassName() == "TH1F")
+            local_objectB.ClassName() == "TProfile") or (
+            local_objectB.ClassName() == "TH1D") or (
+            local_objectB.ClassName() == "TH1F")
 
         # clone, because possibly some content of profiles will
         # be set to zero
-        firstObj = self.objectA.Clone()
-        secondObj = self.objectB.Clone()
+        firstObj = local_objectA.Clone()
+        secondObj = local_objectB.Clone()
 
         if compareWeightOne is True and compareWeightTwo is False:
             # switch histograms, because ROOT can only have the first one unweighted

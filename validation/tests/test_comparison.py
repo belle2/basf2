@@ -30,6 +30,19 @@ class TestComparison(unittest.TestCase):
                     p.Fill(i + 0.5, fixed_number)
         return p
 
+    def create_teff(self, name, bins=20, eff=0.9):
+        """
+        Creates and fills a root TEfficiency plot
+        """
+        p = ROOT.TEfficiency(name, name, bins, 0, 50)
+
+        for i in range(0, 5000):
+            passed = random.uniform(0, 1.0) < eff
+            bin = random.uniform(0.0, 50.0)
+            p.Fill(passed, i)
+
+        return p
+
     def create_histogram(self, name, entries=5000, mu=10, sigma=3):
         """
         Create a TH1D and fill with random content
@@ -94,6 +107,15 @@ class TestComparison(unittest.TestCase):
         #: store for later use
         self.profileDifferentBins = ROOT.TProfile(self.root_name("profileDifferentBins"),
                                                   self.root_name("profileDifferentBins"), 40, 0, 50.0)
+
+        pA = self.create_teff(self.root_name("teffA"))
+        #: store for later use
+        self.teffA = pA
+
+        pB = self.create_teff(self.root_name("teffB"))
+        #: store for later use
+        self.teffB = pB
+
         call_iteration += 1
 
     def test_compare_profiles(self):
@@ -169,6 +191,35 @@ class TestComparison(unittest.TestCase):
 
         with self.assertRaises(validationcomparison.ObjectsNotSupported):
             c.pvalue()
+
+    def test_compare_tefficiencies(self):
+        """
+        Test if two TEfficiency objects can be compared. Is a bit tricky
+        as TEfficiency does not support
+        """
+
+        c = validationcomparison.Chi2Test(self.teffA, self.teffB)
+        self.assertTrue(c.can_compare())
+
+        self.assertAlmostEqual(c.pvalue(), 0.9999987236358295)
+        self.assertAlmostEqual(c.chi2(), 2.0313602336641985)
+        self.assertAlmostEqual(c.chi2ndf(), 0.11285334631467769)
+        self.assertAlmostEqual(c.ndf(), 18)
+
+    def test_compare_tefficiencies_same(self):
+        """
+        Test if two TEfficiency objects can be compared. Is a bit tricky
+        as TEfficiency does not support
+        Comparing the exact same TEfficiency object should give back 100% agreement
+        """
+
+        c = validationcomparison.Chi2Test(self.teffA, self.teffA)
+        self.assertTrue(c.can_compare())
+
+        self.assertAlmostEqual(c.pvalue(), 1.0)
+        self.assertAlmostEqual(c.chi2(), 0.0)
+        self.assertAlmostEqual(c.chi2ndf(), 0.0)
+        self.assertAlmostEqual(c.ndf(), 18)
 
     def test_compare_differing_bins(self):
         """

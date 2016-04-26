@@ -54,6 +54,14 @@ namespace Belle2 {
     }
 
     /**
+     * Get the list of bad wires
+     */
+    std::vector<unsigned short> getBadWires() const
+    {
+      return m_wireList;
+    }
+
+    /**
      * Inquire if the wire is bad
      */
     bool isBadWire(const WireID& wid)

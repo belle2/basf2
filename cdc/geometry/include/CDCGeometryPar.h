@@ -18,6 +18,7 @@
 
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCTimeZero.h>
+#include <cdc/dbobjects/CDCBadWires.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
 
@@ -119,6 +120,18 @@ namespace Belle2 {
        * Set t0 parameters (from DB)
        */
       void setT0();
+
+      /**
+       * Read bad-wires (from a file).
+       * @param GearDir Gear Dir.
+       * @param mode 0: read simulation file, 1: read reconstruction file.
+       */
+      void readBadWire(const GearDir, int mode = 0);
+
+      /**
+       * Set bad-wires (from DB)
+       */
+      void setBadWire();
 
       /**
        * Read channel map between wire-id and electronics-id.
@@ -572,6 +585,16 @@ namespace Belle2 {
       }
 
       /**
+       * Inquire if the wire is bad
+       */
+      inline bool isBadWire(const WireID& wid)
+      {
+        std::vector<unsigned short>::iterator it = std::find(m_badWire.begin(), m_badWire.end(), wid.getEWire());
+        bool torf = (it != m_badWire.end()) ? true : false;
+        return torf;
+      }
+
+      /**
        * Compute effects of the sense wire sag.
        * @param[in] set     Wire position set; =c_Base, c_Misaligned or c_Aligned
        * @param[in] layerID Layer ID
@@ -827,6 +850,8 @@ namespace Belle2 {
 
       std::map<WireID, unsigned short> m_wireToBoard;  /*!< map relating wire-id and board-id. */
 
+      std::vector<unsigned short> m_badWire;  /*!< list of bad-wires. */
+
       unsigned short m_tdcOffset;  /*!< TDC off set value (default = 0).*/
       double m_clockFreq4TDC;      /*!< Clock frequency used for TDC (GHz). */
       double m_tdcBinWidth;        /*!< TDC bin width (nsec/bin). */
@@ -838,6 +863,9 @@ namespace Belle2 {
 
 #if defined(CDC_T0_FROM_DB)
       DBArray<CDCTimeZero> m_t0FromDB; /*!< t0s retrieved from DB. */
+#endif
+#if defined(CDC_BADWIRE_FROM_DB)
+      DBObjPtr<CDCBadWires> m_badWireFromDB; /*!< bad-wires retrieved from DB. */
 #endif
 #if defined(CDC_PROPSPEED_FROM_DB)
       DBObjPtr<CDCPropSpeeds> m_propSpeedFromDB; /*!< prop.-speeds retrieved from DB. */

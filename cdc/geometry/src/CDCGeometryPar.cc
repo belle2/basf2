@@ -34,15 +34,19 @@ CDCGeometryPar& CDCGeometryPar::Instance()
   return *m_B4CDCGeometryParDB;
 }
 
-#if defined(CDC_T0_FROM_DB)
-CDCGeometryPar::CDCGeometryPar() : m_t0FromDB(), m_propSpeedFromDB(), m_timewalkFromDB()
-{
-  m_t0FromDB.addCallback(this, &CDCGeometryPar::setT0);
-  m_propSpeedFromDB.addCallback(this, &CDCGeometryPar::setPropSpeed);
-  m_timeWalkFromDB.addCallback(this, &CDCGeometryPar::setTimeWalk);
-#else
 CDCGeometryPar::CDCGeometryPar()
 {
+#if defined(CDC_T0_FROM_DB)
+  m_t0FromDB.addCallback(this, &CDCGeometryPar::setT0);
+#endif
+#if defined(CDC_BADWIRE_FROM_DB)
+  m_badWireFromDB.addCallback(this, &CDCGeometryPar::setBadWire);
+#endif
+#if defined(CDC_PROPSPEED_FROM_DB)
+  m_propSpeedFromDB.addCallback(this, &CDCGeometryPar::setPropSpeed);
+#endif
+#if defined(CDC_TIMEWALK_FROM_DB)
+  m_timeWalkFromDB.addCallback(this, &CDCGeometryPar::setTimeWalk);
 #endif
   clear();
   read();
@@ -305,6 +309,14 @@ void CDCGeometryPar::read()
 #else
     //Read t0 (from file)
     readT0(gbxParams);
+#endif
+
+#if defined(CDC_BADWIRE_FROM_DB)
+    //Set bad-wire (from DB)
+    setBadWire();
+#else
+    //Read bad-wire (from file)
+    readBadWire(gbxParams);
 #endif
 
     //Read time-walk coefficient
@@ -800,6 +812,50 @@ void CDCGeometryPar::readT0(const GearDir gbxParams, int mode)
 }
 
 
+// Read bad-wires.
+void CDCGeometryPar::readBadWire(const GearDir gbxParams, int mode)
+{
+  std::string fileName0 = gbxParams.getString("bwFileName");
+  if (mode == 1) {
+    fileName0 = gbxParams.getString("bw4ReconFileName");
+  }
+  fileName0 = "/cdc/data/" + fileName0;
+  std::string fileName = FileSystem::findFile(fileName0);
+
+  ifstream ifs;
+
+  if (fileName == "") {
+    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
+  } else {
+    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    ifs.open(fileName.c_str());
+    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
+  }
+
+  int iCL(0), iW(0);
+  unsigned nRead = 0;
+
+  while (true) {
+    ifs >> iCL >> iW;
+
+    if (ifs.eof()) break;
+
+    ++nRead;
+
+    m_badWire.push_back(WireID(iCL, iW));
+
+    if (m_debug) {
+      std::cout << iCL << " " << iW << std::endl;
+    }
+  }
+
+  if (nRead > nSenseWires) B2FATAL("CDCGeometryPar::readBadWire: #lines read-in (=" << nRead <<
+                                     ") is larger than the total #sense wires (=" << nSenseWires << ") !");
+
+  ifs.close();
+}
+
+
 // Read time-walk parameters
 void CDCGeometryPar::readTW(const GearDir gbxParams, const int mode)
 {
@@ -890,6 +946,15 @@ void CDCGeometryPar::setT0()
     m_t0[iCL][iW] = ent.getT0();
     //    std::cout <<"t0DB"<<  iCL <<" "<< iW <<" "<< ent.getT0() << std::endl;
   }
+}
+#endif
+
+
+#if defined(CDC_BADWIRE_FROM_DB)
+// Set bad-wire (from DB)
+void CDCGeometryPar::setBadWire()
+{
+  m_badWire = m_badWireFromDB->getBadWires();
 }
 #endif
 

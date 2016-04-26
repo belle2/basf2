@@ -23,8 +23,6 @@ MaskingModule::MaskingModule() : HistoModule()
 
   addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("mask"));
-  m_MaskDirectoryPath = std::string("");
-  addParam("MaskDirectoryPath", m_MaskDirectoryPath, "Path to place of mask files", m_MaskDirectoryPath);
   m_nEventsProcess = -1;
   addParam("nEventsProcess", m_nEventsProcess, "Number of events to process", m_nEventsProcess);
   m_AppendMaskFile = 1;
@@ -40,6 +38,18 @@ MaskingModule::MaskingModule() : HistoModule()
   addParam("SVDvCut", m_SVDvCut, "Cut for masking of SVD V strip - prreset for 10 kEvents", m_SVDvCut);
   addParam("TelCut", m_TelCut, "Cut for masking of PXD pixel - prreset for 10 kEvents", m_TelCut);
 
+  addParam("PXDMaskFileBasicName", m_PXDMaskFileBasicName, "Name of file with list of masked channels",
+           std::string("PXD_MaskFiredBasic.xml"));
+  addParam("SVDMaskFileBasicName", m_SVDMaskFileBasicName, "Name of file with list of masked channels",
+           std::string("SVD_MaskFiredBasic.xml"));
+  addParam("TelMaskFileBasicName", m_TelMaskFileBasicName, "Name of file with list of masked channels",
+           std::string("Tel_MaskFiredBasic.xml"));
+  addParam("PXDMaskFileRunName", m_PXDMaskFileRunName, "Name of file with list of masked channels",
+           std::string("PXD_MaskFired_RunXXX.xml"));
+  addParam("SVDMaskFileRunName", m_SVDMaskFileRunName, "Name of file with list of masked channels",
+           std::string("SVD_MaskFired_RunXXX.xml"));
+  addParam("TelMaskFileRunName", m_TelMaskFileRunName, "Name of file with list of masked channels",
+           std::string("Tel_MaskFired_RunXXX.xml"));
 }
 
 
@@ -326,7 +336,7 @@ void MaskingModule::event()
 void MaskingModule::endRun()
 {
   StoreObjPtr<EventMetaData> storeEventMetaData;
-  long unsigned runNo = storeEventMetaData->getRun();
+  //long unsigned runNo = storeEventMetaData->getRun();
   m_nEventsProcessFraction = (double)m_nRealEventsProcess / m_nEventsProcess;
 
   // Maskin border for all sensors at 10 000 events!:
@@ -361,8 +371,12 @@ void MaskingModule::endRun()
   B2INFO("Start to create masking");
   printf("Start to create masking from %i events (fraction: %6.3f)\n", (int)m_nRealEventsProcess, m_nEventsProcessFraction);
 
-  std::string FileName = str(format("%2%PXD_MaskFired_Run%1%.xml") % runNo % m_MaskDirectoryPath);
+  std::string FileName = str(format("%1%") % m_PXDMaskFileBasicName);
   std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+  std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsBasicList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
+        m_ignoredPixelsListName));
+  FileName = str(format("%1%") % m_PXDMaskFileRunName);
+  m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
   std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
       m_ignoredPixelsListName));
   MaskList = fopen(FileName.data(), "w");
@@ -406,13 +420,16 @@ void MaskingModule::endRun()
           for (int i2 = 0; i2 < m_PXDMaskUV[j * c_nPXDPlanes + i]->GetNbinsY(); ++i2) {
             int ExistMask = 0;
             if (m_AppendMaskFile) {
+              if (!m_ignoredPixelsBasicList->pixelOK(VxdID(iLayer, iLadder, iSensor), PXDIgnoredPixelsMap::map_pixel(i1, i2))) {
+                ExistMask += 1;
+              }
               if (!m_ignoredPixelsList->pixelOK(VxdID(iLayer, iLadder, iSensor), PXDIgnoredPixelsMap::map_pixel(i1, i2))) {
-                ExistMask = 1;
+                ExistMask += 1;
               }
             }
             if (ExistMask || (m_PXDHitMapUV[j * c_nPXDPlanes + i]->GetBinContent(i1 + 1, i2 + 1) > PXDCut)) {
               fprintf(MaskList, "        <pixels uStart = \"%04i\" vStart = \"%04i\"></pixels>\n", i1, i2);
-              m_PXDMaskUV[j * c_nPXDPlanes + i]->SetBinContent(i1 + 1, i2 + 1, 1);
+              m_PXDMaskUV[j * c_nPXDPlanes + i]->SetBinContent(i1 + 1, i2 + 1, 1 + ExistMask);
               nMasked++;
             }
           }
@@ -430,7 +447,11 @@ void MaskingModule::endRun()
   fprintf(MaskList, "</PXD>\n");
   fclose(MaskList);
 
-  FileName = str(format("%2%SVD_MaskFired_Run%1%.xml") % runNo % m_MaskDirectoryPath);
+  FileName = str(format("%1%") % m_SVDMaskFileBasicName);
+  m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+  std::unique_ptr<SVDIgnoredStripsMap> m_ignoredStripsBasicList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
+        m_ignoredPixelsListName));
+  FileName = str(format("%1%") % m_SVDMaskFileRunName);
   m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
   std::unique_ptr<SVDIgnoredStripsMap> m_ignoredStripsList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
       m_ignoredPixelsListName));
@@ -463,8 +484,11 @@ void MaskingModule::endRun()
         for (int i1 = 0; i1 < m_SVDMaskU[j * c_nSVDPlanes + i]->GetNbinsX(); ++i1) {
           int ExistMask = 0;
           if (m_AppendMaskFile) {
+            if (!m_ignoredStripsBasicList->stripOK(VxdID(iLayer, iLadder, iSensor, 1), (unsigned short) i1)) {
+              ExistMask += 1;
+            }
             if (!m_ignoredStripsList->stripOK(VxdID(iLayer, iLadder, iSensor, 1), (unsigned short) i1)) {
-              ExistMask = 1;
+              ExistMask += 1;
             }
           }
           float SVDCut = SVDCutUOut[i];
@@ -477,7 +501,7 @@ void MaskingModule::endRun()
 
           if (ExistMask || (sTS > 1)) {  // in al least two timestamps over cut for masking...
             fprintf(MaskList, "                    <strip stripNo = \"%i\"></strip>\n", i1);
-            m_SVDMaskU[j * c_nSVDPlanes + i]->SetBinContent(i1 + 1, 1);
+            m_SVDMaskU[j * c_nSVDPlanes + i]->SetBinContent(i1 + 1, 1 + ExistMask);
             nMaskedU++;
           }
         }
@@ -487,8 +511,11 @@ void MaskingModule::endRun()
         for (int i2 = 0; i2 < m_SVDMaskV[j * c_nSVDPlanes + i]->GetNbinsX(); ++i2) {
           int ExistMask = 0;
           if (m_AppendMaskFile) {
+            if (!m_ignoredStripsBasicList->stripOK(VxdID(iLayer, iLadder, iSensor, 0), (unsigned short) i2)) {
+              ExistMask += 1;
+            }
             if (!m_ignoredStripsList->stripOK(VxdID(iLayer, iLadder, iSensor, 0), (unsigned short) i2)) {
-              ExistMask = 1;
+              ExistMask += 1;
             }
           }
           float SVDCut = SVDCutVOut[i];
@@ -501,7 +528,7 @@ void MaskingModule::endRun()
 
           if (ExistMask || (sTS > 1)) {  // in al least two timestamps over cut for masking...
             fprintf(MaskList, "                    <strip stripNo = \"%i\"></strip>\n", i2);
-            m_SVDMaskV[j * c_nSVDPlanes + i]->SetBinContent(i2 + 1, 1);
+            m_SVDMaskV[j * c_nSVDPlanes + i]->SetBinContent(i2 + 1, 1 + ExistMask);
             nMaskedV++;
           }
         }
@@ -521,7 +548,11 @@ void MaskingModule::endRun()
   fprintf(MaskList, "</SVD>\n");
   fclose(MaskList);
 
-  FileName = str(format("%2%Tel_MaskFired_Run%1%.xml") % runNo % m_MaskDirectoryPath);
+  FileName = str(format("%1%") % m_TelMaskFileBasicName);
+  m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+  std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredTelPixelsBasicList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
+        m_ignoredPixelsListName));
+  FileName = str(format("%1%") % m_TelMaskFileRunName);
   m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
   std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredTelPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
         m_ignoredPixelsListName));
@@ -566,12 +597,16 @@ void MaskingModule::endRun()
         for (int i2 = 0; i2 < m_TelMaskUV[i]->GetNbinsY(); ++i2) {
           int ExistMask = 0;
           if (m_AppendMaskFile) {
+            if (!m_ignoredTelPixelsBasicList->pixelOK(VxdID(iLayer, iLadder, iSensor), PXDIgnoredPixelsMap::map_pixel(i1, i2))) {
+              ExistMask += 1;
+            }
             if (!m_ignoredTelPixelsList->pixelOK(VxdID(iLayer, iLadder, iSensor), PXDIgnoredPixelsMap::map_pixel(i1, i2))) {
-              ExistMask = 1;
+              ExistMask += 1;
             }
           }
-          if (ExistMask || (m_TelMaskUV[i]->GetBinContent(i1 + 1, i2 + 1) > TelCut)) {
+          if (ExistMask || (m_TelHitMapUV[i]->GetBinContent(i1 + 1, i2 + 1) > TelCut)) {
             fprintf(MaskList, "        <pixels uStart = \"%04i\" vStart = \"%04i\"></pixels>\n", i1, i2);
+            m_TelMaskUV[i]->SetBinContent(i1 + 1, i2 + 1, 1 + ExistMask);
             nMasked++;
           }
         }

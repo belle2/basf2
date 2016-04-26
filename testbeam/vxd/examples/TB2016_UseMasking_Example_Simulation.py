@@ -77,7 +77,9 @@ simulation.param('StoreAllSecondaries', True)
 #                 '/vis/scene/add/trajectories smooth',
 #                 '/vis/modeling/trajectories/create/drawByCharge'])
 
+# for simulation:
 RunNoVXD = 0
+
 # Masking for sensors
 pxd_mask1 = 'testbeam/vxd/data/PXD1_MaskListRun'+str(RunNoVXD)+'.xml'  # Gear path
 pxd_mask2 = 'testbeam/vxd/data/PXD2_MaskListRun'+str(RunNoVXD)+'.xml'  # Gear path

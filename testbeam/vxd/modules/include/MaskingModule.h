@@ -210,7 +210,14 @@ namespace Belle2 {
     std::string m_relTelClusterDigitName;    /**< TelClustersToPXDDigits RelationArray name */
     std::string m_storeFramesName;           /**< PXDFrames StoreArray name */
     std::string m_histogramDirectoryName;    /**< Name of the histogram directory in ROOT file */
-    std::string m_MaskDirectoryPath;         /**< Path to the mask file directory */
+
+    std::string m_PXDMaskFileBasicName;      /**< Name of file with list of masked channels */
+    std::string m_SVDMaskFileBasicName;      /**< Name of file with list of masked channels */
+    std::string m_TelMaskFileBasicName;      /**< Name of file with list of masked channels */
+    std::string m_PXDMaskFileRunName;        /**< Name of file with list of masked channels */
+    std::string m_SVDMaskFileRunName;        /**< Name of file with list of masked channels */
+    std::string m_TelMaskFileRunName;        /**< Name of file with list of masked channels */
+
     long m_nEventsProcess;                   /**< Number of events to process */
     long m_nRealEventsProcess;               /**< Real Number of events to process */
     float m_nEventsProcessFraction;          /**< Fraction of events to process to expected No. */

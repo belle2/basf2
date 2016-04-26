@@ -85,7 +85,6 @@ void PXDDigitSorterModule::event()
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
   // If not digits, nothing to do
   if (!storeDigits || !storeDigits.getEntries()) return;
-  storeDigits.clear();
 
   RelationArray relDigitMCParticle(m_relDigitMCParticleName);
   RelationArray relDigitTrueHit(m_relDigitTrueHitName);

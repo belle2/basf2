@@ -25,6 +25,7 @@ namespace Belle2 {
   class Level3Module : public L3TriggerManager, public Module {
 
   public:
+
     /** Constructor, for setting module description and parameters. */
     Level3Module();
 

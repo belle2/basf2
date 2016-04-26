@@ -154,6 +154,9 @@ void ROIPayloadAssemblerModule::event()
   payloadPtr.assign(payload);
 
   unsigned int evtNr = eventMetaDataPtr->getEvent();
+  if ((long long int) evtNr + m_triggerNumberShift > 0)
+    evtNr = evtNr + m_triggerNumberShift;
+
   bool accepted = true; // thats the default until HLT has reject mechanism
   payload->setHeader(accepted, mSendAllDS  ? (evtNr % mSendAllDS) == 0 : 0, mSendROIsDS ? (evtNr % mSendROIsDS) == 0 : 0);
 

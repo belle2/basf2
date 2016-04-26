@@ -304,7 +304,7 @@ void CDCSVGPlotter::drawGFTrackTrajectories(const std::string& storeArrayName, c
 
         TVector3 track_pos = absTrackRep->getPos(*fittedState);
 
-        if (!isnan(x))
+        if (!std::isnan(x))
           m_eventdataPlotter.drawLine(x, y, track_pos.x(), track_pos.y(), attributeMap);
         x = track_pos.x();
         y = track_pos.y();

@@ -402,17 +402,17 @@ void PXDClusterRescueAnalysisModule::terminate()
 
         // signal clusters vs no track
         binContentVs = h_positionClustersHasNoTrack->GetBinContent(x, y, z);
-        if (isnan(binContentVs / binContentSignal)) h_positionClustersSignalVsNoTrack->SetBinContent(x, y, z, 0);
+        if (std::isnan(binContentVs / binContentSignal)) h_positionClustersSignalVsNoTrack->SetBinContent(x, y, z, 0);
         else h_positionClustersSignalVsNoTrack->SetBinContent(x, y, z, binContentVs / binContentSignal);
 
         // signal clusters vs found by NN
         binContentVs = h_positionClustersFoundByNN->GetBinContent(x, y, z);
-        if (isnan(binContentVs / binContentSignal)) h_positionClustersSignalVsFoundByNN->SetBinContent(x, y, z, 0);
+        if (std::isnan(binContentVs / binContentSignal)) h_positionClustersSignalVsFoundByNN->SetBinContent(x, y, z, 0);
         else h_positionClustersSignalVsFoundByNN->SetBinContent(x, y, z, binContentVs / binContentSignal);
 
         // signal clusters vs lost by ROI
         binContentVs = h_positionClustersLostByROI->GetBinContent(x, y, z);
-        if (isnan(binContentVs / binContentSignal)) h_positionClustersSignalVsLostByROI->SetBinContent(x, y, z, 0);
+        if (std::isnan(binContentVs / binContentSignal)) h_positionClustersSignalVsLostByROI->SetBinContent(x, y, z, 0);
         else h_positionClustersSignalVsLostByROI->SetBinContent(x, y, z, binContentVs / binContentSignal);
       }
     }

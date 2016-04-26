@@ -62,7 +62,7 @@ bool Belle2::TestHelpers::angleNear(double expected, double actual, double absEr
 
 bool Belle2::TestHelpers::sameSign(double expected, double actual)
 {
-  if (isnan(expected) or isnan(actual)) return false;
+  if (std::isnan(expected) or std::isnan(actual)) return false;
   using boost::math::sign;
   int expectedSign = sign(expected);
   int actualSign = sign(actual);

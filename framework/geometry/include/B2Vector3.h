@@ -215,7 +215,7 @@ namespace Belle2 {
     /** returns given angle in the interval [-PI,PI) */
     static DataType Mpi_pi(DataType angle)
     {
-      if (isnan(angle)) {
+      if (std::isnan(angle)) {
         B2ERROR(name() << "::Mpi_pi: function called with NaN");
         return angle;
       }

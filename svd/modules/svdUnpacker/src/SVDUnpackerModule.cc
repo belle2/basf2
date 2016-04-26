@@ -170,8 +170,10 @@ void SVDUnpackerModule::event()
           if (m_MainHeader.check == 6) { // FADC header
             fadc = m_MainHeader.FADCnum;
 
-            if ((char) m_MainHeader.trgNumber + m_FADCTriggerNumberOffset !=
-                (char)((m_eventMetaDataPtr->getEvent()) & 0xFF)) {
+
+            if (
+              m_MainHeader.trgNumber !=
+              ((m_eventMetaDataPtr->getEvent() - m_FADCTriggerNumberOffset) & 0xFF)) {
               B2ERROR(" On event number: " << m_eventMetaDataPtr->getEvent() <<
                       std::endl <<
                       " Found a wrong FTB header of the SVD FADC " <<

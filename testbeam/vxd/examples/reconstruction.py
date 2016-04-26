@@ -256,12 +256,17 @@ if args.unpacking:
                         RemapLUT_IF_OB=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'),
                         RemapLUT_IB_OF=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'))
 
-    main.add_module('SVDUnpacker', xmlMapFileName='testbeam/vxd/data/TB_svd_mapping.xml')
+    main.add_module(
+        'SVDUnpacker',
+        xmlMapFileName='testbeam/vxd/data/TB_svd_mapping.xml',
+        FADCTriggerNumberOffset=1,
+        shutUpFTBError=10)
 
 
 if not args.svd_only:
     if args.unpacking:
         main.add_module("PXDRawHitSorter")
+    main.add_module('PXDDigitSorter')
     main.add_module('PXDClusterizer')
 
 main.add_module('SVDDigitSorter')  # , ignoredStripsListName='data/testbeam/vxd/SVD_Masking.xml')
@@ -279,8 +284,8 @@ else:
 add_vxdtf(main, not args.magnet_off, args.svd_only, args.momentum)
 
 if args.gbl_collect:
-    main.add_module('GBLfit', BuildBelle2Tracks=True, beamSpot=[-30, 0, 0])
-    main.add_module('MillepedeCollector', minPValue=0.0)
+    main.add_module('GBLfit')
+    main.add_module('MillepedeCollector', minPValue=0.0001)
 else:
     main.add_module('GenFitter', FilterId='Kalman')
 
@@ -289,22 +294,21 @@ if args.dqm:
         if args.unpacking:
             main.add_module("PXDRawDQM")
         main.add_module("PXDDQMCorr")
-    main.add_module('PXDDQM', histgramDirectoryName='pxddqm')  # does not work
+    main.add_module('PXDDQM', histgramDirectoryName='pxddqm')
     # main.add_module('SVDDQM3') will be removed, replaced by VXDDQMOnLine
     main.add_module('VXDDQMOnLine', SaveOtherHistos=1, SwapPXD=0)
 
     if args.tel_input:
         main.add_module("TelDQM")
-        # main.add_module("TelxVXD2016")
         main.add_module("VXDTelDQMOffLine", SaveOtherHistos=1)
 
     if not args.gbl_collect:
         main.add_module('TrackfitDQM')
 
-main.add_module('TrackBuilder')
 main.add_module('RootOutput')
 
 if args.display:
+    main.add_module('TrackBuilder')
     main.add_module('Display', fullGeometry=True)
 
 process(main)

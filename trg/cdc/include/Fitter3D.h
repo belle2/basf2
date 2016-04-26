@@ -80,6 +80,9 @@ namespace Belle2 {
     /// Removes TSs that are not possible with track Pt.
     void removeImpossibleStereoSuperlayers( bool (&useStSL)[4] );
 
+    /// Selects priority TSs when there are multiple candidate TSs for a superlayer.
+    static void selectAxialTSs( TRGCDCTrack & aTrack, std::vector<int> & bestTSIndex );
+
     /// Does 2D fit. Returns 0 if fit is done successfully. m_mBool should have fIsPrintError, fmcLR, fLRLUT, fmcLR, f2DFit, f2DFitDrift. m_mConstD should have Trg_PI. m_mConstV should have nWires, driftPhi2DError, wirePhi2DError, rr, rr2D.
     static int do2DFit( TRGCDCTrack & aTrack, std::map<std::string, bool> & m_mBool, std::map<std::string, double> & m_mConstD, std::map<std::string, std::vector<double> > & m_mConstV, std::map<std::string, double> & m_mDouble, std::map<std::string, std::vector<double> > & m_mVector);
 

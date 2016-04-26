@@ -56,6 +56,8 @@
 #include "trg/cdc/FpgaUtility.h"
 #include "trg/cdc/HandleRoot.h"
 
+#include <TRandom3.h>
+
 using namespace std;
 namespace Belle2 {
 
@@ -229,7 +231,6 @@ namespace Belle2 {
       m_mDouble["eventNumber"] = m_cdc.getEventNumber();
       m_mDouble["trackId"] = aTrack.getTrackID();
 
-
       ///////////////////////////////////
       //// 2D Fitter
       int fit2DResult = do2DFit(aTrack, m_mBool, m_mConstD, m_mConstV, m_mDouble, m_mVector);
@@ -238,7 +239,7 @@ namespace Belle2 {
       /////////////////////////////////
       // 3D Fitter
       // Check which stereo super layers should be used.
-      bool useStSl[4];
+      bool useStSl[4] = {0,0,0,0};
       findHitStereoSuperlayers(aTrack, useStSl, m_mBool["fIsPrintError"]);
       removeImpossibleStereoSuperlayers(useStSl);
       // Check if number of stereo super layer hits is smaller or equal to 1.
@@ -287,7 +288,6 @@ namespace Belle2 {
           double t_driftTime = m_mVector["tdc"][iSt*2+1] - m_mDouble["eventTime"];
           if (t_driftTime < 0) t_driftTime = 0;
           double t_driftLength = m_mConstV[tableName][(unsigned)t_driftTime];
-
           m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], t_driftLength, m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
         } else {
           m_mVector["phi3D"][iSt] = 9999;
@@ -379,6 +379,7 @@ namespace Belle2 {
 
       if(m_mBool["fVerbose"]) {
         cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]evtTime: "<<m_mDouble["eventTime"]<<endl;
+        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]tsId: "<<m_mVector["tsId"][0]<<" "<<m_mVector["tsId"][1]<<" "<<m_mVector["tsId"][2]<<" "<<m_mVector["tsId"][3]<<" "<<m_mVector["tsId"][4]<<" "<<m_mVector["tsId"][5]<<" "<<m_mVector["tsId"][6]<<" "<<m_mVector["tsId"][7]<<" "<<m_mVector["tsId"][8]<<endl;
         cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]wirePhi: "<<m_mVector["wirePhi"][0]<<" "<<m_mVector["wirePhi"][1]<<" "<<m_mVector["wirePhi"][2]<<" "<<m_mVector["wirePhi"][3]<<" "<<m_mVector["wirePhi"][4]<<" "<<m_mVector["wirePhi"][5]<<" "<<m_mVector["wirePhi"][6]<<" "<<m_mVector["wirePhi"][7]<<" "<<m_mVector["wirePhi"][8]<<endl;
         cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]LR:      "<<int(m_mVector["LR"][0])<<" "<<int(m_mVector["LR"][1])<<" "<<int(m_mVector["LR"][2])<<" "<<int(m_mVector["LR"][3])<<" "<<int(m_mVector["LR"][4])<<" "<<int(m_mVector["LR"][5])<<" "<<int(m_mVector["LR"][6])<<" "<<int(m_mVector["LR"][7])<<" "<<int(m_mVector["LR"][8])<<endl;
         cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]drift:   "<<m_mVector["driftLength"][0]<<" "<<m_mVector["driftLength"][1]<<" "<<m_mVector["driftLength"][2]<<" "<<m_mVector["driftLength"][3]<<" "<<m_mVector["driftLength"][4]<<" "<<m_mVector["driftLength"][5]<<" "<<m_mVector["driftLength"][6]<<" "<<m_mVector["driftLength"][7]<<" "<<m_mVector["driftLength"][8]<<endl;
@@ -463,7 +464,7 @@ namespace Belle2 {
 
       //////////////////////
       // Start of 3D fitter
-      bool useStSl[4];
+      bool useStSl[4] = {0,0,0,0};
       findHitStereoSuperlayers(aTrack, useStSl, m_mBool["fIsPrintError"]);
       removeImpossibleStereoSuperlayers(useStSl);
       // Check if number of stereo super layer hits is smaller or equal to 1.
@@ -564,6 +565,7 @@ namespace Belle2 {
       m_mConstD["zLUTOutBitSize"] = 9;
       m_mConstD["iDenLUTInBitSize"] = 13;
       m_mConstD["iDenLUTOutBitSize"] = 11;
+      // Rotate phi and phi0 to phi range [0, 180]
       ////Rotate phi0///////////////////////////////////////////////////////////
       // Rotate phi0 to -45 deg for + charge or +45 deg for - charge.
       // This will not be needed for firmware case. Range of phi will already be [-90, 90].
@@ -985,9 +987,11 @@ namespace Belle2 {
       // Find if there is a TS with a priority hit.
       // Loop over all TS in same superlayer.
       bool priorityHitTS = 0;
+      cout<<"iAx:"<<iAx<<" nSegments:"<<nSegments<<endl;
       for (unsigned iTS = 0; iTS < nSegments; iTS++) {
         const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
         if (t_segment->center().hit() != 0)  priorityHitTS = 1;
+        cout<<" iTS:"<<iTS<<" priority:"<<t_segment->center().hit()<<" tsId:"<<t_segment->localId()<<endl;
       }
       if(nSegments != 1) {
         if (nSegments == 0){
@@ -1042,9 +1046,68 @@ namespace Belle2 {
     } // End superlayer loop
   }
 
+  void TRGCDCFitter3D::selectAxialTSs( TRGCDCTrack & aTrack, vector<int> & bestTSIndex) {
+    bestTSIndex.resize(5);
+    std::fill_n(bestTSIndex.begin(), 5, -1);
+    for (unsigned iAx = 0; iAx < 5; iAx++) {
+      // Check if all superlayers have one TS
+      const vector<TCLink *> & links = aTrack.links(iAx*2);
+      const unsigned nSegments = links.size();
+      //cout<<"iAx:"<<iAx<<" nSegments:"<<nSegments<<endl;
+      // tsCandiateInfo[iTS] = 1st priority, tdc
+      vector<tuple<int, double> > tsCandiateInfo(nSegments);
+      // Get information from candidates.
+      for (unsigned iTS = 0; iTS < nSegments; iTS++) {
+        const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
+        int firstPriority = 0;
+        if (t_segment->center().hit() != 0)  firstPriority = 1;
+        double tdc = t_segment->priorityTime();
+        std::get<0>(tsCandiateInfo[iTS]) = firstPriority;
+        std::get<1>(tsCandiateInfo[iTS]) = tdc;
+        //cout<<"Ax:"<<iAx<<" iTS:"<<iTS<<" firstPriority:"<<firstPriority<<" tdc:"<<tdc<<endl;
+      }
+      // Select best candidate.
+      // bestTS => tsIndex, { 1st priority, tdc }
+      pair<int, tuple<int, double> > bestTS = make_pair(-1, make_tuple(-1, 9999));
+
+      // Selection type first TS.
+      if (std::get<0>(tsCandiateInfo[0]) == 1) {
+        bestTS.first = 0;
+        bestTS.second = tsCandiateInfo[0];
+      }
+      //// Selection type random.
+      //int randomIndex = gRandom->Integer(nSegments);
+      //if (std::get<0>(tsCandiateInfo[randomIndex]) == 1) {
+      //  bestTS.first = randomIndex;
+      //  bestTS.second = tsCandiateInfo[randomIndex];
+      //}
+      //// Selection type 1st priority.
+      //for (unsigned iTS = 0; iTS < nSegments; iTS++) {
+      //  if (std::get<0>(tsCandiateInfo[iTS]) == 1) {
+      //    bool select = 0;
+      //    if (bestTS.first == -1) select = 1;
+      //    else if (std::get<1>(bestTS.second) > std::get<1>(tsCandiateInfo[iTS])) select = 1;
+      //    if (select) {
+      //      bestTS.first = iTS;
+      //      bestTS.second = tsCandiateInfo[iTS];
+      //    }
+      //  }
+      //}
+
+      //cout<<"Ax:"<<iAx<<" best: iTS:"<<bestTS.first<<" firstPriority:"<<std::get<0>(bestTS.second)<<" tdc:"<<std::get<1>(bestTS.second)<<endl;
+      bestTSIndex[iAx] = bestTS.first;
+    } // End superlayer loop
+  }
+
   int TRGCDCFitter3D::do2DFit( TRGCDCTrack & aTrack, std::map<std::string, bool> & m_mBool, std::map<std::string, double> & m_mConstD, std::map<std::string, std::vector<double> > & m_mConstV, std::map<std::string, double> & m_mDouble, std::map<std::string, std::vector<double> > & m_mVector) {
-    bool useAxSl[5];
-    findHitAxialSuperlayers(aTrack, useAxSl, m_mBool["fIsPrintError"]);
+    bool useAxSl[5] = {0,0,0,0,0};
+    //findHitAxialSuperlayers(aTrack, useAxSl, m_mBool["fIsPrintError"]);
+    vector<int> bestTSIndex(5);
+    selectAxialTSs(aTrack, bestTSIndex);
+    for(unsigned iAx=0; iAx<5; iAx++) {
+      if (bestTSIndex[iAx] != -1) useAxSl[iAx] = 1;
+      //cout<<"useAxSl["<<iAx<<"]:"<<useAxSl[iAx]<<endl;
+    }
     // Check if number of axial super layer hits is smaller or equal to 1.
     int nHitAx = (int)useAxSl[0]+(int)useAxSl[1]+(int)useAxSl[2]+(int)useAxSl[3]+(int)useAxSl[4];
     if(nHitAx <= 1) {
@@ -1062,7 +1125,8 @@ namespace Belle2 {
     for (unsigned iAx = 0; iAx < 5; iAx++) {
       if(useAxSl[iAx] == 1) {
         const vector<TCLink *> & links = aTrack.links(iAx*2);
-        const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
+        //const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
+        const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[bestTSIndex[iAx]]->hit()->cell());
         m_mVector["tsId"][iAx*2] = t_segment->localId();
         m_mVector["wirePhi"][iAx*2] = (double) t_segment->localId()/m_mConstV["nWires"][iAx*2]*4*m_mConstD["Trg_PI"];
         m_mVector["lutLR"][iAx*2] = t_segment->LUT()->getValue(t_segment->lutPattern());

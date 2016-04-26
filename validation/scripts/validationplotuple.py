@@ -280,7 +280,7 @@ class Plotuple:
         self.reference.object.SetFillStyle(1001)
 
         # Draw the reference on the canvas
-        self.reference.object.DrawCopy(self.reference.object.GetOption())
+        self.draw_root_object(self.type, self.reference.object, self.reference.object.GetOption())
         canvas.Update()
         canvas.GetFrame().SetFillColor(ROOT.kWhite)
 
@@ -295,6 +295,7 @@ class Plotuple:
     def create_image_plot(self):
         """!
         Creates image plot for TASImage-objects.
+        TODO: is this actually used or can it be removed ?
         @return: None
         """
 
@@ -356,7 +357,7 @@ class Plotuple:
             pad.SetFillColor(ROOT.kWhite)
 
             # Draw the reference on the canvas
-            plot.object.DrawCopy(plot.object.GetOption())
+            self.draw_root_object(self.type, plot.object, plot.object.GetOption())
             pad.Update()
             pad.GetFrame().SetFillColor(ROOT.kWhite)
 
@@ -387,6 +388,18 @@ class Plotuple:
 
     def get_pdf_filename(self):
         return '{}_{}.pdf'.format(strip_ext(self.rootfile), self.key)
+
+    def draw_root_object(self, type, object, options):
+        """
+        Special handling of the ROOT Draw calls, as some
+        ROOT objects have a slightly differen flavour.
+        """
+
+        if type == 'TEfficiency':
+            # TEff does not provide DrawCopy
+            object.Draw(options)
+        else:
+            object.DrawCopy(options)
 
     def create_histogram_plot(self, mode):
         """!
@@ -494,21 +507,11 @@ class Plotuple:
                             additional_options += ' ' + _
 
                     # Draw the reference on the canvas
-                    if self.type == 'TEfficiency':
-                        # TEff does not provide DrawCopy
-                        plot.object.Draw(plot.object.GetOption() +
-                                         additional_options)
-                    else:
-                        plot.object.DrawCopy(plot.object.GetOption() +
-                                             additional_options)
-
+                    self.draw_root_object(self.type, plot.object, plot.object.GetOption() +
+                                          additional_options)
                     drawn = True
                 else:
-                    if self.type == 'TEfficiency':
-                        # TEff does not provide DrawCopy
-                        plot.object.Draw("SAME")
-                    else:
-                        plot.object.DrawCopy("SAME")
+                    self.draw_root_object(self.type, plot.object, "SAME")
 
                 # redraw grid ontop of histogram, if selected
                 if 'nogrid' not in self.metaoptions:
@@ -534,8 +537,8 @@ class Plotuple:
                         additional_options += ' ' + _
 
                 # Draw the reference on the canvas
-                plot.object.DrawCopy(plot.object.GetOption() +
-                                     additional_options)
+                self.draw_root_object(self.type, plot.object, plot.object.GetOption() +
+                                      additional_options)
                 pad.Update()
                 pad.GetFrame().SetFillColor(ROOT.kWhite)
 

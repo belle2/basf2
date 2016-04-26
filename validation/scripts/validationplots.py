@@ -225,6 +225,7 @@ def get_reference_files():
     # validation folder name used by the packages to keep the validation reference
     # plots
     validation_folder_name = 'validation'
+    validation_test_folder_name = 'validation-test'
 
     # Now collect both local and central ROOT files:
     for location in ['local', 'central']:
@@ -240,6 +241,9 @@ def get_reference_files():
         # lists all root-files within
         glob_search = os.path.join(root, "*", validation_folder_name, "*.root")
         revision_root_files = [os.path.abspath(f) for f in glob.glob(glob_search) if os.path.isfile(f)]
+        # also look in the folder containing the validation tests
+        glob_search = os.path.join(root, "*", validation_test_folder_name, "*.root")
+        revision_root_files += [os.path.abspath(f) for f in glob.glob(glob_search) if os.path.isfile(f)]
 
         # this looks very much like a root file, store
         results[location] += revision_root_files

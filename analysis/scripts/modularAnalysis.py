@@ -1307,9 +1307,7 @@ def keepInROEMasks(
     To avoid unnecessary computation, the input particle list should only contain particles from ROE
     (use cut 'isInRestOfEvent == 1'). To update the ECLCluster masks, the input particle list should be a photon
     particle list (e.g. 'gamma:someLabel'). To update the Track masks, the input particle list should be a charged
-    pion particle list (e.g. 'pi+:someLabel'). It is possible to optimize by treating tracks from V0's separately.
-    The input particle list should be a V0 particle list: K_S0 ('K_S0:someLabel', ''),
-    Lambda ('Lambda:someLabel', '') or converted photons ('gamma:someLabel')
+    pion particle list (e.g. 'pi+:someLabel').
 
     It is possible to update a-priori fractions by providing them (see appendROEMask and appendROEFractions).
     Empty array will result in no change.
@@ -1360,9 +1358,7 @@ def discardFromROEMasks(
     To avoid unnecessary computation, the input particle list should only contain particles from ROE
     (use cut 'isInRestOfEvent == 1'). To update the ECLCluster masks, the input particle list should be a photon
     particle list (e.g. 'gamma:someLabel'). To update the Track masks, the input particle list should be a charged
-    pion particle list (e.g. 'pi+:someLabel'). It is possible to optimize by treating tracks from V0's separately.
-    The input particle list should be a V0 particle list: K_S0 ('K_S0:someLabel', ''),
-    Lambda ('Lambda:someLabel', '') or converted photons ('gamma:someLabel')
+    pion particle list (e.g. 'pi+:someLabel').
 
     It is possible to update a-priori fractions by providing them (see appendROEMask or appendROEFractions).
     Empty array will result in no change.
@@ -1394,6 +1390,47 @@ def discardFromROEMasks(
     updateMask.param('cutString', cut_string)
     updateMask.param('fractions', fractions)
     updateMask.param('discard', True)
+    path.add_module(updateMask)
+
+
+def optimizeROEWithV0(
+    list_name,
+    mask_names,
+    cut_string,
+    fractions=[],
+    path=analysis_main
+):
+    """
+    This function is used to apply particle list specific cuts on one or more ROE masks for Tracks.
+    It is possible to optimize the ROE selection by treating tracks from V0's separately, meaning,
+    taking V0's 4-momentum into account instead of 4-momenta of tracks. A cut for only specific V0's
+    passing it can be applied.
+
+    The input particle list should be a V0 particle list: K_S0 ('K_S0:someLabel', ''),
+    Lambda ('Lambda:someLabel', '') or converted photons ('gamma:someLabel')
+
+    It is possible to update a-priori fractions by providing them (see appendROEMask and appendROEFractions).
+    Empty array will result in no change.
+
+    Updating a non-existing mask will create a new one. If a-priori fractions for ChargedStable particles are not provided,
+    pion-mass hypothesis will be used as default.
+
+    o) treat tracks from K_S0 inside mass window separately, replace track momenta with K_S0 momentum
+       - optimizeROEWithV0('K_S0:opt', 'mask', '0.450 < M < 0.550')
+
+    @param list_name    name of the input ParticleList
+    @param mask_names   array of ROEMasks to be updated
+    @param cut_string   decay string with which the mask will be updated
+    @param fractions    chargedStable particle fractions
+    @param path         modules are added to this path
+    """
+
+    updateMask = register_module('RestOfEventUpdater')
+    updateMask.set_name('RestOfEventUpdater_' + list_name + '_masks')
+    updateMask.param('particleList', list_name)
+    updateMask.param('updateMasks', mask_names)
+    updateMask.param('cutString', cut_string)
+    updateMask.param('fractions', fractions)
     path.add_module(updateMask)
 
 

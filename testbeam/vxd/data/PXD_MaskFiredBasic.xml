@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Meta>
+    <Date>20.04.2016</Date>
+    <Description short="Ignore strip list for PXD planes in 2016 VXD beam test">
+        Crude initial list of bad pixels
+    </Description>
+    <Author>Peter Kodys</Author>
+</Meta>
+<PXD>
+  <layer n="1">
+    <ladder n="1">
+      <sensor n="2">
+        <!-- Masking rectangular parts of the sensor -->
+        <!--pixels uStart = "070" uEnd = "110" vStart = "0" vEnd = "500"></pixels-->
+
+        <!-- Individual pixels can be masked, too -->
+        <!--pixels uStart = "130" vStart = "500"></pixels-->
+
+        <!-- ROW is V  /  COLUMN is U -->
+
+        <!-- Individual rows and columns can be masked, too -->
+        <!--pixels vStart = "500"></pixels-->
+        <!--pixels uStart = "120"></pixels-->
+
+        <!-- Ranges of rows and columns can be masked, too -->
+        <!--pixels vStart = "100" vEnd = "120"></pixels-->
+        <!--pixels uStart = "120" uEnd = "202"></pixels-->
+
+
+      </sensor>
+    </ladder>
+  </layer>
+  <layer n="2">
+    <ladder n="1">
+      <sensor n="2">
+        <!-- Masking rectangular parts of the sensor -->
+        <!--pixels uStart = "070" uEnd = "110" vStart = "0" vEnd = "500"></pixels-->
+
+        <!-- Individual pixels can be masked, too -->
+        <!--pixels uStart = "130" vStart = "500"></pixels-->
+
+        <!-- ROW is V  /  COLUMN is U -->
+
+        <!-- Individual rows and columns can be masked, too -->
+        <!--pixels vStart = "500"></pixels-->
+        <!--pixels uStart = "120"></pixels-->
+
+        <!-- Ranges of rows and columns can be masked, too -->
+        <!--pixels vStart = "100" vEnd = "120"></pixels-->
+        <!--pixels uStart = "120" uEnd = "202"></pixels-->
+
+        <pixels uStart = "0023" vStart = "0069"></pixels>
+        <pixels uStart = "0245" vStart = "0229"></pixels>
+
+      </sensor>
+    </ladder>
+  </layer>
+</PXD>

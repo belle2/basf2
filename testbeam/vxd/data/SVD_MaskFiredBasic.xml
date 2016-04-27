@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Meta>
+    <Date>20.04.2016</Date>
+    <Description short="Ignore strip list for SVD planes in 2016 VXD beam test">
+        Crude initial list of bad strips
+    </Description>
+    <Author>Peter Kodys</Author>
+</Meta>
+<SVD>
+    <layer n="3">
+        <ladder n="1">
+            <sensor n="1">
+                <side side="v">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                </side>
+                <side side="u">
+                </side>
+            </sensor>
+            <sensor n="2">
+                <side side="v">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                </side>
+                <side side="u">
+                </side>
+            </sensor>
+        </ladder>
+    </layer>
+    <layer n="4">
+        <ladder n="1">
+            <sensor n="1">
+                <side side="v">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                </side>
+                <side side="u">
+                </side>
+            </sensor>
+            <sensor n="2">
+                <side side="v">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                </side>
+                <side side="u">
+                </side>
+            </sensor>
+            <sensor n="3">
+                <side side="v">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                </side>
+                <side side="u">
+                </side>
+            </sensor>
+        </ladder>
+    </layer>
+    <layer n="5">
+        <ladder n="1">
+            <sensor n="1">
+                <side side="v">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                </side>
+                <side side="u">
+                </side>
+            </sensor>
+            <sensor n="2">
+                <side side="v">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                </side>
+                <side side="u">
+                </side>
+            </sensor>
+            <sensor n="3">
+                <side side="v">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                </side>
+                <side side="u">
+                </side>
+            </sensor>
+            <sensor n="4">
+                <side side="v">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                </side>
+                <side side="u">
+                </side>
+            </sensor>
+        </ladder>
+    </layer>
+    <layer n="6">
+        <ladder n="1">
+            <sensor n="1">
+                <side side="v">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                </side>
+                <side side="u">
+                </side>
+            </sensor>
+            <sensor n="2">
+                <side side="v">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                </side>
+                <side side="u">
+                </side>
+            </sensor>
+            <sensor n="3">
+                <side side="v">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                </side>
+                <side side="u">
+                </side>
+            </sensor>
+            <sensor n="4">
+                <side side="v">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                </side>
+                <side side="u">
+                </side>
+            </sensor>
+            <sensor n="5">
+                <side side="v">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                </side>
+                <side side="u">
+                </side>
+            </sensor>
+        </ladder>
+    </layer>
+</SVD>

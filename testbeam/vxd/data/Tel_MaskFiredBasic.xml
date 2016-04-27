@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Meta>
+    <Date>20.04.2016</Date>
+    <Description short="Ignore strip list for Tel planes in 2016 VXD beam test">
+        Crude initial list of bad pixels
+    </Description>
+    <Author>Peter Kodys</Author>
+</Meta>
+<PXD>
+  <layer n="7">
+    <ladder n="2">
+      <sensor n="1">
+        <!-- Masking rectangular parts of the sensor -->
+        <!--pixels uStart = "070" uEnd = "110" vStart = "0" vEnd = "500"></pixels-->
+
+        <!-- Individual pixels can be masked, too -->
+        <!--pixels uStart = "130" vStart = "500"></pixels-->
+
+        <!-- ROW is V  /  COLUMN is U -->
+
+        <!-- Individual rows and columns can be masked, too -->
+        <!--pixels vStart = "500"></pixels-->
+        <!--pixels uStart = "120"></pixels-->
+
+        <!-- Ranges of rows and columns can be masked, too -->
+        <!--pixels vStart = "100" vEnd = "120"></pixels-->
+        <!--pixels uStart = "120" uEnd = "202"></pixels-->
+
+        <pixels uStart = "0198" vStart = "0321"></pixels>
+        <pixels uStart = "0247" vStart = "0535"></pixels>
+        <pixels uStart = "0391" vStart = "0446"></pixels>
+        <pixels uStart = "0431" vStart = "0062"></pixels>
+        <pixels uStart = "0579" vStart = "0341"></pixels>
+        <pixels uStart = "0652" vStart = "0547"></pixels>
+        <pixels uStart = "0720" vStart = "0089"></pixels>
+        <pixels uStart = "0721" vStart = "0374"></pixels>
+        <pixels uStart = "0741" vStart = "0170"></pixels>
+        <pixels uStart = "0748" vStart = "0053"></pixels>
+        <pixels uStart = "0869" vStart = "0486"></pixels>
+        <pixels uStart = "0876" vStart = "0472"></pixels>
+        <pixels uStart = "0890" vStart = "0062"></pixels>
+        <pixels uStart = "0903" vStart = "0387"></pixels>
+        <pixels uStart = "0910" vStart = "0407"></pixels>
+        <pixels uStart = "0910" vStart = "0464"></pixels>
+        <pixels uStart = "0943" vStart = "0466"></pixels>
+        <pixels uStart = "1069" vStart = "0370"></pixels>
+        <pixels uStart = "1106" vStart = "0318"></pixels>
+        <pixels uStart = "1116" vStart = "0432"></pixels>
+
+      </sensor>
+    </ladder>
+  </layer>
+  <layer n="7">
+    <ladder n="2">
+      <sensor n="2">
+        <!-- Masking rectangular parts of the sensor -->
+        <!--pixels uStart = "070" uEnd = "110" vStart = "0" vEnd = "500"></pixels-->
+
+        <!-- Individual pixels can be masked, too -->
+        <!--pixels uStart = "130" vStart = "500"></pixels-->
+
+        <!-- ROW is V  /  COLUMN is U -->
+
+        <!-- Individual rows and columns can be masked, too -->
+        <!--pixels vStart = "500"></pixels-->
+        <!--pixels uStart = "120"></pixels-->
+
+        <!-- Ranges of rows and columns can be masked, too -->
+        <!--pixels vStart = "100" vEnd = "120"></pixels-->
+        <!--pixels uStart = "120" uEnd = "202"></pixels-->
+
+        <pixels uStart = "0098" vStart = "0295"></pixels>
+        <pixels uStart = "0099" vStart = "0295"></pixels>
+        <pixels uStart = "0100" vStart = "0295"></pixels>
+        <pixels uStart = "0101" vStart = "0295"></pixels>
+        <pixels uStart = "0102" vStart = "0295"></pixels>
+        <pixels uStart = "0103" vStart = "0295"></pixels>
+        <pixels uStart = "0104" vStart = "0295"></pixels>
+        <pixels uStart = "0105" vStart = "0295"></pixels>
+        <pixels uStart = "0106" vStart = "0295"></pixels>
+        <pixels uStart = "0107" vStart = "0295"></pixels>
+        <pixels uStart = "0108" vStart = "0295"></pixels>
+        <pixels uStart = "0109" vStart = "0295"></pixels>
+        <pixels uStart = "0110" vStart = "0295"></pixels>
+        <pixels uStart = "0111" vStart = "0295"></pixels>
+        <pixels uStart = "0112" vStart = "0295"></pixels>
+        <pixels uStart = "0113" vStart = "0295"></pixels>
+        <pixels uStart = "0114" vStart = "0295"></pixels>
+        <pixels uStart = "0115" vStart = "0295"></pixels>
+        <pixels uStart = "0116" vStart = "0295"></pixels>
+        <pixels uStart = "0117" vStart = "0295"></pixels>
+        <pixels uStart = "0118" vStart = "0295"></pixels>
+        <pixels uStart = "0119" vStart = "0295"></pixels>
+        <pixels uStart = "0120" vStart = "0295"></pixels>
+        <pixels uStart = "0121" vStart = "0295"></pixels>
+        <pixels uStart = "0130" vStart = "0295"></pixels>
+        <pixels uStart = "0131" vStart = "0295"></pixels>
+        <pixels uStart = "0132" vStart = "0295"></pixels>
+        <pixels uStart = "0133" vStart = "0295"></pixels>
+        <pixels uStart = "0134" vStart = "0295"></pixels>
+        <pixels uStart = "0135" vStart = "0295"></pixels>
+        <pixels uStart = "0136" vStart = "0295"></pixels>
+        <pixels uStart = "0137" vStart = "0295"></pixels>
+        <pixels uStart = "0138" vStart = "0295"></pixels>
+        <pixels uStart = "0139" vStart = "0295"></pixels>
+        <pixels uStart = "0140" vStart = "0295"></pixels>
+        <pixels uStart = "0141" vStart = "0295"></pixels>
+        <pixels uStart = "0224" vStart = "0077"></pixels>
+        <pixels uStart = "0267" vStart = "0296"></pixels>
+        <pixels uStart = "0298" vStart = "0030"></pixels>
+        <pixels uStart = "0303" vStart = "0271"></pixels>
+        <pixels uStart = "0313" vStart = "0432"></pixels>
+        <pixels uStart = "0347" vStart = "0276"></pixels>
+        <pixels uStart = "0385" vStart = "0296"></pixels>
+        <pixels uStart = "0398" vStart = "0346"></pixels>
+        <pixels uStart = "0405" vStart = "0075"></pixels>
+        <pixels uStart = "0465" vStart = "0106"></pixels>
+        <pixels uStart = "0525" vStart = "0232"></pixels>
+        <pixels uStart = "0561" vStart = "0312"></pixels>
+        <pixels uStart = "0569" vStart = "0091"></pixels>
+        <pixels uStart = "0651" vStart = "0327"></pixels>
+        <pixels uStart = "0692" vStart = "0461"></pixels>
+        <pixels uStart = "0718" vStart = "0203"></pixels>
+        <pixels uStart = "0732" vStart = "0561"></pixels>
+        <pixels uStart = "0770" vStart = "0109"></pixels>
+        <pixels uStart = "0775" vStart = "0067"></pixels>
+        <pixels uStart = "0801" vStart = "0549"></pixels>
+        <pixels uStart = "0802" vStart = "0452"></pixels>
+        <pixels uStart = "0856" vStart = "0258"></pixels>
+        <pixels uStart = "0860" vStart = "0286"></pixels>
+        <pixels uStart = "0875" vStart = "0438"></pixels>
+        <pixels uStart = "0902" vStart = "0316"></pixels>
+        <pixels uStart = "0910" vStart = "0145"></pixels>
+        <pixels uStart = "0923" vStart = "0369"></pixels>
+        <pixels uStart = "0936" vStart = "0293"></pixels>
+        <pixels uStart = "0936" vStart = "0554"></pixels>
+        <pixels uStart = "0943" vStart = "0282"></pixels>
+        <pixels uStart = "0954" vStart = "0470"></pixels>
+        <pixels uStart = "0955" vStart = "0570"></pixels>
+        <pixels uStart = "0969" vStart = "0430"></pixels>
+        <pixels uStart = "0970" vStart = "0206"></pixels>
+        <pixels uStart = "0997" vStart = "0533"></pixels>
+        <pixels uStart = "1027" vStart = "0373"></pixels>
+        <pixels uStart = "1055" vStart = "0278"></pixels>
+        <pixels uStart = "1061" vStart = "0253"></pixels>
+        <pixels uStart = "1070" vStart = "0187"></pixels>
+        <pixels uStart = "1075" vStart = "0417"></pixels>
+        <pixels uStart = "1075" vStart = "0543"></pixels>
+        <pixels uStart = "1088" vStart = "0216"></pixels>
+        <pixels uStart = "1090" vStart = "0238"></pixels>
+        <pixels uStart = "1099" vStart = "0031"></pixels>
+        <pixels uStart = "1108" vStart = "0269"></pixels>
+        <pixels uStart = "1136" vStart = "0486"></pixels>
+
+      </sensor>
+    </ladder>
+  </layer>
+  <layer n="7">
+    <ladder n="2">
+      <sensor n="3">
+        <!-- Masking rectangular parts of the sensor -->
+        <!--pixels uStart = "070" uEnd = "110" vStart = "0" vEnd = "500"></pixels-->
+
+        <!-- Individual pixels can be masked, too -->
+        <!--pixels uStart = "130" vStart = "500"></pixels-->
+
+        <!-- ROW is V  /  COLUMN is U -->
+
+        <!-- Individual rows and columns can be masked, too -->
+        <!--pixels vStart = "500"></pixels-->
+        <!--pixels uStart = "120"></pixels-->
+
+        <!-- Ranges of rows and columns can be masked, too -->
+        <!--pixels vStart = "100" vEnd = "120"></pixels-->
+        <!--pixels uStart = "120" uEnd = "202"></pixels-->
+
+        <pixels uStart = "0084" vStart = "0424"></pixels>
+        <pixels uStart = "0104" vStart = "0068"></pixels>
+        <pixels uStart = "0122" vStart = "0098"></pixels>
+        <pixels uStart = "0132" vStart = "0465"></pixels>
+        <pixels uStart = "0259" vStart = "0462"></pixels>
+        <pixels uStart = "0296" vStart = "0141"></pixels>
+        <pixels uStart = "0299" vStart = "0271"></pixels>
+        <pixels uStart = "0347" vStart = "0435"></pixels>
+        <pixels uStart = "0377" vStart = "0280"></pixels>
+        <pixels uStart = "0382" vStart = "0308"></pixels>
+        <pixels uStart = "0406" vStart = "0213"></pixels>
+        <pixels uStart = "0407" vStart = "0008"></pixels>
+        <pixels uStart = "0408" vStart = "0434"></pixels>
+        <pixels uStart = "0412" vStart = "0105"></pixels>
+        <pixels uStart = "0445" vStart = "0535"></pixels>
+        <pixels uStart = "0450" vStart = "0204"></pixels>
+        <pixels uStart = "0455" vStart = "0053"></pixels>
+        <pixels uStart = "0456" vStart = "0053"></pixels>
+        <pixels uStart = "0459" vStart = "0556"></pixels>
+        <pixels uStart = "0476" vStart = "0034"></pixels>
+        <pixels uStart = "0477" vStart = "0363"></pixels>
+        <pixels uStart = "0510" vStart = "0277"></pixels>
+        <pixels uStart = "0527" vStart = "0162"></pixels>
+        <pixels uStart = "0558" vStart = "0521"></pixels>
+        <pixels uStart = "0567" vStart = "0149"></pixels>
+        <pixels uStart = "0567" vStart = "0493"></pixels>
+        <pixels uStart = "0682" vStart = "0555"></pixels>
+        <pixels uStart = "0739" vStart = "0277"></pixels>
+        <pixels uStart = "0776" vStart = "0449"></pixels>
+        <pixels uStart = "0790" vStart = "0367"></pixels>
+        <pixels uStart = "0792" vStart = "0120"></pixels>
+        <pixels uStart = "0818" vStart = "0168"></pixels>
+        <pixels uStart = "0835" vStart = "0220"></pixels>
+        <pixels uStart = "0840" vStart = "0459"></pixels>
+        <pixels uStart = "0866" vStart = "0106"></pixels>
+        <pixels uStart = "0880" vStart = "0267"></pixels>
+        <pixels uStart = "0924" vStart = "0470"></pixels>
+        <pixels uStart = "0943" vStart = "0391"></pixels>
+        <pixels uStart = "1000" vStart = "0027"></pixels>
+        <pixels uStart = "1143" vStart = "0415"></pixels>
+
+      </sensor>
+    </ladder>
+  </layer>
+  <layer n="7">
+    <ladder n="3">
+      <sensor n="4">
+        <!-- Masking rectangular parts of the sensor -->
+        <!--pixels uStart = "070" uEnd = "110" vStart = "0" vEnd = "500"></pixels-->
+
+        <!-- Individual pixels can be masked, too -->
+        <!--pixels uStart = "130" vStart = "500"></pixels-->
+
+        <!-- ROW is V  /  COLUMN is U -->
+
+        <!-- Individual rows and columns can be masked, too -->
+        <!--pixels vStart = "500"></pixels-->
+        <!--pixels uStart = "120"></pixels-->
+
+        <!-- Ranges of rows and columns can be masked, too -->
+        <!--pixels vStart = "100" vEnd = "120"></pixels-->
+        <!--pixels uStart = "120" uEnd = "202"></pixels-->
+
+        <pixels uStart = "0031" vStart = "0191"></pixels>
+        <pixels uStart = "0103" vStart = "0209"></pixels>
+        <pixels uStart = "0123" vStart = "0213"></pixels>
+        <pixels uStart = "0130" vStart = "0242"></pixels>
+        <pixels uStart = "0136" vStart = "0045"></pixels>
+        <pixels uStart = "0155" vStart = "0076"></pixels>
+        <pixels uStart = "0157" vStart = "0540"></pixels>
+        <pixels uStart = "0160" vStart = "0439"></pixels>
+        <pixels uStart = "0216" vStart = "0108"></pixels>
+        <pixels uStart = "0223" vStart = "0398"></pixels>
+        <pixels uStart = "0226" vStart = "0254"></pixels>
+        <pixels uStart = "0264" vStart = "0034"></pixels>
+        <pixels uStart = "0286" vStart = "0254"></pixels>
+        <pixels uStart = "0300" vStart = "0458"></pixels>
+        <pixels uStart = "0308" vStart = "0497"></pixels>
+        <pixels uStart = "0309" vStart = "0336"></pixels>
+        <pixels uStart = "0317" vStart = "0406"></pixels>
+        <pixels uStart = "0319" vStart = "0415"></pixels>
+        <pixels uStart = "0366" vStart = "0285"></pixels>
+        <pixels uStart = "0373" vStart = "0129"></pixels>
+        <pixels uStart = "0395" vStart = "0492"></pixels>
+        <pixels uStart = "0401" vStart = "0169"></pixels>
+        <pixels uStart = "0405" vStart = "0455"></pixels>
+        <pixels uStart = "0409" vStart = "0249"></pixels>
+        <pixels uStart = "0456" vStart = "0287"></pixels>
+        <pixels uStart = "0471" vStart = "0459"></pixels>
+        <pixels uStart = "0518" vStart = "0191"></pixels>
+        <pixels uStart = "0531" vStart = "0038"></pixels>
+        <pixels uStart = "0533" vStart = "0438"></pixels>
+        <pixels uStart = "0535" vStart = "0161"></pixels>
+        <pixels uStart = "0575" vStart = "0354"></pixels>
+        <pixels uStart = "0578" vStart = "0518"></pixels>
+        <pixels uStart = "0581" vStart = "0429"></pixels>
+        <pixels uStart = "0705" vStart = "0166"></pixels>
+        <pixels uStart = "0723" vStart = "0473"></pixels>
+        <pixels uStart = "0734" vStart = "0391"></pixels>
+        <pixels uStart = "0782" vStart = "0436"></pixels>
+        <pixels uStart = "0804" vStart = "0040"></pixels>
+        <pixels uStart = "0812" vStart = "0371"></pixels>
+        <pixels uStart = "0832" vStart = "0378"></pixels>
+        <pixels uStart = "0856" vStart = "0217"></pixels>
+        <pixels uStart = "0863" vStart = "0022"></pixels>
+        <pixels uStart = "0871" vStart = "0137"></pixels>
+        <pixels uStart = "0893" vStart = "0021"></pixels>
+        <pixels uStart = "0912" vStart = "0202"></pixels>
+        <pixels uStart = "0917" vStart = "0076"></pixels>
+        <pixels uStart = "0931" vStart = "0089"></pixels>
+        <pixels uStart = "0932" vStart = "0327"></pixels>
+        <pixels uStart = "0945" vStart = "0153"></pixels>
+        <pixels uStart = "0959" vStart = "0394"></pixels>
+        <pixels uStart = "0959" vStart = "0520"></pixels>
+        <pixels uStart = "0964" vStart = "0480"></pixels>
+        <pixels uStart = "0978" vStart = "0255"></pixels>
+        <pixels uStart = "0990" vStart = "0313"></pixels>
+        <pixels uStart = "0991" vStart = "0488"></pixels>
+        <pixels uStart = "1004" vStart = "0145"></pixels>
+        <pixels uStart = "1005" vStart = "0127"></pixels>
+        <pixels uStart = "1009" vStart = "0417"></pixels>
+        <pixels uStart = "1015" vStart = "0165"></pixels>
+        <pixels uStart = "1026" vStart = "0432"></pixels>
+        <pixels uStart = "1036" vStart = "0339"></pixels>
+        <pixels uStart = "1044" vStart = "0052"></pixels>
+        <pixels uStart = "1051" vStart = "0170"></pixels>
+        <pixels uStart = "1053" vStart = "0348"></pixels>
+        <pixels uStart = "1053" vStart = "0469"></pixels>
+        <pixels uStart = "1070" vStart = "0508"></pixels>
+        <pixels uStart = "1072" vStart = "0162"></pixels>
+        <pixels uStart = "1082" vStart = "0209"></pixels>
+        <pixels uStart = "1088" vStart = "0084"></pixels>
+        <pixels uStart = "1090" vStart = "0555"></pixels>
+        <pixels uStart = "1107" vStart = "0066"></pixels>
+        <pixels uStart = "1115" vStart = "0030"></pixels>
+        <pixels uStart = "1122" vStart = "0137"></pixels>
+        <pixels uStart = "1127" vStart = "0439"></pixels>
+        <pixels uStart = "1130" vStart = "0247"></pixels>
+        <pixels uStart = "1133" vStart = "0143"></pixels>
+        <pixels uStart = "1133" vStart = "0305"></pixels>
+        <pixels uStart = "1134" vStart = "0464"></pixels>
+        <pixels uStart = "1135" vStart = "0488"></pixels>
+
+      </sensor>
+    </ladder>
+  </layer>
+  <layer n="7">
+    <ladder n="3">
+      <sensor n="5">
+        <!-- Masking rectangular parts of the sensor -->
+        <!--pixels uStart = "070" uEnd = "110" vStart = "0" vEnd = "500"></pixels-->
+
+        <!-- Individual pixels can be masked, too -->
+        <!--pixels uStart = "130" vStart = "500"></pixels-->
+
+        <!-- ROW is V  /  COLUMN is U -->
+
+        <!-- Individual rows and columns can be masked, too -->
+        <!--pixels vStart = "500"></pixels-->
+        <!--pixels uStart = "120"></pixels-->
+
+        <!-- Ranges of rows and columns can be masked, too -->
+        <!--pixels vStart = "100" vEnd = "120"></pixels-->
+        <!--pixels uStart = "120" uEnd = "202"></pixels-->
+
+        <pixels uStart = "0075" vStart = "0254"></pixels>
+        <pixels uStart = "0089" vStart = "0052"></pixels>
+        <pixels uStart = "0094" vStart = "0302"></pixels>
+        <pixels uStart = "0152" vStart = "0184"></pixels>
+        <pixels uStart = "0238" vStart = "0346"></pixels>
+        <pixels uStart = "0239" vStart = "0498"></pixels>
+        <pixels uStart = "0298" vStart = "0520"></pixels>
+        <pixels uStart = "0332" vStart = "0008"></pixels>
+        <pixels uStart = "0355" vStart = "0381"></pixels>
+        <pixels uStart = "0364" vStart = "0533"></pixels>
+        <pixels uStart = "0449" vStart = "0004"></pixels>
+        <pixels uStart = "0639" vStart = "0499"></pixels>
+        <pixels uStart = "0711" vStart = "0113"></pixels>
+        <pixels uStart = "0817" vStart = "0103"></pixels>
+        <pixels uStart = "0910" vStart = "0420"></pixels>
+        <pixels uStart = "0934" vStart = "0176"></pixels>
+        <pixels uStart = "0971" vStart = "0133"></pixels>
+        <pixels uStart = "1028" vStart = "0347"></pixels>
+        <pixels uStart = "1074" vStart = "0563"></pixels>
+
+      </sensor>
+    </ladder>
+  </layer>
+  <layer n="7">
+    <ladder n="3">
+      <sensor n="6">
+        <!-- Masking rectangular parts of the sensor -->
+        <!--pixels uStart = "070" uEnd = "110" vStart = "0" vEnd = "500"></pixels-->
+
+        <!-- Individual pixels can be masked, too -->
+        <!--pixels uStart = "130" vStart = "500"></pixels-->
+
+        <!-- ROW is V  /  COLUMN is U -->
+
+        <!-- Individual rows and columns can be masked, too -->
+        <!--pixels vStart = "500"></pixels-->
+        <!--pixels uStart = "120"></pixels-->
+
+        <!-- Ranges of rows and columns can be masked, too -->
+        <!--pixels vStart = "100" vEnd = "120"></pixels-->
+        <!--pixels uStart = "120" uEnd = "202"></pixels-->
+
+        <pixels uStart = "0018" vStart = "0059"></pixels>
+        <pixels uStart = "0030" vStart = "0151"></pixels>
+        <pixels uStart = "0034" vStart = "0254"></pixels>
+        <pixels uStart = "0038" vStart = "0134"></pixels>
+        <pixels uStart = "0038" vStart = "0502"></pixels>
+        <pixels uStart = "0049" vStart = "0370"></pixels>
+        <pixels uStart = "0056" vStart = "0019"></pixels>
+        <pixels uStart = "0060" vStart = "0019"></pixels>
+        <pixels uStart = "0066" vStart = "0174"></pixels>
+        <pixels uStart = "0103" vStart = "0018"></pixels>
+        <pixels uStart = "0103" vStart = "0341"></pixels>
+        <pixels uStart = "0105" vStart = "0018"></pixels>
+        <pixels uStart = "0106" vStart = "0018"></pixels>
+        <pixels uStart = "0108" vStart = "0018"></pixels>
+        <pixels uStart = "0110" vStart = "0018"></pixels>
+        <pixels uStart = "0114" vStart = "0018"></pixels>
+        <pixels uStart = "0115" vStart = "0018"></pixels>
+        <pixels uStart = "0117" vStart = "0018"></pixels>
+        <pixels uStart = "0119" vStart = "0018"></pixels>
+        <pixels uStart = "0128" vStart = "0018"></pixels>
+        <pixels uStart = "0129" vStart = "0018"></pixels>
+        <pixels uStart = "0129" vStart = "0054"></pixels>
+        <pixels uStart = "0130" vStart = "0018"></pixels>
+        <pixels uStart = "0131" vStart = "0018"></pixels>
+        <pixels uStart = "0132" vStart = "0018"></pixels>
+        <pixels uStart = "0133" vStart = "0018"></pixels>
+        <pixels uStart = "0134" vStart = "0018"></pixels>
+        <pixels uStart = "0135" vStart = "0018"></pixels>
+        <pixels uStart = "0136" vStart = "0018"></pixels>
+        <pixels uStart = "0137" vStart = "0018"></pixels>
+        <pixels uStart = "0138" vStart = "0018"></pixels>
+        <pixels uStart = "0139" vStart = "0018"></pixels>
+        <pixels uStart = "0227" vStart = "0410"></pixels>
+        <pixels uStart = "0254" vStart = "0413"></pixels>
+        <pixels uStart = "0293" vStart = "0144"></pixels>
+        <pixels uStart = "0296" vStart = "0544"></pixels>
+        <pixels uStart = "0398" vStart = "0286"></pixels>
+        <pixels uStart = "0431" vStart = "0280"></pixels>
+        <pixels uStart = "0469" vStart = "0034"></pixels>
+        <pixels uStart = "0494" vStart = "0348"></pixels>
+        <pixels uStart = "0500" vStart = "0192"></pixels>
+        <pixels uStart = "0502" vStart = "0508"></pixels>
+        <pixels uStart = "0518" vStart = "0465"></pixels>
+        <pixels uStart = "0533" vStart = "0166"></pixels>
+        <pixels uStart = "0575" vStart = "0099"></pixels>
+        <pixels uStart = "0594" vStart = "0548"></pixels>
+        <pixels uStart = "0714" vStart = "0392"></pixels>
+        <pixels uStart = "0948" vStart = "0377"></pixels>
+        <pixels uStart = "1066" vStart = "0130"></pixels>
+
+      </sensor>
+    </ladder>
+  </layer>
+</PXD>

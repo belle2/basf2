@@ -52,7 +52,7 @@ using namespace boost::spirit::endian;
 REG_MODULE(PXDUnpackerDHH)
 
 /// If you change this list, change the NAMEs in the terminate function, too
-//#define ONSEN_ERR_FLAG_FTSW_DHC_MM 0x00000001ul// unused
+#define ONSEN_ERR_FLAG_TB_IDS 0x00000001ul// unused
 #define ONSEN_ERR_FLAG_DHC_DHE_MM  0x00000002ul
 #define ONSEN_ERR_FLAG_DHC_META_MM  0x00000004ul
 #define ONSEN_ERR_FLAG_ONSEN_TRG_FIRST 0x00000008ul
@@ -61,7 +61,7 @@ REG_MODULE(PXDUnpackerDHH)
 #define ONSEN_ERR_FLAG_DHC_FRAMECOUNT 0x00000040ul
 #define ONSEN_ERR_FLAG_DATA_OUTSIDE 0x00000080ul
 #define ONSEN_ERR_FLAG_DHC_START_SECOND  0x00000100ul
-//#define ONSEN_ERR_FLAG_DHC_END2  0x00000200ul// unused
+#define ONSEN_ERR_FLAG_TB_ORDER  0x00000200ul// unused
 #define ONSEN_ERR_FLAG_FIX_SIZE   0x00000400ul
 #define ONSEN_ERR_FLAG_DHE_CRC    0x00000800ul
 #define ONSEN_ERR_FLAG_DHC_UNKNOWN   0x00001000ul
@@ -671,9 +671,9 @@ void PXDUnpackerDHHModule::initialize()
 void PXDUnpackerDHHModule::terminate()
 {
   const string error_name[ONSEN_MAX_TYPE_ERR] = {
-    "-unused-", "DHC/DHE mismatch", "EvtMeta/DHC mismatch", "ONSEN Trigger is not first frame",
+    "TB: Unknown DHE IDs", "DHC/DHE mismatch", "EvtMeta/DHC mismatch", "ONSEN Trigger is not first frame",
     "DHC_END missing", "DHE_START missing", "DHC Framecount mismatch", "DATA outside of DHE",
-    "DHC_START is not second frame", "-unused-", "Fixed size frame wrong size", "DHE CRC Error:",
+    "DHC_START is not second frame", "TB: Wrong DHE IDs order", "Fixed size frame wrong size", "DHE CRC Error:",
     "Unknown DHC type", "Merger CRC Error", "Event Header Full Packet Size Error", "Event Header Magic Error",
     "Event Header Frame Count Error", "Event header Frame Size Error", "HLTROI Magic Error", "Merger HLT/DATCON TrigNr Mismatch",
     "DHP Size too small", "DHP-DHE DHEID mismatch", "DHP-DHE Port mismatch", "DHP Pix w/o row",
@@ -843,7 +843,7 @@ void PXDUnpackerDHHModule::unpack_dhp_raw(void* data, unsigned int frame_len, un
   dhp_dhp_id       =  dhp_pix[2] & 0x0003;
 
   if (dhe_ID != dhp_dhe_id) {
-    B2ERROR("DHE ID in DHE and DHP header differ $" << hex << dhe_ID << " != $" << dhp_dhe_id);
+    B2WARNING("DHE ID in DHE and DHP header differ $" << hex << dhe_ID << " != $" << dhp_dhe_id);
     m_errorMask |= ONSEN_ERR_FLAG_DHE_DHP_DHEID;
   }
   if (dhe_DHPport != dhp_dhp_id) {
@@ -945,7 +945,7 @@ void PXDUnpackerDHHModule::unpack_dhp(void* data, unsigned int frame_len, unsign
   }
 
   if (dhe_ID != dhp_dhe_id) {
-    B2ERROR("DHE ID in DHE and DHP header differ $" << hex << dhe_ID << " != $" << dhp_dhe_id);
+    B2WARNING("DHE ID in DHE and DHP header differ $" << hex << dhe_ID << " != $" << dhp_dhe_id);
     m_errorMask |= ONSEN_ERR_FLAG_DHE_DHP_DHEID;
   }
   if (dhe_DHPport != dhp_dhp_id) {
@@ -1230,6 +1230,10 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       if (verbose)dhc.data_dhe_start_frame->print();
       dhe_first_readout_frame_id_lo = dhc.data_dhe_start_frame->getStartFrameNr();
       dhe_first_offset = dhc.data_dhe_start_frame->getTriggerOffsetRow();
+      if (currentDHEID != 0xFFFFFFFF && (currentDHEID & 0xFFFF) >= dhc.data_dhe_start_frame->getDHEId()) {
+        B2WARNING("DHH IDs are not in expected order! " << (currentDHEID & 0xFFFF) << " >= " << dhc.data_dhe_start_frame->getDHEId());
+        m_errorMask |= ONSEN_ERR_FLAG_TB_ORDER;
+      }
       currentDHEID = dhc.data_dhe_start_frame->getDHEId();
       m_errorMask |= dhc.check_crc();
 
@@ -1245,9 +1249,13 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
 
       // calculate the VXDID for DHE and save them for DHP unpacking
       {
-        // TB 2016 fix for BonnDAQ pedestal data with worn ID
-        if (currentDHEID == 0x01) currentDHEID = 0x03; /// TODO remove after TB
-        if (currentDHEID == 0x21) currentDHEID = 0x23; /// TODO remove after TB
+        // TB 2016 fix for BonnDAQ pedestal data with wrong ID
+        if (currentDHEID != 0x03 && currentDHEID != 0x23) {
+          B2WARNING("Unexpected DHEID for DDESY TB " << currentDHEID);
+          m_errorMask |= ONSEN_ERR_FLAG_TB_IDS;
+          if (currentDHEID == 0x01) currentDHEID = 0x03; /// TODO remove after TB
+          if (currentDHEID == 0x21) currentDHEID = 0x23; /// TODO remove after TB
+        }
 
         /// refering to BelleII Note Nr 0010, the numbers run from ... to
         ///   unsigned int layer, ladder, sensor;
@@ -1268,8 +1276,8 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       countedDHCFrames++;
       if (verbose)dhc.data_ghost_frame->print();
       if (currentDHEID != dhc.data_ghost_frame->getDHEId()) {
-        B2ERROR("DHE ID from DHE Start and this frame do not match $" << hex << currentDHEID << " != $" <<
-                dhc.data_ghost_frame->getDHEId());
+        B2WARNING("DHE ID from DHE Start and this frame do not match $" << hex << currentDHEID << " != $" <<
+                  dhc.data_ghost_frame->getDHEId());
         m_errorMask |= ONSEN_ERR_FLAG_DHE_START_ID;
       }
       /// Attention: Firmware might be changed such, that ghostframe come for all DHPs, not only active ones...
@@ -1328,12 +1336,12 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
                 dhc.data_dhe_end_frame->getDHEId());
         m_errorMask |= ONSEN_ERR_FLAG_DHE_START_END_ID;
       }
-      currentDHEID = 0xFFFFFFFF;
+      currentDHEID |= 0xFF000000;// differenciate from 0xFFFFFFFFF as initial value
       currentVxdId = 0; /// invalid
       m_errorMask |= dhc.check_crc();
       if (found_mask_active_dhp != mask_active_dhp) {
-        B2ERROR("DHE_END: DHP active mask $" << hex << mask_active_dhp << " != $" << hex << found_mask_active_dhp <<
-                " mask of found dhp/ghost frames");
+        B2WARNING("DHE_END: DHP active mask $" << hex << mask_active_dhp << " != $" << hex << found_mask_active_dhp <<
+                  " mask of found dhp/ghost frames");
         m_errorMask |= ONSEN_ERR_FLAG_DHP_ACTIVE;
       }
       countedDHEEndFrames++;
@@ -1396,7 +1404,8 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
 //     }
 //   }
 
-//   if (Frame_Number == 0) { // was 0 for ONSEN
+  /// for Bonndaq data we might not have a DHC START Frame at all, thus we cannot check
+//   if (Frame_Number == 0) { // was 1 for ONSEN
 //     /// Check that DHC Start is first Frame
 //     if (type != DHC_FRAME_HEADER_DATA_TYPE_DHC_START) {
 //       B2ERROR("Second frame is not a DHC start of subevent frame in Event Nr " << eventNrOfThisFrame);
@@ -1410,6 +1419,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
 //     }
 //   }
 //
+  /// for Bonndaq data we might not have a DHC END Frame at all, thus we cannot check
 //   if (Frame_Number == Frames_in_event - 1) {
 //     /// Check that DHC End is last Frame
 //     if (type != DHC_FRAME_HEADER_DATA_TYPE_DHC_END) {
@@ -1513,7 +1523,7 @@ void PXDUnpackerDHHModule::remap_IF_OB(unsigned int& v_cellID, unsigned int& u_c
     v_cellID = row ;
   }
 #endif
-  B2INFO("Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
+//  B2INFO("Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }
 
 //Remaps of inner backward (IB) and outer forward (OF) modules of the PXD
@@ -1536,6 +1546,8 @@ void PXDUnpackerDHHModule::remap_IB_OF(unsigned int& v_cellID, unsigned int& u_c
   if (ch >= 10 and ch <= 15) drain = 1023;
 
   u_cellID = 250 - 1 - drain / 4;
+  if (u_cellID >= 250) u_cellID = 255; // workaround for negative values!!!
+
   unsigned int row = (v_cellID / 4) * 4  + drain % 4;
   if (((dhe_ID >> 5) & 0x1) == 0) { //if inner module
     v_cellID = 768 - 1 - row ;
@@ -1587,6 +1599,7 @@ void PXDUnpackerDHHModule::remap_IB_OF(unsigned int& v_cellID, unsigned int& u_c
   Drain = LUT_IB_OF[DCD_channel];
   B2INFO("in remap ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   u_cellID = 250 - 1 - Drain / 4;
+  if (u_cellID >= 250) uCellID = 255; // workaround for negative values!!!
   row = (v_cellID / 4) * 4  + Drain % 4;
   if (((dhe_ID >> 5) & 0x1) == 0) { //if inner module
     v_cellID = 768 - 1 - row ;
@@ -1594,5 +1607,5 @@ void PXDUnpackerDHHModule::remap_IB_OF(unsigned int& v_cellID, unsigned int& u_c
     v_cellID = row ;
   }
 #endif
-  B2INFO("Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
+//  B2INFO("Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }

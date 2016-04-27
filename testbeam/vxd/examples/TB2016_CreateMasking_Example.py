@@ -238,9 +238,10 @@ else:
         branches = branches + ['PXDDigits', 'SVDDigits']
     main.add_module('RootInput', branchNames=branches)
 
+OutputHistoName = 'TB2016_CreateMaskFiredHistos_Run'+str(RunNoVXD)+'.root'
 
 if args.dqm:
-    main.add_module('HistoManager')
+    main.add_module('HistoManager', histoFileName=OutputHistoName)
 
 main.add_module('Progress')
 

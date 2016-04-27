@@ -223,6 +223,8 @@ void VXDTelDQMOffLineModule::defineHisto()
     m_clustersVSen[i] = NULL;
     m_hitMapUSen[i] = NULL;
     m_hitMapVSen[i] = NULL;
+    m_hitMapDigitUSen[i] = NULL;
+    m_hitMapDigitVSen[i] = NULL;
     m_chargeUSen[i] = NULL;
     m_chargeVSen[i] = NULL;
     m_seedUSen[i] = NULL;
@@ -284,6 +286,22 @@ void VXDTelDQMOffLineModule::defineHisto()
       m_hitMapVSen[iS * c_nSVDPlanes + i] = new TH1F(name.c_str(), title.c_str(), nStrips, 0, nStrips);
       m_hitMapVSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("v position [pitch units]");
       m_hitMapVSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("hits");
+      // Hitmaps in U
+      name = str(format("hSVD_L%2%_S%1%_HitmapDigitsU") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% Hitmap of digits in U, plane %2%") % (iS + 1) % iPlane);
+      nStrips = getInfo(i, iS + 1).getUCells();
+      m_hitMapDigitUSen[iS * c_nSVDPlanes + i] = new TH2F(name.c_str(), title.c_str(), nStrips, 0, nStrips, 6, 0, 6);
+      m_hitMapDigitUSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("u position [pitch units]");
+      m_hitMapDigitUSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("timestamp");
+      m_hitMapDigitUSen[iS * c_nSVDPlanes + i]->GetZaxis()->SetTitle("hits");
+      // Hitmaps in V
+      name = str(format("hSVD_L%2%_S%1%_HitmapDigitsV") % (iS + 1) % iPlane);
+      title = str(format("TB2016 SVD Sensor %1% Hitmap of digits in V, plane %2%") % (iS + 1) % iPlane);
+      nStrips = getInfo(i, iS + 1).getVCells();
+      m_hitMapDigitVSen[iS * c_nSVDPlanes + i] = new TH2F(name.c_str(), title.c_str(), nStrips, 0, nStrips, 6, 0, 6);
+      m_hitMapDigitVSen[iS * c_nSVDPlanes + i]->GetXaxis()->SetTitle("v position [pitch units]");
+      m_hitMapDigitVSen[iS * c_nSVDPlanes + i]->GetYaxis()->SetTitle("timestamp");
+      m_hitMapDigitVSen[iS * c_nSVDPlanes + i]->GetZaxis()->SetTitle("hits");
       //----------------------------------------------------------------
       // Charge of clusters : hClusterCharge[U/V][PlaneNo]
       //----------------------------------------------------------------
@@ -413,7 +431,13 @@ void VXDTelDQMOffLineModule::defineHisto()
         m_correlations[c_nTBPlanes * j + i]->GetZaxis()->SetTitle("hits");
 
       } else if (i < j) { // correlations for u
-        if ((!m_SaveOtherHistos) && (abs(i - j) > 1)) continue;
+        int skypOtherHistos = 0;
+        if (!m_SaveOtherHistos) if (((i == 5) && (j == 6)) || ((i == 6) && (j == 5)) || ((i == 8) && (j == 9)) || ((i == 9)
+                                      && (j == 8))) skypOtherHistos = 1;
+        if ((!m_SaveOtherHistos) && (abs(i - j) > 1)) skypOtherHistos = 1;
+        if (!m_SaveOtherHistos) if (((i == 5) && (j == 9)) || ((i == 9) && (j == 5)) || ((i == 0) && (j == 8)) || ((i == 8)
+                                      && (j == 0))) skypOtherHistos = 0;
+        if (skypOtherHistos) continue;
         if (abs(i - j) > 1) {
           if (m_SaveOtherHistos) DirVXDGlobCorrels->cd();
         } else {
@@ -448,7 +472,14 @@ void VXDTelDQMOffLineModule::defineHisto()
         m_correlations[c_nTBPlanes * j + i]->GetZaxis()->SetTitle("hits");
 
       } else {       // correlations for v
-        if ((!m_SaveOtherHistos) && (abs(i - j) > 1)) continue;
+        int skypOtherHistos = 0;
+        if (!m_SaveOtherHistos) if (((i == 5) && (j == 6)) || ((i == 6) && (j == 5)) || ((i == 8) && (j == 9)) || ((i == 9)
+                                      && (j == 8))) skypOtherHistos = 1;
+        if ((!m_SaveOtherHistos) && (abs(i - j) > 1)) skypOtherHistos = 1;
+        if (!m_SaveOtherHistos) if (((i == 5) && (j == 9)) || ((i == 9) && (j == 5)) || ((i == 0) && (j == 8)) || ((i == 8)
+                                      && (j == 0))) skypOtherHistos = 0;
+        if (skypOtherHistos) continue;
+        //if ((!m_SaveOtherHistos) && (abs(i - j) > 1)) continue;
         if (abs(i - j) > 1) {
           if (m_SaveOtherHistos) DirVXDGlobCorrels->cd();
         } else {
@@ -723,6 +754,19 @@ void VXDTelDQMOffLineModule::event()
       m_seedVSen[indexSen]->Fill(cluster.getSeedCharge());
       m_sizeVSen[indexSen]->Fill(cluster.getSize());
       m_timeVSen[indexSen]->Fill(cluster.getClsTime());
+    }
+  }
+  float m_CutSVDCharge = 22;
+  for (const SVDDigit& digit : storeDigits) {
+    int iPlane = digit.getSensorID().getLayerNumber();
+    if ((iPlane < c_firstSVDPlane) || (iPlane > c_lastSVDPlane)) continue;
+    int indexSen = (digit.getSensorID().getSensorNumber() - 1) * c_nSVDPlanes + planeToIndex(iPlane);
+    if (digit.getCharge() > m_CutSVDCharge) {
+      if (digit.isUStrip()) {
+        m_hitMapDigitUSen[indexSen]->Fill(digit.getCellID(), digit.getIndex());
+      } else {
+        m_hitMapDigitVSen[indexSen]->Fill(digit.getCellID(), digit.getIndex());
+      }
     }
   }
 

@@ -229,8 +229,10 @@ namespace Belle2 {
     TH1F* m_firedVSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];         /**< Fired v strips per event by plane */
     TH1F* m_clustersUSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];      /**< u clusters per event by plane */
     TH1F* m_clustersVSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];      /**< v clusters per event by plane */
-    TH1F* m_hitMapUSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];        /**< Hitmaps for u-strips by plane */
-    TH1F* m_hitMapVSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];        /**< Hitmaps for v-strips by plane */
+    TH1F* m_hitMapUSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];        /**< Hitmaps for u-strips clusters by plane */
+    TH1F* m_hitMapVSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];        /**< Hitmaps for v-strips clusters by plane */
+    TH2F* m_hitMapDigitUSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];   /**< Hitmaps for u-strips all timestamps by plane */
+    TH2F* m_hitMapDigitVSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];   /**< Hitmaps for v-strips all timestamps by plane */
     TH1F* m_chargeUSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];        /**< u charge by plane */
     TH1F* m_chargeVSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];        /**< v charge by plane */
     TH1F* m_seedUSen[c_nSVDPlanes * c_MaxSensorsInSVDPlane];          /**< u seed by plane */

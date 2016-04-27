@@ -250,9 +250,10 @@ else:
         branches = branches + ['PXDDigits', 'SVDDigits']
     main.add_module('RootInput', branchNames=branches)
 
+OutputHistoName = 'TB2016_MaskFiredHistos_Run'+str(RunNoVXD)+'.root'
 
 if args.dqm:
-    main.add_module('HistoManager')
+    main.add_module('HistoManager', histoFileName=OutputHistoName)
 
 main.add_module('Progress')
 
@@ -327,8 +328,10 @@ else:
     main.add_module('GenFitter', FilterId='Kalman')
 
 main.add_module("VXDTelDQMOffLine", SaveOtherHistos=1)
+# main.add_module("VXDDQMOnLine", SaveOtherHistos=1)
 
 main.add_module('TrackBuilder')
+# main.add_module("TBAnalysis")
 main.add_module('RootOutput')
 
 if args.display:

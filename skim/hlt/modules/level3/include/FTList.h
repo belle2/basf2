@@ -24,13 +24,34 @@ namespace Belle2 {
   public:
 
     //! default constructor
-    explicit FTList(const int lengthToAlloc = 100);
+    explicit FTList(const int lengthToAlloc = 100)
+      : m_length(0),
+        m_remain(lengthToAlloc),
+        m_lengthToAlloc(lengthToAlloc),
+        m_obj(static_cast<T*>(std::malloc(lengthToAlloc * sizeof(T))))
+    {
+      if (!m_obj) B2FATAL("FTList::m_obj malloc failed");
+    }
 
     //! copy constructor
-    FTList(const FTList<T>&);
+    FTList(const FTList<T>& src)
+      : m_length(src.m_length),
+        m_remain(src.m_remain),
+        m_lengthToAlloc(src.m_lengthToAlloc)
+    {
+      m_obj = static_cast<T*>(std::malloc((m_length + m_remain) * sizeof(T)));
+      if (!m_obj) B2FATAL("FTList::m_obj malloc failed");
+      T* srcObj = src.m_obj;
+      for (int i = 0; i < m_length; i++) {
+        *(m_obj + i) = *(srcObj + i);
+      }
+    }
 
     //! destructor
-    ~FTList();
+    ~FTList()
+    {
+      free(m_obj);
+    }
 
     //! append an object into the end of the list
     int append(const T x);
@@ -96,38 +117,6 @@ namespace Belle2 {
     //! array of the object
     T* m_obj;
   };
-
-  template <class T>
-  inline
-  FTList<T>::FTList(const int lengthToAlloc)
-    : m_length(0),
-      m_remain(lengthToAlloc),
-      m_lengthToAlloc(lengthToAlloc),
-      m_obj(static_cast<T*>(std::malloc(lengthToAlloc * sizeof(T))))
-  {
-    if (!m_obj) B2FATAL("FTList::m_obj malloc failed");
-  }
-
-  template <class T>
-  FTList<T>::FTList(const FTList<T>& src)
-    : m_length(src.m_length),
-      m_remain(src.m_remain),
-      m_lengthToAlloc(src.m_lengthToAlloc)
-  {
-    m_obj = static_cast<T*>(std::malloc((m_length + m_remain) * sizeof(T)));
-    if (!m_obj) B2FATAL("FTList::m_obj malloc failed");
-    T* srcObj = src.m_obj;
-    for (int i = 0; i < m_length; i++) {
-      *(m_obj + i) = *(srcObj + i);
-    }
-  }
-
-  template <class T>
-  inline
-  FTList<T>::~FTList()
-  {
-    free(m_obj);
-  }
 
   template <class T>
   inline

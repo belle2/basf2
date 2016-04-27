@@ -355,17 +355,10 @@ void HitProcessor::maskHitsWithPoorQuality(CDCTrack& track)
           hit.getWireHit().getAutomatonCell().setMaskedFlag();
         }
       }
+
     }
 
-    if (emptyEndingSLayers.size() > 0) {
-      const int breakSLayer = emptyEndingSLayers.back();
-      for (CDCRecoHit3D& hit : track) {
-        if (hit.getISuperLayer() >= breakSLayer) {
-          hit.getWireHit().getAutomatonCell().setMaskedFlag();
-        }
-      }
-    }
-
+    // We do not use emptyEndingSLayers here, as it would leave to a severy efficiency drop.
   }
 
   deleteAllMarkedHits(track);

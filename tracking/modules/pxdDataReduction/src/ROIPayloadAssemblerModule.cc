@@ -97,6 +97,9 @@ void ROIPayloadAssemblerModule::event()
 
     unsigned int tmpRowMin;
     unsigned int tmpRowMax;
+
+    // TODO Upper/Lower Boarder Check is missing, thus overflows or negative values etc might happen...
+
     if (m_DESYremap and (iROI.getSensorID()).getLayerNumber() == 1) {
       // Inner (because of NO -1 above
       tmpRowMin = nPixelsV - iROI.getMinVid();
@@ -109,6 +112,9 @@ void ROIPayloadAssemblerModule::event()
 
     unsigned int tmpColMin;
     unsigned int tmpColMax;
+
+    // TODO Upper/Lower Boarder Check is missing, thus overflows or negative values etc might happen...
+
     if (m_DESYremap and (iROI.getSensorID()).getLayerNumber() != (iROI.getSensorID()).getSensorNumber()) {
       // Outer Forward, Inner Backward
       tmpColMin = nPixelsU - iROI.getMinUid();
@@ -169,6 +175,27 @@ void ROIPayloadAssemblerModule::event()
   int tmpDHHID = -1;
   int countROIs = 0;
   int addROI = 0;
+
+  for (itOrderedROIraw = orderedROIraw.begin(); itOrderedROIraw != orderedROIraw.end(); ++itOrderedROIraw) {
+
+    if ((int) itOrderedROIraw->getDHHID() == tmpDHHID)
+      countROIs ++;
+    else
+      countROIs = 0;
+
+    if (countROIs < 32) {
+      //      payload->addROIraw(*itOrderedROIraw);
+      payload->addROIraw(itOrderedROIraw->getBigEndian());
+      addROI++;
+    } else
+      B2ERROR("A ROI on DHHID " << itOrderedROIraw->getDHHID() << endl <<
+              " is rejected because the max number of ROIs per pxd sensor per event (32) was exceeded.");
+
+    tmpDHHID = itOrderedROIraw->getDHHID();
+
+  }
+
+  tmpDHHID = -1;
 
   for (itOrderedROIraw = orderedROIraw.begin(); itOrderedROIraw != orderedROIraw.end(); ++itOrderedROIraw) {
 

@@ -24,7 +24,8 @@ while (my $line = <$fh>){
     open(my $shf, '>', $sh_filename);
     print $shf "#!/bin/sh\n";
     print $shf "analyzeHits_extended /group/belle2/testbeam/TOP/CRT_analysis/hits/${line}_writehits.root /group/belle2/testbeam/TOP/CRT_analysis/hits/${line}_plothits_$cutnum.root $cutnum /group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_${cutnum}_info.txt \n";
-    print $shf "analyzeHits_extended /group/belle2/testbeam/TOP/CRT_analysis/hits/${line}_writehits.root /group/belle2/testbeam/TOP/CRT_analysis/expert/hits/${line}_AsicByAsic_plothits_$cutnum.root $cutnum \n";
+#    print $shf "analyzeHits_extended /group/belle2/testbeam/TOP/CRT_analysis/temp/${line}_writehits.root /group/belle2/testbeam/TOP/CRT_analysis/temp/${line}_plothits_$cutnum.root $cutnum /group/belle2/testbeam/TOP/CRT_analysis/combined/${subname}_${cutnum}_info.txt \n";
+#    print $shf "analyzeHits_extended /group/belle2/testbeam/TOP/CRT_analysis/hits/${line}_writehits.root /group/belle2/testbeam/TOP/CRT_analysis/expert/hits/${line}_AsicByAsic_plothits_$cutnum.root $cutnum \n";
     close $shf;
     chmod 0777, $sh_filename;
 
@@ -56,6 +57,7 @@ while (my $line2 = <$fh2>){
     chomp $line2;
     $line2 =~ s{\.[^.]+$}{};
     print $subf2 "/group/belle2/testbeam/TOP/CRT_analysis/hits/${line2}_plothits_$cutnum.root ";
+    #print $subf2 "/group/belle2/testbeam/TOP/CRT_analysis/temp/${line2}_plothits_$cutnum.root ";
 
 }
 chmod 0777, $sub_filename2;

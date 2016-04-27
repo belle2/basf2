@@ -83,17 +83,26 @@ else:
 
 mergemodule = register_module('WaveMerging')
 
-timemodule = register_module('WaveTimingV2')
-timeDict = {'time2TDC': 1.0}
-timemodule.param(timeDict)
-timemodule.param('threshold', 50.)  # always
-if (args.inputRun).find("cpr31") != -1 or (args.inputRun).find("cpr32") != -1:
-    print('FUJI')
-    timemodule.param('threshold_n', 1.)  # fuji
+if (args.inputRun).find("slot") != -1:
+    print('BELLE 2 INSTALLED')
+    timemodule = register_module('WaveTimingV4')
+    timeDict = {'time2TDC': 1.0}
+    timemodule.param(timeDict)
+    timemodule.param('threshold', 50.)  # always
+    timemodule.param('threshold_n', -300.)  # tsukuba
 else:
-    print('TSUKUBA')
-    timemodule.param('threshold_n', -80.)  # tsukuba
+    timemodule = register_module('WaveTimingV2')
+    timeDict = {'time2TDC': 1.0}
+    timemodule.param(timeDict)
+    timemodule.param('threshold', 50.)  # always
+    if (args.inputRun).find("cpr31") != -1 or (args.inputRun).find("cpr32") != -1:
+        print('FUJI')
+        timemodule.param('threshold_n', 1.)  # fuji
+    else:
+        print('TSUKUBA')
+        timemodule.param('threshold_n', -80.)  # tsukuba
 # it shouldn't be anything else
+
 
 timecalibmodule = register_module('DoubleCalPulse')
 if (args.inputRun).find("cpr31") != -1 or (args.inputRun).find("cpr32") != -1:

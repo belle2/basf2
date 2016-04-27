@@ -42,6 +42,13 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
+    int m_TrigDiv;
+    std::string m_TrackCandName;
+    std::string m_TrackName;
+    std::string m_TrackFitResultName;
+    std::string m_PXDInterceptName;
+    std::string m_ROIidName;
+
   private:
 
     int m_goodL1inter;
@@ -49,10 +56,35 @@ namespace Belle2 {
 
     TH1F* m_h1_pValue; /**< pValue TH1F*/
 
-    TH1F* m_h1_uResid_L1;
-    TH1F* m_h1_vResid_L1;
-    TH1F* m_h1_uResid_L2;
-    TH1F* m_h1_vResid_L2;
+    TH1F* m_h1_nROIs_odd;
+    TH1F* m_h1_nROIs_even;
+
+    TH1F* m_h1_uwidthROI_odd;
+    TH1F* m_h1_vwidthROI_odd;
+    TH1F* m_h1_uwidthROI_even;
+    TH1F* m_h1_vwidthROI_even;
+
+    TH2F* m_h2_uvResidCluster_L1;
+    TH2F* m_h2_uvResidCluster_L2;
+    TH2F* m_h2_uvResidDigit_L1;
+    TH2F* m_h2_uvResidDigit_L2;
+
+
+    TH2F*  m_h2_PXDCluster_L1;
+    TH2F*  m_h2_PXDCluster_L2;
+    TH2F*  m_h2_Intercepts_L1;
+    TH2F*  m_h2_Intercepts_L2;
+
+    TH1F* m_h1_uResid_L1_odd;
+    TH1F* m_h1_vResid_L1_odd;
+    TH1F* m_h1_uResid_L2_odd;
+    TH1F* m_h1_vResid_L2_odd;
+    TH1F* m_h1_uResid_L1_even;
+    TH1F* m_h1_vResid_L1_even;
+    TH1F* m_h1_uResid_L2_even;
+    TH1F* m_h1_vResid_L2_even;
+    TH1F* m_h1_uResid_L2_future_even;
+    TH1F* m_h1_vResid_L2_future_even;
 
     TH2F* m_h2_hitMap_vL1_uL1; /**< L1 hitmap*/
     TH2F* m_h2_hitMap_vL2_uL2; /**< L2 hitmap*/
@@ -62,11 +94,16 @@ namespace Belle2 {
 
     TH2F* m_h2_corr_vL3_vL1;
     TH2F* m_h2_corr_vL3_vL2;
-    TH2F* m_h2_corr_uL3_uL1;
-    TH2F* m_h2_corr_uL3_uL2;
+    TH2F* m_h2_corr_uL3_uL1_even;
+    TH2F* m_h2_corr_uL3_uL2_even;
+    TH2F* m_h2_corr_uL3_uL1_odd;
+    TH2F* m_h2_corr_uL3_uL2_odd;
     TH2F* m_h2_corr_uL4_uL1;
     TH2F* m_h2_corr_uL3_uL4;
+    TH2F* m_h2_corr_vL3_vL4;
     TH2F* m_h2_corr_vL3_uL1;
+    TH2F* m_h2_corr_uL1_uL2;
+    TH2F* m_h2_corr_vL1_vL2;
   };
 }
 

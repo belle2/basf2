@@ -78,15 +78,6 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
    */
   const G4double hitTime = track.GetGlobalTime();
 
-
-  /**
-  * drop hit if global time is nan or if it is  more than
-  * hitTimeThreshold (to avoid nuclei fission signals)
-  */
-  if (isnan(hitTime)) {
-    B2ERROR("EKLMSensitiveDetector: global time is nan");
-    return false;
-  }
   // No time cut for background studeis
   if (hitTime > m_ThresholdHitTime &&
       m_GeoDat->getDetectorMode() == EKLMGeometry::c_DetectorNormal) {

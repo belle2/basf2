@@ -165,19 +165,18 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
 
   // // identify HSLB buffer sizes
   // // determine number of HSLBs in the data stream
-  unsigned short asic, win, hslb, maxhslb;
-  int bufsize[4];
-  bufsize[0] = cpr_hdr.offset_block2 - cpr_hdr.offset_block1;
-  bufsize[1] = cpr_hdr.offset_block3 - cpr_hdr.offset_block2;
-  bufsize[2] = cpr_hdr.offset_block4 - cpr_hdr.offset_block3;
-  bufsize[3] = cpr_hdr.num_words - cpr_hdr.block_words - cpr_hdr.offset_block4 + 125; // not quite right?
-  //
-  // // determine number of HSLBs in the data stream
-  if (!bufsize[0])    {maxhslb = 0;}
-  else if (!bufsize[1])  {maxhslb = 1;}
-  else if (!bufsize[2])  {maxhslb = 2;}
-  else if (!bufsize[3])  {maxhslb = 3;}
-  else          {maxhslb = 4;}
+  unsigned short asic, win, hslb;
+  // FIXME: This will not work on data streams with only header and no detectors
+  unsigned short maxhslb = 1;
+  if (cpr_hdr.offset_block2 - cpr_hdr.offset_block1) {
+    maxhslb += 1;
+  }
+  if (cpr_hdr.offset_block3 - cpr_hdr.offset_block2) {
+    maxhslb += 1;
+  }
+  if (cpr_hdr.offset_block4 - cpr_hdr.offset_block3) {
+    maxhslb += 1;
+  }
   B2DEBUG(1, "max hslb: " << maxhslb);
   eventPacket[0] = 1001;
   eventPacket[1] = m_scrod;

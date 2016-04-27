@@ -195,9 +195,16 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
     in.read(reinterpret_cast<char*>(&hslb_hdr), sizeof(hslb_hdr));
     B2DEBUG(1, "Header: " << hex << hslb_hdr.B2L_hdr << "(" << HSLB_B2L_HEADER << ")" << dec)
     if (hslb_hdr.B2L_hdr != HSLB_B2L_HEADER) {
-      B2WARNING("Bad HSLB header... 0x" << hex << hslb_hdr.B2L_hdr << " ... aborting event");
-      m_evtheader_ptr->SetFlag(1000);
-      break;
+      B2WARNING("Bad HSLB header... 0x" << hex << hslb_hdr.B2L_hdr << " ... trying again");
+      in.seekg(-sizeof(hslb_hdr) + sizeof(short int), ios_base::cur);
+      in.read(reinterpret_cast<char*>(&hslb_hdr), sizeof(hslb_hdr));
+      if (hslb_hdr.B2L_hdr != HSLB_B2L_HEADER) {
+        B2WARNING("Bad HSLB header second try... 0x" << hex << hslb_hdr.B2L_hdr << " ... aborting event");
+        m_evtheader_ptr->SetFlag(1000);
+        break;
+      } else {
+        B2DEBUG(1, "second try worked");
+      }
     }
     in.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
     unsigned int eventSize = word;
@@ -236,6 +243,7 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
               int)*streamSize << "pos: " << in.tellg())
     for (win = 0; in && win <= numWindows ; win++) {
       word = readWordUnique(in, word);
+windowStart:
       m_carrier = (word >> 30) & 0x3;
       asic = (word >> 28) & 0x3;
       unsigned int lastWrAddr = (word >> 16) & 0xFF;
@@ -286,6 +294,8 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
             if ((word & 0xF000F000) > 0) {
               B2WARNING("data out of range... event " << m_evt_no);
               m_evtheader_ptr->SetFlag(9999);
+              // trying to interpret this word as a window header
+              goto windowStart;
             }
           }
           m_WfPacket = m_evtwaves_ptr.appendNew(EventWaveformPacket(wavePacket, WAVE_PACKET_SIZE));
@@ -295,6 +305,7 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
 
     }
     int l = 0;
+    // FIXME: this intends the right thing, but somehow is not using the right check points to get back on track
     if (m_evtheader_ptr->GetEventFlag() >= 9999) {
       // must read a short at a time to get back on track...
       unsigned short x1, x2;
@@ -311,14 +322,15 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
       }
       m_evtheader_ptr->SetFlag(1005);
     }
-    // read ahead
+    // read ahead to find a good footer
     while ((word != PACKET_LAST && word != PACKET_LAST2 && word != PACKET_LAST3) && in) {
       in.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
       word = swap_endianess(word);
       B2DEBUG(1, "footer: 0x" << hex << word << dec);
 
       if (word != PACKET_LAST && word != PACKET_LAST2 && word != PACKET_LAST3) {
-        B2WARNING("Bad window footer (" << hex << word << "!=" << PACKET_LAST << dec << ")... marking event " << m_evt_no << ".");
+        B2WARNING("Bad window footer (" << hex << word << "!=" << PACKET_LAST << dec << "); attempt #" << l + 1 << "... marking event " <<
+                  m_evt_no << ".");
         m_evtheader_ptr->SetFlag(1002);
         if (l > 30)  break;
         l++;

@@ -168,15 +168,33 @@ void MCMatcherECLClustersModule::event()
       const ECLHit* aECLHit = eclHits[eclHitIndex];
       int hitCellId         = aECLHit->getCellId() - 1;
       if (aECLHit->getBackgroundTag() != 0) continue;
-      if (CalDigiIndex[hitCellId] != -1 && PrimaryIndex > -1) { // && DigiOldTrack[hitCellId] != PrimaryIndex) {
-        eclCalDigitToMCParticleRelationArray.add(CalDigiIndex[hitCellId], PrimaryIndex);
-        //DigiOldTrack[hitCellId] = PrimaryIndex;
-      }
+      //OLD MC-CalDigit relation, does not handle multiple matching nor weights
+      //if (CalDigiIndex[hitCellId] != -1 && PrimaryIndex > -1) { // && DigiOldTrack[hitCellId] != PrimaryIndex) {
+      //  eclCalDigitToMCParticleRelationArray.add(CalDigiIndex[hitCellId], PrimaryIndex);
+      //DigiOldTrack[hitCellId] = PrimaryIndex;
+      //}
       if (DigiIndex[hitCellId] != -1 && PrimaryIndex > -1) { // && DigiOldTrack[hitCellId] != PrimaryIndex) {
         eclDigitToMCParticleRelationArray.add(DigiIndex[hitCellId], PrimaryIndex);
       }
     }//for (int hit = 0
   }//for index
+
+  for (const auto& eclCalDigit : eclCalDigits) {
+    const auto digitCellId = eclCalDigit.getCellId();
+    for (int iMCPart = 0; iMCPart < mcParticleToECLSimHitRelationArray.getEntries(); iMCPart++) {
+      double energy = 0;
+      for (int simhit = 0; simhit < (int)mcParticleToECLSimHitRelationArray[iMCPart].getToIndices().size(); simhit++) {
+        ECLSimHit* aECLSimHit = eclSimHits[mcParticleToECLSimHitRelationArray[iMCPart].getToIndex(simhit)];
+        if ((aECLSimHit->getCellId() != digitCellId)) continue;
+        energy = energy + aECLSimHit->getEnergyDep();
+      } // simhit
+      if (energy > 0.) {
+        //const auto mcParticle = mcParticles.object(i);
+        eclCalDigitToMCParticleRelationArray.add(eclCalDigit.getArrayIndex(), mcParticleToECLSimHitRelationArray[iMCPart].getFromIndex(),
+                                                 energy);
+      }
+    }//for iMCPart
+  }//for ECLCalDigit
 
   /****************************************************************************************/
 

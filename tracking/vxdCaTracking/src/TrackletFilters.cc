@@ -183,12 +183,6 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
               (*m_hits)[0]->hitPosition.Z() << ", Hit1: " << (*m_hits)[1]->hitPosition.X() << "/" << (*m_hits)[1]->hitPosition.Y() << "/" <<
               (*m_hits)[1]->hitPosition.Z() << ", Hit2: " << (*m_hits)[2]->hitPosition.X() << "/" << (*m_hits)[2]->hitPosition.Y() << "/" <<
               (*m_hits)[2]->hitPosition.Z());
-      // UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY
-      // UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY
-      return make_pair(TVector3(5., 0., 0.) ,
-                       +1); // UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY
-      // UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY
-      // UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY UGLY
     } else {
       B2DEBUG(5, "trackletFilter::calcMomentumSeed: segments parallel, but no magnetic field, therefore no problem...\nHit0: " <<
               (*m_hits)[0]->hitPosition.X() << "/" << (*m_hits)[0]->hitPosition.Y() << "/" << (*m_hits)[0]->hitPosition.Z() << ", Hit1: " <<

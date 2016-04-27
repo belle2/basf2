@@ -294,16 +294,20 @@ windowStart:
             if ((word & 0xF000F000) > 0) {
               B2WARNING("data out of range... event " << m_evt_no);
               m_evtheader_ptr->SetFlag(9999);
-              // trying to interpret this word as a window header
-              goto windowStart;
+              // trying to interpret this word as a window header or footer
+              if ((word != PACKET_LAST) && (word != PACKET_LAST2) && (word != PACKET_LAST3)) {
+                goto windowStart;
+              } else {
+                goto windowFooter;
+              }
             }
           }
           m_WfPacket = m_evtwaves_ptr.appendNew(EventWaveformPacket(wavePacket, WAVE_PACKET_SIZE));
           m_WfPacket->SetASIC(asic);
         }
       }
-
     }
+windowFooter:
     int l = 0;
     // FIXME: this intends the right thing, but somehow is not using the right check points to get back on track
     if (m_evtheader_ptr->GetEventFlag() >= 9999) {

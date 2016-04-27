@@ -45,7 +45,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
 
   TChain t("tree");
   t.Add(filename);
-  int maxadc = 2000;
+  int maxtdc = 2000;
 
   TCut width_cut("TOPCAFDigits.m_width>3.&&TOPCAFDigits.m_width<20.");
   TCut width_cut2("TOPCAFDigits.m_width>3.&&TOPCAFDigits.m_width<10.");
@@ -253,11 +253,11 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
   //TH1D* ch_time_proj_qual = new TH1D("ch_time_proj_qual", "time projection (qual cuts)", 40000, -2000., 2000.);
   ch_time_proj_qual->GetXaxis()->SetTitle("time");
 
-  TH2F* ch_tdcbin = new TH2F("ch_tdcbin", "tdc bin vs channel (quality cuts)", 512, 0., 512., 1500, 0., (double)maxadc);
+  TH2F* ch_tdcbin = new TH2F("ch_tdcbin", "tdc bin vs channel (quality cuts)", 512, 0., 512., maxtdc, 0., (double)maxtdc);
   ch_tdcbin->GetXaxis()->SetTitle("pixel");
   ch_tdcbin->GetYaxis()->SetTitle("hit time bin [time bin]");
 
-  TH2F* tdcbin_time = new TH2F("tdcbin_time", "hit time vs tdc bin (quality cuts)", 1500, 0., (double)maxadc, 4000, -2000., 2000.);
+  TH2F* tdcbin_time = new TH2F("tdcbin_time", "hit time vs tdc bin (quality cuts)", maxtdc, 0., (double)maxtdc, 4000, -2000., 2000.);
   tdcbin_time->GetXaxis()->SetTitle("hit time bin [time bin]");
   tdcbin_time->GetYaxis()->SetTitle("hit time [time bin]");
 
@@ -366,11 +366,12 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
   TH1D* ch_time_proj_tight = new TH1D("ch_time_proj_tight", "time projection", 40000, -2000., 2000.);
   ch_time_proj_tight->GetXaxis()->SetTitle("time");
 
-  TH2F* ch_tdcbin_tight = new TH2F("ch_tdcbin_tight", "tdc bin vs channel (tight cuts)", 512, 0., 512., 1500, 0., (double)maxadc);
+  TH2F* ch_tdcbin_tight = new TH2F("ch_tdcbin_tight", "tdc bin vs channel (tight cuts)", 512, 0., 512., maxtdc, 0., (double)maxtdc);
   ch_tdcbin_tight->GetXaxis()->SetTitle("pixel");
   ch_tdcbin_tight->GetYaxis()->SetTitle("hit time bin [time bin]");
 
-  TH2F* tdcbin_time_tight = new TH2F("tdcbin_time_tight", "hit time vs tdc bin (tight cuts)", 1500, 0., (double)maxadc, 4000, -2000.,
+  TH2F* tdcbin_time_tight = new TH2F("tdcbin_time_tight", "hit time vs tdc bin (tight cuts)", maxtdc, 0., (double)maxtdc, 4000,
+                                     -2000.,
                                      2000.);
   tdcbin_time_tight->GetXaxis()->SetTitle("hit time bin [time bin]");
   tdcbin_time_tight->GetYaxis()->SetTitle("hit time [time bin]");
@@ -470,11 +471,12 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
   TH1D* ch_time_proj_optics = new TH1D("ch_time_proj_optics", "time projection", 40000, -2000., 2000.);
   ch_time_proj_optics->GetXaxis()->SetTitle("time");
 
-  TH2F* ch_tdcbin_optics = new TH2F("ch_tdcbin_optics", "tdc bin vs channel (optics cuts)", 512, 0., 512., 1500, 0., (double)maxadc);
+  TH2F* ch_tdcbin_optics = new TH2F("ch_tdcbin_optics", "tdc bin vs channel (optics cuts)", 512, 0., 512., maxtdc, 0.,
+                                    (double)maxtdc);
   ch_tdcbin_optics->GetXaxis()->SetTitle("pixel");
   ch_tdcbin_optics->GetYaxis()->SetTitle("hit time bin [time bin]");
 
-  TH2F* tdcbin_time_optics = new TH2F("tdcbin_time_optics", "hit time vs tdc bin (optics cuts)", 1500, 0., (double)maxadc, 4000,
+  TH2F* tdcbin_time_optics = new TH2F("tdcbin_time_optics", "hit time vs tdc bin (optics cuts)", maxtdc, 0., (double)maxtdc, 4000,
                                       -2000., 2000.);
   tdcbin_time_optics->GetXaxis()->SetTitle("hit time bin [time bin]");
   tdcbin_time_optics->GetYaxis()->SetTitle("hit time [time bin]");
@@ -612,6 +614,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
   }
 
   TH1F* time_by_asic[64], *time_by_asic_tight[64], *time_by_asic_optics[64];
+  TH2F* tdc2d_by_asic[64];
   for (int ii = 0; ii < 64; ii++) {
     char n_asic[20];
     sprintf(n_asic, "asic_time%i", ii);
@@ -620,9 +623,9 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     time_by_asic_tight[ii] = new TH1F(n_asic, n_asic, 4000, -2000, 2000);
     sprintf(n_asic, "asic_time_optics%i", ii);
     time_by_asic_optics[ii] = new TH1F(n_asic, n_asic, 4000, -2000, 2000);
+    sprintf(n_asic, "tdc2d_by_asic%i", ii);
+    tdc2d_by_asic[ii] = new TH2F(n_asic, n_asic, 400, 0., 800, 150, -500., -350.);
   }
-
-
 
   //Loop over all of the ASICs and fill the time projection plot
   TString asiccut_tmp = "";
@@ -635,6 +638,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     t.Draw(Form("TOPCAFDigits.m_time>>asic_time%i", ii), width_cut && qual_cut && height_cut2 && asiccut_cut);
     t.Draw(Form("TOPCAFDigits.m_time>>asic_time_tight%i", ii), cut_tight && asiccut_cut);
     t.Draw(Form("TOPCAFDigits.m_time>>asic_time_optics%i", ii), cut_optics && asiccut_cut);
+    t.Draw(Form("TOPCAFDigits.m_time:TOPCAFDigits.m_tdc_bin>>tdc2d_by_asic%i", ii), cut_optics && asiccut_cut);
   }
 
 
@@ -870,6 +874,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     time_by_asic[ii]->Write();
     time_by_asic_tight[ii]->Write();
     time_by_asic_optics[ii]->Write();
+    tdc2d_by_asic[ii]->Write();
   }
 
   //Expert plots from Umberto

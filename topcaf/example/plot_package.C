@@ -1,4 +1,4 @@
-void plot_package(TString filename, const char* outfile="", const char* trigpos=""){
+void plot_package(TString filename, const char* outfile="", const char* trigpos="", int flag_expert=0){
 
   int flag_slot = ( (strstr(filename, "slot") != NULL) || (strstr(filename, "cpr2061") != NULL) );
   cout<<flag_slot<<endl;
@@ -138,7 +138,7 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
       py2->GetXaxis()->SetRangeUser(300,500);      
       //if( (strstr(filename, "slot") != NULL) || (strstr(filename, "cpr2061") != NULL)   ){
       if( flag_slot==1 ){
-	py2->GetXaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
+	py2->GetXaxis()->SetRangeUser(xpeaks0[0]-50,xpeaks0[0]+150);
 	TPad* c_py2_1=(TPad*)(c_py2->GetPrimitive("c_py2_1"));
 	if( strstr(filename, "slot") != NULL ) c_py2_1->SetLogy();
       }
@@ -233,7 +233,7 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
 	  asict[ii*16+iii]->GetXaxis()->SetRangeUser(300,500);
 	  //if( (strstr(filename, "slot") != NULL) || (strstr(filename, "cpr2061") != NULL)   ){
 	  if( flag_slot==1 ){
-	    asict[ii*16+iii]->GetXaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
+	    asict[ii*16+iii]->GetXaxis()->SetRangeUser(xpeaks0[0]-50,xpeaks0[0]+150);
 	    cbs_i[ii*16+iii]=(TPad*)(cbs[ii]->GetPrimitive(Form("cbs%i_%i",ii,iii+1)));
 	    if( strstr(filename, "slot") != NULL )	    cbs_i[ii*16+iii]->SetLogy();
 	  }
@@ -242,6 +242,73 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
       asict[ii*16+iii]->Draw();
     }
     cbs[ii]->Print(Form("%s.ps",outfile));
+  }
+
+  if(flag_expert==1){
+    TH1F *asict2d[64];
+    for(int i=0;i<64;i++){
+      asict2d[i]=(TH1F*) fr.Get(Form("tdc2d_by_asic%i",i));
+    }
+    TCanvas *cbs2d[4];
+    TPad *cbs2d_i[64];
+    for(int ii=0;ii<4;ii++){
+      cbs2d[ii]=new TCanvas(Form("cbs2d%i",ii),Form("cbs2d%i",ii),800,800);
+      cbs2d[ii]->Divide(4,4);
+      for(int iii=0;iii<16;iii++){
+	cbs2d[ii]->cd(iii+1);
+	//asict[ii*16+iii]->Rebin(2);
+	if(flag_lab==1){
+	  //asict[ii*16+iii]->GetXaxis()->SetRangeUser(-1300,-1050);
+	}
+	else{
+	  //asict[ii*16+iii]->GetXaxis()->SetRangeUser(-500,-250);
+	  if(trigstring=="laser" || flag_slot==1){
+	    //asict[ii*16+iii]->GetXaxis()->SetRangeUser(300,500);
+	    if( flag_slot==1 ){
+	      //asict[ii*16+iii]->GetXaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
+	      cbs2d_i[ii*16+iii]=(TPad*)(cbs2d[ii]->GetPrimitive(Form("cbs2d%i_%i",ii,iii+1)));
+	      if( strstr(filename, "slot") != NULL )	    cbs2d_i[ii*16+iii]->SetLogy();
+	    }
+	  }
+	}
+	asict2d[ii*16+iii]->Draw("COLZ");
+      }
+      cbs2d[ii]->Print(Form("%s.ps",outfile));
+      
+    }
+  
+
+    for(int i=0;i<16;i++){
+      asict2d[i]->Add(asict2d[i+16]);
+      asict2d[i]->Add(asict2d[i+32]);
+      asict2d[i]->Add(asict2d[i+48]);
+    }
+    TCanvas *cbsc2d[4];
+    TPad *cbsc2d_i[64];
+    for(int ii=0;ii<1;ii++){
+      cbsc2d[ii]=new TCanvas(Form("cbsc2d%i",ii),Form("cbsc2d%i",ii),800,800);
+      cbsc2d[ii]->Divide(4,4);
+      for(int iii=0;iii<16;iii++){
+	cbsc2d[ii]->cd(iii+1);
+	//asict[ii*16+iii]->Rebin(2);
+	if(flag_lab==1){
+	  //asict[ii*16+iii]->GetXaxis()->SetRangeUser(-1300,-1050);
+	}
+	else{
+	  //asict[ii*16+iii]->GetXaxis()->SetRangeUser(-500,-250);
+	  if(trigstring=="laser" || flag_slot==1){
+	    //asict[ii*16+iii]->GetXaxis()->SetRangeUser(300,500);
+	    if( flag_slot==1 ){
+	      //asict[ii*16+iii]->GetXaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
+	      cbsc2d_i[ii*16+iii]=(TPad*)(cbsc2d[ii]->GetPrimitive(Form("cbsc2d%i_%i",ii,iii+1)));
+	      //if( strstr(filename, "slot") != NULL )	    cbsc2d_i[ii*16+iii]->SetLogy();
+	    }
+	  }
+	}
+	asict2d[ii*16+iii]->Draw("COLZ");
+      }
+      cbsc2d[ii]->Print(Form("%s.ps",outfile));
+    }
   }
 
   TH2F *ctt=(TH2F*) fr.Get("tdcbin_time_tight");
@@ -262,7 +329,7 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
       //if(strstr(filename, "slot") != NULL){
       if( flag_slot==1 ){
 	ctt->GetXaxis()->SetRangeUser(0,500);
-        ctt->GetYaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
+        ctt->GetYaxis()->SetRangeUser(xpeaks0[0]-50,xpeaks0[0]+150);
       }
     }
   }
@@ -282,7 +349,7 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
       cht->GetYaxis()->SetRangeUser(250,550);
       //if(strstr(filename, "slot") != NULL){
       if( flag_slot==1 ){
-        cht->GetYaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
+        cht->GetYaxis()->SetRangeUser(xpeaks0[0]-50,xpeaks0[0]+150);
       }
     }
   }

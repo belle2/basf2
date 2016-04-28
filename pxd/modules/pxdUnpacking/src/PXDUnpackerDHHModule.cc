@@ -981,9 +981,6 @@ void PXDUnpackerDHHModule::unpack_dhp(void* data, unsigned int frame_len, unsign
         if (printflag)
           B2INFO("SetRow: " << hex << dhp_row << " CM " << hex << dhp_cm);
       } else {
-        unsigned int v_cellID, u_cellID;
-        v_cellID = dhp_row;// defaults for no mapping
-        u_cellID = dhp_col;// defaults for no mapping
         if (!rowflag) {
           B2ERROR("DHP Unpacking: Pix without Row!!! skip dhp data ");
           m_errorMask |= ONSEN_ERR_FLAG_DHP_PIX_WO_ROW;
@@ -992,6 +989,9 @@ void PXDUnpackerDHHModule::unpack_dhp(void* data, unsigned int frame_len, unsign
         } else {
           dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] & 0x4000) >> 14);
           dhp_col = ((dhp_pix[i]  & 0x3F00) >> 8);
+          unsigned int v_cellID, u_cellID;
+          v_cellID = dhp_row;// defaults for no mapping
+          u_cellID = dhp_col;// defaults for no mapping
           ///  remapping flag
           /// if (dhe_reformat == 0) dhp_col ^= 0x3C ; /// 0->60 61 62 63 4->56 57 58 59 ...
           //dhp_col += dhp_offset;
@@ -1466,7 +1466,7 @@ void PXDUnpackerDHHModule::remap_IF_OB(unsigned int& v_cellID, unsigned int& u_c
   unsigned int ch = 4 * u_cellID + v_cellID % 4;
   unsigned int DCD_col = ch / 16;
   unsigned int DCD_col_sw = 15 - DCD_col;
-  unsigned int  drain = ch % 16 + DCD_col_sw * 16 + 250 * dhp_id;
+  unsigned int  drain = ch % 16 + DCD_col_sw * 16 + 250 * dhp_id;// or 256?
 
   if (ch >= 10 and ch <= 15) drain = 1023;
 
@@ -1518,7 +1518,7 @@ void PXDUnpackerDHHModule::remap_IF_OB(unsigned int& v_cellID, unsigned int& u_c
   };
 
   B2INFO("Remapped :: From COL $" << u_cellID << " ROW $" << v_cellID);
-  DCD_channel = 4 * u_cellID + v_cellID % 4 + 256 * dhp_id;
+  DCD_channel = 4 * u_cellID + v_cellID % 4 + 256 * dhp_id;// or 250??
   Drain = LUT_IF_OB[DCD_channel]; //since LUT starts with one and array with zero
   B2INFO("in remap ROW ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   u_cellID = Drain / 4;
@@ -1540,7 +1540,7 @@ void PXDUnpackerDHHModule::remap_IB_OF(unsigned int& v_cellID, unsigned int& u_c
   unsigned int DCD_col = ch / 16;
   unsigned int DCD_col_sw = 15 - DCD_col;
   unsigned int ch_map = 4 * u_cellID + (3 - v_cellID) % 4;
-  unsigned int drain = ch_map % 16 + DCD_col_sw * 16 + 250 * dhp_id;
+  unsigned int drain = ch_map % 16 + DCD_col_sw * 16 + 250 * dhp_id;// or 256?
 
   if (dhp_id == 1 or dhp_id == 3) {
     if (v_cellID / 2 == 0) {
@@ -1602,11 +1602,11 @@ void PXDUnpackerDHHModule::remap_IB_OF(unsigned int& v_cellID, unsigned int& u_c
   };
 
   B2INFO("Remapped :: From COL $" << u_cellID << " ROW $" << v_cellID);
-  DCD_channel = 4 * u_cellID + v_cellID % 4 + 256 * dhp_id;
+  DCD_channel = 4 * u_cellID + v_cellID % 4 + 256 * dhp_id; // or 250??
   Drain = LUT_IB_OF[DCD_channel];
   B2INFO("in remap ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   u_cellID = 250 - 1 - Drain / 4;
-  if (u_cellID >= 250) uCellID = 255; // workaround for negative values!!!
+  if (u_cellID >= 250) u_cellID = 255; // workaround for negative values!!!
   row = (v_cellID / 4) * 4  + Drain % 4;
   if (((dhe_ID >> 5) & 0x1) == 0) { //if inner module
     v_cellID = 768 - 1 - row ;

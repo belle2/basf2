@@ -243,6 +243,13 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
               int)*streamSize << "pos: " << in.tellg())
     for (win = 0; in && win <= numWindows ; win++) {
       word = readWordUnique(in, word);
+      // this should be a window header. However, if data corruption leads to numWindows being mis-read
+      // this could actually be a footer
+      if ((word != PACKET_LAST) && (word != PACKET_LAST2) && (word != PACKET_LAST3)) {
+        goto windowStart;
+      } else {
+        goto windowFooter;
+      }
 windowStart:
       m_carrier = (word >> 30) & 0x3;
       asic = (word >> 28) & 0x3;

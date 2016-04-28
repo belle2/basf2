@@ -43,7 +43,8 @@ PXDDataReductionModule::PXDDataReductionModule() : Module()
 
   addParam("gfTrackListName", m_gfTracksListName, " name of the list of the fitted tracks", std::string("gfTracks"));
 
-  addParam("badTrackListName", m_badTracksListName, " name of the list of the bad_track_status tracks", std::string("badTracks"));
+  addParam("badTrackListName", m_badTracksListName, " name of the list of the bad_track_status tracks",
+           std::string("badTracksForROI"));
 
   addParam("numIterKalmanFilter", m_numIterKalmanFilter, " number of iterations of the kalman filter ", int(5));
 
@@ -128,7 +129,7 @@ void PXDDataReductionModule::event()
   PXDInterceptsToROIids.create();
 
   StoreArray<genfit::TrackCand> trackCandBadStats(m_badTracksListName);
-  trackCandBadStats.create();
+  trackCandBadStats.create(true);
 
   //  timespec time1, time2, time3;
 

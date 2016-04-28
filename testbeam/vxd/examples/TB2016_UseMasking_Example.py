@@ -10,15 +10,14 @@ from ROOT import Belle2
 
 events = 10000  # Number of events to simulate
 # For simulation:
-RunNoVXD = 0
+RunNoVXD = '0'
 input_files = Belle2.Environment.Instance().getInputFilesOverride()
+rootstr = '.root'
 if len(input_files) > 0:
-    RunNoVXD = int(input_files[0][-11:-5])
-    # print(input_files[0])
-
-# print(input_files[0][-11:-5])
-# print(RunNoVXD)
-# for arg in sys.argv : print(arg)
+    SubNomberString = input_files[0][input_files[0].find(rootstr) + len(rootstr):]
+    NomberString = int(input_files[0][input_files[0].find(rootstr) + len(rootstr) - 11:][0:6])
+    RunNoVXD = str(NomberString) + SubNomberString
+    print('VXD run number: {}'.format(RunNoVXD))
 
 
 def add_geometry(path, magnet=True):
@@ -279,7 +278,7 @@ if args.unpacking:
         triggerfix.if_false(create_path())
         main.add_module(triggerfix)
         """
-        main.add_module('PXDTriggerShifter')
+#        main.add_module('PXDTriggerShifter')
         main.add_module('PXDUnpacker',
                         RemapFlag=True,
                         RemapLUT_IF_OB=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'),

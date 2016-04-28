@@ -299,6 +299,7 @@ windowStart:
             wavePacket[WAVE_HEADER_SIZE + x + 1] = word;
             B2DEBUG(1, "data[" << x << "]: 0x" << hex << word << dec);
             if ((word & 0xF000F000) > 0) {
+              repeatedCheck = false;
               B2WARNING("data out of range... event " << m_evt_no);
               m_evtheader_ptr->SetFlag(9999);
               // trying to interpret this word as a window header or footer
@@ -328,6 +329,10 @@ windowFooter:
         B2DEBUG(1, "evt no: " << m_evt_no << "\tl: " << l << "\tx1: 0x" << hex << x1 << dec);
         if (x1 == 0x616c || x1 == 0x636c) {
           word = PACKET_LAST;
+          in.read(reinterpret_cast<char*>(&x1), sizeof(unsigned short));
+          if ((x1 != 0x7374) && (x1 != 0x7774)) {
+            in.seekg(-sizeof(unsigned short), ios_base::cur);
+          }
         }
         l++;
       }

@@ -2259,13 +2259,17 @@ void VXDTFModule::the_real_event()
 
 void VXDTFModule::event()
 {
+  try {
 #ifdef HAS_CALLGRIND
-  CALLGRIND_START_INSTRUMENTATION;
+    CALLGRIND_START_INSTRUMENTATION;
 #endif
-  this->the_real_event();
+    this->the_real_event();
 #ifdef HAS_CALLGRIND
-  CALLGRIND_STOP_INSTRUMENTATION;
+    CALLGRIND_STOP_INSTRUMENTATION;
 #endif
+  } catch (...) {
+    B2ERROR("Unexpected exception thown by Jakob and catched by Eugenio");
+  }
 }
 
 
@@ -4127,13 +4131,17 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
       accepted = threeHitFilterBox.checkCircleDist2IP(FilterID::distanceHighOccupancy2IP);
     } catch (FilterExceptions::Straight_Line& anException) {
       B2DEBUG(1, "Exception caught: " << FilterID::distanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
-              " test-result is set negative...")
+              " test-result is set negative...");
       accepted = false;
     } catch (FilterExceptions::Circle_too_small& anException) {
       B2DEBUG(1, "Exception caught: " << FilterID::distanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
-              " test-result is set negative...")
+              " test-result is set negative...");
+      accepted = false;
+    } catch (...) {
+      // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
       accepted = false;
     }
+
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " distanceHighOccupancy2IP: segment approved!")
@@ -4177,7 +4185,11 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
       B2WARNING("Exception caught: " << FilterID::pTHighOccupancy << " failed with exception: " << anException.what() <<
                 " test-result is set negative...")
       accepted = false;
+    } catch (...) {
+      // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
+      accepted = false;
     }
+
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " pTHighOccupancy: segment approved!")
@@ -4204,7 +4216,12 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
       B2WARNING("Exception caught: helixParameterHighOccupancyFit failed with exception: " << anException.what() <<
                 " test-result is set negative...")
       accepted = false;
+    } catch (...) {
+      // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
+      accepted = false;
     }
+
+
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " helixParameterHighOccupancyFit: segment approved!")
@@ -4379,7 +4396,11 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
             B2WARNING("Exception caught: " << FilterID::distance2IP << " failed with exception: " << anException.what() <<
                       " test-result is set negative...")
             accepted = false;
+          } catch (...) {
+            // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
+            accepted = false;
           }
+
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " distance2IP: segment approved!")
@@ -4423,7 +4444,11 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
             B2WARNING("Exception caught: " << FilterID::pT << " failed with exception: " << anException.what() <<
                       " test-result is set negative...")
             accepted = false;
+          } catch (...) {
+            // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
+            accepted = false;
           }
+
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " pT: segment approved!")
@@ -4449,6 +4474,9 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           } catch (FilterExceptions::Circle_too_small& anException) {
             B2WARNING("Exception caught: " << FilterID::helixParameterFit << " failed with exception: " << anException.what() <<
                       " test-result is set negative...")
+            accepted = false;
+          } catch (...) {
+            // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
             accepted = false;
           }
 
@@ -4796,6 +4824,9 @@ bool VXDTFModule::NbFinderHighOccupancy(PassData* currentPass, TcFourHitFilters&
       B2WARNING("Exception caught: " << FilterID::deltaDistanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
                 " test-result is set negative...")
       accepted = false;
+    } catch (...) {
+      // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
+      accepted = false;
     }
 
     if (accepted == true) {
@@ -4823,6 +4854,9 @@ bool VXDTFModule::NbFinderHighOccupancy(PassData* currentPass, TcFourHitFilters&
     } catch (FilterExceptions::Circle_too_small& anException) {
       B2WARNING("Exception caught: " << FilterID::deltapTHighOccupancy << " failed with exception: " << anException.what() <<
                 " test-result is set negative...")
+      accepted = false;
+    } catch (...) {
+      // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
       accepted = false;
     }
 
@@ -5227,6 +5261,9 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
       }  catch (FilterExceptions::Circle_too_small& anException) {
         succeeded = false;
         B2WARNING("tcFilter:doTheCircleFit failed, reason: " << anException.what())
+      } catch (...) {
+        // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
+        succeeded = false;
       }
       B2DEBUG(150, " TCFilter, circleFit succeeded: " << succeeded)
       if (succeeded == false) {
@@ -5732,7 +5769,11 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector)
       }
 
       continue;
+    } catch (...) {
+      // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
+      currentTC->setCondition(false); // do not store TCs with failed fits if param-flag is set to false
     }
+
 
     /// WARNING JKL: again, same TC could be updated several times (see down below), is that what you want?
     // Collector TC Update (calcQIbyKalman)
@@ -6277,6 +6318,9 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
     }  catch (FilterExceptions::Circle_too_small& anException) {
       survivedCF = false;
       B2WARNING("baselineTF:doTheCircleFit failed, reason: " << anException.what())
+    } catch (...) {
+      // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
+      survivedCF = false;
     }
     if (survivedCF == false) {
 

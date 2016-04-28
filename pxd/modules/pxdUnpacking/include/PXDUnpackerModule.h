@@ -172,6 +172,8 @@ namespace Belle2 {
       /** ignore missing datcon (dont show error) */
       bool ignore_datcon_flag = true;
 
+      unsigned int dheID_order_error = 0;
+
     };//end class declaration
 
 

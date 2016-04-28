@@ -81,7 +81,8 @@ void SVDPackerModule::beginRun()
 }
 
 
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
 void SVDPackerModule::event()
 {
 
@@ -319,7 +320,7 @@ void SVDPackerModule::event()
   n_basf2evt++;
 
 } // end event function
-
+#pragma GCC diagnostic pop
 
 
 void SVDPackerModule::terminate()

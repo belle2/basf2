@@ -105,6 +105,7 @@ void SVDDigitSorterModule::event()
   std::vector<RelationArray::consolidation_type> relationIndices(storeDigits.getEntries());
   //Mapping of Sample information to sort according to VxdID, row, column
   std::map<VxdID, std::multiset<Sample>> sensors;
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   // Fill sensor information to get sorted SVDDigit indices
   const int nSamples = storeDigits.getEntries();
@@ -112,6 +113,11 @@ void SVDDigitSorterModule::event()
     const SVDDigit* const digit = storeDigits[i];
     Sample sample(digit, i);
     VxdID sensorID = digit->getSensorID();
+    if (!geo.validSensorID(sensorID)) {
+      B2WARNING("Malformed VXDID in SVDDigit: " << sensorID.getLayerNumber() << "/" << sensorID.getLadderNumber() << "/" <<
+                sensorID.getSensorNumber() << "/" << sensorID.getSegmentNumber() << ". Discarding.");
+      continue;
+    }
     // Re-use segment part of VXDID to distinguish u and v strips.
     // u-strps will have segment number 1
     if (digit->isUStrip()) sensorID.setSegmentNumber(1);
@@ -121,7 +127,6 @@ void SVDDigitSorterModule::event()
     }
   }
 
-  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   if (m_minSamples > 1)
     for (auto& vxd_samples : sensors) {

@@ -749,6 +749,9 @@ void endian_swapper(void* a, unsigned int len)
 
 void PXDUnpackerDHHModule::unpack_event(RawDHH& px)
 {
+  // Disable compiler warning for this variable
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
   int Frames_in_event;
   int fullsize;
   int datafullsize;
@@ -813,6 +816,7 @@ void PXDUnpackerDHHModule::unpack_event(RawDHH& px)
   }
 
 }
+#pragma GCC diagnostic pop
 
 void PXDUnpackerDHHModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsigned int dhe_ID, unsigned dhe_DHPport,
                                           VxdID vxd_id)
@@ -1046,6 +1050,8 @@ int PXDUnpackerDHHModule::nr5bits(int i) const
   return lut[i & 0x1F];
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event)
 {
   /// The following STATIC variables are used to save some state or count some things
@@ -1452,6 +1458,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
   countedWordsInEvent += len;
 
 }
+#pragma GCC diagnostic pop
 
 //Remaps of inner forward (IF) and outer backward (OB) modules of the PXD
 void PXDUnpackerDHHModule::remap_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int dhp_id, unsigned int dhe_ID)

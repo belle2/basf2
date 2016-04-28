@@ -7,6 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+// Disable stack-usage diagnostics for this file
+#pragma GCC diagnostic ignored "-Wstack-usage="
 
 #include <pxd/modules/pxdUnpacking/PXDHardwareClusterUnpackerModule.h>
 #include <framework/datastore/DataStore.h>

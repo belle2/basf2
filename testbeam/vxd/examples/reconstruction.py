@@ -266,7 +266,7 @@ if args.unpacking:
 if not args.svd_only:
     if args.unpacking:
         main.add_module("PXDRawHitSorter")
-    main.add_module('PXDDigitSorter')
+    # main.add_module('PXDDigitSorter')
     main.add_module('PXDClusterizer')
 
 main.add_module('SVDDigitSorter')  # , ignoredStripsListName='data/testbeam/vxd/SVD_Masking.xml')

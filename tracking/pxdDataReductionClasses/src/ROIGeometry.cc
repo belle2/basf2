@@ -53,9 +53,10 @@ ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
 
     while (itPlanes != m_planeList.end()) {
 
-      genfit::MeasuredStateOnPlane state = theTrack->getFittedState();
+      genfit::MeasuredStateOnPlane state;
 
       try {
+        state = theTrack->getFittedState();
         genfit::SharedPlanePtr plane(new ROIDetPlane(*itPlanes)); // TODO: save copying
         lambda = state.extrapolateToPlane(plane);
       }  catch (...) {

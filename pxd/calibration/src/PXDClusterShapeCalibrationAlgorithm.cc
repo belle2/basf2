@@ -696,8 +696,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
             std::vector<double> Colm2(nSelRows);
             std::vector<double> Colm3(nSelRows);
             std::vector<double> Colm4(nSelRows);
-            std::vector<double> Colm5(nSelRows);
-            std::vector<double> Colm6(nSelRows);
+            // std::vector<double> Colm5(nSelRows);
+            // std::vector<double> Colm6(nSelRows);
             std::vector<double> Colm7(nSelRows);
             std::vector<double> Colm8(nSelRows);
             for (int i = 0; i < nSelRows; i++) {
@@ -1336,6 +1336,7 @@ int PXDClusterShapeCalibrationAlgorithm::CalculateCorrection(int CorCase, int n,
     preset = 1.0;
     minCorrection = 0.05;
   } else {
+    delete [] array2;
     return 0;
   }
 

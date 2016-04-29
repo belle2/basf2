@@ -48,10 +48,25 @@ int InfoWidget::IsVisited(const char* uri)
 
 void InfoWidget::newEvent()
 {
+  TString lastURI = "";
+  if (!m_history.empty()) {
+    lastURI = m_history.back();
+  }
   m_visited.clear();
   m_history.clear();
 
-  show("main:");
+  //check if the object given by lastURI exists in the new event, too.
+  if (lastURI != "") {
+    URI parsedURI(lastURI);
+    if (!parsedURI.object) {
+      //doesn't exist, go to main page
+      lastURI = "";
+    }
+  }
+
+  if (lastURI == "")
+    lastURI = "main:";
+  show(lastURI);
 }
 
 void InfoWidget::back()
@@ -332,7 +347,8 @@ InfoWidget::URI::URI(const TString& uri):
       //array index found
       arrayIndex = TString(path(delim + 1, idxFieldLength)).Atoi();
       const StoreArray<TObject> arr(entryName.Data(), durability);
-      object = arr[arrayIndex];
+      if (arrayIndex < arr.getEntries())
+        object = arr[arrayIndex];
     }
     const auto& entries = DataStore::Instance().getStoreEntryMap(durability);
     const auto& it = entries.find(entryName.Data());

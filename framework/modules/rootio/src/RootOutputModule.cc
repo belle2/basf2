@@ -129,16 +129,13 @@ void RootOutputModule::initialize()
       //I want to do this in the input module, but I apparently I cannot disable reading those branches.
       //isabling reading the branch by not calling SetBranchAddress() for it results in the following crashes. Calling SetBranchStatus(..., 0) doesn't help, either.
       //reported to ROOT devs, let's see if it gets fixed.
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,0,0)
+      //
       //HasDictionary() is a new function in root 6
       //using it instead of GetClassInfo() avoids  having to parse header files (and
       //the associated memory cost)
       //
       //it also is missing a 'const', hopefully this will be fixed at some point
       if (!const_cast<TClass*>(entryClass)->HasDictionary()) {
-#else
-      if (!entryClass->GetClassInfo()) {
-#endif
         B2WARNING("No dictionary found for class " << entryClass->GetName() << ", branch '" << branchName <<
                   "' will not be saved. (This is probably an obsolete class that is still present in the input file.)");
         continue;

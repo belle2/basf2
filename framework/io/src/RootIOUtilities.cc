@@ -4,9 +4,6 @@
 #include <framework/logging/Logger.h>
 
 #include <RVersion.h>
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-#include <TCint.h>
-#endif
 #include <TTree.h>
 #include <TList.h>
 #include <TClass.h>
@@ -131,13 +128,7 @@ bool RootIOUtilities::hasStreamer(const TClass* cl)
 bool RootIOUtilities::hasCustomStreamer(const TClass* cl)
 {
   //does this class have a custom streamer? (magic from from TTree.cxx)
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,0,0)
   return cl->TestBit(TClass::kHasCustomStreamerMember);
-#else
-  if (!cl->GetClassInfo())
-    return false; //no dictionary for class, so no streamers, either
-  return gCint->ClassInfo_RootFlag(cl->GetClassInfo()) & 1;
-#endif
 }
 
 void RootIOUtilities::loadDictionaries()

@@ -1,9 +1,15 @@
 #include <framework/datastore/DependencyMap.h>
+#include <framework/core/Module.h>
 
 #include <algorithm>
 
 using namespace std;
 using namespace Belle2;
+
+std::string DependencyMap::getModuleID(const Module& mod)
+{
+  return mod.getType() + std::to_string(long(&mod));
+}
 
 void DependencyMap::ModuleInfo::addEntry(const std::string& name, EEntryType type, bool isRelation)
 {

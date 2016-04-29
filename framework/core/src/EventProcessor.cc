@@ -200,7 +200,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
 
     //Set the module dependent log level
     logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
-    DataStore::Instance().getDependencyMap().setModule(module->getName());
+    DataStore::Instance().getDependencyMap().setModule(module);
 
     //Do initialization
     m_processStatisticsPtr->initModule(module);

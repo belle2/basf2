@@ -47,14 +47,11 @@ void DataFlowVisualization::visualizePath(const std::string& filename, const Pat
   file << "  rankdir=LR;\n"; //left -> right
   file << "  compound=true;\n"; //allow edges to subgraphs
 
-  const ModulePtrList& moduleList = path.getModules();
   //for steering file data flow graph, we may get multiple definitions of each node
   //graphviz merges these into the last one, so we'll go through module list in reverse (all boxes should be coloured as outputs)
   const bool steeringFileFlow = true;
-  for (ModulePtrList::const_reverse_iterator it = moduleList.rbegin(); it != moduleList.rend(); ++it) {
-    const std::string& name = (*it)->getName();
-    generateModulePlot(file, name, steeringFileFlow);
-  }
+  for (ModulePtr mod : path.getModules())
+    generateModulePlot(file, *mod, steeringFileFlow);
 
   plotPath(file, path);
 
@@ -93,7 +90,7 @@ void DataFlowVisualization::plotPath(std::ofstream& file, const Path& path, cons
   std::string lastModule("");
   //connect modules in right order...
   for (ModulePtrList::const_iterator it = moduleList.begin(); it != moduleList.end(); ++it) {
-    const std::string& module = (*it)->getName();
+    const std::string& module = DependencyMap::getModuleID(**it);
     file << "    \"" << module << "\";\n";
     if (!lastModule.empty()) {
       file << "    \"" << lastModule << "\" -> \"" << module << "\" [color=black];\n";
@@ -109,11 +106,13 @@ void DataFlowVisualization::plotPath(std::ofstream& file, const Path& path, cons
   file << "  }\n";
 }
 
-void DataFlowVisualization::generateModulePlot(std::ofstream& file, const std::string& name, bool steeringFileFlow)
+void DataFlowVisualization::generateModulePlot(std::ofstream& file, const Module& mod, bool steeringFileFlow)
 {
+  const std::string& name = DependencyMap::getModuleID(mod);
+  const std::string& label = mod.getName();
   if (!steeringFileFlow)
     file << "digraph \"" << name << "\" {\n";
-  file << "  \"" << name << "\";\n";
+  file << " " << name << " [label=\"" << label << "\"];\n";
 
   std::map<std::string, MInfo>::const_iterator foundInfoIter = m_map->getModuleInfoMap().find(name);
   if (foundInfoIter != m_map->getModuleInfoMap().end()) {
@@ -177,14 +176,14 @@ void DataFlowVisualization::executeModuleAndCreateIOPlot(const std::string& modu
   //may throw some ERRORs, but that's OK.
   // TODO:(ignore missing inputs)
   gearboxPtr->initialize();
-  DataStore::Instance().getDependencyMap().setModule(modulePtr->getName());
+  DataStore::Instance().getDependencyMap().setModule(modulePtr.get());
   modulePtr->initialize();
 
   // create plot
   const std::string filename = module + ".dot";
   DataFlowVisualization v(&DataStore::Instance().getDependencyMap());
   std::ofstream file(filename.c_str());
-  v.generateModulePlot(file, module, false);
+  v.generateModulePlot(file, *modulePtr, false);
 
   //clean up to avoid problems with ~TROOT
   modulePtr->terminate();

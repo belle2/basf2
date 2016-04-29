@@ -5,6 +5,8 @@
 #include <string>
 
 namespace Belle2 {
+  class Module;
+
   /** Collect information about the dependencies between modules.
    *
    * Filled inside DataStore during register/require/optional.
@@ -29,6 +31,9 @@ namespace Belle2 {
       void addEntry(const std::string& name, EEntryType type, bool isRelation);
     };
 
+    /** Return unique ID for given module. */
+    static std::string getModuleID(const Module& mod);
+
     /** Is the object/array/relation with given name used as specified input/output type (in any module)?
      *
      * E.g. is('EventMetaData', c_Output) asks if EventMetaData was registered,
@@ -37,7 +42,7 @@ namespace Belle2 {
     bool isUsedAs(std::string branchName, EEntryType type) const;
 
     /** Set the current module (for getCurrentModuleInfo()) */
-    void setModule(const std::string& name) { m_currentModule = name; }
+    void setModule(const Module* mod) { m_currentModule = getModuleID(*mod); }
 
     /** Get info for current module. */
     ModuleInfo& getCurrentModuleInfo() { return m_moduleInfo[m_currentModule]; }

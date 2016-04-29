@@ -16,6 +16,7 @@
 #include <iosfwd>
 
 namespace Belle2 {
+  class Module;
   class Path;
 
   /** class to visualize data flow between modules. */
@@ -38,7 +39,7 @@ namespace Belle2 {
     static void executeModuleAndCreateIOPlot(const std::string& module);
   private:
     /** Create I/O graph for a single module (written to file). */
-    void generateModulePlot(std::ofstream& file, const std::string& module, bool steeringFileFlow = false);
+    void generateModulePlot(std::ofstream& file, const Module& mod, bool steeringFileFlow = false);
 
     /** Create a subgraph for the given Path (including conditional paths). */
     void plotPath(std::ofstream& file, const Path& path, const std::string& pathName = "");

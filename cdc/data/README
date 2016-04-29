@@ -26,7 +26,7 @@ Unit: cm and microsec.
 * xt_v1.dat      : obsolete. xt = xt(layer,l/r,alpha.theta)
 * xt_v0.dat      : obsolete. 1'st version of realistic xt; only layer and L/R dependence is taken into account.
 * xt_simple.dat  : ideal linear xt. v=40 mu/ns.
-* xt_noB_v0.2.dat: xt for B-field = 0.
+* xt_noB_v0.3.dat: xt for B-field = 0.
 
 
 
@@ -78,7 +78,8 @@ The file contains a list of bad wires.
 
 Format: layerID (0-55), wireID(0-)
 
-* badwire.dat: Just a sample file.
+* badwire_sample.dat: Just a sample file.
+* badwire_off.dat   : Empty file; the file for turning-off badwire effect.
 
 
 

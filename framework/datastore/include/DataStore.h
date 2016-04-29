@@ -336,7 +336,7 @@ namespace Belle2 {
      *
      *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary for genfit objects.
      *
-     *  @sa RelationsInterface::addRelationTo
+     *  @sa RelationsObject::addRelationTo
      *  @param fromObject     Pointer to the object from which the relation points.
      *  @param toObject       Pointer to the object to which the relation points.
      *  @param weight         Weight of the relation.
@@ -354,7 +354,7 @@ namespace Belle2 {
      *
      *  @note If possible, use RelationsObject members instead, as they allow more efficent caching.
      *
-     *  @sa RelationsInterface::getRelationsTo
+     *  @sa RelationsObject::getRelationsTo
      *  @param fromObject     Pointer to the object from which the relations point.
      *  @tparam TO            Class of the objects to which the relations point.
      *  @param toName         The name of the store array to which the relations point.
@@ -373,7 +373,7 @@ namespace Belle2 {
      *
      *  @note If at all possible, use RelationsObject members instead, as they allow more efficent caching.
      *
-     *  @sa RelationsInterface::getRelationsFrom
+     *  @sa RelationsObject::getRelationsFrom
      *  @param toObject       Pointer to the object to which the relations point.
      *  @tparam FROM          Class of the objects from which the relations point.
      *  @param fromName       The name of the store array from which the relations point.
@@ -394,7 +394,7 @@ namespace Belle2 {
      *
      *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary for genfit objects.
      *
-     *  @sa RelationsInterface::getRelationsWith
+     *  @sa RelationsObject::getRelationsWith
      *  @param object         Pointer to the object from or to which the relations point.
      *  @tparam T             Class of the objects to or from which the relations point.
      *  @param name           The name of the store array to or from which the relations point.
@@ -412,7 +412,7 @@ namespace Belle2 {
     /** Get the object to which another object has a relation.
      *
      *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary for genfit objects.
-     *  @warning Note that the naming is not consistent with similar member functions of RelationsInterface (exactly switched around). Method will be removed at some point.
+     *  @warning Note that the naming is not consistent with similar member functions of RelationsObject (exactly switched around). Method will be removed at some point.
      *
      *  @param fromObject  Pointer to the object from which the relation points.
      *  @tparam TO     The class of objects to which the relation points.
@@ -432,7 +432,7 @@ namespace Belle2 {
     /** Get the object from which another object has a relation.
      *
      *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary for genfit objects.
-     *  @warning Note that the naming is not consistent with similar member functions of RelationsInterface (exactly switched around). Method will be removed at some point.
+     *  @warning Note that the naming is not consistent with similar member functions of RelationsObject (exactly switched around). Method will be removed at some point.
      *
      *  @param toObject Pointer to the object to which the relation points.
      *  @tparam FROM    The class of objects from which the relation points.

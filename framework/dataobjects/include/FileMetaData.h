@@ -80,8 +80,7 @@ namespace Belle2 {
      */
     std::string getParent(int iParent) const {return m_parentLfns[iParent];}
 
-    /** File creation date and time getter.
-     */
+    /** File creation date and time getter (UTC) */
     std::string getDate() const {return m_date;}
 
     /** Site where the file was created getter.
@@ -217,7 +216,7 @@ namespace Belle2 {
 
     std::vector<std::string> m_parentLfns; /**< LFNs of parent files.  */
 
-    std::string m_date; /**< File creation date and time.  */
+    std::string m_date; /**< File creation date and time (UTC).  */
 
     std::string m_site; /**< Site where the file was created.  */
 

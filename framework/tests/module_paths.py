@@ -3,13 +3,13 @@
 
 import os
 import random
-from basf2 import *
+import basf2  # also test non-polluting import
 from ROOT import Belle2
 
-set_random_seed("something important")
+basf2.set_random_seed("something important")
 
 
-class SelectOddEvents(Module):
+class SelectOddEvents(basf2.Module):
 
     """For events with an odd event number, set module return value to False"""
 
@@ -18,19 +18,19 @@ class SelectOddEvents(Module):
 
         evtmetadata = Belle2.PyStoreObj('EventMetaData')
         if not evtmetadata:
-            B2ERROR('No EventMetaData found')
+            basf2.B2ERROR('No EventMetaData found')
         else:
             event = evtmetadata.obj().getEvent()
-            B2INFO('Setting return value to ' + str(event % 2 == 0))
+            basf2.B2INFO('Setting return value to ' + str(event % 2 == 0))
             self.return_value(event % 2 == 0)
 
     def terminate(self):
         """reimplementation of Module::terminate()."""
 
-        B2INFO('terminating SelectOddEvents')
+        basf2.B2INFO('terminating SelectOddEvents')
 
 
-class ReturnFalse(Module):
+class ReturnFalse(basf2.Module):
 
     """Always return false"""
 
@@ -39,7 +39,7 @@ class ReturnFalse(Module):
         self.return_value(False)
 
 
-class PrintName(Module):
+class PrintName(basf2.Module):
 
     """Print name in event"""
 
@@ -51,41 +51,35 @@ class PrintName(Module):
 
     def event(self):
         """reimplementation of Module::event()."""
-        B2INFO("In module " + self.name())
+        basf2.B2INFO("In module " + self.name())
 
+main = basf2.create_path()
 
 # register necessary modules
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = basf2.register_module('EventInfoSetter')
 # generate three events
 eventinfosetter.param('expList', [0, 1])
 eventinfosetter.param('runList', [1, 2])
 eventinfosetter.param('evtNumList', [2, 1])
 
-eventinfo = register_module('EventInfoPrinter')
-progress = register_module('Progress')
-printcollections = register_module('PrintCollections')
-
-# create main path
-main = create_path()
-
-emptypath = create_path()
-emptypath.add_path(create_path())
+emptypath = basf2.create_path()
+emptypath.add_path(basf2.create_path())
 main.add_path(emptypath)
 
 main.add_module(eventinfosetter)
 
-anotherpath = create_path()
+anotherpath = basf2.create_path()
 main.add_path(anotherpath)  # added here, filled later
-main.add_module(printcollections)
+main.add_module('PrintCollections')
 
-subsubpath = create_path()
-subsubpath.add_module(progress)
+subsubpath = basf2.create_path()
+subsubpath.add_module('Progress')
 subsubpath.add_path(emptypath)
 
 # fill anotherpath now
 module_with_condition = SelectOddEvents()
 anotherpath.add_module(module_with_condition)
-anotherpath.add_module(eventinfo)
+anotherpath.add_module('EventInfoPrinter')
 anotherpath.add_path(subsubpath)
 
 # check printing of paths, should be:
@@ -101,19 +95,19 @@ module_with_condition.if_false(subsubpath)
 
 # test continuing after conditional path
 returnfalse1 = ReturnFalse()
-returnfalse1_condition_path = create_path()
+returnfalse1_condition_path = basf2.create_path()
 returnfalse1_condition_path.add_module(PrintName('ReturnFalse1Condition'))
-returnfalse1.if_false(returnfalse1_condition_path, AfterConditionPath.CONTINUE)
+returnfalse1.if_false(returnfalse1_condition_path, basf2.AfterConditionPath.CONTINUE)
 main.add_module(returnfalse1)
 
 # test more complicated conditions (in this case, it is never met)
 returnfalse2 = ReturnFalse()
-returnfalse2_condition_path = create_path()
+returnfalse2_condition_path = basf2.create_path()
 returnfalse2_condition_path.add_module(PrintName('ReturnFalse2Condition'))
 returnfalse2.if_true(returnfalse2_condition_path)
 
 main.add_module(PrintName("final"))
 
-process(main)
+basf2.process(main)
 
 print(main)

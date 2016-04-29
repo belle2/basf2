@@ -64,7 +64,8 @@ class TestIPythonHandler(unittest.TestCase):
         self.assertEqual(len(calculation.get_keys()), 2)
 
         self.assertEqual(calculation.get("basf2.statistics"), calculation.get_statistics())
-        self.assertEqual(calculation.get("basf2.store_content"), [{'number': 0, 'store_content': [['EventMetaData', 0]]}])
+        sc = [{'number': i, 'store_content': [['EventMetaData', 0]]} for i in range(0, 100, 10)]
+        self.assertEqual(calculation.get("basf2.store_content"), sc)
 
         # The modules
         modules = calculation.get_modules()

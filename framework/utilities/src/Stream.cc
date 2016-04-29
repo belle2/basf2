@@ -30,10 +30,13 @@ std::string Stream::serializeAndEncode(const TObject* obj)
   //convert TMessage into base64-encoded string
   char* buf = msg.Buffer();
   UInt_t len = msg.Length();
+
   if (msg.CompBuffer()) {
     B2FATAL("compression used, but broken thanks to ROOT");
+    /* for future use?
     buf = msg.CompBuffer();
     len = msg.CompLength();
+    */
   }
 
   const std::string& encodedStr(TBase64::Encode(buf, len).Data());

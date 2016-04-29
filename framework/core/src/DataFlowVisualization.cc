@@ -16,12 +16,9 @@
 #include <framework/core/DataFlowVisualization.h>
 #include <framework/datastore/DataStore.h>
 
-
 #include <fstream>
 
-
 using namespace Belle2;
-typedef DependencyMap::ModuleInfo MInfo;
 
 
 namespace {
@@ -75,7 +72,6 @@ void DataFlowVisualization::visualizePath(const std::string& filename, const Pat
 
 void DataFlowVisualization::plotPath(std::ofstream& file, const Path& path, const std::string& pathName)
 {
-  const ModulePtrList& moduleList = path.getModules();
   //graph name must begin with cluster for fancy graphics!
   const std::string graphname = pathName.empty() ? "clusterMain" : ("cluster" + pathName);
   file << "  subgraph \"" << graphname << "\" {\n";
@@ -89,14 +85,14 @@ void DataFlowVisualization::plotPath(std::ofstream& file, const Path& path, cons
   file << "    \"" << graphname  << "_inv\" [shape=point,style=invis];\n";
   std::string lastModule("");
   //connect modules in right order...
-  for (ModulePtrList::const_iterator it = moduleList.begin(); it != moduleList.end(); ++it) {
-    const std::string& module = DependencyMap::getModuleID(**it);
+  for (ModulePtr mod : path.getModules()) {
+    const std::string& module = DependencyMap::getModuleID(*mod);
     file << "    \"" << module << "\";\n";
     if (!lastModule.empty()) {
       file << "    \"" << lastModule << "\" -> \"" << module << "\" [color=black];\n";
     }
-    if ((*it)->hasCondition()) {
-      const Path* conditionPath = (*it)->getConditionPath().get();
+    if (mod->hasCondition()) {
+      const Path* conditionPath = mod->getConditionPath().get();
       plotPath(file, *conditionPath, module);
       file << "    \"" << module << "\" -> \"cluster" << module << "_inv\" [color=grey,lhead=\"cluster" << module << "\"];\n";
     }
@@ -114,29 +110,28 @@ void DataFlowVisualization::generateModulePlot(std::ofstream& file, const Module
     file << "digraph \"" << name << "\" {\n";
   file << " " << name << " [label=\"" << label << "\"];\n";
 
-  std::map<std::string, MInfo>::const_iterator foundInfoIter = m_map->getModuleInfoMap().find(name);
+  const auto foundInfoIter = m_map->getModuleInfoMap().find(name);
   if (foundInfoIter != m_map->getModuleInfoMap().end()) {
-    const MInfo& moduleInfo = foundInfoIter->second;
+    const DependencyMap::ModuleInfo& moduleInfo = foundInfoIter->second;
     for (int i = 0; i < DependencyMap::c_NEntryTypes; i++) {
       const std::set<std::string>& entries = moduleInfo.entries[i];
       const std::set<std::string>& relations = moduleInfo.relations[i];
       const std::string fillcolor = m_fillcolor[i];
       const std::string arrowcolor = m_arrowcolor[i];
 
-      for (std::set<std::string>::const_iterator setit = entries.begin(); setit != entries.end(); ++setit) {
+      for (std::string dsentry : entries) {
         if (!steeringFileFlow)
-          file << "  \"" << *setit << "\" [shape=box,style=filled,fillcolor=" << fillcolor << "];\n";
+          file << "  \"" << dsentry << "\" [shape=box,style=filled,fillcolor=" << fillcolor << "];\n";
         if (i == DependencyMap::c_Output) {
-          m_allOutputs.insert(*setit);
-          file << "  \"" << name << "\" -> \"" << *setit << "\" [color=" << arrowcolor << "];\n";
+          m_allOutputs.insert(dsentry);
+          file << "  \"" << name << "\" -> \"" << dsentry << "\" [color=" << arrowcolor << "];\n";
         } else {
-          m_allInputs.insert(*setit);
-          file << "  \"" << *setit << "\" -> \"" << name  << "\" [color=" << arrowcolor << "];\n";
+          m_allInputs.insert(dsentry);
+          file << "  \"" << dsentry << "\" -> \"" << name  << "\" [color=" << arrowcolor << "];\n";
         }
       }
 
-      for (std::set<std::string>::const_iterator setit = relations.begin(); setit != relations.end(); ++setit) {
-        const std::string& relname = *setit;
+      for (const std::string& relname : relations) {
         size_t pos = relname.rfind("To");
         if (pos == std::string::npos or pos != relname.find("To")) {
           B2WARNING("generateModulePlot(): couldn't split relation name!");
@@ -176,7 +171,7 @@ void DataFlowVisualization::executeModuleAndCreateIOPlot(const std::string& modu
   //may throw some ERRORs, but that's OK.
   // TODO:(ignore missing inputs)
   gearboxPtr->initialize();
-  DataStore::Instance().getDependencyMap().setModule(modulePtr.get());
+  DataStore::Instance().getDependencyMap().setModule(*modulePtr);
   modulePtr->initialize();
 
   // create plot
@@ -190,7 +185,7 @@ void DataFlowVisualization::executeModuleAndCreateIOPlot(const std::string& modu
   gearboxPtr->terminate();
 }
 
-bool DataFlowVisualization::checkArrayUnknown(const std::string& name, const MInfo& info)
+bool DataFlowVisualization::checkArrayUnknown(const std::string& name, const DependencyMap::ModuleInfo& info)
 {
   for (int i = 0; i < DependencyMap::c_NEntryTypes; i++) {
     if (info.entries[i].count(name) != 0)

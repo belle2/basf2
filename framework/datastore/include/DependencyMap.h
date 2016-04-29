@@ -42,7 +42,7 @@ namespace Belle2 {
     bool isUsedAs(std::string branchName, EEntryType type) const;
 
     /** Set the current module (for getCurrentModuleInfo()) */
-    void setModule(const Module* mod) { m_currentModule = getModuleID(*mod); }
+    void setModule(const Module& mod) { m_currentModule = getModuleID(mod); }
 
     /** Get info for current module. */
     ModuleInfo& getCurrentModuleInfo() { return m_moduleInfo[m_currentModule]; }

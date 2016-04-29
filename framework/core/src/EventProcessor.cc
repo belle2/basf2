@@ -190,8 +190,8 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
     m_processStatisticsPtr.create();
   m_processStatisticsPtr->startGlobal();
 
-  for (ModulePtrList::const_iterator listIter = modulePathList.begin(); listIter != modulePathList.end(); ++listIter) {
-    Module* module = listIter->get();
+  for (const ModulePtr& modPtr : modulePathList) {
+    Module* module = modPtr.get();
 
     if (module->hasUnsetForcedParams()) {
       B2ERROR("The module " << module->getName() << " has unset parameters which have to be set by the user!");
@@ -200,7 +200,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
 
     //Set the module dependent log level
     logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
-    DataStore::Instance().getDependencyMap().setModule(module);
+    DataStore::Instance().getDependencyMap().setModule(*module);
 
     //Do initialization
     m_processStatisticsPtr->initModule(module);
@@ -386,7 +386,6 @@ void EventProcessor::processBeginRun(bool skipDB)
   m_inRun = true;
 
   LogSystem& logSystem = LogSystem::Instance();
-  ModulePtrList::const_iterator listIter;
   m_processStatisticsPtr->startGlobal();
 
   if (!skipDB) DBStore::Instance().update();
@@ -394,8 +393,8 @@ void EventProcessor::processBeginRun(bool skipDB)
   //initialize random generator for end run
   RandomNumbers::initializeBeginRun();
 
-  for (listIter = m_moduleList.begin(); listIter != m_moduleList.end(); ++listIter) {
-    Module* module = listIter->get();
+  for (const ModulePtr& modPtr : m_moduleList) {
+    Module* module = modPtr.get();
 
     //Set the module dependent log level
     logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
@@ -420,7 +419,6 @@ void EventProcessor::processEndRun()
   m_inRun = false;
 
   LogSystem& logSystem = LogSystem::Instance();
-  ModulePtrList::const_iterator listIter;
   m_processStatisticsPtr->startGlobal();
 
   const EventMetaData newEventMetaData = *m_eventMetaDataPtr;
@@ -429,8 +427,8 @@ void EventProcessor::processEndRun()
   //initialize random generator for end run
   RandomNumbers::initializeEndRun();
 
-  for (listIter = m_moduleList.begin(); listIter != m_moduleList.end(); ++listIter) {
-    Module* module = listIter->get();
+  for (const ModulePtr& modPtr : m_moduleList) {
+    Module* module = modPtr.get();
 
     //Set the module dependent log level
     logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());

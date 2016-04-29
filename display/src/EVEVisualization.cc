@@ -1079,27 +1079,26 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
 
 void EVEVisualization::makeTracks()
 {
-  std::map<const MCParticle*, MCTrack>::iterator it = m_mcparticleTracks.begin();
-  const std::map<const MCParticle*, MCTrack>::iterator& end = m_mcparticleTracks.end();
-  for (; it != end; ++it) {
-    if (it->second.track) {
-      if (it->second.simhits->Size() > 0) {
-        it->second.track->AddElement(it->second.simhits);
+  for (auto& mcTrackPair : m_mcparticleTracks) {
+    MCTrack& mcTrack = mcTrackPair.second;
+    if (mcTrack.track) {
+      if (mcTrack.simhits->Size() > 0) {
+        mcTrack.track->AddElement(mcTrack.simhits);
       } else {
         //if we don't add it, remove empty collection
-        destroyEveElement(it->second.simhits);
+        destroyEveElement(mcTrack.simhits);
       }
 
       TEveElement* parent = m_tracklist;
-      if (it->second.parentParticle) {
-        const auto& parentIt = m_mcparticleTracks.find(it->second.parentParticle);
+      if (mcTrack.parentParticle) {
+        const auto& parentIt = m_mcparticleTracks.find(mcTrack.parentParticle);
         if (parentIt != m_mcparticleTracks.end()) {
           parent = parentIt->second.track;
         }
       }
-      parent->AddElement(it->second.track);
+      parent->AddElement(mcTrack.track);
     } else { //add simhits directly
-      gEve->AddElement(it->second.simhits);
+      gEve->AddElement(mcTrack.simhits);
     }
   }
   gEve->AddElement(m_tracklist);

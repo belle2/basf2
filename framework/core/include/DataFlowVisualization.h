@@ -42,7 +42,7 @@ namespace Belle2 {
     void generateModulePlot(std::ofstream& file, const Module& mod, bool steeringFileFlow = false);
 
     /** Create a subgraph for the given Path (including conditional paths). */
-    void plotPath(std::ofstream& file, const Path& path, const std::string& pathName = "");
+    static void plotPath(std::ofstream& file, const Path& path, const std::string& pathName = "");
 
     /** If the given array name isn't found in any of info's fields, it is added to m_unknownArrays (and true returned).*/
     bool checkArrayUnknown(const std::string& name, const DependencyMap::ModuleInfo& info);

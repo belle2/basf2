@@ -678,6 +678,15 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
 TEveBox* EVEVisualization::boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth)
 {
+  //force minimum width of polygon to deal with Eve limits
+  float min = 0.04;
+  if (vd < min)
+    vd = min;
+  if (ud < min)
+    ud = min;
+  if (depth < min)
+    depth = min;
+
   TEveBox* box = new TEveBox;
   box->SetPickable(true);
 

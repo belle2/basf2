@@ -11,7 +11,7 @@
 #include <framework/modules/eventinfo/EventInfoSetterModule.h>
 
 #include <framework/core/Environment.h>
-#include <framework/dataobjects/FileMetaData.h>
+#include <framework/utilities/Utils.h>
 
 #include <chrono>
 #include <set>
@@ -110,13 +110,30 @@ void EventInfoSetterModule::initialize()
 
   m_evtNumber = 0;
   m_colIndex = 0; //adjusted in event() if mismatched
+
+  //determine number of events we will process
+  unsigned int totalevents = 0;
+  Belle2::EventInfoSetterModule copy(*this);
+  while (copy.advanceEventCounter()) {
+    copy.m_evtNumber++;
+    totalevents++;
+  }
+  B2DEBUG(100, "EventInfoSetter: will process " << totalevents << " events in total.");
+
+  Environment::Instance().mcEvents() = totalevents;
 }
 
 
-void EventInfoSetterModule::event()
+bool EventInfoSetterModule::advanceEventCounter()
 {
+  // optimized for the assumed normal case of few runs with lots of events
+  // and no skipping.
+  // In the case of 1e9 events, the branch prediction hints give the following
+  // improvements:
+  //    clang:     -18% real time
+  //    gcc (opt): -52% real time
   while (true) {
-    if (m_evtNumber >= static_cast<unsigned long>(m_evtNumList[m_colIndex])) {
+    if (branch_unlikely(m_evtNumber >= static_cast<unsigned int>(m_evtNumList[m_colIndex]))) {
 
       //Search for a column where the event number is greater than 0.
       do {
@@ -127,12 +144,12 @@ void EventInfoSetterModule::event()
       if (m_colIndex < static_cast<int>(m_expList.size())) {
         m_evtNumber = 0;
       } else { //no experiment/run with non-zero number of events found
-        return;
+        return false;
       }
     }
 
     // check if we want to skip to a specific event
-    if (!m_skipToEvent.empty()) {
+    if (branch_unlikely(!m_skipToEvent.empty())) {
       // if current experiment and run number is different to what we're looking for
       if (m_skipToEvent[0] != m_expList[m_colIndex] || m_skipToEvent[1] != m_runList[m_colIndex]) {
         // then we set the m_evtNumber to the max
@@ -144,12 +161,9 @@ void EventInfoSetterModule::event()
         m_skipToEvent.clear();
       }
       // and check again if the event number is in the range we want to generate
-      continue;
-    }
-
-    if (m_eventsToSkip != 0) { //are we still skipping?
-      unsigned long nskip = 1;
-      const unsigned long eventsInList = m_evtNumList[m_colIndex];
+    } else if (branch_unlikely(m_eventsToSkip != 0)) { //are we still skipping?
+      unsigned int nskip = 1;
+      const unsigned int eventsInList = m_evtNumList[m_colIndex];
       if (m_evtNumber < eventsInList) //skip to end of current run?
         nskip = eventsInList - m_evtNumber;
       if (nskip > m_eventsToSkip)
@@ -157,10 +171,17 @@ void EventInfoSetterModule::event()
 
       m_eventsToSkip -= nskip;
       m_evtNumber += nskip;
-    } else { //no? then stop.
+    } else {
       break;
     }
   }
+  return true;
+}
+
+void EventInfoSetterModule::event()
+{
+  if (!advanceEventCounter())
+    return;
 
   m_eventMetaDataPtr.create();
   m_eventMetaDataPtr->setProduction(m_production);
@@ -170,6 +191,5 @@ void EventInfoSetterModule::event()
   auto time = std::chrono::high_resolution_clock::now().time_since_epoch();
   m_eventMetaDataPtr->setTime(std::chrono::duration_cast<std::chrono::nanoseconds>(time).count());
 
-  Environment::Instance().mcEvents()++;
   m_evtNumber++;
 }

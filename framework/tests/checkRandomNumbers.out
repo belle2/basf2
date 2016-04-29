@@ -27,6 +27,7 @@
 [RESULT] Starting event processing, random seed is set to 'this is the seed'
 [DEBUG] Successfully registered object 'ProcessStatistics' (durability: persistent)
 [DEBUG] Successfully registered object 'EventMetaData' (durability: event)
+[DEBUG] EventInfoSetter: will process 12 events in total.
 [DEBUG] Found module providing EventMetaData: EventInfoSetter
 [INFO] First 20 random values in test1::initialize()
   3FE00BA99D52219A, 3FE03FD1201F6C58, 3FC520BCBB647F18, 3FE42E23B32F7FC4

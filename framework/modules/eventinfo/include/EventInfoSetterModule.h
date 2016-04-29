@@ -46,6 +46,9 @@ namespace Belle2 {
      */
     virtual void initialize();
 
+    /** Advances member variables to the next event (which is given by m_evtNumber). */
+    bool advanceEventCounter();
+
     /** Stores the event meta data into the DataStore.
      *
      * Based on the parameters set by the user the current event meta data
@@ -64,8 +67,8 @@ namespace Belle2 {
 
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr; /**< Output object. */
 
-    unsigned long m_evtNumber{0}; /**< The current event number. */
-    unsigned long m_eventsToSkip{0ul}; /**< skip this many events before starting. */
+    unsigned int m_evtNumber{0}; /**< The current event number. */
+    unsigned int m_eventsToSkip{0u}; /**< skip this many events before starting. */
     int m_colIndex{0};  /**< The current index for the exp and run lists. */
     int m_production{0};  /**< The production number. */
 

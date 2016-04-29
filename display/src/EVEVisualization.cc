@@ -88,6 +88,19 @@
 
 using namespace Belle2;
 
+namespace {
+  /** Destroys 'el', zeroes pointer. Supposed to also remove el from global lists, which 'delete el' would not. */
+  template <class T> void destroyEveElement(T*& el)
+  {
+    if (!el) return;
+    if (el->GetDenyDestroy() > 1)
+      B2WARNING("destroyEveElement(): Element " << el->GetName() << " has unexpected refcount " << el->GetDenyDestroy());
+
+    el->DecDenyDestroy(); //also deletes el when refcount <= 0
+    el = nullptr;
+  }
+}
+
 EVEVisualization::EVEVisualization():
   m_assignToPrimaries(false),
   m_eclData(0),
@@ -103,9 +116,7 @@ EVEVisualization::EVEVisualization():
   m_trackpropagator->IncDenyDestroy();
   m_trackpropagator->SetMagFieldObj(m_bfield, false);
   m_trackpropagator->SetFitDaughters(false); //most secondaries are no longer immediate daughters since we might discard those!
-
   m_trackpropagator->SetMaxR(EveGeometry::getMaxR()); //don't draw tracks outside detector
-
   //TODO is this actually needed?
   m_trackpropagator->SetMaxStep(1.0); //make sure to reeval magnetic field often enough
 
@@ -144,12 +155,12 @@ EVEVisualization::~EVEVisualization()
     return; //objects are probably already freed by Eve
 
   //Eve objects
-  delete m_eclData;
-  delete m_unassignedRecoHits;
-  delete m_tracklist;
-  delete m_trackpropagator;
-  delete m_gftrackpropagator;
-  delete m_calo3d;
+  destroyEveElement(m_eclData);
+  destroyEveElement(m_unassignedRecoHits);
+  destroyEveElement(m_tracklist);
+  destroyEveElement(m_trackpropagator);
+  destroyEveElement(m_gftrackpropagator);
+  destroyEveElement(m_calo3d);
   delete m_bfield;
 }
 
@@ -1067,8 +1078,7 @@ void EVEVisualization::makeTracks()
         it->second.track->AddElement(it->second.simhits);
       } else {
         //if we don't add it, remove empty collection
-        it->second.simhits->Destroy();
-        it->second.simhits = nullptr;
+        destroyEveElement(it->second.simhits);
       }
 
       TEveElement* parent = m_tracklist;
@@ -1140,14 +1150,12 @@ void EVEVisualization::clearEvent()
   if (m_eclData)
     ecl_threshold = m_eclData->GetSliceThreshold(0);
 
-  delete m_eclData;
+  destroyEveElement(m_eclData);
   m_eclData = new TEveCaloDataVec(1); //#slices
   m_eclData->IncDenyDestroy();
   m_eclData->RefSliceInfo(0).Setup("ECL", ecl_threshold, kRed);
 
-  delete m_unassignedRecoHits;
-  m_unassignedRecoHits = nullptr;
-
+  destroyEveElement(m_unassignedRecoHits);
 
   gEve->GetSelection()->RemoveElements();
   gEve->GetHighlight()->RemoveElements();

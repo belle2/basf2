@@ -173,6 +173,9 @@ namespace Belle2 {
     /** Get list of streaming objects */
     const std::vector<std::string>& getStreamingObjects() const { return m_streamingObjects; }
 
+    /** Accessor for number of generated events (this is only updated by EventInfoSetter). */
+    int& mcEvents() { return m_mcEvents; }
+
   private:
 
     std::string m_externalsPath;  /**< The path in which the externals are located. */
@@ -190,6 +193,7 @@ namespace Belle2 {
     std::string m_profileModuleName; /**< Name of the module which should be profiled, empty if no profiling requested */
     std::string m_picklePath; /**< Path to the file where the pickled path is stored */
     std::vector<std::string> m_streamingObjects;  /**< objects to be streamed in Tx module (all if empty) */
+    int m_mcEvents; /**< counter for number of generated events. */
 
     /**
      *  Set up environment from standard BELLE2_ environment variables.

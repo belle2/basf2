@@ -63,7 +63,8 @@ Environment::Environment() :
   m_logLevelOverride(LogConfig::c_Default),
   m_visualizeDataFlow(false),
   m_noStats(false),
-  m_dryRun(false)
+  m_dryRun(false),
+  m_mcEvents(0)
 {
   // Check for environment variables set by setuprel
   const char* envarReleaseDir = getenv("BELLE2_RELEASE_DIR");

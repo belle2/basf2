@@ -11,7 +11,6 @@
 #include <framework/modules/eventinfo/EventInfoSetterModule.h>
 
 #include <framework/core/Environment.h>
-#include <framework/core/InputController.h>
 #include <framework/dataobjects/FileMetaData.h>
 
 #include <chrono>
@@ -171,6 +170,6 @@ void EventInfoSetterModule::event()
   auto time = std::chrono::high_resolution_clock::now().time_since_epoch();
   m_eventMetaDataPtr->setTime(std::chrono::duration_cast<std::chrono::nanoseconds>(time).count());
 
-  InputController::mcEvents()++;
+  Environment::Instance().mcEvents()++;
   m_evtNumber++;
 }

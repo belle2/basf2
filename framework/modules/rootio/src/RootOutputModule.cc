@@ -11,7 +11,6 @@
 #include <framework/modules/rootio/RootOutputModule.h>
 
 #include <framework/io/RootIOUtilities.h>
-#include <framework/core/InputController.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/FileMetaData.h>
@@ -255,7 +254,7 @@ void RootOutputModule::fillFileMetaData()
   if (!release) release = "unknown";
   fileMetaDataPtr->setCreationData(date, site, user, release);
   fileMetaDataPtr->setSteering(Environment::Instance().getSteering());
-  fileMetaDataPtr->setMcEvents(InputController::mcEvents());
+  fileMetaDataPtr->setMcEvents(Environment::Instance().mcEvents());
 
   //register the file in the catalog
   if (m_updateFileCatalog) {

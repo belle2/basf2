@@ -22,8 +22,6 @@ namespace Belle2 {
    */
   class FileMetaData : public TObject {
   public:
-
-
     /** Constructor.
      */
     FileMetaData();
@@ -102,7 +100,7 @@ namespace Belle2 {
      */
     std::string getSteering() const {return m_steering;}
 
-    /** Number of geerated events getter.
+    /** Number of generated events getter.
      */
     int getMcEvents() const {return m_mcEvents;}
 
@@ -169,7 +167,7 @@ namespace Belle2 {
     void setMcEvents(int nEvents) {m_mcEvents = nEvents;}
 
     /**
-     * Exposes methods of the FileMateData class to Python.
+     * Exposes methods of the FileMetaData class to Python.
      */
     static void exposePythonAPI();
 

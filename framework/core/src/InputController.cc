@@ -12,7 +12,6 @@ long InputController::s_nextRun = -1;
 long InputController::s_nextEvent = -1;
 long InputController::s_currentEntry = 0;
 const TChain* InputController::s_chain = NULL;
-int InputController::s_mcEvents = 0;
 
 std::string InputController::getCurrentFileName()
 {

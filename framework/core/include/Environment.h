@@ -60,13 +60,16 @@ namespace Belle2 {
     const std::string& getExternalsPath() const { return m_externalsPath; };
 
     /** Override the number of events in run 1 for EventInfoSetter module. */
-    void setNumberEventsOverride(int nevents) { m_numberEventsOverride = nevents; }
+    void setNumberEventsOverride(unsigned int nevents) { m_numberEventsOverride = nevents; }
 
     /** Returns number of events in run 1 for EventInfoSetter module, or 0 for no override. */
-    int getNumberEventsOverride() const { return m_numberEventsOverride; }
+    unsigned int getNumberEventsOverride() const { return m_numberEventsOverride; }
 
     /** Return the number of events, from either input or -n command line override (if less). */
-    int getNumberOfEvents() const;
+    unsigned int getNumberOfEvents() const;
+
+    /** Accessor for number of generated events (this is only updated by EventInfoSetter). */
+    unsigned int& mcEvents() { return m_mcEvents; }
 
     /** Override input file names for modules */
     void setInputFilesOverride(const std::vector<std::string>& names) { m_inputFilesOverride = names; }
@@ -173,15 +176,12 @@ namespace Belle2 {
     /** Get list of streaming objects */
     const std::vector<std::string>& getStreamingObjects() const { return m_streamingObjects; }
 
-    /** Accessor for number of generated events (this is only updated by EventInfoSetter). */
-    int& mcEvents() { return m_mcEvents; }
-
   private:
 
     std::string m_externalsPath;  /**< The path in which the externals are located. */
     int m_numberProcesses;        /**< The number of worker processes that should be used for the parallel processing. */
     std::string m_steering;       /**< The content of the steering file. */
-    int m_numberEventsOverride;   /**< Override number of events in the first run. */
+    unsigned int m_numberEventsOverride;   /**< Override number of events in the first run. */
     std::vector<std::string> m_inputFilesOverride; /**< Override input file names for input modules */
     std::string m_outputFileOverride; /**< Override name of output file for output module */
     int m_numberProcessesOverride; /**< Override m_numberProcesses if >= 0 */
@@ -193,7 +193,7 @@ namespace Belle2 {
     std::string m_profileModuleName; /**< Name of the module which should be profiled, empty if no profiling requested */
     std::string m_picklePath; /**< Path to the file where the pickled path is stored */
     std::vector<std::string> m_streamingObjects;  /**< objects to be streamed in Tx module (all if empty) */
-    int m_mcEvents; /**< counter for number of generated events. */
+    unsigned int m_mcEvents; /**< counter for number of generated events. */
 
     /**
      *  Set up environment from standard BELLE2_ environment variables.

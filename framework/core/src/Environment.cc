@@ -37,10 +37,10 @@ const list<string>& Environment::getModuleSearchPaths() const
   return ModuleManager::Instance().getModuleSearchPaths();
 }
 
-int Environment::getNumberOfEvents() const
+unsigned int Environment::getNumberOfEvents() const
 {
-  int numEventsFromInput = InputController::numEntries();
-  int numEventsFromArgument = getNumberEventsOverride();
+  unsigned int numEventsFromInput = InputController::numEntries();
+  unsigned int numEventsFromArgument = getNumberEventsOverride();
   if (numEventsFromArgument != 0
       && (numEventsFromInput == 0 || numEventsFromArgument < numEventsFromInput))
     return numEventsFromArgument;

@@ -32,7 +32,7 @@ namespace Belle2 {
 
     /** Number of events getter.
      */
-    int getNEvents() const {return m_nEvents;}
+    unsigned int getNEvents() const {return m_nEvents;}
 
     /** Lowest experiment number getter.
      */
@@ -59,6 +59,10 @@ namespace Belle2 {
     unsigned int getEventHigh() const {return m_eventHigh;}
 
     /** Check whether the given event is in the covered range of events.
+     *
+     *  @note This does not guarantee that the event is in the file, only
+     *        that the file contains a range of exp/run/event numbers
+     *        that would make it plausible.
      *
      *  @param experiment The experiment number of the event.
      *  @param run The run number of the event.
@@ -102,7 +106,7 @@ namespace Belle2 {
 
     /** Number of generated events getter.
      */
-    int getMcEvents() const {return m_mcEvents;}
+    unsigned int getMcEvents() const {return m_mcEvents;}
 
     /** Setter for LFN.
       *
@@ -114,7 +118,7 @@ namespace Belle2 {
      *
      *  @param nEvents The number of events.
      */
-    void setNEvents(int nEvents) {m_nEvents = nEvents;}
+    void setNEvents(unsigned int nEvents) {m_nEvents = nEvents;}
 
     /** Lowest experiment, run and event number setter.
      *
@@ -164,7 +168,7 @@ namespace Belle2 {
      *
      *  @param nEvents The number of generated events.
      */
-    void setMcEvents(int nEvents) {m_mcEvents = nEvents;}
+    void setMcEvents(unsigned int nEvents) {m_mcEvents = nEvents;}
 
     /**
      * Exposes methods of the FileMetaData class to Python.
@@ -197,7 +201,7 @@ namespace Belle2 {
 
     std::string m_lfn; /**< Logical file name.  */
 
-    int m_nEvents; /**< Number of events.  */
+    unsigned int m_nEvents; /**< Number of events.  */
 
     int m_experimentLow; /**< Lowest experiment number.  */
 
@@ -225,9 +229,9 @@ namespace Belle2 {
 
     std::string m_steering; /**< The steering file content.  */
 
-    int m_mcEvents; /**< Number of generated events, 0 for real data.  */
+    unsigned int m_mcEvents; /**< Number of generated events, 0 for real data.  */
 
-    ClassDef(FileMetaData, 6); /**< Metadata information about a file. */
+    ClassDef(FileMetaData, 7); /**< Metadata information about a file. */
 
   }; //class
 

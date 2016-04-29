@@ -423,7 +423,8 @@ namespace Belle2 {
           }
           addRecoHit(hit, lines);
         } else {
-          B2ERROR("Got invalid detector ID " << detId << " from track candidate, skipping hit!");
+          //might be a KLM hit or something. not necessarily bad
+          //B2ERROR("Got invalid detector ID " << detId << " from track candidate " << label << ", skipping hit!");
           continue;
         }
       }

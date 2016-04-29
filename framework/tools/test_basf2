@@ -24,12 +24,13 @@ def compare_log(template_file, log, ignore_lines=0, diff_lines=10):
     """Compare the log output to the content of a template file"""
 
     if os.path.isfile(template_file):
-        diff = list(difflib.unified_diff(
-            open(template_file).read().splitlines()[ignore_lines:],
-            log.decode().splitlines()[ignore_lines:],
-            fromfile='template',
-            tofile='current',
-            lineterm='',
+        diff = list(difflib.diff_bytes(
+            difflib.unified_diff,
+            open(template_file, "rb").read().splitlines()[ignore_lines:],
+            log.splitlines()[ignore_lines:],
+            fromfile=b'template',
+            tofile=b'current',
+            lineterm=b'',
             n=0,
             ))
         if len(diff) > 0:

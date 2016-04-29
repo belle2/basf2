@@ -9,9 +9,9 @@
 #ifndef EVTMESSAGE_H
 #define EVTMESSAGE_H
 
-#include "TMessage.h"
-#include <sys/time.h>
+#include <TMessage.h>
 
+struct timeval;
 
 namespace Belle2 {
 
@@ -73,7 +73,7 @@ namespace Belle2 {
     /** Set existing buffer address */
     void  buffer(const char*);
 
-    /** Get size of message including headers*/
+    /** Get size of message including headers. Often, you'll want to use paddedSize() instead. */
     int   size() const;
     /** Same as size(), but as size of an integer array.
      *

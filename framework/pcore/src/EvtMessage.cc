@@ -12,13 +12,17 @@
 #include <cstdlib>
 #include <string>
 
+#include <sys/time.h>
+
 using namespace std;
 using namespace Belle2;
 
-/** Returns smallest value >= bytes that is divisible by sizeof(int). */
-int roundToNearestInt(int bytes)
-{
-  return sizeof(int) * ((bytes + sizeof(int) - 1) / sizeof(int));
+namespace {
+  /** Returns smallest value >= bytes that is divisible by sizeof(int). */
+  int roundToNearestInt(int bytes)
+  {
+    return sizeof(int) * ((bytes + sizeof(int) - 1) / sizeof(int));
+  }
 }
 
 EvtMessage::EvtMessage(char* data):

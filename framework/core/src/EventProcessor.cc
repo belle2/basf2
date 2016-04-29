@@ -137,7 +137,14 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
       if (e.signal != SIGINT) {
         B2FATAL(e.what());
       }
-      //in case of SIGINT, we move on to processTerminate() to shut down saefly
+      //in case of SIGINT, we move on to processTerminate() to shut down safely
+    } catch (...) {
+      if (m_eventMetaDataPtr)
+        B2ERROR("Exception occured in exp/run/evt: "
+                << m_eventMetaDataPtr->getExperiment() << " / "
+                << m_eventMetaDataPtr->getRun() << " / "
+                << m_eventMetaDataPtr->getEvent());
+      throw;
     }
 
   } else {

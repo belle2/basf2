@@ -8,11 +8,14 @@
 #include <TMD5.h>
 #include <TSystem.h>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 #include <curl/curl.h>
 
 #include <boost/filesystem.hpp>
 
 #include <iostream>
+#include <sstream>
 #include <memory>
 #include <string>
 
@@ -159,145 +162,50 @@ size_t ConditionsService::capture_return(void* buffer, size_t size, size_t nmemb
 
 void ConditionsService::parse_payloads(std::string temp)
 {
-  std::unique_ptr<TXMLEngine> xml(new TXMLEngine);
+  std::stringstream input(temp);
+  boost::property_tree::ptree pt;
+  try {
+    boost::property_tree::read_xml(input, pt);
 
-  XMLDocPointer_t xmldoc = xml->ParseString(temp.c_str());
-  if (xmldoc == 0) {
-    B2WARNING("corrupt return from REST call: " << temp.c_str());
+    for (auto& iov : pt.get_child("currentPayloadIovs")) {
+      if (iov.first != "currentPayloadIov") {
+        throw boost::property_tree::ptree_error("child node should be 'currentPayloadIov', not '" + iov.first + "'");
+      }
+      conditionsPayload payloadInfo;
+      auto payload = iov.second.get_child("payload");
+      auto payloadIov = iov.second.get_child("payloadIov");
+      B2DEBUG(100, "Parsing payload with id " << payload.get("<xmlattr>.payloadId", ""));
+      payloadInfo.package = payload.get<std::string>("basf2Module.basf2Package.name");
+      payloadInfo.module = payload.get<std::string>("basf2Module.name");
+      payloadInfo.md5Checksum = payload.get<std::string>("checksum");
+      payloadInfo.logicalFileName = payload.get<std::string>("payloadUrl");
+      payloadInfo.expInitial = payloadIov.get<std::string>("initialRunId.experiment.name");
+      payloadInfo.runInitial = payloadIov.get<std::string>("initialRunId.name");
+      payloadInfo.expFinal = payloadIov.get<std::string>("finalRunId.experiment.name");
+      payloadInfo.runFinal = payloadIov.get<std::string>("finalRunId.name");
+
+      if (payloadInfo.package.size() == 0 || payloadInfo.module.size() == 0 || payloadInfo.logicalFileName.size() == 0) {
+        B2WARNING("ConditionsService::parse_payload Payload not parsed correctly: empty package, module or filename");
+      } else {
+        std::string payloadKey = payloadInfo.package + payloadInfo.module;
+        if (payloadExists(payloadKey)) {
+          B2WARNING("Found duplicate payload key " << payloadKey <<
+                    " while parsing conditions payloads. Using refusing to add payload with identical key.");
+        } else {
+          B2DEBUG(100, "Found payload for module " << payloadInfo.module << " in package " << payloadInfo.package
+                  << " at URL " << payloadInfo.logicalFileName << ".  Storing with key: "
+                  << payloadKey << " and checksum: " << payloadInfo.md5Checksum << ".  IOV (exp/run) from "
+                  << payloadInfo.expInitial << "/" << payloadInfo.runInitial << " to " << payloadInfo.expFinal << "/" << payloadInfo.runFinal);
+          addPayloadInfo(payloadKey, payloadInfo);
+        }
+      }
+    }
+  } catch (boost::property_tree::ptree_error& e) {
+    B2WARNING("Cannot parse database payload information: " << e.what());
     B2WARNING("Access to central database is disabled");
     m_enabled = false;
     return;
   }
-
-  // take access to main node
-  XMLNodePointer_t mainnode = xml->DocGetRootElement(xmldoc);
-
-  // display recursively all nodes and subnodes
-  //  displayNodes(xml, mainnode, 1);
-
-  // parse the payloads
-  XMLNodePointer_t iov_node = xml->GetChild(mainnode);
-  XMLNodePointer_t payload_node = xml->GetChild(iov_node);
-
-  XMLNodePointer_t child_node;
-
-  std::string PackageName, ModuleName, PayloadURL, Checksum;
-
-  XMLAttrPointer_t attr;
-  std::string nodeName;
-
-  while (payload_node) {
-    conditionsPayload payload;
-    nodeName = xml->GetNodeName(payload_node);
-    attr = xml->GetFirstAttr(payload_node);
-    B2DEBUG(100, "Parsing payload... " << nodeName << " with id " << xml->GetAttrValue(attr));
-    if (nodeName == "payload") { /// Found a payload, now parse the needed information.
-
-      child_node = xml->GetChild(payload_node);
-      while (child_node) { // Search for the module
-        nodeName = xml->GetNodeName(child_node);
-
-        if (nodeName == "payloadUrl") {
-          payload.logicalFileName = xml->GetNodeContent(child_node);
-        }
-        if (nodeName == "checksum") {
-          payload.md5Checksum = xml->GetNodeContent(child_node);
-        }
-        if (nodeName == "basf2Module") { // module found
-          XMLNodePointer_t module_node = child_node;
-          child_node = xml->GetChild(child_node);
-          while (child_node) { // Search for the package
-            nodeName = xml->GetNodeName(child_node);
-            if (nodeName == "name") {
-              // Get the module name.
-              payload.module = xml->GetNodeContent(child_node);
-            } else if (nodeName == "basf2Package") {
-              XMLNodePointer_t package_node = child_node;
-              child_node = xml->GetChild(child_node);
-              while (child_node) { // Search for the package name
-                nodeName = xml->GetNodeName(child_node);
-                if (nodeName == "name") {
-                  // Get the module name.
-                  payload.package = xml->GetNodeContent(child_node);
-                }
-                child_node = xml->GetNext(child_node);
-              }
-              child_node = package_node;
-            }
-            child_node = xml->GetNext(child_node);
-          }
-          child_node = module_node;
-        }
-        child_node = xml->GetNext(child_node);
-      }
-    }
-
-    payload_node = xml->GetNext(payload_node);
-    nodeName = xml->GetNodeName(payload_node);
-    if (nodeName == "payloadIov") { /// Found a payload, now parse the needed information.
-      child_node = xml->GetChild(payload_node);
-      while (child_node) { // Search for the runs
-        std::string iovNodeName = xml->GetNodeName(child_node);
-        if ((iovNodeName == "initialRunId") || (iovNodeName == "finalRunId")) {
-          XMLNodePointer_t run_node = child_node;
-          std::string runName, expName;
-          child_node = xml->GetChild(child_node);
-          while (child_node) { // Search for the run name and experiment
-            nodeName = xml->GetNodeName(child_node);
-            if (nodeName == "name") {
-              runName = xml->GetNodeContent(child_node);
-            }
-            if (nodeName == "experiment") {
-              XMLNodePointer_t exp_node = child_node;
-              child_node = xml->GetChild(child_node);
-              while (child_node) { // Search for the experiment name
-                nodeName = xml->GetNodeName(child_node);
-                if (nodeName == "name") {
-                  expName = xml->GetNodeContent(child_node);
-                }
-                child_node = xml->GetNext(child_node);
-              }
-              child_node = exp_node;
-            }
-
-            child_node = xml->GetNext(child_node);
-          }
-          child_node = run_node;
-          if (iovNodeName == "initialRunId") {
-            payload.runInitial = runName;
-            payload.expInitial = expName;
-          }
-          if (iovNodeName == "finalRunId") {
-            payload.runFinal = runName;
-            payload.expFinal = expName;
-          }
-        }
-        child_node = xml->GetNext(child_node);
-      }
-    }
-
-    if (payload.package.size() == 0 || payload.module.size() == 0 || payload.logicalFileName.size() == 0) {
-      B2WARNING("ConditionsService::parse_payload Payload not parsed correctly: empty package, module or filename");
-    } else {
-      std::string payloadKey = payload.package + payload.module;
-      if (ConditionsService::getInstance()->payloadExists(payloadKey)) {
-        B2WARNING("Found duplicate payload key " << payloadKey <<
-                  " while parsing conditions payloads. Using refusing to add payload with identical key.");
-      } else {
-        B2DEBUG(100, "Found payload for module " << payload.module << " in package " << payload.package
-                << " at URL " << payload.logicalFileName << ".  Storing with key: "
-                << payloadKey << " and checksum: " << payload.md5Checksum << ".  IOV (exp/run) from "
-                << payload.expInitial << "/" << payload.runInitial << " to " << payload.expFinal << "/" << payload.runFinal);
-        ConditionsService::getInstance()->addPayloadInfo(payloadKey, payload);
-      }
-    }
-
-    iov_node = xml->GetNext(iov_node);
-    payload_node = xml->GetChild(iov_node);
-  }
-
-  // Release memory before exit
-  xml->FreeDoc(xmldoc);
 }
 
 conditionsPayload ConditionsService::getPayloadInfo(std::string PackageModuleName)

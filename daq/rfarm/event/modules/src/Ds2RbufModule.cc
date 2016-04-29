@@ -77,7 +77,7 @@ void Ds2RbufModule::event()
   //  printf("message size = %d\n", msg->size());
   // Put the message in ring buffer
   for (;;) {
-    int stat = m_rbuf->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);
+    int stat = m_rbuf->insq((int*)msg->buffer(), msg->paddedSize());
     if (stat >= 0) break;
     usleep(100);
     //    usleep(20);

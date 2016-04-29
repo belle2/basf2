@@ -107,11 +107,14 @@ void HLTOutputModule::endRun()
   std::cout << "[HLTOutput] \x1b[32m\t" << m_nEvents << " events (Total size = " << m_size << " kB)\x1b[0m" << std::endl;
   std::cout << "[HLTOutput] \x1b[32m\tTotal elapsed time  = " << etime / 1000.0 << " ms\x1b[0m" << std::endl;
   std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Overall) = " << flowmb << " (MB/s)\x1b[0m" << std::endl;
-  std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Event)   = " << flowmbEvent << " (MB/s)   Time = " << m_timeEvent / 1000.0 << " (ms)\x1b[0m" << std::endl;
+  std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Event)   = " << flowmbEvent << " (MB/s)   Time = " << m_timeEvent / 1000.0 <<
+            " (ms)\x1b[0m" << std::endl;
   if (m_nodeType == "WN") {
-    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Serialization) = " << flowmbSer << " (MB/s)   Time = " << m_timeSerialized / 1000.0 << " (ms)\x1b[0m" << std::endl;
+    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (Serialization) = " << flowmbSer << " (MB/s)   Time = " << m_timeSerialized / 1000.0
+              << " (ms)\x1b[0m" << std::endl;
   } else {
-    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (File reading)  = " << flowmbIO << " (MB/s)   Time = " << m_timeIO / 1000.0 << " (ms)\x1b[0m" << std::endl;
+    std::cout << "[HLTOutput] \x1b[32m\tFlow rate (File reading)  = " << flowmbIO << " (MB/s)   Time = " << m_timeIO / 1000.0 <<
+              " (ms)\x1b[0m" << std::endl;
   }
   std::cout << "[HLTOutput] \x1b[32m\tEvent size = " << avesize << " +- " << sigma << " (kB)\x1b[0m" << std::endl;
 
@@ -149,7 +152,7 @@ void HLTOutputModule::putData()
       //B2INFO("[HLTOutput] \x1b[33mNode type = ES: Reading data from " << m_inputFileName << "\x1b[0m");
       msg = new EvtMessage(buffer);
 
-      while (m_buffer->insq((int*)msg->buffer(), msg->size() / 4 + 1) <= 0) {
+      while (m_buffer->insq((int*)msg->buffer(), msg->paddedSize()) <= 0) {
         usleep(100);
       }
 
@@ -174,7 +177,7 @@ void HLTOutputModule::putData()
 
     gettimeofday(&tn, 0);
 
-    while (m_buffer->insq((int*)msg->buffer(), msg->size() / 4 + 1) <= 0) {
+    while (m_buffer->insq((int*)msg->buffer(), msg->paddedSize()) <= 0) {
       usleep(100);
     }
     B2INFO("[HLTOutput] Put an event into the ring buffer (size = " << msg->size() << ")");

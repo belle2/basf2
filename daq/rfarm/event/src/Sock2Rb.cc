@@ -43,7 +43,7 @@ int Sock2Rb::ReceiveEvent(void)
   // Put the message in ring buffer
   int stat = 0;
   for (;;) {
-    stat = m_rbuf->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);
+    stat = m_rbuf->insq((int*)msg->buffer(), msg->paddedSize());
     if (stat >= 0) break;
     usleep(100);
     //    usleep(20);

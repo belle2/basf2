@@ -141,6 +141,8 @@ parser.add_argument("-j", type=int, default=1, help="Number of processes", dest=
 parser.add_argument("--xml", type=str, default=None, help="Save results into given file as xml")
 parser.add_argument("-n", "--diff-lines", type=int, default=10, help="Number of lines to show if output is different from template")
 parser.add_argument("-q", "--quiet", action="store_true", default=False, help="if given don't print output of failed tests")
+parser.add_argument("--filter", type=str, default=None, help="If given only run tests where the name "
+                    "of the steering file matches the regular expression given")
 parser.add_argument("directories", nargs="*", help="run all tests included in these directories. "
                     "If none are specified run all tests")
 options = parser.parse_args()
@@ -157,6 +159,16 @@ if "BELLE2_LOCAL_DIR" in os.environ:
     all_tests += process_top_dir(os.environ['BELLE2_LOCAL_DIR'], options.directories, processed_dirs)
 if "BELLE2_RELEASE_DIR" in os.environ:
     all_tests += process_top_dir(os.environ['BELLE2_RELEASE_DIR'], options.directories, processed_dirs)
+
+if options.filter is not None:
+    import re
+    try:
+        re_filter = re.compile(options.filter)
+    except Exception as e:
+        print("The --filter argument %r is not a valid regular expression: %s" %
+              (options.filter, e))
+        sys.exit(1)
+    all_tests = [e for e in all_tests if re_filter.search(e[0]) is not None]
 
 all_tests.sort()
 print("Collected %d tests..." % len(all_tests))

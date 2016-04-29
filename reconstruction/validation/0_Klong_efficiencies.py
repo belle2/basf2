@@ -21,7 +21,7 @@ set_random_seed(56424)
 main = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1000])
+eventinfosetter.param('evtNumList', [10000])
 
 main.add_module(eventinfosetter)
 

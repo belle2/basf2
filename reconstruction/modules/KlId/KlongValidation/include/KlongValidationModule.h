@@ -15,13 +15,9 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <TTree.h>
 #include <TFile.h>
 #include <string>
 #include <TEfficiency.h>
-#include <TH1F.h>
-#include <TH2.h>
-#include <TGraphAsymmErrors.h>
 
 
 
@@ -35,43 +31,61 @@ namespace Belle2 {
 
     virtual ~KlongValidationModule();
 
+    /* initialize   **/
     virtual void initialize();
 
+    /*  beginn run   **/
     virtual void beginRun();
 
+    /* process event   **/
     virtual void event();
 
+    /* end run   **/
     virtual void endRun();
 
+    /* terminate   **/
     virtual void terminate();
 
   protected:
 
   private:
 
+    /* momentum   **/
     double m_momentum;
+    /* angle in z-plane   **/
     double m_theta;
+    /* angle in x-y   **/
     double m_phi;
+    /* K0L truth   **/
     double m_isKl;
+    /* is cluster from beambkg?   **/
     double m_isBeamBKG;
+    /* did cluster pass selection of algorythm?   **/
     bool   m_passed;
+    /* cluster wrongly reconstructed as K0L?   **/
     bool   m_faked;
+    /* cluster reconstructed as K0L?   **/
     bool   m_reconstructedAsKl;
 
-    //use TEfficiency histogramms to calculate efficiency
-    // name, title;xtitle;ytitle, bins (noch herausfinden)
+    // use TEfficiency histogramms to calculate efficiency
+    /* efficiency in x-y plane   **/
     TEfficiency* m_effPhi;
+    /* efficiency in angle to z   **/
     TEfficiency* m_effTheta;
+    /* momentum efficiency   **/
     TEfficiency* m_effMom;
+    /* fake anbgle in x-y   **/
     TEfficiency* m_fakePhi;
+    /*  dake angle to z   **/
     TEfficiency* m_fakeTheta;
+    /*  fake momentum plot   **/
     TEfficiency* m_fakeMom;
 
+    /* output path   **/
     std::string m_outPath = "KlongValidationData.root";
 
     /* root tree etc.  **/
     TFile* m_f = nullptr;  //
-    TTree* m_tree = nullptr;
 
   }; // end class
 } // end namespace Belle2

@@ -31,7 +31,7 @@ using namespace std;
 
 REG_MODULE(KlongValidation);
 
-KlongValidationModule::KlongValidationModule(): Module() // constructor kan nkeine argumente nehmen
+KlongValidationModule::KlongValidationModule(): Module()
 {
   setDescription("Used to calculate validation variables for Klong efficiency validations etc...");
 
@@ -60,7 +60,7 @@ void KlongValidationModule::initialize()
   m_f =     new TFile(m_outPath.c_str(), "recreate");
 
   //use TEfficiency histogramms to calculate efficiency
-  // name, title;xtitle;ytitle, bins (noch herausfinden)
+  // name, title;xtitle;ytitle,
   m_effPhi    = new TEfficiency("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 50, -3.2, 3.2);
 
   m_effTheta  = new TEfficiency("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 50, 0, 3.2);
@@ -154,9 +154,10 @@ void KlongValidationModule::event()
 
 void KlongValidationModule::terminate()
 {
-  // write TEff to root file , plotting will be done by Klongvalidation.C in reco.../vali..
+  // write TEff to root file ,
   m_f         -> cd();
 
+  // efficiencies
   m_effPhi   -> SetTitle("Klong efficiency in Phi");
   m_effPhi   -> GetListOfFunctions() -> Add(new TNamed("Description", m_effPhi -> GetTitle()));
   m_effPhi   -> GetListOfFunctions() -> Add(new TNamed("Check", "Should be as high as possible"));
@@ -170,7 +171,7 @@ void KlongValidationModule::terminate()
   m_effMom   -> GetListOfFunctions() -> Add(new TNamed("Check", "Should be as high as possible"));
 
 
-
+  // fake rates
   m_fakePhi   -> SetTitle("Klong fake rate in Phi");
   m_fakePhi   -> GetListOfFunctions() -> Add(new TNamed("Description", m_fakePhi -> GetTitle()));
   m_fakePhi   -> GetListOfFunctions() -> Add(new TNamed("Check", "Should be as high as possible"));

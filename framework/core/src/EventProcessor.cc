@@ -272,7 +272,7 @@ bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule
           m_processStatisticsPtr->suspendGlobal();
 
         processEndRun();
-        processBeginRun();
+        processBeginRun(skipMasterModule);
 
         if (collectStats)
           m_processStatisticsPtr->resumeGlobal();
@@ -374,7 +374,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 }
 
 
-void EventProcessor::processBeginRun()
+void EventProcessor::processBeginRun(bool skipDB)
 {
   m_inRun = true;
 
@@ -382,7 +382,7 @@ void EventProcessor::processBeginRun()
   ModulePtrList::const_iterator listIter;
   m_processStatisticsPtr->startGlobal();
 
-  DBStore::Instance().update();
+  if (!skipDB) DBStore::Instance().update();
 
   //initialize random generator for end run
   RandomNumbers::initializeBeginRun();

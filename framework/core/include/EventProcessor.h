@@ -125,7 +125,7 @@ namespace Belle2 {
      * beginRun() method of the module which triggered
      * the beginRun() loop will also be called.
      */
-    void processBeginRun();
+    void processBeginRun(bool skipDB = false);
 
     /**
      * Calls the end run methods of all modules.

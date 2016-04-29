@@ -677,7 +677,7 @@ namespace Belle2 {
      * Internal pointer to DataStore array containing the daughters of this particle.
      *
      * This is a transient member and will not be written to file. The pointer
-     * is set when it is the first time needed.
+     * is set by getArrayPointer() when first called.
      */
     mutable TClonesArray* m_arrayPointer; //!
 

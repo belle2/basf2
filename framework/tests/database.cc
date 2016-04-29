@@ -216,21 +216,59 @@ namespace {
   {
     StoreObjPtr<EventMetaData> evtPtr;
     DBArray<TObject> objects;
+    DBArray<TObject> missing("notexisting");
+    // check iteration on fresh object
+    {
+      int i = 0;
+      for (auto o : missing) {
+        (void)o;
+        ++i;
+      }
+      EXPECT_EQ(i, 0);
+    }
+
 
     evtPtr->setExperiment(1);
     DBStore::Instance().update();
     EXPECT_TRUE(objects);
+    EXPECT_FALSE(missing);
     EXPECT_EQ(objects.getEntries(), 1);
     EXPECT_EQ(objects[0]->GetUniqueID(), 1);
     evtPtr->setExperiment(4);
     EXPECT_EQ(objects.getEntries(), 1);
     DBStore::Instance().update();
     EXPECT_EQ(objects.getEntries(), 4);
-    EXPECT_EQ(objects[0]->GetUniqueID(), 1);
-    EXPECT_EQ(objects[3]->GetUniqueID(), 4);
+    // check iteration on existing
+    {
+      int i = 0;
+      for (auto o : objects) {
+        EXPECT_EQ(objects[i]->GetUniqueID(), i + 1);
+        ++i;
+      }
+      EXPECT_EQ(i, 4);
+    }
+
+    // check iteration on missing object
+    {
+      int i = 0;
+      for (auto o : missing) {
+        (void)o;
+        ++i;
+      }
+      EXPECT_EQ(i, 0);
+    }
     evtPtr->setExperiment(7);
     DBStore::Instance().update();
     EXPECT_FALSE(objects);
+    // check iteration over missing but previously existing
+    {
+      int i = 0;
+      for (auto o : objects) {
+        EXPECT_EQ(objects[i]->GetUniqueID(), i + 1);
+        ++i;
+      }
+      EXPECT_EQ(i, 0);
+    }
   }
 
   /** Test range checks of DBArray */
@@ -356,7 +394,7 @@ namespace {
     EXPECT_FALSE(payload);
   }
 
-//disable (wrong) warnings about unused functions
+  //disable (wrong) warnings about unused functions
 #if defined(__INTEL_COMPILER)
 #pragma warning disable 177
 #endif

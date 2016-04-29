@@ -330,14 +330,14 @@ namespace Belle2 {
     }
 
     /** Return iterator to first entry. */
-    iterator begin() { ensureAttached(); return m_storeArray ? iterator(*this->getPtr(), 0) : iterator(); }
+    iterator begin() { ensureAttached(); return iterator(m_storeArray); }
     /** Return iterator to last entry +1. */
-    iterator end() { ensureAttached(); return m_storeArray ? iterator(*this->getPtr(), getEntries()) : iterator(); }
+    iterator end() { ensureAttached(); return iterator(m_storeArray, true); }
 
     /** Return const_iterator to first entry. */
-    const_iterator begin() const { ensureAttached(); return m_storeArray ? const_iterator(*this->getPtr(), 0) : const_iterator(); }
+    const_iterator begin() const { ensureAttached(); return const_iterator(m_storeArray); }
     /** Return const_iterator to last entry +1. */
-    const_iterator end() const { ensureAttached(); return m_storeArray ? const_iterator(*this->getPtr(), getEntries()) : const_iterator(); }
+    const_iterator end() const { ensureAttached(); return const_iterator(m_storeArray, true); }
 
   private:
     /** Returns address of the next free position of the array.

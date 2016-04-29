@@ -72,14 +72,14 @@ namespace Belle2 {
     }
 
     /** Return iterator to first entry. */
-    iterator begin() { return iterator(**m_array, 0); }
+    iterator begin() { return iterator(m_array); }
     /** Return iterator to last entry +1. */
-    iterator end() { return iterator(**m_array, getEntries()); }
+    iterator end() { return iterator(m_array, true); }
 
     /** Return const_iterator to first entry. */
-    const_iterator begin() const { return const_iterator(**m_array, 0); }
+    const_iterator begin() const { return const_iterator(m_array); }
     /** Return const_iterator to last entry +1. */
-    const_iterator end() const { return const_iterator(**m_array, getEntries()); }
+    const_iterator end() const { return const_iterator(m_array, true); }
 
   private:
     /** Pointer to pointer to the TClonesArray in the DBStore. */

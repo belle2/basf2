@@ -50,13 +50,12 @@ RingBuffer::RingBuffer(int size)
 }
 
 // Constructor of Global Ringbuffer with name
-RingBuffer::RingBuffer(const char* name, unsigned int size)
+RingBuffer::RingBuffer(const std::string& name, unsigned int size)
 {
   // 0. Determine shared memory type
-  if (strcmp(name, "private") != 0) {      // Global
+  if (name != "private") { // Global
     m_file = true;
-    m_pathname = string("/tmp/") + string(getenv("USER"))
-                 + string("_RB_") + string(name);
+    m_pathname = string("/tmp/") + getenv("USER") + "_RB_" + name;
     //m_pathfd = creat ( m_pathname.c_str(), 0644 );
     //    m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL, 0644);
     m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL | O_RDWR, 0644);
@@ -85,10 +84,10 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
   if (m_pathfd > 0) {
     B2INFO("First global RingBuffer creation: writing SHM info to file.");
     char rbufinfo[256];
-    sprintf(rbufinfo, "%d\n", m_shmid);
+    snprintf(rbufinfo, sizeof(rbufinfo), "%d\n", m_shmid);
     int is = write(m_pathfd, rbufinfo, strlen(rbufinfo));
     if (is < 0) perror("write");
-    sprintf(rbufinfo, "%d\n", m_semid);
+    snprintf(rbufinfo, sizeof(rbufinfo), "%d\n", m_semid);
     is = write(m_pathfd, rbufinfo, strlen(rbufinfo));
     if (is < 0) perror("write");
     close(m_pathfd);
@@ -466,7 +465,7 @@ int RingBuffer::shmid() const
   return m_shmid;
 }
 
-void RingBuffer::DumpInfo()
+void RingBuffer::DumpInfo() const
 {
   SemaphoreLocker locker(m_semid);
 

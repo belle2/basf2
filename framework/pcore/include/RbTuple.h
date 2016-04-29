@@ -11,6 +11,7 @@
 
 
 #include <vector>
+#include <string>
 
 class TDirectory;
 class TFile;
@@ -56,17 +57,13 @@ namespace Belle2 {
     RbTupleManager();
     ~RbTupleManager();
 
-
-    /** Merge given list of root files, code from 'hadd' tool. */
-    void MergeRootfile(TDirectory*, TList*);
-
   private:
     static RbTupleManager* s_instance; /**< singleton instance. */
 
     std::vector<Module*> m_histdefs; /**< registered HistoModules. */
-    int m_nproc; /**< Number of parallel processes. */
-    char m_filename[1024]; /**< Name of histogram output file. */
-    TFile* m_root; /**< Histogram output file. */
+    int m_nproc{0}; /**< Number of parallel processes. */
+    std::string m_filename; /**< Name of histogram output file. */
+    TFile* m_root{nullptr}; /**< Histogram output file. */
   };
 
 } // Belle2 namespace

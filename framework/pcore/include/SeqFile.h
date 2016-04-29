@@ -12,6 +12,8 @@
 #define BLOCKSIZE 512000000*4
 #define SEQBUFSIZE 4000000
 
+#include <string>
+
 namespace Belle2 {
 
   /** A class to manage I/O for a chain of blocked files */
@@ -32,7 +34,7 @@ namespace Belle2 {
   private:
 
   private:
-    char m_filename[256]; /**< Name of the opened file. */
+    std::string m_filename; /**< Name of the opened file. */
     int m_fd; /**< file descriptor. */
     int m_nb; /**< when saving a file, the total number of bytes written, 0 when reading. */
     int m_nfile; /**< file counter, starting at 0 (files are split after BLOCKSIZE bytes). */

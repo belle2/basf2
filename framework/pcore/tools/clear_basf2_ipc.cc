@@ -79,10 +79,10 @@ int main(int argc, char** argv)
         if (deleted) {
           printf("\n");
           char strbuf[1024];
-          sprintf(strbuf, "/tmp/%s", ent->d_name);
+          snprintf(strbuf, 1024, "/tmp/%s", ent->d_name);
           unlink(strbuf);
           if (unnamed != 0) {
-            sprintf(strbuf, "/tmp/%s_%s", getenv("USER"), name);
+            snprintf(strbuf, 1024, "/tmp/%s_%s", getenv("USER"), name);
             unlink(strbuf);
           }
         }

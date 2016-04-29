@@ -41,7 +41,7 @@ namespace Belle2 {
      */
     explicit RingBuffer(int size = c_DefaultSize);
     /** Constructor to create/attach named shared memory in global space */
-    RingBuffer(const char* name, unsigned int size = 0);     // Create / Attach Ring buffer
+    RingBuffer(const std::string& name, unsigned int size = 0);     // Create / Attach Ring buffer
     /** Constructor by attaching to an existing shared memory */
     //    RingBuffer(int shmid);              // Attach Ring Buffer
     /** Destructor */
@@ -95,7 +95,7 @@ namespace Belle2 {
     int remq_counter() const;
 
     /** Dump buffer info */
-    void DumpInfo();
+    void DumpInfo() const;
 
   private:
     bool m_new; /**< True if we created the ring buffer ourselves (and need to clean it). */
@@ -104,8 +104,8 @@ namespace Belle2 {
     int  m_pathfd; /**< Associated file descriptor. */
     key_t m_shmkey; /**< SHM key, see shmget(2). */
     key_t m_semkey; /**< Semaphore key, see semget(2). */
-    std::string
-    m_semshmFileName; /**< file path containing ids of shm and sema for private shared mem, used for easier cleanup if we fail to do things properly */
+    /** file path containing ids of shm and sema for private shared mem, used for easier cleanup if we fail to do things properly */
+    std::string m_semshmFileName;
 
     int  m_shmid; /**< ID of shared memory segment. (See shmget(2)) */
     int* m_shmadr; /**< Address of attached shared memory segment. (See shmat(2)) */

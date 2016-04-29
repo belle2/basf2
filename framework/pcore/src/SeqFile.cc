@@ -20,7 +20,8 @@
 using namespace Belle2;
 using namespace std;
 
-SeqFile::SeqFile(const char* filename, const char* rwflag)
+SeqFile::SeqFile(const char* filename, const char* rwflag):
+  m_filename(filename)
 {
   if (strstr(rwflag, "w") != 0)
     m_fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0664);
@@ -30,7 +31,6 @@ SeqFile::SeqFile(const char* filename, const char* rwflag)
   if (m_fd < 0) {
     B2ERROR("file open error (" << strerror(errno) << "): " << filename);
   }
-  strcpy(m_filename, filename);
   B2INFO("SeqFile: " << m_filename << " opened (fd=" << m_fd << ")");
   m_nfile = 0;
   m_nb = 0;
@@ -51,19 +51,17 @@ int SeqFile::write(char* buf)
 {
   int stat = 0;
   int insize = *((int*)buf); // nbytes in the buffer at the beginning
-  if (insize + m_nb >= BLOCKSIZE &&
-      strcmp(m_filename, "/dev/null") != 0) {
+  if (insize + m_nb >= BLOCKSIZE && m_filename != "/dev/null") {
     close(m_fd);
     B2INFO("SeqFile: previous file closed (size=" << m_nb << " bytes)");
     m_nfile++;
-    char filename[256];
-    sprintf(filename, "%s-%d", m_filename, m_nfile);
-    m_fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0664);
+    auto file = m_filename + '-' + std::to_string(m_nfile);
+    m_fd = open(file.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
     if (m_fd < 0) {
-      B2FATAL("file open error (" << strerror(errno) << "): " << filename);
+      B2FATAL("file open error (" << strerror(errno) << "): " << file);
     }
     m_nb = 0;
-    B2INFO("SeqFile: " << m_filename << " opened");
+    B2INFO("SeqFile: " << file << " opened");
     stat = ::write(m_fd, buf, insize);
     if (stat > 0)
       m_nb += stat;
@@ -88,9 +86,8 @@ int SeqFile::read(char* buf, int size)
     // EOF of current file, search for next file
     close(m_fd);
     m_nfile++;
-    char nextfile[256];
-    sprintf(nextfile, "%s-%d", m_filename, m_nfile);
-    m_fd = open(nextfile, O_RDONLY);
+    auto nextfile = m_filename + '-' + std::to_string(m_nfile);
+    m_fd = open(nextfile.c_str(), O_RDONLY);
     if (m_fd < 0) return 0;   // End of all files
     // Obtain record size from new file
     int stat2 = ::read(m_fd, buf, sizeof(int));

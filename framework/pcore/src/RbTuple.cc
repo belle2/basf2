@@ -18,7 +18,6 @@
 
 #include <sys/types.h>
 #include <unistd.h>
-#include <string.h>
 #include <dirent.h>
 #include <errno.h>
 
@@ -48,7 +47,7 @@ RbTupleManager& RbTupleManager::Instance()
 // Global initialization
 void RbTupleManager::init(int nprocess, const char* filename)
 {
-  strcpy(m_filename, filename);
+  m_filename = filename;
   m_nproc = nprocess;
 
   if (ProcHandler::EvtProcID() == -1 && m_nproc > 0) {
@@ -63,7 +62,7 @@ void RbTupleManager::init(int nprocess, const char* filename)
     }
 
     // Scan the directory and delete temporary files
-    std::string compfile = std::string(filename) + ".";
+    std::string compfile = m_filename + ".";
     while ((dirp = readdir(dp)) != NULL) {
       std::string curfile = std::string(dirp->d_name);
       if (curfile.compare(0, compfile.size(), compfile) == 0) {
@@ -85,14 +84,13 @@ void RbTupleManager::register_module(Module* mod)
 int RbTupleManager::begin(int procid)
 {
   if (m_nproc > 0) {
-    char filename[1024];
-    sprintf(filename, "%s.%d", m_filename, procid);
-    m_root = new TFile(filename, "update");
+    std::string fileNamePlusId = m_filename + '.' + std::to_string(procid);
+    m_root = new TFile(fileNamePlusId.c_str(), "update");
     //    printf("RbTupleManager: histo file opened for process %d (pid=%d)\n",
     //           procid, getpid());
     B2INFO("RbTupleManager : histo file opened for process " << procid << "(" << getpid() << ")");
   } else {
-    m_root = new TFile(m_filename, "recreate");
+    m_root = new TFile(m_filename.c_str(), "recreate");
     //    printf("RbTupleManager: initialized for single-process\n");
     B2INFO("RbTupleManager :  initialized for single process");
   }
@@ -131,7 +129,7 @@ int RbTupleManager::hadd()
 
   // Set up merger with output file
   TFileMerger merger(false, false);
-  if (! merger.OutputFile(m_filename)) {
+  if (!merger.OutputFile(m_filename.c_str())) {
     //    printf ( "RbTupleManager:: error to open output file %s\n", m_filename );
     B2ERROR("RbTupleManager:: error to open output file " << m_filename);
     return -1;
@@ -178,14 +176,3 @@ int RbTupleManager::hadd()
 
   return 0;
 }
-
-
-
-// Body of root file merger grabbed from "hadd"
-
-void RbTupleManager::MergeRootfile(TDirectory* /* target */ , TList* /* sourcelist */)
-{
-}
-
-
-

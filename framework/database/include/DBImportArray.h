@@ -24,9 +24,9 @@ namespace Belle2 {
   public:
 
     /** STL-like iterator over the T objects (not T* ). */
-    typedef ArrayIterator<DBImportArray<T>, T> iterator;
+    typedef ObjArrayIterator<TClonesArray, T> iterator;
     /** STL-like const_iterator over the T objects (not T* ). */
-    typedef ArrayIterator<DBImportArray<T>, const T> const_iterator;
+    typedef ObjArrayIterator<const TClonesArray, const T> const_iterator;
 
     /**
      * Constructor
@@ -101,22 +101,22 @@ namespace Belle2 {
     /**
      * Returns iterator to first entry.
      */
-    iterator begin() { return iterator(this, 0); }
+    iterator begin() { return iterator(*static_cast<TClonesArray*>(m_object), 0); }
 
     /**
      * Returns iterator to last entry +1.
      */
-    iterator end() { return iterator(this, getEntries()); }
+    iterator end() { return iterator(*static_cast<TClonesArray*>(m_object), getEntries()); }
 
     /**
      * Returns const_iterator to first entry.
      */
-    const_iterator begin() const { return const_iterator(this, 0); }
+    const_iterator begin() const { return const_iterator(*static_cast<TClonesArray*>(m_object), 0); }
 
     /**
      * Returns const_iterator to last entry +1.
      */
-    const_iterator end() const { return const_iterator(this, getEntries()); }
+    const_iterator end() const { return const_iterator(*static_cast<TClonesArray*>(m_object), getEntries()); }
 
     /**
      * add event dependency

@@ -61,7 +61,7 @@ namespace Belle2 {
   class RelationArray: public StoreAccessorBase {
   public:
     /** STL-like const_iterator over the T objects (not T* ). */
-    typedef ArrayIterator<RelationArray, const RelationElement> const_iterator;
+    typedef ObjArrayIterator<const TClonesArray, const RelationElement> const_iterator;
 
     /** Typedef to simplify use of correct index_type */
     typedef RelationElement::index_type index_type;
@@ -365,9 +365,9 @@ namespace Belle2 {
           c_doNothing);
 
     /** Return const_iterator to first entry. */
-    const_iterator begin() const { assertValid(); return const_iterator(this, 0); }
+    const_iterator begin() const { assertValid(); return const_iterator((*m_relations)->elements(), 0); }
     /** Return const_iterator to last entry +1. */
-    const_iterator end() const { assertValid(); return const_iterator(this, getEntries()); }
+    const_iterator end() const { assertValid(); return const_iterator((*m_relations)->elements(), getEntries()); }
 
   private:
     /** Constructor which accepts the AccessorParams of the relation.

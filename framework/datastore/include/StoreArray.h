@@ -111,9 +111,9 @@ namespace Belle2 {
   class StoreArray : public StoreAccessorBase {
   public:
     /** STL-like iterator over the T objects (not T* ). */
-    typedef ArrayIterator<StoreArray<T>, T> iterator;
+    typedef ObjArrayIterator<TClonesArray, T> iterator;
     /** STL-like const_iterator over the T objects (not T* ). */
-    typedef ArrayIterator<StoreArray<T>, const T> const_iterator;
+    typedef ObjArrayIterator<const TClonesArray, const T> const_iterator;
 
     /** Register an array, that should be written to the output by default, in the data store.
      *  This must be called in the initialization phase.
@@ -325,14 +325,14 @@ namespace Belle2 {
     TClonesArray* getPtr() const { ensureCreated(); return *m_storeArray;}
 
     /** Return iterator to first entry. */
-    iterator begin() { ensureAttached(); return iterator(this, 0); }
+    iterator begin() { ensureAttached(); return iterator(*this->getPtr(), 0); }
     /** Return iterator to last entry +1. */
-    iterator end() { ensureAttached(); return iterator(this, getEntries()); }
+    iterator end() { ensureAttached(); return iterator(*this->getPtr(), getEntries()); }
 
     /** Return const_iterator to first entry. */
-    const_iterator begin() const { ensureAttached(); return const_iterator(this, 0); }
+    const_iterator begin() const { ensureAttached(); return const_iterator(*this->getPtr(), 0); }
     /** Return const_iterator to last entry +1. */
-    const_iterator end() const { ensureAttached(); return const_iterator(this, getEntries()); }
+    const_iterator end() const { ensureAttached(); return const_iterator(*this->getPtr(), getEntries()); }
 
   private:
     /** Returns address of the next free position of the array.

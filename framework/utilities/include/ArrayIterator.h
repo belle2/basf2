@@ -13,7 +13,39 @@
 
 #include <iterator>
 
+class TObject;
+
 namespace Belle2 {
+  /** Optimized class to iterate over TObjArray and classes inheriting from it.
+   *  iterators are invalidated if the size of the TObjArray is changed.
+   */
+  template <class ArrayType, class ValueType> class ObjArrayIterator: public std::iterator<std::forward_iterator_tag, ValueType>  {
+  public:
+    /** default constructor */
+    ObjArrayIterator() = default;
+    /** real constructor
+     * @param array reference to the TObjArray instance we want to iterate over
+     * @param index integer of the index we want to point to right away
+     */
+    ObjArrayIterator(ArrayType& array, size_t index): m_array{array.GetObjectRef() + index} {}
+    /** prefix increment */
+    ObjArrayIterator<ArrayType, ValueType>& operator++() { ++m_array; return *this; }
+    /** postfix increment */
+    ObjArrayIterator<ArrayType, ValueType> operator++(int) { auto old = *this; ++(*this); return old; }
+    /** check equality. */
+    bool operator==(const ObjArrayIterator<ArrayType, ValueType>& rhs) const { return m_array == rhs.m_array; }
+    /** check inequality. */
+    bool operator!=(const ObjArrayIterator<ArrayType, ValueType>& rhs) const { return !(*this == rhs); }
+
+    /** dereference. */
+    ValueType& operator*() const { return *static_cast<ValueType*>(*m_array); }
+    /** dereference. */
+    ValueType* operator->() const { return &(operator*()); }
+  private:
+    /** pointer to the fCont member of the TObjArray */
+    TObject** m_array{nullptr};
+  };
+
   /** Generic iterator class for arrays, allowing use of STL algorithms, range-based for etc.
    *
    * Implements all operations required for a forward iterator. Note that wether objects can actually

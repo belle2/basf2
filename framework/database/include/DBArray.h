@@ -24,9 +24,9 @@ namespace Belle2 {
   template<class T> class DBArray: public DBAccessorBase {
   public:
     /** STL-like iterator over the T objects (not T* ). */
-    typedef ArrayIterator<DBArray<T>, T> iterator;
+    typedef ObjArrayIterator<TClonesArray, T> iterator;
     /** STL-like const_iterator over the T objects (not T* ). */
-    typedef ArrayIterator<DBArray<T>, const T> const_iterator;
+    typedef ObjArrayIterator<const TClonesArray, const T> const_iterator;
 
     /**
      * Constructor to access an array of objects in the DBStore.
@@ -72,14 +72,14 @@ namespace Belle2 {
     }
 
     /** Return iterator to first entry. */
-    iterator begin() { return iterator(this, 0); }
+    iterator begin() { return iterator(**m_array, 0); }
     /** Return iterator to last entry +1. */
-    iterator end() { return iterator(this, getEntries()); }
+    iterator end() { return iterator(**m_array, getEntries()); }
 
     /** Return const_iterator to first entry. */
-    const_iterator begin() const { return const_iterator(this, 0); }
+    const_iterator begin() const { return const_iterator(**m_array, 0); }
     /** Return const_iterator to last entry +1. */
-    const_iterator end() const { return const_iterator(this, getEntries()); }
+    const_iterator end() const { return const_iterator(**m_array, getEntries()); }
 
   private:
     /** Pointer to pointer to the TClonesArray in the DBStore. */

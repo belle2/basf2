@@ -142,17 +142,23 @@ const ModulePtrList& ModuleManager::getCreatedModules() const
 }
 
 
-ModulePtrList ModuleManager::getModulesByProperties(const ModulePtrList& modulePathList, unsigned int propertyFlags) const
+ModulePtrList ModuleManager::getModulesByProperties(const ModulePtrList& modulePathList, unsigned int propertyFlags)
 {
   ModulePtrList tmpModuleList;
-  ModulePtrList::const_iterator listIter;
 
-  for (listIter = modulePathList.begin(); listIter != modulePathList.end(); ++listIter) {
-    Module* module = listIter->get();
-    if (module->hasProperties(propertyFlags)) tmpModuleList.push_back(*listIter);
-  }
+  for (const ModulePtr& module : modulePathList)
+    if (module->hasProperties(propertyFlags)) tmpModuleList.push_back(module);
 
   return tmpModuleList;
+}
+
+bool ModuleManager::allModulesHaveFlag(const ModulePtrList& list, unsigned int flag)
+{
+  for (auto m : list) {
+    if (!m->hasProperties(flag))
+      return false;
+  }
+  return true;
 }
 
 

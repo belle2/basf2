@@ -111,7 +111,7 @@ void Path::addSkimPath(PathPtr skim_path, std::string ds_ID)
 
   //set c_ParallelProcessingCertified flag if _all_ modules have it set
   auto flag = Module::c_ParallelProcessingCertified;
-  if (allModulesHaveFlag(buildModulePathList(), flag)) {
+  if (ModuleManager::allModulesHaveFlag(buildModulePathList(), flag)) {
     switchStart->setPropertyFlags(flag);
     switchEnd->setPropertyFlags(flag);
   }

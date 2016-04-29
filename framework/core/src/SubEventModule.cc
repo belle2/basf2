@@ -10,6 +10,7 @@
 
 #include <framework/core/SubEventModule.h>
 
+#include <framework/core/ModuleManager.h>
 #include <framework/core/Environment.h>
 #include <framework/core/ProcessStatistics.h>
 #include <framework/pcore/ProcHandler.h>
@@ -54,7 +55,7 @@ void SubEventModule::initSubEvent(const std::string& objectName, const std::stri
   m_moduleList = m_path->buildModulePathList();
   //set c_ParallelProcessingCertified flag if _all_ modules have it set
   auto flag = Module::c_ParallelProcessingCertified;
-  if (allModulesHaveFlag(m_moduleList, flag))
+  if (ModuleManager::allModulesHaveFlag(m_moduleList, flag))
     setPropertyFlags(c_TerminateInAllProcesses | flag);
   else
     setPropertyFlags(c_TerminateInAllProcesses);

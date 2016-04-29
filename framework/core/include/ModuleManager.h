@@ -142,8 +142,11 @@ namespace Belle2 {
      * @param propertyFlags The flags for the module properties.
      * @return A list containing those modules which carry property flags matching the specified ones.
      */
-    std::list< boost::shared_ptr<Module> > getModulesByProperties(const std::list< boost::shared_ptr<Module> >& modulePathList,
-        unsigned int propertyFlags) const;
+    static std::list< boost::shared_ptr<Module> > getModulesByProperties(const std::list< boost::shared_ptr<Module> >& modulePathList,
+        unsigned int propertyFlags);
+
+    /** Returns true if and only if all modules in list have the given flag (or list is empty). */
+    static bool allModulesHaveFlag(const std::list<boost::shared_ptr<Module>>& list, unsigned int flag);
 
     /** Delete all created modules. */
     void reset();

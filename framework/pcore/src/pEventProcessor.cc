@@ -15,6 +15,7 @@
 #include <framework/pcore/DataStoreStreamer.h>
 #include <framework/pcore/RbTuple.h>
 
+#include <framework/core/ModuleManager.h>
 #include <framework/core/Environment.h>
 #include <framework/logging/LogSystem.h>
 
@@ -351,7 +352,7 @@ void pEventProcessor::analyzePath(const PathPtr& path)
     bool hasParallelFlag = module->hasProperties(Module::c_ParallelProcessingCertified);
     //entire conditional path must also be compatible
     if (hasParallelFlag and module->hasCondition()) {
-      if (!allModulesHaveFlag(module->getConditionPath()->getModules(), Module::c_ParallelProcessingCertified))
+      if (!ModuleManager::allModulesHaveFlag(module->getConditionPath()->getModules(), Module::c_ParallelProcessingCertified))
         hasParallelFlag = false;
     }
 

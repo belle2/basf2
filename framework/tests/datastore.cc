@@ -4,6 +4,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/utilities/TestHelpers.h>
+#include <framework/logging/Logger.h>
 
 #include <gtest/gtest.h>
 
@@ -22,6 +23,7 @@ namespace {
       StoreObjPtr<EventMetaData> evtPtr;
       StoreArray<EventMetaData> evtData;
       StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
+      StoreArray<EventMetaData> evtDataEmpty("Empty");
       StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Persistent);
       StoreArray<ProfileInfo> profileInfo;
 
@@ -29,6 +31,7 @@ namespace {
       evtPtr.registerInDataStore();
       evtData.registerInDataStore();
       evtDataDifferentName.registerInDataStore();
+      evtDataEmpty.registerInDataStore();
       evtDataDifferentDurability.registerInDataStore();
       profileInfo.registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
@@ -223,6 +226,13 @@ namespace {
     EXPECT_TRUE(evtData.isValid());
     EXPECT_EQ(evtData.getEntries(), 0);
   }
+  TEST_F(DataStoreTest, RawAccess)
+  {
+    StoreArray<EventMetaData> evtData;
+    StoreArray<EventMetaData> none("doesntexist");
+    EXPECT_TRUE(evtData.getPtr() != nullptr);
+    EXPECT_TRUE(none.getPtr() == nullptr);
+  }
 
   /** check TClonesArray consistency (i.e. no gaps) */
   TEST_F(DataStoreTest, ArrayConsistency)
@@ -398,6 +408,23 @@ namespace {
       i++;
     }
     EXPECT_EQ(i, evtData.getEntries());
+
+    //iteration over registered, but empty array
+    i = 0;
+    StoreArray<EventMetaData> evtDataEmpty("Empty");
+    for (const EventMetaData& emd : evtDataEmpty) {
+      (void)emd;
+      i++;
+    }
+    EXPECT_EQ(i, 0);
+    //iteration over non-existing array
+    i = 0;
+    StoreArray<EventMetaData> nonExistant("doesntexist");
+    for (const EventMetaData& emd : nonExistant) {
+      (void)emd;
+      i++;
+    }
+    EXPECT_EQ(i, 0);
   }
 
   /** test registerInDataStore(), optional() */
@@ -503,7 +530,7 @@ namespace {
   TEST_F(DataStoreTest, ArrayList)
   {
     std::vector<std::string> arrayList = StoreArray<EventMetaData>::getArrayList();
-    std::vector<std::string> exparrayList = {"EventMetaDatas", "EventMetaDatas_2"};
+    std::vector<std::string> exparrayList = {"Empty", "EventMetaDatas", "EventMetaDatas_2"};
     EXPECT_EQ(exparrayList, arrayList);
   }
 

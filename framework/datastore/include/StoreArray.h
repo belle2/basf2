@@ -321,18 +321,23 @@ namespace Belle2 {
      *           be slow, leak memory, and murder your pets.
      *           In most cases, you'll want to use StoreArray functions like operator[],
      *           getEntries() or appendNew() instead.
+     *  \returns pointer to TClonesArray, or NULL if this array was not registered in the data store
      */
-    TClonesArray* getPtr() const { ensureCreated(); return *m_storeArray;}
+    TClonesArray* getPtr() const
+    {
+      ensureCreated();
+      return (m_storeArray ? *m_storeArray : nullptr);
+    }
 
     /** Return iterator to first entry. */
-    iterator begin() { ensureAttached(); return iterator(*this->getPtr(), 0); }
+    iterator begin() { ensureAttached(); return m_storeArray ? iterator(*this->getPtr(), 0) : iterator(); }
     /** Return iterator to last entry +1. */
-    iterator end() { ensureAttached(); return iterator(*this->getPtr(), getEntries()); }
+    iterator end() { ensureAttached(); return m_storeArray ? iterator(*this->getPtr(), getEntries()) : iterator(); }
 
     /** Return const_iterator to first entry. */
-    const_iterator begin() const { ensureAttached(); return const_iterator(*this->getPtr(), 0); }
+    const_iterator begin() const { ensureAttached(); return m_storeArray ? const_iterator(*this->getPtr(), 0) : const_iterator(); }
     /** Return const_iterator to last entry +1. */
-    const_iterator end() const { ensureAttached(); return const_iterator(*this->getPtr(), getEntries()); }
+    const_iterator end() const { ensureAttached(); return m_storeArray ? const_iterator(*this->getPtr(), getEntries()) : const_iterator(); }
 
   private:
     /** Returns address of the next free position of the array.

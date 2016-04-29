@@ -437,6 +437,7 @@ std::string ConditionsService::getPayloadFileURL(std::string packageName, std::s
       CURL* curl;
       FILE* fp;
       CURLcode res;
+      char errbuf[CURL_ERROR_SIZE];
 
       curl = curl_easy_init();
       if (curl) {
@@ -446,13 +447,21 @@ std::string ConditionsService::getPayloadFileURL(std::string packageName, std::s
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, true);
         curl_easy_setopt(curl, CURLOPT_AUTOREFERER, true);
+        curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);
+        curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
         //  curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, progress_func);
         res = curl_easy_perform(curl);
         curl_easy_cleanup(curl);
         fclose(fp);
 
         if (res != CURLE_OK) {
-          B2WARNING("Could not download payload for requested " << packageName << " and " << moduleName << ": " << curl_easy_strerror(res));
+          size_t len = strlen(errbuf);
+          if (len) {
+            B2WARNING("Could not download payload for " << packageName << "/" << moduleName << " from database: " << errbuf);
+          } else {
+            B2WARNING("Could not download payload for " << packageName << "/" << moduleName << " from database: " << curl_easy_strerror(res));
+          }
+          //FIXME: delete file
           return "";
         }
       }

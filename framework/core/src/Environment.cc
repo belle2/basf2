@@ -39,6 +39,10 @@ const list<string>& Environment::getModuleSearchPaths() const
 
 unsigned int Environment::getNumberOfEvents() const
 {
+  // for EventInfoSetter, -n is already taken into account
+  if (m_mcEvents != 0)
+    return m_mcEvents;
+
   unsigned int numEventsFromInput = InputController::numEntries();
   unsigned int numEventsFromArgument = getNumberEventsOverride();
   if (numEventsFromArgument != 0

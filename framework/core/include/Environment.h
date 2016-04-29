@@ -65,7 +65,7 @@ namespace Belle2 {
     /** Returns number of events in run 1 for EventInfoSetter module, or 0 for no override. */
     unsigned int getNumberEventsOverride() const { return m_numberEventsOverride; }
 
-    /** Return the number of events, from either input or -n command line override (if less). */
+    /** Return the number of events, from either input or EventInfoSetter, or -n command line override (if less). */
     unsigned int getNumberOfEvents() const;
 
     /** Accessor for number of generated events (this is only updated by EventInfoSetter). */

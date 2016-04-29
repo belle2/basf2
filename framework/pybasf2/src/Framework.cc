@@ -182,10 +182,8 @@ boost::python::list Framework::getModuleSearchPathsPython() const
 {
   boost::python::list returnList;
 
-  for (std::list<string>::const_iterator listIter = ModuleManager::Instance().getModuleSearchPaths().begin();
-       listIter != ModuleManager::Instance().getModuleSearchPaths().end(); ++listIter) {
-    returnList.append(boost::python::object(*listIter));
-  }
+  for (string path : ModuleManager::Instance().getModuleSearchPaths())
+    returnList.append(boost::python::object(path));
   return returnList;
 }
 
@@ -193,11 +191,8 @@ boost::python::list Framework::getModuleSearchPathsPython() const
 boost::python::dict Framework::getAvailableModulesPython() const
 {
   boost::python::dict returnDict;
-
-  for (map<string, string>::const_iterator mapIter = ModuleManager::Instance().getAvailableModules().begin();
-       mapIter != ModuleManager::Instance().getAvailableModules().end(); ++mapIter) {
-    returnDict[boost::python::object(mapIter->first)] = boost::python::object(mapIter->second);
-  }
+  for (auto modulePair : ModuleManager::Instance().getAvailableModules())
+    returnDict[boost::python::object(modulePair.first)] = boost::python::object(modulePair.second);
   return returnDict;
 }
 
@@ -205,11 +200,9 @@ boost::python::dict Framework::getAvailableModulesPython() const
 boost::python::list Framework::getRegisteredModulesPython() const
 {
   boost::python::list returnList;
-  std::list<ModulePtr> avModList = ModuleManager::Instance().getCreatedModules();
 
-  for (std::list<ModulePtr>::iterator listIter = avModList.begin(); listIter != avModList.end(); ++listIter) {
-    returnList.append(boost::python::object(ModulePtr(*listIter)));
-  }
+  for (ModulePtr mod : ModuleManager::Instance().getCreatedModules())
+    returnList.append(boost::python::object(mod));
   return returnList;
 }
 

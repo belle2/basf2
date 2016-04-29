@@ -91,12 +91,8 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
   int nameptr = 0;
 
   // Loop over streamed objects
-  for (vector<TMessage*>::iterator it = m_buf.begin(); it != m_buf.end(); ++it) {
-    // Get object
-    TMessage* msg = *it;
-    // Get buffer
+  for (TMessage* msg : m_buf) {
     char* buf = msg->Buffer();
-    // Get buffer length
     //    int len = msg->BufferSize();
     UInt_t len = msg->Length();
     if (msg->CompBuffer()) {
@@ -123,7 +119,6 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
     delete msg; // test
   }
 
-  // Create EvtMessage
   EvtMessage* evtmsg = new EvtMessage(msgbuf, totlen, rectype);
 
   //  printf ( "encode : msgbuf = %8.8x, %8.8x, %8.8x, %8.8x\n",

@@ -254,7 +254,7 @@ if args.unpacking:
         main.add_module('PXDUnpacker',
                         RemapFlag=True,
                         RemapLUT_IF_OB=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'),
-                        RemapLUT_IB_OF=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'))
+                        RemapLUT_IB_OF=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OF.csv'))
 
     main.add_module(
         'SVDUnpacker',

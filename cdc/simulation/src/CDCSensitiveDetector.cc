@@ -50,8 +50,10 @@ namespace Belle2 {
   using namespace CDC;
 
   CDCSensitiveDetector::CDCSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
-    SensitiveDetectorBase(name, Const::CDC), m_thresholdEnergyDeposit(thresholdEnergyDeposit),
-    m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0), m_ptrToCDCGeo()
+    SensitiveDetectorBase(name, Const::CDC),
+    m_cdcgp(CDCGeometryPar::Instance()),
+    m_thresholdEnergyDeposit(thresholdEnergyDeposit),
+    m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0)
   {
     StoreArray<MCParticle> mcParticles;
     StoreArray<CDCSimHit> cdcSimHits;
@@ -180,21 +182,18 @@ namespace Belle2 {
 
     if (charge == 0.) return false;
 
-
     // Calculate cell ID
-    CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
-
     TVector3 tposIn(posIn.x() / CLHEP::cm, posIn.y() / CLHEP::cm, posIn.z() / CLHEP::cm);
     TVector3 tposOut(posOut.x() / CLHEP::cm, posOut.y() / CLHEP::cm, posOut.z() / CLHEP::cm);
-    const unsigned idIn = cdcg.cellId(layerId, tposIn);
-    const unsigned idOut = cdcg.cellId(layerId, tposOut);
+    const unsigned idIn = m_cdcgp.cellId(layerId, tposIn);
+    const unsigned idOut = m_cdcgp.cellId(layerId, tposOut);
 #if defined(CDC_DEBUG)
     std::cout << "edep= " << edep << std::endl;
     std::cout << "idIn,idOut= " << idIn << " " << idOut << std::endl;
 #endif
 
     // Calculate drift length
-    std::vector<int> wires = WireId_in_hit_order(idIn, idOut, cdcg.nWiresInLayer(layerId));
+    std::vector<int> wires = WireId_in_hit_order(idIn, idOut, m_cdcgp.nWiresInLayer(layerId));
     G4double sint(0.);
     const G4double s_in_layer = stepLength / CLHEP::cm;
     G4double xint[6] = {0};
@@ -244,8 +243,8 @@ namespace Belle2 {
       HepPoint3D pOnTrack;
 
       // Calculate forward/backward position of current wire
-      const TVector3 tfw3v = cdcg.wireForwardPosition(layerId, wires[i]);
-      const TVector3 tbw3v = cdcg.wireBackwardPosition(layerId, wires[i]);
+      const TVector3 tfw3v = m_cdcgp.wireForwardPosition(layerId, wires[i]);
+      const TVector3 tbw3v = m_cdcgp.wireBackwardPosition(layerId, wires[i]);
 
       const HepPoint3D fwd(tfw3v.x(), tfw3v.y(), tfw3v.z());
       const HepPoint3D bck(tbw3v.x(), tbw3v.y(), tbw3v.z());
@@ -315,7 +314,7 @@ namespace Belle2 {
         if (ntry <= ntryMax) {
           if (m_wireSag) {
             G4double ywb_sag, ywf_sag;
-            cdcg.getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], q2[2], ywb_sag, ywf_sag);
+            m_cdcgp.getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], q2[2], ywb_sag, ywf_sag);
             HELWIR(xwb, ywb_sag, zwb, xwf, ywf_sag, zwf,
                    xp,   yp,   zp,   px,   py,   pz,
                    B_kG, charge, ntryMax, dist, q2, q1, q3, ntry);
@@ -345,7 +344,7 @@ namespace Belle2 {
                                      hitPosition, wirePosition);
           if (m_wireSag) {
             G4double ywb_sag, ywf_sag;
-            cdcg.getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], wirePosition.z(), ywb_sag, ywf_sag);
+            m_cdcgp.getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], wirePosition.z(), ywb_sag, ywf_sag);
             bwp.setY(ywb_sag);
             fwp.setY(ywf_sag);
             distance = ClosestApproach(bwp, fwp, posIn / CLHEP::cm, posOut / CLHEP::cm,
@@ -365,7 +364,7 @@ namespace Belle2 {
                                    hitPosition, wirePosition);
         if (m_wireSag) {
           G4double ywb_sag, ywf_sag;
-          cdcg.getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], wirePosition.z(), ywb_sag, ywf_sag);
+          m_cdcgp.getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], wirePosition.z(), ywb_sag, ywf_sag);
           bwp.setY(ywb_sag);
           fwp.setY(ywf_sag);
           distance = ClosestApproach(bwp, fwp, posIn / CLHEP::cm, posOut / CLHEP::cm,
@@ -402,8 +401,8 @@ namespace Belle2 {
       const TVector3 tPosW(posW.x(), posW.y(), posW.z());
       const TVector3 tPosTrack(posTrack.x(), posTrack.y(), posTrack.z());
       const TVector3 tMom(mom.x(), mom.y(), mom.z());
-      G4int lr = cdcg.getOldLeftRight(tPosW, tPosTrack, tMom);
-      G4int newLrRaw = cdcg.getNewLeftRightRaw(tPosW, tPosTrack, tMom);
+      G4int lr = m_cdcgp.getOldLeftRight(tPosW, tPosTrack, tMom);
+      G4int newLrRaw = m_cdcgp.getNewLeftRightRaw(tPosW, tPosTrack, tMom);
       //      if(abs(pid) == 11) {
       //  std::cout <<"pid,lr,newLrRaw 4electron= " << pid <<" "<< lr <<" "<< newLrRaw << std::endl;
       //      }
@@ -570,9 +569,6 @@ namespace Belle2 {
     //    std::cout <<"#mcParticles= " << mcParticles.getEntries() << std::endl;
     //    std::cout <<"#mcPartToSimHits= " << mcPartToSimHits.getEntries() << std::endl;
 
-    //set pointer to cdcgeometrypar
-    m_ptrToCDCGeo = &(CDCGeometryPar::Instance());
-
     //reset some of negative weights to positive; this is needed for the hits
     //created by secondary particles whose track-lengths get larger than the
     //threshold (set by the user) during G4 swimming (i.e. the weights are
@@ -702,7 +698,7 @@ namespace Belle2 {
         pHit = pIt->second;
         pWireId = pHit->getWireID();
         //      neigh = cdcg.areNeighbors(sWireId, pWireId);
-        neighb = m_ptrToCDCGeo->areNeighbors(sClayer, sSuperLayer, sLayer, sWire, pWireId);
+        neighb = m_cdcgp.areNeighbors(sClayer, sSuperLayer, sLayer, sWire, pWireId);
         if (neighb != 0 || pWireId == sWireId) {
           distance2 = (pHit->getPosTrack() - sPos).Mag2();
           if (distance2 < minDistance2) {
@@ -714,9 +710,9 @@ namespace Belle2 {
       }
 
       //reassign LR using the momentum-direction of the primary particle found
-      unsigned short lR = m_ptrToCDCGeo->getNewLeftRightRaw(sHit->getPosWire(),
-                                                            sHit->getPosTrack(),
-                                                            fHit->getMomentum());
+      unsigned short lR = m_cdcgp.getNewLeftRightRaw(sHit->getPosWire(),
+                                                     sHit->getPosTrack(),
+                                                     fHit->getMomentum());
       //      unsigned short bflr = sHit->getLeftRightPassage();
       sHit->setLeftRightPassage(lR);
       //      std::cout <<"neighb, bfaf lrs, minDistance= " << bestNeighb <<" "<<" "<< bflr <<" "<< sHit->getLeftRightPassage() <<" "<< std::scientific << sqrt(minDistance2) << std::endl;
@@ -897,8 +893,7 @@ namespace Belle2 {
 
     //main
     G4int irTry = 0;
-    CDCGeometryPar& p_cdc = CDCGeometryPar::Instance();
-    G4double div   = p_cdc.nWiresInLayer(layerId);
+    G4double div   = m_cdcgp.nWiresInLayer(layerId);
 
     //Check if s1, s2, ic1 and ic2 are ok
     if (s1 >= s2) {
@@ -913,37 +908,37 @@ namespace Belle2 {
     }
 
     // Calculate forward/backward position of current wire
-    const TVector3 fw0 = p_cdc.wireForwardPosition(layerId, 0);
-    const TVector3 bw0 = p_cdc.wireBackwardPosition(layerId, 0);
+    const TVector3 fw0 = m_cdcgp.wireForwardPosition(layerId, 0);
+    const TVector3 bw0 = m_cdcgp.wireBackwardPosition(layerId, 0);
 
     G4double slant;
-    if (0 == p_cdc.nShifts(layerId)) {
+    if (0 == m_cdcgp.nShifts(layerId)) {
       slant = 0.0;
     } else {
-      double delfi = double(p_cdc.nShifts(layerId)) * CLHEP::pi / p_cdc.nWiresInLayer(layerId);
+      double delfi = double(m_cdcgp.nShifts(layerId)) * CLHEP::pi / m_cdcgp.nWiresInLayer(layerId);
       double sinhdel = std::sin(delfi / 2.0);
       double z1 = fw0.z();
       double z2 = bw0.z();
-      slant = std::atan2(2.0 * (p_cdc.senseWireR(layerId)) * sinhdel, z1 - z2);
+      slant = std::atan2(2.0 * (m_cdcgp.senseWireR(layerId)) * sinhdel, z1 - z2);
       //      std::cout << "slant  = " << slant   << std::endl;
 #if defined(CDC_DEBUG)
-      std::cout << "nwires = " << p_cdc.nWiresInLayer(layerId) << std::endl;
-      std::cout << "nshift = " << p_cdc.nShifts(layerId) << std::endl;
+      std::cout << "nwires = " << m_cdcgp.nWiresInLayer(layerId) << std::endl;
+      std::cout << "nshift = " << m_cdcgp.nShifts(layerId) << std::endl;
       std::cout << "delfi  = " << delfi   << std::endl;
 #endif
     }
 #if defined(CDC_DEBUG)
     std::cout << "layerId,slant= " << layerId << " " << slant << std::endl;
-    std::cout << "R      = " << p_cdc.senseWireR(layerId) << std::endl;
+    std::cout << "R      = " << m_cdcgp.senseWireR(layerId) << std::endl;
     std::cout << "z1,z2  = " << fw0.z() << " " << bw0.z() << std::endl;
-    std::cout << "nshifts= " << p_cdc.nShifts(layerId) << std::endl;
+    std::cout << "nshifts= " << m_cdcgp.nShifts(layerId) << std::endl;
 #endif
-    G4double xwb   = (p_cdc.wireBackwardPosition(layerId, ic1 - 1)).x();
-    G4double ywb   = (p_cdc.wireBackwardPosition(layerId, ic1 - 1)).y();
-    G4double zwb   = (p_cdc.wireBackwardPosition(layerId, ic1 - 1)).z();
-    G4double xwf   = (p_cdc.wireForwardPosition(layerId, ic1 - 1)).x();
-    G4double ywf   = (p_cdc.wireForwardPosition(layerId, ic1 - 1)).y();
-    G4double zwf   = (p_cdc.wireForwardPosition(layerId, ic1 - 1)).z();
+    G4double xwb   = (m_cdcgp.wireBackwardPosition(layerId, ic1 - 1)).x();
+    G4double ywb   = (m_cdcgp.wireBackwardPosition(layerId, ic1 - 1)).y();
+    G4double zwb   = (m_cdcgp.wireBackwardPosition(layerId, ic1 - 1)).z();
+    G4double xwf   = (m_cdcgp.wireForwardPosition(layerId, ic1 - 1)).x();
+    G4double ywf   = (m_cdcgp.wireForwardPosition(layerId, ic1 - 1)).y();
+    G4double zwf   = (m_cdcgp.wireForwardPosition(layerId, ic1 - 1)).z();
 
     /*
     G4double pathl = sqrt((vexit[0] - venter[0]) * (vexit[0] - venter[0])
@@ -1965,8 +1960,7 @@ line100:
     TVector3 thitPosition(0., 0., 0.);
     TVector3 twirePosition(0., 0., 0.);
 
-    CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
-    G4double distance = cdcgp.ClosestApproach(tbwp, tfwp, tposIn, tposOut, thitPosition, twirePosition);
+    G4double distance = m_cdcgp.ClosestApproach(tbwp, tfwp, tposIn, tposOut, thitPosition, twirePosition);
 
     hitPosition.setX(thitPosition.x());
     hitPosition.setY(thitPosition.y());

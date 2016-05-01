@@ -315,6 +315,8 @@ namespace Belle2 {
 
     private:
 
+      CDCGeometryPar& m_cdcgp; /**< Reference to CDCGeometryPar object. */
+
       /**
        * Threshold energy deposit to be stored.
        */
@@ -333,8 +335,6 @@ namespace Belle2 {
 
       int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC array.*/
       int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC EB array.*/
-
-      CDCGeometryPar* m_ptrToCDCGeo; /**< Pointer to CDCGeometry object. */
 
       std::multimap<unsigned short, CDCSimHit*>
       m_hitWithPosWeight; /**< Map containing hits with positive weight. Map may be replaced by vector, which may make the job speed faster... Try later. */

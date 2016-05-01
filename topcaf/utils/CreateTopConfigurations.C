@@ -77,6 +77,9 @@ void CreateTopConfigurations(void){
   TopElectronicConstructionName ModuleC16Construction("ModuleC16");
   TopModuleElectronicConstructions.push_back(ModuleC16Construction);
 
+  TopElectronicConstructionName ModuleC17Construction("ModuleC17");
+  TopModuleElectronicConstructions.push_back(ModuleC17Construction);
+
 
   TopElectronicRefMap ElectronicModuletoScrod;
   TopElectronicRetMap ScrodtoElectronicModule;
@@ -105,12 +108,12 @@ void CreateTopConfigurations(void){
     //ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 16;
     //ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 13;
     //}
-    if ( (*i) == ModuleC01Construction ) {
-	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 41;
-      	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 103;
-      	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 74;
-      	ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 88;
-    }
+    //if ( (*i) == ModuleC01Construction ) {
+    //ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 41;
+    //ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 103;
+    //ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 74;
+    //ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 88;
+    //}
     if ( (*i) == ModuleC02Construction ) {
 	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 32;
       	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 29;
@@ -217,6 +220,12 @@ void CreateTopConfigurations(void){
       	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 47;
       	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 52;
       	ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 78;
+    }
+    if ( (*i) == ModuleC17Construction ) {
+	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 74;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 88;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 41;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 103;
     }
 
     

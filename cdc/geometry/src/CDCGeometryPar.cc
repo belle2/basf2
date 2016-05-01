@@ -37,16 +37,29 @@ CDCGeometryPar& CDCGeometryPar::Instance()
 CDCGeometryPar::CDCGeometryPar()
 {
 #if defined(CDC_T0_FROM_DB)
-  m_t0FromDB.addCallback(this, &CDCGeometryPar::setT0);
+  if (m_t0FromDB.isValid()) {
+    m_t0FromDB.addCallback(this, &CDCGeometryPar::setT0);
+  }
 #endif
 #if defined(CDC_BADWIRE_FROM_DB)
-  m_badWireFromDB.addCallback(this, &CDCGeometryPar::setBadWire);
+  if (m_badwireFromDB.isValid()) {
+    m_badWireFromDB.addCallback(this, &CDCGeometryPar::setBadWire);
+  }
 #endif
 #if defined(CDC_PROPSPEED_FROM_DB)
-  m_propSpeedFromDB.addCallback(this, &CDCGeometryPar::setPropSpeed);
+  if (m_propSpeedFromDB.isValid()) {
+    m_propSpeedFromDB.addCallback(this, &CDCGeometryPar::setPropSpeed);
+  }
 #endif
 #if defined(CDC_TIMEWALK_FROM_DB)
-  m_timeWalkFromDB.addCallback(this, &CDCGeometryPar::setTimeWalk);
+  if (m_timeWalkFromDB.isValid()) {
+    m_timeWalkFromDB.addCallback(this, &CDCGeometryPar::setTimeWalk);
+  }
+#endif
+#if defined(CDC_CHMAP_FROM_DB)
+  if (m_chMapFromDB.isValid()) {
+    m_chMapFromDB.addCallback(this, &CDCGeometryPar::setChMap);
+  }
 #endif
   clear();
   read();
@@ -296,38 +309,33 @@ void CDCGeometryPar::read()
     readSigma(gbxParams);
 
 #if defined(CDC_PROPSPEED_FROM_DB)
-    //Set prop-speed (from DB)
-    setPropSpeed();
+    setPropSpeed();  //Set prop-speed (from DB)
 #else
-    //Read propagation speed
-    readPropSpeed(gbxParams);
+    readPropSpeed(gbxParams);  //Read propagation speed
 #endif
 
 #if defined(CDC_T0_FROM_DB)
-    //Set t0 (from DB)
-    setT0();
+    setT0();  //Set t0 (from DB)
 #else
-    //Read t0 (from file)
-    readT0(gbxParams);
+    readT0(gbxParams);  //Read t0 (from file)
 #endif
 
 #if defined(CDC_BADWIRE_FROM_DB)
-    //Set bad-wire (from DB)
-    setBadWire();
+    setBadWire();  //Set bad-wire (from DB)
 #else
-    //Read bad-wire (from file)
-    readBadWire(gbxParams);
+    readBadWire(gbxParams);  //Read bad-wire (from file)
 #endif
 
-    //Read time-walk coefficient
-    readChMap(gbxParams);
+#if defined(CDC_CHMAP_FROM_DB)
+    setChMap();  //Set ch-map (from DB)
+#else
+    readChMap(gbxParams);  //Read ch-map
+#endif
 
 #if defined(CDC_TIMEWALK_FROM_DB)
-    //Set time-walk coeffs. (from DB)
-    setTW();
+    setTW();  //Set time-walk coeffs. (from DB)
 #else
-    //Read time-walk coeffs. (from file)
-    readTW(gbxParams);
+    readTW(gbxParams);  //Read time-walk coeffs. (from file)
 #endif
   }
 
@@ -976,6 +984,23 @@ void CDCGeometryPar::setTW()
 {
   for (unsigned short iBd = 0; iBd < m_timeWalkFromDB->getEntries(); ++iBd) {
     m_timeWalkCoef[iBd] = m_timeWalkFromDB->getTimeWalk(iBd);
+  }
+}
+#endif
+
+
+#if defined(CDC_CHMAP_FROM_DB)
+// Set ch-map (from DB)
+void CDCGeometryPar::setChMap()
+{
+  for (const auto& cm : m_chMapFromDB) {
+    const unsigned short isl = cm.getISuperLayer();
+    if (isl >= nSuperLayers) continue;
+    const int il  = cm.getILayer();
+    const int iw  = cm.getIWire();
+    const int iBd = cm.getBoardID();
+    const WireID wID(isl, il, iw);
+    m_wireToBoard.insert(pair<WireID, unsigned short>(wID, iBd));
   }
 }
 #endif

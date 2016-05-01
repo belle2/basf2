@@ -21,6 +21,7 @@
 #include <cdc/dbobjects/CDCBadWires.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
+#include <cdc/dbobjects/CDCChannelMap.h>
 
 #include <vector>
 #include <string>
@@ -138,6 +139,11 @@ namespace Belle2 {
        * @param GearDir Gear Dir.
        */
       void readChMap(const GearDir);
+
+      /**
+       * Set channel map (from DB)
+       */
+      void setChMap();
 
       /**
        * Read time-walk parameter.
@@ -872,6 +878,9 @@ namespace Belle2 {
 #endif
 #if defined(CDC_TIMEWALK_FROM_DB)
       DBObjPtr<CDCTimeWalks> m_timeWalkFromDB; /*!< time-walk coeffs. retrieved from DB. */
+#endif
+#if defined(CDC_CHMAP_FROM_DB)
+      DBArray<CDCChannelMap> m_chMapFromDB; /*!< channel map retrieved from DB. */
 #endif
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */

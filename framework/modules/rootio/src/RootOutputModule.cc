@@ -251,7 +251,7 @@ void RootOutputModule::fillFileMetaData()
   if (!release) release = "unknown";
   fileMetaDataPtr->setCreationData(date, site, user, release);
   fileMetaDataPtr->setSteering(Environment::Instance().getSteering());
-  fileMetaDataPtr->setMcEvents(Environment::Instance().mcEvents());
+  fileMetaDataPtr->setMcEvents(Environment::Instance().getNumberOfMCEvents());
 
   //register the file in the catalog
   if (m_updateFileCatalog) {

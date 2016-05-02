@@ -120,7 +120,7 @@ void EventInfoSetterModule::initialize()
   }
   B2DEBUG(100, "EventInfoSetter: will process " << totalevents << " events in total.");
 
-  Environment::Instance().mcEvents() = totalevents;
+  Environment::Instance().setNumberOfMCEvents(totalevents);
 }
 
 

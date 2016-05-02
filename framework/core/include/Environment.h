@@ -68,8 +68,11 @@ namespace Belle2 {
     /** Return the number of events, from either input or EventInfoSetter, or -n command line override (if less). */
     unsigned int getNumberOfEvents() const;
 
-    /** Accessor for number of generated events (this is only updated by EventInfoSetter). */
-    unsigned int& mcEvents() { return m_mcEvents; }
+    /** Number of generated events (from EventInfoSetter). */
+    unsigned int getNumberOfMCEvents() const { return m_mcEvents; }
+
+    /** Set number of generated events (for EventInfoSetter). */
+    void setNumberOfMCEvents(unsigned int n) { m_mcEvents = n; }
 
     /** Override input file names for modules */
     void setInputFilesOverride(const std::vector<std::string>& names) { m_inputFilesOverride = names; }
@@ -205,12 +208,12 @@ namespace Belle2 {
     /**
      * Disable/Hide the copy constructor.
      */
-    Environment(const Environment&);
+    Environment(const Environment&) = delete;
 
     /**
      * Disable/Hide the copy assignment operator.
      */
-    Environment& operator=(const Environment&);
+    Environment& operator=(const Environment&) = delete;
 
     /**
      * The Environment destructor.

@@ -573,6 +573,12 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
         std::vector<float> helixError(15);
         convertHelix(trk_fit, HepPoint3D(0., 0., 0.), helixParam, helixError);
 
+        // Checking for invalid helix curvature with parameter 2 equal to 0:
+        if (helixParam[2] == 0) {
+          B2WARNING("Helix parameter for curvature == 0. Skipping Track! The parameter is: " << helixParam[2] << "...");
+          continue;
+        }
+
         auto trackFitP = trackFitResults.appendNew(helixParam, helixError, pTypeP, pValue, -1, -1);
 
         trackFitPIndex = trackFitP->getArrayIndex();
@@ -621,6 +627,12 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
         std::vector<float> helixParam(5);
         std::vector<float> helixError(15);
         convertHelix(trk_fit, HepPoint3D(0., 0., 0.), helixParam, helixError);
+
+        // Checking for invalid helix curvature with parameter 2 equal to 0:
+        if (helixParam[2] == 0) {
+          B2WARNING("Helix parameter for curvature == 0. Skipping Track! The parameter is: " << helixParam[2] << "...");
+          continue;
+        }
 
         auto trackFitM = trackFitResults.appendNew(helixParam, helixError, pTypeM, pValue, -1, -1);
 

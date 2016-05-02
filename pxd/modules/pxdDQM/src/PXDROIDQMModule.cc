@@ -67,7 +67,7 @@ void PXDROIDQMModule::defineHisto()
 void PXDROIDQMModule::initialize()
 {
   REG_HISTOGRAM
-  m_storeROIs.required(m_PXDRawROIsName);
+  m_storeROIs.isRequired(m_PXDRawROIsName);
 }
 
 void PXDROIDQMModule::beginRun()

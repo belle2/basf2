@@ -12,14 +12,6 @@
 
 #include <framework/core/HistoModule.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-
-#include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDFrame.h>
-#include <pxd/dataobjects/PXDCluster.h>
-
 #include <vector>
 #include <set>
 #include <boost/format.hpp>
@@ -88,10 +80,7 @@ void PXDDQMCorrModule::initialize()
   REG_HISTOGRAM
 
   //Register collections
-  StoreArray<PXDCluster> storeClusters(m_storeClustersName);
-
-  //Store names to speed up creation later
-  m_storeClustersName = storeClusters.getName();
+  m_storeClusters.isRequired(m_storeClustersName);
 }
 
 void PXDDQMCorrModule::beginRun()
@@ -106,17 +95,16 @@ void PXDDQMCorrModule::beginRun()
 
 void PXDDQMCorrModule::event()
 {
-  const StoreArray<PXDCluster> storeClusters(m_storeClustersName);
 
   // If there are no clusters, leave
-  if (!storeClusters || !storeClusters.getEntries()) return;
+  if (!m_storeClusters || !m_storeClusters.getEntries()) return;
 
-  for (const PXDCluster& cluster1 : storeClusters) {
+  for (const PXDCluster& cluster1 : m_storeClusters) {
     int iPlane1 = cluster1.getSensorID().getLayerNumber();
     if ((iPlane1 < c_firstPXDPlane) || (iPlane1 > c_lastPXDPlane)) continue;
     int index1 = planeToIndex(iPlane1);
     if (index1 == 0) {
-      for (const PXDCluster& cluster2 : storeClusters) {
+      for (const PXDCluster& cluster2 : m_storeClusters) {
         int iPlane2 = cluster2.getSensorID().getLayerNumber();
         if ((iPlane2 < c_firstPXDPlane) || (iPlane2 > c_lastPXDPlane)) continue;
         int index2 = planeToIndex(iPlane2);

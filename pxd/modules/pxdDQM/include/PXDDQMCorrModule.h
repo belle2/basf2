@@ -20,6 +20,12 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
+#include <pxd/dataobjects/PXDCluster.h>
+
 #include <vector>
 #include "TH1F.h"
 #include "TH2F.h"
@@ -81,6 +87,9 @@ namespace Belle2 {
 
     std::string m_storeClustersName;      /**< PXDClusters StoreArray name */
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
+
+    /** Storearray for clusters   */
+    StoreArray<PXDCluster> m_storeClusters;
 
     // +1 in dimensions to protect against noisy VXDID values.
     TH2F* m_CorrelationU;          /**< Correlation Sensor 1 vs 2 */

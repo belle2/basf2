@@ -104,10 +104,10 @@ void PXDRawDQMModule::defineHisto()
 void PXDRawDQMModule::initialize()
 {
   REG_HISTOGRAM
-  m_storeRawPxdrarray.optional(m_storeRawPxdrarrayName);
-  m_storeRawHits.required(m_storeRawHitsName);
-  m_storeRawPedestals.required(m_storeRawPedestalsName);
-  m_storeRawAdcs.required(m_storeRawAdcsName);
+  m_storeRawPxdrarray.isOptional(m_storeRawPxdrarrayName);
+  m_storeRawHits.isRequired(m_storeRawHitsName);
+  m_storeRawPedestals.isRequired(m_storeRawPedestalsName);
+  m_storeRawAdcs.isRequired(m_storeRawAdcsName);
 }
 
 void PXDRawDQMModule::beginRun()

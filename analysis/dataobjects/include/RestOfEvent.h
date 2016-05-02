@@ -12,13 +12,13 @@
 #define RESTOFEVENT_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <framework/gearbox/Const.h>
-#include <TLorentzVector.h>
 
 #include <vector>
 #include <string>
 #include <set>
 #include <map>
+
+class TLorentzVector;
 
 namespace Belle2 {
 

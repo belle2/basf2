@@ -10,14 +10,6 @@
 
 #include <analysis/dataobjects/FlavorTaggerInfoMap.h>
 
-#include <framework/datastore/StoreArray.h>
-
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/MCParticle.h>
-
-#include <framework/logging/Logger.h>
-#include <iostream>
-
 using namespace Belle2;
 
 

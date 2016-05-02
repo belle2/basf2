@@ -20,6 +20,7 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <framework/logging/Logger.h>
+#include <TLorentzVector.h>
 #include <iostream>
 
 using namespace Belle2;

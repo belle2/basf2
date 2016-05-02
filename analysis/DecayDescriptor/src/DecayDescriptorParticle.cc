@@ -1,6 +1,5 @@
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <analysis/DecayDescriptor/DecayStringParticle.h>
-#include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/replace.hpp>

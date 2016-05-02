@@ -12,7 +12,6 @@
 #define FANNMLP_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <analysis/dataobjects/Particle.h>
 
 #include <vector>
 

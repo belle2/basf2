@@ -648,7 +648,7 @@ PXDUnpackerDHHModule::PXDUnpackerDHHModule() :
 
 void PXDUnpackerDHHModule::initialize()
 {
-  StoreArray<RawDHH>::required(m_RawDHHsName);
+  m_storeRawDHH.isRequired(m_RawDHHsName);
   //Register output collections
   m_storeRawHits.registerInDataStore(m_PXDRawHitsName);
   m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName);
@@ -701,10 +701,9 @@ void PXDUnpackerDHHModule::terminate()
 
 void PXDUnpackerDHHModule::event()
 {
-  StoreArray<RawDHH> storeRaws(m_RawDHHsName);
   StoreObjPtr<EventMetaData> evtPtr;/// what will happen if it does not exist???
 
-  int nRaws = storeRaws.getEntries();
+  int nRaws = m_storeRawDHH.getEntries();
   if (verbose) {
     B2INFO("PXD DHH Unpacker --> RawDHH Objects in event: " << nRaws);
   };
@@ -719,7 +718,7 @@ void PXDUnpackerDHHModule::event()
 
 
   int nsr = 0;// number of packets
-  for (auto& it : storeRaws) {
+  for (auto& it : m_storeRawDHH) {
     if (verbose) {
       B2INFO("PXD DHH Unpacker --> Unpack Objects: ");
     };

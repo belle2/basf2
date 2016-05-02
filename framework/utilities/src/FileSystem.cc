@@ -14,11 +14,12 @@
 
 #include <boost/filesystem.hpp>
 
-//dlopen etc.
-#include <dlfcn.h>
 #include <chrono>
 #include <random>
-#include <sys/file.h>
+
+//dlopen etc.
+#include <dlfcn.h>
+#include <fcntl.h>
 
 using namespace std;
 using namespace Belle2;
@@ -86,7 +87,8 @@ std::string FileSystem::findFile(const string& path)
 }
 
 
-FileSystem::Lock::Lock(std::string fileName, bool readonly)
+FileSystem::Lock::Lock(std::string fileName, bool readonly) :
+  m_readOnly(readonly)
 {
   const int mode = readonly ? O_RDONLY : O_RDWR;
   m_file = open(fileName.c_str(), mode | O_CREAT, 0640);
@@ -105,8 +107,21 @@ bool FileSystem::Lock::lock(int timeout)
   std::default_random_engine random;
   std::uniform_int_distribution<int> uniform(1, 100);
 
+  /* Note:
+   * Previously, this used flock(), which doesn't work with GPFS.
+   * fcntl() does, and also should be more likely to work on NFS.
+   * If you use the 'nolock' mount option to NFS, you are on your own.
+   */
+  struct flock fl;
+  memset(&fl, '\0', sizeof(fl));
+  fl.l_type = m_readOnly ? F_RDLCK : F_WRLCK;
+  //lock entire file
+  fl.l_whence = SEEK_SET;
+  fl.l_start = 0;
+  fl.l_len = 0;
+
   while (std::chrono::steady_clock::now() < maxtime) {
-    int lock = flock(m_file, LOCK_EX | LOCK_NB);
+    int lock = fcntl(m_file, F_SETLK, &fl);
     if (lock == 0) return true;
     auto next = std::chrono::steady_clock::now() + std::chrono::milliseconds(uniform(random));
     while (std::chrono::steady_clock::now() < next);

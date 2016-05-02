@@ -51,7 +51,8 @@ namespace Belle2 {
 
       /**
        * Construct a Lock object for the given file
-       * @param fileName  Name of the file to be locked
+       * @param fileName  Name of the file to be locked (if it does not exist, it will be created)
+       * @param readonly  create a read-only lock (multiple processes can hold one)
        */
       explicit Lock(std::string fileName, bool readonly = false);
 
@@ -62,13 +63,14 @@ namespace Belle2 {
 
       /**
        * Try to lock the file
-       * @param timeout  Time in seconds until it is tried to get a lock
-       * @return  True if the lock could be obtained
+       * @param timeout  Time in seconds to wait for a lock
+       * @return  True if the lock could be obtained, false if file could not be opened or timeout is reached
        */
       bool lock(int timeout = 20);
 
     private:
       int m_file;  /**< File descriptor of file to be locked */
+      bool m_readOnly; /**< if this is a read-only lock (multiple processes can hold one). */
     };
 
     /** Helper file to create a temporary file and ensure deletion if object goes out of scope */

@@ -91,7 +91,7 @@ void DoubleCalPulseV5Module::event()
 
     //We have looped over hits and found the negative ones of interest
     //Now loop over these and: pick the latest one and ensure there is another hit 50-90 tdc bins before it
-    float max_tdc(0); int max_tdc_idx(-1);
+    float max_tdc(-1); int max_tdc_idx(-1); int cal_1_idx(-1);
     if (h_tdc.size() > 1) {
       for (unsigned int i = 0; i != h_tdc.size(); i++) {
         if (h_tdc[i] > max_tdc) {
@@ -99,32 +99,34 @@ void DoubleCalPulseV5Module::event()
           max_tdc_idx = i;
         }
       }
-      if (max_tdc_idx > -1) { //pointless error catching
-        for (unsigned int i = 0; i != h_tdc.size(); i++) {
-          if ((h_tdc[max_tdc_idx] - h_tdc[i]) > 50 && (h_tdc[max_tdc_idx] - h_tdc[i]) < 90) {
-            //Mark the last cal pulse
-            topcaf_channel_id_t hardwareID = digit_ptr[h_idx[max_tdc_idx]]->GetChannelID();
-            topcaf_channel_id_t asicKey = (hardwareID / 1000000);
-            asicKey *= 1000000;
-            int asic = digit_ptr[h_idx[max_tdc_idx]]->GetASIC();
-            asicKey += asic * 10000;
-            asic_ref_time[asicKey] = digit_ptr[h_idx[max_tdc_idx]]->GetTDCBin();
-            digit_ptr[h_idx[max_tdc_idx]]->SetFlag(10);
+      for (unsigned int i = 0; i != h_tdc.size(); i++) {
+        if ((h_tdc[max_tdc_idx] - h_tdc[i]) > 50 && (h_tdc[max_tdc_idx] - h_tdc[i]) < 90) {
+          //Mark the last cal pulse
+          topcaf_channel_id_t hardwareID = digit_ptr[h_idx[max_tdc_idx]]->GetChannelID();
+          topcaf_channel_id_t asicKey = (hardwareID / 1000000);
+          asicKey *= 1000000;
+          int asic = digit_ptr[h_idx[max_tdc_idx]]->GetASIC();
+          asicKey += asic * 10000;
+          asic_ref_time[asicKey] = digit_ptr[h_idx[max_tdc_idx]]->GetTDCBin();
+          digit_ptr[h_idx[max_tdc_idx]]->SetFlag(10);
 
-            //Mark the first cal pulse
-            hardwareID = digit_ptr[h_idx[i]]->GetChannelID();
-            asicKey = (hardwareID / 1000000);
-            asicKey *= 1000000;
-            asic = digit_ptr[h_idx[i]]->GetASIC();
-            asicKey += asic * 10000;
-            digit_ptr[h_idx[i]]->SetFlag(11);
+          //Keep this as the possible early cal pulse
+          cal_1_idx = i;
 
-          }
         }
       }
+      //Mark the first cal pulse
+      if (cal_1_idx > -1) {
+
+        hardwareID = digit_ptr[h_idx[cal_1_idx]]->GetChannelID();
+        asicKey = (hardwareID / 1000000);
+        asicKey *= 1000000;
+        asic = digit_ptr[h_idx[cal_1_idx]]->GetASIC();
+        asicKey += asic * 10000;
+        digit_ptr[h_idx[cal_1_idx]]->SetFlag(11);
+
+      }
     }
-
-
 
 
     //Loop again to apply calibration times

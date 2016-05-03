@@ -47,7 +47,8 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
       roi[0]->GetXaxis()->SetRangeUser(-500,-100);
     }
     if(trigstring=="laser"){
-      roi[0]->GetXaxis()->SetRangeUser(300,500);
+      //roi[0]->GetXaxis()->SetRangeUser(300,500);
+      roi[0]->GetXaxis()->SetRangeUser(-200,0);
     }
     //For installed modules, use full negative range
     //Similarly for M01 in special condition test at Tsukuba
@@ -135,7 +136,8 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   else{
     py2->GetXaxis()->SetRangeUser(-500,-250);
     if(trigstring=="laser" || flag_slot==1){
-      py2->GetXaxis()->SetRangeUser(300,500);      
+      //py2->GetXaxis()->SetRangeUser(300,500);      
+      py2->GetXaxis()->SetRangeUser(-200,0);      
       //if( (strstr(filename, "slot") != NULL) || (strstr(filename, "cpr2061") != NULL)   ){
       if( flag_slot==1 ){
 	py2->GetXaxis()->SetRangeUser(xpeaks0[0]-50,xpeaks0[0]+150);
@@ -152,7 +154,7 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
     fn0->SetParLimits(2,0.5,5);
   }
   py2->Fit(fn0,"RB");
-  TF1 *fn1=new TF1("fn1","gaus(0)+pol2(3)",xpeaks1[0]-sigma2*2,xpeaks1[0]+sigma2*2);
+  TF1 *fn1=new TF1("fn1","gaus(0)+pol1(3)",xpeaks1[0]-sigma2*2,xpeaks1[0]+sigma2*2);
   fn1->SetParLimits(0,10,py2->GetMaximum()*1.2);
   fn1->SetParLimits(1,xpeaks1[0]-sigma1,xpeaks1[0]+sigma1);
   fn1->SetParLimits(2,4,30);
@@ -194,10 +196,20 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   char ct[20];
   c_subpad->cd(1);
   ptnhit[0]=new TPaveText(0.5,0.8,0.8,0.9,"NDC");
-  sprintf(ct,"Mean no0: %f", h_nhit0->GetMean(1)*h_nhit0->GetEntries()/(h_nhit0->GetEntries()-h_nhit0->GetBinContent(1)));
+  float hmean(0), hden(0);
+  for(int i=2;i<100;i++){
+    hmean = hmean + h_nhit0->GetBinContent(i)*(i-1);
+    hden = hden + h_nhit0->GetBinContent(i);
+  }
+  hmean=hmean/hden;
+  //sprintf(ct,"Mean no0: %f", h_nhit0->GetMean(1)*h_nhit0->GetEntries()/(h_nhit0->GetEntries()-h_nhit0->GetBinContent(1)));
+  sprintf(ct,"Mean no0 (max 100): %f", hmean);
   ptnhit[0]->AddText(ct);
   if(h_nhit0->GetMaximumBin()==1){
     h_nhit0->GetXaxis()->SetRangeUser(1,100);
+  }
+  if(flag_slot==1){
+    h_nhit0->GetXaxis()->SetRangeUser(1,300);
   }
   h_nhit0->Draw();
   ptnhit[0]->Draw("same");
@@ -207,6 +219,9 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   ptnhit[1]->AddText(ct);
   if(h_nhit1->GetMaximumBin()==1){
     h_nhit1->GetXaxis()->SetRangeUser(1,100);
+  }
+  if(flag_slot==1){
+    h_nhit1->GetXaxis()->SetRangeUser(1,300);
   }
   h_nhit1->Draw();
   ptnhit[1]->Draw("same");
@@ -230,7 +245,8 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
       else{
 	asict[ii*16+iii]->GetXaxis()->SetRangeUser(-500,-250);
 	if(trigstring=="laser" || flag_slot==1){
-	  asict[ii*16+iii]->GetXaxis()->SetRangeUser(300,500);
+	  //asict[ii*16+iii]->GetXaxis()->SetRangeUser(300,500);
+	  asict[ii*16+iii]->GetXaxis()->SetRangeUser(-200,0);
 	  //if( (strstr(filename, "slot") != NULL) || (strstr(filename, "cpr2061") != NULL)   ){
 	  if( flag_slot==1 ){
 	    asict[ii*16+iii]->GetXaxis()->SetRangeUser(xpeaks0[0]-50,xpeaks0[0]+150);
@@ -267,7 +283,7 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
 	    if( flag_slot==1 ){
 	      //asict[ii*16+iii]->GetXaxis()->SetRangeUser(xpeaks0[0]-20,xpeaks0[0]+150);
 	      cbs2d_i[ii*16+iii]=(TPad*)(cbs2d[ii]->GetPrimitive(Form("cbs2d%i_%i",ii,iii+1)));
-	      if( strstr(filename, "slot") != NULL )	    cbs2d_i[ii*16+iii]->SetLogy();
+	      //if( strstr(filename, "slot") != NULL )	    cbs2d_i[ii*16+iii]->SetLogy();
 	    }
 	  }
 	}
@@ -324,8 +340,10 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
     ctt->GetXaxis()->SetRangeUser(0,400);
     ctt->GetYaxis()->SetRangeUser(-500,-420);
     if(trigstring=="laser" || flag_slot==1){
-      ctt->GetXaxis()->SetRangeUser(500,1000);
-      ctt->GetYaxis()->SetRangeUser(300,500);
+      //ctt->GetXaxis()->SetRangeUser(500,1000);
+      //ctt->GetYaxis()->SetRangeUser(300,500);
+      ctt->GetXaxis()->SetRangeUser(0,500);
+      ctt->GetYaxis()->SetRangeUser(-200,0);
       //if(strstr(filename, "slot") != NULL){
       if( flag_slot==1 ){
 	ctt->GetXaxis()->SetRangeUser(0,500);
@@ -346,7 +364,8 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   else{
     cht->GetYaxis()->SetRangeUser(-550,-250);
     if(trigstring=="laser" || flag_slot==1){
-      cht->GetYaxis()->SetRangeUser(250,550);
+      //cht->GetYaxis()->SetRangeUser(250,550);
+      cht->GetYaxis()->SetRangeUser(-200,0);
       //if(strstr(filename, "slot") != NULL){
       if( flag_slot==1 ){
         cht->GetYaxis()->SetRangeUser(xpeaks0[0]-50,xpeaks0[0]+150);

@@ -304,11 +304,11 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     sprintf(n_evt, "evtnum%d", ii);
     sprintf(n_hit, "nhit%d", ii);
     evtnum[ii] = new TH1F(n_evt, n_evt, 1000, 0, 16000);
-    nhit[ii] = new TH1F(n_hit, n_hit, 100, 0, 100);
+    nhit[ii] = new TH1F(n_hit, n_hit, 500, 0, 500);
     sprintf(n_evt, "evtnumq%d", ii);
     sprintf(n_hit, "nhitq%d", ii);
     evtnumq[ii] = new TH1F(n_evt, n_evt, 1000, 0, 16000);
-    nhitq[ii] = new TH1F(n_hit, n_hit, 100, 0, 100);
+    nhitq[ii] = new TH1F(n_hit, n_hit, 500, 0, 500);
     sprintf(n_pmt, "pmt_xy%d", ii);
     pmt_xy[ii] = new TH2F(n_pmt, n_pmt, 64, 0., 64., 8, 0., 8.);
     pmt_xy[ii]->SetStats(0);
@@ -416,7 +416,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     sprintf(n_evt_tight, "evtnum_tight%d", ii);
     sprintf(n_hit_tight, "nhit_tight%d", ii);
     evtnum_tight[ii] = new TH1F(n_evt_tight, n_evt_tight, 1000, 0, 16000);
-    nhit_tight[ii] = new TH1F(n_hit_tight, n_hit_tight, 100, 0, 100);
+    nhit_tight[ii] = new TH1F(n_hit_tight, n_hit_tight, 500, 0, 500);
     sprintf(n_pmt_tight, "pmt_xy_tight%d", ii);
     pmt_xy_tight[ii] = new TH2F(n_pmt_tight, n_pmt_tight, 64, 0., 64., 8, 0., 8.);
     pmt_xy_tight[ii]->SetStats(0);
@@ -521,7 +521,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     sprintf(n_evt_optics, "evtnum_optics%d", ii);
     sprintf(n_hit_optics, "nhit_optics%d", ii);
     evtnum_optics[ii] = new TH1F(n_evt_optics, n_evt_optics, 1000, 0, 16000);
-    nhit_optics[ii] = new TH1F(n_hit_optics, n_hit_optics, 100, 0, 100);
+    nhit_optics[ii] = new TH1F(n_hit_optics, n_hit_optics, 500, 0, 500);
     sprintf(n_pmt_optics, "pmt_xy_optics%d", ii);
     pmt_xy_optics[ii] = new TH2F(n_pmt_optics, n_pmt_optics, 64, 0., 64., 8, 0., 8.);
     pmt_xy_optics[ii]->SetStats(0);
@@ -626,7 +626,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
     sprintf(n_asic, "asic_time_optics%i", ii);
     time_by_asic_optics[ii] = new TH1F(n_asic, n_asic, 4000, -2000, 2000);
     sprintf(n_asic, "tdc2d_by_asic%i", ii);
-    tdc2d_by_asic[ii] = new TH2F(n_asic, n_asic, 400, 0., 800, 150, -500., -350.);
+    tdc2d_by_asic[ii] = new TH2F(n_asic, n_asic, 400, 0., 800, 350, -500., -150.);
   }
 
   //Loop over all of the ASICs and fill the time projection plot

@@ -118,10 +118,10 @@ void DoubleCalPulseV5Module::event()
       //Mark the first cal pulse
       if (cal_1_idx > -1) {
 
-        hardwareID = digit_ptr[h_idx[cal_1_idx]]->GetChannelID();
-        asicKey = (hardwareID / 1000000);
+        topcaf_channel_id_t hardwareID = digit_ptr[h_idx[cal_1_idx]]->GetChannelID();
+        topcaf_channel_id_t asicKey = (hardwareID / 1000000);
         asicKey *= 1000000;
-        asic = digit_ptr[h_idx[cal_1_idx]]->GetASIC();
+        int asic = digit_ptr[h_idx[cal_1_idx]]->GetASIC();
         asicKey += asic * 10000;
         digit_ptr[h_idx[cal_1_idx]]->SetFlag(11);
 
@@ -136,7 +136,7 @@ void DoubleCalPulseV5Module::event()
       asicKey *= 1000000;
       int asic = digit_ptr[w]->GetASIC();
       asicKey += asic * 10000;
-      int asic_ch = digit_ptr[w]->GetASICChannel();
+      //int asic_ch = digit_ptr[w]->GetASICChannel();
 
       double corr_time = digit_ptr[w]->GetTDCBin() - asic_ref_time[asicKey];
       digit_ptr[w]->SetTime(corr_time);

@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(SampleTimeCalibrationV3)
+REG_MODULE(SampleTimeCalibrationV5)
 
 void fcnSamplingTime(int& npar, double* gin, double& f, double* par, int iflag);
 std::vector< hit_info > g_hitinfo;
@@ -98,7 +98,7 @@ void SampleTimeCalibrationV5Module::beginRun()
     m_time2tdc = 1. / (topconfig_ptr->getTDCUnit_ns());
   } else {
     m_time2tdc = 1000.;
-    B2WARNING("Defaulting time/TDC to " << m_time2tdc / 1000. << " ps in SampleTimeCalibrationV3 Module.");
+    B2WARNING("Defaulting time/TDC to " << m_time2tdc / 1000. << " ps in SampleTimeCalibrationV5 Module.");
   }
 
   if (m_mode == 1) { // read mode
@@ -147,44 +147,44 @@ void SampleTimeCalibrationV5Module::event()
 
   if (digit_ptr) {
     if (m_mode == 0) { // Calculate calibration
-      std::vector<int> cal_pulses;
+      std::vector<int> cal10_pulses;
+      std::vector<int> cal11_pulses;
       for (int c = 0; c < digit_ptr.getEntries(); c++) { // First id the cal pulse for each asic.
         if (digit_ptr[c]->GetFlag() == 10) {
-          cal_pulses.push_back(c);
+          cal10_pulses.push_back(c);
+        }
+        if (digit_ptr[c]->GetFlag() == 11) {
+          cal11_pulses.push_back(c);
         }
       }
 
-      for (int c = 0; c < digit_ptr.getEntries(); c++) { //
+      //Take no chances: match up the cal pulses to the same asic
+      for (unsigned int d = 0; d < cal10_pulses.size(); d++) {
 
-        if ((digit_ptr[c]->GetTime() > m_cal_mint) && (digit_ptr[c]->GetTime() < m_cal_maxt) && (digit_ptr[c]->GetFlag() == 1)) {
-          topcaf_channel_id_t photon_channel_id = digit_ptr[c]->GetChannelID();
-          topcaf_channel_id_t photon_asic_id = ((photon_channel_id / 1000) * 1000);
-          int photon_win = digit_ptr[c]->GetASICWindow();
-          int photon_win_corr = (photon_win % 4) * 64;
+        topcaf_channel_id_t cal10_channel_id = digit_ptr[cal10_pulses[d]]->GetChannelID();
+        topcaf_channel_id_t cal10_asic_id = ((cal10_channel_id / 1000) * 1000);
+        int cal10_win = digit_ptr[cal10_pulses[d]]->GetASICWindow();
+        int cal10_win_corr = (cal10_win % 4) * 64;
 
-          for (unsigned int d = 0; d < cal_pulses.size(); d++) { // Which cal pulse is it?
-            topcaf_channel_id_t cal_channel_id = digit_ptr[cal_pulses[d]]->GetChannelID();
-            topcaf_channel_id_t cal_asic_id = ((cal_channel_id / 1000) * 1000);
-            int cal_win = digit_ptr[cal_pulses[d]]->GetASICWindow();
-            int cal_win_corr = (cal_win % 4) * 64;
+        for (unsigned int e = 0; e < cal11_pulses.size(); e++) {
 
+          topcaf_channel_id_t cal11_channel_id = digit_ptr[cal11_pulses[e]]->GetChannelID();
+          topcaf_channel_id_t cal11_asic_id = ((cal11_channel_id / 1000) * 1000);
+          int cal11_win = digit_ptr[cal11_pulses[e]]->GetASICWindow();
+          int cal11_win_corr = (cal11_win % 4) * 64;
 
-            if (photon_asic_id == cal_asic_id) { // thats the one.  calculate the two needed numbers and move on.
-              B2DEBUG(1, "phit\tphoton_win_corr: " << photon_win_corr << "\tcal_win_corr: " << cal_win_corr);
-              hit_info this_hit_info;
-              this_hit_info.sample1 = digit_ptr[cal_pulses[d]]->GetTDCBin() + cal_win_corr;
-              this_hit_info.sample2 = digit_ptr[c]->GetTDCBin() + photon_win_corr;
-              m_cal_photon_pairs[cal_asic_id].push_back(this_hit_info);
-              B2DEBUG(1, "pair\tdigi1: " << digit_ptr[cal_pulses[d]]->GetTDCBin() << "\ts1: " << this_hit_info.sample1 << "\tdigi2: " <<
-                      (double)digit_ptr[cal_pulses[d]]->GetTDCBin() << "\ts2: " << this_hit_info.sample2);
-              break;
-            }
-
+          if (cal10_asic_id == cal11_asic_id) {
+            //B2DEBUG(1, "phit\tphoton_win_corr: " << photon_win_corr << "\tcal_win_corr: " << cal_win_corr);
+            hit_info this_hit_info;
+            this_hit_info.sample1 = digit_ptr[cal10_pulses[d]]->GetTDCBin() + cal10_win_corr;
+            this_hit_info.sample2 = digit_ptr[cal11_pulses[e]]->GetTDCBin() + cal11_win_corr;
+            m_cal_photon_pairs[cal10_asic_id].push_back(this_hit_info);
+            //B2DEBUG(1, "pair\tdigi1: " << digit_ptr[cal_pulses[d]]->GetTDCBin() << "\ts1: " << this_hit_info.sample1 << "\tdigi2: " << (double)digit_ptr[cal_pulses[d]]->GetTDCBin() << "\ts2: " << this_hit_info.sample2);
           }
         }
-
       }
     }
+
     for (int c = 0; c < digit_ptr.getEntries(); c++) {
 
       if (m_mode == 1) { // Apply calibration to waveform

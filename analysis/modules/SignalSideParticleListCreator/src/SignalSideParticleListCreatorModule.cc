@@ -71,7 +71,7 @@ void SignalSideParticleListCreatorModule::initialize()
   particleList.registerInDataStore(DataStore::c_DontWriteOut);
   if (!m_isSelfConjugatedParticle) {
     StoreObjPtr<ParticleList> antiParticleList(m_antiParticleListName);
-    antiParticleList.registerInDataStore(m_particleListName);
+    antiParticleList.registerInDataStore(m_antiParticleListName);
   }
 
   // check the decay descriptor

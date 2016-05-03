@@ -1,4 +1,4 @@
-#include <topcaf/modules/WaveTimingV4Module/WaveTimingV4Module.h>
+#include <topcaf/modules/WaveTimingV5Module/WaveTimingV5Module.h>
 #include <topcaf/dataobjects/EventWaveformPacket.h>
 #include <topcaf/dataobjects/EventHeaderPacket.h>
 #include <topcaf/dataobjects/TopConfigurations.h>
@@ -14,12 +14,12 @@
 using namespace Belle2;
 using namespace std;
 
-REG_MODULE(WaveTimingV4);
+REG_MODULE(WaveTimingV5);
 
 //const int max_peaks = 320;
 const int max_peaks = 20;
 
-WaveTimingV4Module::WaveTimingV4Module() : Module()
+WaveTimingV5Module::WaveTimingV5Module() : Module()
 {
   setDescription("This module calculates the timing of itop raw waveform event data");
   addParam("time2TDC", m_time2tdc, "Conversion factor to match iTOPDigit time scale [time unit/ns]", 40.0);
@@ -31,9 +31,9 @@ WaveTimingV4Module::WaveTimingV4Module() : Module()
 }
 
 
-WaveTimingV4Module::~WaveTimingV4Module() {}
+WaveTimingV5Module::~WaveTimingV5Module() {}
 
-void WaveTimingV4Module::initialize()
+void WaveTimingV5Module::initialize()
 {
   m_topcafdigits_ptr.registerInDataStore();
   m_fraction = 0.4;
@@ -43,7 +43,7 @@ void WaveTimingV4Module::initialize()
   m_cf_time = 0;
 }
 
-void WaveTimingV4Module::beginRun()
+void WaveTimingV5Module::beginRun()
 {
   StoreObjPtr<TopConfigurations> topconfig_ptr("", DataStore::c_Persistent);
   if (topconfig_ptr) {
@@ -52,7 +52,7 @@ void WaveTimingV4Module::beginRun()
 }
 
 
-void WaveTimingV4Module::event()
+void WaveTimingV5Module::event()
 {
 
   //Get Waveform from datastore
@@ -183,10 +183,10 @@ void WaveTimingV4Module::event()
         }
         if (m_thresh_n < 0.) {
 
-          //Installed Tsukuba exception
+          //Installed Tsukuba exception - V5
           //Find 5 negative bins in a row with one below threshold
-          //But pick the last one in x
-          //Then lookback a bit and see if there is a hint of a double negative peak
+          //Store all of these as negative hits, then sort it out in the DoubleCalModule
+
           int neg_count(0);
           unsigned int d_peak(0), d_cur_peak(0);
           double d_max(0.), d_cur_max(0.);
@@ -209,108 +209,55 @@ void WaveTimingV4Module::event()
                 }
               }
             } else {
-              neg_count = 0;
-              d_cur_peak = 0;
-              d_cur_max = 0;
+              //if we have a peak in mind, store it
+              if (d_max != 0) {
+                peaks_found++;
+                hit.adc_height = d_max;
+                unsigned int d = (d_peak + 0.5); // First measure front edge.
+                while ((v_samples.at(d) < d_max * m_frac) && (d > 0)) {
+                  d--;
+                }
+
+                double first = v_samples.at(d);
+                double second = v_samples.at(d + 1);
+                double dV = second - first;
+                double frontTime = d + (d_max * m_frac - first) / dV;
+                if (d == 0) {
+                  frontTime = 0.;
+                }
+                //hit.tdc_bin = frontTime;
+
+                d = (d_peak + 0.5); // Now measure back edge.
+                while (((d + 1) < v_samples.size()) && (v_samples.at(d) < (d_max * m_frac))) {
+                  d++;
+                }
+                first = v_samples.at(d);
+                second = v_samples.at(d - 1);
+                dV = second - first;
+                double backTime = d - (d_max * m_frac - first) / dV;
+                if ((d + 1) >= v_samples.size()) {
+                  backTime = d;
+                }
+
+                hit.tdc_bin = frontTime;
+
+                hit.width = backTime - frontTime;
+                hit.chi2 = 0.;
+                hit.q = 0.;
+
+                hits.push_back(hit);
+
+                neg_count = 0;
+                d_cur_peak = 0;
+                d_cur_max = 0;
+                d_peak = 0;
+                d_max = 0;
+              }
             }
           }
 
-          //Count backwards 80 from the peak and look for at least one bin below threshold
-          double d_min = d_peak - 80;
-          int dbl_count(0);
-          if (d_min < 1) d_min = 1; //Handle exception
-          for (unsigned int d = (d_peak - 15); d > d_min; d--) {
-            if (v_samples.at(d) < m_thresh_n) dbl_count++;
-          }
-          if (dbl_count < 1) d_max = 0;
-
-
-          if (d_max != 0) {
-            peaks_found++;
-            hit.adc_height = d_max;
-            unsigned int d = (d_peak + 0.5); // First measure front edge.
-            while ((v_samples.at(d) < d_max * m_frac) && (d > 0)) {
-              d--;
-            }
-
-            double first = v_samples.at(d);
-            double second = v_samples.at(d + 1);
-            double dV = second - first;
-            double frontTime = d + (d_max * m_frac - first) / dV;
-            if (d == 0) {
-              frontTime = 0.;
-            }
-            //hit.tdc_bin = frontTime;
-
-            d = (d_peak + 0.5); // Now measure back edge.
-            while (((d + 1) < v_samples.size()) && (v_samples.at(d) < (d_max * m_frac))) {
-              d++;
-            }
-            first = v_samples.at(d);
-            second = v_samples.at(d - 1);
-            dV = second - first;
-            double backTime = d - (d_max * m_frac - first) / dV;
-            if ((d + 1) >= v_samples.size()) {
-              backTime = d;
-            }
-
-            hit.tdc_bin = frontTime;
-
-            hit.width = backTime - frontTime;
-            hit.chi2 = 0.;
-            hit.q = 0.;
-
-            hits.push_back(hit);
-
-          }
           //else no peak found
 
-          /*
-          for (int c = 0; c < search_peaks_found_n; c++) {
-            if (ypos_n[c] > m_thresh_n) {
-              peaks_found++;
-              hit.adc_height = -1*ypos_n[c];
-              unsigned int d = (xpos_n[c] + 0.5); // First measure front edge.
-              while ( (-1.*(v_samples.at(d)) > ypos_n[c]*m_frac) && (d > 0)) {
-          d--;
-              }
-
-              double first = -1.*v_samples.at(d);
-              double second = -1.*v_samples.at(d + 1);
-              double dV = second - first;
-              double frontTime = (d + ((ypos_n[c] * m_frac) - first) / dV);
-              if (d == 0) {
-          frontTime = 0.;
-              }
-              //hit.tdc_bin = frontTime;
-
-              d = (xpos[c] + 0.5); // Now measure back edge.
-              while (((d + 1) < v_samples.size()) && (-1.*(v_samples.at(d)) > (ypos_n[c]*m_frac)) ) {
-          d++;
-              }
-              first = -1.*v_samples.at(d);
-              second = -1.*v_samples.at(d - 1);
-              dV = second - first;
-              double backTime = (d - ((ypos_n[c] * m_frac) - first) / dV);
-              if ((d + 1) == v_samples.size()) {
-          backTime = d;
-              }
-
-              //For negative pulse, use the back edge for our timing point
-              hit.tdc_bin = backTime;
-
-              hit.width = backTime - frontTime;
-              hit.chi2 = 0.;
-              hit.q=0.;
-
-              hits.push_back(hit);
-
-              B2DEBUG(1, hardwareID << " negative peak found (" << xpos_n[c] << "," << ypos_n[c] << ")\twidth: " << hit.width << "\ttdc: " << hit.tdc_bin <<
-                "\tfrontTime: " << frontTime << "\tbackTime: " << backTime);
-            }
-
-          }
-          */
         }
 
         //      B2DEBUG(1,peaks_found<<" peaks found.");
@@ -335,7 +282,7 @@ void WaveTimingV4Module::event()
 
 }
 
-void WaveTimingV4Module::terminate()
+void WaveTimingV5Module::terminate()
 {
 
 }

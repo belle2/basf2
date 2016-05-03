@@ -534,7 +534,10 @@ def addTrackConversionMonitors(outputRootFile='b2biiTrackConversionMonitors.root
     path.add_module(tracks2hist)
 
 
-def addNeutralsConversionMonitors(outputRootFile='', path=analysis_main):
+def addNeutralsConversionMonitors(gammaOutputRootFile='b2biiGammaConversionMonitors.root',
+                                  neutralPiOutputRootFile='b2biiPi0ConversionMonitors.root',
+                                  MCneutralPiOutputRootFile='b2biiMCPi0ConversionMonitors.root',
+                                  path=analysis_main):
     """
     Creates 'gamma:b2bii_monitor' and 'pi0:b2bii_monitor' from already existing 'gamma:mdst' and
     'pi0:mdst' ParticleList and fills it with all converted neutral gammas.
@@ -544,10 +547,6 @@ def addNeutralsConversionMonitors(outputRootFile='', path=analysis_main):
     @param outputRootFile name of the output ROOT file to which the histograms are saved.
     @param path modules are added to this path
     """
-
-    gammaOutputRootFile = 'b2biiGammaConversionMonitors.root'
-    neutralPiOutputRootFile = 'b2biiPi0ConversionMonitors.root'
-    MCneutralPiOutputRootFile = 'b2biiMCPi0ConversionMonitors.root'
 
     # load gammas and pi0, copy pi0s from 'pi0:mdst' list. We don't want to mess with them.
     copyList('gamma:b2bii_monitor', 'gamma:mdst', False, path)

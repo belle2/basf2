@@ -102,6 +102,7 @@ void DoubleCalPulseV5Module::event()
       if (max_tdc_idx > -1) { //pointless error catching
         for (unsigned int i = 0; i != h_tdc.size(); i++) {
           if ((h_tdc[max_tdc_idx] - h_tdc[i]) > 50 && (h_tdc[max_tdc_idx] - h_tdc[i]) < 90) {
+            //Mark the last cal pulse
             topcaf_channel_id_t hardwareID = digit_ptr[h_idx[max_tdc_idx]]->GetChannelID();
             topcaf_channel_id_t asicKey = (hardwareID / 1000000);
             asicKey *= 1000000;
@@ -109,6 +110,15 @@ void DoubleCalPulseV5Module::event()
             asicKey += asic * 10000;
             asic_ref_time[asicKey] = digit_ptr[h_idx[max_tdc_idx]]->GetTDCBin();
             digit_ptr[h_idx[max_tdc_idx]]->SetFlag(10);
+
+            //Mark the first cal pulse
+            hardwareID = digit_ptr[h_idx[i]]->GetChannelID();
+            asicKey = (hardwareID / 1000000);
+            asicKey *= 1000000;
+            asic = digit_ptr[h_idx[i]]->GetASIC();
+            asicKey += asic * 10000;
+            digit_ptr[h_idx[i]]->SetFlag(11);
+
           }
         }
       }
@@ -130,16 +140,9 @@ void DoubleCalPulseV5Module::event()
       digit_ptr[w]->SetTime(corr_time);
       digit_ptr[w]->SetQuality(asic_ref_time[asicKey]);
       if (asic_ref_time[asicKey] > 0) {
-        if (digit_ptr[w]->GetFlag() != 10) digit_ptr[w]->SetFlag(1); // i.e. calibrated to a pulse.
-        if ((corr_time > 45.) && (corr_time < 70.)
-            && (asic_ch == m_cal_ch)) { // then mark this as the second calibration pulse. hard coded numbers again...
-          digit_ptr[w]->SetFlag(11); // second calibration pulse.
-          if (asic_ref_flag[asicKey] > 9) {
-            asic_ref_flag[asicKey] = 11;
-          } else {
-            asic_ref_flag[asicKey] = 1;
-          }
-        }
+        if (digit_ptr[w]->GetFlag() != 10 && digit_ptr[w]->GetFlag() != 11) digit_ptr[w]->SetFlag(1);  // i.e. calibrated to a pulse.
+      } else {
+        digit_ptr[w]->SetFlag(0);
       }
       //      B2INFO(hardwareID<<"\ttdc: "<<digit_ptr[w]->GetTDCBin()<<"\tasicKey: "<<asicKey<<"\tasic_ref_time: "<<asic_ref_time[asicKey]<<"\tcorr_time: "<<corr_time);
 

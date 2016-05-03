@@ -195,16 +195,9 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
     in.read(reinterpret_cast<char*>(&hslb_hdr), sizeof(hslb_hdr));
     B2DEBUG(1, "Header: " << hex << hslb_hdr.B2L_hdr << "(" << HSLB_B2L_HEADER << ")" << dec)
     if (hslb_hdr.B2L_hdr != HSLB_B2L_HEADER) {
-      B2WARNING("Bad HSLB header... 0x" << hex << hslb_hdr.B2L_hdr << " ... trying again");
-      in.seekg(-sizeof(hslb_hdr) + sizeof(short int), ios_base::cur);
-      in.read(reinterpret_cast<char*>(&hslb_hdr), sizeof(hslb_hdr));
-      if (hslb_hdr.B2L_hdr != HSLB_B2L_HEADER) {
-        B2WARNING("Bad HSLB header second try... 0x" << hex << hslb_hdr.B2L_hdr << " ... aborting event");
-        m_evtheader_ptr->SetFlag(1000);
-        break;
-      } else {
-        B2DEBUG(1, "second try worked");
-      }
+      B2WARNING("Bad HSLB header... 0x" << hex << hslb_hdr.B2L_hdr << " ... aborting event");
+      m_evtheader_ptr->SetFlag(1000);
+      break;
     }
     in.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
     unsigned int eventSize = word;
@@ -243,14 +236,6 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
               int)*streamSize << "pos: " << in.tellg())
     for (win = 0; in && win <= numWindows ; win++) {
       word = readWordUnique(in, word);
-      // this should be a window header. However, if data corruption leads to numWindows being mis-read
-      // this could actually be a footer
-      if ((word != PACKET_LAST) && (word != PACKET_LAST2) && (word != PACKET_LAST3)) {
-        goto windowStart;
-      } else {
-        goto windowFooter;
-      }
-windowStart:
       m_carrier = (word >> 30) & 0x3;
       asic = (word >> 28) & 0x3;
       unsigned int lastWrAddr = (word >> 16) & 0xFF;
@@ -299,25 +284,17 @@ windowStart:
             wavePacket[WAVE_HEADER_SIZE + x + 1] = word;
             B2DEBUG(1, "data[" << x << "]: 0x" << hex << word << dec);
             if ((word & 0xF000F000) > 0) {
-              repeatedCheck = false;
-              B2WARNING("data out of range... event " << m_evt_no);
+              B2WARNING("data " << hex << word << dec << " out of range... event " << m_evt_no);
               m_evtheader_ptr->SetFlag(9999);
-              // trying to interpret this word as a window header or footer
-              if ((word != PACKET_LAST) && (word != PACKET_LAST2) && (word != PACKET_LAST3)) {
-                goto windowStart;
-              } else {
-                goto windowFooter;
-              }
             }
           }
           m_WfPacket = m_evtwaves_ptr.appendNew(EventWaveformPacket(wavePacket, WAVE_PACKET_SIZE));
           m_WfPacket->SetASIC(asic);
         }
       }
+
     }
-windowFooter:
     int l = 0;
-    // FIXME: this intends the right thing, but somehow is not using the right check points to get back on track
     if (m_evtheader_ptr->GetEventFlag() >= 9999) {
       // must read a short at a time to get back on track...
       unsigned short x1, x2;
@@ -329,24 +306,19 @@ windowFooter:
         B2DEBUG(1, "evt no: " << m_evt_no << "\tl: " << l << "\tx1: 0x" << hex << x1 << dec);
         if (x1 == 0x616c || x1 == 0x636c) {
           word = PACKET_LAST;
-          in.read(reinterpret_cast<char*>(&x1), sizeof(unsigned short));
-          if ((x1 != 0x7374) && (x1 != 0x7774)) {
-            in.seekg(-sizeof(unsigned short), ios_base::cur);
-          }
         }
         l++;
       }
       m_evtheader_ptr->SetFlag(1005);
     }
-    // read ahead to find a good footer
+    // read ahead
     while ((word != PACKET_LAST && word != PACKET_LAST2 && word != PACKET_LAST3) && in) {
       in.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
       word = swap_endianess(word);
       B2DEBUG(1, "footer: 0x" << hex << word << dec);
 
       if (word != PACKET_LAST && word != PACKET_LAST2 && word != PACKET_LAST3) {
-        B2WARNING("Bad window footer (" << hex << word << "!=" << PACKET_LAST << dec << "); attempt #" << l + 1 << "... marking event " <<
-                  m_evt_no << ".");
+        B2WARNING("Bad window footer (" << hex << word << "!=" << PACKET_LAST << dec << ")... marking event " << m_evt_no << ".");
         m_evtheader_ptr->SetFlag(1002);
         if (l > 30)  break;
         l++;

@@ -102,9 +102,13 @@ TOPCAF_DataQualityModule::drawWaveforms(EventWaveformPacket* ewp)
     y[i] += iChannel * 1000;
     x.push_back(i);
   }
+  TDirectory* oldDir = gDirectory;
+  m_directory->cd();
   TGraph* g = new TGraph(y.size(), &x[0], &y[0]);
+  // m_directory->WriteTObject(g);
   g->SetMarkerStyle(7);
   mg->Add(g);
+  oldDir->cd();
 }
 
 

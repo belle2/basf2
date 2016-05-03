@@ -1,5 +1,5 @@
-#ifndef SampleTimeCalibrationModule_H
-#define SampleTimeCalibrationModule_H
+#ifndef SampleTimeCalibrationV5Module_H
+#define SampleTimeCalibrationV5Module_H
 
 #include <framework/core/Module.h>
 
@@ -11,20 +11,20 @@
 #include <TProfile.h>
 #include <TMinuit.h>
 
-#include <topcaf/dataobjects/EventWaveformPacket.h>
-
-#include <top/dataobjects/TOPDigit.h>
+#include <topcaf/dataobjects/TOPCAFDigit.h>
 
 namespace Belle2 {
+  struct hit_info {
+    double sample1; // Sample number of first reference point
+    double sample2; // sample number of second reference point
+  };
 
-  typedef std::vector< std::pair<double, double> > v_cell_dt_pair;
-
-  class SampleTimeCalibrationModule : public Module {
+  class SampleTimeCalibrationV5Module : public Module {
 
   public:
 
-    SampleTimeCalibrationModule();
-    ~SampleTimeCalibrationModule();
+    SampleTimeCalibrationV5Module();
+    ~SampleTimeCalibrationV5Module();
 
 //
     void initialize();
@@ -33,22 +33,12 @@ namespace Belle2 {
     void terminate();
 
 
-    //Get the name and/or version of this algorithm
-    std::string GetVersion() {return "1.0.0.1";};
-    std::string GetPayloadTag() {return m_payload_tag;};
-    std::string GetPayloadType() {return "calibration";};
-    std::string GetExperiment() {return m_experiment;};
-
-    std::string GetInitialRun() {return m_initial_run;};
-    std::string GetFinalRun() {return m_final_run;};
-
 
   private:
 
     //methods
-    unsigned int GetWindowID(const EventWaveformPacket* wp);
-    void FillWaveform(const EventWaveformPacket* in_wp);
-    double CalibrateWaveform(const EventWaveformPacket* in_wp);
+    unsigned int GetWindowID(const TOPCAFDigit* in_digit);
+    double CalibrateWaveform(TOPCAFDigit* in_digit);
 
     //var
     std::string m_out_filename, m_in_filename;
@@ -69,17 +59,16 @@ namespace Belle2 {
     TH1D* m_waveform_h;
     TH1D* m_time_calib_tdc_h;
     TH1D* m_dt_h;
-    double sum_max_time, num_max_time, m_tdc;
+    double sum_max_time, num_max_time, m_tdc, m_cal_mint, m_cal_maxt;
     TH1D* m_residual_h, *m_corr_residual_h;
     TMinuit* m_Minuit;
-    std::map<topcaf_channel_id_t, v_cell_dt_pair> m_ch2cell_dt;
-    std::vector< std::pair<double, double> > v_oddevents, v_evenevents;
+    std::map< topcaf_channel_id_t, std::vector<hit_info> >  m_cal_photon_pairs;
 
     int m_channel_samples;  // Can we get this from the data somehow?
     double m_time2tdc;
   };
 
-  typedef std::vector<TOPDigit*> TOPDigits;
+  //  typedef std::vector<TOPCAFDigit*> TOPDigits;
 
 }
 #endif

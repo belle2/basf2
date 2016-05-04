@@ -63,7 +63,7 @@ namespace Belle2 {
              0.001);
     addParam("vertexFitter", m_vertexFitter, "kfitter or rave", string("kfitter"));
     addParam("fitType", m_fitType, "type of the kinematic fit (vertex, massvertex, mass)", string("vertex"));
-    addParam("withConstraint", m_withConstraint, "additional constraint on vertex: ipprofile, iptube, iptubecut", string(""));
+    addParam("withConstraint", m_withConstraint, "additional constraint on vertex: ipprofile, iptube, mother, iptubecut", string(""));
     addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
     addParam("updateDaughters", m_updateDaughters, "true: update the daughters after the vertex fit", false);
   }
@@ -122,7 +122,8 @@ namespace Belle2 {
       m_BeamSpotCenter = TVector3(0.001, 0., .013);
       findConstraintBoost(0.03);
     }
-    if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut")
+    if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"  || m_withConstraint == "mother"
+        || m_withConstraint == "iptubecut")
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
 
@@ -136,6 +137,12 @@ namespace Belle2 {
         if (m_decayString.empty()) ParticleCopy::copyDaughters(particle);
         else B2ERROR("Daughters update works only when all daughters are selected. Daughters will not be updated");
       }
+
+      if (m_withConstraint == "mother") {
+        m_BeamSpotCenter = particle->getVertex();
+        m_beamSpotCov = particle->getVertexErrorMatrix();
+      }
+
 
       bool ok = doVertexFit(particle);
       if (!ok) particle->setPValue(-1);
@@ -158,6 +165,7 @@ namespace Belle2 {
 
     if (m_withConstraint != "ipprofile" &&
         m_withConstraint != "iptube" &&
+        m_withConstraint != "mother" &&
         m_withConstraint != "iptubecut" &&
         m_withConstraint != "")
       B2FATAL("ParticleVertexFitter: " << m_withConstraint << " ***invalid Constraint ");
@@ -783,7 +791,8 @@ namespace Belle2 {
          (m_withConstraint == "" && m_fitType != "mass")) && mother->getNDaughters() < 2) return false;
 
     if (m_withConstraint == "") analysis::RaveSetup::getInstance()->unsetBeamSpot();
-    if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut")
+    if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"  || m_withConstraint == "mother"
+        || m_withConstraint == "iptubecut")
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
     analysis::RaveKinematicVertexFitter rf;

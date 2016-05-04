@@ -26,7 +26,7 @@ def fitVertex(
     @param decay_string select particles used for the vertex fit
     @param fitter       rave or kfitter
     @param fit_type     type of the kinematic fit (valid options are vertex/massvertex/mass)
-    @param constraint   type of additional constraints (valid options are empty string/ipprofile/iptube)
+    @param constraint   type of additional constraints (valid options are empty string/ipprofile/iptube/mother)
     @updateDaughters    meke copy of the daughters and update them after the vertex fit
     @param path         modules are added to this path
     """

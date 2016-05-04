@@ -35,7 +35,9 @@ def compare_log(template_file, log, ignore_lines=0, diff_lines=10):
             ))
         if len(diff) > 0:
             if diff_lines > 0:
-                print('\n'.join(diff[2:2 + diff_lines]))
+                # print directly to the raw buffer object as bytes, don't
+                # decode/encode first
+                sys.stdout.buffer.write(b"\n".join(diff[2:2 + diff_lines]))
             return False
         else:
             return True

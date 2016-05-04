@@ -12,6 +12,7 @@ and will be extended soon.
 
 from basf2 import *
 import os
+import sys
 import shutil
 from pprint import PrettyPrinter
 from datetime import datetime
@@ -19,12 +20,15 @@ from collections import OrderedDict
 from collections import deque
 import pickle
 from time import sleep
+import multiprocessing
+import glob
 
 from .utils import topological_sort
 from .utils import all_dependencies
 from .utils import decode_json_string
 from .utils import method_dispatch
 from .utils import find_sources
+import caf.utils
 import caf.backends
 
 import ROOT
@@ -77,14 +81,19 @@ class Calibration():
     def __init__(self, name, collector=None, algorithms=None, input_files=None):
         """
         You have to specify a unique name for the calibration when creating it.
-        You can specify the collector/algorithms/input files later on or here but it won't run
-        until those are done.
+        You can specify the collector/algorithms/input files later on or here but it won't be valid
+        until those are set.
         """
 
         #: Name of calibration object
         self.name = name
         #: Internal calibration collector/algorithms/input_files stored for this calibration
-        self._collector, self._algorithms, self._input_files = None, [], []
+        self._collector = None
+        #: Internal calibration algorithms stored for this calibration
+        self._algorithms = []
+        #: Internal input_files stored for this calibration
+        self._input_files = []
+
         if collector:
             #: Publicly accessible collector
             self.collector = collector
@@ -94,6 +103,8 @@ class Calibration():
         if input_files:
             #: Files used for collection procedure
             self.input_files = input_files
+        #: Since many algorithms require some different setup, this is a function object to run prior to alg.execute()
+        self.pre_algorithm = None
 
     def is_valid(self):
         """A full calibration consists of a collector AND an associated algorithm AND input_files.
@@ -126,7 +137,7 @@ class Calibration():
             #: Internal storage of calibration object name
             self._name = name
         else:
-            B2FATAL("Tried to set Calibration name to a non-string type")
+            B2ERROR("Tried to set Calibration name to a non-string type")
 
     @property
     def collector(self):
@@ -146,7 +157,7 @@ class Calibration():
             if isinstance(collector, str):
                 collector = register_module(collector)
             if not isinstance(collector, Module):
-                B2FATAL("Collector needs to be either a Module or the name of such a module")
+                B2ERROR("Collector needs to be either a Module or the name of such a module")
         #: Internal storage of collector attribute
         self._collector = collector
 
@@ -166,7 +177,7 @@ class Calibration():
         if isinstance(value, CalibrationAlgorithm):
             self._algorithms = [value]
         else:
-            B2FATAL(("Something other than CalibrationAlgorithm instance passed in ({0})."
+            B2ERROR(("Something other than CalibrationAlgorithm instance passed in ({0})."
                      "Algorithm needs to inherit from Belle2::CalibrationAlgorithm".format(type(value))))
 
     @algorithms.fset.register(tuple)
@@ -181,7 +192,7 @@ class Calibration():
                 if isinstance(alg, CalibrationAlgorithm):
                     self._algorithms.append(alg)
                 else:
-                    B2FATAL(("Something other than CalibrationAlgorithm instance passed in {0}."
+                    B2ERROR(("Something other than CalibrationAlgorithm instance passed in {0}."
                              "Algorithm needs to inherit from Belle2::CalibrationAlgorithm".format(type(value))))
 
     @property
@@ -201,7 +212,7 @@ class Calibration():
         if isinstance(file, str):
             self._input_files = [file]
         else:
-            B2FATAL("Something other than string passed in as an input file.")
+            B2ERROR("Something other than string passed in as an input file.")
 
     @input_files.fset.register(tuple)
     @input_files.fset.register(list)
@@ -215,7 +226,7 @@ class Calibration():
                 if isinstance(file, str):
                     self._input_files.append(file)
                 else:
-                    B2FATAL("Something other than string passed in as an input file.")
+                    B2ERROR("Something other than string passed in as an input file.")
 
     def __repr__(self):
         """
@@ -260,7 +271,7 @@ class CAF():
             self.config = configparser.ConfigParser()
             self.config.read(config_file_path)
         else:
-            B2FATAL("Tried to use $BELLE2_LOCAL_DIR but it wasn't there. Is basf2 set up?")
+            B2ERROR("Tried to use $BELLE2_LOCAL_DIR but it wasn't there. Is basf2 set up?")
 
         #: Dictionary of calibrations for this CAF instance
         self.calibrations = {}
@@ -335,7 +346,7 @@ class CAF():
         """
         jobs = {}
         for calibration_name in calibrations:
-            job = Job(calibration_name)
+            job = Job('_'.join([calibration_name, 'Collector']))
             self._make_calibration_dir(calibration_name)
             collector_path_file = self._make_collector_path(calibration_name)
             job.output_dir = os.path.join(self.output_dir, calibration_name, 'output')
@@ -343,7 +354,8 @@ class CAF():
             job.cmd = ['basf2', 'run_collector_path.py']
             job.input_sandbox_files.append(collector_steering_file_path)
             job.input_sandbox_files.append(collector_path_file)
-            job.output_files = ['*.mille']
+            job.input_files = self.calibrations[calibration_name].input_files
+            job.output_files = ['*.mille', 'RootOutput.root']
             jobs[calibration_name] = job
 
         return jobs
@@ -359,45 +371,167 @@ class CAF():
         # before continuing.
         order = self.order_calibrations()
         if not order:
-            B2FATAL("Couldn't order the calibraitons properly. Probably a cyclic dependency.")
+            B2ERROR("Couldn't order the calibrations properly. Probably a cyclic dependency.")
 
-        # Creates deque of first set of calibrations to submit
-        to_submit = find_sources(order)
-        # remove the submitting calibraitons from the order
-        for calibration_name in to_submit:
+        # Creates list of first set of calibrations to submit
+        col_to_submit = list(find_sources(order))
+        # remove the submitting calibrations from the overall order
+        for calibration_name in col_to_submit:
             order.pop(calibration_name)
 
         # Creates the overall output directory and reset the attribute to use an absolute path to it.
         self.output_dir = self._make_output_dir()
 
         # Main running loop, continues until we're completely finished
-        while to_submit:
-            jobs = self.configure_jobs(to_submit)
+        while col_to_submit:
+            # Create job objects for collectors
+            col_jobs = self.configure_jobs(col_to_submit)
             # Submit collection jobs that have no dependencies
-            results = self.backend.submit(list(jobs.values()))
+            results = self.backend.submit(list(col_jobs.values()))
             # Event loop waiting for results
             while True:
-                # We sleep initially since we only just submitted the jobs
+                # We sleep initially since we only just submitted the collector jobs
                 sleep(self.heartbeat)
-                # loop to check which results are finished and remove from to_submit
-                for calibration_name, result in zip(list(to_submit), results):
+                # loop to check which results are finished and remove from col_to_submit
+                # Iterates over a copy of col_to_submit as we're editing it.
+                for calibration_name, result in zip(col_to_submit[:], results):
                     ready = result.ready()
                     B2DEBUG(100, '{0} is ready: {1}'.format(calibration_name, ready))
                     if ready:
-                        to_submit.remove(calibration_name)
-                # Once everything is finished find any remaining collectors to submit
-                if not to_submit:
+                        col_to_submit.remove(calibration_name)
+
+                # Once the collectors are all done, run the algorithms for them
+                if not col_to_submit:
+                    # We pass in the col_jobs dictionary as it contains the calibration names
+                    # and job objects (output directories) that we need.
+                    self._run_algorithms(col_jobs)
+
                     # Find new sources if they exist
-                    to_submit = find_sources(order)
+                    col_to_submit = list(find_sources(order))
                     # Remove new sources from order
-                    for calibration_name in to_submit:
+                    for calibration_name in col_to_submit:
                         order.pop(calibration_name)
-                    # Go round and submit again
+                    # Go round and submit next calibrations
                     break
 
         # Close down our processing pool nicely
         if isinstance(self.backend, caf.backends.Local):
             self.backend.join()
+
+    def _run_algorithms(self, jobs):
+        """
+        Runs the Calibration Algorithms for all of the calibration names
+        in the list argument.
+
+        Will run them sequentially locally (possible benefits to using a
+        processing pool for low memory algorithms later on.)
+        """
+        B2INFO("""Running the Calibration Algorithms:\n{0}""".format([calibration_name for calibration_name in jobs.keys()]))
+
+        # prepare a multiprocessing context which uses fork
+        ctx = multiprocessing.get_context("fork")
+
+        for calibration_name, job in jobs.items():
+            calibration = self.calibrations[calibration_name]
+            algorithms = calibration.algorithms
+            for algorithm in algorithms:
+                child = ctx.Process(target=self._run_algorithm, args=(calibration, algorithm, job.output_dir))
+                child.start()
+                # wait for it to finish
+                child.join()
+                print("Exit code was {0}".format(child.exitcode))
+
+    def _run_algorithm(self, calibration, algorithm, working_dir):
+        """
+        Runs a single algorithm of a calibration in the output directory of the collector
+        and first runs a setup function passed in.
+        """
+        logging.reset()
+        # Now that we're in a subprocess we can change working directory without affecting
+        # the main process.
+        os.chdir(working_dir)
+        # Get a nicer version of the algorithm name
+        algorithm_name = algorithm.Class_Name().replace('Belle2::', '')
+        # Create a directory to store the output of this algorithm
+        os.mkdir(algorithm_name)
+
+        # add logfile for output
+        logging.add_file(algorithm_name+'/log')
+
+        # Fall back to previous databases if no payloads are found
+        use_database_chain(True)
+
+        #
+        #
+        # HERE IS WHERE WE SHOULD ADD PREVIOUS ALGORITHM DATABASE PAYLOADS
+        #
+        #
+
+        # add local database to save payloads
+        use_local_database(algorithm_name+"/database.txt", algorithm_name, False, LogLevel.INFO)
+
+        B2INFO("Running {0} in working directory {1}".format(algorithm_name, working_dir))
+        B2INFO("Output folder contents of collector was"+str(glob.glob('./*')))
+        if calibration.pre_algorithm:
+            calibration.pre_algorithm()
+
+        # Sorting the run list should not be necessary as the CalibrationAlgorithm does this during
+        # the getRunListFromAllData() function.
+        # Get a vector of all the experiments and runs passed into the algorithm via the output of the collector
+        exprun_vector = algorithm.getRunListFromAllData()
+#        for exprun in exprun_vector:
+#            print(exprun.first, exprun.second)
+        # Create empty IoV vector to execute
+        iov_to_execute = ROOT.vector("std::pair<int,int>")()
+        for exprun in exprun_vector:
+            # Add each exprun to the vector in turn
+            print("Adding Exp:Run = {0}:{1} to execution request".format(exprun.first, exprun.second))
+            iov_to_execute.push_back(exprun)
+            # Perform the algorithm over the requested IoVs
+            alg_result = algorithm.execute(iov_to_execute, 1)  # Need to pass in the iteration
+            # Commit to the local database if we've got a success or iteration requested
+            if alg_result == CalibrationAlgorithm.c_OK or alg_result == CalibrationAlgorithm.c_Iterate:
+                print("Finished with highest Exp:Run = {0}:{1} ".format(exprun.first, exprun.second))
+                algorithm.commit()
+                iov_to_execute.clear()
+        logging.reset()
+        return 0
+
+#    def beginRun(self):
+#        """Collect all runs we have seen"""
+#        event = PyStoreObj("EventMetaData").obj()
+#        self.runs.add((event.getExperiment(), event.getRun()))
+#
+#    def execute(self, runs):
+#        """Execute the algorithm over list of runs"""
+#        # create std::vector<ExpRun> for the argument
+#        iov_vec = ROOT.vector("std::pair<int,int>")()
+#        pair = ROOT.pair("int", "int")()
+#        for run in runs:
+#            pair.first, pair.second = run
+#            iov_vec.push_back(pair)
+#        # run the algorithm
+#        result = self.algorithm.execute(iov_vec, 1)  # Use 1 iteration as default for now
+#        return result
+#
+#    def terminate(self):
+#        """Run the calibration algorithm at the end of the process"""
+#        runs = []  # Start with no runs
+#        for run in sorted(self.runs):
+#            runs.append(run)  # Add in some seen runs and execute over them
+#            result = self.execute(runs)
+#            # if anything else then NotEnoughData is returned then we
+#            # empty the list of runs for the next call.
+#            if result != CalibrationAlgorithm.c_NotEnoughData:
+#                runs = []
+#
+
+#        if isinstance(self.backend, caf.backends.Local):
+#            pool = backends.pool
+#
+#        else:
+#            pool mp.Pool(max_processes=1)
+#
 
     @property
     def backend(self):
@@ -424,14 +558,14 @@ class CAF():
         It returns the absolute path of the new output_dir
         """
         if os.path.isdir(self.output_dir):
-            B2FATAL('{0} output directory already exists.'.format(self.output_dir))
+            B2ERROR('{0} output directory already exists.'.format(self.output_dir))
         else:
             os.mkdir(self.output_dir)
             abs_output_dir = os.path.join(os.getcwd(), self.output_dir)
             if os.path.exists(abs_output_dir):
                 return abs_output_dir
             else:
-                B2FATAL("Attempted to create output_dir {0}, but it didn't work.".format(abs_output_dir))
+                B2ERROR("Attempted to create output_dir {0}, but it didn't work.".format(abs_output_dir))
 
     def _make_calibration_dir(self, calibration_name):
         """
@@ -490,6 +624,8 @@ class Job:
         self.output_files = []
         #: Command and arguments as a list that wil be run by the job on the backend
         self.cmd = []
+        #: Input root files to basf2 job
+        self.input_files = []
 
     def __repr__(self):
         """

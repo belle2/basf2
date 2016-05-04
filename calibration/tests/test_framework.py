@@ -18,6 +18,9 @@ from unittest import TestCase
 
 
 class TestCalibrationClass_Configure(TestCase):
+    """
+    UnitTest for configuration of Calibration class
+    """
     def setUp(self):
         """
         Create useful objects for each test
@@ -83,6 +86,9 @@ class TestCalibrationClass_Configure(TestCase):
 
 
 class TestCalibrationClass_Args(TestCase):
+    """
+    UnitTest for validity of Calibration class when given arguments of different types
+    """
     def setUp(self):
         """
         Create useful objects for each test
@@ -112,6 +118,9 @@ class TestCalibrationClass_Args(TestCase):
 
 
 class TestCalibrationClass_Mismatch(TestCase):
+    """
+    UnitTest to check if Calibration class can identify mismatched collectors and alogirithms
+    """
     def setUp(self):
         """
         Create useful objects for each test
@@ -141,6 +150,9 @@ class TestCalibrationClass_Mismatch(TestCase):
 
 
 class TestCAF(TestCase):
+    """
+    UnitTest for configuration and simple running of CAF
+    """
     def setUp(self):
         """
         Create useful objects for each test and the teardown
@@ -215,16 +227,16 @@ class TestCAF(TestCase):
         fw._make_output_dir()
         self.assertTrue(os.path.isdir('testCAF_outputdir'))
 
-    def test_make_collector_paths(self):
-        """
-        Test that collector paths can be serialized into a file
-        """
-        fw = CAF()
-        fw.add_calibration(self.cal1)
-        fw.output_dir = 'serialise_testCAF_outputdir'
-        fw.backend = Local()
-        fw.run()
-        self.assertTrue(os.path.isfile(fw.output_dir+'/'+self.cal1.name+'/paths/CaTest.pickle'))
+#    def test_make_collector_paths(self):
+#        """
+#        Test that collector paths can be serialized into a file
+#        """
+#        fw = CAF()
+#        fw.add_calibration(self.cal1)
+#        fw.output_dir = 'serialise_testCAF_outputdir'
+#        fw.backend = Local()
+#        fw.run()
+#        self.assertTrue(os.path.isfile(fw.output_dir+'/'+self.cal1.name+'/paths/CaTest.pickle'))
 
     def test_config_output_dir(self):
         """

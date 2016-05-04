@@ -3,6 +3,8 @@ from collections import deque
 from collections import OrderedDict
 import json
 from functools import singledispatch, update_wrapper
+import contextlib
+
 
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
@@ -173,47 +175,14 @@ def method_dispatch(func):
     return wrapper
 
 
-class CalibrationAlgorithmRunner(Module):
+@contextlib.contextmanager
+def temporary_workdir(path):
+    """Context manager that changes the working directory to the given
+    path and then changes it back to its previous value on exit.
     """
-    Algorithm runner.
-
-    This module is responsible of calling the CalibrationAlgorithm with the
-    correct run iovs and record all calibration results.
-    (Shamelessly stolen from calibration_framework.py)
-    """
-
-    def __init__(self, algorithm):
-        """Constructor"""
-        super().__init__()
-        #: Algorithm used in this runner
-        self.algorithm = algorithm
-        #: list of currently collected iovs
-        self.runs = set()
-
-    def beginRun(self):
-        """Collect all runs we have seen"""
-        event = PyStoreObj("EventMetaData").obj()
-        self.runs.add((event.getExperiment(), event.getRun()))
-
-    def execute(self, runs):
-        """Execute the algorithm over list of runs"""
-        # create std::vector<ExpRun> for the argument
-        iov_vec = ROOT.vector("std::pair<int,int>")()
-        pair = ROOT.pair("int", "int")()
-        for run in runs:
-            pair.first, pair.second = run
-            iov_vec.push_back(pair)
-        # run the algorithm
-        result = self.algorithm.execute(iov_vec, 1)  # Use 1 iteration as default for now
-        return result
-
-    def terminate(self):
-        """Run the calibration algorithm at the end of the process"""
-        runs = []  # Start with no runs
-        for run in sorted(self.runs):
-            runs.append(run)  # Add in some seen runs and execute over them
-            result = self.execute(runs)
-            # if anything else then NotEnoughData is returned then we
-            # empty the list of runs for the next call.
-            if result != CalibrationAlgorithm.c_NotEnoughData:
-                runs = []
+    prev_cwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(prev_cwd)

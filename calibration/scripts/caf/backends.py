@@ -6,6 +6,7 @@ import shutil
 from itertools import repeat
 import glob
 from .utils import method_dispatch
+import pickle
 
 # For weird reasons, a multiprocessing pool doesn't work properly as a class attribute
 # So we make it a module variable. Should be fine as starting up multiple pools
@@ -106,7 +107,20 @@ class Local(Backend):
             for file in input_files:
                 shutil.copy(file, job.working_dir)
 
-        result = pool.apply_async(Local.run_job, (self, job))
+        # Check if we have any valid input files
+        existing_input_files = []
+        for input_file_path in job.input_files:
+            if os.path.exists(input_file_path):
+                existing_input_files.append(input_file_path)
+            else:
+                print("Requested input file {0} can't be found, it will be skipped!".format(input_file_path))
+
+        if existing_input_files:
+            # Now make a python file in our input sandbox containing a list of these valid files
+            with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
+                pickle.dump(existing_input_files, input_data_file)
+
+        result = pool.apply_async(Local.run_job, (job,))
         print('Job {0} submitted'.format(job.name))
         return result
 
@@ -123,7 +137,8 @@ class Local(Backend):
         print('Jobs submitted')
         return results
 
-    def run_job(self, job):
+    @staticmethod
+    def run_job(job):
         """
         The function that is used by multiprocessing.Pool.map during process creation. This runs a
         shell command in a subprocess and captures the stdout and stderr of the subprocess to files.
@@ -137,7 +152,7 @@ class Local(Backend):
             print('Sub Process {0} Finished.'.format(job.name))
 
         # Once the subprocess is done, move the requested output to the output directory
-        print('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
+        # print('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
         for pattern in job.output_files:
             output_files = glob.glob(os.path.join(job.working_dir, pattern))
             for file in output_files:

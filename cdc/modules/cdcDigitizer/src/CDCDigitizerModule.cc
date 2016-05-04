@@ -46,6 +46,10 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   // I/O
   addParam("InputCDCSimHitsName",         m_inputCDCSimHitsName, "Name of input array. Should consist of CDCSimHits.", string(""));
   addParam("OutputCDCHitsName",           m_outputCDCHitsName,   "Name of output array. Will consist of CDCHits.",     string(""));
+  addParam("OutputCDCHitsName4Trg",       m_outputCDCHitsName4Trg,
+           "Name of output array for trigger. Can contain several hits per wire, "
+           "if they correspond to different time windows of 32ns.",
+           string("CDCHits4Trg"));
 
   //Relations
   addParam("MCParticlesToCDCSimHitsName",  m_MCParticlesToSimHitsName,
@@ -117,6 +121,11 @@ void CDCDigitizerModule::initialize()
   cdcSimHits.registerRelationTo(cdcHits);
   StoreArray<MCParticle> mcParticles;
   mcParticles.registerRelationTo(cdcHits);
+  // Arrays for trigger.
+  StoreArray<CDCHit> cdcHits4Trg(m_outputCDCHitsName4Trg);
+  cdcHits4Trg.registerPersistent(m_outputCDCHitsName4Trg);
+  cdcSimHits.registerRelationTo(cdcHits4Trg);
+  mcParticles.registerRelationTo(cdcHits4Trg);
 
   m_cdcp = &(CDCGeometryPar::Instance());
   CDCGeometryPar& cdcp = *m_cdcp;
@@ -171,6 +180,10 @@ void CDCDigitizerModule::event()
   map<WireID, SignalInfo> signalMap;
   map<WireID, SignalInfo>::iterator iterSignalMap;
 
+  // signal map for trigger
+  map<pair<WireID, unsigned>, SignalInfo> signalMapTrg;
+  map<pair<WireID, unsigned>, SignalInfo>::iterator iterSignalMapTrg;
+
   // Set trigger timing jitter for this event
   double trigTiming = m_trigTimeJitter == 0. ? 0. : m_trigTimeJitter * (gRandom->Uniform() - 0.5);
   //  std::cout << "trigTiming= " << trigTiming << std::endl;
@@ -184,12 +197,6 @@ void CDCDigitizerModule::event()
     // Hit geom. info
     m_wireID = m_aCDCSimHit->getWireID();
     B2DEBUG(250, "Encoded wire number of current CDCSimHit: " << m_wireID);
-
-    // Reject bad wire
-    //    if (m_cdcp->isBadWire(m_wireID)) {
-    //      std::cout<<"badwire= " << m_wireID.getICLayer() <<" "<< m_wireID.getIWire() << std::endl;
-    //    }
-    if (m_cdcp->isBadWire(m_wireID)) continue;
 
     // Special treatment for cosmic runs in April 2015
     if (m_2015AprRun) {
@@ -320,6 +327,20 @@ void CDCDigitizerModule::event()
       // ... total charge has to be updated.
       iterSignalMap->second.m_charge += hitdEdx;
     }
+
+    // add one hit per trigger time window to the trigger signal map
+    unsigned short trigWindow = floor((hitDriftTime - m_tMin) * m_tdcBinWidthInv / 32);
+    iterSignalMapTrg = signalMapTrg.find(make_pair(m_wireID, trigWindow));
+    if (iterSignalMapTrg == signalMapTrg.end()) {
+      signalMapTrg.insert(make_pair(make_pair(m_wireID, trigWindow),
+                                    SignalInfo(iHits, hitDriftTime, hitdEdx)));
+    } else {
+      if (hitDriftTime < iterSignalMapTrg->second.m_driftTime) {
+        iterSignalMapTrg->second.m_driftTime = hitDriftTime;
+        iterSignalMapTrg->second.m_simHitIndex = iHits;
+      }
+      iterSignalMapTrg->second.m_charge += hitdEdx;
+    }
   } // end loop over SimHits.
 
   //--- Now Store the results into CDCHits and
@@ -375,6 +396,29 @@ void CDCDigitizerModule::event()
     }
 
     ++iCDCHits;
+  }
+
+  // Store the results with trigger time window in a separate array
+  // with corresponding relations.
+  StoreArray<CDCHit> cdcHits4Trg(m_outputCDCHitsName4Trg);
+  cdcHits4Trg.create();
+
+  for (iterSignalMapTrg = signalMapTrg.begin(); iterSignalMapTrg != signalMapTrg.end(); ++iterSignalMapTrg) {
+    unsigned short adcCount = getADCCount(iterSignalMapTrg->second.m_charge);
+    unsigned short tdcCount =
+      static_cast<unsigned short>((m_cdcp->getT0(iterSignalMapTrg->first.first) -
+                                   iterSignalMapTrg->second.m_driftTime) * m_tdcBinWidthInv + 0.5);
+    const CDCHit* cdcHit = cdcHits4Trg.appendNew(tdcCount, adcCount, iterSignalMapTrg->first.first);
+
+    // relations
+    simHits[iterSignalMapTrg->second.m_simHitIndex]->addRelationTo(cdcHit);
+    RelationVector<MCParticle> rels = simHits[iterSignalMapTrg->second.m_simHitIndex]->getRelationsFrom<MCParticle>();
+    if (rels.size() != 0) {
+      //assumption: only one MCParticle
+      const MCParticle* mcparticle = rels[0];
+      double weight = rels.weight(0);
+      mcparticle->addRelationTo(cdcHit, weight);
+    }
   }
 
 }

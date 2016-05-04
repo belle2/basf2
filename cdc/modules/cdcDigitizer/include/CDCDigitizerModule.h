@@ -99,6 +99,7 @@ namespace Belle2 {
 
     std::string m_inputCDCSimHitsName;       /**< Input array name.  */
     std::string m_outputCDCHitsName;         /**< Output array name. */
+    std::string m_outputCDCHitsName4Trg;     /**< Output array name for trigger. */
 
     std::string m_MCParticlesToSimHitsName;    /**< Relation for origin of incoming SimHits. */
     std::string m_SimHitsTOCDCHitsName;      /**< Relation for outgoing CDCHits. */

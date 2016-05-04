@@ -1036,7 +1036,7 @@ namespace Belle2 {
           rise.clock(_clockTDC);
         TRGTime fall = rise;
         fall.shift(1).reverse();
-        w._signal = TRGSignal(rise & fall);
+        w._signal |= TRGSignal(rise & fall);
         w._signal.name(w.name());
 
         //...Left/right...
@@ -1056,7 +1056,8 @@ namespace Belle2 {
         hit->state(CellHitFindingValid | CellHitFittingValid);
 
         //...Store a hit...
-        ((TCWire*)(*_layers[layerId])[wireId])->hit(hit);
+        if (!(*_layers[layerId])[wireId]->hit())
+          ((TCWire*)(*_layers[layerId])[wireId])->hit(hit);
         _hits.push_back(hit);
         if (w.axial()) _axialHits.push_back(hit);
         else _stereoHits.push_back(hit);

@@ -90,7 +90,7 @@ void WaveTimingV4Module::event()
         TH1D m_tmp_h("m_tmp_h", "m_tmp_h", (int)v_samples.size(), 0., (double)v_samples.size());
         //TH1D m_tmp_h_n("m_tmp_h_n", "m_tmp_h_n", (int)v_samples.size(), 0., (double)v_samples.size());
 
-        for (unsigned int s = 0; s < v_samples.size(); s++) {
+        for (size_t s = 0; s < v_samples.size(); s++) {
           m_tmp_h.SetBinContent(s, v_samples.at(s));
           //m_tmp_h_n.SetBinContent(s, -1.*v_samples.at(s));
         }
@@ -134,12 +134,10 @@ void WaveTimingV4Module::event()
             while ((v_samples.at(d) > ypos[c]*m_frac) && (d > 0)) {
               d--;
             }
-
             unsigned int x1 = xpos[c] - 2 * (xpos[c] - d);
             if (x1 <= 1) {
               x1 = 1;
             }
-
             double first = v_samples.at(d);
             double second = v_samples.at(d + 1);
             double dV = second - first;
@@ -164,7 +162,6 @@ void WaveTimingV4Module::event()
             if (x2 >= (v_samples.size() - 1)) {
               x2 = v_samples.size() - 1;
             }
-
             hit.width = backTime - frontTime;
             hit.chi2 = 0.;
             hit.q = 0.;
@@ -219,7 +216,7 @@ void WaveTimingV4Module::event()
           double d_min = d_peak - 80;
           int dbl_count(0);
           if (d_min < 1) d_min = 1; //Handle exception
-          for (unsigned int d = (d_peak - 15); d > d_min; d--) {
+          for (int d = d_peak - 15; d > d_min; d--) {
             if (v_samples.at(d) < m_thresh_n) dbl_count++;
           }
           if (dbl_count < 1) d_max = 0;
@@ -263,76 +260,19 @@ void WaveTimingV4Module::event()
             hits.push_back(hit);
 
           }
-          //else no peak found
-
-          /*
-          for (int c = 0; c < search_peaks_found_n; c++) {
-            if (ypos_n[c] > m_thresh_n) {
-              peaks_found++;
-              hit.adc_height = -1*ypos_n[c];
-              unsigned int d = (xpos_n[c] + 0.5); // First measure front edge.
-              while ( (-1.*(v_samples.at(d)) > ypos_n[c]*m_frac) && (d > 0)) {
-          d--;
-              }
-
-              double first = -1.*v_samples.at(d);
-              double second = -1.*v_samples.at(d + 1);
-              double dV = second - first;
-              double frontTime = (d + ((ypos_n[c] * m_frac) - first) / dV);
-              if (d == 0) {
-          frontTime = 0.;
-              }
-              //hit.tdc_bin = frontTime;
-
-              d = (xpos[c] + 0.5); // Now measure back edge.
-              while (((d + 1) < v_samples.size()) && (-1.*(v_samples.at(d)) > (ypos_n[c]*m_frac)) ) {
-          d++;
-              }
-              first = -1.*v_samples.at(d);
-              second = -1.*v_samples.at(d - 1);
-              dV = second - first;
-              double backTime = (d - ((ypos_n[c] * m_frac) - first) / dV);
-              if ((d + 1) == v_samples.size()) {
-          backTime = d;
-              }
-
-              //For negative pulse, use the back edge for our timing point
-              hit.tdc_bin = backTime;
-
-              hit.width = backTime - frontTime;
-              hit.chi2 = 0.;
-              hit.q=0.;
-
-              hits.push_back(hit);
-
-              B2DEBUG(1, hardwareID << " negative peak found (" << xpos_n[c] << "," << ypos_n[c] << ")\twidth: " << hit.width << "\ttdc: " << hit.tdc_bin <<
-                "\tfrontTime: " << frontTime << "\tbackTime: " << backTime);
-            }
-
-          }
-          */
         }
-
         //      B2DEBUG(1,peaks_found<<" peaks found.");
         evtwaves_ptr[w]->SetHits(hits);
         B2DEBUG(1, hits.size() << " peaks found, " << evtwaves_ptr[w]->GetHits().size() << " made it");
-
-
         //Create topcafDIGITs
-
         for (size_t c = 0; c < hits.size(); c++) {
           TOPCAFDigit* this_topcafdigit = m_topcafdigits_ptr.appendNew(evtwaves_ptr[w]);
-
           this_topcafdigit->SetHitValues(hits[c]);
           this_topcafdigit->SetBoardstack(electronics);
         }
-
       }
     }//End loop
-
   }
-
-
 }
 
 void WaveTimingV4Module::terminate()

@@ -170,7 +170,7 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   else{
     py1t=new TPaveText(0.6,0.5,1.0,0.9,"NDC");
   }
-  char ct1[25];
+  char ct1[50];
   sprintf(ct1,"1: x=%f +/- %f",fn0->GetParameter(1),fn0->GetParError(1));
   py1t->AddText(ct1);
   sprintf(ct1,"1: #s=%f +/- %f",fn0->GetParameter(2),fn0->GetParError(2));
@@ -193,7 +193,7 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   TPad *c_subpad=(TPad*)c_py2->cd(2);
   c_subpad->Divide(2);
   TPaveText *ptnhit[10];
-  char ct[20];
+  char ct[50];
   c_subpad->cd(1);
   ptnhit[0]=new TPaveText(0.5,0.8,0.8,0.9,"NDC");
   float hmean(0), hden(0);

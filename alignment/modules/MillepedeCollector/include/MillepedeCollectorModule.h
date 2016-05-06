@@ -42,6 +42,9 @@ namespace Belle2 {
     /** Only for closing mille binaries after each run */
     virtual void endRun();
 
+    /** Register mille binaries in file catalog */
+    virtual void terminate();
+
     /** Make a name for mille binary (encodes module name + starting exp, run and event + process id) */
     std::string getUniqueMilleName();
 

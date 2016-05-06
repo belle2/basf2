@@ -28,6 +28,8 @@
 #include <genfit/Track.h>
 
 #include <alignment/GlobalLabel.h>
+#include <framework/core/FileCatalog.h>
+#include <framework/dataobjects/FileMetaData.h>
 
 #include <TMath.h>
 
@@ -267,6 +269,24 @@ void MillepedeCollectorModule::endRun()
   if (mille.isOpen())
     mille.close();
 }
+
+void MillepedeCollectorModule::terminate()
+{
+  auto& mille = getObject<MilleData>("mille");
+  auto& catalog = FileCatalog::Instance();
+  StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
+  if (!fileMetaData.isValid()) {
+    B2ERROR("Cannot register binaries in FileCatalog.");
+    return;
+  }
+
+  for (auto binary : mille.getFiles()) {
+    FileMetaData milleMetaData(*fileMetaData);
+    milleMetaData.setLfn(binary);
+    catalog.registerFile(binary, milleMetaData);
+  }
+}
+
 
 std::string MillepedeCollectorModule::getUniqueMilleName()
 {

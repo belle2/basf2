@@ -96,9 +96,6 @@ namespace Belle2 {
     //! get b2l block from "FEE b2link header"
     virtual unsigned int GetB2LFEE32bitEventNumber(int n);
 
-    //! get Event unixtime from "FEE b2link header"
-    double GetEventUnixTime(int n);
-
     //
     // read magic word to check data
     //

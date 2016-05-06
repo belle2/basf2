@@ -429,27 +429,6 @@ void PreRawCOPPERFormat_v1::CheckUtimeCtimeTRGType(int n)
 }
 
 
-
-double PreRawCOPPERFormat_v1::GetEventUnixTime(int n)
-{
-#ifndef READ_OLD_B2LFEE_FORMAT_FILE
-  double retval;
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-  CheckB2LFEEHeaderVersion(n);
-#endif
-  retval = (double)(m_buffer[ GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_TT_UTIME ]) +
-           (double)((m_buffer[ GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE ] >> 4) & 0x7FFFFFF) / 1.27e8;
-  return retval;
-#else
-  exit(1);
-  return 0.;
-#endif
-
-}
-
-
-
-
 unsigned int PreRawCOPPERFormat_v1::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int prev_eve32,
                                                           unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {

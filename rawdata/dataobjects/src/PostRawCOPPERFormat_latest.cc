@@ -217,15 +217,6 @@ void PostRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
   throw (err_str);
 }
 
-
-
-double PostRawCOPPERFormat_latest::GetEventUnixTime(int n)
-{
-  tmp_header.SetBuffer(GetBuffer(n));
-  return (double)(tmp_header.GetTTUtime());
-
-}
-
 unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int prev_eve32,
     unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 

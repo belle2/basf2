@@ -211,9 +211,6 @@ namespace Belle2 {
     //! get b2l block from "FEE b2link header"
     virtual unsigned int GetB2LFEE32bitEventNumber(int n);
 
-    //! get Event unixtime from "FEE b2link header"
-    double GetEventUnixTime(int n);
-
     //
     // read magic word to check data
     //
@@ -683,12 +680,6 @@ namespace Belle2 {
   {
     CheckVersionSetBuffer();
     return m_access->CheckUtimeCtimeTRGType(n);
-  }
-
-  inline  double RawCOPPER::GetEventUnixTime(int n)
-  {
-    CheckVersionSetBuffer();
-    return m_access->GetEventUnixTime(n);
   }
 
   inline  unsigned int RawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)

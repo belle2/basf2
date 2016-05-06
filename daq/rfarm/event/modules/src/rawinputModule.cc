@@ -71,117 +71,15 @@ void RawInputModule::initialize()
   }
   printf("Done. m_fd = %d\n", m_fd);
 
+  // Read the first event in RingBuffer and restore in DataStore.
+  // This is necessary to create object tables before TTree initialization
+  // if used together with SimpleOutput.
   //  ---- Prefetch the first event
   registerRawCOPPERs();
 
   B2INFO("RawInput: initialized.");
 }
 
-void RawInputModule::registerRawCOPPERs()
-{
-
-  int error_flag = 0;
-  // BUffer
-  char* evtbuf = new char[MAXEVTSIZE];
-  // Get a record from file
-  int sstat = read(m_fd, evtbuf, sizeof(int));
-  if (sstat <= 0) return;
-  int* recsize = (int*)evtbuf;
-  int rstat = read(m_fd, evtbuf + sizeof(int), (*recsize - 1) * 4);
-  if (rstat <= 0) return;
-
-  B2INFO("RawInput: got an event from RingBuffer, size=" << recsize <<
-         " (proc= " << (int)getpid() << ")");
-
-  // Unpack SendHeader
-  SendHeader sndhdr;
-  sndhdr.SetBuffer((int*)evtbuf);
-  int npackedevts = sndhdr.GetNumEventsinPacket();
-  if (npackedevts != 1) {
-    B2FATAL("Raw2DsModule::number of events in packet is not 1");
-  }
-  int ncprs = sndhdr.GetNumNodesinPacket();
-  int nwords = sndhdr.GetTotalNwords() - SendHeader::SENDHDR_NWORDS - SendTrailer::SENDTRL_NWORDS;
-
-  // Get buffer header
-  int* bufbody = (int*)evtbuf + SendHeader::SENDHDR_NWORDS;
-
-  // Unpack buffer
-  RawCOPPER tempcpr;
-  tempcpr.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
-
-  //  B2INFO ( "NCoppers = " << ncprs << " Nwords = " << nwords );
-  // Store data contents in Corresponding RawXXXX
-  for (int cprid = 0; cprid < ncprs; cprid++) {
-    // Pick up one COPPER and copy data in a temporary buffer
-    int nwds_buf = tempcpr.GetBlockNwords(cprid);
-    int* cprbuf = new int[nwds_buf];
-    memcpy(cprbuf, tempcpr.GetBuffer(cprid), nwds_buf * 4);
-
-    //    printf ( "Processing COPPER %d: blocknw = %d\n", cprid, nwds_buf );
-
-    if (tempcpr.CheckFTSWID(cprid)) {
-      //      printf ( "FTSW detected\n" );
-      StoreArray<RawFTSW> ary;
-      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-      continue;
-    }
-
-    if (tempcpr.GetErrorBitFlag(cprid)) error_flag = 1;
-
-    // Get subsys id
-    int subsysid = tempcpr.GetNodeID(cprid) & DETECTOR_MASK;
-    //    B2INFO ( "--> subsys ID = " << subsysid << " Block words = " << nwds_buf );
-    // Switch to each detector and register RawXXX
-    if (subsysid == CDC_ID) {
-      //      printf ( "CDC identified\n" );
-      StoreArray<RawCDC> ary;
-      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == SVD_ID) {
-      //      printf ( "SVD identified\n" );
-      StoreArray<RawSVD> ary;
-      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == BECL_ID  || subsysid == EECL_ID) {
-      //      printf ( "ECL identified\n" );
-      StoreArray<RawECL> ary;
-      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == TOP_ID) {
-      //      printf ( "TOP identified\n" );
-      StoreArray<RawTOP> ary;
-      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == ARICH_ID) {
-      //      printf ( "ARICH identified\n" );
-      StoreArray<RawARICH> ary;
-      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == BKLM_ID || subsysid == EKLM_ID) {
-      //      printf ( "KLM identified\n" );
-      StoreArray<RawKLM> ary;
-      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if ((subsysid & 0xF0000000) == TRGDATA_ID) {
-      //      printf ( "TRG identified\n" );
-      StoreArray<RawTRG> ary;
-      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else {
-      //      printf ( "Fall back COPPER identified\n" );
-      StoreArray<RawCOPPER> ary;
-      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    }
-    //    printf ( "COPPER %d completed\n", cprid );
-    //    delete[] cprbuf;
-  }
-
-  StoreObjPtr<EventMetaData> evtmetadata;
-  evtmetadata.create();
-  evtmetadata->setExperiment(sndhdr.GetExpNum());
-  evtmetadata->setRun(sndhdr.GetRunNum());
-  evtmetadata->setEvent(sndhdr.GetEventNumber());
-  if (error_flag) evtmetadata->addErrorFlag(EventMetaData::c_B2LinkCRCError);
-
-  delete[] evtbuf;
-
-  B2INFO("RawInput: DataStore Restored!!");
-  return;
-}
 
 
 void RawInputModule::beginRun()
@@ -193,14 +91,124 @@ void RawInputModule::beginRun()
 
 void RawInputModule::event()
 {
-  printf("This program is obsolete. Do not use this program.\n");
-  exit(1);
   m_nevt++;
   // First event is already loaded
   if (m_nevt == 0) return;
 
   registerRawCOPPERs();
 }
+
+void RawInputModule::registerRawCOPPERs()
+{
+
+  // Get a record from a file
+  int error_flag = 0;
+  char* evtbuf = new char[MAXEVTSIZE];
+  // Get a record from file
+  int sstat = read(m_fd, evtbuf, sizeof(int));
+  if (sstat <= 0) return;
+  int* recsize = (int*)evtbuf;
+  int rstat = read(m_fd, evtbuf + sizeof(int), (*recsize - 1) * 4);
+  if (rstat <= 0) return;
+
+  B2INFO("RawInput: got an event from a file, size=" << recsize <<
+         " (proc= " << (int)getpid() << ")");
+
+  // Unpack SendHeader
+  SendHeader sndhdr;
+  sndhdr.SetBuffer((int*)evtbuf);
+  int npackedevts = sndhdr.GetNumEventsinPacket();
+  if (npackedevts != 1) {
+    B2FATAL("Raw2DsModule::number of events in packet is not 1");
+  }
+  int ncprs = sndhdr.GetNumNodesinPacket();
+  int nwords = sndhdr.GetTotalNwords() - SendHeader::SENDHDR_NWORDS - SendTrailer::SENDTRL_NWORDS;
+  B2INFO("RawInput: Ncprs=" << ncprs << " Nwords=" << nwords);
+
+  // Get buffer header
+  int* bufbody = (int*)evtbuf + SendHeader::SENDHDR_NWORDS;
+
+  //
+  // Copy from Raw2DsModule.cc -- From here
+  //
+
+  // Unpack buffer
+  RawDataBlock tempdblk;
+  tempdblk.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
+
+  // Store data contents in Corresponding RawXXXX
+  for (int cprid = 0; cprid < ncprs * npackedevts; cprid++) {
+    // Pick up one COPPER and copy data in a temporary buffer
+    int nwds_buf = tempdblk.GetBlockNwords(cprid);
+    int* cprbuf = new int[nwds_buf];
+    memcpy(cprbuf, tempdblk.GetBuffer(cprid), nwds_buf * 4);
+
+    // Check FTSW
+    if (tempdblk.CheckFTSWID(cprid)) {
+      StoreArray<RawFTSW> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+      continue;
+    }
+
+    RawCOPPER tempcpr;
+    //    tempcpr.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);  -> bug. If RawFTSW is stored in bufbody, tempcpr's version becomes 0 and getNodeID fails.
+    tempcpr.SetBuffer(cprbuf, nwds_buf, false, 1, 1);
+
+    //    int subsysid = ((RawCOPPER&)tempdblk).GetNodeID(cprid);
+    //    int subsysid = tempcpr.GetNodeID(cprid);
+    int subsysid = tempcpr.GetNodeID(0);
+    if (tempcpr.GetErrorBitFlag(0)) error_flag = 1;
+    //    if (tempcpr.GetErrorBitFlag(cprid)) error_flag = 1;
+
+    // Switch to each detector and register RawXXX
+    if ((subsysid & DETECTOR_MASK) == CDC_ID) {
+      StoreArray<RawCDC> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+    } else if ((subsysid & DETECTOR_MASK) == SVD_ID) {
+      StoreArray<RawSVD> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+    } else if ((subsysid & DETECTOR_MASK) == BECL_ID) {
+      StoreArray<RawECL> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+    } else if ((subsysid & DETECTOR_MASK) == EECL_ID) {
+      StoreArray<RawECL> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+    } else if ((subsysid & DETECTOR_MASK) == TOP_ID) {
+      StoreArray<RawTOP> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+    } else if ((subsysid & DETECTOR_MASK) == ARICH_ID) {
+      StoreArray<RawARICH> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+    } else if ((subsysid & DETECTOR_MASK) == BKLM_ID) {
+      StoreArray<RawKLM> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+    } else if ((subsysid & DETECTOR_MASK) == EKLM_ID) {
+      StoreArray<RawKLM> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+    } else if (((subsysid & DETECTOR_MASK) & 0xF0000000) == TRGDATA_ID) {
+      StoreArray<RawTRG> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+    } else {
+      StoreArray<RawCOPPER> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+    }
+    //    delete[] cprbuf;
+  }
+
+  StoreObjPtr<EventMetaData> evtmetadata;
+  evtmetadata.create();
+  evtmetadata->setExperiment(sndhdr.GetExpNum());
+  evtmetadata->setRun(sndhdr.GetRunNum());
+  evtmetadata->setEvent(sndhdr.GetEventNumber());
+  if (error_flag) evtmetadata->addErrorFlag(EventMetaData::c_B2LinkCRCError);
+
+  delete[] evtbuf;
+  // Copy from Raw2DsModule.cc -- Up to here
+
+  B2INFO("RawInput: DataStore Restored!!");
+  return;
+}
+
 
 void RawInputModule::endRun()
 {

@@ -10,35 +10,6 @@
 
 #include <ecl/modules/MCMatcherECLClusters/MCMatcherECLClustersModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-
-#include <ecl/dataobjects/ECLHit.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLHitAssignment.h>
-
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
-
-#include <TVector3.h>
-
-#include <cstdlib>
-#include <iomanip>
-#include <math.h>
-#include <time.h>
-#include <iomanip>
-#include <utility>
-#include <algorithm>
-#include <vector>
-
-using namespace std;
-using namespace boost;
 using namespace Belle2;
 using namespace ECL;
 
@@ -52,13 +23,17 @@ REG_MODULE(MCMatcherECLClusters)
 //                 Implementation
 //-----------------------------------------------------------------
 
-MCMatcherECLClustersModule::MCMatcherECLClustersModule() : Module()
+MCMatcherECLClustersModule::MCMatcherECLClustersModule() : Module(),
+  m_eclHitToSimHitRelationArray(m_eclHits, m_eclSimHits),
+  m_mcParticleToECLHitRelationArray(m_mcParticles, m_eclHits),
+  m_mcParticleToECLSimHitRelationArray(m_mcParticles, m_eclSimHits),
+  m_eclCalDigitToMCParticleRelationArray(m_eclCalDigits, m_mcParticles),
+  m_eclDigitToMCParticleRelationArray(m_eclDigits, m_mcParticles),
+  m_eclShowerToMCPart(m_eclShowers, m_mcParticles)
 {
   // Set description
-
   setDescription("MCMatcherECLClustersModule");
   setPropertyFlags(c_ParallelProcessingCertified);
-
 }
 
 MCMatcherECLClustersModule::~MCMatcherECLClustersModule()
@@ -67,25 +42,17 @@ MCMatcherECLClustersModule::~MCMatcherECLClustersModule()
 
 void MCMatcherECLClustersModule::initialize()
 {
-  // Initialize variables
-  m_nRun    = 0 ;
-  // CPU time start
-  m_timeCPU = clock() * Unit::us;
-  StoreArray<MCParticle> mcParticles;
-  StoreArray<ECLHit> eclHits;
-  StoreArray<ECLCalDigit> eclCalDigits;
-  StoreArray<ECLDigit> eclDigits;
-  StoreArray<ECLShower> eclShowers;
-  StoreArray<ECLCluster> eclClusters;
-  mcParticles.registerRelationTo(eclHits);
-  eclCalDigits.registerRelationTo(mcParticles);
-  eclCalDigits.registerRelationTo(eclShowers);
-  eclDigits.registerRelationTo(mcParticles);
-  eclDigits.registerRelationTo(eclShowers);
-  eclShowers.registerRelationTo(mcParticles);
-  eclClusters.registerRelationTo(mcParticles);
-  StoreArray<ECLSimHit> ECLSimHitArray;
-  ECLSimHitArray.registerRelationTo(eclHits);
+  m_mcParticles.registerInDataStore();
+  m_eclHits.registerInDataStore();
+  m_eclCalDigits.registerInDataStore();
+  m_eclDigits.registerInDataStore();
+  m_eclClusters.registerInDataStore();
+
+  m_mcParticles.registerRelationTo(m_eclHits);
+  m_eclCalDigits.registerRelationTo(m_mcParticles);
+  m_eclDigits.registerRelationTo(m_mcParticles);
+  m_eclShowers.registerRelationTo(m_mcParticles);
+  m_eclClusters.registerRelationTo(m_mcParticles);
 }
 
 void MCMatcherECLClustersModule::beginRun()
@@ -94,190 +61,94 @@ void MCMatcherECLClustersModule::beginRun()
 
 void MCMatcherECLClustersModule::event()
 {
-  StoreArray<MCParticle> mcParticles;
-  StoreArray<ECLHit> eclHits;
-  StoreArray<ECLCalDigit> eclCalDigits;
-  StoreArray<ECLDigit> eclDigits;
-  StoreArray<ECLSimHit> eclSimHits;
-  RelationArray mcParticleToECLHitRelationArray(mcParticles, eclHits);
-  RelationArray eclCalDigitToMCParticleRelationArray(eclCalDigits, mcParticles);
-  RelationArray eclDigitToMCParticleRelationArray(eclDigits, mcParticles);
-  RelationArray eclHitToSimHitRelationArray(eclHits, eclSimHits);
-  RelationArray mcParticleToECLSimHitRelationArray(mcParticles, eclSimHits);
-
-  /****************************************************************************************/
-
-  //std::vector<int> DigiIndex(8736);
-  int CalDigiIndex[8736];
-  int CalDigiOldTrack[8736];
-  std::fill_n(CalDigiIndex, 8736, -1);
-  std::fill_n(CalDigiOldTrack, 8736, -1);
-
-  int DigiIndex[8736];
-  int DigiOldTrack[8736];
-  std::fill_n(DigiIndex, 8736, -1);
-  std::fill_n(DigiOldTrack, 8736, -1);
-
-  for (const auto& eclCalDigit : eclCalDigits) {
-//    float fitEnergy    = (eclDigit.getAmp()) / 20000.; //ADC count to GeV
-    float calEnergy    = eclCalDigit.getEnergy(); // Calibrated Energy in GeV
-    int cId            = (eclCalDigit.getCellId() - 1);
-    if (calEnergy < 0.) {
-      continue;
-    }
-    CalDigiIndex[cId] = eclCalDigit.getArrayIndex();
+  short int Index[8736];
+  std::fill_n(Index, 8736, -1);
+  const TClonesArray* cd = m_eclCalDigits.getPtr();
+  TObject** ocd = cd->GetObjectRef();
+  for (int i = 0, imax = cd->GetEntries(); i < imax; i++) { // avoiding call of StoreArray::getArrayIndex() member function
+    const ECLCalDigit& t = static_cast<const ECLCalDigit&>(*ocd[i]);
+    double calEnergy = t.getEnergy(); // Calibrated Energy in GeV
+    if (calEnergy < 0) continue;
+    Index[t.getCellId() - 1] = i;
   }
 
-  for (const auto& eclDigit : eclDigits) {
-    float Energy    = eclDigit.getAmp() / 20000;
-    int Id            = (eclDigit.getCellId() - 1);
-    if (Energy < 0.) {
-      continue;
+  RelationArray& p2sh = m_mcParticleToECLSimHitRelationArray;
+  RelationArray& cd2p = m_eclCalDigitToMCParticleRelationArray;
+  RelationArray& sh2p = m_eclShowerToMCPart;
+  ECLSimHit** simhits = (ECLSimHit**)(m_eclSimHits.getPtr()->GetObjectRef());
+
+  TClonesArray* ha = m_eclHitAssignments.getPtr();
+  ECLHitAssignment** oha = (ECLHitAssignment**)(ha->GetObjectRef());
+  int ihamax = ha->GetEntries();
+
+  for (int i = 0, imax = p2sh.getEntries(); i < imax; i++) {
+    const RelationElement& re = p2sh[i];
+    const std::vector<unsigned int>& simhitindx = re.getToIndices();
+    std::map<int, double> e;
+    for (unsigned int j : simhitindx) {
+      const ECLSimHit* h = simhits[j];
+      int id = h->getCellId() - 1;
+      e[id] += h->getEnergyDep();
     }
-    DigiIndex[Id] = eclDigit.getArrayIndex();
+
+    // relation from CalibratedDigit to MC particle
+    for (const std::pair<int, double>& t : e) {
+      int ind = Index[t.first];
+      double w = t.second;
+      if (ind >= 0 && w > 0) cd2p.add(ind, re.getFromIndex(), w);
+    }
+
+    // relation from ECLShower to MC particle
+    std::map<int, double> es;
+    for (int j = 0; j < ihamax; j++) {
+      int id = oha[j]->getCellId() - 1;
+      std::map<int, double>::iterator it = e.find(id);
+      if (it != e.end())
+        es[oha[j]->getShowerId()] += (*it).second;
+    }
+    for (const std::pair<int, double>& t : es)
+      sh2p.add(t.first, re.getFromIndex(), t.second);
   }
 
-  PrimaryTrackMap eclPrimaryMap;  // map<int, int>
+  // reuse Index
+  std::fill_n(Index, 8736, -1);
+  const TClonesArray* ed = m_eclDigits.getPtr();
+  TObject** oed = ed->GetObjectRef();
+  for (int i = 0, imax = ed->GetEntries(); i < imax; i++) { // avoiding call of StoreArray::getArrayIndex() member function
+    const ECLDigit& t = static_cast<const ECLDigit&>(*oed[i]);
+    if (t.getAmp() <= 0) continue;
+    Index[t.getCellId() - 1] = i;
+  }
 
-  for (const auto& mcParticle : mcParticles) {
-    if (mcParticle.getMother() == NULL) continue;
-
-    const int mcParticleIndex = mcParticle.getArrayIndex();
-    const int mcParticleMotherIndex = mcParticle.getMother()->getArrayIndex();
-
-    if (mcParticle.hasStatus(MCParticle::c_PrimaryParticle) and mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
-      eclPrimaryMap.insert(pair<int, int>(mcParticleIndex, mcParticleIndex));
-    } else if (eclPrimaryMap.find(mcParticle.getMother()->getArrayIndex()) != eclPrimaryMap.end()) {
-      eclPrimaryMap.insert(pair<int, int>(mcParticleIndex, eclPrimaryMap[mcParticleMotherIndex]));
+  RelationArray& p2eh = m_mcParticleToECLHitRelationArray;
+  RelationArray& ed2p = m_eclDigitToMCParticleRelationArray;
+  ECLHit** eclhits = (ECLHit**)(m_eclHits.getPtr()->GetObjectRef());
+  for (int i = 0, imax = p2eh.getEntries(); i < imax; i++) {
+    const RelationElement& re = p2eh[i];
+    const std::vector<unsigned int>& eclhitindx = re.getToIndices();
+    for (unsigned int j : eclhitindx) {
+      const ECLHit* t = eclhits[j];
+      int id = t->getCellId() - 1;
+      if (t->getBackgroundTag() == 0 && Index[id] >= 0)
+        ed2p.add(Index[id], re.getFromIndex()); // relation ECLDigit to MC particle
     }
-  } // mcParticles
-
-  for (int index = 0; index < mcParticleToECLHitRelationArray.getEntries(); index++) {
-    int PrimaryIndex = -1;
-    const int mcParticleIndex = mcParticleToECLHitRelationArray[index].getFromIndex();
-    //const map<int, int>::iterator iter = eclPrimaryMap.find(mcParticleIndex);
-
-    //if (iter != eclPrimaryMap.end()) {
-    //  PrimaryIndex = iter->first; //it's the daughter
-    //} else continue;
-
-    PrimaryIndex = mcParticleIndex;
-
-    for (int hit = 0; hit < (int)mcParticleToECLHitRelationArray[index].getToIndices().size(); hit++) {
-      const int eclHitIndex = mcParticleToECLHitRelationArray[index].getToIndex(hit);
-      const ECLHit* aECLHit = eclHits[eclHitIndex];
-      int hitCellId         = aECLHit->getCellId() - 1;
-      if (aECLHit->getBackgroundTag() != 0) continue;
-      //OLD MC-CalDigit relation, does not handle multiple matching nor weights
-      //if (CalDigiIndex[hitCellId] != -1 && PrimaryIndex > -1) { // && DigiOldTrack[hitCellId] != PrimaryIndex) {
-      //  eclCalDigitToMCParticleRelationArray.add(CalDigiIndex[hitCellId], PrimaryIndex);
-      //DigiOldTrack[hitCellId] = PrimaryIndex;
-      //}
-      if (DigiIndex[hitCellId] != -1 && PrimaryIndex > -1) { // && DigiOldTrack[hitCellId] != PrimaryIndex) {
-        eclDigitToMCParticleRelationArray.add(DigiIndex[hitCellId], PrimaryIndex);
-      }
-    }//for (int hit = 0
-  }//for index
-
-  for (const auto& eclCalDigit : eclCalDigits) {
-    const auto digitCellId = eclCalDigit.getCellId();
-    for (int iMCPart = 0; iMCPart < mcParticleToECLSimHitRelationArray.getEntries(); iMCPart++) {
-      double energy = 0;
-      for (int simhit = 0; simhit < (int)mcParticleToECLSimHitRelationArray[iMCPart].getToIndices().size(); simhit++) {
-        ECLSimHit* aECLSimHit = eclSimHits[mcParticleToECLSimHitRelationArray[iMCPart].getToIndex(simhit)];
-        if ((aECLSimHit->getCellId() != digitCellId)) continue;
-        energy = energy + aECLSimHit->getEnergyDep();
-      } // simhit
-      if (energy > 0.) {
-        //const auto mcParticle = mcParticles.object(i);
-        eclCalDigitToMCParticleRelationArray.add(eclCalDigit.getArrayIndex(), mcParticleToECLSimHitRelationArray[iMCPart].getFromIndex(),
-                                                 energy);
-      }
-    }//for iMCPart
-  }//for ECLCalDigit
-
-  /****************************************************************************************/
-
-  StoreArray<ECLShower> eclShowers;
-  StoreArray<ECLHitAssignment> eclHitAssignments;
-  RelationArray eclShowerToMCPart(eclShowers, mcParticles);
-
-  map<int, double> mc_relations;
-  map<int, double> eclMCParticleContributionMap;;
-
-  for (const auto& eclShower : eclShowers) {
-    const auto showerId = eclShower.getShowerId();
-    for (int iMCPart = 0; iMCPart < mcParticleToECLSimHitRelationArray.getEntries(); iMCPart++) {
-      double energy = 0;
-      //for (const auto& eclCalDigit : eclCalDigits) {
-      for (const auto& eclHitAssignment : eclHitAssignments) {
-        const int m_HAShowerId = eclHitAssignment.getShowerId();
-        //const ECLShower* s_digit = eclCalDigit.getRelated<ECLShower>();
-        //const int m_HAShowerId = s_digit->getShowerId();
-        if (m_HAShowerId != showerId) continue;
-        if (m_HAShowerId > showerId) break;
-
-        for (int simhit = 0; simhit < (int)mcParticleToECLSimHitRelationArray[iMCPart].getToIndices().size(); simhit++) {
-          ECLSimHit* aECLSimHit = eclSimHits[mcParticleToECLSimHitRelationArray[iMCPart].getToIndex(simhit)];
-          if ((aECLSimHit->getCellId() - 1 != eclHitAssignment.getCellId() - 1)) continue;
-          //if ((aECLSimHit->getCellId() - 1 != eclCalDigit.getCellId() - 1)) continue;
-          energy = energy + aECLSimHit->getEnergyDep();
-        } // simhit
-      } // eclHitAssignment
-      if (energy > 0.) {
-        eclMCParticleContributionMap.insert(pair<int, double>((int) mcParticleToECLSimHitRelationArray[iMCPart].getFromIndex(), energy));
-      }
-    }//for iMCPart
-
-    int PrimaryIndex = -1;
-    int MaxContribution = 0;
-    for (const auto& pair : eclMCParticleContributionMap) {
-      mc_relations[pair.first] += pair.second;
-      if (pair.second > MaxContribution) {
-        MaxContribution = pair.second;
-        PrimaryIndex = pair.first;
-      }
-    }
-    eclMCParticleContributionMap.clear();
-
-    if (PrimaryIndex == -1) { //continue?
-    } else {
-      for (const auto& pair : mc_relations) {
-        eclShowerToMCPart.add(showerId, pair.first, pair.second);
-      }
-    }
-    mc_relations.clear();
-  } // eclShower
-
-  /****************************************************************************************/
+  }
 
   // to create the relation between ECLCluster->MCParticle with the same weight as
   // the relation between ECLShower->MCParticle.  StoreArray<ECLCluster> eclClusters;
-  StoreArray<ECLCluster> eclClusters;
-  for (const auto& eclShower : eclShowers) {
-    const auto eclCluster = eclShower.getRelatedFrom<ECLCluster>();
-    const auto mcParticles = eclShower.getRelationsTo<MCParticle>();
+  for (const auto& eclShower : m_eclShowers) {
+    const ECLCluster* eclCluster = eclShower.getRelatedFrom<ECLCluster>();
+    const RelationVector<MCParticle> mcParticles = eclShower.getRelationsTo<MCParticle>();
     for (unsigned int i = 0; i < mcParticles.size(); ++i) {
       const auto mcParticle = mcParticles.object(i);
       const auto weight = mcParticles.weight(i);
       eclCluster->addRelationTo(mcParticle, weight);
     }
   }
-
-  for (const auto& eclCluster : eclClusters) {
-    const auto mcParticleWeightPair = eclCluster.getRelatedToWithWeight<MCParticle>();
-    B2DEBUG(200, "ClusterID: " << eclCluster.getArrayIndex()
-            << " Energy: " <<  eclCluster.getEnergy()
-            << " MCParticle: " << mcParticleWeightPair.first->getArrayIndex()
-            << " Weight: " << mcParticleWeightPair.second);
-  }
-  B2DEBUG(200, "-------------------------");
 }
-
 
 void MCMatcherECLClustersModule::endRun()
 {
-  m_nRun++;
 }
 
 void MCMatcherECLClustersModule::terminate()

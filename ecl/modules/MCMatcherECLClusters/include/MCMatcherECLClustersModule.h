@@ -13,16 +13,17 @@
 #define MCMATCHERECLCLUSTERSMODULE_H_
 
 #include <framework/core/Module.h>
-#include <ecl/geometry/ECLGeometryPar.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
+
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLSimHit.h>
-
-#include <string>
-#include <vector>
-#include <queue>
-#include <map>
-
-#include <TRandom3.h>
-
+#include <ecl/dataobjects/ECLHitAssignment.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -45,7 +46,6 @@ namespace Belle2 {
 
       /** Actual digitization of all hits in the ECL.
        *
-       *  The digitized hits are written into the DataStore.
        */
       virtual void event();
 
@@ -55,19 +55,23 @@ namespace Belle2 {
       /** Stopping of CPU clock.*/
       virtual void terminate();
 
-      /** define a map for Primary Track*/
-      typedef std::map< int, int>  PrimaryTrackMap;
-      /** define a multimap for hits in showers */
-      typedef std::multimap< int, int> MultiMap;
-
     private:
-      /** CPU time     */
-      double m_timeCPU;
-      /** Run number   */
-      int    m_nRun;
-
+      StoreArray<MCParticle> m_mcParticles;
+      StoreArray<ECLHit> m_eclHits;
+      StoreArray<ECLCalDigit> m_eclCalDigits;
+      StoreArray<ECLDigit> m_eclDigits;
+      StoreArray<ECLSimHit> m_eclSimHits;
+      StoreArray<ECLShower> m_eclShowers;
+      StoreArray<ECLHitAssignment> m_eclHitAssignments;
+      StoreArray<ECLCluster> m_eclClusters;
+      RelationArray m_eclHitToSimHitRelationArray;
+      RelationArray m_mcParticleToECLHitRelationArray;
+      RelationArray m_mcParticleToECLSimHitRelationArray;
+      RelationArray m_eclCalDigitToMCParticleRelationArray;
+      RelationArray m_eclDigitToMCParticleRelationArray;
+      RelationArray m_eclShowerToMCPart;
     };
   } //ECL
 } // end of Belle2 namespace
 
-#endif // ECLDIGI_H
+#endif // MCMATCHERECLCLUSTERSMODULE_H_

@@ -199,6 +199,7 @@ void RawInputModule::registerRawCOPPERs()
   evtmetadata.create();
   evtmetadata->setExperiment(sndhdr.GetExpNum());
   evtmetadata->setRun(sndhdr.GetRunNum());
+  evtmetadata->setSubrun(sndhdr.GetSubRunNum());
   evtmetadata->setEvent(sndhdr.GetEventNumber());
   if (error_flag) evtmetadata->addErrorFlag(EventMetaData::c_B2LinkCRCError);
 

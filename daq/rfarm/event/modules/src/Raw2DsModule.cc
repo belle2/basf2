@@ -66,11 +66,9 @@ void Raw2DsModule::initialize()
   StoreArray<RawARICH>::registerPersistent();
   StoreArray<RawECL>::registerPersistent();
   StoreArray<RawKLM>::registerPersistent();
+  StoreArray<RawTRG>::registerPersistent();
   StoreArray<RawFTSW>::registerPersistent();
 
-#ifdef DESY
-  StoreArray<RawTLU>::registerPersistent();
-#endif
   // Read the first event in RingBuffer and restore in DataStore.
   // This is necessary to create object tables before TTree initialization
   // if used together with SimpleOutput.
@@ -128,30 +126,22 @@ void Raw2DsModule::registerRawCOPPERs()
 
   // Unpack buffer
   RawDataBlock tempdblk;
-  //  RawCOPPER tempdblk;
   tempdblk.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
 
   // Store data contents in Corresponding RawXXXX
-  //  for (int cprid = 0; cprid < ncprs; cprid++) {
   for (int cprid = 0; cprid < ncprs * npackedevts; cprid++) {
     // Pick up one COPPER and copy data in a temporary buffer
     int nwds_buf = tempdblk.GetBlockNwords(cprid);
     int* cprbuf = new int[nwds_buf];
     memcpy(cprbuf, tempdblk.GetBuffer(cprid), nwds_buf * 4);
-    // Get subsys id
+
     // Check FTSW
     if (tempdblk.CheckFTSWID(cprid)) {
       StoreArray<RawFTSW> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
       continue;
     }
-#ifdef DESY
-    if (tempdblk.CheckTLUID(cprid)) {
-      StoreArray<RawTLU> ary;
-      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-      continue;
-    }
-#endif
+
     RawCOPPER tempcpr;
     //    tempcpr.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);  -> bug. If RawFTSW is stored in bufbody, tempcpr's version becomes 0 and getNodeID fails.
     tempcpr.SetBuffer(cprbuf, nwds_buf, false, 1, 1);

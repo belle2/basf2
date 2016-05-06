@@ -29,6 +29,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     return c_Failure;
   }
 
+  m_steering.clearFiles();
   for (auto file : mille.getFiles())
     m_steering.addFile(file);
 
@@ -51,8 +52,9 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   int undeterminedParams = 0;
   for (int ipar = 0; ipar < m_result.getNoParameters(); ipar++) {
     if (!m_result.isParameterDetermined(ipar)) {
-      if (!m_result.isParameterFixed(ipar))
+      if (!m_result.isParameterFixed(ipar)) {
         ++undeterminedParams;
+      }
       continue;
     }
 

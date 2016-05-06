@@ -37,6 +37,10 @@ namespace Belle2 {
 
     //! Add a file (optionally with weight) to list of binary files
     void addFile(std::string filename, double weight = 1.);
+
+    //! Clear list of files
+    void clearFiles() {files.clear();}
+
   private:
     //! list command lines
     std::vector<std::string> commands;

@@ -82,6 +82,13 @@ MicrotpcDailyReportModule::~MicrotpcDailyReportModule()
 void MicrotpcDailyReportModule::defineHisto()
 {
   for (int i = 0; i < 2; i ++) {
+    h_tpc_flow[i] = new TH1F(TString::Format("h_tpc_flow_%d", i), "", 5000, 0., 24.);
+    h_tpc_pressure[i] = new TH1F(TString::Format("h_tpc_pressure_%d", i), "", 5000, 0., 24.);
+  }
+  for (int i = 0; i < 4; i ++) {
+    h_tpc_temperature[i] = new TH1F(TString::Format("h_tpc_temperature_%d", i), "", 5000, 0., 24.);
+  }
+  for (int i = 0; i < 2; i ++) {
     h_tpc_uptime[i] = new TH1F(TString::Format("h_tpc_uptime_%d", i), "", 3, 0., 3.);
   }
   for (int i = 0; i < 12; i ++) {
@@ -158,6 +165,11 @@ void MicrotpcDailyReportModule::event()
       //PLER = MetaHit.getPLER();
       flagHER = MetaHit.getflagHER();
       flagLER = MetaHit.getflagLER();
+      for (int i = 0; i < 4; i++) h_tpc_temperature[i]->Fill(TimeStamp, MetaHit.getTemperature()[i]);
+      for (int i = 0; i < 2; i++) {
+        h_tpc_pressure[i]->Fill(TimeStamp, MetaHit.getPressure()[i]);
+        h_tpc_flow[i]->Fill(TimeStamp, MetaHit.getFlow()[i]);
+      }
 
       h_iher[0]->Fill(TimeStamp, MetaHit.getIHER());
       if (MetaHit.getflagHER() == 0)
@@ -300,6 +312,11 @@ void MicrotpcDailyReportModule::endRun()
 void MicrotpcDailyReportModule::terminate()
 {
   cout << "terminate section" << endl;
+  for (int i = 0; i < 2; i++) {
+    h_tpc_flow[i]->Divide(h_tpc_rate[0]);
+    h_tpc_pressure[i]->Divide(h_tpc_rate[0]);
+  }
+  for (int i = 0; i < 4; i++) h_tpc_temperature[i]->Divide(h_tpc_rate[0]);
   for (int i = 0; i < 3; i++) {
     h_iher[i]->Divide(h_tpc_rate[0]);
     h_pher[i]->Divide(h_tpc_rate[0]);

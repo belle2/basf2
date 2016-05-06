@@ -102,6 +102,12 @@ namespace Belle2 {
       TH1F* h_tpc_rate_ler[4][10];
       /** Rates of different particle ID correlated to HER beams */
       TH1F* h_tpc_rate_her[4][10];
+      /** TPC flow rate */
+      TH1F* h_tpc_flow[2];
+      /** TPC pressure */
+      TH1F* h_tpc_pressure[2];
+      /** TPC temperature */
+      TH1F* h_tpc_temperature[4];
     };
 
   }

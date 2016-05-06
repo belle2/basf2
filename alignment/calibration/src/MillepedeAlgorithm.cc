@@ -48,8 +48,13 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   int nVXDparams = 0;
   int nCDCparams = 0;
   int nBKLMparams = 0;
+  int undeterminedParams = 0;
   for (int ipar = 0; ipar < m_result.getNoParameters(); ipar++) {
-    if (!m_result.isParameterDetermined(ipar)) continue;
+    if (!m_result.isParameterDetermined(ipar)) {
+      if (!m_result.isParameterFixed(ipar))
+        ++undeterminedParams;
+      continue;
+    }
 
     GlobalLabel param(m_result.getParameterLabel(ipar));
     if (param.isBeam()) ++nBeamParams;
@@ -65,6 +70,11 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     B2WARNING("No CDC parameters determined");
   if (!nBKLMparams)
     B2WARNING("No BKLM parameters determined");
+
+  if (undeterminedParams) {
+    B2WARNING("There are " << undeterminedParams << " undetermined parameters. Not enough data for calibration.");
+    return c_NotEnoughData;
+  }
 
   // Now here comes some experimental part...
   // The main reason to do this, we are only computing

@@ -58,6 +58,18 @@ namespace Belle2 {
     /// Conversion help for charges to clockwise or counterclockwise travel.
     ERotation chargeToERotation(const double charge);
 
+    /// Conversion helper for momenta to two dimensional (absolute) bend radius
+    double absMom2DToBendRadius(const double absMom2D,
+                                const double bZ);
+
+    /// Conversion helper for momenta to two dimensional (absolute) bend radius
+    double absMom2DToBendRadius(const double absMom2D,
+                                const Vector2D& pos2D);
+
+    /// Conversion helper for momenta to two dimensional (absolute) bend radius
+    double absMom2DToBendRadius(const double absMom2D,
+                                const Vector3D& pos3D);
+
     /// Conversion helper for momenta to two dimensional curvature
     double absMom2DToCurvature(const double absMom2D,
                                const double charge,

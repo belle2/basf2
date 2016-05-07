@@ -75,6 +75,24 @@ ERotation TrackFindingCDC::chargeToERotation(const double charge)
   return chargeSignToERotation(sign(charge));
 }
 
+double TrackFindingCDC::absMom2DToBendRadius(const double absMom2D,
+                                             const double bZ)
+{
+  return absMom2D / (bZ * 0.00299792458);
+}
+
+double TrackFindingCDC::absMom2DToBendRadius(const double absMom2D,
+                                             const Vector2D& pos2D)
+{
+  return absMom2DToBendRadius(absMom2D, getBFieldZ(pos2D));
+}
+
+double TrackFindingCDC::absMom2DToBendRadius(const double absMom2D,
+                                             const Vector3D& pos3D)
+{
+  return absMom2DToBendRadius(absMom2D, getBFieldZ(pos3D));
+}
+
 double TrackFindingCDC::absMom2DToCurvature(const double absMom2D,
                                             const double charge,
                                             const double bZ)

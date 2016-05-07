@@ -596,6 +596,11 @@ void VXDTelDQMOffLineModule::event()
   const RelationArray relClusterDigits(storeSVDClusters, storeDigits, m_relClusterDigitName);
   const RelationArray relTelClusterDigits(storeTelClusters, storeTelDigits, m_relTelClusterDigitName);
 
+//  StoreObjPtr<EventMetaData> emd;
+//  unsigned int m_evt = emd->getEvent();
+//  insignet int m_evt = emd->g
+//  emd.getEvent().
+
   // Tel basic histograms:
   // Fired strips
   vector< set<int> > uStripsSenpt(c_nTelPlanes); // sets to eliminate multiple samples per strip

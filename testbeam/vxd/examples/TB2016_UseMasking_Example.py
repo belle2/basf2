@@ -4,7 +4,6 @@
 # Common PXD&SVD TestBeam Jan 2016 @ DESY Simulation
 # This is the default simulation scenario for VXD beam test
 
-
 from basf2 import *
 from ROOT import Belle2
 
@@ -278,13 +277,18 @@ if args.unpacking:
         triggerfix.if_false(create_path())
         main.add_module(triggerfix)
         """
-#        main.add_module('PXDTriggerShifter')
+        main.add_module('PXDTriggerShifter', offset=-1)
         main.add_module('PXDUnpacker',
                         RemapFlag=True,
                         RemapLUT_IF_OB=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'),
-                        RemapLUT_IB_OF=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'))
+                        RemapLUT_IB_OF=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IB_OF.csv'))
 
-    main.add_module('SVDUnpacker', xmlMapFileName='testbeam/vxd/data/TB_svd_mapping.xml')
+    # main.add_module('SVDUnpacker', xmlMapFileName='testbeam/vxd/data/TB_svd_mapping.xml')
+    main.add_module(
+        'SVDUnpacker',
+        xmlMapFileName='testbeam/vxd/data/TB_svd_mapping.xml',
+        FADCTriggerNumberOffset=1,
+        shutUpFTBError=10)
 
 
 if not args.svd_only:
@@ -329,11 +333,11 @@ else:
 main.add_module("VXDTelDQMOffLine", SaveOtherHistos=1)
 # main.add_module("VXDDQMOnLine", SaveOtherHistos=1)
 
-main.add_module('TrackBuilder')
 # main.add_module("TBAnalysis")
 main.add_module('RootOutput')
 
 if args.display:
+    main.add_module('TrackBuilder')
     main.add_module('Display', fullGeometry=True)
 
 process(main)

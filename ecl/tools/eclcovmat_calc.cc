@@ -142,7 +142,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
 
   int cid, group;
   bool readerr = false;
-  vector<int> grmap[217];
+  //vector<int> grmap[217];
   while (! ctoecldatafile.eof()) {
     ctoecldatafile >> cid >> group;
 

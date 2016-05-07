@@ -12,6 +12,7 @@ import tracking.utilities as utilities
 import logging
 
 from tracking.run.minimal import MinimalRun
+import tracking.run.adjustments as adjustments
 
 
 def get_logger():
@@ -184,10 +185,9 @@ class ReadOrGenerateEventsRun(MinimalRun):
                                       components=components,
                                       bkgfiles=bkg_file_paths)
 
-            for module in main_path.modules():
-                if module.type() == 'FullSim':
-                    if self.disable_deltas:
-                        module.param('ProductionCut', 1000000.)
+            if self.disable_deltas:
+                adjustments.disable_deltas(main_path)
+
             # Catch if no generator is added, no background should be simulated and events
             # are not read from a file.
             if not bkg_file_paths and generator_module is None:

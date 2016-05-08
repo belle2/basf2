@@ -7,20 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCSegmentPairSkimmedFitlessVarSet.h"
-
+#include "../include/SkimmedFitlessSegmentPairVarSet.h"
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-CDCSegmentPairSkimmedFitlessVarSet::CDCSegmentPairSkimmedFitlessVarSet(const std::string& prefix) :
+SkimmedFitlessSegmentPairVarSet::SkimmedFitlessSegmentPairVarSet(const std::string& prefix) :
   Super(prefix)
 {
 }
 
-bool CDCSegmentPairSkimmedFitlessVarSet::accept(const CDCSegmentPair*)
+bool SkimmedFitlessSegmentPairVarSet::accept(const CDCSegmentPair*)
 {
   if (var<named("end_first_to_start_last_hit_pos_phi_difference")>() > 1) return false;
   if (var<named("end_first_to_start_last_hit_phi_difference")>() > 1.4) return false;

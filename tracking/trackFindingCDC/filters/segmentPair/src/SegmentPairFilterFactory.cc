@@ -40,7 +40,6 @@ FilterFactory<Filter<CDCSegmentPair> >::getValidFilterNamesAndDescriptions() con
     {"all", "all segment pairs are valid"},
     {"truth", "monte carlo truth"},
     {"none", "no segment pair is valid"},
-    {"recording", "record the encountered instances of segment pairs"},
     {"unionrecording", "record many multiple choosable variable set"},
     {"simple", "mc free with simple criteria"},
     {"fitless", "mc free with simple criteria without the common fit"},
@@ -61,8 +60,6 @@ FilterFactory<Filter<CDCSegmentPair> >::create(const std::string& filterName) co
     return std::unique_ptr<Filter<CDCSegmentPair> >(new SimpleSegmentPairFilter());
   } else if (filterName == string("fitless")) {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new FitlessSegmentPairFilter());
-  } else if (filterName == string("recording")) {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new RecordingSegmentPairFilter());
   } else if (filterName == string("unionrecording")) {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new UnionRecordingSegmentPairFilter());
   } else {

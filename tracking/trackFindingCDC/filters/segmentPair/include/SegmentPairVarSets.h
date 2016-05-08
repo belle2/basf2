@@ -7,9 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
-#include <tracking/trackFindingCDC/filters/segmentPair/CDCSegmentPairFitlessVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/CDCSegmentPairSkimmedFitlessVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/CDCSegmentPairFitVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/CDCSegmentPairTruthVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/SkimmedFitlessSegmentPairVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/FitSegmentPairVarSet.h>

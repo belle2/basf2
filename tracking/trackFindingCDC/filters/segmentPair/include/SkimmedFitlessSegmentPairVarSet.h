@@ -9,19 +9,28 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segmentPair/MCSegmentPairFilter.h>
-
-#include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
+#include <tracking/trackFindingCDC/varsets/SkimmedVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /** Class that computes floating point variables from segment pair.
-     *  that can be forwarded to a flat TNTuple or a TMVA method
+    /**
+     *  Class that computes floating point variables from segment pairs.
+     *  Is the same as the CDCSegmentPairFitlessVarSet but skimmed for non sensical combinations
+     *  without the expensive common fit.
      */
-    class  CDCSegmentPairTruthVarSet : public FilterVarSet<MCSegmentPairFilter> {
+    class  SkimmedFitlessSegmentPairVarSet : public SkimmedVarSet<FitlessSegmentPairVarSet> {
+
+    private:
+      /// Name of the super class.
+      using Super = SkimmedVarSet<FitlessSegmentPairVarSet> ;
+
     public:
       /// Construct the varset and take an optional prefix.
-      explicit CDCSegmentPairTruthVarSet(const std::string& prefix = "");
+      explicit SkimmedFitlessSegmentPairVarSet(const std::string& prefix = "");
+
+      /// Implement the skim cut.
+      virtual bool accept(const CDCSegmentPair* ptrSegmentPair) override final;
     };
   }
 }

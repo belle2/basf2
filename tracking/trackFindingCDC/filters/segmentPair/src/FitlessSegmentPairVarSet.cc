@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCSegmentPairFitlessVarSet.h"
+#include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairVarSet.h>
 #include <assert.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>
@@ -36,13 +36,12 @@ namespace {
 
 }
 
-
-CDCSegmentPairFitlessVarSet::CDCSegmentPairFitlessVarSet(const std::string& prefix) :
-  VarSet<CDCSegmentPairFitlessVarNames>(prefix)
+FitlessSegmentPairVarSet::FitlessSegmentPairVarSet(const std::string& prefix)
+  : Super(prefix)
 {
 }
 
-bool CDCSegmentPairFitlessVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
+bool FitlessSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 {
   bool extracted = extractNested(ptrSegmentPair);
   if (not extracted or not ptrSegmentPair) return false;

@@ -110,7 +110,7 @@ namespace Belle2 {
     /** Class that specifies the names of the variables
      *  that should be generated from a segment
      */
-    class CDCSegmentPairFitlessVarNames : public VarNames<CDCSegmentPair> {
+    class FitlessSegmentPairVarNames : public VarNames<CDCSegmentPair> {
 
     public:
       /// Number of variables to be generated.
@@ -138,11 +138,15 @@ namespace Belle2 {
     /** Class that computes floating point variables from a facet relation.
      *  that can be forwarded to a flat TNtuple or a TMVA method
      */
-    class CDCSegmentPairFitlessVarSet : public VarSet<CDCSegmentPairFitlessVarNames> {
+    class FitlessSegmentPairVarSet : public VarSet<FitlessSegmentPairVarNames> {
+
+    private:
+      /// Type of the base class
+      using Super = VarSet<FitlessSegmentPairVarNames>;
 
     public:
       /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      explicit CDCSegmentPairFitlessVarSet(const std::string& prefix = "");
+      explicit FitlessSegmentPairVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the segment pair
       virtual bool extract(const CDCSegmentPair* ptrSegmentPair) override;

@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/segmentPair/CDCSegmentPairFitVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/FitSegmentPairVarSet.h>
 #include <assert.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>
@@ -19,12 +19,12 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCSegmentPairFitVarSet::CDCSegmentPairFitVarSet(const std::string& prefix) :
-  VarSet<CDCSegmentPairVarNames>(prefix)
+FitSegmentPairVarSet::FitSegmentPairVarSet(const std::string& prefix) :
+  Super(prefix)
 {
 }
 
-bool CDCSegmentPairFitVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
+bool FitSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 {
   bool extracted = extractNested(ptrSegmentPair);
   if (not extracted or not ptrSegmentPair) return false;

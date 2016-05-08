@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentRelation/UnionRecordingSegmentRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/segmentRelation/CDCRecoSegment2DRelationVarSets.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/SegmentRelationVarSets.h>
 
 using namespace std;
 using namespace Belle2;

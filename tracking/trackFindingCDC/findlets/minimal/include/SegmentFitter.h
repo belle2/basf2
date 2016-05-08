@@ -22,6 +22,12 @@ F * Copyright(C) 2015 - Belle II Collaboration                             *
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
+#include <cdc/translators/RealisticTDCCountTranslator.h>
+
+#include <framework/gearbox/Const.h>
+
+#include <boost/math/special_functions/sinc.hpp>
+
 #include <vector>
 #include <string>
 
@@ -62,6 +68,16 @@ namespace Belle2 {
                                       "Positional information of the hits to be used in the fit. "
                                       "Options are 'unit', 'driftLength', 'pseudo', 'proper'.",
                                       m_param_fitVarianceString);
+
+        moduleParamList->addParameter(prefixed(prefix, "updateDriftLength"),
+                                      m_param_updateDriftLength,
+                                      "Switch to reestimate the drift length",
+                                      m_param_updateDriftLength);
+
+        moduleParamList->addParameter(prefixed(prefix, "useAlphaInDriftLength"),
+                                      m_param_useAlphaInDriftLength,
+                                      "Switch to serve the alpha angle to the drift length translator",
+                                      m_param_useAlphaInDriftLength);
       }
 
       /// Signals the beginning of the event processing
@@ -90,7 +106,41 @@ namespace Belle2 {
       /// Main algorithm applying the fit to each segment
       virtual void apply(std::vector<CDCRecoSegment2D>& outputSegments) override final
       {
+        // Update the drift length
+        if (m_param_updateDriftLength) {
+          CDC::RealisticTDCCountTranslator tdcCountTranslator;
+          for (CDCRecoSegment2D& segment : outputSegments) {
+            for (CDCRecoHit2D& recoHit2D : segment) {
+              Vector2D flightDirection = recoHit2D.getFlightDirection2D();
+              Vector2D recoPos = recoHit2D.getRecoPos2D();
+              double alpha = recoPos.angleWith(flightDirection);
+              double arcLength2D = recoPos.cylindricalR() / boost::math::sinc_pi(alpha);
+              double flightTimeEstimation = arcLength2D / Const::speedOfLight;
+
+              const CDCWire& wire = recoHit2D.getWire();
+              const CDCHit* hit = recoHit2D.getWireHit().getHit();
+              const bool rl = recoHit2D.getRLInfo() == ERightLeft::c_Right;
+
+              if (not m_param_useAlphaInDriftLength) {
+                alpha = 0;
+              }
+
+              double driftLength =
+                tdcCountTranslator.getDriftLength(hit->getTDCCount(),
+                                                  wire.getWireID(),
+                                                  flightTimeEstimation,
+                                                  rl,
+                                                  wire.getRefZ(),
+                                                  alpha);
+
+              recoHit2D.setRefDriftLength(driftLength);
+              recoHit2D.snapToDriftCircle();
+            }
+          }
+        }
+
         for (const CDCRecoSegment2D& segment : outputSegments) {
+
           CDCObservations2D observations2D(m_fitPos, m_fitVariance);
           observations2D.appendRange(segment);
           if (observations2D.size() < 4) {
@@ -116,6 +166,12 @@ namespace Belle2 {
 
       /// Parameter : Option string which variance information from the hits should be used
       std::string m_param_fitVarianceString = "proper";
+
+      /// Parameter : Switch to reestimate the drift length
+      bool m_param_updateDriftLength = false;
+
+      /// Parameter : Switch to serve the alpha angle to the drift length translator.
+      bool m_param_useAlphaInDriftLength = false;
 
       /// Option which positional information from the hits should be used
       EFitPos m_fitPos = EFitPos::c_RecoPos;

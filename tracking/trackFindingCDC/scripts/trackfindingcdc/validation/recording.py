@@ -6,6 +6,7 @@ from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 
 class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
     recording_finder_module = basf2.register_module("TrackFinderCDCAutomatonDev")
+    flight_time_estimation = "none"
 
     recording_filter_parameter_name = "FillMeFilterParameters"
     root_output_file_name = "Records.root"
@@ -14,6 +15,18 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
 
     def create_argument_parser(self, **kwds):
         argument_parser = super(RecordingRun, self).create_argument_parser(**kwds)
+
+        argument_parser.add_argument(
+            "-ft",
+            "--flight-time-estimation",
+            choices=["none", "outwards", "downwards"],
+            default=self.flight_time_estimation,
+            dest="flight_time_estimation",
+            help=("Choose which estimation method for the time of flight should be use. \n"
+                  "* 'none' no time of flight corrections\n"
+                  "* 'outwards' means the minimal time needed to travel to the wire from the interaction point \n"
+                  "* 'downwards' means the minimal time needed to travel to the wire from the y = 0 plane downwards \n")
+        )
 
         argument_parser.add_argument(
             '-v',
@@ -56,9 +69,10 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
-        main_path = super(RecordingRun, self).create_path()
+        path = super(RecordingRun, self).create_path()
 
-        main_path.add_module("WireHitTopologyPreparer")
+        path.add_module("WireHitTopologyPreparer",
+                        flightTimeEstimation=self.flight_time_estimation)
 
         recording_finder_module = self.get_basf2_module(self.recording_finder_module)
         main_path.add_module(recording_finder_module)

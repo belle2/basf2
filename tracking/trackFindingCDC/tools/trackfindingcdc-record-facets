@@ -19,18 +19,44 @@ class CDCFacetRecordingRun(RecordingRun):
     root_output_file_name = "FacetFilter.root"
     varsets = ["tmva", "filter(truth)", ]
 
-    recording_filter_parameter_name = "FacetFilterParameters"
-
     recording_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
-
+    recording_filter_parameter_name = "FacetFilterParameters"
     recording_finder_module.param({
         "FacetFilter": "unionrecording",
-        recording_filter_parameter_name : {
-            "rootFileName": root_output_file_name,
-            "varSets": varsets,
-        },
         "FacetRelationFilter": "none"
     })
+
+    flight_time_reestimation = False
+    use_alpha_in_drift_length = False
+
+    def create_argument_parser(self, **kwds):
+        argument_parser = super().create_argument_parser(**kwds)
+
+        argument_parser.add_argument(
+            "-fr",
+            "--flight-time-reestimation",
+            action="store_true",
+            dest="flight_time_reestimation",
+            help=("Switch to reestimate drift length before fitting.")
+        )
+
+        argument_parser.add_argument(
+            "-fl",
+            "--facet-least-square-fit",
+            action="store_true",
+            dest="facet_least_square_fit",
+            help=(" Switch to fit the facet with least square method for the drift length update")
+        )
+
+        return argument_parser
+
+    def configure(self, arguments):
+        super(RecordingRun, self).configure(arguments)
+
+        self.recording_finder_module.param(
+            dict(facetUpdateDriftLength=self.flight_time_reestimation,
+                 facetLeastSquareFit=self.facet_least_square_fit)
+            )
 
 
 def main():

@@ -56,6 +56,10 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   const ParameterLine2D& startToEndLine = facet.getStartToEndLine();
   const ParameterLine2D& middleToEndLine = facet.getMiddleToEndLine();
 
+  const double startDistance = middleToEndLine.distance(startRLWirehit.getRefPos2D()) - startRLWirehit.getSignedRefDriftLength();
+  const double middleDistance = startToEndLine.distance(middleRLWirehit.getRefPos2D()) - middleRLWirehit.getSignedRefDriftLength();
+  const double endDistance = startToMiddleLine.distance(endRLWirehit.getRefPos2D()) - endRLWirehit.getSignedRefDriftLength();
+
   const Vector2D& startToMiddleTangentialVector = startToMiddleLine.tangential();
   const Vector2D& startToEndTangentialVector = startToEndLine.tangential();
   const Vector2D& middleToEndTangentialVector = middleToEndLine.tangential();
@@ -100,14 +104,17 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   var<named("start_phi")>() = startPhi;
   var<named("start_phi_sigma")>() = startPhiSigma;
   var<named("start_phi_pull")>() = startPhiPull;
+  var<named("start_d")>() = startDistance;
 
   var<named("middle_phi")>() = middlePhi;
   var<named("middle_phi_sigma")>() = middlePhiSigma;
   var<named("middle_phi_pull")>() = middlePhiPull;
+  var<named("middle_d")>() = middleDistance;
 
   var<named("end_phi")>() = endPhi;
   var<named("end_phi_sigma")>() = endPhiSigma;
   var<named("end_phi_pull")>() = endPhiPull;
+  var<named("end_d")>() = endDistance;
 
   if (not(startPhiPull < 20 and middlePhiPull < 20 and endPhiPull < 20)) {
     return false;

@@ -17,6 +17,7 @@ from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 from tracking.utilities import NonstrictChoices
 from tracking.validation.utilities import prob, is_primary
 from tracking.validation.plot import ValidationPlot
+import tracking.validation.peelers
 
 import tracking.validation.harvesting as harvesting
 import tracking.validation.refiners as refiners
@@ -36,123 +37,116 @@ CONTACT = "oliver.frost@desy.de"
 
 
 class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
-    n_events = 1000
+    n_events = 10000
     generator_module = "simple_gun"  # Rather high momentum tracks should make the tracks rather straight.
+    monte_carlo = "no"
+    karimaki_fit = False
+    flight_time_estimation = "none"
+    fit_positions = "rlDriftCircle"
+    fit_variance = "proper"
 
-    # All MC segments
-    # segment_finder_module = "SegmentFinderCDCMCTruth"
-
-    # MC Free
-    segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
-    segment_finder_module.param({
-        "FacetFilter": "realistic",
-        "FacetRelationFilter": "simple",
-        "SegmentOrientation": "outwards",  # as is from mc filters
-    })
-
-    # Proper generation logic of facets, filters use MC information
-    # segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
-    # segment_finder_module.param({
-    #         "FacetFilter" : "mc",
-    #         "FacetFilterParameters" : { "allowReverse" : false },
-    #         "FacetRelationFilter" : "mc",
-    #         "FacetRelationFilterParameters" : { "allowReverse" : false },
-    #         })
-
-    fitter = Belle2.TrackFindingCDC.CDCRiemannFitter()
-    fit_positions = "rl"
     output_file_name = "SegmentFitValidation.root"  # Specification for BrowseTFileOnTerminateRunMixin
 
     def create_argument_parser(self, **kwds):
         argument_parser = super(SegmentFitValidationRun, self).create_argument_parser(**kwds)
 
         argument_parser.add_argument(
-            '-f',
-            '--segment-finder',
-            choices=NonstrictChoices([
-                'SegmentFinderCDCMCTruth',
-                'SegmentFinderCDCFacetAutomaton'
-            ]),
-            default=self.segment_finder_module,
-            dest='segment_finder_module',
-            help='Name of the segment finder module to be used to generate the segments',
+            '-m',
+            '--monte-carlo',
+            choices=["no", "medium", "full"],
+            default=self.monte_carlo,
+            dest='monte_carlo',
+            help='Amount of monte carlo information to be used in the segment generation.',
         )
 
-        karimaki_fitter = Belle2.TrackFindingCDC.CDCKarimakiFitter()
-        karimaki_fitter.useOnlyOrientation()
-        riemann_fitter = Belle2.TrackFindingCDC.CDCRiemannFitter()
-        riemann_fitter.useOnlyOrientation()
         argument_parser.add_argument(
             "-k",
             "--karimaki",
-            dest="fitter",
-            action="store_const",
-            const=karimaki_fitter, default=riemann_fitter,
+            dest="karimaki_fit",
+            action="store_true",
             help='Use Karimaki fit instead of Riemann fit'
         )
 
         argument_parser.add_argument(
-            "-p",
-            "--positions",
-            choices=["wire", "reco", "circle", "rl"],
+            "-fp",
+            "--fit-pos",
+            choices=["recoPos", "rlDriftCircle", "wirePos"],
             default=self.fit_positions,
             dest="fit_positions",
-            help=("Choose which positional information the segment fit should use. \n"
-                  "* 'wire' means only the wire position\n"
-                  "* 'reco' means only the reconstructed position\n"
-                  "* 'circle' means only the drift circle *without* the right left passage\n"
-                  "* 'rl' means only the drift circle with the right left passage\n")
+            help=("Choose which positional information the segment fit should be used. \n"
+                  "* 'wirePos' means only the wire position\n"
+                  "* 'recoPos' means only the reconstructed position\n"
+                  "* 'rlDriftCircle' means only the drift circle with the right left passage\n")
+        )
+
+        argument_parser.add_argument(
+            "-fv",
+            "--fit-var",
+            choices=["unit", "driftLength", "pseudo", "proper"],
+            default=self.fit_variance,
+            dest="fit_variance",
+            help=("Choose which variance information the segment fit should be used. \n"
+                  "* 'unit' means equal variance of 1\n"
+                  "* 'driftLength' means inserting the drift length as variance, very improper because dimension mismatch\n"
+                  "* 'pseudo' means the squared dirft length + plus the drift length variance "
+                  "(correct dimension, proper lower bound)\n"
+                  "* 'proper' means only the drift length variance\n")
+        )
+
+        argument_parser.add_argument(
+            "-ft",
+            "--flight-time-estimation",
+            choices=["none", "outwards", "downwards"],
+            default=self.flight_time_estimation,
+            dest="flight_time_estimation",
+            help=("Choose which estimation method for the time of flight should be use. \n"
+                  "* 'none' no time of flight corrections\n"
+                  "* 'outwards' means the minimal time needed to travel to the wire from the interaction point \n"
+                  "* 'downwards' means the minimal time needed to travel to the wire from the y = 0 plane downwards \n")
         )
 
         return argument_parser
 
-    def get_fit_method(self):
-        fitter = self.fitter
-
-        fit_positions = self.fit_positions
-
-        if fit_positions == "wire":
-            def fit_method(segment):
-                wireSegment = segment.getWireSegment()
-                return fitter.fit(wireSegment)
-
-        elif fit_positions == "reco":
-            fitter.useOnlyPosition()
-
-            def fit_method(segment):
-                # Make a filtering step stripping potential Monte Carlo information
-                # in the reconstructed positions
-                rlWireHitSegment = segment.getRLWireHitSegment()
-                CDCRecoSegment2D = Belle2.TrackFindingCDC.CDCRecoSegment2D
-                recoSegment = CDCRecoSegment2D.reconstructUsingFacets(rlWireHitSegment)
-                return fitter.fit(recoSegment)
-
-        elif fit_positions == "circle":
-            def fit_method(segment):
-                wireHitSegment = segment.getWireHitSegment()
-                return fitter.fit(wireHitSegment)
-
-        elif fit_positions == "rl":
-            def fit_method(segment):
-                return fitter.fit(segment)
-
-        else:
-            raise ValueError("Unexpected fit_positions %s" % fit_positions)
-
-        return fit_method
-
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
-        main_path = super(SegmentFitValidationRun, self).create_path()
+        path = super(SegmentFitValidationRun, self).create_path()
 
-        segment_finder_module = self.get_basf2_module(self.segment_finder_module)
-        main_path.add_module(segment_finder_module)
+        path.add_module("WireHitTopologyPreparer",
+                        flightTimeEstimation=self.flight_time_estimation)
 
-        main_path.add_module(SegmentFitterModule(fit_method=self.get_fit_method()))
-        main_path.add_module(SegmentFitValidationModule(self.output_file_name))
+        if self.monte_carlo == "no":
+            # MC free - default
+            path.add_module("SegmentFinderCDCFacetAutomaton",
+                            SegmentOrientation="outwards")
 
-        return main_path
+        elif self.monte_carlo == "medium":
+            # Medium MC - proper generation logic but true facets and facet relations
+            path.add_module("SegmentFinderCDCFacetAutomaton",
+                            FacetFilter="truth",
+                            FacetRelationFilter="truth",
+                            SegmentOrientation="outwards")
+
+        elif self.monte_carlo == "full":
+            # Only true monte carlo segments - put make the positions realistic
+            path.add_module("SegmentCreatorMCTruth",
+                            reconstructedPositions=True)
+
+        else:
+            raise ValueError("Invalid degree of Monte Carlo information")
+
+        path.add_module("SegmentFitter",
+                        segments="CDCRecoSegment2DVector",
+                        karimakiFit=self.karimaki_fit,
+                        fitPos=self.fit_positions,
+                        fitVariance=self.fit_variance)
+
+        path.add_module(SegmentFitValidationModule(self.output_file_name))
+
+        path.add_module("RootOutput",
+                        outputFileName="test.root")
+
+        return path
 
 
 class SegmentFitValidationModule(harvesting.HarvestingModule):
@@ -163,7 +157,6 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
     def __init__(self, output_file_name):
         super(SegmentFitValidationModule, self).__init__(foreach='CDCRecoSegment2DVector',
                                                          output_file_name=output_file_name)
-
         self.mc_segment_lookup = None
 
     def initialize(self):
@@ -186,16 +179,26 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         segment_crops = cdc_peelers.peel_segment2d(segment)
 
         mc_particle = mc_segment_lookup.getMCParticle(segment)
+        mc_particle_crops = tracking.validation.peelers.peel_mc_particle(mc_particle)
+
         fit3d_truth = mc_segment_lookup.getTrajectory3D(segment)
         curvature_truth = fit3d_truth.getCurvatureXY()
+
+        reconstructed_backward = mc_segment_lookup.isForwardOrBackwardToMCTrack(segment)
+
+        if reconstructed_backward != 1:
+            curvature_truth = -curvature_truth
 
         truth_crops = dict(
             tan_lambda_truth=fit3d_truth.getTanLambda(),
             curvature_truth=curvature_truth,
             curvature_residual=segment_crops["curvature_estimate"] - curvature_truth,
+            curvature_pull=(segment_crops["curvature_estimate"] - curvature_truth) / segment_crops["curvature_variance"],
+            reconstructed_backward=reconstructed_backward,
         )
-        segment_crops.update(truth_crops)
 
+        segment_crops.update(truth_crops)
+        segment_crops.update(mc_particle_crops)
         return segment_crops
 
     # Refiners to be executed at the end of the harvesting / termination of the module
@@ -206,38 +209,50 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         part_name="curvature",
         unit="1/cm",
         absolute=False,
-        groupby=[None, "stereo_type", "superlayer_id"],
-        outlier_z_score=3.0,
+        groupby=[None, "stereo_kind", "superlayer_id"],
+        outlier_z_score=5.0,
         title_postfix="")
 
     save_absolute_curvature_pull = refiners.save_pull_analysis(
         part_name="curvature",
         unit="1/cm",
         absolute=True,
-        groupby=[None, "stereo_type", "superlayer_id"],
-        outlier_z_score=3.0,
+        groupby=[None, "stereo_kind", "superlayer_id"],
+        outlier_z_score=5.0,
         title_postfix="")
+
+    save_curvature_pull_by_tan_lambda = refiners.save_profiles(
+        x="tan_lambda_truth",
+        y="curvature_pull",
+        groupby=[None, "stereo_kind", "superlayer_id"],
+        outlier_z_score=5.0)
+
+    save_curvature_residual_by_tan_lambda = refiners.save_profiles(
+        x="tan_lambda_truth",
+        y="curvature_residual",
+        groupby=[None, "stereo_kind", "superlayer_id"],
+        outlier_z_score=5.0)
 
     save_fit_quality_histograms = refiners.save_histograms(
         outlier_z_score=5.0,
-        select={"ndf": "ndf",
-                "chi2": "#chi2",
-                "p_value": "p-value",
-                "tan_lambda_truth": "true tan #lambda",
-                },
-        groupby=[None, "stereo_type", "superlayer_id"],
+        select={
+            "ndf": "ndf",
+            "chi2": "#chi2",
+            "p_value": "p-value",
+            "tan_lambda_truth": "true tan #lambda",
+        },
+        groupby=[None, "stereo_kind", "superlayer_id"],
         title="Histogram of {part_name}{stacked_by_indication}{stackby}",
         description="Distribution of {part_name} in the segment fits",
     )
 
     save_fit_quality_by_tan_lambda_profiles = refiners.save_profiles(
         select={
-            (lambda curvature_estimate, curvature_truth, **kwd:
-             curvature_estimate - curvature_truth): 'curvature residual',
+            'curvature_residual': 'curvature residual',
             "p_value": "fit p-value",
             "tan_lambda_truth": "true tan #lambda",
         },
-        groupby=[None, "stereo_type", "superlayer_id"],
+        groupby=[None, "stereo_kind", "superlayer_id"],
         y=["curvature residual", "fit p-value"],
         x="true tan #lambda",
         check=("The {y_part_name} should be essentially the same over"

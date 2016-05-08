@@ -33,16 +33,31 @@ ADCCountTranslatorBase& CDCWireHit::getADCCountTranslator()
   return s_adcCountTranslator;
 }
 
-CDCWireHit::CDCWireHit() :
-  m_automatonCell(1)
+CDCWireHit::CDCWireHit()
+  : m_automatonCell(1)
 {}
+
+
+CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
+                       const double driftLength,
+                       const double driftLengthVariance,
+                       const double chargeDeposit)
+  : m_automatonCell(1),
+    m_refDriftLength(driftLength),
+    m_refDriftLengthVariance(driftLengthVariance),
+    m_refChargeDeposit(chargeDeposit),
+    m_wire(CDCWire::getInstance(*ptrHit)),
+    m_hit(ptrHit)
+{
+}
+
 
 CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
                        TDCCountTranslatorBase* ptrTDCCountTranslator,
-                       ADCCountTranslatorBase* ptrADCCountTranslator):
-  m_automatonCell(1),
-  m_wire(ptrHit ? CDCWire::getInstance(*ptrHit) : nullptr),
-  m_hit(ptrHit)
+                       ADCCountTranslatorBase* ptrADCCountTranslator)
+  : m_automatonCell(1),
+    m_wire(ptrHit ? CDCWire::getInstance(*ptrHit) : nullptr),
+    m_hit(ptrHit)
 {
   if (not ptrHit) {
     B2ERROR("CDCWireHit constructor invoked with nullptr CDCHit");
@@ -58,38 +73,39 @@ CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
   float refDriftLengthRight = tdcCountTranslator.getDriftLength(hit.getTDCCount(),
                               getWireID(),
                               initialTOFEstimate,
-                              false, //bool leftRight
+                              false, // bool leftRight
                               getWire().getRefZ());
 
   float refDriftLengthLeft = tdcCountTranslator.getDriftLength(hit.getTDCCount(),
                              getWireID(),
                              initialTOFEstimate,
-                             true, //bool leftRight
+                             true, // bool leftRight
                              getWire().getRefZ());
 
   m_refDriftLength = (refDriftLengthLeft + refDriftLengthRight) / 2.0;
 
   m_refDriftLengthVariance = tdcCountTranslator.getDriftLengthResolution(m_refDriftLength,
                              getWireID(),
-                             false, //bool leftRight ?
+                             false, // bool leftRight ?
                              getWire().getRefZ());
 
-  m_refCharge = adcCountTranslator.getCharge(hit.getADCCount(),
-                                             getWireID(),
-                                             false, //bool leftRight
-                                             getWire().getRefZ(),
-                                             0); //theta
+  m_refChargeDeposit = adcCountTranslator.getCharge(hit.getADCCount(),
+                                                    getWireID(),
+                                                    false, // bool leftRight
+                                                    getWire().getRefZ(),
+                                                    0); // theta
 }
-
 
 CDCWireHit::CDCWireHit(const WireID& wireID,
                        const double driftLength,
-                       const double driftLengthVariance):
-  m_automatonCell(1),
-  m_refDriftLength(driftLength),
-  m_refDriftLengthVariance(driftLengthVariance),
-  m_wire(CDCWire::getInstance(wireID)),
-  m_hit(nullptr)
+                       const double driftLengthVariance,
+                       const double chargeDeposit)
+  : m_automatonCell(1),
+    m_refDriftLength(driftLength),
+    m_refDriftLengthVariance(driftLengthVariance),
+    m_refChargeDeposit(chargeDeposit),
+    m_wire(CDCWire::getInstance(wireID)),
+    m_hit(nullptr)
 {}
 
 Vector2D CDCWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const

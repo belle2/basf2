@@ -49,6 +49,21 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       CDCWireHit();
 
+      /**
+       *  Constructor assoziating the CDCHit with estimates of the drift length and charge deposit.
+       *
+       *  Also stores the CDCHit necessary for later translation to Genfit.
+       *
+       *  @param ptrHit               Reference to the CDCHit.
+       *  @param driftLength          Initial estimate of the dirft length at the reference position.
+       *  @param driftLengthVariance  Initial estimate of the variance of the dirft length at the reference position.
+       *  @param chargeDeposit        Initial estimate of the deposited charge in the drift cell.
+       */
+      CDCWireHit(const CDCHit* const ptrHit,
+                 const double driftLength,
+                 const double driftlengthVariance = c_simpleDriftLengthVariance,
+                 const double chargeDeposit = 0);
+
       /// Constructor for augmenting the CDCHit with the geometry information of the CDCWire.
       /** Binds to the CDCHit and the corresponding wire together and translates the TDC count to a driftlength.
        *  Also stores the index of the StoreArray
@@ -65,7 +80,8 @@ namespace Belle2 {
       /// Constructor that takes a wire ID and a driftlength at the reference. For testing only!
       CDCWireHit(const WireID& wireID,
                  const double driftLength,
-                 const double driftlengthVariance = c_simpleDriftLengthVariance);
+                 const double driftlengthVariance = c_simpleDriftLengthVariance,
+                 const double chargeDeposit = 0);
 
       /// Equality comparison based on the wire and the hit id.
       bool operator==(const CDCWireHit& rhs) const
@@ -185,8 +201,8 @@ namespace Belle2 {
       { return m_refDriftLengthVariance; }
 
       /// Getter for the charge due to energy deposit in the drift cell
-      double getRefCharge() const
-      { return m_refCharge; }
+      double getRefChargeDeposit() const
+      { return m_refChargeDeposit; }
 
       /// Checks if the wire hit is based on the given wire.
       bool isOnWire(const CDCWire& wire) const
@@ -248,7 +264,7 @@ namespace Belle2 {
       double m_refDriftLengthVariance = c_simpleDriftLengthVariance;
 
       /// Memory for the charge induced by the energy deposit in the drift cell.
-      double m_refCharge = 0.0;
+      double m_refChargeDeposit = 0.0;
 
       /// Memory for the CDCWire pointer.
       const CDCWire* m_wire = nullptr;

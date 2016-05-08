@@ -65,8 +65,30 @@ namespace Belle2 {
       virtual void initialize() override
       {
         Super::initialize();
+        if (m_skimFilter) m_skimFilter->initialize();
         AVarSet& varSet = Super::getVarSet();
         m_recorder.reset(new Recorder(varSet.getAllVariables(), m_param_rootFileName, m_param_treeName));
+      }
+
+      /// Signal the beginning of a new run to the skimming filter and the varset
+      virtual void beginRun() override
+      {
+        if (m_skimFilter) m_skimFilter->beginRun();
+        Super::beginRun();
+      }
+
+      /// Signal the beginning of a new event to the skimming filter and the varset
+      virtual void beginEvent() override
+      {
+        if (m_skimFilter) m_skimFilter->beginEvent();
+        Super::beginEvent();
+      }
+
+      /// Signal the end of a new run to the skimming filter and the varset
+      virtual void endRun() override
+      {
+        Super::endRun();
+        if (m_skimFilter) m_skimFilter->endRun();
       }
 
       /// Initialize the recorder after event processing.
@@ -74,6 +96,7 @@ namespace Belle2 {
       {
         m_recorder->write();
         m_recorder.reset();
+        if (m_skimFilter) m_skimFilter->terminate();
         Super::terminate();
       }
 
@@ -81,6 +104,11 @@ namespace Belle2 {
       /// Function to evaluate the cluster for its backgroundness.
       virtual Weight operator()(const Object& obj) override final
       {
+        if (m_skimFilter) {
+          Weight skimWeight = (*m_skimFilter)(obj);
+          if (std::isnan(skimWeight)) return NAN;
+        }
+
         Weight extracted = Super::operator()(obj);
         if (not std::isnan(extracted)) {
           m_recorder->capture();
@@ -88,6 +116,15 @@ namespace Belle2 {
 
         return m_param_returnWeight;
       }
+
+    public:
+      // Getter for the skim filter to select objects to be recorded
+      Filter<Object>* getSkimFilter() const
+      { return m_skimFilter.get(); }
+
+      // Setter for the skim filter to select objects to be recorded
+      void setSkimFilter(std::unique_ptr<Filter<Object>> skimFilter)
+      { m_skimFilter = std::move(skimFilter); }
 
     private:
       /// Recorder to write all variable sets of the encountered objects.
@@ -101,6 +138,10 @@ namespace Belle2 {
 
       /// Returns Weight when this filter is called
       Weight m_param_returnWeight;
+
+      /// Skimming filter to select a subset of objects to be recorded.
+      std::unique_ptr<Filter<Object> > m_skimFilter = nullptr;
+
     };
   }
 }

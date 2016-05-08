@@ -42,21 +42,21 @@ namespace Belle2 {
       }
 
       /// Allow setup work to take place at beginning of new run
-      virtual void beginRun() override final
+      virtual void beginRun() override
       {
         Super::beginRun();
         m_varSet.beginRun();
       }
 
       /// Allow setup work to take place at beginning of new event
-      virtual void beginEvent() override final
+      virtual void beginEvent() override
       {
         Super::beginEvent();
         m_varSet.beginEvent();
       }
 
       /// Allow clean up to take place at end of run
-      virtual void endRun() override final
+      virtual void endRun() override
       {
         m_varSet.endRun();
         Super::endRun();

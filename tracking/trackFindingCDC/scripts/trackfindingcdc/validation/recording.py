@@ -10,6 +10,7 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
     recording_filter_parameter_name = "FillMeFilterParameters"
     root_output_file_name = "Records.root"
     varsets = ["truth", ]
+    skim = ""
 
     def create_argument_parser(self, **kwds):
         argument_parser = super(RecordingRun, self).create_argument_parser(**kwds)
@@ -31,6 +32,14 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
             help='File to which the recorded varsets should be written',
         )
 
+        argument_parser.add_argument(
+            '-sk',
+            '--skim',
+            dest='skim',
+            default=self.skim,
+            help=('Name of the filter to skim recorded object')
+        )
+
         return argument_parser
 
     def configure(self, arguments):
@@ -40,6 +49,7 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
             self.recording_filter_parameter_name: {
                 "rootFileName": self.root_output_file_name,
                 "varSets": self.varsets,
+                "skim": self.skim
             },
         })
 

@@ -53,11 +53,23 @@ namespace Belle2 {
                                       "List of names refering to concrete variable sets."
                                       "Valid names: " + join(", ", getValidVarSetNames()),
                                       m_param_varSetNames);
+
+        moduleParamList->addParameter(prefixed(prefix, "skim"),
+                                      m_param_skim,
+                                      "Filter name which object must pass to be recorded."
+                                      "Valid names: " + join(", ", getValidFilterNames()),
+                                      m_param_skim);
       }
 
       /// Initialize the recorder before event processing.
       virtual void initialize() override
       {
+        /// Create the skimming filter
+        if (m_param_skim != "") {
+          std::unique_ptr<CreatedFilter> skimFilter = m_filterFactory.create(m_param_skim);
+          this->setSkimFilter(std::move(skimFilter));
+        }
+
         UnionVarSet<Object>& multiVarSet = Super::getVarSet();
 
         /// Create and add the concrete varsets from the varset parameter.
@@ -84,20 +96,30 @@ namespace Belle2 {
       virtual std::vector<std::string> getValidVarSetNames() const
       {
         // Get all filter names and make a var set name for each.
-        std::map<std::string, std::string> filterNamesAndDescriptions =
-          m_filterFactory.getValidFilterNamesAndDescriptions();
-
         std::vector<std::string> varSetNames;
-        varSetNames.reserve(filterNamesAndDescriptions.size());
-        for (const std::pair<std::string, std::string>& filterNameAndDescription :
-             filterNamesAndDescriptions) {
-          const std::string& filterName = filterNameAndDescription.first;
-
+        std::vector<std::string> filterNames = getValidFilterNames();
+        for (const std::string& filterName : filterNames) {
           std::string varSetName = "filter(" + filterName + ")";
           varSetNames.push_back(varSetName);
         }
-
         return varSetNames;
+      }
+
+      /// Getter for the names of valid filters
+      virtual std::vector<std::string> getValidFilterNames() const
+      {
+        // Get all filter names and make a var set name for each.
+        std::map<std::string, std::string> filterNamesAndDescriptions =
+          m_filterFactory.getValidFilterNamesAndDescriptions();
+
+        std::vector<std::string> filterNames;
+        filterNames.reserve(filterNamesAndDescriptions.size());
+        for (const std::pair<std::string, std::string>& filterNameAndDescription :
+             filterNamesAndDescriptions) {
+          const std::string& filterName = filterNameAndDescription.first;
+          filterNames.push_back(filterName);
+        }
+        return filterNames;
       }
 
       /// Create a variable set for the given name.
@@ -131,6 +153,9 @@ namespace Belle2 {
     private:
       /// List of varsets that should be recorded.
       std::vector<std::string> m_param_varSetNames;
+
+      /// Name of the filter to selected to objects to be record.
+      std::string m_param_skim = "";
 
       /// FilterFactory
       AFilterFactory m_filterFactory;

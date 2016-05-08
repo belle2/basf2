@@ -31,6 +31,12 @@ def main():
     )
 
     argument_parser.add_argument(
+        "--truth",
+	default=None,
+        help="Variables containing the truth",
+    )
+
+    argument_parser.add_argument(
         "-v",
         "--vars",
 	nargs="*",
@@ -76,6 +82,7 @@ def main():
         overview_file_path = os.path.join(records_folder_path, overview_file_name)
 
         overview = ClassificationOverview(overview_file_path, 
+                                          truth_name=arguments.truth,
                                           select=arguments.vars,
                                           groupbys=arguments.groupbys,
                                           filters=arguments.filters,

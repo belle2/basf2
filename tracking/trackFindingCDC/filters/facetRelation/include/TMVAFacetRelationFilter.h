@@ -33,9 +33,9 @@ namespace Belle2 {
        *  Main filter method returning the weight of the facet relation.
        *  The size of the facetRelation with a small penalty depending on the tmva probability.
        */
-      virtual Weight operator()(const Relation<const CDCFacet>& facetRelation) override final
+      virtual Weight predict(const Relation<const CDCFacet>& facetRelation) override final
       {
-        return -2 - 0.2 * (1 - Super::operator()(facetRelation));
+        return -2 - 0.2 * (1 - Super::predict(facetRelation));
       }
 
     };

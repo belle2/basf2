@@ -72,15 +72,22 @@ namespace Belle2 {
       }
 
     public:
-      /// Function to evaluate the cluster for its backgroundness.
-      virtual Weight operator()(const Object& obj) override
+      /// Function to object for its signalness
+      virtual Weight operator()(const Object& obj) override final
+      {
+        double prediction = predict(obj);
+        return prediction < m_param_cut ? NAN : prediction;
+      }
+
+      /// Evaluate the tmva method
+      virtual double predict(const Object& obj)
       {
         Weight extracted = Super::operator()(obj);
         if (std::isnan(extracted)) {
           return NAN;
         } else {
           double prediction = m_expert.predict();
-          return prediction < m_param_cut ? NAN : prediction;
+          return prediction;
         }
       }
 

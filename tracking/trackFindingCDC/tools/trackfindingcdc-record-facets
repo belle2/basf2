@@ -21,7 +21,7 @@ class CDCFacetRecordingRun(RecordingRun):
 
     recording_filter_parameter_name = "FacetFilterParameters"
 
-    recording_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
+    recording_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
 
     recording_finder_module.param({
         "FacetFilter": "unionrecording",

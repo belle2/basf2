@@ -85,15 +85,15 @@ namespace Belle2 {
 
       /// Equality comparison based on the wire and the hit id.
       bool operator==(const CDCWireHit& rhs) const
-      { return getWire() == rhs.getWire() and getRefDriftLength() == rhs.getRefDriftLength(); }
+      { return getWireID() == rhs.getWireID() and getRefDriftLength() == rhs.getRefDriftLength(); }
 
 
       /// Total ordering relation based on the wire and the hit id.
       bool operator<(const CDCWireHit& rhs) const
       {
         return
-          std::make_pair(getWire(), getRefDriftLength()) <
-          std::make_pair(rhs.getWire(), rhs.getRefDriftLength());
+          std::make_pair(getWireID(), getRefDriftLength()) <
+          std::make_pair(rhs.getWireID(), rhs.getRefDriftLength());
       }
 
       /// Defines CDCWires and CDCWireHits to be coaligned on the wire on which they are based.
@@ -117,12 +117,12 @@ namespace Belle2 {
 
       /// Defines CDCWireHits and raw CDCHit to be coaligned.
       friend bool operator<(const CDCWireHit& wireHit, const CDCHit& hit)
-      { return wireHit.getWire().getEWire() < hit.getID(); }
+      { return wireHit.getWireID().getEWire() < hit.getID(); }
 
       /// Defines wire hits and raw CDCHit to be coaligned.
       friend bool operator<(const CDCHit& hit, const CDCWireHit& wireHit)
       // Same as above but the other way round.
-      { return hit.getID() < wireHit.getWire().getEWire(); }
+      { return hit.getID() < wireHit.getWireID().getEWire(); }
 
       /// Defines CDCWireSuperLayer and CDCWireHit to be coaligned on the super layer on which they are based.
       friend bool operator<(const CDCWireHit& wireHit, const CDCWireSuperLayer& wireSuperLayer)
@@ -161,24 +161,23 @@ namespace Belle2 {
       { return getHit() ? getHit()->getArrayIndex() : c_InvalidIndex; }
 
       /// Getter for the CDCWire the hit is located on.
-      const CDCWire& getWire() const
-      { return *m_wire; }
+      const CDCWire& getWire() const;
 
       /// Getter for the WireID of the wire the hit is located on.
       const WireID& getWireID() const
-      { return getWire().getWireID(); }
+      { return m_wireID; }
 
       /// Getter for the stereo type of the underlying wire.
       EStereoKind getStereoKind() const
-      { return getWire().getStereoKind(); }
+      { return ISuperLayerUtil::getStereoKind(getISuperLayer());; }
 
       /// Indicator if the underlying wire is axial.
       bool isAxial() const
-      { return getWire().isAxial(); }
+      { return ISuperLayerUtil::isAxial(getISuperLayer());; }
 
       /// Getter for the super layer id.
       ISuperLayer getISuperLayer() const
-      { return getWire().getISuperLayer(); }
+      { return getWireID().getISuperLayer(); }
 
       /// The two dimensional reference position (z=0) of the underlying wire.
       const Vector2D& getRefPos2D() const
@@ -206,7 +205,7 @@ namespace Belle2 {
 
       /// Checks if the wire hit is based on the given wire.
       bool isOnWire(const CDCWire& wire) const
-      { return getWire() == wire; }
+      { return getWireID() == wire.getWireID(); }
 
       /** Reconstructs a position of primary ionisation on the drift circle.
        *
@@ -235,7 +234,7 @@ namespace Belle2 {
 
       /// String output operator for wire hit objects to help debugging.
       friend std::ostream& operator<<(std::ostream& output, const CDCWireHit& wirehit)
-      { return output << "CDCWireHit(" << wirehit.getWire() << ", drift length=" << wirehit.getRefDriftLength() << ")"; }
+      { return output << "CDCWireHit(" << wirehit.getWireID() << ", drift length=" << wirehit.getRefDriftLength() << ")"; }
 
       /// Getter for the automaton cell.
       AutomatonCell& getAutomatonCell()
@@ -266,8 +265,11 @@ namespace Belle2 {
       /// Memory for the charge induced by the energy deposit in the drift cell.
       double m_refChargeDeposit = 0.0;
 
+      /// Memory for the WireID.
+      WireID m_wireID;
+
       /// Memory for the CDCWire pointer.
-      const CDCWire* m_wire = nullptr;
+      mutable CDCWire const* m_wire = nullptr; //!
 
       /// Memory for the CDCHit pointer.
       const CDCHit* m_hit = nullptr;

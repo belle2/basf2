@@ -465,6 +465,6 @@ namespace Belle2 {
       /// Storage for all wire superlayers in the CDC
       std::vector<Belle2::TrackFindingCDC::CDCWireSuperLayer> m_wireSuperLayers;
 
-    }; // class CDCWireHitTopology
+    }; // class CDCWireTopology
   } // namespace TrackFindingCDC
 } // namespace Belle2

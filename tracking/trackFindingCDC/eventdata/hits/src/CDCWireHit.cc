@@ -35,7 +35,8 @@ ADCCountTranslatorBase& CDCWireHit::getADCCountTranslator()
 
 CDCWireHit::CDCWireHit()
   : m_automatonCell(1)
-{}
+{
+}
 
 
 CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
@@ -46,6 +47,7 @@ CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
     m_refDriftLength(driftLength),
     m_refDriftLengthVariance(driftLengthVariance),
     m_refChargeDeposit(chargeDeposit),
+    m_wireID(ptrHit->getID()),
     m_wire(CDCWire::getInstance(*ptrHit)),
     m_hit(ptrHit)
 {
@@ -56,6 +58,7 @@ CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
                        TDCCountTranslatorBase* ptrTDCCountTranslator,
                        ADCCountTranslatorBase* ptrADCCountTranslator)
   : m_automatonCell(1),
+    m_wireID(ptrHit->getID()),
     m_wire(ptrHit ? CDCWire::getInstance(*ptrHit) : nullptr),
     m_hit(ptrHit)
 {
@@ -104,9 +107,19 @@ CDCWireHit::CDCWireHit(const WireID& wireID,
     m_refDriftLength(driftLength),
     m_refDriftLengthVariance(driftLengthVariance),
     m_refChargeDeposit(chargeDeposit),
+    m_wireID(wireID),
     m_wire(CDCWire::getInstance(wireID)),
     m_hit(nullptr)
-{}
+{
+}
+
+const CDCWire& CDCWireHit::getWire() const
+{
+  if (not m_wire) {
+    m_wire = CDCWire::getInstance(m_wireID);
+  }
+  return *m_wire;
+}
 
 Vector2D CDCWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const
 {

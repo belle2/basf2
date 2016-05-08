@@ -29,6 +29,9 @@ namespace Belle2 {
     class CDCRLTaggedWireHit {
 
     public:
+      /// Default constructor for ROOT
+      CDCRLTaggedWireHit() = default;
+
       /**
        *  Constructs an oriented wire hit.
        *  @param wireHit      The wire hit the oriented hit is associated with.
@@ -238,10 +241,10 @@ namespace Belle2 {
 
     private:
       /// Memory for the reference to the assiziated wire hit.
-      const CDCWireHit* m_wireHit;
+      const CDCWireHit* m_wireHit = nullptr;
 
       /// Memory for the right left passage information of the oriented wire hit.
-      NRightLeft::ERightLeft m_rlInfo;
+      ERightLeft m_rlInfo = ERightLeft::c_Unknown;
 
       /// Memory for the reestimated drift length
       double m_refDriftLength = 0.0;

@@ -30,6 +30,9 @@ namespace Belle2 {
      *  path construction. */
     class CDCFacet : public CDCRLWireHitTriple {
     public:
+      /// Default constructor for ROOT
+      CDCFacet() = default;
+
       /// Constructor taking three oriented wire hits.
       CDCFacet(const CDCRLTaggedWireHit& startRLWireHit,
                const CDCRLTaggedWireHit& middleRLWireHit,

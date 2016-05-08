@@ -18,6 +18,9 @@ namespace Belle2 {
     /// A pair of oriented wire hits.
     class CDCRLWireHitPair {
     public:
+      /// Default constructor for ROOT
+      CDCRLWireHitPair() = default;
+
       /// Constructor taking two oriented wire hits.
       CDCRLWireHitPair(const CDCRLTaggedWireHit& fromRLWireHit,
                        const CDCRLTaggedWireHit& toRLWireHit);

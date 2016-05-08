@@ -43,6 +43,9 @@ namespace Belle2 {
      */
     class CDCRecoHit3D  {
     public:
+      /// Default constructor for ROOT
+      CDCRecoHit3D() = default;
+
       /// Constructor taking all stored variables of the reconstructed hit.
       CDCRecoHit3D(const CDCRLTaggedWireHit& rlWireHit,
                    const Vector3D& position,

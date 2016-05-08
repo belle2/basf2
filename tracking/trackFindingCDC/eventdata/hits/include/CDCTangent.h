@@ -35,6 +35,9 @@ namespace Belle2 {
      *  Generally tangents are only a good approximation between neighboring wire hits.*/
     class CDCTangent : public CDCRLWireHitPair {
     public:
+      /// Default constructor for ROOT
+      CDCTangent() = default;
+
       /// Construct a tangent from a pair of oriented wire hits.
       explicit CDCTangent(const CDCRLWireHitPair& rlWireHitPair);
 

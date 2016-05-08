@@ -56,7 +56,7 @@ namespace Belle2 {
 
     public:
       /// Memory for the wrapped item.
-      T m_item; //! Do not include in the Streamer since the object might not implement it.
+      T m_item;
 
     private:
       /// ROOT Macro to unconditionally make StoreWrapper a ROOT class.

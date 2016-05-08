@@ -8,10 +8,10 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
-#pragma link C++ class Belle2::TrackFindingCDC::CDCTrajectory2D-;
-#pragma link C++ class Belle2::TrackFindingCDC::CDCTrajectorySZ-;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCTrajectory2D+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCTrajectorySZ+;
 
-#pragma link C++ class Belle2::TrackFindingCDC::CDCTrajectory3D-;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCTrajectory3D+;
 
 #endif
 

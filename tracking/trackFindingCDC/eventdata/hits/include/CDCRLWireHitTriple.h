@@ -72,6 +72,8 @@ namespace Belle2 {
         short m_oClockDelta = 0;
       };
 
+      /// Default constructor for ROOT
+      CDCRLWireHitTriple() = default;
 
       /// Constructor taking three oriented wire hits.
       CDCRLWireHitTriple(const CDCRLTaggedWireHit& startRLWireHit,

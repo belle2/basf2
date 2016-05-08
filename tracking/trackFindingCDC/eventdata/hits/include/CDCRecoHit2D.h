@@ -31,6 +31,9 @@ namespace Belle2 {
     class CDCRecoHit2D  {
 
     public:
+      /// Default constructor for ROOT
+      CDCRecoHit2D() = default;
+
       /**
        *  Constructs a reconstructed hit based on the given oriented wire hit with the given
        *  displacement from the wire reference position.

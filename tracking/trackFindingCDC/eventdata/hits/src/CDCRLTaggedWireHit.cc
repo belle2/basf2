@@ -18,7 +18,9 @@ using namespace TrackFindingCDC;
 
 CDCRLTaggedWireHit::CDCRLTaggedWireHit(const CDCWireHit* wireHit,
                                        ERightLeft rlInfo)
-  : CDCRLTaggedWireHit(wireHit, rlInfo, wireHit->getRefDriftLength())
+  : CDCRLTaggedWireHit(wireHit,
+                       rlInfo,
+                       wireHit->getRefDriftLength())
 {
 }
 
@@ -30,6 +32,50 @@ CDCRLTaggedWireHit::CDCRLTaggedWireHit(const CDCWireHit* wireHit,
     m_refDriftLength(driftLength)
 {
 }
+
+CDCRLTaggedWireHit CDCRLTaggedWireHit::average(const CDCRLTaggedWireHit& rlWireHit1,
+                                               const CDCRLTaggedWireHit& rlWireHit2)
+{
+  B2ASSERT("Average of two CDCRLTaggedWireHits with different wire hits requested.",
+           rlWireHit1.getWireHit() == rlWireHit2.getWireHit());
+
+  B2ASSERT("Average of two CDCRLTaggedWireHits with different right left passage information requested.",
+           rlWireHit1.getRLInfo() == rlWireHit2.getRLInfo());
+
+  ERightLeft rlInfo = rlWireHit1.getRLInfo();
+  const CDCWireHit& wireHit = rlWireHit1.getWireHit();
+
+  double driftLength = (rlWireHit1.getRefDriftLength() +
+                        rlWireHit2.getRefDriftLength()) / 2.0;
+
+  CDCRLTaggedWireHit result(&wireHit, rlInfo, driftLength);
+  return result;
+}
+
+CDCRLTaggedWireHit CDCRLTaggedWireHit::average(const CDCRLTaggedWireHit& rlWireHit1,
+                                               const CDCRLTaggedWireHit& rlWireHit2,
+                                               const CDCRLTaggedWireHit& rlWireHit3)
+{
+  B2ASSERT("Average of three CDCRLTaggedWireHits with different wire hits requested.",
+           rlWireHit1.getWireHit() == rlWireHit2.getWireHit() and
+           rlWireHit2.getWireHit() == rlWireHit3.getWireHit());
+
+  B2ASSERT("Average of three CDCRLTaggedWireHits with different right left passage information requested.",
+           rlWireHit1.getRLInfo() == rlWireHit2.getRLInfo() and
+           rlWireHit2.getRLInfo() == rlWireHit3.getRLInfo());
+
+
+  ERightLeft rlInfo = rlWireHit1.getRLInfo();
+  const CDCWireHit& wireHit = rlWireHit1.getWireHit();
+
+  double driftLength = (rlWireHit1.getRefDriftLength() +
+                        rlWireHit2.getRefDriftLength() +
+                        rlWireHit3.getRefDriftLength()) / 3.0;
+
+  CDCRLTaggedWireHit result(&wireHit, rlInfo, driftLength);
+  return result;
+}
+
 
 CDCRLTaggedWireHit CDCRLTaggedWireHit::fromSimHit(const CDCWireHit* wirehit,
                                                   const CDCSimHit& simhit)

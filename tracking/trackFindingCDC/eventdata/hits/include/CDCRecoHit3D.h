@@ -22,13 +22,14 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    /// Forward declaration.
+    // Forward declaration.
     class CDCTrajectory3D;
     class CDCTrajectory2D;
     class CDCTrajectorySZ;
 
-    /// Class representing a three dimensional reconstructed hit.
-    /** A recohit represents a likely point where the particle went through. It is always assoziated with a
+    /**
+     *  Class representing a three dimensional reconstructed hit.
+     *  A recohit represents a likely point where the particle went through. It is always assoziated with a
      *  wire hit it seeks to reconstruct. The reconstructed point is stored as an absolut position from the
      *  origin / interaction point. In addition the reconstructed hit takes a right left passage information
      *  which indicates if the hit wire lies to the right or to the left of the particle trajectory causing the hit.
@@ -53,18 +54,19 @@ namespace Belle2 {
                    const Vector3D& position,
                    double perpS = 0);
 
-
-      /// Constructs a three dimensional reconstructed hit from a sim hit and the assoziated wirehit.
-      /** This translates the sim hit to a reconstructed hit mainly to be able to compare the
+      /**
+       *  Constructs a three dimensional reconstructed hit from a sim hit and the assoziated wirehit.
+       *  This translates the sim hit to a reconstructed hit mainly to be able to compare the
        *  reconstructed values from the algorithm with the Monte Carlo information.
        *  It merely takes the position from the sim hit and calculates the right left passage information.
        *  Since only the time is present in the sim hit but not the travel distance this parameter is just set
        *  NAN!
-       * */
+       */
       static CDCRecoHit3D fromSimHit(const CDCWireHit* wireHit, const CDCSimHit& simHit);
 
-      /// Reconstructs the three dimensional hit from the two dimensional and the two dimensional trajectory.
-      /** For two dimensional reconstructed hits on axial wires this reconstructs
+      /**
+       *  Reconstructs the three dimensional hit from the two dimensional and the two dimensional trajectory.
+       *  For two dimensional reconstructed hits on axial wires this reconstructs
        *  the xy position and the transvers travel distance. The z coordinate cannot
        *  be determined since the projection can not show any information about it. It
        *  is always set to NAN for axial hits.
@@ -72,30 +74,35 @@ namespace Belle2 {
        *  For two dimensional reconstructed hits on stereo wires however the deviation of the xy position
        *  can be used to get z information. The reconstucted hit lies exactly on the fitted trajectory
        *  as seen from the xy plane. Hence also xy position and transvers travel distance are available.
-       *  Only the stereo hits have then the full information to go head and make the sz trajectory. */
+       *  Only the stereo hits have then the full information to go head and make the sz trajectory.
+       */
       static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
                                       const CDCTrajectory2D& trajectory2D);
 
-      /** Reconstructs the three dimensional hit from the wire hit and the given right left passage
+      /**
+       *  Reconstructs the three dimensional hit from the wire hit and the given right left passage
        *  information by shifting it to a z coordinate, where it touches the two dimensional trajectory
-       *  from the side indicated by the right left passage.*/
+       *  from the side indicated by the right left passage.
+       */
       static CDCRecoHit3D reconstruct(const CDCRLTaggedWireHit& rlWireHit,
                                       const CDCTrajectory2D& trajectory2D);
 
-      /** Reconstructs the three dimensional hit from the wire hit and the given right left passage
+      /**
+       *  Reconstructs the three dimensional hit from the wire hit and the given right left passage
        *  information by shifting it to a z coordinate, where it touches the two dimensional trajectory
-       *  from the side indicated by the right left passage.*/
+       *  from the side indicated by the right left passage.
+       */
       static CDCRecoHit3D reconstruct(const CDCWireHit* wireHit,
                                       ERightLeft rlInfo,
                                       const CDCTrajectory2D& trajectory2D);
 
       /**
-       * Reconstruct a three dimensional hit from a wire hit (as in reconstruct(rlWireHit, trajectory2D)), but this time use a
-       * wire hit without a right-left information as an input. The right-left information is chosen to be consistent with the
-       * reference position of the wire and the trajectory passed in to that function (by checking the sign of
-       * trackTrajectory2D.getDist2D(wireHit.getRefPos2D())).
-       * WARNING: This function is only to be used with axial hits (and asserts this). The corresponding rl-wire hit is taken
-       * from the CDCWireHitTopology object.
+       *  Reconstruct a three dimensional hit from a wire hit (as in reconstruct(rlWireHit, trajectory2D)), but this time use a
+       *  wire hit without a right-left information as an input. The right-left information is chosen to be consistent with the
+       *  reference position of the wire and the trajectory passed in to that function (by checking the sign of
+       *  trackTrajectory2D.getDist2D(wireHit.getRefPos2D())).
+       *  WARNING: This function is only to be used with axial hits (and asserts this). The corresponding rl-wire hit is taken
+       *  from the CDCWireHitTopology object.
        */
       static CDCRecoHit3D reconstructNearest(const CDCWireHit* wireHit,
                                              const CDCTrajectory2D& trackTrajectory2D);
@@ -104,10 +111,11 @@ namespace Belle2 {
       static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
                                       const CDCTrajectory3D& trajectory3D);
 
+      /**
+       *  Reconstructs the three dimensional hit from the two dimensional,
+       *  the two dimensional trajectory and sz trajectory.
+       *  For two dimensional reconstructed hits on axial wires this reconstructs
 
-      /// Reconstructs the three dimensional hit from the two dimensional,
-      /// the two dimensional trajectory and sz trajectory.
-      /** For two dimensional reconstructed hits on axial wires this reconstructs
        *  the xy position and the transvers travel distance. The z coordinate is then determined
        *  by evaluating the sz trajectory at the just calculated travel distance. Note that it is important
        *  that both circle trajectory and sz trajectory share a common reference point.
@@ -115,24 +123,29 @@ namespace Belle2 {
        *  For two dimensional reconstructed hits on stereo wires the transerse travel distance is obtained
        *  as in the reconstuct() method before. However the z coordinate is set to the value of the sz trajectory
        *  at just calculated the transvers travel distance, since the trajectory should be more exact than the shifting
-       *  along the wire.*/
+       *  along the wire.
+       */
       static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
                                       const CDCTrajectory2D& trajectory2D,
                                       const CDCTrajectorySZ& trajectorySZ);
 
-      /// Constructs the average of two reconstructed hit positions.
-      /** Averages the hit positions and the travel distance. The function averages only reconstructed hits
+      /**
+       *  Constructs the average of two reconstructed hit positions.
+       *  Averages the hit positions and the travel distance. The function averages only reconstructed hits
        *  assoziated with the same wire hit. If not all recostructed hits are on the same wire hit, the first hit
-       *  is returned unchanged. Also averages the right left passage information with averageInfo(). */
+       *  is returned unchanged. Also averages the right left passage information with averageInfo().
+       */
       static CDCRecoHit3D average(const CDCRecoHit3D& first,
                                   const CDCRecoHit3D& second);
 
-      /// Turns the orientation in place.
-      /** Changes the sign of the right left passage information,
-       *  since the position remains the same by this reversion.*/
+      /**
+       *  Turns the orientation in place.
+       *  Changes the sign of the right left passage information,
+       *  since the position remains the same by this reversion.
+       */
       void reverse();
 
-      /** Returns the recohit with the opposite right left information. */
+      /// Returns the recohit with the opposite right left information.
       CDCRecoHit3D reversed() const;
 
       /// Make the wire hit automatically castable to its underlying cdcHit.
@@ -147,8 +160,10 @@ namespace Belle2 {
                getRecoPos3D() == other.getRecoPos3D();
       }
 
-      /// Total ordering relation based on wire hit, right left passage
-      /// information and position information in this order of importance.
+      /**
+       *  Total ordering relation based on wire hit, right left passage
+       *  information and position information in this order of importance.
+       */
       bool operator<(const CDCRecoHit3D& other) const
       {
         return (getRLWireHit() < other.getRLWireHit() or
@@ -205,10 +220,12 @@ namespace Belle2 {
       void setRLWireHit(const CDCRLTaggedWireHit& rlWireHit)
       { m_rlWireHit = rlWireHit; }
 
-      /// Getter for the right left passage information.
-      /** Returns the right left passage information as see in the xy projection.
+      /**
+       *  Getter for the right left passage information.
+       *  Returns the right left passage information as see in the xy projection.
        *  It gives if the wire lies on the right or on the left side of the track \n
-       *  as you at the xy projection. */
+       *  as you at the xy projection.
+       */
       ERightLeft getRLInfo() const
       { return getRLWireHit().getRLInfo(); }
 
@@ -237,13 +254,17 @@ namespace Belle2 {
       /// Gets the displacement from the wire position in the xy plain at the reconstructed position.
       Vector2D getRecoDisp2D() const;
 
-      /// Constructs a two dimensional reconstructed hit by
-      /// carrying out the stereo ! projection to the wire reference postion.
+      /**
+       *  Constructs a two dimensional reconstructed hit by
+       *  carrying out the stereo ! projection to the wire reference postion.
+       */
       CDCRecoHit2D getRecoHit2D() const
       { return CDCRecoHit2D(m_rlWireHit, getRecoDisp2D()); }
 
-      /// Constructs a two dimensional reconstructed hit by
-      /// carrying out the stereo ! projection to the wire reference postion.
+      /**
+       *  Constructs a two dimensional reconstructed hit by
+       *  carrying out the stereo ! projection to the wire reference postion.
+       */
       CDCRecoHit2D stereoProjectToRef() const
       { return getRecoHit2D(); }
 
@@ -251,13 +272,17 @@ namespace Belle2 {
       Vector2D getRecoWirePos2D() const
       { return getWire().getWirePos2DAtZ(getRecoZ()); }
 
-      /// Returns the drift length next to the reconstructed position.
-      /** Dummy implemented as the reference drift length.*/
+      /**
+       *  Returns the drift length next to the reconstructed position.
+       *  Dummy implemented as the reference drift length.
+       */
       double getSignedRecoDriftLength() const
       { return getRLWireHit().getSignedRefDriftLength(); }
 
-      /// Returns the drift length variance next to the reconstructed position.
-      /// Dummy implemented as the reference drift length.
+      /**
+       *  Returns the drift length variance next to the reconstructed position.
+       *  Dummy implemented as the reference drift length.
+       */
       double getRecoDriftLengthVariance() const
       { return getRLWireHit().getRefDriftLengthVariance(); }
 
@@ -273,23 +298,28 @@ namespace Belle2 {
       void setArcLength2D(const double arcLength2D)
       { m_arcLength2D = arcLength2D; }
 
-      /** Indicator if the hit is in the cdc (scaled by the factor) or already outside its boundaries.
-          Checks for z to be in the range of the wire. */
+      /**
+       *  Indicator if the hit is in the cdc (scaled by the factor) or already outside its boundaries.
+       *  Checks for z to be in the range of the wire.
+       */
       bool isInCellZBounds(const double factor = 1) const
       {
         return getWire().isInCellZBounds(getRecoPos3D(), factor);
       }
 
-      /// Access the object methods and methods from a pointer in the same way.
-      /** In situations where the type is not known to be a pointer or a reference there is no way to tell
+      /**
+       *  Access the object methods and methods from a pointer in the same way.
+       *  In situations where the type is not known to be a pointer or a reference there is no way to tell
        *  if one should use the dot '.' or operator '->' for method look up.
        *  So this function defines the -> operator for the object.
-       *  No matter you have a pointer or an object access is given with '->'.*/
+       *  No matter you have a pointer or an object access is given with '->'.
+       */
       const CDCRecoHit3D* operator->() const
       { return this; }
 
-      /// Calculates the z slope with a given z0.
-      /** We assume a line from the point (0, 0, z0) to the reco position.
+      /**
+       *  Calculates the z slope with a given z0.
+       *  We assume a line from the point (0, 0, z0) to the reco position.
        *  The slope of this line is returned.
        */
       double calculateZSlopeWithZ0(double z0) const
@@ -309,6 +339,7 @@ namespace Belle2 {
 
       /// Memory for the travel distance as see in the xy projection.
       double m_arcLength2D;
-    }; //class
-  } //end namespace TrackFindingCDC
+
+    }; // class CDCRecoHit3D
+  } // namespace TrackFindingCDC
 } // namespace Belle2

@@ -13,9 +13,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-
-#include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Filter for the constuction of good facets based on simple criterions.
@@ -34,21 +31,20 @@ namespace Belle2 {
 
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override;
+      virtual void exposeParameters(ModuleParamList* moduleParamList,
+                                    const std::string& prefix = "") override;
 
     public:
-      /** Main filter method returning the weight of the facet.
+      /**
+       *  Main filter method returning the weight of the facet.
        *  Returns NAN if the cell shall be rejected.
        */
       virtual Weight operator()(const CDCFacet& facet) override final;
 
     private:
-      /// Basic filter to implement a feasible right left passage preselection.
-      FeasibleRLFacetFilter m_feasibleRLFacetFilter;
-
       /// Memory for the used direction of flight deviation.
       double m_param_deviationCosCut;
 
     }; // end class SimpleFacetFilter
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  } // end namespace TrackFindingCDC
+} // end namespace Belle2

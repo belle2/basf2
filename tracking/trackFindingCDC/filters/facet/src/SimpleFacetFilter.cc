@@ -20,14 +20,12 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 SimpleFacetFilter::SimpleFacetFilter():
-  m_feasibleRLFacetFilter(true),
   m_param_deviationCosCut(cos(M_PI / 180.0 * 9))
 {
 }
 
 
 SimpleFacetFilter::SimpleFacetFilter(double deviationCosCut):
-  m_feasibleRLFacetFilter(true),
   m_param_deviationCosCut(deviationCosCut)
 {
 }
@@ -36,7 +34,6 @@ void SimpleFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
                                          const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
-  m_feasibleRLFacetFilter.exposeParameters(moduleParamList, prefix);
   moduleParamList->addParameter(prefixed(prefix, "deviationCosCut"),
                                 m_param_deviationCosCut,
                                 "Acceptable deviation cosine in the angle of adjacent tangents "
@@ -46,9 +43,6 @@ void SimpleFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
 
 Weight SimpleFacetFilter::operator()(const CDCFacet& facet)
 {
-  Weight feasibleRLWeight = m_feasibleRLFacetFilter(facet);
-  if (std::isnan(feasibleRLWeight)) return NAN;
-
   facet.adjustLines();
 
   const ParameterLine2D& startToMiddle = facet.getStartToMiddleLine();

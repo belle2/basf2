@@ -9,15 +9,24 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
+#include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
+
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+
+#include <tracking/trackFindingCDC/fitting/FacetFitter.h>
+
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
-
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
+#include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <framework/gearbox/Const.h>
+
+#include <boost/math/special_functions/sinc.hpp>
 #include <boost/range/adaptor/indirected.hpp>
 
 #include <vector>
@@ -47,11 +56,24 @@ namespace Belle2 {
         return "Creates hit triplet (facets) from each cluster filtered by a acceptance criterion.";
       }
 
-      /** Add the parameters of the filter to the module */
+      /// Add the parameters of the filter to the module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
       {
         m_wireHitRelationFilter.exposeParameters(moduleParamList, prefix);
+        m_feasibleRLFacetFilter.exposeParameters(moduleParamList, prefix);
         m_facetFilter.exposeParameters(moduleParamList, prefix);
+
+        moduleParamList->addParameter(prefixed(prefix, "updateDriftLength"),
+                                      m_param_updateDriftLength,
+                                      "Switch to reestimate the drift length",
+                                      m_param_updateDriftLength);
+
+        moduleParamList->addParameter(prefixed(prefix, "leastSquareFit"),
+                                      m_param_leastSquareFit,
+                                      "Switch to fit the facet with the least square method "
+                                      "for drift length estimation",
+                                      m_param_leastSquareFit);
+
       }
 
       virtual void apply(const std::vector<CDCWireHitCluster>& inputClusters,
@@ -94,7 +116,8 @@ namespace Belle2 {
       }
 
     private:
-      /** Generates facets on the given wire hits generating neighboring triples of hits.
+      /**
+       *  Generates facets on the given wire hits generating neighboring triples of hits.
        *  Inserts the result to the end of the GenericFacetCollection.
        */
       void createFacets(const CDCWireHitCluster& wireHits,
@@ -128,12 +151,13 @@ namespace Belle2 {
                                          endWireHit,
                                          facets);
               }
-            } //end for itEndWireHit
-          } //end for itStartWireHit
-        } //end for itMiddleWireHit
+            } // end for itEndWireHit
+          } // end for itStartWireHit
+        } // end for itMiddleWireHit
       }
 
-      /** Generates reconstruted facets on the three given wire hits by hypothesizing
+      /**
+       *  Generates reconstruted facets on the three given wire hits by hypothesizing
        *  over the 8 left right passage combinations.
        *  Inserts the result to the end of the GenericFacetCollection.
        */
@@ -160,32 +184,105 @@ namespace Belle2 {
               // He should set them if he accepts the facet.
               facet.invalidateLines();
 
-              // Obtain a constant interface to pass to the filter method following
-              const CDCFacet& constFacet = facet;
+              if (m_param_feasibleRLOnly) {
+                Weight feasibleWeight = m_feasibleRLFacetFilter(facet);
+                if (std::isnan(feasibleWeight)) continue;
+              }
 
-              CellWeight cellWeight = m_facetFilter(constFacet);
+              if (m_param_updateDriftLength) {
+                // Reset drift length
+                facet.getStartRLWireHit().setRefDriftLength(startWireHit.getRefDriftLength());
+                facet.getMiddleRLWireHit().setRefDriftLength(middleWireHit.getRefDriftLength());
+                facet.getEndRLWireHit().setRefDriftLength(endWireHit.getRefDriftLength());
+
+                if (m_param_leastSquareFit) {
+                  /*double chi2 =*/ FacetFitter::fit(facet);
+                } else {
+                  facet.adjustLines();
+                }
+
+                // Update drift length
+                updateDriftLength(facet);
+              }
+
+              CellWeight cellWeight = m_facetFilter(facet);
 
               if (not isNotACell(cellWeight)) {
                 facet.getAutomatonCell().setCellWeight(cellWeight);
                 facets.insert(facets.end(), facet);
               }
-            } //end for endRLWireHit
-          } //end for middleRLWireHit
-        } //end for startRLWireHit
+            } // end for endRLWireHit
+          } // end for middleRLWireHit
+        } // end for startRLWireHit
+      }
+
+      /**
+       *  Reestimate the drift length of all three contained drift circles.
+       *  Using the additional flight direction information the accuracy of the drift length
+       *  can be increased alot helping the filters following this step
+       */
+      void updateDriftLength(CDCFacet& facet)
+      {
+        double startDriftLength = getDriftLengthEstimate(facet.getStartRecoHit2D());
+        facet.getStartRLWireHit().setRefDriftLength(startDriftLength);
+
+        double middleDriftLength = getDriftLengthEstimate(facet.getMiddleRecoHit2D());
+        facet.getMiddleRLWireHit().setRefDriftLength(middleDriftLength);
+
+        double endDriftLength = getDriftLengthEstimate(facet.getEndRecoHit2D());
+        facet.getEndRLWireHit().setRefDriftLength(endDriftLength);
+      }
+
+      /// Estimate the drift length of hit making use of the reconstructed flight direction of the hit.
+      double getDriftLengthEstimate(const CDCRecoHit2D& recoHit2D) const
+      {
+        static CDC::RealisticTDCCountTranslator tdcCountTranslator;
+
+        Vector2D flightDirection = recoHit2D.getFlightDirection2D();
+        Vector2D recoPos = recoHit2D.getRecoPos2D();
+        double alpha = recoPos.angleWith(flightDirection);
+        double arcLength2D = recoPos.cylindricalR() / boost::math::sinc_pi(alpha);
+        double flightTimeEstimation = arcLength2D / Const::speedOfLight;
+
+        const CDCWire& wire = recoHit2D.getWire();
+        const CDCHit* hit = recoHit2D.getWireHit().getHit();
+        const bool rl = recoHit2D.getRLInfo() == ERightLeft::c_Right;
+
+        double driftLength =
+          tdcCountTranslator.getDriftLength(hit->getTDCCount(),
+                                            wire.getWireID(),
+                                            flightTimeEstimation,
+                                            rl,
+                                            wire.getRefZ(),
+                                            alpha);
+
+        return driftLength;
       }
 
     private:
-      /// Memory for the wire hit neighborhood in within a cluster.
-      std::vector<WeightedRelation<const CDCWireHit> > m_wireHitRelations;
+      /// Parameter : Switch to apply the rl feasibility cut
+      bool m_param_feasibleRLOnly = true;
+
+      /// Parameter : Switch to reestimate the drift length
+      bool m_param_updateDriftLength = false;
+
+      /// Parameter : Switch to fit the facet with least square method for the drift length update
+      bool m_param_leastSquareFit = false;
 
     private:
       /// The filter for the hit neighborhood.
       BridgingWireHitRelationFilter m_wireHitRelationFilter;
 
+      /// The feasibility filter for the right left passage information
+      FeasibleRLFacetFilter m_feasibleRLFacetFilter;
+
       /// The filter to be used for the facet generation.
       AFacetFilter m_facetFilter;
 
+    private:
+      /// Memory for the wire hit neighborhood in within a cluster.
+      std::vector<WeightedRelation<const CDCWireHit> > m_wireHitRelations;
 
-    }; //end class FacetCreator
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    }; // end class FacetCreator
+  } // end namespace TrackFindingCDC
+} // end namespace Belle2

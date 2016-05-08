@@ -27,10 +27,6 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
   if (not extracted or not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 
-  // Make the feasibility cut on the right left passage information first
-  const Weight feasibleRLWeight = m_feasibleRLFacetFilter(facet);
-  if (std::isnan(feasibleRLWeight)) return false;
-
   double chi2 = FacetFitter::fit(facet);
 
   const ParameterLine2D& fitLine = facet.getStartToEndLine();

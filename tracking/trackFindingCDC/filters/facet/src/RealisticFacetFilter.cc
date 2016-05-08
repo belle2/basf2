@@ -26,13 +26,11 @@ namespace {
 }
 
 RealisticFacetFilter::RealisticFacetFilter():
-  m_feasibleRLFacetFilter(true),
   m_param_phiPullCut(11)
 {
 }
 
 RealisticFacetFilter::RealisticFacetFilter(double phiPullCut):
-  m_feasibleRLFacetFilter(true),
   m_param_phiPullCut(phiPullCut)
 {
 }
@@ -41,7 +39,6 @@ void RealisticFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
                                             const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
-  m_feasibleRLFacetFilter.exposeParameters(moduleParamList, prefix);
   moduleParamList->addParameter(prefixed(prefix, "phiPullCut"),
                                 m_param_phiPullCut,
                                 "Acceptable angle pull in the angle of adjacent tangents to the "
@@ -51,9 +48,6 @@ void RealisticFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
 
 Weight RealisticFacetFilter::operator()(const CDCFacet& facet)
 {
-  Weight feasibleRLWeight = m_feasibleRLFacetFilter(facet);
-  if (std::isnan(feasibleRLWeight)) return NAN;
-
   facet.adjustLines();
 
   const CDCRLTaggedWireHit& startRLWirehit = facet.getStartRLWireHit();

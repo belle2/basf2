@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 #include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
@@ -77,10 +75,6 @@ namespace Belle2 {
 
       /// Generate and assign the variables from the facet
       virtual bool extract(const CDCFacet* facet) override final;
-
-    private:
-      /// Feasible right left passage filter for the feasibility cut of the right left passage information.
-      FeasibleRLFacetFilter m_feasibleRLFacetFilter;
     };
   }
 }

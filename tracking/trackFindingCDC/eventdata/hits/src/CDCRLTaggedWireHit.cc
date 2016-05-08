@@ -17,11 +17,18 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 CDCRLTaggedWireHit::CDCRLTaggedWireHit(const CDCWireHit* wireHit,
-                                       ERightLeft rlInfo) :
-  m_wireHit(wireHit),
-  m_rlInfo(rlInfo)
+                                       ERightLeft rlInfo)
+  : CDCRLTaggedWireHit(wireHit, rlInfo, wireHit->getRefDriftLength())
 {
-  B2ASSERT("Recohit with nullptr as wire hit", wireHit != nullptr);
+}
+
+CDCRLTaggedWireHit::CDCRLTaggedWireHit(const CDCWireHit* wireHit,
+                                       ERightLeft rlInfo,
+                                       double driftLength)
+  : m_wireHit(wireHit),
+    m_rlInfo(rlInfo),
+    m_refDriftLength(driftLength)
+{
 }
 
 CDCRLTaggedWireHit CDCRLTaggedWireHit::fromSimHit(const CDCWireHit* wirehit,

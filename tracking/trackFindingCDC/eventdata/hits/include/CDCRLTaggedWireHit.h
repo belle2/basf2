@@ -27,11 +27,23 @@ namespace Belle2 {
      */
     class CDCRLTaggedWireHit {
     public:
-      /** Constructs an oriented wire hit.
-       *  @param wireHit the wire hit the oriented hit is associated with.
-       *  @param rlInfo the right left passage information of the _wire_ relative to the track */
+      /**
+       *  Constructs an oriented wire hit.
+       *  @param wireHit      The wire hit the oriented hit is associated with.
+       *  @param rlInfo       The right left passage information of the _wire_ relative to the track
+       */
       CDCRLTaggedWireHit(const CDCWireHit* wireHit,
                          ERightLeft rlInfo = ERightLeft::c_Unknown);
+
+      /**
+       *  Constructs an oriented wire hit.
+       *  @param wireHit      The wire hit the oriented hit is associated with.
+       *  @param rlInfo       The right left passage information of the _wire_ relative to the track
+       *  @param driftLength  The reestimated drift length
+       */
+      CDCRLTaggedWireHit(const CDCWireHit* wireHit,
+                         ERightLeft rlInfo,
+                         double driftLength);
 
       /// Constructs an oriented wire hit from a CDCSimHit and the associated wirehit.
       /** This translates the sim hit to an oriented wire hit mainly to be able to compare the
@@ -143,11 +155,15 @@ namespace Belle2 {
 
       /// Getter for the  drift length at the reference position of the wire.
       double getRefDriftLength() const
-      { return getWireHit().getRefDriftLength(); }
+      { return m_refDriftLength; }
+
+      /// Setter for the  drift length at the reference position of the wire.
+      void setRefDriftLength(double driftLength)
+      { m_refDriftLength = driftLength; }
 
       /// Getter for the  drift length at the reference position of the wire.
       double getSignedRefDriftLength() const
-      { return ((ESign)(getRLInfo())) * getRefDriftLength(); }
+      { return static_cast<ESign>(getRLInfo()) * getRefDriftLength(); }
 
       /// Getter for the variance of the drift length at the reference position of the wire.
       double getRefDriftLengthVariance() const
@@ -201,6 +217,9 @@ namespace Belle2 {
 
       /// Memory for the right left passage information of the oriented wire hit.
       NRightLeft::ERightLeft m_rlInfo;
+
+      /// Memory for the reestimated drift length
+      double m_refDriftLength = 0.0;
 
     }; //class CDCRLTaggedWireHit
   } // end namespace TrackFindingCDC

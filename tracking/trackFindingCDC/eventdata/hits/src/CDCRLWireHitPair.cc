@@ -14,8 +14,8 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRLWireHitPair::CDCRLWireHitPair(const CDCRLTaggedWireHit& fromRLWireHit,
-                                   const CDCRLTaggedWireHit& toRLWireHit):
+CDCRLWireHitPair::CDCRLWireHitPair(const CDCRLWireHit& fromRLWireHit,
+                                   const CDCRLWireHit& toRLWireHit):
   m_fromRLWireHit(fromRLWireHit),
   m_toRLWireHit(toRLWireHit)
 {

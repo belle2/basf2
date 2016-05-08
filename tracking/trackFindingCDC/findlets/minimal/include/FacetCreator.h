@@ -167,9 +167,9 @@ namespace Belle2 {
                                     std::vector<CDCFacet>& facets)
       {
         /// Prepare a facet - without fitted tangent lines.
-        CDCRLTaggedWireHit startRLWireHit(&startWireHit, ERightLeft::c_Left);
-        CDCRLTaggedWireHit middleRLWireHit(&middleWireHit, ERightLeft::c_Left);
-        CDCRLTaggedWireHit endRLWireHit(&endWireHit, ERightLeft::c_Left);
+        CDCRLWireHit startRLWireHit(&startWireHit, ERightLeft::c_Left);
+        CDCRLWireHit middleRLWireHit(&middleWireHit, ERightLeft::c_Left);
+        CDCRLWireHit endRLWireHit(&endWireHit, ERightLeft::c_Left);
         CDCFacet facet(startRLWireHit, middleRLWireHit, endRLWireHit, ParameterLine2D());
 
         for (ERightLeft startRLInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {

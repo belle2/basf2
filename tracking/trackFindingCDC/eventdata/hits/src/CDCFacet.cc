@@ -13,9 +13,9 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCFacet::CDCFacet(const CDCRLTaggedWireHit& startRLWireHit,
-                   const CDCRLTaggedWireHit& middleRLWireHit,
-                   const CDCRLTaggedWireHit& endRLWireHit) :
+CDCFacet::CDCFacet(const CDCRLWireHit& startRLWireHit,
+                   const CDCRLWireHit& middleRLWireHit,
+                   const CDCRLWireHit& endRLWireHit) :
   CDCRLWireHitTriple(startRLWireHit, middleRLWireHit, endRLWireHit),
   m_startToMiddle(),
   m_startToEnd(),
@@ -25,9 +25,9 @@ CDCFacet::CDCFacet(const CDCRLTaggedWireHit& startRLWireHit,
   adjustLines();
 }
 
-CDCFacet::CDCFacet(const CDCRLTaggedWireHit& startRLWireHit,
-                   const CDCRLTaggedWireHit& middleRLWireHit,
-                   const CDCRLTaggedWireHit& endRLWireHit,
+CDCFacet::CDCFacet(const CDCRLWireHit& startRLWireHit,
+                   const CDCRLWireHit& middleRLWireHit,
+                   const CDCRLWireHit& endRLWireHit,
                    const ParameterLine2D& startToMiddle,
                    const ParameterLine2D& startToEnd,
                    const ParameterLine2D& middleToEnd) :

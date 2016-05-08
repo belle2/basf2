@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -76,9 +76,9 @@ namespace Belle2 {
       CDCRLWireHitTriple() = default;
 
       /// Constructor taking three oriented wire hits.
-      CDCRLWireHitTriple(const CDCRLTaggedWireHit& startRLWireHit,
-                         const CDCRLTaggedWireHit& middleRLWireHit,
-                         const CDCRLTaggedWireHit& endRLWireHit);
+      CDCRLWireHitTriple(const CDCRLWireHit& startRLWireHit,
+                         const CDCRLWireHit& middleRLWireHit,
+                         const CDCRLWireHit& endRLWireHit);
 
       /// Constructs the reverse tiple from this one.
       CDCRLWireHitTriple reversed() const;
@@ -208,27 +208,27 @@ namespace Belle2 {
       { return getStartWireHit() == wirehit or getRearRLWireHitPair()->hasWireHit(wirehit); }
 
       /// Getter for the first oriented wire hit.
-      CDCRLTaggedWireHit& getStartRLWireHit()
+      CDCRLWireHit& getStartRLWireHit()
       { return m_startRLWireHit; }
 
       /// Getter for the second oriented wire hit.
-      CDCRLTaggedWireHit& getMiddleRLWireHit()
+      CDCRLWireHit& getMiddleRLWireHit()
       { return getRearRLWireHitPair().getFromRLWireHit(); }
 
       /// Getter for the third oriented wire hit.
-      CDCRLTaggedWireHit& getEndRLWireHit()
+      CDCRLWireHit& getEndRLWireHit()
       { return getRearRLWireHitPair().getToRLWireHit(); }
 
       /// Constant getter for the first oriented wire hit.
-      const CDCRLTaggedWireHit& getStartRLWireHit() const
+      const CDCRLWireHit& getStartRLWireHit() const
       { return m_startRLWireHit; }
 
       /// Constant getter for the second oriented wire hit.
-      const CDCRLTaggedWireHit& getMiddleRLWireHit() const
+      const CDCRLWireHit& getMiddleRLWireHit() const
       { return getRearRLWireHitPair().getFromRLWireHit(); }
 
       /// Constant getter for the third oriented wire hit.
-      const CDCRLTaggedWireHit& getEndRLWireHit() const
+      const CDCRLWireHit& getEndRLWireHit() const
       { return getRearRLWireHitPair().getToRLWireHit(); }
 
       /// Getter for the pair of second and third oriented wire hit.
@@ -240,15 +240,15 @@ namespace Belle2 {
       { return m_rearRLWireHitPair; }
 
       /// Setter for the first oriented wire hit.
-      void setStartRLWireHit(const CDCRLTaggedWireHit& startRLWireHit)
+      void setStartRLWireHit(const CDCRLWireHit& startRLWireHit)
       { m_startRLWireHit = startRLWireHit; }
 
       /// Setter for the second oriented wire hit.
-      void setMiddleRLWireHit(const CDCRLTaggedWireHit& middleRLWireHit)
+      void setMiddleRLWireHit(const CDCRLWireHit& middleRLWireHit)
       { m_rearRLWireHitPair.setFromRLWireHit(middleRLWireHit); }
 
       /// Setter for the third oriented wire hit.
-      void setEndRLWireHit(const CDCRLTaggedWireHit& endRLWireHit)
+      void setEndRLWireHit(const CDCRLWireHit& endRLWireHit)
       { m_rearRLWireHitPair.setToRLWireHit(endRLWireHit); }
 
       /// Setter for the right left passage information of the first oriented wire hit.
@@ -273,7 +273,7 @@ namespace Belle2 {
 
     protected:
       /// Memory for the start oriented wire hit.
-      CDCRLTaggedWireHit m_startRLWireHit;
+      CDCRLWireHit m_startRLWireHit;
 
       /// Memory for the second and third wire hits.
       CDCRLWireHitPair m_rearRLWireHitPair;

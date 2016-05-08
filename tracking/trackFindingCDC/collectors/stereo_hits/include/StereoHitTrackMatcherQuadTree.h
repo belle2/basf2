@@ -27,7 +27,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
     class CDCRecoHit3D;
-    class CDCRLTaggedWireHit;
+    class CDCRLWireHit;
     class CDCTrajectory2D;
 
     /**
@@ -43,7 +43,7 @@ namespace Belle2 {
       /// Use tracks as collector items.
       typedef CDCTrack CollectorItem;
       /// Use rl tagged wire hits a collection items.
-      typedef CDCRLTaggedWireHit CollectionItem;
+      typedef CDCRLWireHit CollectionItem;
 
       /// Expose the parameters to the module.
       virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "") override;

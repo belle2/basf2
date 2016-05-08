@@ -102,7 +102,7 @@ namespace {
 
     houghTree.initialize();
 
-    std::vector<CDCRLTaggedWireHit> mcTaggedWireHits;
+    std::vector<CDCRLWireHit> mcTaggedWireHits;
     for (const CDCTrack& mcTrack : m_mcTracks) {
       for (const CDCRecoHit3D& recoHit3D : mcTrack) {
         const CDCWireHit& wireHit = recoHit3D.getWireHit();
@@ -112,7 +112,7 @@ namespace {
     }
 
     // Execute the finding a couple of time to find a stable execution time.
-    vector< pair<HoughBox, vector<CDCRLTaggedWireHit> > > candidates;
+    vector< pair<HoughBox, vector<CDCRLWireHit> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
@@ -140,9 +140,9 @@ namespace {
 
 
     size_t iColor = 0;
-    for (std::pair<HoughBox, std::vector<CDCRLTaggedWireHit> >& candidate : candidates) {
+    for (std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
-      const std::vector<CDCRLTaggedWireHit>& taggedHits = candidate.second;
+      const std::vector<CDCRLWireHit>& taggedHits = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
@@ -153,13 +153,13 @@ namespace {
 
 
       B2DEBUG(100, "Tags of the hits");
-      for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
+      for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         B2DEBUG(100, "    " <<
                 "rl = " << static_cast<int>(rlTaggedWireHit.getRLInfo()) << " " <<
                 "dl = " << rlTaggedWireHit->getRefDriftLength());
       }
 
-      for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
+      for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         const CDCWireHit& wireHit = rlTaggedWireHit.getWireHit();
         std::string color = "blue";
         if (rlTaggedWireHit.getRLInfo() == ERightLeft::c_Right) {

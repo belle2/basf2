@@ -12,7 +12,7 @@
 #include <cmath>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 
@@ -47,7 +47,7 @@ namespace Belle2 {
       CDCRecoHit3D() = default;
 
       /// Constructor taking all stored variables of the reconstructed hit.
-      CDCRecoHit3D(const CDCRLTaggedWireHit& rlWireHit,
+      CDCRecoHit3D(const CDCRLWireHit& rlWireHit,
                    const Vector3D& position,
                    double perpS = 0);
 
@@ -87,7 +87,7 @@ namespace Belle2 {
        *  information by shifting it to a z coordinate, where it touches the two dimensional trajectory
        *  from the side indicated by the right left passage.
        */
-      static CDCRecoHit3D reconstruct(const CDCRLTaggedWireHit& rlWireHit,
+      static CDCRecoHit3D reconstruct(const CDCRLWireHit& rlWireHit,
                                       const CDCTrajectory2D& trajectory2D);
 
       /**
@@ -217,10 +217,10 @@ namespace Belle2 {
       { return getRLWireHit().hasWireHit(wireHit); }
 
       /// Getter for the oriented wire hit.
-      const CDCRLTaggedWireHit& getRLWireHit() const { return m_rlWireHit; }
+      const CDCRLWireHit& getRLWireHit() const { return m_rlWireHit; }
 
       /// Setter for the oriented wire hit assoziated with the reconstructed hit.
-      void setRLWireHit(const CDCRLTaggedWireHit& rlWireHit)
+      void setRLWireHit(const CDCRLWireHit& rlWireHit)
       { m_rlWireHit = rlWireHit; }
 
       /**
@@ -335,7 +335,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the oriented wire hit reference.
-      CDCRLTaggedWireHit m_rlWireHit;
+      CDCRLWireHit m_rlWireHit;
 
       /// Memory for the reconstructed hit position.
       Vector3D m_recoPos3D;

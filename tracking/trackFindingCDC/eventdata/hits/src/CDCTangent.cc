@@ -21,8 +21,8 @@ CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair):
   adjustLine();
 }
 
-CDCTangent::CDCTangent(const CDCRLTaggedWireHit& fromRLWireHit,
-                       const CDCRLTaggedWireHit& toRLWireHit):
+CDCTangent::CDCTangent(const CDCRLWireHit& fromRLWireHit,
+                       const CDCRLWireHit& toRLWireHit):
   CDCRLWireHitPair(fromRLWireHit, toRLWireHit), m_line()
 {
   adjustLine();
@@ -34,8 +34,8 @@ CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair,
   m_line(line)
 {}
 
-CDCTangent::CDCTangent(const CDCRLTaggedWireHit& fromRLWireHit,
-                       const CDCRLTaggedWireHit& toRLWireHit,
+CDCTangent::CDCTangent(const CDCRLWireHit& fromRLWireHit,
+                       const CDCRLWireHit& toRLWireHit,
                        const ParameterLine2D& line):
   CDCRLWireHitPair(fromRLWireHit, toRLWireHit),
   m_line(line)

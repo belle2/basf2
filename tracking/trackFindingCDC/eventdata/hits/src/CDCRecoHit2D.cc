@@ -15,12 +15,12 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRecoHit2D::CDCRecoHit2D(const CDCRLTaggedWireHit& rlWireHit) :
+CDCRecoHit2D::CDCRecoHit2D(const CDCRLWireHit& rlWireHit) :
   m_rlWireHit(rlWireHit),
   m_recoDisp2D(Vector2D::getLowest())
 {}
 
-CDCRecoHit2D::CDCRecoHit2D(const CDCRLTaggedWireHit& rlWireHit,
+CDCRecoHit2D::CDCRecoHit2D(const CDCRLWireHit& rlWireHit,
                            const Vector2D& recoDisp2D) :
   m_rlWireHit(rlWireHit),
   m_recoDisp2D(recoDisp2D)
@@ -31,7 +31,7 @@ CDCRecoHit2D CDCRecoHit2D::fromSimHit(const CDCWireHit* wireHit,
 {
   // find out if the wire is right or left of the track ( view in flight direction )
   Vector3D trackPosToWire{simHit.getPosWire() - simHit.getPosTrack()};
-  CDCRecoHit2D recoHit2D(CDCRLTaggedWireHit::fromSimHit(wireHit, simHit),
+  CDCRecoHit2D recoHit2D(CDCRLWireHit::fromSimHit(wireHit, simHit),
                          Vector2D(-trackPosToWire.x(), -trackPosToWire.y()));
 
   recoHit2D.snapToDriftCircle();
@@ -41,9 +41,9 @@ CDCRecoHit2D CDCRecoHit2D::fromSimHit(const CDCWireHit* wireHit,
 CDCRecoHit2D CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
                                    const CDCRecoHit2D& recoHit2)
 {
-  CDCRLTaggedWireHit rlWireHit =
-    CDCRLTaggedWireHit::average(recoHit1.getRLWireHit(),
-                                recoHit2.getRLWireHit());
+  CDCRLWireHit rlWireHit =
+    CDCRLWireHit::average(recoHit1.getRLWireHit(),
+                          recoHit2.getRLWireHit());
 
   Vector2D displacement =
     Vector2D::average(recoHit1.getRecoDisp2D(),
@@ -59,10 +59,10 @@ CDCRecoHit2D CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
                                    const CDCRecoHit2D& recoHit2,
                                    const CDCRecoHit2D& recoHit3)
 {
-  CDCRLTaggedWireHit rlWireHit =
-    CDCRLTaggedWireHit::average(recoHit1.getRLWireHit(),
-                                recoHit2.getRLWireHit(),
-                                recoHit3.getRLWireHit());
+  CDCRLWireHit rlWireHit =
+    CDCRLWireHit::average(recoHit1.getRLWireHit(),
+                          recoHit2.getRLWireHit(),
+                          recoHit3.getRLWireHit());
 
   Vector2D displacement =
     Vector2D::average(recoHit1.getRecoDisp2D(),
@@ -75,7 +75,7 @@ CDCRecoHit2D CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
   return result;
 }
 
-CDCRecoHit2D CDCRecoHit2D::fromRecoPos2D(const CDCRLTaggedWireHit& rlWireHit,
+CDCRecoHit2D CDCRecoHit2D::fromRecoPos2D(const CDCRLWireHit& rlWireHit,
                                          const Vector2D& pos2D,
                                          bool snap)
 {

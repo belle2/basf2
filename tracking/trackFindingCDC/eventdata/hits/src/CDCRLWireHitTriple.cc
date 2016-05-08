@@ -17,9 +17,9 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 CDCRLWireHitTriple::CDCRLWireHitTriple(
-  const CDCRLTaggedWireHit& startRLWireHit,
-  const CDCRLTaggedWireHit& middleRLWireHit,
-  const CDCRLTaggedWireHit& endRLWireHit
+  const CDCRLWireHit& startRLWireHit,
+  const CDCRLWireHit& middleRLWireHit,
+  const CDCRLWireHit& endRLWireHit
 ):
   m_startRLWireHit(startRLWireHit),
   m_rearRLWireHitPair(middleRLWireHit, endRLWireHit)
@@ -35,7 +35,7 @@ CDCRLWireHitTriple CDCRLWireHitTriple::reversed() const
 
 void CDCRLWireHitTriple::reverse()
 {
-  CDCRLTaggedWireHit newEndRLWireHit = getStartRLWireHit().reversed();
+  CDCRLWireHit newEndRLWireHit = getStartRLWireHit().reversed();
   setMiddleRLWireHit(getEndRLWireHit().reversed());
   setMiddleRLWireHit(getMiddleRLWireHit().reversed());
   setEndRLWireHit(newEndRLWireHit);

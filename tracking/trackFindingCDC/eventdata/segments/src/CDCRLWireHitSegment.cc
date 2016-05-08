@@ -58,7 +58,7 @@ CDCRLWireHitSegment::CDCRLWireHitSegment(const genfit::TrackCand& gfTrackCand)
         const CDCHit* ptrHit = storedHits[hitId];
         const CDCWireHit* ptrWireHit = wireHitTopology.getWireHit(ptrHit);
         if (ptrWireHit) {
-          push_back(CDCRLTaggedWireHit(ptrWireHit, rlInfo));
+          push_back(CDCRLWireHit(ptrWireHit, rlInfo));
         }
 
       }
@@ -73,7 +73,7 @@ CDCRLWireHitSegment::CDCRLWireHitSegment(const genfit::TrackCand& gfTrackCand)
 vector<const CDCWire*> CDCRLWireHitSegment::getWireSegment() const
 {
   std::vector<const Belle2::TrackFindingCDC::CDCWire*> wireSegment;
-  for (const CDCRLTaggedWireHit& rlWireHit : *this) {
+  for (const CDCRLWireHit& rlWireHit : *this) {
     wireSegment.push_back(&(rlWireHit.getWire()));
   }
   return wireSegment;

@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/topology/WireNeighborKind.h>
 
 namespace Belle2 {
@@ -22,8 +22,8 @@ namespace Belle2 {
       CDCRLWireHitPair() = default;
 
       /// Constructor taking two oriented wire hits.
-      CDCRLWireHitPair(const CDCRLTaggedWireHit& fromRLWireHit,
-                       const CDCRLTaggedWireHit& toRLWireHit);
+      CDCRLWireHitPair(const CDCRLWireHit& fromRLWireHit,
+                       const CDCRLWireHit& toRLWireHit);
 
       /// Constructs a oriented wire hit pair that is the reverse of this one.
       CDCRLWireHitPair reversed() const;
@@ -119,27 +119,27 @@ namespace Belle2 {
       { return getToRLWireHit()->getRLInfo(); }
 
       /// Getter for the  first oriented wire hit.
-      CDCRLTaggedWireHit& getFromRLWireHit()
+      CDCRLWireHit& getFromRLWireHit()
       { return m_fromRLWireHit; }
 
       /// Getter for the  second oriented wire hit.
-      CDCRLTaggedWireHit& getToRLWireHit()
+      CDCRLWireHit& getToRLWireHit()
       { return m_toRLWireHit; }
 
       /// Constant getter for the  first oriented wire hit.
-      const CDCRLTaggedWireHit& getFromRLWireHit() const
+      const CDCRLWireHit& getFromRLWireHit() const
       { return m_fromRLWireHit; }
 
       /// Constant getter for the  second oriented wire hit.
-      const CDCRLTaggedWireHit& getToRLWireHit() const
+      const CDCRLWireHit& getToRLWireHit() const
       { return m_toRLWireHit; }
 
       /// Setter for the first oriented wire hit.
-      void setFromRLWireHit(const CDCRLTaggedWireHit& fromRLWireHit)
+      void setFromRLWireHit(const CDCRLWireHit& fromRLWireHit)
       { m_fromRLWireHit = fromRLWireHit; }
 
       /// Setter for the second oriented wire hit.
-      void setToRLWireHit(const CDCRLTaggedWireHit& toRLWireHit)
+      void setToRLWireHit(const CDCRLWireHit& toRLWireHit)
       { m_toRLWireHit = toRLWireHit; }
 
       /// Setter for the right left passage information of the first oriented wire hit.
@@ -158,10 +158,10 @@ namespace Belle2 {
 
     protected:
       /// Memory for the reference to the first oriented wire hit.
-      CDCRLTaggedWireHit m_fromRLWireHit;
+      CDCRLWireHit m_fromRLWireHit;
 
       /// Memory for the reference to the second oriented wire hit.
-      CDCRLTaggedWireHit m_toRLWireHit;
+      CDCRLWireHit m_toRLWireHit;
 
       /// Memory for the cluster id of this facet
       int m_iCluster = -1;

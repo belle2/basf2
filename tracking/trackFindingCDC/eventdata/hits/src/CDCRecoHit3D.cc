@@ -21,7 +21,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-CDCRecoHit3D::CDCRecoHit3D(const CDCRLTaggedWireHit& rlWireHit,
+CDCRecoHit3D::CDCRecoHit3D(const CDCRLWireHit& rlWireHit,
                            const Vector3D& recoPos3D,
                            double perpS) :
   m_rlWireHit(rlWireHit),
@@ -47,7 +47,7 @@ CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit,
   // prepS cannot be deduced from the flightTime in this context
   double perpS = std::numeric_limits<double>::quiet_NaN();
 
-  return CDCRecoHit3D(CDCRLTaggedWireHit::fromSimHit(wireHit, simHit),
+  return CDCRecoHit3D(CDCRLWireHit::fromSimHit(wireHit, simHit),
                       Vector3D{simHit.getPosTrack()},
                       perpS);
 }
@@ -71,7 +71,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCWireHit* wireHit,
   return CDCRecoHit3D(wireHit, rlInfo, recoPos3D, perpS);
 }
 
-CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRLTaggedWireHit& rlWireHit,
+CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRLWireHit& rlWireHit,
                                        const CDCTrajectory2D& trajectory2D)
 {
   Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
@@ -129,7 +129,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstructNearest(const CDCWireHit* wireHit,
 {
   B2ASSERT("This function can only be used with axial hits.", wireHit->isAxial());
   ERightLeft rlInfo = trackTrajectory2D.isRightOrLeft(wireHit->getRefPos2D());
-  CDCRLTaggedWireHit rlWireHit(wireHit, rlInfo);
+  CDCRLWireHit rlWireHit(wireHit, rlInfo);
   return CDCRecoHit3D::reconstruct(rlWireHit, trackTrajectory2D);
 }
 

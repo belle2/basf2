@@ -28,13 +28,13 @@ void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<ANode>::processLeaf(ANo
 {
   // No special post processing version
   // const Phi0CurvBox& phi0CurvBox = *leaf;
-  // for (WithSharedMark<CDCRLTaggedWireHit>& markableRLTaggedWireHit : *leaf) {
+  // for (WithSharedMark<CDCRLWireHit>& markableRLTaggedWireHit : *leaf) {
   //   markableRLTaggedWireHit.mark();
   // }
   // m_candidates.emplace_back(CDCTrajectory2D(PerigeeCircle(phi0CurvBox.getLowerCurv(),
   //                phi0CurvBox.getLowerPhi0Vec(),
   //                0)),
-  //          std::vector<CDCRLTaggedWireHit>(leaf->begin(),
+  //          std::vector<CDCRLWireHit>(leaf->begin(),
   //                  leaf->end()));
   // return;
 
@@ -100,17 +100,17 @@ void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<ANode>::processLeaf(ANo
   // Acquire all available items
   ANode& topNode = leaf->getTree()->getTopNode();
   // Make sure that all items we have used somewhere else are removed from the available items.
-  auto isMarked = [](const WithSharedMark<CDCRLTaggedWireHit>& item) -> bool {
+  auto isMarked = [](const WithSharedMark<CDCRLWireHit>& item) -> bool {
     return item.isMarked();
   };
   topNode.eraseIf(isMarked);
 
   // Collect all hits that are in the precision box
-  std::vector<WithSharedMark<CDCRLTaggedWireHit> > hitsInPrecisionBox;
+  std::vector<WithSharedMark<CDCRLWireHit> > hitsInPrecisionBox;
 
-  for (const WithSharedMark<CDCRLTaggedWireHit>& markableRLTaggedWireHit : topNode) {
+  for (const WithSharedMark<CDCRLWireHit>& markableRLTaggedWireHit : topNode) {
     // Explicitly making a copy here to emphasise that we do not change the top node.
-    WithSharedMark<CDCRLTaggedWireHit> copiedMarkableRLTaggedWireHit = markableRLTaggedWireHit;
+    WithSharedMark<CDCRLWireHit> copiedMarkableRLTaggedWireHit = markableRLTaggedWireHit;
 
     Weight weight = hitInPhi0CurvBox(copiedMarkableRLTaggedWireHit, &precisionPhi0CurvBox);
     if (not std::isnan(weight)) {
@@ -122,10 +122,10 @@ void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<ANode>::processLeaf(ANo
   ///////////////////////////////////////////////////////////////////
   CDCTrajectory2D precisionTrajectory2D = fitter.fit(hitsInPrecisionBox);
 
-  for (WithSharedMark<CDCRLTaggedWireHit>& markableRLTaggedWireHit : hitsInPrecisionBox) {
+  for (WithSharedMark<CDCRLWireHit>& markableRLTaggedWireHit : hitsInPrecisionBox) {
     markableRLTaggedWireHit.mark();
   }
   m_candidates.emplace_back(precisionTrajectory2D,
-                            std::vector<CDCRLTaggedWireHit>(hitsInPrecisionBox.begin(),
-                                                            hitsInPrecisionBox.end()));
+                            std::vector<CDCRLWireHit>(hitsInPrecisionBox.begin(),
+                                                      hitsInPrecisionBox.end()));
 }

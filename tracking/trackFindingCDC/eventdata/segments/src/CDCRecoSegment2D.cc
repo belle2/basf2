@@ -46,8 +46,8 @@ namespace {
     // Make tangents from pairs of hits along the segment.
     transform_adjacent_pairs(rlWireHitSegment.begin(), rlWireHitSegment.end(),
                              back_inserter(tangentSegment),
-                             [](const CDCRLTaggedWireHit & firstRLWireHit,
-    const CDCRLTaggedWireHit & secondRLWireHit) {
+                             [](const CDCRLWireHit & firstRLWireHit,
+    const CDCRLWireHit & secondRLWireHit) {
       return CDCTangent(firstRLWireHit, secondRLWireHit);
     });
 
@@ -69,9 +69,9 @@ namespace {
     // Make tangents from pairs of hits along the segment.
     transform_adjacent_triples(rlWireHitSegment.begin(), rlWireHitSegment.end(),
                                back_inserter(facetSegment),
-                               [](const CDCRLTaggedWireHit & firstRLWireHit,
-                                  const CDCRLTaggedWireHit & secondRLWireHit,
-    const CDCRLTaggedWireHit & thirdRLWireHit) {
+                               [](const CDCRLWireHit & firstRLWireHit,
+                                  const CDCRLWireHit & secondRLWireHit,
+    const CDCRLWireHit & thirdRLWireHit) {
       return CDCFacet(firstRLWireHit, secondRLWireHit, thirdRLWireHit);
     });
 

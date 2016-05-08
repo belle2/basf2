@@ -1,7 +1,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
@@ -35,8 +35,8 @@ Weight StereoHitTrackMatcherQuadTree<HoughTree>::getWeight(const CDCRecoHit3D& r
 }
 
 template <class HoughTree>
-std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree<HoughTree>::match(const CDCTrack& track,
-                                                const std::vector<CDCRLTaggedWireHit>& rlWireHits)
+std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherQuadTree<HoughTree>::match(const CDCTrack& track,
+                                          const std::vector<CDCRLWireHit>& rlWireHits)
 {
   if (m_stereoHitFilter->needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
@@ -47,7 +47,7 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree
   const double radius = trajectory2D.getGlobalCircle().absRadius();
   const bool isCurler = trajectory2D.isCurler();
 
-  typedef std::pair<CDCRecoHit3D, const CDCRLTaggedWireHit*> CDCRecoHitWithRLPointer;
+  typedef std::pair<CDCRecoHit3D, const CDCRLWireHit*> CDCRecoHitWithRLPointer;
   std::vector<CDCRecoHitWithRLPointer> recoHits;
   recoHits.reserve(rlWireHits.size() + track.size());
 
@@ -55,7 +55,7 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree
    * Use the given trajectory to reconstruct the 2d hits in the vector in z direction
    * to match the trajectory perfectly. Then add the newly created reconstructed 3D hit to the given list.
    */
-  for (const CDCRLTaggedWireHit& rlWireHit : rlWireHits) {
+  for (const CDCRLWireHit& rlWireHit : rlWireHits) {
     if (not rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
       Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
       const CDCWire& wire = rlWireHit.getWire();
@@ -80,7 +80,7 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree
   for (const CDCRecoHit3D& recoHit : track) {
     if (not recoHit.isAxial()) {
       recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
-      const CDCRLTaggedWireHit& rlWireHit = recoHit.getRLWireHit();
+      const CDCRLWireHit& rlWireHit = recoHit.getRLWireHit();
       recoHits.emplace_back(recoHit, &rlWireHit);
     }
   }
@@ -107,14 +107,14 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree
   }
 
   // Copy all usable hits (not the duplicates) into this list.
-  std::vector<WithWeight<const CDCRLTaggedWireHit*>> matches;
+  std::vector<WithWeight<const CDCRLWireHit*>> matches;
 
   for (auto outerIterator = foundStereoHits.begin(); outerIterator != foundStereoHits.end();
        ++outerIterator) {
     bool isDoubled = false;
 
     const CDCRecoHit3D& currentRecoHitOuter = outerIterator->first;
-    const CDCRLTaggedWireHit* currentRLWireHitOuter = outerIterator->second;
+    const CDCRLWireHit* currentRLWireHitOuter = outerIterator->second;
     const CDCWireHit& currentWireHitOuter = currentRLWireHitOuter->getWireHit();
     const CDCHit* currentHitOuter = currentWireHitOuter.getHit();
 
@@ -124,7 +124,7 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherQuadTree
 
     for (auto innerIterator = outerIterator; innerIterator != foundStereoHits.end(); ++innerIterator) {
       const CDCRecoHit3D& currentRecoHitInner = innerIterator->first;
-      const CDCRLTaggedWireHit* currentRLWireHitInner = innerIterator->second;
+      const CDCRLWireHit* currentRLWireHitInner = innerIterator->second;
       const CDCWireHit& currentWireHitInner = currentRLWireHitInner->getWireHit();
       const CDCHit* currentHitInner = currentWireHitInner.getHit();
 

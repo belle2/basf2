@@ -365,7 +365,7 @@ class StereoQuadTreePlotter(QuadTreePlotter):
 
         CDCRecoHit3D = Belle2.TrackFindingCDC.CDCRecoHit3D
         wireHit = wireHitTopology.getWireHit(cdcHit)
-        rightLeftWireHit = Belle2.TrackFindingCDC.CDCRLTaggedWireHit(wireHit, rlInfo)
+        rightLeftWireHit = Belle2.TrackFindingCDC.CDCRLWireHit(wireHit, rlInfo)
         if rightLeftWireHit.getStereoType() != 0:
             recoHit = CDCRecoHit3D.reconstruct(rightLeftWireHit, trajectory3D.getTrajectory2D())
             return recoHit

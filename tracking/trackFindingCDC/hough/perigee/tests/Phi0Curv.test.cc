@@ -52,7 +52,7 @@ namespace {
 
 
     // Execute the finding a couple of time to find a stable execution time.
-    vector< pair<HoughBox, vector<CDCRLTaggedWireHit> > > candidates;
+    vector< pair<HoughBox, vector<CDCRLWireHit> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
@@ -77,9 +77,9 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<HoughBox, std::vector<CDCRLTaggedWireHit> >& candidate : candidates) {
+    for (std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
-      const std::vector<CDCRLTaggedWireHit>& taggedHits = candidate.second;
+      const std::vector<CDCRLWireHit>& taggedHits = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
@@ -88,13 +88,13 @@ namespace {
       B2DEBUG(100, "Tags of the hits");
 
       B2DEBUG(100, "Tags of the hits");
-      for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
+      for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         B2DEBUG(100, "    " <<
                 "rl = " << static_cast<int>(rlTaggedWireHit.getRLInfo()) << " " <<
                 "dl = " << rlTaggedWireHit->getRefDriftLength());
       }
 
-      for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
+      for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         const CDCWireHit& wireHit = rlTaggedWireHit.getWireHit();
         std::string color = "blue";
         if (rlTaggedWireHit.getRLInfo() == ERightLeft::c_Right) {
@@ -215,7 +215,7 @@ namespace {
     leafProcessor.setMaxCurv(maxCurvAcceptance);
 
     // Execute the finding a couple of time to find a stable execution time.
-    vector< pair<CDCTrajectory2D, vector<CDCRLTaggedWireHit> > > candidates;
+    vector< pair<CDCTrajectory2D, vector<CDCRLWireHit> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
@@ -242,9 +242,9 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<CDCTrajectory2D, std::vector<CDCRLTaggedWireHit> >& candidate : candidates) {
+    for (std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const CDCTrajectory2D& trajectory2D = candidate.first;
-      const std::vector<CDCRLTaggedWireHit >& taggedHits = candidate.second;
+      const std::vector<CDCRLWireHit >& taggedHits = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
@@ -252,12 +252,12 @@ namespace {
       B2DEBUG(100, "Curv " << trajectory2D.getCurvature());
       B2DEBUG(100, "Tags of the hits");
 
-      for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
+      for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         B2DEBUG(100, "    rl = " << static_cast<int>(rlTaggedWireHit.getRLInfo()) <<
                 " dl = " << rlTaggedWireHit->getRefDriftLength());
       }
 
-      for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
+      for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         const CDCWireHit wireHit = rlTaggedWireHit.getWireHit();
         std::string color = "blue";
         if (rlTaggedWireHit.getRLInfo() == ERightLeft::c_Right) {
@@ -296,7 +296,7 @@ namespace {
     const double minWeight = 30.0;
 
     // Execute the finding a couple of time to find a stable execution time.
-    vector< pair<Phi0CurvBox, vector<CDCRLTaggedWireHit> > > candidates;
+    vector< pair<Phi0CurvBox, vector<CDCRLWireHit> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
@@ -322,9 +322,9 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<Phi0CurvBox, std::vector<CDCRLTaggedWireHit> >& candidate : candidates) {
+    for (std::pair<Phi0CurvBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const Phi0CurvBox& phi0CurvBox = candidate.first;
-      const std::vector<CDCRLTaggedWireHit>& taggedHits = candidate.second;
+      const std::vector<CDCRLWireHit>& taggedHits = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
@@ -332,12 +332,12 @@ namespace {
       B2DEBUG(100, "Curv " << phi0CurvBox.getLowerBound<DiscreteCurv>());
       B2DEBUG(100, "Tags of the hits");
 
-      for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
+      for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         B2DEBUG(100, "    rl = " << static_cast<int>(rlTaggedWireHit.getRLInfo()) <<
                 " dl = " << rlTaggedWireHit->getRefDriftLength());
       }
 
-      for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
+      for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         const CDCWireHit& wireHit = rlTaggedWireHit.getWireHit();
         std::string color = "blue";
         if (rlTaggedWireHit.getRLInfo() == ERightLeft::c_Right) {

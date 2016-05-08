@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <tracking/trackFindingCDC/fitting/EFitPos.h>
@@ -222,7 +222,7 @@ namespace Belle2 {
        *  @return             Number of observations added. One if the observation was added.
        *                      Zero if one of the given variables is NAN.
        */
-      size_t append(const Belle2::TrackFindingCDC::CDCRLTaggedWireHit& rlWireHit)
+      size_t append(const Belle2::TrackFindingCDC::CDCRLWireHit& rlWireHit)
       {
         const ERightLeft rlInfo = rlWireHit.getRLInfo();
 

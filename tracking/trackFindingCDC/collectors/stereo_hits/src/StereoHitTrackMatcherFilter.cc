@@ -1,7 +1,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
@@ -22,15 +22,15 @@ void StereoHitTrackMatcherFilter::exposeParameters(ModuleParamList* moduleParame
 
 }
 
-std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherFilter::match(const CDCTrack& track,
-                                                const std::vector<CDCRLTaggedWireHit>& rlWireHits)
+std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherFilter::match(const CDCTrack& track,
+                                          const std::vector<CDCRLWireHit>& rlWireHits)
 {
   if (m_filter->needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
   }
 
   // List of matches
-  std::vector<WithWeight<const CDCRLTaggedWireHit*>> matches;
+  std::vector<WithWeight<const CDCRLWireHit*>> matches;
 
   // Reconstruct the hits to the track and check their filter result
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
@@ -41,7 +41,7 @@ std::vector<WithWeight<const CDCRLTaggedWireHit*>> StereoHitTrackMatcherFilter::
    * Use the given trajectory to reconstruct the 2d hits in the vector in z direction
    * to match the trajectory perfectly. Then add the newly created reconstructed 3D hit to the matches, if the filter says "yes".
    */
-  for (const CDCRLTaggedWireHit& rlWireHit : rlWireHits) {
+  for (const CDCRLWireHit& rlWireHit : rlWireHits) {
     if (rlWireHit.getStereoKind() != EStereoKind::c_Axial and not rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
       Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
       const CDCWire& wire = rlWireHit.getWire();

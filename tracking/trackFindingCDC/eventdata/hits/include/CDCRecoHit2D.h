@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 namespace Belle2 {
@@ -38,11 +38,11 @@ namespace Belle2 {
        *  Constructs a reconstructed hit based on the given oriented wire hit with the given
        *  displacement from the wire reference position.
        */
-      CDCRecoHit2D(const CDCRLTaggedWireHit& rlWireHit,
+      CDCRecoHit2D(const CDCRLWireHit& rlWireHit,
                    const Vector2D& recoDisp2D);
 
       /// Constructs a reconstructed hit based on the oriented wire hit with no displacement.
-      explicit CDCRecoHit2D(const CDCRLTaggedWireHit& rlWireHit);
+      explicit CDCRecoHit2D(const CDCRLWireHit& rlWireHit);
 
       /**
        *  Constructs the average of two reconstructed hit positions and snaps it to the drift circle.
@@ -72,7 +72,7 @@ namespace Belle2 {
        *  @param pos2D     the absolut position of the wire
        *  @param snap      optional indicator if the displacement shall be shrank to the drift circle (default true)
        */
-      static CDCRecoHit2D fromRecoPos2D(const CDCRLTaggedWireHit& rlWireHit,
+      static CDCRecoHit2D fromRecoPos2D(const CDCRLWireHit& rlWireHit,
                                         const Vector2D& recoPos2D,
                                         bool snap = true);
 
@@ -253,16 +253,16 @@ namespace Belle2 {
       { return getRLWireHit().reconstruct3D(trajectory2D); }
 
       /// Getter for the oriented wire hit assoziated with the reconstructed hit.
-      const CDCRLTaggedWireHit& getRLWireHit() const
+      const CDCRLWireHit& getRLWireHit() const
       { return m_rlWireHit; }
 
       /// Setter for the oriented wire hit assoziated with the reconstructed hit.
-      void setRLWireHit(const CDCRLTaggedWireHit& rlWireHit)
+      void setRLWireHit(const CDCRLWireHit& rlWireHit)
       { m_rlWireHit = rlWireHit; }
 
     private:
       /// Memory for the reference to the assiziated wire hit.
-      CDCRLTaggedWireHit m_rlWireHit;
+      CDCRLWireHit m_rlWireHit;
 
       /// Memory for the displacement fo the assoziated wire reference position.
       Vector2D m_recoDisp2D;

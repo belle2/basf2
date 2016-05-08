@@ -26,9 +26,9 @@ double FacetFitter::fit(const CDCFacet& facet)
   // Weight matrix
   Array< double, 3, 1> w;
 
-  const CDCRLTaggedWireHit& startRLWireHit = facet.getStartRLWireHit();
-  const CDCRLTaggedWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
-  const CDCRLTaggedWireHit& endRLWireHit = facet.getEndRLWireHit();
+  const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();
+  const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
+  const CDCRLWireHit& endRLWireHit = facet.getEndRLWireHit();
 
   const Vector2D support = middleRLWireHit.getWire().getRefPos2D();
 

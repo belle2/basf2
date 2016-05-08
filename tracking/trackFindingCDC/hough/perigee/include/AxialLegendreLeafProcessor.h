@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 
 namespace Belle2 {
@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /// Preliminary structure to save found hits and trajectory information
-      using Candidate = std::pair<CDCTrajectory2D, std::vector<CDCRLTaggedWireHit> >;
+      using Candidate = std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> >;
 
     public:
       /// Initialize a new processor with the maximum level.

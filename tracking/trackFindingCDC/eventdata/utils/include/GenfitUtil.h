@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 
@@ -38,7 +38,7 @@ namespace Belle2 {
         for (const auto& rlWireHitHolder : rlWireHitHolders) {
           ++sortingParameter;
 
-          const CDCRLTaggedWireHit rlWireHit = rlWireHitHolder->getRLWireHit();
+          const CDCRLWireHit rlWireHit = rlWireHitHolder->getRLWireHit();
           const CDCWireHit& wireHit = rlWireHit.getWireHit();
           const CDCWire& wire = rlWireHit.getWire();
 
@@ -84,7 +84,7 @@ namespace Belle2 {
         for (const auto& rlWireHitHolder : rlWireHitHolders) {
           ++sortingParameter;
 
-          const CDCRLTaggedWireHit rlWireHit = rlWireHitHolder->getRLWireHit();
+          const CDCRLWireHit rlWireHit = rlWireHitHolder->getRLWireHit();
           const CDCWireHit& wireHit = rlWireHit.getWireHit();
           const CDCHit* cdcHit = wireHit.getHit();
 

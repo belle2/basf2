@@ -23,22 +23,22 @@ namespace Belle2 {
      *  The right left information is freely setable.
      *  In constrast to the CDCRLWireHits the instances are not managed
      *  by the CDCWireHitTopology, which means that they can be copied and created.
-     *  More than one CDCRLTaggedWireHit can point to one CDCWireHit.
+     *  More than one CDCRLWireHit can point to one CDCWireHit.
      *  For more information see @sa CDCWireHit.
      */
-    class CDCRLTaggedWireHit {
+    class CDCRLWireHit {
 
     public:
       /// Default constructor for ROOT
-      CDCRLTaggedWireHit() = default;
+      CDCRLWireHit() = default;
 
       /**
        *  Constructs an oriented wire hit.
        *  @param wireHit      The wire hit the oriented hit is associated with.
        *  @param rlInfo       The right left passage information of the _wire_ relative to the track
        */
-      CDCRLTaggedWireHit(const CDCWireHit* wireHit,
-                         ERightLeft rlInfo = ERightLeft::c_Unknown);
+      CDCRLWireHit(const CDCWireHit* wireHit,
+                   ERightLeft rlInfo = ERightLeft::c_Unknown);
 
       /**
        *  Constructs an oriented wire hit.
@@ -46,24 +46,24 @@ namespace Belle2 {
        *  @param rlInfo       The right left passage information of the _wire_ relative to the track
        *  @param driftLength  The reestimated drift length
        */
-      CDCRLTaggedWireHit(const CDCWireHit* wireHit,
-                         ERightLeft rlInfo,
-                         double driftLength);
+      CDCRLWireHit(const CDCWireHit* wireHit,
+                   ERightLeft rlInfo,
+                   double driftLength);
 
       /**
        *  Constructs the average of two wire hits with right left passage informations.
        *  Takes the average of the estimated drift lengths.
        */
-      static CDCRLTaggedWireHit average(const CDCRLTaggedWireHit& rlWireHit1,
-                                        const CDCRLTaggedWireHit& rlWireHit2);
+      static CDCRLWireHit average(const CDCRLWireHit& rlWireHit1,
+                                  const CDCRLWireHit& rlWireHit2);
 
       /**
        *  Constructs the average of three wire hits with right left passage informations.
        *  Takes the average of the estimated drift lengths.
        */
-      static CDCRLTaggedWireHit average(const CDCRLTaggedWireHit& rlWireHit1,
-                                        const CDCRLTaggedWireHit& rlWireHit2 ,
-                                        const CDCRLTaggedWireHit& rlWireHit3);
+      static CDCRLWireHit average(const CDCRLWireHit& rlWireHit1,
+                                  const CDCRLWireHit& rlWireHit2 ,
+                                  const CDCRLWireHit& rlWireHit3);
 
 
       /**
@@ -72,18 +72,18 @@ namespace Belle2 {
        *  reconstructed values from the algorithm with the Monte Carlo information.
        *  It merely evaluates, if the true trajectory passes right or left of the wire.
        */
-      static CDCRLTaggedWireHit fromSimHit(const CDCWireHit* wirehit, const CDCSimHit& simhit);
+      static CDCRLWireHit fromSimHit(const CDCWireHit* wirehit, const CDCSimHit& simhit);
 
       /// Returns the oriented wire hit with the opposite right left information.
-      CDCRLTaggedWireHit reversed() const
-      { return CDCRLTaggedWireHit(m_wireHit, NRightLeft::reversed(m_rlInfo)); }
+      CDCRLWireHit reversed() const
+      { return CDCRLWireHit(m_wireHit, NRightLeft::reversed(m_rlInfo)); }
 
       /// Swiches the right left passage to its opposite inplace.
       void reverse()
       { m_rlInfo = NRightLeft::reversed(m_rlInfo); }
 
       /// Equality comparison based on wire hit, left right passage information.
-      bool operator==(const CDCRLTaggedWireHit& rhs) const
+      bool operator==(const CDCRLWireHit& rhs) const
       { return getWireHit() == rhs.getWireHit() and getRLInfo() == rhs.getRLInfo(); }
 
 
@@ -91,7 +91,7 @@ namespace Belle2 {
        *  Total ordering relation based on wire hit and left right passage information
        *  in this order of importance.
        */
-      bool operator<(const CDCRLTaggedWireHit& rhs) const
+      bool operator<(const CDCRLWireHit& rhs) const
       {
         return getWireHit() <  rhs.getWireHit() or (
                  getWireHit() == rhs.getWireHit() and (
@@ -99,25 +99,25 @@ namespace Belle2 {
       }
 
       /// Defines wires and oriented wire hits to be coaligned on the wire on which they are based.
-      friend bool operator<(const CDCRLTaggedWireHit& rlWireHit, const CDCWire& wire)
+      friend bool operator<(const CDCRLWireHit& rlWireHit, const CDCWire& wire)
       { return rlWireHit.getWire() < wire; }
 
       /// Defines oriented wire hits and wires to be coaligned on the wire on which they are based.
-      friend bool operator<(const CDCWire& wire, const CDCRLTaggedWireHit& rlWireHit)
+      friend bool operator<(const CDCWire& wire, const CDCRLWireHit& rlWireHit)
       { return wire < rlWireHit.getWire(); }
 
       /**
        *  Defines wire hits and oriented wire hits to be coaligned on the wire hit
        *  on which they are based.
        */
-      friend bool operator<(const CDCRLTaggedWireHit& rlWireHit, const CDCWireHit& wireHit)
+      friend bool operator<(const CDCRLWireHit& rlWireHit, const CDCWireHit& wireHit)
       { return rlWireHit.getWireHit() < wireHit; }
 
       /**
        *  Defines oriented wire hits and wire hits to be coaligned on the wire hit
        *  on which they are based.
        */
-      friend bool operator<(const CDCWireHit& wireHit, const CDCRLTaggedWireHit& rlWireHit)
+      friend bool operator<(const CDCWireHit& wireHit, const CDCRLWireHit& rlWireHit)
       { return wireHit < rlWireHit.getWireHit(); }
 
       /**
@@ -128,7 +128,7 @@ namespace Belle2 {
        *  No matter you have a pointer or an object access is given with '->'
        *  The object is effectively equal to a pointer to itself.
        */
-      const CDCRLTaggedWireHit* operator->() const
+      const CDCRLWireHit* operator->() const
       { return this; }
 
       /// Make the wire hit automatically castable to its underlying cdcHit.
@@ -232,9 +232,9 @@ namespace Belle2 {
       { return getWireHit().reconstruct3D(trajectory2D, getRLInfo()); }
 
       /// Output operator. Help debugging.
-      friend std::ostream& operator<<(std::ostream& output, const CDCRLTaggedWireHit& rlWireHit)
+      friend std::ostream& operator<<(std::ostream& output, const CDCRLWireHit& rlWireHit)
       {
-        output << "CDCRLTaggedWireHit(" << rlWireHit.getWireHit() << ","
+        output << "CDCRLWireHit(" << rlWireHit.getWireHit() << ","
                << static_cast<typename std::underlying_type<ERightLeft>::type>(rlWireHit.getRLInfo()) << ")" ;
         return output;
       }
@@ -249,6 +249,6 @@ namespace Belle2 {
       /// Memory for the reestimated drift length
       double m_refDriftLength = 0.0;
 
-    }; // class CDCRLTaggedWireHit
+    }; // class CDCRLWireHit
   } // namespace TrackFindingCDC
 } // namespace Belle2

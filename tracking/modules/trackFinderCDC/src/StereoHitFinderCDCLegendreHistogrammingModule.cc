@@ -53,7 +53,7 @@ void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2:
   // Initialize the RL hits
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
   const auto& wireHits = wireHitTopology.getWireHits();
-  std::vector<CDCRLTaggedWireHit> rlTaggedWireHits;
+  std::vector<CDCRLWireHit> rlTaggedWireHits;
   rlTaggedWireHits.reserve(2 * wireHits.size());
   for (const CDCWireHit& wireHit : wireHits) {
     if (not wireHit.getAutomatonCell().hasTakenFlag() and not wireHit.isAxial()) {

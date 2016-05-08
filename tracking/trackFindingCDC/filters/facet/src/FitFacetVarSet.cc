@@ -34,9 +34,9 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
   var<named("chi2")>() = chi2;
   var<named("fit_phi")>() = fitLine.tangential().phi();
 
-  const CDCRLTaggedWireHit& startRLWireHit = facet.getStartRLWireHit();
-  const CDCRLTaggedWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
-  const CDCRLTaggedWireHit& endRLWireHit = facet.getEndRLWireHit();
+  const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();
+  const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
+  const CDCRLWireHit& endRLWireHit = facet.getEndRLWireHit();
 
   const Vector2D startWirePos2D = startRLWireHit.getWire().getRefPos2D();
   const double startL = startRLWireHit.getSignedRefDriftLength();

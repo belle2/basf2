@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
@@ -95,13 +95,13 @@ namespace Belle2 {
        *  in a wider hough hough box up the hierarchy only evaluate for that orientation.
        *  If one of the right left passage hypothesis can be ruled out in this hough box
        *  signal so by tagging it.
-       *  Note the that the CDCRLTaggedWireHit is obtained as non-const reference to
+       *  Note the that the CDCRLWireHit is obtained as non-const reference to
        *  be able to write back the new right left passage hypothesis.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        *  Accepts if either the right passage hypothesis or the left passage hypothesis
        *  is in the hough box.
        */
-      inline Weight operator()(CDCRLTaggedWireHit& rlTaggedWireHit,
+      inline Weight operator()(CDCRLWireHit& rlTaggedWireHit,
                                const HoughBox* const& houghBox)
       {
         const CDCWire& wire = rlTaggedWireHit->getWire();

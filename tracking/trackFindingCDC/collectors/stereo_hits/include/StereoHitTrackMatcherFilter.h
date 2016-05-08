@@ -24,7 +24,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
-    class CDCRLTaggedWireHit;
+    class CDCRLWireHit;
 
     /// A Matcher Algorithm for adding stereo hits to tracks using a configurable filter (e.g. TMVA).
     class StereoHitTrackMatcherFilter : public FilterBasedMatcher<StereoHitFilterFactory> {
@@ -33,7 +33,7 @@ namespace Belle2 {
       typedef CDCTrack CollectorItem;
 
       /// Use rl tagged wire hits a collection items.
-      typedef CDCRLTaggedWireHit CollectionItem;
+      typedef CDCRLWireHit CollectionItem;
 
       /// Empty desctructor. Everything is handled via terminate.
       virtual ~StereoHitTrackMatcherFilter() { }

@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -24,12 +24,12 @@ namespace Belle2 {
     public:
       /**
        * Main method of the comparator class which does the operation (according to std::less).
-       * @param lhs: First CDCRLTaggedWireHit to compare.
-       * @param rhs: Second CDCRLTaggedWireHit to compare.
+       * @param lhs: First CDCRLWireHit to compare.
+       * @param rhs: Second CDCRLWireHit to compare.
        *
        * @return True, if the wire hit of the lhs is less than the wire hit of the rhs.
        */
-      bool operator()(const CDCRLTaggedWireHit* lhs, const CDCRLTaggedWireHit* rhs) const
+      bool operator()(const CDCRLWireHit* lhs, const CDCRLWireHit* rhs) const
       {
         return lhs->getWireHit() < rhs->getWireHit();
       }

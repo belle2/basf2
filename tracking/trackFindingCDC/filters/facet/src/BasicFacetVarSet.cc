@@ -27,17 +27,17 @@ bool BasicFacetVarSet::extract(const CDCFacet* ptrFacet)
 
   ISuperLayer superlayerID = facet.getISuperLayer();
 
-  const CDCRLTaggedWireHit& startRLWirehit = facet.getStartRLWireHit();
+  const CDCRLWireHit& startRLWirehit = facet.getStartRLWireHit();
   const double startDriftLength = startRLWirehit.getSignedRefDriftLength();
   const double startDriftLengthVar = startRLWirehit.getRefDriftLengthVariance();
   const double startDriftLengthSigma = sqrt(startDriftLengthVar);
 
-  const CDCRLTaggedWireHit& middleRLWirehit = facet.getMiddleRLWireHit();
+  const CDCRLWireHit& middleRLWirehit = facet.getMiddleRLWireHit();
   const double middleDriftLength = middleRLWirehit.getSignedRefDriftLength();
   const double middleDriftLengthVar = middleRLWirehit.getRefDriftLengthVariance();
   const double middleDriftLengthSigma = sqrt(middleDriftLengthVar);
 
-  const CDCRLTaggedWireHit& endRLWirehit = facet.getEndRLWireHit();
+  const CDCRLWireHit& endRLWirehit = facet.getEndRLWireHit();
   const double endDriftLength = endRLWirehit.getSignedRefDriftLength();
   const double endDriftLengthVar = endRLWirehit.getRefDriftLengthVariance();
   const double endDriftLengthSigma = sqrt(endDriftLengthVar);

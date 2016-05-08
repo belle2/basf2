@@ -50,15 +50,15 @@ Weight RealisticFacetFilter::operator()(const CDCFacet& facet)
 {
   facet.adjustLines();
 
-  const CDCRLTaggedWireHit& startRLWirehit = facet.getStartRLWireHit();
+  const CDCRLWireHit& startRLWirehit = facet.getStartRLWireHit();
   const double startDriftLengthVar = startRLWirehit.getRefDriftLengthVariance();
   const double startDriftLengthStd = sqrt(startDriftLengthVar);
 
-  const CDCRLTaggedWireHit& middleRLWirehit = facet.getMiddleRLWireHit();
+  const CDCRLWireHit& middleRLWirehit = facet.getMiddleRLWireHit();
   const double middleDriftLengthVar = middleRLWirehit.getRefDriftLengthVariance();
   const double middleDriftLengthStd = sqrt(middleDriftLengthVar);
 
-  const CDCRLTaggedWireHit& endRLWirehit = facet.getEndRLWireHit();
+  const CDCRLWireHit& endRLWirehit = facet.getEndRLWireHit();
   const double endDriftLengthVar = endRLWirehit.getRefDriftLengthVariance();
   const double endDriftLengthStd = sqrt(endDriftLengthVar);
 

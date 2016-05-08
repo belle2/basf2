@@ -34,14 +34,14 @@ namespace Belle2 {
       CDCFacet() = default;
 
       /// Constructor taking three oriented wire hits.
-      CDCFacet(const CDCRLTaggedWireHit& startRLWireHit,
-               const CDCRLTaggedWireHit& middleRLWireHit,
-               const CDCRLTaggedWireHit& endRLWireHit);
+      CDCFacet(const CDCRLWireHit& startRLWireHit,
+               const CDCRLWireHit& middleRLWireHit,
+               const CDCRLWireHit& endRLWireHit);
 
       /// Constructor taking three oriented wire hits and the tangent lines.
-      CDCFacet(const CDCRLTaggedWireHit& startRLWireHit,
-               const CDCRLTaggedWireHit& middleRLWireHit,
-               const CDCRLTaggedWireHit& endRLWireHit,
+      CDCFacet(const CDCRLWireHit& startRLWireHit,
+               const CDCRLWireHit& middleRLWireHit,
+               const CDCRLWireHit& endRLWireHit,
                const ParameterLine2D& startToMiddle,
                const ParameterLine2D& startToEnd = ParameterLine2D(),
                const ParameterLine2D& middleToEnd = ParameterLine2D());

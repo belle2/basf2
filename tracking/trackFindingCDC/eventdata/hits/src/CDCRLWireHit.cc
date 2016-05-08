@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>
 
@@ -16,30 +16,30 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRLTaggedWireHit::CDCRLTaggedWireHit(const CDCWireHit* wireHit,
-                                       ERightLeft rlInfo)
-  : CDCRLTaggedWireHit(wireHit,
-                       rlInfo,
-                       wireHit->getRefDriftLength())
+CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wireHit,
+                           ERightLeft rlInfo)
+  : CDCRLWireHit(wireHit,
+                 rlInfo,
+                 wireHit->getRefDriftLength())
 {
 }
 
-CDCRLTaggedWireHit::CDCRLTaggedWireHit(const CDCWireHit* wireHit,
-                                       ERightLeft rlInfo,
-                                       double driftLength)
+CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wireHit,
+                           ERightLeft rlInfo,
+                           double driftLength)
   : m_wireHit(wireHit),
     m_rlInfo(rlInfo),
     m_refDriftLength(driftLength)
 {
 }
 
-CDCRLTaggedWireHit CDCRLTaggedWireHit::average(const CDCRLTaggedWireHit& rlWireHit1,
-                                               const CDCRLTaggedWireHit& rlWireHit2)
+CDCRLWireHit CDCRLWireHit::average(const CDCRLWireHit& rlWireHit1,
+                                   const CDCRLWireHit& rlWireHit2)
 {
-  B2ASSERT("Average of two CDCRLTaggedWireHits with different wire hits requested.",
+  B2ASSERT("Average of two CDCRLWireHits with different wire hits requested.",
            rlWireHit1.getWireHit() == rlWireHit2.getWireHit());
 
-  B2ASSERT("Average of two CDCRLTaggedWireHits with different right left passage information requested.",
+  B2ASSERT("Average of two CDCRLWireHits with different right left passage information requested.",
            rlWireHit1.getRLInfo() == rlWireHit2.getRLInfo());
 
   ERightLeft rlInfo = rlWireHit1.getRLInfo();
@@ -48,19 +48,19 @@ CDCRLTaggedWireHit CDCRLTaggedWireHit::average(const CDCRLTaggedWireHit& rlWireH
   double driftLength = (rlWireHit1.getRefDriftLength() +
                         rlWireHit2.getRefDriftLength()) / 2.0;
 
-  CDCRLTaggedWireHit result(&wireHit, rlInfo, driftLength);
+  CDCRLWireHit result(&wireHit, rlInfo, driftLength);
   return result;
 }
 
-CDCRLTaggedWireHit CDCRLTaggedWireHit::average(const CDCRLTaggedWireHit& rlWireHit1,
-                                               const CDCRLTaggedWireHit& rlWireHit2,
-                                               const CDCRLTaggedWireHit& rlWireHit3)
+CDCRLWireHit CDCRLWireHit::average(const CDCRLWireHit& rlWireHit1,
+                                   const CDCRLWireHit& rlWireHit2,
+                                   const CDCRLWireHit& rlWireHit3)
 {
-  B2ASSERT("Average of three CDCRLTaggedWireHits with different wire hits requested.",
+  B2ASSERT("Average of three CDCRLWireHits with different wire hits requested.",
            rlWireHit1.getWireHit() == rlWireHit2.getWireHit() and
            rlWireHit2.getWireHit() == rlWireHit3.getWireHit());
 
-  B2ASSERT("Average of three CDCRLTaggedWireHits with different right left passage information requested.",
+  B2ASSERT("Average of three CDCRLWireHits with different right left passage information requested.",
            rlWireHit1.getRLInfo() == rlWireHit2.getRLInfo() and
            rlWireHit2.getRLInfo() == rlWireHit3.getRLInfo());
 
@@ -72,13 +72,13 @@ CDCRLTaggedWireHit CDCRLTaggedWireHit::average(const CDCRLTaggedWireHit& rlWireH
                         rlWireHit2.getRefDriftLength() +
                         rlWireHit3.getRefDriftLength()) / 3.0;
 
-  CDCRLTaggedWireHit result(&wireHit, rlInfo, driftLength);
+  CDCRLWireHit result(&wireHit, rlInfo, driftLength);
   return result;
 }
 
 
-CDCRLTaggedWireHit CDCRLTaggedWireHit::fromSimHit(const CDCWireHit* wirehit,
-                                                  const CDCSimHit& simhit)
+CDCRLWireHit CDCRLWireHit::fromSimHit(const CDCWireHit* wirehit,
+                                      const CDCSimHit& simhit)
 {
   // find out if the wire is right or left of the track ( view in flight direction )
   Vector3D trackPosToWire{simhit.getPosWire() - simhit.getPosTrack()};
@@ -86,7 +86,7 @@ CDCRLTaggedWireHit CDCRLTaggedWireHit::fromSimHit(const CDCWireHit* wirehit,
 
   ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
 
-  CDCRLTaggedWireHit rlWireHit(wirehit, rlInfo);
+  CDCRLWireHit rlWireHit(wirehit, rlInfo);
 
   return rlWireHit;
 }

@@ -82,8 +82,8 @@ namespace Belle2 {
                                    const std::vector<CDCWireHit>& wireHits) const;
 
       /// Retrieve the wire hit including right left passage information for the given CDCHit form the given wire hits
-      CDCRLTaggedWireHit getRLWireHit(const CDCHit* ptrHit,
-                                      const std::vector<CDCWireHit>& wireHits) const;
+      CDCRLWireHit getRLWireHit(const CDCHit* ptrHit,
+                                const std::vector<CDCWireHit>& wireHits) const;
 
       /// Construct an CDCRecoHit3D from the (potential secondary) CDCSimHit information related to the CDCHit.
       CDCRecoHit3D getRecoHit3D(const CDCHit* ptrHit,

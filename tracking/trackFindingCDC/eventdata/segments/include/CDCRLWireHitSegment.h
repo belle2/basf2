@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 namespace genfit {
   class TrackCand;
@@ -21,7 +21,7 @@ namespace Belle2 {
     class CDCWire;
 
     /// A segment consisting of two dimensional reconsturcted hits
-    class CDCRLWireHitSegment :  public CDCSegment<Belle2::TrackFindingCDC::CDCRLTaggedWireHit> {
+    class CDCRLWireHitSegment :  public CDCSegment<Belle2::TrackFindingCDC::CDCRLWireHit> {
     public:
       /// Default constructor for ROOT compatibility.
       CDCRLWireHitSegment() {}

@@ -20,7 +20,7 @@
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<Belle2::TrackFindingCDC::CDCWireHit>+;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<const Belle2::TrackFindingCDC::CDCWireHit *>+;
-#pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<Belle2::TrackFindingCDC::CDCRLTaggedWireHit>+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<Belle2::TrackFindingCDC::CDCRLWireHit>+;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<Belle2::TrackFindingCDC::CDCRecoHit2D>+;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<Belle2::TrackFindingCDC::CDCTangent>+;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSegment<Belle2::TrackFindingCDC::CDCFacet>+;

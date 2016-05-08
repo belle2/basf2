@@ -112,7 +112,7 @@ TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_prepared_event_rl_flags)
 
   for (CDCTrack& track : m_mcTracks) {
     for (const CDCRecoHit3D& recoHit3D : track) {
-      const CDCRLTaggedWireHit& rlWireHit = recoHit3D.getRLWireHit();
+      const CDCRLWireHit& rlWireHit = recoHit3D.getRLWireHit();
       std::string color = "blue";
       if (rlWireHit.getRLInfo() == ERightLeft::c_Right) {
         color = "green";

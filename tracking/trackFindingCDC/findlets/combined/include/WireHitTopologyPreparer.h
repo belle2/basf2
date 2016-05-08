@@ -57,6 +57,8 @@ namespace Belle2 {
                                       "to the first earliest hits in the track and neglects "
                                       "the more cumbersome later hits",
                                       m_param_mcFirstLoop);
+        m_wireHitCreator.exposeParameters(moduleParamList, prefix);
+        m_wireHitTopologyFiller.exposeParameters(moduleParamList, prefix);
       }
 
       /// Signals the start of the event processing

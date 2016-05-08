@@ -11,14 +11,20 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
+
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <cdc/translators/LinearGlobalADCCountTranslator.h>
+
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 
 #include <vector>
 
@@ -39,6 +45,19 @@ namespace Belle2 {
                "which can be used from all modules after that";
       }
 
+      /// Add the parameters to the surrounding module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
+      {
+        moduleParamList->addParameter(prefixed(prefix, "flightTimeEstimation"),
+                                      m_param_flightTimeEstimation,
+                                      "Option which flight direction should be assumed for "
+                                      "an initial time of flight estimation."
+                                      "'none' (no TOF correction), "
+                                      "'outwards', "
+                                      "'downwards'.",
+                                      std::string(m_param_flightTimeEstimation));
+      }
+
       /// Signals the start of the event processing
       virtual void initialize() override final
       {
@@ -51,6 +70,20 @@ namespace Belle2 {
         CDCWireTopology& wireTopology  __attribute__((unused)) = CDCWireTopology::getInstance();
 
         m_tdcCountTranslator.reset(new CDC::RealisticTDCCountTranslator);
+        m_adcCountTranslator.reset(new CDC::LinearGlobalADCCountTranslator);
+
+        if (m_param_flightTimeEstimation != std::string("")) {
+          try {
+            m_flightTimeEstimation = getPreferredDirection(m_param_flightTimeEstimation);
+          } catch (std::invalid_argument& e) {
+            B2ERROR("Unexpected 'flightTimeEstimation' parameter : '" << m_param_flightTimeEstimation);
+          }
+        }
+
+        if (m_flightTimeEstimation == EPreferredDirection::c_Symmetric) {
+          B2ERROR("Unexpected 'flightTimeEstimation' parameter : '" << m_param_flightTimeEstimation);
+        }
+
         Super::initialize();
       }
 
@@ -67,7 +100,53 @@ namespace Belle2 {
         outputWireHits.reserve(useNHits);
 
         for (CDCHit& hit : hits) {
-          outputWireHits.push_back(CDCWireHit(&hit, m_tdcCountTranslator.get()));
+          CDC::TDCCountTranslatorBase& tdcCountTranslator = *m_tdcCountTranslator;
+          CDC::ADCCountTranslatorBase& adcCountTranslator = *m_adcCountTranslator;
+
+          const CDCWire* wire = CDCWire::getInstance(hit);
+
+          double initialTOFEstimate = 0;
+          if (m_flightTimeEstimation == EPreferredDirection::c_None) {
+            initialTOFEstimate = 0;
+          } else if (m_flightTimeEstimation == EPreferredDirection::c_Outwards) {
+            initialTOFEstimate = wire->getRefCylindricalR() / Const::speedOfLight;
+          } else if (m_flightTimeEstimation == EPreferredDirection::c_Downwards) {
+            initialTOFEstimate = -wire->getRefPos2D().y() / Const::speedOfLight;
+          }
+
+          double refDriftLengthRight =
+            tdcCountTranslator.getDriftLength(hit.getTDCCount(),
+                                              wire->getWireID(),
+                                              initialTOFEstimate,
+                                              false, //bool leftRight
+                                              wire->getRefZ());
+
+          double refDriftLengthLeft =
+            tdcCountTranslator.getDriftLength(hit.getTDCCount(),
+                                              wire->getWireID(),
+                                              initialTOFEstimate,
+                                              true, //bool leftRight
+                                              wire->getRefZ());
+
+          double refDriftLength = (refDriftLengthLeft + refDriftLengthRight) / 2.0;
+
+          double refDriftLengthVariance =
+            tdcCountTranslator.getDriftLengthResolution(refDriftLength,
+                                                        wire->getWireID(),
+                                                        false, //bool leftRight ?
+                                                        wire->getRefZ());
+
+          double refChargeDeposit =
+            adcCountTranslator.getCharge(hit.getADCCount(),
+                                         wire->getWireID(),
+                                         false, //bool leftRight
+                                         wire->getRefZ(),
+                                         0); //theta
+
+          outputWireHits.push_back(CDCWireHit(&hit,
+                                              refDriftLength,
+                                              refDriftLengthVariance,
+                                              refChargeDeposit));
         }
 
         // Some safety checks from funky times - did not trigger for ages.
@@ -105,8 +184,18 @@ namespace Belle2 {
       }
 
     private:
+      /// Parameter : Method for the initial time of flight estimation as string
+      std::string m_param_flightTimeEstimation = "none";
+
+      /// Method for the initial time of flight estimation
+      EPreferredDirection m_flightTimeEstimation = EPreferredDirection::c_None;
+
       /// TDC Count translator to be used to calculate the initial dirft length estiamtes
-      std::unique_ptr<CDC::RealisticTDCCountTranslator> m_tdcCountTranslator{nullptr};
+      std::unique_ptr<CDC::TDCCountTranslatorBase> m_tdcCountTranslator{nullptr};
+
+      /// ADC Count translator to be used to calculate the charge deposit in the drift cell
+      std::unique_ptr<CDC::ADCCountTranslatorBase> m_adcCountTranslator{nullptr};
+
       // Note we can only create it on initialisation because the gearbox has to be connected.
 
     }; // end class WireHitCreator

@@ -23,7 +23,9 @@
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCAxialStereoFusion-;
 
+#pragma link C++ class Belle2::TrackFindingCDC::FacetFitter-;
+
+
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSZFitter-;
 
 #endif
-

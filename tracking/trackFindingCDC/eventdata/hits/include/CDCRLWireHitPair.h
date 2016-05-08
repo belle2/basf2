@@ -116,10 +116,18 @@ namespace Belle2 {
       { return getToRLWireHit()->getRLInfo(); }
 
       /// Getter for the  first oriented wire hit.
-      const CDCRLTaggedWireHit& getFromRLWireHit() const
+      CDCRLTaggedWireHit& getFromRLWireHit()
       { return m_fromRLWireHit; }
 
       /// Getter for the  second oriented wire hit.
+      CDCRLTaggedWireHit& getToRLWireHit()
+      { return m_toRLWireHit; }
+
+      /// Constant getter for the  first oriented wire hit.
+      const CDCRLTaggedWireHit& getFromRLWireHit() const
+      { return m_fromRLWireHit; }
+
+      /// Constant getter for the  second oriented wire hit.
       const CDCRLTaggedWireHit& getToRLWireHit() const
       { return m_toRLWireHit; }
 

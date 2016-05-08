@@ -206,23 +206,35 @@ namespace Belle2 {
       { return getStartWireHit() == wirehit or getRearRLWireHitPair()->hasWireHit(wirehit); }
 
       /// Getter for the first oriented wire hit.
-      const CDCRLTaggedWireHit& getStartRLWireHit() const
+      CDCRLTaggedWireHit& getStartRLWireHit()
       { return m_startRLWireHit; }
 
       /// Getter for the second oriented wire hit.
-      const CDCRLTaggedWireHit& getMiddleRLWireHit() const
+      CDCRLTaggedWireHit& getMiddleRLWireHit()
       { return getRearRLWireHitPair().getFromRLWireHit(); }
 
       /// Getter for the third oriented wire hit.
+      CDCRLTaggedWireHit& getEndRLWireHit()
+      { return getRearRLWireHitPair().getToRLWireHit(); }
+
+      /// Constant getter for the first oriented wire hit.
+      const CDCRLTaggedWireHit& getStartRLWireHit() const
+      { return m_startRLWireHit; }
+
+      /// Constant getter for the second oriented wire hit.
+      const CDCRLTaggedWireHit& getMiddleRLWireHit() const
+      { return getRearRLWireHitPair().getFromRLWireHit(); }
+
+      /// Constant getter for the third oriented wire hit.
       const CDCRLTaggedWireHit& getEndRLWireHit() const
       { return getRearRLWireHitPair().getToRLWireHit(); }
 
-      /// Constant getter for the pair of second and third oriented wire hit.
-      const CDCRLWireHitPair& getRearRLWireHitPair() const
-      { return m_rearRLWireHitPair; }
-
       /// Getter for the pair of second and third oriented wire hit.
       CDCRLWireHitPair& getRearRLWireHitPair()
+      { return m_rearRLWireHitPair; }
+
+      /// Constant getter for the pair of second and third oriented wire hit.
+      const CDCRLWireHitPair& getRearRLWireHitPair() const
       { return m_rearRLWireHitPair; }
 
       /// Setter for the first oriented wire hit.

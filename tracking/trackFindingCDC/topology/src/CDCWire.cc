@@ -32,7 +32,14 @@ const CDCWire* CDCWire::getInstance(ISuperLayer iSuperLayer,
 const CDCWire* CDCWire::getInstance(const CDCHit& hit)
 {
   if (not CDCWireTopology::getInstance().isValidWireID(WireID(hit.getID()))) {
-    B2FATAL("Invalid wire id of cdc hit " <<  WireID(hit.getID()));
+    WireID wireID(hit.getID());
+    B2ERROR("Invalid encoded wire id of cdc hit " << wireID);
+    B2ERROR("Superlayer id: " <<  wireID.getISuperLayer());
+    B2ERROR("Layer cid: " <<  wireID.getICLayer());
+    B2ERROR("Layer id: " <<  wireID.getILayer());
+    B2ERROR("Wire id: " <<  wireID.getIWire());
+    B2FATAL("Do not continue with wrong wire id");
+    return nullptr;
   }
 
   const CDCWire& wire = CDCWireTopology::getInstance().getWire(WireID(hit.getID()));

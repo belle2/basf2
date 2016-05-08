@@ -42,6 +42,8 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
     monte_carlo = "no"
     karimaki_fit = False
     flight_time_estimation = "none"
+    flight_time_reestimation = False
+    use_alpha_in_drift_length = False
     fit_positions = "rlDriftCircle"
     fit_variance = "proper"
 
@@ -105,6 +107,21 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
                   "* 'downwards' means the minimal time needed to travel to the wire from the y = 0 plane downwards \n")
         )
 
+        argument_parser.add_argument(
+            "-fr",
+            "--flight-time-reestimation",
+            action="store_true",
+            dest="flight_time_reestimation",
+            help=("Switch to reestimate drift length before fitting.")
+        )
+
+        argument_parser.add_argument(
+            "-fa",
+            "--use-alpha-in-drift-length",
+            action="store_true",
+            dest="use_alpha_in_drift_length",
+            help=("Switch to serve the alpha angle to the drift length translator.")
+        )
         return argument_parser
 
     def create_path(self):
@@ -139,7 +156,9 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
                         segments="CDCRecoSegment2DVector",
                         karimakiFit=self.karimaki_fit,
                         fitPos=self.fit_positions,
-                        fitVariance=self.fit_variance)
+                        fitVariance=self.fit_variance,
+                        updateDriftLength=self.flight_time_reestimation,
+                        useAlphaInDriftLength=self.use_alpha_in_drift_length)
 
         path.add_module(SegmentFitValidationModule(self.output_file_name))
 

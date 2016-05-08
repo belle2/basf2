@@ -206,7 +206,11 @@ namespace Belle2 {
       size_t append(const Belle2::TrackFindingCDC::CDCWireHit* wireHit,
                     const ERightLeft rlInfo = ERightLeft::c_Unknown)
       {
-        return append(*(wireHit), rlInfo);
+        if (wireHit) {
+          return append(*(wireHit), rlInfo);
+        } else {
+          return 0;
+        }
       }
 
       /** Appends the hit circle at wire reference position with a right left passage hypotheses.
@@ -218,11 +222,38 @@ namespace Belle2 {
        *  @return             Number of observations added. One if the observation was added.
        *                      Zero if one of the given variables is NAN.
        */
-      size_t append(const Belle2::TrackFindingCDC::CDCRLTaggedWireHit& rlTaggedWireHit)
+      size_t append(const Belle2::TrackFindingCDC::CDCRLTaggedWireHit& rlWireHit)
       {
-        const ERightLeft rlInfo = rlTaggedWireHit.getRLInfo();
-        const CDCWireHit& wireHit = rlTaggedWireHit.getWireHit();
-        return append(wireHit, rlInfo);
+        const ERightLeft rlInfo = rlWireHit.getRLInfo();
+
+        const double driftLength = rlWireHit.getRefDriftLength();
+        const double driftLengthVariance = rlWireHit.getRefDriftLengthVariance();
+
+        const Vector2D& wireRefPos2D = rlWireHit.getRefPos2D();
+
+        double signedDriftLength = 0;
+        if (m_fitPos == EFitPos::c_RLDriftCircle and isValid(rlInfo)) {
+          signedDriftLength = rlInfo * driftLength;
+        } else {
+          signedDriftLength = 0;
+        }
+
+        double variance = 1;
+        if (m_fitVariance == EFitVariance::c_Unit) {
+          variance = 1;
+        } else if (m_fitVariance == EFitVariance::c_DriftLength) {
+          variance = fabs(driftLength);
+        } else if (m_fitVariance == EFitVariance::c_Pseudo) {
+          variance = getPseudoDriftLengthVariance(driftLength, driftLengthVariance);
+        } else if (m_fitVariance == EFitVariance::c_Proper) {
+          if (abs(rlInfo) != 1) {
+            variance = getPseudoDriftLengthVariance(driftLength, driftLengthVariance);
+          } else {
+            variance = driftLengthVariance;
+          }
+        }
+
+        return fill(wireRefPos2D, signedDriftLength, 1 / variance);
       }
 
       /// Appends the two observed position

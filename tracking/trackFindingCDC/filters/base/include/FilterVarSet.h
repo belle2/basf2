@@ -22,11 +22,12 @@ namespace Belle2 {
     /// Names of the variables to be generated.
     constexpr
     static char const* const filterVarNames[] = {
-      "is_cell",
-      "cell_weight",
+      "accept",
+      "weight",
+      "positive",
     };
 
-    /** Name of the variables that should be extracted from the response of a filter. */
+    /// Name of the variables that should be extracted from the response of a filter.
     template<class AFilter>
     class FilterVarNames : public VarNames<typename AFilter::Object> {
 
@@ -42,7 +43,8 @@ namespace Belle2 {
       }
     };
 
-    /** A variable set based that represents the response of a filter.
+    /**
+     *  A variable set based that represents the response of a filter.
      *
      *  The variables that are extracted from the filter response are the weight
      *  and a boolean whether the response was NaN.
@@ -78,10 +80,11 @@ namespace Belle2 {
       {
         bool extracted = Super::extract(obj);
         if (m_ptrFilter and obj) {
-          Weight cellWeight = (*m_ptrFilter)(*obj);
-          this->template var<named("cell_weight")>() = cellWeight;
-          this->template var<named("is_cell")>() =
-            not std::isnan(cellWeight) and not(cellWeight < m_cut);
+          Weight weight = (*m_ptrFilter)(*obj);
+          this->template var<named("weight")>() = weight;
+          this->template var<named("accept")>() = not std::isnan(weight) and not(weight < m_cut);
+          this->template var<named("positive")>() = weight > 0 and not(weight < m_cut);
+
           // Forward the nested result.
           return extracted;
         } else {

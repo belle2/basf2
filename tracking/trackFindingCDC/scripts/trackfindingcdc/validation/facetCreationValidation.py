@@ -91,7 +91,7 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
         super(FacetCreationValidationModule, self).initialize()
         self.mc_facet_filter = Belle2.TrackFindingCDC.MCFacetFilter()
         self.real_facet_filter = Belle2.TrackFindingCDC.SimpleFacetFilter()
-        self.real_fitless_facet_filter = Belle2.TrackFindingCDC.FitlessFacetFilter(True)
+        self.real_feasible_rl_facet_filter = Belle2.TrackFindingCDC.FeasibleRLFacetFilter(True)
 
     def prepare(self):
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
@@ -108,7 +108,7 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
         return crops
 
     def peel_target(self, facet):
-        mc_weight = self.mc_facet_filter.isGoodFacet(facet)
+        mc_weight = self.mc_facet_filter(facet)
         mc_decision = np.isfinite(mc_weight)  # Filters for nan
 
         return dict(
@@ -281,8 +281,8 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
         # return crops["no_middle_min_cos"] > self.cos_cut_value and crops["select_fitless_hard"]
 
     def real_select(self, facet):
-        real_weigth = self.real_facet_filter.isGoodFacet(facet)
-        real_weigth_fitless = self.real_fitless_facet_filter.isGoodFacet(facet)
+        real_weigth = self.real_facet_filter(facet)
+        real_weigth_fitless = self.real_feasible_rl_facet_filter(facet)
         return dict(
             real_select=np.isfinite(real_weigth),
             real_select_fitless=np.isfinite(real_weigth_fitless),

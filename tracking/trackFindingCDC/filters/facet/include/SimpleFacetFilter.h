@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 
-#include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -43,8 +43,8 @@ namespace Belle2 {
       virtual Weight operator()(const CDCFacet& facet) override final;
 
     private:
-      /// Basic filter to implement a fitless preselection.
-      FitlessFacetFilter m_fitlessFacetFilter;
+      /// Basic filter to implement a feasible right left passage preselection.
+      FeasibleRLFacetFilter m_feasibleRLFacetFilter;
 
       /// Memory for the used direction of flight deviation.
       double m_param_deviationCosCut;

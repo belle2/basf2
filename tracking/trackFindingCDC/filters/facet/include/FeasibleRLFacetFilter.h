@@ -12,14 +12,14 @@
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /** Filter for the constuction of good facets investigating the feasability
+    /**
+     *  Filter for the constuction of good facets investigating the feasability
      *  of the right left passage hypotheses combination.
      *  If the given combination cannot be made by a track reject it.
      */
-    class FitlessFacetFilter : public Filter<CDCFacet> {
+    class FeasibleRLFacetFilter : public Filter<CDCFacet> {
 
     private:
       /// Type of the super class
@@ -27,29 +27,31 @@ namespace Belle2 {
 
     public:
       /// Constructor taking a flag if boarderline feasable cases should be excluded.
-      explicit FitlessFacetFilter(bool hardCut = true);
+      explicit FeasibleRLFacetFilter(bool hardRLCut = true);
 
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override;
+      virtual void exposeParameters(ModuleParamList* moduleParamList,
+                                    const std::string& prefix = "") override;
 
     public:
-      /** Main filter method returning the weight of the facet.
+      /**
+       *  Main filter method returning the weight of the facet.
        *  Returns NAN if the cell shall be rejected.
        */
       virtual Weight operator()(const CDCFacet& facet) override final;
 
     public:
       /// Setter for the flag that the boarderline cases should be excluded.
-      void setHardCut(bool hardCut)
+      void setHardRLCut(bool hardRLCut)
       {
-        m_param_hardCut = hardCut;
+        m_param_hardRLCut = hardRLCut;
       }
 
       /// Getter for the flag that the boarderline cases should be excluded.
-      bool getHardCut() const
+      bool getHardRLCut() const
       {
-        return m_param_hardCut;
+        return m_param_hardRLCut;
       }
 
     private:
@@ -58,8 +60,8 @@ namespace Belle2 {
 
     private:
       /// Switch for hard selection.
-      bool m_param_hardCut;
+      bool m_param_hardRLCut = true;
 
-    }; // end class FitlessFacetFilter
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    }; // end class FeasibleRLFacetFilter
+  } // end namespace TrackFindingCDC
+} // end namespace Belle2

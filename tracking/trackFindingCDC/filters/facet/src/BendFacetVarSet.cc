@@ -34,8 +34,8 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   const CDCFacet& facet = *ptrFacet;
 
   // Make the feasibility cut on the right left passage information first
-  const Weight fitlessWeight = m_fitlessFacetFilter(facet);
-  if (std::isnan(fitlessWeight)) return false;
+  const Weight feasibleRLWeight = m_feasibleRLFacetFilter(facet);
+  if (std::isnan(feasibleRLWeight)) return false;
 
   /// Fit tangents
   facet.adjustLines();

@@ -8,31 +8,30 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-FitlessFacetFilter::FitlessFacetFilter(bool hardCut) :
-  m_param_hardCut(hardCut)
+FeasibleRLFacetFilter::FeasibleRLFacetFilter(bool hardRLCut) :
+  m_param_hardRLCut(hardRLCut)
 {
 }
 
-void FitlessFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
-                                          const std::string& prefix)
+void FeasibleRLFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                             const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
-  moduleParamList->addParameter(prefixed(prefix, "hardCut"),
-                                m_param_hardCut,
+  moduleParamList->addParameter(prefixed(prefix, "hardRLCut"),
+                                m_param_hardRLCut,
                                 "Switch to disallow the boarderline possible hit and "
                                 "right left passage information.",
-                                m_param_hardCut);
+                                m_param_hardRLCut);
 }
 
-CellState FitlessFacetFilter::operator()(const CDCFacet& facet)
+CellState FeasibleRLFacetFilter::operator()(const CDCFacet& facet)
 {
   if (isFeasible(facet)) {
     return 3;
@@ -41,7 +40,7 @@ CellState FitlessFacetFilter::operator()(const CDCFacet& facet)
   }
 }
 
-bool FitlessFacetFilter::isFeasible(const CDCRLWireHitTriple& rlWireHitTriple) const
+bool FeasibleRLFacetFilter::isFeasible(const CDCRLWireHitTriple& rlWireHitTriple) const
 {
   CDCRLWireHitTriple::Shape shape = rlWireHitTriple.getShape();
   short oClockDelta = shape.getOClockDelta();
@@ -88,11 +87,11 @@ bool FitlessFacetFilter::isFeasible(const CDCRLWireHitTriple& rlWireHitTriple) c
           break;
 
         case 2:
-          return ortho or (not m_param_hardCut and meta);
+          return ortho or (not m_param_hardRLCut and meta);
           break;
 
         case 4:
-          return orthoHard or (not m_param_hardCut and ortho);
+          return orthoHard or (not m_param_hardRLCut and ortho);
           break;
       }
       break;
@@ -108,7 +107,7 @@ bool FitlessFacetFilter::isFeasible(const CDCRLWireHitTriple& rlWireHitTriple) c
           break;
 
         case 2:
-          return orthoHard or (not m_param_hardCut and ortho);
+          return orthoHard or (not m_param_hardRLCut and ortho);
           break;
 
         case 3:
@@ -124,7 +123,7 @@ bool FitlessFacetFilter::isFeasible(const CDCRLWireHitTriple& rlWireHitTriple) c
           break;
 
         case 1:
-          return ortho or (not m_param_hardCut and meta);
+          return ortho or (not m_param_hardRLCut and meta);
           break;
 
         case 2:

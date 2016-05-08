@@ -38,7 +38,7 @@ FilterFactory<Filter<CDCFacet> >::getValidFilterNamesAndDescriptions() const
 
   filterNames.insert({
     {"all", "all facets are valid"},
-    {"fitless", "only checking the feasability of right left passage information"},
+    {"feasible", "only checking the feasability of right left passage information"},
     {"truth", "monte carlo truth"},
     {"tmva", "filter facets with a tmva method"},
     {"none", "no facet is valid, stop at cluster generation."},
@@ -58,8 +58,8 @@ FilterFactory<Filter<CDCFacet> >::create(const std::string& filterName) const
     return std::unique_ptr<Filter<CDCFacet> >(new AllFacetFilter());
   } else if (filterName == string("truth")) {
     return std::unique_ptr<Filter<CDCFacet> >(new MCFacetFilter());
-  } else if (filterName == string("fitless")) {
-    return std::unique_ptr<Filter<CDCFacet> >(new FitlessFacetFilter());
+  } else if (filterName == string("feasible")) {
+    return std::unique_ptr<Filter<CDCFacet> >(new FeasibleRLFacetFilter());
   } else if (filterName == string("simple")) {
     return std::unique_ptr<Filter<CDCFacet> >(new SimpleFacetFilter());
   } else if (filterName == string("realistic")) {

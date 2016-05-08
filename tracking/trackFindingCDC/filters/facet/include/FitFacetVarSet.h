@@ -9,10 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
 
 #include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
@@ -72,8 +71,8 @@ namespace Belle2 {
       virtual bool extract(const CDCFacet* facet) override final;
 
     private:
-      /// Fitless filter for the feasibility cut of the right left passage information.
-      FitlessFacetFilter m_fitlessFacetFilter;
+      /// Feasible right left passage filter for the feasibility cut of the right left passage information.
+      FeasibleRLFacetFilter m_feasibleRLFacetFilter;
     };
   }
 }

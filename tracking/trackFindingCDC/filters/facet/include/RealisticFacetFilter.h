@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
@@ -42,8 +42,8 @@ namespace Belle2 {
       Weight operator()(const CDCFacet& facet) override final;
 
     private:
-      /// Basic filter to implement a fitless preselection.
-      FitlessFacetFilter m_fitlessFacetFilter;
+      /// Basic filter to implement a feasible right left passage preselection.
+      FeasibleRLFacetFilter m_feasibleRLFacetFilter;
 
       /// Memory for the pull cu
       double m_param_phiPullCut;

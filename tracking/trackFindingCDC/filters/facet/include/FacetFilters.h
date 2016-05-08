@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/AllFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
-#include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/SimpleFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/RealisticFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/TMVAFacetFilter.h>

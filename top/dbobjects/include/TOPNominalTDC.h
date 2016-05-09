@@ -1,0 +1,207 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Marko Staric                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
+
+#include <top/dbobjects/TOPGeoBase.h>
+#include <vector>
+
+namespace Belle2 {
+
+  /**
+   * Nominal time-to-digit conversion parameters (simplified model)
+   */
+  class TOPNominalTDC: public TOPGeoBase {
+  public:
+
+    /**
+     * Various constants
+     */
+    enum {c_WindowSize = 64, /**< number of samples per ASIC window */
+          c_syncWindows = 2  /**< number of windows corresponding to syncTimeBase */
+         };
+
+    /**
+     * Default constructor
+     */
+    TOPNominalTDC()
+    {}
+
+    /**
+     * Useful constructor (new xml file version)
+     * @param numWindows number of ASIC windows per waveform
+     * @param subBits number of bits per sample
+     * @param syncTimeBase synchonization time base (time width of c_syncWindows)
+     * @param offset time offset
+     * @param pileupTime pile-up time
+     * @param doubleHitResolution double hit resolution time
+     * @param timeJitter r.m.s. of time jitter
+     * @param efficiency electronic efficiency (fraction of hits above threshold)
+     */
+    TOPNominalTDC(int numWindows,
+                  int subBits,
+                  double syncTimeBase,
+                  double offset,
+                  double pileupTime,
+                  double doubleHitResolution,
+                  double timeJitter,
+                  double efficiency);
+
+    /**
+     * Useful constructor (old xml file version)
+     * @param numBits number of bits
+     * @param binWidth time width of a TDC bin
+     * @param offset time offset
+     * @param pileupTime pile-up time
+     * @param doubleHitResolution double hit resolution time
+     * @param timeJitter r.m.s. of time jitter
+     * @param efficiency electronic efficiency (fraction of hits above threshold)
+     */
+    TOPNominalTDC(unsigned numBits,
+                  double binWidth,
+                  double offset,
+                  double pileupTime,
+                  double doubleHitResolution,
+                  double timeJitter,
+                  double efficiency):
+      m_offset(offset),
+      m_pileupTime(pileupTime),
+      m_doubleHitResolution(doubleHitResolution),
+      m_timeJitter(timeJitter),
+      m_efficiency(efficiency),
+      m_numBits(numBits),
+      m_binWidth(binWidth)
+    {}
+
+    /**
+     * Returns number of ASIC windows per waveform
+     * @return number of ASIC windows per waveform
+     */
+    unsigned getNumWindows() const {return m_numWindows;}
+
+    /**
+     * Returns number of bits per sample
+     * @return number of bits per sample
+     */
+    unsigned getSubBits() const {return m_subBits;}
+
+    /**
+     * Returns synchonization time base (time width of c_syncWindows)
+     * @return synchonization time base
+     */
+    double getSyncTimeBase() const {return m_syncTimeBase;}
+
+    /**
+     * Returns time offset
+     * @return time offset
+     */
+    double getOffset() const {return m_offset;}
+
+    /**
+     * Returns pile-up time
+     * @return pile-up time
+     */
+    double getPileupTime() const {return m_pileupTime;}
+
+    /**
+     * Returns double hit resolution time
+     * @return double hit resolution time
+     */
+    double getDoubleHitResolution() const {return m_doubleHitResolution;}
+
+    /**
+     * Returns r.m.s. of time jitter
+     * @return r.m.s. of time jitter
+     */
+    double getTimeJitter() const {return m_timeJitter;}
+
+    /**
+     * Returns electronic efficiency
+     * @return electronic efficiency
+     */
+    double getEfficiency() const {return m_efficiency;}
+
+    /**
+     * Returns number of bits
+     * @return number of bits
+     */
+    unsigned getNumBits() const {return m_numBits;}
+
+    /**
+     * Returns time width of a TDC bin
+     * @return time width of a TDC bin
+     */
+    double getBinWidth() const {return m_binWidth;}
+
+    /**
+     * Returns TDC overflow value
+     * @return overflow value
+     */
+    int getOverflowValue() const {return 1 << m_numBits;}
+
+    /**
+     * Convert TDC count to time
+     * @param TDC TDC count
+     * @return time [ns]
+     */
+    double getTime(int TDC) const {return (TDC + 0.5) * m_binWidth - m_offset;}
+
+    /**
+     * Returns time range lower limit
+     * @return lower limit
+     */
+    double getTimeMin() const {return -m_offset;}
+
+    /**
+     * Returns time range upper limit
+     * @return upper limit
+     */
+    double getTimeMax() const {return getOverflowValue() * m_binWidth - m_offset;}
+
+    /**
+     * Convert time to TDC count.
+     * For times being outside TDC range, TDC overflow value is returned.
+     * @param time [ns]
+     * @return TDC TDC count
+     */
+    int getTDCcount(double time) const;
+
+    /**
+     * Check for consistency of data members
+     * @return true if values consistent (valid)
+     */
+    bool isConsistent() const;
+
+    /**
+     * Print the content of the class
+     * @param title title to be printed
+     */
+    void print(const std::string& title = "Nominal time-to-digit conversion parameters") const;
+
+
+  private:
+
+    unsigned m_numWindows = 0; /**< number of ASIC windows per waveform */
+    unsigned m_subBits = 0; /**< number of bits per sample */
+    float m_syncTimeBase = 0; /**< time width of c_syncWindows */
+    float m_offset = 0; /**< time offset */
+    float m_pileupTime = 0; /**< pile-up time */
+    float m_doubleHitResolution = 0; /**< double hit resolution time */
+    float m_timeJitter = 0; /**< r.m.s. of time jitter */
+    float m_efficiency = 0; /**< electronic efficiency (fract. of hits above threshold) */
+
+    unsigned m_numBits = 0; /**< number of bits */
+    float m_binWidth = 0; /**< time width of a TDC bin */
+
+    ClassDef(TOPNominalTDC, 1); /**< ClassDef */
+
+  };
+
+} // end namespace Belle2

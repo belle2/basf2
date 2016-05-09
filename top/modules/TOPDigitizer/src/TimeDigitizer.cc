@@ -27,10 +27,18 @@ namespace Belle2 {
       if (m_times.empty()) return;
 
       // get parameters of the model
-      auto* topgp = TOPGeometryPar::Instance();
-      double hitResolveTime = topgp->getDoubleHitResolution();
-      double pileupTime = topgp->getPileupTime();
-      int overflow = topgp->TDCoverflow();
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      if (!geo) {
+        B2ERROR("TimeDigitizer::digitize: no time-to-digit conversion available");
+        return;
+      }
+      const auto& tdc = geo->getNominalTDC();
+      double hitResolveTime = tdc.getDoubleHitResolution();
+      double pileupTime = tdc.getPileupTime();
+      int overflow = tdc.getOverflowValue();
+
+      // get channel mapper
+      const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
 
       // split time pattern into multiple hits (according to double-hit resolution)
       std::vector<Iterator> ranges;
@@ -78,14 +86,14 @@ namespace Belle2 {
         if (sigma > 0) time += gRandom->Gaus(0., sigma);
 
         // digitize detection time
-        int TDC = topgp->getTDCcount(time);
-        if (TDC == overflow) continue;
+        int TDCcount = tdc.getTDCcount(time);
+        if (TDCcount == overflow) continue;
 
         // append new digit
-        TOPDigit* digit = digits.appendNew(m_barID, m_pixelID, TDC);
+        TOPDigit* digit = digits.appendNew(m_barID, m_pixelID, TDCcount);
         digit->setTime(time);
         digit->setADC(int(pulseHeight));
-        digit->setChannel(topgp->getChannelMapper().getChannel(m_pixelID));
+        digit->setChannel(channelMapper.getChannel(m_pixelID));
 
         // set relations to simulated hits and MC particles
         for (unsigned j = 0; j < simHits.size(); j++) {

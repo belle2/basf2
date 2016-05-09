@@ -10,6 +10,7 @@
 
 // Own include
 #include <top/modules/TOPTimeBaseCalibrator/TOPTimeBaseCalibratorModule.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 #include <framework/core/ModuleManager.h>
 
@@ -83,12 +84,6 @@ namespace Belle2 {
 
     StoreArray<TOPDigit>::required();
 
-    if (!m_topgp->isInitialized()) {
-      GearDir content("/Detector/DetectorComponent[@name='TOP']/Content");
-      m_topgp->Initialize(content);
-    }
-    if (!m_topgp->isInitialized())
-      B2FATAL("Component TOP not found in Gearbox");
 
   }
 

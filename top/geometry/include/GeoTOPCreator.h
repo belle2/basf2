@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOTOPCREATOR_H_
-#define GEOTOPCREATOR_H_
+#pragma once
 
+#include <top/dbobjects/TOPGeometry.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
@@ -45,6 +45,20 @@ namespace Belle2 {
        * @param content A reference to the content part of the parameter description
        */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume,
+                          geometry::GeometryTypes type);
+
+    private:
+
+      /**
+       * Create a parameter object from the Gearbox XML parameters.
+       */
+      const TOPGeometry* createConfiguration(const GearDir& param);
+
+      /**
+       * Create the geometry from a parameter object.
+       */
+      void createGeometry(const TOPGeometry& parameters,
+                          G4LogicalVolume& topVolume,
                           geometry::GeometryTypes type);
 
       /**
@@ -84,17 +98,16 @@ namespace Belle2 {
        */
       G4LogicalVolume* buildPMT(const GearDir& content);
 
-    protected:
 
-      SensitivePMT* m_sensitivePMT;  /**< Sensitive vol. to register PMT hits */
-      SensitiveBar* m_sensitiveBar;  /**< Sensitive vol. to register incoming particles */
-      BkgSensitiveDetector* m_sensitivePCB1;  /**< PCB sensitive vol. for background studies */
-      BkgSensitiveDetector* m_sensitivePCB2;  /**< PCB sensitive vol. for background studies */
-      TOPGeometryPar* m_topgp;       /**< Geometry parameters from xml files */
-      int isBeamBkgStudy;            /**< flag for beam backgound simulation */
+      SensitivePMT* m_sensitivePMT = 0;  /**< Sensitive vol. to register PMT hits */
+      SensitiveBar* m_sensitiveBar = 0;  /**< Sensitive vol. to register particles */
+      BkgSensitiveDetector* m_sensitivePCB1 = 0;  /**< PCB sensitive for BG studies */
+      BkgSensitiveDetector* m_sensitivePCB2 = 0;  /**< PCB sensitive for BG studies */
+      TOPGeometryPar* m_topgp = TOPGeometryPar::Instance(); /**< old singleton class */
+      const TOPGeometry* m_geometry = 0; /**< Geometry parameters */
+      int m_isBeamBkgStudy = 0; /**< flag for beam backgound simulation */
     };
 
   }
 }
 
-#endif /* GEOTOPCREATOR_H_ */

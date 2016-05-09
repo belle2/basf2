@@ -13,6 +13,7 @@
 
 // Own include
 #include <top/modules/TOPReconstruction/TOPReconstructorModule.h>
+#include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction/TOPreco.h>
 #include <top/reconstruction/TOPtrack.h>
 #include <top/reconstruction/TOPconfigure.h>
@@ -40,7 +41,6 @@
 #include <TVector3.h>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
   using namespace TOP;
@@ -55,14 +55,7 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPReconstructorModule::TOPReconstructorModule() : Module(),
-    m_debugLevel(0),
-    m_smearTrack(false),
-    m_topgp(TOPGeometryPar::Instance()),
-    m_R1(0),
-    m_R2(0),
-    m_Z1(0),
-    m_Z2(0)
+  TOPReconstructorModule::TOPReconstructorModule() : Module()
   {
     // Set description
     setDescription("Reconstruction for TOP counter. Uses reconstructed tracks "
@@ -151,24 +144,17 @@ namespace Belle2 {
     m_smearTrack = m_sigmaRphi > 0 || m_sigmaZ > 0 || m_sigmaTheta > 0 ||
                    m_sigmaPhi > 0;
 
-    // check if geometry parametes are loaded
-
-    if (!m_topgp->isInitialized()) {
-      GearDir content("/Detector/DetectorComponent[@name='TOP']/Content");
-      m_topgp->Initialize(content);
-    }
-    if (!m_topgp->isInitialized()) {
-      B2ERROR("Component TOP not found in Gearbox");
+    // check if geometry is available
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+    if (!geo) {
+      B2FATAL("TOPReconstructor: no geometry available");
       return;
     }
+    geo->useBasf2Units();
 
     // Configure TOP detector
 
     TOPconfigure config;
-    m_R1 = config.getR1();
-    m_R2 = config.getR2();
-    m_Z1 = config.getZ1();
-    m_Z2 = config.getZ2();
     if (m_debugLevel > 0) config.print();
   }
 

@@ -31,7 +31,7 @@
     <reflectiveEdge>
       <width unit="mm">2.25</width>
       <thickness unit="mm">0.2</thickness>
-      <Surface>
+      <Surface name="Reflective edge">
 	<Properties>
 	  <Property name="REFLECTIVITY" unit="eV">
             <value energy="1.0">0.70</value> 

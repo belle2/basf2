@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <top/geometry/TOPGeometryPar.h>
 #include <framework/gearbox/Const.h>
 #include <string>
 
@@ -72,29 +71,18 @@ namespace Belle2 {
   private:
 
     // Module steering parameters
-    double m_minBkgPerBar;    /**< minimal assumed background photons per bar */
-    double m_scaleN0;         /**< scale factor for N0 */
-    double m_sigmaRphi;    /**< track smearing in Rphi (r.m.s) */
-    double m_sigmaZ;       /**< track smearing in Z (r.m.s) */
-    double m_sigmaTheta;   /**< track smearing in Theta (r.m.s) */
-    double m_sigmaPhi;     /**< track smearing in Phi (r.m.s) */
-    double m_maxTime;      /**< optional time limit for photons */
-    int m_PDGCode;   /**< PDG code of hypothesis to construct pulls */
+    double m_minBkgPerBar = 0;    /**< minimal assumed background photons per bar */
+    double m_scaleN0 = 0;         /**< scale factor for N0 */
+    double m_sigmaRphi = 0;    /**< track smearing in Rphi (r.m.s) */
+    double m_sigmaZ = 0;       /**< track smearing in Z (r.m.s) */
+    double m_sigmaTheta = 0;   /**< track smearing in Theta (r.m.s) */
+    double m_sigmaPhi = 0;     /**< track smearing in Phi (r.m.s) */
+    double m_maxTime = 0;      /**< optional time limit for photons */
+    int m_PDGCode = 0;   /**< PDG code of hypothesis to construct pulls */
 
     // others
-    int m_debugLevel;      /**< debug level from logger */
-    bool m_smearTrack;     /**< set to true, if at least one sigma > 0 */
-
-    // Geometry parameters
-
-    TOP::TOPGeometryPar* m_topgp;   /**< geometry parameters */
-
-    // space for TOP bars including wedges
-
-    double m_R1;   /**< inner radius */
-    double m_R2;   /**< outer radius */
-    double m_Z1;   /**< backward z */
-    double m_Z2;   /**< forward z */
+    int m_debugLevel = 0;       /**< debug level from logger */
+    bool m_smearTrack = false;  /**< set to true, if at least one sigma > 0 */
 
     // Masses of particle hypotheses
 

@@ -65,13 +65,10 @@ namespace Belle2 {
     geometry::CreatorFactory<GeoTOPCreator> GeoTOPFactory("TOPCreator");
 
 
-    GeoTOPCreator::GeoTOPCreator(): isBeamBkgStudy(0)
+    GeoTOPCreator::GeoTOPCreator()
     {
       m_sensitivePMT = new SensitivePMT();
       m_sensitiveBar = new SensitiveBar();
-      m_sensitivePCB1 = NULL;
-      m_sensitivePCB2 = NULL;
-      m_topgp = TOPGeometryPar::Instance();
     }
 
 
@@ -82,20 +79,202 @@ namespace Belle2 {
       if (m_sensitivePCB1) delete m_sensitivePCB1;
       if (m_sensitivePCB2) delete m_sensitivePCB2;
       if (m_topgp) delete m_topgp;
+      if (m_geometry) delete m_geometry;
       G4LogicalSkinSurface::CleanSurfaceTable();
     }
+
+
+    const TOPGeometry* GeoTOPCreator::createConfiguration(const GearDir& content)
+    {
+      TOPGeometry* geo = new TOPGeometry();
+
+      // PMT array
+
+      GearDir pmtParams(content, "PMTs/Module");
+      TOPGeoPMT pmt(pmtParams.getLength("ModuleXSize"),
+                    pmtParams.getLength("ModuleYSize"),
+                    pmtParams.getLength("ModuleZSize") +
+                    pmtParams.getLength("WindowThickness") +
+                    pmtParams.getLength("BottomThickness"));
+      pmt.setWallThickness(pmtParams.getLength("ModuleWall"));
+      pmt.setWallMaterial(pmtParams.getString("wallMaterial"));
+      pmt.setFillMaterial(pmtParams.getString("fillMaterial"));
+      pmt.setSensVolume(pmtParams.getLength("SensXSize"),
+                        pmtParams.getLength("SensYSize"),
+                        pmtParams.getLength("SensThickness"),
+                        pmtParams.getString("sensMaterial"));
+      pmt.setNumPixels(pmtParams.getInt("PadXNum"),
+                       pmtParams.getInt("PadYNum"));
+      pmt.setWindow(pmtParams.getLength("WindowThickness"),
+                    pmtParams.getString("winMaterial"));
+      pmt.setBottom(pmtParams.getLength("BottomThickness"),
+                    pmtParams.getString("botMaterial"));
+
+      auto& materials = geometry::Materials::getInstance();
+      GearDir reflEdgeSurfParams(pmtParams, "reflectiveEdge/Surface");
+      pmt.setReflEdge(pmtParams.getLength("reflectiveEdge/width"),
+                      pmtParams.getLength("reflectiveEdge/thickness"),
+                      materials.createOpticalSurfaceConfig(reflEdgeSurfParams));
+
+      GearDir arrayParams(content, "PMTs");
+      TOPGeoPMTArray pmtArray(arrayParams.getInt("nPMTx"),
+                              arrayParams.getInt("nPMTy"),
+                              arrayParams.getLength("Xgap"),
+                              arrayParams.getLength("Ygap"),
+                              arrayParams.getString("stackMaterial"),
+                              pmt);
+      geo->setPMTArray(pmtArray);
+
+      // modules
+
+      GearDir barParams(content, "Bars");
+      GearDir barSurfParams(barParams, "Surface");
+      auto barSurface = materials.createOpticalSurfaceConfig(barSurfParams);
+      double sigmaAlpha = barSurfParams.getDouble("SigmaAlpha");
+
+      TOPGeoBarSegment bar1(barParams.getLength("QWidth"),
+                            barParams.getLength("QThickness"),
+                            barParams.getLength("QBar1Length"),
+                            barParams.getString("BarMaterial"));
+      bar1.setGlue(barParams.getLength("Glue/Thicknes2"),
+                   barParams.getString("Glue/GlueMaterial"));
+      bar1.setSurface(barSurface, sigmaAlpha);
+
+      TOPGeoBarSegment bar2(barParams.getLength("QWidth"),
+                            barParams.getLength("QThickness"),
+                            barParams.getLength("QBar2Length"),
+                            barParams.getString("BarMaterial"));
+      bar2.setGlue(barParams.getLength("Glue/Thicknes1"),
+                   barParams.getString("Glue/GlueMaterial"));
+      bar2.setSurface(barSurface, sigmaAlpha);
+
+      TOPGeoMirrorSegment mirror(barParams.getLength("QWidth"),
+                                 barParams.getLength("QThickness"),
+                                 barParams.getLength("QBarMirror"),
+                                 barParams.getString("BarMaterial"));
+      mirror.setGlue(barParams.getLength("Glue/Thicknes3"),
+                     barParams.getString("Glue/GlueMaterial"));
+      mirror.setSurface(barSurface, sigmaAlpha);
+      GearDir mirrorParams(content, "Mirror");
+      mirror.setRadius(mirrorParams.getLength("Radius"));
+      mirror.setCenterOfCurvature(mirrorParams.getLength("Xpos"),
+                                  mirrorParams.getLength("Ypos"));
+      GearDir mirrorSurfParams(mirrorParams, "Surface");
+      mirror.setCoating(mirrorParams.getLength("mirrorThickness"),
+                        mirrorParams.getString("Material"),
+                        materials.createOpticalSurfaceConfig(mirrorSurfParams));
+
+      TOPGeoPrism prism(barParams.getLength("QWedgeWidth"),
+                        barParams.getLength("QThickness"),
+                        barParams.getLength("QWedgeLength"),
+                        barParams.getLength("QWedgeDown") +
+                        barParams.getLength("QThickness"),
+                        barParams.getLength("QWedgeFlat"),
+                        barParams.getString("BarMaterial"));
+      prism.setGlue(arrayParams.getLength("dGlue"),
+                    arrayParams.getString("glueMaterial"));
+      prism.setSurface(barSurface, sigmaAlpha);
+
+      double radius = barParams.getLength("Radius") + barParams.getLength("QThickness") / 2;
+      double phi = barParams.getLength("Phi0");
+      double backwardZ = barParams.getLength("QZBackward");
+      int numModules = barParams.getInt("Nbar");
+      for (int i = 0; i < numModules; i++) {
+        TOPGeoModule module(i + 1, radius, phi, backwardZ);
+        module.setBarSegment1(bar1);
+        module.setBarSegment2(bar2);
+        module.setMirrorSegment(mirror);
+        module.setPrism(prism);
+        // module.setModuleCNumber(num);
+        // module.setPMTArrayDisplacement(arrayDispl);
+        // module.setModuleDisplacement(moduleDispl);
+        geo->appendModule(module);
+        phi += 2 * M_PI / numModules;
+
+      }
+
+      // boardstack
+
+      TOPGeoBoardStack bs; // TODO
+      geo->setBoardStack(bs);
+
+      // QBB
+
+      TOPGeoQBB qbb; // TODO
+      geo->setQBB(qbb);
+
+      // nominal QE
+
+      GearDir qeParams(content, "QE");
+      std::vector<float> qeData;
+      for (const GearDir& Qeffi : qeParams.getNodes("Qeffi")) {
+        qeData.push_back(Qeffi.getDouble(""));
+      }
+      TOPNominalQE nominalQE(qeParams.getLength("LambdaFirst") / Unit::nm,
+                             qeParams.getLength("LambdaStep") / Unit::nm,
+                             qeParams.getDouble("ColEffi"),
+                             qeData);
+      geo->setNominalQE(nominalQE);
+
+      // nominal TTS
+
+      GearDir ttsParams(content, "PMTs/TTS");
+      TOPNominalTTS nominalTTS;
+      for (const GearDir& Gauss : ttsParams.getNodes("Gauss")) {
+        nominalTTS.appendGaussian(Gauss.getDouble("fraction"),
+                                  Gauss.getTime("mean"),
+                                  Gauss.getTime("sigma"));
+      }
+      nominalTTS.normalize();
+      geo->setNominalTTS(nominalTTS);
+
+      // nominal TDC
+
+      GearDir tdcParams(content, "TDC");
+      if (tdcParams) {
+        TOPNominalTDC nominalTDC(tdcParams.getInt("numWindows"),
+                                 tdcParams.getInt("subBits"),
+                                 tdcParams.getTime("syncTimeBase"),
+                                 tdcParams.getTime("offset"),
+                                 tdcParams.getTime("pileupTime"),
+                                 tdcParams.getTime("doubleHitResolution"),
+                                 tdcParams.getTime("timeJitter"),
+                                 tdcParams.getDouble("efficiency"));
+        geo->setNominalTDC(nominalTDC);
+      } else {
+        TOPNominalTDC nominalTDC(pmtParams.getInt("TDCbits"),
+                                 pmtParams.getTime("TDCbitwidth"),
+                                 pmtParams.getTime("TDCoffset", 0),
+                                 pmtParams.getTime("TDCpileupTime", 0),
+                                 pmtParams.getTime("TDCdoubleHitResolution", 0),
+                                 pmtParams.getTime("TDCtimeJitter", 50e-3),
+                                 pmtParams.getDouble("TDCefficiency", 1));
+        geo->setNominalTDC(nominalTDC);
+      }
+
+      // check for consistency
+
+      if (!geo->isConsistent())
+        B2ERROR("GeoTOPCreator::createConfiguration: geometry not consistently defined");
+
+      return geo;
+    }
+
+
 
 
     void GeoTOPCreator::create(const GearDir& content, G4LogicalVolume& topVolume,
                                GeometryTypes)
     {
 
-      isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
+      m_isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
+
+      m_geometry = createConfiguration(content);
+      m_topgp->setGeometry(m_geometry);
 
       /*! Build detector segment */
 
       //! Initialize parameters
-      m_topgp = TOPGeometryPar::Instance();
       m_topgp->Initialize(content);
       m_topgp->setGeanUnits();
 
@@ -282,18 +461,48 @@ namespace Belle2 {
 
       /*! Add glue to wedge */
 
-      //! for quartz gluing
-      G4Box* box1 = new G4Box("glue_1", Gwidth3 / 2.0, Qthickness / 2.0, Wwidth / 2.0);
-      G4LogicalVolume* gbox1 = new G4LogicalVolume(box1, glueMaterial, "gbox1");
+      double brokenFraction = content.getDouble("Bars/BrokenJointFraction", 0);
 
-      //! color the glue
-      setColor(*gbox1, "rgb(0.0,1.0,1.0,1.0)");
+      if (brokenFraction <= 0) {
+        //! for quartz gluing
+        G4Box* box1 = new G4Box("glue_1", Gwidth3 / 2.0, Qthickness / 2.0, Wwidth / 2.0);
+        G4LogicalVolume* gbox1 = new G4LogicalVolume(box1, glueMaterial, "gbox1");
 
-      //! place the glue
-      G4Transform3D tglue1 = G4Translate3D(-length / 2.0 - Gwidth1 / 2.0 , 0, 0);
+        //! color the glue
+        setColor(*gbox1, "rgb(0.0,1.0,1.0,1.0)");
 
-      new G4PVPlacement(tglue1, gbox1, "TOP.gbox1", qwedge, false, 1);
+        //! place the glue
+        G4Transform3D tglue1 = G4Translate3D(-length / 2.0 - Gwidth1 / 2.0 , 0, 0);
+        new G4PVPlacement(tglue1, gbox1, "TOP.gbox1", qwedge, false, 1);
 
+      } else if (brokenFraction >= 1) {
+        B2WARNING("GeoTOPCreator: simulating totaly broken glue joint at prism");
+
+        G4Material* brokenMaterial = Materials::get("TOPAir");
+        G4Box* box1 = new G4Box("glue_1", Gwidth3 / 2.0, Qthickness / 2.0, Wwidth / 2.0);
+        G4LogicalVolume* gbox1 = new G4LogicalVolume(box1, brokenMaterial, "gbox1");
+        G4Transform3D tglue1 = G4Translate3D(-length / 2.0 - Gwidth1 / 2.0 , 0, 0);
+        new G4PVPlacement(tglue1, gbox1, "TOP.gbox1", qwedge, false, 1);
+
+      } else {
+        B2WARNING("GeoTOPCreator: simulating broken glue joint at prism with fraction "
+                  << brokenFraction);
+        double glueWidth = Wwidth * (1 - brokenFraction);
+        double brokenWidth = Wwidth * brokenFraction;
+        double glueZc = Wwidth * brokenFraction / 2;
+        double brokenZc = Wwidth * (brokenFraction - 1) / 2;
+        G4Material* brokenMaterial = Materials::get("TOPAir");
+
+        G4Box* box1 = new G4Box("glue_1", Gwidth3 / 2, Qthickness / 2, glueWidth / 2);
+        G4LogicalVolume* gbox1 = new G4LogicalVolume(box1, glueMaterial, "gbox1");
+        G4Transform3D tglue1 = G4Translate3D(-length / 2.0 - Gwidth1 / 2.0 , 0, glueZc);
+        new G4PVPlacement(tglue1, gbox1, "TOP.gbox1", qwedge, false, 1);
+
+        G4Box* box1b = new G4Box("glue_1b", Gwidth3 / 2, Qthickness / 2, brokenWidth / 2);
+        G4LogicalVolume* gbox1b = new G4LogicalVolume(box1b, brokenMaterial, "gbox1b");
+        G4Transform3D tglue1b = G4Translate3D(-length / 2 - Gwidth1 / 2 , 0, brokenZc);
+        new G4PVPlacement(tglue1b, gbox1b, "TOP.gbox1b", qwedge, false, 1);
+      }
 
 
       //! for PMT gluing
@@ -485,7 +694,7 @@ namespace Belle2 {
       G4LogicalVolume* pcb1 = new G4LogicalVolume(el1, PCBMaterial, "Board.1");
       G4LogicalVolume* pcb2 = new G4LogicalVolume(el2, PCBMaterial, "Board.2");
 
-      if (isBeamBkgStudy) {
+      if (m_isBeamBkgStudy) {
         m_sensitivePCB1 = new BkgSensitiveDetector("TOP", 1);
         pcb1->SetSensitiveDetector(m_sensitivePCB1);
         m_sensitivePCB2 = new BkgSensitiveDetector("TOP", 2);

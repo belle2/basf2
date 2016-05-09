@@ -13,6 +13,7 @@
 
 // Own include
 #include <top/modules/TOPDQM/TOPDQMModule.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -42,6 +43,8 @@ using boost::format;
 
 namespace Belle2 {
 
+  using namespace TOP;
+
   //-----------------------------------------------------------------
   //                 Register module
   //-----------------------------------------------------------------
@@ -52,9 +55,7 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPDQMModule::TOPDQMModule() : HistoModule(),
-    m_topgp(TOP::TOPGeometryPar::Instance())
-
+  TOPDQMModule::TOPDQMModule() : HistoModule()
   {
     // set module description (e.g. insert text)
     setDescription("TOP DQM histogrammer");
@@ -82,33 +83,40 @@ namespace Belle2 {
     TDirectory* oldDir = gDirectory;
     oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
 
+    // check if geometry is available
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+    if (!geo) {
+      B2FATAL("TOPDQM: no geometry available");
+      return;
+    }
+    geo->useBasf2Units();
+
     // variables needed for booking
-    int NumBars = m_topgp->getNbars();
-    int NumPixels = m_topgp->getNpmtx() * m_topgp->getNpmty() * m_topgp->getNpadx() *
-                    m_topgp->getNpady();
-    int NumTDCbins = 1 << m_topgp->getTDCbits();
+    m_numModules = geo->getNumModules();
+    int numPixels = geo->getPMTArray().getNumPixels();
+    int numTDCbins = geo->getNominalTDC().getOverflowValue();
 
     // book histograms
     m_barHits = new TH1F("barHits", "Number of hits per bar",
-                         NumBars, 0.5, NumBars + 0.5);
+                         m_numModules, 0.5, m_numModules + 0.5);
     m_barHits->GetXaxis()->SetTitle("bar ID");
     m_barHits->GetYaxis()->SetTitle("hits per bar");
 
-    for (int i = 0; i < NumBars; i++) {
+    for (int i = 0; i < m_numModules; i++) {
       string name = str(format("hitsBar%1%") % (i + 1));
       string title = str(format("Number of hits per pixel, bar#%1%") % (i + 1));
       TH1F* h1 = new TH1F(name.c_str(), title.c_str(),
-                          NumPixels, 0.5, NumPixels + 0.5);
+                          numPixels, 0.5, numPixels + 0.5);
       h1->GetXaxis()->SetTitle("pixel ID");
       h1->GetYaxis()->SetTitle("hits per pixel");
       m_pixelHits.push_back(h1);
     }
 
-    for (int i = 0; i < NumBars; i++) {
+    for (int i = 0; i < m_numModules; i++) {
       string name = str(format("timeBar%1%") % (i + 1));
       string title = str(format("Time distribution, bar#%1%") % (i + 1));
       TH1F* h1 = new TH1F(name.c_str(), title.c_str(),
-                          NumTDCbins, 0, NumTDCbins);
+                          numTDCbins, 0, numTDCbins);
       h1->GetXaxis()->SetTitle("time [TDC bins]");
       h1->GetYaxis()->SetTitle("hits per TDC bin");
       m_hitTimes.push_back(h1);
@@ -153,11 +161,6 @@ namespace Belle2 {
 
   void TOPDQMModule::initialize()
   {
-    if (m_topgp->getNbars() == 0) {
-      B2ERROR("TOP geometry not loaded");
-      return;
-    }
-
     // Register histograms (calls back defineHisto)
     REG_HISTOGRAM;
 
@@ -177,8 +180,8 @@ namespace Belle2 {
     for (const auto& digit : digits) {
       m_barHits->Fill(digit.getModuleID());
       int i = digit.getModuleID() - 1;
-      if (i < 0 || i >= m_topgp->getNbars()) {
-        B2ERROR("Invalid module ID found in TOPDigits");
+      if (i < 0 || i >= m_numModules) {
+        B2ERROR("Invalid module ID found in TOPDigits: ID = " << i);
         continue;
       }
       m_pixelHits[i]->Fill(digit.getPixelID());

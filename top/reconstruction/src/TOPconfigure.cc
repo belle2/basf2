@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <top/reconstruction/TOPconfigure.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -23,105 +24,97 @@ namespace Belle2 {
 
     bool TOPconfigure::m_configured(false);
 
-    TOPconfigure::TOPconfigure() :
-      m_topgp(TOPGeometryPar::Instance()),
-      m_R1(0),
-      m_R2(0),
-      m_Z1(0),
-      m_Z2(0),
-      m_timeRange(0)
-
+    TOPconfigure::TOPconfigure()
     {
-      if (!m_topgp->isInitialized()) B2FATAL("TOPconfigure: no geometry available");
-      m_topgp->setBasfUnits();
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      if (!geo) B2FATAL("TOPconfigure: no geometry available");
+      geo->useBasf2Units();
 
       // space for TOP modules
-      m_R1 = m_topgp->getRadius() - m_topgp->getWextdown();
-      double x = m_topgp->getQwidth() / 2.0;
-      double y = m_topgp->getRadius() + m_topgp->getQthickness();
-      m_R2 = sqrt(x * x + y * y);
-      m_Z1 = m_topgp->getZ1() - m_topgp->getWLength();
-      m_Z2 = m_topgp->getZ2();
+      m_R1 = geo->getInnerRadius();
+      m_R2 = geo->getOuterRadius();
+      m_Z1 = geo->getBackwardZ();
+      m_Z2 = geo->getForwardZ();
+
       // TDC time range
-      m_timeRange = (1 << m_topgp->getTDCbits()) * m_topgp->getTDCbitwidth();
+      const auto& tdc = geo->getNominalTDC();
+      m_timeRange = tdc.getOverflowValue() * tdc.getBinWidth();
 
       if (m_configured) return;
 
+      // space for the modules
       setTOPvolume(m_R1, m_R2, m_Z1, m_Z2);
 
-      // get magnetic field at TOP
-      TVector3 point(0, m_topgp->getRadius(), 0);
+      // magnetic field at TOP
+      TVector3 point(0, geo->getRadius(), 0);
       TVector3 Bfield = BFieldMap::Instance().getBField(point);
       setBfield(-Bfield.Z());
 
-      setPMT(m_topgp->getMsizex(), m_topgp->getMsizey(),
-             m_topgp->getAsizex(), m_topgp->getAsizey(),
-             m_topgp->getNpadx(), m_topgp->getNpady());
+      // PMT dimensions
+      const auto& pmt = geo->getPMTArray().getPMT();
+      setPMT(pmt.getSizeX(), pmt.getSizeY(),
+             pmt.getSensSizeX(), pmt.getSensSizeY(),
+             pmt.getNumColumns(), pmt.getNumRows());
 
-      int ng = m_topgp->getNgaussTTS();
-      double sigmaTDC = m_topgp->getELjitter();
-      if (ng > 0) {
-        vector<float> frac, mean, sigma;
-        for (int i = 0; i < ng; i++) {
-          frac.push_back((float) m_topgp->getTTSfrac(i));
-          mean.push_back((float) m_topgp->getTTSmean(i));
-          double sigmaTTS = m_topgp->getTTSsigma(i);
-          sigma.push_back((float) sqrt(sigmaTTS * sigmaTTS + sigmaTDC * sigmaTDC));
-        }
-        setTTS(ng, frac.data(), mean.data(), sigma.data());
+      // TTS parameterization
+      const auto& tts = geo->getNominalTTS().getTTS();
+      std::vector<float> frac, mean, sigma;
+      double sigmaTDC = tdc.getTimeJitter();
+      for (const auto& gauss : tts) {
+        frac.push_back(gauss.fraction);
+        mean.push_back(gauss.position);
+        sigma.push_back(sqrt(gauss.sigma * gauss.sigma + sigmaTDC * sigmaTDC));
       }
+      setTTS(tts.size(), frac.data(), mean.data(), sigma.data());
 
-      int size = m_topgp->getNpointsQE();
-      if (size > 0) {
-        vector<float> Wavelength, QE;
-        for (int i = 0; i < size; i++) {
-          QE.push_back((float) m_topgp->getQE(i));
-          float wl = m_topgp->getLambdaFirst() + m_topgp->getLambdaStep() * i;
-          Wavelength.push_back(wl);
-        }
-        setQE(Wavelength.data(), QE.data(), size,
-              m_topgp->getColEffi() * m_topgp->getELefficiency());
+      // quantum efficiency
+      const auto& nominalQE = geo->getNominalQE();
+      std::vector<float> wavelength;
+      for (unsigned i = 0; i < nominalQE.getQE().size(); i++) {
+        float wl = nominalQE.getLambdaFirst() + nominalQE.getLambdaStep() * i;
+        wavelength.push_back(wl);
       }
+      auto QE = nominalQE.getQE();
+      setQE(wavelength.data(), QE.data(), QE.size(),
+            nominalQE.getCE() * tdc.getEfficiency());
 
-      setTDC(m_topgp->getTDCbits(), m_topgp->getTDCbitwidth(), m_topgp->getTDCoffset());
-      setCFD(m_topgp->getPileupTime(), m_topgp->getDoubleHitResolution());
+      // time to digit conversion
+      setTDC(tdc.getNumBits(), tdc.getBinWidth(), tdc.getOffset());
+      setCFD(tdc.getPileupTime(), tdc.getDoubleHitResolution());
 
-      int n = m_topgp->getNbars();           // number of modules
-      double Dphi = 2 * M_PI / n;
-      double Phi = m_topgp->getPhi0() - 0.5 * M_PI;
+      setEdgeRoughness(0); // No edge roughness
 
-      double R = m_topgp->getRadius();          // innner bar surface radius
-      double MirrR = m_topgp->getMirradius();   // Mirror radius
-      double MirrXc = m_topgp->getMirposx();    // Mirror X center of curvature
-      double MirrYc = m_topgp->getMirposy();    // Mirror Y center of curvature
-      double A = m_topgp->getQwidth();          // bar width
-      double B = m_topgp->getQthickness();      // bar thickness
-      double z1 = m_topgp->getZ1();             // backward bar position
-      double z2 = m_topgp->getZ2();             // forward bar position
-      double DzExp = m_topgp->getWLength();     // expansion volume length
-      double Wwidth = m_topgp->getWwidth();     // expansion volume width
-      double Wflat = m_topgp->getWflat();     // expansion volume flat part
-      double filterThick = m_topgp->getdGlue();
-      double pmtWindow = m_topgp->getWinthickness();
-      double YsizExp = m_topgp->getWextdown() + m_topgp->getQthickness();
-      double XsizPMT = m_topgp->getNpmtx() * m_topgp->getMsizex() +
-                       (m_topgp->getNpmtx() - 1) * m_topgp->getXgap();
-      double YsizPMT = m_topgp->getNpmty() * m_topgp->getMsizey() + m_topgp->getYgap();
-      double x0 = m_topgp->getPMToffsetX();
-      double y0 = m_topgp->getPMToffsetY();
+      // geometry of modules
+      for (unsigned i = 0; i < geo->getNumModules(); i++) {
+        const auto& module = geo->getModule(i + 1);
+        double A = module.getBarWidth();
+        double B = module.getBarThickness();
+        double z1 = module.getBackwardZ();
+        double z2 = module.getForwardZ();
+        double R = module.getInnerRadius();
+        double phi = module.getPhi() - M_PI / 2;
+        int id = setQbar(A, B, z1, z2, R, 0, phi, c_PMT, c_SphericM);
 
-      //! No edge roughness
-      setEdgeRoughness(0);
+        const auto& mirror = module.getMirrorSegment();
+        setMirrorRadius(id, mirror.getRadius());
+        setMirrorCenter(id, mirror.getXc(), mirror.getYc());
 
-      for (int i = 0; i < n; i++) {
-        int id = setQbar(A, B, z1, z2, R, 0, Phi, c_PMT, c_SphericM);
-        setMirrorRadius(id, MirrR);
-        setMirrorCenter(id, MirrXc, MirrYc);
-        addExpansionVolume(id, c_Left, c_Prism, DzExp - Wflat, B / 2, B / 2 - YsizExp,
-                           0, 0, Wwidth);
-        setBBoxWindow(id, Wflat + filterThick + pmtWindow);
-        arrangePMT(id, c_Left, XsizPMT, YsizPMT, x0, y0);
-        Phi += Dphi;
+        const auto& prism = module.getPrism();
+        double prismLength = prism.getLength();
+        double prismFlat = prism.getFlatLength();
+        double prismExit = prism.getExitThickness();
+        double prismWidth = prism.getWidth();
+        addExpansionVolume(id, c_Left, c_Prism, prismLength - prismFlat,
+                           B / 2, B / 2 - prismExit, 0, 0, prismWidth);
+
+        double filter = prism.getFilterThickness();
+        const auto& pmtArray = geo->getPMTArray();
+        double pmtWindow = pmtArray.getPMT().getWinThickness();
+        setBBoxWindow(id, prismFlat + filter + pmtWindow);
+
+        double x0 = module.getPMTArrayDisplacement().getX();
+        double y0 = module.getPMTArrayDisplacement().getY();
+        arrangePMT(id, c_Left, pmtArray.getSizeX(), pmtArray.getSizeY(), x0, y0);
       }
 
       m_configured = TOPfinalize(0);

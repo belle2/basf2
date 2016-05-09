@@ -21,8 +21,9 @@
     <Thicknes2 desc="glue thicknes quartz-quartz" unit="mm">0.05</Thicknes2>
     <Thicknes3 desc="glue thicknes quartz-mirror section" unit="mm">0.05</Thicknes3>
   </Glue>
-
-  <Surface>
+  <BrokenJointFraction desr="fraction of broken prism glue joint">0</BrokenJointFraction>
+  
+  <Surface name="Quartz bar">
     <Properties>
       <Property name="REFLECTIVITY" unit="eV">
         <value energy="1.0">0.9994</value> 

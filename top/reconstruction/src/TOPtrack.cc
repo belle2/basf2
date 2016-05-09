@@ -57,7 +57,12 @@ namespace Belle2 {
       m_track = track;
 
       Const::EDetector myDetID = Const::EDetector::TOP;
-      int NumModules = TOPGeometryPar::Instance()->getNbars();
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      if (!geo) {
+        B2FATAL("TOPtrack::TOPtrack no geometry available");
+        return;
+      }
+      int numModules = geo->getNumModules();
       int pdgCode = abs(chargedStable.getPDGCode());
 
       RelationVector<ExtHit> extHits = track->getRelationsWith<ExtHit>();
@@ -65,7 +70,7 @@ namespace Belle2 {
         const ExtHit* extHit = extHits[i];
         if (abs(extHit->getPdgCode()) != pdgCode) continue;
         if (extHit->getDetectorID() != myDetID) continue;
-        if (extHit->getCopyID() == 0 || extHit->getCopyID() > NumModules) continue;
+        if (extHit->getCopyID() == 0 || extHit->getCopyID() > numModules) continue;
         if (extHit->getStatus() != EXT_ENTER) continue;
         m_extHit = extHit;
       }

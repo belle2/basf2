@@ -19,7 +19,6 @@
 #endif
 
 #include <framework/core/Module.h>
-#include <top/geometry/TOPGeometryPar.h>
 #include <string>
 #include <vector>
 #include "TH1F.h"
@@ -88,9 +87,6 @@ namespace Belle2 {
     double m_pValueCut;   /**< pValue cut */
     bool m_usePionID; /**< use pion ID in track selection */
 
-    // TOP geometry parameters
-    TOP::TOPGeometryPar* m_topgp;   /**< geometry parameters */
-
     // histograms
     TH1F* m_barHits = 0;  /**< number of hits per bar */
     std::vector<TH1F*> m_pixelHits; /**< number of hits per pixel for each bar */
@@ -102,6 +98,9 @@ namespace Belle2 {
     TH1F* m_recoPull = 0;           /**< pull distribution */
     TH2F* m_recoTimeDiff_Phic = 0;  /**< residuals vs phiCer */
     TProfile* m_recoPull_Phic = 0;  /**< pulls vs phiCer */
+
+    // other
+    int m_numModules = 0; /**< number of TOP modules */
 
   };
 

@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <top/geometry/TOPGeometryPar.h>
 #include <string>
 #include <TProfile.h>
 
@@ -82,9 +81,6 @@ namespace Belle2 {
     int m_calChannel; /**< calibration channel */
 
     TProfile* m_profile[c_NumModules][c_NumChannels]; /**< profile histograms */
-
-    /** geometry parameters */
-    TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance();
 
 
   };

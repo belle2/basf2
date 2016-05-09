@@ -19,9 +19,11 @@
 #include <G4ThreeVector.hh>
 #include <G4RotationMatrix.hh>
 
+#include <top/dbobjects/TOPGeometry.h>
 #include <top/geometry/TOPQbar.h>
 #include <top/geometry/FrontEndMapper.h>
 #include <top/geometry/ChannelMapper.h>
+
 #include <vector>
 
 namespace Belle2 {
@@ -603,6 +605,18 @@ namespace Belle2 {
         }
       }
 
+      /**
+       * sets a pointer to geometry object
+       * @param geo pointer to geometry object
+       */
+      void setGeometry(const TOPGeometry* geo) {m_geo = geo;}
+
+      /**
+       * Returns pointer to geometry object
+       * @return pointer to geometry object
+       */
+      const TOPGeometry* getGeometry() const {return m_geo;}
+
     private:
 
       /**
@@ -720,6 +734,7 @@ namespace Belle2 {
       GearDir m_alignment;            /**< GearDir of alignment */
       double m_unit = Unit::cm;       /**< conversion unit for length */
       bool m_initialized = false;     /**< true if Initialize() called */
+      const TOPGeometry* m_geo = 0;   /**< geometry parameters */
 
       static TOPGeometryPar* s_instance;  /**< Pointer to class instance */
 

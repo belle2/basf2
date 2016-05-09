@@ -73,7 +73,12 @@ namespace Belle2 {
       int status;
       moduleID--; // 0-based ID used in fortran
       pixelID--;   // 0-based ID used in fortran
-      float t = TOPGeometryPar::Instance()->getTime(TDC);
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      if (!geo) {
+        B2FATAL("TOPreco::addData: no geometry available");
+        return 0;
+      }
+      float t = geo->getNominalTDC().getTime(TDC);
       data_put_(&moduleID, &pixelID, &TDC, &t, &status);
       return status;
     }

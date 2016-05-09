@@ -10,9 +10,7 @@
 
 #pragma once
 
-#include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction/TOPf77fun.h>
-#include <cstring>
 
 extern "C" {void top_geo_dump_();}
 
@@ -388,12 +386,11 @@ namespace Belle2 {
 
     private:
       static bool m_configured; /**< set to true when done */
-      TOPGeometryPar* m_topgp;   /**< geometry parameters */
-      double m_R1;   /**< inner radius */
-      double m_R2;   /**< outer radius */
-      double m_Z1;   /**< backward z */
-      double m_Z2;   /**< forward z */
-      double m_timeRange; /**< time range of TDC */
+      double m_R1 = 0;   /**< inner radius */
+      double m_R2 = 0;   /**< outer radius */
+      double m_Z1 = 0;   /**< backward z */
+      double m_Z2 = 0;   /**< forward z */
+      double m_timeRange = 0; /**< time range of TDC */
 
     };
 

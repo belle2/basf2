@@ -9,6 +9,7 @@
  **************************************************************************/
 // Own include
 #include <top/modules/TOPDigitizer/TOPDigitizerModule.h>
+#include <top/geometry/TOPGeometryPar.h>
 #include <top/modules/TOPDigitizer/TimeDigitizer.h>
 
 #include <framework/core/ModuleManager.h>
@@ -29,7 +30,7 @@
 #include <framework/logging/Logger.h>
 
 // ROOT
-#include <TRandom3.h>
+#include <TRandom.h>
 
 #include <map>
 
@@ -50,9 +51,7 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPDigitizerModule::TOPDigitizerModule() : Module(),
-    m_bunchTimeSep(0),
-    m_topgp(TOPGeometryPar::Instance())
+  TOPDigitizerModule::TOPDigitizerModule() : Module()
   {
     // Set description()
     setDescription("Digitize TOPSimHits");
@@ -61,10 +60,6 @@ namespace Belle2 {
     // Add parameters
     addParam("timeZeroJitter", m_timeZeroJitter,
              "r.m.s of T0 jitter [ns]", 25e-3);
-    addParam("electronicJitter", m_electronicJitter,
-             "r.m.s of electronic jitter [ns]", 50e-3);
-    addParam("electronicEfficiency", m_electronicEfficiency,
-             "electronic efficiency", 1.0);
     addParam("darkNoise", m_darkNoise,
              "uniformly distributed dark noise (hits per module)", 0.0);
     addParam("trigT0Sigma", m_trigT0Sigma,
@@ -92,22 +87,25 @@ namespace Belle2 {
     StoreObjPtr<TOPRecBunch> recBunch;
     recBunch.registerInDataStore();
 
-    // store electronics jitter and efficiency to make it known to reconstruction
-    m_topgp->setELjitter(m_electronicJitter);
-    m_topgp->setELefficiency(m_electronicEfficiency);
+    // check if geometry is available
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+    if (!geo) {
+      B2FATAL("TOPDigitizer: no geometry available");
+      return;
+    }
+    geo->useBasf2Units();
 
-    // bunch separation in time
+    // set pile-up and double hit resolution times (needed for BG overlay)
+    TOPDigit::setDoubleHitResolution(geo->getNominalTDC().getDoubleHitResolution());
+    TOPDigit::setPileupTime(geo->getNominalTDC().getPileupTime());
+
+    // bunch time separation (TODO: get it from TOPNominalTDC)
     if (m_trigT0Sigma > 0) {
       GearDir superKEKB("/Detector/SuperKEKB/");
       double circumference = superKEKB.getLength("circumference");
       int numofBunches = superKEKB.getInt("numofBunches");
       m_bunchTimeSep = circumference / Const::speedOfLight / numofBunches;
     }
-
-    // set pile-up and double hit resolution times (needed for BG overlay)
-    TOPDigit::setDoubleHitResolution(m_topgp->getDoubleHitResolution());
-    TOPDigit::setPileupTime(m_topgp->getPileupTime());
-
   }
 
   void TOPDigitizerModule::beginRun()
@@ -128,7 +126,8 @@ namespace Belle2 {
     StoreObjPtr<TOPRecBunch> recBunch;
     if (!recBunch.isValid()) recBunch.create();
 
-    m_topgp->setBasfUnits();
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+    geo->useBasf2Units();
 
     // simulate trigger T0 accuracy in finding the right bunch crossing
     double trigT0 = 0;
@@ -147,19 +146,21 @@ namespace Belle2 {
     typedef std::map<unsigned, TimeDigitizer>::iterator Iterator;
 
     // add simulated hits
+    double electronicEfficiency = geo->getNominalTDC().getEfficiency();
+    const auto& tts = geo->getNominalTTS();
     for (const auto& simHit : simHits) {
       // simulate electronic efficiency
-      if (gRandom->Rndm() > m_electronicEfficiency) continue;
+      if (gRandom->Rndm() > electronicEfficiency) continue;
 
       // Do spatial digitization
       double x = simHit.getX();
       double y = simHit.getY();
       int pmtID = simHit.getPmtID();
-      int pixelID = m_topgp->getPixelID(x, y, pmtID);
+      int pixelID = geo->getPMTArray().getPixelID(x, y, pmtID);
       if (pixelID == 0) continue;
 
       // add TTS to photon time and make it relative to start time
-      double time = simHit.getTime() + generateTTS() - startTime;
+      double time = simHit.getTime() + tts.generateTTS() - startTime;
 
       // add time to digitizer of a given pixel
       TimeDigitizer digitizer(simHit.getModuleID(), pixelID);
@@ -170,11 +171,10 @@ namespace Belle2 {
 
     // add randomly distributed dark noise
     if (m_darkNoise > 0) {
-      int numModules = m_topgp->getNbars();
-      int numPixels = m_topgp->getNpmtx() * m_topgp->getNpmty() *
-                      m_topgp->getNpadx() * m_topgp->getNpady();
-      double timeMin = m_topgp->getTime(0);
-      double timeMax = m_topgp->getTime(m_topgp->TDCoverflow() - 1);
+      int numModules = geo->getNumModules();
+      int numPixels = geo->getPMTArray().getNumPixels();
+      double timeMin = geo->getNominalTDC().getTimeMin();
+      double timeMax = geo->getNominalTDC().getTimeMax();
       for (int moduleID = 1; moduleID <= numModules; moduleID++) {
         int numHits = gRandom->Poisson(m_darkNoise);
         for (int i = 0; i < numHits; i++) {
@@ -189,8 +189,9 @@ namespace Belle2 {
     }
 
     // digitize in time
+    double electronicJitter = geo->getNominalTDC().getTimeJitter();
     for (auto& pixel : pixels) {
-      pixel.second.digitize(digits, m_electronicJitter);
+      pixel.second.digitize(digits, electronicJitter);
     }
 
   }
@@ -204,19 +205,6 @@ namespace Belle2 {
   void TOPDigitizerModule::terminate()
   {
 
-  }
-
-  double TOPDigitizerModule::generateTTS()
-  {
-    double prob = gRandom->Rndm();
-    double s = 0;
-    for (int i = 0; i < m_topgp->getNgaussTTS(); i++) {
-      s = s + m_topgp->getTTSfrac(i);
-      if (prob < s) {
-        return gRandom->Gaus(m_topgp->getTTSmean(i), m_topgp->getTTSsigma(i));
-      }
-    }
-    return 0;
   }
 
 

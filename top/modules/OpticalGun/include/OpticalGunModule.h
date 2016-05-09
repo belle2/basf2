@@ -9,12 +9,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef OPTICALGUNMODULE_H
-#define OPTICALGUNMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
-#include <top/geometry/TOPGeometryPar.h>
 #include <TVector3.h>
 #include <TRotation.h>
 
@@ -74,31 +72,30 @@ namespace Belle2 {
   private:
 
     // steering parameters
-    double m_x;          /**< source position in x */
-    double m_y;          /**< source position in y */
-    double m_z;          /**< source position in z */
-    double m_diameter;   /**< source diameter */
-    double m_alpha;      /**< source emission angle [deg] */
-    double m_na;         /**< source numerical aperture */
-    double m_wavelength; /**< source wavelenght [nm] */
-    double m_phi;        /**< first rotation angle (around z) [deg] */
-    double m_theta;      /**< second rotation angle (around x) [deg] */
-    double m_psi;        /**< third rotation angle (around z) [deg] */
-    double m_startTime;  /**< start time */
-    double m_pulseWidth; /**< pulse duration (Gaussian sigma) */
-    double m_numPhotons; /**< average number of photons in a pulse */
-    int m_barID;         /**< TOP bar ID */
-    double m_slitDX;     /**< slit size in x */
-    double m_slitDY;     /**< slit size in y */
-    double m_slitX0;     /**< slit x-offset in respect to source */
-    double m_slitY0;     /**< slit y-offset in respect to source */
-    double m_slitZ;      /**< slit distance from source */
+    double m_x = 0;          /**< source position in x */
+    double m_y = 0;          /**< source position in y */
+    double m_z = 0;          /**< source position in z */
+    double m_diameter = 0;   /**< source diameter */
+    double m_alpha = 0;      /**< source emission angle [deg] */
+    double m_na = 0;         /**< source numerical aperture */
+    double m_wavelength = 0; /**< source wavelenght [nm] */
+    double m_phi = 0;        /**< first rotation angle (around z) [deg] */
+    double m_theta = 0;      /**< second rotation angle (around x) [deg] */
+    double m_psi = 0;        /**< third rotation angle (around z) [deg] */
+    double m_startTime = 0;  /**< start time */
+    double m_pulseWidth = 0; /**< pulse duration (Gaussian sigma) */
+    double m_numPhotons = 0; /**< average number of photons in a pulse */
+    int m_barID = 0;         /**< TOP bar ID */
+    double m_slitDX = 0;     /**< slit size in x */
+    double m_slitDY = 0;     /**< slit size in y */
+    double m_slitX0 = 0;     /**< slit x-offset in respect to source */
+    double m_slitY0 = 0;     /**< slit y-offset in respect to source */
+    double m_slitZ = 0;      /**< slit distance from source */
     std::string m_angularDistribution; /**< emission angular distribution */
 
     // others
-    double m_cosAlpha;   /**< cos(alpha) */
-    double m_energy;     /**< photon energy (from wavelength) */
-    TOP::TOPGeometryPar* m_topgp;   /**< geometry parameters of TOP */
+    double m_cosAlpha = 0;   /**< cos(alpha) */
+    double m_energy = 0;     /**< photon energy (from wavelength) */
 
     TVector3 m_translate;  /**< translation to Belle II frame */
     TRotation m_rotate;    /**< rotation to Belle II frame */
@@ -133,4 +130,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

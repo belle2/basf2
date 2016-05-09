@@ -19,7 +19,6 @@
 #include <top/dbobjects/TOPSampleTime.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPWaveform.h>
-#include <top/geometry/TOPGeometryPar.h>
 
 namespace Belle2 {
 
@@ -134,11 +133,8 @@ namespace Belle2 {
     /** map of (module, channel) and sample time calibration */
     std::map<unsigned, const TOPSampleTime*> m_sampleTimeMap;
     TOPSampleTime* m_sampleTime = 0; /**< default in case no calibration available */
-
-    TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance();  /**< geometry */
-
     unsigned m_falseWindows = 0; /**< false ASIC window count */
-
+    int m_sampleDivisions = 0; /**< number of sample divisions (from TDC subbits) */
   };
 
 } // Belle2 namespace

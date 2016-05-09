@@ -73,12 +73,15 @@ namespace Belle2 {
     StoreArray<RawTOP> rawData(m_outputRawDataName);
     rawData.registerInDataStore();
 
-    if (!m_topgp->isInitialized()) {
-      GearDir content("/Detector/DetectorComponent[@name='TOP']/Content");
-      m_topgp->Initialize(content);
+    // check if geometry is available
+    const auto* geo = m_topgp->getGeometry();
+    if (!geo) {
+      B2ERROR("No geometry available");
+      return;
     }
-    if (!m_topgp->isInitialized()) B2ERROR("Component TOP not found in Gearbox");
+    geo->useBasf2Units();
 
+    // check if front end mappings are available
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
     if (mapSize == 0) B2ERROR("No front-end mapping available for TOP");

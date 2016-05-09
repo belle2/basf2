@@ -45,9 +45,7 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPUnpackerModule::TOPUnpackerModule() : Module(),
-    m_topgp(TOPGeometryPar::Instance())
-
+  TOPUnpackerModule::TOPUnpackerModule() : Module()
   {
     // set module description
     setDescription("Raw data unpacker for TOP");
@@ -79,12 +77,15 @@ namespace Belle2 {
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.registerInDataStore(DataStore::c_DontWriteOut);
 
-    if (!m_topgp->isInitialized()) {
-      GearDir content("/Detector/DetectorComponent[@name='TOP']/Content");
-      m_topgp->Initialize(content);
+    // check if geometry is available
+    const auto* geo = m_topgp->getGeometry();
+    if (!geo) {
+      B2ERROR("No geometry available");
+      return;
     }
-    if (!m_topgp->isInitialized()) B2ERROR("Component TOP not found in Gearbox");
+    geo->useBasf2Units();
 
+    // check if front end mappings are available
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
     if (mapSize == 0) B2ERROR("No front-end mapping available for TOP");
@@ -141,6 +142,12 @@ namespace Belle2 {
     int boardstack = feemap->getBoardstackNumber();
     const auto& mapper = m_topgp->getChannelMapper();
 
+    const auto* geo = m_topgp->getGeometry();
+    if (!geo) {
+      B2ERROR("TOPUnpacker: no geometry of TOP available");
+      return;
+    }
+
     unsigned version = (buffer[0] >> 16) & 0xFF;
     switch (version) {
       case 0:
@@ -151,7 +158,7 @@ namespace Belle2 {
           unsigned flags = (word >> 24) & 0xFF;
           int pixelID = mapper.getPixelID(chan);
           auto* digit = digits.appendNew(moduleID, pixelID, tdc);
-          digit->setTime(m_topgp->getTime(tdc));
+          digit->setTime(geo->getNominalTDC().getTime(tdc));
           digit->setChannel(chan);
           digit->setHitQuality((TOPDigit::EHitQuality) flags);
         }

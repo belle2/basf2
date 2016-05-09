@@ -168,7 +168,7 @@ namespace Belle2 {
     std::string m_inputRawDataName;  /**< name of RawTOP store array */
     std::string m_outputDigitsName;  /**< name of TOPDigit store array */
     std::string m_outputWaveformsName;  /**< name of TOPRawWaveform store array */
-    TOP::TOPGeometryPar* m_topgp;  /**< geometry parameters */
+    TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance(); /**< geometry param */
 
   };
 

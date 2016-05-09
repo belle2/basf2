@@ -10,7 +10,7 @@
 
 // Own include
 #include <top/modules/TOPWFMerger/TOPWFMergerModule.h>
-
+#include <top/geometry/TOPGeometryPar.h>
 #include <framework/core/ModuleManager.h>
 
 // framework - DataStore
@@ -35,6 +35,8 @@
 using namespace std;
 
 namespace Belle2 {
+
+  using namespace TOP;
 
   //-----------------------------------------------------------------
   //                 Register module
@@ -105,8 +107,17 @@ namespace Belle2 {
     if (m_fraction >= 1) B2ERROR("TOPWFMerger: fraction must be less that 1");
     if (m_fraction <= 0) B2ERROR("TOPWFMerger: fraction must be greater that 0");
 
+    // check if geometry is available
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+    if (!geo) {
+      B2FATAL("TOPWFMerger: no geometry available");
+      return;
+    }
+    geo->useBasf2Units();
+
     // default sample times in case calibration is not available
-    m_sampleTime = new TOPSampleTime(0, 0, m_topgp->getSyncTimeBase());
+    m_sampleTime = new TOPSampleTime(0, 0, geo->getNominalTDC().getSyncTimeBase());
+    m_sampleDivisions = (0x1 << geo->getNominalTDC().getSubBits());
 
   }
 
@@ -201,7 +212,6 @@ namespace Belle2 {
       t0 = timeZero->getTime();
     }
 
-    int sampleDivisions = (0x1 << m_topgp->getSubBits());
     StoreArray<TOPDigit> digits;
     for (auto& waveform : waveforms) {
       int nDig = waveform.setDigital(m_threshold,
@@ -227,7 +237,7 @@ namespace Belle2 {
       }
       const auto& hits = waveform.getHits();
       for (const auto& hit : hits) {
-        int tdc = int(hit.time * sampleDivisions);
+        int tdc = int(hit.time * m_sampleDivisions);
         float time = sampleTime->getTimeDifference(firstWindow, hit.time);
         auto* digit = digits.appendNew(moduleID, pixelID, tdc);
         digit->setTime(time + t0);

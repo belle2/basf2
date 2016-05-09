@@ -11,7 +11,7 @@
 
 // Own include
 #include <top/modules/OpticalGun/OpticalGunModule.h>
-
+#include <top/geometry/TOPGeometryPar.h>
 #include <framework/core/ModuleManager.h>
 
 // framework - DataStore
@@ -36,6 +36,8 @@ using namespace std;
 
 namespace Belle2 {
 
+  using namespace TOP;
+
   //-----------------------------------------------------------------
   //                 Register module
   //-----------------------------------------------------------------
@@ -46,8 +48,7 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  OpticalGunModule::OpticalGunModule() : Module(),
-    m_cosAlpha(0), m_energy(0), m_topgp(TOP::TOPGeometryPar::Instance())
+  OpticalGunModule::OpticalGunModule() : Module()
   {
     // set module description
     setDescription("Source of optical photons");
@@ -107,16 +108,22 @@ namespace Belle2 {
     double barZ0 = 0;
     double barPhi = 0;
     if (m_barID != 0) {
-      int Nbars = m_topgp->getNbars();
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      if (!geo) {
+        B2FATAL("OpticalGun: no geometry of TOP available");
+        return;
+      }
+      geo->useBasf2Units();
+
+      int Nbars = geo->getNumModules();
       if (Nbars == 0) B2ERROR("TOP bars are not defined");
       if (m_barID < 0 || m_barID > Nbars) {
         B2ERROR("barID = " << m_barID << " : not a valid ID");
         m_barID = 0;
       } else {
-        m_topgp->setBasfUnits();
-        barY0 = m_topgp->getRadius() + m_topgp->getQthickness() / 2.0;
-        barZ0 = (m_topgp->getZ1() + m_topgp->getZ2()) / 2.0;
-        barPhi = m_topgp->getPhi0() - 0.5 * M_PI + 2.0 * M_PI / Nbars * (m_barID - 1);
+        barY0 = geo->getModule(m_barID).getRadius();
+        barZ0 = geo->getModule(m_barID).getZc();
+        barPhi = geo->getModule(m_barID).getPhi() - M_PI / 2;
       }
     }
     m_translate.SetXYZ(m_x, m_y + barY0, m_z + barZ0);

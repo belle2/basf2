@@ -4,6 +4,7 @@
 #include <map>
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+//#include <framework/datastore/SelectSubset.h>
 #include <topcaf/dataobjects/TOPCAFDigit.h>
 #include "TH1D.h"
 #include "TH2F.h"
@@ -26,7 +27,7 @@ namespace Belle2 {
     double m_tmin, m_tmax;
     double m_wmin, m_wmax;
     double m_adcmin, m_adcmax;
-
+    //  SelectSubset<TOPCAFDigit> m_selector;
   };
 
 }

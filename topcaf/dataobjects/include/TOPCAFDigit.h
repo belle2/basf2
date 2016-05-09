@@ -35,6 +35,19 @@ namespace Belle2 {
     double GetWidth() const {return m_width;}
     double GetADCHeight() const {return m_adc_height;}
 
+    double GetRefTime() const {return m_ref_time;}
+    int GetRefT1() const {return m_ref_T1;}
+    int GetRefMaxBin() const {return m_ref_max_bin;}
+    double GetRefA1() const {return m_ref_A1;}
+    double GetRefA2() const {return m_ref_A2;}
+    double GetRefAmplitude() const {return m_ref_amp;}
+
+
+    int GetCrossT1() const {return m_cross_T1;}
+    int GetMaxBin() const {return m_max_bin;}
+    double GetCrossA1() const {return m_cross_A1;}
+    double GetCrossA2() const {return m_cross_A2;}
+
     // Extra stuff not in the raw packet //
     double GetTime() const {return m_time;}
     int GetTimeBin() const {return m_tdc_bin;}
@@ -55,6 +68,28 @@ namespace Belle2 {
     void SetFlag(int flag) {m_flag = flag;}
     void SetCorrTime(double time) {m_corr_time = time;}
     void SetBoardstack(double bs) {m_boardstack = bs;}
+    //void SetAdcVal(int ibin, int val) {m_adc_values[ibin] = val;}
+    //void SetTdcVal(int ibin, int val) {m_tdc_values[ibin] = val;}
+    void SetID(int id) {m_id = id;}
+    void SetIntBefore(double int_before) {m_int_before = int_before;}
+    void SetIntAfter(double int_after) {m_int_after = int_after;}
+    void SetRisetime(double risetime) {m_risetime = risetime;}
+    void SetFalltime(double falltime) {m_falltime = falltime;}
+    void SetPedRMS(double ped_rms) {m_ped_rms = ped_rms;}
+    void SetRefTime(double ref_time) {m_ref_time = ref_time;}
+    void SetRefT1(int ref_t1) {m_ref_T1 = ref_t1;}
+    //void SetRefT2(double ref_t2) {m_ref_T2 = ref_t2;}
+    void SetRefA1(double ref_a1) {m_ref_A1 = ref_a1;}
+    void SetRefA2(double ref_a2) {m_ref_A2 = ref_a2;}
+
+    void SetCrossT1(int cross_t1) {m_cross_T1 = cross_t1;}
+    //    void SetCrossT2(double cross_t2) {m_cross_T2 = cross_t2;}
+    void SetCrossA1(double cross_a1) {m_cross_A1 = cross_a1;}
+    void SetCrossA2(double cross_a2) {m_cross_A2 = cross_a2;}
+    void SetRefAmplitude(double ref_amp) {m_ref_amp = ref_amp;}
+    void SetMaxBin(int max_bin) {m_max_bin = max_bin;}
+    void SetRefMaxBin(int ref_max_bin) {m_ref_max_bin = ref_max_bin;}
+
 
   private:
     topcaf_channel_id_t m_channel_id;
@@ -83,8 +118,31 @@ namespace Belle2 {
     double m_boardstack;
     int m_flag;
     double m_q;
+    //int m_adc_values[128];
+    //int m_tdc_values[128];
+    int m_id;
+    double m_int_before;
+    double m_int_after;
+    double m_risetime;
+    double m_falltime;
+    double m_ped_rms;
+    double m_ref_time;
+    double m_ref_amp;
+    int m_ref_max_bin;
+    int m_ref_T1;
+    double m_ref_A1;
+    double m_ref_A2;
+    int m_cross_T1;
+    double m_cross_A1;
+    double m_cross_A2;
+    int m_max_bin;
+
+
 
     ClassDef(TOPCAFDigit, 1);
   };
 }
 #endif
+
+/*  LocalWords:  SetRefT
+ */

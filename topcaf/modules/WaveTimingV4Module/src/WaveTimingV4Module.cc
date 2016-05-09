@@ -97,7 +97,7 @@ void WaveTimingV4Module::event()
         TH1D m_tmp_h("m_tmp_h", "m_tmp_h", (int)v_samples.size(), 0., (double)v_samples.size());
         //TH1D m_tmp_h_n("m_tmp_h_n", "m_tmp_h_n", (int)v_samples.size(), 0., (double)v_samples.size());
         //  cout <<"sample size: " <<  v_samples.size() << endl;
-        for (size_t s = 0; s < v_samples.size(); s++) {
+        for (unsigned int s = 0; s < v_samples.size(); s++) {
           m_tmp_h.SetBinContent(s, v_samples.at(s));
           //m_tmp_h_n.SetBinContent(s, -1.*v_samples.at(s));
         }
@@ -146,10 +146,18 @@ void WaveTimingV4Module::event()
             while ((v_samples.at(d) > ypos[c]*m_frac) && (d > 0)) {
               d--;
             }
+            while ((v_samples.at(d10) > ypos[c] * 0.1) && (d10 > 0)) {
+              d10--;
+            }
+            while ((v_samples.at(d90) > ypos[c] * 0.9) && (d90 > 0)) {
+              d90--;
+            }
+
             int x1 = xpos[c] - 2 * (xpos[c] - d);
             if (x1 <= 1) {
               x1 = 1;
             }
+
             //cout << "ristime" << endl;
 
             double first = v_samples.at(d);
@@ -215,6 +223,7 @@ void WaveTimingV4Module::event()
             if (x2 >= (sampleSize - 1)) {
               x2 = sampleSize - 1;
             }
+
             //90% time
             first = v_samples.at(d90);
             second = v_samples.at(d90 - 1);
@@ -231,7 +240,7 @@ void WaveTimingV4Module::event()
             if ((d10 + 1) == sampleSize) {
               cross10 = d10;
             }
-            hit.falltime = cross10 - cross90;
+            hit.falltime = cross90 - cross10;
 
 
             hit.width = backTime - frontTime;
@@ -317,7 +326,9 @@ void WaveTimingV4Module::event()
           double d_min = d_peak - 80;
           int dbl_count(0);
           if (d_min < 1) d_min = 1; //Handle exception
-          for (int d = d_peak - 15; d > d_min; d--) {
+          int d_minus15 = d_peak - 15;
+          if (d_minus15 < 1) d_minus15 = 1; // Handle exception
+          for (int d = d_minus15; d > d_min; d--) {
             if (v_samples.at(d) < m_thresh_n) dbl_count++;
           }
           if (dbl_count < 1) d_max = 0;
@@ -366,13 +377,65 @@ void WaveTimingV4Module::event()
 
             hits.push_back(hit);
           }
+          //else no peak found
+
+          /*
+          for (int c = 0; c < search_peaks_found_n; c++) {
+            if (ypos_n[c] > m_thresh_n) {
+          peaks_found++;
+          hit.adc_height = -1*ypos_n[c];
+          unsigned int d = (xpos_n[c] + 0.5); // First measure front edge.
+          while ( (-1.*(v_samples.at(d)) > ypos_n[c]*m_frac) && (d > 0)) {
+          d--;
+          }
+
+          double first = -1.*v_samples.at(d);
+          double second = -1.*v_samples.at(d + 1);
+          double dV = second - first;
+          double frontTime = (d + ((ypos_n[c] * m_frac) - first) / dV);
+          if (d == 0) {
+          frontTime = 0.;
+          }
+          //hit.tdc_bin = frontTime;
+
+          d = (xpos[c] + 0.5); // Now measure back edge.
+          while (((d + 1) < v_samples.size()) && (-1.*(v_samples.at(d)) > (ypos_n[c]*m_frac)) ) {
+          d++;
+          }
+          first = -1.*v_samples.at(d);
+          second = -1.*v_samples.at(d - 1);
+          dV = second - first;
+          double backTime = (d - ((ypos_n[c] * m_frac) - first) / dV);
+          if ((d + 1) == v_samples.size()) {
+          backTime = d;
+          }
+
+          //For negative pulse, use the back edge for our timing point
+          hit.tdc_bin = backTime;
+
+          hit.width = backTime - frontTime;
+          hit.chi2 = 0.;
+          hit.q=0.;
+
+          hits.push_back(hit);
+
+          B2DEBUG(1, hardwareID << " negative peak found (" << xpos_n[c] << "," << ypos_n[c] << ")\twidth: " << hit.width << "\ttdc: " << hit.tdc_bin <<
+          "\tfrontTime: " << frontTime << "\tbackTime: " << backTime);
+            }
+
+          }
+          */
         }
+
         //      B2DEBUG(1,peaks_found<<" peaks found.");
 
         evtwaves_ptr[w]->SetHits(hits);
         B2DEBUG(1, hits.size() << " peaks found, " << evtwaves_ptr[w]->GetHits().size() << " made it");
+
+
         //Create topcafDIGITs
         for (size_t c = 0; c < hits.size(); c++) {
+
           if (m_isSkim) { // I want to create a skim file
             // calpulse or reasonable photon candidate
             if (hits[c].adc_height < -200 || (hits[c].q > 400 && hits[c].width > 3 && hits[c].width < 8)) {
@@ -429,7 +492,10 @@ void WaveTimingV4Module::event()
         }
       }
     }//End loop
+
   }
+
+
 }
 
 void WaveTimingV4Module::terminate()

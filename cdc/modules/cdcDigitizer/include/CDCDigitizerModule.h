@@ -118,7 +118,7 @@ namespace Belle2 {
     //    unsigned short m_tdcOffset; /**< Offset of TDC count (in ns)*/
     double m_trigTimeJitter;   /**< Magnitude of trigger timing jitter (ns). */
 
-    CDC::CDCGeometryPar* m_cdcp;  /**< Pointer to CDCGeometryPar */
+    CDC::CDCGeometryPar* m_cdcgp;  /**< Pointer to CDCGeometryPar */
     CDCSimHit* m_aCDCSimHit;    /**< Pointer to CDCSimHit */
     WireID m_wireID;            /**< WireID of this hit */
     unsigned short m_posFlag;   /**< left or right flag of this hit */

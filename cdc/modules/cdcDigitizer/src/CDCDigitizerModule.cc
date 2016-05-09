@@ -31,8 +31,7 @@ using namespace CDC;
 // register module
 REG_MODULE(CDCDigitizer)
 CDCDigitizerModule::CDCDigitizerModule() : Module(),
-//  m_tdcOffset(0.0), m_cdcp(), m_aCDCSimHit(), m_posFlag(0),
-  m_cdcp(), m_aCDCSimHit(), m_posFlag(0),
+  m_cdcgp(), m_aCDCSimHit(), m_posFlag(0),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
   m_tdcBinWidth(1.0), m_tdcBinWidthInv(1.0),
   m_tdcResol(0.2887), m_driftV(4.0e-3),
@@ -127,18 +126,17 @@ void CDCDigitizerModule::initialize()
   cdcSimHits.registerRelationTo(cdcHits4Trg);
   mcParticles.registerRelationTo(cdcHits4Trg);
 
-  m_cdcp = &(CDCGeometryPar::Instance());
-  CDCGeometryPar& cdcp = *m_cdcp;
-  //  m_tdcOffset    = cdcp.getTdcOffset();
-  m_tdcBinWidth  = cdcp.getTdcBinWidth();
+  m_cdcgp = &(CDCGeometryPar::Instance());
+  CDCGeometryPar& cdcgp = *m_cdcgp;
+  m_tdcBinWidth  = cdcgp.getTdcBinWidth();
   m_tdcBinWidthInv = 1. / m_tdcBinWidth;
   m_tdcResol     = m_tdcBinWidth / sqrt(12.);
-  m_driftV       = cdcp.getNominalDriftV();
+  m_driftV       = cdcgp.getNominalDriftV();
   m_driftVInv    = 1. / m_driftV;
-  m_propSpeedInv = 1. / cdcp.getNominalPropSpeed();
+  m_propSpeedInv = 1. / cdcgp.getNominalPropSpeed();
   /*
       m_fraction = 1.0;
-      m_resolution1 = cdcp.getNominalSpaceResol();
+      m_resolution1 = cdcgp.getNominalSpaceResol();
       m_resolution2 = 0.;
       m_mean1 = 0.;
       m_mean2 = 0.;
@@ -216,11 +214,11 @@ void CDCDigitizerModule::event()
     //basically misalign flag should be always on since on/off is controlled by the input misalignment.xml file itself.
     m_misalign = true;
 
-    TVector3 bwpMisalign = m_cdcp->wireBackwardPosition(m_wireID, CDCGeometryPar::c_Misaligned);
-    TVector3 fwpMisalign = m_cdcp->wireForwardPosition(m_wireID, CDCGeometryPar::c_Misaligned);
+    TVector3 bwpMisalign = m_cdcgp->wireBackwardPosition(m_wireID, CDCGeometryPar::c_Misaligned);
+    TVector3 fwpMisalign = m_cdcgp->wireForwardPosition(m_wireID, CDCGeometryPar::c_Misaligned);
 
-    TVector3 bwp = m_cdcp->wireBackwardPosition(m_wireID);
-    TVector3 fwp = m_cdcp->wireForwardPosition(m_wireID);
+    TVector3 bwp = m_cdcgp->wireBackwardPosition(m_wireID);
+    TVector3 fwp = m_cdcgp->wireForwardPosition(m_wireID);
 
     //skip correction for wire-position misalignment if unnecessary
     if ((bwpMisalign - bwp).Mag() == 0. && (fwpMisalign - fwp).Mag() == 0.) m_misalign = false;
@@ -241,7 +239,7 @@ void CDCDigitizerModule::event()
         CDCGeometryPar::EWirePosition set = CDCGeometryPar::c_Misaligned;
         const int layerID = m_wireID.getICLayer();
         const int  wireID = m_wireID.getIWire();
-        m_cdcp->getWireSagEffect(set, layerID, wireID, zpos, bckYSag, forYSag);
+        m_cdcgp->getWireSagEffect(set, layerID, wireID, zpos, bckYSag, forYSag);
         bwp.SetY(bckYSag);
         fwp.SetY(forYSag);
       }
@@ -252,7 +250,7 @@ void CDCDigitizerModule::event()
       TVector3 posTrack = m_posTrack;
       TVector3 posWire = m_posWire;
 
-      m_driftLength = m_cdcp->ClosestApproach(bwp, fwp, posIn, posOut, posTrack, posWire);
+      m_driftLength = m_cdcgp->ClosestApproach(bwp, fwp, posIn, posOut, posTrack, posWire);
       //      std::cout << "base-dl, sag-dl, diff= " << m_aCDCSimHit->getDriftLength() <<" "<< m_driftLength <<" "<< m_driftLength - m_aCDCSimHit->getDriftLength() << std::endl;
       m_posTrack = posTrack;
       m_posWire  = posWire;
@@ -261,7 +259,7 @@ void CDCDigitizerModule::event()
       //      double deltaTime = (posTrack - m_posTrack).Mag() / speed;
       m_flightTime += deltaTime;
       m_globalTime += deltaTime;
-      m_posFlag = m_cdcp->getNewLeftRightRaw(m_posWire, m_posTrack, m_momentum);
+      m_posFlag = m_cdcgp->getNewLeftRightRaw(m_posWire, m_posTrack, m_momentum);
     }
 
     // Hit phys. info
@@ -358,8 +356,8 @@ void CDCDigitizerModule::event()
 
     //add time-walk (here for simplicity)
     unsigned short adcCount = getADCCount(iterSignalMap->second.m_charge);
-    iterSignalMap->second.m_driftTime += m_cdcp->getTimeWalk(iterSignalMap->first,
-                                                             adcCount);
+    iterSignalMap->second.m_driftTime += m_cdcgp->getTimeWalk(iterSignalMap->first,
+                                                              adcCount);
 
     //remove negative drift time (TDC) upon request
     if (!m_outputNegativeDriftTime &&
@@ -368,14 +366,14 @@ void CDCDigitizerModule::event()
     }
 
     //N.B. No bias (+ or -0.5 count) is introduced on average in digitization by the real TDC (info. from KEK electronics division). So round off (t0 - drifttime) below.
-    unsigned short tdcCount = static_cast<unsigned short>((m_cdcp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime) *
+    unsigned short tdcCount = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime) *
                                                           m_tdcBinWidthInv + 0.5);
     //    //set tdcCount2ndHit = tdcCount
     //    cdcHits.appendNew(tdcCount, getADCCount(iterSignalMap->second.m_charge), iterSignalMap->first, tdcCount);
     //set tdcCount2ndHit = default value
     cdcHits.appendNew(tdcCount, adcCount, iterSignalMap->first);
 
-    //    std::cout <<"t0= " << m_cdcp->getT0(iterSignalMap->first) << std::endl;
+    //    std::cout <<"t0= " << m_cdcgp->getT0(iterSignalMap->first) << std::endl;
     /*    unsigned short tdcInCommonStop = static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv);
     float driftTimeFromTDC = static_cast<float>(m_tdcOffset - (tdcInCommonStop + 0.5)) * m_tdcBinWidth;
     std::cout <<"driftT bf digitization, TDC in common stop, digitized driftT = " << iterSignalMap->second.m_driftTime <<" "<< tdcInCommonStop <<" "<< driftTimeFromTDC << std::endl;
@@ -406,7 +404,7 @@ void CDCDigitizerModule::event()
   for (iterSignalMapTrg = signalMapTrg.begin(); iterSignalMapTrg != signalMapTrg.end(); ++iterSignalMapTrg) {
     unsigned short adcCount = getADCCount(iterSignalMapTrg->second.m_charge);
     unsigned short tdcCount =
-      static_cast<unsigned short>((m_cdcp->getT0(iterSignalMapTrg->first.first) -
+      static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMapTrg->first.first) -
                                    iterSignalMapTrg->second.m_driftTime) * m_tdcBinWidthInv + 0.5);
     const CDCHit* cdcHit = cdcHits4Trg.appendNew(tdcCount, adcCount, iterSignalMapTrg->first.first);
 
@@ -437,7 +435,7 @@ float CDCDigitizerModule::smearDriftLength(const float driftLength, const float 
       resolution = m_resolution2;
     }
   } else {
-    resolution = m_cdcp->getSigma(driftLength, m_wireID.getICLayer());
+    resolution = m_cdcgp->getSigma(driftLength, m_wireID.getICLayer());
   }
 
   //subtract resol. due to digitization, which'll be added later in the digitization
@@ -474,10 +472,10 @@ float CDCDigitizerModule::getdDdt(const float driftL)
   if (!m_useSimpleDigitization) {
     const unsigned short layer = m_wireID.getICLayer();
     const unsigned short leftRight = m_posFlag;
-    double alpha = m_cdcp->getAlpha(m_posWire, m_momentum);
-    double theta = m_cdcp->getTheta(m_momentum);
-    double t = m_cdcp->getDriftTime(driftL, layer, leftRight, alpha, theta);
-    dDdt = m_cdcp->getDriftV(t, layer, leftRight, alpha, theta);
+    double alpha = m_cdcgp->getAlpha(m_posWire, m_momentum);
+    double theta = m_cdcgp->getTheta(m_momentum);
+    double t = m_cdcgp->getDriftTime(driftL, layer, leftRight, alpha, theta);
+    dDdt = m_cdcgp->getDriftV(t, layer, leftRight, alpha, theta);
 
 #if defined(CDC_DEBUG)
     cout << " " << endl;
@@ -488,7 +486,7 @@ float CDCDigitizerModule::getdDdt(const float driftL)
       int lr = 0;
       for (int i = 0; i < 1000; ++i) {
         t = 1.0 * i;
-        double d = m_cdcp->getDriftLength(t, layer, lr, alpha, theta);
+        double d = m_cdcgp->getDriftLength(t, layer, lr, alpha, theta);
         cout << t << " " << d << endl;
       }
 
@@ -497,7 +495,7 @@ float CDCDigitizerModule::getdDdt(const float driftL)
       lr = 1;
       for (int i = 0; i < 100; ++i) {
         t = 5 * i;
-        double d = m_cdcp->getDriftLength(t, layer, lr, alpha, theta);
+        double d = m_cdcgp->getDriftLength(t, layer, lr, alpha, theta);
         cout << t << " " << d << endl;
       }
       exit(-1);
@@ -531,9 +529,9 @@ float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTo
   } else {
     const unsigned short layer = m_wireID.getICLayer();
     const unsigned short leftRight = m_posFlag;
-    double alpha = m_cdcp->getAlpha(m_posWire, m_momentum);
-    double theta = m_cdcp->getTheta(m_momentum);
-    driftT = m_cdcp->getDriftTime(driftLength, layer, leftRight, alpha, theta);
+    double alpha = m_cdcgp->getAlpha(m_posWire, m_momentum);
+    double theta = m_cdcgp->getTheta(m_momentum);
+    driftT = m_cdcgp->getDriftTime(driftLength, layer, leftRight, alpha, theta);
     //    std::cout <<"alpha,theta,driftT= " << alpha <<" "<< theta <<" "<< driftT << std::endl;
   }
 
@@ -544,7 +542,7 @@ float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTo
   if (addDelay) {
     //calculate signal propagation length in the wire
     CDCGeometryPar::EWirePosition set = m_misalign ? CDCGeometryPar::c_Misaligned : CDCGeometryPar::c_Base;
-    TVector3 backWirePos = m_cdcp->wireBackwardPosition(m_wireID, set);
+    TVector3 backWirePos = m_cdcgp->wireBackwardPosition(m_wireID, set);
 
     double propLength = (m_posWire - backWirePos).Mag();
     B2DEBUG(250, "Propagation in wire length: " << propLength);
@@ -557,9 +555,9 @@ float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTo
 #endif
     } else {
       const unsigned short layer = m_wireID.getICLayer();
-      driftT += (propLength / Unit::cm) * m_cdcp->getPropSpeedInv(layer);
+      driftT += (propLength / Unit::cm) * m_cdcgp->getPropSpeedInv(layer);
 #if defined(CDC_DEBUG)
-      cout << "layer,pseedinv= " << layer << " " << m_cdcp->getPropSpeedInv(layer) << endl;
+      cout << "layer,pseedinv= " << layer << " " << m_cdcgp->getPropSpeedInv(layer) << endl;
 #endif
     }
   }

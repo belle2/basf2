@@ -27,6 +27,7 @@ namespace Belle2 {
     StoreArray<TOPCAFDigit>  m_topcafdigits_ptr;
     double m_time2tdc;
     bool m_dTcalib;
+    bool m_isSkim;
   };
 
 }

@@ -10,6 +10,7 @@
 #include "TSpectrum.h"
 #include <cmath>
 #include <iostream>
+#include "TMath.h"
 
 using namespace Belle2;
 using namespace std;
@@ -28,6 +29,8 @@ WaveTimingV4Module::WaveTimingV4Module() : Module()
   addParam("threshold_n", m_thresh_n, "Negative threshold for Tsukuba calpulse peak search", -1000.);
   addParam("fraction", m_frac, "Fraction of peak height to use for hit timing parameters [0,1]", 0.5);
   addParam("dTcalib", m_dTcalib, "Apply dT calibration.  Data must be in topcaf/data/ directory.", false);
+  addParam("isSkim", m_isSkim, "Create a Skim file", false);
+
 }
 
 
@@ -69,11 +72,13 @@ void WaveTimingV4Module::event()
   // if (evtheader_ptr) {
   //   ftsw = evtheader_ptr->GetFTSW();
   // }
+  //  TF1 *gaussfit = new TF1("gaussfit", "[0]*TMath::Exp(-(x-[1])*(x-[1])/([2]*[2]))", 0., 2000.);
+  //  TF1 *gaussfit = new TF1("gaussfit", "[0]*x", 0., 2000., 3);
 
-  TSpectrum spec(max_peaks);
+  TSpectrum spec(200);
   //TSpectrum spec_n(max_peaks);
   if (evtwaves_ptr) {
-
+    cout << "entries: " << evtwaves_ptr.getEntries() << endl;
     //Look over all waveforms
     for (int w = 0; w < evtwaves_ptr.getEntries(); w++) {
 
@@ -84,18 +89,20 @@ void WaveTimingV4Module::event()
       int asicch = evtwaves_ptr[w]->GetASICChannel();
       //double win_time_shift = evtwaves_ptr[w]->GetTime();
       vector<double> v_samples = evtwaves_ptr[w]->GetSamples();
+      int sampleSize = v_samples.size(); // to avoid warnings on signed/unsigend comparisons
+
       if (v_samples.size() > 0) {
 
         //Find rough peak locations
         TH1D m_tmp_h("m_tmp_h", "m_tmp_h", (int)v_samples.size(), 0., (double)v_samples.size());
         //TH1D m_tmp_h_n("m_tmp_h_n", "m_tmp_h_n", (int)v_samples.size(), 0., (double)v_samples.size());
-
+        //  cout <<"sample size: " <<  v_samples.size() << endl;
         for (size_t s = 0; s < v_samples.size(); s++) {
           m_tmp_h.SetBinContent(s, v_samples.at(s));
           //m_tmp_h_n.SetBinContent(s, -1.*v_samples.at(s));
         }
         //      m_tmp_h->Smooth(2);
-        int search_peaks_found = spec.Search(&m_tmp_h, m_sigma, "nodraw", 0.05);
+        int search_peaks_found = spec.Search(&m_tmp_h, m_sigma, "nodraw", 0.2);
         double* xpos = spec.GetPositionX();
         double* ypos = spec.GetPositionY();
         //int search_peaks_found_n = spec_n.Search(&m_tmp_h_n, m_sigma, "nodraw", 0.05);
@@ -128,16 +135,23 @@ void WaveTimingV4Module::event()
         int peaks_found = 0;
         for (int c = 0; c < search_peaks_found; c++) {
           if (ypos[c] > m_thresh) {
+
             peaks_found++;
             hit.adc_height = ypos[c];
-            unsigned int d = (xpos[c] + 0.5); // First measure front edge.
+            int d = (xpos[c] + 0.5); // First measure front edge.
+            int d10 = (xpos[c] + 0.5); // First measure front edge.
+            int d90 = (xpos[c] + 0.5); // First measure front edge.
+
+
             while ((v_samples.at(d) > ypos[c]*m_frac) && (d > 0)) {
               d--;
             }
-            unsigned int x1 = xpos[c] - 2 * (xpos[c] - d);
+            int x1 = xpos[c] - 2 * (xpos[c] - d);
             if (x1 <= 1) {
               x1 = 1;
             }
+            //cout << "ristime" << endl;
+
             double first = v_samples.at(d);
             double second = v_samples.at(d + 1);
             double dV = second - first;
@@ -145,49 +159,137 @@ void WaveTimingV4Module::event()
             if (d == 0) {
               frontTime = 0.;
             }
-            hit.tdc_bin = frontTime;
 
+            //90% time
+            first = v_samples.at(d90);
+            second = v_samples.at(d90 + 1);
+            dV = second - first;
+            double cross90 = (d90 + ((ypos[c] * 0.9) - first) / dV);
+            if ((d90) == 0) {
+              cross90 = d90;
+            }
+
+            //10% time
+            first = v_samples.at(d10);
+            second = v_samples.at(d10 + 1);
+            dV = second - first;
+            double cross10 = (d10 + ((ypos[c] * 0.1) - first) / dV);
+            if ((d10) == 0) {
+              cross10 = d10;
+            }
+            hit.risetime = cross90 - cross10;
+
+            hit.tdc_bin = frontTime;
+            hit.max_bin = xpos[c];
+            hit.cross_T1 = d;
+            hit.cross_A1 = first;
+            hit.cross_A2 = second;
+
+
+            //cout << "edges" << endl;
             d = (xpos[c] + 0.5); // Now measure back edge.
-            while (((d + 1) < v_samples.size()) && (v_samples.at(d) > (ypos[c]*m_frac))) {
+            d10 = (xpos[c] + 0.5); // Now measure back edge.
+            d90 = (xpos[c] + 0.5); // Now measure back edge.
+
+            while (((d + 1) < sampleSize) && (v_samples.at(d) > (ypos[c]*m_frac))) {
               d++;
             }
+            while (((d10 + 1) < sampleSize) && (v_samples.at(d10) > (ypos[c] * 0.1))) {
+              d10++;
+            }
+            while (((d90 + 1) < sampleSize) && (v_samples.at(d90) > (ypos[c] * 0.9))) {
+              d90++;
+            }
+
+
+            //cout << "fall time" << endl;
+
             first = v_samples.at(d);
             second = v_samples.at(d - 1);
             dV = second - first;
             double backTime = (d - ((ypos[c] * m_frac) - first) / dV);
-            if ((d + 1) == v_samples.size()) {
+            if ((d + 1) == sampleSize) {
               backTime = d;
             }
-            unsigned int x2 = xpos[c] + 2 * (d - xpos[c]);
-            if (x2 >= (v_samples.size() - 1)) {
-              x2 = v_samples.size() - 1;
+            int x2 = xpos[c] + 2 * (d - xpos[c]);
+            if (x2 >= (sampleSize - 1)) {
+              x2 = sampleSize - 1;
             }
+            //90% time
+            first = v_samples.at(d90);
+            second = v_samples.at(d90 - 1);
+            dV = second - first;
+            cross90 = (d90 - ((ypos[c] * 0.9) - first) / dV);
+            if ((d90 + 1) == sampleSize) {
+              cross90 = d90;
+            }
+
+            first = v_samples.at(d10);
+            second = v_samples.at(d10 - 1);
+            dV = second - first;
+            cross90 = (d10 - ((ypos[c] * 0.1) - first) / dV);
+            if ((d10 + 1) == sampleSize) {
+              cross10 = d10;
+            }
+            hit.falltime = cross10 - cross90;
+
+
             hit.width = backTime - frontTime;
             hit.chi2 = 0.;
             hit.q = 0.;
+
+            int xstart1 = x1 - 20;
+            int xstop1 = x1;
+            int xstart2 = x2;
+            int xstop2 = x2 + 20;
+
+            if (xstart1 < 0) xstart1 = 0;
+            if (xstart2 < 0) xstart2 = 0;
+
+            if (xstop2 >= sampleSize - 1) xstop2 = sampleSize - 1;
+            if (xstop1 >= sampleSize - 1) xstop1 = sampleSize - 1;
 
             while (x1 < x2) {
               hit.q +=  v_samples.at(x1);
               x1++;
             }
 
-            hits.push_back(hit);
+            hit.int_before = 0.;
+            hit.int_after = 0.;
+            double int_sq = 0 ; //for RMS calculation
+            int samplecount = 0;
+            while (xstart1 < xstop1) {
+              hit.int_before +=  v_samples.at(xstart1);
+              int_sq += v_samples.at(xstart1) * v_samples.at(xstart1);
+              xstart1++;
+              samplecount++;
+            }
+            hit.int_before = hit.int_before / ((double)samplecount);
+            hit.ped_rms = TMath::Sqrt(int_sq / ((double)samplecount) - hit.int_before * hit.int_before);
+            samplecount = 0;
+            while (xstart2 < xstop2) {
+              hit.int_after +=  v_samples.at(xstart2);
+              xstart2++;
+              samplecount++;
+            }
+            hit.int_after = hit.int_after / ((double)samplecount);
 
+
+            hits.push_back(hit);
             B2DEBUG(1, hardwareID << " peak found (" << xpos[c] << "," << ypos[c] << ")\twidth: " << hit.width << "\ttdc: " << hit.tdc_bin <<
                     "\tfrontTime: " << frontTime << "\tbackTime: " << backTime);
           }
 
         }
         if (m_thresh_n < 0.) {
-
           //Installed Tsukuba exception
           //Find 5 negative bins in a row with one below threshold
           //But pick the last one in x
           //Then lookback a bit and see if there is a hint of a double negative peak
           int neg_count(0);
-          unsigned int d_peak(0), d_cur_peak(0);
+          int d_peak(0), d_cur_peak(0);
           double d_max(0.), d_cur_max(0.);
-          for (unsigned int d = 0; d < v_samples.size(); d++) {
+          for (int d = 0; d < sampleSize; d++) {
             //cout<<d<<": "<<v_samples.at(d)<<endl;
             if (v_samples.at(d) < 0) {
               neg_count++;
@@ -211,7 +313,6 @@ void WaveTimingV4Module::event()
               d_cur_max = 0;
             }
           }
-
           //Count backwards 80 from the peak and look for at least one bin below threshold
           double d_min = d_peak - 80;
           int dbl_count(0);
@@ -221,11 +322,10 @@ void WaveTimingV4Module::event()
           }
           if (dbl_count < 1) d_max = 0;
 
-
           if (d_max != 0) {
             peaks_found++;
             hit.adc_height = d_max;
-            unsigned int d = (d_peak + 0.5); // First measure front edge.
+            int d = (d_peak + 0.5); // First measure front edge.
             while ((v_samples.at(d) < d_max * m_frac) && (d > 0)) {
               d--;
             }
@@ -238,16 +338,15 @@ void WaveTimingV4Module::event()
               frontTime = 0.;
             }
             //hit.tdc_bin = frontTime;
-
             d = (d_peak + 0.5); // Now measure back edge.
-            while (((d + 1) < v_samples.size()) && (v_samples.at(d) < (d_max * m_frac))) {
+            while (((d + 1) < sampleSize) && (v_samples.at(d) < (d_max * m_frac))) {
               d++;
             }
             first = v_samples.at(d);
             second = v_samples.at(d - 1);
             dV = second - first;
             double backTime = d - (d_max * m_frac - first) / dV;
-            if ((d + 1) >= v_samples.size()) {
+            if ((d + 1) >= sampleSize) {
               backTime = d;
             }
 
@@ -256,19 +355,77 @@ void WaveTimingV4Module::event()
             hit.width = backTime - frontTime;
             hit.chi2 = 0.;
             hit.q = 0.;
+            hit.risetime = 0.;
+            hit.falltime = 0.;
+            hit.ped_rms = 0.;
+
+            hit.cross_T1 = d;
+            hit.cross_A1 = first;
+            hit.cross_A2 = second;
+            hit.max_bin = d_peak;
 
             hits.push_back(hit);
-
           }
         }
         //      B2DEBUG(1,peaks_found<<" peaks found.");
+
         evtwaves_ptr[w]->SetHits(hits);
         B2DEBUG(1, hits.size() << " peaks found, " << evtwaves_ptr[w]->GetHits().size() << " made it");
         //Create topcafDIGITs
         for (size_t c = 0; c < hits.size(); c++) {
-          TOPCAFDigit* this_topcafdigit = m_topcafdigits_ptr.appendNew(evtwaves_ptr[w]);
-          this_topcafdigit->SetHitValues(hits[c]);
-          this_topcafdigit->SetBoardstack(electronics);
+          if (m_isSkim) { // I want to create a skim file
+            // calpulse or reasonable photon candidate
+            if (hits[c].adc_height < -200 || (hits[c].q > 400 && hits[c].width > 3 && hits[c].width < 8)) {
+              TOPCAFDigit* this_topcafdigit = m_topcafdigits_ptr.appendNew(evtwaves_ptr[w]);
+
+              this_topcafdigit->SetHitValues(hits[c]);
+              this_topcafdigit->SetBoardstack(electronics);
+              this_topcafdigit->SetRisetime(hits[c].risetime);
+              this_topcafdigit->SetFalltime(hits[c].falltime);
+              this_topcafdigit->SetIntBefore(hits[c].int_before);
+              this_topcafdigit->SetIntAfter(hits[c].int_after);
+              this_topcafdigit->SetCrossT1(hits[c].cross_T1);
+              this_topcafdigit->SetCrossA1(hits[c].cross_A1);
+              this_topcafdigit->SetCrossA2(hits[c].cross_A2);
+              this_topcafdigit->SetMaxBin(hits[c].max_bin);
+              this_topcafdigit->SetPedRMS(hits[c].ped_rms);
+
+              this_topcafdigit->SetID(c);
+            }
+          } else {
+            TOPCAFDigit* this_topcafdigit = m_topcafdigits_ptr.appendNew(evtwaves_ptr[w]);
+
+            this_topcafdigit->SetHitValues(hits[c]);
+            this_topcafdigit->SetBoardstack(electronics);
+            this_topcafdigit->SetRisetime(hits[c].risetime);
+            this_topcafdigit->SetFalltime(hits[c].falltime);
+            this_topcafdigit->SetIntBefore(hits[c].int_before);
+            this_topcafdigit->SetIntAfter(hits[c].int_after);
+            this_topcafdigit->SetCrossT1(hits[c].cross_T1);
+            this_topcafdigit->SetCrossA1(hits[c].cross_A1);
+            this_topcafdigit->SetCrossA2(hits[c].cross_A2);
+            this_topcafdigit->SetMaxBin(hits[c].max_bin);
+            this_topcafdigit->SetPedRMS(hits[c].ped_rms);
+
+            this_topcafdigit->SetID(c);
+          }
+
+          // fill the waveforms
+          /*
+            int firstbin = hits[c].tdc_bin -64;
+            if(firstbin < 0) firstbin = 0;
+            int ibin = 0;
+            for(int isetzero = 0; isetzero < 128; isetzero ++ )
+                  this_topcafdigit->SetAdcVal(isetzero, 0);
+
+            while( ibin < 128 && ibin +firstbin  < v_samples.size()  )
+            {
+            this_topcafdigit->SetAdcVal(ibin, v_samples[ibin+firstbin]);
+            this_topcafdigit->SetTdcVal(ibin, ibin+firstbin);
+            ibin++;
+            }
+          */
+
         }
       }
     }//End loop

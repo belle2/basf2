@@ -21,6 +21,17 @@ public:
   double width; // bin width (1 sigma)
   double chi2; // chi2 of gaus fit to hit
   double q; //integral over waveform ROI
+  double risetime;
+  double falltime;
+  double int_before;
+  double int_after;
+  double ped_rms;
+  double ref_time;
+  int cross_T1;
+  int max_bin;
+  double cross_A1;
+  double cross_A2;
+
   ClassDef(topcaf_hit_t, 1)
 } ;
 

@@ -171,7 +171,7 @@ void FastSeqRootInputModule::ReadFileInThread()
     } else if (size > 0) {
       m_streamer->queueEvtMessage(evtbuf);
     } else {
-      B2FATAL("FastSeqRootInput : Error in reading first event");
+      B2FATAL("FastSeqRootInput : Error in reading event");
     }
     // Statistics
     double dsize = (double)size / 1000.0;

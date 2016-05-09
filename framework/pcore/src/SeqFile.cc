@@ -17,22 +17,68 @@
 #include <errno.h>
 #include <netinet/in.h>
 
+#include <boost/iostreams/device/file_descriptor.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+
 using namespace Belle2;
 using namespace std;
+namespace io = boost::iostreams;
 
-SeqFile::SeqFile(const char* filename, const char* rwflag):
+SeqFile::SeqFile(const std::string& filename, const std::string& rwflag):
   m_filename(filename)
 {
-  if (strstr(rwflag, "w") != 0)
-    m_fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0664);
-  else
-    m_fd = open(filename, O_RDONLY);
-
-  if (m_fd < 0) {
-    B2ERROR("file open error (" << strerror(errno) << "): " << filename);
+  if (filename.empty()) {
+    B2ERROR("SeqFile: Empty filename given");
+    return;
   }
-  B2INFO("SeqFile: " << m_filename << " opened (fd=" << m_fd << ")");
-  m_nfile = 0;
+  bool readonly = rwflag.find('w') == std::string::npos;
+  // is the file already compressed?
+  m_compressed = filename.compare(filename.size() - 3, 3, ".gz") == 0;
+  // strip .gz suffix to add it at the end automatically and correctly for subsequent files
+  if (m_compressed) {
+    m_filename = filename.substr(0, filename.size() - 3);
+  }
+  // open the file
+  openFile(m_filename, readonly);
+  // if that fails and it's not already assumed to be compressed try again adding .gz to the name
+  if (m_fd < 0 && !m_compressed) {
+    B2WARNING("SeqFile: error opening '" << filename << "': " << strerror(errno)
+              << ", trying again with '.gz'");
+    m_compressed = true;
+    openFile(filename, readonly);
+  }
+  // is the file open now?
+  if (m_fd < 0) {
+    B2ERROR("SeqFile: error opening '" << filename << "': " << strerror(errno));
+  } else {
+    B2INFO("SeqFile: " << m_filename << " opened (fd=" << m_fd << ")");
+  }
+}
+
+void SeqFile::openFile(std::string filename, bool readonly)
+{
+  close(m_fd);
+  // add compression suffix if file is supposed to be compressed
+  if (m_compressed) filename += ".gz";
+  if (!readonly) {
+    //open file in create mode and set stream correctly
+    m_fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
+    auto filter = new io::filtering_ostream();
+    if (m_compressed) filter->push(io::gzip_compressor());
+    filter->push(io::file_descriptor_sink(m_fd, io::never_close_handle));
+    filter->exceptions(ios_base::badbit | ios_base::failbit);
+    m_stream.reset(filter);
+  } else {
+    //open file in read mode and set stream correctly
+    m_fd = open(filename.c_str(), O_RDONLY);
+    auto filter = new io::filtering_istream();
+    if (m_compressed) filter->push(io::gzip_decompressor());
+    filter->push(io::file_descriptor_source(m_fd, io::never_close_handle));
+    filter->exceptions(ios_base::badbit | ios_base::failbit);
+    m_stream.reset(filter);
+  }
+  // reset number of written bytes
   m_nb = 0;
 }
 
@@ -49,69 +95,75 @@ int SeqFile::status()
 
 int SeqFile::write(char* buf)
 {
-  int stat = 0;
   int insize = *((int*)buf); // nbytes in the buffer at the beginning
   if (insize + m_nb >= BLOCKSIZE && m_filename != "/dev/null") {
-    close(m_fd);
     B2INFO("SeqFile: previous file closed (size=" << m_nb << " bytes)");
     m_nfile++;
     auto file = m_filename + '-' + std::to_string(m_nfile);
-    m_fd = open(file.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
+    openFile(file, false);
     if (m_fd < 0) {
-      B2FATAL("file open error (" << strerror(errno) << "): " << file);
+      B2FATAL("SeqFile::write() error opening file '" << file << "': " << strerror(errno));
     }
     m_nb = 0;
-    B2INFO("SeqFile: " << file << " opened");
-    stat = ::write(m_fd, buf, insize);
-    if (stat > 0)
-      m_nb += stat;
-  } else {
-    stat = ::write(m_fd, buf, insize);
-    if (stat > 0)
-      m_nb += stat;
+    B2INFO("SeqFile::write() opened '" << file << "'");
   }
-  return stat;
+  // cast stream object
+  std::ostream* out = dynamic_cast<std::ostream*>(m_stream.get());
+  if (!out) {
+    B2FATAL("SeqFile::write() called on a file opened in read mode");
+  }
+  try {
+    out->write(buf, insize);
+    m_nb += insize;
+    return insize;
+  } catch (ios_base::failure& e) {
+    B2ERROR("SeqFile::write() error: " << e.what() << ", " << strerror(errno));
+    return 0;
+  }
 }
 
 int SeqFile::read(char* buf, int size)
 {
-  int recsize = 0;
-  int stat = ::read(m_fd, buf, sizeof(int));    // record size
-  //  printf ( "stat = %d, recsize = %d\n", stat, recsize );
-  if (stat < 0) {
-    // Error in reading file
-    perror("read");
-    return stat;
-  } else if (stat == 0) {
+  // cast stream object
+  std::istream* in = dynamic_cast<std::istream*>(m_stream.get());
+  if (!in) {
+    B2FATAL("SeqFile::read() called on a file opened in write mode");
+  }
+  //trigger eof if there's nothing left int the file. Could throw an error on decompress failure
+  try {
+    in->peek();
+  } catch (ios_base::failure& e) {
+    B2ERROR("SeqFile::read() cannot read file: " << e.what());
+    return -1;
+  }
+  //ok, now we can open the next file reliably
+  if (in->eof()) {
     // EOF of current file, search for next file
-    close(m_fd);
     m_nfile++;
     auto nextfile = m_filename + '-' + std::to_string(m_nfile);
-    m_fd = open(nextfile.c_str(), O_RDONLY);
+    openFile(nextfile, true);
     if (m_fd < 0) return 0;   // End of all files
-    // Obtain record size from new file
-    int stat2 = ::read(m_fd, buf, sizeof(int));
-    if (stat2 < 0) {
-      perror("read2");
-      return stat2;
-    }
-    recsize = *((int*)buf);
-    if (recsize > size) {
-      fprintf(stderr, "read3: buffer too small\n");
-      return -1;
-    }
-    // Obtain body
-    int stat3 = ::read(m_fd, buf + sizeof(int), recsize - sizeof(int));
-    return stat3 + sizeof(int);
-  } else {
-    // Normal processing
-    recsize = *((int*)buf);
-    if (recsize > size) {
-      fprintf(stderr, "read4: buffer too small\n");
-      return -1;
-    }
-    stat = ::read(m_fd, buf + sizeof(int), recsize - sizeof(int));
-    if (stat < 0) perror("read4");
-    return stat;
+    // update the stream pointer
+    in = dynamic_cast<std::istream*>(m_stream.get());
   }
+  try {
+    // Obtain new header
+    in->read(buf, sizeof(int));
+  } catch (ios_base::failure& e) {
+    B2ERROR("SeqFile::read() " << e.what() << ": couldn't read next record size");
+    return -1;
+  }
+  // Normal processing, extract the record size from the first 4 bytes
+  int recsize = *((int*)buf);
+  if (recsize > size) {
+    B2ERROR("SeqFile::read() buffer too small, need at least " << recsize << " bytes");
+    return -1;
+  }
+  try {
+    in->read(buf + sizeof(int), recsize - sizeof(int));
+  } catch (ios_base::failure& e) {
+    B2ERROR("SeqFile::read() " << e.what() << ": could only read " << in->gcount() << " bytes, expected " << recsize);
+    return -1;
+  }
+  return recsize;
 }

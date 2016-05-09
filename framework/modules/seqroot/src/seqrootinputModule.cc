@@ -130,7 +130,7 @@ void SeqRootInputModule::event()
   char* evtbuf = new char[EvtMessage::c_MaxEventSize];
   EvtMessage* evtmsg = NULL;
   int size = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
-  if (size == 0) {
+  if (size <= 0) {
     delete m_file;
     m_file = 0;
     delete[] evtbuf;

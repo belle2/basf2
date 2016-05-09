@@ -37,7 +37,7 @@ StorageSerializerModule::StorageSerializerModule() : Module()
   addParam("compressionLevel", m_compressionLevel, "Compression Level", 0);
   addParam("OutputBufferName", m_obuf_name, "Output buffer name", string(""));
   addParam("OutputBufferSize", m_obuf_size, "Output buffer size", 10);
-  std::cout << "[DEBUG] StorageSerializer: Constructor done." << std::endl;
+  B2DEBUG(100, "StorageSerializer: Constructor done.");
 }
 
 

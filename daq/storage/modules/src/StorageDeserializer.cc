@@ -55,7 +55,7 @@ StorageDeserializerModule::StorageDeserializerModule() : Module()
 
   m_count = 0;
   g_module = this;
-  std::cout << "StorageDeserializer: Constructor done." << std::endl;
+  B2DEBUG(100, "StorageDeserializer: Constructor done.");
 }
 
 

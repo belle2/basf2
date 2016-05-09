@@ -90,6 +90,7 @@ if (args.inputRun).find("slot") != -1:
     timemodule.param(timeDict)
     timemodule.param('threshold', 50.)  # always
     timemodule.param('threshold_n', -300.)  # tsukuba
+    timemodule.param('isSkim', False)
 else:
     timemodule = register_module('WaveTimingV2')
     timeDict = {'time2TDC': 1.0}

@@ -95,7 +95,7 @@ else:
     pedmodule.param('conditions', 1)
 
 camacconverter = register_module('Camac')
-camacDict = {'inputFilename': path.join(args.inputDir, 'camac', args.inputRun+".camac"),
+camacDict = {'inputFilename': path.join(args.inputDir, 'camac', args.inputRun + ".camac"),
 
              #             'crateID': 13369927,  # leps june 2013 itop test beam
              #             'ftswSlot': 7,  # leps june 2013 itop test beam

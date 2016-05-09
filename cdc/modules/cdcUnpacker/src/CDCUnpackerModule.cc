@@ -70,7 +70,7 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("tdcOffset", m_tdcOffset, "TDC offset (in TDC count).", 0);
   addParam("enableDatabase", m_enableDatabase, "Enable database to read the channel map.", false);
 
-  m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::loadMap);
+  //  m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::loadMap);
 }
 
 CDCUnpackerModule::~CDCUnpackerModule()

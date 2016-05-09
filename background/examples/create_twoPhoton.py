@@ -94,11 +94,14 @@ class DiscardEmptyVXD(Module):
     """Discard events with empty PXD and/or SVD SimHits"""
 
     def __init__(self, pxd_only=False):
+        ''' Initialize the module '''
         super(DiscardEmptyVXD, self).__init__()
+        #: PXD only flag
         self.pxd_only = pxd_only
         self.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
 
     def event(self):
+        ''' Event function '''
         pxdsimhits = Belle2.PyStoreArray("PXDSimHits")
         n = pxdsimhits.getEntries()
         if not self.pxd_only:

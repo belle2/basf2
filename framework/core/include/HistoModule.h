@@ -11,10 +11,8 @@
 #include <framework/core/Module.h>
 #include <framework/pcore/RbTuple.h>
 
-#include <string>
 
-
-#define REG_HISTOGRAM   RbTupleManager::Instance().register_module ( this );
+#define REG_HISTOGRAM   Belle2::RbTupleManager::Instance().register_module ( this );
 
 namespace Belle2 {
 
@@ -55,7 +53,4 @@ namespace Belle2 {
   };
 
 }
-#endif // P_EVENT_SERVER_H
-
-
-
+#endif

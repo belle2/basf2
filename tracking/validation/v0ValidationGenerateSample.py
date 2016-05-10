@@ -4,6 +4,7 @@
 """
 <header>
   <contact>tracking@belle2.kek.jp</contact>
+  <input>KShortGenSimNoBkg.root</input>
   <output>V0ValidationSample.root, V0ValidationHarvested.root</output>
   <description>This module generates events for the V0 validation.</description>
 </header>
@@ -12,58 +13,10 @@
 import basf2
 from simulation import add_simulation
 from reconstruction import add_mdst_output
-from modularAnalysis import generateY4S
 from tracking import add_tracking_reconstruction
 from tracking.validation.harvesting import HarvestingModule
-from tracking.validation import refiners, tracking_efficiency_helpers
+from tracking.validation import refiners
 import numpy
-
-
-def run():
-    components = tracking_efficiency_helpers.get_simulation_components()
-
-    basf2.set_random_seed(1337)
-    path = basf2.create_path()
-
-    # generateY4S(1000, path=path)
-
-    path.add_module('EventInfoSetter',
-                    evtNumList=[500],
-                    runList=[1],
-                    expList=[1]
-                    )
-
-    path.add_module('ParticleGun',
-                    pdgCodes=[310],
-                    nTracks=5,
-                    momentumGeneration='uniform',
-                    momentumParams=[0.000, 1.000],
-                    thetaGeneration='uniform',
-                    thetaParams=[17, 150],
-                    phiGeneration='uniform',
-                    phiParams=[0, 360],
-                    vertexGeneration='uniform',
-                    xVertexParams=[0.0, 0.0],
-                    yVertexParams=[0.0, 0.0],
-                    zVertexParams=[0.0, 0.0]
-                    )
-
-    path.add_module('Gearbox')
-    add_simulation(path, components=components)
-    add_tracking_reconstruction(path, components=components)
-
-    # Set options for V0 Validation
-    for module in path.modules():
-        if module.name() == "V0Finder":
-            module.param("Validation", True)
-    path.add_module('MCV0Matcher', V0ColName='V0ValidationVertexs')
-    path.add_module(V0Harvester())
-
-    # Store mdst output plus v0validation
-    add_mdst_output(path, filename='../V0ValidationSample.root', additionalBranches=['V0ValidationVertexs'])
-
-    basf2.process(path)
-    print(basf2.statistics)
 
 
 class V0Harvester(HarvestingModule):
@@ -152,5 +105,20 @@ class V0Harvester(HarvestingModule):
     save_tree = refiners.SaveTreeRefiner()
 
 
-if __name__ == '__main__':
-    run()
+basf2.set_random_seed(1337)
+path = basf2.create_path()
+
+path.add_module('RootInput', inputFileName='../KShortGenSimNoBkg.root')
+path.add_module('Gearbox')
+
+add_tracking_reconstruction(path)
+
+# Set options for V0 Validation
+for module in path.modules():
+    if module.name() == "V0Finder":
+        module.param("Validation", True)
+path.add_module('MCV0Matcher', V0ColName='V0ValidationVertexs')
+path.add_module(V0Harvester())
+
+basf2.process(path)
+print(basf2.statistics)

@@ -53,7 +53,7 @@ else:
 if args.output:
     outputFile = args.output
 else:
-    outputFile = args.inputRun.replace('.sroot', '_writehits.root')
+    outputFile = args.inputRun.replace('.sroot', '_writehits_skim.root')
 print('Writing output root file to ' + outputFile)
 
 
@@ -85,14 +85,14 @@ mergemodule = register_module('WaveMerging')
 
 if (args.inputRun).find("slot") != -1:
     print('BELLE 2 INSTALLED')
-    timemodule = register_module('WaveTimingV4')
+    timemodule = register_module('WaveTimingCalib')
     timeDict = {'time2TDC': 1.0}
     timemodule.param(timeDict)
     timemodule.param('threshold', 50.)  # always
     timemodule.param('threshold_n', -300.)  # tsukuba
     timemodule.param('isSkim', True)
 else:
-    timemodule = register_module('WaveTimingV2')
+    timemodule = register_module('WaveTimingCalib')
     timeDict = {'time2TDC': 1.0}
     timemodule.param(timeDict)
     timemodule.param('threshold', 50.)  # always
@@ -105,7 +105,7 @@ else:
 # it shouldn't be anything else
 
 
-timecalibmodule = register_module('DoubleCalPulse')
+timecalibmodule = register_module('DoubleCalPulseCalib')
 if (args.inputRun).find("cpr31") != -1 or (args.inputRun).find("cpr32") != -1:
     # fuji
     timecalibmodule.param('calibrationTimeMin', 1300)

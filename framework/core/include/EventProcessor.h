@@ -25,12 +25,9 @@ class TRandom;
 namespace Belle2 {
 
   /**
-   * The EventProcessor Class.
-   *
-   * This class provides the core event processing loop.
+   * provides the core event processing loop.
    */
   class EventProcessor {
-
   public:
 
     /**
@@ -62,6 +59,17 @@ namespace Belle2 {
 
     /** async-safe method to write something to STDERR. */
     static void writeToStdErr(const char msg[]);
+
+    /** Install a signal handler 'fn' for given signal.
+     *
+     */
+    static void installSignalHandler(int sig, void (*fn)(int));
+
+    /** Install signal handler for INT, TERM and QUIT signals.
+     *
+     *  If argument is NULL, EventProcessor's own signal handler will be installed.
+     */
+    static void installMainSignalHandlers(void (*fn)(int) = nullptr);
 
   protected:
     /** Exception thrown when execution is stopped by a signal. */
@@ -136,17 +144,6 @@ namespace Belle2 {
      * the endRun() loop will also be called.
      */
     void processEndRun();
-
-    /** Install a signal handler 'fn' for given signal.
-     *
-     */
-    static void installSignalHandler(int sig, void (*fn)(int));
-
-    /** Install signal handler for INT, TERM and QUIT signals.
-     *
-     *  If argument is NULL, EventProcessor's own signal handler will be installed.
-     */
-    static void installMainSignalHandlers(void (*fn)(int) = nullptr);
 
     const Module* m_master;  /**< The master module that determines the experiment/run/event number **/
     ModulePtrList m_moduleList; /**< List of all modules in order initialized. */

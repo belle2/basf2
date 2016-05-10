@@ -257,15 +257,17 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   B2INFO(m_procHandler->getProcessName() << " process finished.");
 
-  //output process does final cleanup, everything else stops here
+  //all processes except output stop here
   if (!m_procHandler->isOutputProcess()) {
     if (gotSigINT) {
-      B2FATAL("Processing aborted via SIGINT.");
+      installSignalHandler(SIGINT, SIG_DFL);
+      raise(SIGINT);
     } else {
       exit(0);
     }
   }
 
+  //output process: do final cleanup
   m_procHandler->waitForAllProcesses();
   B2INFO("All processes completed");
 
@@ -282,8 +284,10 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   //did anything bad happen?
   if (gSignalReceived) {
-    B2FATAL("Processing aborted via signal " << gSignalReceived <<
+    B2ERROR("Processing aborted via signal " << gSignalReceived <<
             ", terminating. Output files have been closed safely and should be readable.");
+    installSignalHandler(gSignalReceived, SIG_DFL);
+    raise(gSignalReceived);
   }
 
 }

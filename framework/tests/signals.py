@@ -32,32 +32,41 @@ def run_test(init_signal, event_signal, abort, test_in_process):
     @param test_in_process 0 input, 1 parallel, 2 output
     """
 
+    testFile = tempfile.NamedTemporaryFile(dir=tmpdir, delete=False)
+
     # main thread just monitors exit status
     if os.fork() != 0:
         retbytes = os.wait()[1]
-        retcode = (retbytes & 0xff00) >> 8
-        killsig = retbytes & 0x00ff
-        ok = False
+        retcode = (retbytes & 0xff00) >> 8  # high byte
+        killsig = retbytes & 0x00ff % 128  # low byte minus core dump bit
+        status_ok = False
         if abort:
             if killsig in (init_signal, event_signal):
-                ok = True
+                status_ok = True
             if retcode != 0:
-                ok = True
+                status_ok = True
         else:
             if killsig == 0 and retcode == 0:
-                ok = True
+                status_ok = True
 
-        if not ok:
+        if not status_ok:
+            print(killsig, retcode)
             if killsig:
                 raise RuntimeError("Killed with wrong signal %d?" % (killsig))
             else:
                 raise RuntimeError("Wrong exit code %d" % (retcode))
+
+        if not abort or event_signal == SIGINT:
+            # is ROOT file ok?
+            file_ok_ret = os.system('showmetadata ' + testFile.name)
+            B2WARNING("file_ok_ret: " + str(file_ok_ret))
+            if file_ok_ret != 0:
+                raise RuntimeError("Root file not properly closed!")
+
         B2WARNING("test ok.")
         return
 
     # actual test
-    testFile = tempfile.NamedTemporaryFile(dir=tmpdir)
-
     num_events = 5
     if abort:
         num_events = int(1e8)  # larger number to test we abort early.
@@ -92,7 +101,6 @@ def run_test(init_signal, event_signal, abort, test_in_process):
     # Create paths
     main = create_path()
     main.add_module(eventinfosetter)
-    main.add_module(output)
     if test_in_process == 0:
         testmod = main.add_module(TestModule())
         main.add_module('ProgressBar').set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
@@ -102,6 +110,7 @@ def run_test(init_signal, event_signal, abort, test_in_process):
     elif test_in_process == 2:
         main.add_module('ProgressBar').set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
         testmod = main.add_module(TestModule())
+    main.add_module(output)
 
     B2WARNING("Running with PID " + str(os.getpid()))
     process(main)
@@ -142,21 +151,14 @@ set_log_level(LogLevel.INFO)
 #       test that signal in init aborts immediately, and the rest of the module's init function is not execetuded
 
 
-# TODO check root files are closed
-
-
-# Check the file meta data (via DataStore)
-# from ROOT import Belle2
-# metadata = Belle2.PyStoreObj('FileMetaData', 1)
-
-# print (metadata.getLfn()) #?
-# assert 10 == metadata.getNEvents()
-
 # clear_basf2_ipc shouldn't find anything to clean up
 ret = os.system('clear_basf2_ipc --test')
 if ret != 0:
     B2FATAL("Some IPC structures were not cleaned up")
 
-B2INFO("All signal tests finished!")
+print("\n")
+print("=========================================================================")
+print("All signal tests finished successfully!")
+print("=========================================================================")
 
 shutil.rmtree(tmpdir)

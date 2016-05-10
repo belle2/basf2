@@ -6,9 +6,8 @@
 #ifndef PROCHANDLER_H
 #define PROCHANDLER_H
 
-#include <vector>
+#include <set>
 #include <string>
-#include <sys/types.h>
 
 namespace Belle2 {
 
@@ -27,7 +26,7 @@ namespace Belle2 {
     /** There is no real output process, but marks current process as output. */
     void startOutputProcess();
 
-    /** Wait until all forked processes are completed */
+    /** Wait until all forked processes handled by this ProcHandler are completed */
     void waitForAllProcesses();
 
     /** Returns true if multiple processes have been spawned, false in single-core mode. */
@@ -55,13 +54,7 @@ namespace Belle2 {
     static std::string getProcessName();
 
   private:
-    /** Start a new process, adding its PID to processList, and setting s_processID = id. */
-    static bool startProc(std::vector<pid_t>* processList, const std::string& procType, int id);
-
-    std::vector<pid_t> m_inputProcessList;  /**< PIDs of input processes. */
-    std::vector<pid_t> m_workerProcessList;  /**< PIDs of worker processes. */
-
-    static int s_processID;       ///< ID of current process
+    std::set<int> m_processList;  /**< PIDs of processes controlled by this ProcHandler. */
 
   };
 }

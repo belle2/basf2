@@ -162,7 +162,9 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
   LogSystem::Instance().printErrorSummary();
 
   if (gSignalReceived == SIGINT) {
-    B2FATAL("Processing aborted via SIGINT, terminating. Output files have been closed safely and should be readable.");
+    B2ERROR("Processing aborted via SIGINT, terminating. Output files have been closed safely and should be readable.");
+    installSignalHandler(SIGINT, SIG_DFL);
+    raise(SIGINT);
   }
 }
 
@@ -246,6 +248,8 @@ void EventProcessor::installSignalHandler(int sig, void (*fn)(int))
 
   s.sa_handler = fn;
   sigemptyset(&s.sa_mask);
+  if (sig == SIGCHLD)
+    s.sa_flags |= SA_NOCLDSTOP; //don't produce signal when children are stopped
 
   if (sigaction(sig, &s, nullptr) != 0) {
     B2FATAL("Cannot setup signal handler for signal " << sig);

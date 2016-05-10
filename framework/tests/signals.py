@@ -56,12 +56,18 @@ def run_test(init_signal, event_signal, abort, test_in_process):
             else:
                 raise RuntimeError("Wrong exit code %d" % (retcode))
 
-        if not abort or event_signal == SIGINT:
+        fileExists = os.path.isfile(testFile.name)
+        if fileExists and (not abort or event_signal == SIGINT):
             # is ROOT file ok?
             file_ok_ret = os.system('showmetadata ' + testFile.name)
             B2WARNING("file_ok_ret: " + str(file_ok_ret))
             if file_ok_ret != 0:
                 raise RuntimeError("Root file not properly closed!")
+
+        # clear_basf2_ipc shouldn't find anything to clean up
+        ret = os.system('clear_basf2_ipc --test')
+        if ret != 0:
+            raise RuntimeError("Some IPC structures were not cleaned up")
 
         B2WARNING("test ok.")
         return
@@ -150,11 +156,6 @@ set_log_level(LogLevel.INFO)
 # TODO add 'immediate_abort' condition
 #       test that signal in init aborts immediately, and the rest of the module's init function is not execetuded
 
-
-# clear_basf2_ipc shouldn't find anything to clean up
-ret = os.system('clear_basf2_ipc --test')
-if ret != 0:
-    B2FATAL("Some IPC structures were not cleaned up")
 
 print("\n")
 print("=========================================================================")

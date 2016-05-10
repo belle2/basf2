@@ -15,8 +15,6 @@
 #include <framework/core/EventProcessor.h>
 #include <framework/core/Path.h>
 
-#include <memory>
-
 
 namespace Belle2 {
 
@@ -106,9 +104,9 @@ namespace Belle2 {
     std::vector<PathPtr> m_outpathlist;
 
     /** input RingBuffers */
-    std::vector<std::shared_ptr<RingBuffer>> m_rbinlist;
+    std::vector<RingBuffer*> m_rbinlist;
     /** output RingBuffers */
-    std::vector<std::shared_ptr<RingBuffer>> m_rboutlist;
+    std::vector<RingBuffer*> m_rboutlist;
 
     /** Pointer to HistoManagerModule, or nullptr if not found. */
     ModulePtr m_histoman;

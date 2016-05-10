@@ -73,6 +73,7 @@ pEventProcessor::pEventProcessor() : EventProcessor(),
 
 pEventProcessor::~pEventProcessor()
 {
+  cleanup();
   g_pEventProcessor = nullptr;
   delete m_procHandler;
 }
@@ -80,7 +81,12 @@ pEventProcessor::~pEventProcessor()
 void pEventProcessor::cleanup()
 {
   if (!m_procHandler->parallelProcessingUsed() or m_procHandler->isOutputProcess()) {
+    for (RingBuffer* rb : m_rbinlist)
+      delete rb;
     m_rbinlist.clear();
+
+    for (RingBuffer* rb : m_rboutlist)
+      delete rb;
     m_rboutlist.clear();
   }
 }

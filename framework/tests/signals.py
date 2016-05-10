@@ -16,6 +16,9 @@ import tempfile
 import shutil
 from basf2 import *
 
+# we test for stray resources later, so let's clean up first
+os.system('clear_basf2_ipc')
+
 tmpdir = tempfile.mkdtemp(prefix='b2signal_test')
 
 set_random_seed("something important")
@@ -123,10 +126,11 @@ for nproc in [0, 1]:
                 run_test(SIGQUIT, None, abort=True, test_in_process=in_proc)
                 run_test(None, SIGQUIT, abort=True, test_in_process=in_proc)
 
-            # crashes in child processes should also result in reasonable cleanup
-            if in_proc != 2:
-                run_test(SIGSEGV, None, abort=True, test_in_process=in_proc)
-                run_test(None, SIGSEGV, abort=True, test_in_process=in_proc)
+            # crashes in any process should also result in reasonable cleanup
+            run_test(SIGSEGV, None, abort=True, test_in_process=in_proc)
+            run_test(None, SIGSEGV, abort=True, test_in_process=in_proc)
+
+            # SIGPIPE would be nice, too. just stops immediately now
         except Exception as e:
             # Note: Without specifying exception type, we might get those from forked processes, too
             B2WARNING("Exception occured for nproc=%d, test_in_process=%d" % (nproc, in_proc))

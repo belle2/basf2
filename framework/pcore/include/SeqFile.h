@@ -21,8 +21,11 @@ namespace Belle2 {
   /** A class to manage I/O for a chain of blocked files */
   class SeqFile {
   public:
-    /** Constructor */
-    SeqFile(const std::string& filename, const std::string& access);
+    /** Constructor.
+     *
+     * @param rwflag should probably be r or rw
+     */
+    SeqFile(const std::string& filename, const std::string& rwflag);
     /** Destructor */
     ~SeqFile();
     /** Returns status after constructor call. If success, fd is returned. If not, -1 */
@@ -34,6 +37,7 @@ namespace Belle2 {
     int read(char* buf, int max);
 
   private:
+    /** actually open the file */
     void openFile(std::string filename, bool readonly);
 
   private:

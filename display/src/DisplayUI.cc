@@ -786,9 +786,6 @@ void DisplayUI::exit()
   //stop event processing after current event
   StoreObjPtr<EventMetaData> eventMetaData;
   eventMetaData->setEndOfData();
-
-  if (AsyncWrapper::isAsync())
-    AsyncWrapper::stopMainProcess();
 }
 
 void DisplayUI::showUserData(const DisplayData& displayData)

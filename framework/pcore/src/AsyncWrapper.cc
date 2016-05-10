@@ -18,7 +18,10 @@
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
 #include <framework/logging/LogSystem.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
+#include <sys/wait.h>
 #include <signal.h>
 #include <unistd.h>
 
@@ -49,13 +52,6 @@ int AsyncWrapper::numAvailableEvents()
 
   return s_currentRingBuffer->numq();
 }
-
-void AsyncWrapper::stopMainProcess()
-{
-  if (s_isAsync)
-    kill(getppid(), SIGINT);
-}
-
 
 AsyncWrapper::AsyncWrapper(const std::string& moduleType): Module(), m_procHandler(0), m_ringBuffer(0), m_rx(0), m_tx(0)
 {
@@ -113,6 +109,11 @@ void AsyncWrapper::initialize()
 void AsyncWrapper::event()
 {
   if (!m_procHandler->isWorkerProcess()) {
+    if (waitpid(-1, NULL, WNOHANG) != 0) {
+      StoreObjPtr<EventMetaData> eventMetaData;
+      eventMetaData->setEndOfData();
+    }
+
     m_tx->event();
   }
 }

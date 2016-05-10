@@ -139,18 +139,10 @@ void WaveTimingV4Module::event()
             peaks_found++;
             hit.adc_height = ypos[c];
             int d = (xpos[c] + 0.5); // First measure front edge.
-            int d10 = (xpos[c] + 0.5); // First measure front edge.
-            int d90 = (xpos[c] + 0.5); // First measure front edge.
 
 
             while ((v_samples.at(d) > ypos[c]*m_frac) && (d > 0)) {
               d--;
-            }
-            while ((v_samples.at(d10) > ypos[c] * 0.1) && (d10 > 0)) {
-              d10--;
-            }
-            while ((v_samples.at(d90) > ypos[c] * 0.9) && (d90 > 0)) {
-              d90--;
             }
 
             int x1 = xpos[c] - 2 * (xpos[c] - d);
@@ -168,45 +160,14 @@ void WaveTimingV4Module::event()
               frontTime = 0.;
             }
 
-            //90% time
-            first = v_samples.at(d90);
-            second = v_samples.at(d90 + 1);
-            dV = second - first;
-            double cross90 = (d90 + ((ypos[c] * 0.9) - first) / dV);
-            if ((d90) == 0) {
-              cross90 = d90;
-            }
-
-            //10% time
-            first = v_samples.at(d10);
-            second = v_samples.at(d10 + 1);
-            dV = second - first;
-            double cross10 = (d10 + ((ypos[c] * 0.1) - first) / dV);
-            if ((d10) == 0) {
-              cross10 = d10;
-            }
-            hit.risetime = cross90 - cross10;
 
             hit.tdc_bin = frontTime;
-            hit.max_bin = xpos[c];
-            hit.cross_T1 = d;
-            hit.cross_A1 = first;
-            hit.cross_A2 = second;
-
 
             //cout << "edges" << endl;
             d = (xpos[c] + 0.5); // Now measure back edge.
-            d10 = (xpos[c] + 0.5); // Now measure back edge.
-            d90 = (xpos[c] + 0.5); // Now measure back edge.
 
             while (((d + 1) < sampleSize) && (v_samples.at(d) > (ypos[c]*m_frac))) {
               d++;
-            }
-            while (((d10 + 1) < sampleSize) && (v_samples.at(d10) > (ypos[c] * 0.1))) {
-              d10++;
-            }
-            while (((d90 + 1) < sampleSize) && (v_samples.at(d90) > (ypos[c] * 0.9))) {
-              d90++;
             }
 
 
@@ -224,64 +185,17 @@ void WaveTimingV4Module::event()
               x2 = sampleSize - 1;
             }
 
-            //90% time
-            first = v_samples.at(d90);
-            second = v_samples.at(d90 - 1);
-            dV = second - first;
-            cross90 = (d90 - ((ypos[c] * 0.9) - first) / dV);
-            if ((d90 + 1) == sampleSize) {
-              cross90 = d90;
-            }
-
-            first = v_samples.at(d10);
-            second = v_samples.at(d10 - 1);
-            dV = second - first;
-            cross90 = (d10 - ((ypos[c] * 0.1) - first) / dV);
-            if ((d10 + 1) == sampleSize) {
-              cross10 = d10;
-            }
-            hit.falltime = cross90 - cross10;
-
 
             hit.width = backTime - frontTime;
             hit.chi2 = 0.;
             hit.q = 0.;
 
-            int xstart1 = x1 - 20;
-            int xstop1 = x1;
-            int xstart2 = x2;
-            int xstop2 = x2 + 20;
-
-            if (xstart1 < 0) xstart1 = 0;
-            if (xstart2 < 0) xstart2 = 0;
-
-            if (xstop2 >= sampleSize - 1) xstop2 = sampleSize - 1;
-            if (xstop1 >= sampleSize - 1) xstop1 = sampleSize - 1;
 
             while (x1 < x2) {
               hit.q +=  v_samples.at(x1);
               x1++;
             }
 
-            hit.int_before = 0.;
-            hit.int_after = 0.;
-            double int_sq = 0 ; //for RMS calculation
-            int samplecount = 0;
-            while (xstart1 < xstop1) {
-              hit.int_before +=  v_samples.at(xstart1);
-              int_sq += v_samples.at(xstart1) * v_samples.at(xstart1);
-              xstart1++;
-              samplecount++;
-            }
-            hit.int_before = hit.int_before / ((double)samplecount);
-            hit.ped_rms = TMath::Sqrt(int_sq / ((double)samplecount) - hit.int_before * hit.int_before);
-            samplecount = 0;
-            while (xstart2 < xstop2) {
-              hit.int_after +=  v_samples.at(xstart2);
-              xstart2++;
-              samplecount++;
-            }
-            hit.int_after = hit.int_after / ((double)samplecount);
 
 
             hits.push_back(hit);
@@ -366,14 +280,6 @@ void WaveTimingV4Module::event()
             hit.width = backTime - frontTime;
             hit.chi2 = 0.;
             hit.q = 0.;
-            hit.risetime = 0.;
-            hit.falltime = 0.;
-            hit.ped_rms = 0.;
-
-            hit.cross_T1 = d;
-            hit.cross_A1 = first;
-            hit.cross_A2 = second;
-            hit.max_bin = d_peak;
 
             hits.push_back(hit);
           }
@@ -433,9 +339,10 @@ void WaveTimingV4Module::event()
         B2DEBUG(1, hits.size() << " peaks found, " << evtwaves_ptr[w]->GetHits().size() << " made it");
 
 
+
+
         //Create topcafDIGITs
         for (size_t c = 0; c < hits.size(); c++) {
-
           if (m_isSkim) { // I want to create a skim file
             // calpulse or reasonable photon candidate
             if (hits[c].adc_height < -200 || (hits[c].q > 400 && hits[c].width > 3 && hits[c].width < 8)) {
@@ -443,34 +350,12 @@ void WaveTimingV4Module::event()
 
               this_topcafdigit->SetHitValues(hits[c]);
               this_topcafdigit->SetBoardstack(electronics);
-              this_topcafdigit->SetRisetime(hits[c].risetime);
-              this_topcafdigit->SetFalltime(hits[c].falltime);
-              this_topcafdigit->SetIntBefore(hits[c].int_before);
-              this_topcafdigit->SetIntAfter(hits[c].int_after);
-              this_topcafdigit->SetCrossT1(hits[c].cross_T1);
-              this_topcafdigit->SetCrossA1(hits[c].cross_A1);
-              this_topcafdigit->SetCrossA2(hits[c].cross_A2);
-              this_topcafdigit->SetMaxBin(hits[c].max_bin);
-              this_topcafdigit->SetPedRMS(hits[c].ped_rms);
-
-              this_topcafdigit->SetID(c);
             }
           } else {
             TOPCAFDigit* this_topcafdigit = m_topcafdigits_ptr.appendNew(evtwaves_ptr[w]);
 
             this_topcafdigit->SetHitValues(hits[c]);
             this_topcafdigit->SetBoardstack(electronics);
-            this_topcafdigit->SetRisetime(hits[c].risetime);
-            this_topcafdigit->SetFalltime(hits[c].falltime);
-            this_topcafdigit->SetIntBefore(hits[c].int_before);
-            this_topcafdigit->SetIntAfter(hits[c].int_after);
-            this_topcafdigit->SetCrossT1(hits[c].cross_T1);
-            this_topcafdigit->SetCrossA1(hits[c].cross_A1);
-            this_topcafdigit->SetCrossA2(hits[c].cross_A2);
-            this_topcafdigit->SetMaxBin(hits[c].max_bin);
-            this_topcafdigit->SetPedRMS(hits[c].ped_rms);
-
-            this_topcafdigit->SetID(c);
           }
 
           // fill the waveforms

@@ -22,7 +22,7 @@ int SemaphoreLocker::create(key_t semkey)
     semid = semget(semkey, 1, 0600);
   }
   if (semid < 0) {
-    B2ERROR("Couldn't create semaphore with semget()! Maybe you have semaphores from aborted processes lying around, you can clean those up using 'clear_basf2_ipc'.");
+    B2ERROR("Couldn't create semaphore with semget()! Maybe you have too many semaphores from aborted processes lying around, you can clean those up by running 'clear_basf2_ipc'.");
     return semid;
   }
 
@@ -43,35 +43,32 @@ bool SemaphoreLocker::isLocked(int semId)
   return (val == 0); //0: locked, 1: unlocked
 
 }
-void SemaphoreLocker::lock()
-{
-  struct sembuf sb;
-  sb.sem_num = 0;
-  sb.sem_op = -1;
-  sb.sem_flg = 0;
-  while (semop(m_id, &sb, 1) == -1) {
-    if (errno == EINTR) {
-      //interrupted by signal (e.g. window size changed), try again
-      continue;
-    } else {
-      B2FATAL("Error in SemaphoreLocker::lock(), semaphore " << m_id << ", error: " << strerror(errno));
+
+namespace {
+  void doSemOp(int semID, int op)
+  {
+    struct sembuf sb;
+    sb.sem_num = 0;
+    sb.sem_op = op;
+    sb.sem_flg = 0;
+    while (semop(semID, &sb, 1) == -1) {
+      if (errno == EINTR) {
+        //interrupted by signal (e.g. window size changed), try again
+        continue;
+      } else {
+        B2FATAL("Another process was aborted, please check previous output for reasons. (" <<
+                strerror(errno) << " for semaphore " << semID << ")");
+      }
     }
   }
+}
+void SemaphoreLocker::lock()
+{
+  doSemOp(m_id, -1);
 }
 
 void SemaphoreLocker::unlock()
 {
-  struct sembuf sb;
-  sb.sem_num = 0;
-  sb.sem_op = 1;
-  sb.sem_flg = 0;
-  while (semop(m_id, &sb, 1) == -1) {
-    if (errno == EINTR) {
-      //interrupted by signal (e.g. window size changed), try again
-      continue;
-    } else {
-      B2FATAL("Error in SemaphoreLocker::unlock(), semaphore " << m_id << ", error: " << strerror(errno));
-    }
-  }
+  doSemOp(m_id, 1);
 }
 

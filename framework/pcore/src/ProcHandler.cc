@@ -118,22 +118,22 @@ void ProcHandler::waitForAllProcesses()
       if (errno == EINTR) {
         continue; //interrupted, try again
       } else if (errno == ECHILD) {
-        B2WARNING(">>>>>ECHILD, stop.");
+        //actually this never happens?
         break; //no children exist, so nothing to do
       } else {
         B2FATAL("waitpid(" << pid << ") failed: " << strerror(errno));
       }
     } else { //state change
-      if (WIFSIGNALED(status) or WEXITSTATUS(status) != 0) {
-        B2FATAL("Execution stopped, sub-process with PID " << pid << " crashed or was killed.");
+      if (WIFSIGNALED(status)) {
+        B2FATAL("Execution stopped, sub-process with PID " << pid << " was killed by signal " << WTERMSIG(status) << ".");
+      } else if (WIFEXITED(status) and WEXITSTATUS(status) != 0) {
+        B2FATAL("Execution stopped, sub-process with PID " << pid << " has exit status " << WEXITSTATUS(status) << ".");
       } else {
         //process exited normally
         nStopped++;
-        B2WARNING(">>>>>PID " << pid << " ok. (" << nStopped << "/" << nProcs << ")");
       }
     }
   }
   m_inputProcessList.clear();
   m_workerProcessList.clear();
-  B2WARNING(">>>>>all children gone.");
 }

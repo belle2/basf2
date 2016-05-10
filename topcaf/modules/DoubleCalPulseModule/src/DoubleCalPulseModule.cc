@@ -63,11 +63,6 @@ void DoubleCalPulseModule::event()
   map<topcaf_channel_id_t, double> asic_ref_time;
 
   map<topcaf_channel_id_t, double> asic_ref_flag;
-  map<topcaf_channel_id_t, double> asic_ref_amp;
-  map<topcaf_channel_id_t, double> asic_ref_A1;
-  map<topcaf_channel_id_t, double> asic_ref_A2;
-  map<topcaf_channel_id_t, int> asic_ref_T1;
-  map<topcaf_channel_id_t, int> asic_ref_max_bin;
 
   if (digit_ptr) {
     //Look over all waveforms for calibration times.
@@ -86,12 +81,6 @@ void DoubleCalPulseModule::event()
           && (digit_ptr[w]->GetWidth() < m_wmax) && (digit_ptr[w]->GetADCHeight() < m_adcmin) && (digit_ptr[w]->GetADCHeight() > m_adcmax)) {
         if ((asic_ch == m_cal_ch) && ((digit_ptr[w]->GetTDCBin() < asic_ref_time[asicKey]) || (asic_ref_time[asicKey] == 0))) {
           asic_ref_time[asicKey] = digit_ptr[w]->GetTDCBin();
-          asic_ref_amp[asicKey] = digit_ptr[w]->GetADCHeight();
-          asic_ref_T1[asicKey] = digit_ptr[w]->GetCrossT1();
-          asic_ref_A1[asicKey] = digit_ptr[w]->GetCrossA1();
-          asic_ref_A2[asicKey] = digit_ptr[w]->GetCrossA2();
-          asic_ref_max_bin[asicKey] = digit_ptr[w]->GetMaxBin();
-
           digit_ptr[w]->SetFlag(10);
         }
         //      B2INFO(hardwareID<<"\ttdc: "<<digit_ptr[w]->GetTDCBin()<<"\tasic_ref_time: "<<asic_ref_time[asicKey]);
@@ -102,12 +91,6 @@ void DoubleCalPulseModule::event()
           && (digit_ptr[w]->GetWidth() < m_wmax) && (digit_ptr[w]->GetADCHeight() < m_adcmin) && (digit_ptr[w]->GetADCHeight() > m_adcmax)) {
         if ((asic_ch == m_cal_ch) && ((digit_ptr[w]->GetTDCBin() < asic_ref_time[asicKey]) || (asic_ref_time[asicKey] == 0))) {
           asic_ref_time[asicKey] = digit_ptr[w]->GetTDCBin();
-          asic_ref_amp[asicKey] = digit_ptr[w]->GetADCHeight();
-          asic_ref_T1[asicKey] = digit_ptr[w]->GetCrossT1();
-          asic_ref_A1[asicKey] = digit_ptr[w]->GetCrossA1();
-          asic_ref_A2[asicKey] = digit_ptr[w]->GetCrossA2();
-          asic_ref_max_bin[asicKey] = digit_ptr[w]->GetMaxBin();
-
           digit_ptr[w]->SetFlag(10);
         }
         //      B2INFO(hardwareID<<"\ttdc: "<<digit_ptr[w]->GetTDCBin()<<"\tasic_ref_time: "<<asic_ref_time[asicKey]);
@@ -116,12 +99,6 @@ void DoubleCalPulseModule::event()
           && (digit_ptr[w]->GetWidth() < m_wmax) && (digit_ptr[w]->GetADCHeight() > m_adcmin) && (digit_ptr[w]->GetADCHeight() < m_adcmax)) {
         if ((asic_ch == m_cal_ch) && ((digit_ptr[w]->GetTDCBin() < asic_ref_time[asicKey]) || (asic_ref_time[asicKey] == 0))) {
           asic_ref_time[asicKey] = digit_ptr[w]->GetTDCBin();
-          asic_ref_amp[asicKey] = digit_ptr[w]->GetADCHeight();
-          asic_ref_T1[asicKey] = digit_ptr[w]->GetCrossT1();
-          asic_ref_A1[asicKey] = digit_ptr[w]->GetCrossA1();
-          asic_ref_A2[asicKey] = digit_ptr[w]->GetCrossA2();
-          asic_ref_max_bin[asicKey] = digit_ptr[w]->GetMaxBin();
-
           digit_ptr[w]->SetFlag(10);
         }
         //      B2INFO(hardwareID<<"\ttdc: "<<digit_ptr[w]->GetTDCBin()<<"\tasic_ref_time: "<<asic_ref_time[asicKey]);
@@ -172,12 +149,6 @@ void DoubleCalPulseModule::event()
       int asic = digit_ptr[w]->GetASIC();
       asicKey += asic * 10000;
 
-      digit_ptr[w]->SetRefAmplitude(asic_ref_amp[asicKey]);
-      digit_ptr[w]->SetRefT1(asic_ref_T1[asicKey]);
-      digit_ptr[w]->SetRefA1(asic_ref_A1[asicKey]);
-      digit_ptr[w]->SetRefA2(asic_ref_A2[asicKey]);
-      digit_ptr[w]->SetRefMaxBin(asic_ref_max_bin[asicKey]);
-      digit_ptr[w]->SetRefTime(asic_ref_time[asicKey]);
 
       //int asic_ch = digit_ptr[w]->GetASICChannel();
 

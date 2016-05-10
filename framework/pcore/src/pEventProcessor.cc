@@ -49,11 +49,7 @@ namespace {
   static void parentSignalHandler(int signal)
   {
     //signal handlers are called asynchronously, making many standard functions (including output) dangerous
-    //write() is, however, safe, so we'll use that to write to stderr.
-    if (signal == SIGSEGV) {
-      EventProcessor::writeToStdErr("\nProcess died with SIGSEGV (Segmentation fault).\n");
-      exit(1);
-    } else if (signal == SIGINT) {
+    if (signal == SIGINT) {
       g_pEventProcessor->gotSigINT();
     } else if (signal == SIGTERM or signal == SIGQUIT) {
       g_pEventProcessor->killRingBuffers();

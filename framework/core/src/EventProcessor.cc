@@ -241,7 +241,13 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
 
 void EventProcessor::installSignalHandler(int sig, void (*fn)(int))
 {
-  if (signal(sig, fn) == SIG_ERR) {
+  struct sigaction s;
+  memset(&s, '\0', sizeof(s));
+
+  s.sa_handler = fn;
+  sigemptyset(&s.sa_mask);
+
+  if (sigaction(sig, &s, nullptr) != 0) {
     B2FATAL("Cannot setup signal handler for signal " << sig);
   }
 }

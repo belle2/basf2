@@ -9,13 +9,12 @@
 #include <framework/pcore/SeqFile.h>
 #include <framework/logging/Logger.h>
 
-#include <stdio.h>
+#include <ios>
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <string.h>
 #include <errno.h>
-#include <netinet/in.h>
 
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -88,7 +87,7 @@ SeqFile::~SeqFile()
   B2INFO("Seq File " << m_nfile << " closed");
 }
 
-int SeqFile::status()
+int SeqFile::status() const
 {
   return m_fd;
 }
@@ -96,7 +95,7 @@ int SeqFile::status()
 int SeqFile::write(char* buf)
 {
   int insize = *((int*)buf); // nbytes in the buffer at the beginning
-  if (insize + m_nb >= BLOCKSIZE && m_filename != "/dev/null") {
+  if (insize + m_nb >= c_MaxFileSize && m_filename != "/dev/null") {
     B2INFO("SeqFile: previous file closed (size=" << m_nb << " bytes)");
     m_nfile++;
     auto file = m_filename + '-' + std::to_string(m_nfile);

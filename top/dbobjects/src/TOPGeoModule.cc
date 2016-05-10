@@ -16,6 +16,50 @@
 using namespace std;
 using namespace Belle2;
 
+TVector3 TOPGeoModule::pointToGlobal(const TVector3& point) const
+{
+  if (!m_rotation) setTransformation();
+  return (*m_rotation) * point + (*m_translation);
+}
+
+TVector3 TOPGeoModule::momentumToGlobal(const TVector3& momentum) const
+{
+  if (!m_rotation) setTransformation();
+  return (*m_rotation) * momentum;
+}
+
+TVector3 TOPGeoModule::pointToLocal(const TVector3& point) const
+{
+  if (!m_rotation) setTransformation();
+  return (*m_rotationInverse) * (point - (*m_translation));
+}
+
+TVector3 TOPGeoModule::momentumToLocal(const TVector3& momentum) const
+{
+  if (!m_rotation) setTransformation();
+  return (*m_rotationInverse) * momentum;
+}
+
+void TOPGeoModule::setTransformation() const
+{
+
+  TRotation Rphi;
+  Rphi.RotateZ(m_phi - M_PI / 2);
+  TVector3 translation(0, getRadius(), getZc());
+
+  TRotation Rot;
+  if (m_moduleDisplacement) {
+    Rot = Rphi * m_moduleDisplacement->getRotation();
+    translation += m_moduleDisplacement->getTranslation();
+  } else {
+    Rot = Rphi;
+  }
+  m_rotation =  new TRotation(Rot);
+  m_rotationInverse = new TRotation(Rot.Inverse());
+  m_translation = new TVector3(Rphi * translation);
+}
+
+
 bool TOPGeoModule::isConsistent() const
 {
   if (m_moduleID <= 0) return false;
@@ -42,7 +86,7 @@ void TOPGeoModule::print(const std::string& title) const
   m_mirror.print();
   m_prism.print();
   m_arrayDisplacement.print();
-  m_moduleDisplacement.print();
+  if (m_moduleDisplacement) m_moduleDisplacement->print();
 
 }
 

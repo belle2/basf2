@@ -107,6 +107,16 @@ namespace Belle2 {
     const TOPGeoModule& getModule(unsigned moduleID) const;
 
     /**
+     * Checks if module exists
+     * @param moduleID module ID (1-based)
+     * @return true if exists
+     */
+    bool isModuleIDValid(unsigned moduleID) const
+    {
+      return moduleID - 1 < m_modules.size();
+    }
+
+    /**
      * Returns PMT array
      * @return PMT array geometry parameters
      */

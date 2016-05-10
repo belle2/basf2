@@ -10,6 +10,7 @@
 
 // Own include
 #include <top/calibration/TOPDatabaseImporter.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 // framework - Database
 #include <framework/database/Database.h>
@@ -36,14 +37,14 @@ using namespace Belle2;
 void TOPDatabaseImporter::importSampleTimeCalibration(std::string fileName)
 {
 
-
-  if (!m_topgp->isInitialized()) {
-    B2ERROR("TOPGeometryPar was not initialized");
+  const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
+  if (!geo) {
+    B2ERROR("TOP geometry is not available");
     return;
   }
 
-  auto& mapper = m_topgp->getChannelMapper();
-  auto syncTimeBase = m_topgp->getSyncTimeBase();
+  auto& mapper = TOP::TOPGeometryPar::Instance()->getChannelMapper();
+  auto syncTimeBase = geo->getNominalTDC().getSyncTimeBase();
 
   std::ifstream stream;
   stream.open(fileName.c_str());

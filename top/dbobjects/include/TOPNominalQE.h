@@ -95,7 +95,7 @@ namespace Belle2 {
 
     float m_lambdaFirst = 0; /**< wavelength of the first data point [nm] */
     float m_lambdaStep = 0;  /**< wavelength step [nm] */
-    float m_CE = 0;          /** collection efficiency */
+    float m_CE = 0;          /**< collection efficiency */
     std::vector<float> m_QE; /**< QE data points */
 
     ClassDef(TOPNominalQE, 1); /**< ClassDef */

@@ -16,6 +16,8 @@
 #include <top/dbobjects/TOPGeoPrism.h>
 #include <top/dbobjects/TOPGeoPMTArrayDisplacement.h>
 #include <top/dbobjects/TOPGeoModuleDisplacement.h>
+#include <TVector3.h>
+#include <TRotation.h>
 
 namespace Belle2 {
 
@@ -41,6 +43,17 @@ namespace Belle2 {
     TOPGeoModule(int moduleID, double radius, double phi, double backwardZ):
       m_moduleID(moduleID), m_radius(radius), m_phi(phi), m_backwardZ(backwardZ)
     {}
+
+    /**
+     * Destructor
+     */
+    ~TOPGeoModule()
+    {
+      if (m_moduleDisplacement) delete m_moduleDisplacement;
+      if (m_rotation) delete m_rotation;
+      if (m_rotationInverse) delete m_rotationInverse;
+      if (m_translation) delete m_translation;
+    }
 
     /**
      * Sets module construction number (0 = ideal module = default)
@@ -87,7 +100,8 @@ namespace Belle2 {
      */
     void setModuleDisplacement(const TOPGeoModuleDisplacement& displ)
     {
-      m_moduleDisplacement = displ;
+      if (m_moduleDisplacement) delete m_moduleDisplacement;
+      m_moduleDisplacement = new TOPGeoModuleDisplacement(displ);
     }
 
     /**
@@ -157,7 +171,7 @@ namespace Belle2 {
      * Returns module displacement
      * @return module displacement parameters
      */
-    const TOPGeoModuleDisplacement& getModuleDisplacement() const
+    const TOPGeoModuleDisplacement* getModuleDisplacement() const
     {
       return m_moduleDisplacement;
     }
@@ -218,6 +232,34 @@ namespace Belle2 {
     double getInnerRadius() const {return getRadius() - getBarThickness() / 2;}
 
     /**
+     * Transforms 3D point from Belle II to module internal frame
+     * @param point 3D point in Belle II frame
+     * @return 3D point in module internal frame
+     */
+    TVector3 pointToLocal(const TVector3& point) const;
+
+    /**
+     * Transforms momentum vector from Belle II to module internal frame
+     * @param momentum momentum vector in Belle II frame
+     * @return momentum vector in module internal frame
+     */
+    TVector3 momentumToLocal(const TVector3& momentum) const;
+
+    /**
+     * Transforms 3D point from module internal frame to Belle II frame
+     * @param point 3D point in module internal frame
+     * @return 3D point in Belle II frame
+     */
+    TVector3 pointToGlobal(const TVector3& point) const;
+
+    /**
+     * Transforms momentum vector from module internal frame to Belle II frame
+     * @param momentum momentum vector in module internal frame
+     * @return momentum vector in Belle II frame
+     */
+    TVector3 momentumToGlobal(const TVector3& momentum) const;
+
+    /**
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
@@ -232,6 +274,11 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Sets transformation cache
+     */
+    void setTransformation() const;
+
     int m_moduleID = 0; /**< module ID */
     float m_radius = 0; /**< radius of bar central plane in Belle II frame */
     float m_phi = 0; /**< azimuthal angle in Belle II frame */
@@ -243,7 +290,14 @@ namespace Belle2 {
     TOPGeoMirrorSegment m_mirror; /**< mirror segment */
     TOPGeoPrism m_prism; /**< prism */
     TOPGeoPMTArrayDisplacement m_arrayDisplacement;  /**< PMT array displacement */
-    TOPGeoModuleDisplacement m_moduleDisplacement;   /**< module displacement */
+    TOPGeoModuleDisplacement* m_moduleDisplacement = 0;   /**< module displacement */
+
+    /** cache for rotation matrix (from internal to Belle II frame) */
+    mutable TRotation* m_rotation = 0;    //!
+    /** cache for inverse rotation matrix */
+    mutable TRotation* m_rotationInverse = 0;    //!
+    /** cache for translation vector (from internal to Belle II frame) */
+    mutable TVector3* m_translation = 0;  //!
 
     ClassDef(TOPGeoModule, 1); /**< ClassDef */
 

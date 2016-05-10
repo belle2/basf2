@@ -110,6 +110,10 @@ namespace Belle2 {
      */
     const GeoOpticalSurface& getSurface() const {return m_surface;}
 
+    /**
+     * Returns geant4 parameter describing surface roughness
+     * @return surface roughness
+     */
     double getSigmaAlpha() const {return m_sigmaAlpha;}
 
     /**

@@ -15,7 +15,7 @@
 namespace Belle2 {
 
   /**
-   *
+   * Geometry parameters of prism
    */
   class TOPGeoPrism: public TOPGeoBarSegment {
   public:

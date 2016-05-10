@@ -36,6 +36,8 @@ using namespace std;
 
 namespace Belle2 {
 
+  using namespace TOP;
+
   //-----------------------------------------------------------------
   //                 Register module
   //-----------------------------------------------------------------
@@ -46,8 +48,7 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPNtupleModule::TOPNtupleModule() : Module(),
-    m_file(0), m_tree(0), m_topgp(TOP::TOPGeometryPar::Instance())
+  TOPNtupleModule::TOPNtupleModule() : Module()
   {
     // set module description
     setDescription("Writes ntuple of TOPLikelihoods with tracking info into a root file");
@@ -55,7 +56,6 @@ namespace Belle2 {
     // Add parameters
     addParam("outputFileName", m_outputFileName, "Output file name",
              string("TOPNtuple.root"));
-
 
   }
 
@@ -119,6 +119,13 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> evtMetaData;
     StoreArray<Track> tracks;
 
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+    if (!geo) {
+      B2ERROR("TOPNtupleModule: no geometry available");
+      return;
+    }
+    geo->useBasf2Units();
+
     for (const auto& track : tracks) {
       const TrackFitResult* trackFit = track.getTrackFitResult(Const::pion);
       if (!trackFit) continue;
@@ -178,10 +185,10 @@ namespace Belle2 {
         int moduleID = extHit->getCopyID();
         TVector3 position = extHit->getPosition();
         TVector3 momentum = extHit->getMomentum();
-        const TOP::TOPQbar* bar = m_topgp->getQbar(moduleID);
-        if (bar) {
-          position = bar->pointToLocal(position);
-          momentum = bar->momentumToLocal(momentum);
+        if (geo->isModuleIDValid(moduleID)) {
+          const auto& module = geo->getModule(moduleID);
+          position = module.pointToLocal(position);
+          momentum = module.momentumToLocal(momentum);
         }
         m_top.extHit.moduleID = moduleID;
         m_top.extHit.PDG = extHit->getPdgCode();
@@ -198,10 +205,10 @@ namespace Belle2 {
         int moduleID = barHit->getModuleID();
         TVector3 position = barHit->getPosition();
         TVector3 momentum = barHit->getMomentum();
-        const TOP::TOPQbar* bar = m_topgp->getQbar(moduleID);
-        if (bar) {
-          position = bar->pointToLocal(position);
-          momentum = bar->momentumToLocal(momentum);
+        if (geo->isModuleIDValid(moduleID)) {
+          const auto& module = geo->getModule(moduleID);
+          position = module.pointToLocal(position);
+          momentum = module.momentumToLocal(momentum);
         }
         m_top.barHit.moduleID = moduleID;
         m_top.barHit.PDG = barHit->getPDG();

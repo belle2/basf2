@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <top/geometry/TOPGeometryPar.h>
 #include <string>
 
 namespace Belle2 {
@@ -28,14 +27,7 @@ namespace Belle2 {
      * Default constructor
      */
     TOPDatabaseImporter()
-    {
-      if (!m_topgp->isInitialized()) {
-        GearDir content("/Detector/DetectorComponent[@name='TOP']/Content");
-        m_topgp->Initialize(content);
-      }
-      if (!m_topgp->isInitialized())
-        B2FATAL("Component TOP not found in Gearbox");
-    }
+    {}
 
 
     /**
@@ -63,10 +55,7 @@ namespace Belle2 {
 
   private:
 
-    /** geometry parameters */
-    TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance();
-
-    ClassDef(TOPDatabaseImporter, 1);  /**< ClassDef */
+    //    ClassDef(TOPDatabaseImporter, 1);  /**< ClassDef - why this is needed? */
   };
 
 } // Belle2 namespace

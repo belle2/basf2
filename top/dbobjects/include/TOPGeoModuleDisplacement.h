@@ -11,6 +11,8 @@
 #pragma once
 
 #include <top/dbobjects/TOPGeoBase.h>
+#include <TVector3.h>
+#include <TRotation.h>
 
 namespace Belle2 {
 
@@ -71,6 +73,23 @@ namespace Belle2 {
      * @return rotation angle
      */
     double getGamma() const {return m_gamma;}
+
+    /**
+     * Returns rotation matrix
+     * @return rotation matrix
+     */
+    TRotation getRotation() const
+    {
+      TRotation rot;
+      rot.RotateX(m_alpha).RotateY(m_beta).RotateZ(m_gamma);
+      return rot;
+    }
+
+    /**
+     * Returns translation vector
+     * @return translation vector
+     */
+    TVector3 getTranslation() const {return TVector3(getX(), getY(), getZ());}
 
     /**
      * Check for consistency of data members

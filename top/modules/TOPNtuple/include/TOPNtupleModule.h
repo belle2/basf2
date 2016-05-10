@@ -69,11 +69,9 @@ namespace Belle2 {
 
     std::string m_outputFileName; /**< output file name (root file) */
 
-    TFile* m_file;      /**< TFile */
-    TTree* m_tree;      /**< TTree with TOPTree structure */
-    TOP::TOPTree m_top; /**< ntuple structure */
-
-    TOP::TOPGeometryPar* m_topgp;  /**< geometry parameters */
+    TFile* m_file = 0;      /**< TFile */
+    TTree* m_tree = 0;      /**< TTree with TOPTree structure */
+    TOP::TOPTree m_top;     /**< ntuple structure */
 
   };
 

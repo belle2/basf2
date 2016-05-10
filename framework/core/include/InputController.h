@@ -82,6 +82,9 @@ namespace Belle2 {
     /** Set the loaded TChain (event durability). */
     static void setChain(const TChain* chain) { s_chain = chain; }
 
+    /** Reset InputController (e.g. after forking a thread) */
+    static void resetForChildProcess();
+
   private:
     InputController() { }
     ~InputController() { }

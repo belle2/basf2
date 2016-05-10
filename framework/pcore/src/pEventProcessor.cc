@@ -22,8 +22,6 @@
 #include <TROOT.h>
 
 #include <signal.h>
-#include <sys/wait.h>
-#include <cstdlib>
 
 
 using namespace std;

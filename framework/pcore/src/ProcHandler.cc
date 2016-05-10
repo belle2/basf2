@@ -4,6 +4,7 @@
 /// @date Jul 14 2008
 
 #include <framework/pcore/ProcHandler.h>
+#include <framework/core/InputController.h>
 #include <framework/logging/Logger.h>
 
 #include <stdio.h>
@@ -42,6 +43,8 @@ bool ProcHandler::startProc(std::vector<pid_t>* processList, const std::string& 
     ProcHandler::s_processID = id;
     //Reset some python state: signals, threads, gil in the child
     PyOS_AfterFork();
+    //InputController becomes useless in child process
+    InputController::resetForChildProcess();
     //die when parent dies
     prctl(PR_SET_PDEATHSIG, SIGHUP);
     return true;

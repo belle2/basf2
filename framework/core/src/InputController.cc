@@ -13,6 +13,17 @@ long InputController::s_nextEvent = -1;
 long InputController::s_currentEntry = 0;
 const TChain* InputController::s_chain = NULL;
 
+void InputController::resetForChildProcess()
+{
+  s_canControlInput = false;
+  s_nextEntry = -1;
+  s_nextExperiment = -1;
+  s_nextRun = -1;
+  s_nextEvent = -1;
+  s_currentEntry = 0;
+  //s_chain is not touched, so numEntries() still works
+}
+
 std::string InputController::getCurrentFileName()
 {
   if (!s_chain)

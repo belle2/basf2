@@ -192,6 +192,9 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   clearFileList();
 
 
+  //install new signal handlers before forking
+  installMainSignalHandlers(parentSignalHandler);
+
   //Path for current process
   PathPtr localPath;
 
@@ -219,8 +222,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       localPath = m_outpathlist[0];
       m_master = localPath->getModules().begin()->get(); //set Rx as master
     }
-
-    installMainSignalHandlers(parentSignalHandler);
   }
 
 

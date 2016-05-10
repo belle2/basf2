@@ -34,9 +34,7 @@ namespace {
 
   void sigChldHandler(int)
   {
-    //TODO: B2Logging is a BAD idea here.
-    //
-    //which child died?
+    int raiseSig = 0;
     while (!s_pidList.empty()) {
       int status;
       int pid = waitpid(-1, &status, WNOHANG);
@@ -61,18 +59,24 @@ namespace {
           //ok, it died because of some signal
           //EventProcessor::writeToStdErr("\nOne of our child processes died, stopping execution...\n");
           int termsig = WTERMSIG(status);
-          if (termsig == SIGINT)
-            raise(SIGINT); //stop processing
-          else
-            B2FATAL("Execution stopped, sub-process with PID " << pid << " was killed by signal " << termsig << ".");
+          if (termsig == SIGINT) {
+            raiseSig = termsig; //stop processing
+          } else {
+            EventProcessor::writeToStdErr("\nExecution stopped, sub-process was killed by signal. Please check other log messages for details.\n");
+            exit(128 + termsig);
+          }
         } else if (WIFEXITED(status) and WEXITSTATUS(status) != 0) {
-          B2FATAL("Execution stopped, sub-process with PID " << pid << " has exit status " << WEXITSTATUS(status) << ".");
+          EventProcessor::writeToStdErr("\nExecution stopped, sub-process exited with non-zero exit status. Please check other log messages for details.\n");
+          exit(1);
         }
 
         //remove pid from global list
         s_pidList.erase(pid);
       }
     }
+
+    if (raiseSig)
+      raise(raiseSig);
 
     //TODO do what exactly?
     //a)

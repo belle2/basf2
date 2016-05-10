@@ -368,8 +368,6 @@ void DisplayUI::makeGui()
   TEveBrowser* browser = gEve->GetBrowser();
   const int margin = 3;
 
-  //workaround for regression in root 5.34/03: closing display window from WM wouldn't stop event loop
-  browser->Connect("CloseWindow()", "TSystem", gSystem, "ExitLoop()");
   browser->Connect("CloseWindow()", "Belle2::DisplayUI", this, "closeAndContinue()");
 
   //add handler for keyboard events, needs to be done for browser TGFrame as well as frames of all TGLViewers
@@ -575,14 +573,9 @@ void DisplayUI::makeGui()
   {
     TGHorizontalFrame* hf = new TGHorizontalFrame(exit_frame);
     {
-      TGButton* b = new TGTextButton(hf, "Continue without display");
-      b->SetToolTipText("Close the display but continue producing/reading events.");
-      hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, margin, margin, margin, margin));
-      b->Connect("Clicked()", "Belle2::DisplayUI", this, "closeAndContinue()");
-
-      b = new TGTextButton(hf, "Exit");
+      TGButton* b = new TGTextButton(hf, "     Exit     ");
       b->SetToolTipText("Close the display and stop basf2 after this event.");
-      hf->AddFrame(b, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, margin, margin, margin, margin));
+      hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, margin, margin, margin, margin));
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "exit()");
 
     }
@@ -738,8 +731,9 @@ void DisplayUI::automaticEvent()
     projectionName.ReplaceAll(" viewer", "");
     projectionName.ReplaceAll("/", "");
     const int width = m_autoPictureWidth->GetIntNumber();
-    glv->SavePictureWidth(TString::Format("%s_%s_%d.png", m_autoFileNamePrefix->GetText(), projectionName.Data(), i), width,
-                          false); // don't scale pixel objects
+    const bool scalePixelObjects = false;
+    TString name = TString::Format("%s_%s_%d.png", m_autoFileNamePrefix->GetText(), projectionName.Data(), i);
+    glv->SavePictureWidth(name, width, scalePixelObjects);
   }
 
   i++;
@@ -749,7 +743,8 @@ void DisplayUI::pollNewEvents()
 {
   if (!AsyncWrapper::isAsync())
     return;
-
+  if (!gEve)
+    return;
 
   int numEvents = AsyncWrapper::numAvailableEvents();
   bool state = m_nextButton->IsEnabled();
@@ -760,10 +755,21 @@ void DisplayUI::pollNewEvents()
 
 void DisplayUI::closeAndContinue()
 {
+  gSystem->ExitLoop();
+  gROOT->SetInterrupt();
   m_cumulative = false;
 
   if (!gEve)
     return;
+
+  // avoid emittting signals at end
+  gEve->GetBrowser()->Disconnect();
+
+  gEve->GetSelection()->Disconnect();
+  gEve->GetHighlight()->Disconnect();
+  gEve->GetSelection()->RemoveElements();
+  gEve->GetHighlight()->RemoveElements();
+
   gEve->GetBrowser()->UnmapWindow();
   gEve->GetBrowser()->SendCloseMessage();
 }

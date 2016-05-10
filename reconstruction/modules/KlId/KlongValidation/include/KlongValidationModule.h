@@ -74,9 +74,9 @@ namespace Belle2 {
     TEfficiency* m_effTheta;
     /* momentum efficiency   **/
     TEfficiency* m_effMom;
-    /* fake anbgle in x-y   **/
+    /* fake phi, angle in x-y   **/
     TEfficiency* m_fakePhi;
-    /*  dake angle to z   **/
+    /*  fake theta, angle to z   **/
     TEfficiency* m_fakeTheta;
     /*  fake momentum plot   **/
     TEfficiency* m_fakeMom;

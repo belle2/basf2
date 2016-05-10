@@ -9,8 +9,6 @@
 #include <framework/pcore/SeqFile.h>
 #include <framework/logging/Logger.h>
 
-#include <ios>
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>

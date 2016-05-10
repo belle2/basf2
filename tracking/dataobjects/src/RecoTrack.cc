@@ -214,3 +214,8 @@ void RecoTrack::prune()
     m_genfitTrack.prune("FL");
   }
 }
+
+genfit::Track& RecoTrackGenfitAccess::getGenfitTrack(RecoTrack& recoTrack)
+{
+  return recoTrack.m_genfitTrack;
+}

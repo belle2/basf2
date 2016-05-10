@@ -36,6 +36,8 @@ namespace genfit {
 
 namespace Belle2 {
 
+  class RecoTrackGenfitAccess;
+
   /** This is the Reconstruction Event-Data Model Track.
    *
    * This class collects hits, saves the track parameters and can be used with a TrackFitter to perform
@@ -80,6 +82,7 @@ namespace Belle2 {
     friend class MeasurementAdder;
     friend class TrackFitter;
     friend class GenfitTrackCreatorModule;
+    friend class RecoTrackGenfitAccess;
 
   private:
     /// Copy the definitions from the RecoHitInformation to this class.
@@ -741,4 +744,21 @@ namespace Belle2 {
     /** Making this class a ROOT class.*/
     ClassDef(RecoTrack, 5);
   };
+
+  /** This class allows access to the genfit::Track of the RecoTrack.
+   *
+   * This class allows direct access to the most holy part of the RecoTrack. The design of the RecoTrack is such, that this should not be required.
+   * However, some interfaces require a genfit::Track, e.g. the genfit rave interface, and the access to the genfit::Track member is required.
+   * This should only be used when no other solution works.
+   */
+  class RecoTrackGenfitAccess {
+  public:
+    /**Give access to the RecoTrack's genfit::Track.
+     *
+     * @param recoTrack
+     * @return genfit::Track of the RecoTrack.
+     */
+    static genfit::Track& getGenfitTrack(RecoTrack& recoTrack);
+  };
+
 }

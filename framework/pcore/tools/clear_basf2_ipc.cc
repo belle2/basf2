@@ -54,22 +54,27 @@ int main(int argc, char** argv)
         //  printf ( "name : %s - shmid = %d, semid = %d\n", name, shmid, semid );
         int unnamed = strcmp(name, "UNNAMED");
         bool deleted = false;
+        bool stale = false;
         if (shmid > 0) {
           if (mode == 0 || (unnamed == 0 && mode == 2) ||
               (unnamed != 0 && mode == 1)) {
 
             shmid_ds shmInfo;
-            shmctl(shmid, IPC_STAT, &shmInfo);
-            //Don't remove SHM segments which still have a process attached
-            //Note that nattch counter is decreased by both shmdt() and exit()
-            if (shmInfo.shm_nattch != 0) {
-              printf("/tmp/%s still has %ld processes attached, skipped.\n", ent->d_name, shmInfo.shm_nattch);
-              continue;
-            }
+            if (shmctl(shmid, IPC_STAT, &shmInfo) != 0) {
+              printf("Removing stale file %s\n", ent->d_name);
+              stale = true; //already gone
+            } else {
+              //Don't remove SHM segments which still have a process attached
+              //Note that nattch counter is decreased by both shmdt() and exit()
+              if (shmInfo.shm_nattch != 0) {
+                printf("/tmp/%s still has %ld processes attached, skipped.\n", ent->d_name, shmInfo.shm_nattch);
+                continue;
+              }
 
-            if (shmctl(shmid, IPC_RMID, (struct shmid_ds*) NULL) == 0) {
-              printf("SHM %d deleted. ", shmid);
-              deleted = true;
+              if (shmctl(shmid, IPC_RMID, (struct shmid_ds*) NULL) == 0) {
+                printf("SHM %d deleted. ", shmid);
+                deleted = true;
+              }
             }
           }
         }
@@ -82,7 +87,7 @@ int main(int argc, char** argv)
             }
           }
         }
-        if (deleted) {
+        if (deleted or stale) {
           if (setReturnCode)
             ret = 1;
           printf("\n");

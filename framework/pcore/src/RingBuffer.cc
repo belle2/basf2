@@ -186,7 +186,6 @@ void RingBuffer::cleanup()
     shmctl(m_shmid, IPC_RMID, (struct shmid_ds*) 0);
     SemaphoreLocker::destroy(m_semid);
     if (m_file) {
-      //      close(m_pathfd);
       unlink(m_pathname.c_str());
     }
     unlink(m_semshmFileName.c_str());

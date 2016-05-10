@@ -24,10 +24,13 @@ namespace Belle2 {
 
   public:
 
+    /**
+     * Gaussian distribution parameters
+     */
     struct Gaussian {
-      float fraction = 0;
-      float mean = 0;
-      float sigma = 0;
+      float fraction = 0; /**< area normalization */
+      float mean = 0;     /**< peak position [ns] */
+      float sigma = 0;    /**< peak width [ns] */
     };
 
     /**

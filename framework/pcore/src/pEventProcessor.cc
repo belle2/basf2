@@ -147,7 +147,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     return;
   }
 
-  setupSignalHandler(cleanupAndStop);
+  installMainSignalHandlers(cleanupAndStop);
 
   //inserts Rx/Tx modules into path (sets up IPC structures)
   preparePaths();
@@ -222,7 +222,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       m_master = localPath->getModules().begin()->get(); //set Rx as master
     }
 
-    setupSignalHandler(parentSignalHandler);
+    installMainSignalHandlers(parentSignalHandler);
   }
 
 
@@ -239,10 +239,10 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
     //input: handle signals normally, will slowly cascade down
     if (m_procHandler->isInputProcess())
-      setupSignalHandler();
+      installMainSignalHandlers();
     //workers will have to ignore the signals, there's no good way to do this safely
     if (m_procHandler->isWorkerProcess())
-      setupSignalHandler(SIG_IGN);
+      installMainSignalHandlers(SIG_IGN);
 
     try {
       processCore(localPath, localModules, maxEvent, m_procHandler->isInputProcess());
@@ -272,9 +272,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   B2INFO("All processes completed");
 
   //finished, disable handler again
-  if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
-    B2FATAL("Cannot ignore SIGINT signal handler\n");
-  }
+  installSignalHandler(SIGINT, SIG_IGN);
 
   cleanup();
   B2INFO("Global process: completed");

@@ -137,11 +137,16 @@ namespace Belle2 {
      */
     void processEndRun();
 
+    /** Install a signal handler 'fn' for given signal.
+     *
+     */
+    static void installSignalHandler(int sig, void (*fn)(int));
+
     /** Install signal handler for INT, TERM and QUIT signals.
      *
      *  If argument is NULL, EventProcessor's own signal handler will be installed.
      */
-    void setupSignalHandler(void (*fn)(int) = nullptr);
+    static void installMainSignalHandlers(void (*fn)(int) = nullptr);
 
     const Module* m_master;  /**< The master module that determines the experiment/run/event number **/
     ModulePtrList m_moduleList; /**< List of all modules in order initialized. */

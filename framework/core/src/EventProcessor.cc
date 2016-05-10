@@ -132,7 +132,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
   //Check if errors appeared. If yes, don't start the event processing.
   int numLogError = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
   if ((numLogError == 0) && m_master) {
-    setupSignalHandler();
+    installMainSignalHandlers();
     try {
       processCore(startPath, moduleList, maxEvent); //Do the event processing
     } catch (StoppedBySignalException& e) {
@@ -239,19 +239,20 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
   m_processStatisticsPtr->stopGlobal(ModuleStatistics::c_Init);
 }
 
-void EventProcessor::setupSignalHandler(void (*fn)(int))
+void EventProcessor::installSignalHandler(int sig, void (*fn)(int))
+{
+  if (signal(sig, fn) == SIG_ERR) {
+    B2FATAL("Cannot setup signal handler for signal " << sig);
+  }
+}
+
+void EventProcessor::installMainSignalHandlers(void (*fn)(int))
 {
   if (!fn)
     fn = signalHandler;
-  if (signal(SIGINT, fn) == SIG_ERR) {
-    B2FATAL("Cannot setup SIGINT signal handler\n");
-  }
-  if (signal(SIGTERM, fn) == SIG_ERR) {
-    B2FATAL("Cannot setup SIGTERM signal handler\n");
-  }
-  if (signal(SIGQUIT, fn) == SIG_ERR) {
-    B2FATAL("Cannot setup SIGQUIT signal handler\n");
-  }
+  installSignalHandler(SIGINT, fn);
+  installSignalHandler(SIGTERM, fn);
+  installSignalHandler(SIGQUIT, fn);
 }
 
 bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule)

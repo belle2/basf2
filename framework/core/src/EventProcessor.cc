@@ -155,6 +155,10 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
   processTerminate(moduleList);
 
   LogSystem::Instance().printErrorSummary();
+
+  if (gSignalReceived == SIGINT) {
+    B2FATAL("Processing aborted via SIGINT, terminating. Output files have been closed safely and should be readable.");
+  }
 }
 
 

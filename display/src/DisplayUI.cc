@@ -86,13 +86,16 @@ void DisplayUI::addParameter(const std::string& label, ModuleParam<bool>& param,
 
 void DisplayUI::next()
 {
+  // periodically called by auto-advance timer, but we don't want to freeze UI if no events are there
   if (!m_nextButton->IsEnabled())
-    return; // periodically called by auto-advance timer, but we don't want to freeze UI if no events are there
+    return;
   goToEvent(m_currentEntry + 1);
 }
 
 void DisplayUI::prev()
 {
+  if (!m_prevButton->IsEnabled())
+    return;
   if (!InputController::canControlInput())
     return;
   goToEvent(m_currentEntry - 1);
@@ -153,7 +156,7 @@ void DisplayUI::goToEvent(Long_t id)
   if (id < 0)
     id = 0;
   const long numEntries = InputController::numEntries();
-  if (id >= numEntries and InputController::canControlInput())
+  if (numEntries > 0 and id >= numEntries)
     id = numEntries - 1;
 
 
@@ -170,6 +173,8 @@ void DisplayUI::goToEvent(Long_t id)
     m_currentEntry++;
   }
   gVirtualX->SetCursor(gEve->GetBrowser()->GetId(), gVirtualX->CreateCursor(kWatch));
+  m_nextButton->SetEnabled(false);
+  m_prevButton->SetEnabled(false);
 
 
   if (m_timer)
@@ -213,7 +218,7 @@ void DisplayUI::togglePlayPause()
   if (m_timer) {
     //pause
     delete m_timer;
-    m_timer = 0;
+    m_timer = nullptr;
     m_playPauseButton->SetPicture(gClient->GetPicture(icondir + "ed_execute.png"));
   } else {
     //play
@@ -411,7 +416,7 @@ void DisplayUI::makeGui()
       m_eventNumberWidget->GetNumberEntry()->Connect("ReturnPressed()", "Belle2::DisplayUI", this, "goToEventWidget()");
 
 
-      if (InputController::canControlInput()) {
+      if (numEntries > 0) {
         TGLabel* maxEvents = new TGLabel(hf, TString::Format("/%ld", numEntries - 1));
         hf->AddFrame(maxEvents, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, margin, margin, margin, margin));
       }

@@ -1,4 +1,4 @@
-#include <topcaf/modules/DoubleCalPulseCalibModule/DoubleCalPulseCalibModule.h>
+#include <topcaf/modules/DoubleCalPulseModule/DoubleCalPulseCalibModule.h>
 #include <topcaf/dataobjects/EventWaveformPacket.h>
 #include <topcaf/dataobjects/EventHeaderPacket.h>
 #include <topcaf/dataobjects/TopConfigurations.h>

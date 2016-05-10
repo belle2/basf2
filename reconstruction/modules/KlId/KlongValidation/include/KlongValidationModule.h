@@ -53,7 +53,7 @@ namespace Belle2 {
     /** momentum   */
     double m_momentum;
     /** angle in z-plane  */
-    double m_theta
+    double m_theta;
     /** angle in x-y   */
     double m_phi;
     /** K0L truth   */

@@ -54,20 +54,18 @@ namespace {
         //further children exist, but no state change yet
         break;
       } else { //state change
-        //errros?
+        //errors?
         if (WIFSIGNALED(status)) {
           //ok, it died because of some signal
           //EventProcessor::writeToStdErr("\nOne of our child processes died, stopping execution...\n");
-          int termsig = WTERMSIG(status);
-          if (termsig == SIGINT) {
-            raiseSig = termsig; //stop processing
-          } else {
-            EventProcessor::writeToStdErr("\nExecution stopped, sub-process was killed by signal. Please check other log messages for details.\n");
-            exit(128 + termsig);
-          }
+          raiseSig = WTERMSIG(status);
+
+          //backtrace in parent is not helpful
+          if (raiseSig == SIGSEGV)
+            raiseSig = SIGTERM;
         } else if (WIFEXITED(status) and WEXITSTATUS(status) != 0) {
           EventProcessor::writeToStdErr("\nExecution stopped, sub-process exited with non-zero exit status. Please check other log messages for details.\n");
-          exit(1);
+          raiseSig = SIGTERM;
         }
 
         //remove pid from global list

@@ -43,7 +43,7 @@ def run_test(init_signal, event_signal, abort, test_in_process):
         if abort:
             if killsig in (init_signal, event_signal):
                 status_ok = True
-            if retcode != 0:
+            if retcode != 0 or killsig == SIGTERM:
                 status_ok = True
         else:
             if killsig == 0 and retcode == 0:
@@ -124,7 +124,7 @@ def run_test(init_signal, event_signal, abort, test_in_process):
 
 
 # set_log_level(LogLevel.WARNING)
-for nproc in [0, 1]:
+for nproc in [0, 3]:
     set_nprocesses(nproc)
     for in_proc in [0, 1, 2]:
         if nproc == 0 and in_proc != 0:

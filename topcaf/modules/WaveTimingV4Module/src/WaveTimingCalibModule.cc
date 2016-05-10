@@ -1,4 +1,4 @@
-#include <topcaf/modules/WaveTimingCalibModule/WaveTimingCalibModule.h>
+#include <topcaf/modules/WaveTimingV4Module/WaveTimingCalibModule.h>
 #include <topcaf/dataobjects/EventWaveformPacket.h>
 #include <topcaf/dataobjects/EventHeaderPacket.h>
 #include <topcaf/dataobjects/TopConfigurations.h>

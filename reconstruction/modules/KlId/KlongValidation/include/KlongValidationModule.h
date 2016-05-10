@@ -31,60 +31,60 @@ namespace Belle2 {
 
     virtual ~KlongValidationModule();
 
-    /* initialize   **/
+    /** initialize   */
     virtual void initialize();
 
-    /*  beginn run   **/
+    /**  beginn run   */
     virtual void beginRun();
 
-    /* process event   **/
+    /** process event   */
     virtual void event();
 
-    /* end run   **/
+    /** end run   */
     virtual void endRun();
 
-    /* terminate   **/
+    /** terminate   */
     virtual void terminate();
 
   protected:
 
   private:
 
-    /* momentum   **/
+    /** momentum   */
     double m_momentum;
-    /* angle in z-plane   **/
-    double m_theta;
-    /* angle in x-y   **/
+    /** angle in z-plane  */
+    double m_theta
+    /** angle in x-y   */
     double m_phi;
-    /* K0L truth   **/
+    /** K0L truth   */
     double m_isKl;
-    /* is cluster from beambkg?   **/
+    /** is cluster from beambkg?   */
     double m_isBeamBKG;
-    /* did cluster pass selection of algorythm?   **/
+    /** did cluster pass selection of algorythm?  */
     bool   m_passed;
-    /* cluster wrongly reconstructed as K0L?   **/
+    /** cluster wrongly reconstructed as K0L?   */
     bool   m_faked;
-    /* cluster reconstructed as K0L?   **/
+    /** cluster reconstructed as K0L?   */
     bool   m_reconstructedAsKl;
 
     // use TEfficiency histogramms to calculate efficiency
-    /* efficiency in x-y plane   **/
+    /** efficiency in x-y plane   */
     TEfficiency* m_effPhi;
-    /* efficiency in angle to z   **/
+    /** efficiency in angle to z   */
     TEfficiency* m_effTheta;
-    /* momentum efficiency   **/
+    /** momentum efficiency   */
     TEfficiency* m_effMom;
-    /* fake phi, angle in x-y   **/
+    /** fake phi, angle in x-y   */
     TEfficiency* m_fakePhi;
-    /*  fake theta, angle to z   **/
+    /**  fake theta, angle to z   */
     TEfficiency* m_fakeTheta;
-    /*  fake momentum plot   **/
+    /**  fake momentum plot   */
     TEfficiency* m_fakeMom;
 
-    /* output path   **/
+    /** output path   */
     std::string m_outPath = "KlongValidationData.root";
 
-    /* root tree etc.  **/
+    /** root tree etc. */
     TFile* m_f = nullptr;  //
 
   }; // end class

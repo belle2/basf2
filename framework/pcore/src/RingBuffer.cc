@@ -204,8 +204,11 @@ int RingBuffer::insq(const int* buf, int size)
 {
   //  printf ( "insq: requesting : %d, nbuf = %d\n", size, m_bufinfo->nbuf );
   if (size <= 0) {
-    B2ERROR("RingBuffer::insq() failed: invalid buffer size = " << size);
-    return -1;
+    B2FATAL("RingBuffer::insq() failed: invalid buffer size = " << size);
+  }
+  if (m_bufinfo->numAttachedTx == 0) {
+    //safe abort was requested
+    exit(0);
   }
   SemaphoreLocker locker(m_semid);
   if (m_bufinfo->nbuf == 0) {

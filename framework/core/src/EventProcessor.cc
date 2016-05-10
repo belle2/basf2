@@ -41,6 +41,8 @@
 #define CALL_MODULE(module, x) module->x()
 #endif
 
+#include <TROOT.h>
+
 #include <signal.h>
 #include <unistd.h>
 #include <cstring>
@@ -55,12 +57,12 @@ namespace {
     gSignalReceived = signal;
 
     if (signal == SIGINT) {
-      EventProcessor::writeToStdErr("Received Ctrl+C, basf2 will exit safely. (Press Ctrl+\\ (SIGQUIT) to abort immediately - this may break output files.)\n");
+      EventProcessor::writeToStdErr("Received Ctrl+C, basf2 will exit safely. (Press Ctrl+\\ (SIGQUIT) to abort immediately - this will break output files.)\n");
     }
   }
 }
 EventProcessor::StoppedBySignalException::StoppedBySignalException(int signal):
-  runtime_error("Excecution stopped by signal " + to_string(signal) + "!"),
+  runtime_error("Execution stopped by signal " + to_string(signal) + "!"),
   signal(signal)
 {
 }
@@ -135,6 +137,9 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
       processCore(startPath, moduleList, maxEvent); //Do the event processing
     } catch (StoppedBySignalException& e) {
       if (e.signal != SIGINT) {
+        // close all open ROOT files, ROOT's exit handler will crash otherwise
+        gROOT->GetListOfFiles()->Delete();
+
         B2FATAL(e.what());
       }
       //in case of SIGINT, we move on to processTerminate() to shut down safely
@@ -234,15 +239,17 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
   m_processStatisticsPtr->stopGlobal(ModuleStatistics::c_Init);
 }
 
-void EventProcessor::setupSignalHandler()
+void EventProcessor::setupSignalHandler(void (*fn)(int))
 {
-  if (signal(SIGINT, signalHandler) == SIG_ERR) {
+  if (!fn)
+    fn = signalHandler;
+  if (signal(SIGINT, fn) == SIG_ERR) {
     B2FATAL("Cannot setup SIGINT signal handler\n");
   }
-  if (signal(SIGTERM, signalHandler) == SIG_ERR) {
+  if (signal(SIGTERM, fn) == SIG_ERR) {
     B2FATAL("Cannot setup SIGTERM signal handler\n");
   }
-  if (signal(SIGQUIT, signalHandler) == SIG_ERR) {
+  if (signal(SIGQUIT, fn) == SIG_ERR) {
     B2FATAL("Cannot setup SIGQUIT signal handler\n");
   }
 }

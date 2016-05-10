@@ -29,12 +29,6 @@ namespace Belle2 {
 
     /** Wait until all forked processes are completed */
     void waitForAllProcesses();
-    /** Wait until input process is completed */
-    void waitForInputProcesses();
-    /** Wait until all worker processes are completed */
-    void waitForWorkerProcesses();
-    /** Wait until output processes are completed */
-    void waitForOutputProcesses();
 
     /** Returns true if multiple processes have been spawned, false in single-core mode. */
     static bool parallelProcessingUsed();
@@ -61,12 +55,11 @@ namespace Belle2 {
     static std::string getProcessName();
 
   private:
-    /** wait for all processes in the given list to terminate. */
-    void waitForProcesses(std::vector<pid_t>& pids);
+    /** Start a new process, adding its PID to processList, and setting s_processID = id. */
+    static bool startProc(std::vector<pid_t>* processList, const std::string& procType, int id);
 
     std::vector<pid_t> m_inputProcessList;  /**< PIDs of input processes. */
     std::vector<pid_t> m_workerProcessList;  /**< PIDs of worker processes. */
-    std::vector<pid_t> m_outputProcessList; /**< PIDs of output processes. */
 
     static int s_processID;       ///< ID of current process
 

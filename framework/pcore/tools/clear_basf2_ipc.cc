@@ -20,6 +20,8 @@
 int main(int argc, char** argv)
 {
   int mode = 2; // unnamed IPC resources only
+  bool setReturnCode = false;
+  int ret = 0;
   if (argc > 1) {
     if (strcmp(argv[1], "all")  == 0)
       mode = 0;
@@ -27,12 +29,16 @@ int main(int argc, char** argv)
       mode = 1;
     else if (strcmp(argv[1], "unnamed") == 0)
       mode = 2;
-    else if (strcmp(argv[1], "--help") == 0) {
+    else if (strcmp(argv[1], "--test") == 0) {
+      setReturnCode = true;
+    } else {
       printf("Usage : clear_basf2_ipc {all|named|unnamed} \n");
       printf("all: all IPCs, named: named IPCs only, unnamed: basf2 internal IPCs only(default)\n");
 
       printf("\n Cleans up inter-process communication (IPC) resources left behind if basf2 crashes.");
       printf("Resources currently in use are not touched.\n");
+      printf("When --test is specified, the return code is set to 1 when uncleaned resources are found.\n");
+      return -1;
     }
   }
 
@@ -77,6 +83,8 @@ int main(int argc, char** argv)
           }
         }
         if (deleted) {
+          if (setReturnCode)
+            ret = 1;
           printf("\n");
           char strbuf[1024];
           snprintf(strbuf, 1024, "/tmp/%s", ent->d_name);
@@ -89,6 +97,7 @@ int main(int argc, char** argv)
       }
     }
     closedir(dir);
+    return ret;
   } else {
     perror("");
     return -1;

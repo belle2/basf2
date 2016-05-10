@@ -27,45 +27,38 @@ ProcHandler::ProcHandler() { }
 
 ProcHandler::~ProcHandler() { }
 
-void ProcHandler::startInputProcess()
+bool ProcHandler::startProc(std::vector<pid_t>* processList, const std::string& procType, int id)
 {
   fflush(stdout);
   fflush(stderr);
   pid_t pid = fork();
   if (pid > 0) {   // Mother process
-    m_inputProcessList.push_back(pid);
-    B2INFO("ProcHandler: input process forked. pid = " << pid);
+    processList->push_back(pid);
+    B2INFO("ProcHandler: " << procType << " process forked. pid = " << pid);
+    fflush(stdout);
   } else if (pid < 0) {
     B2FATAL("fork() failed: " << strerror(errno));
   } else {
-    s_processID = 10000;
+    ProcHandler::s_processID = id;
     //Reset some python state: signals, threads, gil in the child
     PyOS_AfterFork();
     //die when parent dies
     prctl(PR_SET_PDEATHSIG, SIGHUP);
+    return true;
   }
+  return false;
+}
+
+void ProcHandler::startInputProcess()
+{
+  startProc(&m_inputProcessList, "input", 10000);
 }
 
 void ProcHandler::startWorkerProcesses(int nproc)
 {
   for (int i = 0; i < nproc; i++) {
-    fflush(stdout);
-    fflush(stderr);
-    pid_t pid = fork();
-    if (pid > 0) {   // Mother process
-      m_workerProcessList.push_back(pid);
-      B2INFO("ProcHandler: worker process " << i << " forked. pid = " << pid);
-      fflush(stdout);
-    } else if (pid < 0) {
-      B2FATAL("fork() failed: " << strerror(errno));
-    } else { // In worker process
-      s_processID = i;
-      //Reset some python state: signals, threads, gil in the child
-      PyOS_AfterFork();
-      //die when parent dies
-      prctl(PR_SET_PDEATHSIG, SIGHUP);
-      break;
-    }
+    if (startProc(&m_workerProcessList, "worker", i))
+      break; // in child process
   }
 }
 
@@ -114,36 +107,33 @@ std::string ProcHandler::getProcessName()
 }
 
 
-void ProcHandler::waitForProcesses(std::vector<pid_t>& pids)
+void ProcHandler::waitForAllProcesses()
 {
-  for (pid_t pid : pids) {
-    while (1) {
-      int status;
-      int ret = waitpid(pid, &status, 0);
-      if (ret == -1) {
-        if (errno == EINTR) {
-          continue; //interrupted, try again
-        } else if (errno == ECHILD) {
-          break; //doesn't exist anymore, so nothing to do
-        } else {
-          B2FATAL("waitpid(" << pid << ") failed: " << strerror(errno));
-        }
+  unsigned nStopped = 0;
+  unsigned nProcs = m_inputProcessList.size() + m_workerProcessList.size();
+  while (nStopped < nProcs) {
+    int status;
+    int pid = waitpid(-1, &status, 0);
+    if (pid == -1) {
+      if (errno == EINTR) {
+        continue; //interrupted, try again
+      } else if (errno == ECHILD) {
+        B2WARNING(">>>>>ECHILD, stop.");
+        break; //no children exist, so nothing to do
       } else {
-        //success
-        break;
+        B2FATAL("waitpid(" << pid << ") failed: " << strerror(errno));
+      }
+    } else { //state change
+      if (WIFSIGNALED(status) or WEXITSTATUS(status) != 0) {
+        B2FATAL("Execution stopped, sub-process with PID " << pid << " crashed or was killed.");
+      } else {
+        //process exited normally
+        nStopped++;
+        B2WARNING(">>>>>PID " << pid << " ok. (" << nStopped << "/" << nProcs << ")");
       }
     }
   }
-  pids.clear();
+  m_inputProcessList.clear();
+  m_workerProcessList.clear();
+  B2WARNING(">>>>>all children gone.");
 }
-
-void ProcHandler::waitForAllProcesses()
-{
-  waitForInputProcesses();
-  waitForWorkerProcesses();
-  waitForOutputProcesses();
-}
-
-void ProcHandler::waitForInputProcesses() { waitForProcesses(m_inputProcessList); }
-void ProcHandler::waitForWorkerProcesses() { waitForProcesses(m_workerProcessList); }
-void ProcHandler::waitForOutputProcesses() { waitForProcesses(m_outputProcessList); }

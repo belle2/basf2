@@ -30,8 +30,7 @@ using namespace std;
 using namespace Belle2;
 
 namespace {
-  /** PID of sub-process killed by some signal. 0 if none. */
-  static int s_PIDofKilledChild = 0;
+  static int gSignalReceived = 0;
 
   static pEventProcessor* g_pEventProcessor = NULL;
 
@@ -40,8 +39,16 @@ namespace {
     if (g_pEventProcessor)
       g_pEventProcessor->cleanup();
   }
+  void cleanupAndStop(int sig)
+  {
+    cleanupIPC();
 
-  static void signalHandler(int signal)
+    //uninstall current handler and call default one.
+    signal(sig, SIG_DFL);
+    raise(sig);
+  }
+
+  static void parentSignalHandler(int signal)
   {
     //signal handlers are called asynchronously, making many standard functions (including output) dangerous
     //write() is, however, safe, so we'll use that to write to stderr.
@@ -51,27 +58,10 @@ namespace {
     } else if (signal == SIGINT) {
       g_pEventProcessor->gotSigINT();
     } else if (signal == SIGTERM or signal == SIGQUIT) {
-      g_pEventProcessor->gotSigTERM();
-    } else if (signal == SIGCHLD) {
-      if (s_PIDofKilledChild != 0)
-        return; //only once
-
-      //which child died?
-      int status;
-      pid_t pid = waitpid(-1, &status, WNOHANG);
-      //B2WARNING("child died, pid " << pid << ", status " << status);
-      if (pid <= 0 || !WIFSIGNALED(status))
-        return; //process exited normally
-
-      //ok, it died because of some signal
-      s_PIDofKilledChild = pid;
-      //int termsig = WTERMSIG(status);
-
-      EventProcessor::writeToStdErr("\nOne of our child processes died, stopping execution...\n");
-
-      //pid=0: send signal to every process in our progress group (ourselves + children)
-      kill(0, SIGTERM);
+      g_pEventProcessor->killRingBuffers();
     }
+    if (gSignalReceived == 0)
+      gSignalReceived = signal;
   }
 }
 
@@ -100,28 +90,16 @@ void pEventProcessor::cleanup()
 
 void pEventProcessor::gotSigINT()
 {
-  static int numSigInts = 0;
-  if (numSigInts == 0) {
-    EventProcessor::writeToStdErr("\nStopping basf2 after all events in buffer are processed. Press Ctrl+C a second time to discard half-processed events.\n");
-    //SIGINT is handled independently by input process, so we don't need to do anything special
-  } else {
-    EventProcessor::writeToStdErr("\nDiscarding pending events for quicker termination... \n");
-    //clear ringbuffers
-    for (auto rb : m_rbinlist) {
-      rb->clear();
-    }
-    for (auto rb : m_rboutlist) {
-      rb->tryClear(); //might deadlock if we're already locked
-    }
-  }
-  numSigInts++;
+  EventProcessor::writeToStdErr("\nStopping basf2...\n");
+  killRingBuffers();
 }
 
-void pEventProcessor::gotSigTERM()
+void pEventProcessor::killRingBuffers()
 {
   for (auto rb : m_rbinlist) {
     rb->kill();
   }
+  //these might be locked by _this_ process, so we cannot escape
   for (auto rb : m_rboutlist) {
     rb->kill(); //atomic, so doesn't lock
   }
@@ -169,7 +147,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     return;
   }
 
-  setupSignalHandler();
+  setupSignalHandler(cleanupAndStop);
 
   //inserts Rx/Tx modules into path (sets up IPC structures)
   preparePaths();
@@ -177,44 +155,27 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   // ensure that we free the IPC resources!
   atexit(cleanupIPC);
 
-  Path mergedPath;
-  if (!m_inpathlist.empty())
-    mergedPath.addPath(m_inpathlist[0]);
-  mergedPath.addPath(m_mainpathlist[0]);
-  if (!m_outpathlist.empty())
-    mergedPath.addPath(m_outpathlist[0]);
 
   //init statistics
-  m_processStatisticsPtr.registerInDataStore();
-
-  if (!m_processStatisticsPtr)
-    m_processStatisticsPtr.create();
-  ModulePtrList mergedPathModules = mergedPath.buildModulePathList(); //all modules, including Rx and Tx
-  for (ModulePtrList::const_iterator listIter = mergedPathModules.begin(); listIter != mergedPathModules.end(); ++listIter) {
-    Module* module = listIter->get();
-    m_processStatisticsPtr->initModule(module);
+  {
+    m_processStatisticsPtr.registerInDataStore();
+    if (!m_processStatisticsPtr)
+      m_processStatisticsPtr.create();
+    Path mergedPath;
+    if (!m_inpathlist.empty())
+      mergedPath.addPath(m_inpathlist[0]);
+    mergedPath.addPath(m_mainpathlist[0]);
+    if (!m_outpathlist.empty())
+      mergedPath.addPath(m_outpathlist[0]);
+    for (ModulePtr module : mergedPath.buildModulePathList())
+      m_processStatisticsPtr->initModule(module.get());
   }
 
   // 2. Initialization
   ModulePtrList modulelist = spath->buildModulePathList();
   ModulePtrList initGlobally = getModulesWithoutFlag(modulelist, Module::c_InternalSerializer);
   //dump_modules("Initializing globally: ", initGlobally);
-  try {
-    processInitialize(initGlobally);
-  } catch (StoppedBySignalException& e) {
-    B2FATAL(e.what());
-  }
-
-  //initialization finished, disable handler again
-  if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
-    B2FATAL("Cannot ignore SIGINT signal handler\n");
-  }
-  if (signal(SIGTERM, SIG_IGN) == SIG_ERR) {
-    B2FATAL("Cannot ignore SIGTERM signal handler\n");
-  }
-  if (signal(SIGQUIT, SIG_IGN) == SIG_ERR) {
-    B2FATAL("Cannot ignore SIGQUIT signal handler\n");
-  }
+  processInitialize(initGlobally);
 
   ModulePtrList terminateGlobally = getModulesWithFlag(modulelist, Module::c_TerminateInAllProcesses);
 
@@ -261,22 +222,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       m_master = localPath->getModules().begin()->get(); //set Rx as master
     }
 
-    //ignore some signals for framework (mother) process, so only child processes will handle them
-    //once they are finished, the framework process will clean up IPC structures
-    if (signal(SIGTERM, signalHandler) == SIG_ERR) {
-      B2FATAL("Cannot setup SIGTERM signal handler\n");
-    }
-    if (signal(SIGQUIT, signalHandler) == SIG_ERR) {
-      B2FATAL("Cannot setup SIGQUIT signal handler\n");
-    }
-    //If our children are killed, we want to know. (especially since this may happen in any order)
-    if (signal(SIGCHLD, signalHandler) == SIG_ERR) {
-      B2FATAL("Cannot setup SIGCHLD signal handler\n");
-    }
-    //first time: just print a message, afterwards tries to terminate more quickly
-    if (signal(SIGINT, signalHandler) == SIG_ERR) {
-      B2FATAL("Cannot set SIGINT signal handler\n");
-    }
+    setupSignalHandler(parentSignalHandler);
   }
 
 
@@ -284,14 +230,19 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     DataStoreStreamer::removeSideEffects();
   }
 
+  bool gotSigINT = false;
   if (localPath != nullptr) {
     ModulePtrList localModules = localPath->buildModulePathList();
     ModulePtrList procinitmodules = getModulesWithFlag(localModules, Module::c_InternalSerializer);
     //dump_modules("processInitialize for ", procinitmodules);
     processInitialize(procinitmodules);
 
+    //input: handle signals normally, will slowly cascade down
     if (m_procHandler->isInputProcess())
       setupSignalHandler();
+    //workers will have to ignore the signals, there's no good way to do this safely
+    if (m_procHandler->isWorkerProcess())
+      setupSignalHandler(SIG_IGN);
 
     try {
       processCore(localPath, localModules, maxEvent, m_procHandler->isInputProcess());
@@ -300,6 +251,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
         B2FATAL(e.what());
       }
       //in case of SIGINT, we move on to processTerminate() to shut down saefly
+      gotSigINT = true;
     }
     prependModulesIfNotPresent(&localModules, terminateGlobally);
     processTerminate(localModules);
@@ -309,12 +261,14 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   //output process does final cleanup, everything else stops here
   if (!m_procHandler->isOutputProcess()) {
-    exit(0);
+    if (gotSigINT) {
+      B2FATAL("Processing aborted via SIGINT.");
+    } else {
+      exit(0);
+    }
   }
 
-  //TODO: still needed? might be important for cleaning up after crashes
-  m_procHandler->waitForInputProcesses();
-  m_procHandler->waitForWorkerProcesses();
+  m_procHandler->waitForAllProcesses();
   B2INFO("All processes completed");
 
   //finished, disable handler again
@@ -331,9 +285,9 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   }
 
   //did anything bad happen?
-  if (s_PIDofKilledChild != 0) {
-    //fatal, so we get appropriate return code
-    B2FATAL("Execution stopped, sub-process with PID " << s_PIDofKilledChild << " killed by signal.");
+  if (gSignalReceived) {
+    B2FATAL("Processing aborted via signal " << gSignalReceived <<
+            ", terminating. Output files have been closed safely and should be readable.");
   }
 
 }

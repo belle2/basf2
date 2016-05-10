@@ -51,11 +51,11 @@ namespace Belle2 {
      * */
     void gotSigINT();
 
-    /** signal handler for Ctrl+C (async-safe)
+    /** signal handler (async-safe)
      *
-     * Fairly abrupt termination, but still clean RingBuffers.
+     * Fairly abrupt termination after the current event.
      */
-    void gotSigTERM();
+    void killRingBuffers();
 
     /** clean up IPC resources (should only be called in one process). */
     void cleanup();

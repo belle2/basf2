@@ -13,7 +13,6 @@
 
 #include <framework/core/EventProcessor.h>
 #include <framework/core/ModuleManager.h>
-#include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>
@@ -29,6 +28,17 @@ using namespace Belle2;
 
 bool AsyncWrapper::s_isAsync = false;
 RingBuffer* AsyncWrapper::s_currentRingBuffer = NULL;
+namespace {
+  static std::vector<RingBuffer*> rbList;
+  void cleanupIPC()
+  {
+    if (!AsyncWrapper::isAsync()) {
+      for (RingBuffer* rb : rbList)
+        delete rb;
+      rbList.clear();
+    }
+  }
+}
 
 int AsyncWrapper::numAvailableEvents()
 {
@@ -68,6 +78,7 @@ void AsyncWrapper::initialize()
   m_procHandler = new ProcHandler();
   const int bufferSizeInts = 8000000; //~32M, within Ubuntu's shmmax limit
   m_ringBuffer = new RingBuffer(bufferSizeInts);
+  rbList.push_back(m_ringBuffer);
   m_rx = new RxModule(m_ringBuffer);
   m_rx->setLogLevel(LogConfig::c_Error); //suppress warnings about failed statistics merge in receiving process
   m_tx = new TxModule(m_ringBuffer);
@@ -92,6 +103,8 @@ void AsyncWrapper::initialize()
     B2INFO("Asynchronous process done!");
     exit(0);
   } else {
+    atexit(cleanupIPC);
+
     //main thread: chain tx and return
     m_tx->initialize();
   }
@@ -109,16 +122,16 @@ void AsyncWrapper::terminate()
   if (!m_procHandler->isWorkerProcess()) {
     m_tx->terminate();
 
+    m_ringBuffer->kill();
     B2INFO("Waiting for asynchronous process...");
-    EvtMessage term(NULL, 0, MSG_TERMINATE);
-    while (m_ringBuffer->insq((int*)term.buffer(), (term.size() - 1) / sizeof(int) + 1) < 0) {
-      usleep(200);
-    }
-    m_procHandler->waitForWorkerProcesses();
+    m_procHandler->waitForAllProcesses();
     B2INFO("Done, cleaning up...");
     delete m_tx;
     delete m_rx;
     delete m_ringBuffer;
+    for (RingBuffer*& rb : rbList)
+      if (rb == m_ringBuffer)
+        rb = nullptr;
     delete m_procHandler;
   }
 }

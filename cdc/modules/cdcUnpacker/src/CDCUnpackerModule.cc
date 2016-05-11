@@ -479,7 +479,8 @@ void CDCUnpackerModule::loadMap()
   } else {
 
     // Read the channel map from the database.
-    for (const auto& cm : m_channelMapFromDB) {
+    DBArray<CDCChannelMap> channelMaps;
+    for (const auto& cm : channelMaps) {
       const int isl = cm.getISuperLayer();
       const int il = cm.getILayer();
       const int iw = cm.getIWire();

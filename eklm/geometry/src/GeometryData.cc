@@ -645,7 +645,7 @@ void EKLM::GeometryData::initializeFromGearbox()
     }
   }
   try {
-    m_StripBoardPosition = new struct StripBoardPosition[m_NStripBoards];
+    m_StripBoardPosition = new StripBoardPosition[m_NStripBoards];
   } catch (std::bad_alloc& ba) {
     B2FATAL(c_MemErr);
   }
@@ -653,8 +653,8 @@ void EKLM::GeometryData::initializeFromGearbox()
     GearDir StripBoardContent(Boards);
     StripBoardContent.append((boost::format("/StripBoardData/Board[%1%]") %
                               (i + 1)).str());
-    m_StripBoardPosition[i].X = StripBoardContent.getLength("PositionX") *
-                                CLHEP::cm;
+    m_StripBoardPosition[i].setX(StripBoardContent.getLength("PositionX") *
+                                 CLHEP::cm);
   }
   m_Geometry = new EKLMGeometry(*this);
 }

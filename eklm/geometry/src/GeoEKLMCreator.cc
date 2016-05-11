@@ -1783,7 +1783,7 @@ createStripBoard(int iBoard, G4LogicalVolume* segmentReadoutBoard) const
   HepGeom::Transform3D t;
   const struct EKLMGeometry::BoardGeometry* boardGeometry =
     m_GeoDat->getBoardGeometry();
-  const struct EKLMGeometry::StripBoardPosition* stripBoardPos =
+  const EKLMGeometry::StripBoardPosition* stripBoardPos =
     m_GeoDat->getStripBoardPosition(iBoard);
   std::string boardName = "StripBoard_" +
                           boost::lexical_cast<std::string>(iBoard) + "_" +
@@ -1797,7 +1797,7 @@ createStripBoard(int iBoard, G4LogicalVolume* segmentReadoutBoard) const
   }
   geometry::setVisibility(*logicStripBoard, true);
   geometry::setColor(*logicStripBoard, "#0000ffff");
-  t = HepGeom::Translate3D(-0.5 * boardGeometry->Length + stripBoardPos->X,
+  t = HepGeom::Translate3D(-0.5 * boardGeometry->Length + stripBoardPos->getX(),
                            -0.5 * boardGeometry->Height + boardGeometry->BaseHeight +
                            0.5 * boardGeometry->StripHeight, 0.);
   try {

@@ -573,16 +573,30 @@ namespace Belle2 {
     /**
      * Strip readout board position data.
      */
-    struct StripBoardPosition : public TObject {
+    class StripBoardPosition : public TObject {
+
+    public:
 
       /**
        * Constructor.
        */
       StripBoardPosition();
 
-      double X;         /**< X coordinate. */
+      /**
+       * Get X coordinate.
+       */
+      double getX() const;
+
+      /**
+       * Set X coordinate.
+       * @param[in] x X coordinate.
+       */
+      void setX(double x);
 
     private:
+
+      /** X coordinate. */
+      double m_X;
 
       /** Makes objects storable. */
       ClassDef(StripBoardPosition, 1);
@@ -798,7 +812,7 @@ namespace Belle2 {
      * Get position data for strip readout boards.
      * @param[in] board Number of board.
      */
-    const struct StripBoardPosition* getStripBoardPosition(int board) const;
+    const StripBoardPosition* getStripBoardPosition(int board) const;
 
   protected:
 
@@ -893,7 +907,7 @@ namespace Belle2 {
     struct BoardPosition* m_BoardPosition; //[m_NBoardsSector]
 
     /** Positions of strip readout boards. */
-    struct StripBoardPosition* m_StripBoardPosition; //[m_NStripBoards]
+    StripBoardPosition* m_StripBoardPosition; //[m_NStripBoards]
 
     /** Makes objects storable. */
     ClassDef(Belle2::EKLMGeometry, 1);

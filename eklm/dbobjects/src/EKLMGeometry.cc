@@ -233,7 +233,17 @@ EKLMGeometry::BoardPosition::BoardPosition()
 
 EKLMGeometry::StripBoardPosition::StripBoardPosition()
 {
-  X = 0;
+  m_X = 0;
+}
+
+double EKLMGeometry::StripBoardPosition::getX() const
+{
+  return m_X;
+}
+
+void EKLMGeometry::StripBoardPosition::setX(double x)
+{
+  m_X = x;
 }
 
 EKLMGeometry::EKLMGeometry()
@@ -311,7 +321,7 @@ EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
         *geometry.getBoardPosition(i + 1, j + 1);
     }
   }
-  m_StripBoardPosition = new struct StripBoardPosition[m_NStripBoards];
+  m_StripBoardPosition = new StripBoardPosition[m_NStripBoards];
   for (i = 0; i < m_NStripBoards; i++)
     m_StripBoardPosition[i] = *geometry.getStripBoardPosition(i + 1);
 }
@@ -393,7 +403,7 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
   }
   if (m_StripBoardPosition != NULL)
     delete[] m_StripBoardPosition;
-  m_StripBoardPosition = new struct StripBoardPosition[m_NStripBoards];
+  m_StripBoardPosition = new StripBoardPosition[m_NStripBoards];
   for (i = 0; i < m_NStripBoards; i++)
     m_StripBoardPosition[i] = *geometry.getStripBoardPosition(i + 1);
   return *this;

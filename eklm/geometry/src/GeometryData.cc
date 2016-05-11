@@ -254,8 +254,6 @@ void EKLM::GeometryData::readXMLDataStrips()
   int i;
   GearDir Strips("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap/"
                  "Layer/Sector/Plane/Strips");
-  m_NStrips = Strips.getNumberNodes("Strip");
-  checkStrip(m_NStrips);
   m_StripGeometry.setWidth(Strips.getLength("Width") * CLHEP::cm);
   m_StripGeometry.setThickness(Strips.getLength("Thickness") * CLHEP::cm);
   m_StripGeometry.setGrooveDepth(Strips.getLength("GrooveDepth") * CLHEP::cm);
@@ -475,37 +473,43 @@ void EKLM::GeometryData::initializeFromGearbox()
     B2FATAL("EKLM started with unknown geometry mode " << mode << ".");
   m_Mode = (enum DetectorMode)mode;
   readEndcapStructureGeometry();
-  m_SolenoidZ = gd.getLength("SolenoidZ") * CLHEP::cm;
   m_NEndcaps = gd.getInt("NEndcaps");
   checkEndcap(m_NEndcaps);
+  m_NLayers = gd.getInt("NLayers");
+  checkLayer(m_NLayers);
+  m_NDetectorLayers = new int[m_NEndcaps];
+  m_NDetectorLayers[0] = gd.getInt("NDetectorLayersBackward");
+  checkDetectorLayerNumber(1, m_NDetectorLayers[0]);
+  if (m_NEndcaps == 2) {
+    m_NDetectorLayers[1] = gd.getInt("NDetectorLayersForward");
+    checkDetectorLayerNumber(2, m_NDetectorLayers[1]);
+  }
+  m_NSectors = gd.getInt("NSectors");
+  checkSector(m_NSectors);
+  m_NPlanes = gd.getInt("NPlanes");
+  checkPlane(m_NPlanes);
+  m_NSegments = gd.getInt("NSegments");
+  checkSegment(m_NSegments);
+  m_NSegmentSupportElementsSector = (m_NSegments + 1) * m_NPlanes;
+  m_NStripsSegment = gd.getInt("NStripsSegment");
+  m_NStrips = gd.getInt("NStrips");
+  checkStrip(m_NStrips);
+  m_NBoards = gd.getInt("NBoards");
+  checkSegment(m_NBoards);
+  m_NBoardsSector = m_NBoards * m_NPlanes;
+  m_NStripBoards = gd.getInt("NStripBoards");
+  m_SolenoidZ = gd.getLength("SolenoidZ") * CLHEP::cm;
   GearDir EndCap(gd);
   EndCap.append("/Endcap");
   readPositionData(&m_EndcapPosition, &EndCap);
   readSizeData(&m_EndcapPosition, &EndCap);
-  m_MinZForward = m_SolenoidZ + m_EndcapPosition.getZ() -
-                  0.5 * m_EndcapPosition.getLength();
-  m_MaxZBackward = m_SolenoidZ - m_EndcapPosition.getZ() +
-                   0.5 * m_EndcapPosition.getLength();
-  m_NLayers = EndCap.getInt("NLayers");
-  checkLayer(m_NLayers);
-  m_NDetectorLayers = new int[m_NEndcaps];
-  m_NDetectorLayers[0] = EndCap.getInt("NDetectorLayersBackward");
-  checkDetectorLayerNumber(1, m_NDetectorLayers[0]);
-  if (m_NEndcaps == 2) {
-    m_NDetectorLayers[1] = EndCap.getInt("NDetectorLayersForward");
-    checkDetectorLayerNumber(2, m_NDetectorLayers[1]);
-  }
   GearDir Layer(EndCap);
   Layer.append("/Layer");
   readSizeData(&m_LayerPosition, &Layer);
   m_LayerShiftZ = Layer.getLength("ShiftZ") * CLHEP::cm;
-  m_NSectors = Layer.getInt("NSectors");
-  checkSector(m_NSectors);
   GearDir Sector(Layer);
   Sector.append("/Sector");
   readSizeData(&m_SectorPosition, &Sector);
-  m_NPlanes = Sector.getInt("NPlanes");
-  checkPlane(m_NPlanes);
   GearDir SectorSupport(Sector);
   SectorSupport.append("/SectorSupport");
   readPositionData(&m_SectorSupportPosition, &SectorSupport);
@@ -515,10 +519,6 @@ void EKLM::GeometryData::initializeFromGearbox()
   Plane.append("/Plane");
   readPositionData(&m_PlanePosition, &Plane);
   readSizeData(&m_PlanePosition, &Plane);
-  m_NSegments = Plane.getInt("NSegments");
-  if (m_NSegments <= 0)
-    B2FATAL("Number of segments must be positive.");
-  m_NSegmentSupportElementsSector = (m_NSegments + 1) * m_NPlanes;
   m_PlasticSheetGeometry.setWidth(Plane.getLength("PlasticSheetWidth") *
                                   CLHEP::cm);
   m_PlasticSheetGeometry.setDeltaL(Plane.getLength("PlasticSheetDeltaL") *
@@ -561,7 +561,6 @@ void EKLM::GeometryData::initializeFromGearbox()
         SegmentSupportContent.getLength("DeltaLLeft") * CLHEP::cm);
     }
   }
-  m_NStripsSegment = Plane.getInt("NStripsSegment");
   readXMLDataStrips();
   GearDir shield(Sector);
   shield.append("/Shield");
@@ -582,9 +581,6 @@ void EKLM::GeometryData::initializeFromGearbox()
   shieldDetailD.append("/Detail[@id=\"D\"]");
   readShieldDetailGeometry(&shieldDetailGeometry, &shieldDetailD);
   m_ShieldGeometry.setDetailD(shieldDetailGeometry);
-  m_NBoards = Sector.getInt("NBoards");
-  checkSegment(m_NBoards);
-  m_NBoardsSector = m_NBoards * m_NPlanes;
   GearDir Boards(Sector);
   Boards.append("/Boards");
   m_BoardGeometry.setLength(Boards.getLength("Length") * CLHEP::cm);
@@ -595,7 +591,6 @@ void EKLM::GeometryData::initializeFromGearbox()
   m_BoardGeometry.setStripLength(Boards.getLength("StripLength") * CLHEP::cm);
   m_BoardGeometry.setStripWidth(Boards.getLength("StripWidth") * CLHEP::cm);
   m_BoardGeometry.setStripHeight(Boards.getLength("StripHeight") * CLHEP::cm);
-  m_NStripBoards = Boards.getInt("NStripBoards");
   try {
     m_BoardPosition = new BoardPosition[m_NBoardsSector];
   } catch (std::bad_alloc& ba) {
@@ -645,6 +640,10 @@ EKLM::GeometryData::GeometryData(enum DataSource dataSource)
       initializeFromDatabase();
       break;
   }
+  m_MinZForward = m_SolenoidZ + m_EndcapPosition.getZ() -
+                  0.5 * m_EndcapPosition.getLength();
+  m_MaxZBackward = m_SolenoidZ - m_EndcapPosition.getZ() +
+                   0.5 * m_EndcapPosition.getLength();
   calculateSectorSupportGeometry();
   fillStripIndexArrays();
   calculateShieldGeometry();

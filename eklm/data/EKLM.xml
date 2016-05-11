@@ -1,22 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DetectorComponent name="EKLM" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <Description>Belle II EKLM geometry</Description>
-  <Version>0</Version>
-  <Creator library="eklm">EKLMCreator</Creator>
-  <Content>
-    <SolenoidZ desc="Solenoid center Z coordinate" unit="cm">47.0</SolenoidZ>
+	<Description>Belle II EKLM geometry</Description>
+	<Version>0</Version>
+	<Creator library="eklm">EKLMCreator</Creator>
+	<Content>
+    		<xi:include href="DigitizationParams.xml"/>
+		<Mode desc="0 -- normal operation, 1 -- bg study">0</Mode>
+		<!-- Numbers of elements. -->
+    		<NEndcaps desc="Number of endcaps">2</NEndcaps>
+		<NLayers desc="Number of layers in one endcap">14</NLayers>
+		<NDetectorLayersForward desc="Number of detector layers in the forward endcap">14</NDetectorLayersForward>
+		<NDetectorLayersBackward desc="Number of detector layers in the backward endcap">12</NDetectorLayersBackward>
+        	<NSectors desc="Number of sectors in one layer">4</NSectors>
+          	<NPlanes desc="Number of planes in one sector">2</NPlanes>
+		<NSegments desc="Number of segments in one plane">5</NSegments>
+		<!-- NSegmentSupportElementsSector = (NSegments + 1) * NPlanes -->
+		<NStripsSegment desc="Number of strips in one segment">15</NStripsSegment>
+		<NStrips desc="Number of strips">75</NStrips>
+		<NBoards desc="Number of readout boards corresponding to one plane">5</NBoards>
+		<!-- NBoardsSector = NBoards * NPlanes -->
+		<NStripBoards desc="Number of strip readout boards">15</NStripBoards>
+		<!-- Geometry parameters. -->
+		<SolenoidZ desc="Solenoid center Z coordinate" unit="cm">47.0</SolenoidZ>
     <ESTR>
       <Phi unit="deg">-22.5</Phi>
       <NSides desc="number of sides of Barrel KLM Vessel">8</NSides>
     </ESTR>
-    <xi:include href="DigitizationParams.xml"/>
-    <Mode desc="0 -- normal operation, 1 -- bg study">0</Mode>
-    <Displacements desc="File with displacement data, empty - use default positions"></Displacements>
     <SensitiveDetector>
      <EnergyDepositionThreshold desc="All hits with smaller energy will be dropped at SensitiveDetector level" unit="MeV">0.0</EnergyDepositionThreshold>
      <HitTimeThreshold desc="All hits with larger time will be dropped at SensitiveDetector level" unit="ns">1000000000</HitTimeThreshold>
     </SensitiveDetector>
-    <NEndcaps desc="Number of endcaps">2</NEndcaps>
     <Endcap>
       <InnerR desc="Inner radius"   unit="mm">1280.0</InnerR>
       <OuterR desc="Outer radius"   unit="mm">3535.0</OuterR>
@@ -24,22 +37,15 @@
       <X  desc="X position" unit="mm">0</X>
       <Y  desc="Y position" unit="mm">0</Y>
       <Z  desc="Z position" unit="mm">2960.5</Z>
-      <NLayers desc="Number of layers in one endcap">14</NLayers>
-      <NDetectorLayersForward desc="Number of detector layers in the forward endcap">14</NDetectorLayersForward>
-      <NDetectorLayersBackward desc="Number of detector layers in the backward endcap">12</NDetectorLayersBackward>
       <Layer>
 	<InnerR desc="Inner radius"   unit="mm">1305.0</InnerR>
 	<OuterR desc="Outer radius"   unit="mm">3320.0</OuterR>
 	<Length desc="Length"         unit="mm">44.0</Length>
 	<ShiftZ     desc="Z Shift"    unit="mm">91.0</ShiftZ>
-        <NSectors esc="Number of sectors in one layer">4</NSectors>
 	<Sector>
 	  <InnerR desc="Inner radius"   unit="mm">1305.0</InnerR>
 	  <OuterR desc="Outer radius"   unit="mm">3320.0</OuterR>
 	  <Length desc="Length"         unit="mm">39.0</Length>
-          <NPlanes desc="Number of planes in one sector">2</NPlanes>
-          <NBoards desc="Number of readout boards corresponding to one plane">
-          5</NBoards>
           <SectorSupport>
             <InnerR desc="Inner radius" unit="mm">1305.0</InnerR>
             <OuterR desc="Outer radius" unit="mm">3310.0</OuterR>
@@ -78,7 +84,6 @@
 	    <Z  desc="Z position" unit="mm">6.0</Z>
             <PlasticSheetWidth unit="mm">1.0</PlasticSheetWidth>
             <PlasticSheetDeltaL unit="mm">10.0</PlasticSheetDeltaL>
-            <NSegments desc="Number of segments in one plane">5</NSegments>
             <Segments>
               <TopWidth unit="mm">21.0</TopWidth>
               <TopThickness unit="mm">1.5</TopThickness>
@@ -185,7 +190,6 @@
                 </SegmentSupport>
               </SegmentSupportData>
             </Segments>
-            <NStripsSegment desc="Number of strips in one segment">15</NStripsSegment>
             <Strips>
               <Width      desc="Width"       unit="mm">40.0</Width>
               <Thickness  desc="Thickness"   unit="mm">7.0</Thickness>
@@ -742,7 +746,6 @@
             <Height unit="mm">18.0</Height>
             <BaseWidth desc="Width of base board" unit="mm">17.8</BaseWidth>
             <BaseHeight desc="Height of base board" unit="mm">1.6</BaseHeight>
-            <NStripBoards desc="Number of strip readout boards">15</NStripBoards>
             <StripLength desc="Length of strip readout board" unit="mm">1.7
             </StripLength>
             <StripWidth desc="Width of strip readout board" unit="mm">17.9

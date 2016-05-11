@@ -28,7 +28,7 @@ EKLM::AlignmentChecker::AlignmentChecker()
     m_GeoDat->getSectorSupportGeometry();
   const EKLMGeometry::ElementPosition* sectorSupportPosition =
     m_GeoDat->getSectorSupportPosition();
-  const struct EKLMGeometry::SegmentSupportPosition* segmentSupportPos;
+  const EKLMGeometry::SegmentSupportPosition* segmentSupportPos;
   const struct EKLMGeometry::SegmentSupportGeometry* segmentSupportGeometry =
     m_GeoDat->getSegmentSupportGeometry();
   m_LineCorner1 = new LineSegment2D(
@@ -57,8 +57,9 @@ EKLM::AlignmentChecker::AlignmentChecker()
          iSegmentSupport++) {
       segmentSupportPos =
         m_GeoDat->getSegmentSupportPosition(iPlane, iSegmentSupport);
-      lx = 0.5 * (segmentSupportPos->Length - segmentSupportPos->DeltaLLeft -
-                  segmentSupportPos->DeltaLRight);
+      lx = 0.5 * (segmentSupportPos->getLength() -
+                  segmentSupportPos->getDeltaLLeft() -
+                  segmentSupportPos->getDeltaLRight());
       ly = 0.5 * (segmentSupportGeometry->MiddleWidth);
       supportRectangle[0].setX(lx);
       supportRectangle[0].setY(ly);
@@ -73,9 +74,9 @@ EKLM::AlignmentChecker::AlignmentChecker()
       supportRectangle[3].setY(-ly);
       supportRectangle[3].setZ(0);
       t = HepGeom::Translate3D(
-            0.5 * (segmentSupportPos->DeltaLLeft -
-                   segmentSupportPos->DeltaLRight) +
-            segmentSupportPos->X, segmentSupportPos->Y, 0);
+            0.5 * (segmentSupportPos->getDeltaLLeft() -
+                   segmentSupportPos->getDeltaLRight()) +
+            segmentSupportPos->getX(), segmentSupportPos->getY(), 0);
       if (iPlane == 1)
         t = HepGeom::Rotate3D(180. * CLHEP::deg,
                               HepGeom::Vector3D<double>(1., 1., 0.)) * t;

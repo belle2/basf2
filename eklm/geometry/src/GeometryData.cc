@@ -559,8 +559,7 @@ void EKLM::GeometryData::initializeFromGearbox()
     Segments.getLength("MiddleThickness") * CLHEP::cm;
   try {
     m_SegmentSupportPosition =
-      new struct EKLMGeometry::SegmentSupportPosition[
-        m_NSegmentSupportElementsSector];
+      new EKLMGeometry::SegmentSupportPosition[m_NSegmentSupportElementsSector];
   } catch (std::bad_alloc& ba) {
     B2FATAL(c_MemErr);
   }
@@ -572,18 +571,18 @@ void EKLM::GeometryData::initializeFromGearbox()
         (boost::format("/SegmentSupportData[%1%]") % (j + 1)).str());
       SegmentSupportContent.append(
         (boost::format("/SegmentSupport[%1%]") % (i + 1)).str());
-      m_SegmentSupportPosition[k].Length =
-        SegmentSupportContent.getLength("Length") * CLHEP::cm;
-      m_SegmentSupportPosition[k].X =
-        SegmentSupportContent.getLength("PositionX") * CLHEP::cm;
-      m_SegmentSupportPosition[k].Y =
-        SegmentSupportContent.getLength("PositionY") * CLHEP::cm;
-      m_SegmentSupportPosition[k].Z =
-        SegmentSupportContent.getLength("PositionZ") * CLHEP::cm;
-      m_SegmentSupportPosition[k].DeltaLRight =
-        SegmentSupportContent.getLength("DeltaLRight") * CLHEP::cm;
-      m_SegmentSupportPosition[k].DeltaLLeft =
-        SegmentSupportContent.getLength("DeltaLLeft") * CLHEP::cm;
+      m_SegmentSupportPosition[k].setLength(
+        SegmentSupportContent.getLength("Length") * CLHEP::cm);
+      m_SegmentSupportPosition[k].setX(
+        SegmentSupportContent.getLength("PositionX") * CLHEP::cm);
+      m_SegmentSupportPosition[k].setY(
+        SegmentSupportContent.getLength("PositionY") * CLHEP::cm);
+      m_SegmentSupportPosition[k].setZ(
+        SegmentSupportContent.getLength("PositionZ") * CLHEP::cm);
+      m_SegmentSupportPosition[k].setDeltaLRight(
+        SegmentSupportContent.getLength("DeltaLRight") * CLHEP::cm);
+      m_SegmentSupportPosition[k].setDeltaLLeft(
+        SegmentSupportContent.getLength("DeltaLLeft") * CLHEP::cm);
     }
   }
   m_NStripsSegment = Plane.getInt("NStripsSegment");

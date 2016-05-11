@@ -132,14 +132,76 @@ EKLMGeometry::SegmentSupportGeometry::SegmentSupportGeometry()
   MiddleThickness = 0;
 }
 
+/* Class EKLMGeometry::SegmentSupportPosition. */
+
 EKLMGeometry::SegmentSupportPosition::SegmentSupportPosition()
 {
-  DeltaLRight = 0;
-  DeltaLLeft = 0;
-  Length = 0;
-  X = 0;
-  Y = 0;
-  Z = 0;
+  m_DeltaLRight = 0;
+  m_DeltaLLeft = 0;
+  m_Length = 0;
+  m_X = 0;
+  m_Y = 0;
+  m_Z = 0;
+}
+
+double EKLMGeometry::SegmentSupportPosition::getDeltaLRight() const
+{
+  return m_DeltaLRight;
+}
+
+void EKLMGeometry::SegmentSupportPosition::setDeltaLRight(double deltaLRight)
+{
+  m_DeltaLRight = deltaLRight;
+}
+
+double EKLMGeometry::SegmentSupportPosition::getDeltaLLeft() const
+{
+  return m_DeltaLLeft;
+}
+
+void EKLMGeometry::SegmentSupportPosition::setDeltaLLeft(double deltaLLeft)
+{
+  m_DeltaLLeft = deltaLLeft;
+}
+
+double EKLMGeometry::SegmentSupportPosition::getLength() const
+{
+  return m_Length;
+}
+
+void EKLMGeometry::SegmentSupportPosition::setLength(double length)
+{
+  m_Length = length;
+}
+
+double EKLMGeometry::SegmentSupportPosition::getX() const
+{
+  return m_X;
+}
+
+void EKLMGeometry::SegmentSupportPosition::setX(double x)
+{
+  m_X = x;
+}
+
+double EKLMGeometry::SegmentSupportPosition::getY() const
+{
+  return m_Y;
+}
+
+void EKLMGeometry::SegmentSupportPosition::setY(double y)
+{
+  m_Y = y;
+}
+
+double EKLMGeometry::SegmentSupportPosition::getZ() const
+{
+  return m_Z;
+}
+
+void EKLMGeometry::SegmentSupportPosition::setZ(double z)
+{
+  m_Z = z;
 }
 
 /* Class EKLMGeometry::StripGeometry. */
@@ -647,7 +709,7 @@ EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
   m_SolenoidZ = geometry.getSolenoidZ();
   m_LayerShiftZ = geometry.getLayerShiftZ();
   m_SegmentSupportPosition =
-    new struct SegmentSupportPosition[m_NSegmentSupportElementsSector];
+    new SegmentSupportPosition[m_NSegmentSupportElementsSector];
   for (i = 0; i < m_NPlanes; i++) {
     for (j = 0; j <= m_NSegments; j++) {
       m_SegmentSupportPosition[i * (m_NSegments + 1) + j] =
@@ -720,7 +782,7 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
   if (m_SegmentSupportPosition != NULL)
     delete[] m_SegmentSupportPosition;
   m_SegmentSupportPosition =
-    new struct SegmentSupportPosition[m_NSegmentSupportElementsSector];
+    new SegmentSupportPosition[m_NSegmentSupportElementsSector];
   for (i = 0; i < m_NPlanes; i++) {
     for (j = 0; j <= m_NSegments; j++) {
       m_SegmentSupportPosition[i * (m_NSegments + 1) + j] =

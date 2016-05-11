@@ -961,15 +961,15 @@ createSegmentSupportLogicalVolume(int iPlane, int iSegmentSupport)
   std::string segmentSupportName =
     "SegmentSupport_" + boost::lexical_cast<std::string>(iSegmentSupport) +
     "Plane_" + boost::lexical_cast<std::string>(iPlane);
-  const struct EKLMGeometry::SegmentSupportPosition* segmentSupportPos =
+  const EKLMGeometry::SegmentSupportPosition* segmentSupportPos =
     m_GeoDat->getSegmentSupportPosition(iPlane, iSegmentSupport);
   const struct EKLMGeometry::SegmentSupportGeometry* segmentSupportGeometry =
     m_GeoDat->getSegmentSupportGeometry();
   try {
     topBox = new G4Box("BoxTop_" + segmentSupportName,
-                       0.5 * (segmentSupportPos->Length -
-                              segmentSupportPos->DeltaLLeft -
-                              segmentSupportPos->DeltaLRight),
+                       0.5 * (segmentSupportPos->getLength() -
+                              segmentSupportPos->getDeltaLLeft() -
+                              segmentSupportPos->getDeltaLRight()),
                        0.5 * segmentSupportGeometry->TopWidth,
                        0.5 * segmentSupportGeometry->TopThickness);
   } catch (std::bad_alloc& ba) {
@@ -977,9 +977,9 @@ createSegmentSupportLogicalVolume(int iPlane, int iSegmentSupport)
   }
   try {
     midBox = new G4Box("BoxMiddle_" + segmentSupportName,
-                       0.5 * (segmentSupportPos->Length -
-                              segmentSupportPos->DeltaLLeft -
-                              segmentSupportPos->DeltaLRight),
+                       0.5 * (segmentSupportPos->getLength() -
+                              segmentSupportPos->getDeltaLLeft() -
+                              segmentSupportPos->getDeltaLRight()),
                        0.5 * segmentSupportGeometry->MiddleWidth,
                        0.5 * segmentSupportGeometry->MiddleThickness);
   } catch (std::bad_alloc& ba) {
@@ -987,7 +987,7 @@ createSegmentSupportLogicalVolume(int iPlane, int iSegmentSupport)
   }
   try {
     botBox = new G4Box("BoxBottom_" + segmentSupportName,
-                       0.5 * segmentSupportPos->Length,
+                       0.5 * segmentSupportPos->getLength(),
                        0.5 * segmentSupportGeometry->TopWidth,
                        0.5 * segmentSupportGeometry->TopThickness);
   } catch (std::bad_alloc& ba) {
@@ -995,8 +995,8 @@ createSegmentSupportLogicalVolume(int iPlane, int iSegmentSupport)
   }
   t1 = HepGeom::Translate3D(0., 0., 0.5 * (segmentSupportGeometry->MiddleThickness +
                                            segmentSupportGeometry->TopThickness));
-  t2 = HepGeom::Translate3D(0.5 * (segmentSupportPos->DeltaLRight -
-                                   segmentSupportPos->DeltaLLeft),
+  t2 = HepGeom::Translate3D(0.5 * (segmentSupportPos->getDeltaLRight() -
+                                   segmentSupportPos->getDeltaLLeft()),
                             0., -0.5 * (segmentSupportGeometry->MiddleThickness +
                                         segmentSupportGeometry->TopThickness));
   try {
@@ -1828,12 +1828,13 @@ createSegmentSupport(int iSegmentSupport, G4LogicalVolume* plane) const
   HepGeom::Transform3D t;
   G4LogicalVolume* lv =
     m_LogVol.segmentsup[m_CurVol.plane - 1][iSegmentSupport - 1];
-  const struct EKLMGeometry::SegmentSupportPosition* segmentSupportPos =
+  const EKLMGeometry::SegmentSupportPosition* segmentSupportPos =
     m_GeoDat->getSegmentSupportPosition(m_CurVol.plane, iSegmentSupport);
   t = HepGeom::Translate3D(
-        0.5 * (segmentSupportPos->DeltaLLeft -
-               segmentSupportPos->DeltaLRight) +
-        segmentSupportPos->X, segmentSupportPos->Y, segmentSupportPos->Z) *
+        0.5 * (segmentSupportPos->getDeltaLLeft() -
+               segmentSupportPos->getDeltaLRight()) +
+        segmentSupportPos->getX(), segmentSupportPos->getY(),
+        segmentSupportPos->getZ()) *
       HepGeom::RotateX3D(180.0 * CLHEP::deg);
   try {
     new G4PVPlacement(t, lv, lv->GetName() + "_" + plane->GetName(), plane,

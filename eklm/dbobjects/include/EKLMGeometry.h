@@ -363,21 +363,100 @@ namespace Belle2 {
     /**
      * Segment support position.
      */
-    struct SegmentSupportPosition : public TObject {
+    class SegmentSupportPosition : public TObject {
+
+    public:
 
       /**
        * Constructor.
        */
       SegmentSupportPosition();
 
-      double DeltaLRight; /**< Right (X-plane) delta L. */
-      double DeltaLLeft;  /**< Left (X-plane) delta L. */
-      double Length;      /**< Length */
-      double X;           /**< X coordinate. */
-      double Y;           /**< Y coordinate. */
-      double Z;           /**< Z coordinate. */
+      /**
+       * Get right Delta L.
+       */
+      double getDeltaLRight() const;
+
+      /**
+       * Set right Delta L.
+       * @param[in] deltaLRight Right Delta L.
+       */
+      void setDeltaLRight(double deltaLRight);
+
+      /**
+       * Get left Delta L.
+       */
+      double getDeltaLLeft() const;
+
+      /**
+       * Set left DeltaL.
+       * @param[in] deltaLLeft Left Delta L.
+       */
+      void setDeltaLLeft(double deltaLLeft);
+
+      /**
+       * Get length.
+       */
+      double getLength() const;
+
+      /**
+       * Set length.
+       * @param[in] length Length.
+       */
+      void setLength(double length);
+
+      /**
+       * Get X coordinate.
+       */
+      double getX() const;
+
+      /**
+       * Set X coordinate.
+       * @param[in] x X coordinate.
+       */
+      void setX(double x);
+
+      /**
+       * Get Y coordinate.
+       */
+      double getY() const;
+
+      /**
+       * Set Y coordinate.
+       * @param[in] y Y coordinate.
+       */
+      void setY(double y);
+
+      /**
+       * Get Z coordinate.
+       */
+      double getZ() const;
+
+      /**
+       * Set Z coordinate.
+       * @param[in] z Z coordinate.
+       */
+      void setZ(double z);
 
     private:
+
+      /** Right (X-plane) delta L. */
+      double m_DeltaLRight;
+
+      /** Left (X-plane) delta L. */
+      double m_DeltaLLeft;
+
+      /** Length */
+      double m_Length;
+
+      /** X coordinate. */
+      double m_X;
+
+      /** Y coordinate. */
+      double m_Y;
+
+      /** Z coordinate. */
+      double m_Z;
 
       /** Makes objects storable. */
       ClassDef(SegmentSupportPosition, 1);
@@ -1147,7 +1226,7 @@ namespace Belle2 {
      * @param[in] plane   Plane number.
      * @param[in] support Segment support element number.
      */
-    const struct SegmentSupportPosition*
+    const SegmentSupportPosition*
     getSegmentSupportPosition(int plane, int support) const;
 
     /**
@@ -1259,7 +1338,7 @@ namespace Belle2 {
     struct SegmentSupportGeometry m_SegmentSupportGeometry;
 
     /** Position data for segment support structure. */
-    struct SegmentSupportPosition* m_SegmentSupportPosition; //[m_NSegmentSupportElementsSector]
+    SegmentSupportPosition* m_SegmentSupportPosition; //[m_NSegmentSupportElementsSector]
 
     /** Strip geometry data. */
     StripGeometry m_StripGeometry;

@@ -152,10 +152,32 @@ EKLMGeometry::StripGeometry::StripGeometry()
   RSSSize = 0;
 }
 
+/* Class EKLMGeometry::Point. */
+
 EKLMGeometry::Point::Point()
 {
-  X = 0;
-  Y = 0;
+  m_X = 0;
+  m_Y = 0;
+}
+
+double EKLMGeometry::Point::getX() const
+{
+  return m_X;
+}
+
+void EKLMGeometry::Point::setX(double x)
+{
+  m_X = x;
+}
+
+double EKLMGeometry::Point::getY() const
+{
+  return m_Y;
+}
+
+void EKLMGeometry::Point::setY(double y)
+{
+  m_Y = y;
 }
 
 /* Class EKLMGeometry::ShieldDetailGeometry. */
@@ -248,15 +270,15 @@ void EKLMGeometry::ShieldDetailGeometry::setNPoints(int nPoints)
     m_Points = NULL;
 }
 
-const struct EKLMGeometry::Point*
-EKLMGeometry::ShieldDetailGeometry::getPoint(int i) const {
+const EKLMGeometry::Point*
+EKLMGeometry::ShieldDetailGeometry::getPoint(int i) const
+{
   if (i < 0 || i >= m_NPoints)
     B2FATAL("Number of point must be from 0 to " << m_NPoints - 1 << ".");
   return &m_Points[i];
 }
 
-void EKLMGeometry::ShieldDetailGeometry::setPoint(
-  int i, const struct Point& point)
+void EKLMGeometry::ShieldDetailGeometry::setPoint(int i, const Point& point)
 {
   if (i < 0 || i >= m_NPoints)
     B2FATAL("Number of point must be from 0 to " << m_NPoints - 1 << ".");
@@ -328,37 +350,40 @@ void EKLMGeometry::ShieldGeometry::setDetailD(
   m_DetailD = geometry;
 }
 
-const struct EKLMGeometry::Point*
-EKLMGeometry::ShieldGeometry::getDetailACenter() const {
+const EKLMGeometry::Point*
+EKLMGeometry::ShieldGeometry::getDetailACenter() const
+{
   return &m_DetailACenter;
 }
 
 void EKLMGeometry::ShieldGeometry::setDetailACenter(double x, double y)
 {
-  m_DetailACenter.X = x;
-  m_DetailACenter.Y = y;
+  m_DetailACenter.setX(x);
+  m_DetailACenter.setY(y);
 }
 
-const struct EKLMGeometry::Point*
-EKLMGeometry::ShieldGeometry::getDetailBCenter() const {
+const EKLMGeometry::Point*
+EKLMGeometry::ShieldGeometry::getDetailBCenter() const
+{
   return &m_DetailBCenter;
 }
 
 void EKLMGeometry::ShieldGeometry::setDetailBCenter(double x, double y)
 {
-  m_DetailBCenter.X = x;
-  m_DetailBCenter.Y = y;
+  m_DetailBCenter.setX(x);
+  m_DetailBCenter.setY(y);
 }
 
-const struct EKLMGeometry::Point*
-EKLMGeometry::ShieldGeometry::getDetailCCenter() const {
+const EKLMGeometry::Point*
+EKLMGeometry::ShieldGeometry::getDetailCCenter() const
+{
   return &m_DetailCCenter;
 }
 
 void EKLMGeometry::ShieldGeometry::setDetailCCenter(double x, double y)
 {
-  m_DetailCCenter.X = x;
-  m_DetailCCenter.Y = y;
+  m_DetailCCenter.setX(x);
+  m_DetailCCenter.setY(y);
 }
 
 /* Class EKLMGeometry::BoardGeometry. */

@@ -411,17 +411,44 @@ namespace Belle2 {
     /**
      * 2D point.
      */
-    struct Point : public TObject {
+    class Point : public TObject {
+
+    public:
 
       /**
        * Constructor.
        */
       Point();
 
-      double X; /**< X coordinate. */
-      double Y; /**< Y coordinate. */
+      /**
+       * Get X coordinate.
+       */
+      double getX() const;
+
+      /**
+       * Set X coordinate.
+       * @param[in] x X coordinate.
+       */
+      void setX(double x);
+
+      /**
+       * Get Y coordinate.
+       */
+      double getY() const;
+
+      /**
+       * Set Y coordinate.
+       * @param[in] y Y coordinate.
+       */
+      void setY(double y);
 
     private:
+
+      /** X coordinate. */
+      double m_X;
+
+      /** Y coordinate. */
+      double m_Y;
 
       /** Makes objects storable. */
       ClassDef(Point, 1);
@@ -492,14 +519,14 @@ namespace Belle2 {
        * Get point.
        * @param[in] i Number of point (array index).
        */
-      const struct Point* getPoint(int i) const;
+      const Point* getPoint(int i) const;
 
       /**
        * Set point.
        * @param[in] i     Number of point (array index).
        * @param[in] point Point.
        */
-      void setPoint(int i, const struct Point& point);
+      void setPoint(int i, const Point& point);
 
     private:
 
@@ -590,7 +617,7 @@ namespace Belle2 {
       /**
        * Get detail A center.
        */
-      const struct Point* getDetailACenter() const;
+      const Point* getDetailACenter() const;
 
       /**
        * Set detail A center.
@@ -602,7 +629,7 @@ namespace Belle2 {
       /**
        * Get detail B center.
        */
-      const struct Point* getDetailBCenter() const;
+      const Point* getDetailBCenter() const;
 
       /**
        * Set detail B center.
@@ -614,7 +641,7 @@ namespace Belle2 {
       /**
        * Get detail C center.
        */
-      const struct Point* getDetailCCenter() const;
+      const Point* getDetailCCenter() const;
 
       /**
        * Set detail C center.
@@ -643,13 +670,13 @@ namespace Belle2 {
       /* The following data members are not stored in the database. */
 
       /** Detail A center. */
-      struct Point m_DetailACenter; //!
+      Point m_DetailACenter; //!
 
       /** Detail B center. */
-      struct Point m_DetailBCenter; //!
+      Point m_DetailBCenter; //!
 
       /** Detail C center. */
-      struct Point m_DetailCCenter; //!
+      Point m_DetailCCenter; //!
 
       /** Makes objects storable. */
       ClassDef(ShieldGeometry, 1);

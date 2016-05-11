@@ -102,8 +102,8 @@ static void readShieldDetailGeometry(
   for (i = 0; i < n; i++) {
     GearDir point(*gd);
     point.append((boost::format("/Point[%1%]") % (i + 1)).str());
-    p.X = point.getLength("X") * CLHEP::cm;
-    p.Y = point.getLength("Y") * CLHEP::cm;
+    p.setX(point.getLength("X") * CLHEP::cm);
+    p.setY(point.getLength("Y") * CLHEP::cm);
     sdg->setPoint(i, p);
   }
 }
@@ -365,8 +365,8 @@ static void getDetailDxDy(HepGeom::Point3D<double>* points, int nPoints,
 static void EKLMPointToCLHEP(const EKLMGeometry::Point* pointEKLM,
                              HepGeom::Point3D<double>& pointCLHEP)
 {
-  pointCLHEP.setX(pointEKLM->X);
-  pointCLHEP.setY(pointEKLM->Y);
+  pointCLHEP.setX(pointEKLM->getX());
+  pointCLHEP.setY(pointEKLM->getY());
   pointCLHEP.setZ(0);
 }
 

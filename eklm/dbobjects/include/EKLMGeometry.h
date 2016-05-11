@@ -299,26 +299,46 @@ namespace Belle2 {
     };
 
     /**
-     * @struct PlasticSheetGeometry
      * Plastic sheet geometry data.
-     *
-     * @var PlasticSheetGeometry::Width
-     * Width.
-     *
-     * @var PlasticSheetGeometry::DeltaL
-     * Distance from edge of last strip to edge of plastic list.
      */
-    struct PlasticSheetGeometry : public TObject {
+    class PlasticSheetGeometry : public TObject {
+
+    public:
 
       /**
        * Constructor.
        */
       PlasticSheetGeometry();
 
-      double Width;
-      double DeltaL;
+      /**
+       * Get width.
+       */
+      double getWidth() const;
+
+      /**
+       * Set width.
+       * @param[in] width Width.
+       */
+      void setWidth(double width);
+
+      /**
+       * Get Delta L (edge of last strip - edge of plastic sheet distance).
+       */
+      double getDeltaL() const;
+
+      /**
+       * Set Delta L (edge of last strip - edge of plastic sheet distance).
+       * @param[in] deltaL DeltaL.
+       */
+      void setDeltaL(double deltaL);
 
     private:
+
+      /** Width. */
+      double m_Width;
+
+      /** Distance from edge of last strip to edge of plastic sheet. */
+      double m_DeltaL;
 
       /** Makes objects storable. */
       ClassDef(PlasticSheetGeometry, 1);
@@ -1254,7 +1274,7 @@ namespace Belle2 {
     /**
      * Get plastic sheet geometry data.
      */
-    const struct PlasticSheetGeometry* getPlasticSheetGeometry() const;
+    const PlasticSheetGeometry* getPlasticSheetGeometry() const;
 
     /**
      * Get segment support geometry data.
@@ -1372,7 +1392,7 @@ namespace Belle2 {
     struct ElementPosition m_PlanePosition;
 
     /** Plastic sheet geometry data. */
-    struct PlasticSheetGeometry m_PlasticSheetGeometry;
+    PlasticSheetGeometry m_PlasticSheetGeometry;
 
     /** Segment support geometry data. */
     SegmentSupportGeometry m_SegmentSupportGeometry;

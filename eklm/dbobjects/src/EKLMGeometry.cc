@@ -118,10 +118,32 @@ EKLMGeometry::SectorSupportGeometry::SectorSupportGeometry()
   CornerAngle = 0;
 }
 
+/* Class EKLMGeometry::PlasticSheetGeometry. */
+
 EKLMGeometry::PlasticSheetGeometry::PlasticSheetGeometry()
 {
-  Width = 0;
-  DeltaL = 0;
+  m_Width = 0;
+  m_DeltaL = 0;
+}
+
+double EKLMGeometry::PlasticSheetGeometry::getWidth() const
+{
+  return m_Width;
+}
+
+void EKLMGeometry::PlasticSheetGeometry::setWidth(double width)
+{
+  m_Width = width;
+}
+
+double EKLMGeometry::PlasticSheetGeometry::getDeltaL() const
+{
+  return m_DeltaL;
+}
+
+void EKLMGeometry::PlasticSheetGeometry::setDeltaL(double deltaL)
+{
+  m_DeltaL = deltaL;
 }
 
 /* Class EKLMGeometry::SegmentSupportGeometry. */

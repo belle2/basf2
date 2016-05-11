@@ -1108,7 +1108,7 @@ void EKLM::GeoEKLMCreator::createPlasticSheetSolid(int n)
   char name[128];
   G4Box* b[15];
   HepGeom::Transform3D t[15];
-  const struct EKLMGeometry::PlasticSheetGeometry* plasticSheetGeometry =
+  const EKLMGeometry::PlasticSheetGeometry* plasticSheetGeometry =
     m_GeoDat->getPlasticSheetGeometry();
   const struct EKLMGeometry::ElementPosition* stripPos;
   const EKLMGeometry::StripGeometry* stripGeometry =
@@ -1123,12 +1123,12 @@ void EKLM::GeoEKLMCreator::createPlasticSheetSolid(int n)
     snprintf(name, 128, "PlasticSheet_%d_Element_%d", n + 1, i + 1);
     ly = stripGeometry->getWidth();
     if (i == 0 || i == 14)
-      ly = ly - plasticSheetGeometry->DeltaL;
+      ly = ly - plasticSheetGeometry->getDeltaL();
     m = 15 * n + i;
     stripPos = m_GeoDat->getStripPosition(m + 1);
     try {
       b[i] = new G4Box(name, 0.5 * stripPos->Length, 0.5 * ly,
-                       0.5 * plasticSheetGeometry->Width);
+                       0.5 * plasticSheetGeometry->getWidth());
     } catch (std::bad_alloc& ba) {
       B2FATAL(MemErr);
     }
@@ -1852,7 +1852,7 @@ createPlasticSheetElement(int iSheetPlane, int iSheet,
 {
   double z;
   HepGeom::Transform3D t;
-  const struct EKLMGeometry::PlasticSheetGeometry* plasticSheetGeometry =
+  const EKLMGeometry::PlasticSheetGeometry* plasticSheetGeometry =
     m_GeoDat->getPlasticSheetGeometry();
   const EKLMGeometry::StripGeometry* stripGeometry =
     m_GeoDat->getStripGeometry();
@@ -1871,7 +1871,7 @@ createPlasticSheetElement(int iSheetPlane, int iSheet,
     geometry::setVisibility(*m_LogVol.psheet[iSheet - 1], false);
     geometry::setColor(*m_LogVol.psheet[iSheet - 1], "#00ff00ff");
   }
-  z = 0.5 * (stripGeometry->getThickness() + plasticSheetGeometry->Width);
+  z = 0.5 * (stripGeometry->getThickness() + plasticSheetGeometry->getWidth());
   if (iSheetPlane == 2)
     z = -z;
   m_GeoDat->getSheetTransform(&t, (iSheet - 1) * 15);

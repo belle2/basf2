@@ -543,10 +543,10 @@ void EKLM::GeometryData::initializeFromGearbox()
   if (m_NSegments <= 0)
     B2FATAL("Number of segments must be positive.");
   m_NSegmentSupportElementsSector = (m_NSegments + 1) * m_NPlanes;
-  m_PlasticSheetGeometry.Width = Plane.getLength("PlasticSheetWidth") *
-                                 CLHEP::cm;
-  m_PlasticSheetGeometry.DeltaL = Plane.getLength("PlasticSheetDeltaL") *
-                                  CLHEP::cm;
+  m_PlasticSheetGeometry.setWidth(Plane.getLength("PlasticSheetWidth") *
+                                  CLHEP::cm);
+  m_PlasticSheetGeometry.setDeltaL(Plane.getLength("PlasticSheetDeltaL") *
+                                   CLHEP::cm);
   GearDir Segments(Plane);
   Segments.append("/Segments");
   m_SegmentSupportGeometry.setTopWidth(
@@ -783,9 +783,9 @@ EKLM::GeometryData::getSheetTransform(HepGeom::Transform3D* t, int n) const
   double y;
   y = m_StripPosition[n].Y;
   if (n % 15 == 0)
-    y = y + 0.5 * m_PlasticSheetGeometry.DeltaL;
+    y = y + 0.5 * m_PlasticSheetGeometry.getDeltaL();
   else if (n % 15 == 14)
-    y = y - 0.5 * m_PlasticSheetGeometry.DeltaL;
+    y = y - 0.5 * m_PlasticSheetGeometry.getDeltaL();
   *t = HepGeom::Translate3D(m_StripPosition[n].X, y, 0.0);
 }
 

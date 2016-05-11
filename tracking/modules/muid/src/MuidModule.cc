@@ -253,7 +253,7 @@ void MuidModule::initialize()
              - 0.5 * eklmGeometry.getEndcapPosition()->Length
              - 0.5 * eklmGeometry.getLayerPosition()->Length
              - 0.5 * eklmGeometry.getStripGeometry()->getThickness()
-             - 0.5 * eklmGeometry.getPlasticSheetGeometry()->Width) / CLHEP::cm); // in G4e units (cm)
+             - 0.5 * eklmGeometry.getPlasticSheetGeometry()->getWidth()) / CLHEP::cm); // in G4e units (cm)
 
   int nEndcapLayers = eklmGeometry.getNLayers();
   m_OutermostActiveForwardEndcapLayer = eklmGeometry.getNDetectorLayers(2) - 1; // zero-based counting

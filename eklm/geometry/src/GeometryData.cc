@@ -39,9 +39,9 @@ EKLM::GeometryData::Instance(enum DataSource dataSource)
  */
 static void readPositionData(EKLMGeometry::ElementPosition* epos, GearDir* gd)
 {
-  epos->setX(gd->getLength("PositionX") * CLHEP::cm);
-  epos->setY(gd->getLength("PositionY") * CLHEP::cm);
-  epos->setZ(gd->getLength("PositionZ") * CLHEP::cm);
+  epos->setX(gd->getLength("X") * CLHEP::cm);
+  epos->setY(gd->getLength("Y") * CLHEP::cm);
+  epos->setZ(gd->getLength("Z") * CLHEP::cm);
 }
 
 /**
@@ -272,9 +272,9 @@ void EKLM::GeometryData::readXMLDataStrips()
     GearDir StripContent(Strips);
     StripContent.append((boost::format("/Strip[%1%]") % (i + 1)).str());
     m_StripPosition[i].setLength(StripContent.getLength("Length") * CLHEP::cm);
-    m_StripPosition[i].setX(StripContent.getLength("PositionX") * CLHEP::cm);
-    m_StripPosition[i].setY(StripContent.getLength("PositionY") * CLHEP::cm);
-    m_StripPosition[i].setZ(StripContent.getLength("PositionZ") * CLHEP::cm);
+    m_StripPosition[i].setX(StripContent.getLength("X") * CLHEP::cm);
+    m_StripPosition[i].setY(StripContent.getLength("Y") * CLHEP::cm);
+    m_StripPosition[i].setZ(StripContent.getLength("Z") * CLHEP::cm);
   }
 }
 
@@ -550,11 +550,11 @@ void EKLM::GeometryData::initializeFromGearbox()
       m_SegmentSupportPosition[k].setLength(
         SegmentSupportContent.getLength("Length") * CLHEP::cm);
       m_SegmentSupportPosition[k].setX(
-        SegmentSupportContent.getLength("PositionX") * CLHEP::cm);
+        SegmentSupportContent.getLength("X") * CLHEP::cm);
       m_SegmentSupportPosition[k].setY(
-        SegmentSupportContent.getLength("PositionY") * CLHEP::cm);
+        SegmentSupportContent.getLength("Y") * CLHEP::cm);
       m_SegmentSupportPosition[k].setZ(
-        SegmentSupportContent.getLength("PositionZ") * CLHEP::cm);
+        SegmentSupportContent.getLength("Z") * CLHEP::cm);
       m_SegmentSupportPosition[k].setDeltaLRight(
         SegmentSupportContent.getLength("DeltaLRight") * CLHEP::cm);
       m_SegmentSupportPosition[k].setDeltaLLeft(
@@ -620,8 +620,7 @@ void EKLM::GeometryData::initializeFromGearbox()
     GearDir StripBoardContent(Boards);
     StripBoardContent.append((boost::format("/StripBoardData/Board[%1%]") %
                               (i + 1)).str());
-    m_StripBoardPosition[i].setX(StripBoardContent.getLength("PositionX") *
-                                 CLHEP::cm);
+    m_StripBoardPosition[i].setX(StripBoardContent.getLength("X") * CLHEP::cm);
   }
   m_Geometry = new EKLMGeometry(*this);
 }

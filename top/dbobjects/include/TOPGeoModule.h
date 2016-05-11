@@ -233,8 +233,8 @@ namespace Belle2 {
 
     /**
      * Transforms 3D point from Belle II to module internal frame
-     * @param point 3D point in Belle II frame
-     * @return 3D point in module internal frame
+     * @param point 3D point in Belle II frame (basf2 units!)
+     * @return 3D point in module internal frame (basf2 units!)
      */
     TVector3 pointToLocal(const TVector3& point) const;
 
@@ -247,8 +247,8 @@ namespace Belle2 {
 
     /**
      * Transforms 3D point from module internal frame to Belle II frame
-     * @param point 3D point in module internal frame
-     * @return 3D point in Belle II frame
+     * @param point 3D point in module internal frame (basf2 units!)
+     * @return 3D point in Belle II frame (basf2 units!)
      */
     TVector3 pointToGlobal(const TVector3& point) const;
 

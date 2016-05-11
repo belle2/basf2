@@ -27,8 +27,6 @@ namespace Belle2 {
     TOPconfigure::TOPconfigure()
     {
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-      if (!geo) B2FATAL("TOPconfigure: no geometry available");
-      geo->useBasf2Units();
 
       // space for TOP modules
       m_R1 = geo->getInnerRadius();

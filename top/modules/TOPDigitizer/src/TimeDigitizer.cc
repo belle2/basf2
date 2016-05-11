@@ -28,10 +28,6 @@ namespace Belle2 {
 
       // get parameters of the model
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-      if (!geo) {
-        B2ERROR("TimeDigitizer::digitize: no time-to-digit conversion available");
-        return;
-      }
       const auto& tdc = geo->getNominalTDC();
       double hitResolveTime = tdc.getDoubleHitResolution();
       double pileupTime = tdc.getPileupTime();

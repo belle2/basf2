@@ -37,13 +37,8 @@ using namespace Belle2;
 void TOPDatabaseImporter::importSampleTimeCalibration(std::string fileName)
 {
 
-  const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
-  if (!geo) {
-    B2ERROR("TOP geometry is not available");
-    return;
-  }
-
   auto& mapper = TOP::TOPGeometryPar::Instance()->getChannelMapper();
+  const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
   auto syncTimeBase = geo->getNominalTDC().getSyncTimeBase();
 
   std::ifstream stream;

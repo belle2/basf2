@@ -13,7 +13,6 @@
 
 // Own include
 #include <top/modules/TOPReconstruction/TOPReconstructorModule.h>
-#include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction/TOPreco.h>
 #include <top/reconstruction/TOPtrack.h>
 #include <top/reconstruction/TOPconfigure.h>
@@ -143,14 +142,6 @@ namespace Belle2 {
 
     m_smearTrack = m_sigmaRphi > 0 || m_sigmaZ > 0 || m_sigmaTheta > 0 ||
                    m_sigmaPhi > 0;
-
-    // check if geometry is available
-    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    if (!geo) {
-      B2FATAL("TOPReconstructor: no geometry available");
-      return;
-    }
-    geo->useBasf2Units();
 
     // Configure TOP detector
 

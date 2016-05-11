@@ -612,10 +612,16 @@ namespace Belle2 {
       void setGeometry(const TOPGeometry* geo) {m_geo = geo;}
 
       /**
-       * Returns pointer to geometry object
+       * Returns pointer to geometry object using Basf2 units
        * @return pointer to geometry object
        */
-      const TOPGeometry* getGeometry() const {return m_geo;}
+      const TOPGeometry* getGeometry() const
+      {
+        TOPGeometry::useBasf2Units();
+        if (m_geo) return m_geo;
+        B2FATAL("No geometry available for TOP");
+        return 0;
+      }
 
     private:
 

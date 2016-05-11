@@ -83,15 +83,8 @@ namespace Belle2 {
     TDirectory* oldDir = gDirectory;
     oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
 
-    // check if geometry is available
-    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    if (!geo) {
-      B2FATAL("TOPDQM: no geometry available");
-      return;
-    }
-    geo->useBasf2Units();
-
     // variables needed for booking
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_numModules = geo->getNumModules();
     int numPixels = geo->getPMTArray().getNumPixels();
     int numTDCbins = geo->getNominalTDC().getOverflowValue();

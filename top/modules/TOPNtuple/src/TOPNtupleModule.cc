@@ -120,11 +120,6 @@ namespace Belle2 {
     StoreArray<Track> tracks;
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    if (!geo) {
-      B2ERROR("TOPNtupleModule: no geometry available");
-      return;
-    }
-    geo->useBasf2Units();
 
     for (const auto& track : tracks) {
       const TrackFitResult* trackFit = track.getTrackFitResult(Const::pion);

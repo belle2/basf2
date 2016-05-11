@@ -58,10 +58,6 @@ namespace Belle2 {
 
       Const::EDetector myDetID = Const::EDetector::TOP;
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-      if (!geo) {
-        B2FATAL("TOPtrack::TOPtrack no geometry available");
-        return;
-      }
       int numModules = geo->getNumModules();
       int pdgCode = abs(chargedStable.getPDGCode());
 

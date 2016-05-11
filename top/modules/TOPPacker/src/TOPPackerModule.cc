@@ -44,9 +44,7 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPPackerModule::TOPPackerModule() : Module(),
-    m_topgp(TOPGeometryPar::Instance())
-
+  TOPPackerModule::TOPPackerModule() : Module()
   {
     // set module description (e.g. insert text)
     setDescription("Raw data packer for TOP");
@@ -72,14 +70,6 @@ namespace Belle2 {
 
     StoreArray<RawTOP> rawData(m_outputRawDataName);
     rawData.registerInDataStore();
-
-    // check if geometry is available
-    const auto* geo = m_topgp->getGeometry();
-    if (!geo) {
-      B2ERROR("No geometry available");
-      return;
-    }
-    geo->useBasf2Units();
 
     // check if front end mappings are available
     const auto& mapper = m_topgp->getFrontEndMapper();

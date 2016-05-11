@@ -77,14 +77,6 @@ namespace Belle2 {
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.registerInDataStore(DataStore::c_DontWriteOut);
 
-    // check if geometry is available
-    const auto* geo = m_topgp->getGeometry();
-    if (!geo) {
-      B2ERROR("No geometry available");
-      return;
-    }
-    geo->useBasf2Units();
-
     // check if front end mappings are available
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
@@ -143,10 +135,6 @@ namespace Belle2 {
     const auto& mapper = m_topgp->getChannelMapper();
 
     const auto* geo = m_topgp->getGeometry();
-    if (!geo) {
-      B2ERROR("TOPUnpacker: no geometry of TOP available");
-      return;
-    }
 
     unsigned version = (buffer[0] >> 16) & 0xFF;
     switch (version) {

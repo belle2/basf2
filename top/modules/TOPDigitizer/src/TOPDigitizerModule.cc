@@ -87,13 +87,7 @@ namespace Belle2 {
     StoreObjPtr<TOPRecBunch> recBunch;
     recBunch.registerInDataStore();
 
-    // check if geometry is available
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    if (!geo) {
-      B2FATAL("TOPDigitizer: no geometry available");
-      return;
-    }
-    geo->useBasf2Units();
 
     // set pile-up and double hit resolution times (needed for BG overlay)
     TOPDigit::setDoubleHitResolution(geo->getNominalTDC().getDoubleHitResolution());
@@ -127,7 +121,6 @@ namespace Belle2 {
     if (!recBunch.isValid()) recBunch.create();
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    geo->useBasf2Units();
 
     // simulate trigger T0 accuracy in finding the right bunch crossing
     double trigT0 = 0;

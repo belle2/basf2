@@ -45,7 +45,7 @@ void TOPGeoModule::setTransformation() const
 
   TRotation Rphi;
   Rphi.RotateZ(m_phi - M_PI / 2);
-  TVector3 translation(0, getRadius(), getZc());
+  TVector3 translation(0, m_radius, getZc() * s_unit);
 
   TRotation Rot;
   if (m_moduleDisplacement) {

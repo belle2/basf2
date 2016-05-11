@@ -109,12 +109,6 @@ namespace Belle2 {
     double barPhi = 0;
     if (m_barID != 0) {
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-      if (!geo) {
-        B2FATAL("OpticalGun: no geometry of TOP available");
-        return;
-      }
-      geo->useBasf2Units();
-
       int Nbars = geo->getNumModules();
       if (Nbars == 0) B2ERROR("TOP bars are not defined");
       if (m_barID < 0 || m_barID > Nbars) {

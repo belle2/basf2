@@ -107,15 +107,8 @@ namespace Belle2 {
     if (m_fraction >= 1) B2ERROR("TOPWFMerger: fraction must be less that 1");
     if (m_fraction <= 0) B2ERROR("TOPWFMerger: fraction must be greater that 0");
 
-    // check if geometry is available
-    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    if (!geo) {
-      B2FATAL("TOPWFMerger: no geometry available");
-      return;
-    }
-    geo->useBasf2Units();
-
     // default sample times in case calibration is not available
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_sampleTime = new TOPSampleTime(0, 0, geo->getNominalTDC().getSyncTimeBase());
     m_sampleDivisions = (0x1 << geo->getNominalTDC().getSubBits());
 

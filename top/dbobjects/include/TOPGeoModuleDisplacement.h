@@ -86,10 +86,10 @@ namespace Belle2 {
     }
 
     /**
-     * Returns translation vector
+     * Returns translation vector (always in Basf2 units!)
      * @return translation vector
      */
-    TVector3 getTranslation() const {return TVector3(getX(), getY(), getZ());}
+    TVector3 getTranslation() const {return TVector3(m_x, m_y, m_z);}
 
     /**
      * Check for consistency of data members

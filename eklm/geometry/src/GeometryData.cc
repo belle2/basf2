@@ -547,7 +547,6 @@ void EKLM::GeometryData::initializeFromGearbox()
   readPositionData(&m_SectorSupportPosition, &SectorSupport);
   readSizeData(&m_SectorSupportPosition, &SectorSupport);
   readSectorSupportGeometry(&m_SectorSupportGeometry, &SectorSupport);
-  calculateSectorSupportGeometry();
   GearDir Plane(Sector);
   Plane.append("/Plane");
   readPositionData(&m_PlanePosition, &Plane);
@@ -680,6 +679,7 @@ EKLM::GeometryData::GeometryData(enum DataSource dataSource)
       initializeFromDatabase();
       break;
   }
+  calculateSectorSupportGeometry();
   fillStripIndexArrays();
   calculateShieldGeometry();
 }

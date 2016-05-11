@@ -354,7 +354,16 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
   m_NBoardsSector = geometry.getNBoardsSector();
   m_NStripBoards = geometry.getNStripBoards();
   m_SolenoidZ = geometry.getSolenoidZ();
+  m_EndcapStructureGeometry = *geometry.getEndcapStructureGeometry();
+  m_EndcapPosition = *geometry.getEndcapPosition();
+  m_LayerPosition = *geometry.getLayerPosition();
   m_LayerShiftZ = geometry.getLayerShiftZ();
+  m_SectorPosition = *geometry.getSectorPosition();
+  m_SectorSupportPosition = *geometry.getSectorSupportPosition();
+  m_SectorSupportGeometry = *geometry.getSectorSupportGeometry();
+  m_PlanePosition = *geometry.getPlanePosition();
+  m_PlasticSheetGeometry = *geometry.getPlasticSheetGeometry();
+  m_SegmentSupportGeometry = *geometry.getSegmentSupportGeometry();
   if (m_SegmentSupportPosition != NULL)
     delete[] m_SegmentSupportPosition;
   m_SegmentSupportPosition =
@@ -365,11 +374,14 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
         *geometry.getSegmentSupportPosition(i + 1, j + 1);
     }
   }
+  m_StripGeometry = *geometry.getStripGeometry();
   if (m_StripPosition != NULL)
     delete[] m_StripPosition;
   m_StripPosition = new struct ElementPosition[m_NStrips];
   for (i = 0; i < m_NStrips; i++)
     m_StripPosition[i] = *geometry.getStripPosition(i + 1);
+  m_ShieldGeometry = *geometry.getShieldGeometry();
+  m_BoardGeometry = *geometry.getBoardGeometry();
   if (m_BoardPosition != NULL)
     delete[] m_BoardPosition;
   m_BoardPosition = new struct BoardPosition[m_NBoardsSector];

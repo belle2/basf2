@@ -549,14 +549,14 @@ void EKLM::GeometryData::initializeFromGearbox()
                                   CLHEP::cm;
   GearDir Segments(Plane);
   Segments.append("/Segments");
-  m_SegmentSupportGeometry.TopWidth =
-    Segments.getLength("TopWidth") * CLHEP::cm;
-  m_SegmentSupportGeometry.TopThickness =
-    Segments.getLength("TopThickness") * CLHEP::cm;
-  m_SegmentSupportGeometry.MiddleWidth =
-    Segments.getLength("MiddleWidth") * CLHEP::cm;
-  m_SegmentSupportGeometry.MiddleThickness =
-    Segments.getLength("MiddleThickness") * CLHEP::cm;
+  m_SegmentSupportGeometry.setTopWidth(
+    Segments.getLength("TopWidth") * CLHEP::cm);
+  m_SegmentSupportGeometry.setTopThickness(
+    Segments.getLength("TopThickness") * CLHEP::cm);
+  m_SegmentSupportGeometry.setMiddleWidth(
+    Segments.getLength("MiddleWidth") * CLHEP::cm);
+  m_SegmentSupportGeometry.setMiddleThickness(
+    Segments.getLength("MiddleThickness") * CLHEP::cm);
   try {
     m_SegmentSupportPosition =
       new EKLMGeometry::SegmentSupportPosition[m_NSegmentSupportElementsSector];

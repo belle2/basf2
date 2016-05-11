@@ -29,7 +29,7 @@ EKLM::AlignmentChecker::AlignmentChecker()
   const EKLMGeometry::ElementPosition* sectorSupportPosition =
     m_GeoDat->getSectorSupportPosition();
   const EKLMGeometry::SegmentSupportPosition* segmentSupportPos;
-  const struct EKLMGeometry::SegmentSupportGeometry* segmentSupportGeometry =
+  const EKLMGeometry::SegmentSupportGeometry* segmentSupportGeometry =
     m_GeoDat->getSegmentSupportGeometry();
   m_LineCorner1 = new LineSegment2D(
     sectorSupportGeometry->Corner1AInner, sectorSupportGeometry->Corner1BInner);
@@ -60,7 +60,7 @@ EKLM::AlignmentChecker::AlignmentChecker()
       lx = 0.5 * (segmentSupportPos->getLength() -
                   segmentSupportPos->getDeltaLLeft() -
                   segmentSupportPos->getDeltaLRight());
-      ly = 0.5 * (segmentSupportGeometry->MiddleWidth);
+      ly = 0.5 * (segmentSupportGeometry->getMiddleWidth());
       supportRectangle[0].setX(lx);
       supportRectangle[0].setY(ly);
       supportRectangle[0].setZ(0);

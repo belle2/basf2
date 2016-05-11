@@ -124,12 +124,55 @@ EKLMGeometry::PlasticSheetGeometry::PlasticSheetGeometry()
   DeltaL = 0;
 }
 
+/* Class EKLMGeometry::SegmentSupportGeometry. */
+
 EKLMGeometry::SegmentSupportGeometry::SegmentSupportGeometry()
 {
-  TopWidth = 0;
-  TopThickness = 0;
-  MiddleWidth = 0;
-  MiddleThickness = 0;
+  m_TopWidth = 0;
+  m_TopThickness = 0;
+  m_MiddleWidth = 0;
+  m_MiddleThickness = 0;
+}
+
+double EKLMGeometry::SegmentSupportGeometry::getTopWidth() const
+{
+  return m_TopWidth;
+}
+
+void EKLMGeometry::SegmentSupportGeometry::setTopWidth(double topWidth)
+{
+  m_TopWidth = topWidth;
+}
+
+double EKLMGeometry::SegmentSupportGeometry::getTopThickness() const
+{
+  return m_TopThickness;
+}
+
+void EKLMGeometry::SegmentSupportGeometry::setTopThickness(double topThickness)
+{
+  m_TopThickness = topThickness;
+}
+
+double EKLMGeometry::SegmentSupportGeometry::getMiddleWidth() const
+{
+  return m_MiddleWidth;
+}
+
+void EKLMGeometry::SegmentSupportGeometry::setMiddleWidth(double middleWidth)
+{
+  m_MiddleWidth = middleWidth;
+}
+
+double EKLMGeometry::SegmentSupportGeometry::getMiddleThickness() const
+{
+  return m_MiddleThickness;
+}
+
+void EKLMGeometry::SegmentSupportGeometry::setMiddleThickness(
+  double middleThickness)
+{
+  m_MiddleThickness = middleThickness;
 }
 
 /* Class EKLMGeometry::SegmentSupportPosition. */

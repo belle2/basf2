@@ -326,34 +326,74 @@ namespace Belle2 {
     };
 
     /**
-     * @struct SegmentSupportGeometry
      * Segment support geometry data.
-     *
-     * @var SegmentSupportGeometry::TopWidth
-     * Top box width.
-     *
-     * @var SegmentSupportGeometry::TopThickness
-     * Top box thickness.
-     *
-     * @var SegmentSupportGeometry::MiddleWidth
-     * Middle box width.
-     *
-     * @var SegmentSupportGeometry::MiddleThickness
-     * Middle box thickness.
      */
-    struct SegmentSupportGeometry : public TObject {
+    class SegmentSupportGeometry : public TObject {
+
+    public:
 
       /**
        * Constructor.
        */
       SegmentSupportGeometry();
 
-      double TopWidth;
-      double TopThickness;
-      double MiddleWidth;
-      double MiddleThickness;
+      /**
+       * Get top part width.
+       */
+      double getTopWidth() const;
+
+      /**
+       * Set top part width.
+       * @param[in] topWidth Top part width.
+       */
+      void setTopWidth(double topWidth);
+
+      /**
+       * Get top part thickness.
+       */
+      double getTopThickness() const;
+
+      /**
+       * Set top part thickness.
+       * @param[in] topThickness Top part thickness.
+       */
+      void setTopThickness(double topThickness);
+
+      /**
+       * Get middle part width.
+       */
+      double getMiddleWidth() const;
+
+      /**
+       * Set middle part width.
+       * @param[in] middleWidth Middle part width.
+       */
+      void setMiddleWidth(double middleWidth);
+
+      /**
+       * Get middle part thickness.
+       */
+      double getMiddleThickness() const;
+
+      /**
+       * Set middle part thickness.
+       * @param[in] middleThickness Middle part thickness.
+       */
+      void setMiddleThickness(double middleThickness);
 
     private:
+
+      /** Top box width. */
+      double m_TopWidth;
+
+      /** Top box thickness. */
+      double m_TopThickness;
+
+      /** Middle box width. */
+      double m_MiddleWidth;
+
+      /** Middle box thickness. */
+      double m_MiddleThickness;
 
       /** Makes objects storable. */
       ClassDef(SegmentSupportGeometry, 1);
@@ -1219,7 +1259,7 @@ namespace Belle2 {
     /**
      * Get segment support geometry data.
      */
-    const struct SegmentSupportGeometry* getSegmentSupportGeometry() const;
+    const SegmentSupportGeometry* getSegmentSupportGeometry() const;
 
     /**
      * Get position data for segment support structure.
@@ -1335,7 +1375,7 @@ namespace Belle2 {
     struct PlasticSheetGeometry m_PlasticSheetGeometry;
 
     /** Segment support geometry data. */
-    struct SegmentSupportGeometry m_SegmentSupportGeometry;
+    SegmentSupportGeometry m_SegmentSupportGeometry;
 
     /** Position data for segment support structure. */
     SegmentSupportPosition* m_SegmentSupportPosition; //[m_NSegmentSupportElementsSector]

@@ -963,15 +963,15 @@ createSegmentSupportLogicalVolume(int iPlane, int iSegmentSupport)
     "Plane_" + boost::lexical_cast<std::string>(iPlane);
   const EKLMGeometry::SegmentSupportPosition* segmentSupportPos =
     m_GeoDat->getSegmentSupportPosition(iPlane, iSegmentSupport);
-  const struct EKLMGeometry::SegmentSupportGeometry* segmentSupportGeometry =
+  const EKLMGeometry::SegmentSupportGeometry* segmentSupportGeometry =
     m_GeoDat->getSegmentSupportGeometry();
   try {
     topBox = new G4Box("BoxTop_" + segmentSupportName,
                        0.5 * (segmentSupportPos->getLength() -
                               segmentSupportPos->getDeltaLLeft() -
                               segmentSupportPos->getDeltaLRight()),
-                       0.5 * segmentSupportGeometry->TopWidth,
-                       0.5 * segmentSupportGeometry->TopThickness);
+                       0.5 * segmentSupportGeometry->getTopWidth(),
+                       0.5 * segmentSupportGeometry->getTopThickness());
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -980,25 +980,27 @@ createSegmentSupportLogicalVolume(int iPlane, int iSegmentSupport)
                        0.5 * (segmentSupportPos->getLength() -
                               segmentSupportPos->getDeltaLLeft() -
                               segmentSupportPos->getDeltaLRight()),
-                       0.5 * segmentSupportGeometry->MiddleWidth,
-                       0.5 * segmentSupportGeometry->MiddleThickness);
+                       0.5 * segmentSupportGeometry->getMiddleWidth(),
+                       0.5 * segmentSupportGeometry->getMiddleThickness());
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   try {
     botBox = new G4Box("BoxBottom_" + segmentSupportName,
                        0.5 * segmentSupportPos->getLength(),
-                       0.5 * segmentSupportGeometry->TopWidth,
-                       0.5 * segmentSupportGeometry->TopThickness);
+                       0.5 * segmentSupportGeometry->getTopWidth(),
+                       0.5 * segmentSupportGeometry->getTopThickness());
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  t1 = HepGeom::Translate3D(0., 0., 0.5 * (segmentSupportGeometry->MiddleThickness +
-                                           segmentSupportGeometry->TopThickness));
-  t2 = HepGeom::Translate3D(0.5 * (segmentSupportPos->getDeltaLRight() -
-                                   segmentSupportPos->getDeltaLLeft()),
-                            0., -0.5 * (segmentSupportGeometry->MiddleThickness +
-                                        segmentSupportGeometry->TopThickness));
+  t1 = HepGeom::Translate3D(
+         0., 0., 0.5 * (segmentSupportGeometry->getMiddleThickness() +
+                        segmentSupportGeometry->getTopThickness()));
+  t2 = HepGeom::Translate3D(
+         0.5 * (segmentSupportPos->getDeltaLRight() -
+                segmentSupportPos->getDeltaLLeft()), 0.,
+         -0.5 * (segmentSupportGeometry->getMiddleThickness() +
+                 segmentSupportGeometry->getTopThickness()));
   try {
     us = new G4UnionSolid("Union1_" + segmentSupportName, midBox, topBox, t1);
   } catch (std::bad_alloc& ba) {

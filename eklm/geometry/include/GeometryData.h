@@ -19,6 +19,7 @@
 #include <eklm/dbobjects/EKLMGeometry.h>
 #include <eklm/geometry/GeoEKLMTypes.h>
 #include <framework/database/IntervalOfValidity.h>
+#include <framework/gearbox/GearDir.h>
 
 /**
  * @file
@@ -161,6 +162,12 @@ namespace Belle2 {
       ~GeometryData();
 
       /**
+       * Read endcap structure geometry data.
+       * @param[in] gd Current GearDir.
+       */
+      void readEndcapStructureGeometry(const GearDir& gd);
+
+      /**
        * Initialize from Gearbox (XML).
        */
       void initializeFromGearbox();
@@ -189,11 +196,6 @@ namespace Belle2 {
        * Calculate shield geometry data.
        */
       void calculateShieldGeometry();
-
-      /**
-       * Read endcap structure geometry data.
-       */
-      void readEndcapStructureGeometry();
 
       /** Copy of data in this class used to write it to database. */
       EKLMGeometry* m_Geometry;

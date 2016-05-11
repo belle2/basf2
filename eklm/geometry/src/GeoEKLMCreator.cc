@@ -1264,10 +1264,10 @@ void EKLM::GeoEKLMCreator::createShieldDetailALogicalVolume()
   G4SubtractionSolid* ss1, *ss2, *ss3, *solidDetailA;
   double lx, ly;
   const EKLMGeometry::ShieldGeometry* shieldGeometry = m_GeoDat->getShieldGeometry();
-  const struct EKLMGeometry::ShieldDetailGeometry* detailA = shieldGeometry->getDetailA();
+  const EKLMGeometry::ShieldDetailGeometry* detailA = shieldGeometry->getDetailA();
   HepGeom::Transform3D t = HepGeom::Translate3D(0, 0, 0);
-  lx = detailA->LengthX / 2;
-  ly = detailA->LengthY / 2;
+  lx = detailA->getLengthX() / 2;
+  ly = detailA->getLengthY() / 2;
   try {
     box = new G4Box("ShieldDetailA_Box", lx, ly,
                     shieldGeometry->getThickness() / 2);
@@ -1276,28 +1276,28 @@ void EKLM::GeoEKLMCreator::createShieldDetailALogicalVolume()
   }
   ss1 = cutSolidCorner("ShieldDetailA_Subtraction_1", box,
                        m_Solids.subtractionBox, t, false,
-                       detailA->Points[0].X - lx,
-                       detailA->Points[0].Y - ly,
-                       detailA->Points[1].X - lx,
-                       detailA->Points[1].Y - ly);
+                       detailA->getPoint(0)->X - lx,
+                       detailA->getPoint(0)->Y - ly,
+                       detailA->getPoint(1)->X - lx,
+                       detailA->getPoint(1)->Y - ly);
   ss2 = cutSolidCorner("ShieldDetailA_Subtraction_2", ss1,
                        m_Solids.subtractionBox, t, true,
-                       detailA->Points[3].X - lx,
-                       detailA->Points[3].Y - ly,
-                       detailA->Points[2].X - lx,
-                       detailA->Points[2].Y - ly);
+                       detailA->getPoint(3)->X - lx,
+                       detailA->getPoint(3)->Y - ly,
+                       detailA->getPoint(2)->X - lx,
+                       detailA->getPoint(2)->Y - ly);
   ss3 = cutSolidCorner("ShieldDetailA_Subtraction_3", ss2,
                        m_Solids.subtractionBox, t, false,
-                       detailA->Points[3].X - lx,
-                       detailA->Points[3].Y - ly,
-                       detailA->Points[4].X - lx,
-                       detailA->Points[4].Y - ly);
+                       detailA->getPoint(3)->X - lx,
+                       detailA->getPoint(3)->Y - ly,
+                       detailA->getPoint(4)->X - lx,
+                       detailA->getPoint(4)->Y - ly);
   solidDetailA = cutSolidCorner("ShieldDetailA", ss3,
                                 m_Solids.subtractionBox, t, false,
-                                detailA->Points[5].X - lx,
-                                detailA->Points[5].Y - ly,
-                                detailA->Points[6].X - lx,
-                                detailA->Points[6].Y - ly);
+                                detailA->getPoint(5)->X - lx,
+                                detailA->getPoint(5)->Y - ly,
+                                detailA->getPoint(6)->X - lx,
+                                detailA->getPoint(6)->Y - ly);
   try {
     m_LogVol.shield.detailA =
       new G4LogicalVolume(solidDetailA, m_Materials.polyethylene,
@@ -1315,10 +1315,10 @@ void EKLM::GeoEKLMCreator::createShieldDetailBLogicalVolume()
   G4SubtractionSolid* ss1, *solidDetailB;
   double lx, ly;
   const EKLMGeometry::ShieldGeometry* shieldGeometry = m_GeoDat->getShieldGeometry();
-  const struct EKLMGeometry::ShieldDetailGeometry* detailB = shieldGeometry->getDetailB();
+  const EKLMGeometry::ShieldDetailGeometry* detailB = shieldGeometry->getDetailB();
   HepGeom::Transform3D t = HepGeom::Translate3D(0, 0, 0);
-  lx = detailB->LengthX / 2;
-  ly = detailB->LengthY / 2;
+  lx = detailB->getLengthX() / 2;
+  ly = detailB->getLengthY() / 2;
   try {
     box = new G4Box("ShieldDetailB_Box", lx, ly,
                     shieldGeometry->getThickness() / 2);
@@ -1327,16 +1327,16 @@ void EKLM::GeoEKLMCreator::createShieldDetailBLogicalVolume()
   }
   ss1 = cutSolidCorner("ShieldDetailB_Subtraction_1", box,
                        m_Solids.subtractionBox, t, false,
-                       detailB->Points[0].X - lx,
-                       detailB->Points[0].Y - ly,
-                       detailB->Points[1].X - lx,
-                       detailB->Points[1].Y - ly);
+                       detailB->getPoint(0)->X - lx,
+                       detailB->getPoint(0)->Y - ly,
+                       detailB->getPoint(1)->X - lx,
+                       detailB->getPoint(1)->Y - ly);
   solidDetailB = cutSolidCorner("ShieldDetailB", ss1,
                                 m_Solids.subtractionBox, t, false,
-                                detailB->Points[2].X - lx,
-                                detailB->Points[2].Y - ly,
-                                detailB->Points[3].X - lx,
-                                detailB->Points[3].Y - ly);
+                                detailB->getPoint(2)->X - lx,
+                                detailB->getPoint(2)->Y - ly,
+                                detailB->getPoint(3)->X - lx,
+                                detailB->getPoint(3)->Y - ly);
   try {
     m_LogVol.shield.detailB =
       new G4LogicalVolume(solidDetailB, m_Materials.polyethylene,
@@ -1354,10 +1354,10 @@ void EKLM::GeoEKLMCreator::createShieldDetailCLogicalVolume()
   G4SubtractionSolid* ss1, *ss2, *ss3, *solidDetailC;
   double lx, ly;
   const EKLMGeometry::ShieldGeometry* shieldGeometry = m_GeoDat->getShieldGeometry();
-  const struct EKLMGeometry::ShieldDetailGeometry* detailC = shieldGeometry->getDetailC();
+  const EKLMGeometry::ShieldDetailGeometry* detailC = shieldGeometry->getDetailC();
   HepGeom::Transform3D t = HepGeom::Translate3D(0, 0, 0);
-  lx = detailC->LengthX / 2;
-  ly = detailC->LengthY / 2;
+  lx = detailC->getLengthX() / 2;
+  ly = detailC->getLengthY() / 2;
   try {
     box = new G4Box("ShieldDetailC_Box", lx, ly,
                     shieldGeometry->getThickness() / 2);
@@ -1366,28 +1366,28 @@ void EKLM::GeoEKLMCreator::createShieldDetailCLogicalVolume()
   }
   ss1 = cutSolidCorner("ShieldDetailC_Subtraction_1", box,
                        m_Solids.subtractionBox, t, false,
-                       detailC->Points[0].X - lx,
-                       detailC->Points[0].Y - ly,
-                       detailC->Points[1].X - lx,
-                       detailC->Points[1].Y - ly);
+                       detailC->getPoint(0)->X - lx,
+                       detailC->getPoint(0)->Y - ly,
+                       detailC->getPoint(1)->X - lx,
+                       detailC->getPoint(1)->Y - ly);
   ss2 = cutSolidCorner("ShieldDetailC_Subtraction_2", ss1,
                        m_Solids.subtractionBox, t, true,
-                       detailC->Points[3].X - lx,
-                       detailC->Points[3].Y - ly,
-                       detailC->Points[2].X - lx,
-                       detailC->Points[2].Y - ly);
+                       detailC->getPoint(3)->X - lx,
+                       detailC->getPoint(3)->Y - ly,
+                       detailC->getPoint(2)->X - lx,
+                       detailC->getPoint(2)->Y - ly);
   ss3 = cutSolidCorner("ShieldDetailC_Subtraction_3", ss2,
                        m_Solids.subtractionBox, t, false,
-                       detailC->Points[3].X - lx,
-                       detailC->Points[3].Y - ly,
-                       detailC->Points[4].X - lx,
-                       detailC->Points[4].Y - ly);
+                       detailC->getPoint(3)->X - lx,
+                       detailC->getPoint(3)->Y - ly,
+                       detailC->getPoint(4)->X - lx,
+                       detailC->getPoint(4)->Y - ly);
   solidDetailC = cutSolidCorner("ShieldDetailC", ss3,
                                 m_Solids.subtractionBox, t, false,
-                                detailC->Points[5].X - lx,
-                                detailC->Points[5].Y - ly,
-                                detailC->Points[6].X - lx,
-                                detailC->Points[6].Y - ly);
+                                detailC->getPoint(5)->X - lx,
+                                detailC->getPoint(5)->Y - ly,
+                                detailC->getPoint(6)->X - lx,
+                                detailC->getPoint(6)->Y - ly);
   try {
     m_LogVol.shield.detailC =
       new G4LogicalVolume(solidDetailC, m_Materials.polyethylene,
@@ -1403,12 +1403,12 @@ void EKLM::GeoEKLMCreator::createShieldDetailDLogicalVolume()
 {
   G4TriangularPrism* solidDetailDPrism;
   const EKLMGeometry::ShieldGeometry* shieldGeometry = m_GeoDat->getShieldGeometry();
-  const struct EKLMGeometry::ShieldDetailGeometry* detailD = shieldGeometry->getDetailD();
+  const EKLMGeometry::ShieldDetailGeometry* detailD = shieldGeometry->getDetailD();
   try {
     solidDetailDPrism =
       new G4TriangularPrism("ShieldDetailD_Prism",
-                            detailD->LengthX, 0.,
-                            detailD->LengthY, 90. * CLHEP::deg,
+                            detailD->getLengthX(), 0.,
+                            detailD->getLengthY(), 90. * CLHEP::deg,
                             shieldGeometry->getThickness() / 2);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -1997,8 +1997,8 @@ void EKLM::GeoEKLMCreator::createShield(G4LogicalVolume* sector) const
   const double asqrt2 = 1.0 / sqrt(2.0);
   const EKLMGeometry::ShieldGeometry* shieldGeometry =
     m_GeoDat->getShieldGeometry();
-  lx = shieldGeometry->getDetailB()->LengthX / 2;
-  ly = shieldGeometry->getDetailB()->LengthY / 2;
+  lx = shieldGeometry->getDetailB()->getLengthX() / 2;
+  ly = shieldGeometry->getDetailB()->getLengthY() / 2;
   ta = HepGeom::Translate3D(shieldGeometry->getDetailACenter()->X,
                             shieldGeometry->getDetailACenter()->Y, 0) *
        HepGeom::RotateZ3D(-45.0 * CLHEP::deg);

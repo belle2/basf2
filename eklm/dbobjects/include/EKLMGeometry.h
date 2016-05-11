@@ -431,7 +431,9 @@ namespace Belle2 {
     /**
      * Shield layer detail geometry data.
      */
-    struct ShieldDetailGeometry : public TObject {
+    class ShieldDetailGeometry : public TObject {
+
+    public:
 
       /**
        * Constructor.
@@ -453,19 +455,65 @@ namespace Belle2 {
        */
       ~ShieldDetailGeometry();
 
-      /** X length. */
-      double LengthX;
+      /**
+       * Get X length.
+       */
+      double getLengthX() const;
 
-      /** Y length. */
-      double LengthY;
+      /**
+       * Set X length.
+       * @param[in] lengthX X length.
+       */
+      void setLengthX(double lengthX);
 
-      /** Number of points. */
-      int NPoints;
+      /**
+       * Get Y length.
+       */
+      double getLengthY() const;
 
-      /** Points. */
-      Point* Points; //[NPoints]
+      /**
+       * Set Y length.
+       * @param[in] lengthY Y length.
+       */
+      void setLengthY(double lengthY);
+
+      /**
+       * Get number of points.
+       */
+      int getNPoints() const;
+
+      /**
+       * Set number of points.
+       * @param[in] nPoints Number of points.
+       */
+      void setNPoints(int nPoints);
+
+      /**
+       * Get point.
+       * @param[in] i Number of point (array index).
+       */
+      const struct Point* getPoint(int i) const;
+
+      /**
+       * Set point.
+       * @param[in] i     Number of point (array index).
+       * @param[in] point Point.
+       */
+      void setPoint(int i, const struct Point& point);
 
     private:
+
+      /** X length. */
+      double m_LengthX;
+
+      /** Y length. */
+      double m_LengthY;
+
+      /** Number of points. */
+      int m_NPoints;
+
+      /** Points. */
+      Point* m_Points; //[m_NPoints]
 
       /** Makes objects storable. */
       ClassDef(ShieldDetailGeometry, 1);
@@ -498,46 +546,46 @@ namespace Belle2 {
       /**
        * Get detail A geometry.
        */
-      const struct ShieldDetailGeometry* getDetailA() const;
+      const ShieldDetailGeometry* getDetailA() const;
 
       /**
        * Set detail A geometry.
        * @param[in] geometry Detail A geometry.
        */
-      void setDetailA(const struct ShieldDetailGeometry& geometry);
+      void setDetailA(const ShieldDetailGeometry& geometry);
 
       /**
        * Get detail B geometry.
        */
-      const struct ShieldDetailGeometry* getDetailB() const;
+      const ShieldDetailGeometry* getDetailB() const;
 
       /**
        * Set detail B geometry.
        * @param[in] geometry Detail B geometry.
        */
-      void setDetailB(const struct ShieldDetailGeometry& geometry);
+      void setDetailB(const ShieldDetailGeometry& geometry);
 
       /**
        * Get detail C geometry.
        */
-      const struct ShieldDetailGeometry* getDetailC() const;
+      const ShieldDetailGeometry* getDetailC() const;
 
       /**
        * Set detail C geometry.
        * @param[in] geometry Detail C geometry.
        */
-      void setDetailC(const struct ShieldDetailGeometry& geometry);
+      void setDetailC(const ShieldDetailGeometry& geometry);
 
       /**
        * Get detail D geometry.
        */
-      const struct ShieldDetailGeometry* getDetailD() const;
+      const ShieldDetailGeometry* getDetailD() const;
 
       /**
        * Set detail D geometry.
        * @param[in] geometry Detail D geometry.
        */
-      void setDetailD(const struct ShieldDetailGeometry& geometry);
+      void setDetailD(const ShieldDetailGeometry& geometry);
 
       /**
        * Get detail A center.
@@ -581,16 +629,16 @@ namespace Belle2 {
       double m_Thickness;
 
       /** Detail A. */
-      struct ShieldDetailGeometry m_DetailA;
+      ShieldDetailGeometry m_DetailA;
 
       /** Detail B. */
-      struct ShieldDetailGeometry m_DetailB;
+      ShieldDetailGeometry m_DetailB;
 
       /** Detail C. */
-      struct ShieldDetailGeometry m_DetailC;
+      ShieldDetailGeometry m_DetailC;
 
       /** Detail D. */
-      struct ShieldDetailGeometry m_DetailD;
+      ShieldDetailGeometry m_DetailD;
 
       /* The following data members are not stored in the database. */
 

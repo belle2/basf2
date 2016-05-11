@@ -91,26 +91,20 @@ static void readSectorSupportGeometry(
  * @param gd  XML data directory.
  */
 static void readShieldDetailGeometry(
-  struct EKLMGeometry::ShieldDetailGeometry* sdg, GearDir* gd)
+  EKLMGeometry::ShieldDetailGeometry* sdg, GearDir* gd)
 {
-  int i;
-  sdg->LengthX = gd->getLength("LengthX") * CLHEP::cm;
-  sdg->LengthY = gd->getLength("LengthY") * CLHEP::cm;
-  sdg->NPoints = gd->getNumberNodes("Point");
-  if (sdg->NPoints == 0) {
-    sdg->Points = NULL;
-    return;
-  }
-  try {
-    sdg->Points = new EKLMGeometry::Point[sdg->NPoints];
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(c_MemErr);
-  }
-  for (i = 0; i < sdg->NPoints; i++) {
+  int i, n;
+  EKLMGeometry::Point p;
+  sdg->setLengthX(gd->getLength("LengthX") * CLHEP::cm);
+  sdg->setLengthY(gd->getLength("LengthY") * CLHEP::cm);
+  n = gd->getNumberNodes("Point");
+  sdg->setNPoints(n);
+  for (i = 0; i < n; i++) {
     GearDir point(*gd);
     point.append((boost::format("/Point[%1%]") % (i + 1)).str());
-    sdg->Points[i].X = point.getLength("X") * CLHEP::cm;
-    sdg->Points[i].Y = point.getLength("Y") * CLHEP::cm;
+    p.X = point.getLength("X") * CLHEP::cm;
+    p.Y = point.getLength("Y") * CLHEP::cm;
+    sdg->setPoint(i, p);
   }
 }
 
@@ -368,11 +362,11 @@ static void getDetailDxDy(HepGeom::Point3D<double>* points, int nPoints,
  * @param[in]  pointEKLM  EKLM point.
  * @param[out] pointCLHEP CLHEP point.
  */
-static void EKLMPointToCLHEP(const EKLMGeometry::Point& pointEKLM,
+static void EKLMPointToCLHEP(const EKLMGeometry::Point* pointEKLM,
                              HepGeom::Point3D<double>& pointCLHEP)
 {
-  pointCLHEP.setX(pointEKLM.X);
-  pointCLHEP.setY(pointEKLM.Y);
+  pointCLHEP.setX(pointEKLM->X);
+  pointCLHEP.setY(pointEKLM->Y);
   pointCLHEP.setZ(0);
 }
 
@@ -382,78 +376,78 @@ void EKLM::GeometryData::calculateShieldGeometry()
   double r, l, dx, dy, xCenter, yCenter;
   const double asqrt2 = 1.0 / sqrt(2.0);
   HepGeom::Point3D<double> points[8];
-  const struct ShieldDetailGeometry* detailA = m_ShieldGeometry.getDetailA();
-  const struct ShieldDetailGeometry* detailB = m_ShieldGeometry.getDetailB();
-  const struct ShieldDetailGeometry* detailC = m_ShieldGeometry.getDetailC();
-  const struct ShieldDetailGeometry* detailD = m_ShieldGeometry.getDetailD();
+  const ShieldDetailGeometry* detailA = m_ShieldGeometry.getDetailA();
+  const ShieldDetailGeometry* detailB = m_ShieldGeometry.getDetailB();
+  const ShieldDetailGeometry* detailC = m_ShieldGeometry.getDetailC();
+  const ShieldDetailGeometry* detailD = m_ShieldGeometry.getDetailD();
   r = m_SectorSupportPosition.InnerR + m_SectorSupportGeometry.Thickness;
   /* Detail A. */
-  EKLMPointToCLHEP(detailA->Points[0], points[0]);
-  EKLMPointToCLHEP(detailA->Points[1], points[1]);
-  EKLMPointToCLHEP(detailA->Points[2], points[2]);
-  EKLMPointToCLHEP(detailA->Points[3], points[3]);
-  EKLMPointToCLHEP(detailA->Points[4], points[4]);
-  points[5].setX(detailA->LengthX);
-  points[5].setY(detailA->LengthY);
+  EKLMPointToCLHEP(detailA->getPoint(0), points[0]);
+  EKLMPointToCLHEP(detailA->getPoint(1), points[1]);
+  EKLMPointToCLHEP(detailA->getPoint(2), points[2]);
+  EKLMPointToCLHEP(detailA->getPoint(3), points[3]);
+  EKLMPointToCLHEP(detailA->getPoint(4), points[4]);
+  points[5].setX(detailA->getLengthX());
+  points[5].setY(detailA->getLengthY());
   points[5].setZ(0);
-  EKLMPointToCLHEP(detailA->Points[5], points[6]);
-  EKLMPointToCLHEP(detailA->Points[6], points[7]);
-  l = 0.5 * (detailA->LengthX + detailB->LengthX);
+  EKLMPointToCLHEP(detailA->getPoint(5), points[6]);
+  EKLMPointToCLHEP(detailA->getPoint(6), points[7]);
+  l = 0.5 * (detailA->getLengthX() + detailB->getLengthX());
   xCenter = -asqrt2 * l;
   yCenter = asqrt2 * l;
   for (i = 0; i < 8; i++)
     points[i] = HepGeom::Translate3D(xCenter, yCenter, 0) *
                 HepGeom::RotateZ3D(-45.0 * CLHEP::deg) *
-                HepGeom::Translate3D(-detailA->LengthX / 2,
-                                     -detailA->LengthY / 2, 0) *
+                HepGeom::Translate3D(-detailA->getLengthX() / 2,
+                                     -detailA->getLengthY() / 2, 0) *
                 points[i];
   getDetailDxDy(points, 8, r, 1, 1, dx, dy);
   m_ShieldGeometry.setDetailACenter(xCenter + dx, yCenter + dy);
   /* Details B, D, E. */
   points[0].setX(0);
-  points[0].setY(-detailD->LengthY);
+  points[0].setY(-detailD->getLengthY());
   points[0].setZ(0);
-  points[1].setX(detailD->LengthX);
+  points[1].setX(detailD->getLengthX());
   points[1].setY(0);
   points[1].setZ(0);
-  points[2].setX(detailB->LengthX - detailD->LengthX);
+  points[2].setX(detailB->getLengthX() - detailD->getLengthX());
   points[2].setY(0);
   points[2].setZ(0);
-  points[3].setX(detailB->LengthX);
-  points[3].setY(-detailD->LengthY);
+  points[3].setX(detailB->getLengthX());
+  points[3].setY(-detailD->getLengthY());
   points[3].setZ(0);
-  EKLMPointToCLHEP(detailB->Points[0], points[4]);
-  EKLMPointToCLHEP(detailB->Points[1], points[5]);
-  EKLMPointToCLHEP(detailB->Points[2], points[6]);
-  EKLMPointToCLHEP(detailB->Points[3], points[7]);
+  EKLMPointToCLHEP(detailB->getPoint(0), points[4]);
+  EKLMPointToCLHEP(detailB->getPoint(1), points[5]);
+  EKLMPointToCLHEP(detailB->getPoint(2), points[6]);
+  EKLMPointToCLHEP(detailB->getPoint(3), points[7]);
   /* Detail B center coordinates before its shift are (0, 0). */
   for (i = 0; i < 8; i++)
     points[i] = HepGeom::RotateZ3D(-45.0 * CLHEP::deg) *
-                HepGeom::Translate3D(-detailB->LengthX / 2,
-                                     -detailB->LengthY / 2, 0) *
+                HepGeom::Translate3D(-detailB->getLengthX() / 2,
+                                     -detailB->getLengthY() / 2, 0) *
                 points[i];
   getDetailDxDy(points, 8, r, 1, 1, dx, dy);
   m_ShieldGeometry.setDetailBCenter(dx, dy);
   /* Detail C. */
-  EKLMPointToCLHEP(detailC->Points[0], points[0]);
-  EKLMPointToCLHEP(detailC->Points[1], points[1]);
-  EKLMPointToCLHEP(detailC->Points[2], points[2]);
-  EKLMPointToCLHEP(detailC->Points[3], points[3]);
-  EKLMPointToCLHEP(detailC->Points[4], points[4]);
-  points[5].setX(detailC->LengthX);
-  points[5].setY(detailC->LengthY);
+  EKLMPointToCLHEP(detailC->getPoint(0), points[0]);
+  EKLMPointToCLHEP(detailC->getPoint(1), points[1]);
+  EKLMPointToCLHEP(detailC->getPoint(2), points[2]);
+  EKLMPointToCLHEP(detailC->getPoint(3), points[3]);
+  EKLMPointToCLHEP(detailC->getPoint(4), points[4]);
+  points[5].setX(detailC->getLengthX());
+  points[5].setY(detailC->getLengthY());
   points[5].setZ(0);
-  EKLMPointToCLHEP(detailC->Points[5], points[6]);
-  EKLMPointToCLHEP(detailC->Points[6], points[7]);
-  l = 0.5 * (detailB->LengthX + detailC->LengthX);
+  EKLMPointToCLHEP(detailC->getPoint(5), points[6]);
+  EKLMPointToCLHEP(detailC->getPoint(6), points[7]);
+  l = 0.5 * (detailB->getLengthX() + detailC->getLengthX());
   xCenter = asqrt2 * l;
   yCenter = -asqrt2 * l;
   for (i = 0; i < 8; i++)
     points[i] = HepGeom::Translate3D(xCenter, yCenter, 0) *
                 HepGeom::RotateZ3D(-45.0 * CLHEP::deg) *
                 HepGeom::RotateY3D(180.0 * CLHEP::deg) *
-                HepGeom::Translate3D(-detailC->LengthX / 2,
-                                     -detailC->LengthY / 2, 0) *
+                HepGeom::Translate3D(-detailC->getLengthX() / 2,
+                                     -detailC->getLengthY() / 2, 0) *
                 points[i];
   getDetailDxDy(points, 8, r, 1, 1, dx, dy);
   m_ShieldGeometry.setDetailCCenter(xCenter + dx, yCenter + dy);
@@ -498,7 +492,7 @@ void EKLM::GeometryData::readEndcapStructureGeometry()
 void EKLM::GeometryData::initializeFromGearbox()
 {
   int i, j, k, mode;
-  struct ShieldDetailGeometry shieldDetailGeometry;
+  ShieldDetailGeometry shieldDetailGeometry;
   GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
   mode = gd.getInt("Mode");
   if (mode < 0 || mode > 1)

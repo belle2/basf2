@@ -158,27 +158,29 @@ EKLMGeometry::Point::Point()
   Y = 0;
 }
 
+/* Class EKLMGeometry::ShieldDetailGeometry. */
+
 EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry()
 {
-  LengthX = 0;
-  LengthY = 0;
-  NPoints = 0;
-  Points = NULL;
+  m_LengthX = 0;
+  m_LengthY = 0;
+  m_NPoints = 0;
+  m_Points = NULL;
 }
 
 EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry(
   const ShieldDetailGeometry& geometry) : TObject(geometry)
 {
   int i;
-  LengthX = geometry.LengthX;
-  LengthY = geometry.LengthY;
-  NPoints = geometry.NPoints;
-  if (NPoints > 0) {
-    Points = new Point[NPoints];
-    for (i = 0; i < NPoints; i++)
-      Points[i] = geometry.Points[i];
+  m_LengthX = geometry.getLengthX();
+  m_LengthY = geometry.getLengthY();
+  m_NPoints = geometry.getNPoints();
+  if (m_NPoints > 0) {
+    m_Points = new Point[m_NPoints];
+    for (i = 0; i < m_NPoints; i++)
+      m_Points[i] = *geometry.getPoint(i);
   } else
-    Points = NULL;
+    m_Points = NULL;
 }
 
 EKLMGeometry::ShieldDetailGeometry&
@@ -188,24 +190,77 @@ EKLMGeometry::ShieldDetailGeometry::operator=(
   int i;
   if (&geometry == this)
     return *this;
-  LengthX = geometry.LengthX;
-  LengthY = geometry.LengthY;
-  NPoints = geometry.NPoints;
-  if (Points != NULL)
-    delete[] Points;
-  if (NPoints > 0) {
-    Points = new Point[NPoints];
-    for (i = 0; i < NPoints; i++)
-      Points[i] = geometry.Points[i];
+  m_LengthX = geometry.getLengthX();
+  m_LengthY = geometry.getLengthY();
+  m_NPoints = geometry.getNPoints();
+  if (m_Points != NULL)
+    delete[] m_Points;
+  if (m_NPoints > 0) {
+    m_Points = new Point[m_NPoints];
+    for (i = 0; i < m_NPoints; i++)
+      m_Points[i] = *geometry.getPoint(i);
   } else
-    Points = NULL;
+    m_Points = NULL;
   return *this;
 }
 
 EKLMGeometry::ShieldDetailGeometry::~ShieldDetailGeometry()
 {
-  if (Points != NULL)
-    delete[] Points;
+  if (m_Points != NULL)
+    delete[] m_Points;
+}
+
+double EKLMGeometry::ShieldDetailGeometry::getLengthX() const
+{
+  return m_LengthX;
+}
+
+void EKLMGeometry::ShieldDetailGeometry::setLengthX(double lengthX)
+{
+  m_LengthX = lengthX;
+}
+
+double EKLMGeometry::ShieldDetailGeometry::getLengthY() const
+{
+  return m_LengthY;
+}
+
+void EKLMGeometry::ShieldDetailGeometry::setLengthY(double lengthY)
+{
+  m_LengthY = lengthY;
+}
+
+int EKLMGeometry::ShieldDetailGeometry::getNPoints() const
+{
+  return m_NPoints;
+}
+
+void EKLMGeometry::ShieldDetailGeometry::setNPoints(int nPoints)
+{
+  if (nPoints < 0)
+    B2FATAL("Number of points must be nonnegative.");
+  m_NPoints = nPoints;
+  if (m_Points != NULL)
+    delete[] m_Points;
+  if (m_NPoints > 0)
+    m_Points = new Point[m_NPoints];
+  else
+    m_Points = NULL;
+}
+
+const struct EKLMGeometry::Point*
+EKLMGeometry::ShieldDetailGeometry::getPoint(int i) const {
+  if (i < 0 || i >= m_NPoints)
+    B2FATAL("Number of point must be from 0 to " << m_NPoints - 1 << ".");
+  return &m_Points[i];
+}
+
+void EKLMGeometry::ShieldDetailGeometry::setPoint(
+  int i, const struct Point& point)
+{
+  if (i < 0 || i >= m_NPoints)
+    B2FATAL("Number of point must be from 0 to " << m_NPoints - 1 << ".");
+  m_Points[i] = point;
 }
 
 /* Class EKLMGeometry::ShieldGeometry. */
@@ -225,46 +280,50 @@ void EKLMGeometry::ShieldGeometry::setThickness(double thickness)
   m_Thickness = thickness;
 }
 
-const struct EKLMGeometry::ShieldDetailGeometry*
-EKLMGeometry::ShieldGeometry::getDetailA() const {
+const EKLMGeometry::ShieldDetailGeometry*
+EKLMGeometry::ShieldGeometry::getDetailA() const
+{
   return &m_DetailA;
 }
 
 void EKLMGeometry::ShieldGeometry::setDetailA(
-  const struct ShieldDetailGeometry& geometry)
+  const ShieldDetailGeometry& geometry)
 {
   m_DetailA = geometry;
 }
 
-const struct EKLMGeometry::ShieldDetailGeometry*
-EKLMGeometry::ShieldGeometry::getDetailB() const {
+const EKLMGeometry::ShieldDetailGeometry*
+EKLMGeometry::ShieldGeometry::getDetailB() const
+{
   return &m_DetailB;
 }
 
 void EKLMGeometry::ShieldGeometry::setDetailB(
-  const struct ShieldDetailGeometry& geometry)
+  const ShieldDetailGeometry& geometry)
 {
   m_DetailB = geometry;
 }
 
-const struct EKLMGeometry::ShieldDetailGeometry*
-EKLMGeometry::ShieldGeometry::getDetailC() const {
+const EKLMGeometry::ShieldDetailGeometry*
+EKLMGeometry::ShieldGeometry::getDetailC() const
+{
   return &m_DetailC;
 }
 
 void EKLMGeometry::ShieldGeometry::setDetailC(
-  const struct ShieldDetailGeometry& geometry)
+  const ShieldDetailGeometry& geometry)
 {
   m_DetailC = geometry;
 }
 
-const struct EKLMGeometry::ShieldDetailGeometry*
-EKLMGeometry::ShieldGeometry::getDetailD() const {
+const EKLMGeometry::ShieldDetailGeometry*
+EKLMGeometry::ShieldGeometry::getDetailD() const
+{
   return &m_DetailD;
 }
 
 void EKLMGeometry::ShieldGeometry::setDetailD(
-  const struct ShieldDetailGeometry& geometry)
+  const ShieldDetailGeometry& geometry)
 {
   m_DetailD = geometry;
 }

@@ -155,143 +155,454 @@ namespace Belle2 {
     };
 
     /**
-     * @struct SectorSupportGeometry
      * Sector support geometry data.
-     *
-     * @var SectorSupportGeometry::Thickness
-     * Thickness.
-     *
-     * @var SectorSupportGeometry::DeltaLY
-     * outerR - Y of upper edge of BoxY.
-     *
-     * @var SectorSupportGeometry::CornerX
-     * Coordinate X of corner 1.
-     *
-     * @var SectorSupportGeometry::Corner1LX
-     * Corner 1 X length.
-     *
-     * @var SectorSupportGeometry::Corner1Width
-     * Corner 1 width.
-     *
-     * @var SectorSupportGeometry::Corner1Thickness
-     * Corner 1 thickness.
-     *
-     * @var SectorSupportGeometry::Corner1Z
-     * Corner 1 Z coordinate.
-     *
-     * @var SectorSupportGeometry::Corner2LX
-     * Corner 2 X length.
-     *
-     * @var SectorSupportGeometry::Corner2LY
-     * Corner 2 Y length.
-     *
-     * @var SectorSupportGeometry::Corner2Thickness
-     * Corner 2 thickness.
-     *
-     * @var SectorSupportGeometry::Corner2Z
-     * Corner 2 Z coordinate.
-     *
-     * @var SectorSupportGeometry::Corner3LX
-     * Corner 3 X length.
-     *
-     * @var SectorSupportGeometry::Corner3LY
-     * Corner 3 Y length.
-     *
-     * @var SectorSupportGeometry::Corner3Thickness
-     * Corner 3 thickness.
-     *
-     * @var SectorSupportGeometry::Corner3Z
-     * Corner 3 Z coordinate.
-     *
-     * @var SectorSupportGeometry::Corner4LX
-     * Corner 4 X length.
-     *
-     * @var SectorSupportGeometry::Corner4LY
-     * Corner 4 Y length.
-     *
-     * @var SectorSupportGeometry::Corner4Thickness
-     * Corner 4 thickness.
-     *
-     * @var SectorSupportGeometry::Corner4Z
-     * Corner 4 Z coordinate.
-     *
-     * @var SectorSupportGeometry::CornerAngle
-     * Corner 1 angle.
-     *
-     * @var SectorSupportGeometry::Corner1A
-     * Corner 1A coordinates.
-     *
-     * @var SectorSupportGeometry::Corner1AInner
-     * Corner 1A coordinates (inner side).
-     *
-     * @var SectorSupportGeometry::Corner1B
-     * Corner 1B coordinates.
-     *
-     * @var SectorSupportGeometry::Corner1BInner
-     * Corner 1B coordinates (inner side).
-     *
-     * @var SectorSupportGeometry::Corner2Inner
-     * Corner 2 coordinates (inner side) (corner of prism, too).
-     *
-     * @var SectorSupportGeometry::Corner3
-     * Corner 3 coordinates.
-     *
-     * @var SectorSupportGeometry::Corner3Inner
-     * Corner 3 coordinates (inner side).
-     *
-     * @var SectorSupportGeometry::Corner3Prism
-     * Coordinates of the corner of corner 3 prism.
-     *
-     * @var SectorSupportGeometry::Corner4
-     * Corner 4 coordinates.
-     *
-     * @var SectorSupportGeometry::Corner4Inner
-     * Corner 4 coordinates (inner side).
-     *
-     * @var SectorSupportGeometry::Corner4Prism
-     * Coordinates of the corner of corner 4 prism.
      */
-    struct SectorSupportGeometry : public TObject {
+    class SectorSupportGeometry : public TObject {
+
+    public:
 
       /**
        * Constructor.
        */
       SectorSupportGeometry();
 
-      double Thickness;
-      double DeltaLY;
-      double CornerX;
-      double Corner1LX;
-      double Corner1Width;
-      double Corner1Thickness;
-      double Corner1Z;
-      double Corner2LX;
-      double Corner2LY;
-      double Corner2Thickness;
-      double Corner2Z;
-      double Corner3LX;
-      double Corner3LY;
-      double Corner3Thickness;
-      double Corner3Z;
-      double Corner4LX;
-      double Corner4LY;
-      double Corner4Thickness;
-      double Corner4Z;
-      /* The following parameters are not stored in the database. */
-      double CornerAngle;                     //!
-      HepGeom::Point3D<double> Corner1A;      //!
-      HepGeom::Point3D<double> Corner1AInner; //!
-      HepGeom::Point3D<double> Corner1B;      //!
-      HepGeom::Point3D<double> Corner1BInner; //!
-      HepGeom::Point3D<double> Corner2Inner;  //!
-      HepGeom::Point3D<double> Corner3;       //!
-      HepGeom::Point3D<double> Corner3Inner;  //!
-      HepGeom::Point3D<double> Corner3Prism;  //!
-      HepGeom::Point3D<double> Corner4;       //!
-      HepGeom::Point3D<double> Corner4Inner;  //!
-      HepGeom::Point3D<double> Corner4Prism;  //!
+      /**
+       * Get thickness.
+       */
+      double getThickness() const;
+
+      /**
+       * Set thickness.
+       * @param[in] thickness Thickness.
+       */
+      void setThickness(double thickness);
+
+      /**
+       * Get outerR - Y of upper edge of BoxY.
+       */
+      double getDeltaLY() const;
+
+      /**
+       * Set outerR - Y of upper edge of BoxY.
+       * @param[in] deltaLY outerR - Y of upper edge of BoxY.
+       */
+      void setDeltaLY(double deltaLY);
+
+      /**
+       * Get coordinate X of corner 1.
+       */
+      double getCornerX() const;
+
+      /**
+       * Set coordinate X of corner 1.
+       * @param[in] cornerX Coordinate X of corner 1.
+       */
+      void setCornerX(double cornerX);
+
+      /**
+       * Get corner 1 X length.
+       */
+      double getCorner1LX() const;
+
+      /**
+       * Set corner 1 X length.
+       * @param[in] corner1LX Corner 1 X length.
+       */
+      void setCorner1LX(double corner1LX);
+
+      /**
+       * Get corner 1 width.
+       */
+      double getCorner1Width() const;
+
+      /**
+       * Set corner 1 width.
+       * @param[in] corner1Width Corner 1 width.
+       */
+      void setCorner1Width(double corner1Width);
+
+      /**
+       * Get corner 1 thickness.
+       */
+      double getCorner1Thickness() const;
+
+      /**
+       * Set corner 1 thickness.
+       * @param[in] corner1Thickness Corner 1 thickness.
+       */
+      void setCorner1Thickness(double corner1Thickness);
+
+      /**
+       * Get corner 1 Z coordinate.
+       */
+      double getCorner1Z() const;
+
+      /**
+       * Set corner 1 Z coordinate.
+       * @param[in] corner1Z Corner 1 Z coordinate.
+       */
+      void setCorner1Z(double corner1Z);
+
+      /**
+       * Get corner 2 X length.
+       */
+      double getCorner2LX() const;
+
+      /**
+       * Set corner 2 X length.
+       * @param[in] corner2LX Corner 2 X length.
+       */
+      void setCorner2LX(double corner2LX);
+
+      /**
+       * Get corner 2 Y length.
+       */
+      double getCorner2LY() const;
+
+      /**
+       * Set corner 2 Y length.
+       * @param[in] corner2LY Corner 2 Y length.
+       */
+      void setCorner2LY(double corner2LY);
+
+      /**
+       * Get corner 2 thickness.
+       */
+      double getCorner2Thickness() const;
+
+      /**
+       * Set corner 2 thickness.
+       * @param[in] corner2Thickness Corner 2 thickness.
+       */
+      void setCorner2Thickness(double corner2Thickness);
+
+      /**
+       * Get corner 2 Z coordinate.
+       */
+      double getCorner2Z() const;
+
+      /**
+       * Set corner 2 Z coordinate.
+       * @param[in] corner2Z Corner 2 Z coordinate.
+       */
+      void setCorner2Z(double corner2Z);
+
+      /**
+       * Get corner 3 X length.
+       */
+      double getCorner3LX() const;
+
+      /**
+       * Set corner 3 X length.
+       * @param[in] corner3LX Corner 3 X length.
+       */
+      void setCorner3LX(double corner3LX);
+
+      /**
+       * Get corner 3 Y length.
+       */
+      double getCorner3LY() const;
+
+      /**
+       * Set corner 3 Y length.
+       * @param[in] corner3LY Corner 3 Y length.
+       */
+      void setCorner3LY(double corner3LY);
+
+      /**
+       * Get corner 3 thickness.
+       */
+      double getCorner3Thickness() const;
+
+      /**
+       * Set corner 3 thickness.
+       * @param[in] corner3Thickness Corner 3 thickness.
+       */
+      void setCorner3Thickness(double corner3Thickness);
+
+      /**
+       * Get corner 3 Z coordinate.
+       */
+      double getCorner3Z() const;
+
+      /**
+       * Set corner 3 Z coordinate.
+       * @param[in] corner3Z Corner 3 Z coordinate.
+       */
+      void setCorner3Z(double corner3Z);
+
+      /**
+       * Get corner 4 X length.
+       */
+      double getCorner4LX() const;
+
+      /**
+       * Set corner 4 X length.
+       * @param[in] corner4LX Corner 4 X length.
+       */
+      void setCorner4LX(double corner4LX);
+
+      /**
+       * Get corner 4 Y length.
+       */
+      double getCorner4LY() const;
+
+      /**
+       * Set corner 4 Y length.
+       * @param[in] corner4LY Corner 4 Y length.
+       */
+      void setCorner4LY(double corner4LY);
+
+      /**
+       * Get corner 4 thickness.
+       */
+      double getCorner4Thickness() const;
+
+      /**
+       * Set corner 4 thickness.
+       * @param[in] corner4Thickness Corner 4 thickness.
+       */
+      void setCorner4Thickness(double corner4Thickness);
+
+      /**
+       * Get corner 4 Z coordinate.
+       */
+      double getCorner4Z() const;
+
+      /**
+       * Set corner 4 Z coordinate.
+       * @param[in] corner4Z Corner 4 Z coordinate.
+       */
+      void setCorner4Z(double corner4Z);
+
+      /**
+       * Get corner 1 angle.
+       */
+      double getCornerAngle() const;
+
+      /**
+       * Set corner 1 angle.
+       * @param[in] cornerAngle Corner 1 angle.
+       */
+      void setCornerAngle(double cornerAngle);
+
+      /**
+       * Get corner 1A coordinates.
+       */
+      const HepGeom::Point3D<double>& getCorner1A() const;
+
+      /**
+       * Set corner 1A coordinates.
+       * @param[in] corner1A Corner 1A coordinates.
+       */
+      void setCorner1A(const HepGeom::Point3D<double>& corner1A);
+
+      /**
+       * Get corner 1A coordinates (inner side).
+       */
+      const HepGeom::Point3D<double>& getCorner1AInner() const;
+
+      /**
+       * Set corner 1A coordinates (inner side).
+       * @param[in] corner1AInner Corner 1A coordinates (inner side).
+       */
+      void setCorner1AInner(const HepGeom::Point3D<double>& corner1AInner);
+
+      /**
+       * Get corner 1B coordinates.
+       */
+      const HepGeom::Point3D<double>& getCorner1B() const;
+
+      /**
+       * Set corner 1B coordinates.
+       * @param[in] corner1B Corner 1B coordinates.
+       */
+      void setCorner1B(const HepGeom::Point3D<double>& corner1B);
+
+      /**
+       * Get corner 1B coordinates (inner side).
+       */
+      const HepGeom::Point3D<double>& getCorner1BInner() const;
+
+      /**
+       * Set corner 1B coordinates (inner side).
+       * @param[in] corner1BInner Corner 1B coordinates (inner side).
+       */
+      void setCorner1BInner(const HepGeom::Point3D<double>& corner1BInner);
+
+      /**
+       * Get corner 2 coordinates (inner side).
+       */
+      const HepGeom::Point3D<double>& getCorner2Inner() const;
+
+      /**
+       * Set corner 2 coordinates (inner side).
+       * @param[in] corner2Inner Corner 2 coordinates (inner side).
+       */
+      void setCorner2Inner(const HepGeom::Point3D<double>& corner2Inner);
+
+      /**
+       * Get corner 3 coordinates.
+       */
+      const HepGeom::Point3D<double>& getCorner3() const;
+
+      /**
+       * Set corner 3 coordinates.
+       * @param[in] corner3 Corner 3 coordinates.
+       */
+      void setCorner3(const HepGeom::Point3D<double>& corner3);
+
+      /**
+       * Get corner 3 coordinates (inner side).
+       */
+      const HepGeom::Point3D<double>& getCorner3Inner() const;
+
+      /**
+       * Set corner 3 coordinates (inner side).
+       * @param[in] corner3Inner corner 3 coordinates (inner side).
+       */
+      void setCorner3Inner(const HepGeom::Point3D<double>& corner3Inner);
+
+      /**
+       * Get coordinates of the corner of corner 3 prism.
+       */
+      const HepGeom::Point3D<double>& getCorner3Prism() const;
+
+      /**
+       * Set coordinates of the corner of corner 3 prism.
+       * @param[in] corner3Prism Coordinates of the corner of corner 3 prism.
+       */
+      void setCorner3Prism(const HepGeom::Point3D<double>& corner3Prism);
+
+      /**
+       * Get corner 4 coordinates.
+       */
+      const HepGeom::Point3D<double>& getCorner4() const;
+
+      /**
+       * Set corner 4 coordinates.
+       * @param[in] corner4 Corner 4 coordinates.
+       */
+      void setCorner4(const HepGeom::Point3D<double>& corner4);
+
+      /**
+       * Get corner 4 coordinates (inner side).
+       */
+      const HepGeom::Point3D<double>& getCorner4Inner() const;
+
+      /**
+       * Set corner 4 coordinates (inner side).
+       * @param[in] corner4Inner Corner 4 coordinates (inner side).
+       */
+      void setCorner4Inner(const HepGeom::Point3D<double>& corner4Inner);
+
+      /**
+       * Get coordinates of the corner of corner 4 prism.
+       */
+      const HepGeom::Point3D<double>& getCorner4Prism() const;
+
+      /**
+       * Set coordinates of the corner of corner 4 prism.
+       * @param[in] corner4Prism Coordinates of the corner of corner 4 prism.
+       */
+      void setCorner4Prism(const HepGeom::Point3D<double>& corner4Prism);
 
     private:
+
+      /** Thickness. */
+      double m_Thickness;
+
+      /** outerR - Y of upper edge of BoxY. */
+      double m_DeltaLY;
+
+      /** Coordinate X of corner 1. */
+      double m_CornerX;
+
+      /** Corner 1 X length. */
+      double m_Corner1LX;
+
+      /** Corner 1 width. */
+      double m_Corner1Width;
+
+      /** Corner 1 thickness. */
+      double m_Corner1Thickness;
+
+      /** Corner 1 Z coordinate. */
+      double m_Corner1Z;
+
+      /** Corner 2 X length. */
+      double m_Corner2LX;
+
+      /** Corner 2 Y length. */
+      double m_Corner2LY;
+
+      /** Corner 2 thickness. */
+      double m_Corner2Thickness;
+
+      /** Corner 2 Z coordinate. */
+      double m_Corner2Z;
+
+      /** Corner 3 X length. */
+      double m_Corner3LX;
+
+      /** Corner 3 Y length. */
+      double m_Corner3LY;
+
+      /** Corner 3 thickness. */
+      double m_Corner3Thickness;
+
+      /** Corner 3 Z coordinate. */
+      double m_Corner3Z;
+
+      /** Corner 4 X length. */
+      double m_Corner4LX;
+
+      /** Corner 4 Y length. */
+      double m_Corner4LY;
+
+      /** Corner 4 thickness. */
+      double m_Corner4Thickness;
+
+      /** Corner 4 Z coordinate. */
+      double m_Corner4Z;
+
+      /* The following data members are not stored in the database. */
+
+      /** Corner 1 angle. */
+      double m_CornerAngle;                     //!
+
+      /** Corner 1A coordinates. */
+      HepGeom::Point3D<double> m_Corner1A;      //!
+
+      /** Corner 1A coordinates (inner side). */
+      HepGeom::Point3D<double> m_Corner1AInner; //!
+
+      /** Corner 1B coordinates. */
+      HepGeom::Point3D<double> m_Corner1B;      //!
+
+      /** Corner 1B coordinates (inner side). */
+      HepGeom::Point3D<double> m_Corner1BInner; //!
+
+      /** Corner 2 coordinates (inner side) (corner of prism, too). */
+      HepGeom::Point3D<double> m_Corner2Inner;  //!
+
+      /** Corner 3 coordinates. */
+      HepGeom::Point3D<double> m_Corner3;       //!
+
+      /** Corner 3 coordinates (inner side). */
+      HepGeom::Point3D<double> m_Corner3Inner;  //!
+
+      /** Coordinates of the corner of corner 3 prism. */
+      HepGeom::Point3D<double> m_Corner3Prism;  //!
+
+      /** Corner 4 coordinates. */
+      HepGeom::Point3D<double> m_Corner4;       //!
+
+      /** Corner 4 coordinates (inner side). */
+      HepGeom::Point3D<double> m_Corner4Inner;  //!
+
+      /** Coordinates of the corner of corner 4 prism. */
+      HepGeom::Point3D<double> m_Corner4Prism;  //!
 
       /** Makes objects storable. */
       ClassDef(SectorSupportGeometry, 1);
@@ -1264,7 +1575,7 @@ namespace Belle2 {
     /**
      * Get sector support geometry data.
      */
-    const struct SectorSupportGeometry* getSectorSupportGeometry() const;
+    const SectorSupportGeometry* getSectorSupportGeometry() const;
 
     /**
      * Get position data for planes.
@@ -1386,7 +1697,7 @@ namespace Belle2 {
     struct ElementPosition m_SectorSupportPosition;
 
     /** Sector support geometry data. */
-    struct SectorSupportGeometry m_SectorSupportGeometry;
+    SectorSupportGeometry m_SectorSupportGeometry;
 
     /** Position data for planes. */
     struct ElementPosition m_PlanePosition;

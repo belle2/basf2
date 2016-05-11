@@ -62,27 +62,27 @@ static void readSizeData(struct EKLMGeometry::ElementPosition* epos, GearDir* gd
  * @param gd  XML data directory.
  */
 static void readSectorSupportGeometry(
-  struct EKLMGeometry::SectorSupportGeometry* ssg, GearDir* gd)
+  EKLMGeometry::SectorSupportGeometry* ssg, GearDir* gd)
 {
-  ssg->Thickness = gd->getLength("Thickness") * CLHEP::cm;
-  ssg->DeltaLY = gd->getLength("DeltaLY") * CLHEP::cm;
-  ssg->CornerX = gd->getLength("CornerX") * CLHEP::cm;
-  ssg->Corner1LX = gd->getLength("Corner1LX") * CLHEP::cm;
-  ssg->Corner1Width = gd->getLength("Corner1Width") * CLHEP::cm;
-  ssg->Corner1Thickness = gd->getLength("Corner1Thickness") * CLHEP::cm;
-  ssg->Corner1Z = gd->getLength("Corner1Z") * CLHEP::cm;
-  ssg->Corner2LX = gd->getLength("Corner2LX") * CLHEP::cm;
-  ssg->Corner2LY = gd->getLength("Corner2LY") * CLHEP::cm;
-  ssg->Corner2Thickness = gd->getLength("Corner2Thickness") * CLHEP::cm;
-  ssg->Corner2Z = gd->getLength("Corner2Z") * CLHEP::cm;
-  ssg->Corner3LX = gd->getLength("Corner3LX") * CLHEP::cm;
-  ssg->Corner3LY = gd->getLength("Corner3LY") * CLHEP::cm;
-  ssg->Corner3Thickness = gd->getLength("Corner3Thickness") * CLHEP::cm;
-  ssg->Corner3Z = gd->getLength("Corner3Z") * CLHEP::cm;
-  ssg->Corner4LX = gd->getLength("Corner4LX") * CLHEP::cm;
-  ssg->Corner4LY = gd->getLength("Corner4LY") * CLHEP::cm;
-  ssg->Corner4Thickness = gd->getLength("Corner4Thickness") * CLHEP::cm;
-  ssg->Corner4Z = gd->getLength("Corner4Z") * CLHEP::cm;
+  ssg->setThickness(gd->getLength("Thickness") * CLHEP::cm);
+  ssg->setDeltaLY(gd->getLength("DeltaLY") * CLHEP::cm);
+  ssg->setCornerX(gd->getLength("CornerX") * CLHEP::cm);
+  ssg->setCorner1LX(gd->getLength("Corner1LX") * CLHEP::cm);
+  ssg->setCorner1Width(gd->getLength("Corner1Width") * CLHEP::cm);
+  ssg->setCorner1Thickness(gd->getLength("Corner1Thickness") * CLHEP::cm);
+  ssg->setCorner1Z(gd->getLength("Corner1Z") * CLHEP::cm);
+  ssg->setCorner2LX(gd->getLength("Corner2LX") * CLHEP::cm);
+  ssg->setCorner2LY(gd->getLength("Corner2LY") * CLHEP::cm);
+  ssg->setCorner2Thickness(gd->getLength("Corner2Thickness") * CLHEP::cm);
+  ssg->setCorner2Z(gd->getLength("Corner2Z") * CLHEP::cm);
+  ssg->setCorner3LX(gd->getLength("Corner3LX") * CLHEP::cm);
+  ssg->setCorner3LY(gd->getLength("Corner3LY") * CLHEP::cm);
+  ssg->setCorner3Thickness(gd->getLength("Corner3Thickness") * CLHEP::cm);
+  ssg->setCorner3Z(gd->getLength("Corner3Z") * CLHEP::cm);
+  ssg->setCorner4LX(gd->getLength("Corner4LX") * CLHEP::cm);
+  ssg->setCorner4LY(gd->getLength("Corner4LY") * CLHEP::cm);
+  ssg->setCorner4Thickness(gd->getLength("Corner4Thickness") * CLHEP::cm);
+  ssg->setCorner4Z(gd->getLength("Corner4Z") * CLHEP::cm);
 }
 
 /**
@@ -110,79 +110,78 @@ static void readShieldDetailGeometry(
 
 void EKLM::GeometryData::calculateSectorSupportGeometry()
 {
+  HepGeom::Point3D<double> p;
   Line2D line23Outer(0, m_SectorSupportPosition.Y, 1, 0);
   Line2D line23Inner(0, m_SectorSupportPosition.Y +
-                     m_SectorSupportGeometry.Thickness, 1, 0);
+                     m_SectorSupportGeometry.getThickness(), 1, 0);
   Line2D line23Prism(0, m_SectorSupportPosition.Y +
-                     m_SectorSupportGeometry.Thickness +
-                     m_SectorSupportGeometry.Corner3LY, 1, 0);
+                     m_SectorSupportGeometry.getThickness() +
+                     m_SectorSupportGeometry.getCorner3LY(), 1, 0);
   Line2D line41Outer(m_SectorSupportPosition.X, 0, 0, 1);
   Line2D line41Inner(m_SectorSupportPosition.X +
-                     m_SectorSupportGeometry.Thickness, 0, 0, 1);
+                     m_SectorSupportGeometry.getThickness(), 0, 0, 1);
   Line2D line41Prism(m_SectorSupportPosition.X +
-                     m_SectorSupportGeometry.Thickness +
-                     m_SectorSupportGeometry.Corner4LX, 0, 0, 1);
+                     m_SectorSupportGeometry.getThickness() +
+                     m_SectorSupportGeometry.getCorner4LX(), 0, 0, 1);
   Line2D line41Corner1B(m_SectorSupportPosition.X +
-                        m_SectorSupportGeometry.CornerX, 0, 0, 1);
+                        m_SectorSupportGeometry.getCornerX(), 0, 0, 1);
   Circle2D circleInnerOuter(0, 0, m_SectorSupportPosition.InnerR);
   Circle2D circleInnerInner(0, 0, m_SectorSupportPosition.InnerR +
-                            m_SectorSupportGeometry.Thickness);
+                            m_SectorSupportGeometry.getThickness());
   Circle2D circleOuterInner(0, 0, m_SectorSupportPosition.OuterR -
-                            m_SectorSupportGeometry.Thickness);
+                            m_SectorSupportGeometry.getThickness());
   Circle2D circleOuterOuter(0, 0, m_SectorSupportPosition.OuterR);
   HepGeom::Point3D<double> intersections[2];
   /* Corner 1. */
-  m_SectorSupportGeometry.Corner1A.setX(m_SectorSupportPosition.X);
-  m_SectorSupportGeometry.Corner1A.setY(m_SectorSupportPosition.OuterR -
-                                        m_SectorSupportGeometry.DeltaLY);
-  m_SectorSupportGeometry.Corner1A.setZ(0);
+  p.setX(m_SectorSupportPosition.X);
+  p.setY(m_SectorSupportPosition.OuterR - m_SectorSupportGeometry.getDeltaLY());
+  p.setZ(0);
+  m_SectorSupportGeometry.setCorner1A(p);
   line41Corner1B.findIntersection(circleOuterOuter, intersections);
-  m_SectorSupportGeometry.Corner1B = intersections[1];
-  m_SectorSupportGeometry.CornerAngle =
-    atan2(m_SectorSupportGeometry.Corner1B.y() -
-          m_SectorSupportGeometry.Corner1A.y(),
-          m_SectorSupportGeometry.Corner1B.x() -
-          m_SectorSupportGeometry.Corner1A.x()) *
-    CLHEP::rad;
-  m_SectorSupportGeometry.Corner1AInner.setX(m_SectorSupportPosition.X +
-                                             m_SectorSupportGeometry.Thickness);
-  m_SectorSupportGeometry.Corner1AInner.setY(
-    m_SectorSupportGeometry.Corner1A.y() -
-    m_SectorSupportGeometry.Thickness *
-    (1.0 / cos(m_SectorSupportGeometry.CornerAngle) -
-     tan(m_SectorSupportGeometry.CornerAngle)));
-  m_SectorSupportGeometry.Corner1AInner.setZ(0);
-  Line2D lineCorner1(m_SectorSupportGeometry.Corner1AInner.x(),
-                     m_SectorSupportGeometry.Corner1AInner.y(),
-                     m_SectorSupportGeometry.Corner1B.x() -
-                     m_SectorSupportGeometry.Corner1A.x(),
-                     m_SectorSupportGeometry.Corner1B.y() -
-                     m_SectorSupportGeometry.Corner1A.y());
+  m_SectorSupportGeometry.setCorner1B(intersections[1]);
+  m_SectorSupportGeometry.setCornerAngle(
+    atan2(m_SectorSupportGeometry.getCorner1B().y() -
+          m_SectorSupportGeometry.getCorner1A().y(),
+          m_SectorSupportGeometry.getCorner1B().x() -
+          m_SectorSupportGeometry.getCorner1A().x()) * CLHEP::rad);
+  p.setX(m_SectorSupportPosition.X + m_SectorSupportGeometry.getThickness());
+  p.setY(m_SectorSupportGeometry.getCorner1A().y() -
+         m_SectorSupportGeometry.getThickness() *
+         (1.0 / cos(m_SectorSupportGeometry.getCornerAngle()) -
+          tan(m_SectorSupportGeometry.getCornerAngle())));
+  p.setZ(0);
+  m_SectorSupportGeometry.setCorner1AInner(p);
+  Line2D lineCorner1(m_SectorSupportGeometry.getCorner1AInner().x(),
+                     m_SectorSupportGeometry.getCorner1AInner().y(),
+                     m_SectorSupportGeometry.getCorner1B().x() -
+                     m_SectorSupportGeometry.getCorner1A().x(),
+                     m_SectorSupportGeometry.getCorner1B().y() -
+                     m_SectorSupportGeometry.getCorner1A().y());
   lineCorner1.findIntersection(circleOuterInner, intersections);
-  m_SectorSupportGeometry.Corner1BInner = intersections[1];
+  m_SectorSupportGeometry.setCorner1BInner(intersections[1]);
   /* Corner 2. */
   line23Inner.findIntersection(circleOuterInner, intersections);
-  m_SectorSupportGeometry.Corner2Inner = intersections[1];
+  m_SectorSupportGeometry.setCorner2Inner(intersections[1]);
   /* Corner 3. */
   line23Outer.findIntersection(circleInnerOuter, intersections);
-  m_SectorSupportGeometry.Corner3 = intersections[1];
+  m_SectorSupportGeometry.setCorner3(intersections[1]);
   line23Inner.findIntersection(circleInnerInner, intersections);
-  m_SectorSupportGeometry.Corner3Inner = intersections[1];
+  m_SectorSupportGeometry.setCorner3Inner(intersections[1]);
   line23Prism.findIntersection(circleInnerInner, intersections);
-  m_SectorSupportGeometry.Corner3Prism.setX(intersections[1].x());
-  m_SectorSupportGeometry.Corner3Prism.setY(
-    m_SectorSupportPosition.Y + m_SectorSupportGeometry.Thickness);
-  m_SectorSupportGeometry.Corner3Prism.setZ(0);
+  p.setX(intersections[1].x());
+  p.setY(m_SectorSupportPosition.Y + m_SectorSupportGeometry.getThickness());
+  p.setZ(0);
+  m_SectorSupportGeometry.setCorner3Prism(p);
   /* Corner 4. */
   line41Outer.findIntersection(circleInnerOuter, intersections);
-  m_SectorSupportGeometry.Corner4 = intersections[1];
+  m_SectorSupportGeometry.setCorner4(intersections[1]);
   line41Inner.findIntersection(circleInnerInner, intersections);
-  m_SectorSupportGeometry.Corner4Inner = intersections[1];
+  m_SectorSupportGeometry.setCorner4Inner(intersections[1]);
   line41Prism.findIntersection(circleInnerInner, intersections);
-  m_SectorSupportGeometry.Corner4Prism.setX(
-    m_SectorSupportPosition.X + m_SectorSupportGeometry.Thickness);
-  m_SectorSupportGeometry.Corner4Prism.setY(intersections[1].y());
-  m_SectorSupportGeometry.Corner4Prism.setZ(0);
+  p.setX(m_SectorSupportPosition.X + m_SectorSupportGeometry.getThickness());
+  p.setY(intersections[1].y());
+  p.setZ(0);
+  m_SectorSupportGeometry.setCorner4Prism(p);
 }
 
 static bool compareLength(double a, double b)
@@ -380,7 +379,7 @@ void EKLM::GeometryData::calculateShieldGeometry()
   const ShieldDetailGeometry* detailB = m_ShieldGeometry.getDetailB();
   const ShieldDetailGeometry* detailC = m_ShieldGeometry.getDetailC();
   const ShieldDetailGeometry* detailD = m_ShieldGeometry.getDetailD();
-  r = m_SectorSupportPosition.InnerR + m_SectorSupportGeometry.Thickness;
+  r = m_SectorSupportPosition.InnerR + m_SectorSupportGeometry.getThickness();
   /* Detail A. */
   EKLMPointToCLHEP(detailA->getPoint(0), points[0]);
   EKLMPointToCLHEP(detailA->getPoint(1), points[1]);

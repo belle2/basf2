@@ -24,31 +24,31 @@ EKLM::AlignmentChecker::AlignmentChecker()
   HepGeom::Point3D<double> supportRectangle[4];
   HepGeom::Transform3D t;
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  const struct EKLMGeometry::SectorSupportGeometry* sectorSupportGeometry =
+  const EKLMGeometry::SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
   const EKLMGeometry::ElementPosition* sectorSupportPosition =
     m_GeoDat->getSectorSupportPosition();
   const EKLMGeometry::SegmentSupportPosition* segmentSupportPos;
   const EKLMGeometry::SegmentSupportGeometry* segmentSupportGeometry =
     m_GeoDat->getSegmentSupportGeometry();
-  m_LineCorner1 = new LineSegment2D(
-    sectorSupportGeometry->Corner1AInner, sectorSupportGeometry->Corner1BInner);
+  m_LineCorner1 = new LineSegment2D(sectorSupportGeometry->getCorner1AInner(),
+                                    sectorSupportGeometry->getCorner1BInner());
   m_ArcOuter = new Arc2D(
-    0, 0, sectorSupportPosition->OuterR - sectorSupportGeometry->Thickness,
-    atan2(sectorSupportGeometry->Corner2Inner.y(),
-          sectorSupportGeometry->Corner2Inner.x()),
-    atan2(sectorSupportGeometry->Corner1BInner.y(),
-          sectorSupportGeometry->Corner1BInner.x()));
-  m_Line23 = new LineSegment2D(
-    sectorSupportGeometry->Corner2Inner, sectorSupportGeometry->Corner3Inner);
+    0, 0, sectorSupportPosition->OuterR - sectorSupportGeometry->getThickness(),
+    atan2(sectorSupportGeometry->getCorner2Inner().y(),
+          sectorSupportGeometry->getCorner2Inner().x()),
+    atan2(sectorSupportGeometry->getCorner1BInner().y(),
+          sectorSupportGeometry->getCorner1BInner().x()));
+  m_Line23 = new LineSegment2D(sectorSupportGeometry->getCorner2Inner(),
+                               sectorSupportGeometry->getCorner3Inner());
   m_ArcInner = new Arc2D(
-    0, 0, sectorSupportPosition->InnerR + sectorSupportGeometry->Thickness,
-    atan2(sectorSupportGeometry->Corner3Inner.y(),
-          sectorSupportGeometry->Corner3Inner.x()),
-    atan2(sectorSupportGeometry->Corner4Inner.y(),
-          sectorSupportGeometry->Corner4Inner.x()));
-  m_Line41 = new LineSegment2D(
-    sectorSupportGeometry->Corner4Inner, sectorSupportGeometry->Corner1AInner);
+    0, 0, sectorSupportPosition->InnerR + sectorSupportGeometry->getThickness(),
+    atan2(sectorSupportGeometry->getCorner3Inner().y(),
+          sectorSupportGeometry->getCorner3Inner().x()),
+    atan2(sectorSupportGeometry->getCorner4Inner().y(),
+          sectorSupportGeometry->getCorner4Inner().x()));
+  m_Line41 = new LineSegment2D(sectorSupportGeometry->getCorner4Inner(),
+                               sectorSupportGeometry->getCorner1AInner());
   m_SegmentSupport = new Polygon2D** [m_GeoDat->getNPlanes()];
   for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
     m_SegmentSupport[iPlane - 1] =

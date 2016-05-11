@@ -94,28 +94,366 @@ EKLMGeometry::ElementPosition::ElementPosition()
   Z = 0;
 }
 
+/* Class EKLMGeometry::SectorSupportGeometry. */
+
 EKLMGeometry::SectorSupportGeometry::SectorSupportGeometry()
 {
-  Thickness = 0;
-  DeltaLY = 0;
-  CornerX = 0;
-  Corner1LX = 0;
-  Corner1Width = 0;
-  Corner1Thickness = 0;
-  Corner1Z = 0;
-  Corner2LX = 0;
-  Corner2LY = 0;
-  Corner2Thickness = 0;
-  Corner2Z = 0;
-  Corner3LX = 0;
-  Corner3LY = 0;
-  Corner3Thickness = 0;
-  Corner3Z = 0;
-  Corner4LX = 0;
-  Corner4LY = 0;
-  Corner4Thickness = 0;
-  Corner4Z = 0;
-  CornerAngle = 0;
+  m_Thickness = 0;
+  m_DeltaLY = 0;
+  m_CornerX = 0;
+  m_Corner1LX = 0;
+  m_Corner1Width = 0;
+  m_Corner1Thickness = 0;
+  m_Corner1Z = 0;
+  m_Corner2LX = 0;
+  m_Corner2LY = 0;
+  m_Corner2Thickness = 0;
+  m_Corner2Z = 0;
+  m_Corner3LX = 0;
+  m_Corner3LY = 0;
+  m_Corner3Thickness = 0;
+  m_Corner3Z = 0;
+  m_Corner4LX = 0;
+  m_Corner4LY = 0;
+  m_Corner4Thickness = 0;
+  m_Corner4Z = 0;
+  m_CornerAngle = 0;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getThickness() const
+{
+  return m_Thickness;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setThickness(double thickness)
+{
+  m_Thickness = thickness;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getDeltaLY() const
+{
+  return m_DeltaLY;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setDeltaLY(double deltaLY)
+{
+  m_DeltaLY = deltaLY;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCornerX() const
+{
+  return m_CornerX;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCornerX(double cornerX)
+{
+  m_CornerX = cornerX;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner1LX() const
+{
+  return m_Corner1LX;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner1LX(double corner1LX)
+{
+  m_Corner1LX = corner1LX;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner1Width() const
+{
+  return m_Corner1Width;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner1Width(double corner1Width)
+{
+  m_Corner1Width = corner1Width;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner1Thickness() const
+{
+  return m_Corner1Thickness;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner1Thickness(
+  double corner1Thickness)
+{
+  m_Corner1Thickness = corner1Thickness;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner1Z() const
+{
+  return m_Corner1Z;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner1Z(double corner1Z)
+{
+  m_Corner1Z = corner1Z;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner2LX() const
+{
+  return m_Corner2LX;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner2LX(double corner2LX)
+{
+  m_Corner2LX = corner2LX;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner2LY() const
+{
+  return m_Corner2LY;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner2LY(double corner2LY)
+{
+  m_Corner2LY = corner2LY;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner2Thickness() const
+{
+  return m_Corner2Thickness;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner2Thickness(
+  double corner2Thickness)
+{
+  m_Corner2Thickness = corner2Thickness;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner2Z() const
+{
+  return m_Corner2Z;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner2Z(double corner2Z)
+{
+  m_Corner2Z = corner2Z;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner3LX() const
+{
+  return m_Corner3LX;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner3LX(double corner3LX)
+{
+  m_Corner3LX = corner3LX;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner3LY() const
+{
+  return m_Corner3LY;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner3LY(double corner3LY)
+{
+  m_Corner3LY = corner3LY;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner3Thickness() const
+{
+  return m_Corner3Thickness;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner3Thickness(
+  double corner3Thickness)
+{
+  m_Corner3Thickness = corner3Thickness;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner3Z() const
+{
+  return m_Corner3Z;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner3Z(double corner3Z)
+{
+  m_Corner3Z = corner3Z;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner4LX() const
+{
+  return m_Corner4LX;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner4LX(double corner4LX)
+{
+  m_Corner4LX = corner4LX;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner4LY() const
+{
+  return m_Corner4LY;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner4LY(double corner4LY)
+{
+  m_Corner4LY = corner4LY;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner4Thickness() const
+{
+  return m_Corner4Thickness;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner4Thickness(
+  double corner4Thickness)
+{
+  m_Corner4Thickness = corner4Thickness;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCorner4Z() const
+{
+  return m_Corner4Z;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner4Z(double corner4Z)
+{
+  m_Corner4Z = corner4Z;
+}
+
+double EKLMGeometry::SectorSupportGeometry::getCornerAngle() const
+{
+  return m_CornerAngle;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCornerAngle(double cornerAngle)
+{
+  m_CornerAngle = cornerAngle;
+}
+
+const HepGeom::Point3D<double>&
+EKLMGeometry::SectorSupportGeometry::getCorner1A() const
+{
+  return m_Corner1A;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner1A(
+  const HepGeom::Point3D<double>& corner1A)
+{
+  m_Corner1A = corner1A;
+}
+
+const HepGeom::Point3D<double>&
+EKLMGeometry::SectorSupportGeometry::getCorner1AInner() const
+{
+  return m_Corner1AInner;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner1AInner(
+  const HepGeom::Point3D<double>& corner1AInner)
+{
+  m_Corner1AInner = corner1AInner;
+}
+
+const HepGeom::Point3D<double>&
+EKLMGeometry::SectorSupportGeometry::getCorner1B() const
+{
+  return m_Corner1B;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner1B(
+  const HepGeom::Point3D<double>& corner1B)
+{
+  m_Corner1B = corner1B;
+}
+
+const HepGeom::Point3D<double>&
+EKLMGeometry::SectorSupportGeometry::getCorner1BInner() const
+{
+  return m_Corner1BInner;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner1BInner(
+  const HepGeom::Point3D<double>& corner1BInner)
+{
+  m_Corner1BInner = corner1BInner;
+}
+
+const HepGeom::Point3D<double>&
+EKLMGeometry::SectorSupportGeometry::getCorner2Inner() const
+{
+  return m_Corner2Inner;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner2Inner(
+  const HepGeom::Point3D<double>& corner2Inner)
+{
+  m_Corner2Inner = corner2Inner;
+}
+
+const HepGeom::Point3D<double>&
+EKLMGeometry::SectorSupportGeometry::getCorner3() const
+{
+  return m_Corner3;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner3(
+  const HepGeom::Point3D<double>& corner3)
+{
+  m_Corner3 = corner3;
+}
+
+const HepGeom::Point3D<double>&
+EKLMGeometry::SectorSupportGeometry::getCorner3Inner() const
+{
+  return m_Corner3Inner;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner3Inner(
+  const HepGeom::Point3D<double>& corner3Inner)
+{
+  m_Corner3Inner = corner3Inner;
+}
+
+const HepGeom::Point3D<double>&
+EKLMGeometry::SectorSupportGeometry::getCorner3Prism() const
+{
+  return m_Corner3Prism;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner3Prism(
+  const HepGeom::Point3D<double>& corner3Prism)
+{
+  m_Corner3Prism = corner3Prism;
+}
+
+const HepGeom::Point3D<double>&
+EKLMGeometry::SectorSupportGeometry::getCorner4() const
+{
+  return m_Corner4;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner4(
+  const HepGeom::Point3D<double>& corner4)
+{
+  m_Corner4 = corner4;
+}
+
+const HepGeom::Point3D<double>&
+EKLMGeometry::SectorSupportGeometry::getCorner4Inner() const
+{
+  return m_Corner4Inner;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner4Inner(
+  const HepGeom::Point3D<double>& corner4Inner)
+{
+  m_Corner4Inner = corner4Inner;
+}
+
+const HepGeom::Point3D<double>&
+EKLMGeometry::SectorSupportGeometry::getCorner4Prism() const
+{
+  return m_Corner4Prism;
+}
+
+void EKLMGeometry::SectorSupportGeometry::setCorner4Prism(
+  const HepGeom::Point3D<double>& corner4Prism)
+{
+  m_Corner4Prism = corner4Prism;
 }
 
 /* Class EKLMGeometry::PlasticSheetGeometry. */

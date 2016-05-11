@@ -630,7 +630,7 @@ void EKLM::GeometryData::initializeFromGearbox()
   m_BoardGeometry.StripHeight = Boards.getLength("StripHeight") * CLHEP::cm;
   m_NStripBoards = Boards.getInt("NStripBoards");
   try {
-    m_BoardPosition = new struct BoardPosition[m_NBoardsSector];
+    m_BoardPosition = new BoardPosition[m_NBoardsSector];
   } catch (std::bad_alloc& ba) {
     B2FATAL(c_MemErr);
   }
@@ -640,8 +640,8 @@ void EKLM::GeometryData::initializeFromGearbox()
       GearDir BoardContent(Boards);
       BoardContent.append((boost::format("/BoardData[%1%]") % (j + 1)).str());
       BoardContent.append((boost::format("/Board[%1%]") % (i + 1)).str());
-      m_BoardPosition[k].Phi = BoardContent.getLength("Phi") * CLHEP::rad;
-      m_BoardPosition[k].R = BoardContent.getLength("Radius") * CLHEP::cm;
+      m_BoardPosition[k].setPhi(BoardContent.getLength("Phi") * CLHEP::rad);
+      m_BoardPosition[k].setR(BoardContent.getLength("Radius") * CLHEP::cm);
     }
   }
   try {

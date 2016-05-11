@@ -1579,14 +1579,14 @@ void EKLM::GeoEKLMCreator::calcBoardTransform()
   int i;
   int j;
   const struct EKLMGeometry::BoardGeometry* boardGeometry = m_GeoDat->getBoardGeometry();
-  const struct EKLMGeometry::BoardPosition* boardPos;
+  const EKLMGeometry::BoardPosition* boardPos;
   for (i = 0; i < m_GeoDat->getNPlanes(); i++) {
     for (j = 0; j < m_GeoDat->getNBoards(); j++) {
       boardPos = m_GeoDat->getBoardPosition(i + 1, j + 1);
       m_BoardTransform[i][j] =
         HepGeom::Transform3D(
-          HepGeom::RotateZ3D(boardPos->Phi) *
-          HepGeom::Translate3D(boardPos->R - 0.5 * boardGeometry->Height, 0., 0.) *
+          HepGeom::RotateZ3D(boardPos->getPhi()) *
+          HepGeom::Translate3D(boardPos->getR() - 0.5 * boardGeometry->Height, 0., 0.) *
           HepGeom::RotateZ3D(90.0 * CLHEP::deg));
     }
   }

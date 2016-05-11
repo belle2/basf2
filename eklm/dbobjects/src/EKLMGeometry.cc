@@ -225,11 +225,35 @@ EKLMGeometry::BoardGeometry::BoardGeometry()
   StripHeight = 0;
 }
 
+/* Class EKLMGeometry::BoardPosition. */
+
 EKLMGeometry::BoardPosition::BoardPosition()
 {
-  R = 0;
-  Phi = 0;
+  m_R = 0;
+  m_Phi = 0;
 }
+
+double EKLMGeometry::BoardPosition::getR() const
+{
+  return m_R;
+}
+
+void EKLMGeometry::BoardPosition::setR(double r)
+{
+  m_R = r;
+}
+
+double EKLMGeometry::BoardPosition::getPhi() const
+{
+  return m_Phi;
+}
+
+void EKLMGeometry::BoardPosition::setPhi(double phi)
+{
+  m_Phi = phi;
+}
+
+/* Class EKLMGeometry::StripBoardPosition. */
 
 EKLMGeometry::StripBoardPosition::StripBoardPosition()
 {
@@ -245,6 +269,8 @@ void EKLMGeometry::StripBoardPosition::setX(double x)
 {
   m_X = x;
 }
+
+/* Class EKLMGeometry. */
 
 EKLMGeometry::EKLMGeometry()
 {
@@ -314,7 +340,7 @@ EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
   m_StripPosition = new struct ElementPosition[m_NStrips];
   for (i = 0; i < m_NStrips; i++)
     m_StripPosition[i] = *geometry.getStripPosition(i + 1);
-  m_BoardPosition = new struct BoardPosition[m_NBoardsSector];
+  m_BoardPosition = new BoardPosition[m_NBoardsSector];
   for (i = 0; i < m_NPlanes; i++) {
     for (j = 0; j < m_NBoards; j++) {
       m_BoardPosition[i * m_NBoards + i] =
@@ -394,7 +420,7 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
   m_BoardGeometry = *geometry.getBoardGeometry();
   if (m_BoardPosition != NULL)
     delete[] m_BoardPosition;
-  m_BoardPosition = new struct BoardPosition[m_NBoardsSector];
+  m_BoardPosition = new BoardPosition[m_NBoardsSector];
   for (i = 0; i < m_NPlanes; i++) {
     for (j = 0; j < m_NBoards; j++) {
       m_BoardPosition[i * m_NBoards + i] =

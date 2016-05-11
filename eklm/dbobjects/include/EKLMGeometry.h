@@ -553,17 +553,44 @@ namespace Belle2 {
     /**
      * Readout board position data.
      */
-    struct BoardPosition : public TObject {
+    class BoardPosition : public TObject {
+
+    public:
 
       /**
        * Constructor.
        */
       BoardPosition();
 
-      double R;      /**< Radius of far edge of the board. */
-      double Phi;    /**< Angle. */
+      /**
+       * Get radius.
+       */
+      double getR() const;
+
+      /**
+       * Set radius.
+       * @param[in] r Radius.
+       */
+      void setR(double r);
+
+      /**
+       * Get angle.
+       */
+      double getPhi() const;
+
+      /**
+       * Set angle.
+       * @param[in] phi Angle.
+       */
+      void setPhi(double phi);
 
     private:
+
+      /** Radius of far edge of the board. */
+      double m_R;
+
+      /** Angle. */
+      double m_Phi;
 
       /** Makes objects storable. */
       ClassDef(BoardPosition, 1);
@@ -806,7 +833,7 @@ namespace Belle2 {
      * @param[in] plane   Plane number.
      * @param[in] segment Segment number.
      */
-    const struct BoardPosition* getBoardPosition(int plane, int segment) const;
+    const BoardPosition* getBoardPosition(int plane, int segment) const;
 
     /**
      * Get position data for strip readout boards.
@@ -904,7 +931,7 @@ namespace Belle2 {
     struct BoardGeometry m_BoardGeometry;
 
     /** Positions of readout boards. */
-    struct BoardPosition* m_BoardPosition; //[m_NBoardsSector]
+    BoardPosition* m_BoardPosition; //[m_NBoardsSector]
 
     /** Positions of strip readout boards. */
     StripBoardPosition* m_StripBoardPosition; //[m_NStripBoards]

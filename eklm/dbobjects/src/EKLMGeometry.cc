@@ -208,9 +208,98 @@ EKLMGeometry::ShieldDetailGeometry::~ShieldDetailGeometry()
     delete[] Points;
 }
 
+/* Class EKLMGeometry::ShieldGeometry. */
+
 EKLMGeometry::ShieldGeometry::ShieldGeometry()
 {
-  Thickness = 0;
+  m_Thickness = 0;
+}
+
+double EKLMGeometry::ShieldGeometry::getThickness() const
+{
+  return m_Thickness;
+}
+
+void EKLMGeometry::ShieldGeometry::setThickness(double thickness)
+{
+  m_Thickness = thickness;
+}
+
+const struct EKLMGeometry::ShieldDetailGeometry*
+EKLMGeometry::ShieldGeometry::getDetailA() const {
+  return &m_DetailA;
+}
+
+void EKLMGeometry::ShieldGeometry::setDetailA(
+  const struct ShieldDetailGeometry& geometry)
+{
+  m_DetailA = geometry;
+}
+
+const struct EKLMGeometry::ShieldDetailGeometry*
+EKLMGeometry::ShieldGeometry::getDetailB() const {
+  return &m_DetailB;
+}
+
+void EKLMGeometry::ShieldGeometry::setDetailB(
+  const struct ShieldDetailGeometry& geometry)
+{
+  m_DetailB = geometry;
+}
+
+const struct EKLMGeometry::ShieldDetailGeometry*
+EKLMGeometry::ShieldGeometry::getDetailC() const {
+  return &m_DetailC;
+}
+
+void EKLMGeometry::ShieldGeometry::setDetailC(
+  const struct ShieldDetailGeometry& geometry)
+{
+  m_DetailC = geometry;
+}
+
+const struct EKLMGeometry::ShieldDetailGeometry*
+EKLMGeometry::ShieldGeometry::getDetailD() const {
+  return &m_DetailD;
+}
+
+void EKLMGeometry::ShieldGeometry::setDetailD(
+  const struct ShieldDetailGeometry& geometry)
+{
+  m_DetailD = geometry;
+}
+
+const struct EKLMGeometry::Point*
+EKLMGeometry::ShieldGeometry::getDetailACenter() const {
+  return &m_DetailACenter;
+}
+
+void EKLMGeometry::ShieldGeometry::setDetailACenter(double x, double y)
+{
+  m_DetailACenter.X = x;
+  m_DetailACenter.Y = y;
+}
+
+const struct EKLMGeometry::Point*
+EKLMGeometry::ShieldGeometry::getDetailBCenter() const {
+  return &m_DetailBCenter;
+}
+
+void EKLMGeometry::ShieldGeometry::setDetailBCenter(double x, double y)
+{
+  m_DetailBCenter.X = x;
+  m_DetailBCenter.Y = y;
+}
+
+const struct EKLMGeometry::Point*
+EKLMGeometry::ShieldGeometry::getDetailCCenter() const {
+  return &m_DetailCCenter;
+}
+
+void EKLMGeometry::ShieldGeometry::setDetailCCenter(double x, double y)
+{
+  m_DetailCCenter.X = x;
+  m_DetailCCenter.Y = y;
 }
 
 /* Class EKLMGeometry::BoardGeometry. */

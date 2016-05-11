@@ -473,51 +473,135 @@ namespace Belle2 {
     };
 
     /**
-     * @struct ShieldGeometry
      * Shield layer geometry data.
-     *
-     * @var ShieldGeometry::Thickness
-     * Thickness.
-     *
-     * @var ShieldGeometry::DetailA
-     * Detail A.
-     *
-     * @var ShieldGeometry::DetailB
-     * Detail B.
-     *
-     * @var ShieldGeometry::DetailC
-     * Detail C.
-     *
-     * @var ShieldGeometry::DetailD
-     * Detail D.
-     *
-     * @var ShieldGeometry::DetailACenter
-     * Detail A center.
-     *
-     * @var ShieldGeometry::DetailBCenter
-     * Detail B center.
-     *
-     * @var ShieldGeometry::DetailCCenter
-     * Detail C center.
      */
-    struct ShieldGeometry : public TObject {
+    class ShieldGeometry : public TObject {
+
+    public:
 
       /**
        * Constructor.
        */
       ShieldGeometry();
 
-      double Thickness;
-      struct ShieldDetailGeometry DetailA;
-      struct ShieldDetailGeometry DetailB;
-      struct ShieldDetailGeometry DetailC;
-      struct ShieldDetailGeometry DetailD;
-      /* The following parameters are not stored in the database. */
-      HepGeom::Point3D<double> DetailACenter; //!
-      HepGeom::Point3D<double> DetailBCenter; //!
-      HepGeom::Point3D<double> DetailCCenter; //!
+      /**
+       * Get thickness.
+       */
+      double getThickness() const;
+
+      /**
+       * Set thickness.
+       * @param[in] thickness Thickness.
+       */
+      void setThickness(double thickness);
+
+      /**
+       * Get detail A geometry.
+       */
+      const struct ShieldDetailGeometry* getDetailA() const;
+
+      /**
+       * Set detail A geometry.
+       * @param[in] geometry Detail A geometry.
+       */
+      void setDetailA(const struct ShieldDetailGeometry& geometry);
+
+      /**
+       * Get detail B geometry.
+       */
+      const struct ShieldDetailGeometry* getDetailB() const;
+
+      /**
+       * Set detail B geometry.
+       * @param[in] geometry Detail B geometry.
+       */
+      void setDetailB(const struct ShieldDetailGeometry& geometry);
+
+      /**
+       * Get detail C geometry.
+       */
+      const struct ShieldDetailGeometry* getDetailC() const;
+
+      /**
+       * Set detail C geometry.
+       * @param[in] geometry Detail C geometry.
+       */
+      void setDetailC(const struct ShieldDetailGeometry& geometry);
+
+      /**
+       * Get detail D geometry.
+       */
+      const struct ShieldDetailGeometry* getDetailD() const;
+
+      /**
+       * Set detail D geometry.
+       * @param[in] geometry Detail D geometry.
+       */
+      void setDetailD(const struct ShieldDetailGeometry& geometry);
+
+      /**
+       * Get detail A center.
+       */
+      const struct Point* getDetailACenter() const;
+
+      /**
+       * Set detail A center.
+       * @param[in] x X coordinate.
+       * @param[in] y Y coordinate.
+       */
+      void setDetailACenter(double x, double y);
+
+      /**
+       * Get detail B center.
+       */
+      const struct Point* getDetailBCenter() const;
+
+      /**
+       * Set detail B center.
+       * @param[in] x X coordinate.
+       * @param[in] y Y coordinate.
+       */
+      void setDetailBCenter(double x, double y);
+
+      /**
+       * Get detail C center.
+       */
+      const struct Point* getDetailCCenter() const;
+
+      /**
+       * Set detail C center.
+       * @param[in] x X coordinate.
+       * @param[in] y Y coordinate.
+       */
+      void setDetailCCenter(double x, double y);
 
     private:
+
+      /** Thickness. */
+      double m_Thickness;
+
+      /** Detail A. */
+      struct ShieldDetailGeometry m_DetailA;
+
+      /** Detail B. */
+      struct ShieldDetailGeometry m_DetailB;
+
+      /** Detail C. */
+      struct ShieldDetailGeometry m_DetailC;
+
+      /** Detail D. */
+      struct ShieldDetailGeometry m_DetailD;
+
+      /* The following data members are not stored in the database. */
+
+      /** Detail A center. */
+      struct Point m_DetailACenter; //!
+
+      /** Detail B center. */
+      struct Point m_DetailBCenter; //!
+
+      /** Detail C center. */
+      struct Point m_DetailCCenter; //!
 
       /** Makes objects storable. */
       ClassDef(ShieldGeometry, 1);
@@ -926,7 +1010,7 @@ namespace Belle2 {
     /**
      * Get shield layer details geometry data.
      */
-    const struct ShieldGeometry* getShieldGeometry() const;
+    const ShieldGeometry* getShieldGeometry() const;
 
     /**
      * Get readout board geometry data.
@@ -1030,7 +1114,7 @@ namespace Belle2 {
     struct ElementPosition* m_StripPosition; //[m_NStrips]
 
     /** Shield layer details geometry data. */
-    struct ShieldGeometry m_ShieldGeometry;
+    ShieldGeometry m_ShieldGeometry;
 
     /** Readout board geometry data. */
     BoardGeometry m_BoardGeometry;

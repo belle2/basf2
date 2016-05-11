@@ -36,40 +36,11 @@ namespace Belle2 {
     };
 
     /**
-     * @struct EndcapStructureGeometry
-     * @brief EndcapStructure geometry parameters.
-     *
-     * @var EndcapStructureGeometry::Phi
-     * The starting angle of the octagonal Endcap KLM shape.
-     *
-     * @var EndcapStructureGeometry::Dphi
-     * The opening angle (shape is extended from phi to phi+dphi).
-     *
-     * @var EndcapStructureGeometry::Nsides
-     * The number of sides (=8 : octagonal).
-     *
-     * @var EndcapStructureGeometry::Nboundary
-     * The number of boundaries perpendicular to the z-axis.
-     *
-     * @var EndcapStructureGeometry::Z
-     * The z coordinate of the section specified by input id (=boundary id).
-     *
-     * @var EndcapStructureGeometry::Rmin
-     * The radius of the circle tangent to the sides of the inner polygon.
-     *
-     * @var EndcapStructureGeometry::Rmax
-     * The radius of the circle tangent to the sides of the outer polygon.
-     *
-     * @var EndcapStructureGeometry::Zsub
-     * The length of the tube.
-     *
-     * @var EndcapStructureGeometry::Rminsub
-     * The inner radius of the tube.
-     *
-     * @var EndcapStructureGeometry::Rmaxsub
-     * The outer radius of the tube.
+     * EndcapStructure geometry parameters.
      */
-    struct EndcapStructureGeometry : public TObject {
+    class EndcapStructureGeometry : public TObject {
+
+    public:
 
       /**
        * Constructor.
@@ -92,18 +63,157 @@ namespace Belle2 {
        */
       ~EndcapStructureGeometry();
 
-      double Phi;
-      double Dphi;
-      int Nsides;
-      int Nboundary;
-      double* Z;    //[Nboundary]
-      double* Rmin; //[Nboundary]
-      double* Rmax; //[Nboundary]
-      double Zsub;
-      double Rminsub;
-      double Rmaxsub;
+      /**
+       * Get starting angle of the octagonal Endcap KLM shape.
+       */
+      double getPhi() const;
+
+      /**
+       * Set starting angle of the octagonal Endcap KLM shape.
+       * @param[in] phi Starting angle of the octagonal Endcap KLM shape.
+       */
+      void setPhi(double phi);
+
+      /**
+       * Get opening angle.
+       */
+      double getDPhi() const;
+
+      /**
+       * Set opening angle.
+       * @param[in] dPhi Opening angle.
+       */
+      void setDPhi(double dPhi);
+
+      /**
+       * Get number of sides.
+       */
+      int getNSides() const;
+
+      /**
+       * Set number of sides.
+       * @param[in] nSides number of sides.
+       */
+      void setNSides(int nSides);
+
+      /**
+       * Get number of boundaries.
+       */
+      int getNBoundaries() const;
+
+      /**
+       * Set number of boundaries.
+       * @param[in] Number of boundaries.
+       */
+      void setNBoundaries(int nBoundaries);
+
+      /**
+       * Get Z coordinate array.
+       */
+      const double* getZ() const;
+
+      /**
+       * Set Z coordinate.
+       * @param[in] iBoundary Boundary index.
+       * @param[in] z         Z coordinate.
+       */
+      void setZ(int iBoundary, double z);
+
+      /**
+       * Get radius of the circle tangent to the sides of the inner polygon..
+       */
+      const double* getRMin() const;
+
+      /**
+       * Set radius of the circle tangent to the sides of the inner polygon..
+       * @param[in] iBoundary Boundary index.
+       * @param[in] rMin      Radius.
+       */
+      void setRMin(int iBoundary, double rMin);
+
+      /**
+       * Get radius of the circle tangent to the sides of the outer polygon.
+       * @param[in] iBoundary Boundary index.
+       */
+      const double* getRMax() const;
+
+      /**
+       * Set radius of the circle tangent to the sides of the outer polygon.
+       * @param[in] iBoundary Boundary index.
+       * @param[in] rMax      Radius.
+       */
+      void setRMax(int iBoundary, double rMax);
+
+      /**
+       * Get length of the tube.
+       */
+      double getZSub() const;
+
+      /**
+       * Set length of the tube.
+       * @param[in] zSub Length of the tube.
+       */
+      void setZSub(double zSub);
+
+      /**
+       * Get inner radius of the tube.
+       */
+      double getRMinSub() const;
+
+      /**
+       * Set inner radius of the tube.
+       * @param[in] rMinSub Inner radius of the tube.
+       */
+      void setRMinSub(double rMinSub);
+
+      /**
+       * Get outer radius of the tube.
+       */
+      double getRMaxSub() const;
+
+      /**
+       * Set outer radius of the tube.
+       * @param[in] rMaxSub Outer radius of the tube.
+       */
+      void setRMaxSub(double rMaxSub);
 
     private:
+
+      /**
+       * Check boundary index.
+       * @param[in] iBoundary Boundary index.
+       */
+      void checkBoundaryIndex(int iBoundary);
+
+      /** The starting angle of the octagonal Endcap KLM shape. */
+      double m_Phi;
+
+      /** The opening angle (shape is extended from phi to phi+dphi). */
+      double m_DPhi;
+
+      /** The number of sides (=8 : octagonal). */
+      int m_NSides;
+
+      /** The number of boundaries perpendicular to the z-axis. */
+      int m_NBoundaries;
+
+      /** The z coordinate of the section specified by boundary id. */
+      double* m_Z;    //[m_NBoundaries]
+
+      /** The radius of the circle tangent to the sides of the inner polygon. */
+      double* m_RMin; //[m_NBoundaries]
+
+      /** The radius of the circle tangent to the sides of the outer polygon. */
+      double* m_RMax; //[m_NBoundaries]
+
+      /** The length of the tube. */
+      double m_ZSub;
+
+      /** The inner radius of the tube. */
+      double m_RMinSub;
+
+      /** The outer radius of the tube. */
+      double m_RMaxSub;
 
       /** Makes objects storable. */
       ClassDef(EndcapStructureGeometry, 1);
@@ -1604,7 +1714,7 @@ namespace Belle2 {
     /**
      * Get endcap structure geometry data.
      */
-    const struct EndcapStructureGeometry* getEndcapStructureGeometry() const;
+    const EndcapStructureGeometry* getEndcapStructureGeometry() const;
 
     /**
      * Get position data for endcaps.
@@ -1738,7 +1848,7 @@ namespace Belle2 {
     double m_SolenoidZ;
 
     /** Endcap structure geometry data. */
-    struct EndcapStructureGeometry m_EndcapStructureGeometry;
+    EndcapStructureGeometry m_EndcapStructureGeometry;
 
     /** Position data for endcaps. */
     ElementPosition m_EndcapPosition;

@@ -216,26 +216,27 @@ void EKLM::GeoEKLMCreator::createMaterials()
 
 void EKLM::GeoEKLMCreator::createEndcapSolid()
 {
-  const struct EKLMGeometry::EndcapStructureGeometry* endcapStructureGeometry =
+  const EKLMGeometry::EndcapStructureGeometry* endcapStructureGeometry =
     m_GeoDat->getEndcapStructureGeometry();
   G4Polyhedra* op = NULL;
   G4Tubs* tb = NULL;
   try {
     op = new G4Polyhedra("Endcap_Octagonal_Prism",
-                         endcapStructureGeometry->Phi,
-                         endcapStructureGeometry->Dphi,
-                         endcapStructureGeometry->Nsides,
-                         endcapStructureGeometry->Nboundary,
-                         endcapStructureGeometry->Z,
-                         endcapStructureGeometry->Rmin,
-                         endcapStructureGeometry->Rmax);
+                         endcapStructureGeometry->getPhi(),
+                         endcapStructureGeometry->getDPhi(),
+                         endcapStructureGeometry->getNSides(),
+                         endcapStructureGeometry->getNBoundaries(),
+                         endcapStructureGeometry->getZ(),
+                         endcapStructureGeometry->getRMin(),
+                         endcapStructureGeometry->getRMax());
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   try {
-    tb = new G4Tubs("Endcap_Tube", endcapStructureGeometry->Rminsub,
-                    endcapStructureGeometry->Rmaxsub,
-                    endcapStructureGeometry->Zsub, 0.0, 360.0 * CLHEP::deg);
+    tb = new G4Tubs("Endcap_Tube", endcapStructureGeometry->getRMinSub(),
+                    endcapStructureGeometry->getRMaxSub(),
+                    endcapStructureGeometry->getZSub(),
+                    0.0, 360.0 * CLHEP::deg);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }

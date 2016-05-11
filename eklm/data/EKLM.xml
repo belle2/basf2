@@ -7,9 +7,9 @@
     <SolenoidZ desc="Solenoid center Z coordinate" unit="cm">47.0</SolenoidZ>
     <ESTR>
       <EndcapKLM>
-        <Nsides desc="number of sides of Barrel KLM Vessel">8</Nsides>
         <Phi unit="deg">-22.5</Phi>
-        <Dphi unit="deg">360.0</Dphi>
+        <DPhi unit="deg">360.0</DPhi>
+        <NSides desc="number of sides of Barrel KLM Vessel">8</NSides>
         <ZBoundary id="1">
           <Zposition unit="cm">-66.05</Zposition>
           <InnerRadius unit="cm">111.0</InnerRadius>

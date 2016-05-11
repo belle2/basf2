@@ -460,38 +460,29 @@ void EKLM::GeometryData::calculateShieldGeometry()
 
 void EKLM::GeometryData::readEndcapStructureGeometry()
 {
-  int i;
+  int i, n;
   GearDir d("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/ESTR");
   GearDir d1(d);
   GearDir d2(d);
   d1.append("/EndcapKLM");
   d2.append("/EndcapKLMsub");
-  m_EndcapStructureGeometry.Phi = d1.getAngle("Phi") * CLHEP::rad;
-  m_EndcapStructureGeometry.Dphi = d1.getAngle("Dphi") * CLHEP::rad;
-  m_EndcapStructureGeometry.Nsides = d1.getInt("Nsides");
-  m_EndcapStructureGeometry.Nboundary = d1.getNumberNodes("ZBoundary");
-  m_EndcapStructureGeometry.Z =
-    (double*)malloc(m_EndcapStructureGeometry.Nboundary * sizeof(double));
-  if (m_EndcapStructureGeometry.Z == NULL)
-    B2FATAL(c_MemErr);
-  m_EndcapStructureGeometry.Rmin =
-    (double*)malloc(m_EndcapStructureGeometry.Nboundary * sizeof(double));
-  if (m_EndcapStructureGeometry.Rmin == NULL)
-    B2FATAL(c_MemErr);
-  m_EndcapStructureGeometry.Rmax =
-    (double*)malloc(m_EndcapStructureGeometry.Nboundary * sizeof(double));
-  if (m_EndcapStructureGeometry.Rmax == NULL)
-    B2FATAL(c_MemErr);
-  for (i = 0; i < m_EndcapStructureGeometry.Nboundary; i++) {
+  m_EndcapStructureGeometry.setPhi(d1.getAngle("Phi") * CLHEP::rad);
+  m_EndcapStructureGeometry.setDPhi(d1.getAngle("DPhi") * CLHEP::rad);
+  m_EndcapStructureGeometry.setNSides(d1.getInt("NSides"));
+  n = d1.getNumberNodes("ZBoundary");
+  m_EndcapStructureGeometry.setNBoundaries(n);
+  for (i = 0; i < n; i++) {
     GearDir d4(d1);
     d4.append((boost::format("/ZBoundary[%1%]") % (i + 1)).str());
-    m_EndcapStructureGeometry.Z[i] = d4.getLength("Zposition") * CLHEP::cm;
-    m_EndcapStructureGeometry.Rmin[i] = d4.getLength("InnerRadius") * CLHEP::cm;
-    m_EndcapStructureGeometry.Rmax[i] = d4.getLength("OuterRadius") * CLHEP::cm;
+    m_EndcapStructureGeometry.setZ(i, d4.getLength("Zposition") * CLHEP::cm);
+    m_EndcapStructureGeometry.setRMin(
+      i, d4.getLength("InnerRadius") * CLHEP::cm);
+    m_EndcapStructureGeometry.setRMax(
+      i, d4.getLength("OuterRadius") * CLHEP::cm);
   }
-  m_EndcapStructureGeometry.Zsub = d2.getLength("Length") * CLHEP::cm;
-  m_EndcapStructureGeometry.Rminsub = d2.getLength("InnerRadius") * CLHEP::cm;
-  m_EndcapStructureGeometry.Rmaxsub = d2.getLength("OuterRadius") * CLHEP::cm;
+  m_EndcapStructureGeometry.setZSub(d2.getLength("Length") * CLHEP::cm);
+  m_EndcapStructureGeometry.setRMinSub(d2.getLength("InnerRadius") * CLHEP::cm);
+  m_EndcapStructureGeometry.setRMaxSub(d2.getLength("OuterRadius") * CLHEP::cm);
 }
 
 void EKLM::GeometryData::initializeFromGearbox()

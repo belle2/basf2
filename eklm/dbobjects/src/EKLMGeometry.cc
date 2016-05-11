@@ -14,36 +14,44 @@
 
 using namespace Belle2;
 
+/* Class EKLMGeometry::EndcapStructureGeometry. */
+
 EKLMGeometry::EndcapStructureGeometry::EndcapStructureGeometry()
 {
-  Phi = 0;
-  Dphi = 0;
-  Nsides = 0;
-  Nboundary = 0;
-  Z = NULL;
-  Rmin = NULL;
-  Rmax = NULL;
-  Zsub = 0;
-  Rminsub = 0;
-  Rmaxsub = 0;
+  m_Phi = 0;
+  m_DPhi = 0;
+  m_NSides = 0;
+  m_NBoundaries = 0;
+  m_Z = NULL;
+  m_RMin = NULL;
+  m_RMax = NULL;
+  m_ZSub = 0;
+  m_RMinSub = 0;
+  m_RMaxSub = 0;
 }
 
 EKLMGeometry::EndcapStructureGeometry::EndcapStructureGeometry(
   const EndcapStructureGeometry& geometry) : TObject(geometry)
 {
-  Phi = geometry.Phi;
-  Dphi = geometry.Dphi;
-  Nsides = geometry.Nsides;
-  Nboundary = geometry.Nboundary;
-  Z = new double[Nboundary];
-  memcpy(Z, geometry.Z, Nboundary * sizeof(double));
-  Rmin = new double[Nboundary];
-  memcpy(Rmin, geometry.Rmin, Nboundary * sizeof(double));
-  Rmax = new double[Nboundary];
-  memcpy(Rmax, geometry.Rmax, Nboundary * sizeof(double));
-  Zsub = geometry.Zsub;
-  Rminsub = geometry.Rminsub;
-  Rmaxsub = geometry.Rmaxsub;
+  m_Phi = geometry.getPhi();
+  m_DPhi = geometry.getDPhi();
+  m_NSides = geometry.getNSides();
+  m_NBoundaries = geometry.getNBoundaries();
+  if (m_NBoundaries > 0) {
+    m_Z = new double[m_NBoundaries];
+    m_RMin = new double[m_NBoundaries];
+    m_RMax = new double[m_NBoundaries];
+    memcpy(m_Z, geometry.getZ(), m_NBoundaries * sizeof(double));
+    memcpy(m_RMin, geometry.getRMin(), m_NBoundaries * sizeof(double));
+    memcpy(m_RMax, geometry.getRMax(), m_NBoundaries * sizeof(double));
+  } else {
+    m_Z = NULL;
+    m_RMin = NULL;
+    m_RMax = NULL;
+  }
+  m_ZSub = geometry.getZSub();
+  m_RMinSub = geometry.getRMinSub();
+  m_RMaxSub = geometry.getRMaxSub();
 }
 
 EKLMGeometry::EndcapStructureGeometry&
@@ -52,36 +60,164 @@ EKLMGeometry::EndcapStructureGeometry::operator=(
 {
   if (&geometry == this)
     return *this;
-  Phi = geometry.Phi;
-  Dphi = geometry.Dphi;
-  Nsides = geometry.Nsides;
-  Nboundary = geometry.Nboundary;
-  if (Z != NULL)
-    delete[] Z;
-  Z = new double[Nboundary];
-  memcpy(Z, geometry.Z, Nboundary * sizeof(double));
-  if (Rmin != NULL)
-    delete[] Rmin;
-  Rmin = new double[Nboundary];
-  memcpy(Rmin, geometry.Rmin, Nboundary * sizeof(double));
-  if (Rmax != NULL)
-    delete[] Rmax;
-  Rmax = new double[Nboundary];
-  memcpy(Rmax, geometry.Rmax, Nboundary * sizeof(double));
-  Zsub = geometry.Zsub;
-  Rminsub = geometry.Rminsub;
-  Rmaxsub = geometry.Rmaxsub;
+  m_Phi = geometry.getPhi();
+  m_DPhi = geometry.getDPhi();
+  m_NSides = geometry.getNSides();
+  m_NBoundaries = geometry.getNBoundaries();
+  if (m_Z != NULL)
+    delete[] m_Z;
+  if (m_RMin != NULL)
+    delete[] m_RMin;
+  if (m_RMax != NULL)
+    delete[] m_RMax;
+  if (m_NBoundaries > 0) {
+    m_Z = new double[m_NBoundaries];
+    m_RMin = new double[m_NBoundaries];
+    m_RMax = new double[m_NBoundaries];
+    memcpy(m_Z, geometry.getZ(), m_NBoundaries * sizeof(double));
+    memcpy(m_RMin, geometry.getRMin(), m_NBoundaries * sizeof(double));
+    memcpy(m_RMax, geometry.getRMax(), m_NBoundaries * sizeof(double));
+  } else {
+    m_Z = NULL;
+    m_RMin = NULL;
+    m_RMax = NULL;
+  }
+  m_ZSub = geometry.getZSub();
+  m_RMinSub = geometry.getRMinSub();
+  m_RMaxSub = geometry.getRMaxSub();
   return *this;
 }
 
 EKLMGeometry::EndcapStructureGeometry::~EndcapStructureGeometry()
 {
-  if (Z != NULL)
-    delete[] Z;
-  if (Rmin != NULL)
-    delete[] Rmin;
-  if (Rmax != NULL)
-    delete[] Rmax;
+  if (m_Z != NULL)
+    delete[] m_Z;
+  if (m_RMin != NULL)
+    delete[] m_RMin;
+  if (m_RMax != NULL)
+    delete[] m_RMax;
+}
+
+double EKLMGeometry::EndcapStructureGeometry::getPhi() const
+{
+  return m_Phi;
+}
+
+void EKLMGeometry::EndcapStructureGeometry::setPhi(double phi)
+{
+  m_Phi = phi;
+}
+
+double EKLMGeometry::EndcapStructureGeometry::getDPhi() const
+{
+  return m_DPhi;
+}
+
+void EKLMGeometry::EndcapStructureGeometry::setDPhi(double dPhi)
+{
+  m_DPhi = dPhi;
+}
+
+int EKLMGeometry::EndcapStructureGeometry::getNSides() const
+{
+  return m_NSides;
+}
+
+void EKLMGeometry::EndcapStructureGeometry::setNSides(int nSides)
+{
+  m_NSides = nSides;
+}
+
+int EKLMGeometry::EndcapStructureGeometry::getNBoundaries() const
+{
+  return m_NBoundaries;
+}
+
+void EKLMGeometry::EndcapStructureGeometry::setNBoundaries(int nBoundaries)
+{
+  if (nBoundaries < 0)
+    B2FATAL("Number of buondaries must be nonnegative.");
+  if (m_Z != NULL)
+    delete[] m_Z;
+  if (m_RMin != NULL)
+    delete[] m_RMin;
+  if (m_RMax != NULL)
+    delete[] m_RMax;
+  if (nBoundaries > 0) {
+    m_Z = new double[m_NBoundaries];
+    m_RMin = new double[m_NBoundaries];
+    m_RMax = new double[m_NBoundaries];
+  }
+  m_NBoundaries = nBoundaries;
+}
+
+const double* EKLMGeometry::EndcapStructureGeometry::getZ() const
+{
+  return m_Z;
+}
+
+void EKLMGeometry::EndcapStructureGeometry::setZ(int iBoundary, double z)
+{
+  checkBoundaryIndex(iBoundary);
+  m_Z[iBoundary] = z;
+}
+
+const double* EKLMGeometry::EndcapStructureGeometry::getRMin() const
+{
+  return m_RMin;
+}
+
+void EKLMGeometry::EndcapStructureGeometry::setRMin(int iBoundary, double rMin)
+{
+  checkBoundaryIndex(iBoundary);
+  m_RMin[iBoundary] = rMin;
+}
+
+const double* EKLMGeometry::EndcapStructureGeometry::getRMax() const
+{
+  return m_RMax;
+}
+
+void EKLMGeometry::EndcapStructureGeometry::setRMax(int iBoundary, double rMax)
+{
+  checkBoundaryIndex(iBoundary);
+  m_RMax[iBoundary] = rMax;
+}
+
+double EKLMGeometry::EndcapStructureGeometry::getZSub() const
+{
+  return m_ZSub;
+}
+
+void EKLMGeometry::EndcapStructureGeometry::setZSub(double zSub)
+{
+  m_ZSub = zSub;
+}
+
+double EKLMGeometry::EndcapStructureGeometry::getRMinSub() const
+{
+  return m_RMinSub;
+}
+
+void EKLMGeometry::EndcapStructureGeometry::setRMinSub(double rMinSub)
+{
+  m_RMinSub = rMinSub;
+}
+
+double EKLMGeometry::EndcapStructureGeometry::getRMaxSub() const
+{
+  return m_RMaxSub;
+}
+
+void EKLMGeometry::EndcapStructureGeometry::setRMaxSub(double rMaxSub)
+{
+  m_RMaxSub = rMaxSub;
+}
+
+void EKLMGeometry::EndcapStructureGeometry::checkBoundaryIndex(int iBoundary)
+{
+  if (iBoundary < 0 || iBoundary >= m_NBoundaries)
+    B2FATAL("Boundary index must be from 0 to " << m_NBoundaries - 1 << ".");
 }
 
 /* Class EKLMGeometry::ElementPosition. */

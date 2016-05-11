@@ -229,9 +229,9 @@ void MuidModule::initialize()
   m_EndcapMiddleZ = m_BarrelHalfLength + m_EndcapHalfLength;            // in G4e units (cm)
 
   // Measurement uncertainties and acceptance windows
-  double width = eklmGeometry.getStripGeometry()->Width / CLHEP::cm; // in G4e units (cm)
+  double width = eklmGeometry.getStripGeometry()->getWidth() / CLHEP::cm; // in G4e units (cm)
   m_EndcapScintVariance = width * width / 12.0;
-  width = bklmGeometry->getScintHalfWidth() * 2.0;                   // in G4e units (cm)
+  width = bklmGeometry->getScintHalfWidth() * 2.0;                        // in G4e units (cm)
   m_BarrelScintVariance = width * width / 12.0;
   int nBarrelLayers = bklmGeometry->getNLayer();
   for (int layer = 1; layer <= nBarrelLayers; ++layer) {
@@ -252,7 +252,7 @@ void MuidModule::initialize()
   double z0((eklmGeometry.getEndcapPosition()->Z + eklmGeometry.getLayerShiftZ()
              - 0.5 * eklmGeometry.getEndcapPosition()->Length
              - 0.5 * eklmGeometry.getLayerPosition()->Length
-             - 0.5 * eklmGeometry.getStripGeometry()->Thickness
+             - 0.5 * eklmGeometry.getStripGeometry()->getThickness()
              - 0.5 * eklmGeometry.getPlasticSheetGeometry()->Width) / CLHEP::cm); // in G4e units (cm)
 
   int nEndcapLayers = eklmGeometry.getNLayers();

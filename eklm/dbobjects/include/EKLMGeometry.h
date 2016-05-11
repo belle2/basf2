@@ -387,21 +387,100 @@ namespace Belle2 {
     /**
      * Strip geometry data.
      */
-    struct StripGeometry : public TObject {
+    class StripGeometry : public TObject {
+
+    public:
 
       /**
        * Constructor.
        */
       StripGeometry();
 
-      double Width;                    /**< Width. */
-      double Thickness;                /**< Thickness. */
-      double GrooveDepth;              /**< Groove depth. */
-      double GrooveWidth;              /**< Groove width. */
-      double NoScintillationThickness; /**< Non-scintillating layer. */
-      double RSSSize;                  /**< Radiation study SiPM size. */
+      /**
+       * Get width.
+       */
+      double getWidth() const;
+
+      /**
+       * Set width.
+       * @param[in] width Width.
+       */
+      void setWidth(double width);
+
+      /**
+       * Get thickness.
+       */
+      double getThickness() const;
+
+      /**
+       * Set thickness.
+       * @param[in] thickness Thickness.
+       */
+      void setThickness(double thickness);
+
+      /**
+       * Get groove depth.
+       */
+      double getGrooveDepth() const;
+
+      /**
+       * Set groove depth.
+       * @param[in] grooveDepth Groove depth.
+       */
+      void setGrooveDepth(double grooveDepth);
+
+      /**
+       * Get groove width.
+       */
+      double getGrooveWidth() const;
+
+      /**
+       * Set groove width.
+       * @param[in] grooveWidth Groove width.
+       */
+      void setGrooveWidth(double grooveWidth);
+
+      /**
+       * Get nonscintillating layer thickness..
+       */
+      double getNoScintillationThickness() const;
+
+      /**
+       * Set nonscintillating layer thickness..
+       * @param[in] thickness Nonscintillating layer thickness.
+       */
+      void setNoScintillationThickness(double thickness);
+
+      /**
+       * Get "SiPM" size.
+       */
+      double getRSSSize() const;
+
+      /**
+       * Set "SiPM" size.
+       * @param[in]
+       */
+      void setRSSSize(double rssSize);
 
     private:
+
+      /** Width. */
+      double m_Width;
+
+      /** Thickness. */
+      double m_Thickness;
+
+      /** Groove depth. */
+      double m_GrooveDepth;
+
+      /** Groove width. */
+      double m_GrooveWidth;
+
+      /** Non-scintillating layer thickness. */
+      double m_NoScintillationThickness;
+
+      /** Radiation study SiPM size. */
+      double m_RSSSize;
 
       /** Makes objects storable. */
       ClassDef(StripGeometry, 1);
@@ -1074,7 +1153,7 @@ namespace Belle2 {
     /**
      * Get strip geometry data.
      */
-    const struct StripGeometry* getStripGeometry() const;
+    const StripGeometry* getStripGeometry() const;
 
     /**
      * Get position data for strips.
@@ -1183,7 +1262,7 @@ namespace Belle2 {
     struct SegmentSupportPosition* m_SegmentSupportPosition; //[m_NSegmentSupportElementsSector]
 
     /** Strip geometry data. */
-    struct StripGeometry m_StripGeometry;
+    StripGeometry m_StripGeometry;
 
     /** Position data for strips. */
     struct ElementPosition* m_StripPosition; //[m_NStrips]

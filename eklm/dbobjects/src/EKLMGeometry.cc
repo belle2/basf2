@@ -142,14 +142,76 @@ EKLMGeometry::SegmentSupportPosition::SegmentSupportPosition()
   Z = 0;
 }
 
+/* Class EKLMGeometry::StripGeometry. */
+
 EKLMGeometry::StripGeometry::StripGeometry()
 {
-  Width = 0;
-  Thickness = 0;
-  GrooveDepth = 0;
-  GrooveWidth = 0;
-  NoScintillationThickness = 0;
-  RSSSize = 0;
+  m_Width = 0;
+  m_Thickness = 0;
+  m_GrooveDepth = 0;
+  m_GrooveWidth = 0;
+  m_NoScintillationThickness = 0;
+  m_RSSSize = 0;
+}
+
+double EKLMGeometry::StripGeometry::getWidth() const
+{
+  return m_Width;
+}
+
+void EKLMGeometry::StripGeometry::setWidth(double width)
+{
+  m_Width = width;
+}
+
+double EKLMGeometry::StripGeometry::getThickness() const
+{
+  return m_Thickness;
+}
+
+void EKLMGeometry::StripGeometry::setThickness(double thickness)
+{
+  m_Thickness = thickness;
+}
+
+double EKLMGeometry::StripGeometry::getGrooveDepth() const
+{
+  return m_GrooveDepth;
+}
+
+void EKLMGeometry::StripGeometry::setGrooveDepth(double grooveDepth)
+{
+  m_GrooveDepth = grooveDepth;
+}
+
+double EKLMGeometry::StripGeometry::getGrooveWidth() const
+{
+  return m_GrooveWidth;
+}
+
+void EKLMGeometry::StripGeometry::setGrooveWidth(double grooveWidth)
+{
+  m_GrooveWidth = grooveWidth;
+}
+
+double EKLMGeometry::StripGeometry::getNoScintillationThickness() const
+{
+  return m_NoScintillationThickness;
+}
+
+void EKLMGeometry::StripGeometry::setNoScintillationThickness(double thickness)
+{
+  m_NoScintillationThickness = thickness;
+}
+
+double EKLMGeometry::StripGeometry::getRSSSize() const
+{
+  return m_RSSSize;
+}
+
+void EKLMGeometry::StripGeometry::setRSSSize(double rssSize)
+{
+  m_RSSSize = rssSize;
 }
 
 /* Class EKLMGeometry::Point. */

@@ -252,13 +252,13 @@ void EKLM::GeometryData::readXMLDataStrips()
                  "Layer/Sector/Plane/Strips");
   m_NStrips = Strips.getNumberNodes("Strip");
   checkStrip(m_NStrips);
-  m_StripGeometry.Width  = Strips.getLength("Width") * CLHEP::cm;
-  m_StripGeometry.Thickness = Strips.getLength("Thickness") * CLHEP::cm;
-  m_StripGeometry.GrooveDepth = Strips.getLength("GrooveDepth") * CLHEP::cm;
-  m_StripGeometry.GrooveWidth = Strips.getLength("GrooveWidth") * CLHEP::cm;
-  m_StripGeometry.NoScintillationThickness =
-    Strips.getLength("NoScintillationThickness") * CLHEP::cm;
-  m_StripGeometry.RSSSize = Strips.getLength("RSSSize") * CLHEP::cm;
+  m_StripGeometry.setWidth(Strips.getLength("Width") * CLHEP::cm);
+  m_StripGeometry.setThickness(Strips.getLength("Thickness") * CLHEP::cm);
+  m_StripGeometry.setGrooveDepth(Strips.getLength("GrooveDepth") * CLHEP::cm);
+  m_StripGeometry.setGrooveWidth(Strips.getLength("GrooveWidth") * CLHEP::cm);
+  m_StripGeometry.setNoScintillationThickness(
+    Strips.getLength("NoScintillationThickness") * CLHEP::cm);
+  m_StripGeometry.setRSSSize(Strips.getLength("RSSSize") * CLHEP::cm);
   try {
     m_StripPosition = new struct EKLMGeometry::ElementPosition[m_NStrips];
   } catch (std::bad_alloc& ba) {

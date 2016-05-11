@@ -114,9 +114,9 @@ checkSegmentAlignment(int iPlane, int iSegment,
   HepGeom::Point3D<double> stripRectangle[4];
   HepGeom::Transform3D t;
   const struct EKLMGeometry::ElementPosition* stripPosition;
-  const struct EKLMGeometry::StripGeometry* stripGeometry =
+  const EKLMGeometry::StripGeometry* stripGeometry =
     m_GeoDat->getStripGeometry();
-  ly = 0.5 * stripGeometry->Width;
+  ly = 0.5 * stripGeometry->getWidth();
   for (i = 1; i <= m_GeoDat->getNStripsSegment(); i++) {
     iStrip = m_GeoDat->getNStripsSegment() * (iSegment - 1) + i;
     stripPosition = m_GeoDat->getStripPosition(iStrip);

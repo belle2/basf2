@@ -1,12 +1,12 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Makoto Uchida                                            *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+* BASF2 (Belle Analysis Framework 2)                                     *
+* Copyright(C) 2010 - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributors: Makoto Uchida                                            *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
 #pragma once
 
 #include <TObject.h>
@@ -24,7 +24,7 @@ namespace Belle2 {
      * Default constructor
      */
     CDCChannelMap():
-      m_wireID(), m_board(0), m_channel(0)
+      m_cell(65535), m_board(0), m_channel(0)
     {}
 
     /**
@@ -33,7 +33,7 @@ namespace Belle2 {
     CDCChannelMap(unsigned short slayer, unsigned short layer,
                   unsigned short wire,
                   unsigned short board, unsigned short channel):
-      m_wireID(WireID(slayer, layer, wire)),
+      m_cell(WireID(slayer, layer, wire).getEWire()),
       m_board(board), m_channel(channel)
     {
 
@@ -54,7 +54,7 @@ namespace Belle2 {
      */
     unsigned short getISuperLayer() const
     {
-      return m_wireID.getISuperLayer();
+      return (m_cell / 4096);
     }
 
     /**
@@ -62,7 +62,7 @@ namespace Belle2 {
      */
     unsigned short getILayer() const
     {
-      return m_wireID.getILayer();
+      return ((m_cell % 4096) / 512);
     }
 
     /**
@@ -70,15 +70,15 @@ namespace Belle2 {
      */
     unsigned short getIWire() const
     {
-      return m_wireID.getIWire();
+      return (m_cell % 512);
     }
 
   private:
-    WireID m_wireID; /**< Wire ID. */
+    unsigned short m_cell; /**< Cell ID */
     unsigned short m_board; /**< Board ID. */
     unsigned short m_channel; /**< Channel ID */
 
-    ClassDef(CDCChannelMap, 1); /**< ClassDef */
+    ClassDef(CDCChannelMap, 2); /**< ClassDef */
 
   };
 

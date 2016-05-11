@@ -218,24 +218,26 @@ void EKLM::GeoEKLMCreator::createEndcapSolid()
 {
   const EKLMGeometry::EndcapStructureGeometry* endcapStructureGeometry =
     m_GeoDat->getEndcapStructureGeometry();
+  const EKLMGeometry::ElementPosition* endcapPos =
+    m_GeoDat->getEndcapPosition();
+  const double z[2] = { -endcapPos->getLength() / 2, endcapPos->getLength() / 2};
+  const double rMin[2] = {0, 0};
+  const double rMax[2] = {endcapPos->getOuterR(), endcapPos->getOuterR()};
   G4Polyhedra* op = NULL;
   G4Tubs* tb = NULL;
   try {
     op = new G4Polyhedra("Endcap_Octagonal_Prism",
                          endcapStructureGeometry->getPhi(),
-                         endcapStructureGeometry->getDPhi(),
+                         360. * CLHEP::deg,
                          endcapStructureGeometry->getNSides(),
-                         endcapStructureGeometry->getNBoundaries(),
-                         endcapStructureGeometry->getZ(),
-                         endcapStructureGeometry->getRMin(),
-                         endcapStructureGeometry->getRMax());
+                         2, z, rMin, rMax);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
+  /* Subtraction tube has slightly larger Z size. */
   try {
-    tb = new G4Tubs("Endcap_Tube", endcapStructureGeometry->getRMinSub(),
-                    endcapStructureGeometry->getRMaxSub(),
-                    endcapStructureGeometry->getZSub(),
+    tb = new G4Tubs("Endcap_Tube", 0, endcapPos->getInnerR(),
+                    endcapPos->getLength() / 2.0 + 1.0 * CLHEP::mm,
                     0.0, 360.0 * CLHEP::deg);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);

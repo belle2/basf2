@@ -6,26 +6,8 @@
   <Content>
     <SolenoidZ desc="Solenoid center Z coordinate" unit="cm">47.0</SolenoidZ>
     <ESTR>
-      <EndcapKLM>
-        <Phi unit="deg">-22.5</Phi>
-        <DPhi unit="deg">360.0</DPhi>
-        <NSides desc="number of sides of Barrel KLM Vessel">8</NSides>
-        <ZBoundary id="1">
-          <Zposition unit="cm">-66.05</Zposition>
-          <InnerRadius unit="cm">111.0</InnerRadius>
-          <OuterRadius unit="cm">353.5</OuterRadius>
-        </ZBoundary>
-        <ZBoundary id="2">
-          <Zposition unit="cm">66.05</Zposition>
-          <InnerRadius unit="cm">111.0</InnerRadius>
-          <OuterRadius unit="cm">353.5</OuterRadius>
-        </ZBoundary>
-      </EndcapKLM>
-      <EndcapKLMsub>
-        <Length unit="cm">66.1</Length>
-        <InnerRadius unit="cm">110.5</InnerRadius>
-        <OuterRadius unit="cm">128.0</OuterRadius>
-      </EndcapKLMsub>
+      <Phi unit="deg">-22.5</Phi>
+      <NSides desc="number of sides of Barrel KLM Vessel">8</NSides>
     </ESTR>
     <xi:include href="DigitizationParams.xml"/>
     <Mode desc="0 -- normal operation, 1 -- bg study">0</Mode>
@@ -36,8 +18,8 @@
     </SensitiveDetector>
     <NEndcaps desc="Number of endcaps">2</NEndcaps>
     <Endcap>
-      <InnerR desc="Inner radius"   unit="mm">1305.0</InnerR>
-      <OuterR desc="Outer radius"   unit="mm">3320.0</OuterR>
+      <InnerR desc="Inner radius"   unit="mm">1280.0</InnerR>
+      <OuterR desc="Outer radius"   unit="mm">3535.0</OuterR>
       <Length desc="Length"         unit="mm">1321.0</Length>
       <PositionX  desc="X position" unit="mm">0</PositionX>
       <PositionY  desc="Y position" unit="mm">0</PositionY>

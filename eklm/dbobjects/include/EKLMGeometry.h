@@ -48,17 +48,6 @@ namespace Belle2 {
       EndcapStructureGeometry();
 
       /**
-       * Copy constructor.
-       */
-      EndcapStructureGeometry(const EndcapStructureGeometry& geometry);
-
-      /**
-       * Operator =.
-       */
-      EndcapStructureGeometry& operator=(
-        const EndcapStructureGeometry& geometry);
-
-      /**
        * Destructor.
        */
       ~EndcapStructureGeometry();
@@ -75,17 +64,6 @@ namespace Belle2 {
       void setPhi(double phi);
 
       /**
-       * Get opening angle.
-       */
-      double getDPhi() const;
-
-      /**
-       * Set opening angle.
-       * @param[in] dPhi Opening angle.
-       */
-      void setDPhi(double dPhi);
-
-      /**
        * Get number of sides.
        */
       int getNSides() const;
@@ -96,94 +74,7 @@ namespace Belle2 {
        */
       void setNSides(int nSides);
 
-      /**
-       * Get number of boundaries.
-       */
-      int getNBoundaries() const;
-
-      /**
-       * Set number of boundaries.
-       * @param[in] Number of boundaries.
-       */
-      void setNBoundaries(int nBoundaries);
-
-      /**
-       * Get Z coordinate array.
-       */
-      const double* getZ() const;
-
-      /**
-       * Set Z coordinate.
-       * @param[in] iBoundary Boundary index.
-       * @param[in] z         Z coordinate.
-       */
-      void setZ(int iBoundary, double z);
-
-      /**
-       * Get radius of the circle tangent to the sides of the inner polygon..
-       */
-      const double* getRMin() const;
-
-      /**
-       * Set radius of the circle tangent to the sides of the inner polygon..
-       * @param[in] iBoundary Boundary index.
-       * @param[in] rMin      Radius.
-       */
-      void setRMin(int iBoundary, double rMin);
-
-      /**
-       * Get radius of the circle tangent to the sides of the outer polygon.
-       * @param[in] iBoundary Boundary index.
-       */
-      const double* getRMax() const;
-
-      /**
-       * Set radius of the circle tangent to the sides of the outer polygon.
-       * @param[in] iBoundary Boundary index.
-       * @param[in] rMax      Radius.
-       */
-      void setRMax(int iBoundary, double rMax);
-
-      /**
-       * Get length of the tube.
-       */
-      double getZSub() const;
-
-      /**
-       * Set length of the tube.
-       * @param[in] zSub Length of the tube.
-       */
-      void setZSub(double zSub);
-
-      /**
-       * Get inner radius of the tube.
-       */
-      double getRMinSub() const;
-
-      /**
-       * Set inner radius of the tube.
-       * @param[in] rMinSub Inner radius of the tube.
-       */
-      void setRMinSub(double rMinSub);
-
-      /**
-       * Get outer radius of the tube.
-       */
-      double getRMaxSub() const;
-
-      /**
-       * Set outer radius of the tube.
-       * @param[in] rMaxSub Outer radius of the tube.
-       */
-      void setRMaxSub(double rMaxSub);
-
     private:
-
-      /**
-       * Check boundary index.
-       * @param[in] iBoundary Boundary index.
-       */
-      void checkBoundaryIndex(int iBoundary);
 
       /** The starting angle of the octagonal Endcap KLM shape. */
       double m_Phi;
@@ -193,27 +84,6 @@ namespace Belle2 {
 
       /** The number of sides (=8 : octagonal). */
       int m_NSides;
-
-      /** The number of boundaries perpendicular to the z-axis. */
-      int m_NBoundaries;
-
-      /** The z coordinate of the section specified by boundary id. */
-      double* m_Z;    //[m_NBoundaries]
-
-      /** The radius of the circle tangent to the sides of the inner polygon. */
-      double* m_RMin; //[m_NBoundaries]
-
-      /** The radius of the circle tangent to the sides of the outer polygon. */
-      double* m_RMax; //[m_NBoundaries]
-
-      /** The length of the tube. */
-      double m_ZSub;
-
-      /** The inner radius of the tube. */
-      double m_RMinSub;
-
-      /** The outer radius of the tube. */
-      double m_RMaxSub;
 
       /** Makes objects storable. */
       ClassDef(EndcapStructureGeometry, 1);

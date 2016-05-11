@@ -127,7 +127,7 @@ namespace Belle2 {
   private:
 
     std::string m_serialNumber; /**< serial number, e.g. JTxxxx */
-    std::vector<Gaussian> m_gaussians;
+    std::vector<Gaussian> m_gaussians; /**< TTS distribution composed of Gaussians */
 
     ClassDef(TOPPmtTTSPar, 1); /**< ClassDef */
 

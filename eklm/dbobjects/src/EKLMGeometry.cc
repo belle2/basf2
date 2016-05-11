@@ -84,14 +84,76 @@ EKLMGeometry::EndcapStructureGeometry::~EndcapStructureGeometry()
     delete[] Rmax;
 }
 
+/* Class EKLMGeometry::ElementPosition. */
+
 EKLMGeometry::ElementPosition::ElementPosition()
 {
-  InnerR = 0;
-  OuterR = 0;
-  Length = 0;
-  X = 0;
-  Y = 0;
-  Z = 0;
+  m_InnerR = 0;
+  m_OuterR = 0;
+  m_Length = 0;
+  m_X = 0;
+  m_Y = 0;
+  m_Z = 0;
+}
+
+double EKLMGeometry::ElementPosition::getInnerR() const
+{
+  return m_InnerR;
+}
+
+void EKLMGeometry::ElementPosition::setInnerR(double innerR)
+{
+  m_InnerR = innerR;
+}
+
+double EKLMGeometry::ElementPosition::getOuterR() const
+{
+  return m_OuterR;
+}
+
+void EKLMGeometry::ElementPosition::setOuterR(double outerR)
+{
+  m_OuterR = outerR;
+}
+
+double EKLMGeometry::ElementPosition::getLength() const
+{
+  return m_Length;
+}
+
+void EKLMGeometry::ElementPosition::setLength(double length)
+{
+  m_Length = length;
+}
+
+double EKLMGeometry::ElementPosition::getX() const
+{
+  return m_X;
+}
+
+void EKLMGeometry::ElementPosition::setX(double x)
+{
+  m_X = x;
+}
+
+double EKLMGeometry::ElementPosition::getY() const
+{
+  return m_Y;
+}
+
+void EKLMGeometry::ElementPosition::setY(double y)
+{
+  m_Y = y;
+}
+
+double EKLMGeometry::ElementPosition::getZ() const
+{
+  return m_Z;
+}
+
+void EKLMGeometry::ElementPosition::setZ(double z)
+{
+  m_Z = z;
 }
 
 /* Class EKLMGeometry::SectorSupportGeometry. */
@@ -1119,7 +1181,7 @@ EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
         *geometry.getSegmentSupportPosition(i + 1, j + 1);
     }
   }
-  m_StripPosition = new struct ElementPosition[m_NStrips];
+  m_StripPosition = new ElementPosition[m_NStrips];
   for (i = 0; i < m_NStrips; i++)
     m_StripPosition[i] = *geometry.getStripPosition(i + 1);
   m_BoardPosition = new BoardPosition[m_NBoardsSector];
@@ -1195,7 +1257,7 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
   m_StripGeometry = *geometry.getStripGeometry();
   if (m_StripPosition != NULL)
     delete[] m_StripPosition;
-  m_StripPosition = new struct ElementPosition[m_NStrips];
+  m_StripPosition = new ElementPosition[m_NStrips];
   for (i = 0; i < m_NStrips; i++)
     m_StripPosition[i] = *geometry.getStripPosition(i + 1);
   m_ShieldGeometry = *geometry.getShieldGeometry();

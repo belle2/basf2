@@ -111,43 +111,102 @@ namespace Belle2 {
     };
 
     /**
-     * @struct ElementPosition
      * Position information for the elements of detector.
-     *
-     * @var ElementPosition::InnerR
-     * Inner radius.
-     *
-     * @var ElementPosition::OuterR
-     * Outer radius.
-     *
-     * @var ElementPosition::Length
-     * Length.
-     *
-     * @var ElementPosition::X
-     * X coordinate.
-     *
-     * @var ElementPosition::Y
-     * Y coordinate.
-     *
-     * @var ElementPosition::Z
-     * Z coordinate.
-     *
      */
-    struct ElementPosition : public TObject {
+    class ElementPosition : public TObject {
+
+    public:
 
       /**
        * Constructor.
        */
       ElementPosition();
 
-      double InnerR;
-      double OuterR;
-      double Length;
-      double X;
-      double Y;
-      double Z;
+      /**
+       * Get inner radius.
+       */
+      double getInnerR() const;
+
+      /**
+       * Set inner radius.
+       * @param[in] innerR Inner radius.
+       */
+      void setInnerR(double innerR);
+
+      /**
+       * Get outer radius.
+       */
+      double getOuterR() const;
+
+      /**
+       * Set outer radius.
+       * @param[in] outerR Outer radius.
+       */
+      void setOuterR(double outerR);
+
+      /**
+       * Get length.
+       */
+      double getLength() const;
+
+      /**
+       * Set length.
+       * @param[in] length Length.
+       */
+      void setLength(double length);
+
+      /**
+       * Get X coordinate.
+       */
+      double getX() const;
+
+      /**
+       * Set X coordinate.
+       * @param[in] x X coordinate.
+       */
+      void setX(double x);
+
+      /**
+       * Get Y coordinate.
+       */
+      double getY() const;
+
+      /**
+       * Set Y coordinate.
+       * @param[in] y Y coordinate.
+       */
+      void setY(double y);
+
+      /**
+       * Get Z coordinate.
+       */
+      double getZ() const;
+
+      /**
+       * Set Z coordinate.
+       * @param[in] z Z coordinate.
+       */
+      void setZ(double z);
 
     private:
+
+      /** Inner radius. */
+      double m_InnerR;
+
+      /** Outer radius. */
+      double m_OuterR;
+
+      /** Length. */
+      double m_Length;
+
+      /** X coordinate. */
+      double m_X;
+
+      /** Y coordinate. */
+      double m_Y;
+
+      /** Z coordinate. */
+      double m_Z;
 
       /** Makes objects storable. */
       ClassDef(ElementPosition, 1);
@@ -1550,12 +1609,12 @@ namespace Belle2 {
     /**
      * Get position data for endcaps.
      */
-    const struct ElementPosition* getEndcapPosition() const;
+    const ElementPosition* getEndcapPosition() const;
 
     /**
      * Get position data for layers.
      */
-    const struct ElementPosition* getLayerPosition() const;
+    const ElementPosition* getLayerPosition() const;
 
     /**
      * Get Z distance between two layers.
@@ -1565,12 +1624,12 @@ namespace Belle2 {
     /**
      * Get position data for sectors.
      */
-    const struct ElementPosition* getSectorPosition() const;
+    const ElementPosition* getSectorPosition() const;
 
     /**
      * Get position data for sector support structure.
      */
-    const struct ElementPosition* getSectorSupportPosition() const;
+    const ElementPosition* getSectorSupportPosition() const;
 
     /**
      * Get sector support geometry data.
@@ -1580,7 +1639,7 @@ namespace Belle2 {
     /**
      * Get position data for planes.
      */
-    const struct ElementPosition* getPlanePosition() const;
+    const ElementPosition* getPlanePosition() const;
 
     /**
      * Get plastic sheet geometry data.
@@ -1609,7 +1668,7 @@ namespace Belle2 {
      * Get position data for strips.
      * @param[in] strip Strip number.
      */
-    const struct ElementPosition* getStripPosition(int strip) const;
+    const ElementPosition* getStripPosition(int strip) const;
 
     /**
      * Get shield layer details geometry data.
@@ -1682,25 +1741,25 @@ namespace Belle2 {
     struct EndcapStructureGeometry m_EndcapStructureGeometry;
 
     /** Position data for endcaps. */
-    struct ElementPosition m_EndcapPosition;
+    ElementPosition m_EndcapPosition;
 
     /** Position data for layers. */
-    struct ElementPosition m_LayerPosition;
+    ElementPosition m_LayerPosition;
 
     /** Z distance between two layers. */
     double m_LayerShiftZ;
 
     /** Position data for sectors. */
-    struct ElementPosition m_SectorPosition;
+    ElementPosition m_SectorPosition;
 
     /** Position data for sector support structure. */
-    struct ElementPosition m_SectorSupportPosition;
+    ElementPosition m_SectorSupportPosition;
 
     /** Sector support geometry data. */
     SectorSupportGeometry m_SectorSupportGeometry;
 
     /** Position data for planes. */
-    struct ElementPosition m_PlanePosition;
+    ElementPosition m_PlanePosition;
 
     /** Plastic sheet geometry data. */
     PlasticSheetGeometry m_PlasticSheetGeometry;
@@ -1715,7 +1774,7 @@ namespace Belle2 {
     StripGeometry m_StripGeometry;
 
     /** Position data for strips. */
-    struct ElementPosition* m_StripPosition; //[m_NStrips]
+    ElementPosition* m_StripPosition; //[m_NStrips]
 
     /** Shield layer details geometry data. */
     ShieldGeometry m_ShieldGeometry;

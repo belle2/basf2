@@ -37,11 +37,11 @@ EKLM::GeometryData::Instance(enum DataSource dataSource)
  * @param epos Position data.
  * @param gd   XML data directory.
  */
-static void readPositionData(struct EKLMGeometry::ElementPosition* epos, GearDir* gd)
+static void readPositionData(EKLMGeometry::ElementPosition* epos, GearDir* gd)
 {
-  epos->X = gd->getLength("PositionX") * CLHEP::cm;
-  epos->Y = gd->getLength("PositionY") * CLHEP::cm;
-  epos->Z = gd->getLength("PositionZ") * CLHEP::cm;
+  epos->setX(gd->getLength("PositionX") * CLHEP::cm);
+  epos->setY(gd->getLength("PositionY") * CLHEP::cm);
+  epos->setZ(gd->getLength("PositionZ") * CLHEP::cm);
 }
 
 /**
@@ -49,11 +49,11 @@ static void readPositionData(struct EKLMGeometry::ElementPosition* epos, GearDir
  * @param epos Position data.
  * @param gd   XML data directory.
  */
-static void readSizeData(struct EKLMGeometry::ElementPosition* epos, GearDir* gd)
+static void readSizeData(EKLMGeometry::ElementPosition* epos, GearDir* gd)
 {
-  epos->InnerR = gd->getLength("InnerR") * CLHEP::cm;
-  epos->OuterR = gd->getLength("OuterR") * CLHEP::cm;
-  epos->Length = gd->getLength("Length") * CLHEP::cm;
+  epos->setInnerR(gd->getLength("InnerR") * CLHEP::cm);
+  epos->setOuterR(gd->getLength("OuterR") * CLHEP::cm);
+  epos->setLength(gd->getLength("Length") * CLHEP::cm);
 }
 
 /**
@@ -111,30 +111,31 @@ static void readShieldDetailGeometry(
 void EKLM::GeometryData::calculateSectorSupportGeometry()
 {
   HepGeom::Point3D<double> p;
-  Line2D line23Outer(0, m_SectorSupportPosition.Y, 1, 0);
-  Line2D line23Inner(0, m_SectorSupportPosition.Y +
+  Line2D line23Outer(0, m_SectorSupportPosition.getY(), 1, 0);
+  Line2D line23Inner(0, m_SectorSupportPosition.getY() +
                      m_SectorSupportGeometry.getThickness(), 1, 0);
-  Line2D line23Prism(0, m_SectorSupportPosition.Y +
+  Line2D line23Prism(0, m_SectorSupportPosition.getY() +
                      m_SectorSupportGeometry.getThickness() +
                      m_SectorSupportGeometry.getCorner3LY(), 1, 0);
-  Line2D line41Outer(m_SectorSupportPosition.X, 0, 0, 1);
-  Line2D line41Inner(m_SectorSupportPosition.X +
+  Line2D line41Outer(m_SectorSupportPosition.getX(), 0, 0, 1);
+  Line2D line41Inner(m_SectorSupportPosition.getX() +
                      m_SectorSupportGeometry.getThickness(), 0, 0, 1);
-  Line2D line41Prism(m_SectorSupportPosition.X +
+  Line2D line41Prism(m_SectorSupportPosition.getX() +
                      m_SectorSupportGeometry.getThickness() +
                      m_SectorSupportGeometry.getCorner4LX(), 0, 0, 1);
-  Line2D line41Corner1B(m_SectorSupportPosition.X +
+  Line2D line41Corner1B(m_SectorSupportPosition.getX() +
                         m_SectorSupportGeometry.getCornerX(), 0, 0, 1);
-  Circle2D circleInnerOuter(0, 0, m_SectorSupportPosition.InnerR);
-  Circle2D circleInnerInner(0, 0, m_SectorSupportPosition.InnerR +
+  Circle2D circleInnerOuter(0, 0, m_SectorSupportPosition.getInnerR());
+  Circle2D circleInnerInner(0, 0, m_SectorSupportPosition.getInnerR() +
                             m_SectorSupportGeometry.getThickness());
-  Circle2D circleOuterInner(0, 0, m_SectorSupportPosition.OuterR -
+  Circle2D circleOuterInner(0, 0, m_SectorSupportPosition.getOuterR() -
                             m_SectorSupportGeometry.getThickness());
-  Circle2D circleOuterOuter(0, 0, m_SectorSupportPosition.OuterR);
+  Circle2D circleOuterOuter(0, 0, m_SectorSupportPosition.getOuterR());
   HepGeom::Point3D<double> intersections[2];
   /* Corner 1. */
-  p.setX(m_SectorSupportPosition.X);
-  p.setY(m_SectorSupportPosition.OuterR - m_SectorSupportGeometry.getDeltaLY());
+  p.setX(m_SectorSupportPosition.getX());
+  p.setY(m_SectorSupportPosition.getOuterR() -
+         m_SectorSupportGeometry.getDeltaLY());
   p.setZ(0);
   m_SectorSupportGeometry.setCorner1A(p);
   line41Corner1B.findIntersection(circleOuterOuter, intersections);
@@ -144,7 +145,8 @@ void EKLM::GeometryData::calculateSectorSupportGeometry()
           m_SectorSupportGeometry.getCorner1A().y(),
           m_SectorSupportGeometry.getCorner1B().x() -
           m_SectorSupportGeometry.getCorner1A().x()) * CLHEP::rad);
-  p.setX(m_SectorSupportPosition.X + m_SectorSupportGeometry.getThickness());
+  p.setX(m_SectorSupportPosition.getX() +
+         m_SectorSupportGeometry.getThickness());
   p.setY(m_SectorSupportGeometry.getCorner1A().y() -
          m_SectorSupportGeometry.getThickness() *
          (1.0 / cos(m_SectorSupportGeometry.getCornerAngle()) -
@@ -169,7 +171,8 @@ void EKLM::GeometryData::calculateSectorSupportGeometry()
   m_SectorSupportGeometry.setCorner3Inner(intersections[1]);
   line23Prism.findIntersection(circleInnerInner, intersections);
   p.setX(intersections[1].x());
-  p.setY(m_SectorSupportPosition.Y + m_SectorSupportGeometry.getThickness());
+  p.setY(m_SectorSupportPosition.getY() +
+         m_SectorSupportGeometry.getThickness());
   p.setZ(0);
   m_SectorSupportGeometry.setCorner3Prism(p);
   /* Corner 4. */
@@ -178,7 +181,8 @@ void EKLM::GeometryData::calculateSectorSupportGeometry()
   line41Inner.findIntersection(circleInnerInner, intersections);
   m_SectorSupportGeometry.setCorner4Inner(intersections[1]);
   line41Prism.findIntersection(circleInnerInner, intersections);
-  p.setX(m_SectorSupportPosition.X + m_SectorSupportGeometry.getThickness());
+  p.setX(m_SectorSupportPosition.getX() +
+         m_SectorSupportGeometry.getThickness());
   p.setY(intersections[1].y());
   p.setZ(0);
   m_SectorSupportGeometry.setCorner4Prism(p);
@@ -200,8 +204,9 @@ void EKLM::GeometryData::fillStripIndexArrays()
   std::map<double, int> mapLengthStrip2;
   std::map<double, int>::iterator itm;
   for (i = 0; i < m_NStrips; i++) {
-    strips.push_back(m_StripPosition[i].Length);
-    mapLengthStrip.insert(std::pair<double, int>(m_StripPosition[i].Length, i));
+    strips.push_back(m_StripPosition[i].getLength());
+    mapLengthStrip.insert(
+      std::pair<double, int>(m_StripPosition[i].getLength(), i));
   }
   sort(strips.begin(), strips.end(), compareLength);
   l = strips[0];
@@ -237,7 +242,7 @@ void EKLM::GeometryData::fillStripIndexArrays()
   if (m_StripAllToLen == NULL)
     B2FATAL(c_MemErr);
   for (i = 0; i < m_NStrips; i++) {
-    itm = mapLengthStrip2.find(m_StripPosition[i].Length);
+    itm = mapLengthStrip2.find(m_StripPosition[i].getLength());
     if (itm == mapLengthStrip2.end())
       B2FATAL(err);
     m_StripAllToLen[i] = itm->second;
@@ -259,17 +264,17 @@ void EKLM::GeometryData::readXMLDataStrips()
     Strips.getLength("NoScintillationThickness") * CLHEP::cm);
   m_StripGeometry.setRSSSize(Strips.getLength("RSSSize") * CLHEP::cm);
   try {
-    m_StripPosition = new struct EKLMGeometry::ElementPosition[m_NStrips];
+    m_StripPosition = new EKLMGeometry::ElementPosition[m_NStrips];
   } catch (std::bad_alloc& ba) {
     B2FATAL(c_MemErr);
   }
   for (i = 0; i < m_NStrips; i++) {
     GearDir StripContent(Strips);
     StripContent.append((boost::format("/Strip[%1%]") % (i + 1)).str());
-    m_StripPosition[i].Length = StripContent.getLength("Length") * CLHEP::cm;
-    m_StripPosition[i].X = StripContent.getLength("PositionX") * CLHEP::cm;
-    m_StripPosition[i].Y = StripContent.getLength("PositionY") * CLHEP::cm;
-    m_StripPosition[i].Z = StripContent.getLength("PositionZ") * CLHEP::cm;
+    m_StripPosition[i].setLength(StripContent.getLength("Length") * CLHEP::cm);
+    m_StripPosition[i].setX(StripContent.getLength("PositionX") * CLHEP::cm);
+    m_StripPosition[i].setY(StripContent.getLength("PositionY") * CLHEP::cm);
+    m_StripPosition[i].setZ(StripContent.getLength("PositionZ") * CLHEP::cm);
   }
 }
 
@@ -379,7 +384,8 @@ void EKLM::GeometryData::calculateShieldGeometry()
   const ShieldDetailGeometry* detailB = m_ShieldGeometry.getDetailB();
   const ShieldDetailGeometry* detailC = m_ShieldGeometry.getDetailC();
   const ShieldDetailGeometry* detailD = m_ShieldGeometry.getDetailD();
-  r = m_SectorSupportPosition.InnerR + m_SectorSupportGeometry.getThickness();
+  r = m_SectorSupportPosition.getInnerR() +
+      m_SectorSupportGeometry.getThickness();
   /* Detail A. */
   EKLMPointToCLHEP(detailA->getPoint(0), points[0]);
   EKLMPointToCLHEP(detailA->getPoint(1), points[1]);
@@ -505,10 +511,10 @@ void EKLM::GeometryData::initializeFromGearbox()
   EndCap.append("/Endcap");
   readPositionData(&m_EndcapPosition, &EndCap);
   readSizeData(&m_EndcapPosition, &EndCap);
-  m_MinZForward = m_SolenoidZ + m_EndcapPosition.Z -
-                  0.5 * m_EndcapPosition.Length;
-  m_MaxZBackward = m_SolenoidZ - m_EndcapPosition.Z +
-                   0.5 * m_EndcapPosition.Length;
+  m_MinZForward = m_SolenoidZ + m_EndcapPosition.getZ() -
+                  0.5 * m_EndcapPosition.getLength();
+  m_MaxZBackward = m_SolenoidZ - m_EndcapPosition.getZ() +
+                   0.5 * m_EndcapPosition.getLength();
   m_NLayers = EndCap.getInt("NLayers");
   checkLayer(m_NLayers);
   m_NDetectorLayers = new int[m_NEndcaps];
@@ -689,7 +695,7 @@ void EKLM::GeometryData::saveToDatabase(const IntervalOfValidity& iov) const
 
 double EKLM::GeometryData::getStripLength(int strip) const
 {
-  return m_StripPosition[strip - 1].Length;
+  return m_StripPosition[strip - 1].getLength();
 }
 
 int EKLM::GeometryData::getStripLengthIndex(int positionIndex) const
@@ -721,20 +727,20 @@ void
 EKLM::GeometryData::getEndcapTransform(HepGeom::Transform3D* t, int n) const
 {
   if (n == 0)
-    *t = HepGeom::Translate3D(m_EndcapPosition.X, m_EndcapPosition.Y,
-                              -m_EndcapPosition.Z + m_SolenoidZ);
+    *t = HepGeom::Translate3D(m_EndcapPosition.getX(), m_EndcapPosition.getY(),
+                              -m_EndcapPosition.getZ() + m_SolenoidZ);
   else
-    *t = HepGeom::Translate3D(m_EndcapPosition.X, m_EndcapPosition.Y,
-                              m_EndcapPosition.Z + m_SolenoidZ) *
+    *t = HepGeom::Translate3D(m_EndcapPosition.getX(), m_EndcapPosition.getY(),
+                              m_EndcapPosition.getZ() + m_SolenoidZ) *
          HepGeom::RotateY3D(180.*CLHEP::deg);
 }
 
 void
 EKLM::GeometryData::getLayerTransform(HepGeom::Transform3D* t, int n) const
 {
-  *t = HepGeom::Translate3D(0.0, 0.0, m_EndcapPosition.Length / 2.0 -
+  *t = HepGeom::Translate3D(0.0, 0.0, m_EndcapPosition.getLength() / 2.0 -
                             (n + 1) * m_LayerShiftZ +
-                            0.5 * m_LayerPosition.Length);
+                            0.5 * m_LayerPosition.getLength());
 }
 
 void
@@ -761,30 +767,31 @@ void
 EKLM::GeometryData::getPlaneTransform(HepGeom::Transform3D* t, int n) const
 {
   if (n == 0)
-    *t = HepGeom::Translate3D(m_PlanePosition.X, m_PlanePosition.Y,
-                              m_PlanePosition.Z) *
+    *t = HepGeom::Translate3D(m_PlanePosition.getX(), m_PlanePosition.getY(),
+                              m_PlanePosition.getZ()) *
          HepGeom::Rotate3D(180. * CLHEP::deg,
                            HepGeom::Vector3D<double>(1., 1., 0.));
   else
-    *t = HepGeom::Translate3D(m_PlanePosition.X, m_PlanePosition.Y,
-                              -m_PlanePosition.Z);
+    *t = HepGeom::Translate3D(m_PlanePosition.getX(), m_PlanePosition.getY(),
+                              -m_PlanePosition.getZ());
 }
 
 void
 EKLM::GeometryData::getStripTransform(HepGeom::Transform3D* t, int n) const
 {
-  *t = HepGeom::Translate3D(m_StripPosition[n].X, m_StripPosition[n].Y, 0.0);
+  *t = HepGeom::Translate3D(m_StripPosition[n].getX(),
+                            m_StripPosition[n].getY(), 0.0);
 }
 
 void
 EKLM::GeometryData::getSheetTransform(HepGeom::Transform3D* t, int n) const
 {
   double y;
-  y = m_StripPosition[n].Y;
+  y = m_StripPosition[n].getY();
   if (n % 15 == 0)
     y = y + 0.5 * m_PlasticSheetGeometry.getDeltaL();
   else if (n % 15 == 14)
     y = y - 0.5 * m_PlasticSheetGeometry.getDeltaL();
-  *t = HepGeom::Translate3D(m_StripPosition[n].X, y, 0.0);
+  *t = HepGeom::Translate3D(m_StripPosition[n].getX(), y, 0.0);
 }
 

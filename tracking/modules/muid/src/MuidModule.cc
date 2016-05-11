@@ -211,7 +211,7 @@ void MuidModule::initialize()
   m_MinRadiusSq = bklmGeometry->getSolenoidOuterRadius() * CLHEP::cm * 0.2; // roughly 400 mm
   m_MinRadiusSq *= m_MinRadiusSq;
   m_BarrelHalfLength = bklmGeometry->getHalfLength() * CLHEP::cm; // in G4 units (mm)
-  m_EndcapHalfLength = 0.5 * eklmGeometry.getEndcapPosition()->Length; // in G4 units (mm)
+  m_EndcapHalfLength = 0.5 * eklmGeometry.getEndcapPosition()->getLength(); // in G4 units (mm)
   m_OffsetZ = bklmGeometry->getOffsetZ() * CLHEP::cm; // in G4 units (mm)
   double minZ = m_OffsetZ - (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
   double maxZ = m_OffsetZ + (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
@@ -224,9 +224,9 @@ void MuidModule::initialize()
   m_OffsetZ /= CLHEP::cm;                            // now in G4e units (cm)
   m_BarrelMinR = bklmGeometry->getGap1InnerRadius(); // in G4e units (cm)
   m_BarrelMaxR /= CLHEP::cm;                         // now in G4e units (cm)
-  m_EndcapMinR = eklmGeometry.getEndcapPosition()->InnerR / CLHEP::cm;  // in G4e units (cm)
-  m_EndcapMaxR = eklmGeometry.getEndcapPosition()->OuterR / CLHEP::cm;  // in G4e units (cm)
-  m_EndcapMiddleZ = m_BarrelHalfLength + m_EndcapHalfLength;            // in G4e units (cm)
+  m_EndcapMinR = eklmGeometry.getEndcapPosition()->getInnerR() / CLHEP::cm; // in G4e units (cm)
+  m_EndcapMaxR = eklmGeometry.getEndcapPosition()->getOuterR() / CLHEP::cm; // in G4e units (cm)
+  m_EndcapMiddleZ = m_BarrelHalfLength + m_EndcapHalfLength;                // in G4e units (cm)
 
   // Measurement uncertainties and acceptance windows
   double width = eklmGeometry.getStripGeometry()->getWidth() / CLHEP::cm; // in G4e units (cm)
@@ -249,9 +249,10 @@ void MuidModule::initialize()
     m_BarrelModuleMiddleRadius[layer - 1] = bklmGeometry->getActiveMiddleRadius(layer); // in G4e units (cm)
   }
   double dz(eklmGeometry.getLayerShiftZ() / CLHEP::cm); // in G4e units (cm)
-  double z0((eklmGeometry.getEndcapPosition()->Z + eklmGeometry.getLayerShiftZ()
-             - 0.5 * eklmGeometry.getEndcapPosition()->Length
-             - 0.5 * eklmGeometry.getLayerPosition()->Length
+  double z0((eklmGeometry.getEndcapPosition()->getZ()
+             + eklmGeometry.getLayerShiftZ()
+             - 0.5 * eklmGeometry.getEndcapPosition()->getLength()
+             - 0.5 * eklmGeometry.getLayerPosition()->getLength()
              - 0.5 * eklmGeometry.getStripGeometry()->getThickness()
              - 0.5 * eklmGeometry.getPlasticSheetGeometry()->getWidth()) / CLHEP::cm); // in G4e units (cm)
 

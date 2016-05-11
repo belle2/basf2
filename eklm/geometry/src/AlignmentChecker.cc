@@ -34,7 +34,8 @@ EKLM::AlignmentChecker::AlignmentChecker()
   m_LineCorner1 = new LineSegment2D(sectorSupportGeometry->getCorner1AInner(),
                                     sectorSupportGeometry->getCorner1BInner());
   m_ArcOuter = new Arc2D(
-    0, 0, sectorSupportPosition->OuterR - sectorSupportGeometry->getThickness(),
+    0, 0, sectorSupportPosition->getOuterR() -
+    sectorSupportGeometry->getThickness(),
     atan2(sectorSupportGeometry->getCorner2Inner().y(),
           sectorSupportGeometry->getCorner2Inner().x()),
     atan2(sectorSupportGeometry->getCorner1BInner().y(),
@@ -42,7 +43,8 @@ EKLM::AlignmentChecker::AlignmentChecker()
   m_Line23 = new LineSegment2D(sectorSupportGeometry->getCorner2Inner(),
                                sectorSupportGeometry->getCorner3Inner());
   m_ArcInner = new Arc2D(
-    0, 0, sectorSupportPosition->InnerR + sectorSupportGeometry->getThickness(),
+    0, 0, sectorSupportPosition->getInnerR() +
+    sectorSupportGeometry->getThickness(),
     atan2(sectorSupportGeometry->getCorner3Inner().y(),
           sectorSupportGeometry->getCorner3Inner().x()),
     atan2(sectorSupportGeometry->getCorner4Inner().y(),
@@ -114,14 +116,14 @@ checkSegmentAlignment(int iPlane, int iSegment,
   double lx, ly;
   HepGeom::Point3D<double> stripRectangle[4];
   HepGeom::Transform3D t;
-  const struct EKLMGeometry::ElementPosition* stripPosition;
+  const EKLMGeometry::ElementPosition* stripPosition;
   const EKLMGeometry::StripGeometry* stripGeometry =
     m_GeoDat->getStripGeometry();
   ly = 0.5 * stripGeometry->getWidth();
   for (i = 1; i <= m_GeoDat->getNStripsSegment(); i++) {
     iStrip = m_GeoDat->getNStripsSegment() * (iSegment - 1) + i;
     stripPosition = m_GeoDat->getStripPosition(iStrip);
-    lx = 0.5 * stripPosition->Length;
+    lx = 0.5 * stripPosition->getLength();
     stripRectangle[0].setX(lx);
     stripRectangle[0].setY(ly);
     stripRectangle[0].setZ(0);
@@ -136,7 +138,7 @@ checkSegmentAlignment(int iPlane, int iSegment,
     stripRectangle[3].setZ(0);
     t = HepGeom::Translate3D(alignment->getDx() * CLHEP::cm / Unit::cm,
                              alignment->getDy() * CLHEP::cm / Unit::cm, 0) *
-        HepGeom::Translate3D(stripPosition->X, stripPosition->Y, 0) *
+        HepGeom::Translate3D(stripPosition->getX(), stripPosition->getY(), 0) *
         HepGeom::RotateZ3D(alignment->getDalpha() * CLHEP::rad / Unit::rad);
     if (iPlane == 1)
       t = HepGeom::Rotate3D(180. * CLHEP::deg,

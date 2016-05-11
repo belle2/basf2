@@ -196,6 +196,12 @@ void CDCDigitizerModule::event()
     m_wireID = m_aCDCSimHit->getWireID();
     B2DEBUG(250, "Encoded wire number of current CDCSimHit: " << m_wireID);
 
+    // Reject bad wire
+    if (m_cdcgp->isBadWire(m_wireID)) {
+      //      std::cout<<"badwire= " << m_wireID.getICLayer() <<" "<< m_wireID.getIWire() << std::endl;
+      continue;
+    }
+
     // Special treatment for cosmic runs in April 2015
     if (m_2015AprRun) {
       if (m_wireID.getISuperLayer() != 4) continue;

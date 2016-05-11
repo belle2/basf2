@@ -10,6 +10,7 @@
 
 // Own include
 #include <testbeam/top/modules/TOPLeps2013Input/TOPLeps2013InputModule.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 #include <framework/core/ModuleManager.h>
 
@@ -70,7 +71,6 @@ namespace Belle2 {
     m_treeLeps = NULL;
     m_top.clear();
     m_ntof = 0;
-    m_topgp = NULL;
 
     m_numPMTchannels = 0;
     m_numChannels = 0;
@@ -188,20 +188,15 @@ namespace Belle2 {
   void TOPLeps2013InputModule::event()
   {
     // initialize
-    if (!m_topgp) {
-      m_topgp = TOP::TOPGeometryPar::Instance();
-      if (m_topgp->getNbars() == 0) B2FATAL("Geometry not loaded");
+    const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
+    m_numPMTchannels = geo->getPMTArray().getPMT().getNumPixels();
+    m_numChannels = geo->getPMTArray().getNumPixels();
+    if (m_numChannels > 512) B2FATAL("Number of channels > 512");
+    m_tdcWidth = geo->getNominalTDC().getBinWidth() * Unit::ns / Unit::ps;
+    m_tdcOverflow = geo->getNominalTDC().getOverflowValue();
+    m_timeMax = (float) m_tdcOverflow * m_tdcWidth;
 
-      m_topgp->setBasfUnits();
-      m_numPMTchannels = m_topgp->getNpadx() * m_topgp->getNpady();
-      m_numChannels = m_topgp->getNpmtx() * m_topgp->getNpmty() * m_numPMTchannels;
-      if (m_numChannels > 512) B2FATAL("Number of channels > 512");
-      m_tdcWidth = m_topgp->getTDCbitwidth();
-      m_tdcOverflow = 1 << m_topgp->getTDCbits();
-      m_timeMax = (float) m_tdcOverflow * m_tdcWidth;
-    }
     m_top.clear();
-    m_topgp->setBasfUnits();
 
     // create data store objects
     StoreObjPtr<EventMetaData> evtMetaData;
@@ -242,7 +237,7 @@ namespace Belle2 {
       int ich = (m_top.pmtid_mcp[i] - 1) * m_numPMTchannels + m_top.ch_mcp[i];
       int TDC = t / m_tdcWidth;
       if (TDC < m_tdcOverflow)
-        digits.appendNew(1, m_topgp->getNewNumbering(ich), TDC);
+        digits.appendNew(1, getNewNumbering(ich), TDC);
     }
 
     // write track info to data store
@@ -273,7 +268,7 @@ namespace Belle2 {
     // extrapolate track to bar (to the plane at x = inner radius)
     TVector3 direction = momentum.Unit();
     int barID = 1;
-    double x = m_topgp->getRadius();
+    double x = geo->getInnerRadius();
     double path = (x - position.X()) / direction.X();
     double y = position.Y() + path * direction.Y();
     double z = position.Z() + path * direction.Z();
@@ -309,8 +304,31 @@ namespace Belle2 {
   {
   }
 
-  void TOPLeps2013InputModule::printModuleParams() const
+  int TOPLeps2013InputModule::getNewNumbering(int pixelID) const
   {
+    if (pixelID == 0) return 0;
+
+    const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
+    int Npmtx = geo->getPMTArray().getNumColumns();
+    int Npadx = geo->getPMTArray().getPMT().getNumColumns();
+    int Npady = geo->getPMTArray().getPMT().getNumRows();
+
+    pixelID--;
+    int ix = pixelID % Npadx;
+    pixelID /= Npadx;
+    int iy = pixelID % Npady;
+    pixelID /= Npady;
+    int ipmtx = pixelID % Npmtx;
+    int ipmty = pixelID / Npmtx;
+
+    ix = Npadx - 1 - ix;
+    ipmtx = Npmtx - 1 - ipmtx;
+
+    int i = ix + ipmtx * Npadx;
+    int j = iy + ipmty * Npady;
+    int nx = Npmtx * Npadx;
+    return i + j * nx + 1;
+
   }
 
 

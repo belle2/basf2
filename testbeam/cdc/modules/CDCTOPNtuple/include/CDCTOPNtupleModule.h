@@ -13,7 +13,6 @@
 #include <framework/core/Module.h>
 #include <string>
 #include <top/modules/TOPNtuple/NtupleStructure.h>
-#include <top/geometry/TOPGeometryPar.h>
 #include "TFile.h"
 
 namespace Belle2 {
@@ -83,8 +82,6 @@ namespace Belle2 {
     float m_sigma = 0;   /**< PDF sigma (signal) or 0 (background) */
     float m_phiCer = 0;  /**< azimuthal Cerenkov angle */
     float m_wt = 0;      /**< weight */
-
-    TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance();  /**< geometry */
 
   };
 

@@ -10,6 +10,7 @@
 
 // Own include
 #include <testbeam/top/modules/TOPCern2010Output/TOPCern2010OutputModule.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 #include <framework/core/ModuleManager.h>
 
@@ -42,8 +43,7 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPCern2010OutputModule::TOPCern2010OutputModule() : Module(),
-    m_topgp(TOP::TOPGeometryPar::Instance())
+  TOPCern2010OutputModule::TOPCern2010OutputModule() : Module()
   {
     // set module description
     setDescription("Output of CERN2010 test beam simulation to root ntuple (v20110331)");
@@ -82,11 +82,6 @@ namespace Belle2 {
 
   void TOPCern2010OutputModule::initialize()
   {
-
-    if (m_topgp->getNbars() == 0) {
-      B2FATAL("geometry of TOP not defined");
-      return;
-    }
 
     m_file = new TFile(m_outputFileName.c_str(), "RECREATE");
     m_tana = new TTree("ana", "ana");
@@ -135,7 +130,7 @@ namespace Belle2 {
     int ndigi = topDigits.getEntries();
     for (int i = 0; i < ndigi; i++) {
       TOPDigit* digi = topDigits[i];
-      int ich = c_NumChannels - m_topgp->getOldNumbering(digi->getPixelID());
+      int ich = c_NumChannels - getOldNumbering(digi->getPixelID());
       if (digi->getTDC() < m_tdc[ich]) m_tdc[ich] = digi->getTDC(); // single hit TDC
     }
     m_nhit = 0;
@@ -158,8 +153,29 @@ namespace Belle2 {
     m_file->Close();
   }
 
-  void TOPCern2010OutputModule::printModuleParams() const
+  int TOPCern2010OutputModule::getOldNumbering(int pixelID) const
   {
+    if (pixelID == 0) return 0;
+
+    const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
+    int Npmtx = geo->getPMTArray().getNumColumns();
+    int Npadx = geo->getPMTArray().getPMT().getNumColumns();
+    int Npady = geo->getPMTArray().getPMT().getNumRows();
+
+    pixelID--;
+    int nx = Npmtx * Npadx;
+    int i = pixelID % nx;
+    int j = pixelID / nx;
+    int ix = i % Npadx;
+    int ipmtx = i / Npadx;
+    int iy = j % Npady;
+    int ipmty = j / Npady;
+
+    ix = Npadx - 1 - ix;
+    ipmtx = Npmtx - 1 - ipmtx;
+
+    return ix + Npadx * (iy + Npady * (ipmtx + Npmtx * ipmty)) + 1;
+
   }
 
 

@@ -8,12 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPLEPS2013INPUTMODULE_H
-#define TOPLEPS2013INPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
-#include <top/geometry/TOPGeometryPar.h>
 #include <testbeam/top/modules/TOPLeps2013Output/TopTree.h>
 #include "TFile.h"
 
@@ -65,12 +63,14 @@ namespace Belle2 {
      */
     virtual void terminate();
 
-    /**
-     * Prints module parameters.
-     */
-    void printModuleParams() const;
-
   private:
+
+    /**
+     * Convert old numbering scheme for pixels to the new one
+     * @param pixelID pixel ID in the old numbering scheme
+     * @return pixel ID in the new numbering scheme
+     */
+    int getNewNumbering(int pixelID) const;
 
     std::string m_inputFileName;  /**< input file name */
     int m_ntofMin; /**< minimal number of TOF hits to select event */
@@ -90,8 +90,6 @@ namespace Belle2 {
     TOP::TopTree m_top; /**< top tree structure */
     int m_ntof;         /**< number of LEPS TOF detector hits */
 
-    TOP::TOPGeometryPar* m_topgp; /**< geometry parameters */
-
     int m_numPMTchannels; /**< number of PMT channels */
     int m_numChannels;    /**< number of all channels */
     float m_tdcWidth;     /**< TDC bin width in ps */
@@ -104,4 +102,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

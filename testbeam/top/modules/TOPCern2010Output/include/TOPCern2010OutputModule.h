@@ -8,11 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPCERN2010OUTPUTMODULE_H
-#define TOPCERN2010OUTPUTMODULE_H
-
 #include <framework/core/Module.h>
-#include <top/geometry/TOPGeometryPar.h>
 #include <string>
 #include <TFile.h>
 #include <TTree.h>
@@ -67,12 +63,15 @@ namespace Belle2 {
      */
     virtual void terminate();
 
-    /**
-     * Prints module parameters.
-     */
-    void printModuleParams() const;
-
   private:
+
+    /**
+     * Convert new numbering scheme for pixels to the old one
+     * @param pixelID pixel ID in the new numbering scheme
+     * @return pixel ID in the old numbering scheme
+     */
+    int getOldNumbering(int pixelID) const;
+
     std::string m_outputFileName; /**< output file name */
 
     TFile* m_file; /**< TFile */
@@ -99,10 +98,7 @@ namespace Belle2 {
     double m_x;                   /**< track position x*/
     double m_y;                   /**< track position y*/
 
-    TOP::TOPGeometryPar* m_topgp;  /**< geometry parameters */
-
   };
 
 } // Belle2 namespace
 
-#endif

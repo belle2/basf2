@@ -8,11 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPBETASCANMODULE_H
-#define TOPBETASCANMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
-#include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction/TOPreco.h>
 #include <top/reconstruction/TOPtrack.h>
 #include <framework/gearbox/Const.h>
@@ -133,10 +131,7 @@ namespace Belle2 {
     TH1F* m_betaHistogram;   /**< 1D histogram for the results */
     std::vector<TH1F*> m_scanHistograms; /**< scan histograms for control */
 
-    TOP::TOPGeometryPar* m_topgp;   /**< geometry parameters */
-
   };
 
 } // Belle2 namespace
 
-#endif

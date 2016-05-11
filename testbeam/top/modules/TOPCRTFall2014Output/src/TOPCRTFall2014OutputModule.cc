@@ -10,6 +10,7 @@
 
 // Own include
 #include <testbeam/top/modules/TOPCRTFall2014Output/TOPCRTFall2014OutputModule.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 #include <framework/core/ModuleManager.h>
 
@@ -49,8 +50,7 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPCRTFall2014OutputModule::TOPCRTFall2014OutputModule() : Module(),
-    m_topgp(TOP::TOPGeometryPar::Instance())
+  TOPCRTFall2014OutputModule::TOPCRTFall2014OutputModule() : Module()
   {
     // set module description
     setDescription("Output of Cosmic ray test Autumn/Fall 2014 simulation to a specific root TTree format");
@@ -81,11 +81,6 @@ namespace Belle2 {
 
   void TOPCRTFall2014OutputModule::initialize()
   {
-    if (m_topgp->getNbars() == 0) {
-      B2FATAL("geometry of TOP not defined");
-      return;
-    }
-
     m_file = new TFile(m_outputFileName.c_str(), "RECREATE");
     m_treeTop = new TTree("top", "top data tree (simulation)");
 
@@ -127,12 +122,12 @@ namespace Belle2 {
     m_treeTop->Branch("TOF4tdc", &(m_top.TOF4tdc), "TOF4tdc[4]/I");
     m_treeTop->Branch("TOF4adc", &(m_top.TOF4adc), "TOF4adc[4]/I");
 
-    m_topgp->setBasfUnits();
-    m_numPMTchannels = m_topgp->getNpadx() * m_topgp->getNpady();
-    m_numChannels = m_topgp->getNpmtx() * m_topgp->getNpmty() * m_numPMTchannels;
+    const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
+    m_numPMTchannels = geo->getPMTArray().getPMT().getNumPixels();
+    m_numChannels = geo->getPMTArray().getNumPixels();
     if (m_numChannels > 512) B2FATAL("Number of channels > 512");
-    m_tdcWidth = m_topgp->getTDCbitwidth() * Unit::ns / Unit::ps;
-    m_tdcOverflow = 1 << m_topgp->getTDCbits();
+    m_tdcWidth = geo->getNominalTDC().getBinWidth() * Unit::ns / Unit::ps;
+    m_tdcOverflow = geo->getNominalTDC().getOverflowValue();
   }
 
   void TOPCRTFall2014OutputModule::beginRun()
@@ -143,7 +138,6 @@ namespace Belle2 {
   {
 
     m_top.clear();
-    m_topgp->setBasfUnits();
 
     StoreObjPtr<EventMetaData> evtMetaData;
     m_top.runNum = evtMetaData->getRun();
@@ -161,7 +155,7 @@ namespace Belle2 {
     for (int i = 0; i < nEntries; ++i) {
       TOPDigit* digi = topDigits[i];
 
-      int ich = m_topgp->getOldNumbering(digi->getPixelID()) - 1;
+      int ich = getOldNumbering(digi->getPixelID()) - 1;
 
       float tdc(digi->getTDC());
       if (m_randomize) {tdc += gRandom->Rndm();}
@@ -208,8 +202,29 @@ namespace Belle2 {
     m_file->Close();
   }
 
-  void TOPCRTFall2014OutputModule::printModuleParams() const
+  int TOPCRTFall2014OutputModule::getOldNumbering(int pixelID) const
   {
+    if (pixelID == 0) return 0;
+
+    const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
+    int Npmtx = geo->getPMTArray().getNumColumns();
+    int Npadx = geo->getPMTArray().getPMT().getNumColumns();
+    int Npady = geo->getPMTArray().getPMT().getNumRows();
+
+    pixelID--;
+    int nx = Npmtx * Npadx;
+    int i = pixelID % nx;
+    int j = pixelID / nx;
+    int ix = i % Npadx;
+    int ipmtx = i / Npadx;
+    int iy = j % Npady;
+    int ipmty = j / Npady;
+
+    ix = Npadx - 1 - ix;
+    ipmtx = Npmtx - 1 - ipmtx;
+
+    return ix + Npadx * (iy + Npady * (ipmtx + Npmtx * ipmty)) + 1;
+
   }
 
 

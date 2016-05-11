@@ -13,6 +13,7 @@
 #include <top/reconstruction/TOPreco.h>
 #include <top/reconstruction/TOPtrack.h>
 #include <top/reconstruction/TOPconfigure.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 #include <framework/core/ModuleManager.h>
 
@@ -52,9 +53,7 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPbetaScanModule::TOPbetaScanModule() : Module(),
-    m_topgp(TOP::TOPGeometryPar::Instance())
-
+  TOPbetaScanModule::TOPbetaScanModule() : Module()
   {
     // set module description (e.g. insert text)
     setDescription("Reconstructs particle beta using extended maximum likelihood");
@@ -73,7 +72,7 @@ namespace Belle2 {
              "Minimal number of background photons per bar", 0.0);
     addParam("scaleN0", m_scaleN0, "Scale factor for N0", 1.0);
     addParam("electronicJitter", m_electronicJitter,
-             "r.m.s of electronic jitter [ns]", 50e-3);
+             "r.m.s of electronic jitter [ns] - not used!", 50e-3);
     addParam("maxTime", m_maxTime,
              "time limit for photons [ns] (0 = use default one)", 0.0);
     addParam("everyNth", m_everyNth, "randomly choose every Nth event", 0);
@@ -95,8 +94,6 @@ namespace Belle2 {
     m_file = new TFile(m_outputFileName.c_str(), "RECREATE");
     m_betaHistogram = new TH1F("Hbeta", "reconstructed particle beta",
                                m_numBins, m_betaMin, m_betaMax);
-
-    m_topgp->setELjitter(m_electronicJitter);
 
     TOP::TOPconfigure config;
     config.print();
@@ -173,7 +170,8 @@ namespace Belle2 {
                                     Const::ChargedStable chargedStable)
   {
     Const::EDetector myDetID = Const::EDetector::TOP; // TOP
-    int NumBars = m_topgp->getNbars();
+    const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
+    int NumBars = geo->getNumModules();
     int pdgCode = abs(chargedStable.getPDGCode());
     double mass = chargedStable.getMass();
 

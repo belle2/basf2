@@ -8,12 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPLEPS2013OUTPUTMODULE_H
-#define TOPLEPS2013OUTPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
-#include <top/geometry/TOPGeometryPar.h>
 #include <testbeam/top/modules/TOPLeps2013Output/TopTree.h>
 #include "TFile.h"
 
@@ -66,12 +64,14 @@ namespace Belle2 {
      */
     virtual void terminate();
 
-    /**
-     * Prints module parameters.
-     */
-    void printModuleParams() const;
-
   private:
+
+    /**
+     * Convert new numbering scheme for pixels to the old one
+     * @param pixelID pixel ID in the new numbering scheme
+     * @return pixel ID in the old numbering scheme
+     */
+    int getOldNumbering(int pixelID) const;
 
     std::string m_outputFileName; /**< output file name */
     bool m_randomize;             /**< randomize within TDC bin */
@@ -82,8 +82,6 @@ namespace Belle2 {
     TTree* m_treeTop;   /**< TTree top */
     TOP::TopTree m_top; /**< top tree structure */
 
-    TOP::TOPGeometryPar* m_topgp; /**< geometry parameters */
-
     int m_numPMTchannels; /**< number of PMT channels */
     int m_numChannels;    /**< number of all channels */
     float m_tdcWidth;     /**< TDC bin width [ps] */
@@ -93,4 +91,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

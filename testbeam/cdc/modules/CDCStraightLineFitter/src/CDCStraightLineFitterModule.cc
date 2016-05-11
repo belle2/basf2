@@ -198,44 +198,41 @@ namespace Belle2 {
 
       // extrapolate to TOP
 
-      auto* topgp = TOP::TOPGeometryPar::Instance();
-      if (topgp->isInitialized()) {
-        topgp->setBasfUnits();
-        CDCTB::StraightLine trackGlobal(posFit, momFit);
-        trackGlobal.crossPlaneAlpha(m_alpha);
-        trackGlobal.setReferencePoint();
-        const TVector3 startPoint = trackGlobal.getPosition();
-        double mass = Const::pion.getMass();
-        double p = momFit.Mag();
-        double beta = p / sqrt(p * p + mass * mass);
-        for (int barID = 1; barID <= topgp->getNbars(); barID++) {
-          const auto* bar = topgp->getQbar(barID);
-          auto posLocal = bar->pointToLocal(startPoint);
-          auto momLocal = bar->momentumToLocal(momFit);
-          CDCTB::StraightLine trackLocal(posLocal, momLocal);
-          vector<double> paths;
-          double yPlane = -bar->getThickness() / 2;
-          for (int k = 0; k < 2; k++) {
-            if (!trackLocal.crossPlaneY(yPlane)) break;
-            auto position = trackLocal.getPosition();
-            if (fabs(position.X()) > bar->getWidth() / 2) break;
-            if (fabs(position.Z()) > bar->getLength() / 2) break;
-            paths.push_back(trackLocal.getPath());
-            yPlane += bar->getThickness();
-          }
-          if (paths.size() != 2) continue;
-          std::sort(paths.begin(), paths.end());
-          ExtHitStatus status = EXT_ENTER;
-          for (const auto& path : paths) {
-            trackGlobal.setPath(path);
-            auto position = trackGlobal.getPosition();
-            if (!onTheSameSide(position, posFit)) break;
-            double tof = path / (beta * Const::speedOfLight);
-            auto* extHit = extHits.appendNew(Const::pion.getPDGCode(), Const::TOP, barID,
-                                             status, tof, position, momFit, cov);
-            track->addRelationTo(extHit);
-            status = EXT_EXIT;
-          }
+      CDCTB::StraightLine trackGlobal(posFit, momFit);
+      trackGlobal.crossPlaneAlpha(m_alpha);
+      trackGlobal.setReferencePoint();
+      const TVector3 startPoint = trackGlobal.getPosition();
+      double mass = Const::pion.getMass();
+      double p = momFit.Mag();
+      double beta = p / sqrt(p * p + mass * mass);
+      const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
+      for (unsigned moduleID = 1; moduleID <= geo->getNumModules(); moduleID++) {
+        const auto& module = geo->getModule(moduleID);
+        auto posLocal = module.pointToLocal(startPoint);
+        auto momLocal = module.momentumToLocal(momFit);
+        CDCTB::StraightLine trackLocal(posLocal, momLocal);
+        vector<double> paths;
+        double yPlane = -module.getBarThickness() / 2;
+        for (int k = 0; k < 2; k++) {
+          if (!trackLocal.crossPlaneY(yPlane)) break;
+          auto position = trackLocal.getPosition();
+          if (fabs(position.X()) > module.getBarWidth() / 2) break;
+          if (fabs(position.Z()) > module.getBarLength() / 2) break;
+          paths.push_back(trackLocal.getPath());
+          yPlane += module.getBarThickness();
+        }
+        if (paths.size() != 2) continue;
+        std::sort(paths.begin(), paths.end());
+        ExtHitStatus status = EXT_ENTER;
+        for (const auto& path : paths) {
+          trackGlobal.setPath(path);
+          auto position = trackGlobal.getPosition();
+          if (!onTheSameSide(position, posFit)) break;
+          double tof = path / (beta * Const::speedOfLight);
+          auto* extHit = extHits.appendNew(Const::pion.getPDGCode(), Const::TOP, moduleID,
+                                           status, tof, position, momFit, cov);
+          track->addRelationTo(extHit);
+          status = EXT_EXIT;
         }
       }
 

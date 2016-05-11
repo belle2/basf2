@@ -42,7 +42,7 @@ polyline = p
 
 
 # suppress messages and warnings during processing:
-set_log_level(LogLevel.ERROR)
+set_log_level(LogLevel.WARNING)
 
 # Create path
 main = create_path()
@@ -69,6 +69,7 @@ gearbox.param('override', [("/DetectorComponent[@name='TOP']//Nbar", '1', ''),
                            ("/DetectorComponent[@name='TOP']//QZBackward", '0.0', 'cm'),
                            ("/DetectorComponent[@name='TOP']//Bars/Radius", '-1.0', 'cm'),
                            ("/DetectorComponent[@name='TOP']//numWindows", '16', ''),
+                           ("/DetectorComponent[@name='TOP']//BrokenJointFraction", '0.0', ''),
                            ])
 main.add_module(gearbox)
 

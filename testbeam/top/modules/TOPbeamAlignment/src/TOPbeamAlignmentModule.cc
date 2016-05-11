@@ -13,6 +13,7 @@
 #include <top/reconstruction/TOPreco.h>
 #include <top/reconstruction/TOPtrack.h>
 #include <top/reconstruction/TOPconfigure.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 #include <framework/core/ModuleManager.h>
 
@@ -48,9 +49,7 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPbeamAlignmentModule::TOPbeamAlignmentModule() : Module(),
-    m_topgp(TOP::TOPGeometryPar::Instance())
-
+  TOPbeamAlignmentModule::TOPbeamAlignmentModule() : Module()
   {
     // set module description (e.g. insert text)
     setDescription("Performs alignment of the beam using maximum likelihood scan");
@@ -80,7 +79,7 @@ namespace Belle2 {
     addParam("minBkgPerBar", m_minBkgPerBar,
              "Minimal number of background photons per bar", 0.0);
     addParam("electronicJitter", m_electronicJitter,
-             "r.m.s of electronic jitter [ns]", 50e-3);
+             "r.m.s of electronic jitter [ns] - not used!", 50e-3);
 
     m_mass = 0;
     m_x0 = 0;  // by definition!
@@ -109,10 +108,6 @@ namespace Belle2 {
 
   void TOPbeamAlignmentModule::initialize()
   {
-    if (m_topgp->getNbars() == 0) {
-      B2FATAL("geometry of TOP not defined");
-      return;
-    }
 
     // particle mass
     m_mass = 0;
@@ -137,11 +132,11 @@ namespace Belle2 {
 
     m_t0 = 0;
 
-    m_topgp->setBasfUnits();
-    m_numPMTrows = m_topgp->getNpmty();
-    m_numPMTcols = m_topgp->getNpmtx();
-    m_numPADrows = m_topgp->getNpady();
-    m_numPADcols = m_topgp->getNpadx();
+    const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
+    m_numPMTrows = geo->getPMTArray().getNumRows();
+    m_numPMTcols = geo->getPMTArray().getNumColumns();
+    m_numPADrows = geo->getPMTArray().getPMT().getNumRows();
+    m_numPADcols = geo->getPMTArray().getPMT().getNumColumns();
     m_numChannels = m_numPMTrows * m_numPMTcols * m_numPADrows * m_numPADcols;
     m_numEvents = 0;
 
@@ -156,8 +151,6 @@ namespace Belle2 {
     m_pdfAligned = new TH2F("pdfAligned", "PDF after alignment",
                             m_numChannels, 0, m_numChannels,
                             m_numBins, m_tMin, m_tMax);
-
-    m_topgp->setELjitter(m_electronicJitter);
 
     TOP::TOPconfigure config;
     config.print();
@@ -178,10 +171,11 @@ namespace Belle2 {
 
     StoreArray<TOPDigit> topDigits;
     int nHits = topDigits.getEntries();
+    const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
     for (int i = 0; i < nHits; ++i) {
       TOPDigit* data = topDigits[i];
       m_ringImage->Fill(m_rowWiseChannelID[data->getPixelID() - 1],
-                        m_topgp->getTime(data->getTDC()));
+                        geo->getNominalTDC().getTime(data->getTDC()));
     }
     m_numEvents++;
 

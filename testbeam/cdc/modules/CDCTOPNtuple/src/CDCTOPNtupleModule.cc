@@ -10,6 +10,7 @@
 
 // Own include
 #include <testbeam/cdc/modules/CDCTOPNtuple/CDCTOPNtupleModule.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 #include <framework/core/ModuleManager.h>
 
@@ -39,6 +40,8 @@
 using namespace std;
 
 namespace Belle2 {
+
+  using namespace TOP;
 
   //-----------------------------------------------------------------
   //                 Register module
@@ -141,6 +144,8 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> evtMetaData;
     StoreArray<Track> tracks;
 
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+
     if (tracks.getEntries() != 2) return; // TODO: uporabi tudi evente z vec kot 2 tracki
 
     std::vector<TVector3> trackMomentums;
@@ -230,10 +235,10 @@ namespace Belle2 {
         int moduleID = extHit->getCopyID();
         TVector3 position = extHit->getPosition();
         TVector3 momentum = extHit->getMomentum();
-        const TOP::TOPQbar* bar = m_topgp->getQbar(moduleID);
-        if (bar) {
-          position = bar->pointToLocal(position);
-          momentum = bar->momentumToLocal(momentum);
+        if (geo->isModuleIDValid(moduleID)) {
+          const auto& module = geo->getModule(moduleID);
+          position = module.pointToLocal(position);
+          momentum = module.momentumToLocal(momentum);
         }
         m_top.extHit.moduleID = moduleID;
         m_top.extHit.PDG = extHit->getPdgCode();
@@ -250,10 +255,10 @@ namespace Belle2 {
         int moduleID = barHit->getModuleID();
         TVector3 position = barHit->getPosition();
         TVector3 momentum = barHit->getMomentum();
-        const TOP::TOPQbar* bar = m_topgp->getQbar(moduleID);
-        if (bar) {
-          position = bar->pointToLocal(position);
-          momentum = bar->momentumToLocal(momentum);
+        if (geo->isModuleIDValid(moduleID)) {
+          const auto& module = geo->getModule(moduleID);
+          position = module.pointToLocal(position);
+          momentum = module.momentumToLocal(momentum);
         }
         m_top.barHit.moduleID = moduleID;
         m_top.barHit.PDG = barHit->getPDG();

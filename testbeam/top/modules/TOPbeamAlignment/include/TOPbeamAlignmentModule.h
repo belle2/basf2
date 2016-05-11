@@ -8,11 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPBEAMALIGNMENTMODULE_H
-#define TOPBEAMALIGNMENTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
-#include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction/TOPreco.h>
 #include <string>
 #include <sstream>
@@ -313,8 +311,6 @@ namespace Belle2 {
     int m_numEvents;   /**< number of events */
     std::vector<int> m_rowWiseChannelID; /**< converter to row wise channel ID */
 
-    TOP::TOPGeometryPar* m_topgp;   /**< geometry parameters */
-
     // root file and histograms
 
     TFile* m_file;       /**< TFile */
@@ -328,4 +324,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

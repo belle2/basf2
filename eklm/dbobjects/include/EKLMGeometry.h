@@ -527,23 +527,128 @@ namespace Belle2 {
     /**
      * Readout board geometry data.
      */
-    struct BoardGeometry : public TObject {
+    class BoardGeometry : public TObject {
+
+    public:
 
       /**
        * Constructor.
        */
       BoardGeometry();
 
-      double Length;      /**< Length. */
-      double Width;       /**< Width. */
-      double Height;      /**< Height. */
-      double BaseWidth;   /**< Width of base board. */
-      double BaseHeight;  /**< Height of base board. */
-      double StripLength; /**< Length of strip readout board. */
-      double StripWidth;  /**< Width of strip readout board. */
-      double StripHeight; /**< Height of strip readout board. */
+      /**
+       * Get length.
+       */
+      double getLength() const;
+
+      /**
+       * Set length.
+       * @param[in] length Length.
+       */
+      void setLength(double length);
+
+      /**
+       * Get width.
+       */
+      double getWidth() const;
+
+      /**
+       * Set width.
+       * @param[in] width Width.
+       */
+      void setWidth(double width);
+
+      /**
+       * Get height.
+       */
+      double getHeight() const;
+
+      /**
+       * Set height.
+       * @param[in] height Height.
+       */
+      void setHeight(double height);
+
+      /**
+       * Get base board width.
+       */
+      double getBaseWidth() const;
+
+      /**
+       * Set base board width.
+       * @param[in] baseWidth Base board width.
+       */
+      void setBaseWidth(double baseWidth);
+
+      /**
+       * Get base board height.
+       */
+      double getBaseHeight() const;
+
+      /**
+       * Set base board height.
+       * @param[in] baseHeight Base board height.
+       */
+      void setBaseHeight(double baseHeight);
+
+      /**
+       * Get strip board length.
+       */
+      double getStripLength() const;
+
+      /**
+       * Set strip board length.
+       * @param[in] stripLength Strip board length.
+       */
+      void setStripLength(double stripLength);
+
+      /**
+       * Get strip board width.
+       */
+      double getStripWidth() const;
+
+      /**
+       * Set strip board width.
+       * @param[in] stripWidth Strip board width.
+       */
+      void setStripWidth(double stripWidth);
+
+      /**
+       * Get strip board height.
+       */
+      double getStripHeight() const;
+
+      /**
+       * Set strip board height.
+       * @param[in] stripHeight Strip board height.
+       */
+      void setStripHeight(double stripHeight);
 
     private:
+
+      /** Length. */
+      double m_Length;
+
+      /** Width. */
+      double m_Width;
+
+      /** Height. */
+      double m_Height;
+
+      /** Width of base board. */
+      double m_BaseWidth;
+
+      /** Height of base board. */
+      double m_BaseHeight;
+
+      /** Length of strip readout board. */
+      double m_StripLength;
+
+      /** Width of strip readout board. */
+      double m_StripWidth;
+
+      /** Height of strip readout board. */
+      double m_StripHeight;
 
       /** Makes objects storable. */
       ClassDef(BoardGeometry, 1);
@@ -826,7 +931,7 @@ namespace Belle2 {
     /**
      * Get readout board geometry data.
      */
-    const struct BoardGeometry* getBoardGeometry() const;
+    const BoardGeometry* getBoardGeometry() const;
 
     /**
      * Get position data for readout boards.
@@ -928,7 +1033,7 @@ namespace Belle2 {
     struct ShieldGeometry m_ShieldGeometry;
 
     /** Readout board geometry data. */
-    struct BoardGeometry m_BoardGeometry;
+    BoardGeometry m_BoardGeometry;
 
     /** Positions of readout boards. */
     BoardPosition* m_BoardPosition; //[m_NBoardsSector]

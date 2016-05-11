@@ -819,15 +819,15 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
   G4SubtractionSolid* prev_solid = NULL;
   G4SubtractionSolid* res = NULL;
   const struct EKLMGeometry::ElementPosition* planePos = m_GeoDat->getPlanePosition();
-  const struct EKLMGeometry::BoardGeometry* boardGeometry;
+  const EKLMGeometry::BoardGeometry* boardGeometry;
   /* If there are no boards, it is not necessary to subtract their solids. */
   if (m_GeoDat->getDetectorMode() != EKLMGeometry::c_DetectorBackground)
     return plane;
   boardGeometry = m_GeoDat->getBoardGeometry();
   /* Subtraction. */
   try {
-    solidBoardBox = new G4Box("PlateBox", 0.5 * boardGeometry->Length,
-                              0.5 * boardGeometry->Height,
+    solidBoardBox = new G4Box("PlateBox", 0.5 * boardGeometry->getLength(),
+                              0.5 * boardGeometry->getHeight(),
                               0.5 * (planePos->Length + planePos->Z));
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -1422,7 +1422,7 @@ void EKLM::GeoEKLMCreator::createSolids()
 {
   int i, j, n;
   HepGeom::Transform3D t;
-  const struct EKLMGeometry::BoardGeometry* boardGeometry;
+  const EKLMGeometry::BoardGeometry* boardGeometry;
   const struct EKLMGeometry::StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
   /* Endcap, layer, sector. */
   createEndcapSolid();
@@ -1465,24 +1465,24 @@ void EKLM::GeoEKLMCreator::createSolids()
     boardGeometry = m_GeoDat->getBoardGeometry();
     /* Readout board. */
     try {
-      m_Solids.board = new G4Box("Board", 0.5 * boardGeometry->Length,
-                                 0.5 * boardGeometry->Height,
-                                 0.5 * boardGeometry->Width);
+      m_Solids.board = new G4Box("Board", 0.5 * boardGeometry->getLength(),
+                                 0.5 * boardGeometry->getHeight(),
+                                 0.5 * boardGeometry->getWidth());
     } catch (std::bad_alloc& ba) {
       B2FATAL(MemErr);
     }
     try {
-      m_Solids.baseboard = new G4Box("BaseBoard", 0.5 * boardGeometry->Length,
-                                     0.5 * boardGeometry->BaseHeight,
-                                     0.5 * boardGeometry->BaseWidth);
+      m_Solids.baseboard = new G4Box("BaseBoard", 0.5 * boardGeometry->getLength(),
+                                     0.5 * boardGeometry->getBaseHeight(),
+                                     0.5 * boardGeometry->getBaseWidth());
     } catch (std::bad_alloc& ba) {
       B2FATAL(MemErr);
     }
     try {
       m_Solids.stripboard =
-        new G4Box("StripBoard", 0.5 * boardGeometry->StripLength,
-                  0.5 * boardGeometry->StripHeight,
-                  0.5 * boardGeometry->StripWidth);
+        new G4Box("StripBoard", 0.5 * boardGeometry->getStripLength(),
+                  0.5 * boardGeometry->getStripHeight(),
+                  0.5 * boardGeometry->getStripWidth());
     } catch (std::bad_alloc& ba) {
       B2FATAL(MemErr);
     }
@@ -1578,7 +1578,7 @@ void EKLM::GeoEKLMCreator::calcBoardTransform()
 {
   int i;
   int j;
-  const struct EKLMGeometry::BoardGeometry* boardGeometry = m_GeoDat->getBoardGeometry();
+  const EKLMGeometry::BoardGeometry* boardGeometry = m_GeoDat->getBoardGeometry();
   const EKLMGeometry::BoardPosition* boardPos;
   for (i = 0; i < m_GeoDat->getNPlanes(); i++) {
     for (j = 0; j < m_GeoDat->getNBoards(); j++) {
@@ -1586,7 +1586,7 @@ void EKLM::GeoEKLMCreator::calcBoardTransform()
       m_BoardTransform[i][j] =
         HepGeom::Transform3D(
           HepGeom::RotateZ3D(boardPos->getPhi()) *
-          HepGeom::Translate3D(boardPos->getR() - 0.5 * boardGeometry->Height, 0., 0.) *
+          HepGeom::Translate3D(boardPos->getR() - 0.5 * boardGeometry->getHeight(), 0., 0.) *
           HepGeom::RotateZ3D(90.0 * CLHEP::deg));
     }
   }
@@ -1755,7 +1755,7 @@ createBaseBoard(G4LogicalVolume* segmentReadoutBoard) const
 {
   G4LogicalVolume* logicBaseBoard = NULL;
   HepGeom::Transform3D t;
-  const struct EKLMGeometry::BoardGeometry* boardGeometry = m_GeoDat->getBoardGeometry();
+  const EKLMGeometry::BoardGeometry* boardGeometry = m_GeoDat->getBoardGeometry();
   std::string boardName = "BaseBoard_" + segmentReadoutBoard->GetName();
   try {
     logicBaseBoard =
@@ -1766,8 +1766,8 @@ createBaseBoard(G4LogicalVolume* segmentReadoutBoard) const
   }
   geometry::setVisibility(*logicBaseBoard, true);
   geometry::setColor(*logicBaseBoard, "#0000ffff");
-  t = HepGeom::Translate3D(0., -0.5 * boardGeometry->Height +
-                           0.5 * boardGeometry->BaseHeight, 0.);
+  t = HepGeom::Translate3D(0., -0.5 * boardGeometry->getHeight() +
+                           0.5 * boardGeometry->getBaseHeight(), 0.);
   try {
     new G4PVPlacement(t, logicBaseBoard, boardName, segmentReadoutBoard,
                       false, 1, false);
@@ -1781,7 +1781,7 @@ createStripBoard(int iBoard, G4LogicalVolume* segmentReadoutBoard) const
 {
   G4LogicalVolume* logicStripBoard = NULL;
   HepGeom::Transform3D t;
-  const struct EKLMGeometry::BoardGeometry* boardGeometry =
+  const EKLMGeometry::BoardGeometry* boardGeometry =
     m_GeoDat->getBoardGeometry();
   const EKLMGeometry::StripBoardPosition* stripBoardPos =
     m_GeoDat->getStripBoardPosition(iBoard);
@@ -1797,9 +1797,9 @@ createStripBoard(int iBoard, G4LogicalVolume* segmentReadoutBoard) const
   }
   geometry::setVisibility(*logicStripBoard, true);
   geometry::setColor(*logicStripBoard, "#0000ffff");
-  t = HepGeom::Translate3D(-0.5 * boardGeometry->Length + stripBoardPos->getX(),
-                           -0.5 * boardGeometry->Height + boardGeometry->BaseHeight +
-                           0.5 * boardGeometry->StripHeight, 0.);
+  t = HepGeom::Translate3D(-0.5 * boardGeometry->getLength() + stripBoardPos->getX(),
+                           -0.5 * boardGeometry->getHeight() + boardGeometry->getBaseHeight() +
+                           0.5 * boardGeometry->getStripHeight(), 0.);
   try {
     new G4PVPlacement(t, logicStripBoard, boardName, segmentReadoutBoard,
                       false, 1, false);

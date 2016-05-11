@@ -620,14 +620,14 @@ void EKLM::GeometryData::initializeFromGearbox()
   m_NBoardsSector = m_NBoards * m_NPlanes;
   GearDir Boards(Sector);
   Boards.append("/Boards");
-  m_BoardGeometry.Length = Boards.getLength("Length") * CLHEP::cm;
-  m_BoardGeometry.Width = Boards.getLength("Width") * CLHEP::cm;
-  m_BoardGeometry.Height = Boards.getLength("Height") * CLHEP::cm;
-  m_BoardGeometry.BaseWidth = Boards.getLength("BaseWidth") * CLHEP::cm;
-  m_BoardGeometry.BaseHeight = Boards.getLength("BaseHeight") * CLHEP::cm;
-  m_BoardGeometry.StripLength = Boards.getLength("StripLength") * CLHEP::cm;
-  m_BoardGeometry.StripWidth = Boards.getLength("StripWidth") * CLHEP::cm;
-  m_BoardGeometry.StripHeight = Boards.getLength("StripHeight") * CLHEP::cm;
+  m_BoardGeometry.setLength(Boards.getLength("Length") * CLHEP::cm);
+  m_BoardGeometry.setWidth(Boards.getLength("Width") * CLHEP::cm);
+  m_BoardGeometry.setHeight(Boards.getLength("Height") * CLHEP::cm);
+  m_BoardGeometry.setBaseWidth(Boards.getLength("BaseWidth") * CLHEP::cm);
+  m_BoardGeometry.setBaseHeight(Boards.getLength("BaseHeight") * CLHEP::cm);
+  m_BoardGeometry.setStripLength(Boards.getLength("StripLength") * CLHEP::cm);
+  m_BoardGeometry.setStripWidth(Boards.getLength("StripWidth") * CLHEP::cm);
+  m_BoardGeometry.setStripHeight(Boards.getLength("StripHeight") * CLHEP::cm);
   m_NStripBoards = Boards.getInt("NStripBoards");
   try {
     m_BoardPosition = new BoardPosition[m_NBoardsSector];

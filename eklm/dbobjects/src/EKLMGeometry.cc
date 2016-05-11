@@ -213,16 +213,98 @@ EKLMGeometry::ShieldGeometry::ShieldGeometry()
   Thickness = 0;
 }
 
+/* Class EKLMGeometry::BoardGeometry. */
+
+double EKLMGeometry::BoardGeometry::getLength() const
+{
+  return m_Length;
+}
+
+void EKLMGeometry::BoardGeometry::setLength(double length)
+{
+  m_Length = length;
+}
+
+double EKLMGeometry::BoardGeometry::getWidth() const
+{
+  return m_Width;
+}
+
+void EKLMGeometry::BoardGeometry::setWidth(double width)
+{
+  m_Width = width;
+}
+
+double EKLMGeometry::BoardGeometry::getHeight() const
+{
+  return m_Height;
+}
+
+void EKLMGeometry::BoardGeometry::setHeight(double height)
+{
+  m_Height = height;
+}
+
+double EKLMGeometry::BoardGeometry::getBaseWidth() const
+{
+  return m_BaseWidth;
+}
+
+void EKLMGeometry::BoardGeometry::setBaseWidth(double baseWidth)
+{
+  m_BaseWidth = baseWidth;
+}
+
+double EKLMGeometry::BoardGeometry::getBaseHeight() const
+{
+  return m_BaseHeight;
+}
+
+void EKLMGeometry::BoardGeometry::setBaseHeight(double baseHeight)
+{
+  m_BaseHeight = baseHeight;
+}
+
+double EKLMGeometry::BoardGeometry::getStripLength() const
+{
+  return m_StripLength;
+}
+
+void EKLMGeometry::BoardGeometry::setStripLength(double stripLength)
+{
+  m_StripLength = stripLength;
+}
+
+double EKLMGeometry::BoardGeometry::getStripWidth() const
+{
+  return m_StripWidth;
+}
+
+void EKLMGeometry::BoardGeometry::setStripWidth(double stripWidth)
+{
+  m_StripWidth = stripWidth;
+}
+
+double EKLMGeometry::BoardGeometry::getStripHeight() const
+{
+  return m_StripHeight;
+}
+
+void EKLMGeometry::BoardGeometry::setStripHeight(double stripHeight)
+{
+  m_StripHeight = stripHeight;
+}
+
 EKLMGeometry::BoardGeometry::BoardGeometry()
 {
-  Length = 0;
-  Width = 0;
-  Height = 0;
-  BaseWidth = 0;
-  BaseHeight = 0;
-  StripLength = 0;
-  StripWidth = 0;
-  StripHeight = 0;
+  m_Length = 0;
+  m_Width = 0;
+  m_Height = 0;
+  m_BaseWidth = 0;
+  m_BaseHeight = 0;
+  m_StripLength = 0;
+  m_StripWidth = 0;
+  m_StripHeight = 0;
 }
 
 /* Class EKLMGeometry::BoardPosition. */

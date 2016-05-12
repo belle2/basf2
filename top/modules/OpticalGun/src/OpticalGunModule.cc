@@ -28,7 +28,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 // ROOT
-#include <TRandom3.h>
+#include <TRandom.h>
 #include <TVector3.h>
 #include <TRotation.h>
 

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPSENSITIVEBAR_H
-#define TOPSENSITIVEBAR_H
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <top/geometry/TOPGeometryPar.h>
@@ -18,8 +17,10 @@
 namespace Belle2 {
   namespace TOP {
 
-    //! Optional (temporary) class providing the information on MCParticle at TOP bars
-
+    /**
+     * Class providing information on MCParticles hitting the bars.
+     * Applies also quantum efficiency to reduce the number of propagating photons.
+     */
     class SensitiveBar : public Simulation::SensitiveDetectorBase {
 
     public:
@@ -32,18 +33,17 @@ namespace Belle2 {
       /**
        * Process each step and fill TOPBarHits
        * @param aStep Current Geant4 step in the sensitive medium.
-       * @result true if a hit was stored, o.w. false.
+       * @return true when particle that is not an optical photon enters the bar
        */
       bool step(G4Step* aStep, G4TouchableHistory*);
 
     protected:
 
-      TOPGeometryPar* m_topgp; /**< geometry parameters from xml */
+      TOPGeometryPar* m_topgp = TOPGeometryPar::Instance(); /**< geometry parameters */
 
     };
 
   } // end of namespace top
 } // end of namespace Belle2
 
-#endif
 

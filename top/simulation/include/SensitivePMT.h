@@ -8,16 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPSENSITIVEDETECTOR_H
-#define TOPSENSITIVEDETECTOR_H
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <top/geometry/TOPGeometryPar.h>
 
 namespace Belle2 {
   namespace TOP {
-    /*! The Class for TOP Sensitive PMT
-     * In this class, variables will be calculated that will be later stored in TOPSimHit
+    /**
+     * Class providing SimHits.
      */
     class SensitivePMT : public Simulation::SensitiveDetectorBase {
 
@@ -29,19 +28,17 @@ namespace Belle2 {
       SensitivePMT();
 
       /**
-       * Process each step, fill TOPSimHit and TOPSimPhoton
+       * Process each step, fill TOPSimHits and TOPSimPhotons
        * @param aStep Current Geant4 step in the sensitive medium.
-       * @result true if a hit was stored, o.w. false.
+       * @return true if optical photon detected.
        */
       bool step(G4Step* aStep, G4TouchableHistory*);
 
-
     private:
 
-      TOPGeometryPar* m_topgp; /**< geometry parameters from xml */
+      TOPGeometryPar* m_topgp = TOPGeometryPar::Instance(); /**< geometry parameters */
 
     };
   } // end of namespace TOP
 } // end of namespace Belle2
 
-#endif /* TOPSENSITIVEDETECTOR_H */

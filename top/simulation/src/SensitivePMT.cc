@@ -27,7 +27,7 @@
 #include <framework/gearbox/Unit.h>
 
 #include <TVector3.h>
-#include <TRandom3.h>
+#include <TRandom.h>
 
 using namespace std;
 
@@ -35,8 +35,7 @@ namespace Belle2 {
   namespace TOP {
 
     SensitivePMT::SensitivePMT():
-      Simulation::SensitiveDetectorBase("TOP", Const::TOP),
-      m_topgp(TOPGeometryPar::Instance())
+      Simulation::SensitiveDetectorBase("TOP", Const::TOP)
     {
 
       StoreArray<MCParticle> mcParticles;
@@ -66,14 +65,16 @@ namespace Belle2 {
 
       // apply quantum efficiency if not yet done
       bool applyQE = true;
-      Simulation::TrackInfo* info =
-        dynamic_cast<Simulation::TrackInfo*>(photon.GetUserInformation());
-      if (info) applyQE = info->getStatus() < 2;
+      double fraction = 1;
+      auto* info = dynamic_cast<Simulation::TrackInfo*>(photon.GetUserInformation());
+      if (info) {
+        applyQE = info->getStatus() < 2;
+        fraction = info->getFraction();
+      }
       if (applyQE) {
         double energy = photon.GetKineticEnergy() * Unit::MeV / Unit::eV;
-        double qeffi = m_topgp->QE(energy) * m_topgp->getColEffi();
-        double fraction = 1;
-        if (info) fraction = info->getFraction();
+        const auto* geo = m_topgp->getGeometry();
+        double qeffi = geo->getNominalQE().getEfficiency(energy);
         if (gRandom->Uniform() * fraction > qeffi) {
           photon.SetTrackStatus(fStopAndKill);
           return false;
@@ -126,15 +127,16 @@ namespace Belle2 {
 
       StoreArray<TOPSimPhoton> simPhotons;
       if (!simPhotons.isValid()) simPhotons.create();
-      const auto* Qbar = m_topgp->getQbar(moduleID);
-      if (Qbar) {
+      const auto* geo = m_topgp->getGeometry();
+      if (geo->isModuleIDValid(moduleID)) {
         // transform to local frame
-        emiPoint = Qbar->pointToLocal(emiPoint);
-        detPoint = Qbar->pointToLocal(detPoint);
-        emiMomDir = Qbar->momentumToLocal(emiMomDir);
-        detMomDir = Qbar->momentumToLocal(detMomDir);
+        const auto& module = geo->getModule(moduleID);
+        emiPoint = module.pointToLocal(emiPoint);
+        detPoint = module.pointToLocal(detPoint);
+        emiMomDir = module.momentumToLocal(emiMomDir);
+        detMomDir = module.momentumToLocal(detMomDir);
       } else {
-        B2ERROR("SensitivePMT: undefined TOPQbar for moduleID = " << moduleID);
+        B2ERROR("SensitivePMT: undefined module ID = " << moduleID);
       }
       TOPSimPhoton* simPhoton = simPhotons.appendNew(moduleID,
                                                      emiPoint, emiMomDir, emiTime,

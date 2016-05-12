@@ -12,7 +12,7 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/logging/Logger.h>
-#include <TRandom3.h>
+#include <TRandom.h>
 
 using namespace std;
 

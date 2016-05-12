@@ -27,7 +27,7 @@
 #include <framework/gearbox/Unit.h>
 
 #include <TVector3.h>
-#include <TRandom3.h>
+#include <TRandom.h>
 #include <cmath>
 
 using namespace std;
@@ -36,8 +36,7 @@ namespace Belle2 {
   namespace TOP {
 
     SensitiveBar::SensitiveBar():
-      Simulation::SensitiveDetectorBase("TOP", Const::TOP),
-      m_topgp(TOPGeometryPar::Instance())
+      Simulation::SensitiveDetectorBase("TOP", Const::TOP)
     {
 
       // registration of store arrays and relations
@@ -58,20 +57,18 @@ namespace Belle2 {
     bool SensitiveBar::step(G4Step* aStep, G4TouchableHistory*)
     {
 
-      m_topgp->setGeanUnits();
-
-      //! get track and particle definition
+      // get track and particle definition
       G4Track* aTrack = aStep->GetTrack();
       G4ParticleDefinition* particle = aTrack->GetDefinition();
 
-      //! if optical photon, apply QE and return false
+      // if optical photon, apply QE and return false
       if (particle == G4OpticalPhoton::OpticalPhotonDefinition()) {
-        Simulation::TrackInfo* info =
-          dynamic_cast<Simulation::TrackInfo*>(aTrack->GetUserInformation());
+        auto* info = dynamic_cast<Simulation::TrackInfo*>(aTrack->GetUserInformation());
         if (!info) return false;
         if (info->getStatus() < 2) {
           double energy = aTrack->GetKineticEnergy() * Unit::MeV / Unit::eV;
-          double qeffi = m_topgp->QE(energy) * m_topgp->getColEffi();
+          const auto* geo = m_topgp->getGeometry();
+          double qeffi = geo->getNominalQE().getEfficiency(energy);
           double fraction = info->getFraction();
           if (gRandom->Uniform() * fraction > qeffi) {
             aTrack->SetTrackStatus(fStopAndKill);
@@ -83,64 +80,71 @@ namespace Belle2 {
         return false;
       }
 
-      //! continue for other particles
+      // continue for other particles
 
-      //! get the prestep position, a step before current position
+      // get the prestep position, a step before current position
       G4StepPoint* PrePosition =  aStep->GetPreStepPoint();
 
-      //! Check that the hit comes from the bar boundary
+      // Check that the hit comes from the bar boundary
       if (PrePosition->GetStepStatus() != fGeomBoundary) return false;
 
-      //! get lab frame position of the prestep point
+      // get lab frame position of the prestep point
       G4ThreeVector worldPosition = PrePosition->GetPosition();
 
-      //! Transform lab frame to bar frame
+      // Transform lab frame to bar frame
       G4ThreeVector localPosition = PrePosition->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
 
-      //! Check that it is not on the glue boundary or similar
+      // Get bar ID
+      int moduleID = PrePosition->GetTouchableHandle()->GetReplicaNumber(2);
+
+      // Check that it is not on the glue boundary or similar
+      const auto* geo = m_topgp->getGeometry();
+      geo->useGeantUnits();
+      if (!geo->isModuleIDValid(moduleID)) {
+        B2ERROR("SensitiveBar: undefined module ID = " << moduleID);
+        return false;
+      }
+      double halfThickness =  geo->getModule(moduleID).getBarThickness() / 2;
       //!!!! this check is not a whole story -> to be re-written
-      if (fabs(fabs(localPosition.y()) - (m_topgp->getQthickness() / 2)) > 10e-6) {
+      if (fabs(fabs(localPosition.y()) - halfThickness) > 10e-6) {
         return false ;
       }
 
-      //! Get track ID
+      // Get track ID
       int trackID = aTrack->GetTrackID();
 
-      //! get track length and subtract step length to get the length to the boundary
+      // get track length and subtract step length to get the length to the boundary
       double tracklength = aTrack->GetTrackLength() - aStep->GetStepLength();
 
-      //! get global time
+      // get global time
       double globalTime = PrePosition->GetGlobalTime();
 
-      //! momentum on the boundary
+      // momentum on the boundary
       G4ThreeVector momentum = PrePosition->GetMomentum();
 
-      //! Fill three vectors that hold momentum and position
+      // Fill three vectors that hold momentum and position
       TVector3 TPosition(worldPosition.x(), worldPosition.y(), worldPosition.z());
       TVector3 TMomentum(momentum.x(), momentum.y(), momentum.z());
       TVector3 TOrigin(aTrack->GetVertexPosition().x(),
                        aTrack->GetVertexPosition().y(),
                        aTrack->GetVertexPosition().z());
 
-      //! convert to Basf units
+      // convert to Basf units
       TPosition = TPosition * Unit::mm;
       TMomentum = TMomentum  * Unit::MeV;
       TOrigin = TOrigin * Unit::mm;
       tracklength = tracklength * Unit::mm;
 
-      //! Get bar ID
-      int moduleID = PrePosition->GetTouchableHandle()->GetReplicaNumber(2);
-
-      //! Get PDG
+      // Get PDG
       int PDG = (int)(particle->GetPDGEncoding());
 
-      //! write the hit to datastore
+      // write the hit to datastore
       StoreArray<TOPBarHit> barHits;
       if (!barHits.isValid()) barHits.create();
       TOPBarHit* hit = barHits.appendNew(moduleID, PDG, TOrigin, TPosition, TMomentum,
                                          globalTime, tracklength);
 
-      //! set the relation
+      // set the relation
       StoreArray<MCParticle> mcParticles;
       RelationArray rel(mcParticles, barHits);
       rel.add(trackID, hit->getArrayIndex());

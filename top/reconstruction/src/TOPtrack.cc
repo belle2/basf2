@@ -12,7 +12,7 @@
 #include <iomanip>
 #include <math.h>
 #include <stdlib.h>
-#include <TRandom3.h>
+#include <TRandom.h>
 // top
 #include <top/reconstruction/TOPtrack.h>
 #include <top/geometry/TOPGeometryPar.h>

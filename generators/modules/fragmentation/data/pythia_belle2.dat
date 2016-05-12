@@ -7,3 +7,17 @@ StringZ:usePetersonC=off
 StringZ:usePetersonB=off
 StringZ:usePetersonH=off
 StringZ:rFactC=1.0
+
+ParticleDecays:multIncrease=4.5
+ParticleDecays:multIncreaseWeak=2.0
+
+###################
+#control radiation
+###################
+
+## QCD showers on PartonLevel
+ParticleDecays:FSRinDecays=on
+
+## QED radiation of quarks (FSR)
+TimeShower:QEDshowerByQ=on
+

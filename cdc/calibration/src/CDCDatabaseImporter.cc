@@ -408,6 +408,59 @@ void CDCDatabaseImporter::importXT(std::string fileName)
 }
 
 
+void CDCDatabaseImporter::importSigma(std::string fileName)
+{
+  std::ifstream ifs;
+  ifs.open(fileName.c_str());
+  if (!ifs) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCSigmas> sgm;
+  sgm.construct();
+
+  int iL;
+  const int np = nSigmaParams;
+  double sigma[np];
+  unsigned nRead = 0;
+
+  while (true) {
+    ifs >> iL;
+    for (int i = 0; i < np; ++i) {
+      ifs >> sigma[i];
+    }
+    if (ifs.eof()) break;
+
+    ++nRead;
+
+    for (int i = 0; i < np; ++i) {
+      sgm->setSigmaParam(iL, i, sigma[i]);
+    }
+
+    /*    if (m_debug) {
+      cout << iL;
+      for (int i = 0; i < np; ++i) {
+        cout << " " << m_Sigma[iL][i];
+      }
+      cout << endl;
+    }
+    */
+  }
+
+  ifs.close();
+
+  if (nRead != MAX_N_SLAYERS) B2FATAL("importSigma: #lines read-in (=" << nRead << ") is inconsistent with total #layers (=" <<
+                                        MAX_N_SLAYERS << ") !");
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  sgm.import(iov);
+  B2RESULT("Sigma table imported to database.");
+}
+
+
 void CDCDatabaseImporter::printChannelMap()
 {
 
@@ -455,4 +508,10 @@ void CDCDatabaseImporter::printXT()
 {
   DBObjPtr<CDCXTs> xt;
   xt->dump();
+}
+
+void CDCDatabaseImporter::printSigma()
+{
+  DBObjPtr<CDCSigmas> sgm;
+  sgm->dump();
 }

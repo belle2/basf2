@@ -106,6 +106,16 @@ namespace Belle2 {
      */
     void printXT();
 
+    /**
+     * Import sigma table to the database.
+     */
+    void importSigma(std::string fileName);
+    /**
+     * Get the sigma table from the database and
+     * print it.
+     */
+    void printSigma();
+
   private:
 
     /**

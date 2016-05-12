@@ -22,6 +22,7 @@
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/dbobjects/CDCXTs.h>
+#include <cdc/dbobjects/CDCSigmas.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 
 #include <vector>
@@ -39,6 +40,7 @@ const unsigned nBoards       =   300;
 const unsigned nAlphaPoints  =    19;
 const unsigned nThetaPoints  =     7;
 const unsigned nXTParams     =     9;
+const unsigned nSigmaParams  =     7;
 
 namespace Belle2 {
   namespace CDC {
@@ -101,8 +103,12 @@ namespace Belle2 {
        * @param GearDir Gear Dir.
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
-
       void readSigma(const GearDir, int mode = 0);
+
+      /**
+       * Set spatial resolution of Drift length (from DB).
+       */
+      void setSigma();
 
       /**
        * Read the propagation speed along the sense wire.
@@ -887,6 +893,9 @@ namespace Belle2 {
 #endif
 #if defined(CDC_XT_FROM_DB)
       DBObjPtr<CDCXTs> m_xtFromDB; /*!< xt params. retrieved from DB. */
+#endif
+#if defined(CDC_SIGMA_FROM_DB)
+      DBObjPtr<CDCSigmas> m_sigmaFromDB; /*!< sigma params. retrieved from DB. */
 #endif
 #if defined(CDC_CHMAP_FROM_DB)
       DBArray<CDCChannelMap> m_chMapFromDB; /*!< channel map retrieved from DB. */

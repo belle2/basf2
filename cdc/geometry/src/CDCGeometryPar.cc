@@ -61,6 +61,11 @@ CDCGeometryPar::CDCGeometryPar()
     m_xtFromDB.addCallback(this, &CDCGeometryPar::setXT);
   }
 #endif
+#if defined(CDC_SIGMA_FROM_DB)
+  if (m_sigmaFromDB.isValid()) {
+    m_sigmaFromDB.addCallback(this, &CDCGeometryPar::setSigma);
+  }
+#endif
 #if defined(CDC_CHMAP_FROM_DB)
   if (m_chMapFromDB.isValid()) {
     m_chMapFromDB.addCallback(this, &CDCGeometryPar::setChMap);
@@ -313,8 +318,11 @@ void CDCGeometryPar::read()
     readXT(gbxParams);  //Read xt params. (from file)
 #endif
 
-    //Read sigma params.
-    readSigma(gbxParams);
+#if defined(CDC_SIGMA_FROM_DB)
+    setSigma();  //Set sigma params. (from DB)
+#else
+    readSigma(gbxParams);  //Read sigma params. (from file)
+#endif
 
 #if defined(CDC_PROPSPEED_FROM_DB)
     setPropSpeed();  //Set prop-speed (from DB)
@@ -998,7 +1006,7 @@ void CDCGeometryPar::setTW()
 
 
 #if defined(CDC_XT_FROM_DB)
-// Set time-walk coefficient (from DB)
+// Set xt params. (from DB)
 void CDCGeometryPar::setXT()
 {
   for (unsigned short i = 0; i < nAlphaPoints; ++i) {
@@ -1018,6 +1026,29 @@ void CDCGeometryPar::setXT()
           }
         }
       }
+    }
+  }
+}
+#endif
+
+
+#if defined(CDC_SIGMA_FROM_DB)
+// Set sigma params. (from DB)
+void CDCGeometryPar::setSigma()
+{
+  /*
+  for (unsigned short i = 0; i < nAlphaPoints; ++i) {
+    m_alphaPoints[i] = m_xtFromDB->getAlphaPoint(i);
+  }
+
+  for (unsigned short i = 0; i < nThetaPoints; ++i) {
+    m_thetaPoints[i] = m_xtFromDB->getThetaPoint(i);
+  }
+  */
+
+  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+    for (unsigned short i = 0; i < nSigmaParams; ++i) {
+      m_Sigma[iCL][i] = m_sigmaFromDB->getSigmaParam(iCL, i);
     }
   }
 }

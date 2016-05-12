@@ -79,9 +79,6 @@ namespace Belle2 {
       /** The starting angle of the octagonal Endcap KLM shape. */
       double m_Phi;
 
-      /** The opening angle (shape is extended from phi to phi+dphi). */
-      double m_DPhi;
-
       /** The number of sides (=8 : octagonal). */
       int m_NSides;
 

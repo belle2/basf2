@@ -53,7 +53,12 @@ CDCGeometryPar::CDCGeometryPar()
 #endif
 #if defined(CDC_TIMEWALK_FROM_DB)
   if (m_timeWalkFromDB.isValid()) {
-    m_timeWalkFromDB.addCallback(this, &CDCGeometryPar::setTimeWalk);
+    m_timeWalkFromDB.addCallback(this, &CDCGeometryPar::setTW);
+  }
+#endif
+#if defined(CDC_XT_FROM_DB)
+  if (m_xtFromDB.isValid()) {
+    m_xtFromDB.addCallback(this, &CDCGeometryPar::setXT);
   }
 #endif
 #if defined(CDC_CHMAP_FROM_DB)
@@ -302,8 +307,11 @@ void CDCGeometryPar::read()
   m_XTetc = gbxParams.getBool("XTetc");
   B2INFO("CDCGeometryPar: Load x-t etc. params. for digitization (=1); not load (=0):" << m_XTetc);
   if (m_XTetc) {
-    //Read xt params.
-    readXT(gbxParams);
+#if defined(CDC_XT_FROM_DB)
+    setXT();  //Set xt param. (from DB)
+#else
+    readXT(gbxParams);  //Read xt params. (from file)
+#endif
 
     //Read sigma params.
     readSigma(gbxParams);
@@ -984,6 +992,33 @@ void CDCGeometryPar::setTW()
 {
   for (unsigned short iBd = 0; iBd < m_timeWalkFromDB->getEntries(); ++iBd) {
     m_timeWalkCoef[iBd] = m_timeWalkFromDB->getTimeWalk(iBd);
+  }
+}
+#endif
+
+
+#if defined(CDC_XT_FROM_DB)
+// Set time-walk coefficient (from DB)
+void CDCGeometryPar::setXT()
+{
+  for (unsigned short i = 0; i < nAlphaPoints; ++i) {
+    m_alphaPoints[i] = m_xtFromDB->getAlphaPoint(i);
+  }
+
+  for (unsigned short i = 0; i < nThetaPoints; ++i) {
+    m_thetaPoints[i] = m_xtFromDB->getThetaPoint(i);
+  }
+
+  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+    for (unsigned short LR = 0; LR < 2; ++LR) {
+      for (unsigned short iA = 0; iA < nAlphaPoints; ++iA) {
+        for (unsigned short iT = 0; iT < nThetaPoints; ++iT) {
+          for (unsigned short i = 0; i < nXTParams; ++i) {
+            m_XT[iCL][LR][iA][iT][i] = m_xtFromDB->getXTParam(iCL, LR, iA, iT, i);
+          }
+        }
+      }
+    }
   }
 }
 #endif

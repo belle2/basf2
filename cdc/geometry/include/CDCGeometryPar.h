@@ -21,6 +21,7 @@
 #include <cdc/dbobjects/CDCBadWires.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
+#include <cdc/dbobjects/CDCXTs.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 
 #include <vector>
@@ -37,6 +38,7 @@ const unsigned nSuperLayers  =     9;
 const unsigned nBoards       =   300;
 const unsigned nAlphaPoints  =    19;
 const unsigned nThetaPoints  =     7;
+const unsigned nXTParams     =     9;
 
 namespace Belle2 {
   namespace CDC {
@@ -87,8 +89,12 @@ namespace Belle2 {
        * @param[in] GearDir Gear Dir.
        * @param[in] mode 0: read simulation file, 1: read reconstruction file.
        */
-
       void readXT(const GearDir, int mode = 0);
+
+      /**
+       * Set XT-relation table (from DB).
+       */
+      void setXT();
 
       /**
        * Read spatial resolution of Drift length.
@@ -878,6 +884,9 @@ namespace Belle2 {
 #endif
 #if defined(CDC_TIMEWALK_FROM_DB)
       DBObjPtr<CDCTimeWalks> m_timeWalkFromDB; /*!< time-walk coeffs. retrieved from DB. */
+#endif
+#if defined(CDC_XT_FROM_DB)
+      DBObjPtr<CDCXTs> m_xtFromDB; /*!< xt params. retrieved from DB. */
 #endif
 #if defined(CDC_CHMAP_FROM_DB)
       DBArray<CDCChannelMap> m_chMapFromDB; /*!< channel map retrieved from DB. */

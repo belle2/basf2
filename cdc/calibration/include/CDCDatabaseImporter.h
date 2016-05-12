@@ -96,6 +96,16 @@ namespace Belle2 {
      */
     void printTimeWalk();
 
+    /**
+     * Import xt table to the database.
+     */
+    void importXT(std::string fileName);
+    /**
+     * Get the xt table from the database and
+     * print it.
+     */
+    void printXT();
+
   private:
 
     /**

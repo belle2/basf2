@@ -2189,8 +2189,6 @@ void EKLM::GeoEKLMCreator::createFromDB(const std::string& name,
 {
   (void)name;
   (void)type;
-  B2WARNING("EKLM geometry creation from database is not implemented. Gearbox "
-            "will be used.");
   m_GeoDat = &(EKLM::GeometryData::Instance(GeometryData::c_Database));
   try {
     m_TransformData = new EKLM::TransformData(false, true);

@@ -656,7 +656,7 @@ PXDUnpackerModule::PXDUnpackerModule() :
 
 void PXDUnpackerModule::initialize()
 {
-  StoreArray<RawPXD>::required(m_RawPXDsName);
+  m_storeRawPXD.isRequired(m_RawPXDsName);
   //Register output collections
   m_storeRawHits.registerInDataStore(m_PXDRawHitsName);
   m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName);
@@ -745,10 +745,9 @@ void PXDUnpackerModule::terminate()
 
 void PXDUnpackerModule::event()
 {
-  StoreArray<RawPXD> storeRaws(m_RawPXDsName);
   StoreObjPtr<EventMetaData> evtPtr;/// what will happen if it does not exist???
 
-  int nRaws = storeRaws.getEntries();
+  int nRaws = m_storeRawPXD.getEntries();
   if (verbose) {
     B2INFO("PXD Unpacker --> RawPXD Objects in event: " << nRaws);
   };
@@ -763,7 +762,7 @@ void PXDUnpackerModule::event()
 
 
   int nsr = 0;// number of packets
-  for (auto& it : storeRaws) {
+  for (auto& it : m_storeRawPXD) {
     if (verbose) {
       B2INFO("PXD Unpacker --> Unpack Objects: ");
     };

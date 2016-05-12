@@ -79,6 +79,9 @@ namespace Belle2 {
       unsigned int m_unpackedEventsCount;
       /** Error counters */
       unsigned int m_errorCounter[ONSEN_MAX_TYPE_ERR];
+
+      /** Input array for PXD Raw. */
+      StoreArray<RawPXD> m_storeRawPXD;
       /** Output array for Raw Hits. */
       StoreArray<PXDRawHit> m_storeRawHits;
       /** Output array for Raw Hits. */

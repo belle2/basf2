@@ -65,7 +65,7 @@ def run_test(init_signal, event_signal, abort, test_in_process):
                 raise RuntimeError("Root file not properly closed!")
 
         # clear_basf2_ipc shouldn't find anything to clean up
-        ret = os.system('clear_basf2_ipc --test')
+        ret = os.system('clear_basf2_ipc')
         if ret != 0:
             raise RuntimeError("Some IPC structures were not cleaned up")
 

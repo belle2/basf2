@@ -14,6 +14,8 @@
 #include "TObject.h"
 #include <stdio.h>
 #include <stdint.h>
+#include <boost/spirit/home/support/detail/endian.hpp>
+using namespace boost::spirit::endian;
 
 namespace Belle2 {
 
@@ -64,7 +66,7 @@ namespace Belle2 {
      */
     int getNrROIs() const
     {
-      return (m_length - 12) / 8;
+      return (m_length - 5) / 2; // only minus checksum
     }
 
     /** Return DHH ID of ROI j
@@ -74,7 +76,7 @@ namespace Belle2 {
     int getDHHID(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return (m_rootdata[4 + 2 * j] >> 4) & 0x3F; // & 0x3F0
+      return (((ubig32_t*)m_rootdata)[4 + 2 * j] & 0x3F0) >> 4;  // & 0x3F0
     }
 
     /** Return Row 1 of ROI j
@@ -84,7 +86,7 @@ namespace Belle2 {
     int getRow1(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return ((m_rootdata[4 + 2 * j] << 6) & 0x3C0) | ((m_rootdata[2 * j + 1] >> 26) & 0x3F) ;//  & 0x00F , & 0xFC000000
+      return ((((ubig32_t*)m_rootdata)[4 + 2 * j] & 0xF) << 6) | ((((ubig32_t*)m_rootdata)[4 + 2 * j + 1] & 0xFC000000) >> 26) ;
     }
 
     /** Return Row 2 of ROI j
@@ -94,7 +96,7 @@ namespace Belle2 {
     int getRow2(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return (m_rootdata[4 + 2 * j + 1] >> 8) & 0x3FF;  // & 0x0003FF00
+      return (((ubig32_t*)m_rootdata)[4 + 2 * j + 1] & 0x3FF00) >> 8;
     }
 
     /** Return Col 1 of ROI j
@@ -104,7 +106,7 @@ namespace Belle2 {
     int getCol1(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return (m_rootdata[4 + 2 * j + 1] >> 18) & 0xFF; // & 0x03FC0000
+      return (((ubig32_t*)m_rootdata)[4 + 2 * j + 1] & 0x03FC0000) >> 18;
     }
 
     /** Return Col 1 of ROI j
@@ -114,7 +116,7 @@ namespace Belle2 {
     int getCol2(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return (m_rootdata[4 + 2 * j + 1]) & 0xFF;
+      return (((ubig32_t*)m_rootdata)[4 + 2 * j + 1]) & 0xFF;
     }
 
     /** Return Type (Datcon or HLT) of ROI j
@@ -123,8 +125,8 @@ namespace Belle2 {
      */
     int getType(int j) const
     {
-      if (j < 0 || j >= (int)m_length / 8) return -1;
-      return (m_rootdata[4 + 2 * j] >> 10) & 0x1; //  & 0x400
+      if (j < 0 || j >= getNrROIs()) return -1;
+      return (((ubig32_t*)m_rootdata)[4 + 2 * j] & 0x400) >> 10;
     }
 
   private:

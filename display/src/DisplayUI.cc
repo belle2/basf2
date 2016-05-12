@@ -39,6 +39,9 @@
 #include <TROOT.h>
 #include <TSystem.h>
 
+#include <sys/prctl.h>
+#include <signal.h>
+
 #include <cassert>
 
 
@@ -54,6 +57,9 @@ DisplayUI::DisplayUI(bool automatic):
   m_nextButton(0),
   m_timer(0)
 {
+  //ensure GUI thread goes away when parent dies. (root UI loves deadlocks)
+  prctl(PR_SET_PDEATHSIG, SIGHUP);
+
   if (!gEve) {
     B2INFO("Creating TEve window.");
     TEveManager::Create(!m_automatic, "I"); //show window in interactive mode, hide file browser

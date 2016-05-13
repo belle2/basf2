@@ -62,49 +62,42 @@ namespace Belle2 {
                           geometry::GeometryTypes type);
 
       /**
-       * Creates a bar with a stack of PMT's
-       * @param content A reference to the content part of the parameter description
-       * @param moduleID the number used to read the proper alignement parameters.
-       * @return G4AssemblyVolume of a whole bar
-       */
-      G4AssemblyVolume* buildBar(const GearDir& content, const int moduleID);
-
-      /**
-       * Creates a segment of electronics which holds 8 PMTs
-       * @param content A reference to the content part of the parameter description
-       * @return G4AssemblyVolume of one segment of electronics
-       */
-      G4AssemblyVolume* buildElectronics(const GearDir& content);
-
-      /**
        * Creates one module of the TOP counter (bar+support+PMT array)
-       * @param content A reference to the content part of the parameter description
-       * @param moduleID the number used to read the proper alignement parameters.
-       * @return G4LogicalVolume of a whole TOP module
+       * @param geo geometry description
+       * @param moduleID module ID
+       * @return logical volume of the module
        */
-      G4LogicalVolume* buildTOPModule(const GearDir& content, const int moduleID);
+      G4LogicalVolume* buildTOPModule(const TOPGeometry& geo, int moduleID);
+
+      /**
+       * Creates a bar with a stack of PMT's
+       * @param geo geometry description
+       * @param moduleID module ID
+       * @return assembly volume of the bar with PMT's
+       */
+      G4AssemblyVolume* buildBar(const TOPGeometry& geo, int moduleID);
 
       /**
        * Creates a PMT stack
-       * @param content A reference to geometry description
-       * @return G4AssemblyVolume of the desired stack of PMTs
+       * @param geo geometry description
+       * @return logical volume of PMT array
        */
-      G4LogicalVolume* buildPMTstack(const GearDir& content);
+      G4LogicalVolume* buildPMTstack(const TOPGeoPMTArray& geo);
 
       /**
        * Creates a PMT
-       * @param content A reference to geometry description
-       * @return G4LogicalVolume of one PMT
+       * @param geo geometry description
+       * @return logical volume of one PMT
        */
-      G4LogicalVolume* buildPMT(const GearDir& content);
+      G4LogicalVolume* buildPMT(const TOPGeoPMT& geo);
 
 
       SensitivePMT* m_sensitivePMT = 0;  /**< Sensitive vol. to register PMT hits */
       SensitiveBar* m_sensitiveBar = 0;  /**< Sensitive vol. to register particles */
       BkgSensitiveDetector* m_sensitivePCB1 = 0;  /**< PCB sensitive for BG studies */
       BkgSensitiveDetector* m_sensitivePCB2 = 0;  /**< PCB sensitive for BG studies */
-      TOPGeometryPar* m_topgp = TOPGeometryPar::Instance(); /**< old singleton class */
-      const TOPGeometry* m_geometry = 0; /**< Geometry parameters */
+      TOPGeometryPar* m_topgp = TOPGeometryPar::Instance(); /**< singleton class */
+      const TOPGeometry* m_geo = 0; /**< Geometry parameters */
       int m_isBeamBkgStudy = 0; /**< flag for beam backgound simulation */
     };
 

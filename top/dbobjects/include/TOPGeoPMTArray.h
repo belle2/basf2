@@ -114,14 +114,20 @@ namespace Belle2 {
      * @param col valid column number (1-based)
      * @return x coordinate of column center
      */
-    double getX(unsigned col) const {return (2 * col - m_numColumns - 1) / 2.0 * getDx();}
+    double getX(unsigned col) const
+    {
+      return (int)(m_numColumns + 1 - 2 * col) / 2.0 * getDx();
+    }
 
     /**
      * Returns the y coordinate of row center
      * @param row valid row number (1-based)
      * @return y coordinate of row center
      */
-    double getY(unsigned row) const {return (2 * row - m_numRows - 1) / 2.0 * getDy();}
+    double getY(unsigned row) const
+    {
+      return (int)(2 * row - m_numRows - 1) / 2.0 * getDy();
+    }
 
     /**
      * Returns material name into which PMT's are inserted

@@ -1,7 +1,7 @@
 /**************************************************************************
  *                             BASF2                                      *
  *                                                                        *
- *                  The Belle Analysis Framework 2                        *
+ *              The Belle Analysis Software Framework 2                   *
  *                                                                        *
  *                                                                        *
  * There are two ways to work with the framework. Either                  *
@@ -12,7 +12,7 @@
  * This file implements the main executable "basf2".                      *
  *                                                                        *
  *                                                                        *
- * Copyright(C) 2010-2014  Belle II Collaboration                         *
+ * Copyright(C) 2010-2016  Belle II Collaboration                         *
  *                                                                        *
  * Contributing authors :                                                 *
  * (main framework)                                                       *
@@ -64,29 +64,28 @@ using namespace boost::python;
 
 namespace prog = boost::program_options;
 
-void executePythonFile(const string& pythonFile);
+namespace {
+  void executePythonFile(const string& pythonFile)
+  {
+    boost::filesystem::path fullPath(boost::filesystem::initial_path<boost::filesystem::path>());
 
-void executePythonFile(const string& pythonFile)
-{
-  boost::filesystem::path fullPath(boost::filesystem::initial_path<boost::filesystem::path>());
+    fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
+    if ((!(boost::filesystem::is_directory(fullPath))) && (boost::filesystem::exists(fullPath))) {
 
-  fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
-  if ((!(boost::filesystem::is_directory(fullPath))) && (boost::filesystem::exists(fullPath))) {
+      std::ifstream file(fullPath.string().c_str());
+      std::stringstream buffer;
+      buffer << file.rdbuf();
+      Environment::Instance().setSteering(buffer.str());
 
-    std::ifstream file(fullPath.string().c_str());
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    Environment::Instance().setSteering(buffer.str());
+      object main_module = import("__main__");
+      object main_namespace = main_module.attr("__dict__");
 
-    object main_module = import("__main__");
-    object main_namespace = main_module.attr("__dict__");
-
-    exec_file(boost::python::str(fullPath.string()), main_namespace, main_namespace);
-  } else {
-    B2FATAL("The given filename and/or path is not valid: " + pythonFile);
+      exec_file(boost::python::str(fullPath.string()), main_namespace, main_namespace);
+    } else {
+      B2FATAL("The given filename and/or path is not valid: " + pythonFile);
+    }
   }
 }
-
 
 int main(int argc, char* argv[])
 {
@@ -105,7 +104,6 @@ int main(int argc, char* argv[])
   boost::filesystem::path libPath = "lib";
   libPath /= belle2SubDir;
 
-  bool runInteractiveMode = true;
   string runModuleIOVisualization(""); //nothing done if empty
   vector<string> arguments;
   string pythonFile;
@@ -115,20 +113,19 @@ int main(int argc, char* argv[])
     //          Handle command line options
     //---------------------------------------------------
 
-    // Declare a group of options that will be
-    // allowed only on command line
-    prog::options_description generic("Generic options");
+    prog::options_description generic("Generic options (to be used instead of steering file)");
     generic.add_options()
-    ("help,h", "print all available options")
+    ("help,h", "print this help")
     ("version,v", "print version string")
     ("info", "print information about basf2")
     ("modules,m", prog::value<string>()->implicit_value(""),
      "print a list of all available modules (can be limited to a given package), or give detailed information on a specific module given as an argument (case sensitive).")
+    ("module-io", prog::value<string>(),
+     "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
+    ("execute-path", prog::value<string>(),
+     "Do not read any provided steering file, instead execute the pickled (serialized) path from the given file.")
     ;
 
-    // Declare a group of options that will be
-    // allowed both on command line and in
-    // config file
     prog::options_description config("Configuration");
     config.add_options()
     ("steering", prog::value<string>(), "the python steering file")
@@ -137,20 +134,16 @@ int main(int argc, char* argv[])
      "set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
     ("events,n", prog::value<int>(), "override number of events for EventInfoSetter; otherwise set maximum number of events.")
     ("input,i", prog::value<vector<string> >(),
-     "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file.")
+     "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file. For RootInput, wildcards (as in *.root or [1-3].root) can be used, but need to be escaped with \\  or by quoting the argument to avoid expansion by the shell.")
     ("output,o", prog::value<string>(), "override name of output file for (Seq)RootOutput")
     ("processes,p", prog::value<int>(), "override number of worker processes (>=1 enables, 0 disables parallel processing)")
     ("visualize-dataflow", "Generate data flow diagram (dataflow.dot) for the executed steering file.")
-    ("module-io", prog::value<string>(),
-     "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
     ("no-stats",
      "Disable collection of statistics during event processing. Useful for very high-rate applications, but produces empty table with 'print statistics'.")
     ("dry-run",
-     "Read steering file, but do not start any actually start any event processing. Prints information on input/output files that would be used during normal execution.")
+     "Read steering file, but do not start any event processing when process(path) is called. Prints information on input/output files that would be used during normal execution.")
     ("dump-path", prog::value<string>(),
      "Read steering file, but do not actually start any event processing. The module path the steering file would execute is instead pickled (serialized) into the given file.")
-    ("execute-path", prog::value<string>(),
-     "Do not read any provided steering file, instead execute the pickled (serialized) path from the given file.")
 #ifdef HAS_CALLGRIND
     ("profile", prog::value<string>(),
      "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
@@ -169,12 +162,39 @@ int main(int argc, char* argv[])
                 options(cmdlineOptions).positional(posOptDesc).run(), varMap);
     prog::notify(varMap);
 
-    //Check for help option
+    //Check for non-steering file options
     if (varMap.count("help")) {
       cout << "Usage: " << argv[0] << " [OPTIONS] [STEERING_FILE] [-- [STEERING_FILE_OPTIONS]]\n";
       cout << cmdlineOptions << endl;
       return 0;
+    } else if (varMap.count("version")) {
+      pythonFile = "version.py";
+    } else if (varMap.count("info")) {
+      pythonFile = "info.py";
+    } else if (varMap.count("modules")) {
+      string modArgs = varMap["modules"].as<string>();
+      if (!modArgs.empty()) {
+        arguments.insert(arguments.begin(), modArgs);
+      }
+      // recent boost program_options will not consume extra tokens for
+      // implicit options. In this case the module/package name gets consumed
+      // in tyhe steering file so we just use that.
+      if (varMap.count("steering")) {
+        arguments.insert(arguments.begin(), varMap["steering"].as<string>());
+      }
+      pythonFile = "modules.py";
+    } else if (varMap.count("module-io")) {
+      runModuleIOVisualization = varMap["module-io"].as<string>();
+      pythonFile = "basf2.py"; //make module maps available, visualization will happen later
+    } else if (varMap.count("execute-path")) {
+      Environment::Instance().setPicklePath(varMap["execute-path"].as<string>());
+      pythonFile = "execute_pickled_path.py";
+    } else if (varMap.count("steering")) {
+      // steering file not misused as module name, so print it's name :D
+      pythonFile = varMap["steering"].as<string>();
+      B2INFO("Steering file: " << pythonFile);
     }
+
 
     // -p
     // Do now so that we can override if profiling is requested
@@ -225,30 +245,6 @@ int main(int argc, char* argv[])
     }
 #endif
 
-    //Check for version option
-    if (varMap.count("version")) {
-      pythonFile = "version.py";
-    }
-
-    //Check for modules option (-m)
-    if (varMap.count("modules")) {
-      string modArgs = varMap["modules"].as<string>();
-      if (!modArgs.empty()) {
-        arguments.insert(arguments.begin(), modArgs);
-      }
-      // recent boost program_options will not consume extra tokens for
-      // implicit options. In this case the module/package name gets consumed
-      // in tyhe steering file so we just use that.
-      if (varMap.count("steering")) {
-        arguments.insert(arguments.begin(), varMap["steering"].as<string>());
-      }
-      pythonFile = "modules.py";
-    } else if (varMap.count("steering")) {
-      // steering file not misused as module name, so print it's name :D
-      pythonFile = varMap["steering"].as<string>();
-      B2INFO("Steering file: " << pythonFile);
-    }
-
     // -n
     if (varMap.count("events")) {
       int nevents = varMap["events"].as<int>();
@@ -298,11 +294,6 @@ int main(int argc, char* argv[])
       }
     }
 
-    if (varMap.count("module-io")) {
-      runModuleIOVisualization = varMap["module-io"].as<string>();
-      pythonFile = "basf2.py"; //make module maps available, visualization will happen later
-    }
-
     if (varMap.count("no-stats")) {
       Environment::Instance().setNoStats(true);
     }
@@ -311,21 +302,10 @@ int main(int argc, char* argv[])
       Environment::Instance().setDryRun(true);
     }
 
-    //Check for version option
-    if (varMap.count("execute-path")) {
-      Environment::Instance().setPicklePath(varMap["execute-path"].as<string>());
-      pythonFile = "execute_pickled_path.py";
-    }
-
-    //Check for version option
     if (varMap.count("dump-path")) {
       Environment::Instance().setPicklePath(varMap["dump-path"].as<string>());
     }
 
-    //Check for info option
-    if (varMap.count("info")) {
-      pythonFile = "info.py";
-    }
 
   } catch (exception& e) {
     cerr << "error: " << e.what() << endl;
@@ -339,8 +319,6 @@ int main(int argc, char* argv[])
   //  If the python file is set, execute it
   //---------------------------------------------------
   if (!pythonFile.empty()) {
-    runInteractiveMode = false;
-
     //Search in local or central lib/ if this isn't a direct path
     if (!boost::filesystem::exists(pythonFile)) {
       std::string libFile = FileSystem::findFile((libPath / pythonFile).string());
@@ -388,14 +366,11 @@ int main(int argc, char* argv[])
       Py_Finalize();
       return 1;
     }
-
-  }
-
-  //---------------------------------------------------
-  //  If no command line parameter was given, run the
-  //  Python interpreter in interactive mode.
-  //---------------------------------------------------
-  if (runInteractiveMode) {
+  } else {
+    //---------------------------------------------------
+    //  If no command line parameter was given, run the
+    //  Python interpreter in interactive mode.
+    //---------------------------------------------------
     pythonFile = FileSystem::findFile((libPath / "basf2.py").string());
     string extCommand("python3 -i " + pythonFile);
     if (system(extCommand.c_str()) != 0)

@@ -1,6 +1,4 @@
 #include <framework/conditions/ConditionsService.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/core/Module.h>
 #include <framework/logging/Logger.h>
 #include <TFile.h>
@@ -129,11 +127,11 @@ namespace {
 
 void ConditionsService::parse_return(std::string temp)
 {
-  TXMLEngine* xml = new TXMLEngine;
+  std::unique_ptr<TXMLEngine> xml(new TXMLEngine);
 
   XMLDocPointer_t xmldoc = xml->ParseString(temp.c_str());
   if (xmldoc == 0) {
-    B2WARNING("corrupt return from REST call: " << temp.c_str());
+    B2WARNING("corrupt return from REST call: " << temp);
     B2WARNING("Access to central database is disabled");
     m_enabled = false;
     return;
@@ -144,12 +142,10 @@ void ConditionsService::parse_return(std::string temp)
   XMLNodePointer_t mainnode = xml->DocGetRootElement(xmldoc);
 
   // display recursively all nodes and subnodes
-  displayNodes(xml, mainnode, 1);
+  displayNodes(xml.get(), mainnode, 1);
 
   // Release memory before exit
   xml->FreeDoc(xmldoc);
-  delete xml;
-
 }
 
 size_t ConditionsService::capture_return(void* buffer, size_t size, size_t nmemb, void*)
@@ -309,7 +305,7 @@ void ConditionsService::writePayloadFile(std::string payloadFileName,
   curl_slist_free_all(headerlist);
 }
 
-size_t ConditionsService:: write_data(void* ptr, size_t size, size_t nmemb, FILE* stream)
+size_t ConditionsService::write_data(void* ptr, size_t size, size_t nmemb, FILE* stream)
 {
   size_t written = fwrite(ptr, size, nmemb, stream);
   return written;

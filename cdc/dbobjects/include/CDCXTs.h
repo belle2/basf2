@@ -28,7 +28,7 @@ namespace Belle2 {
     CDCXTs() {}
 
     /**
-     * Set alpha point
+     * Set alpha-angle point (rad)
      */
     void setAlphaPoint(unsigned short i, double alpha)
     {
@@ -36,7 +36,7 @@ namespace Belle2 {
     }
 
     /**
-     * Set theta point
+     * Set theta-angle point (rad)
      */
     void setThetaPoint(unsigned short i, double theta)
     {
@@ -46,33 +46,34 @@ namespace Belle2 {
     /**
      * Set xt parameters
      */
-    void setXTParam(unsigned short iCL, unsigned short LR, unsigned short iAlpha, unsigned short iTheta, unsigned short i, double param)
+    void setXTParam(unsigned short iCLayer, unsigned short LR, unsigned short iAlpha, unsigned short iTheta, unsigned short i,
+                    double param)
     {
-      m_xt[iCL][LR][iAlpha][iTheta][i] = param;
+      m_xt[iCLayer][LR][iAlpha][iTheta][i] = param;
     }
 
     /**
      * Multiply the factor
      */
-    void MultiplyFactor(unsigned short iCL, unsigned short LR, unsigned short iAlpha, unsigned short iTheta, unsigned short i,
+    void MultiplyFactor(unsigned short iCLayer, unsigned short LR, unsigned short iAlpha, unsigned short iTheta, unsigned short i,
                         double fact)
     {
-      m_xt[iCL][LR][iAlpha][iTheta][i] *= fact;
+      m_xt[iCLayer][LR][iAlpha][iTheta][i] *= fact;
     }
 
     /**
      * Copy XT params.
      */
-    void copyXTParam(unsigned short iCL, unsigned short LR, unsigned short iAlpha, unsigned short iTheta0, unsigned short iTheta1)
+    void copyXTParam(unsigned short iCLayer, unsigned short LR, unsigned short iAlpha, unsigned short iTheta0, unsigned short iTheta1)
     {
       for (unsigned short i = 0; i < c_nXTParams; ++i) {
-        m_xt[iCL][LR][iAlpha][iTheta1][i] = m_xt[iCL][LR][iAlpha][iTheta0][i];
+        m_xt[iCLayer][LR][iAlpha][iTheta1][i] = m_xt[iCLayer][LR][iAlpha][iTheta0][i];
       }
     }
 
 
     /**
-     * Get alpha point
+     * Get alpha-angle point (rad)
      */
     double getAlphaPoint(unsigned short i)
     {
@@ -80,7 +81,7 @@ namespace Belle2 {
     }
 
     /**
-     * Get theta point
+     * Get theta-angle point (rad)
      */
     double getThetaPoint(unsigned short i)
     {
@@ -90,9 +91,9 @@ namespace Belle2 {
     /**
      * Get xt parameter
      */
-    double getXTParam(unsigned short iCL, unsigned short LR, unsigned short iAlpha, unsigned short iTheta, unsigned short i)
+    double getXTParam(unsigned short iCLayer, unsigned short LR, unsigned short iAlpha, unsigned short iTheta, unsigned short i)
     {
-      return m_xt[iCL][LR][iAlpha][iTheta][i];
+      return m_xt[iCLayer][LR][iAlpha][iTheta][i];
     }
 
     /**

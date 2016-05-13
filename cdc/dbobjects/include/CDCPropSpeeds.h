@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: CDC group                                                *
@@ -17,7 +17,7 @@
 namespace Belle2 {
 
   /**
-   * Database object of CDC.
+   * Database object for signal propagation speed along the wire.
    */
   class CDCPropSpeeds: public TObject {
   public:
@@ -28,14 +28,13 @@ namespace Belle2 {
     CDCPropSpeeds() {}
 
     /**
-     * Set the speed in the list
+     * Set the speed in the list.
      */
-    //    void setSpeed(unsigned short iCLayer, float speed)
-    void setSpeed(float speed)
+    //    void setSpeed(unsigned short iCLayer, double speed)
+    void setSpeed(double speed)
     {
       m_speedList.push_back(speed);
       //      m_speedList[iCLayer] = speed;
-      //      std::cout << m_speedList.size() <<" "<< iCLayer <<" "<< speed << std::endl;
     }
 
     /**
@@ -49,7 +48,7 @@ namespace Belle2 {
     /**
      * Get the speed
      */
-    float getSpeed(unsigned short iCLayer) const
+    double getSpeed(unsigned short iCLayer) const
     {
       return m_speedList[iCLayer];
     }
@@ -64,14 +63,13 @@ namespace Belle2 {
       std::cout << "#entries= " << m_speedList.size() << std::endl;
       std::cout << "in order of clayer and speed (cm/ns)" << std::endl;
 
-      for (unsigned short CL = 0; CL < m_speedList.size(); ++CL) {
-        std::cout << CL << " " << m_speedList[CL] << std::endl;
+      for (unsigned short iCL = 0; iCL < m_speedList.size(); ++iCL) {
+        std::cout << iCL << " " << m_speedList[iCL] << std::endl;
       }
     }
 
   private:
     std::vector<float> m_speedList; /**< list of speed*/
-    //    std::vector<float> m_speedList(56); /**< list of speed*/
 
     ClassDef(CDCPropSpeeds, 1); /**< ClassDef */
   };

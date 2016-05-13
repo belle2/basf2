@@ -31,17 +31,17 @@ namespace Belle2 {
     /**
      * Set sigma parameters
      */
-    void setSigmaParam(unsigned short iCL, unsigned short i, double param)
+    void setSigmaParam(unsigned short iCLayer, unsigned short i, double param)
     {
-      m_sigma[iCL][i] = param;
+      m_sigma[iCLayer][i] = param;
     }
 
     /**
      * Get sigma parameter
      */
-    double getSigmaParam(unsigned short iCL, unsigned short i)
+    double getSigmaParam(unsigned short iCLayer, unsigned short i)
     {
-      return m_sigma[iCL][i];
+      return m_sigma[iCLayer][i];
     }
 
     /**

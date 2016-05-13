@@ -685,6 +685,9 @@ namespace Belle2 {
     if (_tsFinder) {
       _tsFinder->terminate();
     }
+    if (_eventTime.back()) {
+      _eventTime.back()->terminate();
+    }
     if (_fitter3D) {
       _fitter3D->terminate();
     }
@@ -1981,6 +1984,7 @@ namespace Belle2 {
                     trackSegmentClockSimulation,
                     _segmentHits,
                     _segmentHitsSL);
+    _eventTime.back()->doit();
 
     if (trackSegmentSimulationOnly) {
       TRGDebug::leaveStage("TRGCDC fastSimulation");

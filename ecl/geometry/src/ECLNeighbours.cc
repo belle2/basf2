@@ -38,13 +38,23 @@ ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par)
   // fixed number of neighbours:
   if (neighbourDef == "N") {
     B2INFO("ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n: " << parToInt * 2 + 1 << " x " << parToInt * 2 + 1);
-    if ((parToInt >= 0) && (parToInt < 6)) initializeN(parToInt);
+    if ((parToInt >= 0) and (parToInt < 6)) initializeN(parToInt);
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 5)!");
+  } else if (neighbourDef == "NC") {
+    B2INFO("ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus corners): " << parToInt * 2 + 1 << " x " <<
+           parToInt * 2 + 1);
+    if ((parToInt >= 0) and (parToInt < 6)) initializeNC(parToInt, 1);
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 5)!");
+  } else if (neighbourDef == "N2C") {
+    B2INFO("ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus 2 corners): " << parToInt * 2 + 1 << " x " <<
+           parToInt * 2 + 1);
+    if ((parToInt >= 0) and (parToInt < 6)) initializeNC(parToInt, 2);
     else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 5)!");
   }
   // or neighbours depend on the distance:
   else if (neighbourDef == "R") {
     B2INFO("ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", radius: " << par << " cm");
-    if ((par > 0.0) && (par < 30.0 * Belle2::Unit::cm)) initializeR(par);
+    if ((par > 0.0) and (par < 30.0 * Belle2::Unit::cm)) initializeR(par);
     else B2FATAL("ECLNeighbours::ECLNeighbours: " << par << " is an invalid parameter (must be between 0 cm and 30 cm)!");
   }
   // or wrong type:
@@ -145,6 +155,56 @@ void ECLNeighbours::initializeN(int n)
   }
 }
 
+
+void ECLNeighbours::initializeNC(const int n, const int corners)
+{
+  // ECL geometry
+  ECLGeometryPar* geom = ECLGeometryPar::Instance();
+
+  // This is the "NxN-edges" minus edges case (in the barrel)
+  // in the endcaps we project the neighbours to the outer and inner rings.
+  for (int i = 0; i < 8736; i++) {
+
+    // this vector will hold all neighbours for the i-th crystal
+    std::vector<short int> neighbours;
+
+    // phi and theta coordinates of the central crystal
+    geom->Mapping(i);
+    const short tid = geom->GetThetaID();
+    const short pid = geom->GetPhiID();
+
+    // 'left' and 'right' extremal neighbours in the same theta ring
+    const short int phiInc = increasePhiId(pid, tid, n);
+    const short int phiDec = decreasePhiId(pid, tid, n);
+    const double fractionalPhiInc = static_cast < double >(phiInc) / m_crystalsPerRing [ tid ];
+    const double fractionalPhiDec = static_cast < double >(phiDec) / m_crystalsPerRing [ tid ];
+
+    // loop over all possible theta rings and add neighbours
+    for (int theta = tid - n; theta <= tid + n; theta++) {
+      if ((theta > 68) || (theta < 0)) continue;     // valid theta ids are 0..68 (69 in total)
+
+      short int thisPhiInc = TMath::Nint(fractionalPhiInc * m_crystalsPerRing [ theta ]);
+
+      short int thisPhiDec = TMath::Nint(fractionalPhiDec * m_crystalsPerRing [ theta ]);
+      if (thisPhiDec == m_crystalsPerRing [ theta ]) thisPhiDec = 0;
+
+      std::vector<short int> phiList;
+      if ((theta == tid - n) or (theta == tid + n)) phiList = getPhiIdsInBetweenC(thisPhiInc, thisPhiDec, theta, corners);
+      else if (corners == 2 and ((theta == tid - n + 1)
+                                 or (theta == tid + n - 1))) phiList = getPhiIdsInBetweenC(thisPhiInc, thisPhiDec, theta, 1);
+      else phiList = getPhiIdsInBetween(thisPhiInc, thisPhiDec, theta);
+
+      for (unsigned int k = 0; k < phiList.size(); ++k) {
+        neighbours.push_back(geom->GetCellID(theta , phiList.at(k)) + 1);
+      }
+    }
+
+    // push back the final vector of IDs
+    m_neighbourMap.push_back(neighbours);
+
+  }
+}
+
 std::vector<short int> ECLNeighbours::getNeighbours(const short int cid)
 {
   return m_neighbourMap.at(cid);
@@ -173,6 +233,22 @@ std::vector<short int> ECLNeighbours::getPhiIdsInBetween(const short int phi0, c
   while (1) {
     phiList.push_back(loop);
     if (loop == phi1) break;
+    loop = decreasePhiId(loop, theta, 1);
+  }
+
+  return phiList;
+}
+
+std::vector<short int> ECLNeighbours::getPhiIdsInBetweenC(const short int phi0, const short int phi1, const short int theta,
+                                                          const int corners)
+{
+  std::vector<short int> phiList;
+  short int loop = decreasePhiId(phi0, theta, corners); //start at -1
+  short int stop = increasePhiId(phi1, theta, corners); //stop at +1
+
+  while (1) {
+    phiList.push_back(loop);
+    if (loop == stop) break;
     loop = decreasePhiId(loop, theta, 1);
   }
 

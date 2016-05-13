@@ -55,6 +55,9 @@ namespace Belle2 {
       /**  initialize the mask neighbour list. */
       void initializeN(const int nneighbours);
 
+      /**  initialize the mask neighbour list, remove corners. */
+      void initializeNC(const int nneighbours, const int corners);
+
       /**  initialize the radius neighbout list. */
       void initializeR(const double radius);
 
@@ -66,6 +69,10 @@ namespace Belle2 {
 
       /** return a list of phi ids between two phi ids */
       std::vector<short int> getPhiIdsInBetween(const short int phiInc, const short int phiDec, const short int theta);
+
+      /** return a list of phi ids between two phi ids minus edges*/
+      std::vector<short int> getPhiIdsInBetweenC(const short int phiInc, const short int phiDec, const short int theta,
+                                                 const int corners);
 
       /** return the chord length between crystals */
       double getDistance(const double alpha, const double R);

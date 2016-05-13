@@ -42,7 +42,7 @@ CDCGeometryPar::CDCGeometryPar()
   }
 #endif
 #if defined(CDC_BADWIRE_FROM_DB)
-  if (m_badwireFromDB.isValid()) {
+  if (m_badWireFromDB.isValid()) {
     m_badWireFromDB.addCallback(this, &CDCGeometryPar::setBadWire);
   }
 #endif

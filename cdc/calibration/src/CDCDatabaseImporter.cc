@@ -480,7 +480,7 @@ void CDCDatabaseImporter::printTimeZero()
   DBArray<CDCTimeZero> timeZeros;
 
   for (const auto& tz : timeZeros) {
-    std::cout << tz.getILayer() << " " << tz.getIWire() << " "
+    std::cout << tz.getICLayer() << " " << tz.getIWire() << " "
               << tz.getT0() << std::endl;
   }
 

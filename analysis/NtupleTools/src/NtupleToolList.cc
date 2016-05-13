@@ -49,6 +49,8 @@
 #include <analysis/NtupleTools/NtupleLEECLTool.h>
 #include <analysis/NtupleTools/NtupleLEKLMTool.h>
 #include <analysis/NtupleTools/NtupleHLTTagTool.h>
+#include <analysis/NtupleTools/NtupleMCGenKinematicsTool.h>
+#include <analysis/NtupleTools/NtupleMCGenCMSKinematicsTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -134,6 +136,8 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "LEECL")  return new NtupleLEECLTool(tree, d);
   else if (strToolName == "LEKLM")  return new NtupleLEKLMTool(tree, d);
   else if (strToolName == "HLTTag")  return new NtupleHLTTagTool(tree, d);
+  else if (strToolName == "MCGenKinematics") return new NtupleMCGenKinematicsTool(tree, d, strOption);
+  else if (strToolName == "MCGenCMSKinematics") return new NtupleMCGenCMSKinematicsTool(tree, d, strOption);
   B2WARNING("NtupleTool " << strToolName << " is not available!");
   return NULL;
 }

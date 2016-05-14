@@ -15,7 +15,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
-#include <../framework/gearbox/include/Unit.h>
+#include <framework/gearbox/Unit.h>
 
 #include <vxd/geometry/GeoCache.h>
 

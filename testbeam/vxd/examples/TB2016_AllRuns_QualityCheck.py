@@ -293,8 +293,7 @@ else:
 
 OutputHistoName = 'TB2016_QualityCheckHistos_Run'+str(RunNoVXD)+'.root'
 
-if args.dqm:
-    main.add_module('HistoManager', histoFileName=OutputHistoName)
+main.add_module('HistoManager', histoFileName=OutputHistoName)
 
 main.add_module('Progress')
 
@@ -319,6 +318,10 @@ if args.tel_input:
 
 if args.unpacking:
     if not args.svd_only:
+        triggerfix = main.add_module(register_module('PXDTriggerFixer'))
+        triggerfix.if_false(emptypath)
+        main.add_module(triggerfix)
+
         """
         triggerfix = register_module(register_module('PXDTriggerFixer'))
         triggerfix.if_false(create_path())
@@ -380,13 +383,14 @@ if UseTracks:
 
 if args.dqm:
     main.add_module("VXDTelDQMOffLine", SaveOtherHistos=1, SwapTel=0)
-    QualityCheck = register_module('QualityCheck')
-    QualityCheck.param('SummaryFileRunName', SummaryFileRunName)
-    QualityCheck.param('StartTime', StartTimee)
-    QualityCheck.param('EndTime', EndTimee)
-    QualityCheck.param('TelRunNo', TelRunNo)
-    QualityCheck.param('RunNo', RunNoVXD)
-    main.add_module(QualityCheck)
+
+QualityCheck = register_module('QualityCheck')
+QualityCheck.param('SummaryFileRunName', SummaryFileRunName)
+QualityCheck.param('StartTime', StartTimee)
+QualityCheck.param('EndTime', EndTimee)
+QualityCheck.param('TelRunNo', TelRunNo)
+QualityCheck.param('RunNo', RunNoVXD)
+main.add_module(QualityCheck)
 
 main.add_module('RootOutput')
 

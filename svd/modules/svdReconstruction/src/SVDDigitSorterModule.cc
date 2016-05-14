@@ -122,7 +122,7 @@ void SVDDigitSorterModule::event()
     // u-strps will have segment number 1
     if (digit->isUStrip()) sensorID.setSegmentNumber(1);
     // filter out digits from ignored strips
-    if (m_ignoredStripsList->stripOK(digit->getSensorID(), digit->getCellID())) {
+    if (m_ignoredStripsList->stripOK(sensorID, digit->getCellID())) {
       sensors[sensorID].insert(sample);
     }
   }

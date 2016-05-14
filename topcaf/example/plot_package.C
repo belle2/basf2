@@ -59,7 +59,7 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   }
   
   TSpectrum *s0 = new TSpectrum(npeaks);
-  int nfound0 = s0->Search(roi[0],1,"",0.01);
+//  int nfound0 = s0->Search(roi[0],1,"",0.01);
   Double_t *xpeaks0=s0->GetPositionX();
   cout<<"Main peak location: "<<xpeaks0[0]<<endl;
 
@@ -90,10 +90,10 @@ void plot_package(TString filename, const char* outfile="", const char* trigpos=
   }
   
   TSpectrum *s1 = new TSpectrum(npeaks);
-  int nfound1 = s1->Search(roi[1],1,"",0.01);
+//  int nfound1 = s1->Search(roi[1],1,"",0.01);
   Double_t *xpeaks1=s1->GetPositionX();
   TSpectrum *s2 = new TSpectrum(npeaks);
-  int nfound2 = s2->Search(roi[2],1,"",0.01);
+//  int nfound2 = s2->Search(roi[2],1,"",0.01);
   Double_t *xpeaks2=s2->GetPositionX();
 
   cout<<xpeaks0[0]<<" "<<xpeaks1[0]<<" "<<xpeaks2[0]<<" "<<endl;

@@ -718,7 +718,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
 
   t2 = clock();
   cout << "gain " << (t2 - t1) << endl;
-  t1 = t2;
+//  t1 = t2;
 
   for (int c = 0; c < 4; c++) {
     t.Draw(Form("(TOPCAFDigits.m_asic_row*100+TOPCAFDigits.m_asic*10+TOPCAFDigits.m_asic_ch)>>asic_occupancy%d", c),

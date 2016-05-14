@@ -34,7 +34,7 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
   string trigstring = string(trigpos);
   cout << trigstring << endl;
 
-  clock_t t1 = clock();
+//  clock_t t1 = clock();
 
   //detect fuji/tsukuba based on suffix
   //use cut to set trigger position
@@ -363,7 +363,7 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
                                           ibs, icr, ias), 257, 0., 257, 2000, -1000., 1000.);
         ASIC_tdcbin_time[itot]->GetXaxis()->SetTitle("hit time bin %256 [time bin]");
         ASIC_tdcbin_time[itot]->GetYaxis()->SetTitle("hit time [time bin]");
-        t.Draw(Form("TOPCAFDigits.m_time:TOPCAFDigits.m_tdc_bin%256>>ASIC_tdcbin_time_%d_%d_%d", ibs, icr, ias), loose_cut
+        t.Draw(Form("TOPCAFDigits.m_time:TOPCAFDigits.m_tdc_bin%%256>>ASIC_tdcbin_time_%d_%d_%d", ibs, icr, ias), loose_cut
                && Form("TOPCAFDigits.m_boardstack == %d && TOPCAFDigits.m_asic_row == %d && TOPCAFDigits.m_asic == %d",   ibs, icr, ias));
         ASIC_tdcbin_time[itot]->Write();
 
@@ -371,7 +371,7 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
                                             Form("hit height vs tdc bin in ASIC %d %d %d",  ibs, icr, ias), 257, 0., 257, 2000, 0., 2000);
         ASIC_tdcbin_height[itot]->GetXaxis()->SetTitle("hit time bin %256 [time bin]");
         ASIC_tdcbin_height[itot]->GetYaxis()->SetTitle("hit height [adc bin]");
-        t.Draw(Form("TOPCAFDigits.m_adc_height:TOPCAFDigits.m_tdc_bin%256>>ASIC_tdcbin_height_%d_%d_%d", ibs, icr, ias), loose_cut
+        t.Draw(Form("TOPCAFDigits.m_adc_height:TOPCAFDigits.m_tdc_bin%%256>>ASIC_tdcbin_height_%d_%d_%d", ibs, icr, ias), loose_cut
                && Form("TOPCAFDigits.m_boardstack == %d && TOPCAFDigits.m_asic_row == %d && TOPCAFDigits.m_asic == %d",   ibs, icr, ias));
         ASIC_tdcbin_height[itot]->Write();
 
@@ -379,12 +379,17 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
                                            ibs, icr, ias), 257, 0., 257, 200, 0., 20.);
         ASIC_tdcbin_width[itot]->GetXaxis()->SetTitle("hit time bin %256 [time bin]");
         ASIC_tdcbin_width[itot]->GetYaxis()->SetTitle("hit width [adc bin]");
-        t.Draw(Form("TOPCAFDigits.m_width:TOPCAFDigits.m_tdc_bin%256>>ASIC_tdcbin_width_%d_%d_%d", ibs, icr, ias), loose_cut
+        t.Draw(Form("TOPCAFDigits.m_width:TOPCAFDigits.m_tdc_bin%%256>>ASIC_tdcbin_width_%d_%d_%d", ibs, icr, ias), loose_cut
                && Form("TOPCAFDigits.m_boardstack == %d && TOPCAFDigits.m_asic_row == %d && TOPCAFDigits.m_asic == %d",   ibs, icr, ias));
         ASIC_tdcbin_width[itot]->Write();
 
-        ASIC_timing_qual[itot] = new TH1F(Form("ASIC_timing_qual_%d_%d_%d", ibs, icr, ias),  Form("Photon timing after quality cuts",  ibs,
-                                          icr, ias), 4000, -200, 200);
+        ASIC_timing_qual[itot] = new TH1F(Form("ASIC_timing_qual_%d_%d_%d", ibs, icr, ias),
+                                          Form("Photon timing after quality cuts_%d_%d_%d",
+                                               ibs, icr, ias), 4000, -200, 200);
+
+//        ASIC_timing_qual[itot] = new TH1F(Form("ASIC_timing_qual_%d_%d_%d", ibs, icr, ias),  Form("Photon timing after quality cuts",  ibs,
+//                                          icr, ias), 4000, -200, 200); //wxl, warning: too many arguments for format
+
         ASIC_timing_qual[itot]->GetXaxis()->SetTitle("hit time [ns]");
         t.Draw(Form("TOPCAFDigits.m_time>>ASIC_timing_qual_%d_%d_%d", ibs, icr, ias), tight_cut
                && Form("TOPCAFDigits.m_boardstack == %d && TOPCAFDigits.m_asic_row == %d && TOPCAFDigits.m_asic == %d",   ibs, icr, ias));

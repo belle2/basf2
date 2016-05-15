@@ -181,7 +181,7 @@ void ECLCRFinderModule::event()
     const bool fitfailed = eclCalDigit.isFailedFit();
 
     double timeresidual = 999.;
-    if (!fitfailed and abs(timeresolution) > 1e-9) {
+    if (!fitfailed and fabs(timeresolution) > 1e-9) {
       timeresidual = time / timeresolution;
     }
 
@@ -189,8 +189,8 @@ void ECLCRFinderModule::event()
     // Fill seed crystals to a map.
     if (energy >= m_energyCutMod[0]) {
       if (fitfailed > 0 and m_skipFailedTimeFitDigits > 0) continue;
-      if (m_timeCut[0] > 1e-9 and abs(timeresolution) > m_timeCut[0]) continue;
-      if (m_timeCut[0] < -1e-9  and abs(timeresidual) > abs(m_timeCut[0])) continue;
+      if (m_timeCut[0] > 1e-9 and fabs(timeresolution) > m_timeCut[0]) continue;
+      if (m_timeCut[0] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[0])) continue;
 
       m_cellIdToSeedPointerVec[cellid] = &eclCalDigit;
       B2DEBUG(250, "ECLCRFinderModule::event(), adding 'seed' with cellid = " << cellid);
@@ -200,8 +200,8 @@ void ECLCRFinderModule::event()
     // Fill growth crystals to a map.
     if (energy >= m_energyCutMod[1]) {
       if (fitfailed > 0 and m_skipFailedTimeFitDigits > 0) continue;
-      if (m_timeCut[1] > 1e-9 and abs(timeresolution) > m_timeCut[1]) continue;
-      if (m_timeCut[1] < -1e-9  and abs(timeresidual) > abs(m_timeCut[1])) continue;
+      if (m_timeCut[1] > 1e-9 and fabs(timeresolution) > m_timeCut[1]) continue;
+      if (m_timeCut[1] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[1])) continue;
 
       m_cellIdToGrowthPointerVec[cellid] = &eclCalDigit;
       B2DEBUG(250, "ECLCRFinderModule::event(), adding 'growth' with cellid = " << cellid);
@@ -210,8 +210,8 @@ void ECLCRFinderModule::event()
     // Fill all crystals above threshold to a map (this must include growth and seed crystals!).
     if (energy >= m_energyCutMod[2]) {
       if (fitfailed > 0 and m_skipFailedTimeFitDigits > 0) continue;
-      if (m_timeCut[2] > 1e-9 and abs(timeresolution) > m_timeCut[2]) continue;
-      if (m_timeCut[2] < -1e-9  and abs(timeresidual) > abs(m_timeCut[2])) continue;
+      if (m_timeCut[2] > 1e-9 and fabs(timeresolution) > m_timeCut[2]) continue;
+      if (m_timeCut[2] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[2])) continue;
 
       m_cellIdToDigitPointerVec[cellid] = &eclCalDigit;
       B2DEBUG(250, "ECLCRFinderModule::event(), adding 'digit' with cellid = " << cellid);

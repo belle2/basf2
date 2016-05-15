@@ -26,7 +26,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    CDCSigmas() {}
+    CDCSigmas(): m_sigma() {}
 
     /**
      * Set sigma parameters

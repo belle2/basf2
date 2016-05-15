@@ -25,7 +25,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    CDCXTs() {}
+    CDCXTs(): m_alphaPoints(), m_thetaPoints(), m_xt() {}
 
     /**
      * Set alpha-angle point (rad)
@@ -134,6 +134,31 @@ namespace Belle2 {
         }
       }
     }
+
+    /*
+    void init()
+    {
+      for (unsigned short i = 0; i < c_nAlphaPoints; ++i) {
+        m_alphaPoints[i] = 0.;
+      }
+
+      for (unsigned short i = 0; i < c_nThetaPoints; ++i) {
+        m_thetaPoints[i] = 0.;
+      }
+
+      for (unsigned short iCL = 0; iCL < c_nSLayers; ++iCL) {
+        for (unsigned short LR = 0; LR < 2; ++LR) {
+          for (unsigned short iA = 0; iA < c_nAlphaPoints; ++iA) {
+            for (unsigned short iT = 0; iT < c_nThetaPoints; ++iT) {
+              for (unsigned short i = 0; i < c_nXTParams; ++i) {
+                m_xt[iCL][LR][iA][iT][i] = 0.;
+              }
+            }
+          }
+        }
+      }
+    }
+    */
 
   private:
 

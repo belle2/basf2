@@ -3,8 +3,9 @@
 
 """
 <header>
-<output>EKLMK0LOutput.root</output>
-<contact>Timofey Uglov, uglov@itep.ru</contact>
+    <output>EKLMK0LOutput.root</output>
+    <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
+    <description>Generation of 500 muons for EKLM validation.</description>
 </header>
 """
 
@@ -43,6 +44,7 @@ g4sim = register_module('FullSim')
 eklmDigitizer = register_module('EKLMDigitizer')
 eklmReconstructor = register_module('EKLMReconstructor')
 eklmK0LReconstructor = register_module('EKLMK0LReconstructor')
+mc_matcher = register_module('MCMatcherKLMClusters')
 
 # Output
 output = register_module('RootOutput')
@@ -61,6 +63,7 @@ main.add_module(g4sim)
 main.add_module(eklmDigitizer)
 main.add_module(eklmReconstructor)
 main.add_module(eklmK0LReconstructor)
+main.add_module(mc_matcher)
 
 main.add_module(output)
 

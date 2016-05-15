@@ -3,7 +3,7 @@
 
 """
 <header>
-    <output>EKLMK0LOutput.root</output>
+    <output>EKLMMuonOutput.root</output>
     <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
     <description>Generation of 500 K_L0 for EKLM validation.</description>
 </header>

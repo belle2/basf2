@@ -95,7 +95,9 @@ void BKLMReconstructorModule::event()
   std::map<int, int> volIDToDigits;
   for (int d = 0; d < digits.getEntries(); ++d) {
     BKLMDigit* digit = digits[d];
-    volIDToDigits.insert(std::pair<int, int>(digit->getModuleID() & BKLM_MODULESTRIPID_MASK, d));
+    if (digit->inRPC() || digit->isAboveThreshold()) {
+      volIDToDigits.insert(std::pair<int, int>(digit->getModuleID() & BKLM_MODULESTRIPID_MASK, d));
+    }
   }
   if (volIDToDigits.empty()) return;
 

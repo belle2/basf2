@@ -721,9 +721,9 @@ namespace Belle2 {
       if (!material) { B2FATAL("Material '" << materialName << "' missing!");}
 
       // define array volume
-      G4Box* box = new G4Box("stack", geo.getSizeX() / 2, geo.getSizeY() / 2,
+      G4Box* box = new G4Box("PMTarray", geo.getSizeX() / 2, geo.getSizeY() / 2,
                              geo.getPMT().getSizeZ() / 2);
-      G4LogicalVolume* array = new G4LogicalVolume(box, material, "stack");
+      G4LogicalVolume* array = new G4LogicalVolume(box, material, "PMTarray");
 
       // Build one PMT
       G4LogicalVolume* PMT = buildPMT(geo.getPMT());
@@ -732,7 +732,7 @@ namespace Belle2 {
       for (unsigned row = 1; row <= geo.getNumRows(); row++) {
         for (unsigned col = 1; col <= geo.getNumColumns(); col++) {
           G4Transform3D tpmt = G4Translate3D(geo.getX(col), geo.getY(row), 0);
-          new G4PVPlacement(tpmt, PMT, "TOP.window", array, false, geo.getPmtID(row, col));
+          new G4PVPlacement(tpmt, PMT, "TOP.PMT", array, false, geo.getPmtID(row, col));
         }
       }
 

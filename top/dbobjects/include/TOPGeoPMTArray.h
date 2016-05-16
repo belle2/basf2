@@ -41,12 +41,10 @@ namespace Belle2 {
                    const std::string& material,
                    const TOPGeoPMT& pmt):
       m_numRows(numRows), m_numColumns(numColumns), m_dx(gapX), m_dy(gapY),
-      m_material(material), m_pmt(pmt)
+      m_gx(gapX), m_gy(gapY), m_material(material), m_pmt(pmt)
     {
       m_dx += pmt.getSizeX() * s_unit;
       m_dy += pmt.getSizeY() * s_unit;
-      m_sizeX = numColumns * m_dx - gapX;
-      m_sizeY = numRows * m_dy - gapY;
     }
 
     /**
@@ -98,16 +96,28 @@ namespace Belle2 {
     double getDy() const {return m_dy / s_unit;}
 
     /**
+     * Returns gap between PMT's in x
+     * @return gap in x
+     */
+    double getGapX() const {return m_gx / s_unit;}
+
+    /**
+     * Returns gap between PMT's in y
+     * @return gap in y
+     */
+    double getGapY() const {return m_gy / s_unit;}
+
+    /**
      * Returns array volume dimension in x
      * @return size in x
      */
-    double getSizeX() const {return m_sizeX / s_unit;}
+    double getSizeX() const {return m_numColumns * getDx();}
 
     /**
      * Returns array volume dimension in y
      * @return size in y
      */
-    double getSizeY() const {return m_sizeY / s_unit;}
+    double getSizeY() const {return m_numRows * getDy();}
 
     /**
      * Returns x coordinate of column center
@@ -190,8 +200,8 @@ namespace Belle2 {
     unsigned m_numColumns = 0;  /**< number of columns */
     float m_dx = 0; /**< spacing in x */
     float m_dy = 0; /**< spacing in y */
-    float m_sizeX = 0; /**< size in x */
-    float m_sizeY = 0; /**< size in y */
+    float m_gx = 0; /**< gap between PMT's in x */
+    float m_gy = 0; /**< gap between PMT's  in y */
     std::string m_material; /**< material name into which PMT's are inserted */
     TOPGeoPMT m_pmt; /**< PMT geometry parameters */
 

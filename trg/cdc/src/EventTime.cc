@@ -107,9 +107,9 @@ namespace Belle2{
     m_foundT0 = 0;
     m_falseTsHit = 0;
     int threshold = 3;
-    int hc = 0;
-    int hv = 0;
-    int hc_lasts =  5;
+//    int hc = 0;
+//    int hv = 0;
+//    int hc_lasts =  5;
     m_histT= 500;
     m_histT20= 500;
     m_histT10= 500;
@@ -122,7 +122,7 @@ namespace Belle2{
     TH1* h5 = new TH1D("h5", "h5", 1000, -500, 499);
     m_tsfN = tsh.size();
     int cnt[9][64]={};
-    int tempEN=-24555;
+//    int tempEN=-24555;
 
     for (int iClk=0; iClk<64; iClk++){
       for (int iTS=0; iTS<(int)tsh.size(); iTS++){
@@ -156,13 +156,13 @@ namespace Belle2{
         }
       }
       
-      int j,k=0;
-      if(iClk<32) j=0;
-      else j=(iClk-32)*16;
-      if(iClk<63) k=iClk*16;
-      else k=1000;
+      //int j,k=0;
+      //if(iClk<32) j=0;
+      //else j=(iClk-32)*16;
+      //if(iClk<63) k=iClk*16;
+      //else k=1000;
 
-      //for (int i = j; i<k; i++){
+      ////for (int i = j; i<k; i++){
       //  if(h->GetBinContent(i) > threshold){
       //    m_histT = i-500;
       //    m_evtOutS->Fill();

@@ -202,6 +202,7 @@ namespace Belle2 {
     int m_SaveOtherHistos = 1;            /**< flag <0,1> for creation of correlation plots for non-neighboar layers */
     int m_SwapPXD = 0;                    /**< flag <0,1> very special case for swap of u-v coordinates */
     int m_SwapTel = 0;                    /**< flag <0,1> very special case for swap of u-v coordinates */
+    float m_CorrelationGranulation = 1;   /**< set granulation of histogram plots, default is 1 mm, min = 0.02 mm, max = 1 mm */
 
     std::string m_storePXDDigitsName;     /**< PXDDigits StoreArray name */
     std::string m_storeDigitsName;        /**< SVDDigits StoreArray name */

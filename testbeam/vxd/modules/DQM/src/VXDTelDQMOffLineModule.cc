@@ -38,6 +38,8 @@ VXDTelDQMOffLineModule::VXDTelDQMOffLineModule() : HistoModule()
            "flag <0,1> for creation of correlation plots for non-neighboar layers, default = 0 ", m_SaveOtherHistos);
   addParam("SwapPXD", m_SwapPXD, "flag <0,1> very special case for swap of u-v coordinates, default = 0 ", m_SwapPXD);
   addParam("SwapTel", m_SwapTel, "flag <0,1> very special case for swap of u-v coordinates, default = 0 ", m_SwapTel);
+  addParam("CorrelationGranulation", m_CorrelationGranulation,
+           "set granulation of histogram plots, default is 1 mm, min = 0.002 mm, max = 1 mm ", m_CorrelationGranulation);
 
 }
 
@@ -54,6 +56,12 @@ void VXDTelDQMOffLineModule::defineHisto()
 {
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
+
+  if (m_CorrelationGranulation > 1.0) m_CorrelationGranulation = 1.0;  //  set maximum of gramularity to 1 mm
+  if (m_CorrelationGranulation < 0.02) m_CorrelationGranulation = 0.02;  //  set minimum of gramularity to 0.02 mm
+
+  // if binning go over h_MaxBins it decrease preset of range
+  int h_MaxBins = 2000;       //maximal size of histogram binning:
 
   // 2D histograms in global coordinates:
   TDirectory* DirVXDGlobCorrelsNeigh = oldDir->mkdir("TB_CorrelationsNeighboar");
@@ -387,8 +395,18 @@ void VXDTelDQMOffLineModule::defineHisto()
       vSize1 = 16.0;  // cm
       uSize1 = 8.0;   // cm
     }
-    nStripsV1 = vSize1 * 10;  // step 1 mm
-    nStripsU1 = uSize1 * 10;  // step 1 mm
+    nStripsV1 = vSize1 * 10 / m_CorrelationGranulation;  // step 1/m_CorrelationGranulation mm
+    nStripsU1 = uSize1 * 10 / m_CorrelationGranulation;  // step 1/m_CorrelationGranulation mm
+
+    if (nStripsV1 > h_MaxBins) {
+      vSize1 = h_MaxBins * m_CorrelationGranulation / 10.0;
+      nStripsV1 = vSize1 * 10 / m_CorrelationGranulation;
+    }
+    if (nStripsU1 > h_MaxBins) {
+      uSize1 = h_MaxBins * m_CorrelationGranulation / 10.0;
+      nStripsU1 = uSize1 * 10 / m_CorrelationGranulation;
+    }
+
     for (int jL = 0; jL < c_nTBPlanes; jL++) {
       int j = jL;
 //      if (jL >= c_nVXDPlanes) j = c_nTBPlanes + c_nVXDPlanes - jL - c_firstTBPlane;  // reorder of telescopes
@@ -413,8 +431,19 @@ void VXDTelDQMOffLineModule::defineHisto()
         vSize2 = 16.0;  // cm
         uSize2 = 8.0;   // cm
       }
-      nStripsU2 = uSize2 * 10;  // step 1 mm
-      nStripsV2 = vSize2 * 10;  // step 1 mm
+      //nStripsU2 = uSize2 * 10;  // step 1 mm
+      //nStripsV2 = vSize2 * 10;  // step 1 mm
+      nStripsV2 = vSize2 * 10 / m_CorrelationGranulation;  // step 1/m_CorrelationGranulation mm
+      nStripsU2 = uSize2 * 10 / m_CorrelationGranulation;  // step 1/m_CorrelationGranulation mm
+
+      if (nStripsV2 > h_MaxBins) {
+        vSize2 = h_MaxBins * m_CorrelationGranulation / 10.0;
+        nStripsV2 = vSize2 * 10 / m_CorrelationGranulation;
+      }
+      if (nStripsU2 > h_MaxBins) {
+        uSize2 = h_MaxBins * m_CorrelationGranulation / 10.0;
+        nStripsU2 = uSize2 * 10 / m_CorrelationGranulation;
+      }
       if (i == j) {  // hit maps
         DirVXDGlobHitmaps->cd();
         string nameSP = str(format("VXD_L%1%_Hitmap") % indexOrd2);

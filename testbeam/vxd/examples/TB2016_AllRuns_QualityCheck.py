@@ -319,7 +319,8 @@ if args.tel_input:
 if args.unpacking:
     if not args.svd_only:
         triggerfix = main.add_module(register_module('PXDTriggerFixer'))
-        triggerfix.if_false(emptypath)
+        # triggerfix.if_false(emptypath)
+        triggerfix.if_false(create_path())
         main.add_module(triggerfix)
 
         """
@@ -382,7 +383,7 @@ if UseTracks:
         main.add_module('GenFitter', FilterId='Kalman')
 
 if args.dqm:
-    main.add_module("VXDTelDQMOffLine", SaveOtherHistos=1, SwapTel=0)
+    main.add_module("VXDTelDQMOffLine", SaveOtherHistos=1, SwapTel=0, CorrelationGranulation=0.02)
 
 QualityCheck = register_module('QualityCheck')
 QualityCheck.param('SummaryFileRunName', SummaryFileRunName)

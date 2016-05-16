@@ -14,12 +14,16 @@
 ########################################################
 
 from basf2 import *
+import ROOT
 from ROOT import Belle2
 import multiprocessing
 import tempfile
 
 # Suppress messages and warnings during processing.
 set_log_level(LogLevel.RESULT)
+
+#: number of events to generate
+num_events = 100
 
 
 def kkmcgeneration(outputfile):
@@ -30,7 +34,7 @@ def kkmcgeneration(outputfile):
     set_random_seed(get_random_seed() + "_kkmcgeneration")
 
     # event info setter
-    main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
+    main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=num_events)
 
     # use KKMC to generate uubar events (no fragmentation at this stage)
     kkgeninput = main.add_module(
@@ -43,7 +47,8 @@ def kkmcgeneration(outputfile):
 
     # add RootOutput module to write to tmp file but this means we have to
     # ingore the -o command line option to basf2
-    main.add_module("RootOutput", outputFileName=outputfile, ignoreCommandLineOverride=True)
+    main.add_module("RootOutput", outputFileName=outputfile, ignoreCommandLineOverride=True,
+                    updateFileCatalog=False)
 
     process(main)
 
@@ -103,3 +108,41 @@ if __name__ == "__main__":
         fork_process(kkmcgeneration, (tmp.name,))
         # run fragmentation in subprocess
         fork_process(kkmcfragmentation, (tmp.name,))
+
+    # update the file meta catalog in the second file to contain the correct
+    # number of generated events. Sadly there is no more direct way in
+    # release-00-07-00
+
+    # first we find out how many events were actually generated which can be
+    # different from num_events if -n was specified
+    event_override = Belle2.Environment.Instance().getNumberEventsOverride()
+    if event_override > 0:
+        num_events = event_override
+    # next we need the output filename, which could be specified with -o,
+    # otherwise it's RootOutput.root
+    filename = Belle2.Environment.Instance().getOutputFileOverride()
+    if not filename:
+        filename = "RootOutput.root"
+
+    # ok we now the events and the filename so open the file
+    outputfile = ROOT.TFile(filename, "update")
+    # get the persistent tree, and clone it but not its contents
+    persistent = outputfile.Get("persistent")
+    new_persistent = persistent.CloneTree(0)
+    # now loop over all entries (should be just one)
+    for i in range(persistent.GetEntriesFast()):
+        persistent.GetEntry(i)
+        # set the number of generated events
+        persistent.FileMetaData.setMcEvents(num_events)
+        # and also delete the parent filename, the tmp file gets deleted anyway
+        persistent.FileMetaData.setParents(ROOT.std.vector("string")())
+        # and copy to cloned tree
+        new_persistent.Fill()
+
+    # now clean up the old entries in the file
+    persistent.SetDirectory(0)
+    del persistent
+    outputfile.Delete("persistent;1")
+    # and update the file
+    outputfile.Write()
+    outputfile.Close()

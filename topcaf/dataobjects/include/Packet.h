@@ -1,3 +1,6 @@
+/**\class EventWaveformPacket
+ *
+ */
 #ifndef Packet_H
 #define Packet_H
 

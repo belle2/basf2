@@ -1,3 +1,6 @@
+/**\class CamacData
+ *
+ */
 #ifndef CamacData_H
 #define CamacData_H
 
@@ -15,7 +18,7 @@ namespace Belle2 {
 
 //const double sampling_rate=0.04508;//[ns] -- Determine using decay FTSW data (jun2013leps/20130606/datatopcrt-t0cal-e000001r000194-f000.cmc)
 
-// all these values are in ns from Itoh-san's TDC testing as described in iTOP CRT ELOG entry 551
+/// all these values are in ns from Itoh-san's TDC testing as described in iTOP CRT ELOG entry 551
   const double slot2_tdc_timing[8] = { 0.025963, 0.025756, 0.025663, 0.025668, 0.025512, 0.0, 0.0, 0.0 };
   const double slot7_tdc_timing[8] = { 0.0, 0.045056, 0.045088, 0.045347, 0.045728, 0.045183, 0.0, 0.0 };
 
@@ -25,15 +28,13 @@ namespace Belle2 {
     CamacData();
     virtual ~CamacData();
 
-    //--- Getters ---//
+    ///--- Getters ---///
     unsigned int GetEventNumber() const {return m_evt_num;}
-
     unsigned short GetRawTDC() const {return m_raw_tdc;}
     unsigned short GetRawRF0() const {return m_raw_rf0;}
     unsigned short GetRawRF1() const {return m_raw_rf1;}
     unsigned short GetRawRF2() const {return m_raw_rf2;}
     unsigned short GetRawRF3() const {return m_raw_rf3;}
-
     double GetTDC() const {return float(m_raw_tdc) * slot7_tdc_timing[1];}
     double GetRF0() const {return float(m_raw_rf0) * slot7_tdc_timing[2];}
     double GetRF1() const {return float(m_raw_rf1) * slot7_tdc_timing[3];}
@@ -63,7 +64,7 @@ namespace Belle2 {
 
     unsigned short GetRawLEPSMarkerWord() const {return m_raw_leps_marker_word;}
 
-    //--- Setters ---//
+    ///--- Setters ---///
 
     void SetEventNumber(const unsigned int evt) {m_evt_num = evt;}
 
@@ -93,10 +94,10 @@ namespace Belle2 {
   private:
     unsigned int m_evt_num;
 
-    // timing data
+    /// timing data
     unsigned short m_raw_tdc, m_raw_rf0, m_raw_rf1, m_raw_rf2, m_raw_rf3;
 
-    // trigger paddle data
+    /// trigger paddle data
     unsigned short m_raw_trigS_tdc0, m_raw_trigM_tdc0, m_raw_trigS_tdc1, m_raw_trigM_tdc1;
     unsigned short m_raw_timing_tdc, m_raw_ratemon;
     unsigned short m_raw_trigS_adc0, m_raw_trigM_adc0, m_raw_trigS_adc1, m_raw_trigM_adc1;

@@ -1,3 +1,7 @@
+/**\class EventHeaderPacket
+ *
+ */
+
 #ifndef EventHeaderPacket_H
 #define EventHeaderPacket_H
 

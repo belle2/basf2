@@ -18,7 +18,7 @@ using namespace std;
 REG_MODULE(WaveTimingCalib);
 
 //const int max_peaks = 320;
-const int max_peaks = 20;
+//const int max_peaks = 20;
 
 WaveTimingCalibModule::WaveTimingCalibModule() : Module()
 {

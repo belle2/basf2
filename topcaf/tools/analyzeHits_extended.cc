@@ -88,10 +88,12 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
 
   //Define the cuts here using a TSpectrum to search first
   TH2F* ch_time_qual = new TH2F("ch_time_qual", "time vs pixel (quality cuts)", 512, 0., 512., 40000, -2000., 2000.);
-  TH1D* ch_time_proj_qual = new TH1D("ch_time_proj_qual", "time projection (qual cuts)", 40000, -2000., 2000.);
+//  TH1D* ch_time_proj_qual = new TH1D("ch_time_proj_qual", "time projection (qual cuts)", 40000, -2000., 2000.);
   //t.Draw("TOPCAFDigits.m_time:TOPCAFDigits.m_pixel_id>>ch_time_qual", width_cut && qual_cut && height_cut2 && !pmt_quality_cut);
   t.Draw("TOPCAFDigits.m_time:TOPCAFDigits.m_pixel_id>>ch_time_qual", cut_tight);
-  ch_time_proj_qual = ch_time_qual->ProjectionY();
+  TH1D* ch_time_proj_qual = ch_time_qual->ProjectionY();
+  ch_time_proj_qual->SetName("ch_time_proj_qual");
+  ch_time_proj_qual->SetTitle("time projection (qual cuts)");
   ch_time_proj_qual->Rebin(10);
 
   const int npeaks = 1;
@@ -725,7 +727,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
            Form("TOPCAFDigits.m_boardstack==%d", c));
   }
   t.Draw("(TOPCAFDigits.m_boardstack*16+TOPCAFDigits.m_asic_row*4+TOPCAFDigits.m_asic)>>asic_occupancy_all", width_cut && qual_cut
-         && (cosmic_cut[0]) && height_cut && "TOPCAFDigits.m_asic_ch!=7");
+         && (cosmic_cut[0]) && height_cut);
 
   Float_t a_cut = (asic_occupancy_all->GetEntries()) / 64;
   for (int i = 1; i < 65; i++) {
@@ -740,7 +742,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
            && Form("TOPCAFDigits.m_boardstack==%d", c));
   }
   t.Draw("(TOPCAFDigits.m_boardstack*16+TOPCAFDigits.m_asic_row*4+TOPCAFDigits.m_asic)>>asic_occupancy_all_tight", cut_tight
-         && (cosmic_cut[0]) && "TOPCAFDigits.m_asic_ch!=7");
+         && (cosmic_cut[0]));
 
   a_cut = (asic_occupancy_all_tight->GetEntries()) / 64;
   for (int i = 1; i < 65; i++) {
@@ -755,7 +757,7 @@ bool analyzeHits_extended(const char* filename, const char* outfilename = "hits.
            && Form("TOPCAFDigits.m_boardstack==%d", c));
   }
   t.Draw("(TOPCAFDigits.m_boardstack*16+TOPCAFDigits.m_asic_row*4+TOPCAFDigits.m_asic)>>asic_occupancy_all_optics", cut_optics
-         && (cosmic_cut[0]) && "TOPCAFDigits.m_asic_ch!=7");
+         && (cosmic_cut[0]));
 
   a_cut = (asic_occupancy_all_optics->GetEntries()) / 64;
   for (int i = 1; i < 65; i++) {

@@ -7,19 +7,19 @@ namespace Belle2 {
     template <typename T>
     class WrapArray2D {
     public:
-      WrapArray2D(unsigned int rows, unsigned int cols) :
+      WrapArray2D(int rows,  int cols) :
         m_data(new T[rows * cols]), m_ncols(cols)
       {}
       ~WrapArray2D()
       {  delete [] m_data;  }
-      T* operator[](unsigned int irow)
+      T* operator[](int irow)
       {
         return m_data + irow * m_ncols;
       }
       operator T* () { return m_data; }
     private:
       T* m_data;
-      unsigned int m_ncols;
+      int m_ncols;
     };
   }
 }

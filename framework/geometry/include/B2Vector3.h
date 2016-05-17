@@ -442,7 +442,7 @@ namespace Belle2 {
     /** *********************************************** MISCELLANEOUS *********************************************** */
 
     /** Returns the name of the B2Vector. */
-    static const std::string name();
+    static std::string name();
 
     /** create a string containing vector in cartesian and spherical coordinates */
     std::string PrintString(unsigned precision = 4) const
@@ -649,7 +649,7 @@ namespace Belle2 {
 
   /** Returns a less readable (but more compatible) name of the B2Vector3.*/
   template < typename DataType>
-  const std::string B2Vector3<DataType>::name()
+  std::string B2Vector3<DataType>::name()
   {
     return std::string("B2Vector3<") + typeid(DataType).name() + std::string(">");
   }

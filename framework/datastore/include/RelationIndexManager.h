@@ -40,7 +40,7 @@ namespace Belle2 {
      *  @param relation Relation to build an index for
      *  @returns A RelationIndexContainer
      */
-    template<class FROM, class TO> const std::shared_ptr<RelationIndexContainer<FROM, TO>> get(const RelationArray& relation)
+    template<class FROM, class TO> std::shared_ptr<RelationIndexContainer<FROM, TO>> get(const RelationArray& relation)
     {
       const static bool doTypeCheck = (FROM::Class() != TObject::Class() or TO::Class() != TObject::Class());
       if (doTypeCheck)

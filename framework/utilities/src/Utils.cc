@@ -3,13 +3,37 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-#include <TSystem.h>
-
 #include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 #include <cstdlib>
+#include <cstdio>
 #include <iomanip>
 
 using namespace Belle2;
+
+namespace {
+  /** get stream of /proc/PID/statm (kept open between calls)
+   *
+   * this is significantly faster than using TSystem::GetProcInfo()
+   */
+  FILE* getStatm()
+  {
+    static FILE* stream = nullptr;
+    static int pid = 0;
+    int currentPid = getpid();
+    if (currentPid != pid) {
+      pid = currentPid;
+      std::string statm = "/proc/" + std::to_string(pid) + "/statm";
+      stream = fopen(statm.c_str(), "r");
+    }
+    rewind(stream);
+    return stream;
+  }
+  //page size of system
+  const static int pageSizeKb = sysconf(_SC_PAGESIZE) / 1024;
+}
 
 namespace Belle2 {
   namespace Utils {
@@ -23,18 +47,18 @@ namespace Belle2 {
 
     unsigned long getVirtualMemoryKB()
     {
-      ProcInfo_t meminfo;
-      gSystem->GetProcInfo(&meminfo);
-
-      return meminfo.fMemVirtual;
+      unsigned long int vmSizePages = 0;
+      long rssPages = 0;
+      fscanf(getStatm(), "%lu %ld", &vmSizePages, &rssPages);
+      return vmSizePages * pageSizeKb;
     }
 
     unsigned long getRssMemoryKB()
     {
-      ProcInfo_t meminfo;
-      gSystem->GetProcInfo(&meminfo);
-
-      return meminfo.fMemResident;
+      unsigned long int vmSizePages = 0;
+      long rssPages = 0;
+      fscanf(getStatm(), "%lu %ld", &vmSizePages, &rssPages);
+      return rssPages * pageSizeKb;
     }
 
     Timer::Timer(std::string text):

@@ -153,6 +153,13 @@ bool CalibrationAlgorithm::commit()
   return Database::Instance().storeData(payloads);
 }
 
+bool CalibrationAlgorithm::commit(std::list<Database::DBQuery> payloads)
+{
+  if (payloads.empty())
+    return false;
+  return Database::Instance().storeData(payloads);
+}
+
 vector< CalibrationAlgorithm::ExpRun > CalibrationAlgorithm::getRunListFromAllData()
 {
   string fullName(m_prefix + "_" + RUN_RANGE_OBJ_NAME);

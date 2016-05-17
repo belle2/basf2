@@ -78,6 +78,9 @@ namespace Belle2 {
     /// Submit constants from last calibration into database
     bool commit();
 
+    /// Submit constants from a (potentially previous) set of payloads
+    bool commit(std::list<Database::DBQuery> payloads);
+
     /// Get the description of the algoithm (set by developers in constructor)
     const std::string& getDescription() const {return m_description;}
 

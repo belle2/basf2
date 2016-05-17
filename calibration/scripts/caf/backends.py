@@ -95,17 +95,20 @@ class Local(Backend):
         print('Job Submitting:', job.name)
         # Make sure the output directory of the job is created
         if not os.path.exists(job.output_dir):
-            os.mkdir(job.output_dir)
+            os.makedirs(job.output_dir)
 
         # Make sure the working directory of the job is created
         if job.working_dir and not os.path.exists(job.working_dir):
-            os.mkdir(job.working_dir)
+            os.makedirs(job.working_dir)
 
         # Get all of the requested files for the input sandbox and copy them to the working directory
         for file_pattern in job.input_sandbox_files:
             input_files = glob.glob(file_pattern)
-            for file in input_files:
-                shutil.copy(file, job.working_dir)
+            for file_path in input_files:
+                if os.path.isdir(file_path):
+                    shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
+                else:
+                    shutil.copy(file_path, job.working_dir)
 
         # Check if we have any valid input files
         existing_input_files = []

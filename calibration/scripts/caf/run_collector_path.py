@@ -1,6 +1,9 @@
 import glob
 from basf2 import *
 
+use_database_chain(True)
+use_local_database('localdb/database.txt', 'localdb', True, LogLevel.INFO)
+
 # create a path with all modules needed before calibration path is run.
 main = create_path()
 

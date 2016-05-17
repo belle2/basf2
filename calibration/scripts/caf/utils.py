@@ -19,6 +19,21 @@ algorithm_result_names = {
 }
 
 
+def iov_from_vector(iov_vector):
+    """
+    Takes a vector of ExpRun from CalibrationAlgorithm and returns
+    the overall IoV from the lowest ExpRun to the highest. It returns
+    a tuple of the form ((exp_low, run_low), (exp_high, run_high))
+    It assumes that the vector was in order to begine with.
+    """
+    iov_list = [(iov.first, iov.second) for iov in iov_vector]
+    if len(iov_list) > 1:
+        iov_low, iov_high = iov_list[0], iov_list[-1]
+    else:
+        iov_low, iov_high = iov_list[0], iov_list[0]
+    return (iov_low, iov_high)
+
+
 def find_sources(dependencies):
     """
     Returns a deque of node names that have no input dependencies

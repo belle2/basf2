@@ -114,6 +114,12 @@ void CreateTopConfigurations(void){
     //ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 74;
     //ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 88;
     //}
+    if ( (*i) == ModuleC01Construction ) {
+      ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 110;
+      ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 28;
+      ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 68;
+      ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 112;
+    }
     if ( (*i) == ModuleC02Construction ) {
 	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 32;
       	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 29;

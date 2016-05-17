@@ -15,6 +15,8 @@
 
 from basf2 import set_log_level, register_module, process, LogLevel, \
     set_random_seed, print_params, create_path, statistics
+from simulation import add_simulation
+from reconstruction import add_reconstruction
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.WARNING)
@@ -23,9 +25,8 @@ set_log_level(LogLevel.WARNING)
 particlegun = register_module('ParticleGun')
 
 # ============================================================================
-# Setting the random seed for particle generation: this number can be any int,
-# a value of 0 will use a different random seed each time
-set_random_seed(5)
+# Setting the random seed for particle generation
+set_random_seed(123)
 
 # ============================================================================
 # Setting the list of particle codes (PDG codes) for the generated particles
@@ -203,8 +204,6 @@ progress = register_module('Progress')
 gearbox = register_module('Gearbox')
 # Create geometry
 geometry = register_module('Geometry')
-# Run simulation
-simulation = register_module('FullSim')
 # Save output of simulation
 output = register_module('RootOutput')
 
@@ -224,7 +223,10 @@ main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(particlegun)
-main.add_module(simulation)
+
+add_simulation(main)
+add_reconstruction(main)
+
 main.add_module(output)
 
 # Process events

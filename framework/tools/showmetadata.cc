@@ -16,6 +16,8 @@
 #include <TTree.h>
 #include <TError.h>
 
+#include <sys/signal.h>
+
 #include <boost/program_options.hpp>
 
 #include <string>
@@ -27,6 +29,13 @@ namespace prog = boost::program_options;
 
 int main(int argc, char* argv[])
 {
+  //remove SIGPIPE handler set by ROOT which sometimes caused infinite loops
+  //See https://savannah.cern.ch/bugs/?97991
+  //default action is to abort
+  if (signal(SIGPIPE, SIG_DFL) == SIG_ERR) {
+    B2FATAL("Cannot remove SIGPIPE signal handler");
+  }
+
   // Define command line options
   prog::options_description options("Options");
   options.add_options()

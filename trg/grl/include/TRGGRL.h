@@ -173,8 +173,11 @@ class TRGGRL {
     /// root tree 
     TTree * h1;
 
-    double x0, x1, x2, x3, x4, x5, x6, x7, x8, x9;
+	/** Temporary variables to make tree in root files */
+    double x0, x1, x2, x3, x4, x5, x6, x7, x8, x9;	
+	/**  Vector which stores list of TRGGRLMatch without 3D information */
     std::vector<TRGGRLMatch * > matchList;
+	/**  Vector which stores list of TRGGRLMatch with 3D information */
     std::vector<TRGGRLMatch * > matchList3D;
 
     friend class TRGGRLModule;

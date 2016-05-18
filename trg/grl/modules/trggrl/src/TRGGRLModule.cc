@@ -23,6 +23,7 @@ using namespace std;
 
 namespace Belle2 {
 
+/** Register module for TRGGRL */
 REG_MODULE(TRGGRL);
 
 TRGGRL *

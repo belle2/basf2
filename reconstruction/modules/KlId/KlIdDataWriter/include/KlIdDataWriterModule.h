@@ -1,0 +1,143 @@
+
+/***************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Jo-Frederik Krohn                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ *************************************************************************/
+#ifndef KlIdDataWriterModule_H
+#define KlIdDataWriterModule_H
+
+#include <mdst/dataobjects/KLMCluster.h>
+
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
+#include <genfit/Track.h>
+
+#include <TTree.h>
+#include <TFile.h>
+#include <string>
+
+namespace Belle2 {
+
+  class KlIdDataWriterModule : public Module {
+
+  public:
+
+    KlIdDataWriterModule();
+
+    virtual ~KlIdDataWriterModule();
+
+    /** init */
+    virtual void initialize();
+
+    /** beginn run */
+    virtual void beginRun();
+
+    /** process event */
+    virtual void event();
+
+    /** end run */
+    virtual void endRun();
+
+    /** terminate */
+    virtual void terminate();
+
+  protected:
+
+  private:
+
+    std::string m_outPath = "klidData.root";
+
+    /** varibales to write out. used for classification of clusters  */
+    // KLM variables
+    /**  number of clusters */
+    int    m_KLMnCluster;
+    /**  number of layers hit in KLM cluster */
+    int    m_KLMnLayer;
+    /** number of innermost layers hit */
+    int    m_KLMnInnermostLayer;
+    /** global Z position in KLM  */
+    double m_KLMglobalZ;
+    /** timing of KLM Cluster */
+    double m_KLMtime;
+    /** length/width of KLM ,might be redundant */
+    double m_KLMshape;
+    /**  average distance between all KLM clusters */
+    double m_KLMavInterClusterDist;
+    /** hit depth in KLM, distance to IP */
+    double m_KLMhitDepth;
+    /** Energy deposit in KLM (0.2 GeV * nHitCells) */
+    double m_KLMenergy;
+    /**  invariant mass calculated from root vector */
+    double m_KLMinvM;
+    /** distance KLM Cluster <-> track extrapolated into KLM */
+    double m_KLMtrackDist;
+    /** target variable for KLM classification */
+    int    m_KLMTruth;
+    /** distance to next KLM cluster */
+    double m_KLMnextCluster;
+    /** classifier output from bkg classification */
+    double m_KLMBKGProb;
+
+    // variables of closest ECL cluster with respect to KLM cluster
+    /** distance associated ECL <-> KLM cluster */
+    double m_KLMECLDist;
+    /** energy measured in associated ECL cluster */
+    double m_KLMECLE;
+    /** distance between track entry point and cluster center, might be removed */
+    double m_KLMECLdeltaL;   // new
+    /** track distance between associated ECL cluster and track extrapolated into ECL */
+    double m_KLMECLminTrackDist; //new
+    /** E in surrounding 9 crystals divided by surrounding 25 crydtalls */
+    double m_KLMECLE9oE25;
+    /** timing of associated ECL cluster */
+    double m_KLMECLTiming;
+    /** uncertainty on time in associated ECL cluster */
+    double m_KLMECLTerror;
+    /** uncertainty on E in associated ECL cluster */
+    double m_KLMECLEerror;
+    /** primitive distance cluster <-> track for associated ECL cluster */
+    double m_KLMtrackToECL;
+    /** classifier output from bkg classification of associated ECL cluster */
+    double m_KLMECLBKGProb;
+
+
+    // ECL cluster variables for pure ECL Klongs
+    /** measured energy */
+    double m_ECLE;
+    /** energy of 9/25 chrystall rings (E dispersion shape) */
+    double m_ECLE9oE25;
+    /** timing of ECL */
+    double m_ECLTiming;
+    /** distance of cluster to IP */
+    double m_ECLR;
+    /** uncertainty on E measurement in ECL */
+    double m_ECLEerror;
+    /** more sophisticated distaqnce to track in ECL, might be removed */
+    double m_ECLminTrkDistance; // new
+    /** disatance between track entrace into cluster and cluster center */
+    double m_ECLdeltaL; // new
+    /** distance cluster to next track in ECL */
+    double m_ECLtrackDist;
+    /** ECL trarget variable */
+    double m_ECLTruth;
+    /** classifier output from bkg classification of ECL cluster */
+    double m_ECLBKGProb;
+
+
+    /** root file */
+    TFile* m_f = nullptr; //
+    /** tree for klm data */
+    TTree* m_treeKLM = nullptr;
+    /** tree for ecl data */
+    TTree* m_treeECL = nullptr;
+
+  }; // end class
+} // end namespaceBelle2
+
+#endif

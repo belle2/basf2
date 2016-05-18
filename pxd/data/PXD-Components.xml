@@ -88,8 +88,8 @@
       <DrainBorderLargePixel unit="um">6.0</DrainBorderLargePixel>
       <GateDepth unit="um">22</GateDepth>
       <DoublePixel>true</DoublePixel>
-      <ChargeThreshold unit = "ADU">4</ChargeThreshold>
-      <NoiseFraction>0.00001</NoiseFraction>
+      <ChargeThreshold unit = "ADU">7</ChargeThreshold>
+      <NoiseFraction>0.00000005</NoiseFraction>
       <!-- Define the integration window to be 20µs. This probably should go
            somewhere else -->
       <IntegrationStart unit="us">-10.0</IntegrationStart>
@@ -168,8 +168,8 @@
       <DrainBorderLargePixel unit="um">7.0</DrainBorderLargePixel>
       <GateDepth unit="um">22</GateDepth>
       <DoublePixel>true</DoublePixel>
-      <ChargeThreshold unit = "ADU">4</ChargeThreshold>
-      <NoiseFraction>0.00001</NoiseFraction>
+      <ChargeThreshold unit = "ADU">7</ChargeThreshold>
+      <NoiseFraction>0.00000005</NoiseFraction>
       <IntegrationStart unit="us">-10.0</IntegrationStart>
       <IntegrationEnd   unit="us"> 10.0</IntegrationEnd>
     </Active>

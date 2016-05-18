@@ -76,8 +76,8 @@ PXDDigitizerModule::PXDDigitizerModule() :
            "Maximum number of steps when propagating electrons", 200);
 
   addParam("ADC", m_applyADC, "Simulate ADC?", true);
-  addParam("Gq", m_gq, "Gq of a pixel in nA/electron", 0.7);
-  addParam("ADCFineMode", m_ADCFineMode, "Fine mode has slope of ADC curve of 70 nA/ADU, coarse mode has 130", true);
+  addParam("Gq", m_gq, "Gq of a pixel in nA/electron", 0.5);
+  addParam("ADCFineMode", m_ADCFineMode, "Fine mode has slope of ADC curve of 70 nA/ADU, coarse mode has 130", false);
 
   addParam("statisticsFilename", m_rootFilename,
            "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced",

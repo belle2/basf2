@@ -6,7 +6,7 @@ import os
 import time
 import subprocess
 from multiprocessing import Process
-import validationserver_ng
+import validationserver
 
 try:
     import splinter
@@ -39,8 +39,7 @@ def start_webserver():
     return. Therefor this function must be started within
     a new subprocess
     """
-    validationserver_ng.run_server()
-    # check_excecute("python3 validation/scripts/validationserver_ng.py")
+    validationserver.run_server()
 
 
 def check_for_content(revs, min_matrix_plots, min_plot_objects):
@@ -99,7 +98,7 @@ def main():
     try:
         # start webserver to serve json output files, plots and
         # interactive website
-        server_process = subprocess.Popen(["python3", "validation/scripts/validationserver_ng.py"])
+        server_process = subprocess.Popen(["python3", "validation/scripts/validationserver.py"])
 
         # wait for one second for the server to start
         time.sleep(1)

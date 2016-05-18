@@ -34,7 +34,7 @@ from validationscript import Script, ScriptStatus
 from validationfunctions import get_start_time, get_validation_folders, scripts_in_dir, \
     find_creator, parse_cmd_line_arguments
 
-import validationserver_ng
+import validationserver
 import validationplots
 import validationscript
 
@@ -1116,7 +1116,7 @@ def execute():
 
         if cmd_arguments.view:
             # run local webserver
-            validationserver_ng.run_server(openSite=True)
+            validationserver.run_server(openSite=True)
 
     except KeyboardInterrupt:
         validation.log.note('Validation terminated by user!')

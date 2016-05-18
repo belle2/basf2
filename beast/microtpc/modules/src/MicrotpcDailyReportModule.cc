@@ -48,10 +48,6 @@ using namespace std;
 using namespace Belle2;
 using namespace microtpc;
 
-int old_run = 0;
-double T0 = 15000000000.;
-double T1 = 0;
-double DT = 0;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -71,7 +67,7 @@ MicrotpcDailyReportModule::MicrotpcDailyReportModule() : HistoModule()
            "TPC number readout", 3);
   //Date of the report to offset time stamp to zero.
   addParam("inputReportDate", m_inputReportDate, "Date of the report", 20160201);
-
+  for (int i = 0; i < 7; i++)Ctr[i] = 0;
 }
 
 MicrotpcDailyReportModule::~MicrotpcDailyReportModule()
@@ -226,6 +222,8 @@ void MicrotpcDailyReportModule::event()
       side[j] = 0;
       side[j] = aTrack.getside()[j];
     }
+    Bool_t EdgeCuts = false;
+    if (side[0] == 0 && side[1] == 0 && side[2] == 0 && side[3] == 0) EdgeCuts = true;
     Bool_t Asource = false;
     if (side[4] == 2 && side[5] == 2) Asource = true;
     Bool_t Goodtrk = false;
@@ -236,13 +234,15 @@ void MicrotpcDailyReportModule::event()
     partID[0] = 1; //[0] for all events
     for (int j = 0; j < 6; j++) partID[j + 1] = aTrack.getpartID()[j];
     h_tpc_uptime[0]->Fill(1);
+
     if (TimeStamp > 0.) {
       h_tpc_uptime[1]->Fill(1);
       //h_tpc_uptime[2]->Fill(2, DT);
       for (int j = 0; j < 7; j++) {
+        if (j == 3 && EdgeCuts && (partID[1] == 1 || partID[2] == 1 || partID[4] == 1 || partID[5] == 1 || partID[6] == 1)) partID[j] = 0;
+        if ((j == 4 || j == 5) && !Asource) partID[j] = 0;
         if (partID[j] == 1) {
-          if (j == 3 && partID[1] == 0 && partID[2] == 0 && partID[4] == 0 && partID[5] == 0 && partID[6]) partID[j] = 0;
-          if ((j == 4 || j == 5) && !Asource) partID[j] = 0;
+          Ctr[j]++;
           h_tpc_rate[j]->Fill(TimeStamp);
           h_tpc_gain[j]->Fill(TimeStamp, esum);
           h_tpc_triglength[j]->Fill(time_range);
@@ -357,11 +357,20 @@ void MicrotpcDailyReportModule::terminate()
     h_tpc_yvphi[i]->Scale(1. / LifeTime);
   }
 
-  cout << "TPC #" << m_inputTPCNumber << " daily report: event with time stamp " << h_tpc_uptime[1]->GetMaximum() /
+  cout << "TPC position #" << m_inputTPCNumber << " daily report: event with time stamp " << h_tpc_uptime[1]->GetMaximum() /
        h_tpc_uptime[0]->GetMaximum() * 100 <<
        " % of the time " << endl;
-  cout << "TPC #" << m_inputTPCNumber << " daily report: detector was up " << LifeTime / 60. / 60. / 24. * 100. <<
+  cout << "TPC position #" << m_inputTPCNumber << " daily report: detector was up " << LifeTime / 60. / 60. / 24. * 100. <<
        " % of the time" << endl;
+
+  cout << "Total number of: " << endl;
+  cout << "=============== particles measured " << Ctr[0] << end;;
+  cout << "=============== Xray measured " << Ctr[1] << end;;
+  cout << "=============== Xray passing edge cuts measured " << Ctr[2] << end;;
+  cout << "=============== bad calibration alphas and protons measured " << Ctr[3] << end;;
+  cout << "=============== good botton calibration alphas measured " << Ctr[4] << end;;
+  cout << "=============== good top calibration alphas measured " << Ctr[5] << end;;
+  cout << "=============== neutron candidates measured " << Ctr[6] << end;;
 }
 
 

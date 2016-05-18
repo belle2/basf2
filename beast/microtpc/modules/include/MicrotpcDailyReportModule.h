@@ -108,6 +108,8 @@ namespace Belle2 {
       TH1F* h_tpc_pressure[2];
       /** TPC temperature */
       TH1F* h_tpc_temperature[4];
+      /** Counter */
+      Ctr[7];
     };
 
   }

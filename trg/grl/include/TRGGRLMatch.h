@@ -129,7 +129,7 @@ private:
     /** z0 of track  */
     double _z0; 
     /** z slope (polar angle) of track  */
-    double _slope
+    double _slope;
 
     /** x position of cluster */
     double _cluster_x; 
@@ -155,7 +155,7 @@ private:
     /** y position of the cluster calculated by matching */
     double _ex_y; 
     /** z position of the cluster calculated by matching */
-    double _ex_z
+    double _ex_z;
     /** calculated p over e  */
     double _poe;
 

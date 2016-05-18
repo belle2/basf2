@@ -389,7 +389,7 @@ def generate_new_plots(list_of_revisions, process_queue=None):
                                                                          contact=plotuple.contact,
                                                                          check=plotuple.check,
                                                                          is_expert=plotuple.is_expert(),
-                                                                         json_file_path=plotuple.file_json))
+                                                                         json_file_path=plotuple.file))
                 else:
                     compare_plots.append(json_objects.ComparisonPlot(title=plotuple.get_plot_title(),
                                                                      comparison_result=plotuple.comparison_result,

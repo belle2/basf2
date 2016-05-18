@@ -138,8 +138,7 @@ class Plotuple:
         #: will bet set by the chi2test function
         self.pvalue_warn = None
 
-        # The file, in which the histogram or the HMTL-table (for n-tuples)
-        # are stored (without the file extension!)
+        # The json file, in which the ntuple information is stored
         self.file = None
 
         #: width of the plotted image in pixels, will be set by the draw function
@@ -174,7 +173,6 @@ class Plotuple:
         elif self.type == 'TASImage':
             self.create_image_plot()
         elif self.type == 'TNtuple':
-            self.create_ntuple_table()
             self.create_ntuple_table_json()
         else:
             sys.exit('Tried to create histogram/n-tuple, '
@@ -565,92 +563,6 @@ class Plotuple:
         self.file = './{0}/{1}_{2}'.format('/'.join(path.split('/')[2:]),
                                            strip_ext(self.rootfile), self.key)
 
-    def create_ntuple_table(self):
-        """!
-        If the Plotuple-object contains n-tuples, this will create the
-        corresponding HTML-table for it.
-        """
-
-        # The string which will contain our lines of code
-        html = ['<table>']
-
-        # The column names are stored in a
-        # separate variable so we can be sure a
-        # column only contains values that
-        # belong there (no 'shifting' of rows
-        # if a column does not exist in a revision etc.)
-        columns = []
-
-        # Actually read in the column names and write them into the table
-        # headline. The line-variable is used if a single line of HTML is
-        # generated in several steps and serves as a buffer. Once the line
-        # is finished, it is appended to 'html', which is a list of lines
-        line = '<tr><th></th>'
-        for key in list(self.newest.object.keys()):
-            columns.append(key)
-            line += '<th>' + key + '</th>'
-        line += '</tr>'
-        html.append(line)
-
-        # Now fill the table with values
-        # First check if there is a reference object, and in case there
-        # is none,
-        # create a row which states that no reference object is available
-        if self.reference is None and 'reference' in self.list_of_revisions:
-            line = '<tr><td>reference</td>'
-            for _ in columns:
-                line += '<td>n/a</td>'
-            line += '</tr>'
-            html.append(line)
-        elif self.reference is None and 'reference' not in self.list_of_revisions:
-            pass
-        # If there is a reference object, print the reference values as the
-        # first row of the table
-        else:
-            line = '<tr><td>reference</td>'
-            for key in list(self.reference.object.keys()):
-                line += '<td>{0:.4f}</td>'.format(self.reference.object[key])
-            line += '</tr>'
-            html.append(line)
-
-        # Now print the values for all other revisions
-        for ntuple in self.elements:
-            # Get the index of the object (to retrieve the color)
-            ind = index_from_revision(ntuple.revision)
-
-            # Now get the color of the revision
-            color = (ROOT.gROOT.GetColor(get_style(ind, len(self.elements))
-                                         .GetLineColor()).AsHexString())
-
-            line = '<tr><td style="color: {0};">'.format(color)
-            line += ntuple.revision + '</td>'
-
-            for column in columns:
-                line += '<td>{0:.4f}</td>'.format(ntuple.object[column])
-            line += '</tr>'
-
-            html.append(line)
-
-        html.append('</table>')
-
-        # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/'
-                .format('_'
-                        .join(sorted(self
-                                     .list_of_revisions))) + self.package)
-        if not os.path.isdir(path):
-            os.makedirs(path)
-
-        self.path = path
-
-        with open('{0}/{1}_{2}.html'.format(path, strip_ext(self.rootfile),
-                                            self.key), 'w+') as html_file:
-            for line in html:
-                html_file.write(line + '\n')
-
-        self.file = '{0}/{1}_{2}'.format(path, strip_ext(self.rootfile),
-                                         self.key)
-
     def create_ntuple_table_json(self):
         """!
         If the Plotuple-object contains n-tuples, this will create the
@@ -704,104 +616,7 @@ class Plotuple:
         with open(json_ntuple_file, 'w+') as json_file:
             json.dump(json_nutple, json_file)
 
-        self.file_json = json_ntuple_file
+        self.file = json_ntuple_file
 
     def get_plot_title(self):
         return self.file.split("/")[-1].replace(".", "_").strip()
-
-    def html(self):
-        """!
-        @return: The HTML Code for the plot.
-        """
-        html = []
-
-        fxstle = (self.package + "__" +
-                  self.file.split("/")[-1].replace(".", "_")).strip()
-        classes = ['object_wrap', "nomatrix", fxstle, 'fltr']
-        if isinstance(self.pvalue, numbers.Number) and self.pvalue <= 1:
-            classes.append('p_value_leq_1')
-        if isinstance(self.pvalue, numbers.Number) and self.pvalue <= 0.01:
-            classes.append('p_value_leq_0_01')
-        # dont do this, because it will hide both ...
-        # if "expert" in self.metaoptions:
-        #    classes.append('expert_plot')
-        prmn = (self.package + "_" +
-                self.file.split("/")[-1].replace(".", "_")).strip()
-        html.append('<div class="{0}" id="{1}">\n'.format(' '.join(classes),
-                                                          prmn))
-
-        # add a new div which will only be used to hide entries with the expert plot
-        # qualification
-        if "expert" in self.metaoptions:
-            html.append('<div class="expert_plot">')
-
-        html.append('<div class="object">\n')
-
-        if self.type == 'TNtuple':
-            html.append('\n')
-            with open(self.file + '.html', 'r') as table:
-                lines = table.readlines()
-                for line in lines:
-                    html.append(line + '\n')
-            html.append('\n')
-        else:
-            html.append('<a href="./plots/{0}.pdf">'
-                        '<img src="./plots/{0}.png"></a>\n'
-                        .format(self.file))
-            print('\n' + self.file + '\n')
-
-        html.append('</div>\n')
-
-        html.append('<div class="wrap_boxes descriptions">\n')
-        if len(self.key) > 45:
-            h2 = "-<br>".join([self.key[i:i + 45] for i
-                               in range(0, len(self.key), 45)])
-        else:
-            h2 = self.key
-        html.append('<div class="hidebutton" width="100%" align="right" '
-                    'style="font-size: 70%;">'
-                    '(<a href="#' + self.package + '" '
-                    'style="color:black; '
-                    'text-decoration:none;">hide this plot</a>)'
-                    '</div>\n<h3>' + h2 + '</h3>\n')
-
-        if self.warnings:
-            html.append('<p style="color: red;"><strong>Warnings:</strong> '
-                        '{0}</p>'.format(', '.join(self.warnings)))
-
-        # Write out which package and root file the plots belongs to
-        # (May be helpful for orientation)
-        html.append('<p><strong>Package:</strong> {0}</p>\n'
-                    '<p><strong>ROOT file:</strong> {1}</p>'
-                    .format(self.package, os.path.basename(self.rootfile)))
-
-        if self.type != 'TNtuple':
-            html.append('<p><strong>P-Value:</strong> {0}</p>\n'
-                        '<p><strong>Chi^2-Test:</strong> {1}</p>\n'
-                        .format(self.pvalue, self.chi2test_result))
-
-        html.append('<p><strong>Contact:</strong> {0}</p>'
-                    '<p><strong>Description:</strong> {1}</p>\n'
-                    '<p><strong>Check for:</strong> {2}</p>\n'
-                    .format(self.contact, self.description, self.check))
-
-        # Give the possibility to share the plot!
-        html.append('<p><strong>Share this plot/n-tuple:</strong> '
-                    '<input type="text" class="share_plot" '
-                    'value="index.html?PackageOverview=false&Revisions={0}'
-                    '#{1}" size="50" onClick="this.select();"></p>'
-                    .format('_'.join(self.list_of_revisions), prmn))
-
-        # Display the meta-options used for this plot (if there are any)
-        if self.metaoptions:
-            html.append('<p><strong>Used meta-options:</strong> '
-                        '<input type="text" class="meta-options" '
-                        'value="{0}" size="50" onClick="this.select();"></p>'
-                        .format(self.metaoptions))
-
-        if "expert" in self.metaoptions:
-            html.append('</div>\n')
-
-        html.append('</div>\n</div>\n\n')
-
-        return html

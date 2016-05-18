@@ -74,6 +74,13 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
            "Names of event durability branches NOT to be saved. Branches also in branchNames are not saved.", emptyvector);
   addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1],
            "Names of persistent durability branches NOT to be saved. Branches also in branchNamesPersistent are not saved.", emptyvector);
+  addParam("autoFlushSize", m_autoflush,
+           "Value for TTree SetAutoFlush(): a positive value tells ROOT to flush all baskets to disk after n entries, a negative value to flush after -n bytes",
+           -30000000);
+  addParam("autoSaveSize", m_autosave,
+           "Value for TTree SetAutoSave(): a positive value tells ROOT to write the TTree metadata after n entries, a negative value to write the metadata after -n bytes",
+           -30000000);
+  addParam("basketSize", m_basketsize, "Basketsize for Branches in the Tree in bytes", 32000);
 }
 
 
@@ -84,9 +91,6 @@ void RootOutputModule::initialize()
   //ROOT has a default maximum size of 100GB for trees??? For larger trees it creates a new file and does other things that finally produce crashes.
   //Let's set this to 100PB, that should last a bit longer.
   TTree::SetMaxTreeSize(1000 * 1000 * 100000000000LL);
-
-  //buffer size in bytes (default value used by root)
-  const int bufsize = 32000;
 
   //create a file level metadata object in the data store
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
@@ -110,6 +114,8 @@ void RootOutputModule::initialize()
 
     //create the tree and branches
     m_tree[durability] = new TTree(c_treeNames[durability].c_str(), c_treeNames[durability].c_str());
+    m_tree[durability]->SetAutoFlush(m_autoflush);
+    m_tree[durability]->SetAutoSave(m_autosave);
     for (DataStore::StoreEntryIter iter = map.begin(); iter != map.end(); ++iter) {
       const std::string& branchName = iter->first;
       //skip transient entries (allow overriding via branchNames)
@@ -154,7 +160,7 @@ void RootOutputModule::initialize()
           static_cast<TClonesArray*>(iter->second.object)->BypassStreamer(kFALSE);
         }
       }
-      m_tree[durability]->Branch(branchName.c_str(), &iter->second.object, bufsize, splitLevel);
+      m_tree[durability]->Branch(branchName.c_str(), &iter->second.object, m_basketsize, splitLevel);
       m_tree[durability]->SetBranchAddress(branchName.c_str(), &iter->second.object);
       m_entries[durability].push_back(&iter->second);
       B2DEBUG(150, "The branch " << branchName << " was created.");

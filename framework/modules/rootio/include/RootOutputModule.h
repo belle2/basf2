@@ -123,6 +123,15 @@ namespace Belle2 {
      */
     int m_splitLevel;
 
+    /** Number of entries (if >0) or number of bytes (if <0) after which to flush all baskets to disk */
+    int m_autoflush;
+
+    /** Number of entries (if >0) or number of bytes (if <0) after which write the tree metadata to disk */
+    int m_autosave;
+
+    /** basket size for each branch in the file in bytes */
+    int m_basketsize;
+
     /** Flag to enable or disable the update of the metadata catalog */
     bool m_updateFileCatalog;
 

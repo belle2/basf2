@@ -380,16 +380,6 @@ class Validation:
         globally accessible later on. Does not return anything.
         """
 
-        # Copy the HTML skeleton if it is not yet available
-        if not os.path.isdir('html'):
-            belle2_local_dir = os.environ.get('BELLE2_LOCAL_DIR', None)
-            if belle2_local_dir is not None and \
-               os.path.isdir(belle2_local_dir + '/validation/html'):
-                validation_dir = belle2_local_dir
-            else:
-                validation_dir = os.environ['BELLE2_RELEASE_DIR']
-            shutil.copytree(validation_dir + '/validation/html', 'html')
-
         # The name which will be used to create a folder in the results
         # directory. Default is 'current'.
         self.tag = tag
@@ -983,6 +973,9 @@ class Validation:
         # Go to the html directory and create a link to the results folder
         # if it is not yet existing
         save_dir = os.getcwd()
+        if not os.path.exists('html'):
+            os.mkdir('html')
+
         os.chdir('html')
         if not os.path.exists('results'):
             os.symlink('../results', 'results')

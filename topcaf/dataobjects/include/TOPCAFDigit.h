@@ -1,14 +1,14 @@
+/**********************************************************************************
+ * Data class for the Event Packet: Waveform information as defined in:           *
+ * http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format *
+ * Author: Malachi Schram (malachi.schram@pnnl.gov)                               *
+ **********************************************************************************/
+
 #ifndef TOPCAFDigit_H
 #define TOPCAFDigit_H
 
 #include <topcaf/dataobjects/EventWaveformPacket.h>
 #include <vector>
-
-////////////////////////////////////////////////////////////////////////////////////
-// Data class for the Event Packet: Waveform information as defined in:           //
-// http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format //
-// Author: Malachi Schram (malachi.schram@pnnl.gov)                               //
-////////////////////////////////////////////////////////////////////////////////////
 
 namespace Belle2 {
 
@@ -21,7 +21,7 @@ namespace Belle2 {
     TOPCAFDigit(const EventWaveformPacket* wp);
 
 
-    //--- Getters ---//
+    ///--- Getters ---///
     topcaf_channel_id_t GetChannelID() const {return m_channel_id;}
     packet_word_t GetEventNumber() const {return m_evt_num;}
     unsigned short GetRefWindow() const {return  m_asic_refwin;}
@@ -37,7 +37,7 @@ namespace Belle2 {
     double GetADCHeight() const {return m_adc_height;}
 
 
-    // Extra stuff not in the raw packet //
+    /// Extra stuff not in the raw packet ///
     double GetTime() const {return m_time;}
     int GetTimeBin() const {return m_tdc_bin;}
     double GetAmplitude() const {return m_amp;}
@@ -45,7 +45,7 @@ namespace Belle2 {
     double GetQuality() const {return m_quality;}
     int GetFlag() const {return m_flag;}
     double GetCorrTime() const {return m_corr_time;}
-    //--- Setters ---//
+    ///--- Setters ---///
     void SetTime(double time) {m_time = time;}
     void SetTimeBin(int time_bin) {m_time_bin = time_bin;}
     void SetTDCBin(double tdc_bin) {m_tdc_bin = tdc_bin;}

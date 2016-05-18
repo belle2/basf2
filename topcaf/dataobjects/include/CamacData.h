@@ -1,8 +1,8 @@
-////////////////////////////////////////////////////////////////////////////////////
-// Data class for the Event Packet: Header information as defined in:             //
-// http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format //
-// Author: Malachi Schram (malachi.schram@pnnl.gov)                               //
-////////////////////////////////////////////////////////////////////////////////////
+/**********************************************************************************
+ * Data class for the Event Packet: Header information as defined in:             *
+ * http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format *
+ * Author: Malachi Schram (malachi.schram@pnnl.gov)                               *
+ **********************************************************************************/
 
 #ifndef CamacData_H
 #define CamacData_H

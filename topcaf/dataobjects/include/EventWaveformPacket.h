@@ -1,6 +1,8 @@
-/**\class EventWaveformPacket
- *
- */
+/**********************************************************************************
+ * Data class for the Event Packet: Waveform information as defined in:           *
+ * http://www.phys.hawaii.edu/~kurtisn*doku.php?id=itop:documentation:data_format *
+ * Author: Malachi Schram (malachi.schram@pnnl.gov)                               *
+ **********************************************************************************/
 
 #ifndef EventWaveformPacket_H
 #define EventWaveformPacket_H
@@ -8,28 +10,33 @@
 #include <topcaf/dataobjects/Packet.h>
 #include <vector>
 
-////////////////////////////////////////////////////////////////////////////////////
-// Data class for the Event Packet: Waveform information as defined in:           //
-// http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format //
-// Author: Malachi Schram (malachi.schram@pnnl.gov)                               //
-////////////////////////////////////////////////////////////////////////////////////
-
-
 class topcaf_hit_t : public TObject {
 public:
-  int channel_id; // pixel number 0-512..
+  //! pixel number 0-512..
+  int channel_id;
+  //! PMT ID
   int pmt_id;
+  //! PMT Channel ID
   int pmtch_id;
-  double tdc_bin; // hit time (bin number)
-  double adc_height; // hit height in adc counts
-  double width; // bin width (1 sigma)
-  double chi2; // chi2 of gaus fit to hit
-  double q; //integral over waveform ROI
+  //! hit time (bin number)
+  double tdc_bin;
+  //! hit height in adc counts
+  double adc_height;
+  //! bin width (1 sigma)
+  double width;
+  //! chi2 of gaus fit to hit
+  double chi2;
+  //! integral over waveform ROI
+  double q;
+  //! Rise Time
   double risetime;
+  //! Fall Time
   double falltime;
   double int_before;
   double int_after;
+  //! RMS of pedestal
   double ped_rms;
+  //! Reference time
   double ref_time;
   int cross_T1;
   int max_bin;
@@ -52,7 +59,7 @@ namespace Belle2 {
 
     ~EventWaveformPacket();
 
-    //--- Getters ---//
+    ///--- Getters ---///
     topcaf_channel_id_t GetChannelID() const {return m_channel_id;}
     packet_word_t GetEventNumber() const {return m_evt_num;}
     unsigned short GetRefWindow() const {return  m_asic_refwin;}
@@ -66,14 +73,14 @@ namespace Belle2 {
     std::vector< double > GetSamples() const {return v_samples;}
     std::vector< topcaf_hit_t > GetHits() const {return v_hits;}
 
-
-    // Extra stuff not in the raw packet //
+    /// Extra stuff not in the raw packet ///
     double GetTime() const {return m_time;}
     int GetTimeBin() const {return m_time_bin;}
     double GetAmplitude() const {return m_amp;}
     double GetSamplingRate() const {return m_rate;}
     double GetQuality() const {return m_quality;}
-    //--- Setters ---//
+
+    ///--- Setters ---///
     void SetSamples(const std::vector< double >& samples);
     void SetHits(const std::vector< topcaf_hit_t >& hits);
     void SetTime(double time) {m_time = time;}
@@ -84,6 +91,7 @@ namespace Belle2 {
     void SetQuality(double quality) {m_quality = quality;}
 
   private:
+    //! channel ID
     topcaf_channel_id_t m_channel_id;
     packet_word_t m_evt_num;
     packet_word_t m_asic_win;

@@ -1,6 +1,9 @@
-/**\class EventWaveformPacket
- *
- */
+/**********************************************************************************
+ * Base data class for the Event Packets information as defined in:               *
+ * http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format *
+ * Author: Malachi Schram (malachi.schram@pnnl.gov)                               *
+ **********************************************************************************/
+
 #ifndef Packet_H
 #define Packet_H
 
@@ -8,15 +11,9 @@
 
 namespace Belle2 {
 
-
+//! SCROD REV and ID
 #define MASK_SCROD_REV          (0x00FF0000)
 #define MASK_SCROD_ID           (0x0000FFFF)
-
-////////////////////////////////////////////////////////////////////////////////////
-// Base data class for the Event Packets information as defined in:               //
-// http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format //
-// Author: Malachi Schram (malachi.schram@pnnl.gov)                               //
-////////////////////////////////////////////////////////////////////////////////////
 
   class Packet : public TObject {
 
@@ -28,7 +25,7 @@ namespace Belle2 {
 
     Packet(const packet_word_t* temp_buffer, int nwords);
 
-    //--- Getters ---//
+    ///--- Getters ---///
     int GetPacketType() const {return m_type;}
     int GetScrodRev() const {return m_scrod_rev;}
     int GetScrodID() const {return m_scrod_id;}

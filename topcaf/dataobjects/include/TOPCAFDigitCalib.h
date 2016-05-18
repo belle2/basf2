@@ -1,14 +1,15 @@
+/**********************************************************************************
+ * Data class for the Event Packet: Waveform information as defined in:           *
+ * http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format *
+ * Author: Malachi Schram (malachi.schram@pnnl.gov)                               *
+ **********************************************************************************/
+
 #ifndef TOPCAFDigitCalib_H
 #define TOPCAFDigitCalib_H
 
 #include <topcaf/dataobjects/EventWaveformPacket.h>
 #include <vector>
 
-////////////////////////////////////////////////////////////////////////////////////
-// Data class for the Event Packet: Waveform information as defined in:           //
-// http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format //
-// Author: Malachi Schram (malachi.schram@pnnl.gov)                               //
-////////////////////////////////////////////////////////////////////////////////////
 
 namespace Belle2 {
 
@@ -20,7 +21,7 @@ namespace Belle2 {
 
     TOPCAFDigitCalib(const EventWaveformPacket* wp);
 
-    //--- Getters ---//
+    ///--- Getters ---///
     topcaf_channel_id_t GetChannelID() const {return m_channel_id;}
     packet_word_t GetEventNumber() const {return m_evt_num;}
     unsigned short GetRefWindow() const {return  m_asic_refwin;}
@@ -34,7 +35,7 @@ namespace Belle2 {
     double GetTDCBin() const {return m_tdc_bin;}
     double GetWidth() const {return m_width;}
     double GetADCHeight() const {return m_adc_height;}
-
+    ///--- Getters ---///
     double GetRefTime() const {return m_ref_time;}
     int GetRefT1() const {return m_ref_T1;}
     int GetRefMaxBin() const {return m_ref_max_bin;}
@@ -42,13 +43,13 @@ namespace Belle2 {
     double GetRefA2() const {return m_ref_A2;}
     double GetRefAmplitude() const {return m_ref_amp;}
 
-
+    ///--- Getters ---///
     int GetCrossT1() const {return m_cross_T1;}
     int GetMaxBin() const {return m_max_bin;}
     double GetCrossA1() const {return m_cross_A1;}
     double GetCrossA2() const {return m_cross_A2;}
 
-    // Extra stuff not in the raw packet //
+    /// Extra stuff not in the raw packet ///
     double GetTime() const {return m_time;}
     int GetTimeBin() const {return m_tdc_bin;}
     double GetAmplitude() const {return m_amp;}
@@ -56,7 +57,7 @@ namespace Belle2 {
     double GetQuality() const {return m_quality;}
     int GetFlag() const {return m_flag;}
     double GetCorrTime() const {return m_corr_time;}
-    //--- Setters ---//
+    ///--- Setters ---///
     void SetTime(double time) {m_time = time;}
     void SetTimeBin(int time_bin) {m_time_bin = time_bin;}
     void SetTDCBin(double tdc_bin) {m_tdc_bin = tdc_bin;}
@@ -70,6 +71,7 @@ namespace Belle2 {
     void SetBoardstack(double bs) {m_boardstack = bs;}
     //void SetAdcVal(int ibin, int val) {m_adc_values[ibin] = val;}
     //void SetTdcVal(int ibin, int val) {m_tdc_values[ibin] = val;}
+    ///--- Setters ---///
     void SetID(int id) {m_id = id;}
     void SetIntBefore(double int_before) {m_int_before = int_before;}
     void SetIntAfter(double int_after) {m_int_after = int_after;}
@@ -81,7 +83,7 @@ namespace Belle2 {
     //void SetRefT2(double ref_t2) {m_ref_T2 = ref_t2;}
     void SetRefA1(double ref_a1) {m_ref_A1 = ref_a1;}
     void SetRefA2(double ref_a2) {m_ref_A2 = ref_a2;}
-
+    ///---Setters ---///
     void SetCrossT1(int cross_t1) {m_cross_T1 = cross_t1;}
     //    void SetCrossT2(double cross_t2) {m_cross_T2 = cross_t2;}
     void SetCrossA1(double cross_a1) {m_cross_A1 = cross_a1;}

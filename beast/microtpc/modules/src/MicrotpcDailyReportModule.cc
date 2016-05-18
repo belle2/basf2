@@ -364,13 +364,13 @@ void MicrotpcDailyReportModule::terminate()
        " % of the time" << endl;
 
   cout << "Total number of: " << endl;
-  cout << "=============== particles measured " << Ctr[0] << end;;
-  cout << "=============== Xray measured " << Ctr[1] << end;;
-  cout << "=============== Xray passing edge cuts measured " << Ctr[2] << end;;
-  cout << "=============== bad calibration alphas and protons measured " << Ctr[3] << end;;
-  cout << "=============== good botton calibration alphas measured " << Ctr[4] << end;;
-  cout << "=============== good top calibration alphas measured " << Ctr[5] << end;;
-  cout << "=============== neutron candidates measured " << Ctr[6] << end;;
+  cout << "=============== particles measured " << Ctr[0] << endl;
+  cout << "=============== Xray measured " << Ctr[1] << endl;
+  cout << "=============== Xray passing edge cuts measured " << Ctr[2] << endl;
+  cout << "=============== bad calibration alphas and protons measured " << Ctr[3] << endl;
+  cout << "=============== good botton calibration alphas measured " << Ctr[4] << endl;
+  cout << "=============== good top calibration alphas measured " << Ctr[5] << endl;
+  cout << "=============== neutron candidates measured " << Ctr[6] << endl;
 }
 
 

@@ -128,22 +128,6 @@ def serve_existing_plots(list_of_revisions):
 
     print("File exists already and will be served from archive!")
 
-    """
-    # The path where the content.html should be
-    src = './plots/{0}/content.html'.\
-        format('_'.join(sorted(list_of_revisions)))
-
-    # The path where we need it
-    dst = './content.html'
-
-    # Make sure the file exists before we copy it
-    if os.path.isfile(src):
-        shutil.copyfile(src, dst)
-    else:
-        sys.exit('Wanted to use plots from the archive, but the corresponding '
-                 'content.html file could not be found!')
-    """
-
 
 def files_in_pkg(pkg, list_of_revisions):
     """

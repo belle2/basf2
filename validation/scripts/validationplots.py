@@ -295,29 +295,12 @@ def generate_new_plots(list_of_revisions, process_queue=None):
     list_of_keys = sorted(list(set(plot_keys)))
     list_of_packages = sorted(list(set(plot_packages)))
 
-    # Now create the HTML files that contain the lists of all available
-    # revisions and the available packages
-    create_revision_list_html()
-
-    create_packages_list_html(list_of_packages, list_of_revisions)
-
     # Open the output file
     # First: Create destination directory if it does not yet exist
     content_dir = './plots/{0}'.format('_'.join(sorted(
         list_of_revisions)))
     if not os.path.exists(content_dir):
         os.makedirs(content_dir)
-
-    # Now open the file to which we will write all the content HTML
-    html_output = open('{0}/content.html'.format(content_dir), 'w+')
-
-    # Write meta-data, i.e. creation date and revisions contained in the file
-    created = str(datetime.datetime.utcfromtimestamp(int(time.time())))
-    json_revs = ','.join(['"' + _ + '"' for _ in list_of_revisions])
-    html_output.write('<!-- {{ "lastModified": '
-                      '"Plots created:<br>{0} (UTC)", '
-                      '"revisions":[{1}] }} -->'
-                      '\n\n'.format(created, json_revs))
 
     comparison_packages = []
 
@@ -328,9 +311,6 @@ def generate_new_plots(list_of_revisions, process_queue=None):
 
         # Some information to be printed out while the plots are created
         print('Now creating plots for package: {0}'.format(package))
-
-        html_output.write('<div id="' + package + '">\n')
-        html_output.write('<h1>' + package + '</h1>\n')
 
         # A list of all objects (including reference objects) that
         # belong to the current package
@@ -360,13 +340,6 @@ def generate_new_plots(list_of_revisions, process_queue=None):
             # Some more information to be printed out while plots are
             # being created
             print('\nNow creating plots for file: {0}'.format(rootfile))
-
-            # Start the section for the fixed/floating headers
-            html_output.write('<section class="persistent-area">')
-
-            # Write to the HTML the name of the current file
-            html_output.write('<h2 id="{0}_{1}" class="persistent-header">{1}</h2><br>\n'
-                              .format(package, fileName))
 
             # Get the list of all objects that belong to the current
             # package and the current file. First the regular objects:
@@ -410,10 +383,6 @@ def generate_new_plots(list_of_revisions, process_queue=None):
                 plotuple = Plotuple(root_objects, list_of_revisions)
                 list_of_plotuples.append(plotuple)
 
-                # Write the HTML for the Plotuple to the file stream
-                html_output.write('\n\n')
-                html_output.write('\n'.join(plotuple.html()))
-
                 if (plotuple.type == 'TNtuple'):
                     compare_ntuples.append(json_objects.ComparisonNTuple(title=plotuple.get_plot_title(),
                                                                          description=plotuple.description,
@@ -446,15 +415,9 @@ def generate_new_plots(list_of_revisions, process_queue=None):
                                                            ntuples=compare_ntuples)
             compare_files.append(compare_file)
 
-            # Close the section for the header
-            html_output.write('</section>')
-
         comparison_packages.append(json_objects.ComparisonPackage(name=package, plotfiles=compare_files))
         # Make the command line output more readable
         print(2 * '\n')
-
-        # Close the div for the package
-        html_output.write('</div>\n\n')
 
     print("storing to " + '{0}/comparison.json'.format(content_dir))
 
@@ -475,22 +438,6 @@ def generate_new_plots(list_of_revisions, process_queue=None):
     # todo: refactor this information extracion -> json inside a specific class / method after the
     # plots have been created
     json_objects.dump(os.path.join(content_dir, "comparison.json"), json_objects.Comparison(comparison_revs, comparison_packages))
-
-    # Add JavaScript for the fixed headers
-    # Admittedly, this is an ugly workaround...
-    html_output.write('<script type="text/javascript">\n'
-                      'var clonedHeaderRow;\n'
-                      '$(".persistent-area").each(function() {\n'
-                      'clonedHeaderRow = $(".persistent-header", this);\n'
-                      'clonedHeaderRow\n'
-                      '.before(clonedHeaderRow.clone())\n'
-                      '.css("width", clonedHeaderRow.width())\n'
-                      '.addClass("floatingHeader");\n'
-                      '});\n'
-                      '</script>\n')
-
-    # Close the file stream for the HTML file
-    html_output.close()
 
 
 def create_RootObjects_from_list(list_of_root_files, is_reference):
@@ -702,76 +649,6 @@ def create_RootObjects_from_file(root_file, is_reference):
     return file_objects, file_keys, package
 
 
-def create_revision_list_html():
-    """
-    Creates a HTML-list of all available revisions with checkboxes and the
-    font color set accordingly to the line style of the revision in the plots.
-    """
-
-    revisions = open('revisions.html', 'w+')
-    revisions.write('<label><input type="checkbox" name="revisions" '
-                    ' value="reference" checked>&nbsp;<span '
-                    'style="color: black;">reference</span></label><br>\n')
-
-    for item in available_revisions():
-        ind = index_from_revision(item)
-        color = ROOT.gROOT.GetColor(get_style(ind, len(available_revisions()))
-                                    .GetLineColor()).AsHexString()
-        date_of_revision = datetime.datetime.utcfromtimestamp(int(
-            date_from_revision(item)))
-        revisions.write('<label title="Data created: {0} (UTC)">'
-                        '<input type="checkbox" name="revisions" value="{1}" '
-                        'checked>&nbsp;'
-                        '<span style="color: {2};">{1}</span></label><br>\n'
-                        .format(date_of_revision, item, color))
-    revisions.write('<div id="regenerate">Load selected</div>')
-    revisions.close()
-
-
-def create_packages_list_html(list_of_packages, list_of_revisions):
-
-    # Create a file with all available packages
-    # First: Create destination directory if it does not yet exist
-    content_dir = './plots/{0}'.format('_'.join(sorted(
-        list_of_revisions)))
-    if not os.path.exists(content_dir):
-        os.makedirs(content_dir)
-
-    # Now open the file to which we will write list of packages
-    with open('{0}/packages.html'.format(content_dir), 'w+') as pkgs:
-        for pkg in sorted(list_of_packages):
-
-            # Write the checkbox to the HTML
-            pkgs.write('<label>'
-                       '<input type="checkbox" name="packages" '
-                       'value="{0}" checked>&nbsp;'
-                       '<a href="#{0}" class="pkg_container_head" '
-                       'name="{0}">{0} &raquo;</a><br>'
-                       '</label>\n'
-                       .format(pkg))
-
-            # Get a list of all ROOT result files in this package
-            in_pkg = sorted(list(set(files_in_pkg(pkg, list_of_revisions))))
-
-            # Print them into a container
-            pkgs.write('<div class="pkg_container pkg_{0}">'.format(pkg))
-
-            for rootfile in in_pkg:
-
-                # Get the file name and shorten it if necessary
-                filename, extension = os.path.splitext(rootfile)
-                if len(filename) > 20:
-                    shortname = filename[:17] + '...'
-                else:
-                    shortname = filename
-
-                # Write to HTML
-                pkgs.write('<a href="#{0}_{1}" title="{2}">{3}</a><br>\n'
-                           .format(pkg, filename, rootfile, shortname))
-
-            pkgs.write('</div>')
-
-
 ##############################################################################
 #                             Class Definition                               #
 ##############################################################################
@@ -956,7 +833,7 @@ def create_plots(revisions=None, force=False, process_queue=None):
     # generated before or not. In the path we use the alphabetical order of the
     # revisions, not the chronological one
     # (easier to work with on the web server side)
-    expected_path = './plots/{0}/content.html'.format(
+    expected_path = './plots/{0}/revision.json'.format(
         '_'.join(sorted(list_of_revisions)))
 
     # If the path exists and we don't want to force the regeneration of plots,
@@ -967,25 +844,6 @@ def create_plots(revisions=None, force=False, process_queue=None):
     # Otherwise: Create the requested plots
     else:
         generate_new_plots(list_of_revisions, process_queue)
-
-        # Check if we generated the default view (i.e. all available revisions
-        # and the references). If this is the case, copy these files to the
-        # base directory
-        if (sorted(list_of_revisions) ==
-                sorted(['reference'] + available_revisions())):
-
-            # The path where the content.html and packages.html should be
-            src = './plots/{0}/'.format('_'.join(sorted(list_of_revisions)))
-
-            # The path where we need them
-            dst = './'
-
-            # Actually copy the files
-            shutil.copyfile(src + 'content.html', dst + 'content.html')
-            shutil.copyfile(src + 'packages.html', dst + 'packages.html')
-
-            print('Copied generated content.html and packages.html to the '
-                  'base directory! \n')
 
     # signal the main process that the plot creation is complete
     if process_queue:

@@ -16,9 +16,9 @@ namespace Belle2 {
 
   public:
     TOPCAFDigitCalib();
-    TOPCAFDigitCalib(const EventWaveformPacket* wp);
-
     ~TOPCAFDigitCalib();
+
+    TOPCAFDigitCalib(const EventWaveformPacket* wp);
 
     //--- Getters ---//
     topcaf_channel_id_t GetChannelID() const {return m_channel_id;}

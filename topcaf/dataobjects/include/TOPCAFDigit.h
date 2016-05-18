@@ -16,9 +16,10 @@ namespace Belle2 {
 
   public:
     TOPCAFDigit();
+    ~TOPCAFDigit();
+
     TOPCAFDigit(const EventWaveformPacket* wp);
 
-    ~TOPCAFDigit();
 
     //--- Getters ---//
     topcaf_channel_id_t GetChannelID() const {return m_channel_id;}

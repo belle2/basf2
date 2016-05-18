@@ -1,18 +1,15 @@
-/**\class CamacData
- *
- */
+////////////////////////////////////////////////////////////////////////////////////
+// Data class for the Event Packet: Header information as defined in:             //
+// http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format //
+// Author: Malachi Schram (malachi.schram@pnnl.gov)                               //
+////////////////////////////////////////////////////////////////////////////////////
+
 #ifndef CamacData_H
 #define CamacData_H
 
 #include <TObject.h>
 #include <vector>
 #include <map>
-
-////////////////////////////////////////////////////////////////////////////////////
-// Data class for the Event Packet: Header information as defined in:             //
-// http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format //
-// Author: Malachi Schram (malachi.schram@pnnl.gov)                               //
-////////////////////////////////////////////////////////////////////////////////////
 
 namespace Belle2 {
 
@@ -35,25 +32,26 @@ namespace Belle2 {
     unsigned short GetRawRF1() const {return m_raw_rf1;}
     unsigned short GetRawRF2() const {return m_raw_rf2;}
     unsigned short GetRawRF3() const {return m_raw_rf3;}
+    ///--- Getters ---///
     double GetTDC() const {return float(m_raw_tdc) * slot7_tdc_timing[1];}
     double GetRF0() const {return float(m_raw_rf0) * slot7_tdc_timing[2];}
     double GetRF1() const {return float(m_raw_rf1) * slot7_tdc_timing[3];}
     double GetRF2() const {return float(m_raw_rf2) * slot7_tdc_timing[4];}
     double GetRF3() const {return float(m_raw_rf3) * slot7_tdc_timing[5];}
-
+    ///--- Getters ---///
     unsigned short GetRawTrigS0_TDC()     const {return m_raw_trigS_tdc0;}
     unsigned short GetRawTrigM0_TDC()     const {return m_raw_trigM_tdc0;}
     unsigned short GetRawTrigS1_TDC()     const {return m_raw_trigS_tdc1;}
     unsigned short GetRawTrigM1_TDC()     const {return m_raw_trigM_tdc1;}
     unsigned short GetRawTrigTiming_TDC() const {return m_raw_timing_tdc;}
     unsigned short GetRawRateMon()        const {return m_raw_ratemon;}
-
+    ///--- Getters ---///
     double GetTrigS0_TDC()     const {return float(m_raw_trigS_tdc0) * slot2_tdc_timing[0];}
     double GetTrigM0_TDC()     const {return float(m_raw_trigM_tdc0) * slot2_tdc_timing[1];}
     double GetTrigS1_TDC()     const {return float(m_raw_trigS_tdc1) * slot2_tdc_timing[2];}
     double GetTrigM1_TDC()     const {return float(m_raw_trigM_tdc1) * slot2_tdc_timing[3];}
     double GetTrigTiming_TDC() const {return float(m_raw_timing_tdc) * slot2_tdc_timing[4];}
-
+    ///--- Getters ---///
     unsigned short GetRawTrigS_ADC0()     const {return m_raw_trigS_adc0;}
     unsigned short GetRawTrigM_ADC0()     const {return m_raw_trigM_adc0;}
     unsigned short GetRawTrigS_ADC1()     const {return m_raw_trigS_adc1;}
@@ -65,22 +63,20 @@ namespace Belle2 {
     unsigned short GetRawLEPSMarkerWord() const {return m_raw_leps_marker_word;}
 
     ///--- Setters ---///
-
     void SetEventNumber(const unsigned int evt) {m_evt_num = evt;}
-
     void SetRawTDC(const unsigned short tdc)    {m_raw_tdc = tdc;}
     void SetRawRF0TDC(const unsigned short tdc) {m_raw_rf0 = tdc;}
     void SetRawRF1TDC(const unsigned short tdc) {m_raw_rf1 = tdc;}
     void SetRawRF2TDC(const unsigned short tdc) {m_raw_rf2 = tdc;}
     void SetRawRF3TDC(const unsigned short tdc) {m_raw_rf3 = tdc;}
-
+    ///--- Setters ---///
     void SetRawTrigS_TDC0(const unsigned short x) {m_raw_trigS_tdc0 = x;}
     void SetRawTrigM_TDC0(const unsigned short x) {m_raw_trigM_tdc0 = x;}
     void SetRawTrigS_TDC1(const unsigned short x) {m_raw_trigS_tdc1 = x;}
     void SetRawTrigM_TDC1(const unsigned short x) {m_raw_trigM_tdc1 = x;}
     void SetRawTiming_TDC(const unsigned short x) {m_raw_timing_tdc = x;}
     void SetRawRateMon(const unsigned short x)    {m_raw_ratemon = x;}
-
+    ///--- Setters ---///
     void SetRawTrigS_ADC0(const unsigned short x) {m_raw_trigS_adc0 = x;}
     void SetRawTrigM_ADC0(const unsigned short x) {m_raw_trigM_adc0 = x;}
     void SetRawTrigS_ADC1(const unsigned short x) {m_raw_trigS_adc1 = x;}

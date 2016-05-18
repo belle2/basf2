@@ -320,7 +320,7 @@ def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False
     # join the paths of the various result folders
     results_folder = os.path.join(local_dir, "results")
     comparison_folder = os.path.join(local_dir, "html", "plots")
-    static_folder = os.path.join(local_dir, "validation", "html_ng")
+    static_folder = os.path.join(local_dir, "validation", "html_static")
 
     # export js, css and html templates
     cherry_config["/static"] = {

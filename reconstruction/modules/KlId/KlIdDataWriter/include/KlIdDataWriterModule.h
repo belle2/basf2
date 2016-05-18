@@ -11,6 +11,7 @@
 #ifndef KlIdDataWriterModule_H
 #define KlIdDataWriterModule_H
 
+#include <framework/utilities/FileSystem.h>
 #include <mdst/dataobjects/KLMCluster.h>
 
 #include <framework/core/Module.h>
@@ -18,6 +19,7 @@
 
 #include <genfit/Track.h>
 
+#include <TMVA/Reader.h>
 #include <TTree.h>
 #include <TFile.h>
 #include <string>
@@ -51,83 +53,107 @@ namespace Belle2 {
 
   private:
 
-    std::string m_outPath = "klidData.root";
+    std::string m_outPath = "KlIdIDTrainingData.root";
 
     /** varibales to write out. used for classification of clusters  */
     // KLM variables
     /**  number of clusters */
-    int    m_KLMnCluster;
+    Float_t    m_KLMnCluster;
     /**  number of layers hit in KLM cluster */
-    int    m_KLMnLayer;
+    Float_t    m_KLMnLayer;
     /** number of innermost layers hit */
-    int    m_KLMnInnermostLayer;
+    Float_t    m_KLMnInnermostLayer;
     /** global Z position in KLM  */
-    double m_KLMglobalZ;
+    Float_t m_KLMglobalZ;
     /** timing of KLM Cluster */
-    double m_KLMtime;
+    Float_t m_KLMtime;
     /** length/width of KLM ,might be redundant */
-    double m_KLMshape;
+    Float_t m_KLMshape;
     /**  average distance between all KLM clusters */
-    double m_KLMavInterClusterDist;
+    Float_t m_KLMavInterClusterDist;
     /** hit depth in KLM, distance to IP */
-    double m_KLMhitDepth;
+    Float_t m_KLMhitDepth;
     /** Energy deposit in KLM (0.2 GeV * nHitCells) */
-    double m_KLMenergy;
+    Float_t m_KLMenergy;
     /**  invariant mass calculated from root vector */
-    double m_KLMinvM;
+    Float_t m_KLMinvM;
     /** distance KLM Cluster <-> track extrapolated into KLM */
-    double m_KLMtrackDist;
+    Float_t m_KLMtrackDist;
     /** target variable for KLM classification */
-    int    m_KLMTruth;
+    Float_t    m_KLMTruth;
     /** distance to next KLM cluster */
-    double m_KLMnextCluster;
+    Float_t m_KLMnextCluster;
     /** classifier output from bkg classification */
-    double m_KLMBKGProb;
+    Float_t m_KLMBKGProb;
 
     // variables of closest ECL cluster with respect to KLM cluster
     /** distance associated ECL <-> KLM cluster */
-    double m_KLMECLDist;
+    Float_t m_KLMECLDist;
     /** energy measured in associated ECL cluster */
-    double m_KLMECLE;
+    Float_t m_KLMECLE;
     /** distance between track entry point and cluster center, might be removed */
-    double m_KLMECLdeltaL;   // new
+    Float_t m_KLMECLdeltaL;   // new
     /** track distance between associated ECL cluster and track extrapolated into ECL */
-    double m_KLMECLminTrackDist; //new
+    Float_t m_KLMECLminTrackDist; //new
     /** E in surrounding 9 crystals divided by surrounding 25 crydtalls */
-    double m_KLMECLE9oE25;
+    Float_t m_KLMECLE9oE25;
     /** timing of associated ECL cluster */
-    double m_KLMECLTiming;
+    Float_t m_KLMECLTiming;
     /** uncertainty on time in associated ECL cluster */
-    double m_KLMECLTerror;
+    Float_t m_KLMECLTerror;
     /** uncertainty on E in associated ECL cluster */
-    double m_KLMECLEerror;
+    Float_t m_KLMECLEerror;
     /** primitive distance cluster <-> track for associated ECL cluster */
-    double m_KLMtrackToECL;
+    Float_t m_KLMECLtrackDist;
     /** classifier output from bkg classification of associated ECL cluster */
-    double m_KLMECLBKGProb;
-
+    Float_t m_KLMECLBKGProb;
+    /** more sophisticated track distance */
+    Float_t m_KLMECLminTrkDistance; // new
 
     // ECL cluster variables for pure ECL Klongs
     /** measured energy */
-    double m_ECLE;
+    Float_t m_ECLE;
     /** energy of 9/25 chrystall rings (E dispersion shape) */
-    double m_ECLE9oE25;
+    Float_t m_ECLE9oE25;
     /** timing of ECL */
-    double m_ECLTiming;
+    Float_t m_ECLTiming;
     /** distance of cluster to IP */
-    double m_ECLR;
+    Float_t m_ECLR;
     /** uncertainty on E measurement in ECL */
-    double m_ECLEerror;
+    Float_t m_ECLEerror;
     /** more sophisticated distaqnce to track in ECL, might be removed */
-    double m_ECLminTrkDistance; // new
+    Float_t m_ECLminTrkDistance; // new
     /** disatance between track entrace into cluster and cluster center */
-    double m_ECLdeltaL; // new
+    Float_t m_ECLdeltaL; // new
     /** distance cluster to next track in ECL */
-    double m_ECLtrackDist;
+    Float_t m_ECLtrackDist;
     /** ECL trarget variable */
-    double m_ECLTruth;
+    Float_t m_ECLTruth;
     /** classifier output from bkg classification of ECL cluster */
-    double m_ECLBKGProb;
+    Float_t m_ECLBKGProb;
+
+
+    /** default classifier name */
+    std::string m_BKGClassifierName = "KLMBKGClassifierBDT";
+    /** default classifier name  */
+    std::string m_ECLClassifierName = "ECLBKGClassifierBDT";
+
+    /** TMVA classifier object. */
+    TMVA::Reader* m_readerBKG = new TMVA::Reader("Verbose");
+    /** TMVA classifier object. */
+    TMVA::Reader* m_readerECL = new TMVA::Reader("Verbose");
+    /** TMVA classifier object. */
+    TMVA::Reader* m_readerKLMECL = new TMVA::Reader("Verbose");
+
+    /** path to training .xml file. */
+    std::string m_BKGClassifierPath = FileSystem::findFile(
+                                        "reconstruction/data/weights/TMVAFactory_KLMBKGClassifierBDT.weights.xml");
+
+    // this files is located in KlIdECLTMVAExpert !!
+    // the training script as well !
+    /** path to training .xml file. */
+    std::string m_ECLClassifierPath = FileSystem::findFile(
+                                        "reconstruction/data/weights/TMVAFactory_ECLBKGClassifierBDT.weights.xml");
 
 
     /** root file */

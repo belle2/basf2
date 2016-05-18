@@ -78,7 +78,7 @@ void KlIdDataWriterModule::initialize()
   m_treeKLM -> Branch("KLMhitDepth",                & m_KLMhitDepth);
 
   m_treeKLM   -> Branch("KLMdistToNextECL",         & m_KLMECLDist);
-  m_treeKLM   -> Branch("KLMtrackToECL",            & m_KLMtrackToECL);
+  m_treeKLM   -> Branch("KLMtrackToECL",            & m_KLMECLtrackDist);
   m_treeKLM   -> Branch("KLMECLEerror",             & m_KLMECLEerror);
   m_treeKLM   -> Branch("KLMECLenergy",             & m_KLMECLE);
   m_treeKLM   -> Branch("KLMECLE9oE25",             & m_KLMECLE9oE25);
@@ -86,8 +86,8 @@ void KlIdDataWriterModule::initialize()
   m_treeKLM   -> Branch("KLMECLTerror",             & m_KLMECLTerror);
   m_treeKLM   -> Branch("KLMECLdeltaL",             & m_KLMECLdeltaL);
   m_treeKLM   -> Branch("KLMECLmintrackDist",       & m_KLMECLminTrackDist);
-  //m_treeKLM   -> Branch("KLMBKGProb",               & m_KLMBKGProb);
-  //m_treeKLM   -> Branch("KLMECLBKGProb",            & m_KLMECLBKGProb);
+  m_treeKLM   -> Branch("KLMBKGProb",               & m_KLMBKGProb);
+  m_treeKLM   -> Branch("KLMECLBKGProb",            & m_KLMECLBKGProb);
 
   //ECL
   m_treeECL   -> Branch("ECLenergy",                & m_ECLE);
@@ -100,9 +100,58 @@ void KlIdDataWriterModule::initialize()
 
   m_treeECL   -> Branch("ECLdeltaL",                & m_ECLdeltaL);
   m_treeECL   -> Branch("ECLmintrackDist",          & m_ECLminTrkDistance);
-  //m_treeECL   -> Branch("ECLBKGProb",               & m_ECLBKGProb);
+  m_treeECL   -> Branch("ECLBKGProb",               & m_ECLBKGProb);
 
-  //TODO add tmva reader for bkg classification
+
+  // KLM BKG CLASSIFIER
+  // declare vars as they were declared in trainingi, all as floats!
+  m_readerBKG -> AddVariable("KLMnCluster",                   &m_KLMnCluster);
+  m_readerBKG -> AddVariable("KLMnLayer",                     &m_KLMnLayer);
+  m_readerBKG -> AddVariable("KLMnInnermostlayer",            &m_KLMnInnermostLayer);
+  m_readerBKG -> AddVariable("KLMglobalZ",                    &m_KLMglobalZ);
+  m_readerBKG -> AddVariable("KLMtime",                       &m_KLMtime);
+  m_readerBKG -> AddVariable("KLMinvM",                       &m_KLMinvM);
+  m_readerBKG -> AddVariable("KLMtrackDist",                  &m_KLMtrackDist);
+  m_readerBKG -> AddVariable("KLMdistToNextCl",               &m_KLMnextCluster);
+  m_readerBKG -> AddVariable("KLMshape",                      &m_KLMshape);
+  m_readerBKG -> AddVariable("KLMaverageInterClusterDist",    &m_KLMavInterClusterDist);
+  m_readerBKG -> AddVariable("KLMhitDepth",                   &m_KLMhitDepth);
+  // KLM-ECL Vars (ECL clusters that are related to KLM clusters)
+  m_readerBKG -> AddVariable("KLMdistToNextECL",              &m_KLMECLDist);
+  m_readerBKG -> AddVariable("KLMECLenergy",                  &m_KLMECLE);
+  m_readerBKG -> AddVariable("KLMECLE9oE25",                  &m_KLMECLE9oE25);
+  m_readerBKG -> AddVariable("KLMECLtiming",                  &m_KLMECLTiming);
+  m_readerBKG -> AddVariable("KLMECLEerror",                  &m_KLMECLEerror);
+  m_readerBKG -> AddVariable("KLMtrackToECL",                 &m_KLMECLtrackDist);
+  m_readerBKG -> AddVariable("KLMECLdeltaL",                  &m_KLMECLdeltaL);
+  m_readerBKG -> AddVariable("KLMECLmintrackDist",            &m_KLMECLminTrackDist);
+
+
+  //variables for the classification of associated ECL bkg Prob
+  m_readerKLMECL->AddVariable("ECLenergy",                 &m_KLMECLE);
+  m_readerKLMECL->AddVariable("ECLE9oE25",                 &m_KLMECLE9oE25);
+  m_readerKLMECL->AddVariable("ECLtiming",                 &m_KLMECLTiming);
+  m_readerKLMECL->AddVariable("ECLEerror",                 &m_KLMECLEerror);
+  m_readerKLMECL->AddVariable("ECLdistToTrack",            &m_KLMECLtrackDist);
+  m_readerKLMECL->AddVariable("ECLdeltaL",                 &m_KLMECLdeltaL);
+  m_readerKLMECL->AddVariable("ECLmintrackDist",           &m_KLMECLminTrkDistance);
+
+  //variables for the bkg classifier
+  //can use same classifier here but have to declare other vars
+  m_readerECL->AddVariable("ECLenergy",                 &m_ECLE);
+  m_readerECL->AddVariable("ECLE9oE25",                 &m_ECLE9oE25);
+  m_readerECL->AddVariable("ECLtiming",                 &m_ECLTiming);
+  m_readerECL->AddVariable("ECLEerror",                 &m_ECLEerror);
+  m_readerECL->AddVariable("ECLdistToTrack",            &m_ECLtrackDist);
+  m_readerECL->AddVariable("ECLdeltaL",                 &m_ECLdeltaL);
+  m_readerECL->AddVariable("ECLmintrackDist",           &m_ECLminTrkDistance);
+
+
+  // load classifier. name, path
+  m_readerBKG -> BookMVA(m_BKGClassifierName,  m_BKGClassifierPath);
+  m_readerECL -> BookMVA(m_ECLClassifierName,  m_ECLClassifierPath);
+  m_readerKLMECL -> BookMVA(m_ECLClassifierName,  m_ECLClassifierPath);
+
 
 }//init
 
@@ -140,7 +189,6 @@ void KlIdDataWriterModule::event()
     m_KLMinvM = cluster.getMomentum().M2();
     m_KLMenergy = cluster.getMomentum().E();
     m_KLMhitDepth = cluster.getClusterPosition().Mag2();
-    //m_KLMBKGProb = cluster.getBKGProb();
 
     // find nearest ecl cluster and calculate angular distance
     m_KLMECLDist =  9999999;
@@ -170,9 +218,16 @@ void KlIdDataWriterModule::event()
       // names might change
       m_KLMECLdeltaL = closestECLCluster->getTemporaryDeltaL();;
       m_KLMECLminTrackDist = closestECLCluster->getTemporaryMinTrkDistance();
-      //m_KLMECLBKGProb = closestECLCluster->getBKGProb();
-
       m_KLMECLTiming = closestECLCluster->getTiming();
+
+      // >> calculate BKG Classifier output for ECL <<
+      m_KLMECLBKGProb = m_readerKLMECL -> EvaluateMVA(m_ECLClassifierName);
+      // normalize if not errorcode
+      if (m_KLMECLBKGProb > -1.) {
+        m_KLMECLBKGProb = (m_KLMECLBKGProb + 1) / 2.0;
+      } else {m_KLMECLBKGProb = 0;}
+
+
       // needed to add those ecl clusters to KLM particles that have a high
       // kl probability and no relation
       cluster.addRelationTo(closestECLCluster);
@@ -240,7 +295,7 @@ void KlIdDataWriterModule::event()
     // extrapolate genfit trackfit result to their ends and find the
     // closest one
     m_KLMtrackDist = 999999;
-    m_KLMtrackToECL = 999999;
+    m_KLMECLtrackDist = 999999;
     double trackToECL = 999999; // would have to get the vector twice otherwise
     int       num_points = 0;
     int id_of_last_point = 0;
@@ -275,7 +330,7 @@ void KlIdDataWriterModule::event()
           trackToECL =  distance_vec_ecl.Mag2();
 
           if ((trackToECL < 999999) & (trackToECL > 0)) {
-            m_KLMtrackToECL = trackToECL;
+            m_KLMECLtrackDist = trackToECL;
           }
 
         }
@@ -284,6 +339,16 @@ void KlIdDataWriterModule::event()
       } catch (genfit::Exception& e) {
       }// try
     }// for gftrack
+
+
+    // >> calculate BKG Classifier output for KLM <<
+    m_KLMBKGProb = m_readerBKG -> EvaluateMVA(m_BKGClassifierName);
+
+    // normalize if not errorcode
+    if (m_KLMBKGProb > -1.) {
+      m_KLMBKGProb = (m_KLMBKGProb + 1) / 2.0;
+    } else {m_KLMBKGProb = 0; }
+
 
     m_treeKLM -> Fill();
   }// for klmcluster in klmclusters
@@ -305,7 +370,6 @@ void KlIdDataWriterModule::event()
     m_ECLTiming = cluster.getTiming();
     m_ECLR = cluster.getR();
     m_ECLEerror = cluster.getErrorEnergy();
-    //m_ECLBKGProb = cluster.getBKGProb();
 
     const TVector3& cluster_pos = cluster.getclusterPosition();
 
@@ -358,6 +422,14 @@ void KlIdDataWriterModule::event()
     }// for gftrack
 
 
+    // get bkg classification from bvkg classifier...
+    m_ECLBKGProb = m_readerECL -> EvaluateMVA(m_ECLClassifierName);
+    // normalize if not errorcode
+    if (m_ECLBKGProb > -1.) {
+      m_ECLBKGProb = (m_ECLBKGProb + 1) / 2.0;
+    }
+
+
     // finally fill tree
     m_treeECL -> Fill();
 
@@ -375,6 +447,10 @@ void KlIdDataWriterModule::terminate()
   m_treeKLM -> Write();
   m_treeECL -> Write();
   m_f    -> Close();
+
+  delete m_readerBKG;
+  delete m_readerECL;
+  delete m_readerKLMECL;
 }
 
 

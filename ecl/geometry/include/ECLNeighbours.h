@@ -35,7 +35,7 @@ namespace Belle2 {
       ~ECLNeighbours();
 
       /** Return the neighbours for a given crystal ID.*/
-      std::vector<short  int> getNeighbours(short int cid);
+      const std::vector<short int>& getNeighbours(short int cid) const;
 
     private:
       std::vector < std::vector < short int > > m_neighbourMap; // list of list of neighbour cids

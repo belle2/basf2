@@ -205,7 +205,7 @@ void ECLNeighbours::initializeNC(const int n, const int corners)
   }
 }
 
-std::vector<short int> ECLNeighbours::getNeighbours(const short int cid)
+const std::vector<short int>& ECLNeighbours::getNeighbours(const short int cid) const
 {
   return m_neighbourMap.at(cid);
 }

@@ -69,7 +69,7 @@ namespace Belle2 {
     Timer::~Timer()
     {
       double elapsed = (getClock() - m_startTime) / Unit::ms;
-      B2INFO(m_text << std::fixed << std::setprecision(3) << elapsed << " ms");
+      B2INFO(m_text << " " << std::fixed << std::setprecision(3) << elapsed << " ms");
     }
   }
 }

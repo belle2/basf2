@@ -63,10 +63,10 @@ namespace Belle2 {
 
       /**
        * Try to lock the file
-       * @param timeout  Time in seconds to wait for a lock
+       * @param timeout  Time in seconds to wait for a lock (default is rather high to deal with slow FS at KEKCC)
        * @return  True if the lock could be obtained, false if file could not be opened or timeout is reached
        */
-      bool lock(int timeout = 20);
+      bool lock(int timeout = 300);
 
     private:
       int m_file;  /**< File descriptor of file to be locked */
@@ -95,6 +95,6 @@ namespace Belle2 {
 
   private:
     /** no instances. */
-    FileSystem() {}
+    FileSystem() = delete;
   };
 }

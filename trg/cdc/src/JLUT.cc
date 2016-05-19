@@ -291,19 +291,26 @@ namespace Belle2 {
       // Limit output according to requiredNBits
       if (result < 0)
       {
-        if (m_write != 1) {
-          cout << "[Warning] TRGCDCJLUT::m_function => output is smaller then 0. Changed to 0." << endl;
-          cout << "Could happen if invY_min and invY_max are inside x range." << endl;
-        }
         result = 0;
       }
       if (result > m_shiftOffsetOutputMax.getInt())
       {
+        result = m_shiftOffsetOutputMax.getInt();
+      }
+      // Warnings. Use ideal result for checking output.
+      double t_inputActual = anInt* m_inputMin.shift(m_inputShiftBits, 0).getToReal() + m_inputMin.getActual();
+      double t_outputActual = m_floatFunction(t_inputActual);
+      if (t_outputActual < m_shiftOutputMin.getActual()) {
         if (m_write != 1) {
-          cout << "[Warning] TRGCDCJLUT::m_function => output is larger then allowed max value. Changed to " << m_outputIntMax << "." << endl;
+          cout << "[Warning] TRGCDCJLUT::m_function => output is smaller then 0. Changed to 0." << endl;
           cout << "Could happen if invY_min and invY_max are inside x range." << endl;
         }
-        result = m_shiftOffsetOutputMax.getInt();
+      }
+      if (t_outputActual > m_shiftOffsetOutputMax.getActual() + m_shiftOutputMin.getActual()) {
+        if (m_write != 1) {
+          cout << "[Warning] TRGCDCJLUT::m_function => output is larger then allowed max value. Changed to " << m_shiftOffsetOutputMax.getInt() << "." << endl;
+          cout << "Could happen if invY_min and invY_max are inside x range." << endl;
+        }
       }
       return result;
     };

@@ -304,16 +304,16 @@ namespace HandleRoot {
         string t_vectorName = t_name.substr(0, t_find);
         int t_vectorIndex = stoi(t_name.substr(t_find+1,t_name.size()));
         // Create vector if not in map.
-        if(trackMapV.find(t_name)==trackMapV.end()){
-          trackMapV[t_name] = vector<double> (1);
+        if(trackMapV.find(t_vectorName)==trackMapV.end()){
+          trackMapV[t_vectorName] = vector<double> (1);
         }
         // Increase vector size if vector size is too small
-        int nIncrease = t_vectorIndex+1 - trackMapV[t_name].size();
+        int nIncrease = t_vectorIndex+1 - trackMapV[t_vectorName].size();
         if(nIncrease > 0){
-          for (int iIncrease = 0; iIncrease<nIncrease; iIncrease++) trackMapV[t_name].push_back(0);
+          for (int iIncrease = 0; iIncrease<nIncrease; iIncrease++) trackMapV[t_vectorName].push_back(0);
         }
         // Fill to map
-        trackMapV[t_name][t_vectorIndex] = t_value;
+        trackMapV[t_vectorName][t_vectorIndex] = t_value;
       } else {
       // Double
         trackMapD[t_name] = t_value;

@@ -30,6 +30,11 @@ void readFitter3D(string filename){
   TTree* inTreeTrack = (TTree*)inFile->Get("fitter3DeventTree");
   TTree* inTreeConstants = (TTree*)inFile->Get("fitter3DrunTree");
 
+  // Check if float fitter3D values exist
+  int floatExists = 0;
+  if(inTreeTrack->GetBranch("fitter3DTrackDoublefloat_z0")) floatExists = 1;
+
+
   ////Set branches
   TClonesArray* chargeTrackFitter3D = new TClonesArray("TVectorD"); 
   TClonesArray* ptTrackFitter3D = new TClonesArray("TVectorD"); 
@@ -39,17 +44,22 @@ void readFitter3D(string filename){
   TClonesArray* mcPtTrackFitter3D = new TClonesArray("TVectorD"); 
   TClonesArray* mcPhi0TrackFitter3D = new TClonesArray("TVectorD"); 
   TClonesArray* z0TrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* float_z0TrackFitter3D = new TClonesArray("TVectorD"); 
   TClonesArray* cotTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* float_cotTrackFitter3D = new TClonesArray("TVectorD"); 
   TClonesArray* fit3DChi2TrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* float_fit3DChi2TrackFitter3D = new TClonesArray("TVectorD"); 
   TClonesArray* fit2DChi2TrackFitter3D = new TClonesArray("TVectorD"); 
   TClonesArray* mcZ0TrackFitter3D = new TClonesArray("TVectorD"); 
   TClonesArray* mcCotTrackFitter3D = new TClonesArray("TVectorD"); 
   TClonesArray* pdgIdTrackFitter3D = new TClonesArray("TVectorD"); 
   TClonesArray* mcImpactPositionFitter3D = new TClonesArray("TVectorD");
   TClonesArray* mcVertexFitter3D = new TClonesArray("TVectorD");
+  TClonesArray* nHitsTrackFitter3D = new TClonesArray("TVectorD"); 
   inTreeTrack->SetBranchAddress("fitter3DTrackDoublecharge", &chargeTrackFitter3D);
   inTreeTrack->SetBranchAddress("fitter3DTrackDoublept", &ptTrackFitter3D);
   inTreeTrack->SetBranchAddress("fitter3DTrackDoublephi0", &phi0TrackFitter3D);
+  //inTreeTrack->SetBranchAddress("fitter3DTrackDoublerelPhi0", &phi0TrackFitter3D);
   inTreeTrack->SetBranchAddress("fitter3DTrackDoublept2D", &pt2DTrackFitter3D);
   inTreeTrack->SetBranchAddress("fitter3DTrackDoublephi02D", &phi02DTrackFitter3D);
   inTreeTrack->SetBranchAddress("fitter3DTrackDoublemcPt", &mcPtTrackFitter3D);
@@ -63,6 +73,13 @@ void readFitter3D(string filename){
   inTreeTrack->SetBranchAddress("fitter3DTrackDoublepdgId", &pdgIdTrackFitter3D);
   inTreeTrack->SetBranchAddress("fitter3DTrackVectorimpactPosition", &mcImpactPositionFitter3D);
   inTreeTrack->SetBranchAddress("fitter3DTrackVectormcVertex", &mcVertexFitter3D);
+  if (floatExists) {
+    inTreeTrack->SetBranchAddress("fitter3DTrackDoublefloat_z0", &float_z0TrackFitter3D);
+    inTreeTrack->SetBranchAddress("fitter3DTrackDoublefloat_cot", &float_cotTrackFitter3D);
+    inTreeTrack->SetBranchAddress("fitter3DTrackDoublefloat_zChi2", &float_fit3DChi2TrackFitter3D);
+    inTreeTrack->SetBranchAddress("fitter3DTrackDoublenHits", &nHitsTrackFitter3D);
+  }
+
 
   //Make Histogram
   TH1F* hpT    = new TH1F("histpT","Plot of pT",93,0,10);
@@ -99,6 +116,14 @@ void readFitter3D(string filename){
   TH1F* hResphi0   = new TH1F("hResphi00","Resolution plot of phi0",100,-2.5,2.5);
   TH1F* hResz0     = new TH1F("histResz0","Resolution plot of z0",100,-25,25);
   TH1F* hRestheta = new TH1F("hRestheta","Resolution plot of theta",100,-25,25);
+
+  TH1F* hDiffZ0 = 0, *hDiffCot = 0, *hDiffChi2 = 0;
+  if (floatExists) {
+    // Differences between float and firmware version. (cot, z0, chi2)
+    hDiffZ0 = new TH1F("histDiffz0","Plot of z0 difference btw float and firmware",98,-25,25);
+    hDiffCot = new TH1F("histDiffCot","Plot of Cot difference btw float and firmware",98,-25,-25);
+    hDiffChi2 = new TH1F("histDiffChi2","Plot of fit3DChi2 difference btw float and firmware",93,-30,30);
+  }
 
   hResphi0->SetMinimum(0);
   hRespT->SetMinimum(0);
@@ -169,6 +194,13 @@ void readFitter3D(string filename){
       double mcCot = (*(TVectorD*)mcCotTrackFitter3D->At(iTrack))[0];
       double fit3DChi2 = (*(TVectorD*)fit3DChi2TrackFitter3D->At(iTrack))[0];
       double fit2DChi2 = (*(TVectorD*)fit2DChi2TrackFitter3D->At(iTrack))[0];
+      double float_z0 = 0, float_cot = 0, float_fit3DChi2 = 0, nHits = 0;
+      if (floatExists) {
+        float_z0 = (*(TVectorD*)float_z0TrackFitter3D->At(iTrack))[0];
+        float_cot = (*(TVectorD*)float_cotTrackFitter3D->At(iTrack))[0];
+        float_fit3DChi2 = (*(TVectorD*)float_fit3DChi2TrackFitter3D->At(iTrack))[0];
+        nHits = (*(TVectorD*)nHitsTrackFitter3D->At(iTrack))[0];
+      }
       vector<double> mcImpactPosition(3);
       mcImpactPosition[0] = (*(TVectorD*)mcImpactPositionFitter3D->At(iTrack))[0];
       mcImpactPosition[1] = (*(TVectorD*)mcImpactPositionFitter3D->At(iTrack))[1];
@@ -177,6 +209,9 @@ void readFitter3D(string filename){
       mcVertex[0] = (*(TVectorD*)mcVertexFitter3D->At(iTrack))[0];
       mcVertex[1] = (*(TVectorD*)mcVertexFitter3D->At(iTrack))[1];
       mcVertex[2] = (*(TVectorD*)mcVertexFitter3D->At(iTrack))[2];
+
+      // Cut depending on charge.
+      //if(charge==-1) continue;
 
       //// Use 2D fitter values.
       //phi0 = phi02D;
@@ -234,6 +269,12 @@ void readFitter3D(string filename){
       hFit2DChi2->Fill(fit2DChi2);
 
       hPDG->Fill(pdgId);
+
+      if (floatExists) {
+        hDiffZ0->Fill(z0-float_z0);
+        hDiffCot->Fill(cot-float_cot);
+        hDiffChi2->Fill(fit3DChi2-float_fit3DChi2);
+      }
 
     } // track loop
   } // event loop
@@ -384,6 +425,19 @@ void readFitter3D(string filename){
     c7->cd(2);
     hFit3DChi2->Draw();
 
+
+    if (floatExists) {
+      TCanvas *c8 = new TCanvas("c8", "", 1000, 500);
+      c8->Divide(2,2);
+      c8->cd(1);
+      hDiffZ0->Draw();
+      c8->cd(2);
+      hDiffCot->Draw();
+      c8->cd(3);
+      hDiffChi2->Draw();
+    }
+
+
   }
 
   if(graphFlag==0 || graphFlag==2){
@@ -430,5 +484,13 @@ void drawLabel(TH1F* hResz0, double gauss1Mean, double gauss1Sigma, double gauss
     sprintf(jbGauss2Sigma,"Gauss2 Sigma %4.2E", fit2Width);
     jbStatsEntry = jbStats->AddText(jbGauss2Sigma);
     jbStats->Draw();
+    // nOverflow
+    char jbOverflow[30];
+    sprintf(jbOverflow,"Overflow %i", (int)hResz0->GetBinContent(hResz0->GetSize()-1));
+    jbStatsEntry = jbStats->AddText(jbOverflow);
+    // nUnderflow
+    char jbUnderflow[30];
+    sprintf(jbUnderflow,"Underflow %i", (int)hResz0->GetBinContent(0));
+    jbStatsEntry = jbStats->AddText(jbUnderflow);
 }
 

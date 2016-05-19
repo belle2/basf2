@@ -48,8 +48,9 @@ neuro = register_module('NeuroTrigger')
 simulatedComponents = ['MagneticField', 'CDC'
 ,'PXD', 'SVD', 'BeamPipe'
 ]
-# simulatedComponents = ['MagneticField', 'CDC'
-#                        ]
+# To speed things up but not precise.
+# simulatedComponents = ['MagneticFieldConstant4LimitedRCDC', 'CDC', 
+# ]
 
 # ...EventInfoSetter...
 # Set number of events and runs
@@ -151,8 +152,8 @@ cdctrg.param('FastSimulationMode', 0)
 # cdctrg.param('RootTRGCDCFile', 'TRGCDC.root')
 # ---TSF settings---
 # TSLUT (latest version @ 2014.07)
-cdctrg.param('InnerTSLUTFile', os.path.join(basf2datadir, "trg/cdc/innerLUT_v2.2.coe"))
-cdctrg.param('OuterTSLUTFile', os.path.join(basf2datadir, "trg/cdc/outerLUT_v2.2.coe"))
+cdctrg.param('InnerTSLUTFile', os.path.join(basf2datadir, "trg/cdc/innerLUT_v3.0.coe"))
+cdctrg.param('OuterTSLUTFile', os.path.join(basf2datadir, "trg/cdc/outerLUT_v3.0.coe"))
 # 0: Logic TSF, 1: (Default) LUT TSF
 # cdctrg.param('TSFLogicLUT', 0)
 # cdctrg.param('TSFRootFile',1)
@@ -188,6 +189,7 @@ rootOut.param('outputFileName', 'basf2.root')
 
 # ...RootInput...
 rootIn.param('inputFileName', 'basf2.root')
+# rootIn.param('skipNEvents', 0);
 
 
 ##########################################################

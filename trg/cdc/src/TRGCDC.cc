@@ -627,9 +627,6 @@ namespace Belle2 {
     //...For module simulation (Front-end)...
     configure();
 
-    //...Initialize event number...
-    m_eventNum = 1;
-
     //...Initialize root file...
     if (_makeRootFile) { 
       m_file = new TFile((char*)_rootTRGCDCFilename.c_str(), "RECREATE");
@@ -1117,7 +1114,6 @@ namespace Belle2 {
 
     //...Clear old information...
     clear();
-    //cout<<"Event: "<<m_eventNum<<endl;
 
     // There is a 1 window difference between slow control parameter and actual data.
     // For SPrint-8 data
@@ -1500,8 +1496,6 @@ namespace Belle2 {
 
     //...Hit classification...
     classification();
-
-    m_eventNum++;
 
     TRGDebug::leaveStage("TRGCDC updateByData");
   }
@@ -2014,8 +2008,8 @@ namespace Belle2 {
     {
       bool t_use2DFitted = 0;
       if(_perfect2DFinder) t_use2DFitted = 1;
-      if (t_use2DFitted == 0) _h3DFinder->doit(_trackList2D, _trackList3D, m_eventNum);
-      else _h3DFinder->doit(_trackList2DFitted, _trackList3D, m_eventNum);
+      if (t_use2DFitted == 0) _h3DFinder->doit(_trackList2D, _trackList3D);
+      else _h3DFinder->doit(_trackList2DFitted, _trackList3D);
     }
 
     //...Check tracks...
@@ -2041,7 +2035,9 @@ namespace Belle2 {
 
     //...3D tracker...
     _fitter3D->doit(_trackList3D);
+    //cout<<endl<<"----s3DFitter----"<<endl;
     //_fitter3D->doitComplex(_trackList3D);
+    //cout<<"----e3DFitter----"<<endl<<endl;
 
     if (TRGDebug::level() > 1) {
       for (unsigned iTrack = 0; iTrack < _trackList3D.size(); iTrack++) {
@@ -2623,11 +2619,6 @@ namespace Belle2 {
   double TRGCDC::getEventTime(void) const
   {
     return _eventTime.back()->getT0();
-  }
-
-  unsigned TRGCDC::getEventNumber(void) const
-  {
-    return m_eventNum;
   }
 
   void TRGCDC::saveCDCHitInformation(vector<vector<unsigned>>& hitWiresFromCDC)

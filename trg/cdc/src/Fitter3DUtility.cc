@@ -204,11 +204,13 @@ double Fitter3DUtility::calPhi(int localId, int nWires, double driftTime, double
 
 double Fitter3DUtility::rotatePhi(double value, double refPhi) {
   double Trg_PI=3.141592653589793; 
+  double phiMin = -Trg_PI;
+  double phiMax = Trg_PI;
   double result = value - refPhi;
   bool rangeOK=0;
   while(rangeOK==0){
-    if(result > Trg_PI) result -= 2*Trg_PI;
-    else if(result < -Trg_PI) result += 2*Trg_PI;
+    if(result > phiMax) result -= 2*Trg_PI;
+    else if(result < phiMin) result += 2*Trg_PI;
     else rangeOK=1;
   }
   return result;
@@ -228,6 +230,26 @@ int Fitter3DUtility::rotateTsId(int value, int refId, int nTSs) {
     else if(result < 0) result += nTSs;
     else rangeOk = 1;
   }
+  return result;
+}
+
+int Fitter3DUtility::findQuadrant(double value) {
+  // Rotate to [-pi,pi] range.
+  double Trg_PI=3.141592653589793; 
+  double phiMin = -Trg_PI;
+  double phiMax = Trg_PI;
+  bool rangeOK=0;
+  while(rangeOK==0){
+    if(value > phiMax) value -= 2*Trg_PI;
+    else if(value < phiMin) value += 2*Trg_PI;
+    else rangeOK=1;
+  }
+  // Find quadrant.
+  int result = -1;
+  if (value > Trg_PI/2) result = 2;
+  else if (value > 0) result = 1;
+  else if (value > -Trg_PI/2) result = 4;
+  else if (value > -Trg_PI) result = 3;
   return result;
 }
 
@@ -274,18 +296,19 @@ double Fitter3DUtility::calDeltaPhi(int mysign, double anglest, double ztostraw,
 }
 
 double Fitter3DUtility::calZ(int mysign, double anglest, double ztostraw, double rr, double phi2, double rho, double myphi0){
-  double myphiz, acos_real;
+  double myphiz=0, acos_real=0, dPhiAx=0;
   double Trg_PI=3.141592653589793; 
   //Find phifit-phist
   double t_rho = rho;
   if(rr>(2*rho)) t_rho = rr/2;
   acos_real=acos(rr/(2*t_rho));
   if(mysign==1){
-    myphiz = -acos_real-myphi0+phi2;
+    dPhiAx = -acos_real-myphi0;
   }
   else{
-    myphiz = +acos_real-myphi0+phi2;
+    dPhiAx = acos_real-myphi0;
   }
+  myphiz = dPhiAx + phi2;
   if(myphiz>Trg_PI) myphiz-=2*Trg_PI;
   if(myphiz<-Trg_PI) myphiz+=2*Trg_PI;
 
@@ -295,21 +318,24 @@ double Fitter3DUtility::calZ(int mysign, double anglest, double ztostraw, double
 void Fitter3DUtility::calZ(std::map<std::string, double> const & mConstD, std::map<std::string, std::vector<double> > const & mConstV, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT * > & mLutStorage){
   Belle2::TRGCDCJSignalData * commonData = mSignalStorage.begin()->second.getCommonData();
   // Calculate zz[i]
-  // Calculate minInvValue, maxInvValue for LUTs
-  { 
-    unsigned long long t_int = mSignalStorage["rho"].getMinInt();
+  for(unsigned iSt=0; iSt<4; iSt++) {
+    string t_invMinName = "invPhiAxMin_" + to_string(iSt);
+    double t_actual = (mConstV.find("rr")->second)[2*iSt+1]/2;
     double t_toReal = mSignalStorage["rho"].getToReal();
-    double t_actual = mSignalStorage["rho"].getMinActual();
-    mSignalStorage["invPhiAxMin"] = Belle2::TRGCDCJSignal(t_int, t_toReal, t_int, t_int, t_actual, t_actual, t_actual, -1, commonData);
-    t_int = mSignalStorage["rho"].getMaxInt();
+    mSignalStorage[t_invMinName] = Belle2::TRGCDCJSignal(t_actual, t_toReal, commonData);
+    string t_invMaxName = "invPhiAxMax_" + to_string(iSt);
     t_actual = mSignalStorage["rho"].getMaxActual();
-    mSignalStorage["invPhiAxMax"] = Belle2::TRGCDCJSignal(t_int, t_toReal, t_int, t_int, t_actual, t_actual, t_actual, -1, commonData);
+    mSignalStorage[t_invMaxName] = Belle2::TRGCDCJSignal(t_actual, t_toReal, commonData);
   }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<invPhiAxMin_"<<iSt<<">>>"<<endl; mSignalStorage["invPhiAxMin_"+to_string(iSt)].dump();}
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<invPhiAxMax_"<<iSt<<">>>"<<endl; mSignalStorage["invPhiAxMax_"+to_string(iSt)].dump();}
   // Generate LUT(phiAx[i]=acos(rr[i]/2/rho)). 
   for(unsigned iSt=0; iSt<4; iSt++){
     string t_valueName = "phiAx_" + to_string(iSt);
     string t_minName = "phiAxMin_" + to_string(iSt);
     string t_maxName = "phiAxMax_" + to_string(iSt);
+    string t_invMinName = "invPhiAxMin_" + to_string(iSt);
+    string t_invMaxName = "invPhiAxMax_" + to_string(iSt);
     if(mLutStorage.find(t_valueName) == mLutStorage.end()) {
       mLutStorage[t_valueName] = new Belle2::TRGCDCJLUT(t_valueName);
       // Lambda can not copy maps.
@@ -317,7 +343,7 @@ void Fitter3DUtility::calZ(std::map<std::string, double> const & mConstD, std::m
       mLutStorage[t_valueName]->setFloatFunction(
                         [=](double aValue) -> double{return acos(t_parameter/2/aValue);}, 
                         mSignalStorage["rho"],
-                        mSignalStorage["invPhiAxMin"], mSignalStorage["invPhiAxMax"], mSignalStorage["phi0"].getToReal(),
+                        mSignalStorage[t_invMinName], mSignalStorage[t_invMaxName], mSignalStorage["phi0"].getToReal(),
                         (int)mConstD.at("acosLUTInBitSize"), (int)mConstD.at("acosLUTOutBitSize"));
       //mLutStorage[t_valueName]->makeCOE("./LutData/"+t_valueName+".coe");
     }
@@ -365,6 +391,54 @@ void Fitter3DUtility::calZ(std::map<std::string, double> const & mConstD, std::m
     mSignalStorage["dPhi_"+to_string(iSt)] <= mSignalStorage["dPhiAx_"+to_string(iSt)] + mSignalStorage["phi_"+to_string(iSt)];
   }
   //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<dPhi_"<<iSt<<">>>"<<endl; mSignalStorage["dPhi_"+to_string(iSt)].dump();}
+
+  // Rotate dPhi to [-pi, pi]
+  for(unsigned iSt=0; iSt<4; iSt++){
+    string t_valueName = "dPhi_" + to_string(iSt);
+    string t_maxName = "dPhiPiMax_" + to_string(iSt);
+    string t_minName = "dPhiPiMin_" + to_string(iSt);
+    string t_2PiName = "dPhiPi2Pi_" + to_string(iSt);
+    mSignalStorage[t_maxName] = Belle2::TRGCDCJSignal(mConstD.at("Trg_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
+    mSignalStorage[t_minName] = Belle2::TRGCDCJSignal(-mConstD.at("Trg_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
+    mSignalStorage[t_2PiName] = Belle2::TRGCDCJSignal(2*mConstD.at("Trg_PI"), mSignalStorage[t_valueName].getToReal(), commonData);
+  }
+  for(unsigned iSt=0; iSt<4; iSt++){
+    string t_in1Name = "dPhi_" + to_string(iSt);
+    string t_valueName = "dPhiPi_c_" + to_string(iSt);
+    string t_maxName = "dPhiPiMax_" + to_string(iSt);
+    string t_minName = "dPhiPiMin_" + to_string(iSt);
+    string t_2PiName = "dPhiPi2Pi_" + to_string(iSt);
+    // Create data for ifElse
+    vector<pair<Belle2::TRGCDCJSignal, vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > > > t_data;
+    // Compare
+    Belle2::TRGCDCJSignal t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage[t_in1Name], ">", mSignalStorage[t_maxName]);
+    // Assignments
+    vector<pair<Belle2::TRGCDCJSignal *, Belle2::TRGCDCJSignal> > t_assigns = {
+      make_pair(&mSignalStorage[t_valueName], (mSignalStorage[t_in1Name]-mSignalStorage[t_2PiName]).limit(mSignalStorage[t_minName],mSignalStorage[t_maxName])),
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare
+    t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage[t_in1Name], ">", mSignalStorage[t_minName]);
+    // Assignments
+    t_assigns = {
+      make_pair(&mSignalStorage[t_valueName], mSignalStorage[t_in1Name].limit(mSignalStorage[t_minName],mSignalStorage[t_maxName])),
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare
+    t_compare = Belle2::TRGCDCJSignal();
+    // Assignments
+    t_assigns = {
+      make_pair(&mSignalStorage[t_valueName], (mSignalStorage[t_in1Name]+mSignalStorage[t_2PiName]).limit(mSignalStorage[t_minName],mSignalStorage[t_maxName])),
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Process ifElse data.
+    Belle2::TRGCDCJSignal::ifElse(t_data);
+  }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<dPhiPi_c_"<<iSt<<">>>"<<endl; mSignalStorage["dPhiPi_c_"+to_string(iSt)].dump();}
+
   // Calculate dPhiMax[i], dPhiMin[i]=0
   for(unsigned iSt=0; iSt<4; iSt++){
     string t_maxName = "dPhiMax_" + to_string(iSt);
@@ -374,12 +448,12 @@ void Fitter3DUtility::calZ(std::map<std::string, double> const & mConstD, std::m
     mSignalStorage[t_maxName] = Belle2::TRGCDCJSignal(t_value, mSignalStorage[t_valueName].getToReal(), commonData);
     mSignalStorage[t_minName] = Belle2::TRGCDCJSignal(0, mSignalStorage[t_valueName].getToReal(), commonData);
   }
-  // Constrain dPhi to [0, 2*pi*#shift/#holes]
+  // Constrain dPhiPi to [0, 2*pi*#shift/#holes]
   for(unsigned iSt=0; iSt<4; iSt++){
     string t_maxName = "dPhiMax_" + to_string(iSt);
     string t_minName = "dPhiMin_" + to_string(iSt);
     string t_valueName = "dPhi_c_" + to_string(iSt);
-    string t_in1Name = "dPhi_" + to_string(iSt);
+    string t_in1Name = "dPhiPi_c_" + to_string(iSt);
     // For SL1, SL5
     if (iSt%2 == 0) {
       // Create data for ifElse
@@ -414,34 +488,35 @@ void Fitter3DUtility::calZ(std::map<std::string, double> const & mConstD, std::m
     } else {
       // Create data for ifElse
       vector<pair<Belle2::TRGCDCJSignal, vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > > > t_data;
-      // Compare
+      // Compare (dPhi > dPhiMax)
       Belle2::TRGCDCJSignal t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage[t_in1Name], ">", mSignalStorage[t_maxName]);
-      // Assignments
+      // Assignments (dPhi_c = dPhiMax)
       vector<pair<Belle2::TRGCDCJSignal *, Belle2::TRGCDCJSignal> > t_assigns = {
         make_pair(&mSignalStorage[t_valueName], mSignalStorage[t_maxName]),
       };
       // Push to data.
       t_data.push_back(make_pair(t_compare, t_assigns));
-      // Compare
+      // Compare (dPhi > 0)
       t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage[t_in1Name], ">", Belle2::TRGCDCJSignal(0,mSignalStorage[t_in1Name].getToReal(), commonData));
-      // Assignments
+      // Assignments (dPhi_c = dPhi)
       t_assigns = {
         make_pair(&mSignalStorage[t_valueName], Belle2::TRGCDCJSignal::absolute(mSignalStorage[t_in1Name]).limit(mSignalStorage[t_minName],mSignalStorage[t_maxName])),
       };
       // Push to data.
       t_data.push_back(make_pair(t_compare, t_assigns));
-      // Compare
+      // Compare (else) => (dPhi > -Pi)
       t_compare = Belle2::TRGCDCJSignal();
-      // Assignments
+      // Assignments (dPhi_c = dPhiMin)
       t_assigns = {
         make_pair(&mSignalStorage[t_valueName], mSignalStorage[t_minName]),
       };
       // Push to data.
       t_data.push_back(make_pair(t_compare, t_assigns));
-      // Process ifElse data.
+      // Process ifElse.
       Belle2::TRGCDCJSignal::ifElse(t_data);
     }
   }
+
   //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<dPhiMax_"<<iSt<<">>>"<<endl; mSignalStorage["dPhiMax_"+to_string(iSt)].dump();}
   //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<dPhiMin_"<<iSt<<">>>"<<endl; mSignalStorage["dPhiMin_"+to_string(iSt)].dump();}
   //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<dPhi_c_"<<iSt<<">>>"<<endl; mSignalStorage["dPhi_c_"+to_string(iSt)].dump();}
@@ -506,18 +581,23 @@ double Fitter3DUtility::calS(double rho, double rr){
 void Fitter3DUtility::calS(std::map<std::string, double> const & mConstD, std::map<std::string, std::vector<double> > const & mConstV, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT * > & mLutStorage){
   Belle2::TRGCDCJSignalData * commonData = mSignalStorage.begin()->second.getCommonData();
   // Calculate minInvValue, maxInvValue for LUTs
-  { 
-    unsigned long long t_int = mSignalStorage["rho"].getMaxInt();
-    double t_toReal = mSignalStorage["rho"].getToReal();
+  for(unsigned iSt=0; iSt<4; iSt++) {
+    string t_invMinName = "invArcSMin_" + to_string(iSt);
     double t_actual = mSignalStorage["rho"].getMaxActual();
-    mSignalStorage["invArcSMin"] = Belle2::TRGCDCJSignal(t_int, t_toReal, t_int, t_int, t_actual, t_actual, t_actual, -1, commonData);
-    t_int = mSignalStorage["rho"].getMinInt();
-    t_actual = mSignalStorage["rho"].getMinActual();
-    mSignalStorage["invArcSMax"] = Belle2::TRGCDCJSignal(t_int, t_toReal, t_int, t_int, t_actual, t_actual, t_actual, -1, commonData);
+    double t_toReal = mSignalStorage["rho"].getToReal();
+    mSignalStorage[t_invMinName] = Belle2::TRGCDCJSignal(t_actual, t_toReal, commonData);
+    string t_invMaxName = "invArcSMax_" + to_string(iSt);
+    t_actual = (mConstV.find("rr")->second)[2*iSt+1]/2;
+    mSignalStorage[t_invMaxName] = Belle2::TRGCDCJSignal(t_actual, t_toReal, commonData);
   }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<invArcSMin_"<<iSt<<">>>"<<endl; mSignalStorage["invArcSMin_"+to_string(iSt)].dump();}
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<invArcSMax_"<<iSt<<">>>"<<endl; mSignalStorage["invArcSMax_"+to_string(iSt)].dump();}
+
   // Generate LUT(arcS[i]=2*rho*asin(rr[i]/2/rho).
   for(unsigned iSt=0; iSt<4; iSt++){
     string t_valueName = "arcS_" + to_string(iSt);
+    string t_invMinName = "invArcSMin_" + to_string(iSt);
+    string t_invMaxName = "invArcSMax_" + to_string(iSt);
     if(mLutStorage.find(t_valueName) == mLutStorage.end()) {
       mLutStorage[t_valueName] = new Belle2::TRGCDCJLUT(t_valueName);
       // Lambda can not copy maps.
@@ -525,12 +605,12 @@ void Fitter3DUtility::calS(std::map<std::string, double> const & mConstD, std::m
       mLutStorage[t_valueName]->setFloatFunction(
                         [=](double aValue) -> double{return 2*aValue*asin(t_parameter/2/aValue);}, 
                         mSignalStorage["rho"],
-                        mSignalStorage["invArcSMin"], mSignalStorage["invArcSMax"], mSignalStorage["rho"].getToReal(),
+                        mSignalStorage[t_invMinName], mSignalStorage[t_invMaxName], mSignalStorage["rho"].getToReal(),
                         (int)mConstD.at("acosLUTInBitSize"), (int)mConstD.at("acosLUTOutBitSize"));
       //mLutStorage[t_valueName]->makeCOE("./LutData/"+t_valueName+".coe");
     }
   }
-  // arcS[i]=2*rho*asin(rr[i]/2/rho.
+  // arcS[i]=2*rho*asin(rr[i]/2/rho).
   // Operate using LUT(arcS[i]).
   for(unsigned iSt=0; iSt<4; iSt++){
     // Set output name
@@ -551,6 +631,19 @@ double Fitter3DUtility::calDen(double* arcS, double* zError){
   }
   return t_sum1*t_sumSS-pow(t_sumS,2);
 }
+
+double Fitter3DUtility::calDenWithIZError(double* arcS, double* iZError){
+  double t_sum1=0;
+  double t_sumSS=0;
+  double t_sumS=0;
+  for(unsigned iSt =0; iSt<4; iSt++){
+    t_sum1 += pow(iZError[iSt],2);
+    t_sumSS += pow(arcS[iSt]*iZError[iSt],2);
+    t_sumS += arcS[iSt]*pow(iZError[iSt],2);
+  }
+  return t_sum1*t_sumSS-pow(t_sumS,2);
+}
+
 
 void Fitter3DUtility::rSFit(double *iezz2, double *arcS, double *zz, double &z0, double &cot, double &zchi2){
 
@@ -727,18 +820,22 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const & mConstD, std::
   // Calculate denMax and denMin.
   // Create input for calDen.
   double t_rr3D[4], t_wireZError[4];
-  for(int iSt=0; iSt<4; iSt++){
+  for(int iSt=0; iSt<2; iSt++){
     t_rr3D[iSt] = mConstV.at("rr3D")[iSt];
-    t_wireZError[iSt] = mConstV.at("wireZError")[iSt];
+    t_wireZError[iSt] = 1/mConstV.at("wireZError")[iSt];
   }
-  double t_denMin = Fitter3DUtility::calDen(t_rr3D, t_wireZError);
+  for(int iSt=2; iSt<4; iSt++){
+    t_rr3D[iSt] = mConstV.at("rr3D")[iSt];
+    t_wireZError[iSt] = 0;
+  }
+  double t_denMin = Fitter3DUtility::calDenWithIZError(t_rr3D, t_wireZError);
   mSignalStorage["denMin"] = Belle2::TRGCDCJSignal(t_denMin, mSignalStorage["den"].getToReal(), commonData);
   double t_arcSMax[4], t_driftZError[4];
   for(unsigned iSt =0; iSt<4; iSt++){
     t_arcSMax[iSt] = mConstD.at("Trg_PI")*mConstV.at("rr3D")[iSt]/2;
-    t_driftZError[iSt] = mConstV.at("driftZError")[iSt];
+    t_driftZError[iSt] = 1/mConstV.at("driftZError")[iSt];
   }
-  double t_denMax = Fitter3DUtility::calDen(t_arcSMax, t_driftZError);
+  double t_denMax = Fitter3DUtility::calDenWithIZError(t_arcSMax, t_driftZError);
   mSignalStorage["denMax"] = Belle2::TRGCDCJSignal(t_denMax, mSignalStorage["den"].getToReal(), commonData);
   // Constrain den.
   {
@@ -802,6 +899,8 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const & mConstD, std::
     t_actual = mSignalStorage["den_c"].getMinActual();
     mSignalStorage["invIDenMax"] = Belle2::TRGCDCJSignal(t_int, t_toReal, t_int, t_int, t_actual, t_actual, t_actual, -1, commonData);
   }
+  //cout<<"<<<invIDenMin>>>"<<endl; mSignalStorage["invIDenMin"].dump();
+  //cout<<"<<<invIDenMax>>>"<<endl; mSignalStorage["invIDenMax"].dump();
   // Generate LUT(iDen = 1/den)
   if(mLutStorage.find("iDen") == mLutStorage.end()) {
     mLutStorage["iDen"] = new Belle2::TRGCDCJLUT("iDen");
@@ -832,6 +931,7 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const & mConstD, std::
   mSignalStorage["z0"] <= mSignalStorage["z0_p2"] * mSignalStorage["iDen"];
   if(mConstD.at("JB")==1) {cout<<"<<<cot>>>"<<endl; mSignalStorage["cot"].dump();}
   if(mConstD.at("JB")==1) {cout<<"<<<z0>>>"<<endl; mSignalStorage["z0"].dump();}
+
   // fitDistFromZ0[i] = cot*arcS[i]
   for(unsigned iSt=0; iSt<4; iSt++){
     mSignalStorage["fitDistFromZ0_"+to_string(iSt)] <= mSignalStorage["cot"] * mSignalStorage["arcS_"+to_string(iSt)];
@@ -840,8 +940,8 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const & mConstD, std::
   for(unsigned iSt=0; iSt<4; iSt++){
     mSignalStorage["distFromZ0_"+to_string(iSt)] <= mSignalStorage["zz_"+to_string(iSt)] - mSignalStorage["z0"];
   }
-  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<fitDistFromZ0_"<<iSt<<">>>"<<endl; mSignalStorage["chiNum_p1_"+to_string(iSt)].dump();}
-  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<distFromZ0_"<<iSt<<">>>"<<endl; mSignalStorage["chiNum_p1_"+to_string(iSt)].dump();}
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<fitDistFromZ0_"<<iSt<<">>>"<<endl; mSignalStorage["fitDistFromZ0_"+to_string(iSt)].dump();}
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<distFromZ0_"<<iSt<<">>>"<<endl; mSignalStorage["distFromZ0_"+to_string(iSt)].dump();}
   // chiNum[i] = distFromZ0[i] - fitDistFromZ0[i]
   for(unsigned iSt=0; iSt<4; iSt++){
     mSignalStorage["chiNum_"+to_string(iSt)] <= mSignalStorage["distFromZ0_"+to_string(iSt)] - mSignalStorage["fitDistFromZ0_"+to_string(iSt)];

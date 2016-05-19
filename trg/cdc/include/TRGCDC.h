@@ -352,9 +352,6 @@ namespace Belle2 {
     /// returns event time
     double getEventTime(void) const;
 
-    /// returns event number
-    unsigned getEventNumber(void) const;
-
   public:// Utility functions
 
     /// returns wire name.

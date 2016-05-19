@@ -53,6 +53,9 @@ class Fitter3DUtility{
     /// Rotates to range [0, nTSs-1].
     static int rotateTsId(int value, int refId, int nTSs);
 
+    /// Finds quadrant of angle. Angle is in rad.
+    static int findQuadrant(double value);
+
     /// Calculates the fitted axial phi for the stereo super layer.
     static double calStAxPhi(int charge, double anglest, double ztostraw, double rr, double rho, double phi0);
 
@@ -82,6 +85,9 @@ class Fitter3DUtility{
 
     /// Calculates the denominator for fitting z and arc s.
     static double calDen(double* arcS, double* zError);
+
+    /// Calculates the denominator for fitting z and arc s.
+    static double calDenWithIZError(double* arcS, double* iZError);
 
     /// 3D fitter functions
     /// Fits z and arc S.

@@ -18,6 +18,7 @@
 #include <map>
 #include "TFile.h"
 #include "TTree.h"
+#include <framework/dataobjects/EventMetaData.h>
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
 #include "mdst/dataobjects/MCParticle.h"
@@ -48,9 +49,6 @@ namespace Belle2 {
 
 TRGCDCHough3DFinder::TRGCDCHough3DFinder(const TRGCDC & TRGCDC, bool makeRootFile, int finderMode)
     : _cdc(TRGCDC), m_makeRootFile(makeRootFile) , m_finderMode(finderMode) {
-
-    // Initialize variables.
-    m_eventNum = 0;
 
     m_fileFinder3D = 0;
     m_treeTrackFinder3D = 0;
@@ -175,8 +173,7 @@ void TRGCDCHough3DFinder::terminate(void){
     }
 }
 
-void TRGCDCHough3DFinder::doit(vector<TCTrack *> const & trackList2D, vector<TCTrack *> & trackList3D, int eventNum){
-    m_eventNum = eventNum;
+void TRGCDCHough3DFinder::doit(vector<TCTrack *> const & trackList2D, vector<TCTrack *> & trackList3D){
     // Loop over trackList2D and copy to make a new trackList3D. Will delete it at TRGCDC.cc.
     for(unsigned int iTrack=0; iTrack<trackList2D.size(); iTrack++){
       TCTrack & aTrack = * new TCTrack(* trackList2D[iTrack]);
@@ -204,6 +201,11 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
     // For saving to root file.
     if(m_makeRootFile) m_mDouble["iSave"] = 0;
     if(m_makeRootFile) HandleRoot::initializeEvent(m_mEventTVectorD, m_mTClonesArray);
+
+    // Get event number.
+    StoreObjPtr<EventMetaData> eventMetaDataPtr;
+    // Event starts from 0.
+    m_mDouble["eventNumber"] = eventMetaDataPtr->getEvent();;
 
     // Generate arrays for TS candidates.
     vector<vector<double> > stTSs(4);
@@ -246,8 +248,7 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
       // Get MC values related with fitting
       if(m_mBool["fMc"]) TRGCDCFitter3D::getMCValues(_cdc, &aTrack, m_mConstD, m_mDouble, m_mVector);
 
-      // Get event and track ID
-      m_mDouble["eventNumber"] = _cdc.getEventNumber();
+      // Get track ID
       m_mDouble["trackId"] = aTrack.getTrackID();
 
       // 2D Fitter

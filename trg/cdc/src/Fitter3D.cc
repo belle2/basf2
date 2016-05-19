@@ -24,6 +24,7 @@
 #include <bitset>
 #include <iomanip>
 
+#include <framework/dataobjects/EventMetaData.h>
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
 #include "cdc/dataobjects/CDCHit.h"
@@ -75,6 +76,9 @@ namespace Belle2 {
   }
 
   void TRGCDCFitter3D::initialize(){
+
+    StoreObjPtr<EventMetaData>::required();
+
     // If we are using Monte Carlo information.
     m_mBool["fMc"] = 1;
     m_mBool["fVerbose"] = 0;
@@ -209,6 +213,9 @@ namespace Belle2 {
     // Get common values for event.
     if(m_mBool["fEvtTime"]==0) m_mDouble["eventTime"]=0;
     else m_mDouble["eventTime"] = m_cdc.getEventTime();
+    StoreObjPtr<EventMetaData> eventMetaDataPtr;
+    // Event starts from 0.
+    m_mDouble["eventNumber"] = eventMetaDataPtr->getEvent();
 
 
     // Fitter3D
@@ -227,14 +234,16 @@ namespace Belle2 {
 
       // Get MC values for fitter
       if(m_mBool["fMc"]) getMCValues(m_cdc, &aTrack, m_mConstD, m_mDouble, m_mVector);
-      // Get event and track ID
-      m_mDouble["eventNumber"] = m_cdc.getEventNumber();
+      // Get track ID
       m_mDouble["trackId"] = aTrack.getTrackID();
 
       ///////////////////////////////////
       //// 2D Fitter
       int fit2DResult = do2DFit(aTrack, m_mBool, m_mConstD, m_mConstV, m_mDouble, m_mVector);
-      if (fit2DResult != 0) continue;
+      if (fit2DResult != 0) {
+        aTrack.setFitted(0);
+        continue;
+      }
 
       /////////////////////////////////
       // 3D Fitter
@@ -242,12 +251,7 @@ namespace Belle2 {
       bool useStSl[4] = {0,0,0,0};
       findHitStereoSuperlayers(aTrack, useStSl, m_mBool["fIsPrintError"]);
       removeImpossibleStereoSuperlayers(useStSl);
-      // Check if number of stereo super layer hits is smaller or equal to 1.
-      int nHitSl = (int)useStSl[0]+(int)useStSl[1]+(int)useStSl[2]+(int)useStSl[3];
-      if(nHitSl <= 1) {
-        aTrack.setFitted(0);
-        continue;
-      }
+      m_mDouble["nHitStSl"] = (int)useStSl[0]+(int)useStSl[1]+(int)useStSl[2]+(int)useStSl[3];
 
       // Fill information for stereo layers
       for (unsigned iSt = 0; iSt < 4; iSt++) {
@@ -340,6 +344,12 @@ namespace Belle2 {
       m_mDouble["theta"] = m_mConstD["Trg_PI"]/2 - atan(m_mDouble["cot"]);
       m_mDouble["theta"] = 180 / m_mConstD["Trg_PI"];
 
+      // For failed fits. When cot is 0 or nan.
+      if(m_mDouble["cot"] == 0 || std::isnan(m_mDouble["cot"])) {
+        aTrack.setFitted(0);
+        continue;
+      }
+
       // Set track in trackList
       // Set Helix parameters 
       TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0)); 
@@ -358,8 +368,6 @@ namespace Belle2 {
       aTrack.set2DFitChi2(m_mDouble["fit2DChi2"]);
       aTrack.set3DFitChi2(m_mDouble["zChi2"]);
       aTrack.setHelix(helix); 
-
-      //cout<<"charge="<<m_mDouble["charge"]<<" pt="<<m_mDouble["pt"]<<" phi_c="<<m_mDouble["phi0"]<<" z0="<<m_mDouble["z0"]<<" cot="<<m_mDouble["cot"]<<endl;
 
       ///////////////
       // Save values
@@ -433,6 +441,9 @@ namespace Belle2 {
     // Get common values for event.
     if(m_mBool["fEvtTime"]==0) m_mDouble["eventTime"]=0;
     else m_mDouble["eventTime"] = m_cdc.getEventTime();
+    StoreObjPtr<EventMetaData> eventMetaDataPtr;
+    // Event starts from 0.
+    m_mDouble["eventNumber"] = eventMetaDataPtr->getEvent();
 
     // Fitter3D
     // Loop over all tracks
@@ -440,39 +451,28 @@ namespace Belle2 {
 
       TCTrack & aTrack = * trackList[iTrack];
 
-      /////////////////////////////////////////
-      //// Check if all superlayers have one TS for the track.
-      //bool trackFull= isAxialTrackFull(aTrack) && isStereoTrackFull(aTrack);
-      //if(trackFull == 0){
-      //   cout<<"track is not Full."<<endl;
-      //   aTrack.setFitted(0);
-      //   continue;
-      //}
-
       /////////////////////////////////
       // Get MC values for 3D fitter
       if(m_mBool["fMc"]) getMCValues(m_cdc, &aTrack, m_mConstD,  m_mDouble, m_mVector);
       // Get input values for 3D fitter
       // Get event and track ID
-      m_mDouble["eventNumber"] = m_cdc.getEventNumber();
       m_mDouble["trackId"] = aTrack.getTrackID();
 
       ///////////////////////////////////
       //// 2D Fitter
       int fit2DResult = do2DFit(aTrack, m_mBool, m_mConstD, m_mConstV, m_mDouble, m_mVector);
-      if (fit2DResult != 0) continue;
+      if (fit2DResult != 0) {
+        aTrack.setFitted(0);
+        continue;
+      }
 
       //////////////////////
       // Start of 3D fitter
       bool useStSl[4] = {0,0,0,0};
       findHitStereoSuperlayers(aTrack, useStSl, m_mBool["fIsPrintError"]);
       removeImpossibleStereoSuperlayers(useStSl);
-      // Check if number of stereo super layer hits is smaller or equal to 1.
-      int nHitSl = (int)useStSl[0]+(int)useStSl[1]+(int)useStSl[2]+(int)useStSl[3];
-      if(nHitSl <= 1) {
-        aTrack.setFitted(0);
-        continue;
-      }
+      //// Check if number of stereo super layer hits is smaller or equal to 1.
+      m_mDouble["nHitStSl"] = (int)useStSl[0]+(int)useStSl[1]+(int)useStSl[2]+(int)useStSl[3];
 
       // Fill information for stereo layers
       for (unsigned iSt = 0; iSt < 4; iSt++) {
@@ -551,7 +551,7 @@ namespace Belle2 {
       double phiMax = m_mConstD["Trg_PI"];
       double phiMin = -m_mConstD["Trg_PI"];
       // pt = 0.3*1.5*rho*0.01;
-      double rhoMin = 67;
+      double rhoMin = 48;
       double rhoMax = 1600;
       double iError2Max = 0.120857;
       int phiBitSize = 13;
@@ -565,14 +565,20 @@ namespace Belle2 {
       m_mConstD["zLUTOutBitSize"] = 9;
       m_mConstD["iDenLUTInBitSize"] = 13;
       m_mConstD["iDenLUTOutBitSize"] = 11;
-      // Rotate phi and phi0 to phi range [0, 180]
-      ////Rotate phi0///////////////////////////////////////////////////////////
-      // Rotate phi0 to -45 deg for + charge or +45 deg for - charge.
-      // This will not be needed for firmware case. Range of phi will already be [-90, 90].
-      // Find reference value. Set phi0 to be 45 deg or -45 deg depending on charge.
-      if(m_mDouble["charge"] == -1) m_mDouble["relRefPhi"] = m_mDouble["phi0"] - m_mConstD["Trg_PI"]/4;
-      else m_mDouble["relRefPhi"] = m_mDouble["phi0"] + m_mConstD["Trg_PI"]/4;
-      //m_mDouble["relRefPhi"] = 0;
+      // Rotate by quadrants depending on charge and cc(circle center)
+      m_mDouble["relRefPhi"] = 0;
+      int t_quadrant = Fitter3DUtility::findQuadrant(m_mDouble["phi0"]);
+      if (m_mDouble["charge"] == -1) {
+        if (t_quadrant == 1) m_mDouble["relRefPhi"] = 0;
+        else if (t_quadrant == 2) m_mDouble["relRefPhi"] = -m_mConstD["Trg_PI"]/2;
+        else if (t_quadrant == 3) m_mDouble["relRefPhi"] = -m_mConstD["Trg_PI"];
+        else if (t_quadrant == 4) m_mDouble["relRefPhi"] = m_mConstD["Trg_PI"]/2;
+      } else {
+        if (t_quadrant == 1) m_mDouble["relRefPhi"] = m_mConstD["Trg_PI"]/2;
+        else if (t_quadrant == 2) m_mDouble["relRefPhi"] = 0;
+        else if (t_quadrant == 3) m_mDouble["relRefPhi"] = -m_mConstD["Trg_PI"]/2;
+        else if (t_quadrant == 4) m_mDouble["relRefPhi"] = -m_mConstD["Trg_PI"];
+      }
       // Rotate
       m_mDouble["relPhi0"] = Fitter3DUtility::rotatePhi(m_mDouble["phi0"], m_mDouble["relRefPhi"]);
       m_mVector["relPhi3D"] = vector<double> (4);
@@ -659,8 +665,8 @@ namespace Belle2 {
             // outValues => [name, value, bitwidth, min, max, clock]
             vector<tuple<string, double, int, double, double, int> > outValues;
             TRGCDCJSignal::mapSignalsToValues(m_mSignalStorage, chooseValues, outValues);
+            // Changes names with "_" to m_mVector.
             HandleRoot::convertSignalValuesToMaps(outValues, m_mDouble, m_mVector);
-            // Save values to m_mDouble and m_mVector.
           }
         }
       }
@@ -675,6 +681,26 @@ namespace Belle2 {
           saveAllSignals();
           saveIoSignals();
         }
+      }
+
+      //// Simple version of Fitter3D for comparison with complex mode.
+      // Calculate zz
+      m_mVector["float_zz"] = vector<double> (4);
+      for (unsigned iSt = 0; iSt < 4; iSt++) m_mVector["float_zz"][iSt] = Fitter3DUtility::calZ(m_mDouble["charge"], m_mConstV["angleSt"][iSt], m_mConstV["zToStraw"][iSt], m_mConstV["rr3D"][iSt], m_mVector["phi3D"][iSt], m_mDouble["rho"], m_mDouble["phi0"]);
+      // Calculate arcS
+      m_mVector["float_arcS"] = vector<double> (4);
+      for (unsigned iSt = 0; iSt < 4; iSt++) m_mVector["float_arcS"][iSt] = Fitter3DUtility::calS(m_mDouble["rho"], m_mConstV["rr3D"][iSt]);
+      // Fit3D
+      m_mDouble["float_z0"] = 0;
+      m_mDouble["float_cot"] = 0;
+      m_mDouble["float_zChi2"] = 0;
+      Fitter3DUtility::rSFit(&m_mVector["iZError2"][0], &m_mVector["float_arcS"][0], &m_mVector["float_zz"][0], m_mDouble["float_z0"], m_mDouble["float_cot"], m_mDouble["float_zChi2"]);
+      m_mDouble["nHits"] = (int)useStSl[0]+(int)useStSl[1]+(int)useStSl[2]+(int)useStSl[3];
+
+      // For failed fits.
+      if (m_mDouble["cot"] == 0) {
+        aTrack.setFitted(0);
+        continue;
       }
 
       // Set track in trackListOut.
@@ -723,6 +749,7 @@ namespace Belle2 {
         cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]zz:      "<<m_mVector["zz"][0]<<" "<<m_mVector["zz"][1]<<" "<<m_mVector["zz"][2]<<" "<<m_mVector["zz"][3]<<endl;
         cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]arcS:    "<<m_mVector["arcS"][0]<<" "<<m_mVector["arcS"][1]<<" "<<m_mVector["arcS"][2]<<" "<<m_mVector["arcS"][3]<<endl;
         cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]zerror:  "<<m_mVector["zError"][0]<<" "<<m_mVector["zError"][1]<<" "<<m_mVector["zError"][2]<<" "<<m_mVector["zError"][3]<<endl;
+        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]izerror:  "<<m_mVector["iZError2"][0]<<" "<<m_mVector["iZError2"][1]<<" "<<m_mVector["iZError2"][2]<<" "<<m_mVector["iZError2"][3]<<endl;
         cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]charge:  "<<int(m_mDouble["charge"])<<endl;
         cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]pt:      "<<m_mDouble["pt"]<<endl;
         cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]phi0:    "<<m_mDouble["phi0"]<<endl;
@@ -1215,6 +1242,9 @@ namespace Belle2 {
       Fitter3DUtility::rPhiFitter(&m_mConstV["rr2D"][0],&m_mVector["phi2D"][0],&m_mVector["phi2DInvError"][0],m_mDouble["rho"], m_mDouble["phi0"],m_mDouble["fit2DChi2"]); 
       m_mDouble["pt"] = 0.3*1.5*m_mDouble["rho"]/100;
     }
+
+    if (std::isnan(m_mDouble["rho"])) return 2;
+    if (std::isnan(m_mDouble["phi0"])) return 2;
     return 0;
   }
 

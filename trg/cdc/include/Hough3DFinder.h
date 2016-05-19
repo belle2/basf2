@@ -35,16 +35,10 @@ class TRGCDCHough3DFinder {
     /// Destructor
     ~TRGCDCHough3DFinder();
     /// Member functions.
-    /// Finds tracks using tracklist2D and outputs to trackList3D.
-    /// Has parameter to choose between perfect and original finder.
+    /// Finds tracks using tracklist2D and outputs to trackList3D. Has parameter to choose between perfect and original finder.
     void doit(std::vector<TRGCDCTrack *> const & trackList2D, std::vector<TRGCDCTrack *> & trackList3D);
-    /// Finds tracks using tracklist2D and outputs to trackList3D.
-    /// Finds tracks using tracklist. Saves event number. Has parameter to choose between perfect and original finder.
-    void doit(std::vector<TRGCDCTrack *> const & trackList2D, std::vector<TRGCDCTrack *> & trackList3D, int m_eventNum);
     /// Finds tracks using tracklist. Has parameter to choose between perfect and original finder.
     void doit(std::vector<TRGCDCTrack *> & trackList);
-    /// Finds tracks using tracklist. Saves event number. Has parameter to choose between perfect and original finder.
-    void doit(std::vector<TRGCDCTrack *> & trackList, int m_eventNum);
     /// Perfect 3D finder for a track.
     void perfectFinder(std::vector<TRGCDCTrack *> &trackList, unsigned j, std::vector<const TRGCDCSegmentHit*> &mcTSList);
     /// Perfect 3D finder for a tracklist.
@@ -61,8 +55,6 @@ class TRGCDCHough3DFinder {
     /// Members.
     /// Holds the trgcdc singleton.
     const TRGCDC & _cdc;
-    /// Holds the event number.
-    int m_eventNum;
     /// Choose whether to save root file.
     bool m_makeRootFile;
     /// 0: perfect finder, 1: Hough3DFinder, 2: GeoFinder, 3: VHDL GeoFinder

@@ -746,44 +746,74 @@ class GroupByRefiner(Refiner):
             # Wrap it into a list an continue with the general case
             by = [part_name, ]
 
-        for part_name in by:
-            if part_name is None:
-                # Using the empty sting as groupby_value to indicate that all values have been selected
-                value = ""
+        for groupby_spec in by:
+            if groupby_spec is None:
+                # Using empty string as groupby_value to indicate that all values have been selected
+                value = None
                 self.wrapped_refiner(harvesting_module,
                                      crops,
-                                     groupby_part_name=part_name,
+                                     groupby_part_name=None,
                                      groupby_value=value,
                                      *args,
                                      **kwds)
+                continue
 
-            else:
+            elif isinstance(groupby_spec, str):
+                part_name = groupby_spec
+                groupby_parts = crops[part_name]
+                unique_values, index_of_values = np.unique(groupby_parts, unique_inverse=True)
+                groupby_values = [" = {value}]".format(value=value) for value in unique_values]
+
+            elif isinstance(groupby_spec, tuple):
+                part_name = groupby_spec[0]
+                cuts = groupby_spec[1]
+
                 groupby_parts = crops[part_name]
 
-                # Exclude the groupby variable if desired
-                selected_crops = select_crop_parts(crops, exclude=part_name if self.exclude_by else None)
+                # Take care of nans
+                digitization_cuts = list(np.sort(cuts))
+                if digitization_cuts[-1] != np.inf:
+                    digitization_cuts.append(np.inf)
+                index_of_values = np.digitize(groupby_parts, digitization_cuts, right=True)
 
-                unique_values = np.unique(groupby_parts)
-                for value in unique_values:
-                    if np.isnan(value):
-                        indices_for_value = np.isnan(groupby_parts)
+                groupby_values = ["below {upper_bound}".format(upper_bound=digitization_cuts[0])]
+                bin_bounds = list(zip(digitization_cuts[0:], digitization_cuts[1:]))
+                for lower_bound, upper_bound in bin_bounds:
+                    if lower_bound == upper_bound:
+                        # degenerated bin case
+                        groupby_values.append("= {lower_bound}]".format(lower_bound=lower_bound))
+                    elif upper_bound == np.inf:
+                        groupby_values.append("above {lower_bound}".format(lower_bound=lower_bound))
                     else:
-                        indices_for_value = groupby_parts == value
+                        groupby_values.append("between {lower_bound} and {upper_bound}".format(lower_bound=lower_bound,
+                                                                                               upper_bound=upper_bound))
+                groupby_values.append("is nan")
+                assert len(groupby_values) == len(digitization_cuts) + 1
 
-                    filtered_crops = filter_crops(selected_crops, indices_for_value)
+            else:
+                raise ValueError("Unknown groupby specification %s" % groupby_spec)
 
-                    self.wrapped_refiner(harvesting_module,
-                                         filtered_crops,
-                                         groupby_part_name=part_name,
-                                         groupby_value=value,
-                                         *args,
-                                         **kwds)
+            # Exclude the groupby variable if desired
+            selected_crops = select_crop_parts(crops, exclude=part_name if self.exclude_by else None)
+            for index_of_value, groupby_value in enumerate(groupby_values):
+                indices_for_value = index_of_values == index_of_value
+                if not np.any(indices_for_value):
+                    continue
+
+                filtered_crops = filter_crops(selected_crops, indices_for_value)
+
+                self.wrapped_refiner(harvesting_module,
+                                     filtered_crops,
+                                     groupby_part_name=part_name,
+                                     groupby_value=groupby_value,
+                                     *args,
+                                     **kwds)
 
 
 class CdRefiner(Refiner):
     # Folder name to be used if a groupby selection is active.
     default_folder_name = ""
-    default_groupby_addition = "groupby_{groupby}_{groupby_value}"
+    default_groupby_addition = "_groupby_{groupby}_{groupby_value}"
 
     def __init__(self,
                  wrapped_refiner,
@@ -811,17 +841,23 @@ class CdRefiner(Refiner):
                 folder_name = self.default_folder_name
 
         groupby_addition = self.groupby_addition
+
         if groupby_addition is None:
             groupby_addition = self.default_groupby_addition
 
-        groupby_addition = formatter.format(groupby_addition,
-                                            groupby=groupby_part_name,
-                                            groupby_value=groupby_value)
+        if groupby_part_name is None and groupby_value is None:
+            groupby_addition = ""
+        else:
+            groupby_addition = formatter.format(groupby_addition,
+                                                groupby=groupby_part_name,
+                                                groupby_value=groupby_value)
 
         folder_name = formatter.format(folder_name,
                                        groupby_addition=groupby_addition,
                                        groupby=groupby_part_name,
                                        groupby_value=groupby_value)
+
+        folder_name = root_save_name(folder_name)
 
         if folder_name:
             with root_cd(tdirectory):
@@ -886,12 +922,12 @@ def filter(refiner=None, **kwds):
 
 
 def cd(refiner=None, **kwds):
-    def filter_decorator(wrapped_refiner):
+    def cd_decorator(wrapped_refiner):
         return CdRefiner(wrapped_refiner, **kwds)
     if refiner is None:
-        return filter_decorator
+        return cd_decorator
     else:
-        return filter_decorator(refiner)
+        return cd_decorator(refiner)
 
 
 def context(refiner=None,

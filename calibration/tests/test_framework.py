@@ -189,7 +189,7 @@ class TestCAF(TestCase):
         fw.add_calibration(self.cal1)
         fw.add_calibration(self.cal2)
         fw.add_dependency(self.name1, self.name2)
-        self.assertEqual(fw.dependencies, {self.name1: [], self.name2: [self.name1]})
+        self.assertEqual(fw.future_dependencies, {self.name1: [], self.name2: [self.name1]})
 
 #    def test_order_calibrations(self):
 #        """

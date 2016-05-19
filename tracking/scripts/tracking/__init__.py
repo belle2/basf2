@@ -38,6 +38,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
         return
 
     use_vxd = is_vxd_used(components)
+    use_cdc = is_cdc_used(components)
 
     # check for detector geometry, necessary for track extrapolation in genfit
     if 'Geometry' not in path:
@@ -66,10 +67,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
 
     mctrackmatcher = register_module('MCMatcherTracks')
     mctrackmatcher.param('MCGFTrackCandsColName', 'MCTrackCands')
-    # FIXME 2015/10/30: Stopgap for the release, ideally the module
-    # would not care whether the PXD / SVD clusters are available.
     mctrackmatcher.param('UsePXDHits', use_vxd)
     mctrackmatcher.param('UseSVDHits', use_vxd)
+    mctrackmatcher.param('UseCDCHits', use_cdc)
     path.add_module(mctrackmatcher)
 
     # track fitting

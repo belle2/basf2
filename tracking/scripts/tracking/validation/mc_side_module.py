@@ -1,15 +1,18 @@
-import math
-import numpy as np
-
-import tracking.validation.harvesting as harvesting
-import tracking.validation.refiners as refiners
-import tracking.validation.peelers as peelers
-
 import basf2
 
 import ROOT
 ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
+
+import math
+import warnings
+
+import numpy as np
+
+import tracking.validation.harvesting as harvesting
+import tracking.validation.refiners as refiners
+import tracking.validation.peelers as peelers
+import tracking.validation.utilities as utilities
 
 
 class MCSideTrackingValidationModule(harvesting.HarvestingModule):
@@ -17,62 +20,139 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
     """Module to collect matching information about the found particles and to generate
        validation plots and figures of merit on the performance of track finding."""
 
-    def __init__(
-            self,
-            name,
-            contact,
-            output_file_name=None,
-            trackCandidatesColumnName="TrackCands",
-            mcTrackCandidatesColumnName='MCTrackCands',
-            expert_level=None):
+    def __init__(self,
+                 name,
+                 contact,
+                 output_file_name=None,
+                 track_cands_name="TrackCands",
+                 mc_track_cands_name='MCTrackCands',
+                 expert_level=None):
 
         output_file_name = output_file_name or name + 'TrackingValidation.root'
 
-        super(MCSideTrackingValidationModule, self).__init__(foreach=mcTrackCandidatesColumnName,
-                                                             name=name,
-                                                             output_file_name=output_file_name,
-                                                             contact=contact,
-                                                             expert_level=expert_level)
+        super().__init__(foreach=mc_track_cands_name,
+                         name=name,
+                         output_file_name=output_file_name,
+                         contact=contact,
+                         expert_level=expert_level)
 
-        self.trackCandidatesColumnName = trackCandidatesColumnName
-        self.mcTrackCandidatesColumnName = mcTrackCandidatesColumnName
+        #: Name of the StoreArray of the tracks from pattern recognition
+        self.track_cands_name = track_cands_name
+
+        #: Name of the StoreArray of the ideal mc tracks
+        self.mc_track_cands_name = mc_track_cands_name
+
+        #: Reference to the track match lookup object reading the relation information constructed by the MCMatcherTracksModule
+        self.track_match_look_up = None
+
+        #: Set of all detector and hits ids contained in any pr track. Updated each event.
+        self.found_det_hit_ids = set()
+
+        #: Set of all detector and hits ids contained in matched pr tracks. Updated each event.
+        self.matched_det_hit_ids = set()
+
+        #: Set of all detector and hits ids contained in clone pr tracks. Updated each event.
+        self.clone_det_hit_ids = set()
+
+        #: Set of all detector and hits ids contained in background and ghost pr tracks. Updated each event.
+        self.fake_det_hit_ids = set()
 
     def initialize(self):
-        super(MCSideTrackingValidationModule, self).initialize()
-        self.trackMatchLookUp = Belle2.TrackMatchLookUp(self.mcTrackCandidatesColumnName, self.trackCandidatesColumnName)
+        super().initialize()
+        self.track_match_look_up = Belle2.TrackMatchLookUp(self.mc_track_cands_name, self.track_cands_name)
+
+    def prepare(self):
+        """Collect some statistics about the pattern recognition tracks used for comparision to the MC tracks
+
+        Executed once at the start of each event.
+        """
+        super().prepare()
+
+        track_cands = Belle2.PyStoreArray(self.track_cands_name)
+        track_match_look_up = self.track_match_look_up
+
+        found_det_hit_ids = set()
+        matched_det_hit_ids = set()
+        clone_det_hit_ids = set()
+        fake_det_hit_ids = set()
+
+        for track_cand in track_cands:
+            det_hit_ids = utilities.get_det_hit_ids(track_cand)
+
+            found_det_hit_ids |= det_hit_ids
+
+            if track_match_look_up.isMatchedPRTrackCand(track_cand):
+                matched_det_hit_ids |= det_hit_ids
+
+            if track_match_look_up.isClonePRTrackCand(track_cand):
+                clone_det_hit_ids |= det_hit_ids
+
+            if (track_match_look_up.isGhostPRTrackCand(track_cand) or
+                    track_match_look_up.isBackgroundPRTrackCand(track_cand)):
+                fake_det_hit_ids |= det_hit_ids
+
+        self.found_det_hit_ids = found_det_hit_ids
+        self.matched_det_hit_ids = matched_det_hit_ids
+        self.clone_det_hit_ids = clone_det_hit_ids
+        self.fake_det_hit_ids = fake_det_hit_ids
 
     def pick(self, mc_track_cand):
         return True
 
     def peel(self, mc_track_cand):
         """Looks at the individual Monte Carlo tracks and store information about them"""
-        trackMatchLookUp = self.trackMatchLookUp
+        track_match_look_up = self.track_match_look_up
         mc_particles = Belle2.PyStoreArray('MCParticles')
 
         # Analyse from the Monte Carlo reference side
         mc_track_cands = Belle2.PyStoreArray(self.foreach)
         multiplicity = mc_track_cands.getEntries()
 
-        mc_particle = trackMatchLookUp.getRelatedMCParticle(mc_track_cand)
+        mc_particle = track_match_look_up.getRelatedMCParticle(mc_track_cand)
         mc_particle_crops = peelers.peel_mc_particle(mc_particle)
         hit_content_crops = peelers.peel_track_cand_hit_content(mc_track_cand)
         mc_to_pr_match_info_crops = self.peel_mc_to_pr_match_info(mc_track_cand)
+        mc_hit_efficiencies_in_all_pr_tracks_crops = self.peel_hit_efficiencies_in_all_pr_tracks(mc_track_cand)
 
-        crops = dict(multiplicity=multiplicity)
-        crops.update(mc_to_pr_match_info_crops)
-        crops.update(hit_content_crops)
-        crops.update(mc_particle_crops)
+        crops = dict(multiplicity=multiplicity,
+                     **mc_to_pr_match_info_crops,
+                     **hit_content_crops,
+                     **mc_particle_crops,
+                     **mc_hit_efficiencies_in_all_pr_tracks_crops)
+
         return crops
 
     def peel_mc_to_pr_match_info(self, mc_track_cand):
-        trackMatchLookUp = self.trackMatchLookUp
+        track_match_look_up = self.track_match_look_up
         return dict(
-            is_matched=trackMatchLookUp.isMatchedMCTrackCand(mc_track_cand),
-            is_merged=trackMatchLookUp.isMergedMCTrackCand(mc_track_cand),
-            is_missing=trackMatchLookUp.isMissingMCTrackCand(mc_track_cand),
-            hit_efficiency=trackMatchLookUp.getRelatedEfficiency(mc_track_cand),
-            hit_purity=trackMatchLookUp.getRelatedPurity(mc_track_cand),
+            is_matched=track_match_look_up.isMatchedMCTrackCand(mc_track_cand),
+            is_merged=track_match_look_up.isMergedMCTrackCand(mc_track_cand),
+            is_missing=track_match_look_up.isMissingMCTrackCand(mc_track_cand),
+            hit_efficiency=track_match_look_up.getRelatedEfficiency(mc_track_cand),
+            hit_purity=track_match_look_up.getRelatedPurity(mc_track_cand),
         )
+
+    def peel_hit_efficiencies_in_all_pr_tracks(self, mc_track_cand):
+        mc_det_hit_ids = utilities.get_det_hit_ids(mc_track_cand)
+
+        hit_efficiency_in_all_found = utilities.calc_hit_efficiency(self.found_det_hit_ids,
+                                                                    mc_det_hit_ids)
+
+        unfound_hit_efficiency = 1.0 - hit_efficiency_in_all_found
+
+        hit_efficiency_in_all_matched = utilities.calc_hit_efficiency(self.matched_det_hit_ids,
+                                                                      mc_det_hit_ids)
+
+        hit_efficiency_in_all_fake = utilities.calc_hit_efficiency(self.fake_det_hit_ids,
+                                                                   mc_det_hit_ids)
+
+        hit_efficiency_crops = dict(
+            hit_efficiency_in_all_found=hit_efficiency_in_all_found,
+            unfound_hit_efficiency=unfound_hit_efficiency,
+            hit_efficiency_in_all_mached=hit_efficiency_in_all_matched,
+            hit_efficiency_in_all_fake=hit_efficiency_in_all_fake,
+        )
+        return hit_efficiency_crops
 
     # Refiners to be executed on terminate #
     # #################################### #
@@ -88,7 +168,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         key="{part_name}",
         select={"is_matched": "finding efficiency", "hit_efficiency": "hit efficiency", },
         description="""
-finding efficiency - the ratio of matched Monte Carlo tracks to all Monte Carlo tracks <br/>
+finding efficiency - the ratio of matched Monte Carlo tracks to all Monte Carlo tracks
 hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Monte Carlo tracks
 """
     )
@@ -129,6 +209,19 @@ hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
         upper_bound=3.27,
     )
 
+    save_finding_efficiency_by_tan_lamba_in_pt_groups_profiles = refiners.save_profiles(
+        select={
+            'is_matched': 'finding efficiency',
+            'tan_lambda_truth': 'tan #lambda'
+        },
+        y='finding efficiency',
+        y_binary=True,
+        groupby=[("pt_truth", [0.070, 0.250, 0.600])],
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
+    )
+
     # Make profiles of the hit efficiencies versus various fit parameters
     # Rename the quatities to names that display nicely by root latex translation
     renaming_select_for_hit_efficiency_profiles = {
@@ -159,97 +252,31 @@ hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
         upper_bound=3.27,
     )
 
+    #: This creates a histogram for all MC track displaying the ratio of hits contained in any PR track
+    #: Hence this is distinctly larger than the hit efficiency to the matched PR track
+    #: Usefulness under discussion
+    save_hit_efficiency_in_all_found_hist = refiners.save_histograms(
+        # renaming quantity to name that is more suitable for display
+        select=dict(hit_efficiency_in_all_found="total hit efficiency vs. all reconstructed tracks")
+    )
+
+    #: This creates a histogram for *each missing* MC track displaying the ratio of hits contained in any PR tracks
+    #: High values in this hit efficiencies means that the MC track is consumed by other PR tracks but no proper
+    #: match could be established.
+    save_missing_mc_tracks_hit_efficiency_in_all_found_hist = refiners.save_histograms(
+        filter_on="is_missing",  # show only the efficiencies of missing mc tracks
+        # renaming quantity to name that is more suitable for display
+        select=dict(hit_efficiency_in_all_found="total hit efficiency in all reconstructed tracks for missing mc tracks")
+    )
+
 
 class ExpertMCSideTrackingValidationModule(MCSideTrackingValidationModule):
-
     """Module to collect more matching information about the found particles and to generate
        validation plots and figures of merit on the performance of track finding. This module
        gives information on the number of hits etc. """
 
-    def prepare(self):
-        super(ExpertMCSideTrackingValidationModule, self).prepare()
-
-        track_cands = Belle2.PyStoreArray(self.trackCandidatesColumnName)
-        trackMatchLookUp = self.trackMatchLookUp
-
-        pr_cdc_hit_ids = set()
-        pr_good_cdc_hit_ids = set()
-        pr_clone_cdc_hit_ids = set()
-        pr_fake_cdc_hit_ids = set()
-
-        for track_cand in track_cands:
-            cdc_hit_ids_of_track_cand = track_cand.getHitIDs(Belle2.Const.CDC)  # Checked
-            # Working around a bug in ROOT where you should not access empty std::vectors
-            if len(cdc_hit_ids_of_track_cand) == 0:
-                cdc_hit_ids_of_track_cand = set()
-            else:
-                cdc_hit_ids_of_track_cand = set(cdc_hit_ids_of_track_cand)
-
-            pr_cdc_hit_ids |= cdc_hit_ids_of_track_cand
-
-            if trackMatchLookUp.isMatchedPRTrackCand(track_cand):
-                pr_good_cdc_hit_ids |= cdc_hit_ids_of_track_cand
-
-            if trackMatchLookUp.isClonePRTrackCand(track_cand):
-                pr_clone_cdc_hit_ids |= cdc_hit_ids_of_track_cand
-
-            if (trackMatchLookUp.isGhostPRTrackCand(track_cand) or
-                    trackMatchLookUp.isBackgroundPRTrackCand(track_cand)):
-                pr_fake_cdc_hit_ids |= cdc_hit_ids_of_track_cand
-
-        self.pr_cdc_hit_ids = pr_cdc_hit_ids
-        self.pr_good_cdc_hit_ids = pr_good_cdc_hit_ids
-        self.pr_clone_cdc_hit_ids = pr_clone_cdc_hit_ids
-        self.pr_fake_cdc_hit_ids = pr_fake_cdc_hit_ids
-
-    def peel(self, mcTrackCand):
-        base_crops = super(ExpertMCSideTrackingValidationModule, self).peel(mcTrackCand)
-
-        mc_track_cand_cdc_hit_ids = mcTrackCand.getHitIDs(Belle2.Const.CDC)  # Checked
-        # Working around a bug in ROOT where you should not access empty std::vectors
-        if len(mc_track_cand_cdc_hit_ids) == 0:
-            mc_track_cand_cdc_hit_ids = set()
-        else:
-            mc_track_cand_cdc_hit_ids = set(mc_track_cand_cdc_hit_ids)
-
-        ratio = np.divide(1.0 * len(mc_track_cand_cdc_hit_ids & self.pr_cdc_hit_ids), len(mc_track_cand_cdc_hit_ids))
-        ratio_hits_in_mc_tracks_and_in_good_pr_tracks = np.divide(
-            1.0 * len(mc_track_cand_cdc_hit_ids & self.pr_good_cdc_hit_ids), len(mc_track_cand_cdc_hit_ids))
-        ratio_hits_in_mc_tracks_and_in_fake_pr_tracks = np.divide(
-            1.0 * len(mc_track_cand_cdc_hit_ids & self.pr_fake_cdc_hit_ids), len(mc_track_cand_cdc_hit_ids))
-
-        hit_crops = dict(
-            mc_number_of_hits=len(mc_track_cand_cdc_hit_ids),
-            ratio_hits_in_mc_tracks_and_not_in_pr_tracks=1.0 - ratio,
-            ratio_hits_in_mc_tracks_and_in_pr_tracks=ratio,
-            ratio_hits_in_mc_tracks_and_in_good_pr_tracks=ratio_hits_in_mc_tracks_and_in_good_pr_tracks,
-            ratio_hits_in_mc_tracks_and_in_fake_pr_tracks=ratio_hits_in_mc_tracks_and_in_fake_pr_tracks
-        )
-
-        base_crops.update(hit_crops)
-
-        return base_crops
-
-    # Refiners to be executed on terminate #
-    # #################################### #
-    save_ratio_hits_in_mc_tracks_and_in_pr_tracks_hist = refiners.save_histograms(
-        # renaming quantity to name that is more suitable for display
-        select=dict(ratio_hits_in_mc_tracks_and_in_pr_tracks="ratio of hits in MCTracks found by the track finder")
-    )
-
-    save_ratio_hits_in_missing_mc_tracks_and_in_pr_tracks_hist = refiners.save_histograms(
-        filter_on="is_missing",  # filter on missing to mimic what ratio_hits_in_missing_mc_tracks_and_in_pr_tracks used to be
-        # renaming quantity to name that is more suitable for display
-        select=dict(ratio_hits_in_mc_tracks_and_in_pr_tracks="ratio of hits in missing MCTracks found by the track finder")
-    )
-
-
-def main():
-    mcSideTrackingValidationModule = ExpertMCSideTrackingValidationModule(name='mc_test', contact='dummy')
-    mcSideTrackingValidationModule.run('tracked_generic100.root', pyprofile=True)
-
-
-if __name__ == '__main__':
-    import logging
-    logging.basicConfig(level=logging.DEBUG)
-    main()
+    def __init__(self, *args, **kwds):
+        """Constructor issuing a deprecation warning"""
+        warnings.warn("ExpertMCSideTrackingValidationModule is depricated for MCSideTrackingValidationModule",
+                      DeprecationWarning)
+        super().__init__(*args, **kwds)

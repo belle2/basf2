@@ -10,7 +10,7 @@ from ROOT import Belle2
 from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
 import math
-
+import numpy as np
 
 formatter = TolerateMissingKeyFormatter()
 
@@ -102,6 +102,7 @@ def peel_track_cand_hit_content(track_cand, key="{part_name}"):
         n_pxd_hits=n_pxd_hits,
         n_svd_hits=n_svd_hits,
         n_cdc_hits=n_cdc_hits,
+        n_hits=n_pxd_hits + n_svd_hits + n_cdc_hits,
         ndf_hits=ndf,
     )
 
@@ -109,37 +110,61 @@ def peel_track_cand_hit_content(track_cand, key="{part_name}"):
 @format_crop_keys
 def peel_track_cand_seed(track_cand, key="{part_name}"):
     if track_cand:
-        # Need those? Make congruent with the mc_particle variables above
-        # seed_position = track_cand.getPosSeed()
-        # seed_momentum = track_cand.getMomSeed()
-
-        # crops = dict(
-        #     seed_phi=seed_position.Phi(),
-        #     seed_theta=seed_position.Theta(),
-        #     )
-
         seed_fit_result = get_seed_track_fit_result(track_cand)
-        return peel_fit_result(seed_fit_result, key="seed_{part_name}")
+        return peel_track_fit_result(seed_fit_result, key="seed_{part_name}")
 
     else:
-        return peel_fit_result(None, key="seed_{part_name}")
+        return peel_track_fit_result(None, key="seed_{part_name}")
 
 
 @format_crop_keys
-def peel_fit_result(fit_result, key="{part_name}"):
+def peel_track_fit_result(track_fit_result, key="{part_name}"):
     nan = float("nan")
-    if fit_result:
+    if track_fit_result:
+        cov6 = track_fit_result.getCovariance6()
+        mom = track_fit_result.getMomentum()
+        pos = track_fit_result.getPosition()
+
+        pt_estimate = mom.Perp()
+
+        pt_variance = np.divide(
+            mom.X()**2 * cov6(3, 3) + mom.Y()**2 * cov6(4, 4) - 2 * mom.X() * mom.Y() * cov6(3, 4),
+            mom.Perp2()
+        )
+
+        pt_resolution = np.divide(pt_variance, pt_estimate)
+
         fit_crops = dict(
-            d0_estimate=fit_result.getD0(),
-            d0_variance=fit_result.getCov()[0],
-            phi0_estimate=fit_result.getPhi() % (2.0 * math.pi),
-            phi0_variance=fit_result.getCov()[5],
-            omega_estimate=fit_result.getOmega(),
-            omega_variance=fit_result.getCov()[9],
-            z0_estimate=fit_result.getZ0(),
-            z0_variance=fit_result.getCov()[12],
-            tan_lambda_estimate=fit_result.getCotTheta(),
-            tan_lambda_variance=fit_result.getCov()[14],
+            d0_estimate=track_fit_result.getD0(),
+            d0_variance=track_fit_result.getCov()[0],
+            phi0_estimate=track_fit_result.getPhi() % (2.0 * math.pi),
+            phi0_variance=track_fit_result.getCov()[5],
+            omega_estimate=track_fit_result.getOmega(),
+            omega_variance=track_fit_result.getCov()[9],
+            z0_estimate=track_fit_result.getZ0(),
+            z0_variance=track_fit_result.getCov()[12],
+            tan_lambda_estimate=track_fit_result.getCotTheta(),
+            tan_lambda_variance=track_fit_result.getCov()[14],
+
+            x_estimate=pos.X(),
+            x_variance=cov6(0, 0),
+            y_estimate=pos.Y(),
+            y_variance=cov6(1, 1),
+            z_estimate=pos.Z(),
+            z_variance=cov6(2, 2),
+
+            pt_estimate=pt_estimate,
+            pt_variance=pt_variance,
+            pt_resolution=pt_resolution,
+
+            px_estimate=mom.X(),
+            px_variance=cov6(3, 3),
+            py_estimate=mom.Y(),
+            py_variance=cov6(4, 4),
+            pz_estimate=mom.Z(),
+            pz_variance=cov6(5, 5),
+
+            p_value=track_fit_result.getPValue(),
             is_fitted=True,  # FIXME
         )
 
@@ -155,14 +180,34 @@ def peel_fit_result(fit_result, key="{part_name}"):
             z0_variance=nan,
             tan_lambda_estimate=nan,
             tan_lambda_variance=nan,
+
+            x_estimate=nan,
+            x_variance=nan,
+            y_estimate=nan,
+            y_variance=nan,
+            z_estimate=nan,
+            z_variance=nan,
+
+            pt_estimate=nan,
+            pt_variance=nan,
+            pt_resolution=nan,
+
+            px_estimate=nan,
+            px_variance=nan,
+            py_estimate=nan,
+            py_variance=nan,
+            pz_estimate=nan,
+            pz_variance=nan,
+
+            p_value=nan,
+
             is_fitted=False,
         )
 
     return fit_crops
 
 
-# @format_crop_keys
-def get_helix_from_mc_particle(mc_particle, key="{part_name}"):
+def get_helix_from_mc_particle(mc_particle):
     position = mc_particle.getVertex()
     momentum = mc_particle.getMomentum()
     charge_sign = (-1 if mc_particle.getCharge() < 0 else 1)
@@ -172,8 +217,7 @@ def get_helix_from_mc_particle(mc_particle, key="{part_name}"):
     return seed_helix
 
 
-# @format_crop_keys
-def get_seed_track_fit_result(track_cand, key="{part_name}"):
+def get_seed_track_fit_result(track_cand):
     position = track_cand.getPosSeed()
     momentum = track_cand.getMomSeed()
     cartesian_covariance = track_cand.getCovSeed()

@@ -11,8 +11,8 @@ from tracking.validation.plot import ValidationPlot, root_save_name, \
 from tracking.validation.pull import PullAnalysis
 from tracking.validation.fom import ValidationFiguresOfMerit
 
-from tracking.validation.mc_side_module import ExpertMCSideTrackingValidationModule
-from tracking.validation.pr_side_module import ExpertPRSideTrackingValidationModule
+from tracking.validation.mc_side_module import MCSideTrackingValidationModule
+from tracking.validation.pr_side_module import PRSideTrackingValidationModule
 from tracking.validation.eventwise_module import EventwiseTrackingValidationModule
 
 import tracking.metamodules as metamodules
@@ -28,16 +28,16 @@ from ROOT import Belle2
 
 class SeparatedTrackingValidationModule(metamodules.PathModule):
 
-    MCSideModule = ExpertMCSideTrackingValidationModule
-    PRSideModule = ExpertPRSideTrackingValidationModule
+    MCSideModule = MCSideTrackingValidationModule
+    PRSideModule = PRSideTrackingValidationModule
     EventwiseModule = EventwiseTrackingValidationModule
 
     def __init__(self,
                  name,
                  contact,
                  output_file_name=None,
-                 trackCandidatesColumnName="TrackCands",
-                 mcTrackCandidatesColumnName="MCTrackCands",
+                 track_cands_name="TrackCands",
+                 mc_track_cands_name="MCTrackCands",
                  expert_level=None):
 
         # Output TFile to be opened in the initialize methode
@@ -49,22 +49,22 @@ class SeparatedTrackingValidationModule(metamodules.PathModule):
         eventwise_module = self.EventwiseModule(name,
                                                 contact,
                                                 output_file_name=output_file_name,
-                                                trackCandidatesColumnName=trackCandidatesColumnName,
-                                                mcTrackCandidatesColumnName=mcTrackCandidatesColumnName,
+                                                track_cands_name=track_cands_name,
+                                                mc_track_cands_name=mc_track_cands_name,
                                                 expert_level=expert_level)
 
         pr_side_module = self.PRSideModule(name,
                                            contact,
                                            output_file_name=output_file_name,
-                                           trackCandidatesColumnName=trackCandidatesColumnName,
-                                           mcTrackCandidatesColumnName=mcTrackCandidatesColumnName,
+                                           track_cands_name=track_cands_name,
+                                           mc_track_cands_name=mc_track_cands_name,
                                            expert_level=expert_level)
 
         mc_side_module = self.MCSideModule(name,
                                            contact,
                                            output_file_name=output_file_name,
-                                           trackCandidatesColumnName=trackCandidatesColumnName,
-                                           mcTrackCandidatesColumnName=mcTrackCandidatesColumnName,
+                                           track_cands_name=track_cands_name,
+                                           mc_track_cands_name=mc_track_cands_name,
                                            expert_level=expert_level)
 
         self.modules = [
@@ -73,10 +73,10 @@ class SeparatedTrackingValidationModule(metamodules.PathModule):
             mc_side_module,
         ]
 
-        super(SeparatedTrackingValidationModule, self).__init__(modules=self.modules)
+        super().__init__(modules=self.modules)
 
     def initialize(self):
-        super(SeparatedTrackingValidationModule, self).initialize()
+        super().initialize()
         output_tfile = ROOT.TFile(self.output_file_name, "RECREATE")
 
         # Substitute the output file with the common output file opened in this module.
@@ -88,7 +88,7 @@ class SeparatedTrackingValidationModule(metamodules.PathModule):
     def terminate(self):
         self.output_tfile.Flush()
         self.output_tfile.Close()
-        super(SeparatedTrackingValidationModule, self).terminate()
+        super().terminate()
 
 
 # contains all informations necessary for track filters to decide whether

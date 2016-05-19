@@ -57,6 +57,83 @@ def is_stable_in_generator(mc_particle):
     return mc_particle.hasStatus(Belle2.MCParticle.c_StableInGenerator)
 
 
+def get_det_hit_ids(track_cand, det_ids=[Belle2.Const.PXD, Belle2.Const.SVD, Belle2.Const.CDC]):
+    """Retrieves the hit ids contained in the track candidate for the given detector ids
+
+    Parameters
+    ----------
+    track_cand : genfit::TrackCand
+        Track candidate
+    det_ids : list(int)
+        List of the detector ids for which the hit ids should be retrieved
+
+    Returns
+    -------
+    set( (int, int) )
+        A set of pairs like (det_id, hit_id) representing the hit content of the track
+    """
+    det_hit_ids = set()
+    for det_id in det_ids:
+        hit_ids = track_cand.getHitIDs(det_id)
+
+        # Working around a bug in ROOT where you should not access empty std::vectors
+        if len(hit_ids) != 0:
+            det_hit_ids |= set((det_id, hit_id) for hit_id in hit_ids)
+
+    return det_hit_ids
+
+
+def calc_ndf_from_det_hit_ids(det_hit_ids,
+                              ndf_by_det_id={Belle2.Const.PXD: 2,
+                                             Belle2.Const.SVD: 2,
+                                             Belle2.Const.CDC: 1}):
+    """For a set of detector and hit ids calculate the total number of degrees of freedom
+
+    Parameters
+    ----------
+    det_hit_ids : set( (int, int) )
+        A set of pairs like (det_id, hit_id) representing the hit content of a track
+    ndf_by_det_ids : dict(int=int)
+        A map from detector ids to the number of degrees of freedom one hit in this detector represents.
+
+    Returns
+    -------
+    int
+        Total number of degrees of freedom represented by the hit set
+    """
+    return sum(ndf_by_det_id[det_id] for det_id, hit_id in det_hit_ids)
+
+
+def calc_hit_efficiency(det_hit_ids,
+                        mc_det_hit_ids,
+                        ndf_by_det_id={Belle2.Const.PXD: 2,
+                                       Belle2.Const.SVD: 2,
+                                       Belle2.Const.CDC: 1}):
+    """Calculates the fraction of detector and hits ids in a reference (MC) set that are also
+    present in a reconstructed (PR) set.
+
+    The ratio is given in terms of degrees of freedom the hits represent
+
+    Parameters
+    ----------
+    det_hit_ids : set( (int, int) )
+        A set of pairs like (det_id, hit_id) representing the hit content of a reconstructed (PR) track
+    mc_det_hit_ids : set( (int, int) )
+        A set of pairs like (det_id, hit_id) representing the hit content of a reference (MC) track
+    ndf_by_det_ids : dict(int=int)
+        A map from detector ids to the number of degrees of freedom one hit in this detector represents.
+
+    Returns
+    -------
+    float
+        Fraction of hits in the reference (MC) track that are also present in the reconstructed (PR) track
+        in terms of number of degrees of freedom.
+    """
+    common_det_hit_ids = det_hit_ids & mc_det_hit_ids
+    return np.divide(1.0 * calc_ndf_from_det_hit_ids(common_det_hit_ids),
+                     calc_ndf_from_det_hit_ids(mc_det_hit_ids))
+
+
 def getHelixFromMCParticle(mcParticle):
     position = mcParticle.getVertex()
     momentum = mcParticle.getMomentum()

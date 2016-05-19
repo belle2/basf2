@@ -1,31 +1,40 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from ipython_tools import viewer
-from ipython_tools import queue
-import inspect
+try:
+    from inspect import signature
+except ImportError:
+    from funcsigs import signature
 import time
 
+from hep_ipython_tools import viewer
+from hep_ipython_tools.calculation_process import CalculationProcess
 
-class Basf2Calculation:
+
+class Calculation:
 
     """
-    Create a _Basf2Calculation from the given Basf2Process that handles
+    Create a Calculation from the given Process that handles
     the status of the process and the actions like start, stop or wait_for_end
     Do not create instances of this class by yourself but rather use the IPythonHandler for this.
     """
 
-    def __init__(self, process_list):
-        """ Init with the list of processes (possibly empty) """
-        #: The process list (possibly empty)
-        self.process_list = process_list
+    def __init__(self, process_list=None):
+        """ Init with an empty list of processes """
+        #: The process list (possibly empty, even later)
+        if process_list:
+            self.process_list = process_list
+        else:
+            self.process_list = []
+
+        self._calculation_process_type = CalculationProcess
 
     def __iter__(self):
         """
         Make the class iterable over all single processes
         """
         for process in self.process_list:
-            yield Basf2Calculation([process])
+            yield Calculation([process])
 
     def __len__(self):
         """ Return the number of handled processes """
@@ -45,7 +54,7 @@ class Basf2Calculation:
         """
         Start the processes in the background.
         Raises an error of the process has been started already.
-        You can not restart a process. If you want to do so, create another Basf2Calculation instance.
+        You can not restart a process. If you want to do so, create another Calculation instance.
         """
         def f(process):
             if not process.already_run:
@@ -67,9 +76,9 @@ class Basf2Calculation:
         if display_bar:
             # Initialize all process bars
             process_bars = {process: viewer.ProgressBarViewer()
-                            for process in self.process_list if process.path is not None}
+                            for process in self.process_list if process.is_valid}
 
-        started_processes = [p for p in self.process_list if p.path is not None]
+        started_processes = [p for p in self.process_list if p.is_valid]
         running_processes = started_processes
         # Update all process bars as long as minimum one process is running
         while len(running_processes) > 0:
@@ -85,8 +94,8 @@ class Basf2Calculation:
                         del process_bars[process]
 
             for process in running_processes:
-                # Check if the process does not have a path
-                if process.path is None:
+                # Check if the process is valid
+                if not process.is_valid:
                     if display_bar:
                         self.show_end_result(process, process_bars)
 
@@ -162,12 +171,6 @@ class Basf2Calculation:
 
         return self.map_on_processes(f, index)
 
-    def get_modules(self, index=None):
-        """
-        Return the modules in the given path.
-        """
-        return self.map_on_processes(lambda process: process.path.modules() if process.path is not None else None, index)
-
     def get(self, name, index=None):
         """
         Return the saved queue item with the given name
@@ -184,18 +187,6 @@ class Basf2Calculation:
         Return the names of the items that were saved in the queue
         """
         return self.map_on_processes(lambda process: process.get_keys(), index)
-
-    def get_statistics(self, index=None):
-        """
-        Return the statistics of the process if finished
-        """
-        def f(process):
-            if self.is_finished(process) and not self.has_failed(process):
-                return self.get("basf2.statistics", process)
-            else:
-                raise AssertionError("Calculation has not finished.")
-
-        return self.map_on_processes(f, index)
 
     def get_log(self, index=None):
         """
@@ -249,46 +240,6 @@ class Basf2Calculation:
 
         widget.show()
 
-    def show_path(self, index=None):
-        """
-        Show the underlaying basf2 path in an interactive way
-        """
-
-        def f(process):
-            if process.path is not None:
-                return viewer.PathViewer(process.path)
-            else:
-                return None
-
-        self.create_widgets_for_all_processes(f, index)
-
-    def show_collections(self, index=None):
-        """
-        Show some snapshots on the collections.
-        Remember to add the PrintCollectionsPython Module for that!
-        """
-
-        def f(process):
-            if "basf2.store_content" in self.get_keys(process):
-                return viewer.CollectionsViewer(self.get("basf2.store_content", process))
-            else:
-                return None
-
-        self.create_widgets_for_all_processes(f, index)
-
-    def show_statistics(self, index=None):
-        """
-        Show the statistics in a smart manner
-        """
-
-        def f(process):
-            if "basf2.statistics" in self.get_keys(process):
-                return viewer.StatisticsViewer(self.get("basf2.statistics", process))
-            else:
-                return None
-
-        self.create_widgets_for_all_processes(f, index)
-
     def show_log(self, index=None):
         """
         Show the log of the underlaying process(es).
@@ -302,45 +253,48 @@ class Basf2Calculation:
 
         self.create_widgets_for_all_processes(f, index)
 
-
-class Basf2CalculationList:
-
-    """
-    Creates a whole list of paths by combining every list element in every list in lists with every other list in lists.
-    """
-
-    def __init__(self, path_function, lists):
-        """ Init with the path_function and the lists of named parameters """
-
-        #: The path function
-        self.path_function = path_function
-
-        #: The lists of parameters
-        self.lists = lists
-
-    def create_all_paths(self):
+    def show_statistics(self, index=None):
         """
-        Create all paths.
+        Show the statistics in a smart manner
         """
-        import itertools
 
-        parameter_names_in_list = list(self.lists.keys())
-        parameter_values_in_list = list(self.lists.values())
+        def f(process):
+            if "ipython.statistics" in self.get_keys(process):
+                return viewer.StatisticsViewer(self.get("ipython.statistics", process))
+            else:
+                return None
 
-        every_parameter_combination = itertools.product(*parameter_values_in_list)
+        self.create_widgets_for_all_processes(f, index)
 
-        every_parameter_combination_with_names = [{parameter_name: parameter_value for parameter_name, parameter_value in zip(
-            parameter_names_in_list, parameter_values)} for parameter_values in list(every_parameter_combination)]
+    def show_collections(self, index=None):
+        """
+        Show some snapshots on the collections.
+        Remember to add the PrintCollectionsPython Module for that!
+        """
 
-        all_queues = [queue.Basf2CalculationQueue() for combination in every_parameter_combination_with_names]
+        def f(process):
+            if "ipython.store_content" in self.get_keys(process):
+                return viewer.CollectionsViewer(self.get("ipython.store_content", process))
+            else:
+                return None
 
-        def f(q, param_combination):
-            args, vargs, vwargs, defaults = inspect.getargspec(self.path_function)
-            if "queue" in args:
-                param_combination.update({"queue": q})
+        self.create_widgets_for_all_processes(f, index)
 
-            return self.path_function(**param_combination)
+    def get_statistics(self, index=None):
+        """
+        Return the statistics of the process if finished
+        """
+        def f(process):
+            if self.is_finished(process) and not self.has_failed(process):
+                return self.get("ipython.statistics", process)
+            else:
+                raise AssertionError("Calculation has not finished.")
 
-        all_paths = [f(q, parameter_combination)
-                     for q, parameter_combination in zip(all_queues, list(every_parameter_combination_with_names))]
-        return all_paths, all_queues, list(every_parameter_combination_with_names)
+        return self.map_on_processes(f, index)
+
+    def append(self, result_queue, log_file_name, parameters, **kwargs):
+        """
+        Construct a new process with the given parameters and add it to the process_list.
+        """
+        self.process_list.append(self._calculation_process_type(result_queue=result_queue, log_file_name=log_file_name,
+                                                                parameters=parameters, **kwargs))

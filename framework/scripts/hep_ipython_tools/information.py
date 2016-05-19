@@ -1,15 +1,12 @@
-import os
 import re
 from datetime import datetime
 from subprocess import check_output
-from ipython_tools import viewer
 
 
-class Basf2Information:
+class EnvironmentInformation:
 
     """
-    Helper class for accessing the information about basf2
-    from the environment variables.
+    Helper class for accessing the information about the environment.
     """
 
     def __init__(self):
@@ -17,19 +14,19 @@ class Basf2Information:
         Get the variables from the environment variables.
         """
         #: Externals version
-        self.externals_version = os.environ.get("BELLE2_EXTERNALS_VERSION")
+        self.externals_version = ""
         #: Compile options of externals
-        self.externals_option = os.environ.get("BELLE2_EXTERNALS_OPTION")
-        #: Compile options of Belle2
-        self.option = os.environ.get("BELLE2_OPTION")
+        self.externals_option = ""
+        #: Compile options
+        self.option = ""
         #: OS
-        self.architecture = os.environ.get("BELLE2_ARCH")
+        self.architecture = ""
         #: Release version
-        self.release = os.environ.get("BELLE2_RELEASE")
+        self.release = ""
         #: Release folder
-        self.release_folder = os.environ.get("BELLE2_LOCAL_DIR")
+        self.release_folder = ""
         #: Revision number (cached, the real getter is the property)
-        self._cached_revision = None
+        self._cached_revision = ""
 
     @property
     def revision_number(self):
@@ -46,8 +43,8 @@ class Basf2Information:
         A nice representation.
         """
         result = ""
-        result += "externals_version: " + self.externals_version + "\n"
-        result += "externals_option: " + self.externals_option + "\n"
+        result += "externals version: " + self.externals_version + "\n"
+        result += "externals option: " + self.externals_option + "\n"
         result += "option: " + self.option + "\n"
         result += "architecture: " + self.architecture + "\n"
         result += "release: " + self.release + "\n"
@@ -78,31 +75,3 @@ class Basf2Information:
             match = re.search(r"Revision:\s(.*)", line)
             if match:
                 return match.group(1)
-
-
-class ModulesInformation:
-    """
-    A helper class to perform module lookup.
-    """
-
-    def __init__(self):
-        """
-        Initialize with the module list from the framework.
-        """
-        from basf2 import fw
-        #: The cached list of modules the framework offers.
-        self.module_list = fw.list_available_modules()
-
-    def search(self, regex_string):
-        """
-        Search for a given module. You can give ane regular expression you like.
-         The results will be printed as a nice tabbed view with the modules and their parameters
-         and descriptions.
-        """
-        def filter_modules():
-            for module_name in self.module_list:
-                if re.search(regex_string, module_name):
-                    yield module_name
-
-        v = viewer.PathViewer(filter_modules(), standalone=True)
-        v.show()

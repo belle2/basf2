@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# basf2 imports
 import basf2
 from ROOT import Belle2
+
+from hep_ipython_tools.entities import StoreContentList, StoreContent
 
 
 class PrintCollections(basf2.Module):
@@ -43,12 +44,13 @@ class PrintCollections(basf2.Module):
 
         for store_array_name in registered_store_arrays:
             store_array = Belle2.PyStoreArray(store_array_name)
-            event_store_content_list.append([store_array_name, len(store_array)])
+            event_store_content_list.append(StoreContent(store_array_name, len(store_array)))
 
         for store_array_name in registered_store_objects:
-            event_store_content_list.append([store_array_name, 0])
+            event_store_content_list.append(StoreContent(store_array_name, 0))
 
-        self.store_content_list.append({"number": self.event_number, "store_content": event_store_content_list})
+        event_store_content = StoreContentList(content=event_store_content_list, event_number=self.event_number)
+        self.store_content_list.append(event_store_content)
 
     def event(self):
         """
@@ -70,7 +72,7 @@ class PrintCollections(basf2.Module):
         """
         Write the store array contents from the events to the queue.
         """
-        self.queue.put("basf2.store_content", self.store_content_list)
+        self.queue.put("ipython.store_content", self.store_content_list)
 
 
 class ProgressPython(basf2.Module):

@@ -11,17 +11,21 @@
 from basf2 import *
 import ROOT
 from ROOT import Belle2
-from ROOT import TFile, TH1F, TH1I, TNamed
+from ROOT import TFile, TH1F, TNamed
 import math
 
 
 class EKLMK0LPlotModule(Module):
+    """ Class for creation of EKLM K0L validation plots. """
 
     def __init__(self):
+        """Initialization."""
         super(EKLMK0LPlotModule, self).__init__()
+        #: Output file.
         self.output_file = ROOT.TFile('EKLMK0L.root', 'recreate')
         contact = 'Kirill Chilikin (chilikin@lebedev.ru)'
-        self.hist_nkl = ROOT.TH1I('k0l_number',
+        #: Number of K0L histogram.
+        self.hist_nkl = ROOT.TH1F('k0l_number',
                                   'Number of KLM clusters per 1 MC particle',
                                   5, -0.5, 4.5)
         self.hist_nkl.SetXTitle('KLM clusters')
@@ -31,6 +35,7 @@ class EKLMK0LPlotModule(Module):
         l.Add(TNamed('Check', 'No efficiency decrease or multiple candidates \
                      increase'))
         l.Add(TNamed('Contact', contact))
+        #: X resolution histogram.
         self.hist_xres = ROOT.TH1F('k0l_xres',
                                    'EKLM K0L decay vertex X resolution',
                                    100, -50, 50)
@@ -40,6 +45,7 @@ class EKLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'X resolution'))
         l.Add(TNamed('Check', 'No bias, resolution ~ 10 cm.'))
         l.Add(TNamed('Contact', contact))
+        #: Y resolution histogram.
         self.hist_yres = ROOT.TH1F('k0l_yres',
                                    'EKLM K0L decay vertex Y resolution',
                                    100, -50, 50)
@@ -49,6 +55,7 @@ class EKLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'Y resolution'))
         l.Add(TNamed('Check', 'No bias, resolution ~ 10 cm.'))
         l.Add(TNamed('Contact', contact))
+        #: Z resolution histogram.
         self.hist_zres = ROOT.TH1F('k0l_zres',
                                    'EKLM K0L decay vertex Z resolution',
                                    100, -50, 50)
@@ -58,6 +65,7 @@ class EKLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'Z resolution'))
         l.Add(TNamed('Check', 'No bias, resolution ~ 10 cm.'))
         l.Add(TNamed('Contact', contact))
+        #: Time resolution histogram.
         self.hist_tres = ROOT.TH1F('k0l_tres',
                                    'EKLM K0L decay time resolution',
                                    100, -10., 10.)
@@ -67,6 +75,7 @@ class EKLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'Time resolution'))
         l.Add(TNamed('Check', 'No bias.'))
         l.Add(TNamed('Contact', contact))
+        #: Momentum resolution histogram.
         self.hist_pres = ROOT.TH1F('k0l_pres',
                                    'EKLM K0L momentum resolution',
                                    100, -1., 1.)
@@ -76,6 +85,7 @@ class EKLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'Momentum resolution'))
         l.Add(TNamed('Check', 'No bias.'))
         l.Add(TNamed('Contact', contact))
+        #: Momentum theta resolution histogram.
         self.hist_ptres = ROOT.TH1F('k0l_ptres',
                                     'EKLM K0L momentum theta resolution',
                                     100, -0.2, 0.2)
@@ -85,6 +95,7 @@ class EKLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'Momentum theta resolution'))
         l.Add(TNamed('Check', 'No bias, resolution ~ 0.03'))
         l.Add(TNamed('Contact', contact))
+        #: Momentum phi resolution histogram.
         self.hist_ppres = ROOT.TH1F('k0l_ppres',
                                     'EKLM K0L momentum phi resolution',
                                     100, -0.2, 0.2)
@@ -96,6 +107,7 @@ class EKLMK0LPlotModule(Module):
         l.Add(TNamed('Contact', contact))
 
     def event(self):
+        """ Event function. """
         mc_particles = Belle2.PyStoreArray('MCParticles')
         for mc_particle in mc_particles:
             # Select K_L0.
@@ -133,6 +145,7 @@ class EKLMK0LPlotModule(Module):
                 self.hist_ppres.Fill(momentum_k.Phi() - momentum.Phi())
 
     def terminate(self):
+        """ Termination function. """
         self.output_file.cd()
         self.hist_nkl.Write()
         self.hist_xres.Write()

@@ -270,8 +270,11 @@ class ValidationPlot(object):
                 upper_bound=(None, None),
                 outlier_z_score=(None, None),
                 include_exceptionals=(True, True),
-                max_n_data=100000):
+                max_n_data=100000,
+                is_expert=True):
         """Fill the plot with a (unbinned) two dimensional scatter plot"""
+
+        self._is_expert = is_expert
 
         x_lower_bound, y_lower_bound = self.unpack_2d_param(lower_bound)
         x_upper_bound, y_upper_bound = self.unpack_2d_param(upper_bound)
@@ -330,7 +333,6 @@ class ValidationPlot(object):
                include_exceptionals=(True, True),
                allow_discrete=(False, False)):
         """Fill the plot with a two dimensional histogram"""
-
         name = self.name
 
         x_bins, y_bins = self.unpack_2d_param(bins)

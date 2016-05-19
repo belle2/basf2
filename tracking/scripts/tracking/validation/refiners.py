@@ -526,7 +526,8 @@ class SavePullAnalysisRefiner(Refiner):
                  quantity_name=None,
                  unit=None,
                  outlier_z_score=None,
-                 absolute=False):
+                 absolute=False,
+                 which_plots=None):
 
         self.name = name
         self.contact = contact
@@ -548,6 +549,7 @@ class SavePullAnalysisRefiner(Refiner):
 
         self.outlier_z_score = outlier_z_score
         self.absolute = absolute
+        self.which_plots = which_plots
 
     def refine(self,
                harvesting_module,
@@ -608,6 +610,8 @@ class SavePullAnalysisRefiner(Refiner):
 
             quantity_name = self.quantity_name or part_name
 
+            which_plots = self.which_plots
+
             pull_analysis = PullAnalysis(quantity_name,
                                          unit=self.unit,
                                          absolute=self.absolute,
@@ -615,7 +619,7 @@ class SavePullAnalysisRefiner(Refiner):
                                          plot_name=plot_name,
                                          plot_title=plot_title)
 
-            pull_analysis.analyse(truths, estimates, variances)
+            pull_analysis.analyse(truths, estimates, variances, which_plots=which_plots)
 
             pull_analysis.contact = contact
 

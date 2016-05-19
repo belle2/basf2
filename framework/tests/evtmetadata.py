@@ -45,7 +45,7 @@ class EvtMetaDataTest(Module):
             run = evtmetadata.obj().getRun()
             exp = evtmetadata.obj().getExperiment()
             B2INFO(str(event) + '\t' + str(run) + '\t' + str(exp))
-            if event == 3:
+            if event == 4:
                 # stop event processing.
                 evtmetadata.obj().setEndOfData()
 
@@ -91,13 +91,13 @@ for skipNEvents in range(10):
 
 # test skipping to specific events
 skipToEvents = [
-    [0, 0, 0],
-    [0, 0, 2],
-    [0, 1, 0],
-    [0, 1, 5],
-    [0, 2, 2],
-    [1, 0, 0],
-    [2, 0, 0],
+    [0, 0, 1],
+    [0, 0, 3],
+    [0, 1, 1],
+    [0, 1, 6],
+    [0, 2, 3],
+    [1, 0, 1],
+    [2, 0, 1],
 ]
 
 for event in skipToEvents:

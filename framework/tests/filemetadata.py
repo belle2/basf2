@@ -35,18 +35,18 @@ assert 10 == metadata.getNEvents()
 
 assert 7 == metadata.getExperimentLow()
 assert 1 == metadata.getRunLow()
-assert 0 == metadata.getEventLow()
+assert 1 == metadata.getEventLow()
 assert 7 == metadata.getExperimentHigh()
 assert 15 == metadata.getRunHigh()
-assert 0 == metadata.getEventHigh()  # highest evt. no in highest run
-assert metadata.containsEvent(7, 1, 0)
-assert metadata.containsEvent(7, 1, 8)
-assert metadata.containsEvent(7, 15, 0)
-assert metadata.containsEvent(7, 1, 9)  # does not exist, but would be plausible
-assert metadata.containsEvent(7, 3, 5)  # same
-assert not metadata.containsEvent(7, 0, 9)  # does not exist, but would be plausible
-assert not metadata.containsEvent(7, 16, 5)  # same
-assert not metadata.containsEvent(0, 15, 5)
+assert 1 == metadata.getEventHigh()  # highest evt. no in highest run
+assert metadata.containsEvent(7, 1, 1)
+assert metadata.containsEvent(7, 1, 9)
+assert metadata.containsEvent(7, 15, 1)
+assert metadata.containsEvent(7, 1, 10)  # does not exist, but would be plausible
+assert metadata.containsEvent(7, 3, 6)  # same
+assert not metadata.containsEvent(7, 0, 10)  # does not exist, but would be plausible
+assert not metadata.containsEvent(7, 16, 6)  # same
+assert not metadata.containsEvent(0, 15, 6)
 
 assert 0 == metadata.getNParents()
 

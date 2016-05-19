@@ -27,7 +27,7 @@ class CheckEventNumbers(Module):
     def terminate(self):
         """Check if event numbers are as they should be"""
         seen = self.__evtNumbers
-        should = list(range(self.__evtNumList))
+        should = list(range(1, self.__evtNumList+1))
         all_numbers = sorted(set(seen) | set(should))
         all_ok = True
         for evtNr in all_numbers:

@@ -51,7 +51,8 @@ class PrintName(basf2.Module):
 
     def event(self):
         """reimplementation of Module::event()."""
-        basf2.B2INFO("In module " + self.name())
+        # error level to check that this doesn't prevent execution
+        basf2.B2ERROR("In module " + self.name())
 
 main = basf2.create_path()
 
@@ -80,16 +81,15 @@ subsubpath.add_path(emptypath)
 module_with_condition = SelectOddEvents()
 anotherpath.add_module(module_with_condition)
 anotherpath.add_module('EventInfoPrinter')
-anotherpath.add_path(subsubpath)
 
 # check printing of paths, should be:
-# [] -> eventinfosetter -> [SelectOddEvents -> eventinfo -> [Progress -> []]]
+# [] -> eventinfosetter -> [SelectOddEvents -> eventinfo]
 # -> printcollections
 print(main)
 
-# when the module returns false/0 (odd events), we jump to Progress instead:
+# when the module returns true/1 (even events), we jump to Progress instead:
 # [] -> eventinfosetter -> [SelectOddEvents -> [Progress -> []]]
-module_with_condition.if_false(subsubpath)
+module_with_condition.if_true(subsubpath)
 # this is equivalent to:
 # module_with_condition.if_value('<1', subsubpath)
 
@@ -108,6 +108,9 @@ returnfalse2.if_true(returnfalse2_condition_path)
 
 main.add_module(PrintName("final"))
 
+basf2.process(main)
+
+basf2.B2INFO("second process() call follows...")
 basf2.process(main)
 
 print(main)

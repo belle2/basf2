@@ -15,7 +15,7 @@
 #include <string>
 
 namespace Belle2 {
-  /** Store event number, run number, and experiment number.
+  /** Store event, run, and experiment numbers. (see member variable doc for detailed description)
    *
    *  An object of this type is registered by e.g. EventInfoSetter for newly generated data,
    *  and updated with proper values for each event. Alternatively it can also be read from file.
@@ -30,7 +30,7 @@ namespace Belle2 {
   public:
 
     /** Constructor. */
-    explicit EventMetaData(unsigned int event = 0, int run = 0, int experiment = 0);
+    explicit EventMetaData(unsigned int event = 1, int run = 0, int experiment = 0);
 
     /** Destructor. */
     ~EventMetaData() {}
@@ -45,55 +45,37 @@ namespace Belle2 {
      *
      *  @param event The current event number.
      */
-    void setEvent(unsigned int event)
-    {
-      m_event = event;
-    }
+    void setEvent(unsigned int event) { m_event = event; }
 
     /** Run Setter.
      *
      *  @param run The number of the current run.
      */
-    void setRun(int run)
-    {
-      m_run = run;
-    }
+    void setRun(int run) { m_run = run; }
 
     /** Sub run Setter.
      *
      *  @param subrun The number of the current sub run.
      */
-    void setSubrun(int subrun)
-    {
-      m_subrun = subrun;
-    }
+    void setSubrun(int subrun) { m_subrun = subrun; }
 
     /** Experiment Setter.
      *
      *  @param experiment The number of the current experiment.
      */
-    void setExperiment(int experiment)
-    {
-      m_experiment = experiment;
-    }
+    void setExperiment(int experiment) { m_experiment = experiment; }
 
     /** Production Setter.
      *
      *  @param production The integer identifier of the production.
      */
-    void setProduction(int production)
-    {
-      m_production = production;
-    }
+    void setProduction(int production) { m_production = production; }
 
     /** Time Setter.
      *
      *  @param time The time when the event was recorded.
      */
-    void setTime(unsigned long long int time)
-    {
-      m_time = time;
-    }
+    void setTime(unsigned long long int time) { m_time = time; }
 
     /** Marks the end of the data processing.
      *
@@ -114,117 +96,78 @@ namespace Belle2 {
      *
      *  @param parent The LFN of the current parent file.
      */
-    void setParentLfn(std::string parent)
-    {
-      m_parentLfn = parent;
-    }
+    void setParentLfn(std::string parent) { m_parentLfn = parent; }
 
     /** Generated Weight Setter.
      *
      *  @param weight The weight produced by the event generator
      */
-    void setGeneratedWeight(double weight)
-    {
-      m_generatedWeight = weight;
-    }
+    void setGeneratedWeight(double weight) { m_generatedWeight = weight; }
 
     /** Set Error Flag
      *
      *   @param errorFlag a bit flag for an error event.
      */
-    void setErrorFlag(unsigned int errorFlag)
-    {
-      m_errorFlag = errorFlag;
-    }
+    void setErrorFlag(unsigned int errorFlag) { m_errorFlag = errorFlag; }
 
     /** Add Error Flag
      *
      *   @param errorFlag a bit flag for an error event.
      */
-    void addErrorFlag(EventErrorFlag errorFlag)
-    {
-      m_errorFlag |= errorFlag;
-    }
+    void addErrorFlag(EventErrorFlag errorFlag) { m_errorFlag |= errorFlag; }
 
     /** Get error flag
      *
      *  @return Error flag for this event.
      */
-    unsigned int getErrorFlag() const
-    {
-      return m_errorFlag;
-    }
+    unsigned int getErrorFlag() const { return m_errorFlag; }
 
     /** Event Getter.
      *
      *  @return The number of the current event.
      */
-    unsigned int getEvent() const
-    {
-      return m_event;
-    }
+    unsigned int getEvent() const { return m_event; }
 
     /** Run Getter.
      *
      *  @return The number of the current run.
      */
-    int getRun() const
-    {
-      return m_run;
-    }
+    int getRun() const { return m_run; }
 
     /** Sub run Getter.
      *
      *  @return Sub-run number, increases indicate recovery from DAQ-internal trouble without
      *          change to detector constants. Not supposed to be used by offline analysis.
      */
-    int getSubrun() const
-    {
-      return m_subrun;
-    }
+    int getSubrun() const { return m_subrun; }
 
     /** Experiment Getter.
      *
      *  @return The number of the current experiment.
      */
-    int getExperiment() const
-    {
-      return m_experiment;
-    }
+    int getExperiment() const { return m_experiment; }
 
     /** Production Getter.
      *
      *  @return The number of the current production.
      */
-    int getProduction() const
-    {
-      return m_production;
-    }
+    int getProduction() const { return m_production; }
 
     /** Time Getter.
      *
      *  @return The time when the event was recorded.
      */
-    unsigned long long int getTime() const
-    {
-      return m_time;
-    }
+    unsigned long long int getTime() const { return m_time; }
 
     /** Return LFN of the current parent file, or an empty string if not set.
      */
-    const std::string& getParentLfn() const
-    {
-      return m_parentLfn;
-    }
+    const std::string& getParentLfn() const { return m_parentLfn; }
 
     /** Generated Weight Getter.
      *
      *  @return The weight produced by the event generator
      */
-    double getGeneratedWeight() const
-    {
-      return m_generatedWeight;
-    }
+    double getGeneratedWeight() const { return m_generatedWeight; }
 
     /** Comparison Operator.
      *
@@ -242,24 +185,16 @@ namespace Belle2 {
 
 
   private:
-
-    unsigned int m_event; /**< Event number.  */
-
-    int m_run; /**< Run number.  */
-
+    unsigned int m_event; /**< Event number ('normal' data has values > 0).  */
+    int m_run; /**< Run number (usually > 0, run-independent MC has run == 0).  */
     int m_subrun; /**< Sub-run number, increases indicate recovery from DAQ-internal trouble without change to detector constants. Not supposed to be used by offline analysis.  */
-
-    int m_experiment; /**< Experiment number.  */
+    int m_experiment; /**< Experiment number. (valid values: [0, 1023], run-independent MC has exp == 0)  */
 
     int m_production; /**< Unique identifier of the production of the event.  */
-
     unsigned long long int m_time; /**< Time in ns since epoch (1970-01-01).  */
-
     std::string m_parentLfn;  /**< LFN of the parent file */
-
     double m_generatedWeight; /**< Generated weight.  */
-
-    unsigned int m_errorFlag;  /**< Error flag, ORed combination of EventErrorFlag values.  */
+    unsigned int m_errorFlag;  /**< Indicator of error conditions during data taking, ORed combination of EventErrorFlag values.  */
 
     ClassDef(EventMetaData, 4); /**< Store event number, run number, and experiment number. */
   }; //class

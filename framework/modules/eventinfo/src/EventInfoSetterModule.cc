@@ -156,7 +156,7 @@ bool EventInfoSetterModule::advanceEventCounter()
         m_evtNumber = m_evtNumList[m_colIndex];
       } else {
         // otherwise we start at the event number we want to skip to
-        m_evtNumber = m_skipToEvent[2];
+        m_evtNumber = m_skipToEvent[2] - 1;
         // and reset the variable as skipping is done
         m_skipToEvent.clear();
       }
@@ -187,7 +187,7 @@ void EventInfoSetterModule::event()
   m_eventMetaDataPtr->setProduction(m_production);
   m_eventMetaDataPtr->setExperiment(m_expList[m_colIndex]);
   m_eventMetaDataPtr->setRun(m_runList[m_colIndex]);
-  m_eventMetaDataPtr->setEvent(m_evtNumber);
+  m_eventMetaDataPtr->setEvent(m_evtNumber + 1);
   auto time = std::chrono::high_resolution_clock::now().time_since_epoch();
   m_eventMetaDataPtr->setTime(std::chrono::duration_cast<std::chrono::nanoseconds>(time).count());
 

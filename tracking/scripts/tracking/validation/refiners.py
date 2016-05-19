@@ -1,4 +1,3 @@
-
 import functools
 import numpy as np
 import collections
@@ -248,6 +247,7 @@ class Plot2DRefiner(Refiner):
                  check=None,
                  y_unit=None,
                  y_binary=None,
+                 y_log=None,
                  lower_bound=None,
                  upper_bound=None,
                  bins=None,
@@ -273,6 +273,7 @@ class Plot2DRefiner(Refiner):
         self.upper_bound = upper_bound
         self.bins = bins
         self.y_binary = y_binary
+        self.y_log = y_log
 
         self.outlier_z_score = outlier_z_score
         self.allow_discrete = allow_discrete
@@ -354,6 +355,7 @@ class Plot2DRefiner(Refiner):
                                          upper_bound=self.upper_bound,
                                          bins=self.bins,
                                          y_binary=self.y_binary,
+                                         y_log=self.y_log,
                                          outlier_z_score=self.outlier_z_score,
                                          allow_discrete=self.allow_discrete)
 

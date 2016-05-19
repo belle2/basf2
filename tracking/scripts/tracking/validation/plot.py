@@ -177,6 +177,9 @@ class ValidationPlot(object):
         #: custom levels for pvalue errors
         self.pvalue_error = None
 
+        #: Indicator whether the y axes should be displayed as a log scale
+        self.y_log = False
+
     def hist(self,
              xs,
              weights=None,
@@ -220,6 +223,7 @@ class ValidationPlot(object):
                 lower_bound=None,
                 upper_bound=None,
                 y_binary=None,
+                y_log=None,
                 outlier_z_score=None,
                 include_exceptionals=True,
                 allow_discrete=False,
@@ -242,6 +246,8 @@ class ValidationPlot(object):
                        include_exceptionals=include_exceptionals,
                        allow_discrete=allow_discrete,
                        cumulation_direction=cumulation_direction)
+        if y_log:
+            self.y_log = True
 
         if y_binary or self.is_binary(ys):
             if not self.ylabel:
@@ -545,21 +551,26 @@ class ValidationPlot(object):
             if self.plot not in self.histograms:
                 self.plot.Write()
 
+            # always disable ROOT's stat plot because it hides items
+            meta_options = ["nostats"]
+
+            # add expert option, if requested
+            if self.is_expert:
+                meta_options.append("expert")
+
+            # give a custom pvalue warning / error zone if requested
+            if self.pvalue_error is not None:
+                meta_options.append("pvalue-error={}".format(self.pvalue_error))
+            if self.pvalue_warn is not None:
+                meta_options.append("pvalue-warn={}".format(self.pvalue_warn))
+
+            # Indicator if the y axes should be displayed as a logarithmic scale
+            if self.y_log is not None:
+                meta_options.append("logy")
+
+            meta_options_str = ",".join(meta_options)
+
             for histogram in self.histograms:
-                # always disable ROOT's stat plot because it hides items
-                meta_options = ["nostats"]
-
-                # add expert option, if requested
-                if self.is_expert:
-                    meta_options.append("expert")
-
-                # give a custom pvalue warning / error zone if requested
-                if self.pvalue_error is not None:
-                    meta_options.append("pvalue-error={}".format(self.pvalue_error))
-                if self.pvalue_warn is not None:
-                    meta_options.append("pvalue-warn={}".format(self.pvalue_warn))
-
-                meta_options_str = reduce(lambda x, y: x + y + ",", meta_options, "")[:-1]
                 histogram.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', meta_options_str))
                 histogram.Write()
 

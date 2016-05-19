@@ -67,7 +67,7 @@ namespace Belle2 {
 
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr; /**< Output object. */
 
-    unsigned int m_evtNumber{0}; /**< The current event number. */
+    unsigned int m_evtNumber{1}; /**< The current event number. */
     unsigned int m_eventsToSkip{0u}; /**< skip this many events before starting. */
     int m_colIndex{0};  /**< The current index for the exp and run lists. */
     int m_production{0};  /**< The production number. */

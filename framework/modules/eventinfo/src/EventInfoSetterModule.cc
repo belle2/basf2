@@ -38,7 +38,7 @@ EventInfoSetterModule::EventInfoSetterModule() : Module()
     "Sets the event meta data information (exp, run, evt). You must use this "
     "module to tell basf2 about the number of events you want to generate, "
     "unless you have an input module that already does so. Note that all "
-    "experiment/run combinations specified must be unique"
+    "experiment/run combinations specified must be unique."
   );
 
   //Parameter definition
@@ -108,7 +108,7 @@ void EventInfoSetterModule::initialize()
     }
   }
 
-  m_evtNumber = 0;
+  m_evtNumber = 1;
   m_colIndex = 0; //adjusted in event() if mismatched
 
   //determine number of events we will process
@@ -133,7 +133,7 @@ bool EventInfoSetterModule::advanceEventCounter()
   //    clang:     -18% real time
   //    gcc (opt): -52% real time
   while (true) {
-    if (branch_unlikely(m_evtNumber >= static_cast<unsigned int>(m_evtNumList[m_colIndex]))) {
+    if (branch_unlikely(m_evtNumber > static_cast<unsigned int>(m_evtNumList[m_colIndex]))) {
 
       //Search for a column where the event number is greater than 0.
       do {
@@ -142,7 +142,7 @@ bool EventInfoSetterModule::advanceEventCounter()
                (m_evtNumList[m_colIndex] <= 0));
 
       if (m_colIndex < static_cast<int>(m_expList.size())) {
-        m_evtNumber = 0;
+        m_evtNumber = 1;
       } else { //no experiment/run with non-zero number of events found
         return false;
       }
@@ -152,11 +152,11 @@ bool EventInfoSetterModule::advanceEventCounter()
     if (branch_unlikely(!m_skipToEvent.empty())) {
       // if current experiment and run number is different to what we're looking for
       if (m_skipToEvent[0] != m_expList[m_colIndex] || m_skipToEvent[1] != m_runList[m_colIndex]) {
-        // then we set the m_evtNumber to the max
-        m_evtNumber = m_evtNumList[m_colIndex];
+        // then we set the m_evtNumber to the max+1
+        m_evtNumber = m_evtNumList[m_colIndex] + 1;
       } else {
         // otherwise we start at the event number we want to skip to
-        m_evtNumber = m_skipToEvent[2] - 1;
+        m_evtNumber = m_skipToEvent[2];
         // and reset the variable as skipping is done
         m_skipToEvent.clear();
       }
@@ -164,8 +164,8 @@ bool EventInfoSetterModule::advanceEventCounter()
     } else if (branch_unlikely(m_eventsToSkip != 0)) { //are we still skipping?
       unsigned int nskip = 1;
       const unsigned int eventsInList = m_evtNumList[m_colIndex];
-      if (m_evtNumber < eventsInList) //skip to end of current run?
-        nskip = eventsInList - m_evtNumber;
+      if (m_evtNumber <= eventsInList) //skip to end of current run?
+        nskip = eventsInList - m_evtNumber + 1;
       if (nskip > m_eventsToSkip)
         nskip = m_eventsToSkip;
 
@@ -187,7 +187,7 @@ void EventInfoSetterModule::event()
   m_eventMetaDataPtr->setProduction(m_production);
   m_eventMetaDataPtr->setExperiment(m_expList[m_colIndex]);
   m_eventMetaDataPtr->setRun(m_runList[m_colIndex]);
-  m_eventMetaDataPtr->setEvent(m_evtNumber + 1);
+  m_eventMetaDataPtr->setEvent(m_evtNumber);
   auto time = std::chrono::high_resolution_clock::now().time_since_epoch();
   m_eventMetaDataPtr->setTime(std::chrono::duration_cast<std::chrono::nanoseconds>(time).count());
 

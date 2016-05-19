@@ -551,6 +551,10 @@ float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTo
     TVector3 backWirePos = m_cdcgp->wireBackwardPosition(m_wireID, set);
 
     double propLength = (m_posWire - backWirePos).Mag();
+    if (m_cdcgp->getSenseWireZposMode() == 1) {
+      const unsigned short layer = m_wireID.getICLayer();
+      propLength += m_cdcgp->getBwdDeltaZ(layer);
+    }
     B2DEBUG(250, "Propagation in wire length: " << propLength);
 
     if (m_useSimpleDigitization) {

@@ -49,10 +49,16 @@ double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
   // Need to undo everything the digitization does in reverse order.
   // First: Undo propagation in wire, if it was used:
   if (m_useInWirePropagationDelay) {
-    //    m_backWirePos = m_cdcp.wireBackwardPosition(wireID);
+    //N.B. stereo-angle effect is ignored in the following corr.
     m_backWirePos = m_cdcp.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
     //subtract distance divided by speed of electric signal in the wire from the drift time.
-    driftTime -= (z - m_backWirePos.Z()) * m_cdcp.getPropSpeedInv(layer);
+    double zb = m_backWirePos.Z();
+    if (m_cdcp.getSenseWireZposMode() == 1) {
+      //      std::cout <<"layer,zb,dzb,zf,dzf= "<< layer <<" "<< zb <<" "<< m_cdcp.getBwdDeltaZ(layer) <<" "<< m_cdcp.wireForwardPosition(wireID, CDCGeometryPar::c_Aligned).Z() <<" "<< m_cdcp.getFwdDeltaZ(layer) << std::endl;
+      zb -= m_cdcp.getBwdDeltaZ(layer);
+    }
+    //    driftTime -= (z - m_backWirePos.Z()) * m_cdcp.getPropSpeedInv(layer);
+    driftTime -= (z - zb) * m_cdcp.getPropSpeedInv(layer);
   }
 
   // Second: correct for event time. If this wasn't simulated, m_eventTime can just be set to 0.

@@ -218,9 +218,14 @@ void CDCGeometryPar::read()
     B2FATAL("CDCGeometryPar: Materialdefinition mode you specify is invalid.");
   }
 
+  // Get mode for wire z-position
+  m_senseWireZposMode = gbxParams.getInt("SenseWireZposMode");
+  //Set z corrections (from input data)
+  B2INFO("CDCGeometryPar: sense wire z mode:" << m_senseWireZposMode);
+  if (m_senseWireZposMode == 1) readDeltaz(gbxParams);
+
   // Loop over all sense layers
   for (int iSLayer = 0; iSLayer < nSLayer; ++iSLayer) {
-
 
     int layerId = atoi((gbxParams.getString((format("SLayers/SLayer[%1%]/@id") % (iSLayer + 1)).str())).c_str());
 
@@ -231,6 +236,22 @@ void CDCGeometryPar::read()
     m_nShifts[layerId] = atoi((gbxParams.getString((format("SLayers/SLayer[%1%]/NShift") % (iSLayer + 1)).str())).c_str());
     m_offSet[layerId] = atof((gbxParams.getString((format("SLayers/SLayer[%1%]/Offset") % (iSLayer + 1)).str())).c_str());
     m_cellSize[layerId] = 2 * M_PI * m_rSLayer[layerId] / (double) m_nWires[layerId];
+    m_dzSBackwardLayer[layerId] = gbxParams.getLength((format("SLayers/SLayer[%1%]/BwdDeltaZ") % (iSLayer + 1)).str());
+    m_dzSForwardLayer[layerId] = gbxParams.getLength((format("SLayers/SLayer[%1%]/FwdDeltaZ") % (iSLayer + 1)).str());
+
+    //correction to z-position
+    if (m_senseWireZposMode == 0) {
+    } else if (m_senseWireZposMode == 1) {
+      //      B2INFO("bwddz,fwddz=" << m_bwdDz[layerId] <<" "<< m_fwdDz[layerId]);
+      //      B2INFO("bwd z,dz=" << m_zSBackwardLayer[layerId] <<" "<< m_dzSBackwardLayer[layerId]);
+      //      B2INFO("fwd z,dz=" << m_zSForwardLayer[layerId] <<" "<< m_dzSForwardLayer[layerId]);
+      m_zSBackwardLayer[layerId] += m_bwdDz[layerId];
+      m_zSForwardLayer [layerId] += m_fwdDz[layerId];
+      m_zSBackwardLayer[layerId] += m_dzSBackwardLayer[layerId];
+      m_zSForwardLayer [layerId] -= m_dzSForwardLayer [layerId];
+    } else {
+      B2FATAL("CDCGeometryPar: invalid wire z definition mode specified");
+    }
   }
 
   // Get field layers parameters
@@ -785,6 +806,38 @@ void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
   }
 
   if (nRead != MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readPropSpeed: #lines read-in (=" << nRead <<
+                                        ") is inconsistent with total #layers (=" << MAX_N_SLAYERS << ") !");
+
+  ifs.close();
+}
+
+// Read deltaz params.
+void CDCGeometryPar::readDeltaz(const GearDir gbxParams)
+{
+  std::string fileName0 = gbxParams.getString("deltazFileName");
+  fileName0 = "/cdc/data/" + fileName0;
+  std::string fileName = FileSystem::findFile(fileName0);
+
+  ifstream ifs;
+
+  if (fileName == "") {
+    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
+  } else {
+    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    ifs.open(fileName.c_str());
+    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
+  }
+
+  int iL;
+  unsigned nRead = 0;
+
+  while (ifs >> iL) {
+    ifs >> m_bwdDz[iL] >> m_fwdDz[iL];
+    ++nRead;
+    if (m_debug) cout << iL << " " << m_bwdDz[iL] << " " << m_fwdDz[iL] << endl;
+  }
+
+  if (nRead != MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readDeltaz: #lines read-in (=" << nRead <<
                                         ") is inconsistent with total #layers (=" << MAX_N_SLAYERS << ") !");
 
   ifs.close();

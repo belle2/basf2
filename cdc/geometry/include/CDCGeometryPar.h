@@ -76,6 +76,11 @@ namespace Belle2 {
       //! Gets geometry parameters from gearbox.
       void read();
 
+      /**
+       * Read z-corrections.
+       * @param GearDir Gear Dir.
+       */
+      void readDeltaz(const GearDir);
 
       /**
        * Read (mis)alignment params.
@@ -581,6 +586,39 @@ namespace Belle2 {
       }
 
       /**
+       * Return mode for sense wire z position.
+       * Return value =0: define at the end-plate (gas side) with
+       * old design;
+       * =1: define at the bush inside the feedthrough with correction for
+       * the diff. betw. final- and old-design.
+       *
+       */
+      inline int getSenseWireZposMode() const
+      {
+        return m_senseWireZposMode;
+      }
+
+      /**
+       * Return backward 'deltaZ'
+       * @param[in] layerID (0-55)
+       *
+       */
+      inline double getBwdDeltaZ(unsigned short layerID) const
+      {
+        return m_dzSBackwardLayer[layerID];
+      }
+
+      /**
+       * Return forward 'deltaZ'
+       * @param[in] layerID (0-55)
+       *
+       */
+      inline double getFwdDeltaZ(unsigned short layerID) const
+      {
+        return m_dzSForwardLayer[layerID];
+      }
+
+      /**
        * Set the nominal spacial resolution in the unit of um.
        * @param[in] resol spacial resolution (um)
        *
@@ -814,6 +852,7 @@ namespace Belle2 {
       bool m_XTetc4Recon;    /*!< Switch for selecting xt etc. */
       std::string m_version; /*!< The version of geometry parameters. */
       int m_materialDefinitionMode; /*!< Control switch for gas and wire material definition. */
+      int m_senseWireZposMode; /*!< Mode for sense wire z position corr. */
       signed short m_shiftInSuperLayer[nSuperLayers][8]; /*!< shift in phi-direction wrt the 1st layer in each super layer*/
       int m_nSLayer;         /*!< The number of sense wire layer. */
       int m_nFLayer;         /*!< The number of field wire layer. */
@@ -822,7 +861,9 @@ namespace Belle2 {
 
       double m_rSLayer[MAX_N_SLAYERS];          /*!< The array to store radius of sense wire layers. */
       double m_zSForwardLayer[MAX_N_SLAYERS];   /*!< The array to store forward z position of sense wire layers. */
+      double m_dzSForwardLayer[MAX_N_SLAYERS];   /*!< Corrections for forward z position of sense wire layers. */
       double m_zSBackwardLayer[MAX_N_SLAYERS];  /*!< The array to store backward z position of sense wire layers. */
+      double m_dzSBackwardLayer[MAX_N_SLAYERS]; /*!< Corrections for backward z position of sense wire layers. */
       double m_rFLayer[MAX_N_FLAYERS];          /*!< The array to store radius of field wire layers. */
       double m_zFForwardLayer[MAX_N_FLAYERS];   /*!< The array to store forward z position of field wire layers. */
       double m_zFBackwardLayer[MAX_N_FLAYERS];  /*!< The array to store backward z position of field wire layers. */
@@ -844,6 +885,9 @@ namespace Belle2 {
 
       double m_momZ[7];      /*!< Z-cordinates of the cdc mother volume (7 segments). */
       double m_momRmin[7];   /*!< R_min of the cdc mother volume  (7 segments).       */
+
+      double m_bwdDz[MAX_N_SLAYERS];  /*!< Tentative backward z-corrections.*/
+      double m_fwdDz[MAX_N_SLAYERS];  /*!< Tentative forward  z-corrections.*/
 
       float m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the forward endplate for each cell; to be implemented in a smarter way. */
       float m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the backward endplate for each cell; ibid. */

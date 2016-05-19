@@ -1,4 +1,7 @@
-from funcsigs import signature
+try:
+    from funcsigs import signature
+except ImportError:
+    from inspect import signature
 import itertools
 
 from hep_ipython_tools import calculation_queue

@@ -7,6 +7,7 @@ using namespace Belle2;
 // default constructor
 // needs to be here to put this class into the object store
 // also needs to be here so all members can be explicitly initialized, otherwise Cppcheck complains
+// Values for initialization since m_cross_A1 are arbitrary
 TOPCAFDigitCalib::TOPCAFDigitCalib()
   : Packet()
   , m_channel_id(-1)
@@ -34,7 +35,7 @@ TOPCAFDigitCalib::TOPCAFDigitCalib()
   , m_corr_time(0)
   , m_boardstack(-1)
   , m_flag(0)
-  , m_q(0)  // initialized values are arbitary
+  , m_q(0)
   , m_cross_A1(0)
   , m_cross_A2(0)
   , m_cross_T1(0)

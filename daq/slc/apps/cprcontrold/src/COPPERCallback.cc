@@ -379,10 +379,10 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
         }
       }
       std::string cmd = StringUtil::form("regrx 130 %d", flag);
-      system(cmd.c_str());
-      LogFile::info(cmd);
-      sleep(1);
-      system("regrx 130");
+      //system(cmd.c_str());
+      //LogFile::info(cmd);
+      //sleep(1);
+      //system("regrx 130");
       for (int i = 0; i < 4; i++) {
         if (!m_fee[i]) continue;
         const DBObject& o_hslb(obj("hslb", i));

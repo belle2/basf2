@@ -82,7 +82,8 @@ feename(int hwtype, int fwtype)
     if (i == 32) {
       i = ringi;
       ringval[i] = 0x100 + (hwtype<<4) + fwtype;
-      sprintf(ringbuf[i], "%s firmware %d", feetype[hwtype], fwtype);
+      //sprintf(ringbuf[i], "%s firmware %d", feetype[hwtype], fwtype);
+      sprintf(ringbuf[i], "%s", feetype[hwtype]);
       ringi = (ringi + 1) % 32;
     }
     return ringbuf[i];
@@ -227,15 +228,11 @@ readfee8(int fd, int adr)
     int val = 0;
     int ret;
     if ((ret = ioctl(fd, HSLBFEE8_GET(adr), &val)) < 0) {
-      if (PROGRAM) {
-        sprintf(errmsg, "%s: cannot read %s: %s\n",
-                PROGRAM, DEVICE, strerror(errno));
-        exit(1);
-      }
+      sprintf(errmsg, "cannot read %s: %s\n",
+	      DEVICE, strerror(errno));
       return -1;
     }
     return val;
-
   } else {
     writefn(fd, HSREG_CSR, 0x05); /* reset read fifo */
     writefn(fd, adr, 0);          /* dummy value write to pass address */
@@ -253,13 +250,9 @@ writefee8(int fd, int adr, int val)
   if (devtype == FIN_HSLB) {
     if (adr <= 0 || adr > 0x7f) return -1;
     if (ioctl(fd, HSLBFEE8_SET(adr), val) < 0) {
-      if (PROGRAM) {
-        sprintf(errmsg, "%s: cannot write %s: %s\n",
-                PROGRAM, DEVICE, strerror(errno));
-        exit(1);
-      } else {
-        return -1;
-      }
+      sprintf(errmsg, "cannot write %s: %s\n",
+	      DEVICE, strerror(errno));
+      return -1;
     }
     return 0;
     
@@ -282,13 +275,9 @@ readfee32(int fd, int adr, int *valp)
   if (devtype == FIN_HSLB) {
     int val = adr;
     if ((ret = ioctl(fd, HSLBFEE32_GET(0), &val)) < 0) {
-      if (PROGRAM) {
-        sprintf(errmsg, "%s: cannot read %s: %s\n",
-                PROGRAM, DEVICE, strerror(errno));
-        exit(1);
-      } else {
-        return -1;
-      }
+      sprintf(errmsg, "%s: cannot read %s: %s\n",
+	      DEVICE, strerror(errno));
+      return -1;
     }
     *valp = val;
 

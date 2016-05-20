@@ -53,20 +53,6 @@ namespace Belle2 {
     TTDACallback& m_callback;
   };
 
-  class NSMVHandlerTriggerType : public NSMVHandlerText {
-  public:
-    NSMVHandlerTriggerType(TTDACallback& callback,
-                           const std::string& name, const std::string& type)
-      : NSMVHandlerText(name, true, true, type), m_callback(callback) {}
-    virtual ~NSMVHandlerTriggerType() throw() {}
-    bool handleSetText(const std::string& val)
-    {
-      return m_callback.setTriggerType(val);
-    }
-  private:
-    TTDACallback& m_callback;
-  };
-
   class NSMVHandlerStatFT : public NSMVHandlerText {
   public:
     NSMVHandlerStatFT(TTDACallback& callback, const std::string& name)
@@ -81,17 +67,27 @@ namespace Belle2 {
     TTDACallback& m_callback;
   };
 
+  class NSMVHandlerResetFT : public NSMVHandlerText {
+  public:
+    NSMVHandlerResetFT(TTDACallback& callback, const std::string& name)
+      : NSMVHandlerText(name, false, true), m_callback(callback) {}
+    virtual ~NSMVHandlerResetFT() throw() {}
+    bool handleSetText(const std::string& val)
+    {
+      if (val == "on")
+        m_callback.resetft();
+      return true;
+    }
+  private:
+    TTDACallback& m_callback;
+  };
+
 }
 
 using namespace Belle2;
 
-TTDACallback::TTDACallback(const RCNode& ttd)
-  : RCCallback(4), m_ttdnode(ttd)
+TTDACallback::TTDACallback() : RCCallback(4)
 {
-  if (m_ttdnode.getName().size() > 0) {
-    setAutoReply(false);
-    m_ttdnode.setState(Enum::UNKNOWN);
-  }
   m_trgcommands.insert(std::map<std::string, int>::value_type("none", 0));
   m_trgcommands.insert(std::map<std::string, int>::value_type("aux", 1));
   m_trgcommands.insert(std::map<std::string, int>::value_type("i", 2));
@@ -103,38 +99,24 @@ TTDACallback::TTDACallback(const RCNode& ttd)
   m_trgcommands.insert(std::map<std::string, int>::value_type("once", 8));
   m_trgcommands.insert(std::map<std::string, int>::value_type("stop", 9));
   memset(&g_ftstat, 0, sizeof(ftstat_t));
-  m_dummy_rate = -1;
-  m_trigger_limit = -1;
-}
-
-void TTDACallback::setFTSWID(int id)
-{
-  m_ftswid = id;
-}
-
-bool TTDACallback::setTriggerType(const std::string& type) throw()
-{
-  if (m_trgcommands.find(type) != m_trgcommands.end()) {
-    m_trigger_type = type;
-    return true;
-  }
-  return false;
 }
 
 void TTDACallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
   configure(obj);
-  openData("TTDFAST", "pocket_ttd_fast", pocket_ttd_fast_revision);
-  openData("TTDSLOW", "pocket_ttd", pocket_ttd_revision);
+  openData(m_ttdnode.getName() + "FAST", "pocket_ttd_fast", pocket_ttd_fast_revision);
+  openData(m_ttdnode.getName() + "SLOW", "pocket_ttd", pocket_ttd_revision);
 }
 
 void TTDACallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
-  add(new NSMVHandlerInt("ftsw", true, false, m_ftswid));
-  add(new NSMVHandlerTrigft(*this, "trigft"));
-  add(new NSMVHandlerTriggerType(*this, "trigger_type", m_trigger_type));
-  add(new NSMVHandlerInt("trigger_limit", true, true, m_trigger_limit));
-  add(new NSMVHandlerInt("dummy_rate", true, true, m_dummy_rate));
+  if (obj.hasText("ttd")) {
+    std::string ttd = obj.getText("ttd");
+    m_ttdnode = RCNode(ttd);
+    setAutoReply(false);
+  } else {
+    setAutoReply(true);
+  }
   add(new NSMVHandlerInt("expno", true, false, 0));
   add(new NSMVHandlerInt("runno", true, false, 0));
   add(new NSMVHandlerInt("subno", true, false, 0));
@@ -157,6 +139,7 @@ void TTDACallback::configure(const DBObject& obj) throw(RCHandlerException)
   add(new NSMVHandlerInt("trun", true, false, 0));
   add(new NSMVHandlerText("ftstate", true, false, "UNKNOWN"));
   add(new NSMVHandlerStatFT(*this, "statft"));
+  add(new NSMVHandlerResetFT(*this, "resetft"));
 }
 
 void TTDACallback::monitor() throw(RCHandlerException)
@@ -176,8 +159,8 @@ void TTDACallback::monitor() throw(RCHandlerException)
     } catch (const NSMHandlerException& e) {
       LogFile::error(e.what());
     }
-    NSMData& data_fast(getData("TTDFAST"));
-    NSMData& data_slow(getData("TTDSLOW"));
+    NSMData& data_fast(getData(m_ttdnode.getName() + "FAST"));
+    NSMData& data_slow(getData(m_ttdnode.getName() + "SLOW"));
     try {
       if (data_fast.isAvailable() && data_slow.isAvailable()) {
         fast_t* f = (fast_t*)data_fast.get();
@@ -224,67 +207,80 @@ void TTDACallback::monitor() throw(RCHandlerException)
 
 void TTDACallback::load(const DBObject&) throw(RCHandlerException)
 {
+  resetft();
   trigft();
+  send(NSMMessage(m_ttdnode, NSMCommand(13, "LOAD")));
+  setState(RCState::READY_S);
 }
 
 void TTDACallback::start(int expno, int runno) throw(RCHandlerException)
 {
-  int dummy_rate = 0, trigger_limit = 0;
-  get("trigger_type", m_trigger_type);
-  get("dummy_rate", dummy_rate);
-  get("trigger_limit", trigger_limit);
+  DBObject& obj(getDBObject());
+  get(obj);
+  int ftswid = obj.getInt("ftsw");
+  int dummy_rate = obj.getInt("dummy_rate");
+  int trigger_limit = obj.getInt("trigger_limit");
+  std::string trigger_type = obj.getText("trigger_type");
   if (m_ttdnode.getName().size() > 0) {
     int pars[3];
-    pars[0] = m_trgcommands[m_trigger_type];
-    pars[1] = dummy_rate;
+    pars[0] = m_trgcommands[trigger_type];
+    pars[1] = dummy_rate * 1000;
     pars[2] = trigger_limit;
     send(NSMMessage(m_ttdnode, NSMCommand(11, "TRIGFT"), 3, pars));
     pars[0] = expno;
     pars[1] = runno;
     send(NSMMessage(m_ttdnode, NSMCommand(12, "START"), 2, pars));
   } else {
-    std::string cmd = StringUtil::form("regft -%d 160 0x%x", m_ftswid, (expno << 22) + ((runno - 1) << 8));
+    std::string cmd = StringUtil::form("regft -%d 160 0x%x", ftswid, (expno << 22) + ((runno - 1) << 8));
     LogFile::debug(cmd);
     system(cmd.c_str());
     sleep(1);
     trigft();
-    cmd = StringUtil::form("trigft -%d %s %d %d", m_ftswid,
-                           m_trigger_type.c_str(), dummy_rate, trigger_limit);
+    cmd = StringUtil::form("trigft -%d %s %d %d", ftswid,
+                           trigger_type.c_str(), dummy_rate, trigger_limit);
     LogFile::debug(cmd);
     system(cmd.c_str());
   }
   monitor();
-  DBObject& obj(getDBObject());
-  obj.addInt("ftsw", m_ftswid);
-  obj.addText("trigger_type", m_trigger_type);
-  obj.addInt("dummy_rate", dummy_rate);
-  obj.addInt("trigger_limit", trigger_limit);
+  obj.addInt("expno", (int)g_ftstat.exp);
+  obj.addInt("runno", (int)g_ftstat.run);
+  obj.addInt("subno", (int)g_ftstat.sub);
+  obj.addInt("tincnt", g_ftstat.tincnt);
+  obj.addInt("toutcnt", g_ftstat.toutcnt);
+  obj.addInt("tlimit", (int)g_ftstat.tlimit);
+  obj.addInt("tlast", (int)g_ftstat.tlast);
+  obj.addText("err", std::string(g_ftstat.err));
+  obj.addText("errport", std::string(g_ftstat.errport));
+  obj.addInt("tstart", (int)g_ftstat.tstart);
   obj.addText("tstart_s", Date(g_ftstat.tstart).toString());
-  obj.addInt("tstart", g_ftstat.tstart);
-  obj.addInt("trun", g_ftstat.trun);
+  obj.addInt("trun", (int)g_ftstat.trun);
+  obj.addText("ftstate", g_ftstat.state);
 }
 
 void TTDACallback::stop() throw(RCHandlerException)
 {
+  DBObject& obj(getDBObject());
+  int ftswid = obj.getInt("ftsw");
   if (m_ttdnode.getName().size() > 0) {
     send(NSMMessage(m_ttdnode, NSMCommand(13, "STOP")));
   } else {
-    std::string cmd = StringUtil::form("trigft -%d reset", m_ftswid);
+    std::string cmd = StringUtil::form("trigft -%d reset", ftswid);
     LogFile::debug(cmd);
     system(cmd.c_str());
   }
-  int dummy_rate = 0, trigger_limit = 0;
-  get("trigger_type", m_trigger_type);
-  get("dummy_rate", dummy_rate);
-  get("trigger_limit", trigger_limit);
-  DBObject& obj(getDBObject());
-  obj.addInt("ftsw", m_ftswid);
-  obj.addText("trigger_type", m_trigger_type);
-  obj.addInt("dummy_rate", dummy_rate);
-  obj.addInt("trigger_limit", trigger_limit);
+  obj.addInt("expno", (int)g_ftstat.exp);
+  obj.addInt("runno", (int)g_ftstat.run);
+  obj.addInt("subno", (int)g_ftstat.sub);
+  obj.addInt("tincnt", g_ftstat.tincnt);
+  obj.addInt("toutcnt", g_ftstat.toutcnt);
+  obj.addInt("tlimit", (int)g_ftstat.tlimit);
+  obj.addInt("tlast", (int)g_ftstat.tlast);
+  obj.addText("err", std::string(g_ftstat.err));
+  obj.addText("errport", std::string(g_ftstat.errport));
+  obj.addInt("tstart", (int)g_ftstat.tstart);
   obj.addText("tstart_s", Date(g_ftstat.tstart).toString());
-  obj.addInt("tstart", g_ftstat.tstart);
-  obj.addInt("trun", g_ftstat.trun);
+  obj.addInt("trun", (int)g_ftstat.trun);
+  obj.addText("ftstate", g_ftstat.state);
 }
 
 bool TTDACallback::pause() throw(RCHandlerException)
@@ -313,20 +309,27 @@ void TTDACallback::recover(const DBObject&) throw(RCHandlerException)
 void TTDACallback::abort() throw(RCHandlerException)
 {
   stop();
+  setState(RCState::NOTREADY_S);
 }
 
 void TTDACallback::trigft() throw(RCHandlerException)
 {
   try {
+    DBObject& obj(getDBObject());
+    get(obj);
+    int ftswid = obj.getInt("ftsw");
+    int dummy_rate = obj.getInt("dummy_rate");
+    int trigger_limit = obj.getInt("trigger_limit");
+    std::string trigger_type = obj.getText("trigger_type");
     int pars[3];
-    get("trigger_type", m_trigger_type);
-    pars[0] = m_trgcommands[m_trigger_type];
-    get("dummy_rate", pars[1]);
-    get("trigger_limit", pars[2]);
+    pars[0] = m_trgcommands[trigger_type];
+    pars[1] *= 1000;
+    pars[2] = trigger_limit;
+    pars[3] = dummy_rate;
     if (m_ttdnode.getName().size() > 0) {
       send(NSMMessage(m_ttdnode, NSMCommand(11, "TRIGFT"), 3, pars));
     } else {
-      std::string cmd = StringUtil::form("trigft -%d reset", m_ftswid);
+      std::string cmd = StringUtil::form("trigft -%d reset", ftswid);
       LogFile::debug(cmd);
       system(cmd.c_str());
       sleep(1);
@@ -379,5 +382,20 @@ void TTDACallback::error(const char* nodename, const char* data) throw()
     try {
       //setState(RCState::NOTREADY_S);
     } catch (const std::out_of_range& e) {}
+  }
+}
+
+void TTDACallback::resetft() throw()
+{
+  if (m_ttdnode.getName().size() > 0) {
+    LogFile::info("resetft");
+    send(NSMMessage(m_ttdnode, NSMCommand(17, "RESETFT")));
+  } else {
+    DBObject& obj(getDBObject());
+    get(obj);
+    int ftswid = obj.getInt("ftsw");
+    std::string cmd = StringUtil::form("resetft -%d", ftswid);
+    LogFile::info(cmd);
+    system(cmd.c_str());
   }
 }

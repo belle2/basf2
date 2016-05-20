@@ -5,6 +5,7 @@
   20150702 omask address fix
   20160106 jsta copied from ft2p026
   20160328 for pocket_ttd desy beamtest version
+  20160403 errsrc added, use f->error to change color
  */
 
 #include <stdio.h>
@@ -73,7 +74,7 @@ summary2u067(struct timeval *tvp, fast_t *f, slow_t *s)
   sprintf(ss, "16  exprun=%08x exp %d run %d sub %d\n", s->exprun,
     D(s->exprun,31,22), D(s->exprun,21,8), D(s->exprun,7,0));
   strcat(g_ftstat.statft, ss);
-
+  
   sprintf(ss, "17   omask=%08x s3q=%d selx/o=%d/%d x/o=%x/%02x xor=%02x\n", s->omask,
     B(s->omask,31), D(s->omask,30,28), D(s->omask,11,8),
     D(s->omask,15,12), D(s->omask,7,0), D(s->omask, 23, 16));
@@ -102,6 +103,14 @@ summary2u067(struct timeval *tvp, fast_t *f, slow_t *s)
      B(s->reset,21) ? " PAUSED" : "",
      B(s->reset,20) ? " RUNNING" : "",
      ! B(s->reset,20) || f->tlast ? "" : "(LIMIT)");
+  strcat(g_ftstat.statft, ss);
+
+  /* -- 25/9e -- */
+  sprintf(ss, "25/9e esrc=%08x port(%03x) bit(%04x) err(%x) busy(%02x) cnt(%d/%d)\n",
+    f->errsrc,
+    D(f->errport,11,0), D(f->errport,31,16),
+    D(f->errsrc,3,0), D(f->errsrc,9,4),
+    D(f->errsrc,23,20), D(f->errsrc,19,16));
   strcat(g_ftstat.statft, ss);
 
   sprintf(ss, "28  seltrg=%08x %s\n", s->seltrg, dumtrgstr(s->seltrg));
@@ -159,8 +168,8 @@ summary2u067(struct timeval *tvp, fast_t *f, slow_t *s)
   strcat(g_ftstat.statft, ss);
   if (B(f->linkerr,15)) {
     sprintf(ss, " LINK-ERROR=%x/%02x",
-      D(f->linkerr,11,8) ^ D(f->linkup,11,8),
-      D(f->linkerr,7,0)  ^ D(f->linkup,7,0));
+	    D(f->linkerr,11,8) ^ D(f->linkup,11,8),
+	    D(f->linkerr,7,0)  ^ D(f->linkup,7,0));
     strcat(g_ftstat.statft, ss);
   }
   sprintf(ss, "\n");
@@ -259,7 +268,6 @@ summary2u067(struct timeval *tvp, fast_t *f, slow_t *s)
     D(f->fdead,31,16) + (double)D(f->fdead,15,0)/(clkfreq>>11),
     D(f->rdead,31,16) + (double)D(f->rdead,15,0)/(clkfreq>>11));
   strcat(g_ftstat.statft, ss);
-
   g_ftstat.exp = D(s->exprun,31,22);
   g_ftstat.run = D(s->exprun,21,8);
   g_ftstat.sub = D(s->exprun,7,0);
@@ -376,8 +384,8 @@ verbose2u067(struct timeval *tvp, fast_t *f, slow_t *s)
   P("20   reset=%08x%s%s", s->reset,
     B(s->reset,31) ? " no-FIFO" : "",
     B(s->reset,30) ? " auto-reset" : "");
-  if (B(s->reset,24)) P(" use-TLU(delay=%d)", D(s->reset,26,25));
-  P("%s%s%s%s%s%s\n",
+  if (B(s->reset,24)) PP(" use-TLU(delay=%d)", D(s->reset,26,25));
+  PP("%s%s%s%s%s%s\n",
      B(s->reset,16) ? " regbusy" : "",
      B(s->reset,2)  ? " BOR" : "",
      B(s->reset,23) ? " EB" : "",
@@ -401,7 +409,7 @@ verbose2u067(struct timeval *tvp, fast_t *f, slow_t *s)
   P("24 errctim=%08x +%8.6fs\n", s->errctim,
     (double)D(s->errctim,26,0) / clkfreq);
 
-  P("25  errsrc=%08x cntlinkup=%d errport=%x\n", f->errsrc,
+  P("25  errsrc=%08x bit=%04x errport=%03x\n", f->errsrc,
     D(f->errsrc,31,16), D(f->errsrc,11,0));
 
   /* -- 28..2f -- */
@@ -473,11 +481,11 @@ verbose2u067(struct timeval *tvp, fast_t *f, slow_t *s)
   P("3b linkerr=%08x b2lup(%02x) pllup(%02x)",
     f->linkerr, D(f->linkerr,31,24), D(f->linkerr,23,16));
   if (B(f->error,15)) {
-    P(" LINK-ERROR=%x/%02x",
+    PP(" LINK-ERROR=%x/%02x",
       D(f->linkerr,11,8) ^ D(f->linkup,11,8),
       D(f->linkerr,7,0)  ^ D(f->linkup,7,0));
   }
-  P("\n");
+  PP("\n");
 
   /* -- 3c..4f -- */
 
@@ -489,7 +497,7 @@ verbose2u067(struct timeval *tvp, fast_t *f, slow_t *s)
       D(f->odatc[i],15,12),
       D(f->odatc[i],11,0));
     if (B(f->linkup,i)) {
-      P("%s%s%s%s%s%s%s tag=%d cnt=%d\n",
+      PP("%s%s%s%s%s%s%s tag=%d cnt=%d\n",
 	B(f->odata[i],11) ? " busy" : "",
 	B(f->odata[i],10) ? " ERROR" : "",
 	B(f->odata[i],9)  ? " err1" : "",
@@ -500,7 +508,7 @@ verbose2u067(struct timeval *tvp, fast_t *f, slow_t *s)
 	D(f->odatb[i],31,16), /* tag */
 	D(f->odatb[i],15,0)); /* cntb2l */
     } else {
-      P(" no-linkup\n");
+      PP(" no-linkup\n");
     }
   }
   
@@ -513,7 +521,7 @@ verbose2u067(struct timeval *tvp, fast_t *f, slow_t *s)
       D(f->xdatb[i],15,8),
       D(f->xdatb[i],7,0));
     if (B(f->linkup,i+8)) {
-      P(" en=%s%s%s%s%s empty=%s%s%s%s%s",
+      PP(" en=%s%s%s%s%s empty=%s%s%s%s%s",
         Bs(f->xdata[i],28,"A"),
         Bs(f->xdata[i],29,"B"),
         Bs(f->xdata[i],30,"C"),
@@ -536,10 +544,10 @@ verbose2u067(struct timeval *tvp, fast_t *f, slow_t *s)
         Bs(f->xdata[i],25,"B"),
         Bs(f->xdata[i],26,"C"),
         Bs(f->xdata[i],27,"D"));
-      P(" d=%5.3fs\n",
+      PP(" d=%5.3fs\n",
 	 D(f->xdead[i],31,16) + (double)D(f->xdead[i],15,0)/(clkfreq>>11));
     } else {
-      P(" no-linkup\n");
+      PP(" no-linkup\n");
     }
   }
 
@@ -585,10 +593,17 @@ verbose2u067(struct timeval *tvp, fast_t *f, slow_t *s)
     P("%02x  xdead%d=%08x (O%d)       %5.3fs\n", 0x68+i, i, f->xdead[i],
       i, D(f->xdead[i],31,16) + (double)D(f->xdead[i],15,0)/(clkfreq>>11));
   }
+
+  /* -- 9e -- */
+  P("9e  errsrc=%08x err(%x) busy(%02x) cnt(%d/%d)\n",
+    f->errsrc,
+    D(f->errsrc,3,0), D(f->errsrc,9,4),
+    D(f->errsrc,23,20), D(f->errsrc,19,16));
 }
 /* ---------------------------------------------------------------------- *\
    color2u067
 \* ---------------------------------------------------------------------- */
+#ifndef POCKET_TTD
 void
 color2u067(fast_t *f, slow_t *s)
 {
@@ -628,80 +643,39 @@ color2u067(fast_t *f, slow_t *s)
   sprintf(terr, "%04d.%02d.%02d %02d:%02d:%02d",
 	  tp->tm_year+1900, tp->tm_mon+1, tp->tm_mday,
 	  tp->tm_hour, tp->tm_min, tp->tm_sec);
-  char ss[200];
   if (first) {
-    P("starting statft..."); /* white */
-    strcat(g_ftstat.statft, ss);
     sprintf(g_ftstat.state, "STARTING");
   } else if (! B(f->stafifo, 0) && B(s->reset, 21)) { /* paused */
-    P("PAUSED"); /* green */
-    strcat(g_ftstat.statft, ss);
     sprintf(g_ftstat.state, "PAUSED");
   } else if (B(s->reset, 20) && f->tlast == 0) { /* limit */
-    P("at trigger number limit"); /* green */
-    strcat(g_ftstat.statft, ss);
     sprintf(g_ftstat.state, "PAUSED");
-  } else if (f->errport || D(f->errsrc,4,0)) { /* ERROR */
-    if (tstart == s->rstutim) {
-      sprintf(buf, "ERROR (%s -- %s for %ds)", trst, terr, (int)(t1 - t0));
-    } else {
-      sprintf(buf, "ERROR (at %s while not runnning)", terr);
-    }
-    P(buf); /* magenta */
-    strcat(g_ftstat.statft, ss);
+  } else if (D(f->error,15,12)) { /* ERROR */
     sprintf(g_ftstat.state, "ERROR");
   } else if (! B(f->stafifo, 0)) { /* trgstop */
-    if (t1) {
-      sprintf(buf, "READY (%s -- %s for %ds)", trst, terr, (int)(t1 - t0));
-    } else if (t0) {
-      sprintf(buf, "READY (reset at %s)", trst);
-    } else {
-      sprintf(buf, "READY");
-    }
-    P(buf); /* yellow */
-    strcat(g_ftstat.statft, ss);
     sprintf(g_ftstat.state, "READY");
   } else if ((s->seltrg & 7) == 0) { /* none trigger */
-    P("READY (trigger is disabled)"); /* yellow */
-    strcat(g_ftstat.statft, ss);
+    sprintf(g_ftstat.state, "READY");
   } else if (f->toutcnt == toutcnt_sav && B(f->stat, 29)) { /* busy */
-    P("BUSY");
-    strcat(g_ftstat.statft, ss);
     sprintf(g_ftstat.state, "BUSY");
   } else if (f->toutcnt == toutcnt_sav &&
 	     B(s->reset,23) && B(s->reset,16)) { /* EB */
-    P("BUSY from EB");
-    strcat(g_ftstat.statft, ss);
     sprintf(g_ftstat.state, "BUSY");
   } else if (f->toutcnt == toutcnt_sav &&
 	     ! B(s->reset,23) && B(s->reset,16)) { /* EB */
-    P("EB0 is gone");
-    strcat(g_ftstat.statft, ss);
-    sprintf(g_ftstat.state, "BUSY");
+    sprintf(g_ftstat.state, "ERROR");
   } else if (f->tincnt == tincnt_sav) { /* no input */
-    P("no in-coming trigger"); /* green */
-    strcat(g_ftstat.statft, ss);
-    sprintf(g_ftstat.state, "BUSY");
+    sprintf(g_ftstat.state, "no-trigger");
   } else if (f->toutcnt == toutcnt_sav) { /* not-updated */
-    P("BUSY? tout is not updated");
-    strcat(g_ftstat.statft, ss);
     sprintf(g_ftstat.state, "BUSY");
   } else {
     if (tstart != s->rstutim) tstart = s->rstutim;
-    if (interval == 0) {
-      sprintf(buf, "RUNNING (unknown freq %f since %s for %ds)", unk, trst, dt);
-    } else {
-      sprintf(buf, "RUNNING (about %3.1fHz since %s for %ds)",
-              (double)(f->toutcnt - toutcnt_sav) / interval, trst, dt);
-    }
-    P(buf);
-    strcat(g_ftstat.statft, ss);
     sprintf(g_ftstat.state, "RUNNING");
   }
   toutcnt_sav = f->toutcnt;
   tincnt_sav = f->tincnt;
   first = 0;
 }
+#endif
 #if !defined(STATFT_NSM)
 /* --------------------------------------------------------------------- *\
    regs2u067
@@ -843,7 +817,7 @@ stat2u067(ftsw_t *ftsw, int ftswid)
   struct timeval tv;
   int fpgaver = read_ftsw(ftsw, FTSWREG_FPGAVER) & 0x3ff;
   ft2u_t u;
-
+  
   if (fpgaver < 40) {
     P("ft2u%03d is programmed, better to upgrade to ft2u067 or above.\n",
       fpgaver);

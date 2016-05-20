@@ -154,7 +154,7 @@ int LogFile::put_impl(const std::string& msg, Priority priority, va_list ap)
     ConfigFile config("slowcontrol");
     rename(g_filepath.c_str(),
            (config.get("log.dir") + "/" + g_filename + "/" +
-            g_date.toString("%Y.%m.%d.%H.%M.log")).c_str());
+            g_date.toString("%Y.%m.%d.%H.%M.%s.log")).c_str());
     g_mutex.unlock();
     open();
     g_mutex.lock();

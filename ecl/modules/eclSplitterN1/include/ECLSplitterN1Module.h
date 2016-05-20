@@ -160,8 +160,10 @@ namespace Belle2 {
       { return "ECLEventInformation" ; }
 
       /** Utility unpacker of the shower id that contains CR, seed and hypothesis */
-      const int c_Hypothesis = 5; //all photon
       ECLShowerId m_SUtility;
+
+      /** All photon hypothesis identifier -> should be moved to an enum */
+      const int c_Hypothesis = 5;
 
       /** Geometry */
       ECLGeometryPar* m_geom;

@@ -475,12 +475,14 @@ void QualityCheckModule::endRun()
 {
   StoreObjPtr<EventMetaData> storeEventMetaData;
   //long unsigned runNo = storeEventMetaData->getRun();
-  m_nEventsProcessFraction = (float)m_nRealEventsProcess / m_nNoTrigEvents;
+  //m_nEventsProcessFraction = (float)m_nRealEventsProcess / m_nNoTrigEvents;
+  m_nEventsProcessFraction = m_CorrelationPXDSVD_Z->GetKurtosis(); // direction not affected by magnetic field
+  //double m_nEventsProcessFractionY = m_CorrelationPXDSVD_Y->GetKurtosis();
 
   B2INFO("Start to create summary list");
 
-  int IsTrgOK = 1;
-  int IsTrgTimeOK = 1;
+  float TrgAvrg = 0.0;
+  float TrgTimeAvrg = 0.0;
   int IsPlane[c_nTBPlanes];
   int IsPlOK[c_nTBPlanes];
   int IsPlTOK[c_nTBPlanes];
@@ -493,22 +495,18 @@ void QualityCheckModule::endRun()
   }
 
   double avrg = 0;
-  for (int ib = 0; ib < m_TriggerRate->GetNbinsX(); ib++) {
+  for (int ib = 1; ib < m_TriggerRate->GetNbinsX() - 1; ib++) {
     avrg += m_TriggerRate->GetBinContent(ib + 1);
   }
-  avrg /= m_TriggerRate->GetNbinsX();
-  for (int ib = 1; ib < m_TriggerRate->GetNbinsX() - 1; ib++) {
-    if (fabs(avrg - m_TriggerRate->GetBinContent(ib + 1)) > 3.0 * sqrt(avrg)) IsTrgOK = 0;
-  }
+  avrg /= (m_TriggerRate->GetNbinsX() - 2);
+  TrgAvrg = avrg;
 
   avrg = 0;
   for (int ib = 0; ib < m_TriggerRateTime->GetNbinsX(); ib++) {
     avrg += m_TriggerRateTime->GetBinContent(ib + 1);
   }
   avrg /= m_TriggerRateTime->GetNbinsX();
-  for (int ib = 1; ib < m_TriggerRateTime->GetNbinsX() - 1; ib++) {
-    if (fabs(avrg - m_TriggerRateTime->GetBinContent(ib + 1)) > 3.0 * sqrt(avrg)) IsTrgTimeOK = 0;
-  }
+  TrgTimeAvrg = avrg;
 
 
 
@@ -564,7 +562,7 @@ void QualityCheckModule::endRun()
     // create header of file:
     if ((SummaryFile = fopen(FileName.data(), "w")) == NULL) {
     }
-    fprintf(SummaryFile, "  RunNo Events   EvFrom     EvTo T[sec]            DateTime         TimeFrom OKEv OKTi PXDSVD Tel ");
+    fprintf(SummaryFile, "  RunNo Events   EvFrom     EvTo T[sec]            DateTime         TimeFrom    AvEv    AvTi PXDSVD Tel ");
     for (int i = 0; i < c_nTBPlanes; i++) {
       if (i < c_nVXDPlanes) {
         fprintf(SummaryFile, "V%i OKE OKT  Occ ", i + 1);
@@ -582,281 +580,15 @@ void QualityCheckModule::endRun()
   time_t rawtime = (int)(m_StartTime / 1000000);
   char tcc[200];
   strftime(tcc, 200, "%Y/%m/%d,%H:%M:%S", localtime(&rawtime));
-  fprintf(SummaryFile, "%7s %6i %8i %8i %6i %s %lu    %i    %i %6.2f %3i  ",
+  fprintf(SummaryFile, "%7s %6i %8i %8i %6i %s %lu %7.2f %7.2f %6.2f %3i  ",
           m_RunNo.c_str(), (int)(m_EndEvent - m_StartEvent), (int)m_StartEvent, (int)m_EndEvent, (int)((m_EndTime - m_StartTime) / 1000000),
-          tcc, m_StartTime, IsTrgOK,  IsTrgTimeOK, m_nEventsProcessFraction, m_TelRunNo
+          tcc, m_StartTime, TrgAvrg,  TrgTimeAvrg, m_nEventsProcessFraction, m_TelRunNo
          );
   for (int i = 0; i < c_nTBPlanes; i++) {
     fprintf(SummaryFile, "%i   %i   %i %4.1f  ", IsPlane[i], IsPlOK[i], IsPlTOK[i], PlOccup[i]);
   }
   fprintf(SummaryFile, "\n");
   fclose(SummaryFile);
-
-
-  /*
-    std::string m_ignoredPixelsListName0 = str(format("../../../..%1%") % FileName);
-    std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsBasicList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
-          m_ignoredPixelsListName0));
-    FileName = str(format("%1%") % m_PXDMaskFileRunName);
-    std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
-    std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
-        m_ignoredPixelsListName));
-    MaskList = fopen(FileName.data(), "w");
-    fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    fprintf(MaskList, "<Meta>\n");
-    fprintf(MaskList, "    <Date>20.04.2016</Date>\n");
-    fprintf(MaskList, "    <Description short=\"Ignore strip list for PXD planes in 2016 VXD beam test\">\n");
-    fprintf(MaskList, "        Crude initial list of bad pixels\n");
-    fprintf(MaskList, "    </Description>\n");
-    fprintf(MaskList, "    <Author>Peter Kodys</Author>\n");
-    fprintf(MaskList, "</Meta>\n");
-    fprintf(MaskList, "<PXD>\n");
-    for (int i = 0; i < c_nPXDPlanes; i++) {
-      int iLayer = getInfoPXD(i, 2).getID().getLayerNumber();
-      int iLadder = getInfoPXD(i, 2).getID().getLadderNumber();
-      if (m_nEventsPlane[i]) {
-        fprintf(MaskList, "  <layer n=\"%i\">\n", iLayer);
-        fprintf(MaskList, "    <ladder n=\"%i\">\n", iLadder);
-        for (int j = 1; j < c_MaxSensorsInPXDPlane; j++) {
-          if (j >= getSensorsInLayer(indexToPlanePXD(i))) continue;
-          int nMasked = 0;
-          int iSensor = getInfoPXD(i, j + 1).getID().getSensorNumber();
-          fprintf(MaskList, "      <sensor n=\"%i\">\n", iSensor);
-          fprintf(MaskList, "        <!-- QualityCheck rectangular parts of the sensor -->\n");
-          fprintf(MaskList, "        <!--pixels uStart = \"070\" uEnd = \"110\" vStart = \"0\" vEnd = \"500\"></pixels-->\n");
-          fprintf(MaskList, "\n");
-          fprintf(MaskList, "        <!-- Individual pixels can be masked, too -->\n");
-          fprintf(MaskList, "        <!--pixels uStart = \"130\" vStart = \"500\"></pixels-->\n");
-          fprintf(MaskList, "\n");
-          fprintf(MaskList, "        <!-- ROW is V  /  COLUMN is U -->\n");
-          fprintf(MaskList, "\n");
-          fprintf(MaskList, "        <!-- Individual rows and columns can be masked, too -->\n");
-          fprintf(MaskList, "        <!--pixels vStart = \"500\"></pixels-->\n");
-          fprintf(MaskList, "        <!--pixels uStart = \"120\"></pixels-->\n");
-          fprintf(MaskList, "\n");
-          fprintf(MaskList, "        <!-- Ranges of rows and columns can be masked, too -->\n");
-          fprintf(MaskList, "        <!--pixels vStart = \"100\" vEnd = \"120\"></pixels-->\n");
-          fprintf(MaskList, "        <!--pixels uStart = \"120\" uEnd = \"202\"></pixels-->\n");
-          fprintf(MaskList, "\n");
-          for (int i1 = 0; i1 < m_PXDMaskUV[j * c_nPXDPlanes + i]->GetNbinsX(); ++i1) {
-            for (int i2 = 0; i2 < m_PXDMaskUV[j * c_nPXDPlanes + i]->GetNbinsY(); ++i2) {
-              int ExistMask = 0;
-              if (m_AppendMaskFile) {
-                if (!m_ignoredPixelsBasicList->pixelOK(VxdID(iLayer, iLadder, iSensor), PXDIgnoredPixelsMap::map_pixel(i1, i2))) {
-                  ExistMask += 1;
-                }
-                if (!m_ignoredPixelsList->pixelOK(VxdID(iLayer, iLadder, iSensor), PXDIgnoredPixelsMap::map_pixel(i1, i2))) {
-                  ExistMask += 1;
-                }
-              }
-              if (ExistMask || (m_PXDHitMapUV[j * c_nPXDPlanes + i]->GetBinContent(i1 + 1, i2 + 1) > PXDCut)) {
-                fprintf(MaskList, "        <pixels uStart = \"%04i\" vStart = \"%04i\"></pixels>\n", i1, i2);
-                m_PXDMaskUV[j * c_nPXDPlanes + i]->SetBinContent(i1 + 1, i2 + 1, 1 + ExistMask);
-                nMasked++;
-              }
-            }
-          }
-          fprintf(MaskList, "\n");
-          fprintf(MaskList, "      </sensor>\n");
-          B2INFO("PXD(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMasked << " pixels in: " <<
-                 m_ignoredPixelsListName0.data());
-          printf("PXD(%i,%i,%i) masked %i pixels in: %s\n", iLayer, iLadder, iSensor, nMasked, m_ignoredPixelsListName0.data());
-          B2INFO("PXD(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMasked << " pixels in: " <<
-                 m_ignoredPixelsListName.data());
-          printf("PXD(%i,%i,%i) masked %i pixels in: %s\n", iLayer, iLadder, iSensor, nMasked, m_ignoredPixelsListName.data());
-        }
-        fprintf(MaskList, "    </ladder>\n");
-        fprintf(MaskList, "  </layer>\n");
-      }
-    }
-    fprintf(MaskList, "</PXD>\n");
-    fclose(MaskList);
-
-    FileName = str(format("%1%") % m_SVDMaskFileBasicName);
-    m_ignoredPixelsListName0 = str(format("../../../..%1%") % FileName);
-    std::unique_ptr<SVDIgnoredStripsMap> m_ignoredStripsBasicList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
-          m_ignoredPixelsListName0));
-    FileName = str(format("%1%") % m_SVDMaskFileRunName);
-    m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
-    std::unique_ptr<SVDIgnoredStripsMap> m_ignoredStripsList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
-        m_ignoredPixelsListName));
-    MaskList = fopen(FileName.data(), "w");
-    fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    fprintf(MaskList, "<Meta>\n");
-    fprintf(MaskList, "    <Date>20.04.2016</Date>\n");
-    fprintf(MaskList, "    <Description short=\"Ignore strip list for SVD planes in 2016 VXD beam test\">\n");
-    fprintf(MaskList, "        Crude initial list of bad strips\n");
-    fprintf(MaskList, "    </Description>\n");
-    fprintf(MaskList, "    <Author>Peter Kodys</Author>\n");
-    fprintf(MaskList, "</Meta>\n");
-    fprintf(MaskList, "<SVD>\n");
-    for (int i = 0; i < c_nSVDPlanes; i++) {
-      int iLayer = getInfoSVD(i, 2).getID().getLayerNumber();
-      if (m_nEventsPlane[i + 2]) {
-        int iLadder = getInfoSVD(i, 2).getID().getLadderNumber();
-        fprintf(MaskList, "    <layer n=\"%i\">\n", iLayer);
-        fprintf(MaskList, "        <ladder n=\"%i\">\n", iLadder);
-        for (int j = 0; j < c_MaxSensorsInSVDPlane; j++) {
-          if (j >= getSensorsInLayer(indexToPlaneSVD(i))) continue;
-          int nMaskedU = 0;
-          int nMaskedV = 0;
-          int iSensor = getInfoSVD(i, j + 1).getID().getSensorNumber();
-          fprintf(MaskList, "            <sensor n=\"%i\">\n", iSensor);
-          fprintf(MaskList, "                <side side=\"v\">\n");
-          fprintf(MaskList, "                    <stripsFromTo fromStrip = \"620\" toStrip = \"767\"></stripsFromTo>\n");
-          fprintf(MaskList, "                    <!-- Individual strips can be masked, too -->\n");
-          //      for (int i1 = 0; i1 < m_hitMapUV[i+2]->GetNbinsX(); ++i1) {
-          for (int i1 = 0; i1 < m_SVDMaskU[j * c_nSVDPlanes + i]->GetNbinsX(); ++i1) {
-            int ExistMask = 0;
-            if (m_AppendMaskFile) {
-              if (!m_ignoredStripsBasicList->stripOK(VxdID(iLayer, iLadder, iSensor, 1), (unsigned short) i1)) {
-                ExistMask += 1;
-              }
-              if (!m_ignoredStripsList->stripOK(VxdID(iLayer, iLadder, iSensor, 1), (unsigned short) i1)) {
-                ExistMask += 1;
-              }
-            }
-            float SVDCut = SVDCutUOut[i];
-            if ((i1 > SVDMaskRegUMi[i]) && (i1 < SVDMaskRegUMa[i]))
-              SVDCut = SVDCutU[i];
-            int sTS = 0;
-            for (int iTS = 0; iTS < 6; iTS++) {  // look for occupancy on timestamps
-              if (m_SVDHitMapU[j * c_nSVDPlanes + i]->GetBinContent(i1 + 1, iTS) > SVDCut) sTS++;
-            }
-
-            if (ExistMask || (sTS > 1)) {  // in al least two timestamps over cut for masking...
-              fprintf(MaskList, "                    <strip stripNo = \"%i\"></strip>\n", i1);
-              m_SVDMaskU[j * c_nSVDPlanes + i]->SetBinContent(i1 + 1, 1 + ExistMask);
-              nMaskedU++;
-            }
-          }
-          fprintf(MaskList, "                </side>\n");
-          fprintf(MaskList, "                <side side=\"u\">\n");
-          //      for (int i2 = 0; i2 < m_hitMapUV[i+2]->GetNbinsY(); ++i2) {
-          for (int i2 = 0; i2 < m_SVDMaskV[j * c_nSVDPlanes + i]->GetNbinsX(); ++i2) {
-            int ExistMask = 0;
-            if (m_AppendMaskFile) {
-              if (!m_ignoredStripsBasicList->stripOK(VxdID(iLayer, iLadder, iSensor, 0), (unsigned short) i2)) {
-                ExistMask += 1;
-              }
-              if (!m_ignoredStripsList->stripOK(VxdID(iLayer, iLadder, iSensor, 0), (unsigned short) i2)) {
-                ExistMask += 1;
-              }
-            }
-            float SVDCut = SVDCutVOut[i];
-            if ((i2 > SVDMaskRegVMi[i]) && (i2 < SVDMaskRegVMa[i]))
-              SVDCut = SVDCutV[i];
-            int sTS = 0;
-            for (int iTS = 0; iTS < 6; iTS++) {  // look for occupancy on timestamps
-              if (m_SVDHitMapV[j * c_nSVDPlanes + i]->GetBinContent(i2 + 1, iTS) > SVDCut) sTS++;
-            }
-
-            if (ExistMask || (sTS > 1)) {  // in al least two timestamps over cut for masking...
-              fprintf(MaskList, "                    <strip stripNo = \"%i\"></strip>\n", i2);
-              m_SVDMaskV[j * c_nSVDPlanes + i]->SetBinContent(i2 + 1, 1 + ExistMask);
-              nMaskedV++;
-            }
-          }
-          fprintf(MaskList, "                </side>\n");
-          fprintf(MaskList, "            </sensor>\n");
-          B2INFO("SVD(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMaskedU << " U strips in: " <<
-                 m_ignoredPixelsListName0.data());
-          B2INFO("SVD(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMaskedV << " V strips in: " <<
-                 m_ignoredPixelsListName0.data());
-          printf("SVD(%i,%i,%i) masked %i U strips in: %s\n", iLayer, iLadder, iSensor, nMaskedU, m_ignoredPixelsListName0.data());
-          printf("SVD(%i,%i,%i) masked %i V strips in: %s\n", iLayer, iLadder, iSensor, nMaskedV, m_ignoredPixelsListName0.data());
-          B2INFO("SVD(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMaskedU << " U strips in: " <<
-                 m_ignoredPixelsListName.data());
-          B2INFO("SVD(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMaskedV << " V strips in: " <<
-                 m_ignoredPixelsListName.data());
-          printf("SVD(%i,%i,%i) masked %i U strips in: %s\n", iLayer, iLadder, iSensor, nMaskedU, m_ignoredPixelsListName.data());
-          printf("SVD(%i,%i,%i) masked %i V strips in: %s\n", iLayer, iLadder, iSensor, nMaskedV, m_ignoredPixelsListName.data());
-        }
-        fprintf(MaskList, "        </ladder>\n");
-        fprintf(MaskList, "    </layer>\n");
-      }
-    }
-    fprintf(MaskList, "</SVD>\n");
-    fclose(MaskList);
-
-    FileName = str(format("%1%") % m_TelMaskFileBasicName);
-    m_ignoredPixelsListName0 = str(format("../../../..%1%") % FileName);
-    std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredTelPixelsBasicList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
-          m_ignoredPixelsListName0));
-    FileName = str(format("%1%") % m_TelMaskFileRunName);
-    m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
-    std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredTelPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
-          m_ignoredPixelsListName));
-    MaskList = fopen(FileName.data(), "w");
-    fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    fprintf(MaskList, "<Meta>\n");
-    fprintf(MaskList, "    <Date>20.04.2016</Date>\n");
-    fprintf(MaskList, "    <Description short=\"Ignore strip list for Tel planes in 2016 VXD beam test\">\n");
-    fprintf(MaskList, "        Crude initial list of bad pixels\n");
-    fprintf(MaskList, "    </Description>\n");
-    fprintf(MaskList, "    <Author>Peter Kodys</Author>\n");
-    fprintf(MaskList, "</Meta>\n");
-    fprintf(MaskList, "<PXD>\n");
-    for (int i = 0; i < c_nTelPlanes; i++) {
-      if (m_nEventsPlane[i + 6]) {
-        int nMasked = 0;
-        //int iPlane = i + 1;
-        int iLayer = getInfoTel(i).getID().getLayerNumber();
-        int iLadder = getInfoTel(i).getID().getLadderNumber();
-        int iSensor = getInfoTel(i).getID().getSensorNumber();
-        fprintf(MaskList, "  <layer n=\"%i\">\n", iLayer);
-        fprintf(MaskList, "    <ladder n=\"%i\">\n", iLadder);
-        fprintf(MaskList, "      <sensor n=\"%i\">\n", iSensor);
-        fprintf(MaskList, "        <!-- QualityCheck rectangular parts of the sensor -->\n");
-        fprintf(MaskList, "        <!--pixels uStart = \"070\" uEnd = \"110\" vStart = \"0\" vEnd = \"500\"></pixels-->\n");
-        fprintf(MaskList, "\n");
-        fprintf(MaskList, "        <!-- Individual pixels can be masked, too -->\n");
-        fprintf(MaskList, "        <!--pixels uStart = \"130\" vStart = \"500\"></pixels-->\n");
-        fprintf(MaskList, "\n");
-        fprintf(MaskList, "        <!-- ROW is V  /  COLUMN is U -->\n");
-        fprintf(MaskList, "\n");
-        fprintf(MaskList, "        <!-- Individual rows and columns can be masked, too -->\n");
-        fprintf(MaskList, "        <!--pixels vStart = \"500\"></pixels-->\n");
-        fprintf(MaskList, "        <!--pixels uStart = \"120\"></pixels-->\n");
-        fprintf(MaskList, "\n");
-        fprintf(MaskList, "        <!-- Ranges of rows and columns can be masked, too -->\n");
-        fprintf(MaskList, "        <!--pixels vStart = \"100\" vEnd = \"120\"></pixels-->\n");
-        fprintf(MaskList, "        <!--pixels uStart = \"120\" uEnd = \"202\"></pixels-->\n");
-        fprintf(MaskList, "\n");
-
-        for (int i1 = 0; i1 < m_TelMaskUV[i]->GetNbinsX(); ++i1) {
-          for (int i2 = 0; i2 < m_TelMaskUV[i]->GetNbinsY(); ++i2) {
-            int ExistMask = 0;
-            if (m_AppendMaskFile) {
-              if (!m_ignoredTelPixelsBasicList->pixelOK(VxdID(iLayer, iLadder, iSensor), PXDIgnoredPixelsMap::map_pixel(i1, i2))) {
-                ExistMask += 1;
-              }
-              if (!m_ignoredTelPixelsList->pixelOK(VxdID(iLayer, iLadder, iSensor), PXDIgnoredPixelsMap::map_pixel(i1, i2))) {
-                ExistMask += 1;
-              }
-            }
-            if (ExistMask || (m_TelHitMapUV[i]->GetBinContent(i1 + 1, i2 + 1) > TelCut)) {
-              fprintf(MaskList, "        <pixels uStart = \"%04i\" vStart = \"%04i\"></pixels>\n", i1, i2);
-              m_TelMaskUV[i]->SetBinContent(i1 + 1, i2 + 1, 1 + ExistMask);
-              nMasked++;
-            }
-          }
-        }
-        fprintf(MaskList, "\n");
-        fprintf(MaskList, "      </sensor>\n");
-        fprintf(MaskList, "    </ladder>\n");
-        fprintf(MaskList, "  </layer>\n");
-        B2INFO("Tel(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMasked << " pixels in: " <<
-               m_ignoredPixelsListName0.data());
-        printf("Tel(%i,%i,%i) masked %i pixels in: %s\n", iLayer, iLadder, iSensor, nMasked, m_ignoredPixelsListName0.data());
-        B2INFO("Tel(" << iLayer << "," << iLadder << "," << iSensor << ") masked " << nMasked << " pixels in: " <<
-               m_ignoredPixelsListName.data());
-        printf("Tel(%i,%i,%i) masked %i pixels in: %s\n", iLayer, iLadder, iSensor, nMasked, m_ignoredPixelsListName.data());
-      }
-    }
-    fprintf(MaskList, "</PXD>\n");
-    fclose(MaskList);
-  */
 
 }
 

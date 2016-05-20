@@ -218,8 +218,7 @@ def add_vxdtf(path, magnet=True, svd_only=False, momentum=6., filterOverlaps='ho
         param_vxdtf['activateAnglesRZHioC'] = [True]
 
     vxdtf.param(param_vxdtf)
-    if UseTracks:
-        path.add_module(vxdtf)
+    path.add_module(vxdtf)
 
 
 import argparse
@@ -270,7 +269,8 @@ if args.debug:
 # Set up DB chain
 reset_database()
 use_database_chain()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True)
+# use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True)
+use_local_database(Belle2.FileSystem.findFile("/home/peter/database/database.txt"), "", True)
 if args.local_db is not None:
     use_local_database(Belle2.FileSystem.findFile(args.local_db), "", True)
 
@@ -319,15 +319,8 @@ if args.tel_input:
 if args.unpacking:
     if not args.svd_only:
         triggerfix = main.add_module(register_module('PXDTriggerFixer'))
-        # triggerfix.if_false(emptypath)
         triggerfix.if_false(create_path())
         main.add_module(triggerfix)
-
-        """
-        triggerfix = register_module(register_module('PXDTriggerFixer'))
-        triggerfix.if_false(create_path())
-        main.add_module(triggerfix)
-        """
         main.add_module('PXDTriggerShifter')
         main.add_module('PXDUnpacker',
                         RemapFlag=True,
@@ -366,24 +359,31 @@ if args.tel_input:
     main.add_module(TelSort)
     main.add_module('TelClusterizer')
 
-if UseTracks:
-    if args.gbl_collect:
-        main.add_module('SetupGenfitExtrapolation', whichGeometry='TGeo')
-    else:
-        main.add_module('SetupGenfitExtrapolation')
+if args.gbl_collect:
+    main.add_module('SetupGenfitExtrapolation', whichGeometry='TGeo')
+else:
+    main.add_module('SetupGenfitExtrapolation')
 
-    add_vxdtf(main, not args.magnet_off, args.svd_only, args.momentum)
+add_vxdtf(main, not args.magnet_off, args.svd_only, args.momentum)
 
-    if args.gbl_collect:
-        # main.add_module('GBLfit', BuildBelle2Tracks=True, beamSpot=[-30, 0, 0])
-        # main.add_module('MillepedeCollector', minPValue=0.0)
-        main.add_module('GBLfit')
-        main.add_module('MillepedeCollector', minPValue=0.0001)
-    else:
-        main.add_module('GenFitter', FilterId='Kalman')
+if args.gbl_collect:
+    # main.add_module('GBLfit', BuildBelle2Tracks=True, beamSpot=[-30, 0, 0])
+    # main.add_module('MillepedeCollector', minPValue=0.0)
+    main.add_module('GBLfit')
+    main.add_module('MillepedeCollector', minPValue=0.0001)
+else:
+    main.add_module('GenFitter', FilterId='Kalman')
 
 if args.dqm:
-    main.add_module("VXDTelDQMOffLine", SaveOtherHistos=1, SwapTel=0, CorrelationGranulation=0.02)
+    if not args.svd_only:
+        if args.unpacking:
+            main.add_module("PXDRawDQM")
+        main.add_module("PXDDQMCorr")
+    main.add_module('PXDDQM', histgramDirectoryName='pxddqm')
+    # CorrelationGranulation: granularity of correlation plots, min = 0.02 mm, max = 1 mm, default = 1 mm
+    main.add_module("VXDTelDQMOffLine", SaveOtherHistos=1, SwapTel=0, CorrelationGranulation=0.04)
+    if not args.gbl_collect:
+        main.add_module('TrackfitDQM')
 
 QualityCheck = register_module('QualityCheck')
 QualityCheck.param('SummaryFileRunName', SummaryFileRunName)
@@ -393,7 +393,7 @@ QualityCheck.param('TelRunNo', TelRunNo)
 QualityCheck.param('RunNo', RunNoVXD)
 main.add_module(QualityCheck)
 
-main.add_module('RootOutput')
+# main.add_module('RootOutput')
 
 if args.display:
     if UseTracks:

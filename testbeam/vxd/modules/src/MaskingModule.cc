@@ -274,11 +274,14 @@ void MaskingModule::event()
   StoreObjPtr<EventMetaData> storeEventMetaData;
 
 
-  if (storeEventMetaData->getEvent() > (unsigned int)m_nEventsProcess) {
+  // printf("---->%i %i\n",storeEventMetaData->getEvent(),(unsigned int)m_nEventsProcess);
+  if (m_nRealEventsProcess > (unsigned int)m_nEventsProcess) {
+    //if (storeEventMetaData->getEvent() > (unsigned int)m_nEventsProcess) {
+    //printf("------------------------>%i %i\n",storeEventMetaData->getEvent(),(unsigned int)m_nEventsProcess);
     storeEventMetaData->setEndOfData();
   }
-
   m_nRealEventsProcess++;
+
   // **************** PXD masking histograms **********************
   // If there are no PXD pixels, leave PXD histograms
   if (storePXDDigits && storePXDDigits.getEntries()) {
@@ -337,6 +340,12 @@ void MaskingModule::endRun()
 {
   StoreObjPtr<EventMetaData> storeEventMetaData;
   //long unsigned runNo = storeEventMetaData->getRun();
+
+  if (m_nRealEventsProcess < 1000) {
+    printf("Not enough data: %li < 1000, terminate without masking file create.\n", m_nRealEventsProcess);
+    return;
+  }
+
   m_nEventsProcessFraction = (double)m_nRealEventsProcess / m_nEventsProcess;
 
   // Maskin border for all sensors at 10 000 events!:
@@ -372,11 +381,13 @@ void MaskingModule::endRun()
   printf("Start to create masking from %i events (fraction: %6.3f)\n", (int)m_nRealEventsProcess, m_nEventsProcessFraction);
 
   std::string FileName = str(format("%1%") % m_PXDMaskFileBasicName);
-  std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+  std::string m_ignoredPixelsListName = str(format("%1%") % FileName);
+  // std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
   std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsBasicList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
         m_ignoredPixelsListName));
   FileName = str(format("%1%") % m_PXDMaskFileRunName);
-  m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+  m_ignoredPixelsListName = str(format("%1%") % FileName);
+  // m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
   std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
       m_ignoredPixelsListName));
   MaskList = fopen(FileName.data(), "w");
@@ -448,11 +459,13 @@ void MaskingModule::endRun()
   fclose(MaskList);
 
   FileName = str(format("%1%") % m_SVDMaskFileBasicName);
-  m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+  m_ignoredPixelsListName = str(format("%1%") % FileName);
+  //m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
   std::unique_ptr<SVDIgnoredStripsMap> m_ignoredStripsBasicList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
         m_ignoredPixelsListName));
   FileName = str(format("%1%") % m_SVDMaskFileRunName);
-  m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+  m_ignoredPixelsListName = str(format("%1%") % FileName);
+  // m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
   std::unique_ptr<SVDIgnoredStripsMap> m_ignoredStripsList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
       m_ignoredPixelsListName));
   MaskList = fopen(FileName.data(), "w");
@@ -549,11 +562,13 @@ void MaskingModule::endRun()
   fclose(MaskList);
 
   FileName = str(format("%1%") % m_TelMaskFileBasicName);
-  m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+  m_ignoredPixelsListName = str(format("%1%") % FileName);
+  // m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
   std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredTelPixelsBasicList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
         m_ignoredPixelsListName));
   FileName = str(format("%1%") % m_TelMaskFileRunName);
-  m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+  m_ignoredPixelsListName = str(format("%1%") % FileName);
+  // m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
   std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredTelPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
         m_ignoredPixelsListName));
   MaskList = fopen(FileName.data(), "w");

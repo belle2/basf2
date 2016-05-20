@@ -22,8 +22,8 @@ DatabrigdeCallback::~DatabrigdeCallback() throw()
 void DatabrigdeCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
   m_con.init("databrigde", 1);
-  add(new NSMVHandlerInt("cdc.used", true, true, 1));
-  add(new NSMVHandlerInt("top.used", true, true, 1));
+  add(new NSMVHandlerInt("svd.used", true, true, 1));
+  add(new NSMVHandlerInt("ttd.used", true, true, 1));
 }
 
 /*
@@ -50,25 +50,36 @@ void DatabrigdeCallback::monitor() throw(RCHandlerException)
 void DatabrigdeCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
   if (m_con.isAlive()) return;
-  int cdc_used = 0, top_used = 0;
-  get("cdc.used", cdc_used);
-  get("top.used", top_used);
+  int svd_used = 0, ttd_used = 0;
+  get("svd.used", svd_used);
+  get("ttd.used", ttd_used);
   std::string host = "127.0.0.1";
   int port = 5121;
-  if (cdc_used && !top_used) {
-    host = "dcdc07";
-    port = 5101;
-  } else if (!cdc_used && top_used) {
-    host = "dtop02";
-    port = 5101;
-  }
   std::string script;
   try {
     m_con.clearArguments();
-    m_con.setExecutable("databridge");
-    m_con.addArgument(host);
-    m_con.addArgument("%d", port);
-    m_con.addArgument(6121);
+    m_con.setExecutable("/home/usr/b2daq/eb/eb1rx");
+    m_con.addArgument("-l");
+    m_con.addArgument("%d", 5121);
+    int nsenders = 0;
+    if (svd_used) {
+      m_con.addArgument("tx-rpc1:5101");
+      nsenders++;
+    }
+    if (ttd_used) {
+      m_con.addArgument("-F");
+      m_con.addArgument("tx-ttd10:30000");
+      nsenders++;
+    }
+    std::string upname = std::string("/dev/shm/") + getNode().getName() + "_eb1rx_up";
+    std::string downname = std::string("/dev/shm/") + getNode().getName() + "_eb1rx_down";
+    if (m_eb_stat) delete m_eb_stat;
+    LogFile::debug("wcreating eb_statistics(%s, %d, %s, %d)", upname.c_str(), nsenders, downname.c_str(), 1);
+    m_eb_stat = new eb_statistics(upname.c_str(), nsenders, downname.c_str(), 1);
+    m_con.addArgument("-u");
+    m_con.addArgument(upname);
+    m_con.addArgument("-d");
+    m_con.addArgument(downname);
   } catch (const std::out_of_range& e) {
     throw (RCHandlerException(e.what()));
   }

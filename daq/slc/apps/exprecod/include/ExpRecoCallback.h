@@ -29,6 +29,7 @@ namespace Belle2 {
     virtual void start() throw(RCHandlerException);
     virtual void stop() throw(RCHandlerException);
     virtual void recover(const DBObject&) throw(RCHandlerException);
+    virtual void abort() throw(RCHandlerException);
 
     void ExpRecoLogger();
 

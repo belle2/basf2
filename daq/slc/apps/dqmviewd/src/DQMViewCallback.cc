@@ -61,7 +61,9 @@ void DQMViewCallback::update() throw()
     TIter next(file->GetListOfKeys());
     TKey* key = NULL;
     while ((key = (TKey*)next())) {
-      hist.push_back((TH1*)key->ReadObj());
+      TH1* h = (TH1*)key->ReadObj();
+      //if (!h->IsZombie() && h->IsOnHeap())
+      hist.push_back(h);
     }
   }
   if (hist.size() > 0) {

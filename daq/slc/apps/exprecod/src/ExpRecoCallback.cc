@@ -29,7 +29,6 @@ ExpRecoCallback::ExpRecoCallback()
   m_conf = new RFConf(getenv("EXPRECO_CONFFILE"));
 
   s_expreco = this;
-
 }
 
 ExpRecoCallback::~ExpRecoCallback() throw()
@@ -99,6 +98,35 @@ void ExpRecoCallback::start() throw(RCHandlerException)
 
 void ExpRecoCallback::stop() throw(RCHandlerException)
 {
+}
+
+void ExpRecoCallback::abort() throw(RCHandlerException)
+{
+  // Kill processes
+  int status;
+  if (m_pid_basf2 != 0) {
+    kill(m_pid_basf2, SIGINT);
+    waitpid(m_pid_basf2, &status, 0);
+    LogFile::info("killd basf2 (pid=%d)", m_pid_basf2);
+  }
+
+  if (m_pid_receiver != 0) {
+    kill(m_pid_receiver, SIGINT);
+    waitpid(m_pid_receiver, &status, 0);
+    LogFile::info("killd receiver (pid=%d)", m_pid_receiver);
+  }
+
+  if (m_pid_evs != 0) {
+    kill(m_pid_evs, SIGINT);
+    waitpid(m_pid_evs, &status, 0);
+    LogFile::info("killd evs (pid=%d)", m_pid_evs);
+  }
+
+  pthread_cancel(m_logthread);
+
+  // Clear RingBuffer
+  m_rbufin->forceClear();
+  m_rbufout->forceClear();
 }
 
 void ExpRecoCallback::recover(const DBObject&) throw(RCHandlerException)

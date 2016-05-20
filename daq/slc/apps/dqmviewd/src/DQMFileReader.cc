@@ -33,10 +33,13 @@ bool DQMFileReader::init(int index, DQMViewCallback& callback)
   TMapRec* mr = m_file->GetFirst();
   int i = 0;
   while (m_file->OrgAddress(mr)) {
+    LogFile::debug("%s:%d", __FILE__, __LINE__);
     TObject* obj = m_file->Get(mr->GetName());
     if (obj != NULL) {
+      LogFile::debug("%s:%d", __FILE__, __LINE__);
       TString class_name = obj->ClassName();
       if (class_name.Contains("TH1") ||  class_name.Contains("TH2")) {
+        LogFile::debug("%s:%d", __FILE__, __LINE__);
         TH1* h = (TH1*)obj;
         std::string name = h->GetName();
         StringList str_v = StringUtil::split(name, '/');
@@ -89,6 +92,7 @@ int DQMFileReader::update()
   bool updated = false;
   for (StringList::iterator it = m_name_v.begin();
        it != m_name_v.end(); it++) {
+    LogFile::debug("%s:%d", __FILE__, __LINE__);
     std::string name = *it;
     std::string dir = m_hist_m.getDirectory(name);
     TH1* h = m_hist_m.getHist(name);
@@ -120,6 +124,7 @@ bool DQMFileReader::dump(const std::string& dir,
   TFile* file = new TFile(filepath.c_str(), "recreate");
   for (StringList::iterator it = m_name_v.begin();
        it != m_name_v.end(); it++) {
+    LogFile::debug("%s:%d", __FILE__, __LINE__);
     std::string name = *it;
     std::string dir = m_hist_m.getDirectory(name);
     if (dir.size() > 0) name = dir + "/" + name;

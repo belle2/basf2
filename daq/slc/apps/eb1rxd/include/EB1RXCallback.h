@@ -1,17 +1,17 @@
-#ifndef _Belle2_DatabrigdeCallback_h
-#define _Belle2_DatabrigdeCallback_h
+#ifndef _Belle2_EB1RXCallback_h
+#define _Belle2_EB1RXCallback_h
 
 #include "daq/slc/runcontrol/RCCallback.h"
 #include "daq/slc/readout/ProcessController.h"
-#include "daq/slc/apps/storagerd/mmap_statistics.h"
+#include "daq/slc/apps/eb1rxd/mmap_statistics.h"
 
 namespace Belle2 {
 
-  class DatabrigdeCallback : public RCCallback {
+  class EB1RXCallback : public RCCallback {
 
   public:
-    DatabrigdeCallback();
-    virtual ~DatabrigdeCallback() throw();
+    EB1RXCallback();
+    virtual ~EB1RXCallback() throw();
 
   public:
     virtual void initialize(const DBObject& obj) throw(RCHandlerException);
@@ -28,6 +28,12 @@ namespace Belle2 {
   private:
     ProcessController m_con;
     eb_statistics* m_eb_stat;
+    int m_nsenders;
+    double m_nevent_in[10];
+    double m_total_byte_in[10];
+    double m_nevent_out[10];
+    double m_total_byte_out[10];
+    double m_t0;
 
   };
 

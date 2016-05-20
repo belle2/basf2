@@ -45,6 +45,7 @@ void HistSender::run()
         writer.writeInt(hist.size());
         for (size_t n = 0; n < hist.size(); n++) {
           TH1* h = hist[n];
+          //if (h->IsZombie()|| !h->IsOnHeap()) continue;
           std::string name = h->GetName();
           StringList str_v = StringUtil::split(name, '/');
           std::string dirname = "";
@@ -86,13 +87,16 @@ void HistSender::run()
           }
           writer.writeInt(0x7FFF);
         }
-        m_callback->unlock();
+        //m_callback->unlock();
         configured = true;
       }
+      //m_callback->lock();
       writer.writeInt(FLAG_UPDATE);
       writer.writeInt(hist.size());
       for (size_t i = 0; i < hist.size(); i++) {
         TH1* h = hist[i];
+        //printf("%d\n", i);
+        //h->Print();
         std::string name = h->GetName();
         StringList str_v = StringUtil::split(name, '/');
         std::string dirname = "";
@@ -110,9 +114,11 @@ void HistSender::run()
           }
         } else if (class_name.Contains("TH2")) {
           const int nbinsy = h->GetYaxis()->GetNbins();
+          //LogFile::info("%s %d %d", h->GetName(), nbinsy, nbinsx);
           for (int ny = 0; ny < nbinsy; ny++) {
             for (int nx = 0; nx < nbinsx; nx++) {
-              writer.writeFloat(h->GetBinContent(nx + 1, ny + 1));
+              double d = h->GetBinContent(nx + 1, ny + 1);
+              writer.writeFloat(d);
             }
           }
         }

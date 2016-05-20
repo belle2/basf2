@@ -102,12 +102,11 @@ void SocketmonitorCallback::timeout(NSMCommunicator&) throw()
       set(vname + "st", st);
       set(vname + "txqueue", txqueue);
       set(vname + "rxqueue", rxqueue);
-      if (count % 10 == 0) {
+      if (count % 2 == 0) {
         LogFile::debug("%s st=%d tx=%f rx=%f", m_hostname[i].c_str(), st, txqueue, rxqueue);
-        count = 1;
       }
-      count++;
     }
+    count++;
   } catch (const IOException& e) {
 
   }

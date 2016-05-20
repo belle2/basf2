@@ -57,7 +57,10 @@ bool SharedMemory::open()
 
 void SharedMemory::close()
 {
-  if (m_fd > 0) ::close(m_fd);
+  if (m_fd > 0) {
+    ::close(m_fd);
+    m_fd = 0;
+  }
 }
 
 bool SharedMemory::truncate(size_t size) throw()

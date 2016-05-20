@@ -122,6 +122,7 @@ void RunControlCallback::ok(const char* nodename, const char* data) throw()
 
 void RunControlCallback::error(const char* nodename, const char* data) throw()
 {
+  log(LogFile::DEBUG, "ERROR from %s (state = %s)", nodename, data);
   try {
     RCNode& node(findNode(nodename));
     logging(node, LogFile::ERROR, data);
@@ -440,6 +441,7 @@ void RunControlCallback::logging_imp(const NSMNode& node, LogFile::Priority pri,
   if (log.getPriority() >= m_priority_global) {
     reply(NSMMessage(log));
   }
+  RCCallback::log(pri, msg);
 }
 
 bool RunControlCallback::addAll(const DBObject& obj) throw()

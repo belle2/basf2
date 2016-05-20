@@ -2,6 +2,7 @@
 #include "daq/slc/apps/storagerd/storage_status.h"
 
 #include "daq/slc/database/PostgreSQLInterface.h"
+#include "daq/slc/nsm/NSMCommunicator.h"
 
 #include "daq/slc/system/LogFile.h"
 #include "daq/slc/system/Time.h"
@@ -16,6 +17,7 @@ using namespace Belle2;
 
 StoragerCallback::StoragerCallback()
 {
+  setAutoReply(false);
   setTimeout(1);
   /*
   system("killall storagein");
@@ -72,6 +74,33 @@ void StoragerCallback::configure(const DBObject& obj) throw(RCHandlerException)
   } catch (const std::out_of_range& e) {
     throw (RCHandlerException("Bad configuration : %s", e.what()));
   }
+  const DBObjectList& sender(obj("eb2rx").getObjects("sender"));
+  m_nsenders = 0;
+  for (DBObjectList::const_iterator it = sender.begin();
+       it != sender.end(); it++) {
+    std::string vname = StringUtil::form("stat.in[%d].", m_nsenders);
+    add(new NSMVHandlerInt(vname + "addr", true, false, 0));
+    add(new NSMVHandlerInt(vname + "port", true, false, 0));
+    add(new NSMVHandlerInt(vname + "connection", true, false, 0));
+    add(new NSMVHandlerInt(vname + "byte", true, false, 0));
+    add(new NSMVHandlerInt(vname + "event", true, false, 0));
+    add(new NSMVHandlerFloat(vname + "total_byte", true, false, 0));
+    add(new NSMVHandlerFloat(vname + "flowrate", true, false, 0));
+    add(new NSMVHandlerFloat(vname + "nqueue", true, false, 0));
+    //add(new NSMVHandlerFloat(vname + "nevent", true, false, 0));
+    //add(new NSMVHandlerFloat(vname + "evtrate", true, false, 0));
+    m_nsenders++;
+  }
+  std::string vname = StringUtil::form("stat.out.");
+  add(new NSMVHandlerInt(vname + "addr", true, false, 0));
+  add(new NSMVHandlerInt(vname + "port", true, false, 0));
+  add(new NSMVHandlerInt(vname + "connection", true, false, 0));
+  add(new NSMVHandlerInt(vname + "byte", true, false, 0));
+  add(new NSMVHandlerInt(vname + "event", true, false, 0));
+  add(new NSMVHandlerFloat(vname + "total_byte", true, false, 0));
+  add(new NSMVHandlerFloat(vname + "flowrate", true, false, 0));
+  //add(new NSMVHandlerFloat(vname + "nevent", true, false, 0));
+  //add(new NSMVHandlerFloat(vname + "evtrate", true, false, 0));
 }
 
 void StoragerCallback::term() throw()
@@ -110,6 +139,10 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
   const DBObject& isocket(input("socket"));
   const DBObject& osocket(output("socket"));
 
+  m_ibuf.open(ibuf.getText("name"), ibuf.getInt("size") * 1000000, true);
+  m_rbuf.open(rbuf.getText("name"), rbuf.getInt("size") * 1000000, true);
+  m_obuf.open(obuf.getText("name"), obuf.getInt("size") * 1000000, true);
+
   bool use_eb2 = false;
   if (!m_eb2rx.isAlive() && obj.hasObject("eb2rx") && obj("eb2rx").getBool("used")) {
     const DBObject& eb2rx(obj("eb2rx"));
@@ -119,11 +152,11 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_eb2rx.addArgument("-l");
     m_eb2rx.addArgument("%d", eb2rx.getInt("port"));
     const DBObjectList& sender(eb2rx.getObjects("sender"));
-    m_nsenders = 0;
     for (DBObjectList::const_iterator it = sender.begin();
          it != sender.end(); it++) {
-      m_eb2rx.addArgument("%s:%d", it->getText("host").c_str(), it->getInt("port"));
-      m_nsenders++;
+      if (it->getBool("used")) {
+        m_eb2rx.addArgument("%s:%d", it->getText("host").c_str(), it->getInt("port"));
+      }
     }
     std::string upname = std::string("/dev/shm/") + getNode().getName() + "_eb2rx_up";
     std::string downname = std::string("/dev/shm/") + getNode().getName() + "_eb2rx_down";
@@ -163,6 +196,49 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     try_wait();
   }
 
+  /*
+  while(m_eb_stat && obj.hasObject("eb2rx") && obj("eb2rx").getBool("used")) {
+    std::string vname = StringUtil::form("stat.out.");
+    set(vname + "addr", (int)m_eb_stat->down(0).event);
+    set(vname + "port", (int)m_eb_stat->down(0).port);
+    bool connected = (int)m_eb_stat->down(0).port > 0;
+    LogFile::info("downstream %s", (connected?"connected":"disconnected"));
+    bool connected_all = true;
+    connected_all &= connected;
+    set(vname + "connection", connected);
+    const DBObject& eb2rx(obj("eb2rx"));
+    const DBObjectList& sender(eb2rx.getObjects("sender"));
+    for (int i = 0; i < m_nsenders; i++) {
+      if (sender[i].getBool("used")) {
+  std::string vname = StringUtil::form("stat.in[%d].", i);
+  set(vname + "addr", (int)m_eb_stat->up(i).event);
+  set(vname + "port", (int)m_eb_stat->up(i).port);
+  bool connected = (int)m_eb_stat->up(i).port > 0;
+  LogFile::info("upstream[%d] %s", i, (connected?"connected":"disconnected"));
+  set(vname + "connection", connected);
+  connected_all &= connected;
+      }
+    }
+    LogFile::info("all %s", (connected_all?"connected":"disconnected"));
+    if (connected_all) break;
+    try {
+      NSMCommunicator& com(wait(NSMNode(), RCCommand::UNKNOWN, 1));
+      NSMMessage msg = com.getMessage();
+      RCCommand cmd2(msg.getRequestName());
+      if (cmd2 == RCCommand::ABORT) {
+  setState(RCState::ABORTING_RS);
+  abort();
+  return;
+      } else {
+  perform(com);
+      }
+    } catch (const TimeoutException& e) {
+    } catch (const IOException& e) {
+      log(LogFile::ERROR, "IOError %s", e.what());
+      return;
+    }
+  }
+  */
   if (!m_con[1].isAlive()) {
     m_con[1].clearArguments();
     m_con[1].setExecutable("storagerecord");
@@ -241,8 +317,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     flow.open(&(m_con[i].getInfo()));
     m_flow.push_back(flow);
   }
-  m_ibuf.open(ibuf.getText("name"), ibuf.getInt("size") * 1000000);
-  m_rbuf.open(rbuf.getText("name"), rbuf.getInt("size") * 1000000);
+  setState(RCState::READY_S);
 }
 
 void StoragerCallback::start(int expno, int runno) throw(RCHandlerException)
@@ -264,6 +339,7 @@ void StoragerCallback::start(int expno, int runno) throw(RCHandlerException)
 
     }
   }
+  setState(RCState::RUNNING_S);
 }
 
 void StoragerCallback::stop() throw(RCHandlerException)
@@ -289,8 +365,12 @@ void StoragerCallback::stop() throw(RCHandlerException)
     }
     db.close();
   }
+  std::string cmd = StringUtil::form("submit_filejob -all");
+  system(cmd.c_str());
+  LogFile::debug(cmd);
   m_expno = -1;
   m_runno = -1;
+  setState(RCState::READY_S);
 }
 
 void StoragerCallback::recover(const DBObject& obj) throw(RCHandlerException)
@@ -320,6 +400,9 @@ void StoragerCallback::abort() throw(RCHandlerException)
   }
   m_eb2rx.abort();
   set("eb2rx.pid", 0);
+  m_ibuf.unlink();
+  m_rbuf.unlink();
+  m_obuf.unlink();
   if (m_expno >= 0 && m_runno >= 0) {
     ConfigFile config("slowcontrol");
     PostgreSQLInterface db(config.get("database.host"),
@@ -343,6 +426,7 @@ void StoragerCallback::abort() throw(RCHandlerException)
   std::string cmd = StringUtil::form("submit_filejob -all");
   system(cmd.c_str());
   LogFile::debug(cmd);
+  setState(RCState::NOTREADY_S);
 }
 
 void StoragerCallback::monitor() throw(RCHandlerException)
@@ -367,20 +451,76 @@ void StoragerCallback::monitor() throw(RCHandlerException)
   storage_status* info = (storage_status*)data.get();
   info->ctime = Time().getSecond();
   info->nnodes = m_con.size();
+  double t1 = Time().get();
+  double dt = t1 - m_t0;
   if (!(state == RCState::RUNNING_S || state == RCState::READY_S)) {
     memset(info, 0, sizeof(storage_status));
+    std::string vname = StringUtil::form("stat.out.");
+    set(vname + "event", 0);
+    set(vname + "byte", (float)0);
+    set(vname + "addr", 0);
+    set(vname + "port", 0);
+    set(vname + "connection", 0);
+    //set(vname + "nevent", 0);
+    //set(vname + "evtrate", 0);
+    set(vname + "total_byte", 0);
+    set(vname + "flowrate", 0);
+    for (int i = 0; i < m_nsenders; i++) {
+      std::string vname = StringUtil::form("stat.in[%d].", i);
+      set(vname + "event", 0);
+      set(vname + "byte", 0);
+      set(vname + "addr", 0);
+      set(vname + "port", 0);
+      set(vname + "connection", 0);
+      //set(vname + "nevent", 0);
+      //set(vname + "evtrate", 0);
+      set(vname + "total_byte", 0);
+      set(vname + "flowrate", 0);
+    }
   } else {
     if (m_eb_stat) {
       std::vector<IOInfo> io_v;
       IOInfo io;
       io.setLocalAddress(ntohl(m_eb_stat->down(0).addr));
-      io.setLocalPort(m_eb_stat->down(0).port);
+      int port = m_eb_stat->down(0).port;//ntohl(m_eb_stat->down(0).port);
+      io.setLocalPort(port);
       io_v.push_back(io);
       for (int i = 0; i < m_nsenders; i++) {
         IOInfo io;
-        io.setLocalAddress(ntohl(m_eb_stat->up(i).addr));
-        io.setLocalPort(m_eb_stat->up(i).port);
+        io.setLocalAddress(m_eb_stat->up(i).addr);
+        int port = m_eb_stat->up(i).port;//ntohl(m_eb_stat->up(i).port);
+        io.setLocalPort(port);
         io_v.push_back(io);
+      }
+      std::string vname = StringUtil::form("stat.out.");
+      set(vname + "event", (int)m_eb_stat->down(0).event);
+      set(vname + "byte", (float)(m_eb_stat->down(0).byte / 1024.));
+      set(vname + "addr", (int)m_eb_stat->down(0).event);
+      port = m_eb_stat->down(0).port;//ntohl(m_eb_stat->down(0).port);
+      set(vname + "port", (int)port);
+      set(vname + "connection", port > 0);
+      unsigned long long total_byte = m_eb_stat->down(0).total_byte;
+      double dbyte = total_byte - m_total_byte_out[0];
+      double flowrate = dbyte / dt / 1024 / 1024; //MB
+      set(vname + "total_byte", (float)total_byte);
+      set(vname + "flowrate", (float)flowrate);
+      m_total_byte_out[0] = total_byte;
+      //m_nevent_out[0] = nevent;
+      for (int i = 0; i < m_nsenders; i++) {
+        std::string vname = StringUtil::form("stat.in[%d].", i);
+        set(vname + "event", (int)m_eb_stat->up(i).event);
+        set(vname + "byte", (float)(m_eb_stat->up(i).byte / 1024.));
+        set(vname + "addr", (int)m_eb_stat->up(i).event);
+        port = m_eb_stat->up(i).port;//ntohl(m_eb_stat->up(i).port);
+        set(vname + "port", port);
+        set(vname + "connection", port > 0);
+        total_byte = m_eb_stat->up(i).total_byte;
+        dbyte = total_byte - m_total_byte_in[0];
+        flowrate = dbyte / dt / 1024 / 1024; //MB
+        set(vname + "total_byte", (float)total_byte);
+        set(vname + "flowrate", (float)flowrate);
+        m_total_byte_in[i] = total_byte;
+        //m_nevent_in[i] = nevent;
       }
       IOInfo::checkTCP(io_v);
       info->eb2out.event = m_eb_stat->down(0).event;
@@ -392,8 +532,12 @@ void StoragerCallback::monitor() throw(RCHandlerException)
         info->eb2in[i].byte = m_eb_stat->up(i).byte / 1024.;
         info->eb2in[i].nqueue = io_v[i + 1].getRXQueue() / 1024.;
         info->eb2in[i].connection = (io_v[i + 1].getState() == 1);
+        std::string vname = StringUtil::form("stat.in[%d].", i);
+        set(vname + "nqueue", (int)info->eb2in[i].nqueue);
+        //set(vname + "connection", (int)info->eb2in[i].connection);
       }
     }
+    m_t0 = t1;
 
     bool connected = false;
     bool writing = false;
@@ -416,21 +560,29 @@ void StoragerCallback::monitor() throw(RCHandlerException)
         info->runno = rostatus.runno;
         info->subno = rostatus.subno;
         info->node[0].nqueue_in = rostatus.nqueue_in / 1024; // B -> kB
-        SharedEventBuffer::Header* hd = m_ibuf.getHeader();
-        info->node[0].nqueue_out = (hd->nword_in - hd->nword_out) * 4 / 1024 / 1024; // word -> MB
+        if (m_ibuf.isOpened()) {
+          SharedEventBuffer::Header* hd = m_ibuf.getHeader();
+          info->node[0].nqueue_out = (hd->nword_in - hd->nword_out) * 4 / 1024 / 1024; // word -> MB
+        } else {
+          info->node[0].nqueue_out = 0;
+        }
         connected = (info->node[0].connection_in > 0);
         if (state == RCState::RUNNING_S && info->node[0].nevent_in > 0 &&
             info->node[0].nqueue_out == 0 && info->node[0].evtrate_in == 0) {
           m_errcount++;
           if (m_errcount == 12) {
-            log(LogFile::FATAL, "Data flow was stopped over 1 mins");
+            log(LogFile::WARNING, "Data flow was stopped over 1 mins");
           }
         } else {
           m_errcount = 0;
         }
       } else if (i == 1) { // record
-        SharedEventBuffer::Header* hd = m_rbuf.getHeader();
-        info->node[1].nqueue_out = (hd->nword_in - hd->nword_out) * 4 / 1024 / 1024; // word -> MB
+        if (m_rbuf.isOpened()) {
+          SharedEventBuffer::Header* hd = m_rbuf.getHeader();
+          info->node[1].nqueue_out = (hd->nword_in - hd->nword_out) * 4 / 1024 / 1024; // word -> MB
+        } else {
+          info->node[1].nqueue_out = 0;
+        }
         info->nfiles = rostatus.reserved_i[0];
         info->diskid = rostatus.reserved_i[1];
         info->nbytes = rostatus.reserved_f[0];

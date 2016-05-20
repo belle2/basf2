@@ -48,12 +48,18 @@ namespace Belle2 {
     NSMData m_data;
     SharedEventBuffer m_ibuf;
     SharedEventBuffer m_rbuf;
+    SharedEventBuffer m_obuf;
     ConfigFile m_file;
     eb_statistics* m_eb_stat;
     int m_nsenders;
     Time m_time;
     int m_errcount;
     int m_expno, m_runno;
+    double m_nevent_in[10];
+    double m_total_byte_in[10];
+    double m_nevent_out[10];
+    double m_total_byte_out[10];
+    double m_t0;
 
   };
 

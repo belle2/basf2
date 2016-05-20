@@ -9,13 +9,17 @@
 #include <assert.h>
 #include <stdint.h>
 #include <sys/mman.h>
-#include <sys/types.h>
+
+#ifndef O_NOATIME
+#define O_NOATIME 0
+#endif
 
 struct stream_statistics {
   uint32_t addr;
   uint32_t port;
   uint64_t event;
   uint64_t byte;
+  uint64_t total_byte;
 };
 
 class eb_statistics {
@@ -38,9 +42,9 @@ public:
     m_len_u = sizeof(stream_statistics) * m_n_u;
     m_len_d = sizeof(stream_statistics) * m_n_d;
 
-    m_fd_u = open(file_up,   O_RDWR | O_CREAT, 0666);
+    m_fd_u = open(file_up,   O_RDWR | O_CREAT | O_NOATIME, 0644);
     assert(m_fd_u >= 0);
-    m_fd_d = open(file_down, O_RDWR | O_CREAT, 0666);
+    m_fd_d = open(file_down, O_RDWR | O_CREAT | O_NOATIME, 0644);
     assert(m_fd_d >= 0);
 
     stream_statistics buf_u[m_n_u];

@@ -96,7 +96,7 @@ bool NSMVHandlerRCNodeUsed::handleSetInt(int val)
   if (val == 0) {
     m_callback.setState(m_rcnode, RCState::OFF_S);
     try {
-      NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::ABORT));
+      //NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::ABORT));
     } catch (const NSMHandlerException& e) {
       LogFile::warning(e.what());
     }

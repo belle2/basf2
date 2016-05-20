@@ -42,8 +42,6 @@ int main(int argc, char** argv)
   SharedEventBuffer ibuf;
   ibuf.open(argv[1], atoi(argv[2]) * 1000000);
   int* evtbuf = new int[10000000];
-  unsigned long long nbyte_in = 0;
-  unsigned long long nbyte_out = 0;
   unsigned int count_in = 0;
   unsigned int count_out = 0;
   unsigned int expno = 0;
@@ -59,11 +57,11 @@ int main(int argc, char** argv)
   }
   try {
     while (true) {
-      if (use_info) info.setInputPort(0);
+      if (use_info) info.setOutputPort(0);
       TCPSocket socket = serversocket.accept();
       TCPSocketWriter writer(socket);
-      B2INFO("Connected from expreco.");
-      if (use_info) info.setInputPort(port);
+      LogFile::info("Connected from expreco.");
+      if (use_info) info.setOutputPort(port);
       SharedEventBuffer::Header hdr;
       while (true) {
         long long nbyte = (ibuf.read(evtbuf, false, &hdr)) * sizeof(int);
@@ -78,40 +76,36 @@ int main(int argc, char** argv)
             info.setInputNBytes(0);
             info.setOutputCount(0);
             info.setOutputNBytes(0);
-            nbyte_in = nbyte_out = 0;
             count_in = count_out = 0;
           }
         }
         count_in++;
-        nbyte_in += nbyte;
-        if (use_info && count_in % 10 == 0) {
-          info.setInputCount(count_in);
-          info.addInputNBytes(nbyte_in);
+        if (use_info) {
+          info.addInputCount(1);
+          info.addInputNBytes(nbyte);
         }
+        unsigned long long nbyte_out = 0;
         try {
           unsigned int nbyte = htonl(evtbuf[0]);
-          unsigned long long onbyte = writer.write(&nbyte, sizeof(int));
-          onbyte += writer.write(evtbuf, evtbuf[0]);
+          nbyte_out = writer.write(&nbyte, sizeof(int));
+          nbyte_out += writer.write(evtbuf, evtbuf[0]);
           //std::cout << "[DEBUG] In : "<< ntohl(nbyte) << " evtbuf[0] : " << evtbuf[0] << std::endl;
         } catch (const IOException& e) {
-          B2WARNING("Lost connection to expreco " << e.what());
+          LogFile::warning("Lost connection to expreco %s", e.what());
           break;
         }
-        if (nbyte <= 0) {
-          B2WARNING("Connection to expreco broken.");
+        if (nbyte_out <= 0) {
+          LogFile::warning("Connection to expreco broken.");
           if (use_info) info.setInputPort(0);
           info.reportError(RunInfoBuffer::SOCKET_OUT);
           break;
         }
-        nbyte_out += nbyte;
         count_out++;
-        if (use_info && count_out % 10 == 0) {
-          info.setOutputCount(count_out);
+        if (use_info) {
+          info.addOutputCount(1);
           info.addOutputNBytes(nbyte_out);
-          nbyte_out = 0;
         }
       }
-      B2INFO("Closing sender socket");
       socket.close();
     }
   } catch (const std::exception& e) {

@@ -75,6 +75,7 @@ namespace Belle2 {
     //! DataStoreStreamer
     DataStoreStreamer* m_streamer;
     int m_eb2;
+    std::vector<std::string> m_saveObjs;
 
     StoreArray<RawCOPPER> rawcprarray;
 

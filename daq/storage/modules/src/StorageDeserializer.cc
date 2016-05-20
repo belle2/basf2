@@ -52,6 +52,7 @@ StorageDeserializerModule::StorageDeserializerModule() : Module()
   addParam("NodeName", m_nodename, "Node(subsystem) name", std::string(""));
   addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
   addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
+  //addParam("saveObjs", m_saveObjs, "List of objects/arrays to be saved", emptyvector);
 
   m_count = 0;
   g_module = this;
@@ -81,6 +82,7 @@ void StorageDeserializerModule::initialize()
   }
   m_handler = new MsgHandler(m_compressionLevel);
   m_streamer = new DataStoreStreamer();
+  //m_streamer->registerStreamObjs(m_saveObjs);
   m_package = new DataStorePackage(m_streamer, m_eb2);
 
   StoreArray<RawPXD>::registerPersistent();

@@ -153,14 +153,11 @@ public:
     } else {
       const char* belle2lib = getenv("BELLE2_LOCAL_DIR");
       int rev = atoi(StringUtil::split(popen(StringUtil::form("svn info %s | grep Revision", belle2lib)), ':')[1].c_str());
-      int rev_daq = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/daq | grep Revision", belle2lib)),
-                                           ':')[1].c_str());
+      int rev_daq = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/daq | grep Revision", belle2lib)), ':')[1].c_str());
       int rev_rawdata = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/rawdata | grep Revision", belle2lib)),
                                                ':')[1].c_str());
-      int rev_svd = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/svd | grep Revision", belle2lib)),
-                                           ':')[1].c_str());
-      int rev_pxd = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/pxd | grep Revision", belle2lib)),
-                                           ':')[1].c_str());
+      int rev_svd = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/svd | grep Revision", belle2lib)), ':')[1].c_str());
+      int rev_pxd = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/pxd | grep Revision", belle2lib)), ':')[1].c_str());
       char sql[1000];
       sprintf(sql,
               "insert into %s (path_sroot, runtype, expno, runno, fileid, diskid, rev, rev_daq, rev_rawdata, rev_svd, rev_pxd, time_create)"
@@ -262,7 +259,7 @@ int main(int argc, char** argv)
   const bool use_info = nodeid >= 0;
   if (use_info) info.open(nodename, nodeid);
   SharedEventBuffer ibuf;
-  ibuf.open(ibufname, ibufsize * 1000000, true);
+  ibuf.open(ibufname, ibufsize * 1000000);//, true);
   signal(SIGINT, signalHandler);
   signal(SIGKILL, signalHandler);
   ConfigFile config("slowcontrol");
@@ -272,7 +269,7 @@ int main(int argc, char** argv)
                          config.get("database.password"),
                          config.getInt("database.port"));
   SharedEventBuffer obuf;
-  if (obufsize > 0) obuf.open(obufname, obufsize * 1000000, true);
+  if (obufsize > 0) obuf.open(obufname, obufsize * 1000000);//, true);
   if (use_info) info.reportReady();
   B2DEBUG(1, "started recording.");
   int* evtbuf = new int[10000000];
@@ -287,8 +284,8 @@ int main(int argc, char** argv)
   int ecount = 0;
   bool newrun = false;
   while (true) {
-    ibuf.read(evtbuf, true, &iheader);
     if (use_info) info.reportRunning();
+    ibuf.read(evtbuf, true, &iheader);
     int nbyte = evtbuf[0];
     int nword = (nbyte - 1) / 4 + 1;
     bool isnew = false;

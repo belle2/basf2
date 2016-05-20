@@ -71,9 +71,9 @@ int StorageSerializerModule::writeStreamerInfos()
     DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
     for (DataStore::StoreEntryIter iter = map.begin(); iter != map.end(); ++iter) {
       const TClass* entryClass = iter->second.objClass;
+      std::cout << "Recording StreamerInfo : durability " << durability
+                << " : Class Name " << entryClass->GetName() << std::endl;
       TVirtualStreamerInfo* vinfo = entryClass->GetStreamerInfo();
-      //std::cout << "Recording StreamerInfo : durability " << durability
-      //  << " : Class Name " << entryClass->GetName() << std::endl;
       if (!minilist) minilist  =  new TList();
       minilist->Add((TObject*)vinfo);
     }
@@ -120,7 +120,7 @@ void StorageSerializerModule::event()
     header->subno = subno;
     m_nbyte = writeStreamerInfos();
     m_obuf.unlock();
-    return ;
+    //return ;
   } else {
     m_obuf.unlock();
   }

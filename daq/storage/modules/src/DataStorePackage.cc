@@ -22,12 +22,15 @@ using namespace Belle2;
 bool DataStorePackage::restore()
 {
   static int count = 0;
+  //(m_sndhdrary.appendNew())->SetBuffer(m_data.getBuffer());
   int nboard = m_data.getNBoard();
   if (m_eb2 == 0 && nboard == 1) {
     m_data_hlt.setBuffer(m_data.getBuffer());
   } else if (m_eb2 > 0 || nboard > 1) {
     m_data_hlt.setBuffer(m_data.getBody());
+    //(m_sndhdrary.appendNew())->SetBuffer(m_data_hlt.getBuffer());
   }
+
   if (m_data_hlt.getBuffer() == NULL || m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {
     B2FATAL("Bad tarailer magic for HLT = " << m_data_hlt.getTrailerMagic()
             << " count = " << count);
@@ -51,6 +54,7 @@ bool DataStorePackage::restore()
     }
     if (m_data_pxd.getBuffer() != NULL) {
       m_rawpxdary.appendNew((int*)m_data_pxd.getBody(), m_data_pxd.getBodyByteSize());
+      //(m_sndhdrary.appendNew())->SetBuffer(m_data_pxd.getBuffer());
     }
   } else {
     m_data_pxd.setBuffer(NULL);

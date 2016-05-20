@@ -57,7 +57,7 @@ PartialSeqRootReaderModule::~PartialSeqRootReaderModule()
 int PartialSeqRootReaderModule::openFile(int fileno)
 {
   if (m_fd > 0) close(m_fd);
-  if (m_filemax > 0 && fileno > m_filemax) return -1;
+  if (fileno > m_filemax) return -1;
   char filename[200];
   if (fileno > 0) {
     sprintf(filename, "%s-%d", m_path.c_str(), fileno);
@@ -81,6 +81,7 @@ int PartialSeqRootReaderModule::readFile()
     return ret;
   } else if (ret == 0) {
     m_fd = openFile(m_fileno++);
+    if (m_fd <= 0) return -1;
     ret = ::read(m_fd, m_buf, sizeof(int));
   }
   int size = *(int*)m_buf;

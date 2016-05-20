@@ -14,5 +14,7 @@ env['TOOLS_LIBS']['list_storage'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
 env['TOOLS_LIBS']['submit_filejob'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
 env['TOOLS_LIBS']['update_fileinfo'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
 env['TOOLS_LIBS']['end_fileinfo'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
+env['TOOLS_LIBS']['qsub_conversion'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
+env['TOOLS_LIBS']['qsub_gzip'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
 
 Return('env')

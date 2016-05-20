@@ -22,7 +22,7 @@ bool SharedEventBuffer::open(const std::string& nodename,
   std::string username = getenv("USER");
   m_path = "/storage_info_" + username + "_" + nodename;
   LogFile::debug("%s", m_path.c_str());
-  if (recreate) SharedMemory::unlink(m_path);
+  //if (recreate) SharedMemory::unlink(m_path);
   if (!m_memory.open(m_path, size())) {
     perror("shm_open");
     LogFile::fatal("Failed to open %s", m_path.c_str());
@@ -49,9 +49,10 @@ bool SharedEventBuffer::init()
   m_mutex.init();
   m_cond.init();
   memset(m_header, 0, sizeof(Header));
-  for (unsigned long long i = 0; i < m_nword; i++) {
-    m_buf[i] = 0;
-  }
+  memset(m_buf, 0, sizeof(int) * m_nword);
+  //for (unsigned long long i = 0; i < m_nword; i++) {
+  //  m_buf[i] = 0;
+  //}
   return true;
 }
 
@@ -74,8 +75,8 @@ bool SharedEventBuffer::close()
 
 bool SharedEventBuffer::unlink()
 {
-  m_memory.unlink();
   m_memory.close();
+  m_memory.unlink();
   return true;
 }
 

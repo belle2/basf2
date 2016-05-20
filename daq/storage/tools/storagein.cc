@@ -40,7 +40,7 @@ int main(int argc, char** argv)
     info.open(argv[5], atoi(argv[6]));
   }
   SharedEventBuffer ibuf;
-  ibuf.open(argv[1], atoi(argv[2]) * 1000000, true);
+  ibuf.open(argv[1], atoi(argv[2]) * 1000000);//, true);
   info.reportReady();
   TCPSocket socket(argv[3], atoi(argv[4]));
   info.reportReady();

@@ -35,7 +35,7 @@ int main(int argc, char** argv)
                          config.getInt("database.port"));
   std::stringstream ss;
   if (!failed) {
-    ss << "update " << g_table << " set time_convert = current_timestamp, path_cc = '"
+    ss << "update " << g_table << " set time_convert = current_timestamp, path_root = '"
        << filepath << "' where id = " << id << " and time_convert is null;";
     try {
       db.connect();

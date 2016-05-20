@@ -13,6 +13,8 @@
 
 #include <daq/slc/system/Mutex.h>
 #include <rawdata/dataobjects/RawPXD.h>
+//#include <daq/dataobjects/SndHdrTemp.h>
+
 
 #include "daq/storage/BinData.h"
 
@@ -65,6 +67,7 @@ namespace Belle2 {
     //DataStoreStreamer m_streamer;
     DataStoreStreamer* m_streamer;
     StoreArray<RawPXD> m_rawpxdary;
+    //StoreArray<SndHdrTemp> m_sndhdrary;
 
   };
 

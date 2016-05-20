@@ -40,11 +40,11 @@ class Basf2IPythonHandler(IPythonHandler):
         # Use our own calculation type.
         self._calculation_type = Basf2Calculation
 
-    def process(self, path, result_queue=None):
+    def process(self, path, result_queue=None, max_event=0):
         """
         Shortcut for convenience.
         """
-        return IPythonHandler.process(self, result_queue=result_queue, path=path)
+        return IPythonHandler.process(self, result_queue=result_queue, path=path, max_event=max_event)
 
     @staticmethod
     def style():

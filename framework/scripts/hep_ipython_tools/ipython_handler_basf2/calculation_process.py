@@ -13,11 +13,13 @@ class Basf2CalculationProcess(CalculationProcess):
     Overload implementation of the HEPProcess with the correct handling of the path calculation.
     """
 
-    def __init__(self, result_queue, log_file_name, parameters, path, random_seed=None):
+    def __init__(self, result_queue, log_file_name, parameters, path, random_seed=None, max_event=0):
         #: Random seed to set. None will not set it.
         self.random_seed = random_seed
         #: Path to process.
         self.path = path
+        #: The maximum number of events to process. Leave 0 to process al events
+        self.max_event = max_event
 
         super(Basf2CalculationProcess, self).__init__(result_queue=result_queue, log_file_name=log_file_name,
                                                       parameters=parameters)
@@ -66,7 +68,7 @@ class Basf2CalculationProcess(CalculationProcess):
             basf2.reset_log()
             basf2.logging.zero_counters()
             basf2.log_to_file(self.log_file_name)
-            basf2.process(self.path)
+            basf2.process(self.path, self.max_event)
 
             self.result_queue.put("ipython.statistics", Basf2CalculationQueueStatistics(basf2.statistics))
 

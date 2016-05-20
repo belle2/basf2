@@ -34,7 +34,7 @@
 namespace Belle2 {
   namespace ECL {
 
-    /** Class to get LocalMaxi */
+    /** Class to find connected regions */
     class ECLCRFinderModule : public Module {
 
     public:
@@ -117,6 +117,7 @@ namespace Belle2 {
 
     };
 
+    /** Class to find connected regions, pureCsI version*/
     class ECLCRFinderPureCsIModule : public ECLCRFinderModule {
     public:
       /** Name to be used for PureCsI option: ECLCalDigitsPureCsI.*/

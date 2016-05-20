@@ -3,6 +3,8 @@ from hep_ipython_tools.calculation import Calculation
 from hep_ipython_tools.calculation_process import CalculationProcess
 from hep_ipython_tools.calculation_queue import CalculationQueue
 
+# @cond internal_test
+
 
 class TestCalculation(TestCase):
 
@@ -53,3 +55,5 @@ class TestCalculation(TestCase):
         calculations = Calculation([process1, process2, process3])
 
         return calculations, process2
+
+# @endcond

@@ -10,6 +10,7 @@ class ModuleStatistics:
     """
 
     def __init__(self, stats, categories):
+        """Create a new module statistics entity."""
         #: Name property
         self.name = stats.name
         #: Time sum property
@@ -36,6 +37,7 @@ class ModuleStatistics:
         return {name: function(category) for name, category in categories}
 
     def __getitem__(self, item):
+        """Convenience function for the display."""
         if item == "name":
             return self.name
         elif item == "calls":

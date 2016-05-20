@@ -4,6 +4,8 @@ from hep_ipython_tools.calculation_queue import CalculationQueue, CalculationQue
 from hep_ipython_tools.tests.fixtures import MockQueue
 
 
+# @cond internal_test
+
 class A:
     pass
 
@@ -57,3 +59,5 @@ class TestCalculationQueue(TestCase):
 
         self.assertIn("TestItem", self.calculation_queue.get_keys())
         self.assertIn("TestItem2", self.calculation_queue.get_keys())
+
+# @endcond

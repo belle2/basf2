@@ -37,7 +37,7 @@ class Basf2IPythonHandler(IPythonHandler):
         #: A shortcut for returning module information
         self.modules = Basf2ModulesInformation()
 
-        # Use our own calculation type.
+        #: Use our own calculation type.
         self._calculation_type = Basf2Calculation
 
     def process(self, path, result_queue=None, max_event=0):

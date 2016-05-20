@@ -3,6 +3,8 @@ try:
 except ImportError:
     from Queue import Empty
 
+# @cond internal_test
+
 
 class MockQueue:
 
@@ -17,3 +19,5 @@ class MockQueue:
             return self.internal_storage.pop(0)
         except IndexError:
             raise Empty
+
+# @endcond

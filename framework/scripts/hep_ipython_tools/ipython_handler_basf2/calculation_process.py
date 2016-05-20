@@ -14,6 +14,7 @@ class Basf2CalculationProcess(CalculationProcess):
     """
 
     def __init__(self, result_queue, log_file_name, parameters, path, random_seed=None, max_event=0):
+        """Create a new basf2 calculation process."""
         #: Random seed to set. None will not set it.
         self.random_seed = random_seed
         #: Path to process.
@@ -48,6 +49,7 @@ class Basf2CalculationProcess(CalculationProcess):
             self.path = created_path
 
         else:
+            #: Set is_valid to false to not show this process in any listings.
             self.is_valid = False
 
     def start_process(self):

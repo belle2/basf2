@@ -6,6 +6,8 @@ from hep_ipython_tools.calculation_process import CalculationProcess
 from hep_ipython_tools.calculation_queue import CalculationQueue
 from tempfile import NamedTemporaryFile
 
+# @cond internal_test
+
 
 class DerivedCalculationProcess(CalculationProcess):
 
@@ -146,3 +148,5 @@ class TestOngoingLoggingCalculationProcess(TestCase):
         self.process.start()
 
         self.assertEqual(self.process.get_log(), "")
+
+# @endcond

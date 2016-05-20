@@ -7,6 +7,8 @@ import string
 
 class StylingWidget(viewer.StylingWidget):
     """The css string for styling the notebook."""
+
+    #: The css string for styling the notebook.
     css_string = """
         #notebook {
             background-color: rgba(20, 166, 255, 0.3);
@@ -46,6 +48,7 @@ class PathViewer(viewer.IPythonWidget):
         except:
             self.path = path
 
+        #: In the standalone mode, the basic parameters of the modules are shown
         self.standalone = standalone
 
     def create(self):
@@ -82,11 +85,15 @@ class ModuleViewer(viewer.IPythonWidget):
 
     def __init__(self, module, standalone=True):
         """ Init with a module as a string or a registered one. """
+
+        #: The module to show
         if isinstance(module, str):
             import basf2
             self.module = basf2.register_module(module)
         else:
             self.module = module
+
+        #: In the standalone mode, the basic parameters of the modules are shown
         self.standalone = standalone
 
         #: Template for the table beginning
@@ -164,8 +171,11 @@ class ModuleViewer(viewer.IPythonWidget):
 
 
 class DependencyViewer(viewer.IPythonWidget):
+    """Show the dependencies in a nice and fancy way :-)"""
 
     def __init__(self, store_arrays_with_dependencies_JSON):
+        """Create a new dependency viewer."""
+        #: A JSON from the processing of dependencies.
         self.store_arrays_with_dependencies_JSON = store_arrays_with_dependencies_JSON
 
         #: Part of the name representing the object for javascript

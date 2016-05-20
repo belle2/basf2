@@ -27,6 +27,7 @@ class Calculation:
         else:
             self.process_list = []
 
+        #: The calculation process type to use.
         self._calculation_process_type = CalculationProcess
 
     def __iter__(self):

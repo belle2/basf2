@@ -30,6 +30,8 @@ class IPythonWidget(object):
 
 class StylingWidget(IPythonWidget):
     """The css string for styling the notebook."""
+
+    #: The css string for styling the notebook.
     css_string = """
         #notebook-container {
             width: 90%;
@@ -218,8 +220,11 @@ class StatisticsViewer(IPythonWidget):
 
         #: Template for a table cell
         self.table_column_html = """<td style="padding: 10px;">{content}</td>"""
+        #: Template for a table cell spanning 3 columns
         self.table_column_3_html = """<td colspan="3" style="padding: 10px;">{content}</td>"""
+        #: Template for a table cell with left alignment
         self.table_cell_html = """<td style="padding: 10px; text-align: left">{content}</td>"""
+        #: Template for a table cell with 3 columns
         self.table_cell_3_html = """<td style=\"text-align: right\">{content[0]}</td><td>{content[1]}</td><td>{content[2]}</td>"""
 
     def create(self):

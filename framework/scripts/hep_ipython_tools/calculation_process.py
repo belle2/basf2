@@ -12,6 +12,10 @@ class CalculationProcess(Process):
     """
 
     def __init__(self, result_queue, log_file_name, parameters):
+        """
+        Create a new calculation process instance. The parameters here are the absolute standard. You probably have to redefine the
+        constructor in your own class.
+        """
         if result_queue is None:
             raise ValueError("Invalid result_queue")
 

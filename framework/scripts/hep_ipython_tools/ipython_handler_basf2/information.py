@@ -19,11 +19,17 @@ class Basf2EnvironmentInformation(EnvironmentInformation):
         """
         super().__init__()
 
+        #: Externals version
         self.externals_version = os.environ.get("BELLE2_EXTERNALS_VERSION")
+        #: Externals compile options
         self.externals_option = os.environ.get("BELLE2_EXTERNALS_OPTION")
+        #: Belle2 compile options
         self.option = os.environ.get("BELLE2_OPTION")
+        #: Architecture
         self.architecture = os.environ.get("BELLE2_ARCH")
+        #: Release version (if any)
         self.release = os.environ.get("BELLE2_RELEASE")
+        #: Basf2 folder
         self.release_folder = os.environ.get("BELLE2_LOCAL_DIR")
 
 
@@ -37,6 +43,7 @@ class Basf2ModulesInformation:
         Initialize with the module list from the framework.
         """
         from basf2 import fw
+        #: A cached module list for faster lookup.
         self.module_list = fw.list_available_modules()
 
     def search(self, regex_string):

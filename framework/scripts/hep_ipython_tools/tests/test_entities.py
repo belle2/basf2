@@ -2,6 +2,8 @@ from unittest import TestCase
 
 from hep_ipython_tools.entities import StoreContent, StoreContentList, StatisticsColumn, Statistics
 
+# @cond internal_test
+
 
 class TestStoreContent(TestCase):
 
@@ -53,3 +55,5 @@ class TestStatistics(TestCase):
 
         self.assertEqual(statistics.columns, test_columns)
         self.assertEqual(statistics.modules, test_modules)
+
+# @endcond

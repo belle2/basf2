@@ -1,6 +1,8 @@
 from unittest import TestCase
 from hep_ipython_tools.calculation_list import create_every_parameter_combination, create_all_calculations
 
+# @cond internal_test
+
 
 class TestCalculationList(TestCase):
 
@@ -109,3 +111,5 @@ class TestCalculationList(TestCase):
                 self.assertEqual(all_calculation_kwargs[index], {"a": 2 * x, "b": y + 1})
             else:
                 self.assertEqual(all_calculation_kwargs[index], None)
+
+# @endcond

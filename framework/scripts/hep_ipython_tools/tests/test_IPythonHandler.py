@@ -8,6 +8,8 @@ from hep_ipython_tools.information import EnvironmentInformation
 from hep_ipython_tools.ipython_handler import IPythonHandler
 from hep_ipython_tools.tests.fixtures import MockQueue
 
+# @cond internal_test
+
 
 class DeriviedCalculationProcess(CalculationProcess):
 
@@ -49,6 +51,7 @@ class TestIPythonHandler(TestCase):
         queue = DerivedIPythonHandler.create_queue()
 
         self.assertIsInstance(queue, CalculationQueue)
+
         self.assertEqual(queue.get_keys(), [])
         self.assertEqual(queue.results, {})
 
@@ -183,3 +186,5 @@ class TestIPythonHandler(TestCase):
         assert_is_in_processes(3, "ac")
         assert_is_in_processes(2, "bc")
         assert_is_in_processes(3, "bc")
+
+# @endcond

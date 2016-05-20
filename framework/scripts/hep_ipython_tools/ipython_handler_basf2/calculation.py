@@ -13,8 +13,10 @@ class Basf2Calculation(Calculation):
     """
 
     def __init__(self):
+        """Create a new basf2 calculation mostly overloading the standard calculation."""
         super().__init__()
 
+        #: Override the calculation process type with the basf2 one.
         self._calculation_process_type = Basf2CalculationProcess
 
     def show_path(self, index=None):

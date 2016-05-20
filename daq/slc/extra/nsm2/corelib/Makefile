@@ -26,11 +26,14 @@ libs::
 install::
 	install libnsm2_corelib.a $(EXTLIBDIR)
 	install libnsm2_corelib.so $(EXTLIBDIR)
-	mkdir -p $(EXTINCDIR)/nsm2
+	mkdir $(EXTINCDIR)/nsm2
 	install nsmlib2.h $(EXTINCDIR)/nsm2
 
 clean::
 	-rm -f *.o *.a *.so *.bak *~
+
+testparse::
+	$(CC) $(OPT) -DTESTPARSE -o testparse nsmparse.c
 
 nsmlib2.o: $(DEPS)
 

@@ -3,6 +3,7 @@
 #define __nsmlib2_h__
 
 /* -- INCLUDE FILES -------------------------------------------------- */
+#include <stdio.h>       /* for FILE * */
 #include <netinet/in.h>  /* for struct sockaddr_in */
 
 #include "nsm2.h"
@@ -118,6 +119,8 @@ int nsmlib_callback(NSMcontext* nsmc, const char* name,
                     NSMcallback_t callback, NSMfunctype functype);
 int nsmlib_readmem(NSMcontext* nsmc, void* buf,
                    const char* dat, const char* fmt, int rev);
+int nsmlib_statmem(NSMcontext* nsmc,
+                   const char* dat, char* fmtbuf, int bufsiz);
 void* nsmlib_openmem(NSMcontext* nsmc,
                      const char* dat, const char* fmt, int rev);
 void* nsmlib_allocmem(NSMcontext* nsmc,

@@ -42,7 +42,8 @@ main(int argc, char** argv)
   // OPEN shared memory
   // (datap has to be allocated before callback registration
   datap = (struct client_data*)
-          b2nsm_openmem(datname, fmtname, client_data_revision);
+          //b2nsm_openmem(datname, fmtname, client_data_revision);
+          b2nsm_openmem(datname, fmtname, -1);
   if (! datap) {
     printf("%s: openmem %s\n", program, b2nsm_strerror());
     return 1;

@@ -1,10 +1,17 @@
 #ifndef __nsm2_h__
 #define __nsm2_h__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+#if defined(__dummy_close_bracket_to_cheat_emacs_auto_indent)
+}
+#endif
+
 /* -- version info */
 
-#define NSM_PROTOCOL_VERSION 1926 /* protocol version */
-#define NSM_PACKAGE_VERSION  1939 /* package  version */
+#define NSM_PROTOCOL_VERSION 1944 /* protocol version */
+#define NSM_PACKAGE_VERSION  1945 /* package  version */
 
 /*
   20120723 1900 file created
@@ -45,6 +52,12 @@
   20140903 1937 nsmparse fix (see nsmparse.c)
   20140917 1938 newclient error return fix / shm cleanup fix
   20140917 1939 skip revision check by -1
+  20140921 1940 bytes in nsmparse_t, flushmem, less DBG in nsmd2
+  20140922 1941 nsmget is added
+  20140922 1942 nodtim fix
+  20150520 1943 destroyconn fix [for anonymous and for sys.ready]
+  20150521 1944 new protocol version, master recoonect fix
+  20150808 1945 updates for PNNL summer school tutorial
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */
@@ -130,6 +143,7 @@ typedef struct NSMcontext_struct NSMcontext;
 #define NSMEBADREV    (-33) /* data revision is inconsistent (openmem) */
 #define NSMEPARSE     (-34) /* data format parse error (openmem) */
 #define NSMECONNECT   (-35) /* connection error */
+#define NSMEINVPTR    (-36) /* invalid data pointer */
 
 /* NSMmsg (in host byte order) */
 typedef struct {
@@ -145,9 +159,12 @@ typedef struct {
 typedef void (*NSMcallback_t)(NSMmsg* msg, NSMcontext* nsmc);
 typedef void (*NSMfunc_t)(NSMmsg* msg, NSMcontext* nsmc);
 
-/* -- FUNCTIONS ------------------------------------------------------ */
-
-
+#if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
+__dummy_open_bracket_to_cheat_emacs_auto_indent {
+#endif
+#if defined(__cplusplus)
+}
+#endif
 
 #endif /* __nsm2_h__ */
 

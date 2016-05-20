@@ -19,6 +19,7 @@ void b2nsm_context(NSMcontext* context);
 const char* b2nsm_strerror();
 int b2nsm_callback(const char* name, NSMcallback_t callback);
 int b2nsm_readmem(void* buf, const char* dat, const char* fmt, int rev);
+int b2nsm_statmem(const char* dat, char* fmtbuf, int buflen);
 void* b2nsm_openmem(const char* dat, const char* fmt, int rev);
 void* b2nsm_allocmem(const char* dat, const char* fmt, int rev, float cycle);
 int b2nsm_flushmem(const void* ptr, int siz);

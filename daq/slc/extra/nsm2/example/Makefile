@@ -2,7 +2,7 @@
 #  Makefile for NSM2 example clients
 #
 
-ALL = client client_wait ttd_dummy master readdat readca2nsm anonymous bridge
+ALL = client client_wait master readdat anonymous bridge nsmget
 LIBS      = 
 CC        = gcc
 CXX       = g++
@@ -32,14 +32,11 @@ client: client.o $(LIBS)
 client_wait: client_wait.o $(LIBS)
 	$(CXX) -o client_wait $(CFLAGS) client_wait.o $(LIBS)
 
-ttd_dummy: ttd_dummy.o $(LIBS)
-	$(CXX) -o ttd_dummy $(CFLAGS) ttd_dummy.o $(LIBS)
-
 readdat: readdat.o $(LIBS)
 	$(CXX) -o readdat $(CFLAGS) readdat.o $(LIBS)
 
-readca2nsm: readca2nsm.o $(LIBS)
-	$(CXX) -o readca2nsm $(CFLAGS) readca2nsm.o $(LIBS)
+nsmget: nsmget.o $(LIBS) ../nsmget/libnsmget.o
+	$(CXX) -o nsmget $(CXXFLAGS) nsmget.o $(LIBS) ../nsmget/libnsmget.o
 
 anonymous: anonymous.o $(LIBS)
 	$(CXX) -o anonymous $(CFLAGS) anonymous.o $(LIBS)

@@ -283,7 +283,7 @@ typedef struct {
   int64_t timstart; /* creation time of NSMsys (may not by me) */
   int64_t timevent; /* last update of NSMsys */
   uint32_t netmask;
-  int16_t dirty;  /* connection is updated, but fdset is not updated yet */
+  int16_t sock_updated;  /* socket updated, but fdset not updated yet */
   int16_t afirst; /* set and distributed by master */
   int16_t nnod; /* set and distributed by master */
   int16_t nref; /* set and distributed by master */

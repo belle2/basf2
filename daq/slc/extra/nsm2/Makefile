@@ -16,7 +16,6 @@ FILES = \
  corelib/nsmlib2.h \
  corelib/nsmparse.c \
  corelib/nsmparse.h \
- corelib/nsmreq2.h \
  corelib/nsmsys2.h \
  nsmget/Makefile \
  nsmget/libnsmget.cc \
@@ -38,6 +37,8 @@ FILES = \
  example/readdat.cc \
  example/nsmget.cc \
  doc/nsm2.pdf
+
+VER = $(shell sed -n '/NSM_PACKAGE_VERSION/s/.*ION *\([0-9]*\) .*/\1/p' daemon/nsm2.h)
 
 all:
 	(cd daemon  ; make clean all)
@@ -67,15 +68,19 @@ daemon/nsm2.h: $(FILES)
 	@echo
 	@false
 
-package: daemon/nsm2.h
-	@-mkdir tgz
+package: tgz daemon/nsm2.h
+	@-mkdir tgz 2> /dev/null || true
 	@grep 'VERSION' daemon/nsm2.h
 	@grep 'define.*VERSION' daemon/nsmd2.cc
 	@grep 'nsmlib2_version' corelib/nsmlib2.c
 	@grep 'belle2nsm_version' b2lib/belle2nsm.c
 	@echo
-	tar cf - daemon/nsm2.h $(FILES)  | gzip -9 \
-	> tgz/nsm2-$(shell sed -n '/NSM_PACKAGE_VERSION/s/.*ION *\([0-9]*\) .*/\1/p' daemon/nsm2.h).tgz
+	@-rm -rf nsm2-$(VER)
+	@mkdir nsm2-$(VER)
+	@tar cf - daemon/nsm2.h $(FILES) | (cd nsm2-$(VER) ; tar xf -)
+	@tar cf - nsm2-$(VER) | gzip -9 > tgz/nsm2-$(VER).tgz
+	@-rm -rf nsm2-$(VER)
+	@echo tgz/nsm2-$(VER).tgz is created
 
 install: ${BELLE2_EXTERNALS_DIR}/src/nsm2/daemon/Makefile
 

@@ -240,7 +240,7 @@ nsmlib_checkpoint(NSMcontext *nsm, int val)
 {
   DBS(nsm, val);
 }
-/* -- nsm_strerror --------------------------------------------------- */
+/* -- nsmlib_strerror ------------------------------------------------ */
 const char *
 nsmlib_strerror(NSMcontext *nsmc)
 {
@@ -505,8 +505,11 @@ nsmlib_checkif(NSMcontext *nsmc, SOCKAD_IN *sap)
   return NSMENOIF;
 }
 /* -- nsmlib_initnet ------------------------------------------------- */
+/*
+  since nsm-1931 second argument is unused.
+ */
 int
-nsmlib_initnet(NSMcontext *nsmc, const char *host, int port)
+nsmlib_initnet(NSMcontext *nsmc, const char *unused, int port)
 {
   struct hostent *hp;
   NSMcontext *nsmcp;
@@ -1374,7 +1377,7 @@ nsmlib_readmem(NSMcontext *nsmc, void *buf,
   
   if (! fmtname) fmtname = datname;
   
-  if (revision <= 0) {
+  if (revision <= 0 && revision != -1) {
     sprintf(nsmc->errs, "invalid revision %d for data %s", revision, datname);
     return nsmc->errc = NSMEINVPAR;
   }
@@ -1413,6 +1416,43 @@ nsmlib_readmem(NSMcontext *nsmc, void *buf,
 	 (char *)memp + ntohl(datp->dtpos), ntohs(datp->dtsiz));
 
   return 0;
+}
+/* -- nsmlib_statmem ------------------------------------------------ */
+/*
+  return value: size of data if > 0
+  fmtbuf is set with name of struct
+*/
+int
+nsmlib_statmem(NSMcontext *nsmc,
+               const char *datname, char *fmtbuf, int bufsiz)
+{
+  NSMsys *sysp = nsmc->sysp;
+  NSMdat *datp;
+  int datid;
+  int dtfmtlen;
+  
+  if (! fmtbuf) return 0;
+    
+  /* linear search, to be replaced with a hash version */
+  for (datid = 0; datid < NSMSYS_MAX_DAT; datid++) {
+    datp = sysp->dat + datid;
+    if (strcmp(datp->dtnam, datname) == 0) break;
+  }
+  if (datid == NSMSYS_MAX_DAT) {
+    sprintf(nsmc->errs, "data %s not found", datname);
+    nsmc->errc = NSMENOMEM;
+    return -1;
+  }
+
+  dtfmtlen = strlen(datp->dtfmt);
+  *fmtbuf = 0;
+  if (datp->dtfmt[dtfmtlen + 1]) {
+    int dtstrlen = strlen(datp->dtfmt + dtfmtlen + 1);
+    if (dtstrlen < bufsiz) {
+      strcpy(fmtbuf, datp->dtfmt + dtfmtlen + 1);
+    }
+  }
+  return (int)ntohs(datp->dtsiz);
 }
 /* -- nsmlib_openmem ------------------------------------------------- */
 void *
@@ -1575,12 +1615,9 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
   
   if (! fmtname) fmtname = datname;
   if (! nsmc) { nsmlib_errc = NSMENOINIT; return 0; }
-  if (! datname || revision < 0) { nsmc->errc = NSMEINVPAR; }
-
-  if (revision <= 0) {
-    nsmc->errc = NSMEINVPAR;
-    return 0;
-  }
+  if (! datname) { nsmc->errc = NSMEINVPAR; return 0; }
+  if (revision <= 0) { nsmc->errc = NSMEINVPAR; return 0; }
+  if (strlen(datname) > NSMSYS_DNAM_SIZ) { nsmc->errc = NSMEINVPAR; return 0; }
   
   if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr,
                           &newrevision))) {
@@ -1596,11 +1633,16 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
     nsmc->errc = NSMEPARSE;
     return 0;
   }
-  if (! (p = malloc(strlen(datname) + strlen(fmtstr) + 2))) {
+  if (strlen(fmtstr) + strlen(fmtname) + 1 > NSMSYS_DFMT_SIZ) {
+    nsmc->errc = NSMEINVPAR;
+    return 0;
+  }
+  if (! (p = malloc(strlen(datname) + strlen(fmtstr) + strlen(fmtname) + 3))) {
+    nsmc->errc = NSMEALLOC;
     return 0;
   }
 
-  sprintf(p, "%s %s", datname, fmtstr);
+  sprintf(p, "%s %s %s", datname, fmtstr, fmtname);
 
   memset(&msg, 0, sizeof(msg));
   msg.req = NSMCMD_ALLOCMEM;
@@ -1610,6 +1652,7 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
   msg.pars[1] = revision;
   msg.len = strlen(p) + 1;
   msg.datap = p;
+  DBG("datap=%s\n", p);
   nsmc->reqwait = msg.req;
   nsmc->errc = nsmlib_send(nsmc, &msg);
   free(p);
@@ -1628,9 +1671,14 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
 }
 /* -- nsmlib_init ------------------------------------------------------- */
 /*    node is anonymous when nodename = 0                                 */
+/*                                                                        */
+/*    since nsm-1931 IP address for TCP connection is taken from the      */
+/*    shared memory and there is no use for the "host" variable nor       */
+/*    NSM2_HOST environment variable.                                     */
+/*                                                                        */
 /* ---------------------------------------------------------------------- */
 NSMcontext *
-nsmlib_init(const char *nodename, const char *host, int port, int shmkey)
+nsmlib_init(const char *nodename, const char *unused, int port, int shmkey)
 {
   NSMcontext *nsmc;
   int ret = 0;
@@ -1662,13 +1710,12 @@ nsmlib_init(const char *nodename, const char *host, int port, int shmkey)
 
   /* -- environment variables -- */
   if (! port)   port   = nsmlib_atoi(getenv(NSMENV_PORT), NSM2_PORT);
-  if (! host)   host   = getenv(NSMENV_HOST);
   
   /* -- shared memory initialization -- */
   if (ret == 0) ret = nsmlib_initshm(nsmc, shmkey, port);
 
   /* -- network initialization -- */
-  if (ret == 0) ret = nsmlib_initnet(nsmc, host, port);
+  if (ret == 0) ret = nsmlib_initnet(nsmc, 0, port);
 
   /* -- signal handler initialization -- */
   if (ret == 0) ret = nsmlib_initsig(nsmc);

@@ -17,8 +17,6 @@
 #include <errno.h>
 #include "belle2nsm.h"
 
-#include <sys/time.h>
-
 extern "C" {
 #ifdef USE_READLINE
 #include <readline/readline.h>
@@ -370,15 +368,10 @@ main(int argc, char** argv)
       break;
     } else if (strcasecmp(av[0], "start") == 0) {
       if (ac < 3 || ! isdigit(av[2][0])) {
-        printf("usage: start <node> <expno> <runno>\n");
+        printf("usage: start <node> <run-number>\n");
       } else {
-        int expno = atoi(av[2]);
-        int runno = atoi(av[3]);
-        timeval tv;
-        gettimeofday(&tv, 0);
-        int ctime = tv.tv_sec;
-        int pars[4] = {expno, runno, 0, ctime};
-        b2nsm_sendreq(av[1], "START", 4, pars);
+        int runno = atoi(av[2]);
+        b2nsm_sendreq(av[1], "START", 1, &runno);
       }
     } else if (strcasecmp(av[0], "stop") == 0) {
       if (ac < 2) {
@@ -386,17 +379,17 @@ main(int argc, char** argv)
       } else {
         b2nsm_sendreq(av[1], "STOP", 0, 0);
       }
-    } else if (strcasecmp(av[0], "load") == 0) {
+    } else if (strcasecmp(av[0], "config") == 0) {
       if (ac < 2) {
-        printf("usage: load <node>\n");
+        printf("usage: config <node>\n");
       } else {
-        b2nsm_sendreq(av[1], "LOAD", 0, 0);
+        b2nsm_sendreq(av[1], "CONFIG", 0, 0);
       }
-    } else if (strcasecmp(av[0], "abort") == 0) {
+    } else if (strcasecmp(av[0], "forget") == 0) {
       if (ac < 2) {
-        printf("usage: abort <node>\n");
+        printf("usage: forget <node>\n");
       } else {
-        b2nsm_sendreq(av[1], "ABORT", 0, 0);
+        b2nsm_sendreq(av[1], "FORGET", 0, 0);
       }
     } else if (strcasecmp(av[0], "data") == 0) {
       if (ac < 3) {

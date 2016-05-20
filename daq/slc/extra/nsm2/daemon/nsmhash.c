@@ -22,7 +22,7 @@ struct NSMsys;
 #define SYSPTR(pos) (((char *)nsmd_sysp)+pos)
 
 /* -- nsmlib_hashcode ------------------------------------------------ */
-static int
+int
 nsmlib_hashcode(const char *key, int hashmax)
 {
   int num = 0;

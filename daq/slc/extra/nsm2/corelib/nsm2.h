@@ -10,8 +10,8 @@ extern "C" {
 
 /* -- version info */
 
-#define NSM_PROTOCOL_VERSION 1926 /* protocol version */
-#define NSM_PACKAGE_VERSION  1941 /* package  version */
+#define NSM_PROTOCOL_VERSION 1944 /* protocol version */
+#define NSM_PACKAGE_VERSION  1945 /* package  version */
 
 /*
   20120723 1900 file created
@@ -54,6 +54,10 @@ extern "C" {
   20140917 1939 skip revision check by -1
   20140921 1940 bytes in nsmparse_t, flushmem, less DBG in nsmd2
   20140922 1941 nsmget is added
+  20140922 1942 nodtim fix
+  20150520 1943 destroyconn fix [for anonymous and for sys.ready]
+  20150521 1944 new protocol version, master recoonect fix
+  20150808 1945 updates for PNNL summer school tutorial
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */

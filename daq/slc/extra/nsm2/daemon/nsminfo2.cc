@@ -193,10 +193,11 @@ nsminfo_head()
   } else if (sys.master == NSMCON_NON) {
     P("NSM network is not started yet\n");
   } else {
-    P("NSM network v%d.%d.%02d started at %s (%s ago)\n",
+    P("NSM network v%d.%d.%02d started at %s (%s ago) gen=%d\n",
       pver / 1000, (pver % 1000) / 100, pver % 100,
       nsminfo_timestr(tcpcon.timstart, 1),
-      nsminfo_timestr(tcpcon.timstart));
+      nsminfo_timestr(tcpcon.timstart),
+      sys.generation);
   }
   P("NSMD daemon v%d.%d.%02d started at %s (%s ago) priority=%d\n",
     dver / 1000, (dver % 1000) / 100, dver % 100,
@@ -363,16 +364,20 @@ nsminfo_dat(int all = 0)
       MAGENTA();
     }
     if (xverbose) {
-      P("DAT %-3.1d %-31.31s pos=%d sz=%d nod=%d rev=%d ref=%d fmt=%s\n",
+      P("DAT %-3.1d %-31.31s pos=%d sz=%d nod=%d rev=%d ref=%d fmt=%s",
         idat, dat.dtnam, ntohl(dat.dtpos), ntohs(dat.dtsiz),
         (int16_t)ntohs(dat.owner), ntohs(dat.dtrev), ntohs(dat.dtref),
         dat.dtfmt);
     } else {
-      P("DAT %-3.1d %-31.31s sz=%d nod=%d rev=%d ref=%d fmt=%s\n",
+      P("DAT %-3.1d %-31.31s sz=%d nod=%d rev=%d ref=%d fmt=%s",
         idat, dat.dtnam, ntohs(dat.dtsiz),
         (int16_t)ntohs(dat.owner), ntohs(dat.dtrev), ntohs(dat.dtref),
         dat.dtfmt);
     }
+    if (dat.dtfmt[strlen(dat.dtfmt) + 1]) {
+      P(" %s", dat.dtfmt + strlen(dat.dtfmt) + 1);
+    }
+    P("\n");
     BLACK();
   }
 }

@@ -512,6 +512,8 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
       }
     }
     
+    while (isspace(*ptr)) ptr++;
+    
     for (typep = types; typep->name; typep++) {
       int len = strlen(typep->name);
       if (strncmp(ptr, typep->name, len) == 0 && isspace(ptr[len])) {
@@ -717,13 +719,13 @@ nsmlib_parsefile(const char *datname, int revision, const char *incpath,
   }
 
   filebuf = nsmparse_readfile(filepath, 0); /* no need to retreive length */
-  free(filepath);
   
   if (! filebuf) return 0;
 
   parsep = nsmlib_parsestr(datname, revision, filebuf, filepath, fmtstr,
                            revisionp);
   free(filebuf);
+  free(filepath);
 
   return parsep;
 }
@@ -761,7 +763,7 @@ main(int argc, char **argv)
   if (revision <= 0) {
     printf("wrong revision %d\n", revision);
   } else if (parsep = nsmlib_parsefile(datname, revision, incpath,
-				       fmtstr, &newrevison)) {
+				       fmtstr, &newrevision)) {
     printf("parsep found: %s\n", fmtstr);
   } else {
     int errcode;

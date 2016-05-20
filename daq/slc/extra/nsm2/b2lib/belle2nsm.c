@@ -341,6 +341,28 @@ b2nsm_readmem(void *buf, const char *dat, const char *fmt, int rev)
   }
   return ret;
 }
+/* -- b2nsm_statmem ----------------------------------------------------- */
+int
+b2nsm_statmem(const char *dat, char *fmtbuf, int buflen)
+{
+  char dat_uprcase[NSMSYS_NAME_SIZ+1];
+  int ret;
+  if (! nsm) return 0;
+  xuprcpy(dat_uprcase, dat, NSMSYS_NAME_SIZ+1);
+  ret = nsmlib_statmem(nsm, dat_uprcase, fmtbuf, buflen);
+
+  if (! logfp) return ret;
+
+  if (ret < 0) {
+    nsmlib_log("%sstatmem(%s) failed: %s\n",
+	       xt(), dat, b2nsm_strerror());
+  } else if (ret == 0) {
+    nsmlib_log("%sstatmem(%s) no fmt\n", xt(), dat);
+  } else {
+    nsmlib_log("%sstatmem(%s) fmt %s\n", xt(), dat, fmtbuf);
+  }
+  return ret;
+}
 /* -- b2nsm_openmem ----------------------------------------------------- */
 void *
 b2nsm_openmem(const char *dat, const char *fmt, int rev)

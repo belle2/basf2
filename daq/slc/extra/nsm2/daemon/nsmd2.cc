@@ -38,8 +38,12 @@
 //  20140902  1935 memset fix
 //  20140903  1936 debug message fix
 //  20140917  1938 newclient error return fix / shm cleanup fix
+//  20140921  1940 flushmem, less DBG messages
+//  20140922  1942 nodtim fix
+//  20150520  1943 destroyconn fix [for anonymous and for sys.ready]
+//  20150521  1944 new protocol version, master recoonect fix
 
-#define NSM_DAEMON_VERSION   1938 /* daemon   version 1.9.38 */
+#define NSM_DAEMON_VERSION   1944 /* daemon   version 1.9.44 */
 // ----------------------------------------------------------------------
 
 // -- include files -----------------------------------------------------
@@ -183,7 +187,7 @@ void nsmd_do_newmaster(NSMcon&, NSMdmsg&);
 void nsmd_do_delclient(NSMcon&, NSMdmsg&);
 void nsmd_do_allocmem(NSMcon&, NSMdmsg&);
 void nsmd_do_freemem(NSMcon&, NSMdmsg&) {}
-void nsmd_do_flushmem(NSMcon&, NSMdmsg&) {}
+void nsmd_do_flushmem(NSMcon&, NSMdmsg&);
 void nsmd_do_reqcpymem(NSMcon&, NSMdmsg&);
 void nsmd_do_syscpymem(NSMcon&, NSMdmsg&);
 void nsmd_do_openmem(NSMcon&, NSMdmsg&);
@@ -194,7 +198,7 @@ void nsmd_do_dumpdata(NSMcon&, NSMdmsg&) {}
 void nsmd_do_dumpconn(NSMcon&, NSMdmsg&) {}
 void nsmd_do_dumpinfo(NSMcon&, NSMdmsg&) {}
 void nsmd_do_debugflag(NSMcon&, NSMdmsg&) {}
-void nsmd_do_killdaemon(NSMcon&, NSMdmsg&) {}
+void nsmd_do_killdaemon(NSMcon&, NSMdmsg&);
 void nsmd_do_cleanup(NSMcon&, NSMdmsg&) {}
 void nsmd_do_touchmem(NSMcon&, NSMdmsg&) {}
 void nsmd_do_ping(NSMcon&, NSMdmsg&) {}
@@ -314,6 +318,7 @@ static void nsmd_tcpsend(NSMcon& con, NSMdmsg& dmsg,
                          NSMDtcpq* qptr = 0, int beforeafter = 0);
 extern "C" int nsmlib_hash(NSMsys* sysp, int32_t* hashtable, int hashmax,
                            const char* key, int create);
+extern "C" int nsmlib_hashcode(const char* key, int hashmax);
 extern void nsminfo2();
 
 //                   -------------------------
@@ -439,7 +444,7 @@ static int     nsmd_longused = 0;
 void
 nsmd_free(const char* where, const char* p)
 {
-  DBG("free: %s p=%08x\n", where, p);
+  //DBG("free: %s p=%08x\n", where, p);
 
   if (SYSPOS(p) >= 0 && SYSPOS(p) < sizeof(NSMsys)) return;
   if (MEMPOS(p) >= 0 && MEMPOS(p) < sizeof(NSMmem)) return;
@@ -984,7 +989,11 @@ nsmd_shmclean()
     datp->anext = htons(-1);
     datp->nnext = htons(-1);
   }
+  for (NSMcon* conp = sys.con; conp < sys.con + NSMSYS_MAX_CON; conp++) {
+    conp->sock = -1;
+  }
   sys.afirst = htons(-1);
+  sys.ready = -1;
 }
 // -- nsmd_setugid ------------------------------------------------------
 //
@@ -1107,6 +1116,7 @@ nsmd_shmopen(int shmkey, time_t now)
   } else if (retsys == EEXIST || retsys == EACCES) {
     NSMsys& sys = *nsmd_sysp;
     NSMmem& mem = *nsmd_memp;
+    // pid/ipaddr/timstart/timevent are those unchanged by shmclean
     if (sys.pid == mem.pid && sys.ipaddr == mem.ipaddr &&
         sys.timstart == mem.timstart) {
       if (kill(sys.pid, 0) < 0 && errno == ESRCH) { // unexpected
@@ -1116,10 +1126,11 @@ nsmd_shmopen(int shmkey, time_t now)
              sys.pid, sys.ipaddr, sys.timstart, sys.timevent);
         nsmd_destroy_clients();
         sleep(1);
-        sys.pid = getpid();
-        sys.ipaddr = nsmd_myip;
-        sys.timstart = sys.timevent = now;
-        WARN("setting up new sys.pid=%d ip=%08x t=%d",
+        sys.pid      = mem.pid      = getpid();
+        sys.ipaddr   = mem.ipaddr   = nsmd_myip;
+        sys.timstart = mem.timstart = now;
+        sys.timevent = mem.timevent = now;
+        WARN("setting up new sys/mem.pid=%d ip=%08x t=%d",
              sys.pid, sys.ipaddr, sys.timstart);
 
       } else {
@@ -1346,7 +1357,8 @@ nsmd_init(int dryrun)
   tcpcon.sockad = nsmd_sockad;
   udpcon.pid  = tcpcon.pid = -1;
   udpcon.nid  = tcpcon.nid = -1;
-  udpcon.timstart = now;
+  udpcon.timstart = 0;   // NSM2 timstart is unknown yet
+  tcpcon.timstart = now;
   udpcon.pid = tcpcon.pid = sys.pid;
   sys.ncon = 2;
   sys.master = sys.deputy = NSMCON_NON;
@@ -1452,8 +1464,8 @@ static void
 nsmd_freeq(NSMDtcpq* q)
 {
   // otherwise queue entry can be freed
-  DBG("freeq before f=%08x(%08x) l=%08x q=%08x",
-      nsmd_tcpqfirst, nsmd_tcpqfirst ? nsmd_tcpqfirst->prevp : 0, nsmd_tcpqlast, q);
+  //DBG("freeq before f=%08x(%08x) l=%08x q=%08x",
+  // nsmd_tcpqfirst, nsmd_tcpqfirst?nsmd_tcpqfirst->prevp:0, nsmd_tcpqlast, q);
   if (q->prevp) {  // not the first one
     q->prevp->nextp = q->nextp;
   } else {         // the first one
@@ -1464,8 +1476,8 @@ nsmd_freeq(NSMDtcpq* q)
   } else {         // the last one
     nsmd_tcpqlast = q->prevp;
   }
-  DBG("freeq after f=%08x(%08x) l=%08x q=%08x",
-      nsmd_tcpqfirst, nsmd_tcpqfirst ? nsmd_tcpqfirst->prevp : 0, nsmd_tcpqlast, q);
+  //DBG("freeq after f=%08x(%08x) l=%08x q=%08x",
+  // nsmd_tcpqfirst, nsmd_tcpqfirst?nsmd_tcpqfirst->prevp:0, nsmd_tcpqlast, q);
 
   if (q->datap) {
     nsmd_free("tcpfreeq(longbuf)", q->datap - q->npar * sizeof(int32_t));
@@ -1519,9 +1531,7 @@ nsmd_tcpwriteq()
   while (1) { // just for EINTR and EAGAIN
     if ((ret = select(con.sock + 1, 0, &fdset, 0, &tv)) >= 0) break;
     if (errno == EINTR || errno == EAGAIN) continue;
-    close(con.sock);
-    con.sock = -1;
-    //ERRO("tcpwriteq: select"); // unexpected
+    ERRO("tcpwriteq: select"); // unexpected
   }
 
   // if timeout, mark it as WAIT-SELECT
@@ -1560,17 +1570,6 @@ nsmd_tcpwriteq()
     writelen = q->msglen - q->pos;
   }
 
-  {
-    NSMtcphead& head = *(NSMtcphead*)q->buf;
-    int* p = (int*)(q->buf + sizeof(NSMtcphead));
-    int npar = head.npar;
-    int req  = ntohs(head.req);
-    int len  = ntohs(head.len);
-    DBG("tcpwriteq(%d,%d) req=%x len=%d npar=%d p=[%d,%d] buf=%x writep=%x",
-        con.sock, q->conid,
-        req, len, npar, ntohl(p[0]), ntohl(p[1]), q->buf, writep);
-  }
-
   // and actual write
   while (1) { // just for EINTR and EAGAIN
     if ((ret = write(con.sock, writep, writelen)) >= 0) break;
@@ -1578,9 +1577,29 @@ nsmd_tcpwriteq()
     ERRO("tcpwriteq(%d,%d) write %d bytes",
          con.sock, q->conid, writelen); // unexpected
   }
+
+  {
+    NSMtcphead& head = *(NSMtcphead*)q->buf;
+    int* p = (int*)(q->buf + sizeof(NSMtcphead));
+    int npar = head.npar;
+    int req  = ntohs(head.req);
+    int len  = ntohs(head.len);
+    char parbuf[256];
+    switch (npar) {
+      case 0: strcpy(parbuf, "npar=0"); break;
+      case 1: sprintf(parbuf, "p=[%d]", ntohl(p[0])); break;
+      case 2: sprintf(parbuf, "p=[%d,%d]",
+                        ntohl(p[0]), ntohl(p[1])); break;
+      default: sprintf(parbuf, "n=%d p=[%d,%d]",
+                         npar, ntohl(p[0]), ntohl(p[1])); break;
+    }
+    DBG("tcpwriteq(%d,%d) req=%x len=%d %s buf=%x wp=%x(%d/%d)",
+        con.sock, q->conid,
+        req, len, parbuf, q->buf, writep, ret, writelen);
+
+  }
+
   if (ret == 0) ASRT("tcpwriteq: write returns 0 for con=%d", q->conid);
-  DBG("tcpwriteq(%d,%d) = %d/%d %x",
-      con.sock, q->conid, ret, writelen, writep);
 
   // for a large datap, keep the queue to be called again
   if (ret == writelen && wtyp == WHEAD) {
@@ -1638,7 +1657,7 @@ nsmd_tcpsend(NSMcon& con, NSMdmsg& dmsg, NSMDtcpq* qptr, int beforeafter)
   // print the request
   int dispflag = 1;
   if ((req == NSMCMD_SYSCPYMEM || req == NSMCMD_REQCPYMEM) &&
-      (!DBGBIT(4) || !sys.ready || len == NSMD_TCPSENDSIZ)) dispflag = 0;
+      (!DBGBIT(4) || (sys.ready > 0) || len == NSMD_TCPSENDSIZ)) dispflag = 0;
   if ((req == NSMCMD_USRCPYMEM || req == NSMCMD_FLUSHMEM ||
        req == NSMCMD_PING || req == NSMCMD_PONG) && !DBGBIT(6)) dispflag = 0;
   if (DBGBIT(1) || (reqstr[0] == '[' && ! DBGBIT(10))) dispflag = 0;
@@ -1894,9 +1913,9 @@ nsmd_newconn(int conid, int32_t ip, const char* contype)
   con.pid    = -1;
   con.nid    = -1;
   con.status = NSMDC_JC; // just connected, not ready yet
-  con.ready  = sys.ready == -1 ? 0 : sys.ready;
+  con.ready  = sys.ready <= 0 ? 0 : sys.ready;
   con.timevent = time(0);
-  sys.dirty  = 1;
+  sys.sock_updated  = 1;
   return sock;
 }
 // -- nsmd_delconn ------------------------------------------------------
@@ -1907,6 +1926,9 @@ nsmd_delconn(NSMcon& con)
 {
   NSMsys& sys = *nsmd_sysp;
   const int conid = CON_ID(con);
+
+  shutdown(con.sock, 2);
+  close(con.sock);
 
   // sch list and push list have to be updated
   //   :
@@ -1926,6 +1948,7 @@ nsmd_delconn(NSMcon& con)
   for (int i = conid; i < sys.ncon; i++) sys.con[i] = sys.con[i + 1];
   memset(&sys.con[sys.ncon], 0, sizeof(NSMcon));
   memset(&sys.con[sys.ncon].sockad.sin_addr, -1, sizeof(SOCKAD_IN));
+  sys.con[sys.ncon].sock = -1;
 
   // clear and shift tcpq
   NSMDtcpq* q   = nsmd_tcpqfirst;
@@ -1941,13 +1964,12 @@ nsmd_delconn(NSMcon& con)
   }
 
   // and make it dirty to update select fdset
-  sys.dirty = 1;
+  sys.sock_updated = 1;
 }
 // -- nsmd_destroyconn --------------------------------------------------
 //
-// - con is local => delclient
-// - con is MASTER
-// - con is DEPUTY
+// - if con is local => delclient
+// - otherwise con is MASTER/DEPUTY or I am MASTER/DEPUTY
 // - con is MEMBER and I'm a MEMBER => unexpected, delete con
 // - con is MEMBER and I'm a
 // ----------------------------------------------------------------------
@@ -1967,7 +1989,9 @@ nsmd_destroyconn(NSMcon& con, int delcli, const char* bywhom)
   con.status = NSMDC_RM;
 
   if (itslocal) {
-    if (con.nid >= 0) {
+    if (con.nid == NSMSYS_MAX_NOD) {
+      ;
+    } else if (con.nid >= 0) {
       NSMdmsg dmsg;
       memset(&dmsg, 0, sizeof(dmsg));
       dmsg.req = NSMCMD_DELCLIENT;
@@ -1991,9 +2015,13 @@ nsmd_destroyconn(NSMcon& con, int delcli, const char* bywhom)
     }
 
     if (NoMaster()) {
-      WARN("destroyconn: master is missing");
+      if (ConIsDeputy(con)) {
+        sys.deputy = NSMCON_NON;
+      }
+      LOG("destroyconn: master is missing");
     } else if (ConIsMaster(con) && NoDeputy()) {
       nsmd_init_count = NSMD_INITCOUNT_SECOND;
+      sys.master = NSMCON_NON;
     } else if (ConIsMaster(con)) {
       sys.master = sys.deputy;
       sys.deputy = NSMCON_NON;
@@ -2001,21 +2029,21 @@ nsmd_destroyconn(NSMcon& con, int delcli, const char* bywhom)
           ADDR_STR(sys.con[sys.master].sockad));
     } else if (ConIsDeputy(con)) {
       sys.deputy = NSMCON_NON;
-    } else {
-      // disappeared one is not a MASTER/DEPUTY
+    } else if (!IamMaster() && !IamDeputy()) {
+      ASRT("destroyconn: disappeared con=%d is not a MASTER/DEPUTY",
+           &con - sys.con);
     }
   }
 
-  // long procedure here...
-
-  if (sock_save == con.sock) { // if not equal, it might be already removed
-    shutdown(con.sock, 2);
-    close(con.sock);
+  // if not equal, it might be already removedby do_delclient
+  if (sock_save != con.sock) {
+    ASRT("con.sock has changed from %d to %d", sock_save, con.sock);
+  } else {
     nsmd_delconn(con);
   }
 
   // connection to local client connecting before ready
-  if (itslocal && sys.ready <= 0) {
+  if (itslocal || sys.ready <= 0) {
     return;
   }
 
@@ -2046,9 +2074,11 @@ nsmd_destroyconn(NSMcon& con, int delcli, const char* bywhom)
 
   // find new master if both MASTER/DEPUTY are gone
   // declare!
-  sys.ready = -1;
-  nsmd_init_count = NSMD_INITCOUNT_SECOND;
-  nsmd_schedule(NSMCON_NON, NSMSCH_INITBCAST, 0, 0, 1);
+  if (NoMaster()) {
+    sys.ready = -1;
+    nsmd_init_count = NSMD_INITCOUNT_SECOND;
+    nsmd_schedule(NSMCON_NON, NSMSCH_INITBCAST, 0, 0, 1);
+  }
 }
 // --                 -- sch calls --
 //                    ---------------
@@ -2079,10 +2109,12 @@ nsmd_sch_initbcast(int16_t, int32_t)
   } else if (sys.master < 0) { // nsmd_init_count == 0
     LOG("select myself as MASTER");
     nsmd_init_count = -1;
-    sys.con[NSMCON_TCP].timstart = sys.con[NSMCON_UDP].timstart;
+    if (! sys.con[NSMCON_UDP].timstart) {
+      sys.con[NSMCON_UDP].timstart = sys.con[NSMCON_TCP].timstart;
+    }
     sys.con[NSMCON_UDP].timevent = time(0);
     sys.master = NSMCON_TCP;
-    sys.ready  = 3;  // what does 3 mean?
+    sys.ready  = 3;  // ready by standing as a new master
     sys.generation++;
     return -1;
   } else if (sys.deputy >= 2) {
@@ -2117,7 +2149,7 @@ nsmd_fmtcpy(char* buf, int datid, int buftodat, int pos = 0, int len = 0,
   static char fmtc[] = "asid()";
   static char sizc[] = "124809"; // 0 for '(', 9 for ')'
   int loc = 0;
-  const int chunksiz = NSM_UDPDATSIZ; // = 1484
+  const int chunksiz = NSM_UDPDATSIZ; // = 1464
   char* datp = MEMPTR(ntohl(dat.dtpos));
   char* src = buftodat ? buf : datp + pos;
   char* dst = buftodat ? datp + pos : buf;
@@ -2138,7 +2170,7 @@ nsmd_fmtcpy(char* buf, int datid, int buftodat, int pos = 0, int len = 0,
       (uint8_t)src[0], (uint8_t)src[1], (uint8_t)src[2], (uint8_t)src[3]);
   */
 
-  if (len == 0) len = chunksiz;
+  if (len == 0 || len > chunksiz) len = chunksiz;
   if (pos == pos_cache && datid == dat_cache && buftodat == dir_cache) {
     fmt      = fmt_cache;
     ichunk   = ichunk_cache;
@@ -2153,7 +2185,7 @@ nsmd_fmtcpy(char* buf, int datid, int buftodat, int pos = 0, int len = 0,
   const char* fmtp_nest[16];
   int  repeat_nest[16];
 
-  while (*fmt) {
+  while (*fmt && *fmt != ' ') {
     const char* p = fmt_cache ? fmt_cache : strchr(fmtc, *fmt++);
     const int siz = fmt_cache ? siz_cache : sizc[p - fmtc] - '0';
     int       num = fmt_cache ? num_cache : isdigit(*fmt) ? atoi(fmt) : 1;
@@ -2306,6 +2338,7 @@ nsmd_setup_daemon(NSMcon& con, int exception)
   NSMcon& master = sys.con[sys.master];
   NSMcon& deputy = sys.con[sys.deputy];
   NSMcon& tcpcon = sys.con[NSMCON_TCP];
+  NSMcon& udpcon = sys.con[NSMCON_UDP];
   NSMdmsg dmsg;
 
   if (NoMaster()) ASRT("setup_daemon: no master");
@@ -2325,8 +2358,8 @@ nsmd_setup_daemon(NSMcon& con, int exception)
   dmsg.pars[3] = hlltohl(master.timstart, 1);
   dmsg.pars[4] = NoDeputy() ? 0 : hlltohl(deputy.timstart, 0);
   dmsg.pars[5] = NoDeputy() ? 0 : hlltohl(deputy.timstart, 1);
-  dmsg.pars[6] = hlltohl(tcpcon.timstart, 0);
-  dmsg.pars[7] = hlltohl(tcpcon.timstart, 1);
+  dmsg.pars[6] = hlltohl(udpcon.timstart, 0);
+  dmsg.pars[7] = hlltohl(udpcon.timstart, 1);
   dmsg.pars[8] = sys.generation;
 
   if (&con < sys.con || &con >= sys.con + NSMSYS_MAX_CON) {
@@ -2528,7 +2561,6 @@ nsmd_setup_client(NSMcon& con, uid_t uid, pid_t pid, const char* name)
   NSMnod* nodp = nodlastp;
 
   // check for duplication
-#if 1
   int hash = nsmlib_hash(&sys, sys.nodhash, NSMSYS_MAX_HASH, name, 0);
   if (hash >= 0) {
     nodp = (NSMnod*)SYSPTR(ntohl(sys.nodhash[hash]));
@@ -2538,28 +2570,20 @@ nsmd_setup_client(NSMcon& con, uid_t uid, pid_t pid, const char* name)
       return NSMENODEEXIST;
     }
   }
-#else
-  // linear search version
-  for (nodp = sys.nod; nodp < nodlastp; nodp++) {
-    if (strcmp(nodp->name, name) == 0) {
-      if (nodp->nodpid == 0) { // everything else may stay the same
-        break; // unused name is there
-      } else {
-        LOG("NEWCLIENT: nodename %s is in use", name);
-        return NSMENODEEXIST;
-      }
-    }
-  }
-#endif
 
   // look for a free place, or if not found,
   // look for a tentatively-unused place
   NSMnod* nod2p = nodlastp;
+  time_t tlast = time(0);
   if (nodp == nodlastp) {
     for (nodp = sys.nod; nodp < nodlastp; nodp++) {
-      if (nodp->nodtim == 0) {
+      if (nodp->nodpid == 0) {
         if (nodp->name[0] == 0) break;
-        if (nod2p != nodlastp) nod2p = nodp;
+        time_t nodtim = ntohll(nodp->nodtim);
+        if (nodtim < tlast) {
+          nod2p = nodp;
+          tlast = nodtim;
+        }
       }
     }
   }
@@ -2860,6 +2884,25 @@ nsmd_tcpreply(NSMcon& con, NSMdmsg& dmsg, int dest, int par)
   dmsg.dest    = dest;
   dmsg.len     = 0;
   nsmd_tcpsend(con, dmsg);
+}
+// -- nsmd_do_killdaemon ------------------------------------------------
+void
+nsmd_do_killdaemon(NSMcon& con, NSMdmsg& dmsg)
+{
+  NSMsys& sys = *nsmd_sysp;
+  if (dmsg.npar == 0) {
+    nsmd_assert("killdaemon received from %s", ADDR_STR(con.sockad));
+  } else {
+    for (int conid = 2; conid < sys.ncon; conid++) {
+      if (ADDR_IP(sys.con[conid].sockad) == dmsg.pars[0]) {
+        LOG("killdaemon forwarding to %08x", ADDR_STR(sys.con[conid].sockad));
+        dmsg.npar = 0;
+        nsmd_tcpsend(sys.con[conid], dmsg);
+        return;
+      }
+    }
+    LOG("killdaemon forwarding to nowhere (%08x)", dmsg.pars[0]);
+  }
 }
 // -- nsmd_do_newreq ----------------------------------------------------
 //
@@ -3281,7 +3324,7 @@ nsmd_do_usrcpymem(NSMcon& con, NSMdmsg& dmsg)
   int datid  = dmsg.pars[0];
   int offset = dmsg.pars[1];
 
-  nsmd_fmtcpy((char*)dmsg.datap, dmsg.pars[0], 1, offset, dmsg.len);
+  nsmd_fmtcpy((char*)dmsg.datap, datid, 1, offset, dmsg.len);
 }
 // -- nsmd_do_ackdaemon -------------------------------------------------
 //
@@ -3303,7 +3346,7 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
 
   // check if UDP
   if (con.sock != sys.con[NSMCON_UDP].sock) {
-    ASRT("do_newdaemon %s is not UDP", ADDR_STR(con.sockad));
+    ASRT("do_ackdaemon %s is not UDP", ADDR_STR(con.sockad));
   }
 
   // check if anything to change
@@ -3311,7 +3354,8 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
   int32_t newd = htonl(dmsg.pars[1]);
   int32_t oldm = sys.master ? AddrMaster() : -1;
   int32_t oldd = sys.deputy ? AddrDeputy() : -1;
-  if (newm && newm == oldm && newd == oldd) return;
+  int32_t newgen = dmsg.pars[8];
+  if (newm && newm == oldm && newd == oldd && newgen == sys.generation) return;
 
   // check the message source
   int32_t fromip = ADDR_IP(con.sockad);
@@ -3320,9 +3364,13 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
     return;
   }
 
+  // sys.ready
+  if (sys.ready < 0) sys.ready = 0;
+
   // connect to master
-  sys.ready = sys.generation > 0 ? -1 : 0;
-  if (nsmd_newconn(sys.ncon, newm, "master") < 0) {
+  if (newm == nsmd_myip) {
+    sys.master = NSMCON_TCP;
+  } else if (nsmd_newconn(sys.ncon, newm, "master") < 0) {
     // if it cannot connect, it may be because the master have
     // disappeared just now
     sys.master = NSMCON_NON;
@@ -3333,7 +3381,7 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
   }
 
   // connect to deputy if any
-  if (! NoMaster() && newd != -1) {
+  if (! NoMaster() && newd != -1 && newd != nsmd_myip) {
     if (nsmd_newconn(sys.ncon, newd, "deputy") < 0) {
       sys.deputy = NSMCON_NON;
       WARN("Cannot connect to deputy at %s", ADDR_STR(newd));
@@ -3345,12 +3393,13 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
 
   // if cannot connect to master, find the master again.
   // if a new master is found, start copying memory
-  if (sys.master == NSMCON_NON) {
+  if (sys.master == NSMCON_NON ||
+      (sys.master == NSMCON_TCP && sys.deputy == NSMCON_NON)) {
     nsmd_init_count = NSMD_INITCOUNT_FIRST;
     nsmd_schedule(NSMCON_NON, NSMSCH_INITBCAST, 0, 0, 1);
   } else {
-    sys.con[NSMCON_TCP].timstart = hl2tohll(dmsg.pars[6], dmsg.pars[7]);
-    sys.generation = dmsg.pars[8];
+    sys.con[NSMCON_UDP].timstart = hl2tohll(dmsg.pars[6], dmsg.pars[7]);
+    sys.generation = newgen;
 
     // call syscpymem to initiate REQCPYMEM cycle
     memset(&dmsg, 0, sizeof(dmsg));
@@ -3359,7 +3408,13 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
     dmsg.pars[0] = -1; // pos = -1
     dmsg.pars[1] = 0;  // siz = 0
     dmsg.opt     = 3;
-    nsmd_do_syscpymem(sys.con[sys.master], dmsg);
+
+    if (sys.master == NSMCON_TCP) {
+      sys.generation++;
+      nsmd_do_syscpymem(sys.con[sys.deputy], dmsg);
+    } else {
+      nsmd_do_syscpymem(sys.con[sys.master], dmsg);
+    }
   }
 }
 // -- nsmd_do_syscpymem -------------------------------------------------
@@ -3401,7 +3456,7 @@ nsmd_do_syscpymem(NSMcon& con, NSMdmsg& dmsg)
   DBG("syscpymem opt=%d pos=%d siz=%d%s", opt, pos, siz,
       ConIsMaster(con) ? " master" : "");
 
-  if (! ConIsMaster(con)) return;
+  if (! ConIsMaster(con) && !(ConIsDeputy(con) && IamMaster())) return;
 
   if (pos == -1 && siz == 0) {
     // called from ackdaemon to initiate REQCPYMEM cycle
@@ -3455,12 +3510,18 @@ nsmd_do_syscpymem(NSMcon& con, NSMdmsg& dmsg)
         dmsg.opt = 1;
         dmsg.npar = 3;
         dmsg.pars[0] = nsmd_priority;
-        dmsg.pars[1] = hlltohl(sys.con[NSMCON_UDP].timstart, 0);
-        dmsg.pars[2] = hlltohl(sys.con[NSMCON_UDP].timstart, 1);
+        dmsg.pars[1] = hlltohl(sys.con[NSMCON_TCP].timstart, 0);
+        dmsg.pars[2] = hlltohl(sys.con[NSMCON_TCP].timstart, 1);
         DBG("syscpymem sending READY opt=%d prio=%d",
             dmsg.opt, nsmd_priority);
-        nsmd_tcpsend(sys.con[sys.master], dmsg);
-        if (! NoDeputy())
+        if (IamMaster()) {
+          sys.ready = 4;
+        } else {
+          sys.ready = 1;
+        }
+        if (! NoMaster() && ! IamMaster())
+          nsmd_tcpsend(sys.con[sys.master], dmsg);
+        if (! NoDeputy() && ! IamDeputy())
           nsmd_tcpsend(sys.con[sys.deputy], dmsg);
         return;
       }
@@ -3476,7 +3537,11 @@ nsmd_do_syscpymem(NSMcon& con, NSMdmsg& dmsg)
   dmsg.pars[0] = pos;
   dmsg.pars[1] = siz;
   dmsg.len = 0;
-  nsmd_tcpsend(sys.con[sys.master], dmsg);
+  if (IamMaster()) {
+    nsmd_tcpsend(sys.con[sys.deputy], dmsg);
+  } else {
+    nsmd_tcpsend(sys.con[sys.master], dmsg);
+  }
 }
 // -- nsmd_do_reqcpymem -------------------------------------------------
 //
@@ -3572,14 +3637,36 @@ nsmd_do_ready(NSMcon& con, NSMdmsg& dmsg)
     return;
   }
 
-  /* bug: this kills prio in pars[0] --- memset(&dmsg, 0, sizeof(dmsg)); */
+  // opt == 0 when called from do_newmaster
+  // opt == 1 when called from do_syscpymem
 
-  if (opt == 1 && IamDeputy()) { // ready after NSMCMD_SYSCPYMEM
-    return;
-  } if (opt == 1 && IamMaster()) { // ready after NSMCMD_SYSCPYMEM
+  if (opt == 0) return;
+
+  // priority based rearrangement if needed
+  int prio  = dmsg.pars[0];
+  int changed = 1;
+
+  if (IamDeputy()) { // ready after NSMCMD_SYSCPYMEM
+    if (! ConIsMaster(con)) return;
+
+    sys.generation++;
+
+    if (prio < nsmd_priority ||
+        (prio == nsmd_priority && ntohl(conip) > ntohl(nsmd_myip))) {
+
+      ASRT("do_ready: this code probably doesn't work, so let's abort.");
+      sys.master = NSMCON_TCP;
+      sys.deputy = conid;
+      DBG("new master(me), conid=%d prio=%d/%d ip=%08x/%08x", conid,
+          nsmd_priority, prio, ntohl(nsmd_myip), ntohl(conip));
+    } else {
+      DBG("old master is ready again\n");
+      changed = 0;
+    }
+
+  } else if (IamMaster()) { // ready after NSMCMD_SYSCPYMEM
     uint32_t masterip = ADDR_IP(sys.con[sys.master].sockad);
     uint32_t deputyip = ADDR_IP(sys.con[sys.deputy].sockad);
-    int prio  = dmsg.pars[0];
     int deputyprio = sys.con[sys.deputy].priority;
     if (prio > nsmd_priority ||
         (prio == nsmd_priority && ntohl(conip) < ntohl(masterip))) {
@@ -3595,6 +3682,10 @@ nsmd_do_ready(NSMcon& con, NSMdmsg& dmsg)
       DBG("new deputy, conid=%d prio=%d/%d/%d ip=%08x/%08x/%08x", conid,
           prio, nsmd_priority, deputyprio,
           ntohl(conip), ntohl(masterip), ntohl(deputyip));
+    } else if (ConIsDeputy(con)) {
+      sys.generation++; // increment to let members reconnect
+      DBG("old deputy is ready again\n");
+      changed = 0;
     } else {
       DBG("new member, conid=%d prio=%d/%d/%d ip=%08x/%08x/%08x", conid,
           prio, nsmd_priority, deputyprio,
@@ -3603,28 +3694,26 @@ nsmd_do_ready(NSMcon& con, NSMdmsg& dmsg)
     }
   }
 
-#if 0 // probably bug?
-  if (opt == 1) {
-    nsmd_setup_daemon(con);
-  } else if (ConIsMaster(con) || ConIsDeputy(con)) {
-    nsmd_setup_daemon(sys.con[NSMCON_TCP]);
-  }
-#else
-  if (opt == 1) {
+  // If not reconnection, something must have changed to reach here, so
+  // so send ACKDAEMON to relevant nodes
+  if (changed) {
     nsmd_setup_daemon(con);
   }
+
   if (ConIsMaster(con) || ConIsDeputy(con)) {
+    // send to olddeputy when deputy switched from olddeputy
     if (olddeputy != NSMCON_NON) {
-      olddeputy  = sys.deputy;
       nsmd_setup_daemon(sys.con[olddeputy]);
     }
+
+    // and send to everybody except master, deputy and olddeputy
     nsmd_setup_daemon(sys.con[NSMCON_TCP], olddeputy);
   }
-#endif
 }
 // -- nsmd_do_newmaster -------------------------------------------------
 //
-// - newm==oldm, newd==oldd (should not happen, just redundant)
+// - newm==oldm, newd==oldd, newgen==oldgen (should not happen, redundant)
+// - newm==oldm, newd==oldd, newgen!=oldgen (reconnection needed)
 // - newm==oldm, oldd==-1   (first deputy)
 // - newm==oldm, newd!=oldd (new deputy)
 // - newm==oldd, newd==oldm (master<->deputy exchange)
@@ -3643,6 +3732,8 @@ nsmd_do_newmaster(NSMcon& con, NSMdmsg& dmsg)
   int oldd = NoDeputy() ? -1 : ADDR_IP(sys.con[sys.deputy].sockad);
   int newm = htonl(dmsg.pars[0]);
   int newd = htonl(dmsg.pars[1]);
+  int newgen = dmsg.pars[8];
+  int oldgen = sys.generation;
   int itwasme = (oldm == nsmd_myip || oldd == nsmd_myip) ? 1 : 0;
   int itsme   = (newm == nsmd_myip || newd == nsmd_myip) ? 1 : 0;
 
@@ -3650,19 +3741,20 @@ nsmd_do_newmaster(NSMcon& con, NSMdmsg& dmsg)
       ADDR_STR(newm), ADDR_STR(newd), ADDR_STR(oldm), ADDR_STR(oldd));
 
   int64_t tim = hl2tohll(dmsg.pars[6], dmsg.pars[7]);
-  if (tim != sys.con[NSMCON_TCP].timstart) {
-    ASRT("do_newmaster: wrong tim=%lx/%lx", tim, sys.con[NSMCON_TCP].timstart);
+  if (tim != sys.con[NSMCON_UDP].timstart) {
+    ASRT("do_newmaster: wrong tim=%lx/%lx", tim, sys.con[NSMCON_UDP].timstart);
   }
-  if (abs(dmsg.pars[8] - sys.generation) > 1) {
-    ASRT("do_newmaster: generation leap=%d/%d", sys.generation, dmsg.pars[8]);
+  if (abs(newgen - oldgen) > 1) {
+    ASRT("do_newmaster: generation leap %d -> %d", oldgen, newgen);
   }
-  sys.generation = dmsg.pars[8];
 
   // -- check if unchanged
-  if (newm == oldm && newd == oldd) {
+  if (newm == oldm && newd == oldd && newgen == oldgen) {
     LOG("do_newmaster: no change");
     return;
   }
+
+  sys.generation = newgen;
 
   // -- check typical errorneous combinations
   if (newm == newd) ASRT("do_newmaster: pars=%x/%x", newm, newd);
@@ -3685,10 +3777,20 @@ nsmd_do_newmaster(NSMcon& con, NSMdmsg& dmsg)
       }
     } else {
       if (oldd != NSMCON_NON && oldd != newd && oldd != newm) {
-        nsmd_destroyconn(sys.con[sys.deputy], 0, "newmaster");
+        nsmd_delconn(sys.con[sys.deputy]);
+        sys.deputy = NSMCON_NON;
       }
       if (oldm != NSMCON_NON && oldm != newm && oldm != newd) {
-        nsmd_destroyconn(sys.con[sys.master], 0, "newmaster");
+        nsmd_delconn(sys.con[sys.master]);
+        sys.master = NSMCON_NON;
+      }
+      if (newgen != oldgen && ConIsMaster(con) && oldd != -1) {
+        nsmd_delconn(sys.con[sys.deputy]);
+        sys.deputy = NSMCON_NON;
+      }
+      if (newgen != oldgen && ConIsDeputy(con) && oldm != -1) {
+        nsmd_delconn(sys.con[sys.master]);
+        sys.master = NSMCON_NON;
       }
     }
   }
@@ -3713,14 +3815,6 @@ nsmd_do_newmaster(NSMcon& con, NSMdmsg& dmsg)
     if (sys.master == NSMCON_NON && conip == newm) sys.master = conid;
     if (sys.deputy == NSMCON_NON && conip == newd) sys.deputy = conid;
   }
-
-#if 0
-  if (newm == oldd || newd == oldm) {
-    int tmp    = sys.deputy;
-    sys.deputy = sys.master;
-    sys.master = tmp;
-  }
-#endif
 
   // -- connect to missing master and deputy
   int cons_to_send_ready[2];
@@ -3766,185 +3860,7 @@ nsmd_do_newmaster(NSMcon& con, NSMdmsg& dmsg)
       nsmd_tcpsend(sys.con[conid], dmsg);
     }
   }
-}
-// -- nsmd_do_newmaster -------------------------------------------------
-//
-// - newm==oldm, newd==oldd (should not happen, just redundant)
-// - newm==oldm, oldd==-1   (first deputy)
-// - newm==oldm, newd!=oldd (new deputy)
-// - newm==oldd, newd==oldm (master<->deputy exchange)
-// - newm!=oldd, newd==oldm (new master, deputy is old master)
-// ----------------------------------------------------------------------
-void
-nsmd_do_newmaster_old_and_buggy(NSMcon& con, NSMdmsg& dmsg)
-{
-  NSMsys& sys = *nsmd_sysp;
-
-  //DBG("do_newmaster");
-
-  if (dmsg.npar != 9) ASRT("do_newmaster: dmsg.npar(%d) != 9", dmsg.npar);
-
-  int oldm = NoMaster() ? -1 : ADDR_IP(sys.con[sys.master].sockad);
-  int oldd = NoDeputy() ? -1 : ADDR_IP(sys.con[sys.deputy].sockad);
-  int newm = htonl(dmsg.pars[0]);
-  int newd = htonl(dmsg.pars[1]);
-  int itwasme = (oldm == nsmd_myip || oldd == nsmd_myip) ? 1 : 0;
-  int itsme   = (newm == nsmd_myip || newd == nsmd_myip) ? 1 : 0;
-
-  LOG("new master=%s/deputy=%s (old=%s/%s)",
-      ADDR_STR(newm), ADDR_STR(newd), ADDR_STR(oldm), ADDR_STR(oldd));
-
-  int64_t tim = hl2tohll(dmsg.pars[6], dmsg.pars[7]);
-  if (tim != sys.con[NSMCON_TCP].timstart) {
-    ASRT("do_newmaster: wrong tim=%lx/%lx", tim, sys.con[NSMCON_TCP].timstart);
-  }
-  if (abs(dmsg.pars[8] - sys.generation) > 1) {
-    ASRT("do_newmaster: generation leap=%d/%d", sys.generation, dmsg.pars[8]);
-  }
-  sys.generation = dmsg.pars[8];
-
-  if (newm == oldm && newd == oldd) {
-    LOG("do_newmaster: no change");
-    return;
-  }
-  if (newm == newd) ASRT("do_newmaster: pars=%x/%x", newm, newd);
-  if (! newm || newm == -1) ASRT("do_newmaster: invalid newm=%x", newm);
-  if (! newd || newd == -1) ASRT("do_newmaster: invalid newd=%x", newd);
-  if (newm != oldm && newm != oldd && newd != oldm && newd != oldd) {
-    ASRT("do_newmaster: too many changes %08x %08x => %08x %08x",
-         oldm, oldd, newm, newd);
-  }
-
-  // -- swap master and deputy
-  if (newm == oldd || newd == oldm) {
-    int tmp    = sys.deputy;
-    sys.deputy = sys.master;
-    sys.master = tmp;
-  }
-
-  // -- find what and who to change
-  const char* newtyp = 0;
-  int16_t*    chgidp = 0;
-  int16_t*    keepidp = 0;
-  int         newip  = -1;
-  int64_t     newtim = 0;
-
-  if (newm == oldd && newd == oldm) {
-    LOG("newmaster: no new connection");
-    // no new connection
-    if (newm == nsmd_myip) LOG("newmaster: converted to MASTER");
-    if (newd == nsmd_myip) LOG("newmaster: converted to DEPUTY");
-    // still has to send back CMD_READY if it's me
-  } else if (newm == oldm || newm == oldd) {
-    LOG("newmaster: new DEPUTY");
-    newtyp  = "DEPUTY";
-    chgidp  = &sys.deputy;
-    keepidp = &sys.master;
-    newip   = newd;
-    newtim  = hl2tohll(dmsg.pars[4], dmsg.pars[5]);
-  } else if (newd == oldd || newd == oldm) {
-    LOG("newmaster: new MASTER");
-    newtyp  = "MASTER";
-    chgidp  = &sys.master;
-    keepidp = &sys.deputy;
-    newip   = newm;
-    newtim  = hl2tohll(dmsg.pars[2], dmsg.pars[3]);
-  } else {
-    ASRT("do_newmaster: should not come here");
-  }
-
-  // disconnect and/or connect:
-  NSMcon* conp = 0; // where to connect and/or to send CMD_READY
-  int newopt = 0;   // and opt = 0 unless connection failed
-  if (itsme) {
-    LOG("newmaster: it's me");
-    conp = &con;
-    *chgidp = NSMCON_TCP;
-  } else {
-    // - do nothing if I was a member and I'm a new MASTER/DEPUTY
-
-    if (itwasme) {
-      LOG("newmaster: it was me");
-
-      // - disconnect all but new MASTER/DEPUTY if I was a MASTER/DEPUTY
-      //   and I'm not a new MASTER/DEPUTY
-      // - newip should be there
-      if (! chgidp)
-        ASRT("do_newmaster: it's not me but new %s is unknown", newtyp);
-
-      *chgidp = NSMCON_NON;
-      for (int conid = NSMCON_OUT; conid < sys.ncon; conid++) {
-        if (conid == *keepidp)   continue;
-        if (ConidIsLocal(conid)) continue;
-        if (AddrConid(conid) == newip) {
-          if (*chgidp != NSMCON_NON)
-            ASRT("do_newmaster: more than one connection to newip");
-          *chgidp = conid;
-          continue;
-        }
-        nsmd_destroyconn(sys.con[conid], 0, "nomore_used_code");
-      }
-
-      // - it may happen that new MASTER/DEPUTY hasn't been connected to
-      //   old DEPUTY
-      if (*chgidp == NSMCON_NON) {
-        LOG("newmaster: new %s is not connected to me before", newtyp);
-        *chgidp = sys.ncon;
-      }
-
-    } else if (chgidp) {
-      // - disconnect the old master/deputy
-      //   -- if the connection is still there,
-      //   -- if I was and will be a MEMBER, and
-      //   -- if it's not just swapping MASTER/DEPUTY
-      // - newip should not be there
-      if (*chgidp >= NSMCON_OUT) {
-        LOG("newmaster: it's not me, disconnecting con=%d", *chgidp);
-        nsmd_destroyconn(sys.con[*chgidp], 0, "nomore_used_code");
-      } else {
-        LOG("newmaster: it's not me, old %s is already gone", newtyp);
-      }
-      *chgidp = sys.ncon;
-      for (int conid = NSMCON_OUT; conid < sys.ncon; conid++) {
-        if (AddrConid(conid) == newip) *chgidp = conid;
-      }
-      if (*chgidp != sys.ncon)
-        ASRT("do_newmaster: new %s is already connected", newtyp);
-    }
-
-    // - connect to new master/deputy if I'm a MEMBER and it is not
-    //   connected yet
-    if (*chgidp == sys.ncon) {
-      if (nsmd_newconn(*chgidp, newip, newtyp) < 0) {
-        // but if it failed to connect
-        *chgidp = NSMCON_NON;
-        conp = &sys.con[*keepidp];
-        newopt = 1;
-        ASRT("do_newmaster: failed to connect");
-      } else {
-        conp = &sys.con[*chgidp];
-        conp->timstart = newtim;
-        sys.ncon++;
-        if (sys.master == NSMCON_NON || sys.deputy == NSMCON_NON) {
-          ASRT("do_newmaster: master=%d deputy=%d ncon=%d",
-               sys.master, sys.deputy, sys.ncon);
-        }
-      }
-    }
-  }
-
-  // send ready
-  if (conp) {
-    memset(&dmsg, 0, sizeof(dmsg));
-    dmsg.req = NSMCMD_READY;
-    dmsg.npar = 3;
-    dmsg.opt  = newopt;
-    dmsg.pars[0] = nsmd_priority;
-    dmsg.pars[1] = hlltohl(sys.con[NSMCON_UDP].timstart, 0);
-    dmsg.pars[2] = hlltohl(sys.con[NSMCON_UDP].timstart, 1);
-
-    nsmd_tcpsend(*conp, dmsg);
-  }
+  sys.ready = 2;
 }
 // -- nsmd_sysmsgchk ----------------------------------------------------
 int
@@ -3966,7 +3882,7 @@ nsmd_sysmsgchk(const char* func, NSMcon& con, NSMdmsg& dmsg,
   // only either of source of destination nodeid should be there
   if (IsInvalidSysSrcDest(dmsg.src, dmsg.dest, con))
     ASRT("%s invalid src=%d dest=%d conid=%d",
-         dmsg.src, dmsg.dest, CON_ID(con));
+         func, dmsg.src, dmsg.dest, CON_ID(con));
 
   // master is needed
   if (sys.master == NSMCON_NON) {
@@ -3986,7 +3902,7 @@ int
 nsmd_fmtcheck(const char* fmtname, const char** fmtp = 0)
 {
   int fmtsize = 0;
-  for (const char* p = fmtname; *p; p++) {
+  for (const char* p = fmtname; *p && *p != ' '; p++) {
     int siz = 0;
     switch (p[0]) {
       case '(': siz = nsmd_fmtcheck(p + 1, &p); break;
@@ -4188,9 +4104,9 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
     return;
   }
 
-  // otherwise datap should have two strings
+  // otherwise datap should have three strings
   const char* p = dmsg.datap ? strchr(dmsg.datap, ' ') : 0;
-  int len = p ? p - dmsg.datap : 0;
+  int len  = p ? p - dmsg.datap : 0;
   if (dmsg.len < 3 || ! p || len >= NSMSYS_DNAM_SIZ ||
       dmsg.len - len - 1 >= NSMSYS_DFMT_SIZ) {
     DBG("do_allocmem wrong len(%d) or datap(%x,%d)", dmsg.len, p, len);
@@ -4207,15 +4123,18 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
   }
 
   // check the format
-  char fmtname[NSMSYS_DNAM_SIZ + 1];
-  strncpy(fmtname, p + 1, dmsg.len - len - 1);
-  fmtname[dmsg.len - len - 1] = 0;
-  int fmtsize = nsmd_fmtcheck(fmtname, 0);
+  char fmtstr[NSMSYS_DNAM_SIZ + 1];
+  strncpy(fmtstr, p + 1, dmsg.len - len - 1);
+  fmtstr[dmsg.len - len - 1] = 0;
+  char* fmtname = strchr(fmtstr, ' ');
+  if (fmtname) *fmtname++ = 0;
+  int fmtsize = nsmd_fmtcheck(fmtstr, 0);
   if (fmtsize <= 0 || fmtsize > NSM_DATMAXSIZ) {
     DBG("do_allocmem bad fmt(siz=%d)", fmtsize);
     nsmd_tcpreply(con, dmsg, dmsg.src, NSMEINVFMT);
     return;
   }
+  DBG("allocmem p+1 %s", p + 1);
 
   // check the revision
   if (dmsg.npar != 2 || dmsg.pars[1] <= 0) {
@@ -4301,7 +4220,7 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
         /* Old revision!  Has to fail */
         nsmd_tcpreply(con, dmsg, dmsg.src, NSMEMEMEXIST);
         return;
-      } else if (strcmp(fmtname, datp->dtfmt) != 0) {
+      } else if (strcmp(fmtstr, datp->dtfmt) != 0) {
         /* Different format with the same revision!  Has to fail. */
         nsmd_tcpreply(con, dmsg, dmsg.src, NSMEMEMEXIST);
         return;
@@ -4384,7 +4303,8 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
   if (! existed) datp->dtref = htons(0);
   datp->dtrev = htons(revision);
   strcpy(datp->dtnam, datname);
-  strcpy(datp->dtfmt, fmtname);
+  strcpy(datp->dtfmt, fmtstr);
+  if (fmtname) strcpy(datp->dtfmt + strlen(fmtstr) + 1, fmtname);
   nsmd_touchsys(con, SYSPOS(datp), sizeof(*datp));
 
   // return if it is from outside
@@ -4404,7 +4324,72 @@ nsmd_do_allocmem(NSMcon& con, NSMdmsg& dmsg)
   snd.disnod = &nod - sys.nod;
   snd.distim = now10ms;
 }
+// -- nsmd_do_flushmem --------------------------------------------------
+//
+// request: (from client to nsmd)
+//   pars[0] = ppos, pars[1] = psiz, datap = 0
+// return to local client:
+//   pars[0] >= 0 (datid) or < 0 (error), datap = 0
+// ----------------------------------------------------------------------
+void
+nsmd_do_flushmem(NSMcon& con, NSMdmsg& dmsg)
+{
+  NSMsys& sys = *nsmd_sysp;
+  NSMmem& mem = *nsmd_memp;
+  NSMudpbuf udpbuf;
+  int ppos = dmsg.pars[0];
+  int psiz = dmsg.pars[1];
+  int dpos = 0;
+  int dsiz = 0;
+  int n = 0;
+
+  if (nsmd_sysmsgchk("do_flushmem", con, dmsg, 2, 2, 0, 0) < 0 ||
+      dmsg.src == (uint16_t) - 1) {
+    nsmd_tcpreply(con, dmsg, dmsg.src, NSMEINVPAR);
+    return;
+  }
+
+  if (psiz < 0 || ppos < 0 || ppos >= NSM2_MEMSIZ || ppos + psiz > NSM2_MEMSIZ) {
+    LOG("do_flushmem: psiz=%d ppos=%d\n", (int)psiz, (int)ppos);
+    nsmd_tcpreply(con, dmsg, dmsg.src, NSMEINVPTR);
+    return;
+  }
+
+  /* linked list search, same check was already done in nsmlib2 */
+  int nnext = (int16_t)ntohs(sys.nod[dmsg.src].noddat);
+  while (nnext >= 0 && nnext < NSMSYS_MAX_DAT) {
+    NSMdat& dat = sys.dat[nnext];
+    dpos = (int32_t)ntohl(dat.dtpos);
+    dsiz = (int32_t)ntohs(dat.dtsiz);
+    if (ppos == dpos && psiz == 0) psiz = dsiz;
+    if (ppos >= dpos && ppos + psiz <= dpos + dsiz) break;
+
+    nnext = (int16_t)ntohs(dat.nnext);
+    if (++n > NSMSYS_MAX_DAT) nnext = -1; /* avoid inf-loop by broken nnext */
+  }
+  if (nnext < 0 || nnext >= NSMSYS_MAX_DAT) {
+    nsmd_tcpreply(con, dmsg, dmsg.src, NSMENOMEM);
+    return;
+  }
+
+  /* send */
+  ppos -= dpos;
+  while (psiz > 0) {
+    dsiz = nsmd_fmtcpy(udpbuf.dat, nnext, 0, ppos, psiz);
+    if (dsiz < 0) {
+      ASRT("flushmem: dat=%d off=%d siz=%d ret=%d", nnext, ppos, psiz, dsiz);
+    }
+    //DBG("udpsend nnext=%d ppos=%d dsiz=%d/%d\n", nnext, ppos, dsiz, psiz);
+    nsmd_udpsend(0, NSMCMD_USRCPYMEM, nnext, ppos, &udpbuf, dsiz);
+    ppos += dsiz;
+    psiz -= dsiz;
+  }
+
+  nsmd_tcpreply(con, dmsg, dmsg.src, nnext);
+}
 // -- nsmd_command ------------------------------------------------------
+// dispatch command
+// ----------------------------------------------------------------------
 void
 nsmd_command(NSMcon& con, NSMdmsg& dmsg)
 {
@@ -4576,10 +4561,11 @@ nsmd_tcpaccept()
       if (ConidIsLocal(conid)) {
         continue;
       } else if (sys.con[conid].sock >= 0) {
+        LOG("tcpaccept: shutdown existing connection from (%08x)", fromaddr);
         shutdown(sys.con[conid].sock, 2);
         close(sys.con[conid].sock);
         sys.con[conid].sock = -1;
-        sys.dirty = 1;
+        sys.sock_updated = 1;
       }
       break;
     }
@@ -4626,7 +4612,7 @@ nsmd_tcpaccept()
   con.isiz = 0;
   con.osiz = 0;
 
-  sys.dirty  = 1;
+  sys.sock_updated  = 1;
 
   if (ConIsLocal(con)) {
     // if it is a local client, send my pid
@@ -4863,7 +4849,8 @@ disconnect_return:
   }
 #endif
 
-  if (IamMaster() || (IamDeputy() && ConIsMaster(con))) {
+  if ((IamMaster() && ! ConIsLocal(con)) ||
+      (IamDeputy() && ConIsMaster(con))) {
     nsmd_destroyconn(con, 1, "tcprecv");
   } else {
     nsmd_destroyconn(con, 0, "tcprecv");
@@ -4887,7 +4874,7 @@ nsmd_select(fd_set& fdset, int wait_in10ms)
   static fd_set fdset_saved;
   static int highest = -1;
 
-  if (highest < 0 || sys.dirty) {
+  if (highest < 0 || sys.sock_updated) {
     highest = -1;
     FD_ZERO(&fdset);
     for (NSMcon* conp = sys.con; conp < &conlast; conp++) {
@@ -4897,7 +4884,7 @@ nsmd_select(fd_set& fdset, int wait_in10ms)
       }
     }
     fdset_saved = fdset;
-    sys.dirty = 0;
+    sys.sock_updated = 0;
   } else {
     fdset = fdset_saved;
   }
@@ -4995,8 +4982,8 @@ nsmd_loop()
       nsminfo2();
       tinfo_in10ms = (uint64_t)mktime(&tbuf) * 100;
       LOG("tinfo: now %lld.%02d next %lld.%02d",
-          now_in10ms / 100, now_in10ms % 100,
-          tinfo_in10ms / 100, tinfo_in10ms % 100);
+          now_in10ms / 100, (int)now_in10ms % 100,
+          tinfo_in10ms / 100, (int)tinfo_in10ms % 100);
     }
   }
 }

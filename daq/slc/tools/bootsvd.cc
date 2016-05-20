@@ -39,7 +39,7 @@ int main(int argc, char** argv)
   int* cprecl = getcopper(hostname, ncpr, ropcname);
   char s[256];
   if (nsm) {
-    sprintf(s, "killall nsmd2 runcontrold rocontrold");
+    sprintf(s, "killall nsmd2 runcontrold rocontrold des_ser_COPPER_main des_ser_ROPC_main");
     printf("%s\n", s);
     system(s);
     for (int i = 0; i < ncpr; i++) {

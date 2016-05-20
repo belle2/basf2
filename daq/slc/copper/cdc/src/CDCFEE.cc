@@ -40,7 +40,7 @@ void CDCFEE::init(RCCallback& callback, HSLB& hslb)
   callback.add(new NSMVHandlerFloat(vname + ".vcc5v", true, false, 0));
 }
 
-void CDCFEE::boot(HSLB& hslb,  const DBObject& obj)
+void CDCFEE::boot(RCCallback& callback, HSLB& hslb,  const DBObject& obj)
 {
   const std::string firmware = obj.getText("firm");
   /*
@@ -59,7 +59,7 @@ void CDCFEE::boot(HSLB& hslb,  const DBObject& obj)
   }
 }
 
-void CDCFEE::load(HSLB& hslb, const DBObject& obj)
+void CDCFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   // setting CDC control (data format, window and delay)
   int val = 0;

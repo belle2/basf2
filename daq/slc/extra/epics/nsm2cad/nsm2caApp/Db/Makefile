@@ -12,7 +12,7 @@ include $(TOP)/configure/CONFIG
 # databases, templates, substitutions like this
 #DB += xxx.db
 DB += rcnode.db
-DB += hvnode.db
+#DB += hvnode.db
 #DB += hv.db
 #DB += konno_hv.db
 

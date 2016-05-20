@@ -58,8 +58,8 @@ int SVDHVControlCallback::putPV(chid cid, const char* val)
 void SVDHVControlCallback::turnon() throw(HVHandlerException)
 {
   LogFile::info("turnon");
-  putPV(m_RCRqs, "ready");
   putPV(m_PSRqs, "standby");
+  putPV(m_RCRqs, "ready");
 }
 
 void SVDHVControlCallback::turnoff() throw(HVHandlerException)
@@ -82,8 +82,8 @@ void SVDHVControlCallback::peak() throw(HVHandlerException)
 
 void SVDHVControlCallback::recover() throw(HVHandlerException)
 {
-  putPV(m_RCRqs, "notReady");
   putPV(m_PSRqs, "standby");
+  putPV(m_RCRqs, "notReady");
 }
 
 bool SVDHVControlCallback::addPV(const std::string& pvname) throw()

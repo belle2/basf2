@@ -30,7 +30,7 @@ void ARICHFEE::init(RCCallback& callback, HSLB& hslb)
   //callback.add(new FEE32Handler(vname + "rev", callback, hslb, *this, ADR_REG1, MASK_REV));
 }
 
-void ARICHFEE::boot(HSLB& hslb,  const DBObject& obj)
+void ARICHFEE::boot(RCCallback& callback, HSLB& hslb,  const DBObject& obj)
 {
 
 }
@@ -56,7 +56,7 @@ void logmask(const std::string& name, int mask, int max)
   LogFile::debug(ss.str().c_str());
 }
 
-void ARICHFEE::load(HSLB& hslb, const DBObject& obj)
+void ARICHFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   //m_fee.load(hslb, obj);
 }

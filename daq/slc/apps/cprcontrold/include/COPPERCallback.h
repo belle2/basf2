@@ -45,6 +45,7 @@ namespace Belle2 {
     COPPER& getCopper() { return m_copper; }
     ProcessController& getProcess() { return m_con; }
     virtual bool feeload();
+    void getfee(HSLB& hslb, int& hwtype, int& serial, int& fwtype, int& fwver)  throw(HSLBHandlerException);
 
   private:
     ProcessController m_con;

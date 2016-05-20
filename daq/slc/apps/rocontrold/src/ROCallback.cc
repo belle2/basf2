@@ -81,12 +81,13 @@ using namespace Belle2;
 ROCallback::ROCallback(const NSMNode& runcontrol)
   : RCCallback(), m_runcontrol(runcontrol)
 {
-  system("killall basf2");
+  system("killall basf2 eb0");
 }
 
 void ROCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
   allocData(getNode().getName(), "ropc", ropc_revision);
+  add(new NSMVHandlerFloat("loadavg", true, false, 0));
   configure(obj);
   setState(RCState::NOTREADY_S);
   const std::string path_shm = "/cpr_pause_resume";
@@ -152,11 +153,6 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
 void ROCallback::start(int /*expno*/, int /*runno*/) throw(RCHandlerException)
 {
   /*
-  try {
-    if (m_eb0.isUsed()) m_eb0.start(expno, runno);
-  } catch (const RCHandlerException& e) {
-    LogFile::warning("eb0 did not start : %s", e.what());
-  }
   for (size_t i = 0; i < m_stream0.size(); i++) {
     if (!m_stream0[i].start(expno, runno)) {
       throw (RCHandlerException("Faield to start stream0-%d", (int)i));
@@ -325,26 +321,28 @@ void ROCallback::monitor() throw(RCHandlerException)
     double loads[3];
     if (getloadavg(loads, 3) > 0) {
       nsm->loadavg = (float)loads[0];
+      set("loadavg", (float)loads[0]);
     } else {
-      nsm->loadavg = -1;
+      nsm->loadavg = 0;
+      set("loadavg", 0);
     }
     data.flush();
   }
   const RCState state(getNode().getState());
+  for (size_t i = 0; i < m_stream0.size(); i++) {
+    m_stream0[i].check();
+  }
+  m_eb0.check();
   if (state == RCState::RUNNING_S || state == RCState::STARTING_TS) {
     if (m_eb0.isUsed() && !m_eb0.getControl().isAlive()) {
       log(LogFile::ERROR, "eb0 was crashed");
       setState(RCState::ERROR_ES);
-      //setState(RCState::RECOVERING_RS);
-      //recover(getDBObject());
       return;
     }
     for (size_t i = 0; i < m_stream0.size(); i++) {
       if (m_stream0[i].isUsed() && !m_stream0[i].getControl().isAlive()) {
         log(LogFile::ERROR, "basf2 stream0-%d was crashed", (int)i);
         setState(RCState::ERROR_ES);
-        //setState(RCState::RECOVERING_RS);
-        //recover(getDBObject());
         return;
       }
     }

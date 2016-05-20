@@ -22,12 +22,12 @@ void TEMPLATEFEE::init(RCCallback& callback, HSLB& hslb)
   callback.add(new FEE8Handler(vname + "reg1", callback, hslb, *this, REG1_ADDR));
 }
 
-void TEMPLATEFEE::boot(HSLB& hslb,  const DBObject& obj)
+void TEMPLATEFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
 
 }
 
-void TEMPLATEFEE::load(HSLB& hslb, const DBObject& obj)
+void TEMPLATEFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   // writing stream file to FEE
   const std::string stream = obj.getText("stream");

@@ -5,6 +5,11 @@
 #define ADD_FLR       0x02
 #define ADD_MBMR      0x03
 
+#define RESET         0x10
+#define TEST_REG      0x11
+#define FADC_ID       0x12
+#define STATUS        0x20
+
 #define RUN_MODE      0x30
 // (13/04/30)
 #define MT32_CONTROL  0x37

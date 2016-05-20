@@ -126,8 +126,8 @@ void RunControlCallback::error(const char* nodename, const char* data) throw()
   try {
     RCNode& node(findNode(nodename));
     logging(node, LogFile::ERROR, data);
-    reply(NSMMessage(RCCommand::STOP, "Error due to error on " + node.getName()));
-    stop();
+    //reply(NSMMessage(RCCommand::STOP, "Error due to error on " + node.getName()));
+    //stop();
     setState(RCState::ERROR_ES);
     m_starttime = -1;
     m_restarting = false;
@@ -299,7 +299,7 @@ void RunControlCallback::monitor() throw(RCHandlerException)
         log(LogFile::ERROR, "%s got down.", node.getName().c_str());
         setState(node, Enum::UNKNOWN);
         if (state == RCState::RUNNING_S) {
-          stop();
+          //stop();
         }
         setState(RCState::ERROR_ES);
         failed = true;

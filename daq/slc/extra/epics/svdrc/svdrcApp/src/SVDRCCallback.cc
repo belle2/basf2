@@ -8,6 +8,7 @@
 #include "epicsString.h"
 #include "cantProceed.h"
 
+#include "SVDStateDefs.h"
 #include "SVDRCCallback.h"
 
 #include <daq/slc/nsm/NSMCallback.h>
@@ -33,10 +34,12 @@ SVDRCCallback::SVDRCCallback(const NSMNode& node)
 void SVDRCCallback::init(NSMCommunicator&) throw()
 {
   int status = ca_create_channel("B2:PSC:SVD:State:req:S", NULL, NULL, 0, &m_PSRqs);
+  //int status = ca_create_channel("SVD:CTRL:Request", NULL, NULL, 0, &m_PSRqs);
   SEVCHK(status, "Create channel failed");
   status = ca_pend_io(1.0);
   SEVCHK(status, "Channel connection failed");
-  status = ca_create_channel("B2:RC:SVD:State:req:S", NULL, NULL, 0, &m_RCRqs);
+  //status = ca_create_channel("B2:RC:SVD:State:req:S", NULL, NULL, 0, &m_RCRqs);
+  status = ca_create_channel("SVD:CTRL:Request", NULL, NULL, 0, &m_RCRqs);
   SEVCHK(status, "Create channel failed");
   status = ca_pend_io(1.0);
   SEVCHK(status, "Channel connection failed");
@@ -49,6 +52,18 @@ void SVDRCCallback::init(NSMCommunicator&) throw()
   addPV("B2:PSC:SVD:State:req:S");
   addPV("B2:RC:SVD:State:cur:S");
   addPV("B2:RC:SVD:State:req:S");
+  addPV("SVD:CTRL:Request");
+  addPV("SVD:CTRL:State");
+}
+
+void SVDRCCallback::checkRCState()
+{
+  char pvalue[100];
+  ca_get(DBR_STRING, m_RCRqs, pvalue);
+  RCState state(pvalue);
+  if (state != RCState::UNKNOWN) {
+    m_rcstate = state;
+  }
 }
 
 int SVDRCCallback::putPV(chid cid, const char* val)
@@ -59,24 +74,47 @@ int SVDRCCallback::putPV(chid cid, const char* val)
   return status;
 }
 
+int SVDRCCallback::putPV(chid cid, int val)
+{
+  int status = 0;
+  double dval = val;
+  SEVCHK(ca_put(DBR_DOUBLE, cid, &dval), "Put failed");
+  ca_flush_io();
+  return status;
+}
+
 void SVDRCCallback::load(const DBObject&) throw(RCHandlerException)
 {
-  putPV(m_RCRqs, "ready");
+  putPV(m_RCRqs, MAIN_REQ_GET_READY);
+  if (m_rcstate == RCState::NOTREADY_S) {
+    setLoading(true);
+    //putPV(m_RCRqs, "ready");
+    //putPV(m_RCRqs, 1);//MAIN_REQ_GET_READY);
+  } else if (m_rcstate == RCState::READY_S) {
+    setState(RCState::READY_S);
+  }
 }
 
 void SVDRCCallback::abort() throw(RCHandlerException)
 {
-  putPV(m_RCRqs, "notReady");
+  if (m_rcstate == RCState::NOTREADY_S) {
+    setState(RCState::NOTREADY_S);
+  } else {
+    //putPV(m_RCRqs, "ready");
+    putPV(m_RCRqs, MAIN_REQ_ABORT);
+  }
 }
 
 void SVDRCCallback::start(int expno, int runno) throw(RCHandlerException)
 {
-  putPV(m_RCRqs, "running");
+  //putPV(m_RCRqs, "running");
+  putPV(m_RCRqs, MAIN_REQ_START);
 }
 
 void SVDRCCallback::stop() throw(RCHandlerException)
 {
-  putPV(m_RCRqs, "ready");
+  //putPV(m_RCRqs, "ready");
+  putPV(m_RCRqs, MAIN_REQ_STOP);
 }
 
 bool SVDRCCallback::addPV(const std::string& pvname) throw()
@@ -95,7 +133,7 @@ bool SVDRCCallback::addPV(const std::string& pvname) throw()
   ca_replace_access_rights_event(pvnode->mychid, accessRightsCallback);
   ca_create_subscription(DBR_STRING, 1, pvnode->mychid,
                          DBE_VALUE, eventCallback, pvnode, &pvnode->myevid);
-  add(new SVDRCVHandler(vname, NSMVar("")));
+  add(new SVDRCVHandler(vname, NSMVar("", "")));
   return true;
 }
 

@@ -37,7 +37,7 @@ void ECLFEE::init(RCCallback& callback, HSLB& hslb)
   callback.add(new FEE8Handler(vname + "calib_event_per_step", callback, hslb, *this, 0x48));
 }
 
-void ECLFEE::boot(HSLB& hslb,  const DBObject& obj)
+void ECLFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   /*
   int ver;
@@ -53,7 +53,7 @@ void ECLFEE::boot(HSLB& hslb,  const DBObject& obj)
   */
 }
 
-void ECLFEE::load(HSLB& hslb, const DBObject& obj)
+void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   /*
   if (obj.hasValue("shaper_mask_low")) {

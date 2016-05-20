@@ -28,6 +28,9 @@ namespace Belle2 {
     bool term() throw();
     bool stop() throw(RCHandlerException);
 
+  public:
+    virtual void check() {}
+
   protected:
     virtual void initArguments(const DBObject&) = 0;
     virtual bool loadArguments(const DBObject&) = 0;

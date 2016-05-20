@@ -184,7 +184,14 @@ int HSLB::readfee8(int adr) throw(HSLBHandlerException)
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
   }
-  return ::readfee8(m_hslb.fd, adr);
+  int val2 = ::readfee8(m_hslb.fd, adr);
+  if (val2 < 0) {
+    throw (HSLBHandlerException("no response from FEE at HSLB:%c", m_hslb.fin + 'a'));
+  } else {
+    val2 = ::readfn(m_hslb.fd, adr);
+    //printf("reg%02x = %02x\n", adr, val2);
+  }
+  return val2;
 }
 
 void HSLB::writefee8(int adr, int val) throw(HSLBHandlerException)

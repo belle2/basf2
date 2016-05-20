@@ -18,6 +18,9 @@ bool FEE8Handler::feeget(int& val)
 {
   try {
     val = m_hslb.readfee8(m_adr);
+    if (m_bitmax > 0) {
+      val = (bitmask(m_bitmax, m_bitmin) & val) >> m_bitmin;
+    }
     LogFile::info("FEE read8 0x%x >> %x", m_adr, val);
   } catch (const IOException& e) {
     LogFile::error(e.what());

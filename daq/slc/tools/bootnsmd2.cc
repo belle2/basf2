@@ -27,7 +27,7 @@ int main(int argc, char** argv)
   int port = config.getInt(name + ".port");
   std::string host = config.get(name + ".host");
   std::string logdir = config.get("log.dir");
-  std::string cmd = StringUtil::form("nsmd2 -m -s %d -p %d -h %s -l %s/nsm2 ",
+  std::string cmd = StringUtil::form("nsmd2 -s %d -p %d -h %s -l %s/nsm2",
                                      port, port, host.c_str(), logdir.c_str());
   //std::string cmd = StringUtil::form("nsmd2 -b -s %d -p %d -h %s -l %s/nsm2 -o > /dev/null&",
   //                                   port, port, host.c_str(), logdir.c_str());

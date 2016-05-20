@@ -13,8 +13,11 @@ namespace Belle2 {
 
   public:
     virtual void init(RCCallback& callback, HSLB& hslb);
-    virtual void boot(HSLB& hslb, const DBObject& obj);
-    virtual void load(HSLB& hslb, const DBObject& obj);
+    virtual void boot(RCCallback& callback, HSLB& hslb, const DBObject& obj);
+    virtual void load(RCCallback& callback, HSLB& hslb, const DBObject& obj);
+    virtual void monitor(RCCallback& callback, HSLB& hslb);
+    void setRunMode(HSLB& hslb, const std::string& mode);
+    std::string getRunMode(HSLB& hslb);
 
     class NSMVHandlerInitRand : public NSMVHandlerInt {
     public:

@@ -12,6 +12,7 @@ extern "C" {
 #include "svdrc_callback.h"
 }
 
+#include "SVDStateDefs.h"
 #include "SVDRCCallback.h"
 
 #include <daq/slc/nsm/NSMCallback.h>
@@ -75,6 +76,7 @@ void eventCallback(struct event_handler_args eha)
     const char* pvdata  = (const char *)eha.dbr;
     const char* pvname_c = ca_name(eha.chid);
     if (pvname_c != NULL) {
+      /*
       std::string pvname = StringUtil::replace(pvname_c, ":", ".");
       LogFile::debug("Event Callback: %s = %s", pvname.c_str(), pvdata);
       RCState state_target = g_callback->getStateTarget();
@@ -85,6 +87,28 @@ void eventCallback(struct event_handler_args eha)
 	  g_callback->setState(RCState::NOTREADY_S);
 	} else if (val == "ready") {
 	  g_callback->setState(RCState::READY_S);
+	  if (g_callback->isAborting()) {
+	    g_callback->abort();
+	  }
+	} else if (val == "running") {
+	  g_callback->setState(RCState::RUNNING_S);
+	} else if (val == "loading") {
+	  g_callback->setState(RCState::LOADING_TS);
+	} else if (val == "unloading") {
+	  g_callback->setState(RCState::ABORTING_RS);
+	} else if (val == "unknown") {
+	  g_callback->setState(RCState::UNKNOWN);
+	} else if (val == "error") {
+	  g_callback->setState(RCState::ERROR_ES);
+	}
+      } else if (pvname == "SVD.CTRL.State") {
+	if (ival == "notReady") {
+	  g_callback->setState(RCState::NOTREADY_S);
+	} else if (ival == "ready") {
+	  g_callback->setState(RCState::READY_S);
+	  if (g_callback->isAborting()) {
+	    g_callback->abort();
+	  }
 	} else if (val == "running") {
 	  g_callback->setState(RCState::RUNNING_S);
 	} else if (val == "loading") {
@@ -97,6 +121,61 @@ void eventCallback(struct event_handler_args eha)
 	  g_callback->setState(RCState::ERROR_ES);
 	}
       } else if (pvname == "B2.PSC.SVD.State.cur.S") {
+      } 
+      */
+      std::string pvname = StringUtil::replace(pvname_c, ":", ".");
+      LogFile::debug("Event Callback: %s = %s", pvname.c_str(), pvdata);
+      RCState state_target = g_callback->getStateTarget();
+      int ival = atoi(pvdata);
+      if (pvname == "SVD.CTRL.State") {
+	if (ival == MAIN_STATE_DOWN) {
+	  g_callback->setState(RCState::NOTREADY_S);
+	  g_callback->set(pvname, "DOWN");
+	} else if (ival == MAIN_STATE_IDLE) {
+	  g_callback->setState(RCState::NOTREADY_S);
+	  g_callback->set(pvname, "IDLE");
+	} else if (ival == MAIN_STATE_INITIALISING) {
+	  g_callback->setState(RCState::LOADING_TS);
+	  g_callback->set(pvname, "INITIALISING");
+	} else if (ival == MAIN_STATE_CONFIGURING) {
+	  g_callback->setLoading(false);
+	  g_callback->setState(RCState::LOADING_TS);
+	  g_callback->set(pvname, "CONFIGURING");
+	} else if (ival == MAIN_STATE_READY) {
+	  g_callback->setState(RCState::READY_S);
+	  g_callback->set(pvname, "READY");
+	} else if (ival == MAIN_STATE_CAPTURE_EVENTS) {
+	  g_callback->setState(RCState::RUNNING_S);
+	  g_callback->set(pvname, "CAPTURE_EVENTS");
+	} else if (ival == MAIN_STATE_FINISHING) {
+	  g_callback->setState(RCState::LOADING_TS);
+	  g_callback->set(pvname, "FINISHING");
+	} else if (ival == MAIN_STATE_ABORTING) {
+	  g_callback->setState(RCState::ABORTING_RS);
+	  g_callback->set(pvname, "ABORTING");
+	} else if (ival == MAIN_STATE_OUT_OF_SYNC) {
+	  g_callback->setState(RCState::UNKNOWN);
+	  g_callback->set(pvname, "OUT_OF_SYNC");
+	} else if (ival == MAIN_STATE_ERROR) {
+	  g_callback->setState(RCState::ERROR_ES);
+	  g_callback->set(pvname, "ERROR");
+	}
+      } else if (pvname == "SVD.CTRL.Request") {
+	if (ival == MAIN_REQ_PROCESSED) {
+	  g_callback->set(pvname, "PROCESSED");
+	} else if (ival == MAIN_REQ_GET_READY) {
+	  g_callback->set(pvname, "GET_READY");
+	} else if (ival == MAIN_REQ_START) {
+	  g_callback->set(pvname, "START");
+	} else if (ival == MAIN_REQ_STOP) {
+	  g_callback->set(pvname, "STOP");
+	} else if (ival == MAIN_REQ_ABORT) {
+	  g_callback->set(pvname, "ABORT");
+	} else if (ival == MAIN_REQ_FINISH) {
+	  g_callback->set(pvname, "FINISH");
+	}
+      } else {//if (pvname == "B2.RC.SVD.State.cur.S") {
+	  g_callback->set(pvname, pvdata);
       } 
     } else {
       LogFile::warning("Unknown PV (chid=%d)", eha.chid);

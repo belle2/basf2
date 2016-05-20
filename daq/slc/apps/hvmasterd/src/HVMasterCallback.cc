@@ -50,6 +50,7 @@ void HVMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
         LogFile::info("New node : " + node.getName());
       }
       node.setUsed(o_node.getBool("used"));
+      /*
       if (o_node.hasObject("config")) {
         const std::string path = o_node("config").getPath();
         LogFile::info("found config :%s %s", node.getName().c_str(), path.c_str());
@@ -57,6 +58,7 @@ void HVMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
       } else {
         LogFile::warning("Not found config");
       }
+      */
       node_v.push_back(node);
     }
   } catch (const DBHandlerException& e) {
@@ -86,56 +88,68 @@ void HVMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
 
 void HVMasterCallback::monitor() throw(RCHandlerException)
 {
-  HVState state(m_hvnode.getState());
+  HVState state(getNode().getState());
   HVState state_new = HVState::UNKNOWN;
-  bool synchronized = true;
-  for (HVNodeIterator it = m_node_v.begin(); it != m_node_v.end(); it++) {
-    HVNode& node(*it);
+  bool failed = false;
+  for (size_t i = 0; i < m_node_v.size(); i++) {
+    HVNode& node(m_node_v[i]);
     if (!node.isUsed()) continue;
     HVState cstate(node.getState());
+    HVState cstate_new;
     try {
       NSMCommunicator::connected(node.getName());
-      if (cstate == Enum::UNKNOWN) {
-        try {
-          std::string s;
-          get(node, "hvstate", s, 1);
-          if ((cstate = HVState(s)) != Enum::UNKNOWN) {
-            log(LogFile::NOTICE, "%s got up (state=%s).",
-                node.getName().c_str(), cstate.getLabel());
-            setState(node, cstate);
+      try {
+        std::string s;
+        get(node, "hvstate", s, 1);
+        cstate_new = HVState(s);
+        if (cstate_new != cstate) {
+          if (cstate == Enum::UNKNOWN) {
+            log(LogFile::INFO, "%s got up (state=%s).",
+                node.getName().c_str(), cstate_new.getLabel());
           }
-        } catch (const TimeoutException& e) {
-          LogFile::debug("%s timeout for state", node.getName().c_str());
+          cstate = cstate_new;
+          setState(node, cstate);
         }
+      } catch (const TimeoutException& e) {
+        LogFile::debug("%s timeout", node.getName().c_str());
       }
     } catch (const NSMNotConnectedException&) {
       if (cstate != Enum::UNKNOWN) {
         log(LogFile::ERROR, "%s got down.", node.getName().c_str());
         setState(node, Enum::UNKNOWN);
-        synchronized = false;
-        state_new = HVState::ERROR_ES;
+        setState(HVState::ERROR_ES);
+        failed = true;
       }
     }
-    if (cstate.isStable()) {
-      if (state_new == HVState::UNKNOWN) {
+    if (state.isStable() && state != cstate) {
+      if (cstate.isStable() && state_new.getId() > cstate.getId())
         state_new = cstate;
-      }
-      if (state_new != cstate) {
-        synchronized = false;
-      }
-    } else if (cstate.isError()) {
-      state_new = HVState::ERROR_ES;
+    } else if ((state.isTransition() || state.isError()) && state_new != cstate) {
+      state_new = HVState::UNKNOWN;
     }
   }
-  if (state_new == HVState::ERROR_ES ||
-      (synchronized && state_new != HVState::UNKNOWN && state != state_new)) {
+  //if (failed) state_new = HVState::NOTREADY_S;
+  if (state_new != HVState::UNKNOWN && state != state_new) {
     setState(state_new);
-    //reply(NSMMessage(NSMCommand::OK, state_new.getLabel()));
+  }
+  const std::string nodename = m_node_v[m_node_v.size() - 1].getName();
+  if (getNode().getState() != HVState::OFF_S &&
+      checkAll(nodename, HVState::OFF_S)) {
+    setState(HVState::OFF_S);
+  }
+  if (getNode().getState() != HVState::STANDBY_S &&
+      checkAll(nodename, HVState::STANDBY_S)) {
+    setState(HVState::STANDBY_S);
+  }
+  if (getNode().getState() != HVState::PEAK_S &&
+      checkAll(nodename, HVState::PEAK_S)) {
+    setState(HVState::PEAK_S);
   }
 }
 
 void HVMasterCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
+  /*
   bool ready = false;
   while (!ready) {
     ready = true;
@@ -177,6 +191,7 @@ void HVMasterCallback::load(const DBObject& obj) throw(RCHandlerException)
     }
   }
   LogFile::debug("Load done");
+  */
 }
 
 void HVMasterCallback::start(int expno, int runno) throw(RCHandlerException)
@@ -210,12 +225,14 @@ void HVMasterCallback::recover(const DBObject& obj) throw(RCHandlerException)
 
 void HVMasterCallback::abort() throw(RCHandlerException)
 {
-  LogFile::debug("Abort done");
+  /*
   for (HVNodeIterator it = m_node_v.begin(); it != m_node_v.end(); it++) {
     HVNode& node(*it);
     if (!node.isUsed()) continue;
     //NSMCommunicator::send(NSMMessage(node, HVCommand::TURNOFF));
   }
+  LogFile::debug("Abort done");
+  */
 }
 
 void HVMasterCallback::ok(const char* nodename, const char* data) throw()
@@ -239,7 +256,7 @@ void HVMasterCallback::error(const char* nodename, const char* data) throw()
 {
   try {
     HVNode& node(findNode(nodename));
-    //logging(node, LogFile::ERROR, data);
+    setState(node, HVState::ERROR_ES);
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
   }
@@ -357,6 +374,18 @@ throw()
   return true;
 }
 
+bool HVMasterCallback::checkAll(const std::string& node, const HVState& state) throw()
+{
+  for (size_t i = 0; i < m_node_v.size(); i++) {
+    HVNode& cnode(m_node_v[i]);
+    if (cnode.isUsed() && cnode.getState() != state) {
+      return false;
+    }
+    if (cnode.getName() == node) return true;
+  }
+  return true;
+}
+
 void HVMasterCallback::setState(const HVState& state) throw()
 {
   if (m_hvnode.getState() != state) {
@@ -368,11 +397,17 @@ void HVMasterCallback::setState(const HVState& state) throw()
     } catch (const std::exception& e) {
       LogFile::error(e.what());
     }
-    if (RCState(getNode().getState()).isStable()) {
-      if (state == HVState::PEAK_S) {
+    RCState rcstate(getNode().getState());
+    if (rcstate.isStable()) {
+      if (state != HVState::PEAK_S) {
+        if (rcstate == RCState::RUNNING_S) {
+          log(LogFile::FATAL, "HV got down during run");
+          RCCallback::setState(RCState::ERROR_ES);
+        } else {
+          RCCallback::setState(RCState::NOTREADY_S);
+        }
+      } else if (state == HVState::PEAK_S) {
         RCCallback::setState(RCState::READY_S);
-      } else {
-        RCCallback::setState(RCState::NOTREADY_S);
       }
     }
   }

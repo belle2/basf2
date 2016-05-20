@@ -2,6 +2,7 @@
 #define _Belle2_SVDRCCallback_h
 
 #include <daq/slc/runcontrol/RCCallback.h>
+#include <daq/slc/hvcontrol/HVState.h>
 
 struct MYNODE {
   char value[20];
@@ -44,13 +45,29 @@ namespace Belle2 {
 
   public:
     int putPV(chid cid, const char* val);
+    int putPV(chid cid, int val);
     bool addPV(const std::string& pvname) throw();
     RCState& getStateTarget() throw() { return m_state_target; }
-
+    bool isAborting() const throw() { return m_isabort; }
+    void setAborting(bool isabort) throw() { m_isabort = isabort; }
+    bool isLoading() const throw() { return m_isload; }
+    void setLoading(bool isload) throw() { m_isload = isload; }
+    void checkRCState();
+    void setState(const RCState& rcstate)
+    {
+      RCCallback::setState(rcstate);
+      if (!rcstate.isTransition()) {
+        m_rcstate = rcstate;
+      }
+    }
   private:
     chid m_RCRqs;
     chid m_PSRqs;
+    bool m_isabort;
+    bool m_isload;
     RCState m_state_target;
+    RCState m_rcstate;
+    HVState m_pscstate;
 
   };
 

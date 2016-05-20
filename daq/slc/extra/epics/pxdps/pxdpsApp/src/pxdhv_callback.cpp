@@ -81,7 +81,7 @@ void eventCallback(struct event_handler_args eha)
       HVState state_target = g_callback->getStateTarget();
       g_callback->set(pvname, pvdata);
       std::string val = pvdata;
-      if (pvname == "B2.PSC.PXD.State.cur.S") {
+      if (pvname == "B2.PXD.PSC.State.cur.S") {
 	if (val == "off") {
 	  g_callback->setHVState(HVState::OFF_S);
 	  g_callback->setStoppedByTrip(false);
@@ -117,7 +117,7 @@ void eventCallback(struct event_handler_args eha)
 	  g_callback->sendToRC(RCCommand::ABORT);
 	  g_callback->setStoppedByTrip(false);
 	}
-      } else if (pvname == "B2.RC.PXD.State.cur.S") {
+      } else if (pvname == "B2.PXD.RC.State.cur.S") {
 	if (val == "not ready") {
 	  g_callback->setRCState(RCState::NOTREADY_S);
 	} else if (val == "ready") {

@@ -20,6 +20,41 @@
 #include <cstdio>
 #include <sstream>
 
+#define CRCERR     0x68
+#define B2LCSR     0x69
+#define HSD32      0x6e
+#define HSA32      0x6f
+#define HSLBHW     0x70
+#define HSLBFW     0x71
+#define HSLSTAT    0x72
+#define HSLCONT    0x73
+#define CCLK       0x74
+#define CONF       0x75
+#define FEEHW      0x76
+#define FEESERIAL  0x77
+#define FEEVER     0x79
+#define FEETYPE    0x79
+#define SERIAL_L   0x7b
+#define SERIAL_H   0x7c
+#define TYPE_L     0x7d
+#define TYPE_H     0x7e
+#define HSLBID     0x80
+#define HSLBVER    0x81
+#define RESET      0x82
+#define B2LSTAT    0x83
+#define RXDATA     0x84
+#define FWEVT      0x85
+#define FWCLK      0x86
+#define CNTSEC     0x87
+#define NWORD      0x88
+#define ERRDET     0x8c
+#define ERRPAT1    0x8d
+#define ERRPAT2    0x8e
+#define B2LCTIM    0x91
+#define B2LTAG     0x92
+#define B2LUTIM    0x93
+#define B2LERUN    0x94
+
 bool initialized = false;
 
 using namespace Belle2;
@@ -56,6 +91,35 @@ COPPERCallback::COPPERCallback(FEE* fee[4], bool dummymode)
 
 COPPERCallback::~COPPERCallback() throw()
 {
+}
+
+void COPPERCallback::getfee(HSLB& hslb, int& hwtype, int& serial, int& fwtype, int& fwver)
+throw(HSLBHandlerException)
+{
+  hslb.writefn(HSREG_CSR, 0x05); /* reset address fifo */
+  hslb.writefn(HSREG_CSR, 0x06); /* reset status register */
+  int ret = 0;
+  if ((ret = hslb.readfn(HSREG_STAT))) {
+    return ;
+  }
+  hslb.writefn(HSREG_FEEHWTYPE, 0x02); /* dummy value write */
+  hslb.writefn(HSREG_FEESERIAL, 0x02); /* dummy value write */
+  hslb.writefn(HSREG_FEEFWTYPE, 0x02); /* dummy value write */
+  hslb.writefn(HSREG_FEEFWVER,  0x02); /* dummy value write */
+  hslb.writefn(HSREG_CSR, 0x07);
+
+  hslb.hswait_quiet();
+
+  hwtype = hslb.readfn(HSREG_FEEHWTYPE);
+  serial = hslb.readfn(HSREG_FEESERIAL);
+  fwtype = hslb.readfn(HSREG_FEEFWTYPE);
+  fwver  = hslb.readfn(HSREG_FEEFWVER);
+
+  serial = (serial | (hwtype << 8)) & 0xfff;
+  hwtype = (hwtype >> 4) & 0x0f;
+  fwtype  = (fwtype >> 4) & 0x0f;
+
+  //hsp->feecrce = readfee8(fd, HSREG_CRCERR);
 }
 
 void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
@@ -95,8 +159,9 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
     add(new NSMVHandlerFEELoadAll(*this, "loadfee"));
     //bool bootedttrx = false;
     for (int i = 0; i < 4; i++) {
+      if (m_dummymode || !m_fee[i]) continue;
       const DBObject& o_hslb(obj("hslb", i));
-      if (m_dummymode || !m_fee[i] || !o_hslb.getBool("used")) continue;
+      if (!o_hslb.getBool("used")) continue;
       HSLB& hslb(m_hslb[i]);
       hslb.open(i);
       m_fee[i]->init(*this, hslb);
@@ -114,9 +179,55 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       add(new NSMVHandlerHSLBRegFixed(*this, vname + ".fmver", i, 0x81, 4));
       add(new NSMVHandlerHSLBRegFixed(*this, vname + ".b2lstat", i, 0x83, 4));
       add(new NSMVHandlerHSLBRegFixed(*this, vname + ".rxdata", i, 0x84, 4));
-      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".fwevt", i, 0x85, 4));
-      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".fwclk", i, 0x86, 4));
-      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".cntsec", i, 0x87, 4));
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".evtsize", i, 0x85, 4));
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".nevent", i, 0x86, 4));
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".uptime", i, 0x87, 4));
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".nbyte", i, 0x88, 4));
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".nword", i, 0x89, 4));
+
+      //set(vname + ".hslbreset", hslb.readfn(RESET));
+
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".hslbhw", i, HSLBHW, 4));
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".hslbfw", i, HSLBFW, 4));
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".hslbid", i, HSLBID, 4));
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".hslbver", i, HSLBVER, 4));
+      //add(new NSMVHandlerInt(vname + ".serial", true, true, hslb.readfn(SERIAL_L) | (hslb.readfn(SERIAL_H)>>8)));
+      //add(new NSMVHandlerInt(vname + ".type", true, true, hslb.readfn(TYPE_L) | (hslb.readfn(TYPE_H)>>8)));
+
+      int feehw, feeserial, feetype, feever;
+      try {
+        getfee(hslb, feehw, feeserial, feetype, feever);
+      } catch (const std::exception& e) {
+
+      }
+      add(new NSMVHandlerText(vname + ".feename", true, false, ::feename(feehw, feetype)));
+      add(new NSMVHandlerInt(vname + ".feehw", true, false, feehw));
+      add(new NSMVHandlerInt(vname + ".feeserial", true, false, feeserial));
+      add(new NSMVHandlerInt(vname + ".feetype", true, false, feetype));
+      add(new NSMVHandlerInt(vname + ".feever", true, false, feever));
+
+      add(new NSMVHandlerInt(vname + ".crcerr", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".b2lcsr", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".hsd32", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".hsa32", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".hslstat", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".hslcont", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".cclk", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".conf", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".b2lstat", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".rxdata", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".fwevt", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".fwclk", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".cntsec", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".nword", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".errdet", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".errpat1", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".errpat2", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".b2lctim", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".b2ltag", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".b2lutim", true, false, 0));
+      add(new NSMVHandlerInt(vname + ".b2lerun", true, false, 0));
+
       if (m_fee[i] != NULL && obj.hasObject("fee")) {
         const DBObject& o_fee((obj("fee", i)));
         vname = StringUtil::form("fee[%d]", i);
@@ -157,20 +268,57 @@ bool COPPERCallback::feeload()
     get(obj);
     for (int i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj("hslb", i));
-      if (o_hslb.getBool("used") && m_fee[i] != NULL) {
+      if (m_fee[i] != NULL && o_hslb.getBool("used")) {
         HSLB& hslb(m_hslb[i]);
         hslb.open(i);
         if (!obj.hasObject("fee")) continue;
+        std::string vname = StringUtil::form("hslb[%d]", i);
+        set(vname + ".hslbhw", hslb.readfn(HSLBHW));
+        set(vname + ".hslbfw", hslb.readfn(HSLBFW));
+        int feehw, feeserial, feetype, feever;
+        getfee(hslb, feehw, feeserial, feetype, feever);
+        set(vname + ".feename", ::feename(feehw, feetype));
+        set(vname + ".feehw", feehw);
+        set(vname + ".feeserial", feeserial);
+        set(vname + ".feetype", feetype);
+        set(vname + ".feever", feever);
+        set(vname + ".serial", hslb.readfn(SERIAL_L) | (hslb.readfn(SERIAL_H) >> 8));
+        set(vname + ".type", hslb.readfn(TYPE_L) | (hslb.readfn(TYPE_H) >> 8));
+        set(vname + ".hslbid", hslb.readfn(HSLBID));
+        set(vname + ".hslbver", hslb.readfn(HSLBVER));
         try {
           hslb.test();
         } catch (const HSLBHandlerException& e) {
           throw (RCHandlerException("tesths failed : %s", e.what()));
         }
-        FEE& fee(*m_fee[i]);
         try {
-          fee.load(hslb, (obj("fee", i)));
-        } catch (const IOException& e) {
-          throw (RCHandlerException(e.what()));
+          hslb.test();
+          set(vname + ".hslbhw", hslb.readfn(HSLBHW));
+          set(vname + ".hslbfw", hslb.readfn(HSLBFW));
+          int feehw, feeserial, feetype, feever;
+          getfee(hslb, feehw, feeserial, feetype, feever);
+          set(vname + ".feename", ::feename(feehw, feetype));
+          set(vname + ".feehw", feehw);
+          set(vname + ".feeserial", feeserial);
+          set(vname + ".feetype", feetype);
+          set(vname + ".feever", feever);
+          set(vname + ".serial", hslb.readfn(SERIAL_L) | (hslb.readfn(SERIAL_H) >> 8));
+          set(vname + ".type", hslb.readfn(TYPE_L) | (hslb.readfn(TYPE_H) >> 8));
+          set(vname + ".hslbid", hslb.readfn(HSLBID));
+          set(vname + ".hslbver", hslb.readfn(HSLBVER));
+        } catch (const HSLBHandlerException& e) {
+          set(vname + ".hslbhw", -1);
+          set(vname + ".hslbfw", -1);
+          set(vname + ".feename", "LinkDown");
+          set(vname + ".feehw", -1);
+          set(vname + ".feeserial", -1);
+          set(vname + ".feetype", -1);
+          set(vname + ".feever", -1);
+          set(vname + ".serial", -1);
+          set(vname + ".type", -1);
+          set(vname + ".hslbid", -1);
+          set(vname + ".hslbver", -1);
+          throw (RCHandlerException("tesths failed : %s", e.what()));
         }
       }
     }
@@ -187,15 +335,16 @@ void COPPERCallback::boot(const DBObject& obj) throw(RCHandlerException)
   if (!m_dummymode) {
     try {
       for (int i = 0; i < 4; i++) {
+        if (!m_fee[i]) continue;
         const DBObject& o_hslb(obj("hslb", i));
-        if (o_hslb.getBool("used") && m_fee[i] != NULL  && obj.hasObject("fee")) {
+        if (o_hslb.getBool("used") && obj.hasObject("fee")) {
           const DBObject& o_fee(obj("fee", i));
           if (!(o_hslb.hasValue("dummyhslb") && o_hslb.getBool("dummyhslb"))) {
             HSLB& hslb(m_hslb[i]);
             hslb.open(i);
             FEE& fee(*m_fee[i]);
             try {
-              fee.boot(hslb, o_fee);
+              fee.boot(*this, hslb, o_fee);
             } catch (const IOException& e) {
               throw (RCHandlerException(e.what()));
             }
@@ -219,20 +368,61 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
       throw (RCHandlerException("TTRX Link error"));
     }
     try {
+      int flag = 0;
+      int nhslb = 0;
+      for (size_t i = 0; i < 4; i++) {
+        if (!m_fee[i]) continue;
+        const DBObject& o_hslb(obj.getObject("hslb", i));
+        if (o_hslb.getBool("used")) {
+          flag += 1 << i;
+          nhslb++;
+        }
+      }
+      std::string cmd = StringUtil::form("regrx 130 %d", flag);
+      system(cmd.c_str());
+      LogFile::info(cmd);
+      sleep(1);
+      system("regrx 130");
       for (int i = 0; i < 4; i++) {
+        if (!m_fee[i]) continue;
         const DBObject& o_hslb(obj("hslb", i));
-        if (o_hslb.getBool("used") && m_fee[i] != NULL) {
+        if (o_hslb.getBool("used")) {
           HSLB& hslb(m_hslb[i]);
           hslb.open(i);
           if (!obj.hasObject("fee")) continue;
+          std::string vname = StringUtil::form("hslb[%d]", i);
           try {
-            //hslb.test();
+            hslb.test();
+            set(vname + ".hslbhw", hslb.readfn(HSLBHW));
+            set(vname + ".hslbfw", hslb.readfn(HSLBFW));
+            int feehw, feeserial, feetype, feever;
+            getfee(hslb, feehw, feeserial, feetype, feever);
+            set(vname + ".feename", ::feename(feehw, feetype));
+            set(vname + ".feehw", feehw);
+            set(vname + ".feeserial", feeserial);
+            set(vname + ".feetype", feetype);
+            set(vname + ".feever", feever);
+            set(vname + ".serial", hslb.readfn(SERIAL_L) | (hslb.readfn(SERIAL_H) >> 8));
+            set(vname + ".type", hslb.readfn(TYPE_L) | (hslb.readfn(TYPE_H) >> 8));
+            set(vname + ".hslbid", hslb.readfn(HSLBID));
+            set(vname + ".hslbver", hslb.readfn(HSLBVER));
           } catch (const HSLBHandlerException& e) {
+            set(vname + ".hslbhw", -1);
+            set(vname + ".hslbfw", -1);
+            set(vname + ".feename", "LinkDown");
+            set(vname + ".feehw", -1);
+            set(vname + ".feeserial", -1);
+            set(vname + ".feetype", -1);
+            set(vname + ".feever", -1);
+            set(vname + ".serial", -1);
+            set(vname + ".type", -1);
+            set(vname + ".hslbid", -1);
+            set(vname + ".hslbver", -1);
             throw (RCHandlerException("tesths failed : %s", e.what()));
           }
           FEE& fee(*m_fee[i]);
           try {
-            fee.load(hslb, (obj("fee", i)));
+            fee.load(*this, hslb, (obj("fee", i)));
           } catch (const IOException& e) {
             throw (RCHandlerException(e.what()));
           }
@@ -368,6 +558,51 @@ void COPPERCallback::monitor() throw(RCHandlerException)
             set(vname + ".err.cprlengthfifofull", hslb.isCOPPERLengthFifoFull());
             set(vname + ".err.fifofull", hslb.isFifoFull());
             set(vname + ".err.crc", hslb.isCRCError());
+            try {
+              set(vname + ".crcerr", hslb.readfn(CRCERR));
+              set(vname + ".b2lcsr", hslb.readfn(B2LCSR));
+              set(vname + ".hsd32", hslb.readfn(HSD32));
+              set(vname + ".hsa32", hslb.readfn(HSA32));
+              set(vname + ".hslstat", hslb.readfn(HSLSTAT));
+              set(vname + ".hslcont", hslb.readfn(HSLCONT));
+              set(vname + ".cclk", hslb.readfn(CCLK));
+              set(vname + ".conf", hslb.readfn(CONF));
+              set(vname + ".b2lstat", hslb.readfn(B2LSTAT));
+              set(vname + ".rxdata", hslb.readfn(RXDATA));
+              set(vname + ".fwevt", hslb.readfn(FWEVT));
+              set(vname + ".fwclk", hslb.readfn(FWCLK));
+              set(vname + ".cntsec", hslb.readfn(CNTSEC));
+              set(vname + ".nword", hslb.readfn(NWORD));
+              set(vname + ".errdet", hslb.readfn(ERRDET));
+              set(vname + ".errpat1", hslb.readfn(ERRPAT1));
+              set(vname + ".errpat2", hslb.readfn(ERRPAT2));
+              set(vname + ".b2lctim", hslb.readfn(B2LCTIM));
+              set(vname + ".b2ltag", hslb.readfn(B2LTAG));
+              set(vname + ".b2lutim", hslb.readfn(B2LUTIM));
+              set(vname + ".b2lerun", hslb.readfn(B2LERUN));
+            } catch (const HSLBHandlerException& e) {
+              set(vname + ".crcerr", -1);
+              set(vname + ".b2lcsr", -1);
+              set(vname + ".hsd32", -1);
+              set(vname + ".hsa32", -1);
+              set(vname + ".hslstat", -1);
+              set(vname + ".hslcont", -1);
+              set(vname + ".cclk", -1);
+              set(vname + ".conf", -1);
+              set(vname + ".b2lstat", -1);
+              set(vname + ".rxdata", -1);
+              set(vname + ".fwevt", -1);
+              set(vname + ".fwclk", -1);
+              set(vname + ".cntsec", -1);
+              set(vname + ".nword", -1);
+              set(vname + ".errdet", -1);
+              set(vname + ".errpat1", -1);
+              set(vname + ".errpat2", -1);
+              set(vname + ".b2lctim", -1);
+              set(vname + ".b2ltag", -1);
+              set(vname + ".b2lutim", -1);
+              set(vname + ".b2lerun", -1);
+            }
           }
         }
         logging(m_ttrx.isBelle2LinkError(), LogFile::WARNING, "TTRX Belle2 link error");
@@ -412,8 +647,9 @@ void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)
     int flag = 0;
     int nhslb = 0;
     for (size_t i = 0; i < 4; i++) {
+      if (!m_fee[i]) continue;
       const DBObject& o_hslb(obj.getObject("hslb", i));
-      if (m_fee[i] != NULL && o_hslb.getBool("used")) {
+      if (o_hslb.getBool("used")) {
         flag += 1 << i;
         nhslb++;
       }
@@ -430,7 +666,7 @@ void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)
       sprintf(str, "0x%d000000", detectorid);
       copperid += strtol(str, NULL, 0);
       m_con.addArgument(StringUtil::form("%d", copperid));
-      m_con.addArgument("%d", nhslb);
+      m_con.addArgument("%d", flag);
       m_con.addArgument("1");
       const std::string nodename = StringUtil::tolower(getNode().getName());
       m_con.addArgument(nodename + "_" + "basf2");
@@ -474,3 +710,27 @@ bool COPPERCallback::isError() throw()
   return false;
 }
 
+/*
+      add(new NSMVHandlerInt(vname + ".crcerr", true, false, hslb.readfn(CRCERR)));
+      add(new NSMVHandlerInt(vname + ".b2lcsr", true, false, hslb.readfn(B2LCSR)));
+      add(new NSMVHandlerInt(vname + ".hsd32", true, false, hslb.readfn(HSD32)));
+      add(new NSMVHandlerInt(vname + ".hsa32", true, false, hslb.readfn(HSA32)));
+      add(new NSMVHandlerInt(vname + ".hslstat", true, false, hslb.readfn(HSLSTAT)));
+      add(new NSMVHandlerInt(vname + ".hslcont", true, false, hslb.readfn(HSLCONT)));
+      add(new NSMVHandlerInt(vname + ".cclk", true, false, hslb.readfn(CCLK)));
+      add(new NSMVHandlerInt(vname + ".conf", true, false, hslb.readfn(CONF)));
+      add(new NSMVHandlerInt(vname + ".b2lstat", true, false, hslb.readfn(B2LSTAT)));
+      add(new NSMVHandlerInt(vname + ".rxdata", true, false, hslb.readfn(RXDATA)));
+      add(new NSMVHandlerInt(vname + ".fwevt", true, false, hslb.readfn(FWEVT)));
+      add(new NSMVHandlerInt(vname + ".fwclk", true, false, hslb.readfn(FWCLK)));
+      add(new NSMVHandlerInt(vname + ".cntsec", true, false, hslb.readfn(CNTSEC)));
+      add(new NSMVHandlerInt(vname + ".nword", true, false, hslb.readfn(NWORD)));
+      add(new NSMVHandlerInt(vname + ".errdet", true, false, hslb.readfn(ERRDET)));
+      add(new NSMVHandlerInt(vname + ".errpat1", true, false, hslb.readfn(ERRPAT1)));
+      add(new NSMVHandlerInt(vname + ".errpat2", true, false, hslb.readfn(ERRPAT2)));
+      add(new NSMVHandlerInt(vname + ".b2lctim", true, false, hslb.readfn(B2LCTIM)));
+      add(new NSMVHandlerInt(vname + ".b2ltag", true, false, hslb.readfn(B2LTAG)));
+      add(new NSMVHandlerInt(vname + ".b2lutim", true, false, hslb.readfn(B2LUTIM)));
+      add(new NSMVHandlerInt(vname + ".b2lerun", true, false, hslb.readfn(B2LERUN)));
+
+ */

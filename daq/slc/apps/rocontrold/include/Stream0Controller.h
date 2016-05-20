@@ -11,7 +11,7 @@ namespace Belle2 {
     virtual ~Stream0Controller() throw();
 
   public:
-    void check() throw();
+    virtual void check();
 
   protected:
     virtual void initArguments(const DBObject& obj);

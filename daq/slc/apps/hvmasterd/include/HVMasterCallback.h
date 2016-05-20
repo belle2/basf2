@@ -47,6 +47,7 @@ namespace Belle2 {
     void distribute_r(NSMMessage msg) throw();
     HVNode& findNode(const std::string& nodename) throw(std::out_of_range);
     bool check(const std::string& nodename, const HVState& state) throw();
+    bool checkAll(const std::string& node, const HVState& state) throw();
 
   public:
     void setState(const HVState& state) throw();

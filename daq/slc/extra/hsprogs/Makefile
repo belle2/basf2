@@ -2,12 +2,12 @@
 #
 # VERSION 2010060400
 
-EXE1 = booths
+#EXE1 = booths
 EXE2 = reghs
-EXE3 = readhs
-EXE4 = tesths
-EXE5 = staths
-EXE6 = copperstat
+#EXE3 = readhs
+#EXE4 = tesths
+#EXE5 = staths
+#EXE6 = copperstat
 EXE7 = 
 EXE8 = 
 EXE9 = 

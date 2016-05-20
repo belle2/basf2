@@ -97,7 +97,7 @@ void eventCallback(struct event_handler_args eha)
 	  g_callback->setHVState(HVState::TURNINGON_TS);
 	} else if (val == "turningOff") {
 	  g_callback->setHVState(HVState::TURNINGOFF_TS);
-	} else if (val == "tampingUp") {
+	} else if (val == "rampingUp") {
 	  g_callback->setHVState(HVState::RAMPINGUP_TS);
 	} else if (val == "rampingDown") {
 	  g_callback->setHVState(HVState::RAMPINGDOWN_TS);

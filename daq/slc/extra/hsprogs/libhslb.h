@@ -28,7 +28,7 @@ int readfee32(int fd, int adr, int* valp);
 int writefee32(int fd, int adr, int val);
 int writestream(int fd, char* filename);
 const char* hslberr();
-void write_fpga(int fndev, int m012, int ch, int n);
+void write_fpga(int fndev, int m012, int ch, int n, int verbose);
 void dump_fpga(int conf, char* str);
 int boot_fpga(int fndev, const char* file,
               int verbose, int forced, int m012);

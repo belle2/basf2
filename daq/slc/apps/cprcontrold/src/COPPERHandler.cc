@@ -173,7 +173,7 @@ bool NSMVHandlerFEEBoot::handleSetInt(int val)
     FEE& fee(*m_callback.getFEE(m_hslb));
     HSLB& hslb(m_callback.getHSLB(m_hslb));
     try {
-      fee.boot(hslb, obj("fee", m_hslb));
+      fee.boot(m_callback, hslb, obj("fee", m_hslb));
       return true;
     } catch (const IOException& e) {
       LogFile::error(e.what());
@@ -190,7 +190,7 @@ bool NSMVHandlerFEELoad::handleSetInt(int val)
     FEE& fee(*m_callback.getFEE(m_hslb));
     HSLB& hslb(m_callback.getHSLB(m_hslb));
     try {
-      fee.load(hslb, obj("fee", m_hslb));
+      fee.load(m_callback, hslb, obj("fee", m_hslb));
       return true;
     } catch (const IOException& e) {
       LogFile::error(e.what());

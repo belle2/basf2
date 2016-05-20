@@ -76,24 +76,28 @@ void eventCallback(struct event_handler_args eha)
     const char* pvname_c = ca_name(eha.chid);
     if (pvname_c != NULL) {
       std::string pvname = StringUtil::replace(pvname_c, ":", ".");
-      LogFile::debug("Event Callback: %s = %s", pvname.c_str(), pvdata);
       RCState state_target = g_callback->getStateTarget();
       g_callback->set(pvname, pvdata);
+      LogFile::debug("Event Callback: %s = %s", pvname.c_str(), pvdata);
       std::string val = pvdata;
-      if (pvname == "B2.RC.PXD.State.cur.S") {
-	if (val == "not ready") {
+      if (pvname == "B2.PXD.RC.State.cur.S") {
+	if (val == "NOTREADY") {
 	  g_callback->setState(RCState::NOTREADY_S);
-	} else if (val == "ready") {
+	} else if (val == "READY") {
 	  g_callback->setState(RCState::READY_S);
-	} else if (val == "running") {
+	} else if (val == "RUNNING") {
 	  g_callback->setState(RCState::RUNNING_S);
-	} else if (val == "loading") {
+	} else if (val == "LOADING") {
 	  g_callback->setState(RCState::LOADING_TS);
-	} else if (val == "unloading") {
+	} else if (val == "UNLOADING") {
 	  g_callback->setState(RCState::ABORTING_RS);
-	} else if (val == "unknown") {
+	} else if (val == "STARTING") {
+	  g_callback->setState(RCState::STARTING_TS);
+	} else if (val == "STOPPING") {
+	  g_callback->setState(RCState::STOPPING_TS);
+	} else if (val == "UNKNOWN") {
 	  g_callback->setState(RCState::UNKNOWN);
-	} else if (val == "error") {
+	} else if (val == "ERROR") {
 	  g_callback->setState(RCState::ERROR_ES);
 	}
       }

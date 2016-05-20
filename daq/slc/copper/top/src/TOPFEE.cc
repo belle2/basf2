@@ -21,12 +21,12 @@ void TOPFEE::init(RCCallback& callback, HSLB& hslb)
   callback.add(new FEE8Handler(vname + "reg0", callback, hslb, *this, REG0_ADDR));
 }
 
-void TOPFEE::boot(HSLB& hslb,  const DBObject& obj)
+void TOPFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
 
 }
 
-void TOPFEE::load(HSLB& hslb, const DBObject& obj)
+void TOPFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
 
   // writing stream file to FEE

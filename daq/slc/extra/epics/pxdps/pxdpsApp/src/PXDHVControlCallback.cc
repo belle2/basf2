@@ -32,18 +32,18 @@ PXDHVControlCallback::PXDHVControlCallback(const NSMNode& node, const std::strin
 
 void PXDHVControlCallback::init(NSMCommunicator&) throw()
 {
-  int status = ca_create_channel("B2:PSC:PXD:State:req:S", NULL, NULL, 0, &m_PSRqs);
+  int status = ca_create_channel("B2:PXD:PSC:State:req:S", NULL, NULL, 0, &m_PSRqs);
   SEVCHK(status, "Create channel failed");  status = ca_pend_io(1.0);
   SEVCHK(status, "Channel connection failed");
-  status = ca_create_channel("B2:PSC:PXD:State:req:S", NULL, NULL, 0, &m_RCRqs);
+  status = ca_create_channel("B2:PXD:PSC:State:req:S", NULL, NULL, 0, &m_RCRqs);
   SEVCHK(status, "Create channel failed");
   status = ca_pend_io(1.0);
   SEVCHK(status, "Channel connection failed");
   add(new NSMVHandlerText("hvstate", true, false, getNode().getState().getLabel()));
-  addPV("B2:RC:PXD:State:req:S");
-  addPV("B2:PSC:PXD:State:req:S");
-  addPV("B2:RC:PXD:State:cur:S");
-  addPV("B2:PSC:PXD:State:cur:S");
+  addPV("B2:PXD:RC:State:req:S");
+  addPV("B2:PXD:PSC:State:req:S");
+  addPV("B2:PXD:RC:State:cur:S");
+  addPV("B2:PXD:PSC:State:cur:S");
 }
 
 int PXDHVControlCallback::putPV(chid cid, const char* val)

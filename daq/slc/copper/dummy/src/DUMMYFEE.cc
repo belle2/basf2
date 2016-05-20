@@ -17,12 +17,12 @@ void DUMMYFEE::init(RCCallback& callback, HSLB& hslb)
 
 }
 
-void DUMMYFEE::boot(HSLB& hslb,  const DBObject& obj)
+void DUMMYFEE::boot(RCCallback& callback, HSLB& hslb,  const DBObject& obj)
 {
 
 }
 
-void DUMMYFEE::load(HSLB& hslb, const DBObject& obj)
+void DUMMYFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
 
 }

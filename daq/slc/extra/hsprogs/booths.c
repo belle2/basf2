@@ -42,7 +42,7 @@ int xslot = 0;
 /* ---------------------------------------------------------------------- *\
    write_fpga
 \* ---------------------------------------------------------------------- */
-static void
+void
 write_fpga(int fndev, int m012, int ch, int n, int verbose)
 {
   int i, mask, data;
@@ -74,7 +74,7 @@ write_fpga(int fndev, int m012, int ch, int n, int verbose)
 /* ---------------------------------------------------------------------- *\
    dump_fpga
 \* ---------------------------------------------------------------------- */
-static void
+void
 dump_fpga(int conf, char *str)
 {
   printf("CONF register=%02x M012=%d INIT=%d DONE=%d%s%s\n",
@@ -84,7 +84,7 @@ dump_fpga(int conf, char *str)
 /* ---------------------------------------------------------------------- *\
    boot_fpga
 \* ---------------------------------------------------------------------- */
-static int
+int
 boot_fpga(int fndev, char *file, int verbose, int forced, int m012)
 {
   int i, ch, conf;

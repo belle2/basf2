@@ -120,9 +120,6 @@ namespace Belle2 {
       // Background
       const int c_fullBkgdCount = 280; /**< Number of expected background digits at full background. */
 
-      // Geometry
-      ECLGeometryPar* geom;
-
       /** Neighbour maps */
       ECLNeighbours* m_NeighbourMap9; /**< 3x3 = 9 neighbours */
       ECLNeighbours* m_NeighbourMap21; /**< 5x5 neighbours excluding corners = 21 */

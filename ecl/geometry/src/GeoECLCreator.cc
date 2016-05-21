@@ -34,6 +34,7 @@
 #include <G4PVPlacement.hh>
 #include <G4PVReplica.hh>
 #include <G4Transform3D.hh>
+#include "G4SDManager.hh"
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
@@ -206,14 +207,15 @@ namespace Belle2 {
 
     GeoECLCreator::GeoECLCreator(): isBeamBkgStudy(0)
     {
-      m_sensitive = new SensitiveDetector("SensitiveDetector", (2 * 24)*CLHEP::eV, 10 * CLHEP::MeV);
+      m_sensitive = new SensitiveDetector("ECLSensitiveDetector", (2 * 24)*CLHEP::eV, 10 * CLHEP::MeV);
+      G4SDManager::GetSDMpointer()->AddNewDetector(m_sensitive);
       m_bkgsensitive.clear();
     }
 
 
     GeoECLCreator::~GeoECLCreator()
     {
-      delete m_sensitive;
+      //      delete m_sensitive;
       for (BkgSensitiveDetector* sensitive : m_bkgsensitive) delete sensitive;
       m_bkgsensitive.clear();
     }

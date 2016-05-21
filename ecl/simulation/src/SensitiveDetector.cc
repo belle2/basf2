@@ -13,20 +13,16 @@
 using namespace std;
 using namespace Belle2::ECL;
 
-SensitiveDetector::SensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
+#define UNUSED(x)
+
+SensitiveDetector::SensitiveDetector(G4String name, G4double UNUSED(thresholdEnergyDeposit),
+                                     G4double UNUSED(thresholdKineticEnergy)):
   Simulation::SensitiveDetectorBase(name, Const::ECL),
   m_eclSimHitRel(m_mcParticles, m_eclSimHits),
-  m_eclHitRel(m_mcParticles, m_eclHits),
-  m_thresholdEnergyDeposit(thresholdEnergyDeposit),
-  m_thresholdKineticEnergy(thresholdKineticEnergy)
+  m_eclHitRel(m_mcParticles, m_eclHits)//,
+  // m_thresholdEnergyDeposit(thresholdEnergyDeposit),
+  // m_thresholdKineticEnergy(thresholdKineticEnergy)
 {
-  m_oldEvnetNumber = -1;
-  m_oldRunNumber = -1;
-  for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-    for (int  TimeIndex = 0; TimeIndex < 80; TimeIndex++) {
-      m_ECLHitIndex[iECLCell][TimeIndex] = -1;
-    }
-  }
   m_trackID = 0;
   m_WeightedTime = 0;
   m_energyDeposit = 0;
@@ -47,6 +43,11 @@ SensitiveDetector::~SensitiveDetector()
 
 void SensitiveDetector::Initialize(G4HCofThisEvent*)
 {
+  for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
+    for (int  TimeIndex = 0; TimeIndex < 80; TimeIndex++) {
+      m_ECLHitIndex[iECLCell][TimeIndex] = -1;
+    }
+  }
 }
 
 //-----------------------------------------------------
@@ -93,23 +94,16 @@ void SensitiveDetector::EndOfEvent(G4HCofThisEvent*)
 {
 }
 
+inline double dot(const TVector3& u, const TVector3& v)
+{
+  return u.x() * v.x() +  u.y() * v.y() +  u.z() * v.z();
+}
+
 int SensitiveDetector::saveSimHit(G4int cellId, G4int trackID, G4int pid, G4double tof, G4double edep,
                                   const G4ThreeVector& mom, const G4ThreeVector& pos)
 {
-  int currentEvnetNumber = m_eventMetaDataPtr->getEvent();
-  int currentRunNumber = m_eventMetaDataPtr->getRun();
-  if (currentEvnetNumber != m_oldEvnetNumber || currentRunNumber != m_oldRunNumber) {
-    m_oldEvnetNumber = currentEvnetNumber;
-    m_oldRunNumber = currentRunNumber;
-    for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-      for (int  TimeIndex = 0; TimeIndex < 80; TimeIndex++) {
-        m_ECLHitIndex[iECLCell][TimeIndex] = -1;
-      }
-    }
-  }
-
-  if (!m_eclSimHits) m_eclSimHits.create();
-  if (!   m_eclHits)    m_eclHits.create();
+  int simhitNumber = m_eclSimHits.getEntries();
+  m_eclSimHitRel.add(trackID, simhitNumber);
 
   TVector3 momentum(mom.getX(), mom.getY(), mom.getZ());
   TVector3 position(pos.getX(), pos.getY(), pos.getZ());
@@ -119,14 +113,12 @@ int SensitiveDetector::saveSimHit(G4int cellId, G4int trackID, G4int pid, G4doub
   edep     *= 1 / CLHEP::GeV;
   m_eclSimHits.appendNew(cellId + 1, trackID, pid, tof, edep, momentum, position);
 
-  int simhitNumber = m_eclSimHits.getEntries() - 1;
-  m_eclSimHitRel.add(trackID, simhitNumber);
-
   if (tof < 8000) {
     ECLGeometryPar* eclp = ECLGeometryPar::Instance();
     const TVector3& PosCell = eclp->GetCrystalPos(cellId);        // center of crystal position
     const TVector3& VecCell = eclp->GetCrystalVec(cellId);        // vector of crystal axis
-    double z = 15. - (position - PosCell) * VecCell;       // position along the vector of crystal axis
+    position -= PosCell;
+    double z = 15. - dot(position, VecCell);      // position along the vector of crystal axis
     double tsen = 6.05 + z * (0.0749 - z * 0.00112) + tof; // flight time to diode sensor
 
     int TimeIndex = tof * (1. / 100);                      // Hit Time of StoreArray

@@ -10,8 +10,9 @@
 #include <topcaf/dataobjects/Packet.h>
 
 namespace Belle2 {
-//! Define Trigger and Flag
+//! Define Trigger
 #define MASK_TRIGGER (0x000000FF)
+//! Define Flag
 #define MASK_FLAG (0x000000FF)
 
   class EventHeaderPacket: public Packet {
@@ -24,15 +25,22 @@ namespace Belle2 {
 
     ///--- Getters ---///
     inline packet_word_t GetFreezeDate() const {return m_freeze_date;}
+    //! get event number
     inline packet_word_t GetEventNumber() const {return m_evt_num;}
+    //! get event trigger
     inline bool GetEventTrigger() const {return (MASK_TRIGGER & m_trigger);} //use only 1st byte
+    //! get event flag
     inline packet_word_t GetEventFlag() const {return (m_flag);}
+    //! get wave form packets
     inline packet_word_t GetNumWaveformPackets() const {return m_nwaves;}
+    //! get Auxiliary packets
     inline packet_word_t GetNumAuxiliaryPackets() const {return m_aux;}
+    //! Get FTSW
     inline double GetFTSW() {return m_ftsw;}
 
     ///--- Setters ---///
     inline void SetFTSW(double ftsw) {m_ftsw = ftsw;}
+    //! set flag
     inline void SetFlag(packet_word_t flag) {m_flag = flag;}
 
   private:
@@ -46,6 +54,7 @@ namespace Belle2 {
     packet_word_t m_flag;
     //! Number of waves
     packet_word_t m_nwaves;
+    //! Aux
     packet_word_t m_aux;
     //! FTSW
     double m_ftsw;

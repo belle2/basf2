@@ -11,8 +11,9 @@
 
 namespace Belle2 {
 
-//! SCROD REV and ID
+//! define SCROD REV
 #define MASK_SCROD_REV          (0x00FF0000)
+//! define SCROD ID
 #define MASK_SCROD_ID           (0x0000FFFF)
 
   class Packet : public TObject {
@@ -27,10 +28,14 @@ namespace Belle2 {
 
     ///--- Getters ---///
     int GetPacketType() const {return m_type;}
+    //! get SCROD Rev
     int GetScrodRev() const {return m_scrod_rev;}
+    //! get SCROD ID
     int GetScrodID() const {return m_scrod_id;}
 
+    //! pay load
     std::vector<packet_word_t> m_packet_payload;
+    //! type, SCROD Rev and SCROD ID
     packet_word_t  m_type, m_scrod_rev, m_scrod_id;
 
   private:

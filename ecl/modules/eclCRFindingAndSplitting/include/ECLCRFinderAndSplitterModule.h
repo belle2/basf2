@@ -19,7 +19,14 @@
 #define ECLCRFINDERANDSPLITTERMODULE_H_
 
 #include <framework/core/Module.h>
-#include <ecl/utility/ECLShowerId.h>
+// FRAMEWORK
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
+
+// ECL
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLShower.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -50,19 +57,12 @@ namespace Belle2 {
       virtual void terminate();
 
     private:
-      /** CPU time     */
-      double m_timeCPU;
-
-      /** Run number   */
-      int    m_nRun;
-
       /** Event number */
       int    m_nEvent;
 
-      /** Utility unpacker of the shower id that contains CR, seed and hypothesis */
-      ECLShowerId m_SUtility;
-
-
+      StoreArray<ECLCalDigit> m_eclCalDigits;
+      StoreArray<ECLShower> m_eclShowers;
+      StoreArray<ECLConnectedRegion> m_eclCRs;
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/
 

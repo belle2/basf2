@@ -21,7 +21,6 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLSimHit.h>
-#include <ecl/dataobjects/ECLHitAssignment.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -62,7 +61,6 @@ namespace Belle2 {
       StoreArray<ECLDigit> m_eclDigits;
       StoreArray<ECLSimHit> m_eclSimHits;
       StoreArray<ECLShower> m_eclShowers;
-      StoreArray<ECLHitAssignment> m_eclHitAssignments;
       StoreArray<ECLCluster> m_eclClusters;
       RelationArray m_eclHitToSimHitRelationArray;
       RelationArray m_mcParticleToECLHitRelationArray;

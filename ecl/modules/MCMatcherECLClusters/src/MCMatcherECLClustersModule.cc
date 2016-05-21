@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <ecl/modules/MCMatcherECLClusters/MCMatcherECLClustersModule.h>
+//#include <iostream>
 
 using namespace Belle2;
 using namespace ECL;
@@ -74,12 +75,8 @@ void MCMatcherECLClustersModule::event()
 
   RelationArray& p2sh = m_mcParticleToECLSimHitRelationArray;
   RelationArray& cd2p = m_eclCalDigitToMCParticleRelationArray;
-  RelationArray& sh2p = m_eclShowerToMCPart;
   ECLSimHit** simhits = (ECLSimHit**)(m_eclSimHits.getPtr()->GetObjectRef());
-
-  TClonesArray* ha = m_eclHitAssignments.getPtr();
-  ECLHitAssignment** oha = (ECLHitAssignment**)(ha->GetObjectRef());
-  int ihamax = ha->GetEntries();
+  MCParticle** mcs = (MCParticle**)(m_mcParticles.getPtr()->GetObjectRef());
 
   for (int i = 0, imax = p2sh.getEntries(); i < imax; i++) {
     const RelationElement& re = p2sh[i];
@@ -99,15 +96,16 @@ void MCMatcherECLClustersModule::event()
     }
 
     // relation from ECLShower to MC particle
-    std::map<int, double> es;
-    for (int j = 0; j < ihamax; j++) {
-      int id = oha[j]->getCellId() - 1;
-      std::map<int, double>::iterator it = e.find(id);
-      if (it != e.end())
-        es[oha[j]->getShowerId()] += (*it).second;
+    for (const ECLShower& shower : m_eclShowers) {
+      double w = 0;
+      for (const ECLCalDigit& cd : shower.getRelationsTo<ECLCalDigit>()) {
+        int id = cd.getCellId() - 1;
+        std::map<int, double>::const_iterator it = e.find(id);
+        if (it != e.end()) w += (*it).second;
+      }
+      if (w > 0)
+        shower.addRelationTo(mcs[re.getFromIndex()], w);
     }
-    for (const std::pair<int, double>& t : es)
-      sh2p.add(t.first, re.getFromIndex(), t.second);
   }
 
   // reuse Index
@@ -145,6 +143,13 @@ void MCMatcherECLClustersModule::event()
       eclCluster->addRelationTo(mcParticle, weight);
     }
   }
+  // for (const auto& eclCluster : m_eclClusters) {
+  //   const auto mcParticleWeightPair = eclCluster.getRelatedToWithWeight<MCParticle>();
+  //   std::cout<< "ClusterID: " << eclCluster.getArrayIndex()
+  //       << " Energy: " <<  eclCluster.getEnergy()
+  //       << " MCParticle: " << mcParticleWeightPair.first->getArrayIndex()
+  //       << " Weight: " << mcParticleWeightPair.second<<std::endl;
+  // }
 }
 
 void MCMatcherECLClustersModule::endRun()

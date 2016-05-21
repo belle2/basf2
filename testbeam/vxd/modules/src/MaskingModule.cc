@@ -338,8 +338,6 @@ void MaskingModule::event()
 
 void MaskingModule::endRun()
 {
-  StoreObjPtr<EventMetaData> storeEventMetaData;
-  //long unsigned runNo = storeEventMetaData->getRun();
 
   if (m_nRealEventsProcess < 1000) {
     printf("Not enough data: %li < 1000, terminate without masking file create.\n", m_nRealEventsProcess);
@@ -382,12 +380,10 @@ void MaskingModule::endRun()
 
   std::string FileName = str(format("%1%") % m_PXDMaskFileBasicName);
   std::string m_ignoredPixelsListName = str(format("%1%") % FileName);
-  // std::string m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
   std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsBasicList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
         m_ignoredPixelsListName));
   FileName = str(format("%1%") % m_PXDMaskFileRunName);
   m_ignoredPixelsListName = str(format("%1%") % FileName);
-  // m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
   std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
       m_ignoredPixelsListName));
   MaskList = fopen(FileName.data(), "w");
@@ -460,15 +456,13 @@ void MaskingModule::endRun()
 
   FileName = str(format("%1%") % m_SVDMaskFileBasicName);
   m_ignoredPixelsListName = str(format("%1%") % FileName);
-  //m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
   std::unique_ptr<SVDIgnoredStripsMap> m_ignoredStripsBasicList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
         m_ignoredPixelsListName));
-  FileName = str(format("%1%") % m_SVDMaskFileRunName);
-  m_ignoredPixelsListName = str(format("%1%") % FileName);
-  // m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
+  string FileName2 = str(format("%1%") % m_SVDMaskFileRunName);
+  string m_ignoredPixelsListName2 = str(format("%1%") % FileName2);
   std::unique_ptr<SVDIgnoredStripsMap> m_ignoredStripsList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
-      m_ignoredPixelsListName));
-  MaskList = fopen(FileName.data(), "w");
+      m_ignoredPixelsListName2));
+  MaskList = fopen(FileName2.data(), "w");
   fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
   fprintf(MaskList, "<Meta>\n");
   fprintf(MaskList, "    <Date>20.04.2016</Date>\n");
@@ -490,10 +484,9 @@ void MaskingModule::endRun()
         int nMaskedV = 0;
         int iSensor = getInfoSVD(i, j + 1).getID().getSensorNumber();
         fprintf(MaskList, "            <sensor n=\"%i\">\n", iSensor);
-        fprintf(MaskList, "                <side side=\"v\">\n");
-        fprintf(MaskList, "                    <stripsFromTo fromStrip = \"620\" toStrip = \"767\"></stripsFromTo>\n");
+        fprintf(MaskList, "                <side side=\"u\">\n");
+        fprintf(MaskList, "                    <!-- stripsFromTo fromStrip = \"620\" toStrip = \"767\"></stripsFromTo-->\n");
         fprintf(MaskList, "                    <!-- Individual strips can be masked, too -->\n");
-        //      for (int i1 = 0; i1 < m_hitMapUV[i+2]->GetNbinsX(); ++i1) {
         for (int i1 = 0; i1 < m_SVDMaskU[j * c_nSVDPlanes + i]->GetNbinsX(); ++i1) {
           int ExistMask = 0;
           if (m_AppendMaskFile) {
@@ -509,7 +502,9 @@ void MaskingModule::endRun()
             SVDCut = SVDCutU[i];
           int sTS = 0;
           for (int iTS = 0; iTS < 6; iTS++) {  // look for occupancy on timestamps
-            if (m_SVDHitMapU[j * c_nSVDPlanes + i]->GetBinContent(i1 + 1, iTS) > SVDCut) sTS++;
+            if (m_SVDHitMapU[j * c_nSVDPlanes + i]->GetBinContent(i1 + 1, iTS + 1) > SVDCut) {
+              sTS++;
+            }
           }
 
           if (ExistMask || (sTS > 1)) {  // in al least two timestamps over cut for masking...
@@ -519,8 +514,7 @@ void MaskingModule::endRun()
           }
         }
         fprintf(MaskList, "                </side>\n");
-        fprintf(MaskList, "                <side side=\"u\">\n");
-        //      for (int i2 = 0; i2 < m_hitMapUV[i+2]->GetNbinsY(); ++i2) {
+        fprintf(MaskList, "                <side side=\"v\">\n");
         for (int i2 = 0; i2 < m_SVDMaskV[j * c_nSVDPlanes + i]->GetNbinsX(); ++i2) {
           int ExistMask = 0;
           if (m_AppendMaskFile) {
@@ -536,7 +530,7 @@ void MaskingModule::endRun()
             SVDCut = SVDCutV[i];
           int sTS = 0;
           for (int iTS = 0; iTS < 6; iTS++) {  // look for occupancy on timestamps
-            if (m_SVDHitMapV[j * c_nSVDPlanes + i]->GetBinContent(i2 + 1, iTS) > SVDCut) sTS++;
+            if (m_SVDHitMapV[j * c_nSVDPlanes + i]->GetBinContent(i2 + 1, iTS + 1) > SVDCut) sTS++;
           }
 
           if (ExistMask || (sTS > 1)) {  // in al least two timestamps over cut for masking...
@@ -563,12 +557,10 @@ void MaskingModule::endRun()
 
   FileName = str(format("%1%") % m_TelMaskFileBasicName);
   m_ignoredPixelsListName = str(format("%1%") % FileName);
-  // m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
   std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredTelPixelsBasicList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
         m_ignoredPixelsListName));
   FileName = str(format("%1%") % m_TelMaskFileRunName);
   m_ignoredPixelsListName = str(format("%1%") % FileName);
-  // m_ignoredPixelsListName = str(format("../../../..%1%") % FileName);
   std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredTelPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
         m_ignoredPixelsListName));
   MaskList = fopen(FileName.data(), "w");
@@ -584,7 +576,6 @@ void MaskingModule::endRun()
   for (int i = 0; i < c_nTelPlanes; i++) {
     if (m_nEventsPlane[i + 6]) {
       int nMasked = 0;
-      //int iPlane = i + 1;
       int iLayer = getInfoTel(i).getID().getLayerNumber();
       int iLadder = getInfoTel(i).getID().getLadderNumber();
       int iSensor = getInfoTel(i).getID().getSensorNumber();
@@ -647,7 +638,6 @@ void MaskingModule::endRun()
     printf("     Plane %i, avrg occupanci: u: %4.2f v: %4.2f\n", i, m_StatEverageOccupancy[i * 2 + 0],
            m_StatEverageOccupancy[i * 2 + 1]);
   }
-
 }
 
 

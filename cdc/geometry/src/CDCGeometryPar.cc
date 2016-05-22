@@ -1017,11 +1017,12 @@ void CDCGeometryPar::readChMap(const GearDir gbxParams)
 // Set t0 (from DB)
 void CDCGeometryPar::setT0()
 {
-  for (auto ent : m_t0FromDB) {
-    unsigned short iCL  = ent.getICLayer();
-    unsigned short iW  = ent.getIWire();
-    m_t0[iCL][iW] = ent.getT0();
-    //    std::cout <<"t0DB"<<  iCL <<" "<< iW <<" "<< ent.getT0() << std::endl;
+  for (auto const& ent : m_t0FromDB->getT0s()) {
+    const WireID wid = WireID(ent.first);
+    const unsigned short iCL = wid.getICLayer();
+    const unsigned short iW  = wid.getIWire();
+    m_t0[iCL][iW]            = ent.second;
+    //    std::cout <<"t0DB"<<  iCL <<" "<< iW <<" "<< ent.second << std::endl;
   }
 }
 #endif

@@ -17,7 +17,7 @@
 #include <framework/database/DBObjPtr.h>
 
 #include <cdc/dataobjects/WireID.h>
-#include <cdc/dbobjects/CDCTimeZero.h>
+#include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dbobjects/CDCBadWires.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
@@ -924,7 +924,7 @@ namespace Belle2 {
       double m_maxSpaceResol;      /*!< 10 times Nominal spacial resolution. */
 
 #if defined(CDC_T0_FROM_DB)
-      DBArray<CDCTimeZero> m_t0FromDB; /*!< t0s retrieved from DB. */
+      DBObjPtr<CDCTimeZeros> m_t0FromDB; /*!< t0s retrieved from DB. */
 #endif
 #if defined(CDC_BADWIRE_FROM_DB)
       DBObjPtr<CDCBadWires> m_badWireFromDB; /*!< bad-wires retrieved from DB. */

@@ -30,7 +30,7 @@
 // DB objects
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
-#include <cdc/dbobjects/CDCTimeZero.h>
+#include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dbobjects/CDCBadWires.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
@@ -52,7 +52,8 @@ void CDCDatabaseImporter::importTimeZero(std::string fileName)
   }
   B2INFO(fileName << ": open for reading");
 
-  DBImportArray<CDCTimeZero> tz;
+  DBImportObjPtr<CDCTimeZeros> tz;
+  tz.construct();
 
   int iL(0);
   int iC(0);
@@ -64,7 +65,7 @@ void CDCDatabaseImporter::importTimeZero(std::string fileName)
     if (stream.eof()) break;
     ++nRead;
     WireID wire(iL, iC);
-    tz.appendNew(wire, t0);
+    tz->setT0(wire, t0);
     //      if (m_debug) {
     //  std::cout << iL << " " << iC << " " << t0 << std::endl;
     //      }
@@ -477,12 +478,14 @@ void CDCDatabaseImporter::printChannelMap()
 void CDCDatabaseImporter::printTimeZero()
 {
 
-  DBArray<CDCTimeZero> timeZeros;
+  DBObjPtr<CDCTimeZeros> timeZeros;
 
-  for (const auto& tz : timeZeros) {
+  /*  for (const auto& tz : timeZeros) {
     std::cout << tz.getICLayer() << " " << tz.getIWire() << " "
               << tz.getT0() << std::endl;
   }
+  */
+  timeZeros->dump();
 
 }
 

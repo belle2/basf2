@@ -293,14 +293,17 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       //
       // Do not stop data
       //
-      printf("[ERROR] POST B2link event CRC16 error with B2link Packet CRC error run %d sub %d eve %8u fns %d : data(%x) calc(%x) fns nwords %d\n",
-             GetRunNo(n), GetSubRunNo(n), GetEveNo(n), finesse_num,  *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+      printf("[ERROR] POST B2link event CRC16 error with B2link Packet CRC error run %d sub %d eve %8u fns %d : data(%x) calc(%x) fns nwords %d type 0x%.8x\n",
+             GetRunNo(n), GetSubRunNo(n), GetEveNo(n), finesse_num,  *buf , temp_crc16, GetFINESSENwords(n, finesse_num),
+             copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ]);
     } else {
       //
       // Stop taking data
       //
-      printf("[FATAL] POST B2link event CRC16 error without B2link Packet CRC error run %d sub %d eve %8u fns %d: data(%x) calc(%x) fns nwords %d\n",
-             GetRunNo(n), GetSubRunNo(n), GetEveNo(n), finesse_num, *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+      printf("[FATAL] POST B2link event CRC16 error without B2link Packet CRC error run %d sub %d eve %8u fns %d: data(%x) calc(%x) fns nwords %d type 0x%.8x\n",
+             GetRunNo(n), GetSubRunNo(n), GetEveNo(n), finesse_num, *buf , temp_crc16, GetFINESSENwords(n, finesse_num),
+             copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ]);
+
       int* temp_buf = GetFINESSEBuffer(n, finesse_num);
       printf("%.8x ", 0);
       for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {

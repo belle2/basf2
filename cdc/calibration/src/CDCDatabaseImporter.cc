@@ -172,7 +172,8 @@ void CDCDatabaseImporter::importPropSpeed(std::string fileName)
     stream >> iCL >> speed;
     if (stream.eof()) break;
     ++nRead;
-    ps->setSpeed(speed);
+    //    ps->setSpeed(speed);
+    ps->setSpeed(iCL, speed);
     //    ps->setSpeed(iCL, speed);
     //      if (m_debug) {
     //  std::cout << iCL << " " << value << std::endl;

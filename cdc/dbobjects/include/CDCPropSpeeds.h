@@ -22,6 +22,8 @@ namespace Belle2 {
   class CDCPropSpeeds: public TObject {
   public:
 
+    enum {c_nSlayers = 56};
+
     /**
      * Default constructor
      */
@@ -30,11 +32,20 @@ namespace Belle2 {
     /**
      * Set the speed in the list.
      */
-    //    void setSpeed(unsigned short iCLayer, double speed)
-    void setSpeed(double speed)
+    void setSpeed(unsigned short iCLayer, double speed)
+    //    void setSpeed(double speed)
     {
-      m_speedList.push_back(speed);
+      //      m_speedList.push_back(speed);
       //      m_speedList[iCLayer] = speed;
+      m_speedList.at(iCLayer) = speed;
+    }
+
+    /**
+     * Update the speed in the list.
+     */
+    void addSpeed(unsigned short iCLayer, double delta)
+    {
+      m_speedList.at(iCLayer) += delta;
     }
 
     /**
@@ -46,7 +57,15 @@ namespace Belle2 {
     }
 
     /**
-     * Get the speed
+     * Get the whole list
+     */
+    std::vector<float> getList() const
+    {
+      return m_speedList;
+    }
+
+    /**
+     * Get the speed for the specified cLayer
      */
     double getSpeed(unsigned short iCLayer) const
     {
@@ -69,8 +88,8 @@ namespace Belle2 {
     }
 
   private:
-    std::vector<float> m_speedList; /**< list of speed*/
-
+    //    std::vector<float> m_speedList; /**< list of speed*/
+    std::vector<float> m_speedList = std::vector<float>(c_nSlayers); /**< list of speed*/
     ClassDef(CDCPropSpeeds, 1); /**< ClassDef */
   };
 

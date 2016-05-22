@@ -35,9 +35,31 @@ namespace Belle2 {
       m_t0s.insert(std::pair<unsigned short, float>(WireID(ICLayer, IWire).getEWire(), t0));
     }
 
+    /**
+     * Set t0 in the list
+     */
     void setT0(const WireID wid, double t0)
     {
       m_t0s.insert(std::pair<unsigned short, float>(wid.getEWire(), t0));
+    }
+
+    /**
+     * Update t0 in the list
+     */
+    void addT0(unsigned short ICLayer, unsigned short IWire, double delta)
+    {
+      WireID wid(ICLayer, IWire);
+      std::map<unsigned short, float>::iterator it = m_t0s.find(wid.getEWire());
+      it->second += delta;
+    }
+
+    /**
+     * Update t0 in the list
+     */
+    void addT0(const WireID wid, double delta)
+    {
+      std::map<unsigned short, float>::iterator it = m_t0s.find(wid.getEWire());
+      it->second += delta;
     }
 
     /**
@@ -49,21 +71,20 @@ namespace Belle2 {
     }
 
     /**
-     * Get t0 for the specified wire
-     */
-    float getT0(const WireID& wid)
-    {
-      std::map<unsigned short, float>::iterator it = m_t0s.find(wid.getEWire());
-
-      return it->second;
-    }
-
-    /**
      * Get the t0 list
      */
     std::map<unsigned short, float> getT0s()
     {
       return m_t0s;
+    }
+
+    /**
+     * Get t0 for the specified wire
+     */
+    float getT0(const WireID& wid)
+    {
+      std::map<unsigned short, float>::iterator it = m_t0s.find(wid.getEWire());
+      return it->second;
     }
 
     /**
@@ -87,3 +108,4 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
+

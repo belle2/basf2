@@ -18,7 +18,7 @@
 namespace Belle2 {
 
   /**
-   * Database object for time walk.
+   * Database object for time-walk coefficient.
    */
   class CDCTimeWalks: public TObject {
   public:
@@ -37,11 +37,28 @@ namespace Belle2 {
     }
 
     /**
+     * Update the time-walk coefficient in the list
+     */
+    void addTimeWalk(unsigned short boardID, double delta)
+    {
+      std::map<unsigned short, float>::iterator it = m_twList.find(boardID);
+      it->second += delta;
+    }
+
+    /**
      * Get the no. of entries in the list
      */
     unsigned short getEntries() const
     {
       return m_twList.size();
+    }
+
+    /**
+     * Get the whole list
+     */
+    std::map<unsigned short, float> getList()
+    {
+      return m_twList;
     }
 
     /**
@@ -61,7 +78,7 @@ namespace Belle2 {
       std::cout << " " << std::endl;
       std::cout << "Time walk coefficient list" << std::endl;
       std::cout << "#entries= " << m_twList.size() << std::endl;
-      std::cout << "in order of boardID and coefficient (ns*sqrt(ADCcount))" << std::endl;
+      std::cout << "in order of board# and coefficient (ns*sqrt(ADCcount))" << std::endl;
 
       for (auto const& ent : m_twList) {
         std::cout << ent.first << " " << ent.second << std::endl;

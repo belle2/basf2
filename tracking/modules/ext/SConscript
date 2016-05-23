@@ -1,7 +1,7 @@
 Import('env')
-#env['CONTINUE'] = False
 
 env['LIBS'] = [
+    'tracking',
     'CLHEP',
     '$ROOT_LIBS',
     '$GEANT4_LIBS',

@@ -13,6 +13,7 @@
 #include <tracking/dataobjects/Muid.h>
 #include <tracking/dataobjects/MuidHit.h>
 #include <tracking/dataobjects/ExtHit.h>
+#include <tracking/dataobjects/TrackClusterSeparation.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -141,6 +142,8 @@ MuidModule::MuidModule() :
   addParam("MuidHitsColName", m_MuidHitsColName, "Name of collection holding the muidHits from the extrapolation", string(""));
   addParam("ExtHitsColName", m_ExtHitsColName, "Name of collection holding the extHits from the extrapolation", string(""));
   addParam("KLMClustersColName", m_KLMClustersColName, "Name of collection holding the KLMClusters", string(""));
+  addParam("TrackClusterSeparationsColName", m_TrackClusterSeparationsColName,
+           "Name of collection holding the TrackClusterSeparations", string(""));
   addParam("MeanDt", m_MeanDt, "[ns] Mean hit-trigger time for coincident hits (default 0)", double(0.0));
   addParam("MaxDt", m_MaxDt, "[ns] Coincidence window half-width for in-time KLM hits (default +-30)", double(30.0));
   addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated (default 0.1)",
@@ -305,12 +308,14 @@ void MuidModule::initialize()
   StoreArray<BKLMHit2d> bklmHits(m_BKLMHitsColName);
   StoreArray<EKLMHit2d> eklmHits(m_EKLMHitsColName);
   StoreArray<ExtHit> extHits(m_ExtHitsColName);
+  StoreArray<TrackClusterSeparation> trackClusterSeparations(m_TrackClusterSeparationsColName);
   StoreArray<KLMCluster> klmClusters(m_KLMClustersColName);
   muids.registerInDataStore();
   muidHits.registerInDataStore();
   bklmHits.registerInDataStore();
   eklmHits.registerInDataStore();
   extHits.registerInDataStore();
+  trackClusterSeparations.registerInDataStore();
   klmClusters.registerInDataStore();
   tracks.registerRelationTo(muids);
   tracks.registerRelationTo(muidHits);
@@ -318,6 +323,7 @@ void MuidModule::initialize()
   tracks.registerRelationTo(eklmHits);
   tracks.registerRelationTo(extHits);
   tracks.registerRelationTo(klmClusters);
+  klmClusters.registerRelationTo(trackClusterSeparations);
 
   return;
 
@@ -356,10 +362,20 @@ void MuidModule::event()
   StoreArray<Track> tracks(m_TracksColName);
   StoreArray<Muid> muids(m_MuidsColName);
   StoreArray<KLMCluster> klmClusters(m_KLMClustersColName);
+  StoreArray<TrackClusterSeparation> trackClusterSeparations(m_TrackClusterSeparationsColName);
 
   G4Point3D position;
   G4Vector3D momentum;
   G4ErrorTrajErr covG4e(5, 0);
+
+  std::vector<G4ThreeVector> clusterPositions;
+  for (int c = 0; c < klmClusters.getEntries(); ++c) {
+    TrackClusterSeparation* klmClustDist = trackClusterSeparations.appendNew(); // initializes to HUGE distance
+    klmClusters[c]->addRelationTo(klmClustDist);
+    clusterPositions.push_back(G4ThreeVector(klmClusters[c]->getClusterPosition().X(),
+                                             klmClusters[c]->getClusterPosition().Y(),
+                                             klmClusters[c]->getClusterPosition().Z()));
+  }
 
   for (int t = 0; t < tracks.getEntries(); ++t) {
 
@@ -407,6 +423,8 @@ void MuidModule::event()
         const G4Step*  step       = track->GetStep();
         const G4int    preStatus  = step->GetPreStepPoint()->GetStepStatus();
         const G4int    postStatus = step->GetPostStepPoint()->GetStepStatus();
+        G4ThreeVector pos = track->GetPosition();
+        G4ThreeVector mom = track->GetMomentum();
         // Ignore the zero-length step by PropagateOneStep() at each boundary
         if (step->GetStepLength() > 0.0) {
           if (preStatus == fGeomBoundary) {      // first step in this volume?
@@ -420,12 +438,23 @@ void MuidModule::event()
             // Force geant4e to update its G4Track from the Kalman-updated state
             m_ExtMgr->GetPropagator()->SetStepN(0);
           }
+          for (int c = 0; c < trackClusterSeparations.getEntries(); ++c) {
+            G4ThreeVector clusterToTrack = clusterPositions[c] - pos;
+            double distance = clusterToTrack.mag();
+            if (clusterToTrack.mag() < trackClusterSeparations[c]->getDistance()) {
+              trackClusterSeparations[c]->setTrackIndex(t);
+              trackClusterSeparations[c]->setDistance(distance);
+              G4ThreeVector dir(clusterToTrack.unit());
+              trackClusterSeparations[c]->setDirection(dir);
+              trackClusterSeparations[c]->setTrackAngle(acos(dir * mom.unit()));
+            }
+          }
         }
         // Stop extrapolating as soon as the track escapes KLM or curls inward too much
         // or the momentum is too low
         if (m_Target->GetDistanceFromPoint(track->GetPosition()) < 0.0) break;
-        if (track->GetPosition().perp2() < m_MinRadiusSq) break;
-        if (track->GetMomentum().mag2() < minPSq) break;
+        if (pos.perp2() < m_MinRadiusSq) break;
+        if (mom.mag2() < minPSq) break;
         if (errCode) break;
 
       } // track-extrapolation "infinite" loop
@@ -442,9 +471,11 @@ void MuidModule::event()
                                    klmClusters[c]->getClusterPosition().Y(),
                                    klmClusters[c]->getClusterPosition().Z());
         if (position.angle(clusterDirection) < m_MaxClusterTrackConeAngle) {
-          klmClusters[c]->setAssociatedTrackFlag();
-          tracks[t]->addRelationTo(klmClusters[c]);
-          break;
+          if (trackClusterSeparations[c]->getTrackIndex() == t) {
+            klmClusters[c]->setAssociatedTrackFlag();
+            tracks[t]->addRelationTo(klmClusters[c]);
+            break;
+          }
         }
       }
 

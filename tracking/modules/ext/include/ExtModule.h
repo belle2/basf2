@@ -43,6 +43,7 @@ namespace genfit { class Track; }
 namespace Belle2 {
 
   class Track;
+  class TrackExtrapolateG4e;
   namespace Simulation { class ExtManager; }
 
   /** The geant4e-based track extrapolation module.
@@ -82,6 +83,9 @@ namespace Belle2 {
 
   protected:
 
+    //! User-selected PDG codes to extrapolate (anti-particles are included implicitly)
+    std::vector<int> m_PDGCodes;
+
     //! Minimum transverse momentum in GeV/c for extrapolation to be started
     double m_MinPt;
 
@@ -101,67 +105,26 @@ namespace Belle2 {
     std::string m_ExtHitsColName;
 
     //! Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info
-    int m_trackingVerbosity;
+    int m_TrackingVerbosity;
 
     //! A list of Geant4 UI commands that should be applied before the extrapolation starts
-    std::vector<std::string> m_uiCommands;
+    std::vector<std::string> m_UICommands;
 
     //! If set to true the Geant4 visualization support is enabled
-    bool m_enableVisualization;
+    bool m_EnableVisualization;
 
     //! magnetic field stepper to use
-    std::string m_magneticFieldName;
+    std::string m_MagneticFieldStepperName;
 
     //! minimal distance for magnetic field lookup. If distance is smaller, return cached value
-    double m_magneticCacheDistance;
+    double m_MagneticCacheDistance;
 
     //! maximum miss-distance between the trajectory curve and its linear chord(s) approximation
-    double m_deltaChordInMagneticField;
+    double m_DeltaChordInMagneticField;
 
   private:
 
-    //! Register the list of geant4 physical volumes whose entry/exit
-    //! points will be saved during extrapolation
-    void registerVolumes();
-
-    //! Get the physical volume information for a geant4 physical volume
-    void getVolumeID(const G4TouchableHandle&, Const::EDetector&, int&);
-
-    //! Convert the geant4e 5x5 covariance to phasespace 6x6 covariance
-    TMatrixDSym fromG4eToPhasespace(const G4ErrorFreeTrajState*);
-
-    //! Convert the phasespace covariance to geant4e covariance
-    G4ErrorTrajErr fromPhasespaceToG4e(const TVector3&, const TMatrixDSym&);
-
-    //! Define a new track candidate for one reconstructed track and PDG hypothesis
-    void getStartPoint(const genfit::Track*, int, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
-
-    //! Create another extrapolation hit for a track candidate
-    void createHit(const G4ErrorFreeTrajState*, ExtHitStatus, Track*, int);
-
-    //! Pointer to the ExtManager singleton
-    Simulation::ExtManager* m_ExtMgr;
-
-    //! PDG codes for the particleID hypotheses
-    std::vector<int> m_PDGCode;
-
-    //!  ChargedStable hypotheses
-    std::vector<Const::ChargedStable> m_ChargedStable;
-
-    //! Pointers to geant4 physical volumes whose entry points will be saved
-    std::vector<G4VPhysicalVolume*>* m_Enter;
-
-    //! Pointers to geant4 physical volumes whose exit points will be saved
-    std::vector<G4VPhysicalVolume*>* m_Exit;
-
-    //! Time of flight (ns) along the track from the interaction point
-    double m_TOF;
-
-    //! Minimum squared radius (cm) outside of which extrapolation will continue
-    double m_MinRadiusSq;
-
-    //! virtual "target" cylinder (boundary beyond which extrapolation ends)
-    Simulation::ExtCylSurfaceTarget* m_Target;
+    TrackExtrapolateG4e* m_Extrapolator;
 
   };
 

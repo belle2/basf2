@@ -135,6 +135,9 @@ namespace Belle2 {
     //! Name of the KLMCluster collection
     std::string m_KLMClustersColName;
 
+    //! Name of the TrackClusterSeparation collection
+    std::string m_TrackClusterSeparationsColName;
+
     //! Name of the BKLM 2D hits collection
     std::string m_BKLMHitsColName;
 

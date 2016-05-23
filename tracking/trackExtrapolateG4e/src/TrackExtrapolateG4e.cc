@@ -189,10 +189,8 @@ void TrackExtrapolateG4e::event(bool isMuid)
   }
 
   // Loop over the reconstructed tracks.
-  // Do extrapolation for each hypotheses (pion, electron, muon, kaon, proton,
-  // deuteron) of each reconstructed track.
-  // Pion hypothesis:  extrapolate until calorimeter exit
-  // Other hypotheses: extrapolate up to but not including calorimeter
+  // Do extrapolation for each hypothesis (pion, electron, muon, kaon, proton,
+  // deuteron) of each reconstructed track until calorimeter exit.
 
   StoreArray<Track> tracks(m_TracksColName);
 
@@ -324,7 +322,7 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
       if (preStatus == fGeomBoundary) {      // first step in this volume?
         createHit(EXT_ENTER, extState);
       }
-      m_TOF += step->GetDeltaTime();
+      extState.tof += step->GetDeltaTime();
       // Last step in this volume?
       if (postStatus == fGeomBoundary) {
         createHit(EXT_EXIT, extState);
@@ -755,35 +753,3 @@ void TrackExtrapolateG4e::createHit(ExtHitStatus status, ExtState& extState)
   if (extState.track) extState.track->addRelationTo(extHit);
 
 }
-
-// write another volume-entry or volume-exit point on track
-/*
-void TrackExtrapolateG4e::createHitForOneTrack(const G4ErrorFreeTrajState* state, ExtHitStatus status,
-                                               const std::string& extHitsColName, int pdgCode)
-{
-
-  StoreArray<ExtHit> extHits(extHitsColName);
-
-  G4StepPoint* stepPoint = state->GetG4Track()->GetStep()->GetPreStepPoint();
-  G4TouchableHandle preTouch = stepPoint->GetTouchableHandle();
-  G4VPhysicalVolume* preVol = preTouch->GetVolume();
-
-  // Perhaps no hit will be stored?
-  if (find(m_EnterExit->begin(), m_EnterExit->end(), preVol) == m_EnterExit->end()) { return; }
-  if (status == EXT_EXIT) {
-    stepPoint = state->GetG4Track()->GetStep()->GetPostStepPoint();
-  }
-
-  TVector3 pos(stepPoint->GetPosition().x() / CLHEP::cm,
-               stepPoint->GetPosition().y() / CLHEP::cm,
-               stepPoint->GetPosition().z() / CLHEP::cm);
-  TVector3 mom(stepPoint->GetMomentum().x() / CLHEP::GeV,
-               stepPoint->GetMomentum().y() / CLHEP::GeV,
-               stepPoint->GetMomentum().z() / CLHEP::GeV);
-  Const::EDetector detID(Const::EDetector::invalidDetector);
-  int copyID(0);
-  getVolumeID(preTouch, detID, copyID);
-  extHits.appendNew(pdgCode, detID, copyID, status, m_TOF, pos, mom, fromG4eToPhasespace(state));
-
-}
-*/

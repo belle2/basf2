@@ -142,9 +142,6 @@ namespace Belle2 {
     //! Create another extrapolation hit for a track candidate
     void createHit(ExtHitStatus, ExtState&);
 
-//    //! Create another extrapolation hit for a single-track extrapolation
-//    void createHitForOneTrack(const G4ErrorFreeTrajState*, ExtHitStatus, const std::string&, int);
-
     //! Stores pointer to the singleton class
     static TrackExtrapolateG4e* m_Singleton;
 
@@ -177,9 +174,6 @@ namespace Belle2 {
 
     //! Pointers to geant4 physical volumes whose entry/exit points will be saved
     std::vector<G4VPhysicalVolume*>* m_EnterExit;
-
-    //! Time of flight (ns) along the track from the interaction point
-    double m_TOF;
 
     //! Minimum squared radius (cm) outside of which extrapolation will continue
     double m_MinRadiusSq;

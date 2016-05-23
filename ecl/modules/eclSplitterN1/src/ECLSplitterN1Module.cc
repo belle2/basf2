@@ -371,11 +371,12 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
 
     std::vector<ECLCalDigit> digits;
     std::vector<double> weights;
-    std::map<int, TVector3*> centroidList; // key = cellid, value = centroid position
+//    std::map<int, TVector3*> centroidList; // key = cellid, value = centroid position
+    std::map<int, TVector3> centroidList; // key = cellid, value = centroid position
     std::map<int, double> centroidEnergyList; // key = cellid, value = centroid position
-    std::map<int, TVector3*> centroidPoints; // key = locmaxid (as index), value = centroid position
-    std::map<int, TVector3*> localMaximumsPoints; // key = locmaxid, value = maximum position
-    std::map<int, TVector3*> allPoints; // key = cellid, value = digit position
+    std::map<int, TVector3> centroidPoints; // key = locmaxid (as index), value = centroid position
+    std::map<int, TVector3> localMaximumsPoints; // key = locmaxid, value = maximum position
+    std::map<int, TVector3> allPoints; // key = cellid, value = digit position
     std::map<int, std::vector < double > > weightMap; // key = locmaxid, value = vector of weights
     std::vector < ECLCalDigit* >
     digitVector; // the same for all local maxima, the order of weights in weightMap must be the same though
@@ -390,17 +391,17 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
       }
 
       // get the position of this crystal and fill them in a maps
-      TVector3* vectorPosition = new TVector3(m_geom->GetCrystalPos(cellid - 1));
-      localMaximumsPoints.insert(std::map<int, TVector3*>::value_type(cellid, vectorPosition));
-      centroidPoints.insert(std::map<int, TVector3*>::value_type(cellid, vectorPosition));
+      TVector3 vectorPosition = m_geom->GetCrystalPos(cellid - 1);
+      localMaximumsPoints.insert(std::map<int, TVector3>::value_type(cellid, vectorPosition));
+      centroidPoints.insert(std::map<int, TVector3>::value_type(cellid, vectorPosition));
     }
 
     // Fill all digits in a map
     for (auto& aCalDigit : aCR.getRelationsTo<ECLCalDigit>()) {
       const int cellid = aCalDigit.getCellId();
       // get the position of this crystal and fill them in a map
-      TVector3* vectorPosition = new TVector3(m_geom->GetCrystalPos(cellid - 1));
-      allPoints.insert(std::map<int, TVector3*>::value_type(cellid, vectorPosition));
+      TVector3 vectorPosition = m_geom->GetCrystalPos(cellid - 1);
+      allPoints.insert(std::map<int, TVector3>::value_type(cellid, vectorPosition));
 
       digits.push_back(aCalDigit);
     }
@@ -451,7 +452,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
 
           // cellid and position of this digit
           const int digitcellid = digitpoint.first;
-          TVector3* digitpos = digitpoint.second;
+          TVector3 digitpos = digitpoint.second;
           const double digitenergy = ((*myCellIdToDigitPointerMap.find(digitcellid)).second)->getEnergy();
 
           double weight            = 0.0;
@@ -464,7 +465,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
 
             // cell id and position of this centroid
             const int centroidcellid = centroidpoint.first;
-            TVector3* centroidpos = centroidpoint.second;
+            TVector3 centroidpos = centroidpoint.second;
 
             double thisdistance = 0.;
 
@@ -472,7 +473,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
             if (nIterations == 0 and digitcellid == centroidcellid) {
               thisdistance = 0.0;
             } else {
-              TVector3 vectorDistance = ((*centroidpos) - (*digitpos));
+              TVector3 vectorDistance = ((centroidpos) - (digitpos));
               thisdistance = vectorDistance.Mag();
             }
 
@@ -518,16 +519,17 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
         } // end allPoints
 
         // Get the old centroid position.
-        TVector3* oldCentroidPos = (*centroidPoints.find(locmaxcellid)).second;
+        TVector3 oldCentroidPos = (centroidPoints.find(locmaxcellid))->second;
 
         // Calculate the new centroid position.
-        TVector3* newCentroidPos = new TVector3(Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters));
+        TVector3 newCentroidPos = Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters
+                                                                  );
 
         // Calculate new energy
         const double newEnergy = Belle2::ECL::computeEnergySum(digits, weights);
 
         // Calculate the shift of the centroid position for this local maximum.
-        const TVector3 centroidShift = (*oldCentroidPos - *newCentroidPos);
+        const TVector3 centroidShift = (oldCentroidPos - newCentroidPos);
 
         // Save the new centroid position (but dont update yet!), also save the weights and energy.
         centroidList[locmaxcellid] = newCentroidPos;
@@ -542,9 +544,9 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
         centroidShiftAverage += centroidShift.Mag();
 
         // Debugging output
-        B2DEBUG(175, "   old centroid: " << oldCentroidPos->x() << " cm, " <<  oldCentroidPos->y() << " cm, " <<  oldCentroidPos->z() <<
+        B2DEBUG(175, "   old centroid: " << oldCentroidPos.x() << " cm, " <<  oldCentroidPos.y() << " cm, " <<  oldCentroidPos.z() <<
                 "cm");
-        B2DEBUG(175, "   new centroid: " << newCentroidPos->x() << " cm, " <<  newCentroidPos->y() << " cm, " <<  newCentroidPos->z() <<
+        B2DEBUG(175, "   new centroid: " << newCentroidPos.x() << " cm, " <<  newCentroidPos.y() << " cm, " <<  newCentroidPos.z() <<
                 "cm");
         B2DEBUG(175, "   centroid shift: " << centroidShift.Mag() << " cm");
 
@@ -557,7 +559,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
 
       // Update centroid positions for the next round
       for (const auto& locmaxpoint : localMaximumsPoints) {
-        centroidPoints[locmaxpoint.first] = (*centroidList.find(locmaxpoint.first)).second;
+        centroidPoints[locmaxpoint.first] = (centroidList.find(locmaxpoint.first))->second;
       }
 
       ++nIterations;
@@ -611,7 +613,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
       }
 
       // Old position:
-      TVector3* oldshowerposition = (*centroidList.find(locmaxcellid)).second;
+      TVector3* oldshowerposition = new TVector3((centroidList.find(locmaxcellid))->second);
 
       B2DEBUG(175, "old theta: " << oldshowerposition->Theta());
       B2DEBUG(175, "old phi: " << oldshowerposition->Phi());

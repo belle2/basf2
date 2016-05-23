@@ -268,10 +268,10 @@ void energyDistribution(TTree* tree)
   // muons 
   createEnergyHistogram(tree, "Muon", "(anti-muons included)", muons, 1.0);
 
-  // photons
+  // stable mesons 
   createEnergyHistogram(tree, "StableMeson", "(charged pions, K Longs, and charged kaons)", stableMesons, 2.5);
 
-  // nuclei
+  // stable baryons 
   createEnergyHistogram(tree, "StableBaryon", "(protons and neutrons)", stableBaryons, 2.5);
 
 }

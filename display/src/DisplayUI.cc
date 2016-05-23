@@ -778,8 +778,6 @@ void DisplayUI::closeAndContinue()
 
   gEve->GetSelection()->Disconnect();
   gEve->GetHighlight()->Disconnect();
-  gEve->GetSelection()->RemoveElements();
-  gEve->GetHighlight()->RemoveElements();
 
   gEve->GetBrowser()->UnmapWindow();
   gEve->GetBrowser()->SendCloseMessage();

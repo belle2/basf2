@@ -185,6 +185,18 @@ namespace Belle2 {
     /// returns firmware simulation mode.
     unsigned firmwareSimulationMode(void) const;
 
+    /// gets return value for trg cdc module.
+    int getReturnValue(void) const;
+
+    /// gets return value for a module in trg cdc module. moduleName = ["", "TSF", "ETF", "2DFind", "2DFit", "3DFind", "3DFit"]. TSF will be 1st bit and 3DFit will be last bit of _returnValue. No name means all.
+    int getReturnValue(std::string const & moduleName) const;
+
+    /// sets return value for trg cdc module. moduleName = ["TSF", "ETF", "2DFind", "2DFit", "3DFind", "3DFit"]. TSF will be 1st bit and 3DFit will be last bit of _returnValue. No name means all.
+    void setReturnValue(std::string const & moduleName, bool flag);
+
+    /// sets return value for trg cdc module.
+    void setReturnValue(int);
+
     /// dumps debug information.
     void dump(const std::string& message) const;
 
@@ -460,6 +472,9 @@ namespace Belle2 {
 
     /// Firmware simulation mode.
     unsigned _firmwareSimulationMode;
+
+    /// Return value for trg cdc module;
+    int _returnValue;
 
     /// Track list by 2D finding.
     std::vector<TRGCDCTrack*> _trackList2D;
@@ -1012,6 +1027,19 @@ namespace Belle2 {
   TRGCDC::firmwareSimulationMode(void) const
   {
     return _firmwareSimulationMode;
+  }
+
+  inline
+  int
+  TRGCDC::getReturnValue(void) const
+  {
+    return _returnValue;
+  }
+  
+  inline
+  void
+  TRGCDC::setReturnValue(int returnValue) {
+    _returnValue = returnValue;
   }
 
 } // namespace Belle2

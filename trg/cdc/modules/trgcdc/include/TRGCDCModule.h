@@ -64,6 +64,9 @@ namespace Belle2 {
     /// Config. file name.
     std::string _configFilename;
 
+    /// returnValue module's name. Can be ["", "TSF", "ETF", "2DFind", "2DFit", "3DFind", "3DFit"]. No name means all.
+    std::string _returnValueModuleName;
+
 //    /// The filename of LUT for the inner-most track segments.
 //    std::string _innerTSLUTDataFilename;
 //

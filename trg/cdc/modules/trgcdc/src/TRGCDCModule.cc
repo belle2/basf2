@@ -44,6 +44,7 @@ namespace Belle2 {
     : Module::Module(),
       _debugLevel(0),
       _configFilename("TRGCDCConfig.dat"),
+      _returnValueModuleName(""),
       _innerTSLUTFilename("undefined"),
       _outerTSLUTFilename("undefined"),
       _rootTRGCDCFilename("undefined"),
@@ -85,6 +86,7 @@ namespace Belle2 {
              _configFilename,
              "The filename of CDC trigger config file",
              _configFilename);
+    addParam("ReturnValueModuleName", _returnValueModuleName, "Chooses a module for return value. Can be [TSF, ETF, 2DFind, 2DFit, 3DFind, 3DFit]. If blank then returnValue will be for all modules.", _returnValueModuleName);
     addParam("InnerTSLUTFile",
              _innerTSLUTFilename,
              "The filename of LUT for inner-most track segments",
@@ -324,6 +326,9 @@ namespace Belle2 {
   void
   TRGCDCModule::event()
   {
+    // initialize returnValue
+    _cdc->setReturnValue(0);
+
     //...CDC trigger simulation...
     _cdc->update();
     _cdc->simulate();
@@ -332,6 +337,9 @@ namespace Belle2 {
     _cdc->storeSimulationResults(m_2DfinderCollectionName,
                                  m_2DfitterCollectionName,
                                  m_3DfitterCollectionName);
+
+    // module condition
+    setReturnValue(_cdc->getReturnValue(_returnValueModuleName));
   }
 
   void

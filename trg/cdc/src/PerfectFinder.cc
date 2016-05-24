@@ -57,10 +57,11 @@ TRGCDCPerfectFinder::~TRGCDCPerfectFinder() {
 }
 
 int
-TRGCDCPerfectFinder::doit(vector<TCTrack *> & trackList) {
-
+TRGCDCPerfectFinder::doit(vector<TCTrack*> & trackListClone, vector<TCTrack *> & trackList) {
 //  return doitPerfectlySingleTrack(trackList);
-    return doitPerfectly(trackList);
+    int result = doitPerfectly(trackList);
+    trackListClone = trackList;
+    return result;
 }
 
 int

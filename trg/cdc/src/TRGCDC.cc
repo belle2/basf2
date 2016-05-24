@@ -233,6 +233,7 @@ namespace Belle2 {
     _simulationMode(simulationMode),
     _fastSimulationMode(fastSimulationMode),
     _firmwareSimulationMode(firmwareSimulationMode),
+    _returnValue(0),
     _makeRootFile(makeRootFile),
     _perfect2DFinder(perfect2DFinder),
     _perfect3DFinder(perfect3DFinder),
@@ -2000,17 +2001,15 @@ namespace Belle2 {
 
     //...2D finder and fitter...
     if (_perfect2DFinder)
-      _pFinder->doit(_trackList2DFitted);
+      _pFinder->doit(_trackList2D, _trackList2DFitted);
     else
       _hFinder->FindAndFit(_trackList2D, _trackList2DFitted);
+    if(_trackList2D.size()==0) setReturnValue("2DFind",1);
+    if(_trackList2DFitted.size()==0) setReturnValue("2DFit",1);
 
     //...Stereo finder...
-    {
-      bool t_use2DFitted = 0;
-      if(_perfect2DFinder) t_use2DFitted = 1;
-      if (t_use2DFitted == 0) _h3DFinder->doit(_trackList2D, _trackList3D);
-      else _h3DFinder->doit(_trackList2DFitted, _trackList3D);
-    }
+    _h3DFinder->doit(_trackList2D, _trackList3D);
+    if(_trackList3D.size() == 0) setReturnValue("3DFind",1);
 
     //...Check tracks...
     if (TRGDebug::level()) {
@@ -2038,6 +2037,7 @@ namespace Belle2 {
     //cout<<endl<<"----s3DFitter----"<<endl;
     //_fitter3D->doitComplex(_trackList3D);
     //cout<<"----e3DFitter----"<<endl<<endl;
+    if(_trackList3D.size()==0) setReturnValue("3DFit",1);
 
     if (TRGDebug::level() > 1) {
       for (unsigned iTrack = 0; iTrack < _trackList3D.size(); iTrack++) {
@@ -2620,6 +2620,41 @@ namespace Belle2 {
   {
     return _eventTime.back()->getT0();
   }
+
+  void TRGCDC::setReturnValue(std::string const & moduleName, bool flag)
+  {
+    int bitPosition = -1;
+    if (moduleName == "TSF") bitPosition = 0;
+    else if (moduleName == "ETF") bitPosition = 1;
+    else if (moduleName == "2DFind") bitPosition = 2;
+    else if (moduleName == "2DFit") bitPosition = 3;
+    else if (moduleName == "3DFind") bitPosition = 4;
+    else if (moduleName == "3DFit") bitPosition = 5;
+    if (bitPosition != -1) {
+      if (flag) _returnValue |= 1 << bitPosition;
+      else _returnValue &= ~(1 << bitPosition);
+    }
+  }
+
+  int TRGCDC::getReturnValue(std::string const & moduleName) const
+  {
+    if (moduleName == "") return _returnValue;
+
+    int bitPosition = -1;
+    if (moduleName == "TSF") bitPosition = 0;
+    else if (moduleName == "ETF") bitPosition = 1;
+    else if (moduleName == "2DFind") bitPosition = 2;
+    else if (moduleName == "2DFit") bitPosition = 3;
+    else if (moduleName == "3DFind") bitPosition = 4;
+    else if (moduleName == "3DFit") bitPosition = 5;
+    int returnValue = 0;
+    if (bitPosition != -1) {
+      bool bitValue = (_returnValue >> bitPosition) & 1;
+      if (bitValue) returnValue |= 1 << bitPosition;
+    }
+    return returnValue;
+  }
+
 
   void TRGCDC::saveCDCHitInformation(vector<vector<unsigned>>& hitWiresFromCDC)
   {

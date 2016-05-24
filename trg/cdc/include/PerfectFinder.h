@@ -47,7 +47,7 @@ class TRGCDCPerfectFinder {
     std::string version(void) const;
 
     /// do track finding.
-    int doit(std::vector<TRGCDCTrack *> & trackList);
+    int doit(std::vector<TRGCDCTrack*> & trackListClone, std::vector<TRGCDCTrack *> & trackList);
 
     /// returns MC track list which contributes to CDC hits.
     const std::vector<int> & trackListMC(void) const;

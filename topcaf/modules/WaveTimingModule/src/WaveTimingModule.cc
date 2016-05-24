@@ -73,7 +73,7 @@ void WaveTimingModule::event()
     //Look over all waveforms
     for (int w = 0; w < evtwaves_ptr.getEntries(); w++) {
 
-      unsigned int hardwareID = evtwaves_ptr[w]->GetChannelID();
+      topcaf_channel_id_t hardwareID = evtwaves_ptr[w]->GetChannelID();
       //double win_time_shift = evtwaves_ptr[w]->GetTime();
       std::vector< double > v_samples = evtwaves_ptr[w]->GetSamples();
       int refwin = evtwaves_ptr[w]->GetRefWindow();

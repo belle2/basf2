@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2012  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Hiroyuki Nakayama                          *
+ * Contributors: Andreas Moll, Hiroyuki Nakayama, Igal Jaegle             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +14,18 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/GearDir.h>
 #include <mdst/dataobjects/MCParticle.h>
+
+//Start my addition
+#include <generators/SAD/dataobjects/SADMetaHit.h>
+// framework - DataStore
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+// DataStore classes
+#include <framework/io/RootIOUtilities.h>
+#include <framework/dataobjects/EventMetaData.h>
+//End my addition
 
 using namespace std;
 using namespace Belle2;
@@ -32,6 +44,26 @@ ReaderSAD::ReaderSAD(): m_file(NULL), m_tree(NULL), m_transMatrix(NULL),
   m_lostRate = 0.0;
   m_lostE = 0.0;
 
+  //Start my addition
+  m_inputSAD_ssraw =  0;
+  m_inputSAD_sraw = 0;
+  m_inputSAD_ss = 0;
+  m_inputSAD_s = 0;
+  m_inputSAD_Lss = 0;
+  m_inputSAD_nturn = 0;
+  m_inputSAD_x = 0;
+  m_inputSAD_y = 0;
+  m_inputSAD_px = 0;
+  m_inputSAD_py = 0;
+  m_inputSAD_xraw = 0;
+  m_inputSAD_yraw = 0;
+  m_inputSAD_r = 0;
+  m_inputSAD_rr = 0;
+  m_inputSAD_dp_over_p0 = 0;
+  m_inputSAD_E = 0;
+  m_inputSAD_rate = 0;
+  m_inputSAD_watt = 0;
+  //End my addition
 }
 
 
@@ -73,7 +105,32 @@ void ReaderSAD::open(const string& filename) throw(SADCouldNotOpenFileError)
   m_tree->SetBranchAddress("rate", &m_lostRate);
   m_tree->SetBranchAddress("E", &m_lostE);
 
+  //Start my addition
+  m_tree->SetBranchAddress("ssraw", &m_inputSAD_ssraw);
+  m_tree->SetBranchAddress("sraw", &m_inputSAD_sraw);
+  m_tree->SetBranchAddress("ss", &m_inputSAD_ss);
+  //m_tree->SetBranchAddress("s", &m_inputSAD_s);
+  m_tree->SetBranchAddress("Lss", &m_inputSAD_Lss);
+  m_tree->SetBranchAddress("nturn", &m_inputSAD_nturn);
+  //m_tree->SetBranchAddress("x", &m_inputSAD_x);
+  //m_tree->SetBranchAddress("y", &m_inputSAD_y);
+  //m_tree->SetBranchAddress("px", &m_inputSAD_px);
+  //m_tree->SetBranchAddress("py", &m_inputSAD_py);
+  m_tree->SetBranchAddress("xraw", &m_inputSAD_xraw);
+  m_tree->SetBranchAddress("yraw", &m_inputSAD_yraw);
+  m_tree->SetBranchAddress("r", &m_inputSAD_r);
+  m_tree->SetBranchAddress("rr", &m_inputSAD_rr);
+  m_tree->SetBranchAddress("dp_over_p0", &m_inputSAD_dp_over_p0);
+  //m_tree->SetBranchAddress("E", &m_inputSAD_E);
+  //m_tree->SetBranchAddress("rate", &m_inputSAD_rate);
+  m_tree->SetBranchAddress("watt", &m_inputSAD_watt);
+  //End my addition
+
   m_readEntry = -1;
+
+  //Start my addition
+  StoreArray<SADMetaHit>::registerPersistent();
+  //End my addition
 }
 
 
@@ -146,6 +203,15 @@ bool ReaderSAD::getRealParticle(MCParticleGraph& graph)
       m_tree->GetEntry(m_readEntry);
       convertParamsToSADUnits();
 
+      //Start my addition
+      StoreArray<SADMetaHit> SADMetaHits;
+      SADMetaHits.appendNew(SADMetaHit(m_inputSAD_ssraw, m_inputSAD_sraw, m_inputSAD_ss, m_lostS,
+                                       m_inputSAD_Lss, m_inputSAD_nturn,
+                                       m_lostX, m_lostY, m_lostPx, m_lostPy, m_inputSAD_xraw, m_inputSAD_yraw,
+                                       m_inputSAD_r, m_inputSAD_rr, m_inputSAD_dp_over_p0, m_lostE, m_lostRate,
+                                       m_inputSAD_watt));
+      //End my addition
+
       B2DEBUG(10, "> Read particle " << m_readEntry + 1 << "/" << m_tree->GetEntries() << " with s = " << m_lostS << " cm" <<
               " and rate = " << m_lostRate << " Hz")
     } while ((fabs(m_lostS) > m_sRange) && (m_readEntry < m_tree->GetEntries()));
@@ -179,6 +245,9 @@ void ReaderSAD::addAllSADParticles(MCParticleGraph& graph)
     m_tree->GetEntry(iPart);
     convertParamsToSADUnits();
     if (fabs(m_lostS) <= m_sRange) addParticleToMCParticles(graph);
+
+    //std::cout << " in sad " <<  m_inputSAD_sraw << std::endl;
+
   }
 }
 
@@ -194,6 +263,26 @@ void ReaderSAD::convertParamsToSADUnits()
   m_lostS = m_lostS * Unit::m;
   m_lostPx = m_lostPx * Unit::GeV;
   m_lostPy = m_lostPy * Unit::GeV;
+
+  //Start my addition
+  m_inputSAD_ssraw =  m_inputSAD_ssraw * Unit::m;
+  m_inputSAD_sraw = m_inputSAD_sraw * Unit::m;
+  m_inputSAD_ss = m_inputSAD_ss * Unit::m;
+  m_inputSAD_s = m_inputSAD_s * Unit::m;
+  //m_inputSAD_Lss
+  //m_inputSAD_nturn
+  m_inputSAD_x = m_inputSAD_x * Unit::m;
+  m_inputSAD_y = m_inputSAD_y * Unit::m;
+  m_inputSAD_px = m_inputSAD_px * Unit::GeV;
+  m_inputSAD_py =  m_inputSAD_py * Unit::GeV;
+  m_inputSAD_xraw = m_inputSAD_xraw * Unit::m;
+  m_inputSAD_yraw = m_inputSAD_yraw * Unit::m;
+  //m_inputSAD_r
+  //m_inputSAD_rr
+  //m_inputSAD_dp_over_p0
+  //m_inputSAD_E
+  //m_inputSAD_rate
+  //End my addition
 }
 
 
@@ -276,6 +365,15 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   //particle.setEnergy(m_lostE);
   particle.setEnergy(sqrt(m_lostE * m_lostE + particle.getMass()*particle.getMass()));
   particle.setValidVertex(true);
+
+  //Start my addition
+  StoreArray<SADMetaHit> SADMetaHits;
+  SADMetaHits.appendNew(SADMetaHit(m_inputSAD_ssraw, m_inputSAD_sraw, m_inputSAD_ss, m_lostS,
+                                   m_inputSAD_Lss, m_inputSAD_nturn,
+                                   m_lostX, m_lostY, m_lostPx, m_lostPy, m_inputSAD_xraw, m_inputSAD_yraw,
+                                   m_inputSAD_r, m_inputSAD_rr, m_inputSAD_dp_over_p0, m_lostE, m_lostRate,
+                                   m_inputSAD_watt));
+  //End my addition
 }
 
 

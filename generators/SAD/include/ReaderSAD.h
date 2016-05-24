@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2012  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Hiroyuki Nakayama                          *
+ * Contributors: Andreas Moll, Hiroyuki Nakayama, Igal Jaegle             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -142,6 +142,25 @@ namespace Belle2 {
     double m_lostPy;            /**< y momentum at lost position [m]. */
     double m_lostRate;          /**< loss rate [Hz]> */
     double m_lostE;             /**< energy at lost position [m]. */
+
+    double m_inputSAD_ssraw;     /** */
+    double m_inputSAD_sraw;      /** */
+    double m_inputSAD_ss;        /** */
+    double m_inputSAD_s;         /** */
+    double m_inputSAD_Lss;       /** */
+    double m_inputSAD_nturn;     /** */
+    double m_inputSAD_x;         /** */
+    double m_inputSAD_y;         /** */
+    double m_inputSAD_px;        /** */
+    double m_inputSAD_py;        /** */
+    double m_inputSAD_xraw;      /** */
+    double m_inputSAD_yraw;      /** */
+    double m_inputSAD_r;         /** */
+    double m_inputSAD_rr;        /** */
+    double m_inputSAD_dp_over_p0;/** */
+    double m_inputSAD_E;         /** */
+    double m_inputSAD_rate;      /** */
+    double m_inputSAD_watt;      /** */
 
   private:
 

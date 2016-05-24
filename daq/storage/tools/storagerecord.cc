@@ -19,7 +19,7 @@
 #include <daq/storage/BinData.h>
 #include <daq/storage/SharedEventBuffer.h>
 
-#include <daq/slc/database/PostgreSQLInterface.h>
+#include <daq/slc/psql/PostgreSQLInterface.h>
 
 #include <daq/slc/readout/RunInfoBuffer.h>
 

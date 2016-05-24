@@ -9,6 +9,7 @@ namespace Belle2 {
   class EB0Controller : public ROController {
 
   public:
+    EB0Controller(): m_eb_stat(NULL) {}
     virtual ~EB0Controller() throw();
 
   public:

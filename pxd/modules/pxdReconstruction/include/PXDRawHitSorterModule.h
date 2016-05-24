@@ -41,6 +41,15 @@ namespace Belle2 {
       virtual void event();
 
     private:
+      /** Utility function to check pixel coordinates */
+      inline bool goodHit(const PXDRawHit* const rawhit) const
+      {
+        short u = rawhit->getRow();
+        bool goodU = (u == std::min(std::max(u, short(0)), short(249)));
+        short v = rawhit->getColumn();
+        bool goodV = (v == std::min(std::max(v, short(0)), short(767)));
+        return (goodU && goodV);
+      }
       /** Name of the collection to use for PXDRawHits */
       std::string m_storeRawHitsName;
       /** Name of the collection to use for the PXDDigits */
@@ -55,6 +64,8 @@ namespace Belle2 {
       double m_0cut;
       /** Assign VXDID to data that don't have it. */
       bool m_assignID;
+      /** Discard out-of-range hits. */
+      bool m_trimOutOfRange;
       /** Name of the ignored pixels list xml */
       std::string m_ignoredPixelsListName;
       /** Ignored pixels list manager class */

@@ -43,10 +43,10 @@ namespace Belle2 {
       /** Utility function to check pixel coordinates */
       inline bool goodDigit(const PXDDigit* const digit) const
       {
-        int u = digit->getUCellID();
-        bool goodU = (u == std::min(std::max(u, 0), 249));
-        int v = digit->getVCellID();
-        bool goodV = (v == std::min(std::max(v, 0), 767));
+        short u = digit->getUCellID();
+        bool goodU = (u == std::min(std::max(u, short(0)), short(249)));
+        short v = digit->getVCellID();
+        bool goodV = (v == std::min(std::max(v, short(0)), short(767)));
         return (goodU && goodV);
       }
 

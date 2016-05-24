@@ -42,10 +42,12 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
                  "and column.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("mergeDuplicates", m_mergeDuplicates, "If true, add charges of multiple instances of the same fired pixel. Otherwise only keep the first..", true);
+  addParam("mergeDuplicates", m_mergeDuplicates,
+           "If true, add charges of multiple instances of the same fired pixel. Otherwise only keep the first..", true);
   addParam("mergeFrames", m_mergeFrames, "If true, produce a single frame containing digits of all input frames.", true);
   addParam("zeroSuppressionCut", m_0cut, "Minimum charge for a digit to carry", -1000.0);
   addParam("assignID", m_assignID, "Assign VxdID to RAwHits that don't have it", true);
+  addParam("trimOutOfRange", m_trimOutOfRange, "Discard rawhits whith out-of-range coordinates", true);
   addParam("rawHits", m_storeRawHitsName, "PXDRawHit collection name", string(""));
   addParam("digits", m_storeDigitsName, "PXDDigit collection name", string(""));
   addParam("frames", m_storeFramesName, "PXDFrames collection name", string(""));
@@ -100,6 +102,8 @@ void PXDRawHitSorterModule::event()
         continue;
       }
     }
+    if (m_trimOutOfRange && !goodHit(rawhit))
+      continue;
     // Zero-suppression cut
     if (rawhit->getCharge() < m_0cut) continue;
     Pixel px(rawhit, rawhit->getStartRow());
@@ -124,10 +128,10 @@ void PXDRawHitSorterModule::event()
 
   unsigned int index(0);
   // And just loop over the sensors and create the digits.
-  for (auto & sensor : sensors) {
+  for (auto& sensor : sensors) {
     const PXD::Pixel* lastpx(0);
     VxdID sensorID = sensor.first;
-    for (const PXD::Pixel & px : sensor.second) {
+    for (const PXD::Pixel& px : sensor.second) {
       //Normal case: pixel has different address
       if (!lastpx || px > *lastpx) {
         //Write the digit

@@ -1,6 +1,8 @@
 #include "daq/slc/apps/runcontrold/RunControlMasterCallback.h"
 #include "daq/slc/apps/runcontrold/RunControlCallback.h"
 
+#include <daq/slc/psql/PostgreSQLInterface.h>
+
 #include <daq/slc/runcontrol/RCNodeDaemon.h>
 
 #include <daq/slc/base/ConfigFile.h>
@@ -19,7 +21,12 @@ int main(int argc, char** argv)
     //callback->setLogTable(config.get("log.dbtable"));
     callback->setRestartTime(config.getInt("restarttime"));
     RCCallback* callback2 = new RunControlMasterCallback(callback);
-    RCNodeDaemon(config, callback, callback2).run();
+    RCNodeDaemon(config, callback, callback2,
+                 new PostgreSQLInterface(config.get("database.host"),
+                                         config.get("database.dbname"),
+                                         config.get("database.user"),
+                                         config.get("database.password"),
+                                         config.getInt("database.port"))).run();
   }
   return 0;
 }

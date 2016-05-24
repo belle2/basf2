@@ -3,7 +3,7 @@
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 
 #include <daq/slc/system/Daemon.h>
-#include <daq/slc/database/PostgreSQLInterface.h>
+#include <daq/slc/psql/PostgreSQLInterface.h>
 
 #include <daq/slc/base/ConfigFile.h>
 

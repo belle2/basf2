@@ -1,7 +1,7 @@
 #include "daq/slc/hvcontrol/HVControlDaemon.h"
 #include "daq/slc/hvcontrol/HVControlCallback.h"
 
-#include <daq/slc/database/PostgreSQLInterface.h>
+#include <daq/slc/psql/PostgreSQLInterface.h>
 
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 

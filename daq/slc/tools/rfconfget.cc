@@ -1,6 +1,6 @@
 #include <daq/slc/base/StringUtil.h>
 
-#include <daq/slc/database/PostgreSQLInterface.h>
+#include <daq/slc/psql/PostgreSQLInterface.h>
 #include <daq/slc/database/DBObjectLoader.h>
 
 #include <daq/slc/base/StringUtil.h>

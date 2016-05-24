@@ -1,7 +1,7 @@
 #include "daq/slc/apps/storagerd/StoragerCallback.h"
 #include "daq/slc/apps/storagerd/storage_status.h"
 
-#include "daq/slc/database/PostgreSQLInterface.h"
+#include "daq/slc/psql/PostgreSQLInterface.h"
 #include "daq/slc/nsm/NSMCommunicator.h"
 
 #include "daq/slc/system/LogFile.h"

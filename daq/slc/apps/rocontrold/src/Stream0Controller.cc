@@ -55,8 +55,7 @@ bool Stream0Controller::loadArguments(const DBObject& obj)
   }
   setUsed(used);
   if (used) {
-    m_con.setExecutable(StringUtil::form("%s/daq/ropc/des_ser_ROPC_main",
-                                         getenv("BELLE2_LOCAL_DIR")));
+    m_con.setExecutable(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"), script.c_str()));
     m_con.addArgument(m_host);
     m_con.addArgument("1");
     m_con.addArgument(port);

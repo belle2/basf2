@@ -19,9 +19,6 @@ LIBS    += -lnsm2_corelib -lnsm2_b2lib
 LIBS    += -lecldaq
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT 
-ifneq ($(NOT_USE_PSQL),yes)
-CFLAGS  += -I$(PGSQL_INC_PATH)
-endif
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.
 
 MAINS   = $(wildcard *.cc)

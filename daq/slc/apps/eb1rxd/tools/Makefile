@@ -12,13 +12,14 @@ LIBS    += -lm -lpthread -ldl -lrt
 ifneq ($(NOT_USE_PSQL),yes)
 LIBS    += -L$(PGSQL_LIB_PATH) -lpq
 endif
-LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm -ldaq_slc_runcontrol -ldaq_slc_readout -ldaq_slc_apps_eb1rxd
+LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_psql \
+ -ldaq_slc_nsm -ldaq_slc_runcontrol -ldaq_slc_readout -ldaq_slc_apps_eb1rxd
 LIBS    += -lnsm2_corelib -lnsm2_b2lib
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.
 ifneq ($(NOT_USE_PSQL),yes)
-CFLAGS  += -$(PGSQL_INC_PATH) -lpq
+CFLAGS  += -$(PGSQL_INC_PATH)
 endif
 
 MAINS   = $(wildcard *.cc)

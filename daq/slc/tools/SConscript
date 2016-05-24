@@ -10,5 +10,6 @@ env['TOOLS_LIBS']['checknsm2']  = ['daq']
 env['TOOLS_LIBS']['semtest']  = ['framework', 'daq']
 env['TOOLS_LIBS']['bootecl']  = ['daq']
 env['TOOLS_LIBS']['bootcdc']  = ['daq']
+env['TOOLS_LIBS']['boottop']  = ['daq']
 
 Return('env')

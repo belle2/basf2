@@ -1,4 +1,4 @@
-#include <daq/slc/database/PostgreSQLInterface.h>
+#include <daq/slc/psql/PostgreSQLInterface.h>
 #include <daq/slc/database/DAQLogMessage.h>
 
 #include <daq/slc/system/Inotify.h>

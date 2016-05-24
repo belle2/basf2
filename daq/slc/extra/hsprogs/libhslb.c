@@ -275,7 +275,7 @@ readfee32(int fd, int adr, int *valp)
   if (devtype == FIN_HSLB) {
     int val = adr;
     if ((ret = ioctl(fd, HSLBFEE32_GET(0), &val)) < 0) {
-      sprintf(errmsg, "%s: cannot read %s: %s\n",
+      sprintf(errmsg, "cannot read %s: %s\n",
 	      DEVICE, strerror(errno));
       return -1;
     }
@@ -311,13 +311,9 @@ writefee32(int fd, int adr, int val)
     buf[0] = adr;
     buf[1] = val;
     if (ioctl(fd, HSLBFEE32_SET(0), buf) < 0) {
-      if (PROGRAM) {
-        sprintf(errmsg, "%s: cannot write %s: %s\n",
-                PROGRAM, DEVICE, strerror(errno));
-        exit(1);
-      } else {
-        return -1;
-      }
+      sprintf(errmsg, "cannot write %s: %s\n",
+	      DEVICE, strerror(errno));
+      return -1;
     }
     return 0;
   } else {

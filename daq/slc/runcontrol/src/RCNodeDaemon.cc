@@ -1,7 +1,5 @@
 #include "daq/slc/runcontrol/RCNodeDaemon.h"
 
-#include <daq/slc/database/PostgreSQLInterface.h>
-
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Daemon.h>
 
@@ -12,7 +10,8 @@ using namespace Belle2;
 
 RCNodeDaemon::RCNodeDaemon(ConfigFile& config,
                            RCCallback* callback,
-                           RCCallback* callback2)
+                           RCCallback* callback2,
+                           DBInterface* db)
 {
   std::string host = config.get("nsm.host");
   if (host.size() == 0) {
@@ -47,13 +46,8 @@ RCNodeDaemon::RCNodeDaemon(ConfigFile& config,
     callback->setDBFile(file);
   } else if (dbtable.size() > 0) {
     LogFile::debug("database.use=%s", config.getBool("database.use") ? "TRUE" : "FALSE");
-    if (config.getBool("database.use")) {
-      callback->setDB(new PostgreSQLInterface(config.get("database.host"),
-                                              config.get("database.dbname"),
-                                              config.get("database.user"),
-                                              config.get("database.password"),
-                                              config.getInt("database.port")),
-                      dbtable);
+    if (config.getBool("database.use") && db != NULL) {
+      callback->setDB(db, dbtable);
     } else {
       callback->setDBTable(dbtable);
       callback->setProvider(config.get("provider.host"),

@@ -35,10 +35,11 @@ void WaveMergingModule::event()
     return;
   }
 
-  std::map<unsigned int, EventWaveformPackets > ch2wp;
-  for (int w = 0; w < evtwaves_ptr.getEntries(); w++) {
-    unsigned int channel_id = evtwaves_ptr[w]->GetChannelID();
+  std::map<topcaf_channel_id_t, EventWaveformPackets > ch2wp;
 
+  for (int w = 0; w < evtwaves_ptr.getEntries(); w++) {
+
+    topcaf_channel_id_t channel_id = evtwaves_ptr[w]->GetChannelID();
     if (ch2wp[channel_id].size() == 0) {
       EventWaveformPackets ch_waves;
       ch_waves.push_back(evtwaves_ptr[w]);
@@ -52,7 +53,8 @@ void WaveMergingModule::event()
   }
   //Create new event with merged waveforms
   EventWaveformPackets corrected_waves;
-  std::map<unsigned int, EventWaveformPackets>::iterator it = ch2wp.begin();
+  std::map<topcaf_channel_id_t, EventWaveformPackets>::iterator it = ch2wp.begin();
+
   for (; it != ch2wp.end(); ++it) {
     if (it->second.empty()) {
       continue;

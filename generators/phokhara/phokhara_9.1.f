@@ -12102,10 +12102,12 @@ c
       return
       end
 c***********************************************************************
-      real*8 function dgammf(x)
-      real*8 x
-      dgammf=1.d0
-      end
+c      real*8 function dgammf(x)
+c      real*8 x
+c      dgammf=1.d0
+c      end
+c from Henryk Czyz: For the Phokhara 9.x there is a bug in the 'new' form factor.
+c (...) should not be there. It is replacing the cernlib function with the same name.
 c***********************************************************************
 c*********************************************************************** 
       real*8 function virt_muons(delta_2,qq)

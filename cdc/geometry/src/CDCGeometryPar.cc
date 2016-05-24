@@ -1032,7 +1032,7 @@ void CDCGeometryPar::setT0()
 // Set bad-wire (from DB)
 void CDCGeometryPar::setBadWire()
 {
-  m_badWire = m_badWireFromDB->getBadWires();
+  m_badWire = m_badWireFromDB->getWires();
 }
 #endif
 
@@ -1053,7 +1053,7 @@ void CDCGeometryPar::setPropSpeed()
 void CDCGeometryPar::setTW()
 {
   for (unsigned short iBd = 0; iBd < m_timeWalkFromDB->getEntries(); ++iBd) {
-    m_timeWalkCoef[iBd] = m_timeWalkFromDB->getTimeWalk(iBd);
+    m_timeWalkCoef[iBd] = m_timeWalkFromDB->getTimeWalkParam(iBd);
   }
 }
 #endif

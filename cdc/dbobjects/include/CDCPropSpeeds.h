@@ -11,7 +11,6 @@
 
 #include <vector>
 #include <iostream>
-
 #include <TObject.h>
 
 namespace Belle2 {
@@ -22,7 +21,10 @@ namespace Belle2 {
   class CDCPropSpeeds: public TObject {
   public:
 
-    enum {c_nSlayers = 56};
+    /**
+     * Constant
+     */
+    enum {c_nSlayers = 56};  /**< total no. of layers */
 
     /**
      * Default constructor
@@ -31,21 +33,22 @@ namespace Belle2 {
 
     /**
      * Set the speed in the list.
+     * @param iCLayer (continuous) layer-id,
+     * @param speed   propagation speed for the layer
      */
-    void setSpeed(unsigned short iCLayer, double speed)
-    //    void setSpeed(double speed)
+    void setSpeed(unsigned short iCLayer, float speed)
     {
-      //      m_speedList.push_back(speed);
-      //      m_speedList[iCLayer] = speed;
-      m_speedList.at(iCLayer) = speed;
+      m_speeds.at(iCLayer) = speed;
     }
 
     /**
      * Update the speed in the list.
+     * @param iClayer (continuous) layer-id,
+     * @param delta   delta-speed for the layer
      */
-    void addSpeed(unsigned short iCLayer, double delta)
+    void addSpeed(unsigned short iCLayer, float delta)
     {
-      m_speedList.at(iCLayer) += delta;
+      m_speeds.at(iCLayer) += delta;
     }
 
     /**
@@ -53,23 +56,25 @@ namespace Belle2 {
      */
     unsigned short getEntries() const
     {
-      return m_speedList.size();
+      return m_speeds.size();
     }
 
     /**
      * Get the whole list
      */
-    std::vector<float> getList() const
+    std::vector<float> getSpeeds() const
     {
-      return m_speedList;
+      return m_speeds;
     }
 
     /**
-     * Get the speed for the specified cLayer
+     * Get the speed for the specified layer
+     * @param  iCLayer (continuous) layer-id.
+     * @return propagation speed for the layer
      */
-    double getSpeed(unsigned short iCLayer) const
+    float getSpeed(unsigned short iCLayer) const
     {
-      return m_speedList[iCLayer];
+      return m_speeds[iCLayer];
     }
 
     /**
@@ -79,17 +84,17 @@ namespace Belle2 {
     {
       std::cout << " " << std::endl;
       std::cout << "PropSpeed list" << std::endl;
-      std::cout << "#entries= " << m_speedList.size() << std::endl;
+      std::cout << "#entries= " << m_speeds.size() << std::endl;
       std::cout << "in order of clayer and speed (cm/ns)" << std::endl;
 
-      for (unsigned short iCL = 0; iCL < m_speedList.size(); ++iCL) {
-        std::cout << iCL << " " << m_speedList[iCL] << std::endl;
+      for (unsigned short iCL = 0; iCL < m_speeds.size(); ++iCL) {
+        std::cout << iCL << " " << m_speeds[iCL] << std::endl;
       }
     }
 
   private:
-    //    std::vector<float> m_speedList; /**< list of speed*/
-    std::vector<float> m_speedList = std::vector<float>(c_nSlayers); /**< list of speed*/
+    //    std::vector<float> m_speeds; /**< list of speed*/
+    std::vector<float> m_speeds = std::vector<float>(c_nSlayers); /**< list of speed*/
     ClassDef(CDCPropSpeeds, 1); /**< ClassDef */
   };
 

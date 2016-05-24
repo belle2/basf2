@@ -10,7 +10,6 @@
 #pragma once
 
 #include <iostream>
-
 #include <TObject.h>
 
 namespace Belle2 {
@@ -21,7 +20,12 @@ namespace Belle2 {
   class CDCSigmas: public TObject {
   public:
 
-    enum {c_nSLayers = 56, c_nSigmaParams = 7};
+    /**
+     * Constants
+     */
+    enum {c_nSLayers = 56,    /**< total no. of layers */
+          c_nSigmaParams = 7  /**< no. of params. for sigma */
+         };
 
     /**
      * Default constructor
@@ -31,7 +35,7 @@ namespace Belle2 {
     /**
      * Set sigma parameters
      */
-    void setSigmaParam(unsigned short iCLayer, unsigned short i, double param)
+    void setSigmaParam(unsigned short iCLayer, unsigned short i, float param)
     {
       m_sigma[iCLayer][i] = param;
     }
@@ -39,7 +43,7 @@ namespace Belle2 {
     /**
      * Get sigma parameter
      */
-    double getSigmaParam(unsigned short iCLayer, unsigned short i)
+    float getSigmaParam(unsigned short iCLayer, unsigned short i)
     {
       return m_sigma[iCLayer][i];
     }

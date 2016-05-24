@@ -11,14 +11,13 @@
 
 #include <map>
 #include <iostream>
-
 #include <TObject.h>
 #include <cdc/dataobjects/WireID.h>
 
 namespace Belle2 {
 
   /**
-   * Database object for time-walk coefficient.
+   * Database object for time-walk.
    */
   class CDCTimeWalks: public TObject {
   public:
@@ -30,18 +29,22 @@ namespace Belle2 {
 
     /**
      * Set the time-walk coefficient in the list
+     * @param boardID front-end board id.
+     * @param param   coefficient for the time-walk corr. term
      */
-    void setTimeWalk(unsigned short boardID, double tw)
+    void setTimeWalkParam(unsigned short boardID, float param)
     {
-      m_twList.insert(std::pair<unsigned short, float>(boardID, tw));
+      m_tws.insert(std::pair<unsigned short, float>(boardID, param));
     }
 
     /**
      * Update the time-walk coefficient in the list
+     * @param boardID front-end board id.
+     * @param delta   delta-coefficient
      */
-    void addTimeWalk(unsigned short boardID, double delta)
+    void addTimeWalk(unsigned short boardID, float delta)
     {
-      std::map<unsigned short, float>::iterator it = m_twList.find(boardID);
+      std::map<unsigned short, float>::iterator it = m_tws.find(boardID);
       it->second += delta;
     }
 
@@ -50,23 +53,25 @@ namespace Belle2 {
      */
     unsigned short getEntries() const
     {
-      return m_twList.size();
+      return m_tws.size();
     }
 
     /**
      * Get the whole list
      */
-    std::map<unsigned short, float> getList()
+    std::map<unsigned short, float> getTimeWalkParams()
     {
-      return m_twList;
+      return m_tws;
     }
 
     /**
      * Get the time-walk coefficient for the board
+     * @param  boardID front-end board id.
+     * @return time-walk coefficient for the board id.
      */
-    double getTimeWalk(unsigned short boardID)
+    float getTimeWalkParam(unsigned short boardID)
     {
-      std::map<unsigned short, float>::iterator it = m_twList.find(boardID);
+      std::map<unsigned short, float>::iterator it = m_tws.find(boardID);
       return it->second;
     }
 
@@ -77,16 +82,16 @@ namespace Belle2 {
     {
       std::cout << " " << std::endl;
       std::cout << "Time walk coefficient list" << std::endl;
-      std::cout << "#entries= " << m_twList.size() << std::endl;
+      std::cout << "#entries= " << m_tws.size() << std::endl;
       std::cout << "in order of board# and coefficient (ns*sqrt(ADCcount))" << std::endl;
 
-      for (auto const& ent : m_twList) {
+      for (auto const& ent : m_tws) {
         std::cout << ent.first << " " << ent.second << std::endl;
       }
     }
 
   private:
-    std::map<unsigned short, float> m_twList; /**< tw list*/
+    std::map<unsigned short, float> m_tws; /**< tw list*/
 
     ClassDef(CDCTimeWalks, 1); /**< ClassDef */
   };

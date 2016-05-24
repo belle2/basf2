@@ -211,7 +211,7 @@ void CDCDatabaseImporter::importTimeWalk(std::string fileName)
     stream >> iBoard >> coeff;
     if (stream.eof()) break;
     ++nRead;
-    tw->setTimeWalk(iBoard, coeff);
+    tw->setTimeWalkParam(iBoard, coeff);
     //      if (m_debug) {
     //  std::cout << iBoard << " " << coeff << std::endl;
     //      }

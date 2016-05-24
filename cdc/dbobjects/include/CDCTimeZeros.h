@@ -9,9 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <TObject.h>
-#include <iostream>
 #include <map>
+#include <iostream>
+#include <TObject.h>
 #include <cdc/dataobjects/WireID.h>
 
 namespace Belle2 {
@@ -29,34 +29,44 @@ namespace Belle2 {
 
     /**
      * Set t0 in the list
+     * @param iCLayer (continuous) layer id.
+     * @param iWire   wire id. in the layer
+     * @param t0      offset
      */
-    void setT0(unsigned short ICLayer, unsigned short IWire, double t0)
+    void setT0(unsigned short iCLayer, unsigned short iWire, float t0)
     {
-      m_t0s.insert(std::pair<unsigned short, float>(WireID(ICLayer, IWire).getEWire(), t0));
+      m_t0s.insert(std::pair<unsigned short, float>(WireID(iCLayer, iWire).getEWire(), t0));
     }
 
     /**
      * Set t0 in the list
+     * @param wid wire id.
+     * @param t0  offset
      */
-    void setT0(const WireID& wid, double t0)
+    void setT0(const WireID& wid, float t0)
     {
       m_t0s.insert(std::pair<unsigned short, float>(wid.getEWire(), t0));
     }
 
     /**
      * Update t0 in the list
+     * @param iCLayer (continuous) layer id.
+     * @param iWire   wire id. in the layer
+     * @param delta   delta-offset
      */
-    void addT0(unsigned short ICLayer, unsigned short IWire, double delta)
+    void addT0(unsigned short iCLayer, unsigned short iWire, float delta)
     {
-      WireID wid(ICLayer, IWire);
+      WireID wid(iCLayer, iWire);
       std::map<unsigned short, float>::iterator it = m_t0s.find(wid.getEWire());
       it->second += delta;
     }
 
     /**
      * Update t0 in the list
+     * @param wid   wire id.
+     * @param delta delta-offset
      */
-    void addT0(const WireID& wid, double delta)
+    void addT0(const WireID& wid, float delta)
     {
       std::map<unsigned short, float>::iterator it = m_t0s.find(wid.getEWire());
       it->second += delta;
@@ -71,7 +81,7 @@ namespace Belle2 {
     }
 
     /**
-     * Get the t0 list
+     * Get the whole list
      */
     std::map<unsigned short, float> getT0s()
     {
@@ -80,6 +90,8 @@ namespace Belle2 {
 
     /**
      * Get t0 for the specified wire
+     * @param  wire id.
+     * @return t0 for the wire
      */
     float getT0(const WireID& wid)
     {

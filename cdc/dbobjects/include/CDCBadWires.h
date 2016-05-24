@@ -12,7 +12,6 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
-
 #include <TObject.h>
 #include <cdc/dataobjects/WireID.h>
 
@@ -31,18 +30,21 @@ namespace Belle2 {
 
     /**
      * Set the wire in the list
+     * @param wid wire-id to be registered
      */
     void setWire(const WireID& wid)
     {
-      m_wireList.push_back((wid.getEWire()));
+      m_wires.push_back((wid.getEWire()));
     }
 
     /**
      * Set the wire in the list
+     * @param iCLayer (continuous) layer-id of badwire
+     * @param iWire   wire-id of badwire
      */
-    void setWire(unsigned short ICLayer, unsigned short IWire)
+    void setWire(unsigned short iCLayer, unsigned short iWire)
     {
-      m_wireList.push_back(WireID(ICLayer, IWire).getEWire());
+      m_wires.push_back(WireID(iCLayer, iWire).getEWire());
     }
 
     /**
@@ -50,24 +52,26 @@ namespace Belle2 {
      */
     unsigned short getEntries() const
     {
-      return m_wireList.size();
+      return m_wires.size();
     }
 
     /**
-     * Get the list of bad wires
+     * Get the whole list
      */
-    std::vector<unsigned short> getBadWires() const
+    std::vector<unsigned short> getWires() const
     {
-      return m_wireList;
+      return m_wires;
     }
 
     /**
-     * Inquire if the wire is bad
+     * Check if the wire is bad
+     * @param  wid wire id to be checked
+     * @return true if badwire; false if not
      */
     bool isBadWire(const WireID& wid)
     {
-      std::vector<unsigned short>::iterator it = std::find(m_wireList.begin(), m_wireList.end(), wid.getEWire());
-      bool torf = (it != m_wireList.end()) ? true : false;
+      std::vector<unsigned short>::iterator it = std::find(m_wires.begin(), m_wires.end(), wid.getEWire());
+      bool torf = (it != m_wires.end()) ? true : false;
       return torf;
     }
 
@@ -78,16 +82,16 @@ namespace Belle2 {
     {
       std::cout << " " << std::endl;
       std::cout << "Bad wire list" << std::endl;
-      std::cout << "#entries= " << m_wireList.size() << std::endl;
+      std::cout << "#entries= " << m_wires.size() << std::endl;
       std::cout << "in order of ICLayer and IWire and EWire" << std::endl;
 
-      for (auto const ent : m_wireList) {
+      for (auto const ent : m_wires) {
         std::cout << WireID(ent).getICLayer() << " " << WireID(ent).getIWire() << " " << ent << std::endl;
       }
     }
 
   private:
-    std::vector<unsigned short> m_wireList; /**< badwire list*/
+    std::vector<unsigned short> m_wires; /**< badwire list*/
 
     ClassDef(CDCBadWires, 1); /**< ClassDef */
   };

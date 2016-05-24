@@ -38,7 +38,7 @@ namespace Belle2 {
     /**
      * Set t0 in the list
      */
-    void setT0(const WireID wid, double t0)
+    void setT0(const WireID& wid, double t0)
     {
       m_t0s.insert(std::pair<unsigned short, float>(wid.getEWire(), t0));
     }
@@ -56,7 +56,7 @@ namespace Belle2 {
     /**
      * Update t0 in the list
      */
-    void addT0(const WireID wid, double delta)
+    void addT0(const WireID& wid, double delta)
     {
       std::map<unsigned short, float>::iterator it = m_t0s.find(wid.getEWire());
       it->second += delta;

@@ -46,6 +46,9 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <framework/dataobjects/FileMetaData.h>
+#include <framework/core/InputController.h>
+
 namespace Belle2 {
 
   /** PXD DQM Module */
@@ -210,6 +213,8 @@ namespace Belle2 {
     std::string m_relTelClusterDigitName;    /**< TelClustersToPXDDigits RelationArray name */
     std::string m_storeFramesName;           /**< PXDFrames StoreArray name */
     std::string m_histogramDirectoryName;    /**< Name of the histogram directory in ROOT file */
+
+    std::string m_storeFileMetaDataName;     /**< Name of the persistent FileMetaData object */
 
     std::string m_PXDMaskFileBasicName;      /**< Name of file with list of masked channels */
     std::string m_SVDMaskFileBasicName;      /**< Name of file with list of masked channels */

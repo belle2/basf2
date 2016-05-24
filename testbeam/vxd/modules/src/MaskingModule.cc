@@ -194,6 +194,14 @@ void MaskingModule::initialize()
   //StoreObjPtr<EventMetaData> storeEventMetaData;
   storeEventMetaData.required();
 
+  //const StoreObjPtr<FileMetaData> storeFileMetaData(m_storeFileMetaDataName, DataStore::c_Persistent);
+  //unsigned int EventLow = storeFileMetaData->getEventLow();
+  //const StoreObjPtr<FileMetaData> storeFileMetaData(m_storeFileMetaDataName, DataStore::c_Persistent);
+  //int Experiment = storeEventMetaData->getExperiment();
+  //int RunNo = storeEventMetaData->getRun();
+//  InputController::setNextEntry(Experiment, RunNo, EventLow + 14000 - 1090);   // jump to some event
+  //InputController::setNextEntry(Experiment, RunNo, EventLow + 1120 + 0);   // jump to some event
+
 
   // Set maximum of procesed events
   if (m_nEventsProcess < 0) m_nEventsProcess = std::numeric_limits<long>::max();

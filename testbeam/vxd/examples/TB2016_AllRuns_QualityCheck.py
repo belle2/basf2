@@ -40,14 +40,14 @@ def getTimeStamps(filenames):
         chain.Add(f)
     nEntries = chain.GetEntries()
     print('Entriess: {}'.format(nEntries))
-    for ev_number in [0, nEntries-1]:
+    for ev_number in [0, nEntries - 1]:
         chain.GetEntry(ev_number)
         sec = chain.RawFTSWs[0].GetTTUtime(0)
-        usec = int(chain.RawFTSWs[0].GetTTCtime(0)/127.216)
+        usec = int(chain.RawFTSWs[0].GetTTCtime(0) / 127.216)
         if (ev_number == 0):
             tOut[0] = sec * 1000000 + usec
             print('Time Start {}'.format(tOut[0]))
-        if (ev_number == (nEntries-1)):
+        if (ev_number == (nEntries - 1)):
             tOut[1] = sec * 1000000 + usec
             print('Time End   {}'.format(tOut[1]))
     return tOut
@@ -114,14 +114,25 @@ def add_simulation(path, momentum=6., positrons=False):
 # for real data parce from name of VXD:
 
 # SummaryFileRunName = 'QualityCheckSummary_Run'+str(RunNoVXD)+'.txt'
-SummaryFileRunName = 'QualityCheckSummary.txt'
+# SummaryFileRunName = 'QualityCheckSummary.txt'
+SummaryFileRunName = '/home/peter/QualityCheck2/QualityCheckSummary.txt'
+# SummaryFileRunName = '/data2/depfet/TB_DESY_2016/Sources/QualityCheck2/QualityCheckSummary.txt'
 
-pxd_maskBasic = 'testbeam/vxd/data/PXD_MaskFiredBasic.xml'
-svd_maskBasic = 'testbeam/vxd/data/SVD_MaskFiredBasic.xml'
-tel_maskBasic = 'testbeam/vxd/data/Tel_MaskFiredBasic.xml'
-pxd_mask = 'testbeam/vxd/data/PXD_MaskFired_Run'+str(RunNoVXD)+'.xml'
-svd_mask = 'testbeam/vxd/data/SVD_MaskFired_Run'+str(RunNoVXD)+'.xml'
-tel_mask = 'testbeam/vxd/data/Tel_MaskFired_Run'+str(RunNoVXD)+'.xml'
+
+# OutputHistoName = 'TB2016_QualityCheckHistos_Run'+str(RunNoVXD)+'.root'
+OutputHistoName = '/home/peter/QualityCheck2/TB2016_QualityCheckHistos_Run' + str(RunNoVXD) + '.root'
+# OutputHistoName = '/data2/depfet/TB_DESY_2016/Sources/QualityCheck2/TB2016_QualityCheckHistos_Run'+str(RunNoVXD)+'.root'
+
+# PathToMask = 'testbeam/vxd/data/'
+PathToMask = '/home/peter/Masking/'
+# PathToMask = 'testbeam/vxd/data//'
+
+pxd_maskBasic = PathToMask + 'PXD_MaskFiredBasic.xml'
+svd_maskBasic = PathToMask + 'SVD_MaskFiredBasic.xml'
+tel_maskBasic = PathToMask + 'Tel_MaskFiredBasic.xml'
+pxd_mask = PathToMask + 'PXD_MaskFired_Run' + str(RunNoVXD) + '.xml'
+svd_mask = PathToMask + 'SVD_MaskFired_Run' + str(RunNoVXD) + '.xml'
+tel_mask = PathToMask + 'Tel_MaskFired_Run' + str(RunNoVXD) + '.xml'
 
 
 def add_vxdtf(path, magnet=True, svd_only=False, momentum=6., filterOverlaps='hopfield'):
@@ -291,8 +302,6 @@ else:
         branches = branches + ['PXDDigits', 'SVDDigits']
     main.add_module('RootInput', branchNames=branches)
 
-OutputHistoName = 'TB2016_QualityCheckHistos_Run'+str(RunNoVXD)+'.root'
-
 main.add_module('HistoManager', histoFileName=OutputHistoName)
 
 main.add_module('Progress')
@@ -301,7 +310,7 @@ add_geometry(main, not args.magnet_off)
 
 if args.tel_input:
     telmerger = register_module('TelDataMergerTB2016')
-    print('Telescope Number:'+str(int(args.tel_input[-10:-4])))
+    print('Telescope Number:' + str(int(args.tel_input[-10:-4])))
     TelRunNo = int(args.tel_input[-10:-4])
 
     # telmerger.logging.log_level = LogLevel.INFO
@@ -318,9 +327,9 @@ if args.tel_input:
 
 if args.unpacking:
     if not args.svd_only:
-        triggerfix = main.add_module(register_module('PXDTriggerFixer'))
-        triggerfix.if_false(create_path())
-        main.add_module(triggerfix)
+        # triggerfix = main.add_module(register_module('PXDTriggerFixer'))
+        # triggerfix.if_false(create_path())
+        # main.add_module(triggerfix)
         main.add_module('PXDTriggerShifter')
         main.add_module('PXDUnpacker',
                         RemapFlag=True,
@@ -330,7 +339,7 @@ if args.unpacking:
     SVDUNPACK = register_module('SVDUnpacker')
     SVDUNPACK.param('xmlMapFileName', 'testbeam/vxd/data/TB_svd_mapping.xml')
     SVDUNPACK.param('FADCTriggerNumberOffset', 1)
-    SVDUNPACK.param('shutUpFTBError',  10)
+    SVDUNPACK.param('shutUpFTBError', 10)
     main.add_module(SVDUNPACK)
 
 if not args.svd_only:
@@ -375,13 +384,15 @@ else:
     main.add_module('GenFitter', FilterId='Kalman')
 
 if args.dqm:
+    # main.add_module('RawDQMCorr')
     if not args.svd_only:
         if args.unpacking:
             main.add_module("PXDRawDQM")
         main.add_module("PXDDQMCorr")
-    main.add_module('PXDDQM', histgramDirectoryName='pxddqm')
+        main.add_module('PXDRawDQMCorr')
+        main.add_module('PXDDQM', histgramDirectoryName='pxddqm')
     # CorrelationGranulation: granularity of correlation plots, min = 0.02 mm, max = 1 mm, default = 1 mm
-    main.add_module("VXDTelDQMOffLine", SaveOtherHistos=1, SwapTel=0, CorrelationGranulation=0.04)
+    main.add_module("VXDTelDQMOffLine", SaveOtherHistos=1, SwapTel=0, CorrelationGranulation=0.5)
     if not args.gbl_collect:
         main.add_module('TrackfitDQM')
 

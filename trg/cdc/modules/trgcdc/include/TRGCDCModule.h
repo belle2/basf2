@@ -169,6 +169,15 @@ namespace Belle2 {
     /// Switch for TSF.root file.
     bool _fileTSF;
 
+    /// Switch for ETF.root file.
+    bool _fileETF;
+
+    /// Switch for selecting ETF version.
+    bool _fverETF;
+
+    /// Switch for printing Firmware inputs for ETF.
+    bool _fprintFirmETF;
+
     /// Switch for Hough3D.root file.
     bool _fileHough3D;
 

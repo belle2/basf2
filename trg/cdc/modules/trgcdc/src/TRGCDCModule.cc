@@ -68,6 +68,9 @@ namespace Belle2 {
       _fFitter3Ds2DFitDrift(0),
       _wireHitInefficiency(0.),
       _fileTSF(0),
+      _fileETF(0),
+      _fverETF(0),
+      _fprintFirmETF(0),
       _fileHough3D(0),
       _finder3DMode(2),
       _fileFitter3D(0),
@@ -179,6 +182,18 @@ namespace Belle2 {
              _fileTSF,
              "Flag for making TSF.root",
              _fileTSF);
+    addParam("ETFRootFile",
+             _fileETF,
+             "Flag for making ETF.root",
+             _fileETF);
+    addParam("verETF",
+             _fverETF,
+             "Select ETF ver, 0:histogram, 1:old Version, 2:True T0",
+             _fverETF);
+    addParam("printFirmETF",
+             _fprintFirmETF,
+             "Flag for printing Firmware inputs for ETF",
+             _fprintFirmETF);
     addParam("Hough3DRootFile",
              _fileHough3D,
              "Flag for making Hough3D.root",
@@ -310,6 +325,9 @@ namespace Belle2 {
                                _fFitter3Ds2DFitDrift,
                                _wireHitInefficiency,
                                _fileTSF,
+                               _fileETF,
+                               _fverETF,
+                               _fprintFirmETF,
                                _fileHough3D,
                                _finder3DMode,
                                _fileFitter3D,

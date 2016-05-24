@@ -90,6 +90,9 @@ namespace Belle2 {
                              bool fFitter3Ds2DFitDrift = 0,
                              double inefficiency = 0,
                              bool fileTSF = 0,
+                             bool fileETF = 0,
+                             int fverETF = 0,
+                             bool fprintFirmETF = 0,
                              bool fileHough3D = 0,
                              int finder3DMode = 0,
                              bool fileFitter3D = 0,
@@ -128,6 +131,9 @@ namespace Belle2 {
            bool fFitter3Ds2DFitDrift,
            double inefficiecny,
            bool fileTSF,
+           bool fileETF,
+           int fverETF,
+           bool fprintFirmETF,
            bool fileHough3D,
            int finder3DMode,
            bool fileFitter3D,
@@ -529,6 +535,15 @@ namespace Belle2 {
 
     /// Switch for TSF.root file.
     bool _fileTSF;
+
+    /// Switch for ETF.root file.
+    bool _fileETF;
+
+    /// Switch for selecting ETF version.
+    bool _fverETF;
+
+    /// Switch for printing Firmware inputs for ETF.
+    bool _fprintFirmETF;
 
     /// Switch for Hough3D.root file.
     bool _fileHough3D;

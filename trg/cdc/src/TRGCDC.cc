@@ -119,6 +119,9 @@ namespace Belle2 {
                     bool fFitter3Ds2DFitDrift,
                     double inefficiency,
                     bool fileTSF,
+                    bool fileETF,
+                    int fverETF,
+                    bool fprintFirmETF,
                     bool fileHough3D,
                     int finder3DMode,
                     bool fileFitter3D,
@@ -156,6 +159,9 @@ namespace Belle2 {
                         fFitter3Ds2DFitDrift,
                         inefficiency,
                         fileTSF,
+                        fileETF,
+                        fverETF,
+                        fprintFirmETF,
                         fileHough3D,
                         finder3DMode,
                         fileFitter3D,
@@ -221,6 +227,9 @@ namespace Belle2 {
                  bool fFitter3Ds2DFitDrift,
                  double inefficiency,
                  bool fileTSF,
+                 bool fileETF,
+                 int fverETF,
+                 bool fprintFirmETF,
                  bool fileHough3D,
                  int finder3DMode,
                  bool fileFitter3D,
@@ -249,6 +258,9 @@ namespace Belle2 {
     _fFitter3Ds2DFitDrift(fFitter3Ds2DFitDrift),
     _inefficiency(inefficiency),
     _fileTSF(fileTSF),
+    _fileETF(fileETF),
+    _fverETF(fverETF),
+    _fprintFirmETF(fprintFirmETF),
     _fileHough3D(fileHough3D),
     _finder3DMode(finder3DMode),
     _fileFitter3D(fileFitter3D),
@@ -435,7 +447,7 @@ namespace Belle2 {
     }
 
     //...event Time...
-    _eventTime.push_back(new TCEventTime(*this));
+    _eventTime.push_back(new TCEventTime(*this, _fileETF));
     _eventTime.back()->initialize();
 
     //...Make TSF's...
@@ -1979,7 +1991,7 @@ namespace Belle2 {
                     trackSegmentClockSimulation,
                     _segmentHits,
                     _segmentHitsSL);
-    _eventTime.back()->doit();
+    _eventTime.back()->doit(_fverETF, _fprintFirmETF);
 
     if (trackSegmentSimulationOnly) {
       TRGDebug::leaveStage("TRGCDC fastSimulation");

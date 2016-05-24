@@ -104,6 +104,9 @@ main(int argc, char* argv[])
   const unsigned fmclr = 0;
   const double inefficiency = 0;
   const unsigned fileTSF = 0;
+  const unsigned fileETF = 0;
+  const unsigned fverETF = 0;
+  const unsigned fprintFirmETF = 0;
   const unsigned fileHough3D = 0;
   const unsigned finder3DMode = 2;
   const unsigned fileFitter3D = 0;
@@ -131,6 +134,9 @@ main(int argc, char* argv[])
                                   fmclr,
                                   inefficiency,
                                   fileTSF,
+                                  fileETF,
+                                  fverETF,
+                                  fprintFirmETF,
                                   fileHough3D,
                                   finder3DMode,
                                   fileFitter3D,

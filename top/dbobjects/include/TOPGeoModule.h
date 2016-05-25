@@ -39,8 +39,10 @@ namespace Belle2 {
      * @param radius radius of the bar central plane in Belle II frame
      * @param phi azimuthal angle in Belle II frame
      * @param backwardZ z position of prism-bar joint in Belle II frame
+     * @param name object name
      */
-    TOPGeoModule(int moduleID, double radius, double phi, double backwardZ):
+    TOPGeoModule(int moduleID, double radius, double phi, double backwardZ,
+                 const std::string& name = "TOPModule"): TOPGeoBase(name),
       m_moduleID(moduleID), m_radius(radius), m_phi(phi), m_backwardZ(backwardZ)
     {}
 

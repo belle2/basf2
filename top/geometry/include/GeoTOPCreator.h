@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Petric, Marko Staric                               *
+ * Major revision: May-June 2016                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,6 +19,7 @@
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
+class G4Box;
 
 namespace Belle2 {
 
@@ -90,6 +92,93 @@ namespace Belle2 {
        * @return logical volume of one PMT
        */
       G4LogicalVolume* buildPMT(const TOPGeoPMT& geo);
+
+      // -- new creator ----------------------------------------------------
+
+      /**
+       * Assembles optical components (PMT array, prism and bar segments) along z
+       * @param geo geometry description
+       * @param pmtArray pre-created PMT array logical volume
+       * @param Lz array dimension in z
+       * @return assembly volume
+       */
+      G4AssemblyVolume* assembleOptics(const TOPGeoModule& geo,
+                                       G4LogicalVolume* pmtArray,
+                                       double Lz);
+
+      /**
+       * Creates quartz bar segment
+       * @param geo geometry description
+       * @return logical volume of bar segment
+       */
+      G4LogicalVolume* createBarSegment(const TOPGeoBarSegment& geo);
+
+      /**
+       * Creates quartz prism
+       * @param geo geometry description
+       * @return logical volume of prism
+       */
+      G4LogicalVolume* createPrism(const TOPGeoPrism& geo);
+
+      /**
+       * Creates quartz segment with spherical mirror
+       * @param geo geometry description
+       * @return logical volume of mirror segment
+       */
+      G4LogicalVolume* createMirrorSegment(const TOPGeoMirrorSegment& geo);
+
+      /**
+       * Creates PMT array
+       * @param geo geometry description
+       * @return logical volume of PMT array
+       */
+      G4LogicalVolume* createPMTArray(const TOPGeoPMTArray& geo);
+
+      /**
+       * Creates single PMT
+       * @param geo geometry description
+       * @return logical volume of one PMT
+       */
+      G4LogicalVolume* createPMT(const TOPGeoPMT& geo);
+
+      /**
+       * Creates material box
+       * @param name volume name
+       * @param A box x size
+       * @param B box y size
+       * @param C box z size
+       * @param materialName material name
+       * @return logical volume
+       */
+      G4LogicalVolume* createBox(std::string name,
+                                 double A, double B, double C,
+                                 std::string materialName);
+
+      /**
+       * Creates material volume that is intersection of box and half-sphere shell (z > 0)
+       * @param name volume name
+       * @param box box shape
+       * @param Rmin minimal radius of sphere shell
+       * @param Rmax maximal radius of sphere shell
+       * @param xc center of a sphere in x
+       * @param yc center of a sphere in y
+       * @param zc center of a sphere in z
+       * @param materialName material name
+       * @return logical volume
+       */
+      G4LogicalVolume* createBoxSphereIntersection(std::string name,
+                                                   G4Box* box,
+                                                   double Rmin, double Rmax,
+                                                   double xc, double yc, double zc,
+                                                   std::string materialName);
+
+      /**
+       * Adds number to string
+       * @param str string
+       * @param number number to be added
+       * @return string with a number
+       */
+      std::string addNumber(const std::string& str, unsigned number);
 
 
       SensitivePMT* m_sensitivePMT = 0;  /**< Sensitive vol. to register PMT hits */

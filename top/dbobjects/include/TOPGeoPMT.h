@@ -33,9 +33,11 @@ namespace Belle2 {
      * @param sizeX full size in x
      * @param sizeY full size in y
      * @param sizeZ full size in z
+     * @param name object name
      */
-    TOPGeoPMT(double sizeX, double sizeY, double sizeZ):
-      m_sizeX(sizeX), m_sizeY(sizeY), m_sizeZ(sizeZ)
+    TOPGeoPMT(double sizeX, double sizeY, double sizeZ,
+              const std::string& name = "TOPPMT"):
+      TOPGeoBase(name), m_sizeX(sizeX), m_sizeY(sizeY), m_sizeZ(sizeZ)
     {}
 
     /**

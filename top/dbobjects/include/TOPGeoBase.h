@@ -30,6 +30,25 @@ namespace Belle2 {
     {}
 
     /**
+     * Constructor with name
+     * @param name object name
+     */
+    TOPGeoBase(const std::string& name): m_name(name)
+    {}
+
+    /**
+     * Sets object name
+     * @param name object name
+     */
+    void setName(const std::string& name) {m_name = name;}
+
+    /**
+     * Returns object name
+     * @return object name
+     */
+    const std::string& getName() const {return m_name;}
+
+    /**
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
@@ -52,6 +71,8 @@ namespace Belle2 {
 
     static double s_unit; /**< conversion unit for length */
     static std::string s_unitName; /**< conversion unit name */
+
+    std::string m_name; /**< geometry object name */
 
     ClassDef(TOPGeoBase, 1); /**< ClassDef */
 

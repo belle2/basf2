@@ -34,9 +34,11 @@ namespace Belle2 {
      * @param thickness bar segment thickness
      * @param length bar segment length
      * @param material bar segment material name
+     * @param name object name
      */
     TOPGeoBarSegment(double width, double thickness, double length,
-                     const std::string& material):
+                     const std::string& material,
+                     const std::string& name = "TOPbarSegment"): TOPGeoBase(name),
       m_width(width), m_thickness(thickness), m_length(length), m_material(material)
     {}
 

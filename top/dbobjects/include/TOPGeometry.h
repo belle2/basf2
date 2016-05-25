@@ -37,6 +37,13 @@ namespace Belle2 {
     {}
 
     /**
+     * Constructor with name
+     * @param name object name
+     */
+    TOPGeometry(const std::string& name): TOPGeoBase(name)
+    {}
+
+    /**
      * Use basf2 units when returning geometry parameters
      */
     static void useBasf2Units() {s_unit = Unit::cm; s_unitName = "cm";}

@@ -37,6 +37,13 @@ namespace Belle2 {
     {}
 
     /**
+     * Constructor with name
+     * @param name object name
+     */
+    TOPNominalTTS(const std::string& name): TOPGeoBase(name)
+    {}
+
+    /**
      * Append Gaussian
      * @param norm normalization (area)
      * @param mean mean value [ns]

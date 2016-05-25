@@ -32,10 +32,20 @@ namespace Belle2 {
 
     /**
      * Full constructor
+     * @param x translation in x
+     * @param y translation in y
+     * @param z translation in z
+     * @param alpha rotation angle around x
+     * @param beta rotation angle around y
+     * @param gamma rotation angle around z
+     * @param name object name
      */
     TOPGeoModuleDisplacement(double x, double y, double z,
-                             double alpha, double beta, double gamma):
-      m_x(x), m_y(y), m_z(z), m_alpha(alpha), m_beta(beta), m_gamma(gamma)
+                             double alpha, double beta, double gamma,
+                             const std::string& name = "TOPModuleDisplacement"):
+      TOPGeoBase(name),
+      m_x(x), m_y(y), m_z(z),
+      m_alpha(alpha), m_beta(beta), m_gamma(gamma)
     {}
 
     /**

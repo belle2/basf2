@@ -32,10 +32,12 @@ namespace Belle2 {
      * @param thickness mirror segment thickness
      * @param length mirror segment length
      * @param material mirror segment material name
+     * @param name object name
      */
     TOPGeoMirrorSegment(double width, double thickness, double length,
-                        const std::string& material):
-      TOPGeoBarSegment(width, thickness, length, material)
+                        const std::string& material,
+                        const std::string& name = "TOPMirrorSegment"):
+      TOPGeoBarSegment(width, thickness, length, material, name)
     {}
 
     /**
@@ -77,6 +79,12 @@ namespace Belle2 {
     double getRadius() const {return m_radius / s_unit;}
 
     /**
+     * Returns spherical mirror outer radius of curvature
+     * @return radius
+     */
+    double getOuterRadius() const {return (m_radius + m_coatingThickness) / s_unit;}
+
+    /**
      * Returns spherical mirror center of curvature in x
      * @return center of curvature in x
      */
@@ -87,6 +95,12 @@ namespace Belle2 {
      * @return center of curvature in y
      */
     double getYc() const {return m_yc / s_unit;}
+
+    /**
+     * Returns spherical mirror center of curvature in z (in local frame of this segment)
+     * @return center of curvature in z
+     */
+    double getZc() const;
 
     /**
      * Returns reflective coating thickness

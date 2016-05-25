@@ -34,11 +34,13 @@ namespace Belle2 {
      * @param exitThickness thickness at PMT side
      * @param flatLenght length of the flat part at the bottom
      * @param material prism material name
+     * @param name object name
      */
     TOPGeoPrism(double width, double thickness, double length,
                 double exitThickness, double flatLength,
-                const std::string& material):
-      TOPGeoBarSegment(width, thickness, length, material),
+                const std::string& material,
+                const std::string& name = "TOPPrism"):
+      TOPGeoBarSegment(width, thickness, length, material, name),
       m_exitThickness(exitThickness), m_flatLength(flatLength)
     {}
 

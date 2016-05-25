@@ -23,6 +23,7 @@ std::string TOPGeoBase::s_unitName("cm");
 void TOPGeoBase::print(const std::string& title) const
 {
   cout << title << ":" << endl;
+  cout << " name: " << m_name << endl;
 }
 
 

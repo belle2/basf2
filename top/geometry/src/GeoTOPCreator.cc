@@ -3,7 +3,8 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Petric                                             *
+ * Contributors: Marko Petric, Marko Staric                               *
+ * Major revision: May-June 2016                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,9 +24,6 @@
 #include <simulation/kernel/RunManager.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -50,6 +48,8 @@
 #include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
 #include <G4Colour.hh>
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -86,7 +86,7 @@ namespace Belle2 {
 
     const TOPGeometry* GeoTOPCreator::createConfiguration(const GearDir& content)
     {
-      TOPGeometry* geo = new TOPGeometry();
+      TOPGeometry* geo = new TOPGeometry("TOPGeometryIdealized");
 
       // PMT array
 
@@ -139,6 +139,7 @@ namespace Belle2 {
       bar1.setGlue(barParams.getLength("Glue/Thicknes2"),
                    barParams.getString("Glue/GlueMaterial"));
       bar1.setSurface(barSurface, sigmaAlpha);
+      bar1.setName(bar1.getName() + "1");
 
       TOPGeoBarSegment bar2(barParams.getLength("QWidth"),
                             barParams.getLength("QThickness"),
@@ -147,6 +148,7 @@ namespace Belle2 {
       bar2.setGlue(barParams.getLength("Glue/Thicknes1"),
                    barParams.getString("Glue/GlueMaterial"));
       bar2.setSurface(barSurface, sigmaAlpha);
+      bar2.setName(bar2.getName() + "2");
 
       TOPGeoMirrorSegment mirror(barParams.getLength("QWidth"),
                                  barParams.getLength("QThickness"),
@@ -180,7 +182,9 @@ namespace Belle2 {
       double backwardZ = barParams.getLength("QZBackward");
       int numModules = barParams.getInt("Nbar");
       for (int i = 0; i < numModules; i++) {
-        TOPGeoModule module(i + 1, radius, phi, backwardZ);
+        unsigned id = i + 1;
+        TOPGeoModule module(id, radius, phi, backwardZ);
+        module.setName(addNumber(module.getName(), id));
         module.setBarSegment1(bar1);
         module.setBarSegment2(bar2);
         module.setMirrorSegment(mirror);
@@ -190,7 +194,6 @@ namespace Belle2 {
         // module.setModuleDisplacement(moduleDispl);
         geo->appendModule(module);
         phi += 2 * M_PI / numModules;
-
       }
 
       // boardstack
@@ -219,7 +222,7 @@ namespace Belle2 {
       // nominal TTS
 
       GearDir ttsParams(content, "PMTs/TTS");
-      TOPNominalTTS nominalTTS;
+      TOPNominalTTS nominalTTS("TOPNominalTTS");
       for (const GearDir& Gauss : ttsParams.getNodes("Gauss")) {
         nominalTTS.appendGaussian(Gauss.getDouble("fraction"),
                                   Gauss.getTime("mean"),
@@ -278,6 +281,21 @@ namespace Belle2 {
       m_topgp->Initialize(content);
       m_topgp->setGeanUnits();
       m_geo->useGeantUnits();
+
+      // test ---------------------------->
+      bool test = false;
+      if (test) {
+        auto* pmtArray = createPMTArray(m_geo->getPMTArray());
+        double Lz = m_geo->getPMTArray().getPMT().getSizeZ();
+        auto* optics = assembleOptics(m_geo->getModule(1), pmtArray, Lz);
+        G4ThreeVector move;
+        G4RotationMatrix rot;
+        move.setX(m_geo->getModule(1).getBackwardZ());
+        rot.rotateY(M_PI / 2);
+        optics->MakeImprint(&topVolume, move, &rot);
+        return;
+      }
+      // end <----------------------------
 
       // build one module
       G4LogicalVolume* module = buildTOPModule(*m_geo, 1);
@@ -416,8 +434,21 @@ namespace Belle2 {
 
       /* Build quartz bar and insert it into the air */
 
-      G4ThreeVector transa(0, 0, 0);
-      buildBar(geo, moduleID)->MakeImprint(air, transa, 0, 100, false);
+      // bool old = false;
+      bool old = true;
+      if (old) {
+        G4ThreeVector transa(0, 0, 0);
+        buildBar(geo, moduleID)->MakeImprint(air, transa, 0, 100, false);
+      } else {
+        auto* pmtArray = createPMTArray(geo.getPMTArray());
+        double Lz = geo.getPMTArray().getPMT().getSizeZ();
+        auto* optics = assembleOptics(geo.getModule(moduleID), pmtArray, Lz);
+        G4ThreeVector move;
+        G4RotationMatrix rot;
+        move.setX(geo.getModule(1).getBackwardZ());
+        rot.rotateY(M_PI / 2);
+        optics->MakeImprint(air, move, &rot);
+      }
 
       /* Add electronics, this part is not finished, just for backgound studies */
 
@@ -462,6 +493,338 @@ namespace Belle2 {
 
     }
 
+
+
+    // ---- new creator --------------------------------------------------------------
+
+    G4AssemblyVolume* GeoTOPCreator::assembleOptics(const TOPGeoModule& geo,
+                                                    G4LogicalVolume* pmtArray,
+                                                    double La)
+    {
+
+      auto* optics = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(optics);
+
+      double Lm = geo.getMirrorSegment().getFullLength();
+      double L1 = geo.getBarSegment1().getFullLength();
+      double L2 = geo.getBarSegment2().getFullLength();
+      double Lp = geo.getPrism().getFullLength();
+
+      // note: z = 0 is at prism-bar joint
+
+      double Dy = (geo.getPrism().getThickness() - geo.getPrism().getExitThickness()) / 2;
+      G4ThreeVector moveArray(geo.getPMTArrayDisplacement().getX(),
+                              geo.getPMTArrayDisplacement().getY() + Dy,
+                              -(Lp + La / 2));
+      G4RotationMatrix rotArray;
+      rotArray.rotateZ(geo.getPMTArrayDisplacement().getAlpha());
+      optics->AddPlacedVolume(pmtArray, moveArray, &rotArray);
+
+      G4ThreeVector move;
+      G4RotationMatrix rot;
+
+      auto* prism = createPrism(geo.getPrism());
+      move.setZ(0);
+      rot.rotateY(M_PI / 2);
+      optics->AddPlacedVolume(prism, move, &rot);
+
+      auto* barSegment2 = createBarSegment(geo.getBarSegment2());
+      move.setZ(L2 / 2);
+      optics->AddPlacedVolume(barSegment2, move, 0);
+
+      auto* barSegment1 = createBarSegment(geo.getBarSegment1());
+      move.setZ(L2 + L1 / 2);
+      optics->AddPlacedVolume(barSegment1, move, 0);
+
+      auto* mirrorSegment = createMirrorSegment(geo.getMirrorSegment());
+      move.setZ(L2 + L1 + Lm / 2);
+      optics->AddPlacedVolume(mirrorSegment, move, 0);
+
+      return optics;
+    }
+
+
+    G4LogicalVolume* GeoTOPCreator::createBarSegment(const TOPGeoBarSegment& geo)
+    {
+      G4Transform3D move;
+
+      // mother volume
+      auto* bar = createBox(geo.getName(),
+                            geo.getWidth(), geo.getThickness(), geo.getFullLength(),
+                            geo.getMaterial());
+      // glue
+      auto* glue = createBox(geo.getName() + "Glue",
+                             geo.getWidth(), geo.getThickness(), geo.getGlueThickness(),
+                             geo.getGlueMaterial());
+
+      // place glue to -z side
+      move = G4TranslateZ3D(-(geo.getFullLength() - geo.getGlueThickness()) / 2);
+      new G4PVPlacement(move, glue, geo.getName() + "Glue", bar, false, 1);
+
+      // optical surface
+      auto& materials = Materials::getInstance();
+      auto* optSurf = materials.createOpticalSurface(geo.getSurface());
+      optSurf->SetSigmaAlpha(geo.getSigmaAlpha());
+      new G4LogicalSkinSurface("opticalSurface", bar, optSurf);
+
+      // Activate sensitive volume
+      bar->SetSensitiveDetector(m_sensitiveBar);
+
+      return bar;
+    }
+
+
+    G4LogicalVolume* GeoTOPCreator::createMirrorSegment(const TOPGeoMirrorSegment& geo)
+    {
+      G4Transform3D move;
+
+      // box of the bar
+      auto* box = new G4Box(geo.getName(),
+                            geo.getWidth() / 2, geo.getThickness() / 2,
+                            geo.getFullLength() / 2);
+
+      // mother volume
+      auto* bar = createBoxSphereIntersection(geo.getName(),
+                                              box,
+                                              0, geo.getOuterRadius(),
+                                              geo.getXc(), geo.getYc(), geo.getZc(),
+                                              geo.getMaterial());
+
+      // glue
+      auto* glue = createBox(geo.getName() + "Glue",
+                             geo.getWidth(), geo.getThickness(), geo.getGlueThickness(),
+                             geo.getGlueMaterial());
+
+      // place glue to -z side
+      move = G4TranslateZ3D(-(geo.getFullLength() - geo.getGlueThickness()) / 2);
+      new G4PVPlacement(move, glue, geo.getName() + "Glue", bar, false, 1);
+
+      // bar optical surface
+      auto& materials = Materials::getInstance();
+      auto* optSurf = materials.createOpticalSurface(geo.getSurface());
+      optSurf->SetSigmaAlpha(geo.getSigmaAlpha());
+      new G4LogicalSkinSurface("opticalSurface", bar, optSurf);
+
+      // mirror reflective coating
+      auto* mirror = createBoxSphereIntersection(geo.getName() + "ReflectiveCoating",
+                                                 box,
+                                                 geo.getRadius(), geo.getOuterRadius(),
+                                                 geo.getXc(), geo.getYc(), geo.getZc(),
+                                                 geo.getCoatingMaterial());
+
+      // mirror optical surface
+      auto* mirrorSurf = materials.createOpticalSurface(geo.getCoatingSurface());
+      new G4LogicalSkinSurface("mirrorSurface", mirror, mirrorSurf);
+
+      // place reflective coating
+      move = G4TranslateZ3D(0);
+      new G4PVPlacement(move, mirror, geo.getName() + "ReflectiveCoating", bar, false, 1);
+
+      // Activate sensitive volume
+      bar->SetSensitiveDetector(m_sensitiveBar);
+
+      return bar;
+    }
+
+
+    G4LogicalVolume* GeoTOPCreator::createPrism(const TOPGeoPrism& geo)
+    {
+      G4Transform3D move;
+
+      // mother volume
+      std::vector<G4TwoVector> polygon;
+      polygon.push_back(G4TwoVector(0, geo.getThickness() / 2));
+      polygon.push_back(G4TwoVector(0, -geo.getThickness() / 2));
+      polygon.push_back(G4TwoVector(geo.getLength() - geo.getFlatLength(),
+                                    geo.getThickness() / 2 - geo.getExitThickness()));
+      polygon.push_back(G4TwoVector(geo.getFullLength(),
+                                    geo.getThickness() / 2 - geo.getExitThickness()));
+      polygon.push_back(G4TwoVector(geo.getFullLength(), geo.getThickness() / 2));
+
+      auto* volume = new G4ExtrudedSolid(geo.getName(), polygon, geo.getWidth() / 2,
+                                         G4TwoVector(), 1, G4TwoVector(), 1);
+      G4Material* material = Materials::get(geo.getMaterial());
+      if (!material) B2FATAL("Material '" << geo.getMaterial() << "' not found");
+      auto* prism = new G4LogicalVolume(volume, material, geo.getName());
+
+      // wavelenght filter
+      auto* filter = createBox(geo.getName() + "Filter",
+                               geo.getFilterThickness(), geo.getExitThickness(),
+                               geo.getWidth(),
+                               geo.getFilterMaterial());
+
+      // place filter to +x side
+      move = G4Translate3D(geo.getFullLength() - geo.getFilterThickness() / 2,
+                           (geo.getThickness() - geo.getExitThickness()) / 2,
+                           0);
+      new G4PVPlacement(move, filter, geo.getName() + "Filter", prism, false, 1);
+
+      // optical surface
+      auto& materials = Materials::getInstance();
+      auto* optSurf = materials.createOpticalSurface(geo.getSurface());
+      optSurf->SetSigmaAlpha(geo.getSigmaAlpha());
+      new G4LogicalSkinSurface("opticalSurface", prism, optSurf);
+
+      // Activate sensitive volume
+      //      prism->SetSensitiveDetector(m_sensitiveBar);
+
+      return prism;
+    }
+
+
+    G4LogicalVolume* GeoTOPCreator::createPMTArray(const TOPGeoPMTArray& geo)
+    {
+      // mother volume
+      auto* array = createBox(geo.getName(),
+                              geo.getSizeX(), geo.getSizeY(),
+                              geo.getPMT().getSizeZ(),
+                              geo.getMaterial());
+
+      // single PMT
+      auto* pmt = createPMT(geo.getPMT());
+
+      // place PMT's
+      for (unsigned row = 1; row <= geo.getNumRows(); row++) {
+        for (unsigned col = 1; col <= geo.getNumColumns(); col++) {
+          G4Transform3D move = G4Translate3D(geo.getX(col), geo.getY(row), 0);
+          auto id = geo.getPmtID(row, col);
+          new G4PVPlacement(move, pmt, addNumber(geo.getPMT().getName(), id), array,
+                            false, id);
+        }
+      }
+
+      return array;
+    }
+
+
+    G4LogicalVolume* GeoTOPCreator::createPMT(const TOPGeoPMT& geo)
+    {
+      G4Transform3D move;
+
+      // mother volume
+      auto* pmt = createBox(geo.getName(),
+                            geo.getSizeX(), geo.getSizeY(), geo.getSizeZ(),
+                            geo.getWallMaterial());
+
+      // window + photocathode + reflective edge
+      double winThickness = geo.getWinThickness() + geo.getReflEdgeThickness();
+      auto* window = createBox(geo.getName() + "Window",
+                               geo.getSizeX(), geo.getSizeY(),
+                               winThickness,
+                               geo.getWinMaterial());
+      auto* photoCathode = createBox(geo.getName() + "PhotoCathode",
+                                     geo.getSensSizeX(), geo.getSensSizeY(),
+                                     geo.getSensThickness(),
+                                     geo.getSensMaterial());
+      photoCathode->SetSensitiveDetector(m_sensitivePMT); // Activate sensitive area
+
+      move = G4TranslateZ3D(-(winThickness - geo.getSensThickness()) / 2
+                            + geo.getReflEdgeThickness());
+      new G4PVPlacement(move, photoCathode, geo.getName() + "PhotoCathode", window,
+                        false, 1);
+
+      auto* reflEdge = createBox(geo.getName() + "ReflectiveEdge",
+                                 geo.getSizeX(), geo.getSizeY(),
+                                 geo.getReflEdgeThickness(),
+                                 geo.getWallMaterial());
+      double holeSizeX = geo.getSizeX() - 2 * geo.getReflEdgeWidth();
+      double holeSizeY = geo.getSizeY() - 2 * geo.getReflEdgeWidth();
+      if (holeSizeX > 0 and holeSizeY > 0) {
+        auto* hole = createBox(geo.getName() + "ReflectiveEdgeHole",
+                               holeSizeX, holeSizeY,
+                               geo.getReflEdgeThickness(),
+                               geo.getFillMaterial());
+        move = G4TranslateZ3D(0.0);
+        new G4PVPlacement(move, hole, geo.getName() + "ReflectiveEdgeHole", reflEdge,
+                          false, 1);
+      }
+
+      auto& materials = Materials::getInstance();
+      auto* optSurf = materials.createOpticalSurface(geo.getReflEdgeSurface());
+      new G4LogicalSkinSurface("reflectiveEdgeSurface", reflEdge, optSurf);
+
+      move = G4TranslateZ3D(-(winThickness - geo.getReflEdgeThickness()) / 2);
+      new G4PVPlacement(move, reflEdge, geo.getName() + "ReflectiveEdge", window,
+                        false, 1);
+
+      move = G4TranslateZ3D((geo.getSizeZ() - winThickness) / 2);
+      new G4PVPlacement(move, window, geo.getName() + "Window", pmt, false, 1);
+
+      // bottom
+      if (geo.getBotMaterial() != geo.getWallMaterial()) {
+        auto* bottom = createBox(geo.getName() + "Bottom",
+                                 geo.getSizeX(), geo.getSizeY(), geo.getBotThickness(),
+                                 geo.getBotMaterial());
+        move = G4TranslateZ3D(-(geo.getSizeZ() - geo.getBotThickness()) / 2);
+        new G4PVPlacement(move, bottom, geo.getName() + "Bottom", pmt, false, 1);
+      }
+
+      // interior
+      double interiorSizeZ = geo.getSizeZ() - winThickness - geo.getBotThickness();
+      auto* interior = createBox(geo.getName() + "Interior",
+                                 geo.getSizeX() - 2 * geo.getWallThickness(),
+                                 geo.getSizeY() - 2 * geo.getWallThickness(),
+                                 interiorSizeZ,
+                                 geo.getBotMaterial());
+      move = G4TranslateZ3D(-(geo.getSizeZ() - interiorSizeZ) / 2
+                            + geo.getBotThickness());
+      new G4PVPlacement(move, interior, geo.getName() + "Interior", pmt, false, 1);
+
+      return pmt;
+    }
+
+
+    G4LogicalVolume* GeoTOPCreator::createBox(std::string name,
+                                              double A, double B, double C,
+                                              std::string materialName)
+    {
+      G4Box* box = new G4Box(name, A / 2, B / 2, C / 2);
+      G4Material* material = Materials::get(materialName);
+      if (!material) B2FATAL("Material '" << materialName << "' not found");
+      return new G4LogicalVolume(box, material, name);
+    }
+
+
+    G4LogicalVolume* GeoTOPCreator::createBoxSphereIntersection(std::string name,
+                                                                G4Box* box,
+                                                                double Rmin,
+                                                                double Rmax,
+                                                                double xc,
+                                                                double yc,
+                                                                double zc,
+                                                                std::string materialName)
+    {
+      auto* sphere = new G4Sphere(name + "HalfSphere",
+                                  Rmin, Rmax, 0, 2 * M_PI, 0, M_PI / 2);
+      G4Translate3D move(xc, yc, zc);
+      auto* shape = new G4IntersectionSolid(name, box, sphere, move);
+
+      G4Material* material = Materials::get(materialName);
+      if (!material) B2FATAL("Material '" << materialName << "' not found");
+      return new G4LogicalVolume(shape, material, name);
+    }
+
+
+    std::string GeoTOPCreator::addNumber(const std::string& str, unsigned number)
+    {
+      stringstream ss;
+      if (number < 10) {
+        ss << str << "0" << number;
+      } else {
+        ss << str << number;
+      }
+      string out;
+      ss >> out;
+      return out;
+    }
+
+
+
+
+
+    // =============================================================================
+    // ---- old creator ------------------------------------------------------------
+    // =============================================================================
 
 
     G4AssemblyVolume* GeoTOPCreator::buildBar(const TOPGeometry& geo, int moduleID)
@@ -697,6 +1060,7 @@ namespace Belle2 {
 
       // get the PMT stack and position it
       G4LogicalVolume* stack = buildPMTstack(geo.getPMTArray());
+      // G4LogicalVolume* stack = createPMTArray(geo.getPMTArray());
 
       double pmtSizez = geo.getPMTArray().getPMT().getSizeZ();
       double dz = Bposition - WLength - Gwidth1 - dGlue - pmtSizez / 2.0;
@@ -738,8 +1102,6 @@ namespace Belle2 {
 
       return array;
     }
-
-
 
 
     G4LogicalVolume* GeoTOPCreator::buildPMT(const TOPGeoPMT& geo)
@@ -853,5 +1215,6 @@ namespace Belle2 {
       return PMT;
     }
 
-  }
-}
+
+  } // name space TOP
+} // name space Belle2

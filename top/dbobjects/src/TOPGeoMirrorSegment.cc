@@ -16,6 +16,18 @@
 using namespace std;
 using namespace Belle2;
 
+double TOPGeoMirrorSegment::getZc() const
+{
+  double dx = fabs(getXc()) - getWidth() / 2;
+  double dy = fabs(getYc()) - getThickness() / 2;
+  double z = getOuterRadius();
+  if (dx > 0) z = sqrt(z * z - dx * dx);
+  if (dy > 0) z = sqrt(z * z - dy * dy);
+
+  return getFullLength() / 2 - z;
+}
+
+
 bool TOPGeoMirrorSegment::isConsistent() const
 {
   if (m_radius <= 0) return false;

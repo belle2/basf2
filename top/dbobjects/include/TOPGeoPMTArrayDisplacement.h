@@ -32,9 +32,11 @@ namespace Belle2 {
      * @param x translation in x
      * @param y translation in y
      * @param alpha rotation angle around z
+     * @param name object name
      */
-    TOPGeoPMTArrayDisplacement(double x, double y, double alpha):
-      m_x(x), m_y(y), m_alpha(alpha)
+    TOPGeoPMTArrayDisplacement(double x, double y, double alpha,
+                               const std::string& name = "TOPPMTArrayDisplacement"):
+      TOPGeoBase(name), m_x(x), m_y(y), m_alpha(alpha)
     {}
 
     /**

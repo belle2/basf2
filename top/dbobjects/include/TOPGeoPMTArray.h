@@ -35,11 +35,14 @@ namespace Belle2 {
      * @param gapY gap between PMT's in y
      * @param material material name into which PMT's are inserted
      * @param pmt PMT geometry parameters
+     * @param name object name
      */
     TOPGeoPMTArray(unsigned numColumns, unsigned numRows,
                    double gapX, double gapY,
                    const std::string& material,
-                   const TOPGeoPMT& pmt):
+                   const TOPGeoPMT& pmt,
+                   const std::string& name = "TOPPMTArray"):
+      TOPGeoBase(name),
       m_numRows(numRows), m_numColumns(numColumns), m_dx(gapX), m_dy(gapY),
       m_gx(gapX), m_gy(gapY), m_material(material), m_pmt(pmt)
     {

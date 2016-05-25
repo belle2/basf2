@@ -44,6 +44,7 @@ namespace Belle2 {
      * @param doubleHitResolution double hit resolution time
      * @param timeJitter r.m.s. of time jitter
      * @param efficiency electronic efficiency (fraction of hits above threshold)
+     * @param name object name
      */
     TOPNominalTDC(int numWindows,
                   int subBits,
@@ -52,7 +53,8 @@ namespace Belle2 {
                   double pileupTime,
                   double doubleHitResolution,
                   double timeJitter,
-                  double efficiency);
+                  double efficiency,
+                  const std::string& name = "TOPNominalTDC");
 
     /**
      * Useful constructor (old xml file version)
@@ -63,6 +65,7 @@ namespace Belle2 {
      * @param doubleHitResolution double hit resolution time
      * @param timeJitter r.m.s. of time jitter
      * @param efficiency electronic efficiency (fraction of hits above threshold)
+     * @param name object name
      */
     TOPNominalTDC(unsigned numBits,
                   double binWidth,
@@ -70,7 +73,9 @@ namespace Belle2 {
                   double pileupTime,
                   double doubleHitResolution,
                   double timeJitter,
-                  double efficiency):
+                  double efficiency,
+                  const std::string& name = "TOPNominalTDCold"):
+      TOPGeoBase(name),
       m_offset(offset),
       m_pileupTime(pileupTime),
       m_doubleHitResolution(doubleHitResolution),

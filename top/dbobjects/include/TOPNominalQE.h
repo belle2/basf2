@@ -33,9 +33,11 @@ namespace Belle2 {
      * @param lambdaStep wavelength step [nm]
      * @param CE collection efficiency
      * @param qe quantum efficiency data points
+     * @param name object name
      */
     TOPNominalQE(float lambdaFirst, float lambdaStep, float CE,
-                 const std::vector<float>& qe):
+                 const std::vector<float>& qe,
+                 const std::string& name = "TOPNominalQE"): TOPGeoBase(name),
       m_lambdaFirst(lambdaFirst), m_lambdaStep(lambdaStep), m_CE(CE), m_QE(qe)
     {}
 

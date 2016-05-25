@@ -25,7 +25,9 @@ TOPNominalTDC::TOPNominalTDC(int numWindows,
                              double pileupTime,
                              double doubleHitResolution,
                              double timeJitter,
-                             double efficiency):
+                             double efficiency,
+                             const std::string& name):
+  TOPGeoBase(name),
   m_numWindows(numWindows), m_subBits(subBits), m_syncTimeBase(syncTimeBase),
   m_offset(offset), m_pileupTime(pileupTime), m_doubleHitResolution(doubleHitResolution),
   m_timeJitter(timeJitter), m_efficiency(efficiency)

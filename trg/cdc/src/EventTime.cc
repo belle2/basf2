@@ -151,7 +151,7 @@ namespace Belle2{
 
   void TRGCDCEventTime::oldVer(void){
     TRGDebug::enterStage("Event Time");
-    double m_histT=65535;
+    int m_histT=65535;
     for (unsigned i=0; i<_cdc.nSegmentLayers(); i++){
       const Belle2::TRGCDCLayer *l=_cdc.segmentLayer(i);
       const unsigned nWires = l->nCells();
@@ -162,7 +162,7 @@ namespace Belle2{
         if(timing.active()){
           for(unsigned k=0; k<wires.size(); k++){
             if(wires[k]->hit()){
-              double dt= wires[k]->signal()[0]->time();
+              int dt= wires[k]->signal()[0]->time();
               if(m_histT>dt) m_histT=dt;
             }
           }
@@ -205,14 +205,12 @@ namespace Belle2{
 
 
   double TRGCDCEventTime::getT0 (void)const{
-    TRGDebug::enterStage("Event Time");
     if (m_ver==2){
       return 0;
     }
     else{
       int et = m_histT;
       if(m_foundT0 == 0) et = 9999;
-      TRGDebug::leaveStage("Event Time");
       return et;
     }
   }

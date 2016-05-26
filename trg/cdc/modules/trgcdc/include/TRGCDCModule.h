@@ -173,7 +173,7 @@ namespace Belle2 {
     bool _fileETF;
 
     /// Switch for selecting ETF version.
-    bool _fverETF;
+    int _fverETF;
 
     /// Switch for printing Firmware inputs for ETF.
     bool _fprintFirmETF;

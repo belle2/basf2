@@ -35,3 +35,15 @@ boost::python::list DAQDBObject::getFieldNames() const throw()
   }
   return py_list;
 }
+
+boost::python::list DAQDBObject::getNameList(bool showall) const throw()
+{
+  StringList names = m_obj.getNameList(showall);
+  boost::python::list py_list;
+
+  for (StringList::iterator it = names.begin();
+       it != names.end(); it++) {
+    py_list.append(*it);
+  }
+  return py_list;
+}

@@ -24,10 +24,12 @@ namespace Belle2 {
     int getIndex() const { return m_obj.getIndex(); }
     void setIndex(int index) { m_obj.setIndex(index); }
     boost::python::list getFieldNames() const throw();
+    boost::python::list getNameList(bool showall) const throw();
     DBField::Type getProperty(const std::string& name) const throw(std::out_of_range)
     {
       return m_obj.getProperty(name).getType();
     }
+    void print() const throw() { m_obj.print(); }
     bool hasField(const std::string& name) const throw() { return m_obj.hasField(name); }
     bool hasValue(const std::string& name) const throw() { return m_obj.hasValue(name); }
     bool hasText(const std::string& name) const throw() { return m_obj.hasText(name); }

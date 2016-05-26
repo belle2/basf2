@@ -448,7 +448,7 @@ namespace Belle2 {
           s1 = sint;
         }
 
-        const G4int ic(3);  // cubic approximation of the track
+        //        const G4int ic(3);  // cubic approximation of the track
         G4int    flag(0);
         G4double edep_in_cell(0.);
         G4double eLossInCell(0.);
@@ -462,7 +462,7 @@ namespace Belle2 {
                     std::endl;
           std::cout << "s1,s2,ic= " << s1 << " " << s2 << " " << ic << std::endl;
 #endif
-          CellBound(layerId, cel1, cel2, vent, vext, s1, s2, ic, xint, sint, flag);
+          CellBound(layerId, cel1, cel2, vent, vext, s1, s2, xint, sint, flag);
 #if defined(CDC_DEBUG)
           std::cout << "flag,sint= " << flag << " " << sint << std::endl;
           std::cout << "xint= " << xint[0] << " " << xint[1] << " " << xint[2] << " " << xint[3] << " " << xint[4] << " " << xint[5] <<
@@ -862,37 +862,33 @@ namespace Belle2 {
                                   const G4double venter[6],
                                   const G4double vexit[6],
                                   const G4double s1, const G4double s2,
-                                  const G4int ic, G4double xint[6],
+                                  G4double xint[6],
                                   G4double& sint, G4int& iflag)
   {
-    //~dead copy of gsim_cdc_cellbound.F in gsim-cdc for Belle (for tentaive use)
     //---------------------------------------------------------------------------
     // (Purpose)
-    //    calculate intersection of track with cell boundary.
+    //    calculate an intersection of track with cell boundary.
     //
     // (Relations)
-    //    Calls       RotVec, GIPLAN
+    //    Calls       GCUBS
     //
     // (Arguments)
     //   input
-    //     ic1        integer * 4   #cell(serial) of entrance.
-    //     ic2        integer * 4   #cell(serial) of exit.
-    //     venter(6)  real * 4      (x,y,z,px/p,py/p,pz/p) at entrance.
-    //     vexit(6)   real * 4      (x,y,z,px/p,py/p,pz/p) at exit.
-    //     s1         real * 4      track length at entrance.
-    //     s2         real * 4      track length at exit.
-    //     ic         integer * 4   mode for GIPLAN ( ic=3: cubic model )
+    //     ic1        serial cell# (start w/ one) of entrance.
+    //     ic2        serial cell# (start w/ one) of exit.
+    //     venter(6)  (x,y,z,px/p,py/p,pz/p) at entrance.
+    //     vexit(6)   (x,y,z,px/p,py/p,pz/p) at exit.
+    //     s1         track length at entrance.
+    //     s2         track length at exit.
     //   output
-    //     xint(6)    real * 4      (x,y,z,px/p,py/p,pz/p) at intersection of
-    //                              cell boundary.
-    //     sint       real * 4      track length at intersection of cell
-    //                              boundary.
-    //     iflag      integer * 4   return code from GIPLAN.
-    //---------------------------------------------------------------------------
-    const G4double yshift = 0.5;
+    //     xint(6)    (x,y,z,px/p,py/p,pz/p) at intersection of cell boundary.
+    //     sint       track length at intersection of cell boundary.
+    //     iflag      return code.
+    //
+    // N.B.(TODO ?) CDC misalignment wrt Belle2 coordinate system is ignored
+    // when calculating the cell-boundary assuming misalign. is small.
+    //--------------------------------------------------------------------------
 
-    //main
-    G4int irTry = 0;
     G4double div   = m_cdcgp.nWiresInLayer(layerId);
 
     //Check if s1, s2, ic1 and ic2 are ok
@@ -907,38 +903,13 @@ namespace Belle2 {
       }
     }
 
-    // Calculate forward/backward position of current wire
-    const TVector3 fw0 = m_cdcgp.wireForwardPosition(layerId, 0);
-    const TVector3 bw0 = m_cdcgp.wireBackwardPosition(layerId, 0);
-
-    G4double slant;
-    if (0 == m_cdcgp.nShifts(layerId)) {
-      slant = 0.0;
-    } else {
-      double delfi = double(m_cdcgp.nShifts(layerId)) * CLHEP::pi / m_cdcgp.nWiresInLayer(layerId);
-      double sinhdel = std::sin(delfi / 2.0);
-      double z1 = fw0.z();
-      double z2 = bw0.z();
-      slant = std::atan2(2.0 * (m_cdcgp.senseWireR(layerId)) * sinhdel, z1 - z2);
-      //      std::cout << "slant  = " << slant   << std::endl;
-#if defined(CDC_DEBUG)
-      std::cout << "nwires = " << m_cdcgp.nWiresInLayer(layerId) << std::endl;
-      std::cout << "nshift = " << m_cdcgp.nShifts(layerId) << std::endl;
-      std::cout << "delfi  = " << delfi   << std::endl;
-#endif
-    }
-#if defined(CDC_DEBUG)
-    std::cout << "layerId,slant= " << layerId << " " << slant << std::endl;
-    std::cout << "R      = " << m_cdcgp.senseWireR(layerId) << std::endl;
-    std::cout << "z1,z2  = " << fw0.z() << " " << bw0.z() << std::endl;
-    std::cout << "nshifts= " << m_cdcgp.nShifts(layerId) << std::endl;
-#endif
-    G4double xwb   = (m_cdcgp.wireBackwardPosition(layerId, ic1 - 1)).x();
-    G4double ywb   = (m_cdcgp.wireBackwardPosition(layerId, ic1 - 1)).y();
-    G4double zwb   = (m_cdcgp.wireBackwardPosition(layerId, ic1 - 1)).z();
-    G4double xwf   = (m_cdcgp.wireForwardPosition(layerId, ic1 - 1)).x();
-    G4double ywf   = (m_cdcgp.wireForwardPosition(layerId, ic1 - 1)).y();
-    G4double zwf   = (m_cdcgp.wireForwardPosition(layerId, ic1 - 1)).z();
+    //get wire positions for the entrance cell
+    G4double xwb = (m_cdcgp.wireBackwardPosition(layerId, ic1 - 1)).x();
+    G4double ywb = (m_cdcgp.wireBackwardPosition(layerId, ic1 - 1)).y();
+    G4double zwb = (m_cdcgp.wireBackwardPosition(layerId, ic1 - 1)).z();
+    G4double xwf = (m_cdcgp.wireForwardPosition(layerId,  ic1 - 1)).x();
+    G4double ywf = (m_cdcgp.wireForwardPosition(layerId,  ic1 - 1)).y();
+    G4double zwf = (m_cdcgp.wireForwardPosition(layerId,  ic1 - 1)).z();
 
     /*
     G4double pathl = sqrt((vexit[0] - venter[0]) * (vexit[0] - venter[0])
@@ -958,123 +929,116 @@ namespace Belle2 {
       xx2[i] = vexit [i];
     }
 
-    //calculate rotation angles for phi & theta
-    G4int mode;
-    G4double psi, cospsi, sinpsi, phi, theta;
-    G4double xfwb, yfwb, zfwb, xfwf, yfwf, zfwf;
-    G4double zw = 0.0;
-
-    psi = double(ic2 - ic1) * CLHEP::pi / div;
+    //calculate the field wire position betw. cell#1 and #2
+    G4double psi = double(ic2 - ic1) * CLHEP::pi / div;
     if (ic1 == 1 && ic2 == div) {
       psi = -CLHEP::pi / div;
     } else if (ic1 == div && ic2 == 1) {
       psi =  CLHEP::pi / div;
     }
-    cospsi = cos(psi);
-    sinpsi = sin(psi);
+    G4double cospsi = cos(psi);
+    G4double sinpsi = sin(psi);
 
-    if (slant == 0.0) {
-      mode  = 2;
-      theta = 0.;
-      xfwb   = cospsi * xwb - sinpsi * ywb;
-      yfwb   = sinpsi * xwb + cospsi * ywb;
-      phi = atan2(yfwb, xfwb);
-      if (phi < 0.0) phi += 2.*CLHEP::pi;
+    G4double xfwb = cospsi * xwb - sinpsi * ywb;
+    G4double yfwb = sinpsi * xwb + cospsi * ywb;
+    G4double xfwf = cospsi * xwf - sinpsi * ywf;
+    G4double yfwf = sinpsi * xwf + cospsi * ywf;
+    G4double zfwb = zwb;
+    G4double zfwf = zwf;
+
+    //prepare quantities related to the cell-boundary
+    G4double vx = xfwf - xfwb;
+    G4double vy = yfwf - yfwb;
+    G4double vz = zfwf - zfwb;
+    G4double vv = sqrt(vx * vx + vy * vy + vz * vz);
+    vx /= vv;  vy /= vv;  vz /= vv;
+
+    //translate to make the cubic description easier
+    G4double shiftx = (xx1[0] + xx2[0]) * 0.5;
+    G4double shifty = (xx1[1] + xx2[1]) * 0.5;
+    G4double shiftz = (xx1[2] + xx2[2]) * 0.5;
+    G4double shifts = (s1     +     s2) * 0.5;
+    G4double xshft = xx1[0] - shiftx;
+    G4double yshft = xx1[1] - shifty;
+    G4double zshft = xx1[2] - shiftz;
+    G4double sshft = s1     - shifts;
+
+    //approximate the trajectroy by cubic curves
+    G4double pabs1 = sqrt(xx1[3] * xx1[3] + xx1[4] * xx1[4] + xx1[5] * xx1[5]);
+    G4double pabs2 = sqrt(xx2[3] * xx2[3] + xx2[4] * xx2[4] + xx2[5] * xx2[5]);
+    //      std::cout << "pabs1,2= " << pabs1 <<" "<< pabs2 << std::endl;
+
+    G4double a[4] = {0.}, b[4] = {0.}, c[4] = {0.};
+
+    if (m_magneticField) {
+      GCUBS(sshft, xshft, xx1[3] / pabs1, xx2[3] / pabs2, a);
+      GCUBS(sshft, yshft, xx1[4] / pabs1, xx2[4] / pabs2, b);
+      GCUBS(sshft, zshft, xx1[5] / pabs1, xx2[5] / pabs2, c);
+      //      std::cout <<"a= " << a[0] <<" "<< a[1] <<" "<< a[2] <<" "<< a[3] << std::endl;
+      //      std::cout <<"b= " << b[0] <<" "<< b[1] <<" "<< b[2] <<" "<< b[3] << std::endl;
+      //      std::cout <<"c= " << c[0] <<" "<< c[1] <<" "<< c[2] <<" "<< c[3] << std::endl;
     } else {
-      mode = 0;
-      theta = slant;
-      xfwb   = cospsi * xwb - sinpsi * ywb;
-      yfwb   = sinpsi * xwb + cospsi * ywb;
-      xfwf   = cospsi * xwf - sinpsi * ywf;
-      yfwf   = sinpsi * xwf + cospsi * ywf;
-      zfwb   = zwb;
-      zfwf   = zwf;
+      //n.b. following is really better ?
+      a[1] = xshft / sshft;
+      b[1] = yshft / sshft;
+      c[1] = zshft / sshft;
+    }
 
-      //prepare quantities related to the cell-boundary
-      G4double vx = xfwf - xfwb;
-      G4double vy = yfwf - yfwb;
-      G4double vz = zfwf - zfwb;
-      G4double vv = sqrt(vx * vx + vy * vy + vz * vz);
-      vx /= vv;  vy /= vv;  vz /= vv;
+    //calculate an int. point betw. the trajectory and the cell-boundary
+    G4double stry(0.), xtry(0.), ytry(0.), ztry(0.);
+    G4double beta(0.), xfw(0.), yfw(0.);
+    G4double sphi(0.), cphi(0.), dphil(0.), dphih(0.);
+    const G4int maxTrials = 100;
+    const G4double eps = 5.e-4;
+    G4double sl =  sshft;  // negative value
+    G4double sh = -sshft;  // positive value
+    G4int i = 0;
 
-      //translate to make the cubic description easier
-      G4double shiftx = (xx1[0] + xx2[0]) * 0.5;
-      G4double shifty = (xx1[1] + xx2[1]) * 0.5;
-      G4double shiftz = (xx1[2] + xx2[2]) * 0.5;
-      G4double shifts = (s1     +     s2) * 0.5;
-      G4double xshft = xx1[0] - shiftx;
-      G4double yshft = xx1[1] - shifty;
-      G4double zshft = xx1[2] - shiftz;
-      G4double sshft = s1     - shifts;
+    //set initial value (dphil) for the 1st iteration
+    stry = sl;
+    xtry = shiftx + a[0] + stry * (a[1] + stry * (a[2] + stry * a[3]));
+    ytry = shifty + b[0] + stry * (b[1] + stry * (b[2] + stry * b[3]));
+    ztry = shiftz + c[0] + stry * (c[1] + stry * (c[2] + stry * c[3]));
+    beta = (ztry - zfwb) / vz;
+    xfw  = xfwb + beta * vx;
+    yfw  = yfwb + beta * vy;
+    sphi = (xtry * yfw - ytry * xfw);
+    cphi = (xtry * xfw + ytry * yfw);
+    dphil = atan2(sphi, cphi);  //n.b. no need to conv. to dphi...
 
-      //approximate the trajectroy by cubic curves
-      G4double pabs1 = sqrt(xx1[3] * xx1[3] + xx1[4] * xx1[4] + xx1[5] * xx1[5]);
-      G4double pabs2 = sqrt(xx2[3] * xx2[3] + xx2[4] * xx2[4] + xx2[5] * xx2[5]);
-      //      std::cout << "pabs1,2= " << pabs1 <<" "<< pabs2 << std::endl;
+    iflag = 1;
 
-      G4double a[4] = {0.}, b[4] = {0.}, c[4] = {0.};
-
-      if (m_magneticField) {
-        GCUBS(sshft, xshft, xx1[3] / pabs1, xx2[3] / pabs2, a);
-        GCUBS(sshft, yshft, xx1[4] / pabs1, xx2[4] / pabs2, b);
-        GCUBS(sshft, zshft, xx1[5] / pabs1, xx2[5] / pabs2, c);
-      } else {
-        a[1] = xshft / sshft;
-        b[1] = yshft / sshft;
-        c[1] = zshft / sshft;
-      }
-
-      //calculate an int. point betw. the trajectory and the cell-boundary
-      G4double stry(0.), xtry(0.), ytry(0.), ztry(0.);
-      G4double beta(0.), xfw(0.), yfw(0.);
-      G4double sphi(0.), cphi(0.), dphil(0.), dphih(0.);
-      const G4int maxTrials = 100;
-      const G4double eps = 5.e-4;
-      G4double sl =  sshft;
-      G4double sh = -sshft;
-      G4int i = 0;
-
-      stry = sl;
+    while (((sh - sl) > eps) && (i < maxTrials)) {
+      stry = 0.5 * (sl + sh);
       xtry = shiftx + a[0] + stry * (a[1] + stry * (a[2] + stry * a[3]));
       ytry = shifty + b[0] + stry * (b[1] + stry * (b[2] + stry * b[3]));
       ztry = shiftz + c[0] + stry * (c[1] + stry * (c[2] + stry * c[3]));
       beta = (ztry - zfwb) / vz;
       xfw  = xfwb + beta * vx;
       yfw  = yfwb + beta * vy;
-      sphi = (xtry * yfw - ytry * xfw);
-      cphi = (xtry * xfw + ytry * yfw);
-      dphil = atan2(sphi, cphi);
 
-      while (((sh - sl) > eps) && (i < maxTrials)) {
-        stry = 0.5 * (sl + sh);
-        xtry = shiftx + a[0] + stry * (a[1] + stry * (a[2] + stry * a[3]));
-        ytry = shifty + b[0] + stry * (b[1] + stry * (b[2] + stry * b[3]));
-        ztry = shiftz + c[0] + stry * (c[1] + stry * (c[2] + stry * c[3]));
-        beta = (ztry - zfwb) / vz;
-        xfw  = xfwb + beta * vx;
-        yfw  = yfwb + beta * vy;
+      sphi  = (xtry * yfw - ytry * xfw);
+      cphi  = (xtry * xfw + ytry * yfw);
+      dphih = atan2(sphi, cphi);  //n.b. no need to conv. to dphi...
 
-        sphi  = (xtry * yfw - ytry * xfw);
-        cphi  = (xtry * xfw + ytry * yfw);
-        dphih = atan2(sphi, cphi);
-
-        if (dphil * dphih > 0.) {
-          sl = stry;
-        } else {
-          sh = stry;
-        }
-        ++i;
+      if (dphil * dphih > 0.) {
+        sl = stry;
+      } else {
+        sh = stry;
       }
+      ++i;
+    }
 
-      //      std::cout << "itry= " << i << std::endl;
-      if (i >= maxTrials - 1) {
-        B2WARNING("CDCSensitiveDetector: No intersection ?");
+    //      std::cout << "itry= " << i << std::endl;
+    if (i >= maxTrials - 1) {
+      iflag = 0;
+      B2WARNING("CDCSensitiveDetector: No intersection ?");
 
-        /*  G4double ds = 1.e-4;
-        G4int imax = (s2 - s1) / ds + 1;
-        G4double rdphimin = DBL_MAX;
+      /*  G4double ds = 1.e-4;
+      G4int imax = (s2 - s1) / ds + 1;
+      G4double rdphimin = DBL_MAX;
 
-        for (i=0; i <= imax; ++i) {
+      for (i=0; i <= imax; ++i) {
           stry = sshft + i * ds;
           xtry = shiftx + a[0] + stry * (a[1] + stry * (a[2] + stry * a[3]));
           ytry = shifty + b[0] + stry * (b[1] + stry * (b[2] + stry * b[3]));
@@ -1089,393 +1053,59 @@ namespace Belle2 {
           rdphi = sqrt(xfw * xfw + yfw * yfw) * dphi;
 
           if ( std::abs(rdphi) < std::abs(rdphimin)) {
-            rdphimin = rdphi;
-            imin = i;
+      rdphimin = rdphi;
+      imin = i;
           }
-        }
-        */
       }
-      //      sint = sshft + imin * ds;
-      sint = stry;
+      */
+    }
+    //      sint = sshft + imin * ds;
+    sint = stry;
 
-      //      std::cout <<"i,dphil,dphih,sint= " << i <<" "<< dphil <<" "<< dphih <<" "<< sint << std::endl;
-      //get the trajectory at the int. point
-      xint[0] = a[0] + sint * (a[1] + sint * (a[2] + sint * a[3]));
-      xint[1] = b[0] + sint * (b[1] + sint * (b[2] + sint * b[3]));
-      xint[2] = c[0] + sint * (c[1] + sint * (c[2] + sint * c[3]));
-      xint[3] = a[1] + sint * (2. * a[2] + 3. * sint * a[3]);
-      xint[4] = b[1] + sint * (2. * b[2] + 3. * sint * b[3]);
-      xint[5] = c[1] + sint * (2. * c[2] + 3. * sint * c[3]);
+    //      std::cout <<"i,dphil,dphih,sint= " << i <<" "<< dphil <<" "<< dphih <<" "<< sint << std::endl;
+    //get the trajectory at the int. point
+    xint[0] = a[0] + sint * (a[1] + sint * (a[2] + sint * a[3]));
+    xint[1] = b[0] + sint * (b[1] + sint * (b[2] + sint * b[3]));
+    xint[2] = c[0] + sint * (c[1] + sint * (c[2] + sint * c[3]));
+    xint[3] = a[1] + sint * (2. * a[2] + 3. * sint * a[3]);
+    xint[4] = b[1] + sint * (2. * b[2] + 3. * sint * b[3]);
+    xint[5] = c[1] + sint * (2. * c[2] + 3. * sint * c[3]);
 
-      //translate back to the lab. frame
-      xint[0] += shiftx;
-      xint[1] += shifty;
-      xint[2] += shiftz;
-      sint    += shifts;
-      /*
+    //translate back to the lab. frame
+    xint[0] += shiftx;
+    xint[1] += shifty;
+    xint[2] += shiftz;
+    sint    += shifts;
+    /*
       std::cout <<"s1,s2,sint= " << s1 <<" "<< s2 <<" "<< sint << std::endl;
       std::cout <<" xx1= " << xx1[0] <<" "<<  xx1[1] <<" "<<  xx1[2] << std::endl;
       std::cout <<" xx2= " << xx2[0] <<" "<<  xx2[1] <<" "<<  xx2[2] << std::endl;
       std::cout <<"xint= " << xint[0] <<" "<< xint[1] <<" "<< xint[2] << std::endl;
-      */
+    */
 
-      /*      if (((xx1[0] <= xint[0] && xint[0] <= xx2[0]) ||
-           (xx2[0] <= xint[0] && xint[0] <= xx1[0])) &&
-          ((xx1[1] <= xint[1] && xint[1] <= xx2[1]) ||
-           (xx2[1] <= xint[1] && xint[1] <= xx1[1])) &&
-          ((xx1[2] <= xint[2] && xint[2] <= xx2[2]) ||
-           (xx2[2] <= xint[2] && xint[2] <= xx1[2])) &&
-          (s1     <= sint    && sint    <= s2)) {
+    /*      if (((xx1[0] <= xint[0] && xint[0] <= xx2[0]) ||
+      (xx2[0] <= xint[0] && xint[0] <= xx1[0])) &&
+      ((xx1[1] <= xint[1] && xint[1] <= xx2[1]) ||
+      (xx2[1] <= xint[1] && xint[1] <= xx1[1])) &&
+      ((xx1[2] <= xint[2] && xint[2] <= xx2[2]) ||
+      (xx2[2] <= xint[2] && xint[2] <= xx1[2])) &&
+      (s1     <= sint    && sint    <= s2)) {
       } else {
-        std::cout << "strangeinttersection" << std::endl;
+      std::cout << "strangeinttersection" << std::endl;
       }
-      */
-      //re-normalize to one since abs=1 is not guearanteed in the cubic approx.
-      G4double p = sqrt(xint[3] * xint[3] + xint[4] * xint[4] + xint[5] * xint[5]);
-      xint[3] /= p;  xint[4] /= p;  xint[5] /= p;
-      //      std::cout << "norm= " << p << std::endl;
-      iflag = 1;
-      return;
-    }
-
-    //rotate to the plane parallele to the x-z plane.
-    RotVec(xx1[0], xx1[1], xx1[2], phi, theta, mode);
-    RotVec(xx1[3], xx1[4], xx1[5], phi, theta, mode);
-    RotVec(xx2[0], xx2[1], xx2[2], phi, theta, mode);
-    RotVec(xx2[3], xx2[4], xx2[5], phi, theta, mode);
-
-    //check y position for xx1 & xx2
-    G4double yadj = 0.0;
-    if (xx1[1]*xx2[1] > 0.0) {
-      yadj = 0.5 * (xx1[1] + xx2[1]);
-
-      //      //adjust yadj (cell-boundary), because GIPLAN requires yadj be btw xx2[1] and xx1[1]
-      //      const G4double epsl = 1.e-3;
-      //      if( xx1[1] < xx2[1] ) {
-      //  if( 0. < xx1[1] ) yadj =
-      //    xx1[1] + epsl*(xx2[1]-xx1[1])/std::abs(xx2[1]-xx1[1]);
-      //  if( xx2[1] < 0. ) yadj =
-      //    xx2[1] + epsl*(xx1[1]-xx2[1])/std::abs(xx1[1]-xx2[1]);
-      //      }
-      //      if( xx2[1] < xx1[1] ) {
-      //  if( 0. < xx2[1] ) yadj =
-      //    xx2[1] + epsl*(xx1[1]-xx2[1])/std::abs(xx1[1]-xx2[1]);
-      //  if( xx1[1] < 0. ) yadj =
-      //    xx1[1] + epsl*(xx2[1]-xx1[1])/std::abs(xx2[1]-xx1[1]);
-      //      }
-    }
-
-    //get intersection using stupid GEANT tool.
-    G4double yc = yshift + yadj;
-    xx1[1] += yshift;
-    xx2[1] += yshift;
-    G4double pzint[4];
-    const G4int model = m_magneticField ? ic : 2;
-    GIPLAN(yc, xx1, xx2, s1, s2, model, xint, sint, pzint, iflag);
-
-    //reverse rotation
-    if (iflag == 1) {
-      xint[1] -= yshift;
-      RotVec(xint[0], xint[1], xint[2], phi, theta, mode + 1);
-      RotVec(xint[3], xint[4], xint[5], phi, theta, mode + 1);
-      if (mode == 0) xint[2] += zw;
-    } else {
-      B2WARNING("CDCSensitiveDetector: No intersection " << iflag << " " << xx1[1] << " " << xx2[1] << " " << yc << " " << irTry << " " <<
-                ic1 << " " << ic2);
-      //      B2WARNING("Retry with line approximation");
-      GIPLAN(yc, xx1, xx2, s1, s2, 2, xint, sint, pzint, iflag);
-      if (iflag == 1) {
-        xint[1] -= yshift;
-        RotVec(xint[0], xint[1], xint[2], phi, theta, mode + 1);
-        RotVec(xint[3], xint[4], xint[5], phi, theta, mode + 1);
-        if (mode == 0) xint[2] += zw;
-        //  B2INFO(" ");
-        //  B2INFO("mode= " << mode);
-        //  B2INFO("phi= " << phi);
-        //  B2INFO("theta= " << theta);
-        //  B2INFO("yc= " << yc);
-        //  B2INFO("xx2= " << xx2);
-        //  B2INFO("s1= " << s1);
-        //  B2INFO("s2= " << s2);
-        //  B2INFO("ic= " << ic);
-        //  B2INFO("xint= " << xint);
-        //  B2INFO("sint= " << sint);
-        //  B2INFO("venter= " << venter);
-        //  B2INFO("vexit= " << vexit);
-      } else {
-        //B2INFO("Fail again");
-      }
-    }
-
-  }
-
-  void CDCSensitiveDetector::RotVec(G4double& x, G4double& y, G4double& z, const G4double phi, const G4double theta, const G4int mode)
-  {
-    //dead copy of UtilCDC_RotVec in com-cdc for Belle (for tentative use)
-    //----------------------------------------------------------------------
-    //  (Purpose)
-    //
-    //      Rotate coordinate axes in such a way that the stareo wire is
-    //      parallel to Z-axis in X-Z plane in the new coordinate sytem
-    //        Rotation is done assuming Z=0 is the center of CDC (so trans-
-    //      lation must be done before this routine if CDC not centered to
-    //      origin of coordinate system).
-    //
-    //      Rotation order;
-    //        1) rotate in phi  : (Xw,Yw,0) --> (Xw',0,0), wire //to Y-Z       '
-    //        2) rotate in theta: wire // to Z-axis
-    //
-    //  (Input)
-    //       MODE    = 0    : twice rotation (phi --> theta)
-    //               = 1    : twice reverse rotation (-theta --> -phi)
-    //               = 2    : once rotation (phi only)
-    //               = 3    : once reverse rotation (-phi only)
-    //       X       = X compnent of a vector
-    //       Y       = Y compnent of a vector
-    //       Z       = Z compnent of a vector
-    //       phi     = phi
-    //       theta   = theta
-    //  (Output)
-    //       X       = X compnent of a vector after rotation
-    //       Y       = Y compnent of a vector after rotation
-    //       Z       = Z compnent of a vector after rotation
-    //
-    //  (Relation)
-    //       None
-    //-----------------------------------------------------------------------
-
-    G4double cosst = 0., sinst = 0., xx, yy, zz;
-
-    G4double phiw = phi;
-    G4double cs = cos(phiw);
-    G4double sn = sin(phiw);
-
-    if (mode <= 1) {
-      G4double ang = theta;
-      cosst = cos(ang);
-      sinst = sin(ang);
-    }
-
-    if (mode == 0) {
-      xx = x * cs + y * sn;
-      yy = y * cs - x * sn;
-      zz = z;
-      x = xx;
-      y = yy * cosst - zz * sinst;
-      z = zz * cosst + yy * sinst;
-
-    }  else if (mode == 1) {
-      xx = x;
-      yy = y * cosst + z * sinst;
-      zz = z * cosst - y * sinst;
-      x = xx * cs - yy * sn;
-      y = yy * cs + xx * sn;
-      z = zz;
-
-    } else if (mode == 2) {
-      xx = x * cs + y * sn;
-      y  = y * cs - x * sn;
-      x  = xx;
-
-    } else if (mode == 3) {
-      xx = x * cs - y * sn;
-      y  = y * cs + x * sn;
-      x  = xx;
-    }
-
-  }
-
-  void
-  CDCSensitiveDetector::GIPLAN(const G4double yc, const G4double x1[6], const G4double x2[6],
-                               const G4double s1, const G4double s2, const G4int ic,
-                               G4double xint[6], G4double& sint, G4double pzint[4], G4int& iflag)
-  {
-
-    //dead copy of GIPLAN in Geant3 (for tentative use)
-    //.    ******************************************************************
-    //    *                                                                *
-    //    *       Calculates intersection of track (X1,X2)                 *
-    //    *       with plane parallel to (X-Z)                             *
-    //    *        The track is approximated by a cubic in the             *
-    //    *       track length.                                            *
-    //    *       To improve stability, the coordinate system              *
-    //    *       is shifted.                                              *
-    //    *       input parameters                                         *
-    //    *        YC    = Y COORDINATE OF PLANE                           *
-    //    *        X1    = X,Y,Z,XP,YP,ZP OF 1ST POINT                     *
-    //    *        X2    =                   2ND                           *
-    //    *        S1(2) = S AT 1ST(2ND) POINT                             *
-    //    *        IC    = 1 STRAIGHT LINE DEFINED BY X+XP                 *
-    //    *        IC    = 2 STRAIGHT LINE DEFINED BY X1+X2                *
-    //    *        IC    = 3 CUBIC MODEL                                   *
-    //    *                                                                *
-    //    *      output parameters                                         *
-    //    *        XINT  = X,Y,Z,XP,YP,ZP AT INTERSECTION POINT            *
-    //    *        SINT  = S AT INTERSECTION POINT                         *
-    //    *        PZINT = PHI,Z,DPHI/DR,DZ/DR                             *
-    //    *        IFLAG = 1 IF TRACK INTERSECTS PLANE                     *
-    //    *              = 0 IF NOT                                        *
-    //    *                                                                *
-    //    *      Warning : the default accuracy is 10 microns. The value   *
-    //    *      of EPSI must be changed for a better precision            *
-    //    *                                                                *
-    //    *    ==>Called by : <USER>, GUDIGI                               *
-    //    *                                                                *
-    //    *        Authors: R.BRUN/JJ.DUMONT from an original routine by   *
-    //    *       H. BOERNER  KEK  OCTOBER 1982                            *
-    //    *                                                                *
-    //    *                                                                *
-    //    ******************************************************************
-
-    const G4int maxhit(100);
-    const G4double epsi(0.001); //10um
-
-    iflag = 1;
-    G4double drctn = 1.;
-    G4double s(0), dxds(0), dyds(0), dzds(0), bx(0), bz(0), trl2(0);
-    G4double dx(0), dy(0), dz(0), ds(0), trlen(0);
-    G4double shiftx(0), shifty(0), shiftz(0), shifts(0);
-    G4double xshft(0), yshft(0), zshft(0), sshft(0), pabs1(0), pabs2(0);
-    G4double dinter(0), term(0), p(0);
-    G4double a[4] = {0}, b[4] = {0}, c[4] = {0};
-
-    //Track crossing the plane from above or below ?
-
-    if (x2[1] < x1[1])                        goto L5;
-    if (yc < x1[1])                           goto L90;
-    if (yc > x2[1])                           goto L90;
-    if (ic == 2) goto L30;
-    if (ic == 3) goto L7;
-
-    s = s1;
-    dxds = x1[3];
-    dyds = x1[4];
-    dzds = x1[5];
-    bx = x1[0] - dxds * (x1[1] - yc) / dyds;
-    bz = x1[2] - dzds * (x1[1] - yc) / dyds;
-    trl2 = (bx - x1[0]) * (bx - x1[0])
-           + (x1[1] - yc) * (x1[1] - yc)
-           + (bz - x1[2]) * (bz - x1[2]);
-    goto L40;
-
-L5:
-    if (yc < x2[1])                           goto L90;
-    if (yc > x1[1])                           goto L90;
-    if (ic == 2) goto L30;
-    drctn = -1.;
-
-    if (ic == 3) goto L7;
-    s = s2;
-    dxds = x2[3];
-    dyds = x2[4];
-    dzds = x2[5];
-    bx = x2[0] - dxds * (x2[1] - yc) / dyds;
-    bz = x2[2] - dzds * (x2[1] - yc) / dyds;
-    trl2 = (bx - x2[0]) * (bx - x2[0])
-           + (x2[1] - yc) * (x2[1] - yc)
-           + (bz - x2[2]) * (bz - x2[2]);
-    goto  L40;
-
-L30:
-    dx = x2[0] - x1[0];
-    dy = x2[1] - x1[1];
-    dz = x2[2] - x1[2];
-    ds = sqrt(dx * dx + dy * dy + dz * dz);
-    s = s1;
-    dxds = dx / ds;
-    dyds = dy / ds;
-    dzds = dz / ds;
-    bx = x1[0] - dx * (x1[1] - yc) / dy;
-    bz = x1[2] - dz * (x1[1] - yc) / dy;
-    trl2 = (bx - x1[0]) * (bx - x1[0])
-           + (x1[1] - yc) * (x1[1] - yc)
-           + (bz - x1[2]) * (bz - x1[2]);
-
-L40:
-    trlen = sqrt(trl2) * drctn + s;
-    xint[0] = bx;
-    xint[1] = yc;
-    xint[2] = bz;
-    sint = trlen;
-    xint[3] = dxds;
-    xint[4] = dyds;
-    xint[5] = dzds;
-    goto L200;
-
-    //Shift coordinate system such that center of gravity=0
-
-L7:
-    if (yc <= 0.)                                goto L90;
-    shiftx = (x1[0] + x2[0]) * 0.5;
-    shifty = (x1[1] + x2[1]) * 0.5;
-    shiftz = (x1[2] + x2[2]) * 0.5;
-    shifts = (s1 + s2) * 0.5;
-
-    //Only one value necessary since X1= -X2 etc...
-
-    xshft = x1[0] - shiftx;
-    yshft = x1[1] - shifty;
-    zshft = x1[2] - shiftz;
-    sshft = s1    - shifts;
-
-    pabs1 = sqrt(x1[3] * x1[3] + x1[4] * x1[4] + x1[5] * x1[5]);
-    pabs2 = sqrt(x2[3] * x2[3] + x2[4] * x2[4] + x2[5] * x2[5]);
-    if (pabs1 == 0. || pabs2 == 0.)            goto L90;
-
-    //Parametrize the track by a cubic through X1, X2
-
-    GCUBS(sshft, xshft, x1[3] / pabs1, x2[3] / pabs2, a);
-    GCUBS(sshft, yshft, x1[4] / pabs1, x2[4] / pabs2, b);
-    GCUBS(sshft, zshft, x1[5] / pabs1, x2[5] / pabs2, c);
-
-    //Iterate to find the track length corresponding to
-    //the intersection of track and plane.
-    //Start at S=0. middle of the shifted interval.
-
-    dinter = std::abs(s2 - s1) * 0.5;
-    s = 0.;
-
-    for (int i = 1; i <= maxhit; ++i) {
-      G4double y = shifty + b[0] + s * (b[1] + s * (b[2] + s * b[3]));
-      G4double dr = (yc - y) * drctn;
-      if (std::abs(dr) <  epsi)                     goto L20;
-      dinter *= 0.5;
-      if (dr <  0.) s -= dinter;
-      if (dr >= 0.) s += dinter;
-    }
-
-    //Compute intersection in original coordinates
-
-L20:
-    xint[0] = shiftx + a[0] + s * (a[1] + s * (a[2] + s * a[3]));
-    xint[1] = yc;
-    xint[2] = shiftz + c[0] + s * (c[1] + s * (c[2] + s * c[3]));
-    xint[3] = a[1] + s * (2. * a[2] + 3. * s * a[3]);
-    xint[4] = b[1] + s * (2. * b[2] + 3. * s * b[3]);
-    xint[5] = c[1] + s * (2. * c[2] + 3. * s * c[3]);
+    */
     //re-normalize to one since abs=1 is not guearanteed in the cubic approx.
-    p = sqrt(xint[3] * xint[3] + xint[4] * xint[4] + xint[5] * xint[5]);
+    G4double p = sqrt(xint[3] * xint[3] + xint[4] * xint[4] + xint[5] * xint[5]);
     xint[3] /= p;  xint[4] /= p;  xint[5] /= p;
-
-    //Compute PHIHIT,ZHIT and corresponding derivatives
-
-    sint = s + shifts;
-L200:
-    term = 1. / (xint[3] * xint[0] + xint[4] * xint[1]);
-    pzint[0] = atan2(xint[1], xint[0]);
-    pzint[1] = xint[2];
-    pzint[2] = (xint[0] * xint[4] - xint[1] * xint[3]) * term / yc;
-    pzint[3] = term * xint[5] * yc;
-    return;
-
-L90:
-    iflag = 0;
+    //      std::cout << "norm= " << p << std::endl;
+    //    std::cout <<"s1,s2,sint= " << s1 <<" "<< s2 <<" "<< sint << std::endl;
+    //    std::cout <<"xint= " << xint[0] <<" "<< xint[1] <<" "<< xint[2] << std::endl;
+    //    std::cout <<"xint= " << xint[3] <<" "<< xint[4] <<" "<< xint[5] << std::endl;
   }
-
 
   void CDCSensitiveDetector::GCUBS(const G4double x, const G4double y, const G4double d1, const G4double d2, G4double a[4])
   {
-    //~dead copy of GCUBS in Geant3 (for tentative use)
+    //Original: GCUBS in Geant3
     //    ******************************************************************
     //    *                                                                *
     //    *       Calculates a cubic through P1,(X,Y),(-X,-Y),P2           *

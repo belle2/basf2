@@ -95,7 +95,6 @@ namespace Belle2 {
       /*!
 
         (Relations)
-        Calls       RotVec, GIPLAN
 
         (Arguments)
         input
@@ -105,7 +104,6 @@ namespace Belle2 {
         vexit(6)   real * 4      (x,y,z,px/p,py/p,pz/p) at exit.
         s1         real * 4      track length at entrance.
         s2         real * 4      track length at exit.
-        ic         integer * 4   mode for GIPLAN ( ic=3: cubic model )
         output
         xint(6)    real * 4      (x,y,z,px/p,py/p,pz/p) at intersection of
         cell boundary.
@@ -115,83 +113,9 @@ namespace Belle2 {
       */
       void CellBound(const G4int layerId, const G4int ic1, const G4int ic2,
                      const G4double venter[6], const G4double vexit[6],
-                     const G4double s1, const G4double s2, const G4int ic,
+                     const G4double s1, const G4double s2,
                      G4double xint[6], G4double& sint, G4int& iflag);
 
-      //! The method to rotate a vector
-      /*!
-        (Purpose)
-
-        Rotate coordinate axes in such a way that the stareo wire is
-        parallel to Z-axis in X-Z plane in the new coordinate sytem
-        Rotation is done assuming Z=0 is the center of CDC (so trans-
-        lation must be done before this routine if CDC not centered to
-        origin of coordinate system).
-
-        Rotation order;
-        1) rotate in phi  : (Xw,Yw,0) --> (Xw',0,0), wire //to Y-Z       '
-        2) rotate in theta: wire // to Z-axis
-
-        (Input)
-        MODE    = 0    : twice rotation (phi --> theta)
-        = 1    : twice reverse rotation (-theta --> -phi)
-        = 2    : once rotation (phi only)
-        = 3    : once reverse rotation (-phi only)
-        X       = X compnent of a vector
-        Y       = Y compnent of a vector
-        Z       = Z compnent of a vector
-        phi     = phi
-        theta   = theta
-        (Output)
-        X       = X compnent of a vector after rotation
-        Y       = Y compnent of a vector after rotation
-        Z       = Z compnent of a vector after rotation
-
-        (Relation)
-        None
-      */
-      void RotVec(G4double& x, G4double& y, G4double& z, const G4double phi, const G4double theta, const G4int mode);
-
-      //! The method to calculate intersection of track with a plane
-      /*!
-      ******************************************************************
-      *                                                                *
-      *       Calculates intersection of track (X1,X2)                 *
-      *       with plane parallel to (X-Z)                             *
-      *        The track is approximated by a cubic in the             *
-      *       track length.                                            *
-      *       To improve stability, the coordinate system              *
-      *       is shifted.                                              *
-      *       input parameters                                         *
-      *        YC    = Y COORDINATE OF PLANE                           *
-      *        X1    = X,Y,Z,XP,YP,ZP OF 1ST POINT                     *
-      *        X2    =                   2ND                           *
-      *        S1(2) = S AT 1ST(2ND) POINT                             *
-      *        IC    = 1 STRAIGHT LINE DEFINED BY X+XP                 *
-      *        IC    = 2 STRAIGHT LINE DEFINED BY X1+X2                *
-      *        IC    = 3 CUBIC MODEL                                   *
-      *                                                                *
-      *      output parameters                                         *
-      *        XINT  = X,Y,Z,XP,YP,ZP AT INTERSECTION POINT            *
-      *        SINT  = S AT INTERSECTION POINT                         *
-      *        PZINT = PHI,Z,DPHI/DR,DZ/DR                             *
-      *        IFLAG = 1 IF TRACK INTERSECTS PLANE                     *
-      *              = 0 IF NOT                                        *
-      *                                                                *
-      *      Warning : the default accuracy is 10 microns. The value   *
-      *      of EPSI must be changed for a better precision            *
-      *                                                                *
-      *    ==>Called by : <USER>, GUDIGI                               *
-      *                                                                *
-      *        Authors: R.BRUN/JJ.DUMONT from an original routine by   *
-      *       H. BOERNER  KEK  OCTOBER 1982                            *
-      *                                                                *
-      *                                                                *
-      ******************************************************************
-      */
-      void GIPLAN(const G4double yc, const G4double x1[6], const G4double x2[6],
-                  const G4double s1, const G4double s2, const G4int ic,
-                  G4double xint[6], G4double& sint, G4double pzint[4], G4int& iflag);
 
       //!
       /*!

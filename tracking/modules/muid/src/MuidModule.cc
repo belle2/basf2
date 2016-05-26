@@ -374,7 +374,7 @@ void MuidModule::event()
     klmClusters[c]->addRelationTo(klmClustDist);
     clusterPositions.push_back(G4ThreeVector(klmClusters[c]->getClusterPosition().X(),
                                              klmClusters[c]->getClusterPosition().Y(),
-                                             klmClusters[c]->getClusterPosition().Z()));
+                                             klmClusters[c]->getClusterPosition().Z()) * CLHEP::cm);
   }
 
   for (int t = 0; t < tracks.getEntries(); ++t) {
@@ -452,7 +452,7 @@ void MuidModule::event()
         }
         // Stop extrapolating as soon as the track escapes KLM or curls inward too much
         // or the momentum is too low
-        if (m_Target->GetDistanceFromPoint(track->GetPosition()) < 0.0) break;
+        if (m_Target->GetDistanceFromPoint(pos) < 0.0) break;
         if (pos.perp2() < m_MinRadiusSq) break;
         if (mom.mag2() < minPSq) break;
         if (errCode) break;

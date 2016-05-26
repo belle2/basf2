@@ -51,12 +51,21 @@ namespace Belle2 {
     }
 
     /**
-     * Set xt parameters
+     * Set xt parameter
      */
     void setXTParam(unsigned short iCLayer, unsigned short LR, unsigned short iAlpha, unsigned short iTheta, unsigned short i,
                     float param)
     {
       m_xt[iCLayer][LR][iAlpha][iTheta][i] = param;
+    }
+
+    /**
+     * Update xt parameter
+     */
+    void addXTParam(unsigned short iCLayer, unsigned short LR, unsigned short iAlpha, unsigned short iTheta, unsigned short i,
+                    float delta)
+    {
+      m_xt[iCLayer][LR][iAlpha][iTheta][i] += delta;
     }
 
     /**

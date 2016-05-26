@@ -33,11 +33,19 @@ namespace Belle2 {
     CDCSigmas(): m_sigma() {}
 
     /**
-     * Set sigma parameters
+     * Set sigma parameter
      */
     void setSigmaParam(unsigned short iCLayer, unsigned short i, float param)
     {
       m_sigma[iCLayer][i] = param;
+    }
+
+    /**
+     * Update sigma parameter
+     */
+    void addSigmaParam(unsigned short iCLayer, unsigned short i, float delta)
+    {
+      m_sigma[iCLayer][i] += delta;
     }
 
     /**

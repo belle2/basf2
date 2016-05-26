@@ -66,6 +66,9 @@ namespace Belle2 {
 
   public:
 
+    /// Enum for returnValue types
+    enum EReturnValueType { TSF=0, ETF=1, find2D=2, fit2D=3, find3D=4, fit3D=5, any = 6};
+
     /// returns TRGCDC object with specific configuration.
     static TRGCDC* getTRGCDC(const std::string& configFile,
                              unsigned simulationMode = 0,
@@ -194,11 +197,11 @@ namespace Belle2 {
     /// gets return value for trg cdc module.
     int getReturnValue(void) const;
 
-    /// gets return value for a module in trg cdc module. moduleName = ["", "TSF", "ETF", "2DFind", "2DFit", "3DFind", "3DFit"]. TSF will be 1st bit and 3DFit will be last bit of _returnValue. No name means all.
-    int getReturnValue(std::string const & moduleName) const;
+    /// gets return value for a module in trg cdc module. 
+    int getReturnValue(EReturnValueType const & moduleName) const;
 
-    /// sets return value for trg cdc module. moduleName = ["TSF", "ETF", "2DFind", "2DFit", "3DFind", "3DFit"]. TSF will be 1st bit and 3DFit will be last bit of _returnValue. No name means all.
-    void setReturnValue(std::string const & moduleName, bool flag);
+    /// sets return value for trg cdc module. 
+    void setReturnValue(EReturnValueType const & moduleName, bool flag);
 
     /// sets return value for trg cdc module.
     void setReturnValue(int);

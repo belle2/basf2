@@ -44,7 +44,6 @@ namespace Belle2 {
     : Module::Module(),
       _debugLevel(0),
       _configFilename("TRGCDCConfig.dat"),
-      _returnValueModuleName(""),
       _innerTSLUTFilename("undefined"),
       _outerTSLUTFilename("undefined"),
       _rootTRGCDCFilename("undefined"),
@@ -84,12 +83,14 @@ namespace Belle2 {
     setDescription(desc);
     setPropertyFlags(c_ParallelProcessingCertified);
 
+    vector<string> emptyvector;
+
     addParam("DebugLevel", _debugLevel, "TRGCDC debug level", _debugLevel);
     addParam("ConfigFile",
              _configFilename,
              "The filename of CDC trigger config file",
              _configFilename);
-    addParam("ReturnValueModuleName", _returnValueModuleName, "Chooses a module for return value. Can be [TSF, ETF, 2DFind, 2DFit, 3DFind, 3DFit]. If blank then returnValue will be for all modules.", _returnValueModuleName);
+    addParam("ReturnValueModuleNames", _returnValueModuleNames, "Chooses modules for return value. Can be a list of [TSF, ETF, 2DFind, 2DFit, 3DFind, 3DFit]. If empty list then returnValue will be for all modules.", emptyvector);
     addParam("InnerTSLUTFile",
              _innerTSLUTFilename,
              "The filename of LUT for inner-most track segments",
@@ -356,8 +357,21 @@ namespace Belle2 {
                                  m_2DfitterCollectionName,
                                  m_3DfitterCollectionName);
 
-    // module condition
-    setReturnValue(_cdc->getReturnValue(_returnValueModuleName));
+    // Set retrun value
+    int returnValue = _cdc->getReturnValue();
+    int mask = 0;
+    for(vector<string>::iterator it = _returnValueModuleNames.begin(); it != _returnValueModuleNames.end(); ++it) {
+      string const & moduleName = *it;
+      if (moduleName == "TSF") mask |= 1 << 0;
+      else if (moduleName == "ETF") mask |= 1 << 1;
+      else if (moduleName == "find2D") mask |= 1 << 2;
+      else if (moduleName == "fit2D") mask |= 1 << 3;
+      else if (moduleName == "find3D") mask |= 1 << 4;
+      else if (moduleName == "fit3D") mask |= 1 << 5;
+    }
+    if (_returnValueModuleNames.size() == 0) mask = -1;
+    returnValue &= mask;
+    setReturnValue(returnValue);
   }
 
   void

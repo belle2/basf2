@@ -121,9 +121,9 @@ bool NSMVHandlerHSLBFirmware::handleSetText(const std::string& firmware)
   return false;
 }
 
-bool NSMVHandlerHSLBBoot::handleSetText(const std::string& val)
+bool NSMVHandlerHSLBBoot::handleSetInt(int val)
 {
-  if (StringUtil::tolower(val) == "on") {
+  if (val > 0) {
     std::string vname = StringUtil::replace(getName(), ".boot", ".firm");
     std::string firmware;
     m_callback.get(vname, firmware);

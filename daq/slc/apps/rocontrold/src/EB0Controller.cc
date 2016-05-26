@@ -64,10 +64,12 @@ void EB0Controller::initArguments(const DBObject& obj)
 
 bool EB0Controller::loadArguments(const DBObject& obj)
 {
+  /*
   if (obj("eb0").getBool("xinetd")) {
     setUsed(false);
     return false;
   }
+  */
   setUsed(true);
   int port = 0;
   m_nsenders = 0;
@@ -96,10 +98,12 @@ bool EB0Controller::loadArguments(const DBObject& obj)
   std::string downname = std::string("/dev/shm/") + "eb0_down";
   //if (m_eb_stat) delete m_eb_stat;
   //m_eb_stat = new eb_statistics(upname.c_str(), m_nsenders, downname.c_str(), 1);
+  /*
   m_con.addArgument("-u");
   m_con.addArgument(upname);
   m_con.addArgument("-d");
   m_con.addArgument(downname);
+  */
   memset(m_nevent_in, 0, sizeof(m_nevent_in));
   memset(m_nevent_in, 0, sizeof(m_nevent_out));
   memset(m_total_byte_in, 0, sizeof(m_total_byte_in));

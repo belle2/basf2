@@ -10,7 +10,7 @@ namespace Belle2 {
     void write_irs_reg(HSLB& hslb, RCCallback& callback, int carNum, int asicNum,
                        int address, int value, int irsxwrite_retry = 5);
     void verify_dll_asic(HSLB& hslb, RCCallback& callback, int carrier, int asic);
-    void config1asic_FB(HSLB& hslb, RCCallback& callback, int carrier, int asic);
+    void config1asic(HSLB& hslb, RCCallback& callback, int carrier, int asic);
     void check1asicConfig(HSLB& hslb, RCCallback& callback, int carrier, int asic);
 
   }

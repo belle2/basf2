@@ -75,6 +75,8 @@ int RCCommand::isAvailable(const RCState& state) const throw()
     return ENABLED;
   } else if (cmd == RECOVER && state == RCState::ERROR_ES) {
     return ENABLED;
+  } else if (cmd == BOOT && state == RCState::NOTREADY_S) {
+    return ENABLED;
   } else {
     return DISABLED;
   }

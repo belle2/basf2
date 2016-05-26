@@ -52,7 +52,7 @@ namespace Belle2 {
       b2l_write(hslb, CARRIER_PS_vPed3, vPed, carrier);
 
       for (int asic = 0; asic < 4; asic++) {
-        config1asic_FB(hslb, callback, carrier, asic);
+        config1asic(hslb, callback, carrier, asic);
       }
     }
 

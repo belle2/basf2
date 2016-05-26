@@ -10,33 +10,59 @@
 
 #include <daq/slc/base/StringUtil.h>
 
+#include <mgt/hsreg.h>
+
 #include <unistd.h>
 
 namespace Belle2 {
 
   namespace TOPDAQ {
 
+    // registers that won't return values -- don't check
+    int ReadIgnoreRegs[] = { 0x2800, 0x2C00, 0x3000, 0x3400,   // IRSX direct. carrier 0
+                             0x4800, 0x4C00, 0x5000, 0x5400,   // IRSX direct, carrier 1
+                             0x6800, 0x6C00, 0x7000, 0x7400,   // IRSX direct, carrier 2
+                             0x8800, 0x8C00, 0x9000, 0x9400,   // IRSX direct, carrier 3
+                             0x0206, 0x0207, 0x04AA, 0x04B0,   // Misc. SCROD write-only
+                             0x04FF,                           //   "
+                             0x0600, 0x0800, 0x0A00, 0x0C00,   // Misc. PGP registers
+                             0x0601, 0x0801, 0x0A01, 0x0C01,   //   "
+                             0x0602, 0x0802, 0x0A02, 0x0C02,   //   "
+                             0x2206, 0x4206, 0x6206, 0x8206,   // Misc. carrier write-only
+                             0x2207, 0x4207, 0x6207, 0x8207,   //   "
+                             0x24AA, 0x44AA, 0x64AA, 0x84AA,   //   "
+                             0x24AB, 0x44AB, 0x64AB, 0x84AB,   //   "
+                             0x24B0, 0x44B0, 0x64B0, 0x84B0,   //   "
+                             0x24FF, 0x44FF, 0x64FF, 0x84FF
+                           };   //   "
+
     int b2l_fulladdr(int reg, int carrier, int asic)
     {
       return (reg + carrier * 0x2000 + asic * 0x400);
     }
 
+    unsigned int ret_prev = 0xfffffff;
     int b2l_read(HSLB& hslb, int reg, int carrier, int asic, int read_retry)
     {
       if (reg == SCROD_UNDEFINED || reg == CARRIER_UNDEFINED) {
         return -1;
       }
       int addr = b2l_fulladdr(reg, carrier, asic);
+      hslb.writefn32(HSREGL_RESET, 0x100);
       unsigned int ret = hslb.readfee32(addr);
-      for (int i = 0; ret == TIMEOUT && i < read_retry; i++) {
+      ret = hslb.readfee32(addr);
+      int count = read_retry;
+      while (ret == ret_prev && count > 0) {
         ret = hslb.readfee32(addr);
+        count--;
       }
-      LogFile::debug("addr=0x%x, value=0x%x", addr, ret);
+      ret_prev = ret;
       if (ret == 0xDEADBEEF) {
         throw (HSLBHandlerException(" DEADBEEF returned (addr=0x%x)"));
       }
       return ret;
     }
+
     int b2l_write(HSLB& hslb, int reg, unsigned int value,
                   int carrier, int asic, int write_retry)
     {
@@ -44,17 +70,27 @@ namespace Belle2 {
         return -1;
       }
       int addr = b2l_fulladdr(reg, carrier, asic);
+      hslb.writefn32(HSREGL_RESET, 0x100);
       hslb.writefee32(addr, value);
+      for (unsigned int i = 0; i < sizeof(ReadIgnoreRegs) / sizeof(int); i++) {
+        if (addr == ReadIgnoreRegs[i]) return -1;
+      }
+      //LogFile::debug("addr=0x%x, value=0x%x", addr, value);
       unsigned int ret = 0;
-      for (int i = 0; i < write_retry; i++) {
-        ret = hslb.readfee32(addr);
+      int i = 0;
+      for (; i < write_retry; i++) {
+        ret = b2l_read(hslb, reg, carrier, asic);
         if (ret != value) {
+          //LogFile::debug("%d , %d", ret, value);
+          hslb.writefn32(HSREGL_RESET, 0x100);
           hslb.writefee32(addr, value);
+          ret = hslb.readfee32(addr);
         } else {
           return ret;
         }
         usleep(1000);
       }
+      LogFile::debug("retry: %d", i);
       return ret;
     }
 

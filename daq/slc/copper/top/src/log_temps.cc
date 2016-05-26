@@ -174,9 +174,9 @@ namespace Belle2 {
       }
       callback.set(vname + "live", cLive);
       // external sensor readings
-      callback.set(vname + "tempWall,", convert_FPGA_temp(b2l_read(hslb, CARRIER_XADC_Temperature, carrier)));
+      callback.set(vname + "tempWall", convert_FPGA_temp(b2l_read(hslb, CARRIER_XADC_Temperature, carrier)));
       callback.set(vname + "tempASIC01", 0);
-      callback.set(vname + "tempASIC23,", 0);
+      callback.set(vname + "tempASIC23", 0);
       callback.set(vname + "humidity", 0);
     }
 
@@ -184,13 +184,10 @@ namespace Belle2 {
 
     void get_status(HSLB& hslb, RCCallback& callback)
     {
-      LogFile::debug("%s:%d", __FILE__, __LINE__);
       scrod_status(hslb, callback);
-      LogFile::debug("%s:%d", __FILE__, __LINE__);
       for (int carrier = 0; carrier < 4; carrier++) {
         carrier_status(hslb, callback, carrier);
       }
-      LogFile::debug("%s:%d", __FILE__, __LINE__);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -247,9 +244,9 @@ namespace Belle2 {
       callback.add(new NSMVHandlerFloat(vname + "vDDR", true, false, 0));
       callback.add(new NSMVHandlerText(vname + "live", true, false, ""));
       // external sensor readings
-      callback.add(new NSMVHandlerFloat(vname + "tempWall,", true, false, 0));
+      callback.add(new NSMVHandlerFloat(vname + "tempWall", true, false, 0));
       callback.add(new NSMVHandlerFloat(vname + "tempASIC01", true, false, 0));
-      callback.add(new NSMVHandlerFloat(vname + "tempASIC23,", true, false, 0));
+      callback.add(new NSMVHandlerFloat(vname + "tempASIC23", true, false, 0));
       callback.add(new NSMVHandlerFloat(vname + "humidity", true, false, 0));
     }
 

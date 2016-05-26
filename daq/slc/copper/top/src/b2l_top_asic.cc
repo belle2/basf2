@@ -13,8 +13,11 @@
 
 #include <daq/slc/base/StringUtil.h>
 
+#include <mgt/hsreg.h>
+
 #include <unistd.h>
 #include <fstream>
+#include <sstream>
 #include <map>
 
 #define configDebug 0
@@ -34,7 +37,7 @@ namespace Belle2 {
       unsigned int hexValue = address * 0x1000 + value;
       //int addr = b2l_fulladdr(CARRIER_IRSX_irsxDirect, carNum, asicNum);
       b2l_write(hslb, CARRIER_IRSX_irsxDirect, hexValue, carNum, asicNum);
-      b2l_write(hslb, CARRIER_IRSX_irsxDirect, hexValue, carNum, asicNum);
+      //b2l_write(hslb, CARRIER_IRSX_irsxDirect, hexValue, carNum, asicNum);
       unsigned int ret = b2l_read(hslb, CARRIER_IRSX_irsxRegWordOut, carNum, asicNum);
       int count = irsxwrite_retry;
       if (count > 0) {
@@ -43,10 +46,10 @@ namespace Belle2 {
           b2l_write(hslb, CARRIER_IRSX_irsxDirect, 0xF0000, carNum, asicNum);
           ret = b2l_read(hslb, CARRIER_IRSX_irsxRegWordOut, carNum, asicNum);
           count = count - 1;
-          if (ret != hexValue) {
-            callback.log(LogFile::ERROR, "IRSX write fail on %d successive tries: expected 0x%x, got 0x%x",
-                         irsxwrite_retry, hexValue, ret);
-          }
+        }
+        if (ret != hexValue) {
+          callback.log(LogFile::ERROR, "IRSX write fail on %d successive tries: expected 0x%x, got 0x%x",
+                       irsxwrite_retry, hexValue, ret);
         }
       }
     }
@@ -57,14 +60,16 @@ namespace Belle2 {
       std::string line;
       std::map<std::string, float> m;
       while (getline(fin, line)) {
-        StringList items = StringUtil::split(StringUtil::replace(StringUtil::replace(line, "\t", " "), "\n", " "), ' ');
-        if (items.size() > 5) {
-          if (atoi(items[0].c_str()) == car && atoi(items[1].c_str()) == asicnum && atoi(items[2].c_str()) == ch) {
-            m.insert(std::map<std::string, float>::value_type("mean", atoi(items[3].c_str())));
-            m.insert(std::map<std::string, float>::value_type("width", atoi(items[4].c_str())));
-            m.insert(std::map<std::string, float>::value_type("3sigma", atoi(items[5].c_str())));
-            return m;
-          }
+        std::stringstream ss;
+        ss << line;
+        int itmp[3];
+        float ftmp[3];
+        ss >> itmp[0] >> itmp[1] >> itmp[2] >> ftmp[0] >> ftmp[1] >> ftmp[2];
+        if (itmp[0] == car && itmp[1] == asicnum && itmp[2] == ch) {
+          m.insert(std::map<std::string, float>::value_type("mean", ftmp[0]));
+          m.insert(std::map<std::string, float>::value_type("width", ftmp[1]));
+          m.insert(std::map<std::string, float>::value_type("3sigma", ftmp[2]));
+          return m;
         }
       }
       return m;
@@ -97,7 +102,7 @@ namespace Belle2 {
       int retry_count = 1;
 
       // check monTiming values to see if DLL locked
-      std::string monName[] = { "A1", "B1", "A2", "B2", "PHASE", "PHAB",
+      const char* monName[] = { "A1", "B1", "A2", "B2", "PHASE", "PHAB",
                                 "SSPin", "WR_STRB", "SSTout", "SSToutFB"
                               };
 
@@ -109,24 +114,27 @@ namespace Belle2 {
           write_irs_reg(hslb, callback, carrier, asic, 179, mon);
           usleep(200000);
           monVal[mon] = b2l_read(hslb, CARRIER_IRSX_scalerMontiming, carrier, asic);
-          LogFile::debug("%-10s %10d", monName[mon].c_str(), monVal[mon]);
+          LogFile::debug("%-10s %10d", monName[mon], monVal[mon]);
           if (monVal[mon] / 10000 != goodMonVal[mon]) {
-            LogFile::warning("Questionable montiming value");
+            LogFile::warning("Questionable montiming value %d, %d", (monVal[mon] / 10000), goodMonVal[mon]);
+            //LogFile::warning("Questionable montiming value");
           }
         }
         write_irs_reg(hslb, callback, carrier, asic, 179, 0x40);  // SSTout
         usleep(200000);
         monVal[8] = b2l_read(hslb, CARRIER_IRSX_scalerMontiming, carrier, asic);
-        LogFile::debug("%-10s %10d", monName[8].c_str(), monVal[8]);
+        LogFile::debug("%-10s %10d", monName[8], monVal[8]);
         if (monVal[8] / 10000 != goodMonVal[8]) {
-          LogFile::warning("Questionable montiming value");
+          LogFile::warning("Questionable montiming value %d, %d", (monVal[8] / 10000), goodMonVal[8]);
+          //LogFile::warning("Questionable montiming value");
         }
         write_irs_reg(hslb, callback, carrier, asic, 179, 0x48);  // SSToutFB
         usleep(200000);
         monVal[9] = b2l_read(hslb, CARRIER_IRSX_scalerMontiming, carrier, asic);
-        LogFile::debug("%-10s %10d", monName[9].c_str(), monVal[9]);
+        LogFile::debug("%-10s %10d", monName[9], monVal[9]);
         if (monVal[9] / 10000 != goodMonVal[9]) {
-          LogFile::warning("Questionable montiming value");
+          LogFile::warning("Questionable montiming value %d, %d", (monVal[9] / 10000), goodMonVal[9]);
+          //LogFile::warning("Questionable montiming value");
         }
         for (unsigned int i = 0; i < sizeof(monVal) / sizeof(int); i++) {
           if (monVal[i] == 0) {
@@ -152,7 +160,7 @@ namespace Belle2 {
       }
     }
 
-    void config1asic_FB(HSLB& hslb, RCCallback& callback, int carrier, int asic)
+    void config1asic(HSLB& hslb, RCCallback& callback, int carrier, int asic)
     {
       //bool asic_pass = true;   // assume ASIC passes (until it doesn't)
       //std::string asic_fail_msg = ""; // reason for failure
@@ -181,11 +189,7 @@ namespace Belle2 {
       std::string thresholdfile = StringUtil::form("thresholds/SCROD%d.dat", SCROD_ID);
       LogFile::debug("threshold file:" + thresholdfile);
       if (!File::exist(thresholdfile)) {
-        throw (HSLBHandlerException("Threshold file %s does not exist, exiting...", thresholdfile));
-      }
-      std::string FBfile = StringUtil::form("sstoutFB/SCROD%d.fb", SCROD_ID);
-      if (!File::exist(FBfile)) {
-        throw (HSLBHandlerException("SSTOUT_FB file %s does not exist, exiting...", FBfile));
+        throw (HSLBHandlerException("Threshold file %s does not exist, exiting...", thresholdfile.c_str()));
       }
 
       // set channel trigger values
@@ -278,10 +282,7 @@ namespace Belle2 {
 
       //////////////////////////////////////////////////////////
       // from here, asic specific
-      LogFile::debug("Configuring ASIC-specific IRSX registers");
-      int FBvalue = ReadFB(carrier, asic, FBfile);
-      //writeIrsReg(BS, carrier, asic, 196,  110)  # SSTout_FB
-      write_irs_reg(hslb, callback, carrier, asic, 196,  FBvalue);  // SSTout_FB
+      write_irs_reg(hslb, callback, carrier, asic, 196,  110);  // SSTout_FB
       // 110 default rec'd by Gary,this will be ASIC-dependent
 
       // set thresholds
@@ -295,6 +296,10 @@ namespace Belle2 {
       // number of attempts
       int retry_count = 1;
 
+      const char* monName[] = { "A1", "B1", "A2", "B2", "PHASE", "PHAB",
+                                "SSPin", "WR_STRB", "SSTout", "SSToutFB"
+                              };
+
       while (retry_count > 0) {
         // wait for voltage to stabilize
         usleep(100000);
@@ -306,9 +311,6 @@ namespace Belle2 {
 
         // check monTiming values to see if DLL locked
         // check monTiming values to see if DLL locked
-        std::string monName[] = { "A1", "B1", "A2", "B2", "PHASE", "PHAB",
-                                  "SSPin", "WR_STRB", "SSTout", "SSToutFB"
-                                };
         int monVal[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
         // good monTiming values (/10000 for 0.1 sec scaler)
@@ -321,7 +323,8 @@ namespace Belle2 {
           LogFile::debug("%-10s %10d", monName[mon], monVal[mon]);
           if (monVal[mon] / 10000 != goodMonVal[mon]) {
             //monVal[mon] = 0 // mark as "bad"
-            callback.log(LogFile::WARNING, "Questionable montiming value");
+            //callback.log(LogFile::WARNING, "Questionable montiming value");
+            LogFile::warning("Questionable montiming value %d, %d", (monVal[mon] / 10000), goodMonVal[mon]);
           }
         }
 
@@ -332,7 +335,8 @@ namespace Belle2 {
         LogFile::debug("%-10s %10d", monName[8], monVal[8]);
         if (monVal[8] / 10000 != goodMonVal[8]) {
           //monVal[8] = 0 // mark as "bad"
-          callback.log(LogFile::WARNING, "Questionable montiming value");
+          //callback.log(LogFile::WARNING, "Questionable montiming value");
+          LogFile::warning("Questionable montiming value %d, %d", (monVal[8] / 10000), goodMonVal[8]);
         }
         write_irs_reg(hslb, callback, carrier, asic, 179, 0x48);  // SSToutFB
         // time.sleep(0.4); -- GSV mod
@@ -341,7 +345,8 @@ namespace Belle2 {
         LogFile::debug("%-10s %10d", monName[9], monVal[9]);
         if (monVal[9] / 10000 != goodMonVal[9]) {
           //monVal[9] = 0 // mark as "bad"
-          callback.log(LogFile::WARNING, "Questionable montiming value");
+          //callback.log(LogFile::WARNING, "Questionable montiming value");
+          LogFile::warning("Questionable montiming value %d, %d", (monVal[9] / 10000), goodMonVal[9]);
         }
         bool found = false;
         for (unsigned int i = 0; i < sizeof(monVal) / sizeof(int); i++) {
@@ -393,14 +398,13 @@ namespace Belle2 {
       while (bitslip < 0) {
         // clear serial interface sync
         write_irs_reg(hslb, callback, carrier, asic, 252, 1); // CLR_Sync
-        usleep(100000);
+        usleep(200000);
         // scan through bitslip values
         bool success = false;
         for (unsigned int i = 0; i < sizeof(validWrAddrBitslip_pass1) / sizeof(int); i++) {
           bitslip = validWrAddrBitslip_pass1[i];
           b2l_write(hslb, CARRIER_IRSX_wrAddrBitSlip, bitslip, carrier, asic);
-          // usleep(200000);;  // allow new serial interface to settle
-          usleep(100000);  // allow new serial interface to settle
+          usleep(200000);  // allow new serial interface to settle
           int spy = b2l_read(hslb, CARRIER_IRSX_wrAddrSpy, carrier, asic);
           if (configDebug) {
             LogFile::debug("    %2d:  %s  0x%08x", bitslip, spy, target);
@@ -426,15 +430,14 @@ namespace Belle2 {
         while (bitslip < 0) {
           // clear serial interface sync
           write_irs_reg(hslb, callback, carrier, asic, 252, 1);
-          // usleep(200000); -- GSV mod
+          // //usleep(200000); -- GSV mod
           usleep(100000);
           // scan through bitslip values
           bool success = false;
           for (unsigned int i = 0; i < sizeof(validWrAddrBitslip_pass2) / sizeof(int); i++) {
             bitslip = validWrAddrBitslip_pass2[i];
             b2l_write(hslb, CARRIER_IRSX_wrAddrBitSlip, bitslip, carrier, asic);
-            // usleep(200000);  // allow new serial interface to settle
-            usleep(100000);  // allow new serial interface to settle
+            usleep(200000);  // allow new serial interface to settle
             int spy = b2l_read(hslb, CARRIER_IRSX_wrAddrSpy, carrier, asic);
             if (configDebug) {
               LogFile::debug("    %2d:  %s  0x%08x", bitslip, spy, target);
@@ -486,8 +489,8 @@ namespace Belle2 {
         for (unsigned int i = 0; i < sizeof(validEyeAlignBitslip) / sizeof(int); i++) {
           bitslip = validEyeAlignBitslip[i];
           b2l_write(hslb, CARRIER_IRSX_readoutBitSlip, bitslip, carrier, asic, 0);
-          //usleep(200000);
-          usleep(100000);
+          ////usleep(200000);
+          //usleep(100000);
           int data = b2l_read(hslb, CARRIER_IRSX_tpgData, carrier, asic);
           if (configDebug) {
             LogFile::debug("  %2d:  %s  0x%08x", bitslip, data, tpg);
@@ -538,8 +541,8 @@ namespace Belle2 {
         for (unsigned int i = 0; i < sizeof(validDataAlignBitslip) / sizeof(int); i++) {
           bitslip = validDataAlignBitslip[i];
           b2l_write(hslb, CARRIER_IRSX_readoutBitSlip, bitslip, carrier, asic);
-          // usleep(200000);
-          usleep(100000);
+          // //usleep(200000);
+          //usleep(100000);
           int data = b2l_read(hslb, CARRIER_IRSX_tpgData, carrier, asic);
           if (configDebug) {
             LogFile::debug("  %2d:  %s  0x%08x", bitslip, data, tpg);
@@ -691,7 +694,7 @@ namespace Belle2 {
         for (int mon = 0; mon < 8; mon++) {
           write_irs_reg(hslb, callback, carrier, asic, 179, mon);
           // time.sleep(0.4) -- GSV mod
-          usleep(200000);
+          //usleep(200000);
           monVal[mon] = b2l_read(hslb, CARRIER_IRSX_scalerMontiming, carrier, asic);
           LogFile::debug("%-10s %10d", monName[mon], monVal[mon]);
           if (monVal[mon] / 10000 != goodMonVal[mon]) {
@@ -701,7 +704,7 @@ namespace Belle2 {
           write_irs_reg(hslb, callback, carrier, asic, 179, 0x40);  // SSTout
         }
         // time.sleep(0.4) -- GSV mod
-        usleep(200000);
+        //usleep(200000);
         monVal[8] = b2l_read(hslb, CARRIER_IRSX_scalerMontiming, carrier, asic);
         LogFile::debug("%-10s %10d", monName[8], monVal[8]);
         if (monVal[8] / 10000 != goodMonVal[8]) {
@@ -710,7 +713,7 @@ namespace Belle2 {
         }
         write_irs_reg(hslb, callback, carrier, asic, 179, 0x48);  // SSToutFB
         // time.sleep(0.4) -- GSV mod
-        usleep(200000);
+        //usleep(200000);
         monVal[9] = b2l_read(hslb, CARRIER_IRSX_scalerMontiming, carrier, asic);
         LogFile::debug("%-10s %10d", monName[9], monVal[9]);
         if (monVal[9] / 10000 != goodMonVal[9]) {

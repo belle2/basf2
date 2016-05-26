@@ -70,10 +70,12 @@ bool ProcessController::start(int expno, int runno)
   m_info.setExpNumber(expno);
   m_info.setRunNumber(runno);
   m_info.setSubNumber(0);
+  /*
   if (m_info.getState() != RunInfoBuffer::RUNNING) {
     m_info.unlock();
     throw (RCHandlerException(m_parname + " is not running"));
   }
+  */
   m_info.unlock();
   return true;
 }

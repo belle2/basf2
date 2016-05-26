@@ -7,6 +7,7 @@
 #include <daq/slc/base/StringUtil.h>
 
 int cprtop01[] = { 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008 };
+int cprtop02[] = { 2061 };
 int cprtop03[] = { 3009, 3010, 3011, 3012, 3013, 3014, 3015, 3016 };
 
 int* getcopper(const char* hostname, int& ncpr, std::string& ropcname)
@@ -15,6 +16,9 @@ int* getcopper(const char* hostname, int& ncpr, std::string& ropcname)
   if (strcmp(hostname, "top01") == 0) {
     ncpr = sizeof(cprtop01) / sizeof(int);
     return cprtop01;
+  } else if (strcmp(hostname, "top02") == 0) {
+    ncpr = sizeof(cprtop02) / sizeof(int);
+    return cprtop02;
   } else if (strcmp(hostname, "top03") == 0) {
     ncpr = sizeof(cprtop03) / sizeof(int);
     return cprtop03;

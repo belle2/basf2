@@ -5,20 +5,11 @@
 
 export BELLE2_DAQ_SLC=$PWD
 export PATH=$BELLE2_DAQ_SLC/bin:$PATH
-if ! test "$BELLE2_LOCAL_DIR" = "" ; then
-  if [ -d $BELLE2_EXTERNALS_DIR/lib/$BELLE2_EXTERNALS_SUBDIR/ ]; then
-    export PGSQL_LIB_PATH=$BELLE2_EXTERNALS_DIR/lib/$BELLE2_EXTERNALS_SUBDIR
-  else 
-    export PGSQL_LIB_PATH=$BELLE2_EXTERNALS_DIR/$BELLE2_EXTERNALS_SUBDIR/lib
-  fi
-  export PGSQL_INC_PATH=$BELLE2_EXTERNALS_DIR/include/pgsql
-  export LD_LIBRARY_PATH=$BELLE2_DAQ_SLC/lib:$LD_LIBRARY_PATH
-else
-  export PGSQL_LIB_PATH=/usr/pgsql-9.3/lib
-  export PGSQL_INC_PATH=/usr/pgsql-9.3/include
-fi
-export LD_LIBRARY_PATH=$BELLE2_DAQ_SLC/lib:$PGSQL_LIB_PATH/lib:$LD_LIBRARY_PATH
+export PGSQL_LIB_PATH=${HOME}/postgresql/lib
+export PGSQL_INC_PATH=${HOME}/postgresql/include
+export LD_LIBRARY_PATH=$BELLE2_DAQ_SLC/lib:$PGSQL_LIB_PATH:$LD_LIBRARY_PATH
 export NSM2_INCDIR=$BELLE2_DAQ_SLC/data/nsm
+export PYTHONPATH=${BELLE2_DAQ_SLC}/lib:$PYTHONPATH
 
 function setslc () {
     if [ $# -ne 1 ]; then

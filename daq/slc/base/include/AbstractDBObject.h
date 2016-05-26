@@ -41,28 +41,28 @@ namespace Belle2 {
     void setText(const std::string& name, const std::string& value) throw(std::out_of_range) { addText(name, value); }
 
   public:
-    virtual bool getBool(const std::string& name, int index = 0) const throw(std::out_of_range);
-    virtual char getChar(const std::string& name, int index = 0) const throw(std::out_of_range);
-    virtual short getShort(const std::string& name, int index = 0) const throw(std::out_of_range);
-    virtual int getInt(const std::string& name, int index = 0) const throw(std::out_of_range);
-    virtual long long getLong(const std::string& name, int index = 0) const throw(std::out_of_range);
-    virtual float getFloat(const std::string& name, int index = 0) const throw(std::out_of_range);
-    virtual double getDouble(const std::string& name, int index = 0) const throw(std::out_of_range);
-    virtual void addBool(const std::string& name, bool value) throw();
-    virtual void addChar(const std::string& name, char value) throw();
-    virtual void addShort(const std::string& name, short value) throw();
-    virtual void addInt(const std::string& name, int value) throw();
-    virtual void addLong(const std::string& name, long long value) throw();
-    virtual void addFloat(const std::string& name, float value) throw();
-    virtual void addDouble(const std::string& name, double value) throw();
-    virtual void setBool(const std::string& name, bool value, int index = 0) throw(std::out_of_range);
-    virtual void setChar(const std::string& name, int value, int index = 0) throw(std::out_of_range);
-    virtual void setShort(const std::string& name, int value, int index = 0) throw(std::out_of_range);
-    virtual void setInt(const std::string& name, int value, int index = 0) throw(std::out_of_range);
-    virtual void setLong(const std::string& name, long long value, int index = 0) throw(std::out_of_range);
-    virtual void setFloat(const std::string& name, float value, int index = 0) throw(std::out_of_range);
-    virtual void setDouble(const std::string& name, double value, int index = 0) throw(std::out_of_range);
-    virtual const std::string getValueText(const std::string& name) const throw(std::out_of_range);
+    bool getBool(const std::string& name, int index = 0) const throw(std::out_of_range);
+    char getChar(const std::string& name, int index = 0) const throw(std::out_of_range);
+    short getShort(const std::string& name, int index = 0) const throw(std::out_of_range);
+    int getInt(const std::string& name, int index = 0) const throw(std::out_of_range);
+    long long getLong(const std::string& name, int index = 0) const throw(std::out_of_range);
+    float getFloat(const std::string& name, int index = 0) const throw(std::out_of_range);
+    double getDouble(const std::string& name, int index = 0) const throw(std::out_of_range);
+    void addBool(const std::string& name, bool value) throw();
+    void addChar(const std::string& name, char value) throw();
+    void addShort(const std::string& name, short value) throw();
+    void addInt(const std::string& name, int value) throw();
+    void addLong(const std::string& name, long long value) throw();
+    void addFloat(const std::string& name, float value) throw();
+    void addDouble(const std::string& name, double value) throw();
+    void setBool(const std::string& name, bool value, int index = 0) throw(std::out_of_range);
+    void setChar(const std::string& name, int value, int index = 0) throw(std::out_of_range);
+    void setShort(const std::string& name, int value, int index = 0) throw(std::out_of_range);
+    void setInt(const std::string& name, int value, int index = 0) throw(std::out_of_range);
+    void setLong(const std::string& name, long long value, int index = 0) throw(std::out_of_range);
+    void setFloat(const std::string& name, float value, int index = 0) throw(std::out_of_range);
+    void setDouble(const std::string& name, double value, int index = 0) throw(std::out_of_range);
+    const std::string getValueText(const std::string& name) const throw(std::out_of_range);
 
   public:
     virtual const void* getValue(const std::string& name) const throw(std::out_of_range) = 0;

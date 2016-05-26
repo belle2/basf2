@@ -133,11 +133,9 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
   }
   */
   if (NSMCallback::perform(com)) return true;
-  LogFile::info("%s:%d", __FILE__, __LINE__);
   if (cmd.isAvailable(state) ==  NSMCommand::DISABLED) {
     return false;
   }
-  LogFile::info("%s:%d", __FILE__, __LINE__);
   LogFile::debug("%s >> %s (state = %s)", msg.getNodeName(),
                  cmd.getLabel(), state.getLabel());
   addNode(NSMNode(msg.getNodeName()));
@@ -146,11 +144,9 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
   } catch (const std::exception& e) {
     LogFile::error(e.what());
   }
-  LogFile::info("%s:%d", __FILE__, __LINE__);
   RCState tstate(cmd.nextTState());
   try {
     if (tstate != Enum::UNKNOWN) {
-      LogFile::info("%s:%d", __FILE__, __LINE__);
       setState(tstate);
       if (cmd == RCCommand::CONFIGURE) {
         const NSMMessage& msg(com.getMessage());
@@ -165,7 +161,6 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
         setState(state);
         reply(NSMMessage(NSMCommand::OK, state.getLabel()));
       } else if (cmd == RCCommand::BOOT) {
-        LogFile::info("%s:%d", __FILE__, __LINE__);
         get(m_obj);
         boot(m_obj);
       } else if (cmd == RCCommand::LOAD) {

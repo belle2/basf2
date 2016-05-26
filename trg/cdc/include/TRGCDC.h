@@ -371,7 +371,7 @@ namespace Belle2 {
 //  std::vector<const TRGCDCWireHit *> badHits(void) const;
 
     /// returns event time
-    double getEventTime(void) const;
+    int getEventTime(void) const;
 
   public:// Utility functions
 
@@ -543,7 +543,7 @@ namespace Belle2 {
     bool _fileETF;
 
     /// Switch for selecting ETF version.
-    bool _fverETF;
+    int _fverETF;
 
     /// Switch for printing Firmware inputs for ETF.
     bool _fprintFirmETF;

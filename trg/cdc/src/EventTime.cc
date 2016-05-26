@@ -74,18 +74,28 @@ namespace Belle2{
   }
 
   void TRGCDCEventTime::doit(int ver, bool print){
+    TRGDebug::enterStage("Event Time");
     m_eventN +=1;
     m_ver=ver;
 
     if(ver==1){
       oldVer();
+      getT0();
     }
     else if(ver==0){
       hitcount();
       hist();
+      getT0();
     }
-    getT0();
+    else if(ver==2){
+      getT0();
+    }
+    else{
+      cout << "verETF error" << endl;
+      cout << "choose 0:hist, 1:old, 2:trueT0" << endl;
+    }
     if(print) printFirm();
+    TRGDebug::leaveStage("Event Time");
   }
 
   void TRGCDCEventTime::hitcount(void){
@@ -163,7 +173,11 @@ namespace Belle2{
           for(unsigned k=0; k<wires.size(); k++){
             if(wires[k]->hit()){
               int dt= wires[k]->signal()[0]->time();
-              if(m_histT>dt) m_histT=dt;
+              if(m_histT>dt){
+                m_histT=dt;
+                m_foundT0 = 1;
+                m_evtOut->Fill();
+              }
             }
           }
         }
@@ -204,7 +218,7 @@ namespace Belle2{
   }//end of TRGCDCEventTime::printFirm
 
 
-  double TRGCDCEventTime::getT0 (void)const{
+  int TRGCDCEventTime::getT0 (void)const{
     if (m_ver==2){
       return 0;
     }

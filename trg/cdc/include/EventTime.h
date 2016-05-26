@@ -47,7 +47,7 @@ namespace Belle2{
       void hist(void);
       void oldVer(void);
       void printFirm(void);
-      double getT0(void)const;
+      int getT0(void)const;
 
    
     private : 

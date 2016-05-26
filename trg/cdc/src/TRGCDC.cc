@@ -2295,7 +2295,7 @@ namespace Belle2 {
 
     //...Event Time... In ns scale.
     // [FIXME] Not really firmware mode. Just for display.
-    double t_eventTime = _eventTime.back()->getT0();
+    int t_eventTime = _eventTime.back()->getT0();
     // Update WireHit driftTime using eventTime
     // [FIXME] This method is a temorary method. Next time change everything inside EventTime class.
     //cout<<"Hit timing ";
@@ -2628,7 +2628,7 @@ namespace Belle2 {
 //jb TRGDebug::leaveStage("Perfect 3D Finder");
 //jb }
 
-  double TRGCDC::getEventTime(void) const
+  int TRGCDC::getEventTime(void) const
   {
     return _eventTime.back()->getT0();
   }

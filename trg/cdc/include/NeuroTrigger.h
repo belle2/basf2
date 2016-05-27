@@ -95,6 +95,10 @@ namespace Belle2 {
      */
     bool load(const std::string& filename, const std::string& arrayname = "MLPs");
 
+    /** Loads parameters from the geometry and precalculates some constants
+     * that will be needed. */
+    void setConstants();
+
     /** return reference to a neural network */
     CDCTriggerMLP& operator[](unsigned index) { return m_MLPs[index]; }
     /** return const reference to a neural network */

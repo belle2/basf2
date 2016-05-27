@@ -208,18 +208,7 @@ NeuroTrigger::initialize(const Parameters& p)
                                    maxHits, SLpattern, SLpatternMask, p.tMax));
   }
   // load some values from the geometry that will be needed for the input
-  CDCGeometryPar& cdc = CDCGeometryPar::Instance();
-  int layerId = 3;
-  int nTS = 0;
-  for (int iSL = 0; iSL < 9; ++iSL) {
-    m_TSoffset[iSL] = nTS;
-    nTS += cdc.nWiresInLayer(layerId);
-    m_TSoffset[iSL + 1] = nTS;
-    for (int priority = 0; priority < 2; ++ priority) {
-      m_radius[iSL][priority] = cdc.senseWireR(layerId + priority);
-    }
-    layerId += (iSL > 0 ? 6 : 7);
-  }
+  setConstants();
 }
 
 vector<unsigned>
@@ -238,6 +227,23 @@ NeuroTrigger::getRangeIndices(const Parameters& p, unsigned isector)
     indices[3] = (p.SLpattern.size() == 1) ? 0 : isector;
   }
   return indices;
+}
+
+void
+NeuroTrigger::setConstants()
+{
+  CDCGeometryPar& cdc = CDCGeometryPar::Instance();
+  int layerId = 3;
+  int nTS = 0;
+  for (int iSL = 0; iSL < 9; ++iSL) {
+    m_TSoffset[iSL] = nTS;
+    nTS += cdc.nWiresInLayer(layerId);
+    m_TSoffset[iSL + 1] = nTS;
+    for (int priority = 0; priority < 2; ++ priority) {
+      m_radius[iSL][priority] = cdc.senseWireR(layerId + priority);
+    }
+    layerId += (iSL > 0 ? 6 : 7);
+  }
 }
 
 int
@@ -523,17 +529,7 @@ NeuroTrigger::load(const string& filename, const string& arrayname)
   B2DEBUG(100, "loaded " << m_MLPs.size() << " networks");
 
   // load some values from the geometry that will be needed for the input
-  CDCGeometryPar& cdc = CDCGeometryPar::Instance();
-  int layerId = 3;
-  int nTS = 0;
-  for (int iSL = 0; iSL < 9; ++iSL) {
-    m_TSoffset[iSL] = nTS;
-    nTS += cdc.nWiresInLayer(layerId);
-    m_TSoffset[iSL + 1] = nTS;
-    for (int priority = 0; priority < 2; ++ priority) {
-      m_radius[iSL][priority] = cdc.senseWireR(layerId + priority);
-    }
-    layerId += (iSL > 0 ? 6 : 7);
-  }
+  setConstants();
+
   return true;
 }

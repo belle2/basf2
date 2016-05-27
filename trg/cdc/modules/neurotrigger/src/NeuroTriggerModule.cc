@@ -69,8 +69,9 @@ NeuroTriggerModule::event()
     m_NeuroTrigger.updateTrack(*tracks2D[itrack]);
     int isector = m_NeuroTrigger.selectMLP(*tracks2D[itrack]);
     if (isector >= 0) {
-      std::vector<float> MLPinput = m_NeuroTrigger.getInputVector(isector);
-      std::vector<float> target = m_NeuroTrigger.runMLP(isector, MLPinput);
+      vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector);
+      vector<float> MLPinput = m_NeuroTrigger.getInputVector(isector, hitIds);
+      vector<float> target = m_NeuroTrigger.runMLP(isector, MLPinput);
       int zIndex = m_NeuroTrigger[isector].zIndex();
       double z = (zIndex >= 0) ? target[zIndex] : 0.;
       int thetaIndex = m_NeuroTrigger[isector].thetaIndex();
@@ -82,7 +83,6 @@ NeuroTriggerModule::event()
                            z, cot, 0.);
       tracks2D[itrack]->addRelationTo(NNtrack);
       // relations to hits used in MLP
-      std::vector<unsigned> hitIds = m_NeuroTrigger.getSelectedHitIds();
       for (unsigned i = 0; i < hitIds.size(); ++i) {
         NNtrack->addRelationTo(segmentHits[hitIds[i]]);
       }

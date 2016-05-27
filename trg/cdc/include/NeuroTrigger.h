@@ -139,14 +139,18 @@ namespace Belle2 {
      */
     unsigned long getInputPattern(unsigned isector);
 
+    /** Select best hits for each super layer
+     * @param isector index of the MLP that will use the input
+     * @return list of selected hit indices */
+    std::vector<unsigned> selectHits(unsigned isector);
+
     /** Calculate input values for MLP.
      * @param isector index of the MLP that will use the input
+     * @param hitIds hit indices to be used for the input
      * @return scaled vector of input values (1 for each input node)
      */
-    std::vector<float> getInputVector(unsigned isector);
+    std::vector<float> getInputVector(unsigned isector, std::vector<unsigned>& hitIds);
 
-    /** Get list of indices for the hits that are selected as input for the MLP. */
-    std::vector<unsigned> getSelectedHitIds() { return m_selectedHitIds; }
 
     /** Run an expert MLP.
      * @param isector index of the MLP
@@ -165,8 +169,6 @@ namespace Belle2 {
     double m_idRef[9][2] = {};
     /** 2D arclength of current track */
     double m_arclength[9][2] = {};
-    /** List of indices for the hits that are selected as input for the MLP */
-    std::vector<unsigned> m_selectedHitIds = {};
   };
 }
 #endif

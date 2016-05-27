@@ -382,14 +382,12 @@ NeuroTrigger::getInputPattern(unsigned isector)
   return hitPattern & expert.getSLpatternMask();
 }
 
-vector<float>
-NeuroTrigger::getInputVector(unsigned isector)
+vector<unsigned>
+NeuroTrigger::selectHits(unsigned isector)
 {
   StoreArray<CDCTriggerSegmentHit> hits("CDCTriggerSegmentHits");
   CDCTriggerMLP& expert = m_MLPs[isector];
-  // prepare empty input vector and vectors to keep best drift times
-  vector<float> inputVector;
-  inputVector.assign(expert.nNodesLayer(0), 0.);
+  // prepare vectors to keep best drift times, left/right and selected hit IDs
   vector<int> tMin;
   tMin.assign(expert.nNodesLayer(0), expert.getTMax());
   vector<bool> LRknown;
@@ -398,7 +396,7 @@ NeuroTrigger::getInputVector(unsigned isector)
   hitIds.assign(expert.nNodesLayer(0), -1);
   vector<unsigned> nHits;
   nHits.assign(9, 0);
-  // loop over hits, choosing only 1 per superlayer
+  // loop over hits, choosing up to MaxHitsPerSL per superlayer
   B2DEBUG(250, "start hit loop");
   for (int ihit = 0; ihit < hits.getEntries(); ++ ihit) {
     unsigned short iSL = hits[ihit]->getISuperLayer();
@@ -407,14 +405,12 @@ NeuroTrigger::getInputVector(unsigned isector)
       B2DEBUG(250, "skipping hit in SL " << iSL);
       continue;
     }
-    int priority = hits[ihit]->getPriorityPosition();
-    // get priority time (TODO: get event time)
+    // get priority time (TODO: get event time) and apply time window cut
     int t = hits[ihit]->priorityTime();
-    if (t < 0) continue;
-    int LR = hits[ihit]->getLeftRight();
+    if (t < 0 || t > expert.getTMax()) continue;
     double relId = getRelId(*hits[ihit]);
-    if (expert.isRelevant(relId, iSL) && t <= expert.getTMax()) {
-      // get reference hit
+    if (expert.isRelevant(relId, iSL)) {
+      // get reference hit (worst of existing hits)
       unsigned short iRef = iSL;
       if (expert.getMaxHitsPerSL() > 1) {
         if (nHits[iSL] < expert.getMaxHitsPerSL() &&
@@ -436,25 +432,49 @@ NeuroTrigger::getInputVector(unsigned isector)
       } else {
         useHit = (hits[ihit]->LRknown() || t <= tMin[iRef]);
       }
-      B2DEBUG(250, "relevant wire SL " << iSL << " LR " << LR << " t " << t
-              << " iRef " << iRef << " useHit " << useHit);
+      B2DEBUG(250, "relevant wire SL " << iSL << " LR " << hits[ihit]->getLeftRight()
+              << " t " << t << " iRef " << iRef << " useHit " << useHit);
       if (useHit) {
         // keep drift time and LR
         LRknown[iRef] = hits[ihit]->LRknown();
         tMin[iRef] = t;
         hitIds[iRef] = ihit;
-        // get scaled input values: (relId, t, 2D arclength)
-        inputVector[3 * iRef] = expert.scaleId(relId, iSL);
-        inputVector[3 * iRef + 1] = (((LR >> 1) & 1) - (LR & 1)) * t / float(expert.getTMax());
-        inputVector[3 * iRef + 2] = 2. * (m_arclength[iSL][int(priority < 3)] - m_radius[iSL][0])
-                                    / (M_PI_2 * m_radius[iSL][1] - m_radius[iSL][0]) - 1.;
       }
     }
   }
-  // save selected hit Ids (for making relations to track)
-  m_selectedHitIds.clear();
+  // save selected hit Ids
+  vector<unsigned> selectedHitIds = {};
   for (unsigned iHit = 0; iHit < hitIds.size(); ++iHit) {
-    if (hitIds[iHit] >= 0) m_selectedHitIds.push_back(hitIds[iHit]);
+    if (hitIds[iHit] >= 0) selectedHitIds.push_back(hitIds[iHit]);
+  }
+  return selectedHitIds;
+}
+
+vector<float>
+NeuroTrigger::getInputVector(unsigned isector, vector<unsigned>& hitIds)
+{
+  StoreArray<CDCTriggerSegmentHit> hits("CDCTriggerSegmentHits");
+  CDCTriggerMLP& expert = m_MLPs[isector];
+  // prepare empty input vector and vectors to keep best drift times
+  vector<float> inputVector;
+  inputVector.assign(expert.nNodesLayer(0), 0.);
+  // convert hits to input values
+  vector<unsigned> nHits;
+  nHits.assign(9, 0);
+  for (unsigned ii = 0; ii < hitIds.size(); ++ii) {
+    int ihit = hitIds[ii];
+    unsigned short iSL = hits[ihit]->getISuperLayer();
+    unsigned short iRef = iSL + 9 * nHits[iSL];
+    ++nHits[iSL];
+    int t = hits[ihit]->priorityTime();
+    int LR = hits[ihit]->getLeftRight();
+    double relId = getRelId(*hits[ihit]);
+    int priority = hits[ihit]->getPriorityPosition();
+    // get scaled input values: (relId, t, 2D arclength)
+    inputVector[3 * iRef] = expert.scaleId(relId, iSL);
+    inputVector[3 * iRef + 1] = (((LR >> 1) & 1) - (LR & 1)) * t / float(expert.getTMax());
+    inputVector[3 * iRef + 2] = 2. * (m_arclength[iSL][int(priority < 3)] - m_radius[iSL][0])
+                                / (M_PI_2 * m_radius[iSL][1] - m_radius[iSL][0]) - 1.;
   }
   return inputVector;
 }

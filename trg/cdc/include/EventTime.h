@@ -59,7 +59,6 @@ namespace Belle2{
       TH1* h;
  
       int m_fastestT;
-      int m_eventT;
       int m_histT;
       int cnt[9][64];
       int ft[9][64][10];

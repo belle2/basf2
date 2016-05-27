@@ -77,7 +77,6 @@ namespace Belle2{
     TRGDebug::enterStage("Event Time");
     m_eventN +=1;
     m_ver=ver;
-
     if(ver==1){
       oldVer();
       getT0();
@@ -88,6 +87,8 @@ namespace Belle2{
       getT0();
     }
     else if(ver==2){
+      m_histT=0;
+      m_foundT0=1;
       getT0();
     }
     else{
@@ -135,7 +136,6 @@ namespace Belle2{
   void TRGCDCEventTime::hist(void){
     TRGDebug::enterStage("Event Time");
 
-    m_eventT=65535;
     m_foundT0 = 0;
     threshold = 3;
     m_histT= 500;
@@ -161,7 +161,7 @@ namespace Belle2{
 
   void TRGCDCEventTime::oldVer(void){
     TRGDebug::enterStage("Event Time");
-    int m_histT=65535;
+    m_histT=65535;
     for (unsigned i=0; i<_cdc.nSegmentLayers(); i++){
       const Belle2::TRGCDCLayer *l=_cdc.segmentLayer(i);
       const unsigned nWires = l->nCells();
@@ -219,14 +219,9 @@ namespace Belle2{
 
 
   int TRGCDCEventTime::getT0 (void)const{
-    if (m_ver==2){
-      return 0;
-    }
-    else{
-      int et = m_histT;
-      if(m_foundT0 == 0) et = 9999;
-      return et;
-    }
+    int et = m_histT;
+    if(m_foundT0 == 0) et = 9999;
+    return et;
   }
 
   void TRGCDCEventTime::terminate(void){

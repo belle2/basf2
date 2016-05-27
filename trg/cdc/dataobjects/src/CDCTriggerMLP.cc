@@ -75,6 +75,12 @@ CDCTriggerMLP::inPtRange(float pt) const
 }
 
 bool
+CDCTriggerMLP::inInvptRange(float invpt) const
+{
+  return (invptRange[0] <= invpt && invpt <= invptRange[1]);
+}
+
+bool
 CDCTriggerMLP::inThetaRange(float theta) const
 {
   return (thetaRange[0] <= theta && theta <= thetaRange[1]);

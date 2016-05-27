@@ -54,6 +54,8 @@ namespace Belle2 {
     bool inPhiRange(float phi) const;
     /** check whether given pt value is in sector */
     bool inPtRange(float pt) const;
+    /** check whether given 1/pt value is in sector */
+    bool inInvptRange(float invpt) const;
     /** check whether given theta value is in sector */
     bool inThetaRange(float theta) const;
     /** check whether given relative TS ID is in relevant range */

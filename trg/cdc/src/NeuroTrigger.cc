@@ -249,7 +249,7 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
   }
 
   float phi0 = track.getPhi0();
-  float pt = track.getTransverseMomentum() * track.getChargeSign();
+  float invpt = track.getKappa();
   float theta = atan2(1., track.getCotTheta());
 
   // find sector
@@ -257,7 +257,7 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
   // if several sectors match, first in the list is taken
   int bestIndex = -1;
   for (unsigned isector = 0; isector < m_MLPs.size(); ++isector) {
-    if (m_MLPs[isector].inPhiRange(phi0) && m_MLPs[isector].inPtRange(pt)
+    if (m_MLPs[isector].inPhiRange(phi0) && m_MLPs[isector].inInvptRange(invpt)
         && m_MLPs[isector].inThetaRange(theta)) {
       unsigned long hitPattern = getInputPattern(isector);
       unsigned long sectorPattern = m_MLPs[isector].getSLpattern();
@@ -278,7 +278,7 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
 
   if (bestIndex < 0) {
     B2DEBUG(150, "Track does not match any sector.");
-    B2DEBUG(150, "pt=" << pt << ", phi=" << phi0 * 180. / M_PI << ", theta=" << theta * 180. / M_PI);
+    B2DEBUG(150, "invpt=" << invpt << ", phi=" << phi0 * 180. / M_PI << ", theta=" << theta * 180. / M_PI);
   }
 
   return bestIndex;
@@ -296,18 +296,18 @@ NeuroTrigger::selectMLPs(const CDCTriggerTrack& track,
   }
 
   float phi0 = track.getPhi0();
-  float pt = track.getTransverseMomentum() * track.getChargeSign();
+  float invpt = track.getKappa();
   float theta = atan2(1., track.getCotTheta());
 
   if (selectByMC) {
     phi0 = mcparticle.getMomentum().Phi();
-    pt = mcparticle.getMomentum().Pt() * mcparticle.getCharge();
+    invpt = mcparticle.getCharge() / mcparticle.getMomentum().Pt();
     theta = mcparticle.getMomentum().Theta();
   }
 
   // find all matching sectors
   for (unsigned isector = 0; isector < m_MLPs.size(); ++isector) {
-    if (m_MLPs[isector].inPhiRange(phi0) && m_MLPs[isector].inPtRange(pt)
+    if (m_MLPs[isector].inPhiRange(phi0) && m_MLPs[isector].inInvptRange(invpt)
         && m_MLPs[isector].inThetaRange(theta)) {
       indices.push_back(isector);
     }
@@ -315,7 +315,7 @@ NeuroTrigger::selectMLPs(const CDCTriggerTrack& track,
 
   if (indices.size() == 0) {
     B2DEBUG(150, "Track does not match any sector.");
-    B2DEBUG(150, "pt=" << pt << ", phi=" << phi0 * 180. / M_PI << ", theta=" << theta * 180. / M_PI);
+    B2DEBUG(150, "invpt=" << invpt << ", phi=" << phi0 * 180. / M_PI << ", theta=" << theta * 180. / M_PI);
   }
 
   return indices;
@@ -333,7 +333,7 @@ NeuroTrigger::updateTrack(const CDCTriggerTrack& track)
       m_idRef[iSL][priority] = remainder(((track.getPhi0() - phiPt) *
                                           (m_TSoffset[iSL + 1] - m_TSoffset[iSL]) / 2. / M_PI),
                                          (m_TSoffset[iSL + 1] - m_TSoffset[iSL]));
-      m_arclength[iSL][priority] = 2. * phiPt / omega;
+      m_arclength[iSL][priority] = (omega == 0) ? m_radius[iSL][priority] : 2. * phiPt / omega;
     }
   }
 }

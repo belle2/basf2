@@ -81,6 +81,8 @@ namespace Belle2 {
     bool m_selectSectorByMC;
     /** Number of samples to prepare input ranges. */
     int m_nTrainPrepare;
+    /** Input ranges given over the module parameters. */
+    std::vector<std::vector<float>> m_IDranges;
     /** Cut on the hit counters to get relevant ID ranges. */
     double m_relevantCut;
     /** Switch to apply cut to single hit counter or to sum over counters. */

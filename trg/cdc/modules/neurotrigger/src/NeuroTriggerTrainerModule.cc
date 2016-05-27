@@ -130,6 +130,10 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
   addParam("nTrainPrepare", m_nTrainPrepare,
            "Number of samples for preparation of relevant ID ranges "
            "(0: use default ranges).", 1000);
+  addParam("IDranges", m_IDranges,
+           "If list is not empty, it will replace the default ranges. "
+           "1 list or nMLP lists. Set nTrainPrepare to 0 if you use this option.",
+           {});
   addParam("relevantCut", m_relevantCut,
            "Cut for preparation of relevant ID ranges.", 0.02);
   addParam("cutSum", m_cutSum,
@@ -175,9 +179,11 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
 
 void NeuroTriggerTrainerModule::initialize()
 {
+  // register store objects
   StoreArray<CDCTriggerSegmentHit>::required();
   StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
   StoreArray<MCParticle>::required(m_targetCollectionName);
+  // load or initialize neurotrigger
   if (!m_load ||
       !loadTraindata(m_trainFilename, m_trainArrayname) ||
       !m_NeuroTrigger.load(m_filename, m_arrayname)) {
@@ -193,12 +199,31 @@ void NeuroTriggerTrainerModule::initialize()
       }
     }
   }
+  // consistency check of training parameters
   if (m_NeuroTrigger.nSectors() != m_trainSets.size())
     B2ERROR("Number of training sets (" << m_trainSets.size() << ") should match " <<
             "number of sectors (" << m_NeuroTrigger.nSectors() << ")");
   if (m_nTrainMin > m_nTrainMax) {
     m_nTrainMin = m_nTrainMax;
     B2WARNING("nTrainMin set to " << m_nTrainMin << " (was larger than nTrainMax)");
+  }
+  // set IDranges if they were given in the parameters
+  if (m_IDranges.size() > 0) {
+    if (m_IDranges.size() == 1 || m_IDranges.size() == m_NeuroTrigger.nSectors()) {
+      B2DEBUG(50, "Setting relevant ID ranges from parameters.");
+      for (unsigned isector = 0; isector < m_NeuroTrigger.nSectors(); ++isector) {
+        if (m_IDranges[isector].size() == 18)
+          m_NeuroTrigger[isector].relevantID = m_IDranges[isector];
+        else
+          B2ERROR("IDranges must contain 18 values (sector " << isector
+                  << " has " << m_IDranges[isector].size() << ")");
+      }
+      if (m_nTrainPrepare > 0)
+        B2WARNING("Given ID ranges will be replaced during training. "
+                  "Set nTrainPrepare = 0 if you want to give ID ranges by hand.");
+    } else {
+      B2ERROR("Number of IDranges should be 0, 1, or " << m_NeuroTrigger.nSectors());
+    }
   }
 
   // initialize monitoring histograms
@@ -322,6 +347,9 @@ void NeuroTriggerTrainerModule::event()
           zHistsMC[isector]->Fill(mcTrack->getProductionVertex().Z());
           phiHists2D[isector]->Fill(tracks[itrack]->getPhi0());
           ptHists2D[isector]->Fill(tracks[itrack]->getKappa());
+        }
+        if (m_trainSets[isector].nSamples() % 1000 == 0) {
+          B2DEBUG(50, m_trainSets[isector].nSamples() << " samples collected for sector " << isector);
         }
       }
     }

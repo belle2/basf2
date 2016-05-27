@@ -400,8 +400,7 @@ NeuroTrigger::selectHits(unsigned isector)
   B2DEBUG(250, "start hit loop");
   for (int ihit = 0; ihit < hits.getEntries(); ++ ihit) {
     unsigned short iSL = hits[ihit]->getISuperLayer();
-    if ((expert.getSLpatternMask() >> iSL) & 1 &&
-        !((expert.getSLpattern() >> iSL) & 1)) {
+    if (!((expert.getSLpatternUnmasked() >> iSL) & 1)) {
       B2DEBUG(250, "skipping hit in SL " << iSL);
       continue;
     }

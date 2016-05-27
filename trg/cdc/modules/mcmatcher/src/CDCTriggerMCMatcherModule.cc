@@ -94,8 +94,10 @@ CDCTriggerMCMatcherModule::initialize()
   mcparticles.requireRelationTo(segmentHits);
   tracks.requireRelationTo(segmentHits);
   mcparticles.registerRelationTo(mctracks);
+  mcparticles.registerRelationTo(tracks);
   mctracks.registerRelationTo(segmentHits);
   mctracks.registerRelationTo(tracks);
+  tracks.registerRelationTo(mcparticles);
   tracks.registerRelationTo(mctracks);
 }
 
@@ -345,6 +347,7 @@ CDCTriggerMCMatcherModule::event()
           if (m_relateClonesAndMerged) {
             // Add the mc matching relation with negative weight
             prTrack->addRelationTo(mcTrack, -purity);
+            prTrack->addRelationTo(mcTrack->getRelatedFrom<MCParticle>(m_MCParticleCollectionName), -purity);
           }
           B2DEBUG(100, "Classified PRTrack " << prTrackId << " as clone -> mcTrackId "
                   << mcTrackId << " : " << -purity);
@@ -358,6 +361,7 @@ CDCTriggerMCMatcherModule::event()
         // MATCHED
         //Add the mc matching relation
         prTrack->addRelationTo(mcTrack, purity);
+        prTrack->addRelationTo(mcTrack->getRelatedFrom<MCParticle>(m_MCParticleCollectionName), purity);
         B2DEBUG(100, "Classified PRTrack " << prTrackId << " as match -> mcTrackId "
                 << mcTrackId << " : " << purity);
       }
@@ -390,6 +394,7 @@ CDCTriggerMCMatcherModule::event()
         if (m_relateClonesAndMerged) {
           // Add the pr matching relation with negative weight
           mcTrack->addRelationTo(prTrack, -efficiency);
+          mcTrack->getRelatedFrom<MCParticle>(m_MCParticleCollectionName)->addRelationTo(prTrack, -efficiency);
         }
         B2DEBUG(100, "Classifid MCTrack " << mcTrackId << " as merge -> prTrackId "
                 << prTrackId << " : " << -efficiency);
@@ -398,6 +403,7 @@ CDCTriggerMCMatcherModule::event()
         // MATCHED
         // Add the pr matching relation
         mcTrack->addRelationTo(prTrack, efficiency);
+        mcTrack->getRelatedFrom<MCParticle>(m_MCParticleCollectionName)->addRelationTo(prTrack, efficiency);
         B2DEBUG(100, "Classified MCTrack " << mcTrackId << " as match -> prTrackId "
                 << prTrackId << " : " << efficiency);
       }

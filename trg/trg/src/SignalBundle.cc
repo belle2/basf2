@@ -297,7 +297,7 @@ TRGSignalBundle::dumpCOE(const string & fnIn) const {
         fn = name();
 
     //...Open a file to output...
-    ofstream file(fn, ios::out);
+    ofstream file(fn + ".coe", ios::out);
     if (! file.is_open()) {
  	cout << "!!! " << name() << " can not open file : " << fn << endl;
         return;
@@ -329,6 +329,10 @@ TRGSignalBundle::dumpCOE(const string & fnIn) const {
         clk0 = 0;
         clk1 = 1;
     }
+
+    //...32 clocks as default : 2016/04...
+    clk0 = 0;
+    clk1 = 31;
 
     TRGState tmp = state(0);
     const TRGSignalVector & cc = _clock->clockCounter();

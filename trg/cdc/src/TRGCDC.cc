@@ -2357,6 +2357,8 @@ namespace Belle2 {
     //...Read configuration data...
     char b[800];
     unsigned lines = 0;
+    unsigned lastSl = 0;
+    unsigned lastMergerLocalId = 0;
     while (! infile.eof()) {
       infile.getline(b, 800);
       const string l(b);
@@ -2399,6 +2401,11 @@ namespace Belle2 {
       if (lines != wid)
         continue;
 
+      //...Super layer ID...
+      const unsigned sl = _wires[wid]->superLayerId();
+      if (sl != lastSl)
+          lastMergerLocalId = 0;
+
       //...Make a front-end board if necessary...
       bool newFrontEnd = false;
       TCFrontEnd* f = 0;
@@ -2408,7 +2415,7 @@ namespace Belle2 {
         newFrontEnd = true;
         const string name = "CDCFrontEnd" + TRGUtil::itostring(fid);
         TCFrontEnd::boardType t = TCFrontEnd::unknown;
-        if (_wires[wid]->superLayerId() == 0) {
+        if (sl == 0) {
           if (_wires[wid]->localLayerId() < 5)
             t = TCFrontEnd::innerInside;
           else
@@ -2439,9 +2446,10 @@ namespace Belle2 {
             m = _mergers[mid];
           if (! m) {
             newMerger = true;
-            const string name = "CDCMerger" + TRGUtil::itostring(mid);
+            const string name = "CDCMerger" + TRGUtil::itostring(sl) +
+                "-" + TRGUtil::itostring(lastMergerLocalId);
             TCMerger::unitType mt = TCMerger::unknown;
-            if (_wires[wid]->superLayerId() == 0)
+            if (sl == 0)
               mt = TCMerger::innerType;
             else
               mt = TCMerger::outerType;
@@ -2452,6 +2460,9 @@ namespace Belle2 {
                              _clockUser3125,
                              _clockUser6250);
             _mergers.push_back(m);
+            ++lastMergerLocalId;
+            lastSl = sl;
+            cout << "new merger : " << name << endl;
           }
           m->push_back(f);
         }

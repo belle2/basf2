@@ -478,6 +478,13 @@ namespace Belle2 {
     unsigned _fastSimulationMode;
 
     /// Firmware simulation mode.
+    /// bit0 : dump COE from front-ends
+    /// bit1 : dump COE from mergers
+    /// bit2 : dump COE from TSFs
+    /// bit3 : dump COE from 2D trackers
+    /// bit4 : dump COE from 3D trackers
+    /// bit5 : dump COE from Neuro-trackers
+    /// bit6 : dump COE from ETF
     unsigned _firmwareSimulationMode;
 
     /// Return value for trg cdc module;

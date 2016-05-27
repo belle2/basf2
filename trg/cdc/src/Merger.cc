@@ -144,9 +144,6 @@ TRGCDCMerger::dump(const string & message, const string & pre) const {
   TRGBoard::dump(message, pre);
 }
 
-
-
-
 void
 TRGCDCMerger::simulate(void) {
 
@@ -227,6 +224,9 @@ TRGCDCMerger::simulate(void) {
                                 TCMerger::packerOuter);    
   }
   mosb = _mosb;
+
+  if (TRGCDC::getTRGCDC()->firmwareSimulationMode() & 0x2)
+      mosb->dumpCOE();
 
   //...Output to a channel...
   output(0)->signal(_mosb);

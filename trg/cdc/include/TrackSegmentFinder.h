@@ -178,6 +178,11 @@ namespace Belle2 {
                                          vector<int> &,
                                          const unsigned);
 
+      /// Output packer for ETF.
+      TRGSignalVector * packerForETF(vector<TRGSignalVector *> &,
+                                     vector<int> &,
+                                     const unsigned);
+
     double mkint(TRGState );
 
     vector<bool> mkbool(int, int);

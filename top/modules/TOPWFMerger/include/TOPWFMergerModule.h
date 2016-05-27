@@ -73,28 +73,28 @@ namespace Belle2 {
 
     /**
      * Return a key used in m_pedestalMap
-     * @param moduleID module ID
-     * @param channel hardware channel number
+     * @param scrodID scrod ID
+     * @param channel hardware channel number within SCROD
      * @return a key
      */
-    unsigned getKey(int moduleID, unsigned channel) const
+    unsigned getKey(unsigned scrodID, unsigned channel) const
     {
-      return channel + (moduleID << 16);
+      return channel + (scrodID << 16);
     }
 
     /**
-     * Return module ID from key
+     * Return scrod ID from key
      * @param key a key number
-     * @return module ID
+     * @return scrod ID
      */
-    int getModuleID(unsigned key) const {return (key >> 16);}
+    unsigned getScrodID(unsigned key) const {return (key >> 16);}
 
     /**
-     * Return channel number from key
+     * Return channel number (within SCROD) from key
      * @param key a key number
      * @return channel number
      */
-    int getChannel(unsigned key) const {return (key & 0xFFFF);}
+    unsigned getChannel(unsigned key) const {return (key & 0xFFFF);}
 
     /**
      * Appends raw waveform to waveform
@@ -130,9 +130,10 @@ namespace Belle2 {
     std::map<unsigned, const TOPASICChannel*> m_pedestalMap;
 
     DBArray<TOPSampleTime> m_sampleTimes;  /**< sample time calibration */
-    /** map of (module, channel) and sample time calibration */
+    /** map of (scrod, channel) and sample time calibration */
     std::map<unsigned, const TOPSampleTime*> m_sampleTimeMap;
     TOPSampleTime* m_sampleTime = 0; /**< default in case no calibration available */
+
     unsigned m_falseWindows = 0; /**< false ASIC window count */
     int m_sampleDivisions = 0; /**< number of sample divisions (from TDC subbits) */
   };

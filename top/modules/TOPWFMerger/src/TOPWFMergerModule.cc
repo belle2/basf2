@@ -138,7 +138,7 @@ namespace Belle2 {
 
         m_sampleTimeMap.clear();
         for (const auto& asic : m_sampleTimes) {
-          auto key = getKey(asic.getModuleID(), asic.getChannel());
+          auto key = getKey(asic.getScrodID(), asic.getChannel());
           m_sampleTimeMap[key] = &asic;
         }
 
@@ -177,21 +177,22 @@ namespace Belle2 {
       const auto* calibration = m_pedestalMap[key];
       if (!calibration) {
         B2WARNING("TOPWFMerger: no pedestal calibration available for module " <<
-                  getModuleID(key) << " channel " << getChannel(key));
+                  getScrodID(key) << " channel " << getChannel(key));
         continue;
       }
       int numWindows = calibration->getNumofWindows();
       auto moduleID = element.second[0]->getModuleID();
       auto pixelID = element.second[0]->getPixelID();
       auto channel = element.second[0]->getChannel();
-      auto* waveform = waveforms.appendNew(moduleID, pixelID, channel);
+      auto scrodID = element.second[0]->getScrodID();
+      auto* waveform = waveforms.appendNew(moduleID, pixelID, channel, scrodID);
       int prevWindow = element.second[0]->getStorageWindow() - 1;
       for (const auto& rawWaveform : element.second) {
         int window = rawWaveform->getStorageWindow();
         int diff = window - prevWindow;
         prevWindow = window;
         if (diff != 1 and diff != (1 - numWindows))
-          waveform = waveforms.appendNew(moduleID, pixelID, channel);
+          waveform = waveforms.appendNew(moduleID, pixelID, channel, scrodID);
         bool ok = appendRawWavefrom(rawWaveform, calibration, waveform);
         if (ok) waveform->addRelationTo(rawWaveform);
       }
@@ -220,12 +221,13 @@ namespace Belle2 {
       auto refWindow = waveform.getReferenceWindow();
       const auto* sampleTime = m_sampleTime; // default calibration
       if (m_useSampleTimeCalibration and !m_sampleTimeMap.empty()) {
-        auto key = getKey(moduleID, channel);
+        auto scrodID = waveform.getScrodID();
+        auto key = getKey(scrodID, channel % 128);
         sampleTime = m_sampleTimeMap[key];
         if (!sampleTime) {
           sampleTime = m_sampleTime; // use default calibration
-          B2WARNING("TOPWFMerger: no sample time calibration available for module "
-                    << getModuleID(key) << " channel " << getChannel(key));
+          B2WARNING("TOPWFMerger: no sample time calibration available for SCROD "
+                    << scrodID << " channel " << channel % 128);
         }
       }
       const auto& hits = waveform.getHits();

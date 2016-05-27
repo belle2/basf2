@@ -39,13 +39,13 @@ namespace Belle2 {
     }
 
     /**
-     * Constructor with module ID, hardware channel number
-     * @param moduleID module ID
+     * Useful constructor
+     * @param scrodID scrod ID
      * @param channel hardware channel number
      * @param syncTimeBase sinchronization time base (width of 2 ASIC windows)
      */
-    TOPSampleTime(int moduleID, unsigned channel, double syncTimeBase):
-      m_moduleID(moduleID), m_channel(channel)
+    TOPSampleTime(unsigned scrodID, unsigned channel, double syncTimeBase):
+      m_scrodID(scrodID), m_channel(channel)
     {
       setTimeAxis(syncTimeBase);
     }
@@ -71,10 +71,10 @@ namespace Belle2 {
     void setTimeAxis(const std::vector<double>& sampleTimes, double syncTimeBase);
 
     /**
-     * Return module ID
-     * @return module ID
+     * Return scrod ID
+     * @return scrod ID
      */
-    int getModuleID() const {return m_moduleID;}
+    unsigned getScrodID() const {return m_scrodID;}
 
     /**
      * Return hardware channel number
@@ -127,11 +127,11 @@ namespace Belle2 {
 
   private:
 
-    int m_moduleID = 0;               /**< module ID */
-    unsigned m_channel = 0;           /**< hardware channel number */
+    unsigned short m_scrodID = 0;          /**< scrod ID */
+    unsigned short m_channel = 0;          /**< hardware channel number within SCROD */
     float m_timeAxis[c_TimeAxisSize + 1];  /**< time axis + right border point */
 
-    ClassDef(TOPSampleTime, 1); /**< ClassDef */
+    ClassDef(TOPSampleTime, 2); /**< ClassDef */
 
   };
 

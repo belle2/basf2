@@ -57,9 +57,10 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @param pixelID software channel ID (1-based)
      * @param channel hardware channel number (0-based)
+     * @param scrodID SCROD ID
      */
-    TOPWaveform(int moduleID, int pixelID, unsigned channel):
-      m_moduleID(moduleID), m_pixelID(pixelID), m_channel(channel)
+    TOPWaveform(int moduleID, int pixelID, unsigned channel, unsigned scrodID):
+      m_moduleID(moduleID), m_pixelID(pixelID), m_channel(channel), m_scrodID(scrodID)
     {}
 
     /**
@@ -117,6 +118,12 @@ namespace Belle2 {
      * @return channel number
      */
     unsigned getChannel() const { return m_channel; }
+
+    /**
+     * Returns SCROD ID
+     * @return SCROD ID
+     */
+    unsigned getScrodID() const {return m_scrodID;}
 
     /**
      * Returns waveform size (number of samples)
@@ -190,13 +197,14 @@ namespace Belle2 {
     int m_moduleID = 0;                 /**< module ID */
     int m_pixelID = 0;                  /**< software channel ID */
     unsigned m_channel = 0;             /**< hardware channel number */
+    unsigned m_scrodID = 0;             /**< SCROD ID */
     std::vector<WFSample> m_data;       /**< waveform samples */
     std::vector<bool> m_digital;        /**< digital waveform (samples over threshold) */
     std::vector<Hit> m_hits;            /**< reconstructed hits */
     std::vector<unsigned short> m_windows; /**< ASIC window numbers */
     unsigned short m_refWindow = 0; /**< reference ASIC window number */
 
-    ClassDef(TOPWaveform, 4); /**< ClassDef */
+    ClassDef(TOPWaveform, 5); /**< ClassDef */
 
   };
 

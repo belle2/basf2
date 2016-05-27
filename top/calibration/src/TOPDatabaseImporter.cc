@@ -37,7 +37,8 @@ using namespace Belle2;
 void TOPDatabaseImporter::importSampleTimeCalibration(std::string fileName)
 {
 
-  auto& mapper = TOP::TOPGeometryPar::Instance()->getChannelMapper();
+  auto& chMapper = TOP::TOPGeometryPar::Instance()->getChannelMapper();
+  auto& feMapper = TOP::TOPGeometryPar::Instance()->getFrontEndMapper();
   const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
   auto syncTimeBase = geo->getNominalTDC().getSyncTimeBase();
 
@@ -51,8 +52,17 @@ void TOPDatabaseImporter::importSampleTimeCalibration(std::string fileName)
 
   DBImportArray<TOPSampleTime> timeBases;
 
+  // this is how to import from one of Gary's text files (module 3 and 4)
+
   for (int moduleID = 3; moduleID < 5; moduleID++) {
     for (int boardStack = 0; boardStack < 4; boardStack++) {
+      auto* femap = feMapper.getMap(moduleID, boardStack);
+      if (!femap) {
+        B2ERROR("No FrontEnd map available for boardstack " << boardStack <<
+                " of module " << moduleID);
+        continue;
+      }
+      auto scrodID = femap->getScrodID();
       for (int carrierBoard = 0; carrierBoard < 4; carrierBoard++) {
         for (int asic = 0; asic < 4; asic++) {
           for (int chan = 0; chan < 8; chan++) {
@@ -66,8 +76,8 @@ void TOPDatabaseImporter::importSampleTimeCalibration(std::string fileName)
               }
               sampleTimes.push_back(data);
             }
-            auto channel = mapper.getChannel(boardStack, carrierBoard, asic, chan);
-            auto* timeBase = timeBases.appendNew(moduleID, channel, syncTimeBase);
+            auto channel = chMapper.getChannel(boardStack, carrierBoard, asic, chan);
+            auto* timeBase = timeBases.appendNew(scrodID, channel % 128, syncTimeBase);
             timeBase->setTimeAxis(sampleTimes, syncTimeBase);
           }
         }
@@ -93,7 +103,7 @@ void TOPDatabaseImporter::printSampleTimeCalibration()
   DBArray<TOPSampleTime> sampleTimes;
 
   for (const auto& timeBase : sampleTimes) {
-    cout << timeBase.getModuleID() << " " << timeBase.getChannel() << endl;
+    cout << timeBase.getScrodID() << " " << timeBase.getChannel() << endl;
     for (const auto& time : timeBase.getTimeAxis()) {
       cout << time << " ";
     }

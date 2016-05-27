@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -28,6 +28,7 @@
 #include <rawdata/dataobjects/RawTOP.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRawWaveform.h>
+#include <top/dataobjects/TOPRawDigit.h>
 
 using namespace std;
 
@@ -58,6 +59,9 @@ namespace Belle2 {
              "name of TOPDigit store array", string(""));
     addParam("outputWaveformsName", m_outputWaveformsName,
              "name of TOPRawWaveform store array", string(""));
+    addParam("outputRawDigitsName", m_outputRawDigitsName,
+             "name of TOPRawDigit store array", string(""));
+    addParam("swapBytes", m_swapBytes, "if true, swap bytes", false);
 
   }
 
@@ -73,6 +77,9 @@ namespace Belle2 {
 
     StoreArray<TOPDigit> digits(m_outputDigitsName);
     digits.registerInDataStore();
+
+    StoreArray<TOPRawDigit> rawDigits(m_outputRawDigitsName);
+    rawDigits.registerInDataStore();
 
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.registerInDataStore(DataStore::c_DontWriteOut);
@@ -94,6 +101,8 @@ namespace Belle2 {
     StoreArray<RawTOP> rawData(m_inputRawDataName);
     StoreArray<TOPDigit> digits(m_outputDigitsName);
     digits.clear();
+    StoreArray<TOPRawDigit> rawDigits(m_outputRawDigitsName);
+    rawDigits.clear();
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.clear();
 
@@ -101,21 +110,33 @@ namespace Belle2 {
       for (int finesse = 0; finesse < 4; finesse++) {
         const int* buffer = raw.GetDetectorBuffer(0, finesse);
         int bufferSize = raw.GetDetectorNwords(0, finesse);
-        if (bufferSize < 1)
-          continue;
-        unsigned dataFormat = (buffer[0] >> 24) & 0xFF;
+        if (bufferSize < 1) continue;
+
+        DataArray array(buffer, bufferSize, m_swapBytes);
+        unsigned word = array.getWord();
+        unsigned dataFormat = (word >> 24) & 0xFF;
+        unsigned version = (word >> 16) & 0xFF;
         switch (dataFormat) {
           case 1:
-            unpackProductionFormat(buffer, bufferSize, digits);
+            switch (version) {
+              case 0:
+                unpackProductionFormat(buffer, bufferSize, digits);
+                break;
+              case 1:
+                unpackProductionFormat(buffer, bufferSize, rawDigits);
+                break;
+              default:
+                B2ERROR("TOPUnpacker: unknown production format, version = " << version);
+            }
             break;
           case 2:
             unpackWaveformFormat(buffer, bufferSize, waveforms);
             break;
           default:
-            B2ERROR("TOPUnpacker: unknown data format type = " << dataFormat);
+            B2ERROR("TOPUnpacker: unknown data format, type = " << dataFormat);
         }
-      }
-    }
+      } // finesse loop
+    } // rawData loop
 
   }
 
@@ -159,10 +180,57 @@ namespace Belle2 {
   }
 
 
+  void TOPUnpackerModule::unpackProductionFormat(const int* buffer, int bufferSize,
+                                                 StoreArray<TOPRawDigit>& rawDigits)
+  {
+    DataArray array(buffer, bufferSize, m_swapBytes);
+    unsigned word = array.getWord();
+    unsigned short scrodID = word & 0x0FFF;
+
+    int Nhits = array.getLastWord() & 0x01FF;
+    if (bufferSize != 5 * Nhits + 2) {
+      B2ERROR("TOPUnpacker: corrupted data (feature-extraction format) for SCROD ID = "
+              << scrodID);
+      return;
+    }
+
+    for (int hit = 0; hit < Nhits; hit++) {
+      auto* digit = rawDigits.appendNew(scrodID);
+
+      word = array.getWord(); // word 1
+      digit->setCarrierNumber((word >> 29) & 0x03);
+      digit->setASICNumber((word >> 27) & 0x03);
+      digit->setASICChannel((word >> 24) & 0x07);
+      digit->setSample((word >> 16) & 0xFF);
+      digit->setTFine((word >> 12) & 0x0F);
+      digit->setCOffset((word >> 10) & 0x03);
+      digit->setASICWindow(word & 0x1FF);
+
+      word = array.getWord(); // word 2
+      digit->setDeltaSamplePeak((word >> 28) & 0x0F);
+      digit->setDeltaSampleFall((word >> 24) & 0x0F);
+      digit->setDeltaValueFall((word >> 16) & 0xFF);
+      digit->setValuePeak(word & 0xFFFF);
+
+      word = array.getWord(); // word 3
+      digit->setValueSample0((word >> 16) & 0xFFFF);
+      digit->setValueSample1(word & 0xFFFF);
+
+      word = array.getWord(); // word 4
+      digit->setValueFall0((word >> 16) & 0xFFFF);
+      digit->setValueFall1(word & 0xFFFF);
+
+      word = array.getWord(); // word 5
+      digit->setIntegral(word & 0xFFFF);
+    }
+
+  }
+
+
   void TOPUnpackerModule::unpackWaveformFormat(const int* buffer, int bufferSize,
                                                StoreArray<TOPRawWaveform>& waveforms)
   {
-    DataArray array(buffer, bufferSize);
+    DataArray array(buffer, bufferSize, m_swapBytes);
     unsigned word = array.getWord();
     unsigned short scrodID = word & 0xFFFF;
     const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);

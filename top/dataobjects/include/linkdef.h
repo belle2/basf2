@@ -15,6 +15,7 @@
 #pragma link C++ class Belle2::TOPWaveform+;
 #pragma link C++ class Belle2::TOPPull+;
 #pragma link C++ class Belle2::TOPTimeZero+;
+#pragma link C++ class Belle2::TOPRawDigit+;
 
 // schema evolution rules to allow reading of old class versions
 

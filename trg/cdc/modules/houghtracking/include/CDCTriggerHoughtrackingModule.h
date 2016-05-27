@@ -175,6 +175,8 @@ namespace Belle2 {
     unsigned m_connect;
     /** switch to skip second priority hits */
     bool m_ignore2nd;
+    /** switch to check separately for a hit in the innermost super layer */
+    bool m_requireSL0;
 
     /** switch to save the Hough plane in DataStore
      *  (0: don't save, 1: save only peaks, 2: save full plane) */

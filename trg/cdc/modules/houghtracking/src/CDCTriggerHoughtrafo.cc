@@ -26,6 +26,7 @@ using namespace Belle2;
 unsigned short
 CDCTriggerHoughtrackingModule::countSL(bool* layer)
 {
+  if (m_requireSL0 && !layer[0]) return 0;
   unsigned short lcnt = 0;
   for (int i = 0; i < CDC_SUPER_LAYERS; ++i) {
     if (layer[i] == true) ++lcnt;

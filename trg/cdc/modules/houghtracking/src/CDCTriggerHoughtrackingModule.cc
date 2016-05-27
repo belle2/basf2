@@ -69,6 +69,8 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
            (unsigned)(6));
   addParam("ignore2ndPriority", m_ignore2nd,
            "Switch to skip second priority hits.", false);
+  addParam("requireSL0", m_requireSL0,
+           "Switch to check separately for a hit in the innermost superlayer.", false);
   addParam("storeHoughPlane", m_storePlane,
            "Switch for saving Hough plane as TMatrix in DataStore. "
            "0: don't store anything, 1: store only peaks, 2: store full plane "

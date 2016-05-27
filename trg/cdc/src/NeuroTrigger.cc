@@ -344,6 +344,40 @@ NeuroTrigger::updateTrack(const CDCTriggerTrack& track)
   }
 }
 
+void
+NeuroTrigger::updateTrackFix(const CDCTriggerTrack& track)
+{
+  unsigned precisionOmega = m_precision[0];
+  unsigned precisionPhi = m_precision[1];
+  unsigned precisionLUT = m_precision[2];
+  unsigned precisionMu = m_precision[3];
+  unsigned precisionId = m_precision[4];
+  unsigned precisionScale = m_precision[5];
+
+  long omega = round(track.getOmega() * (1 << precisionOmega));
+  long omegaLUT = (precisionLUT < precisionOmega) ? omega >> (precisionOmega - precisionLUT) : omega;
+  long phi = round(track.getPhi0() * (1 << precisionPhi));
+  for (int iSL = 0; iSL < 9; ++iSL) {
+    for (int priority = 0; priority < 2; ++priority) {
+      // LUT, calculated on the fly here
+      float x = (omegaLUT + 0.5 - 1. / (1 << (precisionOmega - precisionLUT + 1))) / (1 << precisionLUT);
+      m_arclength[iSL][priority] =
+        (omegaLUT == 0) ? round(m_radius[iSL][priority] * (1 << precisionMu)) :
+        (abs(omegaLUT) < (2 << precisionLUT) / m_radius[iSL][priority]) ?
+        round(asin(m_radius[iSL][priority] * x / 2.) / x * (2 << precisionMu)) :
+        round(M_PI_2 * m_radius[iSL][priority] * (1 << precisionMu));
+      m_idRef[iSL][priority] =
+        long((phi - long(m_arclength[iSL][priority]) * omega /
+              (long(2) << (precisionMu + precisionOmega - precisionPhi))) *
+             round((m_TSoffset[iSL + 1] - m_TSoffset[iSL]) / 2. / M_PI * (1 << precisionScale)) /
+             (long(1) << (precisionPhi + precisionScale - precisionId)));
+      // unscale after rounding
+      m_arclength[iSL][priority] /= (1 << precisionMu);
+      m_idRef[iSL][priority] /= (1 << precisionId);
+    }
+  }
+}
+
 double
 NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
 {
@@ -479,6 +513,52 @@ NeuroTrigger::getInputVector(unsigned isector, vector<unsigned>& hitIds)
 }
 
 vector<float>
+NeuroTrigger::getInputVectorFix(unsigned isector, vector<unsigned>& hitIds)
+{
+  unsigned precisionMu = m_precision[3];
+  unsigned precisionId = m_precision[4];
+  unsigned precisionScale = m_precision[6];
+  unsigned precisionIn = m_precision[7];
+
+  StoreArray<CDCTriggerSegmentHit> hits("CDCTriggerSegmentHits");
+  CDCTriggerMLP& expert = m_MLPs[isector];
+  // prepare empty input vector and vectors to keep best drift times
+  vector<float> inputVector;
+  inputVector.assign(expert.nNodesLayer(0), 0.);
+  // convert hits to input values
+  vector<unsigned> nHits;
+  nHits.assign(9, 0);
+  for (unsigned ii = 0; ii < hitIds.size(); ++ii) {
+    int ihit = hitIds[ii];
+    unsigned short iSL = hits[ihit]->getISuperLayer();
+    unsigned short iRef = iSL + 9 * nHits[iSL];
+    ++nHits[iSL];
+    int t = hits[ihit]->priorityTime();
+    int LR = hits[ihit]->getLeftRight();
+    double relId = getRelId(*hits[ihit]);
+    int priority = hits[ihit]->getPriorityPosition();
+    // get scaled input values: (relId, t, 2D arclength)
+    vector<float> IDrange = expert.getIDRange(iSL);
+    long Id = long((relId - IDrange[0]) * (1 << precisionId));
+    long scaleId = round((2 << precisionScale) / (IDrange[1] - IDrange[0]));
+    inputVector[3 * iRef] =
+      ((Id * scaleId) >> (precisionId + precisionScale - precisionIn)) - (1 << precisionIn);
+    inputVector[3 * iRef + 1] =
+      (((LR >> 1) & 1) - (LR & 1)) * t * (1 << precisionIn) *
+      round((1 << precisionScale) / float(expert.getTMax())) / (1 << precisionScale);
+    long mu = long((m_arclength[iSL][int(priority < 3)] - m_radius[iSL][0]) * (1 << precisionMu));
+    long scaleMu = round((2 << precisionScale) / (M_PI_2 * m_radius[iSL][1] - m_radius[iSL][0]));
+    inputVector[3 * iRef + 2] =
+      ((mu * scaleMu) >> (precisionMu + precisionScale - precisionIn)) - (1 << precisionIn);
+  }
+  // unscale after rounding
+  for (unsigned ii = 0; ii < inputVector.size(); ++ii) {
+    inputVector[ii] /= (1 << precisionIn);
+  }
+  return inputVector;
+}
+
+vector<float>
 NeuroTrigger::runMLP(unsigned isector, vector<float> input)
 {
   const CDCTriggerMLP& expert = m_MLPs[isector];
@@ -505,6 +585,66 @@ NeuroTrigger::runMLP(unsigned isector, vector<float> input)
     layerinput = layeroutput;
   }
   return expert.unscaleTarget(layeroutput);
+}
+
+vector<float>
+NeuroTrigger::runMLPFix(unsigned isector, vector<float> input)
+{
+  unsigned precisionInput = m_precision[7];
+  unsigned precisionWeights = m_precision[8];
+  unsigned precisionLUT = m_precision[9];
+  unsigned precisionTanh = m_precision[7];
+  unsigned dp = precisionInput + precisionWeights - precisionLUT;
+
+  const CDCTriggerMLP& expert = m_MLPs[isector];
+  // transform inputs to fixed point
+  vector<long> inputFix(input.size(), 0);
+  for (unsigned ii = 0; ii < input.size(); ++ii) {
+    inputFix[ii] = long(round(input[ii] * (1 << precisionInput)));
+  }
+  // transform weights to fixed point
+  vector<float> weights = expert.getWeights();
+  vector<long> weightsFix(weights.size(), 0);
+  for (unsigned iw = 0; iw < weights.size(); ++iw) {
+    weightsFix[iw] = long(round(weights[iw] * (1 << precisionWeights)));
+  }
+  // maximum input value for the tanh LUT
+  unsigned xMax = unsigned(ceil(atanh(1. - 1. / (1 << (precisionTanh + 1))) *
+                                (1 << (precisionLUT + 1))));
+
+  // run MLP
+  vector<long> layerinput = inputFix;
+  vector<long> layeroutput = {};
+  unsigned iw = 0;
+  for (unsigned il = 1; il < expert.nLayers(); ++il) {
+    // add bias input
+    layerinput.push_back(1 << precisionInput);
+    // prepare output
+    layeroutput.clear();
+    layeroutput.assign(expert.nNodesLayer(il), 0);
+    // loop over outputs
+    for (unsigned io = 0; io < layeroutput.size(); ++io) {
+      // loop over inputs
+      for (unsigned ii = 0; ii < layerinput.size(); ++ii) {
+        layeroutput[io] += layerinput[ii] * weightsFix[iw++];
+      }
+      // apply activation function -> LUT, calculated on the fly here
+      unsigned long bin = abs(layeroutput[io]) >> dp;
+      // correction to get symmetrical rounding errors
+      float x = (bin + 0.5 - 1. / (1 << (dp + 1))) / (1 << precisionLUT);
+      long tanhLUT = (bin < xMax) ? long(round(tanh(x / 2.) * (1 << precisionTanh))) : (1 << precisionTanh);
+      layeroutput[io] = (layeroutput[io] < 0) ? -tanhLUT : tanhLUT;
+    }
+    // output is new input
+    layerinput = layeroutput;
+  }
+
+  // transform output back to float before unscaling
+  vector<float> output(layeroutput.size(), 0.);
+  for (unsigned io = 0; io < output.size(); ++io) {
+    output[io] = layeroutput[io] / float(1 << precisionTanh);
+  }
+  return expert.unscaleTarget(output);
 }
 
 void

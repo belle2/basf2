@@ -99,6 +99,9 @@ namespace Belle2 {
      * that will be needed. */
     void setConstants();
 
+    /** set fixed point precision */
+    void setPrecision(std::vector<unsigned> precision) { m_precision = precision; }
+
     /** return reference to a neural network */
     CDCTriggerMLP& operator[](unsigned index) { return m_MLPs[index]; }
     /** return const reference to a neural network */
@@ -129,6 +132,9 @@ namespace Belle2 {
     /** Calculate 2D phi position and arclength for the given track and store them. */
     void updateTrack(const CDCTriggerTrack& track);
 
+    /** Calculate 2D phi position and arclength for the given track and store them. */
+    void updateTrackFix(const CDCTriggerTrack& track);
+
     /** Calculate phi position of a hit relative to 2D track
      * (scaled to number of wires). */
     double getRelId(const CDCTriggerSegmentHit& hit);
@@ -151,12 +157,21 @@ namespace Belle2 {
      */
     std::vector<float> getInputVector(unsigned isector, std::vector<unsigned>& hitIds);
 
+    /** Calculate input values for MLP with fixed point arithmetic.
+     * @param isector index of the MLP that will use the input
+     * @param hitIds hit indices to be used for the input
+     * @return scaled vector of input values (1 for each input node)
+     */
+    std::vector<float> getInputVectorFix(unsigned isector, std::vector<unsigned>& hitIds);
 
     /** Run an expert MLP.
      * @param isector index of the MLP
      * @param input vector of input values
      * @return unscaled output values (z vertex in cm and/or theta in radian) */
     std::vector<float> runMLP(unsigned isector, std::vector<float> input);
+
+    /** Run an expert MLP with fixed point arithmetic. */
+    std::vector<float> runMLPFix(unsigned isector, std::vector<float> input);
 
   private:
     /** List of networks */
@@ -169,6 +184,16 @@ namespace Belle2 {
     double m_idRef[9][2] = {};
     /** 2D arclength of current track */
     double m_arclength[9][2] = {};
+    /** Fixed point precision in bit after radix point.
+     *  10 values:
+     *  - 2D track parameters: omega, phi
+     *  - geometrical values derived from track:
+     *    arclength LUT input, arclength LUT output, reference wire ID
+     *  - scale factors: radian to wire ID, MLP input scale factors
+     *  - MLP values: nodes, weights, activation function LUT input
+     *    (LUT output = nodes)
+     */
+    std::vector<unsigned> m_precision;
   };
 }
 #endif

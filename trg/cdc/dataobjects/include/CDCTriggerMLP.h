@@ -49,6 +49,11 @@ namespace Belle2 {
     unsigned long getSLpatternUnmasked() const { return SLpattern; }
     /** get maximal drift time */
     unsigned short getTMax() const { return tMax; }
+    /** get relevant ID range for given super layer */
+    std::vector<float> getIDRange(unsigned iSL) const
+    {
+      return {relevantID[2 * iSL], relevantID[2 * iSL + 1]};
+    }
 
     /** check whether given phi value is in sector */
     bool inPhiRange(float phi) const;

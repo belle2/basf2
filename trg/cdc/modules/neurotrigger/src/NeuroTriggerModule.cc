@@ -39,6 +39,12 @@ NeuroTriggerModule::NeuroTriggerModule() : Module()
   addParam("outputCollection", m_outputCollectionName,
            "Name of the StoreArray holding the output tracks with neural network estimates.",
            string("TrgNNTracks"));
+  addParam("fixedPoint", m_fixedPoint,
+           "Switch to turn on fixed point arithmetic for FPGA simulation.",
+           false);
+  addParam("precision", m_precision,
+           "fixed point precision in bit after radix point",
+  {16, 14, 12, 8, 10, 10, 12, 12, 10, 10});
 }
 
 
@@ -56,6 +62,10 @@ NeuroTriggerModule::initialize()
   tracks2D.registerRelationTo(tracksNN);
   StoreArray<CDCTriggerSegmentHit> segmentHits;
   tracksNN.registerRelationTo(segmentHits);
+
+  if (m_fixedPoint) {
+    m_NeuroTrigger.setPrecision(m_precision);
+  }
 }
 
 
@@ -66,12 +76,22 @@ NeuroTriggerModule::event()
   StoreArray<CDCTriggerTrack> tracksNN(m_outputCollectionName);
   StoreArray<CDCTriggerSegmentHit> segmentHits;
   for (int itrack = 0; itrack < tracks2D.getEntries(); ++itrack) {
-    m_NeuroTrigger.updateTrack(*tracks2D[itrack]);
+    if (m_fixedPoint) {
+      m_NeuroTrigger.updateTrackFix(*tracks2D[itrack]);
+    } else {
+      m_NeuroTrigger.updateTrack(*tracks2D[itrack]);
+    }
     int isector = m_NeuroTrigger.selectMLP(*tracks2D[itrack]);
     if (isector >= 0) {
       vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector);
-      vector<float> MLPinput = m_NeuroTrigger.getInputVector(isector, hitIds);
-      vector<float> target = m_NeuroTrigger.runMLP(isector, MLPinput);
+      vector<float> target;
+      if (m_fixedPoint) {
+        vector<float> MLPinput = m_NeuroTrigger.getInputVectorFix(isector, hitIds);
+        target = m_NeuroTrigger.runMLPFix(isector, MLPinput);
+      } else {
+        vector<float> MLPinput = m_NeuroTrigger.getInputVector(isector, hitIds);
+        target = m_NeuroTrigger.runMLP(isector, MLPinput);
+      }
       int zIndex = m_NeuroTrigger[isector].zIndex();
       double z = (zIndex >= 0) ? target[zIndex] : 0.;
       int thetaIndex = m_NeuroTrigger[isector].thetaIndex();

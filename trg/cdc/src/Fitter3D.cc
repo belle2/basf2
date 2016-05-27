@@ -1028,11 +1028,11 @@ namespace Belle2 {
       // Find if there is a TS with a priority hit.
       // Loop over all TS in same superlayer.
       bool priorityHitTS = 0;
-      cout<<"iAx:"<<iAx<<" nSegments:"<<nSegments<<endl;
+      //cout<<"iAx:"<<iAx<<" nSegments:"<<nSegments<<endl;
       for (unsigned iTS = 0; iTS < nSegments; iTS++) {
         const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
         if (t_segment->center().hit() != 0)  priorityHitTS = 1;
-        cout<<" iTS:"<<iTS<<" priority:"<<t_segment->center().hit()<<" tsId:"<<t_segment->localId()<<endl;
+        //cout<<" iTS:"<<iTS<<" priority:"<<t_segment->center().hit()<<" tsId:"<<t_segment->localId()<<endl;
       }
       if(nSegments != 1) {
         if (nSegments == 0){
@@ -1110,31 +1110,32 @@ namespace Belle2 {
       // Select best candidate.
       // bestTS => tsIndex, { 1st priority, tdc }
       pair<int, tuple<int, double> > bestTS = make_pair(-1, make_tuple(-1, 9999));
-
-      // Selection type first TS.
-      if (std::get<0>(tsCandiateInfo[0]) == 1) {
-        bestTS.first = 0;
-        bestTS.second = tsCandiateInfo[0];
+      // If there is a candidate.
+      if(tsCandiateInfo.size() != 0) {
+        // Selection type first TS.
+        if (std::get<0>(tsCandiateInfo[0]) == 1) {
+          bestTS.first = 0;
+          bestTS.second = tsCandiateInfo[0];
+        }
+        //// Selection type random.
+        //int randomIndex = gRandom->Integer(nSegments);
+        //if (std::get<0>(tsCandiateInfo[randomIndex]) == 1) {
+        //  bestTS.first = randomIndex;
+        //  bestTS.second = tsCandiateInfo[randomIndex];
+        //}
+        //// Selection type 1st priority.
+        //for (unsigned iTS = 0; iTS < nSegments; iTS++) {
+        //  if (std::get<0>(tsCandiateInfo[iTS]) == 1) {
+        //    bool select = 0;
+        //    if (bestTS.first == -1) select = 1;
+        //    else if (std::get<1>(bestTS.second) > std::get<1>(tsCandiateInfo[iTS])) select = 1;
+        //    if (select) {
+        //      bestTS.first = iTS;
+        //      bestTS.second = tsCandiateInfo[iTS];
+        //    }
+        //  }
+        //}
       }
-      //// Selection type random.
-      //int randomIndex = gRandom->Integer(nSegments);
-      //if (std::get<0>(tsCandiateInfo[randomIndex]) == 1) {
-      //  bestTS.first = randomIndex;
-      //  bestTS.second = tsCandiateInfo[randomIndex];
-      //}
-      //// Selection type 1st priority.
-      //for (unsigned iTS = 0; iTS < nSegments; iTS++) {
-      //  if (std::get<0>(tsCandiateInfo[iTS]) == 1) {
-      //    bool select = 0;
-      //    if (bestTS.first == -1) select = 1;
-      //    else if (std::get<1>(bestTS.second) > std::get<1>(tsCandiateInfo[iTS])) select = 1;
-      //    if (select) {
-      //      bestTS.first = iTS;
-      //      bestTS.second = tsCandiateInfo[iTS];
-      //    }
-      //  }
-      //}
-
       //cout<<"Ax:"<<iAx<<" best: iTS:"<<bestTS.first<<" firstPriority:"<<std::get<0>(bestTS.second)<<" tdc:"<<std::get<1>(bestTS.second)<<endl;
       bestTSIndex[iAx] = bestTS.first;
     } // End superlayer loop

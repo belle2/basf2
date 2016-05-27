@@ -155,7 +155,8 @@ TRGCDCPerfectFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
 	const TCSHit & ts = * hits[i];
 	if (! ts.signal().active()) continue;
 	if (ts.segment().stereo()) continue;
-	const TCWHit * wh = ts.segment().center().hit();
+	//const TCWHit * wh = ts.segment().center().hit();
+	const TCWHit * wh = ts.segment().priority().hit();
 	if (! wh) continue;
 	const CDCSimHit & sh = * wh->simHit();
 	const int trackId = sh.getTrackId();
@@ -214,16 +215,26 @@ TRGCDCPerfectFinder::doitPerfectly(vector<TRGCDCTrack *> & trackList) {
  	    TCLink * best = 0;
 	    //int timeMin = 99999;
 	    float timeMin = 99999;
+      bool bestCenterHit = 0;
  	    for (unsigned j = 0; j < layers[i].size(); j++) {
  		//const TRGTime & t = * (layers[i][j]->cell()->signal())[0];
     const float tsDrift = layers[i][j]->cell()->hit()->drift();
+    const TRGCDCSegment * t_cell = (TRGCDCSegment*)(layers[i][j]->cell());
+    bool centerHit = (t_cell->priorityPosition() == 3);
     //cout<<"PF2D ["<<layers[i][j]->cell()->superLayerId()<<"-"<<layers[i][j]->cell()->localId()<<"] Tick: "<<t.time()<<" Drift: "<<tsDrift<<endl;
  		//if (t.time() < timeMin) {
  		//    timeMin = t.time();
-    if (tsDrift < timeMin) {
+    if (centerHit==1 && bestCenterHit==0) {
         timeMin = tsDrift;
  		    best = layers[i][j];
- 		}
+        bestCenterHit = 1;
+    } else if (centerHit == 0 && bestCenterHit == 1) {
+    } else {
+      if (tsDrift < timeMin) {
+          timeMin = tsDrift;
+ 		      best = layers[i][j];
+ 		  }
+    }
  	    }
  	    forCircle.push_back(best);
  	}

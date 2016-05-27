@@ -2044,7 +2044,9 @@ namespace Belle2 {
     //cout<<endl<<"----s3DFitter----"<<endl;
     //_fitter3D->doitComplex(_trackList3D);
     //cout<<"----e3DFitter----"<<endl<<endl;
-    if(_trackList3D.size()==0) setReturnValue(EReturnValueType::fit3D,1);
+    for(unsigned iTrack = 0; iTrack<_trackList3D.size(); iTrack++) {
+      if(_trackList3D[iTrack]->fitted() == 0) setReturnValue(EReturnValueType::fit3D,1);
+    }
 
     if (TRGDebug::level() > 1) {
       for (unsigned iTrack = 0; iTrack < _trackList3D.size(); iTrack++) {
@@ -2462,7 +2464,7 @@ namespace Belle2 {
             _mergers.push_back(m);
             ++lastMergerLocalId;
             lastSl = sl;
-            cout << "new merger : " << name << endl;
+            //cout << "new merger : " << name << endl;
           }
           m->push_back(f);
         }

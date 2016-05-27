@@ -67,7 +67,14 @@ namespace Belle2 {
   public:
 
     /// Enum for returnValue types
-    enum EReturnValueType { TSF=0, ETF=1, find2D=2, fit2D=3, find3D=4, fit3D=5, any = 6};
+    enum EReturnValueType {TSF = 1 << 0,
+                           ETF = 1 << 1,
+                           find2D = 1 << 2,
+                           fit2D = 1 << 3,
+                           find3D = 1 << 4,
+                           fit3D = 1 << 5,
+                           any = TSF | ETF | find2D | fit2D | find3D | fit3D
+                          };
 
     /// returns TRGCDC object with specific configuration.
     static TRGCDC* getTRGCDC(const std::string& configFile,

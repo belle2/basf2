@@ -351,20 +351,19 @@ namespace Belle2 {
                                  m_2DfitterCollectionName,
                                  m_3DfitterCollectionName);
 
-    // Set retrun value
+    // Set return value
     int returnValue = _cdc->getReturnValue();
     int mask = 0;
     for(vector<string>::iterator it = _returnValueModuleNames.begin(); it != _returnValueModuleNames.end(); ++it) {
       string const & moduleName = *it;
-      if (moduleName == "TSF") mask |= 1 << 0;
-      else if (moduleName == "ETF") mask |= 1 << 1;
-      else if (moduleName == "find2D") mask |= 1 << 2;
-      else if (moduleName == "fit2D") mask |= 1 << 3;
-      else if (moduleName == "find3D") mask |= 1 << 4;
-      else if (moduleName == "fit3D") mask |= 1 << 5;
+      if (moduleName == "TSF") mask |= TRGCDC::EReturnValueType::TSF;
+      else if (moduleName == "ETF") mask |= TRGCDC::EReturnValueType::ETF;
+      else if (moduleName == "find2D") mask |= TRGCDC::EReturnValueType::find2D;
+      else if (moduleName == "fit2D") mask |= TRGCDC::EReturnValueType::fit2D;
+      else if (moduleName == "find3D") mask |= TRGCDC::EReturnValueType::find3D;
+      else if (moduleName == "fit3D") mask |= TRGCDC::EReturnValueType::fit3D;
     }
-    if (_returnValueModuleNames.size() == 0) mask = -1;
-    returnValue &= mask;
+    if (mask != 0) returnValue &= mask;
     setReturnValue(returnValue);
   }
 

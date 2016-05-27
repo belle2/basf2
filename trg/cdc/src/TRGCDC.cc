@@ -2011,12 +2011,12 @@ namespace Belle2 {
       _pFinder->doit(_trackList2D, _trackList2DFitted);
     else
       _hFinder->FindAndFit(_trackList2D, _trackList2DFitted);
-    if(_trackList2D.size()==0) setReturnValue(EReturnValueType::find2D,1);
-    if(_trackList2DFitted.size()==0) setReturnValue(EReturnValueType::fit2D,1);
+    if (_trackList2D.size() == 0) setReturnValue(find2D, 1);
+    if (_trackList2DFitted.size() == 0) setReturnValue(fit2D, 1);
 
     //...Stereo finder...
     _h3DFinder->doit(_trackList2D, _trackList3D);
-    if(_trackList3D.size() == 0) setReturnValue(EReturnValueType::find3D,1);
+    if (_trackList3D.size() == 0) setReturnValue(find3D, 1);
 
     //...Check tracks...
     if (TRGDebug::level()) {
@@ -2038,14 +2038,14 @@ namespace Belle2 {
     //...Event Time... In ns scale.
     // [FIXME] This does nothing.
     _eventTime.back()->getT0();
-    
+
     //...3D tracker...
     _fitter3D->doit(_trackList3D);
     //cout<<endl<<"----s3DFitter----"<<endl;
     //_fitter3D->doitComplex(_trackList3D);
     //cout<<"----e3DFitter----"<<endl<<endl;
     for(unsigned iTrack = 0; iTrack<_trackList3D.size(); iTrack++) {
-      if(_trackList3D[iTrack]->fitted() == 0) setReturnValue(EReturnValueType::fit3D,1);
+      if (_trackList3D[iTrack]->fitted() == 0) setReturnValue(fit3D, 1);
     }
 
     if (TRGDebug::level() > 1) {
@@ -2643,42 +2643,13 @@ namespace Belle2 {
 
   void TRGCDC::setReturnValue(EReturnValueType const & moduleName, bool flag)
   {
-    int bitPosition = -1;
-    switch (moduleName) {
-      case TSF : bitPosition = 0; break;
-      case ETF : bitPosition = 1; break;
-      case find2D : bitPosition = 2; break;
-      case fit2D : bitPosition = 3; break;
-      case find3D : bitPosition = 4; break;
-      case fit3D : bitPosition = 5; break;
-      case any : bitPosition = -1; break;
-    }
-    if (bitPosition != -1) {
-      if (flag) _returnValue |= 1 << bitPosition;
-      else _returnValue &= ~(1 << bitPosition);
-    }
+    if (flag) _returnValue |= moduleName;
+    else _returnValue &= ~moduleName;
   }
 
   int TRGCDC::getReturnValue(EReturnValueType const & moduleName) const
   {
-    if (moduleName == EReturnValueType::any) return _returnValue;
-
-    int bitPosition = -1;
-    switch (moduleName) {
-      case TSF : bitPosition = 0; break;
-      case ETF : bitPosition = 1; break;
-      case find2D : bitPosition = 2; break;
-      case fit2D : bitPosition = 3; break;
-      case find3D : bitPosition = 4; break;
-      case fit3D : bitPosition = 5; break;
-      case any : bitPosition = -1; break;
-    }
-    int returnValue = 0;
-    if (bitPosition != -1) {
-      bool bitValue = (_returnValue >> bitPosition) & 1;
-      if (bitValue) returnValue |= 1 << bitPosition;
-    }
-    return returnValue;
+    return _returnValue & moduleName;
   }
 
 

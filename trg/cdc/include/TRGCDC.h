@@ -87,7 +87,6 @@ namespace Belle2 {
                              unsigned houghDoit = 2,
                              bool fLogicLUTTSF = 0,
                              bool fLRLUT = 1,
-                             bool fevtTime = 1,
                              bool fFitter3Dsmclr = 0,
                              bool fFitter3Ds2DFit = 1,
                              bool fFitter3Ds2DFitDrift = 0,
@@ -128,7 +127,6 @@ namespace Belle2 {
            unsigned houghDoit,
            bool fLogicLUTTSF,
            bool fLRLUT,
-           bool fevtTime,
            bool fFitter3Dsmclr,
            bool fFitter3Ds2DFit,
            bool fFitter3Ds2DFitDrift,
@@ -520,9 +518,6 @@ namespace Belle2 {
 
     /// Switch for the LR LUT in Fitter3D.
     bool _fLRLUT;
-
-    /// Switch for the event tiem in Segment.
-    bool _fevtTime;
 
     /// Switch for MC L/R information in Fitter3D.
     bool _fFitter3Dsmclr;

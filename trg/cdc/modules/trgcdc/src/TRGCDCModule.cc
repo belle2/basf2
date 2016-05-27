@@ -61,7 +61,6 @@ namespace Belle2 {
       _hFinderDoit(2),
       _fLogicLUTTSF(1),
       _fLRLUT(1),
-      _fevtTime(1),
       _fFitter3Dsmclr(0),
       _fFitter3Ds2DFit(1),
       _fFitter3Ds2DFitDrift(0),
@@ -159,10 +158,6 @@ namespace Belle2 {
              _fLRLUT,
              "Using L/R LUT in fitter3D",
              _fLRLUT);
-    addParam("EvtTime",
-             _fevtTime,
-             "Using event time in Segment",
-             _fevtTime);
     addParam("Fitter3DsMcLR",
              _fFitter3Dsmclr,
              "Using MC L/R information for Fitter3D",
@@ -320,7 +315,6 @@ namespace Belle2 {
                                _hFinderDoit,
                                _fLogicLUTTSF,
                                _fLRLUT,
-                               _fevtTime,
                                _fFitter3Dsmclr,
                                _fFitter3Ds2DFit,
                                _fFitter3Ds2DFitDrift,

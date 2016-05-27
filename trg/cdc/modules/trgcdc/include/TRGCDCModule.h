@@ -151,9 +151,6 @@ namespace Belle2 {
     /// Switch for the LR LUT in Fitter3D.
     bool _fLRLUT;
 
-    /// Switch for the event time in Segment.
-    bool _fevtTime;
-
     /// Switch for Fitter3D's MC L/R information.
     bool _fFitter3Dsmclr;
 

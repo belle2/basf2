@@ -180,7 +180,6 @@ namespace Belle2 {
 
     if(m_mBool["fVerbose"]) {
       cout<<"fLRLUT:       "<<m_mBool["fLRLUT"]<<endl;
-      cout<<"fEvtTime:     "<<m_mBool["fEvtTime"]<<endl;
       cout<<"fMc:          "<<m_mBool["fMc"]<<endl;
       cout<<"fVerbose:     "<<m_mBool["fVerbose"]<<endl;
       cout<<"fmcLR:        "<<m_mBool["fmcLR"]<<endl;
@@ -211,12 +210,10 @@ namespace Belle2 {
     }
 
     // Get common values for event.
-    if(m_mBool["fEvtTime"]==0) m_mDouble["eventTime"]=0;
-    else m_mDouble["eventTime"] = m_cdc.getEventTime();
+    m_mDouble["eventTime"] = m_cdc.getEventTime();
     StoreObjPtr<EventMetaData> eventMetaDataPtr;
     // Event starts from 0.
     m_mDouble["eventNumber"] = eventMetaDataPtr->getEvent();
-
 
     // Fitter3D
     // Loop over all tracks
@@ -283,26 +280,35 @@ namespace Belle2 {
         }
       } // End superlayer loop
 
-      // Calculate phi3D using driftTime.
+      // Calculate phi3D.
       m_mVector["phi3D"] = vector<double> (4);
-      for (unsigned iSt = 0; iSt < 4; iSt++) {
-        if(useStSl[iSt] == 1) {
-          // Get drift length from table.
-          string tableName = "driftLengthTableSL" + to_string(iSt*2+1);
-          double t_driftTime = m_mVector["tdc"][iSt*2+1] - m_mDouble["eventTime"];
-          if (t_driftTime < 0) t_driftTime = 0;
-          double t_driftLength = m_mConstV[tableName][(unsigned)t_driftTime];
-          m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], t_driftLength, m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
-        } else {
-          m_mVector["phi3D"][iSt] = 9999;
+      if (m_mDouble["eventTime"] == 9999) {
+        for (unsigned iSt = 0; iSt < 4; iSt++) {
+          m_mVector["phi3D"][iSt] = m_mVector["wirePhi"][iSt*2+1];
+        }
+      } else {
+        for (unsigned iSt = 0; iSt < 4; iSt++) {
+          if(useStSl[iSt] == 1) {
+            // Get drift length from table.
+            string tableName = "driftLengthTableSL" + to_string(iSt*2+1);
+            double t_driftTime = m_mVector["tdc"][iSt*2+1] - m_mDouble["eventTime"];
+            if (t_driftTime < 0) t_driftTime = 0;
+            double t_driftLength = m_mConstV[tableName][(unsigned)t_driftTime];
+            m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], t_driftLength, m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
+          } else {
+            m_mVector["phi3D"][iSt] = 9999;
+          }
         }
       }
       // Get zerror for 3D fit
       m_mVector["zError"] = vector<double> (4);
       for (unsigned iSt = 0; iSt < 4; iSt++) {
         if(useStSl[iSt] == 1) {
+          // Check LR.
           if(m_mVector["LR"][2*iSt+1] != 2) m_mVector["zError"][iSt] = m_mConstV["driftZError"][iSt];
           else m_mVector["zError"][iSt] = m_mConstV["wireZError"][iSt];
+          // Check eventTime
+          if(m_mDouble["eventTime"] == 9999) m_mVector["zError"][iSt] = m_mConstV["wireZError"][iSt];
         } else {
           m_mVector["zError"][iSt] = 9999;
         }
@@ -439,8 +445,7 @@ namespace Belle2 {
     }
 
     // Get common values for event.
-    if(m_mBool["fEvtTime"]==0) m_mDouble["eventTime"]=0;
-    else m_mDouble["eventTime"] = m_cdc.getEventTime();
+    m_mDouble["eventTime"] = m_cdc.getEventTime();
     StoreObjPtr<EventMetaData> eventMetaDataPtr;
     // Event starts from 0.
     m_mDouble["eventNumber"] = eventMetaDataPtr->getEvent();
@@ -504,23 +509,32 @@ namespace Belle2 {
         }
       } // End superlayer loop
 
-      // Calculate phi3D using driftTime.
+      // Calculate phi3D.
       m_mVector["phi3D"] = vector<double> (4);
-      for (unsigned iSt = 0; iSt < 4; iSt++) {
+      if (m_mDouble["eventTime"] == 9999) {
+        for (unsigned iSt = 0; iSt < 4; iSt++) {
+          m_mVector["phi3D"][iSt] = m_mVector["wirePhi"][iSt*2+1];
+        }
+      } else {
+        for (unsigned iSt = 0; iSt < 4; iSt++) {
 
-        // Get drift length from table.
-        string tableName = "driftLengthTableSL" + to_string(iSt*2+1);
-        double t_driftTime = m_mVector["tdc"][iSt*2+1] - m_mDouble["eventTime"];
-        if (t_driftTime < 0) t_driftTime = 0;
-        double t_driftLength = m_mConstV[tableName][(unsigned)t_driftTime];
+          // Get drift length from table.
+          string tableName = "driftLengthTableSL" + to_string(iSt*2+1);
+          double t_driftTime = m_mVector["tdc"][iSt*2+1] - m_mDouble["eventTime"];
+          if (t_driftTime < 0) t_driftTime = 0;
+          double t_driftLength = m_mConstV[tableName][(unsigned)t_driftTime];
 
-        m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], t_driftLength, m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
+          m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], t_driftLength, m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
+        }
       }
       // Get zerror for 3D fit
       m_mVector["zError"] = vector<double> (4);
       for (unsigned iSt = 0; iSt < 4; iSt++) {
+        // Check LR.
         if(m_mVector["LR"][2*iSt+1] != 2) m_mVector["zError"][iSt] = m_mConstV["driftZError"][iSt];
         else m_mVector["zError"][iSt] = m_mConstV["wireZError"][iSt];
+        // Check eventTime
+        if(m_mDouble["eventTime"] == 9999) m_mVector["zError"][iSt] = m_mConstV["wireZError"][iSt];
       }
       // Get inverse zerror ^ 2
       m_mVector["iZError2"] = vector<double> (4);
@@ -1194,8 +1208,11 @@ namespace Belle2 {
     m_mVector["phi2DError"] = vector<double> (5);
     for (unsigned iAx = 0; iAx < 5; iAx++) {
       if(useAxSl[iAx] == 1) {
+        // Check LR.
         if(m_mVector["LR"][2*iAx] != 3) m_mVector["phi2DError"][iAx] = m_mConstV["driftPhi2DError"][iAx];
         else m_mVector["phi2DError"][iAx] = m_mConstV["wirePhi2DError"][iAx];
+        // Check event time.
+        if(m_mDouble["eventTime"] == 9999) m_mVector["phi2DError"][iAx] = m_mConstV["wirePhi2DError"][iAx];
       } else {
         m_mVector["phi2DError"][iAx] = 9999;
       }
@@ -1211,8 +1228,10 @@ namespace Belle2 {
     }
     // Calculate phi2D.
     m_mVector["phi2D"] = vector<double> (5);
-    if (m_mBool["f2DFitDrift"] == 0) {
-      for (unsigned iAx = 0; iAx < 5; iAx++) m_mVector["phi2D"][iAx] = m_mVector["wirePhi"][iAx*2];
+    if (m_mBool["f2DFitDrift"] == 0 || m_mDouble["eventTime"] == 9999) {
+      for (unsigned iAx = 0; iAx < 5; iAx++) {
+        m_mVector["phi2D"][iAx] = m_mVector["wirePhi"][iAx*2];
+      }
     } else {
       for (unsigned iAx = 0; iAx < 5; iAx++) {
         if(useAxSl[iAx] == 1) {
@@ -1221,9 +1240,7 @@ namespace Belle2 {
           double t_driftTime = m_mVector["tdc"][iAx*2] - m_mDouble["eventTime"];
           if (t_driftTime < 0) t_driftTime = 0;
           double t_driftLength = m_mConstV[tableName][(unsigned)t_driftTime];
-
           m_mVector["phi2D"][iAx] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iAx*2], t_driftLength, m_mConstV["rr"][iAx*2], m_mVector["LR"][iAx*2]);
-          //m_mVector["phi2D"][iAx] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iAx*2], m_mVector["tdc"][iAx*2], m_mDouble["eventTime"], m_mConstV["rr"][iAx*2], m_mVector["LR"][iAx*2]);
         } else {
           m_mVector["phi2D"][iAx] = 9999;
         }

@@ -72,7 +72,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("DoSmearing", m_doSmearing,
            "If false, drift length will not be smeared.", true);
 
-  addParam("2015AprRun", m_2015AprRun, "Cosmic runs in April 2015 (i.e. only super-layer #4 on) ?", false);
+  //  addParam("2015AprRun", m_2015AprRun, "Cosmic runs in April 2015 (i.e. only super-layer #4 on) ?", false);
 
   addParam("TrigTimeJitter", m_trigTimeJitter,
            "Magnitude (w) of trigger timing jitter (ns). The trigger timing is randuminzed uniformly in a time window of [-w/2, +w/2].",
@@ -202,11 +202,12 @@ void CDCDigitizerModule::event()
       continue;
     }
 
-    // Special treatment for cosmic runs in April 2015
+    /*    // Special treatment for cosmic runs in April 2015
     if (m_2015AprRun) {
       if (m_wireID.getISuperLayer() != 4) continue;
       if (m_wireID.getIWire() > 15)       continue;
     }
+    */
 
     m_posFlag    = m_aCDCSimHit->getLeftRightPassageRaw();
     m_posWire    = m_aCDCSimHit->getPosWire();

@@ -4,7 +4,7 @@
 // author: Umberto Tamponi
 // email: tamponi@to.infn.it
 //
-//
+// May 28: adapted for the analsysi fo the installed slots (U.T.)
 
 #include <TFile.h>
 #include <TTree.h>
@@ -46,6 +46,7 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
 
   //deifne some standard cuts to produce different plots
   TCut tight_cut("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 10 && TOPCAFDigits.m_q > 0 && TOPCAFDigits.m_adc_height > 100");
+  TCut tight_cut_no7("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 8 && TOPCAFDigits.m_q > 0 && TOPCAFDigits.m_adc_height > 150 && TOPCAFDigits.m_asic_ch!=7");
   TCut loose_cut("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 10 && TOPCAFDigits.m_q > 0");
   TCut optics_cut("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 10 && TOPCAFDigits.m_q > 0 && TOPCAFDigits.m_adc_height > 150 && TOPCAFDigits.m_asic_ch !=7 && TOPCAFDigits.m_tdc_bin%128 > 60 ");
 
@@ -54,49 +55,52 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
 
 
   //first fills the timing plots to gte the position of the primary peak
-  TH1D* timing = new TH1D("timing", "time projection over all the channels", 4000, -200, 200.);
-  timing->GetXaxis()->SetTitle("hit time [ns]");
-  t.Draw("TOPCAFDigits.m_time*0.357>>timing");
+  TH1D* timing = new TH1D("timing", "time projection over all the channels", 8000, -2000, 2000.);
+  timing->GetXaxis()->SetTitle("hit time [tdc bin ]");
+  t.Draw("TOPCAFDigits.m_time>>timing");
 
-  TH1D* timing_qual = new TH1D("timing_qual", "time projection over all the channels, with quality cuts", 4000, -200, 200.);
-  timing_qual->GetXaxis()->SetTitle("hit time [ns]");
-  t.Draw("TOPCAFDigits.m_time*0.357>>timing_qual", tight_cut);
+  TH1D* timing_qual = new TH1D("timing_qual", "time projection over all the channels, with quality cuts", 8000, -2000, 2000.);
+  timing_qual->GetXaxis()->SetTitle("hit time [tdc bin]");
+  t.Draw("TOPCAFDigits.m_time>>timing_qual", tight_cut);
 
-  TH1D* timing_optics = new TH1D("timing_optics", "time projection over all the channels, removing the electronics problems", 4000,
-                                 -200, 200.);
-  timing_qual->GetXaxis()->SetTitle("hit time [ns]");
-  t.Draw("TOPCAFDigits.m_time*0.357>>timing_optics", optics_cut);
+  TH1D* timing_optics = new TH1D("timing_optics", "time projection over all the channels, removing the electronics problems", 8000,
+                                 -2000, 2000.);
+  timing_qual->GetXaxis()->SetTitle("hit time [tdc bin]");
+  t.Draw("TOPCAFDigits.m_time>>timing_optics", optics_cut);
 
-  double max = timing_qual->GetBinCenter(timing_qual->GetMaximumBin());
+  TH1D* timing_max = new TH1D("timing_max", "time projection over all the channels, with quality cuts", 400, -2000., 0.);
+  t.Draw("TOPCAFDigits.m_time>>timing_max", tight_cut_no7);
+
+  double max = timing_max->GetBinCenter(timing_max->GetMaximumBin());
 
 
 
 
-  TCut laser_dir(Form("TMath::Abs(TOPCAFDigits.m_time*0.357 - %f) < 8 ", max));
-  TCut laser_refl(Form("TMath::Abs(TOPCAFDigits.m_time*0.357  - ( %f + 37)) < 5 ", max));
-  TCut cosmic_dir(Form("TMath::Abs(TOPCAFDigits.m_time*0.357 -  %f) < 10 ", max));
-  TCut cosmic_refl(Form("TMath::Abs(TOPCAFDigits.m_time*0.357 - ( %f + 30)) < 10 ", max));
-  TCut mirror_dir(Form("TMath::Abs(TOPCAFDigits.m_time*0.357 -  %f) < 10 ", max));
-  TCut mirror_refl(Form("TMath::Abs(TOPCAFDigits.m_time*0.357 - ( %f + 30)) < 10 ", max));
+  TCut laser_dir(Form("TMath::Abs(TOPCAFDigits.m_time - %f) < 12 ", max));
+  TCut laser_refl(Form("TMath::Abs(TOPCAFDigits.m_time  - ( %f + 80)) < 20 ", max));
+  TCut cosmic_dir(Form("TMath::Abs(TOPCAFDigits.m_time -  %f) < 18 ", max));
+  TCut cosmic_refl(Form("TMath::Abs(TOPCAFDigits.m_time - ( %f + 70)) < 40 ", max));
+  TCut mirror_dir(Form("TMath::Abs(TOPCAFDigits.m_time -  %f) < 10 ", max));
+  TCut mirror_refl(Form("TMath::Abs(TOPCAFDigits.m_time - ( %f + 30)) < 10 ", max));
 
 
   TH2F* ch_time_qual_ROI_laser = new TH2F("ch_time_qual_ROI_laser",
                                           "time projection over all the channels, with quality cuts. Only ROI used for occupancy maps (this is cross  check plot!)", 512, 0,
-                                          512, 6000, -300, 300.);
+                                          512, 8000, -2000, 2000.);
   ch_time_qual_ROI_laser->GetYaxis()->SetTitle("hit time [ns]");
-  t.Draw("TOPCAFDigits.m_time*0.357:TOPCAFDigits.m_pixel_id>>ch_time_qual_ROI_laser", tight_cut && (laser_dir || laser_refl));
+  t.Draw("TOPCAFDigits.m_time:TOPCAFDigits.m_pixel_id>>ch_time_qual_ROI_laser", tight_cut && (laser_dir || laser_refl));
 
   TH2F* ch_time_qual_ROI_midbar = new TH2F("ch_time_qual_ROI_midbar",
                                            "time projection over all the channels, with quality cuts. Only ROI used for occupancy maps (this is cross  check plot!)", 512, 0,
-                                           512, 6000, -300, 300.);
+                                           512, 8000, -2000, 2000.);
   ch_time_qual_ROI_midbar->GetYaxis()->SetTitle("hit time [ns]");
-  t.Draw("TOPCAFDigits.m_time*0.357:TOPCAFDigits.m_pixel_id>>ch_time_qual_ROI_midbar", tight_cut && (cosmic_dir || cosmic_refl));
+  t.Draw("TOPCAFDigits.m_time:TOPCAFDigits.m_pixel_id>>ch_time_qual_ROI_midbar", tight_cut && (cosmic_dir || cosmic_refl));
 
   TH2F* ch_time_qual_ROI_mirror = new TH2F("ch_time_qual_ROI_mirror",
                                            "time projection over all the channels, with quality cuts. Only ROI used for occupancy maps (this is cross  check plot!)", 512, 0,
-                                           512, 6000, -300, 300.);
+                                           512, 8000, -2000, 2000.);
   ch_time_qual_ROI_mirror->GetYaxis()->SetTitle("hit time [ns]");
-  t.Draw("TOPCAFDigits.m_time*0.357:TOPCAFDigits.m_pixel_id>>ch_time_qual_ROI_mirror", tight_cut && (mirror_dir || mirror_refl));
+  t.Draw("TOPCAFDigits.m_time:TOPCAFDigits.m_pixel_id>>ch_time_qual_ROI_mirror", tight_cut && (mirror_dir || mirror_refl));
 
 
 
@@ -220,10 +224,10 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
   TH2F* pmtxy_midbarReflected = new TH2F("pmtxy_midbarReflected", "hitmap of the reflected cosmic light with paddles at z =0", 64, 0.,
                                          64., 8, 0., 8.);
 
-  TH2F* pmtxy_mirrorDirect = new TH2F("pmtxy_mirrorDirect", "hitmap of the direct cosmic light with paddles at z = mirror", 64, 0.,
-                                      64., 8, 0., 8.);
-  TH2F* pmtxy_mirrorReflected = new TH2F("pmtxy_mirrorReflected", "hitmap of the reflected cosmic light with paddles at z = mirror",
-                                         64, 0., 64., 8, 0., 8.);
+  //  TH2F* pmtxy_mirrorDirect = new TH2F("pmtxy_mirrorDirect", "hitmap of the direct cosmic light with paddles at z = mirror", 64, 0.,
+  //                                    64., 8, 0., 8.);
+//  TH2F* pmtxy_mirrorReflected = new TH2F("pmtxy_mirrorReflected", "hitmap of the reflected cosmic light with paddles at z = mirror",
+  //                                       64, 0., 64., 8, 0., 8.);
 
   TH1F* evtnum = new TH1F("evtnum", "event num", 1000, 0, 16000);
   TH1F* nhit = new TH1F("nhit", "hit num", 100, 0, 100);
@@ -260,8 +264,8 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
   t.Draw("(TOPCAFDigits.m_pixel_id-1)/64:(TOPCAFDigits.m_pixel_id-1)%64>>pmtxy_laserReflected",  laser_refl && tight_cut);
   t.Draw("(TOPCAFDigits.m_pixel_id-1)/64:(TOPCAFDigits.m_pixel_id-1)%64>>pmtxy_midbarDirect",  cosmic_dir && tight_cut);
   t.Draw("(TOPCAFDigits.m_pixel_id-1)/64:(TOPCAFDigits.m_pixel_id-1)%64>>pmtxy_midbarReflected",  cosmic_refl && tight_cut);
-  t.Draw("(TOPCAFDigits.m_pixel_id-1)/64:(TOPCAFDigits.m_pixel_id-1)%64>>pmtxy_mirrorDirect",  mirror_dir && tight_cut);
-  t.Draw("(TOPCAFDigits.m_pixel_id-1)/64:(TOPCAFDigits.m_pixel_id-1)%64>>pmtxy_mirrorReflected",  mirror_refl && tight_cut);
+  // t.Draw("(TOPCAFDigits.m_pixel_id-1)/64:(TOPCAFDigits.m_pixel_id-1)%64>>pmtxy_mirrorDirect",  mirror_dir && tight_cut);
+  //t.Draw("(TOPCAFDigits.m_pixel_id-1)/64:(TOPCAFDigits.m_pixel_id-1)%64>>pmtxy_mirrorReflected",  mirror_refl && tight_cut);
 
 
   for (int c = 0; c < 4; c++) {
@@ -300,8 +304,8 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
   pmtxy_laserReflected->Write();
   pmtxy_midbarDirect->Write();
   pmtxy_midbarReflected->Write();
-  pmtxy_mirrorDirect->Write();
-  pmtxy_mirrorReflected->Write();
+  //  pmtxy_mirrorDirect->Write();
+  //  pmtxy_mirrorReflected->Write();
   ch_time_qual->Write();
   timing_qual->Write();
   timing_optics->Write();
@@ -326,9 +330,9 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
 
 
   for (int ich = 0; ich < 8; ich++) {
-    timing_qual_ch[ich] = new TH1F(Form("time_qual_ch_%d", ich), Form("timing on channel %d across all the asics", ich), 4000, -200.,
-                                   200.);
-    timing_qual_ch[ich]->GetYaxis()->SetTitle("hit time [ns]");
+    timing_qual_ch[ich] = new TH1F(Form("time_qual_ch_%d", ich), Form("timing on channel %d across all the asics", ich), 8000, -2000.,
+                                   2000.);
+    timing_qual_ch[ich]->GetYaxis()->SetTitle("hit time [time bin]");
     t.Draw(Form("TOPCAFDigits.m_time>>time_qual_ch_%d", ich), tight_cut && Form("TOPCAFDigits.m_asic_ch == %d", ich));
     timing_qual_ch[ich]->Write();
   }
@@ -351,7 +355,7 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
 
   ch_time_qual_ROI_laser->Write();
   ch_time_qual_ROI_midbar->Write();
-  ch_time_qual_ROI_mirror->Write();
+  //  ch_time_qual_ROI_mirror->Write();
 
 
   int itot = 0;
@@ -360,7 +364,7 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
     for (int icr = 0; icr < 4; icr++) {
       for (int ias = 0; ias < 4; ias++) {
         ASIC_tdcbin_time[itot] = new TH2F(Form("ASIC_tdcbin_time_%d_%d_%d", ibs, icr, ias),  Form("hit time vs tdc bin in ASIC %d %d %d",
-                                          ibs, icr, ias), 257, 0., 257, 2000, -1000., 1000.);
+                                          ibs, icr, ias), 257, 0., 257, 3000, -2000., 1000.);
         ASIC_tdcbin_time[itot]->GetXaxis()->SetTitle("hit time bin %256 [time bin]");
         ASIC_tdcbin_time[itot]->GetYaxis()->SetTitle("hit time [time bin]");
         t.Draw(Form("TOPCAFDigits.m_time:TOPCAFDigits.m_tdc_bin%%256>>ASIC_tdcbin_time_%d_%d_%d", ibs, icr, ias), loose_cut
@@ -385,7 +389,7 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
 
         ASIC_timing_qual[itot] = new TH1F(Form("ASIC_timing_qual_%d_%d_%d", ibs, icr, ias),
                                           Form("Photon timing after quality cuts_%d_%d_%d",
-                                               ibs, icr, ias), 4000, -200, 200);
+                                               ibs, icr, ias), 8000, -2000, 2000);
 
 //        ASIC_timing_qual[itot] = new TH1F(Form("ASIC_timing_qual_%d_%d_%d", ibs, icr, ias),  Form("Photon timing after quality cuts",  ibs,
 //                                          icr, ias), 4000, -200, 200); //wxl, warning: too many arguments for format

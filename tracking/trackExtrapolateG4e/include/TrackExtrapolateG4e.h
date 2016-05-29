@@ -43,12 +43,20 @@ namespace Belle2 {
 
   class Track;
   namespace Simulation { class ExtManager; }
+
+  //! Data structure to define extrapolation state
   struct ExtState {
+    //! Flag to indicate if called by muid (true) or ext (false) module
     bool isMuid;
+    //! Particle hypothesis that is being extrapolated
     int pdgCode;
+    //! Pointer to the geant4e state
     G4ErrorFreeTrajState* g4eState;
+    //! Pointer to the reconstructed track
     Track* track;
+    //! Address of the StoreArray<ExtHit>
     const std::string& extHitsColName;
+    //! Time of flight (ns), updated during extrapolation
     double tof;
   };
 
@@ -89,7 +97,7 @@ namespace Belle2 {
                     const std::string& magneticFieldStepperName,
                     double magneticCacheDistance,
                     double deltaChordInMagneticField,
-                    const std::vector<std::string> uiCommands);
+                    const std::vector<std::string>& uiCommands);
 
     //! Perform beginning-of-run actions
     void beginRun();

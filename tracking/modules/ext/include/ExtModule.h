@@ -86,44 +86,46 @@ namespace Belle2 {
     //! User-selected PDG codes to extrapolate (anti-particles are included implicitly)
     std::vector<int> m_PDGCodes;
 
-    //! Minimum transverse momentum in GeV/c for extrapolation to be started
+    //! User-defined minimum transverse momentum in GeV/c for extrapolation to be started
     double m_MinPt;
 
-    //! Minimum kinetic energy in GeV for extrapolation to continue
+    //! User-defined minimum kinetic energy in GeV for extrapolation to continue
     double m_MinKE;
 
-    //! Maximum step size in cm (0 for no upper limit)
+    //! User-define maximum step size in cm (0 for no upper limit)
     double m_MaxStep;
 
-    //! Flag for source (0 = beam, 1 = cosmic ray)
+    //! User-defined flag for source (0 = beam, 1 = cosmic ray)
     int    m_Cosmic;
 
-    //! Name of the Track collection of the reconstructed tracks to be extrapolated
+    //! User-defined name of the Track collection of the reconstructed tracks to be extrapolated
     std::string m_TracksColName;
 
-    //! Name of the extHit collection of the extrapolation hits
+    //! User-defined name of the extHit collection of the extrapolation hits
     std::string m_ExtHitsColName;
 
-    //! Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info
+    //! User-defined tracking verbosity:
+    //! 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info
     int m_TrackingVerbosity;
 
-    //! A list of Geant4 UI commands that should be applied before the extrapolation starts
+    //! User-defined list of Geant4 UI commands that should be applied before the extrapolation starts
     std::vector<std::string> m_UICommands;
 
-    //! If set to true the Geant4 visualization support is enabled
+    //! User-defined Geant4 visualization support: true to enable
     bool m_EnableVisualization;
 
-    //! magnetic field stepper to use
+    //! User-defined magnetic field stepper to use
     std::string m_MagneticFieldStepperName;
 
-    //! minimal distance for magnetic field lookup. If distance is smaller, return cached value
+    //! User-defined minimal distance for magnetic field lookup. If distance is smaller, return cached value
     double m_MagneticCacheDistance;
 
-    //! maximum miss-distance between the trajectory curve and its linear chord(s) approximation
+    //! User-defined maximum miss-distance between the trajectory curve and its linear chord(s) approximation
     double m_DeltaChordInMagneticField;
 
   private:
 
+    //! Pointer to the TrackExtrapoleG4e singleton
     TrackExtrapolateG4e* m_Extrapolator;
 
   };

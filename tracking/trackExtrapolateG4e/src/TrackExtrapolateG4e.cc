@@ -68,15 +68,18 @@ TrackExtrapolateG4e* TrackExtrapolateG4e::GetInstance()
 }
 
 TrackExtrapolateG4e::TrackExtrapolateG4e() :
+  m_MinPt(0.0), // initialized later
+  m_MinKE(0.0), // initialized later
+  m_TracksColName(""), // initialized later
+  m_ExtHitsColName(""), // initialized later
   m_ExtMgr(NULL), // initialized later
-  m_BKLMVolumes(NULL),
-  m_EKLMVolumes(NULL),
+  m_BKLMVolumes(NULL), // initialized later
+  m_EKLMVolumes(NULL), // initialized later
   m_EnterExit(NULL), // initialized later
   m_MinRadiusSq(0.0), // initialized later
   m_Target(NULL) // initialized later
 {
-  m_TracksColName = "";
-  m_ExtHitsColName = "";
+  m_ChargedStable.clear(); // initialized later
 }
 
 TrackExtrapolateG4e::~TrackExtrapolateG4e()
@@ -95,7 +98,7 @@ void TrackExtrapolateG4e::initialize(const std::vector<int>& pdgCodes,
                                      const std::string& magneticFieldStepperName,
                                      double magneticCacheDistance,
                                      double deltaChordInMagneticField,
-                                     const std::vector<std::string> uiCommands)
+                                     const std::vector<std::string>& uiCommands)
 {
 
   m_TracksColName = tracksColName;
@@ -127,7 +130,7 @@ void TrackExtrapolateG4e::initialize(const std::vector<int>& pdgCodes,
   G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/magField 0.001");
   G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/energyLoss 0.05");
 
-  m_Cosmic = cosmic;
+  m_Cosmic = cosmic; // DIVOT: not used yet
 
   GearDir coilContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
   double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
@@ -135,8 +138,8 @@ void TrackExtrapolateG4e::initialize(const std::vector<int>& pdgCodes,
   double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
   m_Target = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_Target);
-
-  double beampipeRadius = 10.0; // mm DIVOT - get this from geometry!
+  GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
+  double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2") * CLHEP::cm; // mm
   m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
 
   // Hypotheses for extrapolation

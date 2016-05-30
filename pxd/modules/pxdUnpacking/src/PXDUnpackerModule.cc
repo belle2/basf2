@@ -654,6 +654,10 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("RemapFlag", m_RemapFlag, "Set to one if DHP data should be remapped according to Belle II node 10", false);
 }
 
+static int error_block[ONSEN_MAX_TYPE_ERR];
+
+std::string errWeight[ONSEN_MAX_TYPE_ERR];
+
 void PXDUnpackerModule::initialize()
 {
   m_storeRawPXD.isRequired(m_RawPXDsName);
@@ -676,51 +680,53 @@ void PXDUnpackerModule::initialize()
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) m_errorCounter[i] = 0;
 
   if (m_RemapFlag) {
-    printf("open LUT  \n");
+    B2INFO("open LUT");
     int i = 0;
     ifstream LUT_IF_OB_read(m_RemapLUTifob.c_str());
     if (LUT_IF_OB_read) {
       B2INFO("Read Raw ONSEN Data from " << m_RemapLUTifob);
     } else {
-      B2ERROR("Could not open Raw ONSEN Data: " << m_RemapLUTifob);
+      B2ERROR("Could not open LUT_IF_OB: " << m_RemapLUTifob);
     }
     while (!LUT_IF_OB_read.eof()) {
       i++;
       LUT_IF_OB_read >> LUT_IF_OB[i];
-      //      cout << "LUT_IF_OB :: " << i << " :: " << LUT_IF_OB[i] << endl;
+//      B2INFO("LUT_IF_OB :: " << i << " :: " << LUT_IF_OB[i]);
     }
-    printf("LUT_IF_OB written \n");
+    B2INFO("LUT_IF_OB written");
     LUT_IF_OB_read.close();
     int j = 0;
     ifstream LUT_IB_OF_read(m_RemapLUTibof.c_str());
     if (LUT_IB_OF_read) {
       B2INFO("Read Raw ONSEN Data from " << m_RemapLUTibof);
     } else {
-      B2ERROR("Could not open Raw ONSEN Data: " << m_RemapLUTibof);
+      B2ERROR("Could not open LUT_IB_OF: " << m_RemapLUTibof);
     }
     while (!LUT_IB_OF_read.eof()) {
       j++;
       LUT_IB_OF_read >> LUT_IB_OF[j];
-      //    cout << "LUT_IB_OF :: " << j << " :: " << LUT_IB_OF[j] << endl;
+//      B2INFO("LUT_IB_OF :: " << j << " :: " << LUT_IB_OF[j]);
     }
     LUT_IB_OF_read.close();
-    printf("LUT_IB_OF written\n");
+    B2INFO("LUT_IB_OF written");
   }
 }
 
+const string error_name[ONSEN_MAX_TYPE_ERR] = {
+  /*-unused-*/ "DHE IDs have wrong order in DHC frame", "DHC/DHE mismatch", "EvtMeta/DHC mismatch", "ONSEN Trigger is not first frame",
+  "DHC_END missing", "DHE_START missing", "DHC Framecount mismatch", "DATA outside of DHE",
+  "DHC_START is not second frame", "-unused-", "Fixed size frame wrong size", "DHE CRC Error:",
+  "Unknown DHC type", "Merger CRC Error", "Event Header Full Packet Size Error", "Event Header Magic Error",
+  "Event Header Frame Count Error", "Event header Frame Size Error", "HLTROI Magic Error", "Merger HLT/DATCON TrigNr Mismatch",
+  "DHP Size too small", "DHP-DHE DHEID mismatch", "DHP-DHE Port mismatch", "DHP Pix w/o row",
+  "DHE START/END ID mismatch", "DHE ID mismatch of START and this frame", "DHE_START w/o prev END", "Nr PXD data ==0",
+  "Missing Datcon", "NO DHC data for Trigger", "DHE active mismatch", "DHP active mismatch"
+};
+
+const string errW[2] = {"Critical", "FATAL"};
+
 void PXDUnpackerModule::terminate()
 {
-  const string error_name[ONSEN_MAX_TYPE_ERR] = {
-    /*-unused-*/ "DHE IDs have wrong order in DHC frame", "DHC/DHE mismatch", "EvtMeta/DHC mismatch", "ONSEN Trigger is not first frame",
-    "DHC_END missing", "DHE_START missing", "DHC Framecount mismatch", "DATA outside of DHE",
-    "DHC_START is not second frame", "-unused-", "Fixed size frame wrong size", "DHE CRC Error:",
-    "Unknown DHC type", "Merger CRC Error", "Event Header Full Packet Size Error", "Event Header Magic Error",
-    "Event Header Frame Count Error", "Event header Frame Size Error", "HLTROI Magic Error", "Merger HLT/DATCON TrigNr Mismatch",
-    "DHP Size too small", "DHP-DHE DHEID mismatch", "DHP-DHE Port mismatch", "DHP Pix w/o row",
-    "DHE START/END ID mismatch", "DHE ID mismatch of START and this frame", "DHE_START w/o prev END", "Nr PXD data ==0",
-    "Missing Datcon", "NO DHC data for Trigger", "DHE active mismatch", "DHP active mismatch"
-  };
-
   B2ERROR("DHE IDs come in wrong order :: " << dheID_order_error);
   if (dheID_order_error == m_unpackedEventsCount) {
     B2ERROR("DHE IDs come in wrong order in every Event");
@@ -760,6 +766,7 @@ void PXDUnpackerModule::event()
   m_meta_experiment = evtPtr->getExperiment();
   /// evtPtr->getTime()
 
+  for (int k = 0 ; k < ONSEN_MAX_TYPE_ERR ; k++) {error_block[k] = 0;}
 
   int nsr = 0;// number of packets
   for (auto& it : m_storeRawPXD) {
@@ -772,9 +779,21 @@ void PXDUnpackerModule::event()
 
   if (nsr == 0) m_errorMask |= ONSEN_ERR_FLAG_NO_PXD;
 
+  const char* errWptr[4];
+  for (int i = 0 ; i < 4 ; i++) {
+    errWptr[i] = errW[i].c_str();
+  }
+//  strcmp(error_name[i], "DHE IDs have wrong order in DHC frame") == 0
   m_unpackedEventsCount++;
   for (unsigned int i = 0, j = 1; i < ONSEN_MAX_TYPE_ERR; i++) {
     if (m_errorMask & j) m_errorCounter[i]++;
+    if (m_errorMask & j) {
+      if (i == 0 || i == 6 || i == 7 || i == 9 || i == 10 || i == 12 || i == 13) {
+        set_errors(i, errWptr[1]);
+      } else {
+        set_errors(i, errWptr[0]);
+      }
+    }
     j += j;
   }
 }
@@ -1560,7 +1579,7 @@ unsigned int PXDUnpackerModule::remap_col_IF_OB(unsigned int DHP_row, unsigned i
 //   B2INFO("in remap COL ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   u_cellID = Drain / 4;
 //   B2INFO(" col false " << DHP_col << " DCD line " << DCD_channel << " col geo " << col_geo);
-  B2INFO("Remapped :: COL $" << DHP_col << " to u_cellID $" << u_cellID);
+  B2INFO("Remapped :: DHP_COL $" << DHP_col << " to u_cellID $" << u_cellID);
   if (DHP_col > 250) {B2INFO("DHP_COL > 250 :: COL $" << DHP_col << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");}
   if (u_cellID > 250) {B2INFO("U_CELLID > 250 :: u_cellID $" << u_cellID << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");}
   return u_cellID;
@@ -1582,6 +1601,7 @@ unsigned int PXDUnpackerModule::remap_row_IB_OF(unsigned int DHP_row, unsigned i
 //   B2INFO("row false " << DHP_row << " col false " << DHP_col << " DCD line " << DCD_channel << " Gate " << Gate << " Drain " << Drain << " row geo " << row);
   if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - 1 - row ;} //if inner module
   if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = row ;} //if outer module
+  //inverts last two bit
   v_cellID ^= (1u << 1);
   v_cellID ^= 1u ;
   B2INFO("Remapped :: ROW $" << DHP_row << " to v_cellID $" << v_cellID);
@@ -1606,4 +1626,31 @@ unsigned int PXDUnpackerModule::remap_col_IB_OF(unsigned int DHP_row, unsigned i
   if (DHP_col > 250) {B2INFO("DHP_COL > 250 :: COL $" << DHP_col << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");}
   if (u_cellID > 250) {B2INFO("U_CELLID > 250 :: u_cellID $" << u_cellID << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");}
   return u_cellID;
+}
+
+void PXDUnpackerModule::set_errors(int block_number, std::string errorWeight)
+{
+  error_block[block_number]++;
+  errWeight[block_number] = errorWeight;
+
+}
+
+int PXDUnpackerModule::get_errors(int block_number)
+{
+  return error_block[block_number];
+}
+
+int PXDUnpackerModule::get_Nrerrors(void)
+{
+  return ONSEN_MAX_TYPE_ERR;
+}
+
+std::string PXDUnpackerModule::get_errWeight(int nr)
+{
+  return errWeight[nr];
+}
+
+std::string PXDUnpackerModule::get_errTypes(int nr)
+{
+  return error_name[nr];
 }

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Bjoern Spruck / Klemens Lautenbach                                       *
+ * Contributors: Bjoern Spruck / Klemens Lautenbach                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -22,6 +22,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <iostream>
 #include <fstream>
+#include <stdio.h>
+#include <math.h>
 
 namespace Belle2 {
 
@@ -46,6 +48,14 @@ namespace Belle2 {
       virtual void event();
       /** Terminate the module */
       virtual void terminate();
+
+      int get_errors(int block_number);
+
+      int get_Nrerrors(void);
+
+      std::string get_errTypes(int nr);
+
+      std::string get_errWeight(int nr);
 
     private:
 
@@ -167,6 +177,8 @@ namespace Belle2 {
       //Lookup tables for DHP remapping
       int LUT_IF_OB[1030];
       int LUT_IB_OF[1030];
+
+      void set_errors(int block_number, std::string errorWeight);
 
       /** Error Mask set per packet / event*/
       unsigned int m_errorMask;

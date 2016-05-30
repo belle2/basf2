@@ -30,8 +30,7 @@ namespace Belle2 {
   /** Defines a pointer to a path object as a boost shared pointer. */
   typedef boost::shared_ptr<Path> PathPtr;
 
-  /** Implements a path consisting of Module and/or Path objects. The modules are arranged in a linear order.
-   */
+  /** Implements a path consisting of Module and/or Path objects. The modules are arranged in a linear order.  */
   class Path : public PathElement {
 
   public:
@@ -52,24 +51,11 @@ namespace Belle2 {
      * The module is added to the path by inserting it to the end
      * of the list of modules.
      *
+     * See 'pydoc3 basf2.Path' for the complete documentation.
+     *
      * @param module Module that should be added to the path.
      */
     void addModule(boost::shared_ptr<Module> module);
-
-
-    /** Insert another path at the end of this one.
-     *
-     * E.g.
-     *
-       \code
-       main.add_module(a)
-       main.add_path(otherPath)
-       main.add_module(b)
-       \endcode
-     *
-     * would create a path [ A -> [ contents of otherPath ] -> B ].
-     */
-    void addPath(PathPtr path);
 
     /** Returns true if this Path doesn't contain any elements. */
     bool isEmpty() const;
@@ -103,44 +89,6 @@ namespace Belle2 {
      */
     bool contains(std::string moduleType) const;
 
-    /**
-     * Similar to addPath()/add_path(), this will execute path at the current position, but
-     * will run it once for each object in the given array 'arrayName', and set the loop variable
-     * 'loopObjectName' (a StoreObjPtr of same type as array) to the current object.
-     *
-     * Main use case is after using the RestOfEventBuilder on a ParticeList, where
-     * you can use this feature to perform actions on only a part of the event
-     * for a given list of candidates:
-     *
-       \code
-       #read: for each  $objName   in $arrayName   run over $path
-       path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
-       \endcode
-     *
-     * If 'RestOfEvents' contains two elements, during the execution of roe_path a StoreObjectPtr 'RestOfEvent'
-     * will be available, which will point to the first element in the first run, and the second element
-     * in the second run. You can use the variable 'isInRestOfEvent' to select Particles that
-     * originate from this part of the event.
-     *
-     * Changes to existing arrays / objects will be available to all modules after the for_each(),
-     * including those made to the loop variable (it will simply modify the i'th item in the array looped over.)
-     * Arrays / objects of event durability created inside the loop will however be limited to the validity of the loop variable. That is,
-     * creating a list of Particles matching the current MCParticle (loop object) will no longer exist after switching
-     * to the next MCParticle or exiting the loop.
-     */
-    void forEach(std::string loopObjectName, std::string arrayName, PathPtr path);
-
-    /**
-     * Add given path at the end of this path and ensure all modules there
-     * do not influence the main DataStore. You can thus use modules in
-     * skim_path to clean up e.g. the list of particles, save a skimmed uDST file,
-     * and continue working with the unmodified DataStore contents outside of
-     * skim_path.
-     * ds_ID can be specified to give a defined ID to the temporary DataStore,
-     * otherwise, a random name will be generated.
-     */
-    void addSkimPath(PathPtr skim_path, std::string ds_ID);
-
     /** Create an independent copy of this path, recreating all contained modules with the same parameters.
      *
      * Note that parameters are shared, so changing them on a module in the cloned path will also affect
@@ -152,6 +100,15 @@ namespace Belle2 {
     //--------------------------------------------------
     //                   Python API
     //--------------------------------------------------
+
+    /** See 'pydoc3 basf2.Path' */
+    void addPath(PathPtr path);
+
+    /** See 'pydoc3 basf2.Path' */
+    void forEach(std::string loopObjectName, std::string arrayName, PathPtr path);
+
+    /** See 'pydoc3 basf2.Path' */
+    void addSkimPath(PathPtr skim_path, std::string ds_ID);
 
     /** return a string of the form [module a -> module b -> [another path]]
      *

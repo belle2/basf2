@@ -166,29 +166,65 @@ std::string Path::getPathString() const
 }
 
 
-/**
- * Returns a list of the modules in given path (as python list).
- */
-boost::python::list _getModulesPython(const Path* path)
-{
-  boost::python::list returnList;
+namespace {
+  /**
+   * Returns a list of the modules in given path (as python list).
+   */
+  boost::python::list _getModulesPython(const Path* path)
+  {
+    boost::python::list returnList;
 
-  for (const ModulePtr& module : path->getModules())
-    returnList.append(boost::python::object(ModulePtr(module)));
+    for (const ModulePtr& module : path->getModules())
+      returnList.append(boost::python::object(ModulePtr(module)));
 
-  return returnList;
+    return returnList;
+  }
 }
 
 void Path::exposePythonAPI()
 {
-  class_<Path>("Path", no_init)
+  class_<Path>("Path",
+               "Implements a path consisting of Module and/or Path objects (arranged in a linear order). Use create_path() to create a new object.",
+               no_init)
   .def("__str__", &Path::getPathString)
   .def("_add_module_object", &Path::addModule)
-  .def("add_path", &Path::addPath)
-  .def("modules", &_getModulesPython)
-  .def("for_each", &Path::forEach)
+  .def("add_path", &Path::addPath, R"(Insert another path at the end of this one.
+For example,
+>>> path.add_module('A')
+>>> path.add_path(otherPath)
+>>> path.add_module('B')
+would create a path [ A -> [ contents of otherPath ] -> B ].)")
+  .def("modules", &_getModulesPython, "Returns an ordered list of all modules in this path.")
+  .def("for_each", &Path::forEach, R"(Similar to add_path(), this will execute path at the current position, but
+will run it once for each object in the given array 'arrayName', and set the loop variable
+'loopObjectName' (a StoreObjPtr of same type as array) to the current object.
+
+Main use case is after using the RestOfEventBuilder on a ParticeList, where
+you can use this feature to perform actions on only a part of the event
+for a given list of candidates:
+
+>>> path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+read: for each  $objName   in $arrayName   run over $path
+
+If 'RestOfEvents' contains two elements, during the execution of roe_path a StoreObjectPtr 'RestOfEvent'
+will be available, which will point to the first element in the first run, and the second element
+in the second run. You can use the variable 'isInRestOfEvent' to select Particles that
+originate from this part of the event.
+
+Changes to existing arrays / objects will be available to all modules after the for_each(),
+including those made to the loop variable (it will simply modify the i'th item in the array looped over.)
+Arrays / objects of event durability created inside the loop will however be limited to the validity of the loop variable. That is,
+creating a list of Particles matching the current MCParticle (loop object) will no longer exist after switching
+to the next MCParticle or exiting the loop.)", args("loopObjectName", "arrayName", "path"))
   .def("_add_skim_path", &Path::addSkimPath)
-  .def("__contains__", &Path::contains)
+  .def("__contains__", &Path::contains, R"(Does this Path contain a module of the given type?
+
+>>> path = create_path()
+>>> 'RootInput' in path
+False
+>>> path.add_module('RootInput')
+>>> 'RootInput' in path
+True)", args("moduleType"))
   ;
 
   register_ptr_to_python<PathPtr>();

@@ -16,6 +16,7 @@ namespace Belle2 {
 
   public:
     void create(const char* tablename);
+    boost::python::list getDBList(const char* tablename, const char* prefix);
     const std::string& getPath() const throw() { return m_obj.getPath(); }
     void setPath(const std::string& path) throw() { m_obj.setPath(path); }
     int getId() const throw() { return m_obj.getId(); }

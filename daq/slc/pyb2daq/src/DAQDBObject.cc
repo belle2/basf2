@@ -35,6 +35,26 @@ void DAQDBObject::create(const char* tablename)
   db.close();
 }
 
+boost::python::list DAQDBObject::getDBList(const char* tablename,
+                                           const char* prefix)
+{
+  ConfigFile config("slowcontrol");
+  PostgreSQLInterface db(config.get("database.host"),
+                         config.get("database.dbname"),
+                         config.get("database.user"),
+                         config.get("database.password"),
+                         config.getInt("database.port"));
+  StringList names = DBObjectLoader::getDBlist(db, tablename, prefix);
+  db.close();
+  boost::python::list py_list;
+
+  for (StringList::iterator it = names.begin();
+       it != names.end(); it++) {
+    py_list.append(*it);
+  }
+  return py_list;
+}
+
 boost::python::list DAQDBObject::getFieldNames() const throw()
 {
   DBField::NameList names = m_obj.getFieldNames();

@@ -47,6 +47,7 @@ BOOST_PYTHON_MODULE(pyb2daq)
 
   boost::python::class_<DAQDBObject>("DAQDBObject", boost::python::init<const char*, const char*>())
   .def(boost::python::init<>())
+  .def("getDBList", &DAQDBObject::getDBList)
   .def("create", &DAQDBObject::create)
   .def("setPath", &DAQDBObject::setPath)
   .def("setName", &DAQDBObject::setName)

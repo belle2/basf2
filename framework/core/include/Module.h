@@ -13,7 +13,6 @@
 
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/PathElement.h>
-#include <framework/core/CondParser.h>
 #include <framework/logging/LogConfig.h>
 
 #include <boost/shared_ptr.hpp>
@@ -35,6 +34,7 @@ namespace boost {
 namespace Belle2 {
 
   class Module;
+  class ModuleCondition;
   class Path;
 
   /** Defines a pointer to a module object as a boost shared pointer. */
@@ -232,16 +232,11 @@ namespace Belle2 {
      */
     void setLogInfo(int logLevel, unsigned int logInfo);
 
-    /**
-     * Sets the condition path of the module
-     */
-    void setConditionPath(const boost::shared_ptr<Path>& path) { m_conditionPath = path; };
-
 
     /**
      * Sets the condition of the module.
      *
-     * See https://belle2.cc.kek.jp/~twiki/bin/view/Software/ModCondTut or CondParser::parseCondition() for a description of the syntax.
+     * See https://belle2.cc.kek.jp/~twiki/bin/view/Software/ModCondTut or ModuleCondition for a description of the syntax.
      *
      * Please be careful: Avoid creating cyclic paths, e.g. by linking a condition
      * to a path which is processed before the path where this module is
@@ -287,7 +282,10 @@ namespace Belle2 {
     /**
      * Returns true if a condition was set for the module.
      */
-    bool hasCondition() const { return m_hasCondition; };
+    bool hasCondition() const { return m_condition != nullptr; };
+
+    /** Returns condition (or nullptr, if none was set) */
+    const ModuleCondition* getCondition() const { return m_condition; }
 
     /**
      * If a condition was set, it is evaluated and the result is returned.
@@ -298,20 +296,13 @@ namespace Belle2 {
      *
      * @return True if a condition and return value exists and the condition expression was evaluated to true.
      */
-    bool evalCondition();
+    bool evalCondition() const;
 
     /** Returns the path of the condition.  */
-    boost::shared_ptr<Path> getConditionPath() const {return m_conditionPath; };
+    boost::shared_ptr<Path> getConditionPath() const;
 
-    /** Returns the value of the condition.  */
-    int getConditionValue() const {return m_conditionValue; };
-
-    /** Returns the value of the condition.  */
-    Belle2::CondParser::EConditionOperators getConditionOperator() const {return m_conditionOperator; };
-
-
-    /** What to do after a conditional path is finished. */
-    EAfterConditionPath getAfterConditionPath() const { return m_afterConditionPath; }
+    /** What to do after a conditional path is finished. (defaults to c_End if no condition is set)*/
+    Module::EAfterConditionPath getAfterConditionPath() const;
 
     /**
      * Returns true if all specified property flags are available in this module.
@@ -478,12 +469,7 @@ namespace Belle2 {
     bool m_hasReturnValue;     /**< True, if the return value is set. */
     int  m_returnValue;        /**< The return value. */
 
-    bool m_hasCondition;     /**< True, if a condition was set for the module. */
-    boost::shared_ptr<Path> m_conditionPath; /**< The path which which will be executed if the condition is evaluated to true. */
-    Belle2::CondParser::EConditionOperators
-    m_conditionOperator;  /**< The operator of the condition (set by parsing the condition expression). */
-    int m_conditionValue;                    /**< Numeric value used in the condition (set by parsing the condition expression). */
-    EAfterConditionPath m_afterConditionPath; /**< What to do after a conditional path is finished. */
+    ModuleCondition* m_condition; /**< Module condition, only non-null if set. */
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //                    Python API

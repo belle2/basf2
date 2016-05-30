@@ -17,6 +17,7 @@
 #include <boost/python/enum.hpp>
 
 #include <framework/core/Module.h>
+#include <framework/core/ModuleCondition.h>
 #include <framework/core/PyModule.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/core/Path.h>
@@ -35,16 +36,14 @@ Module::Module() :
   m_logConfig(),
   m_hasReturnValue(false),
   m_returnValue(0),
-  m_hasCondition(false),
-  m_conditionValue(0),
-  m_afterConditionPath(EAfterConditionPath::c_End)
+  m_condition(nullptr)
 {
 }
 
 
 Module::~Module()
 {
-
+  delete m_condition;
 }
 
 const std::string& Module::getType() const
@@ -87,18 +86,11 @@ void Module::setLogInfo(int logLevel, unsigned int logInfo)
 
 void Module::if_value(const std::string& expression, boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
 {
-  if (m_hasCondition) {
-    B2ERROR("You can only set a single condition per module!");
+  if (m_condition) {
+    throw std::runtime_error("You can only set a single condition per module!");
   }
 
-  CondParser condParser;
-  if (condParser.parseCondition(expression, m_conditionOperator, m_conditionValue)) {
-    m_hasCondition = true;
-    m_conditionPath = path;
-    m_afterConditionPath = afterConditionPath;
-  } else {
-    B2ERROR("Invalid condition: could not parse condition: '" + expression + "'! The condition is NOT active!");
-  }
+  m_condition = new ModuleCondition(expression, path, afterConditionPath);
 }
 
 
@@ -113,17 +105,31 @@ void Module::if_true(boost::shared_ptr<Path> path, EAfterConditionPath afterCond
 }
 
 
-bool Module::evalCondition()
+bool Module::evalCondition() const
 {
-  if (!m_hasCondition) return false;
+  if (!m_condition) return false;
 
   //okay, a condition was set for this Module...
   if (!m_hasReturnValue) {
     B2FATAL("A condition was set for '" << getName() << "', but the module did not set a return value!");
   }
-  return CondParser::evalCondition(m_returnValue, m_conditionValue, m_conditionOperator);
+  return m_condition->evaluate(m_returnValue);
 }
 
+boost::shared_ptr<Path> Module::getConditionPath() const
+{
+  PathPtr p;
+  if (m_condition)
+    p = m_condition->getPath();
+  return p;
+}
+
+Module::EAfterConditionPath Module::getAfterConditionPath() const
+{
+  if (m_condition)
+    return m_condition->getAfterConditionPath();
+  return EAfterConditionPath::c_End;
+}
 
 bool Module::hasProperties(unsigned int propertyFlags) const
 {
@@ -146,14 +152,11 @@ boost::shared_ptr<PathElement> Module::clone() const
   newModule->m_propertyFlags = m_propertyFlags;
   newModule->m_logConfig = m_logConfig;
 
-  newModule->m_hasCondition = m_hasCondition;
-  if (m_conditionPath) {
-    boost::shared_ptr<Path> p = boost::static_pointer_cast<Path>(m_conditionPath->clone());
-    newModule->m_conditionPath = p;
+  if (!m_condition) {
+    newModule->m_condition = nullptr;
+  } else {
+    newModule->m_condition = new ModuleCondition(*m_condition);
   }
-  newModule->m_conditionOperator = m_conditionOperator;
-  newModule->m_conditionValue = m_conditionValue;
-  newModule->m_afterConditionPath = m_afterConditionPath;
 
   return newModule;
 }
@@ -163,20 +166,8 @@ std::string Module::getPathString() const
 
   std::string output = getName();
 
-  if (m_hasCondition) {
-    output += "(? ";
-    switch (m_conditionOperator) {
-      case Belle2::CondParser::c_GT: output += ">"; break;
-      case Belle2::CondParser::c_ST: output += "<"; break;
-      case Belle2::CondParser::c_GE: output += ">="; break;
-      case Belle2::CondParser::c_SE: output += "<="; break;
-      case Belle2::CondParser::c_NE: output += "!="; break;
-      case Belle2::CondParser::c_EQ: output += "=="; break;
-      default: output += "???";
-    }
-    output += std::to_string(m_conditionValue);
-    output += m_conditionPath->getPathString();
-    output += " )";
+  if (m_condition) {
+    output += m_condition->getString();
   }
 
   return output;
@@ -264,6 +255,18 @@ namespace {
   {
     return *(m->getParamInfoListPython().get()); //copy the list object
   }
+  int _getConditionValuePython(const Module* m)
+  {
+    if (m->getCondition())
+      return m->getCondition()->getConditionValue();
+    throw runtime_error("No condition was set for module " + m->getName());
+  }
+  ModuleCondition::EConditionOperators _getConditionOperatorPython(const Module* m)
+  {
+    if (m->getCondition())
+      return m->getCondition()->getConditionOperator();
+    throw runtime_error("No condition was set for module " + m->getName());
+  }
 }
 
 #if !defined(__GNUG__) || defined(__ICC)
@@ -291,13 +294,13 @@ void Module::exposePythonAPI()
   ;
 
   /* Do not change the names of >, <, ... we use them to serialize conditional pathes */
-  enum_<Belle2::CondParser::EConditionOperators>("ConditionOperator")
-  .value(">", Belle2::CondParser::EConditionOperators::c_GT)
-  .value("<", Belle2::CondParser::EConditionOperators::c_ST)
-  .value(">=", Belle2::CondParser::EConditionOperators::c_GE)
-  .value("<=", Belle2::CondParser::EConditionOperators::c_SE)
-  .value("==", Belle2::CondParser::EConditionOperators::c_EQ)
-  .value("!=", Belle2::CondParser::EConditionOperators::c_NE)
+  enum_<Belle2::ModuleCondition::EConditionOperators>("ConditionOperator")
+  .value(">", Belle2::ModuleCondition::EConditionOperators::c_GT)
+  .value("<", Belle2::ModuleCondition::EConditionOperators::c_ST)
+  .value(">=", Belle2::ModuleCondition::EConditionOperators::c_GE)
+  .value("<=", Belle2::ModuleCondition::EConditionOperators::c_SE)
+  .value("==", Belle2::ModuleCondition::EConditionOperators::c_EQ)
+  .value("!=", Belle2::ModuleCondition::EConditionOperators::c_NE)
   ;
 
   enum_<Module::EModulePropFlags>("ModulePropFlags")
@@ -326,8 +329,8 @@ void Module::exposePythonAPI()
   .def("has_condition", &Module::hasCondition)
   .def("get_condition_path", &Module::getConditionPath)
   .def("get_condition_option", &Module::getAfterConditionPath)
-  .def("get_condition_value", &Module::getConditionValue)
-  .def("get_condition_operator", &Module::getConditionOperator)
+  .def("get_condition_value", &_getConditionValuePython)
+  .def("get_condition_operator", &_getConditionOperatorPython)
   .add_property("logging",
                 make_function(&Module::getLogConfig, return_value_policy<reference_existing_object>()),
                 &Module::setLogConfig)

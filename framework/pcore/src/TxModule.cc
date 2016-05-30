@@ -44,10 +44,6 @@ void TxModule::initialize()
   m_rbuf->txAttached();
   m_streamer = new DataStoreStreamer(m_compressionLevel);
 
-  // Limit streaming objs for performance test
-  //  vector<string> streamobjs = { "EventMetaData", "RawSVDs", "ROIpayload", "ROIs", "SVClusters", "SVDDigits",
-  //        "ProcessStatistics" };
-  //  m_streamer->registerStreamObjs ( streamobjs );
   if ((Environment::Instance().getStreamingObjects()).size() > 0) {
     m_streamer->registerStreamObjs(Environment::Instance().getStreamingObjects());
     B2INFO("Tx: Streaming objects limited : " << (Environment::Instance().getStreamingObjects()).size() << " objects");

@@ -51,7 +51,7 @@ namespace Belle2 {
     //!Compression parameter
     int m_compressionLevel;
 
-    //! RingBuffer ID
+    //! RingBuffer (not owned by us)
     RingBuffer* m_rbuf;
 
     //! DataStoreStreamer

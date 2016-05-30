@@ -101,16 +101,13 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
       buf = msg->CompBuffer();
     }
     // Put name of object in output buffer
-    string& name = m_name[nameptr];
+    const string& name = m_name[nameptr];
     UInt_t nameLength = strlen(name.c_str()) + 1;
     memcpy(msgptr, &nameLength, sizeof(nameLength));
     memcpy(msgptr + sizeof(nameLength), name.c_str(), nameLength);
     msgptr += (sizeof(nameLength) + nameLength);
     totlen += (sizeof(nameLength) + nameLength);
     // Copy object into buffer
-    //    printf ( "encode: obj name = %s : size = %d, msgptr = %8.8x\n",
-    //           name.c_str(), len, msgptr );
-    //    fflush ( stdout );
     memcpy(msgptr, &len, sizeof(len));
     memcpy(msgptr + sizeof(len), buf, len);
     msgptr += (sizeof(len) + len);
@@ -125,12 +122,10 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
   //     *((int*)msgbuf), *((int*)(msgbuf+1)), *((int*)(msgbuf+2)), *((int*)(msgbuf+3)) );
 
   delete[] msgbuf;
-  m_buf.erase(m_buf.begin(), m_buf.end());
-  m_name.erase(m_name.begin(), m_name.end());
+  m_buf.clear();
+  m_name.clear();
 
   return evtmsg;
-
-  //  return new EvtMessage ( NULL, 0, MSG_TERMINATE );
 }
 
 int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
@@ -152,27 +147,11 @@ int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
 
     // Restore object
     UInt_t objlen;
-    //    printf ( "MsgHandler::decode obj=%s\n", name.c_str() );
     memcpy(&objlen, msgptr, sizeof(objlen));
-    //    printf ( "decode : objlen = %d\n", objlen );
-    // Old impl.
+
     TMessage* tmsg = new InMessage(msgptr + sizeof(objlen), objlen);
-    //    char* tmpmsg = new char[objlen];
-    //    TMessage* tmsg = new InMessage ( tmpmsg, objlen );
-    //    TObject* obj = (TObject*)tmsg->ReadObjectAny(NULL);
     TObject* obj = static_cast<TObject*>(tmsg->ReadObjectAny(tmsg->GetClass()));
     objlist.push_back(obj);
-
-    /*
-    if ( obj != NULL ) {
-      printf ( "MsgHandler::decode_msg : obj=%s, class=%s\n",
-         name.c_str(), obj->ClassName() );
-    }
-    else {
-      printf ( "MsgHandler::decode_msg : obj=%s, Null Object\n",
-         name.c_str() );
-    }
-    */
 
     msgptr += objlen + sizeof(objlen);
     totlen += objlen + sizeof(objlen);
@@ -188,6 +167,5 @@ int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
     fflush(stdout);
 
   }
-  //  printf ( "decode : done\n" );
   return 0;
 }

@@ -162,12 +162,8 @@ EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, boo
 
       //skip objects not in the list
       if (!m_streamobjnames.empty()) {
-        //      printf ( "selecting %s : ", (it->first).c_str() );
-        //      std::basic_string<char> objname = it->first;
         vector<string>::iterator pos = std::find(m_streamobjnames.begin(), m_streamobjnames.end(), it->first);
-        //      if ( pos == m_streamobjnames.end() ) { printf ( "\n"); continue; }
         if (pos == m_streamobjnames.end())  continue;
-        //      printf ( "selected [ %s ]\n", (it->first).c_str() );
       }
 
       //verify that bits are unused
@@ -215,11 +211,9 @@ EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, boo
 
   // Encode EvtMessage
   EvtMessage* msg = m_msghandler->encode_msg(MSG_EVENT);
-  (msg->header())->nObjects = nobjs;       // No. of objects
-  (msg->header())->nArrays = narrays;    // No. of arrays
+  (msg->header())->nObjects = nobjs;
+  (msg->header())->nArrays = narrays;
 
-  // Return msg
-  // Note : returned EvtMessage has to be deleted later
   return msg;
 }
 

@@ -696,7 +696,7 @@ namespace Belle2 {
           // time.sleep(0.4) -- GSV mod
           //usleep(200000);
           monVal[mon] = b2l_read(hslb, CARRIER_IRSX_scalerMontiming, carrier, asic);
-          LogFile::debug("%-10s %10d", monName[mon], monVal[mon]);
+          LogFile::debug("%-10s %10d", monName[mon].c_str(), monVal[mon]);
           if (monVal[mon] / 10000 != goodMonVal[mon]) {
             monVal[mon] = -1; // mark as "bad"
             LogFile::debug("Questionable montiming value");
@@ -706,7 +706,7 @@ namespace Belle2 {
         // time.sleep(0.4) -- GSV mod
         //usleep(200000);
         monVal[8] = b2l_read(hslb, CARRIER_IRSX_scalerMontiming, carrier, asic);
-        LogFile::debug("%-10s %10d", monName[8], monVal[8]);
+        LogFile::debug("%-10s %10d", monName[8].c_str(), monVal[8]);
         if (monVal[8] / 10000 != goodMonVal[8]) {
           monVal[8] = -1; // mark as "bad"
           LogFile::debug("Questionable montiming value");
@@ -715,7 +715,7 @@ namespace Belle2 {
         // time.sleep(0.4) -- GSV mod
         //usleep(200000);
         monVal[9] = b2l_read(hslb, CARRIER_IRSX_scalerMontiming, carrier, asic);
-        LogFile::debug("%-10s %10d", monName[9], monVal[9]);
+        LogFile::debug("%-10s %10d", monName[9].c_str(), monVal[9]);
         if (monVal[9] / 10000 != goodMonVal[9]) {
           monVal[9] = -1; // mark as "bad"
           LogFile::debug("Questionable montiming value");

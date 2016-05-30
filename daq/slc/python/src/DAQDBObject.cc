@@ -19,8 +19,19 @@ DAQDBObject::DAQDBObject(const char* tablename, const char* configname)
                          config.get("database.password"),
                          config.getInt("database.port"));
   bool showall = true;
-  db.connect();
   *this = DBObjectLoader::load(db, tablename, configname, showall);
+  db.close();
+}
+
+void DAQDBObject::create(const char* tablename)
+{
+  ConfigFile config("slowcontrol");
+  PostgreSQLInterface db(config.get("database.host"),
+                         config.get("database.dbname"),
+                         config.get("database.user"),
+                         config.get("database.password"),
+                         config.getInt("database.port"));
+  DBObjectLoader::createDB(db, tablename, m_obj);
   db.close();
 }
 

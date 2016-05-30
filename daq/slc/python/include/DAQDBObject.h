@@ -15,6 +15,7 @@ namespace Belle2 {
     DAQDBObject(const char* tablename, const char* configname);
 
   public:
+    void create(const char* tablename);
     const std::string& getPath() const throw() { return m_obj.getPath(); }
     void setPath(const std::string& path) throw() { m_obj.setPath(path); }
     int getId() const throw() { return m_obj.getId(); }

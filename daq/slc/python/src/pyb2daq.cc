@@ -46,6 +46,10 @@ BOOST_PYTHON_MODULE(b2daq)
 #endif
 
   boost::python::class_<DAQDBObject>("DAQDBObject", boost::python::init<const char*, const char*>())
+  .def(boost::python::init<>())
+  .def("create", &DAQDBObject::create)
+  .def("setPath", &DAQDBObject::setPath)
+  .def("setName", &DAQDBObject::setName)
   .def("getPath", &DAQDBObject::getPath, return_value_policy<copy_const_reference>())
   .def("getName", &DAQDBObject::getName, return_value_policy<copy_const_reference>())
   .def("getFieldNames", &DAQDBObject::getFieldNames)

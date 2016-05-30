@@ -31,7 +31,8 @@ CFLAGS  += -I$(PGSQL_INC_PATH)
 endif
 CFLAGS  += $(EXTERNAL_CFLAGS)
 
-EX_INC = $(BELLE2_EXTERNALS_DIR)/include
+#EX_INC = $(BELLE2_EXTERNALS_DIR)/include
+EX_INC = $(HOME)/opt/include
 CFLAGS += -isystem/$(EX_INC)/python3.5 -isystem/$(EX_INC)
 
 LIBS   += -lboost_python -lboost_filesystem -lboost_program_options  -lboost_system  

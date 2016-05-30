@@ -146,7 +146,7 @@ void PXDRawDQMCorrModule::event()
           m_CorrelationV->Fill(hit1.getRow(), hit2.getRow());
           m_DeltaU->Fill(hit2.getColumn() - hit1.getColumn());
           m_DeltaV->Fill(hit2.getRow() - hit1.getRow());
-        } else { // index 2=0
+        } else { // index2=0
           if (hit1.getColumn() != hit2.getColumn()) {
             m_In1CorrelationU->Fill(hit1.getColumn(), hit2.getColumn());
             m_In1DeltaU->Fill(hit2.getColumn() - hit1.getColumn());

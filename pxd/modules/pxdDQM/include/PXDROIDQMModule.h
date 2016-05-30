@@ -59,6 +59,8 @@ namespace Belle2 {
       TH1F* hrawROIHLTrow2; /** Histogram  */
       TH1F* hrawROIHLTcol1; /** Histogram  */
       TH1F* hrawROIHLTcol2; /** Histogram  */
+      TH1F* hrawROIHLTrowSize; /** Histogram  */
+      TH1F* hrawROIHLTcolSize; /** Histogram  */
 
       TH2F* hrawROIDCmap;      /** Histogram  */
       TH2F* hrawROIDCsize;      /** Histogram  */

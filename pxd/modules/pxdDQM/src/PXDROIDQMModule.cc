@@ -51,6 +51,8 @@ void PXDROIDQMModule::defineHisto()
   hrawROIHLTrow2 = new TH1F("hrawROIHLTrow2", "HLT ROI row2;row", 768, 0, 768);
   hrawROIHLTcol1 = new TH1F("hrawROIHLTcol1", "HLT ROI col1;column", 250, 0, 250);
   hrawROIHLTcol2 = new TH1F("hrawROIHLTcol2", "HLT ROI col2;column", 250, 0, 250);
+  hrawROIHLTrowSize = new TH1F("hrawROIHLTrowSize", "HLT ROI size row;column", 768, 0, 768);
+  hrawROIHLTcolSize = new TH1F("hrawROIHLTcolSize", "HLT ROI size col;column", 250, 0, 250);
 
   hrawROIDCmap  = new TH2F("hrawROIDCmap", "DATCON ROI Middle Map ;column;row", 250 / 4, 0, 250, 768 / 4, 0, 768);
   hrawROIDCsize  = new TH2F("hrawROIDCsize", "DATCON ROI Size Map ;column;row", 250 / 4, 0, 250, 768 / 4, 0, 768);
@@ -83,6 +85,8 @@ void PXDROIDQMModule::beginRun()
   hrawROIHLTrow2->Reset();
   hrawROIHLTcol1->Reset();
   hrawROIHLTcol2->Reset();
+  hrawROIHLTrowSize->Reset();
+  hrawROIHLTcolSize->Reset();
 
   hrawROIDCmap->Reset();
   hrawROIDCsize->Reset();
@@ -91,6 +95,7 @@ void PXDROIDQMModule::beginRun()
   hrawROIDCrow2->Reset();
   hrawROIDCcol1->Reset();
   hrawROIDCcol2->Reset();
+
 }
 
 void PXDROIDQMModule::event()
@@ -127,6 +132,8 @@ void PXDROIDQMModule::event()
         hrawROIHLTrow2->Fill(r2);
         hrawROIHLTcol1->Fill(c1);
         hrawROIHLTcol2->Fill(c2);
+        hrawROIHLTrowSize->Fill(rs);
+        hrawROIHLTcolSize->Fill(cs);
       }
     }
   }

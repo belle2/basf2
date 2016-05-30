@@ -69,15 +69,6 @@ namespace Belle2 {
     }
 
     /**
-     * Multiply the factor
-     */
-    void MultiplyFactor(unsigned short iCLayer, unsigned short LR, unsigned short iAlpha, unsigned short iTheta, unsigned short i,
-                        float fact)
-    {
-      m_xt[iCLayer][LR][iAlpha][iTheta][i] *= fact;
-    }
-
-    /**
      * Copy XT params.
      */
     void copyXTParam(unsigned short iCLayer, unsigned short LR, unsigned short iAlpha, unsigned short iTheta0, unsigned short iTheta1)

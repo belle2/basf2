@@ -617,21 +617,21 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
       cout << endl;
     }
 
-    //convert unit, microsec -> nsec  <- tentative
-    i = 1;
-    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-3;
-    i = 2;
-    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-6;
-    i = 3;
-    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-9;
-    i = 4;
-    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-12;
-    i = 5;
-    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-15;
-    i = 6;
-    m_XT[iL][lr][ialpha][itheta][i] *= 1.e3;
-    i = 7;
-    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-3;
+    //    //convert unit, microsec -> nsec  <- tentative
+    //    i = 1;
+    //    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-3;
+    //    i = 2;
+    //    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-6;
+    //    i = 3;
+    //    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-9;
+    //    i = 4;
+    //    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-12;
+    //    i = 5;
+    //    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-15;
+    //    i = 6;
+    //    m_XT[iL][lr][ialpha][itheta][i] *= 1.e3;
+    //    i = 7;
+    //    m_XT[iL][lr][ialpha][itheta][i] *= 1.e-3;
 
   }
 

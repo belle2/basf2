@@ -19,14 +19,17 @@ cut-off: maximum drift time to use 5th order polynomial;
 slope: if drift time is greater than cut-off, xt is approximated by linear
 function. this is the slope for that.
 
+Unit: cm and nsec.
+* xt_v2.2.dat       : =xt_v2.1     but time-unit=nsec and unsigned driftL.
+* xt_noB_v0.4.dat   : =xt_noB_v0.3 but ibid. 
+* xt_simple_v0.1.dat: =xt_simple   but ibid. 
 Unit: cm and microsec.
-
-* xt_v2.1.dat    : layer#55 thickness reduced by ~1cm.
+* xt_v2.1.dat    : obsolete. layer#55 thickness reduced by ~1cm.
 * xt_v2.dat      : obsolete. xt = xt(layer,l/r,alpha,theta) with a bug fixed.
 * xt_v1.dat      : obsolete. xt = xt(layer,l/r,alpha.theta)
 * xt_v0.dat      : obsolete. 1'st version of realistic xt; only layer and L/R dependence is taken into account.
-* xt_simple.dat  : ideal linear xt. v=40 mu/ns.
-* xt_noB_v0.3.dat: xt for B-field = 0.
+* xt_simple.dat  : obsolete. ideal linear xt. v=40 mu/ns.
+* xt_noB_v0.3.dat: obsolete. xt for B-field = 0.
 
 
 

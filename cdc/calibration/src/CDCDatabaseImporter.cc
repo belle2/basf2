@@ -337,15 +337,6 @@ void CDCDatabaseImporter::importXT(std::string fileName)
        }
        cout << endl;
     */
-
-    //convert unit, microsec -> nsec  <- tentative
-    xt->MultiplyFactor(iL, lr, ialpha, itheta, 1, 1.e-3);
-    xt->MultiplyFactor(iL, lr, ialpha, itheta, 2, 1.e-6);
-    xt->MultiplyFactor(iL, lr, ialpha, itheta, 3, 1.e-9);
-    xt->MultiplyFactor(iL, lr, ialpha, itheta, 4, 1.e-12);
-    xt->MultiplyFactor(iL, lr, ialpha, itheta, 5, 1.e-15);
-    xt->MultiplyFactor(iL, lr, ialpha, itheta, 6, 1.e3);
-    xt->MultiplyFactor(iL, lr, ialpha, itheta, 7, 1.e-3);
   }
 
   if (nRead != 2 * (nAlphaPoints - 1) * nThetaPoints * MAX_N_SLAYERS) B2FATAL("importXT: #lines read-in (=" << nRead <<

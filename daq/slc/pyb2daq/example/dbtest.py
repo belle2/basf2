@@ -1,6 +1,6 @@
-import b2daq
+from b2daq import *
 
-obj = b2daq.DAQDBObject("daq", "STORE_CDC@RC:local:cdc:")
+obj = DAQDBObject("daq", "STORE_CDC@RC:local:cdc:")
 
 # show config name
 print(obj.getName())

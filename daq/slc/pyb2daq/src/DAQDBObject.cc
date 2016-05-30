@@ -1,4 +1,4 @@
-#include <daq/slc/python/DAQDBObject.h>
+#include <daq/slc/pyb2daq/DAQDBObject.h>
 
 #include <daq/slc/psql/PostgreSQLInterface.h>
 #include <daq/slc/database/DBObjectLoader.h>

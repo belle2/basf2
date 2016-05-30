@@ -50,43 +50,19 @@ if (withbg == 1):
 else:
     add_simulation(main)
 
-# add reconstruction
-# tracking
-add_tracking_reconstruction(main)
-# post tracking
-
-# CDC PID
-CDCdEdxPID = register_module('CDCDedxPID')
-main.add_module(CDCdEdxPID)
-
-# VXD PID
-VXDdEdxPID = register_module('VXDDedxPID')
-main.add_module(VXDdEdxPID)
-
-# prune tracks
-add_prune_tracks(main)
-
-# extrapolation
-ext = register_module('Ext')
-main.add_module(ext)
-
-# top
-top_rec = register_module('TOPReconstructor')
-main.add_module(top_rec)
-
-# arich
-arich_rec = register_module('ARICHReconstructor')
-main.add_module(arich_rec)
-
 # --------------------------------------------------
 # --------------------------------------------------
 # ECL digit calibration
 ecl_digit_calibration = register_module('ECLDigitCalibrator')
 main.add_module(ecl_digit_calibration)
 
-# ECL Shower Reconstruction
-ecl_reco = register_module('ECLCRFinderAndSplitter')
-main.add_module(ecl_reco)
+# ECL Connected Region Finder
+ecl_crfinder = register_module('ECLCRFinder')
+main.add_module(ecl_crfinder)
+
+# ECL Splitter(s)
+ecl_n1 = register_module('ECLSplitterN1')
+main.add_module(ecl_n1)
 
 # ECL Shower Correction
 ecl_showercorrection = register_module('ECLShowerCorrector')
@@ -108,7 +84,6 @@ main.add_module(ecl_covariance)
 ecl_finalize = register_module('ECLFinalizer')
 main.add_module(ecl_finalize)
 
-# OLD MODULES STILL USING ECLHITASSIGNMENT
 # ECL track shower matching
 ecl_track_match = register_module('ECLTrackShowerMatch')
 main.add_module(ecl_track_match)
@@ -123,30 +98,6 @@ main.add_module(ecl_mc)
 
 # --------------------------------------------------
 # --------------------------------------------------
-
-# EKLM
-eklm_rec = register_module('EKLMReconstructor')
-main.add_module(eklm_rec)
-
-# K0L reconstruction
-eklm_k0l_rec = register_module('EKLMK0LReconstructor')
-main.add_module(eklm_k0l_rec)
-
-# BKLM
-bklm_rec = register_module('BKLMReconstructor')
-main.add_module(bklm_rec)
-
-# K0L reconstruction
-bklm_k0l_rec = register_module('BKLMK0LReconstructor')
-main.add_module(bklm_k0l_rec)
-
-# muon identifcation
-muid = register_module('Muid')
-main.add_module(muid)
-
-# charged particle PID
-mdstPID = register_module('MdstPID')
-main.add_module(mdstPID)
 
 # add output file with most of the available information
 add_mdst_output(

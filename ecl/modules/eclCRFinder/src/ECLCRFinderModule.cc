@@ -263,7 +263,6 @@ void ECLCRFinderModule::event()
 
     // Fill variable(s).
     aCR->setCRId(connectedRegionID);
-    B2INFO(connectedRegionID);
 
     // Add relations to all digits in this CR.
     for (unsigned int i = 1; i < m_cellIdToTempCRIdVec.size(); ++i) {

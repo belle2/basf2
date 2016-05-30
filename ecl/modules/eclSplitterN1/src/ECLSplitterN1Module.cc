@@ -280,7 +280,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
   // Get the number of LMs in this CR
   const int nLocalMaximums = aCR.getRelationsTo<ECLLocalMaximum>().size();
 
-  B2INFO("ECLCRSplitterModule::splitConnectedRegion: nLocalMaximums = " << nLocalMaximums);
+  B2DEBUG(175, "ECLCRSplitterModule::splitConnectedRegion: nLocalMaximums = " << nLocalMaximums);
 
   // Three cases:
   // 1) There is no local maximum (most likely in presence of high background) or there are too many:

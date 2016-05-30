@@ -1,0 +1,9 @@
+Import('env')
+
+env['PYTHON_MODULE'] = True
+env['LIBS'] = ['framework', 'daq', 
+               'boost_python',
+               '$ROOT_LIBS',
+               '$PYTHON_LIBS']
+
+Return('env')

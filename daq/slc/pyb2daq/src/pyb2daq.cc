@@ -6,13 +6,13 @@
 #include <framework/utilities/RegisterPythonModule.h>
 #endif
 
-#include <daq/slc/python/DAQDBObject.h>
+#include <daq/slc/pyb2daq/DAQDBObject.h>
 
-BOOST_PYTHON_MODULE(b2daq)
+using namespace boost::python;
+using namespace Belle2;
+
+BOOST_PYTHON_MODULE(pyb2daq)
 {
-
-  using namespace boost::python;
-  using namespace Belle2;
 
 #ifdef PYHSLB
   boost::python::class_<HSLB>("HSLB")
@@ -87,5 +87,5 @@ BOOST_PYTHON_MODULE(b2daq)
 }
 
 #ifndef PYHSLB
-REGISTER_PYTHON_MODULE(b2daq)
+REGISTER_PYTHON_MODULE(pyb2daq)
 #endif

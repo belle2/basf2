@@ -22,6 +22,8 @@
 
 namespace Belle2 {
 
+  /** Module to perform the ECL KlId classification. This module only classifies ECL clusters.
+   * The output is a KlId object on the datastore. It contains KlId, bkgProb and wheter its an ECL or KLM cluster */
   class KlIdECLTMVAExpertModule : public Module {
 
   public:

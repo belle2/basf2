@@ -32,7 +32,7 @@ void TMVA_KLMBKGTrainer(){
 	// OUTPUT ROOT FILE
 	// 
 
-	TString outfileName(std::string(std::getenv("BELLE2_LOCAL_DIR"))+"/reconstruction/data/KLMBKGClassifierBDT.root" );
+	TString outfileName(std::string(std::getenv("BELLE2_LOCAL_DIR"))+"/reconstruction/data/KLMBKGClassifierBDT_mod.root" );
 	TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
 
@@ -50,9 +50,12 @@ void TMVA_KLMBKGTrainer(){
 
 //  factory->AddVariable("KLMenergy",                     &m_KLMenergy);
 
-  factory -> AddVariable("KLMshape"                   , "KLMshape"                   , "F");
   factory -> AddVariable("KLMaverageInterClusterDist" , "KLMaverageInterClusterDist" , "F");
   factory -> AddVariable("KLMhitDepth"                , "KLMhitDepth"                , "F");
+  factory -> AddVariable("KLMTrackSepDist"            , "KLMTrackSepDist"            , "F");
+  factory -> AddVariable("KLMTrackSepAngle"           , "KLMTrackSepAngle"           , "F");
+
+
 
   // KLM-ECL Vars (ECL clusters that are related to KLM clusters)
 
@@ -80,7 +83,7 @@ void TMVA_KLMBKGTrainer(){
 	//
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  your path here
 	//TODO path to your tuples here
-	chain->Add("/afs/desy.de/user/j/jkrohn/nfs/belle2/my_stuff/generation/root_files/reconstruction_comb/*.root");
+	chain->Add("/afs/desy.de/user/j/jkrohn/nfs/belle2/my_stuff/generation/root_files/leo_bkg/*.root");
 //----------------------------------------------------------------------------------------------
 
 
@@ -98,7 +101,7 @@ void TMVA_KLMBKGTrainer(){
 
 
 	factory->BookMethod(TMVA::Types::kBDT, 
-				                "KLMBKGClassifierBDT",
+				                "KLMBKGClassifierBDT_mod",
                      "NTrees=1000:Shrinkage=0.1!H:!V:IgnoreNegWeightsInTraining:MaxDepth=3:nCuts=256");
 
 

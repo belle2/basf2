@@ -21,6 +21,9 @@
 
 namespace Belle2 {
 
+
+  /** Module to perform the KLM KlId classification. This module only classifies KLM clusters.
+   * The output is a KlId object on the datastore. It contains KlId, bkgProb and wheter its an ECL or KLM cluster */
   class KlIdKLMTMVAExpertModule : public Module {
 
   public:
@@ -61,8 +64,6 @@ namespace Belle2 {
     Float_t m_KLMglobalZ;
     /** timing of KLM Cluster */
     Float_t m_KLMtime;
-    /** length/width of KLM ,might be redundant */
-    Float_t m_KLMshape;
     /**  average distance between all KLM clusters */
     Float_t m_KLMavInterClusterDist;
     /** hit depth in KLM, distance to IP */
@@ -71,21 +72,27 @@ namespace Belle2 {
     Float_t m_KLMenergy;
     /**  invariant mass calculated from root vector */
     Float_t m_KLMinvM;
-    /** distance KLM Cluster <-> track extrapolated Float_to KLM */
+    /** distance KLM Cluster <-> track extrapolated into KLM */
     Float_t m_KLMtrackDist;
     /** distance to next KLM cluster */
     Float_t m_KLMnextCluster;
     /** classifier output from bkg classification */
     Float_t m_KLMBKGProb;
+    /** distance from track separation object  */
+    Float_t m_KLMTrackSepDist;
+    /** angular distance from track separation object.
+     * angle between normal vector of track momentum and cluster position. */
+    Float_t m_KLMTrackSepAngle;
+
 
     // variables of closest ECL cluster with respect to KLM cluster
-    /** distance associated ECL <-> KLM cluster */
+    /** distance associated ECL <-> KLM cluster, extrapolated by genfit */
     Float_t m_KLMECLDist;
     /** energy measured in associated ECL cluster */
     Float_t m_KLMECLE;
     /** distance between track entry poFloat_t and cluster center, might be removed */
     Float_t m_KLMECLdeltaL;   // new
-    /** track distance between associated ECL cluster and track extrapolated Float_to ECL */
+    /** track distance between associated ECL cluster and track extrapolated into ECL */
     Float_t m_KLMECLminTrackDist; //new
     /** E in surrounding 9 crystals divided by surrounding 25 crydtalls */
     Float_t m_KLMECLE9oE25;
@@ -113,7 +120,8 @@ namespace Belle2 {
     /** TMVA classifier object. */
     TMVA::Reader* m_readerBKG = new TMVA::Reader("Verbose");
     /** TMVA classifier object. */
-    TMVA::Reader* m_readerECL = new TMVA::Reader("Verbose");
+    TMVA::Reader* m_readerECLBKG = new TMVA::Reader("Verbose");
+
 
     /** path to training .xml file. */
     std::string m_IDClassifierPath = FileSystem::findFile(
@@ -123,11 +131,10 @@ namespace Belle2 {
     std::string m_BKGClassifierPath = FileSystem::findFile(
                                         "reconstruction/data/weights/TMVAFactory_KLMBKGClassifierBDT.weights.xml");
 
-    // this files is located in KlIdECLTMVAExpert !!
-    // the training script as well !
     /** path to training .xml file. */
-    std::string m_ECLClassifierPath = FileSystem::findFile(
-                                        "reconstruction/data/weights/TMVAFactory_ECLBKGClassifierBDT.weights.xml");
+    std::string m_ECLBKGClassifierPath = FileSystem::findFile(
+                                           "reconstruction/data/weights/TMVAFactory_ECLBKGClassifierBDT.weights.xml");
+
 
 
   }; // end class

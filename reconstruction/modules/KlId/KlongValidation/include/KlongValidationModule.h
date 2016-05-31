@@ -23,6 +23,7 @@
 
 namespace Belle2 {
 
+  /** Module used by the validation server to generate root files for the validation. Calculates fake rates and efficiencies.*/
   class KlongValidationModule : public Module {
 
   public:

@@ -26,6 +26,7 @@
 
 namespace Belle2 {
 
+  /** Module to write training Ntuples for the ID classifier (KlId). Output path has to be specified.  */
   class KlIdDataWriterModule : public Module {
 
   public:
@@ -53,7 +54,11 @@ namespace Belle2 {
 
   private:
 
+    /**  out put path, has to be specified. */
     std::string m_outPath = "KlIdIDTrainingData.root";
+
+    // all vars are declared as Float_t because they are fed to the bkgclassifier
+    // in the bkg datawriter this was not neccesary
 
     /** varibales to write out. used for classification of clusters  */
     // KLM variables
@@ -85,6 +90,11 @@ namespace Belle2 {
     Float_t m_KLMnextCluster;
     /** classifier output from bkg classification */
     Float_t m_KLMBKGProb;
+    /** distance from track separation object  */
+    Float_t m_KLMTrackSepDist;
+    /** angular distance from track separation object */
+    Float_t m_KLMTrackSepAngle;
+
 
     // variables of closest ECL cluster with respect to KLM cluster
     /** distance associated ECL <-> KLM cluster */
@@ -134,7 +144,7 @@ namespace Belle2 {
 
 
     /** default classifier name */
-    std::string m_BKGClassifierName = "KLMBKGClassifierBDT";
+    std::string m_BKGClassifierName = "KLMBKGClassifierBDT_mod";
     /** default classifier name  */
     std::string m_ECLClassifierName = "ECLBKGClassifierBDT";
 
@@ -147,14 +157,11 @@ namespace Belle2 {
 
     /** path to training .xml file. */
     std::string m_BKGClassifierPath = FileSystem::findFile(
-                                        "reconstruction/data/weights/TMVAFactory_KLMBKGClassifierBDT.weights.xml");
+                                        "reconstruction/data/weights/TMVAFactory_KLMBKGClassifierBDT_mod.weights.xml");
 
-    // this files is located in KlIdECLTMVAExpert !!
-    // the training script as well !
     /** path to training .xml file. */
     std::string m_ECLClassifierPath = FileSystem::findFile(
                                         "reconstruction/data/weights/TMVAFactory_ECLBKGClassifierBDT.weights.xml");
-
 
     /** root file */
     TFile* m_f = nullptr; //

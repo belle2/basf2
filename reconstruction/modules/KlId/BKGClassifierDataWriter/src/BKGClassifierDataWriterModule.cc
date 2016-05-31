@@ -18,8 +18,7 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <genfit/Track.h>
-
-#include <tracking/trackFindingCDC/tmva/Recorder.h>
+#include <tracking/dataobjects/TrackClusterSeparation.h>
 
 #include <TTree.h>
 #include <TFile.h>
@@ -77,7 +76,6 @@ void BKGClassifierDataWriterModule::initialize()
   m_treeKLM -> Branch("KLMTruth",                   & m_KLMTruth);
   m_treeKLM -> Branch("KLMdistToNextCl",            & m_KLMnextCluster);
   m_treeKLM -> Branch("KLMenergy",                  & m_KLMenergy);
-  m_treeKLM -> Branch("KLMshape",                   & m_KLMshape);
   m_treeKLM -> Branch("KLMaverageInterClusterDist", & m_KLMavInterClusterDist);
   m_treeKLM -> Branch("KLMhitDepth",                & m_KLMhitDepth);
 
@@ -90,6 +88,10 @@ void BKGClassifierDataWriterModule::initialize()
   m_treeKLM   -> Branch("KLMECLTerror",             & m_KLMECLTerror);
   m_treeKLM   -> Branch("KLMECLdeltaL",             & m_KLMECLdeltaL);
   m_treeKLM   -> Branch("KLMECLmintrackDist",       & m_KLMECLminTrackDist);
+
+  //new TODO check feature importance
+  m_treeKLM   -> Branch("KLMTrackSepDist",          & m_KLMTrackSepDist);
+  m_treeKLM   -> Branch("KLMTrackSepAngle",         & m_KLMTrackSepAngle);
 
   //ECL
   m_treeECL   -> Branch("ECLenergy",                & m_ECLE);
@@ -141,6 +143,10 @@ void BKGClassifierDataWriterModule::event()
     m_KLMinvM = cluster.getMomentum().M2();
     m_KLMenergy = cluster.getMomentum().E();
     m_KLMhitDepth = cluster.getClusterPosition().Mag2();
+    TrackClusterSeparation* trackSep = cluster.getRelatedTo<TrackClusterSeparation>();
+    m_KLMTrackSepDist = trackSep->getDistance();
+    m_KLMTrackSepAngle = trackSep->getTrackAngle();
+
 
     // find nearest ecl cluster and calculate angular distance
     m_KLMECLDist =  9999999;
@@ -166,7 +172,6 @@ void BKGClassifierDataWriterModule::event()
       m_KLMECLE9oE25 = closestECLCluster->getE9oE25();
       m_KLMECLEerror = closestECLCluster->getErrorEnergy();
       m_KLMECLTerror = closestECLCluster->getErrorTiming();
-
       // new KLMECL vars
       // names might change
       m_KLMECLdeltaL = closestECLCluster->getTemporaryDeltaL();;
@@ -186,15 +191,6 @@ void BKGClassifierDataWriterModule::event()
       m_KLMECLTiming = -999;
       m_KLMECLTerror = -999;
       m_KLMECLEerror = -999;
-    }
-
-
-    // some measure of cluster shape
-    // //TODO delete is obsolete
-    if (m_KLMnInnermostLayer > 0) {
-      m_KLMshape = m_KLMnLayer / (1.*m_KLMnInnermostLayer);
-    } else {
-      m_KLMshape = 0;
     }
 
     // calculate distance to next cluster and average inter cluster distance
@@ -238,7 +234,6 @@ void BKGClassifierDataWriterModule::event()
     // calculate eucl. distance klmcluster <-> nearest track
     // extrapolate genfit trackfit result to their ends and find the
     // closest one
-    //TODO try Leos distance
     m_KLMtrackDist = 999999;
     m_KLMtrackToECL = 999999;
     double trackToECL = 999999; // would have to get the vector twice otherwise

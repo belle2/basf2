@@ -20,6 +20,7 @@
 
 namespace Belle2 {
 
+  /** Module to write Ntuples for KlId BKG classifier training. Writes tuples for both ECL and KLM. You have to specify  an outputpath outPath.   */
   class BKGClassifierDataWriterModule : public Module {
 
   public:
@@ -47,7 +48,8 @@ namespace Belle2 {
 
   private:
 
-    std::string m_outPath = "KlIdBKGClaasifierTrainingTuples.root";
+    /** Output path variable. */
+    std::string m_outPath = "KlIdBKGClassifierTrainingTuples.root";
 
     /** varibales to write out. used for classification of clusters  */
     // KLM cluster variables for pure KLM and KLM+ECL Klongs
@@ -61,8 +63,6 @@ namespace Belle2 {
     double m_KLMglobalZ;
     /** timing of KLM Cluster */
     double m_KLMtime;
-    /** length/width of KLM , //TODO remove (classification is invariant under continous transformations )*/
-    double m_KLMshape;
     /**  average distance between all KLM clusters */
     double m_KLMavInterClusterDist;
     /** hit depth in KLM, distance to IP */
@@ -77,6 +77,11 @@ namespace Belle2 {
     int    m_KLMTruth;
     /** distance to next KLM cluster */
     double m_KLMnextCluster;
+    /** distance from track separation object  */
+    double m_KLMTrackSepDist;
+    /** angular distance from track separation object */
+    double m_KLMTrackSepAngle;
+
 
     // variables of closest ECL cluster with respect to KLM cluster
     /** distance associated ECL <-> KLM cluster */

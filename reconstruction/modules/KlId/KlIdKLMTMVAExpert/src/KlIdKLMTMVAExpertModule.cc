@@ -16,6 +16,7 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <genfit/Track.h>
+#include <tracking/dataobjects/TrackClusterSeparation.h>
 
 #include <genfit/Exception.h>
 #include <cstring>
@@ -50,9 +51,9 @@ KlIdKLMTMVAExpertModule::KlIdKLMTMVAExpertModule(): Module()
 
   /** Path were to find the .xml file containing the classifier trainings. */
   addParam("ECLClassifierPath",
-           m_ECLClassifierPath,
+           m_ECLBKGClassifierPath,
            "Path to the .xml weight file containing the fitted classifier.",
-           m_ECLClassifierPath);
+           m_ECLBKGClassifierPath);
 
 
   // classifier names
@@ -112,9 +113,11 @@ void KlIdKLMTMVAExpertModule::initialize()
   m_readerBKG -> AddVariable("KLMinvM",                       &m_KLMinvM);
   m_readerBKG -> AddVariable("KLMtrackDist",                  &m_KLMtrackDist);
   m_readerBKG -> AddVariable("KLMdistToNextCl",               &m_KLMnextCluster);
-  m_readerBKG -> AddVariable("KLMshape",                      &m_KLMshape);
   m_readerBKG -> AddVariable("KLMaverageInterClusterDist",    &m_KLMavInterClusterDist);
   m_readerBKG -> AddVariable("KLMhitDepth",                   &m_KLMhitDepth);
+  m_readerBKG -> AddVariable("KLMTrackSepDist",          & m_KLMTrackSepDist);
+  m_readerBKG -> AddVariable("KLMTrackSepAngle",         & m_KLMTrackSepAngle);
+
   // KLM-ECL Vars (ECL clusters that are related to KLM clusters)
   m_readerBKG -> AddVariable("KLMdistToNextECL",              &m_KLMECLDist);
   m_readerBKG -> AddVariable("KLMECLenergy",                  &m_KLMECLE);
@@ -135,10 +138,14 @@ void KlIdKLMTMVAExpertModule::initialize()
   m_readerID -> AddVariable("KLMinvM",                       &m_KLMinvM);
   m_readerID -> AddVariable("KLMtrackDist",                  &m_KLMtrackDist);
   m_readerID -> AddVariable("KLMdistToNextCl",               &m_KLMnextCluster);
-  m_readerID -> AddVariable("KLMshape",                      &m_KLMshape);
   m_readerID -> AddVariable("KLMaverageInterClusterDist",    &m_KLMavInterClusterDist);
   m_readerID -> AddVariable("KLMhitDepth",                   &m_KLMhitDepth);
   m_readerID -> AddVariable("KLMBKGProb"                 , &m_KLMBKGProb);
+  m_readerID -> AddVariable("KLMECLBKGProb"                 , &m_KLMECLBKGProb);
+  m_readerID -> AddVariable("KLMTrackSepDist",          & m_KLMTrackSepDist);
+  m_readerID -> AddVariable("KLMTrackSepAngle",         & m_KLMTrackSepAngle);
+
+
   // KLM-ECL Vars (ECL clusters that are related to KLM clusters)
   m_readerID -> AddVariable("KLMdistToNextECL",              &m_KLMECLDist);
   m_readerID -> AddVariable("KLMECLenergy",                  &m_KLMECLE);
@@ -148,23 +155,22 @@ void KlIdKLMTMVAExpertModule::initialize()
   m_readerID -> AddVariable("KLMtrackToECL",                 &m_KLMtrackToECL);
   m_readerID -> AddVariable("KLMECLdeltaL",                  &m_KLMECLdeltaL);
   m_readerID -> AddVariable("KLMECLmintrackDist",            &m_KLMECLminTrackDist);
-  m_readerID -> AddVariable("KLMECLBKGProb"                 , &m_KLMECLBKGProb);
 
 
   //ECL BKG CLASSIFIER
-  m_readerECL->AddVariable("ECLenergy",                 &m_KLMECLE);
-  m_readerECL->AddVariable("ECLE9oE25",                 &m_KLMECLE9oE25);
-  m_readerECL->AddVariable("ECLtiming",                 &m_KLMECLTiming);
-  m_readerECL->AddVariable("ECLEerror",                 &m_KLMECLEerror);
-  m_readerECL->AddVariable("ECLdistToTrack",            &m_KLMtrackToECL);
-  m_readerECL->AddVariable("ECLdeltaL",                 &m_KLMECLdeltaL);
-  m_readerECL->AddVariable("ECLmintrackDist",           &m_KLMECLminTrackDist);
+  m_readerECLBKG->AddVariable("ECLenergy",                 &m_KLMECLE);
+  m_readerECLBKG->AddVariable("ECLE9oE25",                 &m_KLMECLE9oE25);
+  m_readerECLBKG->AddVariable("ECLtiming",                 &m_KLMECLTiming);
+  m_readerECLBKG->AddVariable("ECLEerror",                 &m_KLMECLEerror);
+  m_readerECLBKG->AddVariable("ECLdistToTrack",            &m_KLMtrackToECL);
+  m_readerECLBKG->AddVariable("ECLdeltaL",                 &m_KLMECLdeltaL);
+  m_readerECLBKG->AddVariable("ECLmintrackDist",           &m_KLMECLminTrackDist);
 
 
   // load classifier. name, path
   m_readerBKG -> BookMVA(m_BKGClassifierName,  m_BKGClassifierPath);
   m_readerID  -> BookMVA(m_IDClassifierName,   m_IDClassifierPath);
-  m_readerECL -> BookMVA(m_ECLClassifierName,  m_ECLClassifierPath);
+  m_readerECLBKG -> BookMVA(m_ECLClassifierName,  m_ECLBKGClassifierPath);
 }
 
 
@@ -208,13 +214,6 @@ void KlIdKLMTMVAExpertModule::event()
     m_KLMinvM            = cluster.getMomentum().M2();
     m_KLMhitDepth        = cluster.getClusterPosition().Mag2();
 
-    // some measure of cluster shape
-    if (m_KLMnInnermostLayer > 0) {
-      m_KLMshape = m_KLMnLayer / (1.*m_KLMnInnermostLayer);
-    } else {
-      m_KLMshape = 0;
-    }
-
     // find nearest ecl cluster and calculate distance
     m_KLMECLDist =  9999999;
     double closest_ecl_angle_dist = 99999999;
@@ -243,7 +242,7 @@ void KlIdKLMTMVAExpertModule::event()
 
       // m_KLMECLBKGProb = closestECLCluster->getBKGProb();
       // >> calculate BKG Classifier output for ECL <<
-      m_KLMECLBKGProb = m_readerECL -> EvaluateMVA(m_ECLClassifierName);
+      m_KLMECLBKGProb = m_readerECLBKG -> EvaluateMVA(m_ECLClassifierName);
 
       // normalize if not errorcode
       if (m_KLMECLBKGProb > -1.) {
@@ -327,6 +326,12 @@ void KlIdKLMTMVAExpertModule::event()
       } catch (genfit::Exception& e) {
       }// try
     }// for gftrack
+    //TODO check for null?
+    TrackClusterSeparation* trackSep = cluster.getRelatedTo<TrackClusterSeparation>();
+    m_KLMTrackSepDist = trackSep->getDistance();
+    m_KLMTrackSepAngle = trackSep->getTrackAngle();
+
+
 
 
     // >> calculate BKG Classifier output for KLM <<
@@ -362,7 +367,7 @@ void KlIdKLMTMVAExpertModule::terminate()
 {
   delete m_readerID;
   delete m_readerBKG;
-  delete m_readerECL;
+  delete m_readerECLBKG;
 }
 
 

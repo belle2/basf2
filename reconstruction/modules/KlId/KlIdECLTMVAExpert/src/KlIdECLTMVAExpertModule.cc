@@ -137,83 +137,85 @@ void KlIdECLTMVAExpertModule::event()
     // and will be interpreted as a klong in the KLM classifier.
     // So this should avoid double counting.
     if (cluster.getRelatedFrom<KLMCluster>()) {
-      break;
-    }
-
-
-    // get various ECLCluster vars from getters
-    m_ECLE              = cluster.getEnergy();
-    m_ECLE9oE25         = cluster.getE9oE25();
-    m_ECLTiming         = cluster.getTiming();
-    m_ECLEerror         = cluster.getErrorEnergy();
-    m_ECLminTrkDistance = cluster.getTemporaryMinTrkDistance();
-    m_ECLdeltaL         = cluster.getTemporaryDeltaL();
-    //m_ECLBKGProb      = cluster.getBKGProb();
-
-    const TVector3& cluster_pos = cluster.getclusterPosition();
-
-    // get distance to next genfit track
-    // might be obsolete with the new ECLminTrkDist variable
-    // TODO get rid of it ??
-    m_ECLtrackDist = 999999;
-    int       num_points = 0;
-    int id_of_last_point = 0;
-    for (const genfit::Track& track : genfitTracks) {
-
-      num_points = track.getNumPoints();
-      id_of_last_point = num_points - 1;
-
-      // genfit throws an exception if track fit fails ...
-      try {
-
-        genfit::MeasuredStateOnPlane state;
-        state = track.getFittedState(id_of_last_point);
-        // copy: first state on plane is a const ...
-
-        state.extrapolateToPoint(cluster_pos);
-        const TVector3& track_pos_ecl = state.getPos();
-
-        const TVector3& distance_vec_ecl = cluster_pos - track_pos_ecl;
-        double new_dist_ecl = distance_vec_ecl.Mag2();
-
-        // overwrite old distance
-        if (new_dist_ecl < m_ECLtrackDist) {
-          m_ECLtrackDist = new_dist_ecl;
-        }
-
-      } catch (genfit::Exception& e) {
-      }// try
-    }// for gftrack
-
-
-    // get bkg classification from bvkg classifier...
-    m_ECLBKGProb = m_readerBKG -> EvaluateMVA(m_BKGClassifierName);
-
-    // normalize if not errorcode
-    if (m_ECLBKGProb > -1.) {
-      m_ECLBKGProb = (m_ECLBKGProb + 1) / 2.0;
-    }
-
-
-    // >> calculate Kl Id <<
-    MVAOut = m_reader -> EvaluateMVA(m_classifierName);
-    // write id into luster
-
-    // normalize if not errorcode
-    if (MVAOut > -1.) {
-      MVAOut = (MVAOut + 1) / 2.0;
-    }
-
-    // use this when member is put to mdst
-    // if this will ever happen ...
-    //cluster.setKlId(MVAOut);
+      // set id to errorcode, avoids trouble elsewhere - if you ask
+      // eclcluster for its id and it returns null
+      klid = klids.appendNew(-1, -1, 0, 1);
+      cluster.addRelationTo(klid);
+    } else {
 
 
 
-    // KlId, bkg prob, KLM, ECL
-    klid = klids.appendNew(MVAOut, m_ECLBKGProb, 0, 1);
-    cluster.addRelationTo(klid);
+      // get various ECLCluster vars from getters
+      m_ECLE              = cluster.getEnergy();
+      m_ECLE9oE25         = cluster.getE9oE25();
+      m_ECLTiming         = cluster.getTiming();
+      m_ECLEerror         = cluster.getErrorEnergy();
+      m_ECLminTrkDistance = cluster.getTemporaryMinTrkDistance();
+      m_ECLdeltaL         = cluster.getTemporaryDeltaL();
 
+      const TVector3& cluster_pos = cluster.getclusterPosition();
+
+      // get distance to next genfit track
+      // might be obsolete with the new ECLminTrkDist variable
+      // TODO get rid of it ??
+      m_ECLtrackDist = 999999;
+      int       num_points = 0;
+      int id_of_last_point = 0;
+      for (const genfit::Track& track : genfitTracks) {
+
+        num_points = track.getNumPoints();
+        id_of_last_point = num_points - 1;
+
+        // genfit throws an exception if track fit fails ...
+        try {
+
+          genfit::MeasuredStateOnPlane state;
+          state = track.getFittedState(id_of_last_point);
+          // copy: first state on plane is a const ...
+
+          state.extrapolateToPoint(cluster_pos);
+          const TVector3& track_pos_ecl = state.getPos();
+
+          const TVector3& distance_vec_ecl = cluster_pos - track_pos_ecl;
+          double new_dist_ecl = distance_vec_ecl.Mag2();
+
+          // overwrite old distance
+          if (new_dist_ecl < m_ECLtrackDist) {
+            m_ECLtrackDist = new_dist_ecl;
+          }
+
+        } catch (genfit::Exception& e) {
+        }// try
+      }// for gftrack
+
+
+      // get bkg classification from bvkg classifier...
+      m_ECLBKGProb = m_readerBKG -> EvaluateMVA(m_BKGClassifierName);
+
+      // normalize if not errorcode
+      if (m_ECLBKGProb > -1.) {
+        m_ECLBKGProb = (m_ECLBKGProb + 1) / 2.0;
+      }
+
+
+      // >> calculate Kl Id <<
+      MVAOut = m_reader -> EvaluateMVA(m_classifierName);
+      // write id into luster
+
+      // normalize if not errorcode
+      if (MVAOut > -1.) {
+        MVAOut = (MVAOut + 1) / 2.0;
+      }
+
+      // use this when member is put to mdst
+      // if this will ever happen ...
+      //cluster.setKlId(MVAOut);
+
+
+      // KlId, bkg prob, KLM, ECL
+      klid = klids.appendNew(MVAOut, m_ECLBKGProb, 0, 1);
+      cluster.addRelationTo(klid);
+    } // cluster not related to KLMCluster
 
   }// for cluster in clusters
 } // event

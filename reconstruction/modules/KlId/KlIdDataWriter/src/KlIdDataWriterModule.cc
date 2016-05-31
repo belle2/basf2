@@ -14,8 +14,7 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <genfit/Track.h>
-
-#include <tracking/trackFindingCDC/tmva/Recorder.h>
+#include <tracking/dataobjects/TrackClusterSeparation.h>
 
 #include <TTree.h>
 #include <TFile.h>
@@ -73,7 +72,6 @@ void KlIdDataWriterModule::initialize()
   m_treeKLM -> Branch("KLMTruth",                   & m_KLMTruth);
   m_treeKLM -> Branch("KLMdistToNextCl",            & m_KLMnextCluster);
   m_treeKLM -> Branch("KLMenergy",                  & m_KLMenergy);
-  m_treeKLM -> Branch("KLMshape",                   & m_KLMshape);
   m_treeKLM -> Branch("KLMaverageInterClusterDist", & m_KLMavInterClusterDist);
   m_treeKLM -> Branch("KLMhitDepth",                & m_KLMhitDepth);
 
@@ -88,6 +86,9 @@ void KlIdDataWriterModule::initialize()
   m_treeKLM   -> Branch("KLMECLmintrackDist",       & m_KLMECLminTrackDist);
   m_treeKLM   -> Branch("KLMBKGProb",               & m_KLMBKGProb);
   m_treeKLM   -> Branch("KLMECLBKGProb",            & m_KLMECLBKGProb);
+  m_treeKLM   -> Branch("KLMTrackSepDist",          & m_KLMTrackSepDist);
+  m_treeKLM   -> Branch("KLMTrackSepAngle",         & m_KLMTrackSepAngle);
+
 
   //ECL
   m_treeECL   -> Branch("ECLenergy",                & m_ECLE);
@@ -113,10 +114,12 @@ void KlIdDataWriterModule::initialize()
   m_readerBKG -> AddVariable("KLMinvM",                       &m_KLMinvM);
   m_readerBKG -> AddVariable("KLMtrackDist",                  &m_KLMtrackDist);
   m_readerBKG -> AddVariable("KLMdistToNextCl",               &m_KLMnextCluster);
-  m_readerBKG -> AddVariable("KLMshape",                      &m_KLMshape);
   m_readerBKG -> AddVariable("KLMaverageInterClusterDist",    &m_KLMavInterClusterDist);
   m_readerBKG -> AddVariable("KLMhitDepth",                   &m_KLMhitDepth);
-  // KLM-ECL Vars (ECL clusters that are related to KLM clusters)
+  m_readerBKG -> AddVariable("KLMTrackSepDist",          & m_KLMTrackSepDist);
+  m_readerBKG -> AddVariable("KLMTrackSepAngle",         & m_KLMTrackSepAngle);
+
+// KLM-ECL Vars (ECL clusters that are related to KLM clusters)
   m_readerBKG -> AddVariable("KLMdistToNextECL",              &m_KLMECLDist);
   m_readerBKG -> AddVariable("KLMECLenergy",                  &m_KLMECLE);
   m_readerBKG -> AddVariable("KLMECLE9oE25",                  &m_KLMECLE9oE25);
@@ -125,6 +128,7 @@ void KlIdDataWriterModule::initialize()
   m_readerBKG -> AddVariable("KLMtrackToECL",                 &m_KLMECLtrackDist);
   m_readerBKG -> AddVariable("KLMECLdeltaL",                  &m_KLMECLdeltaL);
   m_readerBKG -> AddVariable("KLMECLmintrackDist",            &m_KLMECLminTrackDist);
+
 
 
   //variables for the classification of associated ECL bkg Prob
@@ -189,11 +193,11 @@ void KlIdDataWriterModule::event()
     m_KLMinvM = cluster.getMomentum().M2();
     m_KLMenergy = cluster.getMomentum().E();
     m_KLMhitDepth = cluster.getClusterPosition().Mag2();
-
     // find nearest ecl cluster and calculate angular distance
     m_KLMECLDist =  9999999;
     double closest_ecl_angle_dist = 99999999;
     ECLCluster* closestECLCluster = nullptr;
+
     for (ECLCluster& eclcluster : eclClusters) {
 
       const TVector3& eclcluster_pos = eclcluster.getclusterPosition();
@@ -227,7 +231,6 @@ void KlIdDataWriterModule::event()
         m_KLMECLBKGProb = (m_KLMECLBKGProb + 1) / 2.0;
       } else {m_KLMECLBKGProb = 0;}
 
-
       // needed to add those ecl clusters to KLM particles that have a high
       // kl probability and no relation
       cluster.addRelationTo(closestECLCluster);
@@ -244,14 +247,6 @@ void KlIdDataWriterModule::event()
       m_KLMECLEerror = -999;
     }
 
-
-
-    // some measure of cluster shape
-    if (m_KLMnInnermostLayer > 0) {
-      m_KLMshape = m_KLMnLayer / (1.*m_KLMnInnermostLayer);
-    } else {
-      m_KLMshape = 0;
-    }
 
     // calculate distance to next cluster and average inter cluster distance
     m_KLMavInterClusterDist = 0;
@@ -340,6 +335,11 @@ void KlIdDataWriterModule::event()
       }// try
     }// for gftrack
 
+    TrackClusterSeparation* trackSep = cluster.getRelatedTo<TrackClusterSeparation>();
+    m_KLMTrackSepDist = trackSep->getDistance();
+    m_KLMTrackSepAngle = trackSep->getTrackAngle();
+
+
 
     // >> calculate BKG Classifier output for KLM <<
     m_KLMBKGProb = m_readerBKG -> EvaluateMVA(m_BKGClassifierName);
@@ -370,7 +370,6 @@ void KlIdDataWriterModule::event()
     m_ECLTiming = cluster.getTiming();
     m_ECLR = cluster.getR();
     m_ECLEerror = cluster.getErrorEnergy();
-
     const TVector3& cluster_pos = cluster.getclusterPosition();
 
 

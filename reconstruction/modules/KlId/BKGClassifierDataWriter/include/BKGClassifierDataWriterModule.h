@@ -25,8 +25,10 @@ namespace Belle2 {
 
   public:
 
+    /** Constructor */
     BKGClassifierDataWriterModule();
 
+    /** Destructor */
     virtual ~BKGClassifierDataWriterModule();
 
     /** init */

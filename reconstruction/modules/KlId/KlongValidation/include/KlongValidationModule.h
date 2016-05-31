@@ -28,8 +28,10 @@ namespace Belle2 {
 
   public:
 
+    /** Constructor   */
     KlongValidationModule();
 
+    /** Destructor   */
     virtual ~KlongValidationModule();
 
     /** initialize   */

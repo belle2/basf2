@@ -26,8 +26,10 @@ namespace Belle2 {
 
   public:
 
+    /** Constructor */
     IDValidationModule();
 
+    /** Destructor */
     virtual ~IDValidationModule();
 
     /** init */

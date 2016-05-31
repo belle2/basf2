@@ -31,8 +31,10 @@ namespace Belle2 {
 
   public:
 
+    /** Constructor */
     KlIdDataWriterModule();
 
+    /** Destructor */
     virtual ~KlIdDataWriterModule();
 
     /** init */

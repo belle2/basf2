@@ -28,8 +28,10 @@ namespace Belle2 {
 
   public:
 
+    /** Constructor */
     KlIdECLTMVAExpertModule();
 
+    /** destructor */
     virtual ~KlIdECLTMVAExpertModule();
 
     /** init */

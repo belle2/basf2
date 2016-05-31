@@ -28,8 +28,10 @@ namespace Belle2 {
 
   public:
 
+    /** Constructor */
     KlIdKLMTMVAExpertModule();
 
+    /** Destructor */
     virtual ~KlIdKLMTMVAExpertModule();
 
     /** init */
@@ -69,8 +71,6 @@ namespace Belle2 {
     /** hit depth in KLM, distance to IP */
     Float_t m_KLMhitDepth;
     /** Energy deposit in KLM (0.2 GeV * nHitCells) */
-    Float_t m_KLMenergy;
-    /**  invariant mass calculated from root vector */
     Float_t m_KLMinvM;
     /** distance KLM Cluster <-> track extrapolated into KLM */
     Float_t m_KLMtrackDist;

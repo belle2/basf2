@@ -13,7 +13,7 @@ print((d.strftime('job start: %Y-%m-%d %H:%M:%S\n')))
 # 2/ basf2 ./RunTPC_daily_report.py yyyy mm dd TPCposition output_directory
 
 location = ""
-if len(sys.argv) == 5:
+if len(sys.argv) == 6:
     # parse input
     inputs = '/home/belle/igal/beast/data/NTP/TPC/' + \
         str(sys.argv[1]) + "-" + str(sys.argv[2]) + "-" + str(sys.argv[3]) + "/tpc" + str(sys.argv[4]) + "*.root"

@@ -287,7 +287,7 @@ void QualityCheckModule::event()
   storeFTSW[0]->GetTTTimeVal(0, time);
   m_currentTimeStampFromFTSW = time->tv_sec * 1000000 + time->tv_usec;
   int FromStartTLUTagFromFTSW = (int)((long)m_currentTLUTagFromFTSW - m_TLUStartTagFromFTSWCor);
-  if (m_nVXDDataEvents > 50) {  // first 50 2v2nts could be negative from counting from history before current file storing
+  if (m_nVXDDataEvents > 50) {  // first 50 events could be negative from counting from history before current file storing
     if ((FromStartTLUTagFromFTSW < 0) && (FromStartTLUTagFromFTSW > (32768 / 2))) m_TLUStartTagFromFTSWCor += 32768;
     while (FromStartTLUTagFromFTSW < 0) {
       FromStartTLUTagFromFTSW += 32768;  // correction for TLU counter reset after every 32 768 (2^15)
@@ -500,6 +500,7 @@ void QualityCheckModule::endRun()
   }
   avrg /= (m_TriggerRate->GetNbinsX() - 2);
   TrgAvrg = avrg;
+  TrgAvrg = TrgAvrg / m_EventUnit * 1000.0;  // per 1000 events
 
   avrg = 0;
   for (int ib = 0; ib < m_TriggerRateTime->GetNbinsX(); ib++) {
@@ -507,6 +508,7 @@ void QualityCheckModule::endRun()
   }
   avrg /= m_TriggerRateTime->GetNbinsX();
   TrgTimeAvrg = avrg;
+  TrgTimeAvrg = TrgTimeAvrg / m_TimeUnit;
 
 
 

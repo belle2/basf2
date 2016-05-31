@@ -37,15 +37,15 @@ namespace Belle2 {
     operator int() const throw() { return m_hslb.fd; }
 
   public:
-    int readfn(int adr) throw(HSLBHandlerException);
+    long long readfn(int adr) throw(HSLBHandlerException);
     void writefn(int adr, int val) throw(HSLBHandlerException);
-    int readfn32(int adr) throw(HSLBHandlerException);
+    long long readfn32(int adr) throw(HSLBHandlerException);
     void writefn32(int adr, int val) throw(HSLBHandlerException);
     void hswait_quiet() throw(HSLBHandlerException);
     void hswait() throw(HSLBHandlerException);
     int readfee8(int adr) throw(HSLBHandlerException);
     void writefee8(int adr, int val) throw(HSLBHandlerException);
-    int readfee32(int adr) throw(HSLBHandlerException);
+    long long readfee32(int adr) throw(HSLBHandlerException);
     void writefee32(int adr, int val) throw(HSLBHandlerException);
     void writestream(const char* filename) throw(HSLBHandlerException);
     void bootfpga(const std::string& firmware) throw(HSLBHandlerException);

@@ -126,7 +126,7 @@ bool HSLB::isCRCError() throw(HSLBHandlerException)
   //return (m_hslb.rxdata >> 16 > 0);
 }
 
-int HSLB::readfn(int adr) throw(HSLBHandlerException)
+long long HSLB::readfn(int adr) throw(HSLBHandlerException)
 {
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
@@ -148,7 +148,7 @@ void HSLB::writefn(int adr, int val) throw(HSLBHandlerException)
   }
 }
 
-int HSLB::readfn32(int adr) throw(HSLBHandlerException)
+long long HSLB::readfn32(int adr) throw(HSLBHandlerException)
 {
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
@@ -202,7 +202,7 @@ void HSLB::writefee8(int adr, int val) throw(HSLBHandlerException)
   ::writefee8(m_hslb.fd, adr, val);
 }
 
-int HSLB::readfee32(int adr) throw(HSLBHandlerException)
+long long HSLB::readfee32(int adr) throw(HSLBHandlerException)
 {
   //std::string cmd = StringUtil::form("reghs -%c fee32 0x%x", (m_hslb.fin + 'a'), adr);
   //LogFile::info(cmd);

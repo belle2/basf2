@@ -26,29 +26,7 @@ int main(int argc, char** argv)
   std::string prefix = "";
   bool htmlmode = false;
   for (int i = 2; i < argc; i++) {
-    if (strcmp(argv[i], "-e") == 0) {
-      i++;
-      if (i < argc) expno = atoi(argv[i]);
-    }
-    if (strcmp(argv[i], "-r") == 0) {
-      i++;
-      if (i < argc) runno = atoi(argv[i]);
-    }
-    if (strcmp(argv[i], "-n") == 0) {
-      i++;
-      if (i < argc) nodename = argv[i];
-    }
-    if (strcmp(argv[i], "-p") == 0) {
-      i++;
-      if (i < argc) prefix = argv[i];
-    }
-    if (strcmp(argv[i], "-m") == 0) {
-      i++;
-      if (i < argc) max = atoi(argv[i]);
-    }
-    if (strcmp(argv[i], "--html") == 0) {
-      htmlmode = true;
-    }
+    prefix = argv[i];
   }
 
   ConfigFile config("slowcontrol");

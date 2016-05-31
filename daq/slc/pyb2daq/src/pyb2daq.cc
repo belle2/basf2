@@ -2,6 +2,7 @@
 
 #ifdef PYHSLB
 #include <daq/slc/copper/HSLB.h>
+#include <boost/python.hpp>
 #else
 #include <framework/utilities/RegisterPythonModule.h>
 #endif
@@ -89,4 +90,5 @@ BOOST_PYTHON_MODULE(pyb2daq)
 
 #ifndef PYHSLB
 REGISTER_PYTHON_MODULE(pyb2daq)
+#else
 #endif

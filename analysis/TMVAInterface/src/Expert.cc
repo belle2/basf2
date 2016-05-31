@@ -28,6 +28,7 @@ namespace Belle2 {
     Expert::Expert(ExpertConfig config, bool transformToProbability) : m_config(config),
       m_transformToProbability(transformToProbability)
     {
+      B2WARNING("TMVAInterface is deprecated and will be removed, please migrate all your code to the new mva package!");
       WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
 
       // Initialize TMVA and ROOT stuff

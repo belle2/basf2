@@ -40,7 +40,7 @@ namespace Belle2 {
     Teacher::Teacher(TeacherConfig config, bool useExistingData) : m_config(config), m_file(nullptr), m_tree("",
           DataStore::c_Persistent), splot_class(1)
     {
-
+      B2WARNING("TMVAInterface is deprecated and will be removed, please migrate all your code to the new mva package!");
       WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
 
       // Get Pointers to Variable::Manager::Var for the provided variables

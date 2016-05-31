@@ -58,16 +58,16 @@ namespace Belle2 {
       return m_sensorID;
     }
 
-    /** Get u coordinate of hit position.
-     * @return u coordinate of hit position.
+    /** Get v coordinate of hit position.
+     * @return v coordinate of hit position.
      */
     short getRow() const
     {
       return m_row;
     }
 
-    /** Get v coordinate of hit position.
-     * @return v coordinate of hit position.
+    /** Get u coordinate of hit position.
+     * @return u coordinate of hit position.
      */
     short getColumn() const
     {
@@ -108,7 +108,7 @@ namespace Belle2 {
 
   private:
     unsigned short m_sensorID; /**< Compressed sensor identifier. actually a VxdID object*/
-    short m_row;         /**< Absolute pixel position in u. */
+    short m_row;         /**< Absolute pixel position in v. */
     short m_column;         /**< Absolute pixel position in v. */
     short m_charge;           /**< Deposited charge in pixel. */
     unsigned short m_startRow;  /**< pixel row where reading starts */

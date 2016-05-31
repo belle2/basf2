@@ -68,7 +68,7 @@ void PXDRawHitProducerModule::event()
   VxdID currentSensorID(0);
   unsigned short frameCounter = 0;
   unsigned short startRow = 0;
-  for (const PXDDigit & digit : storeDigits) {
+  for (const PXDDigit& digit : storeDigits) {
     VxdID sensorID = digit.getSensorID();
     if (sensorID != currentSensorID) {
       // We are in a new sensor, so reset sensor-specific settings
@@ -78,7 +78,7 @@ void PXDRawHitProducerModule::event()
     }
     if (frameCounter == 2 && digit.getVCellID() >= startRow) frameCounter = 1;
     storeRawHits.appendNew(
-      sensorID, digit.getUCellID(), digit.getVCellID(), digit.getCharge(),
+      sensorID, digit.getVCellID(), digit.getUCellID(), digit.getCharge(),
       startRow, frameCounter, 0);
   }
   // That's not all, folks. We have to destroy all current PXDDigits.

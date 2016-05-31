@@ -88,7 +88,7 @@ namespace Belle2 {
     {
       factory.PrepareTrainingAndTestTree("", specific_options.m_prepareOption);
 
-      if (specific_options.m_type == "Plugins" or specific_options.m_type == "Plugin") {
+      if (specific_options.m_type == "Plugins") {
         auto base = std::string("TMVA@@MethodBase");
         auto regexp1 = std::string(".*_") + specific_options.m_method + std::string(".*");
         auto regexp2 = std::string(".*") + specific_options.m_method + std::string(".*");
@@ -260,10 +260,13 @@ namespace Belle2 {
       weightfile.getOptions(specific_options);
       expert_signalFraction = weightfile.getSignalFraction();
 
-      std::string custom_weightfile = weightfile.getFileName(".xml");
+      // TMVA parses the method type for plugins out of the weightfile name, so we must ensure that it has the expected format
+      std::string custom_weightfile = weightfile.getFileName(std::string("_") + specific_options.m_method + ".weights.xml");
       weightfile.getFile("TMVA_Weightfile", custom_weightfile);
 
-      if (specific_options.m_type == "Plugins" or specific_options.m_type == "Plugin") {
+      TMVAExpert::load(weightfile);
+
+      if (specific_options.m_type == "Plugins") {
         auto base = std::string("TMVA@@MethodBase");
         auto regexp1 = std::string(".*_") + specific_options.m_method + std::string(".*");
         auto regexp2 = std::string(".*") + specific_options.m_method + std::string(".*");
@@ -276,8 +279,6 @@ namespace Belle2 {
         gROOT->GetPluginManager()->AddHandler(base.c_str(), regexp2.c_str(), className.c_str(), pluginName.c_str(), ctor2.c_str());
         B2INFO("Registered new TMVA Plugin named " << pluginName)
       }
-
-      TMVAExpert::load(weightfile);
 
       if (!m_expert->BookMVA(specific_options.m_method, custom_weightfile)) {
         B2FATAL("Could not set up expert! Please see preceding error message from TMVA!");
@@ -290,10 +291,13 @@ namespace Belle2 {
 
       weightfile.getOptions(specific_options);
 
-      std::string custom_weightfile = weightfile.getFileName(".xml");
+      // TMVA parses the method type for plugins out of the weightfile name, so we must ensure that it has the expected format
+      std::string custom_weightfile = weightfile.getFileName(std::string("_") + specific_options.m_method + ".weights.xml");
       weightfile.getFile("TMVA_Weightfile", custom_weightfile);
 
-      if (specific_options.m_type == "Plugins" or specific_options.m_type == "Plugin") {
+      TMVAExpert::load(weightfile);
+
+      if (specific_options.m_type == "Plugins") {
         auto base = std::string("TMVA@@MethodBase");
         auto regexp1 = std::string(".*_") + specific_options.m_method + std::string(".*");
         auto regexp2 = std::string(".*") + specific_options.m_method + std::string(".*");
@@ -306,8 +310,6 @@ namespace Belle2 {
         gROOT->GetPluginManager()->AddHandler(base.c_str(), regexp2.c_str(), className.c_str(), pluginName.c_str(), ctor2.c_str());
         B2INFO("Registered new TMVA Plugin named " << pluginName)
       }
-
-      TMVAExpert::load(weightfile);
 
       if (!m_expert->BookMVA(specific_options.m_method, custom_weightfile)) {
         B2FATAL("Could not set up expert! Please see preceding error message from TMVA!");

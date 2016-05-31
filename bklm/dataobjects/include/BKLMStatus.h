@@ -58,6 +58,9 @@
 //! bit position for ghost-hit flag (from tracking muid reconstruction)
 #define BKLM_GHOST_BIT 28
 
+//! bit position for used-on-BKLM-stand-alone-track flag (from BKLMTracking reconstruction)
+#define BKLM_ONSTATRACK_BIT 29
+
 //! bit mask for strip-1 [0..47]
 #define BKLM_STRIP_MASK (63 << BKLM_STRIP_BIT)
 
@@ -100,6 +103,9 @@
 //! bit mask for ghost-hit flag (from tracking muid reconstruction)
 #define BKLM_GHOST_MASK (1 << BKLM_GHOST_BIT)
 
+//! bit mask for used-on-BKLM-stand-alone-track flag (from BKLMTracking reconstruction)
+#define BKLM_ONSTATRACK_MASK (1 << BKLM_ONSTATRACK_BIT)
+
 //! bit mask for module identifier
 #define BKLM_MODULEID_MASK (BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK)
 
@@ -107,7 +113,7 @@
 #define BKLM_MODULESTRIPID_MASK (BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK | BKLM_PLANE_MASK | BKLM_STRIP_MASK)
 
 //! bit mask for status bits
-#define BKLM_STATUS_MASK (BKLM_INRPC_MASK | BKLM_MC_MASK | BKLM_DECAYED_MASK | BKLM_OUTOFTIME_MASK | BKLM_INEFFICIENT_MASK | BKLM_ONTRACK_MASK | BKLM_ABOVETHRESHOLD_MASK)
+#define BKLM_STATUS_MASK (BKLM_INRPC_MASK | BKLM_MC_MASK | BKLM_DECAYED_MASK | BKLM_OUTOFTIME_MASK | BKLM_INEFFICIENT_MASK | BKLM_ONTRACK_MASK | BKLM_ABOVETHRESHOLD_MASK | BKLM_ONSTATRACK_MASK)
 
 //! BKLMHit2d Zstrips bit position for strip-1 [0..47]
 #define BKLM_ZSTRIP_BIT 0

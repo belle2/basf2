@@ -103,6 +103,10 @@ namespace Belle2 {
     //! @return whether this 2D hit is associated with a muid-extrapolated track (true) or not (false)
     bool isOnTrack() { return (m_ModuleID & BKLM_ONTRACK_MASK) != 0; }
 
+    //! Determine whether this 2D hit is associated with a BKLM-stand-alone track
+    //! @return whether this 2D hit is associated with a BKLM-stand-alone track (true) or not (false)
+    bool isOnStaTrack() { return (m_ModuleID & BKLM_ONSTATRACK_MASK) != 0; }
+
     //! Determine whether this 2D hit is deemed inefficient
     //! @return whether this 2D hit is deemed inefficient (true) or not (false)
     bool isInefficient() { return (m_ModuleID & BKLM_INEFFICIENT_MASK) != 0; }
@@ -130,6 +134,10 @@ namespace Belle2 {
     //! Set or clear the OnTrack flag
     //! @param flag whether this hit is associated with a muid-extrapolated track (true) or not (false)
     void isOnTrack(bool flag) { if (flag) { m_ModuleID |= BKLM_ONTRACK_MASK; } else { m_ModuleID &= ~BKLM_ONTRACK_MASK; } }
+
+    //! Set or clear the On-BKLM-stand-alone-track flag
+    //! @param flag whether this hit is associated with a stand-alone BKLM track (true) or not (false)
+    void isOnStaTrack(bool flag) { if (flag) { m_ModuleID |= BKLM_ONSTATRACK_MASK; } else { m_ModuleID &= ~BKLM_ONSTATRACK_MASK; } }
 
     //! Set or clear the Inefficient flag
     //! @param flag whether this his is deemed inefficient (true) or not (false)

@@ -108,7 +108,7 @@ int ECLChannelMapper::getCellId(int iCrate, int iShaper, int iChannel)
   //          37 - 44  -- Forward
   //          45 - 52  -- Backward
   int thetaID = 0, phiID = 0, cellID = 0;
-  int arrayIndex = 0, arrayIndex0 = 0;
+  int arrayIndex = 0;
 
   if (iCrate   < 1 || iCrate   > 52) return -1;
   if (iShaper  < 1 || iShaper  > 12) return -1;
@@ -177,6 +177,8 @@ int ECLChannelMapper::getFINESSE(int iCrate)
 {
   if (iCrate < 1 || iCrate > ECL_CRATES) return -1;
 
+  return 1;
+// not implemented yet TODO
 
 }
 

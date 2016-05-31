@@ -130,14 +130,15 @@ void ECLUnpackerModule::readRawECLData(RawCOPPER* rawCOPPERData, int n)
   int adcDataBase, adcDataDiffWidth;
   int compressMode, shaperDataLength;
   int value = 0, nRead = 0, ind = 0, indSample = 0;
-  int nActiveChannelsWithADCData, nADCSamplesPerChannel, nActiveDSPChannels, triggerPhase;
+  int nActiveChannelsWithADCData, nADCSamplesPerChannel, nActiveDSPChannels;
+  // triggerPhase;   /TODO ?
   int dspMask, triggerTag;
   int nShapers;
   int adcMask, adcHighMask, dspTime, dspAmplitude, dspQualityFlag;
 
   std::vector <int> eclWaveformSamples;
 
-  unsigned int evnum = rawCOPPERData->GetEveNo(n);
+//  unsigned int evnum = rawCOPPERData->GetEveNo(n);
   int nodeID = rawCOPPERData->GetNodeID(n);
 
 
@@ -188,7 +189,7 @@ void ECLUnpackerModule::readRawECLData(RawCOPPER* rawCOPPERData, int n)
         nActiveChannelsWithADCData = (value >> 24) & 0x1F;//number of channels with ADC data
         nADCSamplesPerChannel = (value >> 16) & 0x7F;   //ADC samples per channel
         nActiveDSPChannels = (value >> 8) & 0x1F;      //number of active channels in DSP
-        triggerPhase = value & 0xFF;                  //trigger phase
+//        triggerPhase = value & 0xFF;                  //trigger phase
 
         B2DEBUG(50, "nActiveADCChannels = " << nActiveChannelsWithADCData << " samples " << nADCSamplesPerChannel << " nActiveDSPChannels "
                 << nActiveDSPChannels);

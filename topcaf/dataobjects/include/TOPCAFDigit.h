@@ -33,6 +33,8 @@ namespace Belle2 {
     packet_word_t GetASICWindow()const {return m_asic_win;}
     //! get ASIC
     unsigned short GetASIC() const {return m_asic;}
+    //! Carrier
+    unsigned short GetCarrier() const {return m_asic_row;}
     //! ASIC channel
     unsigned short GetASICChannel() const {return m_asic_ch;}
     //! ASIC Row
@@ -47,6 +49,8 @@ namespace Belle2 {
     double GetWidth() const {return m_width;}
     //! ADC height
     double GetADCHeight() const {return m_adc_height;}
+    //! Boardstack
+    double GetBoardstack() const {return m_boardstack;}
 
 
     /// Extra stuff not in the raw packet ///
@@ -86,6 +90,10 @@ namespace Belle2 {
     void SetCorrTime(double time) {m_corr_time = time;}
     //! set Board Stack
     void SetBoardstack(double bs) {m_boardstack = bs;}
+    //! set asic number
+    void SetASIC(unsigned short asic) {m_asic = asic;}
+    //! Set carrier
+    void SetCarrier(unsigned short carrier) {m_asic_row = carrier;}
 
 
   private:

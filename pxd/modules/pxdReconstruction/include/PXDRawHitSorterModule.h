@@ -44,9 +44,9 @@ namespace Belle2 {
       /** Utility function to check pixel coordinates */
       inline bool goodHit(const PXDRawHit* const rawhit) const
       {
-        short u = rawhit->getRow();
+        short u = rawhit->getColumn();
         bool goodU = (u == std::min(std::max(u, short(0)), short(249)));
-        short v = rawhit->getColumn();
+        short v = rawhit->getRow();
         bool goodV = (v == std::min(std::max(v, short(0)), short(767)));
         return (goodU && goodV);
       }

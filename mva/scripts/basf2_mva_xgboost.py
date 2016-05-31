@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Thomas Keck 2016
+
+import numpy as np
+import xgboost as xgb
+import os
+import tempfile
+import collections
+
+
+class State(object):
+    """
+    XGBoost state
+    """
+    def __init__(self, num_round=0, parameters=None):
+        self.parameters = parameters
+        self.num_round = num_round
+        self.estimator = None
+
+
+def get_model(number_of_features, number_of_events, parameters):
+    param = {'bst:max_depth': 2, 'bst:eta': 1, 'silent': 1, 'objective': 'binary:logistic'}
+    if isinstance(parameters, collections.Mapping):
+        param.update(parameters)
+    return State(100, param)
+
+
+def load(obj):
+    """
+    Load XGBoost estimator into state
+    """
+    state = State()
+    f = tempfile.NamedTemporaryFile(delete=False)
+    f.write(obj)
+    f.close()
+    state.estimator = xgb.Booster({})
+    state.estimator.load_model(f.name)
+    os.unlink(f.name)
+    return state
+
+
+def apply(state, X):
+    """
+    Apply estimator to passed data.
+    """
+    data = xgb.DMatrix(X)
+    return state.estimator.predict(data)
+
+
+def begin_fit(state):
+    """
+    Initialize lists which will store the received data
+    """
+    state.X = []
+    state.y = []
+    state.w = []
+    state.Xtest = []
+    state.ytest = []
+    state.wtest = []
+    return state
+
+
+def partial_fit(state, X, y, w, Xtest, ytest, wtest, epoch):
+    """
+    Stores received training data.
+    XGBoost is usually not able to perform a partial fit.
+    """
+    state.X.append(X)
+    state.y.append(y)
+    state.w.append(w)
+    state.Xtest.append(Xtest)
+    state.ytest.append(ytest)
+    state.wtest.append(wtest)
+    return True
+
+
+def end_fit(state):
+    """
+    Merge received data together and fit estimator
+    """
+    dtrain = xgb.DMatrix(np.vstack(state.X), label=np.hstack(state.y).astype(int), weight=np.hstack(state.w))
+    dtest = xgb.DMatrix(np.vstack(state.Xtest), label=np.hstack(state.ytest).astype(int), weight=np.hstack(state.wtest))
+    evallist = [(dtest, 'eval'), (dtrain, 'train')]
+    state.estimator = xgb.train(state.parameters, dtrain, state.num_round, evallist)
+    f = tempfile.NamedTemporaryFile(delete=False)
+    f.close()
+    state.estimator.save_model(f.name)
+    with open(f.name, 'rb') as f2:
+        content = f2.read()
+    os.unlink(f.name)
+    return content

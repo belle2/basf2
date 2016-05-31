@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'mva', '$ROOT_LIBS', 'boost_program_options']
+
+Return('env')

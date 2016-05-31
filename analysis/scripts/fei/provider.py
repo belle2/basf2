@@ -364,16 +364,13 @@ def GenerateTrainingData(resource: fei.dag.Resource, particleName: str, particle
                                  variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                                  filename=removeJPsiSlash(hist_filename), path=resource.path)
 
-        teacher = register_module('TMVATeacher')
-        teacher.set_name('TMVATeacher_' + particleList)
-        teacher.param('prefix', removeJPsiSlash(particleList + '_' + resource.hash))
-        teacher.param('variables', mvaConfig.variables)
-        teacher.param('sample', mvaConfig.target)
-        teacher.param('spectators', spectators)
-        teacher.param('listNames', [particleList])
-        teacher.param('inverseSamplingRates', inverseSamplingRates)
-        teacher.param('lowMemoryProfile', True)
-        teacher.param('maxSamples', int(2*MaximumNumberOfMVASamples))
+        teacher = register_module('VariablesToNtuple')
+        teacher.set_name('VariablesToNtuple_' + particleList)
+        teacher.param('fileName', removeJPsiSlash(particleList + '_' + resource.hash) + '.root')
+        teacher.param('treeName', 'variables')
+        teacher.param('variables', mvaConfig.variables + spectators)
+        teacher.param('particleList', particleList)
+        teacher.param('sampling', (mvaConfig.target, inverseSamplingRates))
         resource.path.add_module(teacher)
         if mvaConfig.sPlotVariable is None:
             resource.condition = ('EventType', '==0')
@@ -382,11 +379,12 @@ def GenerateTrainingData(resource: fei.dag.Resource, particleName: str, particle
     return rootFilename[:-5]
 
 
-def TrainMultivariateClassifier(resource: fei.dag.Resource, mvaConfig: fei.config.MVAConfiguration,
+def TrainMultivariateClassifier(resource: fei.dag.Resource, databasePrefix: str, mvaConfig: fei.config.MVAConfiguration,
                                 trainingData: Filename) -> Filename:
     """
     Train multivariate classifier using the trainingData
         @param resource object
+        @param databasePrefix used to store the generated weightfile
         @param mvaConfig configuration for the multivariate analysis
         @param trainingData name of ROOT-File which contains training data
         @return string config filename
@@ -397,7 +395,6 @@ def TrainMultivariateClassifier(resource: fei.dag.Resource, mvaConfig: fei.confi
     if trainingData is None:
         return
 
-    Nbins = 'CreateMVAPdfs:NbinsMVAPdf=100:'
     configFilename = trainingData + '_1.config'
 
     if not os.path.isfile(configFilename):
@@ -420,12 +417,13 @@ def TrainMultivariateClassifier(resource: fei.dag.Resource, mvaConfig: fei.confi
             return
 
         command = (
-            "{externTeacher} --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
-            " --variables '{variables}' --prefix '{prefix}' > '{prefix}'.log 2>&1".format(
+            "{externTeacher} --method '{method}' --target_variable '{target}' --treename variables --datafile '{prefix}.root' "
+            "--signal_class 1 --variables '{variables}' --weightfile '{prefix}.weights' {config} > '{prefix}'.log 2>&1"
+            " && basf2_mva_upload --filename '{prefix}.weights' --identifier '{databasePrefix}_{prefix}'".format(
+                databasePrefix=databasePrefix,
                 externTeacher=resource.env['externTeacher'],
-                name=mvaConfig.name,
-                type=mvaConfig.type,
-                config=Nbins + mvaConfig.config,
+                method=mvaConfig.method,
+                config=mvaConfig.config,
                 target=mvaConfig.target,
                 variables="' '".join(mvaConfig.variables),
                 prefix=trainingData))
@@ -442,11 +440,12 @@ def TrainMultivariateClassifier(resource: fei.dag.Resource, mvaConfig: fei.confi
     return trainingData
 
 
-def SignalProbability(resource: fei.dag.Resource, particleList: ParticleList,
+def SignalProbability(resource: fei.dag.Resource, databasePrefix: str, particleList: ParticleList,
                       mvaConfig: fei.config.MVAConfiguration, tmvaPrefix: str) -> Hash:
     """
     Calculates the SignalProbability of a ParticleList using the previously trained MVC
         @param resource object
+        @param databasePrefix used to store the generated weightfile
         @param particleList the particleList which is used for training and classification
         @param mvaConfig configuration for the multivariate analysis
         @param tmvaPrefix used to train teh TMVA classifier
@@ -455,14 +454,10 @@ def SignalProbability(resource: fei.dag.Resource, particleList: ParticleList,
     resource.cache = True
     if tmvaPrefix is None or particleList is None:
         return
-    expert = register_module('TMVAExpert')
-    expert.set_name('TMVAExpert_' + particleList)
-    expert.param('prefix', tmvaPrefix)
-    expert.param('method', mvaConfig.name)
-    expert.param('signalFraction', -1)  # Use signalFraction from training
-    expert.param('transformToProbability', True)
-    expert.param('expertOutputName', 'SignalProbability')
-    expert.param('signalClass', 1)
+    expert = register_module('MVAExpert')
+    expert.set_name('MVAExpert_' + particleList)
+    expert.param('identifier', databasePrefix + '_' + tmvaPrefix)
+    expert.param('extraInfoName', 'SignalProbability')
     expert.param('listNames', [particleList])
     resource.path.add_module(expert)
 

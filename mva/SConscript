@@ -1,0 +1,9 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'mva_dataobjects', 'analysis', '$ROOT_LIBS', 'fann', 'libFastBDT_shared']
+
+env.Append(LIBS = ['NeuroBayesExpertCPP'])
+env.Append(LIBS = ['NeuroBayesTeacherCPP'])
+env.Append(LIBS = ['TMVA','MLP','XMLIO'])
+
+Return('env')

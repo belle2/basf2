@@ -44,6 +44,14 @@ namespace Belle2 {
       return false;
     }
 
+    double RandomChoice(const Particle*, const std::vector<double>& choices)
+    {
+      int r = std::rand() % choices.size() + 1;
+      auto it = choices.begin();
+      std::advance(it, r);
+      return *it;
+    }
+
     double NumberOfMCParticlesInEvent(const Particle*, const std::vector<double>& pdgs)
     {
       StoreArray<MCParticle> mcParticles;
@@ -289,6 +297,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("constant(float i)", Constant,
                       "Returns i.\n"
                       "Useful for debugging purposes and in conjunction with the formula meta-variable.");
+
+    REGISTER_VARIABLE("randomChoice(i, j, ...)", RandomChoice,
+                      "Returns random element of given numbers.\n"
+                      "Useful for testing purposes");
 
 
   }

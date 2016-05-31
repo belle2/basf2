@@ -46,8 +46,8 @@ def getCommandLineOptions():
     parser.add_argument('-cache', '--cache', dest='cache', type=str, default=None,
                         help='Use the given file to cache results between multiple executions.'
                              'Data from previous runs has to be provided as input!')
-    parser.add_argument('-externTeacher', '--externTeacher', dest='externTeacher', type=str, default='externTeacher',
-                        help='Use this command to invoke extern teacher: externTeacher or externClusterTeacher')
+    parser.add_argument('-externTeacher', '--externTeacher', dest='externTeacher', type=str, default='basf2_mva_teacher',
+                        help='Use this command to invoke extern teacher: basf2_mva_teacher or externClusterTeacher')
     parser.add_argument('-monitor', '--monitor', dest='monitor', action='store_true',
                         help='Create monitor NTuples/Histograms used for Reporting system')
     parser.add_argument('-prune', '--prune', dest='prune', action='store_true',
@@ -69,7 +69,7 @@ def charge_conjugated_identifier(particle):
     return pdg.conjugate(particle.name) + ':' + particle.label
 
 
-def fullEventInterpretation(signalParticleList, selection_path, particles, BtoBII=False):
+def fullEventInterpretation(signalParticleList, selection_path, particles, databasePrefix, BtoBII=False):
     """
     The Full Event Interpretation algorithm has to be executed multiple times, because of the dependencies between
     the MVCs among each other and PreCuts on Histograms.
@@ -80,6 +80,7 @@ def fullEventInterpretation(signalParticleList, selection_path, particles, BtoBI
                The path should load the data and perform skimming and belle-I conversion if needed
                In addition it should select a signal-side B and create a 'RestOfEvents' list if signalParticleList is not None
         @param particles list of particle objects which shall be reconstructed by this algorithm
+        @param databasePrefix used to store the generated weightfiles in the database
         @param BtoBII Boolian to set geometry and gearbox for B2BII converted Belle Data/MC. Default is False.
         @return FeiState object containing basf2 path to execute, plus status information
     """
@@ -95,6 +96,8 @@ def fullEventInterpretation(signalParticleList, selection_path, particles, BtoBI
     dag.env['nThreads'] = args.nThreads
     dag.env['rerunCachedProviders'] = args.rerunCachedProviders
     dag.env['externTeacher'] = args.externTeacher
+
+    dag.add('DatabasePrefix', databasePrefix)
 
     # Add some fake resources for the FSPs
     for fsp in ['e+:FSP', 'mu+:FSP', 'pi+:FSP', 'K+:FSP', 'K_S0:V0', 'K_L0:FSP', 'p+:FSP', 'gamma:FSP', 'gamma:V0']:
@@ -194,9 +197,11 @@ def fullEventInterpretation(signalParticleList, selection_path, particles, BtoBI
 
             # Train and apply MVC on raw ParticleList
             dag.add('TrainedMVC_' + channel.name, provider.TrainMultivariateClassifier,
+                    databasePrefix='DatabasePrefix',
                     mvaConfig='MVAConfig_' + channel.name,
                     trainingData='TrainingData_' + channel.name)
             dag.add('SignalProbability_' + channel.name, provider.SignalProbability,
+                    databasePrefix='DatabasePrefix',
                     mvaConfig='MVAConfig_' + channel.name,
                     particleList='RawParticleList_' + channel.name,
                     tmvaPrefix='TrainedMVC_' + channel.name)

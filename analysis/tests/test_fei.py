@@ -37,9 +37,8 @@ class TestMVAConfiguration(unittest.TestCase):
 
     def test_Defaults(self):
         config = fei.config.MVAConfiguration()
-        self.assertEqual(config.name, 'FastBDT')
-        self.assertEqual(config.type, 'Plugin')
-        self.assertEqual(config.config, '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')
+        self.assertEqual(config.method, 'FastBDT')
+        self.assertEqual(config.config, '--nTrees 400  --nCutLevels 10 --nLevels 3 --shrinkage 0.1 --randRatio 0.5')
         # We want None, because [] can have nasty side effects when used as default parameter!
         self.assertEqual(config.variables, None)
         self.assertEqual(config.target, 'isSignal')
@@ -709,9 +708,8 @@ class TestGenerateTrainingData(unittest.TestCase):
         self.assertEqual(fei.provider.GenerateTrainingData(resource, 'D0', 'D0:1', mcCounts, preCutConfig, mvaConfig), None)
 
         path = basf2.create_path()
-        path.add_module('TMVATeacher', prefix='D0:1_42', variables=['p', 'pt'], sample='isSignal',
-                        spectators=['isSignal'], listNames=['D0:1'], inverseSamplingRates={},
-                        maxSamples=int(2e7), lowMemoryProfile=True)
+        path.add_module('VariablesToNtuple', fileName='D0:1_42.root', treeName='variables', variables=['p', 'pt', 'isSignal'],
+                        particleList='D0:1', sampling=('isSignal', {}))
         self.assertEqual(resource.path, path)
         self.assertEqual(resource.cache, True)
         self.assertEqual(resource.halt, True)
@@ -733,9 +731,8 @@ class TestGenerateTrainingData(unittest.TestCase):
                         variables=fei.config.variables2binnings(hist_variables),
                         variables_2d=fei.config.variables2binnings_2d(hist_variables_2d),
                         fileName='Monitor_GenerateTrainingData_D0:1.root')
-        path.add_module('TMVATeacher', prefix='D0:1_42', variables=['p', 'pt'], sample='isSignal',
-                        spectators=['isSignal'], listNames=['D0:1'], inverseSamplingRates={},
-                        maxSamples=int(2e7), lowMemoryProfile=True)
+        path.add_module('VariablesToNtuple', fileName='D0:1_42.root', treeName='variables', variables=['p', 'pt', 'isSignal'],
+                        particleList='D0:1', sampling=('isSignal', {}))
         self.assertEqual(resource.path, path)
         self.assertEqual(resource.cache, True)
         self.assertEqual(resource.halt, True)
@@ -751,9 +748,8 @@ class TestGenerateTrainingData(unittest.TestCase):
         self.assertEqual(fei.provider.GenerateTrainingData(resource, 'D0', 'D0:1', mcCounts, preCutConfig, mvaConfig), None)
 
         path = basf2.create_path()
-        path.add_module('TMVATeacher', prefix='D0:1_42', variables=['p', 'pt'], sample='isSignal',
-                        spectators=['isSignal'], listNames=['D0:1'], inverseSamplingRates={0: 11, 1: 2},
-                        maxSamples=int(2e7), lowMemoryProfile=True)
+        path.add_module('VariablesToNtuple', fileName='D0:1_42.root', treeName='variables', variables=['p', 'pt', 'isSignal'],
+                        particleList='D0:1', sampling=('isSignal', {0: 11, 1: 2}))
         self.assertEqual(resource.path, path)
         self.assertEqual(resource.cache, True)
         self.assertEqual(resource.halt, True)
@@ -832,24 +828,26 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
             os.remove('trainingData.root')
 
     def test_TrainMultivariateClassifierSuccessfull(self):
-        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, env={'externTeacher': 'externTeacher'},
+        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource,
+                                                 env={'externTeacher': 'basf2_mva_teacher'},
                                                  path=basf2.create_path(), hash='42')
         resource.EnableMultiThreading = mock_threading
         mvaConfig = unittest.mock.NonCallableMock(spec=fei.config.MVAConfiguration, variables=['p', 'pt'],
-                                                  type='Plugin', config='TMVAConfigString',
+                                                  method='FastBDT', config='ConfigString',
                                                   target='isSignal', sPlotVariable=None)
-        mvaConfig.name = 'FastBDT'
 
         subprocess.call = unittest.mock.create_autospec(self.original_call,
                                                         side_effect=lambda command, shell: open('trainingData_1.config',
                                                                                                 'w').close())
         fei.provider.MinimumNumberOfMVASamples = 499
-        self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, mvaConfig, 'trainingData'),
+        self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, 'FEITEST', mvaConfig, 'trainingData'),
                          'trainingData')
-        subprocess.call.assert_called_once_with("externTeacher --methodName 'FastBDT' --methodType 'Plugin'"
-                                                " --methodConfig 'CreateMVAPdfs:NbinsMVAPdf=100:TMVAConfigString'"
-                                                " --target 'isSignal' --variables 'p' 'pt' --prefix 'trainingData'"
-                                                " > 'trainingData'.log 2>&1", shell=True)
+        subprocess.call.assert_called_once_with("basf2_mva_teacher --method 'FastBDT' --target_variable 'isSignal' "
+                                                "--treename variables "
+                                                "--datafile 'trainingData.root' --signal_class 1 --variables 'p' 'pt' "
+                                                "--weightfile 'trainingData.weights' ConfigString > 'trainingData'.log 2>&1"
+                                                " && basf2_mva_upload --filename 'trainingData.weights' "
+                                                "--identifier 'FEITEST_trainingData'", shell=True)
         os.remove('trainingData_1.config')
 
         path = basf2.create_path()
@@ -858,17 +856,17 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         self.assertEqual(mock_threading_called, True)
 
     def test_TrainMultivariateClassifierTooFewSamples(self):
-        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, env={'externTeacher': 'externTeacher'},
+        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource,
+                                                 env={'externTeacher': 'basf2_mva_teacher'},
                                                  path=basf2.create_path(), hash='42')
         resource.EnableMultiThreading = mock_threading
         mvaConfig = unittest.mock.NonCallableMock(spec=fei.config.MVAConfiguration, variables=['p', 'pt'],
-                                                  type='Plugin', config='TMVAConfigString',
+                                                  method='FastBDT', config='ConfigString',
                                                   target='isSignal', sPlotVariable=None)
-        mvaConfig.name = 'FastBDT'
 
         subprocess.call = unittest.mock.create_autospec(self.original_call)
         fei.provider.MinimumNumberOfMVASamples = 501
-        self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, mvaConfig, 'trainingData'),
+        self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, 'FEITEST', mvaConfig, 'trainingData'),
                          None)
         self.assertFalse(subprocess.call.called)
 
@@ -878,17 +876,17 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         self.assertEqual(mock_threading_called, False)
 
     def test_TrainMultivariateClassifierROOTFileNotAvailable(self):
-        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, env={'externTeacher': 'externTeacher'},
+        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource,
+                                                 env={'externTeacher': 'basf2_mva_teacher'},
                                                  path=basf2.create_path(), hash='42')
         resource.EnableMultiThreading = mock_threading
         mvaConfig = unittest.mock.NonCallableMock(spec=fei.config.MVAConfiguration, variables=['p', 'pt'],
-                                                  type='Plugin', config='TMVAConfigString',
+                                                  method='FastBDT', config='ConfigString',
                                                   target='isSignal', sPlotVariable=None)
-        mvaConfig.name = 'FastBDT'
 
         os.remove('trainingData.root')
         subprocess.call = unittest.mock.create_autospec(self.original_call)
-        self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, mvaConfig, 'trainingData'),
+        self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, 'FEITEST', mvaConfig, 'trainingData'),
                          None)
         self.assertFalse(subprocess.call.called)
 
@@ -898,18 +896,18 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         self.assertEqual(mock_threading_called, False)
 
     def test_TrainMultivariateClassifierTreeNotAvailable(self):
-        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, env={'externTeacher': 'externTeacher'},
+        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource,
+                                                 env={'externTeacher': 'basf2_mva_teacher'},
                                                  path=basf2.create_path(), hash='42')
         resource.EnableMultiThreading = mock_threading
         mvaConfig = unittest.mock.NonCallableMock(spec=fei.config.MVAConfiguration, variables=['p', 'pt'],
-                                                  type='Plugin', config='TMVAConfigString',
+                                                  method='FastBDT', config='ConfigString',
                                                   target='isSignal', sPlotVariable=None)
-        mvaConfig.name = 'FastBDT'
 
         f = ROOT.TFile('trainingData.root', 'RECREATE')
         del f
         subprocess.call = unittest.mock.create_autospec(self.original_call)
-        self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, mvaConfig, 'trainingData'),
+        self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, 'FEITEST', mvaConfig, 'trainingData'),
                          None)
         self.assertFalse(subprocess.call.called)
 
@@ -919,20 +917,22 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         self.assertEqual(mock_threading_called, False)
 
     def test_TrainMultivariateClassifierFailed(self):
-        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, env={'externTeacher': 'externTeacher'},
+        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource,
+                                                 env={'externTeacher': 'basf2_mva_teacher'},
                                                  path=basf2.create_path(), hash='42')
         resource.EnableMultiThreading = mock_threading
         mvaConfig = unittest.mock.NonCallableMock(spec=fei.config.MVAConfiguration, variables=['p', 'pt'],
-                                                  type='Plugin', config='TMVAConfigString',
+                                                  method='FastBDT', config='ConfigString',
                                                   target='isSignal', sPlotVariable=None)
-        mvaConfig.name = 'FastBDT'
 
         subprocess.call = unittest.mock.create_autospec(self.original_call)
-        self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, mvaConfig, 'trainingData'), None)
-        subprocess.call.assert_called_once_with("externTeacher --methodName 'FastBDT' --methodType 'Plugin'"
-                                                " --methodConfig 'CreateMVAPdfs:NbinsMVAPdf=100:TMVAConfigString'"
-                                                " --target 'isSignal' --variables 'p' 'pt' --prefix 'trainingData'"
-                                                " > 'trainingData'.log 2>&1", shell=True)
+        self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, 'FEITEST', mvaConfig, 'trainingData'), None)
+        subprocess.call.assert_called_once_with("basf2_mva_teacher --method 'FastBDT' --target_variable 'isSignal' "
+                                                "--treename variables "
+                                                "--datafile 'trainingData.root' --signal_class 1 --variables 'p' 'pt' "
+                                                "--weightfile 'trainingData.weights' ConfigString > 'trainingData'.log 2>&1"
+                                                " && basf2_mva_upload --filename 'trainingData.weights' "
+                                                "--identifier 'FEITEST_trainingData'", shell=True)
 
         path = basf2.create_path()
         self.assertEqual(resource.path, path)
@@ -940,15 +940,15 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         self.assertEqual(mock_threading_called, True)
 
     def test_AlreadyTrained(self):
-        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, env={'externTeacher': 'externTeacher'},
+        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource,
+                                                 env={'externTeacher': 'basf2_mva_teacher'},
                                                  path=basf2.create_path(), hash='42')
         resource.EnableMultiThreading = mock_threading
         mvaConfig = unittest.mock.NonCallableMock(spec=fei.config.MVAConfiguration, variables=['p', 'pt'],
-                                                  type='Plugin', config='TMVAConfigString',
+                                                  method='FastBDT', config='ConfigString',
                                                   target='isSignal', sPlotVariable=None)
-        mvaConfig.name = 'FastBDT'
         with temporary_file('trainingData_1.config'):
-            self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, mvaConfig, 'trainingData'),
+            self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, 'FEITEST', mvaConfig, 'trainingData'),
                              'trainingData')
 
         path = basf2.create_path()
@@ -957,14 +957,14 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         self.assertEqual(mock_threading_called, False)
 
     def test_MissingTrainingData(self):
-        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, env={'externTeacher': 'externTeacher'},
+        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource,
+                                                 env={'externTeacher': 'basf2_mva_teacher'},
                                                  path=basf2.create_path(), hash='42')
         resource.EnableMultiThreading = mock_threading
         mvaConfig = unittest.mock.NonCallableMock(spec=fei.config.MVAConfiguration, variables=['p', 'pt'],
-                                                  type='Plugin', config='TMVAConfigString',
+                                                  method='FastBDT', config='ConfigString',
                                                   target='isSignal', sPlotVariable=None)
-        mvaConfig.name = 'FastBDT'
-        self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, mvaConfig, None), None)
+        self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, 'FEITEST', mvaConfig, None), None)
 
         path = basf2.create_path()
         self.assertEqual(resource.path, path)
@@ -978,14 +978,11 @@ class TestSignalProbability(unittest.TestCase):
         resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, env={'monitor': False},
                                                  path=basf2.create_path(), hash='42')
         mvaConfig = unittest.mock.NonCallableMock(spec=fei.config.MVAConfiguration, variables=['p', 'pt'],
-                                                  target='isSignal', sPlotVariable=None)
-        mvaConfig.name = 'FastBDT'
-        self.assertEqual(fei.provider.SignalProbability(resource, 'D0:1', mvaConfig, 'configMVC'), '42')
+                                                  method='FastBDT', target='isSignal', sPlotVariable=None)
+        self.assertEqual(fei.provider.SignalProbability(resource, 'FEITEST', 'D0:1', mvaConfig, 'configMVC'), '42')
 
         path = basf2.create_path()
-        path.add_module('TMVAExpert', prefix='configMVC', method='FastBDT',
-                        signalFraction=-1, expertOutputName='SignalProbability',
-                        signalClass=1, transformToProbability=True, listNames=['D0:1'])
+        path.add_module('MVAExpert', identifier='FEITEST_configMVC', extraInfoName='SignalProbability', listNames=['D0:1'])
         self.assertEqual(resource.path, path)
         self.assertEqual(resource.cache, True)
 
@@ -993,14 +990,11 @@ class TestSignalProbability(unittest.TestCase):
         resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, env={'monitor': True},
                                                  path=basf2.create_path(), hash='42')
         mvaConfig = unittest.mock.NonCallableMock(spec=fei.config.MVAConfiguration, variables=['p', 'pt'],
-                                                  target='isSignal', sPlotVariable=None)
-        mvaConfig.name = 'FastBDT'
-        self.assertEqual(fei.provider.SignalProbability(resource, 'D0:1', mvaConfig, 'configMVC'), '42')
+                                                  method='FastBDT', target='isSignal', sPlotVariable=None)
+        self.assertEqual(fei.provider.SignalProbability(resource, 'FEITEST', 'D0:1', mvaConfig, 'configMVC'), '42')
 
         path = basf2.create_path()
-        path.add_module('TMVAExpert', prefix='configMVC', method='FastBDT',
-                        signalFraction=-1, expertOutputName='SignalProbability',
-                        signalClass=1, transformToProbability=True, listNames=['D0:1'])
+        path.add_module('MVAExpert', identifier='FEITEST_configMVC', extraInfoName='SignalProbability', listNames=['D0:1'])
         hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(SignalProbability)', 'isSignal']
         hist_variables_2d = [('extraInfo(SignalProbability)', 'isSignal'),
                              ('extraInfo(SignalProbability)', 'mcErrors'),
@@ -1016,9 +1010,8 @@ class TestSignalProbability(unittest.TestCase):
         resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, env={'monitor': False},
                                                  path=basf2.create_path(), hash='42')
         mvaConfig = unittest.mock.NonCallableMock(spec=fei.config.MVAConfiguration, variables=['p', 'pt'],
-                                                  target='isSignal', sPlotVariable=None)
-        mvaConfig.name = 'FastBDT'
-        self.assertEqual(fei.provider.SignalProbability(resource, 'D0:1', mvaConfig, None), None)
+                                                  method='FastBDT', target='isSignal', sPlotVariable=None)
+        self.assertEqual(fei.provider.SignalProbability(resource, 'FEITEST', 'D0:1', mvaConfig, None), None)
 
         path = basf2.create_path()
         self.assertEqual(resource.path, path)
@@ -1028,9 +1021,8 @@ class TestSignalProbability(unittest.TestCase):
         resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, env={'monitor': False},
                                                  path=basf2.create_path(), hash='42')
         mvaConfig = unittest.mock.NonCallableMock(spec=fei.config.MVAConfiguration, variables=['p', 'pt'],
-                                                  target='isSignal', sPlotVariable=None)
-        mvaConfig.name = 'FastBDT'
-        self.assertEqual(fei.provider.SignalProbability(resource, None, mvaConfig, 'configMVC'), None)
+                                                  method='FastBDT', target='isSignal', sPlotVariable=None)
+        self.assertEqual(fei.provider.SignalProbability(resource, 'FEITEST', None, mvaConfig, 'configMVC'), None)
 
         path = basf2.create_path()
         self.assertEqual(resource.path, path)

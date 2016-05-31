@@ -14,14 +14,13 @@ import typing
 # Define classes at top level to make them pickable
 # Creates new classs via namedtuple, which are like a struct in C
 
-MVAConfiguration = collections.namedtuple('MVAConfiguration', 'name, type, config, variables, target, sPlotVariable')
-MVAConfiguration.__new__.__defaults__ = ('FastBDT', 'Plugin',
-                                         '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+MVAConfiguration = collections.namedtuple('MVAConfiguration', 'method, config, variables, target, sPlotVariable')
+MVAConfiguration.__new__.__defaults__ = ('FastBDT',
+                                         '--nTrees 400  --nCutLevels 10 --nLevels 3 --shrinkage 0.1 --randRatio 0.5',
                                          None, 'isSignal', None)
 MVAConfiguration.__doc__ = "Multivariate analysis configuration class."
-MVAConfiguration.name.__doc__ = "Name of the TMVA Method."
-MVAConfiguration.type.__doc__ = "Type of the TMVA Method (e.g. Plugin)."
-MVAConfiguration.config.__doc__ = "Configuration string of method apsed to TMVA."
+MVAConfiguration.method.__doc__ = "Method used by MVAInterface."
+MVAConfiguration.config.__doc__ = "Method specific configuration string passed to basf2_mva_teacher"
 MVAConfiguration.variables.__doc__ = "List of variables from the VariableManager."\
                                      "{} is expanded to one variable per daughter particle."
 MVAConfiguration.target.__doc__ = "Target variable from the VariableManager."

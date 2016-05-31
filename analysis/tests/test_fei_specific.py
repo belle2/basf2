@@ -50,14 +50,14 @@ sys.argv.append('-verbose')
 sys.argv.append('-prune')
 
 # MCCount Histograms,
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 process(feistate.path)
 assert not feistate.is_trained
 assert len(glob.glob('RootOutput.root')) == 1
 assert len(glob.glob('mcParticlesCount.root')) == 1
 
 # Train FSP Networks
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 process(feistate.path)
 assert not feistate.is_trained
 assert len(glob.glob('RootOutput.root')) == 1
@@ -67,40 +67,40 @@ assert len(glob.glob('pi+*')) == 1
 assert len(glob.glob('K+*')) == 1
 
 # Train pi0 network and independent D networks
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 process(feistate.path)
 assert not feistate.is_trained
 assert len(glob.glob('RootOutput.root')) == 1
-assert len(glob.glob('gamma*')) == 5  # V0 Gamma channel is not trained
-assert len(glob.glob('mu+*')) == 4
-assert len(glob.glob('pi+*')) == 4
-assert len(glob.glob('K+*')) == 4
+assert len(glob.glob('gamma*')) == 4  # V0 Gamma channel is not trained
+assert len(glob.glob('mu+*')) == 3
+assert len(glob.glob('pi+*')) == 3
+assert len(glob.glob('K+*')) == 3
 assert len(glob.glob('pi0*')) == 1
 assert len(glob.glob('D*')) == 3
 
 # Train D networks
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 process(feistate.path)
 assert not feistate.is_trained
 assert len(glob.glob('RootOutput.root')) == 1
-assert len(glob.glob('pi0*')) == 4
-assert len(glob.glob('D*')) == 14
+assert len(glob.glob('pi0*')) == 3
+assert len(glob.glob('D*')) == 11
 
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 process(feistate.path)
 assert not feistate.is_trained
 assert len(glob.glob('RootOutput.root')) == 1
 assert len(glob.glob('moduleStatistics_*')) == 1
-assert len(glob.glob('D*')) == 20
+assert len(glob.glob('D*')) == 15
 
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 assert feistate.is_trained
 assert len(glob.glob('Summary*.pickle')) == 1
 
 
 sys.argv.append('-monitor')
 
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 process(feistate.path)
 assert feistate.is_trained
 assert len(glob.glob('Monitor_MCCounts.root')) == 1
@@ -114,7 +114,7 @@ assert len(glob.glob('Monitor_MakeParticleList_*')) == 22
 assert len(glob.glob('Monitor_*')) == 91
 
 sys.argv.append('-dump-path')
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 feistate.path.modules()[0].param('inputFileName', inputFile)
 feistate.path.modules()[0].param('inputFileNames', [])
 uncached_path = serialize_path(feistate.path)
@@ -129,7 +129,7 @@ sys.argv.append('-cache')
 sys.argv.append('cache.pickle')
 
 # MCCount Histograms,
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 process(feistate.path)
 assert not feistate.is_trained
 assert len(glob.glob('RootOutput.root')) == 1
@@ -138,7 +138,7 @@ assert len(glob.glob('cache.pickle')) == 1
 shutil.copyfile('RootOutput.root', 'RootInput.root')
 
 # Train FSP Networks
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 feistate.path.modules()[0].param('inputFileName', 'RootInput.root')
 process(feistate.path)
 assert not feistate.is_trained
@@ -151,42 +151,42 @@ assert len(glob.glob('cache.pickle.bkp0')) == 1
 shutil.copyfile('RootOutput.root', 'RootInput.root')
 
 # Train pi0 network and independent D networks
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 feistate.path.modules()[0].param('inputFileName', 'RootInput.root')
 process(feistate.path)
 assert not feistate.is_trained
 assert len(glob.glob('RootOutput.root')) == 1
-assert len(glob.glob('gamma*')) == 5  # V0 Gamma channel is not trained
-assert len(glob.glob('mu+*')) == 4
-assert len(glob.glob('pi+*')) == 4
-assert len(glob.glob('K+*')) == 4
+assert len(glob.glob('gamma*')) == 4  # V0 Gamma channel is not trained
+assert len(glob.glob('mu+*')) == 3
+assert len(glob.glob('pi+*')) == 3
+assert len(glob.glob('K+*')) == 3
 assert len(glob.glob('pi0*')) == 1
 assert len(glob.glob('D*')) == 3
 assert len(glob.glob('cache.pickle.bkp1')) == 1
 shutil.copyfile('RootOutput.root', 'RootInput.root')
 
 # Train D networks
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 feistate.path.modules()[0].param('inputFileName', 'RootInput.root')
 process(feistate.path)
 assert not feistate.is_trained
 assert len(glob.glob('RootOutput.root')) == 1
-assert len(glob.glob('pi0*')) == 4
-assert len(glob.glob('D*')) == 14
+assert len(glob.glob('pi0*')) == 3
+assert len(glob.glob('D*')) == 11
 assert len(glob.glob('cache.pickle.bkp2')) == 1
 shutil.copyfile('RootOutput.root', 'RootInput.root')
 
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 feistate.path.modules()[0].param('inputFileName', 'RootInput.root')
 process(feistate.path)
 assert not feistate.is_trained
 assert len(glob.glob('RootOutput.root')) == 1
 assert len(glob.glob('moduleStatistics_*')) == 1
-assert len(glob.glob('D*')) == 20
+assert len(glob.glob('D*')) == 15
 assert len(glob.glob('cache.pickle.bkp3')) == 1
 shutil.copyfile('RootOutput.root', 'RootInput.root')
 
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 feistate.path.modules()[0].param('inputFileName', 'RootInput.root')
 assert len(glob.glob('Summary*.pickle')) == 1
 assert len(glob.glob('cache.pickle.bkp4')) == 1
@@ -208,7 +208,7 @@ sys.argv.pop()
 sys.argv.pop()
 
 sys.argv.append('-dump-path')
-feistate = fullEventInterpretation('B+:signal', selection_path, particles)
+feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
 feistate.path.modules()[0].param('inputFileName', inputFile)
 feistate.path.modules()[0].param('inputFileNames', [])
 cached_path = serialize_path(feistate.path)

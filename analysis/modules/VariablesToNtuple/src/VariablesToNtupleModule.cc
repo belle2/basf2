@@ -133,7 +133,7 @@ float VariablesToNtupleModule::getInverseSamplingRateWeight(const Particle* part
 void VariablesToNtupleModule::event()
 {
   unsigned int nVars = m_variables.size();
-  std::vector<float> vars(nVars);
+  std::vector<float> vars(nVars + 1);
 
   if (m_particleList.empty()) {
     vars[0] = getInverseSamplingRateWeight(nullptr);

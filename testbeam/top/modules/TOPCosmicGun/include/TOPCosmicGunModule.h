@@ -81,6 +81,8 @@ namespace Belle2 {
 
     std::vector<double> m_upperPad; /**< Upper rectangular surface (z,x,Dz,Dx,y). */
     std::vector<double> m_lowerPad; /**< Lower rectangular surface (z,x,Dz,Dx,y). */
+    double m_alpha; /**< rotation angle of trigger paddles [deg] */
+    double m_swimBackDistance; /**< swim back a muon by this distance */
     double m_momentum; /**< Momentum for generation of mono-energetic cosmic ray muons */
     double m_momentumCutOff; /**< Minimum momentum for generated muons (GeV/c). */
     double m_startTime;      /**< start time (time at upperPad). */

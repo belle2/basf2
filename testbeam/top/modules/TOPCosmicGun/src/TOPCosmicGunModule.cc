@@ -29,6 +29,7 @@
 // ROOT
 #include <TRandom3.h>
 #include <TVector3.h>
+#include <TRotation.h>
 #include <TFile.h>
 #include <TF1.h>
 #include <TString.h>
@@ -51,7 +52,7 @@ namespace Belle2 {
 
   {
     // set module description
-    setDescription("Cosmic ray gun for TOP cosmics tests");
+    setDescription("Cosmic ray gun for TOP cosmics tests (no magnetic field!)");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
@@ -59,6 +60,9 @@ namespace Belle2 {
              m_upperPad);
     addParam("lowerPad", m_lowerPad, "Lower rectangular surface (z,x,Dz,Dx,y) in cm",
              m_lowerPad);
+    addParam("alpha", m_alpha, "rotation angle of trigger paddles [deg]", 0.0);
+    addParam("swimBackDistance", m_swimBackDistance,
+             "swim back a muon by this distance", 0.0);
     addParam("startTime", m_startTime, "Start time in nsec (time at upperPad)", 0.0);
     addParam("momentum", m_momentum,
              "Muon Momentum in GeV/c (for mono-energetic muons).", 3.14159);
@@ -247,8 +251,16 @@ namespace Belle2 {
 
       }
     }
+
+    // muon hits on paddels
     TVector3 r1(x1, y1, z1);
     TVector3 r2(x2, y2, z2);
+
+    // rotate paddels
+    TRotation rot;
+    rot.RotateZ(m_alpha * Unit::deg);
+    r1.Transform(rot);
+    r2.Transform(rot);
 
     // generate momentum
     double p = m_momentum; //default momentum
@@ -267,7 +279,14 @@ namespace Belle2 {
 
     // calculate momentum vector
     TVector3 dr = r2 - r1;
-    TVector3 momentum = (p / dr.Mag()) * dr;
+    TVector3 dir = dr.Unit();
+    TVector3 momentum = p * dir;
+
+    // swim back
+    r1 -= m_swimBackDistance * dir;
+    double mass = Const::muon.getMass();
+    double beta = p / sqrt(p * p + mass * mass);
+    double startTime = m_startTime - m_swimBackDistance / beta / Const::speedOfLight;
 
     // create MCParticles data store
     StoreArray<MCParticle> MCParticles;
@@ -280,9 +299,9 @@ namespace Belle2 {
     part->setStatus(MCParticle::c_PrimaryParticle);
     part->addStatus(MCParticle::c_StableInGenerator);
     part->setProductionVertex(r1);
-    part->setProductionTime(m_startTime);
+    part->setProductionTime(startTime);
     part->setMomentum(momentum);
-    double mass = part->getMass();
+    mass = part->getMass();
     double energy = sqrt(p * p + mass * mass);
     part->setEnergy(energy);
 

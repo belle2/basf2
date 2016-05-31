@@ -3,22 +3,20 @@
 
 from basf2 import *
 
-# CRT tests 2016
+# CRT tests 2016 for installed modules
 
-# module position: z = 0 at bar-prism boundary, y = 0 bar central plane.
-
-# specify here the position and sizes of rectangular surfaces cosmic ray has to cross,
-# time when the upper surface is crossed and time resolutions
-# (numbers below are arbitrary!)
+# Trigger paddles' parameters
 # ----------------------------------------------------------------------------------
-# upperPad = [14.7, 0, 25, 30, 37]  # upper trig. paddle: z, x, size_z, size_x, y [cm]
-# lowerPad = [14.7, 0, 25, 25, -63]  # lower trig. paddle: z, x, size_z, size_x, y [cm]
-upperPad = [69.5, 0, 25, 30, 37]  # upper trig. paddle: z, x, size_z, size_x, y [cm]
-lowerPad = [69.5, 0, 25, 25, -63]  # lower trig. paddle: z, x, size_z, size_x, y [cm]
-# upperPad = [242.5, 0, 25, 30, 37]  # upper trig. paddle: z, x, size_z, size_x, y [cm]
-# lowerPad = [242.5, 0, 25, 25, -63]  # lower trig. paddle: z, x, size_z, size_x, y [cm]
-startTime = 0  # time at crossing the upperPad [ns]
+slot = 4  # slot number of the module closest to upper paddle
+z0 = -0.64  # paddles z position [cm]
 sigmaTrig = 2.5  # trigger paddles time resolution [ns]
+
+# note: paddle sizes are enlarged to accomodate for multiple scattering in KLM/ECL
+upperPad = [z0, 0, 50, 30, 93]   # upper trig. paddle: z, x, size_z, size_x, y [cm]
+lowerPad = [z0, 0, 50, 30, -43]  # lower trig. paddle: z, x, size_z, size_x, y [cm]
+alpha = (slot - 4.5) * 360.0 / 16.0  # paddle rotation angle [deg]
+swimBack = 500  # swim back a muon by this distance [cm]
+startTime = 0  # time at crossing the upper paddle [ns]
 # ----------------------------------------------------------------------------------
 
 
@@ -55,31 +53,40 @@ main.add_module(eventinfosetter)
 cosmicgun = register_module('TOPCosmicGun')
 cosmicgun.param('upperPad', upperPad)
 cosmicgun.param('lowerPad', lowerPad)
+cosmicgun.param('alpha', alpha)
+cosmicgun.param('swimBackDistance', swimBack)
 cosmicgun.param('startTime', startTime)
 cosmicgun.param('momentumDistributionType', 'polyline')
 cosmicgun.param('momentumPolyline', polyline)
-# cosmicgun.param('momentumCutOff', 1.0)
+cosmicgun.param('momentumCutOff', 1.5)
 main.add_module(cosmicgun)
 
 # Gearbox
 gearbox = register_module('Gearbox')
-gearbox.param('override', [("/DetectorComponent[@name='TOP']//Nbar", '1', ''),
-                           ("/DetectorComponent[@name='TOP']//Phi0", '-90', 'deg'),
-                           ("/DetectorComponent[@name='TOP']//QZBackward", '0.0', 'cm'),
-                           ("/DetectorComponent[@name='TOP']//Bars/Radius", '-1.0', 'cm'),
-                           ("/DetectorComponent[@name='TOP']//numWindows", '16', ''),
-                           ("/DetectorComponent[@name='TOP']//BrokenJointFraction", '0.0', ''),
-                           ])
+gearbox.param('fileName', 'testbeam/top/CRT2016/TOPinBelle2.xml')
+par = [("/DetectorComponent[@name='TOP']//TDC/numWindows", '16', ''),
+       ("/DetectorComponent[@name='TriggerPaddles']//CRTexp1/psi", str(-alpha), 'deg'),
+       ("/DetectorComponent[@name='TriggerPaddles']//CRTexp1/z", str(z0), 'cm'),
+       ]
+gearbox.param('override', par)
 main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('components', ['TOP'])
+geometry.param('components', ['TOP', 'ECL', 'BKLM', 'TriggerPaddles'])
 main.add_module(geometry)
 
 # Simulation
 simulation = register_module('FullSim')
 main.add_module(simulation)
+
+# Trigger simulation
+trigger = register_module('TOPbeamTrigger')
+trigger.param('detectorIDs', [1, 2])  # upper, lower paddle
+trigger.param('thresholds', [2.0, 2.0])  # in MeV
+main.add_module(trigger)
+emptyPath = create_path()
+trigger.if_false(emptyPath)
 
 # TOP digitization
 TOPdigi = register_module('TOPDigitizer')
@@ -88,7 +95,7 @@ main.add_module(TOPdigi)
 
 # Output
 output = register_module('RootOutput')
-output.param('outputFileName', 'crt2016sim.root')
+output.param('outputFileName', 'crtInstalled2016sim.root')
 main.add_module(output)
 
 # Show progress of processing

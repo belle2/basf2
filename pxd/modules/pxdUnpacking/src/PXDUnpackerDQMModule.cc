@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdDQM/PXDUnpackerDQMModule.h>
+#include <pxd/modules/pxdUnpacking/PXDUnpackerDQMModule.h>
 
 #include "TDirectory.h"
 #include <TAxis.h>

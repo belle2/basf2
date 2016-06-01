@@ -273,6 +273,30 @@ void TrackFitterModule::initialize()
   m_CutExtraPO210->SetPoint(10, 2.267579, 2.03289);
   m_CutExtraPO210->SetPoint(11, -1.855315, 0.1454443);
   m_CutExtraPO210->SetPoint(12, -3.916762, 0.1491452);
+
+
+  m_CutTPC3ExtraPO210 = new TCutG("m_CutTPC3ExtraPO210", 11);
+  m_CutTPC3ExtraPO210->SetPoint(0, -1.144943, 0.4526023);
+  m_CutTPC3ExtraPO210->SetPoint(1, 122.8923, 0.7479061);
+  m_CutTPC3ExtraPO210->SetPoint(2, 294.6363, 1.053053);
+  m_CutTPC3ExtraPO210->SetPoint(3, 641.3046, 1.481244);
+  m_CutTPC3ExtraPO210->SetPoint(4, 895.7401, 1.934043);
+  m_CutTPC3ExtraPO210->SetPoint(5, 1032.499, 2.293329);
+  m_CutTPC3ExtraPO210->SetPoint(6, 1089.747, 2.677224);
+  m_CutTPC3ExtraPO210->SetPoint(7, 1127.912, 3.002058);
+  m_CutTPC3ExtraPO210->SetPoint(8, -4.325386, 3.002058);
+  m_CutTPC3ExtraPO210->SetPoint(9, -1.144943, 0.4624457);
+  m_CutTPC3ExtraPO210->SetPoint(10, -1.144943, 0.4526023);
+
+  m_CutTPC4ExtraPO210 = new TCutG("m_CutTPC4ExtraPO210", 8);
+  m_CutTPC4ExtraPO210->SetPoint(0, -4.325386, 0.4476806);
+  m_CutTPC4ExtraPO210->SetPoint(1, 170.599, 1.018601);
+  m_CutTPC4ExtraPO210->SetPoint(2, 399.5909, 1.599365);
+  m_CutTPC4ExtraPO210->SetPoint(3, 689.0113, 2.342546);
+  m_CutTPC4ExtraPO210->SetPoint(4, 892.5596, 2.992215);
+  m_CutTPC4ExtraPO210->SetPoint(5, -1.144943, 2.997137);
+  m_CutTPC4ExtraPO210->SetPoint(6, -7.50583, 0.4722892);
+  m_CutTPC4ExtraPO210->SetPoint(7, -4.325386, 0.4476806);
 }
 
 void TrackFitterModule::beginRun()
@@ -676,25 +700,28 @@ void TrackFitterModule::event()
         m_partID[1] = 1;
       }
       Bool_t StillAlpha = false;
-      StillAlpha = m_CutExtraPO210->IsInside(m_esum, m_trl);
+      //StillAlpha = m_CutExtraPO210->IsInside(m_esum, m_trl);
       Bool_t IsTopSource = false;
       Bool_t IsBotSource = false;
       if (detNB == 0 || detNB == 3) {
         IsBotSource = m_CutTPC1e4_PO210bot->IsInside(m_impact_y[0], m_phi);
         IsTopSource = m_CutTPC1e4_PO210top->IsInside(m_impact_y[0], m_phi);
+        StillAlpha = m_CutTPC4ExtraPO210->IsInside(m_esum, m_trl);
       } else if (detNB == 1 || detNB == 2) {
         IsBotSource = m_CutTPC2e3_PO210bot->IsInside(m_impact_y[3], m_phi);
         IsTopSource = m_CutTPC2e3_PO210top->IsInside(m_impact_y[3], m_phi);
+        StillAlpha = m_CutTPC3ExtraPO210->IsInside(m_esum, m_trl);
       }
       if (StillAlpha) m_partID[2] = 1;
       if (IsBotSource) m_partID[3] = 1;
       if (IsTopSource) m_partID[4] = 1;
 
       //Bool_t GoodNeutron = false;
-      if (EdgeCuts && fpxhits > 100  && m_esum < 10000. && m_trl < 1.9 && !StillAlpha) {
+      if (EdgeCuts && fpxhits > 10  && m_esum > 10.0 && !StillAlpha) {
         //GoodNeutron = true;
         m_partID[5] = 1;
       }
+
       StoreArray<MicrotpcRecoTrack> RecoTracks;
       RecoTracks.appendNew(i, fpxhits, m_chi2, m_theta, m_phi, m_esum, m_totsum, m_trl, m_time_range, m_parFit, m_parFit_err, m_cov,
                            m_impact_x, m_impact_y, m_side, m_partID);

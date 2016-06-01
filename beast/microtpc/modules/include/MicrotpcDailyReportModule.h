@@ -109,7 +109,7 @@ namespace Belle2 {
       /** TPC temperature */
       TH1F* h_tpc_temperature[4];
       /** Counter */
-      int Ctr[7];
+      int Ctr[8];
     };
 
   }

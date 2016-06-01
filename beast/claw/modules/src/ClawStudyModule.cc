@@ -106,21 +106,20 @@ void ClawStudyModule::event()
   for (int i = 0; i < nSimHits; i++) {
     ClawSimHit* aHit = SimHits[i];
     int detNB = aHit->getCellId();
-    //int trkID = aHit->getTrackId();
-    int pdg = aHit->getPDGCode();
-    double Edep = aHit->getEnergyDep() * 1e3; //GeV -> MeV
-    double tof = aHit->getFlightTime(); //ns
+    if (detNB < 8) {
+      //int trkID = aHit->getTrackId();
+      int pdg = aHit->getPDGCode();
+      double Edep = aHit->getEnergyDep() * 1e3; //GeV -> MeV
+      double tof = aHit->getFlightTime(); //ns
 
-    h_claws_Evtof1[detNB]->Fill(tof, Edep);
-    if (pdg == 22) h_claws_Evtof2[detNB]->Fill(tof, Edep);
-    else if (fabs(pdg) == 11) h_claws_Evtof3[detNB]->Fill(tof, Edep);
-    else h_claws_Evtof4[detNB]->Fill(tof, Edep);
-    if (Edep > m_Ethres)h_claws_edep[detNB]->Fill(Edep);
+      h_claws_Evtof1[detNB]->Fill(tof, Edep);
+      if (pdg == 22) h_claws_Evtof2[detNB]->Fill(tof, Edep);
+      else if (fabs(pdg) == 11) h_claws_Evtof3[detNB]->Fill(tof, Edep);
+      else h_claws_Evtof4[detNB]->Fill(tof, Edep);
+      if (Edep > m_Ethres)h_claws_edep[detNB]->Fill(Edep);
+    }
   }
 
-
-
-  eventNum++;
 }
 
 //read energy threshold from CLAW.xml

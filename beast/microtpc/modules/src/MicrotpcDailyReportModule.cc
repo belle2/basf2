@@ -67,7 +67,7 @@ MicrotpcDailyReportModule::MicrotpcDailyReportModule() : HistoModule()
            "TPC number readout", 3);
   //Date of the report to offset time stamp to zero.
   addParam("inputReportDate", m_inputReportDate, "Date of the report", 20160201);
-  for (int i = 0; i < 7; i++)Ctr[i] = 0;
+  for (int i = 0; i < 8; i++)Ctr[i] = 0;
 }
 
 MicrotpcDailyReportModule::~MicrotpcDailyReportModule()
@@ -87,7 +87,7 @@ void MicrotpcDailyReportModule::defineHisto()
   for (int i = 0; i < 2; i ++) {
     h_tpc_uptime[i] = new TH1F(TString::Format("h_tpc_uptime_%d", i), "", 3, 0., 3.);
   }
-  for (int i = 0; i < 12; i ++) {
+  for (int i = 0; i < 20; i ++) {
     if (i < 7) {
       h_tpc_rate[i] = new TH1F(TString::Format("h_tpc_rate_%d", i), "", 5000, 0., 24.);
       h_tpc_gain[i] = new TH2F(TString::Format("h_tpc_gain_%d", i), "", 1000, 0., 24., 200, 0., 2000.);
@@ -155,6 +155,7 @@ void MicrotpcDailyReportModule::event()
       TimeStamp = MetaHit.getts_start()[0];
       TimeStamp -= TDatime(m_inputReportDate, 0).Convert();
       TimeStamp /= (60. * 60.);
+
       IHER = MetaHit.getIHER();
       ILER = MetaHit.getILER();
       //PHER = MetaHit.getPHER();
@@ -216,6 +217,7 @@ void MicrotpcDailyReportModule::event()
     const float theta = aTrack.gettheta();
     const float trl = aTrack.gettrl();
     const float esum = aTrack.getesum();
+    const int pixnb = aTrack.getpixnb();
     const int time_range = aTrack.gettime_range();
     int side[16];
     for (int j = 0; j < 16; j++) {
@@ -234,12 +236,57 @@ void MicrotpcDailyReportModule::event()
     partID[0] = 1; //[0] for all events
     for (int j = 0; j < 6; j++) partID[j + 1] = aTrack.getpartID()[j];
     h_tpc_uptime[0]->Fill(1);
+    if (EdgeCuts && pixnb > 10. && esum > 10.) {
+      h_tpc_triglength[12]->Fill(time_range);
+      h_tpc_phivtheta[12]->Fill(phi, theta);
+      h_tpc_phivtheta_w[12]->Fill(phi, theta, esum);
+      h_tpc_edepvtrl[12]->Fill(esum, trl);
 
+      h_tpc_triglength[13]->Fill(time_range);
+      h_tpc_phivtheta[13]->Fill(phi, theta);
+      h_tpc_phivtheta_w[13]->Fill(phi, theta, esum);
+      h_tpc_edepvtrl[13]->Fill(esum, trl);
+      Ctr[7]++;
+
+      if (TimeStamp > 19.0 && TimeStamp < 22.0) {
+        h_tpc_triglength[14]->Fill(time_range);
+        h_tpc_phivtheta[14]->Fill(phi, theta);
+        h_tpc_phivtheta_w[14]->Fill(phi, theta, esum);
+        h_tpc_edepvtrl[14]->Fill(esum, trl);
+      }
+      if (TimeStamp > 20.0 && TimeStamp < 23.0) {
+        h_tpc_triglength[15]->Fill(time_range);
+        h_tpc_phivtheta[15]->Fill(phi, theta);
+        h_tpc_phivtheta_w[15]->Fill(phi, theta, esum);
+        h_tpc_edepvtrl[15]->Fill(esum, trl);
+      }
+
+
+      if (TimeStamp > 10.435 && TimeStamp < 12.8383) {
+        h_tpc_triglength[16]->Fill(time_range);
+        h_tpc_phivtheta[16]->Fill(phi, theta);
+        h_tpc_phivtheta_w[16]->Fill(phi, theta, esum);
+        h_tpc_edepvtrl[16]->Fill(esum, trl);
+      }
+      if (TimeStamp > 12.875 && TimeStamp < 15.5193) {
+        h_tpc_triglength[17]->Fill(time_range);
+        h_tpc_phivtheta[17]->Fill(phi, theta);
+        h_tpc_phivtheta_w[17]->Fill(phi, theta, esum);
+        h_tpc_edepvtrl[17]->Fill(esum, trl);
+      }
+      if (TimeStamp > 15.5538 && TimeStamp < 16.0417) {
+        h_tpc_triglength[18]->Fill(time_range);
+        h_tpc_phivtheta[18]->Fill(phi, theta);
+        h_tpc_phivtheta_w[18]->Fill(phi, theta, esum);
+        h_tpc_edepvtrl[18]->Fill(esum, trl);
+      }
+
+    }
     if (TimeStamp > 0.) {
       h_tpc_uptime[1]->Fill(1);
       //h_tpc_uptime[2]->Fill(2, DT);
       for (int j = 0; j < 7; j++) {
-        if (j == 3 && EdgeCuts && (partID[1] == 1 || partID[2] == 1 || partID[4] == 1 || partID[5] == 1 || partID[6] == 1)) partID[j] = 0;
+        if (j == 3 && !EdgeCuts && (partID[1] == 1 || partID[2] == 1 || partID[4] == 1 || partID[5] == 1 || partID[6] == 1)) partID[j] = 0;
         if ((j == 4 || j == 5) && !Asource) partID[j] = 0;
         if (partID[j] == 1) {
           Ctr[j]++;
@@ -346,7 +393,7 @@ void MicrotpcDailyReportModule::terminate()
     }
   }
 
-  for (int i = 0; i < 12; i++) {
+  for (int i = 0; i < 13; i++) {
     h_tpc_triglength[i]->Scale(1. / LifeTime);
     h_tpc_phivtheta[i]->Scale(1. / LifeTime);
     h_tpc_phivtheta_w[i]->Scale(1. / LifeTime);
@@ -370,7 +417,8 @@ void MicrotpcDailyReportModule::terminate()
   cout << "=============== bad calibration alphas and protons measured " << Ctr[3] << endl;
   cout << "=============== good botton calibration alphas measured " << Ctr[4] << endl;
   cout << "=============== good top calibration alphas measured " << Ctr[5] << endl;
-  cout << "=============== neutron candidates measured " << Ctr[6] << endl;
+  cout << "=============== neutron candidates measured tight " << Ctr[6] << endl;
+  cout << "=============== neutron candidates measured loose " << Ctr[7] << endl;
 }
 
 

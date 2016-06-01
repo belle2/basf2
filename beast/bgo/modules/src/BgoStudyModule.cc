@@ -35,6 +35,8 @@
 #include <TFile.h>
 #include <TMath.h>
 
+#include <generators/SAD/dataobjects/SADMetaHit.h>
+
 using namespace std;
 
 using namespace Belle2;
@@ -74,8 +76,10 @@ void BgoStudyModule::defineHisto()
     h_bgos_Evtof4[i] = new TH2F(TString::Format("h_bgos_Evtof4_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
                                 1000., 1000, 0., 400.);
     h_bgos_edep[i] = new TH1F(TString::Format("h_bgos_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
+    h_bgos_edep_test[i] = new TH1F(TString::Format("h_bgos_edep_test_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
   }
-
+  h_bgo_s = new TH1F("h_bgo_s", "", 4000, -200., 200.);
+  h_bgo_s_cut = new TH1F("h_bgo_s_cut", "", 4000, -200., 200.);
 }
 
 
@@ -98,12 +102,25 @@ void BgoStudyModule::event()
 {
   //Here comes the actual event processing
   StoreArray<BgoSimHit>  SimHits;
+  StoreArray<SADMetaHit> SADtruth;
 
   //Skip events with no Hits
   if (SimHits.getEntries() == 0) {
     return;
   }
 
+  int nSAD = SADtruth.getEntries();
+  Bool_t Reject = false;
+  for (int i = 0; i < nSAD; i++) {
+    SADMetaHit* aHit = SADtruth[i];
+    double s = aHit->gets();
+    //double rate = aHit->getrate();
+    h_bgo_s->Fill(-s);
+    if ((-33.0 <= -s && -s <= -30.0) || (19.0 <= -s && -s <= 23.0)) {
+      h_bgo_s_cut->Fill(-s);
+      Reject = true;
+    }
+  }
   int nSimHits = SimHits.getEntries();
 
   //loop over all SimHit entries
@@ -119,7 +136,10 @@ void BgoStudyModule::event()
     if (pdg == 22) h_bgos_Evtof2[detNB]->Fill(tof, Edep);
     else if (fabs(pdg) == 11) h_bgos_Evtof3[detNB]->Fill(tof, Edep);
     else h_bgos_Evtof4[detNB]->Fill(tof, Edep);
-    if (Edep > m_Ethres)h_bgos_edep[detNB]->Fill(Edep);
+    if (Edep > m_Ethres) {
+      h_bgos_edep[detNB]->Fill(Edep);
+      if (!Reject)h_bgos_edep_test[detNB]->Fill(Edep);
+    }
   }
 
 

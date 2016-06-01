@@ -10,6 +10,7 @@
 
 #include <beast/beamabort/modules/BeamabortStudyModule.h>
 #include <beast/beamabort/dataobjects/BeamabortSimHit.h>
+
 #include <beast/beamabort/dataobjects/BeamabortHit.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -35,6 +36,8 @@
 #include <TH3.h>
 #include <TFile.h>
 #include <TMath.h>
+
+#include <generators/SAD/dataobjects/SADMetaHit.h>
 
 using namespace std;
 
@@ -71,12 +74,13 @@ void BeamabortStudyModule::defineHisto()
   for (int i = 0; i < 8; i++) {
     h_dose[i] = new TH1F(TString::Format("h_dose_%d", i), "", 1000, 0., 1000.);
     h_amp[i] = new TH1F(TString::Format("h_amp_%d", i), "", 10000, 0., 10000.);
-    h_Amp[i] = new TH1F(TString::Format("h_Amp_%d", i), "", 100000, 0., 100000.);
-    h_edep[i] = new TH1F(TString::Format("h_edep_%d", i), "", 4000, 0., 4000.);
     h_time[i] = new TH1F(TString::Format("h_time_%d", i), "", 1000, 0., 100.);
     h_vtime[i] = new TH1F(TString::Format("h_vtime_%d", i), "", 1000, 0., 100.);
+    h_Amp[i] = new TH1F(TString::Format("h_Amp_%d", i), "", 100000, 0., 100000.);
+    h_edep[i] = new TH1F(TString::Format("h_edep_%d", i), "", 4000, 0., 4000.);
   }
-
+  h_s = new TH1F("h_s", "", 4000, -200., 200.);
+  h_s_cut = new TH1F("h_s_cut", "", 4000, -200., 200.);
 }
 
 
@@ -98,44 +102,60 @@ void BeamabortStudyModule::beginRun()
 void BeamabortStudyModule::event()
 {
   //Here comes the actual event processing
-  double curr[10];
-  double Edep[10];
-  for (int i = 0; i < 10; i++) {
+  double curr[8];
+  double Edep[8];
+  for (int i = 0; i < 8; i++) {
     curr[i] = 0;
     Edep[i] = 0;
   }
   StoreArray<BeamabortSimHit> SimHits;
+  StoreArray<SADMetaHit> SADtruth;
 
   //Skip events with no Hits
   if (SimHits.getEntries() == 0) {
     return;
   }
 
+  int nSAD = SADtruth.getEntries();
+  Bool_t Reject = false;
+  for (int i = 0; i < nSAD; i++) {
+    SADMetaHit* aHit = SADtruth[i];
+    double s = aHit->gets();
+    double rate = aHit->getrate();
+    h_s->Fill(-s);
+    if ((-33.0 <= -s && -s <= -30.0) || (19.0 <= -s && -s <= 23.0)) {
+      h_s_cut->Fill(-s);
+      Reject = true;
+    }
+  }
   int nSimHits = SimHits.getEntries();
-
+  //if(!Reject) {
   for (int i = 0; i < nSimHits; i++) {
     BeamabortSimHit* aHit = SimHits[i];
     int detNb = aHit->getCellId();
-    double edep = aHit->getEnergyDep();
-    double time = aHit->getFlightTime();
-    double meanEl = edep / m_WorkFunction * 1e9; //GeV to eV
-    double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
-    int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
-    double Amp = NbEle / (6.25 * 1e18); // A x s
-    Edep[i] += edep;
-    curr[i] += Amp;
-    h_dose[detNb]->Fill(edep * 1e6); //GeV to keV
-    h_amp[detNb]->Fill(Amp * 1e15); //A x s -> mA x s
-    h_time[detNb]->Fill(time);
-    h_vtime[detNb]->Fill(time, Amp * 1e15);
+    if (detNb < 8) {
+      double edep = aHit->getEnergyDep();
+      double time = aHit->getFlightTime();
+      double meanEl = edep / m_WorkFunction * 1e9; //GeV to eV
+      double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
+      int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
+      double Amp = NbEle / (6.25 * 1e18); // A x s
+      Edep[detNb] += edep;
+      curr[detNb] += Amp;
+      h_dose[detNb]->Fill(edep * 1e6); //GeV to keV
+      h_amp[detNb]->Fill(Amp * 1e15); //A x s -> mA x s
+      h_time[detNb]->Fill(time);
+      h_vtime[detNb]->Fill(time, Amp * 1e15);
+    }
   }
+
   for (int i = 0; i < 8; i++) {
     if (curr[i] > 0 && Edep[i] > 0) {
-      //cout << " Nb el " << curr[i]*1e15 << " edep " << Edep[i]*1e6 << endl;
       h_Amp[i]->Fill(curr[i] * 1e15);
       h_edep[i]->Fill(Edep[i] * 1e6);
     }
   }
+  //}
 }
 //read tube centers, impulse response, and garfield drift data filename from BEAMABORT.xml
 void BeamabortStudyModule::getXMLData()

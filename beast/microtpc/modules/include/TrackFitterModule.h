@@ -249,6 +249,10 @@ namespace Belle2 {
       TCutG* m_CutTPC2e3_PO210bot;
       /** Cut extra PO210*/
       TCutG* m_CutExtraPO210;
+      /** Cut TPC3 extra PO210*/
+      TCutG* m_CutTPC3ExtraPO210;
+      /** Cut TPC4 extra PO210*/
+      TCutG* m_CutTPC4ExtraPO210;
       /** Raw particle ID */
       int m_partID[6];
     };

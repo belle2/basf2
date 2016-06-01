@@ -91,6 +91,11 @@ namespace Belle2 {
       TH1F* h_time[100];
       /** histo time weighted by volt */
       TH1F* h_vtime[100];
+      /** */
+      TH1F* h_s;
+      /** */
+      TH1F* h_s_cut;
+
     };
 
   }

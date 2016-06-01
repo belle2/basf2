@@ -116,32 +116,36 @@ void PindiodeStudyModule::event()
   for (int i = 0; i < nSimHits; i++) {
     PindiodeSimHit* aHit = SimHits[i];
     int detNb = aHit->getCellId();
-    double edep = aHit->getEnergyDep();
-    double time = aHit->getFlightTime();
-    //int PDG = aHit->getPDGCode();
-    const double meanEl = edep / m_WorkFunction * 1e9; //GeV to eV
-    const double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
-    const int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
-    double volt = NbEle * 1.602176565e-19 * m_CrematGain * 1e12; // volt
-    h_dose1[detNb]->Fill(edep * 1e6); //GeV to keV
-    if ((edep * 1e9) > m_WorkFunction) {
-      h_dose2[detNb]->Fill(edep * 1e6); //GeV to keV
-      h_volt[detNb]->Fill(volt * 1e3); //V to mV
-      h_time[detNb]->Fill(time);
-      h_vtime[detNb]->Fill(time, volt);
+    if (detNb < 64) {
+      double edep = aHit->getEnergyDep();
+      double time = aHit->getFlightTime();
+      //int PDG = aHit->getPDGCode();
+      const double meanEl = edep / m_WorkFunction * 1e9; //GeV to eV
+      const double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
+      const int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
+      double volt = NbEle * 1.602176565e-19 * m_CrematGain * 1e12; // volt
+      h_dose1[detNb]->Fill(edep * 1e6); //GeV to keV
+      if ((edep * 1e9) > m_WorkFunction) {
+        h_dose2[detNb]->Fill(edep * 1e6); //GeV to keV
+        h_volt[detNb]->Fill(volt * 1e3); //V to mV
+        h_time[detNb]->Fill(time);
+        h_vtime[detNb]->Fill(time, volt);
+      }
     }
   }
   int nHits = Hits.getEntries();
   for (int i = 0; i < nHits; i++) {
     PindiodeHit* aHit = Hits[i];
     int detNb = aHit->getdetNb();
-    double edep = aHit->getedep();
-    double volt = aHit->getV();
-    double time = aHit->gettime();
-    h_idose[detNb]->Fill(edep * 1e6); //GeV to keV
-    h_ivolt[detNb]->Fill(volt * 1e3); //V to mV
-    h_itime[detNb]->Fill(time);
-    h_ivtime[detNb]->Fill(time, volt);
+    if (detNb < 64) {
+      double edep = aHit->getedep();
+      double volt = aHit->getV();
+      double time = aHit->gettime();
+      h_idose[detNb]->Fill(edep * 1e6); //GeV to keV
+      h_ivolt[detNb]->Fill(volt * 1e3); //V to mV
+      h_itime[detNb]->Fill(time);
+      h_ivtime[detNb]->Fill(time, volt);
+    }
   }
 
 

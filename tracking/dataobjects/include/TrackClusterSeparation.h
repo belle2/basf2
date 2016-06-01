@@ -35,8 +35,17 @@ namespace Belle2 {
     //! @return separation direction between track and KLM cluster
     G4ThreeVector getDirection() const { return m_Direction; }
 
-    //! @return angle between separation direction and track momentum
-    double getTrackAngle() const { return m_TrackAngle; }
+    //! @return angle between track-cluster direction and track momentum at the POCA
+    double getTrackClusterAngle() const { return m_TrackClusterAngle; }
+
+    //! @return angle between cluster direction and track's initial momentum
+    double getTrackClusterInitialSeparationAngle() const { return m_TrackClusterInitialSeparationAngle; }
+
+    //! @return angle between cluster direction and track's momentum at the POCA
+    double getTrackClusterSeparationAngle() const { return m_TrackClusterSeparationAngle; }
+
+    //! @return angle between track's momentum at the origin and at the POCA
+    double getTrackRotationAngle() const { return m_TrackRotationAngle; }
 
     //! set track index for track that is nearest the KLM cluster
     void setTrackIndex(int t) { m_TrackIndex = t; }
@@ -47,8 +56,17 @@ namespace Belle2 {
     //! set separation direction between track and KLM cluster
     void setDirection(G4ThreeVector dir) { m_Direction = dir; }
 
-    //! set angle between separation direction and track momentum
-    void setTrackAngle(double angle) { m_TrackAngle = angle; }
+    //! set angle between track-cluster direction and track momentum at the POCA
+    void setTrackClusterAngle(double angle) { m_TrackClusterAngle = angle; }
+
+    //! set angle between cluster direction and track's initial momentum
+    void setTrackClusterInitialSeparationAngle(double angle) { m_TrackClusterInitialSeparationAngle = angle; }
+
+    //! set angle between cluster direction and track's momentum at the POCA
+    void setTrackClusterSeparationAngle(double angle) { m_TrackClusterSeparationAngle = angle; }
+
+    //! set angle between track's momentum at the origin and at the POCA
+    void setTrackRotationAngle(double angle) { m_TrackRotationAngle = angle; }
 
   private:
 
@@ -61,11 +79,20 @@ namespace Belle2 {
     //! direction between the track's nearest position and KLM cluster
     G4ThreeVector m_Direction;
 
-    //! angle between the track's momentum and the track-to-cluster direction
-    double m_TrackAngle;
+    //! angle between the track's momentum at the POCA and the track-to-cluster direction (nominally pi/2)
+    double m_TrackClusterAngle;
+
+    //! angle between the track's momentum at the origin and the cluster direction
+    double m_TrackClusterInitialSeparationAngle;
+
+    //! angle between the track's momentum at the POCA and the cluster direction
+    double m_TrackClusterSeparationAngle;
+
+    //! angle between the track's momentum at the origin and at the POCA
+    double m_TrackRotationAngle;
 
     //! Needed to make the ROOT object storable
-    ClassDef(TrackClusterSeparation, 1)
+    ClassDef(TrackClusterSeparation, 2)
 
   };
 }

@@ -17,7 +17,10 @@ TrackClusterSeparation::TrackClusterSeparation() :
   m_TrackIndex(0),
   m_Distance(1.0E10), // "infinity"
   m_Direction(0.0, 0.0, 1.0), // "parallel to z axis"
-  m_TrackAngle(0.0)
+  m_TrackClusterAngle(0.0),
+  m_TrackClusterInitialSeparationAngle(0.0),
+  m_TrackClusterSeparationAngle(0.0),
+  m_TrackRotationAngle(0.0)
 {
 }
 

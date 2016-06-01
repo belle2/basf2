@@ -364,10 +364,7 @@ void MuidModule::event()
   StoreArray<KLMCluster> klmClusters(m_KLMClustersColName);
   StoreArray<TrackClusterSeparation> trackClusterSeparations(m_TrackClusterSeparationsColName);
 
-  G4Point3D position;
-  G4Vector3D momentum;
-  G4ErrorTrajErr covG4e(5, 0);
-
+  // one-to-one indexing correlation among clusterPositions, klmClusters, and trackClusterSeparations
   std::vector<G4ThreeVector> clusterPositions;
   for (int c = 0; c < klmClusters.getEntries(); ++c) {
     TrackClusterSeparation* klmClustDist = trackClusterSeparations.appendNew(); // initializes to HUGE distance
@@ -405,7 +402,11 @@ void MuidModule::event()
 
       pdgCode *= int(gfTrack->getFittedState().getCharge());
       muid->setPDGCode(pdgCode);
-      getStartPoint(gfTrack, pdgCode, position, momentum, covG4e);
+      G4ThreeVector ipPos, ipDir;
+      G4Point3D position;
+      G4Vector3D momentum;
+      G4ErrorTrajErr covG4e(5, 0);
+      getStartPoint(gfTrack, pdgCode, ipPos, ipDir, position, momentum, covG4e);
       muid->setMomentum(momentum.x(), momentum.y(), momentum.z());
       if (momentum.perp() <= m_MinPt) continue;
       if (m_Target->GetDistanceFromPoint(position) < 0.0) continue;
@@ -418,11 +419,11 @@ void MuidModule::event()
       m_ExtMgr->InitTrackPropagation();
       while (true) {
 
-        const G4int    errCode    = m_ExtMgr->PropagateOneStep(state);
-        G4Track*       track      = state->GetG4Track();
-        const G4Step*  step       = track->GetStep();
-        const G4int    preStatus  = step->GetPreStepPoint()->GetStepStatus();
-        const G4int    postStatus = step->GetPostStepPoint()->GetStepStatus();
+        const G4int   errCode    = m_ExtMgr->PropagateOneStep(state);
+        G4Track*      track      = state->GetG4Track();
+        const G4Step* step       = track->GetStep();
+        const G4int   preStatus  = step->GetPreStepPoint()->GetStepStatus();
+        const G4int   postStatus = step->GetPostStepPoint()->GetStepStatus();
         G4ThreeVector pos = track->GetPosition();
         G4ThreeVector mom = track->GetMomentum();
         // Ignore the zero-length step by PropagateOneStep() at each boundary
@@ -446,7 +447,10 @@ void MuidModule::event()
               trackClusterSeparations[c]->setDistance(distance);
               G4ThreeVector dir(clusterToTrack.unit());
               trackClusterSeparations[c]->setDirection(dir);
-              trackClusterSeparations[c]->setTrackAngle(acos(dir * mom.unit()));
+              trackClusterSeparations[c]->setTrackClusterAngle(mom.angle(dir));
+              trackClusterSeparations[c]->setTrackClusterInitialSeparationAngle(clusterPositions[c].angle(ipDir));
+              trackClusterSeparations[c]->setTrackClusterSeparationAngle(clusterPositions[c].angle(mom));
+              trackClusterSeparations[c]->setTrackRotationAngle(mom.angle(ipDir));
             }
           }
         }
@@ -547,7 +551,7 @@ void MuidModule::registerVolumes()
 
 }
 
-void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
+void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode, G4ThreeVector& ipPos, G4ThreeVector& ipDir,
                                G4Point3D& position, G4Vector3D& momentum, G4ErrorTrajErr& covG4e)
 {
 
@@ -593,6 +597,8 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
         ipDirection.SetY(-cos(pocaPhi) * ipPerp);
       }
       // or, approximately, ipPosition=(0,0,0) and ipDirection=(?,?,firstDirection.Z())
+    } else {
+      ipPosition -= (firstPosition * firstDirection) * firstDirection;
     }
     firstLast = false;
     const genfit::TrackPoint* lastPoint = gfTrack->getPointWithMeasurementAndFitterInfo(-1, gfTrackRep);
@@ -623,6 +629,12 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
     // time of flight from I.P. (ns) at the last point on the Genfit track
     m_TOF = pathLength * (sqrt(lastMomMag * lastMomMag + mass * mass) / (lastMomMag * CLHEP::c_light / (CLHEP::cm / CLHEP::ns)));
 
+    ipPos.setX(ipPosition.X() * CLHEP::cm); // in Geant4 units (mm)
+    ipPos.setY(ipPosition.Y() * CLHEP::cm);
+    ipPos.setZ(ipPosition.Z() * CLHEP::cm);
+    ipDir.setX(ipDirection.X());
+    ipDir.setY(ipDirection.Y());
+    ipDir.setZ(ipDirection.Z());
     fromPhasespaceToG4e(lastMomentum, lastCov, covG4e); // covG4e in Geant4e units (GeV/c, cm)
     position.setX(lastPosition.X() * CLHEP::cm); // in Geant4 units (mm)
     position.setY(lastPosition.Y() * CLHEP::cm);

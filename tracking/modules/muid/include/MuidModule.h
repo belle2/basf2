@@ -18,6 +18,7 @@
 #include <simulation/kernel/ExtManager.h>
 #include <simulation/kernel/ExtCylSurfaceTarget.h>
 #include <bklm/geometry/GeometryPar.h>
+#include <G4ThreeVector.hh>
 #include <G4Point3D.hh>
 #include <G4Vector3D.hh>
 #include <G4ErrorTrajErr.hh>
@@ -172,7 +173,7 @@ namespace Belle2 {
     void getVolumeID(const G4TouchableHandle&, Const::EDetector&, int&);
 
     //! Get the starting phase-space point and covariance for one reconstructed track and PDG hypothesis
-    void getStartPoint(const genfit::Track*, int, G4Point3D&, G4Vector3D&, G4ErrorTrajErr&);
+    void getStartPoint(const genfit::Track*, int, G4ThreeVector&, G4ThreeVector&, G4Point3D&, G4Vector3D&, G4ErrorTrajErr&);
 
     //! Add an extrapolation point for the track
     bool createHit(G4ErrorFreeTrajState*, Track*, int);

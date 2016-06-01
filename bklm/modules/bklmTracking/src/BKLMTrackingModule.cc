@@ -21,7 +21,7 @@ REG_MODULE(BKLMTracking)
 
 BKLMTrackingModule::BKLMTrackingModule() : Module()
 {
-  setDescription("perform standard-alone staight line trking for BKLM");
+  setDescription("perform standard-alone straight line tracking for BKLM");
   addParam("MeanDt", m_MeanDt, "[ns] Mean hit-trigger time for coincident hits (default 0)", double(0.0));
   addParam("MaxDt", m_MaxDt, "[ns] Coincidence window half-width for in-time KLM hits (default +-30)", double(30.0));
 }
@@ -61,7 +61,7 @@ void BKLMTrackingModule::event()
   BKLMTrackFinder*  m_finder = new BKLMTrackFinder();
   m_finder->registerFitter(m_fitter);
 
-  if (hits2D.getEntries() < 1) return;
+  //if (hits2D.getEntries() < 1) return;
 
   for (int hi = 0; hi < hits2D.getEntries(); ++hi) {
 
@@ -119,6 +119,9 @@ void BKLMTrackingModule::event()
       }
     }
   }
+
+  delete m_fitter;
+  delete m_finder;
 
 }
 

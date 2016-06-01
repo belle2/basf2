@@ -1054,9 +1054,9 @@ void ECLDataAnalysisModule::event()
     m_eclShowerTheta->push_back(aECLshowers->getTheta());
     m_eclShowerPhi->push_back(aECLshowers->getPhi());
     m_eclShowerR->push_back(aECLshowers->getR());
-    m_eclShowerNHits->push_back(aECLshowers->getNHits());
+    m_eclShowerNHits->push_back(aECLshowers->getNofCrystals());
     m_eclShowerE9oE25->push_back(aECLshowers->getE9oE25());
-    m_eclShowerUncEnergy->push_back(aECLshowers->getUncEnergy());
+    m_eclShowerUncEnergy->push_back(aECLshowers->getEnedepSum());
 
     if (aECLshowers->getRelated<MCParticle>() != (nullptr)) {
       const MCParticle* mc_shower = aECLshowers->getRelated<MCParticle>();

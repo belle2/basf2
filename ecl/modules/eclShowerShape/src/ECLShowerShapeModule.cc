@@ -82,7 +82,7 @@ double ECLShowerShapeModule::computeLateralEnergy(const ECLShower& shower) const
 {
 
   auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
-  if (shower.getNHits() < 3) return 0;
+  if (shower.getNofCrystals() < 3.0) return 0;
 
   // Find the two digits with the maximum energy
   double maxEnergy(0), secondMaxEnergy(0);

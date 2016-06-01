@@ -90,7 +90,7 @@ void ECLElectronIdModule::event()
         trkdepth = eclShower.getTrkDepth();
         shdepth = eclShower.getShowerDepth();
       }
-      nCrystals += int(eclShower.getNHits());
+      nCrystals += int(eclShower.getNofCrystals());
     }
 
     float likelihoods[Const::ChargedStable::c_SetSize];

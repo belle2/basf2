@@ -27,6 +27,9 @@
 // MDST
 #include <mdst/dataobjects/ECLCluster.h>
 
+// OTHER
+#include <ecl/utility/ECLShowerId.h>
+
 // ROOT
 #include <TVector3.h>
 #include <TMatrixFSym.h>
@@ -123,11 +126,9 @@ void ECLFinalizerModule::event()
       eclCluster->setPhi(eclShower.getPhi());
       eclCluster->setR(eclShower.getR());
 
-      eclCluster->setEnedepSum(eclShower.getUncEnergy()); // abuses UncEnergy from the Belle CF in the old code (TF)
-      eclCluster->setNofCrystals(eclShower.getNHits());
-      eclCluster->setHighestE(
-        eclShower.getHighestEnergy()); // not available from original ECLShower, need to update ECLShower (or work around)
-
+      eclCluster->setEnedepSum(eclShower.getEnedepSum());
+      eclCluster->setNofCrystals((int) eclShower.getNofCrystals());
+      eclCluster->setHighestE(eclShower.getHighestEnergy());
       double Mdst_Error[6] = {
         eclShower.getEnergyError(),
         0,
@@ -138,8 +139,11 @@ void ECLFinalizerModule::event()
       };
       eclCluster->setError(Mdst_Error);
 
-      // ECLCluster has no "ID"-like structure, abuse the unused "CrystHealth" (TF)
-      eclCluster->setCrystHealth(eclShower.getUniqueShowerId());
+      // ECLCluster has no "ID"-like structures yet, use the unused "CrystHealth" until we fix the mdst object
+      /** Utility unpacker of the shower id that contains CR, seed and hypothesis */
+      ECLShowerId SUtility;
+      int uniqueid = SUtility.getShowerId(eclShower.getConnectedRegionId(), eclShower.getHypothesisId(), eclShower.getShowerId());
+      eclCluster->setCrystHealth(uniqueid);
 
       // set shower shapes variables
       eclCluster->setLAT(eclShower.getLateralEnergy());

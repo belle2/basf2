@@ -3,8 +3,9 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen                                              *
+ * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
  *               Guglielmo De Nardo (denardo@na.infn.it)                  *
+ *               Poyuan Chen                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,213 +20,327 @@
 
 namespace Belle2 {
 
-  /*! Class to store ECL Showers which are reconstructed from ECLDigit as Belle method
-   * relation to ECLDigit
-   * filled in ecl/modules/eclRecShower/src/ECLReconstructorModule.cc
+  /*! Class to store ECL Showers
    */
 
   class ECLShower : public RelationsObject {
   public:
-    /** default constructor for ROOT */
+
+    /** The status information for the ECLShowers. */
+    enum StatusBit {
+      /** bit 0:  Dead crystal within nominal shower neighbour region.  */
+      c_HasDeadCrystal = 1 << 0,
+
+      /** bit 1:  Hot crystal within nominal shower neighbour region.  */
+      c_HasHotCrystal = 2 << 0,
+
+      /** combined flag to test whether the shower is problematic */
+      c_HasProblematicCrystal = c_HasDeadCrystal | c_HasHotCrystal,
+    };
+
+    /** Default constructor for ROOT */
     ECLShower()
     {
-      m_ShowerId = 0;      /**< Shower ID */
-      m_Energy = 0;      /**< Energy (GeV) */
-      m_Theta = 0;       /**< Theta (rad) */
-      m_Phi = 0;         /**< Phi (rad) */
-      m_R = 0;           /**< R inherit from Belle */
-      m_Error[0] = 0;    /**< Error of Energy, Theta and Phi */
-      m_Error[1] = 0;    /**< Error of Energy, Theta and Phi */
-      m_Error[2] = 0;    /**< Error of Energy, Theta and Phi */
-      m_Mass = 0;        /**< Mass, inherit from Belle */
-      m_Width = 0;       /**< Width, inherit from Belle */
-      m_E9oE25 = 0;      /**< E9oE25, inherit from Belle */
-      m_E9oE25unf = 0;   /**< E9oE25unf, inherit from Belle */
-      m_NHits = 0;       /**< NHits, inherit from Belle */
-      m_Status = 0;        /**< Status, inherit from Belle */
-      m_Grade = 0;         /**< Grade, inherit from Belle */
-      m_UncEnergy = 0;   /**< UncEnergy, inherit from Belle */
-      m_Time = 0;        /**< Time, new parameter for Belle2, wait for more stude */
+      m_isTrk = false;         /**< Match with track */
+      m_Status = 0;            /**< Status (e.g. shower contains one hot crystal) */
+      m_ShowerId = 0;          /**< Shower ID */
+      m_connectedRegionId = 0; /**< Connected Region ID */
+      m_hypothesisId = 0;      /**< Hypothesis ID */
+      m_Energy = 0.0;          /**< Energy (GeV) */
+      m_EnedepSum = 0.0;       /**< Raw Energy Sum (GeV) */
+      m_Theta = 0.0;           /**< Theta (rad) */
+      m_Phi = 0.0;             /**< Phi (rad) */
+      m_R = 0.0;               /**< R (cm) */
+      m_Error[0] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
+      m_Error[1] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
+      m_Error[2] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
+      m_Error[3] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
+      m_Error[4] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
+      m_Error[5] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
+      m_Time = 0;              /**< Time */
+      m_timeResolution = 0;    /**< Time resolution */
+      m_HighestEnergy = 0.0;   /**< Highest energy in Shower*/
+      m_lateralEnergy = 0.0;   /**< Lateral Energy  */
+      m_minTrkDistance = 0.0;  /**< Distance between shower and closest track  */
+      m_trkDepth = 0.0;        /**< Path on track extrapolation to POCA to average cluster direction   */
+      m_showerDepth = 0.0;     /**< Same as above, but on the cluster average direction */
+      m_NofCrystals = 0.0;     /**< Sum of weights of crystals (~number of crystals) */
+      m_zernike20 = 0.0;       /**< Shower shape variable, Zernike Moment 20 */
+      m_zernike40 = 0.0;       /**< Shower shape variable, Zernike Moment 40 */
+      m_zernike42 = 0.0;       /**< Shower shape variable, Zernike Moment 42 */
+      m_zernike51 = 0.0;       /**< Shower shape variable, Zernike Moment 51 */
+      m_zernike53 = 0.0;       /**< Shower shape variable, Zernike Moment 53 */
+      m_secondMoment = 0.0;    /**< Shower shape variable, second moment (needed for merged pi0) */
+      m_E1oE9 = 0.0;           /**< Shower shape variable, E1oE9 */
+      m_E9oE25 = 0;            /**< Shower shape variable, E9oE25 */
 
-      m_UniqueShowerId = 0; /**< Unique Shower ID (TF) */
-      m_HighestEnergy = 0.0; /**< Highest energy in Shower (TF) */
-      m_lateralEnergy = 0.0; /**< Lateral Energy  */
-      m_minTrkDistance = 0.0; /**< Distance between shower and closest track  */
-      m_trkDepth = 0.0; /**< path on track extrapolation to POCA to average cluster direction   */
-      m_showerDepth = 0.0; /**< same as above, but on the cluster average direction*/
-      m_isTrk = false; /**< Match with track  */
     }
 
+    /*! Set Match with Track
+     */
+    void setIsTrack(bool val) { m_isTrk = val; }
+
+    /*! Set Status
+     */
+    void setStatus(int Status) { m_Status = Status; }
 
     /*! Set Shower ID
      */
     void setShowerId(int ShowerId) { m_ShowerId = ShowerId; }
+
+    /*! Set Connected region ID
+     */
+    void setConnectedRegionId(int connectedRegionId) { m_connectedRegionId = connectedRegionId; }
+
+    /*! Set Hypothesis identifier
+     */
+    void setHypothesisId(int hypothesisId) { m_hypothesisId = hypothesisId; }
+
     /*! Set Energy
      */
-    void setEnergy(float Energy) { m_Energy = Energy; }
+    void setEnergy(double Energy) { m_Energy = Energy; }
+
+    /*! Set Raw Energy Sum
+     */
+    void setEnedepsum(double EnergySum) { m_EnedepSum = EnergySum; }
+
     /*! Set Theta (rad)
      */
-    void setTheta(float Theta) { m_Theta = Theta; }
+    void setTheta(double Theta) { m_Theta = Theta; }
+
     /*! Set Phi (rad)
      */
-    void setPhi(float Phi) { m_Phi = Phi; }
+    void setPhi(double Phi) { m_Phi = Phi; }
+
     /*! Set R
      */
-    void setR(float R) { m_R = R; }
-    /*! Set  Error of E, theta, phi
+    void setR(double R) { m_R = R; }
+
+    /*! Set symmetric Error Array(3x3)  for
+            [0]->Error on Energy
+            [2]->Error on Phi
+            [5]->Error on Theta
      */
-    void setError(float  ErrorArray[3]) { for (int i = 0; i < 3; i++) { m_Error[i] = ErrorArray[i];} }
-    /*! Set Mass
-     */
-    void setMass(float Mass) { m_Mass = Mass; }
-    /*! Set Width
-     */
-    void setWidth(float Width) { m_Width = Width; }
-    /*! Set E9oE25
-     */
-    void setE9oE25(float E9oE25) { m_E9oE25 = E9oE25; }
-    /*! Set E9oE25unf
-     */
-    void setE9oE25unf(float E9oE25unf) { m_E9oE25unf = E9oE25unf; }
-    /*! Set NHits
-     */
-    void setNHits(float NHits) { m_NHits = NHits; }
-    /*! Set Status
-     */
-    void setStatus(int Status) { m_Status = Status; }
-    /*! Set Grade
-     */
-    void setGrade(int Grade) { m_Grade = Grade ; }
-    /*! Set UncEnergy
-     */
-    void setUncEnergy(float UncEnergy) { m_UncEnergy = UncEnergy; }
+    void setError(double ErrorArray[6]) { for (unsigned int i = 0; i < 6; i++) { m_Error[i] = ErrorArray[i];} }
+
     /*! Set Time
      */
-    void setTime(float Time) { m_Time = Time; }
-    /*! Set Unique Shower ID (TF)
+    void setTime(double Time) { m_Time = Time; }
+
+    /*! Set Time Resolution
      */
-    void setUniqueShowerId(int UniqueShowerId) { m_UniqueShowerId = UniqueShowerId; }
+    void setTimeResolution(double TimeReso) { m_timeResolution = TimeReso; }
+
     /*! Set Highest Energy (TF)
      */
-    void setHighestEnergy(float HighestEnergy) { m_HighestEnergy = HighestEnergy; }
+    void setHighestEnergy(double HighestEnergy) { m_HighestEnergy = HighestEnergy; }
+
     /*! Set Lateral Energy
      */
-    void setLateralEnergy(float lateralEnergy) { m_lateralEnergy = lateralEnergy; }
+    void setLateralEnergy(double lateralEnergy) { m_lateralEnergy = lateralEnergy; }
+
     /*! Set Distance to closest track
      */
-    void setMinTrkDistance(float dist) { m_minTrkDistance = dist; }
-    /*! Set Match with Track
+    void setMinTrkDistance(double dist) { m_minTrkDistance = dist; }
+
+    /*! Set path on track extrapolation line to POCA to average cluster direction
      */
-    void setIsTrack(bool val) { m_isTrk = val; }
-    /*! set path on track extrapolation line to POCA to average cluster direction */
-    void setTrkDepth(float trkDepth) { m_trkDepth = trkDepth; }
-    /*! set path on the average cluster direction */
-    void setShowerDepth(float showerDepth) { m_showerDepth = showerDepth; }
+    void setTrkDepth(double trkDepth) { m_trkDepth = trkDepth; }
+
+    /*! Set path on the average cluster direction
+     */
+    void setShowerDepth(double showerDepth) { m_showerDepth = showerDepth; }
+
+    /*! Set sum of weights of crystals
+     */
+    void setNofCrystals(double nofCrystals) { m_NofCrystals = nofCrystals; }
+
+    /*! Set Zernike moment 20
+     */
+    void setZernike20(double zernike20) { m_zernike20 = zernike20; }
+
+    /*! Set Zernike moment 40
+     */
+    void setZernike40(double zernike40) { m_zernike40 = zernike40; }
+
+    /*! Set Zernike moment 42
+     */
+    void setZernike42(double zernike42) { m_zernike42 = zernike42; }
+
+    /*! Set Zernike moment 51
+     */
+    void setZernike51(double zernike51) { m_zernike51 = zernike51; }
+
+    /*! Set Zernike moment 53
+     */
+    void setZernike53(double zernike53) { m_zernike53 = zernike53; }
+
+    /*! Set second moment
+     */
+    void setSecondMoment(double secondMoment) { m_secondMoment = secondMoment; }
+
+    /*! Set energy ration E1 over E9
+     */
+    void setE1oE9(double E1oE9) { m_E1oE9 = E1oE9; }
+
+    /*! Set energy ration E9 over E25
+     */
+    void setE9oE25(double E9oE25) { m_E9oE25 = E9oE25; }
+
+    /*! Get if matched with a Track
+     * @return flag for track Matching
+     */
+    bool getIsTrack() const { return m_isTrk; }
+
+    /*! Get Status
+     * @return Status
+     */
+    int getStatus() const { return m_Status; }
 
     /*! Get Shower Id
      * @return Shower Id
      */
     int getShowerId() const { return m_ShowerId; }
+
+    /*! Get Connected region Id
+     * @return Connected region Id
+     */
+    int getConnectedRegionId() const { return m_connectedRegionId; }
+
+    /*! Get Hypothesis Id
+     * @return Hypothesis Id
+     */
+    int getHypothesisId() const { return m_hypothesisId; }
+
     /*! Get Energy
      * @return Energy
      */
-    float getEnergy() const { return m_Energy; }
+    double getEnergy() const { return m_Energy; }
+
+    /*! Get Energy Sum
+     * @return Energy Sum
+     */
+    double getEnedepSum() const { return m_EnedepSum; }
+
     /*! Get Theta
      * @return Theta
      */
-    float getTheta() const { return m_Theta; }
+    double getTheta() const { return m_Theta; }
+
     /*! Get Phi
      * @return Phi
      */
-    float getPhi() const { return m_Phi; }
+    double getPhi() const { return m_Phi; }
+
     /*! Get R
      * @return R
      */
-    float getR() const { return m_R; }
-    /*! Get Error of E, theta, phi
-     * @return Error E, theta, phi
+    double getR() const { return m_R; }
+
+    /*! Get Error Array for Energy->[0], Phi->[2], Theta->[5]
+     * @return Error Array for Energy->[0], Phi->[2], Theta->[5]
      */
-    void getError(float  ErrorArray[3]) const { for (int i = 0; i < 3; i++) { ErrorArray[i] = m_Error[i]; } }
+    void getError(double  ErrorArray[6]) const
+    {
+      for (unsigned int i = 0; i < 6; i++) {
+        ErrorArray[i] = m_Error[i];
+      }
+    }
+
     /*! Get Error of Energy
      * @return Error of Energy
      */
-    float getEnergyError() const { return m_Error[0];}
+    double getEnergyError() const { return m_Error[0];}
+
     /*! Get Error of theta
      * @return Error of theta
      */
-    float getThetaError() const { return  m_Error[1];}
+    double getThetaError() const { return  m_Error[5];}
+
     /*! Get Error of phi
      * @return Error of phi
      */
-    float getPhiError() const {return m_Error[2];}
-    /*! Get Mass
-     * @return Mass
-     */
-    float getMass() const { return m_Mass; }
-    /*! Get Width
-     * @return Width
-     */
-    float getWidth() const { return m_Width; }
-    /*! Get E9oE25
-     * @return E9oE25
-     */
-    float getE9oE25() const { return m_E9oE25; }
-    /*! Get E9oE25unf
-     * @return E9oE25unf
-     */
-    float getE9oE25unf() const { return m_E9oE25unf; }
-    /*! Get NHits
-     * @return NHits
-     */
-    float getNHits() const { return m_NHits; }
-    /*! Get Status
-     * @return Status
-     */
-    int getStatus() const { return m_Status; }
-    /*! Get Grade
-     * @return Grade
-     */
-    int getGrade() const { return m_Grade; }
-    /*! Get UncEnergy
-     * @return UncEnergy
-     */
-    float getUncEnergy() const { return m_UncEnergy; }
+    double getPhiError() const {return m_Error[2];}
+
     /*! Get Time
      * @return Time
      */
-    float getTime() const { return m_Time; }
+    double getTime() const { return m_Time; }
 
-    /*! Get Unique Shower Id
-     * @return Unique Shower Id
+    /*! Get Time Resolution
+     * @return Time Resolution
      */
-    int getUniqueShowerId() const { return m_UniqueShowerId; }
+    double getTimeResolution() const { return m_timeResolution; }
 
     /*! Get Highest Energy in Shower
      * @return Highest Energy
      */
-    float getHighestEnergy() const { return m_HighestEnergy; }
+    double getHighestEnergy() const { return m_HighestEnergy; }
 
     /*! Get Lateral Energy in Shower
      * @return Lateral Energy
      */
-    float getLateralEnergy() const { return m_lateralEnergy; }
+    double getLateralEnergy() const { return m_lateralEnergy; }
 
     /*! Get distance to closest Track
      * @return distance to closest Track
      */
-    float getMinTrkDistance() const { return m_minTrkDistance; }
-    /*! Get if matched with a Track
-     * @return flag for track Matching
-     */
-    bool getIsTrack() const { return m_isTrk; }
+    double getMinTrkDistance() const { return m_minTrkDistance; }
+
     /*! path on track extrapolation to POCA to average cluster direction
      * @return path lenght in cm
      */
-    float getTrkDepth() const { return m_trkDepth; }
+    double getTrkDepth() const { return m_trkDepth; }
+
     /*! path on track extrapolation to POCA to average cluster direction
      * @return path lenght in cm starting from cluster center
      */
-    float getShowerDepth() const { return m_showerDepth; }
+    double getShowerDepth() const { return m_showerDepth; }
+
+    /*! Get NofCrystals
+     * @return NofCrystals
+     */
+    double getNofCrystals() const { return m_NofCrystals; }
+
+    /*! Get Zernike 20
+     * @return zernike20
+     */
+    double getZernike20() const { return m_zernike20; }
+
+    /*! Get Zernike 40
+     * @return zernike40
+     */
+    double getZernike40() const { return m_zernike40; }
+
+    /*! Get Zernike 42
+     * @return zernike42
+     */
+    double getZernike42() const { return m_zernike42; }
+
+    /*! Get Zernike 51
+     * @return zernike40
+     */
+    double getZernike51() const { return m_zernike51; }
+
+    /*! Get Zernike 53
+     * @return zernike40
+     */
+    double getZernike53() const { return m_zernike53; }
+
+    /*! Get second moment
+     * @return second moment
+     */
+    double getSecondMoment() const { return m_secondMoment; }
+
+    /*! Get E1oE9
+     * @return E1oE9
+     */
+    double getE1oE9() const { return m_E1oE9; }
+
+    /*! Get E9oE25
+     * @return E9oE25
+     */
+    double getE9oE25() const { return m_E9oE25; }
 
     //! The method to get return  TVector3 Momentum
     TVector3 getMomentum() const
@@ -237,35 +352,80 @@ namespace Belle2 {
              );
     }
 
-  private:
-    int m_ShowerId;        /**< Shower ID */
-    float m_Energy;        /**< Energy (GeV) */
-    float m_Theta;         /**< Theta (rad) */
-    float m_Phi;           /**< Phi (rad) */
-    float m_R;             /**< R inherit from Belle */
-    float m_Error[3];      /**< Error of Energy, Theta and Phi */
-    float m_Mass;          /**< Mass, inherit from Belle */
-    float m_Width;         /**< Width, inherit from Belle */
-    float m_E9oE25;        /**< E9oE25, inherit from Belle */
-    float m_E9oE25unf;     /**< E9oE25unf, inherit from Belle */
-    float m_NHits;         /**< NHits, inherit from Belle */
-    int m_Status;          /**< Status, inherit from Belle */
-    int m_Grade;           /**< Grade, inherit from Belle */
-    float m_UncEnergy;     /**< UncEnergy, inherit from Belle */
-    float m_Time;          /**< Time, new parameter for Belle2, wait for more stude */
+    /**
+     * Return if specific status bit is set.
+     * @param bitmask The bitmask which is compared to the status of the shower.
+     * @return Returns true if the bitmask matches the status code of the shower.
+     */
+    bool hasStatus(unsigned short int bitmask) const { return (m_Status & bitmask) == bitmask; }
 
-    int m_UniqueShowerId;   /**< Unique Shower ID (TF) */
-    float m_HighestEnergy;  /**< Highest Energy in Shower (GeV) (TF) */
-    float m_lateralEnergy; /**< Lateral Energy in Shower  (GDN) */
-    float m_minTrkDistance;/**< Distance to closest Track  (GDN) */
-    bool m_isTrk; /**< Match with track (GDN) */
-    float m_trkDepth;
-    float m_showerDepth;
+    /*! Check if shower contains a hot crystal
+     */
+    bool hasHotCrystal() const;
+
+    /*! Check if shower contains a dead crystal
+     */
+    bool hasDeadCrystal() const;
+
+    /*! Check if shower contains a problematic crystal
+     */
+    bool hasProblematicCrystal() const;
+
+  private:
+    bool m_isTrk;                   /**< Match with track (GDN) */
+
+    int m_Status;                   /**< Status */
+    int m_ShowerId;                 /**< Shower ID */
+    int m_connectedRegionId;        /**< Connected Region ID (TF)*/
+    int m_hypothesisId;             /**< Hypothesis ID (TF)*/
+
+    Double32_t m_Energy;            /**< Energy (GeV) */
+    Double32_t m_EnedepSum;         /**< Raw Energy Sum(GeV) */
+    Double32_t m_Theta;             /**< Theta (rad) */
+    Double32_t m_Phi;               /**< Phi (rad) */
+    Double32_t m_R;                 /**< R (cm) */
+    Double32_t m_Error[6];          /**< Error of Energy, Theta and Phi */
+    Double32_t m_Time;              /**< Time */
+    Double32_t m_timeResolution;    /**< Time resolution */
+    Double32_t m_HighestEnergy;     /**< Highest Energy in Shower (GeV) (TF) */
+    Double32_t m_lateralEnergy;     /**< Lateral Energy in Shower (GDN) */
+    Double32_t m_minTrkDistance;    /**< Distance between shower and closest track (GDN) */
+    Double32_t m_trkDepth;          /**< Path on track ext. to POCA to avg. cluster dir. (GDN) */
+    Double32_t m_showerDepth;       /**< Same as above, but on the cluster average direction (GDN) */
+    Double32_t m_NofCrystals;       /**< Sum of weights of crystals (~number of crystals) (TF) */
+    Double32_t m_zernike20;         /**< Shower shape variable, Zernike Moment 20 (TF) */
+    Double32_t m_zernike40;         /**< Shower shape variable, Zernike Moment 40 (TF) */
+    Double32_t m_zernike42;         /**< Shower shape variable, Zernike Moment 42 (TF) */
+    Double32_t m_zernike51;         /**< Shower shape variable, Zernike Moment 51 (TF) */
+    Double32_t m_zernike53;         /**< Shower shape variable, Zernike Moment 53 (TF) */
+    Double32_t m_secondMoment;      /**< Shower shape variable, second moment (for merged pi0) (TF) */
+    Double32_t m_E1oE9;             /**< Shower shape variable, E1oE9 (TF) */
+    Double32_t m_E9oE25;            /**< Shower shape variable, E9oE25 */
+
     // 2: added uniqueID and highestE (TF)
     // 3: added LAT and distance to closest track and trk match flag (GDN)
-    ClassDef(ECLShower, 3);/**< ClassDef */
+    // 4: added time resolution (TF)
+    // 5: clean up, float to Double32_t, and new variables (TF)
+    ClassDef(ECLShower, 5);/**< ClassDef */
 
   };
+
+  inline bool ECLShower::hasHotCrystal() const
+  {
+    return hasStatus(c_HasHotCrystal);
+  }
+
+  inline bool ECLShower::hasDeadCrystal() const
+  {
+    return hasStatus(c_HasDeadCrystal);
+  }
+
+  inline bool ECLShower::hasProblematicCrystal() const
+  {
+    return hasStatus(c_HasProblematicCrystal);
+  }
+
+
 } // end namespace Belle2
 
 #endif

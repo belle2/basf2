@@ -68,24 +68,30 @@ void seterrormatrix(ECLShower& eclShower)
   // Only diagonal elements are filled - this needs to be checked (TF)
   // That means E, theta and phi are assumed to be ~uncorrelated.
   // Note that does not mean that px, py, pz and E are uncorrelated!
-  const double iE = 1 / energy, iE12 = sqrt(iE), iE14 = sqrt(iE12);
+  const double iE = 1.0 / energy;
+  const double iE12 = sqrt(iE);
+  const double iE14 = sqrt(iE12);
   const double sigmaE = 0.01 * (0.047 * iE + 1.105 * iE14 + 0.8563) * energy;
   const double sigmaX = 0.1 * (0.27 + 3.4 * iE12 + 1.8 * iE14);
 
-  const double zForward = 196.2, zBackward = -102.2, Rbarrel = 125.0;
+  const double zForward = 196.2;
+  const double zBackward = -102.2;
+  const double Rbarrel = 125.0;
 
   const double theta_f = atan2(Rbarrel, zForward);
   const double theta_b = atan2(Rbarrel, zBackward);
-  double sigmaPhi = 1 / Rbarrel;
+  double sigmaPhi = 1.0 / Rbarrel;
+
   if (theta < theta_f) {
     sigmaPhi = (1 / zForward) / tan(theta);
   } else if (theta > theta_b) {
     sigmaPhi = (1 / zBackward) / tan(theta);
   }
   sigmaPhi *= sigmaX;
+
   double sigmaTheta = sigmaPhi * sin(theta);
 
-  float ErrorMatrix[3] = {static_cast<float>(sigmaE), static_cast<float>(sigmaTheta), static_cast<float>(sigmaPhi)};
+  double ErrorMatrix[6] = {sigmaE, 0.0, sigmaPhi, 0.0, 0.0, sigmaTheta};
 
   eclShower.setError(ErrorMatrix);
 }

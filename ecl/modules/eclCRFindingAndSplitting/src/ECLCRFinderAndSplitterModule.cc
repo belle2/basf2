@@ -27,9 +27,6 @@
 #include <ecl/rec_lib/TEclCFShower.h>
 #include <ecl/rec_lib/TRecEclCF.h>
 
-// OTHER
-#include <ecl/utility/ECLShowerId.h>
-
 // NAMESPACES
 using namespace Belle2;
 using namespace ECL;
@@ -83,7 +80,7 @@ void ECLCRFinderAndSplitterModule::event()
   const int cHypothesis = 5;
 
   /** Utility unpacker of the shower id that contains CR, seed and hypothesis */
-  ECLShowerId SUtility;
+//  ECLShowerId SUtility;
 
   // Cluster finder
   TRecEclCF& cf = TRecEclCF::Instance();
@@ -153,26 +150,31 @@ void ECLCRFinderAndSplitterModule::event()
       }
 
       // fill ECLShower
-      aECLShower->setShowerId(nShower); // must be changed to uniqueid as soon as hitassignment is gone
+      aECLShower->setShowerId(nShowerWithinCR);
       aECLShower->setEnergy(shower.Energy());
+      aECLShower->setEnedepsum(shower.UncEnergy());
       aECLShower->setTheta(shower.Theta());
       aECLShower->setPhi(shower.Phi());
       aECLShower->setR(shower.Distance());
-      aECLShower->setMass(shower.Mass());
-      aECLShower->setWidth(shower.Width()); // should be done in eclShowerShape (TF)
+//      aECLShower->setMass(shower.Mass());
+//      aECLShower->setWidth(shower.Width()); // should be done in eclShowerShape (TF)
       aECLShower->setE9oE25(shower.E9oE25()); // should be done in eclShowerShape (TF)
-      aECLShower->setE9oE25unf(shower.E9oE25unf()); // should be done in eclShowerShape (TF)
-      aECLShower->setNHits(shower.NHits());
-      aECLShower->setStatus(shower.Status());
-      aECLShower->setGrade(shower.Grade());
-      aECLShower->setUncEnergy(shower.UncEnergy());
+//      aECLShower->setE9oE25unf(shower.E9oE25unf()); // should be done in eclShowerShape (TF)
+      aECLShower->setNofCrystals((double) shower.NHits());
+      aECLShower->setStatus(0); // status is not used in this old clustering
+//      aECLShower->setStatus(shower.Status());
+//      aECLShower->setGrade(shower.Grade());
+//      aECLShower->setUncEnergy(shower.UncEnergy());
       aECLShower->setTime(v_TIME);
 
       aECLShower->setHighestEnergy(v_HiEnergy); //(TF)
       // the old shower id (just a counter) must be replaced by the more complex new id
       // you can still use this just as a number - but you can also extract more from it
-      const int uniqueId = SUtility.getShowerId(nCR, cHypothesis, nShowerWithinCR);
-      aECLShower->setUniqueShowerId(uniqueId); //(TF)
+//      const int uniqueId = SUtility.getShowerId(nCR, cHypothesis, nShowerWithinCR);
+//      aECLShower->setUniqueShowerId(uniqueId); //(TF)
+
+      aECLShower->setConnectedRegionId(nCR);
+      aECLShower->setHypothesisId(cHypothesis);
 
       nShower++; // Increment counter for ECLShowers (TF)
       nShowerWithinCR++; // Increment counter for ECLShowers within this ECLCR (TF)

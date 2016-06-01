@@ -12,11 +12,9 @@
 #include <mva/methods/Python.h>
 
 #include <boost/filesystem/convenience.hpp>
-/*
 #include <numpy/npy_common.h>
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
-*/
 
 #include <framework/logging/Logger.h>
 
@@ -81,11 +79,9 @@ namespace Belle2 {
           m_initialized_python = true;
         }
 
-        /*
         if (PyArray_API == NULL) {
           init_numpy();
         }
-        */
       }
 
       ~PythonInitializerSingleton()
@@ -99,13 +95,12 @@ namespace Belle2 {
 
       PythonInitializerSingleton(const PythonInitializerSingleton&) = delete;
 
-      /*
       void* init_numpy()
       {
         // Import array is a macro which returns NUMPY_IMPORT_ARRAY_RETVAL
         import_array();
         return NULL;
-      }*/
+      }
 
       bool m_initialized_python = false;
     };
@@ -137,7 +132,6 @@ namespace Belle2 {
     Weightfile PythonTeacher::train(Dataset& training_data) const
     {
 
-      B2FATAL("Python method does not work at the moment due to some missing headers in basf2");
       Weightfile weightfile;
       std::string custom_weightfile = weightfile.getFileName();
 
@@ -237,7 +231,6 @@ namespace Belle2 {
               y_v[iEvent] = training_data.m_target;
               w_v[iEvent] = training_data.m_weight;
             }
-            /*
             // Maybe slow, create ndarrays outside of loop?
             auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
             auto ndarray_y = boost::python::handle<>(PyArray_SimpleNewFromData(1, dimensions_y, NPY_FLOAT32, y.get()));
@@ -252,7 +245,6 @@ namespace Belle2 {
             boost::python::extract<bool> proxy(r);
             if (proxy.check())
               continue_loop = static_cast<bool>(proxy);
-            */
           }
         }
 
@@ -314,7 +306,6 @@ namespace Belle2 {
     std::vector<float> PythonExpert::apply(Dataset& test_data) const
     {
 
-      B2FATAL("Python method does not work at the moment due to some missing headers in basf2");
       unsigned int numberOfFeatures = test_data.getNumberOfFeatures();
       unsigned int numberOfEvents = test_data.getNumberOfEvents();
 
@@ -330,7 +321,6 @@ namespace Belle2 {
       std::vector<float> probabilities(test_data.getNumberOfEvents());
 
       try {
-        /*
         auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
         auto result = m_framework.attr("apply")(m_state, ndarray_X);
         for (unsigned int iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
@@ -339,7 +329,6 @@ namespace Belle2 {
           probabilities[iEvent] = static_cast<float>(*static_cast<double*>(PyArray_GETPTR1(reinterpret_cast<PyArrayObject*>(result.ptr()),
                                                      iEvent)));
         }
-        */
       } catch (...) {
         PyErr_Print();
         PyErr_Clear();

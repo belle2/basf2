@@ -3,12 +3,12 @@
 
 ########################################################
 # 100 continuum events using EvtGen (using EvtGen, i.e. without ISR)
+# using the custom BELLE2_DECAY file.
 #
 # Example steering file
 ########################################################
 
 from basf2 import *
-from beamparameters import add_beamparameters
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.INFO)
@@ -18,16 +18,11 @@ main = create_path()
 # event info setter
 main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
 
-# beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
-
 # to run the framework the used modules need to be registered
 evtgen = register_module('EvtGenInput')
 evtgen.param('ParentParticle', 'vpho')
-evtgen.param('userDECFile', os.environ['BELLE2_LOCAL_DIR'] +
-             '/generators/evtgen/decayfiles/ccbar+Dst.dec')
-# evtgeninput.param('userDECFile', os.environ['BELLE2_LOCAL_DIR']
-#                   + '/generators/evtgen/decayfiles/uubar.dec')
+evtgen.param('userDECFile', os.environ['BELLE2_LOCAL_DIR'] + '/generators/evtgen/decayfiles/ccbar+Dst.dec')
+evtgen.param('DECFile', os.environ['BELLE2_LOCAL_DIR'] + '/generators/evtgen/decayfiles/DECAY_BELLE2.DEC')
 
 # run
 main.add_module("Progress")

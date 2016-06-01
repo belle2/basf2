@@ -7236,15 +7236,15 @@ Enddecay
 #
 Decay omega # Edited by U. Tamponi, March 2016 
 0.899000000 pi- pi+ pi0     OMEGA_DALITZ;  # 1-Sum(other modes). PDG reports 0.892 \pm 0.07
-0.015300000 pi- pi+           PHOTOS VSS;  # includes pi+ pi- gamma, never directly observed
-0.000066000  rho0  gamma     PARTWAVE 0. 0. 1. 0. 0. 0.;  # was pi0 pi0 gamma
-0.082800000 pi0     gamma       VSP_PWAVE; 
-0.000460000 eta     gamma       VSP_PWAVE; 
-0.000770000 pi0     e+      e-        PHOTOS PHSP; 
+0.015300000 pi- pi+         PHOTOS VSS;  # includes pi+ pi- gamma, never directly observed
+0.000066000 rho0    gamma   HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;  # was pi0 pi0 gamma
+0.082800000 pi0     gamma   VSP_PWAVE; 
+0.000460000 eta     gamma   VSP_PWAVE; 
+0.000770000 pi0     e+      e-    PHOTOS PHSP; 
 0.000130000 pi0     mu+     mu-   PHOTOS PHSP;
-0.00050    pi+ pi- pi+ pi-              PHSP;
-0.000072800 e+      e-                 PHOTOS VLL;  # should be equal by LFU
-0.000090000 mu+     mu-            PHOTOS VLL;  # should be equal by LFU
+0.00050    pi+ pi- pi+ pi-        PHSP;
+0.000072800 e+      e-            PHOTOS VLL;  # should be equal by LFU
+0.000090000 mu+     mu-           PHOTOS VLL;  # should be equal by LFU
 Enddecay
 #
 Decay eta'

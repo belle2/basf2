@@ -14,29 +14,34 @@
 
 namespace Belle2 {
 
+  /** KlId datastore object to store results from KlId calculations.
+   * acces as: double KlId = cluster->getRelatedTo<KlId>()->getKlId() */
   class KlId : public RelationsObject {
 
   public:
 
     KlId();
 
+
+    /** constructor */
     KlId(float klid, float bkgProb, bool isKLM, bool isECL);
 
+    /** constructor */
     virtual ~KlId() {};
 
     /** get Klong ID */
     inline float getKlId() const
     {return m_KlId;}
 
-    /** get Klong ID */
+    /** get beam bkg probability (classifier output)*/
     inline float getBkgProb() const
     {return m_bkgProb;}
 
-    /** get Klong ID */
+    /** is this ID originally a KLM Cluster ?*/
     inline bool isKLM() const
     {return m_isKLM;}
 
-    /** get Klong ID */
+    /** is this ID originally a ECL Cluster ?*/
     inline bool isECL() const
     {return m_isECL;}
 
@@ -55,7 +60,7 @@ namespace Belle2 {
 
 
     /** Needed to make root object storable? */
-    ClassDef(KlId, 1)  //TODO function finden und verstehen
+    ClassDef(KlId, 1)
 
   };
 }

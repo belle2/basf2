@@ -80,13 +80,11 @@ void Fitter3DUtility::rPhiFitter(double *rr, double *phi2, double *invphierror, 
   //double G;
   //Calculate fit error
   for(unsigned i=0;i<5;i++){
-    // Ingore fit error. To solve problem of invFiterror becoming 0 when using below calculation.
-    invFiterror[i] = 1;
     // Sometimes SL8 and SL4 will not be hit. So cannot use below calculation.
     //invFiterror[i]=1/sqrt((rr[4]*rr[4]-2*rr[4]*rr[2]*cos(phi2[4]-phi2[2])+rr[2]*rr[2])/(sin(phi2[4]-phi2[2])*sin(phi2[4]-phi2[2]))-rr[i]*rr[i])*invphierror[i];
     //invFiterror[i]=invphierror[i];
     //invFiterror[i]=invphierror[i]*rr[i];
-    //invFiterror[i]=invphierror[i]/rr[i];
+    invFiterror[i]=invphierror[i]/rr[i];
   }
 
   //r-phi fitter(2D Fitter) ->calculate pt and radius of track-> input for 3D fitter.

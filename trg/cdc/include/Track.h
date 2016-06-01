@@ -79,6 +79,12 @@ class TRGCDCTrack : public TRGCDCTrackBase {
     /// Returns 3D fit chi2
     double get3DFitChi2(void) const;
 
+    /// Set debug value
+    void setDebugValue(int);
+
+    /// Get debug value
+    int getDebugValue(void) const;
+
   public:
 
     /// returns perfect position from GEANT.
@@ -105,6 +111,9 @@ class TRGCDCTrack : public TRGCDCTrackBase {
 
     /// 3D fit chi2
     double m_3DFitChi2;
+
+    /// Debugging variable
+    int m_debugValue;
 };
 
 //-----------------------------------------------------------------------------
@@ -172,6 +181,17 @@ inline
 double TRGCDCTrack::get3DFitChi2(void) const {
      return m_3DFitChi2;
 }
+
+inline
+void TRGCDCTrack::setDebugValue(int debugValue) {
+     m_debugValue = debugValue;
+}
+
+inline
+int TRGCDCTrack::getDebugValue(void) const {
+     return m_debugValue;
+}
+
 
 
 } // namespace Belle2

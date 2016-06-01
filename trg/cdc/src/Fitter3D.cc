@@ -1261,6 +1261,24 @@ namespace Belle2 {
       m_mDouble["pt"] = 0.3*1.5*m_mDouble["rho"]/100;
     }
 
+    if(m_mBool["fVerbose"]) 
+    {
+      cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<int(m_mDouble["trackId"])<<"]f2DFit:        "<<m_mBool["f2DFit"]<<endl;
+      cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<int(m_mDouble["trackId"])<<"]evtTime:       "<<m_mDouble["eventTime"]<<endl;
+      cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<int(m_mDouble["trackId"])<<"]wirePhi:       "<<m_mVector["wirePhi"][0]<<" "<<m_mVector["wirePhi"][1]<<" "<<m_mVector["wirePhi"][2]<<" "<<m_mVector["wirePhi"][3]<<" "<<m_mVector["wirePhi"][4]<<" "<<m_mVector["wirePhi"][5]<<" "<<m_mVector["wirePhi"][6]<<" "<<m_mVector["wirePhi"][7]<<" "<<m_mVector["wirePhi"][8]<<endl;
+      cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<int(m_mDouble["trackId"])<<"]LR:            "<<int(m_mVector["LR"][0])<<" "<<int(m_mVector["LR"][1])<<" "<<int(m_mVector["LR"][2])<<" "<<int(m_mVector["LR"][3])<<" "<<int(m_mVector["LR"][4])<<" "<<int(m_mVector["LR"][5])<<" "<<int(m_mVector["LR"][6])<<" "<<int(m_mVector["LR"][7])<<" "<<int(m_mVector["LR"][8])<<endl;
+      cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<int(m_mDouble["trackId"])<<"]drift:         "<<m_mVector["driftLength"][0]<<" "<<m_mVector["driftLength"][1]<<" "<<m_mVector["driftLength"][2]<<" "<<m_mVector["driftLength"][3]<<" "<<m_mVector["driftLength"][4]<<" "<<m_mVector["driftLength"][5]<<" "<<m_mVector["driftLength"][6]<<" "<<m_mVector["driftLength"][7]<<" "<<m_mVector["driftLength"][8]<<endl;
+      cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<int(m_mDouble["trackId"])<<"]tdc:           "<<m_mVector["tdc"][0]<<" "<<m_mVector["tdc"][1]<<" "<<m_mVector["tdc"][2]<<" "<<m_mVector["tdc"][3]<<" "<<m_mVector["tdc"][4]<<" "<<m_mVector["tdc"][5]<<" "<<m_mVector["tdc"][6]<<" "<<m_mVector["tdc"][7]<<" "<<m_mVector["tdc"][8]<<endl;
+      cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<int(m_mDouble["trackId"])<<"]rr2D:          "<<m_mConstV["rr2D"][0]<<" "<<m_mConstV["rr2D"][1]<<" "<<m_mConstV["rr2D"][2]<<" "<<m_mConstV["rr2D"][3]<<" "<<m_mConstV["rr2D"][4]<<endl;
+      cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<int(m_mDouble["trackId"])<<"]Phi2D:         "<<m_mVector["phi2D"][0]<<" "<<m_mVector["phi2D"][1]<<" "<<m_mVector["phi2D"][2]<<" "<<m_mVector["phi2D"][3]<<" "<<m_mVector["phi2D"][4]<<endl;
+      cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<int(m_mDouble["trackId"])<<"]Phi2DInvError: "<<m_mVector["phi2DInvError"][0]<<" "<<m_mVector["phi2DInvError"][1]<<" "<<m_mVector["phi2DInvError"][2]<<" "<<m_mVector["phi2DInvError"][3]<<" "<<m_mVector["phi2DInvError"][4]<<endl;
+      cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<int(m_mDouble["trackId"])<<"]charge:        "<<int(m_mDouble["charge"])<<endl;
+      cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<int(m_mDouble["trackId"])<<"]pt:            "<<m_mDouble["pt"]<<endl;
+      cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<int(m_mDouble["trackId"])<<"]rho:           "<<m_mDouble["rho"]<<endl;
+      cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<int(m_mDouble["trackId"])<<"]phi0:          "<<m_mDouble["phi0"]<<" "<<m_mDouble["phi0"]/m_mConstD["Trg_PI"]*180<<endl;
+      cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<int(m_mDouble["trackId"])<<"]fit2DChi2:     "<<m_mDouble["fit2DChi2"]<<endl;
+    }
+
     if (std::isnan(m_mDouble["rho"])) return 2;
     if (std::isnan(m_mDouble["phi0"])) return 2;
     return 0;

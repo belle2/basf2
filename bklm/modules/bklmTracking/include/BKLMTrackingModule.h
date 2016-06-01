@@ -19,6 +19,7 @@
 
 namespace Belle2 {
 
+  //! This module perform straight line track finding and fitting for BKLM
   class BKLMTrackingModule: public Module {
 
   public:

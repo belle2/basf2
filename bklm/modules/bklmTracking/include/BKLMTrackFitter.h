@@ -28,7 +28,7 @@ namespace Belle2 {
     class Module;
   }
 
-  //! Store one BKLM Track hit as a ROOT object
+  //! track fitting procedure
   class BKLMTrackFitter {
 
   public:

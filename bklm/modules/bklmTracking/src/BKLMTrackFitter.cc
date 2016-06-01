@@ -251,7 +251,7 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< BKLMHit2d* > hitList,
   const Belle2::bklm::Module* refMod = m_GeoPar->findModule((*hitList.begin())->isForward(), (*hitList.begin())->getSector(), 1);
 
   int n = 0;
-  for (s = hitList.begin(); s != hitList.end(); s++) {
+  for (s = hitList.begin(); s != hitList.end(); ++s) {
 
     hit = *s;
     if (hit->isForward() != isForward || hit->getSector() != sector) {

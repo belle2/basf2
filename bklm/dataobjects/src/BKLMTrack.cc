@@ -34,6 +34,8 @@ BKLMTrack::BKLMTrack():
 //! Copy constructor
 BKLMTrack::BKLMTrack(const BKLMTrack& track) :
   RelationsObject(track),
+  m_Valid(track.m_Valid),
+  m_Good(track.m_Good),
   m_Chi2(track.m_Chi2),
   m_NumHit(track.m_NumHit)
 {

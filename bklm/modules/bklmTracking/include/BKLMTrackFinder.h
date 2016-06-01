@@ -19,6 +19,7 @@
 
 namespace Belle2 {
 
+  //! track finding procedure
   class BKLMTrackFinder {
 
   public:
@@ -27,7 +28,7 @@ namespace Belle2 {
     BKLMTrackFinder();
 
     //! The track finder requires a track fitter.
-    BKLMTrackFinder(BKLMTrackFitter* fitter);
+    explicit BKLMTrackFinder(BKLMTrackFitter* fitter) { };
 
     //! Destructor
     ~BKLMTrackFinder();

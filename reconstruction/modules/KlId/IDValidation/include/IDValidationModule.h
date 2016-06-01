@@ -50,11 +50,6 @@ namespace Belle2 {
   protected:
 
   private:
-
-    /** is KLM*/
-    Float_t m_isKLM;
-    /** is ECL*/
-    Float_t m_isECL;
     /** is KLM*/
     Float_t m_ECLMatchedCorrectly;
 

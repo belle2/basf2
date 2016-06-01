@@ -74,8 +74,6 @@ namespace Belle2 {
     Float_t m_KLMglobalZ;
     /** timing of KLM Cluster */
     Float_t m_KLMtime;
-    /** length/width of KLM ,might be redundant */
-    Float_t m_KLMshape;
     /**  average distance between all KLM clusters */
     Float_t m_KLMavInterClusterDist;
     /** hit depth in KLM, distance to IP */

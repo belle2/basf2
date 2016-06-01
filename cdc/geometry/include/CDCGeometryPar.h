@@ -418,6 +418,18 @@ namespace Belle2 {
         return m_t0[wireID.getICLayer()][wireID.getIWire()];
       }
 
+      //! Returns frontend board id. corresponding to the wire id.
+      /*!
+      \param wireID   wire  id.
+      \return         board id.
+      */
+      unsigned short getBoardID(const WireID& wID) const
+      {
+        std::map<WireID, unsigned short>::const_iterator it = m_wireToBoard.find(wID);
+        unsigned short iret = (it != m_wireToBoard.end()) ? it->second : -999;
+        return iret;
+      }
+
       //! Returns time-walk
       /*!
       \param wireID   wire id

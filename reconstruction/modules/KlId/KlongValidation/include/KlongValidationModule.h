@@ -8,6 +8,7 @@
  * Contributors: Jo-Frederik Krohn                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
+ *
  **************************************************************************/
 #ifndef KlongValidationModule_H
 #define KlongValidationModule_H

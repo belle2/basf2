@@ -176,6 +176,10 @@ namespace Belle2 {
             GearDir layerContent(sectorContent);
             sprintf(name, "/Layer[@layer=\"%d\"]", layer);
             layerContent.append(name);
+            if (layer <= NSCINTLAYER) {
+              if (layerContent.exists("Flip")) m_Flip[fb][sector][layer] = layerContent.getBool("Flip");
+              else m_Flip[fb][sector][layer] = false;
+            }
             Hep3Vector localReconstructionShift(layerContent.getLength("ReconstructionShift/X"),
                                                 layerContent.getLength("ReconstructionShift/Y"),
                                                 layerContent.getLength("ReconstructionShift/Z"));
@@ -351,6 +355,9 @@ namespace Belle2 {
           if (!isForward) rotation.rotateX(M_PI);
           rotation.rotateZ(element.getSectorRotation(sector));
           for (int layer = 1; layer <= m_NLayer; ++layer) {
+            if (layer <= NSCINTLAYER) {
+              m_Flip[fb][sector][layer] = element.getFlipStatus(fb, sector, layer);
+            }
             Hep3Vector localReconstructionShift(element.getLocalReconstructionShiftX(sector, layer),
                                                 element.getLocalReconstructionShiftY(sector, layer),
                                                 element.getLocalReconstructionShiftZ(sector, layer));

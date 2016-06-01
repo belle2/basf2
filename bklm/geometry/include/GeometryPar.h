@@ -558,6 +558,9 @@ namespace Belle2 {
       //! Flag to indicate whether layer contains RPCs (true) or scintillators (false)
       bool m_HasRPCs[NLAYER + 1];
 
+      //! flag of z-phi planes flip for scintillator layers
+      bool m_Flip[BKLM_BACKWARD + 1][NSECTOR + 1][NSCINTLAYER + 1];
+
       //! map of <volumeIDs, pointers to defined modules>
       std::map<int, Module*> m_Modules;
 

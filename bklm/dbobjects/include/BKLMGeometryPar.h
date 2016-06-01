@@ -611,6 +611,12 @@ namespace Belle2 {
     //! Set reconstructionShift of each layer along z  in local system. displacement, not alignment here
     void setLocalReconstructionShiftZ(int sector, int layer, double localReconstructionShift) {m_LocalReconstructionShift_Z[sector][layer] = localReconstructionShift;}
 
+    //! Get the z-phi planes flip status. Ture: z plane is inner, close to IP. False: phi-plane is inner, close to IP
+    bool getFlipStatus(int isForward, int sector, int sciLayer) const {return m_Flip[isForward][sector][sciLayer]; }
+
+    //! Set the z-phi planes flip status. Ture: z plane is inner, close to IP. False: phi-plane is inner, close to IP
+    void setFlipStatus(int isForward, int sector, int sciLayer, bool flip) { m_Flip[isForward][sector][sciLayer] = flip; }
+
     //!get the number of the phi strips on each layer.
     int getPhiStripNumber(int layer) const {return m_PhiStripNumber[layer]; }
 
@@ -900,6 +906,9 @@ namespace Belle2 {
 
     //! ReconstructionShift of each layer along z  in local system. displacement, not alignment here
     double m_LocalReconstructionShift_Z[NSECTOR + 1][NLAYER + 1];
+
+    //! flag of z-phi planes flip for scintillator layers
+    bool m_Flip[BKLM_BACKWARD + 1][NSECTOR + 1][NSCINTLAYER + 1];
 
     //!number of the phi strips on each layer.
     int m_PhiStripNumber[NLAYER + 1];

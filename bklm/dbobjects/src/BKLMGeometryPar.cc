@@ -163,6 +163,10 @@ void BKLMGeometryPar::read(const GearDir& content)
         GearDir layerContent(sectorContent);
         sprintf(name, "/Layer[@layer=\"%d\"]", layer);
         layerContent.append(name);
+        if (layer <= NSCINTLAYER) {
+          if (layerContent.exists("Flip")) m_Flip[fb][sector][layer] = layerContent.getBool("Flip");
+          else m_Flip[fb][sector][layer] = false;
+        }
         //Hep3Vector localReconstructionShift(layerContent.getLength("ReconstructionShift/X"),
         //                                   layerContent.getLength("ReconstructionShift/Y"),
         //                                   layerContent.getLength("ReconstructionShift/Z"));

@@ -145,7 +145,7 @@ void BKGClassifierDataWriterModule::event()
     m_KLMhitDepth = cluster.getClusterPosition().Mag2();
     TrackClusterSeparation* trackSep = cluster.getRelatedTo<TrackClusterSeparation>();
     m_KLMTrackSepDist = trackSep->getDistance();
-    m_KLMTrackSepAngle = trackSep->getTrackAngle();
+    m_KLMTrackSepAngle = trackSep->getTrackClusterAngle();
 
 
     // find nearest ecl cluster and calculate angular distance

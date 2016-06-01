@@ -270,6 +270,20 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< BKLMHit2d* > hitList,
     localHitPos = refMod->globalToLocal(globalPos);
     double hit_localPhiErr = corMod->getPhiStripWidth() / sqrt(12);
     double hit_localZErr = corMod->getZStripWidth() / sqrt(12);
+
+    if (hit->inRPC()) {
+      //+++ scale localErr based on measured-in-Belle resolution
+      int nStrips = hit->getPhiStripMax() - hit->getPhiStripMin() + 1;
+      double dn = nStrips - 1.5;
+      double factor = std::pow((0.9 + 0.4 * dn * dn), 1.5) * 0.60;//measured-in-Belle resolution
+      hit_localPhiErr = hit_localPhiErr * sqrt(factor);
+
+      nStrips = hit->getZStripMax() - hit->getZStripMin() + 1;
+      dn = nStrips - 1.5;
+      factor = std::pow((0.9 + 0.4 * dn * dn), 1.5) * 0.55;//measured-in-Belle resolution
+      hit_localZErr = hit_localZErr * sqrt(factor);
+    }
+
     localHitErr[0][0] = 0.0; //x
     localHitErr[0][1] = 0;
     localHitErr[0][2] = 0;

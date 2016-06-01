@@ -100,7 +100,7 @@ void ECLCRFinderAndSplitterModule::event()
   cf.Attributes();
 
   // counter for connected regions
-  int nCR = 0;
+  int nCR = 1;
 
   // counter for showers (to use old hitassignments)
   // (there is another counter for showers within a CR!)
@@ -109,7 +109,7 @@ void ECLCRFinderAndSplitterModule::event()
   // Loop over Connected Region (CR) - careful, this is a different definition than we use in B2 (TF)
   for (const TEclCFCR& bellecr : cf.CRs()) {
     // counter for showers within CR(TF)
-    int nShowerWithinCR = 0;
+    int nShowerWithinCR = 1;
 
     // create connected region dataobject (TF)
     ECLConnectedRegion* aECLCR = m_eclCRs.appendNew();

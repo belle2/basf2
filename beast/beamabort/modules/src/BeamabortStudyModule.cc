@@ -117,15 +117,15 @@ void BeamabortStudyModule::event()
   }
 
   int nSAD = SADtruth.getEntries();
-  Bool_t Reject = false;
+  //Bool_t Reject = false;
   for (int i = 0; i < nSAD; i++) {
     SADMetaHit* aHit = SADtruth[i];
     double s = aHit->gets();
-    double rate = aHit->getrate();
+    //double rate = aHit->getrate();
     h_s->Fill(-s);
     if ((-33.0 <= -s && -s <= -30.0) || (19.0 <= -s && -s <= 23.0)) {
       h_s_cut->Fill(-s);
-      Reject = true;
+      //Reject = true;
     }
   }
   int nSimHits = SimHits.getEntries();

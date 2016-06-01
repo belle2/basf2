@@ -143,24 +143,24 @@ namespace Belle2 {
     double m_lostRate;          /**< loss rate [Hz]> */
     double m_lostE;             /**< energy at lost position [m]. */
 
-    double m_inputSAD_ssraw;     /** */
-    double m_inputSAD_sraw;      /** */
-    double m_inputSAD_ss;        /** */
-    double m_inputSAD_s;         /** */
-    double m_inputSAD_Lss;       /** */
-    double m_inputSAD_nturn;     /** */
-    double m_inputSAD_x;         /** */
-    double m_inputSAD_y;         /** */
-    double m_inputSAD_px;        /** */
-    double m_inputSAD_py;        /** */
-    double m_inputSAD_xraw;      /** */
-    double m_inputSAD_yraw;      /** */
-    double m_inputSAD_r;         /** */
-    double m_inputSAD_rr;        /** */
-    double m_inputSAD_dp_over_p0;/** */
-    double m_inputSAD_E;         /** */
-    double m_inputSAD_rate;      /** */
-    double m_inputSAD_watt;      /** */
+    double m_inputSAD_ssraw;     /**< scattered position [m]*/
+    double m_inputSAD_sraw;      /**< lost position [m*/
+    double m_inputSAD_ss;        /**< scattered position (|s|<Ltot/2) [m] */
+    double m_inputSAD_s;         /**< lost position (|s|<Ltot/2) [m] */
+    double m_inputSAD_Lss;       /**< length of element in which scattered [m] */
+    double m_inputSAD_nturn;     /**< number of turns from scattered to lost */
+    double m_inputSAD_x;         /**< x at lost position [m]. */
+    double m_inputSAD_y;         /**< y at lost position [m]. */
+    double m_inputSAD_px;        /**< x momentum at lost position [m]. */
+    double m_inputSAD_py;        /**< y momentum at lost position [m]. */
+    double m_inputSAD_xraw;      /**< x at lost position [m] before matching onto beam pipe inner surface */
+    double m_inputSAD_yraw;      /**< y at lost position [m] before matching onto beam pipe inner surface */
+    double m_inputSAD_r;         /**< sqrt(x*x+y*y) [m] */
+    double m_inputSAD_rr;        /**< sqrt(x*x+y*y) [m] before matching onto beam pipe inner surface*/
+    double m_inputSAD_dp_over_p0;/**< dp_over_p0 */
+    double m_inputSAD_E;         /**< energy at lost position [m]. */
+    double m_inputSAD_rate;      /**< loss rate [Hz] */
+    double m_inputSAD_watt;      /**< loss wattage [W] */
 
   private:
 

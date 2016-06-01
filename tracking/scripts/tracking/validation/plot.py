@@ -567,7 +567,7 @@ class ValidationPlot(object):
                 meta_options.append("pvalue-warn={}".format(self.pvalue_warn))
 
             # Indicator if the y axes should be displayed as a logarithmic scale
-            if self.y_log is not None:
+            if self.y_log:
                 meta_options.append("logy")
 
             meta_options_str = ",".join(meta_options)

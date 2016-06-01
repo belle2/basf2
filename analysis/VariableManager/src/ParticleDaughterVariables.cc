@@ -16,6 +16,7 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -45,8 +46,17 @@ namespace Belle2 {
         return -999.0;
       }
 
+      // Check if MC particle exists
+      const MCParticle* mcp = particle->getRelated<MCParticle>();
+      if (!mcp)
+        return -999.0;
+
+      // MCParticle should be related to a B meson
+      if (abs(mcp->getPDG()) != 511 and abs(mcp->getPDG()) != 521)
+        return -999.0;
+
       // Check if the particle has daughters
-      int nDaughters = int(particle->getNDaughters());
+      int nDaughters = int(mcp->getNDaughters());
       if (nDaughters < 1) {
         B2ERROR("This particle does not have any daughters!");
         return -999.0;
@@ -54,10 +64,10 @@ namespace Belle2 {
 
       // Get the PDG sign and load daughters
       int motherPDGSign = (particle->getPDGCode()) / (abs(particle->getPDGCode()));
-      const std::vector<Particle*> daughters = particle->getDaughters();
+      std::vector<MCParticle*> mcDaughters = mcp->getDaughters();
 
       for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-        int daughterPDG = daughters[iDaughter]->getPDGCode();
+        int daughterPDG = mcDaughters[iDaughter]->getPDG();
         int daughterPDGSign = daughterPDG / (abs(daughterPDG));
 
         if (transition[0] == 1) {
@@ -84,18 +94,27 @@ namespace Belle2 {
         return -999.0;
       }
 
+      // Check if MC particle exists
+      const MCParticle* mcp = particle->getRelated<MCParticle>();
+      if (!mcp)
+        return -999.0;
+
+      // MCParticle should be related to a B meson
+      if (abs(mcp->getPDG()) != 511 and abs(mcp->getPDG()) != 521)
+        return -999.0;
+
       // Check if the particle has daughters
-      int nDaughters = int(particle->getNDaughters());
+      int nDaughters = int(mcp->getNDaughters());
       if (nDaughters < 1) {
         B2ERROR("This particle does not have any daughters!");
         return -999.0;
       }
 
       // Load daughters
-      const std::vector<Particle*> daughters = particle->getDaughters();
+      std::vector<MCParticle*> mcDaughters = mcp->getDaughters();
 
       for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-        int daughterPDG = daughters[iDaughter]->getPDGCode();
+        int daughterPDG = mcDaughters[iDaughter]->getPDG();
         if ((abs(daughterPDG) / 10) % 10 == 4 && (abs(daughterPDG) / 100) % 10 == 4) // charmonium state: b->c anti-c q transition
           Status = 1.0;
       }

@@ -766,7 +766,7 @@ namespace Belle2 {
         PCmsLabTransform T;
         TLorentzVector vec = T.rotateLabToCms() * roe->get4Vector(maskName);
 
-        return T.getCMSEnergy() / 2 - vec.E();
+        return vec.E() - T.getCMSEnergy() / 2;
       };
       return func;
     }
@@ -835,7 +835,7 @@ namespace Belle2 {
         {
           double totalSigEnergy = (sig4vec + neutrino4vec).Energy();
           double E = T.getCMSEnergy() / 2;
-          deltaE = E - totalSigEnergy;
+          deltaE = totalSigEnergy - E;
         }
 
         // Definition 1: LAB
@@ -1209,6 +1209,43 @@ namespace Belle2 {
       return (pBCMS - phCMS).Mag2();
     }
 
+    Manager::FunctionPtr q2lnu(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+
+      if (arguments.size() == 0)
+        maskName = "";
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("Wrong number of arguments (1 required) for meta function q2lnu");
+
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        int n = particle->getNDaughters();
+
+        if (n < 1)
+          return -999.9;
+
+        const Particle* lep = particle->getDaughter(n - 1);
+
+        TLorentzVector lep4vec = lep->get4Vector();
+        TLorentzVector nu4vec = missing4Vector(particle, maskName, "6");
+
+        return (lep4vec + nu4vec).Mag2();
+      };
+      return func;
+    }
+
     Manager::FunctionPtr cosThetaEll(const std::vector<std::string>& arguments)
     {
       std::string maskName;
@@ -1320,16 +1357,16 @@ namespace Belle2 {
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
 
-      TLorentzVector rec4vec = T.rotateLabToCms() * particle->get4Vector();
-      TLorentzVector roe4vec = T.rotateLabToCms() * roe->get4Vector(maskName);
-
       TLorentzVector rec4vecLAB = particle->get4Vector();
       TLorentzVector roe4vecLAB = roe->get4Vector(maskName);
+
+      TLorentzVector rec4vec = T.rotateLabToCms() * rec4vecLAB;
+      TLorentzVector roe4vec = T.rotateLabToCms() * roe4vecLAB;
 
       TLorentzVector miss4vec;
       double E_beam_cms = T.getCMSEnergy() / 2.0;
 
-      // Definition 0: CMS, use energy and momentum of tracks and clusters from whole event
+      // Definition 0: CMS, use energy and momentum of tracks and clusters
       if (opt == "0") {
         miss4vec.SetVect(- (rec4vec.Vect() + roe4vec.Vect()));
         miss4vec.SetE(2 * E_beam_cms - (rec4vec.Energy() + roe4vec.Energy()));
@@ -1400,45 +1437,47 @@ namespace Belle2 {
 
         if (mcROEObjects.find(daughters[i]) == mcROEObjects.end()) {
 
+          int pdg = abs(daughters[i]->getPDG());
+
           // photon
-          if (abs(daughters[i]->getPDG()) == 22 and (missingFlags & 1) == 0)
+          if (pdg == 22 and (missingFlags & 1) == 0)
             missingFlags += 1;
 
           // electrons
-          else if (abs(daughters[i]->getPDG()) == 11 and (missingFlags & 2) == 0)
+          else if (pdg == 11 and (missingFlags & 2) == 0)
             missingFlags += 2;
 
           // muons
-          else if (abs(daughters[i]->getPDG()) == 13 and (missingFlags & 4) == 0)
+          else if (pdg == 13 and (missingFlags & 4) == 0)
             missingFlags += 4;
 
           // pions
-          else if (abs(daughters[i]->getPDG()) == 211 and (missingFlags & 8) == 0)
+          else if (pdg == 211 and (missingFlags & 8) == 0)
             missingFlags += 8;
 
           // kaons
-          else if (abs(daughters[i]->getPDG()) == 321 and (missingFlags & 16) == 0)
+          else if (pdg == 321 and (missingFlags & 16) == 0)
             missingFlags += 16;
 
           // protons
-          else if (abs(daughters[i]->getPDG()) == 2212 and (missingFlags & 32) == 0)
+          else if (pdg == 2212 and (missingFlags & 32) == 0)
             missingFlags += 32;
 
           // neutrons
-          else if (abs(daughters[i]->getPDG()) == 2112 and (missingFlags & 64) == 0)
+          else if (pdg == 2112 and (missingFlags & 64) == 0)
             missingFlags += 64;
 
           // kshort
-          else if (abs(daughters[i]->getPDG()) == 310 and ((missingFlags & 128) == 0 or (missingFlags & 256) == 0)) {
+          else if (pdg == 310 and ((missingFlags & 128) == 0 or (missingFlags & 256) == 0)) {
             std::vector<MCParticle*> ksDaug = daughters[i]->getDaughters();
             if (ksDaug.size() == 2) {
               // K_S0 -> pi+ pi-
-              if (abs(ksDaug[0]->getPDG()) == 211 and (missingFlags & 128) == 0) {
+              if (abs(ksDaug[0]->getPDG()) == 211 and abs(ksDaug[1]->getPDG()) == 211 and (missingFlags & 128) == 0) {
                 if (mcROEObjects.find(ksDaug[0]) == mcROEObjects.end() or mcROEObjects.find(ksDaug[1]) == mcROEObjects.end())
                   missingFlags += 128;
               }
               // K_S0 -> pi0 pi0
-              else if (abs(ksDaug[0]->getPDG()) == 111 and (missingFlags & 256) == 0) {
+              else if (abs(ksDaug[0]->getPDG()) == 111 and abs(ksDaug[1]->getPDG()) == 111 and (missingFlags & 256) == 0) {
                 std::vector<MCParticle*> pi0Daug0 = ksDaug[0]->getDaughters();
                 std::vector<MCParticle*> pi0Daug1 = ksDaug[1]->getDaughters();
                 if (mcROEObjects.find(pi0Daug0[0]) == mcROEObjects.end() or
@@ -1451,8 +1490,12 @@ namespace Belle2 {
           }
 
           // klong
-          else if (abs(daughters[i]->getPDG()) == 130 and (missingFlags & 512) == 0)
+          else if (pdg == 130 and (missingFlags & 512) == 0)
             missingFlags += 512;
+
+          // neutrino
+          else if ((pdg == 12 or pdg == 14 or pdg == 16) and (missingFlags & 1024) == 0)
+            missingFlags += 1024;
         }
         checkMCParticleMissingFlags(daughters[i], mcROEObjects, missingFlags);
       }
@@ -1581,6 +1624,10 @@ namespace Belle2 {
                       "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"
                       "where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell.\n"
                       "The B meson momentum in CMS is assumed to be 0.");
+
+    REGISTER_VARIABLE("q2lnu(maskName)", q2lnu,
+                      "Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2, \n"
+                      "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter.");
 
     REGISTER_VARIABLE("missM2OverMissE(maskName)", missM2OverMissE,
                       "Returns custom variable missing mass squared over missing energy");

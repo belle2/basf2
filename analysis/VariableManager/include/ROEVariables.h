@@ -226,6 +226,12 @@ namespace Belle2 {
      */
     double q2Bh(const Particle* particle);
 
+    /**
+     * Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2,
+     * where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter
+     */
+    Manager::FunctionPtr q2lnu(const std::vector<std::string>& arguments);
+
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------

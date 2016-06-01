@@ -934,7 +934,7 @@ namespace Belle2 {
     //! optional comment
     std::string m_comment;
 
-    ClassDef(BKLMGeometryPar, 2);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(BKLMGeometryPar, 3);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 } // end of namespace Belle2

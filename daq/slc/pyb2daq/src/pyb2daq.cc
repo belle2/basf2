@@ -7,7 +7,10 @@
 #include <framework/utilities/RegisterPythonModule.h>
 #endif
 
+#include <daq/slc/system/LogFile.h>
+
 #include <daq/slc/pyb2daq/DAQDBObject.h>
+#include <daq/slc/pyb2daq/PyNSMCallback.h>
 
 using namespace boost::python;
 using namespace Belle2;
@@ -46,6 +49,29 @@ BOOST_PYTHON_MODULE(pyb2daq)
   ;
 #endif
 
+  boost::python::enum_<LogFile::Priority>("LogPriority")
+  .value("UNKNOWN", LogFile::UNKNOWN)
+  .value("DEBUG", LogFile::DEBUG)
+  .value("INFO", LogFile::INFO)
+  .value("NOTICE", LogFile::NOTICE)
+  .value("WARNING", LogFile::WARNING)
+  .value("ERROR", LogFile::ERROR)
+  .value("FATAL", LogFile::FATAL)
+  ;
+
+  boost::python::enum_<DBField::Type>("DAQDBType")
+  .value("UNKNOWN", DBField::UNKNOWN)
+  .value("BOOL", DBField::BOOL)
+  .value("CHAR", DBField::CHAR)
+  .value("SHORT", DBField::SHORT)
+  .value("INT", DBField::INT)
+  .value("LONG", DBField::LONG)
+  .value("FLOAT", DBField::FLOAT)
+  .value("DOUBLE", DBField::DOUBLE)
+  .value("TEXT", DBField::TEXT)
+  .value("OBJECT", DBField::OBJECT)
+  ;
+
   boost::python::class_<DAQDBObject>("DAQDBObject", boost::python::init<const char*, const char*>())
   .def(boost::python::init<>())
   .def("getDBList", &DAQDBObject::getDBList)
@@ -55,6 +81,7 @@ BOOST_PYTHON_MODULE(pyb2daq)
   .def("getPath", &DAQDBObject::getPath, return_value_policy<copy_const_reference>())
   .def("getName", &DAQDBObject::getName, return_value_policy<copy_const_reference>())
   .def("getFieldNames", &DAQDBObject::getFieldNames)
+  .def("getFieldType", &DAQDBObject::getType)
   .def("getNameList", &DAQDBObject::getNameList)
   .def("print", &DAQDBObject::print)
   .def("getId", &DAQDBObject::getId)
@@ -68,7 +95,9 @@ BOOST_PYTHON_MODULE(pyb2daq)
   .def("getFloat", &DAQDBObject::getFloat)
   .def("getDouble", &DAQDBObject::getDouble)
   .def("getText", &DAQDBObject::getText, return_value_policy<copy_const_reference>())
-  .def("getObject", &DAQDBObject::getObject)
+  .def("__call__", &DAQDBObject::getObject)//, return_value_policy<copy_non_const_reference>())
+  .def("__call__", &DAQDBObject::getObjects)//, return_value_policy<copy_non_const_reference>())
+  .def("getObject", &DAQDBObject::getObject)//, return_value_policy<copy_non_const_reference>())
   .def("setBool", &DAQDBObject::setBool)
   .def("setChar", &DAQDBObject::setChar)
   .def("setShort", &DAQDBObject::setShort)
@@ -84,6 +113,16 @@ BOOST_PYTHON_MODULE(pyb2daq)
   .def("addDouble", &DAQDBObject::addDouble)
   .def("addText", &DAQDBObject::addText, return_value_policy<copy_const_reference>())
   .def("addObject", &DAQDBObject::addObject)
+  ;
+
+  boost::python::class_<PyNSMCallback>("NSMCallback", boost::python::init<>())
+  .def("add", &PyNSMCallback::addInt)
+  .def("add", &PyNSMCallback::addFloat)
+  .def("add", &PyNSMCallback::addText)
+  .def("set", &PyNSMCallback::setInt)
+  .def("set", &PyNSMCallback::setFloat)
+  .def("set", &PyNSMCallback::setText)
+  .def("log", &PyNSMCallback::log)
   ;
 
 }

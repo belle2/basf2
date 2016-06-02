@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <sstream>
 
 using namespace Belle2;
 
@@ -303,6 +304,44 @@ void DBObject::print(bool isfull) const throw()
   printf("#\n");
   printf("#\n");
   printf("#\n");
+}
+
+const std::string DBObject::sprint(bool isfull) const throw()
+{
+  std::stringstream ss;
+  const std::string& name_in = "";
+  NameValueList map;
+  search(map, name_in, isfull);
+  size_t length = 0;
+  for (NameValueList::iterator it = map.begin();
+       it != map.end(); it++) {
+    if (it->name.size() > length) length = it->name.size();
+  }
+  ss << "#" << std::endl;
+  ss << "# DB object (confname = " << getName() << ")" << std::endl;
+  ss << "#" << std::endl;
+  ss << "" << std::endl;
+  StringList s = StringUtil::split(getName(), '@');
+  if (s.size() > 1) {
+    ss << StringUtil::form(StringUtil::form("%%-%ds : %%s\n", length),
+                           "nodename", s[0].c_str()) << std:: endl;
+    ss << StringUtil::form(StringUtil::form("%%-%ds : %%s\n", length),
+                           "config", s[1].c_str()) << std:: endl;
+  } else {
+    ss << StringUtil::form(StringUtil::form("%%-%ds : %%s\n", length),
+                           "config", getName().c_str()) << std:: endl;
+  }
+  ss << "" << std::endl;
+  for (NameValueList::iterator it = map.begin();
+       it != map.end(); it++) {
+    ss << StringUtil::form(StringUtil::form("%%-%ds : %%s\n", length),
+                           it->name.c_str(), it->value.c_str()) << std:: endl;
+  }
+  ss << "" << std::endl;
+  ss << "#" << std::endl;
+  ss << "#" << std::endl;
+  ss << "#" << std::endl;
+  return ss.str();
 }
 
 void DBObject::printHTML(bool isfull) const throw()

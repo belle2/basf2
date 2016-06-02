@@ -55,6 +55,7 @@ namespace Belle2 {
   public:
     StringList getNameList(bool isfull) const throw();
     void print(bool isfull = true) const throw();
+    const std::string sprint(bool isfull) const throw();
     void printHTML(bool isfull = true) const throw();
     void printSQL(const std::string& table, std::ostream& out,
                   const std::string& name = "", int index = -1) const throw();

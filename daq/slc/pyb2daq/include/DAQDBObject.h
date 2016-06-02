@@ -27,11 +27,12 @@ namespace Belle2 {
     void setIndex(int index) { m_obj.setIndex(index); }
     boost::python::list getFieldNames() const throw();
     boost::python::list getNameList(bool showall) const throw();
-    DBField::Type getProperty(const std::string& name) const throw(std::out_of_range)
+    DBField::Type getType(const std::string& name) const throw(std::out_of_range)
     {
       return m_obj.getProperty(name).getType();
     }
     void print() const throw() { m_obj.print(); }
+    std::string sprint() const throw() { return m_obj.sprint(true); }
     bool hasField(const std::string& name) const throw() { return m_obj.hasField(name); }
     bool hasValue(const std::string& name) const throw() { return m_obj.hasValue(name); }
     bool hasText(const std::string& name) const throw() { return m_obj.hasText(name); }
@@ -40,8 +41,8 @@ namespace Belle2 {
     void addText(const std::string& name, const std::string& value) throw(std::out_of_range) { m_obj.addText(name, value); }
 
   public:
-    DAQDBObject getObject(const std::string& name) const throw(std::out_of_range) { return m_obj(name); }
-    DAQDBObject getObjects(const std::string& name, int index) const throw(std::out_of_range) { return m_obj(name, index); }
+    DAQDBObject getObject(const std::string& name) throw(std::out_of_range) { return m_obj(name); }
+    DAQDBObject getObjects(const std::string& name, int index) throw(std::out_of_range) { return m_obj(name, index); }
     bool getBool(const std::string& name) const throw(std::out_of_range) { return m_obj.getBool(name); }
     char getChar(const std::string& name) const throw(std::out_of_range) { return m_obj.getChar(name); }
     short getShort(const std::string& name) const throw(std::out_of_range) { return m_obj.getShort(name); }

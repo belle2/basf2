@@ -69,7 +69,7 @@ namespace Belle2 {
      * @param recoTrack
      * @return
      */
-    bool storeTrackFromRecoTrack(const RecoTrack& recoTrack);
+    bool storeTrackFromRecoTrack(RecoTrack& recoTrack);
 
   private:
     std::string m_trackColName;  ///< TrackColName (output).

@@ -26,7 +26,7 @@
 
 using namespace Belle2;
 
-bool TrackBuilder::storeTrackFromRecoTrack(const RecoTrack& recoTrack)
+bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack)
 {
 
   StoreArray<Track> tracks(m_trackColName);
@@ -52,9 +52,7 @@ bool TrackBuilder::storeTrackFromRecoTrack(const RecoTrack& recoTrack)
     }
 
     // Extrapolate the tracks to the perigee.
-
-    const genfit::TrackPoint* firstTrackPoint = recoTrack.getHitPointsWithMeasurement().front();
-    genfit::MeasuredStateOnPlane msop = firstTrackPoint->getFitterInfo(trackRep)->getFittedState();
+    genfit::MeasuredStateOnPlane msop = recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRep);
 
     try {
       msop.extrapolateToLine(m_beamSpot, m_beamAxis);

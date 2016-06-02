@@ -80,8 +80,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
     path.add_module('TrackCreator')
 
     # V0 finding
-    # TODO TODO TODO
-    # path.add_module('V0Finder')
+    path.add_module('V0Finder')
 
     # prune genfit tracks
     if pruneTracks:

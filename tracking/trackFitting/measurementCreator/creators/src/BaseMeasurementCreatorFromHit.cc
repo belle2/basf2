@@ -35,7 +35,8 @@ genfit::TrackPoint* BaseMeasurementCreatorFromHit<HitType, detector>::createTrac
   genfit::AbsMeasurement* coordinateMeasurement,
   RecoTrack& recoTrack, const RecoHitInformation& recoHitInformation) const
 {
-  genfit::TrackPoint* coordinateTrackPoint = new genfit::TrackPoint(coordinateMeasurement, &recoTrack.m_genfitTrack);
+  genfit::TrackPoint* coordinateTrackPoint = new genfit::TrackPoint(coordinateMeasurement,
+      &RecoTrackGenfitAccess::getGenfitTrack(recoTrack));
   coordinateTrackPoint->setSortingParameter(recoHitInformation.getSortingParameter());
 
   return coordinateTrackPoint;

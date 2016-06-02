@@ -163,7 +163,7 @@ bool MeasurementAdder::addMeasurements(RecoTrack& recoTrack) const
   // Special case is with the additional measurement creator factories. They do not need any hits:
   addMeasurementsToRecoTrack(recoTrack, m_additionalMeasurementCreators);
 
-  recoTrack.m_genfitTrack.sort();
+  RecoTrackGenfitAccess::getGenfitTrack(recoTrack).sort();
 
   return true;
 }
@@ -174,7 +174,7 @@ void MeasurementAdder::addMeasurementsToRecoTrack(RecoTrack& recoTrack,
   for (const auto& measurementCreator : measurementCreators) {
     const std::vector<genfit::TrackPoint*>& trackPoints = measurementCreator->createMeasurementPoints(recoTrack);
     for (genfit::TrackPoint* trackPoint : trackPoints) {
-      recoTrack.m_genfitTrack.insertPoint(trackPoint);
+      RecoTrackGenfitAccess::getGenfitTrack(recoTrack).insertPoint(trackPoint);
     }
   }
 }

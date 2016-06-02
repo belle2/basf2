@@ -62,7 +62,7 @@ void GenfitTrackCreatorModule::event()
 
   for (RecoTrack& recoTrack : recoTracks) {
     if (recoTrack.wasFitSuccessful()) {
-      genfitTracks.appendNew(recoTrack.m_genfitTrack);
+      genfitTracks.appendNew(RecoTrackGenfitAccess::getGenfitTrack(recoTrack));
       genfit::TrackCand* relatedTrackCand = recoTrack.getRelated<genfit::TrackCand>(
                                               m_param_genfitTrackCandsStoreArrayName);
 

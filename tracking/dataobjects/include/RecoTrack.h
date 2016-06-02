@@ -74,12 +74,7 @@ namespace Belle2 {
    * See the recoTrack.cc test for an overview on the hit information accessor methods.
    */
   class RecoTrack : public RelationsObject {
-    /// The base measurement creators need to access the genfit track!
-    template <class HitType, Const::EDetector detector>
-    friend class BaseMeasurementCreatorFromHit;
-    friend class MeasurementAdder;
-    friend class TrackFitter;
-    friend class GenfitTrackCreatorModule;
+    /// The RecoTrackGenfitAccess need to access the genfit track (which is intended)!
     friend class RecoTrackGenfitAccess;
 
   private:

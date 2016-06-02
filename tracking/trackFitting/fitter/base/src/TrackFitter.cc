@@ -39,7 +39,7 @@ bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particle
   if (std::signbit(pdgParticleCharge) != std::signbit(recoTrackCharge))
     currentPdgCode *= -1;
 
-  const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.m_genfitTrack.getTrackReps();
+  const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.getRepresentations();
   genfit::AbsTrackRep* alreadyPresentTrackRepresentation = nullptr;
   for (genfit::AbsTrackRep* trackRepresentation : trackRepresentations) {
     // Check if the track representation is a RKTrackRep.
@@ -65,7 +65,7 @@ bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRe
 {
   recoTrack.setTimeSeed(calculateTimeSeed(recoTrack, trackRepresentation));
   // Fit the track
-  m_fitter->processTrack(&recoTrack.m_genfitTrack, false);
+  m_fitter->processTrack(&RecoTrackGenfitAccess::getGenfitTrack(recoTrack), false);
   recoTrack.setDirtyFlag(false);
 
   // Do the hits synchronisation
@@ -98,14 +98,14 @@ bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
 
   const bool measurementAdderNeedsTrackRefit = m_measurementAdder.addMeasurements(recoTrack);
 
-  if (recoTrack.m_genfitTrack.getNumPoints() == 0) {
+  if (RecoTrackGenfitAccess::getGenfitTrack(recoTrack).getNumPoints() == 0) {
     B2WARNING("No track points (measurements) were added to this reco track. Have you used an invalid measurement adder?");
     return false;
   }
 
-  const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.m_genfitTrack.getTrackReps();
+  const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.getRepresentations();
   if (std::find(trackRepresentations.begin(), trackRepresentations.end(), trackRepresentation) == trackRepresentations.end()) {
-    recoTrack.m_genfitTrack.addTrackRep(trackRepresentation);
+    RecoTrackGenfitAccess::getGenfitTrack(recoTrack).addTrackRep(trackRepresentation);
   } else {
     if (not recoTrack.getDirtyFlag() and not m_skipDirtyCheck and not measurementAdderNeedsTrackRefit) {
       B2DEBUG(100, "Hit content did not change, track representation is already present and you used only default parameters." <<

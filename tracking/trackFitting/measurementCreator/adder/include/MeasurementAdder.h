@@ -180,7 +180,7 @@ namespace Belle2 {
         }
 
         for (genfit::TrackPoint* trackPoint : trackPoints) {
-          recoTrack.m_genfitTrack.insertPoint(trackPoint);
+          RecoTrackGenfitAccess::getGenfitTrack(recoTrack).insertPoint(trackPoint);
         }
       }
     }

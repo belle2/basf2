@@ -13,16 +13,34 @@
 using namespace Belle2;
 using namespace std;
 
+ECLChannelMapper::ECLChannelMapper()
+{
+  int i = 0, j = 0;
+  for (i = 0; i < ECL_BARREL_CRATES * ECL_BARREL_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER; i++)
+    convertArrayBarrel[i] = 0;
+  for (i = 0; i < ECL_FWD_CRATES * ECL_FWD_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER; i++)
+    convertArrayFWD[i] = 0;
+  for (i = 0; i < ECL_BKW_CRATES * ECL_BKW_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER; i++)
+    convertArrayBKW[i] = 0;
+  for (i = 0; i < ECL_TOTAL_CHANNELS; i++)
+    for (j = 0; j < 3; j++)
+      convertArrayInv[i][j] = 0;
+
+}
+
 bool ECLChannelMapper::initFromFile(const char* eclMapFileName = "crpsch.dat")
 {
-  float iCrate, iShaper, iChannel, thetaID, phiID, cellID;
-  int arrayIndex = 0;
-  int arrayCount = 0;
+
 
   ifstream mapFile(eclMapFileName);
   if (mapFile.is_open()) {
 
     while (mapFile.good()) {
+
+      float iCrate, iShaper, iChannel, thetaID, phiID, cellID;
+      int arrayIndex = 0;
+      int arrayCount = 0;
+
       mapFile >> iCrate >> iShaper >> iChannel >> thetaID >> phiID >> cellID;
 
       if (cellID > ECL_TOTAL_CHANNELS) {
@@ -44,14 +62,17 @@ bool ECLChannelMapper::initFromFile(const char* eclMapFileName = "crpsch.dat")
 
       if (iCrate > 36 && iCrate < 45) {
         arrayIndex = arrayCount - 36 * 12 * 16;
-//        std::cout << arrayIndex << " " << cellID << std::endl;
-        convertArrayFWD[arrayIndex] = (int)cellID;
+
+//        std::cout << arrayIndex << " " << cellID << std::endl
+        if (arrayIndex >= 0 && arrayIndex < ECL_FWD_CRATES * ECL_FWD_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER)
+          convertArrayFWD[arrayIndex] = (int)cellID;
       }
 
       if (iCrate > 44) {
         arrayIndex = arrayCount - 36 * 12 * 16 - 8 * 10 * 16;
 //        std::cout << arrayIndex << " " << cellID << std::endl;
-        convertArrayBKW[arrayIndex] = (int)cellID;
+        if (arrayIndex >= 0 && arrayIndex < ECL_BKW_CRATES * ECL_BKW_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER)
+          convertArrayBKW[arrayIndex] = (int)cellID;
       }
       arrayCount++;
     }

@@ -30,7 +30,7 @@ namespace Belle2 {
     int convertArrayInv[ECL_TOTAL_CHANNELS][3]; // 0 -- icrate, 1 -- iboard, 2 -- ichannel
 
   public:
-    ECLChannelMapper() {};
+    ECLChannelMapper();
     ~ECLChannelMapper() {};
     /// Initialize channel mapper using data stored in the ASCII file
     bool initFromFile(const char* eclMapFile);

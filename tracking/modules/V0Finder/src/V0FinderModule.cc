@@ -9,25 +9,15 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/V0.h>
 #include <tracking/dataobjects/V0ValidationVertex.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/v0Finding/dataobjects/VertexVector.h>
 #include <tracking/v0Finding/fitter/V0Fitter.h>
 #include <TMath.h>
 #include <TLorentzVector.h>
-#include "genfit/Track.h"
-#include "genfit/GFRaveVertexFactory.h"
-#include "genfit/GFRaveTrackParameters.h"
 
-// The following includes can be retired once we disable the TGeo
-// stuff, genfit initialization should hopefully be centralized at
-// that time.
+// TODO: This dependency can be removed, because the initialization of genfit happens centralized.
 #include "genfit/FieldManager.h"
 #include "genfit/MaterialEffects.h"
-#include "genfit/TGeoMaterialInterface.h"
-#include <TGeoManager.h>
-#include <geometry/GeometryManager.h>
-#include <geometry/bfieldmap/BFieldMap.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
-
 
 using namespace Belle2;
 
@@ -53,8 +43,8 @@ V0FinderModule::V0FinderModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //input tracks
-  addParam("GFTrackColName", m_GFTrackColName,
-           "genfit::Track collection name (input)", std::string(""));
+  addParam("RecoTrackColName", m_RecoTrackColName,
+           "RecoTrack collection name (input)", std::string(""));
   addParam("TFRColName", m_TFRColName,
            "Belle2::TrackFitResult collection name (input).  Note that the V0s "
            "use pointers indices into these arrays, so all hell may break loose "
@@ -100,9 +90,8 @@ void V0FinderModule::initialize()
   StoreArray<TrackFitResult> trackFitResults(m_TFRColName);
   trackFitResults.isRequired();
 
-  StoreArray<genfit::Track> gfTracks(m_GFTrackColName);
-  gfTracks.isRequired();
-  gfTracks.registerRelationTo(trackFitResults);
+  StoreArray<RecoTrack> recoTracks(m_RecoTrackColName);
+  recoTracks.isRequired();
 
   StoreArray<V0> v0s(m_V0ColName);
   v0s.registerInDataStore(DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
@@ -166,7 +155,7 @@ void V0FinderModule::event()
     return;
   }
 
-  V0Fitter v0Fitter(m_TFRColName, m_V0ColName, m_V0ValidationVertexColName, m_GFTrackColName);
+  V0Fitter v0Fitter(m_TFRColName, m_V0ColName, m_V0ValidationVertexColName, m_RecoTrackColName);
   v0Fitter.initializeCuts(m_beamPipeRadius, m_vertexChi2CutInside, m_massWindowKshortInside, m_vertexChi2CutOutside);
   if (m_validation) {
     v0Fitter.enableValidation();

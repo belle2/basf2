@@ -70,7 +70,7 @@ namespace Belle2 {
      * @param vertex Result of the fit is returned via reference.
      * @return
      */
-    bool fitVertex(genfit::Track* trackPlus, genfit::Track* trackMinus, genfit::GFRaveVertex& vertex);
+    bool fitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex);
 
     /// Extrapolate the fit results to the perigee to the vertex.
     bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
@@ -80,7 +80,7 @@ namespace Belle2 {
     double getBzAtVertex(const TVector3& vertexPosition);
 
     /// Build TrackFitResult of V0 Track and set relation to genfit Track.
-    TrackFitResult* buildTrackFitResult(genfit::Track* track, genfit::MeasuredStateOnPlane& msop, double Bz,
+    TrackFitResult* buildTrackFitResult(const genfit::Track& track, const genfit::MeasuredStateOnPlane& msop, const double Bz,
                                         const Const::ParticleType& trackHypothesis);
 
     /// Get track hypotheses for a given v0 hypothesis.
@@ -88,7 +88,7 @@ namespace Belle2 {
 
   private:
     bool m_validation;  ///< Validation flag.
-    std::string m_GFTrackColName;   ///< GFTrackColName (input).
+    std::string m_RecoTrackColName;   ///< RecoTrackColName (input).
 
     StoreArray<TrackFitResult> m_trackFitResults;  ///< TrackFitResultColName (output).
     StoreArray<V0> m_v0s;  ///< V0ColName (output).

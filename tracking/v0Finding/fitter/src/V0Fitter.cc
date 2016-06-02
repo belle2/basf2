@@ -4,6 +4,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/v0Finding/dataobjects/VertexVector.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/GFRaveVertexFactory.h>
@@ -17,7 +18,7 @@ using namespace Belle2;
 
 V0Fitter::V0Fitter(const std::string& trackFitResultColName, const std::string& v0ColName,
                    const std::string& v0ValidationVertexColName, const std::string& gfTrackColName)
-  : m_validation(false), m_GFTrackColName(gfTrackColName)
+  : m_validation(false), m_RecoTrackColName(gfTrackColName)
 {
   m_trackFitResults = StoreArray<TrackFitResult>(trackFitResultColName);
   m_v0s = StoreArray<V0>(v0ColName);
@@ -54,10 +55,10 @@ bool V0Fitter::rejectCandidate(genfit::MeasuredStateOnPlane& stPlus, genfit::Mea
 }
 
 
-bool V0Fitter::fitVertex(genfit::Track* trackPlus, genfit::Track* trackMinus, genfit::GFRaveVertex& vertex)
+bool V0Fitter::fitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex)
 {
   VertexVector vertexVector;
-  std::vector<genfit::Track*> trackPair {trackPlus, trackMinus};
+  std::vector<genfit::Track*> trackPair {&trackPlus, &trackMinus};
 
   try {
     genfit::GFRaveVertexFactory vertexFactory;
@@ -110,17 +111,15 @@ double V0Fitter::getBzAtVertex(const TVector3& vertexPosition)
 }
 
 
-TrackFitResult* V0Fitter::buildTrackFitResult(genfit::Track* track, genfit::MeasuredStateOnPlane& msop, double Bz,
+TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const genfit::MeasuredStateOnPlane& msop, const double Bz,
                                               const Const::ParticleType& trackHypothesis)
 {
   TrackFitResult* v0TrackFitResult
     = m_trackFitResults.appendNew(msop.getPos(), msop.getMom(),
                                   msop.get6DCov(), msop.getCharge(),
                                   trackHypothesis,
-                                  track->getFitStatus()->getPVal(),
+                                  track.getFitStatus()->getPVal(),
                                   Bz, 0, 0);
-
-  DataStore::addRelationFromTo(track, v0TrackFitResult);
   return v0TrackFitResult;
 }
 
@@ -145,23 +144,23 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
                            const Const::ParticleType& v0Hypothesis)  // TODO: Give Particle Types
 {
   const auto trackHypotheses = getTrackHypotheses(v0Hypothesis);
-  genfit::Track* gfTrackPlus = trackPlus->getTrackFitResult(trackHypotheses.first)->getRelatedFrom<genfit::Track>(m_GFTrackColName);
 
-  if (!gfTrackPlus) {
-    B2ERROR("No genfit::Track for TrackFitResult");
+  RecoTrack* recoTrackPlus = trackPlus->getRelated<RecoTrack>(m_RecoTrackColName);
+  if (not recoTrackPlus) {
+    B2ERROR("No RecoTrack for Belle2::Track");
     return false;
   }
+  genfit::Track& gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
 
-  genfit::Track* gfTrackMinus = trackMinus->getTrackFitResult(trackHypotheses.second)->getRelatedFrom<genfit::Track>
-                                (m_GFTrackColName);
-
-  if (!gfTrackMinus) {
-    B2ERROR("No genfit::Track for TrackFitResult");
+  RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_RecoTrackColName);
+  if (not recoTrackMinus) {
+    B2ERROR("No RecoTrack for Belle2::Track");
     return false;
   }
+  genfit::Track& gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
 
-  genfit::MeasuredStateOnPlane stPlus = gfTrackPlus->getFittedState();
-  genfit::MeasuredStateOnPlane stMinus = gfTrackMinus->getFittedState();
+  genfit::MeasuredStateOnPlane stPlus = gfTrackPlus.getFittedState();
+  genfit::MeasuredStateOnPlane stMinus = gfTrackMinus.getFittedState();
 
   if (rejectCandidate(stPlus, stMinus)) {
     return false;

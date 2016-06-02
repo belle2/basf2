@@ -65,7 +65,7 @@ namespace Belle2 {
      */
     virtual void terminate();
   private:
-    std::string m_GFTrackColName; ///< InputcolName of the genfit Tracks.
+    std::string m_RecoTrackColName; ///< InputColName of the RecoTracks.
     std::string m_TFRColName; ///< OutputColName of the TrackFitResults matching to the created V0s.
     std::string m_TrackColName; ///< InputColName of the Tracks.
     std::string m_V0ColName; ///< OutputColName of the V0

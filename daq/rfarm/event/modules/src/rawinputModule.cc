@@ -106,10 +106,16 @@ void RawInputModule::registerRawCOPPERs()
   char* evtbuf = new char[MAXEVTSIZE];
   // Get a record from file
   int sstat = read(m_fd, evtbuf, sizeof(int));
-  if (sstat <= 0) return;
+  if (sstat <= 0) {
+    delete[] evtbuf;
+    return;
+  }
   int* recsize = (int*)evtbuf;
   int rstat = read(m_fd, evtbuf + sizeof(int), (*recsize - 1) * 4);
-  if (rstat <= 0) return;
+  if (rstat <= 0) {
+    delete[] evtbuf;
+    return;
+  }
 
   B2INFO("RawInput: got an event from a file, size=" << recsize <<
          " (proc= " << (int)getpid() << ")");

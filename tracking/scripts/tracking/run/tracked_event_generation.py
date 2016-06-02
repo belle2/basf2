@@ -200,7 +200,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
             gen_fitter_module.param({'pdgCodeToUseForFitting': 13})
             main_path.add_module(gen_fitter_module)
 
-            trackbuilder = basf2.register_module('TrackBuilder')
+            trackbuilder = basf2.register_module('TrackCreator', pdgCodes=13)
             main_path.add_module(trackbuilder)
 
         return main_path

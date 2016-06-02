@@ -262,6 +262,7 @@ main(int argc, char** argv)
       log("event_no = %d \n", event_number);
     }
   }
+  delete copper;
 
   /* EOR */
 }

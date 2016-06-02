@@ -142,7 +142,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 basf2.B2WARNING("Encountered a pattern recognition track with no hits")
                 continue
 
-            cdcHitIDs = [cdcHit.getArrayIndex() for cdcHit in mcTrackCand.getCDCHitList()]  # Checked
+            cdcHitIDs = [cdcHit.getArrayIndex() for cdcHit in trackCand.getCDCHitList()]  # Checked
             # Working around a bug in ROOT where you should not access empty std::vectors
             if len(cdcHitIDs) == 0:
                 cdcHitIDs = set()

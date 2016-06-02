@@ -74,11 +74,18 @@ def get_det_hit_ids(track_cand, det_ids=[Belle2.Const.PXD, Belle2.Const.SVD, Bel
     """
     det_hit_ids = set()
     for det_id in det_ids:
-        hit_ids = track_cand.getHitIDs(det_id)
+        if det_id == Belle2.Const.CDC:
+            hits = track_cand.getCDCHitList()
+        elif det_id == Belle2.Const.SVD:
+            hits = track_cand.getSVDHitList()
+        elif det_id == Belle2.Const.PXD:
+            hits = track_cand.getPXDHitList()
+        else:
+            raise ValueError("DET ID not known.")
 
         # Working around a bug in ROOT where you should not access empty std::vectors
-        if len(hit_ids) != 0:
-            det_hit_ids |= set((det_id, hit_id) for hit_id in hit_ids)
+        if len(hits) != 0:
+            det_hit_ids |= set((det_id, hit.getArrayIndex()) for hit in hits)
 
     return det_hit_ids
 

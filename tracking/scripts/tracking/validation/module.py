@@ -161,8 +161,8 @@ class TrackingValidationModule(basf2.Module):
         exclude_profile_mc_parameter='',
         exclude_profile_pr_parameter='',
         use_expert_folder=True,
-        trackCandidatesColumnName="TrackCands",
-        mcTrackCandidatesColumName="MCTrackCands"
+        trackCandidatesColumnName="RecoTracks",
+        mcTrackCandidatesColumName="MCRecoTracks"
     ):
 
         super(TrackingValidationModule, self).__init__()
@@ -272,8 +272,8 @@ class TrackingValidationModule(basf2.Module):
             # store seed information, they are always available from the pattern reco
             # even if the fit was no successful
             # this information can we used when plotting fake tracks, for example
-            seed_position = trackCand.getPosSeed()
-            seed_momentum = trackCand.getMomSeed()
+            seed_position = trackCand.getPositionSeed()
+            seed_momentum = trackCand.getMomentumSeed()
             seed_tan_lambda = np.divide(1.0, math.tan(seed_momentum.Theta()))  # Avoid zero division exception
             seed_phi = seed_position.Phi()
             seed_theta = seed_position.Theta()
@@ -610,11 +610,12 @@ def getHelixFromMCParticle(mcParticle):
 
 
 def getSeedTrackFitResult(trackCand):
-    position = trackCand.getPosSeed()
-    momentum = trackCand.getMomSeed()
-    cartesian_covariance = trackCand.getCovSeed()
+    position = trackCand.getPositionSeed()
+    momentum = trackCand.getMomentumSeed()
+    cartesian_covariance = trackCand.getSeedCovariance()
     charge_sign = (-1 if trackCand.getChargeSeed() < 0 else 1)
-    particle_type = Belle2.Const.ParticleType(trackCand.getPdgCode())
+    # It does not matter, which particle we put in here, so we just use a pion
+    particle_type = Belle2.Const.pion
     p_value = float('nan')
     b_field = 1.5
     cdc_hit_pattern = 0

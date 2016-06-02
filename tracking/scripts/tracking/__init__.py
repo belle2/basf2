@@ -6,9 +6,14 @@ from basf2 import *
 from ROOT import Belle2
 
 
-def is_vxd_used(components):
-    """Return true, if the VXD is present in the components list"""
+def is_svd_used(components):
+    """Return true, if the SVD is present in the components list"""
     return components is None or 'SVD' in components
+
+
+def is_pxd_used(components):
+    """Return true, if the PXD is present in the components list"""
+    return components is None or 'PXD' in components
 
 
 def is_cdc_used(components):
@@ -34,11 +39,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
     realistic track finding otherwise.
     """
 
-    if components and not ('SVD' in components or 'CDC' in components):
+    if not is_svd_used(components) and not is_cdc_used(components):
         return
-
-    use_vxd = is_vxd_used(components)
-    use_cdc = is_cdc_used(components)
 
     # check for detector geometry, necessary for track extrapolation in genfit
     if 'Geometry' not in path:
@@ -57,39 +59,29 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
     else:
         add_track_finding(path, components)
 
-    # Match the tracks to the MC truth.  The matching works based on
-    # the output of the TrackFinderMCTruth.
+    # Match the tracks to the MC truth. The matching works based on
+    # the output of the TrackFinderMCTruthRecoTracks.
     mctrackfinder = register_module('TrackFinderMCTruthRecoTracks')
     mctrackfinder.param('RecoTracksStoreArrayName', 'MCRecoTracks')
     mctrackfinder.param('WhichParticles', [])
     path.add_module(mctrackfinder)
 
-    # The following modules need genfit::TrackCands
-    path.add_module("GenfitTrackCandidatesCreator")
-    path.add_module(
-        "GenfitTrackCandidatesCreator",
-        genfitTrackCandsStoreArrayName="MCTrackCands",
-        recoTracksStoreArrayName="MCRecoTracks")
-
-    mctrackmatcher = register_module('MCMatcherTracks')
-    mctrackmatcher.param('MCGFTrackCandsColName', 'MCTrackCands')
-    mctrackmatcher.param('UsePXDHits', use_vxd)
-    mctrackmatcher.param('UseSVDHits', use_vxd)
-    mctrackmatcher.param('UseCDCHits', use_cdc)
+    mctrackmatcher = register_module('MCRecoTracksMatcher')
+    mctrackmatcher.param('mcRecoTracksStoreArrayName', 'MCRecoTracks')
+    mctrackmatcher.param('UsePXDHits', is_pxd_used(components))
+    mctrackmatcher.param('UseSVDHits', is_svd_used(components))
+    mctrackmatcher.param('UseCDCHits', is_cdc_used(components))
     path.add_module(mctrackmatcher)
 
     # track fitting
-    trackfitter = path.add_module('GenFitter')
-    trackfitter.param({"PDGCodes": [211]})
-    trackfitter.set_name('combined GenFitter')
+    path.add_module("DAFRecoFitter").set_name("Combined_DAFRecoFitter")
 
     # create Belle2 Tracks from the genfit Tracks
-    trackbuilder = register_module('TrackBuilder')
-    path.add_module(trackbuilder)
+    path.add_module('TrackCreator')
 
     # V0 finding
-    v0finder = register_module('V0Finder')
-    path.add_module(v0finder)
+    # TODO TODO TODO
+    # path.add_module('V0Finder')
 
     # prune genfit tracks
     if pruneTracks:
@@ -115,10 +107,10 @@ def add_track_finding(path, components=None):
     The result is a StoreArray 'RecoTracks' full of RecoTracks (not TrackCands any more!).
     Use the GenfitTrackCandidatesCreator Module to convert back.
     """
-    if components and not ('SVD' in components or 'CDC' in components):
+    if not is_svd_used(components) and not is_cdc_used(components):
         return
 
-    use_vxd = is_vxd_used(components)
+    use_svd = is_svd_used(components)
     use_cdc = is_cdc_used(components)
 
     # if only CDC or VXD are used, the track finding result
@@ -129,20 +121,20 @@ def add_track_finding(path, components=None):
 
     # CDC track finder
     if use_cdc:
-        if use_vxd:
+        if use_svd:
             cdc_reco_tracks = "CDCRecoTracks"
 
         add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks)
 
     # VXD track finder
-    if use_vxd:
+    if use_svd:
         if use_cdc:
             vxd_reco_tracks = "VXDRecoTracks"
 
         add_vxd_track_finding(path, components=components, reco_tracks=vxd_reco_tracks)
 
     # track merging
-    if use_vxd and use_cdc:
+    if use_svd and use_cdc:
         merged_recotracks = 'RecoTracks'
 
         # Fit all reco tracks This will be unneeded once the merger is rewritten.
@@ -165,28 +157,15 @@ def add_track_finding(path, components=None):
 
 
 def add_mc_track_finding(path, components=None):
-    # tracking
-    if components and not ('PXD' in components or 'SVD' in components or 'CDC'
-                           in components):
-        return
-
-    # find MCTracks in CDC, SVD, and PXD
-    mc_trackfinder = register_module('TrackFinderMCTruthRecoTracks')
-    # Default setting in the module may be either way, therefore
-    # accomodate both cases explicitly.
-    if components is None or 'PXD' in components:
-        mc_trackfinder.param('UsePXDHits', 1)
-    else:
-        mc_trackfinder.param('UsePXDHits', 0)
-    if components is None or 'SVD' in components:
-        mc_trackfinder.param('UseSVDHits', 1)
-    else:
-        mc_trackfinder.param('UseSVDHits', 0)
-    if components is None or 'CDC' in components:
-        mc_trackfinder.param('UseCDCHits', 1)
-    else:
-        mc_trackfinder.param('UseCDCHits', 0)
-    path.add_module(mc_trackfinder)
+    """
+    Add the MC based TrackFinder to the path.
+    """
+    if is_cdc_used(components) or is_pxd_used(components) or is_svd_used(components):
+        # find MCTracks in CDC, SVD and PXD (or a subset of it)
+        path.add_module('TrackFinderMCTruthRecoTracks',
+                        UsePXDHits=is_pxd_used(components),
+                        UseSVDHits=is_svd_used(components),
+                        UseCDCHits=is_cdc_used(components))
 
 
 def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
@@ -266,25 +245,24 @@ def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None):
     # Temporary array
     vxd_trackcands = '__VXDGFTrackCands'
 
-    vxd_trackfinder = path.add_module('VXDTF')
-    vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
+    vxd_trackfinder = path.add_module('VXDTF', GFTrackCandidatesColName=vxd_trackcands)
     # WARNING: workaround for possible clashes between fitting and VXDTF
     # stays until the redesign of the VXDTF is finished.
     vxd_trackfinder.param('TESTERexpandedTestingRoutines', False)
-    if components is not None and 'PXD' not in components:
-        vxd_trackfinder.param('sectorSetup',
-                              ['shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
-                               'shiftedL3IssueTestSVDStd-100to400MeV_SVD',
-                               'shiftedL3IssueTestSVDStd-25to100MeV_SVD'
-                               ])
-        vxd_trackfinder.param('tuneCutoffs', 0.06)
-    else:
+    if is_pxd_used(components):
         vxd_trackfinder.param('sectorSetup',
                               ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',
                                'shiftedL3IssueTestVXDStd-100to400MeV_PXDSVD',
                                'shiftedL3IssueTestVXDStd-25to100MeV_PXDSVD'
                                ])
         vxd_trackfinder.param('tuneCutoffs', 0.22)
+    else:
+        vxd_trackfinder.param('sectorSetup',
+                              ['shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
+                               'shiftedL3IssueTestSVDStd-100to400MeV_SVD',
+                               'shiftedL3IssueTestSVDStd-25to100MeV_SVD'
+                               ])
+        vxd_trackfinder.param('tuneCutoffs', 0.06)
 
     # Convert VXD trackcands to reco tracks
     path.add_module("RecoTrackCreator", trackCandidatesStoreArrayName=vxd_trackcands,

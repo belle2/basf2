@@ -20,13 +20,14 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
     """Module to collect matching information about the found particles and to generate
        validation plots and figures of merit on the performance of track finding."""
 
-    def __init__(self,
-                 name,
-                 contact,
-                 output_file_name=None,
-                 track_cands_name="TrackCands",
-                 mc_track_cands_name='MCTrackCands',
-                 expert_level=None):
+    def __init__(
+            self,
+            name,
+            contact,
+            output_file_name=None,
+            trackCandidatesColumnName="RecoTracks",
+            mcTrackCandidatesColumnName='MCRecoTracks',
+            expert_level=None):
 
         output_file_name = output_file_name or name + 'TrackingValidation.root'
 

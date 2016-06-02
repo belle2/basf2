@@ -46,14 +46,14 @@ def run():
     # add additional matching for vxd and cdc only tracks here
 
     # for VXD only track
-    mctrackmatcher_vxd = basf2.register_module('MCMatcherTracks')
+    mctrackmatcher_vxd = basf2.register_module('MCTrackMatcher')
     mctrackmatcher_vxd.param('MCGFTrackCandsColName', 'MCTrackCands')
     mctrackmatcher_vxd.param('PRGFTrackCandsColName', 'VXDGFTrackCands')
     mctrackmatcher_vxd.param('UseCDCHits', False)
     path.add_module(mctrackmatcher_vxd)
 
     # for CDC only tracks
-    mctrackmatcher_cdc = basf2.register_module('MCMatcherTracks')
+    mctrackmatcher_cdc = basf2.register_module('MCTrackMatcher')
     mctrackmatcher_cdc.param('MCGFTrackCandsColName', 'MCTrackCands')
     mctrackmatcher_cdc.param('PRGFTrackCandsColName', 'CDCGFTrackCands')
     mctrackmatcher_cdc.param('UsePXDHits', False)

@@ -16,7 +16,7 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
-#include <genfit/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackPoint.h>
 #include <genfit/KalmanFitterInfo.h>
 
@@ -30,8 +30,6 @@
 
 #include <root/TFile.h>
 #include <root/TTree.h>
-
-#include <boost/foreach.hpp>
 
 using namespace Belle2;
 
@@ -49,17 +47,10 @@ StandardTrackingPerformanceModule::StandardTrackingPerformanceModule() :
 
   addParam("outputFileName", m_outputFileName, "Name of output root file.",
            std::string("StandardTrackingPerformanceOutput.root"));
-  addParam("gfTrackColName", m_gfTrackColName, "Name of genfit::Track collection.",
-           std::string(""));
-  addParam("trackColName", m_trackColName, "Name of Track collection.",
+  addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "Name of the RecoTracks StoreArray.",
            std::string(""));
   addParam("daughterPDGs", m_signalDaughterPDGs, "PDG codes of B daughters.",
            std::vector<int>(0));
-}
-
-StandardTrackingPerformanceModule::~StandardTrackingPerformanceModule()
-{
-
 }
 
 void StandardTrackingPerformanceModule::initialize()
@@ -67,7 +58,7 @@ void StandardTrackingPerformanceModule::initialize()
   // MCParticles and Tracks needed for this module
   StoreArray<MCParticle>::required();
   StoreArray<Track>::required();
-  StoreArray< genfit::Track >::required(m_gfTrackColName);
+  StoreArray<RecoTrack>::required(m_recoTracksStoreArrayName);
   StoreArray<TrackFitResult>::required();
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
@@ -77,12 +68,6 @@ void StandardTrackingPerformanceModule::initialize()
   oldDir->cd();
 
   setupTree();
-
-}
-
-void StandardTrackingPerformanceModule::beginRun()
-{
-
 }
 
 void StandardTrackingPerformanceModule::event()
@@ -95,14 +80,14 @@ void StandardTrackingPerformanceModule::event()
   B2DEBUG(99,
           "Processes experiment " << expNumber << " run " << runNumber << " event " << eventNumber);
 
-  StoreArray< genfit::Track > gfTracks(m_gfTrackColName);
+  StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
   StoreArray<MCParticle> mcParticles;
 
   m_nGeneratedChargedStableMcParticles = 0;
   m_nReconstructedChargedStableTracks = 0;
   m_nFittedChargedStabletracks = 0;
 
-  BOOST_FOREACH(MCParticle & mcParticle, mcParticles) {
+  for (MCParticle& mcParticle : mcParticles) {
     // check status of mcParticle
     if (isPrimaryMcParticle(mcParticle) && isChargedStable(mcParticle) && mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
       setVariablesToDefaultValue();
@@ -123,58 +108,79 @@ void StandardTrackingPerformanceModule::event()
       m_trackProperties.z_gen = mcParticle.getVertex().Z();
 
 
-      genfit::Track* gfTrack = findRelatedTrack(mcParticle, gfTracks);
+      const RecoTrack* recoTrack = nullptr;
+      double maximumWeight = -2;
+      /*// MIMIK OLD MODULE, which took always the last one (which is probably a CDC track).
+      for(const Track& relatedTrack : mcParticle.getRelationsWith<Track>()) {
+        b2Track = &relatedTrack;
+      }*/
+      // find highest rated Track
+      const auto& relatedRecoTracks = mcParticle.getRelationsWith<RecoTrack>(m_recoTracksStoreArrayName);
+      for (unsigned int index = 0; index < relatedRecoTracks.size(); ++index) {
+        const RecoTrack* relatedRecoTrack = relatedRecoTracks.object(index);
+        const double weight = relatedRecoTracks.weight(index);
 
-      if (gfTrack != NULL) { // genfit::Track found
-        // find related TrackFitResult, if none is found, something went wrong during fit or extrapolation
-        const TrackFitResult* fitResult = findRelatedTrackFitResult(gfTrack);
-        if (fitResult != NULL) { // valid TrackFitResult found
-          m_nFittedChargedStabletracks++;
-          // write some data to the root tree
-          TVector3 mom = fitResult->getMomentum();
-          m_trackProperties.cosTheta = mom.CosTheta();
-          m_trackProperties.ptot = mom.Mag();
-          m_trackProperties.pt = mom.Pt();
-          m_trackProperties.px = mom.Px();
-          m_trackProperties.py = mom.Py();
-          m_trackProperties.pz = mom.Pz();
-          m_trackProperties.x = fitResult->getPosition().X();
-          m_trackProperties.y = fitResult->getPosition().Y();
-          m_trackProperties.z = fitResult->getPosition().Z();
+        const unsigned int numberOfRelatedTracks = relatedRecoTrack->getRelationsWith<Track>().size();
+        B2ASSERT("B2Track <-> RecoTrack is not a 1:1 relation as expected!", numberOfRelatedTracks <= 1);
+        // use only the fitted reco tracks
+        if (numberOfRelatedTracks == 1) {
+          if (weight > maximumWeight) {
+            maximumWeight = weight;
+            recoTrack = relatedRecoTrack;
+          }
+        }
+      }
 
-          // Count hits
-          m_trackProperties.nPXDhits = 0;
-          m_trackProperties.nSVDhits = 0;
-          m_trackProperties.nCDChits = 0;
-          m_trackProperties.nWeights = 0;
-          for (size_t iTP = 0; iTP < gfTrack->getNumPointsWithMeasurement(); ++iTP) {
-            const genfit::TrackPoint* tp = gfTrack->getPointWithMeasurement(iTP);
-            for (genfit::AbsMeasurement* m : tp->getRawMeasurements()) {
-              if (dynamic_cast<PXDRecoHit*>(m))
-                ++m_trackProperties.nPXDhits;
-              else if (dynamic_cast<SVDRecoHit*>(m))
-                ++m_trackProperties.nSVDhits;
-              else if (dynamic_cast<SVDRecoHit2D*>(m))
-                m_trackProperties.nSVDhits += 2;
-              else if (dynamic_cast<CDCRecoHit*>(m))
-                ++m_trackProperties.nCDChits;
-              else
-                B2ERROR("Unknown AbsMeasurement in track.");
+      if (recoTrack) {
+        const Track* b2Track = recoTrack->getRelated<Track>();
+        const TrackFitResult* fitResult = b2Track->getTrackFitResult(Const::pion);
+        B2ASSERT("Related Belle2 Track has no related track fit result!", fitResult);
 
-              std::vector<double> weights;
-              genfit::KalmanFitterInfo* kalmanInfo = tp->getKalmanFitterInfo();
-              if (kalmanInfo)
-                weights = kalmanInfo->getWeights();
+        m_nFittedChargedStabletracks++;
+        // write some data to the root tree
+        TVector3 mom = fitResult->getMomentum();
+        m_trackProperties.cosTheta = mom.CosTheta();
+        m_trackProperties.ptot = mom.Mag();
+        m_trackProperties.pt = mom.Pt();
+        m_trackProperties.px = mom.Px();
+        m_trackProperties.py = mom.Py();
+        m_trackProperties.pz = mom.Pz();
+        m_trackProperties.x = fitResult->getPosition().X();
+        m_trackProperties.y = fitResult->getPosition().Y();
+        m_trackProperties.z = fitResult->getPosition().Z();
 
-              for (size_t i = 0;
-                   (i < weights.size()
-                    && m_trackProperties.nWeights < ParticleProperties::maxNweights);
-                   ++i) {
-                m_trackProperties.weights[m_trackProperties.nWeights++] = weights[i];
-              }
+        m_pValue = fitResult->getPValue();
+
+        // Count hits
+        m_trackProperties.nPXDhits = 0;
+        m_trackProperties.nSVDhits = 0;
+        m_trackProperties.nCDChits = 0;
+        m_trackProperties.nWeights = 0;
+        for (genfit::TrackPoint* tp : recoTrack->getHitPointsWithMeasurement()) {
+          for (genfit::AbsMeasurement* m : tp->getRawMeasurements()) {
+            if (dynamic_cast<PXDRecoHit*>(m))
+              ++m_trackProperties.nPXDhits;
+            else if (dynamic_cast<SVDRecoHit*>(m))
+              ++m_trackProperties.nSVDhits;
+            else if (dynamic_cast<SVDRecoHit2D*>(m))
+              m_trackProperties.nSVDhits += 2;
+            else if (dynamic_cast<CDCRecoHit*>(m))
+              ++m_trackProperties.nCDChits;
+            else
+              B2ERROR("Unknown AbsMeasurement in track.");
+
+            std::vector<double> weights;
+            genfit::KalmanFitterInfo* kalmanInfo = tp->getKalmanFitterInfo();
+            if (kalmanInfo)
+              weights = kalmanInfo->getWeights();
+
+            for (size_t i = 0;
+                 (i < weights.size()
+                  && m_trackProperties.nWeights < ParticleProperties::maxNweights);
+                 ++i) {
+              m_trackProperties.weights[m_trackProperties.nWeights++] = weights[i];
             }
           }
-          m_pValue = fitResult->getPValue();
         }
       }
 
@@ -183,58 +189,21 @@ void StandardTrackingPerformanceModule::event()
   }
 }
 
-void StandardTrackingPerformanceModule::endRun()
-{
-
-}
 
 void StandardTrackingPerformanceModule::terminate()
 {
   writeData();
 }
 
-bool StandardTrackingPerformanceModule::isPrimaryMcParticle(MCParticle& mcParticle)
+bool StandardTrackingPerformanceModule::isPrimaryMcParticle(const MCParticle& mcParticle)
 {
   return mcParticle.hasStatus(MCParticle::c_PrimaryParticle);
 }
 
-bool StandardTrackingPerformanceModule::isChargedStable(MCParticle& mcParticle)
+bool StandardTrackingPerformanceModule::isChargedStable(const MCParticle& mcParticle)
 {
   return Const::chargedStableSet.find(abs(mcParticle.getPDG()))
          != Const::invalidParticle;
-}
-
-genfit::Track* StandardTrackingPerformanceModule::findRelatedTrack(
-  MCParticle& mcParticle, StoreArray<genfit::Track>& gfTracks)
-{
-  B2DEBUG(99, "Entered findRelatedTrack function.");
-  int iMcParticle = mcParticle.getArrayIndex();
-  B2DEBUG(99, "MCParticle array index: " << iMcParticle);
-  genfit::Track* resultGfTrack = NULL;
-
-  for (genfit::Track& gfTrack : gfTracks) {
-    const genfit::TrackCand* aTrackCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(&gfTrack);
-    if (!aTrackCandPtr) {
-      B2ERROR("No Track Candidate for track.  Skipping.");
-      continue;
-    }
-    if (aTrackCandPtr->getMcTrackId() == iMcParticle
-        /* FIXME: it used to say 'aTrackCandPtr->getPdgCode() ==
-           mcParticle.getPDG()' as a second contion.  This broke when
-           the MCTrackCandCombiner stopped automatically setting the
-           particle hypothesis to the MC truth.  But the whole
-           sequence in this function doesn't seem to make much sense,
-           as we specified the data structures such that each
-           Belle2::Track contains several Belle2::TrackFitResults
-           corresponding to the various particle hypotheses.  How
-           these relate to genfit::Track is not yet cast in stone.  */
-        && 1) {
-      B2DEBUG(99, "Found genfit::Track<->MCParticle relation.");
-      resultGfTrack = &gfTrack;
-    }
-  }
-
-  return resultGfTrack;
 }
 
 void StandardTrackingPerformanceModule::setupTree()
@@ -283,38 +252,6 @@ void StandardTrackingPerformanceModule::setupTree()
   m_dataTree->Branch("weights", &m_trackProperties.weights, "weights[nWeights]/F");
 }
 
-const TrackFitResult* StandardTrackingPerformanceModule::findRelatedTrackFitResult(
-  const genfit::Track* gfTrack)
-{
-  // search for a related TrackFitResult
-  RelationIndex<genfit::Track, TrackFitResult> relGfTracksToTrackFitResults;
-
-  typedef RelationIndex<genfit::Track, TrackFitResult>::Element relElement_t;
-
-  std::vector<const TrackFitResult*> fitResults;
-
-  BOOST_FOREACH(const relElement_t& relGfTrackToTrackFitResult, relGfTracksToTrackFitResults.getElementsFrom(gfTrack)) {
-    B2DEBUG(99, "----> Related TrackFitResult found!!!");
-
-    fitResults.push_back(relGfTrackToTrackFitResult.to);
-  }
-
-  int numberTrackFitResults = fitResults.size();
-
-  if (numberTrackFitResults == 1) {
-    return fitResults[0];
-  }
-  if (numberTrackFitResults == 0) {
-    return NULL;
-  }
-  if (numberTrackFitResults > 1) {
-    B2DEBUG(99,
-            "genfit::Track has " << numberTrackFitResults << " related TrackFitResults. No TrackFitResult is returned.");
-  }
-
-  return NULL;
-}
-
 void StandardTrackingPerformanceModule::writeData()
 {
   if (m_dataTree != NULL) {
@@ -329,25 +266,24 @@ void StandardTrackingPerformanceModule::writeData()
   }
 }
 
-void StandardTrackingPerformanceModule::findSignalMCParticles(
-  StoreArray<MCParticle>& mcParticles)
+void StandardTrackingPerformanceModule::findSignalMCParticles(const StoreArray<MCParticle>& mcParticles)
 {
   std::sort(m_signalDaughterPDGs.begin(), m_signalDaughterPDGs.end());
 
   std::vector<MCParticle*> daughterMcParticles;
-  BOOST_FOREACH(MCParticle & mcParticle, mcParticles) {
+  for (const MCParticle& mcParticle : mcParticles) {
     // continue if mcParticle is not a B meson
     if (abs(mcParticle.getPDG()) != 511 && abs(mcParticle.getPDG()) != 521)
       continue;
 
     if (isSignalDecay(mcParticle)) {
-      addChargedStable(&mcParticle);
+      addChargedStable(mcParticle);
       break;
     }
   }
 }
 
-bool StandardTrackingPerformanceModule::isSignalDecay(MCParticle& mcParticle)
+bool StandardTrackingPerformanceModule::isSignalDecay(const MCParticle& mcParticle)
 {
   std::vector<int> daughterPDGs;
   std::vector<MCParticle*> daughterMcParticles = mcParticle.getDaughters();
@@ -371,8 +307,7 @@ bool StandardTrackingPerformanceModule::isSignalDecay(MCParticle& mcParticle)
 
 /** remove all Photons in a  given MCParticle* vector, assumption that all phtons come from FSR
  * return std::vector< MCParticle* > daughterWOFSR */
-std::vector<MCParticle*> StandardTrackingPerformanceModule::removeFinalStateRadiation(
-  const std::vector<MCParticle*>& in_daughters)
+std::vector<MCParticle*> StandardTrackingPerformanceModule::removeFinalStateRadiation(const std::vector<MCParticle*>& in_daughters)
 {
   std::vector<MCParticle*> daughtersWOFSR;
   for (unsigned int iDaughter = 0; iDaughter < in_daughters.size(); iDaughter++)
@@ -382,25 +317,24 @@ std::vector<MCParticle*> StandardTrackingPerformanceModule::removeFinalStateRadi
   return daughtersWOFSR;
 }
 
-void StandardTrackingPerformanceModule::addChargedStable(
-  MCParticle* mcParticle)
+void StandardTrackingPerformanceModule::addChargedStable(const MCParticle& mcParticle)
 {
 
   // mcparticle is not a charged stable decays into daughters
   // loop over daughters and add the charged stable particles recursively to the vector
-  std::vector<MCParticle*> daughters = mcParticle->getDaughters();
+  std::vector<MCParticle*> daughters = mcParticle.getDaughters();
   if (daughters.size() != 0) {
     for (auto daughterMcParticle : daughters) {
-      addChargedStable(daughterMcParticle);
+      addChargedStable(*daughterMcParticle);
     }
   }
 
   // charged stable particle is added to the interesting particle vector
-  if (isChargedStable(*mcParticle) && isPrimaryMcParticle(*mcParticle)
-      && mcParticle->hasStatus(MCParticle::c_StableInGenerator)) {
+  if (isChargedStable(mcParticle) && isPrimaryMcParticle(mcParticle)
+      && mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
 //   B2DEBUG(99,
 //          "Found a charged stable particle. Add it to interesting MCParticles. PDG(" << mcParticle->getPDG() << ").");
-    m_interestingChargedStableMcParcticles.push_back(mcParticle);
+    m_interestingChargedStableMcParcticles.push_back(&mcParticle);
     return;
   }
 

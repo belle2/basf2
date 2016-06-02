@@ -93,9 +93,9 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
 
 @format_crop_keys
 def peel_track_cand_hit_content(track_cand, key="{part_name}"):
-    n_pxd_hits = track_cand.getHitIDs(Belle2.Const.PXD).size()
-    n_svd_hits = track_cand.getHitIDs(Belle2.Const.SVD).size()
-    n_cdc_hits = track_cand.getHitIDs(Belle2.Const.CDC).size()
+    n_pxd_hits = track_cand.getNumberOfCDCHits()
+    n_svd_hits = track_cand.getNumberOfSVDHits()
+    n_cdc_hits = track_cand.getNumberOfPXDHits()
     ndf = 2 * n_pxd_hits + 2 * n_svd_hits + n_cdc_hits
 
     return dict(
@@ -218,11 +218,12 @@ def get_helix_from_mc_particle(mc_particle):
 
 
 def get_seed_track_fit_result(track_cand):
-    position = track_cand.getPosSeed()
-    momentum = track_cand.getMomSeed()
-    cartesian_covariance = track_cand.getCovSeed()
+    position = track_cand.getPositionSeed()
+    momentum = track_cand.getMomentumSeed()
+    cartesian_covariance = track_cand.getSeedCovariance()
     charge_sign = (-1 if track_cand.getChargeSeed() < 0 else 1)
-    particle_type = Belle2.Const.ParticleType(track_cand.getPdgCode())
+    # It does not matter, which particle we put in here, so we just use a pion
+    particle_type = Belle2.Const.pion
     p_value = float('nan')
     b_field = 1.5
     cdc_hit_pattern = 0

@@ -98,6 +98,15 @@ namespace Belle2 {
 
   public:
 
+
+    enum MatchingStatus {
+      c_undefined,
+      c_matched,
+      c_clone,
+      c_background,
+      c_ghost
+    };
+
     /**
      * Convenience method which registers all relations required to fully use
      * a RecoTrack. If you create a new RecoTrack StoreArray, call this method
@@ -585,6 +594,17 @@ namespace Belle2 {
       mapOnHits<HitType>(storeArrayNameOfHits, mapFunction, [](const RecoHitInformation&, const HitType*) -> bool { return true; });
     }
 
+    // Matching status
+    MatchingStatus getMatchingStatus() const
+    {
+      return m_matchingStatus;
+    }
+
+    void setMatchingStatus(MatchingStatus matchingStatus)
+    {
+      m_matchingStatus = matchingStatus;
+    }
+
 
   private:
     /// Internal storage for the genfit track.
@@ -602,7 +622,8 @@ namespace Belle2 {
     /// Bool is hits were added to track after fitting and the measurements should be recalculated.
     /// will be true after ROOT deserialization, which means the measurements will be recreated
     bool m_dirtyFlag = true;
-
+    /// Flag used in the MCRecoTracksMatcherModule
+    MatchingStatus m_matchingStatus = MatchingStatus::c_undefined;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.

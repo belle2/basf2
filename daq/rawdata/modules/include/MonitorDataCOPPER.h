@@ -73,6 +73,7 @@ namespace Belle2 {
     TH1* h_size;
     TH1* h_nevt;
     TH1* h_rate;
+    TH1* h_diff;
     TH1* h_hslb_size[4];
     TH1* h_hslb_nevt;
     TH1* h_hslb_rate;
@@ -80,6 +81,7 @@ namespace Belle2 {
     int m_nevt;
     int m_prev_nevt;
 
+    timeval m_tv;
     double m_start_time;
     double m_prev_time;
 

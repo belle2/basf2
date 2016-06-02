@@ -6,7 +6,7 @@
 // Date : 2 - Aug - 2013
 //-
 #include <daq/rawdata/modules/MonitorDataCOPPER.h>
-#include <rawdata/dataobjects/RawSVD.h>
+#include <rawdata/dataobjects/RawECL.h>
 
 #include <cstdio>
 
@@ -52,7 +52,8 @@ void MonitorDataCOPPERModule::defineHisto()
 
   h_size = new TH1F("h_size", "Data size / COPPER; Data size [Byte]; entries", 50, 0, 10000);
 
-  h_rate = new TH1F("h_rate", "Data rate / COPPER; COPPER ID; Data rate [Bytes/s]", 20, 0, 20);
+  h_rate = new TH1F("h_rate", "Event rate; Time [s]; Event Rate [Hz]", 1000, 0, 100000);
+  h_diff = new TH1F("h_diff", "Event inetrval; Event interval[s]; # of Events", 2000, 0, 0.2);
 
 
   /*
@@ -110,7 +111,7 @@ double MonitorDataCOPPERModule::getTimeSec()
 void MonitorDataCOPPERModule::event()
 {
   if (m_loop <= 0) {
-    m_start_time = getTimeSec();
+
     m_loop = 0;
     m_nevt = 0;
   }
@@ -119,32 +120,49 @@ void MonitorDataCOPPERModule::event()
   //StoreArray<RawCOPPER> rawcprarray;
   //StoreArray<RawCDC> raw_dblkarray;
   //StoreArray<RawDataBlock> raw_dblkarray;
-  StoreArray<RawSVD> raw_dblkarray;
+  StoreArray<RawECL> raw_dblkarray;
 
+  int utime = 0;
   int ncpr = raw_dblkarray.getEntries();
+  timeval prev_tv;
+  prev_tv = m_tv;
   for (int j = 0; j < ncpr; j++) {
     m_nevt++;
     for (int i = 0; i < raw_dblkarray[j]->GetNumEntries(); i++) {
-      RawCOPPER* temp_rawcopper = new RawCOPPER;
-      temp_rawcopper->SetBuffer(raw_dblkarray[j]->GetBuffer(i),
-                                raw_dblkarray[j]->GetBlockNwords(i), 0, 1, 1);
+      RawCOPPER temp_rawcopper;
+      temp_rawcopper.SetBuffer(raw_dblkarray[j]->GetBuffer(i),
+                               raw_dblkarray[j]->GetBlockNwords(i), 0, 1, 1);
+
+      if (j == 0 && i == 0) {
+        temp_rawcopper.GetTTTimeVal(i, &m_tv);
+        utime = temp_rawcopper.GetTTUtime(i);
+        if (m_loop == 0) {
+          m_start_time = (double)m_tv.tv_sec;
+        }
+      }
       int size_byte = raw_dblkarray[j]->GetBlockNwords(i) * sizeof(int);
-      //h_ncpr->Fill(i);
-      h_nevt->SetBinContent(i + 1, m_nevt);
-      h_size->SetBinContent(i + 1, h_size->GetBinContent(i + 1) + size_byte);
+      h_nevt->SetBinContent(j + 1, m_nevt);
+      h_size->SetBinContent(j + 1, h_size->GetBinContent(i + 1) + size_byte);
+
     }
   }
 
-  if (m_loop % 100 == 99) {
-    double cur_time = getTimeSec();
-    double tdiff_cur = cur_time - m_start_time;
-    double tdiff_prev = m_prev_time - m_start_time;
-    double rate = (m_nevt - m_prev_nevt) / (tdiff_cur - tdiff_prev);
-    if (m_nevt - m_prev_nevt != 0) {
-      h_rate->Fill(rate);
-    }
-    m_prev_nevt = m_nevt;
-    m_prev_time = cur_time;
+  h_diff->Fill(m_tv.tv_sec - prev_tv.tv_sec + (m_tv.tv_usec - prev_tv.tv_usec) * 1.e-6);
+
+
+
+  int tdiff_cur = m_tv.tv_sec - (int)m_start_time;
+
+  if (m_loop % 1000 == 99) {
+    //   printf("utime %d timeval %d %lf time %d\n", utime, m_tv.tv_sec, m_start_time,tdiff_cur );
   }
+  if (tdiff_cur < 100000  && tdiff_cur > 0) {
+    h_rate->SetBinContent(tdiff_cur / 100, h_rate->GetBinContent(tdiff_cur / 100) + 0.01);
+  }
+
+
   m_loop++;
+
+
+
 }

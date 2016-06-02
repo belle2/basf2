@@ -7,11 +7,11 @@
 #include <sys/errno.h>
 #include "copper.h"
 
-unsigned long buffer[1024 * 1024];
+unsigned int buffer[1024 * 1024];
 int timeout;
 int terminated = 0;
 
-void show_event(unsigned long *head, int len)
+void show_event(unsigned int *head, int len)
 {
     int i, j;
     for (i = 0; i + 1 < (len / 4); i += 8) {
@@ -26,9 +26,9 @@ void show_event(unsigned long *head, int len)
     printf("\n");
 }
 
-unsigned long xor(unsigned long *start, int wordlen)
+unsigned int xor(unsigned int *start, int wordlen)
 {
-    unsigned long ret = 0;
+    unsigned int ret = 0;
     int i;
     while (wordlen--) {
 	ret ^= *(start++);
@@ -162,7 +162,7 @@ main(int argc, char ** argv)
 	printf("%8d # of data = %4d,%4d,%4d,%4d, xor=%08x\n",
 	    event,
 	    buffer[9], buffer[10], buffer[11], buffer[12],
-	    xor((unsigned long *) buffer, ret / 4));
+	    xor((unsigned int *) buffer, ret / 4));
 #if 0
 	show_event(buffer, ret);
 #endif

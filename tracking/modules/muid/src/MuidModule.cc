@@ -17,7 +17,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <genfit/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/DetPlane.h>
 #include <genfit/FieldManager.h>
 #include <genfit/TrackPoint.h>
@@ -374,39 +374,27 @@ void MuidModule::event()
                                              klmClusters[c]->getClusterPosition().Z()) * CLHEP::cm);
   }
 
-  for (int t = 0; t < tracks.getEntries(); ++t) {
-
+  unsigned int trackIndex = 0;
+  for (auto& b2track : tracks) {
     // Typically, only the muon hypothesis is used.  Others are for debugging.
-    for (unsigned int hypothesis = 0; hypothesis < m_ChargedStable.size(); ++hypothesis) {
+    for (const auto& chargedStable : m_ChargedStable) {
+      RecoTrack* recoTrack = b2track.getRelatedTo<RecoTrack>();
 
-      Const::ChargedStable chargedStable = m_ChargedStable[hypothesis];
-      int pdgCode = chargedStable.getPDGCode();
+      // TODO: Which track representation do you want here?
+      const genfit::AbsTrackRep* trackRep = recoTrack->getCardinalRepresentation();
+
+      int charge = int(recoTrack->getTrackFitStatus(trackRep)->getCharge());
+      int pdgCode = chargedStable.getPDGCode() * charge;
       if (chargedStable == Const::electron || chargedStable == Const::muon) pdgCode = -pdgCode;
 
-      Muid* muid = muids.appendNew(pdgCode); // pdgCode doesn't know charge yet
-      tracks[t]->addRelationTo(muid);
+      Muid* muid = muids.appendNew(pdgCode); // pdgCode doesn't know charge yet TODO is this intended?
+      b2track.addRelationTo(muid);
 
-      const TrackFitResult* trackFit = tracks[t]->getTrackFitResult(chargedStable);
-      if (!trackFit) {
-        B2ERROR("No valid TrackFitResult for PDGcode " <<
-                chargedStable.getPDGCode() << ": extrapolation not possible")
-        continue;
-      }
-
-      const genfit::Track* gfTrack = DataStore::getRelated<genfit::Track>(trackFit);
-      if (!gfTrack) {
-        B2ERROR("No relation of TrackFitResult with genfit::Track for PDGcode " <<
-                chargedStable.getPDGCode() << ": extrapolation not possible")
-        continue;
-      }
-
-      pdgCode *= int(gfTrack->getFittedState().getCharge());
-      muid->setPDGCode(pdgCode);
       G4ThreeVector ipPos, ipDir;
       G4Point3D position;
       G4Vector3D momentum;
       G4ErrorTrajErr covG4e(5, 0);
-      getStartPoint(gfTrack, pdgCode, ipPos, ipDir, position, momentum, covG4e);
+      getStartPoint(recoTrack, trackRep, pdgCode, ipPos, ipDir, position, momentum, covG4e);
       muid->setMomentum(momentum.x(), momentum.y(), momentum.z());
       if (momentum.perp() <= m_MinPt) continue;
       if (m_Target->GetDistanceFromPoint(position) < 0.0) continue;
@@ -429,13 +417,13 @@ void MuidModule::event()
         // Ignore the zero-length step by PropagateOneStep() at each boundary
         if (step->GetStepLength() > 0.0) {
           if (preStatus == fGeomBoundary) {      // first step in this volume?
-            createEntryExitHit(state, EXT_ENTER, tracks[t], pdgCode);
+            createEntryExitHit(state, EXT_ENTER, b2track, pdgCode);
           }
           m_TOF += step->GetDeltaTime();
           if (postStatus == fGeomBoundary) {
-            createEntryExitHit(state, EXT_EXIT, tracks[t], pdgCode);
+            createEntryExitHit(state, EXT_EXIT, b2track, pdgCode);
           }
-          if (createHit(state, tracks[t], pdgCode)) {
+          if (createHit(state, b2track, pdgCode)) {
             // Force geant4e to update its G4Track from the Kalman-updated state
             m_ExtMgr->GetPropagator()->SetStepN(0);
           }
@@ -443,7 +431,7 @@ void MuidModule::event()
             G4ThreeVector clusterToTrack = clusterPositions[c] - pos;
             double distance = clusterToTrack.mag();
             if (clusterToTrack.mag() < trackClusterSeparations[c]->getDistance()) {
-              trackClusterSeparations[c]->setTrackIndex(t);
+              trackClusterSeparations[c]->setTrackIndex(trackIndex);
               trackClusterSeparations[c]->setDistance(distance);
               G4ThreeVector dir(clusterToTrack.unit());
               trackClusterSeparations[c]->setDirection(dir);
@@ -467,7 +455,7 @@ void MuidModule::event()
 
       delete state;
 
-      finishTrack(muid, int(gfTrack->getFittedState().getCharge()));
+      finishTrack(muid, charge);
 
       // Find the matching KLMCluster(s)
       for (int c = 0; c < klmClusters.getEntries(); ++c) {
@@ -475,9 +463,9 @@ void MuidModule::event()
                                    klmClusters[c]->getClusterPosition().Y(),
                                    klmClusters[c]->getClusterPosition().Z());
         if (position.angle(clusterDirection) < m_MaxClusterTrackConeAngle) {
-          if (trackClusterSeparations[c]->getTrackIndex() == t) {
+          if (trackClusterSeparations[c]->getTrackIndex() == trackIndex) {
             klmClusters[c]->setAssociatedTrackFlag();
-            tracks[t]->addRelationTo(klmClusters[c]);
+            b2track.addRelationTo(klmClusters[c]);
             break;
           }
         }
@@ -485,6 +473,7 @@ void MuidModule::event()
 
     } // hypothesis loop
 
+    trackIndex++;
   } // track loop
 
 }
@@ -551,23 +540,14 @@ void MuidModule::registerVolumes()
 
 }
 
-void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode, G4ThreeVector& ipPos, G4ThreeVector& ipDir,
+void MuidModule::getStartPoint(RecoTrack* recoTrack, const genfit::AbsTrackRep* gfTrackRep, int pdgCode, G4ThreeVector& ipPos,
+                               G4ThreeVector& ipDir,
                                G4Point3D& position, G4Vector3D& momentum, G4ErrorTrajErr& covG4e)
 {
 
-  genfit::AbsTrackRep* gfTrackRep = gfTrack->getCardinalRep();
-  for (unsigned int rep = 0; rep < gfTrack->getNumReps(); ++rep) {
-    if (gfTrack->getTrackRep(rep)->getPDG() == pdgCode) {
-      gfTrackRep = gfTrack->getTrackRep(rep);
-      break;
-    }
-  }
-
   bool firstLast = true; // for genfit exception catch
   try {
-    const genfit::TrackPoint* firstPoint = gfTrack->getPointWithMeasurementAndFitterInfo(0, gfTrackRep);
-    const genfit::AbsFitterInfo* firstFitterInfo = firstPoint->getFitterInfo(gfTrackRep);
-    const genfit::MeasuredStateOnPlane& firstState = firstFitterInfo->getFittedState(true);
+    const genfit::MeasuredStateOnPlane& firstState = recoTrack->getMeasuredStateOnPlaneFromFirstHit(gfTrackRep);
     TVector3 firstPosition, firstMomentum;
     TMatrixDSym firstCov(6);
     gfTrackRep->getPosMomCov(firstState, firstPosition, firstMomentum, firstCov);
@@ -601,9 +581,7 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode, G4Thre
       ipPosition -= (firstPosition * firstDirection) * firstDirection;
     }
     firstLast = false;
-    const genfit::TrackPoint* lastPoint = gfTrack->getPointWithMeasurementAndFitterInfo(-1, gfTrackRep);
-    const genfit::AbsFitterInfo* lastFitterInfo = lastPoint->getFitterInfo(gfTrackRep);
-    const genfit::MeasuredStateOnPlane& lastState = lastFitterInfo->getFittedState(true);
+    const genfit::MeasuredStateOnPlane& lastState = recoTrack->getMeasuredStateOnPlaneFromLastHit(gfTrackRep);
     TVector3 lastPosition, lastMomentum;
     TMatrixDSym lastCov(6);
     gfTrackRep->getPosMomCov(lastState, lastPosition, lastMomentum, lastCov);
@@ -727,7 +705,7 @@ void MuidModule::getVolumeID(const G4TouchableHandle& touch, Const::EDetector& d
 
 // write another volume-entry or volume-exit extHit on track in KLM
 // (adapted from ExtModule)
-void MuidModule::createEntryExitHit(const G4ErrorFreeTrajState* state, ExtHitStatus status, Track* track, int pdgCode)
+void MuidModule::createEntryExitHit(const G4ErrorFreeTrajState* state, ExtHitStatus status, Track& track, int pdgCode)
 {
 
   StoreArray<ExtHit> extHits(m_ExtHitsColName);
@@ -754,14 +732,14 @@ void MuidModule::createEntryExitHit(const G4ErrorFreeTrajState* state, ExtHitSta
   TMatrixDSym covariance(6);
   fromG4eToPhasespace(state, covariance);
   ExtHit* extHit = extHits.appendNew(pdgCode, detID, copyID, status, m_TOF, pos, mom, covariance);
-  track->addRelationTo(extHit);
+  track.addRelationTo(extHit);
 
 }
 
 // Write another volume-entry point on track.
 // The track state will be modified here by the Kalman fitter.
 
-bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track* track, int pdgCode)
+bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track& track, int pdgCode)
 {
 
   Point point;
@@ -851,7 +829,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track* track, int pdgCod
     StoreArray<MuidHit> muidHits(m_MuidHitsColName);
     MuidHit* muidHit = muidHits.appendNew(pdgCode, point.inBarrel, point.isForward, point.sector, point.layer, point.position,
                                           point.positionAtHitPlane, m_TOF, point.time, point.chi2);
-    track->addRelationTo(muidHit);
+    track.addRelationTo(muidHit);
     G4Point3D newPos(point.position.X() * CLHEP::cm, point.position.Y() * CLHEP::cm, point.position.Z() * CLHEP::cm);
     state->SetPosition(newPos);
     G4Vector3D newMom(point.momentum.X() * CLHEP::GeV, point.momentum.Y() * CLHEP::GeV, point.momentum.Z() * CLHEP::GeV);
@@ -941,7 +919,7 @@ bool MuidModule::findEndcapIntersection(const TVector3& oldPosition, Point& poin
 
 }
 
-bool MuidModule::findMatchingBarrelHit(Point& point, const Track* track)
+bool MuidModule::findMatchingBarrelHit(Point& point, const Track& track)
 
 {
 
@@ -1011,17 +989,20 @@ bool MuidModule::findMatchingBarrelHit(Point& point, const Track* track)
     adjustIntersection(point, localVariance, hit->getGlobalPosition(), extPos0);
     if (point.chi2 >= 0.0) {
       hit->isOnTrack(true);
-      track->addRelationTo(hit);
-      const TrackFitResult* tfResult = track->getTrackFitResult(Const::muon);
+      /*
+      * This function is commented out, because it can not be applied directly.
+      track.addRelationTo(hit);
+      const TrackFitResult* tfResult = track.getTrackFitResult(Const::muon);
       genfit::TrackCand* tc = DataStore::getRelated<genfit::TrackCand>(tfResult);
       tc->addHit(Const::EDetector::KLM, bestHit, 0, point.positionAtHitPlane.Mag()); // "0" for BKLM
+      */
     }
   }
   return point.chi2 >= 0.0;
 
 }
 
-bool MuidModule::findMatchingEndcapHit(Point& point, const Track* track)
+bool MuidModule::findMatchingEndcapHit(Point& point, const Track& track)
 {
 
   StoreArray<EKLMHit2d> eklmHits(m_EKLMHitsColName);
@@ -1060,7 +1041,7 @@ bool MuidModule::findMatchingEndcapHit(Point& point, const Track* track)
     if (point.chi2 >= 0.0) {
       // DIVOT no such function for EKLM!
       // hit->isOnTrack(true);
-      track->addRelationTo(hit);
+      track.addRelationTo(hit);
       /* not yet for EKLM
       const TrackFitResult* tfResult = track->getTrackFitResult(Const::muon);
       genfit::TrackCand* tc = DataStore::getRelated<genfit::TrackCand>(tfResult);

@@ -32,7 +32,7 @@ class G4UserSteppingAction;
 class G4VPhysicalVolume;
 class G4ErrorFreeTrajState;
 class G4String;
-namespace genfit { class Track; }
+namespace genfit { class AbsTrackRep; }
 
 namespace Belle2 {
 
@@ -40,6 +40,7 @@ namespace Belle2 {
   class MuidHit;
   class MuidPar;
   class Track;
+  class RecoTrack;
 
   //! possible intersection of extrapolated track with a KLM layer
   struct Point {
@@ -173,13 +174,14 @@ namespace Belle2 {
     void getVolumeID(const G4TouchableHandle&, Const::EDetector&, int&);
 
     //! Get the starting phase-space point and covariance for one reconstructed track and PDG hypothesis
-    void getStartPoint(const genfit::Track*, int, G4ThreeVector&, G4ThreeVector&, G4Point3D&, G4Vector3D&, G4ErrorTrajErr&);
+    void getStartPoint(RecoTrack* recoTrack, const genfit::AbsTrackRep* gfTrackRep, int pdgCode, G4ThreeVector&, G4ThreeVector&,
+                       G4Point3D&, G4Vector3D&, G4ErrorTrajErr&);
 
     //! Add an extrapolation point for the track
-    bool createHit(G4ErrorFreeTrajState*, Track*, int);
+    bool createHit(G4ErrorFreeTrajState*, Track&, int);
 
     //! Add a KLM sensitive-volume entry/exit extHit for the track
-    void createEntryExitHit(const G4ErrorFreeTrajState*, ExtHitStatus, Track*, int);
+    void createEntryExitHit(const G4ErrorFreeTrajState*, ExtHitStatus, Track&, int);
 
     //! Find the intersection point of the track with the crossed BKLM plane
     bool findBarrelIntersection(const TVector3&, Point&);
@@ -188,10 +190,10 @@ namespace Belle2 {
     bool findEndcapIntersection(const TVector3&, Point&);
 
     //! Find the matching BKLM 2D hit nearest the intersection point of the track with the crossed BKLM plane
-    bool findMatchingBarrelHit(Point&, const Track*);
+    bool findMatchingBarrelHit(Point&, const Track&);
 
     //! Find the matching EKLM 2D hit nearest the intersection point of the track with the crossed EKLM plane
-    bool findMatchingEndcapHit(Point&, const Track*);
+    bool findMatchingEndcapHit(Point&, const Track&);
 
     //! Nudge the track using the matching hit
     void adjustIntersection(Point&, const double*, const TVector3&, const TVector3&);

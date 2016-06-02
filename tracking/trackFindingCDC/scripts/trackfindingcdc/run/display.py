@@ -51,29 +51,29 @@ class CDCDisplayRun(ReadOrGenerateTrackedEventsRun):
             dest='use_python',
             action='store_true',
             help='Swtich to activate the legacy implementation written in python'
-            )
+        )
 
         argument_parser.add_argument(
             "--use_time_in_filename",
             action='store_true',
             help='Use the current time in the names of the generated files'
-            )
+        )
 
         argument_parser.add_argument(
             "-pf",
             '--filename_prefix',
             default="",
             help='Prefix to the names of the generated files'
-            )
+        )
 
         argument_parser.add_argument(
             '-m',
             '--mc-tracks',
             action='store_const',
             dest='finder_module',
-            const='TrackFinderMCTruth',
+            const='TrackFinderMCTruthRecoTracks',
             default=self.finder_module,
-            help='Generate the mc tracks using the TrackFinderMCTruth. Short hand for -f TrackFinderMCTruth'
+            help='Generate the mc tracks using the TrackFinderMCTruthRecoTracks. Short hand for -f TrackFinderMCTruthRecoTracks'
         )
 
         subparser_description = \

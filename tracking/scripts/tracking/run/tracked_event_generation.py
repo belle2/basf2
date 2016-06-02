@@ -109,7 +109,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                     'UseCDCHits': 'CDC' in self.components,
                     'UseOnlyAxialCDCHits': False}
 
-        elif finder_module_name == 'TrackFinderMCTruth':
+        elif finder_module_name == 'TrackFinderMCTruthRecoTracks':
             if isinstance(finder_module_or_name, basf2.Module):
                 return {'UsePXDHits': self.get_module_param(finder_module_or_name, 'UsePXDHits'),
                         'UseSVDHits': self.get_module_param(finder_module_or_name, 'UseSVDHits'),
@@ -182,14 +182,20 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
             # check for detector geometry, necessary for track extrapolation in genfit
             if 'MCTrackMatcher' not in main_path and 'MCMatcherTracks' not in main_path:
                 # Reference Monte Carlo tracks
-                track_finder_mc_truth_module = basf2.register_module('TrackFinderMCTruth')
+                track_finder_mc_truth_module = basf2.register_module('TrackFinderMCTruthRecoTracks')
                 track_finder_mc_truth_module.param({
                     'WhichParticles': ['primary'],
                     'EnergyCut': 0.1,
-                    'GFTrackCandidatesColName': 'MCTrackCands'
+                    'RecoTracksStoreArrayName': 'MCRecoTracks'
                 })
                 track_finder_mc_truth_module.param(tracking_coverage)
                 main_path.add_module(IfMCParticlesPresentModule(track_finder_mc_truth_module))
+                main_path.add_module(
+                    IfMCParticlesPresentModule(
+                        basf2.register_module(
+                            "GenfitTrackCandidatesCreator",
+                            genfitTrackCandsStoreArrayName="MCTrackCands",
+                            recoTracksStoreArrayName="MCRecoTracks")))
 
                 # Track matcher
                 mc_track_matcher_module = basf2.register_module('MCTrackMatcher')

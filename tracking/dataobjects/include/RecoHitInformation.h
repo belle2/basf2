@@ -63,6 +63,7 @@ namespace Belle2 {
     /** The TrackFinder which has added the hit to the track */
     enum OriginTrackFinder {
       c_undefinedTrackFinder,
+      c_MCTrackFinder,
       c_invalidTrackFinder,
       c_LegendreTrackFinder,
       c_LocalTrackFinder,

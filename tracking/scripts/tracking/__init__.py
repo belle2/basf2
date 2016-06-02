@@ -56,14 +56,20 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
         add_mc_track_finding(path, components)
     else:
         add_track_finding(path, components)
-        path.add_module("GenfitTrackCandidatesCreator")
 
     # Match the tracks to the MC truth.  The matching works based on
     # the output of the TrackFinderMCTruth.
-    mctrackfinder = register_module('TrackFinderMCTruth')
-    mctrackfinder.param('GFTrackCandidatesColName', 'MCTrackCands')
+    mctrackfinder = register_module('TrackFinderMCTruthRecoTracks')
+    mctrackfinder.param('RecoTracksStoreArrayName', 'MCRecoTracks')
     mctrackfinder.param('WhichParticles', [])
     path.add_module(mctrackfinder)
+
+    # The following modules need genfit::TrackCands
+    path.add_module("GenfitTrackCandidatesCreator")
+    path.add_module(
+        "GenfitTrackCandidatesCreator",
+        genfitTrackCandsStoreArrayName="MCTrackCands",
+        recoTracksStoreArrayName="MCRecoTracks")
 
     mctrackmatcher = register_module('MCMatcherTracks')
     mctrackmatcher.param('MCGFTrackCandsColName', 'MCTrackCands')
@@ -165,7 +171,7 @@ def add_mc_track_finding(path, components=None):
         return
 
     # find MCTracks in CDC, SVD, and PXD
-    mc_trackfinder = register_module('TrackFinderMCTruth')
+    mc_trackfinder = register_module('TrackFinderMCTruthRecoTracks')
     # Default setting in the module may be either way, therefore
     # accomodate both cases explicitly.
     if components is None or 'PXD' in components:

@@ -13,8 +13,6 @@ import logging
 
 import tracking.metamodules as metamodules
 import tracking.root_utils as root_utils
-from tracking.run.event_generation import StandardEventGenerationRun
-from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 
 from ROOT import Belle2
 
@@ -75,32 +73,3 @@ class StandardTrackingReconstructionModule(metamodules.PathModule):
         path = basf2.create_path()
         tracking.add_tracking_reconstruction(path, *args, **kwds)
         super(StandardTrackingReconstructionModule, self).__init__(path)
-
-
-class CDCMCFinder(metamodules.WrapperModule):
-    """Convenience module to add the MC track finder to the path."""
-
-    def __init__(
-            self,
-            use_cdc=True,
-            use_svd=False,
-            use_pxd=False,
-            only_primaries=False,
-            only_axials=False,
-            track_candidates_store_array_name="MCTrackCands"):
-        mc_track_finder_module = StandardEventGenerationRun.get_basf2_module(
-            'TrackFinderMCTruth',
-            UseCDCHits=use_cdc,
-            UseSVDHits=use_svd,
-            UsePXDHits=use_pxd,
-            UseOnlyAxialCDCHits=only_axials,
-            GFTrackCandidatesColName=track_candidates_store_array_name)
-        """Create a new CDCMCFinder module with the given parameters, which can be used to steer
-           the store array names and the detector components."""
-
-        if only_primaries:
-            mc_track_finder_module.param("WhichParticles", ["primary"])
-        else:
-            mc_track_finder_module.param("WhichParticles", [])
-
-        metamodules.WrapperModule.__init__(self, mc_track_finder_module)

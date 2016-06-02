@@ -1,13 +1,12 @@
 #include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/MCParticle.h>
+
+#include <genfit/TrackCand.h>
+#include <genfit/AbsTrackRep.h>
+#include <genfit/KalmanFitStatus.h>
+#include <genfit/WireTrackCandHit.h>
 
 #include <framework/dataobjects/Helix.h>
-
-#include <genfit/FitStatus.h>
-#include <genfit/KalmanFitStatus.h>
-#include <genfit/RKTrackRep.h>
-#include <genfit/TrackCand.h>
-#include <genfit/AbsFitter.h>
-#include <genfit/WireTrackCandHit.h>
 
 using namespace Belle2;
 
@@ -134,6 +133,12 @@ genfit::TrackCand RecoTrack::createGenfitTrackCand() const
   });
 
   createdTrackCand.sortHits();
+
+  // Set the MC Particle
+  const MCParticle* relatedMCParticle = getRelatedTo<MCParticle>();
+  if (relatedMCParticle) {
+    createdTrackCand.setMcTrackId(relatedMCParticle->getArrayIndex());
+  }
 
   // Add the hits
   return createdTrackCand;

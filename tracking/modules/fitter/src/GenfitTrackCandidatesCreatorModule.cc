@@ -11,6 +11,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/datastore/RelationArray.h>
 
+#include <mdst/dataobjects/MCParticle.h>
 #include <genfit/Track.h>
 
 using namespace std;
@@ -40,22 +41,37 @@ void GenfitTrackCandidatesCreatorModule::initialize()
   genfitTrackCands.registerInDataStore();
 
   genfitTrackCands.registerRelationTo(recoTracks);
+
+
+
+  StoreArray<MCParticle> mcParticles;
+  if (mcParticles.isOptional() and recoTracks.optionalRelationTo(mcParticles)) {
+    genfitTrackCands.registerRelationTo(mcParticles);
+  }
 }
 
 void GenfitTrackCandidatesCreatorModule::event()
 {
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
+  StoreArray<MCParticle> mcParticles;
 
   StoreArray<genfit::TrackCand> genfitTrackCands(m_param_genfitTrackCandsStoreArrayName);
   genfitTrackCands.create();
 
   // ugly...
   RelationArray relationsFromTrackCandsToRecoTracks(genfitTrackCands, recoTracks);
+  RelationArray relationsFromTrackCandsToMCParticle(genfitTrackCands, mcParticles);
+
   unsigned int trackCounter = 0;
 
   for (RecoTrack& recoTrack : recoTracks) {
     genfitTrackCands.appendNew(recoTrack.createGenfitTrackCand());
     relationsFromTrackCandsToRecoTracks.add(trackCounter, trackCounter);
+
+    MCParticle* relatedMCParticle = recoTrack.getRelatedTo<MCParticle>();
+    if (relatedMCParticle) {
+      relationsFromTrackCandsToMCParticle.add(trackCounter, relatedMCParticle->getArrayIndex());
+    }
     trackCounter++;
   }
 }

@@ -37,11 +37,12 @@ class G4UserSteppingAction;
 class G4VPhysicalVolume;
 class G4ErrorFreeTrajState;
 class G4String;
-namespace genfit { class Track; }
+namespace genfit { class AbsTrackRep; }
 
 namespace Belle2 {
 
   class Track;
+  class RecoTrack;
   namespace Simulation { class ExtManager; }
 
   //! Data structure to define extrapolation state
@@ -145,7 +146,8 @@ namespace Belle2 {
     G4ErrorTrajErr fromPhasespaceToG4e(const G4ThreeVector&, const G4ErrorSymMatrix&);
 
     //! Define a new track candidate for one reconstructed track and PDG hypothesis
-    void getStartPoint(const genfit::Track*, int, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&, double&);
+    void getStartPoint(RecoTrack* recoTrack, const genfit::AbsTrackRep* gfTrackRep, int pdgCode,
+                       G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&, double&);
 
     //! Create another extrapolation hit for a track candidate
     void createHit(ExtHitStatus, ExtState&);

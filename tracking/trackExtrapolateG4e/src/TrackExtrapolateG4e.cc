@@ -17,7 +17,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <genfit/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/DetPlane.h>
 #include <genfit/FieldManager.h>
 #include <genfit/TrackPoint.h>
@@ -205,26 +205,17 @@ void TrackExtrapolateG4e::event(bool isMuid)
 
     for (const auto& chargedStable : m_ChargedStable) {
 
-      const TrackFitResult* trackFit = b2track.getTrackFitResult(chargedStable);
-      if (!trackFit) {
-        B2ERROR("No valid TrackFitResult for PDGcode " <<
-                chargedStable.getPDGCode() << ": extrapolation not possible")
-        continue;
-      }
+      RecoTrack* recoTrack = b2track.getRelatedTo<RecoTrack>();
 
-      const genfit::Track* gfTrack = DataStore::getRelated<genfit::Track>(trackFit);
-      if (!gfTrack) {
-        B2ERROR("No relation of TrackFitResult with genfit::Track for PDGcode " <<
-                chargedStable.getPDGCode() << ": extrapolation not possible")
-        continue;
-      }
+      // TODO: Correct rep! Check, if really fitted!
+      const genfit::AbsTrackRep* trackRep = recoTrack->getCardinalRepresentation();
 
-      int charge = int(gfTrack->getFitStatus(gfTrack->getCardinalRep())->getCharge());
+      int charge = int(recoTrack->getTrackFitStatus(trackRep)->getCharge());
       int pdgCode = chargedStable.getPDGCode() * charge;
       if (chargedStable == Const::electron || chargedStable == Const::muon) pdgCode = -pdgCode;
 
       double tof = 0.0;
-      getStartPoint(gfTrack, pdgCode, positionG4e, momentumG4e, covG4e, tof);
+      getStartPoint(recoTrack, trackRep, pdgCode, positionG4e, momentumG4e, covG4e, tof);
       if (momentumG4e.perp() <= m_MinPt) continue;
       if (m_Target->GetDistanceFromPoint(positionG4e) < 0.0) continue;
       G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
@@ -468,24 +459,13 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
 
 }
 
-void TrackExtrapolateG4e::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
+void TrackExtrapolateG4e::getStartPoint(RecoTrack* recoTrack, const genfit::AbsTrackRep* gfTrackRep, int pdgCode,
                                         G4ThreeVector& position, G4ThreeVector& momentum,
                                         G4ErrorTrajErr& covG4e, double& tof)
 {
-
-  genfit::AbsTrackRep* gfTrackRep = gfTrack->getCardinalRep();
-  for (unsigned int rep = 0; rep < gfTrack->getNumReps(); ++rep) {
-    if (gfTrack->getTrackRep(rep)->getPDG() == pdgCode) {
-      gfTrackRep = gfTrack->getTrackRep(rep);
-      break;
-    }
-  }
-
   bool firstLast = true; // for genfit exception catch
   try {
-    const genfit::TrackPoint* firstPoint = gfTrack->getPointWithMeasurementAndFitterInfo(0, gfTrackRep);
-    const genfit::AbsFitterInfo* firstFitterInfo = firstPoint->getFitterInfo(gfTrackRep);
-    const genfit::MeasuredStateOnPlane& firstState = firstFitterInfo->getFittedState(true);
+    const genfit::MeasuredStateOnPlane& firstState = recoTrack->getMeasuredStateOnPlaneFromFirstHit(gfTrackRep);
     TVector3 firstPosition, firstMomentum;
     TMatrixDSym firstCov(6);
     gfTrackRep->getPosMomCov(firstState, firstPosition, firstMomentum, firstCov);
@@ -517,9 +497,7 @@ void TrackExtrapolateG4e::getStartPoint(const genfit::Track* gfTrack, int pdgCod
       // or, approximately, ipPosition=(0,0,0) and ipDirection=(?,?,firstDirection.Z())
     }
     firstLast = false;
-    const genfit::TrackPoint* lastPoint = gfTrack->getPointWithMeasurementAndFitterInfo(-1, gfTrackRep);
-    const genfit::AbsFitterInfo* lastFitterInfo = lastPoint->getFitterInfo(gfTrackRep);
-    const genfit::MeasuredStateOnPlane& lastState = lastFitterInfo->getFittedState(true);
+    const genfit::MeasuredStateOnPlane& lastState = recoTrack->getMeasuredStateOnPlaneFromLastHit(gfTrackRep);
     TVector3 lastPosition, lastMomentum;
     TMatrixDSym lastCov(6);
     gfTrackRep->getPosMomCov(lastState, lastPosition, lastMomentum, lastCov);
@@ -561,8 +539,6 @@ void TrackExtrapolateG4e::getStartPoint(const genfit::Track* gfTrack, int pdgCod
     momentum.setY(0.0);
     momentum.setZ(0.0);
   }
-
-  return;
 }
 
 TMatrixDSym TrackExtrapolateG4e::fromG4eToPhasespace(const G4ErrorFreeTrajState* g4eState)

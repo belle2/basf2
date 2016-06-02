@@ -31,8 +31,8 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
-#include <genfit/TrackCand.h>
-#include <genfit/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
+
 #include <genfit/AbsTrackRep.h>
 #include <genfit/Exception.h>
 #include <genfit/MaterialEffects.h>
@@ -98,14 +98,12 @@ void CDCDedxPIDModule::initialize()
 
   // required inputs
   StoreArray<Track> tracks;
-  StoreArray<genfit::Track> gfTracks;
+  StoreArray<RecoTrack> recoTracks;
   StoreArray<TrackFitResult> trackfitResults;
-  StoreArray<genfit::TrackCand> trackCandidates;
 
   tracks.isRequired();
-  gfTracks.isRequired();
+  recoTracks.isRequired();
   trackfitResults.isRequired();
-  trackCandidates.isRequired();
 
   //optional inputs
   StoreArray<MCParticle> mcparticles;
@@ -212,10 +210,9 @@ void CDCDedxPIDModule::initialize()
 void CDCDedxPIDModule::event()
 {
   // go through Tracks
-  // get fitresult and gftrack and do extrapolations, save corresponding dE/dx and likelihood values
-  //   get genfit::TrackCand through genfit::Track::getCand()
-  //   get hit indices through genfit::TrackCand::getHit(...)
-  //   create one CDCDedxTrack per fitresult/gftrack
+  // get fitresult and RecoTrack and do extrapolations, save corresponding dE/dx and likelihood values
+  //   get hit indices through RecoTrack::getHitPointsWithMeasurement(...)
+  //   create one CDCDedxTrack per fitresult/recoTrack
   //create one DedkLikelihood per Track (plus rel)
   m_eventID++;
 
@@ -279,16 +276,15 @@ void CDCDedxPIDModule::event()
     dedxTrack->m_cosTheta = trackMom.CosTheta();
     dedxTrack->m_charge = fitResult->getChargeSign();
 
-    // dE/dx values will be calculated using associated genfit::Track
-    const genfit::Track* gftrack = fitResult->getRelatedFrom<genfit::Track>();
-    if (!gftrack) {
+    // dE/dx values will be calculated using associated RecoTrack
+    const RecoTrack* recoTrack = track.getRelatedTo<RecoTrack>();
+    if (!recoTrack) {
       B2WARNING("No related track for this fit...");
       continue;
     }
 
     // Check to see if the track is pruned
-    genfit::AbsTrackRep* trackrep = gftrack->getCardinalRep();
-    if (gftrack->getFitStatus(trackrep)->isTrackPruned()) {
+    if (recoTrack->getTrackFitStatus()->isTrackPruned()) {
       B2ERROR("GFTrack is pruned, please run CDCDedxPID only on unpruned tracks! Skipping this track.");
       continue;
     }
@@ -301,7 +297,7 @@ void CDCDedxPIDModule::event()
     // Get the TrackPoints, which contain the hit information we need.
     // Then iterate over each point.
     int tpcounter = 0;
-    const std::vector< genfit::TrackPoint* > gftrackPoints = gftrack->getPointsWithMeasurement();
+    const std::vector< genfit::TrackPoint* >& gftrackPoints = recoTrack->getHitPointsWithMeasurement();
     for (std::vector< genfit::TrackPoint* >::const_iterator tp = gftrackPoints.begin();
          tp != gftrackPoints.end(); tp++) {
       tpcounter++;
@@ -315,7 +311,7 @@ void CDCDedxPIDModule::event()
 
       // get the poca on the wire and track momentum for this hit
       // make sure the fitter info exists
-      const genfit::AbsFitterInfo* fi = (*tp)->getFitterInfo(trackrep);
+      const genfit::AbsFitterInfo* fi = (*tp)->getFitterInfo();
       if (!fi) {
         B2DEBUG(50, "No fitter info, skipping...");
         continue;
@@ -336,7 +332,7 @@ void CDCDedxPIDModule::event()
         genfit::AbsMeasurement* aAbsMeasurementPtr = (*(tp + 1))->getRawMeasurement(0);
         const CDCRecoHit* nextcdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtr);
         // if next hit fails, assume this is the last hit in the layer
-        if (!nextcdcRecoHit || !(cdcRecoHit->getCDCHit()) || !((*(tp + 1))->getFitterInfo(trackrep))) {
+        if (!nextcdcRecoHit || !(cdcRecoHit->getCDCHit()) || !((*(tp + 1))->getFitterInfo())) {
           lastHitInCurrentLayer = true;
           break;
         }

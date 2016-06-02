@@ -15,7 +15,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
-#include <framework/datastore/StoreArray.h>
 
 #include <string>
 #include <vector>
@@ -86,8 +85,7 @@ namespace Belle2 {
     static double getTraversedLength(const SVDCluster* hit, const HelixHelper* helix);
 
     /** save energy loss and hit information from SVD/PXDHits to track */
-    template <class HitClass> void saveSiHits(VXDDedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass>& hits,
-                                              const std::vector<int>& hit_indices) const;
+    template <class HitClass> void saveSiHits(VXDDedxTrack* track, const HelixHelper& helix, const std::vector<HitClass*>& hits) const;
 
     /** for all particles, save log-likelihood values into 'logl'.
      *

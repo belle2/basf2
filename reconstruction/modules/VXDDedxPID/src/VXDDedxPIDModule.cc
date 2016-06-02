@@ -28,12 +28,8 @@
 #include <vxd/geometry/GeoCache.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
-#include <genfit/TrackCand.h>
-#include <genfit/Track.h>
-#include <genfit/AbsTrackRep.h>
-#include <genfit/Exception.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/MaterialEffects.h>
-#include <genfit/StateOnPlane.h>
 
 #include <TFile.h>
 #include <TH2F.h>
@@ -100,14 +96,12 @@ void VXDDedxPIDModule::initialize()
 
   // required inputs
   StoreArray<Track> tracks;
-  StoreArray<genfit::Track> gfTracks;
+  StoreArray<RecoTrack> recoTracks;
   StoreArray<TrackFitResult> trackfitResults;
-  StoreArray<genfit::TrackCand> trackCandidates;
 
   tracks.isRequired();
-  gfTracks.isRequired();
+  recoTracks.isRequired();
   trackfitResults.isRequired();
-  trackCandidates.isRequired();
 
   //optional inputs
   StoreArray<MCParticle> mcparticles;
@@ -203,9 +197,6 @@ void VXDDedxPIDModule::event()
   StoreArray<MCParticle> mcparticles;
   const int numMCParticles = mcparticles.getEntries();
 
-  StoreArray<PXDCluster> pxdClusters;
-  StoreArray<SVDCluster> svdClusters;
-
   // outputs
   StoreArray<VXDDedxTrack> dedxArray;
   StoreArray<VXDDedxLikelihood> likelihoodArray;
@@ -259,16 +250,16 @@ void VXDDedxPIDModule::event()
     dedxTrack->m_cosTheta = trackMom.CosTheta();
     dedxTrack->m_charge = fitResult->getChargeSign();
 
-    // dE/dx values will be calculated using associated genfit::Track
-    const genfit::Track* gftrack = fitResult->getRelatedFrom<genfit::Track>();
-    if (!gftrack) {
+    // dE/dx values will be calculated using associated RecoTrack
+    const RecoTrack* recoTrack = track.getRelatedTo<RecoTrack>();
+    if (!recoTrack) {
       B2WARNING("No related track for this fit...");
       continue;
     }
 
-    // Check to see if the track is pruned
-    genfit::AbsTrackRep* trackrep = gftrack->getCardinalRep();
-    if (gftrack->getFitStatus(trackrep)->isTrackPruned()) {
+    // Check to see if the track is pruned. We use the cardinal representation for this, as we do not expect that one
+    // representation is pruned whereas the other is not.
+    if (recoTrack->getTrackFitStatus()->isTrackPruned()) {
       B2ERROR("GFTrack is pruned, please run VXDDedxPID only on unpruned tracks! Skipping this track.");
       continue;
     }
@@ -276,22 +267,14 @@ void VXDDedxPIDModule::event()
     //used for PXD/SVD hits
     const HelixHelper helixAtOrigin(trackPos, trackMom, dedxTrack->m_charge);
 
-    // Now get the genfit::TrackCand to extract the VXD hits
-    genfit::TrackCand* gftrackcand = fitResult->getRelatedFrom<genfit::TrackCand>();
-    if (!gftrackcand || gftrackcand->getNHits() == 0) {
-      B2WARNING("Track has no associated hits, skipping");
-      continue;
-    }
-    gftrackcand->sortHits();
-
     if (m_usePXD) {
-      const std::vector<int>& pxdClusterIDs = gftrackcand->getHitIDs(Const::PXD);
-      saveSiHits(dedxTrack.get(), helixAtOrigin, pxdClusters, pxdClusterIDs);
+      const std::vector<PXDCluster*>& pxdClusters = recoTrack->getPXDHitList();
+      saveSiHits(dedxTrack.get(), helixAtOrigin, pxdClusters);
     }
 
     if (m_useSVD) {
-      const std::vector<int>& svdClusterIDs = gftrackcand->getHitIDs(Const::SVD);
-      saveSiHits(dedxTrack.get(), helixAtOrigin, svdClusters, svdClusterIDs);
+      const std::vector<SVDCluster*>& svdClusters = recoTrack->getSVDHitList();
+      saveSiHits(dedxTrack.get(), helixAtOrigin, svdClusters);
     }
 
     if (dedxTrack->dedx.empty()) {
@@ -429,16 +412,16 @@ double VXDDedxPIDModule::getTraversedLength(const SVDCluster* hit, const HelixHe
 
 
 template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track, const HelixHelper& helix,
-                                                            const StoreArray<HitClass>& hits, const std::vector<int>& hitIndices) const
+                                                            const std::vector<HitClass*>& hits) const
 {
-  const int numHits = hitIndices.size();
+  const int numHits = hits.size();
   if (numHits == 0)
     return;
 
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //figure out which detector to assign hits to
-  const int currentDetector = geo.get(hits[hitIndices.at(0)]->getSensorID()).getType();
+  const int currentDetector = geo.get(hits.front()->getSensorID()).getType();
   assert(currentDetector == VXD::SensorInfoBase::PXD or currentDetector == VXD::SensorInfoBase::SVD);
   assert(currentDetector <= 1); //used as array index
 
@@ -447,9 +430,9 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
 
   VxdID prevSensor;
   for (int i = 0; i < numHits; i++) {
-    const HitClass* hit = hits[hitIndices.at(i)];
+    const HitClass* hit = hits[i];
     if (!hit) {
-      B2ERROR(hits.getName() << " index out of bounds!");
+      B2ERROR("Added hit is a null pointer!");
       continue;
     }
     const VxdID& currentSensor = hit->getSensorID();

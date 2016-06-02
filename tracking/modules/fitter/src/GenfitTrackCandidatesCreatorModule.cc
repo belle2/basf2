@@ -153,7 +153,7 @@ void GenfitTrackCandidatesCreatorModule::outputPRAndMCTrackCands(const StoreArra
 
 void GenfitTrackCandidatesCreatorModule::outputPRTrackCands(const StoreArray<RecoTrack>& recoTracks,
                                                             StoreArray<genfit::TrackCand>& genfitTrackCands,
-                                                            const StoreArray<MCParticle>& mcParticles, RelationArray& relationsFromTrackCandsToRecoTracks,
+                                                            const StoreArray<MCParticle>&, RelationArray& relationsFromTrackCandsToRecoTracks,
                                                             RelationArray& relationsFromTrackCandsToMCParticle) const
 {
   for (const RecoTrack& recoTrack : recoTracks) {

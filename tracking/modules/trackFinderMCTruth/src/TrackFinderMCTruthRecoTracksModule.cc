@@ -409,7 +409,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
     if (m_usePXDHits) {
       const RelationVector<PXDCluster>& relatedClusters = aMcParticlePtr->getRelationsFrom<PXDCluster>();
 
-      for (int i = 0; i < relatedClusters.size(); ++i) {
+      for (size_t i = 0; i < relatedClusters.size(); ++i) {
         if (relatedClusters.weight(i) < 0) continue;  // skip hits from secondary particles
 
         const PXDCluster* pxdCluster = relatedClusters.object(i);
@@ -450,7 +450,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
     if (m_useSVDHits) {
       const RelationVector<SVDCluster>& relatedClusters = aMcParticlePtr->getRelationsFrom<SVDCluster>();
 
-      for (int i = 0; i < relatedClusters.size(); ++i) {
+      for (size_t i = 0; i < relatedClusters.size(); ++i) {
         if (relatedClusters.weight(i) < 0) continue;  // skip hits from secondary particles
 
         const SVDCluster* svdCluster = relatedClusters.object(i);
@@ -492,7 +492,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
     if (m_useCDCHits) {
       const RelationVector<CDCHit>& relatedHits = aMcParticlePtr->getRelationsTo<CDCHit>();
 
-      for (int i = 0; i < relatedHits.size(); ++i) {
+      for (size_t i = 0; i < relatedHits.size(); ++i) {
         if (relatedHits.weight(i) < 0) continue;  // skip hits from secondary particles
 
         const CDCHit* cdcHit = relatedHits.object(i);

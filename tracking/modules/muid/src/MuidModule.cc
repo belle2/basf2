@@ -463,7 +463,7 @@ void MuidModule::event()
                                    klmClusters[c]->getClusterPosition().Y(),
                                    klmClusters[c]->getClusterPosition().Z());
         if (position.angle(clusterDirection) < m_MaxClusterTrackConeAngle) {
-          if (trackClusterSeparations[c]->getTrackIndex() == trackIndex) {
+          if (trackClusterSeparations[c]->getTrackIndex() == int(trackIndex)) {
             klmClusters[c]->setAssociatedTrackFlag();
             b2track.addRelationTo(klmClusters[c]);
             break;
@@ -919,7 +919,7 @@ bool MuidModule::findEndcapIntersection(const TVector3& oldPosition, Point& poin
 
 }
 
-bool MuidModule::findMatchingBarrelHit(Point& point, const Track& track)
+bool MuidModule::findMatchingBarrelHit(Point& point, const Track&)
 
 {
 

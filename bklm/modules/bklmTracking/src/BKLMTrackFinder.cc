@@ -21,6 +21,11 @@ BKLMTrackFinder::BKLMTrackFinder()
 {
 }
 
+BKLMTrackFinder::BKLMTrackFinder(BKLMTrackFitter* fitter)
+{
+  m_Fitter = fitter;
+}
+
 //! Destructor
 BKLMTrackFinder::~BKLMTrackFinder()
 {

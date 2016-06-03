@@ -112,9 +112,5 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   var<named("end_phi_pull")>() = endPhiPull;
   var<named("end_d")>() = endDistance;
 
-  if (not(startPhiPull < 20 and middlePhiPull < 20 and endPhiPull < 20)) {
-    return false;
-  }
-
   return true;
 }

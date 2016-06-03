@@ -190,7 +190,7 @@ namespace Belle2 {
               // Reset the lines
               // The filter shall do the fitting of the tangent lines if it wants to.
               // He should set them if he accepts the facet.
-              facet.invalidateLines();
+              facet.invalidateFitLine();
 
               if (m_param_feasibleRLOnly) {
                 Weight feasibleWeight = m_feasibleRLFacetFilter(facet);
@@ -198,6 +198,7 @@ namespace Belle2 {
               }
 
               if (m_param_updateDriftLength) {
+
                 // Reset drift length
                 facet.getStartRLWireHit().setRefDriftLength(startWireHit.getRefDriftLength());
                 facet.getMiddleRLWireHit().setRefDriftLength(middleWireHit.getRefDriftLength());
@@ -206,7 +207,7 @@ namespace Belle2 {
                 if (m_param_leastSquareFit) {
                   /*double chi2 =*/ FacetFitter::fit(facet);
                 } else {
-                  facet.adjustLines();
+                  facet.adjustFitLine();
                 }
 
                 // Update drift length
@@ -233,24 +234,23 @@ namespace Belle2 {
       {
         static CDC::RealisticTDCCountTranslator tdcCountTranslator;
 
-        const ParameterLine2D& line = facet.getStartToEndLine();
-        Vector2D flightDirection = line.tangential();
-        Vector2D centralPos2D = line.at(0.5);
+        const UncertainParameterLine2D& line = facet.getFitLine();
+        Vector2D flightDirection = line->tangential();
+        Vector2D centralPos2D = line->closest(facet.getMiddleWire().getRefPos2D());
         const double alpha = centralPos2D.angleWith(flightDirection);
         const double cylindricalRToFlightTimeFactor = 1.0 / (boost::math::sinc_pi(alpha) * Const::speedOfLight);
 
-        auto doUpdate = [&](CDCRLWireHit & rlWireHit, const Vector2D & recoPos) {
+        auto doUpdate = [&](CDCRLWireHit & rlWireHit, Vector2D recoPos2D) {
           const CDCWire& wire = rlWireHit.getWire();
           const CDCHit* hit = rlWireHit.getWireHit().getHit();
           const bool rl = rlWireHit.getRLInfo() == ERightLeft::c_Right;
-          double flightTimeEstimation =  recoPos.cylindricalR() * cylindricalRToFlightTimeFactor;
+          double flightTimeEstimation =  recoPos2D.cylindricalR() * cylindricalRToFlightTimeFactor;
           double driftLength = tdcCountTranslator.getDriftLength(hit->getTDCCount(),
                                                                  wire.getWireID(),
                                                                  flightTimeEstimation,
                                                                  rl,
                                                                  wire.getRefZ(),
                                                                  alpha);
-
           rlWireHit.setRefDriftLength(driftLength);
         };
 

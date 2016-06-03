@@ -15,42 +15,28 @@ using namespace TrackFindingCDC;
 
 CDCFacet::CDCFacet(const CDCRLWireHit& startRLWireHit,
                    const CDCRLWireHit& middleRLWireHit,
-                   const CDCRLWireHit& endRLWireHit) :
-  CDCRLWireHitTriple(startRLWireHit, middleRLWireHit, endRLWireHit),
-  m_startToMiddle(),
-  m_startToEnd(),
-  m_middleToEnd(),
-  m_automatonCell()
+                   const CDCRLWireHit& endRLWireHit)
+  : CDCRLWireHitTriple(startRLWireHit, middleRLWireHit, endRLWireHit),
+    m_fitLine(),
+    m_automatonCell()
 {
-  adjustLines();
+  adjustFitLine();
 }
 
 CDCFacet::CDCFacet(const CDCRLWireHit& startRLWireHit,
                    const CDCRLWireHit& middleRLWireHit,
                    const CDCRLWireHit& endRLWireHit,
-                   const ParameterLine2D& startToMiddle,
-                   const ParameterLine2D& startToEnd,
-                   const ParameterLine2D& middleToEnd) :
-  CDCRLWireHitTriple(startRLWireHit, middleRLWireHit, endRLWireHit),
-  m_startToMiddle(startToMiddle),
-  m_startToEnd(startToEnd),
-  m_middleToEnd(middleToEnd),
-  m_automatonCell()
+                   const UncertainParameterLine2D& fitLine)
+  : CDCRLWireHitTriple(startRLWireHit, middleRLWireHit, endRLWireHit),
+    m_fitLine(fitLine),
+    m_automatonCell()
 {
 }
 
 void CDCFacet::reverse()
 {
   CDCRLWireHitTriple::reverse();
-
-  m_startToMiddle.reverse();
-  m_startToMiddle.passiveMoveAtBy(-1);
-
-  m_startToEnd.reverse();
-  m_startToEnd.passiveMoveAtBy(-1);
-
-  m_middleToEnd.reverse();
-  m_middleToEnd.passiveMoveAtBy(-1);
+  m_fitLine.reverse();
 }
 
 CDCFacet CDCFacet::reversed() const
@@ -58,35 +44,39 @@ CDCFacet CDCFacet::reversed() const
   return CDCFacet(getEndRLWireHit().reversed(),
                   getMiddleRLWireHit().reversed(),
                   getStartRLWireHit().reversed(),
-                  ParameterLine2D::throughPoints(getEndRecoPos2D(), getMiddleRecoPos2D()),
-                  ParameterLine2D::throughPoints(getEndRecoPos2D(), getStartRecoPos2D()),
-                  ParameterLine2D::throughPoints(getMiddleRecoPos2D(), getStartRecoPos2D()));
+                  m_fitLine.reversed());
 }
 
-void CDCFacet::adjustLines() const
+void CDCFacet::adjustFitLine() const
 {
-  m_startToMiddle =
-    ParameterLine2D::touchingCircles(getStartWireHit().getRefPos2D(),
-                                     getStartRLInfo() * getStartWireHit().getRefDriftLength() ,
-                                     getMiddleWireHit().getRefPos2D(),
-                                     getMiddleRLInfo() * getMiddleWireHit().getRefDriftLength());
-
-  m_startToEnd =
-    ParameterLine2D::touchingCircles(getStartWireHit().getRefPos2D(),
-                                     getStartRLInfo() * getStartWireHit().getRefDriftLength() ,
-                                     getEndWireHit().getRefPos2D(),
-                                     getEndRLInfo() * getEndWireHit().getRefDriftLength());
-
-  m_middleToEnd =
-    ParameterLine2D::touchingCircles(getMiddleWireHit().getRefPos2D(),
-                                     getMiddleRLInfo() * getMiddleWireHit().getRefDriftLength() ,
-                                     getEndWireHit().getRefPos2D(),
-                                     getEndRLInfo() * getEndWireHit().getRefDriftLength());
+  m_fitLine = UncertainParameterLine2D(getStartToEndLine());
 }
 
-void CDCFacet::invalidateLines()
+void CDCFacet::invalidateFitLine()
 {
-  m_startToMiddle.invalidate();
-  m_startToEnd.invalidate();
-  m_middleToEnd.invalidate();
+  m_fitLine.invalidate();
+}
+
+ParameterLine2D CDCFacet::getStartToMiddleLine() const
+{
+  return ParameterLine2D::touchingCircles(getStartRLWireHit().getRefPos2D(),
+                                          getStartRLWireHit().getSignedRefDriftLength() ,
+                                          getMiddleRLWireHit().getRefPos2D(),
+                                          getMiddleRLWireHit().getSignedRefDriftLength());
+}
+
+ParameterLine2D CDCFacet::getStartToEndLine() const
+{
+  return ParameterLine2D::touchingCircles(getStartRLWireHit().getRefPos2D(),
+                                          getStartRLWireHit().getSignedRefDriftLength() ,
+                                          getEndRLWireHit().getRefPos2D(),
+                                          getEndRLWireHit().getSignedRefDriftLength());
+}
+
+ParameterLine2D CDCFacet::getMiddleToEndLine() const
+{
+  return ParameterLine2D::touchingCircles(getMiddleRLWireHit().getRefPos2D(),
+                                          getMiddleRLWireHit().getSignedRefDriftLength() ,
+                                          getEndRLWireHit().getRefPos2D(),
+                                          getEndRLWireHit().getSignedRefDriftLength());
 }

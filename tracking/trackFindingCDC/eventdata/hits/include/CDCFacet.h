@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 
+#include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
@@ -22,12 +23,11 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /** Class representing a triple of neighboring oriented wire with additional trajectory information.
+    /**
+     * Class representing a triple of neighboring oriented wire with additional trajectory information.
      *
-     *  As trajectory information three tangent lines touching pairs on for each pair hits is used.
-     *  Depending on the how much the three lines deviate from each other it is possible to judge
-     *  if a particular triple is unlikely to be in a track and shall not be used as an element in
-     *  path construction. */
+     * As trajectory information a single parameter line from a fit is used
+     */
     class CDCFacet : public CDCRLWireHitTriple {
     public:
       /// Default constructor for ROOT
@@ -38,86 +38,84 @@ namespace Belle2 {
                const CDCRLWireHit& middleRLWireHit,
                const CDCRLWireHit& endRLWireHit);
 
-      /// Constructor taking three oriented wire hits and the tangent lines.
+      /// Constructor taking three oriented wire hits and the fit line.
       CDCFacet(const CDCRLWireHit& startRLWireHit,
                const CDCRLWireHit& middleRLWireHit,
                const CDCRLWireHit& endRLWireHit,
-               const ParameterLine2D& startToMiddle,
-               const ParameterLine2D& startToEnd = ParameterLine2D(),
-               const ParameterLine2D& middleToEnd = ParameterLine2D());
+               const UncertainParameterLine2D& fitLine);
 
-      /// Reverses the facet inplace including the tangential lines.
+      /// Reverses the facet inplace including the fit line.
       void reverse();
 
-      /// Constructs the reverse tiple from this one - this ignores the tangent lines.
+      /// Constructs the reverse tiple from this one.
       CDCFacet reversed() const;
 
-      /// Access the object methods and methods from a pointer in the same way.
-      /** In situations where the type is not known to be a pointer or a reference there is no way to tell
+      /**
+       *  Access the object methods and methods from a pointer in the same way.
+       *  In situations where the type is not known to be a pointer or a reference there is no way to tell
        *  if one should use the dot '.' or operator '->' for method look up.
        *  So this function defines the -> operator for the object.
-       *  No matter you have a pointer or an object access is given with '->'.*/
+       *  No matter you have a pointer or an object access is given with '->'.
+       */
       const CDCFacet* operator->() const
       { return this; }
 
-      /// Getter for the tangential line from the first to the second hit.
-      const ParameterLine2D& getStartToMiddleLine() const
-      { return m_startToMiddle; }
+      /// Adjusts the contained fit line to touch such that it touches the first and third hit.
+      void adjustFitLine() const;
 
-      /// Getter for the tangential line from the first to the third hit.
-      const ParameterLine2D& getStartToEndLine() const
-      { return m_startToEnd; }
+      /// Clear all information in the fit.
+      void invalidateFitLine();
 
-      /// Getter for the tangential line from the second to the third hit.
-      const ParameterLine2D& getMiddleToEndLine() const
-      { return m_middleToEnd; }
+      /// Getter for the contained line fit information.
+      const UncertainParameterLine2D& getFitLine() const
+      { return m_fitLine; }
 
-      /// Setter for the tangential line from the first to the second hit.
-      void setStartToMiddleLine(const ParameterLine2D& startToMiddle) const
-      { m_startToMiddle = startToMiddle; }
+      /// Setter for the contained line fit information.
+      void setFitLine(const UncertainParameterLine2D& fitLine) const
+      { m_fitLine = fitLine; }
 
-      /// Setter for the tangential line from the first to the third hit.
-      void setStartToEndLine(const ParameterLine2D& startToEnd) const
-      { m_startToEnd = startToEnd; }
+      /**
+       *  Getter for the tangential line from the first to the second hit.
+       *  The line is computed as touching the first and second drift circle
+       *  assuming the stored right left passage information.
+       */
+      ParameterLine2D getStartToMiddleLine() const;
 
-      /// Setter for the tangential line from the second to the third hit.
-      void setMiddleToEndLine(const ParameterLine2D& middleToEnd) const
-      { m_middleToEnd = middleToEnd; }
+      /**
+       *  Getter for the tangential line from the first to the third hit.
+       *  The line is computed as touching the first and third drift circle
+       *  assuming the stored right left passage information
+       */
+      ParameterLine2D getStartToEndLine() const;
 
+      /**
+       *  Getter for the tangential line from the second to the third hit.
+       *  The line is computed as touching the second and third drift circle
+       *  assuming the stored right left passage information
+       */
+      ParameterLine2D getMiddleToEndLine() const;
 
-      /// Construct and stores the three tangential lines corresponding to the three pairs of wire hits.
-      void adjustLines() const;
-
-      /// Clear all information in the three tangential lines
-      void invalidateLines();
-
-      /// Getter for the recostructed position at the first hit averaged
-      /// from the two touching points of the tangential lines.
+      /// Getter for the reconstructed position at the first hit on the fit line
       Vector2D getStartRecoPos2D() const
-      { return Vector2D::average(getStartToMiddleLine().at(0), getStartToEndLine().at(0)); }
+      { return getFitLine()->closest(getStartWire().getRefPos2D()); }
 
-      /// Getter for the recostructed position at the second hit averaged
-      /// from the two touching points of the tangential lines.
+      /// Getter for the reconstructed position at the second hit on the fit line
       Vector2D getMiddleRecoPos2D() const
-      { return Vector2D::average(getStartToMiddleLine().at(1), getMiddleToEndLine().at(0)); }
+      { return getFitLine()->closest(getMiddleWire().getRefPos2D()); }
 
-      /// Getter for the recostructed position at the third hit averaged
-      /// from the two touching points of the tangential lines.
+      /// Getter for the reconstructed position at the third hit on the fit line
       Vector2D getEndRecoPos2D() const
-      { return Vector2D::average(getStartToEndLine().at(1), getMiddleToEndLine().at(1)); }
+      { return getFitLine()->closest(getEndWire().getRefPos2D()); }
 
-      /// Getter for the recostructed position including the first hit averaged
-      /// from the two touching points of the tangential lines.
+      /// Getter for the first reconstucted hit
       CDCRecoHit2D getStartRecoHit2D() const
       { return CDCRecoHit2D::fromRecoPos2D(getStartRLWireHit(), getStartRecoPos2D()); }
 
-      /// Getter for the recostructed position including the second hit averaged
-      /// from the two touching points of the tangential lines.
+      /// Getter for the second reconstucted hit
       CDCRecoHit2D getMiddleRecoHit2D() const
       { return CDCRecoHit2D::fromRecoPos2D(getMiddleRLWireHit(), getMiddleRecoPos2D()); }
 
-      /// Getter for the recostructed position including the third hit averaged
-      /// from the two touching points of the tangential lines.
+      /// Getter for the third reconstucted hit
       CDCRecoHit2D getEndRecoHit2D() const
       { return CDCRecoHit2D::fromRecoPos2D(getEndRLWireHit(), getEndRecoPos2D()); }
 
@@ -171,14 +169,8 @@ namespace Belle2 {
       { return m_automatonCell; }
 
     private:
-      /// Memory for the tangential line between first and second hit.
-      mutable ParameterLine2D m_startToMiddle;
-
-      /// Memory for the tangential line between first and third hit.
-      mutable ParameterLine2D m_startToEnd;
-
-      /// Memory for the tangential line between second and third hit.
-      mutable ParameterLine2D m_middleToEnd;
+      /// Memory for a line fit to the three contained hits
+      mutable UncertainParameterLine2D m_fitLine;
 
       /// Memory for the cellular automaton cell assoziated with the facet.
       AutomatonCell m_automatonCell;

@@ -48,7 +48,7 @@ void RealisticFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
 
 Weight RealisticFacetFilter::operator()(const CDCFacet& facet)
 {
-  facet.adjustLines();
+  facet.adjustFitLine();
 
   const CDCRLWireHit& startRLWirehit = facet.getStartRLWireHit();
   const double startDriftLengthVar = startRLWirehit.getRefDriftLengthVariance();

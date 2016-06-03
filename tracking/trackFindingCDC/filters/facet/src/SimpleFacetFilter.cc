@@ -43,7 +43,7 @@ void SimpleFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
 
 Weight SimpleFacetFilter::operator()(const CDCFacet& facet)
 {
-  facet.adjustLines();
+  facet.adjustFitLine();
 
   const ParameterLine2D& startToMiddle = facet.getStartToMiddleLine();
   const ParameterLine2D& startToEnd    = facet.getStartToEndLine();

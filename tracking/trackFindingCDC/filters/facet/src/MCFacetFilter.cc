@@ -31,10 +31,10 @@ Weight MCFacetFilter::operator()(const CDCFacet& facet)
                                inTrackHitDistanceTolerance);
 
   if (isCorrectFacet) {
-    facet.adjustLines();
+    facet.adjustFitLine();
     return 3.0;
   } else if (isCorrectReverseFacet) {
-    facet.adjustLines();
+    facet.adjustFitLine();
     return -3.0;
   } else {
     return NAN;

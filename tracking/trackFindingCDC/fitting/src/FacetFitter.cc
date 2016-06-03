@@ -200,15 +200,7 @@ double FacetFitter::fit(const CDCFacet& facet, int nSteps)
 
   UncertainParameterLine2D fitLine{ ::fit(std::move(xyl), std::move(w), nSteps) };
   fitLine.passiveMoveBy(-support);
-
-  Vector2D startClosest = fitLine->closest(startWirePos2D);
-  Vector2D middleClosest = fitLine->closest(middleWirePos2D);
-  Vector2D endClosest = fitLine->closest(endWirePos2D);
-
-  facet.setStartToMiddleLine(ParameterLine2D::throughPoints(startClosest, middleClosest));
-  facet.setStartToEndLine(ParameterLine2D::throughPoints(startClosest, endClosest));
-  facet.setMiddleToEndLine(ParameterLine2D::throughPoints(middleClosest, endClosest));
-
+  facet.setFitLine(fitLine);
   return fitLine.chi2();
 }
 
@@ -223,8 +215,7 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
   // Weight matrix
   Array< double, 6, 1> w;
 
-  const Vector2D support = \
-                           Vector2D::average(fromFacet.getMiddleWire().getRefPos2D(),
+  const Vector2D support = Vector2D::average(fromFacet.getMiddleWire().getRefPos2D(),
                                              toFacet.getMiddleWire().getRefPos2D());
   {
     const CDCRLWireHit& startRLWireHit = fromFacet.getStartRLWireHit();

@@ -266,7 +266,7 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
         )
 
     def fit(self, facet):
-        facet.adjustLines()
+        facet.adjustFitLine()
 
     def select_fitless(self, fitless_crops):
         return crops["select_fitless_hard"]

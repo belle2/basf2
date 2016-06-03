@@ -34,7 +34,7 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   const CDCFacet& facet = *ptrFacet;
 
   /// Fit tangents
-  facet.adjustLines();
+  facet.adjustFitLine();
 
   const CDCRLWireHit& startRLWirehit = facet.getStartRLWireHit();
   const double startDriftLengthVar = startRLWirehit.getRefDriftLengthVariance();

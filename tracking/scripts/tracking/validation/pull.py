@@ -202,8 +202,10 @@ class PullAnalysis(object):
                                                 estimates,
                                                 outlier_z_score=outlier_z_score,
                                                 is_expert=is_expert)
+
             estimates_by_truths_profile.xlabel = 'True ' + axis_label
             estimates_by_truths_profile.ylabel = 'Estimated ' + axis_label
+
             estimates_by_truths_profile.title = formatter.format(plot_title, subplot_title='Diagonal profile')
             estimates_by_truths_profile.fit_diag()
 
@@ -218,7 +220,7 @@ class PullAnalysis(object):
             residuals_hist.hist(residuals,
                                 outlier_z_score=outlier_z_score,
                                 is_expert=is_expert)
-            residuals_hist.xlabel = axis_label
+            residuals_hist.xlabel = compose_axis_label("#Delta " + quantity_name + " (estimate - truth)", self.unit)
             residuals_hist.title = formatter.format(plot_title, subplot_title='Residual distribution')
 
             self.plots['residuals'] = residuals_hist

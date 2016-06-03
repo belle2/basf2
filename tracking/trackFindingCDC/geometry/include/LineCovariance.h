@@ -18,6 +18,8 @@
 
 #include <tracking/trackFindingCDC/geometry/ELineParameter.h>
 
+#include <Math/SMatrix.h>
+
 namespace Belle2 {
 
   namespace TrackFindingCDC {
@@ -26,47 +28,27 @@ namespace Belle2 {
     class LineCovariance  {
 
     public:
+      /// The matrix type implementing the repesentation of the covariance
+      using Matrix = ROOT::Math::SMatrix< double, 2, 2, ROOT::Math::MatRepSym< double, 2> >;
+
+      /// The matrix type implementing the repesentation of a jacobian matrix used in the transport operations
+      using JacobianMatrix = ROOT::Math::SMatrix< double, 2, 2>;
+
+    public:
       /// Default constructor for ROOT compatibility.
-      LineCovariance() :
-        m_matrix(std::min(ELineParameter::c_Phi0, ELineParameter::c_I),
-                 std::max(ELineParameter::c_Phi0, ELineParameter::c_I))
-      { m_matrix.Zero(); }
-
-      /// Setup the covariance with the given covariance matrx
-      explicit LineCovariance(const TMatrixDSym& covarianceMatrix) :
-        m_matrix(covarianceMatrix)
-      { checkMatrix(); }
-
+      LineCovariance() = default;
 
       /// Down cast operator to symmetric matrix
-      operator const TMatrixDSym& () const
+      operator const Matrix& () const
       { return m_matrix; }
-
-    private:
-      /// Checks the covariance matrix for consistence
-      inline void checkMatrix() const
-      {
-        using namespace NLineParameter;
-        if (matrix().GetNrows() != 2 or
-            matrix().GetNcols() != 2 or
-            matrix().GetColLwb() != c_Phi0 or
-            matrix().GetColUpb() != c_I) {
-          B2ERROR("Line covariance matrix is a  " <<
-                  matrix().GetNrows() << "x" <<
-                  matrix().GetNcols() << " matrix starting from " <<
-                  matrix().GetColLwb() << ". " <<
-                  "Expected 2x2 matrix starting from "  << c_Phi0 << "."
-                 );
-        }
-      }
 
     public:
       /// Setter for the whole covariance matrix of the line parameters
-      inline void setMatrix(const TMatrixDSym& covarianceMatrix)
-      { m_matrix = covarianceMatrix; checkMatrix(); }
+      void setMatrix(const Matrix& matrix)
+      { m_matrix = matrix; }
 
       /// Getter for the whole covariance matrix of the line parameters
-      const TMatrixDSym& matrix() const
+      const Matrix& matrix() const
       { return m_matrix; }
 
       /// Non constant access to the matrix elements return a reference to the underlying matrix entry.
@@ -88,39 +70,33 @@ namespace Belle2 {
         return result;
       }
 
-      /// Sets the covariance matrix to zero.
+      /// Invalidate the covariance matrix and reset it to a none informative martix
       void invalidate()
-      { m_matrix.Zero(); }
+      { m_matrix = ROOT::Math::SMatrixIdentity(); }
 
       /// Sets the covariance matrix to a unit matrix.
       void setUnit()
-      { m_matrix.UnitMatrix(); }
+      { m_matrix = ROOT::Math::SMatrixIdentity(); }
 
       /// Transforms the covariance by the given jacobian matrix in place.
-      void similarityTransform(const TMatrixD& jacobian)
+      void similarityTransform(const JacobianMatrix& jacobian)
       {
-        if (jacobian.GetNrows() != 2 or jacobian.GetNcols() != 2) {
-          B2ERROR("Cannot transform LineCovariance with a " <<
-                  jacobian.GetNrows() << "x"  <<
-                  jacobian.GetNcols() << " inplace.");
-          return;
-        }
-        m_matrix.Similarity(jacobian);
+        ROOT::Math::Similarity(jacobian, m_matrix);
       }
 
       /// Transforms a copy the covariance by the given jacobian matrix.
-      TMatrixDSym similarityTransformed(const TMatrixD& jacobian) const
+      Matrix similarityTransformed(const JacobianMatrix& jacobian) const
       {
-        TMatrixDSym matrix = m_matrix;
-        matrix.Similarity(jacobian);
+        Matrix matrix = m_matrix;
+        ROOT::Math::Similarity(jacobian, matrix);
         return matrix;
       }
 
     private:
       /// Memory for the 2x2 matrix presentation of the covariance.
-      TMatrixDSym m_matrix;
+      Matrix m_matrix;
 
-    }; //class
+    }; // class
 
   } // namespace TrackFindingCDC
 } // namespace Belle2

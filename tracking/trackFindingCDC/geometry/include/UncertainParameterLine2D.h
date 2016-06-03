@@ -124,11 +124,10 @@ namespace Belle2 {
       { m_parameterLine2D.passiveMoveBy(by); }
 
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
-      TMatrixD moveSupportByJacobian(double byAt) const
+      LineCovariance::JacobianMatrix moveSupportByJacobian(double byAt) const
       {
         using namespace NLineParameter;
-        TMatrixD result(c_Phi0, c_I);
-        result.UnitMatrix();
+        LineCovariance::JacobianMatrix result = ROOT::Math::SMatrixIdentity();
         result(c_I, c_Phi0) = -byAt * m_parameterLine2D.tangential().norm();
         return result;
       }
@@ -137,7 +136,7 @@ namespace Belle2 {
       void moveSupportBy(double byAt)
       {
         // Move the covariance matrix first to have access to the original parameters
-        TMatrixD jacobian = moveSupportByJacobian(byAt);
+        LineCovariance::JacobianMatrix jacobian = moveSupportByJacobian(byAt);
         m_lineCovariance.similarityTransform(jacobian);
         m_parameterLine2D.passiveMoveAtBy(byAt);
       }
@@ -145,8 +144,10 @@ namespace Belle2 {
       /// Getter for the covariance as if he coordinate system was moved by the given vector.
       LineCovariance movedSupportCovarianceBy(double byAt) const
       {
-        TMatrixD jacobian = moveSupportByJacobian(byAt);
-        return LineCovariance(lineCovariance().similarityTransformed(jacobian));
+        LineCovariance::JacobianMatrix jacobian = moveSupportByJacobian(byAt);
+        LineCovariance result = m_lineCovariance;
+        result.similarityTransform(jacobian);
+        return result;
       }
 
     private:

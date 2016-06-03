@@ -44,7 +44,7 @@ TEST(TrackFindingCDCTest, fitting_FacetFitter_fitLine)
     EXPECT_NEAR(0, fittedLine->support().x(), 1e-6);
     EXPECT_NEAR(1, fittedLine->support().y(), 1e-6);
     EXPECT_NEAR(0.015 * 1.0 / 4.0, fittedLine.chi2(), 1e-6);
-    fittedLine.lineCovariance().matrix().Print();
+    B2INFO(fittedLine.lineCovariance().matrix());
   }
 }
 
@@ -74,7 +74,7 @@ TEST(TrackFindingCDCTest, fitting_FacetFitter_fitLine_alongYAxes)
     EXPECT_NEAR(1, fittedLine->support().x(), 1e-6);
     EXPECT_NEAR(0, fittedLine->support().y(), 1e-6);
     EXPECT_NEAR(0.015, fittedLine.chi2(), 1e-6);
-    fittedLine.lineCovariance().matrix().Print();
+    B2INFO(fittedLine.lineCovariance().matrix());
   }
 }
 
@@ -105,6 +105,6 @@ TEST(TrackFindingCDCTest, fitting_FacetFitter_fitLine_sameSide)
     EXPECT_NEAR(0, fittedLine->support().x(), 1e-6);
     EXPECT_NEAR(1, fittedLine->support().y(), 1e-6);
     EXPECT_NEAR(0.06, fittedLine.chi2(), 1e-6);
-    fittedLine.lineCovariance().matrix().Print();
+    B2INFO(fittedLine.lineCovariance().matrix());
   }
 }

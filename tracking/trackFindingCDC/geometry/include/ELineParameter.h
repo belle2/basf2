@@ -19,10 +19,10 @@ namespace Belle2 {
       /// Enumeration to address the individual helix parameters in a vector or matrix
       enum ELineParameter {
         /// Constant to address the azimuth angle of the direction of flight at the perigee in a vector or matrix assoziated with perigee parameters.
-        c_Phi0 = 1,
+        c_Phi0 = 0,
 
         /// Constant to address the impact parameter in a vector or matrix assoziated with perigee parameters.
-        c_I = 2,
+        c_I = 1,
       };
     }
 

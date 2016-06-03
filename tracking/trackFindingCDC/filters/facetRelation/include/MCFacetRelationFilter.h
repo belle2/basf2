@@ -28,11 +28,14 @@ namespace Belle2 {
       using Super::operator();
 
     public:
-      /** Constructor also setting the switch if the reversed version of a facet
+      /**
+       *  Constructor also setting the switch if the reversed version of a facet
        *  (in comparision to MC truth) shall be accepted.
        */
-      MCFacetRelationFilter(bool allowReverse = true) :
-        Super(allowReverse), m_mcFacetFilter(allowReverse) {}
+      MCFacetRelationFilter(bool allowReverse = false)
+        : Super(allowReverse),
+          m_mcFacetFilter(allowReverse)
+      {}
 
     public:
       /// Used to prepare the Monte Carlo information for this event.
@@ -45,7 +48,8 @@ namespace Belle2 {
       virtual void terminate() override final;
 
     public:
-      /** Main filter method returning the weight of the neighborhood relation.
+      /**
+       *  Main filter method returning the weight of the neighborhood relation.
        *  Return NAN if relation shall be rejected.
        */
       virtual Weight operator()(const CDCFacet& fromFacet,
@@ -64,5 +68,5 @@ namespace Belle2 {
       MCFacetFilter m_mcFacetFilter;
 
     }; // end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  } // end namespace TrackFindingCDC
+} // end namespace Belle2

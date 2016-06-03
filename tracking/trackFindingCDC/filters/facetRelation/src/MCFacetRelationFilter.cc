@@ -44,6 +44,7 @@ Weight MCFacetRelationFilter::operator()(const CDCFacet& fromFacet,
   if (fromFacet.getStartWire() == toFacet.getEndWire()) {
     return NAN;
   }
+
   // Despite of that two facets are neighbors if both are true facets
   // That also implies the correct tof alignment of the hits not common to both facets
   Weight fromFacetWeight = m_mcFacetFilter(fromFacet);

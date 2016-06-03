@@ -13,7 +13,7 @@ import logging
 
 class CDCFacetRecordingRun(RecordingRun):
     """Run for recording facets encountered at the filter"""
-    n_events = 50
+    # n_events = 50
     # bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
     root_output_file_name = "FacetFilter.root"
@@ -27,7 +27,7 @@ class CDCFacetRecordingRun(RecordingRun):
     })
 
     flight_time_reestimation = False
-    use_alpha_in_drift_length = False
+    facet_least_square_fit = False
 
     def create_argument_parser(self, **kwds):
         argument_parser = super().create_argument_parser(**kwds)
@@ -51,11 +51,11 @@ class CDCFacetRecordingRun(RecordingRun):
         return argument_parser
 
     def configure(self, arguments):
-        super(RecordingRun, self).configure(arguments)
+        super().configure(arguments)
 
         self.recording_finder_module.param(
-            dict(facetUpdateDriftLength=self.flight_time_reestimation,
-                 facetLeastSquareFit=self.facet_least_square_fit)
+            dict(FacetUpdateDriftLength=self.flight_time_reestimation,
+                 FacetLeastSquareFit=self.facet_least_square_fit)
             )
 
 

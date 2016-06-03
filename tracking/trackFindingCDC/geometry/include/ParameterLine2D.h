@@ -231,6 +231,7 @@ namespace Belle2 {
       /// Moves the line in the given direction in place. Corresponds to an active transformation.
       void moveBy(const Vector2D& by)
       { m_support += by; }
+
       /// Moves the line along the first coordinate axes in place. Corresponds to an active transformation.
       void moveAlongFirst(const double first)
       { m_support.setFirst(m_support.first() + first); }
@@ -251,27 +252,42 @@ namespace Belle2 {
       void passiveMoveAlongSecond(const double second)
       { m_support.setSecond(m_support.second() - second); }
       /**@}*/
+
       /** @name Line as a function of the first coordinate
        * The next couple of methods are to interpret the line as a function mapping from first to second coordinate */
       /**@{*/
+
       /// The line slope
-      double slope() const { return tangential().second() / tangential().first(); }
+      double slope() const
+      { return tangential().second() / tangential().first(); }
+
       /// The inveres line slope
-      double inverseSlope() const { return tangential().first() / tangential().second(); }
+      double inverseSlope() const
+      { return tangential().first() / tangential().second(); }
+
       /// Second coordinate for first being zero
-      double intercept() const { return support().second() - slope() * support().first(); }
+      double intercept() const
+      { return support().second() - slope() * support().first(); }
+
       /// First coordinate for second being zero
-      double zero() const { return support().first() - inverseSlope() * support().second(); }
+      double zero() const
+      { return support().first() - inverseSlope() * support().second(); }
+
       /// Method mapping the first coordinate to the second according to the line
-      double map(const double first) const { return  support().second() + slope() * (first - support().first()); }
+      double map(const double first) const
+      { return  support().second() + slope() * (first - support().first()); }
+
       /// Operator mapping the first coordinate to the second according to the line
-      double operator()(const double first) const { return  map(first); }
+      double operator()(const double first) const
+      { return map(first); }
 
       /// Method for the inverse mapping the second coordinate to the first according to the line
-      double inverseMap(const double second) const { return  support().first() + inverseSlope() * (second - support().second()); }
+      double inverseMap(const double second) const
+      { return  support().first() + inverseSlope() * (second - support().second()); }
 
       /// Turns the line into its inverse function in place. Orientation will be flipped as well
-      void invert() { m_tangential.swapCoordinates(); m_support.swapCoordinates(); }
+      void invert()
+      { m_tangential.swapCoordinates(); m_support.swapCoordinates(); }
 
       /// Gives the line assoziated with the inverse function as a copy.
       ParameterLine2D inverted() const
@@ -282,9 +298,12 @@ namespace Belle2 {
       ///@}
 
     private:
-      Vector2D  m_support; ///< Support vector of the line
-      Vector2D  m_tangential; ///< Tangential vector of the line
+      /// Support vector of the line
+      Vector2D  m_support;
 
-    }; //class
+      /// Tangential vector of the line
+      Vector2D  m_tangential;
+
+    }; // class
   } // namespace TrackFindingCDC
 } // namespace Belle2

@@ -28,6 +28,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/WireTrackCandHit.h>
 
+#include <geometry/bfieldmap/BFieldMap.h>
+
 #include <boost/foreach.hpp>
 
 #include <TRandom.h>
@@ -73,6 +75,12 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            m_useOnlyAxialCDCHits,
            "Set true if only the axial CDCHits should be used",
            false);
+  addParam("UseNLoops",
+           m_useNLoops,
+           "Set the number of loops to be included in the MC tracks. "
+           "Default includes all",
+           NAN);
+
 
   addParam("MinPXDHits",
            m_minPXDHits,
@@ -486,6 +494,29 @@ void TrackFinderMCTruthRecoTracksModule::event()
       continue; //goto next mcParticle, do not make track candidate
     }
 
+    // prepare rejection of CDC hits from higher order loops
+    const TVector3 origin(0.0, 0.0, 0.0);
+    const double Bz = BFieldMap::Instance().getBField(origin).Z();
+    const double nLoops = m_useNLoops;
+    auto isWithinNLoops = [Bz, nLoops](const CDCHit * cdcHit) {
+      const CDCSimHit* cdcSimHit = cdcHit->getRelated<CDCSimHit>();
+      if (not cdcSimHit) return false;
+      const MCParticle* mcParticle = cdcSimHit->getRelated<MCParticle>();
+      if (not mcParticle) return false;
+
+      const double tof = cdcSimHit->getFlightTime();
+      const double speed = mcParticle->get4Vector().Beta() * Const::speedOfLight;
+      const float absMom3D = mcParticle->getMomentum().Mag();
+
+      const double loopLength = 2 * M_PI * absMom3D / (Bz * 0.00299792458);
+      const double loopTOF =  loopLength / speed;
+      if (tof > loopTOF * nLoops) {
+        return false;
+      } else {
+        return true;
+      }
+    };
+
     // create a list containing the indices to the CDCHits that belong to one track
     int nAxialHits = 0;
     int nStereoHits = 0;
@@ -496,6 +527,10 @@ void TrackFinderMCTruthRecoTracksModule::event()
         if (relatedHits.weight(i) < 0) continue;  // skip hits from secondary particles
 
         const CDCHit* cdcHit = relatedHits.object(i);
+
+        // Reject higher order hits if requested
+        if (not std::isnan(nLoops) and not isWithinNLoops(cdcHit)) continue;
+
         int superLayerId = cdcHit->getISuperLayer();
 
         const CDCSimHit* aCDCSimHitPtr = cdcHit->getRelatedFrom<CDCSimHit>();

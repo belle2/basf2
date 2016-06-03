@@ -188,8 +188,6 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                     'UseCDCHits': tracking_coverage.get('UseCDCHits', True),
                 })
 
-                mc_track_matcher_module.param(tracking_coverage)
-
                 main_path.add_module(IfMCParticlesPresentModule(track_finder_mc_truth_module))
                 main_path.add_module(IfMCParticlesPresentModule(mc_track_matcher_module))
 

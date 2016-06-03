@@ -235,21 +235,10 @@ std::string MCPDGCodeColorMap::info()
 std::string MCPrimaryColorMap::map(const int, const CDCHit& cdcHit)
 {
   MCParticle* mcParticle = cdcHit.getRelated<MCParticle>("MCParticles");
-  std::vector<int> secondary_type;
   if (mcParticle != nullptr) {
     unsigned short int primaryFlag = 1;
     bool isPrimary = mcParticle->hasStatus(primaryFlag);
     int secondaryProcess = mcParticle->getSecondaryPhysicsProcess();
-    if (secondaryProcess > 0) {
-      MCParticle* motherMCParticle = mcParticle->getMother();
-      secondary_type = {motherMCParticle->getPDG(), mcParticle->getPDG()};
-    } else {
-      //motherMCParticle = None;
-      secondary_type = { -999, mcParticle->getPDG()};
-    }
-
-    if (m_nHitsBySecondaryType.count(secondary_type) == 0) m_nHitsBySecondaryType[secondary_type] = 0;
-    else m_nHitsBySecondaryType[secondary_type] += 1;
 
     if (isPrimary)return "blue";
     else if (secondaryProcess > 200)return "green"; //decay in flight

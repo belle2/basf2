@@ -110,9 +110,10 @@ void CDCSVGPlotter::drawCDCRecoSegments(const std::string& storeObjName, const s
   drawStoreVector<CDCSegmentColorizer>(storedRecoSegments, storeObjName, stroke);
 }
 
-//used by drawCDCSimHitsConnectByToF as comparison tool
+/// used by drawCDCSimHitsConnectByToF as comparison tool
 class comp {
 public:
+  /// Comparision function that sorts CDCSimHits for their flight time.
   bool operator()(const CDCSimHit* x, const CDCSimHit* y) const
   {
     return (x->getFlightTime() < y->getFlightTime());

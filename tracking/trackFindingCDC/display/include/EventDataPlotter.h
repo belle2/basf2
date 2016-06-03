@@ -51,6 +51,7 @@ namespace Belle2 {
 
 
     public:
+      /// Forward the Attributre map from the primitive plotter.
       typedef PrimitivePlotter::AttributeMap AttributeMap;
 
     public:

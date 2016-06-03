@@ -63,7 +63,8 @@ namespace Belle2 {
         "mediumspringgreen",
         "darkgreen",
         "indigo",
-      }), m_length(m_listColors.size()) {};
+      })
+      {};
 
       /**
        * Index operator.
@@ -98,8 +99,8 @@ namespace Belle2 {
       }
 
     private:
+      /// List of colors to be cycled through
       std::vector<std::string> m_listColors;
-      int m_length;
     };
 
     /**
@@ -136,6 +137,7 @@ namespace Belle2 {
       }
 
     private:
+      /// List of colors to be cycled through
       ListColors m_listColors;
     };
 
@@ -163,11 +165,9 @@ namespace Belle2 {
       {
         return m_inputString;
       }
+
     private:
-      /**
-       * Default Constructor is private to prevent m_inputString from being not initialized.
-       */
-      ReturnInputString() {};
+      /// Returned string on each invokation of the color map.
       std::string m_inputString;
     };
 
@@ -204,10 +204,7 @@ namespace Belle2 {
         return m_inputValue;
       }
     private:
-      /**
-       * Default Constructor is private to prevent m_inputValue from being not initialized.
-       */
-      ReturnInputValue() {};
+      /// Returned string on each invokation of the map.
       std::string m_inputValue;
     };
 

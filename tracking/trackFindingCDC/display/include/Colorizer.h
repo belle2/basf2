@@ -25,7 +25,11 @@ namespace Belle2 {
      */
     template<class AObject, class AColorMap = CDCHitColorMap>
     class Colorizer {
-      typedef std::unique_ptr<AColorMap>(Colorizer::*MethodPtr)();
+
+    private:
+      /// A method pointer type of this Colorizer to access color maps.
+      using MethodPtr = std::unique_ptr<AColorMap> (Colorizer::*)();
+
     public:
       /**
        * Default Constructor.
@@ -137,10 +141,18 @@ namespace Belle2 {
         return (mappingClass);
       }
 
+      /// Flag indicating if the stroke attribute method has been set
       bool m_strokeSet;
+
+      /// Flag indicating if the strokeWidth attribute method has been set
       bool m_strokeWidthSet;
+
+      /// Pointer to the method to determine the stroke
       std::unique_ptr<AColorMap> m_strokeMethodPtr;
+
+      /// Pointer to the method to determine the strokeWidth
       std::unique_ptr<AColorMap> m_strokeWidthMethodPtr;
+
       /**
        * A string to pointer-to-member-function map.
        *

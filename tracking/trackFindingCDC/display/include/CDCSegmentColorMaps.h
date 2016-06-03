@@ -54,6 +54,7 @@ namespace Belle2 {
       std::string map(const int iSegment, const CDCRecoSegment2D& segment) override;
 
     private:
+      /// List of colors to be cycled through
       ListColors m_listColors;
     };
 
@@ -122,6 +123,7 @@ namespace Belle2 {
        */
       std::string map(const int iSegment, const CDCRecoSegment2D& segment) override;
     private:
+      /// List of colors to be cycled through
       ListColors m_listColors;
     };
 

@@ -21,28 +21,35 @@ namespace Belle2 {
     class SVGPrimitivePlotter : public PrimitivePlotter {
 
     private:
+      /// Constant for the number of indention space to be used within the svg block
       static int s_defaultNIndentationSpaces;
+
+      /// Constant for the additional number of space to be prepended with each open tag group.
       static int s_addtionalNIndentationSpaces;
 
     public:
       /// Default constructor for ROOT compatibility.
       SVGPrimitivePlotter();
 
-      /// Constructor taking additional attributes that go into the toplevel svg tag.
-      /** @param svgAttributes    A map of attributes that goes into the toplevel svg tag. */
+      /**
+       *  Constructor taking additional attributes that go into the toplevel svg tag.
+       *  @param svgAttributes    A map of attributes that goes into the toplevel svg tag.
+       */
       explicit SVGPrimitivePlotter(const AttributeMap& svgAttributes);
 
       /// Copy constructor
       SVGPrimitivePlotter(const SVGPrimitivePlotter& plotter);
 
     public:
-      /// Returns a newly created plotter instance containing all information of this.
-      /** The new object is created on the heap. The ownership is to the caller who has the responsibility to destroy it.
+      /**
+       *  Returns a newly created plotter instance containing all information of this.
+       *  The new object is created on the heap. The ownership is to the caller who has the responsibility to destroy it.
        */
       virtual std::unique_ptr<PrimitivePlotter> clone() const override;
 
     public:
-      /** Adds a line to the plot
+      /**
+       *  Adds a line to the plot
        *
        *  Base implementation only updates the bounding box.
        *
@@ -58,7 +65,8 @@ namespace Belle2 {
                             const float& endY,
                             const AttributeMap& attributeMap = AttributeMap()) override;
 
-      /** Adds an arrow to the plot
+      /**
+       *  Adds an arrow to the plot
        *
        *  Base implementation only updates the bounding box.
        *
@@ -75,7 +83,8 @@ namespace Belle2 {
                              const AttributeMap& attributeMap = AttributeMap()) override;
 
 
-      /** Adds a circle to the plot
+      /**
+       *  Adds a circle to the plot
        *
        *  Base implementation only updates the bounding box.
        *
@@ -89,7 +98,8 @@ namespace Belle2 {
                               const float& radius,
                               const AttributeMap& attributeMap = AttributeMap()) override;
 
-      /** Adds a circle arc to the plot
+      /**
+       *  Adds a circle arc to the plot
        *
        *  Base implementation only updates the bounding box.
        *
@@ -111,21 +121,24 @@ namespace Belle2 {
                                  const bool& sweepFlag,
                                  const AttributeMap& attributeMap = AttributeMap()) override;
 
-      /** Indicates the start of a group of drawn elements. Meaning depends on the actual implementation.
+      /**
+       *  Indicates the start of a group of drawn elements. Meaning depends on the actual implementation.
        *
        *  Does nothing in the base implementation
        *
        */
       virtual void startGroup(const AttributeMap& attributeMap = AttributeMap()) override;
 
-      /** Indicates the end of a group of drawn elements. Meaning depends on the actual implementation.
+      /**
+       *  Indicates the end of a group of drawn elements. Meaning depends on the actual implementation.
        *
        *  Does nothing in the base implementation
        *
        */
       virtual void endGroup() override;
 
-      /** Saves the current plot state to a file.
+      /**
+       *  Saves the current plot state to a file.
        *
        *  Deriving instances may should implement the approriate thing here and
        *  may return a modified string indicating the file name to which the plot as been written.
@@ -136,7 +149,8 @@ namespace Belle2 {
        */
       virtual const std::string save(const std::string& fileName) override;
 
-      /** Clears all drawed elements from the plotter.
+      /**
+       *  Clears all drawed elements from the plotter.
        *
        *  Base implementation only updates the bounding box.
        */
@@ -144,22 +158,24 @@ namespace Belle2 {
 
 
     private:
-      /** Increases the current indention by one.*/
+      /// Increases the current indention by one.
       void indent();
 
-      /** Decreases the current indention by one.*/
+      /// Decreases the current indention by one.
       void dedent();
 
-      /** Writes the xml header that indicates that this document will be a SVG document to the given output stream.
+      /**
+       *  Writes the xml header that indicates that this document will be a SVG document to the given output stream.
        *
        *  @param[out] outputStream       The output stream to which the result is written.
        */
       void writeSVGHeader(std::ostream& outputStream);
 
-      /** Writes a preamble of <defs> that define an arrow cap which can be referenced by lines */
+      /// Writes a preamble of <defs> that define an arrow cap which can be referenced by lines
       void writeSVGDefs(std::ostream& outputStream);
 
-      /** Writes an opening xml tag to the given output stream taking attributes from two sources.
+      /**
+       *  Writes an opening xml tag to the given output stream taking attributes from two sources.
        *
        *  @param[out] outputStream           The output stream to which the result is written.
        *  @param[in]  tagName                Name of the xml tag to be written
@@ -173,7 +189,8 @@ namespace Belle2 {
                            const AttributeMap& geometryAttributeMap = AttributeMap(),
                            const AttributeMap& styleAttributeMap = AttributeMap());
 
-      /** Writes a stand alone xml tag to the given output stream taking attributes from two sources.
+      /**
+       *  Writes a stand alone xml tag to the given output stream taking attributes from two sources.
        *
        *  @param[out] outputStream           The output stream to which the result is written.
        *  @param[in]  tagName                Name of the xml tag to be written
@@ -187,7 +204,8 @@ namespace Belle2 {
                               const AttributeMap& geometryAttributeMap = AttributeMap(),
                               const AttributeMap& styleAttributeMap = AttributeMap());
 
-      /** Writes part that belongs between the <, > brakets. Used by writeOpeningTag and writeClosing.
+      /**
+       *  Writes part that belongs between the <, > brakets. Used by writeOpeningTag and writeClosing.
        *
        *  Used by writeOpeningTag and writeClosing.
        *  Factored to avoid code dublication.
@@ -204,7 +222,8 @@ namespace Belle2 {
                           const AttributeMap& geometryAttributeMap = AttributeMap(),
                           const AttributeMap& styleAttributeMap = AttributeMap());
 
-      /** Writes attribute specification that belongs between the <, > brakets after the tag name.
+      /**
+       *  Writes attribute specification that belongs between the <, > brakets after the tag name.
        *
        *  @param[out] outputStream           The output stream to which the result is written.
        *  @param[in]  attributeMap           A map of attribute keys to attribute values that shall be attached to the tag.
@@ -212,10 +231,12 @@ namespace Belle2 {
       void writeAttributes(std::ostream& outputStream,
                            const AttributeMap& attributeMap);
 
-      /** Writes a closing xml tag to the given output stream.
+      /**
+       *  Writes a closing xml tag to the given output stream.
        *
        *  @param[out] outputStream           The output stream to which the result is written.
-       *  @param[in]  tagName                Name of the xml tag to be written*/
+       *  @param[in]  tagName                Name of the xml tag to be written
+       */
       void writeClosingTag(std::ostream& outputStream,
                            const std::string& tagName);
 
@@ -231,7 +252,7 @@ namespace Belle2 {
       /// Memory for additional attributes to the toplevel svg element.
       AttributeMap m_svgAttributes;
 
-    }; //class
+    }; // class
 
   } // namespace TrackFindingCDC
 } // namespace Belle2

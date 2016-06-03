@@ -203,6 +203,11 @@ namespace Belle2 {
       std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
     };
 
+
+
+    /**
+     * CDCHit to color map by their assoziated MCParticle::getArrayId() property.
+     */
     class MCParticleColorMap : public CDCHitColorMap {
     public:
       /**
@@ -215,8 +220,13 @@ namespace Belle2 {
        */
       std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
     private:
+      /// List of colors to be cycled
       ListColors m_listColors;
+
+      /// Mapping of the already used colors by the MCParticle::getArrayId to map later CDCHits to the same color.
       std::map<int, std::string> m_newColors;
+
+      /// Index of the color to be used next.
       int m_iColor;
     };
 
@@ -241,10 +251,6 @@ namespace Belle2 {
     class MCPrimaryColorMap : public CDCHitColorMap {
     public:
       /**
-       * Constructor setting up a map to count the hits for each secondary type.
-       */
-      MCPrimaryColorMap(): m_nHitsBySecondaryType( {}) {};
-      /**
        * Function call to map the CDCHit id and object to a color.
        */
       std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
@@ -252,8 +258,6 @@ namespace Belle2 {
        * Informal string summarizing the translation from seconday process codes to colors.
        */
       std::string info() override;
-    private:
-      std::map<std::vector<int>, int> m_nHitsBySecondaryType;
     };
 
     /**

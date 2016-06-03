@@ -4,12 +4,9 @@
 import basf2
 
 from tracking.run.event_generation import ReadOrGenerateEventsRun
-from tracking.modules import (
-    StandardTrackingReconstructionModule
-)
-
 from tracking.metamodules import IfMCParticlesPresentModule, IfStoreArrayPresentModule
 
+import tracking
 import tracking.utilities as utilities
 
 import logging
@@ -138,8 +135,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         # setting up fitting is only necessary when testing
         # track finding comonenst ex-situ
         if (self.fit_geometry and
-                self.finder_module != 'StandardReco' and
-                not isinstance(self.finder_module, StandardTrackingReconstructionModule)):
+                self.finder_module != 'StandardReco'):
 
             # Prepare Genfit extrapolation
             setup_genfit_extrapolation_module = basf2.register_module('SetupGenfitExtrapolation')
@@ -208,7 +204,9 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
 class StandardReconstructionEventsRun(ReadOrGenerateTrackedEventsRun):
     generator_module = 'EvtGenInput'
-    finder_module = 'StandardReco'
+
+    def finder_module(self, main_path):
+        tracking.add_tracking_reconstruction(main_path, components=self.components)
 
 
 def main():

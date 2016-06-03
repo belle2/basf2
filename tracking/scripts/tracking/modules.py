@@ -5,16 +5,13 @@
 """
 
 import basf2
-import tracking
-
-import ROOT
 
 import logging
+import warnings
 
+import tracking
 import tracking.metamodules as metamodules
 import tracking.root_utils as root_utils
-
-from ROOT import Belle2
 
 
 def get_logger():
@@ -69,7 +66,10 @@ class StandardTrackingReconstructionModule(metamodules.PathModule):
        The signature is expressed generically such that it matches the current arguments of the add_reconstruction call.
        Consult the documentation of reconstruction.add_reconstruction for meaning and names of the possible arguments.
        """
+        warnings.warn("The class StandardTrackingReconstructionModule is deprecated. "
+                      "Use tracking.add_tracking_reconstruction instead",
+                      DeprecationWarning)
 
         path = basf2.create_path()
         tracking.add_tracking_reconstruction(path, *args, **kwds)
-        super(StandardTrackingReconstructionModule, self).__init__(path)
+        super().__init__(path)

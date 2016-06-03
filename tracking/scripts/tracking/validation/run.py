@@ -7,8 +7,6 @@ import basf2
 
 from tracking.run.tracked_event_generation import ReadOrGenerateTrackedEventsRun
 from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
-from tracking.modules import StandardTrackingReconstructionModule
-import tracking.modules
 from tracking.validation.hit_module import ExpertTrackingValidationModule
 import tracking.utilities as utilities
 

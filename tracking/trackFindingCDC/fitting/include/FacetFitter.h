@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/geometry/Line2D.h>
+#include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
 #include <Eigen/Dense>
 
 namespace Belle2 {
@@ -22,18 +22,23 @@ namespace Belle2 {
     public:
       /// Fits a proper line to facet and returns the chi2.
       static double fit(const CDCFacet& facet,
-                        bool singleStep = false);
+                        int nSteps = 100);
 
-      /// Fit a line the positions xyl and the weights with a single minization step
-      // static Line2D fitSingleStep(Eigen::Matrix<double, 3, 3> xyl,
-      //          Eigen::Array<double, 3, 1> w,
-      //          double& chi2);
-
-      /// Fit a line the positions xyl and the weights.
-      static Line2D fit(Eigen::Matrix<double, 3, 3> xyl,
-                        Eigen::Array<double, 3, 1> w,
-                        double& chi2,
-                        bool singleStep = false);
+      /**
+       *  Fit a line the positions xyl and the weights.
+       *
+       *  Fits a line to a number of observations with tunable
+       *  acurracy versus execution speed.
+       *  Special implementations for nSteps = 0 and nSteps=1 have been integrated.
+       *  High nSteps use a general minimization method.
+       *
+       *  @param xyl    A matrix of drift length observations
+       *  @param w      An array of weights corresponding to the observations
+       *  @param nSteps Maximal number of steps to be taken in the mimisation
+       */
+      static UncertainParameterLine2D fit(Eigen::Matrix<double, 3, 3> xyl,
+                                          Eigen::Array<double, 3, 1> w,
+                                          int nSteps = 100);
     }; // end class
   } // end namespace TrackFindingCDC
 } // namespace Belle2

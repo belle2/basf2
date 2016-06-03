@@ -47,14 +47,14 @@ void Chi2FacetFilter::exposeParameters(ModuleParamList* moduleParamList,
 
 Weight Chi2FacetFilter::operator()(const CDCFacet& facet)
 {
-  const bool singleStep = true;
-  double chi2 = FacetFitter::fit(facet, singleStep);
+  const bool nSteps = 1;
+  double chi2 = FacetFitter::fit(facet, nSteps);
   if (chi2 > m_param_chi2Cut or std::isnan(chi2)) {
     return NAN;
   } else {
 
     // Introducing a mini penilty to distiguish better facets.
-    double penalty = std::erf(chi2 / m_param_penaltyWidth); // Heuristic function factor is chosen by hand.
+    double penalty = std::erf(chi2 / m_param_penaltyWidth);
 
     // Good facet contains three points of the track
     // the amount carried by this facet can the adjusted more realistically

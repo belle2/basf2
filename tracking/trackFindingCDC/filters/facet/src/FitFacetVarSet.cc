@@ -28,12 +28,21 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
   const CDCFacet& facet = *ptrFacet;
 
   {
-    bool singleStep = true;
-    double chi2_0 = FacetFitter::fit(facet, singleStep);
+    bool nSteps = 0;
+    double chi2_0 = FacetFitter::fit(facet, nSteps);
     var<named("chi2_0")>() = chi2_0;
 
     const ParameterLine2D& fitLine = facet.getStartToEndLine();
     var<named("fit_0_phi")>() = fitLine.tangential().phi();
+  }
+
+  {
+    bool nSteps = 1;
+    double chi2_1 = FacetFitter::fit(facet, nSteps);
+    var<named("chi2_1")>() = chi2_1;
+
+    const ParameterLine2D& fitLine = facet.getStartToEndLine();
+    var<named("fit_1_phi")>() = fitLine.tangential().phi();
   }
 
   double chi2 = FacetFitter::fit(facet);

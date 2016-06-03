@@ -18,7 +18,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace Eigen;
 
-double FacetFitter::fit(const CDCFacet& facet, bool singleStep)
+double FacetFitter::fit(const CDCFacet& facet, int nSteps)
 {
   // Measurement matrix
   Matrix< double, 3, 3> xyl;
@@ -53,19 +53,18 @@ double FacetFitter::fit(const CDCFacet& facet, bool singleStep)
   xyl(2, 2) = endRLWireHit.getSignedRefDriftLength();
   w(2) = 1.0 / endDriftLengthVar;
 
-  double chi2 = 0;
-  ParameterLine2D fitLine{ fit(std::move(xyl), std::move(w), chi2, singleStep) };
+  UncertainParameterLine2D fitLine{ fit(std::move(xyl), std::move(w), nSteps) };
   fitLine.passiveMoveBy(-support);
 
-  Vector2D startClosest = fitLine.closest(startWirePos2D);
-  Vector2D middleClosest = fitLine.closest(middleWirePos2D);
-  Vector2D endClosest = fitLine.closest(endWirePos2D);
+  Vector2D startClosest = fitLine->closest(startWirePos2D);
+  Vector2D middleClosest = fitLine->closest(middleWirePos2D);
+  Vector2D endClosest = fitLine->closest(endWirePos2D);
 
   facet.setStartToMiddleLine(ParameterLine2D::throughPoints(startClosest, middleClosest));
   facet.setStartToEndLine(ParameterLine2D::throughPoints(startClosest, endClosest));
   facet.setMiddleToEndLine(ParameterLine2D::throughPoints(middleClosest, endClosest));
 
-  return chi2;
+  return fitLine.chi2();
 }
 
 namespace {
@@ -105,14 +104,20 @@ namespace {
     vec = vec.passiveRotatedBy(coordinate.flippedSecond());
   }
 
-  double fitPhiOneStep(const Matrix<double, 3, 3>& xylCov, double& chi2)
+  Vector2d fitPhiVecZeroSteps(const Matrix<double, 3, 3>& xylCov, double& chi2)
   {
-    const double phi = (xylCov(0, 1) + xylCov(0, 2)) / xylCov(0, 0);
-    chi2 = (xylCov(1, 1) + 2 * xylCov(1, 2) + xylCov(2, 2) - phi * (xylCov(0, 1) + xylCov(0, 2)));
-    return phi;
+    chi2 = xylCov(1, 1) + 2 * xylCov(1, 2) + xylCov(2, 2);
+    return Vector2d(1, 0);
   }
 
-  double fitPhiBrent(const Matrix<double, 3, 3>& xylCov, int nIter, double& chi2)
+  Vector2d fitPhiVecOneStep(const Matrix<double, 3, 3>& xylCov, double& chi2)
+  {
+    const double phi = (xylCov(0, 1) + xylCov(0, 2)) / xylCov(0, 0);
+    chi2 = xylCov(1, 1) + 2 * xylCov(1, 2) + xylCov(2, 2) - phi * (xylCov(0, 1) + xylCov(0, 2));
+    return Vector2d(std::cos(phi), std::sin(phi));
+  }
+
+  Vector2d fitPhiVecBrent(const Matrix<double, 3, 3>& xylCov, int nIter, double& chi2)
   {
     const Matrix< double, 2, 2> A = xylCov.topLeftCorner<2, 2>();
     const Matrix< double, 2, 1> b = xylCov.topRightCorner<2, 1>();
@@ -131,15 +136,14 @@ namespace {
 
     chi2 = bm.FValMinimum() + c;
     const double phi = bm.XMinimum();
-    return phi;
+    return Vector2d(std::cos(phi), std::sin(phi));
   }
 
 }
 
-Line2D FacetFitter::fit(Matrix<double, 3, 3> xyl,
-                        Array<double, 3, 1> w,
-                        double& chi2,
-                        bool singleStep)
+UncertainParameterLine2D FacetFitter::fit(Matrix<double, 3, 3> xyl,
+                                          Array<double, 3, 1> w,
+                                          int nSteps)
 {
   /// Rotate in forward direction
   Vector2D coordinate = getTangentialForwardDirection(xyl);
@@ -151,29 +155,52 @@ Line2D FacetFitter::fit(Matrix<double, 3, 3> xyl,
 
   rotate(coordinate, xyl);
 
+  const int nObservations = 3;
   Array< double, 1, 3> averages = (xyl.array().colwise() * w).colwise().sum() / w.sum();
   Matrix< double, 3, 3> deltas = xyl.array().rowwise() - averages;
   Matrix< double, 3, 3> weightedDeltas = deltas.array().colwise() * w;
   Matrix< double, 3, 3> covariances = deltas.transpose() * weightedDeltas / w.sum();
 
-  const int nIter = 100;
-
-  double phi = 0.0;
-  if (singleStep) {
-    phi = fitPhiOneStep(covariances, chi2);
+  Vector2d phiVec;
+  double chi2 = 0.0;
+  if (nSteps == 0) {
+    phiVec = fitPhiVecZeroSteps(covariances, chi2);
+  } else if (nSteps == 1) {
+    phiVec = fitPhiVecOneStep(covariances, chi2);
   } else {
-    phi = fitPhiBrent(covariances, nIter, chi2);
+    phiVec = fitPhiVecBrent(covariances, nSteps, chi2);
   }
   chi2 *= w.sum();
 
-  const Vector2D tangential = Vector2D::Phi(phi);
+  LineCovariance lineCovariance;
+  {
+    double meanArcLength = averages.topLeftCorner<1, 2>().matrix() * phiVec;
+    double varArcLength = phiVec.transpose() * covariances.topLeftCorner<2, 2>() * phiVec;
+    double divisor = 1 / ((1 + varArcLength) * w.sum());
+    using namespace NLineParameter;
+    lineCovariance(c_Phi0, c_Phi0) = divisor * 1;
+    lineCovariance(c_Phi0, c_I)    = -divisor * meanArcLength;
+    lineCovariance(c_I, c_Phi0)    = lineCovariance(c_Phi0, c_I);
+    lineCovariance(c_I, c_I)       = divisor * varArcLength;
+  }
 
+  // Matrix<double, 2, 2> invLineCovariance;
+  // invLineCovariance(0, 0) = 1;
+  // invLineCovariance(0, 1) = meanArcLength;
+  // invLineCovariance(1, 0) = meanArcLength;
+  // invLineCovariance(1, 1) = varArcLength + meanArcLength * meanArcLength;
+  // LineCovariance lineCovariance(invLineCovariance.inverse());
+
+  Vector2D tangential(phiVec(0), phiVec(1));
   Vector2D n12 = tangential.orthogonal(ERotation::c_Clockwise);
   double n0 = averages(2) - averages(0) * n12.x() - averages(1) * n12.y();
+  Vector2D support = -n12 * n0;
 
   // Transform the normal vector back into the original coordinate system.
-  unrotate(coordinate, n12);
+  unrotate(coordinate, support);
+  unrotate(coordinate, tangential);
 
-  Line2D fitLine(n0, n12);
-  return  fitLine;
+  ParameterLine2D parameterLine2D(support, tangential);
+  int ndf = nObservations - 2;
+  return UncertainParameterLine2D(parameterLine2D, lineCovariance, chi2, ndf);
 }

@@ -39,7 +39,8 @@ namespace Belle2 {
         m_filterFactory(filterName, filterParameters)
       {}
 
-      /** Expose the set of parameters of the filter to the module parameter list.
+      /**
+       *  Expose the set of parameters of the filter to the module parameter list.
        *
        *  Note that not all filters have yet exposed their parameters in this way.
        */
@@ -50,13 +51,13 @@ namespace Belle2 {
         m_filterFactory.exposeParameters(moduleParamList, prefix);
       }
 
-      /** Return the string holding the used filter name */
+      /// Return the string holding the used filter name
       const std::string& getFilterName() const
       {
         return m_filterFactory.getFilterName();
       }
 
-      /** Set the filter name which should be created */
+      /// Set the filter name which should be created
       void setFilterName(const std::string& filterName)
       {
         m_filterFactory.setFilterName(filterName);
@@ -106,7 +107,8 @@ namespace Belle2 {
         m_filter->terminate();
       }
 
-      /** Function to evaluate the object.
+      /**
+       *  Function to evaluate the object.
        *  Delegates to the filter choosen by module parameters.
        *
        *  @param obj The object to be accepted or rejected.

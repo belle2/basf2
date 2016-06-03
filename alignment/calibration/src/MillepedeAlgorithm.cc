@@ -264,14 +264,17 @@ void MillepedeAlgorithm::prepareMilleBinary()
   std::vector<double>* derGlobal;
 
   // Read vectors of GblData from tree branch
-  std::vector<gbl::GblData> currentGblData;
-  gblDataTree.Branch<std::vector<gbl::GblData>>("GblData", &currentGblData);
+  std::vector<gbl::GblData>* currentGblData = new std::vector<gbl::GblData>();
+  gblDataTree.SetBranchAddress("GblData", &currentGblData);
 
   B2INFO("Writing Millepede binary files...");
   for (unsigned int iRecord = 0; iRecord < gblDataTree.GetEntries(); ++iRecord) {
     gblDataTree.GetEntry(iRecord);
 
-    for (gbl::GblData& theData : currentGblData) {
+    if (!currentGblData)
+      continue;
+
+    for (gbl::GblData& theData : *currentGblData) {
       theData.getAllData(aValue, aErr, indLocal, derLocal, labGlobal,
                          derGlobal);
       milleBinary->addData(aValue, aErr, *indLocal, *derLocal, *labGlobal,

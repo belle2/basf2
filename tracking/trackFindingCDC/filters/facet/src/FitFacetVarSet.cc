@@ -27,8 +27,16 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
   if (not extracted or not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 
-  double chi2 = FacetFitter::fit(facet);
+  {
+    bool singleStep = true;
+    double chi2_0 = FacetFitter::fit(facet, singleStep);
+    var<named("chi2_0")>() = chi2_0;
 
+    const ParameterLine2D& fitLine = facet.getStartToEndLine();
+    var<named("fit_0_phi")>() = fitLine.tangential().phi();
+  }
+
+  double chi2 = FacetFitter::fit(facet);
   const ParameterLine2D& fitLine = facet.getStartToEndLine();
 
   var<named("chi2")>() = chi2;

@@ -27,10 +27,12 @@ namespace Belle2 {
     /// Names of the variables to be generated.
     constexpr
     static char const* const facetFitNames[] = {
-      "fit_phi",
+      "chi2_0",
+      "fit_0_phi",
+      "chi2",
       "erf",
       "tanh",
-      "chi2",
+      "fit_phi",
       "d2",
       "start_distance",
       "middle_distance",

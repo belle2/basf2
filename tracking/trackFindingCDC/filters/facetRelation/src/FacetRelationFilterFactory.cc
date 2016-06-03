@@ -40,6 +40,7 @@ FacetRelationFilterFactory::getValidFilterNamesAndDescriptions() const
     {"all", "all facet relations are valid"},
     {"truth", "facet relations from monte carlo truth"},
     {"simple", "mc free with simple criteria"},
+    {"chi2", "mc free based on chi2 fitting"},
     {"tmva", "filter facets with a tmva method"},
     {"none", "no facet relation is valid, stop at facet creation."},
     {"unionrecording", "record multiple choosable variable sets"},
@@ -61,6 +62,8 @@ FacetRelationFilterFactory::create(const std::string& filterName) const
     return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new TMVAFacetRelationFilter());
   } else if (filterName == string("simple")) {
     return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new SimpleFacetRelationFilter());
+  } else if (filterName == string("chi2")) {
+    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new Chi2FacetRelationFilter());
   } else if (filterName == string("unionrecording")) {
     return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new UnionRecordingFacetRelationFilter());
   } else {

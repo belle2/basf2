@@ -171,7 +171,7 @@ namespace Belle2 {
       ///Sine of the angle between this and rhs
       inline double sinWith(const Vector2D& rhs) const { return cross(rhs) / (norm() * rhs.norm());  }
       ///The angle between this and rhs
-      inline double angleWith(const Vector2D& rhs) const { return atan2(sinWith(rhs), cosWith(rhs)); }
+      inline double angleWith(const Vector2D& rhs) const { return atan2(cross(rhs), dot(rhs)); }
       ///@}
 
       /// Calculates the distance of this point to the rhs

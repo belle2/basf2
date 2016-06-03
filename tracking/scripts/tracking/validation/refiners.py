@@ -142,7 +142,7 @@ class SaveFiguresOfMeritRefiner(Refiner):
 
 class SaveHistogramsRefiner(Refiner):
     default_name = "{module.id}_{part_name}_histogram{stacked_by_indication}{stackby}"
-    default_title = "Histogram of {part_name}{stacked_by_indication}{stackby} in {module.title}"
+    default_title = "Histogram of {part_name}{stacked_by_indication}{stackby} from {module.title}"
     default_contact = "{module.contact}"
     default_description = "This is a histogram of {part_name}{stacked_by_indication}{stackby}."
     default_check = "Check if the distribution is reasonable"
@@ -398,7 +398,7 @@ class Plot2DRefiner(Refiner):
 
 class SaveProfilesRefiner(Plot2DRefiner):
     default_name = "{module.id}_{y_part_name}_by_{x_part_name}_profile"
-    default_title = "Profile of {y_part_name} by {x_part_name} in {module.title}"
+    default_title = "Profile of {y_part_name} by {x_part_name} from {module.title}"
     default_contact = "{module.contact}"
     default_description = "This is a profile of {y_part_name} over {x_part_name}."
     default_check = "Check if the trend line is resonable."
@@ -408,7 +408,7 @@ class SaveProfilesRefiner(Plot2DRefiner):
 
 class SaveScatterRefiner(Plot2DRefiner):
     default_name = "{module.id}_{y_part_name}_by_{x_part_name}_scatter"
-    default_title = "Scatter of {y_part_name} by {x_part_name} in {module.title}"
+    default_title = "Scatter of {y_part_name} by {x_part_name} from {module.title}"
     default_contact = "{module.contact}"
     default_description = "This is a scatter of {y_part_name} over {x_part_name}."
     default_check = "Check if the distributions is reasonable."
@@ -508,7 +508,7 @@ class SaveClassificationAnalysisRefiner(Refiner):
 class SavePullAnalysisRefiner(Refiner):
     default_name = "{module.id}_{quantity_name}"
     default_contact = "{module.contact}"
-    default_title_postfix = " in {module.id}"
+    default_title_postfix = " from {module.title}"
 
     default_truth_name = "{part_name}_truth"
     default_estimate_name = "{part_name}_estimate"

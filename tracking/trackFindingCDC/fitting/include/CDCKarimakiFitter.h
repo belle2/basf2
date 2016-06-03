@@ -22,9 +22,10 @@ namespace Belle2 {
       /// Static getter for a general fitter instance with Karimakis method.
       static const CDCKarimakiFitter& getFitter();
 
-      // Static getter for a line fitter
+      /// Static getter for a line fitter
       static const CDCKarimakiFitter& getLineFitter();
 
+      /// Static getter for a general fitter that does not use the drift length variances
       static const CDCKarimakiFitter& getNoDriftVarianceFitter();
 
     }; // class

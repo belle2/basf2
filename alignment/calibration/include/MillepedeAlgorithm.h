@@ -73,6 +73,9 @@ namespace Belle2 {
       return IOV;
     }
 
+    /// Write out binary files from data in tree with GBL data to be used by Millepede and add them to steering
+    void prepareMilleBinary();
+
     ClassDef(MillepedeAlgorithm, 1); /**< Class implementing Millepede calibration algorithm */
 
   };

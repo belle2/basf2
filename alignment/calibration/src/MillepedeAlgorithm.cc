@@ -21,22 +21,16 @@ MillepedeAlgorithm::MillepedeAlgorithm() : CalibrationAlgorithm("MillepedeCollec
 
 CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 {
-  auto& mille = getObject<MilleData>("mille");
   B2INFO(" Mean of Chi2 / NDF of tracks before calibration: " << getObject<TH1F>("chi2/ndf").GetMean();)
 
-  if (mille.getFiles().empty()) {
-    B2INFO("No binary files.");
-    return c_Failure;
-  }
+  // Write out binary files from tree and add to steering
+  prepareMilleBinary();
 
-  m_steering.clearFiles();
-  for (auto file : mille.getFiles())
-    m_steering.addFile(file);
-
+  // Run calibration on steering
   m_result = m_pede.calibrate(m_steering);
 
   if (!m_pede.success() || !m_result.isValid()) {
-    B2INFO(m_pede.getExitMessage());
+    B2ERROR(m_pede.getExitMessage());
     return c_Failure;
   }
 
@@ -65,13 +59,13 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     if (param.isKLM()) ++nBKLMparams;
   }
   if (!nBeamParams)
-    B2WARNING("No Beam parameters determined");
+    B2INFO("No Beam parameters determined");
   if (!nVXDparams)
-    B2WARNING("No VXD parameters determined");
+    B2INFO("No VXD parameters determined");
   if (!nCDCparams)
-    B2WARNING("No CDC parameters determined");
+    B2INFO("No CDC parameters determined");
   if (!nBKLMparams)
-    B2WARNING("No BKLM parameters determined");
+    B2INFO("No BKLM parameters determined");
 
   if (undeterminedParams) {
     B2WARNING("There are " << undeterminedParams << " undetermined parameters. Not enough data for calibration.");
@@ -232,15 +226,83 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   //commit();
 
   if (paramChi2 / nParams > 1. || fabs(maxCorrectionPull) > 50.) {
-    if (fabs(maxCorrectionPull) > 50.)
-      B2INFO("Largest correction/error is " << maxCorrectionPull << " for parameter with label " << maxCorrectionPullLabel);
-    if (paramChi2 / nParams >= 1.)
-      B2INFO("Parameter corrections incosistent with small change, e.g. sum[(correction/error)^2]/#params = " << paramChi2 / nParams
-             << " = " << paramChi2 << " / " << nParams << " > 1.");
+    B2INFO("Largest correction/error is " << maxCorrectionPull << " for parameter with label " << maxCorrectionPullLabel);
+    B2INFO("Parameter corrections Chi2/NDF, e.g. sum[(correction/error)^2]/#params = " << paramChi2 / nParams
+           << " = " << paramChi2 << " / " << nParams << " > 1.");
+
     B2INFO("Requesting iteration.");
     return c_Iterate;
   }
 
   return c_OK;
 }
+
+void MillepedeAlgorithm::prepareMilleBinary()
+{
+  // Clear list of binaries in steering
+  m_steering.clearFiles();
+
+  // Temp file name
+  const std::string milleFileName("gbl-data.mille");
+
+  // For no entries, no binary file is created
+  auto& gblDataTree = getObject<TTree>("GblDataTree");
+  if (!gblDataTree.GetEntries()) {
+    B2WARNING("No trajectories in GBL data tree.");
+    return;
+  }
+
+  // Create new mille binary
+  auto milleBinary = new gbl::MilleBinary(milleFileName);
+
+  // Containers for GBL data
+  double aValue(0.);
+  double aErr(0.);
+  std::vector<unsigned int>* indLocal;
+  std::vector<double>* derLocal;
+  std::vector<int>* labGlobal;
+  std::vector<double>* derGlobal;
+
+  // Read vectors of GblData from tree branch
+  std::vector<gbl::GblData> currentGblData;
+  gblDataTree.Branch<std::vector<gbl::GblData>>("GblData", &currentGblData);
+
+  B2INFO("Writing Millepede binary files...");
+  for (unsigned int iRecord = 0; iRecord < gblDataTree.GetEntries(); ++iRecord) {
+    gblDataTree.GetEntry(iRecord);
+
+    for (gbl::GblData& theData : currentGblData) {
+      theData.getAllData(aValue, aErr, indLocal, derLocal, labGlobal,
+                         derGlobal);
+      milleBinary->addData(aValue, aErr, *indLocal, *derLocal, *labGlobal,
+                           *derGlobal);
+    }
+    milleBinary->writeRecord();
+  }
+  // Closes the file
+  delete milleBinary;
+  B2INFO("Millepede binary files written.");
+
+  // Add binary to steering
+  m_steering.addFile(milleFileName);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

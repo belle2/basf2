@@ -46,7 +46,7 @@ namespace Belle2 {
     virtual void terminate();
 
     /** Make a name for mille binary (encodes module name + starting exp, run and event + process id) */
-    std::string getUniqueMilleName();
+    //std::string getUniqueMilleName();
 
     /** Get all useable tracks for particles */
     std::vector<genfit::Track*> getParticlesTracks(std::vector<Particle*> particles);
@@ -56,6 +56,8 @@ namespace Belle2 {
 
     /** Compute the transformation matrix d(x,y,z,px,py,pz)/d(q/p,u',v',u,v) from state at first track point (vertex) */
     TMatrixD getLocalToGlobalTransform(genfit::MeasuredStateOnPlane msop);
+
+    void storeTrajectory(gbl::GblTrajectory& trajectory);
 
   private:
     /** Names of arrays with single genfit::Tracks fitted by GBL */
@@ -72,6 +74,7 @@ namespace Belle2 {
     bool m_calibrateVertex;
     /** Minimum p.value for output */
     double m_minPValue;
+    std::vector<gbl::GblData> m_currentGblData{};
   };
 }
 

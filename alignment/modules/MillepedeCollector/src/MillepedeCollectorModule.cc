@@ -33,6 +33,9 @@
 
 #include <TMath.h>
 
+#include <tracking/dataobjects/RecoTrack.h>
+#include <../tracking/trackFitting/fitter/base/include/TrackFitter.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -101,7 +104,10 @@ void MillepedeCollectorModule::prepare()
   }
 
   // Register Mille output
-  registerObject<MilleData>("mille", new MilleData(m_doublePrecision));
+  // registerObject<MilleData>("mille", new MilleData(m_doublePrecision));
+  auto gblDataTree = new TTree("GblDataTree", "GblDataTree");
+  gblDataTree->Branch<std::vector<gbl::GblData>>("GblData", &m_currentGblData);
+  registerObject<TTree>("GblDataTree", gblDataTree);
 
   registerObject<TH1F>("chi2/ndf", new TH1F("chi2/ndf", "chi2/ndf", 200, 0., 50.));
   registerObject<TH1F>("pval", new TH1F("pval", "pval", 100, 0., 1.));
@@ -109,10 +115,11 @@ void MillepedeCollectorModule::prepare()
 
 void MillepedeCollectorModule::collect()
 {
+
   // Open new file on request (at start or after being closed)
-  auto& mille = getObject<MilleData>("mille");
-  if (!mille.isOpen())
-    mille.open(getUniqueMilleName());
+  // auto& mille = getObject<MilleData>("mille");
+  //if (!mille.isOpen())
+  //  mille.open(getUniqueMilleName());
 
 
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
@@ -121,6 +128,7 @@ void MillepedeCollectorModule::collect()
   for (auto arrayName : m_tracks) {
     // Input tracks (have to be fitted by GBL)
     StoreArray<genfit::Track> tracks(arrayName);
+    StoreArray<RecoTrack> recoTracks;
 
     for (auto track : tracks) {
       if (!track.hasFitStatus())
@@ -137,7 +145,9 @@ void MillepedeCollectorModule::collect()
 
       using namespace gbl;
       GblTrajectory trajectory(gbl->collectGblPoints(&track, track.getCardinalRep()), fs->hasCurvature());
-      if (fs->getPVal() > m_minPValue) mille.fill(trajectory);
+
+      // if (fs->getPVal() > m_minPValue) mille.fill(trajectory);
+      if (fs->getPVal() > m_minPValue) storeTrajectory(trajectory);
 
     }
 
@@ -153,7 +163,8 @@ void MillepedeCollectorModule::collect()
         getObject<TH1F>("pval").Fill(gblfs->getPVal());
 
         gbl::GblTrajectory trajectory(gbl->collectGblPoints(track, track->getCardinalRep()), gblfs->hasCurvature());
-        if (gblfs->getPVal() > m_minPValue) mille.fill(trajectory);
+        //if (gblfs->getPVal() > m_minPValue) mille.fill(trajectory);
+        if (gblfs->getPVal() > m_minPValue) storeTrajectory(trajectory);
 
       }
     }
@@ -182,7 +193,9 @@ void MillepedeCollectorModule::collect()
         combined.fit(chi2, ndf, lostWeight);
         B2INFO("Combined GBL fit with vertex constraint: NDF = " << ndf << " Chi2/NDF = " << chi2 / ndf);
 
-        if (TMath::Prob(chi2, ndf) > m_minPValue) mille.fill(combined);
+        //if (TMath::Prob(chi2, ndf) > m_minPValue) mille.fill(combined);
+        if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
+
         getObject<TH1F>("chi2/ndf").Fill(chi2 / ndf);
         getObject<TH1F>("pval").Fill(TMath::Prob(chi2, ndf));
       }
@@ -247,17 +260,14 @@ void MillepedeCollectorModule::collect()
         combined.fit(chi2, ndf, lostWeight);
         B2INFO("Combined GBL fit with vertex + ip profile constraint: NDF = " << ndf << " Chi2/NDF = " << chi2 / ndf);
 
-        if (TMath::Prob(chi2, ndf) > m_minPValue) mille.fill(combined);
+        // if (TMath::Prob(chi2, ndf) > m_minPValue) mille.fill(combined);
+        if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
+
         getObject<TH1F>("chi2/ndf").Fill(chi2 / ndf);
         getObject<TH1F>("pval").Fill(TMath::Prob(chi2, ndf));
       }
     }
   }
-
-  // Split binary files each 10000 events
-  //if (recordCounter % 10000 == 0)
-  //  mille.close();
-
 }
 
 void MillepedeCollectorModule::endRun()
@@ -265,29 +275,44 @@ void MillepedeCollectorModule::endRun()
   // We close the file at end of run, producing
   // one file per run (and process id) which is more
   // convenient than one large binary block.
-  auto& mille = getObject<MilleData>("mille");
-  if (mille.isOpen())
-    mille.close();
+  // auto& mille = getObject<MilleData>("mille");
+  // if (mille.isOpen())
+  //   mille.close();
 }
 
 void MillepedeCollectorModule::terminate()
 {
-  auto& mille = getObject<MilleData>("mille");
-  auto& catalog = FileCatalog::Instance();
+  /*
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
   if (!fileMetaData.isValid()) {
     B2ERROR("Cannot register binaries in FileCatalog.");
     return;
   }
 
-  for (auto binary : mille.getFiles()) {
+
+  const std::vector<string> parents = {fileMetaData->getLfn()};
+  for (auto binary : getObject<MilleData>("mille").getFiles()) {
     FileMetaData milleMetaData(*fileMetaData);
-    milleMetaData.setLfn(binary);
-    catalog.registerFile(binary, milleMetaData);
+    // We reset filename to be set directly by the registerFile procedure
+    milleMetaData.setLfn("");
+    milleMetaData.setParents(parents);
+    FileCatalog::Instance().registerFile(binary, milleMetaData);
   }
+  */
 }
 
+void MillepedeCollectorModule::storeTrajectory(gbl::GblTrajectory& trajectory)
+{
+  if (trajectory.isValid())
+    m_currentGblData = trajectory.getData();
+  else
+    m_currentGblData.clear();
 
+  if (!m_currentGblData.empty())
+    getObject<TTree>("GblDataTree").Fill();
+}
+
+/*
 std::string MillepedeCollectorModule::getUniqueMilleName()
 {
   StoreObjPtr<EventMetaData> emd;
@@ -304,6 +329,7 @@ std::string MillepedeCollectorModule::getUniqueMilleName()
 
   return name;
 }
+*/
 
 std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::vector<Particle*> particles)
 {

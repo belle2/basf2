@@ -15,5 +15,6 @@
 #include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/SimpleFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/RealisticFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet/Chi2FacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/TMVAFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/UnionRecordingFacetFilter.h>

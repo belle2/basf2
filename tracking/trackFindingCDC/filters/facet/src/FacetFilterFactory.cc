@@ -40,11 +40,13 @@ FacetFilterFactory::getValidFilterNamesAndDescriptions() const
     {"all", "all facets are valid"},
     {"feasible", "only checking the feasability of right left passage information"},
     {"truth", "monte carlo truth"},
+    {"unionrecording", "record many multiple choosable variable set"},
     {"tmva", "filter facets with a tmva method"},
     {"none", "no facet is valid, stop at cluster generation."},
-    {"realistic", "mc free with more realistic criteria"},
-    {"unionrecording", "record many multiple choosable variable set"},
     {"simple", "mc free with simple criteria"},
+    {"realistic", "mc free with realistic criteria"},
+    {"realistic_loss", "mc with realistice criteria but losser cut"},
+    {"chi2", "mc free based on chi2 fitting"},
   });
   return filterNames;
 }
@@ -64,6 +66,10 @@ FacetFilterFactory::create(const std::string& filterName) const
     return std::unique_ptr<Filter<CDCFacet> >(new SimpleFacetFilter());
   } else if (filterName == string("realistic")) {
     return std::unique_ptr<Filter<CDCFacet> >(new RealisticFacetFilter());
+  } else if (filterName == string("realistic_loss")) {
+    return std::unique_ptr<Filter<CDCFacet> >(new RealisticFacetFilter(25));
+  } else if (filterName == string("chi2")) {
+    return std::unique_ptr<Filter<CDCFacet> >(new Chi2FacetFilter());
   } else if (filterName == string("tmva")) {
     return std::unique_ptr<Filter<CDCFacet> >(new TMVAFacetFilter());
   } else if (filterName == string("unionrecording")) {

@@ -32,6 +32,14 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
   const ParameterLine2D& fitLine = facet.getStartToEndLine();
 
   var<named("chi2")>() = chi2;
+
+  // Heuristic flattening functions. Ffactor is chosen by hand.
+  const double erfWidth = 120.0;
+  const double tanhWidth = 1.64 * erfWidth;
+
+  var<named("erf")>() = std::erf(chi2 / erfWidth);
+  var<named("tanh")>() = std::tanh(chi2 / tanhWidth);
+
   var<named("fit_phi")>() = fitLine.tangential().phi();
 
   const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();

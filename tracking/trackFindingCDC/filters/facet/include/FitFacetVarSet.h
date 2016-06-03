@@ -28,6 +28,8 @@ namespace Belle2 {
     constexpr
     static char const* const facetFitNames[] = {
       "fit_phi",
+      "erf",
+      "tanh",
       "chi2",
       "d2",
       "start_distance",
@@ -35,7 +37,8 @@ namespace Belle2 {
       "end_distance",
     };
 
-    /** Class that specifies the names of the variables
+    /**
+     *  Class that specifies the names of the variables
      *  that should be generated from a facet
      */
     class FitFacetVarNames : public VarNames<CDCFacet> {
@@ -52,7 +55,8 @@ namespace Belle2 {
       }
     };
 
-    /** Class that computes floating point variables from a facet.
+    /**
+     *  Class that computes floating point variables from a facet.
      *  that can be forwarded to a flat TNtuple or a TMVA method
      */
     class FitFacetVarSet : public VarSet<FitFacetVarNames> {

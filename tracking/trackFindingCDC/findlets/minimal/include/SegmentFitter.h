@@ -19,6 +19,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -78,6 +79,11 @@ namespace Belle2 {
                                       m_param_useAlphaInDriftLength,
                                       "Switch to serve the alpha angle to the drift length translator",
                                       m_param_useAlphaInDriftLength);
+
+        moduleParamList->addParameter(prefixed(prefix, "tofMassScale"),
+                                      m_param_tofMassScale,
+                                      "Mass to estimate the velocity in the flight time to the hit",
+                                      m_param_tofMassScale);
       }
 
       /// Signals the beginning of the event processing
@@ -114,7 +120,8 @@ namespace Belle2 {
               Vector2D flightDirection = recoHit2D.getFlightDirection2D();
               Vector2D recoPos = recoHit2D.getRecoPos2D();
               double alpha = recoPos.angleWith(flightDirection);
-              double arcLength2D = recoPos.cylindricalR() / boost::math::sinc_pi(alpha);
+              double cylindricalR = recoPos.cylindricalR();
+              double arcLength2D = cylindricalR / boost::math::sinc_pi(alpha);
               double flightTimeEstimation = arcLength2D / Const::speedOfLight;
 
               const CDCWire& wire = recoHit2D.getWire();
@@ -123,6 +130,12 @@ namespace Belle2 {
 
               if (not m_param_useAlphaInDriftLength) {
                 alpha = 0;
+              }
+
+              if (not std::isnan(m_param_tofMassScale)) {
+                double curvature = 2.0 * std::sin(alpha) / cylindricalR;
+                double pt = curvatureToAbsMom2D(curvature, recoPos);
+                flightTimeEstimation = hypot(1, m_param_tofMassScale / pt);
               }
 
               double driftLength =
@@ -172,6 +185,9 @@ namespace Belle2 {
 
       /// Parameter : Switch to serve the alpha angle to the drift length translator.
       bool m_param_useAlphaInDriftLength = false;
+
+      /// Parameter : Mass to estimate the velocity in the flight time to the hit
+      double m_param_tofMassScale = NAN;
 
       /// Option which positional information from the hits should be used
       EFitPos m_fitPos = EFitPos::c_RecoPos;

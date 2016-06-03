@@ -336,7 +336,7 @@ class ClassificationOverview:
                         with root_cd(variable_name) as tdirectory:
                             classification_analysis.write(tdirectory)
 
-                    self.classification_analyses.append(classification_analysis)
+                        self.classification_analyses.append(classification_analysis)
 
         if isinstance(self.output_file_name, str):
             output_file.Close()

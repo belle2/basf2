@@ -272,7 +272,7 @@ namespace Belle2 {
       bool m_param_feasibleRLOnly = true;
 
       /// Parameter : Switch to reestimate the drift length
-      bool m_param_updateDriftLength = false;
+      bool m_param_updateDriftLength = true;
 
       /// Parameter : Switch to fit the facet with least square method for the drift length update
       bool m_param_leastSquareFit = false;

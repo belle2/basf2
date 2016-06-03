@@ -182,12 +182,17 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
     """
 
     # Init the geometry for cdc tracking and the hits
-    path.add_module("WireHitTopologyPreparer")
+    path.add_module("WireHitTopologyPreparer",
+                    flightTimeEstimation="outwards",
+                    )
 
     # Find segments and reduce background hits
     path.add_module("SegmentFinderCDCFacetAutomaton",
                     ClusterFilter="tmva",
-                    ClusterFilterParameters={"cut": 0.2})
+                    ClusterFilterParameters={"cut": 0.2},
+                    FacetUpdateDriftLength=True,
+                    FacetFilter="chi2",
+                    )
 
     # Find axial tracks
     path.add_module("TrackFinderCDCLegendreTracking",

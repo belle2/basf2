@@ -183,6 +183,9 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                     'MinimalPurity': 0.66,
                     'RelateClonesToMCParticles': True,
                     'prRecoTracksStoreArrayName': "RecoTracks",
+                    'UsePXDHits': tracking_coverage.get('UsePXDHits', True),
+                    'UseSVDHits': tracking_coverage.get('UseSVDHits', True),
+                    'UseCDCHits': tracking_coverage.get('UseCDCHits', True),
                 })
 
                 mc_track_matcher_module.param(tracking_coverage)

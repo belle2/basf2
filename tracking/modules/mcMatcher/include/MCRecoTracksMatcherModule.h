@@ -157,6 +157,7 @@ namespace Belle2 {
 
     //Other variables
 
+    /// Descriptive type defintion for a number of degrees of freedom.
     typedef int NDF;
     std::map<int, NDF> m_ndf_by_detId = {{Const::PXD, 2}, {Const::SVD, 2}, {Const::CDC, 1}};            /**< Map storing the standard number degrees of freedom for a single hit by detector */
   }; // end class

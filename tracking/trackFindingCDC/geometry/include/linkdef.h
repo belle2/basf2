@@ -16,6 +16,8 @@
 
 #pragma link C++ class Belle2::TrackFindingCDC::Line2D+;
 #pragma link C++ class Belle2::TrackFindingCDC::ParameterLine2D+;
+#pragma link C++ class Belle2::TrackFindingCDC::LineCovariance+;
+#pragma link C++ class Belle2::TrackFindingCDC::UncertainParameterLine2D+;
 
 #pragma link C++ class Belle2::TrackFindingCDC::GeneralizedCircle+;
 

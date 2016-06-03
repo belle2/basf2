@@ -47,13 +47,11 @@ namespace Belle2 {
      * (for FPGA simulation) */
     bool m_fixedPoint;
     /** Fixed point precision in bit after radix point.
-     *  10 values:
+     *  8 values:
      *  - 2D track parameters: omega, phi
-     *  - geometrical values derived from track:
-     *    arclength LUT input, arclength LUT output, reference wire ID
-     *  - scale factors: radian to wire ID, MLP input scale factors
-     *  - MLP values: nodes, weights, activation function LUT input
-     *    (LUT output = nodes)
+     *  - geometrical values derived from track: crossing angle, reference wire ID
+     *  - scale factor: radian to wire ID
+     *  - MLP values: nodes, weights, activation function LUT input (LUT output = nodes)
      */
     std::vector<unsigned> m_precision;
   };

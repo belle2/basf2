@@ -157,13 +157,6 @@ namespace Belle2 {
      */
     std::vector<float> getInputVector(unsigned isector, std::vector<unsigned>& hitIds);
 
-    /** Calculate input values for MLP with fixed point arithmetic.
-     * @param isector index of the MLP that will use the input
-     * @param hitIds hit indices to be used for the input
-     * @return scaled vector of input values (1 for each input node)
-     */
-    std::vector<float> getInputVectorFix(unsigned isector, std::vector<unsigned>& hitIds);
-
     /** Run an expert MLP.
      * @param isector index of the MLP
      * @param input vector of input values
@@ -182,16 +175,14 @@ namespace Belle2 {
     unsigned m_TSoffset[10] = {};
     /** 2D phi position of current track scaled to number of wires */
     double m_idRef[9][2] = {};
-    /** 2D arclength of current track */
-    double m_arclength[9][2] = {};
+    /** 2D crossing angle of current track */
+    double m_alpha[9][2] = {};
     /** Fixed point precision in bit after radix point.
-     *  10 values:
+     *  8 values:
      *  - 2D track parameters: omega, phi
-     *  - geometrical values derived from track:
-     *    arclength LUT input, arclength LUT output, reference wire ID
-     *  - scale factors: radian to wire ID, MLP input scale factors
-     *  - MLP values: nodes, weights, activation function LUT input
-     *    (LUT output = nodes)
+     *  - geometrical values derived from track: crossing angle, reference wire ID
+     *  - scale factor: radian to wire ID
+     *  - MLP values: nodes, weights, activation function LUT input (LUT output = nodes)
      */
     std::vector<unsigned> m_precision;
   };

@@ -66,7 +66,8 @@ namespace Belle2 {
     /** check whether given relative TS ID is in relevant range */
     bool isRelevant(float relId, unsigned iSL) const;
 
-    /** scale relative TS ID from relevant range to [-1, 1] */
+    /** scale relative TS ID from relevant range to approximately [-1, 1]
+     *  (to facilitate the FPGA implementation, the scale factor is rounded to a power of 2)*/
     float scaleId(double relId, unsigned iSL) const;
     /** scale target value from outputScale to [-1, 1] */
     std::vector<float> scaleTarget(std::vector<float> target) const;

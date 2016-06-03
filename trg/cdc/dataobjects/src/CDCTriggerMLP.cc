@@ -95,7 +95,11 @@ CDCTriggerMLP::isRelevant(float relId, unsigned iSL) const
 float
 CDCTriggerMLP::scaleId(double relId, unsigned iSL) const
 {
-  return 2. * (relId - relevantID[2 * iSL]) / (relevantID[2 * iSL + 1] - relevantID[2 * iSL]) - 1.;
+  float scale = 2. / (relevantID[2 * iSL + 1] - relevantID[2 * iSL]);
+  // round down to nearest power of 2
+  scale = pow(2, floor(log2(scale)));
+  float offset = (relevantID[2 * iSL] + relevantID[2 * iSL + 1]) / 2.;
+  return scale * (relId - offset);
 }
 
 std::vector<float>

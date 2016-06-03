@@ -35,6 +35,7 @@ namespace Belle2 {
       WireHitTopologyPreparer()
       {
         addProcessingSignalListener(&m_wireHitCreator);
+        addProcessingSignalListener(&m_wireHitMCMultiLoopBlocker);
         addProcessingSignalListener(&m_wireHitTopologyFiller);
       }
 
@@ -49,35 +50,16 @@ namespace Belle2 {
       virtual void exposeParameters(ModuleParamList* moduleParamList,
                                     const std::string& prefix = "") override
       {
-        moduleParamList->addParameter(prefixed(prefix, "mcFirstLoop"),
-                                      m_param_mcFirstLoop,
-                                      "Switch to delete hits that are not from "
-                                      "the first loop of the tracks before track finding starts. "
-                                      "This is useful for tuning the hit triplet filters "
-                                      "to the first earliest hits in the track and neglects "
-                                      "the more cumbersome later hits",
-                                      m_param_mcFirstLoop);
         m_wireHitCreator.exposeParameters(moduleParamList, prefix);
+        m_wireHitMCMultiLoopBlocker.exposeParameters(moduleParamList, prefix);
         m_wireHitTopologyFiller.exposeParameters(moduleParamList, prefix);
-      }
-
-      /// Signals the start of the event processing
-      virtual void initialize() override final
-      {
-        // Add the multi loop blocking to the signal chain if it is active.
-        if (m_param_mcFirstLoop) {
-          addProcessingSignalListener(&m_wireHitMCMultiLoopBlocker);
-        }
-        Super::initialize();
       }
 
       /// Generates the segment.
       virtual void apply(std::vector<CDCWireHit>& outputWireHits) override final
       {
         m_wireHitCreator.apply(outputWireHits);
-        if (m_param_mcFirstLoop) {
-          m_wireHitMCMultiLoopBlocker.apply(outputWireHits);
-        }
+        m_wireHitMCMultiLoopBlocker.apply(outputWireHits);
         m_wireHitTopologyFiller.apply(outputWireHits);
       }
 
@@ -91,10 +73,6 @@ namespace Belle2 {
 
       /// Publishes the created wire hits to the wire hit topology.
       WireHitTopologyFiller m_wireHitTopologyFiller;
-
-    private:
-      /// Parameter: Switch to delete hits that are not from the first loop of the tracks before track finding starts
-      bool m_param_mcFirstLoop = false;
 
     }; // end class WireHitTopologyPreparer
 

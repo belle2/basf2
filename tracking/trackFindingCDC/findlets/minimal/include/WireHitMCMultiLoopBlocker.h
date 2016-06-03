@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
 #include <vector>
 #include <algorithm>
 
@@ -32,37 +34,51 @@ namespace Belle2 {
       /// Short description of the findlet
       virtual std::string getDescription() override
       {
-        return "Marks all hits that are not on the first loop of the track by considering the mc truth information as background";
+        return "Marks all hits that were not reached after the specified number of loops as background based on MC information.";
+      }
+
+      /// Expose the parameters of the wire hit preparation
+      virtual void exposeParameters(ModuleParamList* moduleParamList,
+                                    const std::string& prefix = "") override
+      {
+        moduleParamList->addParameter(prefixed(prefix, "UseNLoops"),
+                                      m_param_useNLoops,
+                                      "Maximal number of loops accepted as non background",
+                                      m_param_useNLoops);
       }
 
       /// Signals the start of the event processing
       virtual void initialize() override final
       {
-        CDCMCManager::getInstance().requireTruthInformation();
         Super::initialize();
+        if (std::isnan(m_param_useNLoops)) return;
+        CDCMCManager::getInstance().requireTruthInformation();
+
       }
 
       /// Prepare the Monte Carlo information at the start of the event
       virtual void beginEvent() override final
       {
-        CDCMCManager::getInstance().fill();
         Super::beginEvent();
+        if (std::isnan(m_param_useNLoops)) return;
+        CDCMCManager::getInstance().fill();
       }
 
       /// Main algorithm marking the hit of higher loops as background
       virtual void apply(std::vector<CDCWireHit>& wireHits) override final
       {
+        if (std::isnan(m_param_useNLoops)) return;
         const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
-        auto isNotOnFirstLoop = [&mcHitLookUp](const CDCWireHit & wireHit) {
+        auto isWithinMCLoops = [&mcHitLookUp, this](const CDCWireHit & wireHit) {
           const CDCSimHit* simHit = mcHitLookUp.getClosestPrimarySimHit(wireHit.getHit());
-          if (not simHit) return true;
+          if (not simHit) return false;
           // Reject hits with no assoziated CDCSimHit.
 
           const double tof = simHit->getFlightTime();
 
           const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
-          if (not mcParticle) return false;
+          if (not mcParticle) return true;
           // Accept hits with no assoziated MCParticle (e.g. beam background.)
 
           const double speed = mcParticle->get4Vector().Beta() * Const::speedOfLight;
@@ -76,20 +92,25 @@ namespace Belle2 {
           const double bendCircumfence =  2 * M_PI * bendRadius;
           const double loopLength = bendCircumfence * absMom3D / absMom2D;
           const double loopTOF =  loopLength / speed;
-          if (tof > loopTOF) {
-            return true;
-          } else {
+          if (tof > loopTOF * m_param_useNLoops) {
             return false;
+          } else {
+            return true;
           }
         };
 
         for (CDCWireHit& wireHit : wireHits) {
-          if (isNotOnFirstLoop(wireHit)) {
+          if (not isWithinMCLoops(wireHit)) {
             wireHit.getAutomatonCell().setBackgroundFlag();
             wireHit.getAutomatonCell().setTakenFlag();
           }
         }
       }
+
+    private:
+      /// Parameter : Maximal fraction of loops of the mc particles trajectory needs to the hit to unblock it.
+      double m_param_useNLoops = NAN;
+
     }; // end class WireHitMCMultiLoopBlocker
 
   } // end namespace TrackFindingCDC

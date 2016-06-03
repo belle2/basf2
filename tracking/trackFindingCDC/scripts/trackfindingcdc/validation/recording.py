@@ -7,7 +7,7 @@ from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
     recording_finder_module = basf2.register_module("TrackFinderCDCAutomatonDev")
     flight_time_estimation = "none"
-    first_loop = False
+    n_loops = float("nan")
 
     recording_filter_parameter_name = "FillMeFilterParameters"
     root_output_file_name = "Records.root"
@@ -31,10 +31,10 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
 
         argument_parser.add_argument(
             "-l",
-            "--first-loop",
-            action="store_true",
-            dest="first_loop",
-            help=("Choose to block all wire hits but the ones located on the first loop")
+            "--mc-loop-limit",
+            type=float,
+            dest="n_loops",
+            help=("Choose to block all wire hits but the ones located on the {mc_loops} first loops")
         )
         argument_parser.add_argument(
             '-v',
@@ -82,7 +82,7 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
 
         path.add_module("WireHitTopologyPreparer",
                         flightTimeEstimation=self.flight_time_estimation,
-                        mcFirstLoop=self.first_loop)
+                        UseNLoops=self.n_loops)
 
         recording_finder_module = self.get_basf2_module(self.recording_finder_module)
         path.add_module(recording_finder_module)

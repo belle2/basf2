@@ -27,6 +27,17 @@ namespace Belle2 {
       /**
        *  Fit a line the positions xyl and the weights.
        *
+       *  @param fromFacet First facet from the pair of facets
+       *  @param toFacet   Second facet from the pair of facets
+       *  @param nSteps Maximal number of steps to be taken in the mimisation
+       */
+      static UncertainParameterLine2D fit(const CDCFacet& fromFacet,
+                                          const CDCFacet& toFacet,
+                                          int nSteps = 100);
+
+      /**
+       *  Fit a line the positions xyl and the weights.
+       *
        *  Fits a line to a number of observations with tunable
        *  acurracy versus execution speed.
        *  Special implementations for nSteps = 0 and nSteps=1 have been integrated.

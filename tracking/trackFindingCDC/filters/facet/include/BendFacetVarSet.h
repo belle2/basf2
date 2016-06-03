@@ -31,16 +31,19 @@ namespace Belle2 {
       "start_phi_sigma",
       "start_phi_pull",
       "start_d",
+      "start_chi2",
 
       "middle_phi",
       "middle_phi_sigma",
       "middle_phi_pull",
       "middle_d",
+      "middle_chi2",
 
       "end_phi",
       "end_phi_sigma",
       "end_phi_pull",
       "end_d",
+      "end_chi2",
     };
 
     /** Class that specifies the names of the variables

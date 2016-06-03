@@ -44,13 +44,15 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
     flight_time_estimation = "none"
     flight_time_reestimation = False
     use_alpha_in_drift_length = False
+    flight_time_mass_scale = float("nan")
+
     fit_positions = "rlDriftCircle"
     fit_variance = "proper"
 
     output_file_name = "SegmentFitValidation.root"  # Specification for BrowseTFileOnTerminateRunMixin
 
     def create_argument_parser(self, **kwds):
-        argument_parser = super(SegmentFitValidationRun, self).create_argument_parser(**kwds)
+        argument_parser = super().create_argument_parser(**kwds)
 
         argument_parser.add_argument(
             '-m',
@@ -122,12 +124,21 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
             dest="use_alpha_in_drift_length",
             help=("Switch to serve the alpha angle to the drift length translator.")
         )
+
+        argument_parser.add_argument(
+            "-fm",
+            "--flight-time-mass-scale",
+            type=float,
+            dest="flight_time_mass_scale",
+            help=("Mass parameter to estimate the velocity in the time of flight estimation")
+        )
+
         return argument_parser
 
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
-        path = super(SegmentFitValidationRun, self).create_path()
+        path = super().create_path()
 
         path.add_module("WireHitTopologyPreparer",
                         flightTimeEstimation=self.flight_time_estimation)
@@ -138,14 +149,14 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
                             SegmentOrientation="outwards")
 
         elif self.monte_carlo == "medium":
-            # Medium MC - proper generation logic but true facets and facet relations
+            # Medium MC - proper generation logic, but true facets and facet relations
             path.add_module("SegmentFinderCDCFacetAutomaton",
                             FacetFilter="truth",
                             FacetRelationFilter="truth",
                             SegmentOrientation="outwards")
 
         elif self.monte_carlo == "full":
-            # Only true monte carlo segments - put make the positions realistic
+            # Only true monte carlo segments, but make the positions realistic
             path.add_module("SegmentCreatorMCTruth",
                             reconstructedPositions=True)
 
@@ -158,12 +169,10 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
                         fitPos=self.fit_positions,
                         fitVariance=self.fit_variance,
                         updateDriftLength=self.flight_time_reestimation,
-                        useAlphaInDriftLength=self.use_alpha_in_drift_length)
+                        useAlphaInDriftLength=self.use_alpha_in_drift_length,
+                        tofMassScale=self.flight_time_mass_scale)
 
         path.add_module(SegmentFitValidationModule(self.output_file_name))
-
-        path.add_module("RootOutput",
-                        outputFileName="test.root")
 
         return path
 
@@ -174,12 +183,13 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
     compose validation plots on terminate."""
 
     def __init__(self, output_file_name):
-        super(SegmentFitValidationModule, self).__init__(foreach='CDCRecoSegment2DVector',
-                                                         output_file_name=output_file_name)
+        super().__init__(foreach='CDCRecoSegment2DVector',
+                         output_file_name=output_file_name)
+
         self.mc_segment_lookup = None
 
     def initialize(self):
-        super(SegmentFitValidationModule, self).initialize()
+        super().initialize()
         self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
 
     def prepare(self):

@@ -145,13 +145,11 @@ Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const ER
     const double signedDriftLength = isValid(rlInfo) ? rlInfo * getRefDriftLength() : 0.0;
     return trajectory2D.reconstruct3D(wireLine, signedDriftLength);
 
-  } else if (stereoType == EStereoKind::c_Axial) {
+  } else { /*if (stereoType == EStereoKind::c_Axial)*/
     const Vector2D recoPos2D = reconstruct2D(trajectory2D);
     // for axial wire we can not determine the z coordinate by looking at the xy projection only
     // we set it the basic assumption.
     const double z = 0;
     return Vector3D(recoPos2D, z);
   }
-
-  B2FATAL("Reconstructing on invalid stereo type " << static_cast<int>(stereoType));
 }

@@ -97,31 +97,29 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
                                        const CDCTrajectorySZ& trajectorySZ)
 {
   EStereoKind stereoType = recoHit.getStereoKind();
-  if (stereoType == EStereoKind::c_Axial) {
-
-    Vector2D recoPos2D = trajectory2D.getClosest(recoHit.getRecoPos2D());
-    double perpS    = trajectory2D.calcArcLength2D(recoPos2D);
-    double z        = trajectorySZ.mapSToZ(perpS);
-
-    Vector3D recoPos3D(recoPos2D, z);
-    return CDCRecoHit3D(recoHit.getRLWireHit(), recoPos3D, perpS);
-
-  } else if (stereoType == EStereoKind::c_StereoU or stereoType == EStereoKind::c_StereoV) {
+  if (stereoType == EStereoKind::c_StereoU or stereoType == EStereoKind::c_StereoV) {
     //the closest approach of a wire line to a helix
     //( in this case representated by the two trajectories )
     //can not be solved as a closed expression
     //in the common case the z fit has been derived from the reconstructed points generated
     //with the reconstruct methode above in the other reconstruct method.
     //sticking to that method but using the average z from the sz fit
-
     const WireLine wireLine = recoHit.getWireLine();
     Vector3D recoPos3D = trajectory2D.reconstruct3D(wireLine);
-    double perpS    = trajectory2D.calcArcLength2D(recoPos3D.xy());
-    double z        = trajectorySZ.mapSToZ(perpS);
+    double perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
+    double z = trajectorySZ.mapSToZ(perpS);
     recoPos3D.setZ(z);
     return CDCRecoHit3D(recoHit.getRLWireHit(), recoPos3D, perpS);
+
+  } else { /* if (stereoType == EStereoKind::c_Axial)*/
+    Vector2D recoPos2D = trajectory2D.getClosest(recoHit.getRecoPos2D());
+    double perpS = trajectory2D.calcArcLength2D(recoPos2D);
+    double z = trajectorySZ.mapSToZ(perpS);
+
+    Vector3D recoPos3D(recoPos2D, z);
+    return CDCRecoHit3D(recoHit.getRLWireHit(), recoPos3D, perpS);
+
   }
-  B2FATAL("Reconstruction on invalid wire");
 }
 
 CDCRecoHit3D CDCRecoHit3D::reconstructNearest(const CDCWireHit* wireHit,

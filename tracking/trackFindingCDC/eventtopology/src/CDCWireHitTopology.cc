@@ -25,7 +25,7 @@ CDCWireHitTopology& CDCWireHitTopology::getInstance()
 {
   StoreObjPtr<CDCWireHitTopology> instance("", DataStore::c_Persistent);
   if (not instance.isValid()) {
-    B2FATAL("CDCWireHitTopology could not by found in the StoreArray! Have you added the WireHitTopologyPreparer module?");
+    B2FATAL("CDCWireHitTopology could not be found in the StoreArray! Have you added the WireHitTopologyPreparer module?");
   }
 
   return *instance;
@@ -39,7 +39,7 @@ void CDCWireHitTopology::initialize()
   }
   wireHitTopology.registerInDataStore(DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
   if (not wireHitTopology.create(false)) {
-    B2FATAL("Could not create the StoreObject for the Wire Hit Topology properly!");
+    B2FATAL("Could not create the StoreObject for the WireHitTopology properly!");
   }
 }
 

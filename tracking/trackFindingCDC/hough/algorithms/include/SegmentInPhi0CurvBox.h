@@ -17,12 +17,14 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /** Predicate class to check for the containment of segments in a phi0 curv hough space part.
+    /**
+     *  Predicate class to check for the containment of segments in a phi0 curv hough space part.
      *  Unlike hits segments occupy only a point in the hough space.
      */
     class SegmentInPhi0CurvBox {
 
-      /** Checks if the segment is contained in a phi0 curv hough space.
+      /**
+       *  Checks if the segment is contained in a phi0 curv hough space.
        *  Returns the size of the segment if it is contained, returns NAN if it is not contained.
        *  The method simply assumes that the segment has been fitted with origin constraint
        *  and simply uses the values from the contained trajectory
@@ -37,6 +39,10 @@ namespace Belle2 {
         return weight * segment->size();
       }
 
+      /**
+       *  Checks if the given trajectory is considered part of the hough box in phi0, curvature space.
+       *  Returns a finit weight if it is contained, NAN if not contained.
+       */
       inline Weight operator()(const CDCTrajectory2D* trajectory2D,
                                const Phi0CurvBox* phi0CurvBox)
       {
@@ -47,6 +53,11 @@ namespace Belle2 {
         return in ? 1 : NAN;
       }
 
+
+      /**
+       *  Checks if the given hit triplet is considered part of the hough box in phi0, curvature space.
+       *  Returns a finit weight if it is contained, NAN if not contained.
+       */
       inline Weight operator()(const CDCFacet* facet,
                                const Phi0CurvBox* phi0CurvBox)
       {
@@ -68,8 +79,7 @@ namespace Belle2 {
         // Hence we stick with 1 as weight here.
       }
 
-
-
+      /// Predicate checking if the phi0 vector and curvature are contained in the given box.
       inline bool isPhi0CurvPointIn(const Vector2D& phi0Vec,
                                     const double curvature,
                                     const Phi0CurvBox* phi0CurvBox)
@@ -78,7 +88,7 @@ namespace Belle2 {
         const Vector2D& lowerPhi0Vec = phi0CurvBox->getLowerPhi0Vec();
         const Vector2D& upperPhi0Vec = phi0CurvBox->getUpperPhi0Vec();
 
-        // Allow containment keep the reversal symmetry
+        // Allow containment to keep the reversal symmetry
         if (phi0CurvBox->isIn<1>(curvature)) {
           return phi0Vec.isBetween(lowerPhi0Vec, upperPhi0Vec);
 

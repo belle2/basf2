@@ -31,12 +31,13 @@ namespace Belle2 {
      */
     template<class... ATypes>
     class Box;
-    template<>
+
 
     /**
      * Box Base class specification without any template arguments. Is the "zero-th" element in the list of
      * stacked boxes (see below).
      */
+    template<>
     class Box<> {
     public:
       /// Nothing to do on set bounds.
@@ -209,6 +210,20 @@ namespace Belle2 {
       Width<I> getDivisionWidthWithOverlap(const Width<I>& overlap, size_t nDivisions) const
       { return (getWidth<I>() + (nDivisions - 1) * overlap) / nDivisions; }
 
+
+      /**
+       *  Getter for the lower bound of a subbox along the Ith axes in an equal spaced division with overlap.
+       *
+       *  For divisions of this box into n smaller boxes of equal size this computes the lower bound
+       *  in an axes given as template parameter. It also allows for the smaller boxes to overlap
+       *  by a given overlap width while they remain equal in size among each other.
+       *  The smaller boxes are always fully contained within this box.
+       *
+       *  @param overlap    Width of overlap between to conscutive boxes
+       *  @param nDivisions Total number of smaller boxes to be constructed
+       *  @param iDivision  The index of the box in line to be constructed
+       *  @return           The lower bound of the smaller box
+       */
       template<std::size_t I>
       Type<I>
       getLowerDivisionBoundWithOverlap(const Width<I>& overlap,
@@ -219,6 +234,19 @@ namespace Belle2 {
         return Type<I>(getLowerBound<I>() + (getWidth<I>() - overlap) * iDivision / nDivisions);
       }
 
+      /**
+       *  Getter for the upper bound of a subbox along the Ith axes in an equal spaced division with overlap.
+       *
+       *  For divisions of this box into n smaller boxes of equal size this computes the upper bound
+       *  in an axes given as template parameter. It also allows for the smaller boxes to overlap
+       *  by a given overlap width while they remain equal in size among each other.
+       *  The smaller boxes are always fully contained within this box.
+       *
+       *  @param overlap    Width of overlap between to conscutive boxes
+       *  @param nDivisions Total number of smaller boxes to be constructed
+       *  @param iDivision  The index of the box in line to be constructed
+       *  @return           The upper bound of the smaller box
+       */
       template<std::size_t I>
       Type<I>
       getUpperDivisionBoundWithOverlap(const Width<I>& overlap,
@@ -229,7 +257,20 @@ namespace Belle2 {
         return Type<I>(getUpperBound<I>() - (getWidth<I>() - overlap) * (nDivisions - iDivision - 1) / nDivisions);
       }
 
-      /// Get the lower partition in the coordinate I
+
+      /**
+       *  Getter for the both bounds of a subbox along the Ith axes in an equal spaced division with overlap.
+       *
+       *  For divisions of this box into n smaller boxes of equal size this computes the bounds
+       *  in an axes given as template parameter. It also allows for the smaller boxes to overlap
+       *  by a given overlap width while they remain equal in size among each other.
+       *  The smaller boxes are always fully contained within this box.
+       *
+       *  @param overlap    Width of overlap between to conscutive boxes
+       *  @param nDivisions Total number of smaller boxes to be constructed
+       *  @param iDivision  The index of the box in line to be constructed
+       *  @return           The bounds of the smaller box
+       */
       template<std::size_t I>
       std::array<Type<I>, 2 >
       getDivisionBoundsWithOverlap(const Width<I>& overlap,

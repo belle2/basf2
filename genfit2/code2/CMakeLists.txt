@@ -137,8 +137,8 @@ SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS} -O3 -g3")
 # include directories 
 INCLUDE_DIRECTORIES( 
 	BEFORE 
-	${GF_INC_DIRS}
-	${ROOT_INCLUDE_DIRS})
+	${ROOT_INCLUDE_DIRS}
+	${GF_INC_DIRS})
 
 
 # add a target to generate API documentation with Doxygen
@@ -268,6 +268,7 @@ SET(GBL_DICTIONARY_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/ICalibrationParametersDerivatives.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblFitterInfo.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblFitStatus.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblData.h
 )
 ROOT_GENERATE_DICTIONARY("${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
                          "${GBL_DICTIONARY_SOURCES}"

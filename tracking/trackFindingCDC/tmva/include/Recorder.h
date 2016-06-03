@@ -20,10 +20,11 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Class to fill a tree.
+    /// Class to fill a tree from a set of variables
     class Recorder {
     public:
-      /** Construct the Recorder opening the given ROOT file and
+      /**
+       *  Construct the Recorder opening the given ROOT file and
        *  create the underlying TTree and add let the given function setup branches.
        *
        *  @param setBranches    Function invoked with the underlying TTree as argument
@@ -36,7 +37,8 @@ namespace Belle2 {
                const std::string& treeName = "recorded_tree");
 
 
-      /** Construct the Recorder opening the given ROOT file and
+      /**
+       *  Construct the Recorder opening the given ROOT file and
        *  create the underlying TTree and add variable names and values addresses as branches to it.
        *
        *  @param allVariables   A sequence of named values that are used as addresses of branches
@@ -61,7 +63,8 @@ namespace Belle2 {
       TFile* m_tFile;
 
       /// Reference to the TTree.
-      StoreObjPtr<RootMergeable< TTree> > m_tTree;
+      StoreObjPtr<RootMergeable<TTree> > m_tTree;
+
     };
 
   }

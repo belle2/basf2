@@ -22,6 +22,7 @@ namespace Belle2 {
     class CDCTrack;
   }
 
+  /// Module base class to construct tracks from two dimensional segments
   class TrackFinderCDCFromSegmentsModule : public virtual TrackFinderCDCBaseModule {
 
   public:

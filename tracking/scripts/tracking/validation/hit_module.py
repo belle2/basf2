@@ -307,7 +307,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         if self.write_tables:
             # MC Figures of merit
             mc_figures_of_merit = \
-                ValidationManyFiguresOfMerit('%s_mc_figures_of_merit' % self.name)
+                ValidationManyFiguresOfMerit('%s_mc_figures_of_merit' % self.validation_name)
 
             mc_figures_of_merit['mc_pts'] = self.mc_pts
             mc_figures_of_merit['mc_d0s'] = self.mc_d0s
@@ -331,7 +331,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
             # PR Figures of merit
             pr_figures_of_merit = \
-                ValidationManyFiguresOfMerit('%s_pr_figures_of_merit' % self.name)
+                ValidationManyFiguresOfMerit('%s_pr_figures_of_merit' % self.validation_name)
 
             pr_figures_of_merit['pr_clones_and_matches'] = \
                 self.pr_clones_and_matches
@@ -352,7 +352,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
             # Hit Figures of merit
             hit_figures_of_merit = \
-                ValidationFiguresOfMerit('%s_hit_figures_of_merit' % self.name)
+                ValidationFiguresOfMerit('%s_hit_figures_of_merit' % self.validation_name)
 
             hit_figures_of_merit['number_of_total_hits'] = \
                 np.sum(self.number_of_total_hits)

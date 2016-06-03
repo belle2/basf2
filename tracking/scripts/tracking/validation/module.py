@@ -166,11 +166,11 @@ class TrackingValidationModule(basf2.Module):
     ):
 
         super(TrackingValidationModule, self).__init__()
-        self.name = name
+        self.validation_name = name
         self.contact = contact
         self.fit = fit
         self.pulls = pulls
-        self.output_file_name = output_file_name or self.name \
+        self.output_file_name = output_file_name or self.validation_name \
             + 'TrackingValidation.root'
         self.track_filter_object = track_filter_object
         self.plot_name_postfix = plot_name_postfix
@@ -351,7 +351,7 @@ class TrackingValidationModule(basf2.Module):
             self.mc_phi.append(momentum.Phi())
 
     def terminate(self):
-        name = self.name
+        name = self.validation_name
         contact = self.contact
 
         # Overall figures of merit #
@@ -557,7 +557,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         contact = self.contact
 
         validation_plots = []
-        plot_name_prefix = self.name + '_' + root_save_name(quantity_name) \
+        plot_name_prefix = self.validation_name + '_' + root_save_name(quantity_name) \
             + self.plot_name_postfix
 
         if make_hist:

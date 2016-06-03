@@ -15,23 +15,23 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-FilterFactory<Filter<Relation<const CDCTrack> > >::FilterFactory(const std::string& defaultFilterName) :
+TrackRelationFilterFactory::TrackRelationFilterFactory(const std::string& defaultFilterName) :
   Super(defaultFilterName)
 {
 }
 
-std::string FilterFactory<Filter<Relation<const CDCTrack> > >::getFilterPurpose() const
+std::string TrackRelationFilterFactory::getFilterPurpose() const
 {
   return "Track relation filter to be used during the construction of the track network for in super layer merginig.";
 }
 
-std::string FilterFactory<Filter<Relation<const CDCTrack> > >::getModuleParamPrefix() const
+std::string TrackRelationFilterFactory::getModuleParamPrefix() const
 {
   return "TrackRelation";
 }
 
 std::map<std::string, std::string>
-FilterFactory<Filter<Relation<const CDCTrack> > >::getValidFilterNamesAndDescriptions() const
+TrackRelationFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   std::map<std::string, std::string>
   filterNames = Super::getValidFilterNamesAndDescriptions();
@@ -46,7 +46,7 @@ FilterFactory<Filter<Relation<const CDCTrack> > >::getValidFilterNamesAndDescrip
 }
 
 std::unique_ptr<Filter<Relation<const CDCTrack> > >
-FilterFactory<Filter<Relation<const CDCTrack> > >::create(const std::string& filterName) const
+TrackRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
     return std::unique_ptr<Filter<Relation<const CDCTrack> > >(new BaseTrackRelationFilter());

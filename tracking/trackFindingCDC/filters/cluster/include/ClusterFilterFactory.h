@@ -17,40 +17,37 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-       Factory that can creates apropriate cluster filter instance from parameters.
-
-       It knows about all available filters and their parameters.
-       Can collaborate with a Module and expose these parameters to the user in steering files.
-    */
-    template<>
-    class FilterFactory<Filter<CDCWireHitCluster> > :
-      public FilterFactoryBase<Filter<CDCWireHitCluster> > {
+     *  Factory that can creates apropriate cluster filter instance from parameters.
+     *
+     *  It knows about all available filters and their parameters.
+     *  Can collaborate with a Module and expose these parameters to the user in steering files.
+     */
+    class ClusterFilterFactory :
+      public FilterFactory<Filter<CDCWireHitCluster> > {
 
     private:
       /// Type of the base class
-      typedef FilterFactoryBase<Filter<CDCWireHitCluster> > Super;
+      typedef FilterFactory<Filter<CDCWireHitCluster> > Super;
 
     public:
-      /** Fill the default filter name and parameter values*/
-      FilterFactory(const std::string& defaultFilterName = "tmva");
+      /// Fill the default filter name and parameter values
+      ClusterFilterFactory(const std::string& defaultFilterName = "tmva");
 
       using Super::create;
 
-      /** Create a cluster filter with the given name, does not set filter specific parameters. */
+      /// Create a cluster filter with the given name, does not set filter specific parameters.
       virtual std::unique_ptr<Filter<CDCWireHitCluster> > create(const std::string& name) const override;
 
-      /** Getter for a descriptive purpose of the clusterfilter.*/
+      /// Getter for a descriptive purpose of the clusterfilter.
       virtual std::string getFilterPurpose() const override;
 
-      /** Getter for the valid clusterf ilter names and a description for each */
+      /// Getter for the valid clusterf ilter names and a description for each
       virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
-      /** Getter for the prefix prepended to a Module parameter.*/
+      /// Getter for the prefix prepended to a Module parameter.
       virtual std::string getModuleParamPrefix() const override;
 
     };
 
-    /// Legacy alias for the wire hit cluster filter factory
-    typedef FilterFactory<Filter<CDCWireHitCluster> > ClusterFilterFactory;
   }
 }

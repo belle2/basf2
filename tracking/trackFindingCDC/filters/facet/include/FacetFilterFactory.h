@@ -17,24 +17,23 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-       Factory that can creates apropriate facet filter instance from parameters.
-
-       It knows about all available filters and their parameters.
-       Can collaborate with a Module and expose these parameters to the user in steering files.
-    */
-    template<>
-    class FilterFactory<Filter<CDCFacet> > :
-      public FilterFactoryBase<Filter<CDCFacet> > {
+     *  Factory that can creates apropriate facet filter instance from parameters.
+     *
+     *  It knows about all available filters and their parameters.
+     *  Can collaborate with a Module and expose these parameters to the user in steering files.
+     */
+    class FacetFilterFactory :
+      public FilterFactory<Filter<CDCFacet> > {
 
     private:
       /// Type of the base class
-      typedef FilterFactoryBase<Filter<CDCFacet> > Super;
+      typedef FilterFactory<Filter<CDCFacet> > Super;
 
     public:
       /** Fill the default filter name and parameter values*/
-      FilterFactory(const std::string& defaultFilterName = "realistic");
+      FacetFilterFactory(const std::string& defaultFilterName = "realistic");
 
-      using FilterFactoryBase<Filter<CDCFacet> >::create;
+      using Super::create;
 
       /** Create a cluster filter with the given name, does not set filter specific parameters. */
       virtual std::unique_ptr<Filter<CDCFacet> > create(const std::string& name) const override;
@@ -49,9 +48,5 @@ namespace Belle2 {
       virtual std::string getModuleParamPrefix() const override;
 
     };
-
-    /// Alias for the standard facet filter factory
-    typedef FilterFactory<Filter<CDCFacet> > FacetFilterFactory;
-
   }
 }

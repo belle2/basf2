@@ -22,17 +22,16 @@ namespace Belle2 {
      * It knows about all available filters and their parameters.
      * Can collaborate with a Module and expose these parameters to the user in steering files.
      */
-    template<>
-    class FilterFactory<BaseSegmentTrackFilter> :
-      public FilterFactoryBase<BaseSegmentTrackFilter> {
+    class SegmentTrackFilterFactory :
+      public FilterFactory<BaseSegmentTrackFilter> {
 
     private:
       /// Type of the base class
-      typedef FilterFactoryBase<BaseSegmentTrackFilter> Super;
+      typedef FilterFactory<BaseSegmentTrackFilter> Super;
 
     public:
       /** Fill the default filter name and parameter values*/
-      FilterFactory<BaseSegmentTrackFilter>(const std::string& defaultFilterName = "simple") : Super(defaultFilterName) { }
+      SegmentTrackFilterFactory(const std::string& defaultFilterName = "simple") : Super(defaultFilterName) { }
 
       /// Copy the create function from the parent class.
       using Super::create;
@@ -45,11 +44,11 @@ namespace Belle2 {
     };
 
     /// Specialisation for the first step.
-    class SegmentTrackFilterFirstStepFactory : public FilterFactory<BaseSegmentTrackFilter> {
+    class SegmentTrackFilterFirstStepFactory : public SegmentTrackFilterFactory {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<BaseSegmentTrackFilter> Super;
+      typedef SegmentTrackFilterFactory Super;
 
     public:
       /** Fill the default filter name and parameter values*/
@@ -75,11 +74,11 @@ namespace Belle2 {
     };
 
     /// Specialisation for the second step.
-    class SegmentTrackFilterSecondStepFactory : public FilterFactory<BaseSegmentTrackFilter> {
+    class SegmentTrackFilterSecondStepFactory : public SegmentTrackFilterFactory {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<BaseSegmentTrackFilter> Super;
+      typedef SegmentTrackFilterFactory Super;
 
     public:
       /** Fill the default filter name and parameter values*/

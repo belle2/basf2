@@ -15,23 +15,23 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-FilterFactory<Filter<CDCFacet> >::FilterFactory(const std::string& defaultFilterName) :
+FacetFilterFactory::FacetFilterFactory(const std::string& defaultFilterName) :
   Super(defaultFilterName)
 {
 }
 
-std::string FilterFactory<Filter<CDCFacet> >::getFilterPurpose() const
+std::string FacetFilterFactory::getFilterPurpose() const
 {
   return "Facet filter to be used during the construction of facets.";
 }
 
-std::string FilterFactory<Filter<CDCFacet> >::getModuleParamPrefix() const
+std::string FacetFilterFactory::getModuleParamPrefix() const
 {
   return "Facet";
 }
 
 std::map<std::string, std::string>
-FilterFactory<Filter<CDCFacet> >::getValidFilterNamesAndDescriptions() const
+FacetFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   std::map<std::string, std::string>
   filterNames = Super::getValidFilterNamesAndDescriptions();
@@ -50,7 +50,7 @@ FilterFactory<Filter<CDCFacet> >::getValidFilterNamesAndDescriptions() const
 }
 
 std::unique_ptr<Filter<CDCFacet> >
-FilterFactory<Filter<CDCFacet> >::create(const std::string& filterName) const
+FacetFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
     return std::unique_ptr<Filter<CDCFacet> >(new BaseFacetFilter());

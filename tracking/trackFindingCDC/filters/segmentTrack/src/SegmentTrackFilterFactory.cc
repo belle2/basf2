@@ -15,7 +15,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 std::map<std::string, std::string>
-FilterFactory<BaseSegmentTrackFilter>::getValidFilterNamesAndDescriptions() const
+SegmentTrackFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   std::map<std::string, std::string>
   filterNames = Super::getValidFilterNamesAndDescriptions();
@@ -31,7 +31,7 @@ FilterFactory<BaseSegmentTrackFilter>::getValidFilterNamesAndDescriptions() cons
 }
 
 std::unique_ptr<BaseSegmentTrackFilter>
-FilterFactory<BaseSegmentTrackFilter>::create(const std::string& filterName) const
+SegmentTrackFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
     return std::unique_ptr<BaseSegmentTrackFilter>(new BaseSegmentTrackFilter());

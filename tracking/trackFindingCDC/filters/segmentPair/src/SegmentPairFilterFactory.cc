@@ -15,23 +15,23 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-FilterFactory<Filter<CDCSegmentPair> >::FilterFactory(const std::string& defaultFilterName) :
+SegmentPairFilterFactory::SegmentPairFilterFactory(const std::string& defaultFilterName) :
   Super(defaultFilterName)
 {
 }
 
-std::string FilterFactory<Filter<CDCSegmentPair> >::getFilterPurpose() const
+std::string SegmentPairFilterFactory::getFilterPurpose() const
 {
   return "Segment pair filter to be used during the construction of segment pairs.";
 }
 
-std::string FilterFactory<Filter<CDCSegmentPair> >::getModuleParamPrefix() const
+std::string SegmentPairFilterFactory::getModuleParamPrefix() const
 {
   return "SegmentPair";
 }
 
 std::map<std::string, std::string>
-FilterFactory<Filter<CDCSegmentPair> >::getValidFilterNamesAndDescriptions() const
+SegmentPairFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   std::map<std::string, std::string>
   filterNames = Super::getValidFilterNamesAndDescriptions();
@@ -48,7 +48,7 @@ FilterFactory<Filter<CDCSegmentPair> >::getValidFilterNamesAndDescriptions() con
 }
 
 std::unique_ptr<Filter<CDCSegmentPair> >
-FilterFactory<Filter<CDCSegmentPair> >::create(const std::string& filterName) const
+SegmentPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new BaseSegmentPairFilter());

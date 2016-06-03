@@ -22,17 +22,16 @@ namespace Belle2 {
      * It knows about all available filters and their parameters.
      * Can collaborate with a Module and expose these parameters to the user in steering files.
      */
-    template<>
-    class FilterFactory<Filter<CDCSegmentPair> > :
-      public FilterFactoryBase<Filter<CDCSegmentPair> > {
+    class SegmentPairFilterFactory :
+      public FilterFactory<Filter<CDCSegmentPair> > {
 
     private:
       /// Type of the base class
-      typedef FilterFactoryBase<Filter<CDCSegmentPair> > Super;
+      typedef FilterFactory<Filter<CDCSegmentPair> > Super;
 
     public:
       /** Fill the default filter name and parameter values*/
-      FilterFactory<Filter<CDCSegmentPair> >(const std::string& defaultFilterName = "simple");
+      SegmentPairFilterFactory(const std::string& defaultFilterName = "simple");
 
       using Super::create;
 
@@ -50,7 +49,7 @@ namespace Belle2 {
 
     };
 
-    typedef FilterFactory<Filter<CDCSegmentPair> > SegmentPairFilterFactory;
+    typedef SegmentPairFilterFactory SegmentPairFilterFactory;
 
   }
 }

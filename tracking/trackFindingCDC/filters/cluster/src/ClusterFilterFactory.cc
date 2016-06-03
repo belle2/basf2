@@ -14,23 +14,23 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FilterFactory<Filter<CDCWireHitCluster> >::FilterFactory(const std::string& defaultFilterName) :
+ClusterFilterFactory::ClusterFilterFactory(const std::string& defaultFilterName) :
   Super(defaultFilterName)
 {
 }
 
-std::string FilterFactory<Filter<CDCWireHitCluster> >::getFilterPurpose() const
+std::string ClusterFilterFactory::getFilterPurpose() const
 {
   return "Cluster filter examines hit clusters and discards clusters recognised as background.";
 }
 
-std::string FilterFactory<Filter<CDCWireHitCluster> >::getModuleParamPrefix() const
+std::string ClusterFilterFactory::getModuleParamPrefix() const
 {
   return "Cluster";
 }
 
 std::map<std::string, std::string>
-FilterFactory<Filter<CDCWireHitCluster> >::getValidFilterNamesAndDescriptions() const
+ClusterFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   std::map<std::string, std::string>
   filterNames = Super::getValidFilterNamesAndDescriptions();
@@ -45,7 +45,7 @@ FilterFactory<Filter<CDCWireHitCluster> >::getValidFilterNamesAndDescriptions() 
 }
 
 std::unique_ptr<Filter<CDCWireHitCluster> >
-FilterFactory<Filter<CDCWireHitCluster> >::create(const std::string& filterName) const
+ClusterFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == string("all")) {
     return std::unique_ptr<Filter<CDCWireHitCluster> >(new AllClusterFilter());

@@ -17,22 +17,21 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-       Factory that creates apropriate track relation filter instances from parameters.
-
-       It knows about all available filters and their parameters.
-       Can collaborate with a Module and expose these parameters to the user in steering files.
+     *  Factory that creates apropriate track relation filter instances from parameters.
+     *
+     *  It knows about all available filters and their parameters.
+     *  Can collaborate with a Module and expose these parameters to the user in steering files.
     */
-    template<>
-    class FilterFactory<Filter<Relation<const CDCTrack> > > :
-        public FilterFactoryBase<Filter<Relation<const CDCTrack> > > {
+    class TrackRelationFilterFactory :
+      public FilterFactory<Filter<Relation<const CDCTrack> > > {
 
     private:
       /// Type of the base class
-      typedef FilterFactoryBase<Filter<Relation<const CDCTrack> > > Super;
+      typedef FilterFactory<Filter<Relation<const CDCTrack> > > Super;
 
     public:
       /** Fill the default filter name and parameter values*/
-      FilterFactory(const std::string& defaultFilterName = "none");
+      TrackRelationFilterFactory(const std::string& defaultFilterName = "none");
 
       using Super::create;
 
@@ -51,7 +50,7 @@ namespace Belle2 {
     };
 
     /// Legacy alias for the track relation filter factory
-    typedef FilterFactory<Filter<Relation<const CDCTrack> > > TrackRelationFilterFactory;
+    typedef TrackRelationFilterFactory TrackRelationFilterFactory;
 
   }
 }

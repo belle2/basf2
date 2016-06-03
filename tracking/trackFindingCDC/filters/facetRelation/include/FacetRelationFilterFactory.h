@@ -17,22 +17,21 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-       Factory that can creates apropriate facet relation filter instance from parameters.
-
-       It knows about all available filters and their parameters.
-       Can collaborate with a Module and expose these parameters to the user in steering files.
-    */
-    template<>
-    class FilterFactory<Filter<Relation<const CDCFacet> > > :
-        public FilterFactoryBase<Filter<Relation<const CDCFacet> > > {
+     *  Factory that can creates apropriate facet relation filter instance from parameters.
+     *
+     *  It knows about all available filters and their parameters.
+     *  Can collaborate with a Module and expose these parameters to the user in steering files.
+     */
+    class FacetRelationFilterFactory :
+      public FilterFactory<Filter<Relation<const CDCFacet> > > {
 
     private:
       /// Type of the base class
-      typedef FilterFactoryBase<Filter<Relation<const CDCFacet> > > Super;
+      typedef FilterFactory<Filter<Relation<const CDCFacet> > > Super;
 
     public:
-      /** Fill the default filter name and parameter values*/
-      FilterFactory(const std::string& defaultFilterName = "simple");
+      /// Fill the default filter name and parameter values
+      FacetRelationFilterFactory(const std::string& defaultFilterName = "simple");
 
       using Super::create;
 
@@ -51,7 +50,7 @@ namespace Belle2 {
     };
 
     /// Legacy alias for the facet relation filter factory
-    typedef FilterFactory<Filter<Relation<const CDCFacet> > > FacetRelationFilterFactory;
+    typedef FacetRelationFilterFactory FacetRelationFilterFactory;
 
   }
 }

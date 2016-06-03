@@ -15,23 +15,23 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-FilterFactory<Filter<Relation<const CDCFacet> > >::FilterFactory(const std::string& defaultFilterName) :
+FacetRelationFilterFactory::FacetRelationFilterFactory(const std::string& defaultFilterName) :
   Super(defaultFilterName)
 {
 }
 
-std::string FilterFactory<Filter<Relation<const CDCFacet> > >::getFilterPurpose() const
+std::string FacetRelationFilterFactory::getFilterPurpose() const
 {
   return "Facet relation filter to be used during the construction of the facet network.";
 }
 
-std::string FilterFactory<Filter<Relation<const CDCFacet> > >::getModuleParamPrefix() const
+std::string FacetRelationFilterFactory::getModuleParamPrefix() const
 {
   return "FacetRelation";
 }
 
 std::map<std::string, std::string>
-FilterFactory<Filter<Relation<const CDCFacet> > >::getValidFilterNamesAndDescriptions() const
+FacetRelationFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   std::map<std::string, std::string>
   filterNames = Super::getValidFilterNamesAndDescriptions();
@@ -49,7 +49,7 @@ FilterFactory<Filter<Relation<const CDCFacet> > >::getValidFilterNamesAndDescrip
 }
 
 std::unique_ptr<Filter<Relation<const CDCFacet> > >
-FilterFactory<Filter<Relation<const CDCFacet> > >::create(const std::string& filterName) const
+FacetRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
     return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new BaseFacetRelationFilter());

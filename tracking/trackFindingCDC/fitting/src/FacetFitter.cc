@@ -18,75 +18,33 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace Eigen;
 
-double FacetFitter::fit(const CDCFacet& facet, int nSteps)
-{
-  // Measurement matrix
-  Matrix< double, 3, 3> xyl;
-
-  // Weight matrix
-  Array< double, 3, 1> w;
-
-  const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();
-  const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
-  const CDCRLWireHit& endRLWireHit = facet.getEndRLWireHit();
-
-  const Vector2D support = middleRLWireHit.getWire().getRefPos2D();
-
-  const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
-  const Vector2D startWirePos2D = startRLWireHit.getWire().getRefPos2D();
-  xyl(0, 0) = startWirePos2D.x() - support.x();
-  xyl(0, 1) = startWirePos2D.y() - support.y();
-  xyl(0, 2) = startRLWireHit.getSignedRefDriftLength();
-  w(0) = 1.0 / startDriftLengthVar;
-
-  const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
-  const Vector2D middleWirePos2D = middleRLWireHit.getWire().getRefPos2D();
-  xyl(1, 0) = middleWirePos2D.x() - support.x();
-  xyl(1, 1) = middleWirePos2D.y() - support.y();
-  xyl(1, 2) = middleRLWireHit.getSignedRefDriftLength();
-  w(1) = 1.0 / middleDriftLengthVar;
-
-  const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
-  const Vector2D endWirePos2D = endRLWireHit.getWire().getRefPos2D();
-  xyl(2, 0) = endWirePos2D.x() - support.x();
-  xyl(2, 1) = endWirePos2D.y() - support.y();
-  xyl(2, 2) = endRLWireHit.getSignedRefDriftLength();
-  w(2) = 1.0 / endDriftLengthVar;
-
-  UncertainParameterLine2D fitLine{ fit(std::move(xyl), std::move(w), nSteps) };
-  fitLine.passiveMoveBy(-support);
-
-  Vector2D startClosest = fitLine->closest(startWirePos2D);
-  Vector2D middleClosest = fitLine->closest(middleWirePos2D);
-  Vector2D endClosest = fitLine->closest(endWirePos2D);
-
-  facet.setStartToMiddleLine(ParameterLine2D::throughPoints(startClosest, middleClosest));
-  facet.setStartToEndLine(ParameterLine2D::throughPoints(startClosest, endClosest));
-  facet.setMiddleToEndLine(ParameterLine2D::throughPoints(middleClosest, endClosest));
-
-  return fitLine.chi2();
-}
-
 namespace {
 
-  Vector2D getCenterForwardDirection(const Matrix<double, 3, 3>& xyl)
+  template<int N>
+  Vector2D getCenterForwardDirection(const Matrix<double, N, 3>& xyl)
   {
     /// Rotate in forward direction
-    Vector2D coordinate(xyl(2, 0) - xyl(0, 0), xyl(2, 1) - xyl(0, 1));
+    Vector2D coordinate(xyl(N - 1, 0) - xyl(0, 0), xyl(N - 1, 1) - xyl(0, 1));
     return coordinate.unit();
   }
 
-  Vector2D getTangentialForwardDirection(const Matrix<double, 3, 3>& xyl)
+  template<int N>
+  Vector2D getTangentialForwardDirection(const Matrix<double, N, 3>& xyl)
   {
     /// Rotate in forward direction
-    Vector2D from(xyl(0, 0), xyl(0, 1));
-    Vector2D to(xyl(2, 0), xyl(2, 1));
-    ParameterLine2D tangentLine = ParameterLine2D::touchingCircles(from, xyl(0, 2), to, xyl(2, 2));
+    Vector2D fromPos(xyl(0, 0), xyl(0, 1));
+    double fromL = xyl(0, 2);
+
+    Vector2D toPos(xyl(N - 1, 0), xyl(N - 1, 1));
+    double toL = xyl(N - 1, 2);
+
+    ParameterLine2D tangentLine = ParameterLine2D::touchingCircles(fromPos, fromL, toPos, toL);
     Vector2D coordinate = tangentLine.tangential();
     return coordinate.unit();
   }
 
-  void rotate(Vector2D coordinate,  Matrix<double, 3, 3>& xyl)
+  template<int N>
+  void rotate(Vector2D coordinate, Matrix<double, N, 3>& xyl)
   {
     Matrix<double, 3, 3> rot = Matrix<double, 3, 3>::Identity();
     rot(0, 0) = coordinate.x();
@@ -139,68 +97,124 @@ namespace {
     return Vector2d(std::cos(phi), std::sin(phi));
   }
 
+  template<int N>
+  UncertainParameterLine2D fit(Matrix<double, N, 3> xyl,
+                               Array<double, N, 1> w,
+                               int nSteps)
+  {
+    /// Rotate in forward direction
+    Vector2D coordinate = getTangentialForwardDirection(xyl);
+    // Sometimes the calculation of the tangent fails due to misestimated dirft lengths
+    // Make best effort the continue the calculation
+    if (coordinate.hasNAN()) {
+      coordinate = getCenterForwardDirection(xyl);
+    }
+
+    rotate(coordinate, xyl);
+
+    Array< double, 1, 3> averages = (xyl.array().colwise() * w).colwise().sum() / w.sum();
+    Matrix< double, N, 3> deltas = xyl.array().rowwise() - averages;
+    Matrix< double, N, 3> weightedDeltas = deltas.array().colwise() * w;
+    Matrix< double, 3, 3> covariances = deltas.transpose() * weightedDeltas / w.sum();
+
+    Vector2d phiVec;
+    double chi2 = 0.0;
+    if (nSteps == 0) {
+      phiVec = fitPhiVecZeroSteps(covariances, chi2);
+    } else if (nSteps == 1) {
+      phiVec = fitPhiVecOneStep(covariances, chi2);
+    } else {
+      phiVec = fitPhiVecBrent(covariances, nSteps, chi2);
+    }
+    chi2 *= w.sum();
+
+    LineCovariance lineCovariance;
+    {
+      double meanArcLength = averages.topLeftCorner<1, 2>().matrix() * phiVec;
+      double varArcLength = phiVec.transpose() * covariances.topLeftCorner<2, 2>() * phiVec;
+      double divisor = 1 / ((1 + varArcLength) * w.sum());
+      using namespace NLineParameter;
+      lineCovariance(c_Phi0, c_Phi0) = divisor * 1;
+      lineCovariance(c_Phi0, c_I)    = -divisor * meanArcLength;
+      lineCovariance(c_I, c_Phi0)    = lineCovariance(c_Phi0, c_I);
+      lineCovariance(c_I, c_I)       = divisor * varArcLength;
+    }
+
+    // Matrix<double, 2, 2> invLineCovariance;
+    // invLineCovariance(0, 0) = 1;
+    // invLineCovariance(0, 1) = meanArcLength;
+    // invLineCovariance(1, 0) = meanArcLength;
+    // invLineCovariance(1, 1) = varArcLength + meanArcLength * meanArcLength;
+    // LineCovariance lineCovariance(invLineCovariance.inverse());
+
+    Vector2D tangential(phiVec(0), phiVec(1));
+    Vector2D n12 = tangential.orthogonal(ERotation::c_Clockwise);
+    double n0 = averages(2) - averages(0) * n12.x() - averages(1) * n12.y();
+    Vector2D support = -n12 * n0;
+
+    // Transform the normal vector back into the original coordinate system.
+    unrotate(coordinate, support);
+    unrotate(coordinate, tangential);
+
+    ParameterLine2D parameterLine2D(support, tangential);
+    int ndf = N - 2;
+    return UncertainParameterLine2D(parameterLine2D, lineCovariance, chi2, ndf);
+  }
+
+}
+
+double FacetFitter::fit(const CDCFacet& facet, int nSteps)
+{
+  // Measurement matrix
+  Matrix< double, 3, 3> xyl;
+
+  // Weight matrix
+  Array< double, 3, 1> w;
+
+  const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();
+  const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
+  const CDCRLWireHit& endRLWireHit = facet.getEndRLWireHit();
+
+  const Vector2D support = middleRLWireHit.getWire().getRefPos2D();
+
+  const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
+  const Vector2D startWirePos2D = startRLWireHit.getWire().getRefPos2D();
+  xyl(0, 0) = startWirePos2D.x() - support.x();
+  xyl(0, 1) = startWirePos2D.y() - support.y();
+  xyl(0, 2) = startRLWireHit.getSignedRefDriftLength();
+  w(0) = 1.0 / startDriftLengthVar;
+
+  const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
+  const Vector2D middleWirePos2D = middleRLWireHit.getWire().getRefPos2D();
+  xyl(1, 0) = middleWirePos2D.x() - support.x();
+  xyl(1, 1) = middleWirePos2D.y() - support.y();
+  xyl(1, 2) = middleRLWireHit.getSignedRefDriftLength();
+  w(1) = 1.0 / middleDriftLengthVar;
+
+  const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
+  const Vector2D endWirePos2D = endRLWireHit.getWire().getRefPos2D();
+  xyl(2, 0) = endWirePos2D.x() - support.x();
+  xyl(2, 1) = endWirePos2D.y() - support.y();
+  xyl(2, 2) = endRLWireHit.getSignedRefDriftLength();
+  w(2) = 1.0 / endDriftLengthVar;
+
+  UncertainParameterLine2D fitLine{ ::fit(std::move(xyl), std::move(w), nSteps) };
+  fitLine.passiveMoveBy(-support);
+
+  Vector2D startClosest = fitLine->closest(startWirePos2D);
+  Vector2D middleClosest = fitLine->closest(middleWirePos2D);
+  Vector2D endClosest = fitLine->closest(endWirePos2D);
+
+  facet.setStartToMiddleLine(ParameterLine2D::throughPoints(startClosest, middleClosest));
+  facet.setStartToEndLine(ParameterLine2D::throughPoints(startClosest, endClosest));
+  facet.setMiddleToEndLine(ParameterLine2D::throughPoints(middleClosest, endClosest));
+
+  return fitLine.chi2();
 }
 
 UncertainParameterLine2D FacetFitter::fit(Matrix<double, 3, 3> xyl,
                                           Array<double, 3, 1> w,
                                           int nSteps)
 {
-  /// Rotate in forward direction
-  Vector2D coordinate = getTangentialForwardDirection(xyl);
-  // Sometimes the calculation of the tangent fails due to misestimated dirft lengths
-  // Make best effort the continue the calculation
-  if (coordinate.hasNAN()) {
-    coordinate = getCenterForwardDirection(xyl);
-  }
-
-  rotate(coordinate, xyl);
-
-  const int nObservations = 3;
-  Array< double, 1, 3> averages = (xyl.array().colwise() * w).colwise().sum() / w.sum();
-  Matrix< double, 3, 3> deltas = xyl.array().rowwise() - averages;
-  Matrix< double, 3, 3> weightedDeltas = deltas.array().colwise() * w;
-  Matrix< double, 3, 3> covariances = deltas.transpose() * weightedDeltas / w.sum();
-
-  Vector2d phiVec;
-  double chi2 = 0.0;
-  if (nSteps == 0) {
-    phiVec = fitPhiVecZeroSteps(covariances, chi2);
-  } else if (nSteps == 1) {
-    phiVec = fitPhiVecOneStep(covariances, chi2);
-  } else {
-    phiVec = fitPhiVecBrent(covariances, nSteps, chi2);
-  }
-  chi2 *= w.sum();
-
-  LineCovariance lineCovariance;
-  {
-    double meanArcLength = averages.topLeftCorner<1, 2>().matrix() * phiVec;
-    double varArcLength = phiVec.transpose() * covariances.topLeftCorner<2, 2>() * phiVec;
-    double divisor = 1 / ((1 + varArcLength) * w.sum());
-    using namespace NLineParameter;
-    lineCovariance(c_Phi0, c_Phi0) = divisor * 1;
-    lineCovariance(c_Phi0, c_I)    = -divisor * meanArcLength;
-    lineCovariance(c_I, c_Phi0)    = lineCovariance(c_Phi0, c_I);
-    lineCovariance(c_I, c_I)       = divisor * varArcLength;
-  }
-
-  // Matrix<double, 2, 2> invLineCovariance;
-  // invLineCovariance(0, 0) = 1;
-  // invLineCovariance(0, 1) = meanArcLength;
-  // invLineCovariance(1, 0) = meanArcLength;
-  // invLineCovariance(1, 1) = varArcLength + meanArcLength * meanArcLength;
-  // LineCovariance lineCovariance(invLineCovariance.inverse());
-
-  Vector2D tangential(phiVec(0), phiVec(1));
-  Vector2D n12 = tangential.orthogonal(ERotation::c_Clockwise);
-  double n0 = averages(2) - averages(0) * n12.x() - averages(1) * n12.y();
-  Vector2D support = -n12 * n0;
-
-  // Transform the normal vector back into the original coordinate system.
-  unrotate(coordinate, support);
-  unrotate(coordinate, tangential);
-
-  ParameterLine2D parameterLine2D(support, tangential);
-  int ndf = nObservations - 2;
-  return UncertainParameterLine2D(parameterLine2D, lineCovariance, chi2, ndf);
+  return ::fit(std::move(xyl), std::move(w), nSteps);
 }

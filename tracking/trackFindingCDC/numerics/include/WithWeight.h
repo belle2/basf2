@@ -22,6 +22,7 @@ namespace Belle2 {
     class WithWeight : public StarToPtr<T> {
 
     private:
+      /// Type of the base class
       using Super = StarToPtr<T>;
 
     public:

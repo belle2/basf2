@@ -44,7 +44,7 @@ CDCTrack CDCSimpleSimulation::simulate(const CDCTrajectory3D& trajectory3D)
 
 vector<CDCTrack> CDCSimpleSimulation::simulate(const vector<CDCTrajectory3D>& trajectories3D)
 {
-  B2ASSERT("", m_wireHitTopology);
+  B2ASSERT("Wire hit topology was not set in the CDCSimpleSimulation", m_wireHitTopology);
 
   vector<SimpleSimHit> simpleSimHits;
   const size_t nMCTracks = trajectories3D.size();

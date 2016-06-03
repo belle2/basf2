@@ -23,7 +23,8 @@ namespace Belle2 {
     class CDCTrajectory3D;
     class Helix;
 
-    /** Class providing a simple simulation of the CDC mainly for quick unit test checks.
+    /**
+     *  Class providing a simple simulation of the CDC mainly for quick unit test checks.
      *
      *  Most aspects of the detection are idealized
      *  * Trajectories are ideal helices
@@ -39,8 +40,14 @@ namespace Belle2 {
     class CDCSimpleSimulation  {
 
     private:
-      /// Structure to accomdate information about the individual hits.
+
+      /// Structure to accomdate information about the individual hits during the simluation
       struct SimpleSimHit {
+
+        /**
+         *  Constructor from limited truth information
+         *  Mainly used by the manually prepared event
+         */
         SimpleSimHit(CDCWireHit wireHit,
                      size_t iMCTrack,
                      ERightLeft rlInfo) :
@@ -49,6 +56,10 @@ namespace Belle2 {
           m_rlInfo(rlInfo)
         {}
 
+        /**
+         *  Constructor from complete truth information.
+         *  Mainly used in the simple simulation procedure.
+         */
         SimpleSimHit(CDCWireHit wireHit,
                      size_t iMCTrack,
                      ERightLeft rlInfo,
@@ -63,11 +74,22 @@ namespace Belle2 {
           m_trueDriftLength(trueDriftLength)
         {}
 
+        /// Memory for the wire hit instance that will be given to the reconstruction
         CDCWireHit m_wireHit;
+
+        /// Memory for the true index of the track this hit is contained in
         size_t m_iMCTrack;
+
+        /// Memory for the true right left passage information
         ERightLeft m_rlInfo;
+
+        /// Memory for the true position on the track closest to the wire
         Vector3D m_pos3D  = m_wireHit.getRefPos3D();
+
+        /// Memory for the true two dimensional arc length on the helix to this hit
         double m_arcLength2D = NAN;
+
+        /// Memory for the true drift length from the true position to the wire
         double m_trueDriftLength = NAN;
       };
 
@@ -76,13 +98,15 @@ namespace Belle2 {
       explicit CDCSimpleSimulation() : m_wireHitTopology(nullptr)
       {}
 
+      /// Set the wire hit topology that should receive the wire hit objects.
       void setWireHitTopology(CDCWireHitTopology* wireHitTopology)
       {
         m_wireHitTopology = wireHitTopology;
       }
 
     public:
-      /** Propagates the trajectories through the CDC as without energy loss until they first leave the CDC
+      /**
+       *  Propagates the trajectories through the CDC as without energy loss until they first leave the CDC
        *
        *  As a side effect the CDCWireHitTopology is filled with CDCWireHits, which can also be used
        *  as the start point of the finding.
@@ -118,10 +142,9 @@ namespace Belle2 {
                          const double arcLength2DOffset) const;
 
       /// Generate a hit for the given wire.
-      SimpleSimHit
-      createHitForCell(const CDCWire& wire,
-                       const Helix& globalHelix,
-                       const double arcLengthOffset) const;
+      SimpleSimHit createHitForCell(const CDCWire& wire,
+                                    const Helix& globalHelix,
+                                    const double arcLengthOffset) const;
 
     public:
       /// Getter for a global event time offset

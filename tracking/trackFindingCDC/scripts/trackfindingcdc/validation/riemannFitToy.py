@@ -72,7 +72,7 @@ def main():
 
         for x, y, l in zip(xs, ys, ls):
             weight = 1 / pos_var
-            observations.append(x, y, l, weight)
+            observations.fill(x, y, l, weight)
 
         fitter = Belle2.TrackFindingCDC.CDCRiemannFitter.getFitter()
         trajectory = fitter.fit(observations)

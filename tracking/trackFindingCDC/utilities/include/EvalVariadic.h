@@ -50,12 +50,14 @@ namespace Belle2 {
     /** Specialisation where there is exactly one type given */
     template<class AType>
     struct FirstTypeImpl<AType> {
+      /// Result first item of the variadic sequence.
       typedef AType Type;
     };
 
     /** Specialisation where there is more than one type given */
     template<class AType, class... ATypes>
     struct FirstTypeImpl<AType, ATypes...> {
+      /// Result first item of the variadic sequence.
       typedef AType Type;
     };
 

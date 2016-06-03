@@ -35,6 +35,7 @@ namespace Belle2 {
      */
     template<size_t ...indices>
     struct GenIndicesImpl<0, indices...> {
+      /// Result sequence.
       using Type = IndexSequence<indices...>;
     };
 
@@ -50,6 +51,7 @@ namespace Belle2 {
     /// Specialisation for concrete indices
     template< template<size_t> class AFunction, size_t ... Is>
     struct MapIndicesImpl<AFunction, IndexSequence<Is...> > {
+      /// Result sequence of the function application.
       typedef std::tuple<AFunction<Is>...> Type;
     };
 

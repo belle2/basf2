@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /// Fill the default filter name and parameter values
-      FacetRelationFilterFactory(const std::string& defaultFilterName = "simple");
+      FacetRelationFilterFactory(const std::string& defaultFilterName = "chi2");
 
       using Super::create;
 

@@ -114,6 +114,8 @@ namespace Belle2 {
 
     private:
       // Findlets
+
+      /// Preparation findlet creating the wire hits from the packed CDCHits
       WireHitTopologyPreparer m_wireHitTopologyPreparer;
 
       /// First stage cellular automaton segment finder

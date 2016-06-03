@@ -76,6 +76,14 @@ namespace Belle2 {
 
       }
 
+
+      /**
+       *  Central function creating the hit triplets from the clusters.
+       *
+       *  Hit triplets are always contained within one cluster and
+       *  the output hit triplets follow the order of the input clusters
+       *  such that the triplets of the same cluster remain close to each other.
+       */
       virtual void apply(const std::vector<CDCWireHitCluster>& inputClusters,
                          std::vector<CDCFacet>& facets) override
       {

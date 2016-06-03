@@ -91,7 +91,7 @@ namespace Belle2 {
 
         const CDCWire& wire = wireHit.getWire();
 
-        // Analyse primary neighborhood - sorted such that they are most likely sorted.
+        // Analyse primary neighborhood - sorted such that the wire hits relations are most likely sorted.
         for (short oClockDirection : {5, 7, 3, 9, 1, 11}) {
           MayBePtr<const CDCWire> neighborWire = wireTopology.getPrimaryNeighbor(oClockDirection, wire);
           if (neighborWire) wireNeighbors.emplace_back(neighborWire, oClockDirection);
@@ -165,7 +165,7 @@ namespace Belle2 {
       std::map<int, int> m_param_missingPrimaryNeighborThresholdMap =
       {{0, 2}, {2, 2}, {4, 2}, {6, 2}, {8, 2}, {10, 2}};
 
-      //// Array for the number of primary drift cells to be included for the o'clock position at each index.
+      /// Array for the number of primary drift cells to be included for the o'clock position at each index.
       std::array<short, 12> m_missingPrimaryNeighborThresholds;
 
       /// Indices of the considered o'clock positions of the secondary neighborhood.

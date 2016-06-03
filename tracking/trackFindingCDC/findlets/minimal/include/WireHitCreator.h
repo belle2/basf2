@@ -31,7 +31,10 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /* Combines the geometrical information and the raw hit information into wire hits, which can be used from all modules after that. */
+    /**
+     *  Combines the geometrical information and the raw hit information into wire hits,
+     *  which can be used from all modules after that.
+     */
     class WireHitCreator : public Findlet<CDCWireHit> {
     private:
       /// Type of the base class

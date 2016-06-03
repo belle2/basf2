@@ -20,6 +20,7 @@ namespace Belle2 {
     class TMVAFacetFilter: public TMVAFilter<TMVAFacetVarSet> {
 
     public:
+      /// Type of the base class
       using Super = TMVAFilter<TMVAFacetVarSet>;
 
     public:

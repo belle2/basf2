@@ -20,6 +20,8 @@ namespace Belle2 {
     public:
       /// Type of the super class
       typedef FilterOnVarSet<ATruthVarSet> Super;
+
+      /// Type of the filtered object.
       typedef typename ATruthVarSet::Object Object;
 
     public:
@@ -42,6 +44,7 @@ namespace Belle2 {
       }
 
     private:
+      /// Memory for the name of the variable selected as the return value of the filter.
       std::string m_chosenVariable;
     };
   }

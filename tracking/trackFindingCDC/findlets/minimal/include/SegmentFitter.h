@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
-F * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
@@ -34,7 +34,7 @@ F * Copyright(C) 2015 - Belle II Collaboration                             *
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    //// Fits segments with the Riemann method.
+    /// Fits segments with the Riemann method.
     class SegmentFitter:
       public Findlet<CDCRecoSegment2D> {
 

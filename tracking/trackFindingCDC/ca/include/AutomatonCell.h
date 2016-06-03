@@ -49,6 +49,7 @@ namespace Belle2 {
                                                       ECellFlag::c_Background);
 
 
+      /// Flage that are reset at the start of each run of the cellular automaton
       static const ECellFlags c_TemporaryFlags = ECellFlags(ECellFlag::c_Assigned +
                                                             ECellFlag::c_Start +
                                                             ECellFlag::c_Cycle);

@@ -23,7 +23,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    //// Exports segments has genfit tracks
+    /// Exports segments has genfit tracks
     class SegmentExporter:
       public Findlet<const CDCRecoSegment2D> {
 
@@ -38,7 +38,7 @@ namespace Belle2 {
         return "Creates reconstruction track candidates from each individual segments.";
       }
 
-      /** Add the parameters of the filter to the module */
+      /// Add the parameters of the filter to the module.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
       {
         moduleParamList->addParameter(prefixed(prefix, "exportSegments"),

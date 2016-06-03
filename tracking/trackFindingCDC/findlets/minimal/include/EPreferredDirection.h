@@ -15,7 +15,8 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /* Enum for the desired output direction of flight of tracks / segments.
+    /**
+     * Enum for the desired output direction of flight of tracks / segments.
      *
      * Depending on the finder algorithm tracks / segmetns can be generated forward or backward to
      * the direction of travel at random. This enum presents the options for

@@ -67,9 +67,10 @@ namespace Belle2 {
       /// Memory for the wire hits to be stored
       std::shared_ptr<VectorRange<CDCWireHit> > m_wireHits {nullptr}; //!
 
+      /// Macro turning CDCWireHitTopology into a root class
       ClassDef(CDCWireHitTopology, 1);
-    }; //class
 
+    }; // class
 
   } // namespace TrackFindingCDC
 } // namespace Belle2

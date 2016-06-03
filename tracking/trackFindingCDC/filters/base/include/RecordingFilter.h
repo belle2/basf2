@@ -118,11 +118,11 @@ namespace Belle2 {
       }
 
     public:
-      // Getter for the skim filter to select objects to be recorded
+      /// Getter for the skim filter to select objects to be recorded
       Filter<Object>* getSkimFilter() const
       { return m_skimFilter.get(); }
 
-      // Setter for the skim filter to select objects to be recorded
+      /// Setter for the skim filter to select objects to be recorded
       void setSkimFilter(std::unique_ptr<Filter<Object>> skimFilter)
       { m_skimFilter = std::move(skimFilter); }
 

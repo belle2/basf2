@@ -208,10 +208,10 @@ Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start,
       return end2;
     } else {
 
-      //both lengths on curve have a negative sign
-      //the candidate with the lesser length on curve wins because of the discontinuaty
-      //unless the generalized circle is a line
-      //in this case their is no forward intersection with the same cylindrical radius
+      // both lengths on curve have a negative sign
+      // the candidate with the lesser length on curve wins because of the discontinuaty
+      // unless the generalized circle is a line
+      // in this case their is no forward intersection with the same cylindrical radius
       if (isLine()) {
         return Vector2D(NAN, NAN);
       } else {
@@ -227,11 +227,11 @@ Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start,
 
 pair<Vector2D, Vector2D> GeneralizedCircle::sameCylindricalR(const double R) const
 {
-  //extraploted to r
-  //solve
-  // n0 + n1*x + n2*y + n3*r*r == 0
-  // and r = R
-  //search for x and y
+  // extraploted to r
+  // solve
+  //  n0 + n1*x + n2*y + n3*r*r == 0
+  //  and r = R
+  // search for x and y
 
   //solve the equation in a coordinate system parallel and orthogonal to the reduced circle center
   const Vector2D nUnit = n12().unit();
@@ -387,8 +387,8 @@ double GeneralizedCircle::arcLengthFactor(const double directDistance,
 
 double GeneralizedCircle::distance(const Vector2D& point) const
 {
-  //this is the approximated distance also used for the fit
-  //can be correct for second order deviations if nessecary
+  // this is the approximated distance also used for the fit
+  // can be correct for second order deviations if nessecary
   const double fastD = fastDistance(point);
   return distance(fastD);
 }
@@ -400,8 +400,8 @@ double GeneralizedCircle::distance(const Vector2D& point) const
 double GeneralizedCircle::distance(const double fastDistance) const
 {
   if (fastDistance == 0.0 or isLine()) {
-    //special case for unfitted state
-    //and line
+    // special case for unfitted state
+    // and line
     return fastDistance;
   } else {
 
@@ -411,7 +411,7 @@ double GeneralizedCircle::distance(const double fastDistance) const
 
     std::pair<double, double> distance12 = solveQuadraticABC(a, b, c);
 
-    //take the small solution which has always the same sign of the fastDistance
+    // take the small solution which has always the same sign of the fastDistance
     return distance12.second;
 
   }

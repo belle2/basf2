@@ -67,7 +67,7 @@ void ECLShowerShapeModule::event()
 {
   StoreArray<ECLShower> eclShowers(eclShowerArrayName());
   for (auto& eclShower : eclShowers)
-    eclShower.setLateralEnergy(float(computeLateralEnergy(eclShower)));
+    eclShower.setLateralEnergy(computeLateralEnergy(eclShower));
 }
 
 void ECLShowerShapeModule::endRun()
@@ -111,7 +111,7 @@ double ECLShowerShapeModule::computeLateralEnergy(const ECLShower& shower) const
       const auto weight = relatedDigitsPairs.weight(iRel);
       int cId = aECLCalDigit->getCellId();
       ECLGeometryPar* geometry = ECLGeometryPar::Instance();
-      TVector3 pos = geometry->GetCrystalPos(cId);
+      TVector3 pos = geometry->GetCrystalPos(cId - 1);
       TVector3 deltaPos = pos - cryCenter;
       double r = deltaPos.Mag();
       double r2 = r * r;

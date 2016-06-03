@@ -30,6 +30,8 @@ UnionRecordingFacetRelationFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
     return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new BasicFacetRelationVarSet());
+  } else if (name == "fit") {
+    return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new FitFacetRelationVarSet());
   } else if (name == "tmva") {
     return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new TMVAFacetRelationVarSet());
   } else if (name == "truth") {

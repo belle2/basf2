@@ -143,6 +143,10 @@ namespace Belle2 {
         Line2D::passiveMoveBy(bySZ);
       }
 
+      /**
+       *  Calculates the jacobian matrix that is needed for the translation of the parameter covariance
+       *  for a passive move of the coordinate system.
+       */
       SZCovariance passiveMovedCovarianceBy(const Vector2D& bySZ) const
       {
         TMatrixD jacobian = passiveMoveByJacobian(bySZ);

@@ -16,6 +16,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /// Utility class to fit hit triplet and relations of them
     class FacetFitter {
 
     public:

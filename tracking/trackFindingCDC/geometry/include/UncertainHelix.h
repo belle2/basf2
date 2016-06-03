@@ -51,6 +51,7 @@ namespace Belle2 {
       {}
 
 
+      /// Constructor taking all stored parameters as a TVectorD. Depricated.
       explicit UncertainHelix(const TVectorD& parameters,
                               const HelixCovariance& helixCovariance = HelixCovariance(),
                               const double chi2 = 0.0,

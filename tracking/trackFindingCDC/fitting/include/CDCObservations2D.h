@@ -169,6 +169,7 @@ namespace Belle2 {
        *  since on specific assumption can be made from the wire hit alone.
        *  @param wireHit      Hit information to be appended as observation.
        *                      XY position, drift length and inverse variance are taken at the wire reference position.
+       *  @param rlInfo       Right left passage information with which the drift length should be signed.
        *  @return             Number of observations added. One if the observation was added.
        *                      Zero if one of the given variables is NAN.
        */
@@ -203,6 +204,16 @@ namespace Belle2 {
         return fill(wireRefPos2D, signedDriftLength, 1 / variance);
       }
 
+      /**
+       *  Appends the position information of the given wire hit to the
+       *  stored obseravations. Obtionally includes the drift length with
+       *  the given right left orientation
+
+       *  @param wireHit      Hit information to be appended as observation.
+       *  @param rlInfo       Right left passage information with which the drift length should be signed.
+       *  @return             Number of observations added. One if the observation was added.
+       *                      Zero if one of the given variables is NAN.
+       */
       size_t append(const Belle2::TrackFindingCDC::CDCWireHit* wireHit,
                     const ERightLeft rlInfo = ERightLeft::c_Unknown)
       {
@@ -217,7 +228,7 @@ namespace Belle2 {
        *  \note Observations are skipped, if one of the contained variables is NAN.
        *  \note The left right passage information is always set to
        *  the right left passage hypotheses of the give hit.
-       *  @param wireHit      Hit information to be appended as observation.
+       *  @param rlWireHit    Hit information to be appended as observation.
        *                      XY position, signed drift length and inverse variance are taken at the wire reference position.
        *  @return             Number of observations added. One if the observation was added.
        *                      Zero if one of the given variables is NAN.

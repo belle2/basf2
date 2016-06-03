@@ -36,13 +36,14 @@ namespace Belle2 {
         m_lineSZ()
       {}
 
-      /// Constructor taking all stored parameters for internal use.
+      /// Constructor combining a two dimensional circle with the linear augment in the sz space.
       Helix(const PerigeeCircle& circleXY,
             const Line2D& lineSZ) :
         m_circleXY(circleXY),
         m_lineSZ(lineSZ)
       {}
 
+      /// Constructor taking all stored parameters for internal use.
       explicit Helix(const TVectorD& parameters) :
         m_circleXY(parameters(EHelixParameter::c_Curv),
                    parameters(EHelixParameter::c_Phi0),
@@ -51,6 +52,7 @@ namespace Belle2 {
                                             parameters(EHelixParameter::c_Z0)))
       {}
 
+      /// Constructor from all helix parameter
       Helix(const double curvature,
             const double tangentialPhi,
             const double impact,
@@ -60,7 +62,7 @@ namespace Belle2 {
         m_lineSZ(Line2D::fromSlopeIntercept(tanLambda, z0))
       {}
 
-
+      /// Constructor from all helix parameter, phi given as a unit vector
       Helix(const double curvature,
             const Vector2D& tangential,
             const double impact,
@@ -77,6 +79,7 @@ namespace Belle2 {
         m_lineSZ.invalidate();
       }
 
+      /// Indicates if the stored parameter combination designates a valid helix.
       bool isInvalid() const
       { return circleXY().isInvalid() and lineSZ().isInvalid(); }
 

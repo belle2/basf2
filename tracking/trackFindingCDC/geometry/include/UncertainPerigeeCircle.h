@@ -22,7 +22,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-       Adds an uncertainty matrix to the circle in perigee parameterisation.
+     *  Adds an uncertainty matrix to the circle in perigee parameterisation.
      */
     class UncertainPerigeeCircle : public PerigeeCircle {
 
@@ -36,10 +36,10 @@ namespace Belle2 {
       {}
 
       /**
-      Composes an uncertain perigee circle from the perigee parameters
-      and a 3x3 covariance matrix.
-      Covariance matrix defaults to a zero matrix.
-      */
+       * Composes an uncertain perigee circle from the perigee parameters
+       * and a 3x3 covariance matrix.
+       * Covariance matrix defaults to a zero matrix.
+       */
       UncertainPerigeeCircle(const double curvature,
                              const double tangentialPhi,
                              const double impact,
@@ -55,10 +55,10 @@ namespace Belle2 {
 
 
       /**
-      Composes an uncertain perigee circle from the perigee parameters
-      and a 3x3 covariance matrix.
-      Covariance matrix defaults to a zero matrix
-      */
+       *  Composes an uncertain perigee circle from the perigee parameters
+       *  and a 3x3 covariance matrix.
+       *  Covariance matrix defaults to a zero matrix
+       */
       UncertainPerigeeCircle(const double curvature,
                              const Vector2D& tangential,
                              const double impact,
@@ -96,6 +96,7 @@ namespace Belle2 {
         m_ndf(ndf)
       {}
 
+      /// Constructor taking all stored parameters as a TVectorD. Depricated.
       explicit
       UncertainPerigeeCircle(const TVectorD& parameters,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
@@ -106,9 +107,6 @@ namespace Belle2 {
         m_chi2(chi2),
         m_ndf(ndf)
       {}
-
-
-
 
 
     public:
@@ -173,10 +171,10 @@ namespace Belle2 {
 
     public:
       /**
-      Moves the coordinate system by the vector by and
-      calculates the new perigee and its covariance matrix.
-      Change is inplace.
-      */
+       *  Moves the coordinate system by the vector by and
+       *  calculates the new perigee and its covariance matrix.
+       *  Change is inplace.
+       */
       void passiveMoveBy(const Vector2D& by)
       {
         // Move the covariance matrix first to have access to the original parameters
@@ -185,6 +183,10 @@ namespace Belle2 {
         PerigeeCircle::passiveMoveBy(by);
       }
 
+      /**
+       *  Calculates the jacobian matrix that is needed for the translation of the parameter covariance
+       *  for a passive move of the coordinate system.
+       */
       PerigeeCovariance passiveMovedCovarianceBy(const Vector2D& by) const
       {
         TMatrixD jacobian = passiveMoveByJacobian(by);

@@ -47,8 +47,9 @@ void Chi2FacetFilter::exposeParameters(ModuleParamList* moduleParamList,
 
 Weight Chi2FacetFilter::operator()(const CDCFacet& facet)
 {
-  double chi2 = FacetFitter::fit(facet);
-  if (chi2 > m_param_chi2Cut) {
+  const bool singleStep = true;
+  double chi2 = FacetFitter::fit(facet, singleStep);
+  if (chi2 > m_param_chi2Cut or std::isnan(chi2)) {
     return NAN;
   } else {
 

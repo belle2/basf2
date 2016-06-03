@@ -7,6 +7,7 @@ from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
     recording_finder_module = basf2.register_module("TrackFinderCDCAutomatonDev")
     flight_time_estimation = "none"
+    first_loop = False
 
     recording_filter_parameter_name = "FillMeFilterParameters"
     root_output_file_name = "Records.root"
@@ -14,7 +15,7 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
     skim = ""
 
     def create_argument_parser(self, **kwds):
-        argument_parser = super(RecordingRun, self).create_argument_parser(**kwds)
+        argument_parser = super().create_argument_parser(**kwds)
 
         argument_parser.add_argument(
             "-ft",
@@ -29,6 +30,13 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
         )
 
         argument_parser.add_argument(
+            "-l",
+            "--first-loop",
+            action="store_true",
+            dest="first_loop",
+            help=("Choose to block all wire hits but the ones located on the first loop")
+        )
+        argument_parser.add_argument(
             '-v',
             '--varset',
             nargs="+",
@@ -39,6 +47,7 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
         )
 
         argument_parser.add_argument(
+            '-o',
             '--root-output',
             default=self.root_output_file_name,
             dest='root_output_file_name',
@@ -56,7 +65,7 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
         return argument_parser
 
     def configure(self, arguments):
-        super(RecordingRun, self).configure(arguments)
+        super().configure(arguments)
 
         self.recording_finder_module.param({
             self.recording_filter_parameter_name: {
@@ -69,11 +78,12 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
-        path = super(RecordingRun, self).create_path()
+        path = super().create_path()
 
         path.add_module("WireHitTopologyPreparer",
-                        flightTimeEstimation=self.flight_time_estimation)
+                        flightTimeEstimation=self.flight_time_estimation,
+                        mcFirstLoop=self.first_loop)
 
         recording_finder_module = self.get_basf2_module(self.recording_finder_module)
-        main_path.add_module(recording_finder_module)
-        return main_path
+        path.add_module(recording_finder_module)
+        return path

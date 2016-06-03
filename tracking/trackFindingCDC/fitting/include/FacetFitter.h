@@ -21,12 +21,19 @@ namespace Belle2 {
 
     public:
       /// Fits a proper line to facet and returns the chi2.
-      static double fit(const CDCFacet& facet);
+      static double fit(const CDCFacet& facet,
+                        bool singleStep = false);
+
+      /// Fit a line the positions xyl and the weights with a single minization step
+      // static Line2D fitSingleStep(Eigen::Matrix<double, 3, 3> xyl,
+      //          Eigen::Array<double, 3, 1> w,
+      //          double& chi2);
 
       /// Fit a line the positions xyl and the weights.
       static Line2D fit(Eigen::Matrix<double, 3, 3> xyl,
                         Eigen::Array<double, 3, 1> w,
-                        double& chi2);
+                        double& chi2,
+                        bool singleStep = false);
     }; // end class
   } // end namespace TrackFindingCDC
 } // namespace Belle2

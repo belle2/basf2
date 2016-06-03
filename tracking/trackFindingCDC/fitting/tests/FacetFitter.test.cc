@@ -36,13 +36,15 @@ TEST(TrackFindingCDCTest, fitting_FacetFitter_fitLine)
   xyl(2, 1) = 1.1;
   xyl(2, 2) = -0.05;
 
-  double chi2 = 0;
-  Line2D fittedLine = FacetFitter::fit(xyl, weights, chi2);
+  for (bool singleStep : {true, false}) {
+    double chi2 = 0;
+    Line2D fittedLine = FacetFitter::fit(xyl, weights, chi2, singleStep);
 
-  EXPECT_NEAR(1, fittedLine.n0(), 1e-6);
-  EXPECT_NEAR(0, fittedLine.n1(), 1e-6);
-  EXPECT_NEAR(-1, fittedLine.n2(), 1e-6);
-  EXPECT_NEAR(0.015 * 1.0 / 4.0, chi2, 1e-6);
+    EXPECT_NEAR(1, fittedLine.n0(), 1e-6);
+    EXPECT_NEAR(0, fittedLine.n1(), 1e-6);
+    EXPECT_NEAR(-1, fittedLine.n2(), 1e-6);
+    EXPECT_NEAR(0.015 * 1.0 / 4.0, chi2, 1e-6);
+  }
 }
 
 
@@ -63,13 +65,15 @@ TEST(TrackFindingCDCTest, fitting_FacetFitter_fitLine_alongYAxes)
   xyl(2, 1) = 1;
   xyl(2, 2) = 0.05;
 
-  double chi2 = 0;
-  Line2D fittedLine = FacetFitter::fit(xyl, weights, chi2);
+  for (bool singleStep : {true, false}) {
+    double chi2 = 0;
+    Line2D fittedLine = FacetFitter::fit(xyl, weights, chi2, singleStep);
 
-  EXPECT_NEAR(-1, fittedLine.n0(), 1e-6);
-  EXPECT_NEAR(1, fittedLine.n1(), 1e-6);
-  EXPECT_NEAR(0, fittedLine.n2(), 1e-6);
-  EXPECT_NEAR(0.015, chi2, 1e-6);
+    EXPECT_NEAR(-1, fittedLine.n0(), 1e-6);
+    EXPECT_NEAR(1, fittedLine.n1(), 1e-6);
+    EXPECT_NEAR(0, fittedLine.n2(), 1e-6);
+    EXPECT_NEAR(0.015, chi2, 1e-6);
+  }
 }
 
 
@@ -91,11 +95,13 @@ TEST(TrackFindingCDCTest, fitting_FacetFitter_fitLine_sameSide)
   xyl(2, 1) = 0.8;
   xyl(2, 2) = -0.1;
 
-  double chi2 = 0;
-  Line2D fittedLine = FacetFitter::fit(xyl, weights, chi2);
+  for (bool singleStep : {true, false}) {
+    double chi2 = 0;
+    Line2D fittedLine = FacetFitter::fit(xyl, weights, chi2, singleStep);
 
-  EXPECT_NEAR(-1, fittedLine.n0(), 1e-6);
-  EXPECT_NEAR(0, fittedLine.n1(), 1e-6);
-  EXPECT_NEAR(1, fittedLine.n2(), 1e-6);
-  EXPECT_NEAR(0.06, chi2, 1e-6);
+    EXPECT_NEAR(-1, fittedLine.n0(), 1e-6);
+    EXPECT_NEAR(0, fittedLine.n1(), 1e-6);
+    EXPECT_NEAR(1, fittedLine.n2(), 1e-6);
+    EXPECT_NEAR(0.06, chi2, 1e-6);
+  }
 }

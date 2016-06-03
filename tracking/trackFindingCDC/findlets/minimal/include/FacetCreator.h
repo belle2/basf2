@@ -231,14 +231,42 @@ namespace Belle2 {
        */
       void updateDriftLength(CDCFacet& facet)
       {
-        double startDriftLength = getDriftLengthEstimate(facet.getStartRecoHit2D());
-        facet.getStartRLWireHit().setRefDriftLength(startDriftLength);
+        static CDC::RealisticTDCCountTranslator tdcCountTranslator;
 
-        double middleDriftLength = getDriftLengthEstimate(facet.getMiddleRecoHit2D());
-        facet.getMiddleRLWireHit().setRefDriftLength(middleDriftLength);
+        const ParameterLine2D& line = facet.getStartToEndLine();
+        Vector2D flightDirection = line.tangential();
+        Vector2D centralPos2D = line.at(0.5);
+        const double alpha = centralPos2D.angleWith(flightDirection);
+        const double cylindricalRToFlightTimeFactor = 1.0 / (boost::math::sinc_pi(alpha) * Const::speedOfLight);
 
-        double endDriftLength = getDriftLengthEstimate(facet.getEndRecoHit2D());
-        facet.getEndRLWireHit().setRefDriftLength(endDriftLength);
+        auto doUpdate = [&](CDCRLWireHit & rlWireHit, const Vector2D & recoPos) {
+          const CDCWire& wire = rlWireHit.getWire();
+          const CDCHit* hit = rlWireHit.getWireHit().getHit();
+          const bool rl = rlWireHit.getRLInfo() == ERightLeft::c_Right;
+          double flightTimeEstimation =  recoPos.cylindricalR() * cylindricalRToFlightTimeFactor;
+          double driftLength = tdcCountTranslator.getDriftLength(hit->getTDCCount(),
+                                                                 wire.getWireID(),
+                                                                 flightTimeEstimation,
+                                                                 rl,
+                                                                 wire.getRefZ(),
+                                                                 alpha);
+
+          rlWireHit.setRefDriftLength(driftLength);
+        };
+
+        doUpdate(facet.getStartRLWireHit(), facet.getStartRecoPos2D());
+        doUpdate(facet.getMiddleRLWireHit(), facet.getMiddleRecoPos2D());
+        doUpdate(facet.getEndRLWireHit(), facet.getEndRecoPos2D());
+
+        // More accurate implementation
+        // double startDriftLength = getDriftLengthEstimate(facet.getStartRecoHit2D());
+        // facet.getStartRLWireHit().setRefDriftLength(startDriftLength);
+
+        // double middleDriftLength = getDriftLengthEstimate(facet.getMiddleRecoHit2D());
+        // facet.getMiddleRLWireHit().setRefDriftLength(middleDriftLength);
+
+        // double endDriftLength = getDriftLengthEstimate(facet.getEndRecoHit2D());
+        // facet.getEndRLWireHit().setRefDriftLength(endDriftLength);
       }
 
       /// Estimate the drift length of hit making use of the reconstructed flight direction of the hit.

@@ -57,11 +57,11 @@ namespace Belle2 {
       void capture();
 
     private:
-      // Reference to the open TFile.
+      /// Reference to the open TFile.
       TFile* m_tFile;
 
-      // Reference to the TTree.
-      StoreObjPtr<RootMergeable<TTree>> m_tTree;
+      /// Reference to the TTree.
+      StoreObjPtr<RootMergeable< TTree> > m_tTree;
     };
 
   }

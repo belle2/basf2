@@ -28,21 +28,21 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
   const CDCFacet& facet = *ptrFacet;
 
   {
-    bool nSteps = 0;
+    int nSteps = 0;
     double chi2_0 = FacetFitter::fit(facet, nSteps);
     var<named("chi2_0")>() = chi2_0;
 
     const ParameterLine2D& fitLine = facet.getStartToEndLine();
-    var<named("fit_0_phi")>() = fitLine.tangential().phi();
+    var<named("fit_0_phi0")>() = fitLine.tangential().phi();
   }
 
   {
-    bool nSteps = 1;
+    int nSteps = 1;
     double chi2_1 = FacetFitter::fit(facet, nSteps);
     var<named("chi2_1")>() = chi2_1;
 
     const ParameterLine2D& fitLine = facet.getStartToEndLine();
-    var<named("fit_1_phi")>() = fitLine.tangential().phi();
+    var<named("fit_1_phi0")>() = fitLine.tangential().phi();
   }
 
   double chi2 = FacetFitter::fit(facet);
@@ -57,7 +57,7 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
   var<named("erf")>() = std::erf(chi2 / erfWidth);
   var<named("tanh")>() = std::tanh(chi2 / tanhWidth);
 
-  var<named("fit_phi")>() = fitLine.tangential().phi();
+  var<named("fit_phi0")>() = fitLine.tangential().phi();
 
   const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();
   const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();

@@ -28,13 +28,13 @@ namespace Belle2 {
     constexpr
     static char const* const facetFitNames[] = {
       "chi2_0",
-      "fit_0_phi",
+      "fit_0_phi0",
       "chi2_1",
-      "fit_1_phi",
+      "fit_1_phi0",
       "chi2",
+      "fit_phi0",
       "erf",
       "tanh",
-      "fit_phi",
       "d2",
       "start_distance",
       "middle_distance",

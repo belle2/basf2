@@ -47,8 +47,55 @@ namespace Belle2 {
 
     private:
 
+      //Struct used to hold information of the digits projected to a plane perpendicular to the shower direction
+      struct ProjectedECLDigit {
+        double energy;           //weighted energy
+        double rho;              //radial distance
+        double alpha;            //polar angel
+      };
+
       /** Shower shape variable: Lateral energy. */
       double computeLateralEnergy(const ECLShower&) const;
+
+      /** Compute the absolute value of the complex Zernike moment Znm.
+          The moments are computed in a plane perpendicular to the direction of the shower.
+          The plane's origin is at the intersection of the shower direction with the plane.
+          The origin is at a distance from the interaction point equal to the shower distance from the interaction point.
+
+          n, m - are the Zernike polynomial rank
+          R0 - is a scaling factor used to normalize the distances in the described plane.
+          It also sets the maximum distance from the origin (the Zernike polynomials are defined only on the unit circle).
+          All points in the plane with a distance larger than R0 from the origin are ignored.
+
+          Valid values of n,m are n,m >= 0, m <= n.
+          If n or m are invalid the function returns 0.0.
+          */
+
+      double computeAbsZernikeMoment(const std::vector<ProjectedECLDigit>& shower, const double totalEnergy, const int n, const int m,
+                                     const double rho) const;
+
+      /** Compute the second moment in the plane perpendicular to the direction of the shower.
+          The plane's origin is at the intersection of the shower direction with the plane.
+          The origin is at a distance from the interaction point equal to the shower distance from the interaction point. */
+      double computeSecondMoment(const std::vector<ProjectedECLDigit>& shower, const double totalEnergy) const;
+
+      /* Compute projections of the ECLCalDigits to the perpendicular plane
+       */
+      std::vector<ProjectedECLDigit> projectECLDigits(const ECLShower& shower) const;
+
+      /* The radial part of the Zernike polynomial
+       * n,m - Zernike polynomial rank
+       * rho - radial distance             */
+      double Rnm(const int n, const int m, const double rho) const;
+
+      /* Return the complex value of the Zernike polynomial of rank n,m.
+      Znm(rho,alpha) = Rnm(rho) * exp(i*m*alpha)
+      rho - radial distance
+      alpha - polar angle */
+      std::complex<double> zernikeValue(const double rho, const double alpha, const int n, const int m) const;
+
+      double m_rho0; // Scaling factor for radial distances in perpendicular plane
+
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/
 

@@ -19,6 +19,7 @@ namespace Belle2 {
     class SkimmedVarSet : public ABaseVarSet {
 
     private:
+      /// Type of the base class
       typedef ABaseVarSet Super;
 
     public:

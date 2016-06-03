@@ -16,6 +16,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
@@ -277,6 +278,19 @@ namespace Belle2 {
         return append(rlWireHitTriple.getStartRLWireHit())
                + append(rlWireHitTriple.getMiddleRLWireHit())
                + append(rlWireHitTriple.getEndRLWireHit());
+      }
+
+      /// Appends the three observed position
+      size_t append(const Belle2::TrackFindingCDC::CDCFacet& facet)
+      {
+        if (m_fitPos == EFitPos::c_RecoPos) {
+          return append(facet.getStartRecoHit2D())
+                 + append(facet.getMiddleRecoHit2D())
+                 + append(facet.getEndRecoHit2D());
+        } else {
+          const CDCRLWireHitTriple& rlWireHitTriple = facet;
+          return append(rlWireHitTriple);
+        }
       }
 
       /// Appends the hit using the reconstructed position if useRecoPos indicates it

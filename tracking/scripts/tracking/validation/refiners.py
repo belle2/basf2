@@ -765,7 +765,7 @@ class GroupByRefiner(Refiner):
             elif isinstance(groupby_spec, str):
                 part_name = groupby_spec
                 groupby_parts = crops[part_name]
-                unique_values, index_of_values = np.unique(groupby_parts, unique_inverse=True)
+                unique_values, index_of_values = np.unique(groupby_parts, return_inverse=True)
                 groupby_values = [" = {value}]".format(value=value) for value in unique_values]
 
             elif isinstance(groupby_spec, tuple):

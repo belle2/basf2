@@ -22,7 +22,7 @@ REG_MODULE(PXDTriggerShifter)
 
 PXDTriggerShifterModule::PXDTriggerShifterModule(void)
 {
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Module Description
   setDescription("Shift PXD trigger number by offset");
 
@@ -47,7 +47,9 @@ void PXDTriggerShifterModule::event(void)
   pxdTriggerNr &= 0xFFFF;
   triggerNr &= 0xFFFF;
 
+  // Keep current raw data in MRU cache with its original pxd trigger number
   m_previous_events.insert(pxdTriggerNr, *rawdata);
+  // Now try to replace current raw data with raw data with current trigger number + offset
   m_previous_events.retrieve(triggerNr + m_offset, *rawdata);
 }
 

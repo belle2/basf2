@@ -1,7 +1,7 @@
 """Contains functions that operate on populated path adjust some module parameters"""
 
 
-def adjust_parameters(path, module_type, params={}):
+def adjust_module(path, module_type, params={}, **kwds):
     """Set parameters of the module with the given type in the path to the given parameters
 
     Arguments
@@ -12,10 +12,13 @@ def adjust_parameters(path, module_type, params={}):
         Type of the module to adjusted as returned by Module.type()
     params : dict
        Dictionary of parameters served to Module.param(params)
+    **kwds
+       Keyword parameters served to Module.param(params)
     """
     for module in path.modules():
         if module.type() == module_type:
             module.param(params)
+            module.param(kwds)
 
 
 def disable_deltas(path):

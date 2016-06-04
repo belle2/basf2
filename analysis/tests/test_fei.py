@@ -20,6 +20,8 @@ import fei.provider
 
 import numpy as np
 
+import basf2_mva
+
 # @cond
 
 # Define equality operators for a bunch of pybasf2 classes
@@ -817,6 +819,8 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
             pt[0] = i*2
             tree.Fill()
         f.Write("treename")
+        # Upload function does nothing, otherwise unittest will fail due to the invalid weightfile
+        basf2_mva.upload = lambda *args: 1
 
     def tearDown(self):
         global mock_threading_called
@@ -826,6 +830,10 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
 
         if os.path.isfile('trainingData.root'):
             os.remove('trainingData.root')
+
+        # Remove fake upload function again
+        # hence getattr will be used which will return the original function
+        del basf2_mva.upload
 
     def test_TrainMultivariateClassifierSuccessfull(self):
         resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource,
@@ -837,7 +845,7 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
                                                   target='isSignal', sPlotVariable=None)
 
         subprocess.call = unittest.mock.create_autospec(self.original_call,
-                                                        side_effect=lambda command, shell: open('trainingData_1.config',
+                                                        side_effect=lambda command, shell: open('trainingData.xml',
                                                                                                 'w').close())
         fei.provider.MinimumNumberOfMVASamples = 499
         self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, 'FEITEST', mvaConfig, 'trainingData'),
@@ -845,10 +853,10 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         subprocess.call.assert_called_once_with("basf2_mva_teacher --method 'FastBDT' --target_variable 'isSignal' "
                                                 "--treename variables "
                                                 "--datafile 'trainingData.root' --signal_class 1 --variables 'p' 'pt' "
-                                                "--weightfile 'trainingData.weights' ConfigString > 'trainingData'.log 2>&1"
-                                                " && basf2_mva_upload --filename 'trainingData.weights' "
+                                                "--weightfile 'trainingData.xml' ConfigString > 'trainingData'.log 2>&1"
+                                                " && basf2_mva_upload --filename 'trainingData.xml' "
                                                 "--identifier 'FEITEST_trainingData'", shell=True)
-        os.remove('trainingData_1.config')
+        os.remove('trainingData.xml')
 
         path = basf2.create_path()
         self.assertEqual(resource.path, path)
@@ -930,8 +938,8 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         subprocess.call.assert_called_once_with("basf2_mva_teacher --method 'FastBDT' --target_variable 'isSignal' "
                                                 "--treename variables "
                                                 "--datafile 'trainingData.root' --signal_class 1 --variables 'p' 'pt' "
-                                                "--weightfile 'trainingData.weights' ConfigString > 'trainingData'.log 2>&1"
-                                                " && basf2_mva_upload --filename 'trainingData.weights' "
+                                                "--weightfile 'trainingData.xml' ConfigString > 'trainingData'.log 2>&1"
+                                                " && basf2_mva_upload --filename 'trainingData.xml' "
                                                 "--identifier 'FEITEST_trainingData'", shell=True)
 
         path = basf2.create_path()
@@ -947,7 +955,7 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         mvaConfig = unittest.mock.NonCallableMock(spec=fei.config.MVAConfiguration, variables=['p', 'pt'],
                                                   method='FastBDT', config='ConfigString',
                                                   target='isSignal', sPlotVariable=None)
-        with temporary_file('trainingData_1.config'):
+        with temporary_file('trainingData.xml'):
             self.assertEqual(fei.provider.TrainMultivariateClassifier(resource, 'FEITEST', mvaConfig, 'trainingData'),
                              'trainingData')
 

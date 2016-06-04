@@ -23,6 +23,8 @@ import typing
 import fei.dag
 import fei.config
 
+import basf2_mva
+
 Hash = str
 Filename = str
 ParticleList = str
@@ -395,7 +397,7 @@ def TrainMultivariateClassifier(resource: fei.dag.Resource, databasePrefix: str,
     if trainingData is None:
         return
 
-    configFilename = trainingData + '_1.config'
+    configFilename = trainingData + '.xml'
 
     if not os.path.isfile(configFilename):
         f = ROOT.TFile(trainingData + '.root')
@@ -418,8 +420,8 @@ def TrainMultivariateClassifier(resource: fei.dag.Resource, databasePrefix: str,
 
         command = (
             "{externTeacher} --method '{method}' --target_variable '{target}' --treename variables --datafile '{prefix}.root' "
-            "--signal_class 1 --variables '{variables}' --weightfile '{prefix}.weights' {config} > '{prefix}'.log 2>&1"
-            " && basf2_mva_upload --filename '{prefix}.weights' --identifier '{databasePrefix}_{prefix}'".format(
+            "--signal_class 1 --variables '{variables}' --weightfile '{prefix}.xml' {config} > '{prefix}'.log 2>&1"
+            " && basf2_mva_upload --filename '{prefix}.xml' --identifier '{databasePrefix}_{prefix}'".format(
                 databasePrefix=databasePrefix,
                 externTeacher=resource.env['externTeacher'],
                 method=mvaConfig.method,
@@ -432,6 +434,10 @@ def TrainMultivariateClassifier(resource: fei.dag.Resource, databasePrefix: str,
         # FIXME Bug? Because subprocess is not thread-safe, did not cause any problems so far.
         with resource.EnableMultiThreading():
             subprocess.call(command, shell=True)
+        # TODO Upload a second time using same basf2 process which also adds he mva expert,
+        # this can make a difference because the localdb is relative to the working directory
+        # during the start of basf2
+        basf2_mva.upload(trainingData + '.xml', databasePrefix + '_' + trainingData)
 
     if not os.path.isfile(configFilename):
         B2WARNING("Training of MVC failed. Ignoring channel.")
@@ -575,7 +581,7 @@ def CountMCParticles(resource: fei.dag.Resource, names: typing.Sequence[str]) ->
     Belle2.Variable.Manager
 
     for key in root_file.GetListOfKeys():
-        variable = Belle2.Variable.invertMakeROOTCompatible(key.GetName())
+        variable = Belle2.invertMakeROOTCompatible(key.GetName())
         pdgcode = abs(int(variable[len('NumberOfMCParticlesInEvent('):-len(")")]))
         hist = key.ReadObj()
         mc_counts[pdgcode] = {}

@@ -65,7 +65,7 @@ def setup(args):
     shutil.rmtree('collection', ignore_errors=True)
     shutil.rmtree('jobs', ignore_errors=True)
     os.mkdir('collection')
-    os.mkdir('collection/weights')
+    os.mkdir('collection/localdb')
     open('collection/basf2_path.pickle', 'w').close()
     os.mkdir('jobs')
     if args.large_dir:
@@ -83,6 +83,7 @@ def setup(args):
             os.symlink(data_input, 'jobs/{}/input_{}.root'.format(i, j))
         # Symlink weight directory and basf2_path
         os.symlink(args.directory + '/collection/basf2_path.pickle', 'jobs/{}/basf2_path.pickle'.format(i, j))
+        os.symlink(args.directory + '/collection/localdb', 'jobs/{}/localdb')
 
 
 def run_basf2(args):

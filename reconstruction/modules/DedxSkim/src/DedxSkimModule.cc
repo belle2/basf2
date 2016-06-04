@@ -15,8 +15,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <genfit/TrackCand.h>
-#include <genfit/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <cmath>
 
@@ -61,7 +60,7 @@ void DedxSkimModule::initialize()
   // requred inputs
   StoreArray<Track>::required();
   StoreArray<TrackFitResult>::required();
-  StoreArray<genfit::TrackCand>::required();
+  StoreArray<RecoTrack>::required();
   StoreArray<CDCHit>::required();
   //  StoreArray<ECLCluster>::required();
 }
@@ -175,8 +174,8 @@ bool DedxSkimModule::isGoodTrack(const Track* track, const Const::ChargedStable&
   }
 
   // check if there are (enough) cdc hits for this track
-  genfit::TrackCand* gftrackcand = fitResult->getRelatedFrom<genfit::TrackCand>();
-  if (!gftrackcand || gftrackcand->getNHits() == 0) {
+  RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
+  if (!recoTrack || recoTrack->getNumberOfTotalHits() == 0) {
     B2WARNING("Track has no associated hits, skipping");
     return false;
   }
@@ -185,7 +184,7 @@ bool DedxSkimModule::isGoodTrack(const Track* track, const Const::ChargedStable&
   double trackPVal = fitResult->getPValue();
   double d0 = fitResult->getD0();
   double z0 = fitResult->getZ0();
-  int nCDCHits = gftrackcand->getNHits();
+  int nCDCHits = recoTrack->getNumberOfTotalHits();
 
   // apply track quality cuts
   if (trackPVal < 0.00001 || nCDCHits < 1 || std::abs(d0) <= 0.1 || std::abs(z0) <= 10) {

@@ -14,6 +14,11 @@ parser.add_argument(
     metavar='InputRun (i.e. file name = /path/to/InputRun.dat)',
     required=True,
     help='the name for the input data files.')
+parser.add_argument(
+    '--output',
+    required=False,
+    help='the name of the pedestal file',
+    default='pedout.root')
 
 args = parser.parse_args()
 
@@ -27,7 +32,7 @@ itopeventconverter.param('forceTrigger0xF', True)
 pedmodule = register_module('Pedestal')
 pedmodule.param('mode', 0)
 pedmodule.param('writeFile', 1)
-pedmodule.param('outputFileName', 'pedout.root')
+pedmodule.param('outputFileName', args.output)
 
 
 main = create_path()

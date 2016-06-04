@@ -83,46 +83,26 @@ else:
 
 mergemodule = register_module('WaveMerging')
 
-if (args.inputRun).find("slot") != -1:
-    print('BELLE 2 INSTALLED')
-    timemodule = register_module('WaveTimingV4')
-    timeDict = {'time2TDC': 1.0}
-    timemodule.param(timeDict)
-    timemodule.param('threshold', 50.)  # always
-    timemodule.param('threshold_n', -300.)  # tsukuba
-    timemodule.param('isSkim', False)
-else:
-    timemodule = register_module('WaveTimingV2')
-    timeDict = {'time2TDC': 1.0}
-    timemodule.param(timeDict)
-    timemodule.param('threshold', 50.)  # always
-    if (args.inputRun).find("cpr31") != -1 or (args.inputRun).find("cpr32") != -1:
-        print('FUJI')
-        timemodule.param('threshold_n', 1.)  # fuji
-    else:
-        print('TSUKUBA')
-        timemodule.param('threshold_n', -80.)  # tsukuba
+timemodule = register_module('WaveTimingFast')
+timeDict = {'time2TDC': 1.0}
+timemodule.param(timeDict)
+timemodule.param('threshold', 50.)  # always
+timemodule.param('threshold_n', -300.)  # tsukuba
 # it shouldn't be anything else
+# if it, is the code will crash -- on purpose
 
 
 timecalibmodule = register_module('DoubleCalPulse')
-if (args.inputRun).find("cpr31") != -1 or (args.inputRun).find("cpr32") != -1:
-    # fuji
-    timecalibmodule.param('calibrationTimeMin', 1300)
-    timecalibmodule.param('calibrationWidthMax', 30)
+timecalibmodule.param('calibrationTimeMin', 200)   # laser
+timecalibmodule.param('calibrationWidthMax', 10)
+timecalibmodule.param('calibrationWidthMin', 2)
+timecalibmodule.param('calibrationADCThreshold', -300)
+timecalibmodule.param('calibrationADCThreshold_max', -600)
+if (args.inputRun).find("cosmic") != -1:
+    timecalibmodule.param('calibrationWidthMax', 20)
     timecalibmodule.param('calibrationWidthMin', 6)
-    timecalibmodule.param('calibrationADCThreshold', 500)
-    timecalibmodule.param('calibrationADCThreshold_max', 3000)
-else:
-    # tsukuba
-    timecalibmodule.param('calibrationTimeMin', 200)   # laser
-    if (args.inputRun).find("cosmic") != -1:
-        # timecalibmodule.param('calibrationTimeMin',800)  # cosmic
-        timecalibmodule.param('calibrationTimeMin', 200)  # cosmic
-    timecalibmodule.param('calibrationWidthMax', 10)
-    timecalibmodule.param('calibrationWidthMin', 2)
-    timecalibmodule.param('calibrationADCThreshold', -80)
-    timecalibmodule.param('calibrationADCThreshold_max', -600)
+    timecalibmodule.param('calibrationADCThreshold', -300)
+    timecalibmodule.param('calibrationADCThreshold_max', -800)
 
 # sampletimemodule = register_module('SampleTimeCalibrationV3')
 
@@ -144,8 +124,8 @@ main.add_module(itopeventconverter)
 main.add_module(pedmodule)
 main.add_module(mergemodule)
 main.add_module(timemodule)
-# main.add_module(sampletimemodule)
 main.add_module(timecalibmodule)
+# main.add_module(sampletimemodule)
 
 main.add_module(output)
 process(main)

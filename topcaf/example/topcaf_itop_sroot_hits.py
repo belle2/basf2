@@ -87,22 +87,22 @@ timemodule = register_module('WaveTimingFast')
 timeDict = {'time2TDC': 1.0}
 timemodule.param(timeDict)
 timemodule.param('threshold', 50.)  # always
-timemodule.param('threshold_n', -300.)  # tsukuba
+timemodule.param('threshold_n', -300.)  # must be -150 for "small calpulse"
 # it shouldn't be anything else
 # if it, is the code will crash -- on purpose
 
 
 timecalibmodule = register_module('DoubleCalPulse')
 timecalibmodule.param('calibrationTimeMin', 200)   # laser
-timecalibmodule.param('calibrationWidthMax', 10)
-timecalibmodule.param('calibrationWidthMin', 2)
-timecalibmodule.param('calibrationADCThreshold', -300)
-timecalibmodule.param('calibrationADCThreshold_max', -600)
-if (args.inputRun).find("cosmic") != -1:
-    timecalibmodule.param('calibrationWidthMax', 20)
-    timecalibmodule.param('calibrationWidthMin', 6)
-    timecalibmodule.param('calibrationADCThreshold', -300)
-    timecalibmodule.param('calibrationADCThreshold_max', -800)
+timecalibmodule.param('calibrationWidthMax', 20)
+timecalibmodule.param('calibrationWidthMin', 6)
+timecalibmodule.param('calibrationADCThreshold', -300)  # must be -150 for "small calpulse"
+timecalibmodule.param('calibrationADCThreshold_max', -800)
+# if (args.inputRun).find("cosmic") != -1:
+#    timecalibmodule.param('calibrationWidthMax', 20)
+#    timecalibmodule.param('calibrationWidthMin', 6)
+#    timecalibmodule.param('calibrationADCThreshold', -300)
+#    timecalibmodule.param('calibrationADCThreshold_max', -800)
 
 # sampletimemodule = register_module('SampleTimeCalibrationV3')
 

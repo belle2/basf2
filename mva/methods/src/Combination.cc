@@ -77,7 +77,6 @@ namespace Belle2 {
     void CombinationExpert::load(Weightfile& weightfile)
     {
 
-      std::string custom_weightfile = weightfile.getFileName();
       weightfile.getOptions(m_specific_options);
 
       m_experts.clear();

@@ -32,7 +32,7 @@ namespace Belle2 {
        * Constructs a new dataset given the general options
        * @param general_options which defines e.g. number of variables
        */
-      Dataset(const GeneralOptions& general_options);
+      explicit Dataset(const GeneralOptions& general_options);
 
       /**
        * Virtual default destructor
@@ -187,7 +187,7 @@ namespace Belle2 {
        * Creates a new ROOTDataset
        * @param _general_options defines the rootfile, treename, branches, ...
        */
-      ROOTDataset(const GeneralOptions& _general_options);
+      explicit ROOTDataset(const GeneralOptions& _general_options);
 
       /**
        * Returns the number of features in this dataset

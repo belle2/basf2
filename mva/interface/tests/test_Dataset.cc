@@ -19,7 +19,7 @@ namespace {
 
   class TestDataset : public MVA::Dataset {
   public:
-    TestDataset(MVA::GeneralOptions& general_options) : MVA::Dataset(general_options)
+    explicit TestDataset(MVA::GeneralOptions& general_options) : MVA::Dataset(general_options)
     {
       m_input = {1.0, 2.0, 3.0, 4.0, 5.0};
       m_target = 3.0;

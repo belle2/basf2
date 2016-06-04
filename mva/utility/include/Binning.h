@@ -28,7 +28,7 @@ namespace Belle2 {
        * Creates an empty binning with nBins
        * @param nBins number of bins
        */
-      Binning(unsigned int nBins = 0);
+      explicit Binning(unsigned int nBins = 0);
 
       /**
        * Gets the bin corresponding to the given datapoint.

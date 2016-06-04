@@ -30,7 +30,7 @@ namespace Belle2 {
        * Constructs a new teacher using the GeneralOptions for this training
        * @param general_options defining all shared options
        */
-      Teacher(const GeneralOptions& general_options);
+      explicit Teacher(const GeneralOptions& general_options);
 
       /**
        * Train a mva method using the given dataset returning a Weightfile

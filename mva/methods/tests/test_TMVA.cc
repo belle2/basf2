@@ -83,13 +83,12 @@ namespace {
 
   class TestClassificationDataset : public MVA::Dataset {
   public:
-    TestClassificationDataset(const std::vector<float>& data) : MVA::Dataset(MVA::GeneralOptions())
+    explicit TestClassificationDataset(const std::vector<float>& data) : MVA::Dataset(MVA::GeneralOptions()), m_data(data)
     {
       m_input = {0.0};
       m_target = 0.0;
       m_isSignal = false;
       m_weight = 1.0;
-      m_data = data;
     }
 
     virtual unsigned int getNumberOfFeatures() const override { return 1; }
@@ -208,13 +207,12 @@ namespace {
 
   class TestRegressionDataset : public MVA::Dataset {
   public:
-    TestRegressionDataset(const std::vector<float>& data) : MVA::Dataset(MVA::GeneralOptions())
+    explicit TestRegressionDataset(const std::vector<float>& data) : MVA::Dataset(MVA::GeneralOptions()), m_data(data)
     {
       m_input = {0.0};
       m_target = 0.0;
       m_isSignal = false;
       m_weight = 1.0;
-      m_data = data;
     }
 
     virtual unsigned int getNumberOfFeatures() const override { return 1; }

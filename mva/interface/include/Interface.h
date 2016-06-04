@@ -32,7 +32,7 @@ namespace Belle2 {
        * Creates a new Interface to a third-party library
        * @param name of the third-party MVA library
        */
-      AbstractInterface(std::string name);
+      explicit AbstractInterface(std::string name);
 
       /**
        * Virtual destructor
@@ -100,7 +100,7 @@ namespace Belle2 {
        * Constructs a new interface with the given name
        * @param name of the interface
        */
-      Interface(std::string name) : AbstractInterface(name) { }
+      explicit Interface(std::string name) : AbstractInterface(name) { }
 
       /**
        * Get Options of this MVA library

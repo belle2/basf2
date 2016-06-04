@@ -23,7 +23,6 @@ int main(int argc, char* argv[])
 {
 
   std::vector<std::string> filenames;
-  std::vector<std::string> identifiers;
   std::string datafile;
   std::string treename = "variables";
   std::string outputfile;

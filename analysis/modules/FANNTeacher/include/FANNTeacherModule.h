@@ -10,7 +10,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <analysis/utility/WorkingDirectoryManager.h>
+#include <framework/utilities/WorkingDirectoryManager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/FANNMLP.h>
 #include <analysis/dataobjects/FANNMLPData.h>

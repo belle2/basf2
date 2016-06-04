@@ -20,5 +20,5 @@ assert (v.variables.evaluate('constant(123)', None) - 123) < 0.001
 
 # used in FEI
 import ROOT
-assert 'extraInfo__boSignalProbability__bc' == ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(SignalProbability)')
-assert 'extraInfo(SignalProbability)' == ROOT.Belle2.Variable.invertMakeROOTCompatible('extraInfo__boSignalProbability__bc')
+assert 'extraInfo__boSignalProbability__bc' == ROOT.Belle2.makeROOTCompatible('extraInfo(SignalProbability)')
+assert 'extraInfo(SignalProbability)' == ROOT.Belle2.invertMakeROOTCompatible('extraInfo__boSignalProbability__bc')

@@ -15,7 +15,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
-#include <analysis/utility/WorkingDirectoryManager.h>
+#include <framework/utilities/WorkingDirectoryManager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>

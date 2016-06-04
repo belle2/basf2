@@ -9,6 +9,10 @@
 
 #include <TSystem.h>
 
+/**
+ RAII helper class, changing the ROOT working directory
+ and restoring the old one as soon as the object of this class is out of scope
+*/
 class WorkingDirectoryManager {
 public:
   /**

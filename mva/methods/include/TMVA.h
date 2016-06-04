@@ -16,9 +16,8 @@
 #include <mva/interface/Teacher.h>
 #include <mva/interface/Expert.h>
 
-#include <analysis/utility/WorkingDirectoryManager.h>
-#include <analysis/VariableManager/Utility.h>
-
+#include <framework/utilities/MakeROOTCompatible.h>
+#include <framework/utilities/WorkingDirectoryManager.h>
 #include <framework/logging/LogSystem.h>
 #include <framework/utilities/Utils.h>
 #include <framework/logging/Logger.h>

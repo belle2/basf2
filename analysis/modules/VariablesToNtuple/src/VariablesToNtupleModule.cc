@@ -78,7 +78,7 @@ void VariablesToNtupleModule::initialize()
   string varlist = "__weight__";
   for (const string& varStr : m_variables) {
     varlist += ":";
-    varlist += Variable::makeROOTCompatible(varStr);
+    varlist += makeROOTCompatible(varStr);
 
     //also collection function pointers
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);

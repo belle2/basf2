@@ -1,6 +1,7 @@
 #pragma once
 
 #include <analysis/VariableManager/Manager.h>
+#include <framework/utilities/MakeROOTCompatible.h>
 
 #include <string>
 #include <memory>
@@ -10,21 +11,6 @@ namespace Belle2 {
   class Particle;
 
   namespace Variable {
-
-    /**
-     * Remove special characters that ROOT dislikes in branch names, e.g. (, ), :, etc
-     */
-    std::string makeROOTCompatible(std::string str);
-
-    /**
-     * Invert makeROOTCompatible operation
-     */
-    std::string invertMakeROOTCompatible(std::string str);
-
-    /**
-     * Substituation map for makeROOTCompatible
-     */
-    std::map<std::string, std::string> getSubstitutionMap();
 
     /**
      * Returns position of the matched closing parenthesis if the first character in the given

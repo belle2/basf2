@@ -97,8 +97,8 @@ namespace Belle2 {
   {
     if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
 
-      m_target = Variable::makeROOTCompatible(m_target);
-      m_weight = Variable::makeROOTCompatible(m_weight);
+      m_target = makeROOTCompatible(m_target);
+      m_weight = makeROOTCompatible(m_weight);
 
       if (m_target == "") {
         m_teacher->trainSPlot(m_modelFileName, m_discriminatingVariables, m_weight);

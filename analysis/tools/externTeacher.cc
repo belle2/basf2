@@ -191,8 +191,8 @@ int main(int argc, char* argv[])
   TMVAInterface::TeacherConfig config(prefix, treeName, workingDirectory, variables, spectators, methods);
   auto teacher = std::unique_ptr<TMVAInterface::Teacher>(new TMVAInterface::Teacher(config, true));
 
-  target = Variable::makeROOTCompatible(target);
-  weight = Variable::makeROOTCompatible(weight);
+  target = makeROOTCompatible(target);
+  weight = makeROOTCompatible(weight);
 
   if (target == "") {
     teacher->trainSPlot(modelFileName, discriminatingVariables, weight);

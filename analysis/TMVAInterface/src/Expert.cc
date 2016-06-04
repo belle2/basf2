@@ -12,7 +12,7 @@
 #include <analysis/TMVAInterface/Method.h>
 #include <analysis/VariableManager/Utility.h>
 
-#include <analysis/utility/WorkingDirectoryManager.h>
+#include <framework/utilities/WorkingDirectoryManager.h>
 #include <framework/logging/Logger.h>
 
 #include <TSystem.h>
@@ -48,10 +48,10 @@ namespace Belle2 {
 
       m_input.resize(variable_names.size() + spectator_names.size(), 0);
       for (unsigned int i = 0; i < variable_names.size(); ++i) {
-        m_reader->AddVariable(Variable::makeROOTCompatible(variable_names[i]), &m_input[i]);
+        m_reader->AddVariable(makeROOTCompatible(variable_names[i]), &m_input[i]);
       }
       for (unsigned int i = 0; i < spectator_names.size(); ++i) {
-        m_reader->AddSpectator(Variable::makeROOTCompatible(spectator_names[i]), &m_input[i + variable_names.size()]);
+        m_reader->AddSpectator(makeROOTCompatible(spectator_names[i]), &m_input[i + variable_names.size()]);
       }
 
       if (!m_reader->BookMVA(m_config.getMethod(), m_config.getWeightfile())) {

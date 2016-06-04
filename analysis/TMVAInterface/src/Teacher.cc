@@ -8,12 +8,12 @@
  **************************************************************************/
 
 #include <analysis/TMVAInterface/Teacher.h>
-#include <analysis/utility/WorkingDirectoryManager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/RootMergeable.h>
 #include <framework/utilities/Utils.h>
+#include <framework/utilities/WorkingDirectoryManager.h>
 #include <analysis/TMVAInterface/Config.h>
 #include <analysis/TMVAInterface/SPlot.h>
 #include <analysis/TMVAInterface/Expert.h>
@@ -100,9 +100,9 @@ namespace Belle2 {
         tree = new TTree(m_config.getTeacherTreeName().c_str(), m_config.getTeacherTreeName().c_str());
 
         for (unsigned int i = 0; i < variable_names.size(); ++i)
-          tree->Branch(Variable::makeROOTCompatible(variable_names[i]).c_str(), &m_input[i]);
+          tree->Branch(makeROOTCompatible(variable_names[i]).c_str(), &m_input[i]);
         for (unsigned int i = 0; i < spectator_names.size(); ++i)
-          tree->Branch(Variable::makeROOTCompatible(spectator_names[i]).c_str(), &m_input[i + variable_names.size()]);
+          tree->Branch(makeROOTCompatible(spectator_names[i]).c_str(), &m_input[i + variable_names.size()]);
         tree->Branch("__weight__", &m_original_weight);
 
       }
@@ -131,9 +131,9 @@ namespace Belle2 {
 
       m_tree->get().SetBranchAddress("__weight__", &m_original_weight);
       for (unsigned int i = 0; i < variable_names.size(); ++i)
-        m_tree->get().SetBranchAddress(Variable::makeROOTCompatible(variable_names[i]).c_str(), &m_input[i]);
+        m_tree->get().SetBranchAddress(makeROOTCompatible(variable_names[i]).c_str(), &m_input[i]);
       for (unsigned int i = 0; i < spectator_names.size(); ++i)
-        m_tree->get().SetBranchAddress(Variable::makeROOTCompatible(spectator_names[i]).c_str(), &m_input[i + variable_names.size()]);
+        m_tree->get().SetBranchAddress(makeROOTCompatible(spectator_names[i]).c_str(), &m_input[i + variable_names.size()]);
     }
 
     void Teacher::writeTree()
@@ -303,7 +303,7 @@ namespace Belle2 {
 
       TCut cut;
       if (target != "")
-        cut = (std::string("abs(") + Variable::makeROOTCompatible(target) + " - " + std::to_string(classID) +
+        cut = (std::string("abs(") + makeROOTCompatible(target) + " - " + std::to_string(classID) +
                std::string(") < 1e-2")).c_str();
       m_tree->get().SetBranchStatus("*", 1);
       TTree* tree = m_tree->get().CopyTree(cut);
@@ -434,7 +434,7 @@ namespace Belle2 {
       std::vector<std::string> cleaned_variables;
 
       for (auto& x : m_config.getVariables()) {
-        std::string varname = Variable::makeROOTCompatible(x);
+        std::string varname = makeROOTCompatible(x);
         if (m_tree->get().GetMinimum(varname.c_str()) < m_tree->get().GetMaximum(varname.c_str())) {
           cleaned_variables.push_back(x);
         } else {
@@ -530,11 +530,11 @@ namespace Belle2 {
 
       // Add variables to the factory
       for (auto& var : m_config.getVariables()) {
-        factory.AddVariable(Variable::makeROOTCompatible(var));
+        factory.AddVariable(makeROOTCompatible(var));
       }
 
       for (auto& var : m_config.getSpectators()) {
-        factory.AddSpectator(Variable::makeROOTCompatible(var));
+        factory.AddSpectator(makeROOTCompatible(var));
       }
 
       factory.SetSignalWeightExpression(signal_weight);

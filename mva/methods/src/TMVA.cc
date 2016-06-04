@@ -140,18 +140,18 @@ namespace Belle2 {
 
       // Add variables to the factory
       for (auto& var : m_general_options.m_variables) {
-        factory.AddVariable(Belle2::Variable::makeROOTCompatible(var));
+        factory.AddVariable(Belle2::makeROOTCompatible(var));
       }
 
-      factory.SetWeightExpression(Belle2::Variable::makeROOTCompatible(m_general_options.m_weight_variable));
+      factory.SetWeightExpression(Belle2::makeROOTCompatible(m_general_options.m_weight_variable));
 
       TTree* signal_tree = new TTree("signal_tree", "signal_tree");
       TTree* background_tree = new TTree("background_tree", "background_tree");
 
       for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
-        signal_tree->Branch(Belle2::Variable::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
+        signal_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
                             &training_data.m_input[iFeature]);
-        background_tree->Branch(Belle2::Variable::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
+        background_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
                                 &training_data.m_input[iFeature]);
       }
 
@@ -204,18 +204,18 @@ namespace Belle2 {
 
       // Add variables to the factory
       for (auto& var : m_general_options.m_variables) {
-        factory.AddVariable(Belle2::Variable::makeROOTCompatible(var));
+        factory.AddVariable(Belle2::makeROOTCompatible(var));
       }
-      factory.AddTarget(Belle2::Variable::makeROOTCompatible(m_general_options.m_target_variable));
+      factory.AddTarget(Belle2::makeROOTCompatible(m_general_options.m_target_variable));
 
 
       TTree* regression_tree = new TTree("regression_tree", "regression_tree");
 
       for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
-        regression_tree->Branch(Belle2::Variable::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
+        regression_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
                                 &training_data.m_input[iFeature]);
       }
-      regression_tree->Branch(Belle2::Variable::makeROOTCompatible(m_general_options.m_target_variable).c_str(),
+      regression_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_target_variable).c_str(),
                               &training_data.m_target);
 
       regression_tree->Branch("__weight__", &training_data.m_weight);
@@ -226,7 +226,7 @@ namespace Belle2 {
       }
 
       factory.AddRegressionTree(regression_tree);
-      factory.SetWeightExpression(Belle2::Variable::makeROOTCompatible(m_general_options.m_weight_variable), "Regression");
+      factory.SetWeightExpression(Belle2::makeROOTCompatible(m_general_options.m_weight_variable), "Regression");
 
       auto weightfile = trainFactory(factory, jobName);
       weightfile.addOptions(specific_options);
@@ -249,7 +249,7 @@ namespace Belle2 {
       weightfile.getOptions(general_options);
       m_input_cache.resize(general_options.m_variables.size(), 0);
       for (unsigned int i = 0; i < general_options.m_variables.size(); ++i) {
-        m_expert->AddVariable(Belle2::Variable::makeROOTCompatible(general_options.m_variables[i]), &m_input_cache[i]);
+        m_expert->AddVariable(Belle2::makeROOTCompatible(general_options.m_variables[i]), &m_input_cache[i]);
       }
 
     }

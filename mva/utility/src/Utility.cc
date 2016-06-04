@@ -23,7 +23,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <analysis/VariableManager/Utility.h>
+#include <framework/utilities/MakeROOTCompatible.h>
 
 #include <boost/algorithm/string/predicate.hpp>
 
@@ -86,7 +86,7 @@ namespace Belle2 {
         Belle2::EventMetaData emd(event, run, experiment);
         auto weightfile = Weightfile::load(filename, emd);
         weightfiles.push_back(weightfile);
-        std::string branchname = Belle2::Variable::makeROOTCompatible(filename);
+        std::string branchname = Belle2::makeROOTCompatible(filename);
         auto branch = tree.Branch(branchname.c_str(), &result, (branchname + "/F").c_str());
         branches.push_back(branch);
       }
@@ -114,7 +114,7 @@ namespace Belle2 {
           branch->Fill();
         }
 
-        std::string branchname = Belle2::Variable::makeROOTCompatible(general_options.m_target_variable);
+        std::string branchname = Belle2::makeROOTCompatible(general_options.m_target_variable);
 
         if (std::find(known_targets.begin(), known_targets.end(), branchname) == known_targets.end() and not branchname.empty()) {
           known_targets.push_back(branchname);

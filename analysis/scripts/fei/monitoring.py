@@ -62,6 +62,7 @@ def removeJPsiSlash(string):
 
 
 class Statistic(object):
+
     def __init__(self, nTrueSig, nSig, nBg):
         self.nTrueSig = nTrueSig
         self.nSig = nSig
@@ -127,6 +128,7 @@ class Statistic(object):
 
 
 class MonitoringHist(object):
+
     def __init__(self, filename):
         filename = removeJPsiSlash(filename)
         self.valid = os.path.isfile(filename)
@@ -146,14 +148,14 @@ class MonitoringHist(object):
             two_dimensional = isinstance(hist, ROOT.TH2D) or isinstance(hist, ROOT.TH2F)
             if two_dimensional:
                 nbins = (hist.GetNbinsX(), hist.GetNbinsY())
-                self.centers[name] = np.array([[hist.GetXaxis().GetBinCenter(i) for i in range(nbins[0]+2)],
-                                               [hist.GetYaxis().GetBinCenter(i) for i in range(nbins[1]+2)]])
-                self.values[name] = np.array([[hist.GetBinContent(i, j) for i in range(nbins[0]+2)] for j in range(nbins[1]+2)])
+                self.centers[name] = np.array([[hist.GetXaxis().GetBinCenter(i) for i in range(nbins[0] + 2)],
+                                               [hist.GetYaxis().GetBinCenter(i) for i in range(nbins[1] + 2)]])
+                self.values[name] = np.array([[hist.GetBinContent(i, j) for i in range(nbins[0] + 2)] for j in range(nbins[1] + 2)])
                 self.nbins[name] = nbins
             else:
                 nbins = hist.GetNbinsX()
-                self.centers[name] = np.array([hist.GetBinCenter(i) for i in range(nbins+2)])
-                self.values[name] = np.array([hist.GetBinContent(i) for i in range(nbins+2)])
+                self.centers[name] = np.array([hist.GetBinCenter(i) for i in range(nbins + 2)])
+                self.values[name] = np.array([hist.GetBinContent(i) for i in range(nbins + 2)])
                 self.nbins[name] = nbins
 
     def mean(self, name):
@@ -165,7 +167,7 @@ class MonitoringHist(object):
         if name not in self.centers:
             return np.nan
         avg = np.average(self.centers[name], weights=self.values[name])
-        return np.sqrt(np.average((self.centers[name]-avg)**2, weights=self.values[name]))
+        return np.sqrt(np.average((self.centers[name] - avg)**2, weights=self.values[name]))
 
     def min(self, name):
         if name not in self.centers:
@@ -185,6 +187,7 @@ class MonitoringHist(object):
 
 
 class MonitoringNTuple(object):
+
     def __init__(self, filename):
         filename = removeJPsiSlash(filename)
         self.valid = os.path.isfile(filename)
@@ -195,6 +198,7 @@ class MonitoringNTuple(object):
 
 
 class MonitoringMVARanking(object):
+
     def __init__(self, tmvaPrefix):
         if tmvaPrefix is None:
             self.valid = False
@@ -223,6 +227,7 @@ class MonitoringMVARanking(object):
 
 
 class MonitoringModuleStatistics(object):
+
     def __init__(self, particle, statistic, particle2list, channel2lists):
         self.channel_time = {}
         self.channel_time_per_module = {}
@@ -385,7 +390,7 @@ def MonitorROCPlot(particle, filename):
 def MonitorDiagPlot(particle, filename):
     ROOT.gROOT.SetBatch(True)
     nbins = 100
-    probabilityVar = ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(SignalProbability)')
+    probabilityVar = ROOT.Belle2.makeROOTCompatible('extraInfo(SignalProbability)')
 
     canvas = ROOT.TCanvas(filename, 'Diagonal plot', 1600, 1200)
     canvas.cd()
@@ -437,7 +442,7 @@ def MonitoringMCCount(particle, summary):
 
     key = 'NumberOfMCParticlesInEvent({})'.format(abs(pdg.from_name(particle.name)))
     Belle2.Variable.Manager
-    key = Belle2.Variable.makeROOTCompatible(key)
+    key = Belle2.makeROOTCompatible(key)
     hist = root_file.Get(key)
 
     mc_counts = {}
@@ -567,6 +572,7 @@ class MonitoringBranchingFractions(object):
 
 
 class MonitoringParticle(object):
+
     def __init__(self, particle, summary):
         particle2list = {k: v for k, v in summary['particle2list'].items() if v is not None}
         channel2lists = {k: v for k, v in summary['channel2lists'].items() if v is not None}

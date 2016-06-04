@@ -69,7 +69,7 @@ void VariablesToHistogramModule::initialize()
     float low = 0;
     float high = 0;
     std::tie(varStr, varNbins, low, high) = varTuple;
-    std::string compatibleName = Variable::makeROOTCompatible(varStr);
+    std::string compatibleName = makeROOTCompatible(varStr);
 
     auto ptr = std::unique_ptr<StoreObjPtr<RootMergeable<TH1D>>>(new StoreObjPtr<RootMergeable<TH1D>>("", DataStore::c_Persistent));
     ptr->registerInDataStore(m_fileName + varStr, DataStore::c_DontWriteOut);
@@ -97,8 +97,8 @@ void VariablesToHistogramModule::initialize()
     float low2 = 0;
     float high2 = 0;
     std::tie(varStr1, varNbins1, low1, high1, varStr2, varNbins2, low2, high2) = varTuple;
-    std::string compatibleName1 = Variable::makeROOTCompatible(varStr1);
-    std::string compatibleName2 = Variable::makeROOTCompatible(varStr2);
+    std::string compatibleName1 = makeROOTCompatible(varStr1);
+    std::string compatibleName2 = makeROOTCompatible(varStr2);
 
     auto ptr2d = std::unique_ptr<StoreObjPtr<RootMergeable<TH2D>>>(new StoreObjPtr<RootMergeable<TH2D>>("", DataStore::c_Persistent));
     ptr2d->registerInDataStore(m_fileName + varStr1 + varStr2, DataStore::c_DontWriteOut);

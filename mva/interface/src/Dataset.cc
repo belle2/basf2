@@ -10,8 +10,7 @@
 
 #include <mva/interface/Dataset.h>
 
-#include <analysis/VariableManager/Utility.h>
-
+#include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
@@ -178,7 +177,7 @@ namespace Belle2 {
 
     std::vector<float> ROOTDataset::getFeature(unsigned int iFeature)
     {
-      std::string branchName = Belle2::Variable::makeROOTCompatible(m_general_options.m_variables[iFeature]);
+      std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]);
       int nentries = m_tree->GetEntries();
       std::vector<float> values(nentries);
 
@@ -214,13 +213,13 @@ namespace Belle2 {
       if (m_general_options.m_weight_variable == "__weight__") {
         m_tree->SetBranchAddress("__weight__", &m_weight);
       } else if (not m_general_options.m_weight_variable.empty()) {
-        m_tree->SetBranchAddress(Belle2::Variable::makeROOTCompatible(m_general_options.m_weight_variable).c_str(), &m_weight);
+        m_tree->SetBranchAddress(Belle2::makeROOTCompatible(m_general_options.m_weight_variable).c_str(), &m_weight);
       }
       if (not m_general_options.m_target_variable.empty()) {
-        m_tree->SetBranchAddress(Belle2::Variable::makeROOTCompatible(m_general_options.m_target_variable).c_str(), &m_target);
+        m_tree->SetBranchAddress(Belle2::makeROOTCompatible(m_general_options.m_target_variable).c_str(), &m_target);
       }
       for (unsigned int i = 0; i < m_general_options.m_variables.size(); ++i)
-        m_tree->SetBranchAddress(Belle2::Variable::makeROOTCompatible(m_general_options.m_variables[i]).c_str(), &m_input[i]);
+        m_tree->SetBranchAddress(Belle2::makeROOTCompatible(m_general_options.m_variables[i]).c_str(), &m_input[i]);
     }
 
   }

@@ -83,7 +83,7 @@ void BestCandidateSelectionModule::event()
 
   std::string extraInfoName;
   if (m_outputVariableName.empty()) {
-    std::string root_compatible_VariableName = Variable::makeROOTCompatible(m_variableName);
+    std::string root_compatible_VariableName = makeROOTCompatible(m_variableName);
     extraInfoName = root_compatible_VariableName + "_rank";
   } else {
     extraInfoName = m_outputVariableName;

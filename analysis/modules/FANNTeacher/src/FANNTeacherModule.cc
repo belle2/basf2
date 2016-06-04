@@ -11,7 +11,7 @@
 #include <analysis/modules/FANNTeacher/FANNTeacherModule.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/utility/WorkingDirectoryManager.h>
+#include <framework/utilities/WorkingDirectoryManager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/ProcHandler.h>
@@ -531,12 +531,12 @@ namespace Belle2 {
     TTree* tree = new TTree(m_treeName.c_str(), m_treeName.c_str());
 
     for (unsigned int i = 0; i < m_variableNames.size(); ++i)
-      tree->Branch(Variable::makeROOTCompatible(m_variableNames[i]).c_str(), &input[i]);
-    tree->Branch(Variable::makeROOTCompatible(m_targetName).c_str(), &input[m_variableNames.size() + 1]);
+      tree->Branch(makeROOTCompatible(m_variableNames[i]).c_str(), &input[i]);
+    tree->Branch(makeROOTCompatible(m_targetName).c_str(), &input[m_variableNames.size() + 1]);
 
     for (unsigned int i = 0; i < m_variableNames.size(); ++i)
-      tree -> SetBranchAddress(Variable::makeROOTCompatible(m_variableNames[i]).c_str(), &input[i]);
-    tree -> SetBranchAddress(Variable::makeROOTCompatible(m_targetName).c_str(), &input[m_variableNames.size() + 1]);
+      tree -> SetBranchAddress(makeROOTCompatible(m_variableNames[i]).c_str(), &input[i]);
+    tree -> SetBranchAddress(makeROOTCompatible(m_targetName).c_str(), &input[m_variableNames.size() + 1]);
     B2INFO("here0");
     for (unsigned event = 0; event < m_trainSet.nSamples(); ++event) {
       // Fill the tree with the input variables
@@ -599,8 +599,8 @@ namespace Belle2 {
         B2ERROR("Data File does not contain the number of needed variables, i.e. Branches.");
 
       for (unsigned int i = 0; i < m_variableNames.size(); ++i)
-        tree -> SetBranchAddress(Variable::makeROOTCompatible(m_variableNames[i]).c_str(), &data[i]);
-      tree -> SetBranchAddress(Variable::makeROOTCompatible(m_targetName).c_str(), &data[m_variableNames.size() + 1]);
+        tree -> SetBranchAddress(makeROOTCompatible(m_variableNames[i]).c_str(), &data[i]);
+      tree -> SetBranchAddress(makeROOTCompatible(m_targetName).c_str(), &data[m_variableNames.size() + 1]);
 
       for (unsigned int event = 0; event < tree -> GetEntries(); ++event) {
         tree->GetEntry(event);

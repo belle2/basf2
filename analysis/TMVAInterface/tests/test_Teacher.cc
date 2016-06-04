@@ -90,8 +90,8 @@ namespace {
       }
     }
 
-    teacher.trainClassification(factoryOption, prepareOption, Variable::makeROOTCompatible(target),
-                                Variable::makeROOTCompatible(weight));
+    teacher.trainClassification(factoryOption, prepareOption, makeROOTCompatible(target),
+                                makeROOTCompatible(weight));
     MockPluginInspector& inspector = MockPluginInspector::GetInstance();
 
     EXPECT_EQ(n / 2, inspector.GetTrainEvents().size());
@@ -149,8 +149,8 @@ namespace {
       }
     }
 
-    EXPECT_NO_B2ERROR(teacher.trainClassification(factoryOption, prepareOption, Variable::makeROOTCompatible(target),
-                                                  Variable::makeROOTCompatible(weight)));
+    EXPECT_NO_B2ERROR(teacher.trainClassification(factoryOption, prepareOption, makeROOTCompatible(target),
+                                                  makeROOTCompatible(weight)));
   }
 
   TEST(TMVAInterfaceTest, TeacherDropsConstantVariable)
@@ -192,8 +192,8 @@ namespace {
       }
     }
 
-    teacher.trainClassification(factoryOption, prepareOption, Variable::makeROOTCompatible(target),
-                                Variable::makeROOTCompatible(weight));
+    teacher.trainClassification(factoryOption, prepareOption, makeROOTCompatible(target),
+                                makeROOTCompatible(weight));
     MockPluginInspector& inspector = MockPluginInspector::GetInstance();
 
     EXPECT_EQ(n / 2, inspector.GetTrainEvents().size());

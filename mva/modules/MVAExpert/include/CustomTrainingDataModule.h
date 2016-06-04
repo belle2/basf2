@@ -46,8 +46,8 @@ namespace Belle2 {
     virtual void terminate() override;
 
   private:
-    std::string m_filename; /** name of output file */
-    std::ofstream m_file; /** output file */
+    std::string m_filename; /**< name of output file */
+    std::ofstream m_file; /**< output file */
 
   };
 

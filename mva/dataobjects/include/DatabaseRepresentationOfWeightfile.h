@@ -33,7 +33,7 @@ namespace Belle2 {
 
     std::string m_data; /**< Serialized weightfile */
 
-    ClassDef(DatabaseRepresentationOfWeightfile, 1);
+    ClassDef(DatabaseRepresentationOfWeightfile, 1); /**< Class to store weightfile in datastore */
   };
 
 }

@@ -15,12 +15,19 @@ class State(object):
     XGBoost state
     """
     def __init__(self, num_round=0, parameters=None):
+        """ Constructor of the state object """
+        #: Parameters passed to xgboost model
         self.parameters = parameters
+        #: Number of boosting rounds used in xgboost training
         self.num_round = num_round
+        #: XGBoost estimator
         self.estimator = None
 
 
 def get_model(number_of_features, number_of_events, parameters):
+    """
+    Return default xgboost model
+    """
     param = {'bst:max_depth': 2, 'bst:eta': 1, 'silent': 1, 'objective': 'binary:logistic'}
     if isinstance(parameters, collections.Mapping):
         param.update(parameters)

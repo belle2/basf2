@@ -65,7 +65,7 @@ namespace Belle2 {
 
     std::vector<std::string> m_listNames; /**< input particle list names */
     std::string m_identifier; /**< weight-file */
-    std::string m_extraInfoName; /** Name under which the SignalProbability is stored in the extraInfo of the Particle object. */
+    std::string m_extraInfoName; /**< Name under which the SignalProbability is stored in the extraInfo of the Particle object. */
     double m_signal_fraction_override; /**< Signal Fraction which should be used. < 0 means use signal fraction of training sample */
 
     std::vector<const Variable::Manager::Var*> m_feature_variables; /**< Pointers to the feature variables */

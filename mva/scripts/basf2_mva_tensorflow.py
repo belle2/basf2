@@ -12,14 +12,22 @@ class State(object):
     Tensorflow state
     """
     def __init__(self, x=None, y=None, activation=None, cost=None, optimizer=None, session=None):
+        """ Constructor of the state object """
+        #: feature matrix placeholder
         self.x = x
+        #: target placeholder
         self.y = y
+        #: activation function
         self.activation = activation
+        #: cost function
         self.cost = cost
+        #: optimizer used to minimize cost function
         self.optimizer = optimizer
+        #: tensorflow session
         self.session = session
 
     def add_to_collection(self):
+        """ Add the stored members to the current tensorflow collection """
         tf.add_to_collection('x', self.x)
         tf.add_to_collection('y', self.x)
         tf.add_to_collection('activation', self.activation)
@@ -27,6 +35,7 @@ class State(object):
         tf.add_to_collection('optimizer', self.optimizer)
 
     def get_from_collection(self):
+        """ Get members from the current tensorflow collection """
         self.x = tf.get_collection('x')[0]
         self.y = tf.get_collection('y')[0]
         self.activation = tf.get_collection('activation')[0]
@@ -35,6 +44,9 @@ class State(object):
 
 
 def get_model(number_of_features, number_of_events, parameters):
+    """
+    Return default tensorflow model
+    """
     x = tf.placeholder("float", [None, number_of_features])
     y = tf.placeholder("float", [None])
     W = tf.Variable(tf.zeros([number_of_features, 1]))

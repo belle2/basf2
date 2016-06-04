@@ -62,6 +62,9 @@ namespace Belle2 {
     m_file.close();
   }
 
+  /**
+    Helper function which writes something to a binary stream
+  */
   template<class T>
   void binaryWrite(std::ofstream& stream, T x)
   {

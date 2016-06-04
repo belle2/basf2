@@ -166,7 +166,7 @@ namespace Belle2 {
       virtual std::vector<float> getFeature(unsigned int iFeature) override;
 
     private:
-      bool m_use_event_indices = false;
+      bool m_use_event_indices = false; /**< Use only a subset of the wrapped dataset events */
       std::vector<unsigned int>
       m_feature_indices; /**< Mapping from the position of a feature in the given subset to its position in the wrapped dataset */
       std::vector<unsigned int>

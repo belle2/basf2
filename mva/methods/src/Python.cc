@@ -63,12 +63,22 @@ namespace Belle2 {
       return description;
     }
 
+    /**
+    Singleton class which handles the initalization and finalization of Python
+        and numpy
+    */
     class PythonInitializerSingleton {
 
     public:
+      /**
+        Return static instance of PythonInitializerSingleton
+      */
       static PythonInitializerSingleton& GetInstance();
 
     private:
+      /**
+        Constructor of PythonInitializerSingleton
+      */
       PythonInitializerSingleton()
       {
         if (not Py_IsInitialized()) {
@@ -84,6 +94,9 @@ namespace Belle2 {
         }
       }
 
+      /**
+        Destructor of PythonInitializerSingleton
+      */
       ~PythonInitializerSingleton()
       {
         if (m_initialized_python) {
@@ -93,8 +106,16 @@ namespace Belle2 {
         }
       }
 
+      /**
+        Forbid copy constructor of PythonInitializerSingleton
+      */
       PythonInitializerSingleton(const PythonInitializerSingleton&) = delete;
 
+      /**
+        Helper funtion which initalizes array system of numpy.
+        Since import_array is a weird macro we need this wrapper function
+        to protect us from the return statement in this macro
+      */
       void* init_numpy()
       {
         // Import array is a macro which returns NUMPY_IMPORT_ARRAY_RETVAL
@@ -102,7 +123,7 @@ namespace Belle2 {
         return NULL;
       }
 
-      bool m_initialized_python = false;
+      bool m_initialized_python = false; /**< Member which keeps indicate if this class initialized python */
     };
 
     PythonInitializerSingleton& PythonInitializerSingleton::GetInstance()

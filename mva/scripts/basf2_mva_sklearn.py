@@ -13,6 +13,8 @@ class State(object):
     SKLearn state
     """
     def __init__(self, estimator=None):
+        """ Constructor of the state object """
+        #: Pickable sklearn estimator
         self.estimator = estimator
 
 

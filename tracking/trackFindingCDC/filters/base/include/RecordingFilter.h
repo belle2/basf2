@@ -13,32 +13,43 @@
 #include <tracking/trackFindingCDC/tmva/Recorder.h>
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
+#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Filter based on a tmva method.
-    template<class AVarSet>
-    class RecordingFilter: public FilterOnVarSet<AVarSet> {
+    /**
+     *  Filter adapter to make a filter work on a set of variables and record
+     *  the observed instances on invokation
+     */
+    template<class AFilter>
+    class Recording : public OnVarSet<AFilter> {
 
     private:
-      /// Type of the super class
-      typedef FilterOnVarSet<AVarSet> Super;
+      /// Type of the base class
+      using Super = OnVarSet<AFilter>;
 
     public:
       /// Type of the object to be analysed.
-      typedef typename AVarSet::Object Object;
+      using Object = typename AFilter::Object;
+
+    private:
+      /// Type of the var set interface to be used
+      using AVarSet = BaseVarSet<Object>;
 
     public:
       /// Constructor of the filter.
-      RecordingFilter(const std::string& defaultRootFileName = "records.root",
-                      const std::string& defaultTreeName = "records") :
-        Super(),
-        m_recorder(nullptr),
-        m_param_rootFileName(defaultRootFileName),
-        m_param_treeName(defaultTreeName),
-        m_param_returnWeight(NAN)
+      Recording(std::unique_ptr<AVarSet> varSet,
+                const std::string& defaultRootFileName = "records.root",
+                const std::string& defaultTreeName = "records")
+        : Super(std::move(varSet)),
+          m_recorder(nullptr),
+          m_param_rootFileName(defaultRootFileName),
+          m_param_treeName(defaultTreeName),
+          m_param_returnWeight(NAN)
       {}
 
       /// Expose the set of parameters of the filter to the module parameter list.
@@ -120,11 +131,11 @@ namespace Belle2 {
 
     public:
       /// Getter for the skim filter to select objects to be recorded
-      Filter<Object>* getSkimFilter() const
+      MayBePtr<AFilter> getSkimFilter() const
       { return m_skimFilter.get(); }
 
       /// Setter for the skim filter to select objects to be recorded
-      void setSkimFilter(std::unique_ptr<Filter<Object>> skimFilter)
+      void setSkimFilter(std::unique_ptr<AFilter> skimFilter)
       { m_skimFilter = std::move(skimFilter); }
 
     private:
@@ -141,8 +152,29 @@ namespace Belle2 {
       Weight m_param_returnWeight;
 
       /// Skimming filter to select a subset of objects to be recorded.
-      std::unique_ptr<Filter<Object> > m_skimFilter = nullptr;
+      std::unique_ptr<AFilter> m_skimFilter = nullptr;
+    };
 
+    /// Filter based on a tmva method.
+    template<class AVarSet>
+    class RecordingFilter: public Recording<Filter<typename AVarSet::Object> > {
+
+    private:
+      /// Type of the super class
+      typedef Recording<Filter<typename AVarSet::Object> > Super;
+
+    public:
+      /// Type of the object to be analysed.
+      typedef typename AVarSet::Object Object;
+
+    public:
+      /// Constructor of the filter.
+      RecordingFilter(const std::string& defaultRootFileName = "records.root",
+                      const std::string& defaultTreeName = "records")
+        : Super(std::unique_ptr<AVarSet>(new AVarSet()),
+                defaultRootFileName,
+                defaultTreeName)
+      {}
     };
   }
 }

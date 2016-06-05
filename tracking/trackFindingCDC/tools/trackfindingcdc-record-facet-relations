@@ -13,7 +13,7 @@ import logging
 
 class CDCFacetRelationRecordingRun(RecordingRun):
     """Run for recording facet relations encountered at the filter"""
-    n_events = 50
+    # n_events = 50
     # bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
     root_output_file_name = "CDCFacetRelationTruthRecords.root"
@@ -21,7 +21,9 @@ class CDCFacetRelationRecordingRun(RecordingRun):
 
     recording_filter_parameter_name = "FacetRelationFilterParameters"
 
-    recording_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
+    recording_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton",
+                                                    FacetUpdateDriftLength=True, 
+                                                    FacetFilter="chi2")
 
     recording_finder_module.param({
         "FacetRelationFilter": "unionrecording",

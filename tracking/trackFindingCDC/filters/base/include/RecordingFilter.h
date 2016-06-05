@@ -77,7 +77,7 @@ namespace Belle2 {
       {
         Super::initialize();
         if (m_skimFilter) m_skimFilter->initialize();
-        m_recorder.reset(new Recorder(Super::getVarSet().getAllVariables(),
+        m_recorder.reset(new Recorder(Super::getVarSet().getNamedVariables(),
                                       m_param_rootFileName,
                                       m_param_treeName));
       }

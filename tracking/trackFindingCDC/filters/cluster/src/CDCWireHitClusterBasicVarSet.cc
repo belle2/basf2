@@ -21,8 +21,8 @@ using namespace TrackFindingCDC;
 /// Important to define the constexpr here such that it gains external linkage.
 //constexpr const char* const TrackFindingCDC::clusterNames[11];
 
-CDCWireHitClusterBasicVarSet::CDCWireHitClusterBasicVarSet(const std::string& prefix) :
-  VarSet<CDCWireHitClusterBasicVarNames>(prefix)
+CDCWireHitClusterBasicVarSet::CDCWireHitClusterBasicVarSet() :
+  VarSet<CDCWireHitClusterBasicVarNames>()
 {
 }
 

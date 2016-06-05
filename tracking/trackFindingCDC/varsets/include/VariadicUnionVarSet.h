@@ -23,12 +23,12 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-       Class that accomodates many variable sets and presents them as on set of variables.
-       In contrast to the UnionVarSet the individual VarSets are given as variadic template parameters.
-
-       Dummy implementation based on UnionVarSet. The UnionVarSet can be optimized and leverage that
-       the types of all nested variable sets are known at compile time.
-    */
+     *  Class that accomodates many variable sets and presents them as on set of variables.
+     *  In contrast to the UnionVarSet the individual VarSets are given as variadic template parameters.
+     *
+     *  Dummy implementation based on UnionVarSet. The UnionVarSet can be optimized and leverage that
+     *  the types of all nested variable sets are known at compile time.
+     */
     template<class... AVarSets>
     class VariadicUnionVarSet : public BaseVarSet<typename FirstType<AVarSets...>::Object> {
 
@@ -45,30 +45,22 @@ namespace Belle2 {
       typedef BaseVarSet<Object> ContainedVarSet;
 
     public:
-      /// Create the union varset with the given prefix to all variables.
-      explicit VariadicUnionVarSet(const std::string& prefix = "")
+      /// Create the union variable set.
+      explicit VariadicUnionVarSet()
       {
         EvalVariadic{
-          (m_multiVarSet.push_back(std::unique_ptr<ContainedVarSet>(new AVarSets(prefix))) , true)...
+          (m_multiVarSet.push_back(std::unique_ptr<ContainedVarSet>(new AVarSets())) , true)...
         };
 
         assert(m_multiVarSet.size() == sizeof...(AVarSets));
-
       }
 
     public:
       using Super::extract;
 
       /**
-         Main method that extracts the variable values from the complex object.
-      @returns  Indication whether the extraction could be completed successfully.
-      */
-      virtual bool extract(const Object* obj) override final
-      { return m_multiVarSet.extract(obj); }
-
-      /**
-      Initialize all contained variable set before event processing.
-      */
+       *  Initialize all contained variable set before event processing.
+       */
       virtual void initialize() override final
       { m_multiVarSet.initialize(); }
 
@@ -85,27 +77,31 @@ namespace Belle2 {
       { m_multiVarSet.beginRun(); }
 
       /**
-         Terminate all contained variable set after event processing.
-      */
+       *  Terminate all contained variable set after event processing.
+       */
       virtual void terminate() override final
       { m_multiVarSet.terminate(); }
 
       /**
-      Getter for the named tuples storing the values of all the (possibly nested) VarSets
-      Base implementation returns empty vector.
+       *  Main method that extracts the variable values from the complex object.
+       *  @returns  Indication whether the extraction could be completed successfully.
        */
-      virtual
-      std::vector<Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables() override final
-      { return m_multiVarSet.getAllVariables(); }
+      virtual bool extract(const Object* obj) override final
+      { return m_multiVarSet.extract(obj); }
 
       /**
-         Const getter for the named tuples storing the values of all the (possibly nested)
-         variable sets. Base implementation returns an empty vector.
+       *  Getter for the named references to the individual variables
+       *  Base implementaton returns empty vector
        */
-      virtual
-      std::vector<const Belle2::TrackFindingCDC::NamedFloatTuple*>
-      getAllVariables() const override final
-      { return m_multiVarSet.getAllVariables(); }
+      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix = "") override
+      { return m_multiVarSet.getNamedVariables(prefix); }
+
+      /**
+       *   Pointer to the variable with the given name.
+       *   Returns nullptr if not found.
+       */
+      virtual MayBePtr<Float_t> find(std::string varName) override
+      { return m_multiVarSet.find(varName); }
 
     private:
       /// Container for the multiple variable sets.

@@ -14,8 +14,8 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-BasicFacetRelationVarSet::BasicFacetRelationVarSet(const std::string& prefix)
-  : Super(prefix)
+BasicFacetRelationVarSet::BasicFacetRelationVarSet()
+  : Super()
 {
 }
 

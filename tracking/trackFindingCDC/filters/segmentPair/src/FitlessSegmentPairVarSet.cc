@@ -36,8 +36,8 @@ namespace {
 
 }
 
-FitlessSegmentPairVarSet::FitlessSegmentPairVarSet(const std::string& prefix)
-  : Super(prefix)
+FitlessSegmentPairVarSet::FitlessSegmentPairVarSet()
+  : Super()
 {
 }
 

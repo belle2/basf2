@@ -78,8 +78,7 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
         super(ClusterFilterValidationModule, self).__init__(foreach="CDCWireHitClusterVector",
                                                             output_file_name=output_file_name)
         self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
-        prefix = ""
-        self.cluster_varset = Belle2.TrackFindingCDC.CDCWireHitClusterVarSet(prefix)
+        self.cluster_varset = Belle2.TrackFindingCDC.CDCWireHitClusterVarSet()
 
     def initialize(self):
         self.cluster_varset.initialize()
@@ -99,7 +98,7 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
         mc_hit_lookup = self.mc_hit_lookup
 
         self.cluster_varset.extract(cluster)
-        cluster_crops = self.cluster_varset.getNamedValuesWithPrefix()
+        cluster_crops = self.cluster_varset.getNamedValues()
         cluster_crops = dict(cluster_crops)
 
         # Truth variables

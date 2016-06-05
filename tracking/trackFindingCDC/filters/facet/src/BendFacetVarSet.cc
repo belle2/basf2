@@ -22,8 +22,8 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-BendFacetVarSet::BendFacetVarSet(const std::string& prefix)
-  : Super(prefix)
+BendFacetVarSet::BendFacetVarSet()
+  : Super()
 {
 }
 

@@ -13,7 +13,6 @@
 
 #include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
 
-
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <vector>
@@ -47,28 +46,6 @@ namespace Belle2 {
       static const size_t nVars = AObjectVarNames::nNames;
 
     public:
-      /// Constructure taking a optional prefix that can be attached to the names if request.
-      explicit VarSet(const std::string& prefix = "") :
-        m_superLayerCenters(),
-        m_variables(prefix),
-        m_nestedVarSet(prefix)
-      {}
-
-      /// Extract the nested variables next
-      bool extractNested(const Object* obj)
-      {
-        return m_nestedVarSet.extract(AObjectVarNames::getNested(obj));
-      }
-
-      using Super::extract;
-
-      /// Main method that extracts the variable values from the complex object.
-      virtual
-      bool extract(const Object* obj) override
-      {
-        return extractNested(obj);
-      }
-
       /**
        *  Initialize the variable set before event processing.
        *  Can be specialised if the derived variable set has setup work to do.
@@ -95,26 +72,41 @@ namespace Belle2 {
       virtual void terminate() override
       { m_nestedVarSet.terminate(); }
 
-      /** Getter for the named tuples storing the values of all the (possibly nested) VarSets
-       *  Base implementation returns the  named tuple of this variable set.
-       */
-      virtual
-      std::vector<Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables() override
+      /// Extract the nested variables next
+      bool extractNested(const Object* obj)
       {
-        std::vector<NamedFloatTuple*> result = m_nestedVarSet.getAllVariables();
-        result.push_back(&m_variables);
+        return m_nestedVarSet.extract(AObjectVarNames::getNested(obj));
+      }
+
+      using Super::extract;
+
+      /// Main method that extracts the variable values from the complex object.
+      virtual bool extract(const Object* obj) override
+      {
+        return extractNested(obj);
+      }
+
+      /**
+       *  Getter for the named references to the individual variables
+       *  Base implementaton returns empty vector
+       */
+      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix = "") override
+      {
+        std::vector<Named<Float_t*> > result = m_nestedVarSet.getNamedVariables(prefix);
+        std::vector<Named<Float_t*> > extend = m_variables.getNamedVariables(prefix);
+        result.insert(result.end(), extend.begin(), extend.end());
         return result;
       }
 
-      /** Const getter for the named tuples storing the values of all the (possibly nested)
-       *  variable sets. Base implementation returns the named tuple of this variable set.
+      /**
+       *   Pointer to the variable with the given name.
+       *   Returns nullptr if not found.
        */
-      virtual
-      std::vector<const Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables() const override
+      virtual MayBePtr<Float_t> find(std::string varName) override
       {
-        std::vector<const NamedFloatTuple*> result = m_nestedVarSet.getAllVariables();
-        result.push_back(&m_variables);
-        return result;
+        MayBePtr<Float_t> found = m_nestedVarSet.find(varName);
+        if (found) return found;
+        return m_variables.find(varName);
       }
 
     protected:

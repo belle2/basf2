@@ -19,7 +19,7 @@ Weight SimpleSegmentTrackFilter::operator()(const std::pair<const CDCRecoSegment
 {
   Super::operator()(testPair);
 
-  const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();
+  const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValues();
   bool is_stereo = testPair.first->getStereoKind() != EStereoKind::c_Axial;
   double hit_distance = varSet.at("maxmimum_hit_distance_front");
 

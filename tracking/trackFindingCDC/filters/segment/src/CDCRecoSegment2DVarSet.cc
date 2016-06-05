@@ -16,8 +16,8 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRecoSegment2DVarSet::CDCRecoSegment2DVarSet(const std::string& prefix) :
-  VarSet<CDCRecoSegment2DVarNames>(prefix)
+CDCRecoSegment2DVarSet::CDCRecoSegment2DVarSet() :
+  VarSet<CDCRecoSegment2DVarNames>()
 {
 }
 

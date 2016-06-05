@@ -11,6 +11,9 @@
 
 #include <Rtypes.h>
 
+#include <tracking/trackFindingCDC/utilities/Named.h>
+#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+
 #include <vector>
 #include <map>
 #include <string>
@@ -22,16 +25,14 @@ namespace Belle2 {
     class NamedFloatTuple {
 
     public:
-      /// Constructor taking an optional prefix that is prepended to all names if requested.
-      explicit NamedFloatTuple(const std::string& prefix = "");
-
       /// Marking the destructor virtual since we are using virtual functions.
       virtual ~NamedFloatTuple();
 
       /// Getter for the number of parts
       virtual size_t size() const = 0;
 
-      /** Getter for the index from a name.
+      /**
+       *  Getter for the index from a name.
        *  Looks through the associated names and returns the right index if found.
        *  Returns size() (one after the last element) if not found.
        *
@@ -43,25 +44,28 @@ namespace Belle2 {
       /// Getter for the ith name.
       virtual std::string getName(int iValue) const = 0;
 
-      /// Getter for the ith name including the optional prefix.
-      std::string getNameWithPrefix(int iValue) const;
-
       /// Setter for the value of the ith part.
       virtual void set(int iValue, Float_t value) = 0;
 
       /// Setter for the value with the given name.
       void set(const char* const name, Float_t value)
-      {
-        set(getNameIndex(name), value);
-      }
+      { set(getNameIndex(name), value); }
 
       /// Getter for the value of the ith part.
       virtual Float_t get(int iValue) const = 0;
 
       /// Getter for the value with the given name.
       Float_t get(const char* const name) const
+      { return get(getNameIndex(name)); }
+
+      /**
+       *  Getter for a pointer to the value with the given name.
+       *  Return nullptr if not found.
+       */
+      virtual MayBePtr<Float_t> find(std::string name)
       {
-        return get(getNameIndex(name));
+        size_t index = getNameIndex(name.c_str());
+        return (index < size()) ? &(operator[](index)) : nullptr;
       }
 
       /// Reference getter for the value of the ith part.
@@ -69,27 +73,13 @@ namespace Belle2 {
 
       /// Reference getter for the value with the given name.
       Float_t& operator[](const char* const name)
-      {
-        return operator[](getNameIndex(name));
-      }
+      { return operator[](getNameIndex(name)); }
 
-      /// Getter for a map of all name and value pairs
-      std::map<std::string, Float_t> getNamedValues() const;
+      /// Getter for a map of all name and value pairs in this tuple
+      std::map<std::string, Float_t> getNamedValues(std::string prefix = "") const;
 
-      /// Getter for a map of all name including the optional prefix and value pairs
-      std::map<std::string, Float_t> getNamedValuesWithPrefix() const;
-
-      /// Getter for the optional prefix to the names
-      std::string getPrefix() const
-      { return m_prefix;}
-
-      /// Setter for the optional prefix to the names
-      void setPrefix(const std::string& prefix)
-      { m_prefix = prefix;}
-
-    private:
-      /// Memory for the optional prefix.
-      std::string m_prefix;
+      /// Getter for named references to the variables in this tuple
+      std::vector<Named<Float_t*> > getNamedVariables(std::string prefix = "");
     };
   }
 }

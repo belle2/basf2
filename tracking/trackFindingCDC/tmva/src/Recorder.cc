@@ -42,18 +42,15 @@ Recorder::Recorder(const std::function<void(TTree&)>& setBranches,
 }
 
 
-Recorder::Recorder(const std::vector<NamedFloatTuple*>& allVariables,
+Recorder::Recorder(const std::vector<Named<Float_t* > >& namedVariables,
                    const std::string& rootFileName,
                    const std::string& treeName) :
-  Recorder([ & allVariables](TTree & tree)
+  Recorder([ & namedVariables](TTree & tree)
 {
-  for (NamedFloatTuple* variables : allVariables) {
-    size_t nVars = variables->size();
-    for (size_t iVar = 0; iVar < nVars; ++iVar) {
-      std::string name = variables->getNameWithPrefix(iVar);
-      Float_t& value = (*variables)[iVar];
-      tree.Branch(name.c_str(), &value);
-    }
+  for (const Named<Float_t*>& namedVariable : namedVariables) {
+    std::string name = namedVariable.getName();
+    Float_t* variable = namedVariable;
+    tree.Branch(name.c_str(), variable);
   }
 },
 rootFileName,

@@ -19,8 +19,8 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FitSegmentPairVarSet::FitSegmentPairVarSet(const std::string& prefix) :
-  Super(prefix)
+FitSegmentPairVarSet::FitSegmentPairVarSet() :
+  Super()
 {
 }
 

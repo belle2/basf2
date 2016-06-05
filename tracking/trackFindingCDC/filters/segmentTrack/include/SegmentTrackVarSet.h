@@ -78,8 +78,8 @@ namespace Belle2 {
     class SegmentTrackVarSet : public VarSet<SegmentTrackVarNames> {
 
     public:
-      /// Construct the peeler and take an optional prefix.
-      explicit SegmentTrackVarSet(const std::string& prefix = "") : VarSet<SegmentTrackVarNames>(prefix) { }
+      /// Construct the peeler.
+      explicit SegmentTrackVarSet() : VarSet<SegmentTrackVarNames>() { }
 
       /// Generate and assign the variables from the pair
       virtual bool extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair) override final;

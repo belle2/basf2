@@ -62,8 +62,8 @@ namespace Belle2 {
     class StereoHitVarSet : public VarSet<StereoHitVarNames> {
 
     public:
-      /// Construct the peeler and take an optional prefix.
-      explicit StereoHitVarSet(const std::string& prefix = "") : VarSet<StereoHitVarNames>(prefix) { }
+      /// Construct the peeler.
+      explicit StereoHitVarSet() : VarSet<StereoHitVarNames>() { }
 
       /// Generate and assign the variables from the pair
       virtual bool extract(const std::pair<const CDCRecoHit3D*, const CDCTrack*>* testPair) override;

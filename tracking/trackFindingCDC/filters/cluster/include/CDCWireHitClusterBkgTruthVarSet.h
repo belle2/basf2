@@ -55,8 +55,8 @@ namespace Belle2 {
     class CDCWireHitClusterBkgTruthVarSet : public VarSet<CDCWireHitClusterBkgTruthVarNames> {
 
     public:
-      /// Construct the peeler and take an optional prefix.
-      explicit CDCWireHitClusterBkgTruthVarSet(const std::string& prefix = "");
+      /// Construct the peeler.
+      explicit CDCWireHitClusterBkgTruthVarSet();
 
       /// Signal the beginning of a new event - loads the Monte Carlo information
       virtual void beginEvent() override;

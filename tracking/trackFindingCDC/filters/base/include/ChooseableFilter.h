@@ -14,6 +14,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+
     /// Filter can delegate its decision to a filter choosen and set up at run time by parameters from a module
     template<class AFilterFactory>
     class ChooseableFilter: public AFilterFactory::CreatedFilter {

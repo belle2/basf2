@@ -59,8 +59,8 @@ namespace Belle2 {
       using Super = VarSet<TruthFacetRelationVarNames>;
 
     public:
-      /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      explicit TruthFacetRelationVarSet(const std::string& prefix = "");
+      /// Construct the varset to be prepended to all variable names.
+      explicit TruthFacetRelationVarSet();
 
       /// Generate and assign the variables from the facet relation
       virtual bool extract(const Relation<const CDCFacet>* ptrFacetRelation) override final;

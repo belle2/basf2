@@ -127,9 +127,8 @@ namespace Belle2 {
             B2WARNING("Could not construct filter for name " << filterName);
             return std::unique_ptr<BaseVarSet<Object>>(nullptr);
           } else {
-            std::string prefix = filterName + "_";
-            BaseVarSet<Object>* filterVarSet = new FilterVarSet<CreatedFilter>(prefix,
-                std::move(filter));
+            BaseVarSet<Object>* filterVarSet =
+              new FilterVarSet<CreatedFilter>(filterName, std::move(filter));
             return std::unique_ptr<BaseVarSet<Object> >(filterVarSet);
           }
         } else {

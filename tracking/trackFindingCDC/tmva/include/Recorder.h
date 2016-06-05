@@ -45,7 +45,7 @@ namespace Belle2 {
        *  @param rootFileName   Name of ROOT file to which should be written.
        *  @param treeName       Name of the TTree in the ROOT file.
        */
-      Recorder(const std::vector<NamedFloatTuple*>& allVariables,
+      Recorder(const std::vector<Named<Float_t*> >& namedVariables,
                const std::string& rootFileName,
                const std::string& treeName = "recorded_tree");
 

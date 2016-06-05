@@ -73,8 +73,8 @@ namespace Belle2 {
       using Super = VarSet<BendFacetVarNames>;
 
     public:
-      /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      explicit BendFacetVarSet(const std::string& prefix = "");
+      /// Construct the varset to be prepended to all variable names.
+      explicit BendFacetVarSet();
 
       /// Generate and assign the variables from the facet
       virtual bool extract(const CDCFacet* facet) override final;

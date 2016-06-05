@@ -18,18 +18,10 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**
-       A sentinal variable set that does not contain variables and does no extraction.
+     *  A sentinal variable set that does not contain variables and does no extraction.
      */
     template<class AObject>
     class EmptyVarSet final : public BaseVarSet<AObject> {
-
-    private:
-      /// Number of floating point values represented by this class.
-      static const size_t nVars = 0;
-
-    public:
-      /// Constructure taking a optional prefix that can be attached to the names if request.
-      explicit EmptyVarSet(const std::string& /*prefix*/ = "") {}
 
     }; //end class
 

@@ -13,8 +13,8 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-SkimmedFitlessSegmentPairVarSet::SkimmedFitlessSegmentPairVarSet(const std::string& prefix) :
-  Super(prefix)
+SkimmedFitlessSegmentPairVarSet::SkimmedFitlessSegmentPairVarSet() :
+  Super()
 {
 }
 

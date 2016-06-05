@@ -18,8 +18,8 @@ namespace Belle2 {
     class BackgroundSegmentTruthVarSet : public CDCRecoSegment2DTruthVarSet {
 
     public:
-      /// Construct the peeler and take an optional prefix.
-      explicit BackgroundSegmentTruthVarSet(const std::string& prefix = "") : CDCRecoSegment2DTruthVarSet(prefix) { }
+      /// Construct the peeler.
+      explicit BackgroundSegmentTruthVarSet() : CDCRecoSegment2DTruthVarSet() { }
 
       /// Generate and assign the variables from the cluster
       virtual bool extract(const CDCRecoSegment2D* segment) override final

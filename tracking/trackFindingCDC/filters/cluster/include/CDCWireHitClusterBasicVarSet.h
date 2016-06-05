@@ -86,8 +86,8 @@ namespace Belle2 {
     class CDCWireHitClusterBasicVarSet : public VarSet<CDCWireHitClusterBasicVarNames> {
 
     public:
-      /// Construct the peeler and take an optional prefix.
-      explicit CDCWireHitClusterBasicVarSet(const std::string& prefix = "");
+      /// Construct the peeler.
+      explicit CDCWireHitClusterBasicVarSet();
 
       /// Generate and assign the variables from the cluster
       virtual bool extract(const CDCWireHitCluster* cluster) override final;

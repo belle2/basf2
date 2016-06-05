@@ -34,7 +34,7 @@ namespace Belle2 {
       /** Add variable names and values addresses to the underlying tmva reader
        *  and initalize the method.
        */
-      void initializeReader(std::vector<NamedFloatTuple*> allVariables);
+      void initializeReader(std::vector<Named<Float_t*> > namedVariables);
 
       /// Evaluate the TMVA method and return the MVAOutput
       double useWeight() /*__attribute__((deprecated))*/

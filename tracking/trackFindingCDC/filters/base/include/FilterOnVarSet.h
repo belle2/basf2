@@ -89,15 +89,12 @@ namespace Belle2 {
         bool result = Super::needsTruthInformation();
         if (result) return true;
 
-        const std::vector<NamedFloatTuple*>& allVariables = m_varSet->getAllVariables();
-        for (NamedFloatTuple* variables : allVariables) {
-          size_t nVars = variables->size();
-          for (size_t iVar = 0; iVar < nVars; ++iVar) {
-            std::string name = variables->getNameWithPrefix(iVar);
-            // If the name contains the word truth it is considered to have Monte carlo information.
-            if (name.find("truth") != std::string::npos) {
-              return true;
-            }
+        const std::vector<Named<Float_t*> >& namedVariables = m_varSet->getNamedVariables();
+        for (const Named<Float_t*>& namedVariable : namedVariables) {
+          std::string name = namedVariable.getName();
+          // If the name contains the word truth it is considered to have Monte carlo information.
+          if (name.find("truth") != std::string::npos) {
+            return true;
           }
         }
         return false;

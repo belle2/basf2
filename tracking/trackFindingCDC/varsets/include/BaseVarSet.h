@@ -12,6 +12,9 @@
 
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
+#include <tracking/trackFindingCDC/utilities/Named.h>
+#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+
 #include <map>
 #include <vector>
 #include <string>
@@ -19,9 +22,9 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**
-    Generic class that generates some named float values from a given object.
-
-    Base class defining the interface for various different implementation of sets of variables.
+     *  Generic class that generates some named float values from a given object.
+     *
+     *  Base class defining the interface for various different implementation of sets of variables.
      **/
     template<class AObject>
     class BaseVarSet {
@@ -35,20 +38,8 @@ namespace Belle2 {
       virtual ~BaseVarSet() {}
 
       /**
-      Main method that extracts the variable values from the complex object.
-      @returns  Indication whether the extraction could be completed successfully.
-             Base implementation returns always true.
-      */
-      virtual bool extract(const Object* /*obj*/)
-      { return true; }
-
-      /// Method for extraction from an object instead of a pointer.
-      bool extract(const Object& obj)
-      { return extract(&obj); }
-
-      /**
-      Initialize the variable set before event processing.
-         Can be specialised if the derived variable set has setup work to do.
+       *  Initialize the variable set before event processing.
+       *  Can be specialised if the derived variable set has setup work to do.
        */
       virtual void initialize()
       {}
@@ -66,42 +57,61 @@ namespace Belle2 {
       {}
 
       /**
-      Terminate the variable set after event processing.
-      Can be specialised if the derived variable set has to tear down aquired resources.
+       *  Terminate the variable set after event processing.
+       *  Can be specialised if the derived variable set has to tear down aquired resources.
        */
       virtual void terminate()
       {}
 
       /**
-      Getter for the named tuples storing the values of all the (possibly nested) VarSets
-      Base implementation returns empty vector.
+       *  Main method that extracts the variable values from the complex object.
+       *  @returns  Indication whether the extraction could be completed successfully.
+       *            Base implementation returns always true.
        */
-      virtual std::vector<Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables()
-      { return std::vector<NamedFloatTuple*>(); }
+      virtual bool extract(const Object* /*obj*/)
+      { return true; }
+
+      /// Method for extraction from an object instead of a pointer.
+      bool extract(const Object& obj)
+      { return extract(&obj); }
 
       /**
-      Const getter for the named tuples storing the values of all the (possibly nested)
-      variable sets. Base implementation returns an empty vector.
+       *  Getter for the named references to the individual variables
+       *  Base implementaton returns empty vector
        */
-      virtual std::vector<const Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables() const
-      { return std::vector<const NamedFloatTuple*>(); }
+      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string /*prefix*/ = "")
+      { return {}; }
 
-      /// Getter for a map of all name including the optional prefix and value pairs
-      std::map<std::string, Float_t> getNamedValuesWithPrefix() const
+      /**
+       *  Getter for a map of names to float values
+       */
+      virtual std::map<std::string, Float_t> getNamedValues(std::string prefix = "")
       {
-        std::map<std::string, Float_t> namedValues;
-        std::vector<const NamedFloatTuple*> allVariables = getAllVariables();
-        for (const NamedFloatTuple* variables : allVariables) {
-          size_t nVariables = variables->size();
-          for (size_t iVariable = 0; iVariable < nVariables; ++iVariable) {
-            std::string name = variables->getNameWithPrefix(iVariable);
-            Float_t value = variables->get(iVariable);
-            namedValues[name] = value;
-          }
+        std::map<std::string, Float_t> result;
+        std::vector<Named<Float_t*> > namedVariables = getNamedVariables(prefix);
+        for (const Named<Float_t* >& namedVariable : namedVariables) {
+          Float_t* variable = namedVariable;
+          result[namedVariable.getName()] = *variable;
         }
-        return namedValues;
+        return result;
       }
 
-    }; //end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+      /**
+       *   Pointer to the variable with the given name.
+       *   Returns nullptr if not found.
+       */
+      virtual MayBePtr<Float_t> find(std::string varName)
+      {
+        std::vector<Named<Float_t*> > namedVariables = getNamedVariables();
+        for (const Named<Float_t* >& namedVariable : namedVariables) {
+          if (namedVariable.getName() == varName) {
+            Float_t* variable = namedVariable;
+            return variable;
+          }
+        }
+        return nullptr;
+      }
+
+    }; // end class
+  } // end namespace TrackFindingCDC
+} // end namespace Belle2

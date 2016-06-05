@@ -15,25 +15,26 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     /// MC Filter Type using a VarSet and the truth variable in it.
     template<class ATruthVarSet>
-    class MCFilter : public FilterOnVarSet<ATruthVarSet> {
+    class MCFilter : public OnVarSet<Filter<typename ATruthVarSet::Object> > {
 
     public:
       /// Type of the super class.
-      typedef FilterOnVarSet<ATruthVarSet> Super;
+      using Super = OnVarSet<Filter<typename ATruthVarSet::Object> > ;
+
       /// Type of the handled object.
       typedef typename ATruthVarSet::Object Object;
 
     public:
       /// Constructor.
-      MCFilter() : Super() { }
+      MCFilter() : Super(std::unique_ptr<ATruthVarSet>(new ATruthVarSet)) { }
 
       /// Reject an item if the truth variable is 0, else accept it.
       virtual Weight operator()(const Object& object) override
       {
         Super::operator()(object);
-        const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();
+        MayBePtr<Float_t> truth = Super::getVarSet().find("truth");
 
-        if (varSet.at("truth") == 0.0)
+        if (not truth or (*truth) == 0.0)
           return NAN;
         else
           return 1.0;

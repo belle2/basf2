@@ -13,44 +13,35 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-NamedFloatTuple::NamedFloatTuple(const string& prefix) :
-  m_prefix(prefix)
-{
-}
-
 NamedFloatTuple::~NamedFloatTuple()
 {
 }
 
-std::string NamedFloatTuple::getNameWithPrefix(int iValue) const
-{
-  return m_prefix + getName(iValue);
-}
-
-std::map<std::string, Float_t> NamedFloatTuple::getNamedValues() const
+std::map<std::string, Float_t> NamedFloatTuple::getNamedValues(std::string prefix) const
 {
   std::map<std::string, Float_t> namedValues;
-  size_t nValues = size();
+  size_t nVars = size();
 
-  for (size_t iValue = 0; iValue < nValues; ++iValue) {
-    std::string name = getName(iValue);
-    Float_t value = get(iValue);
+  for (size_t iVar = 0; iVar < nVars; ++iVar) {
+    std::string name = prefix + getName(iVar);
+    Float_t value = get(iVar);
     namedValues[name] = value;
   }
 
   return namedValues;
 }
 
-std::map<std::string, Float_t> NamedFloatTuple::getNamedValuesWithPrefix() const
+std::vector<Named<Float_t*> > NamedFloatTuple::getNamedVariables(std::string prefix)
 {
-  std::map<std::string, Float_t> namedValues;
-  size_t nValues = size();
+  std::vector<Named<Float_t*> > namedVariables;
+  int nVars = size();
+  namedVariables.reserve(nVars);
 
-  for (size_t iValue = 0; iValue < nValues; ++iValue) {
-    std::string name = getNameWithPrefix(iValue);
-    Float_t value = get(iValue);
-    namedValues[name] = value;
+  for (int iVar = 0; iVar < nVars; ++iVar) {
+    std::string name = prefix + getName(iVar);
+    Float_t& value = operator[](iVar);
+    namedVariables.emplace_back(name, &value);
   }
 
-  return namedValues;
+  return namedVariables;
 }

@@ -46,8 +46,8 @@ namespace Belle2 {
     class CDCTrackTruthVarSet : public VarSet<CDCTrackTruthVarNames> {
 
     public:
-      /// Construct the peeler and take an optional prefix.
-      explicit CDCTrackTruthVarSet(const std::string& prefix = "") : VarSet<CDCTrackTruthVarNames>(prefix) { }
+      /// Construct the peeler.
+      explicit CDCTrackTruthVarSet() : VarSet<CDCTrackTruthVarNames>() { }
 
       /// Generate and assign the variables from the cluster
       virtual bool extract(const CDCTrack* segment) override;

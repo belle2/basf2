@@ -42,17 +42,14 @@ void Expert::initializeReader(const std::function<void(TMVA::Reader&)>& setReade
   m_reader.BookMVA("FastBDT", getAbsWeightFilePath());
 }
 
-void Expert::initializeReader(std::vector<NamedFloatTuple*> allVariables)
+void Expert::initializeReader(std::vector<Named<Float_t*> > namedVariables)
 {
-  initializeReader([&allVariables](TMVA::Reader & reader) {
-    for (NamedFloatTuple* variables : allVariables) {
-      size_t nVars = variables->size();
-      for (size_t iVar = 0; iVar < nVars; ++iVar) {
-        std::string name = variables->getNameWithPrefix(iVar);
-        TString tName(name.c_str());
-        Float_t& value = (*variables)[iVar];
-        reader.AddVariable(tName, &value);
-      }
+  initializeReader([&namedVariables](TMVA::Reader & reader) {
+    for (const Named<Float_t*>& namedVariable : namedVariables) {
+      std::string name = namedVariable.getName();
+      TString tName(name.c_str());
+      Float_t* variable = namedVariable;
+      reader.AddVariable(tName, variable);
     }
   });
 }

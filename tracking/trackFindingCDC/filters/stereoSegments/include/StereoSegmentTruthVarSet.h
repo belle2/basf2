@@ -49,8 +49,8 @@ namespace Belle2 {
     class StereoSegmentTruthVarSet : public VarSet<StereoSegmentTruthVarNames> {
 
     public:
-      /// Construct the peeler and take an optional prefix.
-      explicit StereoSegmentTruthVarSet(const std::string& prefix = "") : VarSet<StereoSegmentTruthVarNames>(prefix) { }
+      /// Construct the peeler.
+      explicit StereoSegmentTruthVarSet() : VarSet<StereoSegmentTruthVarNames>() { }
 
       /// Generate and assign the variables from the pair.
       virtual bool extract(const std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>, const CDCTrack&>* testPair)

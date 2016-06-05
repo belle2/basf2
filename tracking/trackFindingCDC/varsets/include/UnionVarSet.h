@@ -38,24 +38,8 @@ namespace Belle2 {
       typedef BaseVarSet<Object> ContainedVarSet;
 
     public:
-      using Super::extract;
-
       /**
-      Main method that extracts the variable values from the complex object.
-
-      @returns  Indication whether the extraction could be completed successfully.
-      */
-      virtual bool extract(const Object* obj) override final
-      {
-        bool result = true;
-        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
-          result &= varSet->extract(obj);
-        }
-        return result;
-      }
-
-      /**
-      Initialize all contained variable set before event processing.
+       *  Initialize all contained variable set before event processing.
        */
       virtual void initialize() override final
       {
@@ -89,8 +73,8 @@ namespace Belle2 {
       }
 
       /**
-      Terminate all contained variable set after event processing.
-      */
+       *  Terminate all contained variable set after event processing.
+       */
       virtual void terminate() override final
       {
         for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
@@ -98,40 +82,48 @@ namespace Belle2 {
         }
       }
 
+      /// Allowing the other variant of the extract method
+      using Super::extract;
+
       /**
-      Getter for the named tuples storing the values of all the (possibly nested) VarSets
-      Base implementation returns empty vector.
+       *  Main method that extracts the variable values from the complex object.
+       *
+       *  @returns  Indication whether the extraction could be completed successfully.
        */
-      virtual
-      std::vector<Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables() override final
+      virtual bool extract(const Object* obj) override final
       {
-        std::vector<NamedFloatTuple*> allVariables;
+        bool result = true;
         for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
-          std::vector<NamedFloatTuple*> variablesOfVarSet = varSet->getAllVariables();
-          allVariables.insert(allVariables.end(),
-                              variablesOfVarSet.begin(),
-                              variablesOfVarSet.end());
+          result &= varSet->extract(obj);
         }
-        return allVariables;
+        return result;
       }
 
       /**
-         Const getter for the named tuples storing the values of all the (possibly nested)
-         variable sets. Base implementation returns an empty vector.
+       *  Getter for the named references to the individual variables
+       *  Base implementaton returns empty vector
        */
-      virtual
-      std::vector<const Belle2::TrackFindingCDC::NamedFloatTuple*>
-      getAllVariables() const override final
+      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix = "") override
       {
-        std::vector<const NamedFloatTuple*> allVariables;
-        for (const std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
-          const ContainedVarSet* constVarSet = varSet.get();
-          std::vector<const NamedFloatTuple*> variablesOfVarSet = constVarSet->getAllVariables();
-          allVariables.insert(allVariables.end(),
-                              variablesOfVarSet.begin(),
-                              variablesOfVarSet.end());
+        std::vector<Named<Float_t*> > result;
+        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
+          std::vector<Named<Float_t*> > extend = varSet->getNamedVariables(prefix);
+          result.insert(result.end(), extend.begin(), extend.end());
         }
-        return allVariables;
+        return result;
+      }
+
+      /**
+       *   Pointer to the variable with the given name.
+       *   Returns nullptr if not found.
+       */
+      virtual MayBePtr<Float_t> find(std::string varName) override
+      {
+        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
+          MayBePtr<Float_t> found = varSet->find(varName);
+          if (found) return found;
+        }
+        return nullptr;
       }
 
       /// Add a variable set to the contained variable sets.

@@ -67,7 +67,7 @@ namespace Belle2 {
         Super::initialize();
         m_expert.setWeightFolderName(m_param_weightFolder);
         m_expert.setTrainingName(m_param_trainingName);
-        m_expert.initializeReader(Super::getVarSet().getAllVariables());
+        m_expert.initializeReader(Super::getVarSet().getNamedVariables());
       }
 
     public:

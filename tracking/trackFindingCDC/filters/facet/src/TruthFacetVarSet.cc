@@ -17,8 +17,8 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TruthFacetVarSet::TruthFacetVarSet(const std::string& prefix)
-  : Super(prefix)
+TruthFacetVarSet::TruthFacetVarSet()
+  : Super()
 {
 }
 

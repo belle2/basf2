@@ -15,6 +15,7 @@
 
 #include <framework/core/ModuleParamList.h>
 
+#include <boost/algorithm/string/predicate.hpp>
 #include <memory>
 
 namespace Belle2 {
@@ -65,10 +66,12 @@ namespace Belle2 {
       /// Type of the object from which the filter judgement should be extracted.
       typedef typename Filter::Object Object;
 
-      /// Construct the varset and take an optional prefix.
-      FilterVarSet(const std::string& prefix = "",
+      /// Construct the varset.
+      FilterVarSet(const std::string& filterName = "",
                    std::unique_ptr<Filter> ptrFilter = std::unique_ptr<Filter>(new Filter())) :
-        Super(prefix),
+        Super(),
+        m_filterName(filterName),
+        m_filterNamePrefix(filterName + '_'),
         m_ptrFilter(std::move(ptrFilter))
       {
       }
@@ -151,12 +154,42 @@ namespace Belle2 {
         Super::terminate();
       }
 
+      /**
+       *  Getter for the named references to the individual variables
+       *  Base implementaton returns empty vector
+       */
+      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix = "") override
+      {
+        return Super::getNamedVariables(prefix + m_filterNamePrefix);
+      }
+
+      /**
+       *   Pointer to the variable with the given name.
+       *   Returns nullptr if not found.
+       */
+      virtual MayBePtr<Float_t> find(std::string varName) override
+      {
+        if (boost::starts_with(varName, m_filterNamePrefix)) {
+          std::string varNameWithoutPrefix = varName.substr(m_filterNamePrefix.size());
+          MayBePtr<Float_t> found = Super::find(varNameWithoutPrefix);
+          if (found) return found;
+        }
+        return nullptr;
+      }
+
     public:
       /// The cut on the TMVA output.
       double m_cut = NAN;
 
+      /// Name of the filter
+      std::string m_filterName;
+
+      /// Prefix to be put in front of the filter variables
+      std::string m_filterNamePrefix;
+
       /// Filter from which to generate weight as a variable set;
       std::unique_ptr<Filter> m_ptrFilter;
+
     };
   }
 }

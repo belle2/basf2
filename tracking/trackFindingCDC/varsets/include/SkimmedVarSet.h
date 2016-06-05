@@ -13,8 +13,8 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /** Generic class that generates the same variables from a each of a pair of instances.
-     **/
+
+    /// Variable set that filters on a specific condition
     template<class ABaseVarSet>
     class SkimmedVarSet : public ABaseVarSet {
 
@@ -27,11 +27,6 @@ namespace Belle2 {
       typedef typename ABaseVarSet::Object Object;
 
     public:
-      /// Constructure taking a optional prefix that can be attached to the names if request.
-      explicit SkimmedVarSet(const std::string& prefix = "") :
-        Super(prefix)
-      {}
-
       /// Main method that extracts the variable values from the complex object.
       virtual bool extract(const Object* obj)
       {
@@ -39,7 +34,8 @@ namespace Belle2 {
         return extracted and accept(obj);
       }
 
-      /** Method to be specialised in a derived class after to accept or reject the extracted values.
+      /**
+       *  Method to be specialised in a derived class after to accept or reject the extracted values.
        *
        *  The method may use variables of the object as well as already extracted values.
        */

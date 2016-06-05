@@ -26,8 +26,8 @@ namespace Belle2 {
       using Super = SkimmedVarSet<FitlessSegmentPairVarSet> ;
 
     public:
-      /// Construct the varset and take an optional prefix.
-      explicit SkimmedFitlessSegmentPairVarSet(const std::string& prefix = "");
+      /// Construct the varset.
+      explicit SkimmedFitlessSegmentPairVarSet();
 
       /// Implement the skim cut.
       virtual bool accept(const CDCSegmentPair* ptrSegmentPair) override final;

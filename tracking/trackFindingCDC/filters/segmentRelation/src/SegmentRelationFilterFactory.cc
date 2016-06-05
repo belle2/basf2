@@ -45,15 +45,15 @@ SegmentRelationFilterFactory::getValidFilterNamesAndDescriptions() const
   return filterNames;
 }
 
-std::unique_ptr<Filter<Relation<const CDCRecoSegment2D> > >
+std::unique_ptr<BaseSegmentRelationFilter >
 SegmentRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
-    return std::unique_ptr<Filter<Relation<const CDCRecoSegment2D> > >(new BaseSegmentRelationFilter());
+    return std::unique_ptr<BaseSegmentRelationFilter >(new BaseSegmentRelationFilter());
   } else if (filterName == string("truth")) {
-    return std::unique_ptr<Filter<Relation<const CDCRecoSegment2D> > >(new MCSegmentRelationFilter());
+    return std::unique_ptr<BaseSegmentRelationFilter >(new MCSegmentRelationFilter());
   } else if (filterName == string("unionrecording")) {
-    return std::unique_ptr<Filter<Relation<const CDCRecoSegment2D> > >(new UnionRecordingSegmentRelationFilter());
+    return std::unique_ptr<BaseSegmentRelationFilter >(new UnionRecordingSegmentRelationFilter());
   } else {
     return Super::create(filterName);
   }

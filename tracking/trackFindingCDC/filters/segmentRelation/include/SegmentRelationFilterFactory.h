@@ -23,11 +23,11 @@ namespace Belle2 {
      *  Can collaborate with a Module and expose these parameters to the user in steering files.
      */
     class SegmentRelationFilterFactory :
-      public FilterFactory<Filter<Relation<const CDCRecoSegment2D> > > {
+      public FilterFactory<BaseSegmentRelationFilter > {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<Filter<Relation<const CDCRecoSegment2D> > > Super;
+      typedef FilterFactory<BaseSegmentRelationFilter > Super;
 
     public:
       /** Fill the default filter name and parameter values*/
@@ -36,7 +36,7 @@ namespace Belle2 {
       using Super::create;
 
       /** Create a cluster filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<Filter<Relation<const CDCRecoSegment2D> > > create(const std::string& name) const override;
+      virtual std::unique_ptr<BaseSegmentRelationFilter > create(const std::string& name) const override;
 
       /** Getter for a descriptive purpose of the clusterfilter.*/
       virtual std::string getFilterPurpose() const override;

@@ -21,7 +21,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Base class for filtering the neighborhood of tracks
-    class BaseTrackRelationFilter : public FilterBase<Relation<const CDCTrack> > {
+    class BaseTrackRelationFilter : public Filter<Relation<const CDCTrack> > {
 
     public:
       /// Returns the full range of tracks.

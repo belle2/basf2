@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Base class for filtering the neighborhood of segment triples
-    class BaseSegmentTripleRelationFilter : public FilterBase<Relation<const CDCSegmentTriple>> {
+    class BaseSegmentTripleRelationFilter : public Filter<Relation<const CDCSegmentTriple>> {
 
     public:
       /// Returns a two iterator range covering the range of possible neighboring segment triples of the given facet out of the sorted range given by the two other argumets.

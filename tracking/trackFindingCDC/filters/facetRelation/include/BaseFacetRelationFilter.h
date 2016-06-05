@@ -28,7 +28,7 @@ namespace Belle2 {
      *  isStillPossibleNeighbor method using the geometry of the facet.
      *  Besides that it accepts all facets.
      */
-    class BaseFacetRelationFilter : public FilterBase<Relation<const CDCFacet> > {
+    class BaseFacetRelationFilter : public Filter<Relation<const CDCFacet> > {
 
     public:
       /**

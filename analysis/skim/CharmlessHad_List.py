@@ -42,6 +42,12 @@ def CharmlessHadList():
     bu_VVChannels = ['rho0:loose rho-:loose',
                      ]
 
+    bu_PPPChannels = ['pi+:loose pi-:loose pi+:loose',
+                      'K+:loose K-:loose pi+:loose',
+                      'K+:loose K-:loose K+:loose',
+                      'K+:loose pi-:loose pi+:loose'
+                      ]
+
     bdPPList = []
     for chID, channel in enumerate(bd_PPChannels):
         reconstructDecay('B0:HAD_b2PP' + str(chID) + ' -> ' + channel, btocharmlesscuts, chID)
@@ -72,5 +78,10 @@ def CharmlessHadList():
         reconstructDecay('B-:HAD_b2VV' + str(chID) + ' -> ' + channel, btocharmlesscuts, chID)
         buVVList.append('B-:HAD_b2VV' + str(chID))
 
-    hadLists = bdPPList + bdPVList + bdVVList + buPPList + buPVList + buVVList
+    buPPPList = []
+    for chID, channel in enumerate(bu_PPPChannels):
+        reconstructDecay('B+:HAD_b2PPP' + str(chID) + ' -> ' + channel, btocharmlesscuts, chID)
+        buPPPList.append('B+:HAD_b2PPP' + str(chID))
+
+    hadLists = bdPPList + bdPVList + bdVVList + buPPList + buPVList + buVVList + buPPPList
     return hadLists

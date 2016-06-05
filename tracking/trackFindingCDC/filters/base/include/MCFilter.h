@@ -17,12 +17,13 @@ namespace Belle2 {
     template<class ATruthVarSet>
     class MCFilter : public OnVarSet<Filter<typename ATruthVarSet::Object> > {
 
-    public:
+    private:
       /// Type of the super class.
       using Super = OnVarSet<Filter<typename ATruthVarSet::Object> > ;
 
+    public:
       /// Type of the handled object.
-      typedef typename ATruthVarSet::Object Object;
+      using Object = typename ATruthVarSet::Object;
 
     public:
       /// Constructor.

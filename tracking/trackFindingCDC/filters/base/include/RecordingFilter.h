@@ -155,22 +155,22 @@ namespace Belle2 {
       std::unique_ptr<AFilter> m_skimFilter = nullptr;
     };
 
-    /// Filter based on a tmva method.
+    /// Convience template to create a recording filter for a set of variables.
     template<class AVarSet>
     class RecordingFilter: public Recording<Filter<typename AVarSet::Object> > {
 
     private:
       /// Type of the super class
-      typedef Recording<Filter<typename AVarSet::Object> > Super;
+      using Super = Recording<Filter<typename AVarSet::Object> >;
 
     public:
       /// Type of the object to be analysed.
-      typedef typename AVarSet::Object Object;
+      using Object = typename AVarSet::Object;
 
     public:
       /// Constructor of the filter.
-      RecordingFilter(const std::string& defaultRootFileName = "records.root",
-                      const std::string& defaultTreeName = "records")
+      explicit RecordingFilter(const std::string& defaultRootFileName = "records.root",
+                               const std::string& defaultTreeName = "records")
         : Super(std::unique_ptr<AVarSet>(new AVarSet()),
                 defaultRootFileName,
                 defaultTreeName)

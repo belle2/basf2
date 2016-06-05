@@ -22,11 +22,11 @@ namespace Belle2 {
     /// A filter that records variables form given objects. It may record native varsets and returned weigths from other filters.
     template<class AFilterFactory>
     class UnionRecordingFilter:
-      public RecordingFilter<UnionVarSet<typename AFilterFactory::CreatedFilter::Object> > {
+      public Recording<typename AFilterFactory::CreatedFilter> {
 
     private:
       /// Type of the super class
-      typedef RecordingFilter<UnionVarSet<typename AFilterFactory::CreatedFilter::Object> > Super;
+      using Super = Recording<typename AFilterFactory::CreatedFilter>;
 
       /// Type of the filters that can be included in the recodring
       typedef typename AFilterFactory::CreatedFilter CreatedFilter;
@@ -39,7 +39,9 @@ namespace Belle2 {
       /// Constructor of the filter.
       UnionRecordingFilter(const std::string& defaultRootFileName = "records.root",
                            const std::string& defaultTreeName = "records") :
-        Super(defaultRootFileName, defaultTreeName),
+        Super(std::unique_ptr<UnionVarSet<Object> >(new UnionVarSet<Object>),
+              defaultRootFileName,
+              defaultTreeName),
         m_filterFactory("truth")
       {}
 

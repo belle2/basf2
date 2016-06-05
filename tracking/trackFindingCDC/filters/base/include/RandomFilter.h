@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <TRandom.h>
 
 namespace Belle2 {

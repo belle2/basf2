@@ -23,14 +23,15 @@ namespace Belle2 {
     template<class AFilter>
     class ChooseableFromVarSet : public OnVarSet<AFilter> {
 
+    private:
+      /// Type of the super class
+      using Super =  OnVarSet<AFilter>;
+
     public:
       /// Type of the filtered object.
       using Object = typename AFilter::Object;
 
     private:
-      /// Type of the super class
-      using Super =  OnVarSet<AFilter>;
-
       /// Type of the variable set
       using AVarSet = BaseVarSet<Object>;
 
@@ -103,14 +104,15 @@ namespace Belle2 {
       Float_t* m_variable = nullptr;
     };
 
-    /// MC Filter Type using a VarSet and the truth variable in it.
+    /// Convience template to create a filter returning on variable from a set of variables.
     template<class ATruthVarSet>
     class NamedChoosableVarSetFilter : public ChooseableFromVarSet<Filter<typename ATruthVarSet::Object> > {
 
-    public:
+    private:
       /// Type of the super class
       using Super = ChooseableFromVarSet<Filter<typename ATruthVarSet::Object> > ;
 
+    public:
       /// Type of the filtered object.
       using Object = typename ATruthVarSet::Object;
 

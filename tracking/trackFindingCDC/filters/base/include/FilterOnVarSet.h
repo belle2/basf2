@@ -25,19 +25,17 @@ namespace Belle2 {
     template<class AFilter>
     class OnVarSet : public AFilter {
 
+    private:
+      /// Type of the base class
+      using Super = AFilter;
 
     public:
       /// Type of pbject to be filtered
       using Object = typename AFilter::Object;
 
     private:
-      /// Type of the base class
-      using Super = AFilter;
-
-    private:
       /// Type of the var set interface to be used
       using AVarSet = BaseVarSet<Object>;
-
 
     public:
       /// Constructor from the variable set the filter should use
@@ -122,7 +120,7 @@ namespace Belle2 {
 
     };
 
-    /// Filter based on a tmva method.
+    /// Convience template to create a filter operating on a specific set of variables.
     template<class AVarSet>
     class FilterOnVarSet: public OnVarSet<Filter<typename AVarSet::Object> > {
 

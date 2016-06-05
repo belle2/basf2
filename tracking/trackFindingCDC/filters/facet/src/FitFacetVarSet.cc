@@ -27,59 +27,64 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
   if (not extracted or not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 
+  const Vector2D startWirePos2D = facet.getStartWire().getRefPos2D();
+  const Vector2D middleWirePos2D = facet.getMiddleWire().getRefPos2D();
+  const Vector2D endWirePos2D = facet.getEndWire().getRefPos2D();
+
   {
     int nSteps = 0;
     double chi2_0 = FacetFitter::fit(facet, nSteps);
-    var<named("chi2_0")>() = chi2_0;
+    const UncertainParameterLine2D& fitLine = facet.getFitLine();
+    const double s = fitLine->lengthOnCurve(startWirePos2D, endWirePos2D);
 
-    const ParameterLine2D& fitLine = facet.getStartToEndLine();
-    var<named("fit_0_phi0")>() = fitLine.tangential().phi();
+    var<named("chi2_0")>() = chi2_0;
+    var<named("chi2_0_per_s")>() = chi2_0 / s;
+    var<named("fit_0_phi0")>() = fitLine->tangential().phi();
   }
 
   {
     int nSteps = 1;
     double chi2_1 = FacetFitter::fit(facet, nSteps);
-    var<named("chi2_1")>() = chi2_1;
+    const UncertainParameterLine2D& fitLine = facet.getFitLine();
+    const double s = fitLine->lengthOnCurve(startWirePos2D, endWirePos2D);
 
-    const ParameterLine2D& fitLine = facet.getStartToEndLine();
-    var<named("fit_1_phi0")>() = fitLine.tangential().phi();
+    var<named("chi2_1")>() = chi2_1;
+    var<named("chi2_1_per_s")>() = chi2_1 / s;
+    var<named("fit_1_phi0")>() = fitLine->tangential().phi();
   }
 
-  double chi2 = FacetFitter::fit(facet);
-  const ParameterLine2D& fitLine = facet.getStartToEndLine();
+  {
+    double chi2 = FacetFitter::fit(facet);
+    const UncertainParameterLine2D& fitLine = facet.getFitLine();
+    const double s = fitLine->lengthOnCurve(startWirePos2D, endWirePos2D);
 
-  var<named("chi2")>() = chi2;
+    var<named("chi2")>() = chi2;
 
-  // Heuristic flattening functions. Ffactor is chosen by hand.
-  const double erfWidth = 120.0;
-  const double tanhWidth = 1.64 * erfWidth;
+    // Heuristic flattening functions. Ffactor is chosen by hand.
+    const double erfWidth = 120.0;
+    const double tanhWidth = 1.64 * erfWidth;
 
-  var<named("erf")>() = std::erf(chi2 / erfWidth);
-  var<named("tanh")>() = std::tanh(chi2 / tanhWidth);
+    var<named("erf")>() = std::erf(chi2 / erfWidth);
+    var<named("tanh")>() = std::tanh(chi2 / tanhWidth);
+    var<named("fit_phi0")>() = fitLine->tangential().phi();
 
-  var<named("fit_phi0")>() = fitLine.tangential().phi();
+    const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();
+    const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
+    const CDCRLWireHit& endRLWireHit = facet.getEndRLWireHit();
 
-  const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();
-  const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
-  const CDCRLWireHit& endRLWireHit = facet.getEndRLWireHit();
+    const double startL = startRLWireHit.getSignedRefDriftLength();
+    const double middleL = middleRLWireHit.getSignedRefDriftLength();
+    const double endL = endRLWireHit.getSignedRefDriftLength();
 
-  const Vector2D startWirePos2D = startRLWireHit.getWire().getRefPos2D();
-  const double startL = startRLWireHit.getSignedRefDriftLength();
+    const double startDistance = fitLine->distance(startWirePos2D) - startL;
+    const double middleDistance = fitLine->distance(middleWirePos2D) - middleL;
+    const double endDistance = fitLine->distance(endWirePos2D) - endL;
 
-  const Vector2D middleWirePos2D = middleRLWireHit.getWire().getRefPos2D();
-  const double middleL = middleRLWireHit.getSignedRefDriftLength();
-
-  const Vector2D endWirePos2D = endRLWireHit.getWire().getRefPos2D();
-  const double endL = endRLWireHit.getSignedRefDriftLength();
-
-  const double startDistance = fitLine.distance(startWirePos2D) - startL;
-  const double middleDistance = fitLine.distance(middleWirePos2D) - middleL;
-  const double endDistance = fitLine.distance(endWirePos2D) - endL;
-
-  var<named("start_distance")>() = startDistance;
-  var<named("middle_distance")>() = middleDistance;
-  var<named("end_distance")>() = endDistance;
-  var<named("d2")>() = square(startDistance) + square(middleDistance) + square(endDistance);
+    var<named("start_distance")>() = startDistance;
+    var<named("middle_distance")>() = middleDistance;
+    var<named("end_distance")>() = endDistance;
+    var<named("d2")>() = square(startDistance) + square(middleDistance) + square(endDistance);
+  }
 
   return true;
 }

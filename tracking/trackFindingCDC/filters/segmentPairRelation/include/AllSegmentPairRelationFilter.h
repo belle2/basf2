@@ -16,11 +16,11 @@ namespace Belle2 {
 
     /// Relation filter that lets all possible combinations pass.
     class AllSegmentPairRelationFilter :
-      public Filter<Relation<const CDCSegmentPair>>  {
+      public BaseSegmentPairRelationFilter  {
 
     private:
       /// Type of the super class
-      typedef Filter<Relation<const CDCSegmentPair>> Super;
+      typedef BaseSegmentPairRelationFilter Super;
 
     public:
       /// Importing all overloads from the super class

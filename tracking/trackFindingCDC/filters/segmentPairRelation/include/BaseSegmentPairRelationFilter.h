@@ -20,11 +20,8 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    ///Base class for filtering the neighborhood of axial stereo segment pairs
-
-    template<>
-    class Filter<Relation<const CDCSegmentPair>>  :
-                                                  public FilterBase<Relation<const CDCSegmentPair>> {
+    /// Base class for filtering the neighborhood of axial stereo segment pairs
+    class BaseSegmentPairRelationFilter  : public FilterBase<Relation<const CDCSegmentPair>> {
 
     public:
       /// Returns a two iterator range covering the range of possible neighboring axial stereo segment pairs of the given axial stereo segment pair out of the sorted range given by the two other argumets.
@@ -70,9 +67,6 @@ namespace Belle2 {
         return operator()(from, to);
       }
     }; // end class
-
-    /// Alias for the base class for filtering the neighborhood of axial stereo segment pairs.
-    typedef Filter<Relation<const CDCSegmentPair>>  BaseSegmentPairRelationFilter;
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

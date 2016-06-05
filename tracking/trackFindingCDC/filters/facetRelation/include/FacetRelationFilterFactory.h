@@ -23,11 +23,11 @@ namespace Belle2 {
      *  Can collaborate with a Module and expose these parameters to the user in steering files.
      */
     class FacetRelationFilterFactory :
-      public FilterFactory<Filter<Relation<const CDCFacet> > > {
+      public FilterFactory<BaseFacetRelationFilter > {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<Filter<Relation<const CDCFacet> > > Super;
+      typedef FilterFactory<BaseFacetRelationFilter > Super;
 
     public:
       /// Fill the default filter name and parameter values
@@ -36,7 +36,7 @@ namespace Belle2 {
       using Super::create;
 
       /** Create a cluster filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<Filter<Relation<const CDCFacet> > > create(const std::string& name) const override;
+      virtual std::unique_ptr<BaseFacetRelationFilter > create(const std::string& name) const override;
 
       /** Getter for a descriptive purpose of the clusterfilter.*/
       virtual std::string getFilterPurpose() const override;

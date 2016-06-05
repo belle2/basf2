@@ -49,23 +49,23 @@ FacetRelationFilterFactory::getValidFilterNamesAndDescriptions() const
   return filterNames;
 }
 
-std::unique_ptr<Filter<Relation<const CDCFacet> > >
+std::unique_ptr<BaseFacetRelationFilter >
 FacetRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
-    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new BaseFacetRelationFilter());
+    return std::unique_ptr<BaseFacetRelationFilter >(new BaseFacetRelationFilter());
   } else if (filterName == string("all")) {
-    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new AllFacetRelationFilter());
+    return std::unique_ptr<BaseFacetRelationFilter >(new AllFacetRelationFilter());
   } else if (filterName == string("truth")) {
-    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new MCFacetRelationFilter());
+    return std::unique_ptr<BaseFacetRelationFilter >(new MCFacetRelationFilter());
   } else if (filterName == string("tmva")) {
-    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new TMVAFacetRelationFilter());
+    return std::unique_ptr<BaseFacetRelationFilter >(new TMVAFacetRelationFilter());
   } else if (filterName == string("simple")) {
-    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new SimpleFacetRelationFilter());
+    return std::unique_ptr<BaseFacetRelationFilter >(new SimpleFacetRelationFilter());
   } else if (filterName == string("chi2")) {
-    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new Chi2FacetRelationFilter());
+    return std::unique_ptr<BaseFacetRelationFilter >(new Chi2FacetRelationFilter());
   } else if (filterName == string("unionrecording")) {
-    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new UnionRecordingFacetRelationFilter());
+    return std::unique_ptr<BaseFacetRelationFilter >(new UnionRecordingFacetRelationFilter());
   } else {
     return Super::create(filterName);
   }

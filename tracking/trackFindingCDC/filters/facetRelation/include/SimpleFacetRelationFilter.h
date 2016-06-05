@@ -16,11 +16,11 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class filtering the neighborhood of facets based on simple criterions.
-    class SimpleFacetRelationFilter : public Filter<Relation<const CDCFacet>> {
+    class SimpleFacetRelationFilter : public BaseFacetRelationFilter {
 
     private:
       /// Type of the super class
-      typedef Filter<Relation<const CDCFacet>> Super;
+      typedef BaseFacetRelationFilter Super;
 
     public:
       /// Importing all overloads from the super class

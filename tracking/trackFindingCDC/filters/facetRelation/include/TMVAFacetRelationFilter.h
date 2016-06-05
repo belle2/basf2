@@ -17,16 +17,18 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Background facetRelation detection based on TMVA.
-    class TMVAFacetRelationFilter: public TMVAFilter<TMVAFacetRelationVarSet> {
+    class TMVAFacetRelationFilter: public TMVA<BaseFacetRelationFilter> {
 
     public:
       /// Type of the base class
-      using Super = TMVAFilter<TMVAFacetRelationVarSet>;
+      using Super = TMVA<BaseFacetRelationFilter>;
 
     public:
       /// Constructor initialising the TMVAFilter with standard training name for this filter.
       TMVAFacetRelationFilter()
-        : Super("FacetRelationFilter", -2.19)
+        : Super(std::unique_ptr<TMVAFacetRelationVarSet>(new TMVAFacetRelationVarSet()),
+                "FacetRelationFilter",
+                -2.19)
       {}
 
     public:

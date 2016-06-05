@@ -21,18 +21,20 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Base class for filtering the neighborhood of facets.
-    /** Base implementation providing the getLowestPossibleNeighbor and
+
+    /**
+     *  Base class for filtering the neighborhood of facets.
+     *  Base implementation providing the getLowestPossibleNeighbor and
      *  isStillPossibleNeighbor method using the geometry of the facet.
      *  Besides that it accepts all facets.
      */
-    template<>
-    class Filter<Relation<const CDCFacet>>  :
-                                            public FilterBase<Relation<const CDCFacet>> {
+    class BaseFacetRelationFilter : public FilterBase<Relation<const CDCFacet> > {
 
     public:
-      /** Returns a two iterator range covering the range of possible neighboring
-       *  facets of the given facet out of the sorted range given by the two other argumets.*/
+      /**
+       *  Returns a two iterator range covering the range of possible neighboring
+       *  facets of the given facet out of the sorted range given by the two other argumets.
+       */
       template<class ACDCFacetIterator>
       boost::iterator_range<ACDCFacetIterator>
       getPossibleNeighbors(const CDCFacet& facet,
@@ -48,14 +50,8 @@ namespace Belle2 {
                                                         rangePossibleNeighbors.second);
       }
 
-      /** Legacy method */
-      Weight isGoodNeighbor(const CDCFacet& from ,
-                            const CDCFacet& to)
-      {
-        return operator()(from, to);
-      }
-
-      /** Main filter method returning the weight of the neighborhood relation.
+      /**
+       *  Main filter method returning the weight of the neighborhood relation.
        *  Return always returns NAN to reject all facet neighbors.
        */
       virtual Weight operator()(const CDCFacet& /* from */,
@@ -64,9 +60,11 @@ namespace Belle2 {
         return NAN;
       }
 
-      /** Main filter method overriding the filter interface method.
+      /**
+       *  Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
-       *  the method implementing the rejection.*/
+       *  the method implementing the rejection.
+       */
       virtual Weight operator()(const Relation<const CDCFacet>& relation) override
       {
         const CDCFacet* ptrFrom(relation.first);
@@ -75,11 +73,6 @@ namespace Belle2 {
         return operator()(*ptrFrom, *ptrTo);
       }
 
-
     }; // end class
-
-    /// Alias for the base class for filtering the neighborhood of facets.
-    typedef Filter<Relation<const CDCFacet>> BaseFacetRelationFilter;
-
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

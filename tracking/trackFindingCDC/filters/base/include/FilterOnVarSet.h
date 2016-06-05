@@ -47,7 +47,6 @@ namespace Belle2 {
         B2ASSERT("Varset initialised as nullptr", m_varSet);
       }
 
-
       /// Initialize the filter before event processing.
       virtual void initialize() override
       {
@@ -127,13 +126,13 @@ namespace Belle2 {
     template<class AVarSet>
     class FilterOnVarSet: public OnVarSet<Filter<typename AVarSet::Object> > {
 
-    public:
-      /// Type of the object to be analysed.
-      typedef typename AVarSet::Object Object;
-
     private:
       /// Type of the super class
-      typedef OnVarSet<Filter<Object> > Super;
+      using Super = OnVarSet<Filter<typename AVarSet::Object> >;
+
+    public:
+      /// Type of the object to be analysed.
+      using Object = typename AVarSet::Object;
 
     public:
       /// Constructor of the filter.

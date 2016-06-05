@@ -15,11 +15,11 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Random filter resulting in a random weight between 0 and 1. Only to be used for testing purposes.
-    template<class AFilterType>
-    class RandomFilter : public AFilterType {
+    template<class AFilter>
+    class RandomFilter : public AFilter {
     public:
       /// Never reject an item but give back a random value between 0 and 1.
-      virtual Weight operator()(const typename AFilterType::Object&) override
+      virtual Weight operator()(const typename AFilter::Object&) override
       {
         return gRandom->Rndm();
       }

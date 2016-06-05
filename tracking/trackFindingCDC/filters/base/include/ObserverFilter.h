@@ -19,19 +19,19 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Observer listening to the number of yes and no answers from the filter.
-    template<class ABaseFilter>
-    class ObserverFilter : public ABaseFilter {
+    template<class AFilter>
+    class ObserverFilter : public AFilter {
 
     private:
       /// Type of the filter base class.
-      typedef ABaseFilter Super;
+      typedef AFilter Super;
 
     public:
       /// The base filter.
-      using ABaseFilter::BaseFilter;
+      using AFilter::BaseFilter;
 
       /// Object type to be filtered.
-      typedef typename ABaseFilter::Object Object;
+      typedef typename AFilter::Object Object;
 
     public:
       /// Constructor of the filter.

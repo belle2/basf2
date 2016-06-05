@@ -65,10 +65,9 @@ namespace Belle2 {
       virtual void initialize() override
       {
         Super::initialize();
-        AVarSet& varSet = Super::getVarSet();
         m_expert.setWeightFolderName(m_param_weightFolder);
         m_expert.setTrainingName(m_param_trainingName);
-        m_expert.initializeReader(varSet.getAllVariables());
+        m_expert.initializeReader(Super::getVarSet().getAllVariables());
       }
 
     public:

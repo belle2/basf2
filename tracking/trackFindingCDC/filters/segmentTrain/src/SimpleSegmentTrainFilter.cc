@@ -22,14 +22,12 @@ Weight SimpleSegmentTrainFilter::operator()(const std::pair<std::vector<SegmentI
   const CDCTrack* track = testPair.second;
   const CDCTrajectory2D& trajectory = track->getStartTrajectory3D().getTrajectory2D();
 
-  const SegmentTrainVarSet& varSet = Super::getVarSet();
-
   double lastPerpS;
   bool alreadySet = false;
 
   for (const SegmentInformation* segmentInformation : trainOfSegments) {
     double perpSFront = trajectory.calcArcLength2D(segmentInformation->getSegment()->front().getRecoPos2D());
-    if (alreadySet and perpSFront < (1 - varSet.m_param_percentageForPerpSMeasurements) * lastPerpS) {
+    if (alreadySet and perpSFront < (1 - SegmentTrainVarSet::m_param_percentageForPerpSMeasurements) * lastPerpS) {
       // Means: no
       return NAN;
     }

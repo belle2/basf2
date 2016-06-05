@@ -58,10 +58,11 @@ namespace Belle2 {
     class SegmentTrainVarSet : public VarSet<SegmentTrainVarNames> {
 
     public:
+      /// We use this amount of overlap when defining a segment train
+      static constexpr const float m_param_percentageForPerpSMeasurements = 0.05;
+
       /// Construct the peeler and take an optional prefix.
       explicit SegmentTrainVarSet(const std::string& prefix = "") : VarSet<SegmentTrainVarNames>(prefix) { }
-
-      const float m_param_percentageForPerpSMeasurements = 0.05; /**< We use this amount of overlap when defining a segment train */
 
       /// Generate and assign the variables from the pair
       virtual bool extract(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair)

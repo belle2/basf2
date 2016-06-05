@@ -66,8 +66,9 @@ namespace Belle2 {
       {
         Super::initialize();
         if (m_skimFilter) m_skimFilter->initialize();
-        AVarSet& varSet = Super::getVarSet();
-        m_recorder.reset(new Recorder(varSet.getAllVariables(), m_param_rootFileName, m_param_treeName));
+        m_recorder.reset(new Recorder(Super::getVarSet().getAllVariables(),
+                                      m_param_rootFileName,
+                                      m_param_treeName));
       }
 
       /// Signal the beginning of a new run to the skimming filter and the varset

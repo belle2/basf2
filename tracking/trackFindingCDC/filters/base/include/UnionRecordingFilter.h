@@ -70,26 +70,19 @@ namespace Belle2 {
           this->setSkimFilter(std::move(skimFilter));
         }
 
-        UnionVarSet<Object>& multiVarSet = Super::getVarSet();
+        std::unique_ptr<UnionVarSet<Object> > multiVarSet(new UnionVarSet<Object>());
 
         /// Create and add the concrete varsets from the varset parameter.
         for (std::string name : getVarSetNames()) {
-          std::unique_ptr<BaseVarSet<Object>> varSet = createVarSet(name);
+          std::unique_ptr<BaseVarSet<Object> > varSet = createVarSet(name);
           if (varSet) {
-            multiVarSet.push_back(std::move(varSet));
+            multiVarSet->push_back(std::move(varSet));
           } else {
             B2WARNING("Could not create a variable set from name " << name);
           }
         }
+        Super::setVarSet(std::move(multiVarSet));
         Super::initialize();
-      }
-
-      /// Terminate the recorder after event processing.
-      virtual void terminate() override
-      {
-        Super::terminate();
-        UnionVarSet<Object>& multiVarSet = Super::getVarSet();
-        multiVarSet.clear();
       }
 
       /// Getter for the list of valid names of concret variable sets.

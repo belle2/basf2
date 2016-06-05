@@ -20,10 +20,8 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    ///Base class for filtering the neighborhood of tracks
-    template<>
-    class Filter<Relation<const CDCTrack> > :
-        public FilterBase<Relation<const CDCTrack> > {
+    /// Base class for filtering the neighborhood of tracks
+    class BaseTrackRelationFilter : public FilterBase<Relation<const CDCTrack> > {
 
     public:
       /// Returns the full range of tracks.
@@ -64,9 +62,6 @@ namespace Belle2 {
         return operator()(from, to);
       }
     }; // end class
-
-    /// Alias for the base class for filtering the neighborhood of tracks.
-    typedef Filter<Relation<const CDCTrack> >  BaseTrackRelationFilter;
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

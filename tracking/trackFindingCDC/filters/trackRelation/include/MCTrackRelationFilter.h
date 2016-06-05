@@ -17,11 +17,11 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of track relations based on MC information.
-    class MCTrackRelationFilter : public MCSymmetricFilterMixin<Filter<Relation<const CDCTrack> > > {
+    class MCTrackRelationFilter : public MCSymmetricFilterMixin<BaseTrackRelationFilter > {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<Filter<Relation<const CDCTrack> > > Super;
+      typedef MCSymmetricFilterMixin<BaseTrackRelationFilter > Super;
 
     public:
       /** Constructor also setting the switch ,

@@ -45,15 +45,15 @@ TrackRelationFilterFactory::getValidFilterNamesAndDescriptions() const
   return filterNames;
 }
 
-std::unique_ptr<Filter<Relation<const CDCTrack> > >
+std::unique_ptr<BaseTrackRelationFilter >
 TrackRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
-    return std::unique_ptr<Filter<Relation<const CDCTrack> > >(new BaseTrackRelationFilter());
+    return std::unique_ptr<BaseTrackRelationFilter >(new BaseTrackRelationFilter());
   } else if (filterName == string("truth")) {
-    return std::unique_ptr<Filter<Relation<const CDCTrack> > >(new MCTrackRelationFilter());
+    return std::unique_ptr<BaseTrackRelationFilter >(new MCTrackRelationFilter());
   } else if (filterName == string("unionrecording")) {
-    return std::unique_ptr<Filter<Relation<const CDCTrack> > >(new UnionRecordingTrackRelationFilter());
+    return std::unique_ptr<BaseTrackRelationFilter >(new UnionRecordingTrackRelationFilter());
   } else {
     return Super::create(filterName);
   }

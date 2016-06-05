@@ -16,11 +16,11 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class excepting all segment triples.
-    class AllSegmentTripleRelationFilter : public Filter<Relation<const CDCSegmentTriple>> {
+    class AllSegmentTripleRelationFilter : public BaseSegmentTripleRelationFilter {
 
     private:
       /// Type of the super class
-      typedef Filter<Relation<const CDCSegmentTriple>> Super;
+      typedef BaseSegmentTripleRelationFilter Super;
 
     public:
       /// Importing all overloads from the super class

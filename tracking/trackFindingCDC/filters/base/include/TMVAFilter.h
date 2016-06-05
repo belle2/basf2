@@ -18,22 +18,23 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter based on a tmva method.
-    template<class AVarSet>
-    class TMVAFilter: public FilterOnVarSet<AVarSet> {
+    template<class AFilter>
+    class TMVA : public OnVarSet<AFilter> {
 
     private:
       /// Type of the super class
-      typedef FilterOnVarSet<AVarSet> Super;
+      using Super = OnVarSet<AFilter>;
 
     public:
       /// Type of the object to be analysed.
-      typedef typename AVarSet::Object Object;
+      using Object = typename AFilter::Object;
 
     public:
       /// Constructor of the filter.
-      explicit TMVAFilter(const std::string& defaultTrainingName = "",
-                          double defaultCut = NAN) :
-        Super(),
+      explicit TMVA(std::unique_ptr<BaseVarSet<Object> > varSet,
+                    const std::string& defaultTrainingName = "",
+                    double defaultCut = NAN) :
+        Super(std::move(varSet)),
         m_param_cut(defaultCut),
         m_param_weightFolder("tracking/data"),
         m_param_trainingName(defaultTrainingName),
@@ -102,6 +103,29 @@ namespace Belle2 {
 
       /// TMVA Expert to examine the object
       Expert m_expert;
+
+
+    };
+
+    /// Convience template to create a tmva filter for a set of variables.
+    template<class AVarSet>
+    class TMVAFilter: public TMVA<Filter<typename AVarSet::Object> > {
+
+    private:
+      /// Type of the super class
+      using Super = TMVA<Filter<typename AVarSet::Object> >;
+
+    public:
+      /// Type of the object to be analysed.
+      using Object = typename AVarSet::Object;
+
+      /// Constructor of the filter.
+      explicit TMVAFilter(const std::string& defaultTrainingName = "",
+                          double defaultCut = NAN)
+        :  Super(std::unique_ptr<AVarSet> (new AVarSet()),
+                 defaultTrainingName,
+                 defaultCut)
+      {}
     };
   }
 }

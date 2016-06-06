@@ -14,7 +14,7 @@ path.add_module('RootInput')
 path.add_module('Gearbox')
 path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
 
-feistate = fullEventInterpretation(None, path, particles)
+feistate = fullEventInterpretation(None, path, particles, 'FEI_Belle2_Generic_2016_1')
 
 print(feistate.path)
 process(feistate.path)

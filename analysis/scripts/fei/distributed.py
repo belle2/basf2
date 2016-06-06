@@ -82,8 +82,8 @@ def setup(args):
         for j, data_input in enumerate(data_chunks[i]):
             os.symlink(data_input, 'jobs/{}/input_{}.root'.format(i, j))
         # Symlink weight directory and basf2_path
-        os.symlink(args.directory + '/collection/basf2_path.pickle', 'jobs/{}/basf2_path.pickle'.format(i, j))
-        os.symlink(args.directory + '/collection/localdb', 'jobs/{}/localdb')
+        os.symlink(args.directory + '/collection/basf2_path.pickle', 'jobs/{}/basf2_path.pickle'.format(i))
+        os.symlink(args.directory + '/collection/localdb', 'jobs/{}/localdb'.format(i))
 
 
 def run_basf2(args):
@@ -122,6 +122,7 @@ def create_report(args, summary_file):
 
 
 def submit_job(args, i):
+    os.chdir(args.directory + '/jobs/{}/'.format(i))
     if args.site == 'kekcc':
         ret = subprocess.call("bsub -q b2_fei -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
     elif args.site == 'kitekp':

@@ -40,7 +40,7 @@ applyCuts('B+:sig', 'ROE_deltae(CleanROE) > -0.38 and ROE_mbc(CleanROE) > 4.82',
 
 path.add_module('MCDecayFinder', decayString='B+ ==> tau+ nu_tau', listName='B+:FEIMC', writeOut=True)
 
-feistate = fullEventInterpretation('B+:sig', path, particles)
+feistate = fullEventInterpretation('B+:sig', path, particles, 'FEI_Belle2_Specific_2016_1')
 
 print(feistate.path)
 process(feistate.path)

@@ -40,6 +40,13 @@ namespace Belle2 {
     void upload(const std::string& filename, const std::string& identifier, int exp1 = 0, int run1 = 0, int exp2 = -1, int run2 = -1);
 
     /**
+     * Conenience function which extracts the expertise in a given weightfile into a temporary directory
+     * @param filename of the weightfile
+     * @param directory temporary directory to use
+     */
+    void extract(const std::string& filename, const std::string& directory);
+
+    /**
      * Convenience function which performs a training with the given options
      * @param general_options shared options
      * @param specific_options method specific options

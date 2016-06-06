@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'mva', '$ROOT_LIBS', 'boost_program_options']
+env['LIBS'] = ['framework', 'mva', 'mva_dataobjects', '$ROOT_LIBS', 'boost_program_options']
 
 Return('env')

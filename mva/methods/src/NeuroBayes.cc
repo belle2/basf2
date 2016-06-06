@@ -12,6 +12,90 @@
 
 #include <framework/logging/Logger.h>
 
+#include <assert.h>
+
+
+#define DEACTIVATE_NEUROBAYES
+#ifdef DEACTIVATE_NEUROBAYES
+NeuroBayesTeacher* NeuroBayesTeacher::instance;
+
+NeuroBayesTeacher* NeuroBayesTeacher::Instance(dsa::ec_t**, int , dsa::log_func_t*,
+                                               void*, dsa::delete_enclosed_func_t*)
+{
+  printf("ERROR: NeuroBayesTeacher not available.");
+  return 0;
+}
+
+void NeuroBayesTeacher::NB_DEF(bool) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_TASK(const char*) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_TASK(std::string&) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_DEBUG(int) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_PRE(int) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_INITIALPRUNE(int) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_NODE1(int) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_NODE2(int) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_NODE3(int) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_REG(const char*) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_LEARNDIAG(int) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_LOSS(const char*) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_SHAPE(const char*) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_METHOD(const char*) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_MOM(float) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_EPOCH(int) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_ITER(int) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_RTRAIN(float) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_SPEED(float) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_MAXLEARN(float) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_RELIMPORTANCE(float) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_SURRO(float) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_PRUNEMIN(float) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_PRUNEMAX(float) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_PRUNERESULT(float) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_QUANTILE(float) {assert(0);}
+void NeuroBayesTeacher::NB_RANVIN(int   ,
+                                  int   ,
+                                  int) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_LOSSWGT(float) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_TDELTA(float) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_WEIGHT_MODE(int) {assert(0);}
+void NeuroBayesTeacher::NB_DEF_SPLOT_MODE(int) {assert(0);}
+void NeuroBayesTeacher::NB_TABDEF1(float*, float*,
+                                   int , float*, int ,
+                                   dsa::common_t*) {assert(0);}
+void NeuroBayesTeacher::SetIndividualPreproFlag(int , int , const char*) {assert(0);}
+void NeuroBayesTeacher::SetIndividualPreproParameter(int , int ,
+                                                     float) {assert(0);}
+void NeuroBayesTeacher::SetTarget(float) {assert(0);}
+void NeuroBayesTeacher::SetWeight(float , float) {assert(0);}
+void NeuroBayesTeacher::SetNextInput(int , float*) {assert(0);}
+void NeuroBayesTeacher::SetNEvents(int) {assert(0);}
+void NeuroBayesTeacher::TrainNet(bool) {assert(0);}
+void NeuroBayesTeacher::SetOutputFile(const char*) {assert(0);}
+void NeuroBayesTeacher::SetHistosFile(const char*) {assert(0);}
+void NeuroBayesTeacher::SetCArrayFile(const char*) {assert(0);}
+float* NeuroBayesTeacher::nb_get_expertise() {assert(0);}
+void NeuroBayesTeacher::nb_infoout(float*, float*, int*, int*,
+                                   float*, float*, float*, float*,
+                                   int*, int*) {assert(0);}
+void NeuroBayesTeacher::nb_correl_signi(const char [],
+                                        const char []) {assert(0);}
+void NeuroBayesTeacher::nb_correl_signi(char**, const char [],
+                                        const char []) {assert(0);}
+char** NeuroBayesTeacher::nb_get_varnames(int*) {assert(0);}
+int* NeuroBayesTeacher::nb_get_individual_prepro_flags(int*) {assert(0);}
+void NeuroBayesTeacher::SayHello() {assert(0);}
+NeuroBayesTeacher::~NeuroBayesTeacher() {assert(0);}
+
+Expert::Expert(const std::string, int, bool, dsa::ec_t**,
+               dsa::log_func_t*, void*,
+               dsa::delete_enclosed_func_t*) {assert(0);}
+
+float Expert::nb_expert(ACTION, double*,
+                        float) {assert(0);}
+float Expert::nb_expert(ACTION, float*, float) {assert(0);}
+Expert::~Expert() {assert(0);}
+#endif
+
 namespace Belle2 {
   namespace MVA {
 

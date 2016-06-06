@@ -70,6 +70,21 @@ namespace Belle2 {
       Belle2::MVA::Weightfile::saveToDatabase(weightfile, identifier, iov);
     }
 
+    void extract(const std::string& filename, const std::string& directory)
+    {
+
+      AbstractInterface::initSupportedInterfaces();
+      auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
+      auto weightfile = Weightfile::load(filename);
+      weightfile.setRemoveTemporaryDirectories(false);
+      weightfile.setTemporaryDirectory(directory);
+      GeneralOptions general_options;
+      weightfile.getOptions(general_options);
+      auto expert = supported_interfaces[general_options.m_method]->getExpert();
+      expert->load(weightfile);
+
+    }
+
     void expert(const std::vector<std::string>& filenames, const std::string& datafile, const std::string& treename,
                 const std::string& outputfile, int experiment, int run, int event)
     {

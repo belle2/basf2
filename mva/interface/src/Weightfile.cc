@@ -30,7 +30,8 @@ namespace Belle2 {
     {
       for (auto& filename : m_filenames) {
         if (boost::filesystem::exists(filename)) {
-          boost::filesystem::remove_all(filename);
+          if (m_remove_temporary_directories)
+            boost::filesystem::remove_all(filename);
         }
       }
     }
@@ -57,10 +58,11 @@ namespace Belle2 {
 
     std::string Weightfile::getFileName(const std::string& suffix)
     {
-      char dirtemplate[] = "Basf2MVA.XXXXXXXXXX";
-      auto directory = mkdtemp(dirtemplate);
+      char* directory_template = strdup((m_temporary_directory + "/Basf2MVA.XXXXXXXXXX").c_str());
+      auto directory = mkdtemp(directory_template);
       std::string tmpfile = std::string(directory) + std::string("/weightfile") + suffix;
       m_filenames.push_back(directory);
+      free(directory_template);
       return tmpfile;
     }
 

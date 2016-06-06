@@ -201,9 +201,22 @@ namespace Belle2 {
       static Weightfile loadFromDatabase(const std::string& identifier, const Belle2::EventMetaData& emd = Belle2::EventMetaData(0, 0,
                                          0));
 
+      /**
+       * Set the deletion behaviour of the weightfile object for temporary directories
+       * For debugging it can be useful to not delete temporary directories
+       */
+      void setRemoveTemporaryDirectories(bool remove_temporary_directories) { m_remove_temporary_directories = remove_temporary_directories; }
+
+      /**
+       * set temporary directory which is used to store temporary directories
+       */
+      void setTemporaryDirectory(const std::string& temporary_directory) { m_temporary_directory = temporary_directory; }
+
     private:
       boost::property_tree::ptree m_pt; /**< xml tree containing all the saved information of this weightfile */
       std::vector<std::string> m_filenames; /**< generated temporary filenames, which will be removed in the destructor of this class */
+      bool m_remove_temporary_directories = true; /**< remove all temporary directories in the destructor of this class */
+      std::string m_temporary_directory = "/tmp"; /**< temporary directory which is used to store temporary directories */
     };
 
   }

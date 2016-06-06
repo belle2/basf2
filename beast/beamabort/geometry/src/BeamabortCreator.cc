@@ -95,10 +95,6 @@ namespace Belle2 {
         double phi[100];
         double thetaZ[100];
         double r[100];
-        int dimx = 0;
-        int dimy = 0;
-        int dimx_offset = 0;
-        int dimy_offset = 0;
         int dimz = 0;
         int dimr_dia = 0;
         if (phase == 2) {
@@ -110,6 +106,11 @@ namespace Belle2 {
           }
         }
         if (phase == 1) {
+          int dimx = 0;
+          int dimy = 0;
+          int dimx_offset = 0;
+          int dimy_offset = 0;
+
           for (double x_offset : activeParams.getArray("x_offset", {0})) {
             x_offset *= CLHEP::cm;
             x_off[dimx_offset] = x_offset;

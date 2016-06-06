@@ -11,6 +11,7 @@
 #include <mva/methods/FastBDT.h>
 
 #include <framework/logging/Logger.h>
+#include <sstream>
 
 namespace Belle2 {
   namespace MVA {
@@ -130,8 +131,24 @@ namespace Belle2 {
 #if FastBDT_VERSION_MAJOR >= 3
       m_expert_forest = FastBDT::readForestFromStream<float>(file);
 #else
-      file >> m_expert_feature_binning;
-      m_expert_forest = FastBDT::readForestFromStream(file);
+      // Check for nan or inf in file and replace with 0
+      std::stringstream s;
+      std::string t;
+      while (getline(file, t)) {
+        size_t f = t.find("inf");
+        if (f < std::string::npos) {
+          t.replace(f, std::string("inf").length(), std::string("0.0"));
+          B2WARNING("Found infinity in FastBDT weightfile, I replace it with 0 to prevent horrible crashes, this is fixed in the newer version")
+        }
+        f = t.find("nan");
+        if (f < std::string::npos) {
+          t.replace(f, std::string("nan").length(), std::string("0.0"));
+          B2WARNING("Found nan in FastBDT weightfile, I replace it with 0 to prevent horrible crashes, this is fixed in the newer version")
+        }
+        s << t + '\n';
+      }
+      s >> m_expert_feature_binning;
+      m_expert_forest = FastBDT::readForestFromStream(s);
 #endif
       file.close();
 

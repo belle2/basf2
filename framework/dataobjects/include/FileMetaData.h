@@ -178,7 +178,7 @@ namespace Belle2 {
      *
      *  @param option Use "all" to print everything, except steering file. Use "steering" for printing steering file.
      */
-    virtual void Print(Option_t* option = "") const;
+    virtual void Print(Option_t* option = "") const override;
 
     /** Read file meta data in xml format from the input stream.
      *
@@ -230,7 +230,7 @@ namespace Belle2 {
 
     unsigned int m_mcEvents; /**< Number of generated events, 0 for real data.  */
 
-    ClassDef(FileMetaData, 7); /**< Metadata information about a file. */
+    ClassDefOverride(FileMetaData, 7); /**< Metadata information about a file. */
 
   }; //class
 

@@ -60,6 +60,7 @@ void FileMetaData::exposePythonAPI()
   .def("get_date", &FileMetaData::getDate)
   .def("get_site", &FileMetaData::getSite)
   .def("get_user", &FileMetaData::getUser)
+  .def("get_random_seed", &FileMetaData::getRandomSeed)
   .def("get_release", &FileMetaData::getRelease)
   .def("get_steering", &FileMetaData::getSteering)
   .def("get_mc_events", &FileMetaData::getMcEvents)
@@ -73,19 +74,21 @@ void FileMetaData::Print(Option_t* option) const
     return;
   }
 
-  bool all = (option && (strcmp(option, "all") == 0));
+  const bool all = (option && (strcmp(option, "all") == 0));
   cout << "FileMetaData" << endl;
   cout << "  LFN    : " << m_lfn << endl;
   cout << "  #event : " << m_nEvents << endl;
-  cout << "  range  : " << m_experimentLow << "/" << m_runLow << "/" << m_eventLow << " - "  << m_experimentHigh << "/" << m_runHigh
-       << "/" << m_eventHigh << endl;
+  cout << "  range  : " << m_experimentLow << "/" << m_runLow << "/" << m_eventLow
+       << " - "  << m_experimentHigh << "/" << m_runHigh << "/" << m_eventHigh << endl;
   cout << "  parents:";
-  for (std::string parent : m_parentLfns) cout << " " << parent;
+  for (std::string parent : m_parentLfns)
+    cout << " " << parent;
   cout << endl;
   if (all) {
     cout << "  date   : " << m_date << endl;
     cout << "  site   : " << m_site << endl;
     cout << "  user   : " << m_user << endl;
+    cout << "  seed   : " << m_randomSeed << endl;
     cout << "  release: " << m_release << endl;
     cout << "  #MC    : " << m_mcEvents << endl;
   }

@@ -53,7 +53,7 @@ void DedxDatabaseImporter::importWireGainCalibration()
 
       string histconstants = key->GetName();
 
-      if (histconstants.find("gain") == 0) {
+      if (histconstants.compare("gain") == 0) {
         gain = (TH1F*)f->Get(histconstants.c_str());
       }
 

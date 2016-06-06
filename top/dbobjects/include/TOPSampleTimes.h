@@ -18,9 +18,9 @@
 namespace Belle2 {
 
   /**
-   * Calibration constants of a singe ASIC channel: time axis
+   * Calibration constants of a singe ASIC channel: time axis (sample times)
    */
-  class TOPSampleTime: public TObject {
+  class TOPSampleTimes: public TObject {
   public:
 
     /**
@@ -33,7 +33,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    TOPSampleTime()
+    TOPSampleTimes()
     {
       for (unsigned i = 0; i <= c_TimeAxisSize; i++) m_timeAxis[i] = 0;
     }
@@ -44,7 +44,7 @@ namespace Belle2 {
      * @param channel hardware channel number
      * @param syncTimeBase sinchronization time base (width of 2 ASIC windows)
      */
-    TOPSampleTime(unsigned scrodID, unsigned channel, double syncTimeBase):
+    TOPSampleTimes(unsigned scrodID, unsigned channel, double syncTimeBase):
       m_scrodID(scrodID), m_channel(channel)
     {
       setTimeAxis(syncTimeBase);
@@ -53,7 +53,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    ~TOPSampleTime()
+    ~TOPSampleTimes()
     {
     }
 
@@ -124,14 +124,21 @@ namespace Belle2 {
       return getTime(window, sample) - getTime(window, 0);
     }
 
+    /**
+     * Is time axis calibrated or equidistant
+     * @return true, if calibrated
+     */
+    bool isCalibrated() const {return m_calibrated;}
+
 
   private:
 
     unsigned short m_scrodID = 0;          /**< scrod ID */
     unsigned short m_channel = 0;          /**< hardware channel number within SCROD */
     float m_timeAxis[c_TimeAxisSize + 1];  /**< time axis + right border point */
+    bool m_calibrated = false;             /**< flag: calibrated or equidistant */
 
-    ClassDef(TOPSampleTime, 2); /**< ClassDef */
+    ClassDef(TOPSampleTimes, 1); /**< ClassDef */
 
   };
 

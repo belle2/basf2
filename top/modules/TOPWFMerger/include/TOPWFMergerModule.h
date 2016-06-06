@@ -15,8 +15,10 @@
 #include <map>
 
 #include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPASICChannel.h>
-#include <top/dbobjects/TOPSampleTime.h>
+#include <top/dbobjects/TOPSampleTimes.h>
+#include <top/dbobjects/TOPCalTimebase.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPWaveform.h>
 
@@ -129,10 +131,8 @@ namespace Belle2 {
     /** map of (module, channel) and pedestals */
     std::map<unsigned, const TOPASICChannel*> m_pedestalMap;
 
-    DBArray<TOPSampleTime> m_sampleTimes;  /**< sample time calibration */
-    /** map of (scrod, channel) and sample time calibration */
-    std::map<unsigned, const TOPSampleTime*> m_sampleTimeMap;
-    TOPSampleTime* m_sampleTime = 0; /**< default in case no calibration available */
+    DBObjPtr<TOPCalTimebase> m_timebase;  /**< sample time calibration */
+    TOPSampleTimes m_sampleTimes; /**< equidistant in case no calibration required */
 
     unsigned m_falseWindows = 0; /**< false ASIC window count */
     int m_sampleDivisions = 0; /**< number of sample divisions (from TDC subbits) */

@@ -78,11 +78,6 @@ namespace Belle2 {
   }
 
 
-  TOPWFMergerModule::~TOPWFMergerModule()
-  {
-    if (m_sampleTime) delete m_sampleTime;
-  }
-
   void TOPWFMergerModule::initialize()
   {
 
@@ -107,9 +102,9 @@ namespace Belle2 {
     if (m_fraction >= 1) B2ERROR("TOPWFMerger: fraction must be less that 1");
     if (m_fraction <= 0) B2ERROR("TOPWFMerger: fraction must be greater that 0");
 
-    // default sample times in case calibration is not available
+    // equidistant sample times in case calibration is not required
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    m_sampleTime = new TOPSampleTime(0, 0, geo->getNominalTDC().getSyncTimeBase());
+    m_sampleTimes.setTimeAxis(geo->getNominalTDC().getSyncTimeBase());
     m_sampleDivisions = (0x1 << geo->getNominalTDC().getSubBits());
 
   }
@@ -131,25 +126,6 @@ namespace Belle2 {
     if (m_pedestalMap.empty()) {
       B2FATAL("TOPWFMerger: cannot proceed - no ASIC pedestals available");
       return;
-    }
-
-    if (m_useSampleTimeCalibration) {
-      if (m_sampleTimes.hasChanged()) {
-
-        m_sampleTimeMap.clear();
-        for (const auto& asic : m_sampleTimes) {
-          auto key = getKey(asic.getScrodID(), asic.getChannel());
-          m_sampleTimeMap[key] = &asic;
-        }
-
-        B2INFO("TOPWFMerger: new ASIC sample time calibration map of size "
-               << m_sampleTimeMap.size() << " created");
-      }
-      if (m_sampleTimeMap.empty())
-        B2ERROR("TOPWFMerger: no sample time calibration available - "
-                "will use equidistant sample times");
-    } else {
-      B2INFO("TOPWFMerger: sample time calibration turned OFF");
     }
 
   }
@@ -219,21 +195,20 @@ namespace Belle2 {
       auto channel = waveform.getChannel();
       auto firstWindow = waveform.getFirstWindow();
       auto refWindow = waveform.getReferenceWindow();
-      const auto* sampleTime = m_sampleTime; // default calibration
-      if (m_useSampleTimeCalibration and !m_sampleTimeMap.empty()) {
+      const auto* sampleTimes = &m_sampleTimes; // default calibration
+      if (m_useSampleTimeCalibration and m_timebase.isValid()) {
         auto scrodID = waveform.getScrodID();
-        auto key = getKey(scrodID, channel % 128);
-        sampleTime = m_sampleTimeMap[key];
-        if (!sampleTime) {
-          sampleTime = m_sampleTime; // use default calibration
-          B2WARNING("TOPWFMerger: no sample time calibration available for SCROD "
-                    << scrodID << " channel " << channel % 128);
+        sampleTimes = m_timebase->getSampleTimes(scrodID, channel % 128);
+        if (!sampleTimes->isCalibrated()) {
+          B2ERROR("No sample time calibration available for SCROD " << scrodID
+                  << " channel " << channel % 128);
         }
       }
+
       const auto& hits = waveform.getHits();
       for (const auto& hit : hits) {
         int tdc = int(hit.time * m_sampleDivisions);
-        float time = sampleTime->getTimeDifference(firstWindow, hit.time);
+        float time = sampleTimes->getTimeDifference(firstWindow, hit.time);
         auto* digit = digits.appendNew(moduleID, pixelID, tdc);
         digit->setTime(time + t0);
         digit->setADC(hit.height);

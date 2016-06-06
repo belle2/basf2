@@ -8,36 +8,38 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/dbobjects/TOPSampleTime.h>
+#include <top/dbobjects/TOPSampleTimes.h>
 #include <iostream>
 
 using namespace std;
 using namespace Belle2;
 
-void TOPSampleTime::setTimeAxis(double syncTimeBase)
+void TOPSampleTimes::setTimeAxis(double syncTimeBase)
 {
   double DTime = 2 * syncTimeBase;
   double timeBin = DTime / c_TimeAxisSize;
   for (unsigned i = 0; i < c_TimeAxisSize; i++) m_timeAxis[i] = timeBin * i;
   m_timeAxis[c_TimeAxisSize] = DTime;
+  m_calibrated = false;
 }
 
 
-void TOPSampleTime::setTimeAxis(const std::vector<double>& sampleTimes,
-                                double syncTimeBase)
+void TOPSampleTimes::setTimeAxis(const std::vector<double>& sampleTimes,
+                                 double syncTimeBase)
 {
   if (sampleTimes.size() < c_TimeAxisSize) {
-    B2FATAL("TOPSampleTime::setTimeAxis: vector too short");
+    B2FATAL("TOPSampleTimes::setTimeAxis: vector too short");
     return;
   }
 
   for (unsigned i = 0; i < c_TimeAxisSize; i++) m_timeAxis[i] = sampleTimes[i];
   double DTime = 2 * syncTimeBase;
   m_timeAxis[c_TimeAxisSize] = DTime;
+  m_calibrated = true;
 }
 
 
-float TOPSampleTime::getTime(unsigned window, float sample) const
+float TOPSampleTimes::getTime(unsigned window, float sample) const
 {
 
   int sampleNum = int(sample);

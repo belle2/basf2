@@ -16,6 +16,9 @@
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportArray.h>
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
 
 // framework - xml
 #include <framework/gearbox/GearDir.h>
@@ -26,7 +29,7 @@
 #include <framework/logging/Logger.h>
 
 // DB objects
-#include <top/dbobjects/TOPSampleTime.h>
+#include <top/dbobjects/TOPCalTimebase.h>
 
 #include <iostream>
 #include <fstream>
@@ -50,7 +53,8 @@ void TOPDatabaseImporter::importSampleTimeCalibration(std::string fileName)
   }
   B2INFO(fileName << ": open for reading");
 
-  DBImportArray<TOPSampleTime> timeBases;
+  DBImportObjPtr<TOPCalTimebase> timeBase;
+  timeBase.construct(syncTimeBase);
 
   // this is how to import from one of Gary's text files (module 3 and 4)
 
@@ -77,8 +81,7 @@ void TOPDatabaseImporter::importSampleTimeCalibration(std::string fileName)
               sampleTimes.push_back(data);
             }
             auto channel = chMapper.getChannel(boardStack, carrierBoard, asic, chan);
-            auto* timeBase = timeBases.appendNew(scrodID, channel % 128, syncTimeBase);
-            timeBase->setTimeAxis(sampleTimes, syncTimeBase);
+            timeBase->append(scrodID, channel % 128, sampleTimes);
           }
         }
       }
@@ -86,11 +89,11 @@ void TOPDatabaseImporter::importSampleTimeCalibration(std::string fileName)
   }
 
   stream.close();
-  int ndataRead = timeBases.getEntries() * 256;
+  int ndataRead = timeBase->getSampleTimes().size() * 256;
   B2INFO(fileName << ": file closed, " << ndataRead << " constants read from file");
 
   IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
-  timeBases.import(iov);
+  timeBase.import(iov);
 
   B2RESULT("Sample time calibration constants imported to database");
 
@@ -100,14 +103,42 @@ void TOPDatabaseImporter::importSampleTimeCalibration(std::string fileName)
 void TOPDatabaseImporter::printSampleTimeCalibration()
 {
 
-  DBArray<TOPSampleTime> sampleTimes;
+  DBObjPtr<TOPCalTimebase> timeBase;
 
-  for (const auto& timeBase : sampleTimes) {
-    cout << timeBase.getScrodID() << " " << timeBase.getChannel() << endl;
-    for (const auto& time : timeBase.getTimeAxis()) {
+  for (const auto& sampleTimes : timeBase->getSampleTimes()) {
+    cout << sampleTimes.getScrodID() << " " << sampleTimes.getChannel() << endl;
+    for (const auto& time : sampleTimes.getTimeAxis()) {
       cout << time << " ";
     }
     cout << endl;
   }
+
+}
+
+
+void TOPDatabaseImporter::importTest(int runNumber, double syncTimeBase)
+{
+
+  DBImportObjPtr<TOPCalTimebase> timeBase;
+
+  timeBase.construct(syncTimeBase);
+  for (unsigned scrodID = 0; scrodID < 64; scrodID++) {
+    for (unsigned channel = 0; channel < 128; channel++) {
+      timeBase->append(scrodID, channel);
+    }
+  }
+
+  if (runNumber == 3) {
+    timeBase.addEventDependency(10);
+    timeBase.construct(syncTimeBase + 100);
+    for (unsigned scrodID = 0; scrodID < 64; scrodID++) {
+      for (unsigned channel = 0; channel < 128; channel++) {
+        timeBase->append(scrodID, channel);
+      }
+    }
+  }
+
+  IntervalOfValidity iov(1, runNumber, 1, runNumber);
+  timeBase.import(iov);
 
 }

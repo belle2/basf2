@@ -48,14 +48,13 @@ namespace Belle2 {
     void printSampleTimeCalibration();
 
     /**
-     * Export sample time calibration from database
+     * for testing purposes only! - will be removed ...
      */
-    //    void exportSampleTimeCalibration();
-
+    void importTest(int runNumber, double syncTimeBase);
 
   private:
 
-    //    ClassDef(TOPDatabaseImporter, 1);  /**< ClassDef - why this is needed? */
+    // ClassDef(TOPDatabaseImporter, 1);  /**< ClassDef - why this is needed? */
   };
 
 } // Belle2 namespace

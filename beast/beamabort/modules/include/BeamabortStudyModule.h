@@ -91,9 +91,9 @@ namespace Belle2 {
       TH1F* h_time[100];
       /** histo time weighted by volt */
       TH1F* h_vtime[100];
-      /** */
+      /** Scattering position in the rings */
       TH1F* h_s;
-      /** */
+      /** Scattering position in the rings */
       TH1F* h_s_cut;
 
     };

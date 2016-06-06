@@ -756,7 +756,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDef(RecoTrack, 5);
+    ClassDef(RecoTrack, 6);
   };
 
   /** This class allows access to the genfit::Track of the RecoTrack.

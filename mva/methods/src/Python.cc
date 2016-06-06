@@ -101,7 +101,10 @@ namespace Belle2 {
       {
         if (m_initialized_python) {
           if (Py_IsInitialized()) {
-            Py_Finalize();
+            // We don't finalize Python because this call only frees some memory,
+            // but can cause crashes in loaded python-modules like Theano
+            // https://docs.python.org/3/c-api/init.html
+            // Py_Finalize();
           }
         }
       }

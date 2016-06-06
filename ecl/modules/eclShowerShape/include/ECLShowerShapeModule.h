@@ -47,11 +47,17 @@ namespace Belle2 {
 
     private:
 
-      //Struct used to hold information of the digits projected to a plane perpendicular to the shower direction
+      /**Struct used to hold information of the digits projected to a plane perpendicular to the shower direction */
       struct ProjectedECLDigit {
-        double energy;           //weighted energy
-        double rho;              //radial distance
-        double alpha;            //polar angel
+
+        /** weighted energy */
+        double energy;
+
+        /** radial distance */
+        double rho;
+
+        /** polar angel */
+        double alpha;
       };
 
       /** Shower shape variable: Lateral energy. */
@@ -79,22 +85,22 @@ namespace Belle2 {
           The origin is at a distance from the interaction point equal to the shower distance from the interaction point. */
       double computeSecondMoment(const std::vector<ProjectedECLDigit>& shower, const double totalEnergy) const;
 
-      /* Compute projections of the ECLCalDigits to the perpendicular plane
-       */
+      /** Compute projections of the ECLCalDigits to the perpendicular plane */
       std::vector<ProjectedECLDigit> projectECLDigits(const ECLShower& shower) const;
 
-      /* The radial part of the Zernike polynomial
+      /** The radial part of the Zernike polynomial
        * n,m - Zernike polynomial rank
        * rho - radial distance             */
       double Rnm(const int n, const int m, const double rho) const;
 
-      /* Return the complex value of the Zernike polynomial of rank n,m.
+      /** Return the complex value of the Zernike polynomial of rank n,m.
       Znm(rho,alpha) = Rnm(rho) * exp(i*m*alpha)
       rho - radial distance
       alpha - polar angle */
       std::complex<double> zernikeValue(const double rho, const double alpha, const int n, const int m) const;
 
-      double m_rho0; // Scaling factor for radial distances in perpendicular plane
+      /** Scaling factor for radial distances in perpendicular plane */
+      double m_rho0;
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/

@@ -38,9 +38,13 @@ namespace Belle2 {
       const std::vector<short int>& getNeighbours(short int cid) const;
 
     private:
-      std::vector < std::vector < short int > > m_neighbourMap; // list of list of neighbour cids
-      std::vector < std::vector < short int > > m_neighbourMapTemp; // temp list of list of neighbour cids
+      /** list of list of neighbour cids. */
+      std::vector < std::vector < short int > > m_neighbourMap;
 
+      /** temporary list of list of neighbour cids. */
+      std::vector < std::vector < short int > > m_neighbourMapTemp;
+
+      /** Number of crystals in each theta ring.*/
       const short m_crystalsPerRing[69] = {
         48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, //FWD up to 13
         144, 144, 144, 144, 144, 144, 144,  // BARREL up to 20

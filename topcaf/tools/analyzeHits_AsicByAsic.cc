@@ -45,7 +45,7 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
 
 
   //deifne some standard cuts to produce different plots
-  TCut tight_cut("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 10 && TOPCAFDigits.m_q > 0 && TOPCAFDigits.m_adc_height > 100");
+  TCut tight_cut("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 10 && TOPCAFDigits.m_q > 0 && TOPCAFDigits.m_adc_height > 100 && TOPCAFDigits.m_flag == 201");
   TCut tight_cut_no7("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 8 && TOPCAFDigits.m_q > 0 && TOPCAFDigits.m_adc_height > 150 && TOPCAFDigits.m_asic_ch!=7");
   TCut loose_cut("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 10 && TOPCAFDigits.m_q > 0");
   TCut optics_cut("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 10 && TOPCAFDigits.m_q > 0 && TOPCAFDigits.m_adc_height > 150 && TOPCAFDigits.m_asic_ch !=7 && TOPCAFDigits.m_tdc_bin%128 > 60 ");
@@ -155,7 +155,7 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
   hitmap->SetStats(0);
 
   TH2F* pulser_height_width = new TH2F("pulser_height_width", "pulser signal: height VS width", 200, 0., 20., 1000, -1000., 0.);
-  pulser_height_width->GetXaxis()->SetTitle(" width [ns]");
+  pulser_height_width->GetXaxis()->SetTitle(" width [tdc bin]");
   pulser_height_width->GetYaxis()->SetTitle(" amplitude [acd counts]");
 
 

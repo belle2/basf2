@@ -47,13 +47,12 @@
 #include <TDecompChol.h>
 #include <TDecompSVD.h>
 
-#include "genfit/Tools.h"
-#include "genfit/TrackCand.h"
-#include "genfit/Track.h"
-#include "genfit/FitStatus.h"
-#include "genfit/KalmanFitterInfo.h"
-#include "genfit/KalmanFitStatus.h"
-#include "genfit/MeasuredStateOnPlane.h"
+#include <genfit/Tools.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <genfit/FitStatus.h>
+#include <genfit/KalmanFitterInfo.h>
+#include <genfit/KalmanFitStatus.h>
+#include <genfit/MeasuredStateOnPlane.h>
 
 using namespace Belle2;
 
@@ -91,15 +90,11 @@ namespace {
 
 TrackTimeExtractionModule::TrackTimeExtractionModule() : HistoModule()
 {
-  setDescription("Build the full covariance matrix for genfit::Tracks.");
+  setDescription("Build the full covariance matrix for RecoTracks.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("InputTrackColName", m_InTrackColName, "StoreArray containing the genfit::Tracks to process", std::string(""));
-  addParam("InputTrackCandColName", m_InTrackCandColName,
-           "StoreArray of the genfit::TrackCands corresponding to the genfit::Tracks we are processing", std::string(""));
-  addParam("OutputTrackCandColName", m_OutTrackCandColName, "StoreArray where to put the new track candidates with adjusted times",
-           std::string("refitCands"));
-
+  addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "StoreArray containing the RecoTracks to process",
+           std::string(""));
   addParam("DoHistogramming", m_DoHistogramming, "Whether to generate output histograms", false);
 }
 
@@ -112,15 +107,7 @@ void TrackTimeExtractionModule::initialize()
   if (m_DoHistogramming) {
     REG_HISTOGRAM;
   }
-  StoreArray<genfit::TrackCand>::required(m_InTrackCandColName);
-
-  StoreArray<genfit::Track> GFTracks(m_InTrackColName);
-  GFTracks.isRequired();
-
-  StoreArray<genfit::TrackCand> newTrackCands(m_OutTrackCandColName);
-  newTrackCands.registerInDataStore();
-  newTrackCands.registerRelationTo(GFTracks);
-
+  StoreArray<RecoTrack>::required(m_recoTracksStoreArrayName);
   StoreArray<MCParticle>::optional();
 }
 
@@ -130,36 +117,40 @@ void TrackTimeExtractionModule::defineHisto()
   if (!m_DoHistogramming)
     return;
 
-  hTimes[m_InTrackColName] = new TH1D((std::string("hTimes") + m_InTrackColName).c_str(),
-                                      "event time shifts calculated", 15000, -30, 30);
-  hTimesCorrectHypot[m_InTrackColName] = new TH1D((std::string("hTimesCorrectHypot") + m_InTrackColName).c_str(),
-                                                  "event time shifts calculated", 15000, -30, 30);
-  hTimesGoodTracks[m_InTrackColName] = new TH1D((std::string("hTimesGoodTracks") + m_InTrackColName).c_str(),
-                                                "event time shifts calculated (good tracks)", 15000, -30, 30);
-  hTimesFastTracks[m_InTrackColName] = new TH1D((std::string("hTimesFastTracks") + m_InTrackColName).c_str(),
-                                                "event time shifts calculated (fast tracks)", 15000, -30, 30);
-  hTimesPerTrack[m_InTrackColName] = new TH1D((std::string("hTimesPerTrack") + m_InTrackColName).c_str(),
-                                              "per track time shifts calculated", 15000, -30, 30);
-  hTimesPerTrackVsPVal[m_InTrackColName] = new TH2D((std::string("hTimesPerTrackVsPVal") + m_InTrackColName).c_str(),
-                                                    "per track time shifts calculated", 1500, -30, 30, 100, 0, 1);
+  hTimes[m_recoTracksStoreArrayName] = new TH1D((std::string("hTimes") + m_recoTracksStoreArrayName).c_str(),
+                                                "event time shifts calculated", 15000, -30, 30);
+  hTimesCorrectHypot[m_recoTracksStoreArrayName] = new TH1D((std::string("hTimesCorrectHypot") + m_recoTracksStoreArrayName).c_str(),
+                                                            "event time shifts calculated", 15000, -30, 30);
+  hTimesGoodTracks[m_recoTracksStoreArrayName] = new TH1D((std::string("hTimesGoodTracks") + m_recoTracksStoreArrayName).c_str(),
+                                                          "event time shifts calculated (good tracks)", 15000, -30, 30);
+  hTimesFastTracks[m_recoTracksStoreArrayName] = new TH1D((std::string("hTimesFastTracks") + m_recoTracksStoreArrayName).c_str(),
+                                                          "event time shifts calculated (fast tracks)", 15000, -30, 30);
+  hTimesPerTrack[m_recoTracksStoreArrayName] = new TH1D((std::string("hTimesPerTrack") + m_recoTracksStoreArrayName).c_str(),
+                                                        "per track time shifts calculated", 15000, -30, 30);
+  hTimesPerTrackVsPVal[m_recoTracksStoreArrayName] = new TH2D((std::string("hTimesPerTrackVsPVal") +
+                                                              m_recoTracksStoreArrayName).c_str(),
+                                                              "per track time shifts calculated", 1500, -30, 30, 100, 0, 1);
 
-  hDerivative[m_InTrackColName] = new TH1D((std::string("hDerivative") + m_InTrackColName).c_str(),
-                                           "derivative both mirror hits;[cm/ns]", 1000, -0.02, 0.02);
-  hWeightedDerivative[m_InTrackColName] = new TH1D(("hWeightedDerivative" + m_InTrackColName).c_str(), "derivative, weighted;[cm/ns]",
-                                                   1000, -0.02, 0.02);
-  hWeightedDerivativeBoth[m_InTrackColName] = new TH1D(("hWeightedDerivativeBoth" + m_InTrackColName).c_str(),
-                                                       "derivative both mirror hits, weighted;[cm/ns]", 1000, -0.02, 0.02);
-  hXTRelation[m_InTrackColName] = new TH2D(("hXTRelation" + m_InTrackColName).c_str(), ";measured drift distance;|dr/dt|", 500, -1, 1,
-                                           1000, -0.008, 0.008);
+  hDerivative[m_recoTracksStoreArrayName] = new TH1D((std::string("hDerivative") + m_recoTracksStoreArrayName).c_str(),
+                                                     "derivative both mirror hits;[cm/ns]", 1000, -0.02, 0.02);
+  hWeightedDerivative[m_recoTracksStoreArrayName] = new TH1D(("hWeightedDerivative" + m_recoTracksStoreArrayName).c_str(),
+                                                             "derivative, weighted;[cm/ns]",
+                                                             1000, -0.02, 0.02);
+  hWeightedDerivativeBoth[m_recoTracksStoreArrayName] = new TH1D(("hWeightedDerivativeBoth" + m_recoTracksStoreArrayName).c_str(),
+      "derivative both mirror hits, weighted;[cm/ns]", 1000, -0.02, 0.02);
+  hXTRelation[m_recoTracksStoreArrayName] = new TH2D(("hXTRelation" + m_recoTracksStoreArrayName).c_str(),
+                                                     ";measured drift distance;|dr/dt|", 500, -1, 1,
+                                                     1000, -0.008, 0.008);
 
-  hEstimatedTimeErrors[m_InTrackColName] = new TH1D((std::string("hEstimatedTimeErrors") + m_InTrackColName).c_str(),
-                                                    "errors of event time shifts calculated", 1500, 0, 30);
+  hEstimatedTimeErrors[m_recoTracksStoreArrayName] = new TH1D((std::string("hEstimatedTimeErrors") +
+                                                              m_recoTracksStoreArrayName).c_str(),
+                                                              "errors of event time shifts calculated", 1500, 0, 30);
 
-  hd2chi2da2[m_InTrackColName] = new TH1D((std::string("hd2chi2da2") + m_InTrackColName).c_str(),
-                                          "d^{2}#chi^{2}/da^{2}", 1000, -.1, 20);
+  hd2chi2da2[m_recoTracksStoreArrayName] = new TH1D((std::string("hd2chi2da2") + m_recoTracksStoreArrayName).c_str(),
+                                                    "d^{2}#chi^{2}/da^{2}", 1000, -.1, 20);
 
-  TTree* T = t[m_InTrackColName] = new TTree((std::string("t") + m_InTrackColName).c_str(),
-                                             "track data");
+  TTree* T = t[m_recoTracksStoreArrayName] = new TTree((std::string("t") + m_recoTracksStoreArrayName).c_str(),
+                                                       "track data");
   // Need to add branches individually, to use variable size array.
   T->Branch("nTracks", &td.nTracks, "nTracks/I");
   T->Branch("pVal", td.pval, "pval[nTracks]/F");
@@ -176,21 +167,13 @@ void TrackTimeExtractionModule::defineHisto()
 }
 
 
-void TrackTimeExtractionModule::beginRun()
-{
-}
-
-
 void TrackTimeExtractionModule::event()
 {
-  StoreArray<genfit::Track> GFTracks(m_InTrackColName);
-  StoreArray<genfit::TrackCand> GFTrackCands(m_InTrackCandColName);
-  StoreArray<genfit::TrackCand> newTrackCands(m_OutTrackCandColName);
+  StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
   StoreArray<MCParticle> mcParts("");
-  RelationArray newTrackCandToOldTrack(newTrackCands, GFTracks);
 
   td.nTracks = 0;
-  if (GFTracks.getEntries() > 100) {
+  if (recoTracks.getEntries() > 100) {
     B2WARNING("More than 100 tracks in event, ignoring.");
   }
 
@@ -202,58 +185,45 @@ void TrackTimeExtractionModule::event()
   double sumSecondGoodTracks = 0;
   double sumFirstFastTracks = 0;
   double sumSecondFastTracks = 0;
-  for (int i = 0; i < GFTracks.getEntries(); ++i) {
-    const genfit::Track* gfTrack = GFTracks[i];
-
+  for (RecoTrack& recoTrack : recoTracks) {
     // Assume all tracks are eligible if no MC info.
     td.parentPDG[td.nTracks] = 0;
     td.mcPDG[td.nTracks] = 0;
-    td.PDG[td.nTracks] = gfTrack->getCardinalRep()->getPDG();
+    td.PDG[td.nTracks] = recoTrack.getCardinalRepresentation()->getPDG();
     bool correctHypot = true;
     MCParticle* part = 0;
     if (mcParts.getEntries() > 0) {
-      part = DataStore::getRelated<MCParticle>(gfTrack);
+      part = recoTrack.getRelated<MCParticle>();
       if (part) {
-        correctHypot = part && (std::abs(part->getPDG()) == std::abs(gfTrack->getCardinalRep()->getPDG()));
+        correctHypot = part && (std::abs(part->getPDG()) == std::abs(recoTrack.getCardinalRepresentation()->getPDG()));
         td.mcPDG[td.nTracks] = part->getPDG();
         if (part->getMother())
           td.parentPDG[td.nTracks] = part->getMother()->getPDG();
       }
     }
 
-    for (size_t i = 0; i < gfTrack->getNumPointsWithMeasurement(); ++i) {
-      if (!dynamic_cast<const CDCRecoHit*>(gfTrack->getPointWithMeasurement(i))) {
-        B2DEBUG(200, "No CDC hits in track.");
-        continue;
-      }
+    if (recoTrack.getNumberOfCDCHits() == 0) {
+      B2DEBUG(200, "No CDC hits in track.");
+      continue;
     }
 
     bool goodTrack = false;
     bool fastTrack = false;
     double PVal = 0;
-    bool fitSuccess = gfTrack->hasFitStatus();
-    if (fitSuccess) {
-      genfit::FitStatus* fs = 0;
-      genfit::KalmanFitStatus* kfs = 0;
-      fs = gfTrack->getFitStatus();
+    if (recoTrack.wasFitSuccessful()) {
+      const genfit::FitStatus* fs = recoTrack.getTrackFitStatus();
       if (!fs)
         continue;
       if (fs->isTrackPruned()) {
         B2WARNING("Skipping pruned track");
         continue;
       }
-      fitSuccess = fitSuccess && fs->isFitted();
-      fitSuccess = fitSuccess && fs->isFitConverged();
-      kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
-      fitSuccess = fitSuccess && kfs;
-      if (!fitSuccess)
-        continue;
       td.pval[td.nTracks] = fs->getPVal();
       td.ndf[td.nTracks] = fs->getNdf();
       goodTrack = td.pval[td.nTracks] > 0.01;
       TVector3 mom;
       try {
-        mom = gfTrack->getFittedState().getMom();
+        mom = recoTrack.getMeasuredStateOnPlaneFromFirstHit().getMom();
       } catch (...) {
         continue;
       }
@@ -266,22 +236,22 @@ void TrackTimeExtractionModule::event()
 
     try {
       std::vector<int> vDimMeas;
-      getMeasurementDimensions(gfTrack, vDimMeas);
+      getMeasurementDimensions(recoTrack, vDimMeas);
 
       TMatrixDSym fullCovariance;
-      bool success = buildFullCovarianceMatrix(gfTrack, fullCovariance);
+      bool success = buildFullCovarianceMatrix(recoTrack, fullCovariance);
       if (!success) {
         // Error printed inside.
         continue;
       }
       TMatrixDSym fullResidualCovariance;
       TMatrixDSym inverseFullMeasurementCovariance;
-      buildFullResidualCovarianceMatrix(gfTrack, vDimMeas, fullCovariance, fullResidualCovariance,
+      buildFullResidualCovarianceMatrix(recoTrack, vDimMeas, fullCovariance, fullResidualCovariance,
                                         inverseFullMeasurementCovariance);
 
       TVectorD residuals;
       TVectorD residualsTimeDerivative;
-      buildResidualsAndTimeDerivative(gfTrack, vDimMeas, residuals, residualsTimeDerivative);
+      buildResidualsAndTimeDerivative(recoTrack, vDimMeas, residuals, residualsTimeDerivative);
 
       // Equations with their numbers from 0810.2241:
       // 2 At V^-1 (V - HCHt) V^-1 r       (9)
@@ -295,11 +265,11 @@ void TrackTimeExtractionModule::event()
       td.d2chi2da2[td.nTracks] = d2chi2da2;
 
       if (m_DoHistogramming)
-        hd2chi2da2[m_InTrackColName]->Fill(d2chi2da2);
+        hd2chi2da2[m_recoTracksStoreArrayName]->Fill(d2chi2da2);
 
       if (m_DoHistogramming) {
-        hTimesPerTrack[m_InTrackColName]->Fill(1 / d2chi2da2 * dchi2da);
-        hTimesPerTrackVsPVal[m_InTrackColName]->Fill(1 / d2chi2da2 * dchi2da, PVal);
+        hTimesPerTrack[m_recoTracksStoreArrayName]->Fill(1 / d2chi2da2 * dchi2da);
+        hTimesPerTrackVsPVal[m_recoTracksStoreArrayName]->Fill(1 / d2chi2da2 * dchi2da, PVal);
       }
       if (d2chi2da2 > 20) {
         B2DEBUG(200, "Track with bad second derivative");
@@ -328,41 +298,29 @@ void TrackTimeExtractionModule::event()
     td.nTracks++;
   }
   if (m_DoHistogramming) {
-    hEstimatedTimeErrors[m_InTrackColName]->Fill(sqrt(2 / sumFirst));
-    hTimes[m_InTrackColName]->Fill(1 / sumFirst * sumSecond);
-    hTimesCorrectHypot[m_InTrackColName]->Fill(1 / sumFirstCorrectHypot * sumSecondCorrectHypot);
-    hTimesGoodTracks[m_InTrackColName]->Fill(1 / sumFirstGoodTracks * sumSecondGoodTracks);
-    hTimesFastTracks[m_InTrackColName]->Fill(1 / sumFirstFastTracks * sumSecondFastTracks);
+    hEstimatedTimeErrors[m_recoTracksStoreArrayName]->Fill(sqrt(2 / sumFirst));
+    hTimes[m_recoTracksStoreArrayName]->Fill(1 / sumFirst * sumSecond);
+    hTimesCorrectHypot[m_recoTracksStoreArrayName]->Fill(1 / sumFirstCorrectHypot * sumSecondCorrectHypot);
+    hTimesGoodTracks[m_recoTracksStoreArrayName]->Fill(1 / sumFirstGoodTracks * sumSecondGoodTracks);
+    hTimesFastTracks[m_recoTracksStoreArrayName]->Fill(1 / sumFirstFastTracks * sumSecondFastTracks);
 
     if (td.nTracks > 0)
-      t[m_InTrackColName]->Fill();
+      t[m_recoTracksStoreArrayName]->Fill();
   }
-  for (int i = 0; i < GFTracks.getEntries(); ++i) {
-    const genfit::TrackCand* oldCand = DataStore::getRelated<genfit::TrackCand>(GFTracks[i], m_InTrackCandColName);
-    auto cand = newTrackCands.appendNew(*oldCand);
-    cand->setTimeSeed(cand->getTimeSeed() + 1 / sumFirst * sumSecond);
-    newTrackCandToOldTrack.add(i, i);
+  for (RecoTrack& recoTrack : recoTracks) {
+    recoTrack.setTimeSeed(recoTrack.getTimeSeed() + 1 / sumFirst * sumSecond);
   }
-}
-
-
-void TrackTimeExtractionModule::endRun()
-{
-}
-
-
-void TrackTimeExtractionModule::terminate()
-{
 }
 
 
 void
-TrackTimeExtractionModule::getMeasurementDimensions(const genfit::Track* tr,
+TrackTimeExtractionModule::getMeasurementDimensions(const RecoTrack& recoTrack,
                                                     std::vector<int>& vDimMeas)
 {
-  vDimMeas.resize(tr->getNumPointsWithMeasurement());
-  for (size_t i = 0; i < tr->getNumPointsWithMeasurement(); ++i) {
-    vDimMeas.push_back(tr->getPointWithMeasurement(i)->getRawMeasurement(0)->getDim());
+  const auto& hitPoints = recoTrack.getHitPointsWithMeasurement();
+  vDimMeas.resize(hitPoints.size());
+  for (const auto& hit : hitPoints) {
+    vDimMeas.push_back(hit->getRawMeasurement(0)->getDim());
   }
 }
 
@@ -416,15 +374,16 @@ namespace {
   }
 }
 
-bool TrackTimeExtractionModule::buildFullCovarianceMatrix(const genfit::Track* tr,
+bool TrackTimeExtractionModule::buildFullCovarianceMatrix(const RecoTrack& recoTrack,
                                                           TMatrixDSym& fullCovariance)
 {
-  if (!tr->hasKalmanFitStatus()) {
+  const genfit::KalmanFitStatus* kfs = dynamic_cast<const genfit::KalmanFitStatus*>(recoTrack.getTrackFitStatus());
+
+  if (!kfs) {
     B2ERROR("Track not fitted with a Kalman fitter.");
     return false;
   }
 
-  const genfit::KalmanFitStatus* kfs = tr->getKalmanFitStatus();
   if (!kfs->isFitConverged()) {
     B2ERROR("Track fit didn't converge.");
     return false;
@@ -435,15 +394,16 @@ bool TrackTimeExtractionModule::buildFullCovarianceMatrix(const genfit::Track* t
     return false;
   }
 
-  const unsigned int nPoints = tr->getNumPoints();
-  const genfit::AbsTrackRep* rep = tr->getCardinalRep();
+  const auto& hitPoints = recoTrack.getHitPointsWithMeasurement();
+  const unsigned int nPoints = hitPoints.size();
+  const genfit::AbsTrackRep* rep = recoTrack.getCardinalRepresentation();
   const int nDim = rep->getDim();
 
   fullCovariance.ResizeTo(nPoints * nDim, nPoints * nDim);
   std::vector<TMatrixD> vFitterGain;
   vFitterGain.reserve(nPoints);
   for (unsigned int i = 0; i < nPoints; ++i) {
-    const genfit::TrackPoint* tp = tr->getPoint(i);
+    const genfit::TrackPoint* tp = hitPoints[i];
     const genfit::KalmanFitterInfo* fi = tp->getKalmanFitterInfo();
     if (!fi) {
       B2ERROR("Missing KalmanFitterInfo");
@@ -457,7 +417,7 @@ bool TrackTimeExtractionModule::buildFullCovarianceMatrix(const genfit::Track* t
 
     // Build the corresponding smoother gain matrix.
     if (i + 1 < nPoints) {
-      const genfit::TrackPoint* tpNext = tr->getPoint(i + 1);
+      const genfit::TrackPoint* tpNext = hitPoints[i + 1];
       const genfit::KalmanFitterInfo* fiNext = tpNext->getKalmanFitterInfo();
       if (!fiNext) {
         B2ERROR("Missing next KalmanFitterInfo");
@@ -499,7 +459,7 @@ bool TrackTimeExtractionModule::buildFullCovarianceMatrix(const genfit::Track* t
 }
 
 bool
-TrackTimeExtractionModule::buildFullResidualCovarianceMatrix(const genfit::Track* tr,
+TrackTimeExtractionModule::buildFullResidualCovarianceMatrix(const RecoTrack& recoTrack,
     const std::vector<int>& vDimMeas,
     const TMatrixDSym& fullCovariance,
     TMatrixDSym& fullResidualCovariance,
@@ -507,8 +467,9 @@ TrackTimeExtractionModule::buildFullResidualCovarianceMatrix(const genfit::Track
 {
   /* The fullResidualCovariance is eq. (17) in 0810.2241.  */
 
-  const unsigned int nPoints = tr->getNumPoints();
-  const genfit::AbsTrackRep* rep = tr->getCardinalRep();
+  const auto& hitPoints = recoTrack.getHitPointsWithMeasurement();
+  const unsigned int nPoints = hitPoints.size();
+  const genfit::AbsTrackRep* rep = recoTrack.getCardinalRepresentation();
   const int nDim = rep->getDim();
   int measurementDimensions = std::accumulate(vDimMeas.begin(), vDimMeas.end(), 0);
   fullResidualCovariance.ResizeTo(measurementDimensions, measurementDimensions);
@@ -518,7 +479,7 @@ TrackTimeExtractionModule::buildFullResidualCovarianceMatrix(const genfit::Track
   std::vector<TMatrixD> HMatrices;
   HMatrices.reserve(nPoints);
   for (unsigned int i = 0, index = 0; i < nPoints; ++i) {
-    const genfit::TrackPoint* tp = tr->getPoint(i);
+    const genfit::TrackPoint* tp = hitPoints[i];
     const genfit::AbsMeasurement* meas = tp->getRawMeasurement(0);
     std::unique_ptr<const genfit::AbsHMatrix> pH(meas->constructHMatrix(rep));
     const TMatrixD& H = pH->getMatrix();
@@ -550,7 +511,7 @@ TrackTimeExtractionModule::buildFullResidualCovarianceMatrix(const genfit::Track
   fullResidualCovariance *= -1;
   inverseFullMeasurementCovariance = 0;
   for (unsigned int i = 0, index = 0; i < nPoints; ++i) {
-    const genfit::TrackPoint* tp = tr->getPoint(i);
+    const genfit::TrackPoint* tp = hitPoints[i];
     const genfit::KalmanFitterInfo* fi = tp->getKalmanFitterInfo();
     const genfit::MeasurementOnPlane& mop = fi->getAvgWeightedMeasurementOnPlane();
     TMatrixDSym cov = mop.getCov();
@@ -570,7 +531,7 @@ TrackTimeExtractionModule::buildFullResidualCovarianceMatrix(const genfit::Track
 
 
 void
-TrackTimeExtractionModule::buildResidualsAndTimeDerivative(const genfit::Track* tr,
+TrackTimeExtractionModule::buildResidualsAndTimeDerivative(const RecoTrack& recoTrack,
                                                            const std::vector<int>& vDimMeas,
                                                            TVectorD& residuals,
                                                            TVectorD& residualTimeDerivative)
@@ -581,8 +542,10 @@ TrackTimeExtractionModule::buildResidualsAndTimeDerivative(const genfit::Track* 
   residuals.ResizeTo(measurementDimensions);
   residualTimeDerivative.ResizeTo(measurementDimensions);
 
-  for (unsigned int i = 0, index = 0; i < tr->getNumPoints(); ++i) {
-    const genfit::TrackPoint* tp = tr->getPoint(i);
+  const auto& hitPoints = recoTrack.getHitPointsWithMeasurement();
+  const unsigned int nPoints = hitPoints.size();
+  for (unsigned int i = 0, index = 0; i < nPoints; ++i) {
+    const genfit::TrackPoint* tp = hitPoints[i];
     const genfit::KalmanFitterInfo* fi = tp->getKalmanFitterInfo();
 
     const std::vector<double>& weights = fi->getWeights();
@@ -599,15 +562,15 @@ TrackTimeExtractionModule::buildResidualsAndTimeDerivative(const genfit::Track* 
       residualTimeDerivative[index] = weightedDeriv;
 
       if (m_DoHistogramming) {
-        hDerivative[m_InTrackColName]->Fill(deriv[0]);
-        hDerivative[m_InTrackColName]->Fill(deriv[1]);
-        hWeightedDerivativeBoth[m_InTrackColName]->Fill(deriv[0], weights[0]);
-        hWeightedDerivativeBoth[m_InTrackColName]->Fill(deriv[1], weights[1]);
-        hWeightedDerivative[m_InTrackColName]->Fill(weightedDeriv);
+        hDerivative[m_recoTracksStoreArrayName]->Fill(deriv[0]);
+        hDerivative[m_recoTracksStoreArrayName]->Fill(deriv[1]);
+        hWeightedDerivativeBoth[m_recoTracksStoreArrayName]->Fill(deriv[0], weights[0]);
+        hWeightedDerivativeBoth[m_recoTracksStoreArrayName]->Fill(deriv[1], weights[1]);
+        hWeightedDerivative[m_recoTracksStoreArrayName]->Fill(weightedDeriv);
 
         auto vmops = hit->constructMeasurementsOnPlane(fi->getFittedState());
-        hXTRelation[m_InTrackColName]->Fill(vmops[0]->getState()(0), deriv[0]);
-        hXTRelation[m_InTrackColName]->Fill(vmops[1]->getState()(0), deriv[1]);
+        hXTRelation[m_recoTracksStoreArrayName]->Fill(vmops[0]->getState()(0), deriv[0]);
+        hXTRelation[m_recoTracksStoreArrayName]->Fill(vmops[1]->getState()(0), deriv[1]);
         delete vmops[0];
         delete vmops[1];
       }

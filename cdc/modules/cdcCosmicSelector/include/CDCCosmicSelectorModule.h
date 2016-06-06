@@ -38,12 +38,13 @@ namespace Belle2 {
     void event();
 
   private:
-    double m_xOfCounter;  /**< x-pos. of counter (cm) */
-    double m_yOfCounter;  /**< y-pos. of counter (cm) */
-    double m_zOfCounter;  /**< z-pos. of counter (cm) */
-    double m_wOfCounter;  /**< full-width  of counter (cm) */
-    double m_lOfCounter;  /**< full-length of counter (cm) */
-    int    m_tof;         /**< tof option */
+    double m_xOfCounter;   /**< x-pos. of counter (cm) */
+    double m_yOfCounter;   /**< y-pos. of counter (cm) */
+    double m_zOfCounter;   /**< z-pos. of counter (cm) */
+    double m_wOfCounter;   /**< full-width  of counter (cm) */
+    double m_lOfCounter;   /**< full-length of counter (cm) */
+    int    m_tof;          /**< tof option */
+    bool   m_cryGenerator; /**< cry or cosmics generator */
   };
 
 } // end of Belle2 namespace

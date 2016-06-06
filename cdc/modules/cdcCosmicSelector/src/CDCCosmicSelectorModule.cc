@@ -34,6 +34,7 @@ CDCCosmicSelectorModule::CDCCosmicSelectorModule() : Module()
   addParam("wOfCounter", m_wOfCounter, "full-width  of trigger counter (cm)",  7.0);
   addParam("lOfCounter", m_lOfCounter, "full-length of trigger counter (cm)", 12.5);
   addParam("TOF", m_tof, "Tof=1(2): TOF from production point to trigger counter (IP) is subtracted", 1);
+  addParam("cryGenerator", m_cryGenerator, "true: CRY generator; false Cosmics generator", true);
 }
 
 void CDCCosmicSelectorModule::initialize()
@@ -51,7 +52,7 @@ void CDCCosmicSelectorModule::event()
   // Loop over all particles
   int nMCPs = mcParticles.getEntries();
   B2DEBUG(250, "Number of mcParticles in the current event: " << nMCPs);
-  if (nMCPs != 1) B2FATAL("No. of mcparticle != 1 !");
+  if (nMCPs != 1) B2WARNING("No. of mcparticle != 1 !");
 
   const double mass = 0.1056583715; //muon mass (GeV)
 
@@ -110,6 +111,7 @@ void CDCCosmicSelectorModule::event()
       double fl = 0.;
       if (m_tof == 1) {
         fl = sqrt((xi - vX) * (xi - vX) + (yi - vY) * (yi - vY) + (zi - vZ) * (zi - vZ)); // fl to counter
+        //  std::cout <<"fl= " << fl << std::endl;
       } else if (m_tof == 2) {
         fl = -(cX * vX + cY * vY) / (cX * cX + cY * cY); //fl to origin
       } else {
@@ -121,9 +123,32 @@ void CDCCosmicSelectorModule::event()
       //      if (dot < 0.) fl *= -1.;
 
       const double beta = p / sqrt(p * p + mass * mass);
+      double pTime = m_P->getProductionTime();
+      //      const double pTimeOrg = pTime;
+
+      if (m_cryGenerator) {
+        //calculate an intersection with y=0 plane
+        double xi4cry = -999.;
+        double yi4cry =    0.;
+        double zi4cry = -999.;
+        if (pY != 0.) {
+          xi4cry = (0. - vY) * (pX / pY) + vX;
+          zi4cry = (0. - vY) * (pZ / pY) + vZ;
+        } else {
+          xi4cry = 0.;
+          zi4cry = -vX * (pZ / pX) + vZ;
+        }
+
+        const double fl4cry = sqrt((xi4cry - vX) * (xi4cry - vX) + (yi4cry - vY) * (yi4cry - vY) + (zi4cry - vZ) *
+                                   (zi4cry - vZ)); // fl to y=0 plane
+
+        //reset production time (to the time which old CRY set) once
+        pTime += fl4cry / (c * beta);
+      }
+
       const double tofToCounter = fl / (c * beta);
-      const double pTime = m_P->getProductionTime();
       m_P->setProductionTime(pTime - tofToCounter);
+      //      std::cout <<"org,mod= " << pTimeOrg << m_P->getProductionTime() << std::endl;
       //if not hit, reverse the momentum vector so that the particle will not be simulated
       //better to use condition in basf2...
     } else {

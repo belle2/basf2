@@ -33,7 +33,7 @@ namespace Belle2 {
      * Constructor with name
      * @param name object name
      */
-    TOPGeoBase(const std::string& name): m_name(name)
+    explicit TOPGeoBase(const std::string& name): m_name(name)
     {}
 
     /**

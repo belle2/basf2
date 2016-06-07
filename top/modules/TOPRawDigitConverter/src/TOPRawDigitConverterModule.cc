@@ -50,7 +50,7 @@ namespace Belle2 {
 
   {
     // set module description (e.g. insert text)
-    setDescription("");
+    setDescription("Converts row digits to digits and applies time calibration");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters

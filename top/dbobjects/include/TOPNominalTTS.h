@@ -40,7 +40,7 @@ namespace Belle2 {
      * Constructor with name
      * @param name object name
      */
-    TOPNominalTTS(const std::string& name): TOPGeoBase(name)
+    explicit TOPNominalTTS(const std::string& name): TOPGeoBase(name)
     {}
 
     /**

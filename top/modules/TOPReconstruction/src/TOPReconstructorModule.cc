@@ -13,6 +13,7 @@
 
 // Own include
 #include <top/modules/TOPReconstruction/TOPReconstructorModule.h>
+#include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction/TOPreco.h>
 #include <top/reconstruction/TOPtrack.h>
 #include <top/reconstruction/TOPconfigure.h>

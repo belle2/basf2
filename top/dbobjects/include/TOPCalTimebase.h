@@ -18,7 +18,7 @@
 namespace Belle2 {
 
   /**
-   * Calibration constants of ASIC channels for full detector: time axis (sample times)
+   * Sample time calibration constants for all channels.
    */
   class TOPCalTimebase: public TObject {
   public:
@@ -33,7 +33,7 @@ namespace Belle2 {
      * Useful constructor
      * @param syncTimeBase sinchronization time base (width of 2 ASIC windows)
      */
-    TOPCalTimebase(double syncTimeBase): m_syncTimeBase(syncTimeBase)
+    explicit TOPCalTimebase(double syncTimeBase): m_syncTimeBase(syncTimeBase)
     {}
 
     /**

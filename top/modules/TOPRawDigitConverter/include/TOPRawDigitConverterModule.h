@@ -21,7 +21,7 @@
 namespace Belle2 {
 
   /**
-   *
+   * TOPRawDigits to TOPDigits converter. Applies also time calibration.
    */
   class TOPRawDigitConverterModule : public Module {
 

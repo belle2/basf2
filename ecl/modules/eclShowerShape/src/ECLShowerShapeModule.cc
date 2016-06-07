@@ -7,6 +7,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
  *               Guglielmo De Nardo (denardo@na.infn.it)                  *
+ *               Alon Hershenhorn                                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -27,7 +28,7 @@
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
-//Root
+// ROOT
 #include <TMath.h>
 
 using namespace Belle2;
@@ -50,8 +51,11 @@ ECLShowerShapeModule::ECLShowerShapeModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("rho0", m_rho0,
-           "Scaling factor for radial distances in a plane perpendicular to direction to shower. Distances greated than rho0 will be ignored in Zernike moment calculations",
+           "Scaling factor for radial distances in a plane perpendicular to direction to shower. Distances greated than rho0 will be ignored in Zernike moment calculations.",
            15.0 * Unit::cm);
+  addParam("avgCrystalDimension", m_avgCrystalDimension,
+           "Average crystal dimension used in lateral energy calculation.",
+           5.0 * Unit::cm);
 
 }
 
@@ -61,42 +65,51 @@ ECLShowerShapeModule::~ECLShowerShapeModule()
 
 void ECLShowerShapeModule::initialize()
 {
+  // Initialize neighbour maps.
+  m_neighbourMap9 = new ECLNeighbours("N", 1);
+  m_neighbourMap25 = new ECLNeighbours("N", 2);
 }
 
 void ECLShowerShapeModule::beginRun()
 {
-  // Do not use this for Database updates, they will not follow the concept of a "run"
+  // Do not use this for Database updates, they will not follow the concept of a "run", use callback.
   ;
 }
 
 void ECLShowerShapeModule::event()
 {
   StoreArray<ECLShower> eclShowers(eclShowerArrayName());
-  for (auto& eclShower : eclShowers)
+
+  for (auto& eclShower : eclShowers) {
     eclShower.setLateralEnergy(computeLateralEnergy(eclShower));
+    eclShower.setE1oE9(computeE1oE9(eclShower));
 
-  //---------------------------------------------------------------------
-  //Calculate shower shape variables in a plane perpendicular to the shower direction
-  //---------------------------------------------------------------------
-  for (auto& shower : eclShowers) {
+    // As long as we have the old clustering running, we should not overwrite existing values... or should we? (TF)
+    if (eclShower.getE9oE25() <= 0.0) eclShower.setE9oE25(computeE9oE25(eclShower));
+
+    //---------------------------------------------------------------------
+    // Calculate shower shape variables in a plane perpendicular to the shower direction
+    //---------------------------------------------------------------------
     //Project the digits on the plane perpendicular to the shower direction
-    std::vector<ProjectedECLDigit> projectedECLDigits = projectECLDigits(shower);
+    std::vector<ProjectedECLDigit> projectedECLDigits = projectECLDigits(eclShower);
 
-    //Compute shower shape variables in the plane
-    double absZernike20 = computeAbsZernikeMoment(projectedECLDigits, shower.getEnergy(), 2, 0, m_rho0);
-    double absZernike40 = computeAbsZernikeMoment(projectedECLDigits, shower.getEnergy(), 4, 0, m_rho0);
-    double absZernike42 = computeAbsZernikeMoment(projectedECLDigits, shower.getEnergy(), 4, 2, m_rho0);
-    double absZernike51 = computeAbsZernikeMoment(projectedECLDigits, shower.getEnergy(), 5, 1, m_rho0);
-    double absZernike53 = computeAbsZernikeMoment(projectedECLDigits, shower.getEnergy(), 5, 3, m_rho0);
-    double secondMoment = computeSecondMoment(projectedECLDigits, shower.getEnergy());
+    // Compute shower shape variables in the plane.
+    const double showerEnergy = eclShower.getEnergy();
 
-    //Set shower shape variables
-    shower.setAbsZernike20(absZernike20);
-    shower.setAbsZernike40(absZernike40);
-    shower.setAbsZernike42(absZernike42);
-    shower.setAbsZernike51(absZernike51);
-    shower.setAbsZernike53(absZernike53);
-    shower.setSecondMoment(secondMoment);
+    const double absZernike20 = computeAbsZernikeMoment(projectedECLDigits, showerEnergy, 2, 0, m_rho0);
+    const double absZernike40 = computeAbsZernikeMoment(projectedECLDigits, showerEnergy, 4, 0, m_rho0);
+    const double absZernike42 = computeAbsZernikeMoment(projectedECLDigits, showerEnergy, 4, 2, m_rho0);
+    const double absZernike51 = computeAbsZernikeMoment(projectedECLDigits, showerEnergy, 5, 1, m_rho0);
+    const double absZernike53 = computeAbsZernikeMoment(projectedECLDigits, showerEnergy, 5, 3, m_rho0);
+    const double secondMoment = computeSecondMoment(projectedECLDigits, showerEnergy);
+
+    // Set shower shape variables.
+    eclShower.setAbsZernike20(absZernike20);
+    eclShower.setAbsZernike40(absZernike40);
+    eclShower.setAbsZernike42(absZernike42);
+    eclShower.setAbsZernike51(absZernike51);
+    eclShower.setAbsZernike53(absZernike53);
+    eclShower.setSecondMoment(secondMoment);
   }
 }
 
@@ -105,20 +118,20 @@ std::vector<ECLShowerShapeModule::ProjectedECLDigit> ECLShowerShapeModule::proje
   std::vector<ProjectedECLDigit> tmpProjectedECLDigits; //Will be returned at the end of the function
 
   //---------------------------------------------------------------------
-  //Get shower parameters
+  // Get shower parameters.
   //---------------------------------------------------------------------
-  double showerR = shower.getR();
-  double showerTheta = shower.getTheta();
-  double showerPhi = shower.getPhi();
+  const double showerR = shower.getR();
+  const double showerTheta = shower.getTheta();
+  const double showerPhi = shower.getPhi();
 
   TVector3 showerPosition;
   showerPosition.SetMagThetaPhi(showerR, showerTheta, showerPhi);
 
-  //Unit vector pointing in shower direction
+  // Unit vector pointing in shower direction.
   const TVector3 showerDirection = (1.0 / showerPosition.Mag()) * showerPosition;
 
   //---------------------------------------------------------------------
-  //Calculate axes that span the perpendicular plane
+  // Calculate axes that span the perpendicular plane.
   //---------------------------------------------------------------------
   //xPrimeDirection = showerdirection.cross(zAxis)
   TVector3 xPrimeDirection = TVector3(showerPosition.y(), -showerPosition.x(), 0.0);
@@ -128,7 +141,7 @@ std::vector<ECLShowerShapeModule::ProjectedECLDigit> ECLShowerShapeModule::proje
   yPrimeDirection *= 1.0 / yPrimeDirection.Mag();
 
   //---------------------------------------------------------------------
-  //Loop on CalDigits in shower and calculate the projection
+  // Loop on CalDigits in shower and calculate the projection.
   //---------------------------------------------------------------------
   auto showerDigitRelations = shower.getRelationsTo<ECLCalDigit>();
   ECLGeometryPar* geometry = ECLGeometryPar::Instance();
@@ -139,31 +152,31 @@ std::vector<ECLShowerShapeModule::ProjectedECLDigit> ECLShowerShapeModule::proje
     ProjectedECLDigit tmpProjectedDigit;
 
     //---------------------------------------------------------------------
-    //Projected digit energy
+    // Projected digit energy.
     //---------------------------------------------------------------------
     const auto weight = showerDigitRelations.weight(iRelation);
     tmpProjectedDigit.energy = weight * calDigit->getEnergy();
 
     //---------------------------------------------------------------------
-    //Projected digit radial distance
+    // Projected digit radial distance.
     //---------------------------------------------------------------------
-    int cellId = calDigit->getCellId();
+    const int cellId = calDigit->getCellId();
     TVector3 calDigitPosition = geometry->GetCrystalPos(cellId - 1);
 
-    //Angle between vector pointing to shower and vector pointing to CalDigit,
+    // Angle between vector pointing to shower and vector pointing to CalDigit,
     //where the orgin is the detector origin (implicitly assuming IP = detector origin)
-    double angleDigitShower = calDigitPosition.Angle(showerPosition);
+    const double angleDigitShower = calDigitPosition.Angle(showerPosition);
     tmpProjectedDigit.rho = showerR * TMath::Tan(angleDigitShower);
 
     //---------------------------------------------------------------------
-    //Projected digit polar angle
+    // Projected digit polar angle
     //---------------------------------------------------------------------
-    //Vector perpendicular to the vector pointing to the shower position, pointing to the CalDigit.
-    //It's length is not rho. Not normalized!!! We only care about the angle between in and xPrime.
+    // Vector perpendicular to the vector pointing to the shower position, pointing to the CalDigit.
+    // It's length is not rho. Not normalized!!! We only care about the angle between in and xPrime.
     TVector3 projectedDigitDirection = calDigitPosition - calDigitPosition.Dot(showerDirection) * showerDirection;
     tmpProjectedDigit.alpha = projectedDigitDirection.Angle(xPrimeDirection);
 
-    //adjust so that alpha spans 0..2pi
+    // adjust so that alpha spans 0..2pi
     if (projectedDigitDirection.Angle(yPrimeDirection) > TMath::Pi() / 2.0)
       tmpProjectedDigit.alpha = 2.0 * TMath::Pi() - tmpProjectedDigit.alpha;
     tmpProjectedECLDigits.push_back(tmpProjectedDigit);
@@ -178,6 +191,8 @@ void ECLShowerShapeModule::endRun()
 
 void ECLShowerShapeModule::terminate()
 {
+  if (m_neighbourMap9) delete m_neighbourMap9;
+  if (m_neighbourMap25) delete m_neighbourMap25;
 }
 
 double ECLShowerShapeModule::computeLateralEnergy(const ECLShower& shower) const
@@ -186,9 +201,10 @@ double ECLShowerShapeModule::computeLateralEnergy(const ECLShower& shower) const
   auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
   if (shower.getNofCrystals() < 3.0) return 0;
 
-  // Find the two digits with the maximum energy
+  // Find the two digits with the maximum energy.
   double maxEnergy(0), secondMaxEnergy(0);
   unsigned int iMax(0), iSecondMax(0);
+
   for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
     const auto aECLCalDigit = relatedDigitsPairs.object(iRel);
     const auto weight = relatedDigitsPairs.weight(iRel);
@@ -203,6 +219,7 @@ double ECLShowerShapeModule::computeLateralEnergy(const ECLShower& shower) const
       iSecondMax = iRel;
     }
   }
+
   double sumE = 0;
   TVector3 cryCenter;
   cryCenter.SetMagThetaPhi(shower.getR(), shower.getTheta(), shower.getPhi());
@@ -220,13 +237,14 @@ double ECLShowerShapeModule::computeLateralEnergy(const ECLShower& shower) const
       sumE += weight * aECLCalDigit->getEnergy() * r2;
     }
   }
-  const double r0sq = 5.*5. ; // average crystal dimension
+
+  const double r0sq = m_avgCrystalDimension * m_avgCrystalDimension; // average crystal dimension squared.
   return sumE / (sumE + r0sq * (maxEnergy + secondMaxEnergy));
 }
 
 double ECLShowerShapeModule::Rnm(const int n, const int m, const double rho) const
 {
-  //Some explicit polynomials
+  // Some explicit polynomials.
   if (n == 1 && m == 1) return rho;
   if (n == 2 && m == 0) return 2.0 * rho * rho - 1.0;
   if (n == 2 && m == 2) return rho * rho;
@@ -239,7 +257,7 @@ double ECLShowerShapeModule::Rnm(const int n, const int m, const double rho) con
   if (n == 5 && m == 3) return 5.0 * rho * rho * rho * rho * rho - 4.0 * rho * rho * rho;
   if (n == 5 && m == 5) return rho * rho * rho * rho * rho;
 
-  //Otherwise compute explicitely
+  // Otherwise compute explicitely.
   double returnVal = 0;
   for (int idx = 0; idx <= (n - std::abs(m)) / 2; ++idx)
     returnVal += std::pow(-1, idx) * TMath::Factorial(n - idx) / TMath::Factorial(idx)
@@ -250,7 +268,7 @@ double ECLShowerShapeModule::Rnm(const int n, const int m, const double rho) con
 
 std::complex<double> ECLShowerShapeModule::zernikeValue(const double rho, const double alpha, const int n, const int m) const
 {
-  //Zernike moment defined only on the unit cercile (rho < 1)
+  // Zernike moment defined only on the unit cercile (rho < 1).
   if (rho > 1.0) return std::complex<double>(0, 0);
 
   std::complex<double> i(0, 1);
@@ -262,14 +280,16 @@ std::complex<double> ECLShowerShapeModule::zernikeValue(const double rho, const 
 double ECLShowerShapeModule::computeAbsZernikeMoment(const std::vector<ProjectedECLDigit>& projectedDigits,
                                                      const double totalEnergy, const int n, const int m, const double rho0) const
 {
-  //Make sure n,m are valid
+  if (totalEnergy <= 0.0) return 0.0;
+
+  // Make sure n,m are valid
   if (n < 0 || m < 0) return 0.0;
   if (m > n) return 0.0;
 
   std::complex<double> sum(0.0, 0.0);
 
   for (const auto projectedDigit : projectedDigits) {
-    const double normalizedRho = projectedDigit.rho / rho0;     //Normailze radial distance according to rho0
+    const double normalizedRho = projectedDigit.rho / rho0;     // Normalize radial distance according to rho0.
     sum += projectedDigit.energy * std::conj(zernikeValue(normalizedRho, projectedDigit.alpha, n, m));
   }
   return (n + 1.0) / TMath::Pi() * std::abs(sum) / totalEnergy;
@@ -278,9 +298,91 @@ double ECLShowerShapeModule::computeAbsZernikeMoment(const std::vector<Projected
 double ECLShowerShapeModule::computeSecondMoment(const std::vector<ProjectedECLDigit>& projectedDigits,
                                                  const double totalEnergy) const
 {
+  if (totalEnergy <= 0.0) return 0.0;
+
   double sum = 0.0;
 
   for (const auto projectedDigit : projectedDigits) sum += projectedDigit.energy * projectedDigit.rho * projectedDigit.rho;
 
   return sum / totalEnergy;
 }
+
+
+double ECLShowerShapeModule::computeE1oE9(const ECLShower& shower) const
+{
+
+  // get central id
+  const int centralCellId = shower.getCentralCellId();
+  if (centralCellId == 0) return 0.0; //cell id starts at 1
+
+  // get list of 9 neighbour ids
+  const std::vector< short int > n9 = m_neighbourMap9->getNeighbours(centralCellId);
+
+  double energy1 = 0.0; // to check: 'highest energy' data member may not always be the right one
+  double energy9 = 0.0;
+
+  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
+
+  for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
+    const auto caldigit = relatedDigitsPairs.object(iRel);
+    const auto weight = relatedDigitsPairs.weight(iRel);
+    const auto energy = caldigit->getEnergy();
+    const int cellid  = caldigit->getCellId();
+
+    // get central cell id energy
+    if (cellid == centralCellId) {
+      energy1 = weight * energy;
+    }
+
+    // check if this is contained in the 9 neighbours
+    const auto it9 = std::find(n9.begin(), n9.end(), cellid);
+    if (it9 != n9.end()) {
+      energy9 += weight * energy;
+    }
+
+  }
+
+  if (energy9 >= 0.0) return energy1 / energy9;
+  else return 0.0;
+}
+
+double ECLShowerShapeModule::computeE9oE25(const ECLShower& shower) const
+{
+  // get central id
+  const int centralCellId = shower.getCentralCellId();
+  if (centralCellId == 0) return 0.0; //cell id starts at 1
+
+  // get list of 9 and 25 neighbour ids
+  const std::vector< short int > n9 = m_neighbourMap9->getNeighbours(centralCellId);
+  const std::vector< short int > n25 = m_neighbourMap25->getNeighbours(centralCellId);
+
+  double energy9 = 0.0;
+  double energy25 = 0.0;
+
+  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
+
+  for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
+    const auto caldigit = relatedDigitsPairs.object(iRel);
+    const auto weight = relatedDigitsPairs.weight(iRel);
+    const auto energy = caldigit->getEnergy();
+    const int cellid  = caldigit->getCellId();
+
+    // check if this is contained in the 9 neighbours
+    const auto it9 = std::find(n9.begin(), n9.end(), cellid);
+    if (it9 != n9.end()) {
+      energy9 += weight * energy;
+    }
+
+    // check if this is contained in the 25 neighbours
+    const auto it25 = std::find(n25.begin(), n25.end(), cellid);
+    if (it25 != n25.end()) {
+      energy25 += weight * energy;
+    }
+
+  }
+
+  if (energy25 >= 0.0) return energy9 / energy25;
+  else return 0.0;
+
+}
+

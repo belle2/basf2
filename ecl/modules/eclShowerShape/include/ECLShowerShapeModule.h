@@ -7,6 +7,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
  *               Guglielmo De Nardo (denardo@na.infn.it)                  *
+ *               Alon Hershenhorn                                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,8 +15,12 @@
 #ifndef ECLSHOWERSHAPEMODULE_H_
 #define ECLSHOWERSHAPEMODULE_H_
 
+// FRAMEWORK
 #include <framework/core/Module.h>
+
+// ECL
 #include <ecl/dataobjects/ECLShower.h>
+#include <ecl/geometry/ECLNeighbours.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -47,6 +52,13 @@ namespace Belle2 {
 
     private:
 
+      // Module Parameters
+      /** Scaling factor for radial distances in perpendicular plane */
+      double m_rho0;
+
+      /** Average crystal dimension [cm] */
+      double m_avgCrystalDimension;
+
       /**Struct used to hold information of the digits projected to a plane perpendicular to the shower direction */
       struct ProjectedECLDigit {
 
@@ -59,6 +71,12 @@ namespace Belle2 {
         /** polar angel */
         double alpha;
       };
+
+      /** Neighbour map 9 neighbours, for E9oE25 and E1oE9. */
+      ECLNeighbours* m_neighbourMap9;
+
+      /** Neighbour map 25 neighbours, for E9oE25. */
+      ECLNeighbours* m_neighbourMap25;
 
       /** Shower shape variable: Lateral energy. */
       double computeLateralEnergy(const ECLShower&) const;
@@ -99,8 +117,16 @@ namespace Belle2 {
       alpha - polar angle */
       std::complex<double> zernikeValue(const double rho, const double alpha, const int n, const int m) const;
 
-      /** Scaling factor for radial distances in perpendicular plane */
-      double m_rho0;
+      /** Shower shape variable: E9oE25
+       The energy ratio is calculated taking the weighted 3x3 (=9) and the weighted 5x5 (=25) crystals around the central crystal.
+       If the shower is smaller than this, the reduced number is used for this. */
+      double computeE9oE25(const ECLShower&) const;
+
+      /** Shower shape variable: E1oE9
+       The energy ratio is calculated taking the weighted central (=1) and the weighted 3x3 (=9) crystals around the central crystal.
+       If the shower is smaller than this, the reduced number is used for this. */
+      double computeE1oE9(const ECLShower&) const;
+
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/

@@ -20,6 +20,16 @@ namespace Belle2 {
   class ECLConnectedRegion : public RelationsObject {
   public:
 
+    /** Enumerator for different hypothesis */
+    enum {
+      c_T1 = 1, /**< track, MIP + n gammas */
+      c_T2 = 2, /**< track, Charged hadron */
+      c_T3 = 3, /**< track, Electron + n gammas */
+      c_N1 = 5, /**< neutral, n gammas */
+      c_N2 = 6, /**< neutral, neutral hadron */
+      c_N3 = 7 /**< neutral, merged pi0 */
+    };
+
     /** default constructor for ROOT */
     ECLConnectedRegion()
     {
@@ -117,7 +127,9 @@ namespace Belle2 {
     float m_LikelihoodNeutralHadron;    /**< likelihood for N2 (neutral hadron) */
     float m_LikelihoodMergedPi0;        /**< likelihood for N3 (merged pi0) */
 
-    ClassDef(ECLConnectedRegion, 1); /**< ClassDef */
+    // 1: First version
+    // 2: Added enumerator to hold hypothesis Ids
+    ClassDef(ECLConnectedRegion, 2); /**< ClassDef */
 
   };
 

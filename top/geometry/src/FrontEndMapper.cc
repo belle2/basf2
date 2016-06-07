@@ -42,8 +42,10 @@ namespace Belle2 {
       int numModules = 0; // counter of mapped modules
       for (const GearDir& topModule : frontEndMapping.getNodes("TOPModule")) {
 
-        int moduleID = topModule.getInt("@moduleID");
-        if (moduleID <= 0 or moduleID > c_numModules) {
+        // int moduleCNumber = topModule.getInt("@CNumber");
+        int moduleID = topModule.getInt("moduleID");
+        if (moduleID == 0) continue; // module is not installed into barrel
+        if (moduleID < 0 or moduleID > c_numModules) {
           B2ERROR(topModule.getPath() << " moduleID=" << moduleID << " ***invalid ID");
           continue;
         }

@@ -20,11 +20,11 @@ import sys
 import glob
 
 # user input
-withbg = 1  # add beam background boolean
+withbg = 0  # add beam background boolean
 bgfolder = '/gs/project/belle2-mcgill/users/belle2/background/campaign12'  # folder that holds beam background
 bgfrac = 1.0  # fracion of nominal background
-seed = 12345  # seed for random numbers
-mdstfile = 'refactoring.root'  # output file
+seed = 10000  # seed for random numbers
+mdstfile = 'eclrefactoring.root'  # output file
 
 # set log level
 set_log_level(LogLevel.INFO)
@@ -62,6 +62,8 @@ main.add_module(ecl_crfinder)
 
 # ECL Splitter(s)
 ecl_n1 = register_module('ECLSplitterN1')
+# ecl_n1.set_log_level(LogLevel.DEBUG)
+# ecl_n1.set_debug_level(175)
 main.add_module(ecl_n1)
 
 # ECL Shower Correction
@@ -109,6 +111,7 @@ add_mdst_output(
         'ECLCalDigits',
         'ECLConnectedRegions',
         'ECLShowers',
+        'ECLLocalMaximums',
         'ECLEventInformation'])
 
 # Show progress of processing

@@ -5,8 +5,8 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
  *               Guglielmo De Nardo (denardo@na.infn.it)                  *
- *               Poyuan Chen                                              *
  *               Alon Hershenhorn (hershen@phas.ubc.ca)                   *
+ *               Poyuan Chen                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -35,7 +35,7 @@ namespace Belle2 {
       /** bit 1:  Hot crystal within nominal shower neighbour region.  */
       c_HasHotCrystal = 2 << 0,
 
-      /** combined flag to test whether the shower is problematic */
+      /** combined flag to test whether the shower is 'problematic' */
       c_HasProblematicCrystal = c_HasDeadCrystal | c_HasHotCrystal,
     };
 
@@ -47,6 +47,7 @@ namespace Belle2 {
       m_ShowerId = 0;          /**< Shower ID */
       m_connectedRegionId = 0; /**< Connected Region ID */
       m_hypothesisId = 0;      /**< Hypothesis ID */
+      m_centralCellId = 0;     /**< Central Cell ID */
       m_Energy = 0.0;          /**< Energy (GeV) */
       m_EnedepSum = 0.0;       /**< Raw Energy Sum (GeV) */
       m_Theta = 0.0;           /**< Theta (rad) */
@@ -96,6 +97,10 @@ namespace Belle2 {
     /*! Set Hypothesis identifier
      */
     void setHypothesisId(int hypothesisId) { m_hypothesisId = hypothesisId; }
+
+    /*! Set central cell id
+     */
+    void setCentralCellId(int centralCellId) { m_centralCellId = centralCellId; }
 
     /*! Set Energy
      */
@@ -212,6 +217,11 @@ namespace Belle2 {
      * @return Hypothesis Id
      */
     int getHypothesisId() const { return m_hypothesisId; }
+
+    /*! Get central cell Id
+     * @return central cell Id
+     */
+    int getCentralCellId() const { return m_centralCellId; }
 
     /*! Get Energy
      * @return Energy
@@ -333,12 +343,12 @@ namespace Belle2 {
      */
     double getSecondMoment() const { return m_secondMoment; }
 
-    /*! Get E1oE9
+    /*! Get energy ratio E1oE9
      * @return E1oE9
      */
     double getE1oE9() const { return m_E1oE9; }
 
-    /*! Get E9oE25
+    /*! Get energy ratio E9oE25
      * @return E9oE25
      */
     double getE9oE25() const { return m_E9oE25; }
@@ -379,6 +389,7 @@ namespace Belle2 {
     int m_ShowerId;                 /**< Shower ID */
     int m_connectedRegionId;        /**< Connected Region ID (TF)*/
     int m_hypothesisId;             /**< Hypothesis ID (TF)*/
+    int m_centralCellId;            /**< Central cell ID (TF)*/
 
     Double32_t m_Energy;            /**< Energy (GeV) */
     Double32_t m_EnedepSum;         /**< Raw Energy Sum(GeV) */
@@ -394,11 +405,11 @@ namespace Belle2 {
     Double32_t m_trkDepth;          /**< Path on track ext. to POCA to avg. cluster dir. (GDN) */
     Double32_t m_showerDepth;       /**< Same as above, but on the cluster average direction (GDN) */
     Double32_t m_NofCrystals;       /**< Sum of weights of crystals (~number of crystals) (TF) */
-    Double32_t m_absZernike20;         /**< Shower shape variable, absolute value of Zernike Moment 20 (TF) */
-    Double32_t m_absZernike40;         /**< Shower shape variable, absolute value of Zernike Moment 40 (TF) */
-    Double32_t m_absZernike42;         /**< Shower shape variable, absolute value of Zernike Moment 42 (TF) */
-    Double32_t m_absZernike51;         /**< Shower shape variable, absolute value of Zernike Moment 51 (TF) */
-    Double32_t m_absZernike53;         /**< Shower shape variable, absolute value of Zernike Moment 53 (TF) */
+    Double32_t m_absZernike20;      /**< Shower shape variable, absolute value of Zernike Moment 20 (TF) */
+    Double32_t m_absZernike40;      /**< Shower shape variable, absolute value of Zernike Moment 40 (TF) */
+    Double32_t m_absZernike42;      /**< Shower shape variable, absolute value of Zernike Moment 42 (TF) */
+    Double32_t m_absZernike51;      /**< Shower shape variable, absolute value of Zernike Moment 51 (TF) */
+    Double32_t m_absZernike53;      /**< Shower shape variable, absolute value of Zernike Moment 53 (TF) */
     Double32_t m_secondMoment;      /**< Shower shape variable, second moment (for merged pi0) (TF) */
     Double32_t m_E1oE9;             /**< Shower shape variable, E1oE9 (TF) */
     Double32_t m_E9oE25;            /**< Shower shape variable, E9oE25 */
@@ -407,8 +418,9 @@ namespace Belle2 {
     // 3: added LAT and distance to closest track and trk match flag (GDN)
     // 4: added time resolution (TF)
     // 5: clean up, float to Double32_t, and new variables (TF)
-    // 6: changed names of Zernike moment variables/getters/setters to indicate that they are the absolute values of the moments
-    ClassDef(ECLShower, 6);/**< ClassDef */
+    // 6: changed names of Zernike moment variables/getters/setters to indicate that they are the absolute values of the moments (TF and AH)
+    // 7: added centralCellId (TF)
+    ClassDef(ECLShower, 7);/**< ClassDef */
 
   };
 

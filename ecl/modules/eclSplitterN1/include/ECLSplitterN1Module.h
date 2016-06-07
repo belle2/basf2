@@ -42,7 +42,9 @@
 #include "TH1F.h"
 #include "TFile.h"
 #include "TTree.h"
+#include "TGraph2D.h"
 
+#include <vector>    // std::vector
 
 namespace Belle2 {
   namespace ECL {
@@ -110,6 +112,11 @@ namespace Belle2 {
       const double c_molierRadius = 3.581 *
                                     Belle2::Unit::cm; /**< Constant RM (Molier Radius) from exp(-a*dist/RM), http://pdg.lbl.gov/2009/AtomicNuclearProperties/HTML_PAGES/141.html */
 
+      double m_cutDigitEnergyForEnergy; /**< Minimum digit energy to be included in the shower energy calculation*/
+      double m_cutDigitTimeResidualForEnergy; /**< Maximum time residual to be included in the shower energy calculation*/
+      int m_useOptimalNumberOfDigitsForEnergy; /**< Optimize the number of neighbours for energy calculations */
+      TGraph2D* m_tg2OptimalNumberOfDigitsForEnergy; /**< 2D graph used for interpolation between background and energy. */
+
       // Position
       std::string m_positionMethod;  /**< Position calculation: lilo or linear */
       double m_liloParameterA; /**< lin-log parameter A */
@@ -118,7 +125,13 @@ namespace Belle2 {
       std::vector<double> m_liloParameters; /**< lin-log parameters A, B, and C */
 
       // Background
-      const int c_fullBkgdCount = 280; /**< Number of expected background digits at full background. */
+      const int c_fullBkgdCount = 280; /**< Number of expected background digits at full background, FIXME: ove to database. */
+
+      /** vector (8736+1 entries) with cell id to store array positions */
+      std::vector< int > m_StoreArrPosition;
+
+      /** list with all cellid of this connected region */
+      std::vector< int > m_cellIdInCR;
 
       /** Neighbour maps */
       ECLNeighbours* m_NeighbourMap9; /**< 3x3 = 9 neighbours */
@@ -159,26 +172,29 @@ namespace Belle2 {
       virtual const char* eclEventInformationName() const
       { return "ECLEventInformation" ; }
 
-      /** Utility unpacker of the shower id that contains CR, seed and hypothesis */
-      ECLShowerId m_SUtility;
-
-      /** All photon hypothesis identifier -> should be moved to an enum */
-      const int c_Hypothesis = 5;
-
       /** Geometry */
       ECLGeometryPar* m_geom;
 
       /** Make local maximas for a given connected region. */
-      void makeLocalMaximums(ECLConnectedRegion& aCR, std::map < int, ECLCalDigit* >& cellIdToDigitPointerMap);
+//      void makeLocalMaximums(ECLConnectedRegion& aCR, std::map < int, ECLCalDigit>& cellIdToDigitMap);
+      void makeLocalMaximums(ECLConnectedRegion& aCR);
 
       /** Split connected region into showers. */
-      void splitConnectedRegion(ECLConnectedRegion& aCR, std::map < int, ECLCalDigit* >& cellIdToDigitPointerMap);
+//      void splitConnectedRegion(ECLConnectedRegion& aCR, std::map < int, ECLCalDigit>& cellIdToDigitMap);
+      void splitConnectedRegion(ECLConnectedRegion& aCR);
 
       /** Get number of neighbours based on first energy estimation and background level per event. */
       int getNeighbourMap(const double energy, const double background);
 
+      /** Get optimal number of digits (out of 21) based on first energy estimation and background level per event. */
+      unsigned int getOptimalNumberOfDigits(const double energy, const double background);
+
+      /** Get energy sum for weighted entries. */
+      double getEnergySum(std::vector < std::pair<double, double> >& weighteddigits, const unsigned int n);
+
       /** Estimate energy using 3x3 around central crystal. */
-      int estimateEnergy(const int centerid, std::map < int, ECLCalDigit* >& cellIdToDigitPointerMap);
+//      int estimateEnergy(const int centerid, std::map < int, ECLCalDigit>& cellIdToDigitPointerMap);
+      int estimateEnergy(const int centerid);
 
     }; // end of ECLSplitterN1Module
 

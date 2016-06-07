@@ -10,7 +10,7 @@
  * a CR has no LM the highest energetic digit in the CR is taken as LM.   *
  * The position is reconstructed using logarithmic weights for not too    *
  * small shower and linear weights otherwise ('lilo').                    *
- *                                                                        *                                                                        *
+ *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
  *                                                                        *
@@ -29,6 +29,8 @@
 
 // OTHER
 #include <string>
+#include <utility>      // std::pair
+#include <algorithm>    // std::find
 
 // NAMESPACES
 using namespace Belle2;
@@ -72,6 +74,12 @@ ECLSplitterN1Module::ECLSplitterN1Module() : Module(), m_eclCalDigits(eclCalDigi
   addParam("shiftTolerance", m_shiftTolerance, "Tolerance level for centroid shifts.", 1.0 * Belle2::Unit::mm);
   addParam("minimumSharedEnergy", m_minimumSharedEnergy, "Minimum shared energy.", 25.0 * Belle2::Unit::keV);
   addParam("maxSplits", m_maxSplits, "Maximum number of splits within one connected region.", 10);
+  addParam("cutDigitEnergyForEnergy", m_cutDigitEnergyForEnergy,
+           "Minimum digit energy to be included in the shower energy calculation.", 0.5 * Belle2::Unit::MeV);
+  addParam("cutDigitTimeResidualForEnergy", m_cutDigitTimeResidualForEnergy,
+           "Maximum time residual to be included in the shower energy calculation.", 5.0);
+  addParam("useOptimalNumberOfDigitsForEnergy", m_useOptimalNumberOfDigitsForEnergy,
+           "Optimize the number of digits for energy calculations.", 1);
 
   // Position.
   addParam("positionMethod", m_positionMethod, "Position determination method.", std::string("lilo"));
@@ -101,11 +109,11 @@ void ECLSplitterN1Module::initialize()
   m_liloParameters.at(2) = m_liloParameterC;
 
   if (m_lmMethod == "BaBar" and m_lmRatioCorrection >= m_lmEnergyNeighbourCut) {
-    B2ERROR("ECLCRSplitterModule::initialize(): Choose a energy neighbour cut value of greater than the ratio correction.");
+    B2FATAL("ECLCRSplitterModule::initialize(): Choose a ratio correction larher than the energy neighbour cut!");
   }
 
   if (m_lmEnergyNeighbourCut >= m_lmEnergyCut) {
-    B2ERROR("ECLCRSplitterModule::initialize(): Choose a energy neighbour cut value of greater than the central energy cut.");
+    B2FATAL("ECLCRSplitterModule::initialize(): Choose a energy neighbour cut value of greater than the central energy cut!");
   }
 
   // ECL dataobjects.
@@ -126,6 +134,16 @@ void ECLSplitterN1Module::initialize()
   // Initialize neighbour maps (we will optimize the endcaps later, there is more than just a certain energy containment to be considered)
   m_NeighbourMap9 = new ECLNeighbours("N", 1); // 3x3 = 9
   m_NeighbourMap21 = new ECLNeighbours("NC", 2); // 5x5 excluding corners = 21
+
+  // Initialize optimal digit TGraph2D (for default energy and time cuts)
+  double m_neighboursEnergy[30] = {0.03, 0.05, 0.075, 0.1, 0.15, 0.25, 0.5, 0.75, 1, 2, 0.03, 0.05, 0.075, 0.1, 0.15, 0.25, 0.5, 0.75, 1, 2, 0.03, 0.05, 0.075, 0.1, 0.15, 0.25, 0.5, 0.75, 1, 2};
+  double m_neighboursBackground[30] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+  double m_neighboursN[30] = {5, 6, 7, 7, 9, 11, 13, 21, 21, 21, 2, 3, 4, 4, 5, 9, 11, 11, 15, 21, 2, 3, 3, 4, 4, 5, 8, 9, 11, 21};
+  m_tg2OptimalNumberOfDigitsForEnergy = new TGraph2D(30, m_neighboursEnergy, m_neighboursBackground, m_neighboursN);
+
+  // initialize the vector that gives the relation between cellid and store array position
+  m_StoreArrPosition.resize(8736 + 1);
+
 }
 
 void ECLSplitterN1Module::beginRun()
@@ -135,26 +153,36 @@ void ECLSplitterN1Module::beginRun()
 
 void ECLSplitterN1Module::event()
 {
-  // Loop over all connected regions in this event to find possible significant local maxima.
-  // They will probably have the same or higher energy cut than the seed cell cut of the CRFinder.
-  std::map < int, ECLCalDigit* > CellIdToDigitPointerMap;
+  B2DEBUG(175, "ECLCRSplitterModule::event()");
+
+  // Fill a vector that can be used to map cellid -> store array position
+  memset(&m_StoreArrPosition[0], -1, m_StoreArrPosition.size() * sizeof m_StoreArrPosition[0]);
+  for (int i = 0; i < m_eclCalDigits.getEntries(); i++) {
+    m_StoreArrPosition[m_eclCalDigits[i]->getCellId()] = i;
+  }
 
   // Loop over all connected regions
   for (auto& aCR : m_eclConnectedRegions) {
+    // list theat will hold all cellids in this connected region
+    m_cellIdInCR.clear();
 
-    CellIdToDigitPointerMap.clear();
+    const unsigned int entries = (aCR.getRelationsTo<ECLCalDigit>()).size();
 
-    // Fill all calDigits in this CR into a map to make them accesible by cellid.
-    for (auto& aCalDigit : aCR.getRelationsTo<ECLCalDigit>()) {
-      const int cellid = aCalDigit.getCellId();
-      CellIdToDigitPointerMap[cellid] = &aCalDigit;
+    m_cellIdInCR.resize(entries);
+
+
+    // Fill all calDigits ids in this CR into a vector to make them 'find'-able.
+    int i = 0;
+    for (const auto& caldigit : aCR.getRelationsTo<ECLCalDigit>()) {
+      m_cellIdInCR[i] = caldigit.getCellId();
+      ++i;
     }
 
     // Make the local maximums.
-    makeLocalMaximums(aCR, CellIdToDigitPointerMap);
+    makeLocalMaximums(aCR);
 
     // Split and reconstruct the showers in this connected regions.
-    splitConnectedRegion(aCR, CellIdToDigitPointerMap);
+    splitConnectedRegion(aCR);
 
   } // end auto& aCR
 
@@ -163,15 +191,17 @@ void ECLSplitterN1Module::event()
 
 void ECLSplitterN1Module::endRun()
 {
-  ;
+  if (m_tg2OptimalNumberOfDigitsForEnergy) delete m_tg2OptimalNumberOfDigitsForEnergy;
 }
+
 
 void ECLSplitterN1Module::terminate()
 {
   ;
 }
 
-void ECLSplitterN1Module::makeLocalMaximums(ECLConnectedRegion& aCR, std::map < int, ECLCalDigit* >& myCellIdToDigitPointerMap)
+
+void ECLSplitterN1Module::makeLocalMaximums(ECLConnectedRegion& aCR)
 {
   B2DEBUG(175, "ECLCRSplitterModule::makeLocalMaximums(): START!");
 
@@ -181,26 +211,27 @@ void ECLSplitterN1Module::makeLocalMaximums(ECLConnectedRegion& aCR, std::map < 
   std::vector < double > energyVector;
   int nNeighbours = 0;
   int lmidentifier = 0;
-//  double energy = 0.0;
 
   // Loop over this map and check neighbours.
-  for (auto const& entry : myCellIdToDigitPointerMap) {
+  for (auto const& aECLCalDigit : aCR.getRelationsTo<ECLCalDigit>()) {
     energyVector.clear();
     nNeighbours = 0;
-    const double energy = (entry.second)->getEnergy();
+    const double energy = aECLCalDigit.getEnergy();
 
     // Energy cut.
     if (energy < m_lmEnergyCut) continue;
 
     // Local maximum selection.
-    for (auto& neighbourId : m_NeighbourMap9->getNeighbours(entry.first)) {
+    for (auto& neighbourId : m_NeighbourMap9->getNeighbours(aECLCalDigit.getCellId())) {
 
-      if (neighbourId == entry.first) continue; // skip the center cell
+      if (neighbourId == aECLCalDigit.getCellId()) continue; // skip the center cell
 
-      const auto it = myCellIdToDigitPointerMap.find(neighbourId); // check if the neighbour is in the list
-      if (it == myCellIdToDigitPointerMap.end()) continue; // not in this CR
+      const auto it = std::find(m_cellIdInCR.begin(), m_cellIdInCR.end(),
+                                neighbourId); // check if the neighbour is in the list for this CR
+      if (it == m_cellIdInCR.end()) continue; // not in this CR
 
-      const double energyNeighbour = ((*it).second)->getEnergy();
+      const int pos = m_StoreArrPosition[neighbourId];
+      const double energyNeighbour = m_eclCalDigits[pos]->getEnergy();
 
       // only neighbours with E < Elocmaxcand
       if (energyNeighbour < energy) {
@@ -237,7 +268,7 @@ void ECLSplitterN1Module::makeLocalMaximums(ECLConnectedRegion& aCR, std::map < 
         if (!eclLocalMaximums) eclLocalMaximums.create();
         const auto aLocalMaximum = eclLocalMaximums.appendNew();
 
-        B2DEBUG(175, "ECLCRSplitterModule::makeLocalMaximums(): local max is cellid: " << entry.first);
+        B2DEBUG(175, "ECLCRSplitterModule::makeLocalMaximums(): local max is cellid: " << aECLCalDigit.getCellId());
 
         // Set the id of this local maximum and increment the counter.
         aLocalMaximum->setLMId(lmidentifier);
@@ -256,8 +287,8 @@ void ECLSplitterN1Module::makeLocalMaximums(ECLConnectedRegion& aCR, std::map < 
         aCR.addRelationTo(aLocalMaximum);
 
         // Add relation to the underlying ECLCalDigit.
-        const auto it = myCellIdToDigitPointerMap.find(entry.first);
-        aLocalMaximum->addRelationTo(((*it).second));
+        const int pos = m_StoreArrPosition[aECLCalDigit.getCellId()];
+        aLocalMaximum->addRelationTo(m_eclCalDigits[pos], 1.0);
       }
 
     }
@@ -269,7 +300,7 @@ void ECLSplitterN1Module::makeLocalMaximums(ECLConnectedRegion& aCR, std::map < 
 }
 
 
-void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map < int, ECLCalDigit* >& myCellIdToDigitPointerMap)
+void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 {
 
   // Get the event background level
@@ -299,14 +330,20 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
     aECLShower->addRelationTo(&aCR);
 
     // Find the highest energetic crystal in this CR or use the LM.
+    double highestEnergy = 0.0;
+    double highestEnergyTime = 0.;
+    double highestEnergyTimeResolution = 0.;
+    double weightSum = 0.0;
+
     unsigned int highestEnergyID = 0;
-    if (nLocalMaximums != 1) {
-      double highestEnergy = 0.0;
+    if (nLocalMaximums < 1) {
 
       for (auto const& aECLCalDigit : aCR.getRelationsTo<ECLCalDigit>()) {
         if (aECLCalDigit.getEnergy() > highestEnergy) {
           highestEnergy = aECLCalDigit.getEnergy();
           highestEnergyID = aECLCalDigit.getCellId();
+          highestEnergyTime = aECLCalDigit.getTime();
+          highestEnergyTimeResolution = aECLCalDigit.getTimeResolution();
         }
       }
     } else {
@@ -315,16 +352,17 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
 
       RelationVector<ECLCalDigit> caldigitvector = locmaxvector[0]->getRelationsTo<ECLCalDigit>();
       highestEnergyID = (caldigitvector[0])->getCellId();
+      highestEnergy  = (caldigitvector[0])->getEnergy();
     }
 
     // Get a first estimation of the energy using 3x3 neighbours.
-    std::map<int, ECLCalDigit*>::iterator it; // iterator for the CR digit map
-    const double energyEstimation = estimateEnergy(highestEnergyID, myCellIdToDigitPointerMap);
+    std::map<int, ECLCalDigit>::iterator it; // iterator for the CR digit map
+    const double energyEstimation = estimateEnergy(highestEnergyID);
 
     // Check if 21 would be better in the present background conditions:
-    ECLNeighbours* neighbourMap;
+    ECLNeighbours* neighbourMap; // FIXME pointer needed?
     int nNeighbours = getNeighbourMap(energyEstimation, backgroundLevel);
-    if (nNeighbours == 9) neighbourMap = m_NeighbourMap9;
+    if (nNeighbours == 9 and !m_useOptimalNumberOfDigitsForEnergy) neighbourMap = m_NeighbourMap9;
     else neighbourMap = m_NeighbourMap21;
 
     // Add neighbours etc (this is either a very low energetic photon or garbage anyhow...).
@@ -332,13 +370,16 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
     std::vector<double> weights;
     for (auto& neighbourId : neighbourMap->getNeighbours(highestEnergyID)) {
 
-      // Check if this neighbouts is in this CR
-      it = myCellIdToDigitPointerMap.find(neighbourId);
-      if (it != myCellIdToDigitPointerMap.end()) {
-        digits.push_back(*(*it).second); // list of digits for position reconstruction
-        weights.push_back(1.0); // list of weights (all 1 in this case for now)
-        aECLShower->addRelationTo((*it).second, 1.0); // add digits to this shower
-      }
+      const auto it = std::find(m_cellIdInCR.begin(), m_cellIdInCR.end(),
+                                neighbourId); // check if the neighbour is in the list for this CR
+      if (it == m_cellIdInCR.end()) continue; // not in this CR
+
+      const int pos = m_StoreArrPosition[neighbourId];
+      digits.push_back(*m_eclCalDigits[pos]); // list of digits for position reconstruction
+      weights.push_back(1.0); // list of weights (all 1 in this case for now)
+      weightSum += 1.0;
+
+      aECLShower->addRelationTo(m_eclCalDigits[pos], 1.0); // add digits to this shower, weight = 1
     }
 
     // Get position.
@@ -347,39 +388,55 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
     aECLShower->setPhi(showerposition.Phi());
     aECLShower->setR(showerposition.Mag());
 
-    // Get Energy.
-    const double energy = Belle2::ECL::computeEnergySum(digits, weights);
-    aECLShower->setEnergy(energy);
+    // Get Energy, if requested, set some weights to zero for energy calculation.
+    double showerEnergy = 0.0;
+    if (m_useOptimalNumberOfDigitsForEnergy) {
+      const unsigned int nOptimal = getOptimalNumberOfDigits(energyEstimation, backgroundLevel);
 
-    // Time and time resolution
-    // ...
+      std::vector < std::pair<double, double> > weighteddigits;
+      weighteddigits.resize(digits.size());
+      for (unsigned int i = 0; i < digits.size(); ++i) {
+        weighteddigits.at(i) = std::make_pair((digits.at(i)).getEnergy(), weights.at(i));
+      }
+
+      showerEnergy = getEnergySum(weighteddigits, nOptimal);
+
+    } else {
+      showerEnergy = Belle2::ECL::computeEnergySum(digits, weights);
+    }
+
+    aECLShower->setEnergy(showerEnergy);
+    aECLShower->setEnedepsum(showerEnergy);
+    aECLShower->setHighestEnergy(highestEnergy);
+    aECLShower->setTime(highestEnergyTime);
+    aECLShower->setTimeResolution(highestEnergyTimeResolution);
+    aECLShower->setNofCrystals(weightSum);
 
     B2DEBUG(175, "theta           = " << showerposition.Theta());
     B2DEBUG(175, "phi             = " << showerposition.Phi());
     B2DEBUG(175, "R               = " << showerposition.Mag());
-    B2DEBUG(175, "energy          = " << energy);
+    B2DEBUG(175, "energy          = " << showerEnergy);
+    B2DEBUG(175, "time            = " << highestEnergyTime);
+    B2DEBUG(175, "time resolution = " << highestEnergyTimeResolution);
     B2DEBUG(175, "neighbours      = " << nNeighbours);
     B2DEBUG(175, "backgroundLevel = " << backgroundLevel);
 
-    // Get unique ID
-    const int showerId = m_SUtility.getShowerId(aCR.getCRId(), c_Hypothesis,
-                                                0); // since there is only one shower, we give it the id 0 (or 1?)
-    aECLShower->setShowerId(showerId);
+    // Fill shower Ids
+    aECLShower->setShowerId(1); // always one (only this single shower in the CR)
+    aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N1);
+    aECLShower->setConnectedRegionId(aCR.getCRId());
 
-  } else { // case 3
-    B2DEBUG(175, "case 3");
+  } else {
 
     std::vector<ECLCalDigit> digits;
     std::vector<double> weights;
-//    std::map<int, TVector3*> centroidList; // key = cellid, value = centroid position
     std::map<int, TVector3> centroidList; // key = cellid, value = centroid position
     std::map<int, double> centroidEnergyList; // key = cellid, value = centroid position
     std::map<int, TVector3> centroidPoints; // key = locmaxid (as index), value = centroid position
     std::map<int, TVector3> localMaximumsPoints; // key = locmaxid, value = maximum position
     std::map<int, TVector3> allPoints; // key = cellid, value = digit position
     std::map<int, std::vector < double > > weightMap; // key = locmaxid, value = vector of weights
-    std::vector < ECLCalDigit* >
-    digitVector; // the same for all local maxima, the order of weights in weightMap must be the same though
+    std::vector < ECLCalDigit > digitVector; // the order of weights in weightMap must be the same
 
     // Fill the maxima positions in a map
     for (auto& aLocalMaximum : aCR.getRelationsTo<ECLLocalMaximum>()) {
@@ -407,7 +464,9 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
     }
 
     for (const auto& digitpoint : allPoints) {
-      digitVector.push_back((*myCellIdToDigitPointerMap.find(digitpoint.first)).second);
+      const int cellid = digitpoint.first;
+      const int pos = m_StoreArrPosition[cellid];
+      digitVector.push_back(*m_eclCalDigits[pos]);
     }
 
     // -----------------------------------------------------------------------------------------
@@ -416,7 +475,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
     // in this CR and calculate the weighted distances to the local maximum
     int nIterations = 0;
     double centroidShiftAverage = 0.0;
-//    double lastcentroidShiftAverage = 0.0;
+    //    double lastcentroidShiftAverage = 0.0;
 
     do {
       B2DEBUG(175, "Iteration: #" << nIterations << " (of max. " << m_maxIterations << ")");
@@ -439,7 +498,8 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
 
         // if this is the first iteration the shower energy is not know, take the local maximum energy * 2.
         if (nIterations == 0) {
-          const double locmaxenergy = ((*myCellIdToDigitPointerMap.find(locmaxcellid)).second)->getEnergy();
+          const int pos = m_StoreArrPosition[locmaxcellid];
+          const double locmaxenergy = m_eclCalDigits[pos]->getEnergy();
           centroidEnergyList[locmaxcellid] = 2.*locmaxenergy;
         }
 
@@ -453,7 +513,9 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
           // cellid and position of this digit
           const int digitcellid = digitpoint.first;
           TVector3 digitpos = digitpoint.second;
-          const double digitenergy = ((*myCellIdToDigitPointerMap.find(digitcellid)).second)->getEnergy();
+
+          const int pos = m_StoreArrPosition[digitcellid];
+          const double digitenergy = m_eclCalDigits[pos]->getEnergy();
 
           double weight            = 0.0;
           double energy            = 0.0;
@@ -478,7 +540,8 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
             }
 
             // energy of the centroid aka locmax
-            const double thisenergy = ((*myCellIdToDigitPointerMap.find(centroidcellid)).second)->getEnergy();
+            const int thispos = m_StoreArrPosition[centroidcellid];
+            const double thisenergy = m_eclCalDigits[thispos]->getEnergy();
 
             // Not  the most efficienct way to get this information, but not worth the thinking yet:
             if (locmaxcellid == centroidcellid) {
@@ -500,14 +563,15 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
             weight = 0.0;
           }
 
-          // Check if the weighted energy is above threshold or too far away
+          // Check if the weighted energy is above threshold
           if ((digitenergy * weight) < m_minimumSharedEnergy) {
             weight = 0.0;
           }
 
           // Check for rounding problems larger than unity
           if (weight > 1.0) {
-            B2WARNING("ECLCRSplitterModule::splitConnectedRegion: weight for this digit " << weight << ", resetting it to 1.0.");
+            B2WARNING("ECLCRSplitterModule::splitConnectedRegion: Floating point glitch, weight for this digit " << weight <<
+                      ", resetting it to 1.0.");
             weight = 1.0;
           }
 
@@ -554,7 +618,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
 
       // Get the average centroid shift.
       centroidShiftAverage /= static_cast<double>(nLocalMaximums);
-//      lastcentroidShiftAverage = centroidShiftAverage;
+      //      lastcentroidShiftAverage = centroidShiftAverage;
       B2DEBUG(175, "--> average centroid shift: " << centroidShiftAverage << " cm (tolerance is " << m_shiftTolerance << " cm)");
 
       // Update centroid positions for the next round
@@ -581,9 +645,9 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
       const double energyEstimation = (*centroidEnergyList.find(locmaxcellid)).second;
 
       // Get the neighbour list.
-      ECLNeighbours* neighbourMap;
+      ECLNeighbours* neighbourMap; // FIXME need pointer?
       int nNeighbours = getNeighbourMap(energyEstimation, backgroundLevel);
-      if (nNeighbours == 9) neighbourMap = m_NeighbourMap9;
+      if (nNeighbours == 9 and !m_useOptimalNumberOfDigitsForEnergy) neighbourMap = m_NeighbourMap9;
       else neighbourMap = m_NeighbourMap21;
 
       // Get the neighbour list.
@@ -595,19 +659,35 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
       // Loop over all digits.
       std::vector<ECLCalDigit> digits;
       std::vector<double> weights;
+      double highestEnergy = 0.;
+      double highestEnergyTime = 0.;
+      double highestEnergyTimeResolution = 0.;
+      double weightSum = 0.0;
 
       for (unsigned int i = 0; i < digitVector.size(); ++i) {
-        const ECLCalDigit* digit = digitVector[i];
+        const ECLCalDigit digit = digitVector[i];
         const double weight = myWeights[i];
-        const int cellid = digit->getCellId();
+        const int cellid = digit.getCellId();
 
         // Positive weight and in allowed neighbour list?
-        if (weight > 0) {
+        if (weight > 0.0) {
           if (std::find(neighbourlist.begin(), neighbourlist.end(), cellid) != neighbourlist.end()) {
-            aECLShower->addRelationTo(digit, weight);
 
-            digits.push_back(*digit);
+            const int pos = m_StoreArrPosition[cellid];
+            aECLShower->addRelationTo(m_eclCalDigits[pos], weight);
+
+            digits.push_back(digit);
             weights.push_back(weight);
+
+            weightSum += weight;
+
+            const double energy = digit.getEnergy();
+
+            if (energy * weight > highestEnergy) {
+              highestEnergy = energy * weight;
+              highestEnergyTime = digit.getTime();
+              highestEnergyTimeResolution = digit.getTimeResolution();
+            }
           }
         }
       }
@@ -631,18 +711,37 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR, std::map
       B2DEBUG(175, "new phi: " << showerposition->Phi());
       B2DEBUG(175, "new R: " << showerposition->Mag());
 
-      // New energy
-      const double showerenergy = Belle2::ECL::computeEnergySum(digits, weights);
-      aECLShower->setEnergy(showerenergy);
-      B2DEBUG(175, "new energy: " << showerenergy);
+      // Get Energy, if requested, set weights to zero for energy calculation.
+      double showerEnergy = 0.0;
+      if (m_useOptimalNumberOfDigitsForEnergy) {
+        const unsigned int nOptimal = getOptimalNumberOfDigits(energyEstimation, backgroundLevel);
 
-      // Time and time resolution
-      // ...
+        std::vector < std::pair<double, double> > weighteddigits;
+        weighteddigits.resize(digits.size());
+        for (unsigned int i = 0; i < digits.size(); ++i) {
+          weighteddigits.at(i) = std::make_pair((digits.at(i)).getEnergy(), weights.at(i));
+        }
+
+        showerEnergy = getEnergySum(weighteddigits, nOptimal);
+
+      } else {
+        showerEnergy = Belle2::ECL::computeEnergySum(digits, weights);
+      }
+
+      aECLShower->setEnergy(showerEnergy);
+      aECLShower->setEnedepsum(showerEnergy);
+      aECLShower->setHighestEnergy(highestEnergy);
+      aECLShower->setTime(highestEnergyTime);
+      aECLShower->setTimeResolution(highestEnergyTimeResolution);
+      aECLShower->setNofCrystals(weightSum);
+
+      B2DEBUG(175, "new energy: " << showerEnergy);
 
       // Get unique ID
-      const int showerId = m_SUtility.getShowerId(aCR.getCRId(), c_Hypothesis, iShower);
       ++iShower;
-      aECLShower->setShowerId(showerId);
+      aECLShower->setShowerId(iShower);
+      aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N1);
+      aECLShower->setConnectedRegionId(aCR.getCRId());
 
       // Add relation to the CR.
       aECLShower->addRelationTo(&aCR);
@@ -660,20 +759,56 @@ int ECLSplitterN1Module::getNeighbourMap(const double energy, const double backg
   }
 }
 
+unsigned int ECLSplitterN1Module::getOptimalNumberOfDigits(const double energy, const double background)
+{
+  if (background <= 0.1) return 21;
+  else {
+    // some checks to be within the limits of the tgraph2d
+    double energyChecked = energy;
+    double bgChecked = background;
+    if (bgChecked > 1.0) bgChecked = 1.0;
+    if (energyChecked < 30.0 * Belle2::Unit::MeV) energyChecked = 30.0 * Belle2::Unit::MeV;
+    if (energyChecked > 2.0 * Belle2::Unit::GeV) energyChecked = 2.0 * Belle2::Unit::GeV;
 
-int ECLSplitterN1Module::estimateEnergy(const int centerid, std::map < int, ECLCalDigit* >& cellIdToDigitPointerMap)
+    // extrapolate from tgraph2d
+    return static_cast<unsigned int>(m_tg2OptimalNumberOfDigitsForEnergy->Interpolate(energyChecked, bgChecked));
+  }
+}
+
+double ECLSplitterN1Module::getEnergySum(std::vector < std::pair<double, double> >& weighteddigits, const unsigned int n)
+{
+
+  double energysum = 0.;
+
+  std::sort(weighteddigits.begin(), weighteddigits.end());
+
+  unsigned int min = n;
+  if (weighteddigits.size() < n) min = weighteddigits.size();
+
+  for (unsigned int i = 0; i < min; ++i) {
+    energysum += (weighteddigits.at(i).first * weighteddigits.at(i).second);
+  }
+
+  return energysum;
+}
+
+
+int ECLSplitterN1Module::estimateEnergy(const int centerid)
 {
 
   double energyEstimation = 0.0;
-  std::map<int, ECLCalDigit*>::iterator it; // iterator for the CR digit map
 
   for (auto& neighbourId : m_NeighbourMap9->getNeighbours(centerid)) {
 
     // Check if this neighbour is in this CR
-    it = cellIdToDigitPointerMap.find(neighbourId);
-    if (it != cellIdToDigitPointerMap.end()) {
-      energyEstimation += (*it).second->getEnergy();
-    }
+    const auto it = std::find(m_cellIdInCR.begin(), m_cellIdInCR.end(),
+                              neighbourId); // check if the neighbour is in the list for this CR
+    if (it == m_cellIdInCR.end()) continue; // not in this CR
+
+    const int pos = m_StoreArrPosition[neighbourId];
+    const double energyNeighbour = m_eclCalDigits[pos]->getEnergy();
+
+    energyEstimation += energyNeighbour;
   }
 
   return energyEstimation;

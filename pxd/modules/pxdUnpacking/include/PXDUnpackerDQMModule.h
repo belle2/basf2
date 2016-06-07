@@ -55,6 +55,8 @@ namespace Belle2 {
 
       int m_sizeOfErrorBlock;
       bool m_showStats = false;
+      std::string m_runName;
+
       virtual void defineHisto();
 
       std::vector<std::string> err;

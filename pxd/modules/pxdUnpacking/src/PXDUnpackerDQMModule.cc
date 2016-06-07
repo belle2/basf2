@@ -37,6 +37,7 @@ PXDUnpackerDQMModule::PXDUnpackerDQMModule() : HistoModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("pxdUnpackerError"));
   addParam("showStats", m_showStats, "If set statistics will be shown", false);
+  addParam("RunName", m_runName, "Name of the processed run");
 }
 
 void PXDUnpackerDQMModule::defineHisto()
@@ -46,8 +47,8 @@ void PXDUnpackerDQMModule::defineHisto()
 
   m_sizeOfErrorBlock = errors.get_Nrerrors();
 
-  hUnpackErrorCount = new TH1F("hUnpackErrorCount", "Unpacker errors", m_sizeOfErrorBlock, 0, m_sizeOfErrorBlock);
-  hUnpackErrorCountWeight = new TH2F("hUnpackErrorCountWeight", "Unpacker errors", 4, 0, 4, m_sizeOfErrorBlock, 0,
+  hUnpackErrorCount = new TH1F("hUnpackErrorCount", m_runName.c_str() , m_sizeOfErrorBlock, 0, m_sizeOfErrorBlock);
+  hUnpackErrorCountWeight = new TH2F("hUnpackErrorCountWeight", m_runName.c_str() , 4, 0, 4, m_sizeOfErrorBlock, 0,
                                      m_sizeOfErrorBlock);
   oldDir->cd();
 }

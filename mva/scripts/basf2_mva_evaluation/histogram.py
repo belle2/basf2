@@ -7,8 +7,6 @@ import copy
 
 import numpy
 import pandas
-import scipy
-import scipy.stats
 
 
 def binom_error(n_sig, n_tot):

@@ -9,8 +9,6 @@ import itertools
 
 import numpy
 import pandas
-import scipy
-import scipy.stats
 import matplotlib
 import matplotlib.artist
 import matplotlib.figure
@@ -19,7 +17,7 @@ import matplotlib.colors
 import matplotlib.patches
 import matplotlib.ticker
 
-from . import b2stat
+from . import histogram
 
 from basf2 import *
 
@@ -237,7 +235,7 @@ class PurityOverEfficiency(Plotter):
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
         """
-        hists = b2stat.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
+        hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
         purity, purity_error = hists.get_purity(['Signal'], ['Background'])
 
@@ -280,7 +278,7 @@ class RejectionOverEfficiency(Plotter):
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
         """
-        hists = b2stat.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
+        hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
         rejection, rejection_error = hists.get_efficiency(['Background'])
         rejection = 1 - rejection
@@ -324,7 +322,7 @@ class Diagonal(Plotter):
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
         """
-        hists = b2stat.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
+        hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         purity, purity_error = hists.get_purity_per_bin(['Signal'], ['Background'])
 
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
@@ -397,7 +395,7 @@ class Distribution(Plotter):
         bins = 100
         if self.keep_first_binning and self.first_binning is not None:
             bins = self.first_binning
-        hists = b2stat.Histograms(data, column, {'Total': mask}, weight_column=weight_column, bins=bins)
+        hists = histogram.Histograms(data, column, {'Total': mask}, weight_column=weight_column, bins=bins)
         if self.keep_first_binning and self.first_binning is None:
             self.first_binning = hists.bins
         hist, hist_error = hists.get_hist('Total')
@@ -513,11 +511,11 @@ class Difference(Plotter):
         @param subtrahend_mask boolean numpy.array defining which events are for the subtrahend histogram
         @param weight_column column in data containing the weights for each event
         """
-        hists = b2stat.Histograms(data, column,
-                                  {'Minuend': minuend_mask, 'Subtrahend': subtrahend_mask}, weight_column=weight_column)
+        hists = histogram.Histograms(data, column,
+                                     {'Minuend': minuend_mask, 'Subtrahend': subtrahend_mask}, weight_column=weight_column)
         minuend, minuend_error = hists.get_hist('Minuend')
         subtrahend, subtrahend_error = hists.get_hist('Subtrahend')
-        difference, difference_error = minuend - subtrahend, b2stat.poisson_error(minuend + subtrahend)
+        difference, difference_error = minuend - subtrahend, histogram.poisson_error(minuend + subtrahend)
 
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
         self.ymin = min((difference - difference_error).min(), self.ymin)
@@ -621,21 +619,27 @@ class Overtraining(Plotter):
         difference_bckgrd.plots = difference_bckgrd.labels = []
         difference_bckgrd.finish(line_color=distribution.plots[1][0].get_color())
 
-        # Kolmogorov smirnov test
-        if data.loc[train_mask & signal_mask, column].empty or data.loc[test_mask & signal_mask, column].empty:
-            B2WARNING("Cannot calculate kolmogorov smirnov test for signal due to missing data")
-        else:
-            ks = scipy.stats.ks_2samp(data.loc[train_mask & signal_mask, column], data.loc[test_mask & signal_mask, column])
-            props = dict(boxstyle='round', edgecolor='gray', facecolor='white', linewidth=0.1, alpha=0.5)
-            self.axis_d1.text(0.1, 0.9, r'signal (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36, bbox=props,
-                              verticalalignment='top', horizontalalignment='left', transform=self.axis_d1.transAxes)
-        if data.loc[train_mask & bckgrd_mask, column].empty or data.loc[test_mask & bckgrd_mask, column].empty:
-            B2WARNING("Cannot calculate kolmogorov smirnov test for background due to missing data")
-        else:
-            ks = scipy.stats.ks_2samp(data.loc[train_mask & bckgrd_mask, column], data.loc[test_mask & bckgrd_mask, column])
-            props = dict(boxstyle='round', edgecolor='gray', facecolor='white', linewidth=0.1, alpha=0.5)
-            self.axis_d2.text(0.1, 0.9, r'background (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36, bbox=props,
-                              verticalalignment='top', horizontalalignment='left', transform=self.axis_d2.transAxes)
+        try:
+            import scipy.stats
+            # Kolmogorov smirnov test
+            if data.loc[train_mask & signal_mask, column].empty or data.loc[test_mask & signal_mask, column].empty:
+                B2WARNING("Cannot calculate kolmogorov smirnov test for signal due to missing data")
+            else:
+                ks = scipy.stats.ks_2samp(data.loc[train_mask & signal_mask, column], data.loc[test_mask & signal_mask, column])
+                props = dict(boxstyle='round', edgecolor='gray', facecolor='white', linewidth=0.1, alpha=0.5)
+                self.axis_d1.text(0.1, 0.9, r'signal (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36, bbox=props,
+                                  verticalalignment='top', horizontalalignment='left', transform=self.axis_d1.transAxes)
+            if data.loc[train_mask & bckgrd_mask, column].empty or data.loc[test_mask & bckgrd_mask, column].empty:
+                B2WARNING("Cannot calculate kolmogorov smirnov test for background due to missing data")
+            else:
+                ks = scipy.stats.ks_2samp(data.loc[train_mask & bckgrd_mask, column], data.loc[test_mask & bckgrd_mask, column])
+                props = dict(boxstyle='round', edgecolor='gray', facecolor='white', linewidth=0.1, alpha=0.5)
+                self.axis_d2.text(0.1, 0.9, r'background (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36,
+                                  bbox=props,
+                                  verticalalignment='top', horizontalalignment='left', transform=self.axis_d2.transAxes)
+        except ImportError:
+            B2WARNING("Cannot calculate kolmogorov smirnov test please install scipy!")
+
         return self
 
     def finish(self):

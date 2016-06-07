@@ -8,7 +8,13 @@ import sys
 # First load the required shared library
 from ROOT import gSystem
 gSystem.Load('libmva.so')
+gSystem.Load('libframework.so')
+gSystem.Load('libanalysis.so')
 from ROOT import Belle2
+
+# For some strange reason we need to do this to makeROOTCompatible be available.
+Belle2.Variable.Manager
+Belle2.Variable.Manager.Instance()
 import ROOT
 
 

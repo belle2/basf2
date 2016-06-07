@@ -411,6 +411,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     aECLShower->setTime(highestEnergyTime);
     aECLShower->setTimeResolution(highestEnergyTimeResolution);
     aECLShower->setNofCrystals(weightSum);
+    aECLShower->setCentralCellId(highestEnergyID);
 
     B2DEBUG(175, "theta           = " << showerposition.Theta());
     B2DEBUG(175, "phi             = " << showerposition.Phi());
@@ -734,6 +735,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       aECLShower->setTime(highestEnergyTime);
       aECLShower->setTimeResolution(highestEnergyTimeResolution);
       aECLShower->setNofCrystals(weightSum);
+      aECLShower->setCentralCellId(locmaxcellid);
 
       B2DEBUG(175, "new energy: " << showerEnergy);
 

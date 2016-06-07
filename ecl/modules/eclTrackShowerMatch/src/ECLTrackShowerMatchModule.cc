@@ -104,7 +104,7 @@ void ECLTrackShowerMatchModule::event()
   for (auto& shower : eclRecShowers) {
     // compute the distance from shower COG and the closest extrapolated track
     double dist = computeTrkMinDistance(shower, tracks);
-    shower.setMinTrkDistance(float(dist));
+    shower.setMinTrkDistance(dist);
     ECLCluster* cluster = shower.getRelatedFrom<ECLCluster>();
     if (cluster != nullptr)
       cluster->setMinTrkDistance(float(dist));

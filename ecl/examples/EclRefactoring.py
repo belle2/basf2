@@ -62,9 +62,10 @@ main.add_module(ecl_crfinder)
 
 # ECL Splitter(s)
 ecl_n1 = register_module('ECLSplitterN1')
-# ecl_n1.set_log_level(LogLevel.DEBUG)
-# ecl_n1.set_debug_level(175)
 main.add_module(ecl_n1)
+
+ecl_n2 = register_module('ECLSplitterN2')
+main.add_module(ecl_n2)
 
 # ECL Shower Correction
 ecl_showercorrection = register_module('ECLShowerCorrector')
@@ -76,6 +77,8 @@ main.add_module(ecl_showercalibration)
 
 # ECL Shower Shape
 ecl_showershape = register_module('ECLShowerShape')
+# ecl_showershape.set_log_level(LogLevel.DEBUG)
+# ecl_showershape.set_debug_level(175)
 main.add_module(ecl_showershape)
 
 # ECL covariance matrix

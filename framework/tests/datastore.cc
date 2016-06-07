@@ -692,7 +692,7 @@ namespace {
     EXPECT_EQ(index, 2);
     EXPECT_EQ(entry->name, relObjs2.getName());
 
-    //test storeobjptr (not implemented)
+    //test finding storeobjptr (not implemented, so nothing found)
     StoreObjPtr<EventMetaData> evtPtr;
     entry = nullptr; index = -1;
     EXPECT_FALSE(DataStore::Instance().findStoreEntry(&(*evtPtr), entry, index));

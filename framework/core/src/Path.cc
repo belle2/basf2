@@ -11,6 +11,7 @@
 #include <boost/python/register_ptr_to_python.hpp>
 #include <boost/python/class.hpp>
 #include <boost/python/list.hpp>
+#include <boost/python/docstring_options.hpp>
 
 #include <framework/core/Path.h>
 #include <framework/core/Module.h>
@@ -183,16 +184,18 @@ namespace {
 
 void Path::exposePythonAPI()
 {
+  docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
+
   class_<Path>("Path",
                "Implements a path consisting of Module and/or Path objects (arranged in a linear order). Use create_path() to create a new object.",
                no_init)
   .def("__str__", &Path::getPathString)
-  .def("_add_module_object", &Path::addModule)
+  .def("_add_module_object", &Path::addModule) // actual add_module() is found in basf2_def.py
   .def("add_path", &Path::addPath, R"(Insert another path at the end of this one.
 For example,
->>> path.add_module('A')
->>> path.add_path(otherPath)
->>> path.add_module('B')
+    >>> path.add_module('A')
+    >>> path.add_path(otherPath)
+    >>> path.add_module('B')
 would create a path [ A -> [ contents of otherPath ] -> B ].)")
   .def("modules", &_getModulesPython, "Returns an ordered list of all modules in this path.")
   .def("for_each", &Path::forEach, R"(Similar to add_path(), this will execute path at the current position, but
@@ -203,8 +206,8 @@ Main use case is after using the RestOfEventBuilder on a ParticeList, where
 you can use this feature to perform actions on only a part of the event
 for a given list of candidates:
 
->>> path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
-read: for each  $objName   in $arrayName   run over $path
+    >>> path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+    read: for each  $objName   in $arrayName   run over $path
 
 If 'RestOfEvents' contains two elements, during the execution of roe_path a StoreObjectPtr 'RestOfEvent'
 will be available, which will point to the first element in the first run, and the second element
@@ -219,12 +222,12 @@ to the next MCParticle or exiting the loop.)", args("loopObjectName", "arrayName
   .def("_add_skim_path", &Path::addSkimPath)
   .def("__contains__", &Path::contains, R"(Does this Path contain a module of the given type?
 
->>> path = create_path()
->>> 'RootInput' in path
-False
->>> path.add_module('RootInput')
->>> 'RootInput' in path
-True)", args("moduleType"))
+    >>> path = create_path()
+    >>> 'RootInput' in path
+    False
+    >>> path.add_module('RootInput')
+    >>> 'RootInput' in path
+    True)", args("moduleType"))
   ;
 
   register_ptr_to_python<PathPtr>();

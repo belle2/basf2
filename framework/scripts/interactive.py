@@ -2,13 +2,18 @@
 # -*- coding: utf-8 -*-
 
 """
+interactive.py
+--------------
+
 Defines a function embed() that can be used to drop into an interactive python
 shell from within a steering file or python module. If available, IPython will
 be used. Use Ctrl+D to exit the shell.
 
-Usage:
-import interactive
-interactive.embed()
+    >>> import interactive
+    >>> interactive.embed()
+    In [1]:
+
+See framework/examples/interactive.py for an example.
 """
 
 from basf2 import *

@@ -26,14 +26,15 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
     Pretty print a given table, by using available terminal size and
     word wrapping fields as needed.
 
-    table: A 2d list of table fields. Each row must have the same length.
-    column_width: list of column widths, needs to be of same length as rows
-                  in 'table'. Available fields are:
-                  -n  as needed, up to n characters, word wrap if longer
-                  n   n characters (fixed)
-                  *   use all available space, good for description fields
-                      (can only be used ONCE)
-    first_row_is_heading: header specifies if we should take the first row
+    *table*: A 2d list of table fields. Each row must have the same length.
+
+    *column_width*: list of column widths, needs to be of same length as rows
+    in 'table'. Available fields are::
+        -n  as needed, up to n characters, word wrap if longer
+        n   n characters (fixed)
+        *   use all available space, good for description fields
+            (can only be used ONCE)
+    *first_row_is_heading*: header specifies if we should take the first row
                           as table header and offset it a bit
     """
 
@@ -549,7 +550,7 @@ def list_functions(mod):
 
 def set_streamobjs(objs):
     """
-    Sets objects to be streamed. To be ised to limit objects for the improvement of
+    Sets objects to be streamed. To be used to limit objects for the improvement of
     parallel processing performance
     """
     fw.set_streamobjs(objs)

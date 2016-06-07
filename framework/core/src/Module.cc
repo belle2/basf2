@@ -15,6 +15,7 @@
 #include <boost/python/copy_const_reference.hpp>
 #include <boost/python/overloads.hpp>
 #include <boost/python/enum.hpp>
+#include <boost/python/docstring_options.hpp>
 
 #include <framework/core/Module.h>
 #include <framework/core/ModuleCondition.h>
@@ -285,6 +286,8 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(if_true_overloads, if_true, 1, 2)
 
 void Module::exposePythonAPI()
 {
+  docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
+
   void (Module::*setReturnValueInt)(int) = &Module::setReturnValue;
   void (Module::*setReturnValueBool)(bool) = &Module::setReturnValue;
 
@@ -313,7 +316,31 @@ void Module::exposePythonAPI()
   ;
 
   //Python class definition
-  class_<Module, PyModule>("Module")
+  class_<Module, PyModule>("Module", R"(
+Base class for Modules.
+
+A module is the smallest building block of the framework.
+A typical event processing chain consists of a Path containing
+modules. By inheriting from this base class, various types of
+modules can be created.
+
+Each module is identified by its unique name, and should end in ...Module.
+To make the module 'SomeRecoModule' known to the framework, use REG_MODULE(SomeReco).
+It will then show up in the module list as 'SomeReco'.
+
+Modules can also define a return value (int or bool) using setReturnValue(),
+which can be used in the steering file to split the Path based on the set value:
+    >>> module_with_condition.if_value("<1", another_path)
+
+In case the module condition for a given event is less than 1, the execution
+will be diverted into another_path for this event. You could for example set
+a special return value if an error occurs, and divert the execution into a
+path containing RootOutput if it is found; saving only the data producing/
+produced by the error.
+
+The 'Module Development' section in the manual provides detailed information
+on how to create modules, setting parameters, or using return values/conditions:
+https://belle2.cc.kek.jp/~twiki/bin/view/Software/Basf2manual#Module_Development)")
   .def("__str__", &Module::getPathString)
   .def("name", &Module::getName, return_value_policy<copy_const_reference>())
   .def("type", &Module::getType, return_value_policy<copy_const_reference>())

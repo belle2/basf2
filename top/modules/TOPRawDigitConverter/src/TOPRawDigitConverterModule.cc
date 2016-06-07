@@ -60,6 +60,12 @@ namespace Belle2 {
              "name of TOPDigit store array", string(""));
     addParam("useSampleTimeCalibration", m_useSampleTimeCalibration,
              "if true, use sample time calibration (needs DB)", true);
+    addParam("useChannelT0Calibration", m_useChannelT0Calibration,
+             "if true, use channel T0 calibration (needs DB)", true);
+    addParam("useModuleT0Calibration", m_useModuleT0Calibration,
+             "if true, use module T0 calibration (needs DB)", true);
+    addParam("useCommonT0Calibration", m_useCommonT0Calibration,
+             "if true, use common T0 calibration (needs DB)", true);
 
 
   }
@@ -98,7 +104,19 @@ namespace Belle2 {
 
     // check if calibrations are available
     if (m_useSampleTimeCalibration and !m_timebase.isValid()) {
-      B2ERROR("No sample time calibration available in DB - no conversion done");
+      B2ERROR("Sample time calibration requested but not available - no conversion done");
+      return;
+    }
+    if (m_useChannelT0Calibration and !m_channelT0.isValid()) {
+      B2ERROR("Channel T0 calibration requested but not available - no conversion done");
+      return;
+    }
+    if (m_useModuleT0Calibration and !m_moduleT0.isValid()) {
+      B2ERROR("Module T0 calibration requested but not available - no conversion done");
+      return;
+    }
+    if (m_useCommonT0Calibration and !m_commonT0.isValid()) {
+      B2ERROR("Common T0 calibration requested but not available - no conversion done");
       return;
     }
 
@@ -136,6 +154,10 @@ namespace Belle2 {
         }
       }
       float time = sampleTimes->getTimeDifference(rawDigit.getASICWindow(), rawTime);
+
+      if (m_useChannelT0Calibration) time -= m_channelT0->getT0(moduleID, channel);
+      if (m_useModuleT0Calibration) time -= m_moduleT0->getT0(moduleID);
+      if (m_useCommonT0Calibration) time -= m_commonT0->getT0();
 
       auto* digit = digits.appendNew(moduleID, pixelID, tdc);
       digit->setTime(time);

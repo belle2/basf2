@@ -16,6 +16,9 @@
 
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPCalTimebase.h>
+#include <top/dbobjects/TOPCalChannelT0.h>
+#include <top/dbobjects/TOPCalModuleT0.h>
+#include <top/dbobjects/TOPCalCommonT0.h>
 
 
 namespace Belle2 {
@@ -70,11 +73,17 @@ namespace Belle2 {
 
     std::string m_inputRawDigitsName;  /**< name of TOPRawDigit store array */
     std::string m_outputDigitsName;    /**< name of TOPDigit store array */
-    bool m_useSampleTimeCalibration;   /**< use sample time calibration, if true */
+    bool m_useSampleTimeCalibration;   /**< if true, use sample time calibration */
+    bool m_useChannelT0Calibration;    /**< if true, use channel T0 calibration */
+    bool m_useModuleT0Calibration;     /**< if true, use module T0 calibration */
+    bool m_useCommonT0Calibration;     /**< if true, use common T0 calibration */
 
-    DBObjPtr<TOPCalTimebase> m_timebase;  /**< sample time calibration */
+    DBObjPtr<TOPCalTimebase> m_timebase;  /**< sample time calibration constants */
     TOPSampleTimes m_sampleTimes; /**< equidistant in case no calibration required */
     int m_sampleDivisions = 0; /**< number of sample divisions (from TDC subbits) */
+    DBObjPtr<TOPCalChannelT0> m_channelT0;  /**< channel T0 calibration constants */
+    DBObjPtr<TOPCalModuleT0> m_moduleT0;    /**< module T0 calibration constants */
+    DBObjPtr<TOPCalCommonT0> m_commonT0;    /**< common T0 calibration constants */
 
   };
 

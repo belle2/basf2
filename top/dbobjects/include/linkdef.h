@@ -12,6 +12,9 @@
 #pragma link C++ class Belle2::TOPFrontEndMap+;
 #pragma link C++ class Belle2::TOPSampleTimes+;
 #pragma link C++ class Belle2::TOPCalTimebase+;
+#pragma link C++ class Belle2::TOPCalChannelT0+;
+#pragma link C++ class Belle2::TOPCalModuleT0+;
+#pragma link C++ class Belle2::TOPCalCommonT0+;
 #pragma link C++ class Belle2::TOPGeoBase+;
 #pragma link C++ class Belle2::TOPGeoPMT+;
 #pragma link C++ class Belle2::TOPGeoPMTArray+;

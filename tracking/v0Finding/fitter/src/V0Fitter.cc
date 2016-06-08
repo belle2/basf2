@@ -94,7 +94,7 @@ bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit:
     // code trying several windings before giving up, so this
     // happens occasionally.  Something more stable would perhaps
     // be desirable.
-    B2ERROR("Could not extrapolate track to vertex.");
+    B2WARNING("Could not extrapolate track to vertex.");
     return false;
   }
   return true;

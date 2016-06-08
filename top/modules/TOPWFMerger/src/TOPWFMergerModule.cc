@@ -77,6 +77,9 @@ namespace Belle2 {
 
   }
 
+  TOPWFMergerModule::~TOPWFMergerModule()
+  {
+  }
 
   void TOPWFMergerModule::initialize()
   {

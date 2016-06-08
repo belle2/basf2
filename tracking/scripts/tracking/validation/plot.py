@@ -321,6 +321,67 @@ class ValidationPlot(object):
 
         return self
 
+    def grapherrors(self,
+                    xs_and_err,
+                    ys_and_err,
+                    stackby=None,
+                    lower_bound=(None, None),
+                    upper_bound=(None, None),
+                    outlier_z_score=(None, None),
+                    include_exceptionals=(True, True),
+                    max_n_data=100000,
+                    is_expert=True):
+        """Fill the plot with a (unbinned) two dimensional scatter plot
+        xs_and_err and ys_and_err are tuples containing the values and the errors on these values
+        as numpy arrays
+        """
+
+        self._is_expert = is_expert
+
+        xs = xs_and_err[0]
+        ys = ys_and_err[0]
+
+        x_lower_bound, y_lower_bound = self.unpack_2d_param(lower_bound)
+        x_upper_bound, y_upper_bound = self.unpack_2d_param(upper_bound)
+        x_outlier_z_score, y_outlier_z_score = self.unpack_2d_param(outlier_z_score)
+        x_include_exceptionals, y_include_exceptionals = self.unpack_2d_param(include_exceptionals)
+
+        x_lower_bound, x_upper_bound = self.determine_range(
+            xs,
+            lower_bound=x_lower_bound,
+            upper_bound=x_upper_bound,
+            outlier_z_score=x_outlier_z_score,
+            include_exceptionals=x_include_exceptionals
+        )
+
+        y_lower_bound, y_upper_bound = self.determine_range(
+            ys,
+            lower_bound=y_lower_bound,
+            upper_bound=y_upper_bound,
+            outlier_z_score=y_outlier_z_score,
+            include_exceptionals=y_include_exceptionals
+        )
+
+        graph = ROOT.TGraphErrors()
+
+        graph.SetName(self.name)
+        graph.GetHistogram().SetOption("ALP")
+
+        graph.SetMarkerColor(4)
+        graph.SetMarkerStyle(21)
+
+        # Transport the lower and upper bound as ranges of the axis
+        graph.GetXaxis().SetLimits(x_lower_bound, x_upper_bound)
+        graph.GetYaxis().SetLimits(y_lower_bound, y_upper_bound)
+
+        self.create(graph,
+                    xs=xs,
+                    ys=ys,
+                    stackby=stackby,
+                    reverse_stack=False)
+
+        return self
+
     def hist2d(self,
                xs,
                ys,
@@ -1017,8 +1078,24 @@ class ValidationPlot(object):
             if ys is None:
                 raise ValueError("ys are required for filling a graph")
             self.fill_into_tgraph(plot, xs, ys, filter=filter)
+        elif isinstance(plot, ROOT.TGraphErrors):
+            if ys is None:
+                raise ValueError("ys are required for filling a graph error")
+
+            self.fill_into_tgrapherror(plot, xs, ys)
         else:
             self.fill_into_th1(plot, xs, ys, weights=weights, filter=filter)
+
+    def fill_into_tgrapherror(self, graph, xs, ys, filter=None):
+        """fill point values and error of the x and y axis into the graph"""
+
+        assert(len(xs[0]) == len(ys[0]))
+        # set the overall amount of points
+        graph.Set(len(xs[0]))
+
+        for i in range(len(xs[0])):
+            graph.SetPoint(i, xs[0][i], ys[0][i])
+            graph.SetPointError(i, xs[1][i], ys[1][i])
 
     def fill_into_tgraph(self, graph, xs, ys, filter=None):
         """Fill the data into a TGraph"""

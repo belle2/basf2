@@ -9,6 +9,7 @@ from tracking.validation.plot import ValidationPlot, root_save_name, \
     compose_axis_label
 
 from tracking.validation.pull import PullAnalysis
+from tracking.validation.resolution import ResolutionAnalysis
 from tracking.validation.fom import ValidationFiguresOfMerit
 
 from tracking.validation.mc_side_module import MCSideTrackingValidationModule
@@ -181,6 +182,9 @@ class TrackingValidationModule(basf2.Module):
         self.trackCandidatesColumnName = trackCandidatesColumnName
         self.mcTrackCandidatesColumnName = mcTrackCandidatesColumName
 
+        # default binning used for resolution plots over pt
+        self.resolution_pt_binning = [0.05, 0.1, 0.25, 0.4, 0.6, 1., 1.5, 2., 3., 4.]
+
     def initialize(self):
         self.trackMatchLookUp = Belle2.TrackMatchLookUp(self.mcTrackCandidatesColumnName, self.trackCandidatesColumnName)
 
@@ -204,6 +208,14 @@ class TrackingValidationModule(basf2.Module):
         self.pr_d0_truths = collections.deque()
         self.pr_d0_estimates = collections.deque()
         self.pr_d0_variances = collections.deque()
+
+        self.pr_z0_truths = collections.deque()
+        self.pr_z0_estimates = collections.deque()
+
+        self.pr_pt_truths = collections.deque()
+        self.pr_pt_estimates = collections.deque()
+
+        self.pr_bining_pt = collections.deque()
 
         self.mc_matches = collections.deque()
         self.mc_d0s = collections.deque()
@@ -237,9 +249,11 @@ class TrackingValidationModule(basf2.Module):
             is_matched = trackMatchLookUp.isMatchedPRTrackCand(trackCand)
             is_clone = trackMatchLookUp.isClonePRTrackCand(trackCand)
 
+            pt_truth = float('nan')
             omega_truth = float('nan')
             tan_lambda_truth = float('nan')
             d0_truth = float('nan')
+            z0_truth = float('nan')
 
             mcParticle = None
             if is_matched or is_clone:
@@ -248,7 +262,9 @@ class TrackingValidationModule(basf2.Module):
                 mcHelix = getHelixFromMCParticle(mcParticle)
                 omega_truth = mcHelix.getOmega()
                 tan_lambda_truth = mcHelix.getTanLambda()
+                pt_truth = mcParticle.getMomentum().Perp()
                 d0_truth = mcHelix.getD0()
+                z0_truth = mcHelix.getZ0()
 
             # fill the FilterProperties will all properties on this track
             # gathered so far
@@ -274,6 +290,8 @@ class TrackingValidationModule(basf2.Module):
             tan_lambda_variance = float('nan')
             d0_estimate = float('nan')
             d0_variance = float('nan')
+            z0_estimate = float('nan')
+            pt_estimate = float('nan')
 
             momentum_pt = float('nan')
             momentum = float('nan')
@@ -297,13 +315,17 @@ class TrackingValidationModule(basf2.Module):
                 d0_estimate = prTrackFitResult.getD0()
                 d0_variance = prTrackFitResult.getCov()[0]
 
+                z0_estimate = prTrackFitResult.getZ0()
+
                 momentum = prTrackFitResult.getMomentum()
-                momentum_pt = momentum.Perp()
+                pt_estimate = momentum.Perp()
 
             # store properties of the seed
             self.pr_seed_tan_lambdas.append(seed_tan_lambda)
             self.pr_seed_phi.append(seed_phi)
             self.pr_seed_theta.append(seed_theta)
+
+            self.pr_bining_pt.append(pt_truth)
 
             # store properties resulting from this trackfit
             isMatchedOrIsClone = is_matched or is_clone
@@ -322,6 +344,12 @@ class TrackingValidationModule(basf2.Module):
             self.pr_d0_estimates.append(d0_estimate)
             self.pr_d0_variances.append(d0_variance)
             self.pr_d0_truths.append(d0_truth)
+
+            self.pr_z0_estimates.append(z0_estimate)
+            self.pr_z0_truths.append(z0_truth)
+
+            self.pr_pt_estimates.append(pt_estimate)
+            self.pr_pt_truths.append(pt_truth)
 
     def examine_mc_tracks(self):
         """Looks at the individual Monte Carlo tracks and store information about them"""
@@ -469,10 +497,59 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                             np.array(self.pr_d0_variances))
             curvature_pull_analysis.contact = contact
             pull_analyses.append(curvature_pull_analysis)
-            # TODO
-            # pulls for the vertex residuals
-            # push pull analysis to seperate TDirectory and only forward highlights to the top level
-            # Profile variances versus parameters
+
+            # Resolution plots
+            ##############################
+
+            # d0 impact parameter resolution plot
+            d0_resolution_analysis = ResolutionAnalysis('d0_res',
+                                                        self.resolution_pt_binning,
+                                                        'Pt',
+                                                        plot_name_prefix=plot_name_prefix + '_d0_res',
+                                                        plot_title_postfix=self.plot_title_postfix)
+            d0_resolution_analysis.analyse(np.array(self.pr_bining_pt),
+                                           np.array(self.pr_d0_truths),
+                                           np.array(self.pr_d0_estimates),
+                                           np.array(self.pr_d0_variances))
+            d0_resolution_analysis.contact = contact
+            pull_analyses.append(d0_resolution_analysis)
+
+            # z0 impact parameter resolution plot
+            z0_resolution_analysis = ResolutionAnalysis('z0_res',
+                                                        self.resolution_pt_binning,
+                                                        "Pt",
+                                                        plot_name_prefix=plot_name_prefix + '_z0_res',
+                                                        plot_title_postfix=self.plot_title_postfix)
+            z0_resolution_analysis.analyse(np.array(self.pr_bining_pt),
+                                           np.array(self.pr_z0_truths),
+                                           np.array(self.pr_z0_estimates))
+            z0_resolution_analysis.contact = contact
+            pull_analyses.append(z0_resolution_analysis)
+
+            # omega curvature parameter resolution plot
+            omega_resolution_analysis = ResolutionAnalysis('omega_res',
+                                                           self.resolution_pt_binning,
+                                                           "Pt",
+                                                           plot_name_prefix=plot_name_prefix + '_omega_res',
+                                                           plot_title_postfix=self.plot_title_postfix)
+            omega_resolution_analysis.analyse(np.array(self.pr_bining_pt),
+                                              np.array(self.pr_omega_truths),
+                                              np.array(self.pr_omega_estimates),
+                                              np.array(self.pr_omega_variances))
+            omega_resolution_analysis.contact = contact
+            pull_analyses.append(omega_resolution_analysis)
+
+            # transverse momentum resolution plot
+            pt_resolution_analysis = ResolutionAnalysis('pt_res',
+                                                        self.resolution_pt_binning,
+                                                        "Pt",
+                                                        plot_name_prefix=plot_name_prefix + '_pt_res',
+                                                        plot_title_postfix=self.plot_title_postfix)
+            pt_resolution_analysis.analyse(np.array(self.pr_bining_pt),
+                                           np.array(self.pr_pt_truths),
+                                           np.array(self.pr_pt_estimates))
+            pt_resolution_analysis.contact = contact
+            pull_analyses.append(pt_resolution_analysis)
 
         # Saving #
         ##########

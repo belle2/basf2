@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <FrontEndMapping descr="Mapping of SCROD's to TOP modules">
-  <!-- COPPERid's are arbitrary chosen! -->
 
   <TOPModule CNumber="1">
-    <moduleID descr="slot number">0</moduleID>
+    <moduleID descr="slot number">0</moduleID>  <!-- not installed -->
     <Boardstack col="0">
       <SCRODid>110</SCRODid>
-      <COPPERid>1001</COPPERid>
+      <COPPERid>1001</COPPERid> <!-- arbitrary! -->
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>28</SCRODid>
-      <COPPERid>1001</COPPERid>
+      <COPPERid>1001</COPPERid> <!-- arbitrary! -->
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>56</SCRODid>
-      <COPPERid>1001</COPPERid>
+      <COPPERid>1001</COPPERid> <!-- arbitrary! -->
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>112</SCRODid>
-      <COPPERid>1001</COPPERid>
+      <COPPERid>1001</COPPERid> <!-- arbitrary! -->
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -31,22 +30,22 @@
     <moduleID descr="slot number">6</moduleID>
     <Boardstack col="0">
       <SCRODid>32</SCRODid>
-      <COPPERid>1002</COPPERid>
+      <COPPERid>3006</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>29</SCRODid>
-      <COPPERid>1002</COPPERid>
+      <COPPERid>3006</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>96</SCRODid>
-      <COPPERid>1002</COPPERid>
+      <COPPERid>3006</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>31</SCRODid>
-      <COPPERid>1002</COPPERid>
+      <COPPERid>3006</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -55,22 +54,22 @@
     <moduleID descr="slot number">15</moduleID>
     <Boardstack col="0">
       <SCRODid>42</SCRODid>
-      <COPPERid>1003</COPPERid>
+      <COPPERid>3015</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>26</SCRODid>
-      <COPPERid>1003</COPPERid>
+      <COPPERid>3015</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>34</SCRODid> <!-- up to run 1291: 30 -->
-      <COPPERid>1003</COPPERid>
+      <COPPERid>3015</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>25</SCRODid>
-      <COPPERid>1003</COPPERid>
+      <COPPERid>3015</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -79,22 +78,22 @@
     <moduleID descr="slot number">14</moduleID>
     <Boardstack col="0">
       <SCRODid>45</SCRODid>
-      <COPPERid>1004</COPPERid>
+      <COPPERid>3014</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>50</SCRODid>
-      <COPPERid>1004</COPPERid>
+      <COPPERid>3014</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>48</SCRODid>
-      <COPPERid>1004</COPPERid>
+      <COPPERid>3014</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>46</SCRODid>
-      <COPPERid>1004</COPPERid>
+      <COPPERid>3014</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -103,22 +102,22 @@
     <moduleID descr="slot number">9</moduleID>
     <Boardstack col="0">
       <SCRODid>72</SCRODid>
-      <COPPERid>1005</COPPERid>
+      <COPPERid>3009</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>95</SCRODid>
-      <COPPERid>1005</COPPERid>
+      <COPPERid>3009</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>70</SCRODid>
-      <COPPERid>1005</COPPERid>
+      <COPPERid>3009</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>69</SCRODid>
-      <COPPERid>1005</COPPERid>
+      <COPPERid>3009</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -127,22 +126,22 @@
     <moduleID descr="slot number">12</moduleID>
     <Boardstack col="0">
       <SCRODid>62</SCRODid>
-      <COPPERid>1006</COPPERid>
+      <COPPERid>3012</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>54</SCRODid>
-      <COPPERid>1006</COPPERid>
+      <COPPERid>3012</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>63</SCRODid>
-      <COPPERid>1006</COPPERid>
+      <COPPERid>3012</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>60</SCRODid>
-      <COPPERid>1006</COPPERid>
+      <COPPERid>3012</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -151,22 +150,22 @@
     <moduleID descr="slot number">8</moduleID>
     <Boardstack col="0">
       <SCRODid>38</SCRODid>
-      <COPPERid>1007</COPPERid>
+      <COPPERid>3008</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>24</SCRODid>
-      <COPPERid>1007</COPPERid>
+      <COPPERid>3008</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>39</SCRODid>
-      <COPPERid>1007</COPPERid>
+      <COPPERid>3008</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>97</SCRODid>
-      <COPPERid>1007</COPPERid>
+      <COPPERid>3008</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -175,22 +174,22 @@
     <moduleID descr="slot number">11</moduleID>
     <Boardstack col="0">
       <SCRODid>64</SCRODid>
-      <COPPERid>1008</COPPERid>
+      <COPPERid>3011</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>65</SCRODid>
-      <COPPERid>1008</COPPERid>
+      <COPPERid>3011</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>66</SCRODid>
-      <COPPERid>1008</COPPERid>
+      <COPPERid>3011</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>67</SCRODid>
-      <COPPERid>1008</COPPERid>
+      <COPPERid>3011</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -199,22 +198,22 @@
     <moduleID descr="slot number">13</moduleID>
     <Boardstack col="0">
       <SCRODid>51</SCRODid>
-      <COPPERid>1009</COPPERid>
+      <COPPERid>3013</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>53</SCRODid>
-      <COPPERid>1009</COPPERid>
+      <COPPERid>3013</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>99</SCRODid>
-      <COPPERid>1009</COPPERid>
+      <COPPERid>3013</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>59</SCRODid>
-      <COPPERid>1009</COPPERid>
+      <COPPERid>3013</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -223,22 +222,22 @@
     <moduleID descr="slot number">16</moduleID>
     <Boardstack col="0">
       <SCRODid>35</SCRODid>
-      <COPPERid>1010</COPPERid>
+      <COPPERid>3016</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>23</SCRODid>
-      <COPPERid>1010</COPPERid>
+      <COPPERid>3016</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>44</SCRODid>
-      <COPPERid>1010</COPPERid>
+      <COPPERid>3016</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>102</SCRODid>
-      <COPPERid>1010</COPPERid>
+      <COPPERid>3016</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -247,22 +246,22 @@
     <moduleID descr="slot number">3</moduleID>
     <Boardstack col="0">
       <SCRODid>79</SCRODid>
-      <COPPERid>1011</COPPERid>
+      <COPPERid>3003</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>80</SCRODid>
-      <COPPERid>1011</COPPERid>
+      <COPPERid>3003</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>82</SCRODid>
-      <COPPERid>1011</COPPERid>
+      <COPPERid>3003</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>94</SCRODid>
-      <COPPERid>1011</COPPERid>
+      <COPPERid>3003</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -271,22 +270,22 @@
     <moduleID descr="slot number">4</moduleID>
     <Boardstack col="0">
       <SCRODid>75</SCRODid>
-      <COPPERid>1012</COPPERid>
+      <COPPERid>3004</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>76</SCRODid>
-      <COPPERid>1012</COPPERid>
+      <COPPERid>3004</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>77</SCRODid>
-      <COPPERid>1012</COPPERid>
+      <COPPERid>3004</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>81</SCRODid>
-      <COPPERid>1012</COPPERid>
+      <COPPERid>3004</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -295,22 +294,22 @@
     <moduleID descr="slot number">10</moduleID>
     <Boardstack col="0">
       <SCRODid>83</SCRODid>
-      <COPPERid>1013</COPPERid>
+      <COPPERid>3010</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>98</SCRODid>
-      <COPPERid>1013</COPPERid>
+      <COPPERid>3010</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>84</SCRODid>
-      <COPPERid>1013</COPPERid>
+      <COPPERid>3010</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>36</SCRODid>
-      <COPPERid>1013</COPPERid>
+      <COPPERid>3010</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -319,22 +318,22 @@
     <moduleID descr="slot number">7</moduleID>
     <Boardstack col="0">
       <SCRODid>37</SCRODid>
-      <COPPERid>1014</COPPERid>
+      <COPPERid>3007</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>55</SCRODid>
-      <COPPERid>1014</COPPERid>
+      <COPPERid>3007</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>21</SCRODid> <!-- up to run ?: 57 -->
-      <COPPERid>1014</COPPERid>
+      <COPPERid>3007</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>71</SCRODid>
-      <COPPERid>1014</COPPERid>
+      <COPPERid>3007</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -343,22 +342,22 @@
     <moduleID descr="slot number">5</moduleID>
     <Boardstack col="0">
       <SCRODid>85</SCRODid>
-      <COPPERid>1015</COPPERid>
+      <COPPERid>3005</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>90</SCRODid>
-      <COPPERid>1015</COPPERid>
+      <COPPERid>3005</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>91</SCRODid>
-      <COPPERid>1015</COPPERid>
+      <COPPERid>3005</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>92</SCRODid>
-      <COPPERid>1015</COPPERid>
+      <COPPERid>3005</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -367,22 +366,22 @@
     <moduleID descr="slot number">2</moduleID>
     <Boardstack col="0">
       <SCRODid>40</SCRODid>
-      <COPPERid>1016</COPPERid>
+      <COPPERid>3002</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>47</SCRODid>
-      <COPPERid>1016</COPPERid>
+      <COPPERid>3002</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>52</SCRODid>
-      <COPPERid>1016</COPPERid>
+      <COPPERid>3002</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>78</SCRODid>
-      <COPPERid>1016</COPPERid>
+      <COPPERid>3002</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>
@@ -391,22 +390,22 @@
     <moduleID descr="slot number">1</moduleID>
     <Boardstack col="0">
       <SCRODid>74</SCRODid>
-      <COPPERid>1017</COPPERid>
+      <COPPERid>3001</COPPERid>
       <FinesseSlot>A</FinesseSlot>
     </Boardstack>
     <Boardstack col="1">
       <SCRODid>88</SCRODid>
-      <COPPERid>1017</COPPERid>
+      <COPPERid>3001</COPPERid>
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
       <SCRODid>41</SCRODid>
-      <COPPERid>1017</COPPERid>
+      <COPPERid>3001</COPPERid>
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>
     <Boardstack col="3">
       <SCRODid>103</SCRODid>
-      <COPPERid>1017</COPPERid>
+      <COPPERid>3001</COPPERid>
       <FinesseSlot>D</FinesseSlot>
     </Boardstack>
   </TOPModule>

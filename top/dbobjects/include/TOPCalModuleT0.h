@@ -77,11 +77,11 @@ namespace Belle2 {
     /**
      * Sizes
      */
-    enum {c_numModules = 16,  // number of modules
+    enum {c_numModules = 16,  /**< number of modules */
          };
 
-    float m_T0[c_numModules];    // calibration constants
-    float m_errT0[c_numModules]; // errors on constants
+    float m_T0[c_numModules];    /**< calibration constants */
+    float m_errT0[c_numModules]; /**< errors on constants */
 
     ClassDef(TOPCalModuleT0, 1); /**< ClassDef */
 

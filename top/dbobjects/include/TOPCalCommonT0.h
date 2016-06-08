@@ -51,8 +51,8 @@ namespace Belle2 {
 
   private:
 
-    float m_T0 = 0;    // calibration constant
-    float m_errT0 = 0; // error on constant
+    float m_T0 = 0;    /**< calibration constant */
+    float m_errT0 = 0; /**< error on constant */
 
     ClassDef(TOPCalCommonT0, 1); /**< ClassDef */
 

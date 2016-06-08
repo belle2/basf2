@@ -3,7 +3,7 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost                                             *
+ * Contributors: Oliver Frost, Thomas Hauth                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,16 +25,22 @@ namespace {
   // In addtion to the method defined there it also yields the weight of the relation
   // If no relation is found the weight is not changed
   template <class TO>
-  static TO* getRelatedFromObj(const TObject* fromObject, double& weight, const string& toName = "")
+  static TO* getRelatedObj(const TObject* fromObject, double& weight, const string& toName = "",
+                           DataStore::ESearchSide direction = DataStore::c_ToSide)
   {
-    if (!fromObject) return nullptr;
+    if (!fromObject) {
+      return nullptr;
+    }
     DataStore::StoreEntry* storeEntry = nullptr;
     int index = -1;
-    RelationEntry toEntry = DataStore::Instance().getRelationWith(DataStore::c_ToSide, fromObject, storeEntry, index, TO::Class(),
+    RelationEntry toEntry = DataStore::Instance().getRelationWith(direction, fromObject, storeEntry, index, TO::Class(),
                             toName);
     TO* toObject = static_cast<TO*>(toEntry.object);
 
-    if (toObject) weight = toEntry.weight;
+    if (toObject) {
+      weight = toEntry.weight;
+    }
+
     return toObject;
   }
 
@@ -92,8 +98,8 @@ bool TrackMatchLookUp::isPRTrackCand(const RecoTrack& trackCand)
 const RecoTrack* TrackMatchLookUp::getRelatedMCTrackCand(const RecoTrack& prRecoTrack, float& purity)
 {
   double double_purity = 0; //help variable because DataStore expects double
-  const RecoTrack* mcRecoTrack = getRelatedFromObj<RecoTrack >(&prRecoTrack, double_purity,
-                                 getMCTracksStoreArrayName());
+  const RecoTrack* mcRecoTrack = getRelatedObj<RecoTrack >(&prRecoTrack, double_purity,
+                                                           getMCTracksStoreArrayName());
   if (mcRecoTrack) {
     purity = double_purity;
   } else {
@@ -109,8 +115,8 @@ const RecoTrack* TrackMatchLookUp::getRelatedMCTrackCand(const RecoTrack& prReco
 const RecoTrack* TrackMatchLookUp::getRelatedPRTrackCand(const RecoTrack& mcRecoTrack, float& efficiency)
 {
   double double_efficiency = 0; //help variable because DataStore expects double
-  const RecoTrack* prRecoTrack = getRelatedFromObj<RecoTrack >(&mcRecoTrack, double_efficiency,
-                                 getPRTracksStoreArrayName());
+  const RecoTrack* prRecoTrack = getRelatedObj<RecoTrack >(&mcRecoTrack, double_efficiency,
+                                                           getPRTracksStoreArrayName());
   if (prRecoTrack) {
     efficiency = double_efficiency;
   } else {
@@ -171,7 +177,7 @@ TrackMatchLookUp::getRelatedMCParticle(const RecoTrack& prRecoTrack)
 {
   double dummy_weight = NAN;
   std::string mcParticleStoreArrayName = "";
-  return getRelatedFromObj<MCParticle>(&prRecoTrack, dummy_weight, mcParticleStoreArrayName);
+  return getRelatedObj<MCParticle>(&prRecoTrack, dummy_weight, mcParticleStoreArrayName);
 }
 
 
@@ -180,7 +186,7 @@ const RecoTrack*
 TrackMatchLookUp::getRelatedMCTrackCand(const RecoTrack& trackCand)
 {
   double dummy_weight = NAN;
-  return getRelatedFromObj<RecoTrack>(&trackCand, dummy_weight, getMCTracksStoreArrayName());
+  return getRelatedObj<RecoTrack>(&trackCand, dummy_weight, getMCTracksStoreArrayName());
 }
 
 
@@ -198,7 +204,7 @@ const RecoTrack*
 TrackMatchLookUp::getRelatedPRTrackCand(const RecoTrack& mcRecoTrack)
 {
   double dummy_weight = NAN;
-  return getRelatedFromObj<RecoTrack>(&mcRecoTrack, dummy_weight, getPRTracksStoreArrayName());
+  return getRelatedObj<RecoTrack>(&mcRecoTrack, dummy_weight, getPRTracksStoreArrayName());
 }
 
 

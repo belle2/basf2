@@ -442,10 +442,10 @@ class ValidationPlot(object):
         fit_tf1.SetParName(1, "mean")
         fit_tf1.SetParName(2, "std")
         fit_options = "LM"
-        self.fit(fit_tf1,
-                 fit_options,
-                 lower_bound=lower_bound,
-                 upper_bound=upper_bound)
+        return self.fit(fit_tf1,
+                        fit_options,
+                        lower_bound=lower_bound,
+                        upper_bound=upper_bound)
 
     def fit_line(self):
         """Fit a general line to a one dimensional histogram"""
@@ -525,9 +525,10 @@ class ValidationPlot(object):
         if 'N' not in options:
             options += 'N'
 
-        histogram.Fit(fit_tf1, options, "", lower_bound, upper_bound)
+        fit_res = histogram.Fit(fit_tf1, options + "S", "", lower_bound, upper_bound)
 
         self.set_fit_tf1(histogram, fit_tf1)
+        return fit_res
 
     def show(self):
         """Show the plot."""

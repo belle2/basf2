@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Tobias Schlüter                                          *
+ * Contributors: Tobias Schlüter, Thomas Hauth                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,6 +17,11 @@
 
 namespace Belle2 {
 
+  /**
+   * Takes RecoTracks coming from the event reconstructions and fits them
+   * with the configured list of particles hypothesis and stores the
+   * result in MDST-usable Belle2::Track and Belle2::TrackFitResult classes
+   */
   class TrackCreatorModule : public Module {
 
   public:

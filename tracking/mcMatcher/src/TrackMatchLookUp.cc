@@ -192,10 +192,17 @@ TrackMatchLookUp::getRelatedMCTrackCand(const RecoTrack& trackCand)
 
 
 const TrackFitResult*
-TrackMatchLookUp::getRelatedTrackFitResult(const RecoTrack& prRecoTrack)
+TrackMatchLookUp::getRelatedTrackFitResult(const RecoTrack& prRecoTrack, Const::ChargedStable chargedStable)
 {
   double dummy_weight = NAN;
-  return getRelatedFromObj<TrackFitResult>(&prRecoTrack, dummy_weight, "");
+
+  // get Belle2::Track via the RecoTrack
+  Belle2::Track* b2track = getRelatedObj<Belle2::Track>(&prRecoTrack, dummy_weight, "", DataStore::c_FromSide);
+  if (b2track)
+    // query the Belle2::Track for the selected fit hypothesis
+    return b2track->getTrackFitResult(chargedStable);
+  else
+    return nullptr;
 }
 
 

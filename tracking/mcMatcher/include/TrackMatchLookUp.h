@@ -3,7 +3,7 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost                                             *
+ * Contributors: Oliver Frost, Thomas Hauth                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,6 +11,7 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/Track.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -139,9 +140,11 @@ namespace Belle2 {
     const MCParticle* getRelatedMCParticle(const RecoTrack& trackCand);
 
     /// Looks up the TrackFitResult of a pattern recognition track. Return nullptr if there is no related track fit result.
-    /** The relations are setup to be from track candidate to the track fit result, which is why we only check this direction
+    /** The relations are setup to be from the Belle2::Track to the RecoTrack. Then the TrackFitResults stored within the Belle2::Tracks
+     * are retrieved and the one selected particle hypothesises given via chargedStable is returned
+     * The default is the Pion fit
      */
-    const TrackFitResult* getRelatedTrackFitResult(const RecoTrack& prTrackCand);
+    const TrackFitResult* getRelatedTrackFitResult(const RecoTrack& prTrackCand, Const::ChargedStable chargedStable = Const::pion);
 
     /// Looks for a related Monte Carlo track for the given pattern recognition track candidate and return it if found. Return nullptr if not found.
     const RecoTrack* getRelatedMCTrackCand(const RecoTrack& prTrackCand);

@@ -201,6 +201,10 @@ class TrackingValidationModule(basf2.Module):
         self.pr_tan_lambda_estimates = collections.deque()
         self.pr_tan_lambda_variances = collections.deque()
 
+        self.pr_d0_truths = collections.deque()
+        self.pr_d0_estimates = collections.deque()
+        self.pr_d0_variances = collections.deque()
+
         self.mc_matches = collections.deque()
         self.mc_d0s = collections.deque()
         self.mc_tan_lambdas = collections.deque()
@@ -235,6 +239,8 @@ class TrackingValidationModule(basf2.Module):
 
             omega_truth = float('nan')
             tan_lambda_truth = float('nan')
+            d0_truth = float('nan')
+
             mcParticle = None
             if is_matched or is_clone:
                 # Only matched and clone tracks have a related MCParticle
@@ -242,6 +248,7 @@ class TrackingValidationModule(basf2.Module):
                 mcHelix = getHelixFromMCParticle(mcParticle)
                 omega_truth = mcHelix.getOmega()
                 tan_lambda_truth = mcHelix.getTanLambda()
+                d0_truth = mcHelix.getD0()
 
             # fill the FilterProperties will all properties on this track
             # gathered so far
@@ -265,6 +272,8 @@ class TrackingValidationModule(basf2.Module):
             omega_variance = float('nan')
             tan_lambda_estimate = float('nan')
             tan_lambda_variance = float('nan')
+            d0_estimate = float('nan')
+            d0_variance = float('nan')
 
             momentum_pt = float('nan')
             momentum = float('nan')
@@ -284,6 +293,9 @@ class TrackingValidationModule(basf2.Module):
 
                 tan_lambda_estimate = prTrackFitResult.getCotTheta()
                 tan_lambda_variance = prTrackFitResult.getCov()[14]
+
+                d0_estimate = prTrackFitResult.getD0()
+                d0_variance = prTrackFitResult.getCov()[0]
 
                 momentum = prTrackFitResult.getMomentum()
                 momentum_pt = momentum.Perp()
@@ -306,6 +318,10 @@ class TrackingValidationModule(basf2.Module):
             self.pr_tan_lambda_estimates.append(tan_lambda_estimate)
             self.pr_tan_lambda_variances.append(tan_lambda_variance)
             self.pr_tan_lambda_truths.append(tan_lambda_truth)
+
+            self.pr_d0_estimates.append(d0_estimate)
+            self.pr_d0_variances.append(d0_variance)
+            self.pr_d0_truths.append(d0_truth)
 
     def examine_mc_tracks(self):
         """Looks at the individual Monte Carlo tracks and store information about them"""
@@ -444,6 +460,15 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             curvature_pull_analysis.contact = contact
             pull_analyses.append(curvature_pull_analysis)
 
+            # d0 pull
+            curvature_pull_analysis = PullAnalysis('d0',
+                                                   plot_name_prefix=plot_name_prefix + '_d0',
+                                                   plot_title_postfix=self.plot_title_postfix)
+            curvature_pull_analysis.analyse(np.array(self.pr_d0_truths),
+                                            np.array(self.pr_d0_estimates),
+                                            np.array(self.pr_d0_variances))
+            curvature_pull_analysis.contact = contact
+            pull_analyses.append(curvature_pull_analysis)
             # TODO
             # pulls for the vertex residuals
             # push pull analysis to seperate TDirectory and only forward highlights to the top level

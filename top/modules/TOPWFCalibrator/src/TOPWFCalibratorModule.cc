@@ -61,11 +61,10 @@ namespace Belle2 {
     // Add parameters
     addParam("histogramFileName", m_histogramFileName, "Output root file for histograms",
              string(""));
-
     addParam("moduleID", m_moduleID, "ID of TOP module to calibrate");
-
     addParam("runLow", m_runLow, "IOV:  run lowest", 0);
     addParam("runHigh", m_runHigh, "IOV:  run highest", 0);
+    addParam("numWindows", m_numWindows, "number of windows", int(c_NumWindows));
 
     for (int i = 0; i < c_NumChannels; i++) {
       for (int k = 0; k < c_NumWindows; k++) {
@@ -176,7 +175,7 @@ namespace Belle2 {
       }
     }
     numWindows++;
-    B2INFO("TOPWFCalibratorModule: number of active ASIC storage windows: " <<
+    B2INFO("TOPWFCalibratorModule: number of active ASIC storage windows found: " <<
            numWindows);
 
     DBImportArray<TOPASICChannel> constants;
@@ -187,7 +186,7 @@ namespace Belle2 {
       auto* baseline = m_baseline[channel];
       for (int window = 0; window < c_NumWindows; window++) {
         TProfile* prof = m_profile[channel][window];
-        if (prof) {
+        if (prof and window < m_numWindows) {
           TOPASICPedestals pedestals(window);
           double average = 0;
           if (baseline) average = baseline->GetBinContent(window + 1);
@@ -220,7 +219,8 @@ namespace Belle2 {
 
     B2RESULT("TOPWFCalibratorModule: module ID = " << m_moduleID <<
              ", number of active windows " << numWindows <<
-             ", number of calibrated channels " << all <<
+             " (limited to " << m_numWindows <<
+             "), number of calibrated channels " << all <<
              " incomplete: " << incomplete <<
              " bad samples: " << badSampl <<
              " in " << badPed << " windows");

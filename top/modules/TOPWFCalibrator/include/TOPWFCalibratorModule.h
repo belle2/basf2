@@ -76,6 +76,7 @@ namespace Belle2 {
     int m_moduleID;                  /**< TOP module ID to calibrate */
     int m_runLow;          /**< IOV: from run */
     int m_runHigh;         /**< IOV: to run */
+    int m_numWindows;      /**< number of windows to save their pedestals */
 
     TProfile* m_profile[c_NumChannels][c_NumWindows]; /**< profile histograms */
     TProfile* m_baseline[c_NumChannels]; /**< average baseline */

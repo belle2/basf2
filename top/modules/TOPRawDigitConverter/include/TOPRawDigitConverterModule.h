@@ -78,12 +78,12 @@ namespace Belle2 {
     bool m_useModuleT0Calibration;     /**< if true, use module T0 calibration */
     bool m_useCommonT0Calibration;     /**< if true, use common T0 calibration */
 
-    DBObjPtr<TOPCalTimebase> m_timebase;  /**< sample time calibration constants */
+    DBObjPtr<TOPCalTimebase>* m_timebase = 0;   /**< sample time calibration constants */
+    DBObjPtr<TOPCalChannelT0>* m_channelT0 = 0; /**< channel T0 calibration constants */
+    DBObjPtr<TOPCalModuleT0>* m_moduleT0 = 0;   /**< module T0 calibration constants */
+    DBObjPtr<TOPCalCommonT0>* m_commonT0 = 0;   /**< common T0 calibration constants */
     TOPSampleTimes m_sampleTimes; /**< equidistant in case no calibration required */
     int m_sampleDivisions = 0; /**< number of sample divisions (from TDC subbits) */
-    DBObjPtr<TOPCalChannelT0> m_channelT0;  /**< channel T0 calibration constants */
-    DBObjPtr<TOPCalModuleT0> m_moduleT0;    /**< module T0 calibration constants */
-    DBObjPtr<TOPCalCommonT0> m_commonT0;    /**< common T0 calibration constants */
 
   };
 

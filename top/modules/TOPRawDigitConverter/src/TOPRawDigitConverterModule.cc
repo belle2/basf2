@@ -26,6 +26,7 @@
 // Dataobject classes
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <top/geometry/TOPGeometryPar.h>
 
@@ -67,12 +68,20 @@ namespace Belle2 {
     addParam("useCommonT0Calibration", m_useCommonT0Calibration,
              "if true, use common T0 calibration (needs DB)", true);
 
+    if (m_useSampleTimeCalibration) m_timebase = new DBObjPtr<TOPCalTimebase>;
+    if (m_useChannelT0Calibration) m_channelT0 = new DBObjPtr<TOPCalChannelT0>;
+    if (m_useModuleT0Calibration) m_moduleT0 = new DBObjPtr<TOPCalModuleT0>;
+    if (m_useCommonT0Calibration) m_commonT0 = new DBObjPtr<TOPCalCommonT0>;
 
   }
 
 
   TOPRawDigitConverterModule::~TOPRawDigitConverterModule()
   {
+    if (m_timebase) delete m_timebase;
+    if (m_channelT0) delete m_channelT0;
+    if (m_moduleT0) delete m_moduleT0;
+    if (m_commonT0) delete m_commonT0;
   }
 
 
@@ -96,29 +105,41 @@ namespace Belle2 {
 
   void TOPRawDigitConverterModule::beginRun()
   {
+
+    StoreObjPtr<EventMetaData> evtMetaData;
+
+    // check if calibrations are available when needed - if not, terminate
+
+    if (m_useSampleTimeCalibration) {
+      if (!(*m_timebase).isValid()) {
+        B2FATAL("Sample time calibration requested but not available for run "
+                << evtMetaData->getRun());
+      }
+    }
+    if (m_useChannelT0Calibration) {
+      if (!(*m_channelT0).isValid()) {
+        B2FATAL("Channel T0 calibration requested but not available for run "
+                << evtMetaData->getRun());
+      }
+    }
+    if (m_useModuleT0Calibration) {
+      if (!(*m_moduleT0).isValid()) {
+        B2FATAL("Module T0 calibration requested but not available for run "
+                << evtMetaData->getRun());
+      }
+    }
+    if (m_useCommonT0Calibration) {
+      if (!(*m_commonT0).isValid()) {
+        B2FATAL("Common T0 calibration requested but not available for run "
+                << evtMetaData->getRun());
+      }
+    }
+
   }
 
 
   void TOPRawDigitConverterModule::event()
   {
-
-    // check if calibrations are available
-    if (m_useSampleTimeCalibration and !m_timebase.isValid()) {
-      B2ERROR("Sample time calibration requested but not available - no conversion done");
-      return;
-    }
-    if (m_useChannelT0Calibration and !m_channelT0.isValid()) {
-      B2ERROR("Channel T0 calibration requested but not available - no conversion done");
-      return;
-    }
-    if (m_useModuleT0Calibration and !m_moduleT0.isValid()) {
-      B2ERROR("Module T0 calibration requested but not available - no conversion done");
-      return;
-    }
-    if (m_useCommonT0Calibration and !m_commonT0.isValid()) {
-      B2ERROR("Common T0 calibration requested but not available - no conversion done");
-      return;
-    }
 
     // get mappers
     const auto& feMapper = TOPGeometryPar::Instance()->getFrontEndMapper();
@@ -145,8 +166,8 @@ namespace Belle2 {
       double rawTime = rawDigit.getCFDLeadingTime();
       int tdc = int(rawTime * m_sampleDivisions);
       const auto* sampleTimes = &m_sampleTimes; // equidistant sample times
-      if (m_useSampleTimeCalibration and m_timebase.isValid()) {
-        sampleTimes = m_timebase->getSampleTimes(scrodID, channel % 128);
+      if (m_useSampleTimeCalibration) {
+        sampleTimes = (*m_timebase)->getSampleTimes(scrodID, channel % 128);
         if (!sampleTimes->isCalibrated()) {
           B2ERROR("No sample time calibration available for SCROD " << scrodID
                   << " channel " << channel % 128 << " - raw digit not converted");
@@ -155,9 +176,9 @@ namespace Belle2 {
       }
       float time = sampleTimes->getTimeDifference(rawDigit.getASICWindow(), rawTime);
 
-      if (m_useChannelT0Calibration) time -= m_channelT0->getT0(moduleID, channel);
-      if (m_useModuleT0Calibration) time -= m_moduleT0->getT0(moduleID);
-      if (m_useCommonT0Calibration) time -= m_commonT0->getT0();
+      if (m_useChannelT0Calibration) time -= (*m_channelT0)->getT0(moduleID, channel);
+      if (m_useModuleT0Calibration) time -= (*m_moduleT0)->getT0(moduleID);
+      if (m_useCommonT0Calibration) time -= (*m_commonT0)->getT0();
 
       auto* digit = digits.appendNew(moduleID, pixelID, tdc);
       digit->setTime(time);

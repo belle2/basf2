@@ -88,6 +88,8 @@ REG_MODULE(PXDUnpackerDHH)
 #define ONSEN_ERR_FLAG_SENDALL_TYPE   0x100000000ull
 #define ONSEN_ERR_FLAG_NOTSENDALL_TYPE   0x200000000ull
 #define ONSEN_ERR_FLAG_DHP_DBL_HEADER  0x400000000ull
+#define ONSEN_ERR_FLAG_HEADER_ERR          0x800000000ull
+#define ONSEN_ERR_FLAG_HEADER_ERR_GHOST   0x1000000000ull
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -702,8 +704,8 @@ void PXDUnpackerDHHModule::terminate()
     "DHE START/END ID mismatch", "DHE ID mismatch of START and this frame", "DHE_START w/o prev END", "Nr PXD data ==0",
     "Missing Datcon", "NO DHC data for Trigger", "DHE active mismatch", "DHP active mismatch",
 
-    "SendUnfiltered but Filtered Frame Type", "!SendUnfiltered but Unfiltered Frame Type", "DHP has double header", "unused",
-    "unused", "unused", "unused", "unused",
+    "SendUnfiltered but Filtered Frame Type", "!SendUnfiltered but Unfiltered Frame Type", "DHP has double header", "Error bit in frame header set",
+    "Error bit in GHOST frame header not set", "unused", "unused", "unused",
     "unused", "unused", "unused", "unused",
     "unused", "unused", "unused", "unused",
 
@@ -1174,6 +1176,15 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       }
   }
 
+  if (hw->getErrorFlag()) {
+    if (type != DHC_FRAME_HEADER_DATA_TYPE_GHOST) {
+      m_errorMask |= ONSEN_ERR_FLAG_HEADER_ERR;
+    }
+  } else {
+    if (type == DHC_FRAME_HEADER_DATA_TYPE_GHOST) {
+      m_errorMask |= ONSEN_ERR_FLAG_HEADER_ERR_GHOST;
+    }
+  }
   switch (type) {
     case DHC_FRAME_HEADER_DATA_TYPE_DHP_RAW: {
       countedDHCFrames++;
@@ -1316,7 +1327,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       {
         // TB 2016 fix for BonnDAQ pedestal data with wrong ID
         if (currentDHEID != 0x03 && currentDHEID != 0x23) {
-          B2WARNING("Unexpected DHEID for DDESY TB " << currentDHEID);
+          B2WARNING("Unexpected DHEID for DESY TB " << currentDHEID);
           m_errorMask |= ONSEN_ERR_FLAG_TB_IDS;
           if (currentDHEID == 0x01) currentDHEID = 0x03; /// TODO remove after TB
           if (currentDHEID == 0x21) currentDHEID = 0x23; /// TODO remove after TB

@@ -25,7 +25,7 @@ namespace Belle2 {
 
   namespace PXD {
 
-#define ONSEN_MAX_TYPE_ERR  32
+#define ONSEN_MAX_TYPE_ERR  64
 
 
     /** The PXDUnpackerDHH module.
@@ -60,6 +60,9 @@ namespace Belle2 {
       bool m_ignoreDATCON;
       /** Only unpack, but Do Not Store anything to file */
       bool m_doNotStore;
+      //* Fix EventMeta - HLt Trigger Offset for DESY TB 2016 */
+      int m_DESY16_FixTrigOffset;
+
       /** Event Number from MetaInfo */
       unsigned long m_meta_event_nr;
       /** Run Number from MetaInfo */
@@ -152,12 +155,20 @@ namespace Belle2 {
       void remap_IB_OF(unsigned int& row, unsigned int& col, unsigned int dhp_id, unsigned int dhe_ID);
 
       /** Error Mask set per packet / event*/
-      unsigned int m_errorMask;
+      uint64_t m_errorMask;
       /** give verbose unpacking information -> will eb a parameter in next release */
       bool verbose = true;
       /** ignore missing datcon (dont show error) */
       bool ignore_datcon_flag = true;
 
+      /** counter for not accepted events... should not happen */
+      unsigned int m_notaccepted{0};
+      /** counter for send debug rois */
+      unsigned int m_sendrois{0};
+      /** counter for send unfiltered */
+      unsigned int m_sendunfiltered{0};
+      /** flag send unfiltered */
+      bool m_event_unfiltered{false};
     };//end class declaration
 
 

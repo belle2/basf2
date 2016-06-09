@@ -85,6 +85,10 @@ REG_MODULE(PXDUnpackerDHH)
 #define ONSEN_ERR_FLAG_DHE_ACTIVE   0x40000000ul
 #define ONSEN_ERR_FLAG_DHP_ACTIVE   0x80000000ul
 
+#define ONSEN_ERR_FLAG_SENDALL_TYPE   0x100000000ull
+#define ONSEN_ERR_FLAG_NOTSENDALL_TYPE   0x200000000ull
+#define ONSEN_ERR_FLAG_DHP_DBL_HEADER  0x400000000ull
+
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
@@ -342,6 +346,19 @@ struct dhc_onsen_trigger_frame {
       }
     }
     return m_errorMask;
+  };
+
+  inline bool is_Accepted(void) const
+  {
+    return (magic1 & 0x8000) != 0;
+  };
+  inline bool is_SendROIs(void) const
+  {
+    return (magic1 & 0x2000) != 0;
+  }
+  inline bool is_SendUnfiltered(void) const
+  {
+    return (magic1 & 0x4000) != 0;
   };
 };
 
@@ -644,6 +661,7 @@ PXDUnpackerDHHModule::PXDUnpackerDHHModule() :
   addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing DATCON ROIs", false);
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
   addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of PXD Clusters to be processed", std::string(""));
+  addParam("DESY16FixTrigOffset", m_DESY16_FixTrigOffset, "Fix trigger offset between Meta Event and HLT", 0);
 }
 
 void PXDUnpackerDHHModule::initialize()
@@ -664,8 +682,12 @@ void PXDUnpackerDHHModule::initialize()
 
   ignore_datcon_flag = m_ignoreDATCON;
 
+  m_sendunfiltered = 0;
+  m_sendrois = 0;
+  m_notaccepted = 0;
   m_unpackedEventsCount = 0;
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) m_errorCounter[i] = 0;
+
 }
 
 void PXDUnpackerDHHModule::terminate()
@@ -678,7 +700,17 @@ void PXDUnpackerDHHModule::terminate()
     "Event Header Frame Count Error", "Event header Frame Size Error", "HLTROI Magic Error", "Merger HLT/DATCON TrigNr Mismatch",
     "DHP Size too small", "DHP-DHE DHEID mismatch", "DHP-DHE Port mismatch", "DHP Pix w/o row",
     "DHE START/END ID mismatch", "DHE ID mismatch of START and this frame", "DHE_START w/o prev END", "Nr PXD data ==0",
-    "Missing Datcon", "NO DHC data for Trigger", "DHE active mismatch", "DHP active mismatch"
+    "Missing Datcon", "NO DHC data for Trigger", "DHE active mismatch", "DHP active mismatch",
+
+    "SendUnfiltered but Filtered Frame Type", "!SendUnfiltered but Unfiltered Frame Type", "DHP has double header", "unused",
+    "unused", "unused", "unused", "unused",
+    "unused", "unused", "unused", "unused",
+    "unused", "unused", "unused", "unused",
+
+    "unused", "unused", "unused", "unused",
+    "unused", "unused", "unused", "unused",
+    "unused", "unused", "unused", "unused",
+    "unused", "unused", "unused", "unused"
   };
 
   int flag = 0;
@@ -697,6 +729,7 @@ void PXDUnpackerDHHModule::terminate()
   } else {
     B2INFO("PXD DHH Unpacker --> No Error found in Events: " << m_unpackedEventsCount);
   }
+  // B2ERROR("Statistic 2: !Accepted: " << m_notaccepted << " SendROIs: " << m_sendrois << " Unfiltered: " << m_sendunfiltered);
 }
 
 void PXDUnpackerDHHModule::event()
@@ -711,6 +744,9 @@ void PXDUnpackerDHHModule::event()
   m_errorMask = 0;
 
   m_meta_event_nr = evtPtr->getEvent();
+  if (m_DESY16_FixTrigOffset != 0) {
+    m_meta_event_nr += m_DESY16_FixTrigOffset;
+  }
   m_meta_run_nr = evtPtr->getRun();
   m_meta_subrun_nr = evtPtr->getSubrun();
   m_meta_experiment = evtPtr->getExperiment();
@@ -729,9 +765,12 @@ void PXDUnpackerDHHModule::event()
   if (nsr == 0) m_errorMask |= ONSEN_ERR_FLAG_NO_PXD;
 
   m_unpackedEventsCount++;
-  for (unsigned int i = 0, j = 1; i < ONSEN_MAX_TYPE_ERR; i++) {
-    if (m_errorMask & j) m_errorCounter[i]++;
-    j += j;
+  {
+    uint64_t j = 1;
+    for (unsigned int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
+      if (m_errorMask & j) m_errorCounter[i]++;
+      j += j;
+    }
   }
 }
 
@@ -934,17 +973,17 @@ void PXDUnpackerDHHModule::unpack_dhp(void* data, unsigned int frame_len, unsign
     B2INFO("HEADER --  " << hex << dhp_pix[0] << hex << dhp_pix[1] << hex << dhp_pix[2] << hex << dhp_pix[3] << " -- ");
 
   if (printflag)
-    B2INFO("DHP Header   | " << hex << dhp_pix[2] << " ( " << hex << dhp_pix[2] << " ) ");
+    B2INFO("DHP Header   | $" << hex << dhp_pix[2] << " ( " << dec << dhp_pix[2] << " ) ");
   dhp_header_type  = (dhp_pix[2] & 0xE000) >> 13;
   dhp_reserved     = (dhp_pix[2] & 0x1F00) >> 8;
   dhp_dhe_id       = (dhp_pix[2] & 0x00FC) >> 2;
   dhp_dhp_id       =  dhp_pix[2] & 0x0003;
 
   if (printflag) {
-    B2INFO("DHP type     | " << hex << dhp_header_type << " ( " << dec << dhp_header_type << " ) ");
-    B2INFO("DHP reserved | " << hex << dhp_reserved << " ( " << dec << dhp_reserved << " ) ");
-    B2INFO("DHP DHE ID   | " << hex << dhp_dhe_id << " ( " << dec << dhp_dhe_id << " ) ");
-    B2INFO("DHP DHP ID   | " << hex << dhp_dhp_id << " ( " << dec << dhp_dhp_id << " ) ");
+    B2INFO("DHP type     | $" << hex << dhp_header_type << " ( " << dec << dhp_header_type << " ) ");
+    B2INFO("DHP reserved | $" << hex << dhp_reserved << " ( " << dec << dhp_reserved << " ) ");
+    B2INFO("DHP DHE ID   | $" << hex << dhp_dhe_id << " ( " << dec << dhp_dhe_id << " ) ");
+    B2INFO("DHP DHP ID   | $" << hex << dhp_dhp_id << " ( " << dec << dhp_dhp_id << " ) ");
   }
 
   if (dhe_ID != dhp_dhe_id) {
@@ -966,7 +1005,16 @@ void PXDUnpackerDHHModule::unpack_dhp(void* data, unsigned int frame_len, unsign
 
   dhp_readout_frame_lo  = dhp_pix[3] & 0xFFFF;
   if (printflag)
-    B2INFO("DHP Frame Nr     |   " << hex << dhp_readout_frame_lo << " ( " << hex << dhp_readout_frame_lo << " ) ");
+    B2INFO("DHP Frame Nr     |   " << hex << dhp_readout_frame_lo << " ( " << dec << dhp_readout_frame_lo << " ) ");
+
+
+  if (dhp_pix[2] == dhp_pix[4] && dhp_pix[3] + 1 == dhp_pix[5]) {
+    B2ERROR("DHP data: seems to be double header! skipping ... len " << frame_len);
+    m_errorMask |= ONSEN_ERR_FLAG_DHP_DBL_HEADER;
+//    dump_dhp(data,frame_len);
+//    B2ERROR("Mask $" << hex <<m_errorMask);
+    return;
+  }
 
   for (unsigned int i = 4; i < nr_words ; i++) {
 
@@ -984,6 +1032,7 @@ void PXDUnpackerDHHModule::unpack_dhp(void* data, unsigned int frame_len, unsign
           B2ERROR("DHP Unpacking: Pix without Row!!! skip dhp data ");
           m_errorMask |= ONSEN_ERR_FLAG_DHP_PIX_WO_ROW;
 //           dhp_pixel_error++;
+//          dump_dhp(data,frame_len);
           return;
         } else {
           dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] & 0x4000) >> 14);
@@ -1072,6 +1121,8 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
   static unsigned int currentDHEID = 0xFFFFFFFF;
   static unsigned int currentVxdId = 0;
   static bool isFakedData_event = false;
+  static bool isUnfiltered_event = false;
+
 
   dhc_frame_header_word0* hw = (dhc_frame_header_word0*)data;
 //   error_flag = false;
@@ -1094,10 +1145,10 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
     countedWordsInEvent = 0;
     currentDHEID = 0xFFFFFFFF;
     currentVxdId = 0;
-
+    isUnfiltered_event = false;
     isFakedData_event = false;
-    if (type == DHC_FRAME_HEADER_DATA_TYPE_DHC_START) {
-      B2ERROR("This looks like this is the old Desy 2013/14 testbeam format. Please use the pxdUnpackerDesy1314 module.");
+    if (type != DHC_FRAME_HEADER_DATA_TYPE_DHC_START) {
+      B2ERROR("This does not look like BonnDAQ format. Try to use pxdUnpacker module.");
     }
   }
 
@@ -1148,8 +1199,12 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
     case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP:
     case DHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD: {
       countedDHCFrames++;
-
       if (verbose)dhc.data_direct_readout_frame->print();
+      if (isUnfiltered_event) {
+        if (type == DHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP) m_errorMask |= ONSEN_ERR_FLAG_SENDALL_TYPE;
+      } else {
+        if (type == DHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD) m_errorMask |= ONSEN_ERR_FLAG_NOTSENDALL_TYPE;
+      }
 
       //m_errorMask |= dhc.data_direct_readout_frame->check_error();
 
@@ -1172,9 +1227,14 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
     };
     case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_FCE:
     case DHC_FRAME_HEADER_DATA_TYPE_FCE_RAW: {
-
       countedDHCFrames++;
       if (verbose) hw->print();
+      if (isUnfiltered_event) {
+        if (type == DHC_FRAME_HEADER_DATA_TYPE_ONSEN_FCE) m_errorMask |= ONSEN_ERR_FLAG_SENDALL_TYPE;
+      } else {
+        if (type == DHC_FRAME_HEADER_DATA_TYPE_FCE_RAW) m_errorMask |= ONSEN_ERR_FLAG_NOTSENDALL_TYPE;
+      }
+
       if (currentDHEID != dhc.data_direct_readout_frame_raw->getDHEId()) {
         B2ERROR("DHE ID from DHE Start and this frame do not match $" << hex << currentDHEID << " != $" <<
                 dhc.data_direct_readout_frame_raw->getDHEId());
@@ -1287,6 +1347,9 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       }
       /// Attention: Firmware might be changed such, that ghostframe come for all DHPs, not only active ones...
       found_mask_active_dhp |= 1 << dhc.data_ghost_frame->getDHPPort();
+
+      //found_mask_active_dhp = mask_active_dhp;/// TODO Workaround for DESY TB 2016 doesnt work
+
       m_errorMask |= dhc.check_crc();
 //       stat_ghost++;
 
@@ -1378,6 +1441,10 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       if (Frame_Number != 0) {
         B2ERROR("ONSEN TRG Frame must be the first one.");
       }
+      isUnfiltered_event = dhc.data_onsen_trigger_frame->is_SendUnfiltered();
+      if (isUnfiltered_event) m_sendunfiltered++;
+      if (dhc.data_onsen_trigger_frame->is_SendROIs()) m_sendrois++;
+      if (!dhc.data_onsen_trigger_frame->is_Accepted()) m_notaccepted++;
       break;
     default:
       B2ERROR("UNKNOWN DHC frame type");
@@ -1462,22 +1529,6 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
 //Remaps of inner forward (IF) and outer backward (OB) modules of the PXD
 void PXDUnpackerDHHModule::remap_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int dhp_id, unsigned int dhe_ID)
 {
-  unsigned int ch = 4 * u_cellID + v_cellID % 4;
-  unsigned int DCD_col = ch / 16;
-  unsigned int DCD_col_sw = 15 - DCD_col;
-  unsigned int  drain = ch % 16 + DCD_col_sw * 16 + 250 * dhp_id;// or 256?
-
-  if (ch >= 10 and ch <= 15) drain = 1023;
-
-  u_cellID = drain / 4;
-  unsigned int row = (v_cellID / 4) * 4  + drain % 4;
-  if (((dhe_ID >> 5) & 0x1) == 0) {//if inner module
-    v_cellID = 768 - 1 - row ;
-  } else {//if outer module
-    v_cellID = row ;
-  }
-
-#if 0
   unsigned int DCD_channel = 0;
   unsigned int Drain = 0;
   unsigned int row = 0;
@@ -1516,52 +1567,23 @@ void PXDUnpackerDHHModule::remap_IF_OB(unsigned int& v_cellID, unsigned int& u_c
     766, 767, 768, 769, 770, 771, 772, 773, 774, 775, 776, 777, 778, 779, 780, 781, 750, 751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761, 762, 763, 764, 765
   };
 
-  B2INFO("Remapped :: From COL $" << u_cellID << " ROW $" << v_cellID);
-  DCD_channel = 4 * u_cellID + v_cellID % 4 + 256 * dhp_id;// or 250??
+  // B2INFO("Remapped :: From COL $" << u_cellID << " ROW $" << v_cellID);
+  DCD_channel = (u_cellID << 2) + (v_cellID & 0x3) + 256 * dhp_id;
   Drain = LUT_IF_OB[DCD_channel]; //since LUT starts with one and array with zero
-  B2INFO("in remap ROW ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
-  u_cellID = Drain / 4;
-  row = (v_cellID / 4) * 4  + Drain % 4;
-  if (((dhe_ID >> 5) & 0x1) == 0) {//if inner module
+  u_cellID = Drain >> 2;// no negative values possible here
+  row = (v_cellID & ~0x3)  + (Drain & 0x3); // no ~ bei drain
+  if ((dhe_ID & 0x20) == 0) {//if inner module
     v_cellID = 768 - 1 - row ;
 
   } else {//if outer module
     v_cellID = row ;
   }
-#endif
 //  B2INFO("Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }
 
 //Remaps of inner backward (IB) and outer forward (OF) modules of the PXD
 void PXDUnpackerDHHModule::remap_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int dhp_id, unsigned int dhe_ID)
 {
-  unsigned int ch = 4 * u_cellID + v_cellID % 4;
-  unsigned int DCD_col = ch / 16;
-  unsigned int DCD_col_sw = 15 - DCD_col;
-  unsigned int ch_map = 4 * u_cellID + (3 - v_cellID) % 4;
-  unsigned int drain = ch_map % 16 + DCD_col_sw * 16 + 250 * dhp_id;// or 256?
-
-  if (dhp_id == 1 or dhp_id == 3) {
-    if (v_cellID / 2 == 0) {
-      drain -= 4;
-    } else {
-      drain += 4;
-    }
-  }
-
-  if (ch >= 10 and ch <= 15) drain = 1023;
-
-  u_cellID = 250 - 1 - drain / 4;
-  if (u_cellID >= 250) u_cellID = 255; // workaround for negative values!!!
-
-  unsigned int row = (v_cellID / 4) * 4  + drain % 4;
-  if (((dhe_ID >> 5) & 0x1) == 0) { //if inner module
-    v_cellID = 768 - 1 - row ;
-  } else { //if outer module
-    v_cellID = row ;
-  }
-
-#if 0
   unsigned int DCD_channel = 0;
   unsigned int Drain = 0;
   unsigned int row = 0;
@@ -1600,18 +1622,16 @@ void PXDUnpackerDHHModule::remap_IB_OF(unsigned int& v_cellID, unsigned int& u_c
     765, 764, 771, 770, 769, 768, 775, 774, 773, 772, 779, 778, 777, 776, 783, 782, 749, 748, 755, 754, 753, 752, 759, 758, 757, 756, 763, 762, 761, 760, 767, 766
   };
 
-  B2INFO("Remapped :: From COL $" << u_cellID << " ROW $" << v_cellID);
-  DCD_channel = 4 * u_cellID + v_cellID % 4 + 256 * dhp_id; // or 250??
+  DCD_channel = (u_cellID << 2) + (v_cellID & 0x3) + 256 * dhp_id;
   Drain = LUT_IB_OF[DCD_channel];
-  B2INFO("in remap ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
-  u_cellID = 250 - 1 - Drain / 4;
-  if (u_cellID >= 250) u_cellID = 255; // workaround for negative values!!!
-  row = (v_cellID / 4) * 4  + Drain % 4;
-  if (((dhe_ID >> 5) & 0x1) == 0) { //if inner module
+  u_cellID = 250 - 1 - (Drain >> 2);
+  if (u_cellID >= 250) u_cellID = 255; // workaround for negative values!!! fix LUT above!
+//   row = (v_cellID / 4) * 4  + Drain % 4;
+  row = (v_cellID & ~0x3)  + ((~Drain) & 0x3); // ~ bei drain
+  if ((dhe_ID  & 0x20) == 0) { //if inner module
     v_cellID = 768 - 1 - row ;
   } else { //if outer module
     v_cellID = row ;
   }
-#endif
 //  B2INFO("Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }

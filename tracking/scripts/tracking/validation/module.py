@@ -511,8 +511,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                                         plot_title_postfix=self.plot_title_postfix)
             d0_resolution_analysis.analyse(np.array(self.pr_bining_pt),
                                            np.array(self.pr_d0_truths),
-                                           np.array(self.pr_d0_estimates),
-                                           np.array(self.pr_d0_variances))
+                                           np.array(self.pr_d0_estimates))
             d0_resolution_analysis.contact = contact
             pull_analyses.append(d0_resolution_analysis)
 
@@ -536,8 +535,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                                            plot_title_postfix=self.plot_title_postfix)
             omega_resolution_analysis.analyse(np.array(self.pr_bining_pt),
                                               np.array(self.pr_omega_truths),
-                                              np.array(self.pr_omega_estimates),
-                                              np.array(self.pr_omega_variances))
+                                              np.array(self.pr_omega_estimates))
             omega_resolution_analysis.contact = contact
             pull_analyses.append(omega_resolution_analysis)
 

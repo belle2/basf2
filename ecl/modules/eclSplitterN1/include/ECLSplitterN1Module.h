@@ -176,11 +176,9 @@ namespace Belle2 {
       ECLGeometryPar* m_geom;
 
       /** Make local maximas for a given connected region. */
-//      void makeLocalMaximums(ECLConnectedRegion& aCR, std::map < int, ECLCalDigit>& cellIdToDigitMap);
       void makeLocalMaximums(ECLConnectedRegion& aCR);
 
       /** Split connected region into showers. */
-//      void splitConnectedRegion(ECLConnectedRegion& aCR, std::map < int, ECLCalDigit>& cellIdToDigitMap);
       void splitConnectedRegion(ECLConnectedRegion& aCR);
 
       /** Get number of neighbours based on first energy estimation and background level per event. */
@@ -193,8 +191,7 @@ namespace Belle2 {
       double getEnergySum(std::vector < std::pair<double, double> >& weighteddigits, const unsigned int n);
 
       /** Estimate energy using 3x3 around central crystal. */
-//      int estimateEnergy(const int centerid, std::map < int, ECLCalDigit>& cellIdToDigitPointerMap);
-      int estimateEnergy(const int centerid);
+      double estimateEnergy(const int centerid);
 
     }; // end of ECLSplitterN1Module
 

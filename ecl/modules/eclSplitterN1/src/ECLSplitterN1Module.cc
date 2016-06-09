@@ -320,7 +320,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
   // 3) There are more than one, typically two or three, local maxima and we have to share energy between them.
 
   // ---------------------------------------------------------------------
-  if (nLocalMaximums <= 1 or nLocalMaximums >= m_maxSplits) { // case 1 or 2
+  if (nLocalMaximums <= 1 or nLocalMaximums >= m_maxSplits) {
 
     // Create a shower.
     if (!m_eclShowers) m_eclShowers.create();
@@ -340,9 +340,9 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
       for (auto const& aECLCalDigit : aCR.getRelationsTo<ECLCalDigit>()) {
         if (aECLCalDigit.getEnergy() > highestEnergy) {
-          highestEnergy = aECLCalDigit.getEnergy();
-          highestEnergyID = aECLCalDigit.getCellId();
-          highestEnergyTime = aECLCalDigit.getTime();
+          highestEnergy               = aECLCalDigit.getEnergy();
+          highestEnergyID             = aECLCalDigit.getCellId();
+          highestEnergyTime           = aECLCalDigit.getTime();
           highestEnergyTimeResolution = aECLCalDigit.getTimeResolution();
         }
       }
@@ -356,7 +356,6 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     }
 
     // Get a first estimation of the energy using 3x3 neighbours.
-    std::map<int, ECLCalDigit>::iterator it; // iterator for the CR digit map
     const double energyEstimation = estimateEnergy(highestEnergyID);
 
     // Check if 21 would be better in the present background conditions:
@@ -370,6 +369,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     std::vector<double> weights;
     for (auto& neighbourId : neighbourMap->getNeighbours(highestEnergyID)) {
 
+//      std::map<int, ECLCalDigit>::iterator it; // iterator for the CR digit map
       const auto it = std::find(m_cellIdInCR.begin(), m_cellIdInCR.end(),
                                 neighbourId); // check if the neighbour is in the list for this CR
       if (it == m_cellIdInCR.end()) continue; // not in this CR
@@ -400,6 +400,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       }
 
       showerEnergy = getEnergySum(weighteddigits, nOptimal);
+      B2DEBUG(150, "Shower Energy (1): " << showerEnergy);
 
     } else {
       showerEnergy = Belle2::ECL::computeEnergySum(digits, weights);
@@ -642,8 +643,9 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       if (!m_eclShowers) m_eclShowers.create();
       const auto aECLShower = m_eclShowers.appendNew();
 
-      // We can use the existing weighted energy estimate as starting point.
-      const double energyEstimation = (*centroidEnergyList.find(locmaxcellid)).second;
+      // Use the same method for the estimate (3x3).
+//      const double energyEstimation = (*centroidEnergyList.find(locmaxcellid)).second;
+      const double energyEstimation = estimateEnergy(locmaxcellid);
 
       // Get the neighbour list.
       ECLNeighbours* neighbourMap; // FIXME need pointer?
@@ -724,6 +726,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
         }
 
         showerEnergy = getEnergySum(weighteddigits, nOptimal);
+        B2DEBUG(150, "Shower Energy (2): " << showerEnergy);
 
       } else {
         showerEnergy = Belle2::ECL::computeEnergySum(digits, weights);
@@ -773,6 +776,9 @@ unsigned int ECLSplitterN1Module::getOptimalNumberOfDigits(const double energy, 
     if (energyChecked > 2.0 * Belle2::Unit::GeV) energyChecked = 2.0 * Belle2::Unit::GeV;
 
     // extrapolate from tgraph2d
+    const unsigned int nopt = static_cast<unsigned int>(m_tg2OptimalNumberOfDigitsForEnergy->Interpolate(energyChecked, bgChecked));
+    B2DEBUG(150, "Optimal number of neighbours for: Eraw= " << energy << " (Echecked=" << energyChecked << ", BG: " << bgChecked << ": "
+            << nopt);
     return static_cast<unsigned int>(m_tg2OptimalNumberOfDigitsForEnergy->Interpolate(energyChecked, bgChecked));
   }
 }
@@ -782,20 +788,22 @@ double ECLSplitterN1Module::getEnergySum(std::vector < std::pair<double, double>
 
   double energysum = 0.;
 
-  std::sort(weighteddigits.begin(), weighteddigits.end());
+  std::sort(weighteddigits.begin(), weighteddigits.end(), std::greater<std::pair<double, double>>());
 
   unsigned int min = n;
   if (weighteddigits.size() < n) min = weighteddigits.size();
 
   for (unsigned int i = 0; i < min; ++i) {
+    B2DEBUG(150, "getEnergySum: " << weighteddigits.at(i).first << " " << weighteddigits.at(i).second);
     energysum += (weighteddigits.at(i).first * weighteddigits.at(i).second);
   }
+  B2DEBUG(150, "getEnergySum: energysum=" << energysum);
 
   return energysum;
 }
 
 
-int ECLSplitterN1Module::estimateEnergy(const int centerid)
+double ECLSplitterN1Module::estimateEnergy(const int centerid)
 {
 
   double energyEstimation = 0.0;

@@ -88,6 +88,9 @@ class ResolutionAnalysis(object):
         if is_expert is None:
             is_expert = self.default_is_expert
 
+        if which_plots is None:
+            which_plots = self.default_which_plots
+
         quantity_name = self.quantity_name
 
         axis_label = compose_axis_label(quantity_name, self.unit)
@@ -111,6 +114,9 @@ class ResolutionAnalysis(object):
         plot_title = formatter.format(plot_title,
                                       quantity_name=quantity_name,
                                       plot_title_postfix=self.plot_title_postfix)
+
+        # compute residuals
+        residuals = estimates - truths
 
         # Resolution #
         #############

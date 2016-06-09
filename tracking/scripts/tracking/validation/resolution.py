@@ -70,7 +70,6 @@ class ResolutionAnalysis(object):
         bin_values,
         truths,
         estimates,
-        variances=None,
         which_plots=None,
         is_expert=None
     ):
@@ -84,8 +83,6 @@ class ResolutionAnalysis(object):
             Sample of the true values
         estimates : array_like(float)
             Corresponding estimations
-        variances : array_like(float), optional
-            Corresponding variance estimations
         """
 
         if is_expert is None:
@@ -97,11 +94,6 @@ class ResolutionAnalysis(object):
 
         plot_name_prefix = self.plot_name_prefix
         outlier_z_score = self.outlier_z_score
-
-        if variances is not None:
-            sigmas = np.sqrt(variances)
-            pulls = np.divide(residuals, sigmas)
-            p_values = 1.0 - erf(np.abs(pulls))
 
         plot_name = self.plot_name
         if plot_name is None:

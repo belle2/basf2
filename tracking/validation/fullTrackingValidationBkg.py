@@ -26,15 +26,18 @@ from tracking.validation.run import TrackingValidationRun
 class Full(TrackingValidationRun):
     n_events = N_EVENTS
     root_input_file = '../EvtGenSim.root'
-    finder_module = staticmethod(tracking.add_track_finding)
+    finder_module = staticmethod(tracking.add_tracking_reconstruction)
     tracking_coverage = {
         'UsePXDHits': True,
         'UseSVDHits': True,
         'UseCDCHits': True,
     }
     fit_geometry = "default"
-    fit_tracks = True
+    # tracks will be already fitted by
+    # add_tracking_reconstruction finder module set above
+    fit_tracks = False
     pulls = True
+    resolution = True
     output_file_name = VALIDATION_OUTPUT_FILE
 
 

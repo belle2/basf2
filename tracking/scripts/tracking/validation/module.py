@@ -155,6 +155,7 @@ class TrackingValidationModule(basf2.Module):
         contact,
         fit=False,
         pulls=False,
+        resolution=False,
         output_file_name=None,
         track_filter_object=AlwaysPassFilter(),
         plot_name_postfix='',
@@ -171,6 +172,7 @@ class TrackingValidationModule(basf2.Module):
         self.contact = contact
         self.fit = fit
         self.pulls = pulls
+        self.resolution = resolution
         self.output_file_name = output_file_name or self.validation_name \
             + 'TrackingValidation.root'
         self.track_filter_object = track_filter_object
@@ -498,9 +500,9 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             curvature_pull_analysis.contact = contact
             pull_analyses.append(curvature_pull_analysis)
 
-            # Resolution plots
-            ##############################
-
+        # Resolution plots
+        ##############################
+        if self.resolution:
             # d0 impact parameter resolution plot
             d0_resolution_analysis = ResolutionAnalysis('d0_res',
                                                         self.resolution_pt_binning,

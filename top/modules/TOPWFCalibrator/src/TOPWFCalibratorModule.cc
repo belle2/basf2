@@ -166,9 +166,9 @@ namespace Belle2 {
       file->Close();
     }
 
-    unsigned numWindows = 0;
-    for (unsigned i = 0; i < c_NumChannels; i++) {
-      for (unsigned k = 0; k < c_NumWindows; k++) {
+    int numWindows = 0;
+    for (int i = 0; i < c_NumChannels; i++) {
+      for (int k = 0; k < c_NumWindows; k++) {
         TProfile* prof = m_profile[i][k];
         if (!prof) continue;
         if (k > numWindows) numWindows = k;
@@ -178,15 +178,17 @@ namespace Belle2 {
     B2INFO("TOPWFCalibratorModule: number of active ASIC storage windows found: " <<
            numWindows);
 
+    if (numWindows > m_numWindows) numWindows = m_numWindows;
+
     DBImportArray<TOPASICChannel> constants;
     int badPed = 0;
     int badSampl = 0;
     for (int channel = 0; channel < c_NumChannels; channel++) {
       auto* channelConstants = constants.appendNew(m_moduleID, channel, numWindows);
       auto* baseline = m_baseline[channel];
-      for (int window = 0; window < c_NumWindows; window++) {
+      for (int window = 0; window < numWindows; window++) {
         TProfile* prof = m_profile[channel][window];
-        if (prof and window < m_numWindows) {
+        if (prof) {
           TOPASICPedestals pedestals(window);
           double average = 0;
           if (baseline) average = baseline->GetBinContent(window + 1);

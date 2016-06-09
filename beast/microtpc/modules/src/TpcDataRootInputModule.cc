@@ -291,6 +291,5 @@ namespace Belle2 {
   {
   }
 
-
 } // end Belle2 namespace
 

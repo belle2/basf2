@@ -24,13 +24,13 @@ class PullAnalysis(object):
     default_which_plots = [
         "truths",
         "estimates",
-        "diag_profile",
-        "diag_scatter",
+        # "diag_profile",
+        # "diag_scatter",
         "residuals",
         "sigmas",
         "pulls",
         "p_values",
-        ]
+    ]
 
     default_is_expert = True
 

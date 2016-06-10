@@ -195,7 +195,8 @@ class ResolutionAnalysis(object):
                     ys_err = [v[4]]
 
             # convert to numpy array before giving to the plotting code
-            resolution_graph.grapherrors((np.array(xs), np.array(xs_err)), (np.array(ys), np.array(ys_err)))
+            resolution_graph.grapherrors((np.array(xs), np.array(xs_err)), (np.array(ys), np.array(ys_err)),
+                                         is_expert=is_expert)
             resolution_graph.xlabel = compose_axis_label(self.bin_name, self.bin_unit)
             resolution_graph.ylabel = compose_axis_label(self.quantity_name, self.unit)
             resolution_graph.title = formatter.format(plot_title, subplot_title='Resolution')

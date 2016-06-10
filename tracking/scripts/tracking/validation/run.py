@@ -24,6 +24,7 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
     root_output_file = None  # If events file should be written
     pulls = True
     resolution = False
+    use_expert_folder = True
 
     #: not fit by default
     #: can be overridden by derived validation class
@@ -44,6 +45,7 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
             pulls=self.pulls,
             resolution=self.resolution,
             output_file_name=self.output_file_name,
+            use_expert_folder=self.use_expert_folder,
             exclude_profile_mc_parameter=self.exclude_profile_mc_parameter,
             exclude_profile_pr_parameter=self.exclude_profile_pr_parameter
         )

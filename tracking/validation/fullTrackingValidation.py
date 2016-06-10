@@ -36,6 +36,7 @@ class Full(TrackingValidationRun):
     # tracks will be already fitted by
     # add_tracking_reconstruction finder module set above
     fit_tracks = False
+    use_expert_folder = False
     pulls = True
     resolution = True
     output_file_name = VALIDATION_OUTPUT_FILE

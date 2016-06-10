@@ -50,6 +50,7 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
     with splinter.Browser() as browser:
         # Visit URL
         url = "localhost:8000/static/validation.html"
+        print("Opening {} to perform checks", url)
         browser.visit(url)
 
         if len(browser.title) == 0:
@@ -66,6 +67,7 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
 
         plot_objects = browser.find_by_css(".object")
 
+        print("Checking for a minimum number of {} plot objects", min_plot_objects)
         if len(plot_objects) < min_plot_objects:
             print("Only {} plots found, while {} are expected".format(len(plot_objects), min_plot_objects))
             return False
@@ -102,7 +104,7 @@ def main():
 
         # wait for one second for the server to start
         time.sleep(1)
-        success = success and check_for_content(revs_to_gen + ["reference"], 6, 6)
+        success = success and check_for_content(revs_to_gen + ["reference"], 7, 7)
     except:
         e = sys.exc_info()[0]
         # print exception again

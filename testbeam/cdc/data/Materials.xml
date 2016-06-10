@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <Materials>
 
-  <Material name="Polystyrene">
-    <!-- Polystyrene (C8H8)n : SciFi fibre core (doped with small quantities of other elements) --> 
-    <state>Solid</state>
-    <density unit="g/cm3">1.05</density>
-    <Components>
-      <Element fraction="0.923">C</Element>
-      <Element fraction="0.077">H</Element>
-    </Components>
-  </Material>
-
   <Material name="PMMA">
     <!-- Polymethylmethacrylate (C5H8O2)n (Plexiglas): SciFi fibre cladding --> 
     <state>Solid</state>

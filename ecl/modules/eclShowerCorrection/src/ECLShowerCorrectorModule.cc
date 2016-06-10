@@ -28,7 +28,7 @@
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/utility/ECLShowerId.h>
-#include <ecl/digitization/EclConfiguration.h> // this should not be in digitization (TF)
+#include <ecl/digitization/EclConfiguration.h> // this should not be in digitization but in a more general location (TF)
 
 
 // OTHER
@@ -115,7 +115,7 @@ void ECLShowerCorrectorModule::event()
     const double correctionF       = correctionFactor(uncorrectedEnergy, theta);
 
     if (correctionF < 1e-12) {
-      B2FATAL("ECLShowerCorrectorModule:  << calibrationFactor is (almost) zero: " << correctionF);
+      B2WARNING("ECLShowerCorrectorModule:  << correction factor is (almost) zero: " << correctionF);
     }
 
     const double correctedEnergy = uncorrectedEnergy / correctionF;
@@ -144,6 +144,9 @@ void ECLShowerCorrectorModule::terminate()
 
 double ECLShowerCorrectorModule::correctionFactor(double Energy, double Theta)
 {
+  // Need check if energy is (almost) zero during clustering development
+  if (Energy < 1e-9) return 1.0;
+
   std::vector<double>::const_iterator it = upper_bound(m_ranges.begin(), m_ranges.end(), Theta);
   double x = log(Energy);
   // not really necessary check

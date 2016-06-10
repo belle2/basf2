@@ -197,7 +197,6 @@ namespace Belle2 {
       auto pixelID = waveform.getPixelID();
       auto channel = waveform.getChannel();
       auto firstWindow = waveform.getFirstWindow();
-      auto refWindow = waveform.getReferenceWindow();
       const auto* sampleTimes = &m_sampleTimes; // default calibration
       if (m_useSampleTimeCalibration and m_timebase.isValid()) {
         auto scrodID = waveform.getScrodID();
@@ -214,11 +213,12 @@ namespace Belle2 {
         float time = sampleTimes->getTimeDifference(firstWindow, hit.time);
         auto* digit = digits.appendNew(moduleID, pixelID, tdc);
         digit->setTime(time + t0);
+        digit->setTimeError(hit.timeErr);  // TODO: convert to [ns]
         digit->setADC(hit.height);
-        digit->setPulseWidth(hit.width);
+        digit->setIntegral(hit.area);
+        digit->setPulseWidth(hit.width);  // TODO: convert to [ns], give FWHM!
         digit->setChannel(channel);
         digit->setFirstWindow(firstWindow);
-        digit->setReferenceWindow(refWindow);
         digit->addRelationTo(&waveform);
       }
     }

@@ -45,11 +45,7 @@ namespace Belle2 {
       m_moduleID(moduleID),
       m_pixelID(pixelID),
       m_TDC(TDC),
-      m_ADC(0),
-      m_pulseWidth(0),
-      m_channel(0),
-      m_quality(c_Good),
-      m_time(0)
+      m_quality(c_Good)
     {}
 
     /**
@@ -65,10 +61,16 @@ namespace Belle2 {
     static void setPileupTime(double time) {s_pileupTime = time;}
 
     /**
-     * Sets time in [ns]
+     * Sets detection time
      * @param time time in [ns]
      */
     void setTime(double time) {m_time = time;}
+
+    /**
+     * Sets time uncertainty
+     * @param timeError uncertainty (r.m.s.) in [ns]
+     */
+    void setTimeError(double timeError) {m_timeError = timeError;}
 
     /**
      * Sets digitized detection time
@@ -77,16 +79,22 @@ namespace Belle2 {
     void setTDC(int TDC) {m_TDC = TDC;}
 
     /**
-     * Sets digitized pulse height or integrated charge
-     * @param ADC pulse heigth or integrated charge
+     * Sets pulse height
+     * @param ADC pulse height [ADC counts]
      */
     void setADC(int ADC) {m_ADC = ADC;}
 
     /**
-     * Sets digitized pulse width
-     * @param width pulse width
+     * Sets pulse integral
+     * @param integral pulse integral [ADC counts]
      */
-    void setPulseWidth(int width) {m_pulseWidth = width;}
+    void setIntegral(int integral) {m_integral = integral;}
+
+    /**
+     * Sets pulse width
+     * @param width pulse width (FWHM) in [ns]
+     */
+    void setPulseWidth(double width) {m_pulseWidth = width;}
 
     /**
      * Sets hardware channel number (0-based)
@@ -101,15 +109,7 @@ namespace Belle2 {
     void setFirstWindow(unsigned window) { m_firstWindow = window;}
 
     /**
-     * Sets reference ASIC window number of the merged waveform this hit is taken from
-     * This corresponds to the last window in the analog memory sampled.
-     * All timing is a "look-back" from this window.
-     * @param window ASIC window number
-     */
-    void setReferenceWindow(unsigned window) { m_refWindow = window;}
-
-    /**
-     * Sets hit quality
+     * Sets hit quality flag
      * @param quality hit quality
      */
     void setHitQuality(EHitQuality quality) {m_quality = quality;}
@@ -133,7 +133,7 @@ namespace Belle2 {
     int getModuleID() const { return m_moduleID; }
 
     /**
-     * Returns pixel ID
+     * Returns pixel ID (1-based)
      * @return software channel ID
      */
     int getPixelID() const { return m_pixelID; }
@@ -187,10 +187,16 @@ namespace Belle2 {
     int getPMTPixel() const {return getPMTPixelCol() + (getPMTPixelRow() - 1) * 4;}
 
     /**
-     * Returns t0-subtracted and calibrated time in [ns] (converted back from TDC counts)
-     * @return time
+     * Returns t0-subtracted and calibrated time (converted back from TDC counts)
+     * @return time in [ns]
      */
     double getTime() const { return m_time; }
+
+    /**
+     * Returns time uncertainty
+     * @return uncertainty (r.m.s.) in [ns]
+     */
+    double getTimeError() const {return m_timeError;}
 
     /**
      * Returns digitized time
@@ -199,16 +205,22 @@ namespace Belle2 {
     int getTDC() const { return m_TDC; }
 
     /**
-     * Returns digitized pulse height or integrated charge
-     * @return digitized pulse height or integrated charge
+     * Returns pulse height
+     * @return pulse height [ADC counts]
      */
     int getADC() const { return m_ADC; }
 
     /**
-     * Returns digitized pulse width
-     * @return digitized pulse width
+     * Returns pulse integral
+     * @return pulse integral [ADC counts]
      */
-    int getPulseWidth() const { return m_pulseWidth; }
+    int getIntegral() const {return m_integral;}
+
+    /**
+     * Returns pulse width
+     * @return pulse width (FWHM) in [ns]
+     */
+    double getPulseWidth() const { return m_pulseWidth; }
 
     /**
      * Returns hardware channel number
@@ -247,14 +259,6 @@ namespace Belle2 {
     unsigned getFirstWindow() const { return m_firstWindow;}
 
     /**
-     * Returns reference ASIC window number of the merged waveform this hit is taken from
-     * This corresponds to the last window in the analog memory sampled.
-     * All timing is a "look-back" from this window.
-     * @return window number
-     */
-    unsigned getReferenceWindow() const { return m_refWindow;}
-
-    /**
      * Implementation of the base class function.
      * Enables BG overlay module to identify uniquely the physical channel of this Digit.
      * @return unique channel ID, composed of pixel ID (1-512) and module ID (1-16)
@@ -274,18 +278,19 @@ namespace Belle2 {
     int m_moduleID = 0;       /**< module ID (1-based) */
     int m_pixelID = 0;        /**< software channel ID (1-based) */
     int m_TDC = 0;            /**< digitized time */
-    int m_ADC = 0;            /**< digitized pulse height or charge (to be decided) */
-    int m_pulseWidth = 0;     /**< digitized pulse width */
+    int m_ADC = 0;            /**< pulse height [ADC counts] */
+    int m_integral = 0;       /**< pulse integral [ADC counts] */
     unsigned m_channel = 0;   /**< hardware channel number (0-based) */
     EHitQuality m_quality = c_Junk;  /**< hit quality */
-    float m_time = 0;         /**< time in [ns], converted from TDC, t0-subtracted */
+    float m_time = 0;         /**< calibrated time in [ns], t0-subtracted */
+    float m_timeError = 0;    /**< time uncertainty (r.m.s) in [ns] */
+    float m_pulseWidth = 0;   /**< pulse width (FWHM) in [ns] */
     unsigned short m_firstWindow = 0; /**< first ASIC window of the merged waveform */
-    unsigned short m_refWindow = 0;   /**< reference ASIC window */
 
     static float s_doubleHitResolution; /**< double hit resolving time in [ns] */
     static float s_pileupTime; /**< pile-up time in [ns] */
 
-    ClassDef(TOPDigit, 11); /**< ClassDef */
+    ClassDef(TOPDigit, 12); /**< ClassDef */
 
   };
 

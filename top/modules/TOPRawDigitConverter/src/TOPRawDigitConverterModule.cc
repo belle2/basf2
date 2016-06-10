@@ -163,7 +163,7 @@ namespace Belle2 {
                                          rawDigit.getASICNumber(),
                                          rawDigit.getASICChannel());
       auto pixelID = chMapper.getPixelID(channel);
-      double rawTime = rawDigit.getCFDLeadingTime();
+      double rawTime = rawDigit.getCFDLeadingTime(); // time in [samples]
       int tdc = int(rawTime * m_sampleDivisions);
       const auto* sampleTimes = &m_sampleTimes; // equidistant sample times
       if (m_useSampleTimeCalibration) {
@@ -174,18 +174,21 @@ namespace Belle2 {
           continue;
         }
       }
-      float time = sampleTimes->getTimeDifference(rawDigit.getASICWindow(), rawTime);
-
+      auto window = rawDigit.getASICWindow();
+      double time = sampleTimes->getTimeDifference(window, rawTime); // time in [ns]
       if (m_useChannelT0Calibration) time -= (*m_channelT0)->getT0(moduleID, channel);
       if (m_useModuleT0Calibration) time -= (*m_moduleT0)->getT0(moduleID);
       if (m_useCommonT0Calibration) time -= (*m_commonT0)->getT0();
-
+      double width = sampleTimes->getDeltaTime(window, rawTime,
+                                               rawDigit.getCFDFallingTime()); // in [ns]
       auto* digit = digits.appendNew(moduleID, pixelID, tdc);
       digit->setTime(time);
+      // digit->setTimeError(timeError); TODO!
       digit->setADC(rawDigit.getValuePeak());
-      digit->setPulseWidth(rawDigit.getFWHM());
+      digit->setIntegral(rawDigit.getIntegral());
+      digit->setPulseWidth(width);
       digit->setChannel(channel);
-      digit->setFirstWindow(rawDigit.getASICWindow());
+      digit->setFirstWindow(window);
       digit->addRelationTo(&rawDigit);
     }
 

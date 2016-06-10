@@ -39,16 +39,16 @@ void TOPSampleTimes::setTimeAxis(const std::vector<double>& sampleTimes,
 }
 
 
-float TOPSampleTimes::getTime(unsigned window, float sample) const
+double TOPSampleTimes::getTime(unsigned window, double sample) const
 {
 
   int sampleNum = int(sample);
-  float frac = sample - sampleNum;
+  double frac = sample - sampleNum;
 
   sampleNum += window * c_WindowSize; // counted from window 0
   int n = sampleNum / c_TimeAxisSize;
   int k = sampleNum % c_TimeAxisSize;
-  float time = n * getTimeRange() + m_timeAxis[k]; // from sample 0 window 0
+  double time = n * getTimeRange() + m_timeAxis[k]; // from sample 0 window 0
   time += (m_timeAxis[k + 1] - m_timeAxis[k]) * frac; // add fraction
 
   return time;

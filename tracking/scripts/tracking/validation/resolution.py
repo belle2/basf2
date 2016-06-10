@@ -19,6 +19,7 @@ formatter = TolerateMissingKeyFormatter()
 
 class ResolutionAnalysis(object):
     default_outlier_z_score = 5.0
+    default_min_required_entries = 50
     default_plot_name = "{plot_name_prefix}_{subplot_name}{plot_name_postfix}"
     default_plot_title = "{subplot_title} of {quantity_name}{plot_title_postfix}"
     default_which_plots = [
@@ -38,6 +39,7 @@ class ResolutionAnalysis(object):
         contact='',
         plot_name=None,
         plot_title=None,
+        min_required_entries=None,  # minimum number of entries in a bin for the resolution fit
         plot_name_prefix='',  # depricated use plot_name instead
         plot_name_postfix='',  # depricated use plot_name instead
         plot_title_postfix='',  # depricated use plot_title instead
@@ -54,6 +56,10 @@ class ResolutionAnalysis(object):
             self.outlier_z_score = self.default_outlier_z_score
         else:
             self.outlier_z_score = outlier_z_score
+
+        self.min_required_entries = min_required_entries
+        if self.min_required_entries is None:
+            self.min_required_entries = self.default_min_required_entries
 
         self.plot_name = plot_name
         self.plot_title = plot_title
@@ -148,20 +154,28 @@ class ResolutionAnalysis(object):
                            is_expert=is_expert)
                 vplot.xlabel = compose_axis_label("#Delta " + quantity_name + " (estimate - truth)", self.unit)
                 vplot.title = formatter.format(plot_title, subplot_title='Residual distribution')
-                fit_res = vplot.fit_gaus(z_score=1)
 
-                # extract fit result from ROOT's TFitResut
-                params = fit_res.GetParams()
-                errs = fit_res.Errors()
+                # this values will stay None if no fit could be performed
+                gaus_sigma = None
+                gaus_sigma_err = None
 
-                gaus_mean = params[1]
-                gaus_sigma = params[2]
-                gaus_sigma_err = errs[2]
+                # check if the minimum number of entries are in the histogram
+                if vplot.histograms[0].GetEntries() >= self.min_required_entries:
+                    fit_res = vplot.fit_gaus(z_score=1)
 
+                    # extract fit result from ROOT's TFitResut
+                    params = fit_res.GetParams()
+                    errs = fit_res.Errors()
+
+                    gaus_mean = params[1]
+                    gaus_sigma = params[2]
+                    gaus_sigma_err = errs[2]
+
+                    res_histogram += [(lower_bin, upper_bin, bin_center, vplot)]
+                    self.plots['residuals' + residuals_hist_name] = vplot
+
+                # store the fit results
                 resolution_values += [(lower_bin, upper_bin, bin_center, gaus_sigma, gaus_sigma_err)]
-
-                res_histogram += [(lower_bin, upper_bin, bin_center, vplot)]
-                self.plots['residuals' + residuals_hist_name] = vplot
 
             resolution_graph_name = formatter.format(plot_name, subplot_name="resolution")
             resolution_graph = ValidationPlot(resolution_graph_name)
@@ -173,10 +187,12 @@ class ResolutionAnalysis(object):
             ys_err = []
 
             for v in resolution_values:
-                xs += [v[2]]
-                xs_err = [0.0]
-                ys += [v[3]]
-                ys_err = [v[4]]
+                # could be None if no fit was possible for this bin
+                if v[3]:
+                    xs += [v[2]]
+                    xs_err = [0.0]
+                    ys += [v[3]]
+                    ys_err = [v[4]]
 
             # convert to numpy array before giving to the plotting code
             resolution_graph.grapherrors((np.array(xs), np.array(xs_err)), (np.array(ys), np.array(ys_err)))

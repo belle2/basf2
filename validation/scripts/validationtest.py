@@ -10,7 +10,7 @@ import basf2
 import array
 import numpy as np
 from datetime import datetime
-from ROOT import TFile, TNtuple, TH1F, TF1, TH2F, TF2, TRandom3, gRandom, TNamed, TEfficiency
+from ROOT import TFile, TNtuple, TH1F, TF1, TH2F, TF2, TRandom3, gRandom, TNamed, TEfficiency, TGraphErrors
 
 
 def generateTestPlots(prefix):
@@ -119,3 +119,21 @@ def generateTestPlots(prefix):
     teff.GetListOfFunctions().Add(TNamed('Contact', "Contact Someone"))
 
     teff.Write()
+
+    # add TGraphErrors plot
+    graph_err = TGraphErrors()
+
+    graph_err.Set(50)
+    for i in range(50):
+        # shifted to more passed at larger positions
+        ratio = float(i) / 50.0
+        passed = gRandom.Uniform(ratio * 0.45, 1.0)
+
+        graph_err.SetPoint(i, i + 1.0, passed)
+
+    graph_err.SetName("TGraphErrors")
+    graph_err.GetListOfFunctions().Add(TNamed('Description', "TGraphErrors plot of something"))
+    graph_err.GetListOfFunctions().Add(TNamed('Check', "Check For Something"))
+    graph_err.GetListOfFunctions().Add(TNamed('Contact', "Contact Someone"))
+
+    graph_err.Write()

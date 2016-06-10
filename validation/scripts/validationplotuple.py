@@ -168,6 +168,8 @@ class Plotuple:
 
         if self.type == 'TH1' or self.type == 'TEfficiency':
             self.create_histogram_plot('1D')
+        elif self.type == 'TGraph':
+            self.create_graph_plot()
         elif self.type == 'TH2':
             self.create_histogram_plot('2D')
         elif self.type == 'TASImage':
@@ -393,7 +395,7 @@ class Plotuple:
         ROOT objects have a slightly differen flavour.
         """
 
-        if type == 'TEfficiency':
+        if type == 'TEfficiency' or type == "TGraph":
             # TEff does not provide DrawCopy
             object.Draw(options)
         else:
@@ -544,6 +546,98 @@ class Plotuple:
                 title = pad.GetListOfPrimitives().FindObject('title')
                 if title:
                     title.SetTextColor(style.GetLineColor())
+
+        # Create the folder in which the plot is then stored
+        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions))) +
+                self.package)
+        if not os.path.isdir(path):
+            os.makedirs(path)
+
+        # refactor wtih the code from create_image_plot
+        # Save the plot as PNG and PDF
+        canvas.Print('{0}/{1}_{2}.png'.format(path, strip_ext(self.rootfile),
+                                              self.key))
+        canvas.Print('{0}/{1}_{2}.pdf'.format(path, strip_ext(self.rootfile),
+                                              self.key))
+
+        self.path = path
+
+        self.file = './{0}/{1}_{2}'.format('/'.join(path.split('/')[2:]),
+                                           strip_ext(self.rootfile), self.key)
+
+    def create_graph_plot(self):
+        """!
+        Plots as TGraph/TGraphErrors
+        @return: None
+        """
+
+        # Create a ROOT canvas on which we will draw our plots
+        self.width = 700
+        canvas = ROOT.TCanvas('', '', 700, 525)
+        self.height = 525
+
+        # Allow possibility to turn off the stats box
+        if 'nostats' in self.metaoptions:
+            ROOT.gStyle.SetOptStat("")
+        else:
+            ROOT.gStyle.SetOptStat("nemr")
+
+        # If there is a reference object, and the list of plots is not empty,
+        # perform a Chi^2-Test on the reference object and the first object in
+        # the plot list:
+        if self.reference is not None and self.newest:
+            self.chi2test(canvas)
+
+        if 'nogrid' not in self.metaoptions:
+            canvas.SetGrid()
+        if 'logx' in self.metaoptions:
+            canvas.SetLogx()
+        if 'logy' in self.metaoptions:
+            canvas.SetLogy()
+
+        # A variable which holds whether we
+        # have drawn on the canvas already or not
+        drawn = False
+
+        # If there is a reference object, plot it first
+        if self.reference is not None:
+            self.draw_ref(canvas)
+            drawn = True
+
+        itemsToPlotCount = len(self.elements)
+        # Now draw the normal plots
+        for plot in reversed(self.elements):
+
+            # Get the index of the current plot
+            index = index_from_revision(plot.revision)
+            style = get_style(index, itemsToPlotCount)
+
+            # self.remove_stats_tf1(plot.object)
+
+            # Set line properties accordingly
+            plot.object.SetLineColor(style.GetLineColor())
+            plot.object.SetLineWidth(style.GetLineWidth())
+            plot.object.SetLineStyle(style.GetLineStyle())
+
+            # If we have a one-dimensional histogram
+            if not drawn:
+
+                # Get additional options for 1D histograms
+                additional_options = ''
+                for _ in ['C']:
+                    if _ in self.metaoptions:
+                        additional_options += ' ' + _
+
+                # Draw the reference on the canvas
+                self.draw_root_object(self.type, plot.object, plot.object.GetOption() +
+                                      additional_options)
+                drawn = True
+            else:
+                self.draw_root_object(self.type, plot.object, "SAME")
+
+            # redraw grid ontop of histogram, if selected
+            if 'nogrid' not in self.metaoptions:
+                canvas.RedrawAxis("g")
 
         # Create the folder in which the plot is then stored
         path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions))) +

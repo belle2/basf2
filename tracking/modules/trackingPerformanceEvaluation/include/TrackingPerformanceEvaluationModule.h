@@ -65,12 +65,12 @@ namespace Belle2 {
 
     void fillTrackErrParams2DHistograms(const TrackFitResult* fitResult); /**< fills TH2F*/
 
-    void fillHitsUsedInTrackFitHistograms(const genfit::Track& track);
+    void fillHitsUsedInTrackFitHistograms(const genfit::Track& track); /**< fill TH2F*/
 
-    bool isTraceable(const MCParticle& the_mcParticle);
+    bool isTraceable(const MCParticle& the_mcParticle); /**< is traceable*/
 
-    void addMoreEfficiencyPlots(TList* histoList);
-    void addMoreInefficiencyPlots(TList* histoList);
+    void addMoreEfficiencyPlots(TList* histoList); /**< add efficiency plots*/
+    void addMoreInefficiencyPlots(TList* histoList); /**< add inefficiency plots*/
 
     /* user-defined parameters */
     std::string m_MCParticlesName; /**< MCParticle StoreArray name */
@@ -89,76 +89,76 @@ namespace Belle2 {
     TH1F* m_multiplicityMCTrackCands;  /**< number of MCTrackCands per TrackCands*/
 
     //error on track parameters
-    TH1F* m_h1_d0_err; /**< */
-    TH1F* m_h1_phi_err; /**< */
-    TH1F* m_h1_omega_err; /**< */
-    TH1F* m_h1_z0_err; /**< */
-    TH1F* m_h1_cotTheta_err; /**< */
+    TH1F* m_h1_d0_err; /**< error */
+    TH1F* m_h1_phi_err; /**< error */
+    TH1F* m_h1_omega_err; /**< error */
+    TH1F* m_h1_z0_err; /**< error */
+    TH1F* m_h1_cotTheta_err; /**< error */
     //residuals on track parameters
-    TH1F* m_h1_d0_res; /**< */
-    TH1F* m_h1_phi_res; /**< */
-    TH1F* m_h1_omega_res; /**< */
-    TH1F* m_h1_z0_res; /**< */
-    TH1F* m_h1_cotTheta_res; /**< */
+    TH1F* m_h1_d0_res; /**< error */
+    TH1F* m_h1_phi_res; /**< error */
+    TH1F* m_h1_omega_res; /**< error */
+    TH1F* m_h1_z0_res; /**< error */
+    TH1F* m_h1_cotTheta_res; /**< error */
     //pulls on track parameters
-    TH1F* m_h1_d0_pll; /**< */
-    TH1F* m_h1_phi_pll; /**< */
-    TH1F* m_h1_omega_pll; /**< */
-    TH1F* m_h1_z0_pll; /**< */
-    TH1F* m_h1_cotTheta_pll; /**< */
+    TH1F* m_h1_d0_pll; /**< error */
+    TH1F* m_h1_phi_pll; /**< error */
+    TH1F* m_h1_omega_pll; /**< error */
+    TH1F* m_h1_z0_pll; /**< error */
+    TH1F* m_h1_cotTheta_pll; /**< error */
 
 
 
-    TH2F* m_h2_d0errphi0err_xy;
-    TH2F* m_h2_d0errphi0err_rz;
-    TH2F* m_h2_z0errcotThetaerr_xy;
+    TH2F* m_h2_d0errphi0err_xy; /**< error */
+    TH2F* m_h2_d0errphi0err_rz; /**< error */
+    TH2F* m_h2_z0errcotThetaerr_xy; /**< error */
 
-    TH2F* m_h2_VXDhitsPR_xy;
-    TH2F* m_h2_VXDhitsPR_rz;
-    TH1F* m_h1_nVXDhitsPR;
-    TH1F* m_h1_nVXDhitsWeighted;
-    TH1F* m_h1_nVXDhitsUsed;
-    TH1F* m_h1_nCDChitsPR;
-    TH1F* m_h1_nCDChitsWeighted;
-    TH1F* m_h1_nCDChitsUsed;
-    TH1F* m_h1_nHitDetID;
-    TH2F* m_h2_TrackPointFitWeightVXD;
-    TH2F* m_h2_TrackPointFitWeightCDC;
+    TH2F* m_h2_VXDhitsPR_xy; /**< PR */
+    TH2F* m_h2_VXDhitsPR_rz; /**< PR */
+    TH1F* m_h1_nVXDhitsPR; /**< PR */
+    TH1F* m_h1_nVXDhitsWeighted; /**< weighted */
+    TH1F* m_h1_nVXDhitsUsed; /**< hits used */
+    TH1F* m_h1_nCDChitsPR; /**< PR */
+    TH1F* m_h1_nCDChitsWeighted; /**< weighted */
+    TH1F* m_h1_nCDChitsUsed;/**<used */
+    TH1F* m_h1_nHitDetID; /**< det ID */
+    TH2F* m_h2_TrackPointFitWeightVXD; /**< TP */
+    TH2F* m_h2_TrackPointFitWeightCDC; /**< TP */
 
-    TH1F* m_h1_pValue;
+    TH1F* m_h1_pValue; /**< p val */
 
-    TH2F* m_h2_OmegaerrOmegaVSpt;
+    TH2F* m_h2_OmegaerrOmegaVSpt;  /**< error */
 
-    TH2F* m_h2_z0errVSpt_wpxd;
-    TH2F* m_h2_z0errVSpt_wopxd;
-    TH2F* m_h2_z0errVSpt;
-    TH2F* m_h2_d0errVSpt_wpxd;
-    TH2F* m_h2_d0errVSpt_wopxd;
-    TH2F* m_h2_d0errVSpt;
-    TH2F* m_h2_d0errMSVSpt;
+    TH2F* m_h2_z0errVSpt_wpxd;  /**< error */
+    TH2F* m_h2_z0errVSpt_wopxd; /**< error */
+    TH2F* m_h2_z0errVSpt; /**< error */
+    TH2F* m_h2_d0errVSpt_wpxd; /**< error */
+    TH2F* m_h2_d0errVSpt_wopxd; /**< error */
+    TH2F* m_h2_d0errVSpt; /**< error */
+    TH2F* m_h2_d0errMSVSpt; /**< error */
 
 
     //histograms used for efficiency plots
-    TH1F* m_h1_HitsTrackCandPerMCTrackCand;
-    TH1F* m_h1_HitsMCTrackCand;
+    TH1F* m_h1_HitsTrackCandPerMCTrackCand;  /**< hits */
+    TH1F* m_h1_HitsMCTrackCand;  /**< hits */
 
-    TH3F* m_h3_MCParticle;
-    TH3F* m_h3_TracksPerMCParticle;
-    TH3F* m_h3_MCTrackCand;
-    TH3F* m_h3_TracksPerMCTrackCand;
+    TH3F* m_h3_MCParticle;  /**< efficiency*/
+    TH3F* m_h3_TracksPerMCParticle;  /**< efficiency*/
+    TH3F* m_h3_MCTrackCand;  /**< efficiency*/
+    TH3F* m_h3_TracksPerMCTrackCand;  /**< efficiency*/
 
-    TH3F* m_h3_MCParticle_plus;
-    TH3F* m_h3_TracksPerMCParticle_plus;
-    TH3F* m_h3_MCTrackCand_plus;
-    TH3F* m_h3_TracksPerMCTrackCand_plus;
-    TH3F* m_h3_MCParticle_minus;
-    TH3F* m_h3_TracksPerMCParticle_minus;
-    TH3F* m_h3_MCTrackCand_minus;
-    TH3F* m_h3_TracksPerMCTrackCand_minus;
+    TH3F* m_h3_MCParticle_plus;  /**< efficiency*/
+    TH3F* m_h3_TracksPerMCParticle_plus;  /**< efficiency*/
+    TH3F* m_h3_MCTrackCand_plus;  /**< efficiency*/
+    TH3F* m_h3_TracksPerMCTrackCand_plus;  /**< efficiency*/
+    TH3F* m_h3_MCParticle_minus;  /**< efficiency*/
+    TH3F* m_h3_TracksPerMCParticle_minus;  /**< efficiency*/
+    TH3F* m_h3_MCTrackCand_minus;  /**< efficiency*/
+    TH3F* m_h3_TracksPerMCTrackCand_minus;  /**< efficiency*/
 
     //histograms used for purity plots
-    TH3F* m_h3_MCParticlesPerTrack;
-    TH3F* m_h3_Tracks;
+    TH3F* m_h3_MCParticlesPerTrack;  /**< purityy*/
+    TH3F* m_h3_Tracks; /**< purity*/
 
   };
 } // end of namespace

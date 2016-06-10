@@ -53,6 +53,17 @@ TBAnalysisModule::~TBAnalysisModule()
 void TBAnalysisModule::initialize()
 {
   StoreObjPtr<EventMetaData>::required();
+  StoreArray<genfit::TrackCand>::required(m_TrackCandName);
+  StoreArray<genfit::Track>::required(m_TrackName);
+  StoreArray<TrackFitResult>::required(m_TrackFitResultName);
+  StoreArray<PXDIntercept>::required(m_PXDInterceptName);
+  StoreArray<ROIid>::required(m_ROIidName);
+
+  B2INFO("      TrackCands: " << m_TrackCandName);
+  B2INFO("          Tracks: " << m_TrackName);
+  B2INFO(" TrackFitResults: " << m_TrackFitResultName);
+  B2INFO("   PXDIntercepts: " << m_PXDInterceptName);
+  B2INFO("            ROIs: " << m_ROIidName);
 
   m_goodL1inter = 0;
   m_goodL2inter = 0;
@@ -63,6 +74,8 @@ void TBAnalysisModule::initialize()
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
 
   m_h1_pValue = createHistogram1D("h1pValue", "pValue of the fit", 1000, 0, 1, "pValue", m_histoList);
+  m_h1_mom = createHistogram1D("h1mom", "fitted track momentum", 100, 0, 7, "momentum", m_histoList);
+
 
   m_h1_nROIs_odd = createHistogram1D("h1nROIs_trgDivNot0", "number of ROIs per event", 10, 0, 10, "n ROIs", m_histoList);
   m_h1_nROIs_even = createHistogram1D("h1nROIs_trgDiv0", "number of ROIs per event", 10, 0, 10, "n ROIs", m_histoList);
@@ -180,6 +193,7 @@ void TBAnalysisModule::event()
 
   //track-fit objects
   StoreArray<genfit::Track> tracks(m_TrackName);
+  StoreArray<genfit::Track> offlinetracks("offlinegfTracks");
 
   //ROIs objects
   StoreArray<ROIid> ROIids(m_ROIidName);
@@ -198,18 +212,33 @@ void TBAnalysisModule::event()
   bool isInFiducialL1 = false;
   bool isInFiducialL2 = false;
 
+  if (offlinetracks.getEntries() == 0)
+    return;
+
+  const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(offlinetracks[0], "offlineTrackFitResults");
+  if (fitResult == NULL)
+    return;
+
+  m_h1_mom->Fill(fitResult->getMomentum().Mag());
+  if (abs(fitResult->getMomentum().Mag() - 3.5) > 1.5)
+    return;
+
+
   BOOST_FOREACH(genfit::Track & track, tracks) {
 
 
     const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(&track, m_TrackFitResultName);
 
-    if (fitResult != NULL)
+    if (fitResult != NULL) {
       m_h1_pValue->Fill(fitResult->getPValue());
+    } else
+      continue;
 
     if (fitResult->getPValue() < 0.01)
       continue;
 
     RelationVector<PXDIntercept> PXDIntercept_fromTrack = DataStore::getRelationsFromObj<PXDIntercept>(&track, m_PXDInterceptName);
+
     if (PXDIntercept_fromTrack.size() == 0)
       continue;
 
@@ -221,22 +250,36 @@ void TBAnalysisModule::event()
     isInFiducialL1 = false;
     isInFiducialL2 = false;
 
-    PXDIntercept* theInterceptL1 = PXDIntercept_fromTrack[0];
-    //    if( VxdID(theIntercept->getSensorID()).getLayerNumber() == 1){
-    L1uInter = theInterceptL1->getCoorU();
-    L1vInter = theInterceptL1->getCoorV();
-    //    }   else {
-    //      cout<<"layer 2!"<<endl;
-    PXDIntercept* theInterceptL2 = PXDIntercept_fromTrack[1];
-    L2uInter = theInterceptL2->getCoorU();
-    L2vInter = theInterceptL2->getCoorV();
-    //    }
-    m_h2_interMap_vL1_uL1->Fill(L1vInter, L1uInter);
-    m_h2_interMap_vL2_uL2->Fill(L2vInter, L2uInter);
-//    if (fitResult->getPValue() < 0.0001 )
-    //      continue;
+    if (PXDIntercept_fromTrack.size() > 0) {
+      PXDIntercept* theIntercept0 = PXDIntercept_fromTrack[0];
+      if (VxdID(theIntercept0->getSensorID()).getLayerNumber() == 1) {
+        L1uInter = theIntercept0->getCoorU();
+        L1vInter = theIntercept0->getCoorV();
+      }   else {
+        L2uInter = theIntercept0->getCoorU();
+        L2vInter = theIntercept0->getCoorV();
+      }
+    }
+    if (PXDIntercept_fromTrack.size() > 1) {
+      PXDIntercept* theIntercept1 = PXDIntercept_fromTrack[1];
+      if (VxdID(theIntercept1->getSensorID()).getLayerNumber() == 1) {
+        L1uInter = theIntercept1->getCoorU();
+        L1vInter = theIntercept1->getCoorV();
+      }   else {
+        L2uInter = theIntercept1->getCoorU();
+        L2vInter = theIntercept1->getCoorV();
+      }
+    }
+
+    if (L1vInter != -10)
+      m_h2_interMap_vL1_uL1->Fill(L1vInter, L1uInter);
+    if (L2vInter != -10)
+      m_h2_interMap_vL2_uL2->Fill(L2vInter, L2uInter);
+
 
     if ((L1uInter > 0.05 && L1uInter < 0.25) && abs(L1vInter) < 2)
+      //4 links active
+      //    if ((abs(L1uInter)<0.5) && abs(L1vInter) < 2)
       isInFiducialL1 = true;
 
     if (isInFiducialL1)
@@ -275,19 +318,20 @@ void TBAnalysisModule::event()
       int detId = thehitTC->getDetId();
 
       if (detId == Const::SVD)
-        if (svdClusters[hitId]->getSensorID().getLayerNumber() == 3) {
-          if (svdClusters[hitId]->isUCluster())
-            L3u = svdClusters[hitId]->getPosition();
-          else
-            L3v = svdClusters[hitId]->getPosition();
+        if (hitId < svdClusters.getEntries()) {
+          if (svdClusters[hitId]->getSensorID().getLayerNumber() == 3) {
+            if (svdClusters[hitId]->isUCluster())
+              L3u = svdClusters[hitId]->getPosition();
+            else
+              L3v = svdClusters[hitId]->getPosition();
+          }
+          if (svdClusters[hitId]->getSensorID().getLayerNumber() == 4) {
+            if (svdClusters[hitId]->isUCluster())
+              L4u = svdClusters[hitId]->getPosition();
+            else
+              L4v = svdClusters[hitId]->getPosition();
+          }
         }
-      if (svdClusters[hitId]->getSensorID().getLayerNumber() == 4) {
-        if (svdClusters[hitId]->isUCluster())
-          L4u = svdClusters[hitId]->getPosition();
-        else
-          L4v = svdClusters[hitId]->getPosition();
-      }
-
     }
 
     bool aClusterOnL1 = false;
@@ -359,6 +403,7 @@ void TBAnalysisModule::event()
 
 
     }
+
     m_h2_corr_uL3_uL4->Fill(L3u, L4u);
     m_h2_corr_vL3_vL4->Fill(L3v, L4v);
 
@@ -398,6 +443,7 @@ void TBAnalysisModule::event()
 
   } //tracks
 
+
   for (int i = 0; i < ROIids.getEntries(); i++)
     if (evtNr % m_TrigDiv == 0) {
       m_h1_vwidthROI_even->Fill(ROIids[i]->getMaxVid() - ROIids[i]->getMinVid());
@@ -406,7 +452,6 @@ void TBAnalysisModule::event()
       m_h1_vwidthROI_odd->Fill(ROIids[i]->getMaxVid() - ROIids[i]->getMinVid());
       m_h1_uwidthROI_odd->Fill(ROIids[i]->getMaxUid() - ROIids[i]->getMinUid());
     }
-
 
   if (evtNr % m_TrigDiv == 0) {
 
@@ -430,6 +475,7 @@ void TBAnalysisModule::event()
         interceptL2_twoEvtsAgo.push_back(intercept);
 
   }
+
 }
 
 

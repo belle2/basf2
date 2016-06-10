@@ -54,38 +54,39 @@ namespace Belle2 {
     //list of functions to create histograms:
     TH1F* createHistogram1D(const char* name, const char* title,
                             Int_t nbins, Double_t min, Double_t max,
-                            const char* xtitle, TList* histoList = NULL);
+                            const char* xtitle, TList* histoList = NULL);  /**< thf */
 
     TH2F* createHistogram2D(const char* name, const char* title,
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
-                            TList* histoList = NULL);
+                            TList* histoList = NULL);  /**< thf */
 
     TH3F* createHistogram3D(const char* name, const char* title,
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
                             Int_t nbinsZ, Double_t minZ, Double_t maxZ, const char* titleZ,
-                            TList* histoList = NULL);
+                            TList* histoList = NULL);  /**< thf */
 
     TH3F* createHistogram3D(const char* name, const char* title,
                             Int_t nbinsX, Double_t* binsX, const char* titleX,
                             Int_t nbinsY, Double_t* binsY, const char* titleY,
                             Int_t nbinsZ, Double_t* binsZ, const char* titleZ,
-                            TList* histoList = NULL);
+                            TList* histoList = NULL);  /**< thf */
 
     TH1* duplicateHistogram(const char* newname, const char* newtitle,
-                            TH1* h, TList* histoList = NULL);
+                            TH1* h, TList* histoList = NULL);  /**< thf */
 
 
     TH1F* createHistogramsRatio(const char* name, const char* title,
                                 TH1* hNum, TH1* hDen, bool isEffPlot,
-                                int axisRef);
+                                int axisRef);  /**< thf */
 
 
 
-    void addEfficiencyPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);
-    void addInefficiencyPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);
-    void addPurityPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);
+    void addEfficiencyPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);  /**< efficiency */
+    void addInefficiencyPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL,
+                              TH3F* h3_MCParticle = NULL);  /**< inefficiency */
+    void addPurityPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);  /**< purity */
 
 
     /* user-defined parameters */

@@ -59,9 +59,9 @@ namespace Belle2 {
 
   private:
 
-    bool isV0(const MCParticle& the_mcParticle);
+    bool isV0(const MCParticle& the_mcParticle); /**< is V0*/
 
-    int nMatchedDaughters(const MCParticle& the_mcParticle);
+    int nMatchedDaughters(const MCParticle& the_mcParticle); /**< number of truth matched dauhters*/
 
     /* user-defined parameters */
     std::string m_MCParticlesName; /**< MCParticle StoreArray name */
@@ -94,19 +94,19 @@ namespace Belle2 {
     //    TH1F* m_h1_mom_pll; /**< mom pull*/
     //    TH1F* m_h1_mass_pll; /**< mom pull*/
 
-    TH1F* m_h1_ChiSquare;
+    TH1F* m_h1_ChiSquare; /**< TH1F chi square */
 
-    TH1F* m_h1_nMatchedDau;
+    TH1F* m_h1_nMatchedDau; /**< TH1F n matched daughters*/
+
     //histograms used for efficiency plots
-
-    TH3F* m_h3_MCParticle;
-    TH3F* m_h3_V0sPerMCParticle;
-    TH1F* m_h1_MCParticle_R;
-    TH1F* m_h1_V0sPerMCParticle_R;
+    TH3F* m_h3_MCParticle; /**< */
+    TH3F* m_h3_V0sPerMCParticle; /**< */
+    TH1F* m_h1_MCParticle_R; /**< */
+    TH1F* m_h1_V0sPerMCParticle_R; /**< */
 
     //histograms used for purity plots
-    TH3F* m_h3_V0s;
-    TH3F* m_h3_MCParticlesPerV0;
+    TH3F* m_h3_V0s; /**< */
+    TH3F* m_h3_MCParticlesPerV0; /**< */
 
   };
 } // end of namespace

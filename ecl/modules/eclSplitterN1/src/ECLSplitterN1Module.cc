@@ -353,6 +353,8 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       RelationVector<ECLCalDigit> caldigitvector = locmaxvector[0]->getRelationsTo<ECLCalDigit>();
       highestEnergyID = (caldigitvector[0])->getCellId();
       highestEnergy  = (caldigitvector[0])->getEnergy();
+      highestEnergyTime           = (caldigitvector[0])->getTime();
+      highestEnergyTimeResolution = (caldigitvector[0])->getTimeResolution();
     }
 
     // Get a first estimation of the energy using 3x3 neighbours.

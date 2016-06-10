@@ -365,7 +365,7 @@ class ValidationPlot(object):
         graph = ROOT.TGraphErrors()
 
         graph.SetName(self.name)
-        graph.GetHistogram().SetOption("ALP")
+        graph.GetHistogram().SetOption("A")
 
         graph.SetMarkerColor(4)
         graph.SetMarkerStyle(21)

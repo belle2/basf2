@@ -25,15 +25,12 @@ namespace Belle2 {
       static CDCRecoSegment3D reconstruct(const CDCRecoSegment2D& segment2D,
                                           const CDCTrajectory2D& trajectory2D);
 
-      /** Constructs a two dimensional segment by carrying out the stereo ! projection to the wire reference postion.
-       * Note : no fitting information is transported to the resulting segment.
+      /**
+       *  Constructs a two dimensional segment by carrying out the stereo ! projection to the wire reference postion.
+       *  Note : no fitting information is transported to the resulting segment.
        */
       CDCRecoSegment2D stereoProjectToRef() const;
 
-      /// Returns true of there is one hit in the range which has a reconstructed position in the CDC (scaled by the factor).
-      bool atLeastOneHitIsNotInCDCZBounds(const double factor = 1) const;
     };
   }
 }
-
-

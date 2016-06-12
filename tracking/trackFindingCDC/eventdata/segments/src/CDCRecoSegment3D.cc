@@ -36,15 +36,3 @@ CDCRecoSegment3D CDCRecoSegment3D::reconstruct(const CDCRecoSegment2D& segment2D
   }
   return segment3D;
 }
-
-
-bool CDCRecoSegment3D::atLeastOneHitIsNotInCDCZBounds(const double factor) const
-{
-  for (const CDCRecoHit3D& recoHit : items()) {
-    if (not recoHit.isInCellZBounds(factor)) {
-      return true;
-    }
-  }
-
-  return false;
-}

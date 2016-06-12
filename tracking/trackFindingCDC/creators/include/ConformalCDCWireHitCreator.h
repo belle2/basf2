@@ -27,12 +27,6 @@ namespace Belle2 {
      */
     class ConformalCDCWireHitCreator {
     public:
-      /**
-       * For the use in the QuadTree use this hit set.
-       * @return the hit set with axial hits to use in the QuadTree-Finding.
-       */
-      static std::vector<ConformalCDCWireHit*> createConformalCDCWireHitListForQT(
-        std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
     private:
       /// Static only.

@@ -176,12 +176,10 @@ namespace Belle2 {
                AxialHitQuadTreeProcessorWithNewReferencePoint::rangeY(static_cast<float>(curv - precision_r),
                    static_cast<float>(curv + precision_r)));
 
-        std::vector<ConformalCDCWireHit*> hitsVector = ConformalCDCWireHitCreator::createConformalCDCWireHitListForQT(
-                                                         conformalCDCWireHitList);
-
-        for (ConformalCDCWireHit* hit : hitsVector) {
-          hit->setUsedFlag(false);
-          hit->setMaskedFlag(false);
+        std::vector<ConformalCDCWireHit*> hitsVector;
+        for (ConformalCDCWireHit& trackHit : conformalCDCWireHitList) {
+          if (trackHit.getUsedFlag() or trackHit.getMaskedFlag()) continue;
+          hitsVector.push_back(&trackHit);
         }
 
         AxialHitQuadTreeProcessorWithNewReferencePoint qtProcessor(ranges, std::make_pair(refPos.x(), refPos.y()));

@@ -15,17 +15,3 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-std::vector<ConformalCDCWireHit*> ConformalCDCWireHitCreator::createConformalCDCWireHitListForQT(
-  std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
-{
-  std::vector<ConformalCDCWireHit*> QuadTreeHitWrappers;
-  for (ConformalCDCWireHit& trackHit : conformalCDCWireHitList) {
-    if (trackHit.getUsedFlag() or trackHit.getMaskedFlag()) {
-      continue;
-    }
-    QuadTreeHitWrappers.push_back(&trackHit);
-  }
-  B2DEBUG(90, "In hit set are " << QuadTreeHitWrappers.size() << " hits.")
-  return QuadTreeHitWrappers;
-}

@@ -115,8 +115,12 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
     AxialHitQuadTreeProcessor qtProcessor = quadTreeParameters.constructQTProcessor();
 
     //Prepare vector of QuadTreeHitWrapper* to provide it to the qt processor
-    std::vector<ConformalCDCWireHit*> hitsVector = ConformalCDCWireHitCreator::createConformalCDCWireHitListForQT(
-                                                     m_conformalCDCWireHitList);
+    std::vector<ConformalCDCWireHit*> hitsVector;
+    for (ConformalCDCWireHit& trackHit : m_conformalCDCWireHitList) {
+      if (trackHit.getUsedFlag() or trackHit.getMaskedFlag()) continue;
+      hitsVector.push_back(&trackHit);
+    }
+
     qtProcessor.provideItemsSet(hitsVector);
     //  qtProcessor.seedQuadTree(4, symmetricalKappa);
 

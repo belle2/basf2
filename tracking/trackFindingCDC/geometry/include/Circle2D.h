@@ -53,27 +53,39 @@ namespace Belle2 {
       Circle2D reversed() const
       { return Circle2D(center(), -radius()); }
 
-      /// Transforms the circle to conformal space inplace
-      /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace
+      /**
+       *  Transforms the circle to conformal space inplace.
+       *
+       *  Applies the conformal map in the self-inverse from
+       *  - \f$X = x / (x^2 + y^2 - r^2)\f$
+       *  - \f$Y = y / (x^2 + y^2 - r^2)\f$
+       *  - \f$R = r / (x^2 + y^2 - r^2)\f$
+       *  inplace
        *  This is only stable for off origin circles. The numerical stability of the transformation
-       *  is subjected to the denominator center().normSquared() - signedRadius() * signedRadius()
+       *  is subjected to the denominator center().normSquared() - signedRadius() * signedRadius().
        **/
       inline void conformalTransform()
       {
-        double denominator = center().normSquared() - radius() * radius();
-        m_center /= denominator;
-        m_radius /= denominator;
+        double denominator = 1 / (center().normSquared() - radius() * radius());
+        m_center *= denominator;
+        m_radius *= denominator;
       }
 
-      /// Returns a copy of the circle in conformal space
-      /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) and returns the result as new Circle2D
+      /**
+       *  Returns a copy of the circle in conformal space.
+       *
+       *  Applies the conformal map in the self-inverse from
+       *  - \f$X = x / (x^2 + y^2 - r^2)\f$
+       *  - \f$Y = y / (x^2 + y^2 - r^2)\f$
+       *  - \f$R = r / (x^2 + y^2 - r^2)\f$
+       *  and returns the result as new Circle2D
        *  This is only stable for off origin circles. The numerical stability of the transformation
-       *  is subjected to the denominator center().normSquared() - signedRadius() * signedRadius()
+       *  is subjected to the denominator center().normSquared() - signedRadius() * signedRadius().
        **/
       inline Circle2D conformalTransformed() const
       {
-        double denominator = center().normSquared() - radius() * radius();
-        return Circle2D(center() / denominator, radius() / denominator);
+        double denominator = 1 / (center().normSquared() - radius() * radius());
+        return Circle2D(center() * denominator, radius() * denominator);
       }
 
     public:

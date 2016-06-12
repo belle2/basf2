@@ -26,12 +26,11 @@ CDCConformalHit::CDCConformalHit(const CDCWireHit* wireHit)
 
 std::tuple<Vector2D, double> CDCConformalHit::performConformalTransformWithRespectToPoint(const Vector2D& pos2D) const
 {
-  Vector2D relPos2D = m_wireHit->getRefPos2D() - pos2D;
-  double denominator = 2 / (relPos2D.normSquared() - square(m_wireHit->getRefDriftLength()));
+  Circle2D conformalDriftCircle = m_wireHit->conformalTransformed(pos2D);
 
-  Vector2D conformalPosition = relPos2D * denominator;
-  double conformalDriftLength = m_wireHit->getRefDriftLength() * denominator;
-  return std::make_tuple(conformalPosition, conformalDriftLength);
+  // TODO : Resolve sad mismatch between the legendre conformal transformation and the one defined in the reset of the CDC tracking.
+  return std::make_tuple(conformalDriftCircle.center() * 2,
+                         conformalDriftCircle.radius() * 2);
 }
 
 

@@ -19,6 +19,8 @@
 #include <framework/utilities/Utils.h>
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
 
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
 #include <boost/math/constants/constants.hpp>
 #include <cmath>
 #include <vector>
@@ -51,7 +53,7 @@ namespace Belle2 {
         if (not m_lookup_created) {
           m_lookup_theta.resize(m_nbinsTheta + 1);
           for (unsigned long i = 0; i <= m_nbinsTheta; ++i) {
-            m_lookup_theta[i] = std::make_pair(computeSin(i), computeCos(i));
+            m_lookup_theta[i] = Vector2D(computeCos(i), computeSin(i));
           }
           m_lookup_created = true;
         }
@@ -64,10 +66,23 @@ namespace Belle2 {
       {
         static TrigonometricalLookupTable trigonometricalLookupTable;
         return trigonometricalLookupTable;
-      } ;
+      }
+
+      /// Get unit direction corresponding to the given bin
+      Vector2D thetaVec(unsigned long bin)
+      {
+        if (branch_unlikely(not m_lookup_created)) {
+          initialize();
+        }
+        if (branch_unlikely(bin >= m_lookup_theta.size())) {
+          return Vector2D(computeCos(bin), computeSin(bin));
+        } else {
+          return m_lookup_theta[bin];
+        }
+      }
 
       /// Get sin() corresponding to the given bin
-      inline float sinTheta(unsigned long bin)
+      inline double sinTheta(unsigned long bin)
       {
         if (branch_unlikely(not m_lookup_created)) {
           initialize();
@@ -75,18 +90,18 @@ namespace Belle2 {
         if (branch_unlikely(bin >= m_lookup_theta.size())) {
           return computeSin(bin);
         } else {
-          return m_lookup_theta[bin].first;
+          return m_lookup_theta[bin].y();
         }
       }
 
       /// Get cos() corresponding to the given bin
-      inline float cosTheta(unsigned long bin)
+      inline double cosTheta(unsigned long bin)
       {
         if (branch_unlikely(not m_lookup_created)) initialize();
         if (branch_unlikely(bin >= m_lookup_theta.size())) {
           return computeCos(bin);
         } else {
-          return m_lookup_theta[bin].second;
+          return m_lookup_theta[bin].x();
         }
       }
 
@@ -96,20 +111,20 @@ namespace Belle2 {
     private:
 
       /// Compute cos for the given bin value
-      inline float computeSin(unsigned long bin) const
+      inline double computeSin(unsigned long bin) const
       {
-        const float bin_width = 2.* boost::math::constants::pi<float>()  / m_nbinsTheta;
+        const float bin_width = 2.* boost::math::constants::pi<float>() / m_nbinsTheta;
         return sin(bin * bin_width - boost::math::constants::pi<float>() + bin_width / 2.);
       }
 
       /// Compute cos for the given bin value
-      inline float computeCos(unsigned long bin) const
+      inline double computeCos(unsigned long bin) const
       {
-        const float bin_width = 2.* boost::math::constants::pi<float>()  / m_nbinsTheta;
+        const float bin_width = 2.* boost::math::constants::pi<float>() / m_nbinsTheta;
         return cos(bin * bin_width - boost::math::constants::pi<float>() + bin_width / 2.);
       }
 
-      std::vector<std::pair<float, float>> m_lookup_theta; /**< Lookup array for calculation of sin */
+      std::vector<Vector2D> m_lookup_theta; /**< Lookup array for calculation of sin */
       bool m_lookup_created; /**< Allows to use the same lookup table for sin and cos */
       unsigned long m_nbinsTheta; /**< Number of theta bins */
 

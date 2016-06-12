@@ -218,6 +218,7 @@ namespace Belle2 {
       /// Getter for the average z coordinate at the backward joint points of all wires in this layer
       double getBackwardZ() const
       { return m_backwardZ; }
+
       /**@}*/
 
       /**
@@ -232,6 +233,19 @@ namespace Belle2 {
       /// Getter for outer radius of the layer as taken from the CDCGeometryPar
       double getOuterCylindricalR() const
       { return m_outerCylindricalR; }
+
+      /// Getter for the width of the wire layer in the radial direction
+      double getRadialCellWidth() const
+      { return getOuterCylindricalR() - getInnerCylindricalR(); }
+
+      /**
+       *  Getter for the width of the wire layer in the lateral direction.
+       *
+       *  Lateral means the perpendicular to the radial outwards direction
+       *  The measure is taken at the outer bound, where it is largest for the wire layer
+       */
+      double getLateralCellWidth() const
+      { return getOuterCylindricalR() * 2 * M_PI / size(); }
       /**@}*/
 
     private:

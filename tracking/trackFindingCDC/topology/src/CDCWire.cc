@@ -11,6 +11,8 @@
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
+#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCHit.h>
 
@@ -95,9 +97,9 @@ bool CDCWire::isInCell(const Vector3D& pos3D) const
   if (not inZ) return false;
 
   ILayer iCLayer = getICLayer();
-  const CDCWireLayer& wireLayer = CDCWireTopology::getInstance().getWireLayer(iCLayer);
-  const double innerCylindricalR = wireLayer.getInnerCylindricalR();
-  const double outerCylindricalR = wireLayer.getOuterCylindricalR();
+  const CDCWireLayer& wireLayer = getWireLayer();
+  double innerCylindricalR = wireLayer.getInnerCylindricalR();
+  double outerCylindricalR = wireLayer.getOuterCylindricalR();
   double cylindricalR = pos3D.cylindricalR();
 
   bool inCylindricalR = innerCylindricalR < cylindricalR and cylindricalR < outerCylindricalR;
@@ -109,6 +111,30 @@ bool CDCWire::isInCell(const Vector3D& pos3D) const
   bool inPhi = iWire == getIWire();
   return inPhi;
 }
+
+double CDCWire::getRadialCellWidth() const
+{ return getWireLayer().getRadialCellWidth(); }
+
+
+double CDCWire::getLateralCellWidth() const
+{ return getWireLayer().getLateralCellWidth(); }
+
+
+const CDCWireLayer& CDCWire::getWireLayer() const
+{
+  ILayer iCLayer = getICLayer();
+  return CDCWireTopology::getInstance().getWireLayer(iCLayer);
+}
+
+
+const CDCWireSuperLayer& CDCWire::getWireSuperLayer() const
+{
+  ISuperLayer iSuperLayer = getISuperLayer();
+  return CDCWireTopology::getInstance().getWireSuperLayer(iSuperLayer);
+}
+
+
+
 
 WireNeighborKind CDCWire::getNeighborKind(const CDCWire& wire) const
 {

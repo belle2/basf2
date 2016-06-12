@@ -34,6 +34,11 @@ namespace Belle2 {
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+
+    // Forward declarations
+    class CDCWireLayer;
+    class CDCWireSuperLayer;
+
     /**
      *  Class representing a sense wire in the central drift chamber.
      *  It combines the wire id and a line representation of the wire from the CDC geometry.
@@ -272,8 +277,24 @@ namespace Belle2 {
       /// Checks whether the position is in the z bounds of the drift cell (scaled by the factor) surrounding the wire
       bool isInCellZBounds(const Vector3D& pos3D, const double factor = 1) const
       { return getBackwardZ() * factor < pos3D.z() and pos3D.z() < getForwardZ() * factor; }
+
+      /// Getter for the cell widths in radial direction
+      double getRadialCellWidth() const;
+
+      /// Getter for the cell widths in lateral direction
+      double getLateralCellWidth() const;
       /**@}*/
 
+
+      /**
+       *  @name Access to the wire layer and super layer properties
+       */
+
+      /// Getter for the wire layer
+      const CDCWireLayer& getWireLayer() const;
+
+      /// Getter for the wire super layer
+      const CDCWireSuperLayer& getWireSuperLayer() const;
 
       /**
        *  @name Closest neighborhood

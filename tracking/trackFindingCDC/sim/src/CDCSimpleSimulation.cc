@@ -108,6 +108,7 @@ CDCSimpleSimulation::constructMCTracks(size_t nMCTracks, vector<SimpleSimHit> si
         ++nSameWire;
       } else {
         nSameWire = 1;
+        // cppcheck-suppress unreadVariable
         lastWire = &(simpleSimHit.m_wireHit.getWire());
       }
       return nSameWire > maxNHitOnWire ? true : false;

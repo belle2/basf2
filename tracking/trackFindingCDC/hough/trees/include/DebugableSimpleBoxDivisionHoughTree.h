@@ -25,11 +25,11 @@ namespace Belle2 {
       /// Use the constructors of the super class.
       using Super::Super;
 
-      /// Write out some debug information to a ROOT file with the given name.
       /**
-       * This must be done before felling the tree. Attention: This will delete a ROOT file
-       * with the same name if already present.
-       * @param filename: The ROOT filename.
+       *  Write out some debug information to a ROOT file with the given name.
+       *  This must be done before felling the tree. Attention: This will delete a ROOT file
+       *  with the same name if already present.
+       *  @param filename: The ROOT filename.
        */
       void writeDebugInfoToFile(const std::string& filename)
       {
@@ -61,11 +61,17 @@ namespace Belle2 {
         eventTTree.Write();
 
         auto walker = [&](const typename Super::Node * node) -> bool {
+          // cppcheck-suppress unreadVariable
           lowerX = node->getLowerZ0();
+          // cppcheck-suppress unreadVariable
           upperX = node->getUpperZ0();
+          // cppcheck-suppress unreadVariable
           lowerY = node->getLowerTanLambda();
+          // cppcheck-suppress unreadVariable
           upperY = node->getUpperTanLambda();
+          // cppcheck-suppress unreadVariable
           weight = node->getWeight();
+          // cppcheck-suppress unreadVariable
           level = node->getLevel();
 
           weightTTree.Fill();

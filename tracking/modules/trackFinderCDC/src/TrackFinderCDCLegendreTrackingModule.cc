@@ -90,11 +90,13 @@ void TrackFinderCDCLegendreTrackingModule::startNewEvent()
     // Only select axial hits for legendre tracking
     if (not wireHit.isAxial()) continue;
 
+    // Peculiar check for drift length
+    // If it's greater than the cell size return false (typically this is true for background?).
+    double lateralCellWidth = wireHit.getWire().getLateralCellWidth();
+    const double factor = wireHit.isAxial() ? 0.8 : 0.9; // Stereo case does not happen, copied from original method.
+    if (not(wireHit.getRefDriftLength() < lateralCellWidth * factor)) continue;
+
     m_conformalCDCWireHitList.emplace_back(&wireHit);
-    const CDCConformalHit& newlyAddedHit = m_conformalCDCWireHitList.back();
-    if (not newlyAddedHit.checkHitDriftLength()) {
-      m_conformalCDCWireHitList.pop_back();
-    }
   }
 
   B2DEBUG(90, "Number of hits to be used by legendre track finder: " << m_conformalCDCWireHitList.size() << " axial.");

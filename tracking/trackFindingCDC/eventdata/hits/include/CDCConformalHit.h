@@ -66,12 +66,6 @@ namespace Belle2 {
       /** Returns MASKED flag of the Automaton cell of the CDCWireHit.*/
       bool getMaskedFlag() const {return m_wireHit->getAutomatonCell().hasMaskedFlag();};
 
-      /**
-       *  Check hit drift lenght. if it's greater than the cell size return false (typically this is true for background?).
-       *  TODO: This is done using the CDCGeometry - better do this using the CDCWireTopology!
-       */
-      bool checkHitDriftLength() const;
-
       /// Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. Returns (x',y',driftLength)
       std::tuple<Vector2D, double> performConformalTransformWithRespectToPoint(const Vector2D& refPos2D) const;
 

@@ -133,10 +133,17 @@ std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherQuadTree<Hough
       }
 
       if (innerIterator != outerIterator and currentHitOuter == currentHitInner) {
-        const double lambda11 = 1 / currentRecoHitInner.calculateZSlopeWithZ0(node.getLowerZ0());
-        const double lambda12 = 1 / currentRecoHitInner.calculateZSlopeWithZ0(node.getUpperZ0());
-        const double lambda21 = 1 / currentRecoHitOuter.calculateZSlopeWithZ0(node.getLowerZ0());
-        const double lambda22 = 1 / currentRecoHitOuter.calculateZSlopeWithZ0(node.getUpperZ0());
+        const double innerZ = currentRecoHitInner.getRecoZ();
+        const double outerZ = currentRecoHitOuter.getRecoZ();
+
+        const double innerR = currentRecoHitInner.getRecoPos2D().norm();
+        const double outerR = currentRecoHitOuter.getRecoPos2D().norm();
+
+        const double lambda11 = (innerZ - node.getLowerZ0()) / innerR;
+        const double lambda12 = (innerZ - node.getUpperZ0()) / innerR;
+
+        const double lambda21 = (outerZ - node.getLowerZ0()) / outerR;
+        const double lambda22 = (outerZ - node.getUpperZ0()) / outerR;
 
         const double zSlopeMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
 

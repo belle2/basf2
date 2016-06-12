@@ -118,7 +118,7 @@ namespace Belle2 {
        *  Reconstructs the three dimensional hit from the two dimensional,
        *  the two dimensional trajectory and sz trajectory.
        *  For two dimensional reconstructed hits on axial wires this reconstructs
-
+       *
        *  the xy position and the transvers travel distance. The z coordinate is then determined
        *  by evaluating the sz trajectory at the just calculated travel distance. Note that it is important
        *  that both circle trajectory and sz trajectory share a common reference point.
@@ -203,14 +203,16 @@ namespace Belle2 {
       { return getRLWireHit().getISuperLayer(); }
 
       /// Getter for the wire.
-      const CDCWire& getWire() const { return getRLWireHit().getWire(); }
+      const CDCWire& getWire() const
+      { return getRLWireHit().getWire(); }
 
       /// Checks if the reconstructed hit is assoziated with the give wire.
       bool isOnWire(const CDCWire& wire) const
       { return getRLWireHit().isOnWire(wire); }
 
       /// Getter for the wire hit.
-      const CDCWireHit& getWireHit() const { return getRLWireHit().getWireHit(); }
+      const CDCWireHit& getWireHit() const
+      { return getRLWireHit().getWireHit(); }
 
       /// Checks if the reconstructed hit is assoziated with the give wire hit.
       bool hasWireHit(const CDCWireHit& wireHit) const
@@ -249,10 +251,12 @@ namespace Belle2 {
       { m_recoPos3D = recoPos3D; }
 
       /// Getter for the 2d position of the hit.
-      const Vector2D& getRecoPos2D() const { return getRecoPos3D().xy(); }
+      const Vector2D& getRecoPos2D() const
+      { return getRecoPos3D().xy(); }
 
       /// Getter for the z coordinate of the reconstructed position.
-      double getRecoZ() const { return getRecoPos3D().z(); }
+      double getRecoZ() const
+      { return getRecoPos3D().z(); }
 
       /// Gets the displacement from the wire position in the xy plain at the reconstructed position.
       Vector2D getRecoDisp2D() const;
@@ -306,9 +310,7 @@ namespace Belle2 {
        *  Checks for z to be in the range of the wire.
        */
       bool isInCellZBounds(const double factor = 1) const
-      {
-        return getWire().isInCellZBounds(getRecoPos3D(), factor);
-      }
+      { return getWire().isInCellZBounds(getRecoPos3D(), factor); }
 
       /**
        *  Access the object methods and methods from a pointer in the same way.
@@ -319,19 +321,6 @@ namespace Belle2 {
        */
       const CDCRecoHit3D* operator->() const
       { return this; }
-
-      /**
-       *  Calculates the z slope with a given z0.
-       *  We assume a line from the point (0, 0, z0) to the reco position.
-       *  The slope of this line is returned.
-       */
-      double calculateZSlopeWithZ0(double z0) const
-      {
-        double z = getRecoZ();
-        double radius = getRecoPos2D().norm();
-
-        return radius / (z - z0);
-      }
 
     private:
       /// Memory for the oriented wire hit reference.

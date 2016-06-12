@@ -19,66 +19,72 @@ namespace Belle2 {
     class CDCWireHit;
 
     /**
-     * CDC Hit Class used for pattern recognition in the Legendre tracking algorithm.
-     * This class holds a pointer to a CDCWireHit it belongs to and adds information that are only
-     * relevant to the Legendre algorithm (e.g. the conformal position or the conformal drift length).
-     * These variables are precalculated and cached in this object for faster calculation times in the
-     * quad tree. The flags of the wire hit are accessible through the interface also (only for convenience).
-     * */
+     *  CDC Hit class used for pattern recognition in the Legendre tracking algorithm.
+     *  This class holds a pointer to a CDCWireHit it belongs to and adds information that are only
+     *  relevant to the Legendre algorithm (e.g. the conformal position or the conformal drift length).
+     *  These variables are precalculated and cached in this object for faster calculation times in the
+     *  quad tree. The flags of the wire hit are accessible through the interface also (only for convenience).
+     */
     class ConformalCDCWireHit {
+
     public:
       /**
-       * Constructor to create a ConformalCDCWireHit from a CDCWireHit object.
-       * Some member variables specific to the ConformalCDCWireHit are initialized
-       * (e.g. the conformal transformed position).
+       *  Constructor to create a ConformalCDCWireHit from a CDCWireHit object.
+       *  Some member variables specific to the ConformalCDCWireHit are initialized
+       *  (e.g. the conformal transformed position).
        */
       explicit ConformalCDCWireHit(const CDCWireHit* wireHit);
 
       /** Returns the Hit position (X coordinate) in the conformal plane.*/
-      inline double getConformalX() const { return m_conformalPosition.x(); }
+      const Vector2D& getConformalPos2D() const
+      { return m_conformalPos2D; }
+
+      /** Returns the Hit position (X coordinate) in the conformal plane.*/
+      double getConformalX() const
+      { return m_conformalPos2D.x(); }
 
       /** Returns the Hit position (Y coordinate) in the conformal plane.*/
-      inline double getConformalY() const { return m_conformalPosition.y(); }
+      double getConformalY() const
+      { return m_conformalPos2D.y(); }
 
       /** Returns the drift time in the conformal plane (with r << x,y).*/
-      inline double getConformalDriftLength() const { return m_conformalDriftLength; }
+      double getConformalDriftLength() const
+      { return m_conformalDriftLength; }
 
       /** Returns pointer to the underlying CDCWireHit.*/
-      const CDCWireHit* getCDCWireHit() const { return m_cdcWireHit; }
+      const CDCWireHit* getWireHit() const { return m_wireHit; }
 
       /** Sets TAKEN flag of the Automaton cell of the CDCWireHit.*/
-      void setUsedFlag(bool flag) { m_cdcWireHit->getAutomatonCell().setTakenFlag(flag); };
+      void setUsedFlag(bool flag) { m_wireHit->getAutomatonCell().setTakenFlag(flag); };
 
       /** Sets MASKED flag of the Automaton cell of the CDCWireHit.*/
-      void setMaskedFlag(bool flag) { m_cdcWireHit->getAutomatonCell().setMaskedFlag(flag); };
+      void setMaskedFlag(bool flag) { m_wireHit->getAutomatonCell().setMaskedFlag(flag); };
 
       /** Returns TAKEN flag of the Automaton cell of the CDCWireHit.*/
-      bool getUsedFlag() const {return m_cdcWireHit->getAutomatonCell().hasTakenFlag();};
+      bool getUsedFlag() const {return m_wireHit->getAutomatonCell().hasTakenFlag();};
 
       /** Returns MASKED flag of the Automaton cell of the CDCWireHit.*/
-      bool getMaskedFlag() const {return m_cdcWireHit->getAutomatonCell().hasMaskedFlag();};
+      bool getMaskedFlag() const {return m_wireHit->getAutomatonCell().hasMaskedFlag();};
 
       /**
-       * Check hit drift lenght. if it's greater than the cell size return false (typically this is true for background?).
-       * TODO: This is done using the CDCGeometry - better do this using the CDCWireTopology!
-       * */
+       *  Check hit drift lenght. if it's greater than the cell size return false (typically this is true for background?).
+       *  TODO: This is done using the CDCGeometry - better do this using the CDCWireTopology!
+       */
       bool checkHitDriftLength() const;
 
-      /** Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. Returns (x',y',driftLength) */
-      std::tuple<double, double, double> performConformalTransformWithRespectToPoint(double x0, double y0) const;
+      /// Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. Returns (x',y',driftLength)
+      std::tuple<Vector2D, double> performConformalTransformWithRespectToPoint(const Vector2D& refPos2D) const;
 
     private:
-      const CDCWireHit* m_cdcWireHit;    /**< Pointer to the wire hit. */
+      /// Pointer to the wire hit.
+      const CDCWireHit* m_wireHit;
 
-      Vector2D m_conformalPosition;      /**< Position in the conformal space of the drift center (not the wire!) */
-      double m_conformalDriftLength;     /**< Drift time of the hit in the conformal plane (under the assumption that r << x,y*/
+      /// Position in the conformal space of the drift center (not the wire!)
+      Vector2D m_conformalPos2D;
 
-      /** Assigns values for the conformal coordinates by transforming the wire coordinates of the contained CDCWireHit. */
-      void performConformalTransformation();
-
+      /// Drift time of the hit in the conformal plane
+      double m_conformalDriftLength;
 
     }; //end class CDCTrackHit
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
-
-

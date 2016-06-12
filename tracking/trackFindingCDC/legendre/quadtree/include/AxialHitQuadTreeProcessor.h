@@ -352,10 +352,10 @@ namespace Belle2 {
         for (ItemType* hit : m_quadTree->getItemsVector()) {
           TF1* funct1 = new TF1("funct", "2*[0]*cos(x)/((1-sin(x))*[1]) ", -3.1415, 3.1415);
           funct1->SetLineWidth(1);
-          double r2 = (hit->getPointer()->getCDCWireHit()->getRefPos2D().norm() + hit->getPointer()->getCDCWireHit()->getRefDriftLength()) *
-                      (hit->getPointer()->getCDCWireHit()->getRefPos2D().norm() - hit->getPointer()->getCDCWireHit()->getRefDriftLength());
-          double d2 = hit->getPointer()->getCDCWireHit()->getRefDriftLength() * hit->getPointer()->getCDCWireHit()->getRefDriftLength();
-          double x = hit->getPointer()->getCDCWireHit()->getRefPos2D().x();
+          double r2 = (hit->getPointer()->getWireHit()->getRefPos2D().norm() + hit->getPointer()->getWireHit()->getRefDriftLength()) *
+                      (hit->getPointer()->getWireHit()->getRefPos2D().norm() - hit->getPointer()->getWireHit()->getRefDriftLength());
+          double d2 = hit->getPointer()->getWireHit()->getRefDriftLength() * hit->getPointer()->getWireHit()->getRefDriftLength();
+          double x = hit->getPointer()->getWireHit()->getRefPos2D().x();
 
           funct1->SetParameters(x, r2 - d2);
           funct1->Draw("CSAME");

@@ -18,36 +18,20 @@ using namespace CDC;
 using namespace TrackFindingCDC;
 
 ConformalCDCWireHit::ConformalCDCWireHit(const CDCWireHit* wireHit)
+  : m_wireHit(wireHit)
 {
   assert(wireHit);
-  m_cdcWireHit = wireHit;
-
-  performConformalTransformation();
+  std::tie(m_conformalPos2D, m_conformalDriftLength) = performConformalTransformWithRespectToPoint(Vector2D(0, 0));
 }
 
-void ConformalCDCWireHit::performConformalTransformation()
+std::tuple<Vector2D, double> ConformalCDCWireHit::performConformalTransformWithRespectToPoint(const Vector2D& pos2D) const
 {
-  const Vector2D& twoDimensionalPosition = m_cdcWireHit->getRefPos2D();
-  double dominator = twoDimensionalPosition.normSquared() - m_cdcWireHit->getRefDriftLength() * m_cdcWireHit->getRefDriftLength();
+  Vector2D relPos2D = m_wireHit->getRefPos2D() - pos2D;
+  double denominator = 2 / (relPos2D.normSquared() - square(m_wireHit->getRefDriftLength()));
 
-  //transformation of the coordinates from normal to conformal plane
-  //this is not the actual wire position but the transformed center of the drift circle
-  m_conformalPosition = twoDimensionalPosition.divided(dominator) * 2;
-
-  //conformal drift time =  (x * x + y * y - m_driftTime * m_driftTime)
-  m_conformalDriftLength = 2 * m_cdcWireHit->getRefDriftLength() / (dominator);
-}
-
-
-std::tuple<double, double, double> ConformalCDCWireHit::performConformalTransformWithRespectToPoint(double x0, double y0) const
-{
-  Vector2D twoDimensionalPosition = m_cdcWireHit->getRefPos2D() - Vector2D(x0, y0);
-  double dominator = twoDimensionalPosition.normSquared() - m_cdcWireHit->getRefDriftLength() * m_cdcWireHit->getRefDriftLength();
-
-  Vector2D conformalPosition = twoDimensionalPosition.divided(dominator) * 2;
-  double conformalDriftLength = 2 * m_cdcWireHit->getRefDriftLength() / (dominator);
-
-  return std::make_tuple(conformalPosition.x(), conformalPosition.y(), conformalDriftLength);
+  Vector2D conformalPosition = relPos2D * denominator;
+  double conformalDriftLength = m_wireHit->getRefDriftLength() * denominator;
+  return std::make_tuple(conformalPosition, conformalDriftLength);
 }
 
 
@@ -56,28 +40,27 @@ bool ConformalCDCWireHit::checkHitDriftLength() const
   //Get the position of the hit wire from CDCGeometryParameters
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
 
-  Vector3D wireBegin(cdcg.wireForwardPosition(m_cdcWireHit->getWireID().getICLayer(), m_cdcWireHit->getWireID().getIWire()));
+  Vector3D wireBegin(cdcg.wireForwardPosition(m_wireHit->getWireID().getICLayer(), m_wireHit->getWireID().getIWire()));
 
   Vector3D wireBeginNeighbor;
 
-  if (m_cdcWireHit->getWireID().getIWire() != 0) {
-    wireBeginNeighbor = cdcg.wireForwardPosition(m_cdcWireHit->getWireID().getICLayer(), m_cdcWireHit->getWireID().getIWire() - 1);
+  if (m_wireHit->getWireID().getIWire() != 0) {
+    wireBeginNeighbor = cdcg.wireForwardPosition(m_wireHit->getWireID().getICLayer(), m_wireHit->getWireID().getIWire() - 1);
   } else {
-    wireBeginNeighbor = cdcg.wireForwardPosition(m_cdcWireHit->getWireID().getICLayer(), m_cdcWireHit->getWireID().getIWire() + 1);
+    wireBeginNeighbor = cdcg.wireForwardPosition(m_wireHit->getWireID().getICLayer(), m_wireHit->getWireID().getIWire() + 1);
   }
 
   double delta = fabs(Vector3D(wireBegin - wireBeginNeighbor).xy().norm());
 
   double coef = 1.;
 
-  if (m_cdcWireHit->isAxial()) coef = 0.8;
+  if (m_wireHit->isAxial()) coef = 0.8;
   else coef = 0.9;
 
 
-  if (m_cdcWireHit->getRefDriftLength() > delta * coef) {
+  if (m_wireHit->getRefDriftLength() > delta * coef) {
     return false;
   }
 
   return true;
 }
-

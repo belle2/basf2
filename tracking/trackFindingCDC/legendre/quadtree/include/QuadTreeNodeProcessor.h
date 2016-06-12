@@ -163,7 +163,7 @@ namespace Belle2 {
         std::vector<const CDCWireHit*> cdcWireHits;
 
         for (ConformalCDCWireHit* hit : candidateHits) {
-          cdcWireHits.push_back(hit->getCDCWireHit());
+          cdcWireHits.push_back(hit->getWireHit());
         }
 
         conformalExtension.newRefPoint(cdcWireHits, conformalCDCWireHitList, true);

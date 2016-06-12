@@ -189,7 +189,7 @@ namespace Belle2 {
         std::vector<const CDCWireHit*> newCdcWireHits;
 
         for (ConformalCDCWireHit* hit : newAssignedHits) {
-          newCdcWireHits.push_back(hit->getCDCWireHit());
+          newCdcWireHits.push_back(hit->getWireHit());
         }
 
 

@@ -32,8 +32,11 @@ namespace Belle2 {
        * @param ranges ranges of the initial QuadTree (only one instance without children created)
        * @referencePoint reference position. Conformal transformation will be performed with respect to this point rather than to (0;0)
        */
-      AxialHitQuadTreeProcessorWithNewReferencePoint(const ChildRanges& ranges, std::pair<double, double> referencePoint) :
-        QuadTreeProcessorTemplate(0, ranges), m_referencePoint(referencePoint) { }
+      AxialHitQuadTreeProcessorWithNewReferencePoint(const ChildRanges& ranges,
+                                                     std::pair<double, double> referencePoint)
+        : QuadTreeProcessorTemplate(0, ranges),
+          m_referencePoint(referencePoint.first, referencePoint.second)
+      {}
 
     private:
 
@@ -42,7 +45,7 @@ namespace Belle2 {
       {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
 
       /// Reference point
-      std::pair<double, double> m_referencePoint;
+      Vector2D m_referencePoint;
 
     public:
 
@@ -84,19 +87,17 @@ namespace Belle2 {
         float dist_1[2][2];
         float dist_2[2][2];
 
-        std::tuple<double, double, double> confCoords = hit->performConformalTransformWithRespectToPoint(m_referencePoint.first,
-                                                        m_referencePoint.second);
+        std::tuple<Vector2D, double> confCoords = hit->performConformalTransformWithRespectToPoint(m_referencePoint);
+        Vector2D min_n12 = Vector2D::Phi(node->getXMin());
+        Vector2D max_n12 = Vector2D::Phi(node->getXMax());
 
+        float r_temp_min = std::get<0>(confCoords).dot(min_n12);
+        float r_temp_max = std::get<0>(confCoords).dot(max_n12);
 
-        float r_temp_min = std::get<0>(confCoords) * cos(node->getXMin())
-                           + std::get<1>(confCoords) * sin(node->getXMin());
-        float r_temp_max = std::get<0>(confCoords) * cos(node->getXMax())
-                           + std::get<1>(confCoords) * sin(node->getXMax());
-
-        float r_min1 = r_temp_min - std::get<2>(confCoords);
-        float r_min2 = r_temp_min + std::get<2>(confCoords);
-        float r_max1 = r_temp_max - std::get<2>(confCoords);
-        float r_max2 = r_temp_max + std::get<2>(confCoords);
+        float r_min1 = r_temp_min - std::get<1>(confCoords);
+        float r_min2 = r_temp_min + std::get<1>(confCoords);
+        float r_max1 = r_temp_max - std::get<1>(confCoords);
+        float r_max2 = r_temp_max + std::get<1>(confCoords);
 
         float m_rMin = node->getYMin();
         float m_rMax = node->getYMax();

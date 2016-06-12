@@ -37,17 +37,21 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
   Vector2D tangential = Vector2D::average(fromTangential, toTangential);
 
   double fromMiddleCos = fromFacet->getStartToMiddleLine().tangential().cosWith(toTangential);
-  double toMiddleCos = fromTangential.cosWith(toFacet->getMiddleToEndLine().tangential());
+  double toMiddleCos   = fromTangential.cosWith(toFacet->getMiddleToEndLine().tangential());
 
   var<named("cos_delta")>() = fromTangential.cosWith(toTangential);
 
   var<named("from_middle_cos_delta")>() = fromMiddleCos;
   var<named("to_middle_cos_delta")>() = toMiddleCos;
 
+  Vector2D frontWirePos2D = fromFacet->getStartWire().getRefPos2D();
+  Vector2D backWirePos2D  = toFacet->getEndWire().getRefPos2D();
   {
     int nSteps = 0;
     UncertainParameterLine2D fitLine = FacetFitter::fit(*fromFacet, *toFacet, nSteps);
+    double s = fitLine->lengthOnCurve(frontWirePos2D, backWirePos2D);
     var<named("chi2_0")>() = fitLine.chi2();
+    var<named("chi2_0_per_s")>() = fitLine.chi2() / s;
     var<named("erf_0")>() = std::erf(fitLine.chi2() / 800);
     var<named("fit_0_phi0")>() = fitLine->tangential().phi();
     var<named("fit_0_cos_delta")>() = fitLine->tangential().cosWith(tangential);
@@ -56,18 +60,21 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
   {
     int nSteps = 1;
     UncertainParameterLine2D fitLine = FacetFitter::fit(*fromFacet, *toFacet, nSteps);
+    double s = fitLine->lengthOnCurve(frontWirePos2D, backWirePos2D);
     var<named("chi2_1")>() = fitLine.chi2();
+    var<named("chi2_1_per_s")>() = fitLine.chi2() / s;
     var<named("fit_1_phi0")>() = fitLine->tangential().phi();
     var<named("fit_1_cos_delta")>() = fitLine->tangential().cosWith(tangential);
   }
 
   {
     UncertainParameterLine2D fitLine = FacetFitter::fit(*fromFacet, *toFacet);
+    double s = fitLine->lengthOnCurve(frontWirePos2D, backWirePos2D);
     var<named("chi2")>() = fitLine.chi2();
+    var<named("chi2_per_s")>() = fitLine.chi2() / s;
     var<named("fit_phi0")>() = fitLine->tangential().phi();
     var<named("fit_cos_delta")>() = fitLine->tangential().cosWith(tangential);
   }
-
 
   // Fitter
   {

@@ -34,15 +34,18 @@ namespace Belle2 {
       "to_middle_cos_delta",
 
       "chi2_0",
+      "chi2_0_per_s",
       "erf_0",
       "fit_0_phi0",
       "fit_0_cos_delta",
 
       "chi2_1",
+      "chi2_1_per_s",
       "fit_1_phi0",
       "fit_1_cos_delta",
 
       "chi2",
+      "chi2_per_s",
       "fit_phi0",
       "fit_cos_delta",
 

@@ -59,6 +59,7 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
     const double s = fitLine->lengthOnCurve(startWirePos2D, endWirePos2D);
 
     var<named("chi2")>() = chi2;
+    var<named("chi2_per_s")>() = chi2 / s;
 
     // Heuristic flattening functions. Ffactor is chosen by hand.
     const double erfWidth = 120.0;

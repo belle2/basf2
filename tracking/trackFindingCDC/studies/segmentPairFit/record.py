@@ -43,7 +43,7 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
     flight_time_reestimation = False
     use_alpha_in_drift_length = False
 
-    fit_method_name = "fuse-xy"
+    fit_method_name = "zreco"
     # Specification for BrowseTFileOnTerminateRunMixin
     output_file_name = "SegmentPairFitValidation.root"
 
@@ -83,10 +83,10 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
         fit_method_name = self.fit_method_name
 
         if fit_method_name == 'zreco':
-            sz_fitterSZ = Belle2.TrackFindingCDC.CDCSZFitter.getFitter()
+            sz_fitter = Belle2.TrackFindingCDC.CDCSZFitter.getFitter()
 
             def z_reconstruction_fit(pair):
-                return sz_iftter.update(pair)
+                return sz_fitter.update(pair)
             return z_reconstruction_fit
 
         elif fit_method_name == 'fuse-simple':
@@ -146,7 +146,7 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
                         updateDriftLength=True,
                         useAlphaInDriftLength=True)
 
-        path.add_module("TrackFinderCDCSegmentPairAutomatonDev",
+        path.add_module("TrackFinderSegmentPairAutomaton",
                         WriteSegmentPairs=True,
                         SegmentPairFilter="truth",
                         SegmentPairRelationFilter="none")

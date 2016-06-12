@@ -153,3 +153,10 @@ Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const ER
     return Vector3D(recoPos2D, z);
   }
 }
+
+Circle2D CDCWireHit::conformalTransformed(const Vector2D& relativeTo) const
+{
+  Circle2D driftCircle(getRefPos2D() - relativeTo, getRefDriftLength());
+  driftCircle.conformalTransform();
+  return driftCircle;
+}

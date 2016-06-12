@@ -14,6 +14,8 @@
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackFindingCDC/geometry/Circle2D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/numerics/Index.h>
 
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
@@ -231,6 +233,17 @@ namespace Belle2 {
        */
       Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, const ERightLeft rlInfo) const;
 
+      /**
+       *  Applys the conformal transformation to the drift circle this hit represents
+       *
+       *  Although not advisable to use we provide an interface to obtain the inversion
+       *  at the unit circle as a transformation to the so called conformal space
+       *  We provide the self-inverse for of the transformation
+       *  - \f$X = x / (x^2 + y^2 - r^2)\f$
+       *  - \f$Y = y / (x^2 + y^2 - r^2)\f$
+       *  - \f$R = r / (x^2 + y^2 - r^2)\f$
+       **/
+      Circle2D conformalTransformed(const Vector2D& relativeTo) const;
 
       /// String output operator for wire hit objects to help debugging.
       friend std::ostream& operator<<(std::ostream& output, const CDCWireHit& wirehit)

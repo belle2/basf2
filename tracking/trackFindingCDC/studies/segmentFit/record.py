@@ -24,8 +24,6 @@ import tracking.validation.refiners as refiners
 
 import trackfindingcdc.validation.cdc_peelers as cdc_peelers
 
-from trackfindingcdc import SegmentFitterModule
-
 import logging
 
 

@@ -109,13 +109,11 @@ namespace Belle2 {
         float rMin = node->getYMin();
         float rMax = node->getYMax();
 
-        float cosThetaMin = trigonometricalLookupTable.cosTheta(thetaMin);
-        float sinThetaMin = trigonometricalLookupTable.sinTheta(thetaMin);
-        float cosThetaMax = trigonometricalLookupTable.cosTheta(thetaMax);
-        float sinThetaMax = trigonometricalLookupTable.sinTheta(thetaMax);
+        Vector2D thetaVecMin = trigonometricalLookupTable.thetaVec(thetaMin);
+        Vector2D thetaVecMax = trigonometricalLookupTable.thetaVec(thetaMax);
 
-        float rHitMin = hit->getConformalX() * cosThetaMin + hit->getConformalY() * sinThetaMin;
-        float rHitMax = hit->getConformalX() * cosThetaMax + hit->getConformalY() * sinThetaMax;
+        float rHitMin = thetaVecMin.dot(hit->getConformalPos2D());
+        float rHitMax = thetaVecMax.dot(hit->getConformalPos2D());
 
         // compute sinograms at the left and right borders of the node
         float rHitMin1 = rHitMin - hit->getConformalDriftLength();
@@ -155,9 +153,8 @@ namespace Belle2 {
           valueToReturn = true;
         } else {
 
-          float rHitMinExtr = -1.*hit->getConformalX() * sinThetaMin + hit->getConformalY() * cosThetaMin;
-          float rHitMaxExtr = -1.*hit->getConformalX() * sinThetaMax + hit->getConformalY() * cosThetaMax;
-
+          float rHitMinExtr = thetaVecMin.cross(hit->getConformalPos2D());
+          float rHitMaxExtr = thetaVecMax.cross(hit->getConformalPos2D());
           if (rHitMinExtr * rHitMaxExtr < 0.) valueToReturn = checkExtremum(node, hit);
         }
 
@@ -383,15 +380,11 @@ namespace Belle2 {
       {
         TrigonometricalLookupTable<>& trigonometricalLookupTable = TrigonometricalLookupTable<>::Instance();
 
-        float rMinD = -1.*hit->getConformalX() * trigonometricalLookupTable.sinTheta(node->getXMin())
-                      + hit->getConformalY() * trigonometricalLookupTable.cosTheta(node->getXMin());
 
-        float rMaxD = -1.*hit->getConformalX() * trigonometricalLookupTable.sinTheta(node->getXMax())
-                      + hit->getConformalY() * trigonometricalLookupTable.cosTheta(node->getXMax());
+        float rMinD = trigonometricalLookupTable.thetaVec(node->getXMin()).cross(hit->getConformalPos2D());
+        float rMaxD = trigonometricalLookupTable.thetaVec(node->getXMax()).cross(hit->getConformalPos2D());
 
-
-//        float rMean = node->getYMean();
-
+        // float rMean = node->getYMean();
         if ((rMinD > 0) && (rMaxD * rMinD >= 0)) return true;
         if ((rMaxD * rMinD < 0)) return true;
         return false;
@@ -408,7 +401,7 @@ namespace Belle2 {
       bool checkExtremum(QuadTree* node, ConformalCDCWireHit* hit) const
       {
 
-        double thetaExtremum = atan2(hit->getConformalY(), hit->getConformalX());
+        double thetaExtremum = hit->getConformalPos2D().phi();
 
         double pi = boost::math::constants::pi<double>();
 
@@ -421,11 +414,9 @@ namespace Belle2 {
 
         if ((thetaExtremumLookup > node->getXMax()) || (thetaExtremumLookup < node->getXMin())) return false;
 
-        double rD = hit->getConformalX() * trigonometricalLookupTable.cosTheta(thetaExtremumLookup)
-                    + hit->getConformalY() * trigonometricalLookupTable.sinTheta(thetaExtremumLookup);
-
+        Vector2D thetaVec = trigonometricalLookupTable.thetaVec(thetaExtremumLookup);
+        double rD = thetaVec.dot(hit->getConformalPos2D());
         if ((rD > node->getYMin()) && (rD < node->getYMax())) return true;
-
 
         return false;
       }

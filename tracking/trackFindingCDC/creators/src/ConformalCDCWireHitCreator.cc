@@ -16,29 +16,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void ConformalCDCWireHitCreator::copyHitsFromTopology(std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
-{
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  const VectorRange<CDCWireHit>& cdcWireHits = wireHitTopology.getWireHits();
-
-  B2DEBUG(90, "Number of digitized hits: " << cdcWireHits.size());
-  if (cdcWireHits.size() == 0) {
-    B2WARNING("cdcHitsCollection is empty!");
-  }
-
-  conformalCDCWireHitList.reserve(cdcWireHits.size());
-  for (const CDCWireHit& cdcWireHit : cdcWireHits) {
-    if (cdcWireHit.getAutomatonCell().hasTakenFlag()) continue;
-    conformalCDCWireHitList.emplace_back(&cdcWireHit);
-    const ConformalCDCWireHit& newlyAddedHit = conformalCDCWireHitList.back();
-    if (not(newlyAddedHit.checkHitDriftLength() and newlyAddedHit.getCDCWireHit()->isAxial())) {
-      conformalCDCWireHitList.pop_back();
-    }
-  }
-  B2DEBUG(90, "Number of hits to be used by legendre track finder: " << conformalCDCWireHitList.size() << " axial.");
-}
-
-
 std::vector<ConformalCDCWireHit*> ConformalCDCWireHitCreator::createConformalCDCWireHitListForQT(
   std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
 {

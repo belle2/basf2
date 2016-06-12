@@ -56,6 +56,13 @@ TrackFinderCDCLegendreTrackingModule::TrackFinderCDCLegendreTrackingModule() :
            false);
 }
 
+void TrackFinderCDCLegendreTrackingModule::initialize()
+{
+  StoreWrappedObjPtr<std::vector<CDCWireHit> > storedWireHits("CDCWireHitVector");
+  storedWireHits.isRequired();
+  Super::initialize();
+}
+
 void TrackFinderCDCLegendreTrackingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
   B2ASSERT("Maximal level of QuadTree search is setted to be greater than lookuptable grid level! ",
@@ -72,7 +79,25 @@ void TrackFinderCDCLegendreTrackingModule::startNewEvent()
   B2DEBUG(100, "**********   CDCTrackingModule  ************");
 
   B2DEBUG(100, "Initializing hits");
-  ConformalCDCWireHitCreator::copyHitsFromTopology(m_conformalCDCWireHitList);
+  StoreWrappedObjPtr<std::vector<CDCWireHit> > storedWireHits("CDCWireHitVector");
+  const std::vector<CDCWireHit>& wireHits = *storedWireHits;
+
+  m_conformalCDCWireHitList.reserve(wireHits.size());
+  for (const CDCWireHit& wireHit : wireHits) {
+    // Skip taken hits
+    if (wireHit.getAutomatonCell().hasTakenFlag()) continue;
+
+    // Only select axial hits for legendre tracking
+    if (not wireHit.isAxial()) continue;
+
+    m_conformalCDCWireHitList.emplace_back(&wireHit);
+    const ConformalCDCWireHit& newlyAddedHit = m_conformalCDCWireHitList.back();
+    if (not newlyAddedHit.checkHitDriftLength()) {
+      m_conformalCDCWireHitList.pop_back();
+    }
+  }
+
+  B2DEBUG(90, "Number of hits to be used by legendre track finder: " << m_conformalCDCWireHitList.size() << " axial.");
 }
 
 void TrackFinderCDCLegendreTrackingModule::findTracks()

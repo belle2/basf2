@@ -29,9 +29,16 @@ namespace Belle2 {
    */
   class TrackFinderCDCLegendreTrackingModule: public TrackFinderCDCBaseModule {
 
+  private:
+    /// Type of the base class
+    using Super = TrackFinderCDCBaseModule;
+
   public:
     /// Create and allocate memory for variables here and add the module parameters in this method.
     TrackFinderCDCLegendreTrackingModule();
+
+    /// Initialisation before the event processing starts
+    void initialize();
 
   private:
     /// Parameter

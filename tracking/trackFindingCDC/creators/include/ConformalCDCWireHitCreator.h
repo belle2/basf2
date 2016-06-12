@@ -28,13 +28,6 @@ namespace Belle2 {
     class ConformalCDCWireHitCreator {
     public:
       /**
-       * Compile the hitList from the wire hit topology.
-       * The method goes through all wire hits from the wire hit topology and creates a ConformalCDCWireHit for each.
-       * This ConformalCDCWireHit is however only added to the list, if is fulfills some quality criteria.
-       */
-      static void copyHitsFromTopology(std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
-
-      /**
        * For the use in the QuadTree use this hit set.
        * @return the hit set with axial hits to use in the QuadTree-Finding.
        */

@@ -11,7 +11,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/creators/ConformalCDCWireHitCreator.h>
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 #include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>

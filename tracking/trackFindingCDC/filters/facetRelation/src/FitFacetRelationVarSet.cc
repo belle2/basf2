@@ -29,10 +29,10 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
   if (not extracted or not ptrFacetRelation) return false;
 
   const CDCFacet* fromFacet = ptrFacetRelation->first;
-  const CDCFacet* toFacet = ptrFacetRelation->second;
+  const CDCFacet* toFacet   = ptrFacetRelation->second;
 
-  const Vector2D& fromTangential = fromFacet->getStartToEndLine().tangential();
-  const Vector2D& toTangential = toFacet->getStartToEndLine().tangential();
+  Vector2D fromTangential = fromFacet->getStartToEndLine().tangential();
+  Vector2D toTangential   = toFacet->getStartToEndLine().tangential();
 
   Vector2D tangential = Vector2D::average(fromTangential, toTangential);
 

@@ -20,7 +20,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     class CDCTrack;
-    class ConformalCDCWireHit;
+    class CDCConformalHit;
     class CDCRecoHit3D;
     class CDCTrajectory2D;
     class CDCWireHit;
@@ -49,7 +49,7 @@ namespace Belle2 {
       static void reassignHitsFromOtherTracks(CDCTrackList& cdcTrackList);
 
       /** Append unused hits to tracks */
-      static void appendUnusedHits(std::vector<CDCTrack>& tracks, const std::vector<ConformalCDCWireHit*>& conformalCDCWireHitList);
+      static void appendUnusedHits(std::vector<CDCTrack>& tracks, const std::vector<CDCConformalHit*>& conformalCDCWireHitList);
 
       /** Delete all hits marked as bad (MASKED) in a track. Should be called after every hit reassignment. */
       static void deleteAllMarkedHits(CDCTrack& track);
@@ -67,7 +67,7 @@ namespace Belle2 {
       static ESign getChargeSign(CDCTrack& track) ;
 
       /// Reset all masked hits.
-      static void resetMaskedHits(CDCTrackList& cdcTrackList, std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
+      static void resetMaskedHits(CDCTrackList& cdcTrackList, std::vector<CDCConformalHit>& conformalCDCWireHitList);
 
       /// Unset the MASKED flag and set the TAKEN flag of all hits but do not touch the track flags.
       static void unmaskHitsInTrack(CDCTrack& track);
@@ -83,7 +83,7 @@ namespace Belle2 {
       static void deleteHitsFarAwayFromTrajectory(CDCTrack& trackCandidate, double maximum_distance = 0.2);
 
       /// Assign new hits to the track basing on the distance from the hit to the track.
-      static void assignNewHitsToTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+      static void assignNewHitsToTrack(CDCTrack& track, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
                                        double minimal_distance_to_track = 0.15);
 
       /// Mask hits after breaks in the superlayer as masked and delete them.

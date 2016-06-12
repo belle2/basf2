@@ -10,7 +10,7 @@
 
 
 #pragma once
-#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
@@ -23,7 +23,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /** A QuadTreeProcessor for TrackHits */
-    class AxialHitQuadTreeProcessorWithNewReferencePoint : public QuadTreeProcessorTemplate<float, float, ConformalCDCWireHit, 2, 2> {
+    class AxialHitQuadTreeProcessorWithNewReferencePoint : public QuadTreeProcessorTemplate<float, float, CDCConformalHit, 2, 2> {
 
     public:
 
@@ -49,14 +49,14 @@ namespace Belle2 {
 
     public:
 
-      /// Provide ConformalCDCWireHit to process.
-      void provideItemsSet(std::vector<ConformalCDCWireHit*>& itemsVector) override final
+      /// Provide CDCConformalHit to process.
+      void provideItemsSet(std::vector<CDCConformalHit*>& itemsVector) override final
       {
         clear();
 
         std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
         quadtreeItemsVector.reserve(itemsVector.size());
-        for (ConformalCDCWireHit* item : itemsVector) {
+        for (CDCConformalHit* item : itemsVector) {
           if (item->getUsedFlag()) continue;
           if (insertItemInNode(m_quadTree, item, 0, 0))
             quadtreeItemsVector.push_back(new ItemType(item));
@@ -66,9 +66,9 @@ namespace Belle2 {
       /**
        * @return Hits which belong to the QuadTree
        */
-      std::vector<ConformalCDCWireHit*> getAssignedHits()
+      std::vector<CDCConformalHit*> getAssignedHits()
       {
-        std::vector<ConformalCDCWireHit*> itemsToReturn;
+        std::vector<CDCConformalHit*> itemsToReturn;
         itemsToReturn.reserve(m_quadTree->getNItems());
 
         for (ItemType* item : m_quadTree->getItemsVector()) {
@@ -81,7 +81,7 @@ namespace Belle2 {
       /**
        * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node
        */
-      inline bool insertItemInNode(QuadTree* node, ConformalCDCWireHit* hit, unsigned int /*t_index*/,
+      inline bool insertItemInNode(QuadTree* node, CDCConformalHit* hit, unsigned int /*t_index*/,
                                    unsigned int /*r_index*/) const override final
       {
         float dist_1[2][2];

@@ -25,15 +25,15 @@ namespace Belle2 {
      *  These variables are precalculated and cached in this object for faster calculation times in the
      *  quad tree. The flags of the wire hit are accessible through the interface also (only for convenience).
      */
-    class ConformalCDCWireHit {
+    class CDCConformalHit {
 
     public:
       /**
-       *  Constructor to create a ConformalCDCWireHit from a CDCWireHit object.
-       *  Some member variables specific to the ConformalCDCWireHit are initialized
+       *  Constructor to create a CDCConformalHit from a CDCWireHit object.
+       *  Some member variables specific to the CDCConformalHit are initialized
        *  (e.g. the conformal transformed position).
        */
-      explicit ConformalCDCWireHit(const CDCWireHit* wireHit);
+      explicit CDCConformalHit(const CDCWireHit* wireHit);
 
       /** Returns the Hit position (X coordinate) in the conformal plane.*/
       const Vector2D& getConformalPos2D() const

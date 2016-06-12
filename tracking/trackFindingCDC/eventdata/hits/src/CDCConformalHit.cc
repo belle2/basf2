@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
@@ -17,14 +17,14 @@ using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
 
-ConformalCDCWireHit::ConformalCDCWireHit(const CDCWireHit* wireHit)
+CDCConformalHit::CDCConformalHit(const CDCWireHit* wireHit)
   : m_wireHit(wireHit)
 {
   assert(wireHit);
   std::tie(m_conformalPos2D, m_conformalDriftLength) = performConformalTransformWithRespectToPoint(Vector2D(0, 0));
 }
 
-std::tuple<Vector2D, double> ConformalCDCWireHit::performConformalTransformWithRespectToPoint(const Vector2D& pos2D) const
+std::tuple<Vector2D, double> CDCConformalHit::performConformalTransformWithRespectToPoint(const Vector2D& pos2D) const
 {
   Vector2D relPos2D = m_wireHit->getRefPos2D() - pos2D;
   double denominator = 2 / (relPos2D.normSquared() - square(m_wireHit->getRefDriftLength()));
@@ -35,7 +35,7 @@ std::tuple<Vector2D, double> ConformalCDCWireHit::performConformalTransformWithR
 }
 
 
-bool ConformalCDCWireHit::checkHitDriftLength() const
+bool CDCConformalHit::checkHitDriftLength() const
 {
   //Get the position of the hit wire from CDCGeometryParameters
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();

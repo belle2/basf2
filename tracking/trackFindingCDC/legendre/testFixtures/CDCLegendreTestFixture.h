@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 #include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
@@ -45,7 +45,7 @@ namespace Belle2 {
         }
 
         for (CDCWireHit& hit : m_hitList) {
-          m_trackHitWrapperList.push_back(new ConformalCDCWireHit(&hit));
+          m_trackHitWrapperList.push_back(new CDCConformalHit(&hit));
         }
 
       }
@@ -56,14 +56,14 @@ namespace Belle2 {
         // clean-up hits. Here the assumption is use that
         // no testing code modifies the trackHitWrapperList
 
-        for (ConformalCDCWireHit* pHit : m_trackHitWrapperList) {
+        for (CDCConformalHit* pHit : m_trackHitWrapperList) {
           delete pHit;
         }
         m_trackHitWrapperList.clear();
       }
 
       /// Get vector of the generated hits
-      std::vector<ConformalCDCWireHit*>& getHitVector()
+      std::vector<CDCConformalHit*>& getHitVector()
       {
         return m_trackHitWrapperList;
       }
@@ -71,7 +71,7 @@ namespace Belle2 {
       /// Mark hits as unused (for further QuadTree look-up)
       void markAllHitsAsUnused()
       {
-        for (ConformalCDCWireHit* hit : m_trackHitWrapperList) {
+        for (CDCConformalHit* hit : m_trackHitWrapperList) {
           hit->setUsedFlag(false);
         }
       }
@@ -90,7 +90,7 @@ namespace Belle2 {
 
       std::vector<CDCWireHit> m_hitList; /**< List of the generated CDCWireHits */
       std::vector<CDCTrack> m_trackList; /**< List of the generated CDCTracks */
-      std::vector<ConformalCDCWireHit*> m_trackHitWrapperList; /**< List of the generated ConformalCDCWireHit */
+      std::vector<CDCConformalHit*> m_trackHitWrapperList; /**< List of the generated CDCConformalHit */
 
       /**
        * Generate track candidate

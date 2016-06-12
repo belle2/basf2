@@ -17,7 +17,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 
@@ -27,7 +27,7 @@ using namespace TrackFindingCDC;
 
 
 void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CDCWireHit*>& hits,
-                                                            const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                                            const std::vector<CDCConformalHit>& conformalCDCWireHitList,
                                                             CDCTrackList& cdcTrackList)
 {
   if (hits.size() == 0) return;
@@ -42,7 +42,7 @@ void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CD
   postprocessTrack(track, conformalCDCWireHitList, cdcTrackList);
 }
 
-void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
                                       CDCTrackList& cdcTrackList)
 {
   TrackQualityTools::normalizeTrack(track);
@@ -94,7 +94,7 @@ bool TrackProcessor::checkTrackQuality(const CDCTrack& track, CDCTrackList& cdcT
   return true;
 }
 
-void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList)
+void TrackProcessor::assignNewHits(const std::vector<CDCConformalHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList)
 {
   cdcTrackList.getCDCTracks().erase(std::remove_if(cdcTrackList.getCDCTracks().begin(), cdcTrackList.getCDCTracks().end(),
   [](const CDCTrack & track) {

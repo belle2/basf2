@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 #include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 
 namespace Belle2 {
@@ -48,7 +48,7 @@ namespace Belle2 {
     /// Worker
     TrackFindingCDC::CDCTrackList
     m_cdcTrackList;      /**< Object for holding all found cdc tracks to be passed around to the postprocessing functions. */
-    std::vector<TrackFindingCDC::ConformalCDCWireHit>
+    std::vector<TrackFindingCDC::CDCConformalHit>
     m_conformalCDCWireHitList; /**< List for holding all used conformal CDC wire hits. */
 
     void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks);

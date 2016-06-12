@@ -49,7 +49,7 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
   std::vector<AxialHitQuadTreeProcessor::ReturnList> candidates;
 
   markAllHitsAsUnused();
-  std::vector<ConformalCDCWireHit*>& hitsVector = getHitVector();
+  std::vector<CDCConformalHit*>& hitsVector = getHitVector();
 
   AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdProcessor = [&candidates](const AxialHitQuadTreeProcessor::ReturnList & hits,
   AxialHitQuadTreeProcessor::QuadTree*) {

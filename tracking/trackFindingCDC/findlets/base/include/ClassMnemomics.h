@@ -15,7 +15,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     class CDCWireHit;
-    class ConformalCDCWireHit;
+    class CDCConformalHit;
     class CDCWireHitCluster;
     class CDCFacet;
     class CDCRecoSegment2D;
@@ -38,11 +38,11 @@ namespace Belle2 {
 
 
 
-      /// Returns a short name for class ConformalCDCWireHit to be used in names of parameters.
-      static std::string getParameterName(const ConformalCDCWireHit*) { return "conformalHit"; }
+      /// Returns a short name for class CDCConformalHit to be used in names of parameters.
+      static std::string getParameterName(const CDCConformalHit*) { return "conformalHit"; }
 
-      /// Returns a short description for class ConformalCDCWireHit to be used in descriptions of parameters.
-      static std::string getParameterDescription(const ConformalCDCWireHit*) { return "conformal hit"; }
+      /// Returns a short description for class CDCConformalHit to be used in descriptions of parameters.
+      static std::string getParameterDescription(const CDCConformalHit*) { return "conformal hit"; }
 
 
 

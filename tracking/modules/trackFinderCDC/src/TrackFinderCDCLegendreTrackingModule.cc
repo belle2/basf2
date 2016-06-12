@@ -91,7 +91,7 @@ void TrackFinderCDCLegendreTrackingModule::startNewEvent()
     if (not wireHit.isAxial()) continue;
 
     m_conformalCDCWireHitList.emplace_back(&wireHit);
-    const ConformalCDCWireHit& newlyAddedHit = m_conformalCDCWireHitList.back();
+    const CDCConformalHit& newlyAddedHit = m_conformalCDCWireHitList.back();
     if (not newlyAddedHit.checkHitDriftLength()) {
       m_conformalCDCWireHitList.pop_back();
     }
@@ -115,8 +115,8 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
     AxialHitQuadTreeProcessor qtProcessor = quadTreeParameters.constructQTProcessor();
 
     //Prepare vector of QuadTreeHitWrapper* to provide it to the qt processor
-    std::vector<ConformalCDCWireHit*> hitsVector;
-    for (ConformalCDCWireHit& trackHit : m_conformalCDCWireHitList) {
+    std::vector<CDCConformalHit*> hitsVector;
+    for (CDCConformalHit& trackHit : m_conformalCDCWireHitList) {
       if (trackHit.getUsedFlag() or trackHit.getMaskedFlag()) continue;
       hitsVector.push_back(&trackHit);
     }

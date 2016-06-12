@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 
@@ -41,7 +41,7 @@ void HitProcessor::updateRecoHit3D(CDCTrajectory2D& trackTrajectory2D, CDCRecoHi
 }
 
 
-void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, const std::vector<ConformalCDCWireHit*>& axialHitList)
+void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, const std::vector<CDCConformalHit*>& axialHitList)
 {
   for (CDCTrack& trackCandidate : trackCandidates) {
     if (trackCandidate.size() < 5) continue;
@@ -51,7 +51,7 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, cons
     CDCTrajectory2D trackTrajectory2D = trackCandidate.getStartTrajectory3D().getTrajectory2D();
 
 
-    for (const ConformalCDCWireHit* hit : axialHitList) {
+    for (const CDCConformalHit* hit : axialHitList) {
       if (hit->getUsedFlag() || hit->getMaskedFlag()) continue;
 
       ERightLeft rlInfo = trackTrajectory2D.isRightOrLeft(hit->getWireHit()->getRefPos2D());
@@ -263,9 +263,9 @@ ESign HitProcessor::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
 
 }
 
-void HitProcessor::resetMaskedHits(CDCTrackList& cdcTrackList, std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
+void HitProcessor::resetMaskedHits(CDCTrackList& cdcTrackList, std::vector<CDCConformalHit>& conformalCDCWireHitList)
 {
-  for (ConformalCDCWireHit& hit : conformalCDCWireHitList) {
+  for (CDCConformalHit& hit : conformalCDCWireHitList) {
     hit.setMaskedFlag(false);
     hit.setUsedFlag(false);
   }
@@ -295,7 +295,7 @@ void HitProcessor::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maxim
   deleteAllMarkedHits(track);
 }
 
-void HitProcessor::assignNewHitsToTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+void HitProcessor::assignNewHitsToTrack(CDCTrack& track, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
                                         double minimal_distance_to_track)
 {
   if (track.size() < 10) return;
@@ -303,7 +303,7 @@ void HitProcessor::assignNewHitsToTrack(CDCTrack& track, const std::vector<Confo
 
   const CDCTrajectory2D& trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
 
-  for (const ConformalCDCWireHit& hit : conformalCDCWireHitList) {
+  for (const CDCConformalHit& hit : conformalCDCWireHitList) {
     if (hit.getUsedFlag() or hit.getMaskedFlag()) {
       continue;
     }

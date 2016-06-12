@@ -21,7 +21,7 @@ namespace Belle2 {
     class CDCTrack;
     class CDCWireHit;
     class CDCTrackList;
-    class ConformalCDCWireHit;
+    class CDCConformalHit;
     class CDCTrajectory2D;
 
     /// Class with high-level track (post)processing.
@@ -38,17 +38,17 @@ namespace Belle2 {
 
       /// Create CDCTrack using CDCWireHit hits and store it in the list. Then call the postprocessing on it.
       static void addCandidateFromHitsWithPostprocessing(std::vector<const CDCWireHit*>& hits,
-                                                         const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                                         const std::vector<CDCConformalHit>& conformalCDCWireHitList,
                                                          CDCTrackList& cdcTrackList);
 
       /// Assign new hits to all tracks (using the assignNewHitsToTrack(CDCTrack&) method of the HitsProcessor).
-      static void assignNewHits(const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList);
+      static void assignNewHits(const std::vector<CDCConformalHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList);
 
       /// Check the p-values of the tracks. If they are below the given value, delete the track from the list.
       static void deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackList, double minimal_probability_for_good_fit = 0.4);
 
       /// Perform all track postprocessing.
-      static void postprocessTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+      static void postprocessTrack(CDCTrack& track, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
                                    CDCTrackList& cdcTrackList);
 
     private:

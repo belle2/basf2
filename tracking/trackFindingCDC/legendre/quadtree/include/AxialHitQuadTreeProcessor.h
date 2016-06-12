@@ -16,7 +16,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
@@ -33,10 +33,10 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class ConformalCDCWireHit;
+    class CDCConformalHit;
 
     /** A QuadTreeProcessor for TrackHits */
-    class AxialHitQuadTreeProcessor : public QuadTreeProcessorTemplate<unsigned long, float, ConformalCDCWireHit, 2, 2> {
+    class AxialHitQuadTreeProcessor : public QuadTreeProcessorTemplate<unsigned long, float, CDCConformalHit, 2, 2> {
 
     public:
 
@@ -92,7 +92,7 @@ namespace Belle2 {
        * @param hit hit being checked
        * @return returns true if sinogram of the hit crosses (geometrically) borders of the node
        */
-      inline bool insertItemInNode(QuadTree* node, ConformalCDCWireHit* hit, unsigned int /*t_index*/,
+      inline bool insertItemInNode(QuadTree* node, CDCConformalHit* hit, unsigned int /*t_index*/,
                                    unsigned int /*r_index*/) const override final
       {
         typedef std::array< std::array<float, 2>, 2> Quadlet;
@@ -376,7 +376,7 @@ namespace Belle2 {
        * @return returns false in other cases (namely negative derivative
        *
        */
-      bool checkDerivative(QuadTree* node, ConformalCDCWireHit* hit) const
+      bool checkDerivative(QuadTree* node, CDCConformalHit* hit) const
       {
         TrigonometricalLookupTable<>& trigonometricalLookupTable = TrigonometricalLookupTable<>::Instance();
 
@@ -398,7 +398,7 @@ namespace Belle2 {
        * @param hit hit to check
        * @return true or false
        */
-      bool checkExtremum(QuadTree* node, ConformalCDCWireHit* hit) const
+      bool checkExtremum(QuadTree* node, CDCConformalHit* hit) const
       {
 
         double thetaExtremum = hit->getConformalPos2D().phi();

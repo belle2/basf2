@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
-#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <TMath.h>
@@ -27,7 +27,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
                               CDCTrackList& cdcTrackList)
 {
   if (track1 == track2) return;
@@ -49,7 +49,7 @@ void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vec
 
 }
 
-void TrackMerger::doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+void TrackMerger::doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
                                   double minimum_probability_to_be_merged)
 {
   // Search for best matches
@@ -120,7 +120,7 @@ TrackMerger::BestMergePartner TrackMerger::calculateBestTrackToMerge(CDCTrack& t
 
 
 void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& cdcTrackList,
-                                                 const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                                 const std::vector<CDCConformalHit>& conformalCDCWireHitList,
                                                  double minimum_probability_to_be_merged)
 {
   B2DEBUG(100, "Merger: Initial nCands = " << cdcTrackList.getCDCTracks().size());

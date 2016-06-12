@@ -14,8 +14,7 @@ import numpy as np
 from tracking.run.event_generation import StandardEventGenerationRun
 from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 
-from tracking.utilities import NonstrictChoices
-from tracking.validation.utilities import prob, is_primary
+from tracking.validation.utilities import is_primary
 from tracking.validation.plot import ValidationPlot
 
 import tracking.validation.harvesting as harvesting
@@ -23,7 +22,7 @@ import tracking.validation.refiners as refiners
 
 import trackfindingcdc.validation.cdc_peelers as cdc_peelers
 
-from trackfindingcdc import SegmentFitterModule, AxialStereoPairFitterModule
+from trackfindingcdc import AxialStereoPairFitterModule
 
 import logging
 
@@ -36,32 +35,28 @@ CONTACT = "oliver.frost@desy.de"
 
 
 class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
-    segment_finder_module = basf2.register_module("SegmentFinderCDCMCTruth")
-    segment_finder_module.param({"MinCDCHits": 4})
+    n_events = 10000
+    generator_module = "simple_gun"  # Rather high momentum tracks should make the tracks rather straight.
 
-    segment_pair_finder_module = basf2.register_module("TrackFinderCDCSegmentPairAutomatonDev")
-    segment_pair_finder_module.param({
-        "WriteSegmentPairs": True,
-        "SegmentPairFilter": "truth",
-        "SegmentPairRelationFilter": "none",
-    })
+    monte_carlo = "no"
+    flight_time_estimation = "none"
+    flight_time_reestimation = False
+    use_alpha_in_drift_length = False
+
     fit_method_name = "fuse-xy"
     # Specification for BrowseTFileOnTerminateRunMixin
     output_file_name = "SegmentPairFitValidation.root"
 
     def create_argument_parser(self, **kwds):
-        argument_parser = super(SegmentPairFitValidationRun, self).create_argument_parser(**kwds)
+        argument_parser = super().create_argument_parser(**kwds)
 
         argument_parser.add_argument(
-            '-f',
-            '--segment-finder',
-            choices=NonstrictChoices([
-                'SegmentFinderCDCMCTruth',
-                'SegmentFinderCDCFacetAutomaton'
-            ]),
-            default=self.segment_finder_module,
-            dest='segment_finder_module',
-            help='Name of the segment finder module to be used to generate the segments',
+            '-m',
+            '--monte-carlo',
+            choices=["no", "medium", "full"],
+            default=self.monte_carlo,
+            dest='monte_carlo',
+            help='Amount of monte carlo information to be used in the segment generation.',
         )
 
         argument_parser.add_argument(
@@ -121,20 +116,45 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
-        main_path = super(SegmentPairFitValidationRun, self).create_path()
+        path = super().create_path()
 
-        segment_finder_module = self.get_basf2_module(self.segment_finder_module)
-        main_path.add_module(segment_finder_module)
+        path.add_module("WireHitTopologyPreparer",
+                        flightTimeEstimation="outwards")
 
-        main_path.add_module(SegmentFitterModule())
+        if self.monte_carlo == "no":
+            # MC free - default
+            path.add_module("SegmentFinderCDCFacetAutomaton",
+                            SegmentOrientation="outwards")
 
-        segment_pair_finder_module = self.get_basf2_module(self.segment_pair_finder_module)
-        main_path.add_module(segment_pair_finder_module)
+        elif self.monte_carlo == "medium":
+            # Medium MC - proper generation logic, but true facets and facet relations
+            path.add_module("SegmentFinderCDCFacetAutomaton",
+                            FacetFilter="truth",
+                            FacetRelationFilter="truth",
+                            SegmentOrientation="outwards")
 
-        main_path.add_module(AxialStereoPairFitterModule(fit_method=self.get_fit_method()))
-        main_path.add_module(SegmentPairFitValidationModule(self.output_file_name))
+        elif self.monte_carlo == "full":
+            # Only true monte carlo segments, but make the positions realistic
+            path.add_module("SegmentCreatorMCTruth",
+                            reconstructedPositions=True)
 
-        return main_path
+        else:
+            raise ValueError("Invalid degree of Monte Carlo information")
+
+        path.add_module("SegmentFitter",
+                        segments="CDCRecoSegment2DVector",
+                        updateDriftLength=True,
+                        useAlphaInDriftLength=True)
+
+        path.add_module("TrackFinderCDCSegmentPairAutomatonDev",
+                        WriteSegmentPairs=True,
+                        SegmentPairFilter="truth",
+                        SegmentPairRelationFilter="none")
+
+        path.add_module(AxialStereoPairFitterModule(fit_method=self.get_fit_method()))
+        path.add_module(SegmentPairFitValidationModule(self.output_file_name))
+
+        return path
 
 
 class SegmentPairFitValidationModule(harvesting.HarvestingModule):
@@ -158,24 +178,24 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
 
     def pick(self, segment_pair_relation):
         mc_segment_lookup = self.mc_segment_lookup
-        start_segment = segment_pair_relation.getStartSegment()
-        end_segment = segment_pair_relation.getEndSegment()
-        mc_particle = mc_segment_lookup.getMCParticle(start_segment)
+        from_segment = segment_pair_relation.getFromSegment()
+        to_segment = segment_pair_relation.getToSegment()
+        mc_particle = mc_segment_lookup.getMCParticle(from_segment)
         return (mc_particle and
                 is_primary(mc_particle) and
-                start_segment.size() > 3 and
-                end_segment.size() > 3)
+                from_segment.size() > 3 and
+                to_segment.size() > 3)
 
     def peel(self, segment_pair_relation):
         mc_segment_lookup = self.mc_segment_lookup
 
-        start_segment = segment_pair_relation.getStartSegment()
-        end_segment = segment_pair_relation.getEndSegment()
+        from_segment = segment_pair_relation.getFromSegment()
+        to_segment = segment_pair_relation.getToSegment()
 
-        mc_particle = mc_segment_lookup.getMCParticle(start_segment)
+        mc_particle = mc_segment_lookup.getMCParticle(from_segment)
 
         # Take the fit best at the middle of the segment pair
-        fit3d_truth = mc_segment_lookup.getTrajectory3D(end_segment)
+        fit3d_truth = mc_segment_lookup.getTrajectory3D(to_segment)
 
         truth_crops = dict(
             curvature_truth=fit3d_truth.getCurvatureXY(),

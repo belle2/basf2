@@ -69,14 +69,14 @@ def peel_trajectory3d(trajectory3d, key="{part_name}"):
 
 @peelers.format_crop_keys
 def peel_segment_pair_relation(segment_pair_relation, key="{part_name}"):
-    start_segment = segment_pair_relation.getStartSegment()
-    end_segment = segment_pair_relation.getEndSegment()
+    from_segment = segment_pair_relation.getFromSegment()
+    to_segment = segment_pair_relation.getToSegment()
 
-    start_segment_crops = peel_segment2d(start_segment, key="start_{part_name}")
-    end_segment_crops = peel_segment2d(end_segment, key="end_{part_name}")
+    from_segment_crops = peel_segment2d(from_segment, key="from_{part_name}")
+    to_segment_crops = peel_segment2d(to_segment, key="to_{part_name}")
 
-    sorted_superlayer_ids = sorted([start_segment_crops["start_superlayer_id"],
-                                    end_segment_crops["end_superlayer_id"]])
+    sorted_superlayer_ids = sorted([from_segment_crops["from_superlayer_id"],
+                                    to_segment_crops["to_superlayer_id"]])
 
     superlayer_id_pair = 10.0 * sorted_superlayer_ids[1] + sorted_superlayer_ids[0]
 
@@ -87,8 +87,8 @@ def peel_segment_pair_relation(segment_pair_relation, key="{part_name}"):
         superlayer_id_pair=superlayer_id_pair
     )
 
-    crops.update(start_segment_crops)
-    crops.update(end_segment_crops)
+    crops.update(from_segment_crops)
+    crops.update(to_segment_crops)
     crops.update(trajectory3d_crops)
 
     return crops

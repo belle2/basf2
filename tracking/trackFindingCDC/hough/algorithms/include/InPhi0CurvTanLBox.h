@@ -29,7 +29,9 @@ namespace Belle2 {
 
     public:
       /// Create a new box with the given curler curvature.
-      InPhi0CurvTanLBox(const float& curlCurv) : m_curlCurv(curlCurv) {}
+      explicit InPhi0CurvTanLBox(const float& curlCurv)
+        : m_curlCurv(curlCurv)
+      {}
 
     public:
       /// The box to which this object correspondes.

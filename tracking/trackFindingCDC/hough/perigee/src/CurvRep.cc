@@ -99,7 +99,7 @@ DiscreteCurv::Array CurvBinsSpec::constructInvLinearArray() const
   B2INFO("Width non curling" << widthNonCurling);
   assert(minWidthCurling > widthNonCurling);
 
-  // ++ skips doublication of the identical curvature at m_lowerBound.
+  // ++ skips duplication of the identical curvature at m_lowerBound.
   nonCurlingCurvs.insert(nonCurlingCurvs.end(), ++(curlingCurvs.begin()), curlingCurvs.end());
   B2INFO(nonCurlingCurvs.size());
   B2INFO(nPositions);
@@ -114,7 +114,9 @@ DiscreteCurvWithArcLength2DCache::Array CurvBinsSpec::constructCacheArray() cons
   std::vector<float> discreteCurvs = constructArray();
   std::vector<CurvWithArcLength2DCache> result;
   result.reserve(discreteCurvs.size());
-  result.insert(result.end(), discreteCurvs.begin(), discreteCurvs.end());
+  for (const float& curv : discreteCurvs) {
+    result.emplace_back(curv);
+  }
   return result;
 }
 

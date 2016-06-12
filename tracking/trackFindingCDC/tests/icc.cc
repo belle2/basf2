@@ -22,7 +22,7 @@ namespace {
 
   public:
     /// Simple constructor wrapping a copy of the object.
-    Wrapper(T t) : m_t(t)
+    explicit Wrapper(T t) : m_t(t)
     {}
 
   public:
@@ -57,7 +57,7 @@ namespace {
 
   public:
     /// Simple constructor wrapping a copy of the object.
-    IntWrapper(int t) : m_t(t)
+    explicit IntWrapper(int t) : m_t(t)
     {}
 
   public:

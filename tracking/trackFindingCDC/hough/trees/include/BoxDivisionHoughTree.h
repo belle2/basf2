@@ -24,8 +24,10 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /** A fast hough algorithm with rectangular boxes, which are split linearly by a fixed number of
-     *  divisions in each coordinate up to a maximal level. */
+    /**
+     *  A fast hough algorithm with rectangular boxes, which are split linearly by a fixed number of
+     *  divisions in each coordinate up to a maximal level.
+     */
     template<class AItemPtr, class AHoughBox, size_t ... divisions>
     class BoxDivisionHoughTree {
 
@@ -61,7 +63,7 @@ namespace Belle2 {
     public:
       /// Constructor using the given maximal level.
       template<class...  RangeSpecOverlap>
-      BoxDivisionHoughTree(size_t maxLevel) :
+      explicit BoxDivisionHoughTree(size_t maxLevel) :
         m_maxLevel(maxLevel),
         m_overlaps((divisions * 0) ...)
       {}
@@ -79,7 +81,8 @@ namespace Belle2 {
       size_t getDivision(const size_t i) const
       { return m_divisions[i]; }
 
-      /** Construct the discrete value array at coordinate index I
+      /**
+       *  Construct the discrete value array at coordinate index I
        *  @param lowerBound  Lower bound of the value range
        *  @param upperBound  Upper bound of the value range
        *  @param overlap     Overlap of neighboring bins. Default is no overlap.

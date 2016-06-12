@@ -25,16 +25,19 @@ namespace Belle2 {
     class InPhi0CurvBox {
 
     public:
-      /** Constructor taking the curler curvature
-       *  Curlers with high curvature than the curler curvature may obtain hits from both arms*/
-      InPhi0CurvBox(float curlCurv = NAN) : m_curlCurv(curlCurv) {}
+      /**
+       *  Constructor taking the curler curvature
+       *  Curlers with high curvature than the curler curvature may obtain hits from both arms
+       */
+      explicit InPhi0CurvBox(float curlCurv = NAN) : m_curlCurv(curlCurv) {}
 
     public:
       /// The box to which this object correspondes.
       typedef Box<DiscretePhi0, DiscreteCurv> HoughBox;
 
     public:
-      /** Function that gives the sign of the distance from an observed drift circle to the familiy of curves
+      /**
+       *  Function that gives the sign of the distance from an observed drift circle to the familiy of curves
        *  @returns
        *   * ESign::c_Plus if the drift circle is always on the positive / right site
        *   * ESign::c_Minus means the drift circle is always on the negative / left site

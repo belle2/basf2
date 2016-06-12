@@ -27,14 +27,17 @@ namespace Belle2 {
 
     public:
       /// Constructor taking the curler curvature - give a zero greater 0 to activate one arm exclusive finding.
-      InPhi0ImpactBox(float curlCurv = NAN) : m_curlCurv(curlCurv) {}
+      explicit InPhi0ImpactBox(float curlCurv = NAN)
+        : m_curlCurv(curlCurv)
+      {}
 
     public:
       /// The box to which this object correspondes.
       typedef Box<DiscretePhi0, ContinuousImpact> HoughBox;
 
     public:
-      /** Function that gives the sign of the distance from an observed drift circle to the familiy of curves
+      /**
+       *  Function that gives the sign of the distance from an observed drift circle to the familiy of curves
        *  @returns
        *   * ESign::c_Plus if the drift circle is always on the positive / right site
        *   * ESign::c_Minus means the drift circle is always on the negative / left site

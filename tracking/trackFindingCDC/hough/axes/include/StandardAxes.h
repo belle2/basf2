@@ -32,13 +32,14 @@ namespace Belle2 {
     /// Type for discrete curv values
     using DiscreteCurv = DiscreteValue<float, CurvTag>;
 
-    /** Class representing a curvature value that also caches two dimensional arc length
+    /**
+     *  Class representing a curvature value that also caches two dimensional arc length
      *  to each layer in the CDC
      */
     class CurvWithArcLength2DCache {
     public:
       /// Make cache for one curvature value
-      CurvWithArcLength2DCache(const float& curv);
+      explicit CurvWithArcLength2DCache(const float& curv);
 
       /// Unpack the curvature
       explicit operator float() const
@@ -87,5 +88,6 @@ namespace Belle2 {
 
     /// Type for discrete phi0 values
     using DiscretePhi0 = DiscreteValue<Vector2D, Phi0Tag>;
+
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

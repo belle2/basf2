@@ -19,7 +19,8 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /** Predicate class that is feed the nodes in a WeightedHoughTree walk
+    /**
+     *  Predicate class that is feed the nodes in a WeightedHoughTree walk
      *  It decides if a node should be further expanded and
      *  extracts items from nodes that are considered as leafs to build tracks.
      *
@@ -35,10 +36,12 @@ namespace Belle2 {
 
     public:
       /// Initialize a new processor with the maximum level.
-      AxialLegendreLeafProcessor(const size_t maxLevel) : m_maxLevel(maxLevel)
+      explicit AxialLegendreLeafProcessor(const size_t maxLevel)
+        : m_maxLevel(maxLevel)
       {}
 
-      /** Entry point for the WeightedHoughTree walk to ask
+      /**
+       *  Entry point for the WeightedHoughTree walk to ask
        *  if a node is a leaf that should not be further divided into sub nodes.
        */
       bool operator()(ANode* node)
@@ -67,7 +70,8 @@ namespace Belle2 {
         return node->getLevel() >= m_maxLevel;
       }
 
-      /** A valuable leaf has been found in the hough tree walk extract its content
+      /**
+       *  A valuable leaf has been found in the hough tree walk extract its content
        *  It may pull more hits from the whole tree.
        */
       void processLeaf(ANode* node);

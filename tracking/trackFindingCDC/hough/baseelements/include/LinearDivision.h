@@ -20,7 +20,8 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /** Factory object that constructs sub boxes from a given box with optional overlaps.
+    /**
+     *  Factory object that constructs sub boxes from a given box with optional overlaps.
      *  The number of divisions in each dimension are given as template parameters such
      *  that the total number is know at compile time.
      */
@@ -37,8 +38,8 @@ namespace Belle2 {
 
     public:
       /// Initialise the sub box factory with specific overlaps.
-      LinearDivision(const typename ABox::Delta& overlaps = typename ABox::Delta()) :
-        m_overlaps(overlaps)
+      explicit LinearDivision(const typename ABox::Delta& overlaps = typename ABox::Delta())
+        : m_overlaps(overlaps)
       {}
 
     public:

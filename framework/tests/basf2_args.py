@@ -11,8 +11,6 @@ assert 0 == os.system('basf2 --version')
 
 assert 0 == os.system('basf2 --help')
 
-assert 0 == os.system('basf2 -m')
-
 assert 0 == os.system('basf2 -m RootOutput')
 
 testdir = Belle2.FileSystem.findFile('/framework/tests/')

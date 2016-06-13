@@ -67,12 +67,12 @@ namespace Belle2 {
     bool checkPythonObject(const boost::python::object& pyObject, const boost::variant<Types...>&);
 
     template<typename Scalar>
-    Scalar convertPythonObject(const boost::python::object& pyObject, Scalar defaultValue);
+    Scalar convertPythonObject(const boost::python::object& pyObject, Scalar);
     /** see other templates. */
     template<typename Key, typename Value>
-    std::map<Key, Value> convertPythonObject(const boost::python::object& pyObject, std::map<Key, Value> defaultValue);
+    std::map<Key, Value> convertPythonObject(const boost::python::object& pyObject, std::map<Key, Value>);
     template<typename Value>
-    std::vector<Value> convertPythonObject(const boost::python::object& pyObject, std::vector<Value> defaultValue);
+    std::vector<Value> convertPythonObject(const boost::python::object& pyObject, std::vector<Value>);
     template<typename... Types>
     std::tuple<Types...> convertPythonObject(const boost::python::object& pyObject, std::tuple<Types...>);
     template<typename... Types>

@@ -26,6 +26,10 @@ namespace {
       m_target = 0.0;
       m_isSignal = false;
       m_weight = 1.0;
+      // Suppress cppcheck remark
+      // performance: Variable 'm_a' is assigned in constructor body. Consider performing initialization in initialization list.
+      // Initializing this vector in the initialization list is not readable, and performance is negligible here
+      // cppcheck-suppress *
       m_a = {1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0, 3.0, 3.0, 3.0, 3.0, 4.0, 3.0, 4.0, 4.0, 4.0, 4.0};
     }
 

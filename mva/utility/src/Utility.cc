@@ -125,6 +125,10 @@ namespace Belle2 {
         ROOTDataset data(general_options);
         auto results = expert->apply(data);
         for (auto& r : results) {
+          // Suppress cppcheck false positive
+          // style: Variable 'result' is assigned a value that is never used.
+          // However, it is used, by branch->Fill() internally
+          // cppcheck-suppress *
           result = r;
           branch->Fill();
         }
@@ -137,6 +141,10 @@ namespace Belle2 {
           auto target_branch = tree.Branch(branchname.c_str(), &target, (branchname + "/F").c_str());
           auto targets = data.getTargets();
           for (auto& t : targets) {
+            // Suppress cppcheck false positive
+            // style: Variable 'result' is assigned a value that is never used.
+            // However, it is used, by branch->Fill() internally
+            // cppcheck-suppress *
             target = t;
             target_branch->Fill();
           }

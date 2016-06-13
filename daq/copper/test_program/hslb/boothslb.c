@@ -247,7 +247,10 @@ boot_fpga(mgt_t mgt, char *file, int verbose, int forced, int m012)
   if (verbose || conf != m012) dump_fpga(conf, "(set M012)");
   if (conf != m012) {
     printf("cannot set FPGA to the download mode (M012=%d).%d\n", conf,m012);
-    if (! forced) return -1;
+    if (! forced) {
+      fclose(fp);
+      return -1;
+    }
   }
   
   /* -- programming mode (CONF<=1) -- */

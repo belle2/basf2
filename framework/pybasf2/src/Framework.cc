@@ -11,6 +11,7 @@
 
 #include <framework/pybasf2/Framework.h>
 
+#include <framework/core/PyObjConvUtils.h>
 #include <framework/core/Environment.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/EventProcessor.h>
@@ -161,17 +162,8 @@ std::string Framework::getPicklePath() const
 
 void Framework::setStreamingObjects(boost::python::list streamingObjects)
 {
-  std::vector<std::string> stringVector;
-  int nList = boost::python::len(streamingObjects);
-  for (int i = 0; i < nList; ++i) {
-    extract<std::string> checkValue(streamingObjects[i]);
-    if (checkValue.check()) {
-      stringVector.push_back(checkValue);
-    } else {
-      B2ERROR("set_streamobjs() expects a list of strings, ignoring argument " << i);
-    }
-  }
-  Environment::Instance().setStreamingObjects(stringVector);
+  auto vec = PyObjConvUtils::convertPythonObject(streamingObjects, std::vector<std::string>());
+  Environment::Instance().setStreamingObjects(vec);
 }
 
 //=====================================================================

@@ -82,7 +82,7 @@ namespace Belle2 {
     /**
      * Get alpha-angle point (rad)
      */
-    float getAlphaPoint(unsigned short i)
+    float getAlphaPoint(unsigned short i) const
     {
       return m_alphaPoints[i];
     }
@@ -90,7 +90,7 @@ namespace Belle2 {
     /**
      * Get theta-angle point (rad)
      */
-    float getThetaPoint(unsigned short i)
+    float getThetaPoint(unsigned short i) const
     {
       return m_thetaPoints[i];
     }
@@ -98,7 +98,7 @@ namespace Belle2 {
     /**
      * Get xt parameter
      */
-    float getXTParam(unsigned short iCLayer, unsigned short LR, unsigned short iAlpha, unsigned short iTheta, unsigned short i)
+    float getXTParam(unsigned short iCLayer, unsigned short LR, unsigned short iAlpha, unsigned short iTheta, unsigned short i) const
     {
       return m_xt[iCLayer][LR][iAlpha][iTheta][i];
     }
@@ -106,7 +106,7 @@ namespace Belle2 {
     /**
      * Print all contents
      */
-    void dump()
+    void dump() const
     {
       std::cout << " " << std::endl;
       std::cout << "Contents of xt db" << std::endl;

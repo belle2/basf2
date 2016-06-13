@@ -51,7 +51,7 @@ namespace Belle2 {
     /**
      * Get sigma parameter
      */
-    float getSigmaParam(unsigned short iCLayer, unsigned short i)
+    float getSigmaParam(unsigned short iCLayer, unsigned short i) const
     {
       return m_sigma[iCLayer][i];
     }
@@ -59,7 +59,7 @@ namespace Belle2 {
     /**
      * Print all contents
      */
-    void dump()
+    void dump() const
     {
       std::cout << " " << std::endl;
       std::cout << "Contents of sigma db" << std::endl;

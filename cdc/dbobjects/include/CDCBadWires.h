@@ -68,9 +68,9 @@ namespace Belle2 {
      * @param  wid wire id to be checked
      * @return true if badwire; false if not
      */
-    bool isBadWire(const WireID& wid)
+    bool isBadWire(const WireID& wid) const
     {
-      std::vector<unsigned short>::iterator it = std::find(m_wires.begin(), m_wires.end(), wid.getEWire());
+      std::vector<unsigned short>::const_iterator it = std::find(m_wires.begin(), m_wires.end(), wid.getEWire());
       bool torf = (it != m_wires.end()) ? true : false;
       return torf;
     }

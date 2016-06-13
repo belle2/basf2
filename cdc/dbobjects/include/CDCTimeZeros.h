@@ -83,7 +83,7 @@ namespace Belle2 {
     /**
      * Get the whole list
      */
-    std::map<unsigned short, float> getT0s()
+    std::map<unsigned short, float> getT0s() const
     {
       return m_t0s;
     }
@@ -93,16 +93,16 @@ namespace Belle2 {
      * @param  wire id.
      * @return t0 for the wire
      */
-    float getT0(const WireID& wid)
+    float getT0(const WireID& wid) const
     {
-      std::map<unsigned short, float>::iterator it = m_t0s.find(wid.getEWire());
+      std::map<unsigned short, float>::const_iterator it = m_t0s.find(wid.getEWire());
       return it->second;
     }
 
     /**
      * Print out all contents
      */
-    void dump()
+    void dump() const
     {
       std::cout << " " << std::endl;
       std::cout << "t0 list" << std::endl;

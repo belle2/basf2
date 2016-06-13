@@ -59,7 +59,7 @@ namespace Belle2 {
     /**
      * Get the whole list
      */
-    std::map<unsigned short, float> getTimeWalkParams()
+    std::map<unsigned short, float> getTimeWalkParams() const
     {
       return m_tws;
     }
@@ -69,16 +69,16 @@ namespace Belle2 {
      * @param  boardID front-end board id.
      * @return time-walk coefficient for the board id.
      */
-    float getTimeWalkParam(unsigned short boardID)
+    float getTimeWalkParam(unsigned short boardID) const
     {
-      std::map<unsigned short, float>::iterator it = m_tws.find(boardID);
+      std::map<unsigned short, float>::const_iterator it = m_tws.find(boardID);
       return it->second;
     }
 
     /**
      * Print all contents
      */
-    void dump()
+    void dump() const
     {
       std::cout << " " << std::endl;
       std::cout << "Time walk coefficient list" << std::endl;

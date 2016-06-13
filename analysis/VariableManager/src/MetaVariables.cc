@@ -33,6 +33,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <boost/lexical_cast.hpp>
+#include <limits>
 
 #include <cmath>
 #include <stdexcept>
@@ -391,6 +392,41 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr getVariableByRank(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 4) {
+        std::string listName = arguments[0];
+        std::string rankedVariableName = arguments[1];
+        std::string returnVariableName = arguments[2];
+        std::string extraInfoName = rankedVariableName + "_rank";
+        int rank = 1;
+        try {
+          rank = Belle2::convertString<int>(arguments[3]);
+        } catch (boost::bad_lexical_cast&)  {
+          B2ERROR("3rd argument of getVariableByRank meta function (Rank) must be integer!");
+          return nullptr;
+        }
+
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(returnVariableName);
+        auto func = [var, rank, extraInfoName, listName](const Particle*)-> double {
+          StoreObjPtr<ParticleList> list(listName);
+
+          const unsigned int numParticles = list->getListSize();
+          for (unsigned int i = 0; i < numParticles; i++)
+          {
+            const Particle* p = list->getParticle(i);
+            if (p->getExtraInfo(extraInfoName) == rank)
+              return var->function(p);
+          }
+          // return 0;
+          return std::numeric_limits<double>::signaling_NaN();
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function getVariableByRank")
+      }
+    }
+
     Manager::FunctionPtr countInList(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1 or arguments.size() == 2) {
@@ -538,6 +574,33 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr matchedMCHasPDG(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        int inputPDG = 0 ;
+        try {
+          inputPDG = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2ERROR("Argument must be an integer value.")
+        }
+
+        auto func = [inputPDG](const Particle * particle) -> double{
+          const MCParticle* mcp = particle->getRelated<MCParticle>();
+          if (!mcp)
+            return 0.5;
+
+          if (std::abs(mcp->getPDG()) == inputPDG)
+          {
+            return 1;
+          } else
+            return 0;
+
+        };
+        return func;
+      } else
+        B2FATAL("Wrong number of arguments for meta function matchedMC");
+    }
+
 
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("formula(v1 + v2 * v3 - v4 / v5^v6)", formula,
@@ -625,6 +688,12 @@ namespace Belle2 {
                       "Useful for creating statistics about the number of particles in a list.\n"
                       "E.g. countInList(e+, isSignal == 1) returns the number of correctly reconstructed electrons in the event.\n"
                       "The variable is event-based and does not need a valid particle pointer as input.");
+    REGISTER_VARIABLE("getVariableByRank(particleList, rankedVariableName, variableName, rank)", getVariableByRank,
+                      "Returns a specific variable according to its rank in a particle list.\n"
+                      "The rank is determined via BestCandidateSelection. BestCandidateSelection has to be used before.");
+    REGISTER_VARIABLE("matchedMCHasPDG(PDGCode)", matchedMCHasPDG,
+                      "Returns if the absolute value of aPDGCode of a MCParticle related to a Particle matches a given PDGCode."
+                      "Returns 0/0.5/1 if PDGCode does not match/is not available/ matches");
 
   }
 }

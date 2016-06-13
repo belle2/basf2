@@ -553,6 +553,10 @@ namespace Belle2 {
      * return always one
      */
     double True(const Particle*);
+    /**
+     * return std::numeric_limits<double>::infinity()
+     */
+    double infinity(const Particle*);
   }
 } // Belle2 namespace
 

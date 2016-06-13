@@ -83,6 +83,12 @@ namespace Belle2 {
     Manager::FunctionPtr daughter(const std::vector<std::string>& arguments);
 
     /**
+     * Returns a specific variable according to its rank in a particle list.
+     * The rank is determined via BestCandidateSelection. BestCandidateSelection has to be used before.
+     */
+    Manager::FunctionPtr getVariableByRank(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns 1 if the combination of the particle the function acts upon
      * and a particle from the provided particle list is in the cut and 0 if it is not.
      */

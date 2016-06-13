@@ -1368,6 +1368,12 @@ namespace Belle2 {
       return 1;
     }
 
+    double infinity(const Particle*)
+    {
+      double inf = std::numeric_limits<double>::infinity();
+      return inf;
+    }
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -1582,6 +1588,8 @@ namespace Belle2 {
                       "number of hits associated to this cluster");
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,
                       "number of charged track matched to this cluster");
+    REGISTER_VARIABLE("infinity", infinity,
+                      "returns std::numeric_limits<double>::infinity()");
 
   }
 }

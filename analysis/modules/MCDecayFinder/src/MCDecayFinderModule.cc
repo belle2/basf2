@@ -43,9 +43,6 @@ void MCDecayFinderModule::initialize()
 
   m_decaydescriptor.init(m_strDecay);
 
-  m_particleStore = std::string("FoundParticles") + m_listName;
-  B2DEBUG(1, "particle store used: " << m_particleStore);
-
   m_antiListName = ParticleListName::antiParticleListName(m_listName);
   m_isSelfConjugatedParticle = (m_listName == m_antiListName);
 
@@ -55,7 +52,7 @@ void MCDecayFinderModule::initialize()
 
   // Register output particle list, particle store and relation to MCParticles
   StoreObjPtr<ParticleList> particleList(m_listName);
-  StoreArray<Particle> particles(m_particleStore);
+  StoreArray<Particle> particles;
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   StoreArray<MCParticle> mcparticles;
 
@@ -79,13 +76,12 @@ void MCDecayFinderModule::event()
   // Get output particle list
   StoreObjPtr<ParticleList> outputList(m_listName);
   outputList.create();
-  outputList->initialize(m_decaydescriptor.getMother()->getPDGCode(), m_listName, m_particleStore);
-  outputList->setParticleCollectionName(m_particleStore);
+  outputList->initialize(m_decaydescriptor.getMother()->getPDGCode(), m_listName);
 
   if (!m_isSelfConjugatedParticle) {
     StoreObjPtr<ParticleList> antiOutputList(m_antiListName);
     antiOutputList.create();
-    antiOutputList->initialize(-1 * m_decaydescriptor.getMother()->getPDGCode(), m_antiListName, m_particleStore);
+    antiOutputList->initialize(-1 * m_decaydescriptor.getMother()->getPDGCode(), m_antiListName);
     outputList->bindAntiParticleList(*(antiOutputList));
   }
 
@@ -222,7 +218,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
 int MCDecayFinderModule::write(DecayTree<MCParticle>* decay)
 {
   // Particle array for output
-  StoreArray<Particle> particles(m_particleStore);
+  StoreArray<Particle> particles;
   // Input MCParticle array
   StoreArray<MCParticle> mcparticles;
 

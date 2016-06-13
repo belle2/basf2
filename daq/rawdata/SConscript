@@ -8,6 +8,4 @@ env['SUBLIB'] = True
 
 env['LIBS'] = ['$ROOT_LIBS', 'framework', '$PYTHON_LIBS', 'rawdata' ]
 
-Program('src/dummy_data_src.cc')
-
 Return('env')

@@ -34,14 +34,25 @@ def getCommandLineOptions():
     return args
 
 
-class ExpertInformation():
+class ExpertInformation(object):
+    """
+    Contains information of a export extracted from the GeneralOptions
+    for a convinient access
+    """
     def __init__(self, identifier):
+        """
+        Extract information about an expert from the database using the given identifier
+        """
         general_options = basf2_mva.GeneralOptions()
         weightfile = basf2_mva.Weightfile.load(identifier)
         weightfile.getOptions(general_options)
+        #: Branchname used by basf2_mva_expert for the signal probability
         self.branchname = Belle2.makeROOTCompatible(identifier)
+        #: Branchname used by basf2_mva_expert for the target
         self.target = Belle2.makeROOTCompatible(general_options.m_target_variable)
+        #: Variables used by the expert
         self.variables = [Belle2.makeROOTCompatible(v) for v in general_options.m_variables]
+        #: Signal class in case of classification
         self.signal_class = general_options.m_signal_class
 
 

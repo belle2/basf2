@@ -159,6 +159,7 @@
 
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Matrix/Vector.h"
+#include <TRandom.h>
 
 #include "belle_legacy/helix/Helix.h"
 
@@ -3016,8 +3017,9 @@ namespace Belle2 {
 
         // propagate helix to origin
         int iret;
-        recsim_mdst_propgt_(&amass, pivot, helix,  error,
-                            helix0, error0, &iret);
+        B2FATAL("recsim_mdst_propgt_ is missing");
+        //recsim_mdst_propgt_(&amass, pivot, helix,  error,
+        //                    helix0, error0, &iret);
         if (iret == 0) {
           ch.px(-sin(helix0[1]) / fabs(helix0[2]));
           ch.py(cos(helix0[1]) / fabs(helix0[2]));
@@ -3241,24 +3243,6 @@ namespace Belle2 {
 //Perform extra-smearing for MC tracks. The relevant code is extracted
 //from the module smear_trk originally coded by Marko Staric.
 //=======================================================================
-  const double pi = 4.*atan(1.);
-
-  extern "C" {
-    void ranlux_(float*, int*);
-    void rluxgo_(int*, int*, int*, int*);
-  }
-
-  static inline double GaussRnd()
-  {
-    int n = 2; float u[n];
-    ranlux_(u, &n);
-    return sqrt(-2 * log(u[0])) * cos(2 * pi * u[1]);
-  }
-
-  static inline void rluxgo(int lux, int seed, int k1, int k2)
-  {
-    rluxgo_(&lux, &seed, &k1, &k2);
-  }
 
   static void scale_err_ms(Mdst_trk_fit& fit, double scale[]);
   static void smear_trk_ms(Mdst_trk_fit& fit, double scale[]);
@@ -3268,12 +3252,11 @@ namespace Belle2 {
   void B2BIIFixMdstModule::smear_trk()
   {
 //==========================
-    int expNo = 0, runNo = 0, evtNo = 0, expmc = 1;
+    int expNo = 0, runNo = 0, expmc = 1;
     Belle_event_Manager& evtMgr = Belle_event_Manager::get_manager();
     if (evtMgr.count()) {
       expNo  = evtMgr[0].ExpNo();
       runNo  = evtMgr[0].RunNo();
-      evtNo  = (int)(evtMgr[0].EvtNo() & 0x0FFFFFFF);
       expmc  = evtMgr[0].ExpMC();
     }
     if (expmc == 1) return; // nothing done for real data
@@ -3291,10 +3274,7 @@ namespace Belle2 {
     static bool start = true;
     if (start) {
       start = false;
-      int seed = expNo << 24 | (runNo & 0x000000FF) << 16 | (evtNo & 0x0000FFFF);
-      rluxgo(3, seed, 0, 0);
       B2ERROR("smear_trk: MC events -> track smearing is ON\n");
-      B2ERROR("smear_trk: seed=" << seed);
     }
 
     double scale_mc[5] = {1, 1, 1, 1, 1};
@@ -3390,7 +3370,7 @@ namespace Belle2 {
     }
 
     double g[n];
-    for (int i = 0; i < n; i++) g[i] = GaussRnd();
+    for (int i = 0; i < n; i++) g[i] = gRandom->Gaus();
     double x[n];
     for (int i = 0; i < n; i++) {
       x[i] = 0;

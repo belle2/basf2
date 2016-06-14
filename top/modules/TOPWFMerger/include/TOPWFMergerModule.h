@@ -40,7 +40,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~TOPWFMergerModule();
+    virtual ~TOPWFMergerModule() = default;
 
     /**
      * Initialize the Module.

@@ -1,5 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['belle_legacy']
-
-Return('env')

@@ -86,6 +86,12 @@ extern "C" {
     return r;
   }
 
+  /** Add this because it's undefined in babayaga otherwise */
+  double babayaganlo_getrandomcmsenergy_()
+  {
+    B2FATAL("babayaganlo_getrandomcmsenergy() is not implmented");
+  }
+
   /** FORTRAN routine based on main.f */
 //   void main_belle2_(int* mode, double* xpar, int* npar, double *ecm);
   void main_belle2_(int* mode, double* ecm, double* xpar, int* npar);

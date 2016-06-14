@@ -78,6 +78,12 @@ extern "C" {
     B2WARNING("TEEGG: Maximum weight " << *max  << " to small, increase fmax to at least " << *weight);
   }
 
+  /** just defined to avoid undefined symbol in fortran code, should not be called */
+  void report_() { B2FATAL("Teegg: report_() is not implemented"); }
+  /** just defined to avoid undefined symbol in fortran code, should not be called */
+  void golife_() { B2FATAL("Teegg: golife_() is not implemented"); }
+  /** just defined to avoid undefined symbol in fortran code, should not be called */
+  void golint_() { B2FATAL("Teegg: golint_() is not implemented"); }
 }
 
 Teegg::Teegg()

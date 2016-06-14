@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'rawdata']
+env['LIBS'] = ['framework', 'rawdata', 'Core']
 
 Return('env')

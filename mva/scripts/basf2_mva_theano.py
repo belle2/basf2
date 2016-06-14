@@ -9,18 +9,28 @@ from collections import namedtuple
 
 
 class State(object):
+    """
+    State class for proper handling of parameters and data during function calls. This is a very brief theano example.
+    """
 
     def __init__(self, x=None, y=None, params=None, cost=None, updates=None, train_function=None, eval_function=None):
+        # TODO: make serializable with __getstate__(), __setstate__()
+        #: theano shared variable x
         self.x = x
+        #: theano shared variable y
         self.y = y
 
-        # model parameters
+        #: model params
         self.params = params
+        #: model cost
         self.cost = cost
 
+        #: model grad updates
         self.updates = updates
 
+        #: theano function for training
         self.train_function = train_function
+        #: theano function for evaluation
         self.eval_function = eval_function
 
 
@@ -77,7 +87,8 @@ def get_model(number_of_features, number_of_events, parameters):
 
 
 def load(obj):
-    return obj
+    state = State(eval_function=obj[0])
+    return state
 
 
 def apply(state, X):
@@ -96,5 +107,6 @@ def partial_fit(state, X, y, w, Xvalid, yvalid, wvalid, epoch):
 
 
 def end_fit(state):
-    # FIXME: this won't work
-    return state
+    # FIXME: this might not work as intended
+    # a better method can be found at: http://deeplearning.net/software/theano/tutorial/loading_and_saving.html
+    return [state.eval_function]

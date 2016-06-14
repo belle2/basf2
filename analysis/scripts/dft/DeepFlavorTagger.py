@@ -19,12 +19,16 @@ class RemoveEmptyROEModule(Module):
     """
 
     def __init__(self, extraInfoOutputName, targetExtraInfoOutputName):
+        """ __init__ function """
         super(RemoveEmptyROEModule, self).__init__()
 
-        # FIXME: confuse boost.pythons reference counting (something deep inside basf2?)
+        #: FIXME: confuse boost.pythons reference counting (something deep inside basf2?)
         self.self = self
 
+        #: string extraInfoOutputName
         self.output_name = extraInfoOutputName
+
+        #: string targetExtraInfoOutputName
         self.target_name = targetExtraInfoOutputName
 
     def event(self):
@@ -63,14 +67,18 @@ class FlavorTaggerInforFiller(Module):
 
     def __init__(self, networkExtraInfoOutputName, targetVariableName):
         super(FlavorTaggerInforFiller, self).__init__()
-
-        # FIXME:
+        """ init function """
+        #: FIXME: reference counting
         self.self = self
 
+        #: string, network output name
         self.network_output_name = networkExtraInfoOutputName
+        #: string, targt name
         self.target_name = targetVariableName
 
     def event(self):
+        """ fill FT info map eventwise """
+
         roe = Belle2.PyStoreObj('RestOfEvent')
         ext_info = Belle2.PyStoreObj('EventExtraInfo')
         ft_info = roe.obj().getRelated('FlavorTaggerInfos')

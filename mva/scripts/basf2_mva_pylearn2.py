@@ -22,27 +22,40 @@ from dft import independent_training
 
 
 class State(object):
-
+    """
+    State class for proper handling of parameters and data during function calls.
+    """
     def __init__(self, theano_function=None, flatten_parameters=None, sig_back_pdfs=None, signal_fraction=None):
-        # used for the expert
+        #: theano function
         self.theano_function = theano_function
+        #: parameters used for flattening
         self.flatten_parameters = flatten_parameters
+        #: tuple, signal and background pdfs, used for transformation to probability
         self.sig_back_pdfs = sig_back_pdfs
+        #: signal fraction override
         self.signal_fraction = signal_fraction
 
         # used during training
+        #: bool, transform to probability
         self.transform_to_prob = None
+        #: bool, convert pickled theano gpu function to cpu
         self.convert_to_cpu = None
+        #: parameters
         self.parameters = None
+        #: temporary weightfile from tempfile
         self.temporary_weightfile = None
 
         # check if pdfs should be sampled from validation set
-        # this automatically activates the transform to probability
+        #: this automatically activates the transform to probability
         self.sample_pdfs = None
 
+        #: data vector X
         self.X = None
+        #: target vector y
         self.y = None
+        #: validation vector X
         self.Xvalid = None
+        #: validation vector y
         self.Yvalid = None
 
     # TODO: make serializable (get state, set state) or better use builtin serialization

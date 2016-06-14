@@ -131,6 +131,12 @@ void PXDEfficiencyModule::event()
     m_otherpxd_digit_matched[aVxdID] = -1;
     m_otherpxd_cluster_matched[aVxdID] = -1;
 
+    m_clus_charge[aVxdID] = -9999;
+    m_clus_seedcharge[aVxdID] = -9999;
+    m_clus_size[aVxdID] = -9999;
+    m_clus_usize[aVxdID] = -9999;
+    m_clus_vsize[aVxdID] = -9999;
+
     if (isgood) {
       m_u_fit[aVxdID] = intersec_buff.X();
       m_v_fit[aVxdID] = intersec_buff.Y();
@@ -151,6 +157,15 @@ void PXDEfficiencyModule::event()
       if (bestcluster >= 0) {
         m_u_clus[aVxdID] = m_pxdclusters[bestcluster]->getU();
         m_v_clus[aVxdID] = m_pxdclusters[bestcluster]->getV();
+
+        // Get cluster sizes and charge of the best cluster candidate
+
+        m_clus_charge[aVxdID] = m_pxdclusters[bestcluster]->getCharge();
+        m_clus_seedcharge[aVxdID] = m_pxdclusters[bestcluster]->getSeedCharge();
+
+        m_clus_size[aVxdID] = m_pxdclusters[bestcluster]->getSize();
+        m_clus_usize[aVxdID] = m_pxdclusters[bestcluster]->getUSize();
+        m_clus_vsize[aVxdID] = m_pxdclusters[bestcluster]->getVSize();
       }
     }
 
@@ -166,6 +181,8 @@ void PXDEfficiencyModule::event()
 
   //fill the needed track info
   m_event = int(storeEventMetaData->getEvent());
+  m_run = int(storeEventMetaData->getRun());
+  m_subrun = int(storeEventMetaData->getSubrun());
   m_fit_pValue = fitstatus->getPVal();
   m_fit_ndf = fitstatus->getNdf();
   TVector3 mom = trackstate.getMom();
@@ -319,6 +336,8 @@ void PXDEfficiencyModule::defineHisto()
   m_tree = new TTree("PXDEffiTree", "Tree for calculating pxd efficiencies");
 
   m_tree->Branch("event", &m_event, "event/I");
+  m_tree->Branch("run", &m_run, "run/I");
+  m_tree->Branch("subrun", &m_subrun, "subrun/I");
   m_tree->Branch("fit_pValue", &m_fit_pValue, "fit_pValue/D");
   m_tree->Branch("fit_mom", &m_fit_mom, "fit_mom/D");
   m_tree->Branch("fit_theta", &m_fit_theta,  "fit_theta/D");
@@ -355,6 +374,13 @@ void PXDEfficiencyModule::defineHisto()
     m_tree->Branch("v_clus_" + buff, &(m_v_clus[avxdid]), "v_clus_" + buff + "/D");
     m_tree->Branch("u_digi_" + buff, &(m_u_digi[avxdid]), "u_digi_" + buff + "/D");
     m_tree->Branch("v_digi_" + buff, &(m_v_digi[avxdid]), "v_digi_" + buff + "/D");
+
+    m_tree->Branch("clus_charge_" + buff, &(m_clus_charge[avxdid]), "clus_charge_" + buff + "/D");
+    m_tree->Branch("clus_seedcharge_" + buff, &(m_clus_seedcharge[avxdid]), "clus_seedcharge_" + buff + "/D");
+    m_tree->Branch("clus_size_" + buff, &(m_clus_size[avxdid]), "clus_size__" + buff + "/I");
+    m_tree->Branch("clus_usize_" + buff, &(m_clus_usize[avxdid]), "clus_usize__" + buff + "/I");
+    m_tree->Branch("clus_vsize_" + buff, &(m_clus_vsize[avxdid]), "clus_vsize__" + buff + "/I");
+
     m_tree->Branch("u_fit_" + buff, &(m_u_fit[avxdid]), "u_fit_" + buff + "/D");
     m_tree->Branch("v_fit_" + buff, &(m_v_fit[avxdid]), "v_fit_" + buff + "/D");
     m_tree->Branch("ucell_fit_" + buff, &(m_ucell_fit[avxdid]), "ucell_fit_" + buff + "/I");

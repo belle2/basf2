@@ -125,10 +125,16 @@ namespace Belle2 {
     std::map<VxdID, int> m_otherpxd_digit_matched;
     std::map<VxdID, int> m_otherpxd_cluster_matched;
 
+    // Cluster informatiom
+    std::map<VxdID, double> m_clus_charge;
+    std::map<VxdID, double> m_clus_seedcharge;
+    std::map<VxdID, int> m_clus_size;
+    std::map<VxdID, int> m_clus_usize;
+    std::map<VxdID, int> m_clus_vsize;
 
     //track quality indicators
     double m_fit_pValue, m_fit_mom, m_fit_theta, m_fit_phi, m_fit_chi2;
-    int m_fit_ndf, m_event;
+    int m_fit_ndf, m_event, m_run, m_subrun;
     std::map<VxdID, TH2D*> m_h_tracksdigit;
     std::map<VxdID, TH2D*> m_h_trackscluster;
     std::map<VxdID, TH2D*> m_h_digits;

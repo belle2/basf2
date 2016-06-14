@@ -21,7 +21,6 @@ AddOption('--extra-libpath', dest='extralibpath', action='store', help='Addition
 AddOption('--extra-ccflags', dest='extraccflags', action='store', help='Additional compiler flags')
 AddOption('--ignore-externals-version', dest='check_externals', action='store_false', default=True,
           help="if given the externals version will not checked for consistency between .externals and the environment")
-
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
     import multiprocessing
@@ -65,7 +64,8 @@ if GetOption("check_externals"):
 # create construction environment
 global_env = Environment(
     ENV=os.environ,
-    tools=['default', 'root_dict', 'sym_link', 'process_dir', 'reg_map', 'output', 'autoclean_dir'],
+    tools=['default', 'root_dict', 'sym_link', 'process_dir', 'reg_map', 'output', 'autoclean_dir',
+           'check_libraries'],
     BUILDERS={},
     BUILDDIR=os.path.join('#build', subdir),
     INCDIR='#include',
@@ -301,6 +301,8 @@ else:
     global_env.RemoveNonTargets(global_env["BINDIR"])
     global_env.RemoveNonTargets(global_env["DATADIR"])
 
+# run the library dependency check after everything has been declared
+global_env.CheckLibraryDependencies()
 
 from SCons.Script.Main import OptionsParser
 Help(OptionsParser.format_help() + """

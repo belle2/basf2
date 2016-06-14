@@ -56,6 +56,9 @@ class Fitter3DUtility{
     /// Finds quadrant of angle. Angle is in rad.
     static int findQuadrant(double value);
 
+    /// Sets error using JSignal class.
+    static void setError(std::map<std::string, double> const & mConstD, std::map<std::string, std::vector<double> > const & mConstV, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT * > & mLutStorage);
+
     /// Calculates the fitted axial phi for the stereo super layer.
     static double calStAxPhi(int charge, double anglest, double ztostraw, double rr, double rho, double phi0);
 
@@ -65,19 +68,13 @@ class Fitter3DUtility{
     /// Calculates z.
     static double calZ(int charge, double anglest, double ztostraw, double rr, double phi, double rho, double phi0);
 
-    /// Calculates z using JSignal class.
-    static void calZ(std::map<std::string, double> const & mConstants, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT * > & mLutStorage);
-
-    /// Calculates z using JSignal and multiple constants.(This will be deprecated.)
+    /// Calculates z using JSignal and multiple constants.
     static void calZ(std::map<std::string, double> const & mConstD, std::map<std::string, std::vector<double> > const & mConstV, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT * > & mLutStorage);
 
     /// Calculates arc length.
     static double calS(double rho, double rr);
 
-    /// Calculates arc length using JSingal class.
-    static void calS(std::map<std::string, double> const & mConstants, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT * > & mLutStorage);
-
-    /// Calculates arc length using JSignal and multiple constants. (This will be deprecated.)
+    /// Calculates arc length using JSignal and multiple constants.
     static void calS(std::map<std::string, double> const & mConstD, std::map<std::string, std::vector<double> > const & mConstV, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT * > & mLutStorage);
 
     /// Chooses and calculates inverse z error.
@@ -96,11 +93,9 @@ class Fitter3DUtility{
     /// Fits z and arc S. (Will be deprecated.)
     static void rSFit2(double *iezz21, double *iezz22, double *arcS, double *zz,int *lutv,  double &z0, double &cot,double &zchi2);
 
-    /// Fits z and arc S using JSingal.
-    static void rSFit(std::map<std::string, double> const & mConstants, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT * > & mLutStorage);
-
-    /// Fits z and arc S using JSingal with multiple constants. (This will be deprecated.)
+    /// Fits z and arc S using JSingal with multiple constants.
     static void rSFit(std::map<std::string, double> const & mConstD, std::map<std::string, std::vector<double> > const & mConstV, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT * > & mLutStorage);
+
     /// MC calculation functions
     /// Calculates the impact position of track.
     static void findImpactPosition(TVector3 * mcPosition, TLorentzVector * mcMomentum, int charge, TVector2 & helixCenter, TVector3 & impactPosition);

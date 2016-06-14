@@ -144,17 +144,23 @@ namespace Belle2 {
     // KT study
     //m_mConstV["wireZError"] = vector<double>  ({0.0581, 0.0785, 0.0728, 0.0767});
     //m_mConstV["driftZError"] = vector<double>  ({0.00388, 0.00538, 0.00650, 0.00842});
-    // Orginal study
-    m_mConstV["wireZError"] = vector<double> (4);
-    m_mConstV["wireZError"][0] = 3.19263;
-    m_mConstV["wireZError"][1] = 2.8765;
-    m_mConstV["wireZError"][2] = 2.90057;
-    m_mConstV["wireZError"][3] = 3.96206;
-    m_mConstV["driftZError"] = vector<double> (4);
-    m_mConstV["driftZError"][0] = 3.19263; 
-    m_mConstV["driftZError"][1] = 2.8765; 
-    m_mConstV["driftZError"][2] = 2.90057;
-    m_mConstV["driftZError"][3] = 3.96206;
+    //// Orginal study
+    //m_mConstV["driftZError"] = vector<double> (4);
+    //m_mConstV["driftZError"][0] = 3.19263; 
+    //m_mConstV["driftZError"][1] = 2.8765; 
+    //m_mConstV["driftZError"][2] = 2.90057;
+    //m_mConstV["driftZError"][3] = 3.96206;
+    //// Max factor should be 2.5. Please change iDenLUTOutBitSize to 15 when using 2.5.
+    //// factor 1 shows best z0 results.
+    //{
+    //  double t_factor = 1;
+    //  m_mConstV["wireZError"] = vector<double> (4);
+    //  for (unsigned iSt=0; iSt<4; iSt++) m_mConstV["wireZError"][iSt] = m_mConstV["driftZError"][iSt] * t_factor;
+    //}
+    // (2016.06.07) study
+    //m_mConstV["wireZError"] = vector<double> ({4.752, 6.393, 6.578, 6.418});
+    m_mConstV["driftZError"] = vector<double> ({0.7676, 0.9753, 1.029, 1.372});
+    m_mConstV["wireZError"] = vector<double> ({0.7676, 0.9753, 1.029, 1.372});
 
     // Make driftLength table for each superlayer. Up to 500 clock ticks.
     // driftLengthTableSLX[ tdcCount (~2ns unit) ] = drift length (cm)
@@ -249,6 +255,8 @@ namespace Belle2 {
       findHitStereoSuperlayers(aTrack, useStSl, m_mBool["fIsPrintError"]);
       removeImpossibleStereoSuperlayers(useStSl);
       m_mDouble["nHitStSl"] = (int)useStSl[0]+(int)useStSl[1]+(int)useStSl[2]+(int)useStSl[3];
+      m_mVector["useStSl"] = vector<double> (4);
+      for(unsigned iSt=0; iSt<4; iSt++) m_mVector["useStSl"][iSt] = useStSl[iSt];
 
       // Fill information for stereo layers
       for (unsigned iSt = 0; iSt < 4; iSt++) {
@@ -269,7 +277,7 @@ namespace Belle2 {
         } else {
           m_mVector["tsId"][iSt*2+1] = 9999;
           m_mVector["wirePhi"][iSt*2+1] = 9999;
-          m_mVector["lutLR"][iSt*2+1] = 9999;
+          m_mVector["lutLR"][iSt*2+1] = 0;
           // mcLR should be removed.
           m_mVector["mcLR"][iSt*2+1] = 9999;
           m_mVector["driftLength"][iSt*2+1] = 9999;
@@ -350,6 +358,8 @@ namespace Belle2 {
       m_mDouble["theta"] = m_mConstD["Trg_PI"]/2 - atan(m_mDouble["cot"]);
       m_mDouble["theta"] = 180 / m_mConstD["Trg_PI"];
 
+      if (m_mBool["fVerbose"]) print3DInformation(iTrack);
+
       // For failed fits. When cot is 0 or nan.
       if(m_mDouble["cot"] == 0 || std::isnan(m_mDouble["cot"])) {
         aTrack.setFitted(0);
@@ -389,29 +399,6 @@ namespace Belle2 {
         HandleRoot::saveTrackValues("fitter3D", 
           m_mTClonesArray, m_mDouble, m_mVector
         );
-      }
-
-      if(m_mBool["fVerbose"]) {
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]evtTime: "<<m_mDouble["eventTime"]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]tsId: "<<m_mVector["tsId"][0]<<" "<<m_mVector["tsId"][1]<<" "<<m_mVector["tsId"][2]<<" "<<m_mVector["tsId"][3]<<" "<<m_mVector["tsId"][4]<<" "<<m_mVector["tsId"][5]<<" "<<m_mVector["tsId"][6]<<" "<<m_mVector["tsId"][7]<<" "<<m_mVector["tsId"][8]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]wirePhi: "<<m_mVector["wirePhi"][0]<<" "<<m_mVector["wirePhi"][1]<<" "<<m_mVector["wirePhi"][2]<<" "<<m_mVector["wirePhi"][3]<<" "<<m_mVector["wirePhi"][4]<<" "<<m_mVector["wirePhi"][5]<<" "<<m_mVector["wirePhi"][6]<<" "<<m_mVector["wirePhi"][7]<<" "<<m_mVector["wirePhi"][8]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]LR:      "<<int(m_mVector["LR"][0])<<" "<<int(m_mVector["LR"][1])<<" "<<int(m_mVector["LR"][2])<<" "<<int(m_mVector["LR"][3])<<" "<<int(m_mVector["LR"][4])<<" "<<int(m_mVector["LR"][5])<<" "<<int(m_mVector["LR"][6])<<" "<<int(m_mVector["LR"][7])<<" "<<int(m_mVector["LR"][8])<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]drift:   "<<m_mVector["driftLength"][0]<<" "<<m_mVector["driftLength"][1]<<" "<<m_mVector["driftLength"][2]<<" "<<m_mVector["driftLength"][3]<<" "<<m_mVector["driftLength"][4]<<" "<<m_mVector["driftLength"][5]<<" "<<m_mVector["driftLength"][6]<<" "<<m_mVector["driftLength"][7]<<" "<<m_mVector["driftLength"][8]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]tdc:     "<<m_mVector["tdc"][0]<<" "<<m_mVector["tdc"][1]<<" "<<m_mVector["tdc"][2]<<" "<<m_mVector["tdc"][3]<<" "<<m_mVector["tdc"][4]<<" "<<m_mVector["tdc"][5]<<" "<<m_mVector["tdc"][6]<<" "<<m_mVector["tdc"][7]<<" "<<m_mVector["tdc"][8]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]Phi2D:   "<<m_mVector["phi2D"][0]<<" "<<m_mVector["phi2D"][1]<<" "<<m_mVector["phi2D"][2]<<" "<<m_mVector["phi2D"][3]<<" "<<m_mVector["phi2D"][4]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]Phi3D:   "<<m_mVector["phi3D"][0]<<" "<<m_mVector["phi3D"][1]<<" "<<m_mVector["phi3D"][2]<<" "<<m_mVector["phi3D"][3]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]zz:      "<<m_mVector["zz"][0]<<" "<<m_mVector["zz"][1]<<" "<<m_mVector["zz"][2]<<" "<<m_mVector["zz"][3]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]arcS:    "<<m_mVector["arcS"][0]<<" "<<m_mVector["arcS"][1]<<" "<<m_mVector["arcS"][2]<<" "<<m_mVector["arcS"][3]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]zerror:  "<<m_mVector["zError"][0]<<" "<<m_mVector["zError"][1]<<" "<<m_mVector["zError"][2]<<" "<<m_mVector["zError"][3]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]charge:  "<<int(m_mDouble["charge"])<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]pt:      "<<m_mDouble["pt"]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]phi0:    "<<m_mDouble["phi0"]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]z0:      "<<m_mDouble["z0"]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]cot:     "<<m_mDouble["cot"]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]chi2:    "<<m_mDouble["zChi2"]<<endl;
-      }
-      if(m_mBool["fVerbose"] && m_mBool["fMc"]) {
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]mcPosZ:  "<<m_mVector["mcPosZ"][1]<<" "<<m_mVector["mcPosZ"][3]<<" "<<m_mVector["mcPosZ"][5]<<" "<<m_mVector["mcPosZ"][7]<<endl;
       }
 
     } // End track loop
@@ -478,6 +465,8 @@ namespace Belle2 {
       removeImpossibleStereoSuperlayers(useStSl);
       //// Check if number of stereo super layer hits is smaller or equal to 1.
       m_mDouble["nHitStSl"] = (int)useStSl[0]+(int)useStSl[1]+(int)useStSl[2]+(int)useStSl[3];
+      m_mVector["useStSl"] = vector<double> (4);
+      for(unsigned iSt=0; iSt<4; iSt++) m_mVector["useStSl"][iSt] = useStSl[iSt];
 
       // Fill information for stereo layers
       for (unsigned iSt = 0; iSt < 4; iSt++) {
@@ -498,7 +487,7 @@ namespace Belle2 {
         } else {
           m_mVector["tsId"][iSt*2+1] = 0;
           m_mVector["wirePhi"][iSt*2+1] = 9999;
-          m_mVector["lutLR"][iSt*2+1] = 9999;
+          m_mVector["lutLR"][iSt*2+1] = 0;
           // mcLR should be removed.
           m_mVector["mcLR"][iSt*2+1] = 9999;
           m_mVector["driftLength"][iSt*2+1] = 9999;
@@ -567,10 +556,10 @@ namespace Belle2 {
       // pt = 0.3*1.5*rho*0.01;
       double rhoMin = 48;
       double rhoMax = 1600;
-      double iError2Max = 0.120857;
       int phiBitSize = 13;
       int rhoBitSize = 12;
-      int iError2BitSize = 8;
+      m_mConstD["iError2BitSize"] = 8;
+      m_mConstD["iError2Max"] = 0.120857;
       // LUT values
       m_mConstD["JB"] = 0;
       m_mConstD["acosLUTOutBitSize"] = phiBitSize-1;
@@ -578,7 +567,7 @@ namespace Belle2 {
       m_mConstD["zLUTInBitSize"] = phiBitSize;
       m_mConstD["zLUTOutBitSize"] = 9;
       m_mConstD["iDenLUTInBitSize"] = 13;
-      m_mConstD["iDenLUTOutBitSize"] = 11;
+      m_mConstD["iDenLUTOutBitSize"] = 11; // To increase wireZError = 2.5*driftZError
       // Rotate by quadrants depending on charge and cc(circle center)
       m_mDouble["relRefPhi"] = 0;
       int t_quadrant = Fitter3DUtility::findQuadrant(m_mDouble["phi0"]);
@@ -618,14 +607,20 @@ namespace Belle2 {
           make_tuple("phi_2", m_mVector["relPhi3D"][2], phiBitSize, phiMin, phiMax, 0),
           make_tuple("phi_3", m_mVector["relPhi3D"][3], phiBitSize, phiMin, phiMax, 0),
           make_tuple("rho", m_mDouble["rho"], rhoBitSize, rhoMin, rhoMax, 0),
-          make_tuple("iZError2_0", m_mVector["iZError2"][0], iError2BitSize, 0, iError2Max, 0),
-          make_tuple("iZError2_1", m_mVector["iZError2"][1], iError2BitSize, 0, iError2Max, 0),
-          make_tuple("iZError2_2", m_mVector["iZError2"][2], iError2BitSize, 0, iError2Max, 0),
-          make_tuple("iZError2_3", m_mVector["iZError2"][3], iError2BitSize, 0, iError2Max, 0),
-          make_tuple("charge",(int) (m_mDouble["charge"]==1 ? 1 : 0), 1, 0, 1, 0)
+          make_tuple("iZError2_0", m_mVector["iZError2"][0], m_mConstD["iError2BitSize"], 0, m_mConstD["iError2Max"], 0),
+          make_tuple("iZError2_1", m_mVector["iZError2"][1], m_mConstD["iError2BitSize"], 0, m_mConstD["iError2Max"], 0),
+          make_tuple("iZError2_2", m_mVector["iZError2"][2], m_mConstD["iError2BitSize"], 0, m_mConstD["iError2Max"], 0),
+          make_tuple("iZError2_3", m_mVector["iZError2"][3], m_mConstD["iError2BitSize"], 0, m_mConstD["iError2Max"], 0),
+          make_tuple("charge",(int) (m_mDouble["charge"]==1 ? 1 : 0), 1, 0, 1.5, 0),
+          make_tuple("lr_0", m_mVector["lutLR"][1], 2, 0, 3.5, 0),
+          make_tuple("lr_1", m_mVector["lutLR"][3], 2, 0, 3.5, 0),
+          make_tuple("lr_2", m_mVector["lutLR"][5], 2, 0, 3.5, 0),
+          make_tuple("lr_3", m_mVector["lutLR"][7], 2, 0, 3.5, 0)
         };
         TRGCDCJSignal::valuesToMapSignals(t_values, m_commonData, m_mSignalStorage);
       }
+
+      Fitter3DUtility::setError(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
       Fitter3DUtility::calZ(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
       Fitter3DUtility::calS(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
       Fitter3DUtility::rSFit(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
@@ -709,7 +704,18 @@ namespace Belle2 {
       m_mDouble["float_cot"] = 0;
       m_mDouble["float_zChi2"] = 0;
       Fitter3DUtility::rSFit(&m_mVector["iZError2"][0], &m_mVector["float_arcS"][0], &m_mVector["float_zz"][0], m_mDouble["float_z0"], m_mDouble["float_cot"], m_mDouble["float_zChi2"]);
-      m_mDouble["nHits"] = (int)useStSl[0]+(int)useStSl[1]+(int)useStSl[2]+(int)useStSl[3];
+
+      if (m_mBool["fVerbose"])
+      {
+        for (unsigned iSt=0; iSt<4; iSt++) cout<<"float_zz["<<iSt<<"] : "<<m_mVector["float_zz"][iSt]<<" ";
+        cout<<endl;
+        for (unsigned iSt=0; iSt<4; iSt++) cout<<"float_arcS["<<iSt<<"] : "<<m_mVector["float_arcS"][iSt]<<" ";
+        cout<<endl;
+        cout<<"float_z0: "<<m_mDouble["float_z0"]<<endl;
+        cout<<"float_zChi2: "<<m_mDouble["float_zChi2"]<<endl;
+      }
+
+      if (m_mBool["fVerbose"]) print3DInformation(iTrack);
 
       // For failed fits.
       if (m_mDouble["cot"] == 0) {
@@ -750,29 +756,6 @@ namespace Belle2 {
         HandleRoot::saveTrackValues("fitter3D", 
           m_mTClonesArray, m_mDouble, m_mVector
         );
-      }
-
-      if(m_mBool["fVerbose"]) {
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]evtTime: "<<m_mDouble["eventTime"]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]wirePhi: "<<m_mVector["wirePhi"][0]<<" "<<m_mVector["wirePhi"][1]<<" "<<m_mVector["wirePhi"][2]<<" "<<m_mVector["wirePhi"][3]<<" "<<m_mVector["wirePhi"][4]<<" "<<m_mVector["wirePhi"][5]<<" "<<m_mVector["wirePhi"][6]<<" "<<m_mVector["wirePhi"][7]<<" "<<m_mVector["wirePhi"][8]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]LR:      "<<int(m_mVector["LR"][0])<<" "<<int(m_mVector["LR"][1])<<" "<<int(m_mVector["LR"][2])<<" "<<int(m_mVector["LR"][3])<<" "<<int(m_mVector["LR"][4])<<" "<<int(m_mVector["LR"][5])<<" "<<int(m_mVector["LR"][6])<<" "<<int(m_mVector["LR"][7])<<" "<<int(m_mVector["LR"][8])<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]drift:   "<<m_mVector["driftLength"][0]<<" "<<m_mVector["driftLength"][1]<<" "<<m_mVector["driftLength"][2]<<" "<<m_mVector["driftLength"][3]<<" "<<m_mVector["driftLength"][4]<<" "<<m_mVector["driftLength"][5]<<" "<<m_mVector["driftLength"][6]<<" "<<m_mVector["driftLength"][7]<<" "<<m_mVector["driftLength"][8]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]tdc:     "<<m_mVector["tdc"][0]<<" "<<m_mVector["tdc"][1]<<" "<<m_mVector["tdc"][2]<<" "<<m_mVector["tdc"][3]<<" "<<m_mVector["tdc"][4]<<" "<<m_mVector["tdc"][5]<<" "<<m_mVector["tdc"][6]<<" "<<m_mVector["tdc"][7]<<" "<<m_mVector["tdc"][8]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]Phi2D:   "<<m_mVector["phi2D"][0]<<" "<<m_mVector["phi2D"][1]<<" "<<m_mVector["phi2D"][2]<<" "<<m_mVector["phi2D"][3]<<" "<<m_mVector["phi2D"][4]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]Phi3D:   "<<m_mVector["phi3D"][0]<<" "<<m_mVector["phi3D"][1]<<" "<<m_mVector["phi3D"][2]<<" "<<m_mVector["phi3D"][3]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]zz:      "<<m_mVector["zz"][0]<<" "<<m_mVector["zz"][1]<<" "<<m_mVector["zz"][2]<<" "<<m_mVector["zz"][3]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]arcS:    "<<m_mVector["arcS"][0]<<" "<<m_mVector["arcS"][1]<<" "<<m_mVector["arcS"][2]<<" "<<m_mVector["arcS"][3]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]zerror:  "<<m_mVector["zError"][0]<<" "<<m_mVector["zError"][1]<<" "<<m_mVector["zError"][2]<<" "<<m_mVector["zError"][3]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]izerror:  "<<m_mVector["iZError2"][0]<<" "<<m_mVector["iZError2"][1]<<" "<<m_mVector["iZError2"][2]<<" "<<m_mVector["iZError2"][3]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]charge:  "<<int(m_mDouble["charge"])<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]pt:      "<<m_mDouble["pt"]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]phi0:    "<<m_mDouble["phi0"]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]z0:      "<<m_mDouble["z0"]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]cot:     "<<m_mDouble["cot"]<<endl;
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]chi2:    "<<m_mDouble["zChi2"]<<endl;
-      }
-      if(m_mBool["fVerbose"] && m_mBool["fMc"]) {
-        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]mcPosZ:  "<<m_mVector["mcPosZ"][1]<<" "<<m_mVector["mcPosZ"][3]<<" "<<m_mVector["mcPosZ"][5]<<" "<<m_mVector["mcPosZ"][7]<<endl;
       }
 
     } // End track loop
@@ -1182,7 +1165,7 @@ namespace Belle2 {
       } else {
         m_mVector["tsId"][iAx*2] = 9999;
         m_mVector["wirePhi"][iAx*2] = 9999;
-        m_mVector["lutLR"][iAx*2] = 9999;
+        m_mVector["lutLR"][iAx*2] = 0;
         // mcLR should be removed.
         m_mVector["mcLR"][iAx*2] = 9999;
         m_mVector["driftLength"][iAx*2] = 9999;
@@ -1282,6 +1265,33 @@ namespace Belle2 {
     if (std::isnan(m_mDouble["rho"])) return 2;
     if (std::isnan(m_mDouble["phi0"])) return 2;
     return 0;
+  }
+
+  void TRGCDCFitter3D::print3DInformation(int iTrack)
+  {
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]evtTime: "<<m_mDouble["eventTime"]<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]wirePhi: "<<m_mVector["wirePhi"][0]<<" "<<m_mVector["wirePhi"][1]<<" "<<m_mVector["wirePhi"][2]<<" "<<m_mVector["wirePhi"][3]<<" "<<m_mVector["wirePhi"][4]<<" "<<m_mVector["wirePhi"][5]<<" "<<m_mVector["wirePhi"][6]<<" "<<m_mVector["wirePhi"][7]<<" "<<m_mVector["wirePhi"][8]<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]LR:      "<<int(m_mVector["LR"][0])<<" "<<int(m_mVector["LR"][1])<<" "<<int(m_mVector["LR"][2])<<" "<<int(m_mVector["LR"][3])<<" "<<int(m_mVector["LR"][4])<<" "<<int(m_mVector["LR"][5])<<" "<<int(m_mVector["LR"][6])<<" "<<int(m_mVector["LR"][7])<<" "<<int(m_mVector["LR"][8])<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]lutLR:      "<<int(m_mVector["lutLR"][0])<<" "<<int(m_mVector["lutLR"][1])<<" "<<int(m_mVector["lutLR"][2])<<" "<<int(m_mVector["lutLR"][3])<<" "<<int(m_mVector["lutLR"][4])<<" "<<int(m_mVector["lutLR"][5])<<" "<<int(m_mVector["lutLR"][6])<<" "<<int(m_mVector["lutLR"][7])<<" "<<int(m_mVector["lutLR"][8])<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]useStSl:      "<<int(m_mVector["useStSl"][0])<<" "<<int(m_mVector["useStSl"][1])<<" "<<int(m_mVector["useStSl"][2])<<" "<<int(m_mVector["useStSl"][3])<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]drift:   "<<m_mVector["driftLength"][0]<<" "<<m_mVector["driftLength"][1]<<" "<<m_mVector["driftLength"][2]<<" "<<m_mVector["driftLength"][3]<<" "<<m_mVector["driftLength"][4]<<" "<<m_mVector["driftLength"][5]<<" "<<m_mVector["driftLength"][6]<<" "<<m_mVector["driftLength"][7]<<" "<<m_mVector["driftLength"][8]<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]tdc:     "<<m_mVector["tdc"][0]<<" "<<m_mVector["tdc"][1]<<" "<<m_mVector["tdc"][2]<<" "<<m_mVector["tdc"][3]<<" "<<m_mVector["tdc"][4]<<" "<<m_mVector["tdc"][5]<<" "<<m_mVector["tdc"][6]<<" "<<m_mVector["tdc"][7]<<" "<<m_mVector["tdc"][8]<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]Phi2D:   "<<m_mVector["phi2D"][0]<<" "<<m_mVector["phi2D"][1]<<" "<<m_mVector["phi2D"][2]<<" "<<m_mVector["phi2D"][3]<<" "<<m_mVector["phi2D"][4]<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]Phi3D:   "<<m_mVector["phi3D"][0]<<" "<<m_mVector["phi3D"][1]<<" "<<m_mVector["phi3D"][2]<<" "<<m_mVector["phi3D"][3]<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]zz:      "<<m_mVector["zz"][0]<<" "<<m_mVector["zz"][1]<<" "<<m_mVector["zz"][2]<<" "<<m_mVector["zz"][3]<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]arcS:    "<<m_mVector["arcS"][0]<<" "<<m_mVector["arcS"][1]<<" "<<m_mVector["arcS"][2]<<" "<<m_mVector["arcS"][3]<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]zerror:  "<<m_mVector["zError"][0]<<" "<<m_mVector["zError"][1]<<" "<<m_mVector["zError"][2]<<" "<<m_mVector["zError"][3]<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]izerror:  "<<m_mVector["iZError2"][0]<<" "<<m_mVector["iZError2"][1]<<" "<<m_mVector["iZError2"][2]<<" "<<m_mVector["iZError2"][3]<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]charge:  "<<int(m_mDouble["charge"])<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]pt:      "<<m_mDouble["pt"]<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]phi0:    "<<m_mDouble["phi0"]<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]z0:      "<<m_mDouble["z0"]<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]cot:     "<<m_mDouble["cot"]<<endl;
+     cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]chi2:    "<<m_mDouble["zChi2"]<<endl;
+     if(m_mBool["fMc"])
+     {
+       cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]mcPosZ:  "<<m_mVector["mcPosZ"][1]<<" "<<m_mVector["mcPosZ"][3]<<" "<<m_mVector["mcPosZ"][5]<<" "<<m_mVector["mcPosZ"][7]<<endl;
+     }
   }
 
 

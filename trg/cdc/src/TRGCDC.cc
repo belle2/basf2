@@ -1988,6 +1988,8 @@ namespace Belle2 {
                     _segmentHitsSL);
     _eventTime.back()->doit(_fverETF, _fprintFirmETF);
 
+    if (_segmentHits.size() == 0) setReturnValue(TSF, 1);
+
     if (trackSegmentSimulationOnly) {
       TRGDebug::leaveStage("TRGCDC fastSimulation");
       return;
@@ -2041,9 +2043,7 @@ namespace Belle2 {
 
     //...3D tracker...
     _fitter3D->doit(_trackList3D);
-    //cout<<endl<<"----s3DFitter----"<<endl;
     //_fitter3D->doitComplex(_trackList3D);
-    //cout<<"----e3DFitter----"<<endl<<endl;
     for(unsigned iTrack = 0; iTrack<_trackList3D.size(); iTrack++) {
       if (_trackList3D[iTrack]->fitted() == 0) setReturnValue(fit3D, 1);
     }

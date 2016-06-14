@@ -86,6 +86,9 @@ namespace Belle2 {
     /// Does 2D fit. Returns 0 if fit is done successfully. m_mBool should have fIsPrintError, fmcLR, fLRLUT, fmcLR, f2DFit, f2DFitDrift. m_mConstD should have Trg_PI. m_mConstV should have nWires, driftPhi2DError, wirePhi2DError, rr, rr2D.
     static int do2DFit( TRGCDCTrack & aTrack, std::map<std::string, bool> & m_mBool, std::map<std::string, double> & m_mConstD, std::map<std::string, std::vector<double> > & m_mConstV, std::map<std::string, double> & m_mDouble, std::map<std::string, std::vector<double> > & m_mVector);
 
+    /// Print's information for debugging 3D.
+    void print3DInformation(int iTrack);
+
     /// Functions for saving.
     /// Save VHDL and code files.
     void saveVhdlAndCoe();

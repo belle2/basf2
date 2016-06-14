@@ -251,6 +251,24 @@ int Fitter3DUtility::findQuadrant(double value) {
   return result;
 }
 
+void Fitter3DUtility::setError(std::map<std::string, double> const & mConstD, std::map<std::string, std::vector<double> > const & mConstV, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT * > & mLutStorage)
+{
+  Belle2::TRGCDCJSignalData * commonData = mSignalStorage.begin()->second.getCommonData();
+  // Make constants for wireError,driftError,noError
+  for(unsigned iSt=0; iSt<4; iSt++) 
+  {
+    string t_name;
+    t_name = "iZWireError2_" + to_string(iSt);
+    mSignalStorage[t_name] = Belle2::TRGCDCJSignal(mConstD.at("iError2BitSize"), 1/pow(mConstV.at("wireZError")[iSt],2), 0, mConstD.at("iError2Max"), -1, commonData);
+    t_name = "iZDriftError2_" + to_string(iSt);
+    mSignalStorage[t_name] = Belle2::TRGCDCJSignal(mConstD.at("iError2BitSize"), 1/pow(mConstV.at("driftZError")[iSt],2), 0, mConstD.at("iError2Max"), -1, commonData);
+  }
+  mLutStorage.find("LUT");
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<iZWireError2_"<<iSt<<">>>"<<endl; mSignalStorage["iZWireError2_"+to_string(iSt)].dump();}
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<iZDriftError2_"<<iSt<<">>>"<<endl; mSignalStorage["iZDriftError2_"+to_string(iSt)].dump();}
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<iZError2_"<<iSt<<">>>"<<endl; mSignalStorage["iZError2_"+to_string(iSt)].dump();}
+}
+
 double Fitter3DUtility::calStAxPhi(int mysign, double anglest, double ztostraw, double rr, double rho, double myphi0){
   if(1==2) cout<<anglest<<ztostraw<<endl; // Removes warnings when compileing
 

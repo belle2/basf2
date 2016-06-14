@@ -40,6 +40,8 @@ namespace Belle2 {
     //methods
     unsigned int GetWindowID(const TOPCAFDigit* in_digit);
     double CalibrateWaveform(TOPCAFDigit* in_digit);
+    void smoothSampleHistogram(TH1D* histogram);
+
 
     //var
     std::string m_out_filename, m_in_filename;
@@ -52,7 +54,10 @@ namespace Belle2 {
     int m_useMinuit;
     double m_min_time_diff;
     double m_max_time_diff;
-
+    bool m_invertHitOrder;
+    bool m_smoothSamples;
+    double m_minimumSampleWidth;
+    double m_maximumSampleWidth;
 
     std::string m_payload_tag, m_experiment, m_run;
     std::string m_initial_run, m_final_run;
@@ -67,7 +72,8 @@ namespace Belle2 {
     std::map<topcaf_channel_id_t, TH2D*> m_sample_occupancies_vs_tdiff_hit2;
     std::map<topcaf_channel_id_t, TH2D*> m_sample_occupancies_vs_tdiff_hit1_final;
     std::map<topcaf_channel_id_t, TH2D*> m_sample_occupancies_vs_tdiff_hit2_final;
-
+    std::map<topcaf_channel_id_t, TH2D*> m_iteration_vs_tdiff;
+    std::map<topcaf_channel_id_t, TH2D*> m_samples_hit1_vs_hit2;
 
     TH1D* m_waveform_h;
     TH1D* m_time_calib_tdc_h;

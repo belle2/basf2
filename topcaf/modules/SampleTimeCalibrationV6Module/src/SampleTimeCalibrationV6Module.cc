@@ -53,7 +53,17 @@ SampleTimeCalibrationV6Module::SampleTimeCalibrationV6Module() : Module()
   addParam("minTimeDiff", m_min_time_diff, "Minimum time difference to be used in dT minimisation.", 0.0);
   addParam("maxTimeDiff", m_max_time_diff, "Maximum time difference to be used in dT minimisation.", 256.0);
   addParam("useMinuit", m_useMinuit, "Use minuit based fitter: 1; Use non-minuit based fitter: 0.", 1);
-
+  addParam("invertHitOrder", m_invertHitOrder,
+           "Set to true to invert the order of hits, for example when the first hit is expected to be later than the second hit in the input files.",
+           false);
+  addParam("smoothSamples", m_smoothSamples,
+           "Smooth fit results by replacing results in unphysical bins (or ranges of bins) by interpolating between neighbours.", false);
+  addParam("minimumSampleWidth", m_minimumSampleWidth,
+           "With smoothSamples the minimum width of the sample bin, in terms of multiples of the default bin width, before smoothing is applied.",
+           0.0);
+  addParam("maximumSampleWidth", m_maximumSampleWidth,
+           "With smoothSamples the maximum width of the sample bin, in terms of multiples of the default bin width, before smoothing is applied.",
+           2.0);
 
   m_out_file = nullptr;
   m_in_file = nullptr;
@@ -99,12 +109,20 @@ void SampleTimeCalibrationV6Module::beginRun()
   StoreObjPtr<TopConfigurations> topconfig_ptr("", DataStore::c_Persistent);
   if (topconfig_ptr) {
     m_time2tdc = 1.0 / (topconfig_ptr->getTDCUnit_ns());
-//    B2INFO("topconfig_ptr->getTDCUnit_ns() = " << topconfig_ptr->getTDCUnit_ns());
     B2INFO("Using time/TDC of " << m_time2tdc / 1000.0 << " ps in SampleTimeCalibrationV6 Module.");
   } else {
     m_time2tdc = 1000.;
     B2WARNING("Defaulting time/TDC to " << m_time2tdc / 1000.0 << " ps in SampleTimeCalibrationV6 Module.");
   }
+  // m_time2tdc is never used after this.
+  B2INFO("Note: This parameter (time/TDC) is not actually used currently.");
+
+  if (m_invertHitOrder) {
+    B2INFO("Order of hits will be inverted during module processing.");
+  } else {
+    B2DEBUG(101, "Order of hits will not be inverted during module processing.");
+  }
+
 
   if (m_mode == 1) { // read mode
     TList* list = nullptr;
@@ -146,6 +164,7 @@ void SampleTimeCalibrationV6Module::beginRun()
 
 void SampleTimeCalibrationV6Module::event()
 {
+
   //Get TOPdigits from datastore
   StoreArray<TOPCAFDigit> digit_ptr;
   digit_ptr.isRequired();
@@ -180,26 +199,35 @@ void SampleTimeCalibrationV6Module::event()
 
           if (cal10_asic_id == cal11_asic_id) {
             //B2DEBUG(1, "phit\tphoton_win_corr: " << photon_win_corr << "\tcal_win_corr: " << cal_win_corr);
+
             hit_info this_hit_info;
             this_hit_info.sample1 = digit_ptr[cal10_pulses[d]]->GetTDCBin() + cal10_win_corr;
             this_hit_info.sample2 = digit_ptr[cal11_pulses[e]]->GetTDCBin() + cal11_win_corr;
+            if (m_invertHitOrder) {
+              //invert order of hits - can be useful in cases where the first hit is expected to be later than the second hit
+              double swap_variable = this_hit_info.sample2;
+              this_hit_info.sample2 = this_hit_info.sample1;
+              this_hit_info.sample1 = swap_variable;
+            }
 
             //make some monitoring histograms:
             if (m_sample_occupancies_hit1.find(cal10_asic_id) == m_sample_occupancies_hit1.end()) {
               TString occupancy_histo_name("occ_hit1_");
               occupancy_histo_name += cal10_asic_id;
               m_sample_occupancies_hit1[cal10_asic_id] = new TH1D(occupancy_histo_name, "occupancy - hit1", 256, 0.0, 256.0);
-
+              m_sample_occupancies_hit1[cal10_asic_id]->SetXTitle("sample number % 256");
+              m_sample_occupancies_hit1[cal10_asic_id]->SetYTitle("number of hits");
             }
-            m_sample_occupancies_hit1[cal10_asic_id]->Fill((int((digit_ptr[cal10_pulses[d]]->GetTDCBin() + cal10_win_corr)) % 256));
+            m_sample_occupancies_hit1[cal10_asic_id]->Fill(((int(this_hit_info.sample1)) % 256));
 
             if (m_sample_occupancies_hit2.find(cal11_asic_id) == m_sample_occupancies_hit2.end()) {
               TString occupancy_histo_name("occ_hit2_");
               occupancy_histo_name += cal11_asic_id;
               m_sample_occupancies_hit2[cal11_asic_id] = new TH1D(occupancy_histo_name, "occupancy - hit2", 256, 0.0, 256.0);
+              m_sample_occupancies_hit2[cal11_asic_id]->SetXTitle("sample number % 256");
+              m_sample_occupancies_hit2[cal11_asic_id]->SetYTitle("number of hits");
             }
-            m_sample_occupancies_hit2[cal11_asic_id]->Fill((int((digit_ptr[cal11_pulses[d]]->GetTDCBin() + cal11_win_corr)) % 256));
-
+            m_sample_occupancies_hit2[cal11_asic_id]->Fill(((int(this_hit_info.sample2)) % 256));
 
             double time_difference = this_hit_info.sample1 - this_hit_info.sample2;
             if (m_sample_occupancies_vs_tdiff_hit1.find(cal10_asic_id) == m_sample_occupancies_vs_tdiff_hit1.end()) {
@@ -207,24 +235,35 @@ void SampleTimeCalibrationV6Module::event()
               occupancy_histo_name += cal10_asic_id;
               m_sample_occupancies_vs_tdiff_hit1[cal10_asic_id] = new TH2D(occupancy_histo_name, "time difference vs sample - hit1", 256, 0.0,
                   256.0, 200, m_min_time_diff, m_max_time_diff);
-
+              m_sample_occupancies_vs_tdiff_hit1[cal10_asic_id]->SetXTitle("sample number % 256");
+              m_sample_occupancies_vs_tdiff_hit1[cal10_asic_id]->SetYTitle("time difference / default bin widths");
             }
-            m_sample_occupancies_vs_tdiff_hit1[cal10_asic_id]->Fill((int((digit_ptr[cal10_pulses[d]]->GetTDCBin() + cal10_win_corr)) % 256),
-                                                                    time_difference);
+            m_sample_occupancies_vs_tdiff_hit1[cal10_asic_id]->Fill(((int(this_hit_info.sample1)) % 256), time_difference);
 
             if (m_sample_occupancies_vs_tdiff_hit2.find(cal11_asic_id) == m_sample_occupancies_vs_tdiff_hit2.end()) {
               TString occupancy_histo_name("smp_vs_tdiff_hit2_");
               occupancy_histo_name += cal11_asic_id;
               m_sample_occupancies_vs_tdiff_hit2[cal11_asic_id] = new TH2D(occupancy_histo_name, "time difference vs sample - hit2", 256, 0.0,
                   256.0, 200, m_min_time_diff, m_max_time_diff);
-
+              m_sample_occupancies_vs_tdiff_hit2[cal11_asic_id]->SetXTitle("sample number % 256");
+              m_sample_occupancies_vs_tdiff_hit2[cal11_asic_id]->SetYTitle("time difference / default bin widths");
             }
-            m_sample_occupancies_vs_tdiff_hit2[cal11_asic_id]->Fill((int((digit_ptr[cal11_pulses[d]]->GetTDCBin() + cal11_win_corr)) % 256),
-                                                                    time_difference);
+            m_sample_occupancies_vs_tdiff_hit2[cal11_asic_id]->Fill(((int(this_hit_info.sample2)) % 256), time_difference);
+
+            if (m_samples_hit1_vs_hit2.find(cal11_asic_id) == m_samples_hit1_vs_hit2.end()) {
+              TString histo_name("smp1_vs_smp2_");
+              histo_name += cal11_asic_id;
+              TString title = "Sample1 vs Sample2 for channel ";
+              title += cal11_asic_id;
+              m_samples_hit1_vs_hit2[cal11_asic_id] = new TH2D(histo_name, title, 256, 0.0, 256.0, 256, 0.0, 256.0);
+              m_samples_hit1_vs_hit2[cal11_asic_id]->SetXTitle("Sample1 % 256");
+              m_samples_hit1_vs_hit2[cal11_asic_id]->SetYTitle("Sample2 % 256");
+            }
+            m_samples_hit1_vs_hit2[cal11_asic_id]->Fill(((int(this_hit_info.sample1)) % 256), ((int(this_hit_info.sample2)) % 256));
+
 
 
             m_cal_photon_pairs[cal10_asic_id].push_back(this_hit_info);
-
             //B2DEBUG(1, "pair\tdigi1: " << digit_ptr[cal_pulses[d]]->GetTDCBin() << "\ts1: " << this_hit_info.sample1 << "\tdigi2: " << (double)digit_ptr[cal_pulses[d]]->GetTDCBin() << "\ts2: " << this_hit_info.sample2);
           }
         }
@@ -286,7 +325,7 @@ void  SampleTimeCalibrationV6Module::terminate()
     for (auto iter = m_cal_photon_pairs.begin(); iter != m_cal_photon_pairs.end(); iter++) {
       topcaf_channel_id_t ch_id = iter->first;
       g_hitinfo = iter->second;
-      B2DEBUG(1, "Channel_id: " << ch_id << "\thits available: " << iter->second.size());
+      B2DEBUG(50, "Channel_id: " << ch_id << "\thits available: " << iter->second.size());
     }
 
     //Write monitoring histograms into output file directory "extra":
@@ -302,6 +341,9 @@ void  SampleTimeCalibrationV6Module::terminate()
         it->second->Write();
       }
       for (auto it(m_sample_occupancies_vs_tdiff_hit2.begin()); it != m_sample_occupancies_vs_tdiff_hit2.end(); ++it) {
+        it->second->Write();
+      }
+      for (auto it(m_samples_hit1_vs_hit2.begin()); it != m_samples_hit1_vs_hit2.end(); ++it) {
         it->second->Write();
       }
       m_out_file->cd();
@@ -322,8 +364,8 @@ void  SampleTimeCalibrationV6Module::terminate()
         const int npar = 255;
         std::string s_channel_calib = std::to_string(ch_id);
         m_channel_time_calib_h = new TH1D(s_channel_calib.c_str(), s_channel_calib.c_str(), npar, 0, npar);
-
-
+        m_channel_time_calib_h->SetXTitle("sample number % 256");
+        m_channel_time_calib_h->SetYTitle("dT / default bin widths");
 
         TMinuit myMinuit(npar);
         for (int i = 0; i < npar; i++) {
@@ -345,11 +387,17 @@ void  SampleTimeCalibrationV6Module::terminate()
       } else { //use non-minuit based fitter
         B2INFO("Using non-Minuit based fitting procedure for sample time calibration.");
         B2INFO("Calibrating channel " << ch_id << " using " << g_hitinfo.size() << " hits.");
-        Float_t nomDt(1);
+
+        Float_t winDt(m_time2tdc * 128);  // ns per window
+        Float_t winDt2(2.0 * winDt); // ns per window
+        Float_t nomDt = winDt2 / 255.0;
+
+        //overwrite these values until m_time2tdc has meaningful value, use default bin widths instead:
+        nomDt  = 1.0;
+        winDt2 = nomDt * 255.0;
+        winDt  = winDt2 / 2.0;
+
         Float_t dTval[257];
-        // use units of default bin widths.
-        Float_t winDt2 = nomDt * 255.0;  // ns per window
-        //Float_t nomDt = winDt2/255.0;
         Float_t tWidth(-1);
 
 
@@ -364,6 +412,12 @@ void  SampleTimeCalibrationV6Module::terminate()
         TString title("Calibration");
         title += ch_id;
         TH1F* h1 = new TH1F(name, title, 400, m_min_time_diff, m_max_time_diff);
+        //m_iteration_vs_tdiff = new TH2D()
+
+        //name  = "smp_vs_smp_" + ch_id;
+        //title = "Sample1 vs Sample2 for channel" + ch_id;
+        //m_samples_hit1_vs_hit2 = new TH2D(name, title, 256, 0.0, 256.0, 256, 0.0, 256.0);
+
 
         //Fill h1 for the first time:
         for (auto it(g_hitinfo.begin()); it != g_hitinfo.end(); ++it) {
@@ -391,15 +445,23 @@ void  SampleTimeCalibrationV6Module::terminate()
           time2 = dTval[s2index];
           time2 += sample2_frac * (dTval[s2index + 1] - dTval[s2index]);
 
+          double time_diff(0);
+          if ((time2 - time1) > 0) {time_diff = (time2 - time1);}
+          if ((time2 - time1) < 0) {time_diff = ((winDt2 + time2) - time1);}
+
           time1  += time1_nwin * total;
           time2  += time2_nwin * total;
 
-          double time_diff;
-          if (time2 > time1) {time_diff = time2 - time1;}
-          else {time_diff = time1 - time2;}
-
+          //double time_diff;
+          //if (time2 > time1) {time_diff = time2 - time1;}
+          //else {time_diff = time1 - time2;}
+          //if((time2 - time1) > 0) {time_diff = (time2 - time1);}
+          //if((time2 - time1) < 0) {time_diff = ((winDt2 + time2) - time1);}
 
           h1->Fill(time_diff);
+
+          //Fill other histograms:
+          //m_samples_hit1_vs_hit2->Fill(sample1, sample2);
 
           //B2INFO("time1 = " << time1 << "\ttime2 = " << time2 << "\ttime_diff = " << time_diff);
           //B2INFO("h1->GetMean() = " << h1->GetMean() << "\th1->GetRMS() = " << h1->GetRMS());
@@ -473,20 +535,29 @@ void  SampleTimeCalibrationV6Module::terminate()
                   //tLeading = tryDt[s1index] + sample1_frac * (tryDt[s1index+1] - tryDt[s1index]);
                   //tTrailing = tryDt[s2index] + sample2_frac * (tryDt[s2index+1] - tryDt[s2index]);
 
+                  // tLeading  -> time1
+                  // tTrailing -> time2
+
                   time1 = tryDt[s1index];
                   time1 += sample1_frac * (tryDt[s1index + 1] - tryDt[s1index]);
 
                   time2 = tryDt[s2index];
                   time2 += sample2_frac * (tryDt[s2index + 1] - tryDt[s2index]);
 
+                  double time_diff(0);
+                  if ((time2 - time1) > 0) {time_diff = (time2 - time1);}
+                  if ((time2 - time1) < 0) {time_diff = ((winDt2 + time2) - time1);}
+
+
                   time1  += time1_nwin * total;
                   time2  += time2_nwin * total;
 
                   //double time_diff = time2 - time1;
-                  double time_diff;
-                  if (time2 > time1) {time_diff = time2 - time1;}
-                  else {time_diff = time1 - time2;}
-
+                  //double time_diff;
+                  //if (time2 > time1) {time_diff = time2 - time1;}
+                  //else {time_diff = time1 - time2;}
+                  //if((time2 - time1) > 0) {time_diff = (time2 - time1);}
+                  //if((time2 - time1) < 0) {time_diff = ((winDt2 + time2) - time1);}
                   tLeading  += time1_nwin * total;
                   tTrailing += time2_nwin * total;
 
@@ -553,6 +624,16 @@ void  SampleTimeCalibrationV6Module::terminate()
 
       // Write out sample time calibration histograms (same format for both minuit and non-minuit based fitter.
       if (m_out_file) {
+        if (m_smoothSamples) {
+          TString cloneName(m_channel_time_calib_h->GetName());
+          cloneName += "_original";
+          TH1D* original_channel_time_calib_h = (TH1D*) m_channel_time_calib_h->Clone(cloneName);
+          m_out_file->cd("extra");
+          original_channel_time_calib_h->Write();
+          m_out_file->cd();
+          smoothSampleHistogram(m_channel_time_calib_h);
+        }
+
         m_channel_time_calib_h->Write();
         m_out_file->cd("extra");
         m_channel_time_calib_cumulative_h->Write();
@@ -731,3 +812,41 @@ double SampleTimeCalibrationV6Module::CalibrateWaveform(TOPCAFDigit* in_digit)
   }
 
 }
+
+
+void SampleTimeCalibrationV6Module::smoothSampleHistogram(TH1D* histogram)
+{
+
+  B2DEBUG(57, "Smoothing sample histogram " << histogram->GetName());
+
+  for (int i(1); i < 257; ++i) {
+    B2DEBUG(57, "Checking bin " << i << " with width " << histogram->GetBinContent(i));
+
+    if (histogram->GetBinContent(i) < m_minimumSampleWidth || histogram->GetBinContent(i) > m_maximumSampleWidth) {
+      B2DEBUG(57, "Need to modify sample " << i << "and neighbours.");
+      // Find next bin which passes sample width checks, and the sum of all bins between this bin and that bin passes
+      // scaled sample width checks.  Then average accross selected bins - this method could be improved upon.
+
+      int j(1);
+      double sum(histogram->GetBinContent(i));
+      for (; j < (257 - i); ++j) {
+        sum += histogram->GetBinContent(i + j);
+        bool sumCheck = (sum > (j + 1) * m_minimumSampleWidth && sum < (j + 1) * m_maximumSampleWidth);
+        bool neighbourCheck = (histogram->GetBinContent(i + j) > m_minimumSampleWidth
+                               && histogram->GetBinContent(i + j) < m_maximumSampleWidth);
+        if (sumCheck && neighbourCheck) {break;}
+      }
+
+      for (int k(0); k <= j; ++k) {
+        B2DEBUG(57, "Setting bin " << i + k << " width to " <<  sum / (j + 1));
+        histogram->SetBinContent(i + k, sum / (j + 1));
+      }
+      i += j;
+    }
+  }
+}
+
+
+
+
+

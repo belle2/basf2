@@ -141,7 +141,7 @@ std::string DataStore::defaultObjectName(const std::string& classname)
 
 std::string DataStore::defaultObjectName(const TClass* t)
 {
-  B2ASSERT("Cannot deduce default object name from null pointer TClass", t)
+  B2ASSERT("Cannot deduce default object name from null pointer TClass", t);
   const std::string s = defaultObjectName(t->GetName());
   return s;
 }

@@ -453,7 +453,7 @@ void RootInputModule::entryNotFound(std::string entryOrigin, std::string name, b
     B2FATAL(entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain required object " << name << ", aborting.");
   } else if (fileChanged) {
     B2WARNING(entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain object " << name <<
-              " that was present in a previous entry.")
+              " that was present in a previous entry.");
   }
 }
 

@@ -22,7 +22,7 @@
 /* Belle2 headers. */
 #include <eklm/calibration/EKLMTimeCalibrationAlgorithm.h>
 #include <eklm/dbobjects/EKLMTimeCalibration.h>
-#include <framework/core/ModuleManager.h>
+
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>

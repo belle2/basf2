@@ -10,7 +10,7 @@
 
 // Own include
 #include <top/modules/TOPLaserCalibrator/TOPLaserCalibratorModule.h>
-#include <framework/core/ModuleManager.h>
+
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

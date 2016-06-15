@@ -12,7 +12,7 @@
 #include <testbeam/top/modules/TOPLeps2013Output/TOPLeps2013OutputModule.h>
 #include <top/geometry/TOPGeometryPar.h>
 
-#include <framework/core/ModuleManager.h>
+
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

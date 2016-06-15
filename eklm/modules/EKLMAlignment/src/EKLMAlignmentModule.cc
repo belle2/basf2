@@ -17,7 +17,7 @@
 #include <eklm/geometry/AlignmentChecker.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/modules/EKLMAlignment/EKLMAlignmentModule.h>
-#include <framework/core/ModuleManager.h>
+
 #include <framework/core/RandomNumbers.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>

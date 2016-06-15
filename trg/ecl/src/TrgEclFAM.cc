@@ -13,7 +13,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-#include "framework/core/ModuleManager.h"
+
 #include <framework/logging/Logger.h>
 
 #include <ecl/geometry/ECLGeometryPar.h>

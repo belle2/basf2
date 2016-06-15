@@ -16,7 +16,7 @@
 #include <CLHEP/Vector/LorentzVector.h>
 
 /* Belle2 headers. */
-#include <framework/core/ModuleManager.h>
+
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>

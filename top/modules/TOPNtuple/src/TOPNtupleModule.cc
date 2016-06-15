@@ -11,7 +11,7 @@
 // Own include
 #include <top/modules/TOPNtuple/TOPNtupleModule.h>
 
-#include <framework/core/ModuleManager.h>
+
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

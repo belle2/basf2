@@ -12,7 +12,7 @@
 #include <testbeam/top/modules/TOPCern2010Output/TOPCern2010OutputModule.h>
 #include <top/geometry/TOPGeometryPar.h>
 
-#include <framework/core/ModuleManager.h>
+
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

@@ -11,7 +11,7 @@
 // Own include
 #include <arich/modules/arichRelate/ARICHRelateModule.h>
 
-#include <framework/core/ModuleManager.h>
+
 
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>

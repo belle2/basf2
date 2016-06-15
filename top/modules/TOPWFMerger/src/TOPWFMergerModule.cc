@@ -11,7 +11,7 @@
 // Own include
 #include <top/modules/TOPWFMerger/TOPWFMergerModule.h>
 #include <top/geometry/TOPGeometryPar.h>
-#include <framework/core/ModuleManager.h>
+
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

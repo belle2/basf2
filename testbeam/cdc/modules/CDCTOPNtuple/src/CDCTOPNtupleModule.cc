@@ -12,7 +12,7 @@
 #include <testbeam/cdc/modules/CDCTOPNtuple/CDCTOPNtupleModule.h>
 #include <top/geometry/TOPGeometryPar.h>
 
-#include <framework/core/ModuleManager.h>
+
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

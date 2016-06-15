@@ -12,7 +12,7 @@
 #include <testbeam/cdc/modules/CDCStraightLineFitter/CDCStraightLineFitterModule.h>
 #include <testbeam/cdc/modules/CDCStraightLineFitter/StraightLine.h>
 
-#include <framework/core/ModuleManager.h>
+
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

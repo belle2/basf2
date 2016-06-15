@@ -682,7 +682,7 @@
 #include <cmath>
 #include <cfloat>
 #include <time.h>
-//#include "framework/core/ModuleManager.h"
+
 #include "framework/core/Module.h"
 #include "tracking/modules/trasan/Strings.h"
 #include "tracking/modules/trasan/THelix.h"

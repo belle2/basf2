@@ -14,7 +14,7 @@
 // Own include
 #include <arich/modules/arichNtuple/ARICHNtupleModule.h>
 
-#include <framework/core/ModuleManager.h>
+
 
 // Hit classes
 #include <framework/dataobjects/EventMetaData.h>

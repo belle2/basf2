@@ -11,7 +11,7 @@
 // Own include
 #include <testbeam/top/modules/TOPRawdataInput/TOPRawdataInputModule.h>
 
-#include <framework/core/ModuleManager.h>
+
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

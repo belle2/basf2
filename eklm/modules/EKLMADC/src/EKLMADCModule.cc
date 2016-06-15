@@ -12,7 +12,7 @@
 #include <TH1F.h>
 
 /* Belle2 headers. */
-#include <framework/core/ModuleManager.h>
+
 #include <framework/gearbox/Unit.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/modules/EKLMADC/EKLMADCModule.h>

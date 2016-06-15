@@ -21,7 +21,7 @@
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/modules/KLMClusterEfficiency/KLMClusterEfficiencyModule.h>
-#include <framework/core/ModuleManager.h>
+
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/KLMCluster.h>

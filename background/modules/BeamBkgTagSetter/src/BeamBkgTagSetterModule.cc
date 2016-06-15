@@ -10,7 +10,7 @@
 
 // Own include
 #include <background/modules/BeamBkgTagSetter/BeamBkgTagSetterModule.h>
-#include <framework/core/ModuleManager.h>
+
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

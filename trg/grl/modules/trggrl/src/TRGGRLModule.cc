@@ -15,7 +15,7 @@
 
 #include <stdlib.h>
 #include <iostream>
-#include "framework/core/ModuleManager.h"
+
 #include "trg/trg/Debug.h"
 #include "trg/grl/modules/trggrl/TRGGRLModule.h"
 

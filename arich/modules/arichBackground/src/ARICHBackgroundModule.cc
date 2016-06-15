@@ -10,7 +10,7 @@
 // Own include
 
 #include <arich/modules/arichBackground/ARICHBackgroundModule.h>
-#include <framework/core/ModuleManager.h>
+
 #include <time.h>
 
 // Hit classes

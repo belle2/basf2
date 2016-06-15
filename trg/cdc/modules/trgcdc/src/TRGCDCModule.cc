@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include "G4RunManager.hh"
-#include "framework/core/ModuleManager.h"
+
 #include "trg/cdc/modules/trgcdc/TRGCDCModule.h"
 #include "trg/trg/Debug.h"
 

@@ -12,7 +12,7 @@
 // Own include
 #include <top/modules/OpticalGun/OpticalGunModule.h>
 #include <top/geometry/TOPGeometryPar.h>
-#include <framework/core/ModuleManager.h>
+
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

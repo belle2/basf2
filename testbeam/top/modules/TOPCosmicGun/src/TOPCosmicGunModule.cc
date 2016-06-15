@@ -10,7 +10,7 @@
 
 // Own include
 #include <testbeam/top/modules/TOPCosmicGun/TOPCosmicGunModule.h>
-#include <framework/core/ModuleManager.h>
+
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

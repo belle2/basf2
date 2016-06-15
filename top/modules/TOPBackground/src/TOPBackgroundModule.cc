@@ -10,7 +10,7 @@
 
 // Own include
 #include <top/modules/TOPBackground/TOPBackgroundModule.h>
-#include <framework/core/ModuleManager.h>
+
 #include <time.h>
 
 // framework - DataStore

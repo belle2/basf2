@@ -9,7 +9,7 @@
  **************************************************************************/
 // Own include
 #include <arich/modules/arichDigitizer/ARICHDigitizerModule.h>
-#include <framework/core/ModuleManager.h>
+
 #include <time.h>
 
 // Hit classes

@@ -20,7 +20,7 @@
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/modules/MCMatcherKLMClusters/MCMatcherKLMClustersModule.h>
-#include <framework/core/ModuleManager.h>
+
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/KLMCluster.h>

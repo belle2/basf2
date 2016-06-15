@@ -12,7 +12,7 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/modules/TOPDigitizer/TimeDigitizer.h>
 
-#include <framework/core/ModuleManager.h>
+
 
 // Hit classes
 #include <top/dataobjects/TOPSimHit.h>

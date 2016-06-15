@@ -12,7 +12,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <framework/core/ModuleManager.h>
+
 #include <TVector3.h>
 #include <TH1F.h>
 #include <TAxis.h>

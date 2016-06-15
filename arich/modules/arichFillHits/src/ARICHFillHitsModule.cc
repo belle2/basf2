@@ -11,7 +11,7 @@
 // Own include
 #include <arich/modules/arichFillHits/ARICHFillHitsModule.h>
 
-#include <framework/core/ModuleManager.h>
+
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

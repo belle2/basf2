@@ -12,7 +12,7 @@
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/modules/EKLMReconstructor/EKLMReconstructorModule.h>
-#include <framework/core/ModuleManager.h>
+
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 

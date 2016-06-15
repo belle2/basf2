@@ -13,7 +13,7 @@
 
 /* Belle2 headers. */
 #include <eklm/modules/EKLMDigitizer/EKLMDigitizerModule.h>
-#include <framework/core/ModuleManager.h>
+
 
 using namespace Belle2;
 

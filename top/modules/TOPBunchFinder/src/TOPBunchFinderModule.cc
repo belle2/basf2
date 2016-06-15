@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Module manager
-#include <framework/core/ModuleManager.h>
+
 
 // Own include
 #include <top/modules/TOPBunchFinder/TOPBunchFinderModule.h>

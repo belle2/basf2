@@ -21,7 +21,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework core
-#include <framework/core/ModuleManager.h>
+
 
 // framework aux
 #include <framework/gearbox/Unit.h>

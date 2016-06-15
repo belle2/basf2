@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
-#include "framework/core/ModuleManager.h"
+
 #include "trg/cdc/modules/tsstream/TRGCDCTSStreamModule.h"
 #include "trg/trg/Debug.h"
 #include "trg/trg/BitStream.h"

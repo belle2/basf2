@@ -11,7 +11,7 @@
 // Own include
 #include <background/modules/BGOverlayInput/BGOverlayInputModule.h>
 
-#include <framework/core/ModuleManager.h>
+
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

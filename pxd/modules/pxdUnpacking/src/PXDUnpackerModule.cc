@@ -687,7 +687,7 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("RemapLUT_IB_OF", m_RemapLUTibof, "Name of the LUT which remaps the inner backward and outer forward layer",
            std::string(""));
   addParam("RemapFlag", m_RemapFlag, "Set to one if DHP data should be remapped according to Belle II node 10", false);
-  addParam("DESY16_TrgOff", m_DESY16_FixTrigOffset, "Set to -1 in order to fix trigger missmatch");
+  addParam("DESY16_TrgOff", m_DESY16_FixTrigOffset, "Set to -1 in order to fix trigger missmatch", 0);
   addParam("IgnoreFrameCount", m_ignore_headernrframes, "Ignore Frame count in DHC End Frame", false);
 }
 

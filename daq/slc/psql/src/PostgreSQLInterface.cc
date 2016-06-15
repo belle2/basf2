@@ -2,7 +2,7 @@
 #include "daq/slc/base/ConfigFile.h"
 
 #ifndef NOT_USE_PSQL
-#include <libpq-fe.h>
+#include <pgsql/libpq-fe.h>
 #endif
 
 #include <daq/slc/system/LogFile.h>

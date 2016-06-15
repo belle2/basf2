@@ -75,8 +75,8 @@ components_nr = ['CDC', 'PXD', 'SVD']
 add_mc_reconstruction(main, components_nr)
 
 # Add track extrapolation module
-ext = register_module('Ext')
-main.add_module(ext)
+# ext = register_module('Ext')
+# main.add_module(ext)
 
 # Add ARICH reconstruction module
 arichRECO = register_module('ARICHReconstructor')

@@ -342,12 +342,14 @@ The 'Module Development' section in the manual provides detailed information
 on how to create modules, setting parameters, or using return values/conditions:
 https://belle2.cc.kek.jp/~twiki/bin/view/Software/Basf2manual#Module_Development)")
   .def("__str__", &Module::getPathString)
-  .def("name", &Module::getName, return_value_policy<copy_const_reference>())
-  .def("type", &Module::getType, return_value_policy<copy_const_reference>())
+  .def("name", &Module::getName, return_value_policy<copy_const_reference>(),
+       "Returns the name of the module. Can be changed via set_name(), use type() for identifying a particular module class.")
+  .def("type", &Module::getType, return_value_policy<copy_const_reference>(),
+       "Returns the type of the module (i.e. class name minus 'Module')")
   .def("set_name", &Module::setName)
   .def("description", &Module::getDescription, return_value_policy<copy_const_reference>())
   .def("package", &Module::getPackage, return_value_policy<copy_const_reference>())
-  .def("available_params", &_getParamInfoListPython)
+  .def("available_params", &_getParamInfoListPython, "Return list of all module parameters")
   .def("has_properties", &Module::hasProperties)
   .def("set_property_flags", &Module::setPropertyFlags)
   .def("if_value", &Module::if_value, if_value_overloads())
@@ -361,8 +363,9 @@ https://belle2.cc.kek.jp/~twiki/bin/view/Software/Basf2manual#Module_Development
   .add_property("logging",
                 make_function(&Module::getLogConfig, return_value_policy<reference_existing_object>()),
                 &Module::setLogConfig)
-  .def("param", &Module::setParamPython)
-  .def("param", &Module::setParamPythonDict)
+  .def("param", &Module::setParamPython, "Set parameter with given name to value.", args("name", "value"))
+  .def("param", &Module::setParamPythonDict,
+       "Set parameters using a dictionary: parameters given by the dictionary keys will be set to the corresponding values.")
   .def("return_value", setReturnValueInt)
   .def("return_value", setReturnValueBool)
   .def("set_log_level", &Module::setLogLevel)

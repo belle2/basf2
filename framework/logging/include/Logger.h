@@ -70,7 +70,7 @@
 #define B2DEBUG(level, streamText) _B2_DO_NOTHING
 #else
 #define B2DEBUG(level, streamText) \
-  B2LOGMESSAGE_IFENABLED(Belle2::LogConfig::c_Debug, level, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
+  B2LOG(Belle2::LogConfig::c_Debug, level, streamText)
 #endif
 
 /**
@@ -81,7 +81,7 @@
 #define B2INFO(streamText) _B2_DO_NOTHING
 #else
 #define B2INFO(streamText) \
-  B2LOGMESSAGE_IFENABLED(Belle2::LogConfig::c_Info, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
+  B2LOG(Belle2::LogConfig::c_Info, 0, streamText)
 #endif
 
 /**
@@ -92,7 +92,7 @@
 #define B2RESULT(streamText) _B2_DO_NOTHING
 #else
 #define B2RESULT(streamText) \
-  B2LOGMESSAGE_IFENABLED(Belle2::LogConfig::c_Result, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
+  B2LOG(Belle2::LogConfig::c_Result, 0, streamText)
 #endif
 
 /**
@@ -103,7 +103,7 @@
 #define B2WARNING(streamText) _B2_DO_NOTHING
 #else
 #define B2WARNING(streamText) \
-  B2LOGMESSAGE_IFENABLED(Belle2::LogConfig::c_Warning, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
+  B2LOG(Belle2::LogConfig::c_Warning, 0, streamText)
 #endif
 
 /**

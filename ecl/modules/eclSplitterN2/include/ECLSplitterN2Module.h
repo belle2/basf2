@@ -5,7 +5,7 @@
  * Main reconstruction splitter code for the N2 hypothesis                *
  * (neutral hadron).                                                      *
  * Include all digits of the CR.                                          *
- *                                                                        *                                                                        *
+ *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
  *                                                                        *
@@ -65,7 +65,7 @@ namespace Belle2 {
       std::vector< double > m_liloParameters; /**< lin-log parameters A, B, and C */
 
       // Background
-      const int c_fullBkgdCount = 280; /**< Number of expected background digits at full background, FIXME: ove to database. */
+      //const int c_fullBkgdCount = 280; /**< Number of expected background digits at full background, FIXME: ove to database. */
 
       /** Store array: ECLCalDigit. */
       StoreArray<ECLCalDigit> m_eclCalDigits;

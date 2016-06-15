@@ -31,11 +31,11 @@ progress = register_module('Progress')
 
 # add fragmentation module
 fragmentation = register_module('Fragmentation')
-fragmentation.param('ParameterFile', '../modules/fragmentation/data/pythia_belle2.dat')
+fragmentation.param('ParameterFile', Belle2.FileSystem.findFile('data/generators/modules/fragmentation/pythia_belle2.dat'))
 fragmentation.param('ListPYTHIAEvent', 0)
 fragmentation.param('UseEvtGen', 1)
 fragmentation.param('DecFile', os.path.expandvars('$BELLE2_EXTERNALS_DIR/share/evtgen/DECAY_2010.DEC'))
-fragmentation.param('UserDecFile', '../modules/fragmentation/data/dec_belle2_uubar.dec')
+fragmentation.param('UserDecFile', Belle2.FileSystem.findFile('data/generators/modules/fragmentation/dec_belle2_qqbar.dec'))
 
 # add root output module
 rootoutput = register_module('RootOutput')

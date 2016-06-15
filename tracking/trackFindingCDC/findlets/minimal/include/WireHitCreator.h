@@ -109,12 +109,16 @@ namespace Belle2 {
           const CDCWire* wire = CDCWire::getInstance(hit);
 
           double initialTOFEstimate = 0;
+
           if (m_flightTimeEstimation == EPreferredDirection::c_None) {
             initialTOFEstimate = 0;
-          } else if (m_flightTimeEstimation == EPreferredDirection::c_Outwards) {
-            initialTOFEstimate = wire->getRefCylindricalR() / Const::speedOfLight;
-          } else if (m_flightTimeEstimation == EPreferredDirection::c_Downwards) {
-            initialTOFEstimate = -wire->getRefPos2D().y() / Const::speedOfLight;
+          } else {
+            double directArcLength2D = wire->getRefCylindricalR();
+            if (m_flightTimeEstimation == EPreferredDirection::c_Outwards) {
+              initialTOFEstimate = directArcLength2D / Const::speedOfLight;
+            } else if (m_flightTimeEstimation == EPreferredDirection::c_Downwards) {
+              initialTOFEstimate = std::copysign(directArcLength2D / Const::speedOfLight, -wire->getRefPos2D().y());
+            }
           }
 
           double refDriftLengthRight =

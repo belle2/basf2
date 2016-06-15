@@ -1,13 +1,15 @@
 //+
 // File : PXDTriggerFixerModule.cc
-// Description : Desy 2016 evenet mismatch fixer
+// Description : Desy 2016 event mismatch fixer
 //
 // Author : Bjoern Spruck, with help by Martin Ritter
-// Date : 20 - Apr - 2016
+// Date : 20 - Apr - 2016, Updated 03 - Jun - 2016
 //-
 
 #include <pxd/modules/pxdUnpacking/PXDTriggerFixer.h>
 #include <boost/spirit/home/support/detail/endian.hpp>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 using namespace std;
 using namespace Belle2;
@@ -20,38 +22,96 @@ using namespace boost::spirit::endian;
 //-----------------------------------------------------------------
 REG_MODULE(PXDTriggerFixer)
 
+PXDTriggerFixerModule::PXDTriggerFixerModule(void)
+{
+  // the module CAN NOT run in parallel mode due to the buffering of previous events.
+  // Module Description
+  setDescription("Find PXD data for event which has been shifted by offset");
+
+  //Parameter definition
+  addParam("offset", m_offset, "Trigger offset of PXD content w.r.t. Event trigger number", int(0));
+  addParam("refs_HLT", m_refs_HLT, "Use HLT trigger number as reference with PXD packet", false);
+  addParam("refs_DHC", m_refs_DHC, "Use DHC trigger number as reference with PXD packet", false);
+  addParam("refs_DHE", m_refs_DHE, "Use (first) DHE trigger number as reference with PXD packet", false);
+  addParam("wants_Meta", m_wants_Meta, "Look for EvtMeta trigger number", false);
+  addParam("wants_HLT", m_wants_HLT, "Look for HLT trigger number", false);
+  addParam("wants_DHC", m_wants_DHC, "Look for DHC trigger number", false);
+}
+
 void PXDTriggerFixerModule::initialize(void)
 {
   m_storeRaw.required();
+
+  if (!m_wants_Meta && !m_wants_HLT && !m_wants_DHC) B2FATAL("No source for wanted look up trigger number given (EvtMeta, HLT, DHC)");
+  if (!m_refs_HLT && !m_refs_DHC && !m_refs_DHE) B2FATAL("No source for reference trigger number given (HLT, DHC, DHE)");
+}
+
+void PXDTriggerFixerModule::terminate(void)
+{
+  B2INFO("PXDTriggerFixerModule fixed: " << m_fixed << " not found: " << m_notfixed << " not needed: " << m_notneeded);
 }
 
 void PXDTriggerFixerModule::event(void)
 {
-  // erst mal muss man die beiden trigger nummern finden ...
-  TClonesArray* rawdata = m_storeRaw.getPtr();
-  unsigned int pxdTriggerNr = 0x10000, triggerNr = 0x10000;
-  for (auto& it : m_storeRaw) {
-    if (getTrigNr(it, pxdTriggerNr, triggerNr)) break; // only first (valid) one
-  }
-  pxdTriggerNr &= 0xFFFF;
-  triggerNr &= 0xFFFF;
+  StoreObjPtr<EventMetaData> evtPtr;/// what will happen if it does not exist???
 
-  m_previous_events.insert(pxdTriggerNr, *rawdata);
+  unsigned int triggerNrEvt = evtPtr->getEvent();
+
+  // first, we have to find the trigger numbers from teh pxd data ...
+  TClonesArray* rawdata = m_storeRaw.getPtr();
+  unsigned int triggerNrDHE = 0x10000, triggerNrDHC = 0x10000, triggerNrHLT = 0x10000;
+  for (auto& it : m_storeRaw) {
+    if (getTrigNr(it, triggerNrDHE, triggerNrDHC, triggerNrHLT)) break; // only first (valid) one
+  }
+
+  B2INFO("Fixed trigger offset: Event Meta #$" << hex << triggerNrEvt << " HLT " << triggerNrHLT << " DHC "  << triggerNrDHC <<
+         " DHE "  << triggerNrDHE << " Offset " << dec << m_offset);
+
+  // Attention: triggerNrHLT does not necessary is identical to Event Meta, if
+  // the event builder has been shifting events!
+
+  unsigned int triggerReference = 0x10000;/// trigger number from the package
+  if (m_refs_HLT) triggerReference = triggerNrHLT;
+  if (m_refs_DHC) triggerReference = triggerNrDHC;
+  if (m_refs_DHE) triggerReference = triggerNrDHE;
+
+  // only store if a valid trigger number in PXD packet
+  if (triggerReference != 0x10000) m_previous_events.insert(triggerReference & 0xFFFF, *rawdata);
+
+
+  unsigned int triggerWanted = 0x10000;/// trigger number to look for
+  if (m_wants_Meta) triggerWanted = triggerNrEvt;
+  if (m_wants_HLT) triggerWanted = triggerNrHLT;
+  if (m_wants_DHC) triggerWanted = triggerNrDHC;
+
+  if (triggerWanted == 0x10000) { // invalid
+    setReturnValue(false);
+    m_notfixed++;
+    return;
+  }
+
+  triggerWanted = (triggerWanted + m_offset) & 0xFFFF; /// including offset
 
   setReturnValue(true);
-  if (triggerNr != pxdTriggerNr) {
-    if (!m_previous_events.retrieve(triggerNr, *rawdata)) {
-      B2WARNING("Could not trigger offset for HLT $" << hex << triggerNr << " and DHH $" << hex << pxdTriggerNr);
+  if (triggerWanted != (triggerReference & 0xFFFF) || triggerReference == 0x10000) {
+    // Now try to replace current raw data with raw data with current trigger number + offset
+    // Main problem with this approach, if we do not find the correct data, the previous data
+    // is still there ... thus checking the return value is mandatory!
+    if (!m_previous_events.retrieve(triggerWanted, *rawdata)) {
+      B2WARNING("Could not find data for offset: wanted $" << hex << triggerWanted << " and refs $"  << triggerReference);
       setReturnValue(false);
+      m_notfixed++;
     } else {
-      B2INFO("Fixed trigger offset for #$" << hex << triggerNr << " and " << hex << pxdTriggerNr);
+      B2INFO("Fixed trigger offset for wanted #$" << hex << triggerWanted << " and refs "  << triggerReference);
+      m_fixed++;
     }
+  } else {
+    // no need to fix
+    m_notneeded++;
   }
-  // jetzt sollte es passen.
 }
 
-
-bool PXDTriggerFixerModule::getTrigNr(RawPXD& px, unsigned int& innerDHH, unsigned int& outerHLT)
+bool PXDTriggerFixerModule::getTrigNr(RawPXD& px, unsigned int& innerDHE, unsigned int& innerDHC, unsigned int& outerHLT)
 {
   int Frames_in_event;
   int fullsize;
@@ -77,7 +137,7 @@ bool PXDTriggerFixerModule::getTrigNr(RawPXD& px, unsigned int& innerDHH, unsign
   }
 
   Frames_in_event = ((ubig32_t*)data.data())[1];
-  if (Frames_in_event < 0 || Frames_in_event > 256) {
+  if (Frames_in_event < 1 || Frames_in_event > 250) {
     B2ERROR("Number of Frames invalid: Will not unpack anything. Header corrupted! Frames in event: " << Frames_in_event);
     return false;
   }
@@ -106,17 +166,15 @@ bool PXDTriggerFixerModule::getTrigNr(RawPXD& px, unsigned int& innerDHH, unsign
       B2ERROR("SKIP Frame with Data with not MOD 4 length " << " ( $" << hex << lo << " ) ");
       ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
     } else {
-      B2INFO("unpack DHE(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
-      if (unpack_dhc_frame(ll + (char*)dataptr, innerDHH, outerHLT)) return true;
+      if (unpack_dhc_frame(ll + (char*)dataptr, innerDHE, innerDHC, outerHLT)) return true;
       ll += lo; /// no rounding needed
     }
   }
   return false;
 }
 
-bool PXDTriggerFixerModule::unpack_dhc_frame(void* data, unsigned int& innerDHH, unsigned int& outerHLT)
+bool PXDTriggerFixerModule::unpack_dhc_frame(void* data, unsigned int& innerDHE, unsigned int& innerDHC, unsigned int& outerHLT)
 {
-  // DHE like before, but now 4 bits
 #define DHC_FRAME_HEADER_DATA_TYPE_DHP_RAW     0x0
 #define DHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD     0x5
 #define DHC_FRAME_HEADER_DATA_TYPE_FCE_RAW     0x1 //CLUSTER FRAME
@@ -135,16 +193,16 @@ bool PXDTriggerFixerModule::unpack_dhc_frame(void* data, unsigned int& innerDHH,
 
   switch (((*(ubig16_t*)data) & 0x7800) >> 11) {
     case DHC_FRAME_HEADER_DATA_TYPE_DHC_START: {
-      innerDHH = ((ubig16_t*)data)[1];
-      return true;
+      innerDHC = ((ubig16_t*)data)[1];
+      break;
     }
     case DHC_FRAME_HEADER_DATA_TYPE_DHE_START: {
-      innerDHH = ((ubig16_t*)data)[1];
+      innerDHE = ((ubig16_t*)data)[1];
       return true;
     }
     case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG: {
       outerHLT = ((ubig16_t*)data)[1];
-      //outerHLT = ((ubig32_t*)data)[2];
+      // well how about HLT trigger values as reference?
       break;
     }
     default:

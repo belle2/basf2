@@ -71,7 +71,7 @@ namespace Belle2 {
     /** copy constructor */
     AnalyzingAlgorithmBase(const AnalyzingAlgorithmBase& algo) : m_iD(algo.m_iD)
     {
-      B2ERROR("AnalyzingAlgorithmBase-copy-constructor has been called!")
+      B2ERROR("AnalyzingAlgorithmBase-copy-constructor has been called!");
     }
 
 
@@ -151,7 +151,7 @@ namespace Belle2 {
     /** virtual class to calculate data. takes two TCInfos */
     virtual DataType calcData(const TCInfoType&)
     {
-      B2ERROR(" AnalyzingAlgorithmBase::calcData: if you can see this, the code tried to return the actual baseClass instead of the inherited ones - this is unintended behavior!")
+      B2ERROR(" AnalyzingAlgorithmBase::calcData: if you can see this, the code tried to return the actual baseClass instead of the inherited ones - this is unintended behavior!");
       return DataType();
     }
   };

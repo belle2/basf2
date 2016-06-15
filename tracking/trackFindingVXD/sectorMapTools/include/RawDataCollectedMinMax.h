@@ -42,7 +42,7 @@ namespace Belle2 {
       m_collector((quantiles.first > (1. - quantiles.second) ? quantiles.first * 2. : (1. - quantiles.second) * 2.))
     {
       if (double(expectedSize) / (double(maxSizeThreshold) * 0.05) > double(maxSizeThreshold))
-      { B2FATAL("RawDataCollectedMinMax: expected data to big, can not execute!") }
+      { B2FATAL("RawDataCollectedMinMax: expected data to big, can not execute!"); }
 
       if (maxSizeThreshold < expectedSize) {
         m_fillIntermediateThreshold = maxSizeThreshold / 10;

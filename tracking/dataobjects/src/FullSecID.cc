@@ -106,7 +106,7 @@ FullSecID::FullSecID(unsigned int layerID, bool subLayerID, unsigned int sensorI
   SubLayerID <<= SubLayerBitShift;
   sensorID <<= VxdIDBitShift;
   m_fullSecID = layerID | SubLayerID | sensorID | sectorNumber;
-  B2DEBUG(175, " m_fullSecID/binary: " << m_fullSecID << "/" << std::bitset<32>(m_fullSecID) << "\n, secID/binary: " << sectorNumber << "/" << std::bitset<32>(sectorNumber) << ", layerID-binary: " << std::bitset<32>(layerID) << "\n, SubLayerID-binary: " << std::bitset<32>(SubLayerID)  << ", sensorID-binary: " << std::bitset<32>(sensorID))
+  B2DEBUG(175, " m_fullSecID/binary: " << m_fullSecID << "/" << std::bitset<32>(m_fullSecID) << "\n, secID/binary: " << sectorNumber << "/" << std::bitset<32>(sectorNumber) << ", layerID-binary: " << std::bitset<32>(layerID) << "\n, SubLayerID-binary: " << std::bitset<32>(SubLayerID)  << ", sensorID-binary: " << std::bitset<32>(sensorID));
 }
 
 std::string FullSecID::getFullSecString() const

@@ -41,7 +41,7 @@ namespace Belle2 {
   /** TrackletFilters expects a row of hits stored as a vector of TVector3. These should be on a realistic track through the detector, meaning in the x-y-plane, they form a circle passing the origin (or a point near to it). There have to be at least 4 hits for the ZigZag-Test, for the circlefitter it can be 3 hits, but it should be 4 at least. we will test it first with an aequivalent of a 500 MeV (pT) track and another one having only 50 MeV. The reason for having more than one cirle is the fact that the circlefitter seems to be optimized somehow and therefore could have problems with circles formed by a small number of hits or circles with small radii*/
   TEST_F(TrackletFiltersTest, simpleTest)
   {
-    B2WARNING("TrackletFilters.simpleTest: for convenience, this test has been temporarily disabled, this warning shall stay here until the test has been replaced by are more practical one")
+    B2WARNING("TrackletFilters.simpleTest: for convenience, this test has been temporarily disabled, this warning shall stay here until the test has been replaced by are more practical one");
 //     TVector3 a, b, c, d, e, f, g, h, i, j, k, l, m; // there are up to 12+1 Hits (one for the primary vertex) possible within the VXD before the particle curls back the first time
 //
 //     //The hits will be produced using the same radius (which will be smeared) and different phi-values to describe a cirle-segment covering only a part of the outline of the circle. To get a full helix, the z-value of the hits are changed accordingly to their original phi-value
@@ -1349,7 +1349,7 @@ namespace Belle2 {
     EXPECT_NEAR(aFilter.calcPt(3), results.second.Mag(), somewherenear);
     EXPECT_NEAR(aFilter.calcPt(3), results.second.Perp(), somewherenear);
     EXPECT_NEAR(aFilter.calcPt(3), results.second[0], somewherenear);
-    B2WARNING("results pt: X/Y/Z: " << results.second[0] << "/" << results.second[1] << "/" << results.second[2])
+    B2WARNING("results pt: X/Y/Z: " << results.second[0] << "/" << results.second[1] << "/" << results.second[2]);
 
     v3 = v2;
     std::reverse(v3.begin(), v3.end());
@@ -1366,7 +1366,7 @@ namespace Belle2 {
     EXPECT_NEAR(aFilter.calcPt(3), resultsReverse.second.Perp(), somewherenear);
     EXPECT_NEAR(aFilter.calcPt(3), resultsReverse.second[0], somewherenear);
     B2WARNING("resultsReverse pt: X/Y/Z: " << resultsReverse.second[0] << "/" << resultsReverse.second[1] << "/" <<
-              resultsReverse.second[2])
+              resultsReverse.second[2]);
 //    The difference between aFilter.calcPt(3) and results.second.X() is 0.0074555377781446441, which exceeds somewherenear, where
 // aFilter.calcPt(3) evaluates to 0.013486950000000001,
 // results.second.X() evaluates to 0.0060314122218553569, and
@@ -1643,7 +1643,7 @@ namespace Belle2 {
     for (auto& aCircle : allCircles) {
       for (auto& aQuadrantFilterCombi : aCircle.myQuadrantsAndFilters) {
         /// activate the following warning to be able to distinguish between the results (only feasible for debugging):
-        B2INFO(" circle: " << countCircles << ", quadrant: " << countQuadrants)
+        B2INFO(" circle: " << countCircles << ", quadrant: " << countQuadrants);
 
         testStuff(aQuadrantFilterCombi, aCircle);
 
@@ -1656,7 +1656,7 @@ namespace Belle2 {
     for (auto& aCircle : allReversedCircles) {
       for (auto& aQuadrantFilterCombi : aCircle.myQuadrantsAndFilters) {
         /// activate the following warning to be able to distinguish between the results (only feasible for debugging):
-        B2INFO("reversed circle: " << countCircles << ", quadrant: " << countQuadrants)
+        B2INFO("reversed circle: " << countCircles << ", quadrant: " << countQuadrants);
 
         testStuff(aQuadrantFilterCombi, aCircle);
 

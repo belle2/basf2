@@ -299,12 +299,12 @@ void CDCGeometryPar::read()
   m_clockFreq4TDC = 1.017774;  //in GHz
   double tmp = gbxParams.getDouble("ClockFrequencyForTDC");
   if (tmp != m_clockFreq4TDC) {
-    B2WARNING("CDCGeometryPar: The default clock freq. for TDC (" << m_clockFreq4TDC << " GHz) is replaced with " << tmp << " (GHz).")
+    B2WARNING("CDCGeometryPar: The default clock freq. for TDC (" << m_clockFreq4TDC << " GHz) is replaced with " << tmp << " (GHz).");
     m_clockFreq4TDC = tmp;
   }
-  B2INFO("CDCGeometryPar: Clock freq. for TDC= " << m_clockFreq4TDC << " (GHz).")
+  B2INFO("CDCGeometryPar: Clock freq. for TDC= " << m_clockFreq4TDC << " (GHz).");
   m_tdcBinWidth = 1. / m_clockFreq4TDC;  //in ns
-  B2INFO("CDCGeometryPar: TDC bin width= " << m_tdcBinWidth << " (ns).")
+  B2INFO("CDCGeometryPar: TDC bin width= " << m_tdcBinWidth << " (ns).");
 
   m_nominalDriftV    = 4.e-3;  //in cm/ns
   m_nominalDriftVInv = 1. / m_nominalDriftV; //in ns/cm

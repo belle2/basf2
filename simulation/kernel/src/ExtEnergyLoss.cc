@@ -25,7 +25,7 @@ using namespace Belle2::Simulation;
 ExtEnergyLoss::ExtEnergyLoss(const G4String& processName, G4ProcessType type)
   : G4VContinuousProcess(processName, type), m_energyLossForExtrapolator(NULL)
 {
-  B2DEBUG(200, "ExtEnergyLoss is created")
+  B2DEBUG(200, "ExtEnergyLoss is created");
   if (m_energyLossForExtrapolator == NULL) {
     m_energyLossForExtrapolator = new EnergyLossForExtrapolator;
   }
@@ -66,7 +66,7 @@ G4VParticleChange* ExtEnergyLoss::AlongStepDoIt(const G4Track& aTrack, const G4S
                    aParticleDef);
     G4double kinEnergyHalfStep = (kinEnergyStart + kinEnergyEnd) * 0.5;
 
-    B2DEBUG(200, "ExtEnergyLoss::AlongStepDoIt() BWD  end " << kinEnergyEnd << " halfstep " << kinEnergyHalfStep)
+    B2DEBUG(200, "ExtEnergyLoss::AlongStepDoIt() BWD  end " << kinEnergyEnd << " halfstep " << kinEnergyHalfStep);
 
     // rescale to energy lost at midpoint of step
     kinEnergyEnd = m_energyLossForExtrapolator->EnergyBeforeStep(kinEnergyHalfStep,
@@ -81,7 +81,7 @@ G4VParticleChange* ExtEnergyLoss::AlongStepDoIt(const G4Track& aTrack, const G4S
                                                                 aMaterial,
                                                                 aParticleDef);
     G4double kinEnergyHalfStep = (kinEnergyStart + kinEnergyEnd) * 0.5;
-    B2DEBUG(200, "ExtEnergyLoss::AlongStepDoIt() FWD  end " << kinEnergyEnd << " halfstep " << kinEnergyHalfStep)
+    B2DEBUG(200, "ExtEnergyLoss::AlongStepDoIt() FWD  end " << kinEnergyEnd << " halfstep " << kinEnergyHalfStep);
 
     // rescale to energy lost at midpoint of step
     kinEnergyEnd = m_energyLossForExtrapolator->EnergyAfterStep(kinEnergyHalfStep,
@@ -95,7 +95,7 @@ G4VParticleChange* ExtEnergyLoss::AlongStepDoIt(const G4Track& aTrack, const G4S
 
   B2DEBUG(300, "ExtEnergyLoss::AlongStepDoIt() Estart= " << kinEnergyStart << " Eend " << kinEnergyEnd
           << " Ediff " << -edepo << " step= " << step_length << " mate= " << aMaterial->GetName()
-          << " particle= " << aParticleDef->GetParticleName())
+          << " particle= " << aParticleDef->GetParticleName());
 
   aParticleChange.ClearDebugFlag();
   aParticleChange.ProposeLocalEnergyDeposit(edepo);
@@ -126,11 +126,11 @@ G4double ExtEnergyLoss::GetContinuousStepLimit(const G4Track& aTrack,
                       m_energyLossForExtrapolator->EnergyAfterStep(kinEnergyStart, currentMinimumStep, aMaterial, aParticleDef);
     }
     B2DEBUG(300, "ExtEnergyLoss::GetContinuousStepLimit() currentMinimumStep " << currentMinimumStep
-            << "  kinEnergyLoss " << kinEnergyLoss << " kinEnergyStart " << kinEnergyStart)
+            << "  kinEnergyLoss " << kinEnergyLoss << " kinEnergyStart " << kinEnergyStart);
     if (kinEnergyLoss / kinEnergyStart > m_StepLimit) {
       step = m_StepLimit / (kinEnergyLoss / kinEnergyStart)  * currentMinimumStep;
       B2DEBUG(300, "ExtEnergyLoss::GetContinuousStepLimit() limiting Step " << step
-              << " energy loss fraction " << kinEnergyLoss / kinEnergyStart << " > " << m_StepLimit)
+              << " energy loss fraction " << kinEnergyLoss / kinEnergyStart << " > " << m_StepLimit);
     }
   }
 

@@ -41,7 +41,7 @@ namespace VXDTFDynamicObserversTest {
    */
   void giveMeUpdate(double update)
   {
-    B2INFO("giveMeUpdate was updated! new value: " << update)
+    B2INFO("giveMeUpdate was updated! new value: " << update);
   }
 
 
@@ -93,9 +93,9 @@ namespace VXDTFDynamicObserversTest {
     {
       m_countedChanges++;
       B2INFO("ValueType::updateMyVal was updated (change revision " << m_countedChanges << ")! old value: " << get() << ", new value: " <<
-             newVal)
+             newVal);
       m_myVal = newVal;
-      B2INFO("ValueType::updateMyVal: new value with get again: " << get())
+      B2INFO("ValueType::updateMyVal: new value with get again: " << get());
     }
 
 
@@ -111,7 +111,7 @@ namespace VXDTFDynamicObserversTest {
     void setIdentifier(unsigned int identifier)
     {
       if (m_lockIdentifier == true) {
-        B2ERROR("FancyValueCarrier: identifier is locked, you can not reset it!")
+        B2ERROR("FancyValueCarrier: identifier is locked, you can not reset it!");
         return;
       }
       m_lockIdentifier = true;
@@ -123,7 +123,7 @@ namespace VXDTFDynamicObserversTest {
     unsigned int getIdentifier() const
     {
       if (m_lockIdentifier == false) {
-        B2ERROR("FancyValueCarrier: fancy value is not yet locked to a ObservableState!")
+        B2ERROR("FancyValueCarrier: fancy value is not yet locked to a ObservableState!");
       }
       return m_identifier;
     }

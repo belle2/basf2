@@ -205,6 +205,6 @@ void B2BIIMdstInputModule::endRun()
 void B2BIIMdstInputModule::terminate()
 {
   delete m_fd;
-  B2INFO("B2BIIMdstInput: terminate called")
+  B2INFO("B2BIIMdstInput: terminate called");
 }
 

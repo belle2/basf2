@@ -93,7 +93,7 @@ void KoralWInputModule::terminate()
 {
   m_generator.term();
 
-  B2INFO(">>> Total cross section: " << m_generator.getCrossSection() << " pb +- " << m_generator.getCrossSectionError() << " pb")
+  B2INFO(">>> Total cross section: " << m_generator.getCrossSection() << " pb +- " << m_generator.getCrossSectionError() << " pb");
 }
 
 void KoralWInputModule::initializeGenerator()

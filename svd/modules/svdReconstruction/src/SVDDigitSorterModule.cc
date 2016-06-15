@@ -135,7 +135,7 @@ void SVDDigitSorterModule::event()
       VxdID sensorID = vxd_samples.first;
       // If malformed object, drop it. Only here, for sorted digits the check will be done in sorter module.
       if (!geo.validSensorID(sensorID)) {
-        B2WARNING("Sensor with malformed VxdID " << sensorID.getID() << ", dropping.")
+        B2WARNING("Sensor with malformed VxdID " << sensorID.getID() << ", dropping.");
         continue;
       }
       const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
@@ -155,7 +155,7 @@ void SVDDigitSorterModule::event()
           // Count samples and erase if small, reset counters.
           if (!pass) {
             samples.erase(currentStart, sensor_it);
-            if (sensor_it != firstSample) B2DEBUG(89, "ERASED.")
+            if (sensor_it != firstSample) B2DEBUG(89, "ERASED.");
             }
           currentStart = sensor_it;;
           currentCount = 0;
@@ -199,7 +199,7 @@ void SVDDigitSorterModule::event()
   unsigned int index(0);
   // And just loop over the sensors and assign the digits at the correct position
   for (const auto& sensor : sensors) {
-    B2DEBUG(99, "Sample size: " << sensor.second.size())
+    B2DEBUG(99, "Sample size: " << sensor.second.size());
     const SVD::Sample* lastsample(0);
     for (const SVD::Sample& sample : sensor.second) {
       //Normal case: strip has different address
@@ -225,7 +225,7 @@ void SVDDigitSorterModule::event()
           relationIndices[sample.getArrayIndex()] = std::make_pair(index - 1, false);
         } else {
           //Otherwise delete the second pixel by omitting it here and removing relation elements on consolidation
-          B2INFO("Dropped duplicate digit: " << sensor.first << ", strip " << sample.getCellID() << " sample " << sample.getSampleIndex())
+          B2INFO("Dropped duplicate digit: " << sensor.first << ", strip " << sample.getCellID() << " sample " << sample.getSampleIndex());
           relationIndices[sample.getArrayIndex()] = std::make_pair(0, true);
         }
       }

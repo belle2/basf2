@@ -107,7 +107,7 @@ namespace Belle2 {
                 " after lockdown! This is unintended behavior - doing nothing instead...");
         return;
       }
-      B2DEBUG(5, "FilterMill::add2HitFilter: filter " << newFilter.first << " added")
+      B2DEBUG(5, "FilterMill::add2HitFilter: filter " << newFilter.first << " added");
       m_2Hitfilters.push_back(std::move(newFilter));
     }
 
@@ -120,7 +120,7 @@ namespace Belle2 {
                 " after lockdown! This is unintended behavior - doing nothing instead...");
         return;
       }
-      B2DEBUG(5, "FilterMill::add3HitFilter: filter " << newFilter.first << " added")
+      B2DEBUG(5, "FilterMill::add3HitFilter: filter " << newFilter.first << " added");
       m_3Hitfilters.push_back(std::move(newFilter));
     }
 
@@ -133,7 +133,7 @@ namespace Belle2 {
                 " after lockdown! This is unintended behavior - doing nothing instead...");
         return;
       }
-      B2DEBUG(5, "FilterMill::add4HitFilter: filter " << newFilter.first << " added")
+      B2DEBUG(5, "FilterMill::add4HitFilter: filter " << newFilter.first << " added");
       m_4Hitfilters.push_back(std::move(newFilter));
     }
 
@@ -160,13 +160,13 @@ namespace Belle2 {
           filterNames += filterPack.first + " ";
         }
         B2WARNING("FilterMill:grindData2Hit: an exception was thrown by one of the Filters/SelectionVariables, that indicates strange input data, no data collected! Filters "
-                  << filterNames << " were used and one of them did not work.")
+                  << filterNames << " were used and one of them did not work.");
         return;
       }
 
       collectedData.insert(collectedData.end(), tempData.begin(), tempData.end());
 
-      B2DEBUG(5, "FilterMill::grindData2Hit: collectedData has now " << collectedData.size() << " entries")
+      B2DEBUG(5, "FilterMill::grindData2Hit: collectedData has now " << collectedData.size() << " entries");
     }
 
 
@@ -193,12 +193,12 @@ namespace Belle2 {
           filterNames += filterPack.first + " ";
         }
         B2WARNING("FilterMill:grindData3Hit: an exception was thrown by one of the Filters/SelectionVariables, that indicates strange input data, no data collected! Filters "
-                  << filterNames << " were used and one of them did not work.")
+                  << filterNames << " were used and one of them did not work.");
         return;
       }
       collectedData.insert(collectedData.end(), tempData.begin(), tempData.end());
 
-      B2DEBUG(5, "FilterMill::grindData3Hit: collectedData has now " << collectedData.size() << " entries")
+      B2DEBUG(5, "FilterMill::grindData3Hit: collectedData has now " << collectedData.size() << " entries");
     }
 
 
@@ -221,12 +221,12 @@ namespace Belle2 {
           tempData.push_back({filterPack.first, result});
         }
       } catch (...) {
-        B2WARNING("FilterMill:grindData4Hit: an exception was thrown by one of the Filters/SelectionVariables, that indicates strange input data, no data collected!")
+        B2WARNING("FilterMill:grindData4Hit: an exception was thrown by one of the Filters/SelectionVariables, that indicates strange input data, no data collected!");
         return;
       }
       collectedData.insert(collectedData.end(), tempData.begin(), tempData.end());
 
-      B2DEBUG(5, "FilterMill::grindData4Hit: collectedData has now " << collectedData.size() << " entries")
+      B2DEBUG(5, "FilterMill::grindData4Hit: collectedData has now " << collectedData.size() << " entries");
     }
 
   };

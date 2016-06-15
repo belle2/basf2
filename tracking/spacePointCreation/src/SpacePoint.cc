@@ -162,7 +162,7 @@ vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible() const
     throw InvalidDetectorType();
   }
 
-  B2DEBUG(50, "SpacePoint::getGenfitCompatible(): collected " << collectedMeasurements.size() << " meaturements")
+  B2DEBUG(50, "SpacePoint::getGenfitCompatible(): collected " << collectedMeasurements.size() << " meaturements");
 
   return collectedMeasurements;
 }

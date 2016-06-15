@@ -77,9 +77,9 @@ namespace Belle2 {
       if (nHitCombinations <2 or nHitCombinations > 4)
         B2FATAL("printStaticSectorRelations: input-parameter wrong ("
                 << nHitCombinations
-                << ", allowed only 2-4), skipping print-function!")
+                << ", allowed only 2-4), skipping print-function!");
 
-        B2INFO("now manually printing static sectors with inner sectors:")
+        B2INFO("now manually printing static sectors with inner sectors:");
         std::string secIDCombis = "## printed " + std::to_string(nHitCombinations) + "-sector-combi-output of secMap: " + configName +
                                   "\n{";
       for (const auto* staticSector : filters.getStaticSectors()) {

@@ -94,7 +94,7 @@ namespace Belle2 {
      */
     bool executeAlgorithm(std::vector<TCType*>& overlappingTCs)
     {
-      B2DEBUG(25, "doHopfield - given TCs:\n" << BaseClass::miniPrinter(overlappingTCs))
+      B2DEBUG(25, "doHopfield - given TCs:\n" << BaseClass::miniPrinter(overlappingTCs));
 
       /** TODO
       * commit stuff sofar (take care of non-working tests
@@ -120,12 +120,12 @@ namespace Belle2 {
 
       if (nSurvivors == 0) {
         B2DEBUG(3, "Hopfield network - had no survivors! " << BaseClass::checkAtEnd() << "\n Overview:\n" << BaseClass::miniPrinter(
-                  overlappingTCs))
+                  overlappingTCs));
         return false;
       }
 
       B2DEBUG(50, "executeAlgorithm Hopfield: at end of algoritm: total number of TCs alive: " << BaseClass::checkAtEnd() <<
-              "\n Overview:\n" << BaseClass::miniPrinter(overlappingTCs))
+              "\n Overview:\n" << BaseClass::miniPrinter(overlappingTCs));
       return true;
     }
 
@@ -210,7 +210,7 @@ namespace Belle2 {
       std::iota(sequenceVector.begin(), sequenceVector.end(), 0);
       std::string cOutPut;
       for (unsigned entry : sequenceVector) { cOutPut += std::to_string(entry) + " "; }
-      B2DEBUG(100, "sequenceVector with length " << sequenceVector.size() << " created, entries are from begin to end: " << cOutPut)
+      B2DEBUG(100, "sequenceVector with length " << sequenceVector.size() << " created, entries are from begin to end: " << cOutPut);
 
       int nIterations = 0;
       std::array<double, 100> cValues; // protocolling all values of c
@@ -230,7 +230,7 @@ namespace Belle2 {
 
           xMatrix(0, i) = 0.5 * (1. + tanh(act / T));
 
-          B2DEBUG(100, "tc, random number " << i << " -  old neuron value: " << xMatrix(0, i))
+          B2DEBUG(100, "tc, random number " << i << " -  old neuron value: " << xMatrix(0, i));
         }
 
         T = 0.5 * (T + Tmin);
@@ -238,7 +238,7 @@ namespace Belle2 {
         tempMatrix = (xMatrix - xMatrixOld);
         tempMatrix.Abs();
         c = tempMatrix.Max();
-        B2DEBUG(10, " c value is " << c << " at iteration " << nIterations)
+        B2DEBUG(10, " c value is " << c << " at iteration " << nIterations);
         cValues.at(nIterations) = c;
 
         xMatrixOld = xMatrix;
@@ -261,7 +261,7 @@ namespace Belle2 {
       for (unsigned int i = 0; i < nTCs; i++) {
         B2DEBUG(50, "tc " << i <<
                 " - got final neuron value: " << xMatrix(0, i) <<
-                " and quality indicator " << tcs[i].qi)
+                " and quality indicator " << tcs[i].qi);
         tcs[i].neuronValue = xMatrix(0, i);
       }
 
@@ -287,7 +287,7 @@ namespace Belle2 {
     virtual bool cleanOverlaps()
     {
       std::string result = BaseClass::checkAtStart();
-      B2DEBUG(25, "TrackSetEvaluatorHopfieldNN::cleanOverlaps: " << result)
+      B2DEBUG(25, "TrackSetEvaluatorHopfieldNN::cleanOverlaps: " << result);
 
       std::vector<TCType*> overlaps = BaseClass::getOverlappingTCs();
       unsigned int nOverlaps = overlaps.size();

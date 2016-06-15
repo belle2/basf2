@@ -151,7 +151,7 @@ void SVDDigitizerModule::initialize()
 
   B2INFO(
     "SVDDigitizer parameters (in default system units, *=cannot be set directly):");
-  B2INFO(" DATASTORE COLLECTIONS:")
+  B2INFO(" DATASTORE COLLECTIONS:");
   B2INFO(
     " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
   B2INFO(

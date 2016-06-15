@@ -85,7 +85,7 @@ namespace Belle2 {
     {
       auto pos = AlgoritmType::s_fromTypeToString.find(type);
       if (pos == AlgoritmType::s_fromTypeToString.end()) {
-        B2ERROR("AlgoritmType::getTypeName(): given iD " << type << " is not a valid AlgoritmType, return AlgoritmType::UnknownType!")
+        B2ERROR("AlgoritmType::getTypeName(): given iD " << type << " is not a valid AlgoritmType, return AlgoritmType::UnknownType!");
         return AlgoritmType::s_fromTypeToString[UnknownType];
       }
       return pos->second;
@@ -97,7 +97,7 @@ namespace Belle2 {
     {
       auto pos = AlgoritmType::s_fromStringToType.find(type);
       if (pos == AlgoritmType::s_fromStringToType.end()) {
-        B2ERROR("AlgoritmType::getTypeName(): given iD " << type << " is not a valid AlgoritmType, return AlgoritmType::UnknownType!")
+        B2ERROR("AlgoritmType::getTypeName(): given iD " << type << " is not a valid AlgoritmType, return AlgoritmType::UnknownType!");
         return AlgoritmType::s_fromStringToType[std::string("UnknownType")];
       }
       return pos->second;

@@ -141,6 +141,6 @@ void Ds2RawFileModule::terminate()
 
   // RingBuffer should not be deleted
 
-  B2INFO("Ds2Raw: terminate called")
+  B2INFO("Ds2Raw: terminate called");
 }
 

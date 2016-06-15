@@ -69,9 +69,9 @@ extern"C" {
 
 void KoralW::init(const std::string& dataPath, const std::string& userDataFile, int randomSeed)
 {
-  if (dataPath.empty()) B2FATAL("KoralW: The specified data path is empty !")
-    if (userDataFile.empty()) B2FATAL("KoralW: The specified user data file is empty !")
-      if ((randomSeed < 0) || (randomSeed > 900000000)) B2FATAL("The random seed has to be in the range 0 .. 900 OOO OOO !")
+  if (dataPath.empty()) B2FATAL("KoralW: The specified data path is empty !");
+    if (userDataFile.empty()) B2FATAL("KoralW: The specified user data file is empty !");
+      if ((randomSeed < 0) || (randomSeed > 900000000)) B2FATAL("The random seed has to be in the range 0 .. 900 OOO OOO !");
 
         //Make sure the dataPath ends with an "/"
         string dataPathNew = dataPath;

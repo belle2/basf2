@@ -65,7 +65,7 @@ void SADInputModule::initialize()
 
   //Check parameters
   if (!FileSystem::fileExists(m_filename)) {
-    B2ERROR("Parameter <Filename>: Could not open the file. The filename " << m_filename << " does not exist !")
+    B2ERROR("Parameter <Filename>: Could not open the file. The filename " << m_filename << " does not exist !");
   } else m_reader.open(m_filename);
 
   //Initialize the SAD reader.
@@ -83,7 +83,7 @@ void SADInputModule::initialize()
     case 1 : m_PipePartMatrix->RotateY(her.getDouble("angle") / Unit::deg);
       m_reader.initialize(m_PipePartMatrix, m_range, ReaderSAD::c_HER,  m_readoutTime);
       break;
-    default: B2FATAL("Please specify a valid number for the accRing parameter (0 = LER, 1 = HER) !")
+    default: B2FATAL("Please specify a valid number for the accRing parameter (0 = LER, 1 = HER) !");
       break;
   }
 
@@ -108,7 +108,7 @@ void SADInputModule::event()
           break;
         case 2:  m_reader.addAllSADParticles(mpg);
           break;
-        default: B2FATAL("Please specify a valid number for the readMode parameter !")
+        default: B2FATAL("Please specify a valid number for the readMode parameter !");
           break;
       }
 
@@ -118,7 +118,7 @@ void SADInputModule::event()
       mpg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
     } catch (ReaderSAD::SADEndOfFile& exc) {
-      B2DEBUG(10, exc.what())
+      B2DEBUG(10, exc.what());
       eventMetaDataPtr->setEndOfData();
       return;
     }

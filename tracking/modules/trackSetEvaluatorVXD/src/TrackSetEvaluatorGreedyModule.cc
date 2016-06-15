@@ -43,7 +43,7 @@ void TrackSetEvaluatorGreedyModule::event()
   m_nTCsOverlapping += m_tcNetwork->getNCompetitors();
 
   B2INFO("TrackSetEvaluatorGreedyModule - in event " << m_eventCounter << ": got " << m_spacePointTrackCands.getEntries() <<
-         " TC of which " << m_tcNetwork->getNCompetitors() << " are overlapping")
+         " TC of which " << m_tcNetwork->getNCompetitors() << " are overlapping");
 
   m_tcNetwork->replaceTrackSetEvaluator(new TrackSetEvaluatorGreedy<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard>
                                         (m_tcNetwork->getNodes(), m_tcNetwork->getObserver()));
@@ -51,14 +51,14 @@ void TrackSetEvaluatorGreedyModule::event()
   bool wasSuccessful = m_tcNetwork->cleanOverlaps();
   if (!wasSuccessful) {
     B2ERROR("TrackSetEvaluatorGreedyModule - in event " << m_eventCounter <<
-            ": greedy did not succeed! tracks were not successfully cleaned of overlaps!")
+            ": greedy did not succeed! tracks were not successfully cleaned of overlaps!");
     m_nGreedyFails++;
     return;
   }
   m_totalQI += m_tcNetwork->accessEvaluator()->getTotalQI();
   m_totalSurvivingQI += m_tcNetwork->accessEvaluator()->getTotalSurvivingQI();
 
-  B2INFO("TrackSetEvaluatorGreedyModule - in event " << m_eventCounter << ": after cleanOverlaps: network now looks like this:")
+  B2INFO("TrackSetEvaluatorGreedyModule - in event " << m_eventCounter << ": after cleanOverlaps: network now looks like this:");
   m_tcNetwork->print();
 
   m_nFinalTCs += m_tcNetwork->accessEvaluator()->getNSurvivors();
@@ -87,7 +87,7 @@ void TrackSetEvaluatorGreedyModule::endRun()
          ", sum of QI total: " << m_totalQI <<
          ", sum of QI after cleanOverlaps: " << m_totalSurvivingQI <<
          ", highest/lowest QI found: " << m_maxQI << "/" << m_minQI <<
-         ", number of times Greedy did not succeed: " << m_nGreedyFails)
+         ", number of times Greedy did not succeed: " << m_nGreedyFails);
 }
 
 

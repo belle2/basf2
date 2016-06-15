@@ -207,7 +207,7 @@ namespace Belle2 {
         if (doX) divider++;
         if (doY) divider++;
         if (doZ) divider++;
-        if (divider == 0.) B2FATAL("RawSecMapMerger::testSegmentFilters::testDistanceFilter: was used in an illegal way!")
+        if (divider == 0.) B2FATAL("RawSecMapMerger::testSegmentFilters::testDistanceFilter: was used in an illegal way!");
           double outerX = 1., outerY = 2., outerZ = 3.;
         if (doX) outerX += cut / divider;
         if (doY) outerY += cut / divider;
@@ -284,7 +284,7 @@ namespace Belle2 {
     void processSectorCombinations(const SectorMapConfig& config, VXDTFFilters<SpacePoint>* xHitFilters,
                                    unsigned secChainLength)
     {
-      B2INFO("processSectorCombinations: training map " << config.secMapName << " with secChainLength: " << secChainLength)
+      B2INFO("processSectorCombinations: training map " << config.secMapName << " with secChainLength: " << secChainLength);
 
       // branch-names sorted from outer to inner:
       std::vector<std::string> secBranchNames;
@@ -309,7 +309,7 @@ namespace Belle2 {
       // use rareness-threshold to find sector-combinations which are very rare and remove them:
       unsigned nKilled = mainGraph.pruneGraph(config.rarenessThreshold);
 
-      B2INFO("processSectorCombinations: nKilled after graph-pruning: " << nKilled)
+      B2INFO("processSectorCombinations: nKilled after graph-pruning: " << nKilled);
 
       // get the raw data and determine the cuts for the filters/selectionVariable
       for (auto& subgraph : mainGraph) {
@@ -329,14 +329,14 @@ namespace Belle2 {
       // checks for sectors which have inner neighbour and updates the sublayerID of the sensors.
       mainGraph.updateSubLayerIDs();
 
-      B2INFO("processSectorCombinations: training finished.\n" << mainGraph.print(m_PARAMprintFullGraphs);)
+      B2INFO("processSectorCombinations: training finished.\n" << mainGraph.print(m_PARAMprintFullGraphs););
 
       // TODO this is not yet capable of dealing with other than twoHitFilters. -> generalize!
       getSegmentFilters(config, mainGraph, xHitFilters, secChainLength);
 
       if (xHitFilters->size() == 0) {
         delete xHitFilters;
-        B2FATAL("processSectorCombinations: an empty VXDTFFilters was returned, training data did not work!")
+        B2FATAL("processSectorCombinations: an empty VXDTFFilters was returned, training data did not work!");
       }
 
       // some testing:
@@ -555,7 +555,7 @@ namespace Belle2 {
 
         VXDTFFilters<SpacePoint>* xHitFilters = new VXDTFFilters<SpacePoint>;
 
-        B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 2-hit-combinations:\n\n")
+        B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 2-hit-combinations:\n\n");
         processSectorCombinations(config, xHitFilters, 2);
 
         // for debugging:
@@ -565,15 +565,15 @@ namespace Belle2 {
         // catching case of empty xHitFilters:
         if (xHitFilters->size() == 0) {
           delete xHitFilters;
-          B2FATAL("RawSecMapMerger:initialize: after processSectorCombinations an empty VXDTFFilters was returned, training data did not work!")
+          B2FATAL("RawSecMapMerger:initialize: after processSectorCombinations an empty VXDTFFilters was returned, training data did not work!");
         }
-        B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 3-hit-combinations:\n\n")
+        B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 3-hit-combinations:\n\n");
         processSectorCombinations(config, xHitFilters, 3);
         sectorMap->assignFilters(config.secMapName, xHitFilters);
         return; // TODO WARNING DEBUG we do not want to run more than one run yet!
 
-        B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 4-hit-combinations:\n\n")
-        B2INFO(" assigning no filters to sectorMap: ")
+        B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 4-hit-combinations:\n\n");
+        B2INFO(" assigning no filters to sectorMap: ");
         processSectorCombinations(config, xHitFilters, 4);
 
       }

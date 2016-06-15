@@ -171,7 +171,7 @@ namespace Belle2 {
   /** Unfinished test - shall test bufferOverflows... */
   TEST_F(FullSecIDTest, bufferOverflowTest)
   {
-    B2WARNING("TODO: FullSecIDTest:bufferOverflowTest should catch cases of bad user input")
+    B2WARNING("TODO: FullSecIDTest:bufferOverflowTest should catch cases of bad user input");
     // WARNING TODO should catch cases of bad user input
   }
 }  // namespace

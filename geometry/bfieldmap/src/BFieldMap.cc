@@ -39,7 +39,7 @@ const TVector3 BFieldMap::getBField(const TVector3& point)
     }
 
     m_isMapInitialized = true;
-    B2DEBUG(10, "The magnetic field map has been initialized.")
+    B2DEBUG(10, "The magnetic field map has been initialized.");
   }
 
   //Loop over all magnetic field components and add their magnetic field vectors

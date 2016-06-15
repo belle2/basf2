@@ -94,15 +94,15 @@ NonRootDataExportModule::~NonRootDataExportModule()
 
 void NonRootDataExportModule::initialize()
 {
-  B2INFO("NonRootDataExportModule::initialize() \n checking and setting initial parameters")
+  B2INFO("NonRootDataExportModule::initialize() \n checking and setting initial parameters");
 
   if (m_PARAMDetectorType != "PXD" and m_PARAMDetectorType != "SVD" and m_PARAMDetectorType != "VXD") {  // detectorType
-    B2ERROR(" chosen value '" << m_PARAMDetectorType << "' for parameter detectorType is unknown, setting to 'SVD'")
+    B2ERROR(" chosen value '" << m_PARAMDetectorType << "' for parameter detectorType is unknown, setting to 'SVD'");
     m_PARAMDetectorType = "SVD";
   }
 
   if (m_PARAMoutputFormat != "gsi" and m_PARAMoutputFormat != "simpleMatlab") {  // outputFormat
-    B2ERROR(" chosen value '" << m_PARAMoutputFormat << "' for parameter outputFormat is unknown, setting to 'simpleMatlab'")
+    B2ERROR(" chosen value '" << m_PARAMoutputFormat << "' for parameter outputFormat is unknown, setting to 'simpleMatlab'");
     m_PARAMoutputFormat = "simpleMatlab";
   }
   m_exportContainer.setOutputFormat(m_PARAMoutputFormat);
@@ -115,7 +115,7 @@ void NonRootDataExportModule::initialize()
       StoreArray<SVDTrueHit>::required();
     }
   } else {
-    B2ERROR(" chosen value '" << m_PARAMExportTrueHits << "' for parameter exportTrueHits is unknown, setting to 'none'")
+    B2ERROR(" chosen value '" << m_PARAMExportTrueHits << "' for parameter exportTrueHits is unknown, setting to 'none'");
     m_PARAMExportTrueHits = "none";
   }
 
@@ -125,12 +125,12 @@ void NonRootDataExportModule::initialize()
 
   if (m_PARAMeventCounter < 0) {
     m_PARAMeventCounter = 0;
-    B2ERROR("NonRootDataExport: eventCounter is set on illegal value, resetting to 0!")
+    B2ERROR("NonRootDataExport: eventCounter is set on illegal value, resetting to 0!");
   }
   StoreArray<MCParticle>::required();
   B2INFO("NonRootDataExportModule: chosen detectorType: " << m_PARAMDetectorType << ", exporting TrueHits: " << m_PARAMExportTrueHits
          << " and exporting GFTrackCands: " << m_PARAMExportGFTCs << ", minimal ndf number of hits for tcs: " << m_PARAMminTCLength <<
-         " while using '" << m_PARAMoutputFormat << "/" << m_exportContainer.getOutputFormat() << "' as outputFormat")
+         " while using '" << m_PARAMoutputFormat << "/" << m_exportContainer.getOutputFormat() << "' as outputFormat");
 }
 
 
@@ -174,7 +174,7 @@ void NonRootDataExportModule::event()
     if (m_PARAMDetectorType == "PXD" or m_PARAMDetectorType == "VXD") { // storing pxd truehits
       StoreArray<PXDTrueHit> pxdTrueHits; // carries all trueHits of event
       nPXDTrueHits = pxdTrueHits.getEntries();
-      B2DEBUG(1, "NonRootDataExportModule event " << m_eventCounter << ": executing " << nPXDTrueHits << " PXDTrueHits")
+      B2DEBUG(1, "NonRootDataExportModule event " << m_eventCounter << ": executing " << nPXDTrueHits << " PXDTrueHits");
       RelationIndex<MCParticle, PXDTrueHit> mcParticlesToPxdTrueHits; // allows us to find out which particle caused which truehit
       typedef RelationIndex<MCParticle, PXDTrueHit>::Element RelationElement;
 
@@ -197,13 +197,13 @@ void NonRootDataExportModule::event()
           }
         }
         B2DEBUG(10, " PXDTrueHit with ID " << i << " is attached to mcParticles with ID " << particleID <<
-                " and hasStatusPrimary (0 = true) " << isPrimary)
+                " and hasStatusPrimary (0 = true) " << isPrimary);
 
         if ((m_PARAMExportTrueHits == "real" and isPrimary != 0) or (m_PARAMExportTrueHits == "background" and isPrimary != 1)
             or (m_PARAMExportTrueHits == "all" and isPrimary == -1)) {
           isPrimary = 1;
           particleID = -1;
-          B2DEBUG(10, " PXD hit " << i << " neglected")
+          B2DEBUG(10, " PXD hit " << i << " neglected");
           continue;
         }
         string errorMessage = m_exportContainer.storePXDTrueHit(aGeometry, aTrueHit, i, m_PARAMsmearTrueHits, isPrimary, particleID, pdg);
@@ -220,7 +220,7 @@ void NonRootDataExportModule::event()
     if (m_PARAMDetectorType == "SVD" or m_PARAMDetectorType == "VXD") {
       StoreArray<SVDTrueHit> svdTrueHits; // carries all trueHits of event
       nSVDTrueHits = svdTrueHits.getEntries();
-      B2DEBUG(5, "NonRootDataExportModule event " << m_eventCounter << ": executing " << nSVDTrueHits << " SVDTrueHits")
+      B2DEBUG(5, "NonRootDataExportModule event " << m_eventCounter << ": executing " << nSVDTrueHits << " SVDTrueHits");
       RelationIndex<MCParticle, SVDTrueHit> mcParticlesToSvdTrueHits; // allows us to find out which particle caused which truehit
       typedef RelationIndex<MCParticle, SVDTrueHit>::Element RelationElement;
 
@@ -242,13 +242,13 @@ void NonRootDataExportModule::event()
           }
         }
         B2DEBUG(10, " SVDTrueHit with ID " << i << " is attached to mcParticles with ID " << particleID <<
-                " and hasStatusPrimary (0 = true) " << isPrimary)
+                " and hasStatusPrimary (0 = true) " << isPrimary);
 
         if ((m_PARAMExportTrueHits == "real" and isPrimary != 0) or (m_PARAMExportTrueHits == "background" and isPrimary != 1)
             or (m_PARAMExportTrueHits == "all" and isPrimary == -1)) {
           isPrimary = 1;
           particleID = -1;
-          B2DEBUG(10, " SVD hit " << i << " neglected")
+          B2DEBUG(10, " SVD hit " << i << " neglected");
           continue;
         }
 
@@ -275,17 +275,17 @@ void NonRootDataExportModule::event()
     vector<const SVDTrueHit*> svdHits;
     vector<int> hitIDs; // pxd and svd can use the same vector since modified hitIDs are stored which are unique for each hit
     int nTCs = gftcs.getEntries(), detID, hitID, countedTCs = 0;
-    B2DEBUG(5, "NonRootDataExportModule event " << m_eventCounter << ": executing " << nTCs << " GFTrackCands")
+    B2DEBUG(5, "NonRootDataExportModule event " << m_eventCounter << ": executing " << nTCs << " GFTrackCands");
 
     for (int i = 0; i < nTCs; ++i) {
       hitIDs.clear(); pxdHits.clear(); svdHits.clear();
       genfit::TrackCand* aTC = gftcs[i];
       int nHits = aTC->getNHits();
-      B2DEBUG(10, "event " << m_eventCounter << ": TC " << i << " has got " << nHits << " hits")
+      B2DEBUG(10, "event " << m_eventCounter << ": TC " << i << " has got " << nHits << " hits");
 
       if (int(aTC->getNHits()) < m_PARAMminTCLength) {
         B2WARNING("NonRootDataExportModule - event " << m_eventCounter << ": GfTrackcand " << i << " has only " << nHits <<
-                  " hits (threshold is " << m_PARAMminTCLength << "), neglecting tc...")
+                  " hits (threshold is " << m_PARAMminTCLength << "), neglecting tc...");
         continue;
       }
 
@@ -293,7 +293,7 @@ void NonRootDataExportModule::event()
         detID = 0;
         hitID = 0;
         aTC->getHit(j, detID, hitID); // sets detId and hitId for given hitIndex
-        B2DEBUG(100, "----got Hitinfo. detID: " << detID << ", hitID: " << hitID)
+        B2DEBUG(100, "----got Hitinfo. detID: " << detID << ", hitID: " << hitID);
         if (detID == Const::PXD and m_PARAMDetectorType != "SVD") { // pxd
           hitIDs.push_back(hitID);
           const PXDTrueHit* hit = pxdTrueHits[hitID];
@@ -304,7 +304,7 @@ void NonRootDataExportModule::event()
           svdHits.push_back(hit);
         }
       }
-      B2DEBUG(10, "storing GFTC " << i << " with " << pxdHits.size() << " pxd hits and " << svdHits.size() << " svd hits")
+      B2DEBUG(10, "storing GFTC " << i << " with " << pxdHits.size() << " pxd hits and " << svdHits.size() << " svd hits");
       m_exportContainer.storeGFTC(aGeometry, aTC, countedTCs, i, pxdHits, svdHits, hitIDs);
       for (HitExporter& aContainer : m_exportContainerVector) {
         aContainer.storeGFTC(aGeometry, aTC, countedTCs, i, pxdHits, svdHits, hitIDs);
@@ -317,7 +317,7 @@ void NonRootDataExportModule::event()
   B2DEBUG(5, " event " << m_eventCounter << " got ID " << m_eventCounter << ", internal eventID of " <<
           m_exportContainer.getCurrentEventNumber() << " and got internal hits: " << m_exportContainer.getNumberOfHits() <<
           " hits, of these were " << m_exportContainer.getNumberOfPXDTrueHits() << " PXDTrueHits, and " <<
-          m_exportContainer.getNumberOfSVDTrueHits() << " were SVDTrueHits")
+          m_exportContainer.getNumberOfSVDTrueHits() << " were SVDTrueHits");
 }
 
 
@@ -328,16 +328,16 @@ void NonRootDataExportModule::endRun()
   if (m_PARAMoutputFormat == "gsi") {
     string extendedInfoOfExport = m_exportContainer.exportGsi(m_runCounter,
                                                               15.0); // second entry is the strength of the magnetic field in kiloGauss
-    B2INFO("exportGsi: run " << m_runCounter << ": " << extendedInfoOfExport)
+    B2INFO("exportGsi: run " << m_runCounter << ": " << extendedInfoOfExport);
   } else if (m_PARAMoutputFormat == "simpleMatlab") {
     for (HitExporter& aContainer : m_exportContainerVector) {
       string extendedInfoOfExport = aContainer.exportSimpleMatlab(m_runCounter);
-      B2INFO("exportSimpleMatlab: run " << m_runCounter << ": " << extendedInfoOfExport)
+      B2INFO("exportSimpleMatlab: run " << m_runCounter << ": " << extendedInfoOfExport);
     }
 //     string extendedInfoOfExport = m_exportContainer.exportSimpleMatlab(m_runCounter);
 //     B2INFO("exportSimpleMatlab: run " << m_runCounter <<": " << extendedInfoOfExport)
   } else {
-    B2FATAL("NonRootDataExportModule::endRun: outputFormat '" << m_PARAMoutputFormat << "'not recognized! Aborting export")
+    B2FATAL("NonRootDataExportModule::endRun: outputFormat '" << m_PARAMoutputFormat << "'not recognized! Aborting export");
   }
 
   // cleanUp
@@ -373,7 +373,7 @@ void NonRootDataExportModule::loadSecMap(std::vector<std::string> secMaps)
       newMap = dynamic_cast<const VXDTFSecMap*>(Gearbox::getInstance().getTObject(directory.c_str()));
     } catch (exception& e) {
       B2ERROR("NonRootDataExportModule::loadSecMap: could not load sectorMap: " << aMapName << ". Reason: exception thrown: " << e.what()
-              << ", this means you have to check whether the sectorMaps stored in ../tracking/data/VXDTFindex.xml and/or ../testbeam/vxd/data/VXDTFindexTF.xml are uncommented and locally unpacked and available! Skipping current map...")
+              << ", this means you have to check whether the sectorMaps stored in ../tracking/data/VXDTFindex.xml and/or ../testbeam/vxd/data/VXDTFindexTF.xml are uncommented and locally unpacked and available! Skipping current map...");
       continue;
     }
 
@@ -416,7 +416,7 @@ void NonRootDataExportModule::printSecMap()
       B2DEBUG(1, "Opening sector " << FullSecID(mapEntry.first) << " which has got " << nFriends << " friends");
       if (nFriends != mapEntry.second->getFriendMapSize()) {
         B2WARNING(" number of friends do not match in sector " << FullSecID(mapEntry.first) <<
-                  ": friends by friendVector vs nEntries in FriendMa: " << nFriends << "/" << mapEntry.second->getFriendMapSize())
+                  ": friends by friendVector vs nEntries in FriendMa: " << nFriends << "/" << mapEntry.second->getFriendMapSize());
       }
 
       for (auto friendName : currentFriends) {  // looping through friends

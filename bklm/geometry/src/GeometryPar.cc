@@ -27,7 +27,7 @@ namespace Belle2 {
     GeometryPar* GeometryPar::instance(void)
     {
       if (m_Instance) return m_Instance;
-      B2FATAL("getInstance() called without initialization")
+      B2FATAL("getInstance() called without initialization");
       return NULL;  // never reached
     }
 
@@ -80,7 +80,7 @@ namespace Belle2 {
       m_HalfLength = content.getLength("HalfLength");
       m_NLayer = content.getNumberNodes("Layers/Layer");
       if (m_NLayer > NLAYER) { // for array m_HasRPCs[]
-        B2FATAL("BKLM GeometryPar::read(): # of layers (" << m_NLayer << ") exceeds array size NLAYER (" << NLAYER << ")")
+        B2FATAL("BKLM GeometryPar::read(): # of layers (" << m_NLayer << ") exceeds array size NLAYER (" << NLAYER << ")");
       }
 
       m_IronNominalHeight = content.getLength("Layers/IronNominalHeight");
@@ -262,7 +262,7 @@ namespace Belle2 {
       m_HalfLength = element.getHalfLength();
       m_NLayer = element.getNLayer();
       if (m_NLayer > NLAYER) { // for array m_HasRPCs[]
-        B2FATAL("BKLM GeometryPar::readFromDB(): # of layers (" << m_NLayer << ") exceeds array size NLAYER (" << NLAYER << ")")
+        B2FATAL("BKLM GeometryPar::readFromDB(): # of layers (" << m_NLayer << ") exceeds array size NLAYER (" << NLAYER << ")");
       }
 
       m_IronNominalHeight = element.getIronNominalHeight();

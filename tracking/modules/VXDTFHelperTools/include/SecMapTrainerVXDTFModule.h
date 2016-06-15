@@ -53,14 +53,14 @@ namespace Belle2 {
 
     /** beginRun. */
     virtual void beginRun()
-    { B2INFO("~~~~~~~~~~~SecMapTrainerVXDTFModule - beginRun ~~~~~~~~~~") }
+    { B2INFO("~~~~~~~~~~~SecMapTrainerVXDTFModule - beginRun ~~~~~~~~~~"); }
 
     /** event. */
     virtual void event();
 
     /** endRun. */
     virtual void endRun()
-    { B2INFO("~~~~~~~~~~~SecMapTrainerVXDTFModule - end of endRun ~~~~~~~~~~") }
+    { B2INFO("~~~~~~~~~~~SecMapTrainerVXDTFModule - end of endRun ~~~~~~~~~~"); }
 
     /** terminate. */
     virtual void terminate();

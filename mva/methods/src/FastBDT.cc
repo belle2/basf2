@@ -138,12 +138,12 @@ namespace Belle2 {
         size_t f = t.find("inf");
         if (f < std::string::npos) {
           t.replace(f, std::string("inf").length(), std::string("0.0"));
-          B2WARNING("Found infinity in FastBDT weightfile, I replace it with 0 to prevent horrible crashes, this is fixed in the newer version")
+          B2WARNING("Found infinity in FastBDT weightfile, I replace it with 0 to prevent horrible crashes, this is fixed in the newer version");
         }
         f = t.find("nan");
         if (f < std::string::npos) {
           t.replace(f, std::string("nan").length(), std::string("0.0"));
-          B2WARNING("Found nan in FastBDT weightfile, I replace it with 0 to prevent horrible crashes, this is fixed in the newer version")
+          B2WARNING("Found nan in FastBDT weightfile, I replace it with 0 to prevent horrible crashes, this is fixed in the newer version");
         }
         s << t + '\n';
       }

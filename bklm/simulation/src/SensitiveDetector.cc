@@ -76,7 +76,7 @@ namespace Belle2 {
         m_GeoPar = GeometryPar::instance();
         m_SimPar = SimulationPar::instance();
         if (!(m_SimPar->isValid())) {
-          B2FATAL("Simulation-control parameters are not available from module BKLMParamLoader")
+          B2FATAL("Simulation-control parameters are not available from module BKLMParamLoader");
         }
         m_HitTimeMax = m_SimPar->getHitTimeMax();
         m_DoBackgroundStudy = m_SimPar->getDoBackgroundStudy();
@@ -109,7 +109,7 @@ namespace Belle2 {
         const G4VTouchable* hist = preStep->GetTouchable();
         int depth = hist->GetHistoryDepth();
         if (depth < DEPTH_PLANE) {
-          B2WARNING("Touchable History depth = " << depth << " should be at least " << DEPTH_PLANE)
+          B2WARNING("Touchable History depth = " << depth << " should be at least " << DEPTH_PLANE);
           return false;
         }
         int plane = hist->GetCopyNumber(depth - DEPTH_PLANE);

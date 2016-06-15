@@ -189,7 +189,7 @@ namespace Belle2 {
 
       B2ERROR(" SelectionVariableFactory-2Hit: given name (raw/full): " << variableType <<
               "/" << SelectionVariableType::getTypeName(variableType) <<
-              " is not known, returning dummy function with 0.0 as return value!")
+              " is not known, returning dummy function with 0.0 as return value!");
 
       return [&](const PointType&, const PointType&) -> double { return 0.0; };
     }
@@ -325,7 +325,7 @@ namespace Belle2 {
       }
       B2ERROR(" SelectionVariableFactory-3Hit: given name (raw/full): " << variableType <<
               "/" << SelectionVariableType::getTypeName(variableType) <<
-              " is not known, returning dummy function with 0.0 as return value!")
+              " is not known, returning dummy function with 0.0 as return value!");
 
       return [&](const PointType&, const PointType&, const PointType&) -> double { return 0.0; };
     }
@@ -371,7 +371,7 @@ namespace Belle2 {
 
       B2ERROR(" SelectionVariableFactory-4Hit: given name (raw/full): " << variableType <<
               "/" << SelectionVariableType::getTypeName(variableType) <<
-              " is not known, returning dummy function with 0.0 as return value!")
+              " is not known, returning dummy function with 0.0 as return value!");
 
       return [&](const PointType&, const PointType&, const PointType&, const PointType&) -> double { return 0.0; };
     }

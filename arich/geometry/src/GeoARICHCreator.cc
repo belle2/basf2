@@ -76,11 +76,11 @@ namespace Belle2 {
     {
 
       if (type == 0) {
-        B2INFO("Geometry type: Full")
+        B2INFO("Geometry type: Full");
       } else if (type == 1) {
-        B2INFO("Geometry type: Tracking")
+        B2INFO("Geometry type: Tracking");
       } else if (type == 2) {
-        B2INFO("Geometry type: Display")
+        B2INFO("Geometry type: Display");
       }
       string Type = content.getString("@type", "");
       if (Type == "beamtest") {
@@ -107,7 +107,7 @@ namespace Belle2 {
         // check of material and its refractive index
         if (!material) { B2FATAL("Material '" << materialName << "', required by ARICH Envelope could not be found");}
         if (!getAvgRINDEX(material)) B2WARNING("Material '" << materialName <<
-                                                 "', required by ARICH Envelope has no specified refractive index. Continuing, but no photons in ARICH will be propagated.") ;
+                                                 "', required by ARICH Envelope has no specified refractive index. Continuing, but no photons in ARICH will be propagated.");
         // create and place
         envelope = new G4LogicalVolume(envelopeTube, material, "ARICH.Envelope");
         setVisibility(*envelope, false);
@@ -293,7 +293,7 @@ namespace Belle2 {
         G4ThreeVector asupPos = G4ThreeVector(0, 0, supportZ - asupportThick / 2.) - envOrigin;
         G4Transform3D transform5 = G4Translate3D(asupPos);
         new G4PVPlacement(transform5, lasupportTube, "ARICH.AerogelSupportPlate", envelope, false, 1);
-        B2INFO("ARICH aerogel layers support plate was placed.")
+        B2INFO("ARICH aerogel layers support plate was placed.");
       } else B2WARNING("ARICH aerogel layers will be placed without support plate. No parameters specified.");
 
       // build mirrors
@@ -498,7 +498,7 @@ namespace Belle2 {
     void GeoARICHCreator::createSimple(const GearDir& content, G4LogicalVolume& topVolume)
     {
 
-      B2INFO("ARICH simple (beamtest) geometry will be built.")
+      B2INFO("ARICH simple (beamtest) geometry will be built.");
       GearDir envelopeParams(content, "Envelope");
       double xSize = envelopeParams.getLength("xSize") / Unit::mm;
       double ySize = envelopeParams.getLength("ySize") / Unit::mm;

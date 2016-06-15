@@ -134,7 +134,7 @@ std::pair<Const::ParticleType, Const::ParticleType> V0Fitter::getTrackHypotheses
   } else if (v0Hypothesis == Const::antiLambda) {
     return std::make_pair(Const::pion, Const::proton);
   } else {
-    B2FATAL("Given V0Hypothesis not available.")
+    B2FATAL("Given V0Hypothesis not available.");
     return std::make_pair(Const::invalidParticle, Const::invalidParticle);
   }
 

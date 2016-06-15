@@ -155,9 +155,9 @@ void Phokhara::setDefaultSettings()
 
 void Phokhara::init(const std::string& paramFile)
 {
-  B2INFO("Phokhara::init, using paramater file: " << paramFile)
+  B2INFO("Phokhara::init, using paramater file: " << paramFile);
 
-  if (paramFile.empty()) B2FATAL("Phokhara: The specified param file is empty!")
+  if (paramFile.empty()) B2FATAL("Phokhara: The specified param file is empty!");
     size_t fileLength = paramFile.size();
   phokhara_setparamfile_(paramFile.c_str(), &fileLength);
 

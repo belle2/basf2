@@ -236,7 +236,7 @@ namespace Belle2 {
 
       }
     } else {
-      B2ERROR("Encountered invalid RestOfEvent. This module has to run inside an foreach loop over RestOfEvents!")
+      B2ERROR("Encountered invalid RestOfEvent. This module has to run inside an foreach loop over RestOfEvents!");
     }
 
   }

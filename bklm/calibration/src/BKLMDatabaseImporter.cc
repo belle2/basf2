@@ -59,9 +59,9 @@ void BKLMDatabaseImporter::importBklmElectronicMapping()
           int isForward = axis.getInt("IsForward");
           int layer = axis.getInt("Layer");
           int plane = axis.getInt("Plane");
-          B2DEBUG(1, "reading xml file...")
-          B2DEBUG(1, " copperId: " << copperId << " slotId: " << slotId << " laneId: " << laneId << " axisId: " << axisId)
-          B2DEBUG(1, " sector: " << sector << " isforward: " << isForward << " layer: " << layer << " plane: " << plane)
+          B2DEBUG(1, "reading xml file...");
+          B2DEBUG(1, " copperId: " << copperId << " slotId: " << slotId << " laneId: " << laneId << " axisId: " << axisId);
+          B2DEBUG(1, " sector: " << sector << " isforward: " << isForward << " layer: " << layer << " plane: " << plane);
           // save data as an element of the array
           new(bklmMapping[index]) BKLMElectronicMapping(0, copperId, slotId, laneId, axisId, isForward, sector, layer, plane);
           index++;

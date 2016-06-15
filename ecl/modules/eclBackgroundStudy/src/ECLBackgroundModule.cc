@@ -438,7 +438,7 @@ void ECLBackgroundModule::event()
 
 void ECLBackgroundModule::endRun()
 {
-  B2INFO("ECLBackgroundModule: Total Number of events: "  << m_nEvent)
+  B2INFO("ECLBackgroundModule: Total Number of events: "  << m_nEvent);
 
   //print doses of crystals of interest
   for (int i = 0; i < (int)m_CryInt.size(); i++) {
@@ -615,7 +615,7 @@ TH2F* ECLBackgroundModule::BuildPosHisto(TH1F* h, const char* sub)
     }
 
   } else {
-    B2WARNING("ECLBackgroundModule: Unable to BuildPosHisto. Check Arguments.")
+    B2WARNING("ECLBackgroundModule: Unable to BuildPosHisto. Check Arguments.");
     h_out =  new TH2F("(empty)", "(empty)", 1, 0, 1, 1, 0, 1);
   }
 

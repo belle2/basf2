@@ -79,7 +79,7 @@ SPTCRefereeModule::SPTCRefereeModule() : Module()
 // ======================================================================= INITIALIZE =============================================
 void SPTCRefereeModule::initialize()
 {
-  B2INFO("SPTCReferee::initialize(): ------------------------------------------------ ")
+  B2INFO("SPTCReferee::initialize(): ------------------------------------------------ ");
   // check if StoreArray of SpacePointTrackCands is her
   StoreArray<SpacePointTrackCand> inputSpacePoints(m_PARAMsptcName);
   inputSpacePoints.isRequired(m_PARAMsptcName);
@@ -101,7 +101,7 @@ void SPTCRefereeModule::initialize()
   if (m_PARAMcheckMinDistance) {
     if (m_PARAMminDistance < 0) {
       B2WARNING("minDistance set to value below 0: " << m_PARAMminDistance <<
-                ", Taking the absolute value and resetting 'minDistance' to that!")
+                ", Taking the absolute value and resetting 'minDistance' to that!");
       m_PARAMminDistance = -m_PARAMminDistance;
     }
   }
@@ -109,7 +109,7 @@ void SPTCRefereeModule::initialize()
   B2DEBUG(100, "Provided Parameters: checkSameSensor - " << m_PARAMcheckSameSensor << ", checkMinDistance - " <<
           m_PARAMcheckMinDistance
           << ", checkCurling - " << m_PARAMcheckCurling << ", splitCurlers - " << m_PARAMsplitCurlers << ", keepOnlyFirstPart - " <<
-          m_PARAMkeepOnlyFirstPart << ", useMCInfo - " << m_PARAMuseMCInfo << ", kickSpacePoint - " << m_PARAMkickSpacePoint)
+          m_PARAMkeepOnlyFirstPart << ", useMCInfo - " << m_PARAMuseMCInfo << ", kickSpacePoint - " << m_PARAMkickSpacePoint);
   if (m_PARAMsetOrigin.size() != 3) {
     B2WARNING("CurlingTrackCandSplitter::initialize: Provided origin is not a 3D point! Please provide 3 values (x,y,z). Rejecting user input and setting origin to (0,0,0) for now!");
     m_PARAMsetOrigin.clear();
@@ -141,7 +141,7 @@ void SPTCRefereeModule::event()
 
     if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME())) { trackCand->print(); }
     B2DEBUG(50, "refereeStatus of TrackCand before tests: " << trackCand->getRefereeStatus() << " -> " <<
-            trackCand->getRefereeStatusString())
+            trackCand->getRefereeStatusString());
 
     // if all tests will be performed -> add checkedByReferee status to the SPTC, CAUTION: if there are new tests this has to be updated!!!, WARNING: if curling check fails, checkedForCurling will return false but hasRefereeStatus(c_checkedByReferee) will return true after this module!
     if (m_PARAMcheckCurling && m_PARAMcheckMinDistance && m_PARAMcheckSameSensor) {
@@ -160,7 +160,7 @@ void SPTCRefereeModule::event()
         else { trackCand->addRefereeStatus(SpacePointTrackCand::c_hitsOnSameSensor); } // only add status if the SpacePoints on the same sensors have not been removed!
       } else {
         B2DEBUG(20, "Found no two subsequent SpacePoints on the same sensor for this SpacePointTrackCand (" << iTC << " in Array " <<
-                trackCands.getName() << ")")
+                trackCands.getName() << ")");
       }
       trackCand->addRefereeStatus(SpacePointTrackCand::c_checkedSameSensors);
       B2DEBUG(50, "refereeStatus of TrackCand after checkSameSensor " << trackCand->getRefereeStatus() << " -> " <<
@@ -177,7 +177,7 @@ void SPTCRefereeModule::event()
         else { trackCand->addRefereeStatus(SpacePointTrackCand::c_hitsLowDistance); } // only add status if the SpacePoints not far enough apart have not been removed!
       } else {
         B2DEBUG(20, "Found no two subsequent SpacePoints that were closer than " << m_PARAMminDistance <<
-                " cm together for this SpacePointTrackCand (" << iTC << " in Array " << trackCands.getName() << ")")
+                " cm together for this SpacePointTrackCand (" << iTC << " in Array " << trackCands.getName() << ")");
       }
       trackCand->addRefereeStatus(SpacePointTrackCand::c_checkedMinDistance);
       B2DEBUG(30, "refereeStatus of TrackCand after checkMinDistance " << trackCand->getRefereeStatus() << " -> " <<
@@ -196,12 +196,12 @@ void SPTCRefereeModule::event()
           allChecksClean = false;
           if (m_PARAMsplitCurlers) {
             curlingTrackStubs = splitTrackCand(trackCand, curlingSplitInds, m_PARAMkeepOnlyFirstPart, prevChecksInfo, m_PARAMkickSpacePoint);
-            if (curlingTrackStubs.empty()) { B2ERROR("The vector returned by splitTrackCand is empty!") } // safety measure
+            if (curlingTrackStubs.empty()) { B2ERROR("The vector returned by splitTrackCand is empty!"); } // safety measure
           }
           // set this to the original SPTC only after splitting to avoid having this status in the trackStubs
           trackCand->addRefereeStatus(SpacePointTrackCand::c_curlingTrack);
         } else {
-          B2DEBUG(20, "The only entry in the return vector of checkCurling is 0! The direction of flight is inwards for the whole SPTC!")
+          B2DEBUG(20, "The only entry in the return vector of checkCurling is 0! The direction of flight is inwards for the whole SPTC!");
           trackCand->setFlightDirection(false);
           m_allInwardsCtr++;
         }
@@ -216,7 +216,7 @@ void SPTCRefereeModule::event()
     if (allChecksClean) trackCand->addRefereeStatus(SpacePointTrackCand::c_checkedClean);
 
     B2DEBUG(999, "referee Status of SPTC after referee module: " << trackCand->getRefereeStatus() << " -> " <<
-            trackCand->getRefereeStatusString())
+            trackCand->getRefereeStatusString());
     if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME())) { trackCand->print();}
 
     // store in appropriate StoreArray
@@ -244,7 +244,7 @@ void SPTCRefereeModule::terminate()
   if (m_PARAMcheckMinDistance) { summary << "Checked for minimal distance between two consecutive SpacePoints and found " << m_minDistanceCtr << " TrackCands with SpacePoints not far enough apart.\n"; }
   if (m_PARAMkickSpacePoint) { summary << m_kickedSpacePointsCtr << " SpacePoints have been removed from SpacePointTrackCands\n"; }
   if (m_PARAMcheckCurling) { summary << m_curlingTracksCtr << " SPTCs were curling. Registered " << m_regTrackStubsCtr << " track stubs. 'splitCurlers' was set to " << m_PARAMsplitCurlers << ", 'keepOnlyFirstPart' was set to " << m_PARAMkeepOnlyFirstPart << ". There were " << m_allInwardsCtr << " SPTCs that had flight direction 'inward' for all SpacePoints in them"; }
-  B2INFO("SPTCRefere::terminate(): Module got " << m_totalTrackCandCtr << " SpacePointTrackCands. " << summary.str())
+  B2INFO("SPTCRefere::terminate(): Module got " << m_totalTrackCandCtr << " SpacePointTrackCands. " << summary.str());
   if (!m_PARAMuseMCInfo && m_PARAMcheckCurling) { B2WARNING("The curling checking without MC Information is at the moment at a very crude and unsophisticated state. If you have MC information available you should use it to do this check!"); }
 }
 
@@ -252,7 +252,7 @@ void SPTCRefereeModule::terminate()
 const std::vector<int> SPTCRefereeModule::checkSameSensor(Belle2::SpacePointTrackCand* trackCand)
 {
   B2DEBUG(25, "Checking SpacePointTrackCand " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName() <<
-          " for consecutive SpacePoints on the same sensor")
+          " for consecutive SpacePoints on the same sensor");
   std::vector<int> sameSensorInds; // return vector
 
   std::vector<const SpacePoint*> spacePoints = trackCand->getHits();
@@ -261,11 +261,11 @@ const std::vector<int> SPTCRefereeModule::checkSameSensor(Belle2::SpacePointTrac
   for (unsigned int iSp = 1; iSp < spacePoints.size(); ++iSp) {
     VxdID sensorId = spacePoints.at(iSp)->getVxdID();
     B2DEBUG(50, "Checking SpacePoint " << iSp << ". (ArrayIndex " << spacePoints.at(iSp)->getArrayIndex() <<
-            ") SensorId of this SpacePoint: " << sensorId << ", SensorId of last SpacePoint: " << lastSensorId)
+            ") SensorId of this SpacePoint: " << sensorId << ", SensorId of last SpacePoint: " << lastSensorId);
     if (sensorId == lastSensorId) {
       // push back the index of the first SpacePoint (50:50 chance of getting the right one without further testing) -> retrieving the other index is no big science from this index!!
       sameSensorInds.push_back(iSp - 1);
-      B2DEBUG(30, "SpacePoint " << iSp << " and " << iSp - 1 << " are on the same sensor: " << sensorId)
+      B2DEBUG(30, "SpacePoint " << iSp << " and " << iSp - 1 << " are on the same sensor: " << sensorId);
     }
     lastSensorId = sensorId;
   }
@@ -277,7 +277,7 @@ const std::vector<int> SPTCRefereeModule::checkSameSensor(Belle2::SpacePointTrac
 const std::vector<int> SPTCRefereeModule::checkMinDistance(Belle2::SpacePointTrackCand* trackCand, double minDistance)
 {
   B2DEBUG(25, "Checking the distances between consecutive SpacePoints for SpacePointTrackCand " << trackCand->getArrayIndex() <<
-          " from Array " << trackCand->getArrayIndex())
+          " from Array " << trackCand->getArrayIndex());
   std::vector<int> lowDistanceInds; // return vector
 
   std::vector<const SpacePoint*> spacePoints = trackCand->getHits();
@@ -289,11 +289,11 @@ const std::vector<int> SPTCRefereeModule::checkMinDistance(Belle2::SpacePointTra
     B2DEBUG(60, "Position of SpacePoint " << iSp << " (ArrayIndex " << spacePoints.at(iSp)->getArrayIndex() << "): (" << position.X() <<
             "," << position.Y() << "," << position.Z() << "), Position of SpacePoint " << iSp - 1 << ": (" << oldPosition.X() << "," <<
             oldPosition.Y() << "," << oldPosition.Z() << ") --> old - new = (" << diffPos.X() << "," << diffPos.Y() << "," << diffPos.Z() <<
-            ")")
+            ")");
 
     if (diffPos.Mag() <= minDistance) {
       B2DEBUG(30, "Position difference is " << diffPos.Mag() <<  " but minDistance is set to " << minDistance << ". SpacePoints: " << iSp
-              << " and " << iSp - 1)
+              << " and " << iSp - 1);
       // push back the index of the first SpacePoint (50:50 chance of getting the right one without further testing)
       lowDistanceInds.push_back(iSp);
     }
@@ -310,7 +310,7 @@ SPTCRefereeModule::removeSpacePoints(Belle2::SpacePointTrackCand* trackCand, con
   std::vector<int> removedInds; // return vector
   try {
     unsigned int nInds = indsToRemove.size();
-    B2DEBUG(50, "Got " << nInds << " indices to remove from SPTC " << trackCand->getArrayIndex())
+    B2DEBUG(50, "Got " << nInds << " indices to remove from SPTC " << trackCand->getArrayIndex());
 
     int nRemoved = 0;
     for (int index : boost::adaptors::reverse(indsToRemove)) { // reverse iteration as trackCand gets 'resized' with every remove
@@ -318,7 +318,7 @@ SPTCRefereeModule::removeSpacePoints(Belle2::SpacePointTrackCand* trackCand, con
       trackCand->removeSpacePoint(index);
       nRemoved++;
       m_kickedSpacePointsCtr++;
-      B2DEBUG(50, "Removed SpacePoint " << index << " from SPTC " << trackCand->getArrayIndex())
+      B2DEBUG(50, "Removed SpacePoint " << index << " from SPTC " << trackCand->getArrayIndex());
       // NOTE: this way if a removed SpacePoint is "at the edge" between two trackStubs the status will be assigned to the second of those!
       removedInds.push_back(index - (nInds - nRemoved));
     }
@@ -348,7 +348,7 @@ const std::vector<int> SPTCRefereeModule::checkCurling(Belle2::SpacePointTrackCa
     // get the directions of flight for every SpacePoint
     const std::vector<bool> dirsOfFlight = getDirectionsOfFlight(tcSpacePoints, useMCInfo);
 
-    //   if(trackCand->getNHits() != dirsOfFlight.size()) B2FATAL("did not get a direction of flight for every SpacePoint") // should not /cannot happen
+    //   if(trackCand->getNHits() != dirsOfFlight.size()) B2FATAL("did not get a direction of flight for every SpacePoint"); // should not /cannot happen
 
     // loop over all entries of dirsOfFlight and compare them pair-wise. If they change -> add Index to splitInds.
     if (!dirsOfFlight.at(0)) {
@@ -357,16 +357,16 @@ const std::vector<int> SPTCRefereeModule::checkCurling(Belle2::SpacePointTrackCa
       B2DEBUG(999, "Direction of flight was inwards for first SpacePoint of this SPTC");
     }
     // DEBUG output
-    B2DEBUG(999, "Direction of flight is " << dirsOfFlight.at(0) << " for SpacePoint " << 0 << " of this SPTC")
+    B2DEBUG(999, "Direction of flight is " << dirsOfFlight.at(0) << " for SpacePoint " << 0 << " of this SPTC");
     for (unsigned int i = 1; i < dirsOfFlight.size(); ++i) {
-      B2DEBUG(999, "Direction of flight is " << dirsOfFlight.at(i) << " for SpacePoint " << i << " of this SPTC")
+      B2DEBUG(999, "Direction of flight is " << dirsOfFlight.at(i) << " for SpacePoint " << i << " of this SPTC");
       if (dirsOfFlight.at(i) ^ dirsOfFlight.at(i - 1)) {
         splitInds.push_back(i); // NOTE: using the bitoperator for XOR here to determine if the bools differ!
-        B2DEBUG(999, "Direction of flight has changed from SpacePoint " << i - 1 << " to " << i << ".")
+        B2DEBUG(999, "Direction of flight has changed from SpacePoint " << i - 1 << " to " << i << ".");
       }
     } // END DEBUG output
   } else {
-    B2ERROR("'useMCInfo' is set to true, but SpacePoints of SPTC have not been checked for relations to TrueHits! Not Checking this SPTC for curling!")
+    B2ERROR("'useMCInfo' is set to true, but SpacePoints of SPTC have not been checked for relations to TrueHits! Not Checking this SPTC for curling!");
     trackCand->setTrackStubIndex(-1); // reset to not being checked for curling
   }
   return splitInds;
@@ -380,11 +380,11 @@ SPTCRefereeModule::splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, 
   std::vector<SpacePointTrackCand> trackStubs; // return vector
 
   B2DEBUG(25, "Splitting SpacePointTrackCand " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName() <<
-          ": number of entries in splitIndices " << splitIndices.size())
+          ": number of entries in splitIndices " << splitIndices.size());
 //   int trackStub = 0;
   bool dirOfFlight = splitIndices.at(0) != 0; // if first entry is zero the direction of flight is false (= ingoing)
 
-  B2DEBUG(999, "first entry of passed vector<int> is " << splitIndices.at(0) << " --> direction of flight is " << dirOfFlight)
+  B2DEBUG(999, "first entry of passed vector<int> is " << splitIndices.at(0) << " --> direction of flight is " << dirOfFlight);
   // if the first entry of splitIndices is zero the first TrackStub is from 0 to second entry instead of from 0 to first entry
   int firstLast = dirOfFlight ? splitIndices.at(0) : splitIndices.at(1);
   std::vector<std::pair<int, int> >
@@ -406,7 +406,7 @@ SPTCRefereeModule::splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, 
     stringstream dbOutput;
     dbOutput << "The indices that will be used for splitting the SPTC: ";
     for (auto entry : rangeIndices) { dbOutput << "[" << entry.first << "," << entry.second << ") "; }
-    B2DEBUG(999, dbOutput.str())
+    B2DEBUG(999, dbOutput.str());
   }
 
   // loop over all entries in range indices and create a SpacePointTrackCand from it
@@ -417,7 +417,7 @@ SPTCRefereeModule::splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, 
     unsigned short int refStatus = getCheckStatus(trackCand);
 
     B2DEBUG(250, "Trying to create TrackStub from SPTC " << trackCand->getArrayIndex() << " with indices [" << firstInd << "," <<
-            lastInd << ")")
+            lastInd << ")");
     // encapsulate in try block to catch indices out of range
     try {
       const std::vector<const SpacePoint*> spacePoints = trackCand->getHitsInRange(firstInd, lastInd);
@@ -482,7 +482,7 @@ SPTCRefereeModule::getDirectionsOfFlight(const std::vector<const Belle2::SpacePo
       }
     } catch (SpacePointTrackCand::UnsupportedDetType& anE) {
       B2FATAL("Caught a fatal exception while checking if a SpacePointTrackCand curls: " <<
-              anE.what()) // FATAL because if this happens this needs some time to implement and it affects more than only this module!
+              anE.what()); // FATAL because if this happens this needs some time to implement and it affects more than only this module!
     }
   } else {
     dirsOfFlight = getDirsOfFlightSpacePoints(spacePoints, m_origin);
@@ -497,7 +497,7 @@ bool SPTCRefereeModule::getDirOfFlightTrueHit(const Belle2::SpacePoint* spacePoi
 {
   TrueHitType* trueHit = spacePoint->template getRelatedTo<TrueHitType>("ALL"); // COULDDO: search only certain arrays
 
-  if (trueHit == NULL) { B2ERROR("Found no TrueHit to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName()) }
+  if (trueHit == NULL) { B2ERROR("Found no TrueHit to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName()); }
 
   // get SensorId - needed for transforming local to global coordinates
   VxdID vxdID = trueHit->getSensorID();
@@ -578,7 +578,7 @@ void SPTCRefereeModule::addToStoreArray(const Belle2::SpacePointTrackCand& track
   SpacePointTrackCand* newTC = storeArray.appendNew(trackCand);
   newTC->addRelationTo(origTrackCand);
   B2DEBUG(20, "Added new SPTC to StoreArray " << storeArray.getName() << " and registered relation to SPTC " <<
-          origTrackCand->getArrayIndex() << " from Array " << origTrackCand->getArrayName())
+          origTrackCand->getArrayIndex() << " from Array " << origTrackCand->getArrayName());
   m_regTrackStubsCtr++;
 }
 

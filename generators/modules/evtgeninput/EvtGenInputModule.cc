@@ -139,7 +139,7 @@ void EvtGenInputModule::initializeGenerator()
 
   B2DEBUG(10, "starting initialisation of EvtGen Input Module. ");
   if (getParam<std::string>("pdlFile").isSetInSteering()) {
-    B2ERROR("The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.")
+    B2ERROR("The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.");
   }
 
   //setup the DECAY files:

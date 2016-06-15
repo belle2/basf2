@@ -56,9 +56,9 @@ SecMapTrainerBaseModule::SecMapTrainerBaseModule() :
 /// /// /// /// /// /// /// /// INITIALIZE /// /// /// /// /// /// /// ///
 void SecMapTrainerBaseModule::initialize()
 {
-  B2INFO("~~~~~~~~~~~SecMapTrainerBaseModule - initialize ~~~~~~~~~~")
+  B2INFO("~~~~~~~~~~~SecMapTrainerBaseModule - initialize ~~~~~~~~~~");
   if (m_PARAMallowTraining == false)
-    B2FATAL("you want to execute SecMapTrainerVXDTF but the parameter 'allowTraining' is false! Aborting...")
+    B2FATAL("you want to execute SecMapTrainerVXDTF but the parameter 'allowTraining' is false! Aborting...");
 
     // small lambda for getting random numbers:
     auto rngAppendix = []() -> int { return gRandom->Integer(std::numeric_limits<int>::max()); };
@@ -88,7 +88,7 @@ void SecMapTrainerBaseModule::event()
   int thisRun = m_eventData->getRun();
   int thisEvent = m_eventData->getEvent();
   B2DEBUG(5, "~~~~~~~~~~~SecMapTrainerBaseModule - experiment/run/event " << thisExperiment << "/" << thisRun << "/" << thisEvent <<
-          " ~~~~~~~~~~")
+          " ~~~~~~~~~~");
 
   for (auto& trainer : m_secMapTrainers) {
     trainer.initializeEvent(thisExperiment, thisRun, thisEvent);
@@ -98,7 +98,7 @@ void SecMapTrainerBaseModule::event()
   unsigned nSPTCs = m_spacePointTrackCands.getEntries();
 
   if (nSPTCs == 0) {
-    B2DEBUG(1, "event " << thisEvent << ": there is no SpacePointTrackCandidate!")
+    B2DEBUG(1, "event " << thisEvent << ": there is no SpacePointTrackCandidate!");
     return;
   }
   B2DEBUG(5, "SecMapTrainerBaseModule, event " << thisEvent << ": size of array nSpacePointTrackCands: " << nSPTCs);
@@ -108,10 +108,10 @@ void SecMapTrainerBaseModule::event()
   unsigned nAccepted = 0;
   for (unsigned iTC = 0; iTC not_eq nSPTCs; ++ iTC) {
     const SpacePointTrackCand* currentTC = m_spacePointTrackCands[iTC];
-    B2DEBUG(10, "current SPTC has got " << currentTC->getNHits() << " hits stored")
+    B2DEBUG(10, "current SPTC has got " << currentTC->getNHits() << " hits stored");
 
     for (auto& trainer : m_secMapTrainers) {
-      B2DEBUG(10, "current SPTC will now be checked with secMap " << trainer.getConfig().secMapName << " hits stored")
+      B2DEBUG(10, "current SPTC will now be checked with secMap " << trainer.getConfig().secMapName << " hits stored");
       bool accepted = trainer.storeTC(*currentTC, iTC);
       nAccepted += (accepted ? 1 : 0);
     }
@@ -135,9 +135,9 @@ void SecMapTrainerBaseModule::event()
 /// /// /// /// /// /// /// /// TERMINATE /// /// /// /// /// /// /// ///
 void SecMapTrainerBaseModule::terminate()
 {
-  B2DEBUG(1, " SecMapTrainerBaseModule::terminate:: start.")
+  B2DEBUG(1, " SecMapTrainerBaseModule::terminate:: start.");
   for (auto& trainer : m_secMapTrainers) {
     trainer.terminate();
   }
-  B2INFO(" SecMapTrainerBaseModule, everything is done. Terminating.")
+  B2INFO(" SecMapTrainerBaseModule, everything is done. Terminating.");
 }

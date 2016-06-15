@@ -145,7 +145,7 @@ void ARICHDatabaseImporter::exportAerogelInfo()
   for (const auto& element : elements) {
     B2INFO("Version = " << element.getAerogelVersion() << ", serial = " << element.getAerogelSerial() <<
            ", id = " << element.getAerogelID() << ", n = " << element.getAerogelRefractiveIndex() << ", transmLength = " <<
-           element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness())
+           element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness());
   }
 
 }
@@ -263,7 +263,7 @@ void ARICHDatabaseImporter::exportAerogelInfoEventDep()
     for (const auto& element : elements) {
       B2INFO("Version = " << element.getAerogelVersion() << ", serial = " << element.getAerogelSerial() <<
              ", id = " << element.getAerogelID() << ", n = " << element.getAerogelRefractiveIndex() << ", transmLength = " <<
-             element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness())
+             element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness());
     }
 
   */

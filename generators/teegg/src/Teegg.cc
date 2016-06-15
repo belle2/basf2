@@ -187,7 +187,7 @@ void Teegg::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRot
   if (not eventExtraInfo.isValid())
     eventExtraInfo.create();
   if (eventExtraInfo->hasExtraInfo("GeneratorVP2")) {
-    B2WARNING("EventExtraInfo with given name is already set! I won't set it again!")
+    B2WARNING("EventExtraInfo with given name is already set! I won't set it again!");
   } else {
     eventExtraInfo->addExtraInfo("GeneratorVP2", m_vp2);
   }
@@ -199,11 +199,11 @@ void Teegg::term()
   int mode = 2;
   teeggm_(&mode, m_xpar, m_npar);
 
-  B2RESULT("Cross-section (nb)  = " << teeggresults_.rescross << " +/- " << teeggresults_.rescrosserr << "")
-  B2RESULT("Events (unweighted) = " << teeggresults_.resngen)
-  B2RESULT("Trials              = " << teeggresults_.resntrials)
-  B2RESULT("Efficiency          = " << 100.*teeggresults_.reseff << " %")
-  B2RESULT("Average Q2          = " << teeggresults_.avgq2)
+  B2RESULT("Cross-section (nb)  = " << teeggresults_.rescross << " +/- " << teeggresults_.rescrosserr << "");
+  B2RESULT("Events (unweighted) = " << teeggresults_.resngen);
+  B2RESULT("Trials              = " << teeggresults_.resntrials);
+  B2RESULT("Efficiency          = " << 100.*teeggresults_.reseff << " %");
+  B2RESULT("Average Q2          = " << teeggresults_.avgq2);
 
 }
 

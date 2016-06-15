@@ -122,7 +122,7 @@ namespace Belle2 {
     aSecMapVector.push_back(firstPack);
     B2INFO("creating a secMap named " << aSecMap.getMapName() << " having " << aSecMap.getMaxDistance2origin() <<
            " as maxDistance2Origin- and " << aSecMap.getLowerMomentumThreshold() << " for lowerMomentum-threshold. nValues: " <<
-           aSecMap.getNumOfValues())
+           aSecMap.getNumOfValues());
 
     nCuts++; nSectors++;
     std::string anotherSecMapName = "anotherSecMap";
@@ -135,19 +135,19 @@ namespace Belle2 {
     aSecMapVector.push_back(secondPack);
     B2INFO("creating a secMap named " << anotherSecMap.getMapName() << " having " << anotherSecMap.getMaxDistance2origin() <<
            " as maxDistance2Origin- and " << anotherSecMap.getLowerMomentumThreshold() << " for lowerMomentum-threshold. nValues: " <<
-           anotherSecMap.getNumOfValues())
+           anotherSecMap.getNumOfValues());
 
     for (SecMapVector::MapPack& aMap : aSecMapVector.getFullVector()) {
       B2INFO("vector stored map with name " << aMap.second.getMapName() << " and lower threshold " <<
-             aMap.second.getLowerMomentumThreshold() << " and nValues: " << aMap.second.getNumOfValues())
+             aMap.second.getLowerMomentumThreshold() << " and nValues: " << aMap.second.getNumOfValues());
     }
 
     /// create root file, fill SecMapVector into file, store it, close
     B2INFO("opening root file:");
     TFile f(fName.c_str(), "recreate");
-    B2INFO("storing data to root file:")
+    B2INFO("storing data to root file:");
     aSecMapVector.Write();
-    B2INFO("closing file:")
+    B2INFO("closing file:");
     f.Close();
 
     /// repeat first step to check, whether files can be filled repeatedly
@@ -163,7 +163,7 @@ namespace Belle2 {
     aSecMapVector2.push_back(thirdPack);
     B2INFO("creating a secMap named " << aThirdSecMap.getMapName() << " having " << aThirdSecMap.getMaxDistance2origin() <<
            " as maxDistance2Origin- and " << aThirdSecMap.getLowerMomentumThreshold() << " for lowerMomentum-threshold. nValues: " <<
-           aThirdSecMap.getNumOfValues())
+           aThirdSecMap.getNumOfValues());
 
     nCuts++; nSectors++;
     string aFourthSecMapName = "aFourthSecMap";
@@ -176,12 +176,12 @@ namespace Belle2 {
     aSecMapVector2.push_back(fourthPack);
     B2INFO("creating a secMap named " << aFourthSecMap.getMapName() << " having " << aFourthSecMap.getMaxDistance2origin() <<
            " as maxDistance2Origin- and " << aFourthSecMap.getLowerMomentumThreshold() << " for lowerMomentum-threshold. nValues: " <<
-           aFourthSecMap.getNumOfValues())
+           aFourthSecMap.getNumOfValues());
 
     /// reopen root file, fill SecMapVector into file, store it, close
     B2INFO("opening root file:");
     TFile f3(fName.c_str(), "update");
-    B2INFO("storing data to root file:")
+    B2INFO("storing data to root file:");
     aSecMapVector2.Write();
     f3.Close();
 
@@ -200,7 +200,7 @@ namespace Belle2 {
         try {
           retrievedVector = static_cast<SecMapVector*>(key->ReadObj());
         } catch (exception& e) {
-          B2WARNING("Key was not a SecMapVector, therefore error message: " << e.what() << "\n Skipping this key...")
+          B2WARNING("Key was not a SecMapVector, therefore error message: " << e.what() << "\n Skipping this key...");
           continue;
         }
 
@@ -208,8 +208,8 @@ namespace Belle2 {
           EXPECT_FLOAT_EQ(-1, entry.second.getMaxDistance2origin());
           EXPECT_FLOAT_EQ(1.5, entry.second.getMagneticFieldStrength());
           EXPECT_FLOAT_EQ(0.23, entry.second.getLowerMomentumThreshold());
-          B2INFO(".first is: " << entry.first << ", .second->getMapName() is:" << entry.second.getMapName())
-          B2INFO("and nValues: " << entry.second.getNumOfValues())
+          B2INFO(".first is: " << entry.first << ", .second->getMapName() is:" << entry.second.getMapName());
+          B2INFO("and nValues: " << entry.second.getNumOfValues());
         }
       }
       f2.Close();
@@ -217,9 +217,9 @@ namespace Belle2 {
 
     /// delete file from disk
     if (remove(fName.c_str()) != 0)
-    { B2ERROR("could not delete file!") }
+    { B2ERROR("could not delete file!"); }
     else
-    { B2INFO("File successfully deleted") }
+    { B2INFO("File successfully deleted"); }
 
   }
 

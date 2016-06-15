@@ -219,7 +219,7 @@ namespace Belle2 {
     EXPECT_EQ(aVxdID, aCluster.getSensorID());
 
     /// test whole procedure first with PXDCluster:
-    B2INFO("open root file: " << fNameCluster)
+    B2INFO("open root file: " << fNameCluster);
     TFile f(fNameCluster.c_str(), "recreate");
     f.cd();
     aCluster.Write();
@@ -239,7 +239,7 @@ namespace Belle2 {
         try {
           retrievedCluster = static_cast<PXDCluster*>(key->ReadObj());
         } catch (exception& e) {
-          B2WARNING("Key was not a PXDCluster, therefore error message: " << e.what() << "\n Skipping this key...")
+          B2WARNING("Key was not a PXDCluster, therefore error message: " << e.what() << "\n Skipping this key...");
           continue;
         }
 
@@ -249,9 +249,9 @@ namespace Belle2 {
     }
     /// cleanup
     if (remove(fNameCluster.c_str()) != 0)
-    { B2ERROR("could not delete file " << fNameCluster << "!") }
+    { B2ERROR("could not delete file " << fNameCluster << "!"); }
     else
-    { B2INFO(fNameCluster << " successfully deleted") }
+    { B2INFO(fNameCluster << " successfully deleted"); }
   }
 
 
@@ -267,7 +267,7 @@ namespace Belle2 {
 
 
     /// test whole procedure with B2Vector3:
-    B2INFO("open root file: " << fNameVec)
+    B2INFO("open root file: " << fNameVec);
     TFile f(fNameVec.c_str(), "recreate");
     f.cd();
     f.WriteObject(&aVec, "myVec3");
@@ -290,9 +290,9 @@ namespace Belle2 {
     }
     /// cleanup
     if (remove(fNameVec.c_str()) != 0)
-    { B2ERROR("could not delete file " << fNameVec << "!") }
+    { B2ERROR("could not delete file " << fNameVec << "!"); }
     else
-    { B2INFO(fNameVec << " successfully deleted") }
+    { B2INFO(fNameVec << " successfully deleted"); }
   }
 
 
@@ -316,11 +316,11 @@ namespace Belle2 {
 
 
     /// create root file, fill spacePoint into file, store it, close
-    B2INFO("open root file:" << fNameSP)
+    B2INFO("open root file:" << fNameSP);
     TFile f3(fNameSP.c_str(), "recreate");
     f3.cd();
     testPoint.Write();
-    B2INFO("closing file:")
+    B2INFO("closing file:");
     f3.Close();
 
     /// reopen file, read entries and check them
@@ -337,7 +337,7 @@ namespace Belle2 {
         try {
           retrievedSpacePoint = static_cast<SpacePoint*>(key->ReadObj());
         } catch (exception& e) {
-          B2WARNING("Key was not a SpacePoint, therefore error message: " << e.what() << "\n Skipping this key...")
+          B2WARNING("Key was not a SpacePoint, therefore error message: " << e.what() << "\n Skipping this key...");
           continue;
         }
 
@@ -355,9 +355,9 @@ namespace Belle2 {
     }
     /// delete file from disk, cleanup}
     if (remove(fNameSP.c_str()) != 0)
-    { B2ERROR("could not delete file " << fNameSP << "!") }
+    { B2ERROR("could not delete file " << fNameSP << "!"); }
     else
-    { B2INFO(fNameSP << " successfully deleted") }
+    { B2INFO(fNameSP << " successfully deleted"); }
   }
 
 

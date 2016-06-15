@@ -28,14 +28,14 @@ namespace io = boost::iostreams;
 void BFieldComponentRadial::initialize()
 {
   if (m_mapFilename.empty()) {
-    B2ERROR("The filename for the radial magnetic field component is empty !")
+    B2ERROR("The filename for the radial magnetic field component is empty !");
     return;
   }
 
   string fullPath = FileSystem::findFile("/data/" + m_mapFilename);
 
   if (!FileSystem::fileExists(fullPath)) {
-    B2ERROR("The radial magnetic field map file '" << m_mapFilename << "' could not be found !")
+    B2ERROR("The radial magnetic field map file '" << m_mapFilename << "' could not be found !");
     return;
   }
 
@@ -45,7 +45,7 @@ void BFieldComponentRadial::initialize()
   fieldMapFile.push(io::file_source(fullPath));
 
   //Create the magnetic field map [r,z] and read the data from the file
-  B2DEBUG(10, "Loading the radial magnetic field from file '" << m_mapFilename << "' in to the memory...")
+  B2DEBUG(10, "Loading the radial magnetic field from file '" << m_mapFilename << "' in to the memory...");
   m_mapBuffer = new BFieldPoint*[m_mapSize[0]];
   for (int i = 0; i < m_mapSize[0]; ++i)
     m_mapBuffer[i] = new BFieldPoint[m_mapSize[1]];
@@ -65,7 +65,7 @@ void BFieldComponentRadial::initialize()
     }
   }
 
-  B2DEBUG(10, "... loaded " << m_mapSize[0] << "x" << m_mapSize[1] << " (r,z) elements.")
+  B2DEBUG(10, "... loaded " << m_mapSize[0] << "x" << m_mapSize[1] << " (r,z) elements.");
 }
 
 
@@ -92,7 +92,7 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
 
   //Check if the index values are within the range
   if (((ir + 1) >= m_mapSize[0]) || ((iz + 1) >= m_mapSize[1])) {
-    B2ERROR("The index values for the radial magnetic field map are out of bounds !")
+    B2ERROR("The index values for the radial magnetic field map are out of bounds !");
     return TVector3(0.0, 0.0, 0.0);
   }
 
@@ -187,7 +187,7 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
 
 void BFieldComponentRadial::terminate()
 {
-  B2DEBUG(10, "De-allocating the memory for the radial magnetic field map loaded from the file '" << m_mapFilename << "'")
+  B2DEBUG(10, "De-allocating the memory for the radial magnetic field map loaded from the file '" << m_mapFilename << "'");
 
   //De-Allocate memory to prevent memory leak
   for (int i = 0; i < m_mapSize[0]; ++i)

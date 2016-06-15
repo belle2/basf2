@@ -46,7 +46,7 @@ SPTCvirtualIPRemoverModule::SPTCvirtualIPRemoverModule() : Module()
 void SPTCvirtualIPRemoverModule::event()
 {
   m_eventCounter++;
-  B2DEBUG(1, "\n" << "SPTCvirtualIPRemoverModule:event: event " << m_eventCounter << "\n")
+  B2DEBUG(1, "\n" << "SPTCvirtualIPRemoverModule:event: event " << m_eventCounter << "\n");
   m_nTCsTotal += m_spacePointTrackCands.getEntries();
 
   unsigned nTC = 0;
@@ -93,6 +93,6 @@ void SPTCvirtualIPRemoverModule::endRun()
          << ", nSPTCsPerEvent: " << invEvents * float(m_nTCsTotal)
          << ", nVIPsPerEvent: " << invEvents * float(m_nVIPsTotal)
          << ", nVIPsRemovedPerEvent: " << invEvents * float(m_nVIPsRemoved)
-        )
+        );
 }
 

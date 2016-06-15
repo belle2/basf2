@@ -151,9 +151,9 @@ namespace Belle2 {
     {
       for (auto name : filterNames) {
         m_values.insert({name, std::numeric_limits<double>::max()});
-        B2DEBUG(60, "FilterValueDataSet::constructor: filterName " << name << " has been added.")
+        B2DEBUG(60, "FilterValueDataSet::constructor: filterName " << name << " has been added.");
       }
-      B2DEBUG(50, "FilterValueDataSet::constructor: " << m_values.size() << " filters have been added.")
+      B2DEBUG(50, "FilterValueDataSet::constructor: " << m_values.size() << " filters have been added.");
     }
 
     /** for given filterName a value is set. if filterName does not exist, an error is produced and nothing gets stored. */
@@ -163,7 +163,7 @@ namespace Belle2 {
       if (it == m_values.end()) {
         B2ERROR("FilterValueDataSet::setValueOfFilter: filterName " << filterName
                 << "is not known, value " << value
-                << " will NOT be added!")
+                << " will NOT be added!");
         return;
       }
       it->second = value;
@@ -176,7 +176,7 @@ namespace Belle2 {
       auto it = m_values.find(filterName);
       if (it != m_values.end()) {
         valuePtr = &it->second;
-      } else { B2WARNING("filter could not be found, returning nullptr instead!") }
+      } else { B2WARNING("filter could not be found, returning nullptr instead!"); }
       return valuePtr;
     }
 

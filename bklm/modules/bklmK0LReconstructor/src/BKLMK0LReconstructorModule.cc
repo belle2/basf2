@@ -77,7 +77,7 @@ void BKLMK0LReconstructorModule::initialize()
 void BKLMK0LReconstructorModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("BKLMK0LReconstructor: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun())
+  B2INFO("BKLMK0LReconstructor: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
 }
 
 void BKLMK0LReconstructorModule::event()

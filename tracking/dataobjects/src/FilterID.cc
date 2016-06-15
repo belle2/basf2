@@ -405,7 +405,7 @@ FilterID::filterTypes FilterID::getFilterType(std::string filterString)
   {return outOfSectorRange;}
 
   else {
-    B2WARNING(" FilterID::getFilterType. Input string is out of range, please check that...")
+    B2WARNING(" FilterID::getFilterType. Input string is out of range, please check that...");
     return numFilters;
   }
 }
@@ -417,7 +417,7 @@ FilterID::filterTypes FilterID::getFilterType(int filterInt)
   if (filterInt >= distance3D && filterInt < numFilters) {
     return enumVector[filterInt];
   }
-  B2WARNING(" FilterID::getFilterType. Input int is out of range, please check that...")
+  B2WARNING(" FilterID::getFilterType. Input int is out of range, please check that...");
   return numFilters;
 }
 
@@ -428,7 +428,7 @@ std::string FilterID::getFilterString(int filterType)
   if (filterType >= distance3D && filterType < numFilters) {
     return nameVector[filterType];
   }
-  B2WARNING(" FilterID::getFilterString. Input int is out of range, please check that...")
+  B2WARNING(" FilterID::getFilterString. Input int is out of range, please check that...");
   return "";
 }
 

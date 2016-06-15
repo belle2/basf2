@@ -84,7 +84,7 @@ namespace Belle2 {
 
     if (m_splotPrior != "") {
       if (not m_transformToProbability) {
-        B2WARNING("Using sPlot mode, but don't transform the classifier output to a probability, which is important if you want to use the $x_total quantity!")
+        B2WARNING("Using sPlot mode, but don't transform the classifier output to a probability, which is important if you want to use the $x_total quantity!");
       }
       Variable::Manager& manager = Variable::Manager::Instance();
       m_splotPrior_func = manager.getVariable(m_splotPrior);

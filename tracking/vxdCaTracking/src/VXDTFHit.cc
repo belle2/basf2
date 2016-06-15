@@ -94,7 +94,7 @@ ClusterInfo* VXDTFHit::getClusterInfoUV() const { return m_clusterInfoUV; }  /**
 bool VXDTFHit::isReserved() const
 {
   B2DEBUG(150, "VXDTFHit::isReserved in Sector " << getSectorString() << " cluterU/V/UV: " << m_clusterInfoU << "/" << m_clusterInfoV
-          << "/" << m_clusterInfoUV)
+          << "/" << m_clusterInfoUV);
   if (m_clusterInfoU != NULL) { if (m_clusterInfoU->isReserved() == true) { return true; } }
   if (m_clusterInfoV != NULL) { if (m_clusterInfoV->isReserved() == true) { return true; } }
   if (m_clusterInfoUV != NULL) { if (m_clusterInfoUV->isReserved() == true) { return true; } }

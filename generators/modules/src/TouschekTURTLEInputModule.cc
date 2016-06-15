@@ -73,7 +73,7 @@ void TouschekTURTLEInputModule::initialize()
 {
   //Check if the Gearbox is ready for reading
   if (!Gearbox::getInstance().isOpen()) {
-    B2FATAL("The Touschek Turtle input module requires a valid Gearbox. Please make sure you have the Gearbox module added to your path.")
+    B2FATAL("The Touschek Turtle input module requires a valid Gearbox. Please make sure you have the Gearbox module added to your path.");
   }
 
   //Initialize MCParticle collection
@@ -81,11 +81,11 @@ void TouschekTURTLEInputModule::initialize()
 
   //Check parameters
   if ((m_readHER) && (!FileSystem::fileExists(m_filenameHER))) {
-    B2ERROR("Parameter <FilenameHER>: Could not open the file. The filename " << m_filenameHER << " does not exist !")
+    B2ERROR("Parameter <FilenameHER>: Could not open the file. The filename " << m_filenameHER << " does not exist !");
   } else m_readerHER->open(m_filenameHER);
 
   if ((m_readLER) && (!FileSystem::fileExists(m_filenameLER))) {
-    B2ERROR("Parameter <FilenameLER>: Could not open the file. The filename " << m_filenameLER << " does not exist !")
+    B2ERROR("Parameter <FilenameLER>: Could not open the file. The filename " << m_filenameLER << " does not exist !");
   } else m_readerLER->open(m_filenameLER);
 
   //Get the transformation from local Touschek plane space to global geant4 space
@@ -113,8 +113,8 @@ void TouschekTURTLEInputModule::event()
       //Generate MCParticle list
       mpg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
-      B2INFO("Read " << readHERParticles << " e- particles (HER).")
-      B2INFO("Read " << readLERParticles << " e+ particles (LER).")
+      B2INFO("Read " << readHERParticles << " e- particles (HER).");
+      B2INFO("Read " << readLERParticles << " e+ particles (LER).");
     }
   } catch (runtime_error& exc) {
     B2ERROR(exc.what());

@@ -82,7 +82,7 @@ namespace VXDTFtrackletFilterTest {
                        typename Var::variableType fResult,
                        otherTypes ...)
     {
-      B2INFO("ResultsObserver: Filter " << filterType.name() << " got result of " << fResult)
+      B2INFO("ResultsObserver: Filter " << filterType.name() << " got result of " << fResult);
       lastResult = fResult;
     }
 

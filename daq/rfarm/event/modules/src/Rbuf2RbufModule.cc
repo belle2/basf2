@@ -124,6 +124,6 @@ void Rbuf2RbufModule::endRun()
 
 void Rbuf2RbufModule::terminate()
 {
-  B2INFO("Rbuf2Rbuf: terminate called")
+  B2INFO("Rbuf2Rbuf: terminate called");
 }
 

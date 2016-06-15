@@ -161,13 +161,13 @@ void ECLCRFinderModule::event()
     if (c_fullBkgdCount > 0) frac = static_cast<double>(bkgdcount) / static_cast<double>(c_fullBkgdCount);
 
     B2DEBUG(175, "ECLCRFinderModule::event(), Background count for this event: " << bkgdcount << " (expected for full bkgd: " <<
-            c_fullBkgdCount << ", scaling factor is " << frac << ".")
+            c_fullBkgdCount << ", scaling factor is " << frac << ".");
 
     // Scale cut values.
     for (int i = 0; i < 3; i++) {
       m_energyCutMod[i] = m_energyCut[i] + (m_energyCutBkgd[i] - m_energyCut[i]) * frac;
       B2DEBUG(200, "ECLCRFinderModule::event(), Energy cut value m_energyCutMod[" << i << "] = " << m_energyCutMod[i] <<
-              ", without bkgd scale m_energyCut[" << i << "] = " << m_energyCut[i])
+              ", without bkgd scale m_energyCut[" << i << "] = " << m_energyCut[i]);
     }
   }
 

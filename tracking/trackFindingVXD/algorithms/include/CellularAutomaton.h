@@ -72,21 +72,21 @@ namespace Belle2 {
             if (currentCell != aNeighbour->getMetaInfo()) continue;
 
             goodNeighbours++;
-            B2DEBUG(100, "neighbouring cell found!")
+            B2DEBUG(100, "neighbouring cell found!");
           }
           if (goodNeighbours != 0) {
             currentCell.setStateUpgrade(true);
             activeCells++;
             B2DEBUG(50, "CAstep: accepted cell found - had " << goodNeighbours <<
                     " good neighbours among " << aNode->getInnerNodes().size() <<
-                    " neighbours in total!")
+                    " neighbours in total!");
           } else { /*currentCell.setActivationState(false);*/ deadCells++; } /// WARNING setActivationState does provoke unintended behavior, since sometimes states can not be upgraded in one round, but can in the next round!
         }//CAStep
 
         B2DEBUG(25, "CA: before update-step: at round " << caRound <<
                 ", there are " << activeCells <<
                 " cells still alive, counted " << deadCells <<
-                " dead cells so far")
+                " dead cells so far");
 
         /// Updatestep:
         for (auto* aNode : aNetworkContainer) {
@@ -94,7 +94,7 @@ namespace Belle2 {
           if (currentCell.isActivated() == false or currentCell.isUpgradeAllowed() == false) { continue; }
 
           currentCell.setStateUpgrade(false);
-          B2DEBUG(50, "good cell  with former state: " << currentCell.getState() << " upgraded!")
+          B2DEBUG(50, "good cell  with former state: " << currentCell.getState() << " upgraded!");
           currentCell.increaseState();
           if (currentCell.getState() > highestCellState) { highestCellState = currentCell.getState(); }
         } // Updatestep
@@ -145,7 +145,7 @@ namespace Belle2 {
       B2DEBUG(15, "Last Pass " << BaseClass::m_log.nPasses <<
               " is finished with " << BaseClass::m_log.passResults.back().first <<
               " rounds (negative numbers indicate fail)! Of " << aNetworkContainer.size() <<
-              " cells total. findSeeds() found " << nSeeds << " seeds")
+              " cells total. findSeeds() found " << nSeeds << " seeds");
       return nSeeds;
     }
 
@@ -167,7 +167,7 @@ namespace Belle2 {
       while (nRound < nRounds) {
         for (auto* aNode : aNetworkContainer) {
           if (aNode->getMetaInfo().getState() == nRound) { nCellsOfState.at(nRound) += 1; }
-          B2DEBUG(100, " got cell of state " << aNode->getMetaInfo().getState())
+          B2DEBUG(100, " got cell of state " << aNode->getMetaInfo().getState());
         }
         ++nRound;
       }

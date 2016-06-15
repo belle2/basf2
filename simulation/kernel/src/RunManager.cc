@@ -64,7 +64,7 @@ void RunManager::beginRun(int runNumber)
     ConstructScoringWorlds();
     RunInitialization();
   } else {
-    B2FATAL("The Geant4 kernel was not initialized properly ! The method 'ConfirmBeamOnCondition()' failed. ")
+    B2FATAL("The Geant4 kernel was not initialized properly ! The method 'ConfirmBeamOnCondition()' failed. ");
   }
 }
 

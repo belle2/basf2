@@ -170,7 +170,7 @@ void SVDClusterizerModule::initialize()
   }
   // Warn if tanLorentz set
   if (m_tanLorentzAngle_holes > 0 or m_tanLorentzAngle_electrons > 0)
-    B2WARNING("The tanLorentz parameters are obsolete and have no effect!")
+    B2WARNING("The tanLorentz parameters are obsolete and have no effect!");
     // Report:
     B2INFO("SVDClusterizer Parameters (in default system unit, *=cannot be set directly):");
 
@@ -281,7 +281,7 @@ void SVDClusterizerModule::event()
       VxdID sensorID = storeDigits[i]->getSensorID();
       // If malformed object, drop it. Only here, for sorted digits the check will be done in sorter module.
       if (!geo.validSensorID(sensorID)) {
-        B2WARNING("Malformed SVDDigit, VxdID " << sensorID.getID() << ", dropping.")
+        B2WARNING("Malformed SVDDigit, VxdID " << sensorID.getID() << ", dropping.");
         continue;
       }
       int side = storeDigits[i]->isUStrip() ? 0 : 1;

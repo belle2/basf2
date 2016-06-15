@@ -22,7 +22,7 @@ using namespace CLHEP;
 /*BKLMGeometryPar* BKLMGeometryPar::instance(void)
 {
   if (m_Instance) return m_Instance;
-  B2FATAL("getInstance() called without initialization")
+  B2FATAL("getInstance() called without initialization");
   return NULL;  // never reached
 }
 
@@ -66,7 +66,7 @@ void BKLMGeometryPar::read(const GearDir& content)
   m_HalfLength = content.getLength("HalfLength");
   m_NLayer = content.getNumberNodes("Layers/Layer");
   if (m_NLayer > NLAYER) { // for array m_HasRPCs[]
-    B2FATAL("BKLM BKLMGeometryPar::read(): # of layers (" << m_NLayer << ") exceeds array size NLAYER (" << NLAYER << ")")
+    B2FATAL("BKLM BKLMGeometryPar::read(): # of layers (" << m_NLayer << ") exceeds array size NLAYER (" << NLAYER << ")");
   }
 
   m_IronNominalHeight = content.getLength("Layers/IronNominalHeight");

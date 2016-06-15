@@ -226,6 +226,6 @@ void RawInputModule::endRun()
 void RawInputModule::terminate()
 {
   close(m_fd);
-  B2INFO("RawInput: terminate called")
+  B2INFO("RawInput: terminate called");
 }
 

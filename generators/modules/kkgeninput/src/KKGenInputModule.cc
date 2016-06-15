@@ -159,7 +159,7 @@ void KKGenInputModule::initializeGenerator()
 {
   FILE* fp;
   if (getParam<std::string>("evtpdlfilename").isSetInSteering()) {
-    B2ERROR("KKGenInputModule::initializeGenerator(): The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.")
+    B2ERROR("KKGenInputModule::initializeGenerator(): The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.");
   }
 
   fp = fopen(m_KKMCOutputFileName.c_str(), "r");

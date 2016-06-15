@@ -61,7 +61,7 @@ void EventCounterModule::initialize()
 void EventCounterModule::beginRun()
 {
   B2INFO("################## eventCounter enabled, highlighting every " << m_PARAMstepSize << " event ######################\n" <<
-         "extended infos you can get by activating parameter 'showClusterStatistics', and/or setting debug level to 1 (runWise extra) or 2 (event wise extra)")
+         "extended infos you can get by activating parameter 'showClusterStatistics', and/or setting debug level to 1 (runWise extra) or 2 (event wise extra)");
 
   InitializeCounters();
 
@@ -112,14 +112,14 @@ void EventCounterModule::beginRun()
           m_countedPixelsAndStrips.m_svdStripCounter4V.at(pos) += aSensorInfo.getVCells();
           m_countedPixelsAndStrips.m_svdStripCounterTotal.at(pos) += (aSensorInfo.getUCells() + aSensorInfo.getVCells());
         }
-        B2DEBUG(1, " sensor " << sensor << " has got " << aSensorInfo.getUCells() << "/" << aSensorInfo.getVCells() << " u/v-pixels/strips")
+        B2DEBUG(1, " sensor " << sensor << " has got " << aSensorInfo.getUCells() << "/" << aSensorInfo.getVCells() << " u/v-pixels/strips");
       }
     }
   }
 
   B2INFO("eventCounter - beginRun with m_PARAMshowClusterStatistics == true. Total number of Pixels per PXDsensor and u/vStrips per SVDSensor:\n"
          << m_countedPixelsAndStrips.PrintStuff(false) << "counted number of known and unrecognized layers/ladders/sensors: " << knownLayers
-         << "/" << knownLadders << "/" << knownSensors << ", " << nUnknownLayers << "/" << nUnknownLadders << "/" << nUnknownSensors)
+         << "/" << knownLadders << "/" << knownSensors << ", " << nUnknownLayers << "/" << nUnknownLadders << "/" << nUnknownSensors);
 }
 
 
@@ -129,8 +129,8 @@ void EventCounterModule::event()
   m_eventCounter++;
 
   if (m_PARAMshowClusterStatistics == false) {
-    if (m_eventCounter % m_PARAMstepSize == 0) { B2INFO("EventCounterModule - Event: " << m_eventCounter) }
-    else { B2DEBUG(2, "EventCounterModule - Event: " << m_eventCounter) }
+    if (m_eventCounter % m_PARAMstepSize == 0) { B2INFO("EventCounterModule - Event: " << m_eventCounter); }
+    else { B2DEBUG(2, "EventCounterModule - Event: " << m_eventCounter); }
     return;
   }
 
@@ -259,7 +259,7 @@ void EventCounterModule::event()
            aSvdClusterArray.getEntries() << " pxd/svdClusters. Detailed info: \n" << thisEventCounted.PrintStuff());
   } else {
     B2DEBUG(2, "EventCounterModule - Event: " << m_eventCounter << " having " << aPxdClusterArray.getEntries() << "/" <<
-            aSvdClusterArray.getEntries() << " pxd/svdClusters. Detailed info: \n" << thisEventCounted.PrintStuff())
+            aSvdClusterArray.getEntries() << " pxd/svdClusters. Detailed info: \n" << thisEventCounted.PrintStuff());
   }
 
   m_allEventsCounted.push_back(thisEventCounted);
@@ -513,14 +513,14 @@ void EventCounterModule::endRun()
 
 
   B2INFO("Detailed info about occured numbers: \n" <<
-         " mean:\n" << meanValues.PrintStuff())
+         " mean:\n" << meanValues.PrintStuff());
   B2DEBUG(1, " More detailed info about occured numbers: \n" <<
           " q0:\n" << numberQuantiles.at(0).PrintStuff() <<
           " q0.25:\n" << numberQuantiles.at(1).PrintStuff() <<
           " median:\n" << numberQuantiles.at(2).PrintStuff() <<
           " q0.75:\n" << numberQuantiles.at(3).PrintStuff() <<
           " q1:\n" << numberQuantiles.at(4).PrintStuff()
-         )
+         );
 
 
   CountStuff<double> tempQuantile;
@@ -531,14 +531,14 @@ void EventCounterModule::endRun()
   }
 
   B2INFO("\nDetailed info about occupancies in percent(%): \n" <<
-         " mean:\n" << meanOccupancy.PrintStuff(false))
+         " mean:\n" << meanOccupancy.PrintStuff(false));
   B2DEBUG(1, "\nMore detailed info about occupancies in percent(%): \n" <<
           " q0:\n" << occupancyQuantiles.at(0).PrintStuff(false) <<
           " q0.25:\n" << occupancyQuantiles.at(1).PrintStuff(false) <<
           " median:\n" << occupancyQuantiles.at(2).PrintStuff(false) <<
           " q0.75:\n" << occupancyQuantiles.at(3).PrintStuff(false) <<
           " q1:\n" << occupancyQuantiles.at(4).PrintStuff(false)
-         )
+         );
 }
 
 

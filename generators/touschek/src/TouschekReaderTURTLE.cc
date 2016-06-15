@@ -46,7 +46,7 @@ void TouschekReaderTURTLE::open(const string& filename) throw(TouschekCouldNotOp
 int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph& graph) throw(TouschekConvertFieldError)
 {
   if (m_transMatrix == NULL) {
-    B2ERROR("The transformation matrix is NULL !")
+    B2ERROR("The transformation matrix is NULL !");
   }
 
   int numParticles = 0;
@@ -72,7 +72,7 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph& graph) throw
     BOOST_FOREACH(const string & tok, tokens) {
       try {
         if (index >= 7) {
-          B2WARNING("This Touschek file has more than 7 fields ! Only the first 7 fields were read.")
+          B2WARNING("This Touschek file has more than 7 fields ! Only the first 7 fields were read.");
           break;
         }
         fields[index] = boost::lexical_cast<double>(tok);

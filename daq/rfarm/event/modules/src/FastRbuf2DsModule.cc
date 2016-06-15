@@ -91,7 +91,7 @@ void FastRbuf2DsModule::initialize()
     evtmsg = new EvtMessage(evtbuf);
     m_streamer->restoreDataStore(evtmsg);
   } else {
-    B2FATAL("SeqRootInput : Error in reading first event")
+    B2FATAL("SeqRootInput : Error in reading first event");
   }
   delete evtmsg;
   delete[] evtbuf;
@@ -179,6 +179,6 @@ void FastRbuf2DsModule::endRun()
 void FastRbuf2DsModule::terminate()
 {
   pthread_join(m_thr_input, NULL);
-  B2INFO("FastRbuf2Ds: terminate called")
+  B2INFO("FastRbuf2Ds: terminate called");
 }
 

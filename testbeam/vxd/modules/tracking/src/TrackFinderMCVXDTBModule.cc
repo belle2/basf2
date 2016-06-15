@@ -746,7 +746,7 @@ void TrackFinderMCVXDTBModule::endRun()
     B2WARNING(m_noTrueHitCounter <<
               " cluster hits did not have a relation to a true hit and were therefore not included in a track candidate");
   }
-  B2INFO("The MCTrackFinder created a total of " << m_nTrackCands << " track candidates")
+  B2INFO("The MCTrackFinder created a total of " << m_nTrackCands << " track candidates");
 }
 
 void TrackFinderMCVXDTBModule::terminate()

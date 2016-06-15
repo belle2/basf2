@@ -102,7 +102,7 @@ void SeqRootMergerModule::endRun()
 
 void SeqRootMergerModule::terminate()
 {
-  B2INFO("SeqRootMerger: terminate called")
+  B2INFO("SeqRootMerger: terminate called");
 }
 
 

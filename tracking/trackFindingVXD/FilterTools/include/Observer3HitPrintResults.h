@@ -62,7 +62,7 @@ namespace Belle2 {
                    << "/"
                    << range.getSup();
 
-      B2DEBUG(5, outputStream.str())
+      B2DEBUG(5, outputStream.str());
       /// for debugging:
       //       if (range.contains(fResult)) {
       //         B2INFO(outputStream.str())

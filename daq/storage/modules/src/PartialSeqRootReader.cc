@@ -160,7 +160,7 @@ void PartialSeqRootReaderModule::endRun()
 
 void PartialSeqRootReaderModule::terminate()
 {
-  B2INFO("PartialSeqRootReader: terminate called")
+  B2INFO("PartialSeqRootReader: terminate called");
 }
 
 

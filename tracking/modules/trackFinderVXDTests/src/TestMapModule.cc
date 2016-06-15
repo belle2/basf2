@@ -125,12 +125,12 @@ void TestMapModule::endRun()
 void TestMapModule::terminate()
 {
 
-  B2WARNING("std::map-Filling took " << (m_fillMapStuff.count()) << " nanoseconds")
-  B2WARNING("boost::flat_map-Filling took " << (m_fillFlatMapStuff.count()) << " nanoseconds")
-  B2WARNING("boost::unordered_map-Filling took " << (m_fillUnorderedMapStuff.count()) << " nanoseconds")
-  B2WARNING("std::map-Reading took " << (m_eventMapStuff.count()) << " nanoseconds")
-  B2WARNING("boost::flat_map-Reading took " << (m_eventFlatMapStuff.count()) << " nanoseconds")
-  B2WARNING("boost::unordered_map-Reading took " << (m_eventUnorderedMapStuff.count()) << " nanoseconds")
+  B2WARNING("std::map-Filling took " << (m_fillMapStuff.count()) << " nanoseconds");
+  B2WARNING("boost::flat_map-Filling took " << (m_fillFlatMapStuff.count()) << " nanoseconds");
+  B2WARNING("boost::unordered_map-Filling took " << (m_fillUnorderedMapStuff.count()) << " nanoseconds");
+  B2WARNING("std::map-Reading took " << (m_eventMapStuff.count()) << " nanoseconds");
+  B2WARNING("boost::flat_map-Reading took " << (m_eventFlatMapStuff.count()) << " nanoseconds");
+  B2WARNING("boost::unordered_map-Reading took " << (m_eventUnorderedMapStuff.count()) << " nanoseconds");
 }
 
 void TestMapModule::FillMaps()
@@ -155,7 +155,7 @@ void TestMapModule::FillMaps()
   int vSize = std::distance(seccopy.begin(), newEndOfVector);
   seccopy.resize(vSize);
   B2INFO("TestMapModule::FillMaps: m_sectorAdresses has " << m_sectorAdresses.size() << ", sectors has " << sectors.size() <<
-         ", seccopy has " << seccopy.size() << " entries...")
+         ", seccopy has " << seccopy.size() << " entries...");
   // stl-map
   vector<VXDSector>::iterator secIt = sectors.begin();
   boostClock::time_point beginEvent = boostClock::now();
@@ -184,7 +184,7 @@ void TestMapModule::FillMaps()
   m_fillUnorderedMapStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
 
   B2INFO("TestFlatMapModule::FillMap: map has " << m_testMap.size() << "/" << m_testFlatMap.size() << "/" << m_testUnorderedMap.size()
-         << " entries...")
+         << " entries...");
 }/*{
   LittleHelper littleHelperBox = LittleHelper();
 
@@ -202,7 +202,7 @@ void TestMapModule::FillMaps()
     m_fillStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
   }
 
-  B2INFO("TestMapModule::FillMap: map has " << m_testMap.size() << " entries...")
+  B2INFO("TestMapModule::FillMap: map has " << m_testMap.size() << " entries...");
 }*/
 
 void TestMapModule::FillVector(vector<unsigned int>& vec)
@@ -224,11 +224,11 @@ void TestMapModule::FillVector(vector<unsigned int>& vec)
   std::sort(vec.begin(), vec.end());
   for (int pos = 1; pos < int(vec.size()); ++pos) {
     if (vec[pos] == vec[pos - 1]) {
-      B2INFO(" vecPos " << pos << " double entry, FullSecID/string: " << vec[pos] << "/" << FullSecID(vec[pos]).getFullSecString())
+      B2INFO(" vecPos " << pos << " double entry, FullSecID/string: " << vec[pos] << "/" << FullSecID(vec[pos]).getFullSecString());
     }
   }
 
-  B2INFO("TestMapModule::FillVector: vector has " << vec.size() << " entries...")
+  B2INFO("TestMapModule::FillVector: vector has " << vec.size() << " entries...");
 }
 
 void TestMapModule::JumbleVector(vector<unsigned int>& vec)

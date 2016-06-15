@@ -31,7 +31,7 @@ namespace Belle2 {
   MuidPar::MuidPar(int expNo, const char hypothesisName[]) : m_ReducedChiSquaredDx(0.0)
   {
     fillPDFs(expNo, hypothesisName);
-    if (m_ReducedChiSquaredDx == 0.0) { B2FATAL("Failed to read " << hypothesisName << " PDFs for experiment " << expNo) }
+    if (m_ReducedChiSquaredDx == 0.0) { B2FATAL("Failed to read " << hypothesisName << " PDFs for experiment " << expNo); }
   }
 
   MuidPar::~MuidPar()
@@ -53,7 +53,7 @@ namespace Belle2 {
       content.append(line);
     } else {
       B2FATAL("MuidPar::fillPDFs(): Required XML content /Detector/Tracking/MuidParameters not found for expt #" << expNo <<
-              " or earlier")
+              " or earlier");
     }
 
     for (int outcome = 1; outcome <= MUID_MaxOutcome; ++outcome) {
@@ -98,7 +98,7 @@ namespace Belle2 {
         std::vector<double> reducedChiSquaredPDF = detectorContent.getArray(line);
         if (reducedChiSquaredPDF.size() != MUID_ReducedChiSquaredNbins) {
           B2ERROR("TransversePDF vector for hypothesis " << hypothesisName << "  detector " << detector
-                  << " has " << reducedChiSquaredPDF.size() << " entries; should be " << MUID_ReducedChiSquaredNbins)
+                  << " has " << reducedChiSquaredPDF.size() << " entries; should be " << MUID_ReducedChiSquaredNbins);
           m_ReducedChiSquaredDx = 0.0; // invalidate the PDFs for this hypothesis
         } else {
           for (int i = 0; i < MUID_ReducedChiSquaredNbins; ++i) {
@@ -117,9 +117,9 @@ namespace Belle2 {
     }
 
     if (myExpNo == expNo) {
-      B2INFO("MuidPar::fillPDFs(): Loaded " << hypothesisName << " PDFs for expt #" << myExpNo)
+      B2INFO("MuidPar::fillPDFs(): Loaded " << hypothesisName << " PDFs for expt #" << myExpNo);
     } else {
-      B2INFO("MuidPar::fillPDFs(): Loaded " << hypothesisName << " PDFs for expt #" << myExpNo << " (requested #" << expNo << ")")
+      B2INFO("MuidPar::fillPDFs(): Loaded " << hypothesisName << " PDFs for expt #" << myExpNo << " (requested #" << expNo << ")");
     }
   }
 

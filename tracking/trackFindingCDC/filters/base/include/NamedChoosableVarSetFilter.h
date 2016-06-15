@@ -71,11 +71,11 @@ namespace Belle2 {
         MayBePtr<Float_t> foundVariable = Super::getVarSet().find(m_param_varName);
         if (not foundVariable) {
           B2ERROR("Could not find request variable name " << m_param_varName << " in variable set");
-          B2INFO("Valid names are: ")
+          B2INFO("Valid names are: ");
           std::vector<Named<Float_t* > > namedVariables = Super::getVarSet().getNamedVariables();
           for (const Named<Float_t*>& namedVariable : namedVariables) {
             std::string name = namedVariable.getName();
-            B2INFO("* " << name)
+            B2INFO("* " << name);
           }
         }
         m_variable = foundVariable;

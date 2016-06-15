@@ -168,7 +168,7 @@ namespace Belle2 {
     {
       auto filter = m_2spFilters.find(m_compactSecIDsMap->getCompactID(innerID));
       if (filter == m_2spFilters.end()) {
-        B2DEBUG(1, "StaticSector:accept: could not find compactID for given SecID (" << innerID.getFullSecString() << ")! Returning false.")
+        B2DEBUG(1, "StaticSector:accept: could not find compactID for given SecID (" << innerID.getFullSecString() << ")! Returning false.");
         return false;
       }
       return filter->second.accept(spOnThisSec , spOnInnerSec);
@@ -184,7 +184,7 @@ namespace Belle2 {
       auto filter = m_3spFilters.find(m_compactSecIDsMap->getCompactID(centerID, innerID));
       if (filter == m_3spFilters.end()) {
         B2DEBUG(1, "StaticSector:accept: could not find compactID for given SecIDs  (c/i: " << centerID.getFullSecString() <<
-                "/"  << innerID.getFullSecString() << ")! Returning false.")
+                "/"  << innerID.getFullSecString() << ")! Returning false.");
         return false;
       }
       // TODO WARNING
@@ -202,16 +202,16 @@ namespace Belle2 {
                 const HitType& /*outerSp*/, const HitType& /*outerCenterSp*/,
                 const HitType& /*innerCenterSp*/, const HitType& /*innerSp*/) const
     {
-      B2WARNING("StaticSector:accept 4 hit, all 4 hits are yet ignored in here! TODO: implement!")
+      B2WARNING("StaticSector:accept 4 hit, all 4 hits are yet ignored in here! TODO: implement!");
       auto filter = m_4spFilters.find(m_compactSecIDsMap->getCompactID(outerCenterID, innerCenterID, innerID));
       if (filter == m_4spFilters.end()) {
         B2DEBUG(1, "StaticSector:accept: could not find compactID for given SecIDs  (oc/ic/i: " << outerCenterID.getFullSecString() <<
                 "/"  << innerCenterID.getFullSecString() <<
-                "/"  << innerID.getFullSecString() << ")! Returning false.")
+                "/"  << innerID.getFullSecString() << ")! Returning false.");
         return false;
       }
       // TODO WARNING
-      B2WARNING("StaticSector:accept 4 hit TODO implement!")
+      B2WARNING("StaticSector:accept 4 hit TODO implement!");
       return false;
 //    return filter->second.accept(outerSp , outerCenterSp, innerCenterSp, innerSp);
     }

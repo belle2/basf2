@@ -45,7 +45,7 @@ REG_MODULE(TrackFinderVXDAnalizer)
 
 TrackFinderVXDAnalizerModule::TrackFinderVXDAnalizerModule() : Module()
 {
-  B2INFO("TrackFinderVXDAnalizer-initialize")
+  B2INFO("TrackFinderVXDAnalizer-initialize");
 //   InitializeVariables();
 
   vector<string> rootFileNameVals;
@@ -185,7 +185,7 @@ void TrackFinderVXDAnalizerModule::initialize()
 
   if (m_PARAMorigin.size() != 3) {
     B2ERROR("TrackFinderVXDAnalizerModule::initialize() passed parameter 'origin' has wrong number of entries (allowed: 3) of " <<
-            m_PARAMorigin.size() << " reset to standard (0, 0, 0)")
+            m_PARAMorigin.size() << " reset to standard (0, 0, 0)");
     m_PARAMorigin = {0, 0, 0};
   }
 
@@ -198,7 +198,7 @@ void TrackFinderVXDAnalizerModule::initialize()
       output += "'" + entry + "' ";
     }
     B2FATAL("TrackFinderVXDAnalizer::initialize(), rootFileName is set wrong, although parameter 'writeToRoot' is enabled! Actual entries are: "
-            << output)
+            << output);
   }
 
   // deal with algorithms:
@@ -212,19 +212,19 @@ void TrackFinderVXDAnalizerModule::initialize()
   // prepare all algorithms which store a double per tc:
   for (auto& parameterPackage : m_PARAMtrackedParametersDouble) {
     // check if parameterPackage has two entries: first is TCType, second is vector of algorithms
-    if (parameterPackage.size() != 2) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersDouble' was mis-used! Please read the documentation! (wrong number of added parameters)") }
+    if (parameterPackage.size() != 2) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersDouble' was mis-used! Please read the documentation! (wrong number of added parameters)"); }
 
     // check if vector for tcType is really only one entry
-    if (parameterPackage.front().size() != 1) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersDouble' was mis-used! Please read the documentation! (wrong number of added parameters)") }
+    if (parameterPackage.front().size() != 1) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersDouble' was mis-used! Please read the documentation! (wrong number of added parameters)"); }
 
     std::string tcTypeName = parameterPackage.front()[0];
     if (TCType::isValidName(tcTypeName) == false)
-    { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersDouble' was mis-used! Please read the documentation! (invalid tcType: " << tcTypeName << ")") }
+    { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersDouble' was mis-used! Please read the documentation! (invalid tcType: " << tcTypeName << ")"); }
 
     // for each algorithm, store a branch:
     for (auto& algorithm : parameterPackage.back()) {
       if (AlgoritmType::isValidName(algorithm) == false)
-      { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersDouble' was mis-used! Please read the documentation! (invalid algorithmType: " << algorithm << ")") }
+      { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersDouble' was mis-used! Please read the documentation! (invalid algorithmType: " << algorithm << ")"); }
       m_rootParameterTracker.addParameters4DoubleAlgorithms(tcTypeName, algorithm);
     }
   }
@@ -234,19 +234,19 @@ void TrackFinderVXDAnalizerModule::initialize()
   // prepare all algorithms which store an int per tc:
   for (auto& parameterPackage : m_PARAMtrackedParametersInt) {
     // check if parameterPackage has two entries: first is TCType, second is vector of algorithms
-    if (parameterPackage.size() != 2) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersInt' was mis-used! Please read the documentation! (wrong number of added parameters)") }
+    if (parameterPackage.size() != 2) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersInt' was mis-used! Please read the documentation! (wrong number of added parameters)"); }
 
     // check if vector for tcType is really only one entry
-    if (parameterPackage.front().size() != 1) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersInt' was mis-used! Please read the documentation! (wrong number of added parameters)") }
+    if (parameterPackage.front().size() != 1) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersInt' was mis-used! Please read the documentation! (wrong number of added parameters)"); }
 
     std::string tcTypeName = parameterPackage.front()[0];
     if (TCType::isValidName(tcTypeName) == false)
-    { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersInt' was mis-used! Please read the documentation! (invalid tcType: " << tcTypeName << ")") }
+    { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersInt' was mis-used! Please read the documentation! (invalid tcType: " << tcTypeName << ")"); }
 
     // for each algorithm, store a branch:
     for (auto& algorithm : parameterPackage.back()) {
       if (AlgoritmType::isValidName(algorithm) == false)
-      { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersInt' was mis-used! Please read the documentation! (invalid algorithmType: " << algorithm << ")") }
+      { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersInt' was mis-used! Please read the documentation! (invalid algorithmType: " << algorithm << ")"); }
       m_rootParameterTracker.addParameters4IntAlgorithms(tcTypeName, algorithm);
     }
   }
@@ -256,19 +256,19 @@ void TrackFinderVXDAnalizerModule::initialize()
   // prepare all algorithms which store a vector< double> per tc:
   for (auto& parameterPackage : m_PARAMtrackedParametersVecDouble) {
     // check if parameterPackage has two entries: first is TCType, second is vector of algorithms
-    if (parameterPackage.size() != 2) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersVecDouble' was mis-used! Please read the documentation! (wrong number of added parameters)") }
+    if (parameterPackage.size() != 2) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersVecDouble' was mis-used! Please read the documentation! (wrong number of added parameters)"); }
 
     // check if vector for tcType is really only one entry
-    if (parameterPackage.front().size() != 1) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersVecDouble' was mis-used! Please read the documentation! (wrong number of added parameters)") }
+    if (parameterPackage.front().size() != 1) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersVecDouble' was mis-used! Please read the documentation! (wrong number of added parameters)"); }
 
     std::string tcTypeName = parameterPackage.front()[0];
     if (TCType::isValidName(tcTypeName) == false)
-    { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersVecDouble' was mis-used! Please read the documentation! (invalid tcType: " << tcTypeName << ")") }
+    { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersVecDouble' was mis-used! Please read the documentation! (invalid tcType: " << tcTypeName << ")"); }
 
     // for each algorithm, store a branch:
     for (auto& algorithm : parameterPackage.back()) {
       if (AlgoritmType::isValidName(algorithm) == false)
-      { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersVecDouble' was mis-used! Please read the documentation! (invalid algorithmType: " << algorithm << ")") }
+      { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersVecDouble' was mis-used! Please read the documentation! (invalid algorithmType: " << algorithm << ")"); }
       m_rootParameterTracker.addParameters4VecDoubleAlgorithms(tcTypeName, algorithm);
     }
   }
@@ -341,14 +341,14 @@ void TrackFinderVXDAnalizerModule::event()
 
     for (AnalizerTCInfo& referenceTC : referenceTCVector) {
       int refID = referenceTC.assignedID.getParticleID();
-      B2DEBUG(50, "test TC with assigned ID " << testID << " was matched with refID " << refID)
+      B2DEBUG(50, "test TC with assigned ID " << testID << " was matched with refID " << refID);
       if (refID != testID) continue;
 
       testTC.tcType = AnalizerTCInfo::classifyTC(referenceTC, testTC, m_PARAMpurityThreshold, m_PARAMminNDFThreshold);
 
       B2DEBUG(50, "test TC with assigned ID " << testID <<
               " was classified for the corresponding with type for testTC/refTC: " << TCType::getTypeName(testTC.tcType) <<
-              "/" << TCType::getTypeName(referenceTC.tcType) << " and will now paired up")
+              "/" << TCType::getTypeName(referenceTC.tcType) << " and will now paired up");
 
       referenceTC.pairUp(&testTC);
 
@@ -388,7 +388,7 @@ void TrackFinderVXDAnalizerModule::event()
       default: {
         nBadCases++;
         B2WARNING("TrackFinderVXDAnalizer::event(): test TC got type " << TCType::getTypeName(aTC.tcType) <<
-                  " which is not counted for efficiency-calculation")
+                  " which is not counted for efficiency-calculation");
       }
     }
   }
@@ -404,7 +404,7 @@ void TrackFinderVXDAnalizerModule::event()
       default: {
         nBadCases++;
         B2WARNING("TrackFinderVXDAnalizer::event(): reference TC got type " << TCType::getTypeName(aTC.tcType) <<
-                  " which is not counted for efficiency-calculation")
+                  " which is not counted for efficiency-calculation");
       }
     }
   }

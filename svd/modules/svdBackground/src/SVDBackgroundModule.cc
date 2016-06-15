@@ -226,7 +226,7 @@ void SVDBackgroundModule::event()
 
   // Neutron flux
   if (m_nfluxReportingLevel > c_reportNone) {
-    B2DEBUG(100, "Neutron flux")
+    B2DEBUG(100, "Neutron flux");
     currentSensorID.setID(0);
     for (const SVDTrueHit& hit : storeTrueHits) {
       VxdID sensorID = hit.getSensorID();
@@ -320,7 +320,7 @@ void SVDBackgroundModule::event()
 
   // Fired strips
   if (m_occupancyReportingLevel > c_reportNone) {
-    B2DEBUG(100, "Fired strips")
+    B2DEBUG(100, "Fired strips");
     currentSensorID.setID(0);
     double currentSensorUCut = 0;
     double currentSensorVCut = 0;
@@ -336,9 +336,9 @@ void SVDBackgroundModule::event()
         currentSensorUCut = eToADU(3.0 * info.getElectronicNoiseU());
         currentSensorVCut = eToADU(3.0 * info.getElectronicNoiseV());
       }
-      B2DEBUG(30, "Digit charge: " << digit.getCharge() << " threshold: " << (digit.isUStrip() ? currentSensorUCut : currentSensorVCut))
+      B2DEBUG(30, "Digit charge: " << digit.getCharge() << " threshold: " << (digit.isUStrip() ? currentSensorUCut : currentSensorVCut));
       if (digit.getCharge() < (digit.isUStrip() ? currentSensorUCut : currentSensorVCut)) continue;
-      B2DEBUG(30, "Passed.")
+      B2DEBUG(30, "Passed.");
       // Economize writing u- and v- strips by re-using the Segment field of VxdID
       VxdID writeID(sensorID);
       if (digit.isUStrip())
@@ -384,7 +384,7 @@ void SVDBackgroundModule::event()
     //  W(sn) / t_simulation * sz / #strips(id)
     // )
     //
-    B2DEBUG(100, "Occupancy")
+    B2DEBUG(100, "Occupancy");
     currentSensorID.setID(0);
     double currentNoiseU = 0;
     double currentNoiseV = 0;

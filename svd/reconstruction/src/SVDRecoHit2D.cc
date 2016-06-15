@@ -85,7 +85,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit):
   m_energyDep(0)
 {
   if ((uHit.getRawSensorID() != vHit.getRawSensorID()) || !uHit.isUCluster() || vHit.isUCluster())
-    B2FATAL("Error in SVDRecoHit2D: Incorrect SVDCluster instances on input!")
+    B2FATAL("Error in SVDRecoHit2D: Incorrect SVDCluster instances on input!");
 
     m_sensorID = uHit.getRawSensorID();
 
@@ -123,7 +123,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDRecoHit& uRecoHit, const SVDRecoHit& vRecoHi
   const SVDCluster& uHit = *(uRecoHit.getCluster());
   const SVDCluster& vHit = *(vRecoHit.getCluster());
   if ((uHit.getRawSensorID() != vHit.getRawSensorID()) || !uHit.isUCluster() || vHit.isUCluster())
-    B2FATAL("Error in SVDRecoHit2D: Incorrect SVDCluster instances on input!")
+    B2FATAL("Error in SVDRecoHit2D: Incorrect SVDCluster instances on input!");
 
     m_sensorID = uHit.getRawSensorID();
   m_uCluster = &uHit;

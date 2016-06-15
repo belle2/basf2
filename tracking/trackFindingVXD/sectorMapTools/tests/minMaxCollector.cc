@@ -72,7 +72,7 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(0, newCollector.sampleSize());
     EXPECT_TRUE(newCollector.empty());
 
-    B2INFO("add first entry")
+    B2INFO("add first entry");
     newCollector.append(42.);
     newCollector.print();
 
@@ -84,7 +84,7 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(42., newCollector.getMinMax(0.01, 0.99).first);
     EXPECT_EQ(42., newCollector.getMinMax(0.01, 0.99).second);
 
-    B2INFO("add 2nd entry")
+    B2INFO("add 2nd entry");
     newCollector.append(23.);
     newCollector.print();
 
@@ -94,7 +94,7 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(23., newCollector.getMinMax(0.01, 0.99).first);
     EXPECT_EQ(42., newCollector.getMinMax(0.01, 0.99).second);
 
-    B2INFO("add 3rd entry")
+    B2INFO("add 3rd entry");
     newCollector.append(5.);
     newCollector.print();
 
@@ -104,7 +104,7 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(5., newCollector.getMinMax(0.01, 0.99).first);
     EXPECT_EQ(42., newCollector.getMinMax(0.01, 0.99).second);
 
-    B2INFO("add 47 more entries (sorted add, now 50)")
+    B2INFO("add 47 more entries (sorted add, now 50)");
     for (int i = 1; i < 48; i++) {
       newCollector.append(5. + 0.25 * double(i));
     }
@@ -119,11 +119,11 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(23., newCollector.getMinMax(0.02, 0.98).second);
     EXPECT_NE(16.75, newCollector.getMinMax(0.02, 0.98).second);
 
-    B2INFO("add 50 more entries (sorted add, now 100)")
+    B2INFO("add 50 more entries (sorted add, now 100)");
     for (int i = 1; i < 51; i++) {
       newCollector.append(23. + 0.25 * double(i));
     }
-    B2INFO("add 150 more entries (sorted add, now 250)")
+    B2INFO("add 150 more entries (sorted add, now 250)");
     for (int i = 1; i < 151; i++) {
       newCollector.append(3. + 0.3 * double(i));
     }

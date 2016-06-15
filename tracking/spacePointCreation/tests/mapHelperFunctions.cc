@@ -217,7 +217,7 @@ namespace Belle2 {
       // check if all values are present
       for (const double& d : actualValues) {
         if (std::isnan(d)) {
-          B2INFO("Not comparing NaN value!")
+          B2INFO("Not comparing NaN value!");
           continue;
         }
         EXPECT_FALSE(std::find(expectedValues.begin(), expectedValues.end(), d) == expectedValues.end());

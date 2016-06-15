@@ -101,7 +101,7 @@ namespace Belle2 {
         VxdID vxdID = cluster.getSensorID();
         VxdID::baseType layer = vxdID.getLayerNumber();
         radius = m_layerPositions[layer - 1] / 100.0;
-        B2WARNING("Could not determine SpacePoint for this cluster. Falling back to geometrical information.")
+        B2WARNING("Could not determine SpacePoint for this cluster. Falling back to geometrical information.");
       } else {
         // The positions is the one with w = 0 which is the one on the lowest detector plane.
         radius = spacePoint->getPosition().Perp();

@@ -143,7 +143,7 @@ bool CKFCdcToVxdModule::extrapolateToPXDLayer(genfit::Track* track, std::vector<
                                               StoreArray<PXDCluster>& clusters,
                                               std::vector<genfit::AbsMeasurement*>& hits)
 {
-  B2DEBUG(95, "<----> PXD extrapolateToLayer " << searchLayer << " <---->")
+  B2DEBUG(95, "<----> PXD extrapolateToLayer " << searchLayer << " <---->");
 
   static float layerRadii[7] = {0, 1.421, 2.179, 3.799, 8.0, 10.4, 13.51};
 
@@ -190,7 +190,7 @@ bool CKFCdcToVxdModule::extrapolateToSVDLayer(genfit::Track* track, std::vector<
                                               StoreArray<SVDCluster>& clusters,
                                               bool isU, std::vector<genfit::AbsMeasurement*>& hits)
 {
-  B2DEBUG(95, "<----> extrapolateToLayer " << searchLayer << " <---->")
+  B2DEBUG(95, "<----> extrapolateToLayer " << searchLayer << " <---->");
   TVector3 zaxis(0, 0, 1);
   TVector3 mzaxis(0, 0, -1);
   TVector3 origin(0, 0, 0);

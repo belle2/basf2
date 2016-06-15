@@ -276,7 +276,7 @@ void BKLMEffnRadioModule::event()
 {
   m_eventCounter++;
   if (!(m_eventCounter % 1000))
-    B2DEBUG(1, "looking at event nr " << m_eventCounter)
+    B2DEBUG(1, "looking at event nr " << m_eventCounter);
 
     StoreArray<BKLMHit1d> hits1D;
   //   cout <<" we have " << hits1D.getEntries() << " 1D hits " << endl;
@@ -287,13 +287,13 @@ void BKLMEffnRadioModule::event()
   for (int h = 0;  h < hits1D.getEntries(); h++) {
     int sector = hits1D[h]->getSector() - 1;
     if ((sector < 0) || (sector >= 8)) {
-      B2DEBUG(1, "wrong sector number. sector = " << sector)
+      B2DEBUG(1, "wrong sector number. sector = " << sector);
       continue;
     }
     int layer = hits1D[h]->getLayer() - 1;
     //      cout <<"layer is : "<< layer <<endl;
     if ((layer < 0) || (layer >= 15)) {
-      B2DEBUG(1, "wrong layer number. layer = " << layer)
+      B2DEBUG(1, "wrong layer number. layer = " << layer);
       continue;
     }
     hitsPerLayer[layer]++;
@@ -309,7 +309,7 @@ void BKLMEffnRadioModule::event()
 
     //scintillator layers have 54 channels, not 48 like the rpcs
     if (channelMin < 0 || channelMax < 0 || channelMin > channelMax || channelMax >= 54 || channelMin >= 54) {
-      B2DEBUG(1, "wrong channel, min = " << channelMin << " max = " << channelMax << " layer = " << layer)
+      B2DEBUG(1, "wrong channel, min = " << channelMin << " max = " << channelMax << " layer = " << layer);
       continue;
     }
 
@@ -365,7 +365,7 @@ void BKLMEffnRadioModule::terminate()
     float lInd = i / (float)48;
     float colorIndex = lInd * 48 + 51;
     int roundInd = fabs(lInd * maxStripHits + 0.5);
-    B2DEBUG(1, "lInd is " << lInd << " color index is: " << colorIndex << " max strip: " << maxStripHits << " round ind: " << roundInd)
+    B2DEBUG(1, "lInd is " << lInd << " color index is: " << colorIndex << " max strip: " << maxStripHits << " round ind: " << roundInd);
     char buffer[200];
     sprintf(buffer, "%d", roundInd);
 
@@ -685,7 +685,7 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
 
   set<int> locIndices;
   if (points.size() > 0) {
-    B2DEBUG(1, "point vector not empty...")
+    B2DEBUG(1, "point vector not empty...");
   }
 
   int layer1 = hits2D[firstHit]->getLayer();

@@ -139,7 +139,7 @@ void HepevtInputModule::event()
     } else {
       StoreObjPtr <EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
       eventMetaDataPtr->setEndOfData();
-      B2DEBUG(100, "Reached end of all HepEvt files.")
+      B2DEBUG(100, "Reached end of all HepEvt files.");
     }
   } catch (runtime_error& e) {
     B2ERROR(e.what());

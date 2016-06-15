@@ -535,7 +535,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
         const CDCSimHit* aCDCSimHitPtr = cdcHit->getRelatedFrom<CDCSimHit>();
         if (not aCDCSimHitPtr) {
-          B2DEBUG(100, "     Skipping CDCHit without related CDCSimHit.")
+          B2DEBUG(100, "     Skipping CDCHit without related CDCSimHit.");
           continue;
         }
         double time = aCDCSimHitPtr->getFlightTime();
@@ -684,5 +684,5 @@ void TrackFinderMCTruthRecoTracksModule::endRun()
     B2WARNING(m_noTrueHitCounter <<
               " cluster hits did not have a relation to a true hit and were therefore not included in a track candidate");
   }
-  B2INFO("The MCTrackFinder created a total of " << m_nRecoTracks << " track candidates")
+  B2INFO("The MCTrackFinder created a total of " << m_nRecoTracks << " track candidates");
 }

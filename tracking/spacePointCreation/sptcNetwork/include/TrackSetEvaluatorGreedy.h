@@ -49,22 +49,22 @@ namespace Belle2 {
     bool doGreedy(std::vector<TCType*>& overlappingTCs)
     {
       using namespace std;
-      B2DEBUG(25, "doGreedy:b4Sorting:\n" << BaseClass::miniPrinter(overlappingTCs))
+      B2DEBUG(25, "doGreedy:b4Sorting:\n" << BaseClass::miniPrinter(overlappingTCs));
 
       // sort that TC with highest QI comes first
       std::sort(overlappingTCs.begin(), overlappingTCs.end(), [](const TCType * a, const TCType * b) -> bool { return *a > *b; });
 
-      B2DEBUG(25, "doGreedy:afterSorting:\n" << BaseClass::miniPrinter(overlappingTCs))
+      B2DEBUG(25, "doGreedy:afterSorting:\n" << BaseClass::miniPrinter(overlappingTCs));
 
       // start recursive greedy algorithm...
       bool wasSuccsessfull = greedyRecursive(0, overlappingTCs);
 
       if (wasSuccsessfull) {
         B2DEBUG(50, "doGreedy: at end of greedy algoritm: total number of TCs alive: " << BaseClass::checkAtEnd() <<
-                "\n Overview:\n" << BaseClass::miniPrinter(overlappingTCs))
+                "\n Overview:\n" << BaseClass::miniPrinter(overlappingTCs));
         return true;
       }
-      B2WARNING("doGreedyRecursive aborted!" << BaseClass::checkAtEnd() << "\n Overview:\n" << BaseClass::miniPrinter(overlappingTCs))
+      B2WARNING("doGreedyRecursive aborted!" << BaseClass::checkAtEnd() << "\n Overview:\n" << BaseClass::miniPrinter(overlappingTCs));
       return false;
     }
 
@@ -77,13 +77,13 @@ namespace Belle2 {
     inline bool greedyRecursive(unsigned int currentIndex,
                                 std::vector<TCType*>& overlappingTCs)
     {
-      B2DEBUG(50, "doGreedyRecursive-start: current index: " << currentIndex << ", fullList:\n" << BaseClass::miniPrinter(overlappingTCs))
+      B2DEBUG(50, "doGreedyRecursive-start: current index: " << currentIndex << ", fullList:\n" << BaseClass::miniPrinter(overlappingTCs));
       // if end of container is reached: end greedy recursive for good.
       if ((currentIndex < overlappingTCs.size()) == false) return true;
 
       // bypass all dead entries, skip if end of container is reached:
       while (overlappingTCs.size() > currentIndex and (overlappingTCs[currentIndex]->isAlive() == false)) {
-        B2DEBUG(50, "doGreedyRecursive-while-loop: current index: " << currentIndex << " is dead, skipping...")
+        B2DEBUG(50, "doGreedyRecursive-while-loop: current index: " << currentIndex << " is dead, skipping...");
         currentIndex++;
         if (currentIndex == overlappingTCs.size()) { return true; }
       }
@@ -91,7 +91,7 @@ namespace Belle2 {
       auto vecPrint = [](const std::vector<unsigned int>& vec) -> std::string { std::string out = "competitor:"; for (auto iD : vec) { out += " " + std::to_string(iD) + "," ; } return out; };
       B2DEBUG(50, "\ndoGreedyRecursive before killing stuff: these are the competitors of index (overlap/total) " << currentIndex
               << "/" << overlappingTCs[currentIndex]->getID() << ":\n" << vecPrint(BaseClass::m_manager.getCompetitors(
-                    overlappingTCs[currentIndex]->getID())) << " (in total index)\n")
+                    overlappingTCs[currentIndex]->getID())) << " (in total index)\n");
 
       // copy competitor-IDs to prevent undefined behavior:
       auto competitors = BaseClass::m_manager.getCompetitors(overlappingTCs[currentIndex]->getID());
@@ -103,7 +103,7 @@ namespace Belle2 {
                 " got competitor with index (total, _not_ overlap!) " << competitorID <<
                 " and QI " << BaseClass::m_trackSet[competitorID].getTrackQuality() <<
                 ". The competitor " << competitorID << " got following competitors itself:\n" << vecPrint(BaseClass::m_manager.getCompetitors(
-                      competitorID)) << "\n")
+                      competitorID)) << "\n");
 
         // warning currentIndex is running in overlap-system, but competitorID is in total system!
         BaseClass::m_trackSet[competitorID].setAliveState(false);
@@ -111,7 +111,7 @@ namespace Belle2 {
 
       B2DEBUG(50, "doGreedyRecursive-after killing competitors: current index: " << currentIndex
               << " has now " <<  BaseClass::m_manager.getCompetitors(overlappingTCs[currentIndex]->getID()).size() << " competitors (should be 0)"
-              << ", fullList:\n" << BaseClass::miniPrinter(overlappingTCs))
+              << ", fullList:\n" << BaseClass::miniPrinter(overlappingTCs));
 
       currentIndex++;
 
@@ -136,7 +136,7 @@ namespace Belle2 {
     virtual bool cleanOverlaps()
     {
       std::string result = BaseClass::checkAtStart();
-      B2DEBUG(25, "TrackSetEvaluatorGreedy::cleanOverlaps: " << result)
+      B2DEBUG(25, "TrackSetEvaluatorGreedy::cleanOverlaps: " << result);
 
       std::vector<TCType*> overlaps = BaseClass::getOverlappingTCs();
       unsigned int nOverlaps = overlaps.size();

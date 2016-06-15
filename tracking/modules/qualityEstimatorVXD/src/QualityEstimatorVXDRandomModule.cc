@@ -42,7 +42,7 @@ QualityEstimatorVXDRandomModule::QualityEstimatorVXDRandomModule() : Module()
 void QualityEstimatorVXDRandomModule::event()
 {
   m_eventCounter++;
-  B2DEBUG(1, "\n" << "QualityEstimatorVXDRandomModule:event: event " << m_eventCounter << "\n")
+  B2DEBUG(1, "\n" << "QualityEstimatorVXDRandomModule:event: event " << m_eventCounter << "\n");
   m_nTCsTotal += m_spacePointTrackCands.getEntries();
 
 
@@ -71,7 +71,7 @@ void QualityEstimatorVXDRandomModule::endRun()
   B2INFO("QualityEstimatorVXDRandomModule:endRun: events: " << m_eventCounter
          << ", nSPTCsPerEvent: " << invEvents * float(m_nTCsTotal)
          << ", random number for check of deterministic behavior: " << gRandom->Uniform(1.0)
-        )
+        );
 }
 
 

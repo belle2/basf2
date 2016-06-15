@@ -308,7 +308,7 @@ void TrackfitDQMModule::plotResiduals(const genfit::Track* track)
 
       const genfit::KalmanFitterInfo* kfi = tp->getKalmanFitterInfo();
       if (!kfi) {
-        B2DEBUG(1, "No kalmanfitterinfo")
+        B2DEBUG(1, "No kalmanfitterinfo");
         continue;
       }
 

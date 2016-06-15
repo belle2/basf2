@@ -74,7 +74,7 @@ namespace Belle2 {
       // check that user limits are set properly
       G4UserLimits* userLimits = g4Volume.GetLogicalVolume()->GetUserLimits();
       if (userLimits) {
-        B2DEBUG(100, "Volume " << g4Volume.GetName() << ": max. allowed step set to " << userLimits->GetMaxAllowedStep(track))
+        B2DEBUG(100, "Volume " << g4Volume.GetName() << ": max. allowed step set to " << userLimits->GetMaxAllowedStep(track));
       }
 
       StoreArray<IRSimHit> irSimHits;

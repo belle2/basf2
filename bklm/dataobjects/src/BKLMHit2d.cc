@@ -40,7 +40,7 @@ BKLMHit2d::BKLMHit2d(const BKLMHit1d* hitPhi, const BKLMHit1d* hitZ, const CLHEP
   m_ZStrips = ((hitZ->getStripMin() - 1) << BKLM_ZSTRIP_BIT) | ((hitZ->getStripMax() - 1) << BKLM_ZMAXSTRIP_BIT);
 
   if (((hitZ->getModuleID() ^ m_ModuleID) & BKLM_MODULEID_MASK) != 0) {
-    B2WARNING("Attempt to form a 2D hit from distinct-module 1D hits")
+    B2WARNING("Attempt to form a 2D hit from distinct-module 1D hits");
   }
 
   m_GlobalPosition[0] = globalPos.x();

@@ -118,6 +118,6 @@ void RxSocketModule::endRun()
 
 void RxSocketModule::terminate()
 {
-  B2INFO("terminate called")
+  B2INFO("terminate called");
 }
 

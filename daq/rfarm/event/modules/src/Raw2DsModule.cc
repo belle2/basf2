@@ -211,6 +211,6 @@ void Raw2DsModule::endRun()
 
 void Raw2DsModule::terminate()
 {
-  B2INFO("Raw2Ds: terminate called")
+  B2INFO("Raw2Ds: terminate called");
 }
 

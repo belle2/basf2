@@ -277,7 +277,7 @@ namespace Belle2 {
 
         gROOT->GetPluginManager()->AddHandler(base.c_str(), regexp1.c_str(), className.c_str(), pluginName.c_str(), ctor1.c_str());
         gROOT->GetPluginManager()->AddHandler(base.c_str(), regexp2.c_str(), className.c_str(), pluginName.c_str(), ctor2.c_str());
-        B2INFO("Registered new TMVA Plugin named " << pluginName)
+        B2INFO("Registered new TMVA Plugin named " << pluginName);
       }
 
       if (!m_expert->BookMVA(specific_options.m_method, custom_weightfile)) {
@@ -308,7 +308,7 @@ namespace Belle2 {
 
         gROOT->GetPluginManager()->AddHandler(base.c_str(), regexp1.c_str(), className.c_str(), pluginName.c_str(), ctor1.c_str());
         gROOT->GetPluginManager()->AddHandler(base.c_str(), regexp2.c_str(), className.c_str(), pluginName.c_str(), ctor2.c_str());
-        B2INFO("Registered new TMVA Plugin named " << pluginName)
+        B2INFO("Registered new TMVA Plugin named " << pluginName);
       }
 
       if (!m_expert->BookMVA(specific_options.m_method, custom_weightfile)) {

@@ -62,9 +62,9 @@ public:
   {
     // Is this an exception for low-momentum track that would over-curl in B field?
     if (strstr(description, "Error returned: 3") != NULL) {
-      B2DEBUG(1, "In " << origin << ", " << code << ": " << description)
+      B2DEBUG(1, "In " << origin << ", " << code << ": " << description);
     } else {
-      B2ERROR("In " << origin << ", " << code << ": " << description)
+      B2ERROR("In " << origin << ", " << code << ": " << description);
     }
     return false;
   }
@@ -192,9 +192,9 @@ void ExtManager::Initialize(const char caller[], const std::string& magneticFiel
   if (G4ErrorPropagatorData::GetErrorPropagatorData()->GetState() == G4ErrorState_Init) {
     status += 1;
     if (status == 1) {
-      B2INFO("ExtManager::Initialize(): " << caller << " will run without FullSim; the extrapolator has already been initialized")
+      B2INFO("ExtManager::Initialize(): " << caller << " will run without FullSim; the extrapolator has already been initialized");
     } else {
-      B2INFO("ExtManager::Initialize(): " << caller << " will run with FullSim; the extrapolator has already been initialized")
+      B2INFO("ExtManager::Initialize(): " << caller << " will run with FullSim; the extrapolator has already been initialized");
     }
     return;
   }
@@ -291,9 +291,9 @@ void ExtManager::Initialize(const char caller[], const std::string& magneticFiel
   }
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_Init);
   if (status == 0) {
-    B2INFO("ExtManager::Initialize(): " << caller << " will run without FullSim and has initialized the extrapolator")
+    B2INFO("ExtManager::Initialize(): " << caller << " will run without FullSim and has initialized the extrapolator");
   } else {
-    B2INFO("ExtManager::Initialize(): " << caller << " will run with FullSim and has initialized the extrapolator")
+    B2INFO("ExtManager::Initialize(): " << caller << " will run with FullSim and has initialized the extrapolator");
   }
   return;
 }

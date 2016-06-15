@@ -140,7 +140,7 @@ namespace VXDTFObserversTest {
         pxdCluster->addRelationTo(aParticle);
 
         SpacePoint* newSP = spacePointData.appendNew(pxdCluster, &aSensorInfo);
-        B2DEBUG(10, " setup: new spacePoint got arrayIndex: " << newSP->getArrayIndex() << " and VxdID " << newSP->getVxdID())
+        B2DEBUG(10, " setup: new spacePoint got arrayIndex: " << newSP->getArrayIndex() << " and VxdID " << newSP->getVxdID());
         newSP->addRelationTo(pxdCluster);
       }
 
@@ -170,7 +170,7 @@ namespace VXDTFObserversTest {
       }
 
       B2INFO("ObserversTest:SetUP: created " << mcParticleData.getEntries() << "/" << pxdClusterData.getEntries() << "/" <<
-             svdClusterData.getEntries() << "/" << spacePointData.getEntries() << " mcParticles/pxdClusters/svdClusters/SpacePoints")
+             svdClusterData.getEntries() << "/" << spacePointData.getEntries() << " mcParticles/pxdClusters/svdClusters/SpacePoints");
     }
 
 
@@ -272,10 +272,10 @@ namespace VXDTFObserversTest {
       bool keyAlreadyExisted = true;
       auto foundPos = m_container.find(aKey);
       if (foundPos == m_container.end())  {
-        B2DEBUG(100, " the IDs " << key2str(aKey) << " collected haven't been found yet")
+        B2DEBUG(100, " the IDs " << key2str(aKey) << " collected haven't been found yet");
         foundPos = m_container.insert({aKey, AcceptRejectPair() }).first;
         keyAlreadyExisted = false;
-      } else { B2DEBUG(100, " the IDs " << key2str(aKey) << " collected were already there") }
+      } else { B2DEBUG(100, " the IDs " << key2str(aKey) << " collected were already there"); }
 
       foundPos->second.Increase(accepted);
 
@@ -304,7 +304,7 @@ namespace VXDTFObserversTest {
     {
       for (const auto& aKey : m_container) {
         B2DEBUG(100, "comparing given particles: " << vec2str(givenKey) << " with entry: " << vec2str(
-                  aKey.first.second) << " with result " << (aKey.first.second == givenKey))
+                  aKey.first.second) << " with result " << (aKey.first.second == givenKey));
         if (aKey.first.second == givenKey) { return aKey.second; }
       }
 
@@ -322,7 +322,7 @@ namespace VXDTFObserversTest {
                   ", combi was accepted/rejected: " <<
                   entry.second.accept <<
                   "/" <<
-                  entry.second.reject)
+                  entry.second.reject);
       }
     }
 
@@ -497,9 +497,9 @@ namespace VXDTFObserversTest {
                    << range.getSup();
 
       if (range.contains(fResult)) {
-        B2INFO(outputStream.str())
+        B2INFO(outputStream.str());
       } else {
-        B2WARNING(outputStream.str())
+        B2WARNING(outputStream.str());
       }
     }
   };
@@ -721,10 +721,10 @@ namespace VXDTFObserversTest {
     {
       B2INFO(" Filter " << filterType.name() << " with Mag of outer-/innerHit " << outerHit.getPosition().Mag() << "/" <<
              innerHit.getPosition().Mag() << " got result of " << filterResult << " and Observer-Vector sm_collectedObservers got " <<
-             VectorOfObservers<FilterType>::sm_collectedObservers.size() << " observers collected")
+             VectorOfObservers<FilterType>::sm_collectedObservers.size() << " observers collected");
       B2INFO(" Filter " << filterType.name() << " with Mag of outer-/innerHit " << outerHit.getPosition().Mag() << "/" <<
              innerHit.getPosition().Mag() << " got result of " << filterResult << " and Observer-Vector sm_collectedObserversCSTYLE got " <<
-             VectorOfObservers<FilterType>::sm_collectedObserversCSTYLE.size() << " observers collected")
+             VectorOfObservers<FilterType>::sm_collectedObserversCSTYLE.size() << " observers collected");
 
       /// the idea of the following three lines have to work in the end (I basically want to loop over all attached observers and execute their notify function):
       //    for(auto& anObserver : CollectedObservers<FilterType>::collectedObservers) {
@@ -827,7 +827,7 @@ namespace VXDTFObserversTest {
       SpacePoint& spA = *spacePointData[i];
       SpacePoint& spB = *spacePointData[i - 1];
       B2DEBUG(10, "spData-Sps got arraIndices: " << spacePointData[i]->getArrayIndex() << "/" << spacePointData[i - 1]->getArrayIndex() <<
-              " and VxdIDs " << spacePointData[i]->getVxdID() << "/" << spacePointData[i - 1]->getVxdID())
+              " and VxdIDs " << spacePointData[i]->getVxdID() << "/" << spacePointData[i - 1]->getVxdID());
       observedFilter.accept(spA, spB);
     }
 
@@ -927,7 +927,7 @@ namespace VXDTFObserversTest {
     realname = abi::__cxa_demangle(typeid(storeFuncVariantB).name(), 0, 0, &status);
     std::string name(realname);
     free(realname);
-    B2INFO("storeFuncVariantB is of type: " << name)
+    B2INFO("storeFuncVariantB is of type: " << name);
 
 //  VectorOfObservers<Distance3DSquared>::sm_collectedObserversTry2.push_back(storeFuncVariantB);
 

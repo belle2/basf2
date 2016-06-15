@@ -27,7 +27,7 @@ void StereoSegmentTrackAdder::add(CDCTrack& track, const std::vector<WithWeight<
         arcLength2D += 2 * TMath::Pi() * radius;
       }
 
-      B2ASSERT("This stereo hit has already a taken flag!", not recoHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
+      B2ASSERT("This stereo hit has already a taken flag!", not recoHit.getWireHit().getAutomatonCell().hasTakenFlag()); {
 
         track.emplace_back(recoHit.getRLWireHit(), recoPos3D, arcLength2D);
         recoHit.getWireHit().getAutomatonCell().setTakenFlag();

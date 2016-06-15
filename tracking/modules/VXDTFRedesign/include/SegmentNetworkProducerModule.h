@@ -126,7 +126,7 @@ namespace Belle2 {
 
       if (m_PARAMCreateNeworks < 1 or m_PARAMCreateNeworks > 3) {
         B2FATAL("SegmentNetworkProducerModule::Initialize(): parameter 'createNeworks' is set to " << m_PARAMCreateNeworks <<
-                "which is invalid, please read the documentation (basf2 - m SegmentNetworkProducer)!")
+                "which is invalid, please read the documentation (basf2 - m SegmentNetworkProducer)!");
       }
 
       for (std::string& anArrayName : m_PARAMSpacePointsArrayNames) {
@@ -150,7 +150,7 @@ namespace Belle2 {
 
       if (m_PARAMVirtualIPCoordinates.size() != 3
           or m_PARAMVirtualIPErrors.size() != 3)
-        B2FATAL("SegmentNetworkProducerModule:initialize: parameters for virtualIP are wrong - check basf2 -m!")
+        B2FATAL("SegmentNetworkProducerModule:initialize: parameters for virtualIP are wrong - check basf2 -m!");
 
         m_virtualIPCoordinates = B2Vector3D(m_PARAMVirtualIPCoordinates.at(0), m_PARAMVirtualIPCoordinates.at(1),
                                             m_PARAMVirtualIPCoordinates.at(2));

@@ -214,7 +214,7 @@ namespace Belle2 {
         }
       }
       if (!ok) {
-        B2FATAL("Bug: under-dimensioned array in ScrodData!")
+        B2FATAL("Bug: under-dimensioned array in ScrodData!");
       }
 
       for (auto& packet : packets) delete packet;

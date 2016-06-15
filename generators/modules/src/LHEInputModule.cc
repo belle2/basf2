@@ -138,7 +138,7 @@ void LHEInputModule::event()
     } else {
       StoreObjPtr <EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
       eventMetaDataPtr->setEndOfData();
-      B2DEBUG(100, "Reached end of all LHE files.")
+      B2DEBUG(100, "Reached end of all LHE files.");
     }
   } catch (runtime_error& e) {
     B2ERROR(e.what());

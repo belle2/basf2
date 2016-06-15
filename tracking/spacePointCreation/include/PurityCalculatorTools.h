@@ -97,7 +97,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
         else if (!uGood && vGood) mcParticles.push_back(std::make_pair(-2, 11)); // if only U-Cluster is not related -> weight is 11
       }
     } else {
-      B2ERROR("Unknown DetectorType in getMCParticles! This is just a notification! Needs to be handled!") // should not happen
+      B2ERROR("Unknown DetectorType in getMCParticles! This is just a notification! Needs to be handled!"); // should not happen
     }
 
     return mcParticles;
@@ -161,7 +161,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
       std::vector<std::pair<int, double> > mcParticles;
       if (spacePoint->getType() == VXD::SensorInfoBase::PXD) mcParticles = getMCParticles<PXDTrueHit>(spacePoint);
       else if (spacePoint->getType() == VXD::SensorInfoBase::SVD) mcParticles = getMCParticles<SVDTrueHit>(spacePoint);
-      else if (spacePoint->getType() == VXD::SensorInfoBase::VXD) {B2DEBUG(100, "found generic spacePoint, treating it as virtualIP")}
+      else if (spacePoint->getType() == VXD::SensorInfoBase::VXD) {B2DEBUG(100, "found generic spacePoint, treating it as virtualIP");}
       else B2FATAL("Unknown DetectorType (" << spacePoint->getType() << ") in createPurityInfos! Skipping this SpacePoint " <<
                      spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
 

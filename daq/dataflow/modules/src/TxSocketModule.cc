@@ -87,6 +87,6 @@ void TxSocketModule::endRun()
 
 void TxSocketModule::terminate()
 {
-  B2INFO("terminate called")
+  B2INFO("terminate called");
 }
 

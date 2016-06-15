@@ -71,7 +71,7 @@ namespace Belle2 {
 
     if (!load(m_filename, m_methodName)) {
       B2ERROR("FANN Method " << m_methodName << " not found!");
-    } else B2INFO("Loaded FANN MLP " << m_methodName << " from File " << m_filename << ".")
+    } else B2INFO("Loaded FANN MLP " << m_methodName << " from File " << m_filename << ".");
 
       Variable::Manager& manager = Variable::Manager::Instance();
     m_variables =  manager.getVariables(m_MLP.getVariableNames());

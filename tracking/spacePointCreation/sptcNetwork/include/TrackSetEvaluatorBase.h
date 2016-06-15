@@ -78,7 +78,7 @@ namespace Belle2 {
         }
       }
       B2DEBUG(50, "TrackSetEvaluatorBase::getOverlappingTCs: in a trackset of size " << m_trackSet.size() << ", " << overlappingTCs.size()
-              << " overlapping TCs were found ")
+              << " overlapping TCs were found ");
 
       return overlappingTCs;
     }
@@ -89,12 +89,12 @@ namespace Belle2 {
     {
       if (overlappingTCs.size() != 2) {
         B2ERROR("TrackSetEvaluator::tcDuel: vector of overlapping TCs has wrong size: " << overlappingTCs.size() <<
-                ", should be 2! skipping rest...")
+                ", should be 2! skipping rest...");
         return;
       }
 
       B2DEBUG(25, "TrackSetEvaluator::tcDuel: first competitor got QI: " << overlappingTCs.front()->getTrackQuality() <<
-              ", and second one got: " << overlappingTCs.back()->getTrackQuality())
+              ", and second one got: " << overlappingTCs.back()->getTrackQuality());
       if (overlappingTCs.front()->getTrackQuality() > overlappingTCs.back()->getTrackQuality()) {
         overlappingTCs.back()->setAliveState(false);
       } else {
@@ -126,7 +126,7 @@ namespace Belle2 {
      */
     inline virtual void letThebestTCSurvive(std::vector<TCType*>& overlappingTCs)
     {
-      B2INFO("TrackSetEvaluatorBase::letThebestTCSurvive was triggered! Best QI is: " << overlappingTCs.front()->getTrackQuality())
+      B2INFO("TrackSetEvaluatorBase::letThebestTCSurvive was triggered! Best QI is: " << overlappingTCs.front()->getTrackQuality());
       // sort that TC with highest QI comes first
       std::sort(overlappingTCs.begin(), overlappingTCs.end(), [](const TCType * a, const TCType * b) -> bool { return *a > *b; });
 
@@ -143,7 +143,7 @@ namespace Belle2 {
     virtual bool dealWithSimpleCases(std::vector<TCType*>& overlappingTCs)
     {
       B2DEBUG(10, "TrackSetEvaluatorBase::dealWithSimpleCases was triggered! nOverlaps: " << overlappingTCs.size() <<
-              " checking now for 2 TCs overlapping:")
+              " checking now for 2 TCs overlapping:");
       /* case:
        * only 2 TCs are overlapping.
        * -> tcDuel
@@ -154,12 +154,12 @@ namespace Belle2 {
           return true;
         }
         B2ERROR("TrackSetEvaluator::dealWithSimpleCases: nOverlapping TCs is " << overlappingTCs.size() <<
-                " which is illegal. Stopping cleaning overlaps!")
+                " which is illegal. Stopping cleaning overlaps!");
         return false;
       }
 
       unsigned int nCompatibleTCs = findCompatibleOverlaps(overlappingTCs);
-      B2DEBUG(10, "TrackSetEvaluatorBase::dealWithSimpleCases: checking now for compatible overlaps... (found: " << nCompatibleTCs << ")")
+      B2DEBUG(10, "TrackSetEvaluatorBase::dealWithSimpleCases: checking now for compatible overlaps... (found: " << nCompatibleTCs << ")");
       /* case:
        * Several TCs are overlapping but all of them are from the same "tree".
        * Means that all of them are incompatible with each other
@@ -234,27 +234,27 @@ namespace Belle2 {
       // case: all competitors died
       if ((nOverlaps != 0) and (m_nSurvivors + nOverlaps) < (m_trackSet.size() + 1)) {
         B2WARNING("TrackSetEvaluatorHopfieldNN::cleanOverlaps: " << evalType <<
-                  " claims success but all former competitors are dead! " << result)
+                  " claims success but all former competitors are dead! " << result);
         return false;
       }
 
       // case: everything seems to be fine
       if (wasSuccsessfull and (m_nFinalCompetitors == 0)) {
         B2DEBUG(25, "TrackSetEvaluatorHopfieldNN::cleanOverlaps: " << evalType <<
-                " was successfully completed. " << result)
+                " was successfully completed. " << result);
         return true;
       }
 
       // case: hopfield itself detected an issue
       if (!wasSuccsessfull) {
         B2WARNING("TrackSetEvaluatorHopfieldNN::cleanOverlaps: " << evalType <<
-                  " was not successfully finished! " << result)
+                  " was not successfully finished! " << result);
         return false;
       }
 
       // case: something else went wrong
       B2WARNING("TrackSetEvaluatorHopfieldNN::cleanOverlaps: " << evalType <<
-                " claims success but number of competitors is still not zero! " << result)
+                " claims success but number of competitors is still not zero! " << result);
       return false;
     }
 
@@ -284,7 +284,7 @@ namespace Belle2 {
     {
       B2ERROR(checkAtStart() << "\nTrackSetEvaluatorBase::cleanOverlaps() was called!" <<
               " This function does actually nothing, you sure you didn't want to pass an inheriting trackSetEvaluator to the network instead?" <<
-              " These Classes can really clean overlaps in the network!\n" << checkAtEnd())
+              " These Classes can really clean overlaps in the network!\n" << checkAtEnd());
       return false;
     }
 

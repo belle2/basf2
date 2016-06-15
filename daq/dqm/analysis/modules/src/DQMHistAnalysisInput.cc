@@ -97,6 +97,6 @@ void DQMHistAnalysisInputModule::endRun()
 
 void DQMHistAnalysisInputModule::terminate()
 {
-  B2INFO("terminate called")
+  B2INFO("terminate called");
 }
 

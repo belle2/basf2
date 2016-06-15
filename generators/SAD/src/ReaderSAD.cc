@@ -137,7 +137,7 @@ void ReaderSAD::open(const string& filename) throw(SADCouldNotOpenFileError)
 double ReaderSAD::getSADParticle(MCParticleGraph& graph)
 {
   if (m_tree == NULL) {
-    B2ERROR("The SAD tree doesn't exist !")
+    B2ERROR("The SAD tree doesn't exist !");
     return -1;
   }
 
@@ -151,7 +151,7 @@ double ReaderSAD::getSADParticle(MCParticleGraph& graph)
     m_tree->GetEntry(m_readEntry);
     convertParamsToSADUnits();
     B2DEBUG(10, "> Read particle " << m_readEntry + 1 << "/" << m_tree->GetEntries() << " with s = " << m_lostS << " cm" <<
-            " and rate = " << m_lostRate << " Hz")
+            " and rate = " << m_lostRate << " Hz");
 
     printf("Read particle %d / %d with s= %f [m]\n", m_readEntry + 1 , (int)m_tree->GetEntries(), m_lostS / 100.);
 
@@ -180,7 +180,7 @@ double ReaderSAD::getSADParticle(MCParticleGraph& graph)
 bool ReaderSAD::getRealParticle(MCParticleGraph& graph)
 {
   if (m_tree == NULL) {
-    B2ERROR("The SAD tree doesn't exist !")
+    B2ERROR("The SAD tree doesn't exist !");
     return false;
   }
 
@@ -213,7 +213,7 @@ bool ReaderSAD::getRealParticle(MCParticleGraph& graph)
       //End my addition
 
       B2DEBUG(10, "> Read particle " << m_readEntry + 1 << "/" << m_tree->GetEntries() << " with s = " << m_lostS << " cm" <<
-              " and rate = " << m_lostRate << " Hz")
+              " and rate = " << m_lostRate << " Hz");
     } while ((fabs(m_lostS) > m_sRange) && (m_readEntry < m_tree->GetEntries()));
 
     m_realPartNum = calculateRealParticleNumber(m_lostRate);
@@ -223,7 +223,7 @@ bool ReaderSAD::getRealParticle(MCParticleGraph& graph)
   if ((fabs(m_lostS) <= m_sRange) && (m_realPartNum > 0)) {
     addParticleToMCParticles(graph);
     B2DEBUG(10, "* Created real particle " << m_realPartEntry + 1 << "/" << m_realPartNum << " for SAD particle " << m_readEntry + 1 <<
-            "/" << m_tree->GetEntries())
+            "/" << m_tree->GetEntries());
   }
 
   m_realPartEntry++;
@@ -235,7 +235,7 @@ bool ReaderSAD::getRealParticle(MCParticleGraph& graph)
 void ReaderSAD::addAllSADParticles(MCParticleGraph& graph)
 {
   if (m_tree == NULL) {
-    B2ERROR("The SAD tree doesn't exist !")
+    B2ERROR("The SAD tree doesn't exist !");
     return ;
   }
 

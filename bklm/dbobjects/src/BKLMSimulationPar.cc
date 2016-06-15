@@ -47,7 +47,7 @@ void BKLMSimulationPar::read(const GearDir& content)
 
   m_HitTimeMax = content.getWithUnit("/HitTimeMax");
   m_DoBackgroundStudy = content.getBool("DoBackgroundStudy");
-  B2INFO("DoBackgroundStudy = " << m_DoBackgroundStudy)
+  B2INFO("DoBackgroundStudy = " << m_DoBackgroundStudy);
 
   char name[40];
   int div = 0;

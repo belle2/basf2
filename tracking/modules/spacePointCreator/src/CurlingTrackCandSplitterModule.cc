@@ -93,7 +93,7 @@ void CurlingTrackCandSplitterModule::initialize()
 {
   initializeCounters();
   B2INFO("CurlingTrackCandSplitter ----------------------------- initialize() -------------------------------------");
-  B2WARNING("CurlingTrackCandSplitter is deprecated and will be removed from framework in the near future! use SPTCReferee instead!")
+  B2WARNING("CurlingTrackCandSplitter is deprecated and will be removed from framework in the near future! use SPTCReferee instead!");
   // check if all necessary StoreArrays are present
   StoreArray<SpacePointTrackCand> spacePointTCs(m_PARAMsptcName);
   spacePointTCs.required(m_PARAMsptcName);
@@ -139,7 +139,7 @@ void CurlingTrackCandSplitterModule::initialize()
   // check value for nTrackStubs and reset if necessary
   if (m_PARAMnTrackStubs < 0) {
     B2WARNING("CurlingTrackCandSplitter::initialize> Value of nTrackStubs is below 0: nTrackStubs = " << m_PARAMnTrackStubs <<
-              ". Resetting this value to 0 now! This means that all parts of curling TrackCands will be stored.")
+              ". Resetting this value to 0 now! This means that all parts of curling TrackCands will be stored.");
     m_PARAMnTrackStubs = 0;
   } else { B2DEBUG(1, "Entered value for nTrackStubs = " << m_PARAMnTrackStubs); }
 
@@ -158,7 +158,7 @@ void CurlingTrackCandSplitterModule::initialize()
     if (m_PARAMrootFileName.size() != 2 || (m_PARAMrootFileName[1] != "UPDATE" && m_PARAMrootFileName[1] != "RECREATE")) {
       string output;
       for (string entry : m_PARAMrootFileName) { output += "'" + entry + "' "; }
-      B2FATAL("CurlingTrackCandSplitter::initialize() : rootFileName is set wrong: entries are: " << output)
+      B2FATAL("CurlingTrackCandSplitter::initialize() : rootFileName is set wrong: entries are: " << output);
     }
     // create ROOT file
     m_PARAMrootFileName[0] += ".root";
@@ -313,23 +313,23 @@ void CurlingTrackCandSplitterModule::event()
       }
     } catch (FoundNoTrueHit& anE) {
       B2WARNING("Caught an exception during checking for curling behaviour: " << anE.what() <<
-                " This TrackCandidate cannot be checked for curling behaviour")
+                " This TrackCandidate cannot be checked for curling behaviour");
       m_noDecisionPossibleCtr++;
     } catch (FoundNoCluster& anE) {
       B2WARNING("Caught an exception during checking for curling behaviour: " << anE.what() <<
-                " This TrackCandidate cannot be checked for curling behaviour")
+                " This TrackCandidate cannot be checked for curling behaviour");
       m_noDecisionPossibleCtr++;
     } catch (TrueHitsNotMatching& anE) {
       B2WARNING("Caught an exception during checking for curling behaviour: " << anE.what() <<
-                " This TrackCandidate cannot be checked for curling behaviour")
+                " This TrackCandidate cannot be checked for curling behaviour");
       m_noDecisionPossibleCtr++;
     } catch (SpacePointTrackCand::UnsupportedDetType& anE) {
       B2WARNING("Caught an exception during checking for curling behaviour: " << anE.what() <<
-                " This TrackCandidate cannot be checked for curling behaviour")
+                " This TrackCandidate cannot be checked for curling behaviour");
       m_noDecisionPossibleCtr++;
     } catch (SpacePoint::InvalidNumberOfClusters& anE) {
       B2WARNING("Caught an exception during checking for curling behaviour: " << anE.what() <<
-                " This TrackCandidate cannot be checked for curling behaviour")
+                " This TrackCandidate cannot be checked for curling behaviour");
       m_noDecisionPossibleCtr++;
     }
   }
@@ -428,7 +428,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
           }
 
           B2DEBUG(100, "Found " << relTrueHits.size() << " TrueHits for SVDCluster " << aCluster.getArrayIndex() << " from Array " <<
-                  aCluster.getArrayName())
+                  aCluster.getArrayName());
           for (unsigned int i = 0; i < relTrueHits.size(); ++i) { svdTrueHits.push_back(relTrueHits[i]); }
         }
 
@@ -446,7 +446,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
         // if there is at least one TrueHit in the vector check how many unique TrueHits there are
         if (svdTrueHits.size() >= 1) {
           B2DEBUG(150, "Found " << svdTrueHits.size() << " SVDTrueHits related to Clusters related to SpacePoint " <<
-                  spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". Now checking if they are compatible")
+                  spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". Now checking if they are compatible");
 
           // sort & unique to find the unique entries of the relation vector
           std::sort(svdTrueHits.begin(), svdTrueHits.end());
@@ -650,7 +650,7 @@ CurlingTrackCandSplitterModule::splitCurlingTrackCand(const Belle2::SpacePointTr
       spacePointTCs.push_back(newSPTrackCand);
     } catch (SpacePointTrackCand::SPTCIndexOutOfBounds& anE) {
       B2WARNING("Caught an exception while trying to split SpacePointTrackCands: " << anE.what() <<
-                " This SPTC will be skipped from splitting!")
+                " This SPTC will be skipped from splitting!");
     }
   }
 
@@ -691,7 +691,7 @@ void CurlingTrackCandSplitterModule::getValuesForRoot(const Belle2::SpacePoint* 
   int thLayer = trueHitVxdId.getLayerNumber() - 1;
 
   if (spLayer != thLayer) {
-    B2FATAL("Layer numbers of TrueHit and SpacePoint do not match!") // this should never happen -> FATAL if it does, because something has gone amiss then
+    B2FATAL("Layer numbers of TrueHit and SpacePoint do not match!"); // this should never happen -> FATAL if it does, because something has gone amiss then
   }
 
   // all positions collected, but only write the values to ROOT that have been set appropriately!

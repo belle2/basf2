@@ -205,8 +205,8 @@ namespace Belle2 {
     int lowerIndex = static_cast<int>(dSampleSize * quantiles.first + 0.5);
     int higherIndex = static_cast<int>(dSampleSize * quantiles.second - 0.5); // maxIndex is sampleSize - 1, therefore -0.5
 
-    if (lowerIndex < 0 or lowerIndex > sampleSize) { B2FATAL("lowerIndes is crap, (bounds are 0 and " << sampleSize << ", is: " << lowerIndex << ")")}
-    if (higherIndex < 0 or higherIndex > sampleSize) { B2FATAL("higherIndex is crap, (bounds are 0 and " << sampleSize << ", is: " << higherIndex << ")")}
+    if (lowerIndex < 0 or lowerIndex > sampleSize) { B2FATAL("lowerIndes is crap, (bounds are 0 and " << sampleSize << ", is: " << lowerIndex << ")");}
+    if (higherIndex < 0 or higherIndex > sampleSize) { B2FATAL("higherIndex is crap, (bounds are 0 and " << sampleSize << ", is: " << higherIndex << ")");}
 
     VXDTFRawSecMap::CutoffValues::iterator lowerIter = sample.begin();
     for (int i = 0 ; i < lowerIndex; i++) { ++lowerIter; }
@@ -215,7 +215,7 @@ namespace Belle2 {
     for (int i = 0 ; i < (sampleSize - 1 - higherIndex); i++) { ++higherIter; }
 
     B2INFO("findQuantilesInSample: sampleSize: " << sampleSize << ", quantiles: " << quantiles.first << "/" << quantiles.second <<
-           ", found indices: " << lowerIndex << "/" << higherIndex << ", found values: " << *lowerIter << "/" << *higherIter)
+           ", found indices: " << lowerIndex << "/" << higherIndex << ", found values: " << *lowerIter << "/" << *higherIter);
     return make_pair(*lowerIter, *higherIter);
   }
 }

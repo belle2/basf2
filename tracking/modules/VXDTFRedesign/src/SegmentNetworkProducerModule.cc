@@ -87,7 +87,7 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
 void SegmentNetworkProducerModule::event()
 {
   m_eventCounter++;
-  B2INFO("\n" << "SegmentNetworkProducerModule:event: event " << m_eventCounter << "\n")
+  B2INFO("\n" << "SegmentNetworkProducerModule:event: event " << m_eventCounter << "\n");
 
   // make sure that network exists:
   if (! m_network) { m_network.create(); }
@@ -116,7 +116,7 @@ void SegmentNetworkProducerModule::endRun()
   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
   double invEvents = 1. / m_eventCounter;
 
-  B2INFO("SegmentNetworkProducerModule:endRun: events: " << m_eventCounter << " and invEvents: " << invEvents)
+  B2INFO("SegmentNetworkProducerModule:endRun: events: " << m_eventCounter << " and invEvents: " << invEvents);
   B2WARNING("SegmentNetworkProducerModule:endRun: events: " << m_eventCounter << ", results:\n "
             << "matchSpacePoints-nSPsFound/nSPsLost/nRawSectorsFound: " << m_nSPsFound << "/" << m_nSPsLost << "/" << m_nRawSectorsFound << "\n"
             << ", buildActiveSectorNetwork-nBadSector InnerNotActive/NoInnerActive/NoInnerExisting: " << m_nBadSectorInnerNotActive << "/" <<
@@ -125,7 +125,7 @@ void SegmentNetworkProducerModule::endRun()
             << ", buildTrackNodeNetwork-nTrackNodesAccepted/nTrackNodesRejected/nTrackNodeLinksCreated: " << m_nTrackNodesAccepted << "/" <<
             m_nTrackNodesRejected << "/" << m_nTrackNodeLinksCreated << "\n"
             << ", buildSegmentNetwork-nSegmentsAccepted/nSegmentsRejected/nSegmentLinksCreated: " << m_nSegmentsAccepted << "/" <<
-            m_nSegmentsRejected << "/" << m_nSegmentsLinksCreated << "\n")
+            m_nSegmentsRejected << "/" << m_nSegmentsLinksCreated << "\n");
 }
 
 
@@ -159,7 +159,7 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
 
       // sector for SpacePoint exists:
       FullSecID foundSecID = sectorFound->getFullSecID();
-      B2DEBUG(5, "matchSpacePointToSectors: SP found!: " << foundSecID.getFullSecString()) // TODO Jan8_2016: remove!
+      B2DEBUG(5, "matchSpacePointToSectors: SP found!: " << foundSecID.getFullSecString()); // TODO Jan8_2016: remove!
 
       vector<RawSectorData>::iterator iter =
         std::find_if(
@@ -175,14 +175,14 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
       } else {
         iter->hits.push_back(trackNode);
       }
-//    B2INFO("matchSpacePointToSectors: trackNode Found2: " << *trackNode) // TODO Jan8_2016: remove!
+//    B2INFO("matchSpacePointToSectors: trackNode Found2: " << *trackNode); // TODO Jan8_2016: remove!
 
     } // loop over SpacePoints in StoreArray
   } // loop over StoreArrays
 
   B2DEBUG(1, "SegmentNetworkProducerModule::matchSpacePointToSectors() (ev " << m_eventCounter << "): nSPs found/lost: " << nSPsFound
           << "/" << nSPsLost <<
-          ", nTrackNodes/nCollectedData(nSectors activated): " << trackNodes.size() << "/" << collectedData.size())
+          ", nTrackNodes/nCollectedData(nSectors activated): " << trackNodes.size() << "/" << collectedData.size());
   m_nSPsFound += nSPsFound;
   m_nSPsLost += nSPsLost;
   m_nRawSectorsFound += collectedData.size();
@@ -257,7 +257,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
         activeSectors.push_back(outerSector);
 
         B2DEBUG(5, "SegmentNetworkProducerModule::buildActiveSectorNetwork(): sector " << outerSector->getName() <<
-                " will be combined with inner sector " << innerSector->getName())
+                " will be combined with inner sector " << innerSector->getName());
 
         activeSectorNetwork.linkTheseEntries(*outerSector, *innerSector);
         wasAnythingFoundSoFar = true;
@@ -278,7 +278,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
           "SegmentNetworkProducerModule::buildActiveSectorNetwork() (ev " << m_eventCounter <<
           "): nNoSPinThisInnerSector/nNoValidOfAllInnerSectors/nNoInnerExisting: " <<
           nNoSPinThisInnerSector << "/" << nNoValidOfAllInnerSectors << "/" << nNoInnerExisting <<
-          ", size of nActiveSectors/activeSectorNetwork: " << activeSectors.size() << "/" << activeSectorNetwork.size())
+          ", size of nActiveSectors/activeSectorNetwork: " << activeSectors.size() << "/" << activeSectorNetwork.size());
   m_nGoodSectorsFound += activeSectors.size();
   m_nSectorsLinked += nSectorsLinked;
   m_nBadSectorInnerNotActive += nNoSPinThisInnerSector;
@@ -341,7 +341,7 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
   } // outer sector loop
   B2DEBUG(1, "SegmentNetworkProducerModule::buildTrackNodeNetwork() (ev " << m_eventCounter << "): nAccepted/nRejected: " << nAccepted
           << "/" << nRejected <<
-          ", size of nLinked/hitNetwork: " << nLinked << "/" << hitNetwork.size())
+          ", size of nLinked/hitNetwork: " << nLinked << "/" << hitNetwork.size());
   m_nTrackNodesAccepted += nAccepted;
   m_nTrackNodesRejected += nRejected;
   m_nTrackNodeLinksCreated += nLinked;
@@ -396,7 +396,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           innerHit->getEntry().sector->getFullSecID(),
           &centerHit->getEntry(),
           &innerHit->getEntry());
-        B2DEBUG(5, "buildSegmentNetwork: innerSegment: " << innerSegment->getName())
+        B2DEBUG(5, "buildSegmentNetwork: innerSegment: " << innerSegment->getName());
         DirectedNode<Segment<TrackNode>, CACell>* tempInnerSegmentnode = segmentNetwork.getNode(*innerSegment);
         if (tempInnerSegmentnode == nullptr) {
           segments.push_back(innerSegment);
@@ -414,7 +414,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
             &outerHit->getEntry(),
             &centerHit->getEntry());
           B2DEBUG(5, "buildSegmentNetwork: outerSegment(freshly created): " << outerSegment->getName() << " to be linked with inner segment: "
-                  << innerSegment->getName())
+                  << innerSegment->getName());
 //      segmentNetwork.linkTheseEntries(*outerSegment, *innerSegment);
           DirectedNode<Segment<TrackNode>, CACell>* tempOuterSegmentnode = segmentNetwork.getNode(*outerSegment);
           if (tempOuterSegmentnode == nullptr) {
@@ -425,7 +425,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           }
 
           B2DEBUG(5, "buildSegmentNetwork: outerSegment (after duplicate check): " << outerSegment->getName() <<
-                  " to be linked with inner segment: " << innerSegment->getName())
+                  " to be linked with inner segment: " << innerSegment->getName());
           segmentNetwork.linkTheseEntries(*outerSegment, *innerSegment);
           nLinked++;
           wasAnythingFoundSoFar = true;
@@ -438,7 +438,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
 
   B2DEBUG(1, "SegmentNetworkProducerModule::buildSegmentNetwork() (ev " << m_eventCounter << "): nAccepted/nRejected: " << nAccepted
           << "/" << nRejected <<
-          ", size of nLinked/hitNetwork: " << nLinked << "/" << segmentNetwork.size())
+          ", size of nLinked/hitNetwork: " << nLinked << "/" << segmentNetwork.size());
   m_nSegmentsAccepted += nAccepted;
   m_nSegmentsRejected += nRejected;
   m_nSegmentsLinksCreated += nLinked;

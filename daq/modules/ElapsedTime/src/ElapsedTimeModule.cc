@@ -91,6 +91,6 @@ void ElapsedTimeModule::endRun()
 
 void ElapsedTimeModule::terminate()
 {
-  B2INFO("ElapsedTime: terminate called")
+  B2INFO("ElapsedTime: terminate called");
 }
 

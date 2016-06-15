@@ -33,9 +33,9 @@ using namespace Belle2::PXD;
 
 
 #define assert_float(A,B) if(!isClose((A),(B)))\
-    B2FATAL("Assertion failed: " << #A << " (" << (A) << ") != " << #B << " (" << (B) << ")")
+    B2FATAL("Assertion failed: " << #A << " (" << (A) << ") != " << #B << " (" << (B) << ")");
 #define assert_eq(A,B) if((A)!=(B))\
-    B2FATAL("Assertion failed: " << #A << " (" << (A) << ") != " << #B << " (" << (B) << ")")
+    B2FATAL("Assertion failed: " << #A << " (" << (A) << ") != " << #B << " (" << (B) << ")");
 
 namespace {
   /** Small helper function to compare two doubles with a given precision */

@@ -120,7 +120,7 @@ void VXDSimpleClusterizerModule::beginRun()
   } else {
     paramValue = "false, means that secondary hits can occur and increase the rate of ghost hits";
   }
-  B2INFO("VXDSimpleClusterizer: parameter onlyPrimaries is set to " << paramValue)
+  B2INFO("VXDSimpleClusterizer: parameter onlyPrimaries is set to " << paramValue);
 
   InitializeVariables();
 }
@@ -146,7 +146,7 @@ void VXDSimpleClusterizerModule::event()
   //SVD
   int nSvdTrueHits = m_svdTrueHits.getEntries();
   if (nSvdTrueHits == 0) {B2DEBUG(100, "MCTrackFinder: SVDHitsCollection is empty!");}
-  B2DEBUG(175, "found " << nMcParticles << "/" << nPxdTrueHits << "/" << nSvdTrueHits << " mcParticles, pxdTrueHits, svdTrueHits")
+  B2DEBUG(175, "found " << nMcParticles << "/" << nPxdTrueHits << "/" << nSvdTrueHits << " mcParticles, pxdTrueHits, svdTrueHits");
 
 
   double sigmaU = m_setMeasSigma;
@@ -155,7 +155,7 @@ void VXDSimpleClusterizerModule::event()
 
 ///////////////////////////////////////////////// NOW THE PXD
   for (unsigned int currentTrueHit = 0; int (currentTrueHit) not_eq nPxdTrueHits; ++currentTrueHit) {
-    B2DEBUG(175, "begin PXD current TrueHit: " << currentTrueHit << " of nPxdTrueHits total: " << nPxdTrueHits)
+    B2DEBUG(175, "begin PXD current TrueHit: " << currentTrueHit << " of nPxdTrueHits total: " << nPxdTrueHits);
 
     const PXDTrueHit* aPxdTrueHit = m_pxdTrueHits[currentTrueHit];
     const MCParticle* aMcParticle = aPxdTrueHit->getRelatedFrom<MCParticle>();
@@ -175,9 +175,9 @@ void VXDSimpleClusterizerModule::event()
     }
 
     B2DEBUG(100, " PXD, current TrueHit " << currentTrueHit << " connected to " << particleID << " has an energy deposit of " <<
-            energy * 1000.0 << "MeV ")
+            energy * 1000.0 << "MeV ");
     if (energy < m_energyThreshold) { //ignore hit if energy deposit is too small
-      B2DEBUG(100, " PXD, TrueHit discarded because of energy deposit too small")
+      B2DEBUG(100, " PXD, TrueHit discarded because of energy deposit too small");
       m_weakPXDHitCtr++;
       discardedPXDEdeposit++;
       continue;
@@ -241,7 +241,7 @@ void VXDSimpleClusterizerModule::event()
 
 ////////////////////////////////////////////////  NOW THE SVD
   for (unsigned int currentTrueHit = 0; int (currentTrueHit) not_eq nSvdTrueHits; ++currentTrueHit) {
-    B2DEBUG(175, "begin SVD current TrueHit: " << currentTrueHit << " of nSvdTrueHits total: " << nSvdTrueHits)
+    B2DEBUG(175, "begin SVD current TrueHit: " << currentTrueHit << " of nSvdTrueHits total: " << nSvdTrueHits);
 
     const SVDTrueHit* aSvdTrueHit = m_svdTrueHits[currentTrueHit];
     const MCParticle* aMcParticle = aSvdTrueHit->getRelatedFrom<MCParticle>();
@@ -259,11 +259,11 @@ void VXDSimpleClusterizerModule::event()
     double energy = aSvdTrueHit->getEnergyDep();
 
     B2DEBUG(100, " SVD, current TrueHit " << currentTrueHit << " connected to " << particleID << " has an energy deposit of " <<
-            energy * 1000.0 << "MeV ")
+            energy * 1000.0 << "MeV ");
     if (energy < (m_energyThresholdU + m_energyThresholdV)) { //ignore hit if energy deposity is too snall
       m_weakSVDHitCtr++;
       discardedSVDEdeposit++;
-      B2DEBUG(100, " SVD, TrueHit discarded because of energy deposit too small")
+      B2DEBUG(100, " SVD, TrueHit discarded because of energy deposit too small");
       continue;
     }
 

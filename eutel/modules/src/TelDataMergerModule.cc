@@ -294,7 +294,7 @@ void TelDataMergerModule::saveDigits(tag_type currentTag)
   StoreArray<TelDigit> storeDigits(m_storeDigitsName);
   StoreObjPtr<TelEventInfo> storeTelEventInfo;
 
-  B2INFO("Found a match for event " << currentTag << ". Storing digits.")
+  B2INFO("Found a match for event " << currentTag << ". Storing digits.");
 
   auto digitTuples = m_buffer.getData(currentTag);
 
@@ -355,7 +355,7 @@ void TelDataMergerModule::event()
                 << m_currentTLUTagFromFTSW << " "
                 << "distance from previous: " << distance << " "
                 << "difference: " << abs(differenceEUTEL - differenceFTSW)
-               )
+               );
     } else {
       // only rebase and save if difference within bounds
       m_referenceTimeFromFTSW = m_currentTimeStampFromFTSW;
@@ -394,7 +394,7 @@ void TelDataMergerModule::endRun()
   if (m_reader) { delete m_reader; m_reader = NULL; }
 
   B2INFO("Processed " << m_nVXDDataEvents << " VXD data events!");
-  B2INFO("Matched " << m_nMapHits << "Tel Data events.")
+  B2INFO("Matched " << m_nMapHits << "Tel Data events.");
   if (! m_nBOREvents) {
     B2INFO("No BORE found, possibly truncated file!");
   } else if (m_nBOREvents > 1) {

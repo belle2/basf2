@@ -96,7 +96,7 @@ void FragmentationModule::initialize()
 {
   B2INFO("Initialize PYTHIA8");
   if (getParam<std::string>("EvtPdl").isSetInSteering()) {
-    B2ERROR("The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.")
+    B2ERROR("The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.");
   }
 
   // Generator and the shorthand PythiaEvent = pythia->event are declared in .h file

@@ -59,7 +59,7 @@ void SpacePointCreatorTELModule::initialize()
 
   B2INFO("SpacePointCreatorTELModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
          "\ntelClusters: " << m_telClusters.getName() <<
-         "\nspacePoints: " << m_spacePoints.getName())
+         "\nspacePoints: " << m_spacePoints.getName());
 
 
   // set some counters for output:
@@ -77,7 +77,7 @@ void SpacePointCreatorTELModule::event()
   B2DEBUG(1, "SpacePointCreatorTELModule(" << m_nameOfInstance <<
           ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<
           "\ntelClusters: " << m_telClusters.getEntries() <<
-          "\nspacePoints: " << m_spacePoints.getEntries())
+          "\nspacePoints: " << m_spacePoints.getEntries());
 
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {
@@ -87,7 +87,7 @@ void SpacePointCreatorTELModule::event()
       B2DEBUG(10, "SpacePointCreatorTELModule(" << m_nameOfInstance << ")::event: spacePoint " << index <<
               " with type " << sp->getType() <<
               " and VxdID " << VxdID(sp->getVxdID()) <<
-              " is tied to a cluster in: " << sp->getArrayName())
+              " is tied to a cluster in: " << sp->getArrayName());
     }
   }
 
@@ -101,7 +101,7 @@ void SpacePointCreatorTELModule::terminate()
 {
   B2INFO("SpacePointCreatorTELModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
          "\ntelClusters: " << m_TESTERTelClusterCtr <<
-         "\nspacePoints: " << m_TESTERSpacePointCtr)
+         "\nspacePoints: " << m_TESTERSpacePointCtr);
 }
 
 

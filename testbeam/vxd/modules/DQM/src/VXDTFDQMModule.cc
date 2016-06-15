@@ -317,7 +317,7 @@ void VXDTFDQMModule::beginRun()
 
 void VXDTFDQMModule::event()
 {
-  B2DEBUG(1, "<<<<<<<<<<<<<<<<<<<<< VXDTFDQMModule::event()...")
+  B2DEBUG(1, "<<<<<<<<<<<<<<<<<<<<< VXDTFDQMModule::event()...");
   resetCounters();
   const StoreArray<genfit::TrackCand> caTrackCandidates(m_storeTrackCandsName);
   const StoreArray<PXDCluster> pxdClusters(m_storeSvdClustersName);
@@ -326,7 +326,7 @@ void VXDTFDQMModule::event()
   const StoreArray<genfit::TrackCand> refTrackCandidates(m_storeReferenceTCsColName);
 
 
-  B2INFO("2")
+  B2INFO("2");
   // collecting info from TCs (estimated momentum, nHits, ..)
   int nCaTCs = caTrackCandidates.getEntries();
 //   int nRefTCs = refTrackCandidates.getEntries();
@@ -338,7 +338,7 @@ void VXDTFDQMModule::event()
   TVector3 momentum;
   uint nPXDhits = 0, nSVDhits = 0, nTELhits = 0; // count hits of detectorType used for TCs
   for (const auto aTrackCand : caTrackCandidates) {
-    B2INFO("3")
+    B2INFO("3");
     int nHits = aTrackCand.getNHits();
     tempIndices = aTrackCand.getHitIDs();
     allHitIndicesUsed.insert(allHitIndicesUsed.end(), tempIndices.begin(), tempIndices.end());
@@ -362,11 +362,11 @@ void VXDTFDQMModule::event()
     detectorIDs = aTrackCand.getDetIDs(); // detectorIDs of all Hits
     VxdID aVxdID;
     for (auto detectorID : detectorIDs) {
-      B2INFO("4")
+      B2INFO("4");
       hitIDsOfCurrentDetector = aTrackCand.getHitIDs(detectorID); //Get hit ids of from a specific detector.
 
       for (auto hitID : hitIDsOfCurrentDetector) {
-        B2INFO("5")
+        B2INFO("5");
         if (detectorID == Const::PXD) {
           ++nPXDhits;
           aVxdID = pxdClusters[hitID]->getSensorID();
@@ -408,7 +408,7 @@ void VXDTFDQMModule::event()
       }
     }
   }
-  B2INFO("6")
+  B2INFO("6");
   m_histoNHitsAtPXD->Fill(nPXDhits);
   m_histoNHitsAtSVD->Fill(nSVDhits);
   m_histoNHitsAtTEL->Fill(nTELhits);
@@ -471,7 +471,7 @@ void VXDTFDQMModule::event()
       }
     }
   }
-  B2INFO("7")
+  B2INFO("7");
   // collecting Info from Clusters
   for (const SVDCluster& aCluster : svdClusters) {
     VxdID aVxdID = aCluster.getSensorID();
@@ -491,7 +491,7 @@ void VXDTFDQMModule::event()
       m_countTotalHitsForEachSensor[aVxdID]++;
     } else {
       m_countNoSensorFound++;
-      B2DEBUG(10, "svdClusters: vxdID " << VxdID(aVxdID) << " with layerNumber " << VxdID(aVxdID).getLayerNumber() << " not found...")
+      B2DEBUG(10, "svdClusters: vxdID " << VxdID(aVxdID) << " with layerNumber " << VxdID(aVxdID).getLayerNumber() << " not found...");
       m_badSensorIDs.push_back(aVxdID);
     }
     B2INFO("ClusterCharge: " << aCluster.getCharge());
@@ -506,7 +506,7 @@ void VXDTFDQMModule::event()
       m_countTotalHitsForEachSensor[aVxdID]++;
     } else {
       m_countNoSensorFound++;
-      B2DEBUG(10, "pxdClusters: vxdID " << VxdID(aVxdID) << " not found...")
+      B2DEBUG(10, "pxdClusters: vxdID " << VxdID(aVxdID) << " not found...");
       m_badSensorIDs.push_back(aVxdID);
     }
     ++m_countAllHits;
@@ -523,7 +523,7 @@ void VXDTFDQMModule::event()
       m_countTotalHitsForEachSensor[aVxdID]++;
     } else {
       m_countNoSensorFound++;
-      B2DEBUG(10, "telClusters: vxdID " << VxdID(aVxdID) << " not found...")
+      B2DEBUG(10, "telClusters: vxdID " << VxdID(aVxdID) << " not found...");
       m_badSensorIDs.push_back(aVxdID);
     }
     ++m_countAllHits;
@@ -577,7 +577,7 @@ void VXDTFDQMModule::endRun()
   }
   B2WARNING("VXDTFDQMModule: there were " << m_countNoSensorFound << " of " << m_countAllHits <<
             " cases where sensorID of Hit could not be found in sensorID-specific histograms. Total number of bad sensors before/after unique: "
-            << before << "/" << m_badSensorIDs.size() << ", which were:\n" << vxdIDOutput.str())
+            << before << "/" << m_badSensorIDs.size() << ", which were:\n" << vxdIDOutput.str());
 }
 
 

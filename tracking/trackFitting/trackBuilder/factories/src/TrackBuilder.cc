@@ -94,10 +94,10 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack)
     addedTrack->addRelationTo(&recoTrack);
     const MCParticle* mcParticle = recoTrack.getRelated<MCParticle>(m_mcParticleColName);
     if (mcParticle) {
-      B2DEBUG(200, "Relation to MCParticle set.")
+      B2DEBUG(200, "Relation to MCParticle set.");
       addedTrack->addRelationTo(mcParticle);
     } else {
-      B2DEBUG(200, "Relation to MCParticle not set. No related MCParticle to RecoTrack.")
+      B2DEBUG(200, "Relation to MCParticle not set. No related MCParticle to RecoTrack.");
     }
     // false positive due to new with placement (cppcheck issue #7163)
     // cppcheck-suppress memleak

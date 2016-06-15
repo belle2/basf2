@@ -97,12 +97,12 @@ namespace DirectedNodeNetworkTests {
                                                                 aVxdID));
 
         SpacePoint* newSP = spacePointData.appendNew(pxdCluster, &aSensorInfo);
-        B2DEBUG(10, " setup: new spacePoint got arrayIndex: " << newSP->getArrayIndex() << " and VxdID " << newSP->getVxdID())
+        B2DEBUG(10, " setup: new spacePoint got arrayIndex: " << newSP->getArrayIndex() << " and VxdID " << newSP->getVxdID());
         newSP->addRelationTo(pxdCluster);
       }
 
       B2DEBUG(10, "DirectedNodeNetworkTest:SetUP: created " << pxdClusterData.getEntries() << "/" << spacePointData.getEntries() <<
-              " pxdClusters/SpacePoints")
+              " pxdClusters/SpacePoints");
 
       /// prepare some SpacePointTrackCands partially overlapping:
       vector<SpacePoint*> allSpacePoints;
@@ -195,9 +195,9 @@ namespace DirectedNodeNetworkTests {
     DirectedNodeNetwork<int, VoidMetaInfo> intNetwork;
     EXPECT_EQ(0, intNetwork.size());
 
-    B2INFO("tests case when both nodes are new and when inner one is new, but outer one not")
+    B2INFO("tests case when both nodes are new and when inner one is new, but outer one not");
     for (unsigned int index = 1 ; index < 5; index++) {
-      B2INFO("intArray-index " << index << " of array has entry: " << intArray.at(index))
+      B2INFO("intArray-index " << index << " of array has entry: " << intArray.at(index));
 
       // correct order: outerEntry, innerEntry:
       intNetwork.linkTheseEntries(intArray.at(index - 1), intArray.at(index));
@@ -240,9 +240,9 @@ namespace DirectedNodeNetworkTests {
 
 
     {
-      B2INFO("building another path, which is independent of the first one:")
+      B2INFO("building another path, which is independent of the first one:");
       for (unsigned int index = 1 ; index < 5; index++) {
-        B2INFO("intArray2-index " << index << " of array has entry: " << intArray2.at(index))
+        B2INFO("intArray2-index " << index << " of array has entry: " << intArray2.at(index));
 
         // correct order: outerEntry, innerEntry:
         intNetwork.linkTheseEntries(intArray2.at(index - 1), intArray2.at(index));
@@ -286,12 +286,12 @@ namespace DirectedNodeNetworkTests {
     }
 
 
-    B2INFO("building another path into the network which crosses the other paths:") {
-      B2INFO("tests cases: both new, outer new but inner not, inner new but outer not, both already existing:")
+    B2INFO("building another path into the network which crosses the other paths:"); {
+      B2INFO("tests cases: both new, outer new but inner not, inner new but outer not, both already existing:");
       for (unsigned int index = 1 ; index < 5; index++) {
         B2INFO("intArray3-indices " << index - 1 << "/" << index <<
                " of array have entries: " << intArray3.at(index - 1) << "/" << intArray3.at(index) << "\n"
-               << "theWholeNetwork: \n" << printNodeEntries(intNetwork.getNodes()))
+               << "theWholeNetwork: \n" << printNodeEntries(intNetwork.getNodes()));
 
         // correct order: outerEntry, innerEntry:
         intNetwork.linkTheseEntries(intArray3.at(index - 1), intArray3.at(index));
@@ -308,7 +308,7 @@ namespace DirectedNodeNetworkTests {
         // innerEnd has been updated:
         std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getInnerEnds();
         EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray3.at(index))));
-        B2INFO("innerEnds after indices " << index - 1 << "/" << index << " are: " << printNodeEntries(innerEnds))
+        B2INFO("innerEnds after indices " << index - 1 << "/" << index << " are: " << printNodeEntries(innerEnds));
 
         // get all nodes of outer node, expected: 1 inner and no outerNodes:
         auto& innerNodes = intNetwork.getNode(intArray3.at(index - 1))->getInnerNodes();
@@ -321,7 +321,7 @@ namespace DirectedNodeNetworkTests {
 
       // some extra sanity checks, are inner- and outerEnds as expected?
       EXPECT_EQ(13, intNetwork.size());
-      B2INFO(" theWholeNetwork: \n" << printNodeEntries(intNetwork.getNodes()))
+      B2INFO(" theWholeNetwork: \n" << printNodeEntries(intNetwork.getNodes()));
       std::vector<DirectedNode<int, VoidMetaInfo>*> outerEnds = intNetwork.getOuterEnds();
       std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getInnerEnds();
       EXPECT_EQ(3, outerEnds.size());
@@ -342,8 +342,8 @@ namespace DirectedNodeNetworkTests {
       EXPECT_TRUE(nodeWasFound(innermostNode->getOuterNodes(), intNetwork.getNode(intArray3.at(3))));
     }
 
-    B2INFO("case: when outer node is new, but inner one not: ") {
-      B2INFO("  case: inner one was outer end before: ")
+    B2INFO("case: when outer node is new, but inner one not: "); {
+      B2INFO("  case: inner one was outer end before: ");
       auto* oldOuterMostNode = intNetwork.getOuterEnds().at(0);
       int oldOuterInt = oldOuterMostNode->getEntry();
       onTheFlyCreatedInts.push_back(42);
@@ -364,7 +364,7 @@ namespace DirectedNodeNetworkTests {
       EXPECT_EQ(newInnerInt, *(oldOuterMostNode->getOuterNodes().at(0)));
     }
     {
-      B2INFO("  case: inner one was no outer end before: ")
+      B2INFO("  case: inner one was no outer end before: ");
       onTheFlyCreatedInts.push_back(23);
       int& newOuterInt = onTheFlyCreatedInts.back();
       int& existingInt = intArray.at(1); // neither an outer nor an inner end before.
@@ -398,7 +398,7 @@ namespace DirectedNodeNetworkTests {
 
 
     {
-      B2INFO("case: when both were there, but not linked yet: ")
+      B2INFO("case: when both were there, but not linked yet: ");
       unsigned int sizeB4 = intNetwork.size();
       intNetwork.linkTheseEntries(intArray.at(0), intArray.at(2));
       EXPECT_EQ(sizeB4, intNetwork.size()); // size of network does not change
@@ -411,7 +411,7 @@ namespace DirectedNodeNetworkTests {
       EXPECT_TRUE(nodeWasFound(innerEnds, innerEnds.at(1)));
 
 
-      B2INFO("case: when outer both were there and already linked: (should cause an error!) ")
+      B2INFO("case: when outer both were there and already linked: (should cause an error!) ");
       intNetwork.linkTheseEntries(intArray.at(0), intArray.at(2));
       // nothing was added, everything the same as last case:
       EXPECT_EQ(sizeB4, intNetwork.size());
@@ -424,8 +424,8 @@ namespace DirectedNodeNetworkTests {
     }
 
 
-    B2INFO("testing members for filling, when (at least) one entry was already there:") {
-      B2INFO("case: addInnerToLastOuterNode: both were there, but not linked yet: ")
+    B2INFO("testing members for filling, when (at least) one entry was already there:"); {
+      B2INFO("case: addInnerToLastOuterNode: both were there, but not linked yet: ");
       unsigned int networkSizeB4 = intNetwork.size();
       unsigned int nInnerEndsB4 = intNetwork.getInnerEnds().size();
       intNetwork.addInnerToLastOuterNode(intArray.at(3));
@@ -441,7 +441,7 @@ namespace DirectedNodeNetworkTests {
 
 
     {
-      B2INFO("case: addInnerToLastOuterNode: both were there, but already linked (same results as before, but with an error for unintended behavior):")
+      B2INFO("case: addInnerToLastOuterNode: both were there, but already linked (same results as before, but with an error for unintended behavior):");
       unsigned int networkSizeB4 = intNetwork.size();
       unsigned int nInnerEndsB4 = intNetwork.getInnerEnds().size();
       intNetwork.addInnerToLastOuterNode(intArray.at(3));
@@ -456,7 +456,7 @@ namespace DirectedNodeNetworkTests {
     }
 
     {
-      B2INFO("case: addInnerToLastOuterNode: inner was not there yet (innerEndsUpdate):")
+      B2INFO("case: addInnerToLastOuterNode: inner was not there yet (innerEndsUpdate):");
       onTheFlyCreatedInts.push_back(31);
       int& lastOuterNodeInt = intNetwork.getLastOuterNode()->getEntry();
       int& newInnerInt = onTheFlyCreatedInts.back();
@@ -474,7 +474,7 @@ namespace DirectedNodeNetworkTests {
     }
 
     {
-      B2INFO("case: addOuterToLastInnerNode: both were there, but not linked yet:")
+      B2INFO("case: addOuterToLastInnerNode: both were there, but not linked yet:");
       int& lastInnerNodeInt = intNetwork.getLastInnerNode()->getEntry();
       unsigned int networkSizeB4 = intNetwork.size();
       unsigned int nOuterEndsB4 = intNetwork.getOuterEnds().size();
@@ -486,7 +486,7 @@ namespace DirectedNodeNetworkTests {
     }
 
     {
-      B2INFO("case: addOuterToLastInnerNode: both were there, but already linked (same results as before, but with an error for unintended behavior):")
+      B2INFO("case: addOuterToLastInnerNode: both were there, but already linked (same results as before, but with an error for unintended behavior):");
       int& lastInnerNodeInt = intNetwork.getLastInnerNode()->getEntry();
       unsigned int networkSizeB4 = intNetwork.size();
       unsigned int nOuterEndsB4 = intNetwork.getOuterEnds().size();
@@ -498,7 +498,7 @@ namespace DirectedNodeNetworkTests {
     }
 
     {
-      B2INFO("case: addOuterToLastInnerNode: outer was not there yet (outerEndsUpdate):")
+      B2INFO("case: addOuterToLastInnerNode: outer was not there yet (outerEndsUpdate):");
       onTheFlyCreatedInts.push_back(66);
       int& lastInnerNodeInt = intNetwork.getLastInnerNode()->getEntry();
       int& newOuterInt = onTheFlyCreatedInts.back();

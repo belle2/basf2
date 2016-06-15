@@ -1277,7 +1277,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       m_errorMask |= dhc.check_crc();
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 
-      B2INFO("UNPACK FCE FRAME with len " << hex << len)
+      B2INFO("UNPACK FCE FRAME with len " << hex << len);
       unpack_fce((unsigned short*) data, len - 4, currentVxdId);
 
       break;

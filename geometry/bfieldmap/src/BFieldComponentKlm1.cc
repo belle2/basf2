@@ -26,14 +26,14 @@ namespace io = boost::iostreams;
 void BFieldComponentKlm1::initialize()
 {
   if (m_mapFilename.empty()) {
-    B2ERROR("The filename for the magnetic field Component is empty !")
+    B2ERROR("The filename for the magnetic field Component is empty !");
     return;
   }
 
   string fullPath = FileSystem::findFile("/data/" + m_mapFilename);
 
   if (!FileSystem::fileExists(fullPath)) {
-    B2ERROR("The magnetic field map file '" << m_mapFilename << "' could not be found !")
+    B2ERROR("The magnetic field map file '" << m_mapFilename << "' could not be found !");
     return;
   }
 
@@ -42,7 +42,7 @@ void BFieldComponentKlm1::initialize()
   fieldMapFile.push(io::file_source(fullPath));
 
   //read the data from the file
-  B2DEBUG(10, "Loading the magnetic field from file '" << m_mapFilename << "' in to the memory...")
+  B2DEBUG(10, "Loading the magnetic field from file '" << m_mapFilename << "' in to the memory...");
 
   char dummy[100];
 
@@ -83,7 +83,7 @@ void BFieldComponentKlm1::initialize()
     }
   }
 
-  B2DEBUG(10, "... loaded ")
+  B2DEBUG(10, "... loaded ");
 }
 
 

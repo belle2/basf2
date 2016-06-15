@@ -162,7 +162,7 @@ void TrackExtrapolateG4e::initialize(const std::vector<int>& pdgCodes,
         }
       }
     }
-    if (m_ChargedStable.empty()) B2ERROR("No valid PDG codes for extrapolation")
+    if (m_ChargedStable.empty()) B2ERROR("No valid PDG codes for extrapolation");
     }
 
   for (unsigned i = 0; i < m_ChargedStable.size(); ++i) {
@@ -180,7 +180,7 @@ void TrackExtrapolateG4e::initialize(const std::vector<int>& pdgCodes,
 void TrackExtrapolateG4e::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("ext: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun())
+  B2INFO("ext: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
 }
 
 void TrackExtrapolateG4e::event(bool isMuid)
@@ -364,7 +364,7 @@ void TrackExtrapolateG4e::registerVolumes()
 
   G4PhysicalVolumeStore* pvStore = G4PhysicalVolumeStore::GetInstance();
   if (pvStore->size() == 0) {
-    B2FATAL("No geometry defined. Please create the geometry first.")
+    B2FATAL("No geometry defined. Please create the geometry first.");
   }
 
   m_BKLMVolumes = new vector<G4VPhysicalVolume*>;
@@ -533,7 +533,7 @@ void TrackExtrapolateG4e::getStartPoint(RecoTrack* recoTrack, const genfit::AbsT
   }
 
   catch (genfit::Exception& e) {
-    B2WARNING("Caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " << e.what())
+    B2WARNING("Caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " << e.what());
     // Do not extrapolate this track by forcing minPt cut to fail
     momentum.setX(0.0);
     momentum.setY(0.0);

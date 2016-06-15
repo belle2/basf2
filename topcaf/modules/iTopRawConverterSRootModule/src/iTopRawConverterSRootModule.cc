@@ -193,7 +193,7 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
   wavePacket[0] = 1011;
   for (hslb = 0; hslb < maxhslb; hslb++) {
     in.read(reinterpret_cast<char*>(&hslb_hdr), sizeof(hslb_hdr));
-    B2DEBUG(1, "Header: " << hex << hslb_hdr.B2L_hdr << "(" << HSLB_B2L_HEADER << ")" << dec)
+    B2DEBUG(1, "Header: " << hex << hslb_hdr.B2L_hdr << "(" << HSLB_B2L_HEADER << ")" << dec);
     if (hslb_hdr.B2L_hdr != HSLB_B2L_HEADER) {
       B2WARNING("Bad HSLB header... 0x" << hex << hslb_hdr.B2L_hdr << " ... aborting event");
       m_evtheader_ptr->SetFlag(1000);
@@ -233,7 +233,7 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
       in.seekg(prev_pos);
     }
     B2DEBUG(1, "Reading windows. State " << in.good() << " EOF: " << in.eof() << "size: " << sizeof(
-              int)*streamSize << "pos: " << in.tellg())
+              int)*streamSize << "pos: " << in.tellg());
     for (win = 0; in && win <= numWindows ; win++) {
       word = readWordUnique(in, word);
       m_carrier = (word >> 30) & 0x3;

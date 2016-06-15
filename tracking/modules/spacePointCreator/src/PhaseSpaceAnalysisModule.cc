@@ -58,13 +58,13 @@ void PhaseSpaceAnalysisModule::initialize()
   size_t nNames = m_PARAMcontainerNames.size();
   size_t nTypes = m_PARAMtrackCandTypes.size();
 
-  if (nTypes > nNames) { B2FATAL("Passed " << nTypes << " trackCandTypese but only " << nNames << " containerNames!") }
+  if (nTypes > nNames) { B2FATAL("Passed " << nTypes << " trackCandTypese but only " << nNames << " containerNames!"); }
 
   for (size_t iName = 0; iName < nNames; ++iName) {
     size_t iType = iName < nTypes ? iName : nTypes - 1; // only acces values that are possible
     string tcType = m_PARAMtrackCandTypes.at(iType);
     if (tcType.compare(string("GFTC")) != 0 && tcType.compare(string("SPTC")) != 0) {
-      B2FATAL("Found id " << tcType << " in 'trackCandTypes' but only 'GFTC' and 'SPTC' are allowed!")
+      B2FATAL("Found id " << tcType << " in 'trackCandTypes' but only 'GFTC' and 'SPTC' are allowed!");
     }
 
     string contName = m_PARAMcontainerNames.at(iName);
@@ -80,7 +80,7 @@ void PhaseSpaceAnalysisModule::initialize()
     if (m_PARAMrootFileName.size() != 2 || (m_PARAMrootFileName[1] != "UPDATE" && m_PARAMrootFileName[1] != "RECREATE")) {
       string output;
       for (string id : m_PARAMrootFileName) { output += "'" + id + "' "; }
-      B2FATAL("PhaseSpaceAnalysis::initialize() : rootFileName is set wrong: entries are: " << output)
+      B2FATAL("PhaseSpaceAnalysis::initialize() : rootFileName is set wrong: entries are: " << output);
     }
 
     m_treeNames.push_back(contName);
@@ -104,7 +104,7 @@ void PhaseSpaceAnalysisModule::event()
 
   StoreArray<MCParticle> mcParticles;
   const int nMCParticles = mcParticles.getEntries();
-  B2DEBUG(25, "Found " << nMCParticles << " MCParticles for this event")
+  B2DEBUG(25, "Found " << nMCParticles << " MCParticles for this event");
 
   vector<vector<int> > mcPartIds; // collect all mcParticle Ids of all trackCands
 
@@ -115,7 +115,7 @@ void PhaseSpaceAnalysisModule::event()
     } else if (storeArray.second == c_sptc) {
       mcPartIds.push_back(getMCParticleIDs(boost::any_cast<StoreArray<SpacePointTrackCand> >(storeArray.first)));
     }
-    B2DEBUG(25, mcPartIds.back().size() << " MCParticles of this event were set for this container")
+    B2DEBUG(25, mcPartIds.back().size() << " MCParticles of this event were set for this container");
   }
 
   if (m_PARAMdiffAnalysis) { mcPartIds = getDiffIds(mcPartIds); }
@@ -123,7 +123,7 @@ void PhaseSpaceAnalysisModule::event()
 
   // now loop over all MCParticle IDs
   for (size_t iTree = 0; iTree < mcPartIds.size(); ++iTree) {
-    B2DEBUG(25, "Now collecting values for vector of MCParticle Ids " << iTree)
+    B2DEBUG(25, "Now collecting values for vector of MCParticle Ids " << iTree);
     m_mcPartCtr[iTree]++; // increase counter
 
     m_rootVariables = RootVariables(); // clear root variables for each run
@@ -157,13 +157,13 @@ void PhaseSpaceAnalysisModule::terminate()
   unsigned int nMCParts = accumulate(m_mcPartCtr.begin(), m_mcPartCtr.end(), 0);
   B2INFO("PhaseSpaceAnalysis::terminate(): Collected mcParticle info in " << m_PARAMcontainerNames.size() << " containers."\
          " Collected information from " << nMCParts << " MCParticles and wrote them into " << m_treeNames.size() << " different trees."\
-         << furtherInfo.str())
+         << furtherInfo.str());
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME())) {
     stringstream output;
     output << "tree-wise summary (no of mcParticles):";
     for (unsigned int ctr : m_mcPartCtr) output << " " << ctr;
-    B2DEBUG(1, output.str())
+    B2DEBUG(1, output.str());
   }
 
   // do ROOT stuff
@@ -177,7 +177,7 @@ void PhaseSpaceAnalysisModule::terminate()
 // ================================== initialize root ===============================
 void PhaseSpaceAnalysisModule::initializeRootFile(std::string fileName, std::string writeOption, std::vector<std::string> treeNames)
 {
-  B2DEBUG(10, "initializing root file. fileName: " << fileName << ", writeOption: " << writeOption)
+  B2DEBUG(10, "initializing root file. fileName: " << fileName << ", writeOption: " << writeOption);
   m_rootFilePtr = new TFile(fileName.c_str(), writeOption.c_str());
 
   for (size_t i = 0; i < treeNames.size(); ++i) {
@@ -206,7 +206,7 @@ void PhaseSpaceAnalysisModule::initializeRootFile(std::string fileName, std::str
 // =============================== collect values for root ====================================
 void PhaseSpaceAnalysisModule::getValuesForRoot(Belle2::MCParticle* mcParticle, RootVariables& rootVariables)
 {
-  B2DEBUG(100, "Collecting values for MCParticle " << mcParticle->getArrayIndex())
+  B2DEBUG(100, "Collecting values for MCParticle " << mcParticle->getArrayIndex());
   // collect all the momentum
   const TVector3 momentum = mcParticle->getMomentum();
   rootVariables.MomX.push_back(momentum.X());
@@ -240,7 +240,7 @@ template<typename TrackCandType>
 std::vector<int> PhaseSpaceAnalysisModule::getMCParticleIDs(Belle2::StoreArray<TrackCandType> trackCands)
 {
   const int nTrackCands = trackCands.getEntries();
-  B2DEBUG(25, "In StoreArray " << trackCands.getName() << ": " << nTrackCands << " track candidates for this event")
+  B2DEBUG(25, "In StoreArray " << trackCands.getName() << ": " << nTrackCands << " track candidates for this event");
   std::vector<int> mcPartIds;
   for (int i = 0; i < nTrackCands; ++i) mcPartIds.push_back(trackCands[i]->getMcTrackId());
   // COULDDO: more debug output
@@ -252,7 +252,7 @@ std::vector<int> PhaseSpaceAnalysisModule::getMCParticleIDs(Belle2::StoreArray<T
 std::vector<std::vector<int> > PhaseSpaceAnalysisModule::getDiffIds(const std::vector<std::vector<int> >& allIDs)
 {
   if (allIDs.size() < 2) { // do nothing if there are less than two entries
-    B2DEBUG(50, "There are no more than 1 vectors passed to getDiffIds. No comparison possible. Returning passed vector")
+    B2DEBUG(50, "There are no more than 1 vectors passed to getDiffIds. No comparison possible. Returning passed vector");
     return allIDs;
   }
 

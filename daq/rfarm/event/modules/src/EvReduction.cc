@@ -120,6 +120,6 @@ void EvReductionModule::endRun()
 
 void EvReductionModule::terminate()
 {
-  B2INFO("EvReduction: terminate called")
+  B2INFO("EvReduction: terminate called");
 }
 

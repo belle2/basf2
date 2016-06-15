@@ -45,7 +45,7 @@ namespace Belle2 {
 
   void MCMatchingModule::initialize()
   {
-    B2WARNING("MCMatching module is deprecated. Please use the MCMatcherParticles module instead.")
+    B2WARNING("MCMatching module is deprecated. Please use the MCMatcherParticles module instead.");
     StoreArray<Particle> particles;
     StoreArray<MCParticle> mcparticles;
     particles.isRequired();

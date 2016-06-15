@@ -370,7 +370,7 @@ void BabayagaNLO::generateEvent(MCParticleGraph& mcGraph, double ecm, TVector3 v
   if (not eventExtraInfo.isValid())
     eventExtraInfo.create();
   if (eventExtraInfo->hasExtraInfo("GeneratedPrescale")) {
-    B2WARNING("EventExtraInfo with given name is already set! I won't set it again!")
+    B2WARNING("EventExtraInfo with given name is already set! I won't set it again!");
   } else {
     float targetValue = prescale_.bprescale;
     eventExtraInfo->addExtraInfo("GeneratedPrescale", targetValue);

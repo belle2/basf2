@@ -111,7 +111,7 @@ namespace Belle2 {
       std::set<std::string> excludedNames = m_excluded;
       std::set<std::string> additionalNames = m_additional;
       if (!m_components.empty() && !m_additional.empty()) {
-        B2WARNING("Additional components are ignored when a list of components is provided.")
+        B2WARNING("Additional components are ignored when a list of components is provided.");
       }
 
       //Now create all subcomponents
@@ -269,7 +269,7 @@ namespace Belle2 {
         "Initialization of magnetic field took ",
         BFieldMap::Instance().getBField(TVector3(0, 0, 0));
       );
-      B2INFO("Optimizing geometry and creating lookup tables ...")
+      B2INFO("Optimizing geometry and creating lookup tables ...");
       B2INFO_MEASURE_TIME(
         "Optimizing geometry took ",
         G4GeometryManager::GetInstance()->CloseGeometry(true, LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME()));

@@ -184,7 +184,7 @@ namespace Belle2 {
 
       B2ERROR(" XHitFilterAdapter-2Hit: given name (raw/full): " << variableType <<
               "/" << FilterID::getTypeName(variableType) <<
-              " is not known, returning dummy function with 0.0 as a result instead!")
+              " is not known, returning dummy function with 0.0 as a result instead!");
 
       return [&](const PointType&, const PointType&) -> double { return 0.0; };
     }
@@ -303,7 +303,7 @@ namespace Belle2 {
 
       B2ERROR(" XHitFilterAdapter-3Hit: given name (raw/full): " << variableType <<
               "/" << FilterID::getTypeName(variableType) <<
-              " is not known, returning dummy function with 0.0 as a result instead!")
+              " is not known, returning dummy function with 0.0 as a result instead!");
 
       return [&](const PointType&, const PointType&, const PointType&) -> double { return 0.0; };
     }
@@ -353,7 +353,7 @@ namespace Belle2 {
 
       B2ERROR(" XHitFilterAdapter-4Hit: given name (raw/full): " << variableType <<
               "/" << FilterID::getTypeName(variableType) <<
-              " is not known, returning dummy function with 0.0 as a result instead!")
+              " is not known, returning dummy function with 0.0 as a result instead!");
 
       return [&](const PointType&, const PointType&, const PointType&, const PointType&) -> double { return 0.0; };
     }

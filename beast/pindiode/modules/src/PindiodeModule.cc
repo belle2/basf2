@@ -52,7 +52,7 @@ namespace Belle2 {
 
     void PindiodeModule::initialize()
     {
-      B2INFO("Pindiode: Initialize")
+      B2INFO("Pindiode: Initialize");
       //Here you can do some stuff before processing starts. If you want to
       //write to some collections of the DataStore you have to register these
       //here by using StoreArray<T>::registerPersistent() for collections which

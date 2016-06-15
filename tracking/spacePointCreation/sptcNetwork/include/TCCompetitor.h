@@ -82,12 +82,12 @@ namespace Belle2 {
       if (isCompetitor(iD)) {
         B2WARNING("TCCompetitor(iD: " << m_identifier << ")::addCompetitor: given iD " << iD << " was already found among " <<
                   getNCompetitors() <<
-                  " competitors! ID will not be added again")
+                  " competitors! ID will not be added again");
       } else if (iD == m_identifier) {
         B2ERROR("TCCompetitor(iD: " << m_identifier << ")::addCompetitor: given iD " << iD <<
                 " is identical with itself. This iD is not allowed to be added to the  " <<
                 getNCompetitors() <<
-                " competitors! Attempt to allow competing with itself aborted!")
+                " competitors! Attempt to allow competing with itself aborted!");
       } else {
         m_competitors.push_back(iD);
       }
@@ -102,7 +102,7 @@ namespace Belle2 {
         auto newEndOfVector = std::remove(m_competitors.begin(), m_competitors.end(), iD);
         unsigned int newSize = std::distance(m_competitors.begin(), newEndOfVector);
         B2DEBUG(50, "TCCompetitor::removeCompetitor: own iD " << getID() << " removes competing id: " << iD << " with nOldCompetitors: " <<
-                getNCompetitors() << ", nNewCompetitors: " << newSize)
+                getNCompetitors() << ", nNewCompetitors: " << newSize);
         m_competitors.resize(std::distance(m_competitors.begin(), newEndOfVector));
       } else {
         // storing lambda as function, compiler does not accept direct usage in B2WARNING (do not know why)
@@ -110,7 +110,7 @@ namespace Belle2 {
         B2WARNING("TCCompetitor(iD: " << m_identifier << ")::removeCompetitor: given iD " << iD
                   << " was not found among " << getNCompetitors()
                   << " competitors (with iDs:" << miniPrinter(m_competitors)
-                  << ")! ID can not be removed!")
+                  << ")! ID can not be removed!");
       }
     }
 
@@ -123,7 +123,7 @@ namespace Belle2 {
       std::string out = miniPrinter(m_competitors);
       m_competitors.clear();
       B2DEBUG(50, "TCCompetitor::clearAllCompetitors: competitor " << getID() << " had " << oldSize << " competitors and " <<
-              m_competitors.size() << " competitors now.\nOld ones were: " << out)
+              m_competitors.size() << " competitors now.\nOld ones were: " << out);
     }
   };
 } // end namespace Belle2

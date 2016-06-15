@@ -360,7 +360,7 @@ namespace Belle2 {
     void GeoARICHBtestCreator::createBtestGeometry(const GearDir& content, G4LogicalVolume& topWorld)
     {
 
-      B2INFO("ARICH Btest geometry will be built.")
+      B2INFO("ARICH Btest geometry will be built.");
       ARICHGeometryPar* m_arichgp = ARICHGeometryPar::Instance();
 
       ARICHBtestGeometryPar* m_arichbtgp = ARICHBtestGeometryPar::Instance();

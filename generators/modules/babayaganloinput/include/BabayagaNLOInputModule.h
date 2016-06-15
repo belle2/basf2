@@ -134,7 +134,7 @@ namespace Belle2 {
   {
     std::pair<T, T> p;
     if (vec.size() != 2) {
-      B2ERROR("The parameter " + name + " has to have exactly 2 elements !")
+      B2ERROR("The parameter " + name + " has to have exactly 2 elements !");
     } else {
       p.first  = vec[0];
       p.second = vec[1];

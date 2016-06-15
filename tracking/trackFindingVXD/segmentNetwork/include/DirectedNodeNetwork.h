@@ -170,7 +170,7 @@ namespace Belle2 {
                 ") has index: " << newNode.getIndex() <<
                 ", oldNode was part of endVector and will therefore replaced (oldIndex was " << oldIndex <<
                 " and newIndex is " << *iter <<
-                ")!")
+                ")!");
         return true;
       }
       B2DEBUG(250, "DirectedNodeNetwork::updateNetworkEnd(): oldNode has index " << oldNode.getIndex() <<
@@ -178,7 +178,7 @@ namespace Belle2 {
               ") index: " << newNode.getIndex() <<
               ", oldNode is not part of endVector and will therefore not replaced (endVector[0]/size() is: " << endVector.at(0) <<
               "/" << endVector.size() <<
-              "), newNode will be added instead!")
+              "), newNode will be added instead!");
       endVector.push_back(newNode.getIndex());
       return false;
     }
@@ -204,7 +204,7 @@ namespace Belle2 {
           if (iterPos != m_innerEnds.end()) { *iterPos = innerNode->getIndex(); }
           else { m_innerEnds.push_back(innerNode->getIndex()); }
 
-          B2DEBUG(250, "DirectedNodeNetwork::addToExistingNode(): newEntry is inner and new with index: " << innerNode->getIndex())
+          B2DEBUG(250, "DirectedNodeNetwork::addToExistingNode(): newEntry is inner and new with index: " << innerNode->getIndex());
         } else {
           innerNode = *nodeIter;
         }
@@ -218,7 +218,7 @@ namespace Belle2 {
           if (iterPos != m_outerEnds.end()) { *iterPos = outerNode->getIndex(); }
           else { m_outerEnds.push_back(outerNode->getIndex()); }
 
-          B2DEBUG(250, "DirectedNodeNetwork::addToExistingNode(): newEntry is outer and new with index: " << outerNode->getIndex())
+          B2DEBUG(250, "DirectedNodeNetwork::addToExistingNode(): newEntry is outer and new with index: " << outerNode->getIndex());
         } else {
           outerNode = *nodeIter;
         }
@@ -257,8 +257,8 @@ namespace Belle2 {
     /** to the last outerNode added, another innerNode will be attached */
     void addInnerToLastOuterNode(EntryType& innerEntry)
     {
-//    B2INFO("addInnerToLastOuterNode: inner: " << innerEntry) // TODO Jan8_2016: remove!
-      if (m_lastOuterNode == nullptr) { B2FATAL("addInnerToLastOuterNode() last OuterNode is not yet in this network! CurrentNetworkSize is: " << size()) }
+//    B2INFO("addInnerToLastOuterNode: inner: " << innerEntry); // TODO Jan8_2016: remove!
+      if (m_lastOuterNode == nullptr) { B2FATAL("addInnerToLastOuterNode() last OuterNode is not yet in this network! CurrentNetworkSize is: " << size()); }
 
       // check if entries are identical (catch loops):
       if (*m_lastOuterNode == innerEntry) {
@@ -269,17 +269,17 @@ namespace Belle2 {
       bool wasSuccessful = addToExistingNode(m_lastOuterNode, innerEntry, true);
 
       if (wasSuccessful) {
-        B2DEBUG(250, "DirectedNodeNetwork::addInnerToLastOuterNode(): linking was successful!")
+        B2DEBUG(250, "DirectedNodeNetwork::addInnerToLastOuterNode(): linking was successful!");
         return;
       }
-      B2ERROR("DirectedNodeNetwork::addInnerToLastOuterNode(): last OuterNode and innerEntry were already in the network and were already connected. This is a sign for unintended behavior!")
+      B2ERROR("DirectedNodeNetwork::addInnerToLastOuterNode(): last OuterNode and innerEntry were already in the network and were already connected. This is a sign for unintended behavior!");
     }
 
 
     /** to the last innerNode added, another outerNode will be attached */
     void addOuterToLastInnerNode(EntryType& outerEntry)
     {
-      if (m_lastOuterNode == nullptr) { B2FATAL("addOuterToLastInnerNode() last InnerNode is not yet in this network! CurrentNetworkSize is: " << size()) }
+      if (m_lastOuterNode == nullptr) { B2FATAL("addOuterToLastInnerNode() last InnerNode is not yet in this network! CurrentNetworkSize is: " << size()); }
       // check if entries are identical (catch loops):
       if (outerEntry == *m_lastInnerNode) {
         B2ERROR("DirectedNodeNetwork::addOuterToLastInnerNode(): outerEntry and lastInnerNode are identical! Aborting linking-process");
@@ -289,10 +289,10 @@ namespace Belle2 {
       bool wasSuccessful = addToExistingNode(m_lastInnerNode, outerEntry, false);
 
       if (wasSuccessful) {
-        B2DEBUG(250, "DirectedNodeNetwork::addOuterToLastInnerNode(): linking was successful!")
+        B2DEBUG(250, "DirectedNodeNetwork::addOuterToLastInnerNode(): linking was successful!");
         return;
       }
-      B2ERROR("DirectedNodeNetwork::addOuterToLastInnerNode(): last InnerNode and outerEntry were already in the network and were already connected. This is a sign for unintended behavior!")
+      B2ERROR("DirectedNodeNetwork::addOuterToLastInnerNode(): last InnerNode and outerEntry were already in the network and were already connected. This is a sign for unintended behavior!");
     }
 
 
@@ -304,12 +304,12 @@ namespace Belle2 {
         B2ERROR("DirectedNodeNetwork::linkTheseEntries(): outerEntry and innerEntry are identical! Aborting linking-process");
         return;
       }
-      B2DEBUG(10, "DNN:linkEntriesDEBUG: outer: " << outerEntry << ", inner: " << outerEntry)
+      B2DEBUG(10, "DNN:linkEntriesDEBUG: outer: " << outerEntry << ", inner: " << outerEntry);
 
       // check if entries are already in network.
       auto outerNodeIter = isInNetwork(outerEntry);
       auto innerNodeIter = isInNetwork(innerEntry);
-//    B2INFO("linkTheseEntries: outer: " << outerEntry << ", inner: " << innerEntry) // TODO Jan8_2016: remove!
+//    B2INFO("linkTheseEntries: outer: " << outerEntry << ", inner: " << innerEntry); // TODO Jan8_2016: remove!
 
       /** case 1: none of the entries are added yet:
        *  create nodes for both and link with each other, where outerEntry will be carried by outer node and inner entry by inner node
@@ -327,7 +327,7 @@ namespace Belle2 {
         m_innerEnds.push_back(newInnerNode.getIndex());
 
         B2DEBUG(250, "DirectedNodeNetwork::linkTheseEntries(): outerNode is new with index " << newOuterNode.getIndex() <<
-                ", innerNode is new with index: " << newInnerNode.getIndex())
+                ", innerNode is new with index: " << newInnerNode.getIndex());
         return;
       }
 
@@ -349,7 +349,7 @@ namespace Belle2 {
 
         B2DEBUG(250, "DirectedNodeNetwork::linkTheseEntries(): outerNode was already there with index " << outerNode.getIndex() <<
                 ", innerNode is new with index: " << newInnerNode.getIndex() <<
-                ", outerNode was innerNode before: " << (outerNodeReplaced ? "true" : "false"))
+                ", outerNode was innerNode before: " << (outerNodeReplaced ? "true" : "false"));
         return;
       }
 
@@ -359,11 +359,11 @@ namespace Belle2 {
        *  add outerNode to outerEnds, if innerNode was in outerEnds before, replace old one with new outerNode
        * */
       if (outerNodeIter == m_nodes.rend() and innerNodeIter != m_nodes.rend()) {
-        B2DEBUG(10, "DNN:linkEntriesDEBUG CASE 3: outer: " << outerEntry << ", inner: " << innerEntry)
+        B2DEBUG(10, "DNN:linkEntriesDEBUG CASE 3: outer: " << outerEntry << ", inner: " << innerEntry);
         Node& innerNode = **innerNodeIter; // has to come first to prevent-realloc-issues
         Node& newOuterNode = addNode(outerEntry);
-        B2DEBUG(10, "DNN:linkEntriesDEBUG CASE 3: inner: " << innerNode.getEntry())
-        B2DEBUG(10, "DNN:linkEntriesDEBUG CASE 3: NEW outer: " << newOuterNode.getEntry())
+        B2DEBUG(10, "DNN:linkEntriesDEBUG CASE 3: inner: " << innerNode.getEntry());
+        B2DEBUG(10, "DNN:linkEntriesDEBUG CASE 3: NEW outer: " << newOuterNode.getEntry());
 
         linkNodes(newOuterNode, innerNode);
         m_lastInnerNode = &innerNode;
@@ -374,7 +374,7 @@ namespace Belle2 {
 
         B2DEBUG(250, "DirectedNodeNetwork::linkTheseEntries(): outerNode is new with index " << newOuterNode.getIndex() <<
                 ", innerNode was already there with index: " << innerNode.getIndex() <<
-                ", innerNode was outerNode before: " << (innerNodeReplaced ? "true" : "false"))
+                ", innerNode was outerNode before: " << (innerNodeReplaced ? "true" : "false"));
         return;
       }
 
@@ -407,12 +407,12 @@ namespace Belle2 {
         }
 
         B2DEBUG(250, "DirectedNodeNetwork::linkTheseEntries(): outerNode already there with index " << outerNode.getIndex() <<
-                ", innerNode was already there with index: " << innerNode.getIndex())
+                ", innerNode was already there with index: " << innerNode.getIndex());
         return;
       }
 
       /** case 4B: both are already there and already linked: */
-      B2ERROR("DirectedNodeNetwork::linkTheseEntries(): outerEntry and innerEntry were already in the network and were already connected. This is a sign for unintended behavior!")
+      B2ERROR("DirectedNodeNetwork::linkTheseEntries(): outerEntry and innerEntry were already in the network and were already connected. This is a sign for unintended behavior!");
     }
 
 /// getters:

@@ -21,7 +21,7 @@ MillepedeAlgorithm::MillepedeAlgorithm() : CalibrationAlgorithm("MillepedeCollec
 
 CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 {
-  B2INFO(" Mean of Chi2 / NDF of tracks before calibration: " << getObject<TH1F>("chi2/ndf").GetMean();)
+  B2INFO(" Mean of Chi2 / NDF of tracks before calibration: " << getObject<TH1F>("chi2/ndf").GetMean(););
 
   // Write out binary files from tree and add to steering
   prepareMilleBinary();

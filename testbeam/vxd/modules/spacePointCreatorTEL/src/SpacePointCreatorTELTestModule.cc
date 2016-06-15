@@ -86,9 +86,9 @@ void SpacePointCreatorTELTestModule::initialize()
   B2INFO("SpacePointCreatorTELTestModule(" << m_nameOfInstance << ")::initialize: names found for containers:\n" <<
          "pxdClusters: " << m_pxdClustersName <<
          "\nsvdClusters: " << m_svdClustersName <<
-         "\ntelClusters: " << m_telClustersName)
+         "\ntelClusters: " << m_telClustersName);
 
-  B2WARNING("TODO: at the moment, the genfit-output can only verified visually (by checking, whether the detector types match the number of dimensions stored in the trackPoint)! when full reco chain is working, this testerModule should be extended! -> verification that input cluster(s) is/are converted to genfit-stuff shall be resilient!")
+  B2WARNING("TODO: at the moment, the genfit-output can only verified visually (by checking, whether the detector types match the number of dimensions stored in the trackPoint)! when full reco chain is working, this testerModule should be extended! -> verification that input cluster(s) is/are converted to genfit-stuff shall be resilient!");
 }
 
 
@@ -97,22 +97,22 @@ void SpacePointCreatorTELTestModule::event()
 {
   B2DEBUG(1, "\n\nSpacePointCreatorTestModule(" << m_nameOfInstance << " event " << StoreObjPtr<EventMetaData>("EventMetaData",
           DataStore::c_Event)->getEvent() << "): got " << m_pxdClusters.getEntries() << "/" << m_svdClusters.getEntries() << "/" <<
-          m_telClusters.getEntries() << " PXD/SVD/TelClusters in this event\n\n")
+          m_telClusters.getEntries() << " PXD/SVD/TelClusters in this event\n\n");
 
 
   for (StoreArray<SpacePoint>& aStoreArrayInterface : m_allSpacePointStoreArrays) {
     B2DEBUG(1, " Entering storeArray<SpacePoint> " << aStoreArrayInterface.getName() << " with " << aStoreArrayInterface.getEntries() <<
-            " spacePoints")
+            " spacePoints");
 
     for (unsigned int i = 0; i < uint(aStoreArrayInterface.getEntries()); ++i) {
-      B2DEBUG(2, " Executing SpacePoint " << i)
+      B2DEBUG(2, " Executing SpacePoint " << i);
       const SpacePoint* sp = aStoreArrayInterface[i];
 
       vector<int> indices; // WARNING: nothing is happening with them yet -> write some sort of test!
       string clusterContainer = "";
 
       if (sp->getType() == VXD::SensorInfoBase::SensorType::SVD) {
-        B2DEBUG(2, " SpacePoint " << i << " is attached to SVDCluster(s) of StoreArray " << sp->getArrayName())
+        B2DEBUG(2, " SpacePoint " << i << " is attached to SVDCluster(s) of StoreArray " << sp->getArrayName());
 
         for (const SVDCluster& aCluster : sp->getRelationsTo<SVDCluster>()) {
           indices.push_back(aCluster.getArrayIndex());
@@ -120,10 +120,10 @@ void SpacePointCreatorTELTestModule::event()
 
           B2DEBUG(2, " SpacePoint " << i <<
                   " got pointer to SVDCluster with index " << aCluster.getArrayIndex() <<
-                  " stored in Array " << aCluster.getArrayName())
+                  " stored in Array " << aCluster.getArrayName());
         }
       } else if (sp->getType() == VXD::SensorInfoBase::SensorType::PXD) {
-        B2DEBUG(2, " SpacePoint " << i << " is attached to PXDCluster of StoreArray " << sp->getArrayName())
+        B2DEBUG(2, " SpacePoint " << i << " is attached to PXDCluster of StoreArray " << sp->getArrayName());
 
         for (const PXDCluster& aCluster : sp->getRelationsTo<PXDCluster>()) {
 
@@ -133,11 +133,11 @@ void SpacePointCreatorTELTestModule::event()
 
           B2DEBUG(2, " SpacePoint " << i <<
                   " got pointer to PXDCluster with index " << aCluster.getArrayIndex() <<
-                  " stored in Array " << aCluster.getArrayName())
+                  " stored in Array " << aCluster.getArrayName());
 
         }
       } else if (sp->getType() == VXD::SensorInfoBase::SensorType::TEL) {
-        B2DEBUG(2, " SpacePoint " << i << " is attached to TelCluster of StoreArray " << sp->getArrayName())
+        B2DEBUG(2, " SpacePoint " << i << " is attached to TelCluster of StoreArray " << sp->getArrayName());
 
         for (const TelCluster& aCluster : sp->getRelationsTo<TelCluster>()) {
 
@@ -146,25 +146,25 @@ void SpacePointCreatorTELTestModule::event()
 
           B2DEBUG(2, " SpacePoint " << i <<
                   " got pointer to TelCluster with index " << aCluster.getArrayIndex() <<
-                  " stored in Array " << aCluster.getArrayName())
+                  " stored in Array " << aCluster.getArrayName());
 
         }
 
-      } else { B2ERROR(" SpacePoint is of unknown type " << sp->getType()) }
+      } else { B2ERROR(" SpacePoint is of unknown type " << sp->getType()); }
 
 
       B2DEBUG(1, "SpacePoint " << i <<
               " got sensorType: " << sp->getType() <<
               ", VxdID: " << VxdID(sp->getVxdID()) <<
               ", storeName for Cluster(says SpacePoint): " << sp->getArrayName() <<
-              ", storeName for Cluster(says Cluster): " << clusterContainer)
+              ", storeName for Cluster(says Cluster): " << clusterContainer);
     }
 
     if (aStoreArrayInterface.getEntries() == 0) {
       B2WARNING("given storeArray has no entries! skipping storeArray " << aStoreArrayInterface.getName());
       continue;
     }
-    B2DEBUG(1, "testGenfitCompatibility: feed the track with spacePoints ported to genfit compatible stuff")
+    B2DEBUG(1, "testGenfitCompatibility: feed the track with spacePoints ported to genfit compatible stuff");
     genfit::AbsTrackRep* trackRep = new genfit::RKTrackRep(211);
 
     genfit::Track track(trackRep, aStoreArrayInterface[0]->getPosition(), TVector3(23., 42., 5.));
@@ -185,9 +185,9 @@ void SpacePointCreatorTELTestModule::event()
       track.insertMeasurement(hitOutput[i].second);
       genfit::TrackPoint* point = track.getPointWithMeasurement(i);
       genfit::AbsMeasurement* rawPoint = point->getRawMeasurement();
-      B2DEBUG(2, " executing AbsMeasurement " << i << " with detectorID(PXD = 0,SVD=1,TEL=2,VXD=-1) : " << hitOutput[i].first << ":\n")
+      B2DEBUG(2, " executing AbsMeasurement " << i << " with detectorID(PXD = 0,SVD=1,TEL=2,VXD=-1) : " << hitOutput[i].first << ":\n");
       point->Print();
-      B2DEBUG(2, " converted absMeasurement is of detID: " << rawPoint->getDetId() << ", hitID: " << rawPoint->getHitId())
+      B2DEBUG(2, " converted absMeasurement is of detID: " << rawPoint->getDetId() << ", hitID: " << rawPoint->getHitId());
     }
   }
 

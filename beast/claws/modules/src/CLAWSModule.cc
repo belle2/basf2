@@ -52,7 +52,7 @@ namespace Belle2 {
 
     void CLAWSModule::initialize()
     {
-      B2INFO("CLAWS: Initialize")
+      B2INFO("CLAWS: Initialize");
       //Here you can do some stuff before processing starts. If you want to
       //write to some collections of the DataStore you have to register these
       //here by using StoreArray<T>::registerPersistent() for collections which

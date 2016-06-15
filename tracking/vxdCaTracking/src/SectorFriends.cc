@@ -20,7 +20,7 @@ using namespace Belle2;
 
 void SectorFriends::addValuePair(int aFilter, pair<double, double> values)
 {
-  B2DEBUG(150, "adding valuePair of Filter " << aFilter << " in filterVector of " << m_filters.size() << " entries")
+  B2DEBUG(150, "adding valuePair of Filter " << aFilter << " in filterVector of " << m_filters.size() << " entries");
   if (m_filters.at(aFilter).getType() != -1) {
     m_filters[aFilter].addValuePair(values.first, values.second);
   } else {

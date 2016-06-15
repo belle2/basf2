@@ -66,15 +66,15 @@ void ExtMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
 {
   if (command == m_stepLengthLimitCmd) {
     B2DEBUG(200, "ExtMessenger::SetNewValue() StepLengthAction SetStepLimit "
-            << m_stepLengthLimitCmd->GetNewDoubleValue(newValue))
+            << m_stepLengthLimitCmd->GetNewDoubleValue(newValue));
     m_stepLengthAction->SetStepLimit(m_stepLengthLimitCmd->GetNewDoubleValue(newValue));
   } else if (command == m_magFieldLimitCmd) {
     B2DEBUG(200, "ExtMessenger::SetNewValue() MagFieldAction SetStepLimit "
-            << m_magFieldLimitCmd->GetNewDoubleValue(newValue))
+            << m_magFieldLimitCmd->GetNewDoubleValue(newValue));
     m_magFieldAction->SetStepLimit(m_magFieldLimitCmd->GetNewDoubleValue(newValue));
   } else if (command == m_energyLossCmd) {
     B2DEBUG(200, "ExtMessenger::SetNewValue() EnergyLossAction SetStepLimit "
-            << m_energyLossCmd->GetNewDoubleValue(newValue))
+            << m_energyLossCmd->GetNewDoubleValue(newValue));
     m_energyLossAction->SetStepLimit(m_energyLossCmd->GetNewDoubleValue(newValue));
   }
 }

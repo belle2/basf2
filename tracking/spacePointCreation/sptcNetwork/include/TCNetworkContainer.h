@@ -83,7 +83,7 @@ namespace Belle2 {
       for (const TCCompetitor& aCompetitor : m_links) {
         aCompetitor.hasCompetitors() and nCompetitors++;
       }
-      B2DEBUG(50, "TCNetworkContainer::getNCompetitors: " << nCompetitors)
+      B2DEBUG(50, "TCNetworkContainer::getNCompetitors: " << nCompetitors);
       return nCompetitors;
     }
 
@@ -96,7 +96,7 @@ namespace Belle2 {
       for (const TCType& aTC : m_nodes) {
         aTC.isAlive() and nAlive++;
       }
-      B2DEBUG(50, "TCNetworkContainer::getNTCsAlive: " << nAlive)
+      B2DEBUG(50, "TCNetworkContainer::getNTCsAlive: " << nAlive);
       return nAlive;
     }
 
@@ -124,9 +124,9 @@ namespace Belle2 {
         if (aTC.areCompetitors(newTC)) {
           newCompetitorsFound.push_back(aTC.getID());
           m_links[aTC.getID()].addCompetitor(newTC.getID());
-          B2DEBUG(50, "current TC " << aTC.getID() << " got new competitor " << newTC.getID())
+          B2DEBUG(50, "current TC " << aTC.getID() << " got new competitor " << newTC.getID());
         } else {
-          B2DEBUG(50, "current TC " << aTC.getID() << " is not competing with " << newTC.getID())
+          B2DEBUG(50, "current TC " << aTC.getID() << " is not competing with " << newTC.getID());
         }
       }
 //       B2INFO("TCNEtworkContainer:add: newTC.getID: " << newTC.getID() << ", size(old) for m_nodes/m_links: " << m_nodes.size() << "/" << m_links.size())
@@ -147,12 +147,12 @@ namespace Belle2 {
       for (unsigned int tcID = 0; tcID < size(); tcID++) {
         if (m_nodes[tcID].getID() != tcID) {
           B2ERROR("TCNEtworkContainer:add: TCAvatar got internal iD " << m_nodes[tcID].getID() << " but in-network-iD " << tcID <<
-                  " this is strictly forbidden!")
+                  " this is strictly forbidden!");
         }
       }
       if (m_nodes.size() != m_links.size()) {
         B2ERROR("TCNEtworkContainer:add: m_nodes.size() " << size() << " and m_links.size() " << m_links.size() <<
-                " differ - this is strictly forbidden!")
+                " differ - this is strictly forbidden!");
       }
     }
 
@@ -169,7 +169,7 @@ namespace Belle2 {
                + ", QI: " + std::to_string(aNode.getTrackQuality())
                + ") got competitors: " + vecPrint(m_obsi.getCompetitors(aNode.getID())) + "\n";
       }
-      B2INFO(out << "\n")
+      B2INFO(out << "\n");
     }
 
     /** deactivates a TC and updates the competing links to it */
@@ -179,7 +179,7 @@ namespace Belle2 {
         m_nodes[iD].setAliveState(false);
         return;
       }
-      B2WARNING("TCNetworkContainer:killTC: given iD " << iD << " is not in network with size: " << size() << ", killing aborted...")
+      B2WARNING("TCNetworkContainer:killTC: given iD " << iD << " is not in network with size: " << size() << ", killing aborted...");
     }
 
 

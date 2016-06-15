@@ -361,11 +361,11 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
     }
     genfit::GblFitStatus* fs = dynamic_cast<genfit::GblFitStatus*>(track->getFitStatus());
     if (!fs) {
-      B2INFO("Fit status is not GblFitStatus. You need tracks fitted by GBLfit module.")
+      B2INFO("Fit status is not GblFitStatus. You need tracks fitted by GBLfit module.");
       continue;
     }
     if (!fs->isFittedWithReferenceTrack()) {
-      B2INFO("Track is not fitted with reference track.")
+      B2INFO("Track is not fitted with reference track.");
       continue;
     }
 

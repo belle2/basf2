@@ -108,6 +108,6 @@ void Ds2RbufModule::terminate()
 
   // RingBuffer should not be deleted
 
-  B2INFO("Ds2Rbuf: terminate called")
+  B2INFO("Ds2Rbuf: terminate called");
 }
 

@@ -61,7 +61,7 @@ namespace Belle2 {
     {
       auto pos = TCType::s_fromTypeToString.find(type);
       if (pos == TCType::s_fromTypeToString.end()) {
-        B2ERROR("TCType::getTypeName(): given iD " << type << " is not a valid TCType, returnint TCType::UnknownType!")
+        B2ERROR("TCType::getTypeName(): given iD " << type << " is not a valid TCType, returnint TCType::UnknownType!");
         return TCType::s_fromTypeToString[UnknownType];
       }
       return pos->second;
@@ -73,7 +73,7 @@ namespace Belle2 {
     {
       auto pos = TCType::s_fromStringToType.find(type);
       if (pos == TCType::s_fromStringToType.end()) {
-        B2ERROR("TCType::getTypeName(): given iD " << type << " is not a valid TCType, returnint TCType::UnknownType!")
+        B2ERROR("TCType::getTypeName(): given iD " << type << " is not a valid TCType, returnint TCType::UnknownType!");
         return TCType::s_fromStringToType[std::string("UnknownType")];
       }
       return pos->second;

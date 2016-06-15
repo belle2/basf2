@@ -37,12 +37,12 @@ void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, doub
   m_weightCount = 0;
 
   if ((minPhotonEFrac <= 0.0) || (minPhotonEFrac >= 1.0)) {
-    B2ERROR("BBBrem: The minimum photon energy fraction has to be in the range ]0,1[ !")
+    B2ERROR("BBBrem: The minimum photon energy fraction has to be in the range ]0,1[ !");
     return;
   }
 
-  B2DEBUG(100, "BBBrem: Center of mass energy:     " << cmsEnergy)
-  B2DEBUG(100, "BBBrem: Minimum photon energy:     " << minPhotonEFrac << " * beam energy")
+  B2DEBUG(100, "BBBrem: Center of mass energy:     " << cmsEnergy);
+  B2DEBUG(100, "BBBrem: Minimum photon energy:     " << minPhotonEFrac << " * beam energy");
 
   //Initialize the constants (in order to be consistent with the FORTRAN source code)
   alpha = Const::fineStrConst;
@@ -62,7 +62,7 @@ void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, doub
   a2 = (log1p(z0)) / z0;
   ac = a1 / (a1 + a2);
   sigapp = 8.0 * (alpha * alpha * alpha) / rme2 * (-log(rme2s)) * (a1 + a2) * tomb;
-  B2DEBUG(100, "BBBrem: Approximate cross section: " << sigapp << " millibarn")
+  B2DEBUG(100, "BBBrem: Approximate cross section: " << sigapp << " millibarn");
 
   //Initial-state momenta
   eb     = 0.5 * cmsEnergy;
@@ -175,7 +175,7 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
 
   //If temp2<0 (very very rare): set weight to 0
   if (temp2 < 0.0) {
-    B2WARNING("BBBrem: y too large: delta_t^2 = " << temp2 << " !!!")
+    B2WARNING("BBBrem: y too large: delta_t^2 = " << temp2 << " !!!");
     weight = 0.0;
   } else {
     double tmin = -2.0 * (temp1 + sqrt(temp2));

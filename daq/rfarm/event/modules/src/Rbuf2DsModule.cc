@@ -156,6 +156,6 @@ void Rbuf2DsModule::endRun()
 
 void Rbuf2DsModule::terminate()
 {
-  B2INFO("Rbuf2Ds: terminate called")
+  B2INFO("Rbuf2Ds: terminate called");
 }
 

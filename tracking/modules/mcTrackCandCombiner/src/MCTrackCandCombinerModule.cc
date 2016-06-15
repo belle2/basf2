@@ -303,7 +303,7 @@ void MCTrackCandCombinerModule::event()
   }//end loop over MCParticles
 
   m_nOutputTcs += outCands.getEntries();
-  B2DEBUG(100, "created " << outCands.getEntries() << " track candidates")
+  B2DEBUG(100, "created " << outCands.getEntries() << " track candidates");
 }
 
 void MCTrackCandCombinerModule::endRun()

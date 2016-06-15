@@ -30,46 +30,46 @@ void BFieldComponentQuad::initialize()
 {
   // check if input name is not empty
   if (m_mapFilenameHER.empty()) {
-    B2FATAL("The filename for the HER quadrupole magnetic field component is empty !")
+    B2FATAL("The filename for the HER quadrupole magnetic field component is empty !");
     return;
   }
   if (m_mapFilenameLER.empty()) {
-    B2FATAL("The filename for the LER quadrupole magnetic field component is empty !")
+    B2FATAL("The filename for the LER quadrupole magnetic field component is empty !");
     return;
   }
   if (m_apertFilenameHER.empty()) {
-    B2FATAL("The filename for the HER beam pipe aperture is empty !")
+    B2FATAL("The filename for the HER beam pipe aperture is empty !");
     return;
   }
   if (m_apertFilenameLER.empty()) {
-    B2FATAL("The filename for the LER beam pipe aperture is empty !")
+    B2FATAL("The filename for the LER beam pipe aperture is empty !");
     return;
   }
 
   // check if input files exsits
   string fullPathMapHER = FileSystem::findFile("/data/" + m_mapFilenameHER);
   if (!FileSystem::fileExists(fullPathMapHER)) {
-    B2FATAL("The HER quadrupole magnetic field map file '" << m_mapFilenameHER << "' could not be found !")
+    B2FATAL("The HER quadrupole magnetic field map file '" << m_mapFilenameHER << "' could not be found !");
     return;
   }
   string fullPathMapLER = FileSystem::findFile("/data/" + m_mapFilenameLER);
   if (!FileSystem::fileExists(fullPathMapLER)) {
-    B2FATAL("The LER quadrupole magnetic field map file '" << m_mapFilenameLER << "' could not be found !")
+    B2FATAL("The LER quadrupole magnetic field map file '" << m_mapFilenameLER << "' could not be found !");
     return;
   }
   string fullPathMapHERleak = FileSystem::findFile("/data/" + m_mapFilenameHERleak);
   if (!FileSystem::fileExists(fullPathMapHERleak)) {
-    B2FATAL("The HERleak quadrupole magnetic field map file '" << m_mapFilenameHERleak << "' could not be found !")
+    B2FATAL("The HERleak quadrupole magnetic field map file '" << m_mapFilenameHERleak << "' could not be found !");
     return;
   }
   string fullPathApertHER = FileSystem::findFile("/data/" + m_apertFilenameHER);
   if (!FileSystem::fileExists(fullPathApertHER)) {
-    B2FATAL("The HER aperture file '" << m_apertFilenameHER << "' could not be found !")
+    B2FATAL("The HER aperture file '" << m_apertFilenameHER << "' could not be found !");
     return;
   }
   string fullPathApertLER = FileSystem::findFile("/data/" + m_apertFilenameLER);
   if (!FileSystem::fileExists(fullPathApertLER)) {
-    B2FATAL("The LER aperture file '" << m_apertFilenameLER << "' could not be found !")
+    B2FATAL("The LER aperture file '" << m_apertFilenameLER << "' could not be found !");
     return;
   }
 
@@ -86,7 +86,7 @@ void BFieldComponentQuad::initialize()
   double s, L, K0, K1, SK0, SK1, ROTATE, DX, DY;
 
   //Create the parameter map and read the data from the file
-  B2DEBUG(10, "Loading the HER quadrupole magnetic field from file '" << m_mapFilenameHER << "' in to the memory...")
+  B2DEBUG(10, "Loading the HER quadrupole magnetic field from file '" << m_mapFilenameHER << "' in to the memory...");
   m_mapBufferHER = new ParamPoint[m_mapSizeHER];
   for (int i = 0; i < m_mapSizeHER; ++i) {
     fieldMapFileHER >> name >> s >> L >> K0 >> K1 >> SK0 >> SK1 >> ROTATE >> DX >> DY;
@@ -100,11 +100,11 @@ void BFieldComponentQuad::initialize()
     m_mapBufferHER[i].ROTATE = ROTATE; // [degree]
     m_mapBufferHER[i].DX     = DX; // [m]
     m_mapBufferHER[i].DY     = DY; // [m]
-    B2DEBUG(10, "... loaded HER SAD element " << name << " at s= " << s << "[m].")
+    B2DEBUG(10, "... loaded HER SAD element " << name << " at s= " << s << "[m].");
   }
-  B2DEBUG(10, "... loaded " << m_mapSizeHER << " elements.")
+  B2DEBUG(10, "... loaded " << m_mapSizeHER << " elements.");
 
-  B2DEBUG(10, "Loading the LER quadrupole magnetic field from file '" << m_mapFilenameLER << "' in to the memory...")
+  B2DEBUG(10, "Loading the LER quadrupole magnetic field from file '" << m_mapFilenameLER << "' in to the memory...");
   m_mapBufferLER = new ParamPoint[m_mapSizeLER];
   for (int i = 0; i < m_mapSizeLER; ++i) {
     fieldMapFileLER >> name >> s >> L >> K0 >> K1 >> SK0 >> SK1 >> ROTATE >> DX >> DY;
@@ -118,9 +118,9 @@ void BFieldComponentQuad::initialize()
     m_mapBufferLER[i].ROTATE = ROTATE; // [degree]
     m_mapBufferLER[i].DX     = DX; // [m]
     m_mapBufferLER[i].DY     = DY; // [m]
-    B2DEBUG(10, "... loaded LER SAD element " << name << " at s= " << s << "[m].")
+    B2DEBUG(10, "... loaded LER SAD element " << name << " at s= " << s << "[m].");
   }
-  B2DEBUG(10, "... loaded " << m_mapSizeLER << " elements.")
+  B2DEBUG(10, "... loaded " << m_mapSizeLER << " elements.");
 
   m_mapBufferHERleak = new ParamPoint[m_mapSizeHERleak];
   for (int i = 0; i < m_mapSizeHERleak; ++i) {
@@ -135,9 +135,9 @@ void BFieldComponentQuad::initialize()
     m_mapBufferHERleak[i].ROTATE = ROTATE; // [degree]
     m_mapBufferHERleak[i].DX     = DX; // [m]
     m_mapBufferHERleak[i].DY     = DY; // [m]
-    B2DEBUG(10, "... loaded HERleak SAD element " << name << " at s= " << s << "[m].")
+    B2DEBUG(10, "... loaded HERleak SAD element " << name << " at s= " << s << "[m].");
   }
-  B2DEBUG(10, "... loaded " << m_mapSizeHERleak << " elements.")
+  B2DEBUG(10, "... loaded " << m_mapSizeHERleak << " elements.");
 
 
 
@@ -152,7 +152,7 @@ void BFieldComponentQuad::initialize()
   double r;
 
   //Create the parameter map and read the data from the file
-  B2DEBUG(10, "Loading the HER aperture from file '" << m_apertFilenameHER << "' in to the memory...")
+  B2DEBUG(10, "Loading the HER aperture from file '" << m_apertFilenameHER << "' in to the memory...");
   m_apertBufferHER = new ApertPoint[m_apertSizeHER];
   for (int i = 0; i < m_apertSizeHER; ++i) {
     apertFileHER >> s >> r;
@@ -160,11 +160,11 @@ void BFieldComponentQuad::initialize()
     /* Save parametors in unit [mm], not in basf2 default unit [cm].*/
     m_apertBufferHER[i].s   = s;
     m_apertBufferHER[i].r   = r;
-    B2DEBUG(10, "... loaded HER aperture at s = " << s << "[mm], r = " << r << "[mm]")
+    B2DEBUG(10, "... loaded HER aperture at s = " << s << "[mm], r = " << r << "[mm]");
   }
-  B2DEBUG(10, "... loaded " << m_apertSizeHER << " elements.")
+  B2DEBUG(10, "... loaded " << m_apertSizeHER << " elements.");
 
-  B2DEBUG(10, "Loading the LER aperture from file '" << m_apertFilenameLER << "' in to the memory...")
+  B2DEBUG(10, "Loading the LER aperture from file '" << m_apertFilenameLER << "' in to the memory...");
   m_apertBufferLER = new ApertPoint[m_apertSizeLER];
   for (int i = 0; i < m_apertSizeLER; ++i) {
     apertFileLER >> s >> r;
@@ -172,9 +172,9 @@ void BFieldComponentQuad::initialize()
     /* Save parametors in unit [mm], not in basf2 default unit [cm].*/
     m_apertBufferLER[i].s   = s;
     m_apertBufferLER[i].r   = r;
-    B2DEBUG(10, "... loaded LER aperture at s = " << s << "[mm], r = " << r << "[mm]")
+    B2DEBUG(10, "... loaded LER aperture at s = " << s << "[mm], r = " << r << "[mm]");
   }
-  B2DEBUG(10, "... loaded " << m_apertSizeLER << " elements.")
+  B2DEBUG(10, "... loaded " << m_apertSizeLER << " elements.");
 
 
 }
@@ -260,7 +260,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
     B2DEBUG(20, "Return zero fields since inside both HER and LER at (x,y,z)=("
             << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m << "),"
             << " HER(X,Y,s)=(" << pHER.X() << "," << pHER.Y() << "," << pHER.Z()  << ")[cm], r_HER=" << r_HER << " [mm]  and "
-            << " LER(X,Y,s)=(" << pLER.X() << "," << pLER.Y() << "," << pLER.Z()  << ")[cm], r_LER=" << r_LER << " [mm] . ")
+            << " LER(X,Y,s)=(" << pLER.X() << "," << pLER.Y() << "," << pLER.Z()  << ")[cm], r_LER=" << r_LER << " [mm] . ");
 
     return TVector3(0, 0, 0);
   }
@@ -310,7 +310,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       B2DEBUG(20, "HER quadrupole fields calculated at (x,y,z)=("
               << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
               << ") i.e. (X,Y,s)=(" << X << "," << Y << "," << s
-              << ") is (Bx,By,Bz)=(" << B.X() << "," << B.Y() << "," << B.Z() << ").")
+              << ") is (Bx,By,Bz)=(" << B.X() << "," << B.Y() << "," << B.Z() << ").");
     }
 
     //=====================
@@ -358,7 +358,7 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       B2DEBUG(20, "HER quadrupole leak fields calculated at (x,y,z)=("
               << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
               << ") i.e. (X,Y,s)=(" << X << "," << Y << "," << s
-              << ") is (Bx,By,Bz)=(" << Bleak.X() << "," << Bleak.Y() << "," << Bleak.Z() << ").")
+              << ") is (Bx,By,Bz)=(" << Bleak.X() << "," << Bleak.Y() << "," << Bleak.Z() << ").");
     }
 
 
@@ -408,34 +408,34 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
       B2DEBUG(20, "LER quadrupole fields calculated at (x,y,z)=("
               << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
               << ") i.e. (X,Y,s)=(" << X << "," << Y << "," << s
-              << ") is (Bx,By,Bz)=(" << B.X() << "," << B.Y() << "," << B.Z() << ").")
+              << ") is (Bx,By,Bz)=(" << B.X() << "," << B.Y() << "," << B.Z() << ").");
     }
 
     return B;
   }
 
   /* No chance to reach here, but put this line just in case*/
-  B2FATAL("Quad magnetic field caluculation reaches to the abnormal position in the code")
+  B2FATAL("Quad magnetic field caluculation reaches to the abnormal position in the code");
 
   return TVector3(0, 0, 0);
 }
 
 void BFieldComponentQuad::terminate()
 {
-  B2DEBUG(10, "De-allocating the memory for the HER quadrupole magnetic field map loaded from the file '" << m_mapFilenameHER << "'")
+  B2DEBUG(10, "De-allocating the memory for the HER quadrupole magnetic field map loaded from the file '" << m_mapFilenameHER << "'");
   //De-Allocate memory to prevent memory leak
   delete [] m_mapBufferHER;
 
-  B2DEBUG(10, "De-allocating the memory for the LER quadrupole magnetic field map loaded from the file '" << m_mapFilenameLER << "'")
+  B2DEBUG(10, "De-allocating the memory for the LER quadrupole magnetic field map loaded from the file '" << m_mapFilenameLER << "'");
   delete [] m_mapBufferLER;
 
-  B2DEBUG(10, "De-allocating the memory for the HER leakage field map loaded from the file '" << m_mapFilenameHERleak << "'")
+  B2DEBUG(10, "De-allocating the memory for the HER leakage field map loaded from the file '" << m_mapFilenameHERleak << "'");
   delete [] m_mapBufferHERleak;
 
-  B2DEBUG(10, "De-allocating the memory for the HER aperture map loaded from the file '" << m_apertFilenameHER << "'")
+  B2DEBUG(10, "De-allocating the memory for the HER aperture map loaded from the file '" << m_apertFilenameHER << "'");
   delete [] m_apertBufferHER;
 
-  B2DEBUG(10, "De-allocating the memory for the LER aperture map loaded from the file '" << m_apertFilenameLER << "'")
+  B2DEBUG(10, "De-allocating the memory for the LER aperture map loaded from the file '" << m_apertFilenameLER << "'");
   delete [] m_apertBufferLER;
 
 }

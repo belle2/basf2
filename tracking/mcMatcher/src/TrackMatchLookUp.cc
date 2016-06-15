@@ -69,7 +69,7 @@ TrackMatchLookUp::TrackMatchLookUp(const std::string& mcRecoTrackStoreArrayName,
     m_prTracksStoreArrayName(DataStore::arrayName<RecoTrack>(prRecoTrackStoreArrayName))
 {
   if (m_mcTracksStoreArrayName == m_prTracksStoreArrayName) {
-    B2WARNING("Pattern recognition and Monte Carlo track candidate StoreArray are the same.")
+    B2WARNING("Pattern recognition and Monte Carlo track candidate StoreArray are the same.");
   }
 }
 

@@ -117,6 +117,6 @@ void ReceiveEventModule::endRun()
 
 void ReceiveEventModule::terminate()
 {
-  B2INFO("terminate called")
+  B2INFO("terminate called");
 }
 

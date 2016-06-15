@@ -54,7 +54,7 @@ void FastBDTClassifierTrainingModule::initialize()
 {
 
   if (m_PARAMuseSamples && m_PARAMstoreSamples) {
-    B2ERROR("storeSamples and useSamples are both set to true. However, only one option can be set at a time")
+    B2ERROR("storeSamples and useSamples are both set to true. However, only one option can be set at a time");
   }
 
   if (m_PARAMnTrees < 1) {

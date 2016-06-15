@@ -48,14 +48,14 @@ namespace Belle2 {
     void notifyRemove(unsigned int iD)
     {
       if (iD >= m_links.size()) {
-        B2WARNING("TCCompetitorGuard:notifyRemove: TC not officially registered in network yet! Skipping notifyRemove...")
+        B2WARNING("TCCompetitorGuard:notifyRemove: TC not officially registered in network yet! Skipping notifyRemove...");
         return;
       }
       if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 50, PACKAGENAME()) == true) {
         B2DEBUG(50, "TCCompetitorGuard:notifyRemove: id " << iD << " got " << m_links[iD].getNCompetitors() <<
-                " competitors which will now be informed")
+                " competitors which will now be informed");
 //    auto vecPrint = [] (const std::vector<unsigned int>& vec) -> std::string { std::string out; for (auto iD : vec) { out += "competitors: " + std::to_string(iD) + "\n" ; } return out; };
-        B2DEBUG(50, print(m_links[iD].getCompetitors()) << "\n")
+        B2DEBUG(50, print(m_links[iD].getCompetitors()) << "\n");
       }
 
       // clean now the competitors of given iD
@@ -65,7 +65,7 @@ namespace Belle2 {
         m_links[aCompetitor].removeCompetitor(iD);
         B2DEBUG(50, "TCCompetitorGuard:notifyRemove: current competitor " << aCompetitor << " has removed " << iD << ". nCompetitorsB4: " <<
                 nCompetitorsB4 << ", now: " <<
-                m_links.at(aCompetitor).getNCompetitors())
+                m_links.at(aCompetitor).getNCompetitors());
       }
       // clean now the node of the given iD, has to be done in separate step to prevent undefined behavior
       m_links[iD].clearAllCompetitors();
@@ -81,7 +81,7 @@ namespace Belle2 {
     void clearAllCompetitors(unsigned int iD)
     {
       if (iD >= m_links.size()) {
-        B2WARNING("TCCompetitorGuard:clearAllCompetitors: given ID is not part of the network! Skipping clearAllCompetitors...")
+        B2WARNING("TCCompetitorGuard:clearAllCompetitors: given ID is not part of the network! Skipping clearAllCompetitors...");
         return;
       }
       m_links[iD].clearAllCompetitors();

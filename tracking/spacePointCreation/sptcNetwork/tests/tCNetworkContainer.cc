@@ -94,12 +94,12 @@ namespace TCNetworkContainerTests {
                                                                 aVxdID));
 
         SpacePoint* newSP = spacePointData.appendNew(pxdCluster, &aSensorInfo);
-        B2DEBUG(10, " setup: new spacePoint got arrayIndex: " << newSP->getArrayIndex() << " and VxdID " << newSP->getVxdID())
+        B2DEBUG(10, " setup: new spacePoint got arrayIndex: " << newSP->getArrayIndex() << " and VxdID " << newSP->getVxdID());
         newSP->addRelationTo(pxdCluster);
       }
 
       B2DEBUG(10, "TCNetworkContainerTest:SetUP: created " << pxdClusterData.getEntries() << "/" << spacePointData.getEntries() <<
-              " pxdClusters/SpacePoints")
+              " pxdClusters/SpacePoints");
 
       /// prepare some SpacePointTrackCands partially overlapping:
       vector<SpacePoint*> allSpacePoints;
@@ -155,27 +155,27 @@ namespace TCNetworkContainerTests {
     /** remover function, here a dummy only */
     void notifyRemove(unsigned int iD)
     {
-      B2INFO("MicroObserver:notivyRemove: given iD: " << iD)
+      B2INFO("MicroObserver:notivyRemove: given iD: " << iD);
     }
 
     /** here a dummy only */
     bool hasCompetitors(unsigned int iD)
     {
-      B2INFO("MicroObserver:hasCompetitors: given iD: " << iD)
+      B2INFO("MicroObserver:hasCompetitors: given iD: " << iD);
       return false;
     }
 
     /** here a dummy only */
     bool areCompetitors(unsigned int a, unsigned int b)
     {
-      B2INFO("MicroObserver:areCompetitors: given iDs a/b: " << a << "/" << b)
+      B2INFO("MicroObserver:areCompetitors: given iDs a/b: " << a << "/" << b);
       return false;
     }
 
     /** here a dummy only */
     unsigned countCompetitors()
     {
-      B2INFO("MicroObserver:countCompetitors: does nothing...")
+      B2INFO("MicroObserver:countCompetitors: does nothing...");
       return 0;
     }
 

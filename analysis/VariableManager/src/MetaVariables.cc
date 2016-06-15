@@ -423,7 +423,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function getVariableByRank")
+        B2FATAL("Wrong number of arguments for meta function getVariableByRank");
       }
     }
 
@@ -581,7 +581,7 @@ namespace Belle2 {
         try {
           inputPDG = Belle2::convertString<int>(arguments[0]);
         } catch (boost::bad_lexical_cast&) {
-          B2ERROR("Argument must be an integer value.")
+          B2ERROR("Argument must be an integer value.");
         }
 
         auto func = [inputPDG](const Particle * particle) -> double{

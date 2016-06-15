@@ -212,7 +212,7 @@ namespace Belle2 {
     // calculate Sector ID
     unsigned short aSecID = aTool.calcSecID(uConfigTest, vConfigTest, normalizedCoordinates);
 
-    B2INFO(" calculated secID: " << aSecID << " from coordinates " << localCoordinates.first << "," << localCoordinates.second)
+    B2INFO(" calculated secID: " << aSecID << " from coordinates " << localCoordinates.first << "," << localCoordinates.second);
     // 1. Corner Calculate
     sectorCorner = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner1);
     EXPECT_DOUBLE_EQ(0.5, sectorCorner.first);
@@ -244,7 +244,7 @@ namespace Belle2 {
     // calculate Sector ID
     aSecID = aTool.calcSecID(uConfigTest, vConfigTest, normalizedCoordinates);
 
-    B2INFO(" calculated secID: " << aSecID << " from coordinates " << localCoordinates.first << "," << localCoordinates.second)
+    B2INFO(" calculated secID: " << aSecID << " from coordinates " << localCoordinates.first << "," << localCoordinates.second);
     // 1. Corner Calculate
     sectorCorner = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner1);
     EXPECT_DOUBLE_EQ(0.0, sectorCorner.first);

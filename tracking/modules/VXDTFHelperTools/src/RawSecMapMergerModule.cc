@@ -48,15 +48,15 @@ RawSecMapMergerModule::RawSecMapMergerModule() : Module()
 
 std::vector<std::string> RawSecMapMergerModule::getRootFiles(std::string mapName)
 {
-  B2INFO("RawSecMapMerger::getRootFiles(): loading mapName: " << mapName)
+  B2INFO("RawSecMapMerger::getRootFiles(): loading mapName: " << mapName);
 
   vector<string> files4ThisMap;
   for (string& fileName : m_PARAMrootFileNames) {
     if (fileName.find(mapName) == string::npos) {
-      B2DEBUG(1, "getRootFiles: fileName " << fileName << " was _not_ accepted for map " << mapName)
+      B2DEBUG(1, "getRootFiles: fileName " << fileName << " was _not_ accepted for map " << mapName);
       continue;
     }
-    B2DEBUG(1, "getRootFiles: fileName " << fileName << " accepted for map " << mapName)
+    B2DEBUG(1, "getRootFiles: fileName " << fileName << " accepted for map " << mapName);
     files4ThisMap.push_back(fileName);
   }
   return files4ThisMap;
@@ -68,7 +68,7 @@ std::vector<std::string> RawSecMapMergerModule::getRootFiles(std::string mapName
 
 std::unique_ptr<TChain> RawSecMapMergerModule::createTreeChain(const SectorMapConfig& configuration, std::string nHitString)
 {
-  B2INFO("RawSecMapMerger::createTreeChain(): loading mapName: " << configuration.secMapName << " with extension " << nHitString)
+  B2INFO("RawSecMapMerger::createTreeChain(): loading mapName: " << configuration.secMapName << " with extension " << nHitString);
   unique_ptr<TChain> treeChain = unique_ptr<TChain>(new TChain((configuration.secMapName + nHitString).c_str()));
 
   vector<string> fileList = getRootFiles(configuration.secMapName);
@@ -86,7 +86,7 @@ template<class ValueType> std::vector<BranchInterface<ValueType>> RawSecMapMerge
       const std::vector<std::string>& branchNames)
 {
   vector<BranchInterface<ValueType>> branches;
-  B2INFO("RawSecMapMerger::getBranches(): loading branches: " << branchNames.size())
+  B2INFO("RawSecMapMerger::getBranches(): loading branches: " << branchNames.size());
   unsigned nBranches = branchNames.size();
 
   branches.resize(nBranches, BranchInterface<ValueType>());
@@ -97,7 +97,7 @@ template<class ValueType> std::vector<BranchInterface<ValueType>> RawSecMapMerge
       &(branches[fPos].value),
       &(branches[fPos].branch));
   }
-  B2INFO("RawSecMapMerger::getBranches():  done")
+  B2INFO("RawSecMapMerger::getBranches():  done");
   return branches;
 }
 
@@ -144,7 +144,7 @@ template <class FilterType> void RawSecMapMergerModule::trainGraph(
 {
   auto nEntries = chain->GetEntries();
   B2DEBUG(10, "RawSecMapMerger::trainGraph():  start of " << nEntries << " entries in tree and " << sectorBranches.size() <<
-          " branches")
+          " branches");
   if (nEntries == 0) { B2WARNING("trainGraph: valid file but no data stored!"); return; }
 
   auto percentMark = nEntries / 10; auto progressCounter = 0;
@@ -152,7 +152,7 @@ template <class FilterType> void RawSecMapMergerModule::trainGraph(
   for (auto i = 0 ;  i <= nEntries; i++) {
     if (percentMark < 1 or (i % percentMark) == 0) {
       B2INFO("RawSecMapMerger::trainGraph(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
-             "% related, mainGraph has got " << mainGraph.size() << " sectors...")
+             "% related, mainGraph has got " << mainGraph.size() << " sectors...");
       progressCounter += 10;
     }
     auto thisEntry = chain->LoadTree(i);
@@ -182,7 +182,7 @@ template <class FilterType> SectorGraph<FilterType> RawSecMapMergerModule::build
 {
   auto nEntries = chain->GetEntries();
   B2INFO("RawSecMapMerger::buildGraph():  start of " << nEntries << " entries in tree and " << sectorBranches.size() <<
-         " branches")
+         " branches");
 
   // creating main graph containing all subgraphs:
   vector<string> filterNames;
@@ -197,7 +197,7 @@ template <class FilterType> SectorGraph<FilterType> RawSecMapMergerModule::build
   for (auto i = 0 ;  i <= nEntries; i++) {
     if (percentMark < 1 or (i % percentMark) == 0) {
       B2INFO("RawSecMapMerger::buildGraph(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
-             "% related, mainGraph has got " << mainGraph.size() << " sectors...")
+             "% related, mainGraph has got " << mainGraph.size() << " sectors...");
       progressCounter += 10;
     }
     auto thisEntry = chain->LoadTree(i);
@@ -220,7 +220,7 @@ template <class FilterType> SectorGraph<FilterType> RawSecMapMergerModule::build
     }
   } // entry-loop-end
 
-  B2INFO("RawSecMapMerger::buildGraph(): mainGraph finished - has now size: " << mainGraph.size())
+  B2INFO("RawSecMapMerger::buildGraph(): mainGraph finished - has now size: " << mainGraph.size());
   B2DEBUG(1, "fullGraph-Print: " << mainGraph.print());
 
   return mainGraph;
@@ -244,12 +244,12 @@ void RawSecMapMergerModule::printData(
   B2INFO("RawSecMapMerger::printData():  start of " << nEntries <<
          " entries in tree and " << sectorBranches.size() <<
          "/" << filterBranches.size() <<
-         " sector-/filter-branches")
+         " sector-/filter-branches");
 
   for (unsigned i = 0 ;  i < nEntries; i++) {
     if (percentMark > 1 and (i % percentMark) != 0) { continue; }
     progressCounter += 2;
-    B2INFO("RawSecMapMerger::printData(): entry " << i << " of " << nEntries << ":")
+    B2INFO("RawSecMapMerger::printData(): entry " << i << " of " << nEntries << ":");
 
     auto thisEntry = chain->LoadTree(i);
 
@@ -264,7 +264,7 @@ void RawSecMapMergerModule::printData(
       filterBranches[i].branch->GetEntry(thisEntry);
       out += filterBranches[i].name + ": " + to_string(filterBranches[i].value) + ". ";
     }
-    B2INFO(out << "\n")
+    B2INFO(out << "\n");
   }
 }
 
@@ -377,7 +377,7 @@ template <class FilterType> unsigned RawSecMapMergerModule::addAllSectorsToSecMa
     // // //    segmentFilters.addSectorsOnSensor(config.uDirectionCuts , config.vDirectionCuts, allSecIDsOfThisSensor);
 
     B2DEBUG(1, "Sensor: " << sensor << " had " << allTrainedSecIDsOfSensor.size() << " trained IDs and " << counter <<
-            " sectors in Total")
+            " sectors in Total");
   } // end loop sensor of vxdIDs.
 
   // and add the virtual IP:
@@ -403,10 +403,10 @@ template <class FilterType> void RawSecMapMergerModule::getSegmentFilters(
   if (xHitFilters->size() == 0) {
     unsigned nSectors = addAllSectorsToSecMapThingy(config, mainGraph, *xHitFilters);
     B2DEBUG(1, "RawSecMapMerger::getSegmentFilters: in addAllSectorsToSecMapThingy " << nSectors << " were added to secMap " <<
-            config.secMapName)
+            config.secMapName);
   } else {
     B2DEBUG(1, "RawSecMapMerger::getSegmentFilters: in given xHitFilters-container has size of " << xHitFilters->size() <<
-            " and therefore no further sectors have to be added.")
+            " and therefore no further sectors have to be added.");
   }
   B2DEBUG(1, "RawSecMapMerger::getSegmentFilters: secMap " << config.secMapName << " got the following sectors:\n" <<
           mainGraph.print());
@@ -443,7 +443,7 @@ template <class FilterType> void RawSecMapMergerModule::add2HitFilters(VXDTFFilt
                   + "/"
                   + std::to_string(filterCutsMap.at(filterName).getMax()) + ", ";
   }
-  B2DEBUG(1, "SubGraph " << subGraph.getID().print() << " - filter:min/max: " << filterVals)
+  B2DEBUG(1, "SubGraph " << subGraph.getID().print() << " - filter:min/max: " << filterVals);
 
 //   B2DEBUG(1, "SubGraph " << subGraph.getID().print() << " - min/max: " << named3D << ": " << filterCutsMap.at(named3D).getMin() << "/" << filterCutsMap.at(
 //  named3D).getMax() << ", ")
@@ -520,7 +520,7 @@ template <class FilterType> void RawSecMapMergerModule::add2HitFilters(VXDTFFilt
 
   // secIDs are sorted from outer to inner:
   B2DEBUG(1, "RawSecMapMerger::add2HitFilters: now adding FriendSectorFilter for secIDs (outer/inner): " << secIDs.at(
-            0) << "/" << secIDs.at(1))
+            0) << "/" << secIDs.at(1));
   if (filterContainer.addTwoHitFilter(secIDs.at(0), secIDs.at(1),
                                       friendSectorsSegmentFilter) == 0)
     B2WARNING("secMap: " << config.secMapName << "Problem adding the friendship relation from the inner sector:" <<
@@ -542,7 +542,7 @@ template <class FilterType> void RawSecMapMergerModule::add3HitFilters(VXDTFFilt
                   + "/"
                   + std::to_string(filterCutsMap.at(filterName).getMax()) + ", ";
   }
-  B2DEBUG(1, "SubGraph " << subGraph.getID().print() << " - filter:min/max: " << filterVals)
+  B2DEBUG(1, "SubGraph " << subGraph.getID().print() << " - filter:min/max: " << filterVals);
 
 
   /// JKL Jan 2016 - minimal working example:
@@ -648,7 +648,7 @@ template <class FilterType> void RawSecMapMergerModule::add4HitFilters(
  * }
  * }
  *
- * B2DEBUG(1, "Sensor: " << thisSensorID << " had " << allTrainedSecIDsOfThisSensor.size() << " trained IDs and " << counter << " sectors in Total")
+ * B2DEBUG(1, "Sensor: " << thisSensorID << " had " << allTrainedSecIDsOfThisSensor.size() << " trained IDs and " << counter << " sectors in Total");
  *
  * allFilters.addSectorsOnSensor(config.uDirectionCuts(layer), config.vDirectionCuts(layer), allSecIDsOfThisSensor); // TODO u/vDirectionCuts -> layerspecific!
  *

@@ -186,7 +186,7 @@ void  PedestalModule::terminate()
       ConditionsService::getInstance()->writePayloadFile(tempFile, this);
     }
     if (m_writefile == 1) {
-      B2INFO("writing itop pedestal file manually to " << m_out_ped_filename)
+      B2INFO("writing itop pedestal file manually to " << m_out_ped_filename);
       m_out_ped_file = TFile::Open(m_out_ped_filename.c_str(), "recreate");
       if (m_out_ped_file) {
         m_out_ped_file->cd();

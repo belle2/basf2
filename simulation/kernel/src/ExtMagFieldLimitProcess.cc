@@ -63,7 +63,7 @@ G4double ExtMagFieldLimitProcess::PostStepGetPhysicalInteractionLength(const G4T
       stepLength = m_stepLimit * pmag / BPerpMom;
     }
     B2DEBUG(300, "ExtMagFieldLimitProcess::PostStepGetPhysicalInteractionLength() stepLength "
-            << stepLength << " B " << BPerpMom << " BVec " << BVec << " pmag " << pmag)
+            << stepLength << " B " << BPerpMom << " BVec " << BVec << " pmag " << pmag);
   }
   return stepLength;
 }

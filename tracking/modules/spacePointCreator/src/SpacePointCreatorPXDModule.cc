@@ -57,7 +57,7 @@ void SpacePointCreatorPXDModule::initialize()
 
   B2INFO("SpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
          "pxdClusters: " << m_pxdClusters.getName() <<
-         "\nspacePoints: " << m_spacePoints.getName())
+         "\nspacePoints: " << m_spacePoints.getName());
 
 
   // set some counters for output:
@@ -74,7 +74,7 @@ void SpacePointCreatorPXDModule::event()
 
   B2DEBUG(1, "SpacePointCreatorPXDModule(" << m_nameOfInstance << ")::event: spacePoints created! Size of arrays:\n" <<
           "pxdClusters: " << m_pxdClusters.getEntries() <<
-          ", spacePoints: " << m_spacePoints.getEntries())
+          ", spacePoints: " << m_spacePoints.getEntries());
 
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {
@@ -88,7 +88,7 @@ void SpacePointCreatorPXDModule::event()
               " and VxdID " << VxdID(sp->getVxdID()) <<
               " is stored in Array: " << sp->getArrayName() <<
               " and the related PXDCluster is in " << relatedCluster->getArrayName() <<
-              " with index " << relatedCluster->getArrayIndex())
+              " with index " << relatedCluster->getArrayIndex());
     }
   }
 
@@ -102,7 +102,7 @@ void SpacePointCreatorPXDModule::terminate()
 {
   B2INFO("SpacePointCreatorPXDModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
          "pxdClusters: " << m_TESTERPXDClusterCtr <<
-         ", spacePoints: " << m_TESTERSpacePointCtr)
+         ", spacePoints: " << m_TESTERSpacePointCtr);
 }
 
 

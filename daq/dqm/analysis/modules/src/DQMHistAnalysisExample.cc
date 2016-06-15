@@ -64,6 +64,6 @@ void DQMHistAnalysisExampleModule::endRun()
 
 void DQMHistAnalysisExampleModule::terminate()
 {
-  B2INFO("terminate called")
+  B2INFO("terminate called");
 }
 

@@ -86,9 +86,9 @@ SecMapTrainerVXDTFModule::SecMapTrainerVXDTFModule() :
 /// /// /// /// /// /// /// /// INITIALIZE /// /// /// /// /// /// /// ///
 void SecMapTrainerVXDTFModule::initialize()
 {
-  B2INFO("~~~~~~~~~~~SecMapTrainerVXDTFModule - initialize ~~~~~~~~~~")
+  B2INFO("~~~~~~~~~~~SecMapTrainerVXDTFModule - initialize ~~~~~~~~~~");
   if (m_PARAMallowTraining == false)
-    B2FATAL("you want to execute SecMapTrainerVXDTF but the parameter 'allowTraining' is false! Aborting...")
+    B2FATAL("you want to execute SecMapTrainerVXDTF but the parameter 'allowTraining' is false! Aborting...");
 
     for (auto& trainer : m_secMapTrainers) {
       trainer.initialize();
@@ -107,7 +107,7 @@ void SecMapTrainerVXDTFModule::event()
   int thisRun = m_eventData->getRun();
   int thisEvent = m_eventData->getEvent();
   B2DEBUG(5, "~~~~~~~~~~~SecMapTrainerVXDTFModule - experiment/run/event " << thisExperiment << "/" << thisRun << "/" << thisEvent <<
-          " ~~~~~~~~~~")
+          " ~~~~~~~~~~");
 
   for (auto& trainer : m_secMapTrainers) {
     trainer.initializeEvent(thisExperiment, thisRun, thisEvent);
@@ -118,7 +118,7 @@ void SecMapTrainerVXDTFModule::event()
   unsigned nSPTCs = m_spacePointTrackCands.getEntries();
 
   if (nSPTCs == 0) {
-    B2DEBUG(1, "event " << thisEvent << ": there is no SpacePointTrackCandidate!")
+    B2DEBUG(1, "event " << thisEvent << ": there is no SpacePointTrackCandidate!");
     return;
   }
   B2DEBUG(5, "SecMapTrainerVXDTFModule, event " << thisEvent << ": size of array nSpacePointTrackCands: " << nSPTCs);
@@ -128,7 +128,7 @@ void SecMapTrainerVXDTFModule::event()
   unsigned nAccepted = 0;
   for (unsigned iTC = 0; iTC not_eq nSPTCs; ++ iTC) {
     const SpacePointTrackCand* currentTC = m_spacePointTrackCands[iTC];
-    B2DEBUG(10, "currens SPTC has got " << currentTC->getNHits() << " hits stored")
+    B2DEBUG(10, "currens SPTC has got " << currentTC->getNHits() << " hits stored");
 
 //     bool accepted = m_testTrainer.storeTC(*currentTC, iTC);
 
@@ -160,9 +160,9 @@ void SecMapTrainerVXDTFModule::event()
 /// /// /// /// /// /// /// /// TERMINATE /// /// /// /// /// /// /// ///
 void SecMapTrainerVXDTFModule::terminate()
 {
-  B2DEBUG(1, " SecMapTrainerVXDTFModule::terminate:: start.")
+  B2DEBUG(1, " SecMapTrainerVXDTFModule::terminate:: start.");
   for (auto& trainer : m_secMapTrainers) {
     trainer.terminate();
   }
-  B2INFO(" SecMapTrainerVXDTFModule, everything is done. Terminating.")
+  B2INFO(" SecMapTrainerVXDTFModule, everything is done. Terminating.");
 }

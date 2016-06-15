@@ -136,7 +136,7 @@ namespace VXDTFtwoHitFilterTest {
                        const typename Var::argumentType& innerHit,
                        otherTypes ...)
     {
-      B2ERROR(" Filter " << filterType.name() << " got result of " << fResult)
+      B2ERROR(" Filter " << filterType.name() << " got result of " << fResult);
     }
 
   };
@@ -158,7 +158,7 @@ namespace VXDTFtwoHitFilterTest {
                        otherTypes ...)
     {
       B2WARNING(" Filter " << filterType.name() << " with outerhit/innerhit: " << outerHit.getPosition().PrintStringXYZ() << "/" <<
-                innerHit.getPosition().PrintStringXYZ() << " got result of " << fResult)
+                innerHit.getPosition().PrintStringXYZ() << " got result of " << fResult);
     }
 
   };
@@ -188,10 +188,10 @@ namespace VXDTFtwoHitFilterTest {
     {
       B2INFO(" Filter " << filterType.name() << " with Mag of outer-/innerHit " << outerHit.getPosition().Mag() << "/" <<
              innerHit.getPosition().Mag() << " got result of " << fResult << " and Observer-Vector sm_collectedObservers got " <<
-             VectorOfObservers<FilterType>::sm_collectedObservers.size() << " observers collected")
+             VectorOfObservers<FilterType>::sm_collectedObservers.size() << " observers collected");
       B2INFO(" Filter " << filterType.name() << " with Mag of outer-/innerHit " << outerHit.getPosition().Mag() << "/" <<
              innerHit.getPosition().Mag() << " got result of " << fResult << " and Observer-Vector sm_collectedObserversCSTYLE got " <<
-             VectorOfObservers<FilterType>::sm_collectedObserversCSTYLE.size() << " observers collected")
+             VectorOfObservers<FilterType>::sm_collectedObserversCSTYLE.size() << " observers collected");
 
       /// the idea of the following three lines have to work in the end (I basically want to loop over all attached observers and execute their notify function):
       //    for(auto& anObserver : CollectedObservers<FilterType>::collectedObservers) {
@@ -259,7 +259,7 @@ namespace VXDTFtwoHitFilterTest {
     realname = abi::__cxa_demangle(typeid(storeFuncVariantB).name(), 0, 0, &status);
     std::string name(realname);
     free(realname);
-    B2INFO("storeFuncVariantB is of type: " << name)
+    B2INFO("storeFuncVariantB is of type: " << name);
 
 //  VectorOfObservers<Distance3DSquared>::sm_collectedObserversTry2.push_back(storeFuncVariantB);
 

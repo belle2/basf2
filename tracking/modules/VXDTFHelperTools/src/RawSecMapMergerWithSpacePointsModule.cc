@@ -138,23 +138,23 @@ void RawSecMapMergerWithSpacePointsModule::initialize()
   /// imported parameters check:
 
   if (m_PARAMimportROOTorXML == true) { ///import via root file
-    if (int(m_PARAMsampleQuantiles.size()) != 2) { B2FATAL(" parameter sampleQuantiles is wrong, only exactly 2 entries allowed!")}
-    if (int(m_PARAMsampleThreshold.size()) != 2) { B2FATAL(" parameter sampleThreshold is wrong, only exactly 2 entries allowed!")}
-    if (int(m_PARAMsmallSampleQuantiles.size()) != 2) { B2FATAL(" parameter smallSampleQuantiles is wrong, only exactly 2 entries allowed!")}
-    if (int(m_PARAMstretchFactor.size()) != 2) { B2FATAL(" parameter stretchFactor is wrong, only exactly 2 entries allowed!")}
+    if (int(m_PARAMsampleQuantiles.size()) != 2) { B2FATAL(" parameter sampleQuantiles is wrong, only exactly 2 entries allowed!");}
+    if (int(m_PARAMsampleThreshold.size()) != 2) { B2FATAL(" parameter sampleThreshold is wrong, only exactly 2 entries allowed!");}
+    if (int(m_PARAMsmallSampleQuantiles.size()) != 2) { B2FATAL(" parameter smallSampleQuantiles is wrong, only exactly 2 entries allowed!");}
+    if (int(m_PARAMstretchFactor.size()) != 2) { B2FATAL(" parameter stretchFactor is wrong, only exactly 2 entries allowed!");}
     if (m_PARAMrarenessFilter < 0. or m_PARAMrarenessFilter > 1.) {
       B2WARNING("ExportSectorMapModule::initialize:  parameter rarenessFilter is set to " << m_PARAMrarenessFilter <<
                 ", which is not within the allowed range of 0 < x < 1! Setting to 0...!"); m_PARAMrarenessFilter = 0;
     }
   } else { /// import via xml file
     if (int(m_PARAMsetOrigin.size()) != 3) {
-      B2WARNING("RawSecMapMergerWithSpacePointsModule::initialize: origin is set wrong, please set only 3 values (x,y,z). Rejecting user defined value and reset to (0,0,0)!")
+      B2WARNING("RawSecMapMergerWithSpacePointsModule::initialize: origin is set wrong, please set only 3 values (x,y,z). Rejecting user defined value and reset to (0,0,0)!");
       m_PARAMsetOrigin.clear();
       m_PARAMsetOrigin = {0., 0., 0.};
     }
     B2INFO("RawSecMapMergerWithSpacePointsModule::initialize: origin is set to: (x,y,z) (" << m_PARAMsetOrigin[0] << "," <<
            m_PARAMsetOrigin[1] << ","
-           << m_PARAMsetOrigin[2] << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T")
+           << m_PARAMsetOrigin[2] << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T");
   }
 }
 
@@ -175,7 +175,7 @@ void RawSecMapMergerWithSpacePointsModule::terminate()
 
     B2INFO("Imported via XML-file: number of Sector-Entries: " << m_fullSectorMapCopy.size() << ", of friend-entries: " <<
            countedStuff.first << ", of filter-entries: " << countedStuff.second << ", mField: " << m_PARAMmagneticFieldStrength <<
-           "T, and additional Info:\n" << m_PARAMadditionalInfo)
+           "T, and additional Info:\n" << m_PARAMadditionalInfo);
   } else { // import via root file
 
     pair<int, int> countedStuff = importROOTMap();              /// importROOTMap
@@ -184,7 +184,7 @@ void RawSecMapMergerWithSpacePointsModule::terminate()
       B2INFO("Imported via ROOT-file of a total of " << countedStuff.first << "/" << countedStuff.second <<
              " sectors/totalEntries, to XML converted number of Sector-Entries: " << aMap.size() << ", of friend-entries: " <<
              aMap.getNumOfFriends() << ", of final cutoffValues: " << aMap.getNumOfValues() << ", mField: " << aMap.getMagneticFieldStrength() <<
-             "T, and additional Info:\n" << aMap.getAdditionalInfo())
+             "T, and additional Info:\n" << aMap.getAdditionalInfo());
     }
   }
 
@@ -193,7 +193,7 @@ void RawSecMapMergerWithSpacePointsModule::terminate()
   m_fillStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
 
   B2INFO("RawSecMapMergerWithSpacePointsModule::terminate: importing the map took " << (m_fillStuff.count()) << "/" << int(
-           m_fillStuff.count() * 0.000001) << " nano-/milliseconds")
+           m_fillStuff.count() * 0.000001) << " nano-/milliseconds");
 }
 
 
@@ -204,7 +204,7 @@ double RawSecMapMergerWithSpacePointsModule::getXMLValue(GearDir& cuts, string& 
   try {
     aValue = cuts.getDouble(valueType);
   } catch (...) {
-    B2WARNING("import of " << filterType << "-" << valueType << "-value failed! Setting to 0!!")
+    B2WARNING("import of " << filterType << "-" << valueType << "-value failed! Setting to 0!!");
     aValue = 0;
   }
   return aValue;
@@ -228,7 +228,7 @@ std::pair<int, int> RawSecMapMergerWithSpacePointsModule::importXMLMap()
 
   if (sectorList.getNumberNodes("aSector") == 0) {
     B2FATAL("Failed to import sector map " << chosenSetup <<
-            "! No track finding possible. Please check ../tracking/data/VXDTFindex.xml whether your chosen sector maps are uncommented (and files linked there are not zipped) and recompile if you change entries...")
+            "! No track finding possible. Please check ../tracking/data/VXDTFindex.xml whether your chosen sector maps are uncommented (and files linked there are not zipped) and recompile if you change entries...");
   }
 
   double cutoffMinValue, cutoffMaxValue;
@@ -262,7 +262,7 @@ std::pair<int, int> RawSecMapMergerWithSpacePointsModule::importXMLMap()
         GearDir cuts(aFilter, "cuts/");
         cutoffMinValue = 0., cutoffMaxValue = 0.;
         int filterID = FilterID().getFilterType(aFilterName);
-        if (filterID == FilterID::numFilters) { B2FATAL("Filter in XML-File does not exist! check FilterID-class!")}
+        if (filterID == FilterID::numFilters) { B2FATAL("Filter in XML-File does not exist! check FilterID-class!");}
         // now, for each filter will be checked, whether it shall be stored or not and whether the cutoffs shall be modified:
         if (aFilterName == FilterID::nameDistance3D) {   // first: activateDistance3D, second: tuneDistance3D
           cutoffMinValue = getXMLValue(cuts, min, aFilterName);
@@ -410,7 +410,7 @@ std::pair<int, int> RawSecMapMergerWithSpacePointsModule::importROOTMap()
         0;// values are all the values measured for each cutoff-type which are used for calculating the cutoffs afterwards
 
   string fileName =  m_PARAMrootFileName + "SecMap.root";
-  B2DEBUG(1, "importROOTMap: reading file " << fileName)
+  B2DEBUG(1, "importROOTMap: reading file " << fileName);
   SecMapVector importedMaps; // stores all different maps which were imported (similar maps are combined)
 
 
@@ -429,13 +429,13 @@ std::pair<int, int> RawSecMapMergerWithSpacePointsModule::importROOTMap()
         retrievedVector = static_cast<SecMapVector*>
                           (key->ReadObj()); // not very performant, but here, the performance is not an issue, especially since there is only a relatively small number of vectors imported - compared the size of their objects
       } catch (exception& e) {
-        B2WARNING("Key was not a SecMapVector, therefore error message: " << e.what() << "\n Skipping this key...")
+        B2WARNING("Key was not a SecMapVector, therefore error message: " << e.what() << "\n Skipping this key...");
         continue;
       }
 
       countSecMapVectors++;
       B2INFO(" current secMapVector has " << retrievedVector->size() << " secMaps stored, this vector is number " << countSecMapVectors <<
-             "!")
+             "!");
       unsigned nExternalMaps = retrievedVector->size();
       countExternalMaps += nExternalMaps;
 //      std::vector< Belle2::SecMapVector::MapPack>
@@ -443,7 +443,7 @@ std::pair<int, int> RawSecMapMergerWithSpacePointsModule::importROOTMap()
         countMaps++;
         B2INFO("opening new map " << tempSecMap.second.getMapName() <<  " (number " << countMaps << " so far), with " <<
                tempSecMap.second.getNumOfSectors() << " sectors, " << tempSecMap.second.getNumOfFriends() << " friends and " <<
-               tempSecMap.second.getNumOfValues() << " total values" << endl;)
+               tempSecMap.second.getNumOfValues() << " total values" << endl;);
 
 
         /// merging intermediate maps to one map of each type:
@@ -452,32 +452,32 @@ std::pair<int, int> RawSecMapMergerWithSpacePointsModule::importROOTMap()
         for (SecMapVector::MapPack& anotherMap : importedMaps.getFullVector()) {  // loop over already existing maps
           ++countNumberOfComparisons;
           B2INFO("Iteration " << countNumberOfComparisons << " (of " << nExternalMaps * nInternalMaps << "), current retrieved map: " <<
-                 tempSecMap.first << ", current imported map: " << anotherMap.first << " taken from SecMapVector with size of " << nInternalMaps)
+                 tempSecMap.first << ", current imported map: " << anotherMap.first << " taken from SecMapVector with size of " << nInternalMaps);
           B2DEBUG(5, "tempSecMap.second, anotherMap.second:\ndetectorType: " << tempSecMap.second.getDetectorType() << ", " <<
                   anotherMap.second.getDetectorType() << ",  size: " << tempSecMap.second.size() << ", " << anotherMap.second.size() << ",  MapName: "
                   << tempSecMap.second.getMapName() << ", " << anotherMap.second.getMapName() << ",  MagneticField: " <<
                   tempSecMap.second.getMagneticFieldStrength() << ", " << anotherMap.second.getMagneticFieldStrength() << ",  origin: " <<
-                  tempSecMap.second.getOrigin().Mag() << ", " << anotherMap.second.getOrigin().Mag())
+                  tempSecMap.second.getOrigin().Mag() << ", " << anotherMap.second.getOrigin().Mag());
 
           if (tempSecMap.second == anotherMap.second) {  // compares VXDTFRawSecMaps
             countMatches++;
             B2INFO("Partner found for " << anotherMap.first << " and will now be merged " << tempSecMap.first << ", there were " << countMatches
-                   << " matches for maps so far")            anotherMap.second.addSectorMap(
+                   << " matches for maps so far");            anotherMap.second.addSectorMap(
                      tempSecMap.second.getSectorMap()); // INFO: removes entries from imported map and adds it to existing one ( more precisely: if sector-friend-combination already exists and current filterType too, then all values of added map will be moved to the existing one. If the sector, or the sector-friend-combination or the filterType in that combi does not exist yet, then the data gets copied, not moved)
             anotherMap.second.addDistances(tempSecMap.second.getDistances()); // after adding sectors, the sector-distaces are added separately
-            B2INFO("Map: " << anotherMap.first << " has been merged with " << tempSecMap.first)
+            B2INFO("Map: " << anotherMap.first << " has been merged with " << tempSecMap.first);
             partnerMapFound = true;
             break;
           }
         }
         if (partnerMapFound == false) {
           importedMaps.push_back(tempSecMap);
-          B2INFO("Map: " << tempSecMap.first << " has no compatible pendant imported yet, storing directly ")
+          B2INFO("Map: " << tempSecMap.first << " has no compatible pendant imported yet, storing directly ");
         }
 
-        B2INFO("ExportSectorMapModule::importROOTMap: finishing import of new map " << tempSecMap.second.getMapName())
+        B2INFO("ExportSectorMapModule::importROOTMap: finishing import of new map " << tempSecMap.second.getMapName());
         B2DEBUG(5, ", with " << tempSecMap.second.getNumOfSectors() << " sectors, " << tempSecMap.second.getNumOfFriends() <<
-                " friends and " << tempSecMap.second.getNumOfValues() << " total values" << endl;)
+                " friends and " << tempSecMap.second.getNumOfValues() << " total values" << endl;);
       }
     }
     importedRootFile.Close();
@@ -493,9 +493,9 @@ std::pair<int, int> RawSecMapMergerWithSpacePointsModule::importROOTMap()
       countTotalValues += aMap.second.getNumOfValues();
     }
 
-    B2INFO("counted manually afterwards: " << endl << importedMapsCounted.str() << endl)
+    B2INFO("counted manually afterwards: " << endl << importedMapsCounted.str() << endl);
     B2INFO("got " << countExternalMaps << "/" << importedMaps.size() << " external/imported maps inhabiting " << countTotalValues <<
-           " total values")
+           " total values");
   } // end root-check
 
 

@@ -74,7 +74,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
       if (primaryParticle->GetUserInformation() != NULL) {
         const_cast<G4Track*>(track)->SetUserInformation(new TrackInfo(ParticleInfo::getInfo(*primaryParticle)));
       } else {
-        B2WARNING(track->GetDefinition()->GetPDGEncoding() << " has no MCParticle user information !")
+        B2WARNING(track->GetDefinition()->GetPDGEncoding() << " has no MCParticle user information !");
       }
     }
 
@@ -114,7 +114,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
     }
 
   } catch (CouldNotFindUserInfo& exc) {
-    B2FATAL(exc.what())
+    B2FATAL(exc.what());
   }
 }
 
@@ -184,6 +184,6 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
       }
     }
   } catch (CouldNotFindUserInfo& exc) {
-    B2FATAL(exc.what())
+    B2FATAL(exc.what());
   }
 }

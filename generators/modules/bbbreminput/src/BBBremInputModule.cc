@@ -102,10 +102,10 @@ void BBBremInputModule::terminate()
   m_generator.term();
 
   B2RESULT("Cross-section (weighted):                   " << m_generator.getCrossSection() << " +/- " <<
-           m_generator.getCrossSectionError() << " [mb]")
-  B2RESULT("Maximum weight delivered:                   " << m_generator.getMaxWeightDelivered())
+           m_generator.getCrossSectionError() << " [mb]");
+  B2RESULT("Maximum weight delivered:                   " << m_generator.getMaxWeightDelivered());
   B2RESULT("Overweight bias cross-section (unweighted): " << m_generator.getCrossSectionOver() << " +/- " <<
-           m_generator.getCrossSectionErrorOver() << " [mb]")
+           m_generator.getCrossSectionErrorOver() << " [mb]");
 }
 
 void BBBremInputModule::initializeGenerator()

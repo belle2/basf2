@@ -51,7 +51,7 @@ namespace Belle2 {
 
     void He3tubeModule::initialize()
     {
-      B2INFO("He3tube: Initialize")
+      B2INFO("He3tube: Initialize");
       //Here you can do some stuff before processing starts. If you want to
       //write to some collections of the DataStore you have to register these
       //here by using StoreArray<T>::registerPersistent() for collections which

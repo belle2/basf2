@@ -91,7 +91,7 @@ namespace Belle2 {
       auto pos = SelectionVariableType::s_fromTypeToString.find(type);
       if (pos == SelectionVariableType::s_fromTypeToString.end()) {
         B2ERROR("SelectionVariableType::getTypeName(): given iD " << type <<
-                " is not a valid SelectionVariableType, return SelectionVariableType::UnknownType!")
+                " is not a valid SelectionVariableType, return SelectionVariableType::UnknownType!");
         return SelectionVariableType::s_fromTypeToString[UnknownType];
       }
       return pos->second;
@@ -104,7 +104,7 @@ namespace Belle2 {
       auto pos = SelectionVariableType::s_fromStringToType.find(type);
       if (pos == SelectionVariableType::s_fromStringToType.end()) {
         B2ERROR("SelectionVariableType::getTypeName(): given iD " << type <<
-                " is not a valid SelectionVariableType, return SelectionVariableType::UnknownType!")
+                " is not a valid SelectionVariableType, return SelectionVariableType::UnknownType!");
         return SelectionVariableType::s_fromStringToType[std::string("UnknownType")];
       }
       return pos->second;

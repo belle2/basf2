@@ -732,7 +732,7 @@ void GenFitterVXDTBModule::event()
 
 void GenFitterVXDTBModule::endRun()
 {
-  B2INFO("----- GenFitter run summary")
+  B2INFO("----- GenFitter run summary");
   B2INFO("      " << m_successfulGFTrackCandFitCounter << " track candidates were fitted successfully");
   B2INFO("      in total " << m_successfulFitCounter << " tracks were fitted");
   if (m_failedFitCounter > 0) {

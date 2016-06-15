@@ -141,6 +141,6 @@ void DQMHistAnalysisOutputNSMModule::endRun()
 
 void DQMHistAnalysisOutputNSMModule::terminate()
 {
-  B2INFO("terminate called")
+  B2INFO("terminate called");
 }
 

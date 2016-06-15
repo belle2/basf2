@@ -42,7 +42,7 @@ QualityEstimatorVXDCircleFitModule::QualityEstimatorVXDCircleFitModule() : Modul
 void QualityEstimatorVXDCircleFitModule::event()
 {
   m_eventCounter++;
-  B2DEBUG(1, "\n" << "QualityEstimatorVXDCircleFitModule:event: event " << m_eventCounter << "\n")
+  B2DEBUG(1, "\n" << "QualityEstimatorVXDCircleFitModule:event: event " << m_eventCounter << "\n");
   m_nTCsTotal += m_spacePointTrackCands.getEntries();
 
 
@@ -114,7 +114,7 @@ void QualityEstimatorVXDCircleFitModule::endRun()
 
   B2INFO("QualityEstimatorVXDCircleFitModule:endRun: events: " << m_eventCounter
          << ", nSPTCsPerEvent: " << invEvents * float(m_nTCsTotal)
-        )
+        );
 }
 
 

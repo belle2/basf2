@@ -105,7 +105,7 @@ void BHWideInputModule::terminate()
 
   B2RESULT("BHWideInputModule: Total cross section: " << m_generator.getCrossSection() * 0.001 << " nb +- " <<
            m_generator.getCrossSection() *
-           m_generator.getCrossSectionError() * 0.001 << " nb")
+           m_generator.getCrossSectionError() * 0.001 << " nb");
 }
 
 void BHWideInputModule::initializeGenerator()

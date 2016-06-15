@@ -48,7 +48,7 @@ void TrackSetEvaluatorHopfieldNNModule::event()
   m_nTCsCleanAtStart += nCleanTCsAtStart;
 
   B2DEBUG(10, "TrackSetEvaluatorHopfieldNNModule - in event " << m_eventCounter << ": got " << nTCs <<
-          " TC of which " << nCompetitors << " are overlapping")
+          " TC of which " << nCompetitors << " are overlapping");
 
   m_tcNetwork->replaceTrackSetEvaluator(new TrackSetEvaluatorHopfieldNN<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard>
                                         (m_tcNetwork->getNodes(), m_tcNetwork->getObserver()));
@@ -57,7 +57,7 @@ void TrackSetEvaluatorHopfieldNNModule::event()
 
   if (!wasSuccessful) {
     B2WARNING("TrackSetEvaluatorHopfieldNNModule - in event " << m_eventCounter <<
-              ": Hopfield did not succeed! Now trying fallback solution: Greedy!!")
+              ": Hopfield did not succeed! Now trying fallback solution: Greedy!!");
     m_nHopfieldFails++;
 
     m_tcNetwork->replaceTrackSetEvaluator(new TrackSetEvaluatorGreedy<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard>
@@ -67,7 +67,7 @@ void TrackSetEvaluatorHopfieldNNModule::event()
 
     if (!wasSuccessful) { // not even greedy did work!
       B2ERROR("TrackSetEvaluatorGreedyModule - in event " << m_eventCounter <<
-              ": greedy did not succeed! tracks were not successfully cleaned of overlaps!")
+              ": greedy did not succeed! tracks were not successfully cleaned of overlaps!");
       m_completeFails++;
       return;
     }
@@ -104,7 +104,7 @@ void TrackSetEvaluatorHopfieldNNModule::endRun()
          ", sum of QI total: " << m_totalQI <<
          ", sum of QI after cleanOverlaps: " << m_totalSurvivingQI <<
          ", highest/lowest QI found: " << m_maxQI << "/" << m_minQI <<
-         ", number of times Hopfield (and Greedy) did not succeed: " << m_nHopfieldFails << "(" << m_completeFails << ")")
+         ", number of times Hopfield (and Greedy) did not succeed: " << m_nHopfieldFails << "(" << m_completeFails << ")");
 }
 
 

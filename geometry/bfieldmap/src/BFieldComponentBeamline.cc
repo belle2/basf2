@@ -66,11 +66,11 @@ void BFieldComponentBeamline::initialize_beamline(int isher)
   }
 
   if (mapFilename.empty()) {
-    B2ERROR("The filename for the beamline magnetic field component is empty !")
+    B2ERROR("The filename for the beamline magnetic field component is empty !");
     return;
   }
   if (mapFilename.empty()) {
-    B2ERROR("The filename for the beamline interpolation component is empty !")
+    B2ERROR("The filename for the beamline interpolation component is empty !");
     return;
   }
 
@@ -78,7 +78,7 @@ void BFieldComponentBeamline::initialize_beamline(int isher)
   string fullPath = FileSystem::findFile("/data/" + mapFilename);
 
   if (!FileSystem::fileExists(fullPath)) {
-    B2ERROR("The beamline magnetic field map file '" << mapFilename << "' could not be found !")
+    B2ERROR("The beamline magnetic field map file '" << mapFilename << "' could not be found !");
     return;
   }
 
@@ -88,7 +88,7 @@ void BFieldComponentBeamline::initialize_beamline(int isher)
   fieldMapFile.push(io::file_source(fullPath));
 
   //Create the magnetic field map [r,z] and read the data from the file
-  B2DEBUG(10, "Loading the beamline magnetic field from file '" << mapFilename << "' in to the memory...")
+  B2DEBUG(10, "Loading the beamline magnetic field from file '" << mapFilename << "' in to the memory...");
 
   fieldMapFile >> m_mapSizeRPhi[isher] >> m_jointR >> m_nGridR >> m_nGridPhi;
   fieldMapFile >> m_mapSizeZ >> m_jointZ >> m_gridPitchZ[0] >> m_gridPitchZ[1];
@@ -122,7 +122,7 @@ void BFieldComponentBeamline::initialize_beamline(int isher)
   fullPath = FileSystem::findFile("/data/" + interFilename);
 
   if (!FileSystem::fileExists(fullPath)) {
-    B2ERROR("The beamline interpolation map file '" << interFilename << "' could not be found !")
+    B2ERROR("The beamline interpolation map file '" << interFilename << "' could not be found !");
     return;
   }
 

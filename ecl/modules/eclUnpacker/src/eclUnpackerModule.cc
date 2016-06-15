@@ -284,7 +284,7 @@ void ECLUnpackerModule::readRawECLData(RawCOPPER* rawCOPPERData, int n)
     catch (...) {
       // errors while reading data block
       // do something (count errors etc) TODO
-      B2ERROR("Corrupted data from ECL collector")
+      B2ERROR("Corrupted data from ECL collector");
     }
   }
 }

@@ -427,7 +427,7 @@ namespace PurityCalcTests {
     ASSERT_FALSE(findIt == mcParts.end());
     EXPECT_DOUBLE_EQ(findIt->second, 1);
 
-    B2INFO("The occuring error message is expected! It is used to discover some corner cases in real usage!")
+    B2INFO("The occuring error message is expected! It is used to discover some corner cases in real usage!");
     mcParts = getMCParticles<PXDTrueHit>(m_spacePoints[3]); // PXD with two TrueHits pointing to one MCParticle
     ASSERT_EQ(mcParts.size(), 1);
     EXPECT_EQ(mcParts[0].first, 1); // related to MCParticle 2
@@ -519,7 +519,7 @@ namespace PurityCalcTests {
     unsigned totCls = 20;
     float ndf = 4 * 2 + 8 * 2; // 4 PXD SpacePoints, and 8 two Cluster SVD-SpacePoints
 
-    B2INFO("There will be WARNING and ERROR messages! Those are expected!")
+    B2INFO("There will be WARNING and ERROR messages! Those are expected!");
     std::vector<MCVXDPurityInfo> purities = createPurityInfos(sptc); // create the purityInfos
 
     EXPECT_EQ(purities.size(), 4); // 4 different Particle Ids: 0, 1, -1, -2

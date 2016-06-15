@@ -58,7 +58,7 @@ void ExportGeometryModule::initialize()
 {
   //Check parameters
   if (!FileSystem::fileDirExists(m_filenameROOT)) {
-    B2ERROR("Parameter <Filename>: The path of the filename " << m_filenameROOT << " does not exist !")
+    B2ERROR("Parameter <Filename>: The path of the filename " << m_filenameROOT << " does not exist !");
   }
 #ifndef HAS_GDML
   if (m_exportAsGDML) {

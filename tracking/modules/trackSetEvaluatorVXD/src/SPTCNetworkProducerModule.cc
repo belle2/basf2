@@ -47,7 +47,7 @@ void SPTCNetworkProducerModule::event()
           << ": tcArray with name " << m_PARAMtcArrayName
           << " got " << m_spacePointTrackCands.getEntries()
           << " SPTCs!\n"
-          << ", mode to compare TCs is set to " << m_tcNetwork->getCompareTCsMode())
+          << ", mode to compare TCs is set to " << m_tcNetwork->getCompareTCsMode());
 
   // fill the tcNetwork
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
@@ -60,9 +60,9 @@ void SPTCNetworkProducerModule::event()
           << " nodes (TCs), of which " << m_tcNetwork->getNTCsAlive()
           << "are still alive and " << m_tcNetwork->getNCompetitors()
           << "are linked to each other (overlapping)..."
-         )
+         );
 
-  B2DEBUG(10, "in event " << m_eventCounter << " the network looks like this:")
+  B2DEBUG(10, "in event " << m_eventCounter << " the network looks like this:");
 //   m_tcNetwork->print();
 
   m_nNodesNetwork += m_tcNetwork->size();
@@ -80,7 +80,7 @@ void SPTCNetworkProducerModule::endRun()
          << ", nSPTCsPerEvent: " << invEvents * float(m_nTCsTotal)
          << ", nNodesPerEvent: " << invEvents * float(m_nNodesNetwork)
          << ", nLinksPerEvent: " << invEvents * float(m_nLinksNetwork)
-        )
+        );
 }
 
 

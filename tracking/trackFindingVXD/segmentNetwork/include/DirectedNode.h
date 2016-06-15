@@ -66,7 +66,7 @@ namespace Belle2 {
     /** copy constructor */
     DirectedNode(const DirectedNode& node) : m_entry(node.m_entry), m_innerNodes(node.m_innerNodes), m_outerNodes(node.m_outerNodes),
       m_index(node.m_index), m_metaInfo(node.m_metaInfo)
-    { B2ERROR("DirectedNode-copy-constructor has been called!") }
+    { B2ERROR("DirectedNode-copy-constructor has been called!"); }
 
     /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */
 
@@ -75,14 +75,14 @@ namespace Belle2 {
     void addInnerNode(DirectedNode<EntryType, MetaInfoType>& newNode)
     {
       B2DEBUG(10, "DirectedNode::addInnerNode(): was called! OwnIndex/newInnerNodeIndex: " << m_index << "/" << newNode.getIndex() <<
-              " and innerNodesSize: " << m_innerNodes.size() << ")!")
+              " and innerNodesSize: " << m_innerNodes.size() << ")!");
       m_innerNodes.push_back(&newNode);
 //    auto* newPtr(&newNode);
 //    B2WARNING("newPtr = " << newPtr << " and newPtr->getIndex: " << newPtr->getIndex())
 //    m_innerNodes.push_back(newPtr); // WARNING ERROR does not work...
 
 //    m_innerNodes.push_back(newNode.getIndex());
-      B2DEBUG(250, "push_back of nodeIndex: " << m_index << " is over and has now innerNodesSize: " << m_innerNodes.size())
+      B2DEBUG(250, "push_back of nodeIndex: " << m_index << " is over and has now innerNodesSize: " << m_innerNodes.size());
     }
 
 
@@ -90,10 +90,10 @@ namespace Belle2 {
     void addOuterNode(DirectedNode<EntryType, MetaInfoType>& newNode)
     {
       B2DEBUG(10, "DirectedNode::addOuterNode(): was called! OwnIndex/outerNodeIndex: " << m_index << "/" << newNode.getIndex() <<
-              " and outerNodesSize: " << m_outerNodes.size() << ")!")
-      B2DEBUG(10, "m_index is: " << m_index)
+              " and outerNodesSize: " << m_outerNodes.size() << ")!");
+      B2DEBUG(10, "m_index is: " << m_index);
       m_outerNodes.push_back(&newNode);
-      B2DEBUG(250, "push_back of nodeIndex: " << m_index << " is over and has now innerNodesSize: " << m_outerNodes.size())
+      B2DEBUG(250, "push_back of nodeIndex: " << m_index << " is over and has now innerNodesSize: " << m_outerNodes.size());
     }
 
 

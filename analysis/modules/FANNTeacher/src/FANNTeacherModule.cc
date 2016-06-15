@@ -223,7 +223,7 @@ namespace Belle2 {
       if (!load(m_filename, arrayname)) {
         m_MLPs.push_back(FANNMLP(arrayname, m_variableNames, m_targetName, nNodes, neuronType, trainingMethod, nCycles,
                                  validationFraction, randomSeeds, testRate, nThreads, epochMonitoring));
-      } else B2ERROR("FANN Method " << arrayname << " already trained in File " << m_filename << ".")
+      } else B2ERROR("FANN Method " << arrayname << " already trained in File " << m_filename << ".");
       }
   }
 

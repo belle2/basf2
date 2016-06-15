@@ -71,13 +71,13 @@ void GeoMagneticField::create(const GearDir& content, G4LogicalVolume& /*topVolu
   BOOST_FOREACH(const GearDir & component, content.getNodes("Components/Component")) {
     //Get the type of the magnetic field and call the appropriate function
     string compType = component.getString("attribute::type");
-    B2DEBUG(10, "GeoMagneticField creator: Loading the parameters for the component type'" << compType << "'")
+    B2DEBUG(10, "GeoMagneticField creator: Loading the parameters for the component type'" << compType << "'");
 
     findIter = m_componentTypeMap.find(compType);
     if (findIter != m_componentTypeMap.end()) {
       findIter->second(component);
     } else {
-      B2ERROR("The magnetic field component type '" << compType << "' is unknown !")
+      B2ERROR("The magnetic field component type '" << compType << "' is unknown !");
     }
   }
 }

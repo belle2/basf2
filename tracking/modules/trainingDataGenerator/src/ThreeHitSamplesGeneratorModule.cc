@@ -195,7 +195,7 @@ bool ThreeHitSamplesGeneratorModule::isValidHitCombination(const std::vector<con
     prevLayer = layer;
   }
 
-  B2DEBUG(150, "Combination is valid!")
+  B2DEBUG(150, "Combination is valid!");
   return true;
 }
 

@@ -43,13 +43,13 @@ namespace Belle2 {
 
         layerErrors.push_back(make_pair(globalError.X(), globalError.Y()));
         B2DEBUG(175, " getGlobalizedHitErrors at layer " << layer << ", ladder " << ladder << ", sigmaX/Y/Z" << globalError.X() << "/" <<
-                globalError.Y() << "/" << globalError.Z() <<  " [unit cm?]")
+                globalError.Y() << "/" << globalError.Z() <<  " [unit cm?]");
       }
 
       errorContainer.push_back(layerErrors);
     }
 
-    B2DEBUG(1, " getGlobalizedHitErrors, " << errorContainer.size() << " layers stored...")
+    B2DEBUG(1, " getGlobalizedHitErrors, " << errorContainer.size() << " layers stored...");
 
     return errorContainer;
   }
@@ -73,10 +73,10 @@ namespace Belle2 {
 //      double sigmaV = aSensorInfo.getUPitch(0.); // error at center of sensor
 //       double sigmaU = aSensorInfo.getVPitch(0.); // error at center of sensor
       errorContainer.push_back(make_pair(sigmaU, sigmaV));
-      B2DEBUG(5, " getHitErrors at layer " << layer << ", sigmaU/V" << sigmaU << "/" << sigmaV << " [unit cm?]")
+      B2DEBUG(5, " getHitErrors at layer " << layer << ", sigmaU/V" << sigmaU << "/" << sigmaV << " [unit cm?]");
     }
 
-    B2DEBUG(1, " getHitErrors, " << errorContainer.size() << " layers stored...")
+    B2DEBUG(1, " getHitErrors, " << errorContainer.size() << " layers stored...");
     return errorContainer;
   }
 

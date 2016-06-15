@@ -166,7 +166,7 @@ void VXDDedxPIDModule::initialize()
                    or fabs(xMax - m_pdfs[detector][iPart]->GetXaxis()->GetXmax()) > epsFactor * xMax
                    or fabs(yMin - m_pdfs[detector][iPart]->GetYaxis()->GetXmin()) > epsFactor * yMax
                    or fabs(yMax - m_pdfs[detector][iPart]->GetYaxis()->GetXmax()) > epsFactor * yMax) {
-          B2FATAL("PDF for PDG " << pdgCode << ", detector " << detector << suffix << " has binning/dimensions differing from previous PDF.")
+          B2FATAL("PDF for PDG " << pdgCode << ", detector " << detector << suffix << " has binning/dimensions differing from previous PDF.");
         }
       }
     }

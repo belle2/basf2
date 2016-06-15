@@ -73,7 +73,7 @@ void HitExporter::storeSensorInfo(const VXD::SensorInfoBase& aSensorInfo)
 //  double thicknessInRadiationLengthNoUnits = thickness*density/radLengthX0;
   TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local); // center of the sensor in global coords
   double radius = globalSensorPos.Perp();
-  B2DEBUG(1, "StoreSensorinfo: radius " << radius << ", thickness " << thickness << ", redRadLengthX0 " << redRadLengthX0)
+  B2DEBUG(1, "StoreSensorinfo: radius " << radius << ", thickness " << thickness << ", redRadLengthX0 " << redRadLengthX0);
   string formattedSensorInfo = (boost::format("%1% %2% %3%") % radius % (thickness / redRadLengthX0) % (thickness * density)).str();
   m_geometry.push_back(formattedSensorInfo);
 }
@@ -88,7 +88,7 @@ void HitExporter::prepareEvent(int n)
   m_thisEvent = pEventInfo;
   B2DEBUG(5, "HitExporter::prepareEvent: address of m_thisEvent is pointing at: " << m_thisEvent << " map containing events has " <<
           m_storedOutput.size() << "entries and event " << m_eventNumber << " has an event pointing at " << m_storedOutput.find(
-            m_eventNumber)->second)
+            m_eventNumber)->second);
 }
 
 
@@ -103,10 +103,10 @@ int HitExporter::getCurrentEventNumber()
 int HitExporter::getNumberOfHits()
 {
   std::vector<ExporterHitInfo>* hits = NULL;
-  B2DEBUG(10, "HitExporter::getNumberOfHits, before getting hits, vector points at " << hits)
+  B2DEBUG(10, "HitExporter::getNumberOfHits, before getting hits, vector points at " << hits);
 //  m_thisEvent->getHits(hits);
   hits = m_thisEvent->getHits();
-  B2DEBUG(10, "HitExporter::getNumberOfHits, after getting hits, vector points at " << hits)
+  B2DEBUG(10, "HitExporter::getNumberOfHits, after getting hits, vector points at " << hits);
   return hits->size();
 }
 
@@ -136,7 +136,7 @@ std::string HitExporter::storePXDTrueHit(VXD::GeoCache& geometry, const PXDTrueH
   int aLayerID = aVxdID.getLayerNumber();
   B2DEBUG(10, "within HitExporter::storePXDTrueHit. Hit " << storeArrayID << " with particleID " << particleID << " and pdg " << pdg
           << " isPrimaryBackgroundOrGhost: " << isPrimaryBackgroundOrGhost << " has been found in sensorID " << aVxdID << " at Layer " <<
-          aLayerID)
+          aLayerID);
 //  const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
   VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
   return storeTrueHit(aSensorInfo, aHit->getU(), aHit->getV(), 0, storeArrayID, isPrimaryBackgroundOrGhost, aLayerID, particleID, pdg,
@@ -155,7 +155,7 @@ std::string HitExporter::storeSVDTrueHit(VXD::GeoCache& geometry, const SVDTrueH
   int aLayerID = aVxdID.getLayerNumber();
   B2DEBUG(10, "within HitExporter::storeSVDDTrueHit. Hit " << storeArrayID << " with particleID " << particleID << " and pdg " << pdg
           << " isPrimaryBackgroundOrGhost: " << isPrimaryBackgroundOrGhost << " has been found in sensorID " << aVxdID << " at Layer " <<
-          aLayerID)
+          aLayerID);
 //  const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
   VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
   return storeTrueHit(aSensorInfo, aHit->getU(), aHit->getV(), 1, storeArrayID, isPrimaryBackgroundOrGhost, aLayerID, particleID, pdg,
@@ -173,10 +173,10 @@ std::string HitExporter::storeTrueHit(VXD::SensorInfoBase aSensorInfo, double u,
   double sigmaU = aSensorInfo.getUPitch(v) / sqrt(12.); // this is NOT a typo!
   double sigmaV = aSensorInfo.getVPitch(v) / sqrt(12.);
   if (doSmear == true) {
-    B2DEBUG(100, " u/v before smearing: " << u << "/" << v)
+    B2DEBUG(100, " u/v before smearing: " << u << "/" << v);
     u = smearBox.smearValueGauss(-1000., +1000., u, sigmaU);
     v = smearBox.smearValueGauss(-1000., +1000., v, sigmaV);
-    B2DEBUG(100, " u/v after smearing: " << u << "/" << v)
+    B2DEBUG(100, " u/v after smearing: " << u << "/" << v);
   }
   TVector3 hitLocal(u, v, 0.);
   TVector3 hitGlobal = aSensorInfo.pointToGlobal(hitLocal);
@@ -195,7 +195,7 @@ std::string HitExporter::storeTrueHit(VXD::SensorInfoBase aSensorInfo, double u,
   if (sensorAngle > M_PI) { sensorAngle -= 2.*M_PI; } else if (sensorAngle < -M_PI) { sensorAngle += 2.*M_PI; }
 
   B2DEBUG(10, " -> this hit has got U/V " << hitLocal.X() << "/" << hitLocal.Y() << " and CovUU/CovVV " << covValues.X() << "/" <<
-          covValues.Z() << " and sensorAngle " << sensorAngle)
+          covValues.Z() << " and sensorAngle " << sensorAngle);
 
   unsigned int chosenID = 0;
   if (m_attachedPass != NULL) {   // is only attached, if we want to print the matlabOutput
@@ -211,7 +211,7 @@ std::string HitExporter::storeTrueHit(VXD::SensorInfoBase aSensorInfo, double u,
       configs << ", vConfig: ";
       for (auto aVal : m_attachedPass->secConfigV) { configs << aVal << " "; }
       B2DEBUG(10, "calculating secID, with " << configs.str() << ", normCoords: " << normCoords.first << "/" << normCoords.second <<
-              ", calculated secID " << mySecID << " at sensor " << myVxdID)
+              ", calculated secID " << mySecID << " at sensor " << myVxdID);
     }
     FullSecID fullSecID0 = FullSecID(myVxdID.getLayerNumber(), false, myVxdID.getID(), mySecID);
     FullSecID fullSecID1 = FullSecID(myVxdID.getLayerNumber(), true, myVxdID.getID(), mySecID);
@@ -253,7 +253,7 @@ std::string HitExporter::storeGFTC(VXD::GeoCache& geometry, const genfit::TrackC
   } else if (m_outputFormat == "simpleMatlab") {
 // do nothing
   } else {
-    B2FATAL("HitExporter::storeGFTC: '" << m_outputFormat << "' is not a known outputFormat!")
+    B2FATAL("HitExporter::storeGFTC: '" << m_outputFormat << "' is not a known outputFormat!");
   }
 
   int pdg = aTC->getPdgCode();
@@ -262,11 +262,11 @@ std::string HitExporter::storeGFTC(VXD::GeoCache& geometry, const genfit::TrackC
   double qP = chargeD / pVal;
   momentum = momentum.Unit();
   B2DEBUG(5, "storeGFTC: momentum: " << pVal << ", pt: " << pTVal << ", qP: " << qP << ", pdg: " << pdg << " and theta of vertex: " <<
-          momentum.Theta())
+          momentum.Theta());
 
   ExporterTcInfo newTC(pdg, motherID);
   B2DEBUG(5, " HitExporter::storeGFTC, executing tc with FileIndex/simIndex/motherID: " << tcFileIndex << "/" << tcSimIndex << "/" <<
-          motherID << " which has got " << pxdHits.size() << "/" << svdHits.size() << " hits")
+          motherID << " which has got " << pxdHits.size() << "/" << svdHits.size() << " hits");
 
   TVector3 hitMomentum, hitPosition;
 
@@ -317,7 +317,7 @@ std::string HitExporter::storeGFTC(VXD::GeoCache& geometry, const genfit::TrackC
       hitInfo << motherID << " " << hitPosition.X() << " " << hitPosition.Y() << " " << hitPosition.Z() << " " << FullSecID(vID, false,
               0) << endl;
     } else {
-      B2FATAL("HitExporter::storeGFTC: '" << m_outputFormat << "' is not a known outputFormat!")
+      B2FATAL("HitExporter::storeGFTC: '" << m_outputFormat << "' is not a known outputFormat!");
     }
     newTC.addHit(make_pair(radius, (hitInfo).str()));
   }
@@ -343,7 +343,7 @@ std::string HitExporter::exportGsi(int runNumber, float bz)
 {
   string hitsFileName, mcPointsFileName, mcTracksFileName, settingsFileName, hitLabesFileName;
   ofstream hitsFileStream, settingsFileStream, mcTracksFileStream, mcPointsFileStream, hitLabesFileStream;
-  B2DEBUG(1, " HitExporter::exportGsi: got " << m_storedOutput.size() << " events, exporting to files ")
+  B2DEBUG(1, " HitExporter::exportGsi: got " << m_storedOutput.size() << " events, exporting to files ");
   stringstream returnStringStream;
   returnStringStream  << " in run " << runNumber << " the following events had to be dropped: ";
 
@@ -363,17 +363,17 @@ std::string HitExporter::exportGsi(int runNumber, float bz)
     int nMCtcs = tcsOfEvent->size();
     int nMCHits = eventInfo.second->getNMCHits();
     if (nHits == 0) {
-      B2WARNING("HitExporter::exportGsi: event " << eventInfo.first << " has no hits! Dropping data...")
+      B2WARNING("HitExporter::exportGsi: event " << eventInfo.first << " has no hits! Dropping data...");
       droppedEventsCtr++;
       returnStringStream << eventInfo.first << " ";
       continue;
     } else if (nMCHits == 0) {
-      B2WARNING("HitExporter::exportGsi: event " << eventInfo.first << " has no mcHits! Dropping data...")
+      B2WARNING("HitExporter::exportGsi: event " << eventInfo.first << " has no mcHits! Dropping data...");
       droppedEventsCtr++;
       returnStringStream << eventInfo.first << " ";
       continue;
     } else if (tcsOfEvent == 0) {
-      B2WARNING("HitExporter::exportGsi: event " << eventInfo.first << " has no TCs! Dropping data...")
+      B2WARNING("HitExporter::exportGsi: event " << eventInfo.first << " has no TCs! Dropping data...");
       droppedEventsCtr++;
       returnStringStream << eventInfo.first << " ";
       continue;
@@ -391,15 +391,15 @@ std::string HitExporter::exportGsi(int runNumber, float bz)
     hitLabesFileStream.open(hitLabesFileName.c_str(), std::ios_base::trunc);
 
     if (hitsOfEvent == NULL) {
-      B2WARNING("event " << eventInfo.first << " has no hits! Rejecting event...")
+      B2WARNING("event " << eventInfo.first << " has no hits! Rejecting event...");
       continue;
     }
     if (tcsOfEvent == NULL) {
-      B2WARNING("event " << eventInfo.first << " has no tcs! Rejecting event...")
+      B2WARNING("event " << eventInfo.first << " has no tcs! Rejecting event...");
       continue;
     }
     B2DEBUG(1, " HitExporter::exportGsi: executing event " << eventInfo.first << " and storing " << nHits << " hits, " << nMCHits <<
-            " mcPoints and " << nMCHits << " mcTracks in files" << hitsFileName << ", " << mcPointsFileName << " and " << mcTracksFileName)
+            " mcPoints and " << nMCHits << " mcTracks in files" << hitsFileName << ", " << mcPointsFileName << " and " << mcTracksFileName);
 
     // writing first line of files:
     hitsFileStream << nHits << endl;
@@ -430,7 +430,7 @@ std::string HitExporter::exportGsi(int runNumber, float bz)
       mcTracksFileStream << 0 << " " << 0 << " " << 1 << endl;
 
       B2DEBUG(10, "->HitExporter::exportGsi: executing tc with pdgCode/motherID " << pdg << "/" << motherID << " and adding " << nMChits
-              << " hits to " << mcTracksFileName)
+              << " hits to " << mcTracksFileName);
 
       // doing mcPoints
       for (const TcHitEntry& hit : (*hits)) {
@@ -456,7 +456,7 @@ std::string HitExporter::exportGsi(int runNumber, float bz)
     }
 
     if (mcPointCounter != nMCHits) {
-      B2ERROR("HitExporter::exportGsi:: num of MC hits is wrong! is: " << nMCHits << ", should: " << mcPointCounter)
+      B2ERROR("HitExporter::exportGsi:: num of MC hits is wrong! is: " << nMCHits << ", should: " << mcPointCounter);
     }
 
     mcTracksFileStream << endl;
@@ -475,7 +475,7 @@ std::string HitExporter::exportGsi(int runNumber, float bz)
   //doing settings.data
   settingsFileName = "settings.data";
   int nLayers = m_geometry.size();
-  B2DEBUG(5, " HitExporter::exportGsi: generating settings-file and storing " << nLayers << " layers in " << settingsFileName)
+  B2DEBUG(5, " HitExporter::exportGsi: generating settings-file and storing " << nLayers << " layers in " << settingsFileName);
   settingsFileStream.open(settingsFileName.c_str(), std::ios_base::trunc);
   settingsFileStream << nLayers << endl << bz <<
                      endl; // TODO bz-Value should be able to be read from up-to-date source in case of changing values.
@@ -495,7 +495,7 @@ std::string HitExporter::exportSimpleMatlab(int runNumber)
 {
   string hitsFileName, mcPointsFileName;
   ofstream hitsFileStream, mcPointsFileStream;
-  B2DEBUG(1, " HitExporter::exportSimpleMatlab: got " << m_storedOutput.size() << " events, exporting to files ")
+  B2DEBUG(1, " HitExporter::exportSimpleMatlab: got " << m_storedOutput.size() << " events, exporting to files ");
   stringstream returnStringStream;
   returnStringStream  << " in run " << runNumber << " the following events had to be dropped: ";
 
@@ -511,17 +511,17 @@ std::string HitExporter::exportSimpleMatlab(int runNumber)
     tcsOfEvent = eventInfo.second->getTcs();
     int nMCHits = eventInfo.second->getNMCHits();
     if (nHits == 0) {
-      B2WARNING("HitExporter::exportSimpleMatlab: event " << eventInfo.first << " has no hits! Dropping data...")
+      B2WARNING("HitExporter::exportSimpleMatlab: event " << eventInfo.first << " has no hits! Dropping data...");
       droppedEventsCtr++;
       returnStringStream << eventInfo.first << " ";
       continue;
     } else if (nMCHits == 0) {
-      B2WARNING("HitExporter::exportSimpleMatlab: event " << eventInfo.first << " has no mcHits! Dropping data...")
+      B2WARNING("HitExporter::exportSimpleMatlab: event " << eventInfo.first << " has no mcHits! Dropping data...");
       droppedEventsCtr++;
       returnStringStream << eventInfo.first << " ";
       continue;
     } else if (tcsOfEvent == 0) {
-      B2WARNING("HitExporter::exportSimpleMatlab: event " << eventInfo.first << " has no TCs! Dropping data...")
+      B2WARNING("HitExporter::exportSimpleMatlab: event " << eventInfo.first << " has no TCs! Dropping data...");
       droppedEventsCtr++;
       returnStringStream << eventInfo.first << " ";
       continue;
@@ -540,15 +540,15 @@ std::string HitExporter::exportSimpleMatlab(int runNumber)
     mcPointsFileStream.open(mcPointsFileName.c_str(), std::ios_base::trunc);
 
     if (hitsOfEvent == NULL) {
-      B2WARNING("event " << eventInfo.first << " has no hits! Rejecting event...")
+      B2WARNING("event " << eventInfo.first << " has no hits! Rejecting event...");
       continue;
     }
     if (tcsOfEvent == NULL) {
-      B2WARNING("event " << eventInfo.first << " has no tcs! Rejecting event...")
+      B2WARNING("event " << eventInfo.first << " has no tcs! Rejecting event...");
       continue;
     }
     B2DEBUG(1, " HitExporter::exportSimpleMatlab: executing event " << eventInfo.first << " and storing " << nHits << " hits, " <<
-            nMCHits << " mcPoints in files" << hitsFileName << ", " << mcPointsFileName)
+            nMCHits << " mcPoints in files" << hitsFileName << ", " << mcPointsFileName);
 
     // writing first line of files:
     hitsFileStream << nHits << endl;
@@ -569,7 +569,7 @@ std::string HitExporter::exportSimpleMatlab(int runNumber)
       int motherID = tc.getMotherID();
 
       B2DEBUG(10, "->HitExporter::exportSimpleMatlab: executing tc with pdgCode/motherID " << pdg << "/" << motherID << " and adding " <<
-              nMChits << " hits.")
+              nMChits << " hits.");
 
       // doing mcPoints
       for (const TcHitEntry& hit : (*hits)) {
@@ -582,7 +582,7 @@ std::string HitExporter::exportSimpleMatlab(int runNumber)
     goodTCsCtr += mcTrackCounter;
 
     if (mcPointCounter != nMCHits) {
-      B2ERROR("HitExporter::exportSimpleMatlab: num of MC hits is wrong! is: " << nMCHits << ", should: " << mcPointCounter)
+      B2ERROR("HitExporter::exportSimpleMatlab: num of MC hits is wrong! is: " << nMCHits << ", should: " << mcPointCounter);
     }
 
     mcPointsFileStream << endl;

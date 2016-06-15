@@ -71,7 +71,7 @@ namespace Belle2 {
     /** overloaded '!='-operator */
     bool operator!=(const TrackNode& b) const
     {
-      if (spacePoint == nullptr) B2FATAL("TrackNode::operator !=: spacePoint for Tracknode not set - aborting run.")
+      if (spacePoint == nullptr) B2FATAL("TrackNode::operator !=: spacePoint for Tracknode not set - aborting run.");
         return !(*this == b);
     }
 
@@ -87,7 +87,7 @@ namespace Belle2 {
     /** returns reference to hit. */
     const SpacePoint& getHit() const
     {
-      if (spacePoint == nullptr) B2FATAL("TrackNode::getHit: spacePoint for Tracknode not set - aborting run.")
+      if (spacePoint == nullptr) B2FATAL("TrackNode::getHit: spacePoint for Tracknode not set - aborting run.");
         return *spacePoint;
     }
 
@@ -109,7 +109,7 @@ namespace Belle2 {
     /** returns reference to hit. */
     ActiveSector<StaticSectorType, TrackNode>& getActiveSector()
     {
-      if (sector == nullptr) B2FATAL("TrackNode::getActiveSector: ActiveSector for Tracknode not set - aborting run.")
+      if (sector == nullptr) B2FATAL("TrackNode::getActiveSector: ActiveSector for Tracknode not set - aborting run.");
         return *sector;
     }
 

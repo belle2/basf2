@@ -31,18 +31,18 @@ void RootParameterTracker::collectData4DoubleAlgorithms(std::string tcTypeName, 
     if (entry.first != algoName) {
       B2ERROR("RootParameterTracker::collectData4DoubleAlgorithms() key (" << entry.first <<
               ") of container does not match to its content (" << algoName <<
-              ") - skipping entry! ")
+              ") - skipping entry! ");
       continue;
     }
     B2DEBUG(50, "RootParameterTracker::collectData4DoubleAlgorithms(), executing algorithm of type: " << algoName <<
-            " with collected data-entries of " << dataVector->size())
+            " with collected data-entries of " << dataVector->size());
 
     try {
       double calcVal = anAlgorithm->calcData(aTC);
       dataVector->push_back(calcVal);
       B2DEBUG(20, "RootParameterTracker::collectData4DoubleAlgorithms(), tc with type " << tcTypeName <<
               " and applied algorithm " << algoName <<
-              " and got " << calcVal << " as a result!")
+              " and got " << calcVal << " as a result!");
     }  catch (AnalyzingAlgorithm<double>::No_refTC_Attached& anException) {
       B2WARNING("RootParameterTracker::collectData4DoubleAlgorithms(), Exception caught for tc with type " << tcTypeName <<
                 " and applied algorithm " << algoName <<
@@ -74,18 +74,18 @@ void RootParameterTracker::collectData4IntAlgorithms(std::string tcTypeName, con
     if (entry.first != algoName) {
       B2ERROR("RootParameterTracker::collectData4DoubleAlgorithms() key (" << entry.first <<
               ") of container does not match to its content (" << algoName <<
-              ") - skipping entry! ")
+              ") - skipping entry! ");
       continue;
     }
     B2DEBUG(50, "RootParameterTracker::collectData4DoubleAlgorithms(), executing algorithm of type: " << algoName <<
-            " with collected data-entries of " << dataVector->size())
+            " with collected data-entries of " << dataVector->size());
 
     try {
       int calcVal = anAlgorithm->calcData(aTC);
       dataVector->push_back(calcVal);
       B2DEBUG(20, "RootParameterTracker::collectData4DoubleAlgorithms(), tc with type " << tcTypeName <<
               " and applied algorithm " << algoName <<
-              " and got " << calcVal << " as a result!")
+              " and got " << calcVal << " as a result!");
     } catch (AnalyzingAlgorithm<int>::No_refTC_Attached& anException) {
       B2WARNING("RootParameterTracker::collectData4DoubleAlgorithms(), Exception caught for tc with type " << tcTypeName <<
                 " and applied algorithm " << algoName <<
@@ -118,11 +118,11 @@ void RootParameterTracker::collectData4VecDoubleAlgorithms(std::string tcTypeNam
     if (entry.first != algoName) {
       B2ERROR("RootParameterTracker::collectData4VecDoubleAlgorithms() key (" << entry.first <<
               ") of container does not match to its content (" << algoName <<
-              ") - skipping entry! ")
+              ") - skipping entry! ");
       continue;
     }
     B2DEBUG(50, "RootParameterTracker::collectData4VecDoubleAlgorithms(), executing algorithm of type: " << algoName <<
-            " with collected data-entries of " << dataVector->size())
+            " with collected data-entries of " << dataVector->size());
 
     try {
       vector<double> calcVal = anAlgorithm->calcData(aTC);
@@ -131,7 +131,7 @@ void RootParameterTracker::collectData4VecDoubleAlgorithms(std::string tcTypeNam
       B2DEBUG(20, "RootParameterTracker::collectData4VecDoubleAlgorithms(), tc with type " << tcTypeName <<
               " and applied algorithm " << algoName <<
               " and got: " << printVec() <<
-              " as a result!")
+              " as a result!");
     }  catch (AnalyzingAlgorithm<vector<double>>::No_refTC_Attached& anException) {
       B2WARNING("RootParameterTracker::collectData4VecDoubleAlgorithms(), Exception caught for tc with type " << tcTypeName <<
                 " and applied algorithm " << algoName <<
@@ -173,7 +173,7 @@ void RootParameterTracker::addParameters4DoubleAlgorithms(std::string tcTypeName
    * */
   B2DEBUG(5, "RootParameterTracker::addParameters4DoubleAlgorithms(), given parameters are tcTypeName/algorithmName: " << tcTypeName
           << "/" <<
-          algorithmName)
+          algorithmName);
 
   TTree* tree4tcType = prepareTTree(tcTypeName);
 
@@ -181,7 +181,7 @@ void RootParameterTracker::addParameters4DoubleAlgorithms(std::string tcTypeName
   auto* algorithms4tcType = m_algoDataDouble.find(tcTypeName);
   if (algorithms4tcType == NULL) {
     B2DEBUG(5, "RootParameterTracker::addParameters4DoubleAlgorithms(), tcType " << tcTypeName <<
-            " not yet added to m_algoDataDouble, doing it now...")
+            " not yet added to m_algoDataDouble, doing it now...");
     m_algoDataDouble.push_back({
       tcTypeName,
       StringKeyBox<pair<AnalyzingAlgorithm<double>*, vector<double>*> >()
@@ -189,13 +189,13 @@ void RootParameterTracker::addParameters4DoubleAlgorithms(std::string tcTypeName
     algorithms4tcType = m_algoDataDouble.find(tcTypeName);
   }
   B2DEBUG(5, "RootParameterTracker::addParameters4DoubleAlgorithms(), m_algoDataDouble has " << m_algoDataDouble.size() <<
-          " tcTypes stored")
+          " tcTypes stored");
 
 /// make sure that algorithm and its dataStuff exists:
   auto* data4AlgorithmOftcType = algorithms4tcType->find(algorithmName);
   if (data4AlgorithmOftcType == NULL) {
     B2DEBUG(5, "RootParameterTracker::addParameters4DoubleAlgorithms(), algorithm " << algorithmName <<
-            " not yet added to m_algoDataDouble[tcType], doing it now...")
+            " not yet added to m_algoDataDouble[tcType], doing it now...");
     AnalyzingAlgorithm<double>* newAlgorithm = AnalyzingAlgorithmFactoryDouble<double, AnalizerTCInfo, TVector3>
                                                (AlgoritmType::getTypeEnum(algorithmName));
     algorithms4tcType->push_back({
@@ -214,10 +214,10 @@ void RootParameterTracker::addParameters4DoubleAlgorithms(std::string tcTypeName
   } else {
     B2WARNING("RootParameterTracker::addParameters4DoubleAlgorithms() given tcTypeName/algorithmName: " << tcTypeName <<
               "/" << algorithmName <<
-              " was already added and will not be added again. This is a sign for unintended behavior - nothing will be added!")
+              " was already added and will not be added again. This is a sign for unintended behavior - nothing will be added!");
   }
   B2DEBUG(5, "RootParameterTracker::addParameters4DoubleAlgorithms(), m_algoDataDouble[tcType] has " << algorithms4tcType->size() <<
-          " algorithms stored")
+          " algorithms stored");
 }
 
 
@@ -231,7 +231,7 @@ void RootParameterTracker::addParameters4IntAlgorithms(std::string tcTypeName, s
 {
   B2DEBUG(5, "RootParameterTracker::addParameters4IntAlgorithms(), given parameters are tcTypeName/algorithmName: " << tcTypeName <<
           "/" <<
-          algorithmName)
+          algorithmName);
 
   TTree* tree4tcType = prepareTTree(tcTypeName);
 
@@ -239,20 +239,20 @@ void RootParameterTracker::addParameters4IntAlgorithms(std::string tcTypeName, s
   auto* algorithms4tcType = m_algoDataInt.find(tcTypeName);
   if (algorithms4tcType == NULL) {
     B2DEBUG(5, "RootParameterTracker::addParameters4IntAlgorithms(), tcType " << tcTypeName <<
-            " not yet added to m_algoDataInt, doing it now...")
+            " not yet added to m_algoDataInt, doing it now...");
     m_algoDataInt.push_back({
       tcTypeName,
       StringKeyBox<pair<AnalyzingAlgorithm<int>*, vector<int>*> >()
     });
     algorithms4tcType = m_algoDataInt.find(tcTypeName);
   }
-  B2DEBUG(5, "RootParameterTracker::addParameters4IntAlgorithms(), m_algoDataInt has " << m_algoDataInt.size() << " tcTypes stored")
+  B2DEBUG(5, "RootParameterTracker::addParameters4IntAlgorithms(), m_algoDataInt has " << m_algoDataInt.size() << " tcTypes stored");
 
   /// make sure that algorithm and its dataStuff exists:
   auto* data4AlgorithmOftcType = algorithms4tcType->find(algorithmName);
   if (data4AlgorithmOftcType == NULL) {
     B2DEBUG(5, "RootParameterTracker::addParameters4IntAlgorithms(), algorithm " << algorithmName <<
-            " not yet added to m_algoDataInt[tcType], doing it now...")
+            " not yet added to m_algoDataInt[tcType], doing it now...");
     AnalyzingAlgorithm<int>* newAlgorithm = AnalyzingAlgorithmFactoryInt<int, AnalizerTCInfo, TVector3>(AlgoritmType::getTypeEnum(
                                               algorithmName));
     algorithms4tcType->push_back({
@@ -271,10 +271,10 @@ void RootParameterTracker::addParameters4IntAlgorithms(std::string tcTypeName, s
   } else {
     B2WARNING("RootParameterTracker::addParameters4DoubleAlgorithms() given tcTypeName/algorithmName: " << tcTypeName <<
               "/" << algorithmName <<
-              " was already added and will not be added again. This is a sign for unintended behavior - nothing will be added!")
+              " was already added and will not be added again. This is a sign for unintended behavior - nothing will be added!");
   }
   B2DEBUG(5, "RootParameterTracker::addParameters4DoubleAlgorithms(), m_algoDataInt[tcType] has " << algorithms4tcType->size() <<
-          " algorithms stored")
+          " algorithms stored");
 }
 
 
@@ -288,7 +288,7 @@ void RootParameterTracker::addParameters4VecDoubleAlgorithms(std::string tcTypeN
 {
   B2DEBUG(5, "RootParameterTracker::addParameters4VecDoubleAlgorithms(), given parameters are tcTypeName/algorithmName: " <<
           tcTypeName << "/" <<
-          algorithmName)
+          algorithmName);
 
   TTree* tree4tcType = prepareTTree(tcTypeName);
 
@@ -296,7 +296,7 @@ void RootParameterTracker::addParameters4VecDoubleAlgorithms(std::string tcTypeN
   auto* algorithms4tcType = m_algoDataVecDouble.find(tcTypeName);
   if (algorithms4tcType == NULL) {
     B2DEBUG(5, "RootParameterTracker::addParameters4VecDoubleAlgorithms(), tcType " << tcTypeName <<
-            " not yet added to m_algoDataVecDouble, doing it now...")
+            " not yet added to m_algoDataVecDouble, doing it now...");
     m_algoDataVecDouble.push_back({
       tcTypeName,
       StringKeyBox<pair<AnalyzingAlgorithm<vector<double>>*, vector<vector<double>>*> >()
@@ -304,13 +304,13 @@ void RootParameterTracker::addParameters4VecDoubleAlgorithms(std::string tcTypeN
     algorithms4tcType = m_algoDataVecDouble.find(tcTypeName);
   }
   B2DEBUG(5, "RootParameterTracker::addParameters4VecDoubleAlgorithms(), m_algoDataVecDouble has " << m_algoDataVecDouble.size() <<
-          " tcTypes stored")
+          " tcTypes stored");
 
   /// make sure that algorithm and its dataStuff exists:
   auto* data4AlgorithmOftcType = algorithms4tcType->find(algorithmName);
   if (data4AlgorithmOftcType == NULL) {
     B2DEBUG(5, "RootParameterTracker::addParameters4VecDoubleAlgorithms(), algorithm " << algorithmName <<
-            " not yet added to m_algoDataVecDouble[tcType], doing it now...")
+            " not yet added to m_algoDataVecDouble[tcType], doing it now...");
     AnalyzingAlgorithm<vector<double>>* newAlgorithm = AnalyzingAlgorithmFactoryVecDouble<vector<double>, AnalizerTCInfo, TVector3>
                                                        (AlgoritmType::getTypeEnum(algorithmName));
     algorithms4tcType->push_back({
@@ -329,8 +329,8 @@ void RootParameterTracker::addParameters4VecDoubleAlgorithms(std::string tcTypeN
   } else {
     B2WARNING("RootParameterTracker::addParameters4VecDoubleAlgorithms() given tcTypeName/algorithmName: " << tcTypeName <<
               "/" << algorithmName <<
-              " was already added and will not be added again. This is a sign for unintended behavior - nothing will be added!")
+              " was already added and will not be added again. This is a sign for unintended behavior - nothing will be added!");
   }
   B2DEBUG(5, "RootParameterTracker::addParameters4VecDoubleAlgorithms(), m_algoDataVecDouble[tcType] has " <<
-          algorithms4tcType->size() << " algorithms stored")
+          algorithms4tcType->size() << " algorithms stored");
 }

@@ -32,7 +32,7 @@ namespace Belle2 {
 
     /** constructor expects filterIDs. */
     SectorGraph(std::vector<FilterType>& fIDs) : m_filterIDs(fIDs)
-    { if (m_filterIDs.empty()) { B2FATAL("SectorGraph-constructor: passed filterIDs are empty, this is an illegal usage of this class!") } }
+    { if (m_filterIDs.empty()) { B2FATAL("SectorGraph-constructor: passed filterIDs are empty, this is an illegal usage of this class!"); } }
 
     /** for better readability. */
     using Iterator = typename std::unordered_map<SubGraphID, SubGraph<FilterType>>::iterator;
@@ -63,7 +63,7 @@ namespace Belle2 {
       if (m_subgraphs.find(newID) != end())
       { B2WARNING("SectorGraph::add: given ID " << newID.print() << " is already in graph, not added again..."); return end(); }
       std::pair<Iterator, bool> pos = m_subgraphs.insert({newID, SubGraph<FilterType>(newID, m_filterIDs)});
-      B2DEBUG(1, "SectorGraph::add: new subgraph added: " << pos.first->second.print())
+      B2DEBUG(1, "SectorGraph::add: new subgraph added: " << pos.first->second.print());
       return pos.first;
     }
 
@@ -113,7 +113,7 @@ namespace Belle2 {
       unsigned long nFoundB4 = nFoundTotal(), nKilled = 0;
       unsigned sizeb4 = size();
       B2DEBUG(1, "pruneGraph - before pruning: graph of size " << sizeb4 << " has " << trunks.size() << " trunks with " << nFoundB4 <<
-              " total found.")
+              " total found.");
 
       // collect subGraphs (branches) to be deleted:
       std::vector<SubGraph<FilterType>*> deadBranches;
@@ -151,7 +151,7 @@ namespace Belle2 {
       }
 
       B2DEBUG(1, "pruneGraph - after pruning graph with size (before/after " << sizeb4 << "/" << size() <<
-              ") and nFound (before/after/killed " << nFoundB4 << "/" << nFoundTotal() << "/" << nKilled)
+              ") and nFound (before/after/killed " << nFoundB4 << "/" << nFoundTotal() << "/" << nKilled);
 
       return nKilled;
     }
@@ -178,7 +178,7 @@ namespace Belle2 {
         idsFound.insert(idsFound.end(), found.begin(), found.end());
       }
       for (unsigned id : idsFound) { idsPrinted += FullSecID(id).getFullSecString() + " "; }
-      B2DEBUG(1, "updateSubLayerIDs: before unique of found ids, following IDs are recorded: \n" << idsPrinted)
+      B2DEBUG(1, "updateSubLayerIDs: before unique of found ids, following IDs are recorded: \n" << idsPrinted);
       nFound += idsFound.size();
       std::sort(idsFound.begin(), idsFound.end());
       idsFound.erase(std::unique(idsFound.begin(), idsFound.end()), idsFound.end());
@@ -186,7 +186,7 @@ namespace Belle2 {
 
       idsPrinted = "";
       for (unsigned id : idsFound) { idsPrinted += FullSecID(id).getFullSecString() + " "; }
-      B2DEBUG(1, "updateSubLayerIDs: before updating Subgraphs, following IDs have to be updated: \n" << idsPrinted)
+      B2DEBUG(1, "updateSubLayerIDs: before updating Subgraphs, following IDs have to be updated: \n" << idsPrinted);
 
 
       // update all subGraphIDs where subLayerID has to be increased:
@@ -194,14 +194,14 @@ namespace Belle2 {
         SubGraph<FilterType>& graph = subGraphEntry.second;
         unsigned nSecsUpdated = graph.idCheckAndUpdate(idsFound);
         if (nSecsUpdated == 0) {
-          B2DEBUG(50, "updateSubLayerIDs: was _not_ updated: " << graph.getID().print())
+          B2DEBUG(50, "updateSubLayerIDs: was _not_ updated: " << graph.getID().print());
           continue;
         }
         nGraphsUpdated++;
-        B2DEBUG(50, "updateSubLayerIDs: was updated " << nSecsUpdated << " times: " << graph.getID().print())
+        B2DEBUG(50, "updateSubLayerIDs: was updated " << nSecsUpdated << " times: " << graph.getID().print());
       }
 
-      B2DEBUG(1, "updateSubLayerIDs: nSectors found/updated: " << nFound << "/" << nUpdated << ", nSubgraphs updated: " << nGraphsUpdated)
+      B2DEBUG(1, "updateSubLayerIDs: nSectors found/updated: " << nFound << "/" << nUpdated << ", nSubgraphs updated: " << nGraphsUpdated);
 
       // create new map of Subgraphs with updated LayerIDs
       // subGraph: copy with updated iD.
@@ -223,7 +223,7 @@ namespace Belle2 {
         if (sectorsFound.empty()) continue;
         foundIDs.insert(foundIDs.end(), sectorsFound.begin(), sectorsFound.end());
       }
-      B2DEBUG(1, "getAllFullSecIDsOfSensor: VxdID " << sensor << " has " << foundIDs.size() << " sectors in this graph")
+      B2DEBUG(1, "getAllFullSecIDsOfSensor: VxdID " << sensor << " has " << foundIDs.size() << " sectors in this graph");
       return foundIDs;
     }
 

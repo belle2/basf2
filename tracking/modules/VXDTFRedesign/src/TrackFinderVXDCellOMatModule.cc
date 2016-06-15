@@ -157,14 +157,14 @@ void TrackFinderVXDCellOMatModule::event()
           " and " << collectedPaths.size() <<
           " paths while calling its collecting function " << m_pathCollector.nRecursiveCalls <<
           " times and checking " << m_pathCollector.nNodesPassed <<
-          " nodes.")
+          " nodes.");
 
 
   /// convert the raw paths to fullgrown SpacePoinTrackCands
   unsigned int nCreated = m_sptcCreator.createSPTCs(m_TCs, collectedSpacePointPaths, m_PARAMremoveVirtualIP);
   B2DEBUG(10, " TrackFinderVXDCellOMat-event" << m_eventCounter <<
           ": " << nCreated <<
-          " TCs created and stored into StoreArray!")
+          " TCs created and stored into StoreArray!");
 
 }
 

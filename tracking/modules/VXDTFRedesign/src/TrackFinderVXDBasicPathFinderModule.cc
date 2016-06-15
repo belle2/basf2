@@ -139,7 +139,7 @@ void TrackFinderVXDBasicPathFinderModule::event()
   }
   B2DEBUG(15, "TrackFinderVXDBasicPathFinderModule - event " << m_eventCounter <<
           ": arking seeds is now finished. Of " << segmentNetwork.size() <<
-          " cells total -> found " << nSeeds << " seeds")
+          " cells total -> found " << nSeeds << " seeds");
   if (nSeeds == 0) { B2WARNING("TrackFinderVXDBasicPathFinderModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
 
 
@@ -167,14 +167,14 @@ void TrackFinderVXDBasicPathFinderModule::event()
           " and " << collectedPaths.size() <<
           " paths while calling its collecting function " << m_pathCollector.nRecursiveCalls <<
           " times and checking " << m_pathCollector.nNodesPassed <<
-          " nodes.")
+          " nodes.");
 
 
   /// convert the raw paths to fullgrown SpacePoinTrackCands
   unsigned int nCreated = m_sptcCreator.createSPTCs(m_TCs, collectedSpacePointPaths, m_PARAMremoveVirtualIP);
   B2DEBUG(10, " TrackFinderVXDCellOMat-event" << m_eventCounter <<
           ": " << nCreated <<
-          " TCs created and stored into StoreArray!")
+          " TCs created and stored into StoreArray!");
 
 }
 

@@ -214,7 +214,7 @@ static bool extrapolateToCylinder(float radius, genfit::Track* track, TVector3& 
 bool CDCToVXDExtrapolatorModule::extrapolateToPXDLayer(genfit::Track* track, int searchLayer, StoreArray<PXDCluster>& clusters)
 {
   bool found = false;
-  B2DEBUG(95, "<----> PXD extrapolateToLayer " << searchLayer << " <---->")
+  B2DEBUG(95, "<----> PXD extrapolateToLayer " << searchLayer << " <---->");
 
   static float layerRadii[7] = {0, 1.421, 2.179, 3.799, 8.0, 10.4, 13.51};
 
@@ -329,14 +329,14 @@ bool CDCToVXDExtrapolatorModule::extrapolateToPXDLayer(genfit::Track* track, int
     }
   }
 
-  B2DEBUG(95, "<----> End PXD extrapolateToLayer " << searchLayer << " <---->")
+  B2DEBUG(95, "<----> End PXD extrapolateToLayer " << searchLayer << " <---->");
 
   return found;
 }
 
 bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int searchLayer, StoreArray<SVDCluster>& clusters)
 {
-  B2DEBUG(95, "<----> extrapolateToLayer " << searchLayer << " <---->")
+  B2DEBUG(95, "<----> extrapolateToLayer " << searchLayer << " <---->");
   TVector3 zaxis(0, 0, 1);
   TVector3 mzaxis(0, 0, -1);
   TVector3 origin(0, 0, 0);
@@ -567,7 +567,7 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
         fitter->setMaxFailedHits(5);
         try {
           if (!track->checkConsistency()) {
-            B2DEBUG(50, "Inconsistent track found, attempting to sort!")
+            B2DEBUG(50, "Inconsistent track found, attempting to sort!");
             bool sorted = track->sort();
             if (!sorted) {
               B2DEBUG(50, "Track points NOT SORTED! Still inconsistent, I can't be held responsible for assertion failure!");
@@ -649,7 +649,7 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
   } else {
     B2DEBUG(190, "NO MATCHING V CLUSTER FOUND FOR TRACK");
   }
-  B2DEBUG(95, "<----> End extrapolateToLayer " << searchLayer << " <---->")
+  B2DEBUG(95, "<----> End extrapolateToLayer " << searchLayer << " <---->");
   return (bestv >= 0) && (bestu >= 0);
 }
 
@@ -709,7 +709,7 @@ bool CDCToVXDExtrapolatorModule::refitTrack(genfit::Track* track)
   }
   try {
     if (!track->checkConsistency()) {
-      B2DEBUG(50, "Inconsistent track found, attempting to sort!")
+      B2DEBUG(50, "Inconsistent track found, attempting to sort!");
       bool sorted = track->sort();
       if (!sorted) {
         B2DEBUG(50, "Track points NOT SORTED! Still inconsistent, I can't be held responsible for assertion failure!");

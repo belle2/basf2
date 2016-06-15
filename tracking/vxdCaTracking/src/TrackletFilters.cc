@@ -44,7 +44,7 @@ using boost::math::sign;
 
 bool TrackletFilters::ziggZaggXY()
 {
-  if (m_hits == NULL) B2FATAL(" TrackletFilters::ziggZaggXY hits not set, therefore no calculation possible - please check that!")
+  if (m_hits == NULL) B2FATAL(" TrackletFilters::ziggZaggXY hits not set, therefore no calculation possible - please check that!");
     list<int> chargeSigns;
   bool isZiggZagging = false; // good: not ziggZagging
   for (int i = 0; i < m_numHits - 2; ++i) {
@@ -65,7 +65,7 @@ bool TrackletFilters::ziggZaggXY()
 bool TrackletFilters::ziggZaggXYWithSigma()
 {
   if (m_hits == NULL)
-    B2FATAL(" TrackletFilters::ziggZaggXYWithSigma: hits not set, therefore no calculation possible - please check that!")
+    B2FATAL(" TrackletFilters::ziggZaggXYWithSigma: hits not set, therefore no calculation possible - please check that!");
     list<int> chargeSigns;
   bool isZiggZagging = false; // good: not ziggZagging
   for (int i = 0; i < m_numHits - 2; ++i) {
@@ -86,7 +86,7 @@ bool TrackletFilters::ziggZaggXYWithSigma()
 
 bool TrackletFilters::ziggZaggRZ()
 {
-  if (m_hits == NULL) B2FATAL(" TrackletFilters::ziggZaggRZ: hits not set, therefore no calculation possible - please check that!")
+  if (m_hits == NULL) B2FATAL(" TrackletFilters::ziggZaggRZ: hits not set, therefore no calculation possible - please check that!");
     list<int> chargeSigns;
   bool isZiggZagging = false; // good: not ziggZagging
   vector<TVector3> rzHits;
@@ -113,7 +113,7 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
 {
   if (m_numHits < 3) {
     B2ERROR("calcInitialValues4TCs: currentTC got " << m_numHits <<
-            " hits! At this point only tcs having at least 3 hits should exist!")
+            " hits! At this point only tcs having at least 3 hits should exist!");
   }
   //     hitA = (*hits)[2]->hitPosition;
   TVector3 hitB = (*m_hits)[1]->hitPosition;
@@ -130,48 +130,48 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
   try {
     fitResults = helixFit(m_hits, useBackwards, setMomentumMagnitude);
   } catch (FilterExceptions::Straight_Line& anException) {
-    B2DEBUG(1, "Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what())
+    B2DEBUG(1, "Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what());
     try {
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
 
       B2DEBUG(1, "After catching straight line case in Helix fit, the lineFit has chi2 of " << fitResults.first  <<
               "\nwhile using following hits:\n" << printHits(m_hits) << "with seed: " << fitResults.second.X() << " " << fitResults.second.Y() <<
-              " " << fitResults.second.Z() << "\n")
+              " " << fitResults.second.Z() << "\n");
 
     } catch (FilterExceptions::Straight_Up& anException) {
       try {
         fitResults = circleFit(m_hits, useBackwards, setMomentumMagnitude);
       } catch (FilterExceptions::Straight_Line& anException) {
-        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what())
+        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what());
       }
     }
 
   } catch (FilterExceptions::Center_Is_Origin& anException) {
-    B2INFO("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what())
+    B2INFO("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what());
     try {
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
     } catch (FilterExceptions::Straight_Up& anException) {
       try {
         fitResults = circleFit(m_hits, useBackwards, setMomentumMagnitude);
       } catch (FilterExceptions::Straight_Line& anException) {
-        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what())
+        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what());
       }
     }
   } catch (FilterExceptions::Invalid_result_Nan& anException) {
     B2INFO("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what() <<
-           "\nwhile using following hits:\n" << printHits(m_hits))
+           "\nwhile using following hits:\n" << printHits(m_hits));
     try {
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
     } catch (FilterExceptions::Straight_Up& anException) {
       try {
         fitResults = circleFit(m_hits, useBackwards, setMomentumMagnitude);
       } catch (FilterExceptions::Straight_Line& anException) {
-        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what())
+        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what());
       }
     }
   }
   B2DEBUG(10, "calcMomentumSeed: return values of Fit: first(radius): " << fitResults.first << ", second.Mag(): " <<
-          fitResults.second.Mag())
+          fitResults.second.Mag());
   int signValue = boost::math::sign(hitC *
                                     hitB); // sign of curvature: is > 0 if angle between vectors is < 90°, < 0 else (rule of scalar product)
   if (signValue == 0) {
@@ -187,7 +187,7 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
       B2DEBUG(5, "trackletFilter::calcMomentumSeed: segments parallel, but no magnetic field, therefore no problem...\nHit0: " <<
               (*m_hits)[0]->hitPosition.X() << "/" << (*m_hits)[0]->hitPosition.Y() << "/" << (*m_hits)[0]->hitPosition.Z() << ", Hit1: " <<
               (*m_hits)[1]->hitPosition.X() << "/" << (*m_hits)[1]->hitPosition.Y() << "/" << (*m_hits)[1]->hitPosition.Z() << ", Hit2: " <<
-              (*m_hits)[2]->hitPosition.X() << "/" << (*m_hits)[2]->hitPosition.Y() << "/" << (*m_hits)[2]->hitPosition.Z())
+              (*m_hits)[2]->hitPosition.X() << "/" << (*m_hits)[2]->hitPosition.Y() << "/" << (*m_hits)[2]->hitPosition.Z());
     }
   }
   return make_pair(fitResults.second, signValue); //.first: momentum vector. .second: sign of curvature
@@ -197,7 +197,7 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
 // poca = point of closest approach of fitted circle to origin
 double TrackletFilters::circleFit(double& pocaPhi, double& pocaD, double& curvature)
 {
-  if (m_hits == NULL) { B2FATAL(" TrackletFilters::circleFit hits not set, therefore no calculation possible - please check that!") }
+  if (m_hits == NULL) { B2FATAL(" TrackletFilters::circleFit hits not set, therefore no calculation possible - please check that!"); }
 
   bool clockwise =
     CalcCurvature(); // Calculates Curvature: True means clockwise, False means counterclockwise.TODO this is not an optimized approach; just to get things to work. CalcCurvature could be integrated into the looping over the hits which CircleFit does anyhow.
@@ -214,7 +214,7 @@ double TrackletFilters::circleFit(double& pocaPhi, double& pocaD, double& curvat
   for (PositionInfo* hit : *m_hits) {
     weight = 1. / (sqrt(hit->hitSigma.X() * hit->hitSigma.X() + hit->hitSigma.Y() * hit->hitSigma.Y()) * tuningParameter);
     B2DEBUG(100, " current hitSigmaU/V/X/Y: " << hit->sigmaU << "/" << hit->sigmaV << "/" << hit->hitSigma.X() << "/" <<
-            hit->hitSigma.Y() << ", weight: " << weight)
+            hit->hitSigma.Y() << ", weight: " << weight);
     sumWeights += weight;
     if (std::isnan(weight) or std::isinf(weight) == true) { B2ERROR("TrackletFilters::circleFit, chosen sigma is 'nan': " << weight << ", setting arbitrary error: " << stopper << ")"); weight = stopper; }
     x = hit->hitPosition.X();
@@ -344,7 +344,7 @@ std::pair<double, TVector3> TrackletFilters::circleFit(const std::vector<Positio
   xCc = xPoca + signValue * absRadius * invAbsRValue * xPoca;
   yCc = yPoca + signValue * absRadius * invAbsRValue * yPoca;
   B2DEBUG(100, "TrackletFilters::circleFit: phi: " << phiValue << ", psi: " << psi << ", xPoca: " << xPoca << ", yPoca: " << yPoca  <<
-          ", xCc: " << xCc << ", yCc: " << yCc)
+          ", xCc: " << xCc << ", yCc: " << yCc);
 
   /// circleCenter as result:
 //  if (0 == false) {
@@ -363,7 +363,7 @@ std::pair<double, TVector3> TrackletFilters::circleFit(const std::vector<Positio
   }
 
   B2DEBUG(100, "TrackletFilters::circleFit: xHit: " << xHit << ", yHit: " << yHit << ", xCc: " << xCc << ", yCc: " << yCc <<
-          ", curvature: " << curvature)
+          ", curvature: " << curvature);
 
   /// seedHitPosition as result:
 //  if (0 == false) {
@@ -391,7 +391,7 @@ std::pair<double, TVector3> TrackletFilters::circleFit(const std::vector<Positio
 //  } else {
 //    beta = alfa - M_PI*0.5;
 //  }
-  B2DEBUG(100, "TrackletFilters::circleFit: phiValue: " << phiValue << ", psi: " << psi << ", alfa: " << alfa << ", beta: " << beta)
+  B2DEBUG(100, "TrackletFilters::circleFit: phiValue: " << phiValue << ", psi: " << psi << ", alfa: " << alfa << ", beta: " << beta);
 
   if (setMomentumMagnitude ==
       0) { // in this case, we do not want an artificial magnitude for the pT-Vector and calculate the value ourself
@@ -411,11 +411,11 @@ std::pair<double, TVector3> TrackletFilters::circleFit(const std::vector<Positio
 std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<PositionInfo*>* hits, bool useBackwards,
                                                       double setMomentumMagnitude)
 {
-  if (hits == NULL) { B2FATAL(" TrackletFilters::circleFit hits not set, therefore no calculation possible - please check that!") }
+  if (hits == NULL) { B2FATAL(" TrackletFilters::circleFit hits not set, therefore no calculation possible - please check that!"); }
 
   int nHits = hits->size();
 
-  if (nHits < 3) { B2ERROR(" TrackletFilters::circleFit number of hits too low: " << nHits << " hits, therefore no useful calculation possible - please check that!") }
+  if (nHits < 3) { B2ERROR(" TrackletFilters::circleFit number of hits too low: " << nHits << " hits, therefore no useful calculation possible - please check that!"); }
 
 
   // WARNING this function assumes that hits are sorted and first hit is innermost hit!!!
@@ -467,7 +467,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
     invVarZvalues(index, 0) = invVarZ;
     B2DEBUG(75, "helixFit: hit.X(): " << hit->hitPosition.X() << ", hit.Y(): " << hit->hitPosition.Y() << ", hit.Z(): " <<
             hit->hitPosition.Z() << ", hit.sigmaU: " << hit->sigmaU << ", hit.sigmaV: " << hit->sigmaV << ", hit.hitSigma X/Y/Z: " <<
-            hit->hitSigma.X() << "/" << hit->hitSigma.Y() << "/" << hit->hitSigma.Z())
+            hit->hitSigma.X() << "/" << hit->hitSigma.Y() << "/" << hit->hitSigma.Z());
 
 //    hitsFileStream << setprecision(14) << x << " " << y << " " << z << " " << varU << " " << varV << endl;
 ///   phi = atan2(y , x);  // not used yet, but will be needed for some calculations which are not implemented yet
@@ -487,7 +487,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
     ++index;
     B2DEBUG(75, "helixFit: index: " << index << ", invVarZ: " << invVarZ << ", invVarianceXY: " << inverseVarianceXY << ", x: " << x <<
-            ", y: " << y << ", z: " << z << ", r2: " << r2)
+            ", y: " << y << ", z: " << z << ", r2: " << r2);
   }
 
 //  hitsFileStream.close();
@@ -550,7 +550,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
       minValueIndex = i;
     }
   }
-  if (minValueIndex < 0) { B2FATAL("TrackletFilters::helixFit produced eigenValue smaller than 0 (" << minValue << ")!")}
+  if (minValueIndex < 0) { B2FATAL("TrackletFilters::helixFit produced eigenValue smaller than 0 (" << minValue << ")!");}
 
   double distanceOfPlane = 0;
   for (int i = 0; i < nEVs; ++i) {// calculating scalar product by hand
@@ -580,7 +580,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 /// fix dec8,2013:
 //  double rho = sqrt((1. - n3 * n3 - 4.*distanceOfPlane * n3) * aInv * aInv); // radius of the circle
 
-  B2DEBUG(25, "helixFit: circle: origin x: " << xc << ", y: " << yc << ", radius: " << rho  << endl)
+  B2DEBUG(25, "helixFit: circle: origin x: " << xc << ", y: " << yc << ", radius: " << rho  << endl);
 
 
   /// line fit:
@@ -596,7 +596,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
   TMatrixD T2 = b * R2 - H2; // temporary value T2 = vector, since b = scalar * vector R2 - Vector H2
   B2DEBUG(25, "helixFit: T.min: " << T2.Min() << ", T.max: " << T2.Max() << ", R2.min: " << R2.Min() << ", R2.max: " << R2.Max() <<
-          ", H2.min: " << H2.Min() << ", H2.max: " << H2.Max() << ", H.min: " << H.Min() << ", H.max: " << H.Max() << ", b: " << b)
+          ", H2.min: " << H2.Min() << ", H2.max: " << H2.Max() << ", H.min: " << H.Min() << ", H.max: " << H.Max() << ", b: " << b);
 
   if (lambdaCheckMatrix4NAN(T2) == true) {B2DEBUG(50, "helixFit: T2 got 'nan'-entries!"); didNanAppear = true; }
 
@@ -660,14 +660,14 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   }
 
   TMatrixD xs(nHits, 1), ys(nHits, 1);
-  B2DEBUG(25, " sum d1: " << dx1 + dy1 << ", d2: " << dx2 + dy2)
+  B2DEBUG(25, " sum d1: " << dx1 + dy1 << ", d2: " << dx2 + dy2);
 
   if ((dx1 + dy1) < (dx2 + dy2)) {
     if (lambdaCheckMatrix4NAN(x1) == true or lambdaCheckMatrix4NAN(y1) == true) {
       xs = x2; ys = y2;
       if (lambdaCheckMatrix4NAN(x2) == true or lambdaCheckMatrix4NAN(y2) == true) {
         B2DEBUG(10, "there is 'nan' = " << lambdaCheckMatrix4NAN(x1) << "/" << lambdaCheckMatrix4NAN(y1) << "/" << lambdaCheckMatrix4NAN(
-                  x2) << "/" << lambdaCheckMatrix4NAN(y2) << " in x1/y1/x2/y2!")
+                  x2) << "/" << lambdaCheckMatrix4NAN(y2) << " in x1/y1/x2/y2!");
 
       }
     } else  {
@@ -678,7 +678,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
       xs = x1; ys = y1;
       if (lambdaCheckMatrix4NAN(x1) == true or lambdaCheckMatrix4NAN(y1) == true) {
         B2DEBUG(10, "there is 'nan' = " << lambdaCheckMatrix4NAN(x1) << "/" << lambdaCheckMatrix4NAN(y1) << "/" << lambdaCheckMatrix4NAN(
-                  x2) << "/" << lambdaCheckMatrix4NAN(y2) << " in x1/y1/x2/y2!")
+                  x2) << "/" << lambdaCheckMatrix4NAN(y2) << " in x1/y1/x2/y2!");
       }
     } else  {
       xs = x2; ys = y2;
@@ -704,7 +704,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
       didNanAppear = true;
       B2DEBUG(3, "helixFit: i: " << i << ", s(i) = 'nan', components - rho: " << rho << ", radiusX: " << radiusX << ", radiusY: " <<
               radiusY << ", radiusXb: " << radiusXb << ", radiusYb: " << radiusYb << ", invRadiusMag: " << invRadiusMag << ", radiusMagb: " <<
-              radiusMagb << ", xs(i): " << xs(i, 0) << ", ys(i): " << ys(i, 0))
+              radiusMagb << ", xs(i): " << xs(i, 0) << ", ys(i): " << ys(i, 0));
     }
   }
 
@@ -721,7 +721,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
     AtG(0, i) = invVarZvalues(i, 0);
     AtG(1, i) = sw;
     B2DEBUG(75, "hit i: " <<  i << ", sumWi: " << sumWi << ", sw: " << sw << ", sumWiSi: " << sumWiSi << ", sumWiSi2: " << sumWiSi2 <<
-            ", s(i): " << s(i, 0) << ", invVarZvalues(i): " << invVarZvalues(i, 0))
+            ", s(i): " << s(i, 0) << ", invVarZvalues(i): " << invVarZvalues(i, 0));
   }
   AtGA(0, 0) = sumWi; // sum of weights
   AtGA(0, 1) = sumWiSi; // sum of weights times arc length
@@ -735,7 +735,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
   TMatrixD p = AtGAInv * AtG *
                zValues; // fitted z value in the first point, tan(lambda) -> WARNING FIXME why is the first point 1,0 not 0,0? jkl feb8th2014
-  if (lambdaCheckMatrix4NAN(p) == true) { B2DEBUG(10, "helixFit: p got 'nan'-entries!") }
+  if (lambdaCheckMatrix4NAN(p) == true) { B2DEBUG(10, "helixFit: p got 'nan'-entries!"); }
 
   double thetaVal = (M_PI * 0.5 - atan(p(1,
                                          0))); // WARNING: was M_PI*0.5 - atan(p(1,0)), but values were wrong! double-WARNING: but + atan was wrong too!
@@ -744,7 +744,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   if (std::isnan(thetaVal) == true) {
     didNanAppear = true;
     thetaVal = (hits->at(0)->hitPosition - hits->at(nHits - 1)->hitPosition).Theta(); /// INFO swapped! feb4th2014
-    B2DEBUG(3, "helixFit: calculating theta for momentum produced 'nan' -> fallback-solution produces theta: " << thetaVal)
+    B2DEBUG(3, "helixFit: calculating theta for momentum produced 'nan' -> fallback-solution produces theta: " << thetaVal);
     if (std::isnan(thetaVal) == true) { B2ERROR("helixFit: no usable Theta value could be produced -> serious error telling us that helix fit does not work! bypass is setting the value to 0!"); thetaVal = 0; }
   }
 
@@ -780,7 +780,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   double pZ = calcPt(rho) * p(1,
                               0); // pz = pt / tan (Theta); where Theta is Arctan(s/z), s... arc length in (x,y) = radius * Phi in radians, z... z-distance. So pz = pt * z / s = magneticFieldFactor*rho*z/s, and p(1,0).."fitted z-value" (TODO: check that!) seems to be z/s. => calcPt(rho)p(1,0)
   B2DEBUG(25, "helixFit: radius(rho): " << rho << ", theta: " << thetaVal << ", pT: " << pT << ", pZ: " << pZ << ", pVector.Perp: " <<
-          pVector.Perp() << ", pVector.Mag: " << pVector.Mag() << ", fitted zValue: " << p(1, 0))
+          pVector.Perp() << ", pVector.Mag: " << pVector.Mag() << ", fitted zValue: " << p(1, 0));
   TVector3 vectorToSecondHit = secondHit - seedHit;
   vectorToSecondHit.SetZ(0);
 
@@ -803,7 +803,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   if (didNanAppear == true && LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {
     B2DEBUG(3, "helixFit: there was a 'nan'-value detected. When using magnetic field of " << m_3hitFilterBox.getMagneticField() <<
             ", the following hits were part of this TC: \n" << printHits(m_hits) << "\n pVector  x/y/z: " << pVector.X() << "/" << pVector.Y()
-            << "/" << pVector.Z())
+            << "/" << pVector.Z());
   }
 
 
@@ -1057,7 +1057,7 @@ TVector3 pTVector = (pT / radiusInCm) * radialVector.Orthogonal();
     numOfCurrentHits = currentHits.size();
 
     if (numOfCurrentHits < 3) {
-      B2ERROR("calcInitialValues4TCs: currentTC got " << numOfCurrentHits << " hits! At this point only tcs having at least 3 hits should exist!")
+      B2ERROR("calcInitialValues4TCs: currentTC got " << numOfCurrentHits << " hits! At this point only tcs having at least 3 hits should exist!");
     }
 
     TVector3 hitA, hitB, hitC;
@@ -1125,7 +1125,7 @@ TVector3 pTVector = (pT / radiusInCm) * radialVector.Orthogonal();
 
 bool TrackletFilters::CalcCurvature()
 {
-  if (m_hits == NULL) B2FATAL(" TrackletFilters::CalcCurvature: hits not set, therefore no calculation possible - please check that!")
+  if (m_hits == NULL) B2FATAL(" TrackletFilters::CalcCurvature: hits not set, therefore no calculation possible - please check that!");
     double sumOfCurvature = 0.;
   for (int i = 0; i < m_numHits - 2; ++i) {
     TVector3 ab = m_hits->at(i)->hitPosition - m_hits->at(i + 1)->hitPosition;

@@ -134,10 +134,10 @@ namespace Belle2 {
     /** takes care of storing only paths which are long enough. */
     void storeAcceptedPath(PathPtr newPath, std::vector<PathPtr >& allNodePaths) const
     {
-      B2DEBUG(150, "storeAcceptedPath was started")
+      B2DEBUG(150, "storeAcceptedPath was started");
       if (!(newPath->size() < minPathLength)) {
         B2DEBUG(100, "storeAcceptedPath: path with size " << newPath->size() << " was accepted and will now be stored next to " <<
-                allNodePaths.size() << " other paths")
+                allNodePaths.size() << " other paths");
         allNodePaths.push_back(std::move(newPath));
       }
     }
@@ -147,12 +147,12 @@ namespace Belle2 {
     /** recursice pathFinder collecting all possible combinations there are.  WARNING does not take care of metaInfo (where e.g. CA-cell-state is stored) */
     void findPathsRecursive(std::vector<PathPtr >& allNodePaths, PathPtr& currentPath, NeighbourContainerType& innerNeighbours)
     {
-      B2DEBUG(150, "findPathsRecursive was started")
+      B2DEBUG(150, "findPathsRecursive was started");
 
       if (innerNeighbours.empty()) {
         B2DEBUG(75, "findPathsRecursive: currentPath with nEntries: " << currentPath->size() <<
                 "(of " << allNodePaths.size() <<
-                " paths so far) has no inner neighbours!-> path complete, skipping")
+                " paths so far) has no inner neighbours!-> path complete, skipping");
         nNodesPassed++;
         return;
       } // path complete, end function
@@ -161,7 +161,7 @@ namespace Belle2 {
       for (unsigned int n = 1; n < innerNeighbours.size(); ++n) {
         if (m_compatibilityChecker.areCompatible(currentPath->back(), innerNeighbours[n]) == false) { B2DEBUG(100, "findPathsRecursive: nodes are not compatible"); continue; }
 
-        B2DEBUG(125, "findPathsRecursive: currentPath was cloned for neighbour " << n << " of " << innerNeighbours.size())
+        B2DEBUG(125, "findPathsRecursive: currentPath was cloned for neighbour " << n << " of " << innerNeighbours.size());
         PathPtr newPath = clone(currentPath); // deep copy of existing path
 
         newPath->push_back(innerNeighbours[n]);
@@ -171,16 +171,16 @@ namespace Belle2 {
                 " paths so far) executing neighbour #" << n <<
                 " of " << innerNeighbours.size() <<
                 " neighbours. Found " << newNeighbours.size() <<
-                " for it.")
+                " for it.");
 
         nNodesPassed++; nRecursiveCalls++;
         findPathsRecursive(allNodePaths, newPath, newNeighbours);               /// findPathsRecursive
-        B2DEBUG(150, "findPathsRecursive: newPath: " << newPath->size() << ", currentPath.size: " << currentPath->size())
+        B2DEBUG(150, "findPathsRecursive: newPath: " << newPath->size() << ", currentPath.size: " << currentPath->size());
         storeAcceptedPath(std::move(newPath), allNodePaths);
       } // makes clones of current Path for each neighbour (excluding the first one) and adds it to the Paths if neighbour fits in the scheme...
 
       B2DEBUG(150, "findPathsRecursive: currentPath.size: " << currentPath->size() << ", innerNeighbours.size: " <<
-              innerNeighbours.size())
+              innerNeighbours.size());
       if (m_compatibilityChecker.areCompatible(currentPath->back(), innerNeighbours[0]) == false) { return; }
 
       //separate step for the first neighbour in line (has to be done after the cloning parts)...
@@ -188,7 +188,7 @@ namespace Belle2 {
               "(of " << allNodePaths.size() <<
               " paths so far) executing neighbour #" << 0 <<
               " of " << innerNeighbours.size() <<
-              " neighbours")
+              " neighbours");
       currentPath->push_back(innerNeighbours[0]);
       NeighbourContainerType& newNeighbours = innerNeighbours[0]->getInnerNodes();
 

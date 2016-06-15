@@ -107,7 +107,7 @@ void GenfitTrackCandidatesCreatorModule::outputPRAndMCTrackCands(const StoreArra
         relationsFromPRTrackCandsToMCParticle.add(trackCounter, mcParticleArrayIndex);
         newGenfitTrackCand->setMcTrackId(mcParticleArrayIndex);
       } else {
-        B2WARNING("PRRecoTrack marked as 'matched', but no related MCParticle found. Something is going wrong here.")
+        B2WARNING("PRRecoTrack marked as 'matched', but no related MCParticle found. Something is going wrong here.");
       }
     }
   }
@@ -124,7 +124,7 @@ void GenfitTrackCandidatesCreatorModule::outputPRAndMCTrackCands(const StoreArra
       relationsFromMCTrackCandsToMCParticle.add(trackCounter, mcParticleArrayIndex);
       newGenfitTrackCand->setMcTrackId(mcParticleArrayIndex);
     } else {
-      B2WARNING("MCRecoTrack without related MCParticle? Something is going wrong here.")
+      B2WARNING("MCRecoTrack without related MCParticle? Something is going wrong here.");
     }
   }
 

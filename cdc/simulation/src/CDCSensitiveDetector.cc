@@ -495,7 +495,7 @@ namespace Belle2 {
           if (kinEnergyBefore >= 0.) {
             momBefore = sqrt(kinEnergyBefore * (kinEnergyBefore + 2.*mass));
           } else {
-            B2WARNING("CDCSensitiveDetector: Kinetic Energy < 0.")
+            B2WARNING("CDCSensitiveDetector: Kinetic Energy < 0.");
             momBefore = 0.;
           }
 

@@ -34,12 +34,12 @@ void BFieldComponent3d::initialize()
 
   // Input field map
   if (m_mapFilename.empty()) {
-    B2ERROR("The filename for the 3d magnetic field component is empty !")
+    B2ERROR("The filename for the 3d magnetic field component is empty !");
     return;
   }
   string fullPath = FileSystem::findFile("/data/" + m_mapFilename);
   if (!FileSystem::fileExists(fullPath)) {
-    B2ERROR("The 3d magnetic field map file '" << m_mapFilename << "' could not be found !")
+    B2ERROR("The 3d magnetic field map file '" << m_mapFilename << "' could not be found !");
     return;
   }
 

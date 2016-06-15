@@ -96,7 +96,7 @@ void svdDumpModule::event()
     for (int j = 0; j < rawSVD[ i ]->GetNumEntries(); j++) {
       unsigned int nWords = rawSVD[i]->Get1stDetectorNwords(j);
       if (((int)nWords - m_nFtbHeader - m_nFtbTrailer) < 0) {
-        B2FATAL("Remaining data size is negative: " << ((int)nWords - m_nFtbHeader - m_nFtbTrailer))
+        B2FATAL("Remaining data size is negative: " << ((int)nWords - m_nFtbHeader - m_nFtbTrailer));
       }
       unsigned int remaining_nWords = (nWords - m_nFtbHeader - m_nFtbTrailer);
       total_nWords += remaining_nWords;

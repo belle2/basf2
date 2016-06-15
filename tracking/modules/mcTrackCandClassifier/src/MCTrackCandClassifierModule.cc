@@ -488,7 +488,7 @@ void MCTrackCandClassifierModule::endRun()
   B2INFO("** MCTrackCandClassifier parameters **");
   B2INFO("rootfilename = " << m_rootFileName);
   B2INFO("use PXD informations = " << m_usePXD);
-  B2INFO("--> classification criteria:")
+  B2INFO("--> classification criteria:");
   if (m_applyAnnulus)
     B2INFO("  -)  |d - R| < " << m_nSigma << " dL thetaMS");
   if (m_applySemiplane)

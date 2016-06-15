@@ -255,7 +255,7 @@ SecMapTrainerWithSpacePointsModule::~SecMapTrainerWithSpacePointsModule()
 void SecMapTrainerWithSpacePointsModule::initialize()
 {
   if (int(m_PARAMsetOrigin.size()) != 3) {
-    B2WARNING("SecMapTrainerWithSpacePointsModule::initialize: origin is set wrong, please set only 3 values (x,y,z). Rejecting user defined value and reset to (0,0,0)!")
+    B2WARNING("SecMapTrainerWithSpacePointsModule::initialize: origin is set wrong, please set only 3 values (x,y,z). Rejecting user defined value and reset to (0,0,0)!");
     m_PARAMsetOrigin.clear();
     m_PARAMsetOrigin.assign(3, 0);
   }
@@ -263,24 +263,24 @@ void SecMapTrainerWithSpacePointsModule::initialize()
 
   if (m_PARAMminTrackletLength < 2) {
     B2ERROR("SecMapTrainerWithSpacePointsModule::initialize: minTrackletLength is set to " << m_PARAMminTrackletLength <<
-            " which can't produce any usefull results, setting value to 2, but consider setting the parameter to 3 which is the recommended minimal length")
+            " which can't produce any usefull results, setting value to 2, but consider setting the parameter to 3 which is the recommended minimal length");
     m_PARAMminTrackletLength = 2;
   }
 
   if (int(m_PARAMacceptedRegionForSensors.size()) != 2) {
     B2ERROR("SecMapTrainerWithSpacePointsModule::initialize: acceptedRegionForSensor-parameter has got " <<
             m_PARAMacceptedRegionForSensors.size()
-            << " which is not allowed. Setting to standard value. If you do not know the correct choice, please type 'basf2 -m VXDTF' and read the description.")
+            << " which is not allowed. Setting to standard value. If you do not know the correct choice, please type 'basf2 -m VXDTF' and read the description.");
     m_PARAMacceptedRegionForSensors.clear();
     m_PARAMacceptedRegionForSensors.assign(2, -1);
   }
 
   if (m_PARAMtestBeam < 0 or m_PARAMtestBeam > 2) {
     B2ERROR("SecMapTrainerWithSpacePointsModule::initialize: testbeam-parameter set to " << m_PARAMtestBeam <<
-            " which is not allowed. Setting to 0. If you do not know the correct choice, please type 'basf2 -m VXDTF' and read the description.")
+            " which is not allowed. Setting to 0. If you do not know the correct choice, please type 'basf2 -m VXDTF' and read the description.");
     m_PARAMtestBeam = 0;
   }
-  if (m_PARAMmultiHitsAllowed == true and m_PARAMtestBeam > 0) { B2WARNING("SecMapTrainerWithSpacePointsModule::Initialize: parameter 'multiHitsAllowed' is true although 'testBeamm' is " << m_PARAMtestBeam << "! Is this on purpose? Please check!")}
+  if (m_PARAMmultiHitsAllowed == true and m_PARAMtestBeam > 0) { B2WARNING("SecMapTrainerWithSpacePointsModule::Initialize: parameter 'multiHitsAllowed' is true although 'testBeamm' is " << m_PARAMtestBeam << "! Is this on purpose? Please check!");}
 
 
   if (m_PARAManalysisWriteToRoot == true) { // preparing output of analysis data:
@@ -290,13 +290,13 @@ void SecMapTrainerWithSpacePointsModule::initialize()
         output += "'" + entry + "' ";
       }
       B2FATAL("SecMapTrainerWithSpacePointsModule::initialize: rootFileName is set wrong, although parameter 'writeToRoot' is enabled! Actual entries are: "
-              << output)
+              << output);
     }
   }
 
   if (m_filterCharges != -1 and m_filterCharges != 0 and m_filterCharges != 1) {
     B2ERROR("SecMapTrainerWithSpacePointsModule::initialize: parameter filterCharges is set to " << m_filterCharges <<
-            ", which is invalid, setting to standard (0)!")
+            ", which is invalid, setting to standard (0)!");
     m_filterCharges = 0;
   }
 
@@ -304,7 +304,7 @@ void SecMapTrainerWithSpacePointsModule::initialize()
   m_threeHitFilterBox.resetMagneticField(m_PARAMmagneticFieldStrength);
   m_fourHitFilterBox.resetMagneticField(m_PARAMmagneticFieldStrength);
 
-  B2INFO("~~~~~~~~~~~SecMapTrainerWithSpacePointsModule - initialize ~~~~~~~~~~")
+  B2INFO("~~~~~~~~~~~SecMapTrainerWithSpacePointsModule - initialize ~~~~~~~~~~");
 
 
   m_numOfLayers = 0;
@@ -331,9 +331,9 @@ void SecMapTrainerWithSpacePointsModule::initialize()
   m_trackletLengthCounter.assign(m_numOfLayers * 2 + 1, 0);
 
   B2INFO("chosen detectorTypes: " << detectorNames.str() << ", highestAllowedLayer: " << m_PARAMhighestAllowedLayer << ", smearHits: "
-         << m_PARAMsmearHits << ", noCurler: " << m_PARAMnoCurler << ", uniSigma: " << m_PARAMuniSigma)
+         << m_PARAMsmearHits << ", noCurler: " << m_PARAMnoCurler << ", uniSigma: " << m_PARAMuniSigma);
   B2INFO("origin is set to: (x,y,z) (" << m_PARAMsetOrigin.at(0) << "," << m_PARAMsetOrigin.at(1) << "," << m_PARAMsetOrigin.at(
-           2) << "), testBeam-mode is " << m_PARAMtestBeam << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T")
+           2) << "), testBeam-mode is " << m_PARAMtestBeam << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T");
 
   if (m_PARAMpTCutSmearer > 100 or m_PARAMpTCutSmearer < 0) { B2ERROR("pTCutSmearer was set to " << m_PARAMpTCutSmearer << ", which is not allowed, set to 0 now..."); m_PARAMpTCutSmearer = 0; }
 
@@ -370,7 +370,7 @@ void SecMapTrainerWithSpacePointsModule::initialize()
 
     B2INFO("SecMapTrainerWithSpacePointsModule-start: will use " << secMapName << " for storing cutoffs in range " <<
            secMap->getPtCuts().first <<
-           " - " << secMap->getPtCuts().second << " GeV/c")
+           " - " << secMap->getPtCuts().second << " GeV/c");
     m_sectorMaps.push_back(secMap);
   }
 
@@ -401,7 +401,7 @@ void SecMapTrainerWithSpacePointsModule::initialize()
 
   B2INFO("SecMapTrainerWithSpacePointsModule-start: will use " << secMapName << " for storing cutoffs in range " <<
          secMap->getPtCuts().first <<
-         " - " << secMap->getPtCuts().second << " GeV/c")
+         " - " << secMap->getPtCuts().second << " GeV/c");
   m_sectorMaps.push_back(secMap);
 
 
@@ -415,12 +415,12 @@ void SecMapTrainerWithSpacePointsModule::initialize()
 
     m_treeEventWisePtr = dynamic_cast<TTree*>(m_rootFilePtr->Get("m_treeEventWisePtr")); // trying to open existing TTree in file
     if (m_treeEventWisePtr == NULL/* and m_PARAMstoreExtraAnalysis == true*/) {  // did not exist
-      B2INFO(" m_treeEventWisePtr did not exist, creating new tree...")
+      B2INFO(" m_treeEventWisePtr did not exist, creating new tree...");
       m_treeEventWisePtr = new TTree("m_treeEventWisePtr", "anEventWiseTree");
       m_treeEventWisePtr->Branch("pTValuesInLayer1", &m_rootpTValuesInLayer1);
       m_treeEventWisePtr->Branch("momValuesInLayer1", &m_rootmomValuesInLayer1);
     } else { /*if (m_PARAMstoreExtraAnalysis == true)*/
-      B2INFO(" m_treeEventWisePtr did exist, reopen old tree... Print: ")
+      B2INFO(" m_treeEventWisePtr did exist, reopen old tree... Print: ");
       m_rootpTValuesInLayer1Ptr = &m_rootpTValuesInLayer1;
       m_rootmomValuesInLayer1Ptr = &m_rootmomValuesInLayer1;
       m_treeEventWisePtr->SetBranchAddress("pTValuesInLayer1", &m_rootpTValuesInLayer1Ptr);
@@ -441,7 +441,7 @@ void SecMapTrainerWithSpacePointsModule::initialize()
 /// /// /// /// /// /// /// /// BEGIN RUN /// /// /// /// /// /// /// ///
 void SecMapTrainerWithSpacePointsModule::beginRun()
 {
-  B2INFO("~~~~~~~~~~~SecMapTrainerWithSpacePointsModule - beginRun ~~~~~~~~~~")
+  B2INFO("~~~~~~~~~~~SecMapTrainerWithSpacePointsModule - beginRun ~~~~~~~~~~");
 
 //   InitializeVariables();
 }
@@ -454,13 +454,13 @@ void SecMapTrainerWithSpacePointsModule::event()
   //get the data
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   m_eventCounter = eventMetaDataPtr->getEvent();
-  B2DEBUG(5, "~~~~~~~~~~~SecMapTrainerWithSpacePointsModule - event " << m_eventCounter << " ~~~~~~~~~~")
+  B2DEBUG(5, "~~~~~~~~~~~SecMapTrainerWithSpacePointsModule - event " << m_eventCounter << " ~~~~~~~~~~");
 
   //simulated particles and hits
   unsigned nSPTCs = m_spacePointTrackCands.getEntries();
 
   if (nSPTCs == 0) {
-    B2INFO("event " << m_eventCounter << ": there is no SpacePointTrackCandidate!")
+    B2INFO("event " << m_eventCounter << ": there is no SpacePointTrackCandidate!");
     return;
   }
 
@@ -480,7 +480,7 @@ void SecMapTrainerWithSpacePointsModule::event()
   for (unsigned iTC = 0; iTC not_eq nSPTCs; ++ iTC) {
     const SpacePointTrackCand* currentTC = m_spacePointTrackCands[iTC];
     B2DEBUG(10, "current SPTC " << currentTC->getArrayIndex() <<
-            " has got " << currentTC->getNHits() << " hits stored")
+            " has got " << currentTC->getNHits() << " hits stored");
     unsigned chosenMap = 0;
     for (auto* secMap : m_sectorMaps) {
       chosenMap++;
@@ -493,7 +493,7 @@ void SecMapTrainerWithSpacePointsModule::event()
               "GeV/c was " << (accepted ? string("accepted") : string("rejected")) <<
               " by secMap " << secMap->getName() <<
               " having momCuts: " << secMap->getPtCuts().first <<
-              "/" << secMap->getPtCuts().second)
+              "/" << secMap->getPtCuts().second);
       if (!accepted) continue;
       m_trackletMomentumCounter.at(chosenMap - 1)++;
 
@@ -512,7 +512,7 @@ void SecMapTrainerWithSpacePointsModule::event()
     nTotalHits += tracklet.getTrack().size();
   }
   B2DEBUG(5, "finished tracklet-generation. " << trackletsOfEvent.size() << " tracklets and " << nSPTCs <<
-          " original tracks found having mean of " << float(nTotalHits) / float(trackletsOfEvent.size()) << " hits per tracklet")
+          " original tracks found having mean of " << float(nTotalHits) / float(trackletsOfEvent.size()) << " hits per tracklet");
   string currentSector, friendSector;
 //4hit-variables:
   TVector3 hitG, moHitG, graMoHitG, greGraMoHitG;
@@ -542,7 +542,7 @@ void SecMapTrainerWithSpacePointsModule::event()
 //       B2DEBUG(20, "tracklet has a hit in the following sector: " << currentSector)
     }
     B2DEBUG(20, "executing " << i + 1 << "th tracklet with size " << aTracklet.size() << " and hits in the sectors:\n" <<
-            tcSectors.str() << endl)
+            tcSectors.str() << endl);
 
     InternalRawSectorMap::MapOfSectors::iterator thisSectorPos;
     for (; iter != aTracklet.end(); ++iter) {
@@ -553,11 +553,11 @@ void SecMapTrainerWithSpacePointsModule::event()
       }
 
       if (firstrun == false) {
-        B2DEBUG(25, "calculating 2-hit-filters")
+        B2DEBUG(25, "calculating 2-hit-filters");
         if (secondrun == false) {
-          B2DEBUG(25, "calculating 3-hit-filters")
+          B2DEBUG(25, "calculating 3-hit-filters");
           if (thirdrun == false) {
-            B2DEBUG(25, "calculating 4-hit-filters")
+            B2DEBUG(25, "calculating 4-hit-filters");
             currentSector = it4HitsFilter->getSectorID();
             friendSector = it3HitsFilter->getSectorID();
             thisSectorPos = thisSecMap->find(currentSector);
@@ -572,7 +572,7 @@ void SecMapTrainerWithSpacePointsModule::event()
 //             greGraMoHitG.SetZ(0.);
             B2DEBUG(50, "4-hit: outer -> innerHit Perp and SecID \n" << hitG.Perp() << "/" << currentSector << " " << moHitG.Perp() << "/" <<
                     friendSector << " " << graMoHitG.Perp() << "/" << it2HitsFilter->getSectorID() << " " << greGraMoHitG.Perp() << "/" <<
-                    iter->getSectorID())
+                    iter->getSectorID());
             m_fourHitFilterBox.resetValues(hitG, moHitG, graMoHitG, greGraMoHitG); // outerhit, centerhit, innerhit
 
             if (m_PARAMlogDeltaPt == true) {
@@ -582,25 +582,25 @@ void SecMapTrainerWithSpacePointsModule::event()
                 deltapT = m_fourHitFilterBox.deltapT();
               } catch (FilterExceptions::Straight_Line& exception) {
                 B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltapT threw an exception: " << exception.what() <<
-                          ", value discarded...")
+                          ", value discarded...");
                 succeeded = false;
               } catch (FilterExceptions::Circle_too_small& exception) {
                 B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltapT threw an exception: " << exception.what() <<
-                          ", value discarded...")
+                          ", value discarded...");
                 succeeded = false;
               }
               if (std::isnan(deltapT) == false) {
                 if (succeeded == true) {
                   B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapT-Value: " << deltapT << " gets stored in sector " <<
-                          thisSectorPos->second.getSectorID())
+                          thisSectorPos->second.getSectorID());
                   thisSectorPos->second.addValue(friendSector, FilterID::deltapT, deltapT);
                 } else {
-                  B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapT-value got discarded")
+                  B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapT-value got discarded");
                 }
               } else {
                 m_badFilterValueCtr++;
                 B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltapT-Value: " << deltapT << " is 'nan'! currentSec: " <<
-                          currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                          currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
                 hitG.Print(); moHitG.Print(); graMoHitG.Print(); greGraMoHitG.Print();
               }
             }
@@ -612,25 +612,25 @@ void SecMapTrainerWithSpacePointsModule::event()
                 deltaDistCircleCenter =  m_fourHitFilterBox.deltaDistCircleCenter();
               } catch (FilterExceptions::Straight_Line& exception) {
                 B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltaDistCircleCenter threw an exception: " <<
-                          exception.what() << ", value discarded...")
+                          exception.what() << ", value discarded...");
                 succeeded = false;
               } catch (FilterExceptions::Circle_too_small& exception) {
                 B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltaDistCircleCenter threw an exception: " <<
-                          exception.what() << ", value discarded...")
+                          exception.what() << ", value discarded...");
                 succeeded = false;
               }
               if (std::isnan(deltaDistCircleCenter) == false) {
                 if (succeeded == true) {
                   B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenter-Value: " << deltaDistCircleCenter <<
-                          " gets stored in sector " << thisSectorPos->second.getSectorID())
+                          " gets stored in sector " << thisSectorPos->second.getSectorID());
                   thisSectorPos->second.addValue(friendSector, FilterID::deltaDistance2IP, deltaDistCircleCenter);
                 } else {
-                  B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenter-value got discarded")
+                  B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenter-value got discarded");
                 }
               } else {
                 m_badFilterValueCtr++;
                 B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenter-Value: " << deltaDistCircleCenter <<
-                          " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                          " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
                 hitG.Print(); moHitG.Print(); graMoHitG.Print(); greGraMoHitG.Print();
               }
             }
@@ -638,32 +638,32 @@ void SecMapTrainerWithSpacePointsModule::event()
             //#### debugFilters:
             if (m_PARAMlogAlwaysTrue4Hit == true) {
               B2DEBUG(50, "4-hit-filterDEBUG in event " << m_eventCounter << ": calculated alwaysTrue4Hit-Value: " << 1 <<
-                      " gets stored in sector " << thisSectorPos->second.getSectorID())
+                      " gets stored in sector " << thisSectorPos->second.getSectorID());
               thisSectorPos->second.addValue(friendSector, FilterID::alwaysTrue4Hit, 1);
             }
             if (m_PARAMlogAlwaysFalse4Hit == true) {
               B2DEBUG(50, "4-hit-filterDEBUG in event " << m_eventCounter << ": calculated alwaysFalse4Hit-Value: " << 0 <<
-                      " gets stored in sector " << thisSectorPos->second.getSectorID())
+                      " gets stored in sector " << thisSectorPos->second.getSectorID());
               thisSectorPos->second.addValue(friendSector, FilterID::alwaysFalse4Hit, 0);
             }
             if (m_PARAMlogRandom4Hit == true) {
               B2DEBUG(50, "4-hit-filterDEBUG in event " << m_eventCounter << ": calculated random4Hit-Value: " << 0.5 << " gets stored in sector "
-                      << thisSectorPos->second.getSectorID())
+                      << thisSectorPos->second.getSectorID());
               thisSectorPos->second.addValue(friendSector, FilterID::random4Hit, 0.5);
             }
             if (m_PARAMlogZigZagXY == true) {
               B2DEBUG(50, "4-hit-filterDEBUG in event " << m_eventCounter << ": calculated ziggZaggXY-Value: " << 1 << " gets stored in sector "
-                      << thisSectorPos->second.getSectorID())
+                      << thisSectorPos->second.getSectorID());
               thisSectorPos->second.addValue(friendSector, FilterID::ziggZaggXY, 1);
             }
             if (m_PARAMlogAlwaysTrue4Hit == true) {
               B2DEBUG(50, "4-hit-filterDEBUG in event " << m_eventCounter << ": calculated ziggZaggXYWithSigma-Value: " << 1 <<
-                      " gets stored in sector " << thisSectorPos->second.getSectorID())
+                      " gets stored in sector " << thisSectorPos->second.getSectorID());
               thisSectorPos->second.addValue(friendSector, FilterID::ziggZaggXYWithSigma, 1);
             }
             if (m_PARAMlogAlwaysTrue4Hit == true) {
               B2DEBUG(50, "4-hit-filterDEBUG in event " << m_eventCounter << ": calculated ziggZaggRZ-Value: " << 1 << " gets stored in sector "
-                      << thisSectorPos->second.getSectorID())
+                      << thisSectorPos->second.getSectorID());
               thisSectorPos->second.addValue(friendSector, FilterID::ziggZaggRZ, 1);
             }
 
@@ -682,7 +682,7 @@ void SecMapTrainerWithSpacePointsModule::event()
           m_fourHitFilterBox.resetValues(hitGlobal, motherHitGlobal, grandMotherHitGlobal, m_origin); // outerhit, centerhit, innerhit
           B2DEBUG(50, "3-hit and hioc 3+1: outer -> innerHit Perp and SecID \n" << hitGlobal.Perp() << "/" << currentSector << " " <<
                   motherHitGlobal.Perp() << "/" << friendSector << " " << grandMotherHitGlobal.Perp() << "/" << iter->getSectorID() << " " <<
-                  m_origin.Perp())
+                  m_origin.Perp());
           if (m_PARAMlogDeltaPtHighOccupancy == true and lastRun == false) {
             bool succeeded = true;
             deltapT = 0;
@@ -690,25 +690,25 @@ void SecMapTrainerWithSpacePointsModule::event()
               deltapT = m_fourHitFilterBox.deltapT();
             } catch (FilterExceptions::Straight_Line& exception) {
               B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltapTHighOccupancy threw an exception: " <<
-                        exception.what() << ", value discarded...")
+                        exception.what() << ", value discarded...");
               succeeded = false;
             } catch (FilterExceptions::Circle_too_small& exception) {
               B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltapTHighOccupancy threw an exception: " <<
-                        exception.what() << ", value discarded...")
+                        exception.what() << ", value discarded...");
               succeeded = false;
             }
             if (std::isnan(deltapT) == false) {
               if (succeeded == true) {
                 B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapTHighOccupancy-Value: " << deltapT <<
-                        " gets stored in sector " << thisSectorPos->second.getSectorID())
+                        " gets stored in sector " << thisSectorPos->second.getSectorID());
                 thisSectorPos->second.addValue(friendSector, FilterID::deltapTHighOccupancy, deltapT);
               } else {
-                B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapTHighOccupancy-value got discarded")
+                B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapTHighOccupancy-value got discarded");
               }
             } else {
               m_badFilterValueCtr++;
               B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltapTHighOccupancy-Value: " << deltapT <<
-                        " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                        " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); m_origin.Print();
             }
           }
@@ -719,26 +719,26 @@ void SecMapTrainerWithSpacePointsModule::event()
               deltaDistCircleCenter =  m_fourHitFilterBox.deltaDistCircleCenter();
             } catch (FilterExceptions::Straight_Line& exception) {
               B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltaDistCircleCenterHighOccupancy threw an exception: " <<
-                        exception.what() << ", value discarded...")
+                        exception.what() << ", value discarded...");
               succeeded = false;
             } catch (FilterExceptions::Circle_too_small& exception) {
               B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltaDistCircleCenterHighOccupancy threw an exception: " <<
-                        exception.what() << ", value discarded...")
+                        exception.what() << ", value discarded...");
               succeeded = false;
             }
             if (std::isnan(deltaDistCircleCenter) == false) {
               if (succeeded == true) {
                 B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenterHighOccupancy-Value: " <<
-                        deltaDistCircleCenter << " gets stored in sector " << thisSectorPos->second.getSectorID())
+                        deltaDistCircleCenter << " gets stored in sector " << thisSectorPos->second.getSectorID());
                 thisSectorPos->second.addValue(friendSector, FilterID::deltaDistanceHighOccupancy2IP, deltaDistCircleCenter);
               } else {
-                B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenterHighOccupancy-value got discarded")
+                B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenterHighOccupancy-value got discarded");
               }
             } else {
               m_badFilterValueCtr++;
               B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenterHighOccupancy-Value: " <<
                         deltaDistCircleCenter << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector <<
-                        ". Printing Vectors(outer2inner): ")
+                        ". Printing Vectors(outer2inner): ");
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); m_origin.Print();
             }
           }
@@ -753,25 +753,25 @@ void SecMapTrainerWithSpacePointsModule::event()
               dist2IP = m_threeHitFilterBox.calcCircleDist2IP();
             } catch (FilterExceptions::Straight_Line& exception) {
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating dist2IP threw an exception: " << exception.what() <<
-                        ", value discarded...")
+                        ", value discarded...");
               succeeded = false;
             } catch (FilterExceptions::Circle_too_small& exception) {
               B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating dist2IP threw an exception: " << exception.what() <<
-                        ", value discarded...")
+                        ", value discarded...");
               succeeded = false;
             }
             if (std::isnan(dist2IP) == false) {
               if (succeeded == true) {
                 B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated dist2IP-Value: " << dist2IP << " gets stored in sector " <<
-                        thisSectorPos->second.getSectorID())
+                        thisSectorPos->second.getSectorID());
                 thisSectorPos->second.addValue(friendSector, FilterID::distance2IP, dist2IP);
               } else {
-                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated dist2IP-value got discarded")
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated dist2IP-value got discarded");
               }
             } else {
               m_badFilterValueCtr++;
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated dist2IP-Value: " << dist2IP << " is 'nan'! currentSec: " <<
-                        currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                        currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); m_origin.Print();
             }
           }
@@ -783,25 +783,25 @@ void SecMapTrainerWithSpacePointsModule::event()
               pT = m_threeHitFilterBox.calcPt();
             } catch (FilterExceptions::Straight_Line& exception) {
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating pT threw an exception: " << exception.what() <<
-                        ", value discarded...")
+                        ", value discarded...");
               succeeded = false;
             } catch (FilterExceptions::Circle_too_small& exception) {
               B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating pT threw an exception: " << exception.what() <<
-                        ", value discarded...")
+                        ", value discarded...");
               succeeded = false;
             }
             if (std::isnan(pT) == false) {
               if (succeeded == true) {
                 B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated pT-Value: " << pT << " gets stored in sector " <<
-                        thisSectorPos->second.getSectorID())
+                        thisSectorPos->second.getSectorID());
                 thisSectorPos->second.addValue(friendSector, FilterID::pT, pT);
               } else {
-                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated pT-value got discarded")
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated pT-value got discarded");
               }
             } else {
               m_badFilterValueCtr++;
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated pT-Value: " << pT << " is 'nan'! currentSec: " <<
-                        currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                        currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
             }
             if (m_PARAMtrackErrorTracks == true) {
@@ -815,12 +815,12 @@ void SecMapTrainerWithSpacePointsModule::event()
             deltaSlopeRZ = m_threeHitFilterBox.calcDeltaSlopeRZ();
             if (std::isnan(deltaSlopeRZ) == false) {
               B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeRZ-Value: " << deltaSlopeRZ <<
-                      " gets stored in sector " << thisSectorPos->second.getSectorID())
+                      " gets stored in sector " << thisSectorPos->second.getSectorID());
               thisSectorPos->second.addValue(friendSector, FilterID::deltaSlopeRZ, deltaSlopeRZ);
             } else {
               m_badFilterValueCtr++;
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeRZ-Value: " << deltaSlopeRZ <<
-                        " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                        " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
             }
           }
@@ -829,12 +829,12 @@ void SecMapTrainerWithSpacePointsModule::event()
             angles3D = m_threeHitFilterBox.calcAngle3D();
             if (std::isnan(angles3D) == false) {
               B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated angles3D-Value: " << angles3D << " gets stored in sector "
-                      << thisSectorPos->second.getSectorID())
+                      << thisSectorPos->second.getSectorID());
               thisSectorPos->second.addValue(friendSector, FilterID::angles3D, angles3D);
             } else {
               m_badFilterValueCtr++;
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated angles3D-Value: " << angles3D << " is 'nan'! currentSec: " <<
-                        currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                        currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
             }
           }
@@ -843,12 +843,12 @@ void SecMapTrainerWithSpacePointsModule::event()
             anglesXY = m_threeHitFilterBox.calcAngleXY();
             if (std::isnan(anglesXY) == false) {
               B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesXY-Value: " << anglesXY << " gets stored in sector "
-                      << thisSectorPos->second.getSectorID())
+                      << thisSectorPos->second.getSectorID());
               thisSectorPos->second.addValue(friendSector, FilterID::anglesXY, anglesXY);
             }  else {
               m_badFilterValueCtr++;
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesXY-Value: " << anglesXY << " is 'nan'! currentSec: " <<
-                        currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                        currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
             }
           }
@@ -857,12 +857,12 @@ void SecMapTrainerWithSpacePointsModule::event()
             anglesRZ = m_threeHitFilterBox.calcAngleRZ();
             if (std::isnan(anglesRZ) == false) {
               B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesRZ-Value: " << anglesRZ << " gets stored in sector "
-                      << thisSectorPos->second.getSectorID())
+                      << thisSectorPos->second.getSectorID());
               thisSectorPos->second.addValue(friendSector, FilterID::anglesRZ, anglesRZ);
             } else {
               m_badFilterValueCtr++;
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesRZ-Value: " << anglesRZ << " is 'nan'! currentSec: " <<
-                        currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                        currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
             }
           }
@@ -874,25 +874,25 @@ void SecMapTrainerWithSpacePointsModule::event()
               helixParameterFit = m_threeHitFilterBox.calcHelixParameterFit();
             } catch (FilterExceptions::Straight_Line& exception) {
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating helixParameterFit threw an exception: " << exception.what()
-                        << ", value discarded...")
+                        << ", value discarded...");
               succeeded = false;
             } catch (FilterExceptions::Circle_too_small& exception) {
               B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating helixParameterFit threw an exception: " << exception.what()
-                        << ", value discarded...")
+                        << ", value discarded...");
               succeeded = false;
             }
             if (std::isnan(helixParameterFit) == false) {
               if (succeeded == true) {
                 B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixParameterFit-Value: " << helixParameterFit <<
-                        " gets stored in sector " << thisSectorPos->second.getSectorID())
+                        " gets stored in sector " << thisSectorPos->second.getSectorID());
                 thisSectorPos->second.addValue(friendSector, FilterID::helixParameterFit, helixParameterFit);
               } else {
-                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixParameterFit-value got discarded")
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixParameterFit-value got discarded");
               }
             } else {
               m_badFilterValueCtr++;
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated helixParameterFit-Value: " << helixParameterFit <<
-                        " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                        " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
             }
           }
@@ -904,25 +904,25 @@ void SecMapTrainerWithSpacePointsModule::event()
               deltaSOverZ = m_threeHitFilterBox.calcDeltaSOverZ();
             } catch (FilterExceptions::Straight_Line& exception) {
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating deltaSOverZ threw an exception: " << exception.what() <<
-                        ", value discarded...")
+                        ", value discarded...");
               succeeded = false;
             } catch (FilterExceptions::Circle_too_small& exception) {
               B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltaSOverZ threw an exception: " << exception.what() <<
-                        ", value discarded...")
+                        ", value discarded...");
               succeeded = false;
             }
             if (std::isnan(deltaSOverZ) == false) {
               if (succeeded == true) {
                 B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSOverZ-Value: " << deltaSOverZ <<
-                        " gets stored in sector " << thisSectorPos->second.getSectorID())
+                        " gets stored in sector " << thisSectorPos->second.getSectorID());
                 thisSectorPos->second.addValue(friendSector, FilterID::deltaSOverZ, deltaSOverZ);
               } else {
-                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSOverZ-value got discarded")
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSOverZ-value got discarded");
               }
             } else {
               m_badFilterValueCtr++;
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated deltaSOverZ-Value: " << deltaSOverZ <<
-                        " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                        " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
             }
           }
@@ -934,26 +934,26 @@ void SecMapTrainerWithSpacePointsModule::event()
               deltaSlopeZOverS = m_threeHitFilterBox.calcDeltaSlopeZOverS();
             } catch (FilterExceptions::Straight_Line& exception) {
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating deltaSlopeZOverS threw an exception: " << exception.what() <<
-                        ", value discarded...")
+                        ", value discarded...");
               succeeded = false;
             } catch (FilterExceptions::Circle_too_small& exception) {
               B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltaSlopeZOverS threw an exception: " << exception.what() <<
-                        ", value discarded...")
+                        ", value discarded...");
               succeeded = false;
             }
             if (std::isnan(deltaSlopeZOverS) == false) {
               if (succeeded == true) {
                 B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeZOverS-Value: " << deltaSlopeZOverS <<
-                        " gets stored in sector " << thisSectorPos->second.getSectorID())
+                        " gets stored in sector " << thisSectorPos->second.getSectorID());
                 thisSectorPos->second.addValue(friendSector, FilterID::deltaSlopeZOverS, deltaSlopeZOverS);
               } else {
-                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeZOverS-value got discarded")
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeZOverS-value got discarded");
               }
 
             } else {
               m_badFilterValueCtr++;
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeZOverS-Value: " << deltaSlopeZOverS <<
-                        " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                        " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
             }
           }
@@ -961,17 +961,17 @@ void SecMapTrainerWithSpacePointsModule::event()
           //#### debugFilters:
           if (m_PARAMlogAlwaysTrue3Hit == true) {
             B2DEBUG(50, "3-hit-filterDEBUG in event " << m_eventCounter << ": calculated alwaysTrue3Hit-Value: " << 1 <<
-                    " gets stored in sector " << thisSectorPos->second.getSectorID())
+                    " gets stored in sector " << thisSectorPos->second.getSectorID());
             thisSectorPos->second.addValue(friendSector, FilterID::alwaysTrue3Hit, 1);
           }
           if (m_PARAMlogAlwaysFalse3Hit == true) {
             B2DEBUG(50, "3-hit-filterDEBUG in event " << m_eventCounter << ": calculated alwaysFalse3Hit-Value: " << 0 <<
-                    " gets stored in sector " << thisSectorPos->second.getSectorID())
+                    " gets stored in sector " << thisSectorPos->second.getSectorID());
             thisSectorPos->second.addValue(friendSector, FilterID::alwaysFalse3Hit, 0);
           }
           if (m_PARAMlogRandom3Hit == true) {
             B2DEBUG(50, "3-hit-filterDEBUG in event " << m_eventCounter << ": calculated random3Hit-Value: " << 0.5 << " gets stored in sector "
-                    << thisSectorPos->second.getSectorID())
+                    << thisSectorPos->second.getSectorID());
             thisSectorPos->second.addValue(friendSector, FilterID::random3Hit, 0.5);
           }
 
@@ -983,18 +983,18 @@ void SecMapTrainerWithSpacePointsModule::event()
         friendSector = iter->getSectorID();
         thisSectorPos = thisSecMap->find(currentSector);
 
-        if (thisSectorPos == thisSecMap->end()) { B2ERROR(" sector " << currentSector << " not found...")} /// WARNING TODO WTF?!?
+        if (thisSectorPos == thisSecMap->end()) { B2ERROR(" sector " << currentSector << " not found...");} /// WARNING TODO WTF?!?
 
         if (typeid(string).name() != typeid(friendSector).name()) {
           B2WARNING("SecMapTrainerWithSpacePointsModule event " << m_eventCounter <<
-                    ": type of friendSector is no string, aborting tracklet...")
+                    ": type of friendSector is no string, aborting tracklet...");
           continue;
         }
 
         hitGlobal = it2HitsFilter->getHitPosition();
         motherHitGlobal = iter->getHitPosition();
         B2DEBUG(50, "2-hit and hioc 2+1: outer -> innerHit Perp and SecID \n" << hitGlobal.Perp() << "/" << currentSector << " " <<
-                motherHitGlobal.Perp() << "/" << friendSector << " " << m_origin.Perp())
+                motherHitGlobal.Perp() << "/" << friendSector << " " << m_origin.Perp());
 
         /// high occupancy mode for 2+1 hits
         m_threeHitFilterBox.resetValues(hitGlobal, motherHitGlobal, m_origin); // outerhit, centerhit, innerhit
@@ -1005,26 +1005,26 @@ void SecMapTrainerWithSpacePointsModule::event()
             dist2IP = m_threeHitFilterBox.calcCircleDist2IP();
           } catch (FilterExceptions::Straight_Line& exception) {
             B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating distHighOccupancy2IP threw an exception: " <<
-                      exception.what() << ", value discarded...")
+                      exception.what() << ", value discarded...");
             succeeded = false;
           } catch (FilterExceptions::Circle_too_small& exception) {
             B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating distHighOccupancy2IP threw an exception: " <<
-                      exception.what() << ", value discarded...")
+                      exception.what() << ", value discarded...");
             succeeded = false;
           }
           if (std::isnan(dist2IP) == false) {
             if (succeeded == true) {
               B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-Value(FilterID " <<
                       FilterID::distanceHighOccupancy2IP << "): " << dist2IP << " for sector " << FullSecID(friendSector) << " gets stored in sector " <<
-                      thisSectorPos->second.getSectorID())
+                      thisSectorPos->second.getSectorID());
               thisSectorPos->second.addValue(friendSector, FilterID::distanceHighOccupancy2IP, dist2IP);
             } else {
-              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-value got discarded")
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-value got discarded");
             }
           } else {
             m_badFilterValueCtr++;
             B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-Value: " << dist2IP <<
-                      " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                      " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
             hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
@@ -1035,25 +1035,25 @@ void SecMapTrainerWithSpacePointsModule::event()
             pT = m_threeHitFilterBox.calcPt();
           } catch (FilterExceptions::Straight_Line& exception) {
             B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating pTHighOccupancy threw an exception: " << exception.what() <<
-                      ", value discarded...")
+                      ", value discarded...");
             succeeded = false;
           } catch (FilterExceptions::Circle_too_small& exception) {
             B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating pTHighOccupancy threw an exception: " << exception.what() <<
-                      ", value discarded...")
+                      ", value discarded...");
             succeeded = false;
           }
           if (std::isnan(pT) == false) {
             if (succeeded == true) {
               B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated pTHighOccupancy-Value: " << pT << " gets stored in sector "
-                      << thisSectorPos->second.getSectorID())
+                      << thisSectorPos->second.getSectorID());
               thisSectorPos->second.addValue(friendSector, FilterID::pTHighOccupancy, pT);
             } else {
-              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-value got discarded")
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-value got discarded");
             }
           } else {
             m_badFilterValueCtr++;
             B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated pTHighOccupancy-Value: " << pT << " is 'nan'! currentSec: " <<
-                      currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                      currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
             hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
@@ -1061,12 +1061,12 @@ void SecMapTrainerWithSpacePointsModule::event()
           deltaSlopeRZ = m_threeHitFilterBox.calcDeltaSlopeRZ();
           if (std::isnan(deltaSlopeRZ) == false) {
             B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeHighOccupancyRZ-Value: " << deltaSlopeRZ <<
-                    " gets stored in sector " << thisSectorPos->second.getSectorID())
+                    " gets stored in sector " << thisSectorPos->second.getSectorID());
             thisSectorPos->second.addValue(friendSector, FilterID::deltaSlopeHighOccupancyRZ, deltaSlopeRZ);
           } else {
             m_badFilterValueCtr++;
             B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeHighOccupancyRZ-Value: " << deltaSlopeRZ <<
-                      " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                      " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
             hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
@@ -1074,12 +1074,12 @@ void SecMapTrainerWithSpacePointsModule::event()
           angles3D = m_threeHitFilterBox.calcAngle3D();
           if (std::isnan(angles3D) == false) {
             B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancy3D-Value: " << angles3D <<
-                    " gets stored in sector " << thisSectorPos->second.getSectorID())
+                    " gets stored in sector " << thisSectorPos->second.getSectorID());
             thisSectorPos->second.addValue(friendSector, FilterID::anglesHighOccupancy3D, angles3D);
           } else {
             m_badFilterValueCtr++;
             B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancy3D-Value: " << angles3D <<
-                      " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                      " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
             hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
@@ -1087,12 +1087,12 @@ void SecMapTrainerWithSpacePointsModule::event()
           anglesXY = m_threeHitFilterBox.calcAngleXY();
           if (std::isnan(anglesXY) == false) {
             B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancyXY-Value: " << anglesXY <<
-                    " gets stored in sector " << thisSectorPos->second.getSectorID())
+                    " gets stored in sector " << thisSectorPos->second.getSectorID());
             thisSectorPos->second.addValue(friendSector, FilterID::anglesHighOccupancyXY, anglesXY);
           }  else {
             m_badFilterValueCtr++;
             B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancyXY-Value: " << anglesXY <<
-                      " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                      " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
             hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
@@ -1100,12 +1100,12 @@ void SecMapTrainerWithSpacePointsModule::event()
           anglesRZ = m_threeHitFilterBox.calcAngleRZ();
           if (std::isnan(anglesRZ) == false) {
             B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancyRZ-Value: " << anglesRZ <<
-                    " gets stored in sector " << thisSectorPos->second.getSectorID())
+                    " gets stored in sector " << thisSectorPos->second.getSectorID());
             thisSectorPos->second.addValue(friendSector, FilterID::anglesHighOccupancyRZ, anglesRZ);
           } else {
             m_badFilterValueCtr++;
             B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated anglesHighOccupancyRZ-Value: " << anglesRZ <<
-                      " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                      " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
             hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
@@ -1116,25 +1116,25 @@ void SecMapTrainerWithSpacePointsModule::event()
             helixParameterFit = m_threeHitFilterBox.calcHelixParameterFit();
           } catch (FilterExceptions::Straight_Line& exception) {
             B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating helixParameterHighOccupancyFit threw an exception: " <<
-                      exception.what() << ", value discarded...")
+                      exception.what() << ", value discarded...");
             succeeded = false;
           } catch (FilterExceptions::Circle_too_small& exception) {
             B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating helixParameterHighOccupancyFit threw an exception: " <<
-                      exception.what() << ", value discarded...")
+                      exception.what() << ", value discarded...");
             succeeded = false;
           }
           if (std::isnan(helixParameterFit) == false) {
             if (succeeded == true) {
               B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixParameterHighOccupancyFit-Value: " << helixParameterFit
-                      << " gets stored in sector " << thisSectorPos->second.getSectorID())
+                      << " gets stored in sector " << thisSectorPos->second.getSectorID());
               thisSectorPos->second.addValue(friendSector, FilterID::helixParameterHighOccupancyFit, helixParameterFit);
             } else {
-              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixParameterHighOccupancyFit-value got discarded")
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixParameterHighOccupancyFit-value got discarded");
             }
           } else {
             m_badFilterValueCtr++;
             B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated helixHighOccupancyFit-Value: " << helixParameterFit <<
-                      " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                      " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
             hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
@@ -1168,12 +1168,12 @@ void SecMapTrainerWithSpacePointsModule::event()
           distanceXY = m_twoHitFilterBox.calcDistXY();
           if (std::isnan(distanceXY) == false) {
             B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated distanceXY-Value: " << distanceXY <<
-                    " gets stored in sector " << thisSectorPos->second.getSectorID())
+                    " gets stored in sector " << thisSectorPos->second.getSectorID());
             thisSectorPos->second.addValue(friendSector, FilterID::distanceXY, distanceXY);
           } else {
             m_badFilterValueCtr++;
             B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated distanceXY-Value: " << distanceXY << " is 'nan'! currentSec: "
-                      << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                      << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
             hitGlobal.Print(); motherHitGlobal.Print();
           }
         }
@@ -1182,12 +1182,12 @@ void SecMapTrainerWithSpacePointsModule::event()
           distanceZ = m_twoHitFilterBox.calcDistZ();
           if (std::isnan(distanceZ) == false) {
             B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated distanceZ-Value: " << distanceZ << " gets stored in sector "
-                    << thisSectorPos->second.getSectorID())
+                    << thisSectorPos->second.getSectorID());
             thisSectorPos->second.addValue(friendSector, FilterID::distanceZ, distanceZ);
           } else {
             m_badFilterValueCtr++;
             B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated distanceZ-Value: " << distanceZ << " is 'nan'! currentSec: "
-                      << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                      << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
             hitGlobal.Print(); motherHitGlobal.Print();
           }
         }
@@ -1196,12 +1196,12 @@ void SecMapTrainerWithSpacePointsModule::event()
           distance3D = m_twoHitFilterBox.calcDist3D();
           if (std::isnan(distance3D) == false) {
             B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated distance3D-Value: " << distance3D <<
-                    " gets stored in sector " << thisSectorPos->second.getSectorID())
+                    " gets stored in sector " << thisSectorPos->second.getSectorID());
             thisSectorPos->second.addValue(friendSector, FilterID::distance3D, distance3D);
           } else {
             m_badFilterValueCtr++;
             B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated distance3D-Value: " << distance3D << " is 'nan'! currentSec: "
-                      << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                      << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
             hitGlobal.Print(); motherHitGlobal.Print();
           }
         }
@@ -1210,12 +1210,12 @@ void SecMapTrainerWithSpacePointsModule::event()
           normedDistance3D = m_twoHitFilterBox.calcNormedDist3D();
           if (std::isnan(normedDistance3D) == false) {
             B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated normedDistance3D-Value: " << normedDistance3D <<
-                    " gets stored in sector " << thisSectorPos->second.getSectorID())
+                    " gets stored in sector " << thisSectorPos->second.getSectorID());
             thisSectorPos->second.addValue(friendSector, FilterID::normedDistance3D, normedDistance3D);
           } else {
             m_badFilterValueCtr++;
             B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated normedDistance3D-Value: " << normedDistance3D <<
-                      " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                      " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
             hitGlobal.Print(); motherHitGlobal.Print();
           }
         }
@@ -1224,12 +1224,12 @@ void SecMapTrainerWithSpacePointsModule::event()
           slopeRZ = m_twoHitFilterBox.calcSlopeRZ();
           if (std::isnan(slopeRZ) == false) {
             B2DEBUG(50, "2-hit-filter in event " << m_eventCounter << ": calculated slopeRZ-Value: " << slopeRZ << " gets stored in sector " <<
-                    thisSectorPos->second.getSectorID())
+                    thisSectorPos->second.getSectorID());
             thisSectorPos->second.addValue(friendSector, FilterID::slopeRZ, slopeRZ);
           } else {
             m_badFilterValueCtr++;
             B2WARNING("2-hit-filter in event " << m_eventCounter << ": calculated slopeRZ-Value: " << slopeRZ << " is 'nan'! currentSec: " <<
-                      currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+                      currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ");
             hitGlobal.Print(); motherHitGlobal.Print();
           }
         }
@@ -1237,17 +1237,17 @@ void SecMapTrainerWithSpacePointsModule::event()
         //#### debugFilters:
         if (m_PARAMlogAlwaysTrue2Hit == true) {
           B2DEBUG(50, "2-hit-filterDEBUG in event " << m_eventCounter << ": calculated alwaysTrue2Hit-Value: " << 1 <<
-                  " gets stored in sector " << thisSectorPos->second.getSectorID())
+                  " gets stored in sector " << thisSectorPos->second.getSectorID());
           thisSectorPos->second.addValue(friendSector, FilterID::alwaysTrue2Hit, 1);
         }
         if (m_PARAMlogAlwaysFalse2Hit == true) {
           B2DEBUG(50, "2-hit-filterDEBUG in event " << m_eventCounter << ": calculated alwaysFalse2Hit-Value: " << 0 <<
-                  " gets stored in sector " << thisSectorPos->second.getSectorID())
+                  " gets stored in sector " << thisSectorPos->second.getSectorID());
           thisSectorPos->second.addValue(friendSector, FilterID::alwaysFalse2Hit, 0);
         }
         if (m_PARAMlogRandom2Hit == true) {
           B2DEBUG(50, "2-hit-filterDEBUG in event " << m_eventCounter << ": calculated random2Hit-Value: " << 0.5 << " gets stored in sector "
-                  << thisSectorPos->second.getSectorID())
+                  << thisSectorPos->second.getSectorID());
           thisSectorPos->second.addValue(friendSector, FilterID::random2Hit, 0.5);
         }
         ++it2HitsFilter; //important for 2hit-Filters: points to current hit of 2-hit-processes
@@ -1260,7 +1260,7 @@ void SecMapTrainerWithSpacePointsModule::event()
     m_rootFilePtr->cd();
     m_treeEventWisePtr->Fill();
   }
-  B2DEBUG(5, "SecMapTrainerWithSpacePointsModule - event " << m_eventCounter << ", calculations done!")
+  B2DEBUG(5, "SecMapTrainerWithSpacePointsModule - event " << m_eventCounter << ", calculations done!");
 }
 
 
@@ -1268,7 +1268,7 @@ void SecMapTrainerWithSpacePointsModule::event()
 /// /// /// /// /// /// /// /// END RUN /// /// /// /// /// /// /// ///
 void SecMapTrainerWithSpacePointsModule::endRun()
 {
-  B2INFO("~~~~~~~~~~~SecMapTrainerWithSpacePointsModule - end of endRun ~~~~~~~~~~")
+  B2INFO("~~~~~~~~~~~SecMapTrainerWithSpacePointsModule - end of endRun ~~~~~~~~~~");
 }
 
 
@@ -1279,28 +1279,28 @@ void SecMapTrainerWithSpacePointsModule::terminate()
   int totalTrackletCounter = 0;
   int totalHitCounter = 0;
   m_eventCounter++;
-  B2INFO("~~~~~~~~~~~SecMapTrainerWithSpacePointsModule - terminate ~~~~~~~~~~")
+  B2INFO("~~~~~~~~~~~SecMapTrainerWithSpacePointsModule - terminate ~~~~~~~~~~");
   for (int i = 0; i < int(m_PARAMsecMapNames.size()); ++i) {
     B2INFO(" within " << m_eventCounter << " events we got " << m_trackletMomentumCounter.at(i) << " tracklets in the " <<
-           m_PARAMsecMapNames.at(i) << " setup")
+           m_PARAMsecMapNames.at(i) << " setup");
   }
   for (int i = 0; i < int(m_trackletLengthCounter.size()); i++) {
 //    if ( m_trackletLengthCounter.at(i) == 0 ) { continue; }
     B2INFO(" within " << m_eventCounter << " events we got " << m_trackletLengthCounter.at(i) << " tracklets containing " << i + 1 <<
-           " hits")
+           " hits");
     totalTrackletCounter += m_trackletLengthCounter.at(i);
     totalHitCounter += m_trackletLengthCounter.at(i) * (i + 1);
   }
-  B2INFO(m_badHitsCounter << " hits had to be discarded because of double impact in same sensor having same direction of flight")
+  B2INFO(m_badHitsCounter << " hits had to be discarded because of double impact in same sensor having same direction of flight");
   B2INFO(m_badTrackletCounter <<
-         " tracklets had to be discarded because of crazy flight (forward and backward movement all the time)")
+         " tracklets had to be discarded because of crazy flight (forward and backward movement all the time)");
 
   B2INFO(" there were " << float(totalTrackletCounter) / float(m_eventCounter) << "/" << float(m_telHitCounter) / float(
            m_eventCounter) << "/" << float(m_pxdHitCounter) / float(m_eventCounter) << "/" << float(m_svdHitCounter) / float(
-           m_eventCounter) << " tracklets/telHits/pxdHits/svdHits per event and " << m_totalHitCounter << " hits total")
-  B2INFO(" there were " << m_longTrackCounter << " Tracks having more than " << m_numOfLayers * 2 << " hits...")
-  B2INFO(" there were " << m_longTrackletCounter << " Tracklets having more than " << m_numOfLayers * 2 << " hits!!!")
-  B2INFO(m_badFilterValueCtr << " times, a filter produced invalid results ('nan')")
+           m_eventCounter) << " tracklets/telHits/pxdHits/svdHits per event and " << m_totalHitCounter << " hits total");
+  B2INFO(" there were " << m_longTrackCounter << " Tracks having more than " << m_numOfLayers * 2 << " hits...");
+  B2INFO(" there were " << m_longTrackletCounter << " Tracklets having more than " << m_numOfLayers * 2 << " hits!!!");
+  B2INFO(m_badFilterValueCtr << " times, a filter produced invalid results ('nan')");
 
 
   /// ~~~~~~~~~~~~~~~~~~~ exporting secMaps ~~~~~~~~~~~~~~~ ///
@@ -1313,7 +1313,7 @@ void SecMapTrainerWithSpacePointsModule::terminate()
   for (InternalRawSectorMap* thisMap : m_sectorMaps) {
     int secMapSize = thisMap->size();
     ctr = 0;
-    B2INFO("writing " << secMapSize << " entries of secmap " << m_PARAMsecMapNames.at(smCtr))
+    B2INFO("writing " << secMapSize << " entries of secmap " << m_PARAMsecMapNames.at(smCtr));
 
     VXDTFRawSecMapTypedef::StrippedRawSecMap rootSecMap;
     VXDTFRawSecMapTypedef::SectorDistancesMap
@@ -1323,9 +1323,9 @@ void SecMapTrainerWithSpacePointsModule::terminate()
     for (InternalRawSectorMap::SecMapEntry& thisEntry : *secMap) {
       if (secMapSize > 10) {
         if ((ctr % int(0.1 * float(secMapSize))) == 0 && secMapSize > 0) { // this check produces segfault if secMapSize < 10
-          B2INFO("writing entry " << ctr << ": " << thisEntry.first)
+          B2INFO("writing entry " << ctr << ": " << thisEntry.first);
         }
-      } else { B2INFO("writing entry " << ctr << ": " << thisEntry.first) }
+      } else { B2INFO("writing entry " << ctr << ": " << thisEntry.first); }
 
       // doing typeCheck: if (Class* check = dynamic_cast<Class*>(aPtr)) != NULL) then aPtr isOfType Class*
 //      if ((Sector* derived = dynamic_cast<Sector*>(&thisEntry.second)) != NULL)
@@ -1343,7 +1343,7 @@ void SecMapTrainerWithSpacePointsModule::terminate()
         thisEntry.second.clearFriends();
         ctr++;
       } else {
-        B2WARNING(" sector " << thisEntry.first << " is no sector!")
+        B2WARNING(" sector " << thisEntry.first << " is no sector!");
       }
     }
 
@@ -1352,14 +1352,14 @@ void SecMapTrainerWithSpacePointsModule::terminate()
     for (VXDTFRawSecMapTypedef::SectorDistance aValue : distanceOfSectorsMap) {
       sectorDistances << FullSecID(aValue.first) << "/" << aValue.second << "\n";
     }
-    B2DEBUG(1, "the following sectors had the following distances to the chosen origin:\n" << sectorDistances.str())
+    B2DEBUG(1, "the following sectors had the following distances to the chosen origin:\n" << sectorDistances.str());
 
     if (m_PARAMsecMapWriteToRoot == true and rootSecMap.size() != 0) {
 
       for (auto& aSector : rootSecMap) {  // looping over sectors (VXDTFRawSecMapTypedef::StrippedRawSecMap)
-        B2DEBUG(10, "In Sector " << FullSecID(aSector.first) << " there are the following friends:")
+        B2DEBUG(10, "In Sector " << FullSecID(aSector.first) << " there are the following friends:");
         for (auto& afriend : aSector.second) {  // looping over friends
-          B2DEBUG(10, "..." << FullSecID(afriend.first) << " with " << afriend.second.size() << " cutoffTypes")
+          B2DEBUG(10, "..." << FullSecID(afriend.first) << " with " << afriend.second.size() << " cutoffTypes");
         }
       }
       // fill in data:
@@ -1391,7 +1391,7 @@ void SecMapTrainerWithSpacePointsModule::terminate()
       for (auto aMap : rawSectorMapVector.getFullVector()) {
         info << aMap.second.size() << "/" <<  aMap.second.getNumOfFriends() << "/" << aMap.second.getNumOfValues() << ", ";
       }
-      B2INFO(info.str() << " Entries.")
+      B2INFO(info.str() << " Entries.");
     }
 
     thisMap->clear();
@@ -1414,7 +1414,7 @@ void SecMapTrainerWithSpacePointsModule::terminate()
     TFile secMapFile(fileNameOnly.c_str(), m_PARAMrootFileName.at(1).c_str());
     rawSectorMapVector.Write();
     secMapFile.Close();
-    B2INFO(" SecMapTrainerWithSpacePointsModule::endRun: exporting secMaps via " << fileNameOnly)
+    B2INFO(" SecMapTrainerWithSpacePointsModule::endRun: exporting secMaps via " << fileNameOnly);
   }
 
 
@@ -1423,7 +1423,7 @@ void SecMapTrainerWithSpacePointsModule::terminate()
     delete secMap;
   }
   m_sectorMaps.clear();
-  B2INFO(" SecMapTrainerWithSpacePointsModule, everything is done. Terminating.")
+  B2INFO(" SecMapTrainerWithSpacePointsModule, everything is done. Terminating.");
 }
 
 
@@ -1435,40 +1435,40 @@ bool SecMapTrainerWithSpacePointsModule::acceptHit(const SpacePoint* aSP, SecMap
   // catch hits on layers too high
   if (VxdID(aSP->getVxdID()).getLayerNumber() > secMap->getHighestAllowedLayer()) {
     B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to being on a Layer too high: " << VxdID(
-              aSP->getVxdID()).getLayerNumber())
+              aSP->getVxdID()).getLayerNumber());
     return false;
   }
 
   // catch hits which are on wrong detector
   Belle2::VXD::SensorInfoBase::SensorType detectorType = aSP->getType();
   if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::PXD and secMap->usePXD() == false) {
-    B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type PXD")
+    B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type PXD");
     return false;
   }
   if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::SVD and secMap->useSVD() == false) {
-    B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type SVD")
+    B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type SVD");
     return false;
   }
   if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::TEL and secMap->useTEL() == false) {
-    B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type TEL")
+    B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type TEL");
     return false;
   }
 
   // catch hits which are out of range
   if (secMap->getAcceptedRegionForSensors().first > 0) {
     if ((aSP->getPosition() - m_origin).Mag() < secMap->getAcceptedRegionForSensors().first) {
-      B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad hit position (below lower threshold)")
+      B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad hit position (below lower threshold)");
       return false;
     }
   }
   if (secMap->getAcceptedRegionForSensors().second > 0) {
     if ((aSP->getPosition() - m_origin).Mag() > secMap->getAcceptedRegionForSensors().second) {
-      B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad hit position (above upper threshold)")
+      B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad hit position (above upper threshold)");
       return false;
     }
   }
   // passed all tests
-  B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was accepted by secMap " << secMap->getName())
+  B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was accepted by secMap " << secMap->getName());
   return true;
 } /**< for given hit and sectorMap, the function returns true, if hit is accepted and false if not */
 
@@ -1483,7 +1483,7 @@ bool SecMapTrainerWithSpacePointsModule::checkAcceptanceOfSecMap(SecMapTrainerWi
   // catch wrong pT-range
   if (secMap->acceptPt(currentTC->getMomSeed().Perp()) == false) {
     B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " (with nhits " <<
-            currentTC->getNHits() << ") was rejected due to wrong pT")
+            currentTC->getNHits() << ") was rejected due to wrong pT");
     return false;
   }
 
@@ -1491,12 +1491,12 @@ bool SecMapTrainerWithSpacePointsModule::checkAcceptanceOfSecMap(SecMapTrainerWi
   if (m_filterCharges != 0) {
     if (std::abs(currentTC->getPdgCode()) > 10 and std::abs(currentTC->getPdgCode()) < 16) { // catch leptons
       if (boost::math::sign(currentTC->getPdgCode()) == boost::math::sign(m_filterCharges)) {
-        B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to wrong lepton charge")
+        B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to wrong lepton charge");
         return false;
       }
     } else {
       if (boost::math::sign(currentTC->getPdgCode()) != boost::math::sign(m_filterCharges)) {
-        B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to wrong hadron charge")
+        B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to wrong hadron charge");
         return false;
       }
     }
@@ -1504,7 +1504,7 @@ bool SecMapTrainerWithSpacePointsModule::checkAcceptanceOfSecMap(SecMapTrainerWi
 
   // catch TCs where more than one hit was on the same sensor
   if (currentTC->hasHitsOnSameSensor()) {
-    B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due having hits on same sensor.")
+    B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due having hits on same sensor.");
     return false;
   }
 
@@ -1512,14 +1512,14 @@ bool SecMapTrainerWithSpacePointsModule::checkAcceptanceOfSecMap(SecMapTrainerWi
   if (currentTC->getPosSeed().Perp() > m_PARAMmaxXYvertexDistance
       or
       std::abs(currentTC->getPosSeed().Z()) > m_PARAMmaxZvertexDistance) {
-    B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to bad seed position")
+    B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to bad seed position");
     return false;
   }
 
   // catch tracks which are too short in any case
   if (currentTC->getNHits() < m_PARAMminTrackletLength) {
     B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to having not enough hits (" <<
-            currentTC->getNHits() << ")")
+            currentTC->getNHits() << ")");
     return false;
   }
 
@@ -1533,12 +1533,12 @@ bool SecMapTrainerWithSpacePointsModule::checkAcceptanceOfSecMap(SecMapTrainerWi
   if (nGoodHits < m_PARAMminTrackletLength) {
     B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to having not enough _good_ hits ("
             <<
-            nGoodHits << ")")
+            nGoodHits << ")");
     return false;
   }
 
   // pass all tests
-  B2DEBUG(25, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was accepted by secMap " << secMap->getName())
+  B2DEBUG(25, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was accepted by secMap " << secMap->getName());
   return true;
 } /**< can be accepted by several secMaps, because of momentum range or whatever  */
 
@@ -1659,7 +1659,7 @@ std::string SecMapTrainerWithSpacePointsModule::calcSecID(const SpacePoint* aSP,
             aCenterOfSector.second << " for hit " << aCoorNormalized.first << "/" << aCoorNormalized.second);
     B2DEBUG(100, "OOO Sector " << aSectorName << " - edges: O(" << localCorner00.first << "," << localCorner00.second << "), U(" <<
             localCorner01.first << "," << localCorner01.second << "), V(" << localCorner10.first << "," << localCorner10.second << "), UV(" <<
-            localCorner11.first << "," << localCorner11.second << "), centerU/V: " << aCenterOfSector.first << "/" << aCenterOfSector.second)
+            localCorner11.first << "," << localCorner11.second << "), centerU/V: " << aCenterOfSector.first << "/" << aCenterOfSector.second);
 
 
     dist2Origin = (aSensorInfo.pointToGlobal(TVector3(aCenterOfSector.first, aCenterOfSector.second, 0.)) - m_origin).Mag();

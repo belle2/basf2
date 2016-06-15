@@ -108,10 +108,10 @@ namespace Belle2 {
         and (AlgoritmType::isHitValueVecDoubleType(algorithmID)
              or AlgoritmType::isHitValueIntType(algorithmID))) {
       B2WARNING(" AnalyzingAlgorithmFactoryDouble: given algorithmID " << AlgoritmType::getTypeName(algorithmID) <<
-                " is no algorithm of double type but of another (valid) category. Please use the correct factory for your purpose. Returning non-functioning base-class instead!")
+                " is no algorithm of double type but of another (valid) category. Please use the correct factory for your purpose. Returning non-functioning base-class instead!");
     } else {
       B2ERROR(" AnalyzingAlgorithmFactoryDouble: given algorithmID " << AlgoritmType::getTypeName(algorithmID) <<
-              " is not known, returning non-functioning base-class instead!")
+              " is not known, returning non-functioning base-class instead!");
     }
 
     return new AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>();
@@ -147,10 +147,10 @@ namespace Belle2 {
              or AlgoritmType::isResidualDoubleType(algorithmID)
              or AlgoritmType::isHitValueVecDoubleType(algorithmID))) {
       B2WARNING(" AnalyzingAlgorithmInt: given algorithmID " << AlgoritmType::getTypeName(algorithmID) <<
-                " is no algorithm of int type but of another (valid) category. Please use the correct factory for your purpose. Returning non-functioning base-class instead!")
+                " is no algorithm of int type but of another (valid) category. Please use the correct factory for your purpose. Returning non-functioning base-class instead!");
     } else {
       B2ERROR(" AnalyzingAlgorithmInt: given algorithmID " << AlgoritmType::getTypeName(algorithmID) <<
-              " is not known, returning non-functioning base-class instead!")
+              " is not known, returning non-functioning base-class instead!");
     }
 
     return new AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>();
@@ -187,10 +187,10 @@ namespace Belle2 {
              or AlgoritmType::isResidualDoubleType(algorithmID)
              or AlgoritmType::isHitValueIntType(algorithmID))) {
       B2WARNING(" AnalyzingAlgorithmVecDouble: given algorithmID " << AlgoritmType::getTypeName(algorithmID) <<
-                " is no algorithm of vector<double> type but of another (valid) category. Please use the correct factory for your purpose. Returning non-functioning base-class instead!")
+                " is no algorithm of vector<double> type but of another (valid) category. Please use the correct factory for your purpose. Returning non-functioning base-class instead!");
     } else {
       B2ERROR(" AnalyzingAlgorithmVecDouble: given algorithmID " << AlgoritmType::getTypeName(algorithmID) <<
-              " is not known, returning non-functioning base-class instead!")
+              " is not known, returning non-functioning base-class instead!");
     }
 
     return new AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>();

@@ -193,8 +193,8 @@ namespace Belle2 {
 //    B2INFO("maxIndex: " << maxIndex);
       unsigned finalMaxIndex = ((int(m_biggestValues.size()) - int(maxIndex) - 1) < 0) ? 0 : m_biggestValues.size() - 1 - maxIndex;
 
-      if (minIndex > (m_smallestValues.size() - 1)) { B2ERROR("minIndex " << minIndex << " calculated for minQuantile " << minQuantile << " bigger than nSmallestValues " << m_smallestValues.size() << "!") }
-      if (finalMaxIndex > (m_biggestValues.size() - 1)) { B2ERROR("maxIndex " << maxIndex << " calculated for maxQuantile " << maxQuantile << " bigger than nBiggestValues " << m_biggestValues.size() << "!") }
+      if (minIndex > (m_smallestValues.size() - 1)) { B2ERROR("minIndex " << minIndex << " calculated for minQuantile " << minQuantile << " bigger than nSmallestValues " << m_smallestValues.size() << "!"); }
+      if (finalMaxIndex > (m_biggestValues.size() - 1)) { B2ERROR("maxIndex " << maxIndex << " calculated for maxQuantile " << maxQuantile << " bigger than nBiggestValues " << m_biggestValues.size() << "!"); }
       return {m_smallestValues.at(minIndex), m_biggestValues.at(finalMaxIndex)};
     }
 
@@ -235,7 +235,7 @@ namespace Belle2 {
     void merge(const MinMaxCollector<DataType>& other)
     {
       if (other.m_quantileCut != m_quantileCut) {
-        B2WARNING("MinMaxCollector::merge: other collector has differing size in quantileCut. If this is not the purpose, this could indicate unintended behavior!")
+        B2WARNING("MinMaxCollector::merge: other collector has differing size in quantileCut. If this is not the purpose, this could indicate unintended behavior!");
       }
       if (other.m_quantileCut > m_quantileCut) {
         m_quantileCut = other.m_quantileCut;

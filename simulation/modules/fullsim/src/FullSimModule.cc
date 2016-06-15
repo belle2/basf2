@@ -273,7 +273,7 @@ void FullSimModule::initialize()
     double zeroChargeTol = 0.01 * Unit::e;
     if (fabs(currParticle->GetPDGCharge()) > zeroChargeTol) {
       currParticle->GetProcessManager()->AddDiscreteProcess(m_stepLimiter);
-      B2DEBUG(100, "Added StepLimiter process for " << currParticle->GetParticleName())
+      B2DEBUG(100, "Added StepLimiter process for " << currParticle->GetParticleName());
     }
   }
 

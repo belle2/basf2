@@ -95,6 +95,6 @@ void Ds2SampleModule::terminate()
 
   // RingBuffer should not be deleted
 
-  B2INFO("Ds2Sample: terminate called")
+  B2INFO("Ds2Sample: terminate called");
 }
 

@@ -191,13 +191,13 @@ void BabayagaNLOInputModule::initializeGenerator()
   // its either a fixed value or a fractional one
   // if both are provided, the fractional has priority
   if (m_eMinFrac >= 0.) {
-    B2INFO("Setting EMIN using fraction " << m_eMinFrac << " of CMS energy: cut=" << m_eMinFrac * ecmnominal << " GeV")
+    B2INFO("Setting EMIN using fraction " << m_eMinFrac << " of CMS energy: cut=" << m_eMinFrac * ecmnominal << " GeV");
     m_generator.setMinEnergy(m_eMinFrac * ecmnominal);
   } else m_generator.setMinEnergy(m_eMin);
 
   // check if a maximum weight is provided
   if (m_fMax > 0. && (m_mode == "unweighted" || m_mode == "uw")) {
-    B2INFO("Setting FMAX manually (no maximum search performed) =" << m_fMax)
+    B2INFO("Setting FMAX manually (no maximum search performed) =" << m_fMax);
     m_generator.setFMax(m_fMax);
     m_generator.setNSearchMax(-1);
   } else if (m_mode == "weighted" || m_mode == "w") {

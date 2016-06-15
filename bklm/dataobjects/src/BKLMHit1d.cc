@@ -37,7 +37,7 @@ BKLMHit1d::BKLMHit1d(const std::vector<BKLMDigit*>& digits) :
   m_ModuleID = 0;
 
   if (digits.size() == 0) {
-    B2WARNING("Attempt to create a 1D hit with no BKLMDigits")
+    B2WARNING("Attempt to create a 1D hit with no BKLMDigits");
     return;
   }
 
@@ -48,7 +48,7 @@ BKLMHit1d::BKLMHit1d(const std::vector<BKLMDigit*>& digits) :
   for (std::vector<BKLMDigit*>::const_iterator iDigit = digits.begin(); iDigit != digits.end(); ++iDigit) {
     BKLMDigit* digit = *iDigit;
     if (((digit->getModuleID() ^ m_ModuleID) & mask) != 0) {
-      B2WARNING("Attempt to combine non-parallel or distinct-module BKLMDigits")
+      B2WARNING("Attempt to combine non-parallel or distinct-module BKLMDigits");
       continue;
     }
     m_Time += digit->getTime();

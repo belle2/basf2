@@ -60,6 +60,6 @@ void CertifyParallelModule::endRun()
 
 void CertifyParallelModule::terminate()
 {
-  B2INFO("ElapsedTime: terminate called")
+  B2INFO("ElapsedTime: terminate called");
 }
 

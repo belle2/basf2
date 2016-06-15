@@ -98,9 +98,9 @@ namespace Belle2 {
     EXPECT_FALSE(doStuffHere({23}));
 
     if (doStuffHere() == false) {
-      B2WARNING("it didn't work!")
+      B2WARNING("it didn't work!");
     } else {
-      B2WARNING("yay, it worked!")
+      B2WARNING("yay, it worked!");
     }
   }
 

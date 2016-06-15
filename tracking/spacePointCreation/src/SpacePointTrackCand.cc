@@ -255,7 +255,7 @@ void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
            c_removedHits) << "\n";
   output << "omitted Clusters: " << hasRefereeStatus(c_omittedClusters) << ", single Cluster SPs: " << hasRefereeStatus(
            c_singleClustersSPs) << "\n";
-  B2DEBUG(debuglevel, output.str())
+  B2DEBUG(debuglevel, output.str());
 }
 
 // get referee status as string

@@ -294,11 +294,11 @@ void MuidModule::initialize()
         }
       }
     }
-    if (m_ChargedStable.empty()) B2ERROR("No valid PDG codes for extrapolation")
+    if (m_ChargedStable.empty()) B2ERROR("No valid PDG codes for extrapolation");
     }
 
   for (unsigned i = 0; i < m_ChargedStable.size(); ++i) {
-    B2INFO("Muid hypothesis for PDG code " << m_ChargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated")
+    B2INFO("Muid hypothesis for PDG code " << m_ChargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated");
   }
 
   // Register output and relation arrays' persistence
@@ -333,7 +333,7 @@ void MuidModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
   int expNo = evtMetaData->getExperiment();
-  B2INFO("muid: Experiment " << expNo << "  run " << evtMetaData->getRun())
+  B2INFO("muid: Experiment " << expNo << "  run " << evtMetaData->getRun());
   m_MuonPlusPar = new MuidPar(expNo, "MuonPlus");
   m_MuonMinusPar = new MuidPar(expNo, "MuonMinus");
   m_PionPlusPar = new MuidPar(expNo, "PionPlus");
@@ -512,7 +512,7 @@ void MuidModule::registerVolumes()
 
   G4PhysicalVolumeStore* pvStore = G4PhysicalVolumeStore::GetInstance();
   if (pvStore->size() == 0) {
-    B2FATAL("No geometry defined. Please create the geometry first.")
+    B2FATAL("No geometry defined. Please create the geometry first.");
   }
 
   m_BKLMVolumes = new vector<G4VPhysicalVolume*>;
@@ -623,7 +623,7 @@ void MuidModule::getStartPoint(RecoTrack* recoTrack, const genfit::AbsTrackRep* 
   }
 
   catch (genfit::Exception& e) {
-    B2WARNING("Caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " << e.what())
+    B2WARNING("Caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " << e.what());
     // Do not extrapolate this track by forcing minPt cut to fail in caller
     momentum.setX(0.0);
     momentum.setY(0.0);
@@ -667,7 +667,7 @@ void MuidModule::getVolumeID(const G4TouchableHandle& touch, Const::EDetector& d
       detID = Const::EDetector::KLM;
       int baseDepth = touch->GetHistoryDepth() - DEPTH_RPC;
       if ((baseDepth < 0) || (baseDepth > DEPTH_SCINT - DEPTH_RPC)) {
-        B2WARNING("Touchable History baseDepth = " << baseDepth + DEPTH_RPC << " (should be 9=RPC or 11=scint)")
+        B2WARNING("Touchable History baseDepth = " << baseDepth + DEPTH_RPC << " (should be 9=RPC or 11=scint)");
       } else {
         int plane = touch->GetCopyNumber(baseDepth);
         int layer = touch->GetCopyNumber(baseDepth + 4);

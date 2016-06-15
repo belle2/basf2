@@ -51,7 +51,7 @@ std::pair<int, int> PassData::importSectorMap(const VXDTFSecMapTypedef::SecMapCo
                                );
       }
       if (iterator == distancesMap.end()) { // if still not found, print warning...
-        B2WARNING("neither sector " << currentSecID << " nor " << newSecID << " found, initialising using 0 for distance")
+        B2WARNING("neither sector " << currentSecID << " nor " << newSecID << " found, initialising using 0 for distance");
       }
       pSector = new VXDSector(currentSecID, iterator->second, useDistances);
     } else {
@@ -71,7 +71,7 @@ std::pair<int, int> PassData::importSectorMap(const VXDTFSecMapTypedef::SecMapCo
         unsigned int filterID = aFilter.first;
         bool doNotStore = false;
         cutoffMinValue = 0, cutoffMaxValue = 0;
-        if (filterID >= static_cast<unsigned int>(FilterID::numFilters)) { B2FATAL("PassData::importSectorMap: Filter in XML-File does not exist! check FilterID-class!")}
+        if (filterID >= static_cast<unsigned int>(FilterID::numFilters)) { B2FATAL("PassData::importSectorMap: Filter in XML-File does not exist! check FilterID-class!");}
 
         // now, for each filter will be checked, whether it shall be stored or not and whether the cutoffs shall be modified:
         if (filterID == FilterID::distance3D && this->distance3D.first == true) {   // first: activateDistance3D, second: tuneDistance3D

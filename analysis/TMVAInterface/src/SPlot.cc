@@ -58,7 +58,7 @@ namespace Belle2 {
                                                           temp_tree_data.get(), vars));
 
       if (discriminating_values->numEntries() != temp_tree_data->GetEntries()) {
-        B2FATAL("RooDataSet threw out some events, probably because they were outside the defined range of the RooRealVar")
+        B2FATAL("RooDataSet threw out some events, probably because they were outside the defined range of the RooRealVar");
       }
 
       int numberOfEvents = vec.size();

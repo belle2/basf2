@@ -175,7 +175,7 @@ namespace Belle2 {
     if (m_vertexFitter == "kfitter") {
       // TODO: add this functionality
       if (m_decayString != "")
-        B2FATAL("ParticleVertexFitter: kfitter does not support yet selection of daughters via decay string!") ;
+        B2FATAL("ParticleVertexFitter: kfitter does not support yet selection of daughters via decay string!");
       if (m_withConstraint == "iptube" || m_withConstraint == "iptubecut")
         B2FATAL("ParticleVertexFitter: kfitter does not support yet the iptube constraint ");
 

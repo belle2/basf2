@@ -31,14 +31,14 @@ namespace {
     B2DEBUG(100, "test");
     B2WARNING("test");
 
-    //sadly, these only work without semicolon after macro (breaking the indentation as a consequence)
+    //these only work if the macros themselves don't include ';' at the end
     if (true)
-      B2WARNING("test")
-      else { /* ... */ }
+      B2WARNING("test");
+    else { /* ... */ }
 
     if (true)
-      B2DEBUG(100, "test")
-      else { /* .. */ }
+      B2DEBUG(100, "test");
+    else { /* .. */ }
 
   }
 }  // namespace

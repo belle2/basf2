@@ -217,19 +217,19 @@ void LogPythonInterface::exposePythonAPI()
 }
 
 //
-//This macro is a wrapper around the generic B2LOGMESSAGE macro to supply most
+//This macro is a wrapper around the generic _B2LOGMESSAGE macro to supply most
 //of the arguments using information from the python interpreter. It is only
 //used by the log* Messages of the LogPythonInterface to show meaningful log
 //message information for messages sent from the steering file
 //
 #define PYTHON_LOG(loglevel, debuglevel, text) \
-  B2LOGMESSAGE(loglevel, debuglevel, text, "steering", \
+  _B2LOGMESSAGE(loglevel, debuglevel, text, "steering", \
                extract<std::string>(eval("currentframe().f_back.f_code.co_name", inspectDict)), \
                extract<std::string>(eval("currentframe().f_back.f_code.co_filename", inspectDict)), \
                extract<int>(eval("currentframe().f_back.f_lineno", inspectDict)))
 
 #define PYTHON_LOG_IFENABLED(loglevel, debuglevel, text) \
-  B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, text, "steering", \
+  _B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, text, "steering", \
                          extract<std::string>(eval("currentframe().f_back.f_code.co_name", inspectDict)), \
                          extract<std::string>(eval("currentframe().f_back.f_code.co_filename", inspectDict)), \
                          extract<int>(eval("currentframe().f_back.f_lineno", inspectDict)))

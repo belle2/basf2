@@ -21,7 +21,7 @@
  * \def _B2_DO_NOTHING()
  * Used when things are compiled out.
  */
-#define _B2_DO_NOTHING { }
+#define _B2_DO_NOTHING do { } while(0)
 
 /**
  * \def PACKAGENAME()
@@ -46,21 +46,20 @@
 #endif
 
 /** send generic log message. */
-#define B2LOGMESSAGE(loglevel, debuglevel, streamText, package, function, file, line) { \
-    std::ostringstream stringBuffer; stringBuffer << streamText;        \
+#define _B2LOGMESSAGE(loglevel, debuglevel, streamText, package, function, file, line) { \
+    std::ostringstream stringBuffer; stringBuffer << streamText; \
     Belle2::LogSystem::Instance().sendMessage(Belle2::LogMessage(loglevel, stringBuffer.rdbuf()->str(), package, function, file, line)); \
   }
 
 /** send generic log message if the log level is enabled. */
-#define B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, streamText, package, function, file, line) { \
+#define _B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, streamText, package, function, file, line) do { \
     if (Belle2::LogSystem::Instance().isLevelEnabled(loglevel, debuglevel, package)) { \
-      B2LOGMESSAGE(loglevel, debuglevel, streamText, package, function, file, line); \
-    } }
+      _B2LOGMESSAGE(loglevel, debuglevel, streamText, package, function, file, line); \
+    } } while(0)
 
 /** send generic log message if the log level is enabled. */
-#define B2LOG(loglevel, debuglevel, streamText) { \
-    B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__); \
-  }
+#define B2LOG(loglevel, debuglevel, streamText) \
+  _B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
 
 /**
  * \def B2DEBUG(level, streamText)
@@ -69,8 +68,7 @@
 #ifdef LOG_NO_B2DEBUG
 #define B2DEBUG(level, streamText) _B2_DO_NOTHING
 #else
-#define B2DEBUG(level, streamText) \
-  B2LOG(Belle2::LogConfig::c_Debug, level, streamText)
+#define B2DEBUG(level, streamText) B2LOG(Belle2::LogConfig::c_Debug, level, streamText)
 #endif
 
 /**
@@ -80,8 +78,7 @@
 #ifdef LOG_NO_B2INFO
 #define B2INFO(streamText) _B2_DO_NOTHING
 #else
-#define B2INFO(streamText) \
-  B2LOG(Belle2::LogConfig::c_Info, 0, streamText)
+#define B2INFO(streamText) B2LOG(Belle2::LogConfig::c_Info, 0, streamText)
 #endif
 
 /**
@@ -91,8 +88,7 @@
 #ifdef LOG_NO_B2RESULT
 #define B2RESULT(streamText) _B2_DO_NOTHING
 #else
-#define B2RESULT(streamText) \
-  B2LOG(Belle2::LogConfig::c_Result, 0, streamText)
+#define B2RESULT(streamText) B2LOG(Belle2::LogConfig::c_Result, 0, streamText)
 #endif
 
 /**
@@ -102,25 +98,26 @@
 #ifdef LOG_NO_B2WARNING
 #define B2WARNING(streamText) _B2_DO_NOTHING
 #else
-#define B2WARNING(streamText) \
-  B2LOG(Belle2::LogConfig::c_Warning, 0, streamText)
+#define B2WARNING(streamText) B2LOG(Belle2::LogConfig::c_Warning, 0, streamText)
 #endif
 
 /**
  * \def B2ERROR(streamText)
  * Send an error message.
  */
-#define B2ERROR(streamText) \
-  B2LOGMESSAGE(Belle2::LogConfig::c_Error, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
+#define B2ERROR(streamText) do { \
+    _B2LOGMESSAGE(Belle2::LogConfig::c_Error, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__) \
+  } while (0)
+
 
 /**
  * \def B2FATAL(streamText)
  * Send a fatal message, program will abort after printing it.
  */
-#define B2FATAL(streamText) { \
-    B2LOGMESSAGE(Belle2::LogConfig::c_Fatal, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__) \
+#define B2FATAL(streamText) do { \
+    _B2LOGMESSAGE(Belle2::LogConfig::c_Fatal, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__); \
     exit(1); \
-  }
+  } while(0)
 
 #ifdef LOG_NO_B2ASSERT
 #define B2ASSERT(message, condition) _B2_DO_NOTHING
@@ -129,11 +126,11 @@
  * if 'condition' is false, abort execution with a B2FATAL.
  * If the LOG_NO_B2ASSERT macro is defined when framework/logging/Logger.h is included (e.g. via -DLOG_NO_B2ASSERT), these are compiled out.
  */
-#define B2ASSERT(message, condition) { \
+#define B2ASSERT(message, condition) do { \
     if (!(condition)) { \
-      B2FATAL(message) \
+      B2FATAL(message); \
     } \
-  }
+  } while(0)
 #endif
 
 #endif  // LOGGER_H

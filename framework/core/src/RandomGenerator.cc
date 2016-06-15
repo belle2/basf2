@@ -114,7 +114,7 @@ void RandomGenerator::setState(int barrier)
     for (int i = 0; i < 16; ++i) {
       info << ((i % 4 == 0) ? "\n    " : " ") << std::setw(16) << std::setfill('0') << std::hex << m_state[i];
     }
-    B2LOGMESSAGE(Belle2::LogConfig::c_Debug, 100, info.str(), PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__);
+    _B2LOGMESSAGE(Belle2::LogConfig::c_Debug, 100, info.str(), PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__);
   }
 #endif
 }

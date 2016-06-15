@@ -148,6 +148,8 @@ namespace Belle2 {
 
       int nr5bits(int i) const;/// helper function to "count" nr of set bits within lower 5 bits
 
+      void endian_swapper(void* a, unsigned int len);
+
       //Remaps rows of inner forward (IF) and outer backward (OB) modules of the PXD
       void remap_IF_OB(unsigned int& row, unsigned int& col, unsigned int dhp_id, unsigned int dhe_ID);
 

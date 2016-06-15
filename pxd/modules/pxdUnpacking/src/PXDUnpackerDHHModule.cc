@@ -776,7 +776,7 @@ void PXDUnpackerDHHModule::event()
   }
 }
 
-void endian_swapper(void* a, unsigned int len)
+void PXDUnpackerDHHModule::endian_swapper(void* a, unsigned int len)
 {
   // Quick and Dirty swapper for BonnDAQ
   ubig16_t* p;

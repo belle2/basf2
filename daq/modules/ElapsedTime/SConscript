@@ -1,5 +1,5 @@
-Import('env')
+Import ('env')
 
 env['LIBS'] = ['framework', 'daq']
 
-Return('env')
+Return ('env')

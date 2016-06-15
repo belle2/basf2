@@ -89,6 +89,21 @@ global_env = Environment(
     TOOLS_LIBPATH={},
     TEST_LIBS=[],
     TEST_FILES=[],
+    LINKFLAGS=[
+        # don't add library dependencies which we don't actually need
+        "-Wl,--as-needed",
+        # and make sure we don't allow undefined symbols
+        "-Wl,--no-undefined",
+        # not even in shared libraries
+        "-Wl,--no-allow-shlib-undefined",
+        # but, for simplicity let's copy the needed entries from dependent
+        # libraries first. That is if a->b and b->c than "a" using symbol from
+        # "c" will also compile. This is not 100% what we might want because it
+        # leads to implicit dependencies which are hard to track but we get too
+        # many errors otherwise, especially since framework/core/Module.h pulls
+        # in an dependency to boost_python so let's keep it for now.
+        "-Wl,--copy-dt-needed-entries"
+    ],
 )
 
 # recalculate MD5 sums only if the time stamp differs

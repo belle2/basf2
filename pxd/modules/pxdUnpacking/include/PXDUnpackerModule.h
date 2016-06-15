@@ -29,7 +29,7 @@ namespace Belle2 {
 
   namespace PXD {
 
-#define ONSEN_MAX_TYPE_ERR  32
+#define ONSEN_MAX_TYPE_ERR  64
 
 
     /** The PXDUnpacker module.
@@ -67,6 +67,7 @@ namespace Belle2 {
       std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
       std::string m_RemapLUTifob;  /**< Name of the LUT which remaps DHP data for inner forward and outer backward modules */
       std::string m_RemapLUTibof;  /**< Name of the LUT which remaps DHP data for inner backward and outer forward modules */
+      bool m_ignore_headernrframes;
 
       /**  Swap the endianess of the ONSEN header yes/no */
       bool m_headerEndianSwap;
@@ -84,6 +85,8 @@ namespace Belle2 {
       unsigned long m_meta_subrun_nr;
       /** Experiment from MetaInfo */
       unsigned long m_meta_experiment;
+      /** For DESY TB data */
+      int m_DESY16_FixTrigOffset;
 
       /** Event counter */
       unsigned int m_unpackedEventsCount;
@@ -181,7 +184,7 @@ namespace Belle2 {
       void set_errors(int block_number, std::string errorWeight);
 
       /** Error Mask set per packet / event*/
-      unsigned int m_errorMask;
+      uint64_t m_errorMask;
       /** give verbose unpacking information -> will eb a parameter in next release */
       bool verbose = true;
       /** ignore missing datcon (dont show error) */

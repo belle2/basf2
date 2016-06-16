@@ -14,6 +14,9 @@ class State(object):
     """
 
     def __init__(self, x=None, y=None, params=None, cost=None, updates=None, train_function=None, eval_function=None):
+        """
+        Constructor of the State class
+        """
         # TODO: make serializable with __getstate__(), __setstate__()
         #: theano shared variable x
         self.x = x

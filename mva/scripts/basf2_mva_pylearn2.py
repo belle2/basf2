@@ -26,6 +26,9 @@ class State(object):
     State class for proper handling of parameters and data during function calls.
     """
     def __init__(self, theano_function=None, flatten_parameters=None, sig_back_pdfs=None, signal_fraction=None):
+        """
+        Constructor of the State class
+        """
         #: theano function
         self.theano_function = theano_function
         #: parameters used for flattening
@@ -40,7 +43,7 @@ class State(object):
         self.transform_to_prob = None
         #: bool, convert pickled theano gpu function to cpu
         self.convert_to_cpu = None
-        #: parameters
+        #: dictionary, parameters
         self.parameters = None
         #: temporary weightfile from tempfile
         self.temporary_weightfile = None

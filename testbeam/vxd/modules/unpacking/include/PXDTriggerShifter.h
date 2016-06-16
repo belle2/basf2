@@ -14,7 +14,7 @@
 namespace Belle2 {
 
   namespace PXD {
-    /// Module to match PXD and ONSET trigger number which differ by fixed offset
+    /// Module to match PXD/DHC/ONSEN/HLT trigger number which differ (including an offset)
     class PXDTriggerShifterModule: public Module {
     private:
       /// MRU cache size
@@ -26,9 +26,12 @@ namespace Belle2 {
       /// The trigger offset
       int m_offset;
 
+      unsigned int m_fixed{0}, m_notfixed{0}, m_notneeded{0};
+
     public:
       PXDTriggerShifterModule();
       void initialize(void);
+      void terminate(void);
       void event(void);
       /// Get the DHH and HLT trigger number from RawPXD
       bool getTrigNr(RawPXD& px, unsigned int& innerDHH, unsigned int& outerHLT);

@@ -23,10 +23,10 @@ REG_MODULE(PXDTriggerShifter)
 PXDTriggerShifterModule::PXDTriggerShifterModule(void)
 {
   // Module is NOT allowed to be run in parallel!!!
-  // Reason: we store previous events in a lock up table ... the order is important!
+  // Reason: we buffer previous events in a lock up table ... the order is important!
 
   // Module Description
-  setDescription("Shift PXD trigger number by offset");
+  setDescription("Find PXD data for event which has been shifted by offset");
 
   //Parameter definition
   addParam("offset", m_offset, "Trigger offset of PXD w.r.t. SVD trigger number", int(-1));
@@ -38,23 +38,48 @@ void PXDTriggerShifterModule::initialize(void)
   m_storeRaw.required();
 }
 
+void PXDTriggerShifterModule::terminate(void)
+{
+  B2INFO("PXDTriggerShifter fixed: " << m_fixed << " not found: " << m_notfixed << " not needed: " << m_notneeded);
+}
+
 void PXDTriggerShifterModule::event(void)
 {
-  // erst mal muss man die beiden trigger nummern finden ...
+  // first, we have to find the trigger numbers from the pxd data ...
   TClonesArray* rawdata = m_storeRaw.getPtr();
   unsigned int pxdTriggerNr = 0x10000, triggerNr = 0x10000;
   for (auto& it : m_storeRaw) {
     if (getTrigNr(it, pxdTriggerNr, triggerNr)) break; // only first (valid) one
   }
-  pxdTriggerNr &= 0xFFFF;
-  triggerNr &= 0xFFFF;
 
   // Keep current raw data in MRU cache with its original pxd trigger number
-  m_previous_events.insert(pxdTriggerNr, *rawdata);
-  // Now try to replace current raw data with raw data with current trigger number + offset
-  m_previous_events.retrieve(triggerNr + m_offset, *rawdata);
-}
+  if (pxdTriggerNr != 0x10000) m_previous_events.insert(pxdTriggerNr & 0xFFFF, *rawdata);
 
+  if (triggerNr == 0x10000) { // invalid
+    setReturnValue(false);
+    m_notfixed++;
+    return;
+  }
+  triggerNr = (triggerNr + m_offset) & 0xFFFF; /// including offset
+
+  setReturnValue(true);
+  if (triggerNr != (pxdTriggerNr & 0xFFFF) || pxdTriggerNr == 0x10000) {
+    // Now try to replace current raw data with raw data with current trigger number + offset
+    // Main problem with this approach, if we do not find the correct data, the previous data
+    // is still there ... thus checking the return value is mandatory!
+    if (!m_previous_events.retrieve(triggerNr, *rawdata)) {
+      B2WARNING("Could not find data for offset for HLT $" << hex << triggerNr << " and DHH $" << hex << pxdTriggerNr);
+      setReturnValue(false);
+      m_notfixed++;
+    } else {
+      B2INFO("Fixed trigger offset for #$" << hex << triggerNr << " and " << hex << pxdTriggerNr);
+      m_fixed++;
+    }
+  } else {
+    // no need to fix
+    m_notneeded++;
+  }
+}
 
 bool PXDTriggerShifterModule::getTrigNr(RawPXD& px, unsigned int& innerDHH, unsigned int& outerHLT)
 {
@@ -63,7 +88,7 @@ bool PXDTriggerShifterModule::getTrigNr(RawPXD& px, unsigned int& innerDHH, unsi
   int datafullsize;
 
   if (px.size() <= 0 || px.size() > 16 * 1024 * 1024) {
-    B2ERROR("PXD Unpacker --> invalid packet size (32bit words) " << hex << px.size());
+    B2ERROR("PXD Trigger Shifter --> invalid packet size (32bit words) " << hex << px.size());
     return false;
   }
   std::vector<unsigned int> data(px.size());
@@ -82,7 +107,7 @@ bool PXDTriggerShifterModule::getTrigNr(RawPXD& px, unsigned int& innerDHH, unsi
   }
 
   Frames_in_event = ((ubig32_t*)data.data())[1];
-  if (Frames_in_event < 0 || Frames_in_event > 256) {
+  if (Frames_in_event < 1 || Frames_in_event > 250) {
     B2ERROR("Number of Frames invalid: Will not unpack anything. Header corrupted! Frames in event: " << Frames_in_event);
     return false;
   }
@@ -111,7 +136,6 @@ bool PXDTriggerShifterModule::getTrigNr(RawPXD& px, unsigned int& innerDHH, unsi
       B2ERROR("SKIP Frame with Data with not MOD 4 length " << " ( $" << hex << lo << " ) ");
       ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
     } else {
-      B2INFO("unpack DHE(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
       if (unpack_dhc_frame(ll + (char*)dataptr, innerDHH, outerHLT)) return true;
       ll += lo; /// no rounding needed
     }
@@ -121,7 +145,6 @@ bool PXDTriggerShifterModule::getTrigNr(RawPXD& px, unsigned int& innerDHH, unsi
 
 bool PXDTriggerShifterModule::unpack_dhc_frame(void* data, unsigned int& innerDHH, unsigned int& outerHLT)
 {
-  // DHE like before, but now 4 bits
 #define DHC_FRAME_HEADER_DATA_TYPE_DHP_RAW     0x0
 #define DHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD     0x5
 #define DHC_FRAME_HEADER_DATA_TYPE_FCE_RAW     0x1 //CLUSTER FRAME
@@ -144,6 +167,7 @@ bool PXDTriggerShifterModule::unpack_dhc_frame(void* data, unsigned int& innerDH
       return true;
     }
     case DHC_FRAME_HEADER_DATA_TYPE_DHE_START: {
+      // workaround for BonnDAQ ...
       innerDHH = ((ubig16_t*)data)[1];
       return true;
     }

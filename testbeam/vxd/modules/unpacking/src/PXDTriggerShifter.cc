@@ -22,7 +22,9 @@ REG_MODULE(PXDTriggerShifter)
 
 PXDTriggerShifterModule::PXDTriggerShifterModule(void)
 {
-  setPropertyFlags(c_ParallelProcessingCertified);
+  // Module is NOT allowed to be run in parallel!!!
+  // Reason: we store previous events in a lock up table ... the order is important!
+
   // Module Description
   setDescription("Shift PXD trigger number by offset");
 

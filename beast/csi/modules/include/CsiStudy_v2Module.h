@@ -71,19 +71,19 @@ namespace Belle2 {
       double m_Ethres;
 
       /** Energy deposited vs TOF */
-      TH2F* h_csi_Evtof1[8];
+      TH2F* h_csi_Evtof1[18];
       /** Energy deposited vs TOF */
-      TH2F* h_csi_Evtof2[8];
+      TH2F* h_csi_Evtof2[18];
       /** Energy deposited vs TOF */
-      TH2F* h_csi_Evtof3[8];
+      TH2F* h_csi_Evtof3[18];
       /** Energy deposited vs TOF */
-      TH2F* h_csi_Evtof4[8];
+      TH2F* h_csi_Evtof4[18];
       /** Energy deposited */
-      TH1F* h_csi_edep[8];
+      TH1F* h_csi_edep[18];
       /** Energy deposited */
-      TH1F* h_csi_edep_nocut[8];
+      TH1F* h_csi_edep_nocut[18];
       /** Energy deposited */
-      TH1F* h_csi_edep_test[8];
+      TH1F* h_csi_edep_test[18];
       /** Scattering position in the rings */
       TH1F* h_csi_s;
       /** Scattering position in the rings */

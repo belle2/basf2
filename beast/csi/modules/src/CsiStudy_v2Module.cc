@@ -66,7 +66,7 @@ CsiStudy_v2Module::~CsiStudy_v2Module()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void CsiStudy_v2Module::defineHisto()
 {
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < 18; i++) {
     h_csi_Evtof1[i] = new TH2F(TString::Format("h_csi_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 5000, 0., 1000.,
                                1000, 0., 400.);
     h_csi_Evtof2[i] = new TH2F(TString::Format("h_csi_Evtof2_%d", i), "Energy deposited [MeV] vs TOF [ns] - only photons", 5000, 0.,

@@ -4,6 +4,7 @@
   <Content>
     <BeamBackgroundStudy desc="select 1 if you want to record neutron and gamma hits">0</BeamBackgroundStudy>  
     
+    <Ethres>0.15</Ethres>    
     <Threshold>0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5</Threshold>
     <Range>1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5</Range>
     <EnergyResolutionConst>0.03,0.04,0.05</EnergyResolutionConst>

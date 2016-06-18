@@ -181,15 +181,12 @@ class TestCAF(TestCase):
         fw.add_calibration(self.cal2)
         self.assertTrue(fw.calibrations[self.name1].name == self.name1 and fw.calibrations[self.name2].name == self.name2)
 
-    def test_add_dependency(self):
+    def test_add_dependency_on_itself(self):
         """
-        Test that add_dependency function results in correct output
+        Test that add_dependency function cannot add itself
         """
-        fw = CAF()
-        fw.add_calibration(self.cal1)
-        fw.add_calibration(self.cal2)
-        fw.add_dependency(self.name1, self.name2)
-        self.assertEqual(fw.future_dependencies, {self.name1: [], self.name2: [self.name1]})
+        self.cal1.depends_on(self.cal1)
+        self.assertFalse(self.cal1.dependencies)
 
 #    def test_order_calibrations(self):
 #        """

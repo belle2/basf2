@@ -6,8 +6,6 @@ Calibration Framework - David Dossett 2016
 
 This module implements several objects/functions to configure and run the calibration.
 These can then be used to construct the workflow of the calibration job.
-Much of the current flow is borrowed from the calibration_framework.py module
-and will be extended soon.
 """
 
 from basf2 import *
@@ -91,7 +89,7 @@ class Calibration():
         until those are set.
         """
 
-        #: Name of calibration object
+        #: Name of calibration object, THIS MUST BE UNIQUE WHEN ADDING INTO CAF!
         self.name = name
         #: Internal calibration collector/algorithms/input_files stored for this calibration
         self._collector = None
@@ -114,6 +112,12 @@ class Calibration():
         #: Output results of algorithms for each iteration
         self.results = {}
 
+        #: List of calibration objects that will depend on this one.
+        self.future_dependencies = []
+        #: OrderedDictionary of dependencies of calibration objects, where value is the calibrations
+        #: that the key depends on.
+        self.dependencies = []
+
     def is_valid(self):
         """A full calibration consists of a collector AND an associated algorithm AND input_files.
         This returns False if any are missing or if the collector and algorithm are mismatched."""
@@ -128,6 +132,31 @@ class Calibration():
                     return False
             else:
                 return True
+
+    def depends_on(self, calibration):
+        """Adds dependency of this calibration on another i.e. This calibration
+        will not run until the dependency has completed, and the constants produced
+        will be used via the database chain.
+
+        You can define multiple dependencies for a single calibration simply
+        by calling this multiple times. Be careful when adding the calibration into
+        the CAF not to add a circular/cyclic dependency. If you do the sort will return an
+        empty order and the CAF job will fail.
+
+        This function appens to the dependencies and future_dependencies attributes of this
+        calibration and the input one respectively. This prevents us having to do too much
+        recalculation later on.
+        """
+        # Check that we don't have two calibration names that are the same
+        if self.name != calibration.name:
+            # Tests if we have the calibrations added as dependencies already and adds if not
+            if calibration not in self.dependencies:
+                self.dependencies.append(calibration)
+            if self not in calibration.dependencies:
+                calibration.future_dependencies.append(self)
+        else:
+            B2WARNING(("Tried to add {0} as a dependency for {1} but they have the same name."
+                       "Dependency was not added.".format(calibration, self)))
 
     @property
     def name(self):
@@ -283,12 +312,12 @@ class CAF():
 
         #: Dictionary of calibrations for this CAF instance
         self.calibrations = {}
-        #: OrderedDictionary of future dependencies of calibration objects, where the value is all
-        #: calibrations that will depend on the key.
-        self.future_dependencies = OrderedDict()
-        #: OrderedDictionary of dependencies of calibration objects, where value is the calibrations
-        #: that the key depends on.
-        self.dependencies = OrderedDict()
+        #: Dictionary of future dependencies of calibration objects, where the value is all
+        #: calibrations that will depend on the key, filled during self.run()
+        self.future_dependencies = {}
+        #: Dictionary of dependencies of calibration objects, where value is the calibrations
+        #: that the key depends on, filled during self.run()
+        self.dependencies = {}
         #: Output path to store results of calibration and bookkeeping information
         self.output_dir = self.config['CAF_DEFAULTS']['ResultsDir']
         #: Polling frequencywhile waiting for jobs to finish
@@ -308,43 +337,51 @@ class CAF():
         if calibration.is_valid():
             if calibration.name not in self.calibrations:
                 self.calibrations[calibration.name] = calibration
-                self.dependencies[calibration.name] = []
-                self.future_dependencies[calibration.name] = []
             else:
                 B2WARNING('Tried to add a calibration with the name '+calibration.name+' twice.')
         else:
             B2WARNING(("Tried to add incomplete/invalid calibration ({0}) to the framwork."
                        "It was not added and will not be part of the final process.".format(calibration.name)))
 
-    def add_dependency(self, calibration_name, depends_on):
-        """Adds dependency of one entire calibration step on another by
-        using their unique names found from:
-        >>> cal.name
-        You can define multiple dependencies for a single calibration simply
-        by calling this multiple times. Be careful not to add a circular/cyclic
-        dependency or the sort will return an empty list and the CAF job will fail.
+    def _remove_missing_dependencies(self):
         """
-        if calibration_name != depends_on:
-            # Tests if we have the calibrations added
-            if set([calibration_name, depends_on]).issubset([cal for cal in self.calibrations.keys()]):
-                # Note that we add the depends_on as the key and the calibration
-                # name as the value. This is to make the sorting algorithm
-                # simpler and more efficient later.
-                self.future_dependencies[depends_on].append(calibration_name)
-                self.dependencies[calibration_name].append(depends_on)
-            else:
-                B2WARNING(("Tried to add dependency for calibrations not in the framework."
-                           "Dependency was not added."))
-        else:
-            B2WARNING(("Tried to add dependency for calibration {0} on itself."
-                       "Dependency was not added.".format(calibration_name)))
+        This checks the future and past dependencies of each calibration in the CAF.
+        If any dependencies are not known to the CAF then they are removed from the calibration
+        object directly.
+        """
+        calibration_names = [calibration.name for calibration in self.calibrations.values()]
+
+        def is_dependency_in_caf(dependency):
+            """
+            Quick function to use with filter() and check dependencies against calibrations known to CAF
+            """
+            return dependency.name in calibration_names
+
+        # Check that there aren't dependencies on calibrations not added to the framework
+        # Remove them from the calibration objects if there are.
+        for calibration in self.calibrations.values():
+            filtered_future_dependencies = list(filter(is_dependency_in_caf, calibration.future_dependencies))
+            calibration.future_dependencies = filtered_future_dependencies
+
+            filtered_dependencies = list(filter(is_dependency_in_caf, calibration.dependencies))
+            calibration.dependencies = filtered_dependencies
 
     def order_calibrations(self):
         """
-        - Takes everything put into the dependencies dictionary and passes it to a sorting
-        algorithm.
+        - Uses dependency atrributes of calibrations to create a dependency dictionary and passes it
+        to a sorting algorithm.
         - Returns True if sort was succesful, False if it failed (most likely a cyclic dependency)
         """
+        # First remove any dependencies on calibrations not added to the CAF
+        self._remove_missing_dependencies()
+        # Filling dependencies dictionaries of CAF for sorting, only explicit dependencies for now
+        # Note that they currently use the names not the calibration objects.
+        for calibration in self.calibrations.values():
+            future_dependencies_names = [dependency.name for dependency in calibration.future_dependencies]
+            past_dependencies_names = [dependency.name for dependency in calibration.dependencies]
+
+            self.future_dependencies[calibration.name] = future_dependencies_names
+            self.dependencies[calibration.name] = past_dependencies_names
         # Gives us a list of A (not THE) valid ordering and checks for cyclic dependencies
         order = topological_sort(self.future_dependencies)
         if order:
@@ -352,8 +389,10 @@ class CAF():
             # First get an ordered dictionary of the sort order but including all implicit dependencies.
             ordered_full_dependencies = all_dependencies(self.future_dependencies, order)
             # Need to implement an ordering algorithm here, based on number of future dependents?
+            #
+            # TODO
+            #
             order = ordered_full_dependencies
-
         return order
 
     def configure_jobs(self, calibrations, iteration):

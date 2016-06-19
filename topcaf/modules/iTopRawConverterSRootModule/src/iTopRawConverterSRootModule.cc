@@ -41,6 +41,7 @@ iTopRawConverterSRootModule::iTopRawConverterSRootModule() : Module()
   setDescription("This module is used to upack the raw data from the testbeam and crt data");
   addParam("forceTrigger0xF", m_forceTrigger0xF, "Forcing all trigger bits to 0xF", false);
   addParam("headerlessBlob", m_headerlessBlob, "write out data without belle2link headers", string(""));
+  addParam("useRawTOP", m_useRawTOP, "parse from RawTOP instead of RawDataBlock", false);
 
   m_WfPacket = nullptr;
   m_EvtPacket = nullptr;
@@ -58,6 +59,16 @@ iTopRawConverterSRootModule::~iTopRawConverterSRootModule()
 void
 iTopRawConverterSRootModule::initialize()
 {
+
+  //input
+  if (m_useRawTOP) {
+    StoreArray<RawTOP> raw;
+    raw.isRequired();
+  } else {
+    StoreArray<RawDataBlock> raw;
+    raw.isRequired();
+  }
+
   //output
   m_evtheader_ptr.registerInDataStore();
   m_evtwaves_ptr.registerInDataStore();
@@ -361,24 +372,35 @@ iTopRawConverterSRootModule::parseData(istream& in, size_t streamSize)
 void
 iTopRawConverterSRootModule::event()
 {
-  StoreArray<RawDataBlock> raw_dblkarray;
 
-  size_t array_entries = raw_dblkarray.getEntries();
-  // B2DEBUG(1, "Number of RAW entries: " << array_entries);
-  // There should only be one entry per "event"
-  for (size_t i = 0; i < array_entries; i++) {
-    RawDataBlock* raw = raw_dblkarray[i];
-    //   B2DEBUG(1, "Number of RAW Entries: " << raw->GetNumEntries());
-    //   B2DEBUG(1, "Number of RAW Events: " << raw->GetNumEvents());
-    //   B2DEBUG(1, "Number of RAW Nodes: " << raw->GetNumNodes());
-    // There should only be one "event" in the block
-    int* data = raw->GetWholeBuffer();
-    size_t nWords = raw->TotalBufNwords();
-    // intbuf buffer(data, nWords);
-    // istream in(&buffer);
-    string buffer(reinterpret_cast<char*>(data), nWords * sizeof(int));
-    istringstream in(buffer);
-    parseData(in, nWords);
+  if (m_useRawTOP) {
+    StoreArray<RawTOP> rawTOP;
+    for (auto& raw : rawTOP) {
+      int* data = raw.GetWholeBuffer();
+      size_t nWords = raw.TotalBufNwords();
+      string buffer(reinterpret_cast<char*>(data), nWords * sizeof(int));
+      istringstream in(buffer);
+      parseData(in, nWords);
+    }
+  } else {
+    StoreArray<RawDataBlock> raw_dblkarray;
+    size_t array_entries = raw_dblkarray.getEntries();
+    // B2DEBUG(1, "Number of RAW entries: " << array_entries);
+    // There should only be one entry per "event"
+    for (size_t i = 0; i < array_entries; i++) {
+      RawDataBlock* raw = raw_dblkarray[i];
+      //   B2DEBUG(1, "Number of RAW Entries: " << raw->GetNumEntries());
+      //   B2DEBUG(1, "Number of RAW Events: " << raw->GetNumEvents());
+      //   B2DEBUG(1, "Number of RAW Nodes: " << raw->GetNumNodes());
+      // There should only be one "event" in the block
+      int* data = raw->GetWholeBuffer();
+      size_t nWords = raw->TotalBufNwords();
+      // intbuf buffer(data, nWords);
+      // istream in(&buffer);
+      string buffer(reinterpret_cast<char*>(data), nWords * sizeof(int));
+      istringstream in(buffer);
+      parseData(in, nWords);
+    }
   }
   m_evt_no += 1;
 }

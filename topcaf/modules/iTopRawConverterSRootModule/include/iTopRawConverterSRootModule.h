@@ -11,6 +11,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
+#include <rawdata/dataobjects/RawTOP.h>
 
 namespace Belle2 {
 
@@ -97,6 +98,7 @@ namespace Belle2 {
     bool m_forceTrigger0xF;
     std::string m_headerlessBlob;
     std::ofstream m_headerlessBlobFile;
+    bool m_useRawTOP;
 
     CPR_hdr cpr_hdr;
     HSLB_hdr hslb_hdr;

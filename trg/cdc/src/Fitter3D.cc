@@ -143,27 +143,11 @@ namespace Belle2 {
     m_mConstV["driftPhi2DError"][3] = 0.00019084;
     m_mConstV["driftPhi2DError"][4] = 0.0001514;
 
-    // KT study
-    //m_mConstV["wireZError"] = vector<double>  ({0.0581, 0.0785, 0.0728, 0.0767});
-    //m_mConstV["driftZError"] = vector<double>  ({0.00388, 0.00538, 0.00650, 0.00842});
-    //// Orginal study
-    //m_mConstV["driftZError"] = vector<double> (4);
-    //m_mConstV["driftZError"][0] = 3.19263; 
-    //m_mConstV["driftZError"][1] = 2.8765; 
-    //m_mConstV["driftZError"][2] = 2.90057;
-    //m_mConstV["driftZError"][3] = 3.96206;
-    //// Max factor should be 2.5. Please change iDenLUTOutBitSize to 15 when using 2.5.
-    //// factor 1 shows best z0 results.
-    //{
-    //  double t_factor = 1;
-    //  m_mConstV["wireZError"] = vector<double> (4);
-    //  for (unsigned iSt=0; iSt<4; iSt++) m_mConstV["wireZError"][iSt] = m_mConstV["driftZError"][iSt] * t_factor;
-    //}
     // (2016.06.07) study
     //m_mConstV["wireZError"] = vector<double> ({4.752, 6.393, 6.578, 6.418});
+    //m_mConstV["driftZError"] = vector<double> ({0.4701, 0.7203, 0.8058, 0.9382});
     m_mConstV["driftZError"] = vector<double> ({0.7676, 0.9753, 1.029, 1.372});
     m_mConstV["wireZError"] = vector<double> ({0.7676, 0.9753, 1.029, 1.372});
-    //m_mConstV["driftZError"] = vector<double> ({0.4701, 0.7203, 0.8058, 0.9382});
 
     // Make driftLength table for each superlayer. Up to 511 clock ticks.
     // driftLengthTableSLX[ tdcCount (~2ns unit) ] = drift length (cm)
@@ -588,10 +572,6 @@ namespace Belle2 {
       m_mVector["relPhi3D"] = vector<double> (4);
       for(unsigned iSt=0; iSt<4; iSt++) m_mVector["relPhi3D"][iSt] = Fitter3DUtility::rotatePhi(m_mVector["phi3D"][iSt], m_mDouble["relRefPhi"]);
 
-      //for(unsigned iSt=0; iSt<4; iSt++) cout<<" phi3D_"<<iSt<<":"<<m_mVector["phi3D"][iSt]; cout<<endl;
-      //cout<<"relPhi0:"<<m_mDouble["relPhi0"]<<endl;
-      //for(unsigned iSt=0; iSt<4; iSt++) cout<<" relPhi3D_"<<iSt<<":"<<m_mVector["relPhi3D"][iSt]; cout<<endl;
-
       // Rotate wirePhi
       m_mVector["relWirePhi3D"] = vector<double> (4);
       for(unsigned iSt=0; iSt<4; iSt++) {
@@ -605,33 +585,10 @@ namespace Belle2 {
         m_mVector["relWirePhi3D"][iSt] = t_relWirePhi;
       }
 
-      
       // Rotate tsId
       m_mVector["relTsId3D"] = vector<double> (4);
       for(unsigned iSt=0; iSt<4; iSt++) m_mVector["relTsId3D"][iSt] = Fitter3DUtility::rotateTsId(m_mVector["tsId"][2*iSt+1],m_mDouble["relRefPhi"]/m_mConstD["Trg_PI"]/2*m_mConstV["nTSs"][2*iSt+1],m_mConstV["nTSs"][2*iSt+1]);
-      //////Test if rotate tsId works
-      //for(unsigned iSt=0; iSt<4; iSt++) {
-      //  if(m_mVector["useStSl"][iSt] == 1) {
-      //    double t_relWirePhiFromTSId = m_mVector["relTsId3D"][iSt]*1.0/m_mConstV["nTSs"][2*iSt+1]*2*m_mConstD["Trg_PI"];
-      //    if (fabs(t_relWirePhiFromTSId - m_mVector["relWirePhi3D"][iSt])>0.000001) {
-      //      cout<<"relWirePhi"<<iSt<<":        "<<m_mVector["relWirePhi3D"][iSt]<<endl;
-      //      cout<<"relWirePhiFromTSId"<<iSt<<":"<<t_relWirePhiFromTSId<<endl;
-      //      cout<<"wirePhi"<<iSt<<":"<<m_mVector["wirePhi"][2*iSt+1]<<endl;
-      //      cout<<"tsIdPhi"<<iSt<<":"<<m_mVector["tsId"][2*iSt+1]/m_mConstV["nTSs"][2*iSt+1]*2*m_mConstD["Trg_PI"]<<endl;
-      //      cout<<"nTS"<<iSt<<":"<<m_mConstV["nTSs"][2*iSt+1]<<endl;
-      //      cout<<"tsId"<<iSt<<":"<<m_mVector["tsId"][2*iSt+1]<<endl;
-      //      cout<<"relTsId"<<iSt<<":"<<m_mVector["relTsId3D"][iSt]<<endl;
-      //      cout<<"relRefPhiForTsId"<<iSt<<":"<<m_mDouble["relRefPhi"]/m_mConstD["Trg_PI"]/2*m_mConstV["nTSs"][2*iSt+1]<<endl;
-      //      cout<<"relRefPhi:"<<m_mDouble["relRefPhi"]<<endl;
-      //    }
-      //  }
-      //}
 
-      //// Constrain rho to rhoMin
-      //if(m_mDouble["rho"] < rhoMin) {
-      //    m_mDouble["rho"] = rhoMin;
-      //    m_mDouble["pt"] = rhoMin * 0.3 * 1.5 * 0.01;
-      //}
       // Constrain rho to rhoMax.
       if(m_mDouble["rho"] > rhoMax) {
         m_mDouble["rho"] = rhoMax;
@@ -660,49 +617,12 @@ namespace Belle2 {
           make_tuple("tdc_2", m_mVector["tdc"][5], m_mConstD["tdcBitSize"], 0, pow(2,m_mConstD["tdcBitSize"])-0.5, 0),
           make_tuple("tdc_3", m_mVector["tdc"][7], m_mConstD["tdcBitSize"], 0, pow(2,m_mConstD["tdcBitSize"])-0.5, 0),
           make_tuple("eventTime", m_mDouble["eventTime"], m_mConstD["tdcBitSize"]+1, 0, pow(2,m_mConstD["tdcBitSize"]+1)-0.5, 0)
-          //make_tuple("phi_0", m_mVector["relPhi3D"][0], phiBitSize, phiMin, phiMax, 0),
-          //make_tuple("phi_1", m_mVector["relPhi3D"][1], phiBitSize, phiMin, phiMax, 0),
-          //make_tuple("phi_2", m_mVector["relPhi3D"][2], phiBitSize, phiMin, phiMax, 0),
-          //make_tuple("phi_3", m_mVector["relPhi3D"][3], phiBitSize, phiMin, phiMax, 0),
         };
         TRGCDCJSignal::valuesToMapSignals(t_values, m_commonData, m_mSignalStorage);
       }
 
       Fitter3DUtility::setError(m_mConstD, m_mConstV, m_mSignalStorage);
       Fitter3DUtility::calPhi(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
-      //// Test if wirePhi works
-      //for(unsigned iSt=0; iSt<4; iSt++) {
-      //  if(m_mVector["useStSl"][iSt] == 1) 
-      //  {
-      //    if (fabs(m_mSignalStorage["wirePhi_"+to_string(iSt)].getRealInt() - m_mVector["relWirePhi3D"][iSt])>0.000001) {
-      //      cout<<"relWirePhi"<<iSt<<":        "<<m_mVector["relWirePhi3D"][iSt]<<endl;
-      //      m_mSignalStorage["wirePhi_"+to_string(iSt)].dump();
-      //    }
-      //  }
-      //}
-
-      //////// Test if phi works
-      //m_mVector["rotatePhi3D"] = vector<double> (4);
-      //for (unsigned iSt = 0; iSt < 4; iSt++) {
-      //  // Get drift length from table.
-      //  string tableName = "driftLengthTableSL" + to_string(iSt*2+1);
-      //  //double t_driftTime = m_mVector["tdc"][iSt*2+1] - m_mDouble["eventTime"];
-      //  double t_driftTime = m_mVector["tdc"][iSt*2+1];
-      //  if (t_driftTime < 0) t_driftTime = 0;
-      //  double t_driftLength = m_mConstV[tableName][(unsigned)t_driftTime];
-      //  m_mVector["rotatePhi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["relWirePhi3D"][iSt], t_driftLength, m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
-      //}
-      //for(unsigned iSt=0; iSt<4; iSt++) {
-      //  if(m_mVector["useStSl"][iSt] == 1) 
-      //  {
-      //    if(fabs(m_mVector["rotatePhi3D"][iSt] - m_mSignalStorage["tPhi_"+to_string(iSt)].getRealInt()) > 0.0001) {
-      //      cout<<m_mVector["rotatePhi3D"][iSt] - m_mSignalStorage["tPhi_"+to_string(iSt)].getRealInt()<<endl;
-      //      cout<<m_mVector["rotatePhi3D"][iSt]<<endl;
-      //      m_mSignalStorage["tPhi_"+to_string(iSt)].dump();
-      //    }
-      //  }
-      //}
-
       Fitter3DUtility::calZ(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
       Fitter3DUtility::calS(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
       Fitter3DUtility::rSFit(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
@@ -863,7 +783,6 @@ namespace Belle2 {
     unsigned layerId = segmentHit->segment().center().layerId();
     int nWires = cdcp.nWiresInLayer(layerId)*2;
     double rr = cdcp.senseWireR(layerId);
-    //double driftLength = segmentHit->drift();
     double tdc = segmentHit->segment().priorityTime();
     int lr = segmentHit->segment().LUT()->getValue(segmentHit->segment().lutPattern());
     return Fitter3DUtility::calPhi(localId, nWires, tdc, eventTime, rr, lr);

@@ -140,7 +140,7 @@ class MonitoringHist(object):
         self.centers = {}
         self.nbins = {}
         for key in f.GetListOfKeys():
-            name = Belle2.Variable.invertMakeROOTCompatible(key.GetName())
+            name = Belle2.invertMakeROOTCompatible(key.GetName())
             hist = key.ReadObj()
             if not (isinstance(hist, ROOT.TH1D) or isinstance(hist, ROOT.TH1F) or
                     isinstance(hist, ROOT.TH2D) or isinstance(hist, ROOT.TH2F)):
@@ -222,7 +222,7 @@ class MonitoringMVARanking(object):
                     v = line.split(':')
                     if int(v[1]) - 1 != len(self.ranking):
                         B2WARNING("Error during read out of TMVA ranking from " + logfile)
-                    oldname = Belle2.Variable.invertMakeROOTCompatible(v[2].strip())
+                    oldname = Belle2.invertMakeROOTCompatible(v[2].strip())
                     self.ranking.append((oldname, float(v[3])))
 
 

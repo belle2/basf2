@@ -350,8 +350,7 @@ void DesSerPrePC::setRecvdBuffer(RawDataBlockFormat* temp_raw_datablk, int* dele
   }
   m_recvd_totbytes += total_buf_nwords * sizeof(int);
 
-  int temp_delete_flag = 0;
-  temp_raw_datablk->SetBuffer((int*)temp_buf, total_buf_nwords, temp_delete_flag,
+  temp_raw_datablk->SetBuffer((int*)temp_buf, total_buf_nwords, *delete_flag,
                               num_events_in_sendblock, num_nodes_in_sendblock);
 
   //

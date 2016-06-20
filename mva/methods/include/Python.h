@@ -48,7 +48,7 @@ namespace Belle2 {
     /**
      * Options for the Python MVA method
      */
-    class PythonOptions : public Options {
+    class PythonOptions : public SpecificOptions {
 
     public:
       /**
@@ -67,6 +67,11 @@ namespace Belle2 {
        * Returns a program options description for all available options
        */
       virtual po::options_description getDescription() override;
+
+      /**
+       * Return method name
+       */
+      virtual std::string getMethod() const override { return "Python"; }
 
       std::string m_framework = "sklearn"; /**< framework to use e.g. sklearn, xgboost, theano, tensorflow, ... */
       std::string m_steering_file =

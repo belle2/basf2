@@ -14,7 +14,6 @@ if __name__ == "__main__":
     general_options.m_weightfile = "MVADatabaseIdentifier"
     general_options.m_variables = basf2_mva.vector('p', 'pz', 'daughter(0, Kid)')
     general_options.m_target_variable = "isSignal"
-    general_options.m_method = "FastBDT"
 
     fastbdt_options = basf2_mva.FastBDTOptions()
 

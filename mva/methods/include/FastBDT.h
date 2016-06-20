@@ -29,7 +29,7 @@ namespace Belle2 {
     /**
      * Options for the FANN MVA method
      */
-    class FastBDTOptions : public Options {
+    class FastBDTOptions : public SpecificOptions {
 
     public:
       /**
@@ -48,6 +48,11 @@ namespace Belle2 {
        * Returns a program options description for all available options
        */
       virtual po::options_description getDescription() override;
+
+      /**
+       * Return method name
+       */
+      virtual std::string getMethod() const override { return "FastBDT"; }
 
       unsigned int m_nTrees = 400; /**< Number of trees */
       unsigned int m_nCuts = 8; /**< Number of cut Levels = log_2(Number of Cuts) */

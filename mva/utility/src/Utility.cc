@@ -156,7 +156,7 @@ namespace Belle2 {
 
     }
 
-    void teacher(const GeneralOptions& general_options, const Options& specific_options, const MetaOptions& meta_options)
+    void teacher(const GeneralOptions& general_options, const SpecificOptions& specific_options, const MetaOptions& meta_options)
     {
       if (not meta_options.m_use_splot) {
         ROOTDataset data(general_options);
@@ -167,9 +167,17 @@ namespace Belle2 {
     }
 
 
-    std::unique_ptr<Belle2::MVA::Expert> teacher_dataset(const GeneralOptions& general_options, const Options& specific_options,
+    std::unique_ptr<Belle2::MVA::Expert> teacher_dataset(GeneralOptions general_options, const SpecificOptions& specific_options,
                                                          Dataset& data)
     {
+      if (general_options.m_method.empty()) {
+        general_options.m_method = specific_options.getMethod();
+      } else {
+        if (general_options.m_method != specific_options.getMethod()) {
+          B2ERROR("The method specified in the general options is in conflict with the provided specific option:" << general_options.m_method
+                  << " " << specific_options.getMethod());
+        }
+      }
       AbstractInterface::initSupportedInterfaces();
       auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
       if (supported_interfaces.find(general_options.m_method) != supported_interfaces.end()) {
@@ -185,7 +193,7 @@ namespace Belle2 {
       }
     }
 
-    std::unique_ptr<Belle2::MVA::Expert> teacher_splot(const GeneralOptions& general_options, const Options& specific_options,
+    std::unique_ptr<Belle2::MVA::Expert> teacher_splot(const GeneralOptions& general_options, const SpecificOptions& specific_options,
                                                        const MetaOptions& meta_options)
     {
 

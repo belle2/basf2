@@ -34,7 +34,7 @@ namespace Belle2 {
     /**
      * Options for the TMVA MVA method
      */
-    class TMVAOptions : public Options {
+    class TMVAOptions : public SpecificOptions {
 
     public:
       /**
@@ -53,6 +53,11 @@ namespace Belle2 {
        * Returns a program options description for all available options
        */
       virtual po::options_description getDescription() override;
+
+      /**
+       * Return method name
+       */
+      virtual std::string getMethod() const override { return "TMVA"; }
 
     public:
       std::string m_method = "BDT"; /**< tmva method name */
@@ -104,6 +109,11 @@ namespace Belle2 {
        */
       virtual po::options_description getDescription() override;
 
+      /**
+       * Return method name
+       */
+      virtual std::string getMethod() const override { return "TMVAClassification"; }
+
     public:
       bool transform2probability = true; /**< Transform output of method to a probability */
     };
@@ -123,6 +133,11 @@ namespace Belle2 {
       {
         m_factoryOption += ":AnalysisType=Regression";
       }
+
+      /**
+       * Return method name
+       */
+      virtual std::string getMethod() const override { return "TMVARegression"; }
     };
 
 

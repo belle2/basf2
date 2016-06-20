@@ -39,6 +39,7 @@ class ExpertInformation(object):
     Contains information of a export extracted from the GeneralOptions
     for a convinient access
     """
+
     def __init__(self, identifier):
         """
         Extract information about an expert from the database using the given identifier

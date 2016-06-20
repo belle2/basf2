@@ -45,6 +45,7 @@ namespace {
     EXPECT_EQ(specific_options2.m_binning, "binning");
     EXPECT_EQ(specific_options2.m_nBins, 3);
 
+    EXPECT_EQ(specific_options.getMethod(), std::string("PDF"));
   }
 
   class TestDataset : public MVA::Dataset {
@@ -70,7 +71,7 @@ namespace {
 
   TEST(PDFTest, PDFInterface)
   {
-    MVA::Interface<MVA::PDFOptions, MVA::PDFTeacher, MVA::PDFExpert> interface("TestPDF");
+    MVA::Interface<MVA::PDFOptions, MVA::PDFTeacher, MVA::PDFExpert> interface;
 
     MVA::GeneralOptions general_options;
     MVA::PDFOptions specific_options;

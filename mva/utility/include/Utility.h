@@ -52,7 +52,7 @@ namespace Belle2 {
      * @param specific_options method specific options
      * @param splot_options optional options for an splot training
      */
-    void teacher(const GeneralOptions& general_options, const Options& specific_options,
+    void teacher(const GeneralOptions& general_options, const SpecificOptions& specific_options,
                  const MetaOptions& meta_options = MetaOptions());
 
     /**
@@ -71,7 +71,7 @@ namespace Belle2 {
      * @param specific_options method specific options
      * @param data to use
      */
-    std::unique_ptr<Belle2::MVA::Expert> teacher_dataset(const GeneralOptions& general_options, const Options& specific_options,
+    std::unique_ptr<Belle2::MVA::Expert> teacher_dataset(GeneralOptions general_options, const SpecificOptions& specific_options,
                                                          Dataset& data);
 
     /**
@@ -80,7 +80,7 @@ namespace Belle2 {
      * @param splot_options splot options defining the splot training
      * @param specific_options of the used mva method
      */
-    std::unique_ptr<Belle2::MVA::Expert> teacher_splot(const GeneralOptions& general_options, const Options& specific_options,
+    std::unique_ptr<Belle2::MVA::Expert> teacher_splot(const GeneralOptions& general_options, const SpecificOptions& specific_options,
                                                        const MetaOptions& meta_options);
 
 

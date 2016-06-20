@@ -51,6 +51,7 @@ namespace {
     EXPECT_FLOAT_EQ(specific_options2.m_shrinkage, 0.2);
     EXPECT_FLOAT_EQ(specific_options2.m_randRatio, 0.8);
 
+    EXPECT_EQ(specific_options.getMethod(), std::string("FastBDT"));
   }
 
   class TestDataset : public MVA::Dataset {
@@ -76,7 +77,7 @@ namespace {
 
   TEST(FastBDTTest, FastBDTInterface)
   {
-    MVA::Interface<MVA::FastBDTOptions, MVA::FastBDTTeacher, MVA::FastBDTExpert> interface("TestFastBDT");
+    MVA::Interface<MVA::FastBDTOptions, MVA::FastBDTTeacher, MVA::FastBDTExpert> interface;
 
     MVA::GeneralOptions general_options;
     general_options.m_variables = {"A"};

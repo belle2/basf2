@@ -36,6 +36,7 @@ namespace {
 
     EXPECT_EQ(specific_options2.m_output, 0.1);
 
+    EXPECT_EQ(specific_options.getMethod(), std::string("Trivial"));
   }
 
   class TestDataset : public MVA::Dataset {
@@ -61,7 +62,7 @@ namespace {
 
   TEST(TrivialTest, TrivialInterface)
   {
-    MVA::Interface<MVA::TrivialOptions, MVA::TrivialTeacher, MVA::TrivialExpert> interface("TestTrivial");
+    MVA::Interface<MVA::TrivialOptions, MVA::TrivialTeacher, MVA::TrivialExpert> interface;
 
     MVA::GeneralOptions general_options;
     MVA::TrivialOptions specific_options;

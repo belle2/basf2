@@ -34,7 +34,7 @@ namespace Belle2 {
     /**
      * Options for the NeuroBayes MVA method
      */
-    class NeuroBayesOptions : public Options {
+    class NeuroBayesOptions : public SpecificOptions {
 
     public:
       /**
@@ -53,6 +53,11 @@ namespace Belle2 {
        * Returns a program options description for all available options
        */
       virtual po::options_description getDescription() override;
+
+      /**
+       * Return method name
+       */
+      virtual std::string getMethod() const override { return "NeuroBayes"; }
 
       std::string m_lossFunction = "ENTROPY"; /**< Loss function */
       std::string m_regularization = "REG"; /**< Used regularization method */

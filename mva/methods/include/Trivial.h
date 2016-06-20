@@ -23,7 +23,7 @@ namespace Belle2 {
      * Options for the Trivial MVA method.
      * Used for debugging and testing
      */
-    class TrivialOptions : public Options {
+    class TrivialOptions : public SpecificOptions {
 
     public:
       /**
@@ -42,6 +42,11 @@ namespace Belle2 {
        * Returns a program options description for all available options
        */
       virtual po::options_description getDescription() override;
+
+      /**
+       * Return method name
+       */
+      virtual std::string getMethod() const override { return "Trivial"; }
 
       double m_output = 0.5; /**< Output of the trivial method */
     };

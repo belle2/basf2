@@ -79,6 +79,9 @@ namespace {
     MVA::TMVAOptionsRegression specific_regression_options;
     EXPECT_EQ(specific_regression_options.m_factoryOption, "!V:!Silent:Color:DrawProgressBar:AnalysisType=Regression");
 
+    EXPECT_EQ(specific_classification_options.getMethod(), std::string("TMVAClassification"));
+    EXPECT_EQ(specific_regression_options.getMethod(), std::string("TMVARegression"));
+
   }
 
   class TestClassificationDataset : public MVA::Dataset {
@@ -105,7 +108,7 @@ namespace {
   TEST(TMVATest, TMVAClassificationInterface)
   {
     MVA::Interface<MVA::TMVAOptionsClassification, MVA::TMVATeacherClassification, MVA::TMVAExpertClassification>
-    interface("TestTMVAClassification");
+    interface;
 
     MVA::GeneralOptions general_options;
     general_options.m_variables = {"A"};
@@ -155,7 +158,7 @@ namespace {
   TEST(TMVATest, TMVAClassificationPlugin)
   {
     MVA::Interface<MVA::TMVAOptionsClassification, MVA::TMVATeacherClassification, MVA::TMVAExpertClassification>
-    interface("TestTMVAClassification");
+    interface;
 
     MVA::GeneralOptions general_options;
     general_options.m_variables = {"A"};
@@ -227,7 +230,7 @@ namespace {
 
   TEST(TMVATest, TMVARegressionInterface)
   {
-    MVA::Interface<MVA::TMVAOptionsRegression, MVA::TMVATeacherRegression, MVA::TMVAExpertRegression> interface("TestTMVARegression");
+    MVA::Interface<MVA::TMVAOptionsRegression, MVA::TMVATeacherRegression, MVA::TMVAExpertRegression> interface;
 
     MVA::GeneralOptions general_options;
     general_options.m_variables = {"A"};

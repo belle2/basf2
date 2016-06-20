@@ -61,14 +61,15 @@ namespace Belle2 {
       /**
        * Get Options of this MVA library
        */
-      virtual std::unique_ptr<Options> getOptions() const = 0;
+      virtual std::unique_ptr<SpecificOptions> getOptions() const = 0;
 
       /**
        * Get Teacher of this MVA library
        * @param general_options shared options of all libraries
        * @param specific_options specific options for this library
        */
-      virtual std::unique_ptr<Teacher> getTeacher(const GeneralOptions& general_options, const Options& specific_options) const = 0;
+      virtual std::unique_ptr<Teacher> getTeacher(const GeneralOptions& general_options,
+                                                  const SpecificOptions& specific_options) const = 0;
 
       /**
        * Get Exoert of this MVA library
@@ -100,19 +101,20 @@ namespace Belle2 {
        * Constructs a new interface with the given name
        * @param name of the interface
        */
-      explicit Interface(std::string name) : AbstractInterface(name) { }
+      Interface() : AbstractInterface(TemplateOptions().getMethod()) { }
 
       /**
        * Get Options of this MVA library
        */
-      virtual std::unique_ptr<Options> getOptions() const override { return std::unique_ptr<Options>(new TemplateOptions); }
+      virtual std::unique_ptr<SpecificOptions> getOptions() const override { return std::unique_ptr<SpecificOptions>(new TemplateOptions); }
 
       /**
        * Get Teacher of this MVA library
        * @param general_options shared options of all libraries
        * @param specific_options specific options for this library
        */
-      virtual std::unique_ptr<Teacher> getTeacher(const GeneralOptions& general_options, const Options& specific_options) const override
+      virtual std::unique_ptr<Teacher> getTeacher(const GeneralOptions& general_options,
+                                                  const SpecificOptions& specific_options) const override
       {
         return std::unique_ptr<Teacher>(new TemplateTeacher(general_options, dynamic_cast<const TemplateOptions&>(specific_options)));
       }

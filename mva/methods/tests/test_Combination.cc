@@ -41,6 +41,7 @@ namespace {
     EXPECT_EQ(specific_options2.m_weightfiles[0], "A");
     EXPECT_EQ(specific_options2.m_weightfiles[1], "B");
 
+    EXPECT_EQ(specific_options.getMethod(), std::string("Combination"));
   }
 
   class TestDataset : public MVA::Dataset {
@@ -67,11 +68,11 @@ namespace {
   TEST(CombinationTest, CombinationInterface)
   {
     TestHelpers::TempDirCreator tmp_dir;
-    MVA::Interface<MVA::TrivialOptions, MVA::TrivialTeacher, MVA::TrivialExpert> trivial("TestTrivial");
-    MVA::Interface<MVA::CombinationOptions, MVA::CombinationTeacher, MVA::CombinationExpert> interface("TestCombination");
+    MVA::Interface<MVA::TrivialOptions, MVA::TrivialTeacher, MVA::TrivialExpert> trivial;
+    MVA::Interface<MVA::CombinationOptions, MVA::CombinationTeacher, MVA::CombinationExpert> combination;
 
     MVA::GeneralOptions general_options;
-    general_options.m_method = "TestTrivial";
+    general_options.m_method = "Trivial";
     TestDataset dataset({1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0});
 
     MVA::TrivialOptions trivial_options;
@@ -86,13 +87,13 @@ namespace {
     MVA::Weightfile::saveToXMLFile(trivial_weightfile2, "weightfile2.xml");
 
 
-    general_options.m_method = "TestCombination";
+    general_options.m_method = "Combination";
     MVA::CombinationOptions specific_options;
     specific_options.m_weightfiles = {"weightfile1.xml", "weightfile2.xml"};
-    auto teacher = interface.getTeacher(general_options, specific_options);
+    auto teacher = combination.getTeacher(general_options, specific_options);
     auto weightfile = teacher->train(dataset);
 
-    auto expert = interface.getExpert();
+    auto expert = combination.getExpert();
     expert->load(weightfile);
     auto probabilities = expert->apply(dataset);
     EXPECT_EQ(probabilities.size(), dataset.getNumberOfEvents());

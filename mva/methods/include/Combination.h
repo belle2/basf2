@@ -23,7 +23,7 @@ namespace Belle2 {
     /**
      * Options for the Combination MVA method
      */
-    class CombinationOptions : public Options {
+    class CombinationOptions : public SpecificOptions {
 
     public:
       /**
@@ -42,6 +42,11 @@ namespace Belle2 {
        * Returns a program options description for all available options
        */
       virtual po::options_description getDescription() override;
+
+      /**
+       * Return method name
+       */
+      virtual std::string getMethod() const override { return "Combination"; }
 
       std::vector<std::string> m_weightfiles; /**< Weightfiles of all methods we want to combine */
 

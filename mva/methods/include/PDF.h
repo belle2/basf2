@@ -24,7 +24,7 @@ namespace Belle2 {
     /**
      * Options for the PDF MVA method
      */
-    class PDFOptions : public Options {
+    class PDFOptions : public SpecificOptions {
 
     public:
       /**
@@ -43,6 +43,11 @@ namespace Belle2 {
        * Returns a program options description for all available options
        */
       virtual po::options_description getDescription() override;
+
+      /**
+       * Return method name
+       */
+      virtual std::string getMethod() const override { return "PDF"; }
 
       std::string m_binning = "frequency"; /**< which type of binning is performed e.g. frequency or equidistant */
       std::string m_mode = "probability"; /**< mode which defines the final output e.g. probability */

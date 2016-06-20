@@ -13,6 +13,8 @@
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/logging/Logger.h>
 
+#include <boost/filesystem/operations.hpp>
+
 namespace Belle2 {
   namespace MVA {
 
@@ -159,6 +161,11 @@ namespace Belle2 {
 
     ROOTDataset::ROOTDataset(const GeneralOptions& general_options) : Dataset(general_options)
     {
+      if (not boost::filesystem::exists(m_general_options.m_datafile)) {
+        B2ERROR("Error given ROOT file dies not exists " << m_general_options.m_datafile);
+        throw std::runtime_error("Error during open of ROOT file named " + m_general_options.m_datafile);
+      }
+
       m_file = TFile::Open(m_general_options.m_datafile.c_str(), "UPDATE");
       if (not m_file or not m_file->IsOpen()) {
         B2ERROR("Error during open of ROOT file named " << m_general_options.m_datafile);

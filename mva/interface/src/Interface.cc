@@ -26,10 +26,10 @@ namespace Belle2 {
     AbstractInterface::AbstractInterface(std::string name) : m_name(name)
     {
       if (s_supported_interfaces.find(m_name) != s_supported_interfaces.end()) {
-        B2ERROR("An interface with the name " << m_name << " already exists!");
-        throw std::runtime_error("An interface with the name " + m_name + " already exists!");
+        B2WARNING("An interface with the name " << m_name << " already exists!");
+      } else {
+        s_supported_interfaces.insert(std::make_pair(name, this));
       }
-      s_supported_interfaces.insert(std::make_pair(name, this));
     }
 
     AbstractInterface::~AbstractInterface()
@@ -43,16 +43,16 @@ namespace Belle2 {
 
     void AbstractInterface::initSupportedInterfaces()
     {
-      static Interface<FastBDTOptions, FastBDTTeacher, FastBDTExpert> interface_FastBDT("FastBDT");
-      static Interface<NeuroBayesOptions, NeuroBayesTeacher, NeuroBayesExpert> interface_NeuroBayes("NeuroBayes");
-      static Interface<FANNOptions, FANNTeacher, FANNExpert> interface_FANN("FANN");
+      static Interface<FastBDTOptions, FastBDTTeacher, FastBDTExpert> interface_FastBDT;
+      static Interface<NeuroBayesOptions, NeuroBayesTeacher, NeuroBayesExpert> interface_NeuroBayes;
+      static Interface<FANNOptions, FANNTeacher, FANNExpert> interface_FANN;
       static Interface<TMVAOptionsClassification, TMVATeacherClassification, TMVAExpertClassification>
-      interface_TMVAClassification("TMVAClassification");
-      static Interface<TMVAOptionsRegression, TMVATeacherRegression, TMVAExpertRegression> interface_TMVARegression("TMVARegression");
-      static Interface<PythonOptions, PythonTeacher, PythonExpert> interface_Python("Python");
-      static Interface<PDFOptions, PDFTeacher, PDFExpert> interface_PDF("PDF");
-      static Interface<CombinationOptions, CombinationTeacher, CombinationExpert> interface_Combination("Combination");
-      static Interface<TrivialOptions, TrivialTeacher, TrivialExpert> interface_Trivial("Trivial");
+      interface_TMVAClassification;
+      static Interface<TMVAOptionsRegression, TMVATeacherRegression, TMVAExpertRegression> interface_TMVARegression;
+      static Interface<PythonOptions, PythonTeacher, PythonExpert> interface_Python;
+      static Interface<PDFOptions, PDFTeacher, PDFExpert> interface_PDF;
+      static Interface<CombinationOptions, CombinationTeacher, CombinationExpert> interface_Combination;
+      static Interface<TrivialOptions, TrivialTeacher, TrivialExpert> interface_Trivial;
     }
 
   }

@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
   // Loop over all hyperparameters -> needs also apply functionality from expert
   // Do sPlot boost
 
-  std::map<std::string, std::unique_ptr<Options>> specific_options;
+  std::map<std::string, std::unique_ptr<SpecificOptions>> specific_options;
 
   for (auto& interface : AbstractInterface::getSupportedInterfaces()) {
     specific_options.emplace(interface.second->getName(), interface.second->getOptions());

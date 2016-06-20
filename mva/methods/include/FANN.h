@@ -25,7 +25,7 @@ namespace Belle2 {
     /**
      * Options for the FANN MVA method
      */
-    class FANNOptions : public Options {
+    class FANNOptions : public SpecificOptions {
 
     public:
       /**
@@ -44,6 +44,11 @@ namespace Belle2 {
        * Returns a program options description for all available options
        */
       virtual po::options_description getDescription() override;
+
+      /**
+       * Return method name
+       */
+      virtual std::string getMethod() const override { return "FANN"; }
 
       unsigned int m_max_epochs = 1000; /**< Maximum number of epochs */
       unsigned int m_epochs_between_reports = 100; /**< Epochs between each report of training status */

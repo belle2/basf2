@@ -87,6 +87,19 @@ namespace Belle2 {
     };
 
     /**
+     * Specific Options, all mehtod Options have to inherit from this class
+     */
+    class SpecificOptions : public Options {
+
+    public:
+      /**
+       * Returns method name, used in the interface to register the method
+       */
+      virtual std::string getMethod() const = 0;
+
+    };
+
+    /**
      * Meta Options which modify the underlying training by doing sPlot, Multiclass and HyperparameterSearch
      */
     class MetaOptions : public Options {

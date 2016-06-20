@@ -5,12 +5,11 @@ env['LIBS'] = [
     '$ROOT_LIBS',
     '$GEANT4_LIBS',
     'framework',
-    'simulation',
     'genfit2',
+    'simulation',
     'tracking_dataobjects',
-    'bklm', 'bklm_dataobjects', 'bklm_dbobjects',
+    'bklm', 'bklm_dataobjects',
     'eklm', 'eklm_dataobjects', 'eklm_dbobjects',
-    'simulation_dataobjects',
     'mdst_dataobjects',
     ]
 

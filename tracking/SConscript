@@ -18,7 +18,6 @@ env['LIBS'] = [
     'CLHEP',
     '$ROOT_LIBS',
     '$GEANT4_LIBS',
-    'tracking_v0Finding_dataobjects',
     'FastBDT_shared',
     ]
 

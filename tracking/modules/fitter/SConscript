@@ -8,8 +8,6 @@ env['LIBS'] = [
 	'mdst_dataobjects',
 	'pxd_dataobjects',
 	'svd_dataobjects',
-	'vxd_dataobjects',
-	'vxd',
 	'tracking'
     ]
 

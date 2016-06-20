@@ -6,9 +6,8 @@ env['LIBS'] = [
     'mdst_dataobjects',
     'pxd', 'pxd_dataobjects',
     'svd', 'svd_dataobjects',
-    'vxd', 'vxd_dataobjects',
+    'vxd',
     'cdc', 'cdc_dataobjects',
-    'calibration',
     'genfit2',
     'alignment'
    # 'tracking', 'tracking_dataobjects',

@@ -3,10 +3,9 @@ Import('env')
 env['LIBS'] = [
     'framework',
     'mdst_dataobjects',
-    'vxd_dataobjects',
     'pxd_dataobjects', 
     'svd_dataobjects',
-    'cdc', 'cdc_dataobjects',
+    'cdc_dataobjects',
     'genfit2',
     ]
 

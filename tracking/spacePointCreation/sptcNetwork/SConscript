@@ -10,12 +10,6 @@ env['SUBLIB'] = True
 
 
 env['LIBS'] = [
-    'genfit2', 
-    'pxd_dataobjects', 
-    'svd_dataobjects', 
-    'vxd',
-    'vxd_dataobjects', 
     'framework', 
-    'tracking'
     ]
 Return('env')

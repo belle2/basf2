@@ -388,24 +388,27 @@ void CDCUnpackerModule::event()
               // Store to the CDCHit.
               const WireID  wireId = getWireID(board, ch);
 
-              if (board == m_boardIDTrig && ch == m_channelTrig) {
-                tdcCountTrig = tdc1;
+              if (isValidBoardChannel(wireId)) {
+                if (board == m_boardIDTrig && ch == m_channelTrig) {
+                  tdcCountTrig = tdc1;
+                } else {
+                  cdcHits.appendNew(tdc1, fadcSum, wireId, tdc2);
+                }
+
+                if (m_enableStoreCDCRawHit == true) {
+                  // Store to the CDCRawHit object.
+                  cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch, trgTime, fadcSum, tdc1, tdc2, tot);
+                }
+
+                if (m_setRelationRaw2Hit == true &&
+                    !(board == m_boardIDTrig && ch == m_channelTrig)) {
+                  // Set relation.
+                  CDCHit* hit = cdcHits[cdcHits.getEntries() - 1];
+                  const CDCRawHit* raw = cdcRawHits[cdcRawHits.getEntries() - 1];
+                  hit->addRelationTo(raw);
+                }
               } else {
-                cdcHits.appendNew(tdc1, fadcSum, wireId, tdc2);
-
-              }
-
-              if (m_enableStoreCDCRawHit == true) {
-                // Store to the CDCRawHit object.
-                cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch, trgTime, fadcSum, tdc1, tdc2, tot);
-              }
-
-              if (m_setRelationRaw2Hit == true &&
-                  !(board == m_boardIDTrig && ch == m_channelTrig)) {
-                // Set relation.
-                CDCHit* hit = cdcHits[cdcHits.getEntries() - 1];
-                const CDCRawHit* raw = cdcRawHits[cdcRawHits.getEntries() - 1];
-                hit->addRelationTo(raw);
+                B2WARNING("Undefined board id is fired: " << board << " " << ch);
               }
             }
             it += static_cast<int>(length);
@@ -417,17 +420,18 @@ void CDCUnpackerModule::event()
       }
     }
   }
+
   //
-  // t0 correction from the trigger scinti.
+  // t0 correction w.r.t. the timing of the trigger counter.
   //
   if (m_subtractTrigTiming == true) {
     for (auto& hit : cdcHits) {
-      unsigned short tdc1 = hit.getTDCCount();
-      unsigned short tdc2 = hit.getTDCCount2ndHit();
-      tdc1  = tdc1 - tdcCountTrig + m_tdcOffset;
-      tdc2  = tdc2 - tdcCountTrig + m_tdcOffset;
-      hit.setTDCCount(tdc1);
-      hit.setTDCCount2ndHit(tdc2);
+      int tdc1 = hit.getTDCCount();
+      int tdc2 = hit.getTDCCount2ndHit();
+      tdc1  = tdc1 - (tdcCountTrig - m_tdcOffset);
+      tdc2  = tdc2 - (tdcCountTrig - m_tdcOffset);
+      hit.setTDCCount(static_cast<unsigned short>(tdc1));
+      hit.setTDCCount2ndHit(static_cast<unsigned short>(tdc2));
     }
   }
 }

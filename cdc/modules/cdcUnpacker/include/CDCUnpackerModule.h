@@ -18,6 +18,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
 #include <cdc/dataobjects/CDCRawHitWaveForm.h>
+#include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <rawdata/dataobjects/RawDataBlock.h>
 
@@ -99,7 +100,7 @@ namespace Belle2 {
 
       /**
        * Getter for CDC data mode.
-       * 1 for raw data mode, 2 for supressed mode.
+       * 1 for raw data mode, 2 for suppressed mode.
        */
       int getDataType()
       {
@@ -160,6 +161,18 @@ namespace Belle2 {
        */
       void printBuffer(int* buf, int nwords);
 
+      /**
+       * Check if the hit wire is valid or not.
+       * @param WireID hit wire.
+       */
+      bool isValidBoardChannel(WireID wireId)
+      {
+        if (wireId.getEWire() == 65535) {
+          return false;
+        } else {
+          return true;
+        }
+      }
     private:
 
       /**
@@ -173,7 +186,7 @@ namespace Belle2 {
       int m_version;
 
       /**
-       * Frontend board ID.
+       * Front end board ID.
        */
       int m_boardId;
 
@@ -211,12 +224,12 @@ namespace Belle2 {
       bool m_setRelationRaw2Hit;
 
       /**
-       * Name of the RawCDC dataobject (supressed mode).
+       * Name of the RawCDC dataobject (suppressed mode).
        */
       std::string m_rawCDCName;
 
       /**
-       * Name of the CDCRawHit dataobject (supressed mode).
+       * Name of the CDCRawHit dataobject (suppressed mode).
        */
       std::string m_cdcRawHitName;
 
@@ -278,7 +291,7 @@ namespace Belle2 {
       int m_channelTrig;
 
       /**
-       * Enable/Disable to sutract the trigger timing
+       * Enable/Disable to subtract the trigger timing
        * from TDCs.
        */
       bool m_subtractTrigTiming;

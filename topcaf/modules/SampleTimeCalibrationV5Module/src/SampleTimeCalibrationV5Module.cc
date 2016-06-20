@@ -20,16 +20,21 @@ using namespace Belle2;
 
 REG_MODULE(SampleTimeCalibrationV5)
 
-void fcnSamplingTime(int& npar, double* gin, double& f, double* par, int iflag);
-std::vector< hit_info > g_hitinfo;
-std::vector< double > g_dt_ave;
-std::map< topcaf_channel_id_t, std::vector<double> > g_averages;
-int g_cycles;
-TH2D h1o("h1o", "time1 diff vs sample", 256, 0, 256, 100, 190, 210);
-TH2D h2o("h2o", "time2 diff vs sample", 256, 0, 256, 100, 190, 210);
+namespace topcafSampleTimeCalibrationV5MinuitParameters {
 
-TH2D h1f("h1f", "time1 diff vs sample", 256, 0, 256, 100, 190, 210);
-TH2D h2f("h2f", "time2 diff vs sample", 256, 0, 256, 100, 190, 210);
+  //TMinuit function SetFCN() requires a global fuction.
+  //Put function and associated parameters into separate namespace to avoid truly global variables.
+  void fcnSamplingTime(int& npar, double* gin, double& f, double* par, int iflag);
+  std::vector< hit_info > g_hitinfo;
+  std::vector< double > g_dt_ave;
+  std::map< topcaf_channel_id_t, std::vector<double> > g_averages;
+  int g_cycles;
+  TH2D h1o("h1o", "time1 diff vs sample", 256, 0, 256, 100, 190, 210);
+  TH2D h2o("h2o", "time2 diff vs sample", 256, 0, 256, 100, 190, 210);
+
+  TH2D h1f("h1f", "time1 diff vs sample", 256, 0, 256, 100, 190, 210);
+  TH2D h2f("h2f", "time2 diff vs sample", 256, 0, 256, 100, 190, 210);
+}
 
 SampleTimeCalibrationV5Module::SampleTimeCalibrationV5Module() : Module()
 {
@@ -205,6 +210,7 @@ void SampleTimeCalibrationV5Module::event()
 
 void  SampleTimeCalibrationV5Module::terminate()
 {
+  using namespace topcafSampleTimeCalibrationV5MinuitParameters;
 
   //If output requested then save calibration
   if ((m_writefile == 1) || ((m_conditions == 1) && (m_mode == 0))) {
@@ -296,8 +302,10 @@ void  SampleTimeCalibrationV5Module::terminate()
 }
 
 
-void fcnSamplingTime(int& npar, double* gin, double& f, double* par, int iflag)
+void topcafSampleTimeCalibrationV5MinuitParameters::fcnSamplingTime(int& npar, double* gin, double& f, double* par, int iflag)
 {
+  using namespace topcafSampleTimeCalibrationV5MinuitParameters;
+
   double chisq = npar + iflag + gin[0];
   chisq = 0.;
   double ave = 0.;

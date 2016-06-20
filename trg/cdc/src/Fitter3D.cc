@@ -92,10 +92,12 @@ namespace Belle2 {
     CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
     m_mConstV["rr"] = vector<double> (9);
     m_mConstV["nWires"] = vector<double> (9);
+    m_mConstV["nTSs"] = vector<double> (9);
     for(unsigned iSL=0; iSL<9; iSL++){
       unsigned t_layerId = m_cdc.segment(iSL,0).center().layerId();
       m_mConstV["rr"][iSL] = cdcp.senseWireR(t_layerId);
       m_mConstV["nWires"][iSL] = cdcp.nWiresInLayer(t_layerId)*2;
+      m_mConstV["nTSs"][iSL] = cdcp.nWiresInLayer(t_layerId);
     }
 
     m_mConstV["zToStraw"] = vector<double> (4);
@@ -161,16 +163,16 @@ namespace Belle2 {
     //m_mConstV["wireZError"] = vector<double> ({4.752, 6.393, 6.578, 6.418});
     m_mConstV["driftZError"] = vector<double> ({0.7676, 0.9753, 1.029, 1.372});
     m_mConstV["wireZError"] = vector<double> ({0.7676, 0.9753, 1.029, 1.372});
+    //m_mConstV["driftZError"] = vector<double> ({0.4701, 0.7203, 0.8058, 0.9382});
 
-    // Make driftLength table for each superlayer. Up to 500 clock ticks.
+    // Make driftLength table for each superlayer. Up to 511 clock ticks.
     // driftLengthTableSLX[ tdcCount (~2ns unit) ] = drift length (cm)
     for (unsigned iSl = 0; iSl < 9; iSl++) {
       string tableName = "driftLengthTableSL" + to_string(iSl);
-      unsigned tableSize = 500;
+      unsigned tableSize = 512;
       m_mConstV[tableName] = vector<double> (tableSize);
-
       unsigned t_layer = m_cdc.segment(iSl,0).center().layerId();
-      for (unsigned iTick = 0; iTick <= tableSize; iTick++) {
+      for (unsigned iTick = 0; iTick < tableSize; iTick++) {
         double t_driftTime = iTick * 2 * cdcp.getTdcBinWidth();
         double avgDriftLength = 0;
         if (m_mBool["fXtSimple"] == 1) {
@@ -188,7 +190,7 @@ namespace Belle2 {
       cout<<"fLRLUT:       "<<m_mBool["fLRLUT"]<<endl;
       cout<<"fMc:          "<<m_mBool["fMc"]<<endl;
       cout<<"fVerbose:     "<<m_mBool["fVerbose"]<<endl;
-      cout<<"fmcLR:        "<<m_mBool["fmcLR"]<<endl;
+      if(m_mBool["fMc"]) cout<<"fmcLR:        "<<m_mBool["fmcLR"]<<endl;
       cout<<"fRoot:        "<<m_mBool["fRootFile"]<<endl;
       cout<<"PI:           "<<m_mConstD["Trg_PI"]<<endl;
       cout<<"rr:           "<<m_mConstV["rr"][0]<<" "<<m_mConstV["rr"][1]<<" "<<m_mConstV["rr"][2]<<" "<<m_mConstV["rr"][3]<<" "<<m_mConstV["rr"][4]<<" "<<m_mConstV["rr"][5]<<" "<<m_mConstV["rr"][6]<<" "<<m_mConstV["rr"][7]<<" "<<m_mConstV["rr"][8]<<endl;
@@ -235,7 +237,7 @@ namespace Belle2 {
       //   continue;
       //}
 
-      // Get MC values for fitter
+      // Get MC values for fitter.
       if(m_mBool["fMc"]) getMCValues(m_cdc, &aTrack, m_mConstD, m_mDouble, m_mVector);
       // Get track ID
       m_mDouble["trackId"] = aTrack.getTrackID();
@@ -251,24 +253,24 @@ namespace Belle2 {
       /////////////////////////////////
       // 3D Fitter
       // Check which stereo super layers should be used.
-      bool useStSl[4] = {0,0,0,0};
-      findHitStereoSuperlayers(aTrack, useStSl, m_mBool["fIsPrintError"]);
-      removeImpossibleStereoSuperlayers(useStSl);
-      m_mDouble["nHitStSl"] = (int)useStSl[0]+(int)useStSl[1]+(int)useStSl[2]+(int)useStSl[3];
       m_mVector["useStSl"] = vector<double> (4);
-      for(unsigned iSt=0; iSt<4; iSt++) m_mVector["useStSl"][iSt] = useStSl[iSt];
+      findHitStereoSuperlayers(aTrack, m_mVector["useStSl"], m_mBool["fIsPrintError"]);
+      removeImpossibleStereoSuperlayers(m_mVector["useStSl"]);
+      m_mDouble["nHitStSl"] = m_mVector["useStSl"][0]+m_mVector["useStSl"][1]+m_mVector["useStSl"][2]+m_mVector["useStSl"][3];
+
+      m_mVector["useSl"] = vector<double> (9);
+      for (unsigned iAx=0; iAx<5; iAx++) m_mVector["useSl"][2*iAx] = m_mVector["useAxSl"][iAx];
+      for (unsigned iSt=0; iSt<4; iSt++) m_mVector["useSl"][2*iSt+1] = m_mVector["useAxSl"][iSt];
 
       // Fill information for stereo layers
       for (unsigned iSt = 0; iSt < 4; iSt++) {
-        if(useStSl[iSt] == 1) {
+        if(m_mVector["useStSl"][iSt] == 1) {
           const vector<TCLink *> & links = aTrack.links(iSt*2+1);
           const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
           m_mVector["tsId"][iSt*2+1] = t_segment->localId();
           m_mVector["wirePhi"][iSt*2+1] = (double) t_segment->localId()/m_mConstV["nWires"][iSt*2+1]*4*m_mConstD["Trg_PI"];
-          //m_mVector["lutLR"][iSL] = t_segment->LUT()->getLRLUT(t_segment->hitPattern(),iSL);
           m_mVector["lutLR"][iSt*2+1] = t_segment->LUT()->getValue(t_segment->lutPattern());
-          // mcLR should be removed.
-          m_mVector["mcLR"][iSt*2+1] = t_segment->hit()->mcLR();
+          if(m_mBool["fMc"]) m_mVector["mcLR"][iSt*2+1] = t_segment->hit()->mcLR()+1;
           m_mVector["driftLength"][iSt*2+1] = t_segment->hit()->drift();
           m_mVector["tdc"][iSt*2+1] = t_segment->priorityTime();
           if(m_mBool["fmcLR"]==1) m_mVector["LR"][iSt*2+1] = m_mVector["mcLR"][iSt*2+1];
@@ -278,8 +280,7 @@ namespace Belle2 {
           m_mVector["tsId"][iSt*2+1] = 9999;
           m_mVector["wirePhi"][iSt*2+1] = 9999;
           m_mVector["lutLR"][iSt*2+1] = 0;
-          // mcLR should be removed.
-          m_mVector["mcLR"][iSt*2+1] = 9999;
+          if(m_mBool["fMc"]) m_mVector["mcLR"][iSt*2+1] = 9999;
           m_mVector["driftLength"][iSt*2+1] = 9999;
           m_mVector["tdc"][iSt*2+1] = 9999;
           if(m_mBool["fmcLR"]==1) m_mVector["LR"][iSt*2+1] = 9999;
@@ -296,7 +297,7 @@ namespace Belle2 {
         }
       } else {
         for (unsigned iSt = 0; iSt < 4; iSt++) {
-          if(useStSl[iSt] == 1) {
+          if(m_mVector["useStSl"][iSt] == 1) {
             // Get drift length from table.
             string tableName = "driftLengthTableSL" + to_string(iSt*2+1);
             double t_driftTime = m_mVector["tdc"][iSt*2+1] - m_mDouble["eventTime"];
@@ -311,9 +312,9 @@ namespace Belle2 {
       // Get zerror for 3D fit
       m_mVector["zError"] = vector<double> (4);
       for (unsigned iSt = 0; iSt < 4; iSt++) {
-        if(useStSl[iSt] == 1) {
+        if(m_mVector["useStSl"][iSt] == 1) {
           // Check LR.
-          if(m_mVector["LR"][2*iSt+1] != 2) m_mVector["zError"][iSt] = m_mConstV["driftZError"][iSt];
+          if(m_mVector["LR"][2*iSt+1] != 3) m_mVector["zError"][iSt] = m_mConstV["driftZError"][iSt];
           else m_mVector["zError"][iSt] = m_mConstV["wireZError"][iSt];
           // Check eventTime
           if(m_mDouble["eventTime"] == 9999) m_mVector["zError"][iSt] = m_mConstV["wireZError"][iSt];
@@ -324,7 +325,7 @@ namespace Belle2 {
       // Get inverse zerror ^ 2
       m_mVector["iZError2"] = vector<double> (4);
       for (unsigned iSt = 0; iSt < 4; iSt++) {
-        if(useStSl[iSt] == 1) {
+        if(m_mVector["useStSl"][iSt] == 1) {
           m_mVector["iZError2"][iSt] = 1/pow(m_mVector["zError"][iSt],2);
         } else {
           m_mVector["iZError2"][iSt] = 0;
@@ -334,7 +335,7 @@ namespace Belle2 {
       // Calculate zz
       m_mVector["zz"] = vector<double> (4);
       for (unsigned iSt = 0; iSt < 4; iSt++) {
-        if(useStSl[iSt] == 1) {
+        if(m_mVector["useStSl"][iSt] == 1) {
           m_mVector["zz"][iSt] = Fitter3DUtility::calZ(m_mDouble["charge"], m_mConstV["angleSt"][iSt], m_mConstV["zToStraw"][iSt], m_mConstV["rr3D"][iSt], m_mVector["phi3D"][iSt], m_mDouble["rho"], m_mDouble["phi0"]);
         } else {
           m_mVector["zz"][iSt] = 0;
@@ -343,7 +344,7 @@ namespace Belle2 {
       // Calculate arcS
       m_mVector["arcS"] = vector<double> (4);
       for (unsigned iSt = 0; iSt < 4; iSt++) {
-        if(useStSl[iSt] == 1) {
+        if(m_mVector["useStSl"][iSt] == 1) {
           m_mVector["arcS"][iSt] = Fitter3DUtility::calS(m_mDouble["rho"], m_mConstV["rr3D"][iSt]);
         } else {
           m_mVector["arcS"][iSt] = 0; 
@@ -460,25 +461,21 @@ namespace Belle2 {
 
       //////////////////////
       // Start of 3D fitter
-      bool useStSl[4] = {0,0,0,0};
-      findHitStereoSuperlayers(aTrack, useStSl, m_mBool["fIsPrintError"]);
-      removeImpossibleStereoSuperlayers(useStSl);
-      //// Check if number of stereo super layer hits is smaller or equal to 1.
-      m_mDouble["nHitStSl"] = (int)useStSl[0]+(int)useStSl[1]+(int)useStSl[2]+(int)useStSl[3];
       m_mVector["useStSl"] = vector<double> (4);
-      for(unsigned iSt=0; iSt<4; iSt++) m_mVector["useStSl"][iSt] = useStSl[iSt];
+      findHitStereoSuperlayers(aTrack, m_mVector["useStSl"], m_mBool["fIsPrintError"]);
+      removeImpossibleStereoSuperlayers(m_mVector["useStSl"]);
+      m_mDouble["nHitStSl"] = m_mVector["useStSl"][0]+m_mVector["useStSl"][1]+m_mVector["useStSl"][2]+m_mVector["useStSl"][3];
 
       // Fill information for stereo layers
       for (unsigned iSt = 0; iSt < 4; iSt++) {
-        if(useStSl[iSt] == 1) {
+        if(m_mVector["useStSl"][iSt] == 1) {
           const vector<TCLink *> & links = aTrack.links(iSt*2+1);
           const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
           m_mVector["tsId"][iSt*2+1] = t_segment->localId();
           m_mVector["wirePhi"][iSt*2+1] = (double) t_segment->localId()/m_mConstV["nWires"][iSt*2+1]*4*m_mConstD["Trg_PI"];
           //m_mVector["lutLR"][iSL] = t_segment->LUT()->getLRLUT(t_segment->hitPattern(),iSL);
           m_mVector["lutLR"][iSt*2+1] = t_segment->LUT()->getValue(t_segment->lutPattern());
-          // mcLR should be removed.
-          m_mVector["mcLR"][iSt*2+1] = t_segment->hit()->mcLR();
+          if(m_mBool["fMc"]) m_mVector["mcLR"][iSt*2+1] = t_segment->hit()->mcLR() + 1;
           m_mVector["driftLength"][iSt*2+1] = t_segment->hit()->drift();
           m_mVector["tdc"][iSt*2+1] = t_segment->priorityTime();
           if(m_mBool["fmcLR"]==1) m_mVector["LR"][iSt*2+1] = m_mVector["mcLR"][iSt*2+1];
@@ -488,10 +485,9 @@ namespace Belle2 {
           m_mVector["tsId"][iSt*2+1] = 0;
           m_mVector["wirePhi"][iSt*2+1] = 9999;
           m_mVector["lutLR"][iSt*2+1] = 0;
-          // mcLR should be removed.
-          m_mVector["mcLR"][iSt*2+1] = 9999;
+          if(m_mBool["fMc"]) m_mVector["mcLR"][iSt*2+1] = 9999;
           m_mVector["driftLength"][iSt*2+1] = 9999;
-          m_mVector["tdc"][iSt*2+1] = 9999;
+          m_mVector["tdc"][iSt*2+1] = 0;
           if(m_mBool["fmcLR"]==1) m_mVector["LR"][iSt*2+1] = 9999;
           else if(m_mBool["fLRLUT"]==1) m_mVector["LR"][iSt*2+1] = 9999;
           else m_mVector["LR"][iSt*2+1] = 9999;
@@ -506,21 +502,20 @@ namespace Belle2 {
         }
       } else {
         for (unsigned iSt = 0; iSt < 4; iSt++) {
-
           // Get drift length from table.
           string tableName = "driftLengthTableSL" + to_string(iSt*2+1);
           double t_driftTime = m_mVector["tdc"][iSt*2+1] - m_mDouble["eventTime"];
           if (t_driftTime < 0) t_driftTime = 0;
           double t_driftLength = m_mConstV[tableName][(unsigned)t_driftTime];
-
           m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], t_driftLength, m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
         }
       }
+
       // Get zerror for 3D fit
       m_mVector["zError"] = vector<double> (4);
       for (unsigned iSt = 0; iSt < 4; iSt++) {
         // Check LR.
-        if(m_mVector["LR"][2*iSt+1] != 2) m_mVector["zError"][iSt] = m_mConstV["driftZError"][iSt];
+        if(m_mVector["LR"][2*iSt+1] != 3) m_mVector["zError"][iSt] = m_mConstV["driftZError"][iSt];
         else m_mVector["zError"][iSt] = m_mConstV["wireZError"][iSt];
         // Check eventTime
         if(m_mDouble["eventTime"] == 9999) m_mVector["zError"][iSt] = m_mConstV["wireZError"][iSt];
@@ -528,7 +523,7 @@ namespace Belle2 {
       // Get inverse zerror ^ 2
       m_mVector["iZError2"] = vector<double> (4);
       for (unsigned iSt = 0; iSt < 4; iSt++) {
-        if(useStSl[iSt] == 1) {
+        if(m_mVector["useStSl"][iSt] == 1) {
           m_mVector["iZError2"][iSt] = 1/pow(m_mVector["zError"][iSt],2);
         } else {
           m_mVector["iZError2"][iSt] = 0;
@@ -554,16 +549,22 @@ namespace Belle2 {
       double phiMax = m_mConstD["Trg_PI"];
       double phiMin = -m_mConstD["Trg_PI"];
       // pt = 0.3*1.5*rho*0.01;
-      double rhoMin = 48;
+      //double rhoMin = 48;
+      double rhoMin = 20;
       double rhoMax = 1600;
+      //double rhoMax = 2000;
       int phiBitSize = 13;
-      int rhoBitSize = 12;
+      // 5bit (clock counter) + 4 bit (2ns resolution)
+      m_mConstD["tdcBitSize"] = 9;
+      m_mConstD["rhoBitSize"] = 12;
       m_mConstD["iError2BitSize"] = 8;
-      m_mConstD["iError2Max"] = 0.120857;
+      m_mConstD["iError2Max"] = 1/pow(m_mConstV["wireZError"][0],2);
       // LUT values
       m_mConstD["JB"] = 0;
+      m_mConstD["driftPhiLUTOutBitSize"] = phiBitSize-1;
+      m_mConstD["driftPhiLUTInBitSize"] = m_mConstD["tdcBitSize"];
       m_mConstD["acosLUTOutBitSize"] = phiBitSize-1;
-      m_mConstD["acosLUTInBitSize"] = rhoBitSize;
+      m_mConstD["acosLUTInBitSize"] = m_mConstD["rhoBitSize"];
       m_mConstD["zLUTInBitSize"] = phiBitSize;
       m_mConstD["zLUTOutBitSize"] = 9;
       m_mConstD["iDenLUTInBitSize"] = 13;
@@ -582,45 +583,126 @@ namespace Belle2 {
         else if (t_quadrant == 3) m_mDouble["relRefPhi"] = -m_mConstD["Trg_PI"]/2;
         else if (t_quadrant == 4) m_mDouble["relRefPhi"] = -m_mConstD["Trg_PI"];
       }
-      // Rotate
+      // Rotate phi
       m_mDouble["relPhi0"] = Fitter3DUtility::rotatePhi(m_mDouble["phi0"], m_mDouble["relRefPhi"]);
       m_mVector["relPhi3D"] = vector<double> (4);
       for(unsigned iSt=0; iSt<4; iSt++) m_mVector["relPhi3D"][iSt] = Fitter3DUtility::rotatePhi(m_mVector["phi3D"][iSt], m_mDouble["relRefPhi"]);
 
-      // Constrain rho to rhoMin
-      if(m_mDouble["rho"] < rhoMin) {
-          m_mDouble["rho"] = rhoMin;
-          m_mDouble["pt"] = rhoMin * 0.3 * 1.5 * 0.01;
+      //for(unsigned iSt=0; iSt<4; iSt++) cout<<" phi3D_"<<iSt<<":"<<m_mVector["phi3D"][iSt]; cout<<endl;
+      //cout<<"relPhi0:"<<m_mDouble["relPhi0"]<<endl;
+      //for(unsigned iSt=0; iSt<4; iSt++) cout<<" relPhi3D_"<<iSt<<":"<<m_mVector["relPhi3D"][iSt]; cout<<endl;
+
+      // Rotate wirePhi
+      m_mVector["relWirePhi3D"] = vector<double> (4);
+      for(unsigned iSt=0; iSt<4; iSt++) {
+        double t_relWirePhi = Fitter3DUtility::rotatePhi(m_mVector["wirePhi"][2*iSt+1], m_mDouble["relRefPhi"]);
+        bool rangeOk = 0;
+        while(rangeOk==0){
+          if(t_relWirePhi < 0) t_relWirePhi += 2*m_mConstD["Trg_PI"];
+          else if(t_relWirePhi > 2*m_mConstD["Trg_PI"]) t_relWirePhi -= 2*m_mConstD["Trg_PI"];
+          else rangeOk = 1;
+        }
+        m_mVector["relWirePhi3D"][iSt] = t_relWirePhi;
       }
+
+      
+      // Rotate tsId
+      m_mVector["relTsId3D"] = vector<double> (4);
+      for(unsigned iSt=0; iSt<4; iSt++) m_mVector["relTsId3D"][iSt] = Fitter3DUtility::rotateTsId(m_mVector["tsId"][2*iSt+1],m_mDouble["relRefPhi"]/m_mConstD["Trg_PI"]/2*m_mConstV["nTSs"][2*iSt+1],m_mConstV["nTSs"][2*iSt+1]);
+      //////Test if rotate tsId works
+      //for(unsigned iSt=0; iSt<4; iSt++) {
+      //  if(m_mVector["useStSl"][iSt] == 1) {
+      //    double t_relWirePhiFromTSId = m_mVector["relTsId3D"][iSt]*1.0/m_mConstV["nTSs"][2*iSt+1]*2*m_mConstD["Trg_PI"];
+      //    if (fabs(t_relWirePhiFromTSId - m_mVector["relWirePhi3D"][iSt])>0.000001) {
+      //      cout<<"relWirePhi"<<iSt<<":        "<<m_mVector["relWirePhi3D"][iSt]<<endl;
+      //      cout<<"relWirePhiFromTSId"<<iSt<<":"<<t_relWirePhiFromTSId<<endl;
+      //      cout<<"wirePhi"<<iSt<<":"<<m_mVector["wirePhi"][2*iSt+1]<<endl;
+      //      cout<<"tsIdPhi"<<iSt<<":"<<m_mVector["tsId"][2*iSt+1]/m_mConstV["nTSs"][2*iSt+1]*2*m_mConstD["Trg_PI"]<<endl;
+      //      cout<<"nTS"<<iSt<<":"<<m_mConstV["nTSs"][2*iSt+1]<<endl;
+      //      cout<<"tsId"<<iSt<<":"<<m_mVector["tsId"][2*iSt+1]<<endl;
+      //      cout<<"relTsId"<<iSt<<":"<<m_mVector["relTsId3D"][iSt]<<endl;
+      //      cout<<"relRefPhiForTsId"<<iSt<<":"<<m_mDouble["relRefPhi"]/m_mConstD["Trg_PI"]/2*m_mConstV["nTSs"][2*iSt+1]<<endl;
+      //      cout<<"relRefPhi:"<<m_mDouble["relRefPhi"]<<endl;
+      //    }
+      //  }
+      //}
+
+      //// Constrain rho to rhoMin
+      //if(m_mDouble["rho"] < rhoMin) {
+      //    m_mDouble["rho"] = rhoMin;
+      //    m_mDouble["pt"] = rhoMin * 0.3 * 1.5 * 0.01;
+      //}
       // Constrain rho to rhoMax.
       if(m_mDouble["rho"] > rhoMax) {
         m_mDouble["rho"] = rhoMax;
         m_mDouble["pt"] = rhoMax * 0.3 * 1.5 * 0.01;
       }
 
+      // Constrain event time
+      if (m_mDouble["eventTime"] == 9999) m_mDouble["eventTime"] = pow(2,m_mConstD["tdcBitSize"]);
+
       // Change to Signals.
       {
         vector<tuple<string, double, int, double, double, int> > t_values = {
           make_tuple("phi0", m_mDouble["relPhi0"], phiBitSize, phiMin, phiMax, 0),
-          make_tuple("phi_0", m_mVector["relPhi3D"][0], phiBitSize, phiMin, phiMax, 0),
-          make_tuple("phi_1", m_mVector["relPhi3D"][1], phiBitSize, phiMin, phiMax, 0),
-          make_tuple("phi_2", m_mVector["relPhi3D"][2], phiBitSize, phiMin, phiMax, 0),
-          make_tuple("phi_3", m_mVector["relPhi3D"][3], phiBitSize, phiMin, phiMax, 0),
-          make_tuple("rho", m_mDouble["rho"], rhoBitSize, rhoMin, rhoMax, 0),
-          make_tuple("iZError2_0", m_mVector["iZError2"][0], m_mConstD["iError2BitSize"], 0, m_mConstD["iError2Max"], 0),
-          make_tuple("iZError2_1", m_mVector["iZError2"][1], m_mConstD["iError2BitSize"], 0, m_mConstD["iError2Max"], 0),
-          make_tuple("iZError2_2", m_mVector["iZError2"][2], m_mConstD["iError2BitSize"], 0, m_mConstD["iError2Max"], 0),
-          make_tuple("iZError2_3", m_mVector["iZError2"][3], m_mConstD["iError2BitSize"], 0, m_mConstD["iError2Max"], 0),
+          make_tuple("rho", m_mDouble["rho"], m_mConstD["rhoBitSize"], rhoMin, rhoMax, 0),
           make_tuple("charge",(int) (m_mDouble["charge"]==1 ? 1 : 0), 1, 0, 1.5, 0),
           make_tuple("lr_0", m_mVector["lutLR"][1], 2, 0, 3.5, 0),
           make_tuple("lr_1", m_mVector["lutLR"][3], 2, 0, 3.5, 0),
           make_tuple("lr_2", m_mVector["lutLR"][5], 2, 0, 3.5, 0),
-          make_tuple("lr_3", m_mVector["lutLR"][7], 2, 0, 3.5, 0)
+          make_tuple("lr_3", m_mVector["lutLR"][7], 2, 0, 3.5, 0),
+          make_tuple("tsId_0", m_mVector["relTsId3D"][0], ceil(log(m_mConstV["nTSs"][1])/log(2)), 0, pow(2,ceil(log(m_mConstV["nTSs"][1])/log(2)))-0.5, 0),
+          make_tuple("tsId_1", m_mVector["relTsId3D"][1], ceil(log(m_mConstV["nTSs"][3])/log(2)), 0, pow(2,ceil(log(m_mConstV["nTSs"][3])/log(2)))-0.5, 0),
+          make_tuple("tsId_2", m_mVector["relTsId3D"][2], ceil(log(m_mConstV["nTSs"][5])/log(2)), 0, pow(2,ceil(log(m_mConstV["nTSs"][5])/log(2)))-0.5, 0),
+          make_tuple("tsId_3", m_mVector["relTsId3D"][3], ceil(log(m_mConstV["nTSs"][7])/log(2)), 0, pow(2,ceil(log(m_mConstV["nTSs"][7])/log(2)))-0.5, 0),
+          make_tuple("tdc_0", m_mVector["tdc"][1], m_mConstD["tdcBitSize"], 0, pow(2,m_mConstD["tdcBitSize"])-0.5, 0),
+          make_tuple("tdc_1", m_mVector["tdc"][3], m_mConstD["tdcBitSize"], 0, pow(2,m_mConstD["tdcBitSize"])-0.5, 0),
+          make_tuple("tdc_2", m_mVector["tdc"][5], m_mConstD["tdcBitSize"], 0, pow(2,m_mConstD["tdcBitSize"])-0.5, 0),
+          make_tuple("tdc_3", m_mVector["tdc"][7], m_mConstD["tdcBitSize"], 0, pow(2,m_mConstD["tdcBitSize"])-0.5, 0),
+          make_tuple("eventTime", m_mDouble["eventTime"], m_mConstD["tdcBitSize"]+1, 0, pow(2,m_mConstD["tdcBitSize"]+1)-0.5, 0)
+          //make_tuple("phi_0", m_mVector["relPhi3D"][0], phiBitSize, phiMin, phiMax, 0),
+          //make_tuple("phi_1", m_mVector["relPhi3D"][1], phiBitSize, phiMin, phiMax, 0),
+          //make_tuple("phi_2", m_mVector["relPhi3D"][2], phiBitSize, phiMin, phiMax, 0),
+          //make_tuple("phi_3", m_mVector["relPhi3D"][3], phiBitSize, phiMin, phiMax, 0),
         };
         TRGCDCJSignal::valuesToMapSignals(t_values, m_commonData, m_mSignalStorage);
       }
 
-      Fitter3DUtility::setError(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
+      Fitter3DUtility::setError(m_mConstD, m_mConstV, m_mSignalStorage);
+      Fitter3DUtility::calPhi(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
+      //// Test if wirePhi works
+      //for(unsigned iSt=0; iSt<4; iSt++) {
+      //  if(m_mVector["useStSl"][iSt] == 1) 
+      //  {
+      //    if (fabs(m_mSignalStorage["wirePhi_"+to_string(iSt)].getRealInt() - m_mVector["relWirePhi3D"][iSt])>0.000001) {
+      //      cout<<"relWirePhi"<<iSt<<":        "<<m_mVector["relWirePhi3D"][iSt]<<endl;
+      //      m_mSignalStorage["wirePhi_"+to_string(iSt)].dump();
+      //    }
+      //  }
+      //}
+
+      //////// Test if phi works
+      //m_mVector["rotatePhi3D"] = vector<double> (4);
+      //for (unsigned iSt = 0; iSt < 4; iSt++) {
+      //  // Get drift length from table.
+      //  string tableName = "driftLengthTableSL" + to_string(iSt*2+1);
+      //  //double t_driftTime = m_mVector["tdc"][iSt*2+1] - m_mDouble["eventTime"];
+      //  double t_driftTime = m_mVector["tdc"][iSt*2+1];
+      //  if (t_driftTime < 0) t_driftTime = 0;
+      //  double t_driftLength = m_mConstV[tableName][(unsigned)t_driftTime];
+      //  m_mVector["rotatePhi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["relWirePhi3D"][iSt], t_driftLength, m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
+      //}
+      //for(unsigned iSt=0; iSt<4; iSt++) {
+      //  if(m_mVector["useStSl"][iSt] == 1) 
+      //  {
+      //    if(fabs(m_mVector["rotatePhi3D"][iSt] - m_mSignalStorage["tPhi_"+to_string(iSt)].getRealInt()) > 0.0001) {
+      //      cout<<m_mVector["rotatePhi3D"][iSt] - m_mSignalStorage["tPhi_"+to_string(iSt)].getRealInt()<<endl;
+      //      cout<<m_mVector["rotatePhi3D"][iSt]<<endl;
+      //      m_mSignalStorage["tPhi_"+to_string(iSt)].dump();
+      //    }
+      //  }
+      //}
+
       Fitter3DUtility::calZ(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
       Fitter3DUtility::calS(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
       Fitter3DUtility::rSFit(m_mConstD, m_mConstV, m_mSignalStorage, m_mLutStorage);
@@ -871,7 +953,6 @@ namespace Belle2 {
     m_mDouble["mcStatus"] = trackMCParticle.getStatus();
     m_mDouble["pdgId"] = trackMCParticle.getPDG();
 
-
     // Find position of track for each super layer
     //...G4 trackID...
     unsigned id = trackRelation.contributor(0);
@@ -907,6 +988,8 @@ namespace Belle2 {
       }
       mcTSList[i] = best;
     }
+
+
     // Get mc track positions. Unit is cm.
     m_mVector["mcPosX"] = vector<double> ({9999,9999,9999,9999,9999,9999,9999,9999,9999});
     m_mVector["mcPosY"] = vector<double> ({9999,9999,9999,9999,9999,9999,9999,9999,9999});
@@ -920,26 +1003,26 @@ namespace Belle2 {
       }
     }
     // Get mc LR
-    m_mVector["mcLR"] = vector<double> (9);
+    m_mVector["simMcLR"] = vector<double> (9);
     for(unsigned iSL=0; iSL<9; iSL++){
       if(mcTSList[iSL]!=0) {
-        m_mVector["mcLR"][iSL] = mcTSList[iSL]->simHit()->getPosFlag();
+        m_mVector["simMcLR"][iSL] = mcTSList[iSL]->simHit()->getPosFlag();
       }
     }
 
-    // Find helix parameters and mc position at R
-    for(unsigned iSL=0; iSL<9; iSL++){
-      if(mcTSList[iSL]!=0) {
-        TVectorD t_helixParameters; 
-        TVector3 t_positionAtR;
-        TVector3 t_momentumAtR;
-        Fitter3DUtility::calHelixParameters(mcTSList[iSL]->simHit()->getPosIn(), mcTSList[iSL]->simHit()->getMomentum(),trackMCParticle.getCharge(),t_helixParameters);
-        //cout<<"dr: "<<helixParameters[0]<<" phi0: "<<helixParameters[1]<<" R: "<<1/helixParameters[2]/0.3/1.5*100<<" dz: "<<helixParameters[3]<<" tanLambda: "<<helixParameters[4]<<endl;
-        //calVectorsAtR(t_helixParameters, trackMCParticle.getCharge(), m_rr[iSL]*100, t_positionAtR, t_momentumAtR);
-        //cout<<" x: "<<t_positionAtR.X()<<"  y: "<<t_positionAtR.Y()<<"  z: "<<t_positionAtR.Z()<<endl;
-        //cout<<"Px: "<<t_momentumAtR.X()<<" Py: "<<t_momentumAtR.Y()<<" Pz: "<<t_momentumAtR.Z()<<endl;
-      }
-    }
+    //// Find helix parameters and mc position at R
+    //for(unsigned iSL=0; iSL<9; iSL++){
+    //  if(mcTSList[iSL]!=0) {
+    //    TVectorD t_helixParameters; 
+    //    TVector3 t_positionAtR;
+    //    TVector3 t_momentumAtR;
+    //    Fitter3DUtility::calHelixParameters(mcTSList[iSL]->simHit()->getPosIn(), mcTSList[iSL]->simHit()->getMomentum(),trackMCParticle.getCharge(),t_helixParameters);
+    //    //cout<<"dr: "<<helixParameters[0]<<" phi0: "<<helixParameters[1]<<" R: "<<1/helixParameters[2]/0.3/1.5*100<<" dz: "<<helixParameters[3]<<" tanLambda: "<<helixParameters[4]<<endl;
+    //    //calVectorsAtR(t_helixParameters, trackMCParticle.getCharge(), m_rr[iSL]*100, t_positionAtR, t_momentumAtR);
+    //    //cout<<" x: "<<t_positionAtR.X()<<"  y: "<<t_positionAtR.Y()<<"  z: "<<t_positionAtR.Z()<<endl;
+    //    //cout<<"Px: "<<t_momentumAtR.X()<<" Py: "<<t_momentumAtR.Y()<<" Pz: "<<t_momentumAtR.Z()<<endl;
+    //  }
+    //}
   }
 
   bool TRGCDCFitter3D::isAxialTrackFull( TRGCDCTrack & aTrack ){
@@ -1002,8 +1085,8 @@ namespace Belle2 {
     return trackFull;
   }
 
-  void TRGCDCFitter3D::findHitAxialSuperlayers( TRGCDCTrack & aTrack,  bool (&useAxSl)[5], bool printError ){
-    std::fill_n( useAxSl, 5, 1 );
+  void TRGCDCFitter3D::findHitAxialSuperlayers( TRGCDCTrack & aTrack,  vector<double> & useAxSl, bool printError ){
+    useAxSl.assign(5,1);
     for (unsigned iAx = 0; iAx < 5; iAx++) {
       // Check if all superlayers have one TS
       const vector<TCLink *> & links = aTrack.links(iAx*2);
@@ -1032,8 +1115,8 @@ namespace Belle2 {
     } // End superlayer loop
   }
 
-  void TRGCDCFitter3D::findHitStereoSuperlayers( TRGCDCTrack & aTrack,  bool (&useStSl)[4] , bool printError){
-    std::fill_n( useStSl, 4, 1 );
+  void TRGCDCFitter3D::findHitStereoSuperlayers( TRGCDCTrack & aTrack,  vector<double> & useStSl, bool printError){
+    useStSl.assign(4,1);
     for (unsigned iSt = 0; iSt < 4; iSt++) {
       // Check if all superlayers have one TS
       const vector<TCLink *> & links = aTrack.links(iSt*2+1);
@@ -1060,7 +1143,7 @@ namespace Belle2 {
     } // End superlayer loop
   }
 
-  void TRGCDCFitter3D::removeImpossibleStereoSuperlayers( bool (&useStSl)[4] ){
+  void TRGCDCFitter3D::removeImpossibleStereoSuperlayers( vector<double> & useStSl){
     for (unsigned iSt = 0; iSt < 4; iSt++) {
       // Check if rho is large enough for stereo super layer.
       if(2*m_mDouble["rho"] < m_mConstV["rr3D"][iSt] ) {
@@ -1125,17 +1208,20 @@ namespace Belle2 {
   }
 
   int TRGCDCFitter3D::do2DFit( TRGCDCTrack & aTrack, std::map<std::string, bool> & m_mBool, std::map<std::string, double> & m_mConstD, std::map<std::string, std::vector<double> > & m_mConstV, std::map<std::string, double> & m_mDouble, std::map<std::string, std::vector<double> > & m_mVector) {
-    bool useAxSl[5] = {0,0,0,0,0};
+    m_mVector["useAxSl"] = vector<double> (5);
     //findHitAxialSuperlayers(aTrack, useAxSl, m_mBool["fIsPrintError"]);
+
+    // Find best TS between links for each SL.
     vector<int> bestTSIndex(5);
     selectAxialTSs(aTrack, bestTSIndex);
     for(unsigned iAx=0; iAx<5; iAx++) {
-      if (bestTSIndex[iAx] != -1) useAxSl[iAx] = 1;
+      if (bestTSIndex[iAx] != -1) m_mVector["useAxSl"][iAx] = 1;
       //cout<<"useAxSl["<<iAx<<"]:"<<useAxSl[iAx]<<endl;
     }
+
     // Check if number of axial super layer hits is smaller or equal to 1.
-    int nHitAx = (int)useAxSl[0]+(int)useAxSl[1]+(int)useAxSl[2]+(int)useAxSl[3]+(int)useAxSl[4];
-    if(nHitAx <= 1) {
+    m_mDouble["nHitAx"] = m_mVector["useAxSl"][0]+m_mVector["useAxSl"][1]+m_mVector["useAxSl"][2]+m_mVector["useAxSl"][3]+m_mVector["useAxSl"][4];
+    if(m_mDouble["nHitAx"] <= 1) {
       aTrack.setFitted(0);
       return 1;
     }
@@ -1147,8 +1233,9 @@ namespace Belle2 {
     m_mVector["LR"] = vector<double> (9);
     m_mVector["driftLength"] = vector<double> (9);
     m_mVector["tdc"] = vector<double> (9);
+    if(m_mVector.find("mcLR") == m_mVector.end()) m_mVector["mcLR"] = vector<double> (9);
     for (unsigned iAx = 0; iAx < 5; iAx++) {
-      if(useAxSl[iAx] == 1) {
+      if(m_mVector["useAxSl"][iAx] == 1) {
         const vector<TCLink *> & links = aTrack.links(iAx*2);
         //const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
         const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[bestTSIndex[iAx]]->hit()->cell());
@@ -1156,7 +1243,7 @@ namespace Belle2 {
         m_mVector["wirePhi"][iAx*2] = (double) t_segment->localId()/m_mConstV["nWires"][iAx*2]*4*m_mConstD["Trg_PI"];
         m_mVector["lutLR"][iAx*2] = t_segment->LUT()->getValue(t_segment->lutPattern());
         // mcLR should be removed.
-        m_mVector["mcLR"][iAx*2] = t_segment->hit()->mcLR();
+        if(m_mBool["fMc"]) m_mVector["mcLR"][iAx*2] = t_segment->hit()->mcLR()+1;
         m_mVector["driftLength"][iAx*2] = t_segment->hit()->drift();
         m_mVector["tdc"][iAx*2] = t_segment->priorityTime();
         if(m_mBool["fmcLR"]==1) m_mVector["LR"][iAx*2] = m_mVector["mcLR"][iAx*2];
@@ -1167,7 +1254,7 @@ namespace Belle2 {
         m_mVector["wirePhi"][iAx*2] = 9999;
         m_mVector["lutLR"][iAx*2] = 0;
         // mcLR should be removed.
-        m_mVector["mcLR"][iAx*2] = 9999;
+        if(m_mBool["fMc"]) m_mVector["mcLR"][iAx*2] = 9999;
         m_mVector["driftLength"][iAx*2] = 9999;
         m_mVector["tdc"][iAx*2] = 9999;
         if(m_mBool["fmcLR"]==1) m_mVector["LR"][iAx*2] = 9999;
@@ -1191,7 +1278,7 @@ namespace Belle2 {
     // Set phi2DError for 2D fit
     m_mVector["phi2DError"] = vector<double> (5);
     for (unsigned iAx = 0; iAx < 5; iAx++) {
-      if(useAxSl[iAx] == 1) {
+      if(m_mVector["useAxSl"][iAx] == 1) {
         // Check LR.
         if(m_mVector["LR"][2*iAx] != 3) m_mVector["phi2DError"][iAx] = m_mConstV["driftPhi2DError"][iAx];
         else m_mVector["phi2DError"][iAx] = m_mConstV["wirePhi2DError"][iAx];
@@ -1204,7 +1291,7 @@ namespace Belle2 {
     // Set invPhi2DError for 2D fit
     m_mVector["phi2DInvError"] = vector<double> (5);
     for (unsigned iAx = 0; iAx < 5; iAx++) {
-      if(useAxSl[iAx] == 1) {
+      if(m_mVector["useAxSl"][iAx] == 1) {
         m_mVector["phi2DInvError"][iAx] = 1/m_mVector["phi2DError"][iAx];
       } else {
         m_mVector["phi2DInvError"][iAx] = 0;
@@ -1218,7 +1305,7 @@ namespace Belle2 {
       }
     } else {
       for (unsigned iAx = 0; iAx < 5; iAx++) {
-        if(useAxSl[iAx] == 1) {
+        if(m_mVector["useAxSl"][iAx] == 1) {
           // Get drift length from table.
           string tableName = "driftLengthTableSL" + to_string(iAx*2);
           double t_driftTime = m_mVector["tdc"][iAx*2] - m_mDouble["eventTime"];
@@ -1291,6 +1378,7 @@ namespace Belle2 {
      if(m_mBool["fMc"])
      {
        cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]mcPosZ:  "<<m_mVector["mcPosZ"][1]<<" "<<m_mVector["mcPosZ"][3]<<" "<<m_mVector["mcPosZ"][5]<<" "<<m_mVector["mcPosZ"][7]<<endl;
+       cout<<"[E"<<int(m_mDouble["eventNumber"])<<"][T"<<iTrack<<"]mcLR:      "<<int(m_mVector["mcLR"][0])<<" "<<int(m_mVector["mcLR"][1])<<" "<<int(m_mVector["mcLR"][2])<<" "<<int(m_mVector["mcLR"][3])<<" "<<int(m_mVector["mcLR"][4])<<" "<<int(m_mVector["mcLR"][5])<<" "<<int(m_mVector["mcLR"][6])<<" "<<int(m_mVector["mcLR"][7])<<" "<<int(m_mVector["mcLR"][8])<<endl;
      }
   }
 

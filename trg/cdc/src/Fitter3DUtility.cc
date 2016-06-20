@@ -28,6 +28,7 @@ using std::string;
 using std::stringstream;
 using std::to_string;
 using std::get;
+using std::function;
 
 int Fitter3DUtility::findSign(double *phi2){
   double Trg_PI=3.141592653589793; 
@@ -177,15 +178,20 @@ void Fitter3DUtility::rPhiFit2(double *rr, double *phi2, double *phierror, doubl
 }
 
 double Fitter3DUtility::calPhi(double wirePhi, double driftLength, double rr, int lr){
+  //cout<<"rr:"<<rr<<" lr:"<<lr;
   double result = wirePhi;
+  //cout<<" wirePhi:"<<result;
   // time is in 2ns rms clock.
   double t_dPhi = driftLength;
+  //cout<<" driftLength:"<<t_dPhi;
   // Change to radian
   // rr is cm scale.
   t_dPhi=atan(t_dPhi/rr);
+  //cout<<" driftPhi:"<<t_dPhi;
   // Use LR to add dPhi
   if(lr == 1) result -= t_dPhi;
   else if(lr == 2) result += t_dPhi;
+  //cout<<" phi:"<<result<<endl;
   return result;
 }
 
@@ -198,6 +204,121 @@ double Fitter3DUtility::calPhi(double wirePhi, double driftTime, double eventTim
 double Fitter3DUtility::calPhi(int localId, int nWires, double driftTime, double eventTime, double rr, int lr){
   double wirePhi = (double)localId/nWires*4*M_PI;
   return Fitter3DUtility::calPhi(wirePhi, driftTime, eventTime, rr, lr);
+}
+
+void Fitter3DUtility::calPhi(std::map<std::string, double> const & mConstD, std::map<std::string, std::vector<double> > const & mConstV, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT * > & mLutStorage) {
+  Belle2::TRGCDCJSignalData * commonData = mSignalStorage.begin()->second.getCommonData();
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<tsId_"<<iSt<<">>>"<<endl; mSignalStorage["tsId_"+to_string(iSt)].dump();}
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<tdc_"<<iSt<<">>>"<<endl; mSignalStorage["tdc_"+to_string(iSt)].dump();}
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<lr_"<<iSt<<">>>"<<endl; mSignalStorage["lr_"+to_string(iSt)].dump();}
+  // Make phiFactor constants
+  for(unsigned iSt=0; iSt<4; iSt++) 
+  {
+    int nShiftBits = int(log(pow(2,24)/2/mConstD.at("Trg_PI")*mConstV.at("nTSs")[2*iSt+1]*mSignalStorage["phi0"].getToReal())/log(2));
+    string t_name;
+    t_name = "phiFactor_" + to_string(iSt);
+    mSignalStorage[t_name] = Belle2::TRGCDCJSignal(2*mConstD.at("Trg_PI")/mConstV.at("nTSs")[2*iSt+1], mSignalStorage["phi0"].getToReal()/pow(2,nShiftBits), commonData);
+  }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<phiFactor_"<<iSt<<">>>"<<endl; mSignalStorage["phiFactor_"+to_string(iSt)].dump();}
+  // wirePhi <= tsId * phiFactor
+  for(unsigned iSt=0; iSt<4; iSt++) mSignalStorage["wirePhi_"+to_string(iSt)] <= mSignalStorage["tsId_"+to_string(iSt)] * mSignalStorage["phiFactor_"+to_string(iSt)];
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<wirePhi_"<<iSt<<">>>"<<endl; mSignalStorage["wirePhi_"+to_string(iSt)].dump();}
+
+  //cout<<"<<<eventTime>>>"<<endl; mSignalStorage["eventTime"].dump();
+  // Calculate driftTime (tdc - eventTime)
+  for(unsigned iSt=0; iSt<4; iSt++) {
+    string t_in1Name = "tdc_" + to_string(iSt);
+    string t_valueName = "driftTime_" + to_string(iSt);
+    // Create data for ifElse
+    vector<pair<Belle2::TRGCDCJSignal, vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > > > t_data;
+    // Compare (tdc >= eventTime)
+    Belle2::TRGCDCJSignal t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage[t_in1Name], ">=", mSignalStorage["eventTime"]);
+    // Assignments 
+    vector<pair<Belle2::TRGCDCJSignal *, Belle2::TRGCDCJSignal> > t_assigns = {
+      make_pair(&mSignalStorage[t_valueName], (mSignalStorage[t_in1Name] - mSignalStorage["eventTime"]).limit(Belle2::TRGCDCJSignal(mSignalStorage[t_in1Name].getMaxActual(),mSignalStorage[t_in1Name].getToReal(), commonData), Belle2::TRGCDCJSignal(mSignalStorage[t_in1Name].getMaxActual(),mSignalStorage[t_in1Name].getToReal(), commonData)))
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare (else)
+    t_compare = Belle2::TRGCDCJSignal();
+    // Assignments
+    t_assigns = {
+      make_pair(&mSignalStorage[t_valueName], Belle2::TRGCDCJSignal(0,mSignalStorage[t_in1Name].getToReal(), commonData))
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Process ifElse data.
+    Belle2::TRGCDCJSignal::ifElse(t_data);
+  }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<driftTime_"<<iSt<<">>>"<<endl; mSignalStorage["driftTime_"+to_string(iSt)].dump();}
+
+  // Calculate minInvValue, maxInvValue for LUTs
+  {
+    mSignalStorage["invDriftPhiMin"] = Belle2::TRGCDCJSignal(0, mSignalStorage["driftTime_0"].getToReal(), commonData);
+    mSignalStorage["invDriftPhiMax"] = Belle2::TRGCDCJSignal(pow(2,mConstD.at("tdcBitSize"))-1, mSignalStorage["driftTime_0"].getToReal(), commonData);
+  }
+  //cout<<"<<<invDriftPhiMin>>>"<<endl; mSignalStorage["invDriftPhiMin"].dump();
+  //cout<<"<<<invDriftPhiMax>>>"<<endl; mSignalStorage["invDriftPhiMax"].dump();
+  // Generate LUT(driftPhi[i]=arctan(driftLengthFunction(driftTime))/r[i])
+  for(unsigned iSt=0; iSt<4; iSt++){
+    string t_valueName = "driftPhi_" + to_string(iSt);
+    string t_inName = "driftTime_" + to_string(iSt);
+    if(mLutStorage.find(t_valueName) == mLutStorage.end()) {
+      mLutStorage[t_valueName] = new Belle2::TRGCDCJLUT(t_valueName);
+      // Lambda can not copy maps.
+      double t_parameter = mConstV.at("rr3D")[iSt];
+      mLutStorage[t_valueName]->setFloatFunction(
+                        [=](double aValue) -> double{return mConstV.at("driftLengthTableSL"+to_string(2*iSt+1))[aValue]/t_parameter;}, 
+                        mSignalStorage[t_inName],
+                        mSignalStorage["invDriftPhiMin"], mSignalStorage["invDriftPhiMax"], mSignalStorage["phi0"].getToReal(),
+                        (int)mConstD.at("driftPhiLUTInBitSize"), (int)mConstD.at("driftPhiLUTOutBitSize"));
+      //mLutStorage[t_valueName]->makeCOE("./LutData/"+t_valueName+".coe");
+    }
+  }
+  //// driftPhi[i]=arctan(driftLengthFunction(driftTime))/r[i]
+  //// Operate using LUT(driftPhi[i]).
+  for(unsigned iSt=0; iSt<4; iSt++){
+    //cout<<"driftTime:"<<mSignalStorage["driftTime_"+to_string(iSt)].getActual()<<endl;
+    //cout<<"actual:"<<mLutStorage["driftPhi_"+to_string(iSt)]->getFloatOutput(mSignalStorage["driftTime_"+to_string(iSt)].getActual())<<endl;
+    mLutStorage["driftPhi_"+to_string(iSt)]->operate(mSignalStorage["driftTime_"+to_string(iSt)], mSignalStorage["driftPhi_"+to_string(iSt)]);
+  }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<driftPhi_"<<iSt<<">>>"<<endl; mSignalStorage["driftPhi_"+to_string(iSt)].dump();}
+
+  // Set error depending on lr(0:no hit, 1: left, 2: right, 3: not determined)
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<lr_"<<iSt<<">>>"<<endl; mSignalStorage["lr_"+to_string(iSt)].dump();}
+  for(unsigned iSt=0; iSt<4; iSt++) {
+    string t_in1Name = "lr_" + to_string(iSt);
+    string t_valueName = "phi_" + to_string(iSt);
+    // Create data for ifElse
+    vector<pair<Belle2::TRGCDCJSignal, vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > > > t_data;
+    // Compare (lr == 1)
+    Belle2::TRGCDCJSignal t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage[t_in1Name], "=", Belle2::TRGCDCJSignal(1,mSignalStorage[t_in1Name].getToReal(), commonData));
+    // Assignments 
+    vector<pair<Belle2::TRGCDCJSignal *, Belle2::TRGCDCJSignal> > t_assigns = {
+      make_pair(&mSignalStorage[t_valueName], mSignalStorage["wirePhi_"+to_string(iSt)] - mSignalStorage["driftPhi_"+to_string(iSt)])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare (lr == 2)
+    t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage[t_in1Name], "=", Belle2::TRGCDCJSignal(2,mSignalStorage[t_in1Name].getToReal(), commonData));
+    // Assignments
+    t_assigns = {
+      make_pair(&mSignalStorage[t_valueName], mSignalStorage["wirePhi_"+to_string(iSt)] + mSignalStorage["driftPhi_"+to_string(iSt)])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare (else)
+    t_compare = Belle2::TRGCDCJSignal();
+    // Assignments
+    t_assigns = {
+      make_pair(&mSignalStorage[t_valueName], mSignalStorage["wirePhi_"+to_string(iSt)])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Process ifElse data.
+    Belle2::TRGCDCJSignal::ifElse(t_data);
+  }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<phi_"<<iSt<<">>>"<<endl; mSignalStorage["phi_"+to_string(iSt)].dump();}
 }
 
 double Fitter3DUtility::rotatePhi(double value, double refPhi) {
@@ -219,12 +340,11 @@ double Fitter3DUtility::rotatePhi(double value, int refId, int nTSs) {
   return rotatePhi(value, refPhi);
 }
 
-// TODO rotatePhi range and rotateTSId range do not match.
 int Fitter3DUtility::rotateTsId(int value, int refId, int nTSs) {
   int result = value - refId;
   bool rangeOk = 0;
   while(rangeOk==0){
-    if(result > nTSs) result -= nTSs;
+    if(result >= nTSs) result -= nTSs;
     else if(result < 0) result += nTSs;
     else rangeOk = 1;
   }
@@ -251,10 +371,10 @@ int Fitter3DUtility::findQuadrant(double value) {
   return result;
 }
 
-void Fitter3DUtility::setError(std::map<std::string, double> const & mConstD, std::map<std::string, std::vector<double> > const & mConstV, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT * > & mLutStorage)
+void Fitter3DUtility::setError(std::map<std::string, double> const & mConstD, std::map<std::string, std::vector<double> > const & mConstV, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage)
 {
   Belle2::TRGCDCJSignalData * commonData = mSignalStorage.begin()->second.getCommonData();
-  // Make constants for wireError,driftError,noError
+  // Make constants for wireError,driftError,noneError
   for(unsigned iSt=0; iSt<4; iSt++) 
   {
     string t_name;
@@ -262,11 +382,88 @@ void Fitter3DUtility::setError(std::map<std::string, double> const & mConstD, st
     mSignalStorage[t_name] = Belle2::TRGCDCJSignal(mConstD.at("iError2BitSize"), 1/pow(mConstV.at("wireZError")[iSt],2), 0, mConstD.at("iError2Max"), -1, commonData);
     t_name = "iZDriftError2_" + to_string(iSt);
     mSignalStorage[t_name] = Belle2::TRGCDCJSignal(mConstD.at("iError2BitSize"), 1/pow(mConstV.at("driftZError")[iSt],2), 0, mConstD.at("iError2Max"), -1, commonData);
+    t_name = "iZNoneError2_" + to_string(iSt);
+    mSignalStorage[t_name] = Belle2::TRGCDCJSignal(mConstD.at("iError2BitSize"), 0, 0, mConstD.at("iError2Max"), -1, commonData);
   }
-  mLutStorage.find("LUT");
   //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<iZWireError2_"<<iSt<<">>>"<<endl; mSignalStorage["iZWireError2_"+to_string(iSt)].dump();}
   //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<iZDriftError2_"<<iSt<<">>>"<<endl; mSignalStorage["iZDriftError2_"+to_string(iSt)].dump();}
-  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<iZError2_"<<iSt<<">>>"<<endl; mSignalStorage["iZError2_"+to_string(iSt)].dump();}
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<iZNoneError2_"<<iSt<<">>>"<<endl; mSignalStorage["iZNoneError2_"+to_string(iSt)].dump();}
+
+  // Set error depending on lr(0:no hit, 1: left, 2: right, 3: not determined)
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<lr_"<<iSt<<">>>"<<endl; mSignalStorage["lr_"+to_string(iSt)].dump();}
+  for(unsigned iSt=0; iSt<4; iSt++) {
+    string t_in1Name = "lr_" + to_string(iSt);
+    string t_valueName = "invErrorLR_" + to_string(iSt);
+    string t_noneErrorName = "iZNoneError2_" + to_string(iSt);
+    string t_driftErrorName = "iZDriftError2_" + to_string(iSt);
+    string t_wireErrorName = "iZWireError2_" + to_string(iSt);
+    // Create data for ifElse
+    vector<pair<Belle2::TRGCDCJSignal, vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > > > t_data;
+    // Compare (lr == 0)
+    Belle2::TRGCDCJSignal t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage[t_in1Name], "=", Belle2::TRGCDCJSignal(0,mSignalStorage[t_in1Name].getToReal(), commonData));
+    // Assignments (invErrorLR <= iZNoneError2)
+    vector<pair<Belle2::TRGCDCJSignal *, Belle2::TRGCDCJSignal> > t_assigns = {
+      make_pair(&mSignalStorage[t_valueName], mSignalStorage[t_noneErrorName])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare (lr == 3)
+    t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage[t_in1Name], "=", Belle2::TRGCDCJSignal(3,mSignalStorage[t_in1Name].getToReal(), commonData));
+    // Assignments (invErrorLR <= iZWireError)
+    t_assigns = {
+      make_pair(&mSignalStorage[t_valueName], mSignalStorage[t_wireErrorName])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare (else)
+    t_compare = Belle2::TRGCDCJSignal();
+    // Assignments (invErrorLR <= iZDriftError)
+    t_assigns = {
+      make_pair(&mSignalStorage[t_valueName], mSignalStorage[t_driftErrorName])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Process ifElse data.
+    Belle2::TRGCDCJSignal::ifElse(t_data);
+  }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<invErrorLR_"<<iSt<<">>>"<<endl; mSignalStorage["invErrorLR_"+to_string(iSt)].dump();}
+
+  // Make constants for half radius of SL
+  for(unsigned iSt=0; iSt<4; iSt++) {
+    string t_name;
+    t_name = "halfRadius_" + to_string(iSt);
+    mSignalStorage[t_name] = Belle2::TRGCDCJSignal(mConstV.at("rr")[iSt*2+1]/2, mSignalStorage["rho"].getToReal(), commonData);
+  }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<halfRadius_"<<iSt<<">>>"<<endl; mSignalStorage["halfRadius_"+to_string(iSt)].dump();}
+  // Set error depending on R(helix radius)
+  //cout<<"<<<rho>>>"<<endl; mSignalStorage["rho"].dump();
+  for(unsigned iSt=0; iSt<4; iSt++) {
+    string t_compareName = "halfRadius_" + to_string(iSt);
+    string t_valueName = "iZError2_" + to_string(iSt);
+    string t_noneErrorName = "iZNoneError2_" + to_string(iSt);
+    string t_in1Name = "invErrorLR_" + to_string(iSt);
+    // Create data for ifElse
+    vector<pair<Belle2::TRGCDCJSignal, vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > > > t_data;
+    // Compare (R < r/2)
+    Belle2::TRGCDCJSignal t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage["rho"], "<", mSignalStorage[t_compareName]);
+    // Assignments (invError <= 0)
+    vector<pair<Belle2::TRGCDCJSignal *, Belle2::TRGCDCJSignal> > t_assigns = {
+      make_pair(&mSignalStorage[t_valueName], mSignalStorage[t_noneErrorName])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare (else)
+    t_compare = Belle2::TRGCDCJSignal();
+    // Assignments (invError <= invErrorLR)
+    t_assigns = {
+      make_pair(&mSignalStorage[t_valueName], mSignalStorage[t_in1Name])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Process ifElse data.
+    Belle2::TRGCDCJSignal::ifElse(t_data);
+  }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<invError_"<<iSt<<">>>"<<endl; mSignalStorage["invError_"+to_string(iSt)].dump();}
 }
 
 double Fitter3DUtility::calStAxPhi(int mysign, double anglest, double ztostraw, double rr, double rho, double myphi0){

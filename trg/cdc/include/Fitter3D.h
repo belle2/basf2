@@ -72,13 +72,13 @@ namespace Belle2 {
     bool isStereoTrackFull( TRGCDCTrack & aTrack );
 
     /// Finds which axial superlayers has TSs. useAxSL array indicating hit superlayers.
-    static void findHitAxialSuperlayers( TRGCDCTrack & aTrack, bool (&useAxSL)[5] , bool printError);
+    static void findHitAxialSuperlayers( TRGCDCTrack & aTrack, std::vector<double> & useAxSL , bool printError);
 
     /// Finds which stereo superlayers has TSs. useStSL array indicating hit superlayers.
-    static void findHitStereoSuperlayers( TRGCDCTrack & aTrack, bool (&useStSL)[4] , bool printError);
+    static void findHitStereoSuperlayers( TRGCDCTrack & aTrack, std::vector<double> & useStSL, bool printError);
 
     /// Removes TSs that are not possible with track Pt.
-    void removeImpossibleStereoSuperlayers( bool (&useStSL)[4] );
+    void removeImpossibleStereoSuperlayers( std::vector<double> & useStSL);
 
     /// Selects priority TSs when there are multiple candidate TSs for a superlayer.
     static void selectAxialTSs( TRGCDCTrack & aTrack, std::vector<int> & bestTSIndex );

@@ -7,6 +7,7 @@
 #include <TVector2.h>
 #include <map>
 #include <string>
+#include <functional>
 #include <tuple>
 namespace Belle2{
   class TRGCDCJSignal;
@@ -44,6 +45,9 @@ class Fitter3DUtility{
     /// Pre 3D fitter functions
     static double calPhi(int localId, int nWires, double driftTime, double eventTime, double rr, int lr);
 
+    /// Calculates phi
+    static void calPhi(std::map<std::string, double> const & mConstD, std::map<std::string, std::vector<double> > const & mConstV, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT * > & mLutStorage);
+
     /// Rotates to range [-pi, pi]
     static double rotatePhi(double value, double refPhi);
 
@@ -57,7 +61,7 @@ class Fitter3DUtility{
     static int findQuadrant(double value);
 
     /// Sets error using JSignal class.
-    static void setError(std::map<std::string, double> const & mConstD, std::map<std::string, std::vector<double> > const & mConstV, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage, std::map<std::string, Belle2::TRGCDCJLUT * > & mLutStorage);
+    static void setError(std::map<std::string, double> const & mConstD, std::map<std::string, std::vector<double> > const & mConstV, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage);
 
     /// Calculates the fitted axial phi for the stereo super layer.
     static double calStAxPhi(int charge, double anglest, double ztostraw, double rr, double rho, double phi0);

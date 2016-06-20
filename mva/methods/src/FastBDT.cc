@@ -135,14 +135,17 @@ namespace Belle2 {
       std::stringstream s;
       std::string t;
       while (getline(file, t)) {
-        size_t f = t.find("inf");
-        if (f < std::string::npos) {
+        size_t f = 0;
+
+        while ((f = t.find("inf", f)) != std::string::npos) {
           t.replace(f, std::string("inf").length(), std::string("0.0"));
+          f += std::string("0.0").length();
           B2WARNING("Found infinity in FastBDT weightfile, I replace it with 0 to prevent horrible crashes, this is fixed in the newer version");
         }
-        f = t.find("nan");
-        if (f < std::string::npos) {
+        f = 0;
+        while ((f = t.find("nan", f)) != std::string::npos) {
           t.replace(f, std::string("nan").length(), std::string("0.0"));
+          f += std::string("0.0").length();
           B2WARNING("Found nan in FastBDT weightfile, I replace it with 0 to prevent horrible crashes, this is fixed in the newer version");
         }
         s << t + '\n';

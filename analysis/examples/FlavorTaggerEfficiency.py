@@ -99,11 +99,11 @@ class Quiet:
 if Belle2.FileSystem.findFile(workingFile):
 
     # root-file
-    rootfile = ROOT.TFile(workingFile, 'UPDATE')
+    rootfile = ROOT.TFile(workingFile, 'READ')
+    rootfile.cd()
     tree = rootfile.Get(treeName)
     # tree = rootfile.Get('Bd_JpsiKS_tuple')
     mcstatus = array('d', [-511.5, 0.0, 511.5])
-    rootfile.cd()
     ROOT.TH1.SetDefaultSumw2()
 
     totalBranches = []
@@ -203,14 +203,11 @@ if Belle2.FileSystem.findFile(workingFile):
 
         # filling with abs(qr) in one of 6 bins with its weight
         # separate calculation for B0 and B0bar
-        treeB0 = tree.CopyTree('B0_qrMC>0 ')
-        treeB0bar = tree.CopyTree('B0_qrMC<0  ')
+
         tree.Project('Average_r', 'abs(B0_' + method + '_qrCombined)',
                      'abs(B0_' + method + '_qrCombined)')
-        treeB0.Project('Average_rB0', 'abs(B0_' + method + '_qrCombined)',
-                       'abs(B0_' + method + '_qrCombined)')
-        treeB0bar.Project('Average_rB0bar', 'abs(B0_' + method + '_qrCombined)',
-                          'abs(B0_' + method + '_qrCombined)')
+        tree.Project('Average_rB0', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(B0_qrMC>0)')
+        tree.Project('Average_rB0bar', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(B0_qrMC<0)')
 
         # filling with abs(qr) in one of 6 bins
         tree.Project('entries_per_bin', 'abs(B0_' + method + '_qrCombined)', 'B0_qrMC!=0')
@@ -646,18 +643,18 @@ if Belle2.FileSystem.findFile(workingFile):
                 100) +
             ' %   *')
 
-        hist_signal.Write('', ROOT.TObject.kOverwrite)
-        hist_background.Write('', ROOT.TObject.kOverwrite)
-        hist_probB0.Write('', ROOT.TObject.kOverwrite)
-        hist_probB0bar.Write('', ROOT.TObject.kOverwrite)
-        hist_qrB0.Write('', ROOT.TObject.kOverwrite)
-        hist_qrB0bar.Write('', ROOT.TObject.kOverwrite)
-        hist_absqrB0.Write('', ROOT.TObject.kOverwrite)
-        hist_absqrB0bar.Write('', ROOT.TObject.kOverwrite)
-        hist_aver_rB0.Write('', ROOT.TObject.kOverwrite)
-        hist_aver_rB0bar.Write('', ROOT.TObject.kOverwrite)
-        hist_all.Write('', ROOT.TObject.kOverwrite)
-        hist_calib_B0.Write('', ROOT.TObject.kOverwrite)
+        # hist_signal.Write('', ROOT.TObject.kOverwrite)
+        # hist_background.Write('', ROOT.TObject.kOverwrite)
+        # hist_probB0.Write('', ROOT.TObject.kOverwrite)
+        # hist_probB0bar.Write('', ROOT.TObject.kOverwrite)
+        # hist_qrB0.Write('', ROOT.TObject.kOverwrite)
+        # hist_qrB0bar.Write('', ROOT.TObject.kOverwrite)
+        # hist_absqrB0.Write('', ROOT.TObject.kOverwrite)
+        # hist_absqrB0bar.Write('', ROOT.TObject.kOverwrite)
+        # hist_aver_rB0.Write('', ROOT.TObject.kOverwrite)
+        # hist_aver_rB0bar.Write('', ROOT.TObject.kOverwrite)
+        # hist_all.Write('', ROOT.TObject.kOverwrite)
+        # hist_calib_B0.Write('', ROOT.TObject.kOverwrite)
         Canvas.Destructor()
     # if average_eff != 0:
         # print '*    -------------------------------------------------------------------------'

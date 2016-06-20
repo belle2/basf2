@@ -102,7 +102,8 @@ FlavorTagger(
         'Lambda',
         'FSC',
         'MaximumPstar',
-        'KaonPion'])
+        'KaonPion'],
+    belleOrBelle2='Belle2')
 #
 # If you want to train the Flavor Tagger by yourself you have to specify the name of the weight files and the categories
 # you want to use like:
@@ -145,6 +146,10 @@ FlavorTagger(
 #
 # combinerMethods=['TMVA-FBDT']
 #
+# With the belleOrBelle2 argument you specify if you are using Belle MC (also Belle Data) or Belle2 MC.
+# If you want to use Belle MC please follow the dedicated tutorial B2A802-FlavorTagger-BelleMC.py
+# since you need to follow a special module order.
+
 
 # Fit Vertex of the B0 on the tag side
 TagV('B0:jspiks', 'breco', 0.001, 'standard_PXD')
@@ -173,14 +178,6 @@ toolsDST += ['MCDeltaT', '^B0']
 ntupleFile('B2A801-FlavorTagger.root')
 ntupleTree('B0tree', 'B0:jspiks', toolsDST)
 
-# If you want to calculate the efficiency of the FlavorTagger on your own
-# File use the script analysis/examples/FlavorTaggerEfficiency.py giving
-# your file as argument:
-
-# basf2 FlavorTaggerEfficiency.py YourFile.root
-
-# Note: This script needs MCParticles. If the name of your tree is not 'B0tree' please change line 65.
-
 # Summary of created Lists
 summaryOfLists(['J/psi:mumu', 'K_S0:pipi', 'B0:jspiks'])
 
@@ -189,3 +186,11 @@ process(analysis_main)
 
 # print out the summary
 print(statistics)
+
+# If you want to calculate the efficiency of the FlavorTagger on your own
+# File use the script analysis/examples/FlavorTaggerEfficiency.py giving
+# your file as argument:
+
+# basf2 FlavorTaggerEfficiency.py YourFile.root
+
+# Note: This efficiency script needs MCParticles. If the name of your tree is not 'B0tree' please change line 65.

@@ -162,7 +162,7 @@ class RemoveExtraInfoModule(Module):
 
     def event(self):
         """ Process for each event """
-        ModeCode = GetModeCode()
+        ModeCode = getModeCode()
         for particleList in EventLevelParticleLists:
             plist = Belle2.PyStoreObj(particleList[0])
             for i in range(0, plist.obj().getListSize()):
@@ -173,7 +173,7 @@ class RemoveExtraInfoModule(Module):
             info.obj().removeExtraInfo()
 
 
-def SetModeCode(mode='Expert'):
+def setModeCode(mode='Expert'):
     """
     Sets ModeCode= 0 for Teacher or =1 for Expert mode.
     """
@@ -185,15 +185,32 @@ def SetModeCode(mode='Expert'):
         ModeCode = 0
 
 
-def GetModeCode():
+def getModeCode():
     """
     Gets the global ModeCode.
     """
-    global ModeCode
+
     if ModeCode == 1:
         return 1
     else:
         return 0
+
+
+def setBelleOrBelle2(belleOrBelle2='Belle2'):
+    """
+    Sets belleOrBelle2Flag according to the specified argument.
+    """
+
+    global belleOrBelle2Flag
+    belleOrBelle2Flag = belleOrBelle2
+
+
+def getBelleOrBelle2():
+    """
+    Gets the global ModeCode.
+    """
+    return belleOrBelle2Flag
+
 
 # Methods for Track and Event Levels
 methods = [
@@ -359,128 +376,137 @@ def WhichCategories(categories=[
 
 # Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
 variables = dict()
-variables['Electron'] = [
-    'useCMSFrame(p)',
-    'useCMSFrame(pt)',
-    'p',
-    'pt',
-    'eid',
-    'eid_dEdx',
-    'eid_TOP',
-    'SemiLeptonicVariables(recoilMass)',
-    'SemiLeptonicVariables(pMissCMS)',
-    'SemiLeptonicVariables(cosThetaMissCMS)',
-    'SemiLeptonicVariables(EW90)',
-    'eid_ARICH',
-    'eid_ECL',
-    'chiProb',
-]
-variables['IntermediateElectron'] = variables['Electron']
-variables['Muon'] = [
-    'useCMSFrame(p)',
-    'useCMSFrame(pt)',
-    'p',
-    'pt',
-    'muid',
-    'muid_dEdx',
-    'muid_TOP',
-    'SemiLeptonicVariables(recoilMass)',
-    'SemiLeptonicVariables(pMissCMS)',
-    'SemiLeptonicVariables(cosThetaMissCMS)',
-    'SemiLeptonicVariables(EW90)',
-    'muid_ARICH',
-    'chiProb',
-]
-variables['IntermediateMuon'] = variables['Muon']
-variables['KinLepton'] = [
-    'useCMSFrame(p)',
-    'useCMSFrame(pt)',
-    'p',
-    'pt',
-    'muid',
-    'muid_dEdx',
-    'muid_TOP',
-    'SemiLeptonicVariables(recoilMass)',
-    'SemiLeptonicVariables(pMissCMS)',
-    'SemiLeptonicVariables(cosThetaMissCMS)',
-    'SemiLeptonicVariables(EW90)',
-    'muid_ARICH',
-    'eid',
-    'eid_dEdx',
-    'eid_TOP',
-    'eid_ARICH',
-    'eid_ECL',
-    'chiProb',
-]
-variables['IntermediateKinLepton'] = variables['KinLepton']
-variables['Kaon'] = [
-    'useCMSFrame(p)',
-    'useCMSFrame(pt)',
-    'cosTheta',
-    'pt',
-    'Kid',
-    'Kid_dEdx',
-    'Kid_TOP',
-    'Kid_ARICH',
-    'NumberOfKShortinROEParticleList(K_S0:ROEKaon)',
-    'ptTracksRoe',
-    'distance',
-    'chiProb',
-]
-variables['SlowPion'] = [
-    'useCMSFrame(p)',
-    'useCMSFrame(pt)',
-    'cosTheta',
-    'p',
-    'pt',
-    'piid',
-    'piid_dEdx',
-    'piid_TOP',
-    'piid_ARICH',
-    'pi_vs_edEdxid',
-    'cosTPTO',
-    'Kid',
-    'eid',
-    'chiProb',
-]
-variables['FastPion'] = variables['SlowPion']
-variables['Lambda'] = [
-    'lambdaFlavor',
-    'NumberOfKShortinROEParticleList(K_S0:ROELambda)',
-    'M',
-    'cosAngleBetweenMomentumAndVertexVector',
-    'lambdaZError',
-    'daughter(1,p)',
-    'daughter(1,useCMSFrame(p))',
-    'useCMSFrame(p)',
-    'p',
-    'chiProb',
-    'distance',
-]
+KId = {'Belle': 'Kid_belle', 'Belle2': 'Kid'}
+muId = {'Belle': 'muIDBelle', 'Belle2': 'muid'}
 
-# Only for Event Level
-variables['KaonPion'] = ['HighestProbInCat(K+:KaonROE, isRightTrack(Kaon))',
-                         'HighestProbInCat(pi+:SlowPionROE, isRightTrack(SlowPion))',
-                         'KaonPionVariables(cosKaonPion)', 'KaonPionVariables(HaveOpositeCharges)', 'Kid']
 
-variables['MaximumPstar'] = [
-    'useCMSFrame(p)',
-    'useCMSFrame(pt)',
-    'p',
-    'pt',
-    'cosTPTO',
-    'ImpactXY',
-]
+def setVariables():
+    """
+    Sets the Variables used for Track and Event Levels.
+    """
 
-variables['FSC'] = [
-    'useCMSFrame(p)',
-    'cosTPTO',
-    'Kid',
-    'FSCVariables(pFastCMS)',
-    'FSCVariables(cosSlowFast)',
-    'FSCVariables(cosTPTOFast)',
-    'FSCVariables(SlowFastHaveOpositeCharges)',
-]
+    variables['Electron'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'p',
+        'pt',
+        'eid',
+        'eid_dEdx',
+        'eid_TOP',
+        'SemiLeptonicVariables(recoilMass)',
+        'SemiLeptonicVariables(pMissCMS)',
+        'SemiLeptonicVariables(cosThetaMissCMS)',
+        'SemiLeptonicVariables(EW90)',
+        'eid_ARICH',
+        'eid_ECL',
+        'chiProb',
+    ]
+    variables['IntermediateElectron'] = variables['Electron']
+    variables['Muon'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'p',
+        'pt',
+        muId[getBelleOrBelle2()],
+        'muid_dEdx',
+        'muid_TOP',
+        'SemiLeptonicVariables(recoilMass)',
+        'SemiLeptonicVariables(pMissCMS)',
+        'SemiLeptonicVariables(cosThetaMissCMS)',
+        'SemiLeptonicVariables(EW90)',
+        'muid_ARICH',
+        'chiProb',
+    ]
+    variables['IntermediateMuon'] = variables['Muon']
+    variables['KinLepton'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'p',
+        'pt',
+        muId[getBelleOrBelle2()],
+        'muid_dEdx',
+        'muid_TOP',
+        'SemiLeptonicVariables(recoilMass)',
+        'SemiLeptonicVariables(pMissCMS)',
+        'SemiLeptonicVariables(cosThetaMissCMS)',
+        'SemiLeptonicVariables(EW90)',
+        'muid_ARICH',
+        'eid',
+        'eid_dEdx',
+        'eid_TOP',
+        'eid_ARICH',
+        'eid_ECL',
+        'chiProb',
+    ]
+    variables['IntermediateKinLepton'] = variables['KinLepton']
+    variables['Kaon'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'cosTheta',
+        'pt',
+        KId[getBelleOrBelle2()],
+        'Kid_dEdx',
+        'Kid_TOP',
+        'Kid_ARICH',
+        'NumberOfKShortinROEParticleList(K_S0:ROEKaon)',
+        'ptTracksRoe',
+        'distance',
+        'chiProb',
+    ]
+    variables['SlowPion'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'cosTheta',
+        'p',
+        'pt',
+        'piid',
+        'piid_dEdx',
+        'piid_TOP',
+        'piid_ARICH',
+        'pi_vs_edEdxid',
+        'cosTPTO',
+        KId[getBelleOrBelle2()],
+        'eid',
+        'chiProb',
+    ]
+    variables['FastPion'] = variables['SlowPion']
+    variables['Lambda'] = [
+        'lambdaFlavor',
+        'NumberOfKShortinROEParticleList(K_S0:ROELambda)',
+        'M',
+        'cosAngleBetweenMomentumAndVertexVector',
+        'lambdaZError',
+        'daughter(1,p)',
+        'daughter(1,useCMSFrame(p))',
+        'useCMSFrame(p)',
+        'p',
+        'chiProb',
+        'distance',
+    ]
+
+    # Only for Event Level
+    variables['KaonPion'] = ['HighestProbInCat(K+:KaonROE, isRightTrack(Kaon))',
+                             'HighestProbInCat(pi+:SlowPionROE, isRightTrack(SlowPion))',
+                             'KaonPionVariables(cosKaonPion)', 'KaonPionVariables(HaveOpositeCharges)', 'Kid']
+
+    variables['MaximumPstar'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'p',
+        'pt',
+        'cosTPTO',
+        'ImpactXY',
+    ]
+
+    variables['FSC'] = [
+        'useCMSFrame(p)',
+        'cosTPTO',
+        'Kid',
+        'FSCVariables(pFastCMS)',
+        'FSCVariables(cosSlowFast)',
+        'FSCVariables(cosTPTOFast)',
+        'FSCVariables(SlowFastHaveOpositeCharges)',
+    ]
 
 
 def FillParticleLists(mode='Expert', path=analysis_main):
@@ -499,7 +525,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
         # Check if there is K short in this event
         if particleList == 'K+:KaonROE':
             # Precut done to prevent from overtraining, might be redundant
-            applyCuts(particleList, '0.1<Kid', path=path)
+            applyCuts(particleList, '0.1<' + KId[getBelleOrBelle2()], path=path)
             fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1',
                              path=path)
             reconstructDecay('K_S0:ROEKaon -> pi+:inKaonRoe pi-:inKaonRoe',
@@ -788,6 +814,7 @@ def FlavorTagger(
         'FSC',
         'MaximumPstar',
         'KaonPion'],
+    belleOrBelle2="Belle2",
     path=analysis_main,
 ):
     """
@@ -819,6 +846,13 @@ def FlavorTagger(
     if len(combinerMethods) < 1 or len(combinerMethods) > 2:
         B2FATAL('FlavorTagger: Invalid list of combinerMethods. The available methods are "TMVA-FBDT" and "FANN-MLP"')
 
+    global belleOrBelle2Flag
+
+    if belleOrBelle2 == 'Belle2' or belleOrBelle2 == 'Belle':
+        belleOrBelle2Flag = belleOrBelle2
+    else:
+        B2FATAL('FlavorTagger: Wrong argument for belleOrBelle2 given: The available modes are "Belle2" or "Belle"')
+
     global FANNmlp
     global TMVAfbdt
 
@@ -838,7 +872,9 @@ def FlavorTagger(
     B2INFO('    Working directory is: ' + workingDirectory)
     B2INFO(' ')
 
-    SetModeCode(mode)
+    setModeCode(mode)
+    setBelleOrBelle2(belleOrBelle2)
+    setVariables()
 
     roe_path = create_path()
     emptypath = create_path()

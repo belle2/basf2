@@ -35,6 +35,7 @@ GenfitTrackCreatorModule::GenfitTrackCreatorModule() :
 
 void GenfitTrackCreatorModule::initialize()
 {
+  B2WARNING("This module is depricated as it uses genfit::Track(Cand)s instead of RecoTracks. It will be removed in the future. If you need information on the transition, please contact Nils Braun (nils.braun@kit.edu).");
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
   recoTracks.isRequired();
 

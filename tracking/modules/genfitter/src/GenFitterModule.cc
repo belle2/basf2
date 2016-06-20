@@ -187,6 +187,7 @@ GenFitterModule::~GenFitterModule()
 
 void GenFitterModule::initialize()
 {
+  B2WARNING("This module is depricated as it uses genfit::Track(Cand)s instead of RecoTracks. It will be removed in the future. If you need information on the transition, please contact Nils Braun (nils.braun@kit.edu).");
   StoreArray<genfit::TrackCand> trackCandidates(m_gfTrackCandsColName);
   StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
   trackCandidates.isRequired();

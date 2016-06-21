@@ -219,6 +219,15 @@ namespace Belle2 {
       /// Draws the hit content of the RecoTrack.
       void draw(const RecoTrack& recoTrack, const AttributeMap& attributeMap = AttributeMap());
 
+      /// Draws trajectory the CDCRecoSegment2D
+      void drawTrajectory(const CDCRecoSegment2D& segment, const AttributeMap& attributeMap = AttributeMap());
+
+      /// Draws trajectory the CDCTrack
+      void drawTrajectory(const CDCTrack& track, const AttributeMap& attributeMap = AttributeMap());
+
+      /// Draws curve along the fitted points of the RecoTrack
+      void drawTrajectory(const RecoTrack& recoTrack, const AttributeMap& attributeMap = AttributeMap());
+
       /// Allow the drawing of pointers checking if the pointer is nonzero.
       template<class T>
       void draw(const T* ptr, const AttributeMap& attributeMap = AttributeMap())

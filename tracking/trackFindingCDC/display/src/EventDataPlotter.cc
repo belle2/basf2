@@ -656,14 +656,62 @@ void EventDataPlotter::draw(const RecoTrack& recoTrack, const AttributeMap& attr
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
   primitivePlotter.startGroup(attributeMap);
-
   for (const CDCHit* ptrHit : recoTrack.getCDCHitList()) {
     if (ptrHit) {
       const CDCHit& hit = *ptrHit;
       draw(hit);
     }
   }
+  primitivePlotter.endGroup();
+}
+
+
+void EventDataPlotter::drawTrajectory(const CDCRecoSegment2D& segment, const AttributeMap& attributeMap)
+{
+  draw(segment.getTrajectory2D(), attributeMap);
+}
+
+void EventDataPlotter::drawTrajectory(const CDCTrack& track, const AttributeMap& attributeMap)
+{
+  draw(track.getStartTrajectory3D().getTrajectory2D(), attributeMap);
+}
+
+void EventDataPlotter::drawTrajectory(const RecoTrack& recoTrack, const AttributeMap& attributeMap)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  primitivePlotter.startGroup(attributeMap);
+
+  bool fitSuccessful = not recoTrack.getRepresentations().empty() and recoTrack.wasFitSuccessful();
+  if (fitSuccessful) {
+    std::vector<std::array<float, 2> > points;
+    std::vector<std::array<float, 2> > tangents;
+
+    TVector3 pos;
+    TVector3 mom;
+    TMatrixDSym cov;
+    size_t nHits = recoTrack.getHitPointsWithMeasurement().size();
+    // const cast to access the  measurements along the track
+    RecoTrack& vRecoTrack = const_cast<RecoTrack& >(recoTrack);
+    for (size_t i = 0; i < nHits; ++i) {
+      try {
+        const genfit::MeasuredStateOnPlane& state = vRecoTrack.getMeasuredStateOnPlaneFromHit(i);
+        state.getPosMomCov(pos, mom, cov);
+      } catch (genfit::Exception) {
+        continue;
+      }
+
+      float x = pos.X();
+      float y = pos.Y();
+      float px = mom.X();
+      float py = mom.Y();
+
+      points.push_back({x, y});
+      tangents.push_back({px, py});
+    }
+    primitivePlotter.drawCurve(points, tangents, attributeMap);
+  }
 
   primitivePlotter.endGroup();
-
 }

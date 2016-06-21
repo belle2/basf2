@@ -2,18 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import basf2_mva
-from basf2_mva_evaluation import plotting
+from basf2_mva_evaluation import plots
 import argparse
 import tempfile
 
-import root_numpy
-import root_pandas
-
 import numpy as np
-import pandas as pd
-
 from B2Tools import b2latex
-
 from ROOT import Belle2
 
 import os
@@ -62,10 +56,12 @@ if __name__ == '__main__':
 
     tempdir = tempfile.mkdtemp()
     identifiers = sum(args.identifier, [])
-    basf2_mva.expert(basf2_mva.vector(*identifiers), args.datafile, args.treename, tempdir + '/expert.root')
-    expert_df = pd.DataFrame(root_pandas.root2array(tempdir + '/expert.root', 'variables'))
-    feature_df = pd.DataFrame(root_pandas.root2array(args.datafile, args.treename))
-    expert_information = {identifier: ExpertInformation(identifier) for identifier in identifiers}
+    rootfilename = tempdir + '/expert.root'
+    basf2_mva.expert(basf2_mva.vector(*identifiers), args.datafile, args.treename, rootfilename)
+    expert_informations = [ExpertInformation(identifier) for identifier in identifiers]
+
+    probabilities = [expert_information.branchname for expert_information in expert_informations]
+    truths = [expert_information.target for expert_information in expert_informations]
 
     # Change working directory after experts run, because they might want to access
     # a locadb in the current working directory
@@ -81,34 +77,18 @@ if __name__ == '__main__':
     o += b2latex.Section("Plots")
 
     graphics = b2latex.Graphics()
-    p = plotting.VerboseDistribution()
-    for identifier, information in expert_information.items():
-        p.add(expert_df, information.branchname)
-    p.finish()
-    p.save('verbose_distribution_plot.png')
+    plots.Distribution(rootfilename, 'verbose_distribution_plot.png', probabilities, truths)
     graphics.add('verbose_distribution_plot.png', width=1.0)
     o += graphics.finish()
 
     graphics = b2latex.Graphics()
-    p = plotting.PurityOverEfficiency()
-    for identifier, information in expert_information.items():
-        p.add(expert_df, information.branchname,
-              expert_df[information.target] == information.signal_class,
-              expert_df[information.target] != information.signal_class)
-    p.finish()
-    p.save('roc_purity_plot.png')
-    graphics.add('roc_purity_plot.png', width=1.0)
+    plots.ROC(rootfilename, 'roc_plot.png', probabilities, truths)
+    graphics.add('roc_plot.png', width=1.0)
     o += graphics.finish()
 
     graphics = b2latex.Graphics()
-    p = plotting.RejectionOverEfficiency()
-    for identifier, information in expert_information.items():
-        p.add(expert_df, information.branchname,
-              expert_df[information.target] == information.signal_class,
-              expert_df[information.target] != information.signal_class)
-    p.finish()
-    p.save('roc_rejection_plot.png')
-    graphics.add('roc_rejection_plot.png', width=1.0)
+    plots.Diagonal(rootfilename, 'diagonal_plot.png', probabilities, truths)
+    graphics.add('diagonal_plot.png', width=1.0)
     o += graphics.finish()
 
     o.finish()

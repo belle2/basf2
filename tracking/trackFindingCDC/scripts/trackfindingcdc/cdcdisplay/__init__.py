@@ -7,11 +7,9 @@ from ROOT import gSystem
 gSystem.Load('libframework')  # for PyStoreArray
 gSystem.Load('libcdc')  # for CDCSimHit
 gSystem.Load('libtracking')  # for CDCHit and so on
-gSystem.Load('libgenfit2')  # for GFTrackCands
 
 from ROOT import Belle2  # make Belle2 namespace available
 from ROOT import std
-from ROOT import genfit
 
 import os
 import os.path
@@ -199,17 +197,11 @@ class CDCSVGDisplayModule(Module):
 
         # Those are only available, if any track finder is in the module chain (not tested for others than the local track finder)
 
-        #: Draw the output Genfit trackcands
-        self.draw_gftrackcands = False
-
-        #: Draw the output Genfit tracks
-        self.draw_gftracks = False
+        #: Draw the output RecoTracks
+        self.draw_recotracks = False
 
         #: Draw the output Genfit track trajectories
-        self.draw_gftrack_trajectories = False
-
-        #: Draw the trajectories stored in the output Genfit tracks
-        self.draw_gftrackcand_trajectories = False
+        self.draw_recotrack_trajectories = False
 
         #: Draw a red cdc hit of the rl info of the track reco hits is wrong, else a green one
         self.draw_wrong_rl_infos_in_tracks = False
@@ -220,8 +212,8 @@ class CDCSVGDisplayModule(Module):
         #: Name of the CDC Hits store array
         self.cdc_hits_store_array_name = "CDCHits"
 
-        #: Name of the genfit track cand store array
-        self.track_cands_store_array_name = "TrackCands"
+        #: Name of the RecoTracks store array
+        self.reco_tracks_store_array_name = "RecoTracks"
 
         #: Name of the CDC Wire Hit Clusters
         self.cdc_wire_hit_cluster_store_obj_name = "CDCWireHitClusterVector"
@@ -264,10 +256,8 @@ class CDCSVGDisplayModule(Module):
             'draw_connect_tof',
             'draw_rlinfo',
             'draw_reassigned',
-            'draw_gftrackcands',
-            'draw_gftracks',
-            'draw_gftrackcand_trajectories',
-            'draw_gftrack_trajectories',
+            'draw_recotracks',
+            'draw_recotrack_trajectories',
             # Specialised options to be used in the CDC local tracking context
             # obtain them from the all_drawoptions property
             # 'draw_segments_id',
@@ -840,17 +830,13 @@ class CDCSVGDisplayModule(Module):
                                         for cdcTrack in tracks)
                     plotter.draw_iterable(iterTrajectories, **styleDict)
 
-        # Draw the genfit track candidates
-        if self.draw_gftrackcands:
+        # Draw the RecoTracks
+        if self.draw_recotracks:
             if self.use_cpp:
-                cppplotter.drawGFTrackCands(self.track_cands_store_array_name, 'ListColors', '')
+                cppplotter.drawRecoTracks(self.reco_tracks_store_array_name, 'ListColors', '')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
-                plotter.draw_storearray(self.track_cands_store_array_name, **styleDict)
-
-        # Draw the genfit track
-        if self.draw_gftracks:
-            cppplotter.drawGFTracks('GF2Tracks', '', '')
+                plotter.draw_storearray(self.reco_tracks_store_array_name, **styleDict)
 
         # Draw interaction point
         if self.draw_interaction_point:
@@ -903,13 +889,13 @@ class CDCSVGDisplayModule(Module):
                                         segments)
                     plotter.draw_iterable(iterTrajectories)
 
-        # Draw the trajectories of the genfit track candidates
-        if self.draw_gftrackcand_trajectories:
+        # Draw the trajectories of the reco tracks
+        if self.draw_recotrack_trajectories:
             if self.use_cpp:
-                cppplotter.drawGFTrackCandTrajectories(self.track_cands_store_array_name, '', '')
+                cppplotter.drawRecoTrackTrajectories(self.reco_tracks_store_array_name, '', '')
             if self.use_python:
-                gftrackcand_storearray = Belle2.PyStoreArray(self.track_cands_store_array_name)
-                if gftrackcand_storearray:
+                recotrack_storearray = Belle2.PyStoreArray(self.reco_tracks_store_array_name)
+                if recotrack_storearray:
                     def color_map(iTrajectory, trajectory):
                         # return "black"
                         return attributemaps.listColors[iTrajectory
@@ -918,10 +904,10 @@ class CDCSVGDisplayModule(Module):
                     styleDict = {'stroke': color_map}
 
                     trajectories = []
-                    for gftrackcand in gftrackcand_storearray:
-                        tMomentum = gftrackcand.getMomSeed()
-                        charge = gftrackcand.getChargeSeed()
-                        tPosition = gftrackcand.getPosSeed()
+                    for recotrack in recotrack_storearray:
+                        tMomentum = recotrack.getMomentumSeed()
+                        charge = recotrack.getChargeSeed()
+                        tPosition = recotrack.getPositionSeed()
 
                         momentum = Belle2.TrackFindingCDC.Vector2D(tMomentum.X(),
                                                                    tMomentum.Y())
@@ -934,10 +920,6 @@ class CDCSVGDisplayModule(Module):
                         trajectories.append(trajectory)
 
                     plotter.draw_iterable(trajectories, **styleDict)
-
-        # Draw the genfit track-trajectories
-        if self.draw_gftrack_trajectories:
-            cppplotter.drawGFTrackTrajectories('GF2Tracks', '', '')
 
         fileName = self.new_output_filename()
         cppfileName = self.new_output_filename()

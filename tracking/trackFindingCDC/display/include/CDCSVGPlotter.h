@@ -82,36 +82,20 @@ namespace Belle2 {
                                       const std::string& strokeWidth);
 
       /**
-       * Draw GFTrackCands.
-       * @param storeArrayName The name of the StoreArray containing the GFTrackCands.
+       * Draw RecoTracks.
+       * @param storeArrayName The name of the StoreArray containing the RecoTracks.
        */
-      void drawGFTrackCands(const std::string& storeArrayName,
-                            const std::string& stroke,
-                            const std::string& strokeWidth);
+      void drawRecoTracks(const std::string& storeArrayName,
+                          const std::string& stroke,
+                          const std::string& strokeWidth);
 
       /**
-       * Draw GFTrackCandTrajectories.
-       * @param storeArrayName The name of the StoreArray containing the GFTrackCands.
+       * Draw RecoTracks trajectories.
+       * @param storeArrayName The name of the StoreArray containing the RecoTracks.
        */
-      void drawGFTrackCandTrajectories(const std::string& storeArrayName,
-                                       const std::string& stroke,
-                                       const std::string& strokeWidth);
-
-      /**
-       * Draw GFTracks.
-       * @param storeArrayName The name of the StoreArray containing the GFTracks.
-       */
-      void drawGFTracks(const std::string& storeArrayName,
-                        const std::string& stroke,
-                        const std::string& strokeWidth);
-
-      /**
-       * Draws GFTrackTrajectories.
-       * @param storeArrayName The name of the StoreArray containing the CDCTracks.
-       */
-      void drawGFTrackTrajectories(const std::string& storeObjName,
-                                   const std::string& stroke,
-                                   const std::string& strokeWidth);
+      void drawRecoTrackTrajectories(const std::string& storeArrayName,
+                                     const std::string& stroke,
+                                     const std::string& strokeWidth);
 
       /**
        * Draw the axial to stereo segment pairs from Monte Carlo truth.

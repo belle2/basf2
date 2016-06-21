@@ -11,7 +11,11 @@
 #include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TestHelpers.h>
 
+#include <boost/filesystem/operations.hpp>
+
 #include <gtest/gtest.h>
+
+#include <fstream>
 
 using namespace Belle2;
 
@@ -29,12 +33,12 @@ namespace {
 
     virtual unsigned int getNumberOfFeatures() const override { return 5; }
     virtual unsigned int getNumberOfEvents() const override { return 20; }
-    virtual void loadEvent(unsigned int) override { };
+    virtual void loadEvent(unsigned int iEvent) override { float f = static_cast<float>(iEvent); m_input = {f + 1, f + 2, f + 3, f + 4, f + 5}; };
     virtual float getSignalFraction() override { return 0.1; };
-    virtual std::vector<float> getFeature(unsigned int) override
+    virtual std::vector<float> getFeature(unsigned int iFeature) override
     {
       std::vector<float> a(20, 0.0);
-      std::iota(a.begin(), a.end(), 0);
+      std::iota(a.begin(), a.end(), iFeature + 1);
       return a;
     }
 
@@ -68,6 +72,11 @@ namespace {
     EXPECT_FLOAT_EQ(x.getSignalFraction(), 1.0);
 
     auto feature = x.getFeature(1);
+    EXPECT_EQ(feature.size(), 1);
+    EXPECT_FLOAT_EQ(feature[0], 2.0);
+
+    // Same result for mother class implementation
+    feature = x.Dataset::getFeature(1);
     EXPECT_EQ(feature.size(), 1);
     EXPECT_FLOAT_EQ(feature[0], 2.0);
 
@@ -107,8 +116,38 @@ namespace {
     auto feature = x.getFeature(1);
     EXPECT_EQ(feature.size(), 10);
     for (unsigned int iEvent = 0; iEvent < 10; ++iEvent) {
-      EXPECT_FLOAT_EQ(feature[iEvent], iEvent * 2);
+      EXPECT_FLOAT_EQ(feature[iEvent], iEvent * 2 + 4);
     };
+
+    // Same result for mother class implementation
+    feature = x.Dataset::getFeature(1);
+    EXPECT_EQ(feature.size(), 10);
+    for (unsigned int iEvent = 0; iEvent < 10; ++iEvent) {
+      EXPECT_FLOAT_EQ(feature[iEvent], iEvent * 2 + 4);
+    };
+
+    // Test without event indices
+    MVA::SubDataset y(general_options, {}, test_dataset);
+    feature = y.getFeature(1);
+    EXPECT_EQ(feature.size(), 20);
+    for (unsigned int iEvent = 0; iEvent < 20; ++iEvent) {
+      EXPECT_FLOAT_EQ(feature[iEvent], iEvent + 4);
+    };
+
+    // Same result for mother class implementation
+    feature = y.Dataset::getFeature(1);
+    EXPECT_EQ(feature.size(), 20);
+    for (unsigned int iEvent = 0; iEvent < 20; ++iEvent) {
+      EXPECT_FLOAT_EQ(feature[iEvent], iEvent + 4);
+    };
+
+    general_options.m_variables = {"a", "d", "e", "DOESNOTEXIST"};
+    try {
+      EXPECT_B2ERROR(MVA::SubDataset(general_options, events, test_dataset));
+    } catch (...) {
+
+    }
+    EXPECT_THROW(MVA::SubDataset(general_options, events, test_dataset), std::runtime_error);
 
   }
 
@@ -127,6 +166,7 @@ namespace {
     tree.Branch("e", &e);
     tree.Branch("f", &f);
     tree.Branch("g", &g);
+    tree.Branch("__weight__", &c);
 
     for (unsigned int i = 0; i < 5; ++i) {
       a = i + 1.0;
@@ -214,6 +254,15 @@ namespace {
     EXPECT_FLOAT_EQ(feature[3], 4.1);
     EXPECT_FLOAT_EQ(feature[4], 5.1);
 
+    // Same result for mother class implementation
+    feature = x.Dataset::getFeature(1);
+    EXPECT_EQ(feature.size(), 5);
+    EXPECT_FLOAT_EQ(feature[0], 1.1);
+    EXPECT_FLOAT_EQ(feature[1], 2.1);
+    EXPECT_FLOAT_EQ(feature[2], 3.1);
+    EXPECT_FLOAT_EQ(feature[3], 4.1);
+    EXPECT_FLOAT_EQ(feature[4], 5.1);
+
     auto weights = x.getWeights();
     EXPECT_EQ(weights.size(), 5);
     EXPECT_FLOAT_EQ(weights[0], 1.2);
@@ -238,6 +287,44 @@ namespace {
     EXPECT_EQ(signals[3], false);
     EXPECT_EQ(signals[4], true);
 
+    // Using __weight__ should work as well,
+    // the only difference to using _weight__ instead of g is
+    // in setBranchAddresses which avoids calling makeROOTCompatible
+    // So we have to check the behaviour using __weight__ as well
+    general_options.m_weight_variable = "__weight__";
+    MVA::ROOTDataset y(general_options);
+
+    weights = y.getWeights();
+    EXPECT_EQ(weights.size(), 5);
+    EXPECT_FLOAT_EQ(weights[0], 1.2);
+    EXPECT_FLOAT_EQ(weights[1], 2.2);
+    EXPECT_FLOAT_EQ(weights[2], 3.2);
+    EXPECT_FLOAT_EQ(weights[3], 4.2);
+    EXPECT_FLOAT_EQ(weights[4], 5.2);
+
+    general_options.m_datafile = "DOESNOTEXIST.root";
+    general_options.m_treename = "tree";
+    try {
+      EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
+    } catch (...) {
+
+    }
+    EXPECT_THROW(MVA::ROOTDataset{general_options}, std::runtime_error);
+
+    general_options.m_datafile = "ISNotAValidROOTFile";
+    general_options.m_treename = "tree";
+
+    {
+      std::ofstream(general_options.m_datafile);
+    }
+    EXPECT_TRUE(boost::filesystem::exists(general_options.m_datafile));
+
+    try {
+      EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
+    } catch (...) {
+
+    }
+    EXPECT_THROW(MVA::ROOTDataset{general_options}, std::runtime_error);
 
 
   }

@@ -13,6 +13,9 @@
 #include <framework/utilities/TestHelpers.h>
 
 #include <framework/database/LocalDatabase.h>
+#include <boost/filesystem/operations.hpp>
+
+#include <fstream>
 
 #include <gtest/gtest.h>
 
@@ -103,15 +106,62 @@ namespace {
 
   }
 
+  TEST(WeightfileTest, StaticSaveLoadDatabase)
+  {
+
+    TestHelpers::TempDirCreator tmp_dir;
+    LocalDatabase::createInstance("TestDatabase.txt");
+
+    MVA::Weightfile weightfile;
+    weightfile.addElement("Test", "a");
+
+    MVA::Weightfile::save(weightfile, "MVAInterfaceTest");
+    auto loaded = MVA::Weightfile::loadFromDatabase("MVAInterfaceTest");
+    EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+    loaded = MVA::Weightfile::load("MVAInterfaceTest");
+    EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+  }
+
+  TEST(WeightfileTest, StaticSaveLoadXML)
+  {
+
+    TestHelpers::TempDirCreator tmp_dir;
+
+    MVA::Weightfile weightfile;
+    weightfile.addElement("Test", "a");
+
+    MVA::Weightfile::save(weightfile, "MVAInterfaceTest.xml");
+    auto loaded = MVA::Weightfile::loadFromXMLFile("MVAInterfaceTest.xml");
+    EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+    loaded = MVA::Weightfile::load("MVAInterfaceTest.xml");
+    EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+  }
+
+  TEST(WeightfileTest, StaticSaveLoadROOT)
+  {
+
+    TestHelpers::TempDirCreator tmp_dir;
+
+    MVA::Weightfile weightfile;
+    weightfile.addElement("Test", "a");
+
+    MVA::Weightfile::save(weightfile, "MVAInterfaceTest.root");
+    auto loaded = MVA::Weightfile::loadFromROOTFile("MVAInterfaceTest.root");
+    EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+    loaded = MVA::Weightfile::load("MVAInterfaceTest.root");
+    EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+  }
+
   TEST(WeightfileTest, StaticDatabase)
   {
 
     TestHelpers::TempDirCreator tmp_dir;
-    /*StoreObjPtr<EventMetaData> evtPtr;
-    DataStore::Instance().setInitializeActive(true);
-    evtPtr.registerInDataStore();
-    DataStore::Instance().setInitializeActive(false);
-    evtPtr.construct(0, 0, 1);*/
     LocalDatabase::createInstance("TestDatabase.txt");
 
     MVA::Weightfile weightfile;
@@ -179,6 +229,41 @@ namespace {
     std::string filename = weightfile.getFileName(".xml");
     unsigned int length = filename.size();
     EXPECT_TRUE(filename.substr(length - 4, length) == ".xml");
+
+    {
+      MVA::Weightfile weightfile2;
+      weightfile2.setRemoveTemporaryDirectories(true);
+      filename = weightfile2.getFileName(".xml");
+      {
+        std::ofstream a(filename);
+      }
+      EXPECT_TRUE(boost::filesystem::exists(filename));
+    }
+    EXPECT_FALSE(boost::filesystem::exists(filename));
+
+    {
+      MVA::Weightfile weightfile2;
+      weightfile2.setRemoveTemporaryDirectories(false);
+      filename = weightfile2.getFileName(".xml");
+      {
+        std::ofstream a(filename);
+      }
+      EXPECT_TRUE(boost::filesystem::exists(filename));
+    }
+    EXPECT_TRUE(boost::filesystem::exists(filename));
+    boost::filesystem::remove_all(filename);
+
+    char* directory_template = strdup("/tmp/Basf2Sub.XXXXXXXXXX");
+    auto tempdir = std::string(mkdtemp(directory_template));
+    {
+      MVA::Weightfile weightfile2;
+      weightfile2.setTemporaryDirectory(tempdir);
+      filename = weightfile2.getFileName(".xml");
+      EXPECT_EQ(filename.substr(0, tempdir.size()), tempdir);
+    }
+    free(directory_template);
+    boost::filesystem::remove_all(tempdir);
+
 
   }
 

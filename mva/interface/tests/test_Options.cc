@@ -71,6 +71,9 @@ namespace {
     EXPECT_EQ(general_options2.m_target_variable, "Target");
     EXPECT_EQ(general_options2.m_weight_variable, "Weight");
 
+    // Test if po::options_description is created without crashing
+    auto description = general_options.getDescription();
+    EXPECT_EQ(description.options().size(), 9);
   }
 
   TEST(OptionsTest, MetaOptions)
@@ -124,6 +127,10 @@ namespace {
     EXPECT_EQ(meta_options2.m_splot_mc_file, "mc.root");
     EXPECT_EQ(meta_options2.m_splot_combined, true);
     EXPECT_EQ(meta_options2.m_splot_boosted, true);
+
+    // Test if po::options_description is created without crashing
+    auto description = meta_options.getDescription();
+    EXPECT_EQ(description.options().size(), 9);
 
   }
 

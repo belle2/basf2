@@ -143,9 +143,10 @@ void DisplayUI::updateUI()
   } else {
     time_t secondsSinceEpoch = eventMetaData->getTime() / 1e9;
     //double subSecondPart = double(eventMetaData->getTime()) / 1e9 - secondsSinceEpoch;
-    char date[30] = "<invalid time>";
-    auto gmt = gmtime(&secondsSinceEpoch);
-    if (gmt)
+    char date[30] = "<Invalid time>";
+    if (secondsSinceEpoch == 0)
+      strcpy(date, "");
+    else if (auto gmt = gmtime(&secondsSinceEpoch))
       strftime(date, 30, "<%Y-%m-%d %H:%M:%S>", gmt);
     m_eventLabel->SetText(TString::Format("Event: \t\t%u\nRun: \t\t%d\nExperiment: \t%d\n\n%s",
                                           eventMetaData->getEvent(),

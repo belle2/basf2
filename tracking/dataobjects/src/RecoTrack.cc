@@ -53,10 +53,12 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
   const TVector3& position = trackCand.getPosSeed();
   const TVector3& momentum = trackCand.getMomSeed();
   const short int charge = trackCand.getChargeSeed();
+  const double time = trackCand.getTimeSeed();
 
   RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge,
                                                  cdcHits.getName(), svdHits.getName(),
                                                  pxdHits.getName(), recoHitInformations.getName());
+  newRecoTrack->setTimeSeed(time);
 
   // TODO Set the covariance seed (that should be done by the tracking package)
   TMatrixDSym covSeed(6);
@@ -108,6 +110,7 @@ genfit::TrackCand RecoTrack::createGenfitTrackCand() const
   // Set the trajectory parameters
   createdTrackCand.setPosMomSeed(getPositionSeed(), getMomentumSeed(), getChargeSeed());
   createdTrackCand.setCovSeed(getSeedCovariance());
+  createdTrackCand.setTimeSeed(getTimeSeed());
 
   // Add the hits
   mapOnHits<UsedCDCHit>(m_storeArrayNameOfCDCHits, [&createdTrackCand](const RecoHitInformation & hitInformation,

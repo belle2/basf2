@@ -26,9 +26,6 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       CDCRLWireHitSegment() {}
 
-      /// Construct from a genfit track candidate.
-      explicit CDCRLWireHitSegment(const genfit::TrackCand& trackCand);
-
       /// Getter for the vector of wires the hits of this segment are based on in the same order
       std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const;
     }; //end class CDCRLWireHitSegment

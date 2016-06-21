@@ -33,20 +33,22 @@ void WireHitMCMultiLoopBlocker::exposeParameters(ModuleParamList* moduleParamLis
 void WireHitMCMultiLoopBlocker::initialize()
 {
   Super::initialize();
-  if (std::isnan(m_param_useNLoops)) return;
-  CDCMCManager::getInstance().requireTruthInformation();
+  if (std::isfinite(m_param_useNLoops)) {
+    CDCMCManager::getInstance().requireTruthInformation();
+  }
 }
 
 void WireHitMCMultiLoopBlocker::beginEvent()
 {
   Super::beginEvent();
-  if (std::isnan(m_param_useNLoops)) return;
-  CDCMCManager::getInstance().fill();
+  if (std::isfinite(m_param_useNLoops)) {
+    CDCMCManager::getInstance().fill();
+  }
 }
 
 void WireHitMCMultiLoopBlocker::apply(std::vector<CDCWireHit>& wireHits)
 {
-  if (std::isnan(m_param_useNLoops)) return;
+  if (not std::isfinite(m_param_useNLoops)) return;
   const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
   auto isWithinMCLoops = [&mcHitLookUp, this](const CDCWireHit & wireHit) {

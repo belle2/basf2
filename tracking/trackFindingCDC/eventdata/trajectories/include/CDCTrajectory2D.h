@@ -79,6 +79,10 @@ namespace Belle2 {
       { return getLocalCircle().arcLengthBetween(Vector2D(0.0, 0.0), point - getLocalOrigin()); }
 
 
+      /// Getter for the position at a given two dimensional arc length
+      Vector2D getPos2DAtArcLength2D(double arcLength2D)
+      { return getLocalOrigin() + getLocalCircle().atArcLength(arcLength2D); }
+
       /// Calculate the travel distance between the two given positions
       /** Returns the travel distance on the trajectory from the first given point to \n
        *  the second given point. This is subjected to a discontinuity at the far point \n

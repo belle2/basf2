@@ -39,3 +39,42 @@ TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory2D_constructorPosM
 
   EXPECT_NEAR(newChargeSign, chargeSign, 10e-7);
 }
+
+
+TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory2D_reconstruct)
+{
+  Vector3D forward(-1.0, 1.0, 10.0);
+  Vector3D backward(1.0, 1.0, -10.0);
+  WireLine wireLine(forward, backward);
+
+  double localPhi0 = M_PI / 3;
+  double localCurv = -2.0;
+  double localImpact = 0.0;
+  PerigeeCircle localPerigeeCircle(localCurv, localPhi0, localImpact);
+  Vector3D localOrigin(0.5, 1, -5);
+
+  Vector3D positionOnWire = wireLine.pos3DAtZ(localOrigin.z());
+  EXPECT_NEAR(localOrigin.x(), positionOnWire.x(), 10e-7);
+  EXPECT_NEAR(localOrigin.y(), positionOnWire.y(), 10e-7);
+  EXPECT_NEAR(localOrigin.z(), positionOnWire.z(), 10e-7);
+
+  CDCTrajectory2D trajectory2D(localOrigin.xy(), localPerigeeCircle);
+  double arcLength2D = trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
+
+  // Check that the old origin is still on the line
+  double distance = trajectory2D.getDist2D(localOrigin.xy());
+  EXPECT_NEAR(0, distance, 10e-7);
+
+  // Extrapolate back to the local origin
+  Vector2D extrapolation2D = trajectory2D.getPos2DAtArcLength2D(-arcLength2D);
+  EXPECT_NEAR(localOrigin.x(), extrapolation2D.x(), 10e-7);
+  EXPECT_NEAR(localOrigin.y(), extrapolation2D.y(), 10e-7);
+
+  Vector3D recoPos3D = trajectory2D.reconstruct3D(wireLine);
+  B2INFO(trajectory2D);
+  B2INFO(recoPos3D);
+
+  EXPECT_NEAR(localOrigin.x(), recoPos3D.x(), 10e-7);
+  EXPECT_NEAR(localOrigin.y(), recoPos3D.y(), 10e-7);
+  EXPECT_NEAR(localOrigin.z(), recoPos3D.z(), 10e-7);
+}

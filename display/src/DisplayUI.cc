@@ -535,7 +535,7 @@ void DisplayUI::makeGui()
 
     {
       TGCheckButton* b = new TGCheckButton(visOptionsFrame, "Cumulative mode (experimental)");
-      b->SetToolTipText("Do not erase previous event, i.e. show data from multiple events.");
+      b->SetToolTipText("Do not erase previous event, i.e. show data from multiple events. This is quite unstable and will crash sooner or later.");
       b->SetState(m_cumulative ? kButtonDown : kButtonUp);
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "toggleCumulative()");
       visOptionsFrame->AddFrame(b, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 0, margin, margin, margin));

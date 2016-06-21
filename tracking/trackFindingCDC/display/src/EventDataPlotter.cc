@@ -467,18 +467,22 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
   // Add attributes if not present
   attributeMap.insert(defaultAttributeMap.begin(), defaultAttributeMap.end());
 
+
+  Vector2D trajectoryExit = trajectory2D.getOuterExit();
+  if (trajectoryExit.hasNAN()) {
+    // Curlers do not leave the CDC
+    // Stop the trajectory at the inner wall to be able to
+    // see the start point
+    trajectoryExit = trajectory2D.getInnerExit();
+  }
+
   if (trajectory2D.getLocalCircle().isCircle()) {
 
     const float radius = trajectory2D.getLocalCircle().absRadius();
 
-    const Vector2D trajectoryExit = trajectory2D.getExit();
-    const float& endX = trajectoryExit.x();
-    const float& endY = trajectoryExit.y();
-
     if (trajectoryExit.hasNAN()) {
       // No exit point out of the cdc could be detected.
       // Draw full circle
-
       const Vector2D center = trajectory2D.getGlobalCircle().center();
       const float radius = trajectory2D.getLocalCircle().absRadius();
       const float& centerX = center.x();
@@ -486,12 +490,13 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
 
       primitivePlotter.drawCircle(centerX, centerY, radius);
 
-
     } else {
-
       const Vector2D start = trajectory2D.getSupport();
       const float& startX = start.x();
       const float& startY = start.y();
+
+      const float& endX = trajectoryExit.x();
+      const float& endY = trajectoryExit.y();
 
       const int curvature = -charge;
       const bool sweepFlag = curvature > 0;
@@ -510,17 +515,15 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
     }
   } else {
     // trajectory is a straight line
-    const Vector2D start = trajectory2D.getSupport();
-    const float& startX = start.x();
-    const float& startY = start.y();
-
-    const Vector2D trajectoryExit = trajectory2D.getExit();
-    const float endX = trajectoryExit.x();
-    const float endY = trajectoryExit.y();
-
     if (trajectoryExit.hasNAN()) {
       B2WARNING("Could not compute point off exit in a straight line case.");
     } else {
+      const Vector2D start = trajectory2D.getSupport();
+      const float& startX = start.x();
+      const float& startY = start.y();
+
+      const float& endX = trajectoryExit.x();
+      const float& endY = trajectoryExit.y();
       primitivePlotter.drawLine(startX, startY, endX, endY, attributeMap);
     }
   }

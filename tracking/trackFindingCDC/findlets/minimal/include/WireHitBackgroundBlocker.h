@@ -31,58 +31,21 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      virtual std::string getDescription() override
-      {
-        return "Marks hits as background based on simple heuristics.";
-      }
+      virtual std::string getDescription() override;
 
       /// Expose the parameters of the wire hit preparation
       virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix = "") override
-      {
-        moduleParamList->addParameter(prefixed(prefix, "blockNegativeDriftLength"),
-                                      m_param_blockNegativeDriftLength,
-                                      "Switch to drop wire hits with negative "
-                                      "drift lengths from output",
-                                      m_param_blockNegativeDriftLength);
-
-        moduleParamList->addParameter(prefixed(prefix, "noiseChargeDeposit"),
-                                      m_param_noiseChargeDeposit,
-                                      "Threshold above which the hit is considered"
-                                      "drift lengths from output",
-                                      m_param_noiseChargeDeposit);
-
-
-
-      }
+                                    const std::string& prefix = "") override;
 
       /// Main algorithm marking the hit of higher loops as background
-      virtual void apply(std::vector<CDCWireHit>& wireHits) override final
-      {
-        for (CDCWireHit& wireHit : wireHits) {
-          bool markAsBackground = false;
-
-          if (wireHit.getRefDriftLength() < 0 and m_param_blockNegativeDriftLength) {
-            markAsBackground = true;
-          }
-
-          if (wireHit.getRefChargeDeposit() < m_param_noiseChargeDeposit) {
-            markAsBackground = true;
-          }
-
-          if (markAsBackground) {
-            wireHit.getAutomatonCell().setBackgroundFlag();
-            wireHit.getAutomatonCell().setTakenFlag();
-          }
-        }
-      }
+      virtual void apply(std::vector<CDCWireHit>& wireHits) override final;
 
     private:
       /// Parameter : Switch to drop negative drift lengths from the created wire hits
       bool m_param_blockNegativeDriftLength = false;
 
-      /// Parameter : Threshold below, which hits are consider noise background
-      double m_param_noiseChargeDeposit = NAN;
+      /// Parameter : Threshold below, which hits are consider electronic noise background
+      double m_param_noiseChargeDeposit = 0;
 
     }; // end class WireHitBackgroundBlocker
 

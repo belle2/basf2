@@ -101,12 +101,17 @@ void Path::forEach(std::string loopObjectName, std::string arrayName, PathPtr pa
   addModule(module);
 }
 
-void Path::addSkimPath(PathPtr skim_path, std::string ds_ID)
+void Path::addIndependentPath(PathPtr independent_path, std::string ds_ID, boost::python::list merge_back)
 {
+  if (ds_ID.empty()) {
+    static int dscount = 1;
+    ds_ID = "DS " + std::to_string(dscount++);
+  }
+  auto mergeBack = PyObjConvUtils::convertPythonObject(merge_back, std::vector<std::string>());
   ModulePtr switchStart = ModuleManager::Instance().registerModule("SwitchDataStore");
-  static_cast<SwitchDataStoreModule&>(*switchStart).init(ds_ID, true);
+  static_cast<SwitchDataStoreModule&>(*switchStart).init(ds_ID, true, mergeBack);
   ModulePtr switchEnd = ModuleManager::Instance().registerModule("SwitchDataStore");
-  static_cast<SwitchDataStoreModule&>(*switchEnd).init("", false);
+  static_cast<SwitchDataStoreModule&>(*switchEnd).init("", false, mergeBack);
   switchStart->setName("SwitchDataStore ('' -> '" + ds_ID + "')");
   switchEnd->setName("SwitchDataStore ('' <- '" + ds_ID + "')");
 
@@ -118,7 +123,7 @@ void Path::addSkimPath(PathPtr skim_path, std::string ds_ID)
   }
 
   addModule(switchStart);
-  addPath(skim_path);
+  addPath(independent_path);
   addModule(switchEnd);
 }
 
@@ -219,7 +224,7 @@ including those made to the loop variable (it will simply modify the i'th item i
 Arrays / objects of event durability created inside the loop will however be limited to the validity of the loop variable. That is,
 creating a list of Particles matching the current MCParticle (loop object) will no longer exist after switching
 to the next MCParticle or exiting the loop.)", args("loopObjectName", "arrayName", "path"))
-  .def("_add_skim_path", &Path::addSkimPath)
+  .def("_add_independent_path", &Path::addIndependentPath)
   .def("__contains__", &Path::contains, R"(Does this Path contain a module of the given type?
 
     >>> path = create_path()

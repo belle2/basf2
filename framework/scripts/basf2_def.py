@@ -445,7 +445,7 @@ def _add_module(self, module, logLevel=None, debugLevel=None, **kwargs):
 Path.add_module = _add_module
 
 
-def _add_skim_path(self, skim_path, ds_ID=''):
+def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=[]):
     """
     Add given path at the end of this path and ensure all modules there
     do not influence the main DataStore. You can thus use modules in
@@ -454,13 +454,13 @@ def _add_skim_path(self, skim_path, ds_ID=''):
     skim_path.
     ds_ID can be specified to give a defined ID to the temporary DataStore,
     otherwise, a random name will be generated.
+    merge_back_event is a list of object/array names (of event durability)
+    that will be merged back into the main path.
     """
-    if not ds_ID:
-        import random
-        ds_ID = 'skim' + str(random.randint(0, 4000000))
-    self._add_skim_path(skim_path, ds_ID)
+    self._add_independent_path(skim_path, ds_ID, merge_back_event)
 
-Path.add_skim_path = _add_skim_path
+Path.add_independent_path = _add_independent_path
+Path.add_skim_path = _add_independent_path  # TODO deprecate
 
 
 def serialize_value(module, parameter):

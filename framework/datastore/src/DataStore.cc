@@ -724,7 +724,15 @@ void DataStore::switchID(const std::string& id)
   m_storeEntryMap.switchID(id);
 }
 
-void DataStore::copyContentsTo(const std::string& id) { m_storeEntryMap.copyContentsTo(id); }
+void DataStore::copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event)
+{
+  m_storeEntryMap.copyEntriesTo(id, entrylist_event);
+}
+
+void DataStore::copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event)
+{
+  m_storeEntryMap.copyContentsTo(id, entrylist_event);
+}
 
 
 DataStore::SwitchableDataStoreContents::SwitchableDataStoreContents():
@@ -739,26 +747,59 @@ void DataStore::SwitchableDataStoreContents::createNewDataStoreID(const std::str
   if (m_idToIndexMap.count(id) > 0)
     return;
 
-  int newidx = m_entries.size();
-  m_idToIndexMap[id] = newidx;
+  copyEntriesTo(id);
+  //copy actual contents, fixing pointers
+  copyContentsTo(id);
+}
+void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event)
+{
+  int targetidx;
+  if (m_idToIndexMap.count(id) == 0) {
+    //new DataStore & full copy
+    if (!entrylist_event.empty())
+      B2FATAL("entrlylist_event given for new DS id. This shouldn't happen, report to framework author.");
+    targetidx = m_entries.size();
+    m_idToIndexMap[id] = targetidx;
 
-  //copy entries
-  m_entries.push_back(m_entries[m_currentIdx]);
+    //copy entries
+    m_entries.push_back(m_entries[m_currentIdx]);
+  } else if (!entrylist_event.empty()) {
+    //copy only given entries (in c_Event)
+    targetidx = m_idToIndexMap.at(id);
+    for (auto entryname : entrylist_event) {
+      if (m_entries[m_currentIdx][c_Event].count(entryname) == 0)
+        continue;
+      if (m_entries[targetidx][c_Event].count(entryname) != 0) {
+        B2WARNING("Independent path: entry '" << entryname << "' already exists in DataStore '" << id <<
+                  "'! This will likely break something.");
+      }
+      m_entries[targetidx][c_Event][entryname] = m_entries[m_currentIdx][c_Event][entryname];
+    }
+  } else {
+    B2FATAL("no entrlylist_event given, not new DS id. This shouldn't happen, report to framework author.");
+  }
+
   //fix duplicate pointers
-  for (auto& map : m_entries[newidx]) {
-    for (auto& entrypair : map) {
+  for (int iDurability = 0; iDurability < c_NDurabilityTypes; iDurability++) {
+    for (auto& entrypair : m_entries[targetidx][iDurability]) {
       if (not entrypair.second.object)
         B2FATAL("createNewDataStoreID(): object '" << entrypair.first << " already null (this should never happen).");
+      if (!entrylist_event.empty()) {
+        //skip all entries of other durabilities
+        if (iDurability != c_Event)
+          continue;
+        //skip all entries not found in entrylist_event
+        if (std::find(entrylist_event.begin(), entrylist_event.end(), entrypair.first) == entrylist_event.end())
+          continue;
+      }
 
       entrypair.second.object = nullptr; //remove duplicate ownership
       entrypair.second.ptr = nullptr;
     }
   }
-  //copy actual contents, fixing pointers
-  copyContentsTo(id);
 }
 
-void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& id)
+void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event)
 {
   int targetidx = m_idToIndexMap.at(id);
   auto& targetMaps = m_entries[targetidx];
@@ -768,8 +809,18 @@ void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& i
     for (const auto& entrypair : sourceMaps[iDurability]) {
       const StoreEntry& fromEntry = entrypair.second;
       //does this exist in target?
-      if (targetMaps[iDurability].count(fromEntry.name) == 0)
+      if (targetMaps[iDurability].count(fromEntry.name) == 0) {
         continue;
+      }
+
+      if (!entrylist_event.empty()) {
+        //skip all entries of other durabilities
+        if (iDurability != c_Event)
+          continue;
+        //skip all entries not found in entrylist_event
+        if (std::find(entrylist_event.begin(), entrylist_event.end(), fromEntry.name) == entrylist_event.end())
+          continue;
+      }
 
       StoreEntry& target = targetMaps[iDurability][fromEntry.name];
 

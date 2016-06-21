@@ -24,7 +24,7 @@ namespace Belle2 {
      */
     SwitchDataStoreModule();
     /** setter for Path. */
-    void init(std::string to, bool doCopy);
+    void init(std::string to, bool doCopy, std::vector<std::string> mergeBack);
 
     ~SwitchDataStoreModule();
 
@@ -38,5 +38,6 @@ namespace Belle2 {
     std::string m_from; /**< active DataStore ID before this module. */
     std::string m_to; /**< active DataStore ID after this module. */
     bool m_doCopy; /**< should data be copied to m_to? */
+    std::vector<std::string> m_mergeBack; /** list of obj/arrays that should be copied to m_to regardless of m_doCopy. */
   };
 }

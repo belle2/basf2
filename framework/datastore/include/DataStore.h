@@ -565,8 +565,10 @@ namespace Belle2 {
     std::string currentID() const;
     /** switch to DataStore with given ID. */
     void switchID(const std::string& id);
+    /** copy entries (not contents) of current DataStore to the DataStore with given ID. */
+    void copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
     /** copy contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
-    void copyContentsTo(const std::string& id);
+    void copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
 
   private:
     /** Hidden constructor, as it is a singleton.*/
@@ -627,8 +629,10 @@ namespace Belle2 {
       void switchID(const std::string& id);
       /** returns ID of current DataStore. */
       const std::string& currentID() const { return m_currentID; }
+      /** copy entries (not contents) of current DataStore to the DataStore with given ID. */
+      void copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
       /** copy contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
-      void copyContentsTo(const std::string& id);
+      void copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
       /** creates new datastore with given id, copying the registered objects/arrays from the current one. */
       void createNewDataStoreID(const std::string& id);
     private:

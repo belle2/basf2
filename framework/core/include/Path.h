@@ -17,6 +17,11 @@
 
 #include <list>
 
+namespace boost {
+  namespace python {
+    class list;
+  }
+}
 
 namespace Belle2 {
 
@@ -108,7 +113,7 @@ namespace Belle2 {
     void forEach(std::string loopObjectName, std::string arrayName, PathPtr path);
 
     /** See 'pydoc3 basf2.Path' */
-    void addSkimPath(PathPtr skim_path, std::string ds_ID);
+    void addIndependentPath(PathPtr independent_path, std::string ds_ID, boost::python::list merge_back);
 
     /** return a string of the form [module a -> module b -> [another path]]
      *

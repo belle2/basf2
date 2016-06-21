@@ -14,6 +14,7 @@
 
 using namespace Belle2;
 
+//REG_MODLUE needed for --execute-path functionality
 //Note: should not appear in module list since we're not in the right directory
 REG_MODULE(SwitchDataStore)
 
@@ -24,15 +25,17 @@ SwitchDataStoreModule::SwitchDataStoreModule() : Module()
   addParam("toID", m_to, "active DataStore id after this module", std::string(""));
   addParam("doCopy", m_doCopy,
            "should data be copied to DataStore 'toID'? This should be true only when toID refers to a _new_ DataStore ID", false);
+  addParam("mergeBack", m_mergeBack, "if given, copy the given objects/arrays over even if doCopy is fals.", std::vector<std::string> {});
 }
 
 SwitchDataStoreModule::~SwitchDataStoreModule()
 {
 }
-void SwitchDataStoreModule::init(std::string to, bool doCopy)
+void SwitchDataStoreModule::init(std::string to, bool doCopy, std::vector<std::string> mergeBack)
 {
   m_to = to;
   m_doCopy = doCopy;
+  m_mergeBack = mergeBack;
 }
 
 void SwitchDataStoreModule::initialize()
@@ -48,6 +51,11 @@ void SwitchDataStoreModule::initialize()
   if (m_doCopy) {
     //create DataStore ID that doesn't exist yet (copying contents)
     DataStore::Instance().createNewDataStoreID(m_to);
+  } else if (!m_mergeBack.empty()) {
+    //if m_mergeBack is set, we need to register the objects/arrays there, too!
+    DataStore::Instance().copyEntriesTo(m_to, m_mergeBack);
+    //then copy
+    DataStore::Instance().copyContentsTo(m_to, m_mergeBack);
   }
 
   //switch
@@ -59,6 +67,7 @@ void SwitchDataStoreModule::terminate()
     //copy contents over
     DataStore::Instance().copyContentsTo(m_from);
   }
+  //nothing merged back. this is not really consistent anyway.
 
   //terminate() is called in reverse order.
   DataStore::Instance().switchID(m_from);
@@ -77,6 +86,8 @@ void SwitchDataStoreModule::event()
   if (m_doCopy) {
     //copy contents over
     DataStore::Instance().copyContentsTo(m_to);
+  } else if (!m_mergeBack.empty()) {
+    DataStore::Instance().copyContentsTo(m_to, m_mergeBack);
   }
 
   DataStore::Instance().switchID(m_to);

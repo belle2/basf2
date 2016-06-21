@@ -59,12 +59,6 @@ namespace Belle2 {
                                       "'outwards', "
                                       "'downwards'.",
                                       m_param_flightTimeEstimation);
-
-        moduleParamList->addParameter(prefixed(prefix, "dropNegativeDriftLength"),
-                                      m_param_dropNegativeDriftLength,
-                                      "Switch to drop wire hits with negative "
-                                      "drift lengths from output",
-                                      m_param_dropNegativeDriftLength);
       }
 
       /// Signals the start of the event processing
@@ -161,12 +155,10 @@ namespace Belle2 {
                                          wire->getRefZ(),
                                          0); //theta
 
-          if (refDriftLength > 0 or not m_param_dropNegativeDriftLength) {
-            outputWireHits.push_back(CDCWireHit(&hit,
-                                                refDriftLength,
-                                                refDriftLengthVariance,
-                                                refChargeDeposit));
-          }
+          outputWireHits.push_back(CDCWireHit(&hit,
+                                              refDriftLength,
+                                              refDriftLengthVariance,
+                                              refChargeDeposit));
 
         }
 
@@ -178,9 +170,6 @@ namespace Belle2 {
       }
 
     private:
-      /// Parameter : Switch to drop negative drift lengths from the created wire hits
-      bool m_param_dropNegativeDriftLength = false;
-
       /// Parameter : Method for the initial time of flight estimation as string
       std::string m_param_flightTimeEstimation = "none";
 

@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitCreator.h>
+#include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundBlocker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitTopologyFiller.h>
 
@@ -35,6 +36,7 @@ namespace Belle2 {
       WireHitTopologyPreparer()
       {
         addProcessingSignalListener(&m_wireHitCreator);
+        addProcessingSignalListener(&m_wireHitBackgroundBlocker);
         addProcessingSignalListener(&m_wireHitMCMultiLoopBlocker);
         addProcessingSignalListener(&m_wireHitTopologyFiller);
       }
@@ -51,6 +53,7 @@ namespace Belle2 {
                                     const std::string& prefix = "") override
       {
         m_wireHitCreator.exposeParameters(moduleParamList, prefix);
+        m_wireHitBackgroundBlocker.exposeParameters(moduleParamList, prefix);
         m_wireHitMCMultiLoopBlocker.exposeParameters(moduleParamList, prefix);
         m_wireHitTopologyFiller.exposeParameters(moduleParamList, prefix);
       }
@@ -59,6 +62,7 @@ namespace Belle2 {
       virtual void apply(std::vector<CDCWireHit>& outputWireHits) override final
       {
         m_wireHitCreator.apply(outputWireHits);
+        m_wireHitBackgroundBlocker.apply(outputWireHits);
         m_wireHitMCMultiLoopBlocker.apply(outputWireHits);
         m_wireHitTopologyFiller.apply(outputWireHits);
       }
@@ -68,7 +72,10 @@ namespace Belle2 {
       /// Creates the wire hits from CDCHits attaching geometry information.
       WireHitCreator m_wireHitCreator;
 
-      /// Creates the wire hits from CDCHits attaching geometry information.
+      /// Marks hits as background based on simple heuristics
+      WireHitBackgroundBlocker m_wireHitBackgroundBlocker;
+
+      /// Marks higher order loops as background for tuning analysis
       WireHitMCMultiLoopBlocker m_wireHitMCMultiLoopBlocker;
 
       /// Publishes the created wire hits to the wire hit topology.

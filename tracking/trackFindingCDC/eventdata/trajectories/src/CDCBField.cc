@@ -88,7 +88,7 @@ double TrackFindingCDC::absMom2DToBendRadius(const double absMom2D,
                                              const double bZ)
 {
   // In case of zero magnetic field return something large
-  return std::fmin(222, absMom2D / (bZ * 0.00299792458));
+  return std::fmin(4440, absMom2D / (bZ * 0.00299792458));
 }
 
 double TrackFindingCDC::absMom2DToBendRadius(const double absMom2D,
@@ -127,7 +127,7 @@ double TrackFindingCDC::absMom2DToCurvature(const double absMom2D,
 double TrackFindingCDC::curvatureToAbsMom2D(const double curvature,
                                             const double bZ)
 {
-  return std::fmin(1, std::fabs(bZ * 0.00299792458 / curvature));
+  return std::fmin(20, std::fabs(bZ * 0.00299792458 / curvature));
 }
 
 double TrackFindingCDC::curvatureToAbsMom2D(const double curvature,

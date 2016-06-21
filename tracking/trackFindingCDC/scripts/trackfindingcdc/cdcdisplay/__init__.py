@@ -236,7 +236,7 @@ class CDCSVGDisplayModule(Module):
         self.filename_prefix = "CDCDisplay"
 
         #: Use time instead of prefix in filename
-        self.use_time_in_filename = True or False
+        self.use_time_in_filename = False
 
     @property
     def drawoptions(self):

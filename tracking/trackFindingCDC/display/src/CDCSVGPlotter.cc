@@ -26,6 +26,31 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+namespace {
+
+  template<bool a_drawTrajectory, class AObject>
+  struct DrawTrajectoryHelper;
+
+  template<class AObject>
+  struct DrawTrajectoryHelper<true, AObject> {
+  public:
+    static void draw(EventDataPlotter& plotter, AObject& object, const AttributeMap& attributeMap)
+    {
+      plotter.drawTrajectory(object, attributeMap);
+    }
+  };
+
+  template<class AObject>
+  struct DrawTrajectoryHelper<false, AObject> {
+  public:
+    static void draw(EventDataPlotter& plotter, AObject& object, const AttributeMap& attributeMap)
+    {
+      plotter.draw(object, attributeMap);
+    }
+  };
+}
+
+
 CDCSVGPlotter::CDCSVGPlotter(bool animate)
   : m_animate(animate),
     m_eventdataPlotter(animate)
@@ -44,7 +69,7 @@ CDCSVGPlotter::CDCSVGPlotter(bool animate)
   m_eventdataPlotter.setCanvasWidth(default_width);
 }
 
-template<class AIterable, class AColorizer>
+template<bool a_drawTrajectory, class AIterable, class AColorizer>
 void CDCSVGPlotter::drawIterable(const AIterable& iterable, AColorizer& colorizer)
 {
   unsigned int c_Item = 0;
@@ -53,20 +78,19 @@ void CDCSVGPlotter::drawIterable(const AIterable& iterable, AColorizer& colorize
     if (!colorizer.isStrokeWidthSet()) {
       for (const auto& item : iterable) {
         obj_styling["stroke"] = colorizer.mapStroke(c_Item, item);
-        draw(item, obj_styling);
+        draw<a_drawTrajectory>(item, obj_styling);
         ++c_Item;
       }
     } else
       for (const auto& item : iterable) {
         obj_styling["stroke"] = colorizer.mapStroke(c_Item, item);
         obj_styling["stroke-width"] = colorizer.mapStrokeWidth(c_Item, item);
-
-        draw(item, obj_styling);
-        c_Item++;
+        draw<a_drawTrajectory>(item, obj_styling);
+        ++c_Item;
       }
   } else
     for (const auto& item : iterable) {
-      draw(item, obj_styling);
+      draw<a_drawTrajectory>(item, obj_styling);
       ++c_Item;
     }
 }
@@ -203,25 +227,9 @@ void CDCSVGPlotter::drawCDCTracks(const std::string& storeObjName, const std::st
 
 void CDCSVGPlotter::drawRecoTrackTrajectories(const std::string& storeArrayName, const std::string&, const std::string&)
 {
-  B2INFO("Drawing trajectories of the exported RecoTracks");
   StoreArray<RecoTrack> storeArray(storeArrayName);
-  if (storeArray) {
-    B2INFO("#RecoTracks: " << storeArray.getEntries());
-    ListColorsColorizer<CDCTrajectory2D> colorizer;
-    std::vector<CDCTrajectory2D> trajectories;
-    for (const RecoTrack& recoTrack : storeArray) {
-      const TVector3& tPosition = recoTrack.getPositionSeed();
-      const TVector3& tMomentum = recoTrack.getMomentumSeed();
-      double charge = recoTrack.getChargeSeed();
-
-      Vector2D momentum(tMomentum.x(), tMomentum.Y());
-      Vector2D position(tPosition.x(), tPosition.Y());
-
-      CDCTrajectory2D trajectory(position, momentum, charge);
-      trajectories.push_back(trajectory);
-    }
-    drawIterable(trajectories, colorizer);
-  } else B2WARNING("No Genfit tracks present");
+  const bool drawTrajectories = true;
+  drawStoreArray<ListColorsColorizer<RecoTrack>, drawTrajectories>(storeArray, storeArrayName);
 }
 
 void CDCSVGPlotter::drawRecoTracks(const std::string& storeArrayName, const std::string&, const std::string&)
@@ -333,66 +341,36 @@ void CDCSVGPlotter::drawAxialStereoSegmentPairs(const std::string& storeObjName,
   drawStoreVector<ListColorsColorizer<CDCSegmentPair>>(storedCDCAxialStereoSegmentPairs, storeObjName);
 }
 
-void CDCSVGPlotter::drawCDCWireHitClusters(const std::string& storeObjName, const std::string& stroke,
+void CDCSVGPlotter::drawCDCWireHitClusters(const std::string& storeObjName,
+                                           const std::string& stroke,
                                            const std::string&)
 {
   StoreWrappedObjPtr<std::vector<CDCWireHitCluster>> storedCDCWireHitClusters(storeObjName);
   drawStoreVector<ListColorsColorizer<CDCWireHitCluster>>(storedCDCWireHitClusters, storeObjName, stroke);
 }
 
-void CDCSVGPlotter::drawSegmentTrajectories(const std::string& storeObjName, const std::string&,
+void CDCSVGPlotter::drawSegmentTrajectories(const std::string& storeObjName,
+                                            const std::string&,
                                             const std::string&)
 {
-  B2INFO("Drawing the fits to the selected RecoHit2DSegments");
-
   StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedRecoSegments(storeObjName);
-  if (storedRecoSegments) {
-    std::vector<CDCRecoSegment2D>& recoSegments = *storedRecoSegments;
-
-    B2INFO("#2D Trajectories " << recoSegments.size() << " from segments");
-
-    std::vector<CDCTrajectory2D> trajectories;
-
-    for (auto segment : recoSegments) {
-      trajectories.push_back(segment.getTrajectory2D());
-    }
-
-    InputValueColorizer<CDCTrajectory2D> colorizer;
-    drawIterable(trajectories, colorizer);
-  } else
-    B2INFO(storeObjName << "does not exist in current DataStore");
+  const bool drawTrajectories = true;
+  drawStoreVector<InputValueColorizer<CDCRecoSegment2D>, drawTrajectories>(storedRecoSegments, storeObjName);
 }
 
 void CDCSVGPlotter::drawTrackTrajectories(const std::string& storeObjName,
                                           const std::string&,
                                           const std::string&)
 {
-  B2INFO("Drawing the fits to the selected RecoHit2DSegments");
-
   StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(storeObjName);
-  if (storedTracks) {
-    std::vector<CDCTrack>& tracks = *storedTracks;
-
-    B2INFO("#2D Trajectories " << tracks.size() << " from tracks");
-
-    std::vector<CDCTrajectory2D> trajectories;
-
-    for (auto track : tracks) {
-      trajectories.push_back(track.getStartTrajectory3D().getTrajectory2D());
-    }
-
-    InputValueColorizer<CDCTrajectory2D> colorizer;
-    drawIterable(trajectories, colorizer);
-  } else
-    B2INFO(storeObjName << "does not exist in current DataStore");
+  const bool drawTrajectories = true;
+  drawStoreVector<InputValueColorizer<CDCTrack>, drawTrajectories>(storedTracks, storeObjName);
 }
 
-
-
-template<class AObject>
+template<bool a_drawTrajectory, class AObject>
 void CDCSVGPlotter::draw(const AObject& obj, const std::map<std::string, std::string>& obj_attributes)
 {
-  m_eventdataPlotter.draw(obj, obj_attributes);
+  DrawTrajectoryHelper<a_drawTrajectory, const AObject>::draw(m_eventdataPlotter, obj, obj_attributes);
 }
 
 void CDCSVGPlotter::drawWires(const CDCWireTopology& cdcWireTopology)
@@ -418,12 +396,18 @@ const std::string CDCSVGPlotter::saveSVGFile(const std::string& svgFileName)
   return (m_eventdataPlotter.save(svgFileName));
 }
 
-template<class AColorizer, class AObject>
-void CDCSVGPlotter::drawStoreArray(const StoreArray<AObject>& storeArray, const std::string& storeArrayName,
+template<class AColorizer, bool a_drawTrajectories, class AObject>
+void CDCSVGPlotter::drawStoreArray(const StoreArray<AObject>& storeArray,
+                                   const std::string& storeArrayName,
                                    const std::string& stroke,
                                    const std::string& strokeWidth)
 {
-  B2INFO("Drawing StoreArray: " << storeArrayName);
+  if (a_drawTrajectories) {
+    B2INFO("Drawing trajectories from StoreArray: " << storeArrayName);
+  } else {
+    B2INFO("Drawing StoreArray: " << storeArrayName);
+  }
+
   if (storeArray) {
     B2INFO("with " << storeArray.getEntries() << " entries");
     AColorizer colorizer;
@@ -436,7 +420,7 @@ void CDCSVGPlotter::drawStoreArray(const StoreArray<AObject>& storeArray, const 
       colorizer.setStrokeWidth(strokeWidth);
     if (colorizer.isStrokeWidthSet())
       B2INFO("stroke-width: " << colorizer.printStrokeWidthAttribute());
-    drawIterable(storeArray, colorizer);
+    drawIterable<a_drawTrajectories>(storeArray, colorizer);
   } else {
     B2WARNING(storeArrayName << " not present in the DataStore");
     B2INFO("Current content of the DataStore:");
@@ -450,12 +434,17 @@ void CDCSVGPlotter::drawStoreArray(const StoreArray<AObject>& storeArray, const 
   }
 }
 
-template<class AColorizer, class AItem>
-void CDCSVGPlotter::drawStoreVector(const StoreWrappedObjPtr<std::vector<AItem>>& storeVector, const std::string& storeObjName,
+template<class AColorizer, bool a_drawTrajectories, class AItem>
+void CDCSVGPlotter::drawStoreVector(const StoreWrappedObjPtr<std::vector<AItem>>& storeVector,
+                                    const std::string& storeObjName,
                                     const std::string& stroke,
                                     const std::string& strokeWidth)
 {
-  B2INFO("Drawing vector from DataStore: " << storeObjName);
+  if (a_drawTrajectories) {
+    B2INFO("Drawing trajectories for vector from DataStore: " << storeObjName);
+  } else {
+    B2INFO("Drawing vector from DataStore: " << storeObjName);
+  }
   if (storeVector) {
     std::vector<AItem>& vector = *storeVector;
     B2INFO("with " << vector.size() << " entries");
@@ -469,7 +458,7 @@ void CDCSVGPlotter::drawStoreVector(const StoreWrappedObjPtr<std::vector<AItem>>
       colorizer.setStrokeWidth(strokeWidth);
     if (colorizer.isStrokeWidthSet())
       B2INFO("stroke-width: " << colorizer.printStrokeWidthAttribute());
-    drawIterable(vector, colorizer);
+    drawIterable<a_drawTrajectories>(vector, colorizer);
   } else {
     B2WARNING(storeObjName << " not present in the DataStore");
     B2INFO("Current content of the DataStore:");

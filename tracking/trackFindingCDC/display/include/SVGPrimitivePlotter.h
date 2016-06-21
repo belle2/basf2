@@ -51,8 +51,6 @@ namespace Belle2 {
       /**
        *  Adds a line to the plot
        *
-       *  Base implementation only updates the bounding box.
-       *
        *  @param startX        x coordinate where the line starts.
        *  @param startY        y coordinate where the line starts.
        *  @param endX          x coordinate where the line ends.
@@ -67,8 +65,6 @@ namespace Belle2 {
 
       /**
        *  Adds an arrow to the plot
-       *
-       *  Base implementation only updates the bounding box.
        *
        *  @param startX        x coordinate where the arrow starts.
        *  @param startY        y coordinate where the arrow starts.
@@ -86,8 +82,6 @@ namespace Belle2 {
       /**
        *  Adds a circle to the plot
        *
-       *  Base implementation only updates the bounding box.
-       *
        *  @param centerX        x coordinate of the circle center.
        *  @param centerY        y coordinate of the circle center.
        *  @param radius         radius of the circle
@@ -100,8 +94,6 @@ namespace Belle2 {
 
       /**
        *  Adds a circle arc to the plot
-       *
-       *  Base implementation only updates the bounding box.
        *
        *  @param startX        x coordinate where the line starts.
        *  @param startY        y coordinate where the line starts.
@@ -123,17 +115,11 @@ namespace Belle2 {
 
       /**
        *  Indicates the start of a group of drawn elements. Meaning depends on the actual implementation.
-       *
-       *  Does nothing in the base implementation
-       *
        */
       virtual void startGroup(const AttributeMap& attributeMap = AttributeMap()) override;
 
       /**
        *  Indicates the end of a group of drawn elements. Meaning depends on the actual implementation.
-       *
-       *  Does nothing in the base implementation
-       *
        */
       virtual void endGroup() override;
 
@@ -151,8 +137,6 @@ namespace Belle2 {
 
       /**
        *  Clears all drawed elements from the plotter.
-       *
-       *  Base implementation only updates the bounding box.
        */
       virtual void clear() override;
 

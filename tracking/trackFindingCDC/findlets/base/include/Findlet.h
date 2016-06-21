@@ -28,11 +28,11 @@ namespace Belle2 {
       using IOTypes = std::tuple<AIOTypes...>;
 
     protected:
-      /// Only forward a range for immutable types
+      /// Forward a range of mutable objects
       template<class T>
       struct ToVectorImpl {
         /// A mutable range of Ts.
-        using Type = std::vector<T>;
+        using Type = std::vector<typename std::remove_reference<T>::type >;
       };
 
       /// Specialisation to only forward a range for immutable types.

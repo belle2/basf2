@@ -30,7 +30,7 @@ namespace Belle2 {
     class FindletModule : public Module {
 
     private:
-      /// Tuple of inpurt/ output types of the findlet
+      /// Tuple of input / output types of the findlet
       using IOTypes = typename AFindlet::IOTypes;
 
       /// Accessor for the individual coordinate difference types.
@@ -39,7 +39,11 @@ namespace Belle2 {
 
       /// Accessor for the individual coordinate difference types.
       template<std::size_t I>
-      using StoreVector = StoreWrappedObjPtr< std::vector<typename std::remove_const<IOType<I> >::type> >;
+      using StrippedIOType = typename std::remove_reference<typename std::remove_const<IOType<I> >::type>::type;
+
+      /// Accessor for the individual coordinate difference types.
+      template<std::size_t I>
+      using StoreVector = StoreWrappedObjPtr< std::vector<StrippedIOType<I> > >;
 
       /// Number of typpes served to the findlet
       static const std::size_t c_nTypes = std::tuple_size<IOTypes>::value;
@@ -121,17 +125,24 @@ namespace Belle2 {
         evalVariadic((registerStoreVector<Is>(), std::ignore) ...);
       }
 
+      /** Check if the given io type designates an input store vector
+       *  Only types that are marked as constant or reference are input.
+       */
+      template<std::size_t I>
+      bool isInputStoreVector()
+      {
+        return std::is_const<IOType<I> >::value or std::is_reference<IOType<I> >::value;
+      }
+
       /** Require the vector with index I to be on the DataStore.
-       *  Only types that are marked as constant are required to be on
-       *  the DataStore.  Before this module. Others are generally
+       *  Only types that are marked as constant or reference are required to be on
+       *  the DataStore before this module. Others are generally
        *  output vectors and need to be registered only.
        */
       template<std::size_t I>
       void requireStoreVector()
       {
-        // Require only IOTypes that are marked as constant
-        bool required = std::is_const<IOType<I> >::value;
-        if (required) {
+        if (isInputStoreVector<I>()) {
           getStoreVector<I>().isRequired();
         }
       }
@@ -140,13 +151,22 @@ namespace Belle2 {
       template<std::size_t I>
       void registerStoreVector()
       {
-        getStoreVector<I>().registerInDataStore(DataStore::c_DontWriteOut);
+        if (not isInputStoreVector<I>()) {
+          getStoreVector<I>().registerInDataStore(DataStore::c_DontWriteOut);
+        }
       }
 
       /** Create the vector with index I on the DataStore.*/
       template<std::size_t I>
       void createStoreVector()
       {
+        if (not isInputStoreVector<I>() and getStoreVector<I>().isValid()) {
+          B2WARNING("Output StoreVector for "
+                    << getStoreVectorParameterName<I>()
+                    << " already created in the DataStore with name "
+                    << m_param_storeVectorNames[I]);
+        }
+
         if (not getStoreVector<I>().isValid()) {
           getStoreVector<I>().construct();
         }
@@ -169,16 +189,8 @@ namespace Belle2 {
       template<std::size_t I>
       void addStoreVectorParameter()
       {
-        bool primary = I == GetIndexInTuple<IOType<I>, IOTypes>::value;
-        int order = primary ? 1 : 2;
-        // Cannot distinguish more than two different positions of the same type as of yet...
-        bool input = std::is_const<IOType<I> >::value;
-        using NonConstIOType = typename std::remove_const<IOType<I> >::type;
-        std::string classParameterName = m_classMnemomics.getParameterName(static_cast<NonConstIOType*>(nullptr));
-        std::string classParameterDescription = m_classMnemomics.getParameterDescription(static_cast<NonConstIOType*>(nullptr));
-
-        std::string name = getStoreVectorParameterName(classParameterName, order, input);
-        std::string description = getStoreVectorParameterDescription(classParameterDescription, order, input);
+        std::string name = getStoreVectorParameterName<I>();
+        std::string description = getStoreVectorParameterDescription<I>();
         if (m_param_storeVectorNames[I] == "") {
           // Make a forced parameter
           this->addParam(name,
@@ -191,6 +203,28 @@ namespace Belle2 {
                          description,
                          m_param_storeVectorNames[I]);
         }
+      }
+
+      /** Get parameter name for the StoreVector at index I */
+      template<std::size_t I>
+      std::string getStoreVectorParameterName()
+      {
+        bool primary = I == GetIndexInTuple<IOType<I>, IOTypes>::value;
+        int order = primary ? 1 : 2;
+        bool input = isInputStoreVector<I>();
+        std::string classParameterName = m_classMnemomics.getParameterName(static_cast<StrippedIOType<I>*>(nullptr));
+        return getStoreVectorParameterName(classParameterName, order, input);
+      }
+
+      /** Get parameter description for the StoreVector at index I */
+      template<std::size_t I>
+      std::string getStoreVectorParameterDescription()
+      {
+        bool primary = I == GetIndexInTuple<IOType<I>, IOTypes>::value;
+        int order = primary ? 1 : 2;
+        bool input = isInputStoreVector<I>();
+        std::string classParameterDescription = m_classMnemomics.getParameterDescription(static_cast<StrippedIOType<I>*>(nullptr));
+        return getStoreVectorParameterName(classParameterDescription, order, input);
       }
 
       /** Compose a parameter name for the name of the vector on the DataStore.

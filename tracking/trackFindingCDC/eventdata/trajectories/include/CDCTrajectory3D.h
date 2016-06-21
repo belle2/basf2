@@ -286,6 +286,12 @@ namespace Belle2 {
         return result;
       }
 
+      /// Output helper for debugging
+      friend std::ostream& operator<<(std::ostream& output, const CDCTrajectory3D& trajectory3D)
+      {
+        return output << "Local origin : " << trajectory3D.getLocalOrigin() <<  ", "
+               << "local helix : " << trajectory3D.getLocalHelix();
+      }
 
     private:
       /// Memory for local coordinate origin of the circle representing the trajectory in global coordinates

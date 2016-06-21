@@ -250,8 +250,6 @@ namespace Belle2 {
         return result;
       }
 
-
-
       /// Getter for the projection into xy space
       const PerigeeCircle& circleXY() const
       { return m_circleXY; }
@@ -259,6 +257,18 @@ namespace Belle2 {
       /// Getter for the projection into xy space
       const Line2D& lineSZ() const
       { return m_lineSZ; }
+
+      /// Debug helper
+      friend std::ostream& operator<<(std::ostream& output, const Helix& helix)
+      {
+        return output <<
+               "Helix(" <<
+               "curvature=" << helix.curvatureXY() << "," <<
+               "tangentialPhi=" << helix.tangentialPhi() << "," <<
+               "impact=" << helix.impactXY() << "," <<
+               "tanL=" << helix.tanLambda() << "," <<
+               "z0=" << helix.z0() << ")" ;
+      }
 
     private:
       /// Memory of the projection of the helix in xy space.

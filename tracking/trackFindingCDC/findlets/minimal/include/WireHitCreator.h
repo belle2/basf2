@@ -96,15 +96,20 @@ namespace Belle2 {
         if (not outputWireHits.empty()) return;
 
         StoreArray<CDCHit> hits;
-        hits.isRequired();
 
         // Create the wirehits into a vector
         Index useNHits = hits.getEntries();
         outputWireHits.reserve(useNHits);
 
-        for (CDCHit& hit : hits) {
-          CDC::TDCCountTranslatorBase& tdcCountTranslator = *m_tdcCountTranslator;
-          CDC::ADCCountTranslatorBase& adcCountTranslator = *m_adcCountTranslator;
+        const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+        CDC::TDCCountTranslatorBase& tdcCountTranslator = *m_tdcCountTranslator;
+        CDC::ADCCountTranslatorBase& adcCountTranslator = *m_adcCountTranslator;
+
+        for (const CDCHit& hit : hits) {
+          if (not wireTopology.isValidWireID(WireID(hit.getID()))) {
+            B2WARNING("Skip invalid wire id " << hit.getID());
+            continue;
+          }
 
           const CDCWire* wire = CDCWire::getInstance(hit);
 
@@ -155,33 +160,6 @@ namespace Belle2 {
                                               refDriftLengthVariance,
                                               refChargeDeposit));
         }
-
-        // Some safety checks from funky times - did not trigger for ages.
-        // cppcheck-suppress syntaxError
-        for (int iHit = 0; iHit < useNHits; ++iHit) {
-          CDCHit* ptrHit = hits[iHit];
-          CDCHit& hit = *ptrHit;
-          const WireID wireID(hit.getID());
-          const CDCWireHit& wireHit = outputWireHits[iHit];
-
-          if (iHit != hit.getArrayIndex()) {
-            B2ERROR("CDCHit.getArrayIndex() produced wrong result. Expected : " << iHit << " Actual : " << hit.getArrayIndex());
-          }
-
-          if (wireID.getEWire() != hit.getID()) {
-            B2ERROR("WireID.getEWire() differs from CDCHit.getID()");
-          }
-
-          if (hit.getID() != wireHit.getWire().getEWire()) {
-            B2ERROR("CDCHit.getID() differs from CDCWireHit.getWire().getEWire()");
-          }
-          if (hit.getArrayIndex() != wireHit.getStoreIHit()) {
-            B2ERROR("CDCHit.getArrayIndex() differs from CDCWireHit.getStoreIHit");
-          }
-        }
-
-        B2DEBUG(100, "  Created number of CDCWireHits == " << useNHits);
-        B2DEBUG(100, "  Number of usable CDCWireHits == " << useNHits);
 
         if (useNHits == 0) {
           B2WARNING("Event with no hits");

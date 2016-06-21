@@ -19,6 +19,14 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
+    /// Helper functions to interact with the magnetic field
+    class CDCBFieldUtil {
+    public:
+
+      /// Indicator if the magnetic field is off in the current geometry.
+      static bool isOff();
+    };
+
     /// Getter for the absolute magnetic field strength in z direction ( in Tesla )
     double getBFieldZMagnitude(const Vector2D& pos2D);
 
@@ -39,8 +47,6 @@ namespace Belle2 {
 
     /// Getter for the signed alpha of the magnetic field in z direction
     double getAlphaZ(const Vector3D& pos3D);
-
-
 
     /// Conversion helper from clockwise or counterclockwise travel to the charge sign.
     /** Return the charge sign based on the travel direction on the fitted circle. \n

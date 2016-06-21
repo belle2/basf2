@@ -20,6 +20,15 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+bool CDCBFieldUtil::isOff()
+{
+  TVector3 origin(0, 0, 0);
+  double b = BFieldMap::Instance().getBField(origin).Mag();
+  const double c_EarthMagneticField = 3.2e-5;
+  return not(b > 5 * c_EarthMagneticField);
+}
+
+
 double TrackFindingCDC::getBFieldZMagnitude(const Vector2D& pos2D)
 {
   return std::fabs(TrackFindingCDC::getBFieldZ(pos2D));
@@ -78,7 +87,8 @@ ERotation TrackFindingCDC::chargeToERotation(const double charge)
 double TrackFindingCDC::absMom2DToBendRadius(const double absMom2D,
                                              const double bZ)
 {
-  return absMom2D / (bZ * 0.00299792458);
+  // In case of zero magnetic field return something large
+  return std::fmin(222, absMom2D / (bZ * 0.00299792458));
 }
 
 double TrackFindingCDC::absMom2DToBendRadius(const double absMom2D,
@@ -97,7 +107,7 @@ double TrackFindingCDC::absMom2DToCurvature(const double absMom2D,
                                             const double charge,
                                             const double bZ)
 {
-  return - charge * bZ * 0.00299792458 / absMom2D;
+  return - charge * bZ * 0.00299792458 * std::fmax(0, 1 / absMom2D);
 }
 
 double TrackFindingCDC::absMom2DToCurvature(const double absMom2D,
@@ -117,7 +127,7 @@ double TrackFindingCDC::absMom2DToCurvature(const double absMom2D,
 double TrackFindingCDC::curvatureToAbsMom2D(const double curvature,
                                             const double bZ)
 {
-  return std::fabs(bZ * 0.00299792458 / curvature);
+  return std::fmin(1, std::fabs(bZ * 0.00299792458 / curvature));
 }
 
 double TrackFindingCDC::curvatureToAbsMom2D(const double curvature,

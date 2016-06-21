@@ -21,8 +21,6 @@ namespace Belle2 {
      *  Class representing an oriented hit wire including a hypotheses
      *  whether the causing track passes left or right.
      *  The right left information is freely setable.
-     *  In constrast to the CDCRLWireHits the instances are not managed
-     *  by the CDCWireHitTopology, which means that they can be copied and created.
      *  More than one CDCRLWireHit can point to one CDCWireHit.
      *  For more information see @sa CDCWireHit.
      */

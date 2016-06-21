@@ -122,13 +122,13 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
   }
 }
 
-CDCRecoHit3D CDCRecoHit3D::reconstructNearest(const CDCWireHit* wireHit,
-                                              const CDCTrajectory2D& trackTrajectory2D)
+CDCRecoHit3D CDCRecoHit3D::reconstructNearest(const CDCWireHit* axialWireHit,
+                                              const CDCTrajectory2D& trajectory2D)
 {
-  B2ASSERT("This function can only be used with axial hits.", wireHit->isAxial());
-  ERightLeft rlInfo = trackTrajectory2D.isRightOrLeft(wireHit->getRefPos2D());
-  CDCRLWireHit rlWireHit(wireHit, rlInfo);
-  return CDCRecoHit3D::reconstruct(rlWireHit, trackTrajectory2D);
+  B2ASSERT("This function can only be used with axial hits.", axialWireHit->isAxial());
+  ERightLeft rlInfo = trajectory2D.isRightOrLeft(axialWireHit->getRefPos2D());
+  CDCRLWireHit rlWireHit(axialWireHit, rlInfo);
+  return CDCRecoHit3D::reconstruct(rlWireHit, trajectory2D);
 }
 
 CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first, const CDCRecoHit3D& second)

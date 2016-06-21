@@ -24,11 +24,11 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Marks all hits that are not on the first loop of the track by considering the mc truth information as background
-    class WireHitMCMultiLoopBlocker : public Findlet<CDCWireHit> {
+    class WireHitMCMultiLoopBlocker : public Findlet<CDCWireHit&> {
 
     private:
       /// Type of the base class
-      typedef Findlet<CDCWireHit> Super;
+      typedef Findlet<CDCWireHit&> Super;
 
     public:
       /// Short description of the findlet

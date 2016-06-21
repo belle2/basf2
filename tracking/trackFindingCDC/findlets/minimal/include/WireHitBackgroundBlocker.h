@@ -23,11 +23,11 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Marks hits as background based on simple heuristics
-    class WireHitBackgroundBlocker : public Findlet<CDCWireHit> {
+    class WireHitBackgroundBlocker : public Findlet<CDCWireHit&> {
 
     private:
       /// Type of the base class
-      typedef Findlet<CDCWireHit> Super;
+      typedef Findlet<CDCWireHit&> Super;
 
     public:
       /// Short description of the findlet

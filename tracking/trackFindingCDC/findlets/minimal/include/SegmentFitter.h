@@ -37,11 +37,11 @@ namespace Belle2 {
 
     /// Fits segments with the Riemann method.
     class SegmentFitter:
-      public Findlet<CDCRecoSegment2D> {
+      public Findlet<CDCRecoSegment2D&> {
 
     private:
       /// Type of the base class
-      typedef Findlet<CDCRecoSegment2D> Super;
+      typedef Findlet<CDCRecoSegment2D&> Super;
 
     public:
       /// Short description of the findlet

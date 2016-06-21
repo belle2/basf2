@@ -38,11 +38,11 @@ namespace Belle2 {
              class AFacetRelationFilter,
              class ASegmentRelationFilter>
     class SegmentFinderFacetAutomaton :
-      public Findlet<CDCWireHit, CDCRecoSegment2D> {
+      public Findlet<CDCWireHit&, CDCRecoSegment2D> {
 
     private:
       /// Type of the base class
-      typedef Findlet<CDCWireHit, CDCRecoSegment2D> Super;
+      typedef Findlet<CDCWireHit&, CDCRecoSegment2D> Super;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
@@ -55,7 +55,6 @@ namespace Belle2 {
         addProcessingSignalListener(&m_facetRelationCreator);
         addProcessingSignalListener(&m_segmentCreatorFacetAutomaton);
         addProcessingSignalListener(&m_segmentMerger);
-        addProcessingSignalListener(&m_segmentOrienter);
 
         addProcessingSignalListener(&m_segmentFitter);
         addProcessingSignalListener(&m_segmentOrienter);

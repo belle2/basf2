@@ -25,10 +25,10 @@ namespace Belle2 {
      *  the vector providing the hits should not be destroyed as long as the hits need to be accessed
      *  from the CDCWireHitTopology.
      */
-    class WireHitTopologyFiller : public Findlet<CDCWireHit> {
+    class WireHitTopologyFiller : public Findlet<CDCWireHit&> {
     private:
       /// Type of the base class
-      typedef Findlet<CDCWireHit> Super;
+      typedef Findlet<CDCWireHit&> Super;
 
     public:
       /// Short description of the findlet

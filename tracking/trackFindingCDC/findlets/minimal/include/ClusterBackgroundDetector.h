@@ -24,11 +24,11 @@ namespace Belle2 {
     /// Marks clusters as background based on a background measure
     template<class ClusterFilter = BaseClusterFilter>
     class ClusterBackgroundDetector :
-      public Findlet<CDCWireHitCluster> {
+      public Findlet<CDCWireHitCluster&> {
 
     private:
       /// Type of the base class
-      typedef Findlet<CDCWireHitCluster> Super;
+      typedef Findlet<CDCWireHitCluster&> Super;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.

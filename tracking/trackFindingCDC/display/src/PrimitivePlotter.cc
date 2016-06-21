@@ -85,6 +85,20 @@ void PrimitivePlotter::drawCircleArc(const float& startX,
   m_boundingBox &= BoundingBox(startX, startY, endX, endY);
 }
 
+void PrimitivePlotter::drawCurve(const std::vector<std::array<float, 2> >& points,
+                                 const std::vector<std::array<float, 2> >& /* tangents */,
+                                 const AttributeMap& /*attributeMap */)
+{
+  for (size_t i = 0; i < points.size() - 1; ++i) {
+    float startX = points[i][0];
+    float startY = points[i][1];
+    float endX = points[i + 1][0];
+    float endY = points[i + 1][1];
+    m_boundingBox &= BoundingBox(startX, startY, endX, endY);
+  }
+}
+
+
 
 void PrimitivePlotter::startGroup(const AttributeMap& /* attributeMap */)
 {

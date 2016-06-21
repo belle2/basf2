@@ -113,6 +113,18 @@ namespace Belle2 {
                                  const bool& sweepFlag,
                                  const AttributeMap& attributeMap = AttributeMap()) override;
 
+      /** Adds a smooth curve to the plot
+       *
+       *  Current implementation approxiamtes circle arcs between the points with cubic splines.
+       *
+       *  @param points        X,Y points on the curve
+       *  @param tangents      Tangent vector at each point. Length of tangents does not matter.
+       *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
+       */
+      virtual void drawCurve(const std::vector<std::array<float, 2> >& points,
+                             const std::vector<std::array<float, 2> >& tangents,
+                             const AttributeMap& attributeMap = AttributeMap()) override;
+
       /**
        *  Indicates the start of a group of drawn elements. Meaning depends on the actual implementation.
        */

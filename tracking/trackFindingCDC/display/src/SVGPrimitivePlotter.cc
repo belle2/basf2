@@ -168,6 +168,86 @@ void SVGPrimitivePlotter::drawCircleArc(const float& startX,
 
 }
 
+void SVGPrimitivePlotter::drawCurve(const std::vector<std::array<float, 2> >& points,
+                                    const std::vector<std::array<float, 2> >& tangents,
+                                    const AttributeMap& attributeMap)
+{
+  // Magic number for circle approximation with splines
+  static const double k = 4.0 / 3.0 * (std::sqrt(2.0) - 1.0);
+
+  B2ASSERT("Expect number of points and tangents to be the same",
+           points.size() == tangents.size());
+  if (points.size() < 2) return;
+
+  PrimitivePlotter::drawCurve(points, tangents, attributeMap);
+
+  std::ostringstream pathStream;
+
+  // Move to point
+  float startX = std::get<0>(points[0]);
+  float startY = std::get<1>(points[0]);
+
+  pathStream << "M";
+  pathStream << ' ' << to_string(startX);
+  pathStream << ' ' << to_string(startY);
+
+  for (size_t iCurrent = 0, iNext = 1;
+       iNext < points.size();
+       iCurrent = iNext, ++iNext) {
+
+    float currentTX = std::get<0>(tangents[iCurrent]);
+    float currentTY = std::get<1>(tangents[iCurrent]);
+
+    float nextTX = std::get<0>(tangents[iNext]);
+    float nextTY = std::get<1>(tangents[iNext]);
+
+    float currentT =  std::hypot(currentTX, currentTY);
+    float nextT =  std::hypot(nextTX, nextTY);
+
+    currentTX /= currentT;
+    currentTY /= currentT;
+    nextTX /= nextT;
+    nextTY /= nextT;
+
+    float currentX = std::get<0>(points[iCurrent]);
+    float currentY = std::get<1>(points[iCurrent]);
+
+    float nextX = std::get<0>(points[iNext]);
+    float nextY = std::get<1>(points[iNext]);
+
+    // Circle arc angle
+    float alpha = std::atan2(currentTX * nextTY - currentTY * nextTX,
+                             currentTX * nextTX + currentTY * nextTY);
+
+    float distance = std::hypot(currentX - nextX, currentY - nextY);
+    float controlLength = k * distance / 2 / std::cos(alpha / 2);
+
+    float currentControlX = currentX + currentTX * controlLength;
+    float currentControlY = currentY + currentTY * controlLength;
+
+    float nextControlX = nextX - nextTX * controlLength;
+    float nextControlY = nextY - nextTY * controlLength;
+
+    pathStream << ' ' << "C";
+
+    pathStream << ' ' <<  to_string(currentControlX);
+    pathStream << ' ' <<  to_string(currentControlY);
+
+    pathStream << ' ' <<  to_string(nextControlX);
+    pathStream << ' ' <<  to_string(nextControlY);
+
+    pathStream << ' ' <<  to_string(nextX);
+    pathStream << ' ' <<  to_string(nextY);
+  }
+
+  AttributeMap geometryAttributeMap {
+    {"d", pathStream.str()}
+  };
+
+  writeStandAloneTag(m_svgContentStream, "path", geometryAttributeMap, attributeMap);
+}
+
+
 
 void SVGPrimitivePlotter::startGroup(const AttributeMap& attributeMap)
 {

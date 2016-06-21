@@ -12,7 +12,7 @@ import tracking.utilities as utilities
 import logging
 
 from tracking.run.minimal import MinimalRun
-import tracking.run.adjustments as adjustments
+import tracking.adjustments as adjustments
 
 
 def get_logger():

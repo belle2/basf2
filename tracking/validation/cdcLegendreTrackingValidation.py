@@ -25,7 +25,11 @@ from tracking.validation.run import TrackingValidationRun
 class CDCLegendre(TrackingValidationRun):
     n_events = N_EVENTS
     root_input_file = '../EvtGenSimNoBkg.root'
-    finder_module = 'TrackFinderCDCLegendreTracking'
+
+    @staticmethod
+    def finder_module(path):
+        path.add_module('WireHitTopologyPreparer')
+        path.add_module('TrackFinderCDCLegendreTracking')
     fit_geometry = None
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE

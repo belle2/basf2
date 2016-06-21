@@ -24,7 +24,7 @@ class CDCDebugDisplayRun(CDCDisplayRun):
     # })
 
     finder_module = ["WireHitTopologyPreparer", finder_module, "PrintCollections"]
-    finder_module = basf2.register_module("WireHitTopologyPreparer", UseNLoops=1)
+    finder_module = basf2.register_module("WireHitTopologyPreparer")
 
     show_all_drawoptions = True
     # Also show draw options that are related to the cellular automaton track finder

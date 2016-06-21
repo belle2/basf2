@@ -346,7 +346,6 @@ void GenFitterModule::event()
       const TVector3& momentumSeed = aTrackCandPointer->getMomSeed();
 
       // We reset the track's time after constructing it from the TrackCand.
-      double timeSeed = aTrackCandPointer->getTimeSeed();
       if (m_estimateSeedTime) {
         // Particle velocity in cm / ns.
         const double m = part->Mass();
@@ -360,21 +359,24 @@ void GenFitterModule::event()
         // obtaining this directly from the difference in z, as it
         // only provide arc-lengths in the transverse plane, so we do
         // it like this.
-        const Helix h(posSeed, momentumSeed, part->Charge() / 3, 1.5);
-        const double s2D = h.getArcLength2DAtCylindricalR(posSeed.Perp());
+        // const Helix h(posSeed, momentumSeed, part->Charge() / 3, 1.5);
+        const Helix h(posSeed, momentumSeed, part->Charge() / 3, 0);
+        const double s2D = h.getArcLength2DAtXY(posSeed.X(), posSeed.Y());
         const double s = s2D * hypot(1, h.getTanLambda());
 
         // Time (ns) from trigger (= 0 ns) to posSeed assuming constant velocity.
-        timeSeed = s / v;
+        double timeSeed = s / v;
 
-        if (!(timeSeed > -1000)) {
+        if (not(fabs(timeSeed) < 1000)) {
           // Guard against NaN or just something silly.
           B2WARNING("Fixing calculated seed Time " << timeSeed << " to zero.");
           timeSeed = 0;
         }
         // Update the TrackCand in case we estimated the time.
         aTrackCandPointer->setTimeSeed(timeSeed);
+
       }
+      double timeSeed = aTrackCandPointer->getTimeSeed();
 
       B2DEBUG(99, "Fit track with start values: ");
 

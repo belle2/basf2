@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import Module
+import basf2
 
 from ROOT import gSystem
 gSystem.Load('libframework')  # for PyStoreArray
@@ -22,7 +22,7 @@ from . import svgdrawing
 from .svgdrawing import attributemaps
 
 
-class CDCSVGDisplayModule(Module):
+class CDCSVGDisplayModule(basf2.Module):
 
     """
     Personal two dimensional event display based on scalable vector graphics
@@ -395,6 +395,11 @@ class CDCSVGDisplayModule(Module):
 
         # Construct additional information from basic Monte Carlo data, if it is available from the DataStore
         # Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
+
+        # Skip empty events
+        if Belle2.PyStoreArray(self.cdc_hits_store_array_name).getEntries() == 0:
+            basf2.B2INFO("Skip empty event")
+            return
 
         # ######### CDCHits ##########
         # Draw the raw CDCHits

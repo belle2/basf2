@@ -79,7 +79,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            m_useNLoops,
            "Set the number of loops to be included in the MC tracks. "
            "Default includes all",
-           NAN);
+           INFINITY);
 
 
   addParam("MinPXDHits",
@@ -126,6 +126,11 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            m_neutrals,
            "Set true if track candidates should be created also for neutral particles",
            bool(false));
+
+  addParam("SetTimeSeed",
+           m_setTimeSeed,
+           "Set true to forward the production time as time seed of the particles to the RecoTrack",
+           true);
 
   //smearing of MCMomentum
   addParam("Smearing",
@@ -429,7 +434,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
           continue;
         }
 
-        float time = -1;
+        float time = NAN;
         for (const PXDTrueHit& pxdTrueHit : relatedTrueHits) {
           // make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
           const RelationVector<MCParticle>& relatedMCParticles = pxdTrueHit.getRelationsFrom<MCParticle>();
@@ -439,10 +444,11 @@ void TrackFinderMCTruthRecoTracksModule::event()
             break;
           }
         }
-
-        hitsWithTimeAndDetectorInformation.emplace_back(time, pxdCluster->getArrayIndex(), Const::PXD);
-        ++hitCounter;
-        ndf += 2;
+        if (not std::isnan(time)) {
+          hitsWithTimeAndDetectorInformation.emplace_back(time, pxdCluster->getArrayIndex(), Const::PXD);
+          ++hitCounter;
+          ndf += 2;
+        }
       }
 
       B2DEBUG(100, "     add " << hitCounter << " PXDClusters. " << relatedClusters.size() - hitCounter <<
@@ -470,7 +476,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
           continue;
         }
 
-        float time = -1;
+        float time = NAN;
         for (const SVDTrueHit& svdTrueHit : relatedTrueHits) {
           // make sure only a true hit is taken that really comes from the current mcParticle. This must be carefully checked because several trueHits from different real tracks can be melted into one cluster
           const RelationVector<MCParticle>& relatedMCParticles = svdTrueHit.getRelationsFrom<MCParticle>();
@@ -480,10 +486,11 @@ void TrackFinderMCTruthRecoTracksModule::event()
             break;
           }
         }
-
-        hitsWithTimeAndDetectorInformation.emplace_back(time, svdCluster->getArrayIndex(), Const::SVD);
-        ++hitCounter;
-        ndf += 1;
+        if (not std::isnan(time)) {
+          hitsWithTimeAndDetectorInformation.emplace_back(time, svdCluster->getArrayIndex(), Const::SVD);
+          ++hitCounter;
+          ndf += 1;
+        }
       }
 
       B2DEBUG(100, "     add " << hitCounter << " SVDClusters. " << relatedClusters.size() - hitCounter <<
@@ -584,9 +591,12 @@ void TrackFinderMCTruthRecoTracksModule::event()
     //set track parameters from MCParticle information
     TVector3 positionTrue = aMcParticlePtr->getProductionVertex();
     TVector3 momentumTrue = aMcParticlePtr->getMomentum();
+    double timeTrue = aMcParticlePtr->getProductionTime();
+
     // if no kind of smearing is activated the initial values (seeds) for track fit will be the simulated truth
     TVector3 momentum = momentumTrue;
     TVector3 position = positionTrue;
+    double time = timeTrue;
     TVectorD stateSeed(6); //this will
     TMatrixDSym covSeed(6);
     covSeed.Zero(); // just to be save
@@ -628,6 +638,9 @@ void TrackFinderMCTruthRecoTracksModule::event()
     // TODO: In former times, the track candidate also stored the PDG code!!!
     short int charge = static_cast<short int>(aMcParticlePtr->getCharge());
     RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge);
+    if (m_setTimeSeed) {
+      newRecoTrack->setTimeSeed(time);
+    }
     ++m_nRecoTracks;
 
 

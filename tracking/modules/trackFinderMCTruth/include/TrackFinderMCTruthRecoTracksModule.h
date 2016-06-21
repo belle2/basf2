@@ -61,7 +61,7 @@ namespace Belle2 {
     bool m_useSVDHits;                                          /**< Boolean to select if SVDHits should be used*/
     bool m_useCDCHits;                                          /**< Boolean to select if CDCHits should be used*/
     bool m_useOnlyAxialCDCHits;                                 /**< Boolean to select if only axial CDCHits should be used*/
-    float m_useNLoops = NAN;                                    /**< Number of loops to include in the MC tracks - effects only CDC.*/
+    float m_useNLoops;                                          /**< Number of loops to include in the MC tracks - effects only CDC.*/
 
 
     bool m_enforceTrueHit;                                      /**< If set true only cluster hits that have a relation to a TrueHit will be included in the track candidate */
@@ -71,6 +71,7 @@ namespace Belle2 {
     double m_energyCut;                                         /**< Create track candidates only for MCParticles with energy above this cut*/
     bool m_neutrals;                                            /**< Boolean to mark if track candidates should also be created for neutral particles.*/
 
+    bool m_setTimeSeed;                                         /**< Boolean to forward the production time as seed time*/
     double m_smearing;                                          /**< Smearing of MCMomentum and MCVertex in %. This adds a relative error to the initial values without changing the default large initial covariance matrix using for fitting*/
     std::vector<double>
     m_smearingCov;                          /**< Covariance matrix used to smear the true pos and mom before passed to track candidate. This matrix will also passed to Genfit as the initial covarance matrix. If any diagonal value is negative this feature will not be used. OFF DIAGNOLA ELEMENTS DO NOT HAVE AN EFFECT AT THE MOMENT */

@@ -48,6 +48,14 @@ namespace Belle2 {
       /// Constructor taking the range of layers the superlayer shall contain. Use rather getInstance() to avoid instance constructions.
       explicit CDCWireSuperLayer(const ConstVectorRange<CDCWireLayer>& wireLayerRange);
 
+      /// Disallow copy construction of wire super layers.
+      CDCWireSuperLayer(const CDCWireSuperLayer& wireSuperLayer) = delete;
+
+      /// Allow move construction of wire super layers for use in std::vector.
+      CDCWireSuperLayer(CDCWireSuperLayer&& wireSuperLayer) = default;
+
+      /// Disallow copy assignment of wire super layers.
+      void operator=(const CDCWireSuperLayer& wireSuperLayer) = delete;
     public:
       /// Intializes the superlayer variables of according the layer range. Set the numbering shift of contained layers.
       void initialize();

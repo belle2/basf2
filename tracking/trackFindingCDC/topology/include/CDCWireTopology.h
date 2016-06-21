@@ -47,6 +47,12 @@ namespace Belle2 {
       CDCWireTopology()
       { initialize(); }
 
+      /// Disallow copy construction of the wire topology.
+      CDCWireTopology(const CDCWireTopology& wireTopology) = delete;
+
+      /// Disallow copy assignment of the wire topology.
+      void operator=(const CDCWireTopology& wireTopology) = delete;
+
     public:
       /// Total number of wires
       static const IWire c_NWires = 14336;

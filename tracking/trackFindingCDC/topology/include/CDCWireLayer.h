@@ -63,6 +63,16 @@ namespace Belle2 {
        */
       explicit CDCWireLayer(const ConstVectorRange<CDCWire>& wireRange);
 
+
+      /// Disallow copy construction of wire layers.
+      CDCWireLayer(const CDCWireLayer& wireLayer) = delete;
+
+      /// Allow move construction of wire layers for use in std::vector.
+      CDCWireLayer(CDCWireLayer&& wireLayer) = default;
+
+      /// Disallow copy assignment of wire layers.
+      void operator=(const CDCWireLayer& wireLayer) = delete;
+
     public:
       /// Intializes the wire layer variables to the average of according variables in the wire range
       void initialize();

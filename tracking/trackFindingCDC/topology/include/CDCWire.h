@@ -72,6 +72,15 @@ namespace Belle2 {
       /// Constructor taking the superlayer id, the layer id and the wire id. Use rather getInstance() to avoid instance constructions.
       CDCWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire);
 
+      /// Disallow copy construction of wires.
+      CDCWire(const CDCWire& wire) = delete;
+
+      /// Allow move construction of wires for use in std::vector.
+      CDCWire(CDCWire&& wire) = default;
+
+      /// Disallow copy assignment of wires.
+      void operator=(const CDCWire& wire) = delete;
+
     public:
       /// Equality comparision based on wireID.
       bool operator==(const CDCWire& other) const

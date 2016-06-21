@@ -4,8 +4,6 @@
  *  Created on: Feb 25, 2015
  *      Author: dschneider
  */
-
-#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackFindingCDC/display/CDCSVGPlotter.h>
 
 #include <cdc/dataobjects/CDCRecoHit.h>
@@ -21,6 +19,10 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+
+#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
+#include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
+
 #include <cmath>
 
 using namespace Belle2;
@@ -53,7 +55,13 @@ namespace {
 
 CDCSVGPlotter::CDCSVGPlotter(bool animate)
   : m_animate(animate),
-    m_eventdataPlotter(animate)
+    m_eventdataPlotter(std::unique_ptr<PrimitivePlotter>(new SVGPrimitivePlotter(AttributeMap {
+  {"stroke", "orange"},
+  {"stroke-width", "0.55"},
+  {"fill", "none"},
+  {"transform", "translate(0, 1120) scale(1,-1)"}
+})),
+animate)
 {
   int top = -112;
   int left = -112;
@@ -81,18 +89,20 @@ void CDCSVGPlotter::drawIterable(const AIterable& iterable, AColorizer& colorize
         draw<a_drawTrajectory>(item, obj_styling);
         ++c_Item;
       }
-    } else
+    } else {
       for (const auto& item : iterable) {
         obj_styling["stroke"] = colorizer.mapStroke(c_Item, item);
         obj_styling["stroke-width"] = colorizer.mapStrokeWidth(c_Item, item);
         draw<a_drawTrajectory>(item, obj_styling);
         ++c_Item;
       }
-  } else
+    }
+  } else {
     for (const auto& item : iterable) {
       draw<a_drawTrajectory>(item, obj_styling);
       ++c_Item;
     }
+  }
 }
 
 CDCSVGPlotter* CDCSVGPlotter::clone()

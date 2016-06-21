@@ -54,8 +54,7 @@ void ExtendedRiemannsMethod::update(CDCTrajectory2D& trajectory2D,
     perigeeCircle.reverse();
   }
 
-  trajectory2D.setLocalOrigin(ref);
-  trajectory2D.setLocalCircle(perigeeCircle);
+  trajectory2D = CDCTrajectory2D(ref, perigeeCircle);
 }
 
 
@@ -312,7 +311,7 @@ namespace {
     if (lineConstrained) {
       reducedNInvCov.row(iReducedN3) = Matrix<double, 1, 3>::Zero();
       reducedNInvCov.col(iReducedN3) = Matrix<double, 3, 1>::Zero();
-      reducedNInvCov(iReducedN0, iReducedN3) = 1.;
+      reducedNInvCov(iReducedN3, iReducedN3) = 1.;
     }
 
     if (originConstrained) {
@@ -366,8 +365,16 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
   // The same as above without drift lengths
   Matrix<double, 4, 4> sNoL = s.block<4, 4>(0, 0);
 
-  // Determine NDF : Circle fit eats up 3 degrees of freedom.
-  size_t ndf = observations2D.size() - 3;
+  // Determine NDF : Circle fit eats up to 3 degrees of freedom debpending on the constraints
+  size_t ndf = observations2D.size() - 1;
+
+  if (not isOriginConstrained()) {
+    --ndf;
+  }
+
+  if (not isLineConstrained()) {
+    --ndf;
+  }
 
   // Parameters to be fitted
   UncertainPerigeeCircle resultCircle;

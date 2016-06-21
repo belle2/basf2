@@ -233,8 +233,12 @@ UncertainPerigeeCircle KarimakisMethod::fitInternal(CDCObservations2D& observati
   // Covariance matrix
   Matrix< double, 4, 4> cNoL = aNoL - meansNoL * meansNoL.transpose();
 
-  // Determine NDF : Circle fit eats up 3 degrees of freedom.
+  // Determine NDF : Circle fit eats up to 3 degrees of freedom debpending on the constraints
   size_t ndf = observations2D.size() - 3;
+
+  if (not isLineConstrained()) {
+    --ndf;
+  }
 
   // Parameters to be fitted
   UncertainPerigeeCircle resultCircle;

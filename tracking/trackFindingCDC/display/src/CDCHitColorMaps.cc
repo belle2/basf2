@@ -7,7 +7,6 @@
 #include <tracking/trackFindingCDC/display/CDCHitColorMaps.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <set>
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <sstream>
@@ -31,14 +30,30 @@ std::string ZeroDriftLengthStrokeWidthMap::map(const int, const CDCHit& cdcHit)
   else return ("0.2");
 }
 
+
+
+TakenFlagColorMap::TakenFlagColorMap()
+{
+  if (not m_storedWireHits) {
+    B2WARNING("CDCWireHitVector could not be found on the DataStore. Cannot plot the taken flags.");
+  }
+}
+
 std::string TakenFlagColorMap::map(const int, const CDCHit& cdcHit)
 {
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  const CDCHit* cdcHitptr = &cdcHit;
-  const CDCWireHit* wirehit = wireHitTopology.getWireHit(cdcHitptr);
-  if (wirehit->getAutomatonCell().hasTakenFlag()) {
-    return "red";
-  } else return m_bkgHitColor;
+  if (m_storedWireHits) {
+    const std::vector<CDCWireHit>& wireHits = *m_storedWireHits;
+    ConstVectorRange<CDCWireHit> wireHitRange =
+      std::equal_range(wireHits.begin(), wireHits.end(), cdcHit);
+
+    if (not wireHitRange.empty()) {
+      const CDCWireHit& wireHit =  wireHitRange.front();
+      if (wireHit.getAutomatonCell().hasTakenFlag()) {
+        return "red";
+      }
+    }
+  }
+  return m_bkgHitColor;
 }
 
 std::string RLColorMap::map(const int, const CDCHit& cdcHit)

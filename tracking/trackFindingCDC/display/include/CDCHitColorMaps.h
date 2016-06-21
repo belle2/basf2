@@ -9,12 +9,15 @@
 #define CDCHITCOLORMAPS_H_
 
 #include <tracking/trackFindingCDC/display/ColorMaps.h>
+#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <map>
 #include <cdc/dataobjects/CDCHit.h>
 
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+
+    class CDCWireHit;
 
     /**
      * Virtual base class for CDCHit to color map objects.
@@ -115,10 +118,17 @@ namespace Belle2 {
      */
     class TakenFlagColorMap : public CDCHitColorMap {
     public:
+      /// Constructor checking if the CDCWireHits caring the taken flag are accessable.
+      TakenFlagColorMap();
+
       /**
        * Function call to map the CDCHit id and object to a color.
        */
       std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
+
+    private:
+      /// Memory of the handle to the CDCWireHits on the DataStore.
+      StoreWrappedObjPtr<std::vector<CDCWireHit> > m_storedWireHits{"CDCWireHitVector"};
     };
 
     /**

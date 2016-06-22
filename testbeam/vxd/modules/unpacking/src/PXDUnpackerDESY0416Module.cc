@@ -617,12 +617,12 @@ PXDUnpackerDESY0416Module::PXDUnpackerDESY0416Module() :
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
   addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of PXD Clusters to be processed", std::string(""));
   addParam("DESY16FixTrigOffset", m_DESY16_FixTrigOffset, "Fix trigger offset between Meta Event and HLT", 0);
-  addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask which stops processing by returning false by task",
-           /*ONSEN_ERR_FLAG_DHC_END | ONSEN_ERR_FLAG_DHE_START | ONSEN_ERR_FLAG_DATA_OUTSIDE |*/
-           ONSEN_ERR_FLAG_FIX_SIZE | ONSEN_ERR_FLAG_DHE_CRC | ONSEN_ERR_FLAG_DHC_UNKNOWN | /*ONSEN_ERR_FLAG_MERGER_CRC |*/
-           ONSEN_ERR_FLAG_DHP_SIZE | /*ONSEN_ERR_FLAG_DHP_PIX_WO_ROW | ONSEN_ERR_FLAG_DHE_START_END_ID | ONSEN_ERR_FLAG_DHE_START_ID |*/
-           ONSEN_ERR_FLAG_DHE_START_WO_END
-          );
+  addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask which stops processing by returning false by task", (uint64_t)(
+             /*ONSEN_ERR_FLAG_DHC_END | ONSEN_ERR_FLAG_DHE_START | ONSEN_ERR_FLAG_DATA_OUTSIDE |*/
+             ONSEN_ERR_FLAG_FIX_SIZE | ONSEN_ERR_FLAG_DHE_CRC | ONSEN_ERR_FLAG_DHC_UNKNOWN | /*ONSEN_ERR_FLAG_MERGER_CRC |*/
+             ONSEN_ERR_FLAG_DHP_SIZE | /*ONSEN_ERR_FLAG_DHP_PIX_WO_ROW | ONSEN_ERR_FLAG_DHE_START_END_ID | ONSEN_ERR_FLAG_DHE_START_ID |*/
+             ONSEN_ERR_FLAG_DHE_START_WO_END
+           ));
 }
 
 void PXDUnpackerDESY0416Module::initialize()

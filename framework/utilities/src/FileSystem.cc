@@ -122,7 +122,8 @@ bool FileSystem::Lock::lock(int timeout)
 
   do {
     int lock = fcntl(m_file, F_SETLK, &fl);
-    if (lock == 0) return true;
+    if (lock == 0)
+      return true;
     usleep(uniform(random) * 1000);
   } while (std::chrono::steady_clock::now() < maxtime);
 

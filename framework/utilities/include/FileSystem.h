@@ -63,6 +63,8 @@ namespace Belle2 {
 
       /**
        * Try to lock the file
+       * @note Locks are not exclusive inside the same process, i.e. lock() will succeed even if a lock
+       *       is already held by the current process.
        * @param timeout  Time in seconds to wait for a lock (default is rather high to deal with slow FS at KEKCC)
        * @return  True if the lock could be obtained, false if file could not be opened or timeout is reached
        */

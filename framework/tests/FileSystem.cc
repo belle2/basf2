@@ -40,22 +40,10 @@ namespace {
     FileSystem::TemporaryFile temp;
     std::string filename = temp.getName();
 
-    {
-      //multiple readonly locks ok
-      FileSystem::Lock ro(filename, true);
-      EXPECT_TRUE(ro.lock(1));
-      EXPECT_TRUE(ro.lock(1));
-      EXPECT_TRUE(ro.lock(1));
-      EXPECT_TRUE(ro.lock(1));
-
-      FileSystem::Lock rw(filename, false);
-      EXPECT_FALSE(rw.lock(1));
-    }
-
-    {
-      FileSystem::Lock rw(filename, false);
-      EXPECT_TRUE(rw.lock(0));
-      EXPECT_FALSE(rw.lock(0));
-    }
+    //check 0-timeout locks work
+    FileSystem::Lock lk(filename);
+    EXPECT_TRUE(lk.lock(0));
+    //NOTE: in same process, the lock is NOT exclusive!
+    EXPECT_TRUE(lk.lock(0));
   }
 }  // namespace

@@ -225,7 +225,9 @@ namespace Belle2 {
 
         std::vector<unsigned int> data_indices(numberOfEvents);
         std::iota(data_indices.begin(), data_indices.end(), 0);
-        std::random_shuffle(data_indices.begin(), data_indices.end());
+        // disabled random shuffle since this is very slow (O(days)) on large files.
+        // TODO: remove it in a more sophisticated way
+        //std::random_shuffle(data_indices.begin(), data_indices.end());
 
         auto start_train = data_indices.begin();
         auto end_train = data_indices.begin() + static_cast<unsigned int>(numberOfEvents * m_specific_options.m_training_fraction);
@@ -236,8 +238,10 @@ namespace Belle2 {
         unsigned int nBatches = std::floor(numberOfEvents / batch_size);
         bool continue_loop = true;
         for (unsigned int iIteration = 0; iIteration < m_specific_options.m_nIterations and continue_loop; ++iIteration) {
-          std::random_shuffle(training_indices.begin(), training_indices.end());
-          std::random_shuffle(validation_indices.begin(), validation_indices.end());
+          // disabled random shuffle since this is very slow (O(days)) on large files.
+          // TODO: remove it in a more sophisticated way
+          // std::random_shuffle(training_indices.begin(), training_indices.end());
+          // std::random_shuffle(validation_indices.begin(), validation_indices.end());
 
           for (unsigned int iBatch = 0; iBatch < nBatches and continue_loop; ++iBatch) {
             for (unsigned int iEvent = 0; iEvent < training_batch_size; ++iEvent) {

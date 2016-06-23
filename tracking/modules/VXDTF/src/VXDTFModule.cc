@@ -2269,6 +2269,12 @@ void VXDTFModule::event()
 #endif
   } catch (...) {
     B2ERROR("Unexpected exception thown by Jakob and catched by Eugenio");
+    //doing some cleanup
+    B2DEBUG(1, "Doing some clean up!");
+    for (PassData* currentPass : m_passSetupVector) {
+      cleanEvent(currentPass);
+    }
+    cleanEvent(&m_baselinePass);
   }
 }
 
@@ -6179,6 +6185,7 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
   for (VXDTFHit& hit : passInfo->fullHitsVector) {
     B2DEBUG(10, " VXDHit at sector " << hit.getSectorString() << " with radius " << hit.getHitCoordinates()->Perp() <<
             " stores real Cluster (u/v/uv)" << hit.getClusterIndexU() << "/" << hit.getClusterIndexV() << "/" << hit.getClusterIndexUV());
+
     aLayerID = hit.getVxdID().getLayerNumber();
     hitsPerLayer.at(aLayerID - 1) += 1;
     if (hitsPerLayer[aLayerID - 1] > maxCounts) { maxCounts = hitsPerLayer[aLayerID - 1]; }
@@ -6219,12 +6226,16 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
     }
     listOfHitExtras.sort(); // now first entry is seed, following entries are hits with growing distance
 
+    //Thomas
+    //changed the check for the same vxdid to a check for the layer number
+    int aLayer = -1;
     for (HitExtra& bundle : listOfHitExtras) {  // collect hits for TC
-      if (aVxdID == bundle.second->getVxdID()) { continue; }
+      if (aLayer == bundle.second->getVxdID().getLayerNumber()) { continue; }
       newTC->addHits(bundle.second);
-      aVxdID = bundle.second->getVxdID();
+      aLayer = bundle.second->getVxdID().getLayerNumber();
     }
   }
+
 
   // now we have got exactly 1 TC, we do some filtering now:
   const vector<VXDTFHit*>& hitsOfTC = newTC->getHits();

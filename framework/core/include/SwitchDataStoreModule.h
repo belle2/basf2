@@ -13,7 +13,7 @@
 #include <framework/core/Module.h>
 
 namespace Belle2 {
-  /** Internal module used by Path.add_skim_path(). Don't use it directly. */
+  /** Internal module used by Path.add_independent_path(). Don't use it directly. */
   class SwitchDataStoreModule : public Module {
 
   public:
@@ -38,6 +38,7 @@ namespace Belle2 {
     std::string m_from; /**< active DataStore ID before this module. */
     std::string m_to; /**< active DataStore ID after this module. */
     bool m_doCopy; /**< should data be copied to m_to? */
-    std::vector<std::string> m_mergeBack; /** list of obj/arrays that should be copied to m_to regardless of m_doCopy. */
+    std::vector<std::string>
+    m_mergeBack; /**< list of obj/arrays (of event durability) that should be copied to m_to regardless of m_doCopy. */
   };
 }

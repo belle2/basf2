@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# @cond
+
 import os
 from basf2 import *
 from ROOT import Belle2
@@ -81,3 +83,4 @@ main.add_module(CheckData()).set_name("checkdata 3")
 process(main)
 
 print(statistics)
+# @endcond

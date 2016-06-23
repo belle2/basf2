@@ -8,11 +8,21 @@ from basf2 import *
 from ROOT import Belle2
 
 
-def add_geometry(path, magnet=True):
+def add_geometry(path, magnet=True, field=1.):
     path.add_module('Gearbox', fileName='testbeam/vxd/FullVXDTB2016.xml')
-
+    if args.field == 1.:
+        path.add_module('Gearbox', fileName='testbeam/vxd/FullVXDTB2016.xml')
+    else:
+        path.add_module('Gearbox',
+                        fileName='testbeam/vxd/FullVXDTB2016.xml',
+                        override=[("/DetectorComponent[@name='MagneticFieldConstant']//Z",
+                                   str(args.field),
+                                   "")])
     if magnet:
-        path.add_module('Geometry')
+        if args.field == 1.:
+            path.add_module('Geometry')
+        else:
+            path.add_module('Geometry', excludedComponents=['MagneticField'], additionalComponents=['MagneticFieldConstant'])
     else:
         path.add_module('Geometry', excludedComponents=['MagneticField'])
 
@@ -164,14 +174,25 @@ import argparse
 parser = argparse.ArgumentParser(description="Reconstruction for DESY VXD Testbeam 2016")
 parser.add_argument('--local-db', dest='local_db', action='store', default=None, type=str, help='Location of local db')
 parser.add_argument(
+    '--global-tag',
+    dest='global_tag',
+    action='store',
+    default=None,
+    type=str,
+    help='Global tag to use at central DB in PNNL')
+parser.add_argument(
     '--magnet-off',
     dest='magnet_off',
     action='store_const',
     const=True,
     default=False,
     help='Turn off magnetic field')
+parser.add_argument('--run', dest='run', action='store', default=0, type=int,
+                    help='Run number')
 parser.add_argument('--momentum', dest='momentum', action='store', default=6., type=float,
                     help='Nominal momentum of particles (if magnet is off). Default = 6 GeV/c')
+parser.add_argument('--field', dest='field', action='store', default=1., type=float,
+                    help='Magnetuc field in Tesla. If different from 1. and magnet ON, the provided value is used')
 parser.add_argument('--svd-only', dest='svd_only', action='store_const', const=True,
                     default=False, help='Use only SVD sector maps in VXDTF track finder')
 parser.add_argument('--raw-input', dest='raw_input', action='store_const', const=True, default=False,
@@ -211,6 +232,8 @@ use_database_chain()
 use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True)
 if args.local_db is not None:
     use_local_database(Belle2.FileSystem.findFile(args.local_db), "", True)
+if args.global_tag is not None:
+    use_central_database(args.global_tag, LogLevel.DEBUG)
 
 main = create_path()
 
@@ -224,11 +247,15 @@ else:
 
 
 if args.dqm:
-    main.add_module('HistoManager')
+    main.add_module('HistoManager', histoFileName='h' + str(args.run) + '.root')
+
+if args.unpacking:
+    if not args.svd_only:
+        main.add_module('PXDTriggerShifter')
 
 main.add_module('Progress')
 
-add_geometry(main, not args.magnet_off)
+add_geometry(main, not args.magnet_off, args.field)
 
 if args.tel_input:
     telmerger = register_module('TelDataMergerTB2016')
@@ -250,7 +277,6 @@ if args.unpacking:
         triggerfix.if_false(create_path())
         main.add_module(triggerfix)
         """
-        main.add_module('PXDTriggerShifter')
         main.add_module('PXDUnpacker',
                         RemapFlag=True,
                         RemapLUT_IF_OB=Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'),
@@ -285,7 +311,8 @@ add_vxdtf(main, not args.magnet_off, args.svd_only, args.momentum)
 
 if args.gbl_collect:
     main.add_module('GBLfit')
-    main.add_module('MillepedeCollector', minPValue=0.0001)
+    # main.add_module('GBLdiagnostics', rootFile='gbl' + str(args.run) + '.root')
+    main.add_module('MillepedeCollector', minPValue=0.0000)
 else:
     main.add_module('GenFitter', FilterId='Kalman')
 
@@ -305,7 +332,7 @@ if args.dqm:
     if not args.gbl_collect:
         main.add_module('TrackfitDQM')
 
-main.add_module('RootOutput')
+main.add_module('RootOutput', outputFileName='run' + str(args.run) + '.root', branchNames=['EventMetaData'])
 
 if args.display:
     main.add_module('TrackBuilder')

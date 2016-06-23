@@ -30,6 +30,12 @@ class CDCLegendre(TrackingValidationRun):
     def finder_module(path):
         path.add_module('WireHitTopologyPreparer')
         path.add_module('TrackFinderCDCLegendreTracking')
+
+    tracking_coverage = {'UsePXDHits': False,
+                         'UseSVDHits': False,
+                         'UseCDCHits': True,
+                         'UseOnlyAxialCDCHits': True}
+
     fit_geometry = None
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE

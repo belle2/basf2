@@ -42,6 +42,20 @@ namespace {
     EXPECT_EQ(specific_options2.m_weightfiles[1], "B");
 
     EXPECT_EQ(specific_options.getMethod(), std::string("Combination"));
+
+    // Test if po::options_description is created without crashing
+    auto description = specific_options.getDescription();
+    EXPECT_EQ(description.options().size(), 1);
+
+    // Check for B2ERROR and throw if version is wrong
+    // we try with version 100, surely we will never reach this!
+    pt.put("Combination_version", 100);
+    try {
+      EXPECT_B2ERROR(specific_options2.load(pt));
+    } catch (...) {
+
+    }
+    EXPECT_THROW(specific_options2.load(pt), std::runtime_error);
   }
 
   class TestDataset : public MVA::Dataset {
@@ -68,12 +82,12 @@ namespace {
   TEST(CombinationTest, CombinationInterface)
   {
     TestHelpers::TempDirCreator tmp_dir;
-    MVA::Interface<MVA::TrivialOptions, MVA::TrivialTeacher, MVA::TrivialExpert> trivial;
-    MVA::Interface<MVA::CombinationOptions, MVA::CombinationTeacher, MVA::CombinationExpert> combination;
 
     MVA::GeneralOptions general_options;
     general_options.m_method = "Trivial";
     TestDataset dataset({1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0});
+
+    MVA::Interface<MVA::TrivialOptions, MVA::TrivialTeacher, MVA::TrivialExpert> trivial;
 
     MVA::TrivialOptions trivial_options;
     trivial_options.m_output = 0.1;
@@ -86,7 +100,7 @@ namespace {
     auto trivial_weightfile2 = trivial_teacher2->train(dataset);
     MVA::Weightfile::saveToXMLFile(trivial_weightfile2, "weightfile2.xml");
 
-
+    MVA::Interface<MVA::CombinationOptions, MVA::CombinationTeacher, MVA::CombinationExpert> combination;
     general_options.m_method = "Combination";
     MVA::CombinationOptions specific_options;
     specific_options.m_weightfiles = {"weightfile1.xml", "weightfile2.xml"};
@@ -99,6 +113,18 @@ namespace {
     EXPECT_EQ(probabilities.size(), dataset.getNumberOfEvents());
     for (unsigned int i = 0; i < dataset.getNumberOfEvents(); ++i)
       EXPECT_FLOAT_EQ(probabilities[i], (0.1 * 0.6) / (0.1 * 0.6 + (1 - 0.1) * (1 - 0.6)));
+
+    // Error and throw runtime error if method does not exist
+    trivial_weightfile2.addElement("method", "DOESNOTEXIST");
+    MVA::Weightfile::saveToXMLFile(trivial_weightfile2, "weightfile2.xml");
+    weightfile = teacher->train(dataset);
+    try {
+      EXPECT_B2ERROR(expert->load(weightfile));
+    } catch (...) {
+
+    }
+    EXPECT_THROW(expert->load(weightfile), std::runtime_error);
+
 
   }
 

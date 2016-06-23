@@ -37,6 +37,20 @@ namespace {
     EXPECT_EQ(specific_options2.m_output, 0.1);
 
     EXPECT_EQ(specific_options.getMethod(), std::string("Trivial"));
+
+    // Test if po::options_description is created without crashing
+    auto description = specific_options.getDescription();
+    EXPECT_EQ(description.options().size(), 1);
+
+    // Check for B2ERROR and throw if version is wrong
+    // we try with version 100, surely we will never reach this!
+    pt.put("Trivial_version", 100);
+    try {
+      EXPECT_B2ERROR(specific_options2.load(pt));
+    } catch (...) {
+
+    }
+    EXPECT_THROW(specific_options2.load(pt), std::runtime_error);
   }
 
   class TestDataset : public MVA::Dataset {

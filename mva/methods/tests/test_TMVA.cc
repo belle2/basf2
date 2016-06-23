@@ -82,6 +82,20 @@ namespace {
     EXPECT_EQ(specific_classification_options.getMethod(), std::string("TMVAClassification"));
     EXPECT_EQ(specific_regression_options.getMethod(), std::string("TMVARegression"));
 
+    // Test if po::options_description is created without crashing
+    auto description = specific_options.getDescription();
+    EXPECT_EQ(description.options().size(), 5);
+
+    // Check for B2ERROR and throw if version is wrong
+    // we try with version 100, surely we will never reach this!
+    pt.put("TMVA_version", 100);
+    try {
+      EXPECT_B2ERROR(specific_options2.load(pt));
+    } catch (...) {
+
+    }
+    EXPECT_THROW(specific_options2.load(pt), std::runtime_error);
+
   }
 
   class TestClassificationDataset : public MVA::Dataset {

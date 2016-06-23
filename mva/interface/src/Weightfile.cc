@@ -159,7 +159,16 @@ namespace Belle2 {
 
     Weightfile Weightfile::loadFromROOTFile(const std::string& filename)
     {
+
+      if (not boost::filesystem::exists(filename)) {
+        throw std::runtime_error("Given filename does not exist: " + filename);
+      }
+
       TFile file(filename.c_str(), "UPDATE");
+      if (file.IsZombie() or not file.IsOpen()) {
+        throw std::runtime_error("Error during open of ROOT file named " + filename);
+      }
+
       DatabaseRepresentationOfWeightfile* database_representation_of_weightfile = nullptr;
       file.GetObject("Weightfile", database_representation_of_weightfile);
       std::stringstream ss(database_representation_of_weightfile->m_data);
@@ -169,6 +178,10 @@ namespace Belle2 {
 
     Weightfile Weightfile::loadFromXMLFile(const std::string& filename)
     {
+      if (not boost::filesystem::exists(filename)) {
+        throw std::runtime_error("Given filename does not exist: " + filename);
+      }
+
       Weightfile weightfile;
       boost::property_tree::xml_parser::read_xml(filename, weightfile.m_pt);
       return weightfile;
@@ -193,6 +206,11 @@ namespace Belle2 {
     Weightfile Weightfile::loadFromDatabase(const std::string& identifier, const Belle2::EventMetaData& emd)
     {
       auto pair = Belle2::Database::Instance().getData(emd, "dbstore", identifier);
+
+      if (pair.first == 0) {
+        throw std::runtime_error("Given identifier cannot be loaded from the database: " + identifier);
+      }
+
       DatabaseRepresentationOfWeightfile database_representation_of_weightfile = *static_cast<DatabaseRepresentationOfWeightfile*>
           (pair.first);
       std::stringstream ss(database_representation_of_weightfile.m_data);

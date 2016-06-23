@@ -122,6 +122,7 @@ namespace {
     loaded = MVA::Weightfile::load("MVAInterfaceTest");
     EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
 
+    EXPECT_THROW(MVA::Weightfile::loadFromDatabase("DOES_NOT_EXIST"), std::runtime_error);
   }
 
   TEST(WeightfileTest, StaticSaveLoadXML)
@@ -139,6 +140,8 @@ namespace {
     loaded = MVA::Weightfile::load("MVAInterfaceTest.xml");
     EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
 
+    EXPECT_THROW(MVA::Weightfile::loadFromXMLFile("DOES_NOT_EXIST.xml"), std::runtime_error);
+
   }
 
   TEST(WeightfileTest, StaticSaveLoadROOT)
@@ -155,6 +158,13 @@ namespace {
 
     loaded = MVA::Weightfile::load("MVAInterfaceTest.root");
     EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+    EXPECT_THROW(MVA::Weightfile::loadFromROOTFile("DOES_NOT_EXIST.root"), std::runtime_error);
+
+    {
+      std::fstream file("INVALID.root");
+    }
+    EXPECT_THROW(MVA::Weightfile::loadFromROOTFile("INVALID.root"), std::runtime_error);
 
   }
 

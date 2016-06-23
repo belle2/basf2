@@ -167,7 +167,7 @@ namespace Belle2 {
       }
 
       m_file = TFile::Open(m_general_options.m_datafile.c_str(), "UPDATE");
-      if (not m_file or not m_file->IsOpen()) {
+      if (not m_file or m_file->IsZombie() or not m_file->IsOpen()) {
         B2ERROR("Error during open of ROOT file named " << m_general_options.m_datafile);
         throw std::runtime_error("Error during open of ROOT file named " + m_general_options.m_datafile);
       }

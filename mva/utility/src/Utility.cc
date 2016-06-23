@@ -85,6 +85,18 @@ namespace Belle2 {
 
     }
 
+    bool available(const std::string& filename, int experiment, int run, int event)
+    {
+
+      try {
+        auto weightfile = Weightfile::load(filename, Belle2::EventMetaData(event, run, experiment));
+        return true;
+      } catch (...) {
+        return false;
+      }
+
+    }
+
     void expert(const std::vector<std::string>& filenames, const std::string& datafile, const std::string& treename,
                 const std::string& outputfile, int experiment, int run, int event)
     {

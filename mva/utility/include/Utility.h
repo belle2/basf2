@@ -40,6 +40,15 @@ namespace Belle2 {
     void upload(const std::string& filename, const std::string& identifier, int exp1 = 0, int run1 = 0, int exp2 = -1, int run2 = -1);
 
     /**
+     * Conenience function which checks if an experise is available
+     * @param filename or identifier of the expertise
+     * @param experiment current experiment
+     * @param run current run
+     * @param event current event
+     */
+    bool available(const std::string& filename, int experiment = 0, int run = 0, int event = 0);
+
+    /**
      * Conenience function which extracts the expertise in a given weightfile into a temporary directory
      * @param filename of the weightfile
      * @param directory temporary directory to use

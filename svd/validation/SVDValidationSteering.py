@@ -14,9 +14,8 @@
   <input>EvtGenSimRec.root</input>
   <output>SVDValidationOutput.root</output>
   <output>SVDValidationTTree.root</output>
-  <output>SVDValidationTTreeDigit.root</output>
+  <output>SVDValidationTTreeStrip.root</output>
   <output>SVDValidationTTreeSimhit.root</output>
-  <output>SVDValidationTTreeEfficiency.root</output>
   <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
   <description>This is the SVD validation steering file.</description>
 </header>
@@ -25,9 +24,8 @@
 from basf2 import *
 # Individual validation packages
 from SVDValidationTTree import *
-from SVDValidationTTreeDigit import *
+from SVDValidationTTreeStrip import *
 from SVDValidationTTreeSimhit import *
-from SVDValidationTTreeEfficiency import *
 
 set_random_seed(12345)
 
@@ -58,12 +56,10 @@ main.add_module(progress)
 # SVD validation modules
 svdvalidation = SVDValidationTTree()
 main.add_module(svdvalidation)
-svdvalidationdigit = SVDValidationTTreeDigit()
-main.add_module(svdvalidationdigit)
+svdvalidationstrip = SVDValidationTTreeStrip()
+main.add_module(svdvalidationstrip)
 svdvalidationsimhit = SVDValidationTTreeSimhit()
 main.add_module(svdvalidationsimhit)
-svdefficiency = SVDValidationTTreeEfficiency()
-main.add_module(svdefficiency)
 
 process(main)
 

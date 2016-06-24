@@ -43,6 +43,7 @@ gROOT.ProcessLine('struct EventData {\
     float cluster_size;\
     float cluster_interstripPosition;\
     float cluster_pull;\
+    float cluster_residual;\
     float truehit_position;\
     float truehit_deposEnergy;\
     float truehit_lossmomentum;\
@@ -158,9 +159,11 @@ class SVDValidationTTree(Module):
                     truehitPos = truehit.getU()
                 else:
                     truehitPos = truehit.getV()
-                cluster_pull = (clusterPos - truehitPos) / clusterPosSigma
+                cluster_residual = clusterPos - truehitPos
+                cluster_pull = cluster_residual / clusterPosSigma
                 self.data.cluster_position = clusterPos
                 self.data.cluster_positionSigma = clusterPosSigma
+                self.data.cluster_residual = cluster_residual
                 self.data.cluster_pull = cluster_pull
                 # Truehit information
                 self.data.truehit_position = truehitPos

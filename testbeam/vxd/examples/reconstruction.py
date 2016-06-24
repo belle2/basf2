@@ -322,17 +322,16 @@ if args.dqm:
             main.add_module("PXDRawDQM")
         main.add_module("PXDDQMCorr")
     main.add_module('PXDDQM', histgramDirectoryName='pxddqm')
-    # main.add_module('SVDDQM3') will be removed, replaced by VXDDQMOnLine
-    main.add_module('VXDDQMOnLine', SaveOtherHistos=1, SwapPXD=0)
+
+    main.add_module("VXDTelDQMOffLine", SaveOtherHistos=1, CorrelationGranulation=0.5)
 
     if args.tel_input:
         main.add_module("TelDQM")
-        main.add_module("VXDTelDQMOffLine", SaveOtherHistos=1)
 
     if not args.gbl_collect:
         main.add_module('TrackfitDQM')
 
-main.add_module('RootOutput', outputFileName='run' + str(args.run) + '.root', branchNames=['EventMetaData'])
+# main.add_module('RootOutput', outputFileName='run' + str(args.run) + '.root') # , branchNames=['EventMetaData'])
 
 if args.display:
     main.add_module('TrackBuilder')

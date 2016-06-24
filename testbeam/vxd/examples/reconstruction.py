@@ -247,7 +247,7 @@ else:
 
 
 if args.dqm:
-    main.add_module('HistoManager', histoFileName='h' + str(args.run) + '.root')
+    main.add_module('HistoManager')
 
 if args.unpacking:
     if not args.svd_only:
@@ -332,6 +332,8 @@ if args.dqm:
         main.add_module('TrackfitDQM')
 
 # main.add_module('RootOutput', outputFileName='run' + str(args.run) + '.root') # , branchNames=['EventMetaData'])
+main.add_module('RootOutput')
+
 
 if args.display:
     main.add_module('TrackBuilder')

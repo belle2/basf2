@@ -19,4 +19,4 @@ basf2_mva_teacher --datafile train.root --treename tree --weightfile weightfile2
 basf2_mva_upload --filename weightfile2.root --identifier MVADatabaseIdentifier2 
 
 # Apply the trained methods on data
-basf2_mva_expert --weightfiles weightfile.root weightfile2.root MVADatabaseIdentifier MVADatabaseIdentifier2 --datafile train.root --treename tree --outputfile expert.root
+basf2_mva_expert --weightfiles weightfile.root weightfile2.root MVADatabaseIdentifier MVADatabaseIdentifier2 --datafiles train.root --treename tree --outputfile expert.root

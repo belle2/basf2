@@ -18,6 +18,8 @@
 
 #include <mva/interface/Interface.h>
 
+#include <boost/algorithm/string/predicate.hpp>
+
 #include <framework/logging/Logger.h>
 
 
@@ -54,41 +56,53 @@ namespace Belle2 {
       StoreObjPtr<ParticleExtraInfoMap>::registerPersistent("", DataStore::c_Event, false); //allow re-registration
     }
 
-    m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
-                                  DBObjPtr<DatabaseRepresentationOfWeightfile>(m_identifier));
-
+    if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
+      m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
+                                    DBObjPtr<DatabaseRepresentationOfWeightfile>(m_identifier));
+    }
     MVA::AbstractInterface::initSupportedInterfaces();
 
   }
 
   void MVAExpertModule::beginRun()
   {
-    if (m_weightfile_representation->hasChanged()) {
 
-      auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
-      std::stringstream ss((*m_weightfile_representation)->m_data);
-      auto weightfile = MVA::Weightfile::loadFromStream(ss);
-      MVA::GeneralOptions general_options;
-      weightfile.getOptions(general_options);
-
-      // Overwrite signal fraction from training
-      if (m_signal_fraction_override > 0)
-        weightfile.addSignalFraction(m_signal_fraction_override);
-
-      m_expert = supported_interfaces[general_options.m_method]->getExpert();
-      m_expert->load(weightfile);
-
-      Variable::Manager& manager = Variable::Manager::Instance();
-      m_feature_variables =  manager.getVariables(general_options.m_variables);
-      if (m_feature_variables.size() != general_options.m_variables.size()) {
-        B2FATAL("One or more feature variables could not be loaded via the Variable::Manager. Check the names!");
+    if (m_weightfile_representation) {
+      if (m_weightfile_representation->hasChanged()) {
+        std::stringstream ss((*m_weightfile_representation)->m_data);
+        auto weightfile = MVA::Weightfile::loadFromStream(ss);
+        init_mva(weightfile);
       }
-
-      std::vector<float> dummy;
-      dummy.resize(m_feature_variables.size(), 0);
-      m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, dummy, 0));
-
+    } else {
+      auto weightfile = MVA::Weightfile::loadFromFile(m_identifier);
+      init_mva(weightfile);
     }
+
+  }
+
+  void MVAExpertModule::init_mva(MVA::Weightfile& weightfile)
+  {
+
+    auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+    MVA::GeneralOptions general_options;
+    weightfile.getOptions(general_options);
+
+    // Overwrite signal fraction from training
+    if (m_signal_fraction_override > 0)
+      weightfile.addSignalFraction(m_signal_fraction_override);
+
+    m_expert = supported_interfaces[general_options.m_method]->getExpert();
+    m_expert->load(weightfile);
+
+    Variable::Manager& manager = Variable::Manager::Instance();
+    m_feature_variables =  manager.getVariables(general_options.m_variables);
+    if (m_feature_variables.size() != general_options.m_variables.size()) {
+      B2FATAL("One or more feature variables could not be loaded via the Variable::Manager. Check the names!");
+    }
+
+    std::vector<float> dummy;
+    dummy.resize(m_feature_variables.size(), 0);
+    m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, dummy, 0));
 
   }
 

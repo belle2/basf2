@@ -86,6 +86,12 @@ namespace {
     auto description = specific_options.getDescription();
     EXPECT_EQ(description.options().size(), 5);
 
+    auto description_reg = specific_regression_options.getDescription();
+    EXPECT_EQ(description_reg.options().size(), 5);
+
+    auto description_cls = specific_classification_options.getDescription();
+    EXPECT_EQ(description_cls.options().size(), 6);
+
     // Check for B2ERROR and throw if version is wrong
     // we try with version 100, surely we will never reach this!
     pt.put("TMVA_version", 100);

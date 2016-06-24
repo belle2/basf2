@@ -67,11 +67,11 @@ namespace Belle2 {
     /**
      * Convenience function applies experts on given data
      * @param filenames vector of filenames or database identifiers
-     * @param datafile ROOT file containing the data
+     * @param datafiles ROOT files containing the data
      * @param treename treename of ROOT file
      * @param outputfile name of the output ROOT file
      */
-    void expert(const std::vector<std::string>& filenames, const std::string& datafile, const std::string& treename,
+    void expert(const std::vector<std::string>& filenames, const std::vector<std::string>& datafile, const std::string& treename,
                 const std::string& outputfile, int experiment = 0, int run = 0, int event = 0);
 
     /**

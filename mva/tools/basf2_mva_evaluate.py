@@ -2,13 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import basf2_mva
-from basf2_mva_evaluation import plots
+from basf2_mva_evaluation import roc_plot, diag_plot, distribution_plot
 import argparse
 import tempfile
 
 import numpy as np
 from B2Tools import b2latex
+import ROOT
 from ROOT import Belle2
+from ROOT import gSystem
+gSystem.Load('libanalysis.so')
 
 import os
 import shutil
@@ -18,9 +21,10 @@ import sys
 def getCommandLineOptions():
     """ Parses the command line options of the fei and returns the corresponding arguments. """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--identifier', dest='identifier', type=str, required=True, action='append', nargs='+',
+    parser.add_argument('-i', '--identifiers', dest='identifiers', type=str, required=True, action='append', nargs='+',
                         help='DB Identifier or weightfile')
-    parser.add_argument('-d', '--datafile', dest='datafile', type=str, required=True, help='Data file containing ROOT TTree')
+    parser.add_argument('-d', '--datafiles', dest='datafiles', type=str, required=True, action='append', nargs='+',
+                        help='Data file containing ROOT TTree')
     parser.add_argument('-t', '--treename', dest='treename', type=str, default='tree', help='Treename in data file')
     parser.add_argument('-o', '--outputfile', dest='outputfile', type=str, default='output.pdf',
                         help='Name of the outputted pdf file')
@@ -28,40 +32,39 @@ def getCommandLineOptions():
     return args
 
 
-class ExpertInformation(object):
+def extract_names(identifiers, datafiles):
     """
-    Contains information of a export extracted from the GeneralOptions
-    for a convinient access
+    Extract information about an expert from the database using the given identifiers and datafile
     """
-
-    def __init__(self, identifier):
-        """
-        Extract information about an expert from the database using the given identifier
-        """
+    probabilities = []
+    truths = []
+    variables = []
+    labels = []
+    for identifier in identifiers:
         general_options = basf2_mva.GeneralOptions()
         weightfile = basf2_mva.Weightfile.load(identifier)
         weightfile.getOptions(general_options)
-        #: Branchname used by basf2_mva_expert for the signal probability
-        self.branchname = Belle2.makeROOTCompatible(identifier)
-        #: Branchname used by basf2_mva_expert for the target
-        self.target = Belle2.makeROOTCompatible(general_options.m_target_variable)
-        #: Variables used by the expert
-        self.variables = [Belle2.makeROOTCompatible(v) for v in general_options.m_variables]
-        #: Signal class in case of classification
-        self.signal_class = general_options.m_signal_class
+        for datafile in datafiles:
+            variables.append([Belle2.makeROOTCompatible(v) for v in general_options.m_variables])
+            probabilities.append(Belle2.makeROOTCompatible(identifier + '_' + datafile))
+            truths.append(Belle2.makeROOTCompatible(identifier + '_' + datafile + '_' + general_options.m_target_variable))
+            labels.append(identifier + " " + datafile)
+    return probabilities, truths, variables, labels
 
 
 if __name__ == '__main__':
+    ROOT.gROOT.SetBatch(True)
     args = getCommandLineOptions()
 
     tempdir = tempfile.mkdtemp()
-    identifiers = sum(args.identifier, [])
-    rootfilename = tempdir + '/expert.root'
-    basf2_mva.expert(basf2_mva.vector(*identifiers), args.datafile, args.treename, rootfilename)
-    expert_informations = [ExpertInformation(identifier) for identifier in identifiers]
+    identifiers = sum(args.identifiers, [])
+    datafiles = sum(args.datafiles, [])
 
-    probabilities = [expert_information.branchname for expert_information in expert_informations]
-    truths = [expert_information.target for expert_information in expert_informations]
+    rootfilename = tempdir + '/expert.root'
+    basf2_mva.expert(basf2_mva.vector(*identifiers), basf2_mva.vector(*datafiles), args.treename, rootfilename)
+    probabilities, truths, variables, labels = extract_names(identifiers, datafiles)
+
+    rootfile = ROOT.TFile(rootfilename, "UPDATE")
 
     # Change working directory after experts run, because they might want to access
     # a locadb in the current working directory
@@ -77,18 +80,18 @@ if __name__ == '__main__':
     o += b2latex.Section("Plots")
 
     graphics = b2latex.Graphics()
-    plots.Distribution(rootfilename, 'verbose_distribution_plot.png', probabilities, truths)
-    graphics.add('verbose_distribution_plot.png', width=1.0)
-    o += graphics.finish()
-
-    graphics = b2latex.Graphics()
-    plots.ROC(rootfilename, 'roc_plot.png', probabilities, truths)
+    roc_plot.from_file(rootfile, probabilities, truths, labels, 'roc_plot.png')
     graphics.add('roc_plot.png', width=1.0)
     o += graphics.finish()
 
     graphics = b2latex.Graphics()
-    plots.Diagonal(rootfilename, 'diagonal_plot.png', probabilities, truths)
+    diag_plot.from_file(rootfile, probabilities, truths, labels, 'diagonal_plot.png')
     graphics.add('diagonal_plot.png', width=1.0)
+    o += graphics.finish()
+
+    graphics = b2latex.Graphics()
+    distribution_plot.from_file(rootfile, probabilities, truths, labels, 'distribution_plot.png')
+    graphics.add('distribution_plot.png', width=1.0)
     o += graphics.finish()
 
     o.finish()

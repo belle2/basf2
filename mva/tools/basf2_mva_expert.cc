@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 {
 
   std::vector<std::string> filenames;
-  std::string datafile;
+  std::vector<std::string> datafiles;
   std::string treename = "variables";
   std::string outputfile;
 
@@ -31,7 +31,8 @@ int main(int argc, char* argv[])
   description.add_options()
   ("help", "print this message")
   ("weightfiles", po::value<std::vector<std::string>>(&filenames)->multitoken(), "Names of weightfiles")
-  ("datafile", po::value<std::string>(&datafile)->required(), "ROOT file containing the training dataset")
+  ("datafiles", po::value<std::vector<std::string>>(&datafiles)->multitoken()->required(),
+   "ROOT files containing the training dataset")
   ("treename", po::value<std::string>(&treename), "Name of tree in ROOT datafile")
   ("outputfile", po::value<std::string>(&outputfile)->required(), "ROOT file containing the results");
 
@@ -51,7 +52,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  Belle2::MVA::expert(filenames, datafile, treename, outputfile);
+  Belle2::MVA::expert(filenames, datafiles, treename, outputfile);
   return 0;
 
 }

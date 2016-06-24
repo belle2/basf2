@@ -119,6 +119,8 @@ namespace {
     auto loaded = MVA::Weightfile::loadFromDatabase("MVAInterfaceTest");
     EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
 
+    EXPECT_THROW(MVA::Weightfile::loadFromFile("MVAInterfaceTest"), std::runtime_error);
+
     loaded = MVA::Weightfile::load("MVAInterfaceTest");
     EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
 
@@ -135,6 +137,9 @@ namespace {
 
     MVA::Weightfile::save(weightfile, "MVAInterfaceTest.xml");
     auto loaded = MVA::Weightfile::loadFromXMLFile("MVAInterfaceTest.xml");
+    EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+    loaded = MVA::Weightfile::loadFromFile("MVAInterfaceTest.xml");
     EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
 
     loaded = MVA::Weightfile::load("MVAInterfaceTest.xml");
@@ -154,6 +159,9 @@ namespace {
 
     MVA::Weightfile::save(weightfile, "MVAInterfaceTest.root");
     auto loaded = MVA::Weightfile::loadFromROOTFile("MVAInterfaceTest.root");
+    EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+    loaded = MVA::Weightfile::loadFromFile("MVAInterfaceTest.root");
     EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
 
     loaded = MVA::Weightfile::load("MVAInterfaceTest.root");

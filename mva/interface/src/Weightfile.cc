@@ -157,6 +157,17 @@ namespace Belle2 {
       }
     }
 
+    Weightfile Weightfile::loadFromFile(const std::string& filename)
+    {
+      if (boost::ends_with(filename, ".root")) {
+        return loadFromROOTFile(filename);
+      } else if (boost::ends_with(filename, ".xml")) {
+        return loadFromXMLFile(filename);
+      } else {
+        throw std::runtime_error("Cannot load file " + filename + " because file extension is not supported");
+      }
+    }
+
     Weightfile Weightfile::loadFromROOTFile(const std::string& filename)
     {
 

@@ -97,7 +97,7 @@ namespace Belle2 {
 
     }
 
-    void expert(const std::vector<std::string>& filenames, const std::string& datafile, const std::string& treename,
+    void expert(const std::vector<std::string>& filenames, const std::vector<std::string>& datafiles, const std::string& treename,
                 const std::string& outputfile, int experiment, int run, int event)
     {
 
@@ -113,54 +113,57 @@ namespace Belle2 {
         Belle2::EventMetaData emd(event, run, experiment);
         auto weightfile = Weightfile::load(filename, emd);
         weightfiles.push_back(weightfile);
-        std::string branchname = Belle2::makeROOTCompatible(filename);
-        auto branch = tree.Branch(branchname.c_str(), &result, (branchname + "/F").c_str());
-        branches.push_back(branch);
+
+        for (const auto& datafile : datafiles) {
+          std::string branchname = Belle2::makeROOTCompatible(filename + "_" + datafile);
+          auto branch = tree.Branch(branchname.c_str(), &result, (branchname + "/F").c_str());
+          branches.push_back(branch);
+        }
       }
 
-      std::vector<std::string> known_targets;
       AbstractInterface::initSupportedInterfaces();
       auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
 
-      for (unsigned int i = 0; i < weightfiles.size(); ++i) {
-        auto& weightfile = weightfiles[i];
-        auto& branch = branches[i];
-
+      unsigned int i = 0;
+      for (auto& weightfile : weightfiles) {
         GeneralOptions general_options;
         weightfile.getOptions(general_options);
-        general_options.m_datafile = datafile;
         general_options.m_treename = treename;
 
         auto expert = supported_interfaces[general_options.m_method]->getExpert();
         expert->load(weightfile);
 
-        ROOTDataset data(general_options);
-        auto results = expert->apply(data);
-        for (auto& r : results) {
-          // Suppress cppcheck false positive
-          // style: Variable 'result' is assigned a value that is never used.
-          // However, it is used, by branch->Fill() internally
-          // cppcheck-suppress *
-          result = r;
-          branch->Fill();
-        }
-
-        std::string branchname = Belle2::makeROOTCompatible(general_options.m_target_variable);
-
-        if (std::find(known_targets.begin(), known_targets.end(), branchname) == known_targets.end() and not branchname.empty()) {
-          known_targets.push_back(branchname);
-          float target = 0;
-          auto target_branch = tree.Branch(branchname.c_str(), &target, (branchname + "/F").c_str());
-          auto targets = data.getTargets();
-          for (auto& t : targets) {
+        for (const auto& datafile : datafiles) {
+          general_options.m_datafile = datafile;
+          auto& branch = branches[i];
+          ROOTDataset data(general_options);
+          auto results = expert->apply(data);
+          for (auto& r : results) {
             // Suppress cppcheck false positive
             // style: Variable 'result' is assigned a value that is never used.
             // However, it is used, by branch->Fill() internally
             // cppcheck-suppress *
-            target = t;
-            target_branch->Fill();
+            result = r;
+            branch->Fill();
+          }
+
+
+          if (not general_options.m_target_variable.empty()) {
+            std::string branchname = Belle2::makeROOTCompatible(std::string(branch->GetName()) + "_" + general_options.m_target_variable);
+            float target = 0;
+            auto target_branch = tree.Branch(branchname.c_str(), &target, (branchname + "/F").c_str());
+            auto targets = data.getTargets();
+            for (auto& t : targets) {
+              // Suppress cppcheck false positive
+              // style: Variable 'result' is assigned a value that is never used.
+              // However, it is used, by branch->Fill() internally
+              // cppcheck-suppress *
+              target = t;
+              target_branch->Fill();
+            }
           }
         }
+        ++i;
       }
 
       tree.SetEntries();

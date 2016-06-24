@@ -65,4 +65,4 @@ if __name__ == "__main__":
     # Apply the trained methods on data
     basf2_mva.expert(basf2_mva.vector('MVAPdf', 'MVAFull', 'MVAOrdinary', 'MVASPlot',
                                       'MVASPlotCombined', 'MVASPlotBoosted', 'MVASPlotCombinedBoosted'),
-                     'train.root', 'tree', 'expert.root')
+                     basf2_mva.vector('train.root'), 'tree', 'expert.root')

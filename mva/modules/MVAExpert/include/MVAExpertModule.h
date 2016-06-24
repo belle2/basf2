@@ -60,6 +60,12 @@ namespace Belle2 {
      */
     float analyse(Particle*);
 
+    /**
+     * Initialize mva expert, dataset and features
+     * Called everytime the weightfile in the database changes in begin run
+     */
+    void init_mva(MVA::Weightfile& weightfile);
+
 
   private:
 

@@ -31,4 +31,4 @@ if __name__ == "__main__":
 
     # Apply the trained methods on data
     basf2_mva.expert(basf2_mva.vector('weightfile.root', 'weightfile2.root', 'MVADatabaseIdentifier', 'MVADatabaseIdentifier2'),
-                     'train.root', 'tree', 'expert.root')
+                     basf2_mva.vector('train.root'), 'tree', 'expert.root')

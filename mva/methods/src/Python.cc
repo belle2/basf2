@@ -217,7 +217,7 @@ namespace Belle2 {
         auto parameters = json.attr("loads")(m_specific_options.m_config.c_str());
 
         auto module = boost::python::import(steering_path.stem().c_str());
-        auto framework = boost::python::import((std::string("basf2_mva_") + m_specific_options.m_framework).c_str());
+        auto framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
 
         auto model = get_attr_from_module_else_fallback_to_framework("get_model", module, framework)(numberOfFeatures, numberOfEvents,
                      parameters);

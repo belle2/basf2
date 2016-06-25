@@ -40,6 +40,9 @@ namespace Belle2 {
     /** Find a cluster adjacent to the given coordinates. If no cluster is found, 0 is returned */
     ClusterCandidate& ClusterCache::findCluster(unsigned int u, unsigned int v)
     {
+      if (u >= m_maxU - 2) {
+        throw std::out_of_range("u cell id is outside of valid range");
+      }
       switchRow(v);
       const unsigned int u1 = u + 1;
       //Look for cluster top of current pixel (0,0 at top left corner, rows going

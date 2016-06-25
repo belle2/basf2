@@ -223,7 +223,11 @@ void PXDClusterizerModule::event()
     // contain holes or are disconnected.
 
     // Find correct cluster and add pixel to cluster
-    m_cache->findCluster(px.getU(), px.getV()).add(px);
+    try {
+      m_cache->findCluster(px.getU(), px.getV()).add(px);
+    } catch (std::out_of_range& e) {
+      B2WARNING("PXD clustering: Ignoring pixel " << px.getU() << "," << px.getV() << ": " << e.what());
+    }
   }
   writeClusters(sensorID);
 }

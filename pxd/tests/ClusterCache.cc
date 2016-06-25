@@ -132,7 +132,7 @@ namespace Belle2 {
 
       //Check if all 7 pixels are present using a bitmask to see if we get every index from 1 to 7 once
       std::bitset<7> check_index(-1);
-      for (const Pixel & px : foundZ.pixels()) {
+      for (const Pixel& px : foundZ.pixels()) {
         ASSERT_LT(0u, px.getIndex());
         ASSERT_GE(7u, px.getIndex());
         EXPECT_TRUE(check_index[px.getIndex() - 1]) << "index: " << px.getIndex();
@@ -150,6 +150,19 @@ namespace Belle2 {
       ASSERT_TRUE(cache.empty());
       cache.findCluster(0, 0);
       ASSERT_FALSE(cache.empty());
+    }
+
+    /** Check that out_of_range exceptions are raised if the pixel is out of range */
+    TEST(ClusterCache, OutOfRange)
+    {
+      ClusterCache cache(250);
+      for (int i = -10; i < 260; ++i) {
+        if (i >= 0 && i < 250) {
+          ASSERT_NO_THROW(cache.findCluster(i, 0));
+        } else {
+          ASSERT_THROW(cache.findCluster(i, 0), std::out_of_range);
+        }
+      }
     }
   } //PXD namespace
 } //Belle namespace

@@ -84,7 +84,7 @@ namespace Belle2 {
 
       enum {
         /** Default maximum number of PIXEL columns the cache can handle */
-        c_defaultNumberColumns = 768
+        c_defaultNumberColumns = 250
       };
       /** Create a new cache */
       explicit ClusterCache(unsigned int maxU = c_defaultNumberColumns);

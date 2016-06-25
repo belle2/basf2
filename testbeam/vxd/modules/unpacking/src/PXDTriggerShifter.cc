@@ -8,6 +8,8 @@
 
 #include <testbeam/vxd/modules/unpacking/PXDTriggerShifter.h>
 #include <boost/spirit/home/support/detail/endian.hpp>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 using namespace std;
 using namespace Belle2;
@@ -45,12 +47,20 @@ void PXDTriggerShifterModule::terminate(void)
 
 void PXDTriggerShifterModule::event(void)
 {
+  StoreObjPtr<EventMetaData> evtPtr;/// what will happen if it does not exist???
+
+  unsigned int triggerNrEvt = evtPtr->getEvent();
+
   // first, we have to find the trigger numbers from the pxd data ...
   TClonesArray* rawdata = m_storeRaw.getPtr();
   unsigned int pxdTriggerNr = 0x10000, triggerNr = 0x10000;
+// pxdTriggerNr is the DHC one
+// triggerNR the HLT/Onsen one
   for (auto& it : m_storeRaw) {
     if (getTrigNr(it, pxdTriggerNr, triggerNr)) break; // only first (valid) one
   }
+
+  triggerNr = triggerNrEvt & 0xFFFF; // Overwrite Onsen/HLT TrigNr with EvtMeta One
 
   // Keep current raw data in MRU cache with its original pxd trigger number
   if (pxdTriggerNr != 0x10000) m_previous_events.insert(pxdTriggerNr & 0xFFFF, *rawdata);

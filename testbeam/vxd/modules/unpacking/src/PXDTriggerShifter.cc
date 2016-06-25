@@ -56,6 +56,7 @@ void PXDTriggerShifterModule::event(void)
   if (pxdTriggerNr != 0x10000) m_previous_events.insert(pxdTriggerNr & 0xFFFF, *rawdata);
 
   if (triggerNr == 0x10000) { // invalid
+    m_storeRaw.clear();// To be sure remove not fitting data
     setReturnValue(false);
     m_notfixed++;
     return;
@@ -67,6 +68,7 @@ void PXDTriggerShifterModule::event(void)
     // Now try to replace current raw data with raw data with current trigger number + offset
     // Main problem with this approach, if we do not find the correct data, the previous data
     // is still there ... thus checking the return value is mandatory!
+    m_storeRaw.clear();// To be sure, remove not fitting data
     if (!m_previous_events.retrieve(triggerNr, *rawdata)) {
       B2WARNING("Could not find data for offset for HLT $" << hex << triggerNr << " and DHH $" << hex << pxdTriggerNr);
       setReturnValue(false);

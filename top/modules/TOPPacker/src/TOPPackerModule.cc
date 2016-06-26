@@ -10,8 +10,7 @@
 
 // Own include
 #include <top/modules/TOPPacker/TOPPackerModule.h>
-
-
+#include <top/RawDataTypes.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -113,9 +112,8 @@ namespace Belle2 {
         const auto* feemap = mapper.getMapFromCopper(copperID, finesse);
         if (!feemap) continue;
         unsigned scrodID = feemap->getScrodID();
-        unsigned dataFormat = 1; // production data -> TODO: use enum
-        unsigned version = 0;
-        Buffer[finesse].push_back(scrodID + (version << 16) + (dataFormat << 24));
+        unsigned dataFormat = static_cast<unsigned>(TOP::RawDataType::c_Draft);
+        Buffer[finesse].push_back(scrodID + (dataFormat << 16));
         for (const auto& digit : sortedDigits[feemap->getIndex()]) {
           unsigned tdc = digit->getTDC() & 0xFFFF;
           unsigned chan = digit->getChannel() % 128;

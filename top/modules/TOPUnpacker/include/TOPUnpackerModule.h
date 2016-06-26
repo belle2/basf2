@@ -153,54 +153,61 @@ namespace Belle2 {
   private:
 
     /**
-     * Unpack raw data given in production format version 0
+     * Expand 13-bit signed-word to 16-bit signed-word
+     */
+    short expand13to16bits(unsigned short x) const
+    {
+      unsigned short signBit = x & 0x1000;
+      return ((x & 0x1FFF) | signBit << 1 | signBit << 2 | signBit << 3);
+    }
+
+
+    /**
+     * sum both 16-bit words of 32-bit integer
+     */
+    unsigned short sumShorts(unsigned int x) const
+    {
+      return x + (x >> 16);
+    }
+
+
+    /**
+     * Unpack raw data given in a tentative production format (will vanish in future)
      * @param buffer raw data buffer
      * @param bufferSize buffer size
      * @param digits collection to unpack to
      */
-    void unpackProductionFormat(const int* buffer, int bufferSize,
-                                StoreArray<TOPDigit>& digits);
+    void unpackProductionDraft(const int* buffer, int bufferSize,
+                               StoreArray<TOPDigit>& digits);
 
     /**
-     * Unpack raw data given in production format version 1.
-     * This format is also called feature-extraction format version 1.9c
+     * Unpack raw data given in feature-extraction production format
      * @param buffer raw data buffer
      * @param bufferSize buffer size
      * @param rawDigits collection to unpack to
      */
-    void unpackProductionFormat(const int* buffer, int bufferSize,
-                                StoreArray<TOPRawDigit>& rawDigits);
+    void unpackType0Ver16(const int* buffer, int bufferSize,
+                          StoreArray<TOPRawDigit>& rawDigits);
 
     /**
-     * Unpack raw data given in waveform format
+     * Unpack raw data given in waveform format (Kurtis packets - IRS3B)
      * @param buffer raw data buffer
      * @param bufferSize buffer size
      * @param waveforms collection to unpack to
+     * @return number of words remaining in data buffer
      */
-    void unpackWaveformFormat(const int* buffer, int bufferSize,
-                              StoreArray<TOPRawWaveform>& waveforms);
+    int unpackWaveformsIRS3B(const int* buffer, int bufferSize,
+                             StoreArray<TOPRawWaveform>& waveforms);
 
     /**
-     * Unpack raw data given in waveform format version 1 (Kurtis packets - IRS3B)
-     * @param array raw data buffer
-     * @param feemap front-end map
+     * Unpack raw data given in waveform format (gigE format - IRSX)
+     * @param buffer raw data buffer
+     * @param bufferSize buffer size
      * @param waveforms collection to unpack to
      * @return number of words remaining in data buffer
      */
-    int unpackWaveformFormatV1(TOP::DataArray& array,
-                               const TOPFrontEndMap* feemap,
-                               StoreArray<TOPRawWaveform>& waveforms);
-
-    /**
-     * Unpack raw data given in waveform format version 2 (gigE format - IRSX)
-     * @param array raw data buffer
-     * @param feemap front-end map
-     * @param waveforms collection to unpack to
-     * @return number of words remaining in data buffer
-     */
-    int unpackWaveformFormatV2(TOP::DataArray& array,
-                               const TOPFrontEndMap* feemap,
-                               StoreArray<TOPRawWaveform>& waveforms);
+    int unpackWaveformsGigE(const int* buffer, int bufferSize,
+                            StoreArray<TOPRawWaveform>& waveforms);
 
     std::string m_inputRawDataName;  /**< name of RawTOP store array */
     std::string m_outputDigitsName;  /**< name of TOPDigit store array */

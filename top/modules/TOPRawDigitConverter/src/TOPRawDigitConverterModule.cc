@@ -150,6 +150,7 @@ namespace Belle2 {
     digits.clear();
 
     for (const auto& rawDigit : rawDigits) {
+      if (rawDigit.getErrorFlags() != 0) continue;
       auto scrodID = rawDigit.getScrodID();
       const auto* feemap = feMapper.getMap(scrodID);
       if (!feemap) {

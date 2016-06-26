@@ -10,8 +10,7 @@
 
 // Own include
 #include <top/modules/TOPUnpacker/TOPUnpackerModule.h>
-
-
+#include <top/RawDataTypes.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -112,38 +111,43 @@ namespace Belle2 {
         int bufferSize = raw.GetDetectorNwords(0, finesse);
         if (bufferSize < 1) continue;
 
+        int err = 0;
         DataArray array(buffer, bufferSize, m_swapBytes);
         unsigned word = array.getWord();
-        unsigned dataFormat = (word >> 24) & 0xFF;
-        unsigned version = (word >> 16) & 0xFF;
+        int dataFormat = (word >> 16);
         switch (dataFormat) {
-          case 1:
-            switch (version) {
-              case 0:
-                unpackProductionFormat(buffer, bufferSize, digits);
-                break;
-              case 1:
-                unpackProductionFormat(buffer, bufferSize, rawDigits);
-                break;
-              default:
-                B2ERROR("TOPUnpacker: unknown production format, version = " << version);
-            }
+          case static_cast<int>(TOP::RawDataType::c_Type0Ver16):
+            unpackType0Ver16(buffer, bufferSize, rawDigits);
             break;
-          case 2:
-            unpackWaveformFormat(buffer, bufferSize, waveforms);
+          case static_cast<int>(TOP::RawDataType::c_Draft):
+            unpackProductionDraft(buffer, bufferSize, digits);
+            break;
+          case static_cast<int>(TOP::RawDataType::c_GigE):
+            err = unpackWaveformsGigE(buffer, bufferSize, waveforms);
+            break;
+          case static_cast<int>(TOP::RawDataType::c_IRS3B):
+            err = unpackWaveformsIRS3B(buffer, bufferSize, waveforms);
             break;
           default:
-            B2ERROR("TOPUnpacker: unknown data format, type = " << dataFormat);
+            B2ERROR("TOPUnpacker: unknown data format, Type = " <<
+                    (dataFormat >> 8) << ", Version = " <<
+                    (dataFormat & 0xFF));
         }
+
+        if (err != 0)
+          B2ERROR("TOPUnpacker: " << err << " words of data buffer not used");
+
       } // finesse loop
     } // rawData loop
 
   }
 
 
-  void TOPUnpackerModule::unpackProductionFormat(const int* buffer, int bufferSize,
-                                                 StoreArray<TOPDigit>& digits)
+  void TOPUnpackerModule::unpackProductionDraft(const int* buffer, int bufferSize,
+                                                StoreArray<TOPDigit>& digits)
   {
+
+    B2DEBUG(100, "Unpacking ProductionDraft to TOPDigits, dataSize = " << bufferSize);
 
     unsigned short scrodID = buffer[0] & 0xFFFF;
     const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);
@@ -157,115 +161,99 @@ namespace Belle2 {
 
     const auto* geo = m_topgp->getGeometry();
 
-    unsigned version = (buffer[0] >> 16) & 0xFF;
-    switch (version) {
-      case 0:
-        for (int i = 1; i < bufferSize; i++) {
-          int word = buffer[i];
-          int tdc = word & 0xFFFF;
-          unsigned chan = ((word >> 16) & 0x7F) + boardstack * 128;
-          unsigned flags = (word >> 24) & 0xFF;
-          int pixelID = mapper.getPixelID(chan);
-          auto* digit = digits.appendNew(moduleID, pixelID, tdc);
-          digit->setTime(geo->getNominalTDC().getTime(tdc));
-          digit->setChannel(chan);
-          digit->setHitQuality((TOPDigit::EHitQuality) flags);
-        }
-        break;
-      default:
-        B2ERROR("TOPUnpacker::unpackProductionFormat: unknown data format version "
-                << version);
+    for (int i = 1; i < bufferSize; i++) {
+      int word = buffer[i];
+      int tdc = word & 0xFFFF;
+      unsigned chan = ((word >> 16) & 0x7F) + boardstack * 128;
+      unsigned flags = (word >> 24) & 0xFF;
+      int pixelID = mapper.getPixelID(chan);
+      auto* digit = digits.appendNew(moduleID, pixelID, tdc);
+      digit->setTime(geo->getNominalTDC().getTime(tdc));
+      digit->setChannel(chan);
+      digit->setHitQuality((TOPDigit::EHitQuality) flags);
     }
 
   }
 
 
-  void TOPUnpackerModule::unpackProductionFormat(const int* buffer, int bufferSize,
-                                                 StoreArray<TOPRawDigit>& rawDigits)
+  void TOPUnpackerModule::unpackType0Ver16(const int* buffer, int bufferSize,
+                                           StoreArray<TOPRawDigit>& rawDigits)
   {
+
+    B2DEBUG(100, "Unpacking Type0Ver16 to TOPRawDigits, dataSize = " << bufferSize);
+
     DataArray array(buffer, bufferSize, m_swapBytes);
     unsigned word = array.getWord();
     unsigned short scrodID = word & 0x0FFF;
 
-    int Nhits = array.getLastWord() & 0x01FF;
+    unsigned last = array.getLastWord();
+    int Nhits = last & 0x01FF;
     if (bufferSize != 5 * Nhits + 2) {
       B2ERROR("TOPUnpacker: corrupted data (feature-extraction format) for SCROD ID = "
               << scrodID);
       return;
     }
 
+    unsigned short errorFlags = 0;
+    if (((word >> 12) & 0x0F) != 0x0A) errorFlags |= TOPRawDigit::c_HeadMagic;
+    if (((last >> 9) & 0x07) != 0x05) errorFlags |= TOPRawDigit::c_TailMagic;
+
     for (int hit = 0; hit < Nhits; hit++) {
       auto* digit = rawDigits.appendNew(scrodID);
 
       word = array.getWord(); // word 1
-      digit->setCarrierNumber((word >> 29) & 0x03);
-      digit->setASICNumber((word >> 27) & 0x03);
-      digit->setASICChannel((word >> 24) & 0x07);
-      digit->setSample((word >> 16) & 0xFF);
-      digit->setTFine((word >> 12) & 0x0F);
-      digit->setCOffset((word >> 10) & 0x03);
-      digit->setASICWindow(word & 0x1FF);
+      digit->setCarrierNumber((word >> 30) & 0x03);
+      digit->setASICNumber((word >> 28) & 0x03);
+      digit->setASICChannel((word >> 25) & 0x07);
+      digit->setASICWindow((word >> 16) & 0x1FF);
+      digit->setTFine((word >> 8) & 0x0F);
+      auto flags = errorFlags;
+      if (((word >> 12) & 0x0F) != 0x0B) flags |= TOPRawDigit::c_HitMagic;
+      unsigned short checkSum = sumShorts(word);
 
       word = array.getWord(); // word 2
-      digit->setDeltaSamplePeak((word >> 28) & 0x0F);
-      digit->setDeltaSampleFall((word >> 24) & 0x0F);
-      digit->setDeltaValueFall((word >> 16) & 0xFF);
-      digit->setValuePeak(word & 0xFFFF);
+      digit->setValuePeak(expand13to16bits(word >> 16));
+      digit->setIntegral(word & 0xFFFF);
+      checkSum += sumShorts(word);
 
       word = array.getWord(); // word 3
-      digit->setValueSample0((word >> 16) & 0xFFFF);
-      digit->setValueSample1(word & 0xFFFF);
+      digit->setValueRise0(expand13to16bits(word >> 16));
+      digit->setValueRise1(expand13to16bits(word));
+      checkSum += sumShorts(word);
 
       word = array.getWord(); // word 4
-      digit->setValueFall0((word >> 16) & 0xFFFF);
-      digit->setValueFall1(word & 0xFFFF);
+      digit->setValueFall0(expand13to16bits(word >> 16));
+      digit->setValueFall1(expand13to16bits(word));
+      checkSum += sumShorts(word);
 
       word = array.getWord(); // word 5
-      digit->setIntegral(word & 0xFFFF);
+      digit->setSampleRise(word >> 24);
+      digit->setDeltaSamplePeak((word >> 20) & 0x0F);
+      digit->setDeltaSampleFall((word >> 16) & 0x0F);
+      checkSum += sumShorts(word);
+      if (checkSum != 0) flags |= TOPRawDigit::c_HitChecksum;
+
+      digit->setErrorFlags(flags);
+
     }
 
   }
 
 
-  void TOPUnpackerModule::unpackWaveformFormat(const int* buffer, int bufferSize,
-                                               StoreArray<TOPRawWaveform>& waveforms)
+  int TOPUnpackerModule::unpackWaveformsIRS3B(const int* buffer, int bufferSize,
+                                              StoreArray<TOPRawWaveform>& waveforms)
   {
+
+    B2DEBUG(100, "Unpacking IRS3B to TOPRawWaveforms, dataSize = " << bufferSize);
+
     DataArray array(buffer, bufferSize, m_swapBytes);
     unsigned word = array.getWord();
     unsigned short scrodID = word & 0xFFFF;
     const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);
     if (!feemap) {
       B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
-      return;
+      return array.getRemainingWords();
     }
-
-    unsigned version = (word >> 16) & 0xFF;
-    int err = 0;
-    switch (version) {
-      case 1:
-        err = unpackWaveformFormatV1(array, feemap, waveforms);
-        if (err != 0)
-          B2ERROR("TOPUnpacker::unpackWaveformFormat: " << err <<
-                  " words of data buffer not used");
-        break;
-      case 2:
-        err = unpackWaveformFormatV2(array, feemap, waveforms);
-        if (err != 0)
-          B2ERROR("TOPUnpacker::unpackWaveformFormat: " << err <<
-                  " words of data buffer not used");
-        break;
-      default:
-        B2ERROR("TOPUnpacker::unpackWaveformFormat: unknown data format version "
-                << version);
-    }
-
-  }
-
-
-  int TOPUnpackerModule::unpackWaveformFormatV1(TOP::DataArray& array,
-                                                const TOPFrontEndMap* feemap,
-                                                StoreArray<TOPRawWaveform>& waveforms)
-  {
 
     StoreObjPtr<EventMetaData> evtMetaData;
     int moduleID = feemap->getModuleID();
@@ -315,17 +303,26 @@ namespace Belle2 {
   }
 
 
-  int TOPUnpackerModule::unpackWaveformFormatV2(TOP::DataArray& array,
-                                                const TOPFrontEndMap* feemap,
-                                                StoreArray<TOPRawWaveform>& waveforms)
+  int TOPUnpackerModule::unpackWaveformsGigE(const int* buffer, int bufferSize,
+                                             StoreArray<TOPRawWaveform>& waveforms)
   {
+
+    B2DEBUG(100, "Unpacking GigE to TOPRawWaveforms, dataSize = " << bufferSize);
+
+    DataArray array(buffer, bufferSize, m_swapBytes);
+    unsigned word = array.getWord();
+    unsigned short scrodID = word & 0xFFFF;
+    const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);
+    if (!feemap) {
+      B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
+      return array.getRemainingWords();
+    }
 
     StoreObjPtr<EventMetaData> evtMetaData;
     int moduleID = feemap->getModuleID();
     int boardstack = feemap->getBoardstackNumber();
     const auto& mapper = m_topgp->getChannelMapper(ChannelMapper::c_IRSX);
 
-    unsigned word = 0;
     unsigned numPackets = array.getWord();
     for (unsigned packet = 0; packet < numPackets; packet++) {
       word = array.getWord();

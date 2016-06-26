@@ -10,8 +10,7 @@
 
 // Own include
 #include <testbeam/top/modules/TOPCRTEventBuilder/TOPCRTEventBuilderModule.h>
-
-
+#include <top/RawDataTypes.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -287,13 +286,12 @@ namespace Belle2 {
       if (data[0] == data[1]) i0 = 1;
       int word = swap32(data[i0 + 1]);
       unsigned scrodID = (word >> 9) & 0x7F;
-      unsigned dataFormat = 2; // waveforms
-      unsigned version = 2; // gigE (sparsified or unsparsified)
+      unsigned dataFormat = static_cast<unsigned>(TOP::RawDataType::c_GigE);
       if (scrodID == 16 and m_expNumber == 0 and
           m_runNumber >= 1700 and m_runNumber < 2220) {
         scrodID = scrods[finesse]; // fix since ID is wrong
       }
-      Buffer[finesse].push_back(scrodID + (version << 16) + (dataFormat << 24));
+      Buffer[finesse].push_back(scrodID + (dataFormat << 16));
       Buffer[finesse].push_back(1); // number of gigE packets
       for (int i = i0; i < size - 1; i++) {
         Buffer[finesse].push_back(swap32(data[i]));

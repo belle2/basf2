@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <testbeam/top/modules/TOPRawdataInput/Packet.h>
+#include <top/RawDataTypes.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
@@ -190,9 +191,8 @@ namespace Belle2 {
       allocateData(dataSize);
 
       unsigned scrodID = scrod & 0xFFFF;
-      unsigned dataFormat = 2; // waveform data -> TODO: use enum
-      unsigned version = 1;
-      ok = add(scrodID + (version << 16) + (dataFormat << 24));
+      unsigned dataFormat = static_cast<unsigned>(TOP::RawDataType::c_IRS3B);
+      ok = add(scrodID + (dataFormat << 16));
       ok = add(header->scrod);
       ok = add(header->freezeDate);
       ok = add(header->eventNumber);

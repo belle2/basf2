@@ -10,8 +10,7 @@
 
 // Own include
 #include <testbeam/top/modules/TOPRawdataInput/TOPRawdataInputModule.h>
-
-
+#include <top/RawDataTypes.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -310,10 +309,9 @@ namespace Belle2 {
         for (const auto& word : m_gigEPacket) scrodData.push_back(word); // append packet
         scrodData[1]++; // increment packet counter
       } else {
-        unsigned dataFormat = 2;
-        unsigned version = 2;
+        unsigned dataFormat = static_cast<unsigned>(TOP::RawDataType::c_GigE);
         auto& scrodData = eventData[scrod];
-        scrodData.push_back(scrod + (version << 16) + (dataFormat << 24)); // append header
+        scrodData.push_back(scrod + (dataFormat << 16)); // append header
         scrodData.push_back(0); // append packet counter
         for (const auto& word : m_gigEPacket) scrodData.push_back(word); // append packet
         scrodData[1]++; // increment packet counter

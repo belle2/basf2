@@ -41,6 +41,9 @@ namespace Belle2 {
     unsigned int GetWindowID(const TOPCAFDigit* in_digit);
     double CalibrateWaveform(TOPCAFDigit* in_digit);
     void smoothSampleHistogram(TH1D* histogram);
+    void getSampleNumbersAndFractions(Belle2::hit_info* this_hit_info, int& sample1, int& sample2, double& fraction1,
+                                      double& fraction2);
+    void makeClosurePlots(topcaf_channel_id_t ch_id, std::vector<hit_info>& hitInfoVector);
 
 
     //var
@@ -58,6 +61,10 @@ namespace Belle2 {
     bool m_smoothSamples;
     double m_minimumSampleWidth;
     double m_maximumSampleWidth;
+    int m_nIterations;
+    int m_nMinimiserBins;
+    float m_dTval[257];
+
 
     std::string m_payload_tag, m_experiment, m_run;
     std::string m_initial_run, m_final_run;
@@ -72,13 +79,19 @@ namespace Belle2 {
     std::map<topcaf_channel_id_t, TH2D*> m_sample_occupancies_vs_tdiff_hit2;
     std::map<topcaf_channel_id_t, TH2D*> m_sample_occupancies_vs_tdiff_hit1_final;
     std::map<topcaf_channel_id_t, TH2D*> m_sample_occupancies_vs_tdiff_hit2_final;
-    std::map<topcaf_channel_id_t, TH2D*> m_iteration_vs_tdiff;
+    //std::map<topcaf_channel_id_t, TH2D*> m_iteration_vs_tdiff;
     std::map<topcaf_channel_id_t, TH2D*> m_samples_hit1_vs_hit2;
+    std::map<topcaf_channel_id_t, TH2D*> m_samples_hit1_vs_hit2_after;
+    TH2D* m_closure_tdiff_vs_sample1;
+    TH2D* m_closure_tdiff_vs_sample2;
+    TH2D* m_closure_time1_vs_time2;
 
     TH1D* m_waveform_h;
     TH1D* m_time_calib_tdc_h;
     TH1D* m_channel_time_calib_h;
     TH1D* m_channel_time_calib_cumulative_h;
+    TH2D* m_iteration_vs_tdiff;
+
     TH1D* m_dt_h;
     double sum_max_time, num_max_time, m_tdc, m_cal_mint, m_cal_maxt;
     TH1D* m_residual_h, *m_corr_residual_h;

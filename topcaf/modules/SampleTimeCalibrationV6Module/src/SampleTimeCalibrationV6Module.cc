@@ -69,6 +69,9 @@ SampleTimeCalibrationV6Module::SampleTimeCalibrationV6Module() : Module()
   addParam("maximumSampleWidth", m_maximumSampleWidth,
            "With smoothSamples the maximum width of the sample bin, in terms of multiples of the default bin width, before smoothing is applied.",
            2.0);
+  addParam("nIterations", m_nIterations, "Number of iterations to use for the minimiser.", 20);
+  addParam("nMinimiserBins", m_nMinimiserBins, "Number of bins to use in the width histograms used by the minimiser.", 400);
+
 
   m_out_file = nullptr;
   m_in_file = nullptr;
@@ -234,26 +237,36 @@ void SampleTimeCalibrationV6Module::event()
             }
             m_sample_occupancies_hit2[cal11_asic_id]->Fill(((int(this_hit_info.sample2)) % 256));
 
-            double time_difference = this_hit_info.sample1 - this_hit_info.sample2;
+            //double time_difference = this_hit_info.sample2 - this_hit_info.sample1;
+            //Float_t winDt(m_time2tdc * 128);  // ns per window
+            //Float_t winDt2(2.0 * winDt); // ns per window
+
+            //double time_difference(0);
+            //if ((time2 - time1) > 0) {time_difference = (this_hit_info.sample2 - this_hit_info.sample1);}
+            //if ((time2 - time1) < 0) {time_difference = ((winDt2 + this_hit_info.sample2) - this_hit_info.sample1);}
+
+
+
+
             if (m_sample_occupancies_vs_tdiff_hit1.find(cal10_asic_id) == m_sample_occupancies_vs_tdiff_hit1.end()) {
               TString occupancy_histo_name("smp_vs_tdiff_hit1_");
               occupancy_histo_name += cal10_asic_id;
               m_sample_occupancies_vs_tdiff_hit1[cal10_asic_id] = new TH2D(occupancy_histo_name, "time difference vs sample - hit1", 256, 0.0,
-                  256.0, 200, m_min_time_diff, m_max_time_diff);
+                  256.0, m_nMinimiserBins, m_min_time_diff, m_max_time_diff);
               m_sample_occupancies_vs_tdiff_hit1[cal10_asic_id]->SetXTitle("sample number % 256");
               m_sample_occupancies_vs_tdiff_hit1[cal10_asic_id]->SetYTitle("time difference / default bin widths");
             }
-            m_sample_occupancies_vs_tdiff_hit1[cal10_asic_id]->Fill(((int(this_hit_info.sample1)) % 256), time_difference);
+            //m_sample_occupancies_vs_tdiff_hit1[cal10_asic_id]->Fill(62.0, 62.0);
 
             if (m_sample_occupancies_vs_tdiff_hit2.find(cal11_asic_id) == m_sample_occupancies_vs_tdiff_hit2.end()) {
               TString occupancy_histo_name("smp_vs_tdiff_hit2_");
               occupancy_histo_name += cal11_asic_id;
               m_sample_occupancies_vs_tdiff_hit2[cal11_asic_id] = new TH2D(occupancy_histo_name, "time difference vs sample - hit2", 256, 0.0,
-                  256.0, 200, m_min_time_diff, m_max_time_diff);
+                  256.0, m_nMinimiserBins, m_min_time_diff, m_max_time_diff);
               m_sample_occupancies_vs_tdiff_hit2[cal11_asic_id]->SetXTitle("sample number % 256");
               m_sample_occupancies_vs_tdiff_hit2[cal11_asic_id]->SetYTitle("time difference / default bin widths");
             }
-            m_sample_occupancies_vs_tdiff_hit2[cal11_asic_id]->Fill(((int(this_hit_info.sample2)) % 256), time_difference);
+            //m_sample_occupancies_vs_tdiff_hit2[cal11_asic_id]->Fill(((int(this_hit_info.sample2)) % 256), time_difference);
 
             if (m_samples_hit1_vs_hit2.find(cal11_asic_id) == m_samples_hit1_vs_hit2.end()) {
               TString histo_name("smp1_vs_smp2_");
@@ -343,12 +356,12 @@ void  SampleTimeCalibrationV6Module::terminate()
       for (auto it2(m_sample_occupancies_hit2.begin()); it2 != m_sample_occupancies_hit2.end(); ++it2) {
         it2->second->Write();
       }
-      for (auto it(m_sample_occupancies_vs_tdiff_hit1.begin()); it != m_sample_occupancies_vs_tdiff_hit1.end(); ++it) {
-        it->second->Write();
-      }
-      for (auto it(m_sample_occupancies_vs_tdiff_hit2.begin()); it != m_sample_occupancies_vs_tdiff_hit2.end(); ++it) {
-        it->second->Write();
-      }
+//      for (auto it(m_sample_occupancies_vs_tdiff_hit1.begin()); it != m_sample_occupancies_vs_tdiff_hit1.end(); ++it) {
+//        it->second->Write();
+//      }
+//      for (auto it(m_sample_occupancies_vs_tdiff_hit2.begin()); it != m_sample_occupancies_vs_tdiff_hit2.end(); ++it) {
+//        it->second->Write();
+//      }
       for (auto it(m_samples_hit1_vs_hit2.begin()); it != m_samples_hit1_vs_hit2.end(); ++it) {
         it->second->Write();
       }
@@ -391,6 +404,9 @@ void  SampleTimeCalibrationV6Module::terminate()
         }
 
       } else { //use non-minuit based fitter
+
+
+        //if (2100000000 != ch_id) {continue;}
         B2INFO("Using non-Minuit based fitting procedure for sample time calibration.");
         B2INFO("Calibrating channel " << ch_id << " using " << g_hitinfo.size() << " hits.");
 
@@ -403,26 +419,43 @@ void  SampleTimeCalibrationV6Module::terminate()
         winDt2 = nomDt * 255.0;
         winDt  = winDt2 / 2.0;
 
-        Float_t dTval[257];
+        //Float_t m_dTval[257];
         Float_t tWidth(-1);
 
 
         // initialize starting dT values
-        for (Int_t i(0); i < 256; ++i) {dTval[i] = i * nomDt;} // start with the nominal dT values
+        for (Int_t i(0); i < 256; ++i) {m_dTval[i] = i * nomDt;} // start with the nominal dT values
         //dTval[256] = winDt2;  // wrap constraint
-        dTval[256] = winDt2;
+        m_dTval[256] = winDt2;
 
         //Float_t lowVal(0);
         //Float_t highVal(260);
         TString name("h_dTmin");
         TString title("Calibration");
         title += ch_id;
-        TH1F* h1 = new TH1F(name, title, 400, m_min_time_diff, m_max_time_diff);
+        TH1F* h1 = new TH1F(name, title, m_nMinimiserBins, m_min_time_diff, m_max_time_diff);
+        h1->SetXTitle("Sample number % 256");
+        h1->SetYTitle("time difference / default sample widths");
+
+
         //m_iteration_vs_tdiff = new TH2D()
 
         //name  = "smp_vs_smp_" + ch_id;
         //title = "Sample1 vs Sample2 for channel" + ch_id;
         //m_samples_hit1_vs_hit2 = new TH2D(name, title, 256, 0.0, 256.0, 256, 0.0, 256.0);
+
+
+        name = "iteration_vs_tdiff_";
+        name += ch_id;
+        title = "Width vs iteration for channel ";
+        title += ch_id;
+        m_iteration_vs_tdiff = new TH2D(name, title, m_nIterations, 0.0, m_nIterations, m_nMinimiserBins, m_min_time_diff, m_max_time_diff);
+        m_iteration_vs_tdiff->SetXTitle("Iteration number");
+        m_iteration_vs_tdiff->SetYTitle("width / default sample widths");
+
+
+
+
 
 
         //Fill h1 for the first time:
@@ -445,11 +478,11 @@ void  SampleTimeCalibrationV6Module::terminate()
           s1index = s1index % 256;
           s2index = s2index % 256;
 
-          time1 = dTval[s1index];
-          time1 += sample1_frac * (dTval[s1index + 1] - dTval[s1index]);
+          time1 = m_dTval[s1index];
+          time1 += sample1_frac * (m_dTval[s1index + 1] - m_dTval[s1index]);
 
-          time2 = dTval[s2index];
-          time2 += sample2_frac * (dTval[s2index + 1] - dTval[s2index]);
+          time2 = m_dTval[s2index];
+          time2 += sample2_frac * (m_dTval[s2index + 1] - m_dTval[s2index]);
 
           double time_diff(0);
           if ((time2 - time1) > 0) {time_diff = (time2 - time1);}
@@ -465,6 +498,9 @@ void  SampleTimeCalibrationV6Module::terminate()
           //if((time2 - time1) < 0) {time_diff = ((winDt2 + time2) - time1);}
 
           h1->Fill(time_diff);
+          m_iteration_vs_tdiff->Fill(0.0 , time_diff);
+          m_sample_occupancies_vs_tdiff_hit1[ch_id]->Fill(s1index, time_diff);
+          m_sample_occupancies_vs_tdiff_hit2[ch_id]->Fill(s2index, time_diff);
 
           //Fill other histograms:
           //m_samples_hit1_vs_hit2->Fill(sample1, sample2);
@@ -479,6 +515,12 @@ void  SampleTimeCalibrationV6Module::terminate()
         h1_initial_title += "_initial";
         TH1F* h1_initial = (TH1F*) h1->Clone(h1_initial_title);
 
+
+
+
+
+
+
         m_out_file->cd("extra");
         h1_initial->Write();
         m_out_file->cd();
@@ -487,9 +529,9 @@ void  SampleTimeCalibrationV6Module::terminate()
         Float_t tryRMS, aMean, tryDt[256];
         Float_t bestRMS = 10.0;
         Int_t   moBettah;
-        Float_t stepDt, stepDtRef = 0.3;  // try adaptive step size ;
+        Float_t stepDt, stepDtRef = 0.1;  // try adaptive step size ;
 
-        for (Int_t nSize = 0; nSize < 20; nSize++) {
+        for (Int_t nSize = 0; nSize < m_nIterations; nSize++) {
           stepDtRef /= 1.2;  // ad hoc 20% reduction each pass (perhaps not make magic number)
 
           for (Int_t nOuter = 1; nOuter < 256; nOuter++) {
@@ -501,11 +543,11 @@ void  SampleTimeCalibrationV6Module::terminate()
 
               // sign loop
               for (Int_t nSign = 0; nSign < 2; nSign++) {
-                for (Int_t nI = 0; nI < 256; nI++) {tryDt[nI] = dTval[nI];} // assign starting place
+                for (Int_t nI = 0; nI < 256; nI++) {tryDt[nI] = m_dTval[nI];} // assign starting place
 
 
                 // update timing  for trial exchanges
-                tryDt[nOuter] = dTval[nOuter] + stepDt * (0.5 - 1.0 * nSign);
+                tryDt[nOuter] = m_dTval[nOuter] + stepDt * (0.5 - 1.0 * nSign);
 
                 h1->Reset();  // clear for check
 
@@ -571,7 +613,7 @@ void  SampleTimeCalibrationV6Module::terminate()
                   //if((tTrailing-tLeading)<0) {tWidth = ((winDt2+tTrailing)-tLeading);}
                   //B2INFO("time1 = " << time1 << "\ttime2 = " << time2 << "\ttime_diff = " << time_diff);
                   //B2INFO("tLeading = " << tLeading << "\ttTrailing = " << tTrailing << "\ttWidth = " << tWidth);
-
+                  tWidth = time_diff;
 
                   h1->Fill(time_diff);
                 }  // evts loop
@@ -584,8 +626,11 @@ void  SampleTimeCalibrationV6Module::terminate()
                   B2DEBUG(2, "bestRMS = " << tryRMS << " for nOuter = " << nOuter);
                   B2DEBUG(2, "tryDT[nOuter] = " << tryDt[nOuter] << " for stepDT = " << (-1.0 + 2 * nSign)*stepDt);
                   B2DEBUG(2, "tWidth = " << tWidth << " and Mean = " << aMean);
+                  //B2INFO("bestRMS = " << tryRMS << " for nOuter = " << nOuter);
+                  //B2INFO("tryDT[nOuter] = " << tryDt[nOuter] << " for stepDT = " << (-1.0 + 2 * nSign)*stepDt);
+                  //B2INFO("tWidth = " << tWidth << " and Mean = " << aMean);
 
-                  dTval[nOuter] = tryDt[nOuter];
+                  m_dTval[nOuter] = tryDt[nOuter];
                   moBettah = 1; // try loop again
                   bestRMS = tryRMS;
                 }
@@ -595,6 +640,11 @@ void  SampleTimeCalibrationV6Module::terminate()
             }  // moBettah loop
 
           }  // nOuter (sample position) loop
+          B2INFO("Finished iteration " << nSize + 1 << ": h1->GetRMS() = " << h1->GetRMS());
+          for (int iBin(1); iBin < m_nMinimiserBins; ++iBin) {
+            m_iteration_vs_tdiff->SetBinContent(nSize + 1, iBin, h1->GetBinContent(iBin));
+          }
+
 
         }  // nSize loop
 
@@ -610,10 +660,10 @@ void  SampleTimeCalibrationV6Module::terminate()
         output_name += "_cumulative";
         m_channel_time_calib_cumulative_h = new TH1D(output_name.c_str(), output_title, 255, 0, 255);
         for (int i = 0; i < 256; ++i) {
-          m_channel_time_calib_h->SetBinContent(i + 1, dTval[i + 1] - dTval[i]);
-          m_channel_time_calib_cumulative_h->SetBinContent(i + 1, dTval[i]);
+          m_channel_time_calib_h->SetBinContent(i + 1, m_dTval[i + 1] - m_dTval[i]);
+          m_channel_time_calib_cumulative_h->SetBinContent(i + 1, m_dTval[i]);
           //channel_time_calib_h->SetBinError(i + 1, err[i]);
-          B2DEBUG(1, "par[" << i << "]: " << dTval[i]);
+          B2DEBUG(1, "par[" << i << "]: " << m_dTval[i]);
         }
 
         TString h1_final_title("h1_");
@@ -641,14 +691,25 @@ void  SampleTimeCalibrationV6Module::terminate()
         }
 
         m_channel_time_calib_h->Write();
+
         m_out_file->cd("extra");
         m_channel_time_calib_cumulative_h->Write();
+        m_iteration_vs_tdiff->Write();
+
+
+
+
         m_out_file->cd();
       }
 
       delete m_channel_time_calib_h;
-
+      makeClosurePlots(ch_id, g_hitinfo);
     } // end loop over cal_photon_pairs
+
+    //make closure plots
+//    makeClosurePlots(ch_id, g_hitinfo);
+
+
 
 
     if (m_out_file) {
@@ -656,6 +717,14 @@ void  SampleTimeCalibrationV6Module::terminate()
       h2o.Write();
       h1f.Write();
       h2f.Write();
+      m_out_file->cd("extra");
+      for (auto it(m_sample_occupancies_vs_tdiff_hit1.begin()); it != m_sample_occupancies_vs_tdiff_hit1.end(); ++it) {
+        it->second->Write();
+      }
+      for (auto it(m_sample_occupancies_vs_tdiff_hit2.begin()); it != m_sample_occupancies_vs_tdiff_hit2.end(); ++it) {
+        it->second->Write();
+      }
+      m_out_file->cd();
     }
 
 
@@ -853,6 +922,118 @@ void SampleTimeCalibrationV6Module::smoothSampleHistogram(TH1D* histogram)
     }
   }
 }
+
+
+
+void SampleTimeCalibrationV6Module::getSampleNumbersAndFractions(Belle2::hit_info* this_hit_info, int& sample1, int& sample2,
+    double& fraction1, double& fraction2)
+{
+
+  double sample1temp = fmod(this_hit_info->sample1, 256);
+  double sample2temp = fmod(this_hit_info->sample2, 256);
+
+  fraction1 = modf(sample1temp, &sample1temp);
+  fraction2 = modf(sample2temp, &sample2temp);
+
+  sample1 = int(sample1temp);
+  sample2 = int(sample2temp);
+  sample2 = sample2 % 256;
+  sample2 = sample2 % 256;
+
+}
+
+void SampleTimeCalibrationV6Module::makeClosurePlots(topcaf_channel_id_t ch_id, std::vector<hit_info>& hitInfoVector)
+{
+
+  B2INFO("In SampleTimeCalibrationV6Module::makeClosurePlots.");
+
+
+  TString closureHistogramName("closure_sample1_");
+  closureHistogramName += ch_id;
+  TString closureHistogramTitle("Closure histogram for sample 1 for channel ");
+  closureHistogramTitle += ch_id;
+  m_closure_tdiff_vs_sample1 = new TH2D(closureHistogramName, closureHistogramTitle, 256, 0.0, 256.0, m_nMinimiserBins,
+                                        m_min_time_diff, m_max_time_diff);
+  m_closure_tdiff_vs_sample1->SetContour(256);
+  m_closure_tdiff_vs_sample1->SetXTitle("Sample number % 256");
+  m_closure_tdiff_vs_sample1->SetYTitle("time difference / default sample widths");
+
+  closureHistogramName = "closure_sample2_";
+  closureHistogramName += ch_id;
+  closureHistogramTitle = "Closure histogram for sample 2 for channel ";
+  closureHistogramTitle += ch_id;
+  m_closure_tdiff_vs_sample2 = new TH2D(closureHistogramName, closureHistogramTitle, 256, 0.0, 256.0, m_nMinimiserBins,
+                                        m_min_time_diff, m_max_time_diff);
+  m_closure_tdiff_vs_sample2->SetContour(256);
+  m_closure_tdiff_vs_sample2->SetXTitle("Sample number % 256");
+  m_closure_tdiff_vs_sample2->SetYTitle("time difference / default sample widths");
+
+  closureHistogramName = "closure_time1_vs_time2_";
+  closureHistogramName += ch_id;
+  closureHistogramTitle = "Closure histogram: time1 vs time2 for channel ";
+  closureHistogramTitle += ch_id;
+  m_closure_time1_vs_time2 = new TH2D(closureHistogramName, closureHistogramTitle, 256 * 4, 0.0, 256.0, 256 * 4, 0.0, 256.0);
+  m_closure_time1_vs_time2->SetContour(256);
+  m_closure_time1_vs_time2->SetXTitle("time1 / default sample widths");
+  m_closure_time1_vs_time2->SetYTitle("time2 / default sample widths");
+
+
+  for (auto it(hitInfoVector.begin()); it != hitInfoVector.end(); ++it) {
+
+    double nomDt  = 1.0;
+    double winDt2 = nomDt * 255.0;
+//    double winDt  = winDt2 / 2.0;
+
+    int total = 256;
+
+//    int time1_nwin = it->sample1 / total;
+//    int time2_nwin = it->sample2 / total;
+    double sample1 = fmod(it->sample1, total);
+    double sample2 = fmod(it->sample2, total);
+    double time1 = 0.;
+    double time2 = 0.;
+    double sample1_frac = modf(sample1, &sample1);
+    double sample2_frac = modf(sample2, &sample2);
+
+    int s1index(sample1);
+    int s2index(sample2);
+    s1index = s1index % 256;
+    s2index = s2index % 256;
+
+    time1 = m_dTval[s1index];
+    time1 += sample1_frac * (m_dTval[s1index + 1] - m_dTval[s1index]);
+
+    time2 = m_dTval[s2index];
+    time2 += sample2_frac * (m_dTval[s2index + 1] - m_dTval[s2index]);
+
+    double timeDifference(0);
+    if ((time2 - time1) > 0) {timeDifference = (time2 - time1);}
+    if ((time2 - time1) < 0) {timeDifference = ((winDt2 + time2) - time1);}
+
+    m_closure_tdiff_vs_sample1->Fill(s1index, timeDifference);
+    m_closure_tdiff_vs_sample2->Fill(s2index, timeDifference);
+    m_closure_time1_vs_time2->Fill(time1, time2);
+
+
+  }
+
+  if (m_out_file) {
+
+    m_out_file->cd("extra");
+    m_closure_tdiff_vs_sample1->Write();
+    m_closure_tdiff_vs_sample2->Write();
+    m_closure_time1_vs_time2->Write();
+    m_out_file->cd("");
+  }
+
+}
+
+
+
+
+
+
+
 
 
 

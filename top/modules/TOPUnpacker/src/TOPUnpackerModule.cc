@@ -71,8 +71,12 @@ namespace Belle2 {
   void TOPUnpackerModule::initialize()
   {
 
+    // input
+
     StoreArray<RawTOP> rawData(m_inputRawDataName);
     rawData.isRequired();
+
+    // output
 
     StoreArray<TOPDigit> digits(m_outputDigitsName);
     digits.registerInDataStore();
@@ -82,6 +86,8 @@ namespace Belle2 {
 
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.registerInDataStore(DataStore::c_DontWriteOut);
+
+    rawDigits.registerRelationTo(waveforms, DataStore::c_Event, DataStore::c_DontWriteOut);
 
     // check if front end mappings are available
     const auto& mapper = m_topgp->getFrontEndMapper();
@@ -118,6 +124,12 @@ namespace Belle2 {
         switch (dataFormat) {
           case static_cast<int>(TOP::RawDataType::c_Type0Ver16):
             unpackType0Ver16(buffer, bufferSize, rawDigits);
+            break;
+          case static_cast<int>(TOP::RawDataType::c_Type2Ver1):
+            err = unpackType2or3Ver1(buffer, bufferSize, rawDigits, waveforms, false);
+            break;
+          case static_cast<int>(TOP::RawDataType::c_Type3Ver1):
+            err = unpackType2or3Ver1(buffer, bufferSize, rawDigits, waveforms, true);
             break;
           case static_cast<int>(TOP::RawDataType::c_Draft):
             unpackProductionDraft(buffer, bufferSize, digits);
@@ -236,6 +248,183 @@ namespace Belle2 {
       digit->setErrorFlags(flags);
 
     }
+
+  }
+
+
+  int TOPUnpackerModule::unpackType2or3Ver1(const int* buffer, int bufferSize,
+                                            StoreArray<TOPRawDigit>& rawDigits,
+                                            StoreArray<TOPRawWaveform>& waveforms,
+                                            bool pedestalSubtracted)
+  {
+
+    if (pedestalSubtracted) {
+      B2DEBUG(100, "Unpacking Type3Ver1 to TOPRawDigits and TOPRawWaveforms, dataSize = "
+              << bufferSize);
+    } else {
+      B2DEBUG(100, "Unpacking Type2Ver1 to TOPRawDigits and TOPRawWaveforms, dataSize = "
+              << bufferSize);
+    }
+
+    DataArray array(buffer, bufferSize, m_swapBytes);
+
+    const int numWindows = 4; // to be checked with Lynn
+    int hitSize = 21 + 64 / 2 * numWindows; // if header repeates with every hit (Lynn?)
+    int Nhits = bufferSize / hitSize;
+
+    unsigned word = 0;
+    for (int hit = 0; hit < Nhits; hit++) {
+
+      word = array.getWord(); // word 0 (header with Type/Version)
+      if ((word & 0xFFFF) != 0xAAAA) {
+        B2ERROR("TOPUnpacker: corrupted data for Type2or3Ver1 - no header word 0xAAAA");
+        return array.getRemainingWords();
+      }
+
+      word = array.getWord(); // word 1
+      unsigned short convertedAddr = word & 0x1FF;
+      unsigned short scrodID = (word >> 9) & 0x7F;
+
+      word = array.getWord(); // word 2
+
+      // feature-extracted data (positive signal)
+      word = array.getWord(); // word 3
+      word = array.getWord(); // word 4
+      short samplePeak_p = (word >> 16) & 0xFFFF;
+      short valuePeak_p = word & 0xFFFF;
+
+      word = array.getWord(); // word 5
+      short sampleRise_p = (word >> 16) & 0xFFFF;
+      short valueRise0_p = word & 0xFFFF;
+
+      word = array.getWord(); // word 6
+      short valueRise1_p = (word >> 16) & 0xFFFF;
+      short sampleFall_p = word & 0xFFFF;
+
+      word = array.getWord(); // word 7
+      short valueFall0_p = (word >> 16) & 0xFFFF;
+      short valueFall1_p = word & 0xFFFF;
+
+      word = array.getWord(); // word 8
+      short integral_p = (word >> 16) & 0xFFFF;
+      short qualityFlags_p = word & 0xFFFF;
+
+      // feature-extracted data (negative signal)
+      word = array.getWord(); // word 9
+      word = array.getWord(); // word 10
+      short samplePeak_n = (word >> 16) & 0xFFFF;
+      short valuePeak_n = word & 0xFFFF;
+
+      word = array.getWord(); // word 11
+      short sampleRise_n = (word >> 16) & 0xFFFF;
+      short valueRise0_n = word & 0xFFFF;
+
+      word = array.getWord(); // word 12
+      short valueRise1_n = (word >> 16) & 0xFFFF;
+      short sampleFall_n = word & 0xFFFF;
+
+      word = array.getWord(); // word 13
+      short valueFall0_n = (word >> 16) & 0xFFFF;
+      short valueFall1_n = word & 0xFFFF;
+
+      word = array.getWord(); // word 14
+      short integral_n = (word >> 16) & 0xFFFF;
+      short qualityFlags_n = word & 0xFFFF;
+
+      // waveform header
+      word = array.getWord(); // word 15
+      word = array.getWord(); // word 16
+      word = array.getWord(); // word 17
+      word = array.getWord(); // word 18
+      //  unsigned short numPoints = (word >> 16) & 0xFFFF;
+      unsigned short carrier = (word >> 14) & 0x03;
+      unsigned short asic = (word >> 12) & 0x03;
+      unsigned short asicChannel = (word >> 9) & 0x07;
+      unsigned short window = word & 0x1FF;
+      if (window != convertedAddr)
+        B2ERROR("TOPUnpacker: Type2or3Ver1 - window numbers differ " << window <<
+                " " << convertedAddr);
+
+      std::vector<TOPRawDigit*> digits; // needed for creating relations to waveforms
+      // store to raw digits (carrier/asic/channel not available before waveform header!)
+      if (abs(valuePeak_p) > 1) {
+        auto* digit = rawDigits.appendNew(scrodID);
+        digit->setCarrierNumber(carrier);
+        digit->setASICNumber(asic);
+        digit->setASICChannel(asicChannel);
+        digit->setASICWindow(window);
+        digit->setSampleRise(sampleRise_p);
+        digit->setDeltaSamplePeak(samplePeak_p - sampleRise_p);
+        digit->setDeltaSampleFall(sampleFall_p - sampleRise_p);
+        digit->setValueRise0(valueRise0_p);
+        digit->setValueRise1(valueRise1_p);
+        digit->setValuePeak(valuePeak_p);
+        digit->setValueFall0(valueFall0_p);
+        digit->setValueFall1(valueFall1_p);
+        digit->setIntegral(integral_p);
+        digit->setErrorFlags(qualityFlags_p); // temporary place to store!
+        digits.push_back(digit);
+      }
+      if (abs(valuePeak_n) > 1) {
+        auto* digit = rawDigits.appendNew(scrodID);
+        digit->setCarrierNumber(carrier);
+        digit->setASICNumber(asic);
+        digit->setASICChannel(asicChannel);
+        digit->setASICWindow(window);
+        digit->setSampleRise(sampleRise_n);
+        digit->setDeltaSamplePeak(samplePeak_n - sampleRise_n);
+        digit->setDeltaSampleFall(sampleFall_n - sampleRise_n);
+        digit->setValueRise0(valueRise0_n);
+        digit->setValueRise1(valueRise1_n);
+        digit->setValuePeak(valuePeak_n);
+        digit->setValueFall0(valueFall0_n);
+        digit->setValueFall1(valueFall1_n);
+        digit->setIntegral(integral_n);
+        digit->setErrorFlags(qualityFlags_n); // temporary place to store!
+        digits.push_back(digit);
+      }
+
+      word = array.getWord(); // word 19
+      word = array.getWord(); // word 20
+      word = array.getWord(); // word 21
+
+      // unpack waveforms
+      std::vector<unsigned short> adcData;
+      for (int i = 0; i < numWindows; i++) {
+        word = array.getWord();
+        adcData.push_back(word & 0xFFFF);
+        adcData.push_back((word >> 16) & 0xFFFF);
+      }
+
+      // determine slot number (moduleID) and boardstack
+      int moduleID = 0;
+      int boardstack = 0;
+      const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);
+      if (feemap) {
+        moduleID = feemap->getModuleID();
+        boardstack = feemap->getBoardstackNumber();
+      } else {
+        B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
+      }
+
+      // determine hardware channel and pixelID (valid only if feemap available!)
+      const auto& mapper = m_topgp->getChannelMapper(ChannelMapper::c_IRSX);
+      unsigned channel = mapper.getChannel(boardstack, carrier, asic, asicChannel);
+      int pixelID = mapper.getPixelID(channel);
+
+      // store to raw waveforms
+      unsigned lastWriteAddr = 0; // not important, but maybe available somewhere?
+      auto* waveform = waveforms.appendNew(moduleID, pixelID, channel, scrodID, 0,
+                                           0, 0, lastWriteAddr, window,
+                                           mapper.getType(), mapper.getName(), adcData);
+      waveform->setPedestalSubtractedFlag(pedestalSubtracted);
+
+      // create relations btw. raw digits and waveform
+      for (auto& digit : digits) digit->addRelationTo(waveform);
+
+    }
+
+    return array.getRemainingWords();
 
   }
 

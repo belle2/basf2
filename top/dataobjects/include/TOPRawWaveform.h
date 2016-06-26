@@ -73,6 +73,11 @@ namespace Belle2 {
     }
 
     /**
+     * Sets pedestal subtracted flag
+     */
+    void setPedestalSubtractedFlag(bool value) {m_pedestalSubtracted = value;}
+
+    /**
      * Returns module ID
      * @return module ID
      */
@@ -143,6 +148,12 @@ namespace Belle2 {
      * @return true, if pedestal mode
      */
     bool isPedestalMode() const { return (m_flags & 0x0001);}
+
+    /**
+     * Tells whether pedestal already subtracted or not
+     * @return true if subtracted
+     */
+    bool isPedestalSubtracted() const {return m_pedestalSubtracted;}
 
     /**
      * Returns IRS reference analog storage window.
@@ -230,6 +241,7 @@ namespace Belle2 {
     std::vector<unsigned short> m_data;  /**< waveform ADC values */
     unsigned m_electronicType = 0;      /**< electronic type (see ChannelMapper::EType) */
     std::string m_electronicName;   /**< electronic name */
+    bool m_pedestalSubtracted = false; /**< true, if pedestal already subtracted */
 
     ClassDef(TOPRawWaveform, 4); /**< ClassDef */
 

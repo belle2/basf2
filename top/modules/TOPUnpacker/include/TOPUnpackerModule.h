@@ -189,6 +189,21 @@ namespace Belle2 {
     void unpackType0Ver16(const int* buffer, int bufferSize,
                           StoreArray<TOPRawDigit>& rawDigits);
 
+
+    /**
+     * Unpack raw data given in feature-extraction interim format
+     * @param buffer raw data buffer
+     * @param bufferSize buffer size
+     * @param rawDigits collection to unpack feature-extracted data
+     * @param waveforms collection to unpack waveforms
+     * @param pedestalSubtracted false for version 2, true for version 3
+     * @return number of words remaining in data buffer
+     */
+    int unpackType2or3Ver1(const int* buffer, int bufferSize,
+                           StoreArray<TOPRawDigit>& rawDigits,
+                           StoreArray<TOPRawWaveform>& waveforms,
+                           bool pedestalSubtracted);
+
     /**
      * Unpack raw data given in waveform format (Kurtis packets - IRS3B)
      * @param buffer raw data buffer

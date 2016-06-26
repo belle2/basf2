@@ -269,7 +269,7 @@ namespace Belle2 {
     DataArray array(buffer, bufferSize, m_swapBytes);
 
     const int numWindows = 4; // to be checked with Lynn
-    int hitSize = 21 + 64 / 2 * numWindows; // if header repeates with every hit (Lynn?)
+    int hitSize = 22 + 64 / 2 * numWindows; // if header repeates with every hit (Lynn?)
     int Nhits = bufferSize / hitSize;
 
     unsigned word = 0;

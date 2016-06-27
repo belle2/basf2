@@ -83,6 +83,9 @@ namespace Belle2 {
    * This could result in optimized code as the compiler can reorder the code
    * to reduce conditional jumps during execution. Due to the high efficiency
    * of todays branch prediction systems the effect is probably small.
+   * \warning Use of this macro should be accompanied by a comment
+   *          documenting the (significant) performance gains that justify
+   *          its use. (Please make sure you compile in 'opt' mode.)
    * \see #branch_unlikely(x)
    *
    * Usage:
@@ -90,7 +93,7 @@ namespace Belle2 {
    *     if (branch_likely(my_number > 10)) {
    *       // executed very often
    *     } else {
-   *       // executed very seldom
+   *       // executed only rarely
    *     }
    */
 
@@ -101,12 +104,15 @@ namespace Belle2 {
    * This could result in optimized code as the compiler can reorder the code
    * to reduce conditional jumps during execution. Due to the high efficiency
    * of todays branch prediction systems the effect is probably small.
+   * \warning Use of this macro should be accompanied by a comment
+   *          documenting the (significant) performance gains that justify
+   *          its use. (Please make sure you compile in 'opt' mode.)
    * \see #branch_likely(x)
    *
    * Usage:
    *
    *     if (branch_unlikely(my_number > 10)) {
-   *       // executed very seldom
+   *       // executed only rarely
    *     } else {
    *       // executed very often
    *     }

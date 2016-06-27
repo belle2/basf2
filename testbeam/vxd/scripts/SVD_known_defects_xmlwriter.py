@@ -27,6 +27,9 @@ from xmlwriter_tools import *
 
 def create_file():
 
+    # do we want to write the defects as xml content ?
+    write_defect_types = False
+
     # do we want to write an xml file with physical strip # converted to uv
     # strip # ?
     use_uv_strip_number = True
@@ -48,7 +51,11 @@ def create_file():
     update_z_filenames(path)
 
     # open output file
-    output = 'SVD_MaskListKnownDefects.xml'
+    if write_defect_types:
+        output = 'SVD_KnownDefects_Advanced.xml'
+    else:
+        output = 'SVD_KnownDefects.xml'
+
     f = open(output, 'w')
 
     # start writing on file
@@ -99,7 +106,8 @@ def create_file():
 
                     # print list of strips with their defects
                     print_file_content(i, j, k, filename, f,
-                                       list_of_good_defects, use_uv_strip_number)
+                                       list_of_good_defects,
+                                       write_defect_types, use_uv_strip_number)
 
                     # write final lines
                     f.write('\t\t\t\t</side>\n')

@@ -180,7 +180,8 @@ def get_filename(i, j, k, path_layer):
 
 
 def print_file_content(layer_num, sensor_num, side_num, filename, f,
-                       list_of_good_defects, use_uv_strip_number):
+                       list_of_good_defects,
+                       write_defect_types, use_uv_strip_number):
 
     list_of_defects = get_list_of_defects(filename)
 
@@ -222,7 +223,11 @@ def print_file_content(layer_num, sensor_num, side_num, filename, f,
                         strip_number = phys_strip_number
 
                     # write strip number and its defects in xml file
-                    f.write('\t\t\t\t\t<strip stripNo = \"' + strip_number + '\"' + defects_str + '></strip>\n')
+                    if write_defect_types:
+                        f.write('\t\t\t\t\t<strip stripNo = \"' + strip_number + '\"' + defects_str + '></strip>\n')
+                    else:
+                        f.write('\t\t\t\t\t<strip stripNo = \"' + strip_number + '\"' + '></strip>\n' +
+                                '\t\t\t\t\t<!-- ' + defects_str + ' -->\n')
             else:
                 if rows and 'parameter' in rows[0]:
                     break  # stop when we hit the 'parameters' row, strip numbers have finished

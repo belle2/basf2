@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Meta>
-	<Date>05/05/2016</Date>
-	<Description short="Ignore strips list for SVD planes in 2016 TB">
-		List of known strip defects from layers groups
+	<Date>27/06/2016</Date>
+	<Description short="List of known defects for SVD planes in 2016 TB">
+		List of known strip defects, built using input from ladders groups, used to analyse 2016
+        testbeam data.
 	</Description>
 	<Author>Giacomo Caria</Author>
 </Meta>
@@ -20,18 +21,28 @@
 		<ladder n="1">
 			<sensor n="1">
 				<side side="v">
-					<strip stripNo = "764" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
-					<strip stripNo = "763" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
-					<strip stripNo = "760" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
+					<strip stripNo = "764"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
+					<strip stripNo = "763"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
+					<strip stripNo = "760"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
 				</side>
 				<side side="u">
-					<strip stripNo = "417" defect1 = "Short_ET"></strip>
-					<strip stripNo = "416" defect1 = "Metal_Short_DSSD" defect2 = "Short_ET"></strip>
-					<strip stripNo = "415" defect1 = "Metal_Short_DSSD"></strip>
-					<strip stripNo = "411" defect1 = "Metal_Short_DSSD" defect2 = "Short_ET"></strip>
-					<strip stripNo = "410" defect1 = "Metal_Short_DSSD" defect2 = "Short_ET"></strip>
-					<strip stripNo = "409" defect1 = "Metal_Short_DSSD" defect2 = "Short_ET"></strip>
-					<strip stripNo = "278" defect1 = "Pinhole_ET"></strip>
+					<strip stripNo = "417"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "416"></strip>
+					<!--  defect1 = "Metal_Short_DSSD" defect2 = "Short_ET" -->
+					<strip stripNo = "415"></strip>
+					<!--  defect1 = "Metal_Short_DSSD" -->
+					<strip stripNo = "411"></strip>
+					<!--  defect1 = "Metal_Short_DSSD" defect2 = "Short_ET" -->
+					<strip stripNo = "410"></strip>
+					<!--  defect1 = "Metal_Short_DSSD" defect2 = "Short_ET" -->
+					<strip stripNo = "409"></strip>
+					<!--  defect1 = "Metal_Short_DSSD" defect2 = "Short_ET" -->
+					<strip stripNo = "278"></strip>
+					<!--  defect1 = "Pinhole_ET" -->
 				</side>
 			</sensor>
 			<sensor n="2">
@@ -46,41 +57,62 @@
 		<ladder n="1">
 			<sensor n="1">
 				<side side="v">
-					<strip stripNo = "308" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
+					<strip stripNo = "308"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
 				</side>
 				<side side="u">
-					<strip stripNo = "0" defect1 = "Open_ET"></strip>
-					<strip stripNo = "113" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
-					<strip stripNo = "149" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
-					<strip stripNo = "194" defect1 = "Open_ET"></strip>
-					<strip stripNo = "262" defect1 = "Short_ET"></strip>
-					<strip stripNo = "263" defect1 = "Short_ET"></strip>
-					<strip stripNo = "290" defect1 = "Short_ET"></strip>
-					<strip stripNo = "291" defect1 = "Short_ET"></strip>
-					<strip stripNo = "314" defect1 = "Short_ET"></strip>
-					<strip stripNo = "315" defect1 = "Short_ET"></strip>
-					<strip stripNo = "414" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
-					<strip stripNo = "466" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
+					<strip stripNo = "0"></strip>
+					<!--  defect1 = "Open_ET" -->
+					<strip stripNo = "113"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
+					<strip stripNo = "149"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
+					<strip stripNo = "194"></strip>
+					<!--  defect1 = "Open_ET" -->
+					<strip stripNo = "262"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "263"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "290"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "291"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "314"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "315"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "414"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
+					<strip stripNo = "466"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
 				</side>
 			</sensor>
 			<sensor n="2">
 				<side side="v">
-					<strip stripNo = "74" defect1 = "Open_ET"></strip>
-					<strip stripNo = "126" defect1 = "Open_ET"></strip>
+					<strip stripNo = "74"></strip>
+					<!--  defect1 = "Open_ET" -->
+					<strip stripNo = "126"></strip>
+					<!--  defect1 = "Open_ET" -->
 				</side>
 				<side side="u">
-					<strip stripNo = "754" defect1 = "Pinhole_ET"></strip>
-					<strip stripNo = "356" defect1 = "metal_open_DSSD"></strip>
-					<strip stripNo = "309" defect1 = "Short_ET"></strip>
-					<strip stripNo = "308" defect1 = "Short_ET"></strip>
+					<strip stripNo = "754"></strip>
+					<!--  defect1 = "Pinhole_ET" -->
+					<strip stripNo = "356"></strip>
+					<!--  defect1 = "metal_open_DSSD" -->
+					<strip stripNo = "309"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "308"></strip>
+					<!--  defect1 = "Short_ET" -->
 				</side>
 			</sensor>
 			<sensor n="3">
 				<side side="v">
-					<strip stripNo = "493" defect1 = "Pinhole_ET"></strip>
+					<strip stripNo = "493"></strip>
+					<!--  defect1 = "Pinhole_ET" -->
 				</side>
 				<side side="u">
-					<strip stripNo = "757" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
+					<strip stripNo = "757"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
 				</side>
 			</sensor>
 		</ladder>
@@ -91,49 +123,80 @@
 			</sensor>
 			<sensor n="2">
 				<side side="v">
-					<strip stripNo = "0" defect1 = "Open_ET"></strip>
-					<strip stripNo = "3" defect1 = "Open_ET"></strip>
-					<strip stripNo = "7" defect1 = "Pinhole_ET"></strip>
-					<strip stripNo = "15" defect1 = "Pinhole_ET"></strip>
-					<strip stripNo = "17" defect1 = "Pinhole_ET"></strip>
-					<strip stripNo = "277" defect1 = "Pinhole_ET"></strip>
-					<strip stripNo = "284" defect1 = "Pinhole_ET"></strip>
-					<strip stripNo = "398" defect1 = "Open_ET"></strip>
-					<strip stripNo = "426" defect1 = "Pinhole_ET"></strip>
-					<strip stripNo = "442" defect1 = "Open_ET"></strip>
-					<strip stripNo = "470" defect1 = "Open_ET"></strip>
+					<strip stripNo = "0"></strip>
+					<!--  defect1 = "Open_ET" -->
+					<strip stripNo = "3"></strip>
+					<!--  defect1 = "Open_ET" -->
+					<strip stripNo = "7"></strip>
+					<!--  defect1 = "Pinhole_ET" -->
+					<strip stripNo = "15"></strip>
+					<!--  defect1 = "Pinhole_ET" -->
+					<strip stripNo = "17"></strip>
+					<!--  defect1 = "Pinhole_ET" -->
+					<strip stripNo = "277"></strip>
+					<!--  defect1 = "Pinhole_ET" -->
+					<strip stripNo = "284"></strip>
+					<!--  defect1 = "Pinhole_ET" -->
+					<strip stripNo = "398"></strip>
+					<!--  defect1 = "Open_ET" -->
+					<strip stripNo = "426"></strip>
+					<!--  defect1 = "Pinhole_ET" -->
+					<strip stripNo = "442"></strip>
+					<!--  defect1 = "Open_ET" -->
+					<strip stripNo = "470"></strip>
+					<!--  defect1 = "Open_ET" -->
 				</side>
 				<side side="u">
-					<strip stripNo = "700" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
-					<strip stripNo = "699" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
-					<strip stripNo = "698" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
-					<strip stripNo = "488" defect1 = "metal_open_DSSD"></strip>
-					<strip stripNo = "369" defect1 = "metal_open_DSSD"></strip>
-					<strip stripNo = "45" defect1 = "metal_open_DSSD"></strip>
-					<strip stripNo = "17" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
+					<strip stripNo = "700"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
+					<strip stripNo = "699"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
+					<strip stripNo = "698"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
+					<strip stripNo = "488"></strip>
+					<!--  defect1 = "metal_open_DSSD" -->
+					<strip stripNo = "369"></strip>
+					<!--  defect1 = "metal_open_DSSD" -->
+					<strip stripNo = "45"></strip>
+					<!--  defect1 = "metal_open_DSSD" -->
+					<strip stripNo = "17"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
 				</side>
 			</sensor>
 			<sensor n="3">
 				<side side="v">
-					<strip stripNo = "0" defect1 = "Open_ET"></strip>
-					<strip stripNo = "421" defect1 = "Short_ET"></strip>
-					<strip stripNo = "423" defect1 = "Short_ET"></strip>
-					<strip stripNo = "511" defect1 = "Open_ET"></strip>
+					<strip stripNo = "0"></strip>
+					<!--  defect1 = "Open_ET" -->
+					<strip stripNo = "421"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "423"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "511"></strip>
+					<!--  defect1 = "Open_ET" -->
 				</side>
 				<side side="u">
-					<strip stripNo = "748" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
-					<strip stripNo = "303" defect1 = "Open_ET"></strip>
-					<strip stripNo = "137" defect1 = "Short_ET"></strip>
-					<strip stripNo = "136" defect1 = "Short_ET"></strip>
-					<strip stripNo = "49" defect1 = "Short_ET"></strip>
-					<strip stripNo = "48" defect1 = "Short_ET"></strip>
-					<strip stripNo = "2" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
-					<strip stripNo = "1" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
+					<strip stripNo = "748"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
+					<strip stripNo = "303"></strip>
+					<!--  defect1 = "Open_ET" -->
+					<strip stripNo = "137"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "136"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "49"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "48"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "2"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
+					<strip stripNo = "1"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
 				</side>
 			</sensor>
 			<sensor n="4">
 				<side side="v">
-					<strip stripNo = "278" defect1 = "Open_ET"></strip>
+					<strip stripNo = "278"></strip>
+					<!--  defect1 = "Open_ET" -->
 				</side>
 				<side side="u">
 				</side>
@@ -146,66 +209,102 @@
 				<side side="v">
 				</side>
 				<side side="u">
-					<strip stripNo = "751" defect1 = "Open_ET"></strip>
+					<strip stripNo = "751"></strip>
+					<!--  defect1 = "Open_ET" -->
 				</side>
 			</sensor>
 			<sensor n="2">
 				<side side="v">
 				</side>
 				<side side="u">
-					<strip stripNo = "754" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
+					<strip stripNo = "754"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
 				</side>
 			</sensor>
 			<sensor n="3">
 				<side side="v">
 				</side>
 				<side side="u">
-					<strip stripNo = "767" defect1 = "Short_ET"></strip>
-					<strip stripNo = "745" defect1 = "Open_ET"></strip>
-					<strip stripNo = "1" defect1 = "Short_ET"></strip>
-					<strip stripNo = "0" defect1 = "Short_ET"></strip>
+					<strip stripNo = "767"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "745"></strip>
+					<!--  defect1 = "Open_ET" -->
+					<strip stripNo = "1"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "0"></strip>
+					<!--  defect1 = "Short_ET" -->
 				</side>
 			</sensor>
 			<sensor n="4">
 				<side side="v">
-					<strip stripNo = "15" defect1 = "Short_ET"></strip>
-					<strip stripNo = "189" defect1 = "Short_ET"></strip>
+					<strip stripNo = "15"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "189"></strip>
+					<!--  defect1 = "Short_ET" -->
 				</side>
 				<side side="u">
-					<strip stripNo = "767" defect1 = "Short_ET"></strip>
-					<strip stripNo = "766" defect1 = "Short_ET"></strip>
-					<strip stripNo = "737" defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET"></strip>
-					<strip stripNo = "443" defect1 = "Short_ET"></strip>
-					<strip stripNo = "442" defect1 = "Short_ET"></strip>
-					<strip stripNo = "441" defect1 = "Short_ET"></strip>
-					<strip stripNo = "415" defect1 = "Short_ET"></strip>
-					<strip stripNo = "413" defect1 = "Short_ET"></strip>
-					<strip stripNo = "410" defect1 = "Short_ET"></strip>
-					<strip stripNo = "409" defect1 = "Short_ET"></strip>
-					<strip stripNo = "407" defect1 = "Short_ET"></strip>
-					<strip stripNo = "405" defect1 = "Short_ET"></strip>
-					<strip stripNo = "402" defect1 = "Short_ET"></strip>
-					<strip stripNo = "401" defect1 = "Short_ET"></strip>
-					<strip stripNo = "399" defect1 = "Short_ET"></strip>
-					<strip stripNo = "397" defect1 = "Short_ET"></strip>
-					<strip stripNo = "394" defect1 = "Short_ET"></strip>
-					<strip stripNo = "393" defect1 = "Short_ET"></strip>
-					<strip stripNo = "391" defect1 = "Short_ET"></strip>
-					<strip stripNo = "389" defect1 = "Short_ET"></strip>
-					<strip stripNo = "386" defect1 = "Short_ET"></strip>
-					<strip stripNo = "385" defect1 = "Short_ET"></strip>
-					<strip stripNo = "0" defect1 = "Short_ET"></strip>
+					<strip stripNo = "767"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "766"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "737"></strip>
+					<!--  defect1 = "pinhole_DSSD" defect2 = "Pinhole_ET" -->
+					<strip stripNo = "443"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "442"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "441"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "415"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "413"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "410"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "409"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "407"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "405"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "402"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "401"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "399"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "397"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "394"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "393"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "391"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "389"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "386"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "385"></strip>
+					<!--  defect1 = "Short_ET" -->
+					<strip stripNo = "0"></strip>
+					<!--  defect1 = "Short_ET" -->
 				</side>
 			</sensor>
 			<sensor n="5">
 				<side side="v">
 				</side>
 				<side side="u">
-					<strip stripNo = "759" defect1 = "metal_open_DSSD" defect2 = "Open_ET"></strip>
-					<strip stripNo = "523" defect1 = "Pinhole_ET"></strip>
-					<strip stripNo = "439" defect1 = "metal_open_DSSD" defect2 = "Open_ET"></strip>
-					<strip stripNo = "267" defect1 = "metal_open_DSSD" defect2 = "Open_ET"></strip>
-					<strip stripNo = "253" defect1 = "metal_open_DSSD" defect2 = "Open_ET"></strip>
+					<strip stripNo = "759"></strip>
+					<!--  defect1 = "metal_open_DSSD" defect2 = "Open_ET" -->
+					<strip stripNo = "523"></strip>
+					<!--  defect1 = "Pinhole_ET" -->
+					<strip stripNo = "439"></strip>
+					<!--  defect1 = "metal_open_DSSD" defect2 = "Open_ET" -->
+					<strip stripNo = "267"></strip>
+					<!--  defect1 = "metal_open_DSSD" defect2 = "Open_ET" -->
+					<strip stripNo = "253"></strip>
+					<!--  defect1 = "metal_open_DSSD" defect2 = "Open_ET" -->
 				</side>
 			</sensor>
 		</ladder>

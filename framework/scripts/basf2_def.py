@@ -4,7 +4,6 @@
 from basf2_env import *
 
 import os
-import sys
 import inspect
 
 
@@ -166,6 +165,9 @@ def register_module(name_or_module, shared_lib_path=None, logLevel=None, debugLe
     debugLevel : Number indicating the detail of debug messages, default 100
     kwargs: Additional parameters of the module to be set.
 
+    You can also use :func:`Path.add_module() <basf2.Path.add_module>` directly,
+    which accepts the same name, logging and module parameter arguments.
+
     >>> basf.register_module('EventInfoSetter', evtNumList=100, logLevel=LogLevel.ERROR)
     <pybasf2.Module at 0x1e356e0>
     """
@@ -235,6 +237,14 @@ def set_nprocesses(nproc):
     """
 
     fw.set_nprocesses(nproc)
+
+
+def set_streamobjs(objs):
+    """
+    Sets objects to be streamed. To be used to limit objects for the improvement of
+    parallel processing performance
+    """
+    fw.set_streamobjs(objs)
 
 
 def print_all_modules(moduleList, package=''):
@@ -543,12 +553,7 @@ def is_mod_function(mod, func):
 
 
 def list_functions(mod):
+    """
+    Returns list of function names defined in the given Python module.
+    """
     return [func.__name__ for func in mod.__dict__.values() if is_mod_function(mod, func)]
-
-
-def set_streamobjs(objs):
-    """
-    Sets objects to be streamed. To be used to limit objects for the improvement of
-    parallel processing performance
-    """
-    fw.set_streamobjs(objs)

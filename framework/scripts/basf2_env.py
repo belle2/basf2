@@ -40,12 +40,8 @@ basf2copyright = 'Copyright(C) 2010-2016  Belle II Collaboration'
 
 # Reset the signal handler to allow the framework execution
 # to be stopped with Ctrl-c (Python installs own handler)
+# This will again be replaced once process() is called.
 signal.signal(signal.SIGINT, signal.SIG_DFL)
-
-
-# -----------------------------------------------
-#       Create default framework object
-# -----------------------------------------------
 
 # Create default framework, also initialises environment
 fw = Framework()

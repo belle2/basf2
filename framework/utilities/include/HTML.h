@@ -43,5 +43,10 @@ namespace Belle2 {
 
     /** Reformat given HTML string into terminal-friendly plain text. */
     std::string htmlToPlainText(const std::string& html);
+
+    /** Convert &, <, > etc. to entities. (not a complete list!)  */
+    std::string escape(const std::string& str);
+    /** inverse of escape() */
+    std::string unescape(const std::string& str);
   }
 }

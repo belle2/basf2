@@ -11,6 +11,7 @@
 #include <boost/python/class.hpp>
 
 #include <framework/dataobjects/FileMetaData.h>
+#include <framework/utilities/HTML.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -113,9 +114,9 @@ bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
     std::string tag = line.substr(0, pos);
     std::string value = line.substr(pos, line.rfind("<") - pos);
     if (tag.compare("<LFN>") == 0) {
-      m_lfn = value;
+      m_lfn = HTML::unescape(value);
     } else if (tag.compare("<PFN>") == 0) {
-      physicalFileName = value;
+      physicalFileName = HTML::unescape(value);
     } else if (tag.compare("<ExperimentLow>") == 0) {
       m_experimentLow = stoi(value);
     } else if (tag.compare("<RunLow>") == 0) {
@@ -131,11 +132,11 @@ bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
     } else if (tag.compare("<Parents>") == 0) {
       pos = value.find(",");
       while (pos > 0) {
-        m_parentLfns.push_back(value.substr(0, pos));
+        m_parentLfns.push_back(HTML::unescape(value.substr(0, pos)));
         value.erase(0, pos + 1);
         pos = value.find(",");
       }
-      m_parentLfns.push_back(value);
+      m_parentLfns.push_back(HTML::unescape(value));
     }
   }
 
@@ -145,9 +146,9 @@ bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
 bool FileMetaData::write(std::ostream& output, std::string physicalFileName)
 {
   output << "  <File>\n";
-  output << "    <LFN>" << m_lfn << "</LFN>\n";
+  output << "    <LFN>" << HTML::escape(m_lfn) << "</LFN>\n";
   if (!physicalFileName.empty()) {
-    output << "    <PFN>" << physicalFileName << "</PFN>\n";
+    output << "    <PFN>" << HTML::escape(physicalFileName) << "</PFN>\n";
   }
   output << "    <ExperimentLow>" << m_experimentLow << "</ExperimentLow>\n";
   output << "    <RunLow>" << m_runLow << "</RunLow>\n";
@@ -156,9 +157,9 @@ bool FileMetaData::write(std::ostream& output, std::string physicalFileName)
   output << "    <RunHigh>" << m_runHigh << "</RunHigh>\n";
   output << "    <EventHigh>" << m_eventHigh << "</EventHigh>\n";
   if (!m_parentLfns.empty()) {
-    output << "    <Parents>" << m_parentLfns[0];
+    output << "    <Parents>" << HTML::escape(m_parentLfns[0]);
     for (unsigned int parent = 1; parent < m_parentLfns.size(); parent++) {
-      output << "," << m_parentLfns[parent];
+      output << "," << HTML::escape(m_parentLfns[parent]);
     }
     output << "</Parents>\n";
   }

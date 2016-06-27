@@ -121,6 +121,7 @@ std::string HTML::htmlToPlainText(const std::string& html)
   replace_all(tmp, "<br>", "\n");
   replace_all(tmp, "</p>", "\n");
   replace_all(tmp, "</tr>", "\n");
+  replace_all(tmp, "&nbsp;", " ");
 
   //remove non-ascii \mu
   replace_all(tmp, "\x0b5", "u");
@@ -129,8 +130,26 @@ std::string HTML::htmlToPlainText(const std::string& html)
   const static boost::regex tagRegex("<.*?>");
   tmp = boost::regex_replace(tmp, tagRegex, "");
 
+  tmp = unescape(tmp);
+
+  return tmp;
+}
+
+std::string HTML::escape(const std::string& str)
+{
+  std::string tmp = str;
+  replace_all(tmp, "&", "&amp;"); //must be first
+  replace_all(tmp, ">", "&gt;");
+  replace_all(tmp, "<", "&lt;");
+  replace_all(tmp, "\"", "&quot;");
+  return tmp;
+}
+
+std::string HTML::unescape(const std::string& str)
+{
+  std::string tmp = str;
   //replace entities (important ones at least)
-  replace_all(tmp, "&nbsp;", " ");
+  replace_all(tmp, "&quot;", "\"");
   replace_all(tmp, "&gt;", ">");
   replace_all(tmp, "&lt;", "<");
   replace_all(tmp, "&amp;", "&"); //must be last

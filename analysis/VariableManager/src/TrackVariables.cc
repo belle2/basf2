@@ -100,6 +100,36 @@ namespace Belle2 {
       return trackFit->getZ0();
     }
 
+    double trackD0Error(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) return 0.0;
+
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      if (!trackFit) return 0.0;
+
+      double errorSquared = trackFit->getCovariance5()[0][0];
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return 0.0;
+    }
+
+    double trackZ0Error(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) return 0.0;
+
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      if (!trackFit) return 0.0;
+
+      double errorSquared = trackFit->getCovariance5()[3][3];
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return 0.0;
+    }
+
     double trackPValue(const Particle* part)
     {
       const Track* track = part->getTrack();
@@ -120,6 +150,8 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("d0",     trackD0,     "Signed distance to the POCA in the r-phi plane");
     REGISTER_VARIABLE("z0",     trackZ0,     "z coordinate of the POCA");
+    REGISTER_VARIABLE("d0Err",  trackD0Error,     "Error of signed distance to the POCA in the r-phi plane");
+    REGISTER_VARIABLE("z0Err",  trackZ0Error,     "Error of z coordinate of the POCA");
     REGISTER_VARIABLE("pValue", trackPValue, "chi2 probalility of the track fit");
 
   }

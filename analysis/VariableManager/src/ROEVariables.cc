@@ -805,6 +805,31 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr bssMassDifference(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+
+      if (arguments.size() == 0)
+        maskName = "";
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("Wrong number of arguments (1 required) for meta function bssMassDifference");
+
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        TLorentzVector neutrino4vec = missing4Vector(particle->getDaughter(0), maskName, "6");
+        TLorentzVector sig4vec = particle->getDaughter(0)->get4Vector();
+
+        TLorentzVector bsMom = neutrino4vec + sig4vec;
+        TLorentzVector bssMom = bsMom + particle->getDaughter(1)->get4Vector();
+
+        return bssMom.M() - bsMom.M();
+      };
+      return func;
+    }
+
     Manager::FunctionPtr correctedBMesonDeltaE(const std::vector<std::string>& arguments)
     {
       std::string maskName;
@@ -1613,6 +1638,9 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("xiZ(maskName)", xiZ,
                       "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)");
+
+    REGISTER_VARIABLE("bssMassDifference(maskName)", bssMassDifference,
+                      "Bs* - Bs mass difference");
 
     REGISTER_VARIABLE("cosThetaEll(maskName)", cosThetaEll,
                       "Returns the angle between M and lepton in W rest frame in the decays of the type\n"

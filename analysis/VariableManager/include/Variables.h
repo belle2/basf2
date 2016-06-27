@@ -111,6 +111,13 @@ namespace Belle2 {
     double covMatrixElement(const Particle*, const std::vector<double>& element);
 
     /**
+     * return momentum deviation chi^2 value calculated as
+     * chi^2 = sum_i (p_i - mc(p_i))^2/sigma(p_i)^2, where sum runs over i = px, py, pz and
+     * mc(p_i) is the mc truth value and sigma(p_i) is the estimated error of i-th component of momentum vector
+     */
+    double momentumDeviationChi2(const Particle*);
+
+    /**
      * return mass (determined from particle's 4-momentum vector)
      */
     double particleMass(const Particle* part);

@@ -255,6 +255,11 @@ namespace Belle2 {
      */
     void checkMCParticleMissingFlags(const MCParticle* mcp, std::set<const MCParticle*> mcROEObjects, int& missingFlags);
 
+
+    /**
+     * temp
+     */
+    Manager::FunctionPtr bssMassDifference(const std::vector<std::string>& arguments);
   }
 } // Belle2 namespace
 

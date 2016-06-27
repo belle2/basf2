@@ -55,6 +55,16 @@ namespace Belle2 {
     double trackZ0(const Particle* part);
 
     /**
+     * returns the track's D0 impact parameter error
+     */
+    double trackD0Error(const Particle* part);
+
+    /**
+     * returns the track's Z0 impact parameter error
+     */
+    double trackZ0Error(const Particle* part);
+
+    /**
      * returns the pValue of the track's fit
      */
     double trackPValue(const Particle* part);

@@ -87,12 +87,12 @@ def skimOutputUdst(skimname, particleLists=[], path=analysis_main):
     filter_path = create_path()
     skimfilter.if_value('=1', filter_path, AfterConditionPath.CONTINUE)
 
-    # add_skim_path() is rather expensive, only do this for skimmed events
+    # add_independent_path() is rather expensive, only do this for skimmed events
     skim_path = create_path()
     removeParticlesNotInLists(particleLists, path=skim_path)
     outputUdst(skimname + '.udst.root', particleLists, path=skim_path)
     outputMdst(skimname + '.mdst.root', path=skim_path)
-    filter_path.add_skim_path(skim_path, "skim_" + skimname)
+    filter_path.add_independent_path(skim_path, "skim_" + skimname)
 
 
 def generateY4S(noEvents, decayTable=None, path=analysis_main):

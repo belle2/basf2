@@ -20,7 +20,7 @@ REG_MODULE(SwitchDataStore)
 
 SwitchDataStoreModule::SwitchDataStoreModule() : Module()
 {
-  setDescription("Internal module used by Path.add_skim_path(). This shouldn't appear in 'basf2 -m' output. If it does, check REG_MODULE() handling.");
+  setDescription("Internal module used by Path.add_independent_path(). This shouldn't appear in 'basf2 -m' output. If it does, check REG_MODULE() handling.");
 
   addParam("toID", m_to, "active DataStore id after this module", std::string(""));
   addParam("doCopy", m_doCopy,

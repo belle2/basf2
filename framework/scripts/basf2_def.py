@@ -442,8 +442,6 @@ def _add_module(self, module, logLevel=None, debugLevel=None, **kwargs):
     self._add_module_object(module)
     return module
 
-Path.add_module = _add_module
-
 
 def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=[]):
     """
@@ -459,8 +457,8 @@ def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=[]):
     """
     self._add_independent_path(skim_path, ds_ID, merge_back_event)
 
+Path.add_module = _add_module
 Path.add_independent_path = _add_independent_path
-Path.add_skim_path = _add_independent_path  # TODO deprecate
 
 
 def serialize_value(module, parameter):

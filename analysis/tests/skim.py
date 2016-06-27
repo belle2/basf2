@@ -52,8 +52,8 @@ output.param('outputFileName', 'skimtest_reduced.root')
 skimpath.add_module(output)
 
 # }}}
-# main.add_skim_path(skimpath, 'skim')
-main.add_skim_path(skimpath)  # with auto-generated name
+# main.add_independent_path(skimpath, 'skim')
+main.add_independent_path(skimpath)  # with auto-generated name
 
 # Important difference to removeparticlesnotinlists test:
 # we save the skimmed  file _before_ the full output

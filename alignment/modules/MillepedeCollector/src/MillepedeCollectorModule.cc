@@ -33,9 +33,6 @@
 
 #include <TMath.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
-#include <../tracking/trackFitting/fitter/base/include/TrackFitter.h>
-
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -65,6 +62,8 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
            bool(false));
   addParam("minPValue", m_minPValue, "Minimum p-value to write out a trejectory, <0 to write out all",
            double(-1.));
+  addParam("useGblTree", m_useGblTree, "Store GBL trajectories in a tree instead of output to binary files",
+           bool(true));
 }
 
 void MillepedeCollectorModule::prepare()
@@ -72,7 +71,7 @@ void MillepedeCollectorModule::prepare()
   StoreObjPtr<EventMetaData>::required();
 
   if (m_tracks.empty() && m_particles.empty() && m_vertices.empty() && m_primaryVertices.empty())
-    B2ERROR("You have to specify either arrays of single tracks or particle lists single single particles or mothers with vertex constrained daughters.");
+    B2ERROR("You have to specify either arrays of single tracks or particle lists of single single particles or mothers with vertex constrained daughters.");
 
   if (!m_tracks.empty()) {
     for (auto arrayName : m_tracks)
@@ -104,9 +103,10 @@ void MillepedeCollectorModule::prepare()
   }
 
   // Register Mille output
-  // registerObject<MilleData>("mille", new MilleData(m_doublePrecision));
+  registerObject<MilleData>("mille", new MilleData(m_doublePrecision));
+
   auto gblDataTree = new TTree("GblDataTree", "GblDataTree");
-  gblDataTree->Branch<std::vector<gbl::GblData>>("GblData", &m_currentGblData);
+  gblDataTree->Branch<std::vector<gbl::GblData>>("GblData", &m_currentGblData, 32000, 99);
   registerObject<TTree>("GblDataTree", gblDataTree);
 
   registerObject<TH1F>("chi2/ndf", new TH1F("chi2/ndf", "chi2/ndf", 200, 0., 50.));
@@ -115,11 +115,12 @@ void MillepedeCollectorModule::prepare()
 
 void MillepedeCollectorModule::collect()
 {
-
-  // Open new file on request (at start or after being closed)
-  // auto& mille = getObject<MilleData>("mille");
-  //if (!mille.isOpen())
-  //  mille.open(getUniqueMilleName());
+  if (!m_useGblTree) {
+    // Open new file on request (at start or after being closed)
+    auto& mille = getObject<MilleData>("mille");
+    if (!mille.isOpen())
+      mille.open(getUniqueMilleName());
+  }
 
 
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
@@ -275,14 +276,14 @@ void MillepedeCollectorModule::endRun()
   // We close the file at end of run, producing
   // one file per run (and process id) which is more
   // convenient than one large binary block.
-  // auto& mille = getObject<MilleData>("mille");
-  // if (mille.isOpen())
-  //   mille.close();
+  auto& mille = getObject<MilleData>("mille");
+  if (mille.isOpen())
+    mille.close();
 }
 
 void MillepedeCollectorModule::terminate()
 {
-  /*
+
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
   if (!fileMetaData.isValid()) {
     B2ERROR("Cannot register binaries in FileCatalog.");
@@ -298,21 +299,25 @@ void MillepedeCollectorModule::terminate()
     milleMetaData.setParents(parents);
     FileCatalog::Instance().registerFile(binary, milleMetaData);
   }
-  */
+
 }
 
 void MillepedeCollectorModule::storeTrajectory(gbl::GblTrajectory& trajectory)
 {
-  if (trajectory.isValid())
-    m_currentGblData = trajectory.getData();
-  else
-    m_currentGblData.clear();
+  if (m_useGblTree) {
+    if (trajectory.isValid())
+      m_currentGblData = trajectory.getData();
+    else
+      m_currentGblData.clear();
 
-  if (!m_currentGblData.empty())
-    getObject<TTree>("GblDataTree").Fill();
+    if (!m_currentGblData.empty())
+      getObject<TTree>("GblDataTree").Fill();
+  } else {
+    getObject<MilleData>("mille").fill(trajectory);
+  }
 }
 
-/*
+
 std::string MillepedeCollectorModule::getUniqueMilleName()
 {
   StoreObjPtr<EventMetaData> emd;
@@ -329,7 +334,7 @@ std::string MillepedeCollectorModule::getUniqueMilleName()
 
   return name;
 }
-*/
+
 
 std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::vector<Particle*> particles)
 {

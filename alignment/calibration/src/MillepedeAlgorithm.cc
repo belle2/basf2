@@ -25,6 +25,8 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 
   // Write out binary files from tree and add to steering
   prepareMilleBinary();
+  for (auto file : getObject<MilleData>("mille").getFiles())
+    m_steering.addFile(file);
 
   // Run calibration on steering
   m_result = m_pede.calibrate(m_steering);

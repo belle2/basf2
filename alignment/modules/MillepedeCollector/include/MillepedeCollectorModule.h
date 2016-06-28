@@ -46,7 +46,7 @@ namespace Belle2 {
     virtual void terminate();
 
     /** Make a name for mille binary (encodes module name + starting exp, run and event + process id) */
-    //std::string getUniqueMilleName();
+    std::string getUniqueMilleName();
 
     /** Get all useable tracks for particles */
     std::vector<genfit::Track*> getParticlesTracks(std::vector<Particle*> particles);
@@ -57,6 +57,7 @@ namespace Belle2 {
     /** Compute the transformation matrix d(x,y,z,px,py,pz)/d(q/p,u',v',u,v) from state at first track point (vertex) */
     TMatrixD getLocalToGlobalTransform(genfit::MeasuredStateOnPlane msop);
 
+    /** Write down a GBL trajectory (to TTree or binary file) */
     void storeTrajectory(gbl::GblTrajectory& trajectory);
 
   private:
@@ -74,7 +75,10 @@ namespace Belle2 {
     bool m_calibrateVertex;
     /** Minimum p.value for output */
     double m_minPValue;
+    /** Current vector of GBL data from trajectory to be stored in a tree */
     std::vector<gbl::GblData> m_currentGblData{};
+    /** Whether to use TTree to accumulate GBL data instead of binary files*/
+    bool m_useGblTree{true};
   };
 }
 

@@ -28,6 +28,7 @@
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPRawDigit.h>
+#include <top/dataobjects/TOPSlowData.h>
 
 using namespace std;
 
@@ -84,6 +85,9 @@ namespace Belle2 {
     StoreArray<TOPRawDigit> rawDigits(m_outputRawDigitsName);
     rawDigits.registerInDataStore();
 
+    StoreArray<TOPSlowData> slowData;
+    slowData.registerInDataStore();
+
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.registerInDataStore(DataStore::c_DontWriteOut);
 
@@ -103,13 +107,18 @@ namespace Belle2 {
   void TOPUnpackerModule::event()
   {
 
+    // input
     StoreArray<RawTOP> rawData(m_inputRawDataName);
+
+    // output
     StoreArray<TOPDigit> digits(m_outputDigitsName);
     digits.clear();
     StoreArray<TOPRawDigit> rawDigits(m_outputRawDigitsName);
     rawDigits.clear();
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.clear();
+    StoreArray<TOPSlowData> slowData;
+    slowData.clear();
 
     for (auto& raw : rawData) {
       for (int finesse = 0; finesse < 4; finesse++) {
@@ -123,7 +132,7 @@ namespace Belle2 {
         int dataFormat = (word >> 16);
         switch (dataFormat) {
           case static_cast<int>(TOP::RawDataType::c_Type0Ver16):
-            unpackType0Ver16(buffer, bufferSize, rawDigits);
+            unpackType0Ver16(buffer, bufferSize, rawDigits, slowData);
             break;
           case static_cast<int>(TOP::RawDataType::c_Type2Ver1):
             err = unpackType2or3Ver1(buffer, bufferSize, rawDigits, waveforms, false);
@@ -189,7 +198,8 @@ namespace Belle2 {
 
 
   void TOPUnpackerModule::unpackType0Ver16(const int* buffer, int bufferSize,
-                                           StoreArray<TOPRawDigit>& rawDigits)
+                                           StoreArray<TOPRawDigit>& rawDigits,
+                                           StoreArray<TOPSlowData>& slowData)
   {
 
     B2DEBUG(100, "Unpacking Type0Ver16 to TOPRawDigits, dataSize = " << bufferSize);
@@ -205,6 +215,10 @@ namespace Belle2 {
               << scrodID);
       return;
     }
+
+    short SDType = last >> 24;
+    short SDValue = (last >> 12) & 0x0FFF;
+    if (SDType != 0) slowData.appendNew(scrodID, SDType, SDValue);
 
     unsigned short errorFlags = 0;
     if (((word >> 12) & 0x0F) != 0x0A) errorFlags |= TOPRawDigit::c_HeadMagic;

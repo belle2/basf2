@@ -16,6 +16,7 @@
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPRawDigit.h>
+#include <top/dataobjects/TOPSlowData.h>
 #include <string>
 
 namespace Belle2 {
@@ -185,9 +186,11 @@ namespace Belle2 {
      * @param buffer raw data buffer
      * @param bufferSize buffer size
      * @param rawDigits collection to unpack to
+     * @param slowData collection to unpack to
      */
     void unpackType0Ver16(const int* buffer, int bufferSize,
-                          StoreArray<TOPRawDigit>& rawDigits);
+                          StoreArray<TOPRawDigit>& rawDigits,
+                          StoreArray<TOPSlowData>& slowData);
 
 
     /**

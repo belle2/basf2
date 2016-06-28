@@ -32,19 +32,19 @@ from stdLooseFSParticles import stdLoosePi
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistBKG = [
     '/hsm/belle2/bdata/MC/signal/B2Kstargamma/mcprod1405/BGx1/mc35_B2Kstargamma_BGx1_s00/B2Kstargamma_e0001r001*_s00_BGx1.mdst.root'
-    ]
+]
 filelistSIG = \
     ['/hsm/belle2/bdata/MC/signal/B2Rhogamma/mcprod1405/BGx1/mc35_B2Rhogamma_BGx1_s00/B2Rhogamma_e0001r001*_s00_BGx1.mdst.root'
      ]
 
 # Run B0 -> rho gamma reconstruction over B0 -> rho gamma MC
 rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction-SIGMC.root'
-inputMdstList(filelistSIG)
+inputMdstList('MC5', filelistSIG)
 
 # Run B0 -> rho gamma reconstruction over B0 -> K* gamma MC
 # (uncomment next two lines and comment above two to run over BKG MC)
 # rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction-BKGMC.root'
-# inputMdstList(filelistBKG)
+# inputMdstList('MC5',filelistBKG)
 
 # use standard final state particle lists
 #

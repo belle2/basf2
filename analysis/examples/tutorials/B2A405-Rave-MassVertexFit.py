@@ -43,7 +43,7 @@ filelistSIG = \
     ['/hsm/belle2/bdata/MC/signal/cc2dstar/mcprod1405/BGx1/mc35_cc2dstar_BGx1_s00/cc2dstar_e0001r001*_s00_BGx1.mdst.root'
      ]
 
-inputMdstList(filelistSIG)
+inputMdstList('MC5', filelistSIG)
 
 # use standard final state particle lists
 #

@@ -26,7 +26,7 @@ filelist = [
 ]
 
 main = create_path()
-inputMdstList(filelist, path=main)
+inputMdstList('MC5', filelist, path=main)
 
 teacher = register_module('TMVAOnTheFlyTeacher')
 # Takes the same arguments as the TMVATeacher module
@@ -54,7 +54,7 @@ print(statistics)
 # usually one wants to use an independent data set for this step.
 
 main = create_path()
-inputMdstList(filelist, path=main)
+inputMdstList('MC5', filelist, path=main)
 
 # Write Out the necessary data for an electron identification training
 expert = register_module('TMVAExpert')

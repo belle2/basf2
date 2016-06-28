@@ -33,7 +33,7 @@ filelist = [
 ]
 
 main = create_path()
-inputMdstList(filelist, path=main)
+inputMdstList('MC5', filelist, path=main)
 
 # Select all electron candidates
 fillParticleList('e-', '', False, path=main)
@@ -109,7 +109,7 @@ subprocess.call("externTeacher --workingDirectory TMVA --prefix NtupleTools --me
 
 
 main = create_path()
-inputMdstList(filelist, path=main)
+inputMdstList('MC5', filelist, path=main)
 fillParticleList('e-', '', False, path=main)
 
 # For the VariablesToNtuple based-training the application is the same
@@ -129,7 +129,7 @@ applyTMVAMethod('e-', prefix='NtupleTools', method="FastBDT", expertOutputName='
                 workingDirectory="TMVA", path=main)
 
 # Write out signal probability and mc truth
-variablesToNTuple('e-', ['extraInfo(VariablesToNtupleProbability)', 'extraInfo(NtupleToolsProbability)',  'isSignal'],
+variablesToNTuple('e-', ['extraInfo(VariablesToNtupleProbability)', 'extraInfo(NtupleToolsProbability)', 'isSignal'],
                   filename='TMVA/NtupleOutput.root', path=main)
 
 process(main)

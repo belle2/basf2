@@ -53,7 +53,7 @@ filelist = [
 
 # Run B0 -> rho gamma reconstruction over B0 -> rho gamma and B0 -> K0s pi0 MC
 rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction.root'
-inputMdstList(filelist)
+inputMdstList('MC5', filelist)
 
 fillParticleList('gamma:highE', 'E > 1.5')
 fillParticleList('pi+:loose', 'abs(d0) < 0.5 and abs(z0) < 0.5 and DLLKaon > 0')

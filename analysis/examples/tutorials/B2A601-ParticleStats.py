@@ -45,7 +45,7 @@ filelistSS = ['/hsm/belle2/bdata/MC/generic/ssbar/mcprod1405/BGx1/mc35_ssbar_BGx
 filelistDD = ['/hsm/belle2/bdata/MC/generic/ddbar/mcprod1405/BGx1/mc35_ddbar_BGx1_s01/ddbar_e0001r0010_s01_BGx1.mdst.root']
 filelistUU = ['/hsm/belle2/bdata/MC/generic/uubar/mcprod1405/BGx1/mc35_uubar_BGx1_s01/uubar_e0001r0010_s01_BGx1.mdst.root']
 
-inputMdstList(filelistMIX + filelistCHG + filelistCC + filelistSS + filelistDD + filelistUU)
+inputMdstList('MC5', filelistMIX + filelistCHG + filelistCC + filelistSS + filelistDD + filelistUU)
 
 # create and fill final state ParticleLists
 # use standard lists

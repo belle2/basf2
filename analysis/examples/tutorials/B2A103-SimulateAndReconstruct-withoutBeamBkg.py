@@ -33,7 +33,7 @@ if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
              'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
 
 # load input ROOT file
-inputMdst('B2A101-Y4SEventGeneration-evtgen.root')
+inputMdst('default', 'B2A101-Y4SEventGeneration-evtgen.root')
 
 # simulation
 add_simulation(analysis_main)

@@ -73,20 +73,20 @@ outFile = ''
 
 if sample == 'signal':
     if sampleSize == 'test':
-        inputMdstList(testSIG)
+        inputMdstList('MC5', testSIG)
         outFile = 'Bd_KsPi0_reconstructedSignalMC_test.root'
     else:
-        inputMdstList(fullSIG)
+        inputMdstList('MC5', fullSIG)
         outFile = 'Bd_KsPi0_reconstructedSignalMC_full.root'
 elif sample == 'continuum':
     if sampleSize == 'test':
-        inputMdstList(testCC + testSS + testDD + testUU)
+        inputMdstList('MC5', testCC + testSS + testDD + testUU)
         outFile = 'Bd_KsPi0_reconstructedContinuumMC_test.root'
     else:
-        inputMdstList(fullCC + fullSS + fullDD + fullUU)
+        inputMdstList('MC5', fullCC + fullSS + fullDD + fullUU)
         outFile = 'Bd_KsPi0_reconstructedContinuumMC_full.root'
 else:
-    inputMdstList(fullCH + fullMX)
+    inputMdstList('MC5', fullCH + fullMX)
     outFile = 'Bd_KsPi0_reconstructedGenericMC.root'
 
 

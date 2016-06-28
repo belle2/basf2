@@ -35,7 +35,7 @@ filelist = [
 ]
 
 main = create_path()
-inputMdstList(filelist, path=main)
+inputMdstList('MC5', filelist, path=main)
 fillParticleList('e-', '', False, path=main)
 
 # Write Out the necessary data for an electron identification training
@@ -62,7 +62,7 @@ subprocess.call("externTeacher --workingDirectory TMVA --prefix Multiclass --met
                 "NTreeLayers=3' --target 'abs(mcPDG)' --variables eid muid Kid piid prid 'useCMSFrame(p)' chiProb", shell=True)
 
 main = create_path()
-inputMdstList(filelist, path=main)
+inputMdstList('MC5', filelist, path=main)
 fillParticleList('e-', '', False, path=main)
 
 # In a multiclass problem the signal class is the target value for the class which should be identified

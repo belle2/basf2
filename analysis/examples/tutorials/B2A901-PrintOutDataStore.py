@@ -25,7 +25,7 @@ if not os.path.isfile('B2A101-Y4SEventGeneration-gsim-BKGx0.root'):
              'tutorial scripts first.')
 
 # load input ROOT file
-inputMdst('B2A101-Y4SEventGeneration-gsim-BKGx0.root')
+inputMdst('default', 'B2A101-Y4SEventGeneration-gsim-BKGx0.root')
 
 # print out the contents of the DataStore
 printDataStore()

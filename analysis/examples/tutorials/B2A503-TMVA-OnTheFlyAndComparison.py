@@ -31,7 +31,7 @@ filelist = [
 ]
 
 main = create_path()
-inputMdstList(filelist, path=main)
+inputMdstList('MC5', filelist, path=main)
 
 # Select all electron candidates
 fillParticleList('e-', '', False, path=main)
@@ -62,7 +62,7 @@ print(statistics)
 # Now lets apply the methods as usual
 
 main = create_path()
-inputMdstList(filelist, path=main)
+inputMdstList('MC5', filelist, path=main)
 fillParticleList('e-', '', False, path=main)
 
 # Apply the TMVA training using the TMVAExpert module

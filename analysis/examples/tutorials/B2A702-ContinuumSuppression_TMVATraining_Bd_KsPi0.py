@@ -84,9 +84,9 @@ fullUU = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/B
 
 
 if sampleSize == 'test':
-    inputMdstList(testSIG1 + testSIG2 + testCC + testSS + testDD + testUU)
+    inputMdstList('MC5', testSIG1 + testSIG2 + testCC + testSS + testDD + testUU)
 elif sampleSize == 'full':
-    inputMdstList(fullSIG + fullCC + fullSS + fullDD + fullUU)
+    inputMdstList('MC5', fullSIG + fullCC + fullSS + fullDD + fullUU)
 else:
     sys.exit('sampleSize does not match any of the available samples: `test` or `full`')
 

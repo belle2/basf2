@@ -25,7 +25,7 @@ if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
              'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
 
 # load input ROOT file
-inputMdst('B2A101-Y4SEventGeneration-evtgen.root')
+inputMdst('None', 'B2A101-Y4SEventGeneration-evtgen.root')
 
 # print out the contents of the StoreArray<MCParticle>
 printPrimaryMCParticles()

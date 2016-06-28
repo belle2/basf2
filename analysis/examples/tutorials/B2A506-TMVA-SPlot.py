@@ -29,7 +29,7 @@ filelist = [
 ]
 
 main = create_path()
-inputMdstList(filelist, path=main)
+inputMdstList('MC5', filelist, path=main)
 
 fillParticleList('K-', 'Kid > 0.1', path=main)
 fillParticleList('pi+', 'piid > 0.1', path=main)
@@ -111,7 +111,7 @@ subprocess.call("externTeacher --workingDirectory TMVA --prefix SPlot --methodNa
 # usually one wants to use an independent data set for this step.
 
 main = create_path()
-inputMdstList(filelist, path=main)
+inputMdstList('MC5', filelist, path=main)
 fillParticleList('K-', 'Kid > 0.1', path=main)
 fillParticleList('pi+', 'piid > 0.1', path=main)
 
@@ -127,7 +127,7 @@ matchMCTruth('D0', path=main)
 # In the standard case everything works like in the basics_expert.py example
 
 applyTMVAMethod('D0', prefix='SPlot', method="FastBDT", expertOutputName='SPlotProbability', workingDirectory="TMVA", path=main)
-variablesToNTuple('D0', ['extraInfo(SPlotProbability)',  'isSignal'], filename='TMVA/SPlotOutput.root', path=main)
+variablesToNTuple('D0', ['extraInfo(SPlotProbability)', 'isSignal'], filename='TMVA/SPlotOutput.root', path=main)
 
 # In the future there will be (hopefully) a more advanced sPlot training
 # which allow the usage of correlated variables.

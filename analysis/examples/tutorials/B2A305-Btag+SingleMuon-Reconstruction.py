@@ -52,7 +52,7 @@ from stdLooseFSParticles import stdLooseMu
 from stdFSParticles import goodPi0
 
 # load data
-inputMdst('B2A101-Y4SEventGeneration-gsim-BKGx1.root')
+inputMdst('default', 'B2A101-Y4SEventGeneration-gsim-BKGx1.root')
 
 # create and fill final state ParticleLists
 # use standard lists

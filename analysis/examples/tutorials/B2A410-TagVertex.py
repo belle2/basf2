@@ -44,7 +44,7 @@ filelistSIG = \
      'DBxxxxxxxx/MC5/prod00000103/s00/e0000/4S/r00000/1111440100/sub00/mdst_000001_prod00000103_task00000001.root'
      ]
 
-inputMdstList(filelistSIG)
+inputMdstList('MC5', filelistSIG)
 
 # use standard final state particle lists
 #

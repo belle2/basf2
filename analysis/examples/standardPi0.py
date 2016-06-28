@@ -18,7 +18,7 @@ if len(sys.argv) != 2:
 inputMdstFileName = sys.argv[1]
 
 # load the input MDST file
-inputMdst(inputMdstFileName)
+inputMdst('default', inputMdstFileName)
 
 # fetch the standard photon (input for standard pi0 reconstruction)
 # the reconstructed photon Particles are collected in the gamma:all ParticleList

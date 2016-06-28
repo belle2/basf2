@@ -37,7 +37,7 @@ outSkim = str(sys.argv[2])
 
 main = create_path()
 
-inputMdstList(['/hsm/belle2/bdata/MC/generic/ccbar/mcprod1405/BGx0/mc35_ccbar_BGx0_s00/ccbar_e0001r0973_s00_BGx0.mdst.root'])
+inputMdstList('MC5', ['/hsm/belle2/bdata/MC/generic/ccbar/mcprod1405/BGx0/mc35_ccbar_BGx0_s00/ccbar_e0001r0973_s00_BGx0.mdst.root'])
 
 # Do the analysis
 fillParticleList('gamma:all', '')

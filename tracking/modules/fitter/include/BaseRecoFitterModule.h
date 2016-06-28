@@ -60,8 +60,8 @@ namespace Belle2 {
     std::string m_param_svdHitsStoreArrayName = "SVDClusters";
     /** StoreArray name of the PXD hits. */
     std::string m_param_pxdHitsStoreArrayName = "PXDClusters";
-    /** Use this particle hypothesis for fitting. Please use the positive pdg code only. */
-    unsigned int m_param_pdgCodeToUseForFitting = 211;
+    /** Use these particle hypotheses for fitting. Please use positive pdg codes only. */
+    std::vector<unsigned int> m_param_pdgCodesToUseForFitting = {211};
     /** Resort the hits while fitting. */
     bool m_param_resortHits = false;
   };

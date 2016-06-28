@@ -68,7 +68,8 @@ namespace Belle2 {
     std::vector<double> m_beamSpot;  ///< BeamSpot define the coordinate system in which the tracks will be extrapolated to the perigee.
     std::vector<double>
     m_beamAxis;   ///< BeamAxis define the coordinate system in which the tracks will be extrapolated to the perigee.
-    std::vector<int> m_pdgCodes;  ///< PDG codes for which TrackFitResults will be created.
+    std::vector<int> m_additionalPDGCodes;  ///< PDG codes for which TrackFitResults will be created.
+    int m_defaultPDGCode; ///< Default PDG code, for which TrackFitResults will be created.
   };
 }
 

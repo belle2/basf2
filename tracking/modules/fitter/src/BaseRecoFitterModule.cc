@@ -39,9 +39,9 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
   addParam("pxdHitsStoreArrayName", m_param_pxdHitsStoreArrayName, "StoreArray name of the input PXD hits.",
            m_param_pxdHitsStoreArrayName);
 
-  addParam("pdgCodeToUseForFitting", m_param_pdgCodeToUseForFitting,
-           "Use this particle hypothesis for fitting. Please use the positive pdg code only.",
-           m_param_pdgCodeToUseForFitting);
+  addParam("pdgCodesToUseForFitting", m_param_pdgCodesToUseForFitting,
+           "Use these particle hypotheses for fitting. Please use positive pdg codes only.",
+           m_param_pdgCodesToUseForFitting);
 
   addParam("resortHits", m_param_resortHits, "Resort the hits while fitting.",
            m_param_resortHits);
@@ -75,8 +75,6 @@ void BaseRecoFitterModule::event()
   B2DEBUG(100, "Number of reco track candidates to process: " << recoTracks.getEntries());
   unsigned int recoTrackCounter = 0;
 
-  Const::ChargedStable particleUsedForFitting(m_param_pdgCodeToUseForFitting);
-
   for (RecoTrack& recoTrack : recoTracks) {
     if (recoTrack.getNumberOfTotalHits() < 3) {
       B2WARNING("Genfit2Module: only " << recoTrack.getNumberOfTotalHits() << " were assigned to the Track! " <<
@@ -90,20 +88,25 @@ void BaseRecoFitterModule::event()
             recoTrack.getMomentumSeed().Z());
     B2DEBUG(100, "Position: " << recoTrack.getPositionSeed().X() << " " << recoTrack.getPositionSeed().Y() << " " <<
             recoTrack.getPositionSeed().Z());
-    B2DEBUG(100, "PDG: " << m_param_pdgCodeToUseForFitting);
     B2DEBUG(100, "Total number of hits assigned to the track: " << recoTrack.getNumberOfTotalHits());
 
-    fitter.fit(recoTrack, particleUsedForFitting);
+    for (const unsigned int pdgCodeToUseForFitting : m_param_pdgCodesToUseForFitting) {
+      Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
+      B2DEBUG(100, "PDG: " << pdgCodeToUseForFitting);
+      const bool wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
 
-    if (recoTrack.wasFitSuccessful()) {
-      const genfit::FitStatus* fs = recoTrack.getTrackFitStatus();
-      const genfit::KalmanFitStatus* kfs = dynamic_cast<const genfit::KalmanFitStatus*>(fs);
       B2DEBUG(99, "-----> Fit results:");
-      B2DEBUG(99, "       Chi2 of the fit: " << kfs->getChi2());
-      B2DEBUG(99, "       NDF of the fit: " << kfs->getBackwardNdf());
-      //Calculate probability
-      double pValue = recoTrack.getTrackFitStatus()->getPVal();
-      B2DEBUG(99, "       pValue of the fit: " << pValue);
+      if (wasFitSuccessful) {
+        const genfit::FitStatus* fs = recoTrack.getTrackFitStatus();
+        const genfit::KalmanFitStatus* kfs = dynamic_cast<const genfit::KalmanFitStatus*>(fs);
+        B2DEBUG(99, "       Chi2 of the fit: " << kfs->getChi2());
+        B2DEBUG(99, "       NDF of the fit: " << kfs->getBackwardNdf());
+        //Calculate probability
+        double pValue = recoTrack.getTrackFitStatus()->getPVal();
+        B2DEBUG(99, "       pValue of the fit: " << pValue);
+      } else {
+        B2DEBUG(99, "       fit failed!");
+      }
     }
     recoTrackCounter += 1;
   }

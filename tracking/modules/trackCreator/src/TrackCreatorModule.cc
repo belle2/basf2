@@ -46,7 +46,10 @@ TrackCreatorModule::TrackCreatorModule() :
   addParam("beamAxis", m_beamAxis,
            "(BeamSpot and )BeamAxis define the coordinate system in which the tracks will be extrapolated to the perigee.",
            std::vector<double> {0.0, 0.0, 1.0});
-  addParam("pdgCodes", m_pdgCodes, "PDG codes for which TrackFitResults will be created.", std::vector<int> {211});
+  addParam("additionalPDGCodes", m_additionalPDGCodes,
+           "PDG codes additional to the defaultPDGCode (cardinal) representation, for which TrackFitResults will be created.",
+           std::vector<int> {});
+  addParam("defaultPDGCode", m_defaultPDGCode, "Default PDG code, for which TrackFitResults will be created.", 211);
 
 }
 
@@ -96,11 +99,16 @@ void TrackCreatorModule::event()
   TrackFitter trackFitter;
   TrackBuilder trackBuilder(m_trackColName, m_trackFitResultColName, m_mcParticleColName);
   for (auto& recoTrack : recoTracks) {
-    for (const auto& pdg : m_pdgCodes) {
-      B2DEBUG(200, "Trying to fit with PDG = " << pdg);
-      trackFitter.fit(recoTrack, Const::ParticleType(abs(pdg)));
+    const bool pionFitWasSuccessful = trackFitter.fit(recoTrack, Const::ParticleType(abs(m_defaultPDGCode)));
+    if (pionFitWasSuccessful) {
+      for (const auto& pdg : m_additionalPDGCodes) {
+        B2DEBUG(200, "Trying to fit with PDG = " << pdg);
+        trackFitter.fit(recoTrack, Const::ParticleType(abs(pdg)));
+      }
+      trackBuilder.storeTrackFromRecoTrack(recoTrack);
+    } else {
+      B2DEBUG(200, "Pion fit failed - not creating a Track out of this RecoTrack.");
     }
-    trackBuilder.storeTrackFromRecoTrack(recoTrack);
   }
 }
 

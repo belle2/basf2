@@ -11,13 +11,10 @@ import http
 
 def setupBelleMagneticField(path=analysis_main):
     """
-    Sets up the Belle Magnetic field (constant).
+    This function set the Belle Magnetic field (constant).
     """
-    gearbox = register_module('Gearbox')
-    gearbox.param('fileName', 'b2bii/Belle.xml')
-    path.add_module(gearbox)
-
-    path.add_module('Geometry', ignoreIfPresent=False, components=['MagneticField'])
+    B2WARNING('setupBelleMagneticField function is obsolete. Please remove it from your scripts. '
+              'The Belle magnetic field is now being set via the settings in inputMdst(List) fucntion.')
 
 
 def setupB2BIIDatabase(isMC=False):

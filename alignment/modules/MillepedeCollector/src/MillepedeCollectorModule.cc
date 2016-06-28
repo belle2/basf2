@@ -128,6 +128,8 @@ void MillepedeCollectorModule::collect()
 
   for (auto arrayName : m_tracks) {
     // Input tracks (have to be fitted by GBL)
+    StoreArray<genfit::Track> tracks(arrayName);
+
     for (auto track : tracks) {
       if (!track.hasFitStatus())
         continue;

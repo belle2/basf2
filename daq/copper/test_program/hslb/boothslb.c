@@ -262,7 +262,10 @@ boot_fpga(mgt_t mgt, char *file, int verbose, int forced, int m012)
   if (verbose || (conf & 0x80)) dump_fpga(conf, "(PRGM<=1)");
   if (conf & 0x80) {
     printf("cannot set FPGA to the programming mode.\n");
-    if (! forced) return -1;
+    if (! forced){
+      fclose(fp);
+      return -1;
+    }
   }
 
   write_mgt(mgt, MGT_CONF, 0x86);

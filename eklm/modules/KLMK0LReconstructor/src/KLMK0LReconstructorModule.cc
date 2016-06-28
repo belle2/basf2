@@ -70,6 +70,8 @@ void KLMK0LReconstructorModule::event()
   /* Fill vector of 2d hits. */
   n = bklmHit2ds.getEntries();
   for (i = 0; i < n; i++) {
+    if (bklmHit2ds[i]->isOutOfTime())
+      continue;
     hit2d = new KLMHit2d(bklmHit2ds[i]);
     klmHit2ds.push_back(hit2d);
   }

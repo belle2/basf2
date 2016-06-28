@@ -40,7 +40,7 @@ namespace Belle2 {
       m_inputSAD_r(0), m_inputSAD_rr(0), m_inputSAD_dp_over_p0(0), m_inputSAD_E(0), m_inputSAD_rate(0), m_inputSAD_watt(0) {}
     /** Meta hit store array */
     SADMetaHit(double inputSAD_ssraw, double inputSAD_sraw, double inputSAD_ss, double inputSAD_s,
-               double inputSAD_Lss, double inputSAD_nturn,
+               double inputSAD_Lss, int inputSAD_nturn,
                double inputSAD_x, double inputSAD_y, double inputSAD_px, double inputSAD_py, double inputSAD_xraw, double inputSAD_yraw,
                double inputSAD_r, double inputSAD_rr, double inputSAD_dp_over_p0, double inputSAD_E, double inputSAD_rate, double inputSAD_watt):
       m_inputSAD_ssraw(inputSAD_ssraw), m_inputSAD_sraw(inputSAD_sraw), m_inputSAD_ss(inputSAD_ss), m_inputSAD_s(inputSAD_s),
@@ -52,83 +52,83 @@ namespace Belle2 {
     {
     }
 
-    /** Return location of scattering in the ring */
-    int getssraw()  const { return m_inputSAD_ssraw; }
-    /** Return */
-    int getsraw()  const { return m_inputSAD_sraw; }
-    /** Return */
-    int getss()  const { return m_inputSAD_ss; }
-    /** Return location of particle loss in the ring */
-    int gets()  const { return m_inputSAD_s; }
-    /** Return */
-    int getLss()  const { return m_inputSAD_Lss; }
-    /** Return number of turns until particle loss */
+    /** Return scattered position [m] */
+    double getssraw()  const { return m_inputSAD_ssraw; }
+    /** Return lost position [m] */
+    double getsraw()  const { return m_inputSAD_sraw; }
+    /** Return  scattered position (|s|<Ltot/2) [m] */
+    double getss()  const { return m_inputSAD_ss; }
+    /** Return lost position (|s|<Ltot/2) [m] */
+    double gets()  const { return m_inputSAD_s; }
+    /** Return length of element in which scattered [m] */
+    double getLss()  const { return m_inputSAD_Lss; }
+    /** Return number of turns from scattered to lost */
     int getn_turn()  const { return m_inputSAD_nturn; }
     /** Return x-coordinate of the lost particle */
-    int getx()  const { return m_inputSAD_x; }
+    double getx()  const { return m_inputSAD_x; }
     /** Return y-coordinate of the lost particle  */
-    int gety()  const { return m_inputSAD_y; }
+    double gety()  const { return m_inputSAD_y; }
     /** Return momentum x-coordinate of the lost particle */
-    int getpx()  const { return m_inputSAD_px; }
+    double getpx()  const { return m_inputSAD_px; }
     /** Return momentum y-coordinate of the lost particle */
-    int getpy()  const { return m_inputSAD_py; }
-    /** Return */
-    int getxraw()  const { return m_inputSAD_xraw; }
-    /** Return */
-    int getyraw()  const { return m_inputSAD_yraw; }
-    /** Return */
-    int getr()  const { return m_inputSAD_r; }
-    /** Return */
-    int getrr()  const { return m_inputSAD_rr; }
+    double getpy()  const { return m_inputSAD_py; }
+    /** Return  x at lost position [m] before matching onto beam pipe inner surface */
+    double getxraw()  const { return m_inputSAD_xraw; }
+    /** Return  x at lost position [m] before matching onto beam pipe inner surface */
+    double getyraw()  const { return m_inputSAD_yraw; }
+    /** Return sqrt(x*x+y*y) [m] */
+    double getr()  const { return m_inputSAD_r; }
+    /** Return sqrt(x*x+y*y) [m]before matching onto beam pipe inner surface */
+    double getrr()  const { return m_inputSAD_rr; }
     /** Return momentum deviation of the lost particle  */
-    int getdp_over_p0()  const { return m_inputSAD_dp_over_p0; }
-    /** Return */
-    int getE()  const { return m_inputSAD_E; }
-    /** Return */
-    int getrate()  const { return m_inputSAD_rate; }
-    /** Return */
-    int getwatt()  const { return m_inputSAD_watt; }
+    double getdp_over_p0()  const { return m_inputSAD_dp_over_p0; }
+    /** Return energy loss */
+    double getE()  const { return m_inputSAD_E; }
+    /** Return loss rate [Hz] */
+    double getrate()  const { return m_inputSAD_rate; }
+    /** Return loss wattage [W] */
+    double getwatt()  const { return m_inputSAD_watt; }
 
   private:
 
-    /** Return */
+    /** Return scattered position [m] */
     double m_inputSAD_ssraw;
-    /** Return */
+    /** Return lost position [m] */
     double m_inputSAD_sraw;
-    /** Return */
+    /** Return scattered position (|s|<Ltot/2) [m] */
     double m_inputSAD_ss;
-    /** Return */
+    /** Return lost position (|s|<Ltot/2) [m] */
     double m_inputSAD_s;
-    /** Return */
+    /** Return length of element in which scattered [m] */
     double m_inputSAD_Lss;
-    /** Return */
-    double m_inputSAD_nturn;
-    /** Return */
+    /** Return number of turns from scattered to lost */
+    int m_inputSAD_nturn;
+    /** Return x-coordinate of the lost particle */
     double m_inputSAD_x;
-    /** Return */
+    /** Return y-coordinate of the lost particle */
     double m_inputSAD_y;
-    /** Return */
+    /** Return  momentum x-coordinate of the lost particle  */
     double m_inputSAD_px;
-    /** Return */
+    /** Return  momentum y-coordinate of the lost particle */
     double m_inputSAD_py;
-    /** Return */
+    /** Return x at lost position [m] before matching onto beam pipe inner surface */
     double m_inputSAD_xraw;
-    /** Return */
+    /** Return y at lost position [m] before matching onto beam pipe inner surface */
     double m_inputSAD_yraw;
-    /** Return */
+    /** Return sqrt(x*x+y*y) [m] */
     double m_inputSAD_r;
-    /** Return */
+    /** Return sqrt(x*x+y*y) [m] at lost position [m] before matching onto beam pipe inner surface */
     double m_inputSAD_rr;
-    /** Return */
+    /** Return dp over p0 */
     double m_inputSAD_dp_over_p0;
-    /** Return */
+    /** Return energy loss */
     double m_inputSAD_E;
-    /** Return */
+    /** Return loss rate [Hz] */
     double m_inputSAD_rate;
-    /** Return */
+    /** Return watt loss [Hz] */
     double m_inputSAD_watt;
 
-    ClassDef(SADMetaHit, 1)
+    ClassDef(SADMetaHit, 2)
   };
 
 } // end namespace Belle2

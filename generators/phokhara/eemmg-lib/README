@@ -1,0 +1,35 @@
+
+This directory contains the following subdirectories
+    ff       -- the ff library, part of QCDLoop (see http://qcdloop.fnal.gov/)
+    ql       -- the ql library, part of QCDLoop (see http://qcdloop.fnal.gov/)
+    src      -- PJFry library
+    eemmg5   -- e+e-mu+mu-gamma pentagons library
+    eemmgisr -- e+e-mu+mu-gamma ISR library (for tests)
+
+The Makefile.inc contains compiler settings.
+You can edit it or use one of 3 predefined combinations:
+    Makefile.inc.gfortran --  gcc + gfortran
+    Makefile.inc.g77      --  gcc + g77
+    Makefile.inc.ifort    --  icpc + ifort
+
+For instance to use icpc + ifort one needs to replace constents of Makefile.inc
+with the contents of Makefile.inc.ifort
+
+After that, typing make should compile QCDLoop, PJFry, eemmg5 and eemmgisr libraries.
+In addition two test programs are compiled test and demo. Their output can be compared
+with reference output test.log and demo.log to make sure that PJFry operates correctly.
+
+By default recommended dynamic libraries (*.so) are compiled. In that case runtime
+environment should tell the loader where to find them.
+For instance by setting LD_LIBRARY_PATH variable to path to libraries.
+
+If static libraries (*.a) are needed, one can uncomment the corresponding section
+of Makefile.inc. In that case dynamic libraries will not be built.
+Linking with static libraries should include -lstdc++ when linking with FORTRAN compiler.
+
+The following FF message can appear:
+     ffopen: error: could not open /lscrm/yundin/.config/ff/fferr.dat
+          adjust path in ffopen (ffinit_mine.f)
+     fferr:  warning cannot open fferr.dat with error texts
+It can be either ignored or fixed by putting files ff/ffwarn.dat and ff/fferr.dat
+to $HOME/.config/ff or $HOME/ff

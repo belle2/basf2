@@ -1,0 +1,16 @@
+PJFRY_1.0 {
+    global:
+        extern "C++" {
+            PJFry::*;
+        };
+        pgetmusq_;
+        psetmusq_;
+        pclearcache_;
+        pa0_;
+        pb0_; pb0i_; pb0ij_;
+        pc0_; pc0i_; pc0ij_; pc0ijk_;
+        pd0_; pd0i_; pd0ij_; pd0ijk_; pd0ijkl_;
+        pe0_; pe0i_; pe0ij_; pe0ijk_; pe0ijkl_; pe0ijklm_;
+    local:
+        *;
+};

@@ -1,0 +1,18 @@
+QCDLOOP1_1.9 {
+  global:
+    qlinit_;
+    ffexi_;
+    qli1_;
+    qli2_;
+    qli3_;
+    qli4_;
+    ffprec_;
+    ffflag_;
+
+  local: *;
+};
+
+#QCDLOOP1_1.10 {
+#  global:
+#    somefunction;
+#} QCDLOOP1_1.9;

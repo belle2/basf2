@@ -1,0 +1,7 @@
+EEMMG_1.0 {
+    global:
+        eemmgloopmix_;
+        eemmgsqampmix_;
+    local:
+        *;
+};

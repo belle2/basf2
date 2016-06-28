@@ -1,0 +1,32 @@
+PJFRY_1.0 {
+    global:
+        extern "C++" {
+            PJFry::*;
+        };
+        pgetmusq_;
+        psetmusq_;
+        pclearcache_;
+        pa0_;
+        pb0_; pb0i_; pb0ij_;
+        pc0_; pc0i_; pc0ij_; pc0ijk_;
+        pd0_; pd0i_; pd0ij_; pd0ijk_; pd0ijkl_;
+        pe0_; pe0i_; pe0ij_; pe0ijk_; pe0ijkl_; pe0ijklm_;
+    local:
+        *;
+};
+
+@enable_golem_mode_begin@
+PJFRY95_1.0 {
+        pggetmusq_;
+        pgsetmusq_;
+        pgsetmat_;
+        pggetmat_;
+        pginitgolem95_;
+        pgpreparesmatrix_;
+        pga5*_; pgb5*_; pgc5*_;
+        pga4*_; pgb4*_; pgc4*_;
+        pga3*_; pgb3*_;
+        pga2*_; pgb2*_;
+        pga1*_;
+} PJFRY_1.0;
+@enable_golem_mode_end@

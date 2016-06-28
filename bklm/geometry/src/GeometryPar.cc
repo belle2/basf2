@@ -28,7 +28,7 @@ namespace Belle2 {
     GeometryPar* GeometryPar::instance(void)
     {
       if (m_Instance) return m_Instance;
-      B2FATAL("instance() called without initialization")
+      B2FATAL("instance() called without initialization");
       return NULL;  // never reached
     }
 

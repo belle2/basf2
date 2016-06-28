@@ -15,7 +15,7 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 
-inputMdst('../Bu_D0pi_Kpi_GENSIMRECtoDST.dst.root')
+inputMdst('default', '../Bu_D0pi_Kpi_GENSIMRECtoDST.dst.root')
 loadStdCharged()
 
 reconstructDecay('D0 -> K-:all pi+:all', '1.7 < M <2.0')

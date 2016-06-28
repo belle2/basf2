@@ -15,7 +15,7 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 
-inputMdst('../Bd_JpsiKS_mumu_GENSIMRECtoDST.dst.root')
+inputMdst('default', '../Bd_JpsiKS_mumu_GENSIMRECtoDST.dst.root')
 loadStdCharged()
 # fillParticleList('mu-:all','')
 # fillParticleList('pi-:all','')

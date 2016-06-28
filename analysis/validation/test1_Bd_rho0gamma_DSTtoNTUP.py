@@ -16,7 +16,7 @@ from modularAnalysis import *
 from stdCharged import *
 from stdPhotons import *
 
-inputMdst('../Bd_rho0gamma_GENSIMRECtoDST.dst.root')
+inputMdst('default', '../Bd_rho0gamma_GENSIMRECtoDST.dst.root')
 loadStdCharged()
 loadStdPhoton()
 

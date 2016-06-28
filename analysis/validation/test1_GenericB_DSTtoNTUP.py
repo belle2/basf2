@@ -18,7 +18,7 @@ from stdV0s import *
 from stdPhotons import *
 from stdPi0s import *
 
-inputMdst('../GenericB_GENSIMRECtoDST.dst.root')
+inputMdst('default', '../GenericB_GENSIMRECtoDST.dst.root')
 loadStdCharged()
 loadStdPhotons()
 loadStdPi0s()

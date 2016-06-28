@@ -23,7 +23,7 @@ from modularAnalysis import *
 from stdCharged import *
 from stdPhotons import *
 
-inputMdst('../MDSTtoUDST.udst.root')
+inputMdst('default', '../MDSTtoUDST.udst.root')
 loadStdCharged()
 loadStdPhoton()
 

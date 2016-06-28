@@ -82,7 +82,7 @@ matchMCTruth('K_S0:mdst')
 vertexKFit('K_S0:mdst', -1)
 
 # The Belle PID variables are: atcPIDBelle(sigHyp, bkgHyp), muIDBelle, and eIDBelle
-printVariableValues('pi+:all', ['mcPDG', 'p', 'atcPIDBelle(3,2)', 'muIDBelle', 'muIDBelleQuality', 'eIDBelle'])
+printVariableValues('pi+:all', ['mcPDG', 'p', 'atcPIDBelle(3,2)', 'muIDBelle', 'muIDBelleQuality', 'eIDBelle', 'nSVDHits'])
 
 printVariableValues('gamma:mdst', ['mcPDG', 'E', 'clusterE9E25'])
 printVariableValues('pi0:mdst', ['mcPDG', 'p', 'M', 'InvM'])

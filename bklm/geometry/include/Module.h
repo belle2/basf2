@@ -76,29 +76,33 @@ namespace Belle2 {
       Module(void);
 
       //! Constructor with explicit values (for RPC module)
-      Module(double            phiStripWidth,
-             int               phiStripMin,
-             int               phiStripMax,
-             double            zStripWidth,
-             int               zStripNumber,
-             CLHEP::Hep3Vector globalOrigin,
-             CLHEP::Hep3Vector localReconstructionShift,
+      Module(double             phiStripWidth,
+             int                phiStripMin,
+             int                phiStripMax,
+             double             zStripWidth,
+             int                zStripNumber,
+             CLHEP::Hep3Vector  globalOrigin,
+             CLHEP::Hep3Vector  localReconstructionShift,
              CLHEP::HepRotation rotation);
 
       //! Constructor with explicit values (for scint module)
-      Module(double            stripWidth,
-             int               phiStripNumber,
-             int               phiSensorSide,
-             int               zStripNumber,
-             CLHEP::Hep3Vector globalOrigin,
-             CLHEP::Hep3Vector localReconstructionShift,
-             CLHEP::HepRotation rotation);
+      Module(double             stripWidth,
+             int                phiStripNumber,
+             int                phiSensorSide,
+             int                zStripNumber,
+             CLHEP::Hep3Vector  globalOrigin,
+             CLHEP::Hep3Vector  localReconstructionShift,
+             CLHEP::HepRotation rotation,
+             bool               isFlipped);
 
       //! Copy constructor
       Module(const Module& m);
 
       //! Destructor
       ~Module();
+
+      //! Determine if this module is flipped by 180 degrees about z axis within its air gap
+      bool isFlipped() const { return m_IsFlipped; }
 
       //! Determine if this module contains RPCs (true) or scintillators (false)
       bool hasRPCs() const { return m_HasRPCs; }
@@ -179,6 +183,9 @@ namespace Belle2 {
 
       //! flag to indicate whether this module contains RPCs (true) or scintillators (false)
       bool m_HasRPCs;
+
+      //! flag to indicate if this module is flipped by 180 degrees about z axis within its air gap
+      bool m_IsFlipped;
 
       //! to store the width (in cm) of each phi strip this module
       double m_PhiStripWidth;

@@ -21,6 +21,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
+#include <simulation/background/BkgSensitiveDetector.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include "CLHEP/Vector/ThreeVector.h"
@@ -31,7 +32,6 @@
 
 #include "G4Step.hh"
 #include "G4VProcess.hh"
-#include "G4Neutron.hh"
 
 #define DEPTH_FORWARD 2
 #define DEPTH_SECTOR 3
@@ -48,11 +48,10 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector(const G4String& name) : SensitiveDetectorBase(name, Const::KLM)
     {
       m_FirstCall = true;
-      m_NeutronPDG = 0;     // dummy initializer
-      m_DoBackgroundStudy = false;  // dummy initializer
-      m_HitTimeMax = 0.0;   // dummy initializer
-      m_GeoPar = NULL;  // dummy initializer
-      m_SimPar = NULL;  // dummy initializer
+      m_HitTimeMax = 0.0;
+      m_BkgSensitiveDetector = NULL;
+      m_GeoPar = NULL;
+      m_SimPar = NULL;
       StoreArray<MCParticle> particles;
       StoreArray<BKLMSimHit> simHits;
       StoreArray<BKLMSimHitPosition> simHitPositions;
@@ -67,22 +66,29 @@ namespace Belle2 {
     //-----------------------------------------------------
     // Method invoked for every step in sensitive detector
     //-----------------------------------------------------
-    G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory*)
+    G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
     {
 
       // Once-only initializations (constructor is called too early for these)
       if (m_FirstCall) {
         m_FirstCall = false;
         m_GeoPar = GeometryPar::instance();
+        if (m_GeoPar->doBeamBackgroundStudy()) {
+          m_BkgSensitiveDetector = m_GeoPar->getBkgSensitiveDetector();
+        }
         m_SimPar = SimulationPar::instance();
         if (!(m_SimPar->isValid())) {
           B2FATAL("Simulation-control parameters are not available from module BKLMParamLoader");
         }
         m_HitTimeMax = m_SimPar->getHitTimeMax();
-        m_DoBackgroundStudy = m_SimPar->getDoBackgroundStudy();
-        m_NeutronPDG = G4Neutron::Definition()->GetPDGEncoding(); // =2112
         if (!gRandom) B2FATAL("gRandom is not initialized; please set up gRandom first");
       }
+
+      // Record a BeamBackHit for any particle
+      if (m_BkgSensitiveDetector != NULL) {
+        m_BkgSensitiveDetector->step(step, history);
+      }
+
       StoreArray<BKLMSimHit> simHits;
       if (!simHits.isValid()) simHits.create();
       StoreArray<BKLMSimHitPosition> simHitPositions;
@@ -101,11 +107,9 @@ namespace Belle2 {
       G4StepPoint* preStep  = step->GetPreStepPoint();
       G4StepPoint* postStep = step->GetPostStepPoint();
       G4Track*     track    = step->GetTrack();
-      int          pdg      = track->GetDefinition()->GetPDGEncoding();
 
-      // Record a step for a charged track that deposits some energy.
-      // Background study: Record every neutron passage, whether it deposits energy or not.
-      if (((eDep > 0.0) && (postStep->GetCharge() != 0.0)) || (m_DoBackgroundStudy && (pdg == m_NeutronPDG))) {
+      // Record a BKLMSimHit for a charged track that deposits some energy.
+      if ((eDep > 0.0) && (postStep->GetCharge() != 0.0)) {
         const G4VTouchable* hist = preStep->GetTouchable();
         int depth = hist->GetHistoryDepth();
         if (depth < DEPTH_PLANE) {

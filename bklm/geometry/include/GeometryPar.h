@@ -19,18 +19,10 @@
 
 #include "CLHEP/Vector/ThreeVector.h"
 
-//! already defined in BKLMGeometryPar.h
-//#define NLAYER 15
-//#define NSECTOR 8
-//#define NSCINT 100
-//#define BKLM_INNER 1
-//#define BKLM_OUTER 2
-//#define BKLM_FORWARD 1
-//#define BKLM_BACKWARD 2
-
 namespace Belle2 {
 
   class GearDir;
+  class BkgSensitiveDetector;
 
   namespace bklm {
 
@@ -55,8 +47,11 @@ namespace Belle2 {
       //! Get the overlap-check flag for the geometry builder
       bool doOverlapCheck(void) const { return m_DoOverlapCheck; }
 
-      //! Determine if the sensitive detectors in a given layer are RPCs (=true) or scintillators (=false)
-      bool hasRPCs(int layer) const;
+      //! Get the beam background study flag
+      bool doBeamBackgroundStudy(void) const { return m_DoBeamBackgroundStudy; }
+
+      //! Get the beam background study flag
+      BkgSensitiveDetector* getBkgSensitiveDetector(void) const { return m_BkgSensitiveDetector; }
 
       //! Get the inner radius of specified layer
       double getLayerInnerRadius(int layer) const;
@@ -91,6 +86,10 @@ namespace Belle2 {
       //! Get the shift (dx,dy,dz) of the scintillator detector module's scintillator envelope within its enclosure
       const CLHEP::Hep3Vector getScintEnvelopeOffset(int layer, bool hasChimney) const;
 
+      //! Get the sign (+/-1) of scintillator-envelope's shift along y axis within its enclosing module for MPPC placement
+      //! -1: shift envelope along -y to place MPPCs at +y, +1: shift envelope along +y to place MPPCs at -y
+      int getScintEnvelopeOffsetSign(int layer) const { return m_ScintEnvelopeOffsetSign[layer - 1]; }
+
       //! Get the radial offset of the scintillator detector module's active envelope due to difference in polystyrene-sheet thicknesses
       double getPolystyreneOffsetX(void) const;
 
@@ -120,6 +119,9 @@ namespace Belle2 {
 
       //! Get the radial midpoint of the detector module's active volume of specified layer
       double getActiveMiddleRadius(int layer) const;
+
+      //! Get the flip (180-degrees about z axis) of a particular BKLM module
+      bool getModuleFlip(int fb, int sector, int layer) const { return m_IsFlipped[fb - 1][sector - 1][layer - 1]; }
 
       //! Get the global rotation angle about z of the entire BKLM
       double getRotation(void) const { return m_Rotation; }
@@ -295,6 +297,54 @@ namespace Belle2 {
       //! Get the angular width of the layer-0 support plate's bracket's cutout
       double getBracketCutoutDphi(void) const { return m_BracketCutoutDphi; }
 
+      //! Get the number of preamplifier readout stations
+      int getNReadoutStation(void) const { return m_NReadoutStation; }
+
+      //! Get the selector for phi (true) or z (false) readout station
+      bool getReadoutStationIsPhi(int station) const { return m_ReadoutStationIsPhi[station - 1]; }
+
+      //! Get the position of each readout station
+      double getReadoutStationPosition(int station) const { return m_ReadoutStationPosition[station - 1]; }
+
+      //! Get the size (dx,dy,dz) of the readout container
+      const CLHEP::Hep3Vector getReadoutContainerHalfSize(void) const;
+
+      //! Get the size (dx,dy,dz) of the carrier card
+      const CLHEP::Hep3Vector getReadoutCarrierHalfSize(void) const;
+
+      //! Get the size (dx,dy,dz) of the preamplifier card
+      const CLHEP::Hep3Vector getReadoutPreamplifierHalfSize(void) const;
+
+      //! Get the number of preamplifier positions along the length of the carrier card
+      int getNReadoutPreamplifierPosition(void) const { return m_ReadoutPreamplifierPosition.size(); }
+
+      //! Get the position of a preamplifier along the length of the carrier card
+      double getReadoutPreamplifierPosition(int preamp) const { return m_ReadoutPreamplifierPosition[preamp - 1]; }
+
+      //! Get the size (dx,dy,dz) of the readout connectors pair
+      const CLHEP::Hep3Vector getReadoutConnectorsHalfSize(void) const;
+
+      //! Get the position of the readout connectors pair along the length of the carrier card
+      double getReadoutConnectorsPosition(void) const { return m_ReadoutConnectorsPosition; }
+
+      //! Get the MPPC housing radius
+      double getMPPCHousingRadius(void) const { return m_MPPCHousingRadius; }
+
+      //! Get the MPPC housing half-length
+      double getMPPCHousingHalfLength(void) const { return 0.5 * m_MPPCHousingLength; }
+
+      //! Get the MPPC half-length
+      double getMPPCHalfLength(void) const { return 0.5 * m_MPPCLength; }
+
+      //! Get the MPPC half-width
+      double getMPPCHalfWidth(void) const { return 0.5 * m_MPPCWidth; }
+
+      //! Get the MPPC half-height
+      double getMPPCHalfHeight(void) const { return 0.5 * m_MPPCHeight; }
+
+      //! Determine if the sensitive detectors in a given layer are RPCs (=true) or scintillators (=false)
+      bool hasRPCs(int layer) const;
+
       //! Get the pointer to the definition of a module
       const Module* findModule(bool isForward, int sector, int layer) const;
 
@@ -324,80 +374,92 @@ namespace Belle2 {
       //! Get geometry parameters from Gearbox
       void read(const GearDir&);
 
-      //! Get geometry parameters from DataBase
+      //! Get geometry parameters from Conditions Database
       void readFromDB(const BKLMGeometryPar&);
+
+      //! Calculate additional geometry parameters
+      void calculate();
 
       //! Flag for enabling overlap-check during geometry construction
       bool m_DoOverlapCheck;
 
-      //! global rotation about z of the BKLM
+      //! Flag for enabling beam background study (=use bkg sensitive-detector function too)
+      bool m_DoBeamBackgroundStudy;
+
+      //! Pointer to object that creates BeamBkgHits for BKLM
+      BkgSensitiveDetector* m_BkgSensitiveDetector;
+
+      //! Global rotation about z of the BKLM
       double m_Rotation;
 
-      //! global offset along z of the BKLM
+      //! Global rotation angle of a sector
+      double m_SectorRotation[2][NSECTOR];
+
+      //! Global offset along z of the BKLM
       double m_OffsetZ;
 
-      //! starting angle of the polygon shape
+      //! Starting angle of the polygon shape
       double m_Phi;
 
-      //! number of sectors (=8 : octagonal)
+      //! Number of sectors (=8 : octagonal)
       int m_NSector;
 
-      //! outer radius of the solenoid
+      //! Outer radius of the solenoid
       double m_SolenoidOuterRadius;
 
-      //! radius of the circle tangent to the sides of the outer polygon
+      //! Radius of the circle tangent to the sides of the outer polygon
       double m_OuterRadius;
 
-      //! half-length along z of the BKLM
+      //! Half-length along z of the BKLM
       double m_HalfLength;
 
-      //! number of layers in one sector
+      //! Number of layers in one sector
       int m_NLayer;
 
-      //! nominal height of a layer's structural iron
+      //! Nominal height of a layer's structural iron
       double m_IronNominalHeight;
 
-      //! actual height of a layer's stuctural iron
+      //! Actual height of a layer's stuctural iron
       double m_IronActualHeight;
 
-      //! radius of the inner tangent circle of the innermost gap
+      //! Radius of the inner tangent circle of the innermost gap
       double m_Gap1InnerRadius;
 
-      //! nominal height of the innermost gap
+      //! Nominal height of the innermost gap
       double m_Gap1NominalHeight;
 
-      //! actual height of the innermost gap
+      //! Actual height of the innermost gap
       double m_Gap1ActualHeight;
 
-      //! height of layer 0: internal use only
+      //! Height of layer 0: internal use only
       double m_Layer1Height;
 
-      //! height of a layer: internal use only
+      //! Height of a layer: internal use only
       double m_LayerHeight;
 
-      //! variable for width (at the outer radius) of the adjacent structural iron on either side of innermost gap
+      //! Width (at the outer radius) of the adjacent structural iron on either side of innermost gap
       double m_Gap1IronWidth;
 
-      //! length along z of each gap
+      //! Length along z of each gap
       double m_GapLength;
 
-      //! nominal height of outer gaps
+      //! Nominal height of outer gaps
       double m_GapNominalHeight;
 
-      //! actual height of outer gaps
+      //! Actual height of outer gaps
       double m_GapActualHeight;
 
-      //! width (at the outer radius) of the adjacent structural iron on either side of a gap
+      //! Width (at the outer radius) of the adjacent structural iron on either side of a gap
       double m_GapIronWidth;
 
-      //! radius of the inner tangent circle of virtual gap 0 (assuming equal-height layers)
+      //! Radius of the inner tangent circle of virtual gap 0 (assuming equal-height layers)
       double m_GapInnerRadius;
 
       //! Number of phi-readout RPC strips in each layer
-      int m_NPhiStrips[NLAYER + 1];
+      int m_NPhiStrips[NLAYER];
 
       //! Number of phi-readout scintillators in each layer
-      int m_NPhiScints[NLAYER + 1];
+      int m_NPhiScints[NLAYER];
 
       //! number of z-measuring cathode strips in a standard RPC module
       int m_NZStrips;
@@ -411,8 +473,18 @@ namespace Belle2 {
       //! number of z-measuring scintillators in a chimney-sector scintillator module
       int m_NZScintsChimney;
 
-      //! Sign (+/-1) of scintillator envelope's shift along phi axis within its enclosing module
-      int m_PhiScintsOffsetSign[NLAYER + 1];
+      //! Sign (+/-1) of scintillator-envelope's shift along y axis within its enclosing module for MPPC placement
+      //! -1: shift envelope along -y to place MPPCs at +y, +1: shift envelope along +y to place MPPCs at -y
+      int m_ScintEnvelopeOffsetSign[NLAYER];
+
+      //! Width of the phi strips on each layer
+      double m_PhiStripWidth[NLAYER];
+
+      //! Width of the z strips on each layer
+      double m_ZStripWidth[NLAYER];
+
+      //! Shortening of the nominal length of the z scintillators
+      double m_ZScintDLength[NLAYER][NZSCINT];
 
       //! length along z of the module
       double m_ModuleLength;
@@ -555,11 +627,86 @@ namespace Belle2 {
       //! angular width of the innermost-module support plate's bracket's cutout
       double m_BracketCutoutDphi;
 
-      //! Flag to indicate whether layer contains RPCs (true) or scintillators (false)
-      bool m_HasRPCs[NLAYER + 1];
+      //! Number of preamplifier readout stations
+      int m_NReadoutStation;
 
-      //! flag of z-phi planes flip for scintillator layers
-      bool m_Flip[BKLM_BACKWARD + 1][NSECTOR + 1][NSCINTLAYER + 1];
+      //! Selector for phi (true) or z (false) readout station
+      bool m_ReadoutStationIsPhi[NSTATION];
+
+      //! Position of each readout station along its relevant axis
+      double m_ReadoutStationPosition[NSTATION];
+
+      //! Length of the readout station's container
+      double m_ReadoutContainerLength;
+
+      //! Width of the readout station's container
+      double m_ReadoutContainerWidth;
+
+      //! Height of the readout station's container
+      double m_ReadoutContainerHeight;
+
+      //! Length of the readout carrier card
+      double m_ReadoutCarrierLength;
+
+      //! Width of the readout carrier card
+      double m_ReadoutCarrierWidth;
+
+      //! Height of the readout carrier card
+      double m_ReadoutCarrierHeight;
+
+      //! Length of the preamplifier card
+      double m_ReadoutPreamplifierLength;
+
+      //! Width of the preamplifier card
+      double m_ReadoutPreamplifierWidth;
+
+      //! Height of the preamplifier card
+      double m_ReadoutPreamplifierHeight;
+
+      //! Positions of the preamplifiers along the length of the carrier card
+      std::vector<double> m_ReadoutPreamplifierPosition;
+
+      //! Length of the readout connectors pair
+      double m_ReadoutConnectorsLength;
+
+      //! Width of the readout connectors pair
+      double m_ReadoutConnectorsWidth;
+
+      //! Height of the readout connectors pair
+      double m_ReadoutConnectorsHeight;
+
+      //! Position of the readout connectors pair along the length of the carrier card
+      double m_ReadoutConnectorsPosition;
+
+      //! MPPC housing radius
+      double m_MPPCHousingRadius;
+
+      //! MPPC housing length
+      double m_MPPCHousingLength;
+
+      //! MPPC length
+      double m_MPPCLength;
+
+      //! MPPC width
+      double m_MPPCWidth;
+
+      //! MPPC height
+      double m_MPPCHeight;
+
+      //! Flag to indicate whether layer contains RPCs (true) or scintillators (false)
+      bool m_HasRPCs[NLAYER];
+
+      //! Reconstruction dx in local system. displacement, not alignment
+      double m_LocalReconstructionShiftX[2][NSECTOR][NLAYER];
+
+      //! Reconstruction dy in local system. displacement, not alignment
+      double m_LocalReconstructionShiftY[2][NSECTOR][NLAYER];
+
+      //! Reconstruction dz in local system. displacement, not alignment
+      double m_LocalReconstructionShiftZ[2][NSECTOR][NLAYER];
+
+      //! Flag to indicate whether a module is flipped (true) or not (false) by 180 degrees about the z axis
+      bool m_IsFlipped[2][NSECTOR][NLAYER];
 
       //! map of <volumeIDs, pointers to defined modules>
       std::map<int, Module*> m_Modules;

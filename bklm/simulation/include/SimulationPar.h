@@ -37,9 +37,6 @@ namespace Belle2 {
       //! Get the maximum global time for a recorded sim hit
       double getHitTimeMax(void) const { return m_HitTimeMax; }
 
-      //! Get the flag that controls whether to do the neutron-background study
-      bool getDoBackgroundStudy(void) const { return (m_DoBackgroundStudy != 0.0); }
-
       //! Get the maximum multiplicity in the RPC strip cumulative prob density functions
       int getMaxMultiplicity(void) const { return c_MAX_NHIT; }
 
@@ -65,9 +62,6 @@ namespace Belle2 {
 
       //! variable for the maximum global time for a recorded sim hit
       double m_HitTimeMax;
-
-      //! flag for whether the neutron background study is done
-      double m_DoBackgroundStudy;
 
       //! RPC phiStrip multiplicity cumulative probability distribution table
       double m_PhiMultiplicityCDF[c_NDIV + 1][c_MAX_NHIT];

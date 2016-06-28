@@ -50,7 +50,6 @@
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::bklm;
-using namespace CLHEP;
 
 REG_MODULE(BKLMEffnRadio)
 
@@ -278,7 +277,7 @@ void BKLMEffnRadioModule::event()
   if (!(m_eventCounter % 1000))
     B2DEBUG(1, "looking at event nr " << m_eventCounter);
 
-    StoreArray<BKLMHit1d> hits1D;
+  StoreArray<BKLMHit1d> hits1D;
   //   cout <<" we have " << hits1D.getEntries() << " 1D hits " << endl;
 
   m_hHitsPerEvent1D->Fill(hits1D.getEntries());

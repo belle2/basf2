@@ -17,20 +17,6 @@
 using namespace std;
 using namespace Belle2;
 
-// BKLMSimulationPar* BKLMSimulationPar::m_Instance = NULL;
-
-/*BKLMSimulationPar* BKLMSimulationPar::instance()
-{
-  if (!m_Instance) m_Instance = new BKLMSimulationPar();
-  return m_Instance;
-}
-
-BKLMSimulationPar::BKLMSimulationPar()
-{
-  m_IsValid = false;
-}
-*/
-
 BKLMSimulationPar::BKLMSimulationPar(const GearDir& content)
 {
   read(content);
@@ -46,8 +32,7 @@ void BKLMSimulationPar::read(const GearDir& content)
   if (!content) return;
 
   m_HitTimeMax = content.getWithUnit("/HitTimeMax");
-  m_DoBackgroundStudy = content.getBool("DoBackgroundStudy");
-  B2INFO("DoBackgroundStudy = " << m_DoBackgroundStudy);
+  B2INFO("HitTimeMax = " << m_HitTimeMax);
 
   char name[40];
   int div = 0;

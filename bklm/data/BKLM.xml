@@ -2,9 +2,10 @@
 <DetectorComponent name="BKLM" xmlns:xi="http://www.w3.org/2001/XInclude">
   <Creator library="bklm">BKLMCreator</Creator>
   <Content>
+    <xi:include href="BKLMElectronicsMapping.xml"/>
     <xi:include href="BKLMSimulationPar.xml"/>
-    <BeamBackgroundStudy desc="select 1 if you want to record neutron and gamma hits">0</BeamBackgroundStudy>
-    <DoOverlapCheck desc="Flag to check for volume overlaps during geometry construction">0</DoOverlapCheck>
+    <DoOverlapCheck desc="Flag to check for volume overlaps during geometry construction">false</DoOverlapCheck>
+    <BeamBackgroundStudy desc="Flag to check for volume overlaps during geometry construction">true</BeamBackgroundStudy>
     <Rotation desc="Rotation about z axis of the BKLM with respect to the Detector"  unit="mrad">0.0</Rotation>
     <OffsetZ  desc="Offset of the BKLM along z with respect to the IP" unit="cm">47.0</OffsetZ>
     <Phi desc="Starting azimuthal angle of the BKLM polygon" unit="deg">-22.5</Phi>
@@ -27,6 +28,76 @@
     <BracketInnerRadius unit="cm">201.18</BracketInnerRadius>
     <BracketInset unit="cm">32.5</BracketInset>
     <BracketCutoutDphi unit="deg">50.076196</BracketCutoutDphi>
+    <Readout>
+      <Stations>
+        <!-- Phi stations are at same y location relative to module center in L0, L1 -->
+        <Station station="1">
+          <IsPhi>true</IsPhi>
+          <Position unit="cm">-65.5</Position>
+        </Station>
+        <Station station="2">
+          <IsPhi>true</IsPhi>
+          <Position unit="cm">-15.5</Position>
+        </Station>
+        <Station station="3">
+          <IsPhi>true</IsPhi>
+          <Position unit="cm">59.5</Position>
+        </Station>
+        <!-- Z stations are at same z location relative to module's readout-panel end in L0, L1 including chimney modules -->
+        <Station station="4">
+          <IsPhi>false</IsPhi>
+          <Position unit="cm">-15.5</Position>
+        </Station>
+        <Station station="5">
+          <IsPhi>false</IsPhi>
+          <Position unit="cm">-69.5</Position>
+        </Station>
+        <Station station="6">
+          <IsPhi>false</IsPhi>
+          <Position unit="cm">-129.5</Position>
+        </Station>
+        <Station station="7">
+          <IsPhi>false</IsPhi>
+          <Position unit="cm">-189.5</Position>
+        </Station>
+      </Stations>
+      <Container>
+        <Length unit="cm">18.05</Length>
+        <Width unit="cm">1.80</Width>
+        <Height unit="cm">1.80</Height>
+      </Container>
+      <Carrier>
+        <Length unit="cm">18.0</Length>
+        <Width unit="cm">1.778</Width>
+        <Height unit="cm">0.16</Height>
+      </Carrier>
+      <Preamplifier>
+        <Length unit="cm">0.17</Length>
+        <Width unit="cm">1.778</Width>
+        <Height unit="cm">1.62</Height>
+        <Position unit="cm">
+           -7.558, -7.004, -6.449, -5.895, -5.341, -4.786, -4.282, -3.678,
+           4.194, 4.753, 5.311, 5.869, 6.428, 6.986, 7.544
+        </Position>
+      </Preamplifier>
+      <Connectors>
+        <Length unit="cm">6.5</Length>
+        <Width unit="cm">1.72</Width>
+        <Height unit="cm">1.62</Height>
+        <Position unit="cm">0.258</Position>
+      </Connectors>
+      <MPPC>
+        <Housing>
+          <Radius unit="cm">0.375</Radius>
+          <Length unit="cm">1.15</Length>
+        </Housing>
+        <Sensor>
+          <Length unit="cm">0.13</Length>
+          <Width unit="cm">0.13</Width>
+          <Height unit="cm">0.01</Height>
+        </Sensor>
+      </MPPC>
+    </Readout>    
     <Layers>
       <InnerRadius unit="cm">201.9</InnerRadius>
       <GapLength unit="cm">222.0</GapLength>
@@ -49,9 +120,9 @@
         <ZStrips>
           <Width unit="cm">4.52</Width>
         </ZStrips>
+        <ScintEnvelopeOffsetSign desc="Shift scint envelope to -y for MPPCs at +y (i.e., on left)">-1</ScintEnvelopeOffsetSign>
         <PhiScintillators>
           <NScints>37</NScints>
-          <OffsetSign>-1</OffsetSign>
         </PhiScintillators>
       </Layer>
       <Layer layer="2">
@@ -63,9 +134,9 @@
         <ZStrips>
           <Width unit="cm">4.52</Width>
         </ZStrips>
+        <ScintEnvelopeOffsetSign desc="Shift scint envelope to +y for MPPCs at -y (i.e., on right)">+1</ScintEnvelopeOffsetSign>
         <PhiScintillators>
           <NScints>42</NScints>
-          <OffsetSign>+1</OffsetSign>
         </PhiScintillators>
         <ZScintillators>
           <Scint scint="7">
@@ -258,6 +329,7 @@
             </ReconstructionShift>
           </Layer>
           <Layer layer="2">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -366,6 +438,7 @@
             </ReconstructionShift>
           </Layer>
           <Layer layer="2">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -575,6 +648,7 @@
         <Sector sector="4">
           <Phi unit="deg">135</Phi>
           <Layer layer="1">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -683,6 +757,7 @@
         <Sector sector="5">
           <Phi unit="deg">180</Phi>
           <Layer layer="1">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -791,6 +866,7 @@
         <Sector sector="6">
           <Phi unit="deg">225</Phi>
           <Layer layer="1">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -899,6 +975,7 @@
         <Sector sector="7">
           <Phi unit="deg">270</Phi>
           <Layer layer="1">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -906,6 +983,7 @@
             </ReconstructionShift>
           </Layer>
           <Layer layer="2">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -1014,6 +1092,7 @@
             </ReconstructionShift>
           </Layer>
           <Layer layer="2">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -1117,6 +1196,7 @@
         <Sector sector="1">
           <Phi unit="deg">0</Phi>
           <Layer layer="1">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -1225,6 +1305,7 @@
         <Sector sector="2">
           <Phi unit="deg">45</Phi>
           <Layer layer="1">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -1448,6 +1529,7 @@
             </ReconstructionShift>
           </Layer>
           <Layer layer="2">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -1556,6 +1638,7 @@
             </ReconstructionShift>
           </Layer>
           <Layer layer="2">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -1664,6 +1747,7 @@
             </ReconstructionShift>
           </Layer>
           <Layer layer="2">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -1765,6 +1849,7 @@
         <Sector sector="7">
           <Phi unit="deg">270</Phi>
           <Layer layer="1">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -1772,6 +1857,7 @@
             </ReconstructionShift>
           </Layer>
           <Layer layer="2">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>
@@ -1873,6 +1959,7 @@
         <Sector sector="8">
           <Phi unit="deg">315</Phi>
           <Layer layer="1">
+            <Flip>true</Flip>
             <ReconstructionShift>
                <X unit="cm">0.5</X>
                <Y unit="cm">0.0</Y>

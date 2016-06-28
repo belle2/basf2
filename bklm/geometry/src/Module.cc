@@ -16,7 +16,6 @@
 #include <iostream>
 
 using namespace std;
-using namespace CLHEP;
 
 namespace Belle2 {
 
@@ -24,6 +23,7 @@ namespace Belle2 {
 
     Module::Module() :
       m_HasRPCs(false),
+      m_IsFlipped(false),
       m_PhiStripWidth(0.0),
       m_PhiStripMin(0),
       m_PhiStripMax(0),
@@ -34,9 +34,9 @@ namespace Belle2 {
       m_ZPositionBase(0.0),
       m_PhiSensorSide(0),
       m_SignalSpeed(0.0),
-      m_GlobalOrigin(Hep3Vector()),
-      m_LocalReconstructionShift(Hep3Vector()),
-      m_Rotation(HepRotation())
+      m_GlobalOrigin(CLHEP::Hep3Vector()),
+      m_LocalReconstructionShift(CLHEP::Hep3Vector()),
+      m_Rotation(CLHEP::HepRotation())
     {
       m_RotationInverse = m_Rotation.inverse();
       m_PhiScintPositions.clear();
@@ -48,15 +48,16 @@ namespace Belle2 {
     }
 
     // constructor for RPC module
-    Module::Module(double     phiStripWidth,
-                   int        phiStripMin,
-                   int        phiStripMax,
-                   double     zStripWidth,
-                   int        zStripNumber,
-                   Hep3Vector globalOrigin,
-                   Hep3Vector localReconstructionShift,
-                   HepRotation rotation) :
+    Module::Module(double             phiStripWidth,
+                   int                phiStripMin,
+                   int                phiStripMax,
+                   double             zStripWidth,
+                   int                zStripNumber,
+                   CLHEP::Hep3Vector  globalOrigin,
+                   CLHEP::Hep3Vector  localReconstructionShift,
+                   CLHEP::HepRotation rotation) :
       m_HasRPCs(true),
+      m_IsFlipped(false),
       m_PhiStripWidth(phiStripWidth),
       m_PhiStripMin(phiStripMin),
       m_PhiStripMax(phiStripMax),
@@ -81,14 +82,16 @@ namespace Belle2 {
     }
 
     // constructor for scint module
-    Module::Module(double     stripWidth,
-                   int        phiStripNumber,
-                   int        phiSensorSide,
-                   int        zStripNumber,
-                   Hep3Vector globalOrigin,
-                   Hep3Vector localReconstructionShift,
-                   HepRotation rotation) :
+    Module::Module(double             stripWidth,
+                   int                phiStripNumber,
+                   int                phiSensorSide,
+                   int                zStripNumber,
+                   CLHEP::Hep3Vector  globalOrigin,
+                   CLHEP::Hep3Vector  localReconstructionShift,
+                   CLHEP::HepRotation rotation,
+                   bool               isFlipped) :
       m_HasRPCs(false),
+      m_IsFlipped(isFlipped),
       m_PhiStripWidth(stripWidth),
       m_PhiStripMin(1),
       m_PhiStripMax(phiStripNumber),
@@ -101,7 +104,7 @@ namespace Belle2 {
       m_SignalSpeed(0.5671 * Const::speedOfLight), // m_firstPhotonlightSpeed, from EKLM
       m_GlobalOrigin(globalOrigin),
       m_LocalReconstructionShift(localReconstructionShift),
-      m_Rotation(rotation)
+      m_Rotation(isFlipped ? rotation.rotateZ(M_PI) : rotation)
     {
       m_RotationInverse = m_Rotation.inverse();
       m_PhiScintLengths.clear();
@@ -115,6 +118,7 @@ namespace Belle2 {
     // copy constructor
     Module::Module(const Module& m) :
       m_HasRPCs(m.m_HasRPCs),
+      m_IsFlipped(m.m_IsFlipped),
       m_PhiStripWidth(m.m_PhiStripWidth),
       m_PhiStripMin(m.m_PhiStripMin),
       m_PhiStripMax(m.m_PhiStripMax),
@@ -166,19 +170,19 @@ namespace Belle2 {
       m_ZScintPositions[scint] = position;
     }
 
-    const Hep3Vector Module::getLocalPosition(double phiStripAve, double zStripAve) const
+    const CLHEP::Hep3Vector Module::getLocalPosition(double phiStripAve, double zStripAve) const
     {
       // "+0.5" assures that the local position is in the middle of the strip
-      return Hep3Vector(0.0,
-                        (phiStripAve - m_PhiPositionBase + 0.5) * m_PhiStripWidth,
-                        (zStripAve - m_ZPositionBase + 0.5) * m_ZStripWidth);
+      return CLHEP::Hep3Vector(0.0,
+                               (phiStripAve - m_PhiPositionBase + 0.5) * m_PhiStripWidth,
+                               (zStripAve - m_ZPositionBase + 0.5) * m_ZStripWidth);
     }
 
-    const Hep3Vector Module::getPropagationTimes(const Hep3Vector& local) const
+    const CLHEP::Hep3Vector Module::getPropagationTimes(const CLHEP::Hep3Vector& local) const
     {
       double dy = m_PhiPositionBase * m_PhiStripWidth - m_PhiSensorSide * local.y();
       double dz = m_ZStripMax * m_ZStripWidth - local.z();
-      return Hep3Vector(0.0, dz / m_SignalSpeed, dy / m_SignalSpeed);
+      return CLHEP::Hep3Vector(0.0, dz / m_SignalSpeed, dy / m_SignalSpeed);
     }
 
   } // end of namespace bklm

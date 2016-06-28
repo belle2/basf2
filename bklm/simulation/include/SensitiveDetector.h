@@ -16,6 +16,7 @@
 namespace Belle2 {
 
   class BKLMSimHit;
+  class BkgSensitiveDetector;
 
   namespace bklm {
 
@@ -43,17 +44,14 @@ namespace Belle2 {
       //! Find the ranges of matching RPC strips for each simulated hit
       void convertHitToRPCStrips(const CLHEP::Hep3Vector&, const Module*, int&, int&, int&, int&);
 
-      //! Flag to say whether background study will be done or not
-      bool m_DoBackgroundStudy;
-
-      //! PDG encoding for neutron
-      int m_NeutronPDG;
+      //! Flag to enforce once-only initializations in Initialize()
+      bool m_FirstCall;
 
       //! maximum permissible hit time (based on overflow of LeCroy 1877 TDC)
       double m_HitTimeMax;
 
-      //! Flag to enforce once-only initializations in Initialize()
-      bool m_FirstCall;
+      //! Pointer to a sensitive-detector object used for beam-background steps
+      BkgSensitiveDetector* m_BkgSensitiveDetector;
 
       //! Pointer to GeometryPar singleton
       GeometryPar* m_GeoPar;

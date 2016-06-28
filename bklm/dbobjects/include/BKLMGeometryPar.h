@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-//#include "bklm/geometry/Module.h"
-
 #include <vector>
 #include <map>
 
@@ -21,373 +19,315 @@
 #include <cmath>
 #include <vector>
 
-//#include <TROOT.h>
-//#include <TClass.h>
-
 static const int NLAYER = 15;
 static const int NSCINTLAYER = 2;
 static const int NSECTOR = 8;
-static const int NSCINT = 100;
+static const int NPHISCINT = 48;
+static const int NZSCINT = 54;
+static const int NSTATION = 7;
 static const int BKLM_INNER = 1;
 static const int BKLM_OUTER = 2;
 static const int BKLM_FORWARD = 1;
 static const int BKLM_BACKWARD = 2;
+static const int CHIMNEY_SECTOR = 3;
 
 namespace Belle2 {
 
   class GearDir;
 
   /**
-  * The Class for BKLM geometry.
+  * The Class for BKLM geometry
   */
 
   class BKLMGeometryPar: public TObject {
 
   public:
 
-    //!Default constructor
-    BKLMGeometryPar() {};
+    //! Default constructor
+    BKLMGeometryPar() {}
 
-    //! Constructor
+    //! Constructor using Gearbox
     explicit BKLMGeometryPar(const GearDir&);
 
     //! Destructor
     ~BKLMGeometryPar();
 
-    //! Returen BKLM geometry version
-    int getVersion() const {return m_version; }
-
-    //! set BKLM geometry version
-    void setVersion(int version) { m_version = version; }
-
-    //! Get the overlap-check flag for the geometry builder
-    bool doOverlapCheck(void) const { return m_DoOverlapCheck == 1 ? true : false; }
-
-    //! Get the flag for doing beamBackgroundStudy
-    bool doBeamBackgroundStudy(void) const { return (m_beamBackgroundStudy == 1 ? true : false); }
-
-    //! Clear all geometry parameters
-    //void clear();
-
     //! Get geometry parameters from Gearbox
     void read(const GearDir&);
 
+    //! Get BKLM-geometry version
+    int getVersion() const { return m_version; }
+
+    //! Set BKLM geometry version
+    void setVersion(int version) { m_version = version; }
+
+    //! Get the overlap-check flag for the geometry builder
+    bool doOverlapCheck(void) const { return m_DoOverlapCheck; }
+
+    //! Set the overlap-check flag for the geometry builder
+    void doOverlapCheck(bool flag) { m_DoOverlapCheck = flag; }
+
+    //! Get the beam background study flag
+    bool doBeamBackgroundStudy(void) const { return m_DoBeamBackgroundStudy; }
+
+    //! Set the beam background study flag
+    void doBeamBackgroundStudy(bool flag) { m_DoBeamBackgroundStudy = flag; }
+
     //! Determine if the sensitive detectors in a given layer are RPCs (=true) or scintillators (=false)
-    //bool hasRPCs(int layer) const {return m_HasRPCs[layer]; }
-    bool hasRPCs(int layer) const;
+    bool hasRPCs(int layer) const { return m_HasRPCs[layer - 1]; }
 
     //! Set flag to indicate whether layer contains RPCs (true) or scintillators (false)
-    void setHasRPCs(int layer, bool hasRPC) { m_HasRPCs[layer] = hasRPC; }
-
-    //! Get the inner radius of specified layer
-    double getLayerInnerRadius(int layer) const;
-
-    //! Get the outer radius of specified layer
-    double getLayerOuterRadius(int layer) const;
-
-    //! Get the size (dx,dy,dz) of the gap [=slot] of specified layer
-    const CLHEP::Hep3Vector getGapHalfSize(int layer, bool hasChimney) const;
-
-    //! Get the size (dx,dy,dz) of the detector module of specified layer
-    const CLHEP::Hep3Vector getModuleHalfSize(int layer, bool hasChimney) const;
-
-    //! Get the size (dx,dy,dz) of the detector module's interior volume 1
-    const CLHEP::Hep3Vector getModuleInteriorHalfSize1(int layer, bool hasChimney) const;
-
-    //! Get the size (dx,dy,dz) of the scintillator detector module's polystyrene filler
-    const CLHEP::Hep3Vector getModuleInteriorHalfSize2(int layer, bool hasChimney) const;
-
-    //! Get the size (dx,dy,dz) of the detector module's electrode of specified layer
-    const CLHEP::Hep3Vector getElectrodeHalfSize(int layer, bool hasChimney) const;
-
-    //! Get the size (dx,dy,dz) of the detector module's gas gaps of specified layer
-    const CLHEP::Hep3Vector getGasHalfSize(int layer, bool hasChimney) const;
-
-    //! Get the size (dx,dy,dz) of the scintillator detector module's air filler
-    const CLHEP::Hep3Vector getAirHalfSize(int layer, bool hasChimney) const;
-
-    //! Get the size (dx,dy,dz) of the scintillator detector module's scintillator envelope
-    const CLHEP::Hep3Vector getScintEnvelopeHalfSize(int layer, bool hasChimney) const;
-
-    //! Get the shift (dx,dy,dz) of the scintillator detector module's scintillator envelope within its enclosure
-    const CLHEP::Hep3Vector getScintEnvelopeOffset(int layer, bool hasChimney) const;
-
-    //! Get the radial offset of the scintillator detector module's active envelope due to difference in polystyrene-sheet thicknesses
-    double getPolystyreneOffsetX(void) const;
+    void hasRPCs(int layer, bool flag) { m_HasRPCs[layer] = flag; }
 
     //! Get the thickness of the inactive TiO2-polystyrene coating on top (broad) surface of a scintillator strip
     double getScintTiO2ThicknessTop(void) const { return m_ScintTiO2ThicknessTop; }
 
     //! Set the thickness of the inactive TiO2-polystyrene coating on top (broad) surface of a scintillator strip
-    void setScintTiO2ThicknessTop(double scintTiO2ThicknessTop)  { m_ScintTiO2ThicknessTop = scintTiO2ThicknessTop; }
+    void setScintTiO2ThicknessTop(double x)  { m_ScintTiO2ThicknessTop = x; }
 
     //! Get the thickness of the inactive TiO2-polystyrene coating on side (short) surface of a scintillator strip
     double getScintTiO2ThicknessSide(void) const { return m_ScintTiO2ThicknessSide; }
 
     //! Set the thickness of the inactive TiO2-polystyrene coating on side (short) surface of a scintillator strip
-    void setScintTiO2ThicknessSide(double scintTiO2ThicknessSide) {m_ScintTiO2ThicknessSide = scintTiO2ThicknessSide; }
+    void setScintTiO2ThicknessSide(double x) { m_ScintTiO2ThicknessSide = x; }
 
     //! Get length along z of the chimney hole
-    double getChimneyLength(void) const {return m_ChimneyLength;}
+    double getChimneyLength(void) const { return m_ChimneyLength; }
 
     //! Set length along z of the chimney hole
-    void setChimneyLength(double chimneyLength) {m_ChimneyLength = chimneyLength;}
+    void setChimneyLength(double x) { m_ChimneyLength = x; }
 
     //! Get width of the chimney hole
-    double getChimneyWidth(void) const {return m_ChimneyWidth;}
+    double getChimneyWidth(void) const { return m_ChimneyWidth; }
 
     //! Set width of the chimney hole
-    void setChimneyWidth(double chimneyWidth) {m_ChimneyWidth = chimneyWidth;}
-
-    //! Get half of the height of the entire volume of a scintillator strip (including TiO2 coating)
-    double getScintHalfHeight(void) const { return 0.5 * m_ScintHeight; }
+    void setChimneyWidth(double x) { m_ChimneyWidth = x; }
 
     //! Get the height of the entire volume of a scintillator strip (including TiO2 coating)
     double getScintHeight(void) const { return  m_ScintHeight; }
 
     //! Set the height of the entire volume of a scintillator strip (including TiO2 coating)
-    void setScintHeight(double scintHeight) {  m_ScintHeight = scintHeight; }
+    void setScintHeight(double x) {  m_ScintHeight = x; }
 
-    //! Get half of the height of the entire volume of a scintillator strip (including TiO2 coating)
-    double getScintHalfWidth(void) const { return 0.5 * m_ScintWidth; }
-
-    //! Get the height of the entire volume of a scintillator strip (including TiO2 coating)
+    //! Get the width of the entire volume of a scintillator strip (including TiO2 coating)
     double getScintWidth(void) const { return m_ScintWidth; }
 
-    //! Set the height of the entire volume of a scintillator strip (including TiO2 coating)
-    void setScintWidth(double scintWidth) { m_ScintWidth = scintWidth; }
+    //! Set the width of the entire volume of a scintillator strip (including TiO2 coating)
+    void setScintWidth(double x) { m_ScintWidth = x; }
 
     //! Get the radius of the cylindrical central bore in a scintillator strip
     double getScintBoreRadius(void) const { return m_ScintBoreRadius; }
 
     //! Set the radius of the cylindrical central bore in a scintillator strip
-    void setScintBoreRadius(double scintBoreRadius) { m_ScintBoreRadius = scintBoreRadius; }
+    void setScintBoreRadius(double x) { m_ScintBoreRadius = x; }
 
     //! Get the radius of the cylindrical central WLS fiber in a scintillator strip
     double getScintFiberRadius(void) const { return m_ScintFiberRadius; }
 
     //! Set the radius of the cylindrical central WLS fiber in a scintillator strip
-    void setScintFiberRadius(double scintFiberRadius) { m_ScintFiberRadius = scintFiberRadius; }
-
-    //! Get the radial midpoint of the gap of specified layer
-    double getGapMiddleRadius(int layer) const;
-
-    //! Get the radial midpoint of the detector module of specified layer
-    double getModuleMiddleRadius(int layer) const;
-
-    //! Get the radial midpoint of the detector module's active volume of specified layer
-    double getActiveMiddleRadius(int layer) const;
+    void setScintFiberRadius(double x) { m_ScintFiberRadius = x; }
 
     //! Get the global rotation angle about z of the entire BKLM
     double getRotation(void) const { return m_Rotation; }
 
+    //! Set the global rotation angle about z of the entire BKLM
+    void setRotation(double x)  { m_Rotation = x; }
+
     //! Get the rotation angle for a sector
-    double getSectorRotation(int sector) const {return m_SectorRotation[sector];}
+    double getSectorRotation(int fb, int sector) const { return m_SectorRotation[fb - 1][sector - 1]; }
 
     //! Set the rotation angle for a sector
-    void setSectorRotation(int sector, double sectorRotation) {m_SectorRotation[sector] = sectorRotation; }
-
-    //! Set the global rotation angle about z of the entire BKLM
-    void setRotation(double rotation)  { m_Rotation = rotation; }
+    void setSectorRotation(int fb, int sector, double x) { m_SectorRotation[fb - 1][sector - 1] = x; }
 
     //! Get the global shift along a of the entire BKLM
     double getOffsetZ(void) const { return m_OffsetZ; }
 
     //! Set the global shift along a of the entire BKLM
-    void setOffsetZ(double offsetZ) { m_OffsetZ = offsetZ; }
+    void setOffsetZ(double x) { m_OffsetZ = x; }
 
     //! Get the starting angle of the BKLM's polygon shape
     double getPhi(void) const { return m_Phi; }
 
     //! Set the starting angle of the BKLM's polygon shape
-    void setPhi(double phi) { m_Phi = phi; }
+    void setPhi(double x) { m_Phi = x; }
 
     //! Get the outer radius of the solenoid
     double getSolenoidOuterRadius(void) const { return m_SolenoidOuterRadius; }
 
     //! Set the outer radius of the solenoid
-    void setSolenoidOuterRadius(double solenoidOuterRadius) {m_SolenoidOuterRadius = solenoidOuterRadius; }
+    void setSolenoidOuterRadius(double x) { m_SolenoidOuterRadius = x; }
 
     //! Get the number of sectors of the BKLM
     int getNSector(void) const { return m_NSector; }
 
     //! Set the number of sectors of the BKLM
-    void setNSector(int nSector) { m_NSector = nSector; }
+    void setNSector(int n) { m_NSector = n; }
 
     //! Get the half-length along z of the BKLM
     double getHalfLength(void) const { return m_HalfLength; }
 
     //! Set the half-length along z of the BKLM
-    void setHalfLength(double halfLength) { m_HalfLength = halfLength; }
+    void setHalfLength(double x) { m_HalfLength = x; }
 
     //! Get the radius of the inscribed circle of the outer polygon
     double getOuterRadius(void) const { return m_OuterRadius; }
 
     //! Set the radius of the inscribed circle of the outer polygon
-    void setOuterRadius(double outerRadius) { m_OuterRadius = outerRadius; }
+    void setOuterRadius(double x) { m_OuterRadius = x; }
 
     //! Get the number of modules in one sector
     int getNLayer(void) const { return m_NLayer; }
 
     //! Set the number of modules in one sector
-    void setNLayer(double nLayer) { m_NLayer = nLayer; }
+    void setNLayer(double n) { m_NLayer = n; }
 
     //! Get the nominal height of a layer's structural iron
     double getIronNominalHeight(void) const { return m_IronNominalHeight; }
 
     //! Set the nominal height of a layer's structural iron
-    void setIronNominalHeight(double ironNominalHeight) { m_IronNominalHeight = ironNominalHeight; }
+    void setIronNominalHeight(double x) { m_IronNominalHeight = x; }
 
     //! Get the actual height of a layer's structural iron
     double getIronActualHeight(void) const { return m_IronActualHeight; }
 
     //! Set the actual height of a layer's structural iron
-    void setIronActualHeight(double ironActualHeight) { m_IronActualHeight = ironActualHeight; }
+    void setIronActualHeight(double x) { m_IronActualHeight = x; }
 
     //! Get the radius of the inner tangent circle of gap 0 (innermost)
     double getGap1InnerRadius(void) const { return m_Gap1InnerRadius; }
 
     //! Set the radius of the inner tangent circle of gap 0 (innermost)
-    void setGap1InnerRadius(double gap1InnerRadius) { m_Gap1InnerRadius = gap1InnerRadius; }
+    void setGap1InnerRadius(double x) { m_Gap1InnerRadius = x; }
 
     //! Get the nominal height of the innermost gap
     double getGap1NominalHeight(void) const { return m_Gap1NominalHeight; }
 
     //! Set the nominal height of the innermost gap
-    void setGap1NominalHeight(double gap1NominalHeight) { m_Gap1NominalHeight = gap1NominalHeight; }
-
-    //! Get the actual height of the innermost gap
-    double getGap1ActualHeight(void) const { return m_Gap1ActualHeight; }
-
-    //! Set the actual height of the innermost gap
-    void setGap1ActualHeight(double gap1ActualHeight) { m_Gap1ActualHeight = gap1ActualHeight; }
-
-    //! Get the height of layer 1,the innermost layer
-    double getLayer1Height(void) const { return m_Layer1Height; }
-
-    //! Set the actual height of layer 1, the innermost layer
-    void setLayer1Height(double Height) { m_Layer1Height = Height; }
-
-    //! Get the height of layer
-    double getLayerHeight(void) const { return m_LayerHeight; }
-
-    //! Set the actual height of layer
-    void setLayerHeight(double Height) { m_LayerHeight = Height; }
+    void setGap1NominalHeight(double x) { m_Gap1NominalHeight = x; }
 
     //! Get the width (at the outer radius) of the adjacent structural iron on either side of innermost gap
     double getGap1IronWidth(void) const { return m_Gap1IronWidth; }
 
     //! Set the width (at the outer radius) of the adjacent structural iron on either side of innermost gap
-    void setGap1IronWidth(double gap1IronWidth) { m_Gap1IronWidth = gap1IronWidth; }
+    void setGap1IronWidth(double x) { m_Gap1IronWidth = x; }
 
     //! Get the length along z of the module gap
     double getGapLength(void) const { return m_GapLength; }
 
     //! Set the length along z of the module gap
-    void setGapLength(double gapLength) { m_GapLength = gapLength; }
+    void setGapLength(double x) { m_GapLength = x; }
 
     //! Get the nominal height of the outer gaps
     double getGapNominalHeight(void) const { return m_GapNominalHeight; }
 
     //! Set the nominal height of the outer gaps
-    void setGapNominalHeight(double gapNominalHeight) { m_GapNominalHeight = gapNominalHeight; }
-
-    //! Get the actual height of the outer gaps
-    double getGapActualHeight(void) const { return m_GapActualHeight; }
-
-    //! Set the actual height of the outer gaps
-    void setGapActualHeight(double gapActualHeight) { m_GapActualHeight = gapActualHeight; }
+    void setGapNominalHeight(double x) { m_GapNominalHeight = x; }
 
     //! Get the width (at the outer radius) of the adjacent structural iron on either side of a gap
     double getGapIronWidth(void) const { return m_GapIronWidth; }
 
     //! Set the width (at the outer radius) of the adjacent structural iron on either side of a gap
-    void setGapIronWidth(double gapIronWidth) { m_GapIronWidth = gapIronWidth; }
+    void setGapIronWidth(double x) { m_GapIronWidth = x; }
 
-    //! Get the radius of the inner tangent circle of gap 1 (next-to-innermost)
-    double getGapInnerRadius(void) const { return m_GapInnerRadius; }
+    //! Get the number of z-measuring cathode strips in an RPC module (no chimney)
+    int getNZStrips(void) const { return m_NZStrips; }
 
-    //! Set the radius of the inner tangent circle of gap 1 (next-to-innermost)
-    void setGapInnerRadius(double gapInnerRadius) { m_GapInnerRadius = gapInnerRadius; }
+    //! Set the number of z-measuring cathode strips in an RPC module (no chimney)
+    void setNZStrips(int n) { m_NZStrips = n; }
 
-    //! Get the number of z-measuring cathode strips in an RPC module
-    int getNZStrips(bool isChimney) const { return (isChimney ? m_NZStripsChimney : m_NZStrips); }
+    //! Get the number of z-measuring cathode strips in an RPC module (with chimney)
+    int getNZStripsChimney(void) const { return m_NZStripsChimney; }
 
-    //! Set the number of z-measuring cathode strips in an RPC module
-    void setNZStrips(int nZStrips) { m_NZStrips = nZStrips; }
-
-    //! Set the number of z-measuring cathode strips in an RPC module in Chimney sector
-    void setNZStripsChimney(int nZStripsChimney) { m_NZStripsChimney = nZStripsChimney; }
+    //! Set the number of z-measuring cathode strips in an RPC module (with chimney)
+    void setNZStripsChimney(int n) { m_NZStripsChimney = n; }
 
     //! Get the number of phi-measuring cathode strips in an RPC module
-    int getNPhiStrips(int layer) const { return m_NPhiStrips[layer]; }
+    int getNPhiStrips(int layer) const { return m_NPhiStrips[layer - 1]; }
 
-    //! set the number of phi-measuring cathode strips in an RPC module
-    void setNPhiStrips(int layer, int nPhiStrips) {m_NPhiStrips[layer] = nPhiStrips;}
+    //! Set the number of phi-measuring cathode strips in an RPC module
+    void setNPhiStrips(int layer, int n) { m_NPhiStrips[layer - 1] = n; }
 
-    //! Get the number of z-measuring scintillators in a scintillator module
-    int getNZScints(bool isChimney) const { return (isChimney ? m_NZScintsChimney : m_NZScints); }
+    //! Get the number of z-measuring scintillators in a scintillator module (no chimney)
+    int getNZScints(void) const { return m_NZScints; }
 
-    //! Set the number of z-measuring scintillators in a scintillator module
-    void setNZScints(int nZScints) { m_NZScints = nZScints; }
+    //! Set the number of z-measuring scintillators in a scintillator module (no chimney)
+    void setNZScints(int n) { m_NZScints = n; }
 
-    //! Set the number of z-measuring scintillators in a scintillator module
-    void setNZScintsChimney(int nZScintsChimney) { m_NZScintsChimney = nZScintsChimney; }
+    //! Get the number of z-measuring scintillators in a scintillator module (with chimney)
+    int getNZScintsChimney(void) const { return m_NZScintsChimney; }
+
+    //! Set the number of z-measuring scintillators in a scintillator module (with chimney)
+    void setNZScintsChimney(int n) { m_NZScintsChimney = n; }
 
     //! Get the number of phi-measuring scintillators in a scintillator module
-    //int getNPhiScints(int layer) const{return m_NPhiScints[layer]; }
-    int getNPhiScints(int layer) const;
+    int getNPhiScints(int layer) const { return m_NPhiScints[layer - 1]; }
 
-    //! set the number of phi-measuring scintillators in an scintillator module
-    void setNPhiScints(int layer, int nPhiScints) {m_NPhiScints[layer] = nPhiScints;}
+    //! Set the number of phi-measuring scintillators in an scintillator module
+    void setNPhiScints(int layer, int n) { m_NPhiScints[layer - 1] = n; }
 
-    //! get the number of phi-measuring scintillators in an scintillator module
-    double getPhiScintsOffsetSign(int layer) const {return m_PhiScintsOffsetSign[layer]; }
+    //! Get the sign of shift of scintillator envelope along local y axis (-1: MPPCs on left, +1: MPPCs on right)
+    //! *for scintillator layers only*
+    double getScintEnvelopeOffsetSign(int layer) const { return m_ScintEnvelopeOffsetSign[layer - 1]; }
 
-    //! set the number of phi-measuring scintillators in an scintillator module
-    void setPhiScintsOffsetSign(int layer, int phiScintsOffsetSign) {m_PhiScintsOffsetSign[layer] = phiScintsOffsetSign;}
+    //! Set the sign of shift of scintillator envelope along local y axis (-1: MPPCs on left, +1: MPPCs on right)
+    //! *for scintillator layers only*
+    void setScintEnvelopeOffsetSign(int layer, int n) { m_ScintEnvelopeOffsetSign[layer - 1] = n; }
+
+    //! Get width of the phi strips on each layer
+    double getPhiStripWidth(int layer) const { return m_PhiStripWidth[layer - 1]; }
+
+    //! Set width of the phi strips on each layer
+    void setPhiStripWidth(int layer, double x) { m_PhiStripWidth[layer - 1] = x; }
+
+    //! Get width of the z strips on each layer
+    double getZStripWidth(int layer) const { return m_ZStripWidth[layer - 1]; }
+
+    //! Set width of the z strips on each layer
+    void setZStripWidth(int layer, double x) { m_ZStripWidth[layer - 1] = x; }
+
+    //! Get shortening of nominal length of the z scintillators
+    //! *for scintillator layers only*
+    double getZScintDLength(int layer, int scint) const { return m_ZScintDLength[layer - 1][scint - 1]; }
+
+    //! Set shortening of nominal length of the z scintillators
+    //! *for scintillator layers only*
+    void setZScintDLength(int layer, int scint, double x) { m_ZScintDLength[layer - 1][scint - 1] = x; }
 
     //! Get the length along z of the module
     double getModuleLength(void) const { return m_ModuleLength; }
 
     //! Set the length along z of the module
-    void setModuleLength(double moduleLength) { m_ModuleLength = moduleLength; }
+    void setModuleLength(double x) { m_ModuleLength = x; }
 
     //! Get the length along z of the module
     double getModuleLengthChimney(void) const { return m_ModuleLengthChimney; }
 
     //! Set the length along z of the module
-    void setModuleLengthChimney(double moduleLengthChimney) { m_ModuleLengthChimney = moduleLengthChimney; }
+    void setModuleLengthChimney(double x) { m_ModuleLengthChimney = x; }
 
     //! Get the height of the module's aluminum cover (2 per module)
     double getModuleCoverHeight(void) const { return m_ModuleCoverHeight; }
 
     //! Set the height of the module's aluminum cover (2 per module)
-    void setModuleCoverHeight(double moduleCoverHeight) { m_ModuleCoverHeight = moduleCoverHeight; }
+    void setModuleCoverHeight(double x) { m_ModuleCoverHeight = x; }
 
     //! Get the height of the module's readout or ground copper plane (4 per module)
     double getModuleCopperHeight(void) const { return m_ModuleCopperHeight; }
 
     //! Set the height of the module's readout or ground copper plane (4 per module)
-    void setModuleCopperHeight(double moduleCopperHeight) { m_ModuleCopperHeight = moduleCopperHeight; }
+    void setModuleCopperHeight(double x) { m_ModuleCopperHeight = x; }
 
     //! Get the height of the module's transmission-line foam (2 per module)
     double getModuleFoamHeight(void) const { return m_ModuleFoamHeight; }
 
     //! Set the height of the module's transmission-line foam (2 per module)
-    void setModuleFoamHeight(double moduleFoamHeight) { m_ModuleFoamHeight = moduleFoamHeight; }
+    void setModuleFoamHeight(double x) { m_ModuleFoamHeight = x; }
 
     //! Get the height of the module's insulating mylar (2 per module)
     double getModuleMylarHeight(void) const { return m_ModuleMylarHeight; }
 
     //! Set the height of the module's insulating mylar (2 per module)
-    void setModuleMylarHeight(double moduleMylarHeight) { m_ModuleMylarHeight = moduleMylarHeight; }
-
-    //! Get the height of a detector module's readout
-    double getModuleReadoutHeight(void) const {return m_ModuleReadoutHeight;}
-
-    //! Set the height of a detector module's readout
-    void setModuleReadoutHeight(double ModuleReadoutHeight) { m_ModuleReadoutHeight = ModuleReadoutHeight;}
+    void setModuleMylarHeight(double x) { m_ModuleMylarHeight = x; }
 
     //! Get the height of the module's glass electrode (4 per module)
     double getModuleGlassHeight(void) const { return m_ModuleGlassHeight; }
@@ -399,542 +339,592 @@ namespace Belle2 {
     double getModuleGasHeight(void) const { return m_ModuleGasHeight; }
 
     //! Set the height of the module's gas gap (2 per module)
-    void setModuleGasHeight(double moduleGasHeight) { m_ModuleGasHeight = moduleGasHeight; }
-
-    //! Get the height of the module
-    double getModuleHeight(void) const { return m_ModuleHeight; }
-
-    //! Set the height of the module
-    void setModuleHeight(double moduleHeight) { m_ModuleHeight = moduleHeight; }
+    void setModuleGasHeight(double x) { m_ModuleGasHeight = x; }
 
     //! Get the width of the module's perimeter aluminum frame
     double getModuleFrameWidth(void) const { return m_ModuleFrameWidth; }
 
     //! Set the width of the module's perimeter aluminum frame
-    void setModuleFrameWidth(double moduleFrameWidth) { m_ModuleFrameWidth = moduleFrameWidth; }
+    void setModuleFrameWidth(double x) { m_ModuleFrameWidth = x; }
 
     //! Get the thickness of the module's perimeter aluminum frame
     double getModuleFrameThickness(void) const { return m_ModuleFrameThickness; }
 
     //! Set the thickness of the module's perimeter aluminum frame
-    void setModuleFrameThickness(double moduleFrameThickness) { m_ModuleFrameThickness = moduleFrameThickness; }
+    void setModuleFrameThickness(double x) { m_ModuleFrameThickness = x; }
 
     //! Get the width of the module's gas-gap's perimeter spacer
     double getModuleGasSpacerWidth(void) const { return m_ModuleGasSpacerWidth; }
 
     //! Set the width of the module's gas-gap's perimeter spacer
-    void setModuleGasSpacerWidth(double moduleGasSpacerWidth) { m_ModuleGasSpacerWidth = moduleGasSpacerWidth; }
-
-    //! Get the size of the border between a detector module's perimeter and electrode
-    double getModuleElectrodeBorder(void) const { return m_ModuleElectrodeBorder; }
-
-    //! Set the size of the border between a detector module's perimeter and electrode
-    void setModuleElectrodeBorder(double moduleElectrodeBorder) { m_ModuleElectrodeBorder = moduleElectrodeBorder; }
+    void setModuleGasSpacerWidth(double x) { m_ModuleGasSpacerWidth = x; }
 
     //! Get the height of the inner polystyrene-filler sheet
     double getModulePolystyreneInnerHeight(void) const { return m_ModulePolystyreneInnerHeight; }
 
     //! Set the height of the inner polystyrene-filler sheet
-    void setModulePolystyreneInnerHeight(double modulePolystyreneInnerHeight) { m_ModulePolystyreneInnerHeight = modulePolystyreneInnerHeight; }
+    void setModulePolystyreneInnerHeight(double x) { m_ModulePolystyreneInnerHeight = x; }
 
     //! Get the height of the outer polystyrene-filler sheet
     double getModulePolystyreneOuterHeight(void) const { return m_ModulePolystyreneOuterHeight; }
 
     //! Set the height of the outer polystyrene-filler sheet
-    void setModulePolystyreneOuterHeight(double modulePolystyreneOuterHeight) { m_ModulePolystyreneOuterHeight = modulePolystyreneOuterHeight; }
-
-    //! Get the size of the chimney hole in the specified layer
-    const CLHEP::Hep3Vector getChimneyHalfSize(int layer) const;
-
-    //! Get the position of the chimney hole in the specified layer
-    const CLHEP::Hep3Vector getChimneyPosition(int layer) const;
+    void setModulePolystyreneOuterHeight(double x) { m_ModulePolystyreneOuterHeight = x; }
 
     //! Get the thickness of the chimney cover plate
     double getChimneyCoverThickness(void) const { return m_ChimneyCoverThickness; }
 
     //! Set the thickness of the chimney cover plate
-    void setChimneyCoverThickness(double chimneyCoverThickness) { m_ChimneyCoverThickness = chimneyCoverThickness; }
+    void setChimneyCoverThickness(double x) { m_ChimneyCoverThickness = x; }
 
     //! Get the inner radius of the chimney housing
     double getChimneyHousingInnerRadius(void) const { return m_ChimneyHousingInnerRadius; }
 
     //! Set the inner radius of the chimney housing
-    void setChimneyHousingInnerRadius(double chimneyHousingInnerRadius) { m_ChimneyHousingInnerRadius = chimneyHousingInnerRadius; }
+    void setChimneyHousingInnerRadius(double x) { m_ChimneyHousingInnerRadius = x; }
 
     //! Get the outer radius of the chimney housing
     double getChimneyHousingOuterRadius(void) const { return m_ChimneyHousingOuterRadius; }
 
     //! Set the outer radius of the chimney housing
-    void setChimneyHousingOuterRadius(double chimneyHousingOuterRadius) { m_ChimneyHousingOuterRadius = chimneyHousingOuterRadius; }
+    void setChimneyHousingOuterRadius(double x) { m_ChimneyHousingOuterRadius = x; }
 
     //! Get the inner radius of the chimney radiation shield
     double getChimneyShieldInnerRadius(void) const { return m_ChimneyShieldInnerRadius; }
 
     //! Set the inner radius of the chimney radiation shield
-    void setChimneyShieldInnerRadius(double chimneyShieldInnerRadius) { m_ChimneyShieldInnerRadius = chimneyShieldInnerRadius; }
+    void setChimneyShieldInnerRadius(double x) { m_ChimneyShieldInnerRadius = x; }
 
     //! Get the outer radius of the chimney radiation shield
     double getChimneyShieldOuterRadius(void) const { return m_ChimneyShieldOuterRadius; }
 
     //! Set the outer radius of the chimney radiation shield
-    void setChimneyShieldOuterRadius(double chimneyShieldOuterRadius) { m_ChimneyShieldOuterRadius = chimneyShieldOuterRadius; }
+    void setChimneyShieldOuterRadius(double x) { m_ChimneyShieldOuterRadius = x; }
 
     //! Get the inner radius of the chimney pipe
     double getChimneyPipeInnerRadius(void) const { return m_ChimneyPipeInnerRadius; }
 
     //! Set the inner radius of the chimney pipe
-    void setChimneyPipeInnerRadius(double chimneyPipeInnerRadius) { m_ChimneyPipeInnerRadius = chimneyPipeInnerRadius; }
+    void setChimneyPipeInnerRadius(double x) { m_ChimneyPipeInnerRadius = x; }
 
     //! Get the outer radius of the chimney pipe
     double getChimneyPipeOuterRadius(void) const { return m_ChimneyPipeOuterRadius; }
 
     //! Set the outer radius of the chimney pipe
-    void setChimneyPipeOuterRadius(double chimneyPipeOuterRadius) { m_ChimneyPipeOuterRadius = chimneyPipeOuterRadius; }
+    void setChimneyPipeOuterRadius(double x) { m_ChimneyPipeOuterRadius = x; }
 
     //! Get the thickness of the radial rib that supports the solenoid / inner detectors
     double getRibThickness(void) const { return m_RibThickness; }
 
     //! Set the thickness of the radial rib that supports the solenoid / inner detectors
-    void setRibThickness(double ribThickness) { m_RibThickness = ribThickness; }
+    void setRibThickness(double x) { m_RibThickness = x; }
 
     //! Get the width of the cable-services channel at each end
     double getCablesWidth(void) const { return m_CablesWidth; }
 
     //! Set the width of the cable-services channel at each end
-    void setCablesWidth(double cablesWidth) {m_CablesWidth = cablesWidth; }
+    void setCablesWidth(double x) { m_CablesWidth = x; }
 
     //! Get the width of the brace in the middle of the cable-services channel
     double getBraceWidth(void) const { return m_BraceWidth; }
 
     //! Set the width of the brace in the middle of the cable-services channel
-    void setBraceWidth(double braceWidth) { m_BraceWidth = braceWidth; }
+    void setBraceWidth(double x) { m_BraceWidth = x; }
 
     //! Get the width of the brace in the middle of the cable-services channel in the chimney sector
     double getBraceWidthChimney(void) const { return m_BraceWidthChimney; }
 
     //! Set the width of the brace in the middle of the cable-services channel in the chimney sector
-    void setBraceWidthChimney(double braceWidthChimney) { m_BraceWidthChimney = braceWidthChimney; }
+    void setBraceWidthChimney(double x) { m_BraceWidthChimney = x; }
 
     //! Get width of the innermost-module support plate
     double getSupportPlateWidth(void) const { return m_SupportPlateWidth; }
 
     //! Set width of the innermost-module support plate
-    void setSupportPlateWidth(double supportPlateWidth) { m_SupportPlateWidth = supportPlateWidth; }
+    void setSupportPlateWidth(double x) { m_SupportPlateWidth = x; }
 
     //! Get height of the innermost-module support plate
     double getSupportPlateHeight(void) const { return m_SupportPlateHeight; }
 
     //! Set height of the innermost-module support plate
-    void setSupportPlateHeight(double supportPlateHeight) { m_SupportPlateHeight = supportPlateHeight; }
+    void setSupportPlateHeight(double x) { m_SupportPlateHeight = x; }
 
     //! Get length of the innermost-module support plate
     double getSupportPlateLength(void) const { return m_SupportPlateLength; }
 
     //! Set length of the innermost-module support plate
-    void setSupportPlateLength(double supportPlateLength) { m_SupportPlateLength = supportPlateLength; }
+    void setSupportPlateLength(double x) { m_SupportPlateLength = x; }
 
     //! Get length of the innermost-module support plate in the chimney sector
     double getSupportPlateLengthChimney(void) const { return m_SupportPlateLengthChimney; }
 
     //! Set length of the innermost-module support plate in the chimney sector
-    void setSupportPlateLengthChimney(double supportPlateLengthChimney) { m_SupportPlateLengthChimney = supportPlateLengthChimney; }
-
-    //! Get the size of the layer-0 support plate
-    const CLHEP::Hep3Vector getSupportPlateHalfSize(bool) const;
+    void setSupportPlateLengthChimney(double x) { m_SupportPlateLengthChimney = x; }
 
     //! Get the width of the layer-0 support plate's bracket
     double getBracketWidth(void) const { return m_BracketWidth; }
 
     //! Set the width of the layer-0 support plate's bracket
-    void setBracketWidth(double bracketWidth) { m_BracketWidth = bracketWidth; }
+    void setBracketWidth(double x) { m_BracketWidth = x; }
 
     //! Get the thickness of the layer-0 support plate's bracket
     double getBracketThickness(void) const { return m_BracketThickness; }
 
     //! Set the thickness of the layer-0 support plate's bracket
-    void setBracketThickness(double bracketThickness) { m_BracketThickness = bracketThickness; }
+    void setBracketThickness(double x) { m_BracketThickness = x; }
 
     //! Get the length of the layer-0 support plate's bracket
     double getBracketLength(void) const { return m_BracketLength; }
 
     //! Set the length of the layer-0 support plate's bracket
-    void setBracketLength(double bracketLength) { m_BracketLength = bracketLength; }
+    void setBracketLength(double x) { m_BracketLength = x; }
 
     //! Get the width of the layer-0 support plate's bracket's rib
     double getBracketRibWidth(void) const { return m_BracketRibWidth; }
 
     //! Set the width of the layer-0 support plate's bracket's rib
-    void setBracketRibWidth(double bracketRibWidth) { m_BracketRibWidth = bracketRibWidth; }
+    void setBracketRibWidth(double x) { m_BracketRibWidth = x; }
 
     //! Get the thickness of the layer-0 support plate's bracket's rib
     double getBracketRibThickness(void) const { return m_BracketRibThickness; }
 
     //! Set the thickness of the layer-0 support plate's bracket's rib
-    void setBracketRibThickness(double bracketRibThickness) { m_BracketRibThickness = bracketRibThickness; }
+    void setBracketRibThickness(double x) { m_BracketRibThickness = x; }
 
     //! Get distance from support plate's end of bracket
-    double getBracketInset(void)const {return m_BracketInset; }
+    double getBracketInset(void)const { return m_BracketInset; }
 
     //! Set distance from support plate's end of bracket
-    void setBracketInset(double bracketInset) {m_BracketInset = bracketInset; }
+    void setBracketInset(double x) { m_BracketInset = x; }
 
     //! Get the inner radius of the layer-0 support plate's bracket
     double getBracketInnerRadius(void) const { return m_BracketInnerRadius; }
 
     //! Set the inner radius of the layer-0 support plate's bracket
-    void setBracketInnerRadius(double bracketInnerRadius) { m_BracketInnerRadius = bracketInnerRadius; }
-
-    //! Get the position of a layer-0 support plate's bracket
-    double getBracketZPosition(int, bool) const;
+    void setBracketInnerRadius(double x) { m_BracketInnerRadius = x; }
 
     //! Get the angular width of the layer-0 support plate's bracket's cutout
     double getBracketCutoutDphi(void) const { return m_BracketCutoutDphi; }
 
     //! Set the angular width of the layer-0 support plate's bracket's cutout
-    void setBracketCutoutDphi(double bracketCutoutDphi) { m_BracketCutoutDphi = bracketCutoutDphi; }
+    void setBracketCutoutDphi(double x) { m_BracketCutoutDphi = x; }
 
-    //! Get reconstructionShift of each layer along x  in local system. displacement, not alignment here
-    double getLocalReconstructionShiftX(int sector, int layer) const {return m_LocalReconstructionShift_X[sector][layer];}
+    //! Get the number of preamplifier readout stations
+    int getNReadoutStation(void) const { return m_NReadoutStation; }
 
-    //! Set reconstructionShift of each layer along x  in local system. displacement, not alignment here
-    void setLocalReconstructionShiftX(int sector, int layer, double localReconstructionShift) {m_LocalReconstructionShift_X[sector][layer] = localReconstructionShift;}
+    //! Get the selector for phi (true) or z (false) readout station
+    bool getReadoutStationIsPhi(int station) const { return m_ReadoutStationIsPhi[station - 1]; }
 
-    //! Get reconstructionShift of each layer along y  in local system. displacement, not alignment here
-    double getLocalReconstructionShiftY(int sector, int layer) const {return m_LocalReconstructionShift_Y[sector][layer];}
+    //! Get the position of each readout station along its relevant axis
+    double getReadoutStationPosition(int station) const { return m_ReadoutStationPosition[station - 1]; }
 
-    //! Set reconstructionShift of each layer along y  in local system. displacement, not alignment here
-    void setLocalReconstructionShiftY(int sector, int layer, double localReconstructionShift) {m_LocalReconstructionShift_Y[sector][layer] = localReconstructionShift;}
+    //! Get the length of the readout station's container
+    double getReadoutContainerLength(void) const { return m_ReadoutContainerLength; }
 
-    //! Get reconstructionShift of each layer along z  in local system. displacement, not alignment here
-    double getLocalReconstructionShiftZ(int sector, int layer) const {return m_LocalReconstructionShift_Z[sector][layer];}
+    //! Get the width of the readout station's container
+    double getReadoutContainerWidth(void) const { return m_ReadoutContainerWidth; }
 
-    //! Set reconstructionShift of each layer along z  in local system. displacement, not alignment here
-    void setLocalReconstructionShiftZ(int sector, int layer, double localReconstructionShift) {m_LocalReconstructionShift_Z[sector][layer] = localReconstructionShift;}
+    //! Get the height of the readout station's container
+    double getReadoutContainerHeight(void) const { return m_ReadoutContainerHeight; }
 
-    //! Get the z-phi planes flip status. Ture: z plane is inner, close to IP. False: phi-plane is inner, close to IP
-    bool getFlipStatus(int isForward, int sector, int sciLayer) const {return m_Flip[isForward][sector][sciLayer]; }
+    //! Get the length of the readout carrier card
+    double getReadoutCarrierLength(void) const { return m_ReadoutCarrierLength; }
 
-    //! Set the z-phi planes flip status. Ture: z plane is inner, close to IP. False: phi-plane is inner, close to IP
-    void setFlipStatus(int isForward, int sector, int sciLayer, bool flip) { m_Flip[isForward][sector][sciLayer] = flip; }
+    //! Get the width of the readout carrier card
+    double getReadoutCarrierWidth(void) const { return m_ReadoutCarrierWidth; }
 
-    //!get the number of the phi strips on each layer.
-    int getPhiStripNumber(int layer) const {return m_PhiStripNumber[layer]; }
+    //! Get the height of the readout carrier card
+    double getReadoutCarrierHeight(void) const { return m_ReadoutCarrierHeight; }
 
-    //!get width of the phi strips on each layer.
-    double getPhiStripWidth(int layer) const {return m_PhiStripWidth[layer]; }
+    //! Get the length of the preamplifier card
+    double getReadoutPreamplifierLength(void) const { return m_ReadoutPreamplifierLength; }
 
-    //!set width of the phi strips on each layer.
-    void setPhiStripWidth(int layer, double width) {m_PhiStripWidth[layer] = width;}
+    //! Get the width of the preamplifier card
+    double getReadoutPreamplifierWidth(void) const { return m_ReadoutPreamplifierWidth; }
 
-    //!get width of the z strips on each layer.
-    double getZStripWidth(int layer) const {return m_ZStripWidth[layer]; }
+    //! Get the height of the preamplifier card
+    double getReadoutPreamplifierHeight(void) const { return m_ReadoutPreamplifierHeight; }
 
-    //!set width of the z strips on each layer.
-    void setZStripWidth(int layer, double width) {m_ZStripWidth[layer] = width;}
+    //! Get the number of preamplifier positions along the length of the carrier card
+    int getNReadoutPreamplifierPosition(void) const { return m_ReadoutPreamplifierPosition.size(); }
 
-    //! get dLength of the phi scintillators.
-    double getPhiScintsDlength(int layer, int sci) const {return m_PhiScintsDlength[layer][sci]; }
+    //! Get the position of a preamplifier along the length of the carrier card
+    double getReadoutPreamplifierPosition(int preamp) const { return m_ReadoutPreamplifierPosition[preamp - 1]; }
 
-    //! set dLength of the phi scintillators.
-    void setPhiScintsDlength(int layer, int sci, double phiScintsDlength) {m_PhiScintsDlength[layer][sci] = phiScintsDlength; }
+    //! Get the length of the readout connectors pair
+    double getReadoutConnectorsLength(void) const { return m_ReadoutConnectorsLength; }
 
-    //! get dLength of the z scintillators.
-    double getZScintsDlength(int layer, int sci) const {return m_ZScintsDlength[layer][sci]; }
+    //! Get the width of the readout connectors pair
+    double getReadoutConnectorsWidth(void) const { return m_ReadoutConnectorsWidth; }
 
-    //! set dLength of the z scintillators.
-    void setZScintsDlength(int layer, int sci, double zScintsDlength) {m_ZScintsDlength[layer][sci] = zScintsDlength; }
+    //! Get the height of the readout connectors pair
+    double getReadoutConnectorsHeight(void) const { return m_ReadoutConnectorsHeight; }
 
-    //! Get the pointer to the definition of a module
-    //const bklm::Module* findModule(bool isForward, int sector, int layer) const;
+    //! Get the position of the readout connectors pair along the length of the carrier card
+    double getReadoutConnectorsPosition(void) const { return m_ReadoutConnectorsPosition; }
 
-    //! Get the pointer to the definition of a module
-    //const bklm::Module* findModule(int layer, bool hasChimney) const;
+    //! Get the MPPC housing radius
+    double getMPPCHousingRadius(void) const { return m_MPPCHousingRadius; }
 
-    //! Get  comment
-    std::string getBKLMGeometryParComment() const {return m_comment; }
+    //! Get the MPPC housing length
+    double getMPPCHousingLength(void) const { return m_MPPCHousingLength; }
+
+    //! Get the MPPC length
+    double getMPPCLength(void) const { return m_MPPCLength; }
+
+    //! Get the MPPC width
+    double getMPPCWidth(void) const { return m_MPPCWidth; }
+
+    //! Get the MPPC height
+    double getMPPCHeight(void) const { return m_MPPCHeight; }
+
+    //! Get reconstruction dx in local system. displacement, not alignment
+    double getLocalReconstructionShiftX(int fb, int sector, int layer) const { return m_LocalReconstructionShiftX[fb - 1][sector - 1][layer - 1]; }
+
+    //! Set reconstruction dx in local system. displacement, not alignment
+    void setLocalReconstructionShiftX(int fb, int sector, int layer, double x) { m_LocalReconstructionShiftX[fb - 1][sector - 1][layer - 1] = x; }
+
+    //! Get reconstruction dy in local system. displacement, not alignment
+    double getLocalReconstructionShiftY(int fb, int sector, int layer) const { return m_LocalReconstructionShiftY[fb - 1][sector - 1][layer - 1]; }
+
+    //! Set reconstruction dy in local system. displacement, not alignment
+    void setLocalReconstructionShiftY(int fb, int sector, int layer, double x) { m_LocalReconstructionShiftY[fb - 1][sector - 1][layer - 1] = x; }
+
+    //! Get reconstruction dz in local system. displacement, not alignment
+    double getLocalReconstructionShiftZ(int fb, int sector, int layer) const { return m_LocalReconstructionShiftZ[fb - 1][sector - 1][layer - 1]; }
+
+    //! Set reconstruction dz in local system. displacement, not alignment
+    void setLocalReconstructionShiftZ(int fb, int sector, int layer, double x) { m_LocalReconstructionShiftZ[fb - 1][sector - 1][layer - 1] = x; }
+
+    //! Get the z-phi planes flip (i.e., rotation by 180 degrees about z axis)
+    //! True: z plane is inner, close to IP. False: phi-plane is inner, close to IP
+    //! *for scintillator layers only*
+    bool isFlipped(int fb, int sector, int layer) const { return m_IsFlipped[fb - 1][sector - 1][layer - 1]; }
+
+    //! Set the z-phi planes flip (i.e., rotation by 180 degrees about z axis)
+    //! True: z plane is inner, close to IP. False: phi-plane is inner, close to IP
+    //! *for scintillator layers only*
+    void isFlipped(int fb, int sector, int layer, bool flag) { m_IsFlipped[fb - 1][sector - 1][layer - 1] = flag; }
+
+    //! Get comment
+    std::string getBKLMGeometryParComment() const { return m_comment; }
 
     //! Set comment
-    void setBKLMGeometryParComment(const std::string& comment) {m_comment = comment;}
+    void setBKLMGeometryParComment(const std::string& s) { m_comment = s; }
 
   private:
 
-    //! geometry version
+    //! Geometry version
     int m_version;
 
     //! Flag for enabling overlap-check during geometry construction
-    int m_DoOverlapCheck;
+    bool m_DoOverlapCheck;
 
-    //! Flag for beam Background Study
-    int m_beamBackgroundStudy;
+    //! Flag for enabling beam background study (=alternate sensitive-detector function)
+    bool m_DoBeamBackgroundStudy;
 
-    //! global rotation about z of the BKLM
+    //! Global rotation angle about z of the BKLM
     double m_Rotation;
 
-    //! global rotation of a sector
-    double m_SectorRotation[NSECTOR + 1];
+    //! Global rotation angle of a sector
+    double m_SectorRotation[2][NSECTOR];
 
-    //! global offset along z of the BKLM
+    //! Global offset along z of the BKLM
     double m_OffsetZ;
 
-    //! starting angle of the polygon shape
+    //! Starting angle of the polygon shape
     double m_Phi;
 
-    //! number of sectors (=8 : octagonal)
+    //! Number of sectors (=8 : octagonal)
     int m_NSector;
 
-    //! outer radius of the solenoid
+    //! Outer radius of the solenoid
     double m_SolenoidOuterRadius;
 
-    //! radius of the circle tangent to the sides of the outer polygon
+    //! Radius of the circle tangent to the sides of the outer polygon
     double m_OuterRadius;
 
-    //! half-length along z of the BKLM
+    //! Half-length along z of the BKLM
     double m_HalfLength;
 
-    //! number of layers in one sector
+    //! Number of layers in one sector
     int m_NLayer;
 
-    //! nominal height of a layer's structural iron
+    //! Nominal height of a layer's structural iron
     double m_IronNominalHeight;
 
-    //! actual height of a layer's stuctural iron
+    //! Actual height of a layer's stuctural iron
     double m_IronActualHeight;
 
-    //! radius of the inner tangent circle of the innermost gap
-    double m_Gap1InnerRadius;
-
-    //! nominal height of the innermost gap
+    //! Nominal height of the innermost gap
     double m_Gap1NominalHeight;
 
-    //! actual height of the innermost gap
-    double m_Gap1ActualHeight;
-
-    //! height of layer 0
-    double m_Layer1Height;
-
-    //! height of a layer
-    double m_LayerHeight;
-
-    //! variable for width (at the outer radius) of the adjacent structural iron on either side of innermost gap
-    double m_Gap1IronWidth;
-
-    //! length along z of each gap
-    double m_GapLength;
-
-    //! nominal height of outer gaps
+    //! Nominal height of outer gaps
     double m_GapNominalHeight;
 
-    //! actual height of outer gaps
-    double m_GapActualHeight;
+    //! Radius of the inner tangent circle of the innermost gap
+    double m_Gap1InnerRadius;
 
-    //! width (at the outer radius) of the adjacent structural iron on either side of a gap
+    //! Width (at the outer radius) of the adjacent structural iron on either side of innermost gap
+    double m_Gap1IronWidth;
+
+    //! Width (at the outer radius) of the adjacent structural iron on either side of a gap
     double m_GapIronWidth;
 
-    //! radius of the inner tangent circle of virtual gap 0 (assuming equal-height layers)
-    double m_GapInnerRadius;
+    //! Length along z of each gap
+    double m_GapLength;
 
-    //! Number of phi-readout RPC strips in each layer
-    int m_NPhiStrips[NLAYER + 1];
-
-    //! Number of phi-readout scintillators in each layer
-    int m_NPhiScints[NLAYER + 1];
-
-    //! number of z-measuring cathode strips in a standard RPC module
+    //! Number of z-measuring cathode strips in a standard RPC module
     int m_NZStrips;
 
-    //! number of z-measuring cathode strips in a chimney-sector RPC module
+    //! Number of z-measuring cathode strips in a chimney-sector RPC module
     int m_NZStripsChimney;
 
-    //! number of z-measuring scintillators in a standard scintillator module
+    //! Number of z-measuring scintillators in a standard scintillator module
     int m_NZScints;
 
-    //! number of z-measuring scintillators in a chimney-sector scintillator module
+    //! Number of z-measuring scintillators in a chimney-sector scintillator module
     int m_NZScintsChimney;
 
-    //! Sign (+/-1) of scintillator envelope's shift along phi axis within its enclosing module
-    int m_PhiScintsOffsetSign[NLAYER + 1];
+    //! Flag to indicate whether layer contains RPCs (true) or scintillators (false)
+    bool m_HasRPCs[NLAYER];
 
-    //! length along z of the module
+    //! Number of phi-readout RPC strips in each layer
+    int m_NPhiStrips[NLAYER];
+
+    //! Width of the phi strips on each layer
+    double m_PhiStripWidth[NLAYER];
+
+    //! Width of the z strips on each layer
+    double m_ZStripWidth[NLAYER];
+
+    //! Sign (+/-1) of scintillator-envelope's shift along y axis within its enclosing module for MPPC placement
+    //! -1: shift envelope along -y to place MPPCs at +y, +1: shift envelope along +y to place MPPCs at -y
+    //! *for scintillator layers only*
+    int m_ScintEnvelopeOffsetSign[NSCINTLAYER];
+
+    //! Number of phi-readout scintillators in each layer
+    //! *for scintillator layers only*
+    int m_NPhiScints[NSCINTLAYER];
+
+    //! Shortening of the nominal length of the z scintillators
+    //! *for scintillator layers only*
+    double m_ZScintDLength[NSCINTLAYER][NZSCINT];
+
+    //! Length along z of the module
     double m_ModuleLength;
 
-    //! length along z of the module in the chimney sector
+    //! Length along z of the module in the chimney sector
     double m_ModuleLengthChimney;
 
-    //! height of a detector module's aluminum cover
+    //! Height of a detector module's aluminum cover
     double m_ModuleCoverHeight;
 
-    //! height of a detector module's copper readout or ground plane
+    //! Height of a detector module's copper readout or ground plane
     double m_ModuleCopperHeight;
 
-    //! height of a detector module's transmission-line foam
+    //! Height of a detector module's transmission-line foam
     double m_ModuleFoamHeight;
 
-    //! height of a detector module's mylar insulation
+    //! Height of a detector module's mylar insulation
     double m_ModuleMylarHeight;
 
-    //! height of a detector module's readout
-    double m_ModuleReadoutHeight;
-
-    //! height of a detector module's glass electrode
+    //! Height of a detector module's glass electrode
     double m_ModuleGlassHeight;
 
-    //! height of a detector module's gas gap
+    //! Height of a detector module's gas gap
     double m_ModuleGasHeight;
 
-    //! height of a detector module
-    double m_ModuleHeight;
-
-    //! width of a detector module's frame ("C" shape - width of horizontal leg)
+    //! Width of a detector module's frame ("C" shape - width of horizontal leg)
     double m_ModuleFrameWidth;
 
-    //! thickness of a detector module's frame ("C" shape - thickness of vertical leg)
+    //! Thickness of a detector module's frame ("C" shape - thickness of vertical leg)
     double m_ModuleFrameThickness;
 
-    //! width of a detector module's spacer
+    //! Width of a detector module's spacer
     double m_ModuleGasSpacerWidth;
 
-    //! size of the border between a detector module's perimeter and electrode
-    double m_ModuleElectrodeBorder;
-
-    //! height of the inner polystyrene-filler sheet
+    //! Height of the inner polystyrene-filler sheet
     double m_ModulePolystyreneInnerHeight;
 
-    //! height of the outer polystyrene-filler sheet
+    //! Height of the outer polystyrene-filler sheet
     double m_ModulePolystyreneOuterHeight;
 
-    //! width of one scintillator strip (cm), including the TiO2 coating
+    //! Width of one scintillator strip (cm), including the TiO2 coating
     double m_ScintWidth;
 
-    //! height of one scintillator strip (cm), including the TiO2 coating
+    //! Height of one scintillator strip (cm), including the TiO2 coating
     double m_ScintHeight;
 
-    //! radius (cm) of the central bore in the scintillator strip
+    //! Radius (cm) of the central bore in the scintillator strip
     double m_ScintBoreRadius;
 
-    //! radius (cm) of the central WLS fiber in the scintillator strip
+    //! Radius (cm) of the central WLS fiber in the scintillator strip
     double m_ScintFiberRadius;
 
-    //! thickness (cm) of the TiO2 coating on the top (and bottom) of the scintillator strip
+    //! Thickness (cm) of the TiO2 coating on the top (and bottom) of the scintillator strip
     double m_ScintTiO2ThicknessTop;
 
-    //! thickness (cm) of the TiO2 coating on the left (and right) side of the scintillator strip
+    //! Thickness (cm) of the TiO2 coating on the left (and right) side of the scintillator strip
     double m_ScintTiO2ThicknessSide;
 
-    //! length along z of the chimney hole
+    //! Length along z of the chimney hole
     double m_ChimneyLength;
 
-    //! width of the chimney hole
+    //! Width of the chimney hole
     double m_ChimneyWidth;
 
-    //! thickness of the chimney's iron cover plate
+    //! Thickness of the chimney's iron cover plate
     double m_ChimneyCoverThickness;
 
-    //! inner radius of the chimney housing
+    //! Inner radius of the chimney housing
     double m_ChimneyHousingInnerRadius;
 
-    //! outer radius of the chimney housing
+    //! Outer radius of the chimney housing
     double m_ChimneyHousingOuterRadius;
 
-    //! inner radius of the chimney shield
+    //! Inner radius of the chimney shield
     double m_ChimneyShieldInnerRadius;
 
-    //! outer radius of the chimney shield
+    //! Outer radius of the chimney shield
     double m_ChimneyShieldOuterRadius;
 
-    //! inner radius of the chimney pipe
+    //! Inner radius of the chimney pipe
     double m_ChimneyPipeInnerRadius;
 
-    //! outer radius of the chimney pipe
+    //! Outer radius of the chimney pipe
     double m_ChimneyPipeOuterRadius;
 
-    //! thickness of the radial rib that supports the solenoid / inner detectors
+    //! Thickness of the radial rib that supports the solenoid / inner detectors
     double m_RibThickness;
 
-    //! width of the cable-services channel at each end
+    //! Width of the cable-services channel at each end
     double m_CablesWidth;
 
-    //! width of the central brace in the middle of the cable-services channel
+    //! Width of the central brace in the middle of the cable-services channel
     double m_BraceWidth;
 
-    //! width of the central brace in the middle of the cable-services channel in the chimney sector
+    //! Width of the central brace in the middle of the cable-services channel in the chimney sector
     double m_BraceWidthChimney;
 
-    //! width of the innermost-module support plate
+    //! Width of the innermost-module support plate
     double m_SupportPlateWidth;
 
-    //! height of the innermost-module support plate
+    //! Height of the innermost-module support plate
     double m_SupportPlateHeight;
 
-    //! length of the innermost-module support plate
+    //! Length of the innermost-module support plate
     double m_SupportPlateLength;
 
-    //! length of the innermost-module support plate in the chimney sector
+    //! Length of the innermost-module support plate in the chimney sector
     double m_SupportPlateLengthChimney;
 
-    //! width of the innermost-module support plate's bracket
+    //! Width of the innermost-module support plate's bracket
     double m_BracketWidth;
 
-    //! thickness of the innermost-module support plate's bracket
+    //! Thickness of the innermost-module support plate's bracket
     double m_BracketThickness;
 
-    //! length of the innermost-module support plate's bracket
+    //! Length of the innermost-module support plate's bracket
     double m_BracketLength;
 
-    //! width of the innermost-module support plate's bracket's rib
+    //! Width of the innermost-module support plate's bracket's rib
     double m_BracketRibWidth;
 
-    //! thickness of the innermost-module support plate's bracket's rib
+    //! Thickness of the innermost-module support plate's bracket's rib
     double m_BracketRibThickness;
 
-    //! distance from support plate's end of bracket
-    double m_BracketInset;
-
-    //! inner radius of the innermost-module support plate's bracket
+    //! Inner radius of the innermost-module support plate's bracket
     double m_BracketInnerRadius;
 
-    //! angular width of the innermost-module support plate's bracket's cutout
+    //! Distance from support plate's end of bracket
+    double m_BracketInset;
+
+    //! Angular width of the innermost-module support plate's bracket's cutout
     double m_BracketCutoutDphi;
 
-    //! Flag to indicate whether layer contains RPCs (true) or scintillators (false)
-    bool m_HasRPCs[NLAYER + 1];
+    //! Number of preamplifier readout stations
+    int m_NReadoutStation;
 
-    //! ReconstructionShift of each layer along x  in local system. displacement, not alignment here
-    double m_LocalReconstructionShift_X[NSECTOR + 1][NLAYER + 1];
+    //! Selector for phi (true) or z (false) readout station
+    bool m_ReadoutStationIsPhi[NSTATION];
 
-    //! ReconstructionShift of each layer along y  in local system. displacement, not alignment here
-    double m_LocalReconstructionShift_Y[NSECTOR + 1][NLAYER + 1];
+    //! Position of each readout station along its relevant axis
+    double m_ReadoutStationPosition[NSTATION];
 
-    //! ReconstructionShift of each layer along z  in local system. displacement, not alignment here
-    double m_LocalReconstructionShift_Z[NSECTOR + 1][NLAYER + 1];
+    //! Length of the readout station
+    double m_ReadoutContainerLength;
 
-    //! flag of z-phi planes flip for scintillator layers
-    bool m_Flip[BKLM_BACKWARD + 1][NSECTOR + 1][NSCINTLAYER + 1];
+    //! Width of the readout station
+    double m_ReadoutContainerWidth;
 
-    //!number of the phi strips on each layer.
-    int m_PhiStripNumber[NLAYER + 1];
+    //! Height of the readout station
+    double m_ReadoutContainerHeight;
 
-    //!width of the phi strips on each layer.
-    double m_PhiStripWidth[NLAYER + 1];
+    //! Length of the readout carrier card
+    double m_ReadoutCarrierLength;
 
-    //!width of the z strips on each layer.
-    double m_ZStripWidth[NLAYER + 1];
+    //! Width of the readout carrier card
+    double m_ReadoutCarrierWidth;
 
-    //!dLength of the phi scintillators.
-    double m_PhiScintsDlength[NSCINTLAYER + 1][NSCINT + 1];
+    //! Height of the readout carrier card
+    double m_ReadoutCarrierHeight;
 
-    //!dLength of the z scintillators.
-    double m_ZScintsDlength[NSCINTLAYER + 1][NSCINT + 1];
+    //! Length of the preamplifier card
+    double m_ReadoutPreamplifierLength;
 
-    //! map of <volumeIDs, defined modules>, internal use only
-    //std::map<int, bklm::Module> m_Modules;
+    //! Width of the preamplifier card
+    double m_ReadoutPreamplifierWidth;
 
-    //! static pointer to the singleton instance of this class
-    //static GeometryPar* m_Instance;
+    //! Height of the preamplifier card
+    double m_ReadoutPreamplifierHeight;
 
-    //! optional comment
+    //! Positions of the preamplifiers along the length of the carrier card
+    std::vector<double> m_ReadoutPreamplifierPosition;
+
+    //! Length of the readout connectors pair
+    double m_ReadoutConnectorsLength;
+
+    //! Width of the readout connectors pair
+    double m_ReadoutConnectorsWidth;
+
+    //! Height of the readout connectors pair
+    double m_ReadoutConnectorsHeight;
+
+    //! Position of the readout connectors pair along the length of the carrier card
+    double m_ReadoutConnectorsPosition;
+
+    //! MPPC housing radius
+    double m_MPPCHousingRadius;
+
+    //! MPPC housing length
+    double m_MPPCHousingLength;
+
+    //! MPPC length
+    double m_MPPCLength;
+
+    //! MPPC width
+    double m_MPPCWidth;
+
+    //! MPPC height
+    double m_MPPCHeight;
+
+    //! Reconstruction dx in local system. displacement, not alignment
+    double m_LocalReconstructionShiftX[2][NSECTOR][NLAYER];
+
+    //! Reconstruction dy in local system. displacement, not alignment
+    double m_LocalReconstructionShiftY[2][NSECTOR][NLAYER];
+
+    //! Reconstruction dz in local system. displacement, not alignment
+    double m_LocalReconstructionShiftZ[2][NSECTOR][NLAYER];
+
+    //! Flag of z-phi planes flip *for scintillator layers only*
+    bool m_IsFlipped[2][NSECTOR][NSCINTLAYER];
+
+    //! Optional comment
     std::string m_comment;
 
-    ClassDef(BKLMGeometryPar, 3);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(BKLMGeometryPar, 4);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 } // end of namespace Belle2

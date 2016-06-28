@@ -50,9 +50,6 @@ namespace Belle2 {
     //! Get the maximum global time for a recorded sim hit
     double getHitTimeMax(void) const { return m_HitTimeMax; }
 
-    //! Get the flag that controls whether to do the neutron-background study
-    bool getDoBackgroundStudy(void) const { return (m_DoBackgroundStudy != 0.0); }
-
     //! Get number of divisions for phi strips
     int getNPhiDivision(void)  const {return m_NPhiDiv;}
 
@@ -130,7 +127,7 @@ namespace Belle2 {
     //! optional comment
     std::string m_comment;
 
-    ClassDef(BKLMSimulationPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(BKLMSimulationPar, 2);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 

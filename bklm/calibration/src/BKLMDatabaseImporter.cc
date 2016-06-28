@@ -50,7 +50,7 @@ void BKLMDatabaseImporter::importBklmElectronicMapping()
 
     for (GearDir& slot : copper.getNodes("Slot")) {
       int slotId = slot.getInt("@id");
-      //B2DEBUG(1, "slotid: " << slotId)
+      //B2DEBUG(1, "slotid: " << slotId);
       for (GearDir& lane : slot.getNodes("Lane")) {
         int laneId = lane.getInt("@id");
         for (GearDir& axis : lane.getNodes("Axis")) {
@@ -120,12 +120,14 @@ void BKLMDatabaseImporter::exportBklmGeometryPar()
 {
   DBObjPtr<BKLMGeometryPar> element("BKLMGeometryPar");
 
-  B2INFO("BKLMGeometryPar version: " << element->getVersion() << ", global rotation angle " << element->getRotation() <<
-         ", module height: " << element->getModuleHeight() << ", module frame width: " << element->getModuleFrameWidth() <<
-         ", module frame thickness: " << element->getModuleFrameThickness() << ", local reconstructure shift (x,y,z) of sector.1 layer.1: ("
-         <<
-         element->getLocalReconstructionShiftX(1, 1) << ", " << element->getLocalReconstructionShiftY(1,
-             1) << ", " << element->getLocalReconstructionShiftZ(1, 1) << ")");
+  B2INFO("BKLMGeometryPar version: " << element->getVersion() <<
+         ", global rotation angle " << element->getRotation() <<
+         ", module frame width: " << element->getModuleFrameWidth() <<
+         ", module frame thickness: " << element->getModuleFrameThickness() <<
+         ", local reconstruction shift (x,y,z) of forward sector 1 layer 1: (" <<
+         element->getLocalReconstructionShiftX(1, 1, 1) << ", " <<
+         element->getLocalReconstructionShiftY(1, 1, 1) << ", " <<
+         element->getLocalReconstructionShiftZ(1, 1, 1) << ")");
 }
 
 void BKLMDatabaseImporter::importBklmSimulationPar()
@@ -151,7 +153,7 @@ void BKLMDatabaseImporter::exportBklmSimulationPar()
 
   DBObjPtr<BKLMSimulationPar> element("BKLMSimulationPar");
 
-  B2INFO("DoBackgroundStudy: " << element->getDoBackgroundStudy());
+  B2INFO("HitTimeMax: " << element->getHitTimeMax());
   B2INFO("weight table: ");
   for (int ii = 0; ii < element->getNPhiDivision(); ii++) {
     for (int jj = 1; jj <= element->getNPhiMultiplicity(ii); jj++) {

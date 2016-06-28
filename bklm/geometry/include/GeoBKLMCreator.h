@@ -115,27 +115,30 @@ namespace Belle2 {
       void putLayer1BracketsInInnerVoid(G4LogicalVolume*, bool);
 
       //! Put the layers into each sector
-      void putLayersInSector(G4LogicalVolume*, bool, bool);
+      void putLayersInSector(G4LogicalVolume*, int, int, bool);
 
       //! Put the solenoid's cooling chimney into the backward top sector
       void putChimneyInLayer(G4LogicalVolume*, int);
 
       //! Put the module (and enclosing air gap) into each layer
-      void putModuleInLayer(G4LogicalVolume*, const Module*, int, bool);
+      void putModuleInLayer(G4LogicalVolume*, int, int, int, bool, bool);
 
       //! Put the RPCs into each detector module's interior (module is itself in an air gap)
       void putRPCsInInterior(G4LogicalVolume*, int, bool);
 
       //! Put the scintillators into each detector module's interior (module is itself in an air gap)
-      void putScintsInInterior(G4LogicalVolume*, const Module*, int, bool);
-
-      //! get pointer to sector logical volume
-      G4LogicalVolume* getSectorLogical(int, bool, bool);
+      void putScintsInInterior(G4LogicalVolume*, int, int, int, bool);
 
       //! Get pointer to scintillator logical volume
-      G4LogicalVolume* getScintLogical(double, double, double);
+      G4LogicalVolume* getScintLogical(double, double, double, double);
 
-      //! get shape corresponding to the solenoid (for subtraction)
+      //! Get pointer to MPPC-container logical volume
+      G4LogicalVolume* getMPPCHousingLogical(void);
+
+      //! Get pointer to readout-container logical volume
+      G4LogicalVolume* getReadoutContainerLogical(void);
+
+      //! Get shape corresponding to the solenoid (for subtraction)
       G4Tubs* getSolenoidTube(void);
 
       //! convert G4VSolid's name to corresponding G4LogicalVolume name
@@ -162,38 +165,53 @@ namespace Belle2 {
       //! Pointer to solid for cap
       G4Polyhedra* m_CapSolid;
 
-      //! Pointer to logical volumes for cap
+      //! Pointer to logical volumes for cap [hasChimney]
       G4LogicalVolume* m_CapLogical[2];
 
-      //! Pointer to solid for inner iron
+      //! Pointer to solid for inner iron [hasInnerSupport | hasChimney]
       G4VSolid* m_InnerIronSolid;
 
-      //! Pointer to logical volumes for inner iron
+      //! Pointer to logical volumes for inner iron [hasInnerSupport | hasChimney]
       G4LogicalVolume* m_InnerIronLogical[4];
 
       //! Pointer to solid for inner air
       G4VSolid* m_InnerAirSolid;
 
-      //! Pointer to logical volumes for inner air
+      //! Pointer to logical volumes for inner air [hasInnerSupport | hasChimney]
       G4LogicalVolume* m_InnerAirLogical[4];
 
-      //! Pointer to logical volumes for support structure
+      //! Pointer to logical volumes for support structure [hasChimney]
       G4LogicalVolume* m_SupportLogical[2];
 
       //! Pointer to logical volume for bracket
       G4LogicalVolume* m_BracketLogical;
 
-      //! Pointers to solids for iron in each layer
-      G4Polyhedra* m_LayerIronSolid[NLAYER + 1];
+      //! Pointers to solids for iron in each layer [layer-1]
+      G4Polyhedra* m_LayerIronSolid[NLAYER];
 
-      //! Pointers to logical volumes for iron in each layer
-      G4LogicalVolume* m_LayerIronLogical[2 * (NLAYER + 1)];
+      //! Pointers to logical volumes for iron in each layer [isFlipped | hasChimney | layer-1]
+      G4LogicalVolume* m_LayerIronLogical[4 * NLAYER];
+
+      //! Pointers to solids for air gap in each layer [hasChimney | layer-1]
+      G4Box* m_LayerGapSolid[2 * NLAYER];
+
+      //! Pointers to logical volumes for air gap in each layer [isFlipped | hasChimney | layer-1]
+      G4LogicalVolume* m_LayerGapLogical[4 * NLAYER];
+
+      //! Pointers to logical volumes for detector modules in each layer's air gap [hasChimney | layer-1]
+      G4LogicalVolume* m_LayerModuleLogical[2 * NLAYER];
 
       //! Pointer to solid for sector's enclosing tube
       G4Tubs* m_SectorTube;
 
-      //! Pointers to logical volumes for each sector
-      G4LogicalVolume* m_SectorLogical[NSECTOR];
+      //! Pointers to logical volumes for each sector [fb-1][sector-1]
+      G4LogicalVolume* m_SectorLogical[2][NSECTOR];
+
+      //! Pointer to logical volume for MPPC housing
+      G4LogicalVolume* m_MPPCHousingLogical;
+
+      //! Pointer to logical volume for scint preamplifier/carrier container
+      G4LogicalVolume* m_ReadoutContainerLogical;
 
       //! Pointer to solid for solenoid
       G4Tubs* m_SolenoidTube;

@@ -9,21 +9,43 @@ from vertex import *
 from analysisPath import *
 
 
-def inputMdst(filename, path=analysis_main):
+def inputMdst(environmentType, filename, path=analysis_main):
     """
     Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
 
+    The correct environment (e.g. magnetic field settings) are determined from the specified environment type.
+    The currently available environments are:
+       o) 'MC5'     : for analysis of Belle II MC samples produced with releases prior to build-2016-05-01.
+                      This environment sets the constant magnetic field (B = 1.5 T)
+       o) 'default' : for analysis of Belle II MC samples produced with releases with build-2016-05-01 or newer
+                      This environment sets the default magnetic field (see geometry settings)
+       o) 'Belle'   : for analysis of converted (or during of conversion of) Belle MC/DATA samples
+       o) 'None'    : for analysis of generator level information or during simulation/reconstruction of
+                      previously generated events
+
+    @param environmentType type of the environment to be loaded
     @param filename the name of the file to be loaded
     @param modules are added to this path
     """
 
-    inputMdstList([filename], path)
+    inputMdstList(environmentType, [filename], path)
 
 
-def inputMdstList(filelist, path=analysis_main):
+def inputMdstList(environmentType, filelist, path=analysis_main):
     """
     Loads the specified ROOT (DST/mDST/muDST) files with the RootInput module.
 
+    The correct environment (e.g. magnetic field settings) are determined from the specified environment type.
+    The currently available environments are:
+       o) 'MC5'     : for analysis of Belle II MC samples produced with releases prior to build-2016-05-01.
+                      This environment sets the constant magnetic field (B = 1.5 T)
+       o) 'default' : for analysis of Belle II MC samples produced with releases with build-2016-05-01 or newer
+                      This environment sets the default magnetic field (see geometry settings)
+       o) 'Belle'   : for analysis of converted (or during of conversion of) Belle MC/DATA samples
+       o) 'None'    : for analysis of generator level information or during simulation/reconstruction of
+                      previously generated events
+
+    @param environmentType type of the environment to be loaded
     @param filelist the filename list of files to be loaded
     @param modules are added to this path
     """
@@ -34,8 +56,22 @@ def inputMdstList(filelist, path=analysis_main):
     progress = register_module('ProgressBar')
     path.add_module(progress)
 
-    gearbox = register_module('Gearbox')
-    path.add_module(gearbox)
+    environToMagneticField = {'MC5': 'MagneticFieldConstant',
+                              'default': 'MagneticField',
+                              'Belle': 'MagneticFieldConstantBelle'}
+
+    if environmentType in environToMagneticField:
+        path.add_module('Gearbox')
+        path.add_module('Geometry', ignoreIfPresent=False, components=[environToMagneticField.get(environmentType)])
+    elif environmentType is 'None':
+        B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
+    else:
+        environments = ''
+        for key in environToMagneticField.keys():
+            environments += key + ' '
+
+        environments += 'None.'
+        B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following: ' + environments)
 
 
 def outputMdst(filename, path=analysis_main):

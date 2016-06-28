@@ -268,8 +268,8 @@ namespace Belle2 {
 
     DataArray array(buffer, bufferSize, m_swapBytes);
 
-    const int numWindows = 4; // to be checked with Lynn
-    int hitSize = 22 + 64 / 2 * numWindows; // if header repeates with every hit (Lynn?)
+    const int numWindows = 4;
+    int hitSize = 22 + 32 * numWindows; //not clear: header repeates with every hit or not
     int Nhits = bufferSize / hitSize;
 
     unsigned word = 0;
@@ -277,7 +277,7 @@ namespace Belle2 {
 
       word = array.getWord(); // word 0 (header with Type/Version)
       if ((word & 0xFFFF) != 0xAAAA) {
-        B2ERROR("TOPUnpacker: corrupted data for Type2or3Ver1 - no header word 0xAAAA");
+        B2ERROR("TOPUnpacker: corrupted data for Type2or3Ver1 - no 0xAAAA in header word");
         return array.getRemainingWords();
       }
 
@@ -286,6 +286,8 @@ namespace Belle2 {
       unsigned short scrodID = (word >> 9) & 0x7F;
 
       word = array.getWord(); // word 2
+      // not clear where to find carrier, asic and channel numbers for FE data
+      // should be in word 1 or 2
 
       // feature-extracted data (positive signal)
       word = array.getWord(); // word 3
@@ -336,7 +338,8 @@ namespace Belle2 {
       word = array.getWord(); // word 16
       word = array.getWord(); // word 17
       word = array.getWord(); // word 18
-      //  unsigned short numPoints = (word >> 16) & 0xFFFF;
+      // int numPoints = (word >> 16) & 0xFFFF;
+      int numPoints = 32 * numWindows;
       unsigned short carrier = (word >> 14) & 0x03;
       unsigned short asic = (word >> 12) & 0x03;
       unsigned short asicChannel = (word >> 9) & 0x07;
@@ -345,8 +348,8 @@ namespace Belle2 {
         B2ERROR("TOPUnpacker: Type2or3Ver1 - window numbers differ " << window <<
                 " " << convertedAddr);
 
-      std::vector<TOPRawDigit*> digits; // needed for creating relations to waveforms
       // store to raw digits (carrier/asic/channel not available before waveform header!)
+      std::vector<TOPRawDigit*> digits; // needed for creating relations to waveforms
       if (abs(valuePeak_p) > 1) {
         auto* digit = rawDigits.appendNew(scrodID);
         digit->setCarrierNumber(carrier);
@@ -362,7 +365,7 @@ namespace Belle2 {
         digit->setValueFall0(valueFall0_p);
         digit->setValueFall1(valueFall1_p);
         digit->setIntegral(integral_p);
-        digit->setErrorFlags(qualityFlags_p); // temporary place to store!
+        digit->setErrorFlags(qualityFlags_p); // temporary solution !
         digits.push_back(digit);
       }
       if (abs(valuePeak_n) > 1) {
@@ -380,7 +383,7 @@ namespace Belle2 {
         digit->setValueFall0(valueFall0_n);
         digit->setValueFall1(valueFall1_n);
         digit->setIntegral(integral_n);
-        digit->setErrorFlags(qualityFlags_n); // temporary place to store!
+        digit->setErrorFlags(qualityFlags_n); // temporary solution !
         digits.push_back(digit);
       }
 
@@ -390,7 +393,7 @@ namespace Belle2 {
 
       // unpack waveforms
       std::vector<unsigned short> adcData;
-      for (int i = 0; i < numWindows; i++) {
+      for (int i = 0; i < numPoints; i++) {
         word = array.getWord();
         adcData.push_back(word & 0xFFFF);
         adcData.push_back((word >> 16) & 0xFFFF);
@@ -408,7 +411,7 @@ namespace Belle2 {
       }
 
       // determine hardware channel and pixelID (valid only if feemap available!)
-      const auto& mapper = m_topgp->getChannelMapper(ChannelMapper::c_IRSX);
+      const auto& mapper = m_topgp->getChannelMapper();
       unsigned channel = mapper.getChannel(boardstack, carrier, asic, asicChannel);
       int pixelID = mapper.getPixelID(channel);
 

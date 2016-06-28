@@ -15,7 +15,7 @@
       <FinesseSlot>B</FinesseSlot>
     </Boardstack>
     <Boardstack col="2">
-      <SCRODid>56</SCRODid>
+      <SCRODid>68</SCRODid>
       <COPPERid>1001</COPPERid> <!-- arbitrary! -->
       <FinesseSlot>C</FinesseSlot>
     </Boardstack>

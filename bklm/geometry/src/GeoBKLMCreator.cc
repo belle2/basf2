@@ -81,6 +81,7 @@ namespace Belle2 {
         m_SectorLogical[0][sector] = NULL;
         m_SectorLogical[1][sector] = NULL;
       }
+      m_MPPCHousingLogical = NULL;
       m_ReadoutContainerLogical = NULL;
       m_SolenoidTube = NULL;
       m_ScintLogicals.clear();

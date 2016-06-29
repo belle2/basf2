@@ -1,8 +1,8 @@
-import os
-import sys
-import math
 import numpy as np
 import numpy.random
+
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 
 import basf2
@@ -13,17 +13,8 @@ gSystem.Load('libtracking')
 gSystem.Load('libtracking_trackFindingCDC')
 
 from ROOT import Belle2  # make Belle2 namespace available
-from ROOT import std
 
-from tracking.utilities import NonstrictChoices
 from tracking.validation.utilities import prob
-
-import tracking.validation.harvesting as harvesting
-import tracking.validation.refiners as refiners
-import tracking.metamodules as metamodules
-
-from tracking.run.event_generation import StandardEventGenerationRun
-from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 
 import logging
 
